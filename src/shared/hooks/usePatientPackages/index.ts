@@ -1,6 +1,6 @@
 export {
-  useAddPatientPackage,
-  useConsumePackageSession,
-  usePackageOfferings,
+  type PatientPackageUpdateVars,
   usePatientPackages,
+  usePatientPurchases,
+  useUpdatePatientPackage,
 } from './usePatientPackages.ts';

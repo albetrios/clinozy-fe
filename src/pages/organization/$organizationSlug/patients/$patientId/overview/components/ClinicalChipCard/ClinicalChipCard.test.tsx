@@ -5,9 +5,23 @@ import { axe } from 'vitest-axe';
 
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
+import type { ClinicalChip } from '../../../shared/patient-clinical.ts';
 import { ClinicalChipCard, type ClinicalChipCardProps } from './ClinicalChipCard.tsx';
 
 const ID = 'clinical-card-complaints';
+
+const TANNING: ClinicalChip = {
+  id: 'pcn_tanning',
+  text: 'Tanning on face',
+  pending: false,
+  fresh: false,
+};
+const UNEVEN: ClinicalChip = {
+  id: 'pcn_uneven',
+  text: 'Uneven skin tone',
+  pending: false,
+  fresh: true,
+};
 
 async function renderCard(props: Partial<ClinicalChipCardProps> = {}) {
   const onAdd = vi.fn();
@@ -16,8 +30,8 @@ async function renderCard(props: Partial<ClinicalChipCardProps> = {}) {
     <ClinicalChipCard
       title="Complaints"
       tone="blush"
-      items={['Tanning on face', 'Uneven skin tone']}
-      fresh={new Set(['Uneven skin tone'])}
+      items={[TANNING, UNEVEN]}
+      loading={false}
       onAdd={onAdd}
       onRemove={onRemove}
       canEdit
@@ -65,11 +79,33 @@ describe('ClinicalChipCard (H:780; patient-file.md:53)', () => {
   it('removes a chip at once', async () => {
     const { user, onRemove } = await renderCard();
     await user.click(screen.getByRole('button', { name: 'Remove Tanning on face' }));
-    expect(onRemove).toHaveBeenCalledWith('Tanning on face');
+    expect(onRemove).toHaveBeenCalledWith(TANNING);
+  });
+
+  it('keeps a chip that is still saving from being removed', async () => {
+    await renderCard({
+      items: [TANNING, { id: 'saving:acne', text: 'Acne', pending: true, fresh: true }],
+    });
+    const chip = screen.getAllByTestId(`${ID}-chip`)[1];
+    expect(chip).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByRole('button', { name: 'Remove Acne' })).toBeDisabled();
+    expect(screen.getByTestId(`${ID}-new`)).toHaveTextContent('1 new');
+  });
+
+  it('shows bars, and no input, while the notes load', async () => {
+    const { container } = await renderCard({ items: [], loading: true });
+    const card = screen.getByTestId(ID);
+    expect(within(card).getByTestId('skeleton-rows')).toHaveAttribute(
+      'aria-busy',
+      'true',
+    );
+    expect(card).not.toHaveTextContent('Nothing added yet');
+    expect(within(card).queryByRole('textbox')).not.toBeInTheDocument();
+    expect(await axe(container)).toHaveNoViolations();
   });
 
   it('reads without Patients edit, and says when it is empty', async () => {
-    await renderCard({ items: [], fresh: new Set(), canEdit: false });
+    await renderCard({ items: [], canEdit: false });
     const card = screen.getByTestId(ID);
     expect(card).toHaveTextContent('Nothing added yet');
     expect(within(card).queryByRole('textbox')).not.toBeInTheDocument();

@@ -1,208 +1,383 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { isHttpError } from '@/shared/errors/HttpError.ts';
+vi.mock('@/core/http/api.ts', () => ({
+  api: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
+}));
+import { api } from '@/core/http/api.ts';
 
-import type { PrescriptionItem } from './clinic-schema.ts';
-import { patientRef } from './fixtures/patients.fixtures.ts';
-import { staffRef } from './fixtures/staff.fixtures.ts';
-import { clinicFixtures, resetClinicFixtures } from './fixtures/world.fixtures.ts';
-import { medicineForm } from './medicines-contracts.ts';
-import { patientQueryKeys } from './patients-api.ts';
 import {
+  approvePrescription,
   createPrescription,
   deletePrescription,
   fetchPrescription,
-  fetchRxCatalog,
-  fetchRxSheetContext,
+  fetchRxSheetClinic,
   listPatientPrescriptions,
-  type PrescriptionInput,
-  prescriptionQueryKeys,
+  listPrescriptionKits,
+  listRxMedicines,
   restorePrescription,
   updatePrescription,
 } from './prescriptions-api.ts';
+import type { PrescriptionFields } from './prescriptions-contracts.ts';
 
-const DHARTI = patientRef('Dharti Galani');
-const ARPITA = patientRef('Arpita Kachhadiya');
-const DR_DRASHTI = staffRef('DD');
+const PATIENT_ID = 'pat_priya0000000000000000';
+const RX_ID = 'rx_rx50000000000000000000';
+const NISHA = 'mem_nisha0000000000000000';
+const KEY = 'key-0000000000000000';
 
-beforeEach(() => resetClinicFixtures());
-afterEach(() => resetClinicFixtures());
+/** A prescription as clinozy-be answers it: the lines as written (absent fields left out). */
+const rxRow = (patch: Record<string, unknown> = {}) => ({
+  id: RX_ID,
+  prescription_number: 500,
+  patient_id: PATIENT_ID,
+  appointment_id: null,
+  doctor_membership_id: NISHA,
+  prescription_date: '2026-10-01',
+  items: [
+    {
+      medicine_name: 'Flubolt 400',
+      dose_night: 1,
+      meal: 'after',
+      quantity: 8,
+      remarks: '10 days',
+    },
+    { medicine_name: 'Clonix-B Lotion', timing: 'morning_night', body_part: 'scalp' },
+  ],
+  advice: 'Avoid sun',
+  lab_report: null,
+  procedure_today: null,
+  follow_up_date: null,
+  print_language: 'english',
+  status: 'draft',
+  approved_at: null,
+  approved_by_membership_id: null,
+  created_at: '2026-10-01T05:00:00.000Z',
+  updated_at: '2026-10-01T05:00:00.000Z',
+  ...patch,
+});
 
-function line(name: string, fields: Partial<PrescriptionItem> = {}): PrescriptionItem {
-  return {
-    medicineId: null,
-    medicineName: name,
-    doseMorning: 0,
-    doseAfternoon: 0,
-    doseNight: 1,
-    sos: false,
-    meal: 'after',
-    timing: null,
-    timingText: null,
-    bodyPart: null,
-    bodyPartText: null,
-    qty: 8,
-    remarks: null,
-    ...fields,
-  };
-}
+/** One list page as clinozy-be answers it. */
+const page = (rows: unknown[], next: string | null = null) => ({
+  data: rows,
+  meta: {
+    request_id: 'req',
+    pagination: { per_page: 100, next, has_more: next !== null },
+  },
+});
 
-function input(fields: Partial<PrescriptionInput> = {}): PrescriptionInput {
-  return {
-    patientId: DHARTI,
-    appointmentId: null,
-    doctorId: DR_DRASHTI,
-    date: '2026-10-03',
-    items: [line('Glycolac Cream')],
-    advice: null,
-    labReport: null,
-    procedureToday: null,
-    followUpDate: null,
-    ...fields,
-  };
-}
+const one = (row: unknown) => ({ data: row, meta: { request_id: 'req' } });
 
-async function refusal(write: Promise<unknown>) {
-  try {
-    await write;
-  } catch (error) {
-    return error;
-  }
-  throw new Error('expected the write to be refused');
-}
+/** What a drawer save writes. */
+const FIELDS: PrescriptionFields = {
+  doctorId: NISHA,
+  date: '2026-10-03',
+  items: [
+    {
+      medicineId: 'med_flubolt0000000000000',
+      medicineName: 'Flubolt 400',
+      doseMorning: 0,
+      doseAfternoon: 0,
+      doseNight: 1,
+      sos: false,
+      meal: 'after',
+      timing: null,
+      timingText: null,
+      bodyPart: 'other',
+      bodyPartText: 'Neck',
+      qty: 8,
+      remarks: null,
+    },
+  ],
+  advice: null,
+  labReport: 'CBC',
+  procedureToday: null,
+};
 
-describe('prescriptions (S:1641)', () => {
-  it('sits under the patients key, so a saved Rx refreshes the file', () => {
-    expect(prescriptionQueryKeys.patient(DHARTI).slice(0, 2)).toEqual([
-      ...patientQueryKeys.all,
+/** The body every write of {@link FIELDS} sends. */
+const BODY = {
+  doctor_membership_id: NISHA,
+  prescription_date: '2026-10-03',
+  items: [
+    {
+      medicine_name: 'Flubolt 400',
+      medicine_id: 'med_flubolt0000000000000',
+      dose_morning: 0,
+      dose_afternoon: 0,
+      dose_night: 1,
+      is_sos: false,
+      meal: 'after',
+      timing: null,
+      timing_text: null,
+      body_part: 'other',
+      body_part_text: 'Neck',
+      quantity: 8,
+      remarks: null,
+    },
+  ],
+  advice: null,
+  lab_report: 'CBC',
+  procedure_today: null,
+};
+
+const PARAMS = { patient_id: PATIENT_ID, patient_prescription_id: RX_ID };
+
+beforeEach(() => {
+  vi.mocked(api.get).mockReset();
+  vi.mocked(api.post).mockReset();
+  vi.mocked(api.patch).mockReset();
+  vi.mocked(api.delete).mockReset();
+});
+
+describe('the patient’s prescriptions', () => {
+  it('reads every page newest first and reads an absent line field as none', async () => {
+    vi.mocked(api.get)
+      .mockResolvedValueOnce(page([rxRow()], 'cursor-2') as never)
+      .mockResolvedValueOnce(
+        page([
+          rxRow({ id: 'rx_rx49900000000000000000', prescription_number: 499 }),
+        ]) as never,
+      );
+    const rows = await listPatientPrescriptions(PATIENT_ID);
+    expect(api.get).toHaveBeenNthCalledWith(
+      1,
+      '/app/patients/{patient_id}/prescriptions',
+      {
+        params: { patient_id: PATIENT_ID },
+        query: { sort: 'prescription_date', order: 'desc', limit: 100, after: undefined },
+      },
+    );
+    expect(vi.mocked(api.get).mock.calls[1]?.[1]).toMatchObject({
+      query: { after: 'cursor-2' },
+    });
+    expect(rows.map((row) => row.seq)).toEqual([500, 499]);
+    expect(rows[0]).toMatchObject({
+      id: RX_ID,
+      seq: 500,
+      patientId: PATIENT_ID,
+      doctorId: NISHA,
+      date: '2026-10-01',
+      status: 'draft',
+      advice: 'Avoid sun',
+      updatedAt: '2026-10-01T05:00:00.000Z',
+    });
+    expect(rows[0]?.items).toEqual([
+      {
+        medicineId: null,
+        medicineName: 'Flubolt 400',
+        doseMorning: 0,
+        doseAfternoon: 0,
+        doseNight: 1,
+        sos: false,
+        meal: 'after',
+        timing: null,
+        timingText: null,
+        bodyPart: null,
+        bodyPartText: null,
+        qty: 8,
+        remarks: '10 days',
+      },
+      expect.objectContaining({
+        medicineName: 'Clonix-B Lotion',
+        timing: 'morning_night',
+        bodyPart: 'scalp',
+        // No quantity on the wire: one.
+        qty: 1,
+      }),
     ]);
   });
 
-  it('reads one patient’s prescriptions, newest first', async () => {
-    const saved = await createPrescription(input({ date: '2099-12-31' }));
-    const list = await listPatientPrescriptions(DHARTI);
-    expect(list).toHaveLength(2);
-    expect(list[0]?.id).toBe(saved.id);
-    expect(list.map((rx) => rx.date)).toEqual(
-      [...list.map((rx) => rx.date)].sort().reverse(),
+  it('reads one prescription by its patient and id', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce(
+      one(
+        rxRow({ status: 'approved', approved_at: '2026-10-02T05:00:00.000Z' }),
+      ) as never,
     );
-    expect(list.every((rx) => rx.patientId === DHARTI)).toBe(true);
+    const rx = await fetchPrescription({ patientId: PATIENT_ID, prescriptionId: RX_ID });
+    expect(api.get).toHaveBeenCalledWith(
+      '/app/patients/{patient_id}/prescriptions/{patient_prescription_id}',
+      { params: PARAMS },
+    );
+    expect(rx).toMatchObject({
+      status: 'approved',
+      approvedAt: '2026-10-02T05:00:00.000Z',
+    });
   });
+});
 
-  it('numbers a new prescription and matches a typed name to the store’s medicine', async () => {
-    const saved = await createPrescription(input());
-    expect(saved.seq).toBeGreaterThan(501);
-    const [item] = saved.items;
-    const glycolac = clinicFixtures.medicines.snapshot(
-      (medicine) => medicine.name === 'Glycolac Cream',
-    )[0];
-    expect(item?.medicineId).toBe(glycolac?.id);
-    expect(await fetchPrescription(saved.id)).toMatchObject({ seq: saved.seq });
-  });
-
-  it('adds a name the store does not carry to Medical as a quick draft (S:378)', async () => {
-    const before = clinicFixtures.medicines.snapshot().length;
-    const saved = await createPrescription(input({ items: [line('  Minoxin 5% ')] }));
-    const quick = clinicFixtures.medicines.snapshot((medicine) => medicine.isQuick);
-    expect(clinicFixtures.medicines.snapshot()).toHaveLength(before + 1);
-    expect(quick.at(-1)).toMatchObject({ name: 'Minoxin 5%', mrp: 0, batches: [] });
-    expect(saved.items[0]).toMatchObject({
-      medicineName: 'Minoxin 5%',
-      medicineId: quick.at(-1)?.id,
+describe('writes', () => {
+  it('writes a draft with every line field, at the visit’s booking when there is one', async () => {
+    vi.mocked(api.post).mockResolvedValue(one(rxRow()) as never);
+    await createPrescription({
+      patientId: PATIENT_ID,
+      fields: FIELDS,
+      idempotencyKey: KEY,
+    });
+    expect(api.post).toHaveBeenLastCalledWith(
+      '/app/patients/{patient_id}/prescriptions',
+      {
+        params: { patient_id: PATIENT_ID },
+        body: BODY,
+        idempotencyKey: KEY,
+      },
+    );
+    await createPrescription({
+      patientId: PATIENT_ID,
+      fields: FIELDS,
+      appointmentId: 'appt_sana0000000000000000',
+      idempotencyKey: KEY,
+    });
+    expect(vi.mocked(api.post).mock.lastCall?.[1]).toMatchObject({
+      body: { ...BODY, appointment_id: 'appt_sana0000000000000000' },
     });
   });
 
-  it('refuses a prescription without a medicine — “Add a medicine”', async () => {
-    const error = await refusal(createPrescription(input({ items: [] })));
-    expect(isHttpError(error) && error.status).toBe(422);
-    expect(isHttpError(error) && error.message).toBe('Add a medicine');
+  it('saves a draft with the read’s updated_at', async () => {
+    vi.mocked(api.patch).mockResolvedValueOnce(one(rxRow()) as never);
+    await updatePrescription({
+      patientId: PATIENT_ID,
+      prescriptionId: RX_ID,
+      fields: FIELDS,
+      expectedUpdatedAt: '2026-10-01T05:00:00.000Z',
+      idempotencyKey: KEY,
+    });
+    expect(api.patch).toHaveBeenCalledWith(
+      '/app/patients/{patient_id}/prescriptions/{patient_prescription_id}',
+      {
+        params: PARAMS,
+        body: { ...BODY, expected_updated_at: '2026-10-01T05:00:00.000Z' },
+        idempotencyKey: KEY,
+      },
+    );
   });
 
-  it('refuses a dose tap above 2 and a quantity of 0', async () => {
-    const error = await refusal(
-      createPrescription(
-        input({ items: [line('Glycolac Cream', { doseNight: 3, qty: 0 })] }),
-      ),
+  it('approves, deletes with the reason and restores', async () => {
+    vi.mocked(api.post).mockResolvedValue(one(rxRow({ status: 'approved' })) as never);
+    const approved = await approvePrescription({
+      patientId: PATIENT_ID,
+      prescriptionId: RX_ID,
+      idempotencyKey: KEY,
+    });
+    expect(approved.status).toBe('approved');
+    expect(api.post).toHaveBeenLastCalledWith(
+      '/app/patients/{patient_id}/prescriptions/{patient_prescription_id}/approve',
+      { params: PARAMS, idempotencyKey: KEY },
     );
-    expect(isHttpError(error) && error.status).toBe(422);
-  });
 
-  it('saves changes, and deletes and restores a prescription', async () => {
-    const saved = await createPrescription(input());
-    const changed = await updatePrescription(
-      saved.id,
-      input({ advice: 'Avoid scrubs', items: [line('Epriva Tab', { qty: 20 })] }),
+    await deletePrescription({
+      patientId: PATIENT_ID,
+      prescriptionId: RX_ID,
+      reason: 'other',
+      note: 'Written twice',
+    });
+    expect(api.delete).toHaveBeenCalledWith(
+      '/app/patients/{patient_id}/prescriptions/{patient_prescription_id}',
+      { params: PARAMS, reason: 'other', note: 'Written twice' },
     );
-    expect(changed).toMatchObject({ seq: saved.seq, advice: 'Avoid scrubs' });
-    expect(changed.items).toHaveLength(1);
+    await deletePrescription({
+      patientId: PATIENT_ID,
+      prescriptionId: RX_ID,
+      reason: 'mistake',
+      note: null,
+    });
+    expect(vi.mocked(api.delete).mock.lastCall?.[1]).toEqual({
+      params: PARAMS,
+      reason: 'mistake',
+      note: undefined,
+    });
 
-    await deletePrescription(saved.id, 'mistake', null);
-    expect((await listPatientPrescriptions(DHARTI)).map((rx) => rx.id)).not.toContain(
-      saved.id,
-    );
-    await restorePrescription(saved.id);
-    expect((await listPatientPrescriptions(DHARTI)).map((rx) => rx.id)).toContain(
-      saved.id,
+    await restorePrescription({
+      patientId: PATIENT_ID,
+      prescriptionId: RX_ID,
+      idempotencyKey: KEY,
+    });
+    expect(api.post).toHaveBeenLastCalledWith(
+      '/app/patients/{patient_id}/prescriptions/{patient_prescription_id}/restore',
+      { params: PARAMS, idempotencyKey: KEY },
     );
   });
 });
 
-describe('the Rx drawer’s medicines (H:4806)', () => {
-  it('splits Topical from Oral by the name', () => {
-    expect(medicineForm('Clonix-B Lotion')).toBe('topical');
-    expect(medicineForm('Sunscreen SPF 50')).toBe('topical');
-    expect(medicineForm('Flubolt 400')).toBe('oral');
+describe('the drawer’s reads', () => {
+  it('reads the member’s kits A to Z, every page', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce(
+      page([
+        {
+          id: 'rxk_hairfall00000000000000',
+          owner_membership_id: NISHA,
+          name: 'Hair fall kit',
+          items: [{ medicine_name: 'Flubolt 400', dose_night: 1, quantity: 8 }],
+          created_at: '2026-10-01T05:00:00.000Z',
+          updated_at: '2026-10-01T05:00:00.000Z',
+        },
+      ]) as never,
+    );
+    const kits = await listPrescriptionKits();
+    expect(api.get).toHaveBeenCalledWith('/app/prescription-kits', {
+      query: { sort: 'name', order: 'asc', limit: 100, after: undefined },
+    });
+    expect(kits).toEqual([
+      {
+        id: 'rxk_hairfall00000000000000',
+        name: 'Hair fall kit',
+        items: [expect.objectContaining({ medicineName: 'Flubolt 400', qty: 8 })],
+      },
+    ]);
   });
 
-  it('offers the store’s medicines A to Z with their MRP and stock', async () => {
-    const { medicines } = await fetchRxCatalog(DHARTI);
-    const names = medicines.map((medicine) => medicine.name.toLowerCase());
-    expect(names).toEqual([...names].sort());
-    const glycolac = medicines.find((medicine) => medicine.name === 'Glycolac Cream');
-    expect(glycolac).toMatchObject({ form: 'topical', last: null });
-    expect(glycolac?.medicineId).toBeTruthy();
-    expect(glycolac?.stock).toBeGreaterThanOrEqual(0);
+  it('reads the store’s medicines with their stock', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce(
+      page([
+        {
+          id: 'med_flubolt0000000000000',
+          name: 'Flubolt 400',
+          composition: 'Fluconazole',
+          mrp: 120,
+          quantity: 8,
+          stock_level: 'ok',
+        },
+      ]) as never,
+    );
+    expect(await listRxMedicines()).toEqual([
+      {
+        id: 'med_flubolt0000000000000',
+        name: 'Flubolt 400',
+        composition: 'Fluconazole',
+        stock: 8,
+      },
+    ]);
+    expect(api.get).toHaveBeenCalledWith('/app/medicines', {
+      query: { sort: 'name', order: 'asc', limit: 100, after: undefined },
+    });
   });
 
-  it('adds the names the clinic’s Rx carry that the store lacks, with a last line', async () => {
-    const { medicines, often } = await fetchRxCatalog(ARPITA);
-    const flubolt = medicines.find((medicine) => medicine.name === 'Flubolt 400');
-    expect(flubolt).toMatchObject({ medicineId: null, stock: null, mrp: null });
-    expect(flubolt?.last).toMatchObject({ doseNight: 1, meal: 'after', qty: 8 });
-    // "Often prescribed" counts every patient's prescriptions (H:4806): five at most.
-    expect(often).toContain('Flubolt 400');
-    expect(often.length).toBeLessThanOrEqual(5);
-    // Another patient is offered the name too, with the clinic's last line.
-    const other = await fetchRxCatalog(DHARTI);
+  it('reads the clinic, and the branch only with branch:read', async () => {
+    const organization = one({
+      id: 'org_test',
+      name: 'Cresence Skin Clinic',
+      specialties: ['skin'],
+      currency: 'INR',
+    });
+    vi.mocked(api.get).mockImplementation(async (path) =>
+      path === '/tenancy/organization'
+        ? (organization as never)
+        : (one({ id: 'brn_main', phone: '+919825044120', gst_number: 'GSTIN' }) as never),
+    );
+    expect(await fetchRxSheetClinic({ branchId: 'brn_main', readsBranch: true })).toEqual(
+      {
+        organization: { name: 'Cresence Skin Clinic', specialties: ['skin'] },
+        branch: { phone: '+919825044120', gstNumber: 'GSTIN' },
+      },
+    );
+    expect(api.get).toHaveBeenCalledWith('/app/branches/{branch_id}', {
+      params: { branch_id: 'brn_main' },
+    });
+
+    vi.mocked(api.get).mockClear();
     expect(
-      other.medicines.find((medicine) => medicine.name === 'Flubolt 400')?.last,
-    ).toMatchObject({ doseNight: 1, meal: 'after' });
-    expect(other.often).toEqual(often);
-  });
-
-  it('puts the most prescribed first in “Often prescribed”', async () => {
-    await createPrescription(input({ items: [line('Sunscreen SPF 50')] }));
-    await createPrescription(input({ items: [line('Epriva Tab')] }));
-    const { often } = await fetchRxCatalog(DHARTI);
-    expect(often[0]).toBe('Sunscreen SPF 50');
-    expect(often).toContain('Epriva Tab');
-  });
-});
-
-describe('the printed sheet’s context', () => {
-  it('names the patient, the doctor, the clinic and the patient’s branch', async () => {
-    const context = await fetchRxSheetContext(DHARTI, DR_DRASHTI);
-    const dharti = await clinicFixtures.patients.get(DHARTI);
-    const branch = clinicFixtures.branches.snapshot(
-      (row) => row.id === dharti.homeBranchId,
-    )[0];
-    expect(context.patient).toMatchObject({ firstName: 'Dharti', seq: dharti.seq });
-    expect(context.doctor?.firstName).toBe('Dr. Drashti');
-    expect(context.organization.name).toBeTruthy();
-    expect(context.branch.phone).toBe(branch?.phone);
-  });
-
-  it('has no doctor when none is named', async () => {
-    expect((await fetchRxSheetContext(DHARTI, null)).doctor).toBeNull();
+      await fetchRxSheetClinic({ branchId: 'brn_main', readsBranch: false }),
+    ).toEqual({
+      organization: { name: 'Cresence Skin Clinic', specialties: ['skin'] },
+      branch: { phone: '', gstNumber: null },
+    });
+    expect(api.get).toHaveBeenCalledTimes(1);
   });
 });

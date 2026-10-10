@@ -331,7 +331,7 @@
     },
     "missing": "Add name and mobile",
     "mobileInvalid": "Enter a 10-digit mobile",
-    "created": "Patient {{id}} created · onboarding task added",
+    "created": "Patient {{id}} created",
     "openFile": "Open file",
     "saved": "{{name}} saved",
     "registered": "{{name}} registered as patient {{id}}",
@@ -339,7 +339,8 @@
     "registeredPhotos_other": "{{name}} registered as patient {{id}} · {{count}} photos filed",
     "duplicate": "Same mobile as {{name}} · {{id}}",
     "useExisting": "Use existing",
-    "summaryEmpty": "New patient"
+    "summaryEmpty": "New patient",
+    "knownPerson": "{{name}} is already in your contacts · the file opens on them"
   },
   "recordDrawer": {
     "cancel": "Cancel",
@@ -810,9 +811,6 @@
     "pricesHiddenHint": "Prices hidden · use the eye to show",
     "showPrices": "Show prices",
     "hidePrices": "Hide prices",
-    "savesOnList": "Saves {{amount}} on list",
-    "invoicedAmount": "{{amount}} invoiced",
-    "atListPrice": "At list price",
     "columns": {
       "suggested": "Suggested",
       "qty": "Qty",
@@ -823,7 +821,7 @@
     "more": "More",
     "quantity": "Quantity",
     "finalPrice": "Final price",
-    "belowFloor": "Below the lowest price {{price}}",
+    "belowFloor": "Below the lowest price",
     "tooMuchDiscount": "Too much discount · ask an admin",
     "details": "Offering details",
     "statuses": {
@@ -841,8 +839,6 @@
     "statusLabel": "Status · {{status}}",
     "invoiced": "Invoiced",
     "invoicedOf": "Invoiced · {{done}} of {{total}}",
-    "linkInvoice": "Link an invoice",
-    "linkInvoiceHint": "Link an invoice by hand",
     "remove": "Remove",
     "empty": "Nothing suggested for {{first}} yet.",
     "whyIdea": "Why this idea",
@@ -852,15 +848,10 @@
     "addHint": "Add to suggestions",
     "addOffering": "Add offering",
     "purchasesTitle": "{{first}}’s last purchases",
-    "purchasesSummary_one": "{{count}} line · {{paid}} paid so far",
-    "purchasesSummary_other": "{{count}} lines · {{paid}} paid so far",
     "purchaseColumns": {
       "date": "Date",
       "bought": "Bought",
-      "qty": "Qty",
-      "paid": "Paid",
-      "sessions": "Sessions",
-      "invoice": "Invoice"
+      "sessions": "Sessions"
     },
     "sessionsUsed": "{{used}} of {{total}} used",
     "activityTitle": "Contact activity",
@@ -899,17 +890,7 @@
       "lowest": "lowest {{price}}"
     },
     "ideaReasons": {
-      "history": "Idea from history",
-      "note": "Doctor’s note · “{{text}}”",
-      "complaint": "Complaint · {{text}}",
-      "visits_one": "{{count}} visit so far · a package saves on each session",
-      "visits_other": "{{count}} visits so far · a package saves on each session",
-      "renew": "Package almost used up · renew",
-      "first": "First visit · start with a consultation"
-    },
-    "purchaseKinds": {
-      "medicine": "Medicine",
-      "item": "Item"
+      "history": "Idea from history"
     },
     "delivery": {
       "queued": "Queued",
@@ -919,7 +900,9 @@
       "failed": "Not delivered",
       "received": "Received"
     },
-    "activityLead": "Lead {{id}}"
+    "activityLead": "Lead {{id}}",
+    "purchasesCount_one": "{{count}} line",
+    "purchasesCount_other": "{{count}} lines"
   },
   "contactEditor": {
     "title": "Edit contact",

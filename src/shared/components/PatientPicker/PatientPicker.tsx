@@ -6,8 +6,8 @@ import {
   searchPatientPicker,
 } from '@/shared/api/clinic/patient-search-api.ts';
 import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
+import { useFixturePatient } from '@/shared/hooks/useFixturePatients/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
-import { usePatient } from '@/shared/hooks/usePatients/index.ts';
 
 import {
   PATIENT_PICKER_KEYS,
@@ -58,7 +58,7 @@ export function PatientPicker({
 }: PatientPickerProps) {
   const { t } = useTranslation(PATIENT_PICKER_NS);
   const formatPaise = usePaiseFormat();
-  const current = usePatient(value ?? undefined);
+  const current = useFixturePatient(value ?? undefined);
   const selected: PickerOption<PatientPickRow>[] = current.data
     ? [patientPickOption(patientPickOf(current.data), t, formatPaise)]
     : [];

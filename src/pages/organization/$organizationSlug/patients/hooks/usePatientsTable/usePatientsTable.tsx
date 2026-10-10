@@ -23,7 +23,6 @@ import {
   PERSON_CARD_NS,
 } from '@/shared/components/PersonCard/person-card.constants.ts';
 import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { useRoomTable } from '@/shared/hooks/useRoomTable/index.ts';
 
 import {
@@ -32,7 +31,6 @@ import {
   patientAge,
   PatientAgeCell,
   PatientBadges,
-  PatientDueCell,
   PatientFollowUpCell,
   PatientIdCell,
   PatientNameCell,
@@ -62,10 +60,11 @@ const rowOf = (original: unknown) => original as PatientRow;
 
 /**
  * The Patients columns (KICKOFF §6.5 Table; `patients.md:28–31`): ID · Patient ·
- * Gender · Type · Status · Conversion · Age · Follow-up · Due · Updated, their
- * tracks, which sort, which the recommended set hides (Gender, Conversion,
- * Age) and what each folds to — the meta line on a tablet, the phone rows'
- * fold line (Updated folds to nothing). The column ids are the URL's sort keys.
+ * Gender · Type · Status · Conversion · Age · Follow-up · Updated, their
+ * tracks, which sort (ID and Follow-up — the two the API sorts by), which the
+ * recommended set hides (Gender, Conversion, Age) and what each folds to — the
+ * meta line on a tablet, the phone rows' fold line (Updated folds to nothing).
+ * The column ids are the URL's sort keys. Due goes: a row carries no dues (G4).
  */
 function usePatientColumns(
   contactActions: (patient: PatientRow) => ContactCardActions,
@@ -73,7 +72,6 @@ function usePatientColumns(
   const { t } = useTranslation(PATIENTS_NS);
   const { t: tClinic } = useTranslation(CLINIC_NS);
   const { t: tCard } = useTranslation(PERSON_CARD_NS);
-  const formatPaise = usePaiseFormat();
   const clock = useClinicClock();
   const today = clinicToday();
 
@@ -126,6 +124,7 @@ function usePatientColumns(
     },
     {
       id: 'name',
+      enableSorting: false,
       accessorFn: (patient) => patientName(patient),
       header: t(PATIENTS_KEYS.columns.name),
       cell: ({ row }) => (
@@ -152,6 +151,7 @@ function usePatientColumns(
     },
     {
       id: 'types',
+      enableSorting: false,
       accessorFn: (patient) => patient.types.join(','),
       header: t(PATIENTS_KEYS.columns.types),
       cell: ({ row }) => <PatientBadges badges={types(row.original)} />,
@@ -163,6 +163,7 @@ function usePatientColumns(
     },
     {
       id: 'status',
+      enableSorting: false,
       accessorKey: 'status',
       header: t(PATIENTS_KEYS.columns.status),
       cell: ({ row }) => <PatientBadges badges={status(row.original)} />,
@@ -174,6 +175,7 @@ function usePatientColumns(
     },
     {
       id: 'conversion',
+      enableSorting: false,
       accessorKey: 'conversion',
       header: t(PATIENTS_KEYS.columns.conversion),
       cell: ({ row }) => <PatientBadges badges={conversion(row.original)} dot />,
@@ -186,6 +188,7 @@ function usePatientColumns(
     },
     {
       id: 'age',
+      enableSorting: false,
       accessorFn: (patient) => patientAge(patient.dateOfBirth, today),
       header: t(PATIENTS_KEYS.columns.age),
       cell: ({ row }) => (
@@ -222,28 +225,14 @@ function usePatientColumns(
       },
     },
     {
-      id: 'due',
-      accessorKey: 'dueTotal',
-      header: t(PATIENTS_KEYS.columns.due),
-      cell: ({ row }) => <PatientDueCell dueTotal={row.original.dueTotal} />,
-      meta: {
-        track: '96px',
-        align: 'end',
-        foldValue: (original) => {
-          const { dueTotal } = rowOf(original);
-          return dueTotal > 0 ? formatPaise(dueTotal) : '—';
-        },
-      },
-    },
-    {
       id: 'updated',
+      enableSorting: false,
       accessorKey: 'updatedAt',
       header: t(PATIENTS_KEYS.columns.updated),
       cell: ({ row }) => <PatientUpdatedCell patient={row.original} />,
-      // 1.3fr, not the design's 1fr (H:4698): a 12-hour "Yesterday 10:40 AM"
-      // beside "Dr. Drashti" needs ~211px, which 1fr leaves at 188 at 1440.
-      // The 28px people pill folds to nothing (H:4115).
-      meta: { track: 'minmax(150px,1.3fr)', foldValue: () => null },
+      // No people pill: the API does not say who saved the file (G4), so the
+      // cell is the time alone. It folds to nothing (H:4115).
+      meta: { track: 'minmax(130px,1fr)', foldValue: () => null },
     },
   ];
 }
@@ -262,7 +251,7 @@ export interface PatientsTableInput {
 
 /**
  * The Patients table instance (KICKOFF §6.5) on the shared room table: the
- * server sorts through the URL's `sort`; the Columns choice is a device pref
+ * server sorts through the URL's `sort` (ID or Follow-up; newest first without one); the Columns choice is a device pref
  * (recommended set: Gender, Conversion and Age hidden); the rows are the
  * loaded cursor pages, keyed by the patient's id.
  */

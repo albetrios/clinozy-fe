@@ -24,8 +24,7 @@ import { manifest } from './timeline.manifest.ts';
  * `?visit=open` without an open visit (`gone`). A stale link drops the param
  * and leaves the Overview (KICKOFF §6.6: a deep link never starts a visit —
  * navigation never mutates). A visit that ends under the flow — "✓ Complete
- * visit", or a Collect that pays its bill in full with nothing to fill (D18) —
- * leaves the flow the way it came: Today when Today's card opened it.
+ * visit" — leaves the flow the way it came: Today when Today's card opened it.
  */
 function useFlowExit(visit: VisitRecord | null, gone: boolean) {
   const navigate = useNavigate();

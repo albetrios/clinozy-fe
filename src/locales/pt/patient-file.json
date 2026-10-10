@@ -33,9 +33,7 @@
     "activity": "Atividade",
     "showActivity": "Mostrar mensagens e atividade",
     "hideActivity": "Ocultar mensagens e atividade",
-    "unread_one": "{{count}} mensagem não lida",
-    "unread_many": "{{count}} de mensagens não lidas",
-    "unread_other": "{{count}} mensagens não lidas"
+    "awaitingReply": "Aguardando resposta"
   },
   "sectionsPopover": {
     "trigger": "Ficha do paciente · todas as seções",
@@ -48,8 +46,6 @@
       "team": "Equipe"
     },
     "openNow": "Aberta agora",
-    "empty": "Vazia",
-    "hasRecords": "Com registros",
     "pin": "Fixar na barra",
     "unpin": "Desafixar da barra",
     "pinAria": "Fixar na barra · {{section}}",
@@ -65,14 +61,11 @@
     "items": {
       "prescription": "Receita",
       "treatment": "Tratamento",
-      "invoice": "Fatura",
-      "payment": "Pagamento",
       "photo": "Foto",
       "appointment": "Consulta",
       "report": "Relatório",
       "note": "Nota"
-    },
-    "nothingDue": "Nada pendente para {{name}}"
+    }
   },
   "section": {
     "primary": {
@@ -82,8 +75,7 @@
       "images": "Enviar imagens",
       "reports": "Enviar relatório",
       "invoices": "Nova fatura",
-      "payments": "Registrar pagamento",
-      "packages": "Adicionar pacote"
+      "payments": "Registrar pagamento"
     },
     "more": "Mais para {{name}}"
   },
@@ -102,7 +94,6 @@
     "reach": "Contatos",
     "reachSub": {
       "whatsappPrimary": "WhatsApp · Principal",
-      "fromLead": "Celular · Do lead",
       "mobile": "Celular",
       "instagram": "Instagram"
     },
@@ -121,20 +112,10 @@
     "birthdayToday": "🎂 hoje",
     "noAddress": "Sem endereço",
     "upNext": "Próximos",
-    "visitService": "{{service}} · {{minutes}} min",
     "reschedule": "Remarcar",
     "book": "Agendar",
     "notBooked": "Não agendado",
     "noUpcoming": "Nenhuma visita futura",
-    "maskedAmount": "₹ ••••",
-    "dueSince_one": "há {{count}} dia",
-    "dueSince_many": "há {{count}} de dias",
-    "dueSince_other": "há {{count}} dias",
-    "showAmount": "Mostrar valor",
-    "hideAmount": "Ocultar valor",
-    "collect": "Receber",
-    "creditToReturn": "{{amount}} a devolver",
-    "allPaid": "Tudo pago · nada pendente",
     "feedback": "Feedback",
     "feedbackScore": "{{feel}} · {{score}}/10",
     "feedbackReview": "{{rating}}★ no {{source}}",
@@ -164,10 +145,7 @@
       "none": "Sem visita associada",
       "noneSub": "Enviadas a partir da ficha",
       "visit": "{{day}} · {{service}}",
-      "visitSub": "#{{seq}} · {{status}}",
-      "visitMeta_one": "{{count}} foto",
-      "visitMeta_many": "{{count}} de fotos",
-      "visitMeta_other": "{{count}} fotos"
+      "visitSub": "#{{seq}} · {{status}}"
     },
     "sizes": {
       "label": "Tamanho das miniaturas",
@@ -178,7 +156,6 @@
       "mediumShort": "M",
       "largeShort": "L"
     },
-    "groupWithVisit": "{{photos}} · {{visit}}",
     "tile": {
       "open": "Abrir {{name}}",
       "edit": "Editar detalhes",
@@ -217,17 +194,16 @@
       "underarm": "Axila",
       "legs": "Pernas",
       "arms": "Braços",
-      "other": "Outra"
+      "other": "Outra",
+      "upperLip": "Buço",
+      "chin": "Queixo",
+      "neck": "Pescoço",
+      "hands": "Mãos",
+      "fullBody": "Corpo inteiro"
     },
     "viewer": {
       "label": "Visualizador de fotos",
       "position": "{{index}} de {{total}}",
-      "zoom": "Zoom",
-      "zoomOut": "Reduzir",
-      "zoomOutHint": "Reduzir (−)",
-      "zoomIn": "Ampliar",
-      "zoomInHint": "Ampliar (+)",
-      "zoomReset": "Ajustar à tela (0)",
       "close": "Fechar visualizador",
       "closeHint": "Fechar (Esc)",
       "previous": "Foto anterior",
@@ -236,11 +212,9 @@
       "nextHint": "Próxima (→)",
       "hints": {
         "browse": "← → navegar",
-        "zoom": "Role ou + − para zoom",
-        "pan": "Arraste para mover · clique duplo para redefinir",
         "close": "Esc fecha"
       },
-      "missing": "Foto de exemplo · nenhum arquivo anexado",
+      "missing": "Pré-visualização indisponível",
       "notFoundRecord": "Foto"
     },
     "details": {
@@ -256,9 +230,14 @@
       "visitHint": "opcional · arquiva a foto nessa consulta",
       "notAttached": "Não associada",
       "save": "Salvar detalhes",
-      "saved": "Detalhes da foto salvos"
+      "saved": "Detalhes da foto salvos",
+      "stage": "Etapa"
     },
-    "loading": "Carregando fotos"
+    "loading": "Carregando fotos",
+    "stages": {
+      "before": "Antes",
+      "after": "Depois"
+    }
   },
   "rx": {
     "record": "Receita",
@@ -272,16 +251,7 @@
     "medicines_other": "{{count}} medicamentos",
     "quickFill": {
       "print": "Imprimir receita",
-      "repeat": "Repetir última receita {{number}}",
-      "kits": {
-        "hairFall": "Kit queda de cabelo",
-        "postPeel": "Kit pós-peeling",
-        "pigmentation": "Kit pigmentação"
-      }
-    },
-    "kit": {
-      "reapply": "Reaplicar a cada 3 h",
-      "avoidSun": "Evitar sol e esfoliantes por 48 h"
+      "repeat": "Repetir última receita {{number}}"
     },
     "steps": {
       "prescription": "Receita",
@@ -294,10 +264,8 @@
     "quick": {
       "placeholder": "Digite medicamento, dose, horário · ex. flu 0-0-1 af 10d",
       "hint": "od · bd · tds · hs · af/bf · 5d · x8",
-      "often": "Receitados com frequência",
       "groups": {
         "all": "Todos",
-        "often": "Receitados com frequência",
         "oral": "Oral",
         "topical": "Tópico"
       },
@@ -389,13 +357,20 @@
       "summary": "{{medicines}} · {{doctor}}",
       "noMedicine": "Adicione um medicamento",
       "saved": "Receita salva",
-      "savedNumber": "Receita {{number}} salva"
+      "savedNumber": "Receita {{number}} salva",
+      "approve": "Salvar e aprovar",
+      "approvedNumber": "Receita {{number}} aprovada"
     },
     "delete": {
       "title": "Excluir esta receita?",
       "deleted": "Receita excluída"
     },
-    "preview": "Receita {{number}}"
+    "preview": "Receita {{number}}",
+    "status": {
+      "draft": "Rascunho",
+      "approved": "Aprovada"
+    },
+    "approvedNote": "Aprovada · uma receita aprovada não pode ser alterada"
   },
   "treatment": {
     "record": "Tratamento",
@@ -407,7 +382,6 @@
     "session": "Sessão {{session}}",
     "quickFill": {
       "next": "Próxima sessão de {{name}}",
-      "package": "{{name}} · sessão {{session}}",
       "checkIn": "Registrar acompanhamento"
     },
     "type": "Tipo",
@@ -547,8 +521,8 @@
       "calls": {
         "none": "Sem ligação",
         "next_day": "No dia seguinte",
-        "in_2_days": "Em 2 dias",
-        "in_week": "Em uma semana"
+        "in_week": "Em uma semana",
+        "in_two_days": "Em 2 dias"
       },
       "feedback": "Retorno sobre este tratamento",
       "feedbackItem": "{{date}} · {{feel}} {{score}}/10",
@@ -559,9 +533,25 @@
       "edit": "Salvar alterações",
       "saved": "Tratamento salvo"
     },
-    "delete": {
-      "title": "Excluir este tratamento?",
-      "deleted": "Tratamento excluído"
+    "package": {
+      "label": "Do pacote",
+      "hint": "ao salvar, usa uma de suas sessões",
+      "option": "{{name}} · {{used}} de {{total}} usadas",
+      "numbered": "Definido pelo pacote",
+      "uses": "Usa 1 sessão de {{name}}"
+    },
+    "reverse": {
+      "title": "Anular este tratamento?",
+      "body": "Ele continua na ficha, marcado como anulado, e a sessão de pacote usada é devolvida. Não é possível desfazer.",
+      "action": "Anular",
+      "done": "Tratamento anulado",
+      "status": "Anulado",
+      "note": "Anulado em {{date}} · {{reason}}",
+      "reasons": {
+        "mistake": "Registrado por engano",
+        "wrongPatient": "Paciente errado",
+        "notDone": "Sessão não realizada"
+      }
     }
   },
   "report": {
@@ -599,36 +589,32 @@
     },
     "view": {
       "sub": "{{name}} · {{date}}",
-      "addedBy": "Adicionado por",
-      "fileLine": "{{name}} · {{format}} · compartilhado com o paciente se pedir",
       "notes": "Notas",
-      "noNotes": "Nenhuma nota neste relatório",
-      "download": "Baixar",
-      "downloading": "Baixando {{name}}"
+      "noNotes": "Nenhuma nota neste relatório"
     }
   },
   "package": {
-    "title": "Adicionar pacote",
-    "step": "Escolha um pacote",
-    "option": "{{name}} · {{sessions}} sess. · {{price}}",
-    "empty": "Ainda não há serviços de várias sessões",
+    "title": "Editar pacote",
     "summary": "As sessões são contadas quando um tratamento é concluído",
-    "save": "Adicionar pacote",
-    "noPick": "Escolha um pacote",
-    "added": "Pacote adicionado · fature-o em Faturas",
+    "save": "Salvar alterações",
     "card": {
       "left_one": "Resta {{count}}",
       "left_many": "Restam {{count}}",
       "left_other": "Restam {{count}}",
       "used": "{{used}} de {{total}} usadas",
       "validTill": "Válido até {{date}}",
-      "next": "Próxima: {{date}}",
-      "use": "Usar uma sessão",
       "book": "Agendar a próxima",
       "empty": "Nenhum pacote ainda",
-      "sessionUsed": "Sessão {{used}} de {{total}} usada",
-      "noneLeft": "Não restam sessões"
-    }
+      "noExpiry": "Sem validade",
+      "statuses": {
+        "used_up": "Esgotado",
+        "expired": "Expirado"
+      },
+      "edit": "Editar"
+    },
+    "validUntil": "Válido até",
+    "sessions": "Sessões",
+    "saved": "Pacote salvo"
   },
   "clinical": {
     "titles": {
@@ -644,7 +630,8 @@
     "remove": "Remover {{name}}",
     "newCount_one": "{{count}} novo",
     "newCount_many": "{{count}} de novos",
-    "newCount_other": "{{count}} novos"
+    "newCount_other": "{{count}} novos",
+    "removed": "Removido: {{name}}"
   },
   "feedback": {
     "title": "Feedback",
@@ -676,7 +663,6 @@
     "linkLabel": "Link",
     "noNext": "Nenhum próximo passo anotado",
     "noLink": "Nenhum link",
-    "files": "▶ {{files}}",
     "actions": "Ações",
     "edit": "Editar",
     "remove": "Remover",
@@ -704,7 +690,10 @@
     "reviewRemoved": "Avaliação removida",
     "more_one": "mais {{count}}",
     "more_many": "mais {{count}}",
-    "more_other": "mais {{count}}"
+    "more_other": "mais {{count}}",
+    "files_one": "▶ {{count}} arquivo",
+    "files_many": "▶ {{count}} arquivos",
+    "files_other": "▶ {{count}} arquivos"
   },
   "checkIn": {
     "titles": {
@@ -741,9 +730,6 @@
     "offeringSessions_one": "{{price}} · {{count}} sessão",
     "offeringSessions_many": "{{price}} · {{count}} sessões",
     "offeringSessions_other": "{{price}} · {{count}} sessões",
-    "contextVisit": "Acompanhamento da visita",
-    "contextAppointment": "Acompanhamento da visita · Consulta {{number}}",
-    "contextAftercare": "Acompanhamento após {{treatment}}",
     "save": "Salvar acompanhamento",
     "saveEdit": "Salvar alterações",
     "noFeel": "Escolha como está agora",
@@ -751,7 +737,9 @@
     "added": " · {{count}} adicionados às sugestões",
     "callBack": " · tarefa de retorno do médico criada",
     "updated": "Acompanhamento atualizado",
-    "record": "Acompanhamento"
+    "record": "Acompanhamento",
+    "noScore": "Escolha a nota do paciente",
+    "offeringsPlanned": "Adicionado às sugestões"
   },
   "review": {
     "title": "Registrar uma avaliação",
@@ -780,7 +768,10 @@
     "updated": "Avaliação atualizada",
     "badLink": "Adicione um link https://",
     "notRated": "Sem nota",
-    "record": "Avaliação"
+    "record": "Avaliação",
+    "attachedFiles_one": "{{count}} arquivo",
+    "attachedFiles_many": "{{count}} arquivos",
+    "attachedFiles_other": "{{count}} arquivos"
   },
   "logFeedback": {
     "title": "Registrar feedback",
@@ -885,7 +876,6 @@
       "feedback": "Avaliação",
       "report": "Laudo",
       "type": "Tipo",
-      "uploadedBy": "Enviado por",
       "invoice": "Fatura",
       "items": "Itens",
       "bill": "Valor",
@@ -915,8 +905,6 @@
     "placeholder": "Adicione uma nota para a equipe",
     "add": "Adicionar nota",
     "by": "{{name}} · {{date}}",
-    "delete": "Excluir nota",
-    "deleted": "Nota excluída",
     "empty": "Nenhuma nota ainda"
   },
   "timeline": {
@@ -942,10 +930,7 @@
     },
     "packages": {
       "progress": "{{used}} / {{total}}",
-      "next": "Próxima · {{date}}",
-      "overdue": "Sessão {{session}} atrasada",
       "done": "Todas as sessões concluídas",
-      "use": "Usar sessão",
       "empty": "Nenhum pacote ativo"
     },
     "prescriptions": {
@@ -953,15 +938,6 @@
     },
     "treatments": {
       "sub": "Sessão {{session}} · {{date}}"
-    },
-    "billing": {
-      "due": "Pendente",
-      "paid": "Pago",
-      "show": "Mostrar valores",
-      "hide": "Ocultar valores",
-      "invoice": "Fatura {{type}} {{number}}",
-      "sub": "{{date}} · {{amount}}",
-      "collect": "Receber pagamento"
     },
     "reports": {
       "sub": "{{type}} · {{date}}"
@@ -974,13 +950,8 @@
     "activity": {
       "filtersLabel": "Filtros de atividade",
       "notes": "Notas",
-      "filterTitle": "{{label}} · {{count}}",
-      "rx": "Receita {{number}} · {{medicines}}",
-      "treatment": "{{name}} · sessão {{session}}",
-      "received": "Recebido {{amount}} · {{mode}}",
-      "refund": "Reembolso {{amount}} · {{mode}}",
-      "against": "Referente a {{number}}",
-      "empty": "Nenhuma atividade ainda"
+      "empty": "Nenhuma atividade ainda",
+      "masked": "₹ ••••"
     }
   },
   "visitFlow": {
@@ -995,9 +966,7 @@
     "steps": {
       "checks": "Chegada e segurança",
       "rx": "Receita",
-      "treatment": "Tratamento",
-      "invoice": "Fatura",
-      "collect": "Receber e compartilhar"
+      "treatment": "Tratamento"
     },
     "checks": {
       "labels": {
@@ -1030,29 +999,10 @@
       "empty": "Registrar a sessão de hoje",
       "last": "Últimos ajustes: {{memo}}",
       "done": "{{name}} · sessão {{session}}",
-      "repeated": "Sessão {{session}} registrada com os últimos ajustes"
+      "repeated": "Sessão {{session}} registrada com os últimos ajustes",
+      "repeatPackage": "⚡ Repetir · {{name}}"
     },
-    "invoice": {
-      "total": "Total",
-      "create": "Criar fatura a partir da visita",
-      "custom": "Fatura personalizada",
-      "created": "Fatura {{number}} criada a partir da visita",
-      "nothing": "Nada a faturar",
-      "ready_one": "{{count}} item pronto · {{total}}",
-      "ready_many": "{{count}} itens prontos · {{total}}",
-      "ready_other": "{{count}} itens prontos · {{total}}",
-      "covered": "Coberto pelo pacote · nada a faturar",
-      "empty": "Nada a faturar ainda",
-      "done": "{{number}} · {{total}}"
-    },
-    "collect": {
-      "upi": "Receber {{amount}} · UPI",
-      "received": "{{amount}} recebidos ({{mode}})",
-      "share": "Compartilhar receita, fatura e fotos",
-      "shared": "Receita, fatura e fotos enviadas para {{name}} pelo WhatsApp",
-      "due": "{{amount}} pendente",
-      "nothing": "Nada pendente",
-      "sent": "Enviado pelo WhatsApp"
-    }
+    "paused": "Visita pausada",
+    "resume": "Retomar"
   }
 }

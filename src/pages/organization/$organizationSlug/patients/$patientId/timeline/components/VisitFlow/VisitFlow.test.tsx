@@ -1,25 +1,50 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
+import { moveAppointment } from '@/shared/api/clinic/appointments-api.ts';
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
-import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
-import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
+import type { ClinicalNote } from '@/shared/api/clinic/clinical-notes-contracts.ts';
+import type { PatientPackageRow } from '@/shared/api/clinic/patient-packages-contracts.ts';
 import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import { fetchVisit } from '@/shared/api/clinic/visits-api.ts';
-import { shownLocation } from '@/tests/utils/shown-location.ts';
+  approvePrescription,
+  createPrescription,
+} from '@/shared/api/clinic/prescriptions-api.ts';
+import type {
+  PrescriptionKit,
+  PrescriptionRecord,
+} from '@/shared/api/clinic/prescriptions-contracts.ts';
+import { moveFloorStage } from '@/shared/api/clinic/today-api.ts';
+import { createTreatment } from '@/shared/api/clinic/treatments-api.ts';
+import type { TreatmentRecord } from '@/shared/api/clinic/treatments-contracts.ts';
+import {
+  fetchVisitCheckNotes,
+  recordVisitCheck,
+  removeVisitCheck,
+  setVisitPaused,
+} from '@/shared/api/clinic/visits-api.ts';
+import type { VisitRecord } from '@/shared/api/clinic/visits-contracts.ts';
+import type { PatientFileSectionSlug } from '@/shared/clinic/patient-file-sections.ts';
+import { PATIENT_FILE_SECTIONS } from '@/shared/clinic/patient-file-sections.ts';
+import {
+  APPOINTMENT_NOW,
+  APPOINTMENT_TODAY,
+  appointmentRow,
+  DOCTOR_NISHA,
+} from '@/tests/utils/appointment-doubles.ts';
+import {
+  patientFile,
+  TEST_CONTACT_ID,
+  TEST_PATIENT_ID,
+} from '@/tests/utils/patient-doubles.ts';
 
 import {
   patientFileUrl,
-  renderPatientFile,
+  renderInPatientFile,
   resetPatientFile,
 } from '../../../__tests__/integration/patient-file-test-router.tsx';
-import { VISIT_FLOW_STEPS } from './visit-flow.constants.ts';
+import { VisitFlow } from './VisitFlow.tsx';
 
 const { notifyMock } = vi.hoisted(() => ({
   notifyMock: {
@@ -36,247 +61,574 @@ vi.mock('@/shared/notify/index.ts', () => ({
   TOAST_DURATION_MS: { default: 5_200, error: 9_000 },
 }));
 
-const DHRUV = patientRef('Dhruv Patel');
-const SANA = patientRef('Sana Kapoor');
+/** What clinozy-be holds for Priya's visit: its notes, Rx, sessions, packages, the kits. */
+const world = vi.hoisted(() => ({
+  visit: null as VisitRecord | null,
+  notes: [] as ClinicalNote[],
+  prescriptions: [] as PrescriptionRecord[],
+  treatments: [] as TreatmentRecord[],
+  packages: [] as PatientPackageRow[],
+  kits: [] as PrescriptionKit[],
+  failNotes: false,
+}));
+vi.mock('@/shared/api/clinic/visits-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchOpenVisit: vi.fn(async () => world.visit),
+  fetchVisitCheckNotes: vi.fn(async () => {
+    if (world.failNotes) throw new TypeError('Failed to fetch');
+    return world.notes;
+  }),
+  recordVisitCheck: vi.fn(
+    async ({ check, appointmentId }: { check: string; appointmentId: string }) => {
+      const texts: Record<string, string> = {
+        consent: 'Consent signed',
+        photos: 'Before photos taken',
+        allergies: 'Allergies & medicines checked',
+      };
+      const note: ClinicalNote = {
+        id: `pcn_${check}`,
+        patientId: 'pat_priya0000000000000000',
+        kind: 'safety_check',
+        text: texts[check] ?? check,
+        appointmentId,
+        diagnosisId: null,
+        addedAt: new Date().toISOString(),
+      };
+      world.notes = [...world.notes, note];
+      return note;
+    },
+  ),
+  removeVisitCheck: vi.fn(async ({ noteId }: { noteId: string }) => {
+    world.notes = world.notes.filter((note) => note.id !== noteId);
+  }),
+  setVisitPaused: vi.fn(async () => world.visit),
+}));
+vi.mock('@/shared/api/clinic/patient-file-api.ts', async (importOriginal) => {
+  const { patientFile: file } = await import('@/tests/utils/patient-doubles.ts');
+  return {
+    ...(await importOriginal<object>()),
+    fetchPatientFile: vi.fn(async () => file()),
+  };
+});
+vi.mock('@/shared/api/clinic/prescriptions-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  listPatientPrescriptions: vi.fn(async () => world.prescriptions),
+  listPrescriptionKits: vi.fn(async () => world.kits),
+  createPrescription: vi.fn(
+    async ({
+      patientId,
+      fields,
+      appointmentId,
+    }: {
+      patientId: string;
+      fields: Pick<PrescriptionRecord, 'doctorId' | 'date' | 'items'>;
+      appointmentId: string | null;
+    }) => {
+      const record = {
+        id: 'rx_new000000000000000000',
+        seq: 512,
+        patientId,
+        appointmentId,
+        advice: null,
+        labReport: null,
+        procedureToday: null,
+        followUpDate: null,
+        status: 'draft',
+        approvedAt: null,
+        approvedById: null,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        ...fields,
+      } satisfies PrescriptionRecord;
+      world.prescriptions = [record, ...world.prescriptions];
+      return record;
+    },
+  ),
+  approvePrescription: vi.fn(async () => {
+    const [record] = world.prescriptions;
+    if (!record) throw new Error('nothing to approve');
+    return { ...record, status: 'approved' };
+  }),
+}));
+vi.mock('@/shared/api/clinic/treatments-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  listPatientTreatments: vi.fn(async () => world.treatments),
+  createTreatment: vi.fn(
+    async ({
+      patientId,
+      input,
+    }: {
+      patientId: string;
+      input: Omit<TreatmentRecord, 'id'>;
+    }) => {
+      const [last] = world.treatments;
+      if (!last) throw new Error('no session to repeat');
+      const record: TreatmentRecord = {
+        ...last,
+        ...input,
+        id: 'trt_new00000000000000000',
+        patientId,
+        appointmentId: input.appointmentId ?? null,
+      };
+      world.treatments = [record, ...world.treatments];
+      return record;
+    },
+  ),
+}));
+vi.mock('@/shared/api/clinic/patient-packages-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  listPatientPackages: vi.fn(async () => world.packages),
+}));
+vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => {
+  const { appointmentRow: row } = await import('@/tests/utils/appointment-doubles.ts');
+  return {
+    ...(await importOriginal<object>()),
+    moveAppointment: vi.fn(async () => {
+      world.visit = null;
+      return row({ status: 'completed' });
+    }),
+  };
+});
+vi.mock('@/shared/api/clinic/today-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  moveFloorStage: vi.fn(async () => undefined),
+}));
+vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => {
+  const { DOCTOR_NISHA: nisha, DOCTOR_ARJUN: arjun } =
+    await import('@/tests/utils/appointment-doubles.ts');
+  return {
+    ...(await importOriginal<object>()),
+    fetchTeamDirectory: vi.fn(async () => [nisha, arjun]),
+  };
+});
+vi.mock('@/shared/tenancy/my-membership.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  findMyMembershipId: vi.fn(async () => 'mem_nisha0000000000000000'),
+}));
 
-/** The file on a patient's `timeline?visit=open`, for a member previewed as `role`. */
-function openFlow(patientId: string, role: Role) {
+const APPOINTMENT_ID = 'appt_priya000000000000000';
+const PACKAGE_ID = 'poff_lhr0000000000000000';
+
+/** Priya's visit today — checked in, with Dr. Nisha, for a booking of `type`. */
+function visitOf(overrides: Partial<VisitRecord> = {}, type = 'consultation' as const) {
+  return {
+    appointmentId: APPOINTMENT_ID,
+    booking: appointmentRow({
+      id: APPOINTMENT_ID,
+      contactId: TEST_CONTACT_ID,
+      patientId: TEST_PATIENT_ID,
+      date: APPOINTMENT_TODAY,
+      status: 'checked_in',
+      type,
+      visitStage: 'with_doctor',
+    }),
+    stage: 'with_doctor',
+    stageAt: '2026-10-03T03:35:00.000Z',
+    pausedAt: null,
+    ...overrides,
+  } satisfies VisitRecord;
+}
+
+/** Her last laser session — session 3, before today. */
+function lastSession(overrides: Partial<TreatmentRecord> = {}): TreatmentRecord {
+  return {
+    id: 'trt_last00000000000000000',
+    patientId: TEST_PATIENT_ID,
+    appointmentId: 'appt_old000000000000000000',
+    offeringId: 'off_lhr00000000000000000',
+    name: 'Laser hair reduction',
+    template: 'skin',
+    performedAt: '2026-09-20T05:00:00.000Z',
+    doctorId: DOCTOR_NISHA.id,
+    therapistId: null,
+    bodyParts: ['legs'],
+    sessionNumber: 3,
+    parameters: { machine: 'GentleMax', power: '18 J/cm²', wavelength: '755' },
+    remark: null,
+    aftercareCall: 'in_two_days',
+    packageId: null,
+    isBilled: false,
+    status: 'done',
+    reversedReason: null,
+    reversedAt: null,
+    latestCheckIn: null,
+    createdAt: '2026-09-20T05:00:00.000Z',
+    updatedAt: '2026-09-20T05:00:00.000Z',
+    ...overrides,
+  };
+}
+
+/** A safety-check note already at the visit. */
+const checkNote = (id: string, text: string): ClinicalNote => ({
+  id,
+  patientId: TEST_PATIENT_ID,
+  kind: 'safety_check',
+  text,
+  appointmentId: APPOINTMENT_ID,
+  diagnosisId: null,
+  addedAt: '2026-10-03T03:40:00.000Z',
+});
+
+const HAIR_FALL_KIT: PrescriptionKit = {
+  id: 'rxk_hairfall0000000000000',
+  name: 'Hair fall kit',
+  items: [
+    {
+      medicineId: null,
+      medicineName: 'Minoxidil 5%',
+      doseMorning: 1,
+      doseAfternoon: 0,
+      doseNight: 1,
+      sos: false,
+      meal: null,
+      timing: null,
+      timingText: null,
+      bodyPart: null,
+      bodyPartText: null,
+      qty: 1,
+      remarks: null,
+    },
+  ],
+};
+
+/**
+ * The flow for a member previewed as `role`, in the file at `timeline?visit=open` — where the
+ * Overview mounts it — on `visit`.
+ */
+async function openFlow({
+  role = 'owner',
+  visit = visitOf(),
+  viewable = PATIENT_FILE_SECTIONS,
+}: {
+  role?: Role;
+  visit?: VisitRecord;
+  viewable?: readonly PatientFileSectionSlug[];
+} = {}) {
+  world.visit = visit;
   const user = userEvent.setup();
-  const view = renderPatientFile(patientFileUrl(patientId, '/timeline?visit=open'), {
+  const view = renderInPatientFile(<VisitFlow visit={visit} />, {
     role,
+    file: patientFile(),
+    section: 'timeline',
+    viewable,
   });
+  await act(() =>
+    view.router.navigate({
+      href: patientFileUrl(TEST_PATIENT_ID, '/timeline?visit=open'),
+    }),
+  );
+  await screen.findByTestId('visit-flow');
   return { user, ...view };
 }
 
 const step = (name: string) => screen.getByTestId(`visit-flow-step-${name}`);
 const stateOf = () =>
   Object.fromEntries(
-    VISIT_FLOW_STEPS.map((name) => [name, step(name).getAttribute('data-state')]),
-  );
-const todaysSessions = () =>
-  clinicFixtures.treatments.snapshot(
-    (row) => row.appointmentId === ref.appointment(2865),
+    ['checks', 'rx', 'treatment'].map((name) => [
+      name,
+      step(name).getAttribute('data-state'),
+    ]),
   );
 
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] });
-  vi.setSystemTime(new Date(clinicInstant('2026-10-03', '10:42')));
+  vi.setSystemTime(APPOINTMENT_NOW);
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetClinicFixtures();
+  Object.assign(world, {
+    visit: null,
+    notes: [],
+    prescriptions: [],
+    treatments: [lastSession()],
+    packages: [],
+    kits: [HAIR_FALL_KIT],
+    failNotes: false,
+  });
 });
 afterEach(() => {
   resetPatientFile();
-  resetClinicFixtures();
   vi.useRealTimers();
+  vi.mocked(moveFloorStage).mockClear();
+  vi.mocked(moveAppointment).mockClear();
+  vi.mocked(createPrescription).mockClear();
+  vi.mocked(approvePrescription).mockClear();
+  vi.mocked(createTreatment).mockClear();
+  vi.mocked(recordVisitCheck).mockClear();
+  vi.mocked(removeVisitCheck).mockClear();
+  vi.mocked(setVisitPaused).mockClear();
+  vi.mocked(fetchVisitCheckNotes).mockClear();
 });
 
-describe('VisitFlow (KICKOFF §6.6 Visit flow, D18; H:758–768)', () => {
-  it('takes the Overview’s place with the five steps, the checks current', async () => {
-    openFlow(DHRUV, 'owner');
-    const flow = await screen.findByTestId('visit-flow');
-    expect(screen.queryByTestId('overview-bento')).not.toBeInTheDocument();
+describe('VisitFlow (KICKOFF §6.6 Visit flow; H:758–768) on clinozy-be', () => {
+  it('shows the three steps on the visit’s records, the checks current', async () => {
+    const { container } = await openFlow();
+    const flow = screen.getByTestId('visit-flow');
     expect(within(flow).getByText('Visit in progress')).toBeInTheDocument();
-    // Inside the flow the file bar offers neither Start visit nor Resume.
-    expect(screen.queryByText('Visit in progress · Resume')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('patient-file-start-visit')).not.toBeInTheDocument();
     expect(
       within(flow)
         .getAllByRole('heading', { level: 3 })
         .map((heading) => heading.textContent),
-    ).toEqual([
-      'Check-in & safety',
-      'Prescription',
-      'Treatment',
-      'Invoice',
-      'Collect & share',
-    ]);
-    expect(stateOf()).toEqual({
-      checks: 'current',
-      rx: 'later',
-      treatment: 'later',
-      invoice: 'later',
-      collect: 'later',
-    });
-    expect(step('checks')).toHaveTextContent('3 checks left');
+    ).toEqual(['Check-in & safety', 'Prescription', 'Treatment']);
+    await waitFor(() => expect(step('checks')).toHaveTextContent('3 checks left'));
+    expect(stateOf()).toEqual({ checks: 'current', rx: 'later', treatment: 'later' });
+    expect(step('rx')).toHaveTextContent('One tap from a kit, or write one');
     expect(
       await within(step('treatment')).findByTestId('visit-flow-repeat'),
     ).toHaveTextContent('⚡ Repeat · Laser hair reduction · session 4');
     expect(step('treatment')).toHaveTextContent(
-      'Last settings: GentleMax · 18 J/cm² · 755 nm · Type IV',
+      'Last settings: GentleMax · 18 J/cm² · 755 nm',
     );
-    expect(
-      within(step('treatment')).getByText(/^Uses 1 session of /),
-    ).toBeInTheDocument();
+    // Invoice and "Collect & share" wait for Payments on the API; the share goes (§6 #26).
+    expect(screen.queryByText('Invoice')).not.toBeInTheDocument();
+    expect(screen.queryByText('Share Rx, invoice & photos')).not.toBeInTheDocument();
+    expect(await axe(container)).toHaveNoViolations();
   });
 
-  it('holds the treatment until the checks are done, then repeats the last session', async () => {
-    const { user } = openFlow(DHRUV, 'owner');
+  it('holds the treatment until the checks are done, then repeats the last session and moves the visit on', async () => {
+    const { user } = await openFlow();
     await user.click(await screen.findByTestId('visit-flow-repeat'));
     expect(notifyMock.info).toHaveBeenCalledWith('Finish check-in first');
-    expect(todaysSessions()).toHaveLength(0);
+    expect(createTreatment).not.toHaveBeenCalled();
 
     for (const check of ['consent', 'photos', 'allergies']) {
       const tile = screen.getByTestId(`visit-flow-check-${check}`);
       await user.click(tile);
       await waitFor(() => expect(tile).toHaveAttribute('aria-checked', 'true'));
+      await waitFor(() => expect(tile).not.toBeDisabled());
     }
+    expect(vi.mocked(recordVisitCheck).mock.calls.map(([vars]) => vars.check)).toEqual([
+      'consent',
+      'photos',
+      'allergies',
+    ]);
+    expect(recordVisitCheck).toHaveBeenCalledWith(
+      expect.objectContaining({
+        patientId: TEST_PATIENT_ID,
+        appointmentId: APPOINTMENT_ID,
+      }),
+    );
     await waitFor(() => expect(step('checks')).toHaveAttribute('data-state', 'done'));
     expect(step('checks')).toHaveTextContent('All checks done');
     expect(step('rx')).toHaveAttribute('data-state', 'current');
 
     await user.click(screen.getByTestId('visit-flow-repeat'));
-    await waitFor(() => expect(todaysSessions()).toHaveLength(1));
-    expect(todaysSessions()[0]).toMatchObject({ sessionNo: 4, bodyParts: ['legs'] });
-    expect(notifyMock.success).toHaveBeenCalledWith(
-      'Session 4 recorded with last settings',
+    await waitFor(() =>
+      expect(notifyMock.success).toHaveBeenCalledWith(
+        'Session 4 recorded with last settings',
+      ),
+    );
+    expect(vi.mocked(createTreatment).mock.calls[0]?.[0]).toMatchObject({
+      patientId: TEST_PATIENT_ID,
+      input: {
+        name: 'Laser hair reduction',
+        sessionNumber: 4,
+        bodyParts: ['legs'],
+        aftercareCall: 'in_two_days',
+        appointmentId: APPOINTMENT_ID,
+        packageId: null,
+      },
+    });
+    // Q8 (the plan's proposal): a session takes the visit to Checkout.
+    await waitFor(() =>
+      expect(moveFloorStage).toHaveBeenCalledWith(
+        expect.objectContaining({ appointmentId: APPOINTMENT_ID, stage: 'checkout' }),
+      ),
     );
     await waitFor(() => expect(step('treatment')).toHaveAttribute('data-state', 'done'));
     expect(step('treatment')).toHaveTextContent('Laser hair reduction · session 4');
+    // The visit has its session: a second one is a new treatment.
+    expect(screen.queryByTestId('visit-flow-repeat')).not.toBeInTheDocument();
   });
 
-  it('prescribes a kit in one tap, for a doctor', async () => {
-    const { user, router } = openFlow(SANA, 'doctor');
-    const kits = await screen.findAllByTestId('visit-flow-kit');
-    expect(kits.map((kit) => kit.textContent)).toEqual([
-      '⚡ Hair fall kit',
-      '⚡ Post-peel kit',
-      '⚡ Pigmentation kit',
-    ]);
-    await user.click(kits[0]!);
+  it('repeats on the package while it can still spend a session, and shows its pill', async () => {
+    world.treatments = [lastSession({ packageId: PACKAGE_ID })];
+    world.packages = [
+      {
+        id: PACKAGE_ID,
+        offeringId: 'off_lhrpack000000000000000',
+        name: 'LHR Legs · 6 sessions',
+        sessionsTotal: 6,
+        sessionsUsed: 3,
+        sessionsLeft: 3,
+        status: 'active',
+        validUntil: null,
+        invoiceId: 'invc_lhr0000000000000000',
+        createdAt: '2026-09-01T05:00:00.000Z',
+        updatedAt: '2026-09-20T05:00:00.000Z',
+      },
+    ];
+    world.notes = [
+      checkNote('pcn_consent', 'Consent signed'),
+      checkNote('pcn_photos', 'Before photos taken'),
+      checkNote('pcn_allergies', 'Allergies & medicines checked'),
+    ];
+    const { user } = await openFlow();
+    expect(
+      await within(step('treatment')).findByText(
+        'Uses 1 session of LHR Legs · 6 sessions',
+      ),
+    ).toBeInTheDocument();
+    await waitFor(() => expect(step('checks')).toHaveAttribute('data-state', 'done'));
+    await user.click(screen.getByTestId('visit-flow-repeat'));
+    await waitFor(() => expect(createTreatment).toHaveBeenCalledTimes(1));
+    expect(vi.mocked(createTreatment).mock.calls[0]?.[0].input.packageId).toBe(
+      PACKAGE_ID,
+    );
+  });
+
+  it('unticks a check — its note removed — the tile itself the way back', async () => {
+    world.notes = [checkNote('pcn_consent', 'Consent signed')];
+    const { user } = await openFlow();
+    const tile = screen.getByTestId('visit-flow-check-consent');
+    await waitFor(() => expect(tile).toHaveAttribute('aria-checked', 'true'));
+    expect(step('checks')).toHaveTextContent('2 checks left');
+    await user.click(tile);
+    await waitFor(() => expect(tile).toHaveAttribute('aria-checked', 'false'));
+    expect(removeVisitCheck).toHaveBeenCalledWith({
+      patientId: TEST_PATIENT_ID,
+      noteId: 'pcn_consent',
+    });
+  });
+
+  it('prescribes a kit in one tap for a doctor — approved, at the visit — and moves the visit on', async () => {
+    const { user } = await openFlow({ role: 'doctor' });
+    const [kit] = await screen.findAllByTestId('visit-flow-kit');
+    if (!kit) throw new Error('no kit');
+    expect(kit).toHaveTextContent('⚡ Hair fall kit');
+    await user.click(kit);
     await waitFor(() =>
       expect(notifyMock.success).toHaveBeenCalledWith('Hair fall kit prescribed'),
     );
-    await waitFor(() => expect(step('rx')).toHaveAttribute('data-state', 'done'));
-    expect(step('rx')).toHaveTextContent('Flubolt 400, Clonix-B Lotion');
-    // The Rx at the consult moves Today's card on (L-64: the stage follows the records).
-    expect((await fetchVisit(ref.visit(2866))).visit.stage).toBe('checkout');
-
-    await user.click(screen.getByTestId('visit-flow-write-rx'));
+    expect(vi.mocked(createPrescription).mock.calls[0]?.[0]).toMatchObject({
+      patientId: TEST_PATIENT_ID,
+      appointmentId: APPOINTMENT_ID,
+      fields: {
+        doctorId: DOCTOR_NISHA.id,
+        date: APPOINTMENT_TODAY,
+        items: HAIR_FALL_KIT.items,
+        advice: null,
+      },
+    });
+    // Q19: a doctor's save is approved.
+    expect(approvePrescription).toHaveBeenCalledTimes(1);
+    // Q8: a consultation's Rx takes it to Checkout — no session is due.
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe(
-        patientFileUrl(SANA, '/prescriptions/create'),
+      expect(moveFloorStage).toHaveBeenCalledWith(
+        expect.objectContaining({ appointmentId: APPOINTMENT_ID, stage: 'checkout' }),
       ),
     );
-    // The drawer keeps the flow open behind it and closes back to it.
-    expect(router.state.location.search).toEqual({ visit: 'open' });
+    await waitFor(() => expect(step('rx')).toHaveTextContent('Minoxidil 5%'));
+    expect(step('rx')).toHaveAttribute('data-state', 'done');
   });
 
-  it('opened from Today: its drawers carry the way back, and Pause returns to Today (L-64)', async () => {
-    const user = userEvent.setup();
-    const { router } = renderPatientFile(
-      patientFileUrl(DHRUV, '/timeline?visit=open&from=today'),
-      { role: 'owner' },
-    );
+  it('writes a prescription in the drawer, the flow kept behind it', async () => {
+    const { user, router } = await openFlow({ role: 'doctor' });
     await user.click(await screen.findByTestId('visit-flow-write-rx'));
     await waitFor(() =>
       expect(router.state.location.pathname).toBe(
-        patientFileUrl(DHRUV, '/prescriptions/create'),
+        patientFileUrl(TEST_PATIENT_ID, '/prescriptions/create'),
       ),
     );
-    expect(router.state.location.search).toEqual({ visit: 'open', from: 'today' });
-    await router.navigate({
-      href: patientFileUrl(DHRUV, '/timeline?visit=open&from=today'),
-    });
-    await user.click(await screen.findByTestId('visit-flow-pause'));
-    await waitFor(() =>
-      expect(router.state.location.pathname).toBe('/organization/acme/today'),
-    );
-    expect((await fetchVisit(ref.visit(2865))).visit.stage).toBe('treatment');
-  });
-
-  it('bills the visit and collects what is due, for the front desk', async () => {
-    const { user } = openFlow(SANA, 'front_desk');
-    const invoice = await screen.findByTestId('visit-flow-step-invoice');
-    expect(within(invoice).queryByTestId('visit-flow-kit')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('visit-flow-kit')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('visit-flow-write-rx')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('visit-flow-repeat')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('visit-flow-new-treatment')).not.toBeInTheDocument();
-    expect(await within(invoice).findByText('Total')).toBeInTheDocument();
-    expect(within(invoice).getAllByText('₹ ••••').length).toBeGreaterThan(1);
-
-    await user.click(within(invoice).getByTestId('visit-flow-create-invoice'));
-    await waitFor(() =>
-      expect(notifyMock.success).toHaveBeenCalledWith(
-        expect.stringMatching(/^Invoice .+ created from the visit$/),
-      ),
-    );
-    await waitFor(() => expect(invoice).toHaveAttribute('data-state', 'done'));
-    expect((await fetchVisit(ref.visit(2866))).invoice).not.toBeNull();
-
-    const receipts = () =>
-      clinicFixtures.payments.snapshot((row) => row.kind === 'receipt').length;
-    const before = receipts();
-    await user.click(await screen.findByTestId('visit-flow-collect-cash'));
-    await waitFor(() => expect(receipts()).toBe(before + 1));
-    expect(notifyMock.success).toHaveBeenLastCalledWith('₹ •••• received by Cash');
-  });
-
-  it('opened from Today: a Collect that pays the bill in full ends the visit and goes back to Today (D18, S:352)', async () => {
-    // Ishita is at Checkout with her bill (#791) and nothing to fill.
-    const ISHITA = patientRef('Ishita Vora');
-    const user = userEvent.setup();
-    const { router } = renderPatientFile(
-      patientFileUrl(ISHITA, '/timeline?visit=open&from=today'),
-      { role: 'owner' },
-    );
-    await user.click(await screen.findByTestId('visit-flow-custom-invoice'));
-    await waitFor(() =>
-      expect(shownLocation(router).pathname).toBe('/organization/acme/invoices/create'),
-    );
-    // The flow stands behind the custom invoice (A-P1), which closes back into it,
-    // Today still its way back.
-    expect(router.state.location.pathname).toBe(patientFileUrl(ISHITA, '/timeline'));
-    expect(shownLocation(router).search).toMatchObject({
-      from: `patients/${ISHITA}/timeline?visit=open&from=today`,
-    });
-    await router.navigate({
-      href: patientFileUrl(ISHITA, '/timeline?visit=open&from=today'),
-    });
-
-    await user.click(await screen.findByTestId('visit-flow-collect-upi'));
-    await waitFor(() =>
-      expect(router.state.location.pathname).toBe('/organization/acme/today'),
-    );
-    expect(notifyMock.success).toHaveBeenCalledWith(
-      expect.stringMatching(/ received by UPI$/),
-    );
-    expect((await fetchVisit(ref.visit(2864))).visit.stage).toBe('done');
-  });
-
-  it('shares the visit, then completes it and goes back to the Overview', async () => {
-    const { user, router } = openFlow(DHRUV, 'owner');
-    await user.click(await screen.findByTestId('visit-flow-share'));
-    await waitFor(() =>
-      expect(notifyMock.success).toHaveBeenCalledWith(
-        'Rx, invoice and photos sent to Dhruv Patel on WhatsApp',
-      ),
-    );
-    await waitFor(() => expect(step('collect')).toHaveTextContent('Sent on WhatsApp'));
-
-    await user.click(screen.getByTestId('visit-flow-complete'));
-    await waitFor(() =>
-      expect(notifyMock.success).toHaveBeenLastCalledWith('Visit completed'),
-    );
-    expect(await screen.findByTestId('overview-bento')).toBeInTheDocument();
-    expect(router.state.location.search).toEqual({});
-    expect((await fetchVisit(ref.visit(2865))).visit.stage).toBe('done');
-  });
-
-  it('pauses with the visit still open, the file bar resuming it', async () => {
-    const { user, router } = openFlow(DHRUV, 'owner');
-    await user.click(await screen.findByTestId('visit-flow-pause'));
-    expect(await screen.findByTestId('overview-bento')).toBeInTheDocument();
-    expect(screen.queryByTestId('patient-file-start-visit')).not.toBeInTheDocument();
-    await user.click(screen.getByText('Visit in progress · Resume'));
-    expect(await screen.findByTestId('visit-flow')).toBeInTheDocument();
     expect(router.state.location.search).toEqual({ visit: 'open' });
-    expect((await fetchVisit(ref.visit(2865))).visit.stage).toBe('treatment');
   });
 
-  it('has no axe violations', async () => {
-    const { container } = openFlow(DHRUV, 'owner');
-    await screen.findByTestId('visit-flow-repeat');
-    expect(await axe(container)).toHaveNoViolations();
+  it('pauses — out of the flow, the visit left open — and resumes a paused visit', async () => {
+    const { user, router } = await openFlow();
+    await user.click(await screen.findByTestId('visit-flow-pause'));
+    await waitFor(() => expect(router.state.location.search).toEqual({}));
+    expect(setVisitPaused).toHaveBeenCalledWith(
+      expect.objectContaining({ appointmentId: APPOINTMENT_ID, paused: true }),
+    );
+  });
+
+  it('shows a paused visit as paused, with Resume', async () => {
+    const { user } = await openFlow({
+      visit: visitOf({ pausedAt: '2026-10-03T03:50:00.000Z' }),
+    });
+    expect(screen.queryByTestId('visit-flow-pause')).not.toBeInTheDocument();
+    await user.click(await screen.findByTestId('visit-flow-resume'));
+    await waitFor(() =>
+      expect(setVisitPaused).toHaveBeenCalledWith(
+        expect.objectContaining({ appointmentId: APPOINTMENT_ID, paused: false }),
+      ),
+    );
+  });
+
+  it('completes the visit with what it did — the package session, the follow-up', async () => {
+    world.treatments = [
+      lastSession({
+        id: 'trt_today00000000000000',
+        appointmentId: APPOINTMENT_ID,
+        sessionNumber: 4,
+        packageId: PACKAGE_ID,
+      }),
+    ];
+    world.prescriptions = [
+      {
+        id: 'rx_today000000000000000',
+        seq: 511,
+        patientId: TEST_PATIENT_ID,
+        appointmentId: APPOINTMENT_ID,
+        doctorId: DOCTOR_NISHA.id,
+        date: APPOINTMENT_TODAY,
+        items: HAIR_FALL_KIT.items,
+        advice: null,
+        labReport: null,
+        procedureToday: null,
+        followUpDate: '2026-10-26',
+        status: 'approved',
+        approvedAt: '2026-10-03T03:45:00.000Z',
+        approvedById: DOCTOR_NISHA.id,
+        createdAt: '2026-10-03T03:45:00.000Z',
+        updatedAt: '2026-10-03T03:45:00.000Z',
+      },
+    ];
+    const { user } = await openFlow();
+    await waitFor(() => expect(step('treatment')).toHaveAttribute('data-state', 'done'));
+    await waitFor(() => expect(step('rx')).toHaveAttribute('data-state', 'done'));
+    await user.click(await screen.findByTestId('visit-flow-complete'));
+    await waitFor(() =>
+      expect(notifyMock.success).toHaveBeenCalledWith(
+        'Visit completed · 1 package session used · follow-up set for Oct 26',
+      ),
+    );
+    expect(moveAppointment).toHaveBeenCalledWith(
+      expect.objectContaining({ appointmentId: APPOINTMENT_ID, route: 'complete' }),
+    );
+  });
+
+  it('leaves a therapist the treatment — the checks read-only, no Pause or Complete', async () => {
+    world.notes = [checkNote('pcn_consent', 'Consent signed')];
+    await openFlow({ role: 'therapist' });
+    await waitFor(() =>
+      expect(screen.getByTestId('visit-flow-check-consent')).toHaveAttribute(
+        'aria-checked',
+        'true',
+      ),
+    );
+    expect(screen.getByTestId('visit-flow-check-photos')).toBeDisabled();
+    expect(screen.queryByTestId('visit-flow-pause')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('visit-flow-complete')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('visit-flow-kit')).not.toBeInTheDocument();
+    expect(await screen.findByTestId('visit-flow-new-treatment')).toBeInTheDocument();
+  });
+
+  it('shows no checks to a member who can’t read the clinical record — and holds nothing on them', async () => {
+    const { user } = await openFlow({
+      viewable: PATIENT_FILE_SECTIONS.filter((section) => section !== 'overview'),
+    });
+    expect(screen.queryByTestId('visit-flow-step-checks')).not.toBeInTheDocument();
+    expect(fetchVisitCheckNotes).not.toHaveBeenCalled();
+    await user.click(await screen.findByTestId('visit-flow-repeat'));
+    await waitFor(() => expect(createTreatment).toHaveBeenCalledTimes(1));
+    expect(notifyMock.info).not.toHaveBeenCalled();
+  });
+
+  it('says a check read failed, in place, and reads again on Retry', async () => {
+    world.failNotes = true;
+    const { user } = await openFlow();
+    await waitFor(() => expect(step('checks')).toHaveTextContent('Could not load data.'));
+    world.failNotes = false;
+    await user.click(screen.getByTestId('visit-flow-retry-checks'));
+    await waitFor(() => expect(step('checks')).toHaveTextContent('3 checks left'));
   });
 });

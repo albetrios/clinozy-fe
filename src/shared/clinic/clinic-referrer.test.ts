@@ -16,7 +16,7 @@ import {
 } from './clinic-referrer.ts';
 import { PATIENT_FILE_SECTIONS } from './patient-file-sections.ts';
 
-const PATIENT = '0b6d2f0e-5c7a-4c1e-9b2a-3d4e5f6a7b8c';
+const PATIENT = 'pat_priya0000000000000000';
 /** A lead and a booking are clinozy-be public ids; the fixture rooms' records stay UUIDs. */
 const LEAD = 'lead_riya00000000000000000';
 const BOOKING = 'appt_riya00000000000000000';

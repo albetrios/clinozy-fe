@@ -9,6 +9,11 @@ family-shared review drawer over it (`../../shared/components/ReviewDrawer/`), o
 closing goes back to that section. The params are parsed by `validatePatientFeedbackSearch`
 in `../../patient-id.dialog-search.ts`.
 
+Data: clinozy-be — the drawer saves with `POST /app/patients/{patient_id}/reviews` (`createReview`,
+`@/shared/api/clinic/feedback-api.ts`; `patient:update`); the server opens the doctor call-back
+for a rating of 3 or less. Picked files go to the upload tray and are filed on the review's
+`file_keys` as each upload is confirmed (`attachReviewFile`). No file can be read back (B1).
+
 Gated by the file layout (membership, the `clinic-patients` module, the org status); in-room
 Patients edit is `useClinicAccess` — anyone without it who follows the link lands back on the
 section with the permission toast.

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { kebabCase } from '@/lib/kebab-case.ts';
 import { cn } from '@/lib/utils.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import { TREATMENT_LIMITS } from '@/shared/api/clinic/treatments-contracts.ts';
 import {
   DrawerChips,
   DrawerField,
@@ -40,37 +41,37 @@ const K = TREATMENT_KEYS;
 /** What every template field renders from. */
 interface FieldProps {
   values: TreatmentFormValues;
-  setParam: (key: string, value: string) => void;
+  setParameter: (key: string, value: string) => void;
   testId: string;
 }
 
-/** A param's test id: `skinType` → `<testId>-skin-type`. */
-function paramTestId(testId: string, param: string): string {
-  return `${testId}-${kebabCase(param)}`;
+/** A parameter's test id: `skinType` → `<testId>-skin-type`. */
+function parameterTestId(testId: string, parameter: string): string {
+  return `${testId}-${kebabCase(parameter)}`;
 }
 
-/** One-pick chips that store their option's value in `params[param]`. */
-function ParamChips({
+/** One-pick chips that store their option's value in `parameters[parameter]`. */
+function ParameterChips({
   label,
   hint,
-  param,
+  parameter,
   options,
   optionLabel,
   tone,
   span = 'full',
   values,
-  setParam,
+  setParameter,
   testId,
 }: FieldProps & {
   label: string;
   hint?: string;
-  param: string;
+  parameter: string;
   options: readonly TemplateOption[];
   optionLabel: (option: TemplateOption) => string;
   tone?: Tone;
   span?: 'half' | 'full';
 }) {
-  const current = options.find((option) => option.value === values.params[param]);
+  const current = options.find((option) => option.value === values.parameters[parameter]);
   return (
     <DrawerField label={label} hint={hint} span={span}>
       <DrawerChips
@@ -82,28 +83,31 @@ function ParamChips({
         }))}
         value={current?.key ?? null}
         onChange={(key) =>
-          setParam(param, options.find((option) => option.key === key)?.value ?? '')
+          setParameter(
+            parameter,
+            options.find((option) => option.key === key)?.value ?? '',
+          )
         }
         clearable
-        testId={paramTestId(testId, param)}
+        testId={parameterTestId(testId, parameter)}
       />
     </DrawerField>
   );
 }
 
-/** A text field stored in `params[param]` (≤80, `S:411`). */
-function ParamText({
+/** A text field stored in `parameters[parameter]` (≤ 80). */
+function ParameterText({
   label,
-  param,
+  parameter,
   placeholder,
   span,
   multiline = false,
   values,
-  setParam,
+  setParameter,
   testId,
 }: FieldProps & {
   label: string;
-  param: string;
+  parameter: string;
   placeholder?: string;
   span: 'half' | 'full';
   multiline?: boolean;
@@ -111,10 +115,10 @@ function ParamText({
   const id = useId();
   const props = {
     id,
-    maxLength: 80,
+    maxLength: TREATMENT_LIMITS.parameter,
     placeholder,
-    value: values.params[param] ?? '',
-    'data-testid': paramTestId(testId, param),
+    value: values.parameters[parameter] ?? '',
+    'data-testid': parameterTestId(testId, parameter),
   };
   return (
     <DrawerField label={label} htmlFor={id} span={span}>
@@ -122,13 +126,13 @@ function ParamText({
         <DrawerTextarea
           {...props}
           rows={3}
-          onChange={(event) => setParam(param, event.currentTarget.value)}
+          onChange={(event) => setParameter(parameter, event.currentTarget.value)}
         />
       ) : (
         <DrawerInput
           {...props}
           capitalize={false}
-          onChange={(event) => setParam(param, event.currentTarget.value)}
+          onChange={(event) => setParameter(parameter, event.currentTarget.value)}
         />
       )}
     </DrawerField>
@@ -178,11 +182,11 @@ function AreaChips({
  * Upper left 21–28, Lower right 48–41, Lower left 31–38 — as 28px buttons;
  * a picked tooth is dark.
  */
-function TeethChart({ values, setParam, testId }: FieldProps) {
+function TeethChart({ values, setParameter, testId }: FieldProps) {
   const { t } = useTranslation(TREATMENT_NS);
-  const picked = teethOf(values.params.teeth);
+  const picked = teethOf(values.parameters.teeth);
   const toggle = (tooth: number) =>
-    setParam(
+    setParameter(
       'teeth',
       storedTeeth(
         picked.includes(tooth)
@@ -233,18 +237,18 @@ function TeethChart({ values, setParam, testId }: FieldProps) {
 }
 
 /** A number field stored as text: a stepper with its unit (weeks, kg). */
-function ParamStepper({
+function ParameterStepper({
   label,
-  param,
+  parameter,
   suffix,
   max,
   span,
   values,
-  setParam,
+  setParameter,
   testId,
 }: FieldProps & {
   label: string;
-  param: string;
+  parameter: string;
   suffix: string;
   max: number;
   span: 'third' | 'half';
@@ -255,12 +259,12 @@ function ParamStepper({
       <DrawerStepper
         id={id}
         label={label}
-        value={Number(values.params[param] ?? 0)}
-        onValueChange={(value) => setParam(param, value ? String(value) : '')}
+        value={Number(values.parameters[parameter] ?? 0)}
+        onValueChange={(value) => setParameter(parameter, value ? String(value) : '')}
         min={0}
         max={max}
         suffix={suffix}
-        testId={paramTestId(testId, param)}
+        testId={parameterTestId(testId, parameter)}
       />
     </DrawerField>
   );
@@ -271,10 +275,10 @@ function SkinFields(props: FieldProps & { setAreas: (areas: string[]) => void })
   const { t } = useTranslation(TREATMENT_NS);
   return (
     <DrawerFieldGrid>
-      <ParamChips
+      <ParameterChips
         {...props}
         label={t(K.skin.therapyType)}
-        param="type"
+        parameter="type"
         options={SKIN_THERAPY_TYPES}
         optionLabel={(option) =>
           t(K.skin.therapyTypes[option.key as keyof typeof K.skin.therapyTypes])
@@ -289,47 +293,47 @@ function SkinFields(props: FieldProps & { setAreas: (areas: string[]) => void })
         optionLabel={(option) => t(K.skin.areas[option.key as keyof typeof K.skin.areas])}
         tone="sky"
       />
-      <ParamChips
+      <ParameterChips
         {...props}
         label={t(K.skin.skinType)}
-        param="skinType"
+        parameter="skinType"
         options={SKIN_TYPES}
         optionLabel={(option) => t(K.skin.skinTypeValue, { type: option.key })}
         tone="butter"
       />
-      <ParamText
+      <ParameterText
         {...props}
         label={t(K.skin.machine)}
-        param="machine"
+        parameter="machine"
         placeholder={t(K.skin.machinePlaceholder)}
         span="half"
       />
-      <ParamChips
+      <ParameterChips
         {...props}
         label={t(K.skin.wavelength)}
-        param="wavelength"
+        parameter="wavelength"
         options={WAVELENGTHS}
         optionLabel={(option) => option.value}
         span="half"
       />
-      <ParamText
+      <ParameterText
         {...props}
         label={t(K.skin.startReading)}
-        param="startReading"
+        parameter="startReading"
         placeholder={t(K.skin.readingPlaceholder)}
         span="half"
       />
-      <ParamText
+      <ParameterText
         {...props}
         label={t(K.skin.endReading)}
-        param="endReading"
+        parameter="endReading"
         placeholder={t(K.skin.readingPlaceholder)}
         span="half"
       />
-      <ParamText
+      <ParameterText
         {...props}
         label={t(K.skin.power)}
-        param="power"
+        parameter="power"
         placeholder={t(K.skin.powerPlaceholder)}
         span="full"
       />
@@ -342,10 +346,10 @@ function DentalFields(props: FieldProps) {
   const { t } = useTranslation(TREATMENT_NS);
   return (
     <DrawerFieldGrid>
-      <ParamChips
+      <ParameterChips
         {...props}
         label={t(K.dental.procedure)}
-        param="procedure"
+        parameter="procedure"
         options={DENTAL_PROCEDURES}
         optionLabel={(option) =>
           t(K.dental.procedures[option.key as keyof typeof K.dental.procedures])
@@ -353,19 +357,19 @@ function DentalFields(props: FieldProps) {
         tone="mint"
       />
       <TeethChart {...props} />
-      <ParamText
+      <ParameterText
         {...props}
         label={t(K.dental.material)}
-        param="material"
+        parameter="material"
         placeholder={t(K.dental.materialPlaceholder)}
         span="half"
       />
       <DrawerField label={t(K.dental.anaesthesia)} span="half">
         <DrawerToggle
           aria-label={t(K.dental.anaesthesia)}
-          checked={props.values.params.anaesthesia === ANAESTHESIA.given}
+          checked={props.values.parameters.anaesthesia === ANAESTHESIA.given}
           onCheckedChange={(given) =>
-            props.setParam(
+            props.setParameter(
               'anaesthesia',
               given ? ANAESTHESIA.given : ANAESTHESIA.notGiven,
             )
@@ -393,38 +397,38 @@ function PhysioFields(props: FieldProps & { setAreas: (areas: string[]) => void 
         }
         tone="sage"
       />
-      <ParamChips
+      <ParameterChips
         {...props}
         label={t(K.physio.modality)}
-        param="modality"
+        parameter="modality"
         options={PHYSIO_MODALITIES}
         optionLabel={(option) =>
           t(K.physio.modalities[option.key as keyof typeof K.physio.modalities])
         }
         tone="sky"
       />
-      <ParamChips
+      <ParameterChips
         {...props}
         label={t(K.physio.painBefore)}
         hint={t(K.physio.painHint)}
-        param="painBefore"
+        parameter="painBefore"
         options={PAIN_SCORES}
         optionLabel={(option) => option.value}
         tone="blush"
       />
-      <ParamChips
+      <ParameterChips
         {...props}
         label={t(K.physio.painAfter)}
         hint={t(K.physio.painHint)}
-        param="painAfter"
+        parameter="painAfter"
         options={PAIN_SCORES}
         optionLabel={(option) => option.value}
         tone="sage"
       />
-      <ParamText
+      <ParameterText
         {...props}
         label={t(K.physio.exercises)}
-        param="exercises"
+        parameter="exercises"
         placeholder={t(K.physio.exercisesPlaceholder)}
         span="full"
         multiline
@@ -439,10 +443,10 @@ function GynacFields(props: FieldProps) {
   const lmpId = useId();
   return (
     <DrawerFieldGrid>
-      <ParamChips
+      <ParameterChips
         {...props}
         label={t(K.gynac.visitType)}
-        param="visitType"
+        parameter="visitType"
         options={GYNAC_VISIT_TYPES}
         optionLabel={(option) =>
           t(K.gynac.visitTypes[option.key as keyof typeof K.gynac.visitTypes])
@@ -453,8 +457,8 @@ function GynacFields(props: FieldProps) {
         <DatePicker
           id={lmpId}
           label={t(K.gynac.lmp)}
-          value={props.values.params.lmp || null} // NOSONAR(S6606): a cleared date is stored as "" — it means no date
-          onChange={(date) => props.setParam('lmp', date ?? '')}
+          value={props.values.parameters.lmp || null} // NOSONAR(S6606): a cleared date is stored as "" — it means no date
+          onChange={(date) => props.setParameter('lmp', date ?? '')}
           past={300}
           future={0}
           clearable
@@ -462,33 +466,33 @@ function GynacFields(props: FieldProps) {
           testId={`${props.testId}-lmp`}
         />
       </DrawerField>
-      <ParamStepper
+      <ParameterStepper
         {...props}
         label={t(K.gynac.gestation)}
-        param="gestationWeeks"
+        parameter="gestationWeeks"
         suffix={t(K.gynac.weeks)}
         max={42}
         span="half"
       />
-      <ParamText
+      <ParameterText
         {...props}
         label={t(K.gynac.bp)}
-        param="bp"
+        parameter="bp"
         placeholder={t(K.gynac.bpPlaceholder)}
         span="half"
       />
-      <ParamStepper
+      <ParameterStepper
         {...props}
         label={t(K.gynac.weight)}
-        param="weightKg"
+        parameter="weightKg"
         suffix={t(K.gynac.kg)}
         max={250}
         span="half"
       />
-      <ParamText
+      <ParameterText
         {...props}
         label={t(K.gynac.findings)}
-        param="findings"
+        parameter="findings"
         placeholder={t(K.gynac.findingsPlaceholder)}
         span="full"
         multiline
@@ -502,17 +506,17 @@ function GeneralFields(props: FieldProps) {
   const { t } = useTranslation(TREATMENT_NS);
   return (
     <DrawerFieldGrid>
-      <ParamText
+      <ParameterText
         {...props}
         label={t(K.general.area)}
-        param="area"
+        parameter="area"
         placeholder={t(K.general.areaPlaceholder)}
         span="full"
       />
-      <ParamText
+      <ParameterText
         {...props}
         label={t(K.general.parameters)}
-        param="parameters"
+        parameter="parameters"
         placeholder={t(K.general.parametersPlaceholder)}
         span="full"
         multiline
@@ -527,12 +531,12 @@ function GeneralFields(props: FieldProps) {
  */
 export function TreatmentTemplateFields({
   values,
-  setParam,
+  setParameter,
   setAreas,
   readOnly,
   testId,
 }: FieldProps & { setAreas: (areas: string[]) => void; readOnly: boolean }) {
-  const props = { values, setParam, setAreas, testId };
+  const props = { values, setParameter, setAreas, testId };
   let fields = <GeneralFields {...props} />;
   if (values.template === 'skin') fields = <SkinFields {...props} />;
   else if (values.template === 'dental') fields = <DentalFields {...props} />;

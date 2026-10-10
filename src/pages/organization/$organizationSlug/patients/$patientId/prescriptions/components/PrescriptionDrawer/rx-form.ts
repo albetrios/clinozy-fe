@@ -1,15 +1,15 @@
 import type {
   BodyPart,
-  Prescription,
   PrescriptionItem,
   RxMeal,
   RxTiming,
   Tone,
 } from '@/shared/api/clinic/clinic-schema.ts';
 import type {
-  PrescriptionInput,
+  PrescriptionFields,
+  PrescriptionRecord,
   RxCatalogMedicine,
-} from '@/shared/api/clinic/prescriptions-api.ts';
+} from '@/shared/api/clinic/prescriptions-contracts.ts';
 import {
   quickLineCount,
   withQuickLineRow,
@@ -278,7 +278,7 @@ export function newRxForm(date: string, doctorId: string | null): RxFormValues {
 }
 
 /** A saved prescription as the edit drawer opens it. */
-export function rxFormOf(prescription: Prescription): RxFormValues {
+export function rxFormOf(prescription: PrescriptionRecord): RxFormValues {
   return {
     date: prescription.date,
     doctorId: prescription.doctorId,
@@ -292,24 +292,14 @@ export function rxFormOf(prescription: Prescription): RxFormValues {
 }
 
 /** The write a save sends: the named lines and the notes, blanks as null. */
-export function rxInputOf(
-  values: RxFormValues,
-  context: {
-    patientId: string;
-    appointmentId: string | null;
-    followUpDate: string | null;
-  },
-): PrescriptionInput {
+export function rxFieldsOf(values: RxFormValues): PrescriptionFields {
   return {
-    patientId: context.patientId,
-    appointmentId: context.appointmentId,
     doctorId: values.doctorId ?? '',
     date: values.date,
     items: namedRxLines(values.items).map(rxItemOf),
     advice: textOrNull(values.advice),
     labReport: textOrNull(values.labReport),
     procedureToday: textOrNull(values.procedureToday),
-    followUpDate: context.followUpDate,
   };
 }
 
@@ -411,7 +401,7 @@ export function initialRxForm({
   medicines,
   catalog,
 }: {
-  prescription: Prescription | null;
+  prescription: PrescriptionRecord | null;
   today: string;
   doctorId: string | null;
   medicines: readonly string[];
@@ -424,7 +414,7 @@ export function initialRxForm({
 /**
  * A new prescription opened from a smart note (AMBER A-F5): a line for each
  * medicine it named — the store's, with its last dosage, when the catalogue
- * carries the name; else the name as typed (the save maps it, `S:378`).
+ * carries the name; else the name as typed — free text, as the API keeps it (§5.4).
  */
 export function rxFormWithMedicines(
   form: RxFormValues,
@@ -465,93 +455,4 @@ export function steppedRxLines(
     newRow: () => rxLineFor(medicine, {}, daysNote),
     blank: emptyRxLine,
   });
-}
-
-// ── Kits ──
-
-/** A kit's line (H:4810). */
-interface RxKitLine {
-  name: string;
-  dose: string;
-  when: string;
-  where: string;
-  qty: number;
-  /** A note in the drawer's words ("Reapply every 3 h"). */
-  remark?: 'reapply';
-}
-
-/** One Quick fill kit (H:4810; `patient-file.md:283`). */
-export interface RxKit {
-  id: 'hairFall' | 'postPeel' | 'pigmentation';
-  tone: Tone;
-  lines: readonly RxKitLine[];
-  /** The kit's advice for the Notes ("Avoid sun and scrubs for 48 h"). */
-  advice?: 'avoidSun';
-}
-
-/** The three kits, verbatim from the design (H:4810). */
-export const RX_KITS: readonly RxKit[] = [
-  {
-    id: 'hairFall',
-    tone: 'lav',
-    lines: [
-      { name: 'Flubolt 400', dose: '0-0-1', when: 'after', where: '', qty: 8 },
-      {
-        name: 'Clonix-B Lotion',
-        dose: '',
-        when: 'morning_night',
-        where: 'scalp',
-        qty: 1,
-      },
-      {
-        name: 'Densyl-AD Shampoo',
-        dose: '',
-        when: 'thrice_week',
-        where: 'scalp',
-        qty: 1,
-      },
-    ],
-  },
-  {
-    id: 'postPeel',
-    tone: 'blush',
-    lines: [
-      {
-        name: 'Sunscreen SPF 50',
-        dose: '1-1-0',
-        when: 'morning',
-        where: 'face',
-        qty: 1,
-        remark: 'reapply',
-      },
-    ],
-    advice: 'avoidSun',
-  },
-  {
-    id: 'pigmentation',
-    tone: 'butter',
-    lines: [
-      { name: 'Tranexa 500', dose: '1-0-1', when: 'after', where: '', qty: 20 },
-      { name: 'Sunscreen SPF 50', dose: '1-1-0', when: 'morning', where: 'face', qty: 1 },
-    ],
-  },
-];
-
-/** A kit's lines, each matched to the store's medicine by name where it has one. */
-export function rxKitLines(
-  kit: RxKit,
-  catalog: readonly Pick<RxCatalogMedicine, 'name' | 'medicineId'>[],
-  remark: (key: 'reapply') => string,
-): RxFormLine[] {
-  return kit.lines.map((line) => ({
-    medicineId:
-      catalog.find((medicine) => medicine.name.toLowerCase() === line.name.toLowerCase())
-        ?.medicineId ?? null,
-    medicineName: line.name,
-    dose: line.dose,
-    when: line.when,
-    where: line.where,
-    qty: line.qty,
-    remarks: line.remark ? remark(line.remark) : '',
-  }));
 }

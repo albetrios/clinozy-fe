@@ -3,12 +3,9 @@ import userEvent from '@testing-library/user-event';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import { fetchPatientFile } from '@/shared/api/clinic/patient-file-api.ts';
-import type { PatientFile } from '@/shared/api/clinic/patient-file-contracts.ts';
+import type { PatientRecord } from '@/shared/api/clinic/patients-contracts.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
-import { fsi } from '@/tests/utils/bidi-marks.ts';
+import { patientFile, patientRecord } from '@/tests/utils/patient-doubles.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { PatientRail, type PatientRailProps } from './PatientRail.tsx';
@@ -20,30 +17,41 @@ vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 
 /** 10:00 on 3 Oct, clinic time. */
 const NOW = new Date('2026-10-03T04:30:00Z');
-let file: PatientFile;
+
+/** Priya's record with a second number on file, a patient since 24 Sep, 14:40 clinic time. */
+const PRIYA: PatientRecord = patientRecord({
+  createdAt: '2026-09-24T09:10:00.000Z',
+  phones: [
+    { phone: '+919876543210', isPrimary: true, isOnWhatsapp: true },
+    { phone: '+919825099887', isPrimary: false, isOnWhatsapp: false },
+  ],
+});
+
+/** Her file: Instagram, Gujarati, a check-in and a review. */
+const FILE = patientFile({
+  patient: PRIYA,
+  instagram: 'priya.shah',
+  language: 'gujarati',
+  feedback: {
+    feel: 'better',
+    score: 7,
+    review: { source: 'google', rating: 5 },
+    checkIns: 2,
+    reviews: 1,
+  },
+});
 
 function renderRail(props: Partial<PatientRailProps> = {}) {
-  const handlers = { onToggleMasked: vi.fn() };
-  const view = renderWithProviders(
+  return renderWithProviders(
     <TooltipProvider>
-      <PatientRail
-        file={file}
-        masked
-        actions={{}}
-        className="flex"
-        {...handlers}
-        {...props}
-      />
+      <PatientRail file={FILE} actions={{}} className="flex" {...props} />
     </TooltipProvider>,
   );
-  return { ...view, ...handlers };
 }
 
-beforeAll(async () => {
+beforeAll(() => {
   vi.useFakeTimers({ toFake: ['Date'] });
   vi.setSystemTime(NOW);
-  resetClinicFixtures();
-  file = await fetchPatientFile(patientRef('Dharti Galani'));
 });
 afterAll(() => vi.useRealTimers());
 beforeEach(() => {
@@ -52,28 +60,22 @@ beforeEach(() => {
 
 describe('PatientRail', () => {
   it('shows who they are: the name, the ID, how long a patient, type and status', async () => {
-    // A patient since 24 Sep, 14:40 clinic time.
-    const since = { ...file.patient, createdAt: '2026-09-24T09:10:00.000Z' };
-    const { container } = renderRail({
-      file: { ...file, patient: since },
-      onEditContact: vi.fn(),
-    });
+    const { container } = renderRail({ onEditContact: vi.fn() });
     const rail = await screen.findByTestId('patient-rail');
-    expect(rail).toHaveAccessibleName('Dharti Galani');
+    expect(rail).toHaveAccessibleName('Priya Shah');
     expect(rail).toHaveTextContent('#3508');
     expect(rail).toHaveTextContent('9 days as patient');
     expect(rail).toHaveTextContent('Aesthetic');
-    expect(rail).toHaveTextContent('Regular');
+    expect(rail).toHaveTextContent('New');
     expect(await axe(container)).toHaveNoViolations();
   });
 
   it('keeps the name, ID, numbers, date and address whole on a right-to-left page', async () => {
     document.documentElement.dir = 'rtl';
     try {
-      const since = { ...file.patient, createdAt: '2026-09-24T09:10:00.000Z' };
-      renderRail({ file: { ...file, patient: since } });
+      renderRail();
       const rail = await screen.findByTestId('patient-rail');
-      const name = within(rail).getByText('Dharti Galani');
+      const name = within(rail).getByText('Priya Shah');
       expect(name).toHaveAttribute('dir', 'auto');
       expect(name).toHaveClass('[text-align:match-parent]');
       expect(screen.getByTestId('patient-rail-copy-id')).toHaveAttribute('dir', 'ltr');
@@ -83,16 +85,13 @@ describe('PatientRail', () => {
       );
       // Every number and handle reads left to right, masked or not.
       const reach = screen.getByRole('region', { name: 'Reach' });
-      for (const value of within(reach).getAllByText(/•••• \d{4}|@dharti/)) {
+      for (const value of within(reach).getAllByText(/•••• \d{4}|priya\.shah/)) {
         expect(value).toHaveAttribute('dir', 'auto');
       }
       const about = screen.getByRole('region', { name: 'About' });
       expect(within(about).getByText('Gujarati')).toHaveAttribute('dir', 'auto');
-      expect(within(about).getByText('Umra, Velanja', { exact: false })).toHaveAttribute(
-        'dir',
-        'auto',
-      );
-      expect(rail).toHaveTextContent('Dharti Galani#3508·9 days as patient');
+      expect(within(about).getByText('Adajan, Surat')).toHaveAttribute('dir', 'auto');
+      expect(rail).toHaveTextContent('Priya Shah#3508·9 days as patient');
     } finally {
       document.documentElement.dir = '';
     }
@@ -115,16 +114,36 @@ describe('PatientRail', () => {
     expect(screen.queryByTestId('patient-rail-edit')).not.toBeInTheDocument();
   });
 
+  it('reaches them on the primary number, their other numbers and Instagram — no lead number', async () => {
+    renderRail();
+    const reach = await screen.findByRole('region', { name: 'Reach' });
+    expect(reach).toHaveTextContent('•••• 3210');
+    expect(reach).toHaveTextContent('WhatsApp · Primary');
+    expect(reach).toHaveTextContent('•••• 9887');
+    expect(reach).toHaveTextContent('Mobile');
+    expect(reach).not.toHaveTextContent('From lead');
+    // The handle is not a number — never masked (a plan addition, Appendix F).
+    expect(reach).toHaveTextContent('priya.shah');
+    expect(reach).toHaveTextContent('Instagram');
+  });
+
+  it('lists the primary number alone for a person with one number and no Instagram', async () => {
+    renderRail({ file: patientFile() });
+    const reach = await screen.findByRole('region', { name: 'Reach' });
+    expect(within(reach).getAllByRole('button', { name: 'Show number' })).toHaveLength(1);
+    expect(reach).not.toHaveTextContent('Instagram');
+  });
+
   it('masks each number until its own eye is pressed (Q-F4)', async () => {
     const user = userEvent.setup();
     renderRail();
     const reach = await screen.findByRole('region', { name: 'Reach' });
-    expect(reach).toHaveTextContent('•••• 3212');
-    expect(reach).toHaveTextContent('WhatsApp · Primary');
-    // The handle is not a number — never masked (a plan addition, Appendix F).
-    expect(reach).toHaveTextContent('@dharti');
-    await user.click(within(reach).getByRole('button', { name: 'Show number' }));
-    expect(reach).not.toHaveTextContent('••••');
+    const [primaryEye] = within(reach).getAllByRole('button', { name: 'Show number' });
+    if (!primaryEye) throw new Error('no eye on the primary number');
+    await user.click(primaryEye);
+    expect(reach).not.toHaveTextContent('•••• 3210');
+    // The other number stays masked.
+    expect(reach).toHaveTextContent('•••• 9887');
     expect(within(reach).getByRole('button', { name: 'Hide number' })).toHaveAttribute(
       'aria-pressed',
       'true',
@@ -137,23 +156,31 @@ describe('PatientRail', () => {
     expect(about).toHaveTextContent('Female · 30 yrs');
     expect(about).toHaveTextContent('🎂 in 24 days');
     expect(about).toHaveTextContent('Gujarati');
-    expect(about).toHaveTextContent('Umra, Velanja');
+    expect(about).toHaveTextContent('Adajan, Surat');
     expect(within(about).getByText('Data: consent given')).toBeInTheDocument();
   });
 
-  it('says "No address" when there is none', async () => {
-    renderRail({ file: { ...file, patient: { ...file.patient, address: null } } });
-    expect(await screen.findByRole('region', { name: 'About' })).toHaveTextContent(
-      'No address',
-    );
+  it('names no language when the person asked for none, and says "No address"', async () => {
+    renderRail({
+      file: patientFile({
+        language: null,
+        patient: patientRecord({ address: null }),
+      }),
+    });
+    const about = await screen.findByRole('region', { name: 'About' });
+    expect(about).toHaveTextContent('No address');
+    expect(about).not.toHaveTextContent(/Gujarati|Hindi|English/);
   });
 
   it('offers to book when no visit is coming, and to reschedule the next one', async () => {
     const user = userEvent.setup();
     const onBook = vi.fn();
-    const none = renderRail({ file: { ...file, nextVisit: null }, actions: { onBook } });
+    const none = renderRail({ file: patientFile(), actions: { onBook } });
     expect(await screen.findByRole('region', { name: 'Up next' })).toHaveTextContent(
       'Not booked',
+    );
+    expect(screen.getByRole('region', { name: 'Up next' })).toHaveTextContent(
+      'No upcoming visit',
     );
     await user.click(screen.getByTestId('patient-rail-book'));
     expect(onBook).toHaveBeenLastCalledWith(null);
@@ -161,58 +188,36 @@ describe('PatientRail', () => {
     none.unmount();
 
     const next = {
-      appointmentId: 'a1',
+      appointmentId: 'appt_priya00000000000000000',
       date: '2026-10-03',
       startTime: '11:00',
       serviceLabel: 'Hydrafacial',
-      durationMin: 45,
     };
-    renderRail({ file: { ...file, nextVisit: next }, actions: { onBook } });
+    renderRail({ file: patientFile({ nextVisit: next }), actions: { onBook } });
     const upNext = await screen.findByRole('region', { name: 'Up next' });
     // The date tile names the day; the line beside it reads the time alone.
     expect(upNext).toHaveTextContent(/11:00\sAM/);
     expect(upNext).not.toHaveTextContent('Today');
-    // The service is an isolated token in its line.
-    expect(upNext).toHaveTextContent(`${fsi('Hydrafacial')} · 45 min`);
+    // The service alone — no length.
+    expect(upNext).toHaveTextContent('Hydrafacial');
+    expect(upNext).not.toHaveTextContent('min');
     await user.click(screen.getByTestId('patient-rail-book'));
     expect(screen.getByTestId('patient-rail-book')).toHaveTextContent('Reschedule');
     expect(onBook).toHaveBeenLastCalledWith(next);
   });
 
-  it('masks what they owe behind its eye, and collects it', async () => {
-    const user = userEvent.setup();
-    const onCollect = vi.fn();
-    const owing = { ...file, due: 120_000, dueSince: '2026-09-21' };
-    const { onToggleMasked } = renderRail({ file: owing, actions: { onCollect } });
-    expect(await screen.findByTestId('patient-rail-due')).toHaveTextContent('₹ ••••');
-    expect(screen.getByRole('region', { name: 'Up next' })).toHaveTextContent(
-      'since 12 days',
-    );
-    await user.click(screen.getByTestId('patient-rail-due-eye'));
-    expect(onToggleMasked).toHaveBeenCalledOnce();
-    await user.click(screen.getByTestId('patient-rail-collect'));
-    expect(onCollect).toHaveBeenCalledOnce();
+  it('hides Book without the appointment write', async () => {
+    renderRail();
+    await screen.findByRole('region', { name: 'Up next' });
+    expect(screen.queryByTestId('patient-rail-book')).not.toBeInTheDocument();
   });
 
-  it('shows the amount once unmasked, and "All paid" when nothing is owed', async () => {
-    const shown = renderRail({ file: { ...file, due: 120_000 }, masked: false });
-    expect(await screen.findByTestId('patient-rail-due')).toHaveTextContent('1,200');
-    shown.unmount();
-
-    renderRail({ file: { ...file, due: 0 } });
-    expect(await screen.findByRole('region', { name: 'Up next' })).toHaveTextContent(
-      'All paid · nothing due',
-    );
-    expect(screen.queryByTestId('patient-rail-due')).not.toBeInTheDocument();
-  });
-
-  it('shows what the clinic holds to give back, masked with the file', async () => {
-    renderRail({
-      file: { ...file, credit: { amount: 50_000, reasons: ['Charged twice'] } },
-    });
+  it('keeps no dues, credit or Collect in Up next', async () => {
+    renderRail();
     const upNext = await screen.findByRole('region', { name: 'Up next' });
-    expect(upNext).toHaveTextContent(`${fsi('₹ ••••')} to return`);
-    expect(upNext).toHaveTextContent(fsi('Charged twice'));
+    expect(screen.queryByTestId('patient-rail-due')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('patient-rail-collect')).not.toBeInTheDocument();
+    expect(upNext).not.toHaveTextContent(/All paid|to return|₹/);
   });
 
   it('sums up their feedback and opens it', async () => {
@@ -224,6 +229,31 @@ describe('PatientRail', () => {
     expect(feedback).toHaveTextContent('2 check-ins · 1 review');
     await user.click(feedback);
     expect(onFeedback).toHaveBeenCalledOnce();
+  });
+
+  it('reads the latest review without a check-in, and "No feedback yet" with neither', async () => {
+    const review = renderRail({
+      file: patientFile({
+        feedback: {
+          feel: null,
+          score: null,
+          review: { source: 'google', rating: 5 },
+          checkIns: 0,
+          reviews: 1,
+        },
+      }),
+    });
+    expect(await screen.findByTestId('patient-rail-feedback')).toHaveTextContent(
+      '5★ on Google',
+    );
+    review.unmount();
+
+    renderRail({ file: patientFile() });
+    const feedback = await screen.findByTestId('patient-rail-feedback');
+    expect(feedback).toHaveTextContent('No feedback yet');
+    expect(feedback).toHaveTextContent('0 check-ins · 0 reviews');
+    // Nothing to open without the member's Feedback.
+    expect(feedback).toBeDisabled();
   });
 
   it('keeps to identity for a member who reads billing alone (A-F14)', async () => {

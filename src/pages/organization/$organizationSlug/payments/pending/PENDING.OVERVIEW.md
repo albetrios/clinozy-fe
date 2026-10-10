@@ -55,7 +55,7 @@ as its note, so a save keeps it.
   "Record ₹800", at most what is owed; a part leaves the rest open ("₹X adjusted"). A
   patient's give-back is a refund with its credit note when the credit — or the entry it
   came from — names an invoice. Give back needs the `refund` ability (Q-U8); Got it back,
-  Create. The patient file's "₹500 to return" opens the same drawer.
+  Create.
 - **Use on next bill** (`hooks/useCreditOnBill/`, Q-G9) — a patient's open Give credit goes
   on their oldest invoice with a due, min(credit, due), as a Credit-mode receipt: "₹500 of
   CR-2 adjusted on invoice #772", the row then "Adjusted · Invoice #772" (or "₹X adjusted"

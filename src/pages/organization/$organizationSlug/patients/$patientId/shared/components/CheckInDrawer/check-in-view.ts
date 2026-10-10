@@ -1,18 +1,15 @@
-import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
 import { isolateJoin, isolateText } from '@/lib/bidi-isolate.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import {
   type CheckinFeel,
   OFFERING_CATEGORY_VALUES,
 } from '@/shared/api/clinic/clinic-schema.ts';
 import { localDateOf } from '@/shared/api/clinic/clinic-time.ts';
-import {
-  type CheckInContext,
-  FEEDBACK_LIMITS,
+import type {
+  CheckInContext,
+  CheckInOffering,
 } from '@/shared/api/clinic/feedback-contracts.ts';
-import type { OfferingRecord } from '@/shared/api/clinic/offerings-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import {
   CHECKIN_FEEL_TONES,
@@ -44,32 +41,17 @@ export interface CheckInStepView {
   peek: DrawerPeekItem[];
 }
 
-/** The drawer's title, sub line and the `context` a new check-in stores. */
+/** The drawer's title and sub line. */
 export interface CheckInHead {
   title: string;
   sub: string;
-  /** "Aftercare after LHR Full Face", "Visit check-in · Appt #2790" or "Visit check-in" (`S:510`). */
-  context: string;
-}
-
-/** The stored `context`: what the check-in follows, in words, within the contract's 80. */
-function contextText(context: CheckInContext | undefined, t: TFunction): string {
-  let text = t(K.contextVisit);
-  if (context?.treatment) {
-    text = t(K.contextAftercare, { treatment: context.treatment.name });
-  } else if (context?.appointment) {
-    text = t(K.contextAppointment, {
-      number: displayId.appointment(context.appointment.seq),
-    });
-  }
-  return text.slice(0, FEEDBACK_LIMITS.context);
 }
 
 /**
  * The head (H:4396): "Aftercare check-in" after a treatment, "Visit check-in"
  * otherwise, over "Dharti Galani · LHR Full Face · last check-in 24 Sep: Same"
  * — the treatment's name or the visit's service, and the patient's check-in
- * before this one.
+ * before this one. The stored `context` is the server's words (TR9), not the drawer's.
  */
 export function useCheckInHead({
   patientName,
@@ -78,11 +60,11 @@ export function useCheckInHead({
 }: {
   patientName: string;
   aftercare: boolean;
-  context: CheckInContext | undefined;
+  context: CheckInContext;
 }): CheckInHead {
   const { t } = useTranslation([CHECK_IN_NS, CLINIC_NS]);
   const { formatDate } = useLocaleFormat();
-  const previous = context?.previous;
+  const { previous } = context;
   const last = previous
     ? t(K.last, {
         date: isolateText(
@@ -95,29 +77,29 @@ export function useCheckInHead({
         feel: t(CLINIC_KEYS.checkInFeels[previous.feel], { ns: CLINIC_NS }),
       })
     : '';
-  const service = context?.treatment?.name ?? context?.appointment?.service;
+  const service = context.treatmentName ?? context.visitService;
   return {
     title: t(aftercare ? K.titles.aftercare : K.titles.visit),
     // The drawer's sub keeps the page's direction; each part is isolated.
     sub: isolateJoin([patientName, service, last]),
-    context: contextText(context, t),
   };
 }
 
 /**
  * The offerings a plan can name (H:4396 `nextOf`): the active ones and any
- * already named, by category, each "₹4,800 · 7 sessions".
+ * already named, by category, each "₹4,800 · 7 sessions" (the API's rupees).
  */
 export function useCheckInOfferingOptions(
-  offerings: readonly OfferingRecord[],
+  offerings: readonly CheckInOffering[],
   picked: readonly string[],
-): PickerOption<OfferingRecord>[] {
+): PickerOption<CheckInOffering>[] {
   const { t } = useTranslation([CHECK_IN_NS, CLINIC_NS]);
-  const money = usePaiseFormat();
-  const rank = (offering: OfferingRecord) =>
+  const paise = usePaiseFormat();
+  const money = (rupees: number) => paise(Math.round(rupees * 100));
+  const rank = (offering: CheckInOffering) =>
     OFFERING_CATEGORY_VALUES.indexOf(offering.category);
   return offerings
-    .filter((offering) => offering.active || picked.includes(offering.id))
+    .filter((offering) => offering.isActive || picked.includes(offering.id))
     .sort((a, b) => rank(a) - rank(b))
     .map((offering) => ({
       key: offering.id,
@@ -145,7 +127,7 @@ export function useCheckInOfferingOptions(
  */
 export function useCheckInStepsView(
   values: CheckInFormValues,
-  named: readonly PickerOption<OfferingRecord>[],
+  named: readonly PickerOption<CheckInOffering>[],
 ): Record<CheckInStepId, CheckInStepView> {
   const { t } = useTranslation([CHECK_IN_NS, CLINIC_NS]);
   const { t: tDrawer } = useTranslation(RECORD_DRAWER_NS);
@@ -154,7 +136,7 @@ export function useCheckInStepsView(
     t(CLINIC_KEYS.checkInFeels[feel], { ns: CLINIC_NS });
   const feel = values.feel ? feelOf(values.feel) : '';
   const score = values.score > 0 ? String(values.score) : '';
-  const now = values.now.trim();
+  const now = values.currentState.trim();
   const followed = values.followed ? followedLabel(t, values.followed) : '';
   const details = values.followedNote.trim();
   const plan = values.nextPlan.trim();

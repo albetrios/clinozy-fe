@@ -1,151 +1,266 @@
-import type { InvoiceStatus } from './clinic-money.ts';
-import type {
-  Channel,
-  DeliveryStatus,
-  InvoiceType,
-  LeadStatus,
-  OfferingCategory,
-  SuggestionStatus,
-  Tone,
+import { z } from 'zod';
+
+import type { ApiData } from '@/core/http/api.ts';
+import { wireSchema } from '@/core/http/wire-schema.ts';
+
+import {
+  DELIVERY_STATUS_VALUES,
+  type DeliveryStatus,
+  OFFERING_CATEGORY_VALUES,
+  type OfferingCategory,
+  SUGGESTION_STATUS_VALUES,
+  type SuggestionStatus,
+  type Tone,
+  TONE_VALUES,
 } from './clinic-schema.ts';
 
 /*
- * A patient's plan (`getPlan`, `S:1635`; `OfferingSuggestion`, `S:480–499`):
- * the offering suggestions joined with their offering and who made them, the
- * ideas the plan derives from the patient's history, their last purchases and
- * the contact's last messages — what the Offering suggestions card shows in
- * the appointment form and the patient file. REPLACE_WITH_API: the joins and
- * the ideas are the server's; the fixture server answers them for now.
+ * A patient's plan on clinozy-be (api-integration §5.4; route map `getPlan`): the offering
+ * suggestions (`/app/patients/:patient_id/offering-suggestions`) with the server's plan total
+ * (`meta.plan_total`, the planned and accepted rows), what each row invoiced
+ * (`invoiced_quantity`, `is_fully_invoiced`), its lowest-price flag (`is_below_lowest_price`)
+ * and where it was made (`source_label`); the ideas (`…/offering-ideas`); the offerings the card
+ * names and adds from (`/app/offerings`); and the contact's last messages
+ * (`/app/contacts/:contact_id/activities`). The client computes none of these (§7). Money is in
+ * rupees, as the API sends it.
  */
 
-/** Who made a suggestion, as the card's 26px avatar shows them. */
-interface PlanSuggester {
-  name: string;
-  initials: string;
-  tone: Tone;
-}
+type ApiSuggestion = NonNullable<
+  ApiData<'/app/patients/{patient_id}/offering-suggestions', 'get'>
+>[number];
+type ApiOffering = NonNullable<ApiData<'/app/offerings', 'get'>>[number];
+type ApiActivity = NonNullable<
+  ApiData<'/app/contacts/{contact_id}/activities', 'get'>
+>[number];
 
-/**
- * One offering suggestion as the plan reads it — the record and its offering
- * (`null` name: the offering was removed). Money is in paise; `price` is the
- * whole line's final price, `null` meaning list × qty (`S:490`).
- */
-export interface PlanSuggestion {
+/** A plan row as the API answers it. */
+export const planSuggestionWire = wireSchema<ApiSuggestion>()(
+  z.object({
+    id: z.string(),
+    offering_id: z.string(),
+    offering_name: z.string(),
+    quantity: z.number().int(),
+    price: z.number().nullable(),
+    status: z.enum(SUGGESTION_STATUS_VALUES),
+    reason: z.string().nullable(),
+    source_label: z.string(),
+    suggested_by_membership_id: z.string().nullable(),
+    invoiced_quantity: z.number().int(),
+    is_fully_invoiced: z.boolean(),
+    is_below_lowest_price: z.boolean(),
+    created_at: z.string(),
+    updated_at: z.string(),
+  }),
+);
+
+/** One offering in the patient's plan. */
+export interface PlanSuggestionRow {
   id: string;
   offeringId: string;
-  name: string | null;
-  category: OfferingCategory | null;
-  tone: Tone;
-  /** The offering's sessions per unit (a package's count; 1 otherwise). */
-  sessions: number;
-  /** One unit's list price. */
-  listPrice: number;
-  /** One unit's lowest price; `null` when the offering has no floor. */
-  floorPrice: number | null;
-  qty: number;
+  /** The offering's name — empty when the offering is gone. */
+  name: string;
+  /** 1–99. */
+  quantity: number;
+  /** The whole quantity's final amount; `null` = the offering's billed price × quantity (PK9). */
   price: number | null;
   status: SuggestionStatus;
-  appointmentId: string | null;
-  /** Where it was suggested ("Appt #2790 · Consultation", "Counselling call"). */
-  sourceLabel: string;
+  /** Why it was suggested. */
   reason: string | null;
-  /** ISO instant it was suggested. */
+  /** Where it was made: "Patient file", "Appt #2861 · Hydrafacial", "Check-in · 24 Sep". */
+  sourceLabel: string;
+  /** Who suggested it — a membership id. */
+  suggestedById: string | null;
+  /** Units the invoices' lines have taken. */
+  invoicedQuantity: number;
+  /** Every unit invoiced — "✓ Invoiced", its controls gone. */
+  isFullyInvoiced: boolean;
+  /** Its price is under the offering's lowest price × quantity — warned, not refused (PK9). */
+  isBelowLowestPrice: boolean;
   createdAt: string;
-  /** Units invoiced so far — Σ the invoice links' qty. */
-  invoicedQty: number;
-  /** What the linked invoice lines come to. */
-  invoicedAmount: number;
-  suggestedBy: PlanSuggester | null;
+  /** What a change sends back as `expected_updated_at`. */
+  updatedAt: string;
+}
+
+/** A plan row from the wire. */
+export function toPlanSuggestionRow(
+  row: z.output<typeof planSuggestionWire>,
+): PlanSuggestionRow {
+  return {
+    id: row.id,
+    offeringId: row.offering_id,
+    name: row.offering_name,
+    quantity: row.quantity,
+    price: row.price,
+    status: row.status,
+    reason: row.reason,
+    sourceLabel: row.source_label,
+    suggestedById: row.suggested_by_membership_id,
+    invoicedQuantity: row.invoiced_quantity,
+    isFullyInvoiced: row.is_fully_invoiced,
+    isBelowLowestPrice: row.is_below_lowest_price,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+/** A patient's plan: its rows, newest first, and the server's total. */
+export interface PatientPlan {
+  suggestions: PlanSuggestionRow[];
+  /** The planned and accepted rows' final amounts (`meta.plan_total`). */
+  planTotal: number;
 }
 
 /**
- * Why the plan offers an idea (H:4355–4366): a doctor's note, a complaint,
- * the visits so far (a package saves on each session), a package nearly used
- * up, or a first visit.
+ * One idea as `…/offering-ideas` answers it. The OpenAPI document gives that route's 200 no body
+ * (api-integration §9 M3), so there is no generated type to check this against.
  */
-export type PlanIdeaReason =
-  | { kind: 'note'; text: string }
-  | { kind: 'complaint'; text: string }
-  | { kind: 'visits'; count: number }
-  | { kind: 'renew' }
-  | { kind: 'first' };
+export const planIdeaWire = z.object({
+  offering_id: z.string(),
+  offering_name: z.string(),
+  category: z.enum(OFFERING_CATEGORY_VALUES),
+  sessions: z.number().int(),
+  price: z.number(),
+  reason: z.string(),
+});
 
-/** An offering the plan suggests adding — the card's Sparkles rows (at most four). */
-export interface PlanIdea {
+/** An offering the server suggests adding — the card's Sparkles rows (at most four). */
+export interface PlanIdeaRow {
   offeringId: string;
   name: string;
   category: OfferingCategory;
-  tone: Tone;
   sessions: number;
-  listPrice: number;
-  reason: PlanIdeaReason;
+  /** The offering's list price. */
+  price: number;
+  /** Why, in the server's words ("First visit · start with a consultation"). */
+  reason: string;
 }
 
-/** One line the patient bought — "<first>’s last purchases" (the last six). */
-export interface PlanPurchase {
-  /** `<invoice id>:<line index>`. */
+/** An idea from the wire. */
+export function toPlanIdeaRow(row: z.output<typeof planIdeaWire>): PlanIdeaRow {
+  return {
+    offeringId: row.offering_id,
+    name: row.offering_name,
+    category: row.category,
+    sessions: row.sessions,
+    price: row.price,
+    reason: row.reason,
+  };
+}
+
+/** An offering as the catalogue answers it — the parts the plan card reads. */
+export const planOfferingWire = wireSchema<ApiOffering>()(
+  z.object({
+    id: z.string(),
+    name: z.string(),
+    category: z.enum(OFFERING_CATEGORY_VALUES),
+    tone: z.enum(TONE_VALUES),
+    sessions: z.number().int(),
+    price: z.number(),
+    offer_price: z.number().nullable(),
+    min_price: z.number().nullable(),
+    is_active: z.boolean(),
+  }),
+);
+
+/** An offering the card names a row by, prices it with, and adds from ("Add offering"). */
+export interface PlanOffering {
   id: string;
-  invoiceId: string;
-  invoiceSeq: number;
-  invoiceType: InvoiceType;
-  invoiceStatus: InvoiceStatus;
-  /** The invoice's date. */
-  date: string;
   name: string;
-  /** The offering's category; `null` for a medicine or an unknown line. */
-  category: OfferingCategory | null;
-  qty: number;
-  /** The line after its discount, before GST. */
-  amount: number;
-  /** A package's sessions used of the total; `null` for anything else. */
-  sessions: { used: number; total: number } | null;
+  category: OfferingCategory;
+  tone: Tone;
+  /** Sessions per unit — a package's count, 1 otherwise. */
+  sessions: number;
+  /** One unit's list price. */
+  price: number;
+  /** One unit's offer price, when it has one — what it bills at instead. */
+  offerPrice: number | null;
+  /** One unit's lowest price — `null` without `offering:lower_price:read` (O15). */
+  minPrice: number | null;
+  isActive: boolean;
 }
 
-/** One message of the contact's thread — "Contact activity" (the last five, newest first). */
-export interface PlanActivity {
+/** A catalogue row from the wire. */
+export function toPlanOffering(row: z.output<typeof planOfferingWire>): PlanOffering {
+  return {
+    id: row.id,
+    name: row.name,
+    category: row.category,
+    tone: row.tone,
+    sessions: row.sessions,
+    price: row.price,
+    offerPrice: row.offer_price,
+    minPrice: row.min_price,
+    isActive: row.is_active,
+  };
+}
+
+/** One unit's billed price — the offer price, else the list price (PK9). */
+export const billedPrice = (
+  offering: Pick<PlanOffering, 'price' | 'offerPrice'>,
+): number => offering.offerPrice ?? offering.price;
+
+/** The contact-stream entries "Contact activity" lists: the messages and the calls. */
+export const PLAN_ACTIVITY_TYPES = ['whatsapp', 'instagram', 'call_log'] as const;
+
+/** Every entry type of a contact's stream. */
+const ACTIVITY_TYPE_VALUES = [
+  'whatsapp',
+  'instagram',
+  'call_log',
+  'note',
+  'system',
+] as const;
+
+/** A contact-stream entry as the API answers it — the parts the card reads. */
+export const planActivityWire = wireSchema<ApiActivity>()(
+  z.object({
+    id: z.string(),
+    type: z.enum(ACTIVITY_TYPE_VALUES),
+    direction: z.enum(['sent', 'received']).nullable(),
+    body: z.string(),
+    delivery_status: z.enum(DELIVERY_STATUS_VALUES).nullable(),
+    occurred_at: z.string(),
+  }),
+);
+
+/** One message or call of the contact's stream — "Contact activity" (the last five). */
+export interface PlanActivityRow {
   id: string;
   /** ISO instant. */
   at: string;
-  channel: Channel;
-  direction: 'sent' | 'got';
+  channel: 'whatsapp' | 'instagram' | 'call';
+  direction: 'sent' | 'received';
   text: string;
-  /** A sent message's delivery; `null` for one they sent. */
+  /** A sent message's delivery; `null` for one they sent or a call. */
   delivery: DeliveryStatus | null;
 }
 
-/** A patient's plan (`getPlan`, `S:1635`). */
-export interface PatientPlan {
-  suggestions: PlanSuggestion[];
-  ideas: PlanIdea[];
-  purchases: PlanPurchase[];
-  /** Receipts less refunds over every invoice of theirs, in paise. */
-  paidSoFar: number;
-  /** Their lead — "Contact activity · Lead #<seq> · <status>", "Open chat"; `null` without one. */
-  lead: { id: string; seq: number; status: LeadStatus | null } | null;
-  activity: PlanActivity[];
+/** A stream entry from the wire — `null` for a note or a server entry, which the card skips. */
+export function toPlanActivityRow(
+  row: z.output<typeof planActivityWire>,
+): PlanActivityRow | null {
+  if (row.type === 'note' || row.type === 'system') return null;
+  return {
+    id: row.id,
+    at: row.occurred_at,
+    channel: row.type === 'call_log' ? 'call' : row.type,
+    direction: row.direction ?? 'sent',
+    text: row.body,
+    delivery: row.delivery_status,
+  };
 }
 
-/** A suggestion's quantity range (`S:487`). */
-export const PLAN_QTY = { min: 1, max: 99 } as const;
-
-/**
- * A new suggestion (`addSuggestion`, `S:1646`): an idea's "+ Add" or "Add
- * offering" — one unit at list price, Planned, against the visit it was made
- * in.
- */
+/** A new plan row: one unit at its billed price, Planned (`POST …/offering-suggestions`). */
 export interface SuggestionCreateInput {
-  patientId: string;
   offeringId: string;
-  appointmentId?: string | null;
-  /** Where it was made ("Appt #2861 · Hydrafacial", "Patient file"). */
-  sourceLabel: string;
   /** Why — an idea's reason. */
-  reason?: string | null;
+  reason: string | null;
 }
 
-/** An edit of one suggestion (`updateSuggestion`, `S:1646`): its quantity, final price or status. */
-export interface SuggestionPatch {
-  qty?: number;
+/** A plan row's change (`PATCH …/offering-suggestions/:id`): its quantity, final amount or status. */
+export interface SuggestionChange {
+  quantity?: number;
+  /** The whole quantity's final amount; `null` goes back to the billed price. */
   price?: number | null;
   status?: SuggestionStatus;
 }

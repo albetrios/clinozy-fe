@@ -33,8 +33,7 @@
     "activity": "Activity",
     "showActivity": "Show messages & activity",
     "hideActivity": "Hide messages & activity",
-    "unread_one": "{{count}} unread message",
-    "unread_other": "{{count}} unread messages"
+    "awaitingReply": "Waiting for a reply"
   },
   "sectionsPopover": {
     "trigger": "Patient file · all sections",
@@ -47,8 +46,6 @@
       "team": "Team"
     },
     "openNow": "Open now",
-    "empty": "Empty",
-    "hasRecords": "Has records",
     "pin": "Pin to bar",
     "unpin": "Unpin from bar",
     "pinAria": "Pin to bar · {{section}}",
@@ -64,14 +61,11 @@
     "items": {
       "prescription": "Prescription",
       "treatment": "Treatment",
-      "invoice": "Invoice",
-      "payment": "Payment",
       "photo": "Photo",
       "appointment": "Appointment",
       "report": "Report",
       "note": "Note"
-    },
-    "nothingDue": "Nothing due for {{name}}"
+    }
   },
   "section": {
     "primary": {
@@ -81,8 +75,7 @@
       "images": "Upload images",
       "reports": "Upload report",
       "invoices": "New invoice",
-      "payments": "Record payment",
-      "packages": "Add package"
+      "payments": "Record payment"
     },
     "more": "More for {{name}}"
   },
@@ -99,7 +92,6 @@
     "reach": "Reach",
     "reachSub": {
       "whatsappPrimary": "WhatsApp · Primary",
-      "fromLead": "Mobile · From lead",
       "mobile": "Mobile",
       "instagram": "Instagram"
     },
@@ -117,19 +109,10 @@
     "birthdayToday": "🎂 today",
     "noAddress": "No address",
     "upNext": "Up next",
-    "visitService": "{{service}} · {{minutes}} min",
     "reschedule": "Reschedule",
     "book": "Book",
     "notBooked": "Not booked",
     "noUpcoming": "No upcoming visit",
-    "maskedAmount": "₹ ••••",
-    "dueSince_one": "since {{count}} day",
-    "dueSince_other": "since {{count}} days",
-    "showAmount": "Show amount",
-    "hideAmount": "Hide amount",
-    "collect": "Collect",
-    "creditToReturn": "{{amount}} to return",
-    "allPaid": "All paid · nothing due",
     "feedback": "Feedback",
     "feedbackScore": "{{feel}} · {{score}}/10",
     "feedbackReview": "{{rating}}★ on {{source}}",
@@ -156,9 +139,7 @@
       "none": "Not attached to a visit",
       "noneSub": "Uploaded from the file",
       "visit": "{{day}} · {{service}}",
-      "visitSub": "#{{seq}} · {{status}}",
-      "visitMeta_one": "{{count}} photo",
-      "visitMeta_other": "{{count}} photos"
+      "visitSub": "#{{seq}} · {{status}}"
     },
     "sizes": {
       "label": "Thumbnail size",
@@ -169,7 +150,6 @@
       "mediumShort": "M",
       "largeShort": "L"
     },
-    "groupWithVisit": "{{photos}} · {{visit}}",
     "tile": {
       "open": "Open {{name}}",
       "edit": "Edit details",
@@ -206,17 +186,16 @@
       "underarm": "Underarm",
       "legs": "Legs",
       "arms": "Arms",
-      "other": "Other"
+      "other": "Other",
+      "upperLip": "Upper lip",
+      "chin": "Chin",
+      "neck": "Neck",
+      "hands": "Hands",
+      "fullBody": "Full body"
     },
     "viewer": {
       "label": "Photo viewer",
       "position": "{{index}} of {{total}}",
-      "zoom": "Zoom",
-      "zoomOut": "Zoom out",
-      "zoomOutHint": "Zoom out (−)",
-      "zoomIn": "Zoom in",
-      "zoomInHint": "Zoom in (+)",
-      "zoomReset": "Fit to screen (0)",
       "close": "Close viewer",
       "closeHint": "Close (Esc)",
       "previous": "Previous photo",
@@ -225,11 +204,9 @@
       "nextHint": "Next (→)",
       "hints": {
         "browse": "← → browse",
-        "zoom": "Scroll or + − zoom",
-        "pan": "Drag to move · double-click to reset",
         "close": "Esc close"
       },
-      "missing": "Sample photo · no file attached",
+      "missing": "Preview not available",
       "notFoundRecord": "Photo"
     },
     "details": {
@@ -245,9 +222,14 @@
       "visitHint": "optional · files the photo under that appointment",
       "notAttached": "Not attached",
       "save": "Save details",
-      "saved": "Photo details saved"
+      "saved": "Photo details saved",
+      "stage": "Stage"
     },
-    "loading": "Loading photos"
+    "loading": "Loading photos",
+    "stages": {
+      "before": "Before",
+      "after": "After"
+    }
   },
   "rx": {
     "record": "Prescription",
@@ -260,16 +242,7 @@
     "medicines_other": "{{count}} medicines",
     "quickFill": {
       "print": "Print prescription",
-      "repeat": "Repeat last Rx {{number}}",
-      "kits": {
-        "hairFall": "Hair fall kit",
-        "postPeel": "Post-peel kit",
-        "pigmentation": "Pigmentation kit"
-      }
-    },
-    "kit": {
-      "reapply": "Reapply every 3 h",
-      "avoidSun": "Avoid sun and scrubs for 48 h"
+      "repeat": "Repeat last Rx {{number}}"
     },
     "steps": {
       "prescription": "Prescription",
@@ -282,10 +255,8 @@
     "quick": {
       "placeholder": "Type medicine, dose, timing · e.g. flu 0-0-1 af 10d",
       "hint": "od · bd · tds · hs · af/bf · 5d · x8",
-      "often": "Often prescribed",
       "groups": {
         "all": "All",
-        "often": "Often prescribed",
         "oral": "Oral",
         "topical": "Topical"
       },
@@ -375,13 +346,20 @@
       "summary": "{{medicines}} · {{doctor}}",
       "noMedicine": "Add a medicine",
       "saved": "Prescription saved",
-      "savedNumber": "Prescription {{number}} saved"
+      "savedNumber": "Prescription {{number}} saved",
+      "approve": "Save & approve",
+      "approvedNumber": "Prescription {{number}} approved"
     },
     "delete": {
       "title": "Delete this prescription?",
       "deleted": "Prescription deleted"
     },
-    "preview": "Prescription {{number}}"
+    "preview": "Prescription {{number}}",
+    "status": {
+      "draft": "Draft",
+      "approved": "Approved"
+    },
+    "approvedNote": "Approved · an approved prescription can’t be changed"
   },
   "treatment": {
     "record": "Treatment",
@@ -393,7 +371,6 @@
     "session": "Session {{session}}",
     "quickFill": {
       "next": "Next session of {{name}}",
-      "package": "{{name}} · session {{session}}",
       "checkIn": "Log check-in"
     },
     "type": "Type",
@@ -533,8 +510,8 @@
       "calls": {
         "none": "No call",
         "next_day": "Next day",
-        "in_2_days": "In 2 days",
-        "in_week": "In a week"
+        "in_week": "In a week",
+        "in_two_days": "In 2 days"
       },
       "feedback": "Feedback on this treatment",
       "feedbackItem": "{{date}} · {{feel}} {{score}}/10",
@@ -545,9 +522,25 @@
       "edit": "Save changes",
       "saved": "Treatment saved"
     },
-    "delete": {
-      "title": "Delete this treatment?",
-      "deleted": "Treatment deleted"
+    "package": {
+      "label": "From package",
+      "hint": "saving uses one of its sessions",
+      "option": "{{name}} · {{used}} of {{total}} used",
+      "numbered": "Set by the package",
+      "uses": "Uses 1 session of {{name}}"
+    },
+    "reverse": {
+      "title": "Reverse this treatment?",
+      "body": "It stays in the file, marked reversed, and a package session it used comes back. This can’t be undone.",
+      "action": "Reverse",
+      "done": "Treatment reversed",
+      "status": "Reversed",
+      "note": "Reversed {{date}} · {{reason}}",
+      "reasons": {
+        "mistake": "Recorded by mistake",
+        "wrongPatient": "Wrong patient",
+        "notDone": "Session not done"
+      }
     }
   },
   "report": {
@@ -584,35 +577,31 @@
     },
     "view": {
       "sub": "{{name}} · {{date}}",
-      "addedBy": "Added by",
-      "fileLine": "{{name}} · {{format}} · shared with the patient on request",
       "notes": "Notes",
-      "noNotes": "No notes on this report",
-      "download": "Download",
-      "downloading": "Downloading {{name}}"
+      "noNotes": "No notes on this report"
     }
   },
   "package": {
-    "title": "Add package",
-    "step": "Pick a package",
-    "option": "{{name}} · {{sessions}}s · {{price}}",
-    "empty": "No multi-session offerings yet",
+    "title": "Edit package",
     "summary": "Sessions are counted when a treatment is completed",
-    "save": "Add package",
-    "noPick": "Pick a package",
-    "added": "Package added · invoice it from Invoices",
+    "save": "Save changes",
     "card": {
       "left_one": "{{count}} left",
       "left_other": "{{count}} left",
       "used": "{{used}} of {{total}} used",
       "validTill": "Valid till {{date}}",
-      "next": "Next: {{date}}",
-      "use": "Use a session",
       "book": "Book next",
       "empty": "No packages yet",
-      "sessionUsed": "Session {{used}} of {{total}} used",
-      "noneLeft": "No sessions left"
-    }
+      "noExpiry": "No expiry",
+      "statuses": {
+        "used_up": "Used up",
+        "expired": "Expired"
+      },
+      "edit": "Edit"
+    },
+    "validUntil": "Valid till",
+    "sessions": "Sessions",
+    "saved": "Package saved"
   },
   "clinical": {
     "titles": {
@@ -627,7 +616,8 @@
     "add": "Add {{title}}",
     "remove": "Remove {{name}}",
     "newCount_one": "{{count}} new",
-    "newCount_other": "{{count}} new"
+    "newCount_other": "{{count}} new",
+    "removed": "{{name}} removed"
   },
   "feedback": {
     "title": "Feedback",
@@ -659,7 +649,6 @@
     "linkLabel": "Link",
     "noNext": "No next step noted",
     "noLink": "No link added",
-    "files": "▶ {{files}}",
     "actions": "Actions",
     "edit": "Edit",
     "remove": "Remove",
@@ -686,7 +675,9 @@
     "checkInRemoved": "Check-in removed",
     "reviewRemoved": "Review removed",
     "more_one": "{{count}} more",
-    "more_other": "{{count}} more"
+    "more_other": "{{count}} more",
+    "files_one": "▶ {{count}} file",
+    "files_other": "▶ {{count}} files"
   },
   "checkIn": {
     "titles": {
@@ -722,9 +713,6 @@
     "offeringsPlaceholder": "Search offerings",
     "offeringSessions_one": "{{price}} · {{count}} session",
     "offeringSessions_other": "{{price}} · {{count}} sessions",
-    "contextVisit": "Visit check-in",
-    "contextAppointment": "Visit check-in · Appt {{number}}",
-    "contextAftercare": "Aftercare after {{treatment}}",
     "save": "Save check-in",
     "saveEdit": "Save changes",
     "noFeel": "Pick how it is now",
@@ -732,7 +720,9 @@
     "added": " · {{count}} added to suggestions",
     "callBack": " · doctor call-back task created",
     "updated": "Check-in updated",
-    "record": "Check-in"
+    "record": "Check-in",
+    "noScore": "Pick the patient’s score",
+    "offeringsPlanned": "Added to offering suggestions"
   },
   "review": {
     "title": "Log a review",
@@ -761,7 +751,9 @@
     "updated": "Review updated",
     "badLink": "Add an https:// link",
     "notRated": "Not rated",
-    "record": "Review"
+    "record": "Review",
+    "attachedFiles_one": "{{count}} file",
+    "attachedFiles_other": "{{count}} files"
   },
   "logFeedback": {
     "title": "Log feedback",
@@ -856,7 +848,6 @@
       "feedback": "Feedback",
       "report": "Report",
       "type": "Type",
-      "uploadedBy": "Uploaded by",
       "invoice": "Invoice",
       "items": "Items",
       "bill": "Bill",
@@ -886,8 +877,6 @@
     "placeholder": "Add a note for the team",
     "add": "Add note",
     "by": "{{name}} · {{date}}",
-    "delete": "Delete note",
-    "deleted": "Note deleted",
     "empty": "No notes yet"
   },
   "timeline": {
@@ -912,10 +901,7 @@
     },
     "packages": {
       "progress": "{{used}} / {{total}}",
-      "next": "Next · {{date}}",
-      "overdue": "Session {{session}} overdue",
       "done": "All sessions done",
-      "use": "Use session",
       "empty": "No active packages"
     },
     "prescriptions": {
@@ -923,15 +909,6 @@
     },
     "treatments": {
       "sub": "Session {{session}} · {{date}}"
-    },
-    "billing": {
-      "due": "Due",
-      "paid": "Paid",
-      "show": "Show amounts",
-      "hide": "Hide amounts",
-      "invoice": "{{type}} invoice {{number}}",
-      "sub": "{{date}} · {{amount}}",
-      "collect": "Collect payment"
     },
     "reports": {
       "sub": "{{type}} · {{date}}"
@@ -944,13 +921,8 @@
     "activity": {
       "filtersLabel": "Activity filters",
       "notes": "Notes",
-      "filterTitle": "{{label}} · {{count}}",
-      "rx": "Rx {{number}} · {{medicines}}",
-      "treatment": "{{name}} · session {{session}}",
-      "received": "Received {{amount}} · {{mode}}",
-      "refund": "Refund {{amount}} · {{mode}}",
-      "against": "Against {{number}}",
-      "empty": "No activity yet"
+      "empty": "No activity yet",
+      "masked": "₹ ••••"
     }
   },
   "visitFlow": {
@@ -965,9 +937,7 @@
     "steps": {
       "checks": "Check-in & safety",
       "rx": "Prescription",
-      "treatment": "Treatment",
-      "invoice": "Invoice",
-      "collect": "Collect & share"
+      "treatment": "Treatment"
     },
     "checks": {
       "labels": {
@@ -999,28 +969,10 @@
       "empty": "Record today's session",
       "last": "Last settings: {{memo}}",
       "done": "{{name}} · session {{session}}",
-      "repeated": "Session {{session}} recorded with last settings"
+      "repeated": "Session {{session}} recorded with last settings",
+      "repeatPackage": "⚡ Repeat · {{name}}"
     },
-    "invoice": {
-      "total": "Total",
-      "create": "Create invoice from visit",
-      "custom": "Custom invoice",
-      "created": "Invoice {{number}} created from the visit",
-      "nothing": "Nothing to bill",
-      "ready_one": "{{count}} item ready · {{total}}",
-      "ready_other": "{{count}} items ready · {{total}}",
-      "covered": "Covered by package · nothing to bill",
-      "empty": "Nothing to bill yet",
-      "done": "{{number}} · {{total}}"
-    },
-    "collect": {
-      "upi": "Collect {{amount}} · UPI",
-      "received": "{{amount}} received by {{mode}}",
-      "share": "Share Rx, invoice & photos",
-      "shared": "Rx, invoice and photos sent to {{name}} on WhatsApp",
-      "due": "{{amount}} due",
-      "nothing": "Nothing due",
-      "sent": "Sent on WhatsApp"
-    }
+    "paused": "Visit paused",
+    "resume": "Resume"
   }
 }

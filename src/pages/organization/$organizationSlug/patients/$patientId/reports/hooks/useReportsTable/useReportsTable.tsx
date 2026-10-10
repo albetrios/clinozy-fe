@@ -1,7 +1,7 @@
 import { type ColumnDef, useTable } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 
-import type { PatientReport } from '@/shared/api/clinic/clinic-schema.ts';
+import type { PatientReport } from '@/shared/api/clinic/patient-reports-contracts.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { TonePill } from '@/shared/components/Cells/index.ts';
 import {
@@ -14,11 +14,9 @@ import {
   PATIENT_SECTION_TABLE_IDS,
   PATIENT_TABLE_KEYS,
   PATIENT_TABLE_NS,
-  StaffCell,
   useTableDay,
 } from '../../../shared/components/PatientSectionTable/index.ts';
-import { useStaffLookup } from '../../../shared/hooks/useStaffLookup/index.ts';
-import { reportFileFormat } from '../../report-file.ts';
+import { reportFileFormats } from '../../report-file.ts';
 import { REPORT_KEYS, REPORT_TYPE_TONES } from '../../reports.constants.ts';
 
 const keys = PATIENT_TABLE_KEYS;
@@ -26,18 +24,21 @@ const rowOf = (original: unknown) => original as PatientReport;
 
 /**
  * The Reports columns (KICKOFF §6.6 Section tables; H:4760): Report (the
- * name over "PDF · shared with patient on request") · Type · Date · Uploaded
- * by, 760px in all. On a phone Report leads, Type is the key and the date
- * folds under it; the uploader's pill folds to nothing (H:4115).
+ * name over "PDF · shared with patient on request", or "0 files" before any
+ * lands) · Type · Date, 760px in all. On a phone Report leads, Type is the
+ * key and the date folds under it. The design's "Uploaded by" goes: the API
+ * does not say who added a report (G4).
  */
 function useReportsColumns(): ColumnDef<DataTableFeatures, PatientReport>[] {
   const { t } = useTranslation(PATIENT_TABLE_NS);
   const day = useTableDay();
-  const staff = useStaffLookup();
   const type = (report: PatientReport) => t(REPORT_KEYS.types[report.type]);
-  // As the Report view words it: a report with no file yet reads as drawn.
-  const fileLine = (report: PatientReport) =>
-    t(keys.reports.fileSub, { format: reportFileFormat(report.files) });
+  const fileLine = (report: PatientReport) => {
+    const format = reportFileFormats(report.fileKeys);
+    return format
+      ? t(keys.reports.fileSub, { format })
+      : t(REPORT_KEYS.upload.files, { count: report.fileKeys.length });
+  };
   return [
     {
       id: 'report',
@@ -83,15 +84,6 @@ function useReportsColumns(): ColumnDef<DataTableFeatures, PatientReport>[] {
         <span className="text-body truncate tabular-nums">{day(row.original.date)}</span>
       ),
       meta: { track: '130px' },
-    },
-    {
-      id: 'uploadedBy',
-      accessorFn: (row) => staff(row.createdById)?.name ?? '',
-      header: t(keys.columns.uploadedBy),
-      enableSorting: false,
-      cell: ({ row }) => <StaffCell person={staff(row.original.createdById)} />,
-      // The 28px people pill folds to nothing (H:4115).
-      meta: { track: '180px', foldValue: () => null },
     },
   ];
 }

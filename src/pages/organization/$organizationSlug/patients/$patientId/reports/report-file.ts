@@ -1,4 +1,4 @@
-/** The formats a report's file can be (`S:447`), by the stored name's extension. */
+/** The formats a report's file can be (`S:447`), by the stored key's extension. */
 const FILE_FORMATS: Readonly<Record<string, string>> = {
   pdf: 'PDF',
   jpg: 'JPG',
@@ -7,10 +7,14 @@ const FILE_FORMATS: Readonly<Record<string, string>> = {
 };
 
 /**
- * "PDF" — a report's first file's format, the Report view's file line and the
- * Reports table's sub line; a report with none reads as drawn (H:4019).
+ * "PDF" or "PDF, JPG" — the formats of a report's files, in the order first attached, read
+ * off each stored key's extension (`file_keys`); empty when it has none, or none the File
+ * field takes. The Report view's File line and the Reports table's sub line.
  */
-export function reportFileFormat(files: readonly string[]): string {
-  const extension = files[0]?.split('.').pop()?.toLowerCase() ?? '';
-  return FILE_FORMATS[extension] ?? 'PDF';
+export function reportFileFormats(fileKeys: readonly string[]): string {
+  const formats = fileKeys.flatMap((key) => {
+    const format = FILE_FORMATS[key.split('.').pop()?.toLowerCase() ?? ''];
+    return format ? [format] : [];
+  });
+  return [...new Set(formats)].join(', ');
 }

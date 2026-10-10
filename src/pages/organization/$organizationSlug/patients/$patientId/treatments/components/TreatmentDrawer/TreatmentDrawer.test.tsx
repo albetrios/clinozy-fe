@@ -1,22 +1,34 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import type * as AppointmentsApiModule from '@/shared/api/clinic/appointments-api.ts';
+import type * as DirectoryApiModule from '@/shared/api/clinic/directory-api.ts';
+import type * as PatientPackagesApiModule from '@/shared/api/clinic/patient-packages-api.ts';
+import { listPatientPackages } from '@/shared/api/clinic/patient-packages-api.ts';
+import type * as TreatmentsApiModule from '@/shared/api/clinic/treatments-api.ts';
+import { createTreatment, updateTreatment } from '@/shared/api/clinic/treatments-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { withoutBidiMarks } from '@/tests/utils/bidi-marks.ts';
+import { patientFile } from '@/tests/utils/patient-doubles.ts';
 
 import {
-  patientFileUrl,
-  renderPatientFile,
-  resetPatientFile,
-} from '../../../__tests__/integration/patient-file-test-router.tsx';
+  BOOKABLE_TREATMENTS,
+  patientPackage,
+  seededTreatmentsWorld,
+  TEAM,
+  TEST_PACKAGE_ID,
+  TEST_TREATMENT_ID,
+  treatmentRecord,
+  type TreatmentsWorld,
+} from '../../__tests__/integration/treatment-doubles.ts';
+import {
+  renderTreatments,
+  resetTreatments,
+  type TreatmentsMember,
+  treatmentsUrl,
+} from '../../__tests__/integration/treatments-test-router.tsx';
 
 const viewport = vi.hoisted(() => ({ tier: 'desktop' as ViewportTier }));
 vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
@@ -36,32 +48,90 @@ const { notifyMock } = vi.hoisted(() => ({
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 
-const DHARTI = patientRef('Dharti Galani');
-/** Dharti's LHR Full Face, session 1 — one check-in ("Better 7/10"). */
-const LHR = ref.treatment(498);
-const url = (rest: string) => patientFileUrl(DHARTI, `/treatments${rest}`);
+const world = vi.hoisted(() => ({}) as TreatmentsWorld);
+vi.mock('@/shared/api/clinic/treatments-api.ts', async (importOriginal) => {
+  const { treatmentsApiDouble } =
+    await import('../../__tests__/integration/treatment-doubles.ts');
+  return {
+    ...(await importOriginal<typeof TreatmentsApiModule>()),
+    ...treatmentsApiDouble(world),
+  };
+});
+vi.mock('@/shared/api/clinic/patient-packages-api.ts', async (importOriginal) => {
+  const { packagesApiDouble } =
+    await import('../../__tests__/integration/treatment-doubles.ts');
+  return {
+    ...(await importOriginal<typeof PatientPackagesApiModule>()),
+    ...packagesApiDouble(world),
+  };
+});
+vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof AppointmentsApiModule>()),
+  fetchBookableTreatments: vi.fn(async () => BOOKABLE_TREATMENTS),
+}));
+vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof DirectoryApiModule>()),
+  fetchTeamDirectory: vi.fn(async () => TEAM),
+}));
+vi.mock('@/shared/tenancy/my-membership.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  findMyMembershipId: vi.fn(async () => TEAM[0]?.id ?? null),
+}));
+// The check-in drawer is the feedback group's; the stacked one only has to open and close.
+vi.mock('../../../shared/components/CheckInDrawer/index.ts', () => ({
+  CheckInDrawer: ({
+    treatmentId,
+    appointmentId,
+    stacked,
+    onClose,
+  }: {
+    treatmentId: string | null;
+    appointmentId: string | null;
+    stacked?: boolean;
+    onClose: () => void;
+  }) => (
+    <div
+      data-testid="check-in-drawer"
+      data-treatment={treatmentId ?? ''}
+      data-appointment={appointmentId ?? 'none'}
+      data-stacked={String(Boolean(stacked))}
+    >
+      <button type="button" data-testid="check-in-drawer-dismiss" onClick={onClose}>
+        Back
+      </button>
+    </div>
+  ),
+}));
 
-const newest = () =>
-  clinicFixtures.treatments
-    .snapshot((row) => row.patientId === DHARTI)
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
+const FILE = patientFile();
+const url = (rest: string) => treatmentsUrl(FILE, rest);
+/** A doctor signed in with both treatment codes. */
+const WRITER: TreatmentsMember = {
+  permissions: ['patient_treatment:create', 'patient_treatment:update', 'patient:update'],
+};
 
-async function openNew(role: 'therapist' | 'doctor' = 'therapist') {
+async function openNew(member: TreatmentsMember = WRITER) {
   const user = userEvent.setup();
-  const view = renderPatientFile(url('/create'), { role });
+  const view = renderTreatments(url('/create'), { member });
   const drawer = await screen.findByTestId('treatment-drawer');
   return { ...view, user, drawer };
 }
 
+async function openEdit(member: TreatmentsMember = WRITER) {
+  const user = userEvent.setup();
+  const view = renderTreatments(url(`/${TEST_TREATMENT_ID}/edit`), { member });
+  const drawer = await screen.findByTestId('treatment-drawer');
+  return { ...view, user, drawer };
+}
+
+const lastCreate = () => vi.mocked(createTreatment).mock.lastCall?.[0];
+
 beforeEach(() => {
   viewport.tier = 'desktop';
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetClinicFixtures();
+  Object.assign(world, seededTreatmentsWorld());
 });
-afterEach(() => {
-  resetPatientFile();
-  resetClinicFixtures();
-});
+afterEach(() => resetTreatments());
 
 describe('Treatment drawer (KICKOFF §6.6; S:38–39)', () => {
   it('opens a new treatment as the next session of the last one, with Quick fill', async () => {
@@ -79,7 +149,6 @@ describe('Treatment drawer (KICKOFF §6.6; S:38–39)', () => {
     expect(within(drawer).getByTestId('treatment-drawer-name')).toHaveValue(
       'LHR Full Face',
     );
-    // The step's summary values are isolated tokens; their words and order as read:
     expect(
       withoutBidiMarks(
         within(drawer).getByTestId('treatment-drawer-step-session').textContent,
@@ -89,7 +158,11 @@ describe('Treatment drawer (KICKOFF §6.6; S:38–39)', () => {
     expect(
       within(fill).getByRole('button', { name: /Next session of LHR Full Face/ }),
     ).toBeVisible();
-    expect(within(fill).getAllByRole('button').length).toBeGreaterThan(1);
+    expect(
+      within(fill).getByTestId(`treatment-drawer-quick-fill-package-${TEST_PACKAGE_ID}`),
+    ).toBeInTheDocument();
+    // The name chips are the clinic's active treatments (`GET /app/offerings`).
+    expect(await within(drawer).findByText('Underarm Peel')).toBeInTheDocument();
     expect(await axeForDialog(baseElement)).toHaveNoViolations();
   });
 
@@ -106,7 +179,7 @@ describe('Treatment drawer (KICKOFF §6.6; S:38–39)', () => {
   });
 
   it('switches to Dental, picks teeth and saves a blank name as “Treatment”', async () => {
-    const { user, drawer, router } = await openNew('doctor');
+    const { user, drawer, router } = await openNew();
     await user.clear(within(drawer).getByTestId('treatment-drawer-name'));
     await user.click(within(drawer).getByTestId('treatment-drawer-template-dental'));
     expect(within(drawer).getByTestId('treatment-drawer-badges')).toHaveTextContent(
@@ -122,46 +195,95 @@ describe('Treatment drawer (KICKOFF §6.6; S:38–39)', () => {
       expect(notifyMock.success).toHaveBeenCalledWith('Treatment saved'),
     );
     await waitFor(() => expect(router.state.location.pathname).toBe(url('')));
-    expect(newest()).toMatchObject({
-      name: 'Treatment',
-      template: 'dental',
-      params: { teeth: '18' },
-      aftercareCall: 'next_day',
+    expect(lastCreate()).toEqual({
+      patientId: FILE.patient.id,
+      input: expect.objectContaining({
+        name: 'Treatment',
+        template: 'dental',
+        parameters: { teeth: '18' },
+        sessionNumber: 2,
+        aftercareCall: 'next_day',
+        packageId: null,
+      }),
+      idempotencyKey: expect.any(String),
     });
   });
 
-  it('uses a package session from its Quick fill chip', async () => {
+  it('spends a package session from "From package": the server numbers it (§6 #20)', async () => {
     const { user, drawer } = await openNew();
-    const fill = within(drawer).getByTestId('treatment-drawer-quick-fill');
-    const chip = within(fill)
-      .getAllByRole('button')
-      .find((button) =>
-        button.dataset.testid?.startsWith('treatment-drawer-quick-fill-package-'),
-      );
-    if (!chip) throw new Error('no package chip');
-    const packageId = chip.dataset.testid?.replace(
-      'treatment-drawer-quick-fill-package-',
-      '',
+    await user.click(
+      within(drawer).getByTestId(`treatment-drawer-package-${TEST_PACKAGE_ID}`),
     );
-    const before = clinicFixtures.patientPackages.snapshot(
-      (row) => row.id === packageId,
-    )[0];
-    await user.click(chip);
+    expect(within(drawer).getByTestId('treatment-drawer-name')).toHaveValue(
+      'LHR Full Face · B4G7',
+    );
+    expect(
+      within(drawer).getByTestId('treatment-drawer-session-numbered'),
+    ).toBeInTheDocument();
+    expect(within(drawer).getByTestId('treatment-drawer-badges')).not.toHaveTextContent(
+      'Session',
+    );
     await user.click(within(drawer).getByTestId('treatment-drawer-save'));
     await waitFor(() =>
       expect(notifyMock.success).toHaveBeenCalledWith('Treatment saved'),
     );
-    const after = clinicFixtures.patientPackages.snapshot(
-      (row) => row.id === packageId,
-    )[0];
-    expect(after?.sessionsUsed).toBe((before?.sessionsUsed ?? 0) + 1);
-    expect(newest()?.packageId).toBe(packageId);
+    expect(lastCreate()?.input).toMatchObject({
+      packageId: TEST_PACKAGE_ID,
+      offeringId: 'off_lhrpack000000000000000',
+    });
+    // The package now reads 2 of 7 used — the server's count, read again.
+    expect(world.packages[0]?.sessionsUsed).toBe(2);
   });
 
-  it('edits a treatment with its feedback line, saving “Treatment saved”', async () => {
-    const user = userEvent.setup();
-    renderPatientFile(url(`/${LHR}/edit`), { role: 'doctor' });
-    const drawer = await screen.findByTestId('treatment-drawer');
+  it('offers no package that cannot spend a session', async () => {
+    world.packages = [
+      patientPackage({ status: 'used_up', sessionsUsed: 7, sessionsLeft: 0 }),
+    ];
+    const { drawer } = await openNew();
+    expect(
+      within(drawer).queryByTestId(`treatment-drawer-package-${TEST_PACKAGE_ID}`),
+    ).not.toBeInTheDocument();
+    expect(
+      within(drawer).queryByTestId(
+        `treatment-drawer-quick-fill-package-${TEST_PACKAGE_ID}`,
+      ),
+    ).not.toBeInTheDocument();
+  });
+
+  it('says why a package session was refused and reads the packages again', async () => {
+    world.refuseConflict = 'offering_used_up';
+    const { user, drawer } = await openNew();
+    await user.click(
+      within(drawer).getByTestId(`treatment-drawer-package-${TEST_PACKAGE_ID}`),
+    );
+    const reads = vi.mocked(listPatientPackages).mock.calls.length;
+    await user.click(within(drawer).getByTestId('treatment-drawer-save'));
+    await waitFor(() => expect(notifyMock.error).toHaveBeenCalled());
+    await waitFor(() =>
+      expect(vi.mocked(listPatientPackages).mock.calls.length).toBeGreaterThan(reads),
+    );
+    expect(screen.getByTestId('treatment-drawer')).toBeInTheDocument();
+  });
+
+  it('shows the server’s field errors on their fields and opens their step', async () => {
+    world.refuseFields = [
+      { field: 'body.session_number', message: 'Too big: expected number to be <=999' },
+    ];
+    const { user, drawer } = await openNew();
+    await user.click(
+      within(drawer).getByTestId('treatment-drawer-step-aftercare-trigger'),
+    );
+    await user.click(within(drawer).getByTestId('treatment-drawer-save'));
+    await waitFor(() =>
+      expect(notifyMock.error).toHaveBeenCalledWith(
+        'Too big: expected number to be <=999',
+      ),
+    );
+    expect(within(drawer).getByTestId('treatment-drawer-session')).toBeVisible();
+  });
+
+  it('edits a treatment with its feedback line, saving with the read', async () => {
+    const { user, drawer } = await openEdit();
     expect(within(drawer).getByTestId('treatment-drawer-title')).toHaveTextContent(
       'Edit treatment',
     );
@@ -171,45 +293,45 @@ describe('Treatment drawer (KICKOFF §6.6; S:38–39)', () => {
     expect(within(drawer).getByTestId('treatment-drawer-feedback')).toHaveTextContent(
       /· Better 7\/10/,
     );
+    await user.type(within(drawer).getByTestId('treatment-drawer-remark'), 'Settled');
     await user.click(within(drawer).getByTestId('treatment-drawer-save'));
     await waitFor(() =>
       expect(notifyMock.success).toHaveBeenCalledWith('Treatment saved'),
     );
+    expect(vi.mocked(updateTreatment).mock.lastCall?.[0]).toMatchObject({
+      treatment: { id: TEST_TREATMENT_ID, updatedAt: '2026-10-01T09:30:00.000Z' },
+      fields: { remark: 'Settled' },
+    });
+  });
+
+  it('names an edited session’s package and keeps its number', async () => {
+    world.treatments = [
+      treatmentRecord({ packageId: TEST_PACKAGE_ID, sessionNumber: 2 }),
+    ];
+    const { drawer } = await openEdit();
+    // "Uses 1 session of LHR Full Face · B4G7" — new copy (locales-C.json).
+    expect(within(drawer).getByTestId('treatment-drawer-package')).toHaveTextContent(
+      /LHR Full Face · B4G7|treatment\.package\.uses/,
+    );
+    expect(
+      within(drawer).getByTestId('treatment-drawer-session-increase'),
+    ).toBeDisabled();
   });
 
   it('logs a check-in from an edit: ⚡ "Log check-in" stacks the aftercare check-in, Back returns', async () => {
-    const user = userEvent.setup();
-    renderPatientFile(url(`/${LHR}/edit`), { role: 'doctor' });
-    const drawer = await screen.findByTestId('treatment-drawer');
+    const { user, drawer } = await openEdit();
     await user.click(within(drawer).getByTestId('treatment-drawer-quick-fill-check-in'));
     const checkIn = await screen.findByTestId('check-in-drawer');
-    expect(within(checkIn).getByTestId('check-in-drawer-title')).toHaveTextContent(
-      'Aftercare check-in',
-    );
-    const back = within(checkIn).getByTestId('check-in-drawer-dismiss');
-    expect(back).toHaveTextContent('Back');
-    await user.click(back);
+    // The aftercare check-in follows the session and is taken at no visit.
+    expect(checkIn).toHaveAttribute('data-treatment', TEST_TREATMENT_ID);
+    expect(checkIn).toHaveAttribute('data-appointment', 'none');
+    expect(checkIn).toHaveAttribute('data-stacked', 'true');
+    // The stand-in sits outside the drawer's focus layer, which turns pointer events off there.
+    fireEvent.click(within(checkIn).getByTestId('check-in-drawer-dismiss'));
     await waitFor(() =>
       expect(screen.queryByTestId('check-in-drawer')).not.toBeInTheDocument(),
     );
     expect(screen.getByTestId('treatment-drawer')).toBeInTheDocument();
-  });
-
-  it('saves the stacked check-in as the treatment’s aftercare — no booking, as the row’s “Check-in” writes it', async () => {
-    const user = userEvent.setup();
-    renderPatientFile(url(`/${LHR}/edit`), { role: 'doctor' });
-    const drawer = await screen.findByTestId('treatment-drawer');
-    await user.click(within(drawer).getByTestId('treatment-drawer-quick-fill-check-in'));
-    const checkIn = await screen.findByTestId('check-in-drawer');
-    await user.click(within(checkIn).getByTestId('check-in-drawer-feel-much_better'));
-    await user.click(within(checkIn).getByTestId('check-in-drawer-save'));
-    await waitFor(() =>
-      expect(screen.queryByTestId('check-in-drawer')).not.toBeInTheDocument(),
-    );
-    const saved = clinicFixtures.checkIns.snapshot(
-      (row) => row.treatmentId === LHR && row.feel === 'much_better',
-    );
-    expect(saved).toEqual([expect.objectContaining({ appointmentId: null })]);
   });
 
   it('offers no "Log check-in" on a new treatment', async () => {
@@ -219,9 +341,38 @@ describe('Treatment drawer (KICKOFF §6.6; S:38–39)', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('reads only for an Admin — treatments are Doctor and Therapist (S:39)', async () => {
+  it('reverses from the footer, after its reason', async () => {
+    const { user, drawer, router } = await openEdit();
+    await user.click(within(drawer).getByTestId('treatment-drawer-reverse'));
+    const dialog = await screen.findByTestId('confirm-dialog');
+    await user.click(within(dialog).getByTestId('confirm-reason-wrong-patient'));
+    await user.click(within(dialog).getByTestId('confirm-accept'));
+    await waitFor(() => expect(router.state.location.pathname).toBe(url('')));
+    expect(world.treatments[0]).toMatchObject({ status: 'reversed' });
+  });
+
+  it('reads a reversed session only, with its reason', async () => {
+    world.treatments = [
+      treatmentRecord({
+        status: 'reversed',
+        reversedReason: 'Wrong patient',
+        reversedAt: '2026-10-02T06:00:00.000Z',
+      }),
+    ];
+    const { drawer } = await openEdit();
+    expect(within(drawer).queryByTestId('treatment-drawer-save')).not.toBeInTheDocument();
+    expect(
+      within(drawer).queryByTestId('treatment-drawer-reverse'),
+    ).not.toBeInTheDocument();
+    // "Reversed 2 Oct · Wrong patient" — new copy (locales-C.json).
+    expect(within(drawer).getByTestId('treatment-drawer-reversed')).toHaveTextContent(
+      /Wrong patient|treatment\.reverse\.note/,
+    );
+  });
+
+  it('reads only for a role without the treatment gate (View-as)', async () => {
     const user = userEvent.setup();
-    renderPatientFile(url(`/${LHR}/edit`), { role: 'admin' });
+    renderTreatments(url(`/${TEST_TREATMENT_ID}/edit`), { member: { role: 'admin' } });
     const drawer = await screen.findByTestId('treatment-drawer');
     expect(within(drawer).queryByTestId('treatment-drawer-save')).not.toBeInTheDocument();
     expect(within(drawer).getByTestId('treatment-drawer-summary')).toHaveTextContent(

@@ -3,7 +3,11 @@ import type { UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { localDateOf } from '@/shared/api/clinic/clinic-time.ts';
-import type { TreatmentCheckIn } from '@/shared/api/clinic/treatments-api.ts';
+import type { PatientPackageRow } from '@/shared/api/clinic/patient-packages-contracts.ts';
+import {
+  TREATMENT_LIMITS,
+  type TreatmentCheckIn,
+} from '@/shared/api/clinic/treatments-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import {
   DrawerChips,
@@ -20,7 +24,11 @@ import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
 import { PatientStaffPicker } from '../../../shared/components/PatientStaffPicker/index.ts';
 import { TREATMENT_KEYS, TREATMENT_NS } from '../../treatments.constants.ts';
-import { AFTERCARE_CALLS, type TreatmentFormValues } from './treatment-form.ts';
+import {
+  AFTERCARE_CALLS,
+  onPackageForm,
+  type TreatmentFormValues,
+} from './treatment-form.ts';
 
 const K = TREATMENT_KEYS;
 
@@ -30,20 +38,130 @@ export interface TreatmentNameChip {
   offeringId: string;
 }
 
+/** The session number: the stepper, or the package's words when the server numbers it. */
+function SessionNumberField({
+  form,
+  values,
+  fixed,
+  fieldId,
+}: {
+  form: UseFormReturn<TreatmentFormValues>;
+  values: TreatmentFormValues;
+  /** An edit of a session spent from a package: its number stays (the server refuses a change). */
+  fixed: boolean;
+  fieldId: string;
+}) {
+  const { t } = useTranslation(TREATMENT_NS);
+  const fromPackage = !fixed && values.packageId !== null;
+  return (
+    <DrawerField
+      label={t(K.sessionNo)}
+      htmlFor={fromPackage ? undefined : fieldId}
+      hint={fixed ? t(K.package.numbered) : undefined}
+      span="third"
+    >
+      {fromPackage ? (
+        <DrawerInfo testId="treatment-drawer-session-numbered">
+          {t(K.package.numbered)}
+        </DrawerInfo>
+      ) : (
+        <DrawerStepper
+          id={fieldId}
+          label={t(K.sessionNo)}
+          value={values.sessionNumber}
+          onValueChange={(sessionNumber) =>
+            form.setValue('sessionNumber', sessionNumber, { shouldDirty: true })
+          }
+          min={TREATMENT_LIMITS.session.min}
+          max={TREATMENT_LIMITS.session.max}
+          disabled={fixed}
+          testId="treatment-drawer-session"
+        />
+      )}
+    </DrawerField>
+  );
+}
+
+/**
+ * "From package" (§6 #20): a new session picks one of the patient's packages
+ * with a session left — saving spends it and the server numbers the session;
+ * an edit names the package the session spent.
+ */
+function PackageField({
+  form,
+  values,
+  packages,
+  linkedPackage,
+}: {
+  form: UseFormReturn<TreatmentFormValues>;
+  values: TreatmentFormValues;
+  packages: readonly PatientPackageRow[];
+  linkedPackage: PatientPackageRow | null;
+}) {
+  const { t } = useTranslation(TREATMENT_NS);
+  if (linkedPackage) {
+    return (
+      <DrawerField label={t(K.package.label)} span="full">
+        <DrawerInfo testId="treatment-drawer-package">
+          {t(K.package.uses, { name: linkedPackage.name })}
+        </DrawerInfo>
+      </DrawerField>
+    );
+  }
+  if (packages.length === 0) return null;
+  return (
+    <DrawerField label={t(K.package.label)} hint={t(K.package.hint)} span="full">
+      <DrawerChips
+        label={t(K.package.label)}
+        options={packages.map((row) => ({
+          value: row.id,
+          label: t(K.package.option, {
+            name: row.name,
+            used: row.sessionsUsed,
+            total: row.sessionsTotal,
+          }),
+          tone: 'mint' as const,
+        }))}
+        value={values.packageId}
+        onChange={(packageId) => {
+          const row = packages.find((entry) => entry.id === packageId);
+          const next = row
+            ? onPackageForm(form.getValues(), row)
+            : { ...form.getValues(), packageId: null };
+          form.setValue('name', next.name, { shouldDirty: true });
+          form.setValue('offeringId', next.offeringId, { shouldDirty: true });
+          form.setValue('packageId', next.packageId, { shouldDirty: true });
+        }}
+        clearable
+        testId="treatment-drawer-package"
+      />
+    </DrawerField>
+  );
+}
+
 /**
  * Step 1 "Session" (H:4811–4812; `patient-file.md:131–134`): Treatment ("Pick
  * or type" with four offerings as chips) · Session number · Doctor ·
- * Therapist (a second tap clears).
+ * Therapist (a second tap clears) · From package.
  */
 export function TreatmentSessionFields({
   form,
   values,
   names,
+  packages,
+  linkedPackage,
+  sessionFixed,
   readOnly,
 }: {
   form: UseFormReturn<TreatmentFormValues>;
   values: TreatmentFormValues;
   names: readonly TreatmentNameChip[];
+  /** The packages a new session may spend; none on an edit. */
+  packages: readonly PatientPackageRow[];
+  /** The package an edited session spent, when the file still lists it. */
+  linkedPackage: PatientPackageRow | null;
+  /** The session was spent from a package: its number stays. */
+  sessionFixed: boolean;
   readOnly: boolean;
 }) {
   const { t } = useTranslation(TREATMENT_NS);
@@ -57,7 +175,7 @@ export function TreatmentSessionFields({
           <div className="flex min-w-0 flex-col gap-1.5">
             <DrawerInput
               id={`${ids}-name`}
-              maxLength={120}
+              maxLength={TREATMENT_LIMITS.name}
               placeholder={t(K.namePlaceholder)}
               data-testid="treatment-drawer-name"
               {...form.register('name', {
@@ -77,25 +195,23 @@ export function TreatmentSessionFields({
                   if (!chip) return;
                   form.setValue('name', chip.name, { shouldDirty: true });
                   form.setValue('offeringId', chip.offeringId, { shouldDirty: true });
+                  // Another treatment is not the picked package's session.
+                  const picked = packages.find((row) => row.id === values.packageId);
+                  if (picked && picked.offeringId !== chip.offeringId) {
+                    form.setValue('packageId', null, { shouldDirty: true });
+                  }
                 }}
                 testId="treatment-drawer-name-quick"
               />
             ) : null}
           </div>
         </DrawerField>
-        <DrawerField label={t(K.sessionNo)} htmlFor={`${ids}-session`} span="third">
-          <DrawerStepper
-            id={`${ids}-session`}
-            label={t(K.sessionNo)}
-            value={values.sessionNo}
-            onValueChange={(sessionNo) =>
-              form.setValue('sessionNo', sessionNo, { shouldDirty: true })
-            }
-            min={1}
-            max={99}
-            testId="treatment-drawer-session"
-          />
-        </DrawerField>
+        <SessionNumberField
+          form={form}
+          values={values}
+          fixed={sessionFixed}
+          fieldId={`${ids}-session`}
+        />
         <DrawerField
           label={t(K.doctor)}
           htmlFor={`${ids}-doctor`}
@@ -104,7 +220,6 @@ export function TreatmentSessionFields({
         >
           <PatientStaffPicker
             id={`${ids}-doctor`}
-            staffRole="doctor"
             label={t(K.doctor)}
             placeholder={t(K.doctorPlaceholder)}
             value={values.doctorId}
@@ -121,7 +236,6 @@ export function TreatmentSessionFields({
         >
           <PatientStaffPicker
             id={`${ids}-therapist`}
-            staffRole="therapist"
             label={t(K.therapist)}
             placeholder={t(K.therapistPlaceholder)}
             value={values.therapistId}
@@ -131,6 +245,12 @@ export function TreatmentSessionFields({
             testId="treatment-drawer-therapist"
           />
         </DrawerField>
+        <PackageField
+          form={form}
+          values={values}
+          packages={packages}
+          linkedPackage={linkedPackage}
+        />
       </DrawerFieldGrid>
     </DrawerStepBody>
   );
@@ -179,7 +299,7 @@ export function TreatmentAftercareFields({
           <DrawerTextarea
             id={`${ids}-remark`}
             rows={3}
-            maxLength={1000}
+            maxLength={TREATMENT_LIMITS.remark}
             placeholder={t(K.aftercare.remarkPlaceholder)}
             data-testid="treatment-drawer-remark"
             {...form.register('remark')}

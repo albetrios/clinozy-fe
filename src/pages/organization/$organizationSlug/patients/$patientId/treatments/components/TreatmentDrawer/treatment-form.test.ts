@@ -1,146 +1,174 @@
 import { describe, expect, it } from 'vitest';
 
-import type { Treatment } from '@/shared/api/clinic/clinic-schema.ts';
+import type { PatientPackageRow } from '@/shared/api/clinic/patient-packages-contracts.ts';
 
 import {
+  patientPackage,
+  treatmentRecord,
+} from '../../__tests__/integration/treatment-doubles.ts';
+import {
+  canSpendSession,
   newTreatmentForm,
   nextSessionForm,
+  onPackageForm,
   rememberTemplate,
   startingTemplate,
   storedTeeth,
   teethOf,
   templateTone,
+  treatmentFieldsOf,
   treatmentFormOf,
-  treatmentInputOf,
   withTemplate,
 } from './treatment-form.ts';
 
-const CONTEXT = {
-  patientId: 'p',
-  appointmentId: null,
-  performedAt: '2026-10-03T06:30:00.000Z',
-  fallbackName: 'Treatment',
-};
-
-function treatment(fields: Partial<Treatment> = {}): Treatment {
-  return {
-    name: 'LHR Full Face',
-    template: 'skin',
-    sessionNo: 1,
-    bodyParts: ['face'],
-    params: {
-      type: 'Laser',
-      skinType: 'Type IV',
-      machine: 'Soprano Ice',
-      wavelength: '810',
-    },
-    doctorId: 'dr',
-    therapistId: 'th',
-    offeringId: 'of',
-    packageId: 'pk',
-    remark: 'Mild redness',
-    aftercareCall: 'in_2_days',
-    ...fields,
-  } as Treatment;
-}
+const LHR = treatmentRecord({
+  bodyParts: ['face'],
+  parameters: {
+    type: 'Laser',
+    skinType: 'Type IV',
+    machine: 'Soprano Ice',
+    wavelength: '810',
+  },
+  doctorId: 'mem_dr',
+  therapistId: 'mem_th',
+  offeringId: 'off_lhr',
+  packageId: 'poff_lhr',
+  remark: 'Mild redness',
+  aftercareCall: 'in_two_days',
+});
 
 describe('the treatment form', () => {
   it('starts a new treatment on session 1 with the next-day call', () => {
     expect(
-      newTreatmentForm('dental', { doctorId: 'dr', therapistId: null }),
+      newTreatmentForm('dental', { doctorId: 'mem_dr', therapistId: null }),
     ).toMatchObject({
       template: 'dental',
-      sessionNo: 1,
-      doctorId: 'dr',
+      sessionNumber: 1,
+      doctorId: 'mem_dr',
       therapistId: null,
+      packageId: null,
       aftercareCall: 'next_day',
     });
   });
 
   it('continues the last treatment: its name, areas and the next session (H:4811)', () => {
-    const staff = { doctorId: 'dr2', therapistId: null };
-    expect(newTreatmentForm('skin', staff, treatment({ sessionNo: 3 }))).toMatchObject({
+    const staff = { doctorId: 'mem_other', therapistId: null };
+    expect(newTreatmentForm('skin', staff, { ...LHR, sessionNumber: 3 })).toMatchObject({
       template: 'skin',
       name: 'LHR Full Face',
-      offeringId: 'of',
+      offeringId: 'off_lhr',
       packageId: null,
       areas: ['face'],
-      params: {},
-      sessionNo: 4,
-      doctorId: 'dr2',
+      parameters: {},
+      sessionNumber: 4,
+      doctorId: 'mem_other',
     });
     // Another template keeps the name and session, not the areas.
-    expect(newTreatmentForm('physio', staff, treatment())).toMatchObject({
+    expect(newTreatmentForm('physio', staff, LHR)).toMatchObject({
       template: 'physio',
       name: 'LHR Full Face',
       areas: [],
-      sessionNo: 2,
+      sessionNumber: 2,
     });
   });
 
   it('opens a saved treatment with its chips from its body parts', () => {
-    expect(treatmentFormOf(treatment())).toMatchObject({
+    expect(treatmentFormOf(LHR)).toMatchObject({
       areas: ['face'],
-      params: {
+      parameters: {
         type: 'Laser',
         skinType: 'Type IV',
         machine: 'Soprano Ice',
         wavelength: '810',
       },
+      packageId: 'poff_lhr',
       remark: 'Mild redness',
+      aftercareCall: 'in_two_days',
     });
   });
 
-  it('keeps the exact area chips through a save', () => {
+  it('maps the area chips onto the API’s body parts and keeps their exact list', () => {
     const values = {
       ...newTreatmentForm('skin', { doctorId: null, therapistId: null }),
       name: 'Upper lip LHR',
-      areas: ['upperLip', 'chin', 'underarm'],
+      areas: ['upperLip', 'chin', 'underarm', 'fullBody'],
     };
-    const input = treatmentInputOf(values, CONTEXT);
-    expect(input.bodyParts).toEqual(['face', 'underarm']);
-    expect(input.params.areas).toBe('Upper lip, Chin, Underarm');
-    expect(treatmentFormOf(treatment({ ...input, params: input.params })).areas).toEqual([
-      'upperLip',
-      'chin',
-      'underarm',
-    ]);
+    const fields = treatmentFieldsOf(values, 'Treatment');
+    expect(fields.bodyParts).toEqual(['upper_lip', 'chin', 'underarm', 'full_body']);
+    expect(fields.parameters.areas).toBe('Upper lip, Chin, Underarm, Full body');
+    expect(
+      treatmentFormOf(treatmentRecord({ ...fields, parameters: fields.parameters }))
+        .areas,
+    ).toEqual(['upperLip', 'chin', 'underarm', 'fullBody']);
+  });
+
+  it('names Physio’s neck and back as body parts, the joints only in the list', () => {
+    const values = {
+      ...newTreatmentForm('physio', { doctorId: null, therapistId: null }),
+      areas: ['neck', 'knee', 'back'],
+    };
+    const fields = treatmentFieldsOf(values, 'Treatment');
+    expect(fields.bodyParts).toEqual(['neck', 'back']);
+    expect(fields.parameters.areas).toBe('Neck, Back, Knee');
   });
 
   it('clears the areas and fields when the template switches', () => {
-    const values = { ...treatmentFormOf(treatment()), name: 'Peel' };
+    const values = { ...treatmentFormOf(LHR), name: 'Peel' };
     expect(withTemplate(values, 'dental')).toMatchObject({
       template: 'dental',
       name: 'Peel',
       areas: [],
-      params: {},
+      parameters: {},
     });
   });
 
   it('saves a blank name as “Treatment” and drops blank fields (A-F11)', () => {
     const values = {
       ...newTreatmentForm('general', { doctorId: null, therapistId: null }),
-      params: { area: '  ', parameters: 'Dose: 2 ml' },
+      parameters: { area: '  ', parameters: 'Dose: 2 ml' },
     };
-    expect(treatmentInputOf(values, CONTEXT)).toMatchObject({
+    expect(treatmentFieldsOf(values, 'Treatment')).toMatchObject({
       name: 'Treatment',
-      params: { parameters: 'Dose: 2 ml' },
+      parameters: { parameters: 'Dose: 2 ml' },
       bodyParts: [],
       remark: null,
     });
   });
 
-  it('fills the next session of the last treatment', () => {
+  it('fills the next session of the last treatment, on its package while it has a session', () => {
     const current = newTreatmentForm('dental', { doctorId: null, therapistId: null });
-    expect(nextSessionForm(treatment({ sessionNo: 2 }), current)).toMatchObject({
+    const last = { ...LHR, sessionNumber: 2 };
+    const open = patientPackage({ id: 'poff_lhr' });
+    expect(nextSessionForm(last, current, [open])).toMatchObject({
       template: 'skin',
       name: 'LHR Full Face',
-      sessionNo: 3,
-      packageId: 'pk',
-      doctorId: 'dr',
-      therapistId: 'th',
+      sessionNumber: 3,
+      packageId: 'poff_lhr',
+      doctorId: 'mem_dr',
+      therapistId: 'mem_th',
       areas: ['face'],
     });
+    const usedUp = patientPackage({ id: 'poff_lhr', status: 'used_up', sessionsLeft: 0 });
+    expect(nextSessionForm(last, current, [usedUp]).packageId).toBeNull();
+  });
+
+  it('puts a session on a package: its name, offering and id (the server numbers it)', () => {
+    const current = newTreatmentForm('skin', { doctorId: null, therapistId: null });
+    const row = patientPackage();
+    expect(onPackageForm(current, row)).toMatchObject({
+      name: row.name,
+      offeringId: row.offeringId,
+      packageId: row.id,
+    });
+  });
+
+  it('spends only an active package with a session left — the server’s counts', () => {
+    const rows: PatientPackageRow[] = [
+      patientPackage({ id: 'a' }),
+      patientPackage({ id: 'b', status: 'used_up', sessionsLeft: 0 }),
+      patientPackage({ id: 'c', status: 'expired' }),
+    ];
+    expect(rows.filter(canSpendSession).map((row) => row.id)).toEqual(['a']);
   });
 
   it('stores teeth as their FDI codes back to back', () => {
@@ -155,7 +183,7 @@ describe('the treatment form', () => {
   });
 
   it('starts from the patient’s last template, else the one saved last', () => {
-    expect(startingTemplate(treatment({ template: 'physio' }))).toBe('physio');
+    expect(startingTemplate({ ...LHR, template: 'physio' })).toBe('physio');
     rememberTemplate('gynac');
     expect(startingTemplate(undefined)).toBe('gynac');
   });

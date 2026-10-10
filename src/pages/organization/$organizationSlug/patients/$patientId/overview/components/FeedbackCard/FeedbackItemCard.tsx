@@ -17,11 +17,13 @@ import {
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { ChevronDown, PenLine, Trash } from '@/shared/icons/index.ts';
 
+import { useStaffLookup } from '../../../shared/hooks/useStaffLookup/index.ts';
 import { CLINICAL_NS, FEEDBACK_KEYS } from '../../overview.constants.ts';
 import {
   FEEDBACK_TYPE_LOOK,
   feedbackActionsFor,
   feedbackCardView,
+  type FeedbackVisit,
 } from './feedback-view.ts';
 
 const K = FEEDBACK_KEYS;
@@ -29,6 +31,8 @@ const K = FEEDBACK_KEYS;
 /** Props of {@link FeedbackItemCard}. */
 export interface FeedbackItemCardProps {
   item: FeedbackItem;
+  /** Names the visit a review follows, from the patient's bookings. */
+  visitOf: (appointmentId: string | null) => FeedbackVisit | null;
   /** Patients edit: Edit, Remove and Log action. */
   canEdit: boolean;
   onEdit: (item: FeedbackItem) => void;
@@ -37,30 +41,10 @@ export interface FeedbackItemCardProps {
   testId: string;
 }
 
-/** The 20px initials chip and first name of who logged it (H:4389 footer). */
-function ByChip({ item }: { item: FeedbackItem }) {
-  if (!item.by) return null;
-  return (
-    <span
-      data-slot="pill"
-      className="text-caption text-muted-foreground-strong bg-card inline-flex h-6 flex-none items-center gap-1.25 rounded-full border ps-0.5 pe-2 whitespace-nowrap"
-    >
-      <span
-        aria-hidden="true"
-        data-slot="pill"
-        className={cn(
-          'flex size-5 items-center justify-center rounded-full text-[0.5rem] font-semibold',
-          TONE_CLASSES[item.by.tone].surface,
-        )}
-      >
-        {item.by.initials}
-      </span>
-      {item.by.name.split(' ')[0]}
-    </span>
-  );
-}
-
-/** "Action needed" + "Log action ⌄", the logged "✓ Doctor called · Riya", or nothing. */
+/**
+ * "Action needed" + "Log action ⌄", the latest follow-up logged — "✓ Doctor called · Riya",
+ * who logged it from the team — or nothing.
+ */
 function ActionLine({
   item,
   canEdit,
@@ -68,9 +52,12 @@ function ActionLine({
   testId,
 }: Pick<FeedbackItemCardProps, 'item' | 'canEdit' | 'onLogAction' | 'testId'>) {
   const { t } = useTranslation(CLINICAL_NS);
-  if (item.action) {
-    const action = t(K.actionKinds[item.action.action]);
-    const by = item.action.by?.name.split(' ')[0];
+  const staff = useStaffLookup();
+  const record = item.kind === 'checkIn' ? item.checkIn : item.review;
+  const [logged] = record.actions;
+  if (logged) {
+    const action = t(K.actionKinds[logged.action]);
+    const by = staff(logged.authorId)?.name.split(' ')[0];
     // The name isolated: a Latin first name keeps its place in a right-to-left pill.
     const text = by
       ? t(K.actionBy, { action, name: isolateText(by) })
@@ -92,7 +79,7 @@ function ActionLine({
       </>
     );
   }
-  if (!item.needsAction) return <span className="flex-1" />;
+  if (!record.needsAction) return <span className="flex-1" />;
   return (
     <>
       <span
@@ -145,11 +132,13 @@ function ActionLine({
  * One card of the Feedback carousel (H:4389; `patient-file.md:52–56`): 236px
  * tall — the type's tile, name and sub line with Edit / Remove; the feel or
  * the stars, the score and its trend, the followed or files tag; the quote
- * (two lines); "Next · …" or "Link · …"; and the footer: the date, the action
- * state and who logged it. A card that needs action and has none is outlined.
+ * (two lines); "Next · …" or "Link · …"; and the footer: the date and the
+ * action state. A card the server says needs action is outlined. Who logged
+ * the record is not shown — the API does not say (G4).
  */
 export function FeedbackItemCard({
   item,
+  visitOf,
   canEdit,
   onEdit,
   onRemove,
@@ -158,11 +147,12 @@ export function FeedbackItemCard({
 }: FeedbackItemCardProps) {
   const { t } = useTranslation(CLINICAL_NS);
   const { formatDate } = useLocaleFormat();
-  const view = feedbackCardView(item, t);
+  const view = feedbackCardView(item, t, visitOf);
   const look = FEEDBACK_TYPE_LOOK[view.type];
   const Icon = look.icon;
+  const record = item.kind === 'checkIn' ? item.checkIn : item.review;
   const date = formatDate(
-    localDateOf(item.date),
+    localDateOf(record.date),
     { day: 'numeric', month: 'short' },
     { civilDay: true },
   );
@@ -174,7 +164,7 @@ export function FeedbackItemCard({
       data-kind={item.kind}
       className={cn(
         'bg-card flex h-59 min-w-0 snap-start flex-col gap-2 rounded-xl border p-3',
-        item.needsAction && !item.action && 'ring-destructive/40 ring-1',
+        record.needsAction && 'ring-destructive/40 ring-1',
       )}
     >
       <div className="flex min-w-0 items-center gap-2">
@@ -282,7 +272,6 @@ export function FeedbackItemCard({
           onLogAction={onLogAction}
           testId={testId}
         />
-        <ByChip item={item} />
       </div>
     </article>
   );

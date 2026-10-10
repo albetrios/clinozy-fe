@@ -45,25 +45,42 @@ export function isBillingSection(section: PatientFileSectionSlug): boolean {
 }
 
 /**
+ * The clinozy-be code a section's records need beyond Patients view: the clinical record
+ * (Clinical notes, Photos, Reports), prescriptions and treatments (api-integration §5.4 Gate).
+ */
+const SECTION_READ_CODES: Readonly<Partial<Record<PatientFileSectionSlug, string>>> = {
+  overview: 'patient:clinical_record:read',
+  images: 'patient:clinical_record:read',
+  reports: 'patient:clinical_record:read',
+  prescriptions: 'patient_prescription:read',
+  treatments: 'patient_treatment:read',
+};
+
+/**
  * What the member may see of a patient file (Q-F1, AMBER A-F14): the clinical
  * and care sections with Patients view, the billing sections with Payments
  * view (`billing.view`, `S:33`) — so an Accountant reads Invoices and Payments
- * and nothing else. In the file's order.
+ * and nothing else. A signed-in member (`canCode`; none during View-as, which
+ * previews by role) also needs each section's own read code. In the file's
+ * order.
  */
 export function viewablePatientFileSections(access: {
   patients: boolean;
   billing: boolean;
+  canCode?: (code: string) => boolean;
 }): PatientFileSectionSlug[] {
-  return PATIENT_FILE_SECTIONS.filter((section) =>
-    isBillingSection(section) ? access.billing : access.patients,
-  );
+  return PATIENT_FILE_SECTIONS.filter((section) => {
+    if (isBillingSection(section)) return access.billing;
+    const code = SECTION_READ_CODES[section];
+    return access.patients && (!(code && access.canCode) || access.canCode(code));
+  });
 }
 
 /**
  * The schema's role-named gates on the file's records (D22; `S:35–40`,
- * AMBER A-F15): writing a prescription is Doctor or Admin, a treatment
- * Doctor or Therapist, and the Private photo album is Doctor or Admin. The
- * clinic's Owner always passes.
+ * AMBER A-F15) as a View-as preview reads them: writing a prescription is
+ * Doctor or Admin, a treatment Doctor or Therapist, and the Private photo
+ * album is Doctor or Admin. The clinic's Owner always passes.
  */
 const PATIENT_FILE_ROLE_GATES = {
   prescriptions: ['doctor', 'admin'],
@@ -74,11 +91,26 @@ const PATIENT_FILE_ROLE_GATES = {
 /** A role-named gate of the file. */
 export type PatientFileRoleGate = keyof typeof PATIENT_FILE_ROLE_GATES;
 
-/** Whether the roles in force pass a role-named gate — the Owner always does. */
+/** The clinozy-be code behind each gate: writing a prescription or a treatment, the Private album. */
+const PATIENT_FILE_GATE_CODES: Readonly<Record<PatientFileRoleGate, string>> = {
+  prescriptions: 'patient_prescription:create',
+  treatments: 'patient_treatment:create',
+  privateAlbum: 'patient:private_album:read',
+};
+
+/**
+ * Whether the access in force passes one of the file's gates: the signed-in member by their own
+ * code; a View-as preview by its role (the Owner always passes).
+ */
 export function passesPatientFileGate(
-  roles: readonly Role[],
+  access: {
+    roles: readonly Role[];
+    previewRole: string | null;
+    canCode: (code: string) => boolean;
+  },
   gate: PatientFileRoleGate,
 ): boolean {
+  if (!access.previewRole) return access.canCode(PATIENT_FILE_GATE_CODES[gate]);
   const allowed: readonly Role[] = PATIENT_FILE_ROLE_GATES[gate];
-  return roles.some((role) => role === 'owner' || allowed.includes(role));
+  return access.roles.some((role) => role === 'owner' || allowed.includes(role));
 }

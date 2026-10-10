@@ -17,8 +17,6 @@ export const PATIENT_SECTIONS_POPOVER_KEYS = {
     team: 'sectionsPopover.groups.team',
   },
   openNow: 'sectionsPopover.openNow',
-  empty: 'sectionsPopover.empty',
-  hasRecords: 'sectionsPopover.hasRecords',
   pin: 'sectionsPopover.pin',
   unpin: 'sectionsPopover.unpin',
   /** "Pin to bar · Visits". */

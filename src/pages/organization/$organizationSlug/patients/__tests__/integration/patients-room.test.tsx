@@ -3,13 +3,25 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import type * as ContactsApiModule from '@/shared/api/clinic/contacts-api.ts';
 import type * as PatientsApiModule from '@/shared/api/clinic/patients-api.ts';
+import {
+  createPatient,
+  deletePatient,
+  listPatients,
+  restorePatient,
+} from '@/shared/api/clinic/patients-api.ts';
+import type { PatientListParams } from '@/shared/api/clinic/patients-contracts.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { shownLocation } from '@/tests/utils/shown-location.ts';
 
 import { PatientsPage } from '../../PatientsPage.tsx';
+import {
+  DHARTI,
+  NOW,
+  type PatientsWorld,
+  seededPatientsWorld,
+} from './patients-test-data.ts';
 import { renderPatientsRoutes, resetPatientsRoutes } from './patients-test-router.tsx';
 
 const viewport = vi.hoisted(() => ({ tier: 'desktop' as ViewportTier }));
@@ -39,21 +51,23 @@ vi.mock('@/lib/csv.ts', async (importOriginal) => ({
   downloadCsv: csv.downloadCsv,
 }));
 
-/** Fails the list read while `failing` is set — the room's list error. */
-const listGate = vi.hoisted(() => ({ failing: false }));
+const world = vi.hoisted(() => ({}) as PatientsWorld);
 vi.mock('@/shared/api/clinic/patients-api.ts', async (importOriginal) => {
-  const actual = await importOriginal<typeof PatientsApiModule>();
+  const { patientsApiDouble } = await import('./patients-test-data.ts');
   return {
-    ...actual,
-    listPatients: async (...args: Parameters<typeof actual.listPatients>) => {
-      if (listGate.failing) throw new Error('connection dropped');
-      return actual.listPatients(...args);
-    },
+    ...(await importOriginal<typeof PatientsApiModule>()),
+    ...patientsApiDouble(world),
+  };
+});
+vi.mock('@/shared/api/clinic/contacts-api.ts', async (importOriginal) => {
+  const { contactsApiDouble } = await import('./patients-test-data.ts');
+  return {
+    ...(await importOriginal<typeof ContactsApiModule>()),
+    ...contactsApiDouble(world),
   };
 });
 
 const PATIENTS = '/organization/acme/patients';
-const DHARTI = patientRef('Dharti Galani');
 
 const rows = () => screen.getAllByTestId('patients-table-row');
 const rowOf = (name: string) => {
@@ -62,138 +76,172 @@ const rowOf = (name: string) => {
   return row;
 };
 
+/** The params of the last list read. */
+const lastListParams = (): PatientListParams => {
+  const params = vi.mocked(listPatients).mock.lastCall?.[0];
+  if (!params) throw new Error('the list was never read');
+  return params;
+};
+
 beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(NOW);
   viewport.tier = 'desktop';
-  listGate.failing = false;
+  Object.assign(world, seededPatientsWorld());
   for (const fn of Object.values(notifyMock)) fn.mockReset();
   csv.downloadCsv.mockReset();
-  resetClinicFixtures();
+  vi.mocked(listPatients).mockClear();
+  vi.mocked(createPatient).mockClear();
+  vi.mocked(deletePatient).mockClear();
+  vi.mocked(restorePatient).mockClear();
 });
 afterEach(() => {
+  vi.useRealTimers();
   resetPatientsRoutes();
-  resetClinicFixtures();
 });
 
 describe('the Patients room (KICKOFF §6.5)', () => {
   it('lists the roster under the toolbar, ending with "All patients loaded"', async () => {
     const { container } = renderPatientsRoutes(PATIENTS, PatientsPage);
-    await waitFor(() => expect(rows()).toHaveLength(30));
+    await waitFor(() => expect(rows()).toHaveLength(4));
     expect(
       screen.getByRole('heading', { level: 1, name: 'Patients' }),
     ).toBeInTheDocument();
     const tabs = within(screen.getByTestId('patients-tabs'));
     expect(tabs.getAllByRole('tab').map((tab) => tab.textContent)).toEqual([
       'All',
-      'In clinic today',
-      'With dues',
       'Follow-up due',
       'Recall',
     ]);
+    // Newest first, without a sort; the All view reads everyone.
+    expect(lastListParams()).toMatchObject({ view: 'all', sort: undefined });
+    expect(rows()[0]).toHaveTextContent('Dharti Galani');
+    expect(rows()[0]).toHaveTextContent('+91 82006 03212');
     expect(screen.getByTestId('patients-table-end')).toHaveTextContent(
       'All patients loaded',
     );
-    expect(screen.getByTestId('patients-new')).toHaveTextContent('New patient');
-    // The recommended set hides Gender, Conversion and Age: 6 of 9 shown.
+    expect(await screen.findByTestId('patients-new')).toHaveTextContent('New patient');
+    // The recommended set hides Gender, Conversion and Age; there is no Due column.
     expect(screen.getByTestId('patients-columns-trigger')).toHaveAttribute(
       'title',
-      'Columns · 6 of 9 shown',
+      'Columns · 5 of 8 shown',
     );
+    expect(
+      screen.getAllByRole('columnheader').map((header) => header.textContent?.trim()),
+    ).toEqual(expect.arrayContaining(['ID', 'Patient', 'Type', 'Status', 'Follow-up']));
+    expect(screen.queryByRole('columnheader', { name: /Due/ })).toBeNull();
+    expect(screen.queryByRole('columnheader', { name: /Gender/ })).toBeNull();
     expect(await axe(container)).toHaveNoViolations();
   });
 
-  it('switches views through the URL; the list follows', async () => {
+  it('switches views through the URL; the list read follows', async () => {
     const user = userEvent.setup();
     const { router } = renderPatientsRoutes(PATIENTS, PatientsPage);
-    await waitFor(() => expect(rows()).toHaveLength(30));
-    await user.click(screen.getByTestId('patients-tab-dues'));
+    await waitFor(() => expect(rows()).toHaveLength(4));
+    await user.click(screen.getByTestId('patients-tab-follow'));
     await user.keyboard('{Enter}');
     await waitFor(() =>
-      expect(router.state.location.search).toMatchObject({ view: 'dues' }),
+      expect(router.state.location.search).toMatchObject({ view: 'follow' }),
     );
-    await waitFor(() => expect(rows().length).toBeLessThan(30));
-    for (const row of rows()) expect(row).not.toHaveTextContent(/—\s*$/);
+    // Follow-up due: today's and the overdue ones.
+    await waitFor(() => expect(rows()).toHaveLength(2));
+    expect(lastListParams()).toMatchObject({ view: 'follow' });
+    expect(rowOf('Dharti Galani')).toBeInTheDocument();
+    expect(rowOf('Kiran Desai')).toBeInTheDocument();
+
+    await user.click(screen.getByTestId('patients-tab-recall'));
+    await user.keyboard('{Enter}');
+    await waitFor(() => expect(rows()).toHaveLength(1));
+    expect(lastListParams()).toMatchObject({ view: 'recall' });
+    expect(rows()[0]).toHaveTextContent('Kiran Desai');
   });
 
-  it('sorts on the server from the header: ascending, descending, off', async () => {
+  it('sorts on the server from the ID and Follow-up headers: ascending, descending, off', async () => {
     const user = userEvent.setup();
     const { router } = renderPatientsRoutes(PATIENTS, PatientsPage);
-    await waitFor(() => expect(rows()).toHaveLength(30));
-    const header = screen.getByRole('button', { name: /^ID/ });
-    await user.click(header);
+    await waitFor(() => expect(rows()).toHaveLength(4));
+    // Only ID and Follow-up sort — the two the API sorts by.
+    expect(screen.queryByRole('button', { name: /^Patient/ })).toBeNull();
+    expect(screen.queryByRole('button', { name: /^Updated/ })).toBeNull();
+
+    await user.click(screen.getByRole('button', { name: /^ID/ }));
     await waitFor(() =>
       expect(router.state.location.search).toMatchObject({ sort: 'seq:asc' }),
     );
     await waitFor(() => expect(rows()[0]).toHaveTextContent('#198'));
+    expect(lastListParams()).toMatchObject({ sort: 'seq', order: 'asc' });
     await user.click(screen.getByRole('button', { name: /^ID/ }));
     await waitFor(() =>
       expect(router.state.location.search).toMatchObject({ sort: 'seq:desc' }),
     );
+    await waitFor(() => expect(rows()[0]).toHaveTextContent('#3508'));
     await user.click(screen.getByRole('button', { name: /^ID/ }));
     await waitFor(() => expect(router.state.location.search).not.toHaveProperty('sort'));
+
+    await user.click(screen.getByRole('button', { name: /^Follow-up/ }));
+    await waitFor(() =>
+      expect(router.state.location.search).toMatchObject({ sort: 'followUp:asc' }),
+    );
+    await waitFor(() => expect(rows()[0]).toHaveTextContent('Kiran Desai'));
+    expect(lastListParams()).toMatchObject({ sort: 'followUp', order: 'asc' });
   });
 
   it('opens the patient file on a row click, Activity open from md', async () => {
     const user = userEvent.setup();
     const { router } = renderPatientsRoutes(PATIENTS, PatientsPage);
-    await waitFor(() => expect(rows()).toHaveLength(30));
+    await waitFor(() => expect(rows()).toHaveLength(4));
     await user.click(within(rowOf('Dharti Galani')).getByText('#3508'));
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe(`${PATIENTS}/${DHARTI}`),
+      expect(router.state.location.pathname).toBe(`${PATIENTS}/${DHARTI.id}`),
     );
     expect(router.state.location.search).toMatchObject({ activity: 'open' });
   });
 
-  it('opens New invoice and Collect over the list, which stays (A-P1), and Edit over it', async () => {
+  it('offers Edit and Delete on a row — no New invoice or Collect — and opens Edit over the file', async () => {
     const user = userEvent.setup();
     const { router } = renderPatientsRoutes(PATIENTS, PatientsPage);
-    await waitFor(() => expect(rows()).toHaveLength(30));
+    await waitFor(() => expect(rows()).toHaveLength(4));
     const dharti = within(rowOf('Dharti Galani'));
-    expect(dharti.getByTestId('patients-row-action-collect')).toHaveAttribute(
-      'aria-label',
-      expect.stringMatching(/^Collect ₹/),
-    );
-    await user.click(dharti.getByTestId('patients-row-action-new-invoice'));
+    expect(dharti.getByTestId('patients-row-action-edit')).toBeInTheDocument();
+    expect(dharti.getByTestId('patients-row-action-delete')).toBeInTheDocument();
+    expect(dharti.queryByTestId('patients-row-action-new-invoice')).toBeNull();
+    expect(dharti.queryByTestId('patients-row-action-collect')).toBeNull();
+    await user.click(dharti.getByTestId('patients-row-action-edit'));
     await waitFor(() =>
-      expect(shownLocation(router).pathname).toBe('/organization/acme/invoices/create'),
+      expect(router.state.location.pathname).toBe(`${PATIENTS}/${DHARTI.id}/edit`),
+    );
+  });
+
+  it('books the person from the contact card: New appointment over the list with who=<contact>', async () => {
+    const user = userEvent.setup();
+    const { router } = renderPatientsRoutes(PATIENTS, PatientsPage);
+    await waitFor(() => expect(rows()).toHaveLength(4));
+    await user.hover(
+      within(rowOf('Dharti Galani')).getByRole('button', { name: /Dharti Galani/ }),
+    );
+    await user.click(await screen.findByTestId('contact-card-new-appointment'));
+    await waitFor(() =>
+      expect(shownLocation(router).pathname).toBe(
+        '/organization/acme/appointments/create',
+      ),
     );
     expect(shownLocation(router).search).toEqual({
-      type: 'clinic',
-      patient: DHARTI,
+      who: DHARTI.contactId,
       from: 'patients',
     });
+    // The list stays behind the drawer.
     expect(router.state.location.pathname).toBe(PATIENTS);
-    expect(rows()).toHaveLength(30);
-
-    router.history.back();
-    await waitFor(() => expect(rows()).toHaveLength(30));
-    await user.click(
-      within(rowOf('Dharti Galani')).getByTestId('patients-row-action-collect'),
-    );
-    await waitFor(() =>
-      expect(shownLocation(router).pathname).toBe('/organization/acme/payments/receive'),
-    );
-    expect(shownLocation(router).search).toEqual({ patient: DHARTI, from: 'patients' });
-    expect(router.state.location.pathname).toBe(PATIENTS);
-
-    router.history.back();
-    await waitFor(() => expect(rows()).toHaveLength(30));
-    await user.click(
-      within(rowOf('Dharti Galani')).getByTestId('patients-row-action-edit'),
-    );
-    await waitFor(() =>
-      expect(router.state.location.pathname).toBe(`${PATIENTS}/${DHARTI}/edit`),
-    );
   });
 
   it('opens New patient over the list, its filters kept', async () => {
     const user = userEvent.setup();
-    const { router } = renderPatientsRoutes(`${PATIENTS}?view=dues`, PatientsPage);
+    const { router } = renderPatientsRoutes(`${PATIENTS}?view=follow`, PatientsPage);
     await waitFor(() => expect(rows().length).toBeGreaterThan(0));
     await user.click(screen.getByTestId('patients-new'));
     await waitFor(() =>
       expect(router.state.location.pathname).toBe(`${PATIENTS}/create`),
     );
-    expect(router.state.location.search).toMatchObject({ view: 'dues' });
+    expect(router.state.location.search).toMatchObject({ view: 'follow' });
     const drawer = await screen.findByTestId('patient-drawer');
     expect(within(drawer).getByTestId('patient-drawer-title')).toHaveTextContent(
       'New patient',
@@ -201,7 +249,7 @@ describe('the Patients room (KICKOFF §6.5)', () => {
     // Cancel closes it back onto the same list.
     await user.click(within(drawer).getByRole('button', { name: 'Cancel' }));
     await waitFor(() => expect(router.state.location.pathname).toBe(PATIENTS));
-    expect(router.state.location.search).toEqual({ view: 'dues' });
+    expect(router.state.location.search).toEqual({ view: 'follow' });
   });
 
   it('creates a patient in the drawer: the list stays and refetches with them (D28)', async () => {
@@ -215,30 +263,48 @@ describe('the Patients room (KICKOFF §6.5)', () => {
     expect(within(drawer).getByTestId('patient-drawer-mobile')).toHaveValue(
       '98765 00009',
     );
-    await waitFor(() => expect(rows().length).toBeGreaterThan(0));
+    await waitFor(() => expect(rows()).toHaveLength(4));
+    const reads = vi.mocked(listPatients).mock.calls.length;
     await user.click(within(drawer).getByTestId('patient-drawer-save'));
 
     await waitFor(() => expect(router.state.location.pathname).toBe(PATIENTS));
     // The prefill's name and mobile leave the URL with the drawer.
     expect(router.state.location.search).toEqual({});
+    expect(createPatient).toHaveBeenCalledWith(
+      expect.objectContaining({
+        fields: expect.objectContaining({ firstName: 'Priya', phone: '+919876500009' }),
+        person: 'new',
+      }),
+    );
     await waitFor(() => expect(rowOf('Priya Shah')).toHaveTextContent('+91 98765 00009'));
+    expect(vi.mocked(listPatients).mock.calls.length).toBeGreaterThan(reads);
+    expect(rows()).toHaveLength(5);
     expect(screen.queryByTestId('patient-drawer')).not.toBeInTheDocument();
     expect(notifyMock.success).toHaveBeenCalledWith(
-      expect.stringMatching(/^Patient #\d+ created · onboarding task added$/),
+      expect.stringMatching(/^Patient #3509 created/),
       { action: { label: 'Open file', onClick: expect.any(Function) } },
+    );
+
+    // The toast's "Open file" goes to the new patient's file.
+    const [, options] = notifyMock.success.mock.calls[0] as [
+      string,
+      { action: { onClick: () => void } },
+    ];
+    const created = await vi.mocked(createPatient).mock.results[0]?.value;
+    options.action.onClick();
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe(`${PATIENTS}/${created?.id}`),
     );
   });
 
   it('sends a create link without Create back to the list with the permission toast', async () => {
     const { router } = renderPatientsRoutes(
-      `${PATIENTS}/create?view=dues`,
+      `${PATIENTS}/create?view=recall`,
       PatientsPage,
-      {
-        role: 'therapist',
-      },
+      { role: 'therapist' },
     );
     await waitFor(() => expect(router.state.location.pathname).toBe(PATIENTS));
-    expect(router.state.location.search).toEqual({ view: 'dues' });
+    expect(router.state.location.search).toEqual({ view: 'recall' });
     expect(notifyMock.info).toHaveBeenCalledWith(
       'You do not have permission to perform this action.',
     );
@@ -248,7 +314,7 @@ describe('the Patients room (KICKOFF §6.5)', () => {
   it('removes a patient through the reason confirm, with Undo (D32)', async () => {
     const user = userEvent.setup();
     renderPatientsRoutes(PATIENTS, PatientsPage);
-    await waitFor(() => expect(rows()).toHaveLength(30));
+    await waitFor(() => expect(rows()).toHaveLength(4));
     await user.click(
       within(rowOf('Dharti Galani')).getByTestId('patients-row-action-delete'),
     );
@@ -259,7 +325,12 @@ describe('the Patients room (KICKOFF §6.5)', () => {
     );
     await user.click(within(dialog).getByTestId('confirm-reason-duplicate'));
     await user.click(within(dialog).getByTestId('confirm-accept'));
-    await waitFor(() => expect(rows()).toHaveLength(29));
+    await waitFor(() => expect(rows()).toHaveLength(3));
+    expect(deletePatient).toHaveBeenCalledWith({
+      patientId: DHARTI.id,
+      reason: 'duplicate',
+      note: null,
+    });
     expect(notifyMock.undo).toHaveBeenCalledWith('Dharti Galani removed', {
       onUndo: expect.any(Function),
     });
@@ -268,12 +339,13 @@ describe('the Patients room (KICKOFF §6.5)', () => {
       { onUndo: () => void },
     ];
     onUndo();
-    await waitFor(() => expect(rows()).toHaveLength(30));
+    await waitFor(() => expect(rows()).toHaveLength(4));
+    expect(restorePatient).toHaveBeenCalledWith(DHARTI.id, expect.any(String));
   });
 
   it('exports the selected rows as CSV (Q-P8)', async () => {
     renderPatientsRoutes(PATIENTS, PatientsPage);
-    await waitFor(() => expect(rows()).toHaveLength(30));
+    await waitFor(() => expect(rows()).toHaveLength(4));
     fireEvent.click(within(rowOf('Dharti Galani')).getByRole('checkbox'));
     fireEvent.click(within(rowOf('Raam Shah')).getByRole('checkbox'));
     fireEvent.click(screen.getByTestId('patients-table-bulk-export'));
@@ -281,36 +353,41 @@ describe('the Patients room (KICKOFF §6.5)', () => {
     const [fileName, content] = csv.downloadCsv.mock.calls[0] as [string, string];
     expect(fileName).toBe('patients.csv');
     const [header, ...lines] = content.split('\n');
-    expect(header).toBe('ID,Patient,Type,Status,Follow-up,Due,Updated');
+    expect(header).toBe('ID,Patient,Type,Status,Follow-up,Updated');
     expect(lines).toHaveLength(2);
     expect(lines.join('\n')).toContain('Dharti Galani · +91 82006 03212');
+    expect(lines.join('\n')).toContain('Raam Shah · +91 98795 21034');
     expect(notifyMock.success).toHaveBeenCalledWith('2 rows exported as CSV');
   });
 
   it('answers a search with nothing and filters with nothing differently', async () => {
     const user = userEvent.setup();
-    const { router, unmount } = renderPatientsRoutes(
-      `${PATIENTS}?q=nobody-at-all`,
-      PatientsPage,
-    );
+    const { unmount } = renderPatientsRoutes(`${PATIENTS}?q=nobody-at-all`, PatientsPage);
     expect(await screen.findByText('No patient matches')).toBeInTheDocument();
     expect(
       screen.getByText('Nothing here yet. Try another tab or search.'),
     ).toBeInTheDocument();
+    expect(lastListParams()).toMatchObject({ q: 'nobody-at-all' });
     unmount();
 
-    renderPatientsRoutes(`${PATIENTS}?status=inactive&types=dental`, PatientsPage);
+    const { router } = renderPatientsRoutes(
+      `${PATIENTS}?status=inactive&types=dental`,
+      PatientsPage,
+    );
     expect(await screen.findByText('No matches')).toBeInTheDocument();
+    // One status, as the API filters it.
+    expect(lastListParams()).toMatchObject({ status: 'inactive', types: ['dental'] });
     await user.click(screen.getByTestId('empty-state-clear-filters'));
-    await waitFor(() => expect(rows()).toHaveLength(30));
+    await waitFor(() => expect(rows()).toHaveLength(4));
     expect(router.state.location.search).not.toHaveProperty('status');
+    expect(router.state.location.search).not.toHaveProperty('types');
   });
 
   it('keeps the last copy on a failed read and offers Retry for 9s', async () => {
     const user = userEvent.setup();
     renderPatientsRoutes(PATIENTS, PatientsPage);
-    await waitFor(() => expect(rows()).toHaveLength(30));
-    listGate.failing = true;
+    await waitFor(() => expect(rows()).toHaveLength(4));
+    world.listFails = true;
     await user.click(screen.getByTestId('patients-tab-recall'));
     await user.keyboard('{Enter}');
     await waitFor(() =>
@@ -322,27 +399,32 @@ describe('the Patients room (KICKOFF §6.5)', () => {
         }),
       ),
     );
-    expect(rows()).toHaveLength(30);
+    expect(rows()).toHaveLength(4);
+
+    world.listFails = false;
+    const [, options] = notifyMock.error.mock.calls[0] as [
+      string,
+      { action: { onClick: () => void } },
+    ];
+    options.action.onClick();
+    await waitFor(() => expect(rows()).toHaveLength(1));
+    expect(rows()[0]).toHaveTextContent('Kiran Desai');
   });
 });
 
 describe('access (§6.5 Access, D9)', () => {
   it('a Therapist views only: no New patient, no row actions', async () => {
     renderPatientsRoutes(PATIENTS, PatientsPage, { role: 'therapist' });
-    await waitFor(() => expect(rows()).toHaveLength(30));
+    await waitFor(() => expect(rows()).toHaveLength(4));
     expect(screen.queryByTestId('patients-new')).not.toBeInTheDocument();
     expect(screen.queryByTestId('patients-row-action-edit')).not.toBeInTheDocument();
     expect(screen.queryByTestId('patients-row-action-delete')).not.toBeInTheDocument();
-    expect(
-      screen.queryByTestId('patients-row-action-new-invoice'),
-    ).not.toBeInTheDocument();
   });
 
-  it('a Front desk member bills and edits but never deletes', async () => {
+  it('a Front desk member edits but never deletes', async () => {
     renderPatientsRoutes(PATIENTS, PatientsPage, { role: 'front_desk' });
-    await waitFor(() => expect(rows()).toHaveLength(30));
+    await waitFor(() => expect(rows()).toHaveLength(4));
     const dharti = within(rowOf('Dharti Galani'));
-    expect(dharti.getByTestId('patients-row-action-new-invoice')).toBeInTheDocument();
     expect(dharti.getByTestId('patients-row-action-edit')).toBeInTheDocument();
     expect(dharti.queryByTestId('patients-row-action-delete')).not.toBeInTheDocument();
   });
@@ -353,19 +435,21 @@ describe('on a phone (below md)', () => {
     viewport.tier = 'phone';
   });
 
-  it('shows rows with Due as the key column, the floating "New patient" and Activity closed', async () => {
+  it('shows rows with Type as the key column, the floating "New patient" and Activity closed', async () => {
     const user = userEvent.setup();
     const { router } = renderPatientsRoutes(PATIENTS, PatientsPage);
-    await waitFor(() => expect(rows()).toHaveLength(30));
+    await waitFor(() => expect(rows()).toHaveLength(4));
     expect(screen.queryAllByRole('columnheader')).toHaveLength(0);
     const cells = within(rowOf('Dharti Galani')).getAllByRole('cell');
     expect(cells[0]).toHaveTextContent('Dharti Galani');
-    expect(cells[1]).toHaveTextContent(/₹/);
+    // No Due: the Type is the key column now, and the rest folds into the meta line.
+    expect(cells[1]).toHaveTextContent('Aesthetic');
+    expect(rowOf('Dharti Galani')).not.toHaveTextContent('₹');
     expect(
       rowOf('Dharti Galani').querySelector('[data-slot="data-table-meta"]'),
-    ).toHaveTextContent(/^Type Aesthetic Status Regular Follow-up .+ #3508$/);
+    ).toHaveTextContent(/^Status Regular Follow-up .+ #3508$/);
     expect(screen.getByTestId('patients-fab')).toContainElement(
-      screen.getByTestId('patients-new'),
+      await screen.findByTestId('patients-new'),
     );
     await user.click(within(rowOf('Dharti Galani')).getByText('Dharti Galani'));
     await waitFor(() =>

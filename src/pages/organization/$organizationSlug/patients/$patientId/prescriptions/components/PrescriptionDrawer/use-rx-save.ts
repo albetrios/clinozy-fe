@@ -1,7 +1,7 @@
 import type { FieldPath, UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import type { Prescription } from '@/shared/api/clinic/clinic-schema.ts';
+import type { PrescriptionRecord } from '@/shared/api/clinic/prescriptions-contracts.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import {
   useCreatePrescription,
@@ -9,7 +9,12 @@ import {
 } from '@/shared/hooks/usePrescriptions/index.ts';
 
 import { RX_KEYS, RX_NS } from '../../prescriptions.constants.ts';
-import { namedRxLines, type RxFormValues, rxInputOf } from './rx-form.ts';
+import {
+  namedRxLines,
+  rxFieldsOf,
+  type RxFormLine,
+  type RxFormValues,
+} from './rx-form.ts';
 
 /** The drawer's steps, as the save opens them. */
 export type RxStepId = 'prescription' | 'medicines' | 'notes';
@@ -32,55 +37,111 @@ function rxStepOf(field: string): RxStepId {
   );
 }
 
+/** A row's fields, in its order. */
+const ROW_FIELDS = ['medicineName', 'dose', 'when', 'where', 'qty', 'remarks'] as const;
+
+/** A line field the server names (camelCased), as the row's control that holds it. */
+const LINE_FIELD_OF_SERVER: Readonly<Record<string, (typeof ROW_FIELDS)[number]>> = {
+  medicineName: 'medicineName',
+  medicineId: 'medicineName',
+  doseMorning: 'dose',
+  doseAfternoon: 'dose',
+  doseNight: 'dose',
+  isSos: 'dose',
+  meal: 'when',
+  timing: 'when',
+  timingText: 'when',
+  bodyPart: 'where',
+  bodyPartText: 'where',
+  quantity: 'qty',
+  remarks: 'remarks',
+};
+
+/**
+ * Where the server's field names land on the form: the doctor and the day under the form's
+ * names, and each sent line (`items.<n>.…`, the named rows only — blank rows are not sent) on
+ * the row it came from.
+ */
+function rxServerFields(items: readonly RxFormLine[]) {
+  const rows = items.flatMap((item, index) =>
+    item.medicineName.trim() === '' ? [] : [index],
+  );
+  const fields: Record<string, FieldPath<RxFormValues>> = {
+    doctorMembershipId: 'doctorId',
+    prescriptionDate: 'date',
+  };
+  rows.forEach((row, sent) => {
+    for (const [server, field] of Object.entries(LINE_FIELD_OF_SERVER)) {
+      fields[`items.${sent}.${server}`] = `items.${row}.${field}`;
+    }
+  });
+  const order = FIELD_STEPS.flatMap(([field]): FieldPath<RxFormValues>[] =>
+    field === 'items'
+      ? [
+          'items',
+          ...rows.flatMap((row) =>
+            ROW_FIELDS.map((name): FieldPath<RxFormValues> => `items.${row}.${name}`),
+          ),
+        ]
+      : [field],
+  );
+  return { fields, order };
+}
+
 /** Options of {@link useRxSave}. */
 export interface UseRxSaveOptions {
   form: UseFormReturn<RxFormValues>;
-  /** The prescription an edit saves; a new one has none. */
-  prescription: Prescription | null;
+  /** The draft an edit saves; a new one has none. */
+  prescription: PrescriptionRecord | null;
   patientId: string;
   /** The booking a new Rx is written at — the open visit's, in the visit flow. */
   appointmentId?: string | null;
+  /** The member approves (Q19): the save approves what it wrote. */
+  approves: boolean;
   onStep: (step: RxStepId) => void;
   /** The write went through; `sell` when it was "Save & sell". */
-  onDone: (prescription: Prescription, sell: boolean) => void;
+  onDone: (prescription: PrescriptionRecord, sell: boolean) => void;
+  /** Someone saved the draft meanwhile (`409 record_changed`): load it again. */
+  onStale?: () => void;
 }
 
 /**
- * The Prescription drawer's write on the shared drawer save (KICKOFF §6.0,
- * §6.6): no medicine named → "Add a medicine" and step 2 opens; else
- * `createPrescription` / `updatePrescription` (`S:1641`), names the store
- * lacks becoming quick medicines server-side (Q-M4).
+ * The Prescription drawer's write on the shared drawer save (KICKOFF §6.0, §6.6): no medicine
+ * named → "Add a medicine" and step 2 opens; else `POST …/prescriptions` or the draft's `PATCH`
+ * with its `updated_at`, then `POST …/approve` for an approver (Q19). The server's field errors
+ * land on the form — a line's on its row — and open their step.
  */
 export function useRxSave({
   form,
   prescription,
   patientId,
   appointmentId = null,
+  approves,
   onStep,
   onDone,
+  onStale,
 }: UseRxSaveOptions) {
   const { t } = useTranslation(RX_NS);
   const create = useCreatePrescription({ notifyOnError: false });
   const update = useUpdatePrescription({ notifyOnError: false });
+  const server = rxServerFields(form.getValues('items'));
 
-  return useDrawerSave<RxFormValues, Prescription>({
+  return useDrawerSave<RxFormValues, PrescriptionRecord>({
     form,
-    fieldOrder: FIELD_STEPS.map(([field]) => field),
+    fieldOrder: server.order,
+    serverFields: server.fields,
     toastId: 'rx-save-failed',
     check: (values) =>
       namedRxLines(values.items).length === 0
         ? { fields: ['items'], message: t(RX_KEYS.save.noMedicine) }
         : null,
     onField: (field) => onStep(rxStepOf(field)),
+    onStale,
     write: async () => {
-      const input = rxInputOf(form.getValues(), {
-        patientId,
-        appointmentId: prescription ? prescription.appointmentId : appointmentId,
-        followUpDate: prescription?.followUpDate ?? null,
-      });
+      const fields = rxFieldsOf(form.getValues());
       return prescription
-        ? update.mutateAsync({ id: prescription.id, input })
-        : create.mutateAsync(input);
+        ? update.mutateAsync({ prescription, fields, approve: approves })
+        : create.mutateAsync({ patientId, fields, appointmentId, approve: approves });
     },
     onDone,
   });

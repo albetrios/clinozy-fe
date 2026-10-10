@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import type { PatientReport } from '@/shared/api/clinic/clinic-schema.ts';
+import type { PatientReport } from '@/shared/api/clinic/patient-reports-contracts.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
 import {
   useDeletePatientReport,
@@ -22,8 +22,9 @@ export interface ReportDeleteConfirmProps {
 
 /**
  * "Delete this report?" (KICKOFF §6.6 Section tables, Confirms; §3.5 reason
- * confirm): the report's name as the record and the delete reasons; "Report
- * deleted" offers Undo for the restore window (D32).
+ * confirm): the report's name as the record and the delete reasons
+ * (`DELETE …/reports/:patient_report_id?reason=&note=`); "Report deleted"
+ * offers Undo, which restores it (`POST …/restore`, D32).
  */
 export function ReportDeleteConfirm({
   report,
@@ -43,11 +44,11 @@ export function ReportDeleteConfirm({
         record: report.name,
         undo: {
           message: t(PATIENT_TABLE_KEYS.reports.deleted),
-          onUndo: () => restore.mutate(report.id),
+          onUndo: () => restore.mutate(report),
         },
       }}
       onConfirm={async ({ reason, note }) => {
-        await remove.mutateAsync({ id: report.id, reason, note });
+        await remove.mutateAsync({ report, reason, note });
         onDeleted();
       }}
     />

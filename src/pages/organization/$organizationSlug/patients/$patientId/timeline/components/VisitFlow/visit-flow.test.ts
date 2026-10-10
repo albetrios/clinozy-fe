@@ -1,155 +1,155 @@
 import { describe, expect, it } from 'vitest';
 
-import type { Treatment } from '@/shared/api/clinic/clinic-schema.ts';
-import {
-  NO_VISIT_CHECKS,
-  type VisitBillLine,
-} from '@/shared/api/clinic/visits-contracts.ts';
+import type { PatientPackageRow } from '@/shared/api/clinic/patient-packages-contracts.ts';
+import type { TreatmentRecord } from '@/shared/api/clinic/treatments-contracts.ts';
 
 import {
-  flowInvoice,
+  nextSessionNumber,
   rememberedSettings,
   repeatedSession,
+  spendablePackage,
   stepStates,
 } from './visit-flow.ts';
 
-const ALL_CHECKS = { consent: true, photos: true, allergies: true };
-const NOTHING = { prescription: null, treatment: null, invoice: null };
-/** A record that exists — the states read only whether it does. */
-const some = {} as never;
+/** Priya's last laser session — session 3, on her package. */
+const LAST = {
+  id: 'trt_last00000000000000000',
+  patientId: 'pat_priya0000000000000000',
+  appointmentId: 'appt_old000000000000000000',
+  offeringId: 'off_lhr00000000000000000',
+  name: 'Laser hair reduction',
+  template: 'skin',
+  performedAt: '2026-09-20T05:00:00.000Z',
+  doctorId: 'mem_nisha0000000000000000',
+  therapistId: 'mem_riya00000000000000000',
+  bodyParts: ['legs'],
+  sessionNumber: 3,
+  parameters: {
+    machine: 'GentleMax',
+    power: '18 J/cm²',
+    wavelength: '755',
+    skinType: 'IV',
+    areas: 'Legs',
+  },
+  remark: 'Mild redness',
+  aftercareCall: 'in_two_days',
+  packageId: 'poff_lhr0000000000000000',
+  isBilled: false,
+  status: 'done',
+  reversedReason: null,
+  reversedAt: null,
+  latestCheckIn: null,
+  createdAt: '2026-09-20T05:00:00.000Z',
+  updatedAt: '2026-09-20T05:00:00.000Z',
+} satisfies TreatmentRecord;
 
-const line = (overrides: Partial<VisitBillLine>): VisitBillLine => ({
-  name: 'Consultation',
-  offeringId: null,
-  qty: 1,
-  rate: 50_000,
-  discountPct: 0,
-  gstPct: 0,
-  fromPack: false,
-  ...overrides,
-});
+/** Her LHR package: 3 of 6 used. */
+const PACKAGE = {
+  id: 'poff_lhr0000000000000000',
+  offeringId: 'off_lhrpack000000000000000',
+  name: 'LHR Legs · 6 sessions',
+  sessionsTotal: 6,
+  sessionsUsed: 3,
+  sessionsLeft: 3,
+  status: 'active',
+  validUntil: null,
+  invoiceId: 'invc_lhr0000000000000000',
+  createdAt: '2026-09-01T05:00:00.000Z',
+  updatedAt: '2026-09-20T05:00:00.000Z',
+} satisfies PatientPackageRow;
 
 describe('stepStates (H:4880–4886)', () => {
   it('makes the first step current while nothing is done', () => {
-    expect(stepStates({ checks: NO_VISIT_CHECKS, sharedAt: null }, undefined)).toEqual({
+    expect(stepStates({ checks: false, rx: false, treatment: false })).toEqual({
       checks: 'current',
       rx: 'later',
       treatment: 'later',
-      invoice: 'later',
-      collect: 'later',
     });
   });
 
-  it('marks each step done by its record, the first gap current and the rest later', () => {
-    expect(
-      stepStates(
-        { checks: ALL_CHECKS, sharedAt: null },
-        { ...NOTHING, prescription: some, invoice: some },
-      ),
-    ).toEqual({
+  it('marks the done ones and moves current to the first one not done after them', () => {
+    expect(stepStates({ checks: true, rx: false, treatment: false })).toEqual({
+      checks: 'done',
+      rx: 'current',
+      treatment: 'later',
+    });
+    expect(stepStates({ checks: true, rx: true, treatment: true })).toEqual({
       checks: 'done',
       rx: 'done',
-      treatment: 'current',
-      invoice: 'done',
-      collect: 'later',
+      treatment: 'done',
     });
-    expect(
-      stepStates(
-        { checks: { ...ALL_CHECKS, photos: false }, sharedAt: '2026-10-03T05:00:00Z' },
-        NOTHING,
-      ),
-    ).toMatchObject({ checks: 'current', collect: 'done' });
+  });
+
+  it('keeps a later step done without making it current — no step after a gap is current', () => {
+    expect(stepStates({ checks: false, rx: true, treatment: false })).toEqual({
+      checks: 'current',
+      rx: 'done',
+      treatment: 'later',
+    });
+  });
+
+  it('leaves out a step the member does not see', () => {
+    expect(stepStates({ rx: false, treatment: false })).toEqual({
+      rx: 'current',
+      treatment: 'later',
+    });
   });
 });
 
 describe('rememberedSettings (H:4875)', () => {
   it('reads the last session’s machine, power, wavelength and skin type', () => {
-    const last = {
-      params: {
-        machine: 'Soprano Ice',
-        power: '10 J',
-        wavelength: '810',
-        skinType: 'Type IV',
-      },
-    } as unknown as Treatment;
-    expect(rememberedSettings(last)).toBe('Soprano Ice · 10 J · 810 nm · Type IV');
-    expect(
-      rememberedSettings({ params: { power: '18 J/cm²' } } as unknown as Treatment),
-    ).toBe('18 J/cm²');
+    expect(rememberedSettings(LAST)).toBe('GentleMax · 18 J/cm² · 755 nm · IV');
+  });
+
+  it('leaves out what was not set, and is empty without a session', () => {
+    expect(rememberedSettings({ ...LAST, parameters: { machine: 'Soprano Ice' } })).toBe(
+      'Soprano Ice',
+    );
     expect(rememberedSettings(null)).toBe('');
   });
 });
 
-describe('flowInvoice', () => {
-  it('totals the visit’s lines, GST in', () => {
-    const bill = flowInvoice({
-      billLines: [line({}), line({ name: 'Peel', rate: 100_000, gstPct: 18 })],
-    });
-    expect(bill.lines).toEqual([
-      { name: 'Consultation', amount: 50_000 },
-      { name: 'Peel', amount: 118_000 },
-    ]);
-    expect(bill.total).toBe(168_000);
-    expect(bill.covered).toBe(false);
+describe('spendablePackage', () => {
+  it('is the package while it is active with a session left (the server’s counts)', () => {
+    expect(spendablePackage([PACKAGE], PACKAGE.id)).toBe(PACKAGE);
   });
 
-  it('says a bill of package sessions only is covered', () => {
-    expect(flowInvoice({ billLines: [line({ rate: 0, fromPack: true })] }).covered).toBe(
-      true,
-    );
-    expect(flowInvoice({ billLines: [] })).toEqual({
-      lines: [],
-      total: 0,
-      covered: false,
-    });
+  it('is none once used up or expired, for another package, or for no package', () => {
+    expect(
+      spendablePackage([{ ...PACKAGE, status: 'used_up', sessionsLeft: 0 }], PACKAGE.id),
+    ).toBeNull();
+    expect(spendablePackage([{ ...PACKAGE, status: 'expired' }], PACKAGE.id)).toBeNull();
+    expect(spendablePackage([PACKAGE], 'poff_other')).toBeNull();
+    expect(spendablePackage([PACKAGE], null)).toBeNull();
   });
 });
 
 describe('repeatedSession (H:4875)', () => {
-  const last = {
-    offeringId: 'o1',
-    name: 'Laser hair reduction',
-    template: 'skin_laser',
-    doctorId: 'd1',
-    therapistId: 't1',
-    bodyParts: ['legs'],
-    sessionNo: 3,
-    params: { power: '18 J/cm²' },
-    remark: 'Mild redness',
-    aftercareCall: 'in_2_days',
-    packageId: 'p1',
-  } as unknown as Treatment;
-  const pack = {
-    id: 'p1',
-    name: 'LHR Legs',
-    sessionsTotal: 10,
-    sessionsUsed: 3,
-    soldOn: '2026-08-28',
-    validUntil: '2027-08-28',
-  };
-  const at = {
-    patientId: 'pt',
-    appointmentId: 'ap',
-    performedAt: '2026-10-03T05:12:00.000Z',
-  };
-
-  it('repeats the last session one on, at this visit, on its package', () => {
-    const input = repeatedSession(last, pack, at);
-    expect(input).toMatchObject({
-      ...at,
+  it('is the last session again at this visit — its settings, areas and team — on its package', () => {
+    expect(repeatedSession(LAST, PACKAGE, 'appt_today00000000000000')).toEqual({
       name: 'Laser hair reduction',
-      sessionNo: 4,
+      template: 'skin',
+      offeringId: 'off_lhr00000000000000000',
+      doctorId: 'mem_nisha0000000000000000',
+      therapistId: 'mem_riya00000000000000000',
       bodyParts: ['legs'],
-      params: { power: '18 J/cm²' },
+      sessionNumber: 4,
+      parameters: LAST.parameters,
       remark: null,
-      packageId: 'p1',
+      aftercareCall: 'in_two_days',
+      appointmentId: 'appt_today00000000000000',
+      packageId: PACKAGE.id,
     });
-    expect(input.params).not.toBe(last.params);
   });
 
-  it('leaves the package out once it is used up, or when it is another', () => {
-    expect(repeatedSession(last, { ...pack, sessionsUsed: 10 }, at).packageId).toBeNull();
-    expect(repeatedSession(last, { ...pack, id: 'p2' }, at).packageId).toBeNull();
-    expect(repeatedSession(last, null, at).packageId).toBeNull();
+  it('is off any package when none can spend a session', () => {
+    expect(repeatedSession(LAST, null, 'appt_today00000000000000').packageId).toBeNull();
+  });
+});
+
+describe('nextSessionNumber', () => {
+  it('is one on, at most the API’s 999', () => {
+    expect(nextSessionNumber({ sessionNumber: 3 })).toBe(4);
+    expect(nextSessionNumber({ sessionNumber: 999 })).toBe(999);
   });
 });

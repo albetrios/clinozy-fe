@@ -11,6 +11,7 @@ import {
   type CrossRoomDialog,
   CrossRoomDialogContext,
 } from '@/shared/hooks/useCrossRoomDialog/index.ts';
+import { TEST_PATIENT_ID } from '@/tests/utils/patient-doubles.ts';
 
 import {
   renderInvoicesRoutes,
@@ -141,7 +142,8 @@ describe('useInvoicesDialogRoute (KICKOFF §4, D24; S:92–94)', () => {
 
   it('closes back to another room that opened it; its edit opens over that room (A-P1)', async () => {
     const user = userEvent.setup();
-    const file = `patients/${DHARTI}/invoices`;
+    // The patient file is on clinozy-be: its referrer names a `pat_…` id.
+    const file = `patients/${TEST_PATIENT_ID}/invoices`;
     const preview = renderInvoicesRoutes(`${BASE}/${ref.invoice(787)}?from=${file}`, {
       host: Probe,
     });

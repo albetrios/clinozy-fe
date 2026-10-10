@@ -18,8 +18,8 @@ import { useBranches } from '@/shared/hooks/useBranches/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
+import { useFixturePatient } from '@/shared/hooks/useFixturePatients/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
-import { usePatient } from '@/shared/hooks/usePatients/index.ts';
 import {
   useOpenInvoices,
   useReceivePayment,
@@ -131,7 +131,7 @@ function useReadOnly(props: ReceivePaymentDrawerProps): boolean {
 
 /** The tag beside the title: the entry's `PAY-<seq>`, else the picked patient's `#<seq>`. */
 function useTag(entry: LedgerRow | null, patientId: string | null): string | undefined {
-  const patient = usePatient(entry ? undefined : (patientId ?? undefined));
+  const patient = useFixturePatient(entry ? undefined : (patientId ?? undefined));
   if (entry) return displayId.payment(entry.seq);
   return patient.data ? displayId.patient(patient.data.seq) : undefined;
 }

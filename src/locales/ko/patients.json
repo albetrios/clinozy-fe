@@ -5,8 +5,6 @@
   "views": {
     "label": "환자 보기",
     "all": "전체",
-    "today": "오늘 내원 중",
-    "dues": "미수금 있음",
     "follow": "후속 조치 예정",
     "recall": "리콜"
   },
@@ -26,7 +24,6 @@
     "conversion": "전환",
     "age": "나이",
     "followUp": "후속 조치",
-    "due": "미수금",
     "updated": "업데이트"
   },
   "table": {
@@ -34,8 +31,6 @@
     "age_other": "{{count}}세"
   },
   "rowActions": {
-    "newInvoice": "새 청구서",
-    "collect": "{{amount}} 수납",
     "edit": "편집",
     "delete": "삭제"
   },

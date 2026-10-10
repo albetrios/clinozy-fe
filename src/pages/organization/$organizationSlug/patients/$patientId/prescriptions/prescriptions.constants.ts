@@ -1,4 +1,6 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
+import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { PrescriptionStatus } from '@/shared/api/clinic/prescriptions-contracts.ts';
 
 /** The prescription drawer and its print preview read the patient file's namespace. */
 export const RX_NS = I18N_NAMESPACES.patientFile;
@@ -19,14 +21,11 @@ export const RX_KEYS = {
     print: 'rx.quickFill.print',
     /** "Repeat last Rx #500". */
     repeat: 'rx.quickFill.repeat',
-    kits: {
-      hairFall: 'rx.quickFill.kits.hairFall',
-      postPeel: 'rx.quickFill.kits.postPeel',
-      pigmentation: 'rx.quickFill.kits.pigmentation',
-    },
   },
-  /** A kit's own words: its line note and its advice. */
-  kit: { reapply: 'rx.kit.reapply', avoidSun: 'rx.kit.avoidSun' },
+  /** "Draft" / "Approved" — the drawer's badge and the table's Status. */
+  status: { draft: 'rx.status.draft', approved: 'rx.status.approved' },
+  /** An approved prescription's drawer: why it cannot be changed (Q19). */
+  approvedNote: 'rx.approvedNote',
   steps: {
     prescription: 'rx.steps.prescription',
     medicines: 'rx.steps.medicines',
@@ -38,10 +37,8 @@ export const RX_KEYS = {
   quick: {
     placeholder: 'rx.quick.placeholder',
     hint: 'rx.quick.hint',
-    often: 'rx.quick.often',
     groups: {
       all: 'rx.quick.groups.all',
-      often: 'rx.quick.groups.often',
       oral: 'rx.quick.groups.oral',
       topical: 'rx.quick.groups.topical',
     },
@@ -132,19 +129,32 @@ export const RX_KEYS = {
   save: {
     create: 'rx.save.create',
     edit: 'rx.save.edit',
+    /** "Save & approve" — a member who approves (Q19). */
+    approve: 'rx.save.approve',
     sell: 'rx.save.sell',
-    /** "Approve · print · send to pharmacy" — a new Rx written in the visit flow. */
+    /** "Approve · print · send to pharmacy" — a new Rx an approver writes in the visit flow. */
     visit: 'rx.save.visit',
     /** "2 medicines · Dr. Drashti". */
     summary: 'rx.save.summary',
     noMedicine: 'rx.save.noMedicine',
     saved: 'rx.save.saved',
     savedNumber: 'rx.save.savedNumber',
+    /** "Prescription #500 approved". */
+    approvedNumber: 'rx.save.approvedNumber',
   },
   delete: { title: 'rx.delete.title', deleted: 'rx.delete.deleted' },
   /** "Prescription #500" — the shared print preview's title. */
   preview: 'rx.preview',
 } as const;
+
+/** A prescription's status pill: a draft waits (butter), an approved one is final (sage). */
+export const RX_STATUS_TONES: Readonly<Record<PrescriptionStatus, Tone>> = {
+  draft: 'butter',
+  approved: 'sage',
+};
+
+/** The tones the member's kits take in Quick fill, in turn. */
+export const RX_KIT_TONES: readonly Tone[] = ['lav', 'blush', 'butter', 'mint'];
 
 /** The drawer's and the preview's root test ids. */
 export const RX_TEST_IDS = {

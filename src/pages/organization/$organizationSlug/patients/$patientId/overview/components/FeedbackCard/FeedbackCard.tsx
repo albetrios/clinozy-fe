@@ -1,6 +1,7 @@
-import { useId, useRef, useState } from 'react';
+import { useId, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { revealInScroller } from '@/lib/reveal-in-scroller.ts';
 import { cn } from '@/lib/utils.ts';
 import type { FeedbackActionKind } from '@/shared/api/clinic/clinic-schema.ts';
@@ -12,13 +13,12 @@ import {
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
+import { usePersonAppointments } from '@/shared/hooks/useAppointments/index.ts';
 import {
-  useDeleteCheckIn,
-  useDeleteReview,
+  useDeleteFeedback,
   useLogFeedbackAction,
   usePatientFeedback,
-  useRestoreCheckIn,
-  useRestoreReview,
+  useRestoreFeedback,
 } from '@/shared/hooks/useFeedback/index.ts';
 import {
   ChevronDown,
@@ -30,6 +30,7 @@ import {
 import { notify } from '@/shared/notify/index.ts';
 
 import { feedbackCountsText } from '../../../shared/patient-feedback.ts';
+import { usePatientFileContext } from '../../../shared/patient-file-context.ts';
 import {
   CLINICAL_NS,
   FEEDBACK_KEYS,
@@ -40,11 +41,17 @@ import {
   FEEDBACK_TYPE_LOOK,
   feedbackCardView,
   feedbackTypeLabel,
+  feedbackTypeOf,
+  feedbackTypesOf,
+  type FeedbackVisit,
 } from './feedback-view.ts';
 import { FeedbackItemCard } from './FeedbackItemCard.tsx';
 
 const K = FEEDBACK_KEYS;
 const ID = OVERVIEW_TEST_IDS.feedback;
+
+/** No cards yet — one value, so the visits' lookup is not rebuilt on every render. */
+const NO_ITEMS: readonly FeedbackItem[] = [];
 
 /** A round ‹ or › at the carousel's edge (H:4389): 36px, over the cards, mirrored under RTL. */
 function CarouselArrow({
@@ -88,22 +95,28 @@ export interface FeedbackCardProps {
   onEdit: (item: FeedbackItem) => void;
 }
 
-/** "Remove this check-in?" / "Remove this review?" with the delete reasons and Undo (D32). */
+/**
+ * "Remove this check-in?" / "Remove this review?" with the delete reasons (`DELETE` with the
+ * one picked) and Undo (`POST …/restore`; D32).
+ */
 function RemoveConfirm({
+  patientId,
   item,
+  visitOf,
   onClose,
 }: {
+  patientId: string;
   item: FeedbackItem | null;
+  visitOf: (appointmentId: string | null) => FeedbackVisit | null;
   onClose: () => void;
 }) {
   const { t } = useTranslation(CLINICAL_NS);
-  const removeCheckIn = useDeleteCheckIn();
-  const removeReview = useDeleteReview();
-  const restoreCheckIn = useRestoreCheckIn();
-  const restoreReview = useRestoreReview();
+  const remove = useDeleteFeedback();
+  const restore = useRestoreFeedback();
   if (!item) return null;
-  const view = feedbackCardView(item, t);
+  const view = feedbackCardView(item, t, visitOf);
   const isCheckIn = item.kind === 'checkIn';
+  const record = { patientId, kind: item.kind, id: item.id };
   return (
     <ConfirmDialog
       open
@@ -116,15 +129,11 @@ function RemoveConfirm({
         record: `${view.typeLabel} · ${view.sub}`,
         undo: {
           message: t(isCheckIn ? K.checkInRemoved : K.reviewRemoved),
-          onUndo: () =>
-            isCheckIn ? restoreCheckIn.mutate(item.id) : restoreReview.mutate(item.id),
+          onUndo: () => restore.mutate(record),
         },
       }}
       onConfirm={async ({ reason, note }) => {
-        const vars = { id: item.id, reason, note };
-        await (isCheckIn
-          ? removeCheckIn.mutateAsync(vars)
-          : removeReview.mutateAsync(vars));
+        await remove.mutateAsync({ ...record, reason, note });
         onClose();
       }}
     />
@@ -173,14 +182,14 @@ function TypeChips({
   );
 }
 
-/** What the carousel shows: the cards, and what is left to load. */
+/** What the carousel shows: the cards, and what is left to show. */
 interface FeedbackTrackProps {
   items: readonly FeedbackItem[];
+  visitOf: (appointmentId: string | null) => FeedbackVisit | null;
   /** No feedback of any type — the dashed "No feedback yet" tile. */
   empty: boolean;
-  /** Cards of this type not loaded yet — the "Load more" tile reads up to six. */
+  /** Cards of this type not shown yet — the "Load more" tile shows up to six more. */
   left: number;
-  loading: boolean;
   canEdit: boolean;
   onLog: () => void;
   onLoadMore: () => void;
@@ -195,9 +204,9 @@ interface FeedbackTrackProps {
  */
 function FeedbackTrack({
   items,
+  visitOf,
   empty,
   left,
-  loading,
   canEdit,
   onLog,
   onLoadMore,
@@ -251,6 +260,7 @@ function FeedbackTrack({
           <FeedbackItemCard
             key={item.id}
             item={item}
+            visitOf={visitOf}
             canEdit={canEdit}
             onEdit={onEdit}
             onRemove={onRemove}
@@ -262,12 +272,11 @@ function FeedbackTrack({
           <button
             type="button"
             onClick={onLoadMore}
-            disabled={loading}
             data-slot="card"
             data-testid={`${ID}-load-more`}
             className="border-border-strong bg-card hover:bg-muted text-body text-muted-foreground-strong flex h-59 snap-start flex-col items-center justify-center gap-2 rounded-xl border border-dashed font-medium"
           >
-            {loading ? t(K.loading) : t(K.loadMore)}
+            {t(K.loadMore)}
             <span className="text-caption text-muted-foreground">
               {t(K.more, { count: Math.min(left, FEEDBACK_PAGE_SIZE) })}
             </span>
@@ -279,24 +288,137 @@ function FeedbackTrack({
 }
 
 /**
- * The Feedback card of Clinical notes (KICKOFF §6.6 Feedback; H:807–826;
- * `listFeedback`, `S:1636`): collapsed by default — a 32px tile, "Feedback",
- * "1 check-in · 1 review", the chevron and "Log feedback ⌄". Open: the type
- * chips ("All" and the types this patient has), then the carousel — or the
- * dashed "No feedback yet" tile that opens the picker.
+ * The visits the patient's reviews follow, by booking id — one read of the person's bookings
+ * (the Visits section's), only once a review names one.
+ */
+function useFeedbackVisits(items: readonly FeedbackItem[]) {
+  const { file } = usePatientFileContext();
+  const linked = items.some(
+    (item) => item.kind === 'review' && item.review.appointmentId,
+  );
+  const bookings = usePersonAppointments(linked ? file?.patient.contactId : undefined);
+  return useMemo(() => {
+    const byId = new Map(
+      (bookings.data ?? []).map((booking): [string, FeedbackVisit] => [
+        booking.id,
+        { seq: booking.seq, service: booking.serviceLabel || null }, // NOSONAR(S6606): a blank service is none
+      ]),
+    );
+    return (appointmentId: string | null) =>
+      appointmentId ? (byId.get(appointmentId) ?? null) : null;
+  }, [bookings.data]);
+}
+
+/** "Feedback unavailable" and Retry — the cards' read failed. */
+function FeedbackFailed({ onRetry }: { onRetry: () => void }) {
+  const { t } = useTranslation([CLINICAL_NS, ERRORS_NS]);
+  return (
+    <div
+      role="alert"
+      data-testid={`${ID}-error`}
+      className="flex flex-col items-center gap-2 px-3.5 pt-3 pb-3.5 text-center"
+    >
+      <span className="text-muted-foreground text-xs">
+        {t(ERRORS_KEYS.widget.unavailable, { ns: ERRORS_NS, title: t(K.title) })}
+      </span>
+      <Button type="button" size="sm" variant="outline" onClick={onRetry}>
+        {t(ERRORS_KEYS.widget.retry, { ns: ERRORS_NS })}
+      </Button>
+    </div>
+  );
+}
+
+/** What the open card shows besides the cards' read. */
+interface FeedbackBodyProps extends Omit<
+  FeedbackTrackProps,
+  'items' | 'empty' | 'left' | 'onLoadMore'
+> {
+  id: string;
+  /** Every card, once read. */
+  all: readonly FeedbackItem[] | undefined;
+  isPending: boolean;
+  onRetry: () => void;
+}
+
+/**
+ * The open card: "Loading…", the failure with Retry, or the type chips ("All" and the
+ * types this patient has) over the carousel, six at a time.
+ */
+function FeedbackBody({ id, all, isPending, onRetry, ...track }: FeedbackBodyProps) {
+  const { t } = useTranslation(CLINICAL_NS);
+  const [type, setType] = useState<FeedbackType>('all');
+  const [limit, setLimit] = useState(FEEDBACK_PAGE_SIZE);
+  if (!all) {
+    return (
+      <div id={id} aria-busy={isPending}>
+        {isPending ? (
+          <p
+            data-testid={`${ID}-loading`}
+            className="text-muted-foreground px-3.5 pt-0 pb-3.5 text-xs"
+          >
+            {t(K.loading)}
+          </p>
+        ) : (
+          <FeedbackFailed onRetry={onRetry} />
+        )}
+      </div>
+    );
+  }
+  const shown =
+    type === 'all' ? all : all.filter((item) => feedbackTypeOf(item) === type);
+  const items = shown.slice(0, limit);
+  return (
+    <div id={id}>
+      {all.length > 0 ? (
+        <TypeChips
+          types={feedbackTypesOf(all)}
+          value={type}
+          onChange={(next) => {
+            setType(next);
+            setLimit(FEEDBACK_PAGE_SIZE);
+          }}
+        />
+      ) : null}
+      <FeedbackTrack
+        {...track}
+        items={items}
+        empty={all.length === 0}
+        left={shown.length - items.length}
+        onLoadMore={() => setLimit((value) => value + FEEDBACK_PAGE_SIZE)}
+      />
+    </div>
+  );
+}
+
+/** "2 check-ins · 1 review" counted from the cards read. */
+function countsOf(items: readonly FeedbackItem[]) {
+  const checkIns = items.filter((item) => item.kind === 'checkIn').length;
+  return { checkIns, reviews: items.length - checkIns };
+}
+
+/**
+ * The Feedback card of Clinical notes (KICKOFF §6.6 Feedback; H:807–826):
+ * collapsed by default — a 32px tile, "Feedback", "1 check-in · 1 review"
+ * (the file's counts until the cards are read), the chevron and "Log feedback
+ * ⌄". Open, it reads every check-in and review (`…/check-ins`, `…/reviews`):
+ * the type chips ("All" and the types this patient has), then the carousel,
+ * six at a time — or the dashed "No feedback yet" tile that opens the picker.
  */
 export function FeedbackCard({ patientId, canEdit, onLog, onEdit }: FeedbackCardProps) {
   const { t } = useTranslation(CLINICAL_NS);
+  const { file } = usePatientFileContext();
   const [open, setOpen] = useState(false);
-  const [type, setType] = useState<FeedbackType>('all');
-  const [limit, setLimit] = useState(FEEDBACK_PAGE_SIZE);
   const [removing, setRemoving] = useState<FeedbackItem | null>(null);
-  const page = usePatientFeedback(patientId, { type, limit });
+  const feedback = usePatientFeedback(patientId, { enabled: open });
   const logAction = useLogFeedbackAction();
   const bodyId = useId();
   const sectionRef = useRef<HTMLElement>(null);
-  const items = page.data?.items ?? [];
-  const counts = page.data?.counts ?? { checkIns: 0, reviews: 0 };
+  const visitOf = useFeedbackVisits(feedback.data ?? NO_ITEMS);
+  // Open, the cards read count themselves; collapsed, the file's counts (refreshed by every write).
+  const counts =
+    open && feedback.data
+      ? countsOf(feedback.data)
+      : { checkIns: file?.feedback.checkIns ?? 0, reviews: file?.feedback.reviews ?? 0 };
   const total = counts.checkIns + counts.reviews;
 
   const toggle = () => {
@@ -306,12 +428,7 @@ export function FeedbackCard({ patientId, canEdit, onLog, onEdit }: FeedbackCard
 
   const onLogAction = (item: FeedbackItem, action: FeedbackActionKind) => {
     logAction.mutate(
-      {
-        checkInId: item.kind === 'checkIn' ? item.id : null,
-        reviewId: item.kind === 'review' ? item.id : null,
-        action,
-        note: null,
-      },
+      { patientId, kind: item.kind, id: item.id, action },
       {
         onSuccess: () =>
           notify.success(t(K.actionLogged, { action: t(K.actionKinds[action]) })),
@@ -374,32 +491,25 @@ export function FeedbackCard({ patientId, canEdit, onLog, onEdit }: FeedbackCard
         ) : null}
       </div>
       {open ? (
-        <div id={bodyId}>
-          {total > 0 ? (
-            <TypeChips
-              types={page.data?.types ?? []}
-              value={type}
-              onChange={(next) => {
-                setType(next);
-                setLimit(FEEDBACK_PAGE_SIZE);
-              }}
-            />
-          ) : null}
-          <FeedbackTrack
-            items={items}
-            empty={total === 0}
-            left={(page.data?.total ?? 0) - items.length}
-            loading={page.isFetching}
-            canEdit={canEdit}
-            onLog={onLog}
-            onLoadMore={() => setLimit((value) => value + FEEDBACK_PAGE_SIZE)}
-            onEdit={onEdit}
-            onRemove={setRemoving}
-            onLogAction={onLogAction}
-          />
-        </div>
+        <FeedbackBody
+          id={bodyId}
+          all={feedback.data}
+          isPending={feedback.isPending}
+          onRetry={() => void feedback.refetch()}
+          visitOf={visitOf}
+          canEdit={canEdit}
+          onLog={onLog}
+          onEdit={onEdit}
+          onRemove={setRemoving}
+          onLogAction={onLogAction}
+        />
       ) : null}
-      <RemoveConfirm item={removing} onClose={() => setRemoving(null)} />
+      <RemoveConfirm
+        patientId={patientId}
+        item={removing}
+        visitOf={visitOf}
+        onClose={() => setRemoving(null)}
+      />
     </section>
   );
 }

@@ -1,12 +1,10 @@
 export {
-  useCompleteVisit,
-  useCreateVisitBill,
+  type StartVisitVars,
   useOpenVisit,
-  useSetVisitChecks,
-  useShareVisit,
+  useSetVisitCheck,
+  useSetVisitPaused,
   useStartVisit,
-  useVisitCatalog,
-  useVisitDetail,
-  type VisitWriteOptions,
-  withVisitChecks,
+  useVisitChecks,
+  type VisitCheckVars,
+  type VisitPauseVars,
 } from './useVisits.ts';

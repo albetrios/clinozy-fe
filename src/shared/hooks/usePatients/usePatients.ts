@@ -1,113 +1,131 @@
 import type { DeleteReason } from '@/shared/api/clinic/clinic-schema.ts';
 import { commandSearchQueryKeys } from '@/shared/api/clinic/command-search-api.ts';
 import {
+  contactQueryKeys,
+  findContactByPhone,
+} from '@/shared/api/clinic/contacts-api.ts';
+import { leadQueryKeys } from '@/shared/api/clinic/leads-api.ts';
+import {
   createPatient,
   deletePatient,
   fetchPatient,
-  findPatientByPhone,
   listPatients,
   patientQueryKeys,
   restorePatient,
   updatePatient,
 } from '@/shared/api/clinic/patients-api.ts';
 import type {
-  PatientCreateInput,
-  PatientCreateResult,
+  PatientFields,
   PatientListParams,
-  PatientPatch,
+  PatientPersonInput,
   PatientRecord,
   PatientRow,
 } from '@/shared/api/clinic/patients-contracts.ts';
-import { taskQueryKeys } from '@/shared/api/clinic/tasks-api.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
 import { useCursorList } from '@/shared/hooks/useCursorList/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+
+/** The active organization — every key carries it. */
+const useOrganizationId = () => useOrganizationStore((state) => state.organizationId);
 
 /**
- * What a patient write refreshes: every patient read, and ⌘K's patient
- * results (a name, a mobile or a removal changes what the search finds).
+ * What a patient write refreshes: every patient read, the people (a name or a number is the
+ * contact's), their leads (a new file converts the lead) and ⌘K's results.
  */
-const PATIENT_WRITE_KEYS = [patientQueryKeys.all, commandSearchQueryKeys.all];
+const PATIENT_WRITE_KEYS = [
+  patientQueryKeys.all,
+  contactQueryKeys.all,
+  leadQueryKeys.all,
+  commandSearchQueryKeys.all,
+];
 
 // ── Reads ──
 
 /**
- * The Patients list, a cursor page of 50 at a time (D7, `S:1619`) — the room's
- * infinite scroll. The params come from the URL (`patientListParamsOf`); while
- * new ones load, the previous rows stay on screen (`isRefreshing`). A failed
- * read raises no toast here: the room keeps the last copy and offers Retry
- * (KICKOFF §6.0 List error).
+ * The Patients list, 50 rows a page (`GET /app/patients`, each page joined with its people) —
+ * the room's infinite scroll, for the URL's params; while new ones load the previous rows stay
+ * on screen (`isRefreshing`). A failed read raises no toast here: the room keeps the last copy
+ * and offers Retry.
  */
 export function usePatientList(params: PatientListParams) {
+  const organizationId = useOrganizationId();
   return useCursorList<PatientRow>({
-    queryKey: patientQueryKeys.list(params),
+    queryKey: patientQueryKeys.list(organizationId, params),
     queryFn: async (after) => {
-      const page = await listPatients(params, after ?? null);
-      return {
-        rows: page.items,
-        next: page.nextCursor,
-        hasMore: page.nextCursor !== null,
-      };
+      const page = await listPatients(params, after);
+      return { rows: page.rows, next: page.next, hasMore: page.next !== null };
     },
     notifyOnError: false,
+    enabled: organizationId !== null,
   });
 }
 
-/** One patient by id; idle while there is no id. A deleted or unknown id fails with a 404. */
+/** One patient with their person; idle while there is no id. A deleted or unknown id is a 404. */
 export function usePatient(id: string | undefined) {
+  const organizationId = useOrganizationId();
   return useAppQuery({
-    queryKey: patientQueryKeys.detail(id ?? ''),
+    queryKey: patientQueryKeys.detail(organizationId, id ?? ''),
     queryFn: () => fetchPatient(id ?? ''),
-    enabled: Boolean(id),
+    enabled: Boolean(id) && organizationId !== null,
   });
 }
 
 /**
- * The patient already on a mobile (Q-P7) — the drawer asks once the Mobile
- * field loses focus with ten digits; idle while `phone` is null. A failed
+ * The person already on a number (E.164) — the drawer asks once the Mobile field has ten
+ * digits; idle while `phone` is null. Their `patientId` says whether they have a file. A failed
  * lookup shows no notice, so it raises no toast either.
  */
-export function usePatientByPhone(phone: string | null, exceptId: string | null) {
+export function usePersonByPhone(phone: string | null) {
+  const organizationId = useOrganizationId();
   return useAppQuery({
-    queryKey: patientQueryKeys.byPhone(phone ?? '', exceptId),
-    queryFn: () => findPatientByPhone(phone ?? '', exceptId),
-    enabled: phone !== null,
+    queryKey: patientQueryKeys.byPhone(organizationId, phone ?? ''),
+    queryFn: () => findContactByPhone(phone ?? ''),
+    enabled: phone !== null && organizationId !== null,
     notifyOnError: false,
   });
 }
 
 // ── Writes ──
 
+/** What a create sends: the drawer's fields and who the patient is. */
+export interface PatientCreateVars {
+  fields: PatientFields;
+  person: PatientPersonInput;
+}
+
 /**
- * Create a patient — not optimistic (the drawer shows "Saving…"). The list
- * refetches with the new patient first (D28) and the Tasks list picks up the
- * onboarding task. No toast of its own: the full drawer says "Patient #3509
- * created · onboarding task added" with "Open file", the quick-add "<name>
- * registered as patient #3509" (KICKOFF §6.5).
+ * Create a patient — not optimistic (the drawer shows "Saving…"); the list refetches with the
+ * new patient first (D28). No toast of its own: the full drawer says "Patient #3509 created"
+ * with "Open file".
  */
 export function useCreatePatient(
-  options: CrudMutationOptions<PatientCreateResult, PatientCreateInput> = {},
+  options: CrudMutationOptions<PatientRecord, PatientCreateVars> = {},
 ) {
-  return useAppMutation<PatientCreateResult, PatientCreateInput>({
-    mutationFn: createPatient,
-    invalidateKeys: [...PATIENT_WRITE_KEYS, taskQueryKeys.all],
+  return useAppMutation<PatientRecord, PatientCreateVars>({
+    mutationFn: (vars, action) => createPatient({ ...vars, ...action }),
+    invalidateKeys: PATIENT_WRITE_KEYS,
     ...options,
   });
 }
 
-/** What a patient save sends. */
+/** What a patient save sends: the record as read and the drawer's fields. */
 export interface PatientUpdateVars {
-  id: string;
-  patch: PatientPatch;
+  record: PatientRecord;
+  fields: PatientFields;
 }
 
-/** Save a patient — not optimistic; the drawer names the patient in its toast ("Priya Shah saved"). */
+/**
+ * Save a patient — not optimistic; the person's change and the file's, each refused when
+ * someone saved it meanwhile (`409 record_changed`). The drawer names the patient in its toast
+ * ("Priya Shah saved").
+ */
 export function useUpdatePatient(
   options: CrudMutationOptions<PatientRecord, PatientUpdateVars> = {},
 ) {
   return useAppMutation<PatientRecord, PatientUpdateVars>({
-    mutationFn: ({ id, patch }) => updatePatient(id, patch),
+    mutationFn: (vars, action) => updatePatient({ ...vars, ...action }),
     invalidateKeys: PATIENT_WRITE_KEYS,
     ...options,
   });
@@ -121,31 +139,32 @@ export interface PatientDeleteVars {
 }
 
 /**
- * Remove a patient (`S:1546`) — optimistic: the row leaves every cached list
- * page at once and comes back if the write fails. No toast of its own: the
- * Reason confirm's `reason.undo` shows "<name> removed" with Undo, which runs
+ * Remove a patient — optimistic: the row leaves every cached list page at once and comes back
+ * if the write fails. The lists refresh — not the patient's own read, which would answer 404
+ * while their file closes. No toast of its own: the Reason confirm's "removed" with Undo runs
  * {@link useRestorePatient}.
  */
 export function useDeletePatient(
-  options: CrudMutationOptions<PatientRecord, PatientDeleteVars> = {},
+  options: CrudMutationOptions<void, PatientDeleteVars> = {},
 ) {
-  return useAppMutation<PatientRecord, PatientDeleteVars, unknown, PatientRow>({
-    mutationFn: ({ id, reason, note }) => deletePatient(id, reason, note),
-    invalidateKeys: PATIENT_WRITE_KEYS,
+  const organizationId = useOrganizationId();
+  return useAppMutation<void, PatientDeleteVars, unknown, PatientRow>({
+    mutationFn: ({ id, reason, note }) => deletePatient({ patientId: id, reason, note }),
+    invalidateKeys: [patientQueryKeys.lists(organizationId), commandSearchQueryKeys.all],
     optimisticInfinite: {
-      queryKey: patientQueryKeys.lists(),
+      queryKey: patientQueryKeys.lists(organizationId),
       update: (rows, { id }) => rows.filter((patient) => patient.id !== id),
     },
     ...options,
   });
 }
 
-/** Put a removed patient back — the Undo of its "removed" toast (10s, D32); silent on success. */
+/** Put a removed patient back — the Undo of its "removed" toast; silent on success. */
 export function useRestorePatient(
   options: CrudMutationOptions<PatientRecord, string> = {},
 ) {
   return useAppMutation<PatientRecord, string>({
-    mutationFn: restorePatient,
+    mutationFn: (id, action) => restorePatient(id, action.idempotencyKey),
     invalidateKeys: PATIENT_WRITE_KEYS,
     ...options,
   });

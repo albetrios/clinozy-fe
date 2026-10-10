@@ -1,25 +1,22 @@
 import { describe, expect, it } from 'vitest';
 
-import type {
-  Prescription,
-  PrescriptionItem,
-} from '@/shared/api/clinic/clinic-schema.ts';
+import type { PrescriptionItem } from '@/shared/api/clinic/clinic-schema.ts';
+import type { PrescriptionRecord } from '@/shared/api/clinic/prescriptions-contracts.ts';
 
+import { prescriptionRecord } from '../../__tests__/integration/prescription-doubles.ts';
 import {
   emptyRxLine,
   initialRxForm,
   namedRxLines,
   newRxForm,
-  RX_KITS,
   rxCountOf,
   rxDaysIn,
   rxDoseOf,
+  rxFieldsOf,
   rxFormLineOf,
   rxFormOf,
   rxFormWithMedicines,
-  rxInputOf,
   rxItemOf,
-  rxKitLines,
   rxLineFor,
   rxQtyFor,
   steppedRxLines,
@@ -123,14 +120,14 @@ describe('the form', () => {
   });
 
   it('opens a saved one with its lines and notes', () => {
-    const rx = {
+    const rx = prescriptionRecord({
       date: '2026-09-24',
       doctorId: 'dr',
       items: [item()],
       advice: 'Avoid sun 48h',
       labReport: null,
       procedureToday: 'Chemical peel',
-    } as Prescription;
+    });
     expect(rxFormOf(rx)).toMatchObject({
       items: [{ medicineName: 'Flubolt 400' }],
       advice: 'Avoid sun 48h',
@@ -149,18 +146,21 @@ describe('the form', () => {
       advice: '  ',
       labReport: 'CBC',
     };
-    const input = rxInputOf(values, {
-      patientId: 'p',
-      appointmentId: null,
-      followUpDate: null,
-    });
+    const input = rxFieldsOf(values);
     expect(input.items).toHaveLength(1);
     expect(input.items[0]).toMatchObject({
       medicineName: 'Epriva Tab',
       doseMorning: 1,
       doseNight: 1,
     });
-    expect(input).toMatchObject({ advice: null, labReport: 'CBC', doctorId: 'dr' });
+    expect(input).toEqual({
+      doctorId: 'dr',
+      date: '2026-10-03',
+      items: [expect.objectContaining({ medicineName: 'Epriva Tab' })],
+      advice: null,
+      labReport: 'CBC',
+      procedureToday: null,
+    });
     expect(namedRxLines(values.items)).toHaveLength(1);
   });
 });
@@ -188,15 +188,8 @@ describe('a new prescription from a smart note (AMBER A-F5)', () => {
   });
 
   it('starts an edit from its prescription, a new one from the smart note', () => {
-    const rx = {
-      date: '2026-09-24',
-      doctorId: 'dr',
-      items: [item({ medicineName: 'Epriva Tab' })],
-      advice: null,
-      labReport: null,
-      procedureToday: null,
-    } as Prescription;
-    const opened = (prescription: Prescription | null) =>
+    const rx = prescriptionRecord({ items: [item({ medicineName: 'Epriva Tab' })] });
+    const opened = (prescription: PrescriptionRecord | null) =>
       initialRxForm({
         prescription,
         today: '2026-10-03',
@@ -278,36 +271,5 @@ describe('adding a medicine', () => {
     expect(steppedRxLines([emptyRxLine()], flubolt, -1, daysNote)).toEqual([
       emptyRxLine(),
     ]);
-  });
-});
-
-describe('kits (H:4810)', () => {
-  it('fills the hair fall kit, matched to the store where it has the medicine', () => {
-    const kit = RX_KITS.find((candidate) => candidate.id === 'hairFall');
-    if (!kit) throw new Error('no kit');
-    const lines = rxKitLines(kit, [{ name: 'flubolt 400', medicineId: 'm-1' }], () => '');
-    expect(
-      lines.map((line) => [
-        line.medicineName,
-        line.dose,
-        line.when,
-        line.where,
-        line.qty,
-      ]),
-    ).toEqual([
-      ['Flubolt 400', '0-0-1', 'after', '', 8],
-      ['Clonix-B Lotion', '', 'morning_night', 'scalp', 1],
-      ['Densyl-AD Shampoo', '', 'thrice_week', 'scalp', 1],
-    ]);
-    expect(lines[0]?.medicineId).toBe('m-1');
-  });
-
-  it('writes the post-peel kit’s note in the drawer’s words', () => {
-    const kit = RX_KITS.find((candidate) => candidate.id === 'postPeel');
-    if (!kit) throw new Error('no kit');
-    expect(rxKitLines(kit, [], () => 'Reapply every 3 h')[0]?.remarks).toBe(
-      'Reapply every 3 h',
-    );
-    expect(kit.advice).toBe('avoidSun');
   });
 });

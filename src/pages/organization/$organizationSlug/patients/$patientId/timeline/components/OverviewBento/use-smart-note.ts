@@ -31,9 +31,11 @@ export interface SmartNote {
 /**
  * The Overview's smart note (KICKOFF §6.6; H:4917–4920 — the prototype's
  * "Add" called a handler it never defined, so the build wires it to the VM's
- * `apply`): read with the UI language's words, then English (L-64), the
- * words it recognises become Complaints, Diagnosis and Suggested chips at
- * once ("3 items added from your note"); the medicines it names open New
+ * `apply`): a local keyword parser, not AI (Q15) — read with the UI
+ * language's words, then English (L-64), the words it recognises become
+ * Complaints, Diagnosis and Suggested chips at once, each its own clinical
+ * note (one `POST` a chip, api-integration §5.4; "3 items added from your
+ * note"); the medicines it names open New
  * prescription with a line each — never an Rx saved silently, the Rx gate
  * deciding (`S:35`; AMBER A-F5); nothing → "Nothing recognised yet". The
  * language's words load while the note is typed; if they cannot, "Add" says
@@ -46,8 +48,7 @@ export function useSmartNote(lists: ClinicalLists): SmartNote {
   const { patientId } = usePatientFileContext();
   const access = useClinicAccess();
   const locale = useLocaleStore((state) => state.locale);
-  const writesRx =
-    access.isResolved && passesPatientFileGate(access.roles, 'prescriptions');
+  const writesRx = access.isResolved && passesPatientFileGate(access, 'prescriptions');
   const catalog = useRxCatalog(writesRx ? patientId : '');
   const [note, setNote] = useState('');
   // One "Add" at a time: Enter and the button can both fire while the words load.

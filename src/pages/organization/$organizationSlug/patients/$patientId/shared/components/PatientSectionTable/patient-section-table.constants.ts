@@ -80,7 +80,6 @@ export const PATIENT_TABLE_KEYS = {
     feedback: 'tables.columns.feedback',
     report: 'tables.columns.report',
     type: 'tables.columns.type',
-    uploadedBy: 'tables.columns.uploadedBy',
     invoice: 'tables.columns.invoice',
     items: 'tables.columns.items',
     bill: 'tables.columns.bill',

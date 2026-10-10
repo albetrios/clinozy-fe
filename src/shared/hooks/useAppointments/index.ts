@@ -19,6 +19,7 @@ export {
   useCopyAppointment,
   useCreateAppointment,
   useMoveAppointment,
+  usePersonAppointments,
   useReinstateAppointment,
   useUpdateAppointment,
   withAppointmentStatus,

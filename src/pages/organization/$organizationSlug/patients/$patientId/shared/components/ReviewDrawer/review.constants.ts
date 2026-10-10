@@ -26,6 +26,8 @@ export const REVIEW_KEYS = {
   removeFile: 'review.removeFile',
   /** The files a saved review already has, on its edit. */
   attached: 'review.attached',
+  /** "2 files" — what an attached file is called is not kept, and none can be read back (B1). */
+  attachedFiles: 'review.attachedFiles',
   text: 'review.text',
   textPlaceholder: 'review.textPlaceholder',
   save: 'review.save',

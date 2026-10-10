@@ -1,6 +1,9 @@
 import { useTranslation } from 'react-i18next';
 
-import { type PatientPhoto, photoName } from '@/shared/api/clinic/patient-images-api.ts';
+import {
+  type PatientPhoto,
+  photoName,
+} from '@/shared/api/clinic/patient-images-contracts.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
 import {
   useDeletePatientPhoto,
@@ -18,13 +21,13 @@ const K = PATIENT_PHOTOS_KEYS.delete;
 const reasonLabel = (key: string) => `${PATIENT_PHOTOS_NS}:${key}`;
 
 /**
- * The photo delete's reasons (`patient-file.md:66`): "Wrong patient" and
- * "Blurry / retake" are not in `delete_reason`, so they store `other` with
- * their label as the note; "Duplicate" is the schema's (`S:1490–1496`).
+ * The photo delete's reasons (`patient-file.md:66`), each stored as the API's `reason`:
+ * "Wrong patient" was filed by `mistake`, "Blurry / retake" is `not_needed` (Q24's value for a
+ * removed photo), "Duplicate" is `duplicate`, "Other" is `other` with its note.
  */
 const PHOTO_DELETE_REASONS = [
-  { value: 'wrong_patient', labelKey: reasonLabel(K.reasons.wrongPatient) },
-  { value: 'blurry', labelKey: reasonLabel(K.reasons.blurry) },
+  { value: 'mistake', labelKey: reasonLabel(K.reasons.wrongPatient) },
+  { value: 'not_needed', labelKey: reasonLabel(K.reasons.blurry) },
   { value: 'duplicate', labelKey: reasonLabel(K.reasons.duplicate) },
   { value: 'other', labelKey: reasonLabel(K.reasons.other) },
 ] as const;
@@ -40,8 +43,9 @@ export interface PhotoDeleteConfirmProps {
 
 /**
  * "Delete this photo?" (KICKOFF §6.6 Photos; §3.5 reason confirm): the photo's
- * name as the record, the four reasons; the photo leaves at once and "Photo
- * deleted" offers Undo for the restore window (D32).
+ * name as the record, the four reasons; `DELETE …/images/:patient_image_id`
+ * with the reason picked — the photo leaves at once, and "Photo deleted"
+ * offers Undo, which restores it (`POST …/restore`, D32).
  */
 export function PhotoDeleteConfirm({
   photo,
@@ -62,12 +66,12 @@ export function PhotoDeleteConfirm({
         record: photo ? photoName(photo) : undefined,
         options: PHOTO_DELETE_REASONS,
         undo: photo
-          ? { message: t(K.deleted), onUndo: () => restore.mutate(photo.id) }
+          ? { message: t(K.deleted), onUndo: () => restore.mutate(photo) }
           : undefined,
       }}
       onConfirm={async ({ reason, note }) => {
         if (!photo) return;
-        await remove.mutateAsync({ id: photo.id, reason, note });
+        await remove.mutateAsync({ photo, reason, note });
         // The confirm closes itself once this lands, then offers Undo.
         onDeleted?.();
       }}

@@ -12,7 +12,7 @@ import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import type {
   PatientConsent,
   PatientRecord,
-} from '@/shared/api/clinic/patients-contracts.ts';
+} from '@/shared/api/clinic/patients-fixture-contracts.ts';
 
 import { branchRef, MAIN_BRANCH } from './organization.fixtures.ts';
 import { must, readSeedLabel, ref, seedAt, seedMobile } from './refs.fixtures.ts';

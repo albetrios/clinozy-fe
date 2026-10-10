@@ -1,6 +1,6 @@
 import type { BodyPart, RxMeal, RxTiming } from '@/shared/api/clinic/clinic-schema.ts';
 import type { MedicineForm } from '@/shared/api/clinic/medicines-contracts.ts';
-import type { RxCatalogMedicine } from '@/shared/api/clinic/prescriptions-api.ts';
+import type { RxCatalogMedicine } from '@/shared/api/clinic/prescriptions-contracts.ts';
 import {
   quickLineBrowseMatches,
   quickLineMatches,
@@ -166,19 +166,14 @@ function searchable(medicine: RxCatalogMedicine) {
 
 /**
  * The quick line's matches (H:3790–3792) on the shared search: with words,
- * the medicines every word matches, best first; with none, the "Often
- * prescribed" first and then the catalogue. At most eight.
+ * the medicines every word matches, best first; with none, the catalogue in
+ * its order (the clinic's "Often prescribed" has no read — G4). At most eight.
  */
 export function matchRxMedicines(
   catalog: readonly RxCatalogMedicine[],
   words: readonly string[],
-  often: readonly string[] = [],
 ): RxCatalogMedicine[] {
-  const entries = catalog.map(searchable);
-  const first = often
-    .map((name) => entries.find((entry) => entry.medicine.name === name))
-    .filter((entry): entry is ReturnType<typeof searchable> => Boolean(entry));
-  return quickLineMatches(entries, words, first).map((entry) => entry.medicine);
+  return quickLineMatches(catalog.map(searchable), words).map((entry) => entry.medicine);
 }
 
 /**
@@ -193,8 +188,8 @@ export function typedRxName(
   return quickLineTypedName(catalog.map(searchable), words);
 }
 
-/** Browse's groups (H:3797): everything, the patient's often prescribed, Oral, Topical. */
-export type RxBrowseGroup = 'all' | 'often' | MedicineForm;
+/** Browse's groups (H:3797): everything, Oral, Topical. */
+export type RxBrowseGroup = 'all' | MedicineForm;
 
 /**
  * Browse's tiles (H:3797–3798): the group's medicines whose name or
@@ -204,12 +199,10 @@ export function browseRxMedicines(
   catalog: readonly RxCatalogMedicine[],
   group: RxBrowseGroup,
   words: readonly string[],
-  often: readonly string[] = [],
 ): RxCatalogMedicine[] {
-  return catalog.filter((medicine) => {
-    const inGroup =
-      group === 'all' ||
-      (group === 'often' ? often.includes(medicine.name) : medicine.form === group);
-    return inGroup && quickLineBrowseMatches(searchable(medicine), words);
-  });
+  return catalog.filter(
+    (medicine) =>
+      (group === 'all' || medicine.form === group) &&
+      quickLineBrowseMatches(searchable(medicine), words),
+  );
 }

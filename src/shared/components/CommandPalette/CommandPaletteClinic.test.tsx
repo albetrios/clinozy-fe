@@ -109,12 +109,17 @@ async function renderMenu(path = '/organization/acme/today') {
   return { ...utils, router, user };
 }
 
-/** The codes clinozy-be gives Owner and Admin for the rooms already on it (Leads, Appointments). */
+/**
+ * The codes clinozy-be gives Owner and Admin for the rooms already on it (Leads, Appointments,
+ * Patients).
+ */
 const LIVE_ROOM_CODES: OrganizationPermission[] = [
   'lead:read',
   'lead:create',
   'appointment:read',
   'appointment:create',
+  'patient:read',
+  'patient:create',
 ];
 
 /** The member: Owner and Admin from their platform codes, any other role by View-as. */

@@ -1,18 +1,20 @@
-import type {
-  AftercareCall,
-  BodyPart,
-  Tone,
-  Treatment,
-  TreatmentTemplate,
-} from '@/shared/api/clinic/clinic-schema.ts';
-import type { TreatmentInput } from '@/shared/api/clinic/treatments-api.ts';
+import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { PatientPackageRow } from '@/shared/api/clinic/patient-packages-contracts.ts';
+import {
+  TREATMENT_LIMITS,
+  type TreatmentAftercareCall,
+  type TreatmentBodyPart,
+  type TreatmentFields,
+  type TreatmentRecord,
+  type TreatmentTemplate,
+} from '@/shared/api/clinic/treatments-contracts.ts';
 
 /*
  * The Treatment drawer's form (KICKOFF §6.6; `patient-file.md:123–141,
  * 360–372`; H:4811–4828). A template's chips store the design's English value
- * ("Laser", "Type IV", "810") in `params` — the fixture world's shape (the
- * contract keeps each value as text ≤80, `S:411`) — and the area chips also
- * map onto the contract's `bodyParts` where `body_part` has the place.
+ * ("Laser", "Type IV", "810") in `parameters` — the API keeps each value as text
+ * ≤ 80 — and the area chips also map onto the API's `body_parts` where the
+ * 15-part list has the place (M33).
  */
 
 /** The drawer's form. */
@@ -20,16 +22,17 @@ export interface TreatmentFormValues {
   template: TreatmentTemplate;
   name: string;
   offeringId: string | null;
+  /** The patient's package the session spends (a new one only — §6 #20). */
   packageId: string | null;
-  sessionNo: number;
+  sessionNumber: number;
   doctorId: string | null;
   therapistId: string | null;
   /** The template's area chips (Skin body parts, Physio regions), by key. */
   areas: string[];
-  /** The template's other fields, by the contract's parameter keys. */
-  params: Record<string, string>;
+  /** The template's other fields, by the API's parameter keys. */
+  parameters: Record<string, string>;
   remark: string;
-  aftercareCall: AftercareCall;
+  aftercareCall: TreatmentAftercareCall;
 }
 
 /** A chip of a template field: its key (copy and test id) and the value it stores. */
@@ -66,17 +69,17 @@ export const SKIN_THERAPY_TYPES = [
   option('microneedling', 'Microneedling'),
 ];
 
-/** Skin · laser's body parts, each with the contract's `body_part` (Upper lip and Chin are the face). */
-export const SKIN_AREAS: readonly (TemplateOption & { bodyPart: BodyPart })[] = [
+/** Skin · laser's body parts, each with the API's `body_parts` value. */
+export const SKIN_AREAS: readonly (TemplateOption & { bodyPart: TreatmentBodyPart })[] = [
   { ...option('face', 'Face'), bodyPart: 'face' },
-  { ...option('upperLip', 'Upper lip'), bodyPart: 'face' },
-  { ...option('chin', 'Chin'), bodyPart: 'face' },
+  { ...option('upperLip', 'Upper lip'), bodyPart: 'upper_lip' },
+  { ...option('chin', 'Chin'), bodyPart: 'chin' },
   { ...option('underarm', 'Underarm'), bodyPart: 'underarm' },
   { ...option('arms', 'Arms'), bodyPart: 'arms' },
   { ...option('legs', 'Legs'), bodyPart: 'legs' },
   { ...option('back', 'Back'), bodyPart: 'back' },
   { ...option('chest', 'Chest'), bodyPart: 'chest' },
-  { ...option('fullBody', 'Full body'), bodyPart: 'body' },
+  { ...option('fullBody', 'Full body'), bodyPart: 'full_body' },
 ];
 
 /** The Fitzpatrick skin types I–VI ("Type III"), stored as their numeral. */
@@ -106,16 +109,17 @@ export const FDI_QUADRANTS = [
   { key: 'lowerLeft', teeth: [31, 32, 33, 34, 35, 36, 37, 38] },
 ] as const;
 
-/** Physio's regions; only Back is a contract `body_part`. */
-export const PHYSIO_REGIONS: readonly (TemplateOption & { bodyPart: BodyPart | null })[] =
-  [
-    { ...option('neck', 'Neck'), bodyPart: null },
-    { ...option('shoulder', 'Shoulder'), bodyPart: null },
-    { ...option('back', 'Back'), bodyPart: 'back' },
-    { ...option('hip', 'Hip'), bodyPart: null },
-    { ...option('knee', 'Knee'), bodyPart: null },
-    { ...option('ankle', 'Ankle'), bodyPart: null },
-  ];
+/** Physio's regions; Neck and Back are API body parts, the joints are not. */
+export const PHYSIO_REGIONS: readonly (TemplateOption & {
+  bodyPart: TreatmentBodyPart | null;
+})[] = [
+  { ...option('neck', 'Neck'), bodyPart: 'neck' },
+  { ...option('shoulder', 'Shoulder'), bodyPart: null },
+  { ...option('back', 'Back'), bodyPart: 'back' },
+  { ...option('hip', 'Hip'), bodyPart: null },
+  { ...option('knee', 'Knee'), bodyPart: null },
+  { ...option('ankle', 'Ankle'), bodyPart: null },
+];
 
 /** Physio's Modality chips (`patient-file.md:366`). */
 export const PHYSIO_MODALITIES = [
@@ -142,10 +146,10 @@ export const GYNAC_VISIT_TYPES = [
 ];
 
 /** The aftercare call chips (H:4826) and their tones; Next day is the default. */
-export const AFTERCARE_CALLS: readonly { call: AftercareCall; tone: Tone }[] = [
+export const AFTERCARE_CALLS: readonly { call: TreatmentAftercareCall; tone: Tone }[] = [
   { call: 'none', tone: 'stone' },
   { call: 'next_day', tone: 'sage' },
-  { call: 'in_2_days', tone: 'mint' },
+  { call: 'in_two_days', tone: 'mint' },
   { call: 'in_week', tone: 'sky' },
 ];
 
@@ -155,7 +159,7 @@ export const ANAESTHESIA = { given: 'Given', notGiven: 'Not given' } as const;
 /** The template's area chips, if it has any. */
 function templateAreas(
   template: TreatmentTemplate,
-): readonly (TemplateOption & { bodyPart: BodyPart | null })[] {
+): readonly (TemplateOption & { bodyPart: TreatmentBodyPart | null })[] {
   if (template === 'skin') return SKIN_AREAS;
   if (template === 'physio') return PHYSIO_REGIONS;
   return [];
@@ -175,30 +179,34 @@ export function storedTeeth(teeth: readonly number[]): string {
 
 // ── The form ──
 
+/** The next session's number after `session`, within the API's range. */
+const nextSession = (session: number) =>
+  Math.min(TREATMENT_LIMITS.session.max, session + 1);
+
 /** A blank form for a template: its areas and fields empty, the rest kept. */
 export function withTemplate(
   values: TreatmentFormValues,
   template: TreatmentTemplate,
 ): TreatmentFormValues {
-  return { ...values, template, areas: [], params: {} };
+  return { ...values, template, areas: [], parameters: {} };
 }
 
 /** A new treatment: the template to start with, session 1, the next-day call. */
 export function newTreatmentForm(
   template: TreatmentTemplate,
   staff: { doctorId: string | null; therapistId: string | null },
-  last?: Treatment,
+  last?: TreatmentRecord,
 ): TreatmentFormValues {
   const blank: TreatmentFormValues = {
     template,
     name: '',
     offeringId: null,
     packageId: null,
-    sessionNo: 1,
+    sessionNumber: 1,
     doctorId: staff.doctorId,
     therapistId: staff.therapistId,
     areas: [],
-    params: {},
+    parameters: {},
     remark: '',
     aftercareCall: 'next_day',
   };
@@ -212,14 +220,14 @@ export function newTreatmentForm(
     name: previous.name,
     offeringId: previous.offeringId,
     areas: previous.template === template ? previous.areas : [],
-    sessionNo: Math.min(99, last.sessionNo + 1),
+    sessionNumber: nextSession(last.sessionNumber),
   };
 }
 
 /** A saved treatment's area chips: its own list, else its body parts. */
-function areasOf(treatment: Treatment): string[] {
+function areasOf(treatment: TreatmentRecord): string[] {
   const options = templateAreas(treatment.template);
-  const listed = treatment.params.areas;
+  const listed = treatment.parameters.areas;
   if (listed) {
     return listed
       .split(',')
@@ -228,94 +236,101 @@ function areasOf(treatment: Treatment): string[] {
   }
   return options
     .filter((area) => area.bodyPart && treatment.bodyParts.includes(area.bodyPart))
-    .filter(
-      (area, index, all) =>
-        all.findIndex((other) => other.bodyPart === area.bodyPart) === index,
-    )
     .map((area) => area.key);
 }
 
 /** A saved treatment as the edit drawer opens it. */
-export function treatmentFormOf(treatment: Treatment): TreatmentFormValues {
-  // The areas are their own field (the chips); every other param stays as stored.
-  const params = Object.fromEntries(
-    Object.entries(treatment.params).filter(([key]) => key !== 'areas'),
+export function treatmentFormOf(treatment: TreatmentRecord): TreatmentFormValues {
+  // The areas are their own field (the chips); every other parameter stays as stored.
+  const parameters = Object.fromEntries(
+    Object.entries(treatment.parameters).filter(([key]) => key !== 'areas'),
   );
   return {
     template: treatment.template,
     name: treatment.name,
     offeringId: treatment.offeringId,
     packageId: treatment.packageId,
-    sessionNo: treatment.sessionNo,
+    sessionNumber: treatment.sessionNumber,
     doctorId: treatment.doctorId,
     therapistId: treatment.therapistId,
     areas: areasOf(treatment),
-    params,
+    parameters,
     remark: treatment.remark ?? '',
     aftercareCall: treatment.aftercareCall,
   };
 }
 
-/** The next session of a treatment (Quick fill "Next session of …"). */
+/** A package a new session can spend: active, with a session left (the server's counts). */
+export function canSpendSession(row: PatientPackageRow): boolean {
+  return row.status === 'active' && row.sessionsLeft > 0;
+}
+
+/**
+ * The next session of a treatment (Quick fill "Next session of …"): on its package while that
+ * package can still spend a session.
+ */
 export function nextSessionForm(
-  last: Treatment,
+  last: TreatmentRecord,
   current: TreatmentFormValues,
+  packages: readonly PatientPackageRow[],
 ): TreatmentFormValues {
   const form = treatmentFormOf(last);
+  const onPackage = packages.some(
+    (row) => row.id === last.packageId && canSpendSession(row),
+  );
   return {
     ...current,
     template: form.template,
     name: form.name,
     offeringId: form.offeringId,
-    packageId: form.packageId,
+    packageId: onPackage ? last.packageId : null,
     areas: form.areas,
-    params: form.params,
-    sessionNo: Math.min(99, last.sessionNo + 1),
+    parameters: form.parameters,
+    sessionNumber: nextSession(last.sessionNumber),
     doctorId: form.doctorId,
     therapistId: form.therapistId,
   };
 }
 
-/** The write a save sends; a blank name saves as `fallbackName` (A-F11). */
-export function treatmentInputOf(
+/** A session on a package: the package's offering and name, its number the server's. */
+export function onPackageForm(
   values: TreatmentFormValues,
-  context: {
-    patientId: string;
-    appointmentId: string | null;
-    performedAt: string;
-    fallbackName: string;
-  },
-): TreatmentInput {
+  row: PatientPackageRow,
+): TreatmentFormValues {
+  return { ...values, name: row.name, offeringId: row.offeringId, packageId: row.id };
+}
+
+/** What a save writes; a blank name saves as `fallbackName` (A-F11). */
+export function treatmentFieldsOf(
+  values: TreatmentFormValues,
+  fallbackName: string,
+): TreatmentFields {
   const options = templateAreas(values.template);
   const picked = options.filter((area) => values.areas.includes(area.key));
   const bodyParts = [
     ...new Set(
       picked
         .map((area) => area.bodyPart)
-        .filter((part): part is BodyPart => Boolean(part)),
+        .filter((part): part is TreatmentBodyPart => Boolean(part)),
     ),
   ];
-  const params: Record<string, string> = {};
-  for (const [key, value] of Object.entries(values.params)) {
+  const parameters: Record<string, string> = {};
+  for (const [key, value] of Object.entries(values.parameters)) {
     const text = value.trim();
-    if (text) params[key] = text;
+    if (text) parameters[key] = text;
   }
-  if (picked.length) params.areas = picked.map((area) => area.value).join(', ');
+  if (picked.length) parameters.areas = picked.map((area) => area.value).join(', ');
   return {
-    patientId: context.patientId,
-    appointmentId: context.appointmentId,
-    offeringId: values.offeringId,
-    name: values.name.trim() || context.fallbackName,
+    name: values.name.trim() || fallbackName,
     template: values.template,
-    performedAt: context.performedAt,
+    offeringId: values.offeringId,
     doctorId: values.doctorId,
     therapistId: values.therapistId,
     bodyParts,
-    sessionNo: values.sessionNo,
-    params,
+    sessionNumber: values.sessionNumber,
+    parameters,
     remark: values.remark.trim() || null,
     aftercareCall: values.aftercareCall,
-    packageId: values.packageId,
   };
 }
 
@@ -328,6 +343,6 @@ export function rememberTemplate(template: TreatmentTemplate): void {
 }
 
 /** A new treatment's template: the patient's last, else the one saved last, else Skin · laser. */
-export function startingTemplate(last: Treatment | undefined): TreatmentTemplate {
+export function startingTemplate(last: TreatmentRecord | undefined): TreatmentTemplate {
   return last?.template ?? rememberedTemplate ?? 'skin';
 }

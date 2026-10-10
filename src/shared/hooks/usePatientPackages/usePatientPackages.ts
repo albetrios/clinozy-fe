@@ -1,59 +1,72 @@
 import {
-  addPatientPackage,
-  type AddPatientPackageInput,
-  consumePackageSession,
-  listPackageOfferings,
   listPatientPackages,
+  listPatientPurchases,
   patientPackageQueryKeys,
+  updatePatientPackage,
 } from '@/shared/api/clinic/patient-packages-api.ts';
-import type { PatientPackageRecord } from '@/shared/api/clinic/patient-packages-contracts.ts';
-import { patientQueryKeys } from '@/shared/api/clinic/patients-api.ts';
+import type {
+  PatientPackageChange,
+  PatientPackageRow,
+} from '@/shared/api/clinic/patient-packages-contracts.ts';
+import { planQueryKeys } from '@/shared/api/clinic/plan-api.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
-/** One patient's packages with their offerings (KICKOFF §6.6); idle without a patient. */
+/**
+ * One patient's packages (`GET /app/patients/:patient_id/offerings?is_package=true`) — the
+ * Packages section, a treatment's "From package", the Overview's care card; idle without a
+ * patient or an organization.
+ */
 export function usePatientPackages(patientId: string, { enabled = true } = {}) {
+  const organizationId = useOrganizationStore((state) => state.organizationId);
   return useAppQuery({
-    queryKey: patientPackageQueryKeys.patient(patientId),
+    queryKey: patientPackageQueryKeys.patient(organizationId, patientId),
     queryFn: () => listPatientPackages(patientId),
-    enabled: enabled && patientId !== '',
+    enabled: enabled && patientId !== '' && organizationId !== null,
   });
 }
 
-/** The offerings Add package lists: the active ones of more than one session. */
-export function usePackageOfferings({ enabled = true } = {}) {
+/**
+ * The patient's last six bought offerings, every kind (`GET …/offerings`) — the plan card's
+ * "<first>’s last purchases"; idle without a patient or an organization.
+ */
+export function usePatientPurchases(patientId: string | null) {
+  const organizationId = useOrganizationStore((state) => state.organizationId);
   return useAppQuery({
-    queryKey: patientPackageQueryKeys.offerings(),
-    queryFn: listPackageOfferings,
-    enabled,
+    queryKey: patientPackageQueryKeys.purchases(organizationId, patientId ?? ''),
+    queryFn: () => listPatientPurchases(patientId ?? ''),
+    enabled: Boolean(patientId) && organizationId !== null,
   });
 }
 
-/**
- * Add package (A-F6): an uninvoiced package; refreshes every patient read.
- * The drawer raises "Package added · invoice it from Invoices".
- */
-export function useAddPatientPackage(
-  options: CrudMutationOptions<PatientPackageRecord, AddPatientPackageInput> = {},
-) {
-  return useAppMutation<PatientPackageRecord, AddPatientPackageInput>({
-    mutationFn: addPatientPackage,
-    invalidateKeys: [patientQueryKeys.all],
-    ...options,
-  });
+/** What a package's edit sends: the package as read and its change. */
+export interface PatientPackageUpdateVars {
+  patientId: string;
+  /** The package as read — its id and the `updated_at` the save sends back. */
+  row: Pick<PatientPackageRow, 'id' | 'updatedAt'>;
+  change: PatientPackageChange;
 }
 
 /**
- * Use a session of a package — the card's "Use a session"; refreshes every
- * patient read. The card raises "Session 2 of 7 used" (or "No sessions left").
+ * Change a package's validity or sessions (`PATCH …/offerings/:patient_offering_id`,
+ * `payment:update`) — the caller toasts. It refetches the patient's bought offerings and the
+ * plans (an idea renews a package almost used up).
  */
-export function useConsumePackageSession(
-  options: CrudMutationOptions<PatientPackageRecord, string> = {},
+export function useUpdatePatientPackage(
+  options: CrudMutationOptions<PatientPackageRow, PatientPackageUpdateVars> = {},
 ) {
-  return useAppMutation<PatientPackageRecord, string>({
-    mutationFn: consumePackageSession,
-    invalidateKeys: [patientQueryKeys.all],
+  return useAppMutation<PatientPackageRow, PatientPackageUpdateVars>({
+    mutationFn: ({ patientId, row, change }, action) =>
+      updatePatientPackage({
+        patientId,
+        packageId: row.id,
+        change,
+        expectedUpdatedAt: row.updatedAt,
+        idempotencyKey: action.idempotencyKey,
+      }),
+    invalidateKeys: [patientPackageQueryKeys.all, planQueryKeys.all],
     ...options,
   });
 }

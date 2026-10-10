@@ -33,10 +33,6 @@ export const OFFERING_SUGGESTIONS_KEYS = {
   pricesHiddenHint: 'offeringSuggestions.pricesHiddenHint',
   showPrices: 'offeringSuggestions.showPrices',
   hidePrices: 'offeringSuggestions.hidePrices',
-  /** The total's line: "Saves <₹> on list · <₹> invoiced", either alone, or "At list price". */
-  savesOnList: 'offeringSuggestions.savesOnList',
-  invoicedAmount: 'offeringSuggestions.invoicedAmount',
-  atListPrice: 'offeringSuggestions.atListPrice',
   columns: {
     suggested: 'offeringSuggestions.columns.suggested',
     qty: 'offeringSuggestions.columns.qty',
@@ -47,6 +43,7 @@ export const OFFERING_SUGGESTIONS_KEYS = {
   more: 'offeringSuggestions.more',
   quantity: 'offeringSuggestions.quantity',
   finalPrice: 'offeringSuggestions.finalPrice',
+  /** The server's lowest-price flag: "Below the lowest price", or "ask an admin" without the code. */
   belowFloor: 'offeringSuggestions.belowFloor',
   tooMuchDiscount: 'offeringSuggestions.tooMuchDiscount',
   details: 'offeringSuggestions.details',
@@ -56,8 +53,6 @@ export const OFFERING_SUGGESTIONS_KEYS = {
   statusLabel: 'offeringSuggestions.statusLabel',
   invoiced: 'offeringSuggestions.invoiced',
   invoicedOf: 'offeringSuggestions.invoicedOf',
-  linkInvoice: 'offeringSuggestions.linkInvoice',
-  linkInvoiceHint: 'offeringSuggestions.linkInvoiceHint',
   remove: 'offeringSuggestions.remove',
   empty: 'offeringSuggestions.empty',
   whyIdea: 'offeringSuggestions.whyIdea',
@@ -82,19 +77,9 @@ export const OFFERING_SUGGESTIONS_KEYS = {
     list: 'offeringSuggestions.info.list',
     lowest: 'offeringSuggestions.info.lowest',
   },
-  /** An idea's tooltip (H:4355–4366): "Idea from history · <why> · <category> · <n> sessions". */
+  /** An idea's tooltip (H:4355–4366): "Idea from history · <the server's why> · <category> · <n> sessions". */
   ideaReasons: {
     history: 'offeringSuggestions.ideaReasons.history',
-    note: 'offeringSuggestions.ideaReasons.note',
-    complaint: 'offeringSuggestions.ideaReasons.complaint',
-    visits: 'offeringSuggestions.ideaReasons.visits',
-    renew: 'offeringSuggestions.ideaReasons.renew',
-    first: 'offeringSuggestions.ideaReasons.first',
-  },
-  /** A purchase line with no offering: a medicine or another item (H:4369). */
-  purchaseKinds: {
-    medicine: 'offeringSuggestions.purchaseKinds.medicine',
-    item: 'offeringSuggestions.purchaseKinds.item',
   },
   /** A message's status in "Contact activity" (H:4372). */
   delivery: {
@@ -108,15 +93,12 @@ export const OFFERING_SUGGESTIONS_KEYS = {
   /** "Contact activity · Lead #<seq> · <status>". */
   activityLead: 'offeringSuggestions.activityLead',
   purchasesTitle: 'offeringSuggestions.purchasesTitle',
-  /** "<n> lines · <₹> paid so far". */
-  purchasesSummary: 'offeringSuggestions.purchasesSummary',
+  /** "<n> lines" (plural). */
+  purchasesCount: 'offeringSuggestions.purchasesCount',
   purchaseColumns: {
     date: 'offeringSuggestions.purchaseColumns.date',
     bought: 'offeringSuggestions.purchaseColumns.bought',
-    qty: 'offeringSuggestions.purchaseColumns.qty',
-    paid: 'offeringSuggestions.purchaseColumns.paid',
     sessions: 'offeringSuggestions.purchaseColumns.sessions',
-    invoice: 'offeringSuggestions.purchaseColumns.invoice',
   },
   sessionsUsed: 'offeringSuggestions.sessionsUsed',
   activityTitle: 'offeringSuggestions.activityTitle',

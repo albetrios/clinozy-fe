@@ -1,20 +1,21 @@
+import type { CheckinFeel, CheckinFollowed } from '@/shared/api/clinic/clinic-schema.ts';
 import type {
-  CheckIn,
-  CheckinFeel,
-  CheckinFollowed,
-} from '@/shared/api/clinic/clinic-schema.ts';
-import type { CheckInInput } from '@/shared/api/clinic/feedback-contracts.ts';
+  CheckInFields,
+  PatientCheckIn,
+} from '@/shared/api/clinic/feedback-contracts.ts';
 
 /** The check-in drawer's fields (`patient-file.md:171–179`). */
 export interface CheckInFormValues {
   /** Required by the save ("Pick how it is now"). */
   feel: CheckinFeel | null;
-  /** 1–10; 0 while not rated (A-F12). */
+  /** 1–10; 0 until one is picked — the save asks for it (Q18). */
   score: number;
-  now: string;
+  /** How it is now, in their words. */
+  currentState: string;
   followed: CheckinFollowed | null;
   followedNote: string;
   nextPlan: string;
+  /** The offerings a new check-in puts in the plan; an edit shows the ones it planned. */
   nextOfferingIds: string[];
 }
 
@@ -23,7 +24,7 @@ export function newCheckInForm(): CheckInFormValues {
   return {
     feel: null,
     score: 0,
-    now: '',
+    currentState: '',
     followed: null,
     followedNote: '',
     nextPlan: '',
@@ -32,11 +33,11 @@ export function newCheckInForm(): CheckInFormValues {
 }
 
 /** A saved check-in as the edit drawer opens it. */
-export function checkInFormOf(checkIn: CheckIn): CheckInFormValues {
+export function checkInFormOf(checkIn: PatientCheckIn): CheckInFormValues {
   return {
     feel: checkIn.feel,
     score: checkIn.score,
-    now: checkIn.now ?? '',
+    currentState: checkIn.currentState ?? '',
     followed: checkIn.followed,
     followedNote: checkIn.followedNote ?? '',
     nextPlan: checkIn.nextPlan ?? '',
@@ -46,33 +47,20 @@ export function checkInFormOf(checkIn: CheckIn): CheckInFormValues {
 
 const textOrNull = (text: string) => text.trim() || null;
 
-/** Where a check-in sits: the patient, the visit and treatment it follows, its words and day. */
-export interface CheckInPlace {
-  patientId: string;
-  appointmentId: string | null;
-  treatmentId: string | null;
-  /** "Visit check-in · Appt #2790", "Aftercare after LHR Full Face" (`S:510`). */
-  context: string;
-  date: string;
-}
-
 /**
- * What a save sends — an edit keeps the record's own place. The save checks
- * the feel first ("Pick how it is now"), so a form without one never gets here.
+ * What a save sends — blanks as none. The save asks for the feel and the score first
+ * ("Pick how it is now", "Pick the patient’s score"), so a form without them never gets here.
  */
-export function checkInInputOf(
-  values: CheckInFormValues,
-  place: CheckInPlace,
-): CheckInInput {
-  if (!values.feel) throw new Error('A check-in needs how it is now');
+export function checkInFieldsOf(values: CheckInFormValues): CheckInFields {
+  if (!values.feel || values.score < 1) {
+    throw new Error('A check-in needs how it is now and a score');
+  }
   return {
-    ...place,
     feel: values.feel,
     score: values.score,
-    now: textOrNull(values.now),
+    currentState: textOrNull(values.currentState),
     followed: values.followed,
     followedNote: textOrNull(values.followedNote),
     nextPlan: textOrNull(values.nextPlan),
-    nextOfferingIds: values.nextOfferingIds,
   };
 }

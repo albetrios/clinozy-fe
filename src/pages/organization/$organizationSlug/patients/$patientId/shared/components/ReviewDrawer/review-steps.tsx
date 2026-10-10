@@ -49,10 +49,11 @@ interface ReviewStepFieldsProps {
  */
 export function ReviewWhereFields({ form, values }: ReviewStepFieldsProps) {
   const { t } = useTranslation([REVIEW_NS, CLINIC_NS]);
+  const field = useDrawerFieldIds(form, useId());
   return (
     <DrawerStepBody readOnly={false}>
       <DrawerFieldGrid>
-        <DrawerField label={t(K.where)} span="full">
+        <DrawerField label={t(K.where)} error={field('source').error} span="full">
           <DrawerChips
             label={t(K.where)}
             options={REVIEW_SOURCE_VALUES.map((source) => ({
@@ -67,7 +68,7 @@ export function ReviewWhereFields({ form, values }: ReviewStepFieldsProps) {
             testId={`${REVIEW_TEST_ID}-where`}
           />
         </DrawerField>
-        <DrawerField label={t(K.rating)} span="full">
+        <DrawerField label={t(K.rating)} error={field('rating').error} span="full">
           <DrawerChips
             label={t(K.rating)}
             options={RATINGS.map((rating) => ({
@@ -87,7 +88,7 @@ export function ReviewWhereFields({ form, values }: ReviewStepFieldsProps) {
   );
 }
 
-/** Step 2 "Details" (`patient-file.md:195`): the Link — "https://", ≤200 characters. */
+/** Step 2 "Details" (`patient-file.md:195`): the Link — "https://", ≤200 characters (the API's 500). */
 export function ReviewLinkFields({ form }: Pick<ReviewStepFieldsProps, 'form'>) {
   const { t } = useTranslation(REVIEW_NS);
   const ids = useId();
@@ -120,28 +121,42 @@ export function ReviewLinkFields({ form }: Pick<ReviewStepFieldsProps, 'form'>) 
 /**
  * Step 3 "Notes" (`patient-file.md:196–197`): Video or screenshot — MP4, MOV,
  * JPG or PNG, through the upload tray (its 10 MB cap, not the drawn 100 MB,
- * AMBER A-F13) — the files a saved review already has, and What they said.
+ * AMBER A-F13), ten on a review at most — how many files a saved review
+ * already has (their names are not kept and none can be read back, B1), and
+ * What they said.
  */
 export function ReviewNotesFields({
   form,
   values,
   attached,
-}: ReviewStepFieldsProps & { attached: readonly string[] }) {
+}: ReviewStepFieldsProps & {
+  /** How many files the saved review has. */
+  attached: number;
+}) {
   const { t } = useTranslation(REVIEW_NS);
   const { t: tTray } = useTranslation(UPLOAD_TRAY_NS);
   const { formatNumber } = useLocaleFormat();
-  const ids = useId();
+  const field = useDrawerFieldIds(form, useId());
+  const files = field('files');
+  const text = field('text');
   return (
     <DrawerStepBody readOnly={false}>
       <DrawerFieldGrid>
-        <DrawerField label={t(K.files)} htmlFor={`${ids}-files`} span="full">
+        <DrawerField
+          label={t(K.files)}
+          htmlFor={files.id}
+          error={files.error}
+          span="full"
+        >
           <DrawerFilesField
-            id={`${ids}-files`}
+            id={files.id}
             files={values.files}
-            onChange={(files) =>
-              form.setValue('files', files.slice(0, FEEDBACK_LIMITS.files), {
-                shouldDirty: true,
-              })
+            onChange={(picked) =>
+              form.setValue(
+                'files',
+                picked.slice(0, Math.max(0, FEEDBACK_LIMITS.files - attached)),
+                { shouldDirty: true },
+              )
             }
             accept={REVIEW_FILE_TYPES.join(',')}
             takes={takesReviewFile}
@@ -156,16 +171,16 @@ export function ReviewNotesFields({
             testId={`${REVIEW_TEST_ID}-files`}
           />
         </DrawerField>
-        {attached.length > 0 ? (
+        {attached > 0 ? (
           <DrawerField label={t(K.attached)} span="full">
             <DrawerInfo wrap testId={`${REVIEW_TEST_ID}-attached`}>
-              {attached.map((file) => file.split('/').pop() ?? file).join(', ')}
+              {t(K.attachedFiles, { count: attached })}
             </DrawerInfo>
           </DrawerField>
         ) : null}
-        <DrawerField label={t(K.text)} htmlFor={`${ids}-text`} span="full">
+        <DrawerField label={t(K.text)} htmlFor={text.id} error={text.error} span="full">
           <DrawerTextarea
-            id={`${ids}-text`}
+            {...text.control}
             rows={3}
             maxLength={FEEDBACK_LIMITS.reviewText}
             placeholder={t(K.textPlaceholder)}

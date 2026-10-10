@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { isolateValues } from '@/lib/bidi-isolate.ts';
 import { localDateOf } from '@/shared/api/clinic/clinic-time.ts';
-import type { PatientReportDetail } from '@/shared/api/clinic/patient-reports-api.ts';
+import type { PatientReport } from '@/shared/api/clinic/patient-reports-contracts.ts';
 import {
   DrawerField,
   DrawerFieldGrid,
@@ -20,9 +20,8 @@ import {
   RECORD_DRAWER_NS,
 } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
-import { notify } from '@/shared/notify/index.ts';
 
-import { reportFileFormat } from '../../report-file.ts';
+import { reportFileFormats } from '../../report-file.ts';
 import { REPORT_KEYS, REPORT_NS, REPORT_TEST_IDS } from '../../reports.constants.ts';
 
 const K = REPORT_KEYS;
@@ -57,7 +56,7 @@ function ViewStep({
 
 /** Props of {@link ReportView}. */
 export interface ReportViewProps {
-  detail: PatientReportDetail;
+  report: PatientReport;
   /** The patient's full name — the sub line. */
   patientName: string;
   onClose: () => void;
@@ -67,16 +66,16 @@ export interface ReportViewProps {
  * Report view — `reports/$reportId/` (KICKOFF §6.6 Drawers; H:4019;
  * `patient-file.md:285–299, 374–381`): 560px in sky, the report's name with
  * its type as the tag, "Dharti Galani · 20 Sep 2026"; read-only steps
- * "Report" (Type, Date) → "Details" (Added by, File) → "Notes" ("No notes on
- * this report" when empty). "Download" → "Downloading CBC + Thyroid profile"
- * and the drawer closes, as drawn — the contract serves no download yet.
+ * "Report" (Type, Date) → "Details" (File: "2 files · PDF") → "Notes" ("No
+ * notes on this report" when empty). Gone: "Added by" — the API does not say
+ * who added a report (G4) — and "Download", with no way to read a stored file
+ * back (B1, Q4); the × closes it.
  */
-export function ReportView({ detail, patientName, onClose }: ReportViewProps) {
+export function ReportView({ report, patientName, onClose }: ReportViewProps) {
   const { t } = useTranslation(REPORT_NS);
   const { t: tDrawer } = useTranslation(RECORD_DRAWER_NS);
   const { formatDate } = useLocaleFormat();
   const [step, setStep] = useState<string>('report');
-  const { report, addedBy } = detail;
   const type = t(K.types[report.type]);
   const date = formatDate(
     localDateOf(report.date),
@@ -85,6 +84,12 @@ export function ReportView({ detail, patientName, onClose }: ReportViewProps) {
   );
   const notes = report.notes?.trim() || t(K.view.noNotes); // NOSONAR(S6606): blank notes are none — "" falls back
   const notFilled = tDrawer(RECORD_DRAWER_KEYS.step.notFilled);
+  const files = [
+    t(K.upload.files, { count: report.fileKeys.length }),
+    reportFileFormats(report.fileKeys),
+  ]
+    .filter(Boolean)
+    .join(' · ');
 
   const steps: DrawerStep[] = [
     {
@@ -103,27 +108,9 @@ export function ReportView({ detail, patientName, onClose }: ReportViewProps) {
     {
       id: 'details',
       title: t(K.steps.details),
-      summary: drawerStepSummary([addedBy, report.name], notFilled),
+      summary: drawerStepSummary([files], notFilled),
       content: (
-        <ViewStep
-          rows={[
-            {
-              id: 'added-by',
-              label: t(K.view.addedBy),
-              value: addedBy ?? '—',
-              span: 'third',
-            },
-            {
-              id: 'file',
-              label: t(K.file),
-              value: t(K.view.fileLine, {
-                name: report.name,
-                format: reportFileFormat(report.files),
-              }),
-              span: 'full',
-            },
-          ]}
-        />
+        <ViewStep rows={[{ id: 'file', label: t(K.file), value: files, span: 'full' }]} />
       ),
     },
     {
@@ -153,7 +140,7 @@ export function ReportView({ detail, patientName, onClose }: ReportViewProps) {
       title={report.name}
       tag={type}
       sub={t(K.view.sub, isolateValues({ name: patientName, date }))}
-      // 560px as drawn (H:4019): five read-only values.
+      // 560px as drawn (H:4019).
       content={{ fieldCount: 5 }}
       tone="sky"
       // Opened as a child of the file (H:4019): its close reads "Back".
@@ -161,11 +148,8 @@ export function ReportView({ detail, patientName, onClose }: ReportViewProps) {
       steps={steps}
       openStep={step}
       onOpenStepChange={setStep}
-      saveLabel={t(K.view.download)}
-      onSave={() => {
-        notify.info(t(K.view.downloading, { name: report.name }));
-        onClose();
-      }}
+      // Nothing to do but read it: no download (B1), no edit in the design.
+      hideFooter
       testId={TEST_ID}
     />
   );

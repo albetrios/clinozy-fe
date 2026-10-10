@@ -5,13 +5,12 @@ import { useTranslation } from 'react-i18next';
 import type {
   RxCatalog,
   RxCatalogMedicine,
-} from '@/shared/api/clinic/prescriptions-api.ts';
+} from '@/shared/api/clinic/prescriptions-contracts.ts';
 import {
   nameNumbers,
   type QuickLineItem,
   type QuickLineProps,
 } from '@/shared/components/QuickLine/index.ts';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { RX_KEYS, RX_NS } from '../../prescriptions.constants.ts';
@@ -37,15 +36,17 @@ import { useRxLabels } from './use-rx-labels.ts';
 
 const K = RX_KEYS;
 
-/** Browse's groups (H:3797): All · Often prescribed · Oral · Topical. */
-const GROUPS: readonly RxBrowseGroup[] = ['all', 'often', 'oral', 'topical'];
+/**
+ * Browse's groups (H:3797): All · Oral · Topical — the clinic's "Often prescribed" has no read
+ * (G4).
+ */
+const GROUPS: readonly RxBrowseGroup[] = ['all', 'oral', 'topical'];
 
 /** A name typed without the store's medicine behind it. */
 const typedMedicine = (name: string): RxCatalogMedicine => ({
   name,
   medicineId: null,
   composition: null,
-  mrp: null,
   stock: null,
   form: 'oral',
   last: null,
@@ -75,10 +76,11 @@ function useLineTags() {
 
 /**
  * The Rx quick line's grammar and catalogue (KICKOFF §6.6 step 2; H:4806):
- * the `__czRxMods` parser, the medicines matched and browsed with their last
- * dosage, stock and MRP, the parsed pills, "Often prescribed", and every add
- * writing the form's lines — a pick fills the first blank row ("Flubolt 400
- * added").
+ * the `__czRxMods` parser, the medicines matched and browsed with the
+ * patient's last dosage and the store's stock, the parsed pills, and every
+ * add writing the form's lines — a pick fills the first blank row ("Flubolt
+ * 400 added"). No MRP until the rupee formatter (F10); no "Often prescribed"
+ * (G4).
  */
 export function useRxQuickLine(
   form: UseFormReturn<RxFormValues>,
@@ -86,11 +88,9 @@ export function useRxQuickLine(
   items: RxFormValues['items'],
 ): QuickLineProps<RxCatalogMedicine, RxLineValues> {
   const { t } = useTranslation(RX_NS);
-  const money = usePaiseFormat();
   const labels = useRxLabels();
   const tags = useLineTags();
   const medicines = useMemo(() => catalog?.medicines ?? [], [catalog]);
-  const often = useMemo(() => catalog?.often ?? [], [catalog]);
   const numbers = useMemo(
     () => nameNumbers(medicines.map((medicine) => medicine.name)),
     [medicines],
@@ -112,7 +112,6 @@ export function useRxQuickLine(
       key: medicine.name,
       label: medicine.name,
       sub: [dosage, stock].filter(Boolean).join(' · '),
-      meta: medicine.mrp === null ? undefined : money(medicine.mrp),
       data: medicine,
     };
   };
@@ -131,21 +130,14 @@ export function useRxQuickLine(
       const { words, values } = parseRxLine(text, numbers);
       return { words, values, tags: tags(values) };
     },
-    matches: (words) => matchRxMedicines(medicines, words, often).map(toItem),
+    matches: (words) => matchRxMedicines(medicines, words).map(toItem),
     typedName: (words) => typedRxName(medicines, words),
     onPick: add,
     onCreate: (name, values) => add(typedMedicine(name), values),
-    frequent: {
-      label: t(K.quick.often),
-      items: often
-        .map((name) => medicines.find((medicine) => medicine.name === name))
-        .filter((medicine): medicine is RxCatalogMedicine => Boolean(medicine))
-        .map(toItem),
-    },
     browse: {
       groups: GROUPS.map((id) => ({ id, label: t(K.quick.groups[id]) })),
       tiles: (group, words) =>
-        browseRxMedicines(medicines, group as RxBrowseGroup, words, often).map(toItem),
+        browseRxMedicines(medicines, group as RxBrowseGroup, words).map(toItem),
       count: (item) => rxCountOf(items, item.data.name),
       added: medicines.filter((medicine) => rxCountOf(items, medicine.name) > 0).length,
       onStep: (item, step) =>

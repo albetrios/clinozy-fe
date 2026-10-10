@@ -77,7 +77,11 @@ function where(item: PrescriptionItem, t: TFunction): string {
 /** What the prescription sheet prints from. */
 export interface PrescriptionPrintProps {
   /** The prescription. */
-  prescription: Prescription;
+  /** The fields the sheet prints. */
+  prescription: Pick<
+    Prescription,
+    'seq' | 'date' | 'items' | 'labReport' | 'procedureToday' | 'advice' | 'followUpDate'
+  >;
   /** Its patient: name, patient code and date of birth (the age on the Rx's date). */
   patient: Pick<Patient, 'firstName' | 'lastName' | 'seq' | 'dateOfBirth'>;
   /** The prescribing doctor. */

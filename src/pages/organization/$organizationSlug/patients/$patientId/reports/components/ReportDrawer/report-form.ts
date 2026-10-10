@@ -1,5 +1,5 @@
 import type { ReportType } from '@/shared/api/clinic/clinic-schema.ts';
-import type { PatientReportInput } from '@/shared/api/clinic/patient-reports-api.ts';
+import type { PatientReportInput } from '@/shared/api/clinic/patient-reports-contracts.ts';
 import type { PickedFile } from '@/shared/components/DrawerField/index.ts';
 
 import { REPORT_FILE_TYPES } from '../../reports.constants.ts';
@@ -20,14 +20,10 @@ export function newReportForm(today: string): ReportFormValues {
   return { type: 'lab', name: '', date: today, files: [], note: '' };
 }
 
-/** What `createReport` sends for the form (`S:1644`); a blank note is none. */
-export function reportInputOf(
-  values: ReportFormValues,
-  patientId: string,
-): PatientReportInput {
+/** What `POST …/reports` sends for the form; a blank note is none. */
+export function reportInputOf(values: ReportFormValues): PatientReportInput {
   const note = values.note.trim();
   return {
-    patientId,
     type: values.type,
     name: values.name.trim(),
     date: values.date,

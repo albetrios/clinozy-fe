@@ -6,13 +6,15 @@ import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
 import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+import { patientFile, patientRecord } from '@/tests/utils/patient-doubles.ts';
 import { shownLocation } from '@/tests/utils/shown-location.ts';
 
 import {
   patientFileUrl,
-  renderPatientFile,
+  renderInPatientFile,
   resetPatientFile,
 } from '../__tests__/integration/patient-file-test-router.tsx';
+import { PatientInvoicesPage } from './PatientInvoicesPage.tsx';
 
 const { notifyMock, printMock } = vi.hoisted(() => ({
   notifyMock: {
@@ -50,6 +52,18 @@ async function invoiceRow(number: string) {
   return row;
 }
 
+/**
+ * The Invoices section in the patient file. Its records are still the fixture world's
+ * (Payments, api-integration §5.7), so the file's read names a fixture patient.
+ */
+function renderSection(patientId: string, { role }: { role?: Role } = {}) {
+  return renderInPatientFile(<PatientInvoicesPage />, {
+    file: patientFile({ patient: patientRecord({ id: patientId }) }),
+    section: 'invoices',
+    role,
+  });
+}
+
 beforeEach(() => {
   for (const fn of Object.values(notifyMock)) fn.mockReset();
   printMock.mockClear();
@@ -62,7 +76,7 @@ afterEach(() => {
 
 describe('PatientInvoicesPage', () => {
   it('renders the Invoices section in the patient file', async () => {
-    renderPatientFile(url());
+    renderSection(DHARTI);
     expect(await screen.findByTestId('patient-section-invoices')).toBeInTheDocument();
     expect(
       screen.getByRole('heading', { level: 2, name: 'Invoices' }),
@@ -70,7 +84,7 @@ describe('PatientInvoicesPage', () => {
   });
 
   it('lists her invoices with the bill, what is paid and due, and the status (H:4748)', async () => {
-    renderPatientFile(url());
+    renderSection(DHARTI);
     const lhr = await invoiceRow('#787');
     expect(within(lhr).getByText('LHR Full Face · B4G7')).toBeInTheDocument();
     expect(within(lhr).getAllByText('Clinic').length).toBeGreaterThan(0);
@@ -84,7 +98,7 @@ describe('PatientInvoicesPage', () => {
 
   it('records a payment for an invoice that owes, keeping the section behind it', async () => {
     const user = userEvent.setup();
-    const { router } = renderPatientFile(url());
+    const { router } = renderSection(DHARTI);
     const lhr = await invoiceRow('#787');
     await user.click(within(lhr).getByTestId(action('pay')));
     await waitFor(() =>
@@ -100,7 +114,7 @@ describe('PatientInvoicesPage', () => {
 
   it('opens Edit invoice from a row and the preview from its action', async () => {
     const user = userEvent.setup();
-    const { router } = renderPatientFile(url());
+    const { router } = renderSection(DHARTI);
     const consultation = await invoiceRow('#786');
     expect(within(consultation).queryByTestId(action('pay'))).not.toBeInTheDocument();
     await user.click(within(consultation).getByText('Free first visit'));
@@ -122,7 +136,7 @@ describe('PatientInvoicesPage', () => {
 
   it('prints an invoice’s sheet from its row', async () => {
     const user = userEvent.setup();
-    renderPatientFile(url());
+    renderSection(DHARTI);
     const lhr = await invoiceRow('#787');
     await user.click(within(lhr).getByTestId(action('print')));
     await waitFor(() => expect(printMock).toHaveBeenCalledTimes(1));
@@ -130,7 +144,7 @@ describe('PatientInvoicesPage', () => {
 
   it('asks before deleting an invoice and offers Undo', async () => {
     const user = userEvent.setup();
-    renderPatientFile(url(), { role: 'owner' });
+    renderSection(DHARTI, { role: 'owner' });
     const lhr = await invoiceRow('#787');
     await user.click(within(lhr).getByTestId(action('delete')));
     const dialog = await screen.findByTestId('confirm-dialog');
@@ -149,14 +163,14 @@ describe('PatientInvoicesPage', () => {
   });
 
   it('never deletes a Medical sale’s invoice from the file', async () => {
-    renderPatientFile(url(), { role: 'owner' });
+    renderSection(DHARTI, { role: 'owner' });
     const sale = await invoiceRow('#788');
     expect(within(sale).queryByTestId(action('delete'))).not.toBeInTheDocument();
     expect(within(sale).getByTestId(action('edit'))).toBeInTheDocument();
   });
 
   it('keeps Delete from a member without the void ability', async () => {
-    renderPatientFile(url(), { role: 'front_desk' });
+    renderSection(DHARTI, { role: 'front_desk' });
     const lhr = await invoiceRow('#787');
     for (const id of ['print', 'preview', 'pay', 'edit']) {
       expect(within(lhr).getByTestId(action(id))).toBeInTheDocument();
@@ -165,7 +179,7 @@ describe('PatientInvoicesPage', () => {
   });
 
   it('says so when the patient has no invoices', async () => {
-    renderPatientFile(patientFileUrl(patientRef('Kavya Joshi'), '/invoices'));
+    renderSection(patientRef('Kavya Joshi'));
     expect(await screen.findByText('No invoices yet')).toBeInTheDocument();
   });
 });

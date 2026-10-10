@@ -1,4 +1,8 @@
-import type { BodyPart, Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type {
+  PatientPhotoBodyPart,
+  PatientPhotoStage,
+} from '@/shared/api/clinic/patient-images-contracts.ts';
 import { type AppIcon, ImageIcon, Lock, Sparkles } from '@/shared/icons/index.ts';
 import type { PhotoSize } from '@/shared/store/useDevicePrefsStore/index.ts';
 
@@ -17,35 +21,32 @@ export const PHOTO_ALBUM_LOOK: Readonly<
 };
 
 /**
- * The body parts Photo details offers, in the design's order (the drawer's
- * `PARTS`). Its Neck and Hands are not in the contract's `body_part` — a
- * backend request — so they wait.
- */
-export const PHOTO_BODY_PARTS: readonly BodyPart[] = [
-  'face',
-  'scalp',
-  'chest',
-  'back',
-  'underarm',
-  'arms',
-  'legs',
-];
-
-/**
  * A body part's pill tone (H:4766 `PT_PT`): Face lav, Chest sky, Underarm
- * blush, Legs mint, Arms sage, Back and Scalp butter; the rest stone.
+ * blush, Legs mint, Arms sage, Back and Scalp butter; the rest stone — the
+ * API's fifteen parts (M33) include the ones the design has no tone for.
  */
-export const PHOTO_BODY_PART_TONES: Readonly<Record<BodyPart, Tone>> = {
+export const PHOTO_BODY_PART_TONES: Readonly<Record<PatientPhotoBodyPart, Tone>> = {
   face: 'lav',
+  upper_lip: 'stone',
+  chin: 'stone',
+  neck: 'stone',
   scalp: 'butter',
   hair: 'stone',
-  body: 'stone',
   chest: 'sky',
   back: 'butter',
   underarm: 'blush',
-  legs: 'mint',
   arms: 'sage',
+  hands: 'stone',
+  legs: 'mint',
+  body: 'stone',
+  full_body: 'stone',
   other: 'stone',
+};
+
+/** Each stage's pill and chip tone: Before butter, After mint (the design has no stage). */
+export const PHOTO_STAGE_TONES: Readonly<Record<PatientPhotoStage, Tone>> = {
+  before: 'butter',
+  after: 'mint',
 };
 
 /** The thumbnail sizes, in the radios' order. */

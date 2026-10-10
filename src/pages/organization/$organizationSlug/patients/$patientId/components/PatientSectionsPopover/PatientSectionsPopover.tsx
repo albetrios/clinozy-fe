@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import type { PatientFileCounts } from '@/shared/api/clinic/patient-file-contracts.ts';
 import type { PatientFilePin } from '@/shared/api/clinic/preferences-api.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import type { PatientFileSectionSlug } from '@/shared/clinic/patient-file-sections.ts';
@@ -37,12 +36,6 @@ const HOVER_INK: Readonly<Partial<Record<Tone, string>>> = {
   peach: 'hover:border-tone-peach-foreground',
 };
 
-/** Overview and Clinical notes are never "Empty" — a file always has them (H:4940). */
-const ALWAYS_FILLED: ReadonlySet<PatientFileSectionSlug> = new Set([
-  'timeline',
-  'overview',
-]);
-
 /** Props of {@link PatientSectionsPopover}. */
 export interface PatientSectionsPopoverProps {
   open: boolean;
@@ -53,25 +46,24 @@ export interface PatientSectionsPopoverProps {
   current: PatientFileSectionSlug | null;
   /** The sections the member may open; the others' tiles are left out. */
   viewable: readonly PatientFileSectionSlug[];
-  /** Records per section — "Empty" vs "Has records"; unknown while the file loads. */
-  counts: PatientFileCounts | undefined;
   pins: readonly PatientFilePin[];
   onPick: (section: PatientFileSectionSlug) => void;
   onTogglePin: (section: PatientFileSectionSlug) => void;
 }
 
-/** One section tile: its tone tile, label and state, and its pin at the top end. */
+/**
+ * One section tile: its tone tile, its label — "Open now" under the open one — and its pin at
+ * the top end. No tile says "Empty" or "Has records": the API counts no section's records (G4).
+ */
 function SectionTile({
   section,
   current,
-  empty,
   pinned,
   onPick,
   onTogglePin,
 }: {
   section: PatientFileSectionSlug;
   current: boolean;
-  empty: boolean;
   pinned: boolean;
   onPick: () => void;
   onTogglePin: () => void;
@@ -80,9 +72,6 @@ function SectionTile({
   const tone = PATIENT_FILE_SECTION_TONES[section];
   const Icon = PATIENT_FILE_SECTION_ICONS[section];
   const label = t(PATIENT_FILE_KEYS.sections[section], { ns: PATIENT_FILE_NS });
-  let state = t(K.hasRecords);
-  if (current) state = t(K.openNow);
-  else if (empty) state = t(K.empty);
   return (
     <div className="relative flex min-w-0">
       <button
@@ -95,8 +84,7 @@ function SectionTile({
           HOVER_INK[tone],
           current &&
             cn(TONE_CLASSES[tone].bg, TONE_CLASSES[tone].ring, 'border-transparent'),
-          !current && empty && 'border-border-strong border-dashed bg-transparent',
-          !(current || empty) && 'bg-card',
+          !current && 'bg-card',
         )}
       >
         <span
@@ -112,9 +100,11 @@ function SectionTile({
           <span className="text-detail truncate leading-[1.3] font-semibold">
             {label}
           </span>
-          <span className="text-micro text-muted-foreground whitespace-nowrap">
-            {state}
-          </span>
+          {current ? (
+            <span className="text-micro text-muted-foreground whitespace-nowrap">
+              {t(K.openNow)}
+            </span>
+          ) : null}
         </span>
       </button>
       <button
@@ -152,7 +142,6 @@ export function PatientSectionsPopover({
   patientName,
   current,
   viewable,
-  counts,
   pins,
   onPick,
   onTogglePin,
@@ -211,7 +200,6 @@ export function PatientSectionsPopover({
                   key={section}
                   section={section}
                   current={section === current}
-                  empty={!ALWAYS_FILLED.has(section) && (counts?.[section] ?? 1) === 0}
                   pinned={pins.includes(section)}
                   onPick={() => onPick(section)}
                   onTogglePin={() => onTogglePin(section)}

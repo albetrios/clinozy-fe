@@ -44,14 +44,8 @@ export const REPORT_KEYS = {
   view: {
     /** "Dharti Galani · 20 Sep 2026". */
     sub: 'report.view.sub',
-    addedBy: 'report.view.addedBy',
-    /** "CBC + Thyroid profile · PDF · shared with the patient on request". */
-    fileLine: 'report.view.fileLine',
     notes: 'report.view.notes',
     noNotes: 'report.view.noNotes',
-    download: 'report.view.download',
-    /** "Downloading CBC + Thyroid profile". */
-    downloading: 'report.view.downloading',
   },
 } as const;
 

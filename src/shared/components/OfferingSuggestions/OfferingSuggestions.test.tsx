@@ -33,7 +33,7 @@ const by = {
   label: 'Dr. Reenal · 24 Sep · Patient file',
 } as const;
 
-/** Dharti's plan: a discounted package (accepted), a list-priced pair (half invoiced), a declined peel. */
+/** Dharti's plan: a discounted package (accepted), a pair at its billed price (half invoiced), a declined peel. */
 const LINES: SuggestionLine[] = [
   {
     id: 'lhr',
@@ -43,10 +43,10 @@ const LINES: SuggestionLine[] = [
     qty: 1,
     price: 420_000,
     listPrice: 480_000,
-    floorPrice: 400_000,
     status: 'accepted',
     invoicedQty: 0,
-    invoicedAmount: 0,
+    fullyInvoiced: false,
+    belowLowest: false,
     by,
   },
   {
@@ -57,10 +57,10 @@ const LINES: SuggestionLine[] = [
     qty: 2,
     price: null,
     listPrice: 350_000,
-    floorPrice: 300_000,
     status: 'planned',
     invoicedQty: 1,
-    invoicedAmount: 350_000,
+    fullyInvoiced: false,
+    belowLowest: false,
     by,
   },
   {
@@ -71,10 +71,10 @@ const LINES: SuggestionLine[] = [
     qty: 1,
     price: null,
     listPrice: 250_000,
-    floorPrice: null,
     status: 'declined',
     invoicedQty: 0,
-    invoicedAmount: 0,
+    fullyInvoiced: false,
+    belowLowest: false,
     by,
   },
 ];
@@ -95,20 +95,14 @@ const PURCHASES: SuggestionPurchase[] = [
     date: '24 Sep',
     category: { label: 'Package', tone: 'blush' },
     name: 'LHR Full Face · B4G7',
-    qty: 1,
-    paid: 420_000,
     sessions: { used: 3, total: 6 },
-    invoice: { label: '#1042', status: 'Paid', tone: 'sage' },
   },
   {
     id: 'p2',
     date: '02 Sep',
-    category: { label: 'Facial', tone: 'sky' },
+    category: null,
     name: 'Hydrafacial',
-    qty: 1,
-    paid: 210_000,
     sessions: null,
-    invoice: { label: '#998', status: 'Due', tone: 'butter' },
   },
 ];
 
@@ -147,9 +141,10 @@ function Card({ pricesShown: initialShown = true, ...props }: Props) {
     <OfferingSuggestions
       firstName="Dharti"
       lines={LINES}
+      total={1_120_000}
       variant="form"
       canEdit
-      canDiscount
+      canSeeLowestPrice
       {...props}
       pricesShown={pricesShown}
       onPricesShownChange={(shown) => {
@@ -195,9 +190,7 @@ describe('OfferingSuggestions — header (H:2802–2804, H:4376)', () => {
   });
 
   it('opens in the form: suggested · accepted · past purchases', () => {
-    renderCard(
-      <Card purchases={{ lines: PURCHASES, paidSoFar: 630_000 }} ideas={IDEAS} />,
-    );
+    renderCard(<Card purchases={PURCHASES} ideas={IDEAS} />);
     expect(toggle()).toHaveAttribute('aria-expanded', 'true');
     expect(toggle()).toHaveTextContent(
       'Offering suggestions2 suggested · 1 accepted · 2 past purchases',
@@ -214,21 +207,13 @@ describe('OfferingSuggestions — header (H:2802–2804, H:4376)', () => {
 });
 
 describe('OfferingSuggestions — the total and the price eye', () => {
-  it('totals Planned and Accepted, with what it saves on list and what is invoiced', () => {
+  it('shows the server’s plan total alone — no client sums (§7)', () => {
     renderCard(<Card />);
     expect(card()).toHaveTextContent('₹11,200');
-    expect(card()).toHaveTextContent('Saves ₹600 on list · ₹3,500 invoiced');
+    expect(card()).not.toHaveTextContent('Saves');
+    expect(card()).not.toHaveTextContent('invoiced');
     expect(screen.getByTestId(IDS.prices)).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getByTestId(IDS.prices)).toHaveAccessibleName('Hide prices');
-  });
-
-  it('reads "At list price" without a saving and nothing for an empty plan', () => {
-    const { unmount } = renderCard(<Card lines={[LINES[1]!]} />);
-    expect(card()).toHaveTextContent('₹3,500 invoiced');
-    expect(card()).not.toHaveTextContent('At list price');
-    unmount();
-    renderCard(<Card lines={[{ ...LINES[1]!, invoicedQty: 0, invoicedAmount: 0 }]} />);
-    expect(card()).toHaveTextContent('At list price');
   });
 
   it('masks the plan’s prices behind the eye — an idea keeps its list price — and shows them again', async () => {
@@ -273,7 +258,14 @@ describe('OfferingSuggestions — a suggested row (H:2806–2812)', () => {
     expect(onChange).toHaveBeenLastCalledWith(LINES[1], { qty: 1, price: null });
   });
 
-  it('shows the line’s final price and reports a typed one in paise', async () => {
+  it('never steps a line under what is invoiced (PK7)', () => {
+    renderCard(<Card lines={[{ ...LINES[1]!, qty: 2, invoicedQty: 2 }]} />);
+    expect(
+      within(row('Hydrafacial')).getByRole('button', { name: 'Less' }),
+    ).toBeDisabled();
+  });
+
+  it('shows the line’s final price and saves a typed one in paise when the field is left', async () => {
     const onChange = vi.fn();
     const { user } = renderCard(<Card onChange={onChange} />);
     const price = within(row('Hydrafacial')).getByRole('textbox', {
@@ -282,18 +274,30 @@ describe('OfferingSuggestions — a suggested row (H:2806–2812)', () => {
     expect(price).toHaveValue('7000');
     await user.clear(price);
     await user.type(price, '6500');
-    expect(onChange).toHaveBeenLastCalledWith(LINES[1], { price: 650_000 });
+    expect(onChange).not.toHaveBeenCalled();
+    await user.tab();
+    expect(onChange).toHaveBeenCalledExactlyOnceWith(LINES[1], { price: 650_000 });
   });
 
-  it('names the lowest price below the floor, or asks for an admin without the discount ability', () => {
-    const cheap = { ...LINES[0]!, price: 350_000 };
+  it('leaves an untouched price alone when the field is left', async () => {
+    const onChange = vi.fn();
+    const { user } = renderCard(<Card onChange={onChange} />);
+    await user.click(
+      within(row('Hydrafacial')).getByRole('textbox', { name: 'Final price' }),
+    );
+    await user.tab();
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it('turns the edge red on the server’s lowest-price flag, or asks for an admin without the code', () => {
+    const cheap = { ...LINES[0]!, price: 350_000, belowLowest: true };
     const { unmount } = renderCard(<Card lines={[cheap]} />);
     const price = screen.getByRole('textbox', { name: 'Final price' });
     expect(price).toHaveAttribute('aria-invalid', 'true');
-    expect(price).toHaveAccessibleDescription('Below the lowest price ₹4,000');
+    expect(price).toHaveAccessibleDescription('Below the lowest price');
     unmount();
 
-    renderCard(<Card lines={[cheap]} canDiscount={false} />);
+    renderCard(<Card lines={[cheap]} canSeeLowestPrice={false} />);
     expect(
       screen.getByRole('textbox', { name: 'Final price' }),
     ).toHaveAccessibleDescription('Too much discount · ask an admin');
@@ -327,15 +331,12 @@ describe('OfferingSuggestions — a suggested row (H:2806–2812)', () => {
     expect(row('Chemical peel').className).toContain('opacity-60');
   });
 
-  it('turns a fully invoiced line into "✓ Invoiced · <n> of <n>", its controls gone', () => {
-    const done = { ...LINES[1]!, invoicedQty: 2, invoicedAmount: 700_000 };
-    renderCard(<Card lines={[done]} onLinkInvoice={vi.fn()} />);
+  it('turns a line the server calls fully invoiced into "✓ Invoiced · <n> of <n>", its controls gone', () => {
+    const done = { ...LINES[1]!, invoicedQty: 2, fullyInvoiced: true };
+    renderCard(<Card lines={[done]} />);
     const line = within(row('Hydrafacial'));
     expect(line.getByText('Invoiced · 2 of 2')).toBeInTheDocument();
     expect(line.queryByRole('button', { name: /^Status/ })).not.toBeInTheDocument();
-    expect(
-      line.queryByRole('button', { name: 'Link an invoice' }),
-    ).not.toBeInTheDocument();
     expect(line.getByRole('button', { name: 'More' })).toBeDisabled();
     expect(line.getByRole('textbox', { name: 'Final price' })).toHaveAttribute(
       'readonly',
@@ -343,26 +344,16 @@ describe('OfferingSuggestions — a suggested row (H:2806–2812)', () => {
   });
 
   it('reads "Invoiced" alone for a single unit', () => {
-    const done = { ...LINES[0]!, invoicedQty: 1, invoicedAmount: 420_000 };
+    const done = { ...LINES[0]!, invoicedQty: 1, fullyInvoiced: true };
     renderCard(<Card lines={[done]} />);
     expect(within(row('LHR Full Face · B4G7')).getByText('Invoiced')).toBeInTheDocument();
   });
 
-  it('hands "Link an invoice" to the host', async () => {
-    const onLinkInvoice = vi.fn();
-    const { user } = renderCard(<Card onLinkInvoice={onLinkInvoice} />);
-    await user.click(
-      within(row('Hydrafacial')).getByRole('button', { name: 'Link an invoice' }),
-    );
-    expect(onLinkInvoice).toHaveBeenCalledWith(LINES[1]);
-  });
-
-  it('only reads without edit: no stepper, price, status, link, remove or add', () => {
+  it('only reads without edit: no stepper, price, status, remove or add', () => {
     renderCard(
       <Card
         canEdit={false}
         ideas={IDEAS}
-        onLinkInvoice={vi.fn()}
         addOffering={{ options: OFFERINGS, onPick: vi.fn() }}
         onAddIdea={vi.fn()}
       />,
@@ -374,9 +365,6 @@ describe('OfferingSuggestions — a suggested row (H:2806–2812)', () => {
     );
     expect(line.queryByRole('button', { name: /^Status/ })).not.toBeInTheDocument();
     expect(line.getByText('Planned')).toBeInTheDocument();
-    expect(
-      line.queryByRole('button', { name: 'Link an invoice' }),
-    ).not.toBeInTheDocument();
     expect(line.queryByRole('button', { name: 'Remove' })).not.toBeInTheDocument();
     expect(screen.queryByTestId(IDS.addOffering)).not.toBeInTheDocument();
     expect(
@@ -464,24 +452,23 @@ describe('OfferingSuggestions — open or collapsed', () => {
 });
 
 describe('OfferingSuggestions — purchases and contact activity (H:2819–2825)', () => {
-  it('lists the last purchases with what was paid so far, sessions and the invoice', async () => {
-    const onOpenInvoice = vi.fn();
-    const { user } = renderCard(
-      <Card
-        purchases={{
-          lines: [{ ...PURCHASES[0]!, onOpenInvoice }, PURCHASES[1]!],
-          paidSoFar: 630_000,
-        }}
-      />,
-    );
+  it('lists the last purchases: the date, the category and name, a package’s sessions', () => {
+    renderCard(<Card purchases={PURCHASES} />);
     const section = screen.getByRole('region', { name: 'Dharti’s last purchases' });
-    expect(section).toHaveTextContent('2 lines · ₹6,300 paid so far');
+    expect(section).toHaveTextContent('2 lines');
+    expect(section).not.toHaveTextContent('paid so far');
     const [first, second] = screen.getAllByTestId(IDS.purchase);
-    expect(first).toHaveTextContent('3 of 6 used');
-    expect(second).toHaveTextContent('—');
-    expect(within(second!).getByRole('button', { name: '#998' })).toBeDisabled();
-    await user.click(within(first!).getByRole('button', { name: '#1042' }));
-    expect(onOpenInvoice).toHaveBeenCalledOnce();
+    expect(first).toHaveTextContent('24 SepPackageLHR Full Face · B4G73 of 6 used');
+    expect(second).toHaveTextContent('02 SepHydrafacial—');
+  });
+
+  it('names the activity without a lead summary when there is none', () => {
+    renderCard(<Card activity={{ lines: ACTIVITY }} />);
+    const section = screen.getByRole('region', { name: 'Contact activity' });
+    expect(section).not.toHaveTextContent('Lead');
+    expect(
+      within(section).queryByRole('button', { name: 'Open chat' }),
+    ).not.toBeInTheDocument();
   });
 
   it('lists the contact activity with Sent / Got, the status ink and "Open chat"', async () => {
@@ -511,7 +498,7 @@ describe('OfferingSuggestions — wraps by its own width (KICKOFF §6.6, H:415�
   it('is a size container whose rows, purchases and activity carry the container breakpoints', () => {
     renderCard(
       <Card
-        purchases={{ lines: PURCHASES, paidSoFar: 630_000 }}
+        purchases={PURCHASES}
         activity={{ summary: 'Lead #2363', lines: ACTIVITY }}
       />,
     );
@@ -524,7 +511,7 @@ describe('OfferingSuggestions — wraps by its own width (KICKOFF §6.6, H:415�
     expect(head?.className).toContain('@max-[600px]:hidden');
     // Under 720px purchases and activity go to three columns.
     expect(screen.getAllByTestId(IDS.purchase)[0]!.className).toContain(
-      '@max-[720px]:grid-cols-[64px_minmax(0,1fr)_auto]',
+      '@max-[720px]:grid-cols-[64px_minmax(0,1fr)]',
     );
     expect(screen.getAllByTestId(IDS.activity)[0]!.className).toContain(
       '@max-[720px]:grid-cols-[64px_minmax(0,1fr)_auto]',
@@ -537,9 +524,8 @@ describe('OfferingSuggestions — accessibility', () => {
     const { container } = renderCard(
       <Card
         ideas={IDEAS}
-        purchases={{ lines: PURCHASES, paidSoFar: 630_000 }}
+        purchases={PURCHASES}
         activity={{ summary: 'Lead #2363', lines: ACTIVITY, onOpenChat: vi.fn() }}
-        onLinkInvoice={vi.fn()}
         onAddIdea={vi.fn()}
         addOffering={{ options: OFFERINGS, onPick: vi.fn() }}
       />,

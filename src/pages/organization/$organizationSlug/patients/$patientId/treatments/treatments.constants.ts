@@ -16,8 +16,17 @@ export const TREATMENT_KEYS = {
     checkIn: 'treatment.quickFill.checkIn',
     /** "Next session of LHR Full Face". */
     next: 'treatment.quickFill.next',
-    /** "LHR Full Face · B4G7 · session 2". */
-    package: 'treatment.quickFill.package',
+  },
+  /** "From package" — the patient's package a new session spends (§6 #20). */
+  package: {
+    label: 'treatment.package.label',
+    hint: 'treatment.package.hint',
+    /** "LHR Full Face · B4G7 · 1 of 7 used" — the server's counts; also its Quick fill chip. */
+    option: 'treatment.package.option',
+    /** The session number while the server takes it from the package. */
+    numbered: 'treatment.package.numbered',
+    /** An edit's line: "Uses 1 session of LHR Full Face · B4G7". */
+    uses: 'treatment.package.uses',
   },
   /** The Type switch's name. */
   type: 'treatment.type',
@@ -160,7 +169,7 @@ export const TREATMENT_KEYS = {
     calls: {
       none: 'treatment.aftercare.calls.none',
       next_day: 'treatment.aftercare.calls.next_day',
-      in_2_days: 'treatment.aftercare.calls.in_2_days',
+      in_two_days: 'treatment.aftercare.calls.in_two_days',
       in_week: 'treatment.aftercare.calls.in_week',
     },
     feedback: 'treatment.aftercare.feedback',
@@ -173,7 +182,22 @@ export const TREATMENT_KEYS = {
     edit: 'treatment.save.edit',
     saved: 'treatment.save.saved',
   },
-  delete: { title: 'treatment.delete.title', deleted: 'treatment.delete.deleted' },
+  /** Reverse — in place of the design's delete + Undo: the row stays, the session comes back. */
+  reverse: {
+    title: 'treatment.reverse.title',
+    body: 'treatment.reverse.body',
+    action: 'treatment.reverse.action',
+    done: 'treatment.reverse.done',
+    /** "Reversed" — the row's and the drawer's mark. */
+    status: 'treatment.reverse.status',
+    /** "Reversed 10 Oct · Recorded by mistake". */
+    note: 'treatment.reverse.note',
+    reasons: {
+      mistake: 'treatment.reverse.reasons.mistake',
+      wrongPatient: 'treatment.reverse.reasons.wrongPatient',
+      notDone: 'treatment.reverse.reasons.notDone',
+    },
+  },
 } as const;
 
 /** The drawer's root test id. */

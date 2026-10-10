@@ -8,6 +8,8 @@ import { api } from '@/core/http/api.ts';
 import {
   createContact,
   fetchContact,
+  fetchContactsByIds,
+  findContactByPhone,
   isContactSearchable,
   searchContacts,
   updateContact,
@@ -40,6 +42,7 @@ const contactRow = (patch: Record<string, unknown> = {}) => ({
   referred_by_contact_id: null,
   referred_by_name: null,
   has_marketing_consent: false,
+  patient_number: null,
   ...patch,
 });
 
@@ -90,6 +93,7 @@ describe('fetchContact', () => {
       referredByContactId: null,
       referredByName: null,
       hasMarketingConsent: false,
+      patientNumber: null,
       phones: [
         { phone: '+919879521034', isPrimary: true, isOnWhatsapp: true },
         { phone: '+919879521035', isPrimary: false, isOnWhatsapp: false },
@@ -264,5 +268,50 @@ describe('updateContact', () => {
     });
     expect(saved).toMatchObject({ firstName: 'Anaya K', name: 'Anaya K Desai' });
     expect(saved.phones).toHaveLength(2);
+  });
+});
+
+describe('fetchContactsByIds', () => {
+  it('reads each id once, 100 at most per call, keyed by id with the profile', async () => {
+    const ids = Array.from(
+      { length: 101 },
+      (_, index) => `con_${String(index).padStart(21, 'a')}`,
+    );
+    vi.mocked(api.get)
+      .mockResolvedValueOnce({ data: [contactRow({ id: ids[0] })] } as never)
+      .mockResolvedValueOnce({ data: [contactRow({ id: ids[100] })] } as never);
+
+    const people = await fetchContactsByIds([...ids, ids[0] ?? '']);
+
+    expect(api.get).toHaveBeenCalledTimes(2);
+    expect(api.get).toHaveBeenNthCalledWith(1, '/app/contacts', {
+      query: { ids: ids.slice(0, 100).join(','), limit: 100 },
+    });
+    expect(api.get).toHaveBeenNthCalledWith(2, '/app/contacts', {
+      query: { ids: ids[100], limit: 1 },
+    });
+    expect(people.get(ids[0] ?? '')).toMatchObject({
+      name: 'Anaya Desai',
+      gender: 'female',
+      dateOfBirth: '1994-03-12',
+    });
+    expect(people.size).toBe(2);
+  });
+});
+
+describe('findContactByPhone', () => {
+  it('answers the person on a number, with their file number, or none', async () => {
+    vi.mocked(api.get)
+      .mockResolvedValueOnce({ data: [contactRow({ patient_number: 3508 })] } as never)
+      .mockResolvedValueOnce({ data: [] } as never);
+
+    await expect(findContactByPhone('+919879521034')).resolves.toMatchObject({
+      id: CONTACT_ID,
+      patientNumber: 3508,
+    });
+    expect(api.get).toHaveBeenCalledWith('/app/contacts', {
+      query: { phone: '+919879521034', limit: 1 },
+    });
+    await expect(findContactByPhone('+919800000000')).resolves.toBeNull();
   });
 });

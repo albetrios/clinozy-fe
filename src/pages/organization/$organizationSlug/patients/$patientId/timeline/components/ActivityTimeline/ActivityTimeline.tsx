@@ -1,67 +1,64 @@
+import { useParams } from '@tanstack/react-router';
 import { Fragment, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
+import {
+  organizationPatientPhoto,
+  organizationPatientSection,
+  organizationPrescriptionEdit,
+  organizationReport,
+  organizationTreatmentEdit,
+} from '@/lib/routes/patient-file-builders.ts';
 import { cn } from '@/lib/utils.ts';
 import {
   type CivilDayReading,
   civilDayReading,
 } from '@/shared/api/clinic/clinic-time.ts';
+import type { ContactActivityEntry } from '@/shared/api/clinic/contact-activities-api.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
-import {
-  PersonAvatar,
-  shortPersonName,
-  TonePill,
-} from '@/shared/components/Cells/index.ts';
+import type { PatientFileSectionSlug } from '@/shared/clinic/patient-file-sections.ts';
+import { PersonAvatar, shortPersonName } from '@/shared/components/Cells/index.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
+import { RetryError } from '@/shared/components/RetryError/index.ts';
 import {
   type RoomViewTab,
   RoomViewTabs,
 } from '@/shared/components/RoomToolbar/RoomTabs/index.ts';
+import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
 import {
-  type AppIcon,
-  Calendar,
-  Camera,
-  ClipboardList,
-  MessageSquare,
-  Pill,
-  Receipt,
-  Sparkles,
-  Wallet,
-} from '@/shared/icons/index.ts';
+  useContactActivities,
+  useContactActivityAccess,
+} from '@/shared/hooks/useContactActivities/index.ts';
+import { ClipboardList } from '@/shared/icons/index.ts';
 
-import { PhotoThumb } from '../../../shared/components/PhotoThumb/index.ts';
+import {
+  type StaffChip,
+  useStaffLookup,
+} from '../../../shared/hooks/useStaffLookup/index.ts';
+import { usePatientFileContext } from '../../../shared/patient-file-context.ts';
 import {
   TIMELINE_KEYS,
   TIMELINE_NS,
   TIMELINE_TEST_IDS,
 } from '../../timeline.constants.ts';
 import {
-  ACTIVITY_FILTERS,
-  ACTIVITY_TONES,
-  activityCounts,
-  type ActivityFilter,
-  type ActivityRow,
+  ACTIVITY_VIEW_LOOKS,
+  activityLook,
   activityRows,
-} from './activity-feed.ts';
-import { useActivityFeed } from './use-activity-feed.ts';
+  type ActivityView,
+  activityViewFilter,
+  activityViews,
+  maskedBody,
+} from './activity-timeline.ts';
 
 const K = TIMELINE_KEYS.activity;
 
-/** Each kind's icon (H:4844 `TLI`). */
-const ACTIVITY_ICONS: Readonly<Record<ActivityFilter, AppIcon>> = {
-  all: ClipboardList,
-  visit: Calendar,
-  rx: Pill,
-  treat: Sparkles,
-  inv: Receipt,
-  pay: Wallet,
-  photo: Camera,
-  note: MessageSquare,
-};
-
-/** How many of a day's photos a collapsed row shows (H:4860 `slice(0, 4)`). */
-const PHOTO_THUMBS = 4;
+/** How many entries a page of the timeline reads — "Load more" reads the next. */
+const PAGE_SIZE = 20;
 
 /** The readings whose name is a word or a weekday, so the date follows it. */
 const NAMED_DAYS = new Set<CivilDayReading>([
@@ -73,8 +70,8 @@ const NAMED_DAYS = new Set<CivilDayReading>([
 
 /**
  * A day's header (H:4861), named by the rooms' one time rule: "Today",
- * "Yesterday", "Sat" or "Tomorrow" over the date ("3 Oct"); a week back the
- * date alone ("24 Sep"), a day ahead its date ("7 Oct").
+ * "Yesterday" or "Sat" over the date ("3 Oct"); a week back the date alone
+ * ("24 Sep").
  */
 function useDayHeading(): (day: string) => { main: string; sub: string | null } {
   const clock = useClinicClock();
@@ -85,40 +82,88 @@ function useDayHeading(): (day: string) => { main: string; sub: string | null } 
 }
 
 /**
- * The filter tabs (H:4864) — the room view tabs' track: each kind's icon and
- * count, "All" spelled out, the open one in its tone's ink; each names itself
- * "<kind> · <count>". In-page views of the list: the arrows move, Enter or
- * Space opens.
+ * What a row opens: its record where the file has a route for it (the Rx and treatment
+ * drawers, the photo viewer, the report), else its record's section — each only for a member
+ * who may open it; a note opens Team notes; a task's event or one with no record opens nothing.
+ */
+function useEntryOpen(): (entry: ContactActivityEntry) => (() => void) | null {
+  const navigate = useClinicNavigate();
+  const { organizationSlug = '' } = useParams({ strict: false });
+  const { patientId, viewable } = usePatientFileContext();
+  const record = (section: PatientFileSectionSlug, go: () => Promise<void>) =>
+    viewable.includes(section) ? () => void go() : null;
+  const section = (target: PatientFileSectionSlug) =>
+    record(target, () =>
+      navigate(organizationPatientSection(organizationSlug, patientId, target)),
+    );
+  return (entry) => {
+    if (entry.type === 'note') return section('notes');
+    const { link } = entry;
+    switch (link?.kind) {
+      case 'prescription':
+        return record('prescriptions', () =>
+          navigate(organizationPrescriptionEdit(organizationSlug, patientId, link.id)),
+        );
+      case 'treatment':
+        return record('treatments', () =>
+          navigate(organizationTreatmentEdit(organizationSlug, patientId, link.id)),
+        );
+      case 'image':
+        return record('images', () =>
+          navigate(organizationPatientPhoto(organizationSlug, patientId, link.id)),
+        );
+      case 'report':
+        return record('reports', () =>
+          navigate(organizationReport(organizationSlug, patientId, link.id)),
+        );
+      case 'clinicalNote':
+      case 'checkIn':
+      case 'review':
+        return section('overview');
+      case 'appointment':
+        return section('visits');
+      case 'invoice':
+        return section('invoices');
+      case 'payment':
+        return section('payments');
+      case 'offering':
+        return section('packages');
+      default:
+        return null;
+    }
+  };
+}
+
+/**
+ * The view tabs (H:4864) — the room view tabs' track: each group's icon, "All"
+ * spelled out, the open one in its tone's ink; the server counts no group, so
+ * no tab carries a count (§6 #2). In-page views of the list: the arrows move,
+ * Enter or Space opens.
  */
 function ActivityFilters({
-  counts,
+  views,
   active,
   onSelect,
   controls,
 }: {
-  counts: Readonly<Record<ActivityFilter, number>>;
-  active: ActivityFilter;
-  onSelect: (filter: ActivityFilter) => void;
+  views: readonly ActivityView[];
+  active: ActivityView;
+  onSelect: (view: ActivityView) => void;
   controls?: string;
 }) {
   const { t } = useTranslation(TIMELINE_NS);
-  const kinds = ACTIVITY_FILTERS.filter((kind) => kind === 'all' || counts[kind] > 0);
-  const tabs: RoomViewTab[] = kinds.map((kind) => {
-    const label = t(K.filters[kind]);
+  const tabs: RoomViewTab[] = views.map((view) => {
+    const label = t(K.filters[view]);
+    if (view === 'all') {
+      return { id: view, label, badge: <span>{label}</span>, iconOnly: true };
+    }
+    const look = ACTIVITY_VIEW_LOOKS[view];
     return {
-      id: kind,
-      label: t(K.filterTitle, { label, count: counts[kind] }),
-      // "All" is spelled out; a kind shows its icon. The tab's name says both.
-      icon: kind === 'all' ? undefined : ACTIVITY_ICONS[kind],
+      id: view,
+      label,
+      icon: look.icon,
       iconOnly: true,
-      badge: (
-        <>
-          {kind === 'all' ? <span>{label}</span> : null}
-          <span className="tabular-nums">{counts[kind]}</span>
-        </>
-      ),
-      selectedClassName:
-        kind === 'all' ? undefined : TONE_CLASSES[ACTIVITY_TONES[kind]].ink,
+      selectedClassName: TONE_CLASSES[look.tone].ink,
     };
   });
   return (
@@ -127,8 +172,8 @@ function ActivityFilters({
       tabs={tabs}
       value={active}
       onValueChange={(next) => {
-        const kind = kinds.find((entry) => entry === next);
-        if (kind) onSelect(kind);
+        const view = views.find((entry) => entry === next);
+        if (view) onSelect(view);
       }}
       controls={controls}
       testIds={{ list: TIMELINE_TEST_IDS.filters, tab: TIMELINE_TEST_IDS.filter }}
@@ -138,103 +183,110 @@ function ActivityFilters({
 }
 
 /**
- * One row (H:4856–4863): the kind's tile, the title over its sub line — a
- * day's photos as "3 photos" with their thumbnails — the badge, the time and
- * who; it opens its record.
+ * One row (H:4856–4863): the record's tile, the server's line — a note's text
+ * — its time and who wrote it; it opens its record when the member may.
  */
-function ActivityRowView({ row }: { row: ActivityRow }) {
-  const { t } = useTranslation(TIMELINE_NS);
-  const Icon = ACTIVITY_ICONS[row.kind];
-  const photos = row.kind === 'photo' && row.entries.length > 1;
-  const title = photos ? t(K.photos, { count: row.entries.length }) : row.title;
-  const sub = photos
-    ? [...new Set(row.entries.map((entry) => entry.sub))].join(', ')
-    : row.sub;
-  return (
-    <button
-      type="button"
-      onClick={row.open}
-      data-testid={TIMELINE_TEST_IDS.activityRow}
-      data-kind={row.kind}
-      className="hover:bg-canvas -mx-2 flex min-h-11 items-center gap-2.5 rounded-lg px-2 py-1.5 text-start transition-colors"
-    >
+function ActivityRowView({
+  entry,
+  body,
+  time,
+  by,
+  onOpen,
+}: {
+  entry: ContactActivityEntry;
+  body: string;
+  time: string;
+  by: StaffChip | null;
+  onOpen: (() => void) | null;
+}) {
+  const look = activityLook(entry);
+  const Icon = look.icon;
+  const content = (
+    <>
       <span
         aria-hidden="true"
         className={cn(
           'flex size-7 flex-none items-center justify-center rounded-lg',
-          TONE_CLASSES[ACTIVITY_TONES[row.kind]].surface,
+          TONE_CLASSES[look.tone].surface,
         )}
       >
         <Icon className="size-3.5" />
       </span>
-      <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span
-          className={cn(
-            'text-body truncate',
-            row.kind === 'note' ? 'text-muted-foreground-strong' : 'font-medium',
-          )}
-        >
-          {title}
-        </span>
-        {sub ? (
-          <span className="text-muted-foreground truncate text-xs">{sub}</span>
-        ) : null}
-        {photos ? (
-          <span className="mt-0.5 flex gap-1">
-            {row.entries.slice(0, PHOTO_THUMBS).map((entry) => (
-              <span
-                key={entry.id}
-                className="bg-muted size-8 overflow-hidden rounded-md border"
-              >
-                <PhotoThumb fileUrl={entry.fileUrl ?? ''} fit="cover" />
-              </span>
-            ))}
-          </span>
-        ) : null}
+      <span
+        className={cn(
+          'text-body min-w-0 flex-1 break-words',
+          entry.type === 'note' ? 'text-muted-foreground-strong' : 'font-medium',
+        )}
+      >
+        {body}
       </span>
-      {row.badge ? (
-        <TonePill tone={row.badge.tone} size="sm" className="flex-none">
-          {row.badge.label}
-        </TonePill>
-      ) : null}
-      {row.time ? (
-        <span className="text-muted-foreground flex-none text-xs tabular-nums">
-          {row.time}
+      <span className="text-muted-foreground flex-none text-xs tabular-nums">{time}</span>
+      {by ? (
+        <span title={shortPersonName(by.name)} className="flex-none">
+          <PersonAvatar size="chip" initials={by.initials} tone={by.tone} />
         </span>
       ) : null}
-      {row.by ? (
-        <span title={shortPersonName(row.by.name)} className="flex-none">
-          <PersonAvatar size="chip" initials={row.by.initials} tone={row.by.tone} />
-        </span>
-      ) : null}
+    </>
+  );
+  const shared = {
+    'data-testid': TIMELINE_TEST_IDS.activityRow,
+    'data-kind': entry.link?.kind ?? entry.type,
+  };
+  const className =
+    '-mx-2 flex min-h-11 items-center gap-2.5 rounded-lg px-2 py-1.5 text-start';
+  return onOpen ? (
+    <button
+      type="button"
+      onClick={onOpen}
+      {...shared}
+      className={cn(className, 'hover:bg-canvas transition-colors')}
+    >
+      {content}
     </button>
+  ) : (
+    <div {...shared} className={className}>
+      {content}
+    </div>
   );
 }
 
 /**
- * The Overview's activity timeline (KICKOFF §6.6, D19; H:4840–4864 — a VM
- * with no markup, its layout composed from its fields, AMBER A-F7): a card
- * after the bento — the filter chips with their counts (a chip of none
- * hides), then the patient's records newest first under their days, each
- * opening its record.
+ * The Overview's activity timeline (KICKOFF §6.6, D19; H:4840–4864; §6 #2): a
+ * card after the bento — the person's activity on clinozy-be, not a feed of
+ * its own: the server's record events and the team's notes, newest first under
+ * their days, a page at a time ("Load more"), each opening its record. The
+ * tabs are the stream's own filters — All, Clinical, Billing (billing view
+ * only), Notes. The conversation is the Activity column's. Nothing for a member
+ * who may not read the stream (`contact_activity:read`).
  */
 export function ActivityTimeline() {
-  const { t } = useTranslation(TIMELINE_NS);
+  const { t } = useTranslation([TIMELINE_NS, ERRORS_NS]);
   const titleId = useId();
   const listId = useId();
   const heading = useDayHeading();
-  const { entries, loading } = useActivityFeed();
-  const [filter, setFilter] = useState<ActivityFilter>('all');
-  const counts = activityCounts(entries);
-  // A chip whose records are gone shows everything again.
-  const active = counts[filter] > 0 ? filter : 'all';
-  const rows = activityRows(entries, active);
+  const clock = useClinicClock();
+  const open = useEntryOpen();
+  const staff = useStaffLookup();
+  const { file, viewable, masked } = usePatientFileContext();
+  const { reads } = useContactActivityAccess();
+  const billing = viewable.includes('invoices');
+  const views = activityViews({ billing });
+  const [view, setView] = useState<ActivityView>('all');
+  const active = views.includes(view) ? view : 'all';
+  const stream = useContactActivities(
+    file?.patient.contactId,
+    activityViewFilter(active, { billing }),
+    { limit: PAGE_SIZE, enabled: reads },
+  );
+  if (!reads) return null;
+  const rows = activityRows(stream.entries, clock.dayOf);
 
   return (
     <section
       data-slot="card"
       data-testid={TIMELINE_TEST_IDS.activity}
       aria-labelledby={titleId}
+      aria-busy={stream.isRefreshing || undefined}
       className="bg-card mt-3 flex min-w-0 flex-col gap-3 rounded-xl border p-3.5"
     >
       <div className="flex min-h-7 flex-wrap items-center gap-2">
@@ -252,18 +304,28 @@ export function ActivityTimeline() {
         </h3>
         <span className="flex-1" />
         <ActivityFilters
-          counts={counts}
+          views={views}
           active={active}
-          onSelect={setFilter}
+          onSelect={setView}
           controls={rows.length > 0 ? listId : undefined}
         />
       </div>
+      {stream.isPending && file ? <SkeletonRows rows={3} label={t(K.title)} /> : null}
+      {stream.isError && rows.length === 0 ? (
+        <RetryError
+          message={t(ERRORS_KEYS.frontend.query.loadFailed, { ns: ERRORS_NS })}
+          onRetry={stream.refetch}
+        />
+      ) : null}
       {rows.length > 0 ? (
-        <div id={listId} className="flex flex-col">
+        <div
+          id={listId}
+          className={cn('flex flex-col', stream.isRefreshing && 'opacity-60')}
+        >
           {rows.map((row) => {
             const day = row.newDay ? heading(row.day) : null;
             return (
-              <Fragment key={row.id}>
+              <Fragment key={row.entry.id}>
                 {day ? (
                   <div className="flex items-baseline gap-2 pt-2 pb-1 first:pt-0">
                     <span className="text-xs font-semibold">{day.main}</span>
@@ -272,13 +334,31 @@ export function ActivityTimeline() {
                     ) : null}
                   </div>
                 ) : null}
-                <ActivityRowView row={row} />
+                <ActivityRowView
+                  entry={row.entry}
+                  body={masked ? maskedBody(row.entry.body, t(K.masked)) : row.entry.body}
+                  time={clock.time(row.entry.occurredAt)}
+                  by={staff(row.entry.authorId)}
+                  onOpen={open(row.entry)}
+                />
               </Fragment>
             );
           })}
         </div>
       ) : null}
-      {!loading && entries.length === 0 ? (
+      {stream.hasNextPage ? (
+        <Button
+          type="button"
+          variant="outline"
+          onClick={stream.fetchNextPage}
+          isLoading={stream.isFetchingNextPage}
+          data-testid={TIMELINE_TEST_IDS.activityMore}
+          className="text-body h-9 self-center rounded-lg px-3.5"
+        >
+          {t(K.loadMore)}
+        </Button>
+      ) : null}
+      {stream.isSuccess && rows.length === 0 ? (
         <EmptyState variant="inline" title={t(K.empty)} />
       ) : null}
     </section>

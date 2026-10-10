@@ -6,7 +6,10 @@ import {
   organizationPatientSection,
 } from '@/lib/routes/patient-file-builders.ts';
 import { organizationPatients } from '@/lib/routes/patients-builders.ts';
-import type { PatientNextVisit } from '@/shared/api/clinic/patient-file-contracts.ts';
+import type {
+  PatientFile,
+  PatientNextVisit,
+} from '@/shared/api/clinic/patient-file-contracts.ts';
 import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
 import {
   PATIENT_FILE_DEFAULT_SECTION,
@@ -18,8 +21,30 @@ import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
 import { useOpenVisit, useStartVisit } from '@/shared/hooks/useVisits/index.ts';
 
 import type { RailUpNextActions } from '../../components/PatientRail/index.ts';
+import { useDefaultStaff } from '../../shared/components/PatientStaffPicker/index.ts';
 import { usePatientFileActions } from '../../shared/hooks/usePatientFileActions/index.ts';
 import { usePatientFileContext } from '../../shared/patient-file-context.ts';
+
+/**
+ * Start visit (D18): checks in the patient's booking today, else books a walk-in with their usual
+ * doctor (else the signed-in member), then opens the flow. Undefined — hidden — unless `shown`:
+ * the Overview is the member's, no visit is open and they may move a booking.
+ */
+function useStartVisitAction({
+  file,
+  shown,
+  onStarted,
+}: {
+  file: PatientFile | undefined;
+  shown: boolean;
+  onStarted: () => void;
+}) {
+  const start = useStartVisit();
+  const doctor = useDefaultStaff('doctor', file?.patient.doctorId);
+  if (!(file && shown)) return undefined;
+  const patientId = file.patient.id;
+  return () => start.mutate({ patientId, doctorId: doctor.id }, { onSuccess: onStarted });
+}
 
 /** Where the file's own links go — each hidden (undefined) when the member can't. */
 export interface PatientFileNavigation {
@@ -36,7 +61,7 @@ export interface PatientFileNavigation {
   resumeVisit?: () => void;
   /** The rail's "Edit contact" → `edit/` over this section (A-F1). */
   editContact?: () => void;
-  /** The rail's Up next: Book / Reschedule, Collect, Feedback. */
+  /** The rail's Up next: Book / Reschedule, Feedback. */
   railActions: RailUpNextActions;
   /** A history chip in the Activity column: the appointment or the section. */
   openHistory: (target: ChatHistoryTarget) => void;
@@ -47,19 +72,19 @@ export interface PatientFileNavigation {
 /**
  * The patient file's links (KICKOFF §6.6): its sections, the Patients list,
  * Edit patient over the open section, and the drawers of other rooms —
- * the appointment form (new for this patient, or the next visit to
- * reschedule) and Receive payment — each keeping the file behind it through
- * `from` (§4, AMBER A-P1). Each is left out when access says no.
+ * the appointment form (new for this patient's person, or the next visit to
+ * reschedule) — each keeping the file behind it through `from` (§4, AMBER
+ * A-P1). Each is left out when access says no. Receive payment comes back with
+ * Payments on clinozy-be (D152).
  */
 export function usePatientFileNavigation(): PatientFileNavigation {
   const navigate = useClinicNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
   const search: { visit?: 'open' } = useSearch({ strict: false });
-  const { patientId, section, viewable } = usePatientFileContext();
+  const { patientId, file, section, viewable } = usePatientFileContext();
   const access = useClinicAccess();
   const actions = usePatientFileActions();
   const openVisit = useOpenVisit(patientId).data ?? null;
-  const start = useStartVisit();
   const flowShowing = section === PATIENT_FILE_DEFAULT_SECTION && search.visit === 'open';
   const toFlow = () =>
     void navigate({
@@ -84,7 +109,8 @@ export function usePatientFileNavigation(): PatientFileNavigation {
       clinicCommandNavigation('newAppointment', {
         organizationSlug,
         referrer,
-        search: { who: patientId },
+        // The booking is the person's (`who=` a contact id).
+        search: file ? { who: file.patient.contactId } : {},
       }),
     );
   const editContact = () =>
@@ -92,14 +118,6 @@ export function usePatientFileNavigation(): PatientFileNavigation {
       ...organizationPatientEdit(organizationSlug, patientId),
       search: section ? { from: section } : {},
     });
-  const collect = () =>
-    void navigate(
-      clinicCommandNavigation('newReceipt', {
-        organizationSlug,
-        referrer,
-        search: { patient: patientId },
-      }),
-    );
   const openHistory = (target: ChatHistoryTarget) => {
     if (target.kind === 'patientFile') {
       openSection(target.section);
@@ -111,7 +129,6 @@ export function usePatientFileNavigation(): PatientFileNavigation {
     });
   };
   const canBook = can('appointments', 'create');
-  const startVisit = () => start.mutate({ patientId }, { onSuccess: toFlow });
   const bookOrReschedule = (next: PatientNextVisit | null) =>
     next ? actions.reschedule(next) : book();
 
@@ -119,15 +136,18 @@ export function usePatientFileNavigation(): PatientFileNavigation {
   return {
     openSection,
     backToList: () => void navigate(organizationPatients(organizationSlug)),
-    startVisit:
-      viewable.includes(PATIENT_FILE_DEFAULT_SECTION) && !openVisit
-        ? startVisit
-        : undefined,
+    startVisit: useStartVisitAction({
+      file,
+      shown:
+        viewable.includes(PATIENT_FILE_DEFAULT_SECTION) &&
+        !openVisit &&
+        can('appointments', 'edit'),
+      onStarted: toFlow,
+    }),
     resumeVisit: openVisit && !flowShowing ? toFlow : undefined,
     editContact: can('patients', 'edit') ? editContact : undefined,
     railActions: {
       onBook: canBook ? bookOrReschedule : undefined,
-      onCollect: can('payments', 'create') ? collect : undefined,
       onFeedback: viewable.includes('overview')
         ? () => openSection('overview')
         : undefined,

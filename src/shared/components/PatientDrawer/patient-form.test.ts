@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
-import type { PatientRecord } from '@/shared/api/clinic/patients-contracts.ts';
+import { TEST_BRANCH_ID } from '@/tests/utils/appointment-doubles.ts';
+import { patientRecord } from '@/tests/utils/patient-doubles.ts';
 
 import {
   emptyPatientForm,
@@ -16,8 +17,7 @@ import {
   splitPatientName,
 } from './patient-form.ts';
 
-const BRANCH = '8f6a3e64-6b5c-4a76-9d0e-3f2d1c0b9a87';
-const LEAD = '3f9b0c6e-1d2a-4c5b-8e7f-0a1b2c3d4e5f';
+const BRANCH = TEST_BRANCH_ID;
 
 describe('the patient form', () => {
   it('splits a prefilled name into First and Last', () => {
@@ -60,33 +60,40 @@ describe('the patient form', () => {
   });
 
   it('reads a saved patient back, the follow-up as its clinic-local day and time', () => {
-    const patient = {
+    const patient = patientRecord({
       firstName: 'Dharti',
       lastName: null,
       phone: '+919825044120',
-      phone2: null,
       address: null,
+      status: 'regular',
+      conversion: 'converted',
+      referralSource: 'instagram',
+      followUpAt: clinicInstant('2026-10-05', '14:50'),
+      notes: 'Prefers mornings',
+      consents: ['data', 'marketing'],
+    });
+    expect(patientFormOf(patient)).toMatchObject({
+      firstName: 'Dharti',
+      lastName: '',
+      phone: '9825044120',
+      phone2: '',
+      address: '',
       homeBranchId: BRANCH,
       gender: 'female',
       dateOfBirth: '1995-10-27',
       types: ['aesthetic'],
       status: 'regular',
       conversion: 'converted',
-      referredByName: null,
       referralSource: 'instagram',
-      followUpAt: clinicInstant('2026-10-05', '14:50'),
-      notes: 'Prefers mornings',
-      consents: ['data'],
-    } as unknown as PatientRecord;
-    expect(patientFormOf(patient)).toMatchObject({
-      firstName: 'Dharti',
-      lastName: '',
-      phone: '9825044120',
-      phone2: '',
       followUpDate: '2026-10-05',
       followUpTime: '14:50',
       notes: 'Prefers mornings',
+      consents: ['data', 'marketing'],
     });
+    expect(patientFormOf(patientRecord({ phone2: '+919123456780' })).phone2).toBe(
+      '9123456780',
+    );
+    expect(patientFormOf(patientRecord()).followUpDate).toBeNull();
   });
 
   it('turns the form into the contract’s fields: trimmed, E.164, the follow-up instant', () => {
@@ -100,32 +107,50 @@ describe('the patient form', () => {
         followUpDate: '2026-10-05',
         followUpTime: null,
         notes: ' Allergic to latex ',
+        consents: ['data', 'photos'],
       },
-      { defaultBranchId: BRANCH, leadId: LEAD },
+      { defaultBranchId: BRANCH },
     );
-    expect(input).toMatchObject({
+    expect(input).toEqual({
       firstName: 'Priya',
       lastName: 'Shah',
       phone: '+919876543210',
       phone2: '+919123456780',
       address: null,
       homeBranchId: BRANCH,
+      gender: null,
+      dateOfBirth: null,
       types: ['lhr'],
+      status: 'new',
+      conversion: null,
+      referredByName: null,
+      referralSource: null,
       // Only the day picked: 11:00, the quick chips' hour.
       followUpAt: clinicInstant('2026-10-05', '11:00'),
       notes: 'Allergic to latex',
-      leadId: LEAD,
+      consents: ['data', 'photos'],
     });
   });
 
-  it('leaves the home branch to the server when none is known, and no lead without one', () => {
-    const input = patientInputOf(
+  it('saves the picked home branch over the default, and leaves none to the server', () => {
+    const picked = patientInputOf(
+      {
+        ...emptyPatientForm(),
+        firstName: 'A',
+        phone: '9876543210',
+        homeBranchId: 'brn_other',
+      },
+      { defaultBranchId: BRANCH },
+    );
+    expect(picked.homeBranchId).toBe('brn_other');
+    const unknown = patientInputOf(
       { ...emptyPatientForm(), firstName: 'A', phone: '9876543210' },
       { defaultBranchId: null },
     );
-    expect(input).not.toHaveProperty('homeBranchId');
-    expect(input).not.toHaveProperty('leadId');
-    expect(input.followUpAt).toBeNull();
+    // Without a branch the server names the field (a 422 on `home_branch_id`).
+    expect(unknown.homeBranchId).toBe('');
+    expect(unknown.phone2).toBeNull();
+    expect(unknown.followUpAt).toBeNull();
   });
 
   it('names the empty required fields and the mobiles that are not ten digits', () => {

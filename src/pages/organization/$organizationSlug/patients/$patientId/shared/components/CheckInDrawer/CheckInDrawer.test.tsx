@@ -2,19 +2,28 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
+import type * as AppointmentsApiModule from '@/shared/api/clinic/appointments-api.ts';
+import type * as FeedbackApiModule from '@/shared/api/clinic/feedback-api.ts';
 import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+  createCheckIn,
+  fetchCheckIn,
+  updateCheckIn,
+} from '@/shared/api/clinic/feedback-api.ts';
+import type {
+  CheckInOffering,
+  PatientCheckIn,
+} from '@/shared/api/clinic/feedback-contracts.ts';
+import type * as TreatmentsApiModule from '@/shared/api/clinic/treatments-api.ts';
+import { HttpError } from '@/shared/errors/HttpError.ts';
+import { appointmentRow } from '@/tests/utils/appointment-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { patientFile, TEST_PATIENT_ID } from '@/tests/utils/patient-doubles.ts';
 
 import {
-  patientFileUrl,
-  renderPatientFile,
+  renderInPatientFile,
   resetPatientFile,
 } from '../../../__tests__/integration/patient-file-test-router.tsx';
+import { CheckInDrawer, type CheckInDrawerProps } from './CheckInDrawer.tsx';
 
 const { notifyMock } = vi.hoisted(() => ({
   notifyMock: {
@@ -28,36 +37,108 @@ const { notifyMock } = vi.hoisted(() => ({
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 
-const DHARTI = patientRef('Dharti Galani');
-const LHR = ref.treatment(498);
-const BACK_PEELING = ref.offering(271);
 const D = 'check-in-drawer';
-const url = (rest: string) => patientFileUrl(DHARTI, rest);
-const checkInsOf = () =>
-  clinicFixtures.checkIns.snapshot((row) => row.patientId === DHARTI);
+const TODAY = '2026-10-10';
+const LHR = 'trt_lhr000000000000000000';
+const VISIT = 'appt_visit00000000000000';
+const HYDRAFACIAL = 'off_hydra0000000000000000';
 
-async function open(path: string, role: 'admin' | 'doctor' | 'therapist' = 'doctor') {
-  const user = userEvent.setup();
-  const view = renderPatientFile(url(path), { role });
-  const drawer = await screen.findByTestId(D);
-  return { ...view, user, drawer };
+/** A check-in as the file reads it — the visit before, Better at 7. */
+function checkIn(overrides: Partial<PatientCheckIn> = {}): PatientCheckIn {
+  return {
+    id: 'chk_before000000000000000',
+    patientId: TEST_PATIENT_ID,
+    appointmentId: null,
+    treatmentId: null,
+    context: 'Visit · 24 Sep',
+    feel: 'better',
+    score: 7,
+    scoreChange: null,
+    followed: 'mostly',
+    followedNote: null,
+    currentState: 'Mild redness settled, skin feels smoother',
+    nextPlan: 'Sunscreen every day',
+    nextOfferingIds: [],
+    date: '2026-09-24',
+    needsAction: false,
+    actions: [],
+    createdAt: '2026-09-24T05:00:00.000Z',
+    updatedAt: '2026-09-24T05:00:00.000Z',
+    ...overrides,
+  };
 }
 
-beforeEach(() => {
+const offering = (overrides: Partial<CheckInOffering>): CheckInOffering => ({
+  id: HYDRAFACIAL,
+  name: 'Hydrafacial',
+  category: 'treatment',
+  tone: 'sky',
+  price: 3500,
+  sessions: 1,
+  searchTerms: [],
+  isActive: true,
+  ...overrides,
+});
+
+vi.mock('@/shared/api/clinic/feedback-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof FeedbackApiModule>()),
+  fetchPreviousCheckIn: vi.fn(),
+  listCheckInOfferings: vi.fn(),
+  fetchCheckIn: vi.fn(),
+  createCheckIn: vi.fn(),
+  updateCheckIn: vi.fn(),
+}));
+vi.mock('@/shared/api/clinic/treatments-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof TreatmentsApiModule>()),
+  fetchTreatment: vi.fn(async () => ({ id: LHR, name: 'LHR Full Face' })),
+}));
+vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof AppointmentsApiModule>()),
+  fetchAppointment: vi.fn(async () =>
+    appointmentRow({ id: VISIT, serviceLabel: 'Peel' }),
+  ),
+}));
+
+async function open(props: Partial<CheckInDrawerProps> = {}) {
+  const onClose = vi.fn();
+  const user = userEvent.setup();
+  const view = renderInPatientFile(
+    <CheckInDrawer
+      patientId={TEST_PATIENT_ID}
+      patientName="Priya Shah"
+      checkIn={null}
+      appointmentId={null}
+      treatmentId={null}
+      today={TODAY}
+      onClose={onClose}
+      {...props}
+    />,
+    { file: patientFile(), section: 'overview' },
+  );
+  const drawer = await screen.findByTestId(D);
+  return { ...view, user, drawer, onClose };
+}
+
+beforeEach(async () => {
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetClinicFixtures();
+  const api = await import('@/shared/api/clinic/feedback-api.ts');
+  vi.mocked(api.fetchPreviousCheckIn).mockResolvedValue(checkIn());
+  vi.mocked(api.listCheckInOfferings).mockResolvedValue([
+    offering({}),
+    offering({ id: 'off_old', name: 'Old peel', isActive: false }),
+  ]);
 });
 afterEach(() => {
   resetPatientFile();
-  resetClinicFixtures();
+  vi.resetAllMocks();
 });
 
 describe('Visit / Aftercare check-in (KICKOFF §6.6; S:44–45)', () => {
-  it('opens a visit check-in over Clinical notes with its three steps', async () => {
-    const { drawer, baseElement } = await open('/check-ins/create');
+  it('opens a visit check-in with its three steps, headed by the last check-in', async () => {
+    const { drawer, baseElement } = await open();
     expect(within(drawer).getByTestId(`${D}-title`)).toHaveTextContent('Visit check-in');
     await waitFor(() => expect(drawer).toHaveTextContent(/last check-in .+: Better/));
-    expect(drawer).toHaveTextContent('Dharti Galani');
+    expect(drawer).toHaveTextContent('Priya Shah');
     for (const step of ['How is it now', 'What they followed', 'Next plan of action']) {
       expect(drawer).toHaveTextContent(step);
     }
@@ -66,36 +147,45 @@ describe('Visit / Aftercare check-in (KICKOFF §6.6; S:44–45)', () => {
       'Last time: Mild redness settled, skin feels smoother',
     );
     expect(within(drawer).getByTestId(`${D}-save`)).toHaveTextContent('Save check-in');
-    expect(screen.getByTestId('patient-section-overview')).toBeInTheDocument();
     expect(await axeForDialog(baseElement)).toHaveNoViolations();
   });
 
-  it('is an aftercare check-in over the section it came from when it follows a treatment', async () => {
-    const { drawer } = await open(`/check-ins/create?treatment=${LHR}&from=treatments`);
+  it('is an aftercare check-in named after the session it follows', async () => {
+    const { drawer } = await open({ treatmentId: LHR });
     expect(within(drawer).getByTestId(`${D}-title`)).toHaveTextContent(
       'Aftercare check-in',
     );
     await waitFor(() => expect(drawer).toHaveTextContent('LHR Full Face'));
-    expect(screen.getByTestId('patient-section-treatments')).toBeInTheDocument();
   });
 
-  it('asks how it is now before it saves', async () => {
-    const { user, drawer } = await open('/check-ins/create');
-    const before = checkInsOf().length;
+  it('names the visit’s service when a booking opened it', async () => {
+    const { drawer } = await open({ appointmentId: VISIT });
+    await waitFor(() => expect(drawer).toHaveTextContent('Peel'));
+  });
+
+  it('asks how it is now, then the score (Q18), before it saves', async () => {
+    const { user, drawer } = await open();
     await user.click(within(drawer).getByTestId(`${D}-save`));
     expect(notifyMock.warning).toHaveBeenCalledWith('Pick how it is now');
-    expect(checkInsOf()).toHaveLength(before);
+    await user.click(within(drawer).getByTestId(`${D}-feel-same`));
+    await user.click(within(drawer).getByTestId(`${D}-save`));
+    expect(notifyMock.warning).toHaveBeenCalledTimes(2);
+    expect(notifyMock.warning).not.toHaveBeenLastCalledWith('Pick how it is now');
+    expect(createCheckIn).not.toHaveBeenCalled();
   });
 
-  it('saves a bad check-in with an offering — the suggestion and the doctor call-back follow', async () => {
-    const { user, drawer, router } = await open('/check-ins/create');
-    await user.click(within(drawer).getByTestId(`${D}-feel-worse`));
-    await user.click(within(drawer).getByTestId(`${D}-score-3`));
-    await user.click(within(drawer).getByTestId(`${D}-score-3`));
-    expect(within(drawer).getByTestId(`${D}-score-3`)).toHaveAttribute(
-      'aria-pressed',
-      'false',
+  it('saves a bad check-in with an offering — the toast reads what the server did', async () => {
+    vi.mocked(createCheckIn).mockResolvedValue(
+      checkIn({
+        id: 'chk_new',
+        feel: 'worse',
+        score: 3,
+        nextOfferingIds: [HYDRAFACIAL],
+        needsAction: true,
+      }),
     );
+    const { user, drawer, onClose } = await open({ appointmentId: VISIT });
+    await user.click(within(drawer).getByTestId(`${D}-feel-worse`));
     await user.click(within(drawer).getByTestId(`${D}-score-3`));
     await user.type(within(drawer).getByTestId(`${D}-now`), 'Itching again');
     await user.click(within(drawer).getByTestId(`${D}-step-followed-trigger`));
@@ -103,61 +193,114 @@ describe('Visit / Aftercare check-in (KICKOFF §6.6; S:44–45)', () => {
     await user.click(within(drawer).getByTestId(`${D}-step-next-trigger`));
     await user.type(within(drawer).getByTestId(`${D}-plan`), 'Review in a week');
     await user.click(within(drawer).getByTestId(`${D}-offerings`));
-    await user.click(await screen.findByTestId(`${D}-offerings-option-${BACK_PEELING}`));
+    // Only the active offerings are offered.
+    expect(screen.queryByTestId(`${D}-offerings-option-off_old`)).not.toBeInTheDocument();
+    await user.click(await screen.findByTestId(`${D}-offerings-option-${HYDRAFACIAL}`));
     await user.keyboard('{Escape}');
     await user.click(within(drawer).getByTestId(`${D}-save`));
     await waitFor(() =>
       expect(notifyMock.success).toHaveBeenCalledWith(
-        'Check-in saved for Dharti Galani · 1 added to suggestions · doctor call-back task created',
+        'Check-in saved for Priya Shah · 1 added to suggestions · doctor call-back task created',
       ),
     );
-    await waitFor(() => expect(router.state.location.pathname).toBe(url('/overview')));
-    expect(checkInsOf().find((row) => row.now === 'Itching again')).toMatchObject({
-      feel: 'worse',
-      score: 3,
-      followed: 'partly',
-      nextPlan: 'Review in a week',
-      nextOfferingIds: [BACK_PEELING],
-      context: 'Visit check-in',
-      treatmentId: null,
+    expect(createCheckIn).toHaveBeenCalledWith({
+      patientId: TEST_PATIENT_ID,
+      input: {
+        feel: 'worse',
+        score: 3,
+        currentState: 'Itching again',
+        followed: 'partly',
+        followedNote: null,
+        nextPlan: 'Review in a week',
+        appointmentId: VISIT,
+        treatmentId: null,
+        date: TODAY,
+        nextOfferingIds: [HYDRAFACIAL],
+      },
+      idempotencyKey: expect.any(String),
     });
+    expect(onClose).toHaveBeenCalled();
   });
 
-  it('opens a saved one prefilled and saves its changes — “Check-in updated”', async () => {
-    const [saved] = checkInsOf();
-    if (!saved) throw new Error('Dharti has no check-in');
-    const { user, drawer } = await open(`/check-ins/${saved.id}/edit`);
-    expect(within(drawer).getByTestId(`${D}-feel-${saved.feel}`)).toHaveAttribute(
+  it('puts the server’s field error on the field and opens its step', async () => {
+    vi.mocked(createCheckIn).mockRejectedValue(
+      new HttpError('Bad request', 400, '/app/patients/x/check-ins', 'POST', {
+        error: {
+          type: 'validation_error',
+          errors: [{ field: 'body.next_plan', message: 'Too long' }],
+        },
+      }),
+    );
+    const { user, drawer } = await open();
+    await user.click(within(drawer).getByTestId(`${D}-feel-better`));
+    await user.click(within(drawer).getByTestId(`${D}-score-8`));
+    await user.click(within(drawer).getByTestId(`${D}-save`));
+    await waitFor(() => expect(notifyMock.error).toHaveBeenCalledWith('Too long'));
+    expect(within(drawer).getByTestId(`${D}-step-next`)).toHaveAttribute(
+      'data-status',
+      'open',
+    );
+    expect(within(drawer).getByTestId(`${D}-plan`)).toHaveAttribute(
+      'aria-invalid',
+      'true',
+    );
+  });
+
+  it('opens a saved one prefilled — its offerings named, not picked — and saves the changes', async () => {
+    const saved = checkIn({ id: 'chk_saved', nextOfferingIds: [HYDRAFACIAL] });
+    vi.mocked(updateCheckIn).mockResolvedValue(saved);
+    const { user, drawer } = await open({ checkIn: saved });
+    expect(within(drawer).getByTestId(`${D}-feel-better`)).toHaveAttribute(
       'aria-pressed',
       'true',
     );
     expect(within(drawer).getByTestId(`${D}-save`)).toHaveTextContent('Save changes');
+    await user.click(within(drawer).getByTestId(`${D}-step-next-trigger`));
+    expect(await within(drawer).findByTestId(`${D}-offerings-planned`)).toHaveTextContent(
+      'Hydrafacial',
+    );
+    expect(within(drawer).queryByTestId(`${D}-offerings`)).not.toBeInTheDocument();
+    await user.click(within(drawer).getByTestId(`${D}-step-now-trigger`));
     await user.click(within(drawer).getByTestId(`${D}-feel-much_better`));
     await user.click(within(drawer).getByTestId(`${D}-save`));
     await waitFor(() =>
       expect(notifyMock.success).toHaveBeenCalledWith('Check-in updated'),
     );
-    expect(
-      clinicFixtures.checkIns.snapshot((row) => row.id === saved.id)[0],
-    ).toMatchObject({ feel: 'much_better', context: saved.context, date: saved.date });
-  });
-
-  it('goes back with a toast when the check-in is gone', async () => {
-    const { router } = renderPatientFile(url(`/check-ins/${ref.treatment(1)}/edit`));
-    await waitFor(() => expect(router.state.location.pathname).toBe(url('/overview')));
-    expect(notifyMock.info).toHaveBeenCalledWith(
-      'Check-in not found · it may have been deleted',
+    expect(updateCheckIn).toHaveBeenCalledWith(
+      expect.objectContaining({
+        patientId: TEST_PATIENT_ID,
+        checkInId: 'chk_saved',
+        expectedUpdatedAt: saved.updatedAt,
+        fields: expect.objectContaining({ feel: 'much_better', score: 7 }),
+      }),
     );
   });
 
-  it('turns a member who cannot edit patients back (S:44)', async () => {
-    const { router } = renderPatientFile(url('/check-ins/create?from=visits'), {
-      role: 'therapist',
-    });
-    await waitFor(() => expect(router.state.location.pathname).toBe(url('/visits')));
-    expect(notifyMock.info).toHaveBeenCalledWith(
-      'You do not have permission to perform this action.',
+  it('reloads a check-in someone saved meanwhile (`409 record_changed`)', async () => {
+    const saved = checkIn({ id: 'chk_saved' });
+    vi.mocked(updateCheckIn).mockRejectedValue(
+      new HttpError('Conflict', 409, '/app/patients/x/check-ins/y', 'PATCH', {
+        error: { reason: 'record_changed', detail: 'This record was changed' },
+      }),
     );
-    expect(screen.queryByTestId(D)).not.toBeInTheDocument();
+    vi.mocked(fetchCheckIn).mockResolvedValue(
+      checkIn({ id: 'chk_saved', feel: 'worse', updatedAt: '2026-10-10T09:00:00.000Z' }),
+    );
+    const { user, drawer } = await open({ checkIn: saved });
+    await user.click(within(drawer).getByTestId(`${D}-feel-same`));
+    await user.click(within(drawer).getByTestId(`${D}-save`));
+    await waitFor(() => expect(notifyMock.error).toHaveBeenCalled());
+    const [, options] = notifyMock.error.mock.calls[0] as [
+      string,
+      { action: { onClick: () => void } },
+    ];
+    options.action.onClick();
+    await waitFor(() =>
+      expect(within(drawer).getByTestId(`${D}-feel-worse`)).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      ),
+    );
+    expect(fetchCheckIn).toHaveBeenCalledWith(TEST_PATIENT_ID, 'chk_saved');
   });
 });

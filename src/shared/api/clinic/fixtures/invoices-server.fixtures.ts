@@ -48,7 +48,7 @@ import {
 } from '@/shared/api/clinic/medicine-stock.ts';
 import { effectivePrice } from '@/shared/api/clinic/offerings-pricing.ts';
 import { isLeadNotPatient } from '@/shared/api/clinic/patient-search-api.ts';
-import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
+import { patientName } from '@/shared/api/clinic/patients-fixture-contracts.ts';
 import { newLedgerEntry } from '@/shared/api/clinic/payments-api.ts';
 import type { TaskRecord } from '@/shared/api/clinic/tasks-contracts.ts';
 

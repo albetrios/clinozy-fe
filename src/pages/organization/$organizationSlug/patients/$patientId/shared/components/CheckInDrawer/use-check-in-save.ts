@@ -1,17 +1,12 @@
 import type { FieldPath, UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import type { CheckIn } from '@/shared/api/clinic/clinic-schema.ts';
-import type { CheckInSaved } from '@/shared/api/clinic/feedback-contracts.ts';
+import type { PatientCheckIn } from '@/shared/api/clinic/feedback-contracts.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useCreateCheckIn, useUpdateCheckIn } from '@/shared/hooks/useFeedback/index.ts';
 
 import { CHECK_IN_KEYS, CHECK_IN_NS } from './check-in.constants.ts';
-import {
-  type CheckInFormValues,
-  checkInInputOf,
-  type CheckInPlace,
-} from './check-in-form.ts';
+import { checkInFieldsOf, type CheckInFormValues } from './check-in-form.ts';
 
 /** The drawer's steps, as the save opens them. */
 export type CheckInStepId = 'now' | 'followed' | 'next';
@@ -20,50 +15,66 @@ export type CheckInStepId = 'now' | 'followed' | 'next';
 const FIELD_STEPS: readonly [FieldPath<CheckInFormValues>, CheckInStepId][] = [
   ['feel', 'now'],
   ['score', 'now'],
-  ['now', 'now'],
+  ['currentState', 'now'],
   ['followed', 'followed'],
   ['followedNote', 'followed'],
   ['nextPlan', 'next'],
   ['nextOfferingIds', 'next'],
 ];
 
+/** Where a new check-in sits: the patient, the visit and the treatment it follows, its day. */
+interface CheckInPlace {
+  patientId: string;
+  appointmentId: string | null;
+  treatmentId: string | null;
+  date: string;
+}
+
 /** Options of {@link useCheckInSave}. */
 export interface UseCheckInSaveOptions {
   form: UseFormReturn<CheckInFormValues>;
-  /** The check-in an Edit opens; null for a new one. */
-  checkIn: CheckIn | null;
-  /** Where it sits — read at save time, once the drawer knows the treatment and the visit. */
-  place: () => CheckInPlace;
+  /** The check-in an Edit opens, as last read; null for a new one. */
+  checkIn: PatientCheckIn | null;
+  place: CheckInPlace;
   onStep: (step: CheckInStepId) => void;
-  onDone: (saved: CheckInSaved) => void;
+  /** Someone saved it since the drawer read it (`409 record_changed`): read it again. */
+  onStale?: () => void;
+  onDone: (saved: PatientCheckIn) => void;
 }
 
 /**
  * The check-in's write on the shared drawer save (KICKOFF §6.6): no feel →
- * "Pick how it is now" and the first step opens; else `createCheckIn` or
- * `updateCheckIn` (`S:1648`) — the server adds the named offerings to the
- * suggestions as Planned and, for Worse or a score of 4 or less, a doctor
- * call-back due in 3 hours.
+ * "Pick how it is now", no score → "Pick the patient’s score" (Q18), and the
+ * first step opens; else `POST …/check-ins` or a stale-checked `PATCH`. The
+ * server plans the named offerings and, for Worse or a score of 4 or less,
+ * opens the doctor call-back; its field errors land on the fields.
  */
 export function useCheckInSave({
   form,
   checkIn,
   place,
   onStep,
+  onStale,
   onDone,
 }: UseCheckInSaveOptions) {
   const { t } = useTranslation(CHECK_IN_NS);
   const create = useCreateCheckIn({ notifyOnError: false });
   const update = useUpdateCheckIn({ notifyOnError: false });
 
-  return useDrawerSave<CheckInFormValues, CheckInSaved>({
+  return useDrawerSave<CheckInFormValues, PatientCheckIn>({
     form,
     fieldOrder: FIELD_STEPS.map(([field]) => field),
     toastId: 'check-in-save-failed',
-    check: (values) =>
-      values.feel === null
-        ? { fields: ['feel'], message: t(CHECK_IN_KEYS.noFeel) }
-        : null,
+    check: (values) => {
+      if (values.feel === null) {
+        return { fields: ['feel'], message: t(CHECK_IN_KEYS.noFeel) };
+      }
+      if (values.score < 1) {
+        return { fields: ['score'], message: t(CHECK_IN_KEYS.noScore) };
+      }
+      return null;
+    },
+    onStale,
     onField: (field) =>
       onStep(
         FIELD_STEPS.find(
@@ -71,10 +82,20 @@ export function useCheckInSave({
         )?.[1] ?? 'now',
       ),
     write: () => {
-      const input = checkInInputOf(form.getValues(), place());
+      const values = form.getValues();
+      const fields = checkInFieldsOf(values);
       return checkIn
-        ? update.mutateAsync({ id: checkIn.id, input })
-        : create.mutateAsync(input);
+        ? update.mutateAsync({ checkIn, fields })
+        : create.mutateAsync({
+            patientId: place.patientId,
+            input: {
+              ...fields,
+              appointmentId: place.appointmentId,
+              treatmentId: place.treatmentId,
+              date: place.date,
+              nextOfferingIds: values.nextOfferingIds,
+            },
+          });
     },
     onDone,
   });

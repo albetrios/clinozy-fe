@@ -23,7 +23,7 @@ import type {
   OftenBilledKind,
   SaleContact,
 } from '@/shared/api/clinic/invoices-contracts.ts';
-import { planQueryKeys } from '@/shared/api/clinic/plan-api.ts';
+import { fixturePlanQueryKeys as planQueryKeys } from '@/shared/api/clinic/plan-fixture-api.ts';
 import { taskQueryKeys } from '@/shared/api/clinic/tasks-api.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';

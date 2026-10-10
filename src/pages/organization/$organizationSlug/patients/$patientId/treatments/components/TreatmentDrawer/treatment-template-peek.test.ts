@@ -24,7 +24,12 @@ describe('treatmentDetailsView (H:3832–3840)', () => {
     const view = treatmentDetailsView(
       form('skin', {
         areas: ['face', 'chin', 'unknown'],
-        params: { type: 'Laser', skinType: 'Type IV', wavelength: '810', machine: ' ' },
+        parameters: {
+          type: 'Laser',
+          skinType: 'Type IV',
+          wavelength: '810',
+          machine: ' ',
+        },
       }),
       t,
       formatDay,
@@ -58,7 +63,7 @@ describe('treatmentDetailsView (H:3832–3840)', () => {
 
   it('keeps a stored value the chips no longer list', () => {
     const view = treatmentDetailsView(
-      form('skin', { params: { type: 'Cryo' } }),
+      form('skin', { parameters: { type: 'Cryo' } }),
       t,
       formatDay,
     );
@@ -68,7 +73,7 @@ describe('treatmentDetailsView (H:3832–3840)', () => {
   it('peeks Dental: the procedure, the teeth and the anaesthesia', () => {
     const given = treatmentDetailsView(
       form('dental', {
-        params: {
+        parameters: {
           procedure: 'RCT',
           teeth: '1811',
           anaesthesia: 'Given',
@@ -90,7 +95,10 @@ describe('treatmentDetailsView (H:3832–3840)', () => {
 
   it('peeks Physio and Gynac with their units and dates', () => {
     const physio = treatmentDetailsView(
-      form('physio', { areas: ['back'], params: { modality: 'TENS', painBefore: '7' } }),
+      form('physio', {
+        areas: ['back'],
+        parameters: { modality: 'TENS', painBefore: '7' },
+      }),
       t,
       formatDay,
     );
@@ -101,7 +109,7 @@ describe('treatmentDetailsView (H:3832–3840)', () => {
     ]);
     const gynac = treatmentDetailsView(
       form('gynac', {
-        params: {
+        parameters: {
           visitType: 'ANC',
           lmp: '2026-07-01',
           gestationWeeks: '12',
@@ -120,7 +128,7 @@ describe('treatmentDetailsView (H:3832–3840)', () => {
 
   it('peeks General: the area and the parameters', () => {
     const view = treatmentDetailsView(
-      form('general', { params: { area: 'Scalp', parameters: 'Dose: 2 ml' } }),
+      form('general', { parameters: { area: 'Scalp', parameters: 'Dose: 2 ml' } }),
       t,
       formatDay,
     );

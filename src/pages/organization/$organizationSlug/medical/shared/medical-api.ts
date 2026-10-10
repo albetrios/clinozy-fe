@@ -25,7 +25,7 @@ import { civilDayOffset, clinicToday } from '@/shared/api/clinic/clinic-time.ts'
 import { cheapestRate } from '@/shared/api/clinic/medicine-stock.ts';
 import { MEDICAL_ROOM_QUERY_KEY } from '@/shared/api/clinic/medicines-api.ts';
 import type { MedicineMaker } from '@/shared/api/clinic/medicines-contracts.ts';
-import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
+import { patientName } from '@/shared/api/clinic/patients-fixture-contracts.ts';
 
 import {
   type ManufacturerListParams,

@@ -91,6 +91,7 @@ const contactFieldsWire = {
   referred_by_contact_id: z.string().nullable(),
   referred_by_name: z.string().nullable(),
   has_marketing_consent: z.boolean(),
+  patient_number: z.number().int().nullable(),
 };
 
 /** One contact (`GET /app/contacts/:contact_id`) — with every number. */
@@ -151,6 +152,8 @@ export interface ContactProfile {
   /** Who referred them, as typed. */
   referredByName: string | null;
   hasMarketingConsent: boolean;
+  /** Their patient file's number ("#3508"), once they have one. */
+  patientNumber: number | null;
 }
 
 /** A person with every number — the contact editor's record. */
@@ -198,6 +201,7 @@ export function toContactProfile(row: z.output<typeof contactRowWire>): ContactP
     referredByContactId: row.referred_by_contact_id,
     referredByName: row.referred_by_name,
     hasMarketingConsent: row.has_marketing_consent,
+    patientNumber: row.patient_number,
   };
 }
 

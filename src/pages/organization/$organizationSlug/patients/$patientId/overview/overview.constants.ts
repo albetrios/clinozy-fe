@@ -24,6 +24,8 @@ export const CLINICAL_KEYS = {
   add: 'clinical.add',
   /** "Remove Tanning on face". */
   remove: 'clinical.remove',
+  /** "Tanning on face removed" — its toast, with Undo (Q24). */
+  removed: 'clinical.removed',
 } as const satisfies Record<string, unknown>;
 
 /** The Feedback card's copy (`patient-file.md:52–56`; KICKOFF §6.6 Feedback), verbatim. */

@@ -2,6 +2,8 @@ import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { patientFile, TEST_PATIENT_ID } from '@/tests/utils/patient-doubles.ts';
+
 import {
   patientFileUrl,
   renderInPatientFile,
@@ -31,10 +33,10 @@ function Probe({ canOpen }: { canOpen?: boolean }) {
   );
 }
 
-/** The probe at `…/patients/patient/<path>`. */
+/** The probe at `…/patients/<Priya>/<path>`. */
 async function openAt(path: string, canOpen?: boolean) {
-  const view = renderInPatientFile(<Probe canOpen={canOpen} />);
-  await act(() => view.router.navigate({ href: patientFileUrl('patient', path) }));
+  const view = renderInPatientFile(<Probe canOpen={canOpen} />, { file: patientFile() });
+  await act(() => view.router.navigate({ href: patientFileUrl(TEST_PATIENT_ID, path) }));
   return view;
 }
 
@@ -52,7 +54,7 @@ describe('usePatientFileDialog (S:34, 44–47; A-F1)', () => {
     await user.click(back);
     await waitFor(() =>
       expect(router.state.location.pathname).toBe(
-        patientFileUrl('patient', '/prescriptions'),
+        patientFileUrl(TEST_PATIENT_ID, '/prescriptions'),
       ),
     );
     expect(router.history).toHaveLength(entries);
@@ -66,7 +68,9 @@ describe('usePatientFileDialog (S:34, 44–47; A-F1)', () => {
   it('turns a member who may not open it back, with the permission toast', async () => {
     const { router } = await openAt('/reviews/create?from=visits', false);
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe(patientFileUrl('patient', '/visits')),
+      expect(router.state.location.pathname).toBe(
+        patientFileUrl(TEST_PATIENT_ID, '/visits'),
+      ),
     );
     expect(notifyMock.info).toHaveBeenCalledWith(
       'You do not have permission to perform this action.',

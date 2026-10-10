@@ -5,8 +5,6 @@
   "views": {
     "label": "患者ビュー",
     "all": "すべて",
-    "today": "本日来院中",
-    "dues": "未収金あり",
     "follow": "フォローアップ期限",
     "recall": "リコール"
   },
@@ -26,7 +24,6 @@
     "conversion": "コンバージョン",
     "age": "年齢",
     "followUp": "フォローアップ",
-    "due": "未収",
     "updated": "更新"
   },
   "table": {
@@ -34,8 +31,6 @@
     "age_other": "{{count}}歳"
   },
   "rowActions": {
-    "newInvoice": "新規請求書",
-    "collect": "{{amount}} を回収",
     "edit": "編集",
     "delete": "削除"
   },

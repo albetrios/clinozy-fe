@@ -2,6 +2,8 @@ import { renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { patientFile, TEST_PATIENT_ID } from '@/tests/utils/patient-doubles.ts';
+
 import {
   PatientFileContext,
   type PatientFileContextValue,
@@ -11,8 +13,8 @@ import {
 describe('usePatientFileContext', () => {
   it('hands a part of the file what the layout provides', () => {
     const value: PatientFileContextValue = {
-      patientId: 'p1',
-      file: undefined,
+      patientId: TEST_PATIENT_ID,
+      file: patientFile(),
       section: 'visits',
       viewable: ['visits'],
       masked: true,

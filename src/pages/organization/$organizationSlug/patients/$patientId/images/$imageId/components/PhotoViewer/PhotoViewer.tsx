@@ -1,9 +1,12 @@
 import { Dialog as DialogPrimitive } from 'radix-ui';
-import { type CSSProperties, type KeyboardEvent, type ReactNode, useRef } from 'react';
+import { type KeyboardEvent, type ReactNode, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import { type PatientPhoto, photoName } from '@/shared/api/clinic/patient-images-api.ts';
+import {
+  type PatientPhoto,
+  photoName,
+} from '@/shared/api/clinic/patient-images-contracts.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import {
   ChevronLeft,
@@ -19,7 +22,6 @@ import {
   PATIENT_PHOTOS_KEYS,
   PATIENT_PHOTOS_NS,
 } from '../../../../shared/patient-photos.constants.ts';
-import { usePhotoZoom } from '../../hooks/usePhotoZoom/index.ts';
 import { PHOTO_VIEWER_TEST_IDS } from './photo-viewer.constants.ts';
 
 const K = PATIENT_PHOTOS_KEYS.viewer;
@@ -27,17 +29,20 @@ const K = PATIENT_PHOTOS_KEYS.viewer;
 /** Props of {@link PhotoViewer}. */
 export interface PhotoViewerProps {
   photo: PatientPhoto;
-  /** Its place in the album under the filter, from 0, and how many there are. */
-  index: number;
+  /**
+   * Its place among the album's photos under the filter, from 0, and how many the server
+   * counts; no index when it is not among the photos read (no "2 of 6", no ‹ ›).
+   */
+  index: number | null;
   total: number;
-  /** "Face · 24 Sep · General". */
+  /** "Face · Before · 24 Sep · General". */
   meta: string;
-  /** The previous (−1) or next (1) photo, wrapping. */
+  /** The previous (−1) or next (1) photo. */
   onStep: (step: 1 | -1) => void;
   onClose: () => void;
-  /** Photo details — hidden without Patients edit. */
+  /** Photo details — hidden without `patient:update`. */
   onEdit?: () => void;
-  /** Delete — hidden without Patients delete. */
+  /** Delete — hidden without `patient:update`. */
   onDelete?: () => void;
 }
 
@@ -78,68 +83,17 @@ function RoundButton({
   );
 }
 
-/** The bar's zoom group: − · the level (it resets) · + (H:2683). Hidden on a phone. */
-function ZoomGroup({
-  level,
-  onZoomIn,
-  onZoomOut,
-  onReset,
-}: {
-  level: number;
-  onZoomIn: () => void;
-  onZoomOut: () => void;
-  onReset: () => void;
-}) {
-  const { t } = useTranslation(PATIENT_PHOTOS_NS);
-  const { formatNumber } = useLocaleFormat();
-  return (
-    <fieldset
-      aria-label={t(K.zoom)}
-      className="border-canvas/20 m-0 flex h-9.5 min-w-0 flex-none items-center overflow-hidden rounded-lg border p-0 max-md:hidden"
-    >
-      <button
-        type="button"
-        onClick={onZoomOut}
-        aria-label={t(K.zoomOut)}
-        title={t(K.zoomOutHint)}
-        data-testid={PHOTO_VIEWER_TEST_IDS.zoomOut}
-        className="hover:bg-canvas/10 h-full w-9 text-base"
-      >
-        −
-      </button>
-      <button
-        type="button"
-        onClick={onReset}
-        title={t(K.zoomReset)}
-        data-testid={PHOTO_VIEWER_TEST_IDS.zoomReset}
-        className="border-canvas/20 hover:bg-canvas/10 h-full min-w-14 border-x px-2 text-xs font-semibold tabular-nums"
-      >
-        {formatNumber(level, { style: 'percent', maximumFractionDigits: 0 })}
-      </button>
-      <button
-        type="button"
-        onClick={onZoomIn}
-        aria-label={t(K.zoomIn)}
-        title={t(K.zoomInHint)}
-        data-testid={PHOTO_VIEWER_TEST_IDS.zoomIn}
-        className="hover:bg-canvas/10 h-full w-9 text-base"
-      >
-        +
-      </button>
-    </fieldset>
-  );
-}
-
 /**
  * The photo viewer (KICKOFF §6.6; H:2682–2686; `patient-file.md:317–331`):
  * full screen on `overlay/94`, fading in — the 56px bar (name over "Face ·
- * 24 Sep · General", "2 of 6", the zoom group, Edit details, Delete photo,
- * Close), the photo `min(92%, 1100px) × 92%`, the 64px hint row. Zoom 100–600%
- * by the buttons, the wheel, a double-click or a pinch; a drag pans once
- * zoomed; ‹ › with more than one photo, and a swipe on touch. Keys ← → + − 0;
- * Esc closes; a click outside does not. It keeps the light ramp in dark mode.
- * On a phone the position and the zoom group give way to the pinch, so the
- * name still fits beside Edit, Delete and Close (the design's bar overflows).
+ * Before · 24 Sep · General", "2 of 6", Edit details, Delete photo, Close),
+ * the stage `min(92%, 1100px) × 92%`, the 64px hint row. B1: no file can be
+ * read back, so the stage shows the image glyph, the file's name and "Preview
+ * not available" — and the zoom group, the wheel, double-click, drag-to-pan,
+ * pinch and swipe (all of them about the image's pixels) are gone. ‹ › with
+ * more than one photo; keys ← →; Esc closes; a click outside does not. It
+ * keeps the light ramp in dark mode. On a phone the position gives way, so
+ * the name still fits beside Edit, Delete and Close.
  */
 export function PhotoViewer({
   photo,
@@ -154,33 +108,20 @@ export function PhotoViewer({
   const { t } = useTranslation(PATIENT_PHOTOS_NS);
   const { direction } = useLocaleFormat();
   const contentRef = useRef<HTMLDivElement | null>(null);
-  const zoom = usePhotoZoom(photo.id, onStep);
-  const multi = total > 1;
+  const multi = index !== null && total > 1;
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.metaKey || event.ctrlKey || event.altKey) return;
+    if (event.metaKey || event.ctrlKey || event.altKey || !multi) return;
     const rtl = direction === 'rtl';
     const keys: Readonly<Record<string, () => void>> = {
-      ArrowLeft: () => multi && onStep(rtl ? 1 : -1),
-      ArrowRight: () => multi && onStep(rtl ? -1 : 1),
-      '+': zoom.zoomIn,
-      '=': zoom.zoomIn,
-      '-': zoom.zoomOut,
-      '0': zoom.reset,
+      ArrowLeft: () => onStep(rtl ? 1 : -1),
+      ArrowRight: () => onStep(rtl ? -1 : 1),
     };
     const run = keys[event.key];
     if (!run) return;
     event.preventDefault();
     run();
   };
-
-  const transform = {
-    '--photo-x': `${zoom.x}px`,
-    '--photo-y': `${zoom.y}px`,
-    '--photo-zoom': String(zoom.zoom),
-  } as CSSProperties;
-  let cursor = 'cursor-zoom-in';
-  if (zoom.zoom > 1) cursor = zoom.moving ? 'cursor-grabbing' : 'cursor-grab';
 
   return (
     <DialogPrimitive.Root
@@ -214,15 +155,11 @@ export function PhotoViewer({
               </span>
             </span>
             <span className="flex-1" />
-            <span className="text-disabled flex-none text-xs leading-[normal] tabular-nums max-md:hidden">
-              {t(K.position, { index: index + 1, total })}
-            </span>
-            <ZoomGroup
-              level={zoom.zoom}
-              onZoomIn={zoom.zoomIn}
-              onZoomOut={zoom.zoomOut}
-              onReset={zoom.reset}
-            />
+            {index === null ? null : (
+              <span className="text-disabled flex-none text-xs leading-[normal] tabular-nums max-md:hidden">
+                {t(K.position, { index: index + 1, total })}
+              </span>
+            )}
             {onEdit ? (
               <RoundButton
                 label={t(PATIENT_PHOTOS_KEYS.tile.edit)}
@@ -266,28 +203,17 @@ export function PhotoViewer({
               </RoundButton>
             ) : null}
             <div
-              {...zoom.stage}
               data-testid={PHOTO_VIEWER_TEST_IDS.stage}
-              className={cn(
-                'absolute inset-0 flex touch-none items-center justify-center select-none',
-                cursor,
-              )}
+              className="absolute inset-0 flex items-center justify-center"
             >
-              <div
-                style={transform}
-                className={cn(
-                  'bg-canvas/8 text-disabled flex h-[92%] w-[min(92%,68.75rem)] translate-x-(--photo-x) translate-y-(--photo-y) scale-(--photo-zoom) items-center justify-center overflow-hidden rounded-lg will-change-transform',
-                  zoom.moving
-                    ? 'transition-none'
-                    : 'transition-[translate,scale] duration-120 ease-out',
-                )}
-              >
+              <div className="bg-canvas/8 flex h-[92%] w-[min(92%,68.75rem)] items-center justify-center overflow-hidden rounded-lg">
                 <PhotoThumb
-                  fileUrl={photo.fileUrl}
-                  fit="contain"
                   fallback={
-                    <span className="text-body flex flex-col items-center gap-2">
+                    <span className="text-body flex max-w-full flex-col items-center gap-2 px-6 text-center">
                       <ImageIcon className="size-5.5" />
+                      <span className="text-canvas max-w-full truncate font-medium">
+                        {photo.fileName}
+                      </span>
                       {t(K.missing)}
                     </span>
                   }
@@ -307,9 +233,7 @@ export function PhotoViewer({
             ) : null}
           </div>
           <div className="text-disabled flex flex-wrap items-center justify-center gap-x-4 gap-y-1 px-4 text-xs leading-[normal]">
-            <span>{t(K.hints.browse)}</span>
-            <span>{t(K.hints.zoom)}</span>
-            <span>{t(K.hints.pan)}</span>
+            {multi ? <span>{t(K.hints.browse)}</span> : null}
             <span>{t(K.hints.close)}</span>
           </div>
         </DialogPrimitive.Content>

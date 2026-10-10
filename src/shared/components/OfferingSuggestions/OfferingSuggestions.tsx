@@ -28,7 +28,7 @@ import type {
   SuggestionPatch,
   SuggestionPurchase,
 } from './offering-suggestions.types.ts';
-import { suggestionCounts, suggestionTotals } from './offering-suggestions-model.ts';
+import { suggestionCounts } from './offering-suggestions-model.ts';
 import { IdeaRow, SuggestionRow } from './SuggestionRows.tsx';
 import { ActivityTable, PurchasesTable } from './SuggestionTables.tsx';
 
@@ -79,51 +79,29 @@ function headerSub({
   return parts.join(' · ');
 }
 
-/**
- * The line under the total (H:4376): "Saves <₹> on list · <₹> invoiced",
- * either alone, else "At list price" — nothing while the plan is empty.
- */
-function totalsLine({
-  t,
-  money,
-  totals,
-  hasLines,
-}: {
-  t: Translate;
-  money: (paise: number) => string;
-  totals: { saved: number; invoiced: number };
-  hasLines: boolean;
-}): string {
-  const parts: string[] = [];
-  if (totals.saved > 0) parts.push(t(KEYS.savesOnList, { amount: money(totals.saved) }));
-  if (totals.invoiced > 0) {
-    parts.push(t(KEYS.invoicedAmount, { amount: money(totals.invoiced) }));
-  }
-  if (parts.length > 0) return parts.join(' · ');
-  return hasLines ? t(KEYS.atListPrice) : '';
-}
-
 /** Props for {@link OfferingSuggestions}. */
 export interface OfferingSuggestionsProps {
   /** The patient's first name: "Nothing suggested for <first> yet.", "<first>’s last purchases". */
   firstName: string;
   lines: readonly SuggestionLine[];
+  /** The plan's total in paise — the server's (`meta.plan_total`: the Planned and Accepted lines). */
+  total: number;
   /** Ideas from history, at most four (H:4366). */
   ideas?: readonly SuggestionIdea[];
-  /** The last six purchase lines and what the patient has paid so far (`getPlan`, `S:1635`). */
-  purchases?: { lines: readonly SuggestionPurchase[]; paidSoFar: number };
-  /** "Contact activity · <summary>" — the lead's thread — with "Open chat". */
+  /** The last six things the patient bought (`…/offerings`). */
+  purchases?: readonly SuggestionPurchase[];
+  /** "Contact activity · <summary>" — the contact's last messages — with "Open chat". */
   activity?: {
-    summary: string;
+    summary?: string;
     lines: readonly SuggestionActivityLine[];
     onOpenChat?: () => void;
   };
   /** Where it sits: the patient file starts it collapsed, the appointment form open (H:4375). */
   variant: 'file' | 'form';
-  /** Edit on the plan — quantities, prices, statuses, links, remove, add. Without it the card reads. */
+  /** Edit on the plan (`patient:update`) — quantities, prices, statuses, remove, add. Without it the card reads. */
   canEdit: boolean;
-  /** The discount ability: a price below the floor names the lowest price. */
-  canDiscount: boolean;
+  /** `offering:lower_price:read`: a price below the floor says so rather than "ask an admin". */
+  canSeeLowestPrice: boolean;
   /**
    * Prices shown — controlled: the form starts them shown, the patient file
    * hidden (H:4375).
@@ -131,8 +109,6 @@ export interface OfferingSuggestionsProps {
   pricesShown: boolean;
   onPricesShownChange: (shown: boolean) => void;
   onChange?: (line: SuggestionLine, patch: SuggestionPatch) => void;
-  /** "Link an invoice by hand" — the host opens its invoice picker. */
-  onLinkInvoice?: (line: SuggestionLine) => void;
   /**
    * After the reason confirm: the stored `delete_reason` and note ("Plan
    * changed" is stored as `other` with its label in the note). Throwing keeps
@@ -154,7 +130,11 @@ export interface OfferingSuggestionsProps {
   onOpenChange?: (open: boolean) => void;
 }
 
-/** The open header's end (H:2803): the plan total, the line under it and the 32px price eye. */
+/**
+ * The open header's end (H:2803): the plan total — "Prices hidden" under it
+ * while they hide — and the 32px price eye. The design's "Saves <₹> on list ·
+ * <₹> invoiced" goes: the API serves neither sum (§7, G4).
+ */
 function PlanTotal({
   total,
   summary,
@@ -162,7 +142,7 @@ function PlanTotal({
   onPricesShownChange,
 }: {
   total: string;
-  summary: string;
+  summary?: string;
   pricesShown: boolean;
   onPricesShownChange: (shown: boolean) => void;
 }) {
@@ -172,7 +152,11 @@ function PlanTotal({
     <div className="flex flex-none items-center gap-2 ps-1 pe-3.5">
       <span className="flex flex-col items-end leading-[1.3]">
         <span className="text-title font-semibold tabular-nums">{total}</span>
-        <span className="text-caption text-muted-foreground tabular-nums">{summary}</span>
+        {summary ? (
+          <span className="text-caption text-muted-foreground tabular-nums">
+            {summary}
+          </span>
+        ) : null}
       </span>
       <Button
         type="button"
@@ -203,10 +187,9 @@ type PlanBodyProps = Pick<
   | 'purchases'
   | 'activity'
   | 'canEdit'
-  | 'canDiscount'
+  | 'canSeeLowestPrice'
   | 'pricesShown'
   | 'onChange'
-  | 'onLinkInvoice'
   | 'onAddIdea'
   | 'addOffering'
 > & {
@@ -227,10 +210,9 @@ function PlanBody({
   purchases,
   activity,
   canEdit,
-  canDiscount,
+  canSeeLowestPrice,
   pricesShown,
   onChange,
-  onLinkInvoice,
   onAddIdea,
   addOffering,
   onAskRemove,
@@ -256,9 +238,8 @@ function PlanBody({
           line={line}
           pricesShown={pricesShown}
           canEdit={canEdit}
-          canDiscount={canDiscount}
+          canSeeLowestPrice={canSeeLowestPrice}
           onChange={(patch) => onChange?.(line, patch)}
-          onLinkInvoice={onLinkInvoice ? () => onLinkInvoice(line) : undefined}
           onRemove={() => onAskRemove(line)}
         />
       ))}
@@ -308,12 +289,8 @@ function PlanBody({
           />
         </div>
       ) : null}
-      {purchases && purchases.lines.length > 0 ? (
-        <PurchasesTable
-          firstName={firstName}
-          purchases={purchases.lines}
-          paidSoFar={purchases.paidSoFar}
-        />
+      {purchases && purchases.length > 0 ? (
+        <PurchasesTable firstName={firstName} purchases={purchases} />
       ) : null}
       {activity && activity.lines.length > 0 ? (
         <ActivityTable
@@ -329,8 +306,7 @@ function PlanBody({
 /**
  * Offering suggestions (KICKOFF §6.4 form, §6.6 patient file; H:781–806,
  * H:2802–2826): the header "Offering suggestions" with its sub line and
- * chevron; open, the plan's total with what it saves on list and what is
- * invoiced, and the price eye. Then the suggested rows, the ideas, "Add
+ * chevron; open, the server's plan total and the price eye. Then the suggested rows, the ideas, "Add
  * offering", "<first>’s last purchases" and "Contact activity". It wraps by
  * its own width — a container: rows take two lines under 600px, purchases and
  * activity three columns under 720px (H:415–422) — so the patient file's
@@ -345,7 +321,7 @@ export function OfferingSuggestions({
   onOpenChange,
   ...props
 }: OfferingSuggestionsProps) {
-  const { firstName, lines, pricesShown } = props;
+  const { firstName, lines, total, pricesShown } = props;
   const { t } = useTranslation(OFFERING_SUGGESTIONS_NS);
   const money = usePaiseFormat();
   const [ownOpen, setOwnOpen] = useState(variant === 'form');
@@ -358,12 +334,11 @@ export function OfferingSuggestions({
     if (next) revealInScroller(sectionRef.current);
   };
   const [removing, setRemoving] = useState<SuggestionLine | null>(null);
-  const totals = suggestionTotals(lines);
   const sub = headerSub({
     t,
     open,
     counts: suggestionCounts(lines),
-    purchases: props.purchases?.lines.length ?? 0,
+    purchases: props.purchases?.length ?? 0,
     ideas: ideas.length,
   });
 
@@ -407,12 +382,8 @@ export function OfferingSuggestions({
           </button>
           {open ? (
             <PlanTotal
-              total={pricesShown ? money(totals.total) : t(KEYS.masked)}
-              summary={
-                pricesShown
-                  ? totalsLine({ t, money, totals, hasLines: lines.length > 0 })
-                  : t(KEYS.pricesHidden)
-              }
+              total={pricesShown ? money(total) : t(KEYS.masked)}
+              summary={pricesShown ? undefined : t(KEYS.pricesHidden)}
               pricesShown={pricesShown}
               onPricesShownChange={onPricesShownChange}
             />

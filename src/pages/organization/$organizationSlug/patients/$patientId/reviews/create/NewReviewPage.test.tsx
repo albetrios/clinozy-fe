@@ -1,20 +1,27 @@
-import { screen } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {
+  createMemoryHistory,
+  createRootRoute,
+  createRoute,
+  createRouter,
+  Outlet,
+  RouterProvider,
+} from '@tanstack/react-router';
+import { render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
-import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
+import { PATIENT_FILE_SECTIONS } from '@/shared/clinic/patient-file-sections.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { patientFile, TEST_PATIENT_ID } from '@/tests/utils/patient-doubles.ts';
 
-import {
-  patientFileUrl,
-  renderPatientFile,
-  resetPatientFile,
-} from '../../__tests__/integration/patient-file-test-router.tsx';
+import { PatientFileContext } from '../../shared/patient-file-context.ts';
+import { NewReviewPage } from './NewReviewPage.tsx';
 
-vi.mock('@/shared/notify/index.ts', () => ({
-  notify: {
+const { notifyMock } = vi.hoisted(() => ({
+  notifyMock: {
     success: vi.fn(),
     error: vi.fn(),
     info: vi.fn(),
@@ -23,26 +30,107 @@ vi.mock('@/shared/notify/index.ts', () => ({
     dismiss: vi.fn(),
   },
 }));
+vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
+// The section behind the drawer is a stand-in: this page decides which, not what it shows.
+vi.mock('../../patient-id.sections.ts', async () => {
+  const { createElement } = await import('react');
+  return {
+    PATIENT_FILE_SECTION_PAGES: new Proxy(
+      {},
+      {
+        get: (_pages, slug) => () =>
+          createElement('p', { 'data-testid': `patient-section-${String(slug)}` }),
+      },
+    ),
+  };
+});
 
-const DHARTI = patientRef('Dharti Galani');
+const FILE = `/organization/acme/patients/${TEST_PATIENT_ID}`;
 
-beforeEach(() => resetClinicFixtures());
+/** The page at its route under the file, for the test member previewed as `role`. */
+function renderPage(url: string, role: Role = 'admin') {
+  signInTestMember();
+  useOrganizationStore.getState().setPermissions(['organization:read']);
+  useUIStore.setState({ previewRole: role });
+  const root = createRootRoute({ component: () => <Outlet /> });
+  const file = createRoute({
+    getParentRoute: () => root,
+    path: '/organization/$organizationSlug/patients/$patientId',
+    component: () => (
+      <PatientFileContext.Provider
+        value={{
+          patientId: TEST_PATIENT_ID,
+          file: patientFile(),
+          section: null,
+          viewable: PATIENT_FILE_SECTIONS,
+          masked: true,
+          toggleMasked: () => undefined,
+          photos: { pick: () => undefined, upload: () => undefined },
+        }}
+      >
+        <Outlet />
+      </PatientFileContext.Provider>
+    ),
+  });
+  const page = createRoute({
+    getParentRoute: () => file,
+    path: 'reviews/create',
+    component: NewReviewPage,
+  });
+  const section = createRoute({
+    getParentRoute: () => file,
+    path: '$',
+    component: () => null,
+  });
+  const router = createRouter({
+    routeTree: root.addChildren([file.addChildren([page, section])]),
+    history: createMemoryHistory({ initialEntries: [url] }),
+  });
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  render(
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>,
+  );
+  return { router };
+}
+
+beforeEach(() => {
+  for (const fn of Object.values(notifyMock)) fn.mockReset();
+});
 afterEach(() => {
-  resetPatientFile();
-  resetClinicFixtures();
+  useUIStore.setState({ previewRole: null });
+  useOrganizationStore.getState().clearPermissions();
 });
 
 describe('NewReviewPage (S:46)', () => {
-  it('shows the section it came from with a new review on its source', async () => {
-    renderPatientFile(
-      `${patientFileUrl(DHARTI, '/reviews/create')}?from=visits&source=whatsapp`,
-      { role: 'doctor' },
+  it('shows the section it came from with a new review over it, on the picked source', async () => {
+    renderPage(`${FILE}/reviews/create?from=images&source=video`);
+    expect(await screen.findByTestId('review-drawer-title')).toHaveTextContent(
+      'Log a review',
     );
-    expect(await screen.findByTestId('review-drawer-where-whatsapp')).toHaveAttribute(
+    expect(screen.getByTestId('review-drawer-where-video')).toHaveAttribute(
       'aria-pressed',
       'true',
     );
-    expect(screen.getByTestId('patient-section-visits')).toBeInTheDocument();
-    expect(clinicFixtures.reviews.snapshot(() => true).length).toBeGreaterThan(0);
+    expect(screen.getByTestId('patient-section-images')).toBeInTheDocument();
+  });
+
+  it('starts on Google over Clinical notes when the link names neither', async () => {
+    renderPage(`${FILE}/reviews/create?source=fax`);
+    expect(await screen.findByTestId('review-drawer-where-google')).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(screen.getByTestId('patient-section-overview')).toBeInTheDocument();
+  });
+
+  it('turns a member who cannot edit patients back (S:46)', async () => {
+    const { router } = renderPage(`${FILE}/reviews/create?from=visits`, 'therapist');
+    await waitFor(() => expect(router.state.location.pathname).toBe(`${FILE}/visits`));
+    expect(notifyMock.info).toHaveBeenCalledWith(
+      'You do not have permission to perform this action.',
+    );
+    expect(screen.queryByTestId('review-drawer')).not.toBeInTheDocument();
   });
 });

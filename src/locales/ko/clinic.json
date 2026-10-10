@@ -331,14 +331,15 @@
     },
     "missing": "이름과 휴대폰 번호를 입력하세요",
     "mobileInvalid": "10자리 휴대폰 번호를 입력하세요",
-    "created": "환자 {{id}} 생성됨 · 온보딩 작업 추가됨",
+    "created": "환자 {{id}} 생성됨",
     "openFile": "파일 열기",
     "saved": "{{name}} 저장됨",
     "registered": "{{name}} 님이 환자 {{id}}(으)로 등록됨",
     "registeredPhotos_other": "{{name}} 님이 환자 {{id}}(으)로 등록됨 · 사진 {{count}}장 저장됨",
     "duplicate": "{{name}} 님과 같은 휴대폰 번호 · {{id}}",
     "useExisting": "기존 환자 사용",
-    "summaryEmpty": "새 환자"
+    "summaryEmpty": "새 환자",
+    "knownPerson": "{{name}} 님은 이미 연락처에 있습니다 · 이분의 파일로 생성됩니다"
   },
   "recordDrawer": {
     "cancel": "취소",
@@ -802,9 +803,6 @@
     "pricesHiddenHint": "가격 숨김 · 눈 아이콘으로 표시",
     "showPrices": "가격 표시",
     "hidePrices": "가격 숨기기",
-    "savesOnList": "정가 대비 {{amount}} 절약",
-    "invoicedAmount": "{{amount}} 청구됨",
-    "atListPrice": "정가",
     "columns": {
       "suggested": "제안",
       "qty": "수량",
@@ -815,7 +813,7 @@
     "more": "늘리기",
     "quantity": "수량",
     "finalPrice": "최종 가격",
-    "belowFloor": "최저가 {{price}} 미만",
+    "belowFloor": "최저가 미만",
     "tooMuchDiscount": "할인이 너무 큽니다 · 관리자에게 문의하세요",
     "details": "서비스 정보",
     "statuses": {
@@ -833,8 +831,6 @@
     "statusLabel": "상태 · {{status}}",
     "invoiced": "청구됨",
     "invoicedOf": "청구됨 · {{total}}개 중 {{done}}개",
-    "linkInvoice": "청구서 연결",
-    "linkInvoiceHint": "청구서 직접 연결",
     "remove": "삭제",
     "empty": "{{first}} 님에게 아직 제안된 것이 없습니다.",
     "whyIdea": "이 아이디어를 제안하는 이유",
@@ -844,14 +840,10 @@
     "addHint": "제안에 추가",
     "addOffering": "서비스 추가",
     "purchasesTitle": "{{first}} 님의 최근 구매",
-    "purchasesSummary_other": "{{count}}개 항목 · 지금까지 {{paid}} 결제",
     "purchaseColumns": {
       "date": "날짜",
       "bought": "구매 항목",
-      "qty": "수량",
-      "paid": "결제액",
-      "sessions": "회차",
-      "invoice": "청구서"
+      "sessions": "회차"
     },
     "sessionsUsed": "{{total}}회 중 {{used}}회 사용",
     "activityTitle": "연락처 활동",
@@ -888,16 +880,7 @@
       "lowest": "최저 {{price}}"
     },
     "ideaReasons": {
-      "history": "이력 기반 제안",
-      "note": "의사 메모 · “{{text}}”",
-      "complaint": "주 호소 · {{text}}",
-      "visits_other": "지금까지 {{count}}회 방문 · 패키지면 회차마다 절약",
-      "renew": "패키지 거의 소진 · 갱신",
-      "first": "첫 방문 · 상담부터 시작"
-    },
-    "purchaseKinds": {
-      "medicine": "약",
-      "item": "품목"
+      "history": "이력 기반 제안"
     },
     "delivery": {
       "queued": "대기 중",
@@ -907,7 +890,8 @@
       "failed": "전달 실패",
       "received": "받음"
     },
-    "activityLead": "리드 {{id}}"
+    "activityLead": "리드 {{id}}",
+    "purchasesCount_other": "{{count}}개 항목"
   },
   "contactEditor": {
     "title": "연락처 편집",

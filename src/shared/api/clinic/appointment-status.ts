@@ -74,7 +74,7 @@ export interface AppointmentGuardSubject {
  * before the start ("Available after <time> on <day>") · Completed for a lead
  * or contact (a patient record first).
  */
-export type AppointmentGuardReason =
+type AppointmentGuardReason =
   'no_access' | 'final' | 'not_allowed' | 'visit_day' | 'before_start' | 'needs_patient';
 
 /** A guard's verdict. */

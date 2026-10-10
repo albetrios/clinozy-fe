@@ -6,7 +6,7 @@ the URL and opens the New patient drawer over the list, so a refresh or a shared
 reopens it. `?name=&phone=&fromLead=` prefill the drawer (⌘K "New patient", the contact
 card's "+ Patient") — parsed by `validatePatientCreateSearch` in the parent's
 `../patients.dialog-search.ts` (an invalid mobile is dropped; a valid one arrives E.164;
-`fromLead` must be a record id), and `name` / `phone` are scrubbed from telemetry
+`fromLead` must be a lead's public id, `lead_…` — the patient is filed on its person), and `name` / `phone` are scrubbed from telemetry
 (`SENSITIVE_QUERY_PARAMS`). Gated like the room — membership (`organization:read`) and the
 `clinic-patients` module, then `requireOrgStatus`; in-room Create is `useClinicAccess` —
 without it the list sends the link back with the permission toast. The drawer is the shared

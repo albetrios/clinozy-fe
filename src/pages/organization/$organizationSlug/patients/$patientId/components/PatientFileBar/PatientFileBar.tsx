@@ -8,7 +8,6 @@ import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
 import type { PatientFilePin } from '@/shared/api/clinic/preferences-api.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import type { PatientFileSectionSlug } from '@/shared/clinic/patient-file-sections.ts';
-import { CountBadge } from '@/shared/components/Cells/CountBadge/index.ts';
 import {
   PersonAvatar,
   personInitials,
@@ -146,11 +145,12 @@ function Tip({ label, children }: { label: string; children: ReactNode }) {
 /** The Activity toggle (H:711, H:5001): sage while open, the unread badge while closed; icon-only on a phone. */
 function ActivityToggle({
   open,
-  unread,
+  awaitingReply,
   onToggle,
 }: {
   open: boolean;
-  unread: number;
+  /** Their last message waits for ours — a dot while Activity is closed. */
+  awaitingReply: boolean;
   onToggle: () => void;
 }) {
   const { t } = useTranslation(PATIENT_FILE_BAR_NS);
@@ -174,13 +174,13 @@ function ActivityToggle({
       >
         <Icon aria-hidden="true" className="size-4 rtl:-scale-x-100" />
         <span className="max-md:sr-only">{t(K.activity)}</span>
-        {!open && unread > 0 ? (
-          <CountBadge
-            count={unread}
-            tone="success"
-            srLabel={t(K.unread, { count: unread })}
-            className="max-md:absolute max-md:-end-1 max-md:-top-1"
-          />
+        {!open && awaitingReply ? (
+          <span
+            data-testid={`${ids.activity}-awaiting`}
+            className="bg-success size-2 flex-none rounded-full max-md:absolute max-md:end-0.5 max-md:top-0.5"
+          >
+            <span className="sr-only">{t(K.awaitingReply)}</span>
+          </span>
         ) : null}
       </Button>
     </Tip>
@@ -307,7 +307,6 @@ export function PatientFileBar({
             patientName={name}
             current={section}
             viewable={viewable}
-            counts={file.counts}
             pins={pins}
             onTogglePin={onTogglePin}
             onPick={(picked) => {
@@ -376,7 +375,7 @@ export function PatientFileBar({
         ) : null}
         <ActivityToggle
           open={activityOpen}
-          unread={file.unread}
+          awaitingReply={file.awaitingReply}
           onToggle={onToggleActivity}
         />
       </div>

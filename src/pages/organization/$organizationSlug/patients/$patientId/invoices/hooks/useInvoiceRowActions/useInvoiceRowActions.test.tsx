@@ -4,11 +4,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import { fetchPatientFile } from '@/shared/api/clinic/patient-file-api.ts';
 import { listPatientInvoices } from '@/shared/api/clinic/payments-api.ts';
 import type { PatientInvoiceRow } from '@/shared/api/clinic/payments-contracts.ts';
 import { CROSS_ROOM_PARAM } from '@/shared/clinic/clinic-referrer.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { patientFile, patientRecord } from '@/tests/utils/patient-doubles.ts';
 
 import {
   renderInPatientFile,
@@ -154,7 +154,8 @@ describe('useInvoiceRowActions (H:4748)', () => {
 
   it('opens a copy over the file’s Invoices, which stays — the URL bar on the copy (A-P1)', async () => {
     const dharti = patientRef('Dharti Galani');
-    const file = await fetchPatientFile(dharti);
+    // The file's invoices are still the fixture world's (Payments): the file names her fixture id.
+    const file = patientFile({ patient: patientRecord({ id: dharti }) });
     const view = renderInPatientFile(<Probe />, {
       section: 'invoices',
       role: 'owner',

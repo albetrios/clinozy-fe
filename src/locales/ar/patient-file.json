@@ -33,12 +33,7 @@
     "activity": "النشاط",
     "showActivity": "إظهار الرسائل والنشاط",
     "hideActivity": "إخفاء الرسائل والنشاط",
-    "unread_zero": "لا رسائل غير مقروءة",
-    "unread_one": "رسالة واحدة غير مقروءة",
-    "unread_two": "رسالتان غير مقروءتين",
-    "unread_few": "{{count}} رسائل غير مقروءة",
-    "unread_many": "{{count}} رسالة غير مقروءة",
-    "unread_other": "{{count}} رسالة غير مقروءة"
+    "awaitingReply": "بانتظار الرد"
   },
   "sectionsPopover": {
     "trigger": "ملف المريض · كل الأقسام",
@@ -51,8 +46,6 @@
       "team": "الفريق"
     },
     "openNow": "مفتوح الآن",
-    "empty": "فارغ",
-    "hasRecords": "يحتوي على سجلات",
     "pin": "تثبيت في الشريط",
     "unpin": "إلغاء التثبيت من الشريط",
     "pinAria": "تثبيت في الشريط · {{section}}",
@@ -68,14 +61,11 @@
     "items": {
       "prescription": "وصفة طبية",
       "treatment": "علاج",
-      "invoice": "فاتورة",
-      "payment": "دفعة",
       "photo": "صورة",
       "appointment": "موعد",
       "report": "تقرير",
       "note": "ملاحظة"
-    },
-    "nothingDue": "لا مستحقات على {{name}}"
+    }
   },
   "section": {
     "primary": {
@@ -85,8 +75,7 @@
       "images": "رفع الصور",
       "reports": "رفع تقرير",
       "invoices": "فاتورة جديدة",
-      "payments": "تسجيل دفعة",
-      "packages": "إضافة باقة"
+      "payments": "تسجيل دفعة"
     },
     "more": "المزيد لـ {{name}}"
   },
@@ -111,7 +100,6 @@
     "reach": "وسائل التواصل",
     "reachSub": {
       "whatsappPrimary": "واتساب · أساسي",
-      "fromLead": "جوال · من العميل المحتمل",
       "mobile": "جوال",
       "instagram": "إنستغرام"
     },
@@ -133,23 +121,10 @@
     "birthdayToday": "🎂 اليوم",
     "noAddress": "لا يوجد عنوان",
     "upNext": "التالي",
-    "visitService": "{{service}} · {{minutes}} دقيقة",
     "reschedule": "إعادة الجدولة",
     "book": "حجز",
     "notBooked": "غير محجوز",
     "noUpcoming": "لا زيارة قادمة",
-    "maskedAmount": "₹ ••••",
-    "dueSince_zero": "منذ اليوم",
-    "dueSince_one": "منذ يوم واحد",
-    "dueSince_two": "منذ يومين",
-    "dueSince_few": "منذ {{count}} أيام",
-    "dueSince_many": "منذ {{count}} يومًا",
-    "dueSince_other": "منذ {{count}} يوم",
-    "showAmount": "إظهار المبلغ",
-    "hideAmount": "إخفاء المبلغ",
-    "collect": "تحصيل",
-    "creditToReturn": "{{amount}} للإرجاع",
-    "allPaid": "تم دفع الكل · لا مستحقات",
     "feedback": "الملاحظات",
     "feedbackScore": "{{feel}} · {{score}}/10",
     "feedbackReview": "{{rating}}★ على {{source}}",
@@ -188,13 +163,7 @@
       "none": "غير مرتبطة بزيارة",
       "noneSub": "مرفوعة من الملف",
       "visit": "{{day}} · {{service}}",
-      "visitSub": "#{{seq}} · {{status}}",
-      "visitMeta_zero": "لا صور",
-      "visitMeta_one": "صورة واحدة",
-      "visitMeta_two": "صورتان",
-      "visitMeta_few": "{{count}} صور",
-      "visitMeta_many": "{{count}} صورة",
-      "visitMeta_other": "{{count}} صورة"
+      "visitSub": "#{{seq}} · {{status}}"
     },
     "sizes": {
       "label": "حجم الصور المصغّرة",
@@ -205,7 +174,6 @@
       "mediumShort": "M",
       "largeShort": "L"
     },
-    "groupWithVisit": "{{photos}} · {{visit}}",
     "tile": {
       "open": "فتح {{name}}",
       "edit": "تعديل التفاصيل",
@@ -250,17 +218,16 @@
       "underarm": "الإبط",
       "legs": "الساقان",
       "arms": "الذراعان",
-      "other": "أخرى"
+      "other": "أخرى",
+      "upperLip": "الشفة العليا",
+      "chin": "الذقن",
+      "neck": "الرقبة",
+      "hands": "اليدان",
+      "fullBody": "الجسم كاملًا"
     },
     "viewer": {
       "label": "عارض الصور",
       "position": "{{index}} من {{total}}",
-      "zoom": "التكبير",
-      "zoomOut": "تصغير",
-      "zoomOutHint": "تصغير (−)",
-      "zoomIn": "تكبير",
-      "zoomInHint": "تكبير (+)",
-      "zoomReset": "ملاءمة الشاشة (0)",
       "close": "إغلاق العارض",
       "closeHint": "إغلاق (Esc)",
       "previous": "الصورة السابقة",
@@ -269,11 +236,9 @@
       "nextHint": "التالية (→)",
       "hints": {
         "browse": "← → للتنقل",
-        "zoom": "مرّر أو + − للتكبير",
-        "pan": "اسحب للتحريك · انقر مرتين لإعادة الضبط",
         "close": "Esc للإغلاق"
       },
-      "missing": "صورة نموذجية · لا ملف مرفق",
+      "missing": "المعاينة غير متاحة",
       "notFoundRecord": "الصورة"
     },
     "details": {
@@ -289,9 +254,14 @@
       "visitHint": "اختياري · يحفظ الصورة ضمن ذلك الموعد",
       "notAttached": "غير مرتبطة",
       "save": "حفظ التفاصيل",
-      "saved": "حُفظت تفاصيل الصورة"
+      "saved": "حُفظت تفاصيل الصورة",
+      "stage": "المرحلة"
     },
-    "loading": "جارٍ تحميل الصور"
+    "loading": "جارٍ تحميل الصور",
+    "stages": {
+      "before": "قبل",
+      "after": "بعد"
+    }
   },
   "rx": {
     "record": "الوصفة",
@@ -308,16 +278,7 @@
     "medicines_other": "{{count}} دواء",
     "quickFill": {
       "print": "طباعة الوصفة",
-      "repeat": "تكرار آخر وصفة {{number}}",
-      "kits": {
-        "hairFall": "مجموعة تساقط الشعر",
-        "postPeel": "مجموعة ما بعد التقشير",
-        "pigmentation": "مجموعة التصبغ"
-      }
-    },
-    "kit": {
-      "reapply": "يُعاد وضعه كل 3 ساعات",
-      "avoidSun": "تجنّب الشمس والمقشرات لمدة 48 ساعة"
+      "repeat": "تكرار آخر وصفة {{number}}"
     },
     "steps": {
       "prescription": "الوصفة",
@@ -330,10 +291,8 @@
     "quick": {
       "placeholder": "اكتب الدواء والجرعة والتوقيت · مثل flu 0-0-1 af 10d",
       "hint": "od · bd · tds · hs · af/bf · 5d · x8",
-      "often": "يوصف كثيرًا",
       "groups": {
         "all": "الكل",
-        "often": "يوصف كثيرًا",
         "oral": "فموي",
         "topical": "موضعي"
       },
@@ -431,13 +390,20 @@
       "summary": "{{medicines}} · {{doctor}}",
       "noMedicine": "أضِف دواءً",
       "saved": "حُفظت الوصفة",
-      "savedNumber": "حُفظت الوصفة {{number}}"
+      "savedNumber": "حُفظت الوصفة {{number}}",
+      "approve": "حفظ واعتماد",
+      "approvedNumber": "اعتُمدت الوصفة {{number}}"
     },
     "delete": {
       "title": "حذف هذه الوصفة؟",
       "deleted": "حُذفت الوصفة"
     },
-    "preview": "الوصفة {{number}}"
+    "preview": "الوصفة {{number}}",
+    "status": {
+      "draft": "مسودة",
+      "approved": "معتمدة"
+    },
+    "approvedNote": "معتمدة · لا يمكن تغيير وصفة معتمدة"
   },
   "treatment": {
     "record": "العلاج",
@@ -449,7 +415,6 @@
     "session": "الجلسة {{session}}",
     "quickFill": {
       "next": "الجلسة التالية من {{name}}",
-      "package": "{{name}} · الجلسة {{session}}",
       "checkIn": "تسجيل متابعة"
     },
     "type": "النوع",
@@ -589,8 +554,8 @@
       "calls": {
         "none": "بلا مكالمة",
         "next_day": "في اليوم التالي",
-        "in_2_days": "بعد يومين",
-        "in_week": "بعد أسبوع"
+        "in_week": "بعد أسبوع",
+        "in_two_days": "بعد يومين"
       },
       "feedback": "ملاحظات على هذا العلاج",
       "feedbackItem": "{{date}} · {{feel}} {{score}}/10",
@@ -601,9 +566,25 @@
       "edit": "حفظ التغييرات",
       "saved": "حُفظ العلاج"
     },
-    "delete": {
-      "title": "حذف هذا العلاج؟",
-      "deleted": "حُذف العلاج"
+    "package": {
+      "label": "من باقة",
+      "hint": "الحفظ يستخدم إحدى جلساتها",
+      "option": "{{name}} · استُخدمت {{used}} من {{total}}",
+      "numbered": "تحدده الباقة",
+      "uses": "يستخدم جلسة واحدة من {{name}}"
+    },
+    "reverse": {
+      "title": "إلغاء هذا العلاج؟",
+      "body": "يبقى في الملف موسومًا بالإلغاء، وتعود جلسة الباقة التي استخدمها. لا يمكن التراجع عن ذلك.",
+      "action": "إلغاء",
+      "done": "أُلغي العلاج",
+      "status": "مُلغى",
+      "note": "أُلغي {{date}} · {{reason}}",
+      "reasons": {
+        "mistake": "سُجّل بالخطأ",
+        "wrongPatient": "مريض خاطئ",
+        "notDone": "لم تُنفّذ الجلسة"
+      }
     }
   },
   "report": {
@@ -644,23 +625,14 @@
     },
     "view": {
       "sub": "{{name}} · {{date}}",
-      "addedBy": "أضافه",
-      "fileLine": "{{name}} · {{format}} · يُشارك مع المريض عند الطلب",
       "notes": "الملاحظات",
-      "noNotes": "لا ملاحظات على هذا التقرير",
-      "download": "تنزيل",
-      "downloading": "جارٍ تنزيل {{name}}"
+      "noNotes": "لا ملاحظات على هذا التقرير"
     }
   },
   "package": {
-    "title": "إضافة باقة",
-    "step": "اختر باقة",
-    "option": "{{name}} · {{sessions}} جلسات · {{price}}",
-    "empty": "لا توجد خدمات متعددة الجلسات بعد",
+    "title": "تعديل الباقة",
     "summary": "تُحتسب الجلسات عند اكتمال العلاج",
-    "save": "إضافة الباقة",
-    "noPick": "اختر باقة",
-    "added": "تمت إضافة الباقة · أصدر فاتورتها من الفواتير",
+    "save": "حفظ التغييرات",
     "card": {
       "left_zero": "لا شيء متبقٍ",
       "left_one": "تبقى جلسة",
@@ -670,13 +642,18 @@
       "left_other": "تبقى {{count}}",
       "used": "استُخدم {{used}} من {{total}}",
       "validTill": "صالحة حتى {{date}}",
-      "next": "التالي: {{date}}",
-      "use": "استخدام جلسة",
       "book": "حجز التالي",
       "empty": "لا باقات بعد",
-      "sessionUsed": "استُخدمت الجلسة {{used}} من {{total}}",
-      "noneLeft": "لم تتبقَّ جلسات"
-    }
+      "noExpiry": "بلا انتهاء",
+      "statuses": {
+        "used_up": "مستنفدة",
+        "expired": "منتهية"
+      },
+      "edit": "تعديل"
+    },
+    "validUntil": "صالحة حتى",
+    "sessions": "الجلسات",
+    "saved": "تم حفظ الباقة"
   },
   "clinical": {
     "titles": {
@@ -695,7 +672,8 @@
     "newCount_two": "جديدان",
     "newCount_few": "{{count}} جديدة",
     "newCount_many": "{{count}} جديدًا",
-    "newCount_other": "{{count}} جديد"
+    "newCount_other": "{{count}} جديد",
+    "removed": "تمت إزالة {{name}}"
   },
   "feedback": {
     "title": "الآراء",
@@ -727,7 +705,6 @@
     "linkLabel": "الرابط",
     "noNext": "لا خطوة تالية مسجلة",
     "noLink": "لا رابط",
-    "files": "▶ {{files}}",
     "actions": "الإجراءات",
     "edit": "تعديل",
     "remove": "إزالة",
@@ -758,7 +735,13 @@
     "more_two": "اثنان آخران",
     "more_few": "{{count}} أخرى",
     "more_many": "{{count}} أخرى",
-    "more_other": "{{count}} أخرى"
+    "more_other": "{{count}} أخرى",
+    "files_zero": "▶ لا ملفات",
+    "files_one": "▶ ملف واحد",
+    "files_two": "▶ ملفان",
+    "files_few": "▶ {{count}} ملفات",
+    "files_many": "▶ {{count}} ملفًا",
+    "files_other": "▶ {{count}} ملف"
   },
   "checkIn": {
     "titles": {
@@ -798,9 +781,6 @@
     "offeringSessions_few": "{{price}} · {{count}} جلسات",
     "offeringSessions_many": "{{price}} · {{count}} جلسة",
     "offeringSessions_other": "{{price}} · {{count}} جلسة",
-    "contextVisit": "متابعة الزيارة",
-    "contextAppointment": "متابعة الزيارة · موعد {{number}}",
-    "contextAftercare": "متابعة بعد {{treatment}}",
     "save": "حفظ المتابعة",
     "saveEdit": "حفظ التغييرات",
     "noFeel": "اختر كيف الحال الآن",
@@ -808,7 +788,9 @@
     "added": " · أُضيف {{count}} إلى الاقتراحات",
     "callBack": " · أُنشئت مهمة اتصال للطبيب",
     "updated": "تم تحديث المتابعة",
-    "record": "المتابعة"
+    "record": "المتابعة",
+    "noScore": "اختر تقييم المريض",
+    "offeringsPlanned": "أُضيفت إلى اقتراحات الخدمات"
   },
   "review": {
     "title": "تسجيل تقييم",
@@ -837,7 +819,13 @@
     "updated": "تم تحديث التقييم",
     "badLink": "أضف رابط https://",
     "notRated": "دون تقييم",
-    "record": "التقييم"
+    "record": "التقييم",
+    "attachedFiles_zero": "لا ملفات",
+    "attachedFiles_one": "ملف واحد",
+    "attachedFiles_two": "ملفان",
+    "attachedFiles_few": "{{count}} ملفات",
+    "attachedFiles_many": "{{count}} ملفًا",
+    "attachedFiles_other": "{{count}} ملف"
   },
   "logFeedback": {
     "title": "تسجيل رأي",
@@ -972,7 +960,6 @@
       "feedback": "التقييم",
       "report": "التقرير",
       "type": "النوع",
-      "uploadedBy": "رفعه",
       "invoice": "الفاتورة",
       "items": "البنود",
       "bill": "المبلغ",
@@ -1002,8 +989,6 @@
     "placeholder": "أضف ملاحظة للفريق",
     "add": "إضافة ملاحظة",
     "by": "{{name}} · {{date}}",
-    "delete": "حذف الملاحظة",
-    "deleted": "تم حذف الملاحظة",
     "empty": "لا ملاحظات بعد"
   },
   "timeline": {
@@ -1032,10 +1017,7 @@
     },
     "packages": {
       "progress": "{{used}} / {{total}}",
-      "next": "التالي · {{date}}",
-      "overdue": "الجلسة {{session}} متأخرة",
       "done": "اكتملت كل الجلسات",
-      "use": "استخدام جلسة",
       "empty": "لا باقات نشطة"
     },
     "prescriptions": {
@@ -1043,15 +1025,6 @@
     },
     "treatments": {
       "sub": "الجلسة {{session}} · {{date}}"
-    },
-    "billing": {
-      "due": "مستحق",
-      "paid": "مدفوع",
-      "show": "إظهار المبالغ",
-      "hide": "إخفاء المبالغ",
-      "invoice": "فاتورة {{type}} {{number}}",
-      "sub": "{{date}} · {{amount}}",
-      "collect": "تحصيل الدفعة"
     },
     "reports": {
       "sub": "{{type}} · {{date}}"
@@ -1064,13 +1037,8 @@
     "activity": {
       "filtersLabel": "عوامل تصفية النشاط",
       "notes": "الملاحظات",
-      "filterTitle": "{{label}} · {{count}}",
-      "rx": "الوصفة {{number}} · {{medicines}}",
-      "treatment": "{{name}} · الجلسة {{session}}",
-      "received": "استُلم {{amount}} · {{mode}}",
-      "refund": "استرداد {{amount}} · {{mode}}",
-      "against": "مقابل {{number}}",
-      "empty": "لا نشاط بعد"
+      "empty": "لا نشاط بعد",
+      "masked": "₹ ••••"
     }
   },
   "visitFlow": {
@@ -1085,9 +1053,7 @@
     "steps": {
       "checks": "تسجيل الحضور والسلامة",
       "rx": "الوصفة",
-      "treatment": "العلاج",
-      "invoice": "الفاتورة",
-      "collect": "التحصيل والمشاركة"
+      "treatment": "العلاج"
     },
     "checks": {
       "labels": {
@@ -1123,32 +1089,10 @@
       "empty": "سجّل جلسة اليوم",
       "last": "آخر الإعدادات: {{memo}}",
       "done": "{{name}} · الجلسة {{session}}",
-      "repeated": "سُجلت الجلسة {{session}} بآخر الإعدادات"
+      "repeated": "سُجلت الجلسة {{session}} بآخر الإعدادات",
+      "repeatPackage": "⚡ تكرار · {{name}}"
     },
-    "invoice": {
-      "total": "الإجمالي",
-      "create": "إنشاء فاتورة من الزيارة",
-      "custom": "فاتورة مخصصة",
-      "created": "أُنشئت الفاتورة {{number}} من الزيارة",
-      "nothing": "لا شيء للفوترة",
-      "ready_zero": "لا بنود جاهزة · {{total}}",
-      "ready_one": "بند واحد جاهز · {{total}}",
-      "ready_two": "بندان جاهزان · {{total}}",
-      "ready_few": "{{count}} بنود جاهزة · {{total}}",
-      "ready_many": "{{count}} بندًا جاهزًا · {{total}}",
-      "ready_other": "{{count}} بند جاهز · {{total}}",
-      "covered": "مشمولة بالباقة · لا شيء للفوترة",
-      "empty": "لا شيء للفوترة بعد",
-      "done": "{{number}} · {{total}}"
-    },
-    "collect": {
-      "upi": "تحصيل {{amount}} · UPI",
-      "received": "تم استلام {{amount}} ({{mode}})",
-      "share": "مشاركة الوصفة والفاتورة والصور",
-      "shared": "أُرسلت الوصفة والفاتورة والصور إلى {{name}} عبر WhatsApp",
-      "due": "{{amount}} مستحق",
-      "nothing": "لا شيء مستحق",
-      "sent": "أُرسلت عبر WhatsApp"
-    }
+    "paused": "الزيارة متوقفة مؤقتًا",
+    "resume": "استئناف"
   }
 }

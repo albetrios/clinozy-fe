@@ -2,11 +2,9 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { fsi } from '@/tests/utils/bidi-marks.ts';
+import { patientFile, TEST_PATIENT_ID } from '@/tests/utils/patient-doubles.ts';
 
 import {
   renderInPatientFile,
@@ -14,24 +12,47 @@ import {
 } from '../../../__tests__/integration/patient-file-test-router.tsx';
 import { LogFeedbackPicker } from './LogFeedbackPicker.tsx';
 
-const DHARTI = patientRef('Dharti Galani');
-const LHR = ref.treatment(498);
+const LHR = 'trt_lhr000000000000000000';
 const ID = 'log-feedback-picker';
 
-async function openPicker() {
+/** The patient's sessions as the Treatments section reads them — one reversed. */
+const sessions = vi.hoisted(() => ({
+  enabled: [] as boolean[],
+  rows: [
+    {
+      id: 'trt_lhr000000000000000000',
+      name: 'LHR Full Face',
+      performedAt: '2026-10-03T06:30:00.000Z',
+      status: 'done',
+    },
+    {
+      id: 'trt_peel00000000000000000',
+      name: 'Chemical peel',
+      performedAt: '2026-09-28T06:30:00.000Z',
+      status: 'reversed',
+    },
+  ],
+}));
+vi.mock('@/shared/hooks/useTreatments/index.ts', () => ({
+  usePatientTreatments: (_patientId: string, options: { enabled: boolean }) => {
+    sessions.enabled.push(options.enabled);
+    return { data: options.enabled ? sessions.rows : undefined };
+  },
+}));
+
+async function openPicker(viewable?: Parameters<typeof renderInPatientFile>[1]) {
   const onClose = vi.fn();
   const user = userEvent.setup();
   const view = renderInPatientFile(
     <LogFeedbackPicker
-      patientId={DHARTI}
-      patientName="Dharti Galani"
+      patientId={TEST_PATIENT_ID}
+      patientName="Priya Shah"
       from="overview"
       onClose={onClose}
     />,
-    { section: 'overview' },
+    { file: patientFile(), section: 'overview', ...viewable },
   );
   const picker = await screen.findByTestId(ID);
-  await within(picker).findByTestId(`${ID}-treatment-${LHR}`);
   return { ...view, user, picker, onClose };
 }
 
@@ -40,18 +61,17 @@ const at = (router: { state: { location: { pathname: string; search: object } } 
   search: router.state.location.search,
 });
 
-beforeEach(() => resetClinicFixtures());
-afterEach(() => {
-  resetPatientFile();
-  resetClinicFixtures();
+beforeEach(() => {
+  sessions.enabled = [];
 });
+afterEach(() => resetPatientFile());
 
 describe('Log feedback (KICKOFF §6.6; H:4406–4409)', () => {
   it('groups what can be logged: a consultation, the recent treatments, each review source', async () => {
     const { picker, baseElement } = await openPicker();
     expect(within(picker).getByTestId(`${ID}-title`)).toHaveTextContent('Log feedback');
     expect(picker).toHaveTextContent(
-      `${fsi('Dharti Galani')} · pick what you want to record`,
+      `${fsi('Priya Shah')} · pick what you want to record`,
     );
     for (const group of ['Check-in', 'Treatment feedback', 'Review']) {
       // The titled group, and its chips' own group by the same name.
@@ -64,6 +84,8 @@ describe('Log feedback (KICKOFF §6.6; H:4406–4409)', () => {
     expect(within(picker).getByTestId(`${ID}-treatment-${LHR}`)).toHaveTextContent(
       'After LHR Full Face',
     );
+    // A reversed session is not followed up.
+    expect(picker).not.toHaveTextContent('Chemical peel');
     expect(
       ['google', 'video', 'instagram', 'internal_form', 'whatsapp'].map(
         (source) => within(picker).getByTestId(`${ID}-review-${source}`).textContent,
@@ -83,7 +105,7 @@ describe('Log feedback (KICKOFF §6.6; H:4406–4409)', () => {
     expect(onClose).toHaveBeenCalled();
     await waitFor(() =>
       expect(at(router)).toEqual({
-        path: `/organization/acme/patients/${DHARTI}/check-ins/create`,
+        path: `/organization/acme/patients/${TEST_PATIENT_ID}/check-ins/create`,
         search: { from: 'overview' },
       }),
     );
@@ -98,10 +120,18 @@ describe('Log feedback (KICKOFF §6.6; H:4406–4409)', () => {
     await user.click(within(picker).getByTestId(`${ID}-review-whatsapp`));
     await waitFor(() =>
       expect(at(router)).toEqual({
-        path: `/organization/acme/patients/${DHARTI}/reviews/create`,
+        path: `/organization/acme/patients/${TEST_PATIENT_ID}/reviews/create`,
         search: { from: 'overview', source: 'whatsapp' },
       }),
     );
+  });
+
+  it('offers no treatment check-ins to a member who may not read treatments', async () => {
+    const { picker } = await openPicker({ viewable: ['overview', 'visits'] });
+    expect(sessions.enabled).not.toContain(true);
+    expect(
+      within(picker).queryAllByRole('group', { name: 'Treatment feedback' }),
+    ).toHaveLength(0);
   });
 
   it('closes on "Close"', async () => {

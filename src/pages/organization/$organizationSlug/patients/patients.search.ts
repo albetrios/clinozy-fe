@@ -1,8 +1,9 @@
 /**
  * URL search-param schemas for the Patients room (consumed by routeTree's
- * `validateSearch`): the list's view, search, filters and sort (KICKOFF §6.5,
- * `S:30`). A value the URL can't hold — an unknown type, a bad date range —
- * is dropped, never an error. Defaults stay out of the URL (`/patients` is the
+ * `validateSearch`): the list's view, search, filters and sort as clinozy-be
+ * reads them (api-integration §5.4). A value the URL can't hold — an unknown
+ * type, a bad date range, a view or a filter the API has no read for — is
+ * dropped, never an error. Defaults stay out of the URL (`/patients` is the
  * All view, newest first). New patient's prefill is
  * `patients.dialog-search.ts`'s, off the entry chunk.
  *
@@ -18,7 +19,6 @@ import {
   readFollowUpFilter,
 } from '@/shared/api/clinic/clinic-list-filters.ts';
 import type {
-  Gender,
   PatientConversion,
   PatientStatus,
   PatientType,
@@ -28,64 +28,62 @@ import type {
   PatientView,
 } from '@/shared/api/clinic/patients-contracts.ts';
 
-/** The list's views, in the tab order (`patients.md:203–207`). */
+/**
+ * The list's views, in the tab order (`patients.md:203–207`) — less In clinic today and With
+ * dues, which the API cannot read (G4, Q22).
+ */
 export const PATIENT_VIEWS = [
   'all',
-  'today',
-  'dues',
   'follow',
   'recall',
 ] as const satisfies readonly PatientView[];
 
-/** Each filter's values, in the chip order of its column (`patients.md:28`). */
+/**
+ * Each filter's values, in the chip order of its column (`patients.md:28`) — less Gender, the
+ * person's and not a patients filter (G4).
+ */
 export const PATIENT_FILTER_VALUES = {
-  gender: ['female', 'male', 'other'],
   types: ['aesthetic', 'clinical', 'lhr', 'dental', 'physio', 'gynac'],
   status: ['new', 'regular', 'vip', 'inactive'],
   conversion: ['converted', 'not_converted'],
 } as const satisfies {
-  gender: readonly Gender[];
   types: readonly PatientType[];
   status: readonly PatientStatus[];
   conversion: readonly PatientConversion[];
 };
 
-const SORT_KEYS = [
-  'seq',
-  'name',
-  'types',
-  'status',
-  'conversion',
-  'age',
-  'followUp',
-  'due',
-  'updated',
-] as const satisfies readonly PatientSortKey[];
+/** The columns the API sorts by: ID and Follow-up. */
+const SORT_KEYS = ['seq', 'followUp'] as const satisfies readonly PatientSortKey[];
 
-/** A column sort in the URL: `due:desc`, `name:asc` (the shared table's form). */
+/** A column sort in the URL: `seq:desc`, `followUp:asc` (the shared table's form). */
 export type PatientsSort = `${PatientSortKey}:${'asc' | 'desc'}`;
 
 /** Validated `?…` search params for `/patients` and its dialog route. */
 export interface PatientsSearch {
-  /** All (default) · In clinic today · With dues · Follow-up due · Recall. */
+  /** All (default) · Follow-up due · Recall. */
   view?: PatientView;
-  /** Name, mobile or "#ID" (≤ 80 characters, the contract's `q`). */
+  /** Name, mobile or "#ID" (≤ 80 characters, the API's `q`). */
   q?: string;
   /** Any of these patient types. */
   types?: PatientType[];
-  /** Any of these statuses. */
-  status?: PatientStatus[];
-  /** Any of these genders (a backend request, Appendix F). */
-  gender?: Gender[];
-  /** Either conversion (a backend request, Appendix F). */
-  conversion?: PatientConversion[];
+  /** One status. */
+  status?: PatientStatus;
+  /** One conversion. */
+  conversion?: PatientConversion;
   created?: CreatedFilter;
-  followUp?: FollowUpFilter;
+  /** A follow-up range — every preset but "Not set", which the API cannot read. */
+  followUp?: Exclude<FollowUpFilter, 'not_set'>;
   sort?: PatientsSort;
 }
 
 /** The list's state when the URL says nothing. */
 export const PATIENTS_SEARCH_DEFAULTS = { view: 'all' } as const satisfies PatientsSearch;
+
+/** A Follow-up filter the API can read — every preset but "Not set", or a range. */
+function readPatientFollowUp(value: unknown): PatientsSearch['followUp'] {
+  const filter = readFollowUpFilter(value);
+  return filter === 'not_set' ? undefined : filter;
+}
 
 /**
  * Parse `/patients` search params. Every key is answered, `undefined` included:
@@ -96,11 +94,10 @@ export function validatePatientsSearch(search: Record<string, unknown>): Patient
     view: oneOf(PATIENT_VIEWS, search.view),
     q: queryOf(search.q, 80),
     types: listIn(PATIENT_FILTER_VALUES.types, search.types),
-    status: listIn(PATIENT_FILTER_VALUES.status, search.status),
-    gender: listIn(PATIENT_FILTER_VALUES.gender, search.gender),
-    conversion: listIn(PATIENT_FILTER_VALUES.conversion, search.conversion),
+    status: oneOf(PATIENT_FILTER_VALUES.status, search.status),
+    conversion: oneOf(PATIENT_FILTER_VALUES.conversion, search.conversion),
     created: readCreatedFilter(search.created),
-    followUp: readFollowUpFilter(search.followUp),
+    followUp: readPatientFollowUp(search.followUp),
     sort: sortOf(SORT_KEYS, search.sort),
   };
 }

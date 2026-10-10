@@ -2,26 +2,18 @@ import type { TFunction } from 'i18next';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
+import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
 import { cn } from '@/lib/utils.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import { invoiceTotals } from '@/shared/api/clinic/clinic-money.ts';
-import type { VisitDetail, VisitRecord } from '@/shared/api/clinic/visits-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+import type { VisitRecord } from '@/shared/api/clinic/visits-contracts.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
-import { useOpenInvoices } from '@/shared/hooks/usePayments/index.ts';
-import { useVisitCatalog, useVisitDetail } from '@/shared/hooks/useVisits/index.ts';
 
-import { usePatientFileContext } from '../../../shared/patient-file-context.ts';
-import { TIMELINE_KEYS } from '../../timeline.constants.ts';
+import { ChecksStep, RxStep, StepRetry, TreatmentStep } from './flow-steps.tsx';
 import {
-  ChecksStep,
-  CollectStep,
-  InvoiceStep,
-  RxStep,
-  TreatmentStep,
-} from './flow-steps.tsx';
-import { useVisitFlowActions } from './use-visit-flow.ts';
+  useVisitFlow,
+  type VisitFlowRead,
+  type VisitFlowRecords,
+} from './use-visit-flow.ts';
 import {
   VISIT_FLOW_KEYS,
   VISIT_FLOW_NS,
@@ -31,7 +23,6 @@ import {
 } from './visit-flow.constants.ts';
 import {
   DARK_BUTTON,
-  flowInvoice,
   OUTLINE_BUTTON,
   rememberedSettings,
   stepStates,
@@ -101,110 +92,82 @@ function StepCard({
   );
 }
 
-/** Treatment's status: today's session once recorded, else the last settings, else the ask. */
-function treatmentStatus(t: TFunction, detail: VisitDetail | undefined): string {
-  if (detail?.treatment) {
-    const { name, sessionNo } = detail.treatment;
-    return t(K.treatment.done, { name, session: sessionNo });
-  }
-  const memo = rememberedSettings(detail?.lastTreatment ?? null);
-  return memo ? t(K.treatment.last, { memo }) : t(K.treatment.empty);
+/** A step's status while its read is loading or failed; null once it has answered. */
+function readStatus(t: TFunction, read: VisitFlowRead<unknown>): string | null {
+  if (read.isError) return t(ERRORS_KEYS.frontend.query.loadFailed, { ns: ERRORS_NS });
+  if (read.isLoading) return t(LOCALE_KEYS.loading, { ns: LOCALE_NS });
+  return null;
 }
 
-/** Invoice's status: the invoice once made, else what is ready to bill, else why nothing is. */
-function invoiceStatus(
-  t: TFunction,
-  detail: VisitDetail | undefined,
-  money: (paise: number) => string,
-): string {
-  if (!detail) return t(K.invoice.empty);
-  if (detail.invoice) {
-    return t(K.invoice.done, {
-      number: displayId.invoiceNumber(detail.invoice.seq),
-      total: money(invoiceTotals(detail.invoice).bill),
-    });
+/** Each shown step's status line (H:4881–4885) and whether it is done. */
+function useSteps(records: VisitFlowRecords) {
+  const { t } = useTranslation([VISIT_FLOW_NS, ERRORS_NS, LOCALE_NS]);
+  const status: Partial<Record<VisitFlowStep, string>> = {};
+  const done: Partial<Record<VisitFlowStep, boolean>> = {};
+  const { checks, prescription, treatment } = records;
+  if (checks) {
+    const left = checks.data
+      ? Object.values(checks.data).filter((note) => note === null).length
+      : null;
+    done.checks = left === 0;
+    status.checks =
+      readStatus(t, checks) ??
+      (left === 0 ? t(K.checks.done) : t(K.checks.left, { count: left ?? 0 }));
   }
-  const bill = flowInvoice(detail);
-  if (bill.total > 0) {
-    return t(K.invoice.ready, { count: bill.lines.length, total: money(bill.total) });
+  if (prescription) {
+    done.rx = Boolean(prescription.data);
+    status.rx =
+      readStatus(t, prescription) ??
+      (prescription.data
+        ? prescription.data.items.map((item) => item.medicineName).join(', ')
+        : t(K.rx.empty));
   }
-  return bill.covered ? t(K.invoice.covered) : t(K.invoice.empty);
-}
-
-/** Each step's status line (H:4881–4885). */
-function useStatuses(
-  visit: VisitRecord,
-  detail: VisitDetail | undefined,
-  money: (paise: number) => string,
-  due: number,
-): Readonly<Record<VisitFlowStep, string>> {
-  const { t } = useTranslation(VISIT_FLOW_NS);
-  const left = Object.values(visit.checks).filter((on) => !on).length;
-  let collect = t(K.collect.nothing);
-  if (visit.sharedAt) collect = t(K.collect.sent);
-  else if (due > 0) collect = t(K.collect.due, { amount: money(due) });
-  return {
-    checks: left === 0 ? t(K.checks.done) : t(K.checks.left, { count: left }),
-    rx: detail?.prescription
-      ? detail.prescription.items.map((item) => item.medicineName).join(', ')
-      : t(K.rx.empty),
-    treatment: treatmentStatus(t, detail),
-    invoice: invoiceStatus(t, detail, money),
-    collect,
-  };
+  if (treatment) {
+    const session = treatment.data;
+    const memo = rememberedSettings(records.lastTreatment);
+    done.treatment = Boolean(session);
+    let line = memo ? t(K.treatment.last, { memo }) : t(K.treatment.empty);
+    if (session) {
+      line = t(K.treatment.done, { name: session.name, session: session.sessionNumber });
+    }
+    status.treatment = readStatus(t, treatment) ?? line;
+  }
+  return { status, states: stepStates(done) };
 }
 
 /**
- * The patient file's visit flow (KICKOFF §6.6 Visit flow, D18; H:758–768,
- * H:4871–4898; `patient-file.md:92–101, 392–404`) on `timeline?visit=open`:
- * one column up to 880px — "Visit in progress", Pause and "✓ Complete visit",
- * then five step cards, all open, the first unfinished one current: Check-in &
- * safety, Prescription, Treatment (waits for the checks), Invoice, Collect &
- * share. Today's "Open session" and "Checkout" open it (`from=today`, L-64);
- * the records written here move Today's card on.
+ * The patient file's visit flow (KICKOFF §6.6 Visit flow; H:758–768, H:4871–4898;
+ * `patient-file.md:92–101, 392–404`) on `timeline?visit=open`, on the patient's booking checked
+ * in today: one column up to 880px — "Visit in progress" (or paused), Pause / Resume and "✓
+ * Complete visit", then the step cards, all open, the first unfinished one current: Check-in &
+ * safety, Prescription, Treatment (waits for the checks). Each shows for a member who may read
+ * its records, its controls for one who may write them. Invoice and "Collect & share" come back
+ * with Payments (D152); the share goes (§6 #26).
  */
 export function VisitFlow({ visit }: { visit: VisitRecord }) {
-  const { t } = useTranslation([VISIT_FLOW_NS, CLINIC_NS]);
-  const { patientId, file, masked } = usePatientFileContext();
-  const formatPaise = usePaiseFormat();
-  const detail = useVisitDetail(visit.id).data;
-  const kits = useVisitCatalog().data?.kits ?? [];
-  const oldest = useOpenInvoices(patientId).data?.[0] ?? null;
-  const actions = useVisitFlowActions(visit, detail);
-  const money = (paise: number) =>
-    masked ? t(TIMELINE_KEYS.billing.masked) : formatPaise(paise);
-  const states = stepStates(visit, detail);
-  const statuses = useStatuses(visit, detail, money, file?.due ?? 0);
-  const bill = detail && !detail.invoice ? flowInvoice(detail) : null;
-  const invoiceList =
-    bill && bill.lines.length > 0
-      ? {
-          lines: bill.lines.map((line) => ({
-            name: line.name,
-            amount: money(line.amount),
-          })),
-          total: money(bill.total),
-        }
-      : null;
+  const { t } = useTranslation(VISIT_FLOW_NS);
+  const { records, actions } = useVisitFlow(visit);
+  const { status, states } = useSteps(records);
+  const paused = visit.pausedAt !== null;
   const bodies: Readonly<Record<VisitFlowStep, ReactNode>> = {
-    checks: <ChecksStep visit={visit} onToggle={actions.toggleCheck} />,
-    rx: <RxStep kits={kits} actions={actions} />,
+    checks: records.checks?.data ? (
+      <ChecksStep checks={records.checks.data} actions={actions} />
+    ) : null,
+    rx: <RxStep kits={records.kits} actions={actions} />,
     treatment: (
       <TreatmentStep
-        detail={detail}
-        memo={rememberedSettings(detail?.lastTreatment ?? null)}
-        actions={actions}
-      />
-    ),
-    invoice: <InvoiceStep invoice={invoiceList} actions={actions} />,
-    collect: (
-      <CollectStep
-        due={oldest && oldest.due > 0 ? money(oldest.due) : null}
-        modeLabel={(mode) => t(CLINIC_KEYS.paymentModes[mode], { ns: CLINIC_NS })}
+        records={records}
+        memo={rememberedSettings(records.lastTreatment)}
         actions={actions}
       />
     ),
   };
+  const reads = {
+    checks: records.checks,
+    rx: records.prescription,
+    treatment: records.treatment,
+  } satisfies Record<VisitFlowStep, VisitFlowRead<unknown> | undefined>;
+  const shown = VISIT_FLOW_STEPS.filter((step) => reads[step] !== undefined);
 
   return (
     <div
@@ -214,43 +177,75 @@ export function VisitFlow({ visit }: { visit: VisitRecord }) {
       <div className="flex flex-wrap items-center gap-2.5">
         <span
           data-slot="pill"
-          className="bg-tone-sage text-tone-sage-foreground inline-flex h-6 items-center gap-1.5 rounded-full px-2.5 text-xs font-medium whitespace-nowrap"
+          className={cn(
+            'inline-flex h-6 items-center gap-1.5 rounded-full px-2.5 text-xs font-medium whitespace-nowrap',
+            paused
+              ? 'bg-tone-butter text-tone-butter-foreground'
+              : 'bg-tone-sage text-tone-sage-foreground',
+          )}
         >
-          <span aria-hidden="true" className="bg-success size-1.75 rounded-full" />
-          {t(K.pill)}
+          <span
+            aria-hidden="true"
+            className={cn(
+              'size-1.75 rounded-full',
+              paused ? 'bg-tone-butter-dot' : 'bg-success',
+            )}
+          />
+          {t(paused ? K.paused : K.pill)}
         </span>
         <span className="text-body text-muted-foreground-strong">{t(K.lead)}</span>
         <span className="flex-1 max-md:hidden" />
         <div className="flex gap-2 max-md:basis-full">
-          <Button
-            type="button"
-            {...OUTLINE_BUTTON}
-            onClick={actions.pause}
-            data-testid={ids.pause}
-          >
-            {t(K.pause)}
-          </Button>
-          <Button
-            type="button"
-            {...DARK_BUTTON}
-            onClick={actions.complete}
-            data-testid={ids.complete}
-          >
-            {t(K.complete)}
-          </Button>
+          {actions.pause ? (
+            <Button
+              type="button"
+              {...OUTLINE_BUTTON}
+              onClick={actions.pause}
+              data-testid={ids.pause}
+            >
+              {t(K.pause)}
+            </Button>
+          ) : null}
+          {actions.resume ? (
+            <Button
+              type="button"
+              {...OUTLINE_BUTTON}
+              onClick={actions.resume}
+              data-testid={ids.resume}
+            >
+              {t(K.resume)}
+            </Button>
+          ) : null}
+          {actions.complete ? (
+            <Button
+              type="button"
+              {...DARK_BUTTON}
+              onClick={actions.complete}
+              data-testid={ids.complete}
+            >
+              {t(K.complete)}
+            </Button>
+          ) : null}
         </div>
       </div>
-      {VISIT_FLOW_STEPS.map((step, index) => (
-        <StepCard
-          key={step}
-          step={step}
-          index={index}
-          state={states[step]}
-          status={statuses[step]}
-        >
-          {bodies[step]}
-        </StepCard>
-      ))}
+      {shown.map((step, index) => {
+        const read = reads[step];
+        return (
+          <StepCard
+            key={step}
+            step={step}
+            index={index}
+            state={states[step] ?? 'later'}
+            status={status[step] ?? ''}
+          >
+            {read?.isError ? (
+              <StepRetry step={step} onRetry={read.retry} />
+            ) : (
+              bodies[step]
+            )}
+          </StepCard>
+        );
+      })}
     </div>
   );
 }

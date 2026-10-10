@@ -22,6 +22,7 @@ import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { usePatientTreatments } from '@/shared/hooks/useTreatments/index.ts';
 
+import { usePatientFileContext } from '../../../shared/patient-file-context.ts';
 import {
   CLINICAL_NS,
   LOG_FEEDBACK_KEYS,
@@ -31,7 +32,7 @@ import {
 const K = LOG_FEEDBACK_KEYS;
 const ID = OVERVIEW_TEST_IDS.logFeedback;
 
-/** How many recent treatments the picker offers aftercare check-ins for (H:4406). */
+/** How many recent sessions the picker offers aftercare check-ins for (H:4406). */
 const RECENT_TREATMENTS = 4;
 
 /** Each review source's line on hover (H:4406). */
@@ -58,8 +59,9 @@ export interface LogFeedbackPickerProps {
  * H:4406–4409; F10): 560px, "Log feedback" over "<name> · pick what you want
  * to record"; three groups of chips — "Check-in" (Consultation), "Treatment
  * feedback" (an aftercare check-in for each of the four latest treatments,
- * "After LHR Full Face") and "Review" (each source). A chip closes the picker
- * and opens its drawer over the file; "Close" closes it.
+ * "After LHR Full Face" — for a member who may read treatments) and "Review"
+ * (each source). A chip closes the picker and opens its drawer over the file;
+ * "Close" closes it.
  */
 export function LogFeedbackPicker({
   patientId,
@@ -71,10 +73,17 @@ export function LogFeedbackPicker({
   const { organizationSlug = '' } = useParams({ strict: false });
   const navigate = useNavigate();
   const { formatDate } = useLocaleFormat();
-  const treatments = (usePatientTreatments(patientId).data ?? []).slice(
-    0,
-    RECENT_TREATMENTS,
-  );
+  const { viewable } = usePatientFileContext();
+  // The Treatments section's read (`patient_treatment:read`); without it the group goes.
+  // A reversed session is not followed up.
+  const treatments = (
+    usePatientTreatments(patientId, {
+      enabled: viewable.includes('treatments'),
+      notifyOnError: false,
+    }).data ?? []
+  )
+    .filter((treatment) => treatment.status === 'done')
+    .slice(0, RECENT_TREATMENTS);
 
   const checkIn = (treatment?: string) => {
     onClose();

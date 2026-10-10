@@ -5,8 +5,6 @@
   "views": {
     "label": "Visualizações de pacientes",
     "all": "Todos",
-    "today": "Na clínica hoje",
-    "dues": "Com valores em aberto",
     "follow": "Retorno pendente",
     "recall": "Reativação"
   },
@@ -26,7 +24,6 @@
     "conversion": "Conversão",
     "age": "Idade",
     "followUp": "Retorno",
-    "due": "Em aberto",
     "updated": "Atualizado"
   },
   "table": {
@@ -36,8 +33,6 @@
     "age_other": "{{count}} anos"
   },
   "rowActions": {
-    "newInvoice": "Nova fatura",
-    "collect": "Receber {{amount}}",
     "edit": "Editar",
     "delete": "Excluir"
   },

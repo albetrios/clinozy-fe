@@ -1,8 +1,8 @@
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import i18n from '@/lib/i18n/i18n.ts';
 import { organizationPatientSection } from '@/lib/routes/patient-file-builders.ts';
-import { fetchVisit } from '@/shared/api/clinic/visits-api.ts';
-import { isNotFound } from '@/shared/errors/HttpError.ts';
+import { fetchAppointment } from '@/shared/api/clinic/appointments-api.ts';
+import { isHttpError } from '@/shared/errors/HttpError.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { CLINIC_KEYS, CLINIC_NS } from './clinic.constants.ts';
@@ -20,11 +20,9 @@ export interface VisitNavigation {
 export type VisitRedirect = VisitNavigation & { replace: true };
 
 /**
- * The patient's own page with the visit flow open (KICKOFF §6.6, D18): the
- * Overview on `timeline?visit=open`, Today as the way back (`from=today`). The
- * flow holds what the Visit sheet did — the Rx through the Prescription drawer,
- * the session, the bill and the collection — and a closed visit just leaves
- * the Overview (the page drops a stale `visit=open`).
+ * The patient's own page with the visit flow open (KICKOFF §6.6): the Overview on
+ * `timeline?visit=open`, Today as the way back (`from=today`). A visit that is no longer open
+ * just leaves the Overview (the page drops a stale `visit=open`).
  */
 export function patientVisitTarget(
   organizationSlug: string,
@@ -36,22 +34,27 @@ export function patientVisitTarget(
   };
 }
 
-/** The visit's patient — null when the server doesn't know the visit (a 404); any other failure is thrown. */
-async function patientOfVisit(visitId: string): Promise<string | null> {
+/**
+ * The patient file of a visit's booking (`GET /app/appointments/:appointment_id` — its person's
+ * `patient_id`): null when the server doesn't know the id — a 404, or a 400 for an id that is not
+ * a booking's (the retired Visit's) — or the person has no patient file. Any other failure is
+ * thrown.
+ */
+async function patientOfVisit(appointmentId: string): Promise<string | null> {
   try {
-    return (await fetchVisit(visitId)).person.patientId;
+    return (await fetchAppointment(appointmentId)).patientId;
   } catch (error) {
-    if (isNotFound(error)) return null;
+    if (isHttpError(error) && (error.status === 404 || error.status === 400)) return null;
     throw error;
   }
 }
 
 /**
- * Where an old Visit sheet link lands (`/visits/$visitId?tab=…`, L-64: the
- * sheet is gone): the visit's patient's page with the flow open. A visit the
- * server doesn't know (a 404), or one with no patient record yet, goes to
- * Today with "Visit not found · it may have been deleted". Any other failure
- * — offline, a 5xx — is thrown, for the route's error boundary to show and retry.
+ * Where an old Visit link lands (`/visits/$visitId?tab=…`, L-64: there is no Visit resource — a
+ * visit is its booking, so the id is read as a booking's): the booking's patient's page with the
+ * flow open. An id the server doesn't know, or a person with no patient file, goes to Today with
+ * "Visit not found · it may have been deleted". Any other failure — offline, a 5xx — is thrown,
+ * for the route's error boundary to show and retry.
  */
 export async function visitRedirect(
   organizationSlug: string,

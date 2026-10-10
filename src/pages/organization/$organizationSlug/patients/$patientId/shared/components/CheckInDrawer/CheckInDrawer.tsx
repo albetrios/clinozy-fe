@@ -1,16 +1,20 @@
+import { useQueryClient } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
 import { useState } from 'react';
 import { useForm, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import type { CheckIn } from '@/shared/api/clinic/clinic-schema.ts';
-import type { CheckInSaved } from '@/shared/api/clinic/feedback-contracts.ts';
+import { feedbackQueryKeys, fetchCheckIn } from '@/shared/api/clinic/feedback-api.ts';
+import type { PatientCheckIn } from '@/shared/api/clinic/feedback-contracts.ts';
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
-import { useCheckInContext } from '@/shared/hooks/useFeedback/index.ts';
+import {
+  useCheckInContext,
+  useCheckInOfferings,
+} from '@/shared/hooks/useFeedback/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
-import { useOfferings } from '@/shared/hooks/useOfferings/index.ts';
 import { notify } from '@/shared/notify/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 import { CHECK_IN_KEYS, CHECK_IN_NS, CHECK_IN_TEST_ID } from './check-in.constants.ts';
 import {
@@ -38,7 +42,7 @@ export interface CheckInDrawerProps {
   /** The patient's full name — the sub line and the saved toast. */
   patientName: string;
   /** The check-in a card's Edit opens; null for a new one. */
-  checkIn: CheckIn | null;
+  checkIn: PatientCheckIn | null;
   /** The visit and the treatment it follows (`?appointment=&treatment=`, or the record's own). */
   appointmentId: string | null;
   treatmentId: string | null;
@@ -49,13 +53,42 @@ export interface CheckInDrawerProps {
   onClose: () => void;
 }
 
-/** "Check-in saved for Dharti Galani · 2 added to suggestions · doctor call-back task created". */
-function savedMessage(t: TFunction, patientName: string, saved: CheckInSaved): string {
+/**
+ * "Check-in saved for Dharti Galani · 2 added to suggestions · doctor call-back task created" —
+ * from the server's answer: the offerings it planned (one the plan held is skipped, TR10) and
+ * whether it needs action, which is when it opened the call-back (TR4).
+ */
+function savedMessage(t: TFunction, patientName: string, saved: PatientCheckIn): string {
+  const added = saved.nextOfferingIds.length;
   return [
     t(K.saved, { name: patientName }),
-    saved.suggestionsAdded > 0 ? t(K.added, { count: saved.suggestionsAdded }) : '',
-    saved.callBackCreated ? t(K.callBack) : '',
+    added > 0 ? t(K.added, { count: added }) : '',
+    saved.needsAction ? t(K.callBack) : '',
   ].join('');
+}
+
+/**
+ * An edit's record, kept in step with a reload: a save refused as stale (`409
+ * record_changed`) reads the check-in again and restarts the form on what was saved.
+ */
+function useEditingCheckIn(
+  checkIn: PatientCheckIn | null,
+  reset: (record: PatientCheckIn) => void,
+) {
+  const queryClient = useQueryClient();
+  const organizationId = useOrganizationStore((state) => state.organizationId);
+  const [record, setRecord] = useState(checkIn);
+  const reload = async () => {
+    if (!record) return;
+    const fresh = await queryClient.fetchQuery({
+      queryKey: feedbackQueryKeys.checkIn(organizationId, record.id),
+      queryFn: () => fetchCheckIn(record.patientId, record.id),
+      staleTime: 0,
+    });
+    setRecord(fresh);
+    reset(fresh);
+  };
+  return { record, reload };
 }
 
 /**
@@ -63,10 +96,10 @@ function savedMessage(t: TFunction, patientName: string, saved: CheckInSaved): s
  * (KICKOFF §6.6 Drawers; H:4396; `patient-file.md:171–187, 383–390`): 680px,
  * "Aftercare check-in" when it follows a treatment, "Visit check-in"
  * otherwise; steps "How is it now" → "What they followed" → "Next plan of
- * action", each head naming its values. No feel → "Pick how it is now"; else
- * "Check-in saved for Dharti Galani" with " · 2 added to suggestions" and
- * " · doctor call-back task created" when the server set them off, or
- * "Check-in updated".
+ * action", each head naming its values. No feel → "Pick how it is now", no
+ * score → "Pick the patient’s score"; else "Check-in saved for Dharti Galani"
+ * with " · 2 added to suggestions" and " · doctor call-back task created" when
+ * the server set them off, or "Check-in updated".
  */
 export function CheckInDrawer({
   patientId,
@@ -79,43 +112,40 @@ export function CheckInDrawer({
   onClose,
 }: CheckInDrawerProps) {
   const { t } = useTranslation(CHECK_IN_NS);
-  const context = useCheckInContext(patientId, {
-    appointmentId,
-    treatmentId,
-    editingId: checkIn?.id ?? null,
-  });
-  const offerings = useOfferings({ notifyOnError: false });
   const form = useForm<CheckInFormValues>({
     defaultValues: checkIn ? checkInFormOf(checkIn) : newCheckInForm(),
   });
+  const { record, reload } = useEditingCheckIn(checkIn, (fresh) =>
+    form.reset(checkInFormOf(fresh)),
+  );
+  const context = useCheckInContext(patientId, {
+    appointmentId,
+    treatmentId,
+    editing: record,
+  });
+  const offerings = useCheckInOfferings();
   const values = useFormValues(form);
   const { isDirty } = useFormState({ control: form.control });
   const [step, setStep] = useState<string>('now');
   const head = useCheckInHead({
     patientName,
     aftercare: treatmentId !== null,
-    context: context.data,
+    context,
   });
   const options = useCheckInOfferingOptions(offerings.data ?? [], values.nextOfferingIds);
   const views = useCheckInStepsView(
     values,
     options.filter((option) => values.nextOfferingIds.includes(option.key)),
   );
-  const previous = context.data?.previous ?? null;
 
   const { saveState, save } = useCheckInSave({
     form,
-    checkIn,
-    place: () => ({
-      patientId,
-      appointmentId,
-      treatmentId,
-      context: checkIn?.context ?? head.context,
-      date: checkIn?.date ?? today,
-    }),
+    checkIn: record,
+    place: { patientId, appointmentId, treatmentId, date: today },
     onStep: setStep,
+    onStale: record ? () => void reload() : undefined,
     onDone: (saved) => {
-      notify.success(checkIn ? t(K.updated) : savedMessage(t, patientName, saved));
+      notify.success(record ? t(K.updated) : savedMessage(t, patientName, saved));
       onClose();
     },
   });
@@ -125,19 +155,30 @@ export function CheckInDrawer({
       id: 'now',
       title: t(K.steps.now),
       ...views.now,
-      content: <CheckInNowFields form={form} values={values} previous={previous} />,
+      content: (
+        <CheckInNowFields form={form} values={values} previous={context.previous} />
+      ),
     },
     {
       id: 'followed',
       title: t(K.steps.followed),
       ...views.followed,
-      content: <CheckInFollowedFields form={form} values={values} previous={previous} />,
+      content: (
+        <CheckInFollowedFields form={form} values={values} previous={context.previous} />
+      ),
     },
     {
       id: 'next',
       title: t(K.steps.next),
       ...views.next,
-      content: <CheckInNextFields form={form} values={values} options={options} />,
+      content: (
+        <CheckInNextFields
+          form={form}
+          values={values}
+          options={options}
+          editing={record !== null}
+        />
+      ),
     },
   ];
 
@@ -153,7 +194,7 @@ export function CheckInDrawer({
       steps={steps}
       openStep={step}
       onOpenStepChange={setStep}
-      saveLabel={t(checkIn ? K.saveEdit : K.save)}
+      saveLabel={t(record ? K.saveEdit : K.save)}
       onSave={() => void save()}
       saveState={saveState}
       dirty={isDirty}

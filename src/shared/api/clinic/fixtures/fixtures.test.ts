@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { z } from 'zod';
+import { z } from 'zod';
 
 import { appointmentRecordSchema } from '@/shared/api/clinic/appointments-fixture-contracts.ts';
 import { FIXTURE_ORGANIZATION_ID } from '@/shared/api/clinic/clinic-fixture-store.ts';
@@ -21,6 +21,7 @@ import {
   organizationSchema,
   patientImageSchema,
   patientNoteSchema,
+  patientPackageSchema,
   patientReportSchema,
   prescriptionSchema,
   reviewSchema,
@@ -45,11 +46,15 @@ import {
   offeringRecordSchema,
   offerRecordSchema,
 } from '@/shared/api/clinic/offerings-contracts.ts';
-import { patientPackageRecordSchema } from '@/shared/api/clinic/patient-packages-contracts.ts';
-import { patientRecordSchema } from '@/shared/api/clinic/patients-contracts.ts';
+import { patientRecordSchema } from '@/shared/api/clinic/patients-fixture-contracts.ts';
 import { paymentRecordSchema } from '@/shared/api/clinic/payments-contracts.ts';
 import { taskRecordSchema } from '@/shared/api/clinic/tasks-contracts.ts';
 import { staffProfileSchema } from '@/shared/api/clinic/users-contracts.ts';
+
+/** The fixture's packages: the contract's, and one added before its invoice (`invoiceId` null). */
+const patientPackageRecordSchema = patientPackageSchema.extend({
+  invoiceId: z.uuid().nullable(),
+});
 
 import { patientRef } from './patients.fixtures.ts';
 import { readSeedLabel, seedExpiry, seedMobile } from './refs.fixtures.ts';

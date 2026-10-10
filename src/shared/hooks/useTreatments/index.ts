@@ -1,11 +1,10 @@
 export {
-  type TreatmentDeleteVars,
+  type TreatmentCreateVars,
+  type TreatmentReverseVars,
   type TreatmentUpdateVars,
   useCreateTreatment,
-  useDeleteTreatment,
   usePatientTreatments,
-  useRestoreTreatment,
-  useTreatment,
-  useTreatmentCheckIns,
+  useReverseTreatment,
+  useTreatmentFeedback,
   useUpdateTreatment,
 } from './useTreatments.ts';

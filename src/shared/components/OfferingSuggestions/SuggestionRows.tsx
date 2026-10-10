@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
@@ -23,7 +24,6 @@ import {
   ChevronDown,
   Clock,
   Info,
-  LinkIcon,
   Minus,
   Plus,
   Sparkles,
@@ -44,14 +44,7 @@ import type {
   SuggestionLine,
   SuggestionPatch,
 } from './offering-suggestions.types.ts';
-import {
-  belowFloor,
-  fullyInvoiced,
-  lineFinalPrice,
-  lineFloorPrice,
-  SUGGESTION_QTY,
-  withQty,
-} from './offering-suggestions-model.ts';
+import { lineFinalPrice, SUGGESTION_QTY, withQty } from './offering-suggestions-model.ts';
 
 const KEYS = OFFERING_SUGGESTIONS_KEYS;
 
@@ -84,10 +77,13 @@ function InfoTip({ label, text }: { label: string; text: string }) {
 /** The 92×30 quantity stepper: "Less" · the count · "More" (H:2808). */
 function QtyStepper({
   qty,
+  min,
   readOnly,
   onChange,
 }: {
   qty: number;
+  /** The least it may go to — never under what is invoiced (PK7). */
+  min: number;
   readOnly: boolean;
   onChange: (qty: number) => void;
 }) {
@@ -102,7 +98,7 @@ function QtyStepper({
       <button
         type="button"
         aria-label={t(KEYS.less)}
-        disabled={readOnly || qty <= SUGGESTION_QTY.min}
+        disabled={readOnly || qty <= min}
         onClick={() => onChange(qty - 1)}
         className={step}
       >
@@ -221,40 +217,43 @@ export interface SuggestionRowProps {
   line: SuggestionLine;
   pricesShown: boolean;
   canEdit: boolean;
-  canDiscount: boolean;
+  /** `offering:lower_price:read`: a price under the floor says so rather than "ask an admin". */
+  canSeeLowestPrice: boolean;
   onChange: (patch: SuggestionPatch) => void;
-  onLinkInvoice?: () => void;
   onRemove: () => void;
 }
 
 /**
  * One suggested offering (H:2806–2812): tone dot · name · details · the
- * quantity stepper · the final price (dashed "₹ ••••" while prices hide; a
- * price below the floor turns the edge red with "Below the lowest price <₹>",
- * or "Too much discount · ask an admin" without the discount ability) · the
- * status pill — "✓ Invoiced" once every unit is — · the 26px "by" avatar ·
- * link an invoice and remove.
+ * quantity stepper · the final price (dashed "₹ ••••" while prices hide; the
+ * server's `is_below_lowest_price` turns the edge red with "Below the lowest
+ * price", or "Too much discount · ask an admin" for a member who may not see
+ * the lowest price — §7) · the status pill — "✓ Invoiced" once the server says
+ * every unit is — · the 26px "by" avatar · remove. A typed price is saved when
+ * the field is left, one write per edit.
  */
 export function SuggestionRow({
   line,
   pricesShown,
   canEdit,
-  canDiscount,
+  canSeeLowestPrice,
   onChange,
-  onLinkInvoice,
   onRemove,
 }: SuggestionRowProps) {
   const { t } = useTranslation(OFFERING_SUGGESTIONS_NS);
-  const money = usePaiseFormat();
+  const [typedPrice, setTypedPrice] = useState<number | null>(null);
   const readOnly = !canEdit;
-  const done = fullyInvoiced(line);
-  const floor = lineFloorPrice(line);
+  const done = line.fullyInvoiced;
   let floorMessage: string | undefined;
-  if (belowFloor(line) && floor !== null) {
-    floorMessage = canDiscount
-      ? t(KEYS.belowFloor, { price: money(floor) })
-      : t(KEYS.tooMuchDiscount);
+  if (line.belowLowest) {
+    floorMessage = canSeeLowestPrice ? t(KEYS.belowFloor) : t(KEYS.tooMuchDiscount);
   }
+  const savePrice = () => {
+    if (typedPrice !== null && typedPrice !== lineFinalPrice(line)) {
+      onChange({ price: typedPrice });
+    }
+    setTypedPrice(null);
+  };
   const doneLabel =
     line.qty > 1
       ? t(KEYS.invoicedOf, { done: line.invoicedQty, total: line.qty })
@@ -286,6 +285,7 @@ export function SuggestionRow({
       </span>
       <QtyStepper
         qty={line.qty}
+        min={Math.max(SUGGESTION_QTY.min, line.invoicedQty)}
         readOnly={readOnly || done}
         onChange={(qty) => onChange(withQty(line, qty))}
       />
@@ -301,8 +301,9 @@ export function SuggestionRow({
             </span>
             <ItemsNumberInput
               money
-              value={lineFinalPrice(line)}
-              onValueChange={(next) => onChange({ price: next })}
+              value={typedPrice ?? lineFinalPrice(line)}
+              onValueChange={setTypedPrice}
+              onBlur={savePrice}
               label={t(KEYS.finalPrice)}
               placeholder="0"
               maxLength={8}
@@ -342,22 +343,6 @@ export function SuggestionRow({
         <TooltipContent>{line.by.label}</TooltipContent>
       </Tooltip>
       <span className="inline-flex justify-end gap-1 [grid-area:act]">
-        {canEdit && onLinkInvoice && !done ? (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                type="button"
-                aria-label={t(KEYS.linkInvoice)}
-                onClick={onLinkInvoice}
-                data-slot="button"
-                className={action}
-              >
-                <LinkIcon aria-hidden="true" className="size-3.5" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent>{t(KEYS.linkInvoiceHint)}</TooltipContent>
-          </Tooltip>
-        ) : null}
         {canEdit ? (
           <button
             type="button"

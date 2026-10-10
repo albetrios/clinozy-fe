@@ -23,8 +23,8 @@ export const PATIENT_FILE_BAR_KEYS = {
   activity: 'fileBar.activity',
   showActivity: 'fileBar.showActivity',
   hideActivity: 'fileBar.hideActivity',
-  /** "3 unread" — the badge's spoken text (plural). */
-  unread: 'fileBar.unread',
+  /** "Waiting for a reply" — the Activity dot's spoken text. */
+  awaitingReply: 'fileBar.awaitingReply',
 } as const;
 
 /** The file bar's test ids (KICKOFF §6.6 Test ids). */

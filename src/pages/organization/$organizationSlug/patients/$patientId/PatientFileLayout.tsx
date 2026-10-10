@@ -104,6 +104,7 @@ function useViewableSections() {
         ? viewablePatientFileSections({
             patients: access.can('patients', 'view'),
             billing: access.can('payments', 'view'),
+            canCode: access.previewRole ? undefined : access.canCode,
           })
         : [],
       access,
@@ -179,7 +180,7 @@ function PatientFileBody({
   const phone = useViewportTier() === 'phone';
   const { preferences, update } = usePreferences();
   const { items } = usePatientFileActions();
-  const { section, viewable, masked, toggleMasked } = usePatientFileContext();
+  const { section, viewable, masked } = usePatientFileContext();
   const go = usePatientFileNavigation();
 
   return (
@@ -213,8 +214,6 @@ function PatientFileBody({
           <PatientRail
             file={file}
             limited={!viewable.includes('overview')}
-            masked={masked}
-            onToggleMasked={toggleMasked}
             onEditContact={go.editContact}
             actions={go.railActions}
             className={RAIL_TIER}

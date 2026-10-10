@@ -14,7 +14,6 @@ const { notifyMock } = vi.hoisted(() => ({
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 
 const PATIENTS = '/organization/acme/patients';
-const LEAD = '3f9b0c6e-1d2a-4c5b-8e7f-0a1b2c3d4e5f';
 
 /** Shows what the hook reads, and closes through it. */
 function Probe() {
@@ -42,15 +41,15 @@ describe('usePatientsDialogRoute (D24, S:31)', () => {
     await waitFor(() => expect(read()).toEqual({ kind: 'none' }));
   });
 
-  it('reads New patient and its prefill: the name, the mobile as E.164, the lead', async () => {
+  it('reads New patient and its prefill: the name and the mobile as E.164', async () => {
     renderPatientsRoutes(
-      `${PATIENTS}/create?name=Priya%20Shah&phone=98765%2043210&fromLead=${LEAD}`,
+      `${PATIENTS}/create?name=Priya%20Shah&phone=98765%2043210`,
       Probe,
     );
     await waitFor(() =>
       expect(read()).toEqual({
         kind: 'create',
-        prefill: { name: 'Priya Shah', phone: '+919876543210', leadId: LEAD },
+        prefill: { name: 'Priya Shah', phone: '+919876543210' },
       }),
     );
   });
@@ -58,13 +57,17 @@ describe('usePatientsDialogRoute (D24, S:31)', () => {
   it('closes onto the list with its own params, the prefill dropped', async () => {
     const user = userEvent.setup();
     const { router } = renderPatientsRoutes(
-      `${PATIENTS}/create?view=dues&q=shah&name=Priya&phone=9876543210`,
+      `${PATIENTS}/create?view=follow&q=shah&status=vip&name=Priya&phone=9876543210`,
       Probe,
     );
     await waitFor(() => expect(read()).toMatchObject({ kind: 'create' }));
     await user.click(screen.getByRole('button', { name: 'Close' }));
     await waitFor(() => expect(router.state.location.pathname).toBe(PATIENTS));
-    expect(router.state.location.search).toEqual({ view: 'dues', q: 'shah' });
+    expect(router.state.location.search).toEqual({
+      view: 'follow',
+      q: 'shah',
+      status: 'vip',
+    });
   });
 
   it('refuses a create link without Create: back to the list, with the permission toast once', async () => {

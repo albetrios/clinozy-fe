@@ -3,12 +3,14 @@ import type { UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import {
-  type CheckIn,
   CHECKIN_FEEL_VALUES,
   CHECKIN_FOLLOWED_VALUES,
 } from '@/shared/api/clinic/clinic-schema.ts';
-import { FEEDBACK_LIMITS } from '@/shared/api/clinic/feedback-contracts.ts';
-import type { OfferingRecord } from '@/shared/api/clinic/offerings-contracts.ts';
+import {
+  type CheckInOffering,
+  FEEDBACK_LIMITS,
+  type PatientCheckIn,
+} from '@/shared/api/clinic/feedback-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import {
   CHECKIN_FEEL_TONES,
@@ -18,8 +20,10 @@ import {
   DrawerChips,
   DrawerField,
   DrawerFieldGrid,
+  DrawerInfo,
   DrawerStepBody,
   DrawerTextarea,
+  useDrawerFieldIds,
 } from '@/shared/components/DrawerField/index.ts';
 import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
 
@@ -32,30 +36,34 @@ const K = CHECK_IN_KEYS;
 /** The score chips, 1 to 10 (H:4396). */
 const SCORES = Array.from({ length: 10 }, (_, index) => String(index + 1));
 
-/** What a step's fields render from. */
+/**
+ * What a step's fields render from. Each field shows its own error — the save's ask or the
+ * server's (`useDrawerSave` puts the API's `errors[].field` on it).
+ */
 interface CheckInStepFieldsProps {
   form: UseFormReturn<CheckInFormValues>;
   values: CheckInFormValues;
   /** The patient's check-in before this one — the "Last time: …" placeholders. */
-  previous: CheckIn | null;
+  previous: PatientCheckIn | null;
 }
 
 /**
  * Step 1 "How is it now" (H:4396; `patient-file.md:175–177`): Compared with
- * last visit — Much better sage · Better mint · Same stone · Worse blush, which
- * the save asks for — the patient's own score 1–10 (1–4 blush, 5–7 butter,
- * 8–10 sage; tap the picked one to clear it), and In their words, its
+ * last visit — Much better sage · Better mint · Same stone · Worse blush — and
+ * the patient's own score 1–10 (1–4 blush, 5–7 butter, 8–10 sage), both of
+ * which the save asks for (a score is required, Q18), and In their words, its
  * placeholder the last check-in's words when there are some.
  */
 export function CheckInNowFields({ form, values, previous }: CheckInStepFieldsProps) {
   const { t } = useTranslation([CHECK_IN_NS, CLINIC_NS]);
-  const ids = useId();
-  const lastWords = previous?.now?.trim();
+  const field = useDrawerFieldIds(form, useId());
+  const words = field('currentState');
+  const lastWords = previous?.currentState?.trim();
   return (
     <DrawerStepBody readOnly={false}>
       <DrawerFieldGrid>
         {/* Asked for by the save's toast, not marked (H:4396 draws no "*"). */}
-        <DrawerField label={t(K.feel)} span="full">
+        <DrawerField label={t(K.feel)} error={field('feel').error} span="full">
           <DrawerChips
             label={t(K.feel)}
             options={CHECKIN_FEEL_VALUES.map((feel) => ({
@@ -70,7 +78,12 @@ export function CheckInNowFields({ form, values, previous }: CheckInStepFieldsPr
             testId={`${CHECK_IN_TEST_ID}-feel`}
           />
         </DrawerField>
-        <DrawerField label={t(K.score)} hint={t(K.scoreHint)} span="full">
+        <DrawerField
+          label={t(K.score)}
+          hint={t(K.scoreHint)}
+          error={field('score').error}
+          span="full"
+        >
           <DrawerChips
             label={t(K.score)}
             options={SCORES.map((score) => ({
@@ -79,23 +92,27 @@ export function CheckInNowFields({ form, values, previous }: CheckInStepFieldsPr
               tone: scoreTone(Number(score)),
             }))}
             value={values.score > 0 ? String(values.score) : null}
-            onChange={(score) =>
-              form.setValue('score', score ? Number(score) : 0, { shouldDirty: true })
-            }
-            clearable
+            onChange={(score) => {
+              if (score) form.setValue('score', Number(score), { shouldDirty: true });
+            }}
             testId={`${CHECK_IN_TEST_ID}-score`}
           />
         </DrawerField>
-        <DrawerField label={t(K.words)} htmlFor={`${ids}-now`} span="full">
+        <DrawerField
+          label={t(K.words)}
+          htmlFor={words.id}
+          error={words.error}
+          span="full"
+        >
           <DrawerTextarea
-            id={`${ids}-now`}
+            {...words.control}
             rows={3}
             maxLength={FEEDBACK_LIMITS.now}
             placeholder={
               lastWords ? t(K.wordsLast, { text: lastWords }) : t(K.wordsPlaceholder)
             }
             data-testid={`${CHECK_IN_TEST_ID}-now`}
-            {...form.register('now')}
+            {...form.register('currentState')}
           />
         </DrawerField>
       </DrawerFieldGrid>
@@ -114,12 +131,13 @@ export function CheckInFollowedFields({
   previous,
 }: CheckInStepFieldsProps) {
   const { t } = useTranslation(CHECK_IN_NS);
-  const ids = useId();
+  const field = useDrawerFieldIds(form, useId());
+  const details = field('followedNote');
   const advised = previous?.nextPlan?.trim();
   return (
     <DrawerStepBody readOnly={false}>
       <DrawerFieldGrid>
-        <DrawerField label={t(K.followed)} span="full">
+        <DrawerField label={t(K.followed)} error={field('followed').error} span="full">
           <DrawerChips
             label={t(K.followed)}
             options={CHECKIN_FOLLOWED_VALUES.map((followed) => ({
@@ -135,9 +153,14 @@ export function CheckInFollowedFields({
             testId={`${CHECK_IN_TEST_ID}-followed`}
           />
         </DrawerField>
-        <DrawerField label={t(K.details)} htmlFor={`${ids}-details`} span="full">
+        <DrawerField
+          label={t(K.details)}
+          htmlFor={details.id}
+          error={details.error}
+          span="full"
+        >
           <DrawerTextarea
-            id={`${ids}-details`}
+            {...details.control}
             rows={3}
             maxLength={FEEDBACK_LIMITS.followedNote}
             placeholder={
@@ -155,23 +178,29 @@ export function CheckInFollowedFields({
 /**
  * Step 3 "Next plan of action" (`patient-file.md:180–181`): the Plan, and the
  * offerings to add to the patient's suggestions — each becomes a Planned row
- * on save.
+ * when a new check-in saves (TR10). An edit names the ones it planned, read
+ * only: the API changes the plan in the plan, not on the check-in.
  */
 export function CheckInNextFields({
   form,
   values,
   options,
+  editing,
 }: Omit<CheckInStepFieldsProps, 'previous'> & {
-  options: readonly PickerOption<OfferingRecord>[];
+  options: readonly PickerOption<CheckInOffering>[];
+  /** A saved check-in: its offerings show, not pick. */
+  editing: boolean;
 }) {
   const { t } = useTranslation(CHECK_IN_NS);
-  const ids = useId();
+  const field = useDrawerFieldIds(form, useId());
+  const plan = field('nextPlan');
+  const offerings = field('nextOfferingIds');
   return (
     <DrawerStepBody readOnly={false}>
       <DrawerFieldGrid>
-        <DrawerField label={t(K.plan)} htmlFor={`${ids}-plan`} span="full">
+        <DrawerField label={t(K.plan)} htmlFor={plan.id} error={plan.error} span="full">
           <DrawerTextarea
-            id={`${ids}-plan`}
+            {...plan.control}
             rows={3}
             maxLength={FEEDBACK_LIMITS.nextPlan}
             placeholder={t(K.planPlaceholder)}
@@ -179,33 +208,60 @@ export function CheckInNextFields({
             {...form.register('nextPlan')}
           />
         </DrawerField>
-        <DrawerField
-          label={t(K.offerings)}
-          htmlFor={`${ids}-offerings`}
-          hint={t(K.offeringsHint)}
-          span="full"
-        >
-          <Picker
-            multiple
-            id={`${ids}-offerings`}
+        {editing ? (
+          <PlannedOfferings values={values} options={options} />
+        ) : (
+          <DrawerField
             label={t(K.offerings)}
-            placeholder={t(K.offeringsPlaceholder)}
-            searchPlaceholder={t(K.offeringsPlaceholder)}
-            searchable
-            options={options}
-            value={values.nextOfferingIds}
-            onChange={(offeringIds) =>
-              form.setValue(
-                'nextOfferingIds',
-                offeringIds.slice(0, FEEDBACK_LIMITS.offerings),
-                { shouldDirty: true },
-              )
-            }
-            size="md"
-            testId={`${CHECK_IN_TEST_ID}-offerings`}
-          />
-        </DrawerField>
+            htmlFor={offerings.id}
+            hint={t(K.offeringsHint)}
+            error={offerings.error}
+            span="full"
+          >
+            <Picker
+              multiple
+              id={offerings.id}
+              label={t(K.offerings)}
+              placeholder={t(K.offeringsPlaceholder)}
+              searchPlaceholder={t(K.offeringsPlaceholder)}
+              searchable
+              options={options}
+              value={values.nextOfferingIds}
+              onChange={(offeringIds) =>
+                form.setValue(
+                  'nextOfferingIds',
+                  offeringIds.slice(0, FEEDBACK_LIMITS.offerings),
+                  { shouldDirty: true },
+                )
+              }
+              size="md"
+              testId={`${CHECK_IN_TEST_ID}-offerings`}
+            />
+          </DrawerField>
+        )}
       </DrawerFieldGrid>
     </DrawerStepBody>
+  );
+}
+
+/** An edit's planned offerings by name — nothing when it planned none. */
+function PlannedOfferings({
+  values,
+  options,
+}: {
+  values: CheckInFormValues;
+  options: readonly PickerOption<CheckInOffering>[];
+}) {
+  const { t } = useTranslation(CHECK_IN_NS);
+  const names = values.nextOfferingIds
+    .map((id) => options.find((option) => option.key === id)?.label)
+    .filter((name): name is string => Boolean(name));
+  if (names.length === 0) return null;
+  return (
+    <DrawerField label={t(K.offeringsPlanned)} span="full">
+      <DrawerInfo wrap testId={`${CHECK_IN_TEST_ID}-offerings-planned`}>
+        {names.join(', ')}
+      </DrawerInfo>
+    </DrawerField>
   );
 }

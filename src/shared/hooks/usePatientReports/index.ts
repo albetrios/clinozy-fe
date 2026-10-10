@@ -1,8 +1,8 @@
 export {
+  type PatientReportCreateVars,
   type PatientReportDeleteVars,
   useCreatePatientReport,
   useDeletePatientReport,
-  usePatientReport,
   usePatientReports,
   useRestorePatientReport,
 } from './usePatientReports.ts';

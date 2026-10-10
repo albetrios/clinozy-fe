@@ -7,9 +7,10 @@ import type {
   Tone,
 } from '@/shared/api/clinic/clinic-schema.ts';
 import type {
-  CheckInFeedback,
   FeedbackItem,
   FeedbackType,
+  PatientCheckIn,
+  PatientReview,
 } from '@/shared/api/clinic/feedback-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import {
@@ -49,10 +50,27 @@ export const FEEDBACK_TYPE_LOOK: Readonly<
   whatsapp: { tone: REVIEW_SOURCE_TONES.whatsapp, icon: WhatsAppMark },
 };
 
-/** Which type chip a card answers to. */
-function feedbackTypeOf(item: FeedbackItem): Exclude<FeedbackType, 'all'> {
+/** The type chips after "All", in the card's order (H:4390). */
+const CARD_TYPES = [
+  'visit',
+  'treatment',
+  'google',
+  'video',
+  'instagram',
+  'internal_form',
+  'whatsapp',
+] as const satisfies readonly Exclude<FeedbackType, 'all'>[];
+
+/** Which type chip a card answers to: a review's source, a check-in after a session or a visit. */
+export function feedbackTypeOf(item: FeedbackItem): Exclude<FeedbackType, 'all'> {
   if (item.kind === 'review') return item.review.source;
   return item.checkIn.treatmentId ? 'treatment' : 'visit';
+}
+
+/** The types a patient has a card of — the chips after "All". */
+export function feedbackTypesOf(items: readonly FeedbackItem[]): FeedbackType[] {
+  const present = new Set(items.map(feedbackTypeOf));
+  return CARD_TYPES.filter((type) => present.has(type));
 }
 
 /** A type chip's label: "All", "Consultation", "Treatment feedback", "Google" … */
@@ -61,7 +79,11 @@ export function feedbackTypeLabel(type: FeedbackType, t: TFunction): string {
   return t(CLINIC_KEYS.reviewSources[type], { ns: CLINIC_NS });
 }
 
-/** The follow-ups a card offers (H:4390 `ACTS_C` / `ACTS_R`), as the contract's values. */
+/**
+ * The follow-ups a card offers (H:4390 `ACTS_C` / `ACTS_R`), as the API's values. "Other"
+ * is not offered: the API takes it only with a note saying what was done, and the menu has
+ * no field for one.
+ */
 export function feedbackActionsFor(item: FeedbackItem): FeedbackActionKind[] {
   if (item.kind === 'checkIn') {
     return [
@@ -70,7 +92,6 @@ export function feedbackActionsFor(item: FeedbackItem): FeedbackActionKind[] {
       'free_review_booked',
       'plan_changed',
       'refund_credit',
-      'other',
     ];
   }
   const replied: Partial<Record<string, FeedbackActionKind>> = {
@@ -79,13 +100,13 @@ export function feedbackActionsFor(item: FeedbackItem): FeedbackActionKind[] {
     whatsapp: 'replied_whatsapp',
   };
   const reply = replied[item.review.source];
-  return [
-    ...(reply ? [reply] : []),
-    'doctor_called',
-    'asked_revisit',
-    'refund_credit',
-    'other',
-  ];
+  return [...(reply ? [reply] : []), 'doctor_called', 'asked_revisit', 'refund_credit'];
+}
+
+/** The visit a review follows — its number and service, from the patient's bookings. */
+export interface FeedbackVisit {
+  seq: number;
+  service: string | null;
 }
 
 /** What one card shows (H:4389–4390). */
@@ -95,11 +116,11 @@ export interface FeedbackCardView {
   sub: string;
   /** The pill: the feel ("Better"), or the stars ("★★★★☆"). */
   head: { text: string; tone: Tone; stars: boolean };
-  /** "7/10" or "5/5"; none while not rated. */
+  /** "7/10" or "5/5"; none for a review never rated. */
   score: string | null;
-  /** The score against the check-in before: "▲ 2", "▼ 1", "= same". */
+  /** The server's move against the check-in before: "▲ 2", "▼ 1", "= same". */
   trend: { text: string; direction: 'up' | 'down' | 'same' } | null;
-  /** "Followed mostly" or the review's files. */
+  /** "Followed mostly", or how many files a review has. */
   tag: { text: string; tone: Tone } | null;
   quote: string;
   quoteEmpty: boolean;
@@ -107,22 +128,20 @@ export interface FeedbackCardView {
   detail: string;
 }
 
-/** The visit a card follows: "Hydrafacial · Appt #2790", or just the number. */
-function visitLine(item: FeedbackItem, t: TFunction): string | null {
-  if (!item.appointment) return null;
-  const number = displayId.appointment(item.appointment.seq);
-  return item.appointment.service
-    ? t(K.visitWith, { service: item.appointment.service, number })
+/** The visit a review follows: "Hydrafacial · Appt #2790", or just the number. */
+function visitLine(visit: FeedbackVisit, t: TFunction): string {
+  const number = displayId.appointment(visit.seq);
+  return visit.service
+    ? t(K.visitWith, { service: visit.service, number })
     : t(K.appointment, { number });
 }
 
-function trendOf(score: number, previous: number | null, t: TFunction) {
-  if (score <= 0 || previous === null) return null;
-  const points = score - previous;
-  if (points > 0) return { text: t(K.trendUp, { points }), direction: 'up' as const };
-  if (points < 0)
-    return { text: t(K.trendDown, { points: -points }), direction: 'down' as const };
-  return { text: t(K.trendSame), direction: 'same' as const };
+/** `score_change` as the trend (§7: the server's, never worked out here). */
+function trendOf(change: number | null, t: TFunction): FeedbackCardView['trend'] {
+  if (change === null) return null;
+  if (change > 0) return { text: t(K.trendUp, { points: change }), direction: 'up' };
+  if (change < 0) return { text: t(K.trendDown, { points: -change }), direction: 'down' };
+  return { text: t(K.trendSame), direction: 'same' };
 }
 
 /** A review's rating as its pill: ★ filled up to it (≥4 butter, 3 stone, else blush). */
@@ -144,22 +163,25 @@ function followedTag(followed: CheckinFollowed | null, t: TFunction) {
   };
 }
 
-/** A check-in card: the feel, the score and its trend, what was followed, the words, the plan. */
-function checkInCardView(item: CheckInFeedback, t: TFunction): FeedbackCardView {
-  const { checkIn } = item;
-  const type = feedbackTypeOf(item);
-  const now = checkIn.now?.trim();
+/**
+ * A check-in card: what it follows in the server's words (`context`, TR9 — "After LHR Full
+ * Face", "Visit · 10 Oct"), the feel, the score and its move, what was followed, the words,
+ * the plan.
+ */
+function checkInCardView(checkIn: PatientCheckIn, t: TFunction): FeedbackCardView {
+  const type = checkIn.treatmentId ? 'treatment' : 'visit';
+  const now = checkIn.currentState?.trim();
   return {
     type,
     typeLabel: feedbackTypeLabel(type, t),
-    sub: item.treatmentName ?? visitLine(item, t) ?? t(K.visit),
+    sub: checkIn.context,
     head: {
       text: t(CLINIC_KEYS.checkInFeels[checkIn.feel], { ns: CLINIC_NS }),
       tone: CHECKIN_FEEL_TONES[checkIn.feel],
       stars: false,
     },
-    score: checkIn.score > 0 ? t(K.score, { score: checkIn.score }) : null,
-    trend: trendOf(checkIn.score, item.previousScore, t),
+    score: t(K.score, { score: checkIn.score }),
+    trend: trendOf(checkIn.scoreChange, t),
     tag: followedTag(checkIn.followed, t),
     quote: now ? `“${now}”` : t(K.noNow),
     quoteEmpty: !now,
@@ -168,26 +190,42 @@ function checkInCardView(item: CheckInFeedback, t: TFunction): FeedbackCardView 
   };
 }
 
-/** One card's words and tones (H:4389–4390 `revVM`). */
-export function feedbackCardView(item: FeedbackItem, t: TFunction): FeedbackCardView {
-  if (item.kind === 'checkIn') return checkInCardView(item, t);
-  const { review } = item;
-  const type = feedbackTypeOf(item);
+/**
+ * A review card: the visit it follows (the patient's bookings name it — "Visit" until they
+ * are read), the stars, how many files it has (B1: none can be read back, and their names are
+ * not kept), the words, the link.
+ */
+function reviewCardView(
+  review: PatientReview,
+  visit: FeedbackVisit | null,
+  t: TFunction,
+): FeedbackCardView {
   const text = review.text?.trim();
-  const files = review.files.map((file) => file.split('/').pop() ?? file);
+  let sub = t(K.noVisit);
+  if (visit) sub = visitLine(visit, t);
+  else if (review.appointmentId) sub = t(K.visit);
+  const files = review.fileKeys.length;
   return {
-    type,
-    typeLabel: feedbackTypeLabel(type, t),
-    sub: visitLine(item, t) ?? t(K.noVisit),
+    type: review.source,
+    typeLabel: feedbackTypeLabel(review.source, t),
+    sub,
     head: starsOf(review.rating, t),
     score: review.rating === null ? null : t(K.stars, { rating: review.rating }),
     trend: null,
-    tag: files.length
-      ? { text: t(K.files, { files: files.join(', ') }), tone: 'lav' }
-      : null,
+    tag: files > 0 ? { text: t(K.files, { count: files }), tone: 'lav' } : null,
     quote: text ? `“${text}”` : t(K.noText),
     quoteEmpty: !text,
     detailLabel: t(K.linkLabel),
     detail: review.link?.trim() || t(K.noLink), // NOSONAR(S6606): a blank link is no link — "" falls back
   };
+}
+
+/** One card's words and tones (H:4389–4390 `revVM`); `visitOf` names a booking by id. */
+export function feedbackCardView(
+  item: FeedbackItem,
+  t: TFunction,
+  visitOf: (appointmentId: string | null) => FeedbackVisit | null = () => null,
+): FeedbackCardView {
+  if (item.kind === 'checkIn') return checkInCardView(item.checkIn, t);
+  return reviewCardView(item.review, visitOf(item.review.appointmentId), t);
 }

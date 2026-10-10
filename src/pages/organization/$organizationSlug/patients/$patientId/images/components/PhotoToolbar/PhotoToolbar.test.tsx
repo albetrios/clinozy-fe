@@ -5,14 +5,15 @@ import { axe } from 'vitest-axe';
 
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
+import type { PhotoVisit } from '../../shared/photo-view.ts';
 import { PhotoToolbar, type PhotoToolbarProps } from './PhotoToolbar.tsx';
 
-const VISIT = {
-  appointmentId: '00000000-0000-4000-8000-000000002790',
+const VISIT: PhotoVisit = {
+  appointmentId: 'appt_hydra000000000000000',
   seq: 2790,
   date: '2026-09-24',
   serviceLabel: 'Hydrafacial',
-  status: 'completed' as const,
+  status: 'completed',
 };
 
 function renderToolbar(props: Partial<PhotoToolbarProps> = {}) {
@@ -25,10 +26,10 @@ function renderToolbar(props: Partial<PhotoToolbarProps> = {}) {
     <PhotoToolbar
       album="general"
       albums={['general', 'private', 'lhr']}
+      albumCounts={{ general: 3, lhr: 1, private: 0 }}
       count={3}
-      albumCount={3}
       appointment={undefined}
-      visits={[{ visit: VISIT, count: 3 }]}
+      visits={[VISIT]}
       dayLabel={() => '24 Sep'}
       size="medium"
       {...handlers}
@@ -39,21 +40,22 @@ function renderToolbar(props: Partial<PhotoToolbarProps> = {}) {
 }
 
 describe('PhotoToolbar', () => {
-  it('lays out the albums, the count, the visit filter and the sizes', async () => {
+  it('lays out the albums with the server’s counts, the count, the visit filter and the sizes', async () => {
     const { container } = renderToolbar();
     const tabs = await screen.findByRole('tablist', { name: 'Albums' });
+    expect(within(tabs).getAllByRole('tab')).toHaveLength(3);
+    expect(within(tabs).getByRole('tab', { name: /^General/ })).toHaveAccessibleName(
+      /General.*3 photos/,
+    );
+    expect(within(tabs).getByRole('tab', { name: /^LHR/ })).toHaveAccessibleName(
+      /LHR.*1 photo/,
+    );
     expect(
-      within(tabs)
-        .getAllByRole('tab')
-        .map((tab) => tab.textContent),
-    ).toEqual(['General', 'Private', 'LHR']);
-    expect(screen.getByText('3 photos')).toBeInTheDocument();
+      screen.getByText('3 photos', { selector: 'span:not(.sr-only)' }),
+    ).toBeInTheDocument();
     expect(screen.getByTestId('patient-photos-visit-filter')).toHaveTextContent(
       'All photos',
     );
-    expect(
-      screen.getByRole('radiogroup', { name: 'Thumbnail size' }),
-    ).toBeInTheDocument();
     expect(screen.getByRole('radio', { name: 'Medium thumbnails' })).toHaveAttribute(
       'aria-checked',
       'true',
@@ -64,11 +66,11 @@ describe('PhotoToolbar', () => {
   it('picks an album', async () => {
     const user = userEvent.setup();
     const { onAlbumChange } = renderToolbar();
-    await user.click(await screen.findByRole('tab', { name: 'LHR' }));
+    await user.click(await screen.findByRole('tab', { name: /^LHR/ }));
     expect(onAlbumChange).toHaveBeenCalledWith('lhr');
   });
 
-  it('offers every photo, those under no visit, and each visit with photos', async () => {
+  it('offers every photo, those under no visit, and each visit a photo can be filed under', async () => {
     const user = userEvent.setup();
     const { onAppointmentChange } = renderToolbar();
     await user.click(await screen.findByTestId('patient-photos-visit-filter'));
@@ -80,7 +82,6 @@ describe('PhotoToolbar', () => {
     ]);
     expect(options[0]).toHaveTextContent('3 in General');
     expect(options[2]).toHaveTextContent('#2790 · Completed');
-    expect(options[2]).toHaveTextContent('3 photos');
     await user.click(options[2] as HTMLElement);
     expect(onAppointmentChange).toHaveBeenCalledWith(VISIT.appointmentId);
   });
@@ -93,12 +94,17 @@ describe('PhotoToolbar', () => {
     expect(onAppointmentChange).toHaveBeenCalledWith(undefined);
   });
 
-  it('moves the size with the arrow keys and hides an empty count', async () => {
-    const { onSizeChange } = renderToolbar({ count: 0, size: 'large' });
+  it('moves the size with the arrow keys, and shows no count before the server tells it', async () => {
+    const { onSizeChange } = renderToolbar({
+      count: null,
+      albumCounts: null,
+      size: 'large',
+    });
     fireEvent.keyDown(await screen.findByRole('radio', { name: 'Large thumbnails' }), {
       key: 'ArrowRight',
     });
     expect(onSizeChange).toHaveBeenLastCalledWith('small');
     expect(screen.queryByText(/^\d+ photos?$/)).not.toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'General' })).toBeInTheDocument();
   });
 });

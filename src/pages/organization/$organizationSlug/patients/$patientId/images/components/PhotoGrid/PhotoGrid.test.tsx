@@ -3,56 +3,30 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type { PatientPhoto } from '@/shared/api/clinic/patient-images-api.ts';
-
+import { photoDouble } from '../../__tests__/integration/photo-api-double.ts';
 import type { PhotoDay } from '../../shared/photo-view.ts';
 import { PhotoGrid, type PhotoGridProps } from './PhotoGrid.tsx';
-
-const VISIT = {
-  appointmentId: '00000000-0000-4000-8000-000000002790',
-  seq: 2790,
-  date: '2026-09-24',
-  serviceLabel: 'Hydrafacial',
-  status: 'completed' as const,
-};
-
-function photo(id: string, fields: Partial<PatientPhoto> = {}): PatientPhoto {
-  return {
-    id,
-    organizationId: 'org',
-    createdAt: '2026-09-24T06:30:00.000Z',
-    updatedAt: '2026-09-24T06:30:00.000Z',
-    createdById: 'user',
-    deletedAt: null,
-    deleteReason: null,
-    deleteNote: null,
-    patientId: 'patient',
-    appointmentId: null,
-    album: 'general',
-    fileUrl: 'uploads/a.jpg',
-    fileName: id,
-    bodyPart: null,
-    takenOn: '2026-09-24',
-    caption: null,
-    visit: null,
-    ...fields,
-  };
-}
 
 const DAYS: PhotoDay[] = [
   {
     date: '2026-09-24',
     photos: [
-      photo('IMG_5100', {
+      photoDouble({
+        id: 'pimg_a',
+        displayName: 'IMG_5100',
         bodyPart: 'face',
-        appointmentId: VISIT.appointmentId,
-        visit: VISIT,
+        stage: 'before',
+        serviceLabel: 'Hydrafacial',
       }),
-      photo('IMG_5101', { caption: 'Left cheek' }),
+      photoDouble({ id: 'pimg_b', displayName: 'IMG_5101', caption: 'Left cheek' }),
     ],
-    visit: VISIT,
+    serviceLabel: 'Hydrafacial',
   },
-  { date: '2026-09-20', photos: [photo('IMG_4974')], visit: null },
+  {
+    date: '2026-09-20',
+    photos: [photoDouble({ id: 'pimg_c', displayName: 'IMG_4974' })],
+    serviceLabel: null,
+  },
 ];
 
 function renderGrid(props: Partial<PhotoGridProps> = {}) {
@@ -70,16 +44,20 @@ function renderGrid(props: Partial<PhotoGridProps> = {}) {
 }
 
 describe('PhotoGrid', () => {
-  it('groups the photos by day, naming the visit they were taken at', async () => {
+  it('groups the photos by day with their visit’s service, each tile its name, day and pills', async () => {
     const { container } = renderGrid({ onEdit: vi.fn(), onDelete: vi.fn() });
     const days = screen.getAllByTestId('patient-photos-day');
     expect(days).toHaveLength(2);
     expect(days[0]).toHaveTextContent('day 24');
-    expect(days[0]).toHaveTextContent('2 photos · day 24 · Hydrafacial');
-    expect(days[1]).toHaveTextContent('1 photo');
-    expect(days[1]).not.toHaveTextContent('·');
-    expect(within(days[0] as HTMLElement).getByText('Face')).toBeInTheDocument();
+    expect(days[0]).toHaveTextContent('Hydrafacial');
+    expect(days[1]).not.toHaveTextContent('Hydrafacial');
+    const [first] = screen.getAllByTestId('patient-photo-tile');
+    expect(within(first as HTMLElement).getByText('Face')).toBeInTheDocument();
+    expect(first).toHaveTextContent('IMG_5100');
+    expect(first).toHaveTextContent('day 24');
     expect(screen.getByRole('button', { name: 'Open Left cheek' })).toBeInTheDocument();
+    // B1: the glyph stands in for the image.
+    expect(container.querySelector('img')).toBeNull();
     expect(await axe(container)).toHaveNoViolations();
   });
 
@@ -89,7 +67,7 @@ describe('PhotoGrid', () => {
     const onDelete = vi.fn();
     const { onOpen } = renderGrid({ onEdit, onDelete });
     await user.click(screen.getByRole('button', { name: 'Open IMG_4974' }));
-    expect(onOpen).toHaveBeenCalledWith(expect.objectContaining({ id: 'IMG_4974' }));
+    expect(onOpen).toHaveBeenCalledWith(expect.objectContaining({ id: 'pimg_c' }));
     const [first] = screen.getAllByTestId('patient-photo-tile');
     await user.click(
       within(first as HTMLElement).getByRole('button', { name: 'Edit details' }),
@@ -97,8 +75,8 @@ describe('PhotoGrid', () => {
     await user.click(
       within(first as HTMLElement).getByRole('button', { name: 'Delete photo' }),
     );
-    expect(onEdit).toHaveBeenCalledWith(expect.objectContaining({ id: 'IMG_5100' }));
-    expect(onDelete).toHaveBeenCalledWith(expect.objectContaining({ id: 'IMG_5100' }));
+    expect(onEdit).toHaveBeenCalledWith(expect.objectContaining({ id: 'pimg_a' }));
+    expect(onDelete).toHaveBeenCalledWith(expect.objectContaining({ id: 'pimg_a' }));
   });
 
   it('leaves Edit and Delete off small tiles, and off for a member who can’t', () => {

@@ -15,7 +15,7 @@ import {
 } from '@/shared/api/clinic/clinic-time.ts';
 import type {
   PatientConsent,
-  PatientCreateInput,
+  PatientFields,
   PatientRecord,
 } from '@/shared/api/clinic/patients-contracts.ts';
 import { toClinicPhone } from '@/shared/clinic/clinic-phone.ts';
@@ -58,7 +58,7 @@ export interface PatientDrawerPrefill {
   name?: string;
   /** Their mobile, E.164 or as typed. */
   phone?: string;
-  /** The lead the patient comes from — saved as `leadId` (`S:317`). */
+  /** The lead the patient comes from — the file opens on its person (`contact_id`). */
   leadId?: string;
   /** Their care types instead of Aesthetic — the booking's "Create patient record" (H:6039). */
   types?: readonly PatientType[];
@@ -147,23 +147,22 @@ const textOrNull = (value: string) => value.trim() || null;
 const storedPhone = (digits: string) => toClinicPhone(digits) ?? digits;
 
 /**
- * The contract's fields for a form (`createPatient` / `updatePatient`): text
- * trimmed (empty → none), mobiles in E.164, the follow-up as the instant of
- * its clinic-local day and time (11:00 when only the day is picked). The home
- * branch is the picked one, else `defaultBranchId`, else the server's main one.
+ * The fields a form saves (`POST /app/patients`, or the edit's two writes): text trimmed
+ * (empty → none), mobiles in E.164, the follow-up as the instant of its clinic-local day and
+ * time (11:00 when only the day is picked). The home branch is the picked one, else
+ * `defaultBranchId` — without either the server names the field.
  */
 export function patientInputOf(
   values: PatientFormValues,
-  context: { defaultBranchId: string | null; leadId?: string | null },
-): PatientCreateInput {
-  const homeBranchId = values.homeBranchId ?? context.defaultBranchId;
+  context: { defaultBranchId: string | null },
+): PatientFields {
   return {
     firstName: values.firstName.trim(),
     lastName: textOrNull(values.lastName),
     phone: storedPhone(values.phone),
     phone2: values.phone2 ? storedPhone(values.phone2) : null,
     address: textOrNull(values.address),
-    ...(homeBranchId ? { homeBranchId } : {}),
+    homeBranchId: values.homeBranchId ?? context.defaultBranchId ?? '',
     gender: values.gender,
     dateOfBirth: values.dateOfBirth,
     types: values.types,
@@ -176,7 +175,6 @@ export function patientInputOf(
       : null,
     notes: textOrNull(values.notes),
     consents: values.consents,
-    ...(context.leadId ? { leadId: context.leadId } : {}),
   };
 }
 

@@ -5,8 +5,6 @@
   "views": {
     "label": "मरीज़ों के व्यू",
     "all": "सभी",
-    "today": "आज क्लिनिक में",
-    "dues": "बकाया वाले",
     "follow": "फ़ॉलो-अप बाकी",
     "recall": "रीकॉल"
   },
@@ -26,7 +24,6 @@
     "conversion": "कन्वर्ज़न",
     "age": "उम्र",
     "followUp": "फ़ॉलो-अप",
-    "due": "बकाया",
     "updated": "अपडेट किया"
   },
   "table": {
@@ -35,8 +32,6 @@
     "age_other": "{{count}} वर्ष"
   },
   "rowActions": {
-    "newInvoice": "नया इनवॉइस",
-    "collect": "{{amount}} वसूलें",
     "edit": "संपादित करें",
     "delete": "हटाएँ"
   },

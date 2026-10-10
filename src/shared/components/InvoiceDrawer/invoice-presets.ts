@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import type { InvoicePresets } from '@/shared/api/clinic/invoices-contracts.ts';
 import type { OfferingRecord } from '@/shared/api/clinic/offerings-contracts.ts';
 import { invoiceLineRate } from '@/shared/api/clinic/offerings-pricing.ts';
-import type { PlanSuggestion } from '@/shared/api/clinic/plan-contracts.ts';
+import type { PlanSuggestion } from '@/shared/api/clinic/plan-fixture-contracts.ts';
 import type { QuickFillItem } from '@/shared/components/QuickFillRow/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { notify } from '@/shared/notify/index.ts';

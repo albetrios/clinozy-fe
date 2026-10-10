@@ -1,9 +1,10 @@
 import type { FieldPath, UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { attachPatientPhoto } from '@/shared/api/clinic/patients-api.ts';
+import { attachPatientImage } from '@/shared/api/clinic/patient-images-api.ts';
 import type {
-  PatientCreateInput,
+  PatientFields,
+  PatientPersonInput,
   PatientRecord,
 } from '@/shared/api/clinic/patients-contracts.ts';
 import { mapApiError } from '@/shared/errors/errorHandler.ts';
@@ -42,9 +43,25 @@ const FIELD_STEPS: Readonly<Record<keyof PatientFormValues, PatientDrawerStepId>
 /** The form fields in the drawer's order, for "the first field the server named". */
 const FIELD_ORDER = Object.keys(FIELD_STEPS) as (keyof PatientFormValues)[];
 
-/** The contract's names that the form spells differently. */
+/**
+ * The API's names the form spells differently: the file's follow-up, and the person's fields —
+ * under `contact` on a create, at the root of the contact change on an edit.
+ */
 const SERVER_FIELDS: Readonly<Record<string, keyof PatientFormValues>> = {
   followUpAt: 'followUpDate',
+  'contact.firstName': 'firstName',
+  'contact.lastName': 'lastName',
+  'contact.phones': 'phone',
+  'contact.phones.0.phone': 'phone',
+  'contact.phones.1.phone': 'phone2',
+  'contact.gender': 'gender',
+  'contact.dateOfBirth': 'dateOfBirth',
+  'contact.address': 'address',
+  'contact.referralSource': 'referralSource',
+  'contact.referredByName': 'referredByName',
+  phones: 'phone',
+  'phones.0.phone': 'phone',
+  'phones.1.phone': 'phone2',
 };
 
 /** What a save ended with: a new patient (and the photos it filed), or the saved one. */
@@ -55,16 +72,23 @@ export type PatientSaveOutcome =
 /** Options of {@link usePatientSave}. */
 export interface UsePatientSaveOptions {
   form: UseFormReturn<PatientFormValues>;
-  /** The patient an edit saves; a create has none. */
-  patientId: string | null;
-  /** The contract's fields for the form as it stands. */
-  input: () => PatientCreateInput;
+  /** The patient an edit saves, as read; a create has none. */
+  patient: PatientRecord | null;
+  /** The fields the form saves, as it stands. */
+  input: () => PatientFields;
+  /** Who a create is for: a person the clinic knows, or a new one. */
+  person: () => PatientPersonInput;
   /** Photos to file on the new patient once it exists. */
   photos: readonly File[];
   /** Open a step — the one holding the field a check or the server named. */
   onStep: (stepId: PatientDrawerStepId) => void;
-  /** The server refused the mobile as already taken (`conflict`, `S:1623`): show the notice. */
+  /**
+   * The server refused the mobile as someone else's (`409 contact_phone_exists`) or the person
+   * as already a patient (`409 contact_is_patient`): show the notice.
+   */
   onConflict: () => void;
+  /** The patient changed since the drawer read them (`409 record_changed`): read them again. */
+  onStale?: () => void;
   /** The save went through; `another` when it was "Create & add another". */
   onDone: (outcome: PatientSaveOutcome, another: boolean) => void;
 }
@@ -72,18 +96,20 @@ export interface UsePatientSaveOptions {
 /**
  * The patient drawer's write and its outcomes (KICKOFF §6.0 States, §6.5) on
  * the shared drawer save (`useDrawerSave`). A filled mobile that is not ten
- * digits stops the save on step 1 with "Enter a 10-digit mobile"; a
- * `conflict` (the mobile is taken) shows the duplicate notice and keeps the
- * draft. A create files its photos through the upload tray, which outlives
- * the drawer.
+ * digits stops the save on step 1 with "Enter a 10-digit mobile"; a `409`
+ * (the mobile is someone else's, or the person already has a file) shows the
+ * notice and keeps the draft; a stale edit offers Reload. A create files its
+ * photos in General through the upload tray, which outlives the drawer.
  */
 export function usePatientSave({
   form,
-  patientId,
+  patient,
   input,
+  person,
   photos,
   onStep,
   onConflict,
+  onStale,
   onDone,
 }: UsePatientSaveOptions) {
   const { t } = useTranslation(PATIENT_DRAWER_NS);
@@ -107,27 +133,28 @@ export function usePatientSave({
       onConflict();
       notify.error(mapApiError(error));
     },
+    onStale,
     onField: (field: FieldPath<PatientFormValues>) =>
       onStep(FIELD_STEPS[field as keyof PatientFormValues] ?? 'contact'),
     write: async () => {
-      if (patientId) {
-        const patient = await update.mutateAsync({ id: patientId, patch: input() });
-        return { kind: 'saved', patient };
+      if (patient) {
+        const saved = await update.mutateAsync({ record: patient, fields: input() });
+        return { kind: 'saved', patient: saved };
       }
-      const { patient } = await create.mutateAsync(input());
+      const created = await create.mutateAsync({ fields: input(), person: person() });
       const filed =
         photos.length > 0
           ? enqueue(photos, {
               onUploaded: async (key, file) => {
-                await attachPatientPhoto({
-                  patientId: patient.id,
-                  key,
+                await attachPatientImage({
+                  patientId: created.id,
+                  fileKey: key,
                   fileName: file.name,
                 });
               },
             }).accepted
           : 0;
-      return { kind: 'created', patient, filed };
+      return { kind: 'created', patient: created, filed };
     },
     onDone,
   });

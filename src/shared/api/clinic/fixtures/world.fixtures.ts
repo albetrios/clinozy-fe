@@ -17,6 +17,7 @@ import type {
   Organization,
   PatientImage,
   PatientNote,
+  PatientPackage,
   PatientReport,
   Prescription,
   Review,
@@ -36,12 +37,10 @@ import type {
   OfferingRecord,
   OfferRecord,
 } from '@/shared/api/clinic/offerings-contracts.ts';
-import type { PatientPackageRecord } from '@/shared/api/clinic/patient-packages-contracts.ts';
-import type { PatientRecord } from '@/shared/api/clinic/patients-contracts.ts';
+import type { PatientRecord } from '@/shared/api/clinic/patients-fixture-contracts.ts';
 import type { PaymentRecord } from '@/shared/api/clinic/payments-contracts.ts';
 import type { TaskRecord } from '@/shared/api/clinic/tasks-contracts.ts';
 import type { StaffProfile } from '@/shared/api/clinic/users-contracts.ts';
-import type { VisitRecord } from '@/shared/api/clinic/visits-contracts.ts';
 
 import { appointmentSeed } from './appointments.fixtures.ts';
 import { leadMessageSeed, leadSeed } from './leads.fixtures.ts';
@@ -86,7 +85,6 @@ import {
   stockVendorSeed,
 } from './stock.fixtures.ts';
 import { taskSeed } from './tasks.fixtures.ts';
-import { visitSeed } from './visits.fixtures.ts';
 
 /**
  * The clinic fixture world (D6, D37 — REPLACE_WITH_API): one in-memory
@@ -105,7 +103,7 @@ export const clinicFixtures = {
     resource: 'User',
     seed: () => staffSeed(),
   }),
-  // Patients carry the plan's consent set, "Referred by" and last editor — see patients-contracts.ts.
+  // Patients carry the plan's consent set, "Referred by" and last editor — see patients-fixture-contracts.ts.
   patients: createFixtureCollection<PatientRecord>({
     resource: 'Patient',
     seed: () => patientSeed(),
@@ -126,12 +124,6 @@ export const clinicFixtures = {
     resource: 'Appointment',
     seed: () => appointmentSeed(),
   }),
-  // D18's Visit — plan-only, no display id (Appendix F); see visits-contracts.ts.
-  visits: createFixtureCollection<VisitRecord>({
-    resource: 'Visit',
-    seed: () => visitSeed(),
-    sequenced: false,
-  }),
   prescriptions: createFixtureCollection<Prescription>({
     resource: 'Prescription',
     seed: () => prescriptionSeed(),
@@ -148,8 +140,11 @@ export const clinicFixtures = {
     resource: 'Report',
     seed: () => patientReportSeed(),
   }),
-  // A package may be added before its invoice (A-F6) — see patient-packages-contracts.ts.
-  patientPackages: createFixtureCollection<PatientPackageRecord>({
+  // A package may be added before its invoice (A-F6): the rooms still on fixtures hold
+  // `invoiceId` nullable; the patient file reads clinozy-be's packages.
+  patientPackages: createFixtureCollection<
+    Omit<PatientPackage, 'invoiceId'> & { invoiceId: string | null }
+  >({
     resource: 'Package',
     seed: () => patientPackageSeed(),
   }),

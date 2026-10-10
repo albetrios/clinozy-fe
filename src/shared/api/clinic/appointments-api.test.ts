@@ -35,6 +35,7 @@ import {
   fetchAppointmentRange,
   fetchAppointmentSlots,
   fetchBookableTreatments,
+  fetchPersonAppointments,
   listAppointments,
   moveAppointment,
   updateAppointment,
@@ -360,6 +361,74 @@ describe('fetchAppointmentRange (the calendars)', () => {
     expect(lastQuery()).toMatchObject({ after: 'cursor-2' });
     expect(rows.map((row) => row.doctor?.name)).toEqual(['Nisha Shah', 'Arjun Rao']);
     expect(fetchTeamDirectory).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('fetchPersonAppointments (the patient file’s Visits)', () => {
+  it('reads every page of the person’s bookings, newest first, a hundred at a time', async () => {
+    vi.mocked(api.get)
+      .mockResolvedValueOnce(
+        page([wireRow({ patient_id: PATIENT_ID })], {
+          next: 'cursor-2',
+          has_more: true,
+        }) as never,
+      )
+      .mockResolvedValueOnce(
+        page([
+          wireRow({
+            id: 'appt_older0000000000000000',
+            patient_id: PATIENT_ID,
+            appointment_date: '2026-09-12',
+            doctor_membership_id: DOCTOR_ARJUN.id,
+          }),
+        ]) as never,
+      );
+
+    const rows = await fetchPersonAppointments(CONTACT_ID);
+
+    expect(api.get).toHaveBeenCalledTimes(2);
+    expect(api.get).toHaveBeenNthCalledWith(1, '/app/appointments', {
+      query: {
+        contact_id: CONTACT_ID,
+        sort: 'appointment_date',
+        order: 'desc',
+        limit: 100,
+      },
+    });
+    expect(lastQuery()).toEqual({
+      contact_id: CONTACT_ID,
+      sort: 'appointment_date',
+      order: 'desc',
+      limit: 100,
+      after: 'cursor-2',
+    });
+    expect(rows.map((row) => [row.id, row.date])).toEqual([
+      [APPOINTMENT_ID, APPOINTMENT_TOMORROW],
+      ['appt_older0000000000000000', '2026-09-12'],
+    ]);
+    expect(rows.map((row) => row.doctor?.name)).toEqual(['Nisha Shah', 'Arjun Rao']);
+    expect(rows[0]?.person).toMatchObject({ kind: 'patient', patientId: PATIENT_ID });
+    expect(fetchTeamDirectory).toHaveBeenCalledTimes(1);
+  });
+
+  it('stops at a page that says there is no more, whatever cursor it carries', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce({
+      data: [wireRow()],
+      meta: {
+        request_id: 'req',
+        pagination: { per_page: 100, next: 'stale', has_more: false },
+      },
+    } as never);
+
+    expect(await fetchPersonAppointments(CONTACT_ID)).toEqual([appointmentRow()]);
+    expect(api.get).toHaveBeenCalledTimes(1);
+  });
+
+  it('reads no team for a person with no bookings', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce(page([]) as never);
+
+    expect(await fetchPersonAppointments(CONTACT_ID)).toEqual([]);
+    expect(fetchTeamDirectory).not.toHaveBeenCalled();
   });
 });
 
@@ -735,6 +804,7 @@ describe('appointmentQueryKeys', () => {
       appointmentQueryKeys.detail('org_test', APPOINTMENT_ID),
       appointmentQueryKeys.slots('org_test', slots),
       appointmentQueryKeys.treatments('org_test'),
+      appointmentQueryKeys.person('org_test', CONTACT_ID),
     ]) {
       expect(key.slice(0, 3)).toEqual(prefix);
     }
@@ -749,6 +819,9 @@ describe('appointmentQueryKeys', () => {
   it('carry the organization, so two never share a read', () => {
     expect(appointmentQueryKeys.detail('org_one', APPOINTMENT_ID)).not.toEqual(
       appointmentQueryKeys.detail('org_two', APPOINTMENT_ID),
+    );
+    expect(appointmentQueryKeys.person('org_one', CONTACT_ID)).not.toEqual(
+      appointmentQueryKeys.person('org_two', CONTACT_ID),
     );
   });
 });

@@ -1,97 +1,214 @@
-import { appointmentQueryKeys } from './appointments-api.ts';
-import type { InvoiceRecord } from './invoices-contracts.ts';
-import type {
-  CompleteVisitInput,
-  CreateVisitBillInput,
-  SetVisitChecksInput,
-  ShareVisitInput,
-  StartVisitInput,
-  VisitCatalog,
-  VisitCompletion,
-  VisitDetail,
-  VisitRecord,
-  VisitRecordKind,
+import { z } from 'zod';
+
+import { api } from '@/core/http/api.ts';
+
+import { appointmentQueryKeys, moveAppointment } from './appointments-api.ts';
+import {
+  APPOINTMENT_TYPE_MINUTES,
+  APPOINTMENT_TYPE_SERVICES,
+  appointmentRowWire,
+} from './appointments-contracts.ts';
+import { clinicToday } from './clinic-time.ts';
+import { clinicalNoteQueryKeys, deleteClinicalNote } from './clinical-notes-api.ts';
+import {
+  type ClinicalNote,
+  clinicalNoteWire,
+  toClinicalNote,
+} from './clinical-notes-contracts.ts';
+import { patientFileQueryKeys } from './patient-file-api.ts';
+import {
+  toVisitRecord,
+  VISIT_CHECK_NOTE_TEXTS,
+  type VisitCheck,
+  type VisitRecord,
+  visitWire,
 } from './visits-contracts.ts';
 
 /*
- * The Visit API (D18; Appendix F `getVisit`, `setVisitStage`, `completeVisit`
- * and the file flow's writes — there is no Visit in the schema yet).
- * REPLACE_WITH_API: every call runs on the fixture server, loaded on demand;
- * when clinozy-be serves visits, these bodies become `apiClient` calls and
- * nothing else moves.
+ * The visit on clinozy-be (api-integration §5.1, §5.4): a visit is the person's booking checked
+ * in today — read from `GET /app/appointments` (`contact_id`, today, `status=checked_in`),
+ * started by a check-in of today's booking (`POST …/check-in`, the appointments layer's move)
+ * or a walk-in (`POST /app/appointments` `{is_walk_in}`), paused and resumed (`…/pause`,
+ * `…/resume`). Its safety checks are `safety_check` clinical notes written at it. Every write
+ * carries the user action's key.
  */
 
-const server = () => import('./fixtures/visits-server.fixtures.ts');
-
-/** TanStack Query keys for visits — all under `['clinic', 'visits']`. */
+/** The visit reads' keys, each carrying the organization. */
 export const visitQueryKeys = {
-  all: ['clinic', 'visits'] as const,
-  /** One visit with the records written at it. */
-  detail: (id: string) => [...visitQueryKeys.all, 'detail', id] as const,
-  /** A patient's open visit — the file's Start visit / Resume. */
-  open: (patientId: string) => [...visitQueryKeys.all, 'open', patientId] as const,
-  /** The diagnosis list and the Rx kits. */
-  catalog: () => [...visitQueryKeys.all, 'catalog'] as const,
+  /**
+   * Every open-visit read — under the appointments prefix, so any booking write (a check-in on
+   * Today, a stage move, a complete) refreshes it.
+   */
+  all: [...appointmentQueryKeys.all, 'visits'] as const,
+  /** A person's visit open today. */
+  open: (organizationId: string | null, contactId: string) =>
+    [...visitQueryKeys.all, organizationId, 'open', contactId] as const,
+  /** A visit's safety checks — under the clinical notes' prefix, which every note write refreshes. */
+  checks: (organizationId: string | null, patientId: string, appointmentId: string) =>
+    [
+      ...clinicalNoteQueryKeys.all,
+      organizationId,
+      'visit-checks',
+      patientId,
+      appointmentId,
+    ] as const,
 };
 
 /**
- * What a visit write may have changed: the visits, and Today's floor (under the
- * appointments prefix) — the card moves lanes. The record writes a visit
- * follows (an Rx, a session, a receipt) refresh them too.
+ * What a write at a visit may have changed: every booking read (the open visit, Today's floor,
+ * the person's Visits) and the patient file (its next visit, its Start visit / Resume).
  */
-export const VISIT_WRITE_KEYS = [visitQueryKeys.all, appointmentQueryKeys.all] as const;
+export const VISIT_WRITE_KEYS = [
+  appointmentQueryKeys.all,
+  patientFileQueryKeys.all,
+] as const;
 
-/** One visit with the records written at it (`getVisit`) — a 404 when it is unknown or gone. */
-export async function fetchVisit(id: string): Promise<VisitDetail> {
-  return (await server()).getVisit(id);
+/** The person's bookings today in the given statuses, by start (the API's default sort). */
+async function readTodaysBookings(contactId: string, status: string) {
+  const today = clinicToday();
+  const response = await api.get('/app/appointments', {
+    query: {
+      contact_id: contactId,
+      appointment_date_from: today,
+      appointment_date_to: today,
+      status,
+    },
+  });
+  return response.data ?? [];
 }
 
-/** The patient's open visit today, or null — the file's Start visit / Resume. */
-export async function fetchOpenVisit(patientId: string): Promise<VisitRecord | null> {
-  return (await server()).getOpenVisit(patientId);
+/** The person's visit open today — their booking checked in today — or null. */
+export async function fetchOpenVisit(contactId: string): Promise<VisitRecord | null> {
+  const [row] = z
+    .array(visitWire)
+    .parse(await readTodaysBookings(contactId, 'checked_in'));
+  return row ? toVisitRecord(row) : null;
 }
 
-/** The clinic's diagnosis list and Rx kits (Appendix F). */
-export async function fetchVisitCatalog(): Promise<VisitCatalog> {
-  return (await server()).getVisitCatalog();
-}
-
-/** "Start visit": the patient's open visit, else one for today's booking, else one without. */
-export async function startVisit(input: StartVisitInput): Promise<VisitRecord> {
-  return (await server()).startVisit(input);
-}
-
-/** Tick or untick the file's safety checks. */
-export async function setVisitChecks(input: SetVisitChecksInput): Promise<VisitRecord> {
-  return (await server()).setVisitChecks(input);
-}
-
-/** Create the visit's bill from its lines. */
-export async function createVisitBill(
-  input: CreateVisitBillInput,
-): Promise<{ visit: VisitRecord; invoice: InvoiceRecord }> {
-  return (await server()).createVisitBill(input);
+/** Who a Start visit is for and, should it need a walk-in, where and with whom. */
+interface StartVisitInput {
+  contactId: string;
+  /** The walk-in's branch — the patient's home branch. */
+  branchId: string;
+  /** The walk-in's doctor (a membership id). */
+  doctorId: string;
+  idempotencyKey: string;
 }
 
 /**
- * The server's side of a record written at the patient's open visit (D18: the
- * stage follows the records, `S:352`) — the Rx, the session and the receipt
- * writes call it after their own write, so Today's card moves on. REPLACE_WITH_API:
- * clinozy-be derives the stage itself.
+ * "Start visit": the visit already open stays as it is; else the person's first booking of today
+ * still to come (scheduled or confirmed) is checked in; else a walk-in is booked — today at now
+ * and checked in at once by the server — as a consultation with the doctor at the branch. The
+ * check-in also opens the person's lead's visit on the server (`clinic_visited`).
  */
-export async function advanceVisitAfter(
-  patientId: string,
-  kind: VisitRecordKind,
-): Promise<void> {
-  await (await server()).advanceVisitAfter(patientId, kind);
+export async function startVisit({
+  contactId,
+  branchId,
+  doctorId,
+  idempotencyKey,
+}: StartVisitInput): Promise<void> {
+  if (await fetchOpenVisit(contactId)) return;
+  const [booked] = z
+    .array(appointmentRowWire)
+    .parse(await readTodaysBookings(contactId, 'scheduled,confirmed'));
+  if (booked) {
+    await moveAppointment({
+      appointmentId: booked.id,
+      route: 'check-in',
+      idempotencyKey,
+    });
+    return;
+  }
+  await api.post('/app/appointments', {
+    body: {
+      contact_id: contactId,
+      branch_id: branchId,
+      doctor_membership_id: doctorId,
+      is_walk_in: true,
+      type: 'consultation',
+      service_label: APPOINTMENT_TYPE_SERVICES.consultation,
+      duration_minutes: APPOINTMENT_TYPE_MINUTES.consultation,
+    },
+    idempotencyKey,
+  });
 }
 
-/** Complete the visit and its booking. */
-export async function completeVisit(input: CompleteVisitInput): Promise<VisitCompletion> {
-  return (await server()).completeVisit(input);
+/** Pause a running visit, or resume a paused one — `409 transition_not_allowed` when it already is. */
+export async function setVisitPaused({
+  appointmentId,
+  paused,
+  idempotencyKey,
+}: {
+  appointmentId: string;
+  paused: boolean;
+  idempotencyKey: string;
+}): Promise<VisitRecord> {
+  const response = await api.post(
+    paused
+      ? '/app/appointments/{appointment_id}/pause'
+      : '/app/appointments/{appointment_id}/resume',
+    { params: { appointment_id: appointmentId }, idempotencyKey },
+  );
+  return toVisitRecord(visitWire.parse(response.data));
 }
 
-/** Send the Rx, invoice and photos on WhatsApp. */
-export async function shareVisit(input: ShareVisitInput): Promise<VisitRecord> {
-  return (await server()).shareVisit(input);
+// ── The safety checks ──
+
+/** Where a visit's safety checks are written: the patient and the visit's booking. */
+export interface VisitCheckTarget {
+  patientId: string;
+  appointmentId: string;
+}
+
+/** The visit's `safety_check` notes, oldest first — one page holds a visit's three. */
+export async function fetchVisitCheckNotes({
+  patientId,
+  appointmentId,
+}: VisitCheckTarget): Promise<ClinicalNote[]> {
+  const response = await api.get('/app/patients/{patient_id}/clinical-notes', {
+    params: { patient_id: patientId },
+    query: {
+      kind: 'safety_check',
+      appointment_id: appointmentId,
+      sort: 'created_at',
+      order: 'asc',
+    },
+  });
+  return z
+    .array(clinicalNoteWire)
+    .parse(response.data ?? [])
+    .map(toClinicalNote);
+}
+
+/** Record a check done at the visit — its `safety_check` note, tied to the booking. */
+export async function recordVisitCheck({
+  patientId,
+  appointmentId,
+  check,
+  idempotencyKey,
+}: VisitCheckTarget & {
+  check: VisitCheck;
+  idempotencyKey: string;
+}): Promise<ClinicalNote> {
+  const response = await api.post('/app/patients/{patient_id}/clinical-notes', {
+    params: { patient_id: patientId },
+    body: {
+      kind: 'safety_check',
+      text: VISIT_CHECK_NOTE_TEXTS[check],
+      appointment_id: appointmentId,
+    },
+    idempotencyKey,
+  });
+  return toClinicalNote(clinicalNoteWire.parse(response.data));
+}
+
+/** Untick a check — its note deleted with the reason `not_needed`, as a removed chip is (Q24). */
+export async function removeVisitCheck({
+  patientId,
+  noteId,
+}: {
+  patientId: string;
+  noteId: string;
+}): Promise<void> {
+  await deleteClinicalNote({ patientId, noteId, reason: 'not_needed' });
 }

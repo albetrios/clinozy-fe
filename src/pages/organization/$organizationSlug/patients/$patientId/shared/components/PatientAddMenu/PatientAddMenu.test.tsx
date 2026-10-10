@@ -3,20 +3,20 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { Calendar, Receipt } from '@/shared/icons/index.ts';
+import { Calendar, Camera } from '@/shared/icons/index.ts';
 
 import type { PatientAddItem } from '../../hooks/usePatientFileActions/index.ts';
 import { PatientAddMenu, type PatientAddMenuProps } from './PatientAddMenu.tsx';
 
 function renderMenu(props: Partial<PatientAddMenuProps> = {}) {
   const items: PatientAddItem[] = [
-    { id: 'invoice', tone: 'butter', icon: Receipt, run: vi.fn() },
+    { id: 'photo', tone: 'blush', icon: Camera, run: vi.fn() },
     { id: 'appointment', tone: 'sky', icon: Calendar, run: vi.fn() },
   ];
   const view = render(
     <PatientAddMenu
       variant="file"
-      firstName="Dharti"
+      firstName="Priya"
       items={items}
       trigger={<button type="button">Add to record</button>}
       {...props}
@@ -32,12 +32,12 @@ describe('PatientAddMenu', () => {
     await user.click(screen.getByRole('button', { name: 'Add to record' }));
     const menu = await screen.findByRole('menu', { name: 'Add to record' });
     expect(menu).toHaveClass('w-61.5');
-    expect(within(menu).getByText('Add for Dharti')).toBeInTheDocument();
+    expect(within(menu).getByText('Add for Priya')).toBeInTheDocument();
     expect(
       within(menu)
         .getAllByRole('menuitem')
         .map((item) => item.textContent),
-    ).toEqual(['Invoice', 'Appointment']);
+    ).toEqual(['Photo', 'Appointment']);
     expect(await axe(menu)).toHaveNoViolations();
   });
 
@@ -57,10 +57,10 @@ describe('PatientAddMenu', () => {
     await user.click(screen.getByRole('button', { name: 'Add to record' }));
     const menu = await screen.findByRole('menu');
     expect(menu).toHaveClass('w-60');
-    expect(within(menu).getByText('For Dharti · already selected')).toBeInTheDocument();
+    expect(within(menu).getByText('For Priya · already selected')).toBeInTheDocument();
     // Each row hovers in its own tone.
-    expect(within(menu).getByTestId('patient-file-add-menu-invoice')).toHaveClass(
-      'focus:bg-tone-butter',
+    expect(within(menu).getByTestId('patient-file-add-menu-photo')).toHaveClass(
+      'focus:bg-tone-blush',
     );
   });
 });

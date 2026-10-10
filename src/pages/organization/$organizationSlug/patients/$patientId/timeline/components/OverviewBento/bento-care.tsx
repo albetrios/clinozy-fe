@@ -4,14 +4,15 @@ import { cn } from '@/lib/utils.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import { localDateOf } from '@/shared/api/clinic/clinic-time.ts';
 import type { PatientNextVisit } from '@/shared/api/clinic/patient-file-contracts.ts';
-import type { PatientPackageRow } from '@/shared/api/clinic/patient-packages-api.ts';
+import type { PatientPackageRow } from '@/shared/api/clinic/patient-packages-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { APPOINTMENT_STATUS_TONES, TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { TonePill } from '@/shared/components/Cells/index.ts';
-import { EmptyState } from '@/shared/components/EmptyState/index.ts';
-import { useAppointmentSlotLabel } from '@/shared/hooks/useAppointments/index.ts';
+import {
+  useAppointmentSlotLabel,
+  usePersonAppointments,
+} from '@/shared/hooks/useAppointments/index.ts';
 import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
-import { useFixturePatientAppointments } from '@/shared/hooks/useFixtureAppointments/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { usePatientPackages } from '@/shared/hooks/usePatientPackages/index.ts';
 import { usePatientPrescriptions } from '@/shared/hooks/usePrescriptions/index.ts';
@@ -22,11 +23,13 @@ import { useTableDay } from '../../../shared/components/PatientSectionTable/inde
 import { usePatientFileContext } from '../../../shared/patient-file-context.ts';
 import { useVisitWhen } from '../../../shared/patient-visit.ts';
 import {
+  OVERVIEW_CARD_TONES,
   TIMELINE_KEYS,
   TIMELINE_NS,
   TIMELINE_TEST_IDS,
 } from '../../timeline.constants.ts';
-import { BentoButton, BentoCard, BentoRow } from './bento-card.tsx';
+import { BentoButton, BentoCard, BentoReadState, BentoRow } from './bento-card.tsx';
+import { bentoRead } from './bento-read.ts';
 
 /** How many records a card lists (H:4990 `slice(0, 3)`). */
 const LISTED = 3;
@@ -44,9 +47,11 @@ interface NewCardLinks extends CardLinks {
   onNew?: { label: string; run: () => void } | null;
 }
 
-/** The next visit (H:771): the 44px date tile, its time "11:00 am" and "Peel · 30 min". */
+/**
+ * The next visit (H:771): the 44px date tile, its time "11:00 am" and its
+ * service — the file's read names no length for it.
+ */
 function NextVisitTile({ visit }: { visit: PatientNextVisit }) {
-  const { t } = useTranslation(TIMELINE_NS);
   const { formatDate } = useLocaleFormat();
   const when = useVisitWhen();
   const date = localDateOf(visit.date);
@@ -66,10 +71,7 @@ function NextVisitTile({ visit }: { visit: PatientNextVisit }) {
       <span className="flex min-w-0 flex-1 flex-col gap-px">
         <span className="text-body truncate font-semibold">{when(visit)}</span>
         <span className="text-muted-foreground-strong truncate text-xs">
-          {t(TIMELINE_KEYS.visits.service, {
-            service: visit.serviceLabel,
-            minutes: visit.durationMin,
-          })}
+          {visit.serviceLabel}
         </span>
       </span>
     </div>
@@ -78,8 +80,9 @@ function NextVisitTile({ visit }: { visit: PatientNextVisit }) {
 
 /**
  * Visits (H:771, H:4990–4991): "Book", or "Reschedule" the next visit; the
- * next visit's tile; the last three completed visits with their status —
- * each opening Visits; "No visits yet".
+ * next visit's tile (the file's read); the person's last three completed
+ * bookings with their status (`GET /app/appointments?contact_id=`) — each
+ * opening Visits; "No visits yet".
  */
 export function VisitsBentoCard({
   onOpen,
@@ -90,12 +93,13 @@ export function VisitsBentoCard({
   onReschedule: ((visit: PatientNextVisit) => void) | null;
 }) {
   const { t } = useTranslation([TIMELINE_NS, CLINIC_NS]);
-  const { patientId, file } = usePatientFileContext();
-  const visits = useFixturePatientAppointments(patientId);
+  const { file } = usePatientFileContext();
+  const visits = usePersonAppointments(file?.patient.contactId);
   const slot = useAppointmentSlotLabel();
   const rows = visits.data ?? [];
   const past = rows.filter((row) => row.status === 'completed').slice(0, LISTED);
   const next = file?.nextVisit ?? null;
+  const title = t(TIMELINE_KEYS.cards.visits);
   const testId = TIMELINE_TEST_IDS.card('visits');
   let action = null;
   if (next && onReschedule) {
@@ -114,7 +118,7 @@ export function VisitsBentoCard({
   return (
     <BentoCard
       card="visits"
-      title={t(TIMELINE_KEYS.cards.visits)}
+      title={title}
       icon={Calendar}
       count={rows.length}
       actions={action}
@@ -143,51 +147,46 @@ export function VisitsBentoCard({
           })}
         </div>
       ) : null}
-      {visits.isSuccess && rows.length === 0 ? (
-        <EmptyState
-          variant="inline"
-          testId={`${testId}-empty`}
-          title={t(TIMELINE_KEYS.visits.empty)}
-        />
-      ) : null}
+      <BentoReadState
+        read={bentoRead(visits)}
+        empty={rows.length === 0 && !next}
+        label={title}
+        emptyTitle={t(TIMELINE_KEYS.visits.empty)}
+        testId={testId}
+      />
     </BentoCard>
   );
 }
 
-/** One package's journey (H:773, H:4911–4913): its sessions as segments and what comes next. */
-function PackageJourney({
-  row,
-  late,
-  onUse,
-}: {
-  row: PatientPackageRow;
-  late: boolean;
-  onUse: ((row: PatientPackageRow) => void) | null;
-}) {
+/**
+ * One package (H:773, H:4911–4913): its sessions as segments — used in the
+ * card's ink, the next one marked — and its state as the server keeps it:
+ * "All sessions done" (`used_up`), "Expired", else "Valid till …" / "No
+ * expiry". "Next · 8 Oct" and "Session 2 overdue" go: the API dates no next
+ * session of a package (G4).
+ */
+function PackageJourney({ row }: { row: PatientPackageRow }) {
   const { t } = useTranslation(TIMELINE_NS);
   const day = useTableDay();
   const K = TIMELINE_KEYS.packages;
-  const { sessionsTotal: total, sessionsUsed: used } = row.package;
-  const tone = row.offering?.tone ?? 'lav';
-  const done = used >= total;
-  let next = row.nextVisit
-    ? t(K.next, { date: day(row.nextVisit, true) })
-    : t(K.validTill, { date: day(row.package.validUntil) });
-  if (late) next = t(K.overdue, { session: used + 1 });
-  if (done) next = t(K.done);
+  const { sessionsTotal: total, sessionsUsed: used } = row;
+  const tone = TONE_CLASSES[OVERVIEW_CARD_TONES.packages];
+  let state = row.validUntil
+    ? t(K.validTill, { date: day(row.validUntil) })
+    : t(K.noExpiry);
+  if (row.status === 'expired') state = t(K.expired);
+  if (row.status === 'used_up') state = t(K.done);
   const segment = (index: number) => {
-    if (index < used) return TONE_CLASSES[tone].fill;
-    if (index === used) return late ? TONE_CLASSES.blush.fill : TONE_CLASSES[tone].dot;
+    if (index < used) return tone.fill;
+    if (index === used && row.status === 'active') return tone.dot;
     return 'bg-muted';
   };
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2" data-status={row.status}>
       <div className="flex min-w-0 items-center gap-2">
-        <span className="text-body min-w-0 flex-1 truncate font-medium">
-          {row.offering?.name ?? '—'}
-        </span>
+        <span className="text-body min-w-0 flex-1 truncate font-medium">{row.name}</span>
         <span className="text-detail flex-none font-semibold tabular-nums">
-          {t(K.progress, { used: Math.min(used, total), total })}
+          {t(K.progress, { used, total })}
         </span>
       </div>
       <div aria-hidden="true" className="flex gap-0.75">
@@ -198,82 +197,65 @@ function PackageJourney({
           />
         ))}
       </div>
-      <div className="flex items-center gap-2">
-        <span
-          className={cn(
-            'min-w-0 flex-1 truncate text-xs',
-            late && !done ? 'text-tone-blush-foreground' : 'text-muted-foreground-strong',
-          )}
-        >
-          {next}
-        </span>
-        {onUse ? (
-          <BentoButton
-            onClick={() => onUse(row)}
-            testId={`${TIMELINE_TEST_IDS.card('packages')}-use`}
-          >
-            {t(K.use)}
-          </BentoButton>
-        ) : null}
-      </div>
+      <span className="text-muted-foreground-strong truncate text-xs">{state}</span>
     </div>
   );
 }
 
 /**
- * Packages (H:773, H:4993): each package's sessions as segments — used in
- * the tone's ink, the next in blush when the follow-up is overdue — "Next ·
- * 8 Oct" / "Session 2 overdue" / "All sessions done", "Use session"; "No
- * active packages".
+ * Packages (H:773, H:4993): each package the patient bought (`GET …/offerings?is_package=true`)
+ * with its sessions as the server counts them; "No active packages". "Use session" goes — a
+ * recorded treatment spends one (§6 #20).
  */
-export function PackagesBentoCard({
-  onOpen,
-  onUse,
-}: CardLinks & { onUse: ((row: PatientPackageRow) => void) | null }) {
+export function PackagesBentoCard({ onOpen }: CardLinks) {
   const { t } = useTranslation(TIMELINE_NS);
-  const { patientId, file } = usePatientFileContext();
+  const { patientId } = usePatientFileContext();
   const packages = usePatientPackages(patientId);
   const rows = packages.data ?? [];
-  const followUp = file?.patient.followUpAt ?? null;
-  const late = followUp !== null && followUp < new Date().toISOString();
+  const title = t(TIMELINE_KEYS.cards.packages);
   return (
     <BentoCard
       card="packages"
-      title={t(TIMELINE_KEYS.cards.packages)}
+      title={title}
       icon={Package}
       count={rows.length}
       onOpen={onOpen}
     >
       {rows.map((row) => (
-        <PackageJourney key={row.package.id} row={row} late={late} onUse={onUse} />
+        <PackageJourney key={row.id} row={row} />
       ))}
-      {packages.isSuccess && rows.length === 0 ? (
-        <EmptyState
-          variant="inline"
-          testId={`${TIMELINE_TEST_IDS.card('packages')}-empty`}
-          title={t(TIMELINE_KEYS.packages.empty)}
-        />
-      ) : null}
+      <BentoReadState
+        read={bentoRead(packages)}
+        empty={rows.length === 0}
+        label={title}
+        emptyTitle={t(TIMELINE_KEYS.packages.empty)}
+        testId={TIMELINE_TEST_IDS.card('packages')}
+      />
     </BentoCard>
   );
 }
 
 /**
  * Prescriptions (H:774, H:4994): "New prescription"; the latest "Rx #500"
- * with its date, up to four medicines and its advice; "No prescriptions yet".
+ * with its date, up to four of its medicines and its advice; "No
+ * prescriptions yet".
  */
 export function PrescriptionsBentoCard({ onOpen, onNew }: NewCardLinks) {
   const { t } = useTranslation(TIMELINE_NS);
   const { patientId } = usePatientFileContext();
   const day = useTableDay();
-  const prescriptions = usePatientPrescriptions(patientId);
+  // The card shows its own failure (BentoReadState).
+  const prescriptions = usePatientPrescriptions(patientId, { notifyOnError: false });
   const rows = prescriptions.data ?? [];
   const [latest] = rows;
+  // A medicine is free text: two lines may name the same one — one pill each name.
+  const medicines = [...new Set(latest?.items.map((item) => item.medicineName))];
+  const title = t(TIMELINE_KEYS.cards.prescriptions);
   const testId = TIMELINE_TEST_IDS.card('prescriptions');
   return (
     <BentoCard
       card="prescriptions"
-      title={t(TIMELINE_KEYS.cards.prescriptions)}
+      title={title}
       icon={Pill}
       count={rows.length}
       onNew={onNew}
@@ -293,13 +275,9 @@ export function PrescriptionsBentoCard({ onOpen, onNew }: NewCardLinks) {
             {day(latest.date)}
           </span>
           <div className="flex flex-wrap gap-1">
-            {latest.items.slice(0, MEDICINES_NAMED).map((item) => (
-              <TonePill
-                key={item.medicineName}
-                tone="sage"
-                className="max-w-full truncate"
-              >
-                {item.medicineName}
+            {medicines.slice(0, MEDICINES_NAMED).map((name) => (
+              <TonePill key={name} tone="sage" className="max-w-full truncate">
+                {name}
               </TonePill>
             ))}
           </div>
@@ -308,21 +286,22 @@ export function PrescriptionsBentoCard({ onOpen, onNew }: NewCardLinks) {
           ) : null}
         </div>
       ) : null}
-      {prescriptions.isSuccess && rows.length === 0 ? (
-        <EmptyState
-          variant="inline"
-          testId={`${testId}-empty`}
-          title={t(TIMELINE_KEYS.prescriptions.empty)}
-        />
-      ) : null}
+      <BentoReadState
+        read={bentoRead(prescriptions)}
+        empty={rows.length === 0}
+        label={title}
+        emptyTitle={t(TIMELINE_KEYS.prescriptions.empty)}
+        testId={testId}
+      />
     </BentoCard>
   );
 }
 
 /**
- * Treatments (H:775, H:4995): "New treatment"; the last three — the name
- * over "Session 2 · 24 Sep 2026 · 15:00", as the Treatments table writes the
- * day — each opening its edit drawer; "No treatments yet".
+ * Treatments (H:775, H:4995): "New treatment"; the last three sessions done —
+ * a reversed one stays in Treatments, marked — the name over "Session 2 · 24
+ * Sep 2026 · 15:00" (the server's session number), each opening its edit
+ * drawer; "No treatments yet".
  */
 export function TreatmentsBentoCard({
   onOpen,
@@ -332,13 +311,15 @@ export function TreatmentsBentoCard({
   const { t } = useTranslation(TIMELINE_NS);
   const { patientId } = usePatientFileContext();
   const clock = useClinicClock();
-  const treatments = usePatientTreatments(patientId);
-  const rows = treatments.data ?? [];
+  // The card shows its own failure (BentoReadState).
+  const treatments = usePatientTreatments(patientId, { notifyOnError: false });
+  const rows = (treatments.data ?? []).filter((row) => row.status === 'done');
+  const title = t(TIMELINE_KEYS.cards.treatments);
   const testId = TIMELINE_TEST_IDS.card('treatments');
   return (
     <BentoCard
       card="treatments"
-      title={t(TIMELINE_KEYS.cards.treatments)}
+      title={title}
       icon={Sparkles}
       count={rows.length}
       onNew={onNew}
@@ -351,7 +332,7 @@ export function TreatmentsBentoCard({
               key={row.id}
               title={row.name}
               sub={t(TIMELINE_KEYS.treatments.sub, {
-                session: row.sessionNo,
+                session: row.sessionNumber,
                 date: clock.moment(row.performedAt),
               })}
               onClick={() => onEdit(row.id)}
@@ -360,13 +341,13 @@ export function TreatmentsBentoCard({
           ))}
         </div>
       ) : null}
-      {treatments.isSuccess && rows.length === 0 ? (
-        <EmptyState
-          variant="inline"
-          testId={`${testId}-empty`}
-          title={t(TIMELINE_KEYS.treatments.empty)}
-        />
-      ) : null}
+      <BentoReadState
+        read={bentoRead(treatments)}
+        empty={rows.length === 0}
+        label={title}
+        emptyTitle={t(TIMELINE_KEYS.treatments.empty)}
+        testId={testId}
+      />
     </BentoCard>
   );
 }

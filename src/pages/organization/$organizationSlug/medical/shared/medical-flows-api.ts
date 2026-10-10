@@ -15,7 +15,7 @@ import type {
 } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import { assertDayOpen } from '@/shared/api/clinic/day-close-api.ts';
-import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
+import { patientName } from '@/shared/api/clinic/patients-fixture-contracts.ts';
 import { newLedgerEntry } from '@/shared/api/clinic/payments-api.ts';
 import type { PaymentRecord } from '@/shared/api/clinic/payments-contracts.ts';
 

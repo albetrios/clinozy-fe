@@ -1,99 +1,46 @@
 import { z } from 'zod';
 
+import type { ApiBody, ApiData } from '@/core/http/api.ts';
+import { wireSchema } from '@/core/http/wire-schema.ts';
+
 import {
-  type CheckIn,
-  checkinFeelSchema,
-  checkinFollowedSchema,
-  civilDateSchema,
+  CHECKIN_FEEL_VALUES,
+  CHECKIN_FOLLOWED_VALUES,
+  type CheckinFeel,
+  type CheckinFollowed,
+  FEEDBACK_ACTION_VALUES,
   type FeedbackActionKind,
-  feedbackActionKindSchema,
-  type Review,
+  OFFERING_CATEGORY_VALUES,
+  type OfferingCategory,
+  REVIEW_SOURCE_VALUES,
   type ReviewSource,
-  reviewSourceSchema,
   type Tone,
+  toneSchema,
 } from './clinic-schema.ts';
 
 /*
- * The patient file's feedback — check-ins, reviews and the actions logged on
- * them (`listFeedback`, `createCheckIn`, `createReview`, `logFeedbackAction`;
- * `S:1636, 1648–1650`; KICKOFF §6.6 Feedback, the check-in and review
- * drawers).
+ * The patient file's feedback on clinozy-be (api-integration §5.4): a patient's check-ins
+ * (`/app/patients/:patient_id/check-ins`) and reviews (`…/reviews`), each with the follow-ups
+ * logged on it embedded (`actions`). What needs action and how a score moved are the server's
+ * (`needs_action`, `score_change`; §7); so are the call-back task a bad one opens and the plan
+ * rows a check-in's next offerings become (TR4, TR10) — the client sets off neither.
  */
 
-/** The drawers' limits (`patient-file.md:171–200`; inside the contract's, `S:500–530`). */
+/** The drawers' limits — the design's, inside the API's (`current_state` and `next_plan` 500, `followed_note` 280, a review's `text` 2,000, `link` 500). */
 export const FEEDBACK_LIMITS = {
-  /** `context` ("Day-2 call after LHR"), `S:510`. */
-  context: 80,
   now: 400,
-  followedNote: 300,
+  followedNote: 280,
   nextPlan: 400,
-  /** Offerings a check-in adds to the suggestions. */
+  /** Offerings a new check-in puts in the plan (TR10). */
   offerings: 10,
   reviewText: 600,
   link: 200,
+  /** Files on one review. */
   files: 10,
 } as const;
 
-/** How many feedback cards a page holds — "Load more" adds as many (`S:1636`). */
+/** How many feedback cards the carousel shows before "Load more" shows six more. */
 export const FEEDBACK_PAGE_SIZE = 6;
-
-/**
- * A check-in as the drawer saves it (`createCheckIn`, `S:1648`). `score` is
- * required in the contract (`S:512`) and optional in the drawer: 0 stands
- * for "not rated" until the contract takes none (AMBER A-F12).
- */
-export const checkInInputSchema = z.object({
-  patientId: z.uuid(),
-  appointmentId: z.uuid().nullable(),
-  treatmentId: z.uuid().nullable(),
-  context: z.string().trim().min(1).max(FEEDBACK_LIMITS.context),
-  feel: checkinFeelSchema,
-  score: z.number().int().min(0).max(10),
-  followed: checkinFollowedSchema.nullable(),
-  followedNote: z.string().trim().max(FEEDBACK_LIMITS.followedNote).nullable(),
-  now: z.string().trim().max(FEEDBACK_LIMITS.now).nullable(),
-  nextPlan: z.string().trim().max(FEEDBACK_LIMITS.nextPlan).nullable(),
-  nextOfferingIds: z.array(z.uuid()).max(FEEDBACK_LIMITS.offerings),
-  date: civilDateSchema,
-});
-
-/** A check-in's fields. */
-export type CheckInInput = z.infer<typeof checkInInputSchema>;
-
-/** A review as the drawer saves it (`createReview`, `S:1649`); a link must be https. */
-export const reviewInputSchema = z.object({
-  patientId: z.uuid(),
-  appointmentId: z.uuid().nullable(),
-  source: reviewSourceSchema,
-  rating: z.number().int().min(1).max(5).nullable(),
-  text: z.string().trim().max(FEEDBACK_LIMITS.reviewText).nullable(),
-  link: z
-    .string()
-    .trim()
-    .max(FEEDBACK_LIMITS.link)
-    .regex(/^https:\/\/\S+$/, 'Add an https:// link')
-    .nullable(),
-  date: civilDateSchema,
-});
-
-/** A review's fields. */
-export type ReviewInput = z.infer<typeof reviewInputSchema>;
-
-/** A logged follow-up on negative feedback (`logFeedbackAction`, `S:1650`). */
-export const feedbackActionInputSchema = z
-  .object({
-    checkInId: z.uuid().nullable(),
-    reviewId: z.uuid().nullable(),
-    action: feedbackActionKindSchema,
-    note: z.string().trim().max(280).nullable(),
-  })
-  .refine((value) => (value.checkInId === null) !== (value.reviewId === null), {
-    message: 'Log the action against one check-in or one review',
-    path: ['checkInId'],
-  });
-
-/** A feedback action's fields. */
-export type FeedbackActionInput = z.infer<typeof feedbackActionInputSchema>;
 
 /**
  * One of the Feedback card's type chips (H:4390): every card, the visit and
@@ -101,86 +48,324 @@ export type FeedbackActionInput = z.infer<typeof feedbackActionInputSchema>;
  */
 export type FeedbackType = 'all' | 'visit' | 'treatment' | ReviewSource;
 
-/** Who logged a card or an action: the 20px chip's initials, tone and first name. */
-export interface FeedbackPerson {
+/** A follow-up logged on a check-in or a review — the green "✓ Doctor called · Riya" pill. */
+interface FeedbackLoggedAction {
   id: string;
-  name: string;
-  initials: string;
-  tone: Tone;
-}
-
-/** The follow-up logged on a card — the green "✓ Doctor called · Riya" pill. */
-export interface FeedbackLoggedAction {
   action: FeedbackActionKind;
   note: string | null;
-  by: FeedbackPerson | null;
+  /** Who logged it — a membership id (`mem_…`), the team names it. */
+  authorId: string | null;
   /** When it was logged (ISO). */
   at: string;
 }
 
-/** A check-in card. */
-export interface CheckInFeedback {
-  kind: 'checkIn';
+/** A check-in as the file reads it. */
+export interface PatientCheckIn {
   id: string;
+  patientId: string;
+  /** The visit it was taken at. */
+  appointmentId: string | null;
+  /** The treatment session it follows — an aftercare check-in. */
+  treatmentId: string | null;
+  /** What it follows, in words — "After LHR Full Face", "Visit · 10 Oct" (the server's, TR9). */
+  context: string;
+  feel: CheckinFeel;
+  /** 1–10 (Q18). */
+  score: number;
+  /** Against the patient's check-in before it (the server's, §7); null for the first. */
+  scoreChange: number | null;
+  followed: CheckinFollowed | null;
+  followedNote: string | null;
+  /** How it is now, in their words. */
+  currentState: string | null;
+  nextPlan: string | null;
+  /** The offerings it put in the plan as Planned (TR10). */
+  nextOfferingIds: string[];
+  /** `YYYY-MM-DD`. */
   date: string;
-  checkIn: CheckIn;
-  /** The treatment it follows — an aftercare check-in; null after a visit. */
-  treatmentName: string | null;
-  /** The visit it follows: its number and service ("Appt #2790"). */
-  appointment: { seq: number; service: string | null } | null;
-  /** The score of the check-in before it — the ▲ ▼ trend. */
-  previousScore: number | null;
-  /** Worse, or a score of 4 or less (`S:520`). */
+  /** Worse, or a score of 4 or less, with nothing logged yet (the server's, TR9). */
   needsAction: boolean;
-  action: FeedbackLoggedAction | null;
-  by: FeedbackPerson | null;
+  /** The follow-ups logged on it, newest first. */
+  actions: FeedbackLoggedAction[];
+  createdAt: string;
+  updatedAt: string;
 }
 
-/** A review card. */
-export interface ReviewFeedback {
-  kind: 'review';
+/** A review as the file reads it. */
+export interface PatientReview {
   id: string;
+  patientId: string;
+  appointmentId: string | null;
+  source: ReviewSource;
+  /** 1–5; none for a review that was never rated. */
+  rating: number | null;
+  text: string | null;
+  link: string | null;
+  /** The confirmed uploads on it — no way to read one back yet (B1). */
+  fileKeys: string[];
+  /** `YYYY-MM-DD`. */
   date: string;
-  review: Review;
-  appointment: { seq: number; service: string | null } | null;
-  /** A rating of 3 or less (`S:538`). */
+  /** A rating of 3 or less with nothing logged yet (the server's, TR11). */
   needsAction: boolean;
-  action: FeedbackLoggedAction | null;
-  by: FeedbackPerson | null;
+  /** The follow-ups logged on it, newest first. */
+  actions: FeedbackLoggedAction[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 /** One card of the Feedback carousel. */
-export type FeedbackItem = CheckInFeedback | ReviewFeedback;
+export type FeedbackItem =
+  | { kind: 'checkIn'; id: string; checkIn: PatientCheckIn }
+  | { kind: 'review'; id: string; review: PatientReview };
 
-/** A page of the Feedback card. */
-export interface PatientFeedbackPage {
-  /** The cards of the picked type, newest first, up to the page's limit. */
-  items: FeedbackItem[];
-  /** How many cards the picked type has. */
-  total: number;
-  /** "1 check-in · 1 review" — every type. */
-  counts: { checkIns: number; reviews: number };
-  /** The types this patient has a card of — the chips after "All". */
-  types: FeedbackType[];
+/** Which of the two a card is — the route its writes take. */
+export type FeedbackKind = FeedbackItem['kind'];
+
+/** An offering a new check-in can put in the plan — the drawer's "Add to offering suggestions". */
+export interface CheckInOffering {
+  id: string;
+  name: string;
+  category: OfferingCategory;
+  tone: Tone;
+  /** Rupees, as the API sends them. */
+  price: number;
+  sessions: number;
+  searchTerms: string[];
+  isActive: boolean;
 }
 
-/** What the check-in drawer reads besides the record: the last check-in, the treatment, the visit. */
+/** What the check-in drawer heads with besides the record (H:4396). */
 export interface CheckInContext {
-  /** The latest check-in before this one — "last check-in 24 Sep: Same" and the placeholders. */
-  previous: CheckIn | null;
-  treatment: { id: string; name: string; doctorId: string | null } | null;
-  appointment: { id: string; seq: number; service: string | null } | null;
+  /** The patient's check-in before this one — "last check-in 24 Sep: Same" and the placeholders. */
+  previous: PatientCheckIn | null;
+  /** The treatment an aftercare check-in follows. */
+  treatmentName: string | null;
+  /** The visit it was taken at: its service. */
+  visitService: string | null;
 }
 
-/** A saved check-in and what it set off ("· 2 added to suggestions · doctor call-back task created"). */
-export interface CheckInSaved {
-  checkIn: CheckIn;
-  suggestionsAdded: number;
-  callBackCreated: boolean;
+// ── Writes ──
+
+/** A check-in's own fields — what the drawer writes, a new one and an edit alike. */
+export interface CheckInFields {
+  feel: CheckinFeel;
+  /** 1–10 (Q18). */
+  score: number;
+  currentState: string | null;
+  followed: CheckinFollowed | null;
+  followedNote: string | null;
+  nextPlan: string | null;
 }
 
-/** A saved review and whether it set off a call-back ("· call-back task created"). */
-export interface ReviewSaved {
-  review: Review;
-  callBackCreated: boolean;
+/**
+ * A new check-in: its fields, the visit and the treatment it follows, its day and the offerings
+ * it puts in the plan — on a create only (TR10). The server words its `context` (TR9).
+ */
+export interface CheckInCreateInput extends CheckInFields {
+  appointmentId: string | null;
+  treatmentId: string | null;
+  date: string;
+  nextOfferingIds: string[];
+}
+
+/** A review's own fields — what the drawer writes. */
+export interface ReviewFields {
+  source: ReviewSource;
+  rating: number | null;
+  text: string | null;
+  link: string | null;
+}
+
+/** A new review: its fields, the visit it follows and its day. Its files follow (`attachReviewFile`). */
+export interface ReviewCreateInput extends ReviewFields {
+  appointmentId: string | null;
+  date: string;
+}
+
+/** A check-in change as `PATCH …/check-ins/:patient_check_in_id` takes it. */
+type ApiCheckInChange = NonNullable<
+  ApiBody<'/app/patients/{patient_id}/check-ins/{patient_check_in_id}', 'patch'>
+>;
+
+/** A review change as `PATCH …/reviews/:patient_review_id` takes it. */
+type ApiReviewChange = NonNullable<
+  ApiBody<'/app/patients/{patient_id}/reviews/{patient_review_id}', 'patch'>
+>;
+
+/** The check-in fields as the API names them. */
+export function checkInBodyOf(fields: CheckInFields) {
+  return {
+    feel: fields.feel,
+    score: fields.score,
+    current_state: fields.currentState,
+    followed: fields.followed,
+    followed_note: fields.followedNote,
+    next_plan: fields.nextPlan,
+  } satisfies ApiCheckInChange;
+}
+
+/** The review fields as the API names them. */
+export function reviewBodyOf(fields: ReviewFields) {
+  return {
+    source: fields.source,
+    rating: fields.rating,
+    text: fields.text,
+    link: fields.link,
+  } satisfies ApiReviewChange;
+}
+
+// ── The wire ──
+
+type ApiCheckInRow = NonNullable<
+  ApiData<'/app/patients/{patient_id}/check-ins', 'get'>
+>[number];
+type ApiCheckIn = NonNullable<
+  ApiData<'/app/patients/{patient_id}/check-ins/{patient_check_in_id}', 'get'>
+>;
+type ApiReviewRow = NonNullable<
+  ApiData<'/app/patients/{patient_id}/reviews', 'get'>
+>[number];
+type ApiReview = NonNullable<
+  ApiData<'/app/patients/{patient_id}/reviews/{patient_review_id}', 'get'>
+>;
+type ApiOfferingRow = NonNullable<ApiData<'/app/offerings', 'get'>>[number];
+
+const actionWire = z.object({
+  id: z.string(),
+  action: z.enum(FEEDBACK_ACTION_VALUES),
+  note: z.string().nullable(),
+  author_membership_id: z.string().nullable(),
+  created_at: z.string(),
+});
+
+const checkInFieldsWire = {
+  id: z.string(),
+  patient_id: z.string(),
+  appointment_id: z.string().nullable(),
+  patient_treatment_id: z.string().nullable(),
+  context: z.string(),
+  feel: z.enum(CHECKIN_FEEL_VALUES),
+  score: z.number().int(),
+  score_change: z.number().int().nullable(),
+  followed: z.enum(CHECKIN_FOLLOWED_VALUES).nullable(),
+  followed_note: z.string().nullable(),
+  current_state: z.string().nullable(),
+  next_plan: z.string().nullable(),
+  next_offering_ids: z.array(z.string()),
+  check_in_date: z.string(),
+  needs_action: z.boolean(),
+  actions: z.array(actionWire),
+  created_at: z.string(),
+  updated_at: z.string(),
+};
+
+const reviewFieldsWire = {
+  id: z.string(),
+  patient_id: z.string(),
+  appointment_id: z.string().nullable(),
+  source: z.enum(REVIEW_SOURCE_VALUES),
+  rating: z.number().int().nullable(),
+  text: z.string().nullable(),
+  link: z.string().nullable(),
+  file_keys: z.array(z.string()),
+  review_date: z.string(),
+  needs_action: z.boolean(),
+  actions: z.array(actionWire),
+  created_at: z.string(),
+  updated_at: z.string(),
+};
+
+/** A check-in list row (`GET …/check-ins`). */
+export const checkInRowWire = wireSchema<ApiCheckInRow>()(z.object(checkInFieldsWire));
+
+/** One check-in (`GET …/check-ins/:patient_check_in_id`, and every write's answer). */
+export const checkInWire = wireSchema<ApiCheckIn>()(z.object(checkInFieldsWire));
+
+/** A review list row (`GET …/reviews`). */
+export const reviewRowWire = wireSchema<ApiReviewRow>()(z.object(reviewFieldsWire));
+
+/** One review (`GET …/reviews/:patient_review_id`, and every write's answer). */
+export const reviewWire = wireSchema<ApiReview>()(z.object(reviewFieldsWire));
+
+/** The parts of an offering row the check-in drawer's picker reads (`GET /app/offerings`). */
+export const checkInOfferingWire = wireSchema<ApiOfferingRow>()(
+  z.object({
+    id: z.string(),
+    name: z.string(),
+    category: z.enum(OFFERING_CATEGORY_VALUES),
+    tone: toneSchema,
+    price: z.number(),
+    sessions: z.number().int(),
+    search_terms: z.array(z.string()),
+    is_active: z.boolean(),
+  }),
+);
+
+function toLoggedAction(row: z.output<typeof actionWire>): FeedbackLoggedAction {
+  return {
+    id: row.id,
+    action: row.action,
+    note: row.note,
+    authorId: row.author_membership_id,
+    at: row.created_at,
+  };
+}
+
+/** A check-in as the file reads it. */
+export function toPatientCheckIn(row: z.output<typeof checkInRowWire>): PatientCheckIn {
+  return {
+    id: row.id,
+    patientId: row.patient_id,
+    appointmentId: row.appointment_id,
+    treatmentId: row.patient_treatment_id,
+    context: row.context,
+    feel: row.feel,
+    score: row.score,
+    scoreChange: row.score_change,
+    followed: row.followed,
+    followedNote: row.followed_note,
+    currentState: row.current_state,
+    nextPlan: row.next_plan,
+    nextOfferingIds: row.next_offering_ids,
+    date: row.check_in_date,
+    needsAction: row.needs_action,
+    actions: row.actions.map(toLoggedAction),
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+/** A review as the file reads it. */
+export function toPatientReview(row: z.output<typeof reviewRowWire>): PatientReview {
+  return {
+    id: row.id,
+    patientId: row.patient_id,
+    appointmentId: row.appointment_id,
+    source: row.source,
+    rating: row.rating,
+    text: row.text,
+    link: row.link,
+    fileKeys: row.file_keys,
+    date: row.review_date,
+    needsAction: row.needs_action,
+    actions: row.actions.map(toLoggedAction),
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+/** An offering as the check-in drawer's picker reads it. */
+export function toCheckInOffering(
+  row: z.output<typeof checkInOfferingWire>,
+): CheckInOffering {
+  return {
+    id: row.id,
+    name: row.name,
+    category: row.category,
+    tone: row.tone,
+    price: row.price,
+    sessions: row.sessions,
+    searchTerms: row.search_terms,
+    isActive: row.is_active,
+  };
 }

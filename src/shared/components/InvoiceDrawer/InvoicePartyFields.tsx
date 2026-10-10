@@ -118,8 +118,8 @@ export interface InvoicePartyFieldsProps {
   onParty: (party: InvoicePartyForm | null) => void;
   /** The member changed the team themself: no prefill replaces it any more. */
   onTeamChange: () => void;
-  /** "New patient · “q”" — the full form stacked on top (Q-P2). */
-  onNewPatient: (query: string) => void;
+  /** "New patient · “q”" — the full form stacked on top (Q-P2); absent, the picker has no create. */
+  onNewPatient?: (query: string) => void;
 }
 
 /**

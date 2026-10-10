@@ -8,12 +8,13 @@ import enCommon from '@/locales/en/common.json';
 import enErrors from '@/locales/en/errors.json';
 import enLayout from '@/locales/en/layout.json';
 import enPatients from '@/locales/en/patients.json';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import type * as PatientsApiModule from '@/shared/api/clinic/patients-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useDevicePrefsStore } from '@/shared/store/useDevicePrefsStore/index.ts';
 
 import { PATIENTS_TABLE_ID } from '../../patients.constants.ts';
 import { PatientsPage } from '../../PatientsPage.tsx';
+import { NOW, type PatientsWorld, seededPatientsWorld } from './patients-test-data.ts';
 import { renderPatientsRoutes, resetPatientsRoutes } from './patients-test-router.tsx';
 
 const viewport = vi.hoisted(() => ({ tier: 'desktop' as ViewportTier }));
@@ -29,6 +30,15 @@ vi.mock('@/shared/notify/index.ts', () => ({
   notify: notifyMock,
   TOAST_DURATION_MS: { default: 5_200, error: 9_000 },
 }));
+
+const world = vi.hoisted(() => ({}) as PatientsWorld);
+vi.mock('@/shared/api/clinic/patients-api.ts', async (importOriginal) => {
+  const { patientsApiDouble } = await import('./patients-test-data.ts');
+  return {
+    ...(await importOriginal<typeof PatientsApiModule>()),
+    ...patientsApiDouble(world),
+  };
+});
 
 const PATIENTS = '/organization/acme/patients';
 
@@ -69,14 +79,16 @@ beforeAll(async () => {
 });
 
 beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(NOW);
   viewport.tier = 'desktop';
-  resetClinicFixtures();
+  Object.assign(world, seededPatientsWorld());
   // Every column, the ones hidden by default (Gender, Conversion, Age) included.
   useDevicePrefsStore.setState({ hiddenColumns: { [PATIENTS_TABLE_ID]: [] } });
 });
 afterEach(() => {
+  vi.useRealTimers();
   resetPatientsRoutes();
-  resetClinicFixtures();
   useDevicePrefsStore.setState({ hiddenColumns: {} });
 });
 
@@ -93,6 +105,9 @@ describe('the Patients room with only its route’s namespaces loaded', () => {
     expect(dharti).toHaveTextContent('Aesthetic');
     expect(dharti).toHaveTextContent('Regular');
     expect(dharti).toHaveTextContent('Female');
+    // Conversion (`clinic` › patients) and Age (`patients` › table).
+    expect(dharti).toHaveTextContent('T-Not converted');
+    expect(dharti).toHaveTextContent('30 yrs');
     expect(screen.getByRole('columnheader', { name: /Conversion/ })).toBeInTheDocument();
     expect(document.body.textContent).not.toMatch(RAW_KEY);
   });

@@ -44,7 +44,7 @@ function areaPills(
     .map((key) => ({ label: label(key) }));
 }
 
-/** A number param with its unit ("24 weeks"); none while unset or zero. */
+/** A number parameter with its unit ("24 weeks"); none while unset or zero. */
 function withUnit(value: string | undefined, unit: string): string | undefined {
   return value && Number(value) > 0 ? `${value} ${unit}` : undefined;
 }
@@ -55,7 +55,7 @@ function templateTiles(
   t: TFunction,
   formatDay: (civilDate: string) => string,
 ): DrawerPeekItem[] {
-  const p = values.params;
+  const p = values.parameters;
   const value = (label: string, text: string | undefined): DrawerPeekItem => ({
     kind: 'value',
     label,

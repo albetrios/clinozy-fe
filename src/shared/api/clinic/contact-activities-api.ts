@@ -25,7 +25,9 @@ import type {
  * server's own entries, oldest first — the chat column's thread for a contact. Sending writes
  * one entry (`send-message`, `log-call`, `add-note`); a failed message is queued again
  * (`resend`); `messaging-status` says whether messages go out. The design's SMS and e-mail are
- * not channels (route map §4 #8).
+ * not channels (route map §4 #8). The patient file reads the same stream a page at a time,
+ * newest first, filtered by `type` and `group` — its Overview timeline and its Team notes
+ * (§6 #2, #3: there is no separate patient timeline and no patient note).
  */
 
 type ApiActivity = NonNullable<
@@ -34,6 +36,100 @@ type ApiActivity = NonNullable<
 
 /** The stream's entry types. */
 const ACTIVITY_TYPES = ['whatsapp', 'instagram', 'call_log', 'note', 'system'] as const;
+
+/** One entry type: a message, a logged call, a team note, or the server's own record event. */
+type ContactActivityType = (typeof ACTIVITY_TYPES)[number];
+
+/**
+ * The stream's groups as the server derives them (M10): every message, call and note is
+ * `messages`; a `system` entry goes by the record it links — `clinical`, `money`, `tasks`.
+ */
+const ACTIVITY_GROUPS = ['messages', 'clinical', 'money', 'tasks'] as const;
+
+/** One group of the stream. */
+type ContactActivityGroup = (typeof ACTIVITY_GROUPS)[number];
+
+/** The record an entry is about — at most one of the twelve links is set (M5). */
+const ACTIVITY_LINKS = {
+  appointment_id: 'appointment',
+  invoice_id: 'invoice',
+  payment_id: 'payment',
+  patient_prescription_id: 'prescription',
+  patient_offering_id: 'offering',
+  patient_review_id: 'review',
+  patient_check_in_id: 'checkIn',
+  task_id: 'task',
+  patient_treatment_id: 'treatment',
+  patient_clinical_note_id: 'clinicalNote',
+  patient_image_id: 'image',
+  patient_report_id: 'report',
+} as const;
+
+/** What kind of record an entry links. */
+export type ContactActivityLinkKind =
+  (typeof ACTIVITY_LINKS)[keyof typeof ACTIVITY_LINKS];
+
+/** An entry of the stream as the patient file reads it — the server's words, its record link. */
+export interface ContactActivityEntry {
+  id: string;
+  type: ContactActivityType;
+  group: ContactActivityGroup;
+  /** The text: a message, a note, or the server's own line ("Treatment recorded: Peel"). */
+  body: string;
+  occurredAt: string;
+  /** The member who wrote it (a note, a sent message); none for the server's entries. */
+  authorId: string | null;
+  link: { kind: ContactActivityLinkKind; id: string } | null;
+}
+
+/** What a stream read asks for: entry types and groups, each any of several (`a,b`). */
+export interface ContactActivityFilter {
+  type?: readonly ContactActivityType[];
+  group?: readonly ContactActivityGroup[];
+}
+
+/** One page of the stream, newest first, with the server's total on the first page. */
+export interface ContactActivityPage {
+  rows: ContactActivityEntry[];
+  next: string | null;
+  hasMore: boolean;
+  /** `meta.pagination.estimated_total`; null when the page does not say. */
+  total: number | null;
+}
+
+/** A filter as the list's query takes it: comma-separated values, none left out. */
+function filterQuery(filter: ContactActivityFilter): { type?: string; group?: string } {
+  return {
+    ...(filter.type?.length ? { type: filter.type.join(',') } : {}),
+    ...(filter.group?.length ? { group: filter.group.join(',') } : {}),
+  };
+}
+
+/**
+ * TanStack Query keys for the stream reads — under the messaging domain's key
+ * (`['clinic', 'messages']`, `messageQueryKeys` in `messages-api.ts`, named here so this module
+ * does not load the fixture world), so every write that refreshes a person's thread refreshes
+ * them too; each carries the organization and the contact.
+ */
+export const contactActivityQueryKeys = {
+  all: ['clinic', 'messages', 'activities'] as const,
+  /** Everything read of one person's stream. */
+  contact: (organizationId: string | null, contactId: string) =>
+    [...contactActivityQueryKeys.all, organizationId, contactId] as const,
+  /** The pages of one filter; without `limit`, every page size of it. */
+  list: (
+    organizationId: string | null,
+    contactId: string,
+    filter: ContactActivityFilter,
+    limit?: number,
+  ) =>
+    [
+      ...contactActivityQueryKeys.contact(organizationId, contactId),
+      'list',
+      filterQuery(filter),
+      ...(limit === undefined ? [] : [limit]),
+    ] as const,
+};
 
 const activityWire = wireSchema<ApiActivity>()(
   z.object({
@@ -81,6 +177,72 @@ function toChatMessage(row: z.output<typeof activityWire>): ChatMessage {
     authorId: row.author_membership_id,
     taskId: row.task_id,
     sentAt: row.occurred_at,
+  };
+}
+
+/** An entry with its group and record links — what the patient file's reads parse. */
+const activityEntryWire = wireSchema<ApiActivity>()(
+  activityWire.extend({
+    group: z.enum(ACTIVITY_GROUPS),
+    appointment_id: z.string().nullable(),
+    invoice_id: z.string().nullable(),
+    payment_id: z.string().nullable(),
+    patient_prescription_id: z.string().nullable(),
+    patient_offering_id: z.string().nullable(),
+    patient_review_id: z.string().nullable(),
+    patient_check_in_id: z.string().nullable(),
+    patient_treatment_id: z.string().nullable(),
+    patient_clinical_note_id: z.string().nullable(),
+    patient_image_id: z.string().nullable(),
+    patient_report_id: z.string().nullable(),
+  }),
+);
+
+/** One entry as the patient file reads it: its first (only) record link named by kind. */
+function toActivityEntry(row: z.output<typeof activityEntryWire>): ContactActivityEntry {
+  const column = (Object.keys(ACTIVITY_LINKS) as (keyof typeof ACTIVITY_LINKS)[]).find(
+    (key) => row[key] !== null,
+  );
+  const linked = column ? row[column] : null;
+  return {
+    id: row.id,
+    type: row.type,
+    group: row.group,
+    body: row.body,
+    occurredAt: row.occurred_at,
+    authorId: row.author_membership_id,
+    link: column && linked ? { kind: ACTIVITY_LINKS[column], id: linked } : null,
+  };
+}
+
+/**
+ * One page of a person's stream for a filter, newest first (`order=desc`); `after` is the
+ * cursor. An entry linked to a record the member may not read is not in it (M10).
+ */
+export async function listContactActivities({
+  contactId,
+  filter,
+  limit,
+  after,
+}: {
+  contactId: string;
+  filter: ContactActivityFilter;
+  limit: number;
+  after?: string;
+}): Promise<ContactActivityPage> {
+  const response = await api.get('/app/contacts/{contact_id}/activities', {
+    params: { contact_id: contactId },
+    query: { ...filterQuery(filter), order: 'desc', limit, after },
+  });
+  const pagination = response.meta?.pagination;
+  return {
+    rows: z
+      .array(activityEntryWire)
+      .parse(response.data ?? [])
+      .map(toActivityEntry),
+    next: pagination?.has_more ? (pagination.next ?? null) : null,
+    hasMore: pagination?.has_more === true && Boolean(pagination.next),
+    total: pagination?.estimated_total ?? null,
   };
 }
 

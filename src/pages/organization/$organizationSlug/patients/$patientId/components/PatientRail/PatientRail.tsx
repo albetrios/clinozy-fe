@@ -16,12 +16,9 @@ export interface PatientRailProps {
    * Accountant, Q-F1, AMBER A-F14): Reach, About and Up next hide.
    */
   limited?: boolean;
-  /** The file's money mask (Q-F4) and its toggle — the due card's eye. */
-  masked: boolean;
-  onToggleMasked: () => void;
   /** "Edit contact" — hidden without Patients edit. */
   onEditContact?: () => void;
-  /** Book / Reschedule, Collect, Feedback — each hidden when the member can't. */
+  /** Book / Reschedule and Feedback — each hidden when the member can't. */
   actions: RailUpNextActions;
   /** The rail's tier rule (the layout's: from `lg` with Activity closed, from `xl` open). */
   className?: string;
@@ -36,8 +33,6 @@ export interface PatientRailProps {
 export function PatientRail({
   file,
   limited = false,
-  masked,
-  onToggleMasked,
   onEditContact,
   actions,
   className,
@@ -58,12 +53,7 @@ export function PatientRail({
             <RailReach file={file} />
             <RailAbout file={file} />
           </div>
-          <RailUpNext
-            file={file}
-            masked={masked}
-            onToggleMasked={onToggleMasked}
-            actions={actions}
-          />
+          <RailUpNext file={file} actions={actions} />
         </>
       )}
     </aside>

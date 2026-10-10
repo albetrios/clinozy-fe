@@ -331,7 +331,7 @@
     },
     "missing": "नाम और मोबाइल जोड़ें",
     "mobileInvalid": "10 अंकों का मोबाइल नंबर डालें",
-    "created": "मरीज़ {{id}} बनाया गया · ऑनबोर्डिंग कार्य जोड़ा गया",
+    "created": "मरीज़ {{id}} बनाया गया",
     "openFile": "फ़ाइल खोलें",
     "saved": "{{name}} सहेजा गया",
     "registered": "{{name}} को मरीज़ {{id}} के रूप में दर्ज किया गया",
@@ -339,7 +339,8 @@
     "registeredPhotos_other": "{{name}} को मरीज़ {{id}} के रूप में दर्ज किया गया · {{count}} तस्वीरें रखी गईं",
     "duplicate": "{{name}} जैसा ही मोबाइल · {{id}}",
     "useExisting": "मौजूदा इस्तेमाल करें",
-    "summaryEmpty": "नया मरीज़"
+    "summaryEmpty": "नया मरीज़",
+    "knownPerson": "{{name}} पहले से आपके संपर्कों में हैं · फ़ाइल उन्हीं के नाम पर खुलेगी"
   },
   "recordDrawer": {
     "cancel": "रद्द करें",
@@ -810,9 +811,6 @@
     "pricesHiddenHint": "कीमतें छिपी हैं · दिखाने के लिए आँख का उपयोग करें",
     "showPrices": "कीमतें दिखाएँ",
     "hidePrices": "कीमतें छिपाएँ",
-    "savesOnList": "सूची मूल्य पर {{amount}} की बचत",
-    "invoicedAmount": "{{amount}} का इनवॉइस बना",
-    "atListPrice": "सूची मूल्य पर",
     "columns": {
       "suggested": "सुझाया गया",
       "qty": "मात्रा",
@@ -823,7 +821,7 @@
     "more": "ज़्यादा",
     "quantity": "मात्रा",
     "finalPrice": "अंतिम कीमत",
-    "belowFloor": "न्यूनतम कीमत {{price}} से कम",
+    "belowFloor": "न्यूनतम कीमत से कम",
     "tooMuchDiscount": "बहुत ज़्यादा छूट · किसी एडमिन से पूछें",
     "details": "सेवा का विवरण",
     "statuses": {
@@ -841,8 +839,6 @@
     "statusLabel": "स्थिति · {{status}}",
     "invoiced": "इनवॉइस बना",
     "invoicedOf": "इनवॉइस बना · {{total}} में से {{done}}",
-    "linkInvoice": "इनवॉइस जोड़ें",
-    "linkInvoiceHint": "इनवॉइस हाथ से जोड़ें",
     "remove": "हटाएँ",
     "empty": "{{first}} के लिए अभी कुछ सुझाया नहीं गया।",
     "whyIdea": "यह आइडिया क्यों",
@@ -852,15 +848,10 @@
     "addHint": "सुझावों में जोड़ें",
     "addOffering": "सेवा जोड़ें",
     "purchasesTitle": "{{first}} की पिछली खरीद",
-    "purchasesSummary_one": "{{count}} लाइन · अब तक {{paid}} भुगतान",
-    "purchasesSummary_other": "{{count}} लाइन · अब तक {{paid}} भुगतान",
     "purchaseColumns": {
       "date": "तारीख",
       "bought": "खरीदा",
-      "qty": "मात्रा",
-      "paid": "भुगतान",
-      "sessions": "सत्र",
-      "invoice": "इनवॉइस"
+      "sessions": "सत्र"
     },
     "sessionsUsed": "{{total}} में से {{used}} इस्तेमाल",
     "activityTitle": "संपर्क गतिविधि",
@@ -899,17 +890,7 @@
       "lowest": "न्यूनतम {{price}}"
     },
     "ideaReasons": {
-      "history": "इतिहास से सुझाव",
-      "note": "डॉक्टर का नोट · “{{text}}”",
-      "complaint": "शिकायत · {{text}}",
-      "visits_one": "अब तक {{count}} विज़िट · पैकेज से हर सेशन पर बचत होती है",
-      "visits_other": "अब तक {{count}} विज़िट · पैकेज से हर सेशन पर बचत होती है",
-      "renew": "पैकेज लगभग खत्म · रिन्यू करें",
-      "first": "पहली विज़िट · परामर्श से शुरू करें"
-    },
-    "purchaseKinds": {
-      "medicine": "दवा",
-      "item": "सामान"
+      "history": "इतिहास से सुझाव"
     },
     "delivery": {
       "queued": "कतार में",
@@ -919,7 +900,9 @@
       "failed": "नहीं पहुँचा",
       "received": "मिला"
     },
-    "activityLead": "लीड {{id}}"
+    "activityLead": "लीड {{id}}",
+    "purchasesCount_one": "{{count}} लाइन",
+    "purchasesCount_other": "{{count}} लाइन"
   },
   "contactEditor": {
     "title": "संपर्क संपादित करें",

@@ -22,7 +22,7 @@ import {
   type PlanSuggestion,
   type SuggestionCreateInput,
   type SuggestionPatch,
-} from '@/shared/api/clinic/plan-contracts.ts';
+} from '@/shared/api/clinic/plan-fixture-contracts.ts';
 
 import { findPersonThread } from './contact-threads.fixtures.ts';
 import { FIXTURE_VIEWER_ID } from './staff.fixtures.ts';
@@ -33,7 +33,7 @@ import { clinicFixtures } from './world.fixtures.ts';
  * `updateSuggestion`, `S:1635, 1646`): the suggestions joined with their
  * offering and who made them, the ideas derived from the patient's notes,
  * visits and packages (H:4355–4366), the last six purchase lines and the
- * contact's last five messages. `plan-api.ts` loads it on demand.
+ * contact's last five messages. `plan-fixture-api.ts` loads it on demand.
  */
 
 const IDEA_LIMIT = 4;

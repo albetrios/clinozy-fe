@@ -20,6 +20,7 @@ import {
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import { EditCheckInPage } from '../../check-ins/$checkInId/edit/EditCheckInPage.tsx';
 import { NewCheckInPage } from '../../check-ins/create/NewCheckInPage.tsx';
@@ -64,12 +65,14 @@ export function patientFileUrl(patientId: string, rest = ''): string {
 /**
  * The patient file as `routeTree.tsx` registers it — the layout with its
  * search schema, the eleven sections, Edit patient, the index and unknown
- * sections going to the Overview — opened at `url`, for a member previewed as
+ * sections going to the Overview — opened at `url`, for the test member
+ * (`signInTestMember`: organization `org_test`, slug `acme`) previewed as
  * `role` (View-as narrows the clinic access to that role's matrix). The
  * Patients list and every other path land on stand-ins, so a test can read
  * where a link went.
  */
 export function renderPatientFile(url: string, { role = 'admin' }: { role?: Role } = {}) {
+  signInTestMember();
   useOrganizationStore.getState().setPermissions(['organization:read']);
   useUIStore.setState({ previewRole: role });
 
@@ -210,8 +213,8 @@ export interface InPatientFileOptions {
 
 /**
  * One part of the file — a section, a hook's probe — rendered inside the
- * file's context at `…/patients/<file's patient>/<section>`, for a member
- * previewed as `role`. Any other URL lands on a stand-in, so a test can read
+ * file's context at `…/patients/<file's patient>/<section>`, for the test
+ * member previewed as `role`. Any other URL lands on a stand-in, so a test can read
  * where a link went from `router.state.location`.
  */
 export function renderInPatientFile(
@@ -226,6 +229,7 @@ export function renderInPatientFile(
     photos = { pick: () => undefined, upload: () => undefined },
   }: InPatientFileOptions = {},
 ) {
+  signInTestMember();
   useOrganizationStore.getState().setPermissions(['organization:read']);
   useUIStore.setState({ previewRole: role });
   const patientId = file?.patient.id ?? 'patient';

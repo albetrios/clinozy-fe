@@ -32,9 +32,13 @@ export interface TreatmentStepsView {
  * The drawer's three steps without their fields (H:4811–4827): 1 "Session",
  * 2 "<template> details", 3 "Aftercare" — each collapsed card peeks its
  * fields (the doctor and therapist as pills), and each head names its first
- * four values (H:3840).
+ * four values (H:3840). `session` is the session number as the drawer shows it
+ * — the package's words while the server numbers it.
  */
-export function useTreatmentStepsView(values: TreatmentFormValues): TreatmentStepsView {
+export function useTreatmentStepsView(
+  values: TreatmentFormValues,
+  session: string,
+): TreatmentStepsView {
   const { t } = useTranslation(TREATMENT_NS);
   const { t: tDrawer } = useTranslation(RECORD_DRAWER_NS);
   const { formatDate } = useLocaleFormat();
@@ -42,7 +46,6 @@ export function useTreatmentStepsView(values: TreatmentFormValues): TreatmentSte
   const therapist = useStaffMember(values.therapistId);
   const notFilled = tDrawer(RECORD_DRAWER_KEYS.step.notFilled);
   const name = values.name.trim();
-  const sessionNo = String(values.sessionNo);
   const remark = values.remark.trim();
   const call = t(K.aftercare.calls[values.aftercareCall]);
   const callTone = AFTERCARE_CALLS.find(
@@ -61,12 +64,12 @@ export function useTreatmentStepsView(values: TreatmentFormValues): TreatmentSte
       id: 'session',
       title: t(K.steps.session),
       summary: drawerStepSummary(
-        [name, sessionNo, doctor.shortName, therapist.shortName],
+        [name, session, doctor.shortName, therapist.shortName],
         notFilled,
       ),
       peek: [
         { kind: 'value', label: t(K.name), value: name || undefined },
-        { kind: 'value', label: t(K.sessionNo), value: sessionNo },
+        { kind: 'value', label: t(K.sessionNo), value: session },
         {
           kind: 'value',
           label: t(K.doctor),

@@ -1,20 +1,20 @@
-import type { AppointmentStaff } from '@/shared/api/clinic/appointments-fixture-contracts.ts';
-import { personFullName, shortPersonName } from '@/shared/components/Cells/index.ts';
-import { useFixtureBookableStaff } from '@/shared/hooks/useFixtureAppointments/index.ts';
+import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
+import { shortPersonName } from '@/shared/components/Cells/index.ts';
+import { useTeamDirectory } from '@/shared/hooks/useTeamDirectory/index.ts';
 
-/** A picked staff member and the short name the drawers show ("Dr. Drashti P."). */
+/** A picked team member and the short name the drawers show ("Dr. Drashti P."). */
 export interface StaffMember {
-  person: AppointmentStaff | null;
-  /** Empty while nobody is picked or the staff list has not answered. */
+  person: DirectoryMember | null;
+  /** Empty while nobody is picked or the team has not answered. */
   shortName: string;
 }
 
 /**
- * The person a record's Doctor or Therapist names, for its badge, peek and
- * summary — from the same staff list the picker reads.
+ * The member a record's Doctor or Therapist names, for its badge, peek and summary — from the
+ * same team the picker reads (`GET /app/memberships`).
  */
 export function useStaffMember(staffId: string | null): StaffMember {
-  const staff = useFixtureBookableStaff();
-  const person = staff.data?.find((member) => member.id === staffId) ?? null;
-  return { person, shortName: person ? shortPersonName(personFullName(person)) : '' };
+  const team = useTeamDirectory();
+  const person = staffId ? (team.byId.get(staffId) ?? null) : null;
+  return { person, shortName: person ? shortPersonName(person.name) : '' };
 }

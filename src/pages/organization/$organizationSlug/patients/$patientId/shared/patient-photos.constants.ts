@@ -1,4 +1,8 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
+import type {
+  PatientPhotoBodyPart,
+  PatientPhotoStage,
+} from '@/shared/api/clinic/patient-images-contracts.ts';
 
 /** The patient's photos read the patient file's namespace. */
 export const PATIENT_PHOTOS_NS = I18N_NAMESPACES.patientFile;
@@ -28,8 +32,6 @@ export const PATIENT_PHOTOS_KEYS = {
     visit: 'photos.visitFilter.visit',
     /** "#2790 · Completed". */
     visitSub: 'photos.visitFilter.visitSub',
-    /** "3 photos" (plural). */
-    visitMeta: 'photos.visitFilter.visitMeta',
   },
   sizes: {
     label: 'photos.sizes.label',
@@ -42,8 +44,6 @@ export const PATIENT_PHOTOS_KEYS = {
   },
   /** "Loading photos" — the skeleton's spoken label. */
   loading: 'photos.loading',
-  /** "3 photos · 24 Sep · Hydrafacial" — a date group's line. */
-  groupWithVisit: 'photos.groupWithVisit',
   tile: {
     /** "Open IMG_5100". */
     open: 'photos.tile.open',
@@ -73,28 +73,33 @@ export const PATIENT_PHOTOS_KEYS = {
     },
     deleted: 'photos.delete.deleted',
   },
+  /** The API's fifteen `body_part` values (M33), each by its own key. */
   bodyParts: {
     face: 'photos.bodyParts.face',
+    upper_lip: 'photos.bodyParts.upperLip',
+    chin: 'photos.bodyParts.chin',
+    neck: 'photos.bodyParts.neck',
     scalp: 'photos.bodyParts.scalp',
     hair: 'photos.bodyParts.hair',
-    body: 'photos.bodyParts.body',
     chest: 'photos.bodyParts.chest',
     back: 'photos.bodyParts.back',
     underarm: 'photos.bodyParts.underarm',
-    legs: 'photos.bodyParts.legs',
     arms: 'photos.bodyParts.arms',
+    hands: 'photos.bodyParts.hands',
+    legs: 'photos.bodyParts.legs',
+    body: 'photos.bodyParts.body',
+    full_body: 'photos.bodyParts.fullBody',
     other: 'photos.bodyParts.other',
-  },
+  } satisfies Readonly<Record<PatientPhotoBodyPart, string>>,
+  /** Before / After (`stage`). */
+  stages: {
+    before: 'photos.stages.before',
+    after: 'photos.stages.after',
+  } satisfies Readonly<Record<PatientPhotoStage, string>>,
   viewer: {
     label: 'photos.viewer.label',
     /** "2 of 6". */
     position: 'photos.viewer.position',
-    zoom: 'photos.viewer.zoom',
-    zoomOut: 'photos.viewer.zoomOut',
-    zoomOutHint: 'photos.viewer.zoomOutHint',
-    zoomIn: 'photos.viewer.zoomIn',
-    zoomInHint: 'photos.viewer.zoomInHint',
-    zoomReset: 'photos.viewer.zoomReset',
     close: 'photos.viewer.close',
     closeHint: 'photos.viewer.closeHint',
     previous: 'photos.viewer.previous',
@@ -103,10 +108,9 @@ export const PATIENT_PHOTOS_KEYS = {
     nextHint: 'photos.viewer.nextHint',
     hints: {
       browse: 'photos.viewer.hints.browse',
-      zoom: 'photos.viewer.hints.zoom',
-      pan: 'photos.viewer.hints.pan',
       close: 'photos.viewer.hints.close',
     },
+    /** "Preview not available" — B1: the stage shows the file's name, never its pixels. */
     missing: 'photos.viewer.missing',
     /** "Photo" — the record in "Photo not found · it may have been deleted". */
     notFoundRecord: 'photos.viewer.notFoundRecord',
@@ -119,6 +123,7 @@ export const PATIENT_PHOTOS_KEYS = {
     date: 'photos.details.date',
     album: 'photos.details.album',
     bodyPart: 'photos.details.bodyPart',
+    stage: 'photos.details.stage',
     optional: 'photos.details.optional',
     visit: 'photos.details.visit',
     visitHint: 'photos.details.visitHint',

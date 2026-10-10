@@ -1,4 +1,1 @@
-export {
-  type PrescriptionRowAccess,
-  usePrescriptionRowActions,
-} from './usePrescriptionRowActions.tsx';
+export { usePrescriptionRowActions } from './usePrescriptionRowActions.tsx';

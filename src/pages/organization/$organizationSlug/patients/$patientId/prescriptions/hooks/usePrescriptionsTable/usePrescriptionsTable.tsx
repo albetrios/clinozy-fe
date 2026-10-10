@@ -2,8 +2,9 @@ import { type ColumnDef, useTable } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { Prescription } from '@/shared/api/clinic/clinic-schema.ts';
-import { IdPill } from '@/shared/components/Cells/index.ts';
+import type { PrescriptionRecord } from '@/shared/api/clinic/prescriptions-contracts.ts';
+import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { IdPill, TonePill } from '@/shared/components/Cells/index.ts';
 import {
   type DataTableFeatures,
   dataTableFeatures,
@@ -20,31 +21,36 @@ import {
 } from '../../../shared/components/PatientSectionTable/index.ts';
 import { useStaffLookup } from '../../../shared/hooks/useStaffLookup/index.ts';
 import { rxFormLineOf, useRxLabels } from '../../components/PrescriptionDrawer/index.ts';
+import { RX_KEYS, RX_STATUS_TONES } from '../../prescriptions.constants.ts';
 
 const keys = PATIENT_TABLE_KEYS;
-const rowOf = (original: unknown) => original as Prescription;
+const rowOf = (original: unknown) => original as PrescriptionRecord;
 
 /** "Flubolt 400, Clonix-B Lotion" — the medicines' names. */
-const medicineNames = (prescription: Prescription) =>
+const medicineNames = (prescription: PrescriptionRecord) =>
   prescription.items.map((item) => item.medicineName).join(', ');
 
 /** "Doctor's advice · Today's procedure", the notes the Rx carries. */
-const prescriptionNotes = (prescription: Prescription) =>
+const prescriptionNotes = (prescription: PrescriptionRecord) =>
   [prescription.advice, prescription.procedureToday].filter(Boolean).join(' · ');
 
 /**
  * The Prescriptions columns (KICKOFF §6.6 Section tables; H:4753): ID · Date
  * · Medicines (the names over "0-0-1 · After meal | Morning & night") · Notes
- * (hidden) · Doctor · Updated (hidden), 1100px in all. On a phone Date leads,
- * Medicines is the key and the number folds under it; the doctor's pill folds
- * to nothing (H:4115).
+ * (hidden) · Doctor · Status (Draft · Approved, Q19) · Updated (hidden; when
+ * only — the API names no author, G4), 1100px in all. On a phone Date leads,
+ * Medicines is the key and the number and status fold under it; the doctor's
+ * pill folds to nothing (H:4115).
  */
-function usePrescriptionsColumns(): ColumnDef<DataTableFeatures, Prescription>[] {
+function usePrescriptionsColumns(): ColumnDef<DataTableFeatures, PrescriptionRecord>[] {
+  // The section tables and the Rx copy share the patient file's namespace.
   const { t } = useTranslation(PATIENT_TABLE_NS);
+  const status = (prescription: PrescriptionRecord) =>
+    t(RX_KEYS.status[prescription.status]);
   const day = useTableDay();
   const staff = useStaffLookup();
   const labels = useRxLabels();
-  const directions = (prescription: Prescription) =>
+  const directions = (prescription: PrescriptionRecord) =>
     prescription.items
       .map((item) => {
         const line = rxFormLineOf(item);
@@ -118,28 +124,42 @@ function usePrescriptionsColumns(): ColumnDef<DataTableFeatures, Prescription>[]
       meta: { track: 'minmax(120px,.8fr)', foldValue: () => null },
     },
     {
+      id: 'status',
+      accessorFn: status,
+      header: t(keys.columns.status),
+      enableSorting: false,
+      cell: ({ row }) => (
+        <TonePill tone={RX_STATUS_TONES[row.original.status]} dot>
+          {status(row.original)}
+        </TonePill>
+      ),
+      meta: {
+        track: '110px',
+        kind: 'badges',
+        foldValue: (original) => ({
+          value: status(rowOf(original)),
+          dotClassName: TONE_CLASSES[RX_STATUS_TONES[rowOf(original).status]].fill,
+        }),
+      },
+    },
+    {
       id: 'updated',
       accessorKey: 'updatedAt',
       header: t(keys.columns.updated),
       enableSorting: false,
-      cell: ({ row }) => (
-        <UpdatedCell
-          person={staff(row.original.createdById)}
-          at={row.original.updatedAt}
-        />
-      ),
+      cell: ({ row }) => <UpdatedCell person={null} at={row.original.updatedAt} />,
       meta: { track: '150px', defaultHidden: true, foldValue: () => null },
     },
   ];
 }
 
 /** The Prescriptions table: the patient's prescriptions, newest first; Columns is a device pref. */
-export function usePrescriptionsTable(rows: readonly Prescription[]) {
+export function usePrescriptionsTable(rows: readonly PrescriptionRecord[]) {
   const columns = usePrescriptionsColumns();
   const visibility = useHiddenColumns(PATIENT_SECTION_TABLE_IDS.prescriptions, columns);
   return useTable({
     features: dataTableFeatures,
-    data: rows as Prescription[],
+    data: rows as PrescriptionRecord[],
     columns,
     manualPagination: true,
     manualSorting: true,

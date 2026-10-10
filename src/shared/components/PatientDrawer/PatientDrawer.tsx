@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from '@tanstack/react-router';
 import type { TFunction } from 'i18next';
 import { useId, useState } from 'react';
@@ -6,8 +7,10 @@ import { useTranslation } from 'react-i18next';
 
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import { fetchPatient, patientQueryKeys } from '@/shared/api/clinic/patients-api.ts';
 import {
   patientName,
+  type PatientPersonInput,
   type PatientRecord,
 } from '@/shared/api/clinic/patients-contracts.ts';
 import { defaultBranchId } from '@/shared/clinic/clinic-branch.ts';
@@ -22,9 +25,11 @@ import { useBranches } from '@/shared/hooks/useBranches/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
-import { usePatientByPhone } from '@/shared/hooks/usePatients/index.ts';
+import { useLead } from '@/shared/hooks/useLeads/index.ts';
+import { usePatient, usePersonByPhone } from '@/shared/hooks/usePatients/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
 import { notify } from '@/shared/notify/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 import {
   PATIENT_DRAWER_KEYS,
@@ -43,7 +48,10 @@ import {
   patientInputOf,
 } from './patient-form.ts';
 import { PatientClinicFields, PatientContactFields } from './PatientDrawerFields.tsx';
-import { PatientDuplicateNotice } from './PatientDrawerParts.tsx';
+import {
+  PatientDuplicateNotice,
+  PatientKnownPersonNotice,
+} from './PatientDrawerParts.tsx';
 import { type PatientSaveOutcome, usePatientSave } from './use-patient-save.ts';
 
 /** What every use of the drawer passes. */
@@ -123,15 +131,70 @@ function sessionPrefill(
 }
 
 /**
- * The duplicate-mobile check (Q-P7): a mobile that loses focus as a valid
- * ten digits is looked up; the notice shows while the field still holds it.
+ * The duplicate-mobile check (Q-P7): a mobile that loses focus as a valid ten digits is looked
+ * up (`GET /app/contacts?phone=`); the notice shows while the field still holds it. The person
+ * on it is a patient already (`patient`, other than the one being edited) or someone the clinic
+ * knows without a file (`known` — a new file opens on them).
  */
-function useDuplicateMobile(phone: string, exceptId: string | null) {
+function useDuplicateMobile(phone: string, editingId: string | null) {
   const [checked, setChecked] = useState<string | null>(null);
-  const lookup = usePatientByPhone(checked, exceptId);
-  const patient =
+  const lookup = usePersonByPhone(checked);
+  const person =
     checked !== null && toClinicPhone(phone) === checked ? (lookup.data ?? null) : null;
-  return { patient, check: (digits: string) => setChecked(toClinicPhone(digits)) };
+  const patientId = person?.patientId ?? null;
+  const other = patientId !== null && patientId !== editingId;
+  return {
+    patient:
+      other && person
+        ? { id: patientId, name: person.name, seq: person.patientNumber }
+        : null,
+    known: person && patientId === null && editingId === null ? person : null,
+    check: (digits: string) => {
+      const phone = toClinicPhone(digits);
+      // The same number again (the server refused it as taken): ask once more.
+      if (phone !== null && phone === checked) void lookup.refetch();
+      else setChecked(phone);
+    },
+  };
+}
+
+/**
+ * Who a new patient is: the lead's person when the drawer opened from a lead, else the person
+ * already on the mobile, else a new one.
+ */
+function usePersonInput(
+  leadId: string | undefined,
+  known: { id: string } | null,
+): () => PatientPersonInput {
+  const lead = useLead(leadId);
+  return () => {
+    const contactId = lead.data?.contactId ?? known?.id;
+    return contactId ? { contactId } : 'new';
+  };
+}
+
+/**
+ * An edit's record, kept in step with a reload: a save refused as stale (`409
+ * record_changed`) reads the patient again and restarts the form on what was saved.
+ */
+function useEditingRecord(
+  patient: PatientRecord | null,
+  reset: (record: PatientRecord) => void,
+) {
+  const queryClient = useQueryClient();
+  const organizationId = useOrganizationStore((state) => state.organizationId);
+  const [record, setRecord] = useState(patient);
+  const reload = async () => {
+    if (!record) return;
+    const fresh = await queryClient.fetchQuery({
+      queryKey: patientQueryKeys.detail(organizationId, record.id),
+      queryFn: () => fetchPatient(record.id),
+      staleTime: 0,
+    });
+    setRecord(fresh);
+    reset(fresh);
+  };
+  return { record, reload };
 }
 
 /** The Quick fill chips: each presets fields and keeps the rest; none saves. */
@@ -256,6 +319,37 @@ function useSaveOutcome(props: PatientDrawerProps, onAnother: () => void) {
   return { finish, existingAction };
 }
 
+/**
+ * What the mobile check found, under the number: the patient already on it ("Same mobile as …",
+ * with Open file / Use existing once their record is read — "Use existing" hands over the whole
+ * record), someone the clinic knows without a file, or nothing.
+ */
+function MobileCheckNotice({
+  duplicate,
+  action,
+  testId,
+}: {
+  duplicate: ReturnType<typeof useDuplicateMobile>;
+  action: ReturnType<typeof useSaveOutcome>['existingAction'];
+  testId: string;
+}) {
+  const existingRecord = usePatient(duplicate.patient?.id).data ?? null;
+  if (duplicate.patient) {
+    return (
+      <PatientDuplicateNotice
+        person={duplicate.patient}
+        actionLabel={action.label}
+        onAction={existingRecord ? () => action.run(existingRecord) : undefined}
+        testId={testId}
+      />
+    );
+  }
+  if (duplicate.known) {
+    return <PatientKnownPersonNotice name={duplicate.known.name} testId={testId} />;
+  }
+  return null;
+}
+
 /** One opening of the drawer: the form, its checks and its save. */
 function PatientDrawerSession(props: SessionProps) {
   const { fresh, onAnother } = props;
@@ -272,6 +366,9 @@ function PatientDrawerSession(props: SessionProps) {
   const form = useForm<PatientFormValues>({
     defaultValues: editing ? patientFormOf(editing) : emptyPatientForm(prefill),
   });
+  const { record, reload } = useEditingRecord(editing, (fresh) =>
+    form.reset(patientFormOf(fresh)),
+  );
   const values = useFormValues(form);
   const { isDirty } = useFormState({ control: form.control });
   const [openStep, setOpenStep] = useState<string>('contact');
@@ -287,22 +384,20 @@ function PatientDrawerSession(props: SessionProps) {
     homeBranchId,
   });
   const duplicate = useDuplicateMobile(values.phone, editing?.id ?? null);
+  const person = usePersonInput(prefill?.leadId, duplicate.known);
   const { finish, existingAction } = useSaveOutcome(props, onAnother);
   const { saveState, save } = usePatientSave({
     form,
-    patientId: editing?.id ?? null,
-    input: () =>
-      patientInputOf(form.getValues(), {
-        defaultBranchId: startingBranchId,
-        leadId: prefill?.leadId,
-      }),
+    patient: record,
+    input: () => patientInputOf(form.getValues(), { defaultBranchId: startingBranchId }),
+    person,
     photos: photos.map((photo) => photo.file),
     onStep: setOpenStep,
     onConflict: () => duplicate.check(form.getValues('phone')),
+    onStale: record ? () => void reload() : undefined,
     onDone: finish,
   });
 
-  const existing = duplicate.patient;
   const steps: DrawerStep[] = [
     {
       id: 'contact',
@@ -321,14 +416,11 @@ function PatientDrawerSession(props: SessionProps) {
           today={today}
           onMobileBlur={() => duplicate.check(form.getValues('phone'))}
           duplicate={
-            existing ? (
-              <PatientDuplicateNotice
-                patient={existing}
-                actionLabel={existingAction.label}
-                onAction={() => existingAction.run(existing)}
-                testId={chrome.testId}
-              />
-            ) : null
+            <MobileCheckNotice
+              duplicate={duplicate}
+              action={existingAction}
+              testId={chrome.testId}
+            />
           }
         />
       ),
@@ -398,10 +490,11 @@ function PatientDrawerSession(props: SessionProps) {
  * and "Clinic, referral & follow-up". New starts at Status New with the Quick
  * fill presets; a mobile that loses focus with ten digits is looked up, and a
  * patient already on it shows "Same mobile as …" (Q-P7) — a warning, never a
- * block. Save never disables: an empty First name or Mobile opens step 1 with
- * "Add name and mobile". A create adds the onboarding task, files the first
- * photos and toasts "Patient #3509 created · onboarding task added" with
- * "Open file" (D28, Q-P6); "Create & add another" restarts the drawer empty.
+ * block; someone the clinic knows without a file says the new file opens on
+ * them. Save never disables: an empty First name or Mobile opens step 1 with
+ * "Add name and mobile". A create files the first photos in General and
+ * toasts "Patient #3509 created" with "Open file" (D28, Q-P6); "Create & add
+ * another" restarts the drawer empty. An edit writes the person and the file.
  * Every opening starts a fresh form.
  */
 export function PatientDrawer(props: PatientDrawerProps) {

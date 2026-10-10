@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
 import { useState } from 'react';
 import { useForm, type UseFormReturn, useFormState } from 'react-hook-form';
@@ -5,39 +6,58 @@ import { useTranslation } from 'react-i18next';
 
 import { isolateValues } from '@/lib/bidi-isolate.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { Prescription, Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import { localDateOf } from '@/shared/api/clinic/clinic-time.ts';
-import type { RxCatalog } from '@/shared/api/clinic/prescriptions-api.ts';
+import {
+  fetchPrescription,
+  prescriptionQueryKeys,
+} from '@/shared/api/clinic/prescriptions-api.ts';
+import type {
+  PrescriptionKit,
+  PrescriptionRecord,
+  PrescriptionStatus,
+  RxCatalog,
+} from '@/shared/api/clinic/prescriptions-contracts.ts';
 import { visitFlowReferrer } from '@/shared/clinic/clinic-referrer.ts';
 import {
   type DrawerStep,
   drawerStepSummary,
 } from '@/shared/components/DrawerSteps/index.ts';
 import type { QuickFillItem } from '@/shared/components/QuickFillRow/index.ts';
-import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
+import {
+  type DrawerBadge,
+  RecordDrawer,
+} from '@/shared/components/RecordDrawer/index.ts';
 import {
   RECORD_DRAWER_KEYS,
   RECORD_DRAWER_NS,
 } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 import { useStaffMember } from '../../../shared/components/PatientStaffPicker/index.ts';
-import { RX_KEYS, RX_NS, RX_TEST_IDS } from '../../prescriptions.constants.ts';
+import {
+  RX_KEYS,
+  RX_KIT_TONES,
+  RX_NS,
+  RX_STATUS_TONES,
+  RX_TEST_IDS,
+} from '../../prescriptions.constants.ts';
+import { useRxPrint } from '../RxPrintPreview/index.ts';
 import { RxDeleteConfirm } from './rx-delete-confirm.tsx';
 import {
   initialRxForm,
   namedRxLines,
-  RX_KITS,
   RX_NOTES,
+  rxFieldsOf,
   rxFormLineOf,
+  rxFormOf,
   type RxFormValues,
-  rxInputOf,
-  rxKitLines,
 } from './rx-form.ts';
 import { RxMedicinesField } from './rx-medicines-field.tsx';
 import { RxNotesFields, RxPrescriptionFields } from './rx-steps.tsx';
-import { rxSaveLabelKey, rxVisitMode, useRxDone, useRxPrint } from './use-rx-done.tsx';
+import { rxSaveLabelKey, rxVisitMode, useRxDone } from './use-rx-done.tsx';
 import { useRxSave } from './use-rx-save.ts';
 
 const K = RX_KEYS;
@@ -138,48 +158,63 @@ function useRxSteps({
   ];
 }
 
+/** What the member may do in the drawer, read once by the section. */
+export interface PrescriptionDrawerAccess {
+  /** Write a new prescription (`patient_prescription:create`). */
+  writes: boolean;
+  /** Change a draft and approve it (`patient_prescription:update`; Q19). */
+  approves: boolean;
+  /** Delete a draft (`patient_prescription:delete`). */
+  deletes: boolean;
+  /** Start a medical sale (Medical's create) — of an approved prescription only. */
+  sells: boolean;
+}
+
 /** Props of {@link PrescriptionDrawer}. */
 export interface PrescriptionDrawerProps {
   /** The prescription an edit opens; null for a new one. */
-  prescription: Prescription | null;
+  prescription: PrescriptionRecord | null;
   /** The patient: their name and number head the drawer. */
   patient: { id: string; name: string; seq: number };
   /** The patient's prescriptions, newest first — "Repeat last Rx #500". */
-  history: readonly Prescription[];
+  history: readonly PrescriptionRecord[];
   catalog: RxCatalog | undefined;
-  /** The doctor a new prescription starts with (the last prescribing doctor). */
+  /** The member's own kits (`GET /app/prescription-kits`) — Quick fill copies their lines. */
+  kits: readonly PrescriptionKit[];
+  /** The doctor a new prescription starts with (the last prescribing doctor, else the member). */
   defaultDoctorId: string | null;
-  /** Doctor, Admin, Owner (`S:35, 37`); anyone else reads it. */
-  writable: boolean;
-  canDelete: boolean;
+  access: PrescriptionDrawerAccess;
   today: string;
   /** A smart note's medicines (AMBER A-F5): a new prescription starts with a line each. */
   medicines?: readonly string[];
   /**
    * Written in the visit flow (`?visit=open`, the flow's "Write prescription"; L-64):
-   * a new Rx is tied to the open visit's booking — Today's pharmacy lane and
-   * Medical's "Prescriptions to fill" — its save reads "Approve · print · send
-   * to pharmacy", and the saved Rx prints on A4 before the drawer closes; the
-   * visit moves on (the server's rule, `advanceVisitAfter`). "Save & sell"
-   * keeps the flow behind the sale (`fromToday`: Today opened the flow).
+   * a new Rx is tied to the open visit's booking — Today's pharmacy lane — an
+   * approver's save reads "Approve · print · send to pharmacy", and the approved
+   * Rx prints on A4 before the drawer closes. "Save & sell" keeps the flow behind
+   * the sale (`fromToday`: Today opened the flow); `onWritten` moves the visit on once a new
+   * one lands (Q8).
    */
-  visit?: { appointmentId: string | null; fromToday: boolean };
+  visit?: { appointmentId: string | null; fromToday: boolean; onWritten?: () => void };
   onClose: () => void;
 }
 
-/** The Quick fill chips (H:4810): Print (edit), Repeat last Rx (new), the three kits. */
+/**
+ * The Quick fill chips (H:4810): Print (an edit — kept on an approved one), Repeat last Rx
+ * (new), and the member's own kits, each copying its lines into the form.
+ */
 function quickFillItems({
   form,
   prescription,
   last,
-  catalog,
+  kits,
   print,
   t,
 }: {
   form: UseFormReturn<RxFormValues>;
-  prescription: Prescription | null;
-  last: Prescription | undefined;
-  catalog: RxCatalog | undefined;
+  prescription: PrescriptionRecord | null;
+  last: PrescriptionRecord | undefined;
+  kits: readonly PrescriptionKit[];
   print: () => void;
   t: TFunction;
 }): QuickFillItem[] {
@@ -194,6 +229,7 @@ function quickFillItems({
       id: 'print',
       label: t(K.quickFill.print),
       tone: 'sage',
+      keepWhenReadOnly: true,
       onSelect: print,
     });
   } else if (last) {
@@ -205,40 +241,154 @@ function quickFillItems({
         fill({ items: last.items.map(rxFormLineOf), advice: last.advice ?? '' }),
     });
   }
-  for (const kit of RX_KITS) {
+  kits.forEach((kit, index) => {
     items.push({
-      id: kit.id,
-      label: t(K.quickFill.kits[kit.id]),
-      tone: kit.tone,
-      onSelect: () =>
-        fill({
-          items: rxKitLines(kit, catalog?.medicines ?? [], () => t(K.kit.reapply)),
-          ...(kit.advice ? { advice: t(K.kit.avoidSun) } : {}),
-        }),
+      id: `kit-${kit.id}`,
+      label: kit.name,
+      tone: RX_KIT_TONES[index % RX_KIT_TONES.length],
+      onSelect: () => fill({ items: kit.items.map(rxFormLineOf) }),
     });
-  }
+  });
   return items;
+}
+
+/**
+ * An edit's draft, kept in step with a reload: a save refused as stale (`409 record_changed`)
+ * reads the prescription again and restarts the form on what was saved.
+ */
+function useEditingRecord(
+  prescription: PrescriptionRecord | null,
+  reset: (record: PrescriptionRecord) => void,
+) {
+  const queryClient = useQueryClient();
+  const organizationId = useOrganizationStore((state) => state.organizationId);
+  const [record, setRecord] = useState(prescription);
+  const reload = async () => {
+    if (!record) return;
+    const fresh = await queryClient.fetchQuery({
+      queryKey: prescriptionQueryKeys.detail(organizationId, record.patientId, record.id),
+      queryFn: () =>
+        fetchPrescription({ patientId: record.patientId, prescriptionId: record.id }),
+      staleTime: 0,
+    });
+    setRecord(fresh);
+    reset(fresh);
+  };
+  return { record, reload };
+}
+
+/** What the drawer allows for the record it holds (Q19): a draft is changed by an approver only. */
+function rxDrawerMode(
+  record: PrescriptionRecord | null,
+  access: PrescriptionDrawerAccess,
+) {
+  const status = record?.status ?? 'draft';
+  const draft = status === 'draft';
+  // A new one is a write; a draft's change is an approver's (PATCH needs `…:update`).
+  const writable = record ? draft && access.approves : access.writes;
+  return {
+    status,
+    draft,
+    writable,
+    deletable: record !== null && draft && access.deletes,
+    // A sale fills an approved prescription only: "Save & sell" is an approver's.
+    sellable: writable && access.approves && access.sells,
+  };
+}
+
+/** The header's badges and the footer's summary: the medicines, the status, the doctor. */
+function useRxHeader(values: RxFormValues, status: PrescriptionStatus) {
+  const { t } = useTranslation(RX_NS);
+  const { person: doctor, shortName: doctorName } = useStaffMember(values.doctorId);
+  const medicines = t(K.medicines, { count: namedRxLines(values.items).length });
+  const badges: DrawerBadge[] = [
+    { id: 'medicines', label: medicines, tone: 'sage' },
+    { id: 'status', label: t(K.status[status]), tone: RX_STATUS_TONES[status] },
+  ];
+  if (doctor) badges.push({ id: 'doctor', label: doctorName, tone: doctor.tone });
+  return {
+    badges,
+    doctorName,
+    doctorTone: doctor?.tone,
+    summary: doctorName
+      ? t(K.save.summary, { medicines, doctor: doctorName })
+      : medicines,
+  };
+}
+
+/**
+ * The drawer's save (Q19): an approver's writes and approves; at the visit an approved Rx
+ * prints; "Save & sell" opens the sale, back to the visit flow or the patient's prescriptions.
+ */
+function useRxDrawerSave({
+  form,
+  record,
+  reload,
+  patientId,
+  visit,
+  approves,
+  onStep,
+  onClose,
+}: {
+  form: UseFormReturn<RxFormValues>;
+  record: PrescriptionRecord | null;
+  reload: () => Promise<void>;
+  patientId: string;
+  visit: PrescriptionDrawerProps['visit'];
+  approves: boolean;
+  onStep: (step: string) => void;
+  onClose: () => void;
+}) {
+  const { t } = useTranslation(RX_NS);
+  const { atVisit, appointmentId } = rxVisitMode(visit, record);
+  const printRx = useRxPrint();
+  const { saveState, save } = useRxSave({
+    form,
+    prescription: record,
+    patientId,
+    appointmentId,
+    approves,
+    onStep,
+    onStale: record ? () => void reload() : undefined,
+    onDone: useRxDone({
+      editing: record !== null,
+      atVisit,
+      onWritten: atVisit ? visit?.onWritten : undefined,
+      sellFrom: visit
+        ? visitFlowReferrer(patientId, visit.fromToday)
+        : `patients/${patientId}/prescriptions`,
+      print: printRx,
+      onClose,
+    }),
+  });
+  // The sheet as the form stands: an approved one's is its read.
+  const print = () => {
+    if (record) void printRx({ ...record, ...rxFieldsOf(form.getValues()) });
+  };
+  const saveLabel = t(rxSaveLabelKey({ editing: record !== null, approves, atVisit }));
+  return { saveState, save, saveLabel, print };
 }
 
 /**
  * The Prescription drawer — `prescriptions/create/` and
  * `prescriptions/$prescriptionId/edit/` (KICKOFF §6.6 Drawers; H:4804–4810;
  * `patient-file.md:105–121, 349–358`): 1040px, "New prescription" / "Edit
- * prescription" + "#500", "Dharti Galani · #3508", the medicine count (sage)
- * and the doctor; Quick fill "Print prescription" (edit) · "Repeat last Rx
- * #500" (new) · the three kits; three steps. "Save prescription" / "Save
- * changes" — no medicine: "Add a medicine" — and "Save & sell", which saves
- * and hands the prescription to a new medical sale (`?prescription=`, PRD
- * Flow 2; the sale is L-50c's). View only without the Rx gate.
+ * prescription" + "#500", "Dharti Galani · #3508", the medicine count (sage),
+ * the status (Draft · Approved) and the doctor; Quick fill "Print prescription"
+ * (edit) · "Repeat last Rx #500" (new) · the member's kits; three steps. An
+ * approver's save is "Save & approve" (Q19), anyone else's writes a draft — no
+ * medicine: "Add a medicine" — and "Save & sell" approves and hands the
+ * prescription to a new medical sale (`?prescription=`, PRD Flow 2: a sale fills
+ * an approved Rx). An approved prescription is final: it reads only, and prints.
  */
 export function PrescriptionDrawer({
   prescription,
   patient,
   history,
   catalog,
+  kits,
   defaultDoctorId,
-  writable,
-  canDelete,
+  access,
   today,
   medicines: smartNoteMedicines = [],
   visit,
@@ -254,72 +404,52 @@ export function PrescriptionDrawer({
       catalog: catalog?.medicines ?? [],
     }),
   });
+  const { record, reload } = useEditingRecord(prescription, (fresh) =>
+    form.reset(rxFormOf(fresh)),
+  );
   const values = useFormValues(form);
   const { isDirty } = useFormState({ control: form.control });
   const [step, setStep] = useState<string>('prescription');
   const [deleting, setDeleting] = useState(false);
-
-  const { person: doctor, shortName: doctorName } = useStaffMember(values.doctorId);
-  const medicines = t(K.medicines, { count: namedRxLines(values.items).length });
+  const mode = rxDrawerMode(record, access);
+  const header = useRxHeader(values, mode.status);
   const steps = useRxSteps({
     form,
     values,
     catalog,
-    doctorName,
-    doctorTone: doctor?.tone,
+    doctorName: header.doctorName,
+    doctorTone: header.doctorTone,
     today,
-    readOnly: !writable,
+    readOnly: !mode.writable,
   });
-
-  const { approving, appointmentId } = rxVisitMode(visit, prescription);
-  const printRx = useRxPrint(patient.id, values.doctorId);
-  const { saveState, save } = useRxSave({
+  const { saveState, save, saveLabel, print } = useRxDrawerSave({
     form,
-    prescription,
+    record,
+    reload,
     patientId: patient.id,
-    appointmentId,
+    visit,
+    approves: access.approves,
     onStep: setStep,
-    onDone: useRxDone({
-      editing: prescription !== null,
-      approving,
-      sellFrom: visit
-        ? visitFlowReferrer(patient.id, visit.fromToday)
-        : `patients/${patient.id}/prescriptions`,
-      print: printRx,
-      onClose,
-    }),
+    onClose,
   });
-
-  const print = () => {
-    if (!prescription) return;
-    const input = rxInputOf(form.getValues(), {
-      patientId: patient.id,
-      appointmentId: prescription.appointmentId,
-      followUpDate: prescription.followUpDate,
-    });
-    void printRx({ ...prescription, ...input });
-  };
 
   return (
     <>
       <RecordDrawer
         open
         onClose={onClose}
-        title={t(prescription ? K.title.edit : K.title.create)}
-        tag={prescription ? displayId.prescription(prescription.seq) : undefined}
+        title={t(record ? K.title.edit : K.title.create)}
+        tag={record ? displayId.prescription(record.seq) : undefined}
         sub={t(
           K.sub,
           isolateValues({ name: patient.name, id: displayId.patient(patient.seq) }),
         )}
-        badges={[
-          { id: 'medicines', label: medicines, tone: 'sage' },
-          ...(doctor ? [{ id: 'doctor', label: doctorName, tone: doctor.tone }] : []),
-        ]}
+        badges={header.badges}
         quickFill={quickFillItems({
           form,
-          prescription,
+          prescription: record,
           last: history[0],
-          catalog,
+          kits,
           print,
           t,
         })}
@@ -328,22 +458,29 @@ export function PrescriptionDrawer({
         steps={steps}
         openStep={step}
         onOpenStepChange={setStep}
-        summary={
-          doctorName ? t(K.save.summary, { medicines, doctor: doctorName }) : medicines
-        }
-        readOnly={!writable}
-        saveLabel={t(rxSaveLabelKey(prescription !== null, approving))}
+        summary={header.summary}
+        readOnly={!mode.writable}
+        saveLabel={saveLabel}
         onSave={() => void save(false)}
         saveState={saveState}
-        saveAndAddLabel={t(K.save.sell)}
-        onSaveAndAdd={() => void save(true)}
-        onDelete={prescription && canDelete ? () => setDeleting(true) : undefined}
+        saveAndAddLabel={mode.sellable ? t(K.save.sell) : undefined}
+        onSaveAndAdd={mode.sellable ? () => void save(true) : undefined}
+        onDelete={mode.deletable ? () => setDeleting(true) : undefined}
         dirty={isDirty}
         testId={RX_TEST_IDS.drawer}
-      />
-      {prescription && canDelete ? (
+      >
+        {mode.draft ? null : (
+          <p
+            data-testid={`${RX_TEST_IDS.drawer}-approved`}
+            className="text-detail text-muted-foreground"
+          >
+            {t(K.approvedNote)}
+          </p>
+        )}
+      </RecordDrawer>
+      {record && mode.deletable ? (
         <RxDeleteConfirm
-          prescription={prescription}
+          prescription={record}
           open={deleting}
           onOpenChange={setDeleting}
           onDeleted={onClose}

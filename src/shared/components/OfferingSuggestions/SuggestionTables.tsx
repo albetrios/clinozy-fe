@@ -5,7 +5,6 @@ import { cn } from '@/lib/utils.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { TonePill } from '@/shared/components/Cells/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 
 import {
   OFFERING_SUGGESTIONS_KEYS,
@@ -22,23 +21,16 @@ import type {
 const KEYS = OFFERING_SUGGESTIONS_KEYS;
 
 /**
- * Purchases on six tracks (H:2820); under 720px of card width three columns
- * — date · bought · invoice, then paid · sessions — Qty dropped and the
- * header hidden (H:418).
+ * Purchases on three tracks (H:2820) — date · bought · sessions; the design's
+ * Qty, Paid and Invoice columns are not served by `…/offerings` (G4). Under
+ * 720px of card width the sessions take a second line under the name and the
+ * header hides (H:418).
  */
 const PURCHASE_GRID =
-  'grid grid-cols-[64px_minmax(0,1fr)_32px_80px_minmax(0,120px)_max-content] items-center gap-2 px-3.5 [&>*]:min-w-0 @max-[720px]:grid-cols-[64px_minmax(0,1fr)_auto] @max-[720px]:gap-y-1 @max-[720px]:py-2';
+  'grid grid-cols-[64px_minmax(0,1fr)_minmax(0,160px)] items-center gap-2 px-3.5 [&>*]:min-w-0 @max-[720px]:grid-cols-[64px_minmax(0,1fr)] @max-[720px]:gap-y-1 @max-[720px]:py-2';
 
-/** Each purchase cell's place under 720px — literal classes for Tailwind. */
-const PURCHASE_AT = {
-  date: '@max-[720px]:col-start-1 @max-[720px]:row-start-1',
-  bought: '@max-[720px]:col-start-2 @max-[720px]:row-start-1',
-  qty: '@max-[720px]:hidden',
-  paid: '@max-[720px]:col-start-3 @max-[720px]:row-start-1',
-  sessions: '@max-[720px]:col-start-2 @max-[720px]:row-start-2',
-  invoice:
-    '@max-[720px]:col-start-3 @max-[720px]:row-start-2 @max-[720px]:justify-self-end',
-} as const;
+/** The sessions cell's place under 720px — a literal class for Tailwind. */
+const PURCHASE_SESSIONS_AT = '@max-[720px]:col-start-2 @max-[720px]:row-start-2';
 
 /**
  * Activity on four tracks (H:2824); under 720px three columns: when ·
@@ -59,7 +51,7 @@ const STATUS_INK: Readonly<Record<SuggestionActivityStatusTone, string>> = {
 const TABLE_HEAD =
   'border-border text-micro text-muted-foreground border-b py-1.25 font-semibold tracking-[0.05em] uppercase @max-[720px]:hidden';
 
-/** A section's title line: "<title> · <summary>" (H:2819, H:2823). */
+/** A section's title line: "<title> · <summary>" (H:2819, H:2823); the title alone without one. */
 function SectionTitle({
   title,
   summary,
@@ -67,7 +59,7 @@ function SectionTitle({
   className,
 }: {
   title: string;
-  summary: string;
+  summary?: string;
   action?: ReactNode;
   className?: string;
 }) {
@@ -76,12 +68,16 @@ function SectionTitle({
       <span className="text-micro text-muted-foreground leading-[1.2] font-semibold tracking-[0.05em] uppercase">
         {title}
       </span>
-      <span aria-hidden="true" className="text-micro text-disabled leading-[1.2]">
-        ·
-      </span>
-      <span className="text-caption text-muted-foreground min-w-0 truncate leading-[1.2]">
-        {summary}
-      </span>
+      {summary ? (
+        <>
+          <span aria-hidden="true" className="text-micro text-disabled leading-[1.2]">
+            ·
+          </span>
+          <span className="text-caption text-muted-foreground min-w-0 truncate leading-[1.2]">
+            {summary}
+          </span>
+        </>
+      ) : null}
       {action ? (
         <>
           <span className="flex-1" />
@@ -93,39 +89,29 @@ function SectionTitle({
 }
 
 /**
- * "<first>’s last purchases · <n> lines · <₹> paid so far" (H:2819–2821):
- * Date · Bought (category pill + name) · Qty · Paid · Sessions (a 64px bar,
- * "<n> of <n> used") · Invoice (its id, which opens it, and its status).
+ * "<first>’s last purchases · <n> lines" (H:2819–2821; `…/offerings`): Date ·
+ * Bought (category pill + name) · Sessions (a 64px bar, "<n> of <n> used",
+ * for a package).
  */
 export function PurchasesTable({
   firstName,
   purchases,
-  paidSoFar,
 }: {
   firstName: string;
   purchases: readonly SuggestionPurchase[];
-  /** Everything the patient has paid, not only these lines (H:4371). */
-  paidSoFar: number;
 }) {
   const { t } = useTranslation(OFFERING_SUGGESTIONS_NS);
-  const money = usePaiseFormat();
   const columns = KEYS.purchaseColumns;
   return (
     <section aria-label={t(KEYS.purchasesTitle, { first: firstName })}>
       <SectionTitle
         title={t(KEYS.purchasesTitle, { first: firstName })}
-        summary={t(KEYS.purchasesSummary, {
-          count: purchases.length,
-          paid: money(paidSoFar),
-        })}
+        summary={t(KEYS.purchasesCount, { count: purchases.length })}
       />
       <div aria-hidden="true" className={cn(PURCHASE_GRID, TABLE_HEAD)}>
         <span>{t(columns.date)}</span>
         <span>{t(columns.bought)}</span>
-        <span>{t(columns.qty)}</span>
-        <span className="text-end">{t(columns.paid)}</span>
         <span>{t(columns.sessions)}</span>
-        <span>{t(columns.invoice)}</span>
       </div>
       {purchases.map((purchase) => (
         <div
@@ -137,25 +123,22 @@ export function PurchasesTable({
             'border-muted text-detail min-h-9 border-b py-1 leading-[1.2]',
           )}
         >
-          <span
-            className={cn(
-              'text-muted-foreground-strong whitespace-nowrap tabular-nums',
-              PURCHASE_AT.date,
-            )}
-          >
+          <span className="text-muted-foreground-strong whitespace-nowrap tabular-nums">
             {purchase.date}
           </span>
-          <span className={cn('flex items-center gap-1.5', PURCHASE_AT.bought)}>
-            <TonePill tone={purchase.category.tone} size="xs" className="text-micro h-5">
-              {purchase.category.label}
-            </TonePill>
+          <span className="flex items-center gap-1.5">
+            {purchase.category ? (
+              <TonePill
+                tone={purchase.category.tone}
+                size="xs"
+                className="text-micro h-5"
+              >
+                {purchase.category.label}
+              </TonePill>
+            ) : null}
             <span className="min-w-0 truncate font-medium">{purchase.name}</span>
           </span>
-          <span className={cn('tabular-nums', PURCHASE_AT.qty)}>{purchase.qty}</span>
-          <span className={cn('text-end font-semibold tabular-nums', PURCHASE_AT.paid)}>
-            {money(purchase.paid)}
-          </span>
-          <span className={cn('flex items-center gap-1.5', PURCHASE_AT.sessions)}>
+          <span className={cn('flex items-center gap-1.5', PURCHASE_SESSIONS_AT)}>
             {purchase.sessions ? (
               <>
                 <span
@@ -183,20 +166,6 @@ export function PurchasesTable({
               <span className="text-caption text-disabled">—</span>
             )}
           </span>
-          <span className={cn('inline-flex items-center gap-1.5', PURCHASE_AT.invoice)}>
-            <button
-              type="button"
-              data-slot="pill"
-              onClick={purchase.onOpenInvoice}
-              disabled={!purchase.onOpenInvoice}
-              className="border-border bg-muted text-foreground-soft hover:bg-muted-strong text-caption h-6 rounded-full border px-2 font-medium whitespace-nowrap transition-colors"
-            >
-              {purchase.invoice.label}
-            </button>
-            <TonePill tone={purchase.invoice.tone} size="xs" className="text-micro h-5">
-              {purchase.invoice.status}
-            </TonePill>
-          </span>
         </div>
       ))}
     </section>
@@ -212,7 +181,8 @@ export function ActivityTable({
   lines,
   onOpenChat,
 }: {
-  summary: string;
+  /** "Lead #2363 · Contacted" — none without a lead the member may read. */
+  summary?: string;
   lines: readonly SuggestionActivityLine[];
   onOpenChat?: () => void;
 }) {

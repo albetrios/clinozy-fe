@@ -71,6 +71,9 @@ export const appointmentQueryKeys = {
   /** The treatments the form offers. */
   treatments: (organizationId: string | null) =>
     [...appointmentQueryKeys.all, organizationId, 'treatments'] as const,
+  /** A person's bookings — the patient file's Visits. */
+  person: (organizationId: string | null, contactId: string) =>
+    [...appointmentQueryKeys.all, organizationId, 'person', contactId] as const,
 };
 
 /** One page of the Agenda — the design's 50. */
@@ -165,6 +168,33 @@ export async function listAppointments(
     next: pagination?.has_more ? (pagination.next ?? null) : null,
     total: pagination?.estimated_total ?? null,
   };
+}
+
+/** A person's bookings, newest first — every page (`contact_id`); the patient file's Visits. */
+export async function fetchPersonAppointments(
+  contactId: string,
+): Promise<AppointmentRow[]> {
+  const records = await collectAllPages(async (after) => {
+    const response = await api.get('/app/appointments', {
+      query: {
+        contact_id: contactId,
+        sort: 'appointment_date',
+        order: 'desc',
+        limit: RANGE_PAGE_SIZE,
+        after: after ?? undefined,
+      },
+    });
+    return {
+      rows: z
+        .array(appointmentRowWire)
+        .parse(response.data ?? [])
+        .map(toAppointmentRecord),
+      next: response.meta?.pagination?.has_more
+        ? (response.meta.pagination.next ?? null)
+        : null,
+    };
+  }, 'appointments-person');
+  return withDoctors(records);
 }
 
 /** Every booking a Day, Week or Month board shows — every page of the range. */

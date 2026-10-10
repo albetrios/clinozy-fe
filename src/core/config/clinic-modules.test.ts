@@ -12,11 +12,12 @@ describe('clinic module keys (D8)', () => {
     for (const key of keys) expect(key).toMatch(/^clinic-[a-z]+$/);
   });
 
-  it('takes Leads and Appointments off the fixtures — they are on the API — and keeps Today on them', () => {
+  it('takes Leads, Appointments and Patients off the fixtures — they are on the API — and keeps Today on them', () => {
     expect(FIXTURE_BACKED_CLINIC_MODULES).not.toContain(CLINIC_MODULES.leads);
     expect(FIXTURE_BACKED_CLINIC_MODULES).not.toContain(CLINIC_MODULES.appointments);
+    expect(FIXTURE_BACKED_CLINIC_MODULES).not.toContain(CLINIC_MODULES.patients);
     expect(FIXTURE_BACKED_CLINIC_MODULES).toContain(CLINIC_MODULES.today);
-    expect(FIXTURE_BACKED_CLINIC_MODULES).toHaveLength(8);
+    expect(FIXTURE_BACKED_CLINIC_MODULES).toHaveLength(7);
   });
 
   it('production disables every fixture-backed room until its API lands', () => {
@@ -26,6 +27,7 @@ describe('clinic module keys (D8)', () => {
     for (const key of FIXTURE_BACKED_CLINIC_MODULES) expect(disabled.has(key)).toBe(true);
     expect(disabled.has(CLINIC_MODULES.leads)).toBe(false);
     expect(disabled.has(CLINIC_MODULES.appointments)).toBe(false);
+    expect(disabled.has(CLINIC_MODULES.patients)).toBe(false);
   });
 
   it('local and development keep the rooms on', () => {

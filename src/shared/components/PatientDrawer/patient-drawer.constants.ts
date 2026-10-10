@@ -79,7 +79,7 @@ export const PATIENT_DRAWER_KEYS = {
   missing: 'patientDrawer.missing',
   /** "Enter a 10-digit mobile" — a mobile that is not ten digits from 6–9. */
   mobileInvalid: 'patientDrawer.mobileInvalid',
-  /** "Patient #3509 created · onboarding task added" (D28, Q-P6). */
+  /** "Patient #3509 created" (D28, Q-P6). */
   created: 'patientDrawer.created',
   openFile: 'patientDrawer.openFile',
   /** "Priya Shah saved". */
@@ -91,6 +91,8 @@ export const PATIENT_DRAWER_KEYS = {
   duplicate: 'patientDrawer.duplicate',
   /** Quick-add's action on the notice: the parent field takes the existing patient. */
   useExisting: 'patientDrawer.useExisting',
+  /** "Riya Mehta is already in your contacts · the file opens on them". */
+  knownPerson: 'patientDrawer.knownPerson',
   /** The footer summary with no name yet. */
   summaryEmpty: 'patientDrawer.summaryEmpty',
 } as const;

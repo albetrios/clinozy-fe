@@ -25,18 +25,10 @@ import { useRoomFilters } from '@/shared/components/RoomToolbar/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { usePatientList } from '@/shared/hooks/usePatients/index.ts';
 import { useRoomList } from '@/shared/hooks/useRoomList/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
-import {
-  FileIcon,
-  PenLine,
-  Receipt,
-  Trash,
-  Users,
-  Wallet,
-} from '@/shared/icons/index.ts';
+import { FileIcon, PenLine, Trash, Users } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { PatientsToolbar } from './components/PatientsToolbar/index.ts';
@@ -64,7 +56,6 @@ function filterKeyOf(params: ReturnType<typeof patientListParamsOf>): string {
     params.q,
     params.types,
     params.status,
-    params.gender,
     params.conversion,
     params.created,
     params.followUp,
@@ -74,9 +65,9 @@ function filterKeyOf(params: ReturnType<typeof patientListParamsOf>): string {
 /**
  * Patients room (KICKOFF §6.5; `patients.md`): the room toolbar — views,
  * search, Filters, saved views, Columns and "New patient" (a floating pill on
- * a phone) — over the shared table: folded columns on a tablet, rows with Due
- * as the key column on a phone, selection and the bulk bar from `md`, row
- * actions, infinite scroll over cursor pages. The view, search, filters and
+ * a phone) — over the shared table: folded columns on a tablet, rows on a
+ * phone, selection and the bulk bar from `md`, row actions (Edit · Delete),
+ * infinite scroll over cursor pages. The view, search, filters and
  * sort live in the URL; the list read follows them. Its dialog route —
  * `create/` — renders nothing: this page reads the URL and opens the drawer.
  */
@@ -89,7 +80,6 @@ export function PatientsPage() {
   const { patchSearch } = useDataTableUrlState(true);
   const access = useClinicAccess();
   const tier = useViewportTier();
-  const formatPaise = usePaiseFormat();
   const filters = useRoomFilters(PATIENT_FILTER_FIELDS);
   const [deleting, setDeleting] = useState<PatientDeleteTarget | null>(null);
   const { dialog, close } = usePatientsDialogRoute();
@@ -100,7 +90,6 @@ export function PatientsPage() {
   const go = (navigation: ClinicCommandNavigation) => void navigate(navigation);
   const can = (action: 'create' | 'edit' | 'delete') =>
     access.isResolved && access.can('patients', action);
-  const canBill = access.isResolved && access.can('payments', 'create');
   const openFile = (patient: PatientRow) =>
     go(
       clinicCommandNavigation('patient', {
@@ -135,7 +124,8 @@ export function PatientsPage() {
               clinicCommandNavigation('newAppointment', {
                 organizationSlug,
                 referrer: 'patients',
-                search: { who: patient.id },
+                // The booking is the person's (`who=` a contact id).
+                search: { who: patient.contactId },
               }),
             )
         : undefined,
@@ -150,38 +140,8 @@ export function PatientsPage() {
 
   const rowActions = (patient: PatientRow): DataTableRowAction[] => {
     const actions: DataTableRowAction[] = [];
-    if (canBill) {
-      actions.push({
-        id: 'new-invoice',
-        label: t(PATIENTS_KEYS.rowActions.newInvoice),
-        icon: Receipt,
-        onSelect: () =>
-          go(
-            clinicCommandNavigation('newInvoice', {
-              organizationSlug,
-              referrer: 'patients',
-              search: { type: 'clinic', patient: patient.id },
-            }),
-          ),
-      });
-      if (patient.dueTotal > 0) {
-        actions.push({
-          id: 'collect',
-          label: t(PATIENTS_KEYS.rowActions.collect, {
-            amount: formatPaise(patient.dueTotal),
-          }),
-          icon: Wallet,
-          onSelect: () =>
-            go(
-              clinicCommandNavigation('newReceipt', {
-                organizationSlug,
-                referrer: 'patients',
-                search: { patient: patient.id },
-              }),
-            ),
-        });
-      }
-    }
+    // New invoice and Collect come back with Payments on clinozy-be: the invoice drawer and
+    // Receive still read the fixture patients, and a row carries no dues (G4).
     if (can('edit')) {
       actions.push({
         id: 'edit',

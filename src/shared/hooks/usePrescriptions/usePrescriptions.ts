@@ -1,154 +1,357 @@
 import { useQueryClient } from '@tanstack/react-query';
+import { useMemo } from 'react';
 
-import type { DeleteReason, Prescription } from '@/shared/api/clinic/clinic-schema.ts';
-import { MEDICAL_ROOM_QUERY_KEY } from '@/shared/api/clinic/medicines-api.ts';
-import { patientQueryKeys } from '@/shared/api/clinic/patients-api.ts';
+import type { DeleteReason } from '@/shared/api/clinic/clinic-schema.ts';
 import {
+  approvePrescription,
   createPrescription,
   deletePrescription,
-  fetchPrescription,
-  fetchRxCatalog,
-  fetchRxSheetContext,
+  fetchRxSheetClinic,
   listPatientPrescriptions,
-  type PrescriptionInput,
+  listPrescriptionKits,
+  listRxMedicines,
   prescriptionQueryKeys,
   restorePrescription,
   updatePrescription,
 } from '@/shared/api/clinic/prescriptions-api.ts';
-import { VISIT_WRITE_KEYS } from '@/shared/api/clinic/visits-api.ts';
+import {
+  type PrescriptionFields,
+  type PrescriptionRecord,
+  type RxCatalog,
+  rxCatalogOf,
+} from '@/shared/api/clinic/prescriptions-contracts.ts';
+import { todayQueryKeys } from '@/shared/api/clinic/today-api.ts';
+import { passesPatientFileGate } from '@/shared/clinic/patient-file-sections.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
+import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+
+/** The active organization — every key carries it. */
+const useOrganizationId = () => useOrganizationStore((state) => state.organizationId);
+
+/** How long the kits, the store's medicines and the sheet's clinic are reused. */
+const CATALOG_STALE_MS = 5 * 60_000;
+
+// ── Access ──
+
+/** What the member may do with a patient's prescriptions. */
+export interface PrescriptionAccess {
+  /** The member's codes have answered — an unresolved `false` means "not known yet". */
+  resolved: boolean;
+  /** Write a new one (`patient_prescription:create`): Save prescription, Copy, the kits. */
+  writes: boolean;
+  /** Change a draft and approve it (`patient_prescription:update`): "Save & approve" (Q19). */
+  approves: boolean;
+  /** Delete a draft (`patient_prescription:delete`). */
+  deletes: boolean;
+  /** The store's medicines as suggestions (`medicine:read`). */
+  readsMedicines: boolean;
+  /** The printed footer's branch phone and GSTIN (`branch:read`). */
+  readsBranch: boolean;
+}
 
 /**
- * What a prescription write refreshes: every patient read — the prescriptions
- * sit under it, and the file's section counts read them — and the Medical
- * room's reads, whose "Prescriptions to fill" lists the Rx no sale has filled.
+ * The member's prescription access, from their permission codes. A View-as preview has no codes
+ * (`canCode` is false), so it previews by the role gate as the file does: a role that may write
+ * a prescription (Doctor, Admin, the Owner) also approves it and reads the medicines — the role
+ * presets grant them together — and deletes it only with Patients delete.
  */
-const RX_WRITE_KEYS = [patientQueryKeys.all, MEDICAL_ROOM_QUERY_KEY];
+export function usePrescriptionAccess(): PrescriptionAccess {
+  const access = useClinicAccess();
+  return useMemo(() => {
+    const resolved = access.isResolved;
+    const writes = resolved && passesPatientFileGate(access, 'prescriptions');
+    const holds = (code: string) => resolved && access.canCode(code);
+    if (access.previewRole) {
+      return {
+        resolved,
+        writes,
+        approves: writes,
+        deletes: writes && access.can('patients', 'delete'),
+        readsMedicines: writes,
+        readsBranch: false,
+      };
+    }
+    return {
+      resolved,
+      writes,
+      approves: holds('patient_prescription:update'),
+      deletes: holds('patient_prescription:delete'),
+      readsMedicines: holds('medicine:read'),
+      readsBranch: holds('branch:read'),
+    };
+  }, [access]);
+}
 
-/** One patient's prescriptions, newest first (KICKOFF §6.6); idle without a patient. */
-export function usePatientPrescriptions(patientId: string, { enabled = true } = {}) {
+// ── Reads ──
+
+/** Options of {@link usePatientPrescriptions}. */
+export interface PatientPrescriptionsOptions {
+  /** Read only for a member who may see them (`patient_prescription:read`). */
+  enabled?: boolean;
+  /** Toast a failed read (default true); off where the screen shows the failure in place. */
+  notifyOnError?: boolean;
+}
+
+/**
+ * One patient's prescriptions, newest first (`GET …/prescriptions`, every page) — the section,
+ * the Overview's card, Activity and the drawer's "Repeat last Rx"; idle without a patient.
+ */
+export function usePatientPrescriptions(
+  patientId: string,
+  { enabled = true, notifyOnError = true }: PatientPrescriptionsOptions = {},
+) {
+  const organizationId = useOrganizationId();
   return useAppQuery({
-    queryKey: prescriptionQueryKeys.patient(patientId),
+    queryKey: prescriptionQueryKeys.list(organizationId, patientId),
     queryFn: () => listPatientPrescriptions(patientId),
-    enabled: enabled && patientId !== '',
+    enabled: enabled && patientId !== '' && organizationId !== null,
+    notifyOnError,
   });
+}
+
+/** The member's own kits (`GET /app/prescription-kits`) — the drawer's Quick fill. */
+export function usePrescriptionKits({ enabled = true }: { enabled?: boolean } = {}) {
+  const organizationId = useOrganizationId();
+  return useAppQuery({
+    queryKey: prescriptionQueryKeys.kits(organizationId),
+    queryFn: listPrescriptionKits,
+    enabled: enabled && organizationId !== null,
+    staleTime: CATALOG_STALE_MS,
+  });
+}
+
+/** The Rx drawer's medicines while they are being read. */
+export interface RxCatalogRead {
+  /** Undefined until the patient's prescriptions (and the store, when read) have answered. */
+  data: RxCatalog | undefined;
 }
 
 /**
- * One prescription — the edit drawer's and the print preview's read. No toast
- * when it fails: the dialog route turns a missing record into "Prescription
- * not found" and goes back to the section.
+ * The Rx drawer's medicines (H:4806): the store's (`GET /app/medicines`, for a member holding
+ * `medicine:read`) and every name the patient's prescriptions carry, each with the patient's
+ * last line of it (`rxCatalogOf`). Idle without a patient. A failed store read leaves the
+ * patient's own names.
  */
-export function usePrescription(id: string) {
-  return useAppQuery({
-    queryKey: prescriptionQueryKeys.detail(id),
-    queryFn: () => fetchPrescription(id),
-    enabled: id !== '',
-    notifyOnError: false,
+export function useRxCatalog(patientId: string): RxCatalogRead {
+  const organizationId = useOrganizationId();
+  const { readsMedicines } = usePrescriptionAccess();
+  const reads = readsMedicines && patientId !== '';
+  const prescriptions = usePatientPrescriptions(patientId);
+  const store = useAppQuery({
+    queryKey: prescriptionQueryKeys.medicines(organizationId),
+    queryFn: listRxMedicines,
+    enabled: reads && organizationId !== null,
+    staleTime: CATALOG_STALE_MS,
   });
+  const ready = prescriptions.data !== undefined && !(reads && store.isPending);
+  const data = useMemo(
+    () => (ready ? rxCatalogOf(store.data ?? [], prescriptions.data ?? []) : undefined),
+    [ready, store.data, prescriptions.data],
+  );
+  return { data };
 }
 
-/** The Rx drawer's medicines, with this patient's last line of each (H:4806). */
-export function useRxCatalog(patientId: string) {
-  return useAppQuery({
-    queryKey: prescriptionQueryKeys.catalog(patientId),
-    queryFn: () => fetchRxCatalog(patientId),
-    enabled: patientId !== '',
-  });
-}
-
-/** The printed sheet's read — one key and fetch for the hook and for a print that waits for it. */
-function rxSheetQuery(patientId: string, doctorId: string | null) {
+/** The printed sheet's clinic read — one key and fetch for the hook and a print that waits. */
+function rxSheetClinicQuery(
+  organizationId: string | null,
+  branchId: string | null,
+  readsBranch: boolean,
+) {
   return {
-    queryKey: prescriptionQueryKeys.sheet(patientId, doctorId),
-    queryFn: () => fetchRxSheetContext(patientId, doctorId),
+    queryKey: [
+      ...prescriptionQueryKeys.sheetClinic(organizationId, branchId),
+      readsBranch,
+    ] as const,
+    queryFn: () => fetchRxSheetClinic({ branchId, readsBranch }),
+    staleTime: CATALOG_STALE_MS,
   };
 }
 
-/** What the printed sheet needs beyond the Rx: the patient, doctor, clinic and branch. */
-export function useRxSheetContext(patientId: string, doctorId: string | null) {
-  return useAppQuery({ ...rxSheetQuery(patientId, doctorId), enabled: patientId !== '' });
+/** The printed sheet's clinic — its name and specialties — and the branch's phone and GSTIN. */
+export function useRxSheetClinic(branchId: string | null) {
+  const organizationId = useOrganizationId();
+  const { resolved, readsBranch } = usePrescriptionAccess();
+  return useAppQuery({
+    ...rxSheetClinicQuery(organizationId, branchId, readsBranch),
+    enabled: resolved && organizationId !== null,
+  });
 }
 
 /**
- * Read a printed sheet's context now: the copy {@link useRxSheetContext} keeps,
- * else the server's — so a print waits for it instead of skipping. A failed
- * read toasts with Retry, as the hook's does, and rejects.
+ * Read a printed sheet's clinic now: the copy {@link useRxSheetClinic} keeps, else the
+ * server's — so a print waits for it instead of skipping. A failed read toasts with Retry, as
+ * the hook's does, and rejects.
  */
-export function useLoadRxSheetContext() {
+export function useLoadRxSheetClinic() {
   const queryClient = useQueryClient();
-  return (patientId: string, doctorId: string | null) =>
+  const organizationId = useOrganizationId();
+  const { readsBranch } = usePrescriptionAccess();
+  return (branchId: string | null) =>
     // `query({ staleTime: 'static' })`, not the deprecated `ensureQueryData`: the copy
     // the hook keeps is served as it is, and the network is touched only on a miss.
     queryClient.query({
-      ...rxSheetQuery(patientId, doctorId),
+      ...rxSheetClinicQuery(organizationId, branchId, readsBranch),
       staleTime: 'static',
       meta: { notifyOnError: true },
     });
 }
 
+// ── Writes ──
+
 /**
- * Write a prescription; the drawer raises "Prescription saved". Written at
- * the patient's open visit, it moves the visit on — the visits and Today's
- * floor are read again.
+ * What a prescription write refreshes: every patient's list and every prescription's read,
+ * Today's floor — its pharmacy card joins the approved prescription of each booking (D149) — and
+ * the person's activity.
  */
+const rxWriteKeys = (organizationId: string | null) => [
+  prescriptionQueryKeys.lists(organizationId),
+  prescriptionQueryKeys.details(organizationId),
+  todayQueryKeys.floors(),
+  // The person's activity: the server writes a `system` entry for a new Rx (`messageQueryKeys`,
+  // named here so the hook does not load the messages module).
+  ['clinic', 'messages'],
+];
+
+/**
+ * Approve what was just written, when asked — "Save & approve" (Q19) — on its own key (the
+ * write's key with `:approve`), so a retry replays the write and approves again. A failed
+ * approval refreshes the lists first: the draft stands.
+ */
+function useApproveAfterWrite() {
+  const queryClient = useQueryClient();
+  const organizationId = useOrganizationId();
+  return async (
+    written: PrescriptionRecord,
+    { approve, idempotencyKey }: { approve: boolean; idempotencyKey: string },
+  ): Promise<PrescriptionRecord> => {
+    if (!approve) return written;
+    try {
+      return await approvePrescription({
+        patientId: written.patientId,
+        prescriptionId: written.id,
+        idempotencyKey: `${idempotencyKey}:approve`,
+      });
+    } catch (error) {
+      void queryClient.invalidateQueries({
+        queryKey: prescriptionQueryKeys.lists(organizationId),
+      });
+      throw error;
+    }
+  };
+}
+
+/** What a new prescription sends. */
+export interface PrescriptionCreateVars {
+  patientId: string;
+  fields: PrescriptionFields;
+  /** The booking of the visit it is written at (the visit flow); none from the section. */
+  appointmentId?: string | null;
+  /** Approve it once written — a member holding `patient_prescription:update` (Q19). */
+  approve?: boolean;
+}
+
+/** Write a prescription — a draft, or approved with `approve`; the screen raises its own toast. */
 export function useCreatePrescription(
-  options: CrudMutationOptions<Prescription, PrescriptionInput> = {},
+  options: CrudMutationOptions<PrescriptionRecord, PrescriptionCreateVars> = {},
 ) {
-  return useAppMutation<Prescription, PrescriptionInput>({
-    mutationFn: createPrescription,
-    invalidateKeys: [...RX_WRITE_KEYS, ...VISIT_WRITE_KEYS],
+  const organizationId = useOrganizationId();
+  const approveAfter = useApproveAfterWrite();
+  return useAppMutation<PrescriptionRecord, PrescriptionCreateVars>({
+    mutationFn: async ({ patientId, fields, appointmentId, approve = false }, action) => {
+      const created = await createPrescription({
+        patientId,
+        fields,
+        appointmentId,
+        idempotencyKey: action.idempotencyKey,
+      });
+      return approveAfter(created, { approve, idempotencyKey: action.idempotencyKey });
+    },
+    invalidateKeys: rxWriteKeys(organizationId),
     ...options,
   });
 }
 
-/** A prescription save: the record and its fields. */
+/** A draft's save: the read it changes (its `updated_at` refuses a stale save) and its fields. */
 export interface PrescriptionUpdateVars {
-  id: string;
-  input: PrescriptionInput;
+  prescription: PrescriptionRecord;
+  fields: PrescriptionFields;
+  /** Approve it once saved (Q19). */
+  approve?: boolean;
 }
 
-/** Save a prescription's changes; the drawer raises "Prescription #500 saved". */
+/** Save a draft's changes, and approve it with `approve`; the drawer raises its own toast. */
 export function useUpdatePrescription(
-  options: CrudMutationOptions<Prescription, PrescriptionUpdateVars> = {},
+  options: CrudMutationOptions<PrescriptionRecord, PrescriptionUpdateVars> = {},
 ) {
-  return useAppMutation<Prescription, PrescriptionUpdateVars>({
-    mutationFn: ({ id, input }) => updatePrescription(id, input),
-    invalidateKeys: RX_WRITE_KEYS,
+  const organizationId = useOrganizationId();
+  const approveAfter = useApproveAfterWrite();
+  return useAppMutation<PrescriptionRecord, PrescriptionUpdateVars>({
+    mutationFn: async ({ prescription, fields, approve = false }, action) => {
+      const saved = await updatePrescription({
+        patientId: prescription.patientId,
+        prescriptionId: prescription.id,
+        fields,
+        expectedUpdatedAt: prescription.updatedAt,
+        idempotencyKey: action.idempotencyKey,
+      });
+      return approveAfter(saved, { approve, idempotencyKey: action.idempotencyKey });
+    },
+    invalidateKeys: rxWriteKeys(organizationId),
     ...options,
   });
 }
 
-/** A prescription delete: the record and the confirm's stored reason and note. */
+/** The prescription a delete or a restore names. */
+export type PrescriptionRef = Pick<PrescriptionRecord, 'id' | 'patientId'>;
+
+/** A draft's delete: the record and the confirm's reason and note. */
 export interface PrescriptionDeleteVars {
-  id: string;
+  prescription: PrescriptionRef;
   reason: DeleteReason;
   note: string | null;
 }
 
 /**
- * Delete a prescription. No toast of its own: the reason confirm's `undo`
- * raises "Prescription deleted" with Undo, which runs {@link useRestorePrescription}.
+ * Delete a draft. The lists and Today refresh — not the prescription's own read, which would
+ * answer 404 while its drawer closes. No toast of its own: the reason confirm's
+ * "Prescription deleted" with Undo runs {@link useRestorePrescription}.
  */
 export function useDeletePrescription(
-  options: CrudMutationOptions<Prescription, PrescriptionDeleteVars> = {},
+  options: CrudMutationOptions<void, PrescriptionDeleteVars> = {},
 ) {
-  return useAppMutation<Prescription, PrescriptionDeleteVars>({
-    mutationFn: ({ id, reason, note }) => deletePrescription(id, reason, note),
-    invalidateKeys: RX_WRITE_KEYS,
+  const organizationId = useOrganizationId();
+  return useAppMutation<void, PrescriptionDeleteVars>({
+    mutationFn: ({ prescription, reason, note }) =>
+      deletePrescription({
+        patientId: prescription.patientId,
+        prescriptionId: prescription.id,
+        reason,
+        note,
+      }),
+    invalidateKeys: [
+      prescriptionQueryKeys.lists(organizationId),
+      todayQueryKeys.floors(),
+    ],
     ...options,
   });
 }
 
-/** Put a deleted prescription back — the Undo of its toast (D32); silent on success. */
+/** Put a deleted draft back — the Undo of its toast; silent on success. */
 export function useRestorePrescription(
-  options: CrudMutationOptions<Prescription, string> = {},
+  options: CrudMutationOptions<PrescriptionRecord, PrescriptionRef> = {},
 ) {
-  return useAppMutation<Prescription, string>({
-    mutationFn: restorePrescription,
-    invalidateKeys: RX_WRITE_KEYS,
+  const organizationId = useOrganizationId();
+  return useAppMutation<PrescriptionRecord, PrescriptionRef>({
+    mutationFn: (prescription, action) =>
+      restorePrescription({
+        patientId: prescription.patientId,
+        prescriptionId: prescription.id,
+        idempotencyKey: action.idempotencyKey,
+      }),
+    invalidateKeys: rxWriteKeys(organizationId),
     ...options,
   });
 }

@@ -5,8 +5,6 @@
   "views": {
     "label": "Patientenansichten",
     "all": "Alle",
-    "today": "Heute in der Klinik",
-    "dues": "Mit offenen Beträgen",
     "follow": "Wiedervorlage fällig",
     "recall": "Recall"
   },
@@ -26,7 +24,6 @@
     "conversion": "Konversion",
     "age": "Alter",
     "followUp": "Wiedervorlage",
-    "due": "Offen",
     "updated": "Aktualisiert"
   },
   "table": {
@@ -35,8 +32,6 @@
     "age_other": "{{count}} J."
   },
   "rowActions": {
-    "newInvoice": "Neue Rechnung",
-    "collect": "{{amount}} kassieren",
     "edit": "Bearbeiten",
     "delete": "Löschen"
   },

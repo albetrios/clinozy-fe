@@ -5,8 +5,6 @@
   "views": {
     "label": "عروض المرضى",
     "all": "الكل",
-    "today": "في العيادة اليوم",
-    "dues": "عليهم مستحقات",
     "follow": "متابعة مستحقة",
     "recall": "استدعاء"
   },
@@ -26,7 +24,6 @@
     "conversion": "التحويل",
     "age": "العمر",
     "followUp": "المتابعة",
-    "due": "المستحق",
     "updated": "آخر تحديث"
   },
   "table": {
@@ -39,8 +36,6 @@
     "age_other": "{{count}} سنة"
   },
   "rowActions": {
-    "newInvoice": "فاتورة جديدة",
-    "collect": "تحصيل {{amount}}",
     "edit": "تعديل",
     "delete": "حذف"
   },

@@ -1,14 +1,11 @@
-import type { AppointmentStaff } from '@/shared/api/clinic/appointments-fixture-contracts.ts';
-import { personFullName } from '@/shared/components/Cells/index.ts';
+import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
 import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
-import { useFixtureBookableStaff } from '@/shared/hooks/useFixtureAppointments/index.ts';
+import { useTeamDirectory } from '@/shared/hooks/useTeamDirectory/index.ts';
 
 /** Props of {@link PatientStaffPicker}. */
 export interface PatientStaffPickerProps {
-  /** Who it lists: the clinic's doctors, or its therapists. */
-  staffRole: 'doctor' | 'therapist';
   value: string | null;
-  onChange: (staffId: string | null, person: AppointmentStaff | null) => void;
+  onChange: (staffId: string | null, person: DirectoryMember | null) => void;
   /** The field's name ("Doctor") and the empty trigger's text ("Pick doctor"). */
   label: string;
   placeholder: string;
@@ -20,12 +17,11 @@ export interface PatientStaffPickerProps {
 }
 
 /**
- * The record drawers' person picker (KICKOFF §6.6; `patient-file.md:109–129`):
- * the active doctors or therapists with their avatars, on the one Picker. A
- * picked person who has since left still shows on a saved record.
+ * The record drawers' person picker (KICKOFF §6.6; `patient-file.md:109–129`): the team with
+ * their avatars, on the one Picker — the Doctor's and the Therapist's alike, as the team has no
+ * doctor or therapist roles to read (M41).
  */
 export function PatientStaffPicker({
-  staffRole,
   value,
   onChange,
   label,
@@ -35,21 +31,17 @@ export function PatientStaffPicker({
   id,
   testId,
 }: PatientStaffPickerProps) {
-  const staff = useFixtureBookableStaff();
-  const people = (staff.data ?? []).filter(
-    (person) =>
-      person.roles.includes(staffRole) && (person.active || person.id === value),
-  );
-  const options: PickerOption<AppointmentStaff>[] = people.map((person) => ({
+  const team = useTeamDirectory();
+  const options: PickerOption<DirectoryMember>[] = team.members.map((person) => ({
     key: person.id,
-    label: personFullName(person),
+    label: person.name,
     tone: person.tone,
     leading: { kind: 'avatar', initials: person.initials },
     keywords: [person.initials],
     data: person,
   }));
   return (
-    <Picker<AppointmentStaff>
+    <Picker<DirectoryMember>
       id={id}
       label={label}
       placeholder={placeholder}

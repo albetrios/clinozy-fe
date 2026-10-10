@@ -6,7 +6,7 @@
  * from here (`dialogSearch` in `routeTree.tsx`); the page that opens the drawer
  * parses it, and this module loads with the room.
  */
-import { RECORD_ID, textOf } from '@/lib/routes/search-params.ts';
+import { PUBLIC_ID, textOf } from '@/lib/routes/search-params.ts';
 import { toClinicPhone } from '@/shared/clinic/clinic-phone.ts';
 
 /** The New patient prefill (`S:31`; ⌘K "New patient", the contact card's "+ Patient"). */
@@ -15,7 +15,7 @@ export interface PatientCreateSearch {
   name?: string;
   /** Their mobile, E.164 — a typed or pasted 10-digit Indian mobile. */
   phone?: string;
-  /** The lead the patient comes from — sets `Patient.leadId` (`S:317`). */
+  /** The lead the patient comes from (`lead_…`) — the file opens on its person. */
   fromLead?: string;
 }
 
@@ -33,6 +33,7 @@ export function validatePatientCreateSearch(
   return {
     name: name && name.length <= 120 ? name : undefined,
     phone: (phone && toClinicPhone(phone)) || undefined,
-    fromLead: RECORD_ID.test(fromLead) ? fromLead : undefined,
+    fromLead:
+      PUBLIC_ID.test(fromLead) && fromLead.startsWith('lead_') ? fromLead : undefined,
   };
 }

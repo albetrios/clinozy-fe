@@ -2,18 +2,35 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
+import type * as ReportsApiModule from '@/shared/api/clinic/patient-reports-api.ts';
 import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+  attachPatientReportFile,
+  createPatientReport,
+} from '@/shared/api/clinic/patient-reports-api.ts';
+import { HttpError } from '@/shared/errors/HttpError.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 
 import {
-  patientFileUrl,
-  renderPatientFile,
-  resetPatientFile,
-} from '../../../__tests__/integration/patient-file-test-router.tsx';
+  seedReports,
+  storedReports,
+} from '../../__tests__/integration/report-api-double.ts';
+import {
+  renderReports,
+  REPORT_CODES,
+  reportsUrl,
+  resetReports,
+} from '../../__tests__/integration/reports-test-router.tsx';
+
+vi.mock('@/shared/api/clinic/patient-reports-api.ts', async (importOriginal) => {
+  const double = await import('../../__tests__/integration/report-api-double.ts');
+  return {
+    ...(await importOriginal<typeof ReportsApiModule>()),
+    listPatientReports: vi.fn(double.listPatientReports),
+    fetchPatientReport: vi.fn(double.fetchPatientReport),
+    createPatientReport: vi.fn(double.createPatientReport),
+    attachPatientReportFile: vi.fn(double.attachPatientReportFile),
+  };
+});
 
 const { notifyMock, enqueueMock } = vi.hoisted(() => ({
   notifyMock: {
@@ -26,19 +43,19 @@ const { notifyMock, enqueueMock } = vi.hoisted(() => ({
   },
   enqueueMock: vi.fn(() => ({ accepted: 1, skipped: 0 })),
 }));
-vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
+vi.mock('@/shared/notify/index.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  notify: notifyMock,
+}));
 vi.mock('@/shared/hooks/useUploadQueue/index.ts', () => ({
   useUploadQueue: () => ({ enqueue: enqueueMock }),
 }));
 
-const DHARTI = patientRef('Dharti Galani');
-const url = (rest: string) => patientFileUrl(DHARTI, `/reports${rest}`);
-const reportsOf = () =>
-  clinicFixtures.patientReports.snapshot((row) => row.patientId === DHARTI);
+const created = () => storedReports().map((row) => row.report);
 
 async function openUpload() {
   const user = userEvent.setup({ applyAccept: false });
-  const view = renderPatientFile(url('/create'), { role: 'doctor' });
+  const view = renderReports(reportsUrl('/create'));
   const drawer = await screen.findByTestId('report-drawer');
   return { ...view, user, drawer };
 }
@@ -46,12 +63,10 @@ async function openUpload() {
 beforeEach(() => {
   for (const fn of Object.values(notifyMock)) fn.mockReset();
   enqueueMock.mockClear();
-  resetClinicFixtures();
+  vi.mocked(createPatientReport).mockClear();
+  seedReports([]);
 });
-afterEach(() => {
-  resetPatientFile();
-  resetClinicFixtures();
-});
+afterEach(() => resetReports());
 
 describe('Upload report (KICKOFF §6.6; S:42)', () => {
   it('opens over Reports with its steps, Lab and today', async () => {
@@ -59,10 +74,7 @@ describe('Upload report (KICKOFF §6.6; S:42)', () => {
     expect(within(drawer).getByTestId('report-drawer-title')).toHaveTextContent(
       'Upload report',
     );
-    expect(drawer).toHaveTextContent('Dharti Galani');
-    expect(within(drawer).getByTestId('report-drawer-step-report')).toHaveTextContent(
-      'Report',
-    );
+    expect(drawer).toHaveTextContent('Priya Shah');
     expect(within(drawer).getByTestId('report-drawer-type-lab')).toHaveAttribute(
       'aria-pressed',
       'true',
@@ -81,17 +93,16 @@ describe('Upload report (KICKOFF §6.6; S:42)', () => {
 
   it('asks for a name before it uploads', async () => {
     const { user, drawer } = await openUpload();
-    const before = reportsOf().length;
     await user.click(within(drawer).getByTestId('report-drawer-save'));
     expect(notifyMock.warning).toHaveBeenCalledWith('Name the report');
     expect(within(drawer).getByTestId('report-drawer-name')).toHaveAttribute(
       'aria-invalid',
       'true',
     );
-    expect(reportsOf()).toHaveLength(before);
+    expect(createPatientReport).not.toHaveBeenCalled();
   });
 
-  it('uploads a scan with its file and note — “Report uploaded”', async () => {
+  it('uploads a scan with its note — "Report uploaded" — and queues its file', async () => {
     const { user, drawer, router } = await openUpload();
     await user.click(within(drawer).getByTestId('report-drawer-type-scan'));
     await user.type(within(drawer).getByTestId('report-drawer-name'), 'Chest X-ray');
@@ -106,9 +117,22 @@ describe('Upload report (KICKOFF §6.6; S:42)', () => {
     await waitFor(() =>
       expect(notifyMock.success).toHaveBeenCalledWith('Report uploaded'),
     );
-    await waitFor(() => expect(router.state.location.pathname).toBe(url('')));
-    const saved = reportsOf().find((row) => row.name === 'Chest X-ray');
-    expect(saved).toMatchObject({ type: 'scan', notes: 'No findings', files: [] });
+    await waitFor(() => expect(router.state.location.pathname).toBe(reportsUrl()));
+    expect(createPatientReport).toHaveBeenCalledWith({
+      patientId: 'pat_priya0000000000000000',
+      input: {
+        type: 'scan',
+        name: 'Chest X-ray',
+        date: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/),
+        notes: 'No findings',
+      },
+      idempotencyKey: expect.any(String),
+    });
+    expect(created()[0]).toMatchObject({
+      type: 'scan',
+      notes: 'No findings',
+      fileKeys: [],
+    });
     expect(enqueueMock).toHaveBeenCalledWith([pdf], expect.any(Object));
   });
 
@@ -126,15 +150,50 @@ describe('Upload report (KICKOFF §6.6; S:42)', () => {
       File[],
       { onUploaded: (key: string) => Promise<void> },
     ];
-    await target.onUploaded('reports/lipid.pdf');
-    expect(reportsOf().find((row) => row.name === 'Lipid profile')?.files).toEqual([
-      'reports/lipid.pdf',
-    ]);
+    await target.onUploaded('organization-files/org_test/lipid.pdf');
+    const report = created()[0];
+    expect(attachPatientReportFile).toHaveBeenCalledWith({
+      patientId: 'pat_priya0000000000000000',
+      reportId: report?.id,
+      fileKey: 'organization-files/org_test/lipid.pdf',
+    });
+    expect(report?.fileKeys).toEqual(['organization-files/org_test/lipid.pdf']);
   });
 
-  it('turns a member who cannot edit patients back (S:42)', async () => {
-    const { router } = renderPatientFile(url('/create'), { role: 'therapist' });
-    await waitFor(() => expect(router.state.location.pathname).toBe(url('')));
+  it('outlines the field the server refuses, on its step', async () => {
+    vi.mocked(createPatientReport).mockRejectedValueOnce(
+      new HttpError('Invalid', 400, '/x', 'POST', {
+        error: {
+          type: 'validation_error',
+          detail: 'Invalid values for fields in request',
+          errors: [
+            {
+              field: 'body.notes',
+              message: 'Too big: expected string to have <=1000 characters',
+            },
+          ],
+        },
+      }),
+    );
+    const { user, drawer } = await openUpload();
+    await user.type(within(drawer).getByTestId('report-drawer-name'), 'CBC');
+    await user.click(within(drawer).getByTestId('report-drawer-save'));
+    expect(
+      await within(drawer).findByText(
+        'Too big: expected string to have <=1000 characters',
+      ),
+    ).toBeInTheDocument();
+    expect(within(drawer).getByTestId('report-drawer-note')).toHaveAttribute(
+      'aria-invalid',
+      'true',
+    );
+  });
+
+  it('turns a member without patient:update back', async () => {
+    const { router } = renderReports(reportsUrl('/create'), {
+      codes: REPORT_CODES.filter((code) => code !== 'patient:update'),
+    });
+    await waitFor(() => expect(router.state.location.pathname).toBe(reportsUrl()));
     expect(notifyMock.info).toHaveBeenCalledWith(
       'You do not have permission to perform this action.',
     );

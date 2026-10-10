@@ -1,164 +1,113 @@
 import { z } from 'zod';
 
+import { api } from '@/core/http/api.ts';
+import { collectAllPages } from '@/shared/api/fetch-all-pages.ts';
+
 import {
-  clinicHttpError,
-  compareText,
-  validateClinicInput,
-} from './clinic-fixture-store.ts';
-import type { Offering } from './clinic-schema.ts';
-import { addCivilDays, clinicToday } from './clinic-time.ts';
-import type { PatientPackageRecord } from './patient-packages-contracts.ts';
+  patientOfferingWire,
+  type PatientPackageChange,
+  type PatientPackageRow,
+  type PatientPurchaseRow,
+  toPatientPackageRow,
+  toPatientPurchaseRow,
+} from './patient-packages-contracts.ts';
 import { patientQueryKeys } from './patients-api.ts';
 
 /*
- * A patient's packages (`S:452–466`; KICKOFF §6.6 Packages, Add package), on
- * the fixture world until clinozy-be serves them — REPLACE_WITH_API (D6).
- * The contract makes a package only by invoicing its offering (`invoiceId`
- * server-set, `S:461`); "Add package" adds one before its invoice, with no
- * invoice (AMBER A-F6, an Appendix F request — `patient-packages-contracts.ts`).
+ * A patient's bought offerings on clinozy-be (`/app/patients/:patient_id/offerings`,
+ * api-integration §5.4): the packages, the plan card's last purchases, and a package's change
+ * of validity or sessions (`PATCH`, `payment:update`). Bought only by invoicing (G4); the
+ * sessions move only with treatments (§6 #20).
  */
 
-/** TanStack Query keys for packages — under the patients' key (the file's counts). */
+/** TanStack Query keys for a patient's bought offerings — under the patients' key. */
 export const patientPackageQueryKeys = {
   all: [...patientQueryKeys.all, 'packages'] as const,
-  /** One patient's packages. */
-  patient: (patientId: string) =>
-    [...patientPackageQueryKeys.all, 'patient', patientId] as const,
-  /** The offerings a package can be added from (more than one session). */
-  offerings: () => [...patientPackageQueryKeys.all, 'offerings'] as const,
+  patient: (organizationId: string | null, patientId: string) =>
+    [...patientPackageQueryKeys.all, organizationId, patientId] as const,
+  /** The last purchases — under the patient's packages, so a change refreshes both. */
+  purchases: (organizationId: string | null, patientId: string) =>
+    [...patientPackageQueryKeys.patient(organizationId, patientId), 'purchases'] as const,
 };
 
-const fixtureWorld = () => import('./fixtures/world.fixtures.ts');
+/** The most one page of a patient's offerings takes. */
+const PAGE_SIZE = 100;
 
-/** The longest validity an offering may carry (`offerings-contracts.ts`) — "no expiry". */
-const NO_EXPIRY_DAYS = 1095;
+/** How many lines "<first>’s last purchases" lists (H:2819). */
+const PURCHASE_LINES = 6;
 
-/** The offering behind a package, as its card and chips name it. */
-export type PackageOffering = Pick<
-  Offering,
-  'id' | 'name' | 'tone' | 'sessions' | 'price' | 'validityDays'
->;
-
-/** A patient's package with its offering. */
-export interface PatientPackageRow {
-  package: PatientPackageRecord;
-  /** Null when its offering is gone. */
-  offering: PackageOffering | null;
-  /** False until an invoice names it ("Add package", A-F6). */
-  invoiced: boolean;
-  /** The day of the next booking that uses one of its sessions — "Next: 8 Oct"; null when none. */
-  nextVisit: string | null;
-}
-
-const packageOffering = (offering: Offering): PackageOffering => ({
-  id: offering.id,
-  name: offering.name,
-  tone: offering.tone,
-  sessions: offering.sessions,
-  price: offering.price,
-  validityDays: offering.validityDays,
-});
-
-/** One patient's packages in the order they were sold — Add package appends (H:4834; REPLACE_WITH_API). */
+/** Every package a patient holds, newest first (`is_package=true`, every page). */
 export async function listPatientPackages(
   patientId: string,
 ): Promise<PatientPackageRow[]> {
-  const { clinicFixtures } = await fixtureWorld();
-  const offerings = new Map(
-    clinicFixtures.offerings.snapshot().map((offering) => [offering.id, offering]),
-  );
-  const today = clinicToday();
-  const nextVisit = (packageId: string) =>
-    clinicFixtures.appointments
-      .snapshot(
-        (visit) =>
-          visit.patientPackageId === packageId &&
-          visit.date >= today &&
-          (visit.status === 'scheduled' || visit.status === 'confirmed'),
-      )
-      .map((visit) => visit.date)
-      .sort(compareText)[0] ?? null;
-  return clinicFixtures.patientPackages
-    .snapshot((row) => row.patientId === patientId)
-    .sort((a, b) => compareText(a.createdAt, b.createdAt))
-    .map((row) => {
-      const offering = offerings.get(row.offeringId);
-      return {
-        package: row,
-        offering: offering ? packageOffering(offering) : null,
-        invoiced: row.invoiceId !== null,
-        nextVisit: nextVisit(row.id),
-      };
+  return collectAllPages(async (after) => {
+    const response = await api.get('/app/patients/{patient_id}/offerings', {
+      params: { patient_id: patientId },
+      query: {
+        is_package: 'true',
+        sort: 'created_at',
+        order: 'desc',
+        limit: PAGE_SIZE,
+        after: after ?? undefined,
+      },
     });
+    return {
+      rows: z
+        .array(patientOfferingWire)
+        .parse(response.data ?? [])
+        .map(toPatientPackageRow),
+      next: response.meta?.pagination?.has_more
+        ? (response.meta.pagination.next ?? null)
+        : null,
+    };
+  }, 'patient-packages');
 }
 
-/**
- * Use a session by hand — the card's "Use a session" (H:833): one more used,
- * a 409 "No sessions left" when none is. The contract counts sessions only
- * through treatments (`S:452–466`), so this is a backend request
- * (REPLACE_WITH_API).
- */
-export async function consumePackageSession(id: string): Promise<PatientPackageRecord> {
-  const { clinicFixtures } = await fixtureWorld();
-  const row = await clinicFixtures.patientPackages.get(id);
-  if (row.sessionsUsed >= row.sessionsTotal) {
-    throw clinicHttpError(409, 'conflict', 'No sessions left');
-  }
-  return clinicFixtures.patientPackages.update(id, {
-    sessionsUsed: row.sessionsUsed + 1,
+/** The patient's last six bought offerings, every kind, newest first — one page. */
+export async function listPatientPurchases(
+  patientId: string,
+): Promise<PatientPurchaseRow[]> {
+  const response = await api.get('/app/patients/{patient_id}/offerings', {
+    params: { patient_id: patientId },
+    query: { sort: 'created_at', order: 'desc', limit: PURCHASE_LINES },
   });
+  return z
+    .array(patientOfferingWire)
+    .parse(response.data ?? [])
+    .map(toPatientPurchaseRow);
 }
 
 /**
- * The offerings Add package lists (H:4833): the live, active ones of more
- * than one session, in the order the catalogue keeps them (the prototype's
- * `OF_SEED` order).
+ * Change a package's validity or sessions — `400` names `valid_until` (before its invoice's
+ * date) or `sessions_total` (below what was spent); `409 record_changed` when it changed since
+ * `expectedUpdatedAt`.
  */
-export async function listPackageOfferings(): Promise<PackageOffering[]> {
-  const { clinicFixtures } = await fixtureWorld();
-  return clinicFixtures.offerings
-    .snapshot((offering) => offering.active && offering.sessions > 1)
-    .map(packageOffering);
-}
-
-/** What Add package sends: the patient and the offering. */
-const addPatientPackageSchema = z.object({
-  patientId: z.uuid(),
-  offeringId: z.uuid(),
-});
-
-/** Add package's fields. */
-export type AddPatientPackageInput = z.infer<typeof addPatientPackageSchema>;
-
-/**
- * Add a package before its invoice ("Package added · invoice it from
- * Invoices"; A-F6, REPLACE_WITH_API): every session of the offering, none
- * used, valid for the offering's days from today (no expiry: the longest the
- * contract allows), no invoice yet. A 422 when the offering is not a
- * multi-session one ("Pick a package").
- */
-export async function addPatientPackage(
-  input: AddPatientPackageInput,
-): Promise<PatientPackageRecord> {
-  const { clinicFixtures } = await fixtureWorld();
-  const fields = validateClinicInput(
-    addPatientPackageSchema.refine(
-      (value) =>
-        clinicFixtures.offerings.snapshot(
-          (offering) => offering.id === value.offeringId && offering.sessions > 1,
-        ).length > 0,
-      { message: 'Pick a package', path: ['offeringId'] },
-    ),
-    input,
+export async function updatePatientPackage({
+  patientId,
+  packageId,
+  change,
+  expectedUpdatedAt,
+  idempotencyKey,
+}: {
+  patientId: string;
+  packageId: string;
+  change: PatientPackageChange;
+  expectedUpdatedAt: string;
+  idempotencyKey: string;
+}): Promise<PatientPackageRow> {
+  const response = await api.patch(
+    '/app/patients/{patient_id}/offerings/{patient_offering_id}',
+    {
+      params: { patient_id: patientId, patient_offering_id: packageId },
+      body: {
+        ...(change.validUntil !== undefined && { valid_until: change.validUntil }),
+        ...(change.sessionsTotal !== undefined && {
+          sessions_total: change.sessionsTotal,
+        }),
+        expected_updated_at: expectedUpdatedAt,
+      },
+      idempotencyKey,
+    },
   );
-  await clinicFixtures.patients.get(fields.patientId);
-  const offering = await clinicFixtures.offerings.get(fields.offeringId);
-  return clinicFixtures.patientPackages.create({
-    patientId: fields.patientId,
-    offeringId: offering.id,
-    invoiceId: null,
-    sessionsTotal: offering.sessions,
-    sessionsUsed: 0,
-    validUntil: addCivilDays(clinicToday(), offering.validityDays || NO_EXPIRY_DAYS),
-  });
+  return toPatientPackageRow(patientOfferingWire.parse(response.data));
 }

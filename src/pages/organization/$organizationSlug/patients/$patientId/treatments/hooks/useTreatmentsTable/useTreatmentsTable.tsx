@@ -2,8 +2,9 @@ import { type ColumnDef, useTable } from '@tanstack/react-table';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
-import type { Tone, Treatment } from '@/shared/api/clinic/clinic-schema.ts';
-import type { TreatmentCheckIn } from '@/shared/api/clinic/treatments-api.ts';
+import { cn } from '@/lib/utils.ts';
+import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { TreatmentRecord } from '@/shared/api/clinic/treatments-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { CHECKIN_FEEL_TONES, TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { TonePill } from '@/shared/components/Cells/index.ts';
@@ -34,13 +35,13 @@ import {
 import { TREATMENT_KEYS } from '../../treatments.constants.ts';
 
 const keys = PATIENT_TABLE_KEYS;
-const rowOf = (original: unknown) => original as Treatment;
+const rowOf = (original: unknown) => original as TreatmentRecord;
 
 /** How many of the template's values the Details cell joins (H:4754 `trDetail`). */
 const DETAILS_SHOWN = 4;
 
 /** Days until each aftercare call (H:4754 `cb`): the next day, in 2 days, in a week. */
-const CALL_IN_DAYS = { none: 0, next_day: 1, in_2_days: 2, in_week: 7 } as const;
+const CALL_IN_DAYS = { none: 0, next_day: 1, in_two_days: 2, in_week: 7 } as const;
 
 /** What the Feedback cell says of a treatment, and in which tone. */
 interface TreatmentFeedback {
@@ -51,16 +52,24 @@ interface TreatmentFeedback {
 }
 
 /**
- * A treatment's feedback (H:4754 `fbOf`): its latest check-in — "Better ·
- * 7/10" in the feel's tone — else the aftercare call still to make in butter
- * ("Call next day", "Call in 2 days"), else nothing ("—").
+ * A treatment's feedback (H:4754 `fbOf`): a reversed one says so, its reason
+ * on hover; else its latest check-in (the server's `latest_check_in`) —
+ * "Better · 7/10" in the feel's tone — else the aftercare call still to make
+ * in butter ("Call next day", "Call in 2 days"), else nothing ("—").
  */
 function treatmentFeedback(
-  treatment: Treatment,
-  checkIn: TreatmentCheckIn | undefined,
+  treatment: TreatmentRecord,
   t: TFunction,
   formatDay: (civilDate: string) => string,
 ): TreatmentFeedback | null {
+  if (treatment.status === 'reversed') {
+    return {
+      label: t(TREATMENT_KEYS.reverse.status),
+      tone: 'blush',
+      title: treatment.reversedReason ?? undefined,
+    };
+  }
+  const checkIn = treatment.latestCheckIn;
   if (checkIn) {
     return {
       label: t(keys.treatments.feedbackScore, {
@@ -90,14 +99,14 @@ function treatmentFeedback(
 function useTreatmentParts() {
   const { t } = useTranslation(PATIENT_TABLE_NS);
   const day = useTableDay();
-  return (treatment: Treatment) => {
+  return (treatment: TreatmentRecord) => {
     const { peek } = treatmentDetailsView(treatmentFormOf(treatment), t, (date) =>
       day(date),
     );
     const teethLabel = t(TREATMENT_KEYS.dental.teeth);
     const areas =
       treatment.template === 'dental'
-        ? teethOf(treatment.params.teeth).map((tooth) => `#${tooth}`)
+        ? teethOf(treatment.parameters.teeth).map((tooth) => `#${tooth}`)
         : peek.flatMap((tile) =>
             tile.kind === 'multi' ? tile.values.map((pill) => pill.label) : [],
           );
@@ -116,25 +125,23 @@ function useTreatmentParts() {
 /**
  * The Treatments columns (KICKOFF §6.6 Section tables; H:4754): Treatment ·
  * Area · Team (hidden) · Session · Details (hidden) · Feedback · Date — no
- * ID column, as a treatment has no display number (the contract gives it no
- * `seq`). On a phone Treatment leads, Area is the key and the session, the
- * feedback and the date fold under it.
+ * ID column, as a treatment has no display number (N1). On a phone Treatment
+ * leads, Area is the key and the session, the feedback and the date fold
+ * under it.
  */
-function useTreatmentsColumns(
-  checkIns: Readonly<Record<string, TreatmentCheckIn>>,
-): ColumnDef<DataTableFeatures, Treatment>[] {
+function useTreatmentsColumns(): ColumnDef<DataTableFeatures, TreatmentRecord>[] {
   const { t } = useTranslation(PATIENT_TABLE_NS);
   const day = useTableDay();
   const clock = useClinicClock();
   const staff = useStaffLookup();
   const parts = useTreatmentParts();
-  const team = (treatment: Treatment) =>
+  const team = (treatment: TreatmentRecord) =>
     [staff(treatment.doctorId), staff(treatment.therapistId)].filter(
       (person): person is StaffChip => person !== null,
     );
-  const feedback = (treatment: Treatment) =>
-    treatmentFeedback(treatment, checkIns[treatment.id], t, (date) => day(date));
-  const template = (treatment: Treatment) =>
+  const feedback = (treatment: TreatmentRecord) =>
+    treatmentFeedback(treatment, t, (date) => day(date));
+  const template = (treatment: TreatmentRecord) =>
     t(TREATMENT_KEYS.templates[treatment.template]);
 
   return [
@@ -146,7 +153,15 @@ function useTreatmentsColumns(
       enableHiding: false,
       cell: ({ row }) => (
         <span className="flex min-w-0 flex-col">
-          <span className="text-body truncate font-medium">{row.original.name}</span>
+          <span
+            className={cn(
+              'text-body truncate font-medium',
+              // A reversed session stays in the file, struck through.
+              row.original.status === 'reversed' && 'text-muted-foreground line-through',
+            )}
+          >
+            {row.original.name}
+          </span>
           <span className="text-caption text-muted-foreground truncate">
             {template(row.original)}
           </span>
@@ -191,17 +206,17 @@ function useTreatmentsColumns(
     },
     {
       id: 'session',
-      accessorKey: 'sessionNo',
+      accessorKey: 'sessionNumber',
       header: t(keys.columns.session),
       enableSorting: false,
       cell: ({ row }) => (
-        <TonePill tone="butter">{`#${row.original.sessionNo}`}</TonePill>
+        <TonePill tone="butter">{`#${row.original.sessionNumber}`}</TonePill>
       ),
       meta: {
         track: '80px',
         kind: 'badges',
         foldValue: (original) => ({
-          value: `#${rowOf(original).sessionNo}`,
+          value: `#${rowOf(original).sessionNumber}`,
           dotClassName: TONE_CLASSES.butter.fill,
         }),
       },
@@ -259,18 +274,15 @@ function useTreatmentsColumns(
 }
 
 /**
- * The Treatments table: the patient's treatments, newest first, with each
- * one's latest check-in; the Columns choice is a device pref.
+ * The Treatments table: the patient's sessions, newest first, each with its
+ * latest check-in; the Columns choice is a device pref.
  */
-export function useTreatmentsTable(
-  rows: readonly Treatment[],
-  checkIns: Readonly<Record<string, TreatmentCheckIn>>,
-) {
-  const columns = useTreatmentsColumns(checkIns);
+export function useTreatmentsTable(rows: readonly TreatmentRecord[]) {
+  const columns = useTreatmentsColumns();
   const visibility = useHiddenColumns(PATIENT_SECTION_TABLE_IDS.treatments, columns);
   return useTable({
     features: dataTableFeatures,
-    data: rows as Treatment[],
+    data: rows as TreatmentRecord[],
     columns,
     manualPagination: true,
     manualSorting: true,

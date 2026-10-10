@@ -14,6 +14,7 @@ import {
   fetchAppointmentRange,
   fetchAppointmentSlots,
   fetchBookableTreatments,
+  fetchPersonAppointments,
   listAppointments,
   moveAppointment,
   updateAppointment,
@@ -53,6 +54,7 @@ import {
   useCopyAppointment,
   useCreateAppointment,
   useMoveAppointment,
+  usePersonAppointments,
   useReinstateAppointment,
   useUpdateAppointment,
   withAppointmentStatus,
@@ -66,6 +68,7 @@ vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => ({
   fetchAppointment: vi.fn(),
   fetchAppointmentSlots: vi.fn(),
   fetchBookableTreatments: vi.fn(),
+  fetchPersonAppointments: vi.fn(),
   createAppointment: vi.fn(),
   copyAppointment: vi.fn(),
   updateAppointment: vi.fn(),
@@ -193,6 +196,9 @@ beforeEach(() => {
     dayCount(APPOINTMENT_TOMORROW, { scheduled: 2 }),
   ]);
   vi.mocked(fetchAppointment).mockImplementation(async (id) => stored(id));
+  vi.mocked(fetchPersonAppointments).mockImplementation(async (contactId) =>
+    server.rows.filter((row) => row.contactId === contactId),
+  );
   vi.mocked(fetchAppointmentSlots).mockImplementation(async ({ date }) =>
     slotDay(date, ['10:00', '11:00']),
   );
@@ -378,6 +384,54 @@ describe('the reads', () => {
     expect(
       client.getQueryData(appointmentQueryKeys.detail('org_else', RIYA.id)),
     ).toBeUndefined();
+  });
+});
+
+describe('usePersonAppointments (the patient file’s Visits)', () => {
+  it('reads one person’s bookings under the organization and the person', async () => {
+    const { result } = renderHook(() => usePersonAppointments(KABIR.contactId), {
+      wrapper,
+    });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(fetchPersonAppointments).toHaveBeenCalledWith(KABIR.contactId);
+    expect(result.current.data).toEqual([KABIR]);
+    expect(
+      client.getQueryData(appointmentQueryKeys.person('org_test', KABIR.contactId)),
+    ).toEqual([KABIR]);
+  });
+
+  it('stays idle without a contact, and outside an organization', () => {
+    const { result: noContact } = renderHook(() => usePersonAppointments(undefined), {
+      wrapper,
+    });
+    expect(noContact.current.fetchStatus).toBe('idle');
+
+    useOrganizationStore.getState().clearOrganization();
+    const { result: noOrganization } = renderHook(
+      () => usePersonAppointments(RIYA.contactId),
+      { wrapper },
+    );
+    expect(noOrganization.current.fetchStatus).toBe('idle');
+    expect(fetchPersonAppointments).not.toHaveBeenCalled();
+  });
+
+  it('reads the person again after a booking for them', async () => {
+    const meera = NEW_BOOKING.contactId;
+    const { result } = renderHook(
+      () => ({ visits: usePersonAppointments(meera), book: useCreateAppointment() }),
+      { wrapper },
+    );
+    await waitFor(() => expect(result.current.visits.isSuccess).toBe(true));
+    expect(result.current.visits.data).toEqual([]);
+
+    await act(() => result.current.book.mutateAsync(NEW_BOOKING));
+
+    await waitFor(() =>
+      expect(result.current.visits.data?.map((row) => row.id)).toEqual([
+        'appt_meera0000000000000000',
+      ]),
+    );
+    expect(fetchPersonAppointments).toHaveBeenCalledTimes(2);
   });
 });
 

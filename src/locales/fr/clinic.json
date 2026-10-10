@@ -331,7 +331,7 @@
     },
     "missing": "Ajoutez le nom et le mobile",
     "mobileInvalid": "Saisissez un mobile à 10 chiffres",
-    "created": "Patient {{id}} créé · tâche d’accueil ajoutée",
+    "created": "Patient {{id}} créé",
     "openFile": "Ouvrir le dossier",
     "saved": "Modifications de {{name}} enregistrées",
     "registered": "Dossier patient {{id}} créé pour {{name}}",
@@ -340,7 +340,8 @@
     "registeredPhotos_other": "Dossier patient {{id}} créé pour {{name}} · {{count}} photos classées",
     "duplicate": "Même mobile que {{name}} · {{id}}",
     "useExisting": "Utiliser l’existant",
-    "summaryEmpty": "Nouveau patient"
+    "summaryEmpty": "Nouveau patient",
+    "knownPerson": "{{name}} est déjà dans vos contacts · le dossier s’ouvre à son nom"
   },
   "recordDrawer": {
     "cancel": "Annuler",
@@ -818,9 +819,6 @@
     "pricesHiddenHint": "Prix masqués · utilisez l’œil pour les afficher",
     "showPrices": "Afficher les prix",
     "hidePrices": "Masquer les prix",
-    "savesOnList": "Économise {{amount}} sur le prix catalogue",
-    "invoicedAmount": "{{amount}} facturé",
-    "atListPrice": "Au prix catalogue",
     "columns": {
       "suggested": "Suggéré",
       "qty": "Qté",
@@ -831,7 +829,7 @@
     "more": "Plus",
     "quantity": "Quantité",
     "finalPrice": "Prix final",
-    "belowFloor": "Sous le prix minimum {{price}}",
+    "belowFloor": "Sous le prix minimum",
     "tooMuchDiscount": "Remise trop élevée · demandez à un administrateur",
     "details": "Détails de la prestation",
     "statuses": {
@@ -849,8 +847,6 @@
     "statusLabel": "Statut · {{status}}",
     "invoiced": "Facturé",
     "invoicedOf": "Facturé · {{done}} sur {{total}}",
-    "linkInvoice": "Lier une facture",
-    "linkInvoiceHint": "Lier une facture manuellement",
     "remove": "Retirer",
     "empty": "Rien de suggéré pour {{first}} pour l’instant.",
     "whyIdea": "Pourquoi cette idée",
@@ -860,16 +856,10 @@
     "addHint": "Ajouter aux suggestions",
     "addOffering": "Ajouter une prestation",
     "purchasesTitle": "Derniers achats de {{first}}",
-    "purchasesSummary_one": "{{count}} ligne · {{paid}} payé à ce jour",
-    "purchasesSummary_many": "{{count}} lignes · {{paid}} payé à ce jour",
-    "purchasesSummary_other": "{{count}} lignes · {{paid}} payé à ce jour",
     "purchaseColumns": {
       "date": "Date",
       "bought": "Acheté",
-      "qty": "Qté",
-      "paid": "Payé",
-      "sessions": "Séances",
-      "invoice": "Facture"
+      "sessions": "Séances"
     },
     "sessionsUsed": "{{used}} sur {{total}} utilisées",
     "activityTitle": "Activité du contact",
@@ -910,18 +900,7 @@
       "lowest": "minimum {{price}}"
     },
     "ideaReasons": {
-      "history": "Idée tirée de l’historique",
-      "note": "Note du médecin · « {{text}} »",
-      "complaint": "Motif de plainte · {{text}}",
-      "visits_one": "{{count}} visite jusqu’ici · un forfait fait économiser à chaque séance",
-      "visits_many": "{{count}} visites jusqu’ici · un forfait fait économiser à chaque séance",
-      "visits_other": "{{count}} visites jusqu’ici · un forfait fait économiser à chaque séance",
-      "renew": "Forfait presque épuisé · renouveler",
-      "first": "Première visite · commencer par une consultation"
-    },
-    "purchaseKinds": {
-      "medicine": "Médicament",
-      "item": "Article"
+      "history": "Idée tirée de l’historique"
     },
     "delivery": {
       "queued": "En file",
@@ -931,7 +910,10 @@
       "failed": "Non distribué",
       "received": "Reçu"
     },
-    "activityLead": "Prospect {{id}}"
+    "activityLead": "Prospect {{id}}",
+    "purchasesCount_one": "{{count}} ligne",
+    "purchasesCount_many": "{{count}} lignes",
+    "purchasesCount_other": "{{count}} lignes"
   },
   "contactEditor": {
     "title": "Modifier le contact",

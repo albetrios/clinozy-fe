@@ -5,8 +5,8 @@ import {
   matchesCommandSearch,
 } from './command-search-api.ts';
 import type { LeadRecord } from './leads-fixture-contracts.ts';
-import { listPatients } from './patients-api.ts';
-import { patientName } from './patients-contracts.ts';
+import { listPatients } from './patients-fixture-api.ts';
+import { patientName } from './patients-fixture-contracts.ts';
 
 /*
  * The patient field's search (Receive payment, the Invoice drawer — KICKOFF

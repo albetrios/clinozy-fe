@@ -1,21 +1,35 @@
-import { fireEvent, screen, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
-import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
+import { findContactByPhone } from '@/shared/api/clinic/contacts-api.ts';
+import type {
+  ContactProfile,
+  ContactSummary,
+} from '@/shared/api/clinic/contacts-contracts.ts';
+import { fetchLead } from '@/shared/api/clinic/leads-api.ts';
+import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
+import { attachPatientImage } from '@/shared/api/clinic/patient-images-api.ts';
 import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import type * as PatientsApiModule from '@/shared/api/clinic/patients-api.ts';
-import type { PatientRecord } from '@/shared/api/clinic/patients-contracts.ts';
+  createPatient,
+  fetchPatient,
+  updatePatient,
+} from '@/shared/api/clinic/patients-api.ts';
+import type {
+  PatientFields,
+  PatientRecord,
+} from '@/shared/api/clinic/patients-contracts.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { contactHit } from '@/tests/utils/appointment-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { fsi } from '@/tests/utils/bidi-marks.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { EMPTY_CONTACT_PROFILE } from '@/tests/utils/contact-doubles.ts';
+import { patientRecord } from '@/tests/utils/patient-doubles.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 const viewport = vi.hoisted(() => ({ tier: 'desktop' as ViewportTier }));
@@ -40,34 +54,112 @@ vi.mock('@/shared/hooks/useUploadQueue/index.ts', () => ({
   useUploadQueue: () => ({ enqueue: enqueueMock }),
 }));
 
-/** The next create fails with this, once. */
-const api = vi.hoisted(() => ({ createError: null as unknown }));
-vi.mock('@/shared/api/clinic/patients-api.ts', async (importOriginal) => {
-  const original = await importOriginal<typeof PatientsApiModule>();
-  return {
-    ...original,
-    createPatient: async (input: Parameters<typeof original.createPatient>[0]) => {
-      const error = api.createError;
-      if (error) {
-        api.createError = null;
-        throw error;
-      }
-      return original.createPatient(input);
-    },
-  };
-});
+vi.mock('@/shared/api/clinic/patients-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchPatient: vi.fn(),
+  createPatient: vi.fn(),
+  updatePatient: vi.fn(),
+}));
+vi.mock('@/shared/api/clinic/contacts-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  findContactByPhone: vi.fn(),
+}));
+vi.mock('@/shared/api/clinic/leads-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchLead: vi.fn(),
+}));
+vi.mock('@/shared/api/clinic/patient-images-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  attachPatientImage: vi.fn(),
+}));
 
 import { PatientDrawer } from './PatientDrawer.tsx';
 
-/** 10:00 on 3 Oct, clinic time — the seed day is today. */
+/** 10:00 on 3 Oct, clinic time. */
 const NOW = new Date('2026-10-03T04:30:00Z');
-const DHARTI = patientRef('Dharti Galani');
 
-const dharti = () => {
-  const [patient] = clinicFixtures.patients.snapshot((record) => record.id === DHARTI);
-  if (!patient) throw new Error('the seed lost Dharti');
-  return patient;
+/** Dharti Galani, #3508 — a patient on +91 82006 03212. */
+const DHARTI = patientRecord({
+  id: 'pat_dharti000000000000000',
+  seq: 3508,
+  contactId: 'con_dharti000000000000000',
+  firstName: 'Dharti',
+  lastName: 'Galani',
+  name: 'Dharti Galani',
+  phone: '+918200603212',
+  phones: [{ phone: '+918200603212', isPrimary: true, isOnWhatsapp: true }],
+  status: 'regular',
+  consents: ['data', 'photos'],
+});
+const DHARTI_DIGITS = '8200603212';
+
+/** Dharti as the duplicate check finds her: a person with a file. */
+const DHARTI_PERSON: ContactSummary & ContactProfile = {
+  ...contactHit({
+    id: DHARTI.contactId,
+    contactNumber: 1100,
+    firstName: 'Dharti',
+    lastName: 'Galani',
+    name: 'Dharti Galani',
+    primaryPhone: DHARTI.phone,
+    patientId: DHARTI.id,
+    openLeadId: null,
+  }),
+  ...EMPTY_CONTACT_PROFILE,
+  patientNumber: 3508,
 };
+
+/** Riya Mehta — someone the clinic knows (a lead's person) without a patient file. */
+const RIYA_PERSON: ContactSummary & ContactProfile = {
+  ...contactHit(),
+  ...EMPTY_CONTACT_PROFILE,
+};
+const RIYA_DIGITS = '9825011241';
+
+/** The lead a New patient link can come from, and its person. */
+const LEAD_ID = 'lead_anaya0000000000000000';
+const LEAD_CONTACT_ID = 'con_anaya0000000000000000';
+
+/** The id and number clinozy-be gives the next patient. */
+const NEW_PATIENT_ID = 'pat_new00000000000000000';
+const NEW_CONTACT_ID = 'con_new00000000000000000';
+
+/** The patients clinozy-be holds, by id — a create or a save writes here, a read answers from it. */
+let saved = new Map<string, PatientRecord>();
+
+/** A record with the drawer's fields written over it, as the server would answer the save. */
+function recordWith(base: PatientRecord, fields: PatientFields): PatientRecord {
+  const phones = [fields.phone, fields.phone2].filter((phone): phone is string =>
+    Boolean(phone),
+  );
+  return {
+    ...base,
+    firstName: fields.firstName,
+    lastName: fields.lastName,
+    name: [fields.firstName, fields.lastName].filter(Boolean).join(' '),
+    phone: fields.phone,
+    phone2: fields.phone2,
+    phones: phones.map((phone, index) => ({
+      phone,
+      isPrimary: index === 0,
+      isOnWhatsapp: true,
+    })),
+    gender: fields.gender,
+    dateOfBirth: fields.dateOfBirth,
+    address: fields.address,
+    referralSource: fields.referralSource,
+    referredByName: fields.referredByName,
+    homeBranchId: fields.homeBranchId,
+    types: fields.types,
+    status: fields.status,
+    conversion: fields.conversion ?? 'not_converted',
+    followUpAt: fields.followUpAt,
+    notes: fields.notes,
+    consents: fields.consents,
+    hasMarketingConsent: fields.consents.includes('marketing'),
+    updatedAt: new Date().toISOString(),
+  };
+}
 
 function setUser() {
   return userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
@@ -107,24 +199,76 @@ async function fillRequired(
   await user.type(screen.getByTestId('patient-drawer-mobile'), mobile);
 }
 
+/** Let the last duplicate-number lookup answer, and the drawer render its answer. */
+async function lookupAnswered() {
+  await act(async () => {
+    await vi.mocked(findContactByPhone).mock.results.at(-1)?.value;
+  });
+}
+
+/** The vars of the last create. */
+function lastCreate() {
+  const call = vi.mocked(createPatient).mock.lastCall?.[0];
+  if (!call) throw new Error('nothing was created');
+  return call;
+}
+
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] });
   vi.setSystemTime(NOW);
   viewport.tier = 'desktop';
-  api.createError = null;
+  saved = new Map([[DHARTI.id, structuredClone(DHARTI)]]);
   enqueueMock.mockReset();
   enqueueMock.mockImplementation((files: readonly File[]) => ({
     accepted: files.length,
     skipped: 0,
   }));
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetClinicFixtures();
+  vi.mocked(fetchPatient).mockReset();
+  vi.mocked(fetchPatient).mockImplementation(async (patientId) => {
+    const record = saved.get(patientId);
+    if (!record) {
+      throw new HttpError('Not found', 404, `/app/patients/${patientId}`, 'GET');
+    }
+    return structuredClone(record);
+  });
+  vi.mocked(createPatient).mockReset();
+  vi.mocked(createPatient).mockImplementation(async ({ fields, person }) => {
+    const created = recordWith(
+      patientRecord({
+        id: NEW_PATIENT_ID,
+        seq: 3509,
+        contactId: person === 'new' ? NEW_CONTACT_ID : person.contactId,
+        consents: [],
+      }),
+      fields,
+    );
+    saved.set(created.id, created);
+    return structuredClone(created);
+  });
+  vi.mocked(updatePatient).mockReset();
+  vi.mocked(updatePatient).mockImplementation(async ({ record, fields }) => {
+    const next = recordWith(record, fields);
+    saved.set(next.id, next);
+    return structuredClone(next);
+  });
+  vi.mocked(findContactByPhone).mockReset();
+  vi.mocked(findContactByPhone).mockImplementation(
+    async (phone) =>
+      [DHARTI_PERSON, RIYA_PERSON].find((person) => person.primaryPhone === phone) ??
+      null,
+  );
+  vi.mocked(fetchLead).mockReset();
+  vi.mocked(fetchLead).mockImplementation(
+    async (leadId) => ({ id: leadId, contactId: LEAD_CONTACT_ID }) as LeadRecord,
+  );
+  vi.mocked(attachPatientImage).mockReset();
+  signInTestMember();
 });
 afterEach(() => {
   vi.useRealTimers();
-  resetClinicFixtures();
   useUIStore.setState({ previewRole: null });
-  useOrganizationStore.getState().clearPermissions();
+  useOrganizationStore.getState().clearOrganization();
 });
 
 describe('PatientDrawer — New patient (KICKOFF §6.5)', () => {
@@ -186,6 +330,7 @@ describe('PatientDrawer — New patient (KICKOFF §6.5)', () => {
       'data-status',
       'open',
     );
+    expect(createPatient).not.toHaveBeenCalled();
     expect(onCreated).not.toHaveBeenCalled();
   });
 
@@ -198,12 +343,13 @@ describe('PatientDrawer — New patient (KICKOFF §6.5)', () => {
     const mobile = screen.getByTestId('patient-drawer-mobile');
     expect(mobile).toHaveAttribute('aria-invalid', 'true');
     expect(screen.getByRole('alert')).toHaveTextContent('Enter a 10-digit mobile');
+    expect(createPatient).not.toHaveBeenCalled();
     expect(onCreated).not.toHaveBeenCalled();
   });
 
-  it('creates the patient with the onboarding task and toasts "Open file"', async () => {
+  it('creates the patient with a new person and toasts "Patient #3509 created" with "Open file"', async () => {
     const user = setUser();
-    const { onCreated } = renderCreate({ leadId: undefined });
+    const { onCreated } = renderCreate();
     await fillRequired(user);
     await user.type(screen.getByTestId('patient-drawer-last-name'), 'Shah');
     await user.click(screen.getByTestId('patient-drawer-step-contact-next'));
@@ -215,23 +361,38 @@ describe('PatientDrawer — New patient (KICKOFF §6.5)', () => {
     await user.click(screen.getByTestId('patient-drawer-save'));
 
     await waitFor(() => expect(onCreated).toHaveBeenCalledTimes(1));
-    const created = onCreated.mock.calls[0]?.[0] as PatientRecord;
-    expect(created).toMatchObject({
-      firstName: 'Priya',
-      lastName: 'Shah',
-      phone: '+919876500001',
-      types: ['aesthetic', 'lhr'],
-      status: 'new',
+    expect(createPatient).toHaveBeenCalledTimes(1);
+    expect(lastCreate()).toEqual({
+      fields: {
+        firstName: 'Priya',
+        lastName: 'Shah',
+        phone: '+919876500001',
+        phone2: null,
+        address: null,
+        homeBranchId: expect.stringMatching(/.+/),
+        gender: null,
+        dateOfBirth: null,
+        types: ['aesthetic', 'lhr'],
+        status: 'new',
+        conversion: null,
+        referredByName: null,
+        referralSource: null,
+        followUpAt: null,
+        notes: null,
+        consents: [],
+      },
+      person: 'new',
+      idempotencyKey: expect.any(String),
+    });
+    expect(onCreated.mock.calls[0]?.[0]).toMatchObject({
+      id: NEW_PATIENT_ID,
+      seq: 3509,
+      name: 'Priya Shah',
     });
     expect(notifyMock.success).toHaveBeenCalledWith(
-      `Patient #${created.seq} created · onboarding task added`,
+      expect.stringMatching(/^Patient #3509 created/),
       { action: { label: 'Open file', onClick: expect.any(Function) } },
     );
-    expect(
-      clinicFixtures.tasks.snapshot(
-        (task) => task.patientId === created.id && task.title === 'Onboarding',
-      ),
-    ).toHaveLength(1);
     expect(enqueueMock).not.toHaveBeenCalled();
   });
 
@@ -260,6 +421,7 @@ describe('PatientDrawer — New patient (KICKOFF §6.5)', () => {
       'false',
     );
     expect(notifyMock.success).not.toHaveBeenCalled();
+    expect(createPatient).not.toHaveBeenCalled();
   });
 
   it('sets the follow-up from a quick chip computed from today', async () => {
@@ -279,17 +441,45 @@ describe('PatientDrawer — New patient (KICKOFF §6.5)', () => {
   it('warns about a mobile another patient already has, when the field loses focus', async () => {
     const user = setUser();
     renderCreate();
-    const digits = dharti().phone.slice(3);
-    await fillRequired(user, { mobile: digits });
+    await fillRequired(user, { mobile: DHARTI_DIGITS });
     await user.tab();
     const notice = await screen.findByTestId('patient-drawer-duplicate');
-    expect(notice).toHaveTextContent(`Same mobile as Dharti Galani · #${dharti().seq}`);
-    expect(screen.getByTestId('patient-drawer-duplicate-action')).toHaveTextContent(
-      'Open file',
-    );
+    expect(findContactByPhone).toHaveBeenCalledWith(DHARTI.phone);
+    expect(notice).toHaveTextContent('Same mobile as Dharti Galani · #3508');
+    // "Open file" once the patient on it is read.
+    expect(
+      await screen.findByTestId('patient-drawer-duplicate-action'),
+    ).toHaveTextContent('Open file');
+    expect(fetchPatient).toHaveBeenCalledWith(DHARTI.id);
     // Editing the mobile drops the notice until it is checked again.
     await user.type(screen.getByTestId('patient-drawer-mobile'), '{Backspace}');
     expect(screen.queryByTestId('patient-drawer-duplicate')).not.toBeInTheDocument();
+  });
+
+  it('opens the file on someone the clinic already knows, with a notice and no action', async () => {
+    const user = setUser();
+    const { onCreated } = renderCreate();
+    await fillRequired(user, { first: 'Riya', mobile: RIYA_DIGITS });
+    await user.tab();
+    const notice = await screen.findByTestId('patient-drawer-duplicate');
+    expect(notice).not.toHaveTextContent('Same mobile as');
+    expect(screen.queryByTestId('patient-drawer-duplicate-action')).toBeNull();
+
+    await user.click(screen.getByTestId('patient-drawer-save'));
+    await waitFor(() => expect(onCreated).toHaveBeenCalledTimes(1));
+    // The new file is the known person's, not a new contact.
+    expect(lastCreate().person).toEqual({ contactId: RIYA_PERSON.id });
+    expect(onCreated.mock.calls[0]?.[0]).toMatchObject({ contactId: RIYA_PERSON.id });
+  });
+
+  it('opens the file on the lead’s person when New patient comes from a lead', async () => {
+    const user = setUser();
+    const { onCreated } = renderCreate({ name: 'Anaya Desai', leadId: LEAD_ID });
+    await waitFor(() => expect(fetchLead).toHaveBeenCalledWith(LEAD_ID));
+    await user.type(await screen.findByTestId('patient-drawer-mobile'), '9876500005');
+    await user.click(screen.getByTestId('patient-drawer-save'));
+    await waitFor(() => expect(onCreated).toHaveBeenCalledTimes(1));
+    expect(lastCreate().person).toEqual({ contactId: LEAD_CONTACT_ID });
   });
 
   it('"Create & add another" saves, then restarts the drawer empty', async () => {
@@ -298,6 +488,7 @@ describe('PatientDrawer — New patient (KICKOFF §6.5)', () => {
     await user.type(await screen.findByTestId('patient-drawer-mobile'), '9876500002');
     await user.click(screen.getByText('Create & add another'));
     await waitFor(() => expect(notifyMock.success).toHaveBeenCalledTimes(1));
+    expect(createPatient).toHaveBeenCalledTimes(1);
     expect(onCreated).not.toHaveBeenCalled();
     await waitFor(() =>
       expect(screen.getByTestId('patient-drawer-first-name')).toHaveValue(''),
@@ -309,7 +500,7 @@ describe('PatientDrawer — New patient (KICKOFF §6.5)', () => {
     const user = setUser();
     const { onCreated } = renderCreate();
     await fillRequired(user);
-    api.createError = new TypeError('Failed to fetch');
+    vi.mocked(createPatient).mockRejectedValueOnce(new TypeError('Failed to fetch'));
     await user.click(screen.getByTestId('patient-drawer-save'));
     await waitFor(() => expect(notifyMock.error).toHaveBeenCalledTimes(1));
     expect(notifyMock.error).toHaveBeenCalledWith(
@@ -329,15 +520,23 @@ describe('PatientDrawer — New patient (KICKOFF §6.5)', () => {
     ];
     options.action.onClick();
     await waitFor(() => expect(onCreated).toHaveBeenCalledTimes(1));
+    expect(createPatient).toHaveBeenCalledTimes(2);
   });
 
   it('outlines the field a validation error names and opens its step', async () => {
     const user = setUser();
     renderCreate();
     await fillRequired(user);
-    api.createError = new HttpError('Unprocessable', 422, '/api/patients', 'POST', {
-      error: { fields: { followUpAt: ['Pick a follow-up in the future'] } },
-    });
+    vi.mocked(createPatient).mockRejectedValueOnce(
+      new HttpError('Bad request', 400, '/app/patients', 'POST', {
+        error: {
+          type: 'validation_error',
+          errors: [
+            { field: 'body.follow_up_at', message: 'Pick a follow-up in the future' },
+          ],
+        },
+      }),
+    );
     await user.click(screen.getByTestId('patient-drawer-save'));
     await waitFor(() =>
       expect(notifyMock.error).toHaveBeenCalledWith('Pick a follow-up in the future'),
@@ -350,18 +549,58 @@ describe('PatientDrawer — New patient (KICKOFF §6.5)', () => {
     expect(screen.getByTestId('patient-drawer-save')).toHaveTextContent('Create patient');
   });
 
+  it('reads the person’s fields under `contact` as the form’s own', async () => {
+    const user = setUser();
+    renderCreate();
+    await fillRequired(user);
+    await user.click(screen.getByTestId('patient-drawer-step-contact-next'));
+    vi.mocked(createPatient).mockRejectedValueOnce(
+      new HttpError('Bad request', 400, '/app/patients', 'POST', {
+        error: {
+          type: 'validation_error',
+          errors: [{ field: 'body.contact.phones/0/phone', message: 'Not a mobile' }],
+        },
+      }),
+    );
+    await user.click(screen.getByTestId('patient-drawer-save'));
+    await waitFor(() => expect(notifyMock.error).toHaveBeenCalledWith('Not a mobile'));
+    expect(screen.getByTestId('patient-drawer-step-contact')).toHaveAttribute(
+      'data-status',
+      'open',
+    );
+    expect(screen.getByTestId('patient-drawer-mobile')).toHaveAttribute(
+      'aria-invalid',
+      'true',
+    );
+  });
+
   it('shows the duplicate notice when the server refuses the mobile as taken', async () => {
     const user = setUser();
     renderCreate();
-    await fillRequired(user, { mobile: dharti().phone.slice(3) });
-    api.createError = new HttpError('Conflict', 409, '/api/patients', 'POST', {
-      error: { detail: 'A patient with this phone exists' },
-    });
-    await user.click(screen.getByTestId('patient-drawer-save'));
-    expect(await screen.findByTestId('patient-drawer-duplicate')).toHaveTextContent(
-      'Same mobile as Dharti Galani',
+    await fillRequired(user, { mobile: DHARTI_DIGITS });
+    await user.click(screen.getByTestId('patient-drawer-step-contact-next'));
+    vi.mocked(createPatient).mockRejectedValueOnce(
+      new HttpError('Conflict', 409, '/app/patients', 'POST', {
+        error: {
+          reason: 'contact_phone_exists',
+          detail: 'Another contact has this mobile',
+        },
+      }),
     );
-    expect(notifyMock.error).toHaveBeenCalledWith('A patient with this phone exists');
+    await user.click(screen.getByTestId('patient-drawer-save'));
+    await waitFor(() =>
+      expect(notifyMock.error).toHaveBeenCalledWith('Another contact has this mobile'),
+    );
+    expect(await screen.findByTestId('patient-drawer-duplicate')).toHaveTextContent(
+      'Same mobile as Dharti Galani · #3508',
+    );
+    // The draft stays, on the step that holds the mobile.
+    expect(screen.getByTestId('patient-drawer-step-contact')).toHaveAttribute(
+      'data-status',
+      'open',
+    );
+    expect(screen.getByTestId('patient-drawer-first-name')).toHaveValue('Priya');
+    expect(screen.getByTestId('patient-drawer-save')).toHaveTextContent('Create patient');
   });
 
   it('takes photos dropped on the zone, and lets a pick be removed', async () => {
@@ -380,7 +619,7 @@ describe('PatientDrawer — New patient (KICKOFF §6.5)', () => {
     expect(screen.queryByText('dropped.jpg')).not.toBeInTheDocument();
   });
 
-  it('files the first photos through the upload tray once the patient exists', async () => {
+  it('files the first photos on the new patient through the upload tray', async () => {
     const user = setUser();
     const { onCreated } = renderCreate();
     await fillRequired(user);
@@ -395,28 +634,30 @@ describe('PatientDrawer — New patient (KICKOFF §6.5)', () => {
 
     await user.click(screen.getByTestId('patient-drawer-save'));
     await waitFor(() => expect(onCreated).toHaveBeenCalledTimes(1));
-    const created = onCreated.mock.calls[0]?.[0] as PatientRecord;
     expect(enqueueMock).toHaveBeenCalledWith([photo], {
       onUploaded: expect.any(Function),
     });
+    expect(attachPatientImage).not.toHaveBeenCalled();
     const [, target] = enqueueMock.mock.calls[0] as [
       File[],
       { onUploaded: (key: string, file: File) => Promise<void> },
     ];
     await target.onUploaded('org/patients/before.jpg', photo);
-    expect(
-      clinicFixtures.patientImages.snapshot((image) => image.patientId === created.id),
-    ).toHaveLength(1);
+    expect(attachPatientImage).toHaveBeenCalledWith({
+      patientId: NEW_PATIENT_ID,
+      fileKey: 'org/patients/before.jpg',
+      fileName: 'before.jpg',
+    });
   });
 });
 
 describe('PatientDrawer — Edit patient', () => {
-  function renderEdit(onSaved = vi.fn()) {
+  function renderEdit(onSaved = vi.fn(), patient: PatientRecord = DHARTI) {
     renderWithProviders(
       <PatientDrawer
         mode="edit"
         open
-        patient={dharti()}
+        patient={patient}
         onClose={vi.fn()}
         onSaved={onSaved}
       />,
@@ -432,13 +673,12 @@ describe('PatientDrawer — Edit patient', () => {
     expect(within(panel).getByTestId('patient-drawer-title')).toHaveTextContent(
       'Edit patient',
     );
-    expect(within(panel).getByTestId('patient-drawer-tag')).toHaveTextContent(
-      `#${dharti().seq}`,
-    );
+    expect(within(panel).getByTestId('patient-drawer-tag')).toHaveTextContent('#3508');
     expect(
       within(panel).queryByTestId('patient-drawer-quick-fill'),
     ).not.toBeInTheDocument();
     expect(within(panel).getByTestId('patient-drawer-first-name')).toHaveValue('Dharti');
+    expect(within(panel).getByTestId('patient-drawer-mobile')).toHaveValue('82006 03212');
     // The closed step peeks at its values.
     expect(
       within(panel).getByTestId('patient-drawer-step-clinic-peek'),
@@ -448,8 +688,104 @@ describe('PatientDrawer — Edit patient', () => {
     await user.type(within(panel).getByTestId('patient-drawer-last-name'), 'Patel');
     await user.click(within(panel).getByTestId('patient-drawer-save'));
     await waitFor(() => expect(onSaved).toHaveBeenCalledTimes(1));
+    expect(updatePatient).toHaveBeenCalledWith({
+      record: DHARTI,
+      fields: expect.objectContaining({
+        firstName: 'Dharti',
+        lastName: 'Patel',
+        phone: DHARTI.phone,
+        status: 'regular',
+        consents: ['data', 'photos'],
+      }),
+      idempotencyKey: expect.any(String),
+    });
     expect(notifyMock.success).toHaveBeenCalledWith('Dharti Patel saved');
-    expect(dharti().lastName).toBe('Patel');
+    expect(onSaved.mock.calls[0]?.[0]).toMatchObject({ lastName: 'Patel' });
+  });
+
+  it('never warns about the edited patient’s own mobile, but does about another’s', async () => {
+    const user = setUser();
+    asRole('admin');
+    const raam = patientRecord({
+      id: 'pat_raam00000000000000000',
+      seq: 3441,
+      firstName: 'Raam',
+      lastName: 'Shah',
+      name: 'Raam Shah',
+      phone: '+919879521034',
+    });
+    renderEdit(vi.fn(), raam);
+    const mobile = await screen.findByTestId('patient-drawer-mobile');
+    await user.click(mobile);
+    await user.tab();
+    await waitFor(() => expect(findContactByPhone).toHaveBeenCalledWith(raam.phone));
+    await lookupAnswered();
+    expect(screen.queryByTestId('patient-drawer-duplicate')).not.toBeInTheDocument();
+
+    await user.clear(mobile);
+    await user.type(mobile, DHARTI_DIGITS);
+    await user.tab();
+    expect(await screen.findByTestId('patient-drawer-duplicate')).toHaveTextContent(
+      'Same mobile as Dharti Galani · #3508',
+    );
+
+    // Someone the clinic knows without a file says nothing on an edit — only a create opens on them.
+    await user.clear(mobile);
+    await user.type(mobile, RIYA_DIGITS);
+    await user.tab();
+    await waitFor(() =>
+      expect(findContactByPhone).toHaveBeenCalledWith(RIYA_PERSON.primaryPhone),
+    );
+    await lookupAnswered();
+    expect(screen.queryByTestId('patient-drawer-duplicate')).not.toBeInTheDocument();
+  });
+
+  it('reads the patient again on a stale save and restarts the form on what was saved', async () => {
+    const user = setUser();
+    asRole('admin');
+    const onSaved = renderEdit();
+    const panel = await drawer();
+    await user.clear(within(panel).getByTestId('patient-drawer-last-name'));
+    await user.type(within(panel).getByTestId('patient-drawer-last-name'), 'Patel');
+    // Someone saved Dharti meanwhile.
+    const theirs = {
+      ...DHARTI,
+      lastName: 'Mehta',
+      name: 'Dharti Mehta',
+      updatedAt: NOW.toISOString(),
+    };
+    saved.set(DHARTI.id, theirs);
+    vi.mocked(updatePatient).mockRejectedValueOnce(
+      new HttpError('Conflict', 409, `/app/patients/${DHARTI.id}`, 'PATCH', {
+        error: { reason: 'record_changed', detail: 'Someone saved this meanwhile' },
+      }),
+    );
+    await user.click(within(panel).getByTestId('patient-drawer-save'));
+    await waitFor(() =>
+      expect(notifyMock.error).toHaveBeenCalledWith('Someone saved this meanwhile', {
+        id: 'patient-save-failed',
+        action: { label: 'Reload', onClick: expect.any(Function) },
+      }),
+    );
+    expect(onSaved).not.toHaveBeenCalled();
+
+    const [, options] = notifyMock.error.mock.calls[0] as [
+      string,
+      { action: { onClick: () => void } },
+    ];
+    options.action.onClick();
+    await waitFor(() =>
+      expect(within(panel).getByTestId('patient-drawer-last-name')).toHaveValue('Mehta'),
+    );
+    expect(fetchPatient).toHaveBeenCalledWith(DHARTI.id);
+
+    // The next save carries what was read again.
+    await user.click(within(panel).getByTestId('patient-drawer-save'));
+    await waitFor(() => expect(onSaved).toHaveBeenCalledTimes(1));
+    expect(vi.mocked(updatePatient).mock.lastCall?.[0].record).toMatchObject({
+      lastName: 'Mehta',
+      updatedAt: NOW.toISOString(),
+    });
   });
 
   it('offers Delete with the delete ability, as "Delete this record?" with the summary', async () => {
@@ -477,6 +813,29 @@ describe('PatientDrawer — Edit patient', () => {
     ).toBeVisible();
     expect(within(panel).getByTestId('patient-drawer-first-name')).toBeDisabled();
     expect(within(panel).queryByTestId('patient-drawer-delete')).not.toBeInTheDocument();
+  });
+
+  it('answers from the member’s own codes: patient:update edits, Delete needs patient:delete', async () => {
+    useOrganizationStore
+      .getState()
+      .setPermissions(['organization:read', 'patient:read', 'patient:update']);
+    renderEdit();
+    const panel = await drawer();
+    await waitFor(() =>
+      expect(within(panel).getByTestId('patient-drawer-first-name')).toBeEnabled(),
+    );
+    expect(within(panel).getByTestId('patient-drawer-save')).toBeInTheDocument();
+    expect(within(panel).queryByTestId('patient-drawer-delete')).not.toBeInTheDocument();
+  });
+
+  it('is view-only for a member holding patient:read alone', async () => {
+    useOrganizationStore.getState().setPermissions(['organization:read', 'patient:read']);
+    renderEdit();
+    const panel = await drawer();
+    await waitFor(() =>
+      expect(within(panel).queryByTestId('patient-drawer-save')).not.toBeInTheDocument(),
+    );
+    expect(within(panel).getByTestId('patient-drawer-first-name')).toBeDisabled();
   });
 });
 
@@ -521,9 +880,9 @@ describe('PatientDrawer — quick-add (Q-P2)', () => {
     ]);
     await user.click(within(panel).getByTestId('patient-quick-add-save'));
     await waitFor(() => expect(onPick).toHaveBeenCalledTimes(1));
-    const created = onPick.mock.calls[0]?.[0] as PatientRecord;
+    expect(onPick.mock.calls[0]?.[0]).toMatchObject({ id: NEW_PATIENT_ID, seq: 3509 });
     expect(notifyMock.success).toHaveBeenCalledWith(
-      `Priya Shah registered as patient #${created.seq} · 2 photos filed`,
+      'Priya Shah registered as patient #3509 · 2 photos filed',
     );
   });
 
@@ -531,15 +890,15 @@ describe('PatientDrawer — quick-add (Q-P2)', () => {
     const user = setUser();
     const onPick = renderQuick();
     const panel = await drawer('patient-quick-add');
-    await user.type(
-      within(panel).getByTestId('patient-quick-add-mobile'),
-      dharti().phone.slice(3),
-    );
+    await user.type(within(panel).getByTestId('patient-quick-add-mobile'), DHARTI_DIGITS);
     await user.tab();
     const action = await within(panel).findByTestId('patient-quick-add-duplicate-action');
     expect(action).toHaveTextContent('Use existing');
     await user.click(action);
-    expect(onPick).toHaveBeenCalledWith(expect.objectContaining({ id: DHARTI }));
+    expect(onPick).toHaveBeenCalledWith(
+      expect.objectContaining({ id: DHARTI.id, seq: 3508, name: 'Dharti Galani' }),
+    );
+    expect(createPatient).not.toHaveBeenCalled();
   });
 
   it('starts from a booking’s prefill and raises the booking’s own toast (H:6039)', async () => {
@@ -571,7 +930,13 @@ describe('PatientDrawer — quick-add (Q-P2)', () => {
     await user.click(within(panel).getByTestId('patient-quick-add-save'));
     await waitFor(() => expect(onPick).toHaveBeenCalledTimes(1));
     expect(notifyMock.success).toHaveBeenCalledWith('Riya is now a patient');
-    const created = onPick.mock.calls[0]?.[0] as PatientRecord;
-    expect(created).toMatchObject({ types: ['lhr'], notes: 'Upper lip and chin' });
+    expect(lastCreate().fields).toMatchObject({
+      types: ['lhr'],
+      notes: 'Upper lip and chin',
+    });
+    expect(onPick.mock.calls[0]?.[0]).toMatchObject({
+      types: ['lhr'],
+      notes: 'Upper lip and chin',
+    });
   });
 });

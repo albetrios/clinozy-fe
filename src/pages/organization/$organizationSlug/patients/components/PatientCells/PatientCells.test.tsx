@@ -2,15 +2,14 @@ import { screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type { PatientRow } from '@/shared/api/clinic/patients-contracts.ts';
 import { withoutBidiMarks } from '@/tests/utils/bidi-marks.ts';
+import { patientRow } from '@/tests/utils/patient-doubles.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { followUpWhen, patientAge } from './patient-cells.ts';
 import {
   PatientAgeCell,
   PatientBadges,
-  PatientDueCell,
   PatientFollowUpCell,
   PatientIdCell,
   PatientNameCell,
@@ -21,50 +20,17 @@ import {
 const NOW = new Date('2026-10-03T04:30:00Z');
 const TODAY = '2026-10-03';
 
-const patient: PatientRow = {
-  organizationId: '00000000-0000-4000-8000-0000000c1a10',
-  createdAt: '2026-09-24T09:10:00.000Z',
-  updatedAt: '2026-10-03T03:30:00.000Z',
-  createdById: '00000000-0000-4000-8000-0000000a0001',
-  updatedById: '00000000-0000-4000-8000-0000000a0001',
-  deletedAt: null,
-  deleteReason: null,
-  deleteNote: null,
-  id: '0b6d2f0e-5c7a-4c1e-9b2a-3d4e5f6a7b8c',
-  seq: 3508,
+const patient = patientRow({
   firstName: 'Dharti',
   lastName: 'Galani',
+  name: 'Dharti Galani',
   phone: '+918200603212',
-  phone2: null,
-  email: null,
-  gender: 'female',
-  dateOfBirth: '1995-10-27',
-  address: 'Umra, Velanja',
-  homeBranchId: '00000000-0000-4000-8000-0000000b0001',
-  types: ['aesthetic'],
   status: 'regular',
-  conversion: 'not_converted',
-  referralSource: null,
-  referredByName: null,
-  referredByPatientId: null,
-  consentGiven: true,
   consents: ['data', 'photos'],
-  doctorId: null,
   followUpAt: '2026-10-03T09:20:00.000Z',
-  notes: null,
-  complaints: null,
-  diagnosis: null,
-  treatmentSuggestions: null,
-  futureSuggestions: null,
-  leadId: null,
-  dueTotal: 200_000,
-  updatedBy: {
-    id: '00000000-0000-4000-8000-0000000a0001',
-    name: 'Riya Shah',
-    initials: 'RS',
-    tone: 'butter',
-  },
-};
+  createdAt: '2026-09-24T09:10:00.000Z',
+  updatedAt: '2026-10-03T03:30:00.000Z',
+});
 
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] });
@@ -142,21 +108,13 @@ describe('PatientCells', () => {
     ).toEqual(['Today 2:50 PM', 'Wed 2:50 PM', 'Oct 9 2:50 PM']);
   });
 
-  it('shows what is due in the blush ink, else a muted dash', async () => {
-    const { unmount } = renderWithProviders(<PatientDueCell dueTotal={200_000} />);
-    const due = await screen.findByText(/2,000/);
-    expect(due).toHaveClass('text-tone-blush-foreground', 'font-semibold');
-    unmount();
-    renderWithProviders(<PatientDueCell dueTotal={0} />);
-    expect(await screen.findByText('—')).toHaveClass('text-muted-foreground');
-  });
-
-  it('names who last saved the patient, and when', async () => {
+  it('says when the patient was last saved — the time alone, no one named', async () => {
     renderWithProviders(<PatientUpdatedCell patient={patient} />);
-    expect(await screen.findByText('Riya S.')).toBeInTheDocument();
     // Saved at 09:00 this morning: the rooms' one time rule names the day.
     // The rule's time is an isolated token beside its day word.
-    expect(screen.getByText(/^Today \u20689:00\sAM\u2069$/)).toBeInTheDocument();
+    expect(await screen.findByText(/^Today \u20689:00\sAM\u2069$/)).toBeInTheDocument();
+    expect(screen.queryByText('Riya S.')).not.toBeInTheDocument();
+    expect(document.querySelector('[data-slot="person-chip"]')).toBeNull();
   });
 
   it('draws the patient chip — sage avatar, "P" badge, name over the mobile — and is accessible', async () => {

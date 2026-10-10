@@ -1,20 +1,29 @@
-import { screen } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {
+  createMemoryHistory,
+  createRootRoute,
+  createRoute,
+  createRouter,
+  Outlet,
+  RouterProvider,
+} from '@tanstack/react-router';
+import { render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
-import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
+import type * as FeedbackApiModule from '@/shared/api/clinic/feedback-api.ts';
+import type * as TreatmentsApiModule from '@/shared/api/clinic/treatments-api.ts';
+import { PATIENT_FILE_SECTIONS } from '@/shared/clinic/patient-file-sections.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { patientFile, TEST_PATIENT_ID } from '@/tests/utils/patient-doubles.ts';
 
-import {
-  patientFileUrl,
-  renderPatientFile,
-  resetPatientFile,
-} from '../../__tests__/integration/patient-file-test-router.tsx';
+import { PatientFileContext } from '../../shared/patient-file-context.ts';
+import { NewCheckInPage } from './NewCheckInPage.tsx';
 
-vi.mock('@/shared/notify/index.ts', () => ({
-  notify: {
+const { notifyMock } = vi.hoisted(() => ({
+  notifyMock: {
     success: vi.fn(),
     error: vi.fn(),
     info: vi.fn(),
@@ -23,24 +32,111 @@ vi.mock('@/shared/notify/index.ts', () => ({
     dismiss: vi.fn(),
   },
 }));
+vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
+// The section behind the drawer is a stand-in: this page decides which, not what it shows.
+vi.mock('../../patient-id.sections.ts', async () => {
+  const { createElement } = await import('react');
+  return {
+    PATIENT_FILE_SECTION_PAGES: new Proxy(
+      {},
+      {
+        get: (_pages, slug) => () =>
+          createElement('p', { 'data-testid': `patient-section-${String(slug)}` }),
+      },
+    ),
+  };
+});
+vi.mock('@/shared/api/clinic/feedback-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof FeedbackApiModule>()),
+  fetchPreviousCheckIn: vi.fn(async () => null),
+  listCheckInOfferings: vi.fn(async () => []),
+}));
+vi.mock('@/shared/api/clinic/treatments-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof TreatmentsApiModule>()),
+  fetchTreatment: vi.fn(async () => ({ id: 'trt_lhr', name: 'LHR Full Face' })),
+}));
 
-const DHARTI = patientRef('Dharti Galani');
+const FILE = `/organization/acme/patients/${TEST_PATIENT_ID}`;
 
-beforeEach(() => resetClinicFixtures());
+/** The page at its route under the file, for the test member previewed as `role`. */
+function renderPage(url: string, role: Role = 'admin') {
+  signInTestMember();
+  useOrganizationStore.getState().setPermissions(['organization:read']);
+  useUIStore.setState({ previewRole: role });
+  const root = createRootRoute({ component: () => <Outlet /> });
+  const file = createRoute({
+    getParentRoute: () => root,
+    path: '/organization/$organizationSlug/patients/$patientId',
+    component: () => (
+      <PatientFileContext.Provider
+        value={{
+          patientId: TEST_PATIENT_ID,
+          file: patientFile(),
+          section: null,
+          viewable: PATIENT_FILE_SECTIONS,
+          masked: true,
+          toggleMasked: () => undefined,
+          photos: { pick: () => undefined, upload: () => undefined },
+        }}
+      >
+        <Outlet />
+      </PatientFileContext.Provider>
+    ),
+  });
+  const page = createRoute({
+    getParentRoute: () => file,
+    path: 'check-ins/create',
+    component: NewCheckInPage,
+  });
+  const section = createRoute({
+    getParentRoute: () => file,
+    path: '$',
+    component: () => null,
+  });
+  const router = createRouter({
+    routeTree: root.addChildren([file.addChildren([page, section])]),
+    history: createMemoryHistory({ initialEntries: [url] }),
+  });
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  render(
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>,
+  );
+  return { router };
+}
+
+beforeEach(() => {
+  for (const fn of Object.values(notifyMock)) fn.mockReset();
+});
 afterEach(() => {
-  resetPatientFile();
-  resetClinicFixtures();
+  useUIStore.setState({ previewRole: null });
+  useOrganizationStore.getState().clearPermissions();
 });
 
 describe('NewCheckInPage (S:44)', () => {
   it('shows the section it came from with a new check-in over it', async () => {
-    renderPatientFile(`${patientFileUrl(DHARTI, '/check-ins/create')}?from=images`, {
-      role: 'doctor',
-    });
+    renderPage(`${FILE}/check-ins/create?from=images`);
     expect(await screen.findByTestId('check-in-drawer-title')).toHaveTextContent(
       'Visit check-in',
     );
     expect(screen.getByTestId('patient-section-images')).toBeInTheDocument();
-    expect(clinicFixtures.checkIns.snapshot(() => true).length).toBeGreaterThan(0);
+  });
+
+  it('is an aftercare check-in when `?treatment=` names the session, over Clinical notes', async () => {
+    renderPage(`${FILE}/check-ins/create?treatment=trt_lhr`);
+    expect(await screen.findByTestId('check-in-drawer-title')).toHaveTextContent(
+      'Aftercare check-in',
+    );
+    expect(screen.getByTestId('patient-section-overview')).toBeInTheDocument();
+  });
+
+  it('turns a member who cannot edit patients back (S:44)', async () => {
+    const { router } = renderPage(`${FILE}/check-ins/create?from=visits`, 'therapist');
+    await waitFor(() => expect(router.state.location.pathname).toBe(`${FILE}/visits`));
+    expect(notifyMock.info).toHaveBeenCalledWith(
+      'You do not have permission to perform this action.',
+    );
+    expect(screen.queryByTestId('check-in-drawer')).not.toBeInTheDocument();
   });
 });

@@ -2,25 +2,29 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
-import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import type * as PrescriptionsApi from '@/shared/api/clinic/prescriptions-api.ts';
-import { fetchVisit } from '@/shared/api/clinic/visits-api.ts';
+import { HttpError } from '@/shared/errors/HttpError.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+import { DOCTOR_NISHA } from '@/tests/utils/appointment-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { fsi } from '@/tests/utils/bidi-marks.ts';
+import { TEST_PATIENT_ID } from '@/tests/utils/patient-doubles.ts';
 import { shownLocation } from '@/tests/utils/shown-location.ts';
 
 import {
-  patientFileUrl,
-  renderPatientFile,
-  resetPatientFile,
-} from '../../../__tests__/integration/patient-file-test-router.tsx';
+  prescriptionLine,
+  prescriptionRecord,
+  resetRxWorld,
+  rxServerApi,
+  rxWorld,
+  TEST_PRESCRIPTION_ID,
+} from '../../__tests__/integration/prescription-doubles.ts';
+import {
+  type PrescriptionsMember,
+  prescriptionsUrl,
+  renderPrescriptions,
+  resetPrescriptionsMember,
+} from '../../__tests__/integration/prescriptions-test-router.tsx';
+import { PrescriptionDrawer } from './PrescriptionDrawer.tsx';
 
 const viewport = vi.hoisted(() => ({ tier: 'desktop' as ViewportTier }));
 vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
@@ -45,71 +49,85 @@ vi.mock('@/shared/components/PrintTemplate/print-document.ts', () => ({
   PRINTING_ATTRIBUTE: 'data-printing',
 }));
 
-/** Holds the print sheet's read while a test sets it, to print before it lands. */
-const sheetGate = vi.hoisted(() => ({ hold: null as Promise<void> | null }));
-vi.mock('@/shared/api/clinic/prescriptions-api.ts', async (importOriginal) => {
-  const actual = await importOriginal<typeof PrescriptionsApi>();
+vi.mock('@/shared/api/clinic/prescriptions-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  ...(await import('../../__tests__/integration/prescription-doubles.ts')).rxServerApi,
+}));
+vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => {
+  const { DOCTOR_ARJUN, DOCTOR_NISHA: NISHA } =
+    await import('@/tests/utils/appointment-doubles.ts');
   return {
-    ...actual,
-    fetchRxSheetContext: async (
-      ...args: Parameters<typeof actual.fetchRxSheetContext>
-    ) => {
-      await sheetGate.hold;
-      return actual.fetchRxSheetContext(...args);
-    },
+    ...(await importOriginal<object>()),
+    fetchTeamDirectory: vi.fn(async () => [NISHA, DOCTOR_ARJUN]),
   };
 });
+vi.mock('@/shared/tenancy/my-membership.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  findMyMembershipId: vi.fn(async () => 'mem_nisha0000000000000000'),
+}));
 
-const DHARTI = patientRef('Dharti Galani');
-const RX_497 = ref.prescription(497);
-const url = (rest: string) => patientFileUrl(DHARTI, `/prescriptions${rest}`);
+const url = prescriptionsUrl;
+/** A member who writes drafts and approves none. */
+const DRAFTER: PrescriptionsMember = {
+  codes: ['patient_prescription:read', 'patient_prescription:create'],
+};
+const HAIR_FALL = {
+  id: 'rxk_hairfall00000000000000',
+  name: 'Hair fall kit',
+  items: [
+    prescriptionLine(),
+    prescriptionLine({
+      medicineName: 'Clonix-B Lotion',
+      doseNight: 0,
+      meal: null,
+      timing: 'morning_night',
+      bodyPart: 'scalp',
+      qty: 1,
+    }),
+  ],
+};
 
-/** Dharti's prescriptions, newest first. */
-const dhartiRx = () =>
-  clinicFixtures.prescriptions
-    .snapshot((rx) => rx.patientId === DHARTI)
-    .sort((a, b) => b.seq - a.seq);
-
-async function openNew(role: 'doctor' | 'owner' = 'doctor') {
+async function openNew(member: PrescriptionsMember = { role: 'admin' }) {
   const user = userEvent.setup();
-  const view = renderPatientFile(url('/create'), { role });
+  const view = renderPrescriptions(url('/create'), { member });
   const drawer = await screen.findByTestId('rx-drawer');
   return { ...view, user, drawer };
 }
+
+async function openEdit(member: PrescriptionsMember = { role: 'admin' }) {
+  const user = userEvent.setup();
+  const view = renderPrescriptions(url(`/${TEST_PRESCRIPTION_ID}/edit`), { member });
+  const drawer = await screen.findByTestId('rx-drawer');
+  return { ...view, user, drawer };
+}
+
+/** The newest prescription the stand-in server holds. */
+const written = () => rxWorld.prescriptions.at(-1);
 
 beforeEach(() => {
   viewport.tier = 'desktop';
   for (const fn of Object.values(notifyMock)) fn.mockReset();
   printMock.mockClear();
-  sheetGate.hold = null;
-  resetClinicFixtures();
+  for (const fn of Object.values(rxServerApi)) fn.mockClear();
+  resetRxWorld({ prescriptions: [prescriptionRecord()], kits: [HAIR_FALL] });
 });
-afterEach(() => {
-  resetPatientFile();
-  resetClinicFixtures();
-});
+afterEach(() => resetPrescriptionsMember());
 
-describe('Prescription drawer (KICKOFF §6.6; S:35, 37)', () => {
-  it('heads a new prescription with the patient, the count and the kits', async () => {
+describe('Prescription drawer (KICKOFF §6.6; S:35, 37; Q19)', () => {
+  it('heads a new prescription with the patient, the count, Draft and the member’s kits', async () => {
     const { drawer, baseElement } = await openNew();
     expect(within(drawer).getByTestId('rx-drawer-title')).toHaveTextContent(
       'New prescription',
     );
-    expect(drawer).toHaveTextContent(`${fsi('Dharti Galani')} · ${fsi('#3508')}`);
-    expect(within(drawer).getByTestId('rx-drawer-badges')).toHaveTextContent(
-      '0 medicines',
-    );
-    const fill = within(drawer).getByTestId('rx-drawer-quick-fill');
+    expect(drawer).toHaveTextContent(`${fsi('Priya Shah')} · ${fsi('#3508')}`);
+    const badges = within(drawer).getByTestId('rx-drawer-badges');
+    expect(badges).toHaveTextContent('0 medicines');
     expect(
-      within(fill)
+      within(within(drawer).getByTestId('rx-drawer-quick-fill'))
         .getAllByRole('button')
         .map((chip) => chip.textContent),
-    ).toEqual([
-      'Repeat last Rx #497',
-      'Hair fall kit',
-      'Post-peel kit',
-      'Pigmentation kit',
-    ]);
+    ).toEqual(['Repeat last Rx #500', 'Hair fall kit']);
+    expect(rxServerApi.listPrescriptionKits).toHaveBeenCalled();
     expect(await axeForDialog(baseElement)).toHaveNoViolations();
   });
 
@@ -121,124 +139,94 @@ describe('Prescription drawer (KICKOFF §6.6; S:35, 37)', () => {
       'data-status',
       'open',
     );
-    expect(dhartiRx()).toHaveLength(1);
+    expect(rxServerApi.createPrescription).not.toHaveBeenCalled();
   });
 
-  it('in the visit flow: approves, prints, sends to the pharmacy and goes back to the flow (L-64)', async () => {
-    vi.useFakeTimers({ toFake: ['Date'] });
-    vi.setSystemTime(new Date(clinicInstant('2026-10-03', '10:42')));
-    resetClinicFixtures();
-    try {
-      // Sana Kapoor is with the doctor (visit 2866), opened from Today's card.
-      const SANA = patientRef('Sana Kapoor');
-      const user = userEvent.setup();
-      const { router } = renderPatientFile(
-        patientFileUrl(SANA, '/prescriptions/create?visit=open&from=today'),
-        { role: 'doctor' },
-      );
-      const drawer = await screen.findByTestId('rx-drawer');
-      const save = within(drawer).getByTestId('rx-drawer-save');
-      expect(save).toHaveTextContent('Approve · print · send to pharmacy');
-      await user.click(within(drawer).getByTestId('rx-drawer-quick-fill-hairFall'));
-      await user.click(save);
-      await waitFor(() => expect(printMock).toHaveBeenCalledTimes(1));
-      await waitFor(() =>
-        expect(router.state.location.pathname).toBe(patientFileUrl(SANA, '/timeline')),
-      );
-      expect(router.state.location.search).toEqual({ visit: 'open', from: 'today' });
-      const [written] = clinicFixtures.prescriptions
-        .snapshot((rx) => rx.patientId === SANA)
-        .sort((a, b) => b.seq - a.seq);
-      // Tied to the visit's booking: Today's pharmacy lane and Medical's to fill.
-      expect(written?.appointmentId).toBe(ref.appointment(2866));
-      const visit = await fetchVisit(ref.visit(2866));
-      expect(visit.visit.stage).toBe('checkout');
-      expect(visit.rxToFill).toBe(true);
-    } finally {
-      vi.useRealTimers();
-    }
-  });
-
-  it('in the visit flow, Save & sell prints once the sheet is read and keeps the flow behind the sale (L-64)', async () => {
-    vi.useFakeTimers({ toFake: ['Date'] });
-    vi.setSystemTime(new Date(clinicInstant('2026-10-03', '10:42')));
-    resetClinicFixtures();
-    try {
-      const SANA = patientRef('Sana Kapoor');
-      let release: () => void = () => undefined;
-      sheetGate.hold = new Promise((resolve) => {
-        release = resolve;
-      });
-      const user = userEvent.setup();
-      const { router } = renderPatientFile(
-        patientFileUrl(SANA, '/prescriptions/create?visit=open&from=today'),
-        { role: 'doctor' },
-      );
-      const drawer = await screen.findByTestId('rx-drawer');
-      await user.click(within(drawer).getByTestId('rx-drawer-quick-fill-hairFall'));
-      await user.click(within(drawer).getByTestId('rx-drawer-save-and-add'));
-      await waitFor(() =>
-        expect(shownLocation(router).pathname).toBe(
-          '/organization/acme/medical/sales/create',
-        ),
-      );
-      // The flow itself stands behind the sale (A-P1).
-      expect(router.state.location.pathname).toBe(patientFileUrl(SANA, '/timeline'));
-      expect(router.state.location.search).toMatchObject({
-        visit: 'open',
-        from: 'today',
-      });
-      const [written] = clinicFixtures.prescriptions
-        .snapshot((rx) => rx.patientId === SANA)
-        .sort((a, b) => b.seq - a.seq);
-      // The sale closes back into the flow, Today still its way back.
-      expect(shownLocation(router).search).toEqual({
-        prescription: written?.id,
-        from: `patients/${SANA}/timeline?visit=open&from=today`,
-      });
-      // The sheet is still being read: the print waits for it rather than skipping.
-      expect(printMock).not.toHaveBeenCalled();
-      release();
-      await waitFor(() => expect(printMock).toHaveBeenCalledTimes(1));
-    } finally {
-      vi.useRealTimers();
-    }
-  });
-
-  it('fills the hair fall kit and saves it — “Prescription saved”', async () => {
+  it('writes and approves for an approver — the kit’s lines, “Prescription #501 approved”', async () => {
     const { user, drawer, router } = await openNew();
-    await user.click(within(drawer).getByTestId('rx-drawer-quick-fill-hairFall'));
-    expect(within(drawer).getByTestId('rx-drawer-badges')).toHaveTextContent(
-      '3 medicines',
+    await user.click(
+      within(drawer).getByTestId(`rx-drawer-quick-fill-kit-${HAIR_FALL.id}`),
     );
-    await user.click(within(drawer).getByTestId('rx-drawer-save'));
+    expect(within(drawer).getByTestId('rx-drawer-badges')).toHaveTextContent(
+      '2 medicines',
+    );
+    const save = within(drawer).getByTestId('rx-drawer-save');
+    expect(save).toHaveTextContent('Save & approve');
+    await user.click(save);
+    await waitFor(() =>
+      expect(notifyMock.success).toHaveBeenCalledWith('Prescription #501 approved'),
+    );
+    await waitFor(() => expect(router.state.location.pathname).toBe(url('')));
+    const create = rxServerApi.createPrescription.mock.lastCall?.[0];
+    expect(create).toMatchObject({
+      patientId: TEST_PATIENT_ID,
+      appointmentId: null,
+      fields: { doctorId: DOCTOR_NISHA.id, advice: null },
+    });
+    expect(create?.fields.items.map((item) => item.medicineName)).toEqual([
+      'Flubolt 400',
+      'Clonix-B Lotion',
+    ]);
+    expect(create?.fields.items[1]).toMatchObject({
+      timing: 'morning_night',
+      bodyPart: 'scalp',
+    });
+    expect(rxServerApi.approvePrescription).toHaveBeenCalledWith({
+      patientId: TEST_PATIENT_ID,
+      prescriptionId: written()?.id,
+      idempotencyKey: `${create?.idempotencyKey}:approve`,
+    });
+    expect(written()?.status).toBe('approved');
+  });
+
+  it('saves a draft for a member who does not approve — no “Save & sell”', async () => {
+    const { user, drawer } = await openNew(DRAFTER);
+    await user.click(
+      within(drawer).getByTestId(`rx-drawer-quick-fill-kit-${HAIR_FALL.id}`),
+    );
+    const save = within(drawer).getByTestId('rx-drawer-save');
+    expect(save).toHaveTextContent('Save prescription');
+    expect(
+      within(drawer).queryByTestId('rx-drawer-save-and-add'),
+    ).not.toBeInTheDocument();
+    await user.click(save);
     await waitFor(() =>
       expect(notifyMock.success).toHaveBeenCalledWith('Prescription saved'),
     );
-    await waitFor(() => expect(router.state.location.pathname).toBe(url('')));
-    const [saved] = dhartiRx();
-    expect(saved?.items.map((item) => item.medicineName)).toEqual([
-      'Flubolt 400',
-      'Clonix-B Lotion',
-      'Densyl-AD Shampoo',
-    ]);
-    expect(saved?.items[1]).toMatchObject({ timing: 'morning_night', bodyPart: 'scalp' });
+    expect(rxServerApi.approvePrescription).not.toHaveBeenCalled();
+    expect(written()?.status).toBe('draft');
   });
 
-  it('repeats the last prescription', async () => {
-    const { user, drawer } = await openNew();
+  it('approves and hands the prescription to a new medical sale (Save & sell)', async () => {
+    const { user, drawer, router } = await openNew();
     await user.click(within(drawer).getByTestId('rx-drawer-quick-fill-repeat'));
-    expect(within(drawer).getByTestId('rx-drawer-badges')).toHaveTextContent(
-      '1 medicine',
+    await user.click(within(drawer).getByTestId('rx-drawer-save-and-add'));
+    await waitFor(() =>
+      expect(shownLocation(router).pathname).toBe(
+        '/organization/acme/medical/sales/create',
+      ),
     );
+    expect(written()?.status).toBe('approved');
+    expect(shownLocation(router).search).toEqual({
+      prescription: written()?.id,
+      from: `patients/${TEST_PATIENT_ID}/prescriptions`,
+    });
   });
 
-  it('adds a medicine from the quick line with its shorthand', async () => {
+  it('adds a medicine of the store from the quick line with its shorthand and stock', async () => {
+    rxWorld.medicines = [
+      {
+        id: 'med_glycolac000000000000',
+        name: 'Glycolac Cream',
+        composition: null,
+        stock: 4,
+      },
+    ];
     const { user, drawer } = await openNew();
     await user.click(within(drawer).getByTestId('rx-drawer-step-medicines-trigger'));
     const line = await within(drawer).findByRole('combobox', { name: 'Quick add' });
     await user.type(line, 'glyco 1-0-1 af 10d');
-    expect(drawer).toHaveTextContent('1-0-1');
+    expect(await screen.findByText(/4 in stock/)).toBeInTheDocument();
     await user.keyboard('{Enter}');
     expect(notifyMock.success).toHaveBeenCalledWith('Glycolac Cream added');
     const row = within(drawer).getAllByTestId('rx-items-row')[0] as HTMLElement;
@@ -249,67 +237,156 @@ describe('Prescription drawer (KICKOFF §6.6; S:35, 37)', () => {
     );
   });
 
-  it('saves and hands the prescription to a new medical sale (Save & sell)', async () => {
-    const { user, drawer, router } = await openNew();
-    await user.click(within(drawer).getByTestId('rx-drawer-quick-fill-pigmentation'));
-    await user.click(within(drawer).getByTestId('rx-drawer-save-and-add'));
-    await waitFor(() =>
-      expect(shownLocation(router).pathname).toBe(
-        '/organization/acme/medical/sales/create',
-      ),
+  it('shows the server’s field errors on the line it names and opens Medicines', async () => {
+    rxServerApi.createPrescription.mockRejectedValueOnce(
+      new HttpError('Invalid', 400, '/app/patients/…/prescriptions', 'POST', {
+        error: {
+          type: 'validation_error',
+          errors: [
+            { field: 'body.items/1/quantity', message: 'Too small: expected >=1' },
+          ],
+        },
+      }),
     );
-    const [saved] = dhartiRx();
-    expect(shownLocation(router).search).toEqual({
-      prescription: saved?.id,
-      from: `patients/${DHARTI}/prescriptions`,
-    });
-    // The Rx drawer closes; Prescriptions stays behind the sale (A-P1).
-    expect(router.state.location.pathname).toBe(url(''));
+    const { user, drawer } = await openNew(DRAFTER);
+    await user.click(
+      within(drawer).getByTestId(`rx-drawer-quick-fill-kit-${HAIR_FALL.id}`),
+    );
+    await user.click(within(drawer).getByTestId('rx-drawer-step-notes-trigger'));
+    await user.click(within(drawer).getByTestId('rx-drawer-save'));
+    await waitFor(() =>
+      expect(notifyMock.error).toHaveBeenCalledWith('Too small: expected >=1'),
+    );
+    expect(within(drawer).getByTestId('rx-drawer-step-medicines')).toHaveAttribute(
+      'data-status',
+      'open',
+    );
   });
 
-  it('edits a prescription, prints it, and saves “Prescription #497 saved”', async () => {
-    const user = userEvent.setup();
-    const { router } = renderPatientFile(url(`/${RX_497}/edit`), { role: 'doctor' });
-    const drawer = await screen.findByTestId('rx-drawer');
+  it('edits a draft, prints it and saves it with its updated_at, approving it', async () => {
+    const { user, drawer, router } = await openEdit();
     expect(within(drawer).getByTestId('rx-drawer-title')).toHaveTextContent(
       'Edit prescription',
     );
-    expect(within(drawer).getByTestId('rx-drawer-tag')).toHaveTextContent('#497');
+    expect(within(drawer).getByTestId('rx-drawer-tag')).toHaveTextContent('#500');
+    expect(within(drawer).getByTestId('rx-drawer-badges')).toHaveTextContent('Draft');
     await user.click(within(drawer).getByTestId('rx-drawer-quick-fill-print'));
     await waitFor(() => expect(printMock).toHaveBeenCalledTimes(1));
     await user.click(within(drawer).getByTestId('rx-drawer-save'));
     await waitFor(() =>
-      expect(notifyMock.success).toHaveBeenCalledWith('Prescription #497 saved'),
+      expect(notifyMock.success).toHaveBeenCalledWith('Prescription #500 approved'),
+    );
+    expect(rxServerApi.updatePrescription).toHaveBeenCalledWith(
+      expect.objectContaining({
+        prescriptionId: TEST_PRESCRIPTION_ID,
+        expectedUpdatedAt: '2026-10-01T05:00:00.000Z',
+      }),
     );
     await waitFor(() => expect(router.state.location.pathname).toBe(url('')));
   });
 
-  it('reads only for a member without the Rx gate (S:37)', async () => {
-    renderPatientFile(url(`/${RX_497}/edit`), { role: 'front_desk' });
-    const drawer = await screen.findByTestId('rx-drawer');
+  it('offers Reload when someone saved the draft meanwhile, and reads it again', async () => {
+    const { user, drawer } = await openEdit();
+    // Saved elsewhere since the drawer read it.
+    rxWorld.prescriptions = [
+      prescriptionRecord({ updatedAt: '2026-10-02T09:00:00.000Z' }),
+    ];
+    await user.click(within(drawer).getByTestId('rx-drawer-save'));
+    await waitFor(() => expect(notifyMock.error).toHaveBeenCalled());
+    const options = notifyMock.error.mock.lastCall?.[1] as {
+      action?: { label: string; onClick: () => void };
+    };
+    expect(options.action?.label).toBe('Reload');
+    rxServerApi.fetchPrescription.mockClear();
+    options.action?.onClick();
+    await waitFor(() => expect(rxServerApi.fetchPrescription).toHaveBeenCalled());
+    await user.click(within(drawer).getByTestId('rx-drawer-save'));
+    await waitFor(() =>
+      expect(notifyMock.success).toHaveBeenCalledWith('Prescription #500 approved'),
+    );
+  });
+
+  it('reads an approved prescription only — it can print, not change or go', async () => {
+    rxWorld.prescriptions = [prescriptionRecord({ status: 'approved' })];
+    const { drawer } = await openEdit();
+    expect(within(drawer).getByTestId('rx-drawer-approved')).toHaveTextContent(
+      'an approved prescription can’t be changed',
+    );
+    expect(within(drawer).getByTestId('rx-drawer-badges')).toHaveTextContent('Approved');
     expect(within(drawer).queryByTestId('rx-drawer-save')).not.toBeInTheDocument();
-    expect(within(drawer).queryByTestId('rx-drawer-quick-fill')).not.toBeInTheDocument();
+    expect(within(drawer).queryByTestId('rx-drawer-delete')).not.toBeInTheDocument();
+    expect(within(drawer).getByTestId('rx-drawer-quick-fill-print')).toBeInTheDocument();
+  });
+
+  it('reads only for a member without the Rx gate (S:37)', async () => {
+    const { drawer } = await openEdit({ role: 'front_desk' });
+    expect(within(drawer).queryByTestId('rx-drawer-save')).not.toBeInTheDocument();
     expect(within(drawer).getByTestId('rx-drawer-summary')).toHaveTextContent(
       'View only · your role can’t change this',
     );
   });
 
-  it('deletes a prescription with a reason, offering Undo', async () => {
-    const user = userEvent.setup();
-    const { router } = renderPatientFile(url(`/${RX_497}/edit`), { role: 'owner' });
-    const drawer = await screen.findByTestId('rx-drawer');
+  it('deletes a draft with a reason, offering Undo that restores it', async () => {
+    const { user, drawer, router } = await openEdit();
     await user.click(within(drawer).getByTestId('rx-drawer-delete'));
     const confirm = await screen.findByTestId('confirm-dialog');
-    expect(confirm).toHaveTextContent('Delete this prescription?');
     expect(within(confirm).getByTestId('confirm-record')).toHaveTextContent(
-      'Prescription #497',
+      'Prescription #500',
     );
     await user.click(within(confirm).getByTestId('confirm-reason-mistake'));
     await user.click(within(confirm).getByTestId('confirm-accept'));
     await waitFor(() => expect(router.state.location.pathname).toBe(url('')));
-    expect(dhartiRx()).toHaveLength(0);
+    expect(rxServerApi.deletePrescription).toHaveBeenCalledWith({
+      patientId: TEST_PATIENT_ID,
+      prescriptionId: TEST_PRESCRIPTION_ID,
+      reason: 'mistake',
+      note: null,
+    });
     expect(notifyMock.undo).toHaveBeenCalledWith('Prescription deleted', {
       onUndo: expect.any(Function),
     });
+    const [, { onUndo }] = notifyMock.undo.mock.lastCall as [
+      string,
+      { onUndo: () => void },
+    ];
+    onUndo();
+    await waitFor(() => expect(rxServerApi.restorePrescription).toHaveBeenCalled());
+    expect(rxWorld.prescriptions.map((prescription) => prescription.id)).toEqual([
+      TEST_PRESCRIPTION_ID,
+    ]);
+  });
+
+  it('in the visit flow: writes at the visit’s booking, approves and prints (L-64)', async () => {
+    const user = userEvent.setup();
+    const onClose = vi.fn();
+    renderPrescriptions(url(''), {
+      ui: (
+        <PrescriptionDrawer
+          prescription={null}
+          patient={{ id: TEST_PATIENT_ID, name: 'Priya Shah', seq: 3508 }}
+          history={[]}
+          catalog={undefined}
+          kits={[HAIR_FALL]}
+          defaultDoctorId={DOCTOR_NISHA.id}
+          access={{ writes: true, approves: true, deletes: false, sells: false }}
+          today="2026-10-03"
+          visit={{ appointmentId: 'appt_sana0000000000000000', fromToday: true }}
+          onClose={onClose}
+        />
+      ),
+    });
+    const drawer = await screen.findByTestId('rx-drawer');
+    const save = within(drawer).getByTestId('rx-drawer-save');
+    expect(save).toHaveTextContent('Approve · print · send to pharmacy');
+    await user.click(
+      within(drawer).getByTestId(`rx-drawer-quick-fill-kit-${HAIR_FALL.id}`),
+    );
+    await user.click(save);
+    await waitFor(() => expect(printMock).toHaveBeenCalledTimes(1));
+    expect(rxServerApi.createPrescription.mock.lastCall?.[0]).toMatchObject({
+      appointmentId: 'appt_sana0000000000000000',
+    });
+    expect(written()?.status).toBe('approved');
+    expect(onClose).toHaveBeenCalled();
   });
 });

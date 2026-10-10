@@ -1,161 +1,124 @@
-import { PATIENT_FILE_SECTIONS } from '@/shared/clinic/patient-file-sections.ts';
+import { z } from 'zod';
 
-import { compareText } from './clinic-fixture-store.ts';
-import { invoiceBalance } from './clinic-money.ts';
-import { clinicToday } from './clinic-time.ts';
-import type {
-  PatientFile,
-  PatientFileCounts,
-  PatientFileFeedback,
-  PatientNextVisit,
+import { api, type ApiData } from '@/core/http/api.ts';
+import { wireSchema } from '@/core/http/wire-schema.ts';
+
+import { CHECKIN_FEEL_VALUES, REVIEW_SOURCE_VALUES } from './clinic-schema.ts';
+import { fetchContact } from './contacts-api.ts';
+import {
+  PATIENT_LANGUAGE_TAGS,
+  type PatientFile,
+  type PatientFileFeedback,
+  type PatientLanguage,
+  type PatientNextVisit,
 } from './patient-file-contracts.ts';
 import { patientQueryKeys } from './patients-api.ts';
+import { patientWire, toPatientRecord } from './patients-contracts.ts';
 
 /*
- * The patient file's read (`getPatient` with its rail facts, `S:1629`), on the
- * fixture world until clinozy-be serves it — REPLACE_WITH_API (D6). The world
- * is imported on demand, so its seed data never lands in a route chunk.
+ * The patient file's read on clinozy-be (api-integration §5.4): the patient
+ * (`GET /app/patients/:patient_id`), then — at once — their person with every number
+ * (`GET /app/contacts/:contact_id`), the person's next booking from its preview
+ * (`…/preview`, which answers without the numbers — M46) and the newest check-in and review,
+ * whose totals the rail counts.
  */
 
 /**
- * TanStack Query keys for the file's read — under the patients' key, so every
- * patient write (the Edit drawer, a record saved from the file) refreshes it.
+ * TanStack Query keys for the file's read — under the patients' key, so every patient write
+ * (the Edit drawer, a record saved from the file) refreshes it.
  */
 export const patientFileQueryKeys = {
   all: [...patientQueryKeys.all, 'file'] as const,
-  detail: (patientId: string) => [...patientFileQueryKeys.all, patientId] as const,
+  detail: (organizationId: string | null, patientId: string) =>
+    [...patientFileQueryKeys.all, organizationId, patientId] as const,
 };
 
-const fixtureWorld = () => import('./fixtures/world.fixtures.ts');
-const threadFixtures = () => import('./fixtures/contact-threads.fixtures.ts');
-const fileFixtures = () => import('./fixtures/patient-file.fixtures.ts');
+type ApiPreview = NonNullable<ApiData<'/app/contacts/{contact_id}/preview', 'get'>>;
 
-type World = Awaited<ReturnType<typeof fixtureWorld>>['clinicFixtures'];
+const previewWire = wireSchema<ApiPreview>()(
+  z.object({
+    next_appointment: z
+      .object({
+        id: z.string(),
+        appointment_date: z.string(),
+        start_time: z.string(),
+        service_label: z.string(),
+      })
+      .nullable(),
+  }),
+);
 
-/** The statuses a visit still to come can have — not closed, not cancelled. */
-const UPCOMING = new Set(['scheduled', 'confirmed', 'checked_in']);
+const latestCheckInWire = z.object({
+  feel: z.enum(CHECKIN_FEEL_VALUES),
+  score: z.number().int(),
+});
 
-/** Their next visit: the earliest booking from today on that is still to happen. */
-function nextVisitOf(
-  world: World,
-  patientId: string,
-  today: string,
-): PatientNextVisit | null {
-  const [next] = world.appointments
-    .snapshot(
-      (appointment) =>
-        appointment.patientId === patientId &&
-        appointment.date >= today &&
-        UPCOMING.has(appointment.status),
-    )
-    .sort((a, b) => compareText(a.date, b.date) || compareText(a.startTime, b.startTime));
-  return next
-    ? {
-        appointmentId: next.id,
-        date: next.date,
-        startTime: next.startTime,
-        serviceLabel: next.serviceLabel,
-        durationMin: next.durationMin,
-      }
-    : null;
+const latestReviewWire = z.object({
+  source: z.enum(REVIEW_SOURCE_VALUES),
+  rating: z.number().int().nullable(),
+});
+
+/** The language a person asked for: their first language tag. */
+function languageOf(tags: readonly string[]): PatientLanguage | null {
+  return PATIENT_LANGUAGE_TAGS.find((language) => tags.includes(language)) ?? null;
 }
 
-/** What they owe across their open invoices (paise) and the oldest open invoice's date. */
-function duesOf(world: World, patientId: string) {
-  const payments = world.payments.snapshot();
-  let due = 0;
-  let since: string | null = null;
-  for (const invoice of world.invoices.snapshot((row) => row.patientId === patientId)) {
-    const balance = invoiceBalance(invoice, payments);
-    if (balance.due === 0) continue;
-    due += balance.due;
-    if (since === null || invoice.date < since) since = invoice.date;
-  }
-  return { due, since };
-}
-
-/** The latest check-in's feel and score, else the latest review, and the totals. */
-function feedbackOf(world: World, patientId: string): PatientFileFeedback {
-  const newest = <T extends { date: string; createdAt: string }>(rows: T[]) =>
-    [...rows].sort(
-      (a, b) => compareText(b.date, a.date) || compareText(b.createdAt, a.createdAt),
-    );
-  const checkIns = newest(world.checkIns.snapshot((row) => row.patientId === patientId));
-  const reviews = newest(world.reviews.snapshot((row) => row.patientId === patientId));
-  const [checkIn] = checkIns;
-  const [review] = reviews;
+/** The newest check-in and review, and how many of each there are. */
+async function feedbackOf(patientId: string): Promise<PatientFileFeedback> {
+  const [checkIns, reviews] = await Promise.all([
+    api.get('/app/patients/{patient_id}/check-ins', {
+      params: { patient_id: patientId },
+      query: { limit: 1, sort: 'check_in_date', order: 'desc' },
+    }),
+    api.get('/app/patients/{patient_id}/reviews', {
+      params: { patient_id: patientId },
+      query: { limit: 1, sort: 'review_date', order: 'desc' },
+    }),
+  ]);
+  const [checkIn] = z.array(latestCheckInWire).parse(checkIns.data ?? []);
+  const [review] = z.array(latestReviewWire).parse(reviews.data ?? []);
+  const total = (response: typeof checkIns | typeof reviews) =>
+    response.meta?.pagination?.estimated_total ?? response.data?.length ?? 0;
   return {
     feel: checkIn?.feel ?? null,
     score: checkIn?.score ?? null,
     review: review ? { source: review.source, rating: review.rating } : null,
-    checkIns: checkIns.length,
-    reviews: reviews.length,
+    checkIns: total(checkIns),
+    reviews: total(reviews),
   };
 }
 
-/** How many records each section holds; Overview and Clinical notes count none (never "Empty"). */
-function countsOf(world: World, patientId: string): PatientFileCounts {
-  const mine = (row: { patientId: string | null }) => row.patientId === patientId;
-  const counts = Object.fromEntries(
-    PATIENT_FILE_SECTIONS.map((section) => [section, 0]),
-  ) as PatientFileCounts;
-  counts.visits = world.appointments.snapshot(mine).length;
-  counts.prescriptions = world.prescriptions.snapshot(mine).length;
-  counts.treatments = world.treatments.snapshot(mine).length;
-  counts.images = world.patientImages.snapshot(mine).length;
-  counts.reports = world.patientReports.snapshot(mine).length;
-  counts.invoices = world.invoices.snapshot(mine).length;
-  counts.payments = world.payments.snapshot(mine).length;
-  counts.packages = world.patientPackages.snapshot(mine).length;
-  counts.notes = world.patientNotes.snapshot(mine).length;
-  return counts;
-}
-
 /**
- * One patient's file (`getPatient`, `S:1629`; REPLACE_WITH_API): the record
- * and the rail facts — a 404 when the patient is unknown or deleted. Their
- * thread is the one the chat column reads (their lead, or the contact thread
- * their first message opened, Q-F6).
+ * One patient's file: the record with their person, and the rail's facts — a 404 when the
+ * patient is gone or in a branch the member cannot see.
  */
 export async function fetchPatientFile(patientId: string): Promise<PatientFile> {
-  const [
-    { clinicFixtures: world },
-    { findPersonThread },
-    { patientInstagram, patientLanguage },
-  ] = await Promise.all([fixtureWorld(), threadFixtures(), fileFixtures()]);
-  const patient = await world.patients.get(patientId);
-  const lead = patient.leadId
-    ? (world.leads.snapshot((row) => row.id === patient.leadId)[0] ?? null)
-    : null;
-  const thread = findPersonThread(world.leads.snapshot(), {
-    leadId: null,
-    patientId,
-    phone: null,
+  const response = await api.get('/app/patients/{patient_id}', {
+    params: { patient_id: patientId },
   });
-  const { due, since } = duesOf(world, patientId);
-  const credits = world.pendingCredits.snapshot(
-    (row) =>
-      row.patientId === patientId && row.direction === 'give' && row.status === 'open',
-  );
+  const patient = patientWire.parse(response.data);
+  const [person, preview, feedback] = await Promise.all([
+    fetchContact(patient.contact_id),
+    api.get('/app/contacts/{contact_id}/preview', {
+      params: { contact_id: patient.contact_id },
+    }),
+    feedbackOf(patientId),
+  ]);
+  const next = previewWire.parse(preview.data).next_appointment;
+  const nextVisit: PatientNextVisit | null = next
+    ? {
+        appointmentId: next.id,
+        date: next.appointment_date,
+        startTime: next.start_time.slice(0, 5),
+        serviceLabel: next.service_label,
+      }
+    : null;
   return {
-    patient,
-    leadPhone:
-      lead && lead.phone !== patient.phone && lead.phone !== patient.phone2
-        ? lead.phone
-        : null,
-    instagram: patientInstagram(patient.seq),
-    language: patientLanguage(patient.seq),
-    nextVisit: nextVisitOf(world, patientId, clinicToday()),
-    due,
-    dueSince: since,
-    credit: credits.length
-      ? {
-          amount: credits.reduce((sum, row) => sum + row.amount, 0),
-          reasons: credits.map((row) => row.reason),
-        }
-      : null,
-    feedback: feedbackOf(world, patientId),
-    counts: countsOf(world, patientId),
-    unread: thread?.unreadCount ?? 0,
+    patient: toPatientRecord(patient, person),
+    instagram: person.instagramHandles[0] ?? null,
+    language: languageOf(person.preferenceTags),
+    nextVisit,
+    feedback,
+    awaitingReply: person.isAwaitingReply,
   };
 }

@@ -7,6 +7,7 @@ import { feedbackQueryKeys, fetchReview } from '@/shared/api/clinic/feedback-api
 import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDialogRouteRecord } from '@/shared/hooks/useDialogRouteRecord/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 import { PATIENT_FILE_SECTION_PAGES } from '../../../patient-id.sections.ts';
 import {
@@ -31,10 +32,11 @@ export function EditReviewPage() {
   const access = useClinicAccess();
   const canEdit = access.isResolved ? access.can('patients', 'edit') : undefined;
   const { behind, back } = usePatientFileDialog({ canOpen: canEdit });
+  const organizationId = useOrganizationStore((state) => state.organizationId);
   const { record } = useDialogRouteRecord({
     id: reviewId,
-    queryKey: feedbackQueryKeys.review,
-    fetchRecord: fetchReview,
+    queryKey: (id) => feedbackQueryKeys.review(organizationId, id),
+    fetchRecord: (id) => fetchReview(patientId, id),
     recordLabel: t(REVIEW_KEYS.record),
     onMissing: back,
   });

@@ -1,93 +1,93 @@
 import { describe, expect, it } from 'vitest';
 
-import type {
-  PatientPhoto,
-  PatientPhotoVisit,
-} from '@/shared/api/clinic/patient-images-api.ts';
+import { appointmentRow } from '@/tests/utils/appointment-doubles.ts';
 
-import { photoAt, photoDays, photosInView, visitsWithPhotos } from './photo-view.ts';
+import {
+  PHOTO_PATIENT_ID,
+  photoDouble,
+} from '../__tests__/integration/photo-api-double.ts';
+import {
+  photoAt,
+  photoDays,
+  photoListParamsOf,
+  photoMatchesVisit,
+  photoVisitsOf,
+} from './photo-view.ts';
 
-const VISIT: PatientPhotoVisit = {
-  appointmentId: '00000000-0000-4000-8000-000000002790',
-  seq: 2790,
-  date: '2026-09-24',
-  serviceLabel: 'Hydrafacial',
-  status: 'completed',
-};
+const VISIT = 'appt_hydra000000000000000';
 
-function photo(id: string, fields: Partial<PatientPhoto> = {}): PatientPhoto {
-  return {
-    id,
-    organizationId: 'org',
-    createdAt: '2026-09-24T06:30:00.000Z',
-    updatedAt: '2026-09-24T06:30:00.000Z',
-    createdById: 'user',
-    deletedAt: null,
-    deleteReason: null,
-    deleteNote: null,
-    patientId: 'patient',
-    appointmentId: null,
-    album: 'general',
-    fileUrl: 'https://files.example/a.jpg',
-    fileName: id,
-    bodyPart: null,
-    takenOn: '2026-09-24',
-    caption: null,
-    visit: null,
-    ...fields,
-  };
-}
+describe('photo-view', () => {
+  it('reads an album a page of 12 at a time, under the visit filter when there is one', () => {
+    expect(photoListParamsOf('general', undefined)).toEqual({
+      album: 'general',
+      limit: 12,
+    });
+    expect(photoListParamsOf('lhr', 'none')).toEqual({
+      album: 'lhr',
+      appointmentId: 'none',
+      limit: 12,
+    });
+  });
 
-const FILED = { appointmentId: VISIT.appointmentId, visit: VISIT };
-const PHOTOS = [
-  photo('a', FILED),
-  photo('b', { ...FILED, album: 'lhr' }),
-  photo('c', { takenOn: '2026-09-20' }),
-  photo('d', { ...FILED, takenOn: '2026-09-20' }),
-];
+  it('says whether the visit filter keeps a photo', () => {
+    const filed = photoDouble({ appointmentId: VISIT });
+    const loose = photoDouble();
+    expect(photoMatchesVisit(filed, undefined)).toBe(true);
+    expect(photoMatchesVisit(loose, 'none')).toBe(true);
+    expect(photoMatchesVisit(filed, 'none')).toBe(false);
+    expect(photoMatchesVisit(filed, VISIT)).toBe(true);
+    expect(photoMatchesVisit(loose, VISIT)).toBe(false);
+  });
 
-describe('photosInView', () => {
-  it('keeps an album’s photos, all of them, those under no visit, or one visit’s', () => {
-    expect(photosInView(PHOTOS, 'general', undefined).map((p) => p.id)).toEqual([
-      'a',
-      'c',
-      'd',
+  it('groups the photos by day in the read’s order, with the first one’s service', () => {
+    const days = photoDays([
+      photoDouble({ id: 'a', takenOn: '2026-09-24', serviceLabel: 'Hydrafacial' }),
+      photoDouble({ id: 'b', takenOn: '2026-09-24' }),
+      photoDouble({ id: 'c', takenOn: '2026-09-20' }),
     ]);
-    expect(photosInView(PHOTOS, 'general', 'none').map((p) => p.id)).toEqual(['c']);
-    expect(photosInView(PHOTOS, 'general', VISIT.appointmentId).map((p) => p.id)).toEqual(
-      ['a', 'd'],
+    expect(days.map((day) => [day.date, day.photos.map((photo) => photo.id)])).toEqual([
+      ['2026-09-24', ['a', 'b']],
+      ['2026-09-20', ['c']],
+    ]);
+    expect(days[0]?.serviceLabel).toBe('Hydrafacial');
+    expect(days[1]?.serviceLabel).toBeNull();
+  });
+
+  it('offers the patient’s checked-in and completed visits, latest first', () => {
+    const own = { patientId: PHOTO_PATIENT_ID };
+    const visits = photoVisitsOf(
+      [
+        appointmentRow({ ...own, id: 'appt_a', date: '2026-09-20', status: 'completed' }),
+        appointmentRow({
+          ...own,
+          id: 'appt_b',
+          date: '2026-09-24',
+          status: 'checked_in',
+        }),
+        appointmentRow({ ...own, id: 'appt_c', date: '2026-09-28', status: 'scheduled' }),
+        appointmentRow({ ...own, id: 'appt_d', date: '2026-09-22', status: 'cancelled' }),
+        appointmentRow({ id: 'appt_e', date: '2026-09-25', status: 'completed' }),
+      ],
+      PHOTO_PATIENT_ID,
     );
-    expect(photosInView(PHOTOS, 'private', undefined)).toEqual([]);
+    expect(visits.map((visit) => visit.appointmentId)).toEqual(['appt_b', 'appt_a']);
+    expect(visits[0]).toEqual({
+      appointmentId: 'appt_b',
+      seq: 2861,
+      date: '2026-09-24',
+      serviceLabel: 'Consultation',
+      status: 'checked_in',
+    });
   });
-});
 
-describe('photoDays', () => {
-  it('groups photos by the day they were taken, with the first one’s visit', () => {
-    const days = photoDays(photosInView(PHOTOS, 'general', undefined));
-    expect(days.map((day) => [day.date, day.photos.map((p) => p.id)])).toEqual([
-      ['2026-09-24', ['a']],
-      ['2026-09-20', ['c', 'd']],
-    ]);
-    expect(days[0]?.visit).toBe(VISIT);
-    expect(days[1]?.visit).toBeNull();
-  });
-});
-
-describe('visitsWithPhotos', () => {
-  it('offers the visits that hold a photo, with their counts', () => {
-    const other = { ...VISIT, appointmentId: 'other', seq: 2800 };
-    expect(visitsWithPhotos([other, VISIT], PHOTOS)).toEqual([
-      { visit: VISIT, count: 3 },
-    ]);
-  });
-});
-
-describe('photoAt', () => {
-  it('steps through the list, wrapping at both ends', () => {
-    const list = photosInView(PHOTOS, 'general', undefined);
-    expect(photoAt(list, 'a', 1)?.id).toBe('c');
-    expect(photoAt(list, 'd', 1)?.id).toBe('a');
-    expect(photoAt(list, 'a', -1)?.id).toBe('d');
-    expect(photoAt(list, 'missing', 1)).toBeNull();
+  it('steps through the photos read, wrapping only once every page is read', () => {
+    const list = ['a', 'b', 'c'].map((id) => photoDouble({ id }));
+    expect(photoAt(list, 'b', 1, false)?.id).toBe('c');
+    expect(photoAt(list, 'b', -1, false)?.id).toBe('a');
+    expect(photoAt(list, 'c', 1, false)).toBeNull();
+    expect(photoAt(list, 'a', -1, false)).toBeNull();
+    expect(photoAt(list, 'c', 1, true)?.id).toBe('a');
+    expect(photoAt(list, 'a', -1, true)?.id).toBe('c');
+    expect(photoAt(list, 'missing', 1, true)).toBeNull();
   });
 });

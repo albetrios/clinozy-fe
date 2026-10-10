@@ -136,7 +136,8 @@ describe('useClinicAccess', () => {
 
 describe('useClinicAccess — the staff profile’s roles (L-31)', () => {
   it('takes the signed-in member’s clinic roles from their staff profile', async () => {
-    signIn('farah@cresence.skin', VIEWER_CODES);
+    // Patients answers from the member's codes (it is on the API); the rest from the matrix.
+    signIn('farah@cresence.skin', [...VIEWER_CODES, 'patient:read']);
     const { result } = renderAccess();
     await waitFor(() => expect(result.current.isResolved).toBe(true));
     expect(result.current.roles).toEqual(['pharmacist']);

@@ -1,80 +1,142 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import type * as PackagesApiModule from '@/shared/api/clinic/patient-packages-api.ts';
+import type { PatientPackageRow } from '@/shared/api/clinic/patient-packages-contracts.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+
+vi.mock('@/shared/notify/index.ts', () => ({
+  notify: { success: vi.fn(), error: vi.fn(), info: vi.fn(), undo: vi.fn() },
+}));
+
+/** The patient's packages on the "server": a PATCH changes the row and its `updated_at`. */
+const server = vi.hoisted(() => ({ rows: [] as PatientPackageRow[] }));
+vi.mock('@/shared/api/clinic/patient-packages-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof PackagesApiModule>()),
+  listPatientPackages: vi.fn(async () => structuredClone(server.rows)),
+  listPatientPurchases: vi.fn(async () =>
+    server.rows.map((row) => ({ ...row, isPackage: true })),
+  ),
+  updatePatientPackage: vi.fn(
+    async ({
+      packageId,
+      change,
+    }: Parameters<typeof PackagesApiModule.updatePatientPackage>[0]) => {
+      server.rows = server.rows.map((row) =>
+        row.id === packageId
+          ? { ...row, ...change, updatedAt: '2026-10-11T00:00:00.000Z' }
+          : row,
+      );
+      return structuredClone(server.rows.find((row) => row.id === packageId)!);
+    },
+  ),
+}));
 
 import {
-  useAddPatientPackage,
-  useConsumePackageSession,
-  usePackageOfferings,
+  listPatientPackages,
+  listPatientPurchases,
+  updatePatientPackage,
+} from '@/shared/api/clinic/patient-packages-api.ts';
+
+import {
   usePatientPackages,
+  usePatientPurchases,
+  useUpdatePatientPackage,
 } from './usePatientPackages.ts';
 
-const DHARTI = patientRef('Dharti Galani');
-let client: QueryClient;
+const PATIENT = 'pat_priti000000000000000';
+const LHR: PatientPackageRow = {
+  id: 'poff_lhr0000000000000000000',
+  offeringId: 'off_lhr00000000000000000000',
+  name: 'LHR Full Face',
+  sessionsTotal: 7,
+  sessionsUsed: 1,
+  sessionsLeft: 6,
+  status: 'active',
+  validUntil: '2027-10-10',
+  invoiceId: 'invc_one0000000000000000000',
+  createdAt: '2026-10-10T01:48:09.406Z',
+  updatedAt: '2026-10-10T01:48:09.406Z',
+};
 
+let client: QueryClient;
 function wrapper({ children }: { children: ReactNode }) {
   return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
 }
 
 beforeEach(() => {
-  resetClinicFixtures();
+  signInTestMember();
+  server.rows = [LHR];
   client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
 });
 afterEach(() => {
   client.clear();
-  resetClinicFixtures();
+  vi.resetAllMocks();
 });
 
 describe('usePatientPackages', () => {
-  it('adds a package from a multi-session offering and refreshes the list', async () => {
+  it('reads the patient’s packages', async () => {
+    const { result } = renderHook(() => usePatientPackages(PATIENT), { wrapper });
+    await waitFor(() => expect(result.current.data).toEqual([LHR]));
+    expect(listPatientPackages).toHaveBeenCalledWith(PATIENT);
+  });
+
+  it('stays idle without a patient, an organization or when not enabled', () => {
     const { result } = renderHook(
       () => ({
-        list: usePatientPackages(DHARTI),
-        offerings: usePackageOfferings(),
-        add: useAddPatientPackage(),
+        none: usePatientPackages(''),
+        off: usePatientPackages(PATIENT, { enabled: false }),
+        purchases: usePatientPurchases(null),
       }),
       { wrapper },
     );
-    await waitFor(() => expect(result.current.list.data).toHaveLength(2));
-    await waitFor(() => expect(result.current.offerings.data?.length).toBeGreaterThan(0));
-    const offeringId = result.current.offerings.data?.[0]?.id ?? '';
-    await act(() => result.current.add.mutateAsync({ patientId: DHARTI, offeringId }));
-    await waitFor(() => expect(result.current.list.data).toHaveLength(3));
-    expect(result.current.list.data?.filter((row) => !row.invoiced)).toHaveLength(1);
-  });
-
-  it('stays idle without a patient', () => {
-    const { result } = renderHook(() => usePatientPackages(''), { wrapper });
-    expect(result.current.fetchStatus).toBe('idle');
+    expect(result.current.none.fetchStatus).toBe('idle');
+    expect(result.current.off.fetchStatus).toBe('idle');
+    expect(result.current.purchases.fetchStatus).toBe('idle');
+    useOrganizationStore.getState().clearOrganization();
+    const { result: orphan } = renderHook(() => usePatientPackages(PATIENT), { wrapper });
+    expect(orphan.current.fetchStatus).toBe('idle');
   });
 });
 
-describe('useConsumePackageSession', () => {
-  it('uses a session by hand, and refuses one when none is left', async () => {
-    const lhr = ref.patientPackage(1);
+describe('usePatientPurchases', () => {
+  it('reads the last purchases', async () => {
+    const { result } = renderHook(() => usePatientPurchases(PATIENT), { wrapper });
+    await waitFor(() => expect(result.current.data).toHaveLength(1));
+    expect(listPatientPurchases).toHaveBeenCalledWith(PATIENT);
+  });
+});
+
+describe('useUpdatePatientPackage', () => {
+  it('saves a change with the package’s `updated_at` and refreshes the packages and purchases', async () => {
     const { result } = renderHook(
-      () => ({ list: usePatientPackages(DHARTI), use: useConsumePackageSession() }),
+      () => ({
+        packages: usePatientPackages(PATIENT),
+        purchases: usePatientPurchases(PATIENT),
+        update: useUpdatePatientPackage(),
+      }),
       { wrapper },
     );
-    await waitFor(() => expect(result.current.list.data).toHaveLength(2));
-    const saved = await act(() => result.current.use.mutateAsync(lhr));
-    expect(saved).toMatchObject({ sessionsUsed: 2, sessionsTotal: 7 });
-    await waitFor(() =>
-      expect(
-        result.current.list.data?.find((row) => row.package.id === lhr)?.package
-          .sessionsUsed,
-      ).toBe(2),
+    await waitFor(() => expect(result.current.packages.isSuccess).toBe(true));
+    await waitFor(() => expect(result.current.purchases.isSuccess).toBe(true));
+    await act(() =>
+      result.current.update.mutateAsync({
+        patientId: PATIENT,
+        row: LHR,
+        change: { sessionsTotal: 8 },
+      }),
     );
-    for (let used = 2; used < 7; used += 1) {
-      await act(() => result.current.use.mutateAsync(lhr));
-    }
-    await expect(result.current.use.mutateAsync(lhr)).rejects.toMatchObject({
-      status: 409,
+    expect(updatePatientPackage).toHaveBeenCalledWith({
+      patientId: PATIENT,
+      packageId: LHR.id,
+      change: { sessionsTotal: 8 },
+      expectedUpdatedAt: LHR.updatedAt,
+      idempotencyKey: expect.any(String),
     });
+    await waitFor(() => expect(result.current.packages.data?.[0]?.sessionsTotal).toBe(8));
+    await waitFor(() => expect(listPatientPurchases).toHaveBeenCalledTimes(2));
   });
 });

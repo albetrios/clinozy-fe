@@ -15,22 +15,24 @@ import { defaultParseSearch, defaultStringifySearch } from '@tanstack/react-rout
  */
 
 /**
- * A patient-file section: `patients/<uuid>/<section>`. A literal on purpose (the
- * security lint forbids built RegExps); a test pins its sections to the file's
- * (`PATIENT_FILE_SECTIONS`, `patient-file-sections.ts`).
+ * A patient-file section: `patients/<patient id>/<section>` — a clinozy-be patient (`pat_…`),
+ * or a fixture patient (a UUID) while the file's Invoices and Payments sections still read the
+ * fixture world (Payments, api-integration §5.7). A literal on purpose (the security lint forbids
+ * built RegExps); a test pins its sections to the file's (`PATIENT_FILE_SECTIONS`,
+ * `patient-file-sections.ts`).
  */
 export const PATIENT_FILE_REFERRER =
-  /^patients\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/(?:timeline|overview|visits|prescriptions|treatments|images|reports|invoices|payments|packages|notes)$/;
+  /^patients\/(?:pat_[a-z0-9]{21}|[0-9a-f-]{36})\/(?:timeline|overview|visits|prescriptions|treatments|images|reports|invoices|payments|packages|notes)$/;
 
 /**
- * The patient's visit flow — `patients/<uuid>/timeline?visit=open`, with
+ * The patient's visit flow — `patients/<patient id>/timeline?visit=open`, with
  * `&from=today` when Today's card opened it (KICKOFF §6.6, L-64): the one
  * referrer that carries a query, so a drawer the flow opens in another room
  * (the Rx drawer's "Save & sell") closes back into the flow. Built by
  * {@link visitFlowReferrer}.
  */
 const VISIT_FLOW_REFERRER =
-  /^patients\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/timeline\?visit=open(?:&from=today)?$/;
+  /^patients\/pat_[a-z0-9]{21}\/timeline\?visit=open(?:&from=today)?$/;
 
 const REFERRER_PATTERNS: readonly RegExp[] = [
   /^today$/,

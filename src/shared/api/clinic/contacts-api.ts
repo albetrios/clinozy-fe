@@ -6,10 +6,12 @@ import {
   type Contact,
   contactBodyOf,
   type ContactFields,
+  type ContactProfile,
   contactRowWire,
   type ContactSummary,
   contactWire,
   toContact,
+  toContactProfile,
   toContactSummary,
 } from './contacts-contracts.ts';
 
@@ -42,8 +44,6 @@ export async function fetchContact(contactId: string): Promise<Contact> {
 
 async function listContacts(query: {
   q?: string;
-  phone?: string;
-  ids?: string;
   limit: number;
 }): Promise<ContactSummary[]> {
   const response = await api.get('/app/contacts', { query });
@@ -51,6 +51,42 @@ async function listContacts(query: {
     .array(contactRowWire)
     .parse(response.data ?? [])
     .map(toContactSummary);
+}
+
+/** The most ids one `GET /app/contacts?ids=` takes (CT12). */
+const IDS_PER_READ = 100;
+
+/**
+ * The people behind a page of records that point at them (`contact_id`) — a patients page's
+ * names, numbers and birth dates — by id; an id the API does not answer for is left out.
+ */
+export async function fetchContactsByIds(
+  ids: readonly string[],
+): Promise<Map<string, ContactSummary & ContactProfile>> {
+  const unique = [...new Set(ids)];
+  const people = new Map<string, ContactSummary & ContactProfile>();
+  for (let start = 0; start < unique.length; start += IDS_PER_READ) {
+    const chunk = unique.slice(start, start + IDS_PER_READ);
+    const response = await api.get('/app/contacts', {
+      query: { ids: chunk.join(','), limit: chunk.length },
+    });
+    for (const row of z.array(contactRowWire).parse(response.data ?? [])) {
+      people.set(row.id, { ...toContactSummary(row), ...toContactProfile(row) });
+    }
+  }
+  return people;
+}
+
+/**
+ * The person on a number (E.164), if the clinic knows one, with their file's number — the
+ * patient drawer's duplicate check.
+ */
+export async function findContactByPhone(
+  phone: string,
+): Promise<(ContactSummary & ContactProfile) | null> {
+  const response = await api.get('/app/contacts', { query: { phone, limit: 1 } });
+  const [row] = z.array(contactRowWire).parse(response.data ?? []);
+  return row ? { ...toContactSummary(row), ...toContactProfile(row) } : null;
 }
 
 /** A whole contact number: "C-12345", "c12345", "#12345". */

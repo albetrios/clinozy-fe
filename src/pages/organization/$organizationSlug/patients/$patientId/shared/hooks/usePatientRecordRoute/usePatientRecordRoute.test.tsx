@@ -2,7 +2,8 @@ import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { clinicHttpError } from '@/shared/api/clinic/clinic-fixture-store.ts';
+import { HttpError } from '@/shared/errors/HttpError.ts';
+import { patientFile, TEST_PATIENT_ID } from '@/tests/utils/patient-doubles.ts';
 
 import {
   patientFileUrl,
@@ -16,11 +17,26 @@ const { notifyMock } = vi.hoisted(() => ({
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 
-const RECORDS: Record<string, { name: string }> = { r1: { name: 'CBC report' } };
+/** The report on file, by its public id. */
+const REPORT = 'rep_cbc000000000000000000';
+/** A report id the API answers 404 for — gone, or never there. */
+const GONE = 'rep_gone00000000000000000';
+
+const RECORDS: Record<string, { name: string }> = { [REPORT]: { name: 'CBC report' } };
 
 async function fetchRecord(id: string) {
   const record = RECORDS[id];
-  if (!record) throw clinicHttpError(404, 'not_found', 'Report not found');
+  if (!record) {
+    throw new HttpError(
+      'Not Found',
+      404,
+      `/app/patients/${TEST_PATIENT_ID}/reports/${id}`,
+      'GET',
+      {
+        error: { type: 'request_error', code: 'not_found', detail: 'Report not found' },
+      },
+    );
+  }
   return record;
 }
 
@@ -45,10 +61,13 @@ function Probe({ id, canCreate }: { id?: string; canCreate: boolean | undefined 
   );
 }
 
-const reports = (rest = '') => patientFileUrl('patient', `/reports${rest}`);
+const reports = (rest = '') => patientFileUrl(TEST_PATIENT_ID, `/reports${rest}`);
 
 function renderAt(rest: string, props: { id?: string; canCreate: boolean | undefined }) {
-  const view = renderInPatientFile(<Probe {...props} />, { section: 'reports' });
+  const view = renderInPatientFile(<Probe {...props} />, {
+    file: patientFile(),
+    section: 'reports',
+  });
   act(() => view.router.history.push(reports(rest)));
   return view;
 }
@@ -87,7 +106,7 @@ describe('usePatientRecordRoute', () => {
   });
 
   it('opens a record as a view', async () => {
-    renderAt('/r1', { id: 'r1', canCreate: false });
+    renderAt(`/${REPORT}`, { id: REPORT, canCreate: false });
     await waitFor(() =>
       expect(screen.getByTestId('record')).toHaveTextContent('CBC report'),
     );
@@ -95,7 +114,7 @@ describe('usePatientRecordRoute', () => {
   });
 
   it('opens a record as an edit under `/edit`', async () => {
-    renderAt('/r1/edit', { id: 'r1', canCreate: false });
+    renderAt(`/${REPORT}/edit`, { id: REPORT, canCreate: false });
     await waitFor(() => expect(screen.getByTestId('mode')).toHaveTextContent('edit'));
     await waitFor(() =>
       expect(screen.getByTestId('record')).toHaveTextContent('CBC report'),
@@ -104,14 +123,14 @@ describe('usePatientRecordRoute', () => {
 
   it('closes back to the section, keeping no dialog in the URL', async () => {
     const user = userEvent.setup();
-    const { router } = renderAt('/r1', { id: 'r1', canCreate: true });
+    const { router } = renderAt(`/${REPORT}`, { id: REPORT, canCreate: true });
     await waitFor(() => expect(screen.getByTestId('mode')).toHaveTextContent('view'));
     await user.click(screen.getByRole('button', { name: 'Close' }));
     await waitFor(() => expect(router.state.location.pathname).toBe(reports()));
   });
 
   it('goes back with "Report not found" for an id that names nothing', async () => {
-    const { router } = renderAt('/gone', { id: 'gone', canCreate: true });
+    const { router } = renderAt(`/${GONE}`, { id: GONE, canCreate: true });
     await waitFor(() => expect(router.state.location.pathname).toBe(reports()));
     expect(notifyMock.info).toHaveBeenCalledWith(
       'Report not found · it may have been deleted',

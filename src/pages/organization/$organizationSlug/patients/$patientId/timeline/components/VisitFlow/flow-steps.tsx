@@ -1,62 +1,76 @@
 import { useTranslation } from 'react-i18next';
 
-import { occurrenceKeys } from '@/lib/occurrence-keys.ts';
+import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { cn } from '@/lib/utils.ts';
-import {
-  VISIT_CHECKS,
-  VISIT_PAYMENT_MODES,
-  type VisitDetail,
-  type VisitPaymentMode,
-  type VisitRecord,
-  type VisitRxKit,
-} from '@/shared/api/clinic/visits-contracts.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import type { PrescriptionKit } from '@/shared/api/clinic/prescriptions-contracts.ts';
+import { VISIT_CHECKS, type VisitChecks } from '@/shared/api/clinic/visits-contracts.ts';
+import { TONE_CLASSES, toneForLabel } from '@/shared/clinic/clinic-tones.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { WhatsAppMark } from '@/shared/icons/index.ts';
 
-import type { VisitFlowActions } from './use-visit-flow.ts';
+import type { VisitFlowActions, VisitFlowRecords } from './use-visit-flow.ts';
 import {
   VISIT_FLOW_KEYS,
   VISIT_FLOW_NS,
   VISIT_FLOW_TEST_IDS,
+  type VisitFlowStep,
 } from './visit-flow.constants.ts';
-import { DARK_BUTTON, OUTLINE_BUTTON } from './visit-flow.ts';
+import { nextSessionNumber, OUTLINE_BUTTON } from './visit-flow.ts';
 
 const K = VISIT_FLOW_KEYS;
 const ids = VISIT_FLOW_TEST_IDS;
 
-/** Each collect mode's tone (H:766): UPI sage, Cash butter, Card sky. */
-const MODE_TONES = { upi: 'sage', cash: 'butter', card: 'sky' } as const;
-
-/** Each mode's button under the pointer: its tone at 80%. */
-const MODE_PRESS = {
-  upi: 'hover:bg-tone-sage/80',
-  cash: 'hover:bg-tone-butter/80',
-  card: 'hover:bg-tone-sky/80',
-} as const;
-
-/** Step 1 (H:762): the three safety checks, each a tile that ticks. */
-export function ChecksStep({
-  visit,
-  onToggle,
+/** A step whose read failed: its Retry, in place of its controls. */
+export function StepRetry({
+  step,
+  onRetry,
 }: {
-  visit: VisitRecord;
-  onToggle: VisitFlowActions['toggleCheck'];
+  step: VisitFlowStep;
+  onRetry: () => void;
+}) {
+  const { t } = useTranslation(ERRORS_NS);
+  return (
+    <div>
+      <Button
+        type="button"
+        {...OUTLINE_BUTTON}
+        onClick={onRetry}
+        data-testid={ids.retry(step)}
+      >
+        {t(ERRORS_KEYS.widget.retry)}
+      </Button>
+    </div>
+  );
+}
+
+/**
+ * Step 1 (H:762): the three safety checks, each a tile that ticks — read-only for a member who
+ * may not write the patient's clinical record, waiting while its write is in flight.
+ */
+export function ChecksStep({
+  checks,
+  actions,
+}: {
+  checks: VisitChecks;
+  actions: Pick<VisitFlowActions, 'toggleCheck' | 'checkSaving'>;
 }) {
   const { t } = useTranslation(VISIT_FLOW_NS);
+  const { toggleCheck, checkSaving } = actions;
   return (
     <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-2">
       {VISIT_CHECKS.map((check) => {
-        const on = visit.checks[check];
+        const on = checks[check] !== null;
+        const saving = checkSaving(check);
         return (
           <button // NOSONAR(S6819): styled-button checkbox; a native checkbox input cannot hold this two-line tile
             key={check}
             type="button"
             role="checkbox"
             aria-checked={on}
-            onClick={() => onToggle(check)}
+            aria-busy={saving || undefined}
+            disabled={!toggleCheck || saving}
+            onClick={() => toggleCheck?.(check)}
             data-testid={ids.check(check)}
-            className="bg-canvas hover:bg-muted flex items-center gap-2.5 rounded-xl border px-3 py-2.5 text-start"
+            className="bg-canvas hover:bg-muted disabled:hover:bg-canvas flex items-center gap-2.5 rounded-xl border px-3 py-2.5 text-start disabled:cursor-default"
           >
             <span
               aria-hidden="true"
@@ -84,13 +98,13 @@ export function ChecksStep({
   );
 }
 
-/** Step 2 (H:763): the one-tap kits and "Write prescription". */
+/** Step 2 (H:763): the member's one-tap kits and "Write prescription". */
 export function RxStep({
   kits,
   actions,
 }: {
-  kits: readonly VisitRxKit[];
-  actions: VisitFlowActions;
+  kits: readonly PrescriptionKit[];
+  actions: Pick<VisitFlowActions, 'prescribeKit' | 'writeRx'>;
 }) {
   const { t } = useTranslation(VISIT_FLOW_NS);
   const { prescribeKit, writeRx } = actions;
@@ -98,25 +112,23 @@ export function RxStep({
   return (
     <div className="flex flex-wrap items-center gap-1.5">
       {prescribeKit
-        ? kits.map((kit) => {
-            const tone = TONE_CLASSES[kit.tone];
-            return (
-              <button
-                key={kit.key}
-                type="button"
-                onClick={() => prescribeKit(kit)}
-                data-testid={ids.kit}
-                data-kit={kit.key}
-                data-slot="pill"
-                className={cn(
-                  'h-6 rounded-full border border-dashed border-current px-2.5 text-xs font-medium whitespace-nowrap',
-                  tone.surface,
-                )}
-              >
-                {t(K.rx.kit, { name: kit.name })}
-              </button>
-            );
-          })
+        ? kits.map((kit) => (
+            <button
+              key={kit.id}
+              type="button"
+              onClick={() => prescribeKit(kit)}
+              data-testid={ids.kit}
+              data-kit={kit.id}
+              data-slot="pill"
+              className={cn(
+                'h-6 rounded-full border border-dashed border-current px-2.5 text-xs font-medium whitespace-nowrap',
+                // A kit has no tone of its own on the API: its name picks one.
+                TONE_CLASSES[toneForLabel(kit.name)].surface,
+              )}
+            >
+              {t(K.rx.kit, { name: kit.name })}
+            </button>
+          ))
         : null}
       {writeRx ? (
         <Button
@@ -134,18 +146,22 @@ export function RxStep({
 
 /** Step 3 (H:764): "⚡ Repeat · …", "New treatment", the remembered settings and the package pill. */
 export function TreatmentStep({
-  detail,
+  records,
   memo,
   actions,
 }: {
-  detail: VisitDetail | undefined;
+  records: Pick<VisitFlowRecords, 'lastTreatment' | 'pack'>;
   memo: string;
-  actions: VisitFlowActions;
+  actions: Pick<VisitFlowActions, 'repeatTreatment' | 'newTreatment'>;
 }) {
   const { t } = useTranslation(VISIT_FLOW_NS);
-  const last = detail?.lastTreatment ?? null;
-  const pack = detail?.pack ?? null;
-  const usesPack = pack !== null && (detail?.treatment ?? last)?.packageId === pack.id;
+  const { lastTreatment: last, pack } = records;
+  let repeatLabel = '';
+  if (last) {
+    repeatLabel = pack
+      ? t(K.treatment.repeatPackage, { name: last.name })
+      : t(K.treatment.repeat, { name: last.name, session: nextSessionNumber(last) });
+  }
   return (
     <div className="flex flex-wrap items-center gap-2">
       {actions.repeatTreatment && last ? (
@@ -156,7 +172,7 @@ export function TreatmentStep({
           data-testid={ids.repeat}
           className="bg-tone-lav text-tone-lav-foreground hover:bg-tone-lav/80 text-detail"
         >
-          {t(K.treatment.repeat, { name: last.name, session: last.sessionNo + 1 })}
+          {repeatLabel}
         </Button>
       ) : null}
       {actions.newTreatment ? (
@@ -174,7 +190,7 @@ export function TreatmentStep({
           {t(K.treatment.memo, { memo })}
         </span>
       ) : null}
-      {usesPack ? (
+      {pack ? (
         <span
           data-slot="pill"
           className="bg-tone-lav text-tone-lav-foreground inline-flex h-6 max-w-full items-center truncate rounded-full px-2.5 text-xs font-medium tabular-nums"
@@ -182,110 +198,6 @@ export function TreatmentStep({
           {t(K.treatment.pack, { name: pack.name })}
         </span>
       ) : null}
-    </div>
-  );
-}
-
-/** Step 4 (H:765): the visit's lines and total, "Create invoice from visit" and "Custom invoice". */
-export function InvoiceStep({
-  invoice,
-  actions,
-}: {
-  invoice: { lines: { name: string; amount: string }[]; total: string } | null;
-  actions: VisitFlowActions;
-}) {
-  const { t } = useTranslation(VISIT_FLOW_NS);
-  if (!(actions.createInvoice || actions.customInvoice)) return null;
-  const keys = occurrenceKeys(invoice?.lines.map((line) => line.name) ?? []);
-  return (
-    <div className="flex flex-col gap-2">
-      {invoice ? (
-        <div className="overflow-hidden rounded-xl border">
-          {invoice.lines.map((line, index) => (
-            <div
-              key={keys[index]}
-              className="text-body border-muted flex justify-between gap-3 border-b px-3 py-2"
-            >
-              <span className="min-w-0 break-words">{line.name}</span>
-              <span className="tabular-nums">{line.amount}</span>
-            </div>
-          ))}
-          <div className="bg-canvas text-body flex justify-between gap-3 px-3 py-2 font-semibold">
-            <span>{t(K.invoice.total)}</span>
-            <span className="tabular-nums">{invoice.total}</span>
-          </div>
-        </div>
-      ) : null}
-      <div className="flex flex-wrap gap-2">
-        {actions.createInvoice ? (
-          <Button
-            type="button"
-            {...DARK_BUTTON}
-            onClick={actions.createInvoice}
-            data-testid={ids.createInvoice}
-          >
-            {t(K.invoice.create)}
-          </Button>
-        ) : null}
-        {actions.customInvoice ? (
-          <Button
-            type="button"
-            {...OUTLINE_BUTTON}
-            onClick={actions.customInvoice}
-            data-testid={ids.customInvoice}
-          >
-            {t(K.invoice.custom)}
-          </Button>
-        ) : null}
-      </div>
-    </div>
-  );
-}
-
-/** Step 5 (H:766): collect what is due in a tap, and share the Rx, invoice and photos. */
-export function CollectStep({
-  due,
-  modeLabel,
-  actions,
-}: {
-  /** The oldest open invoice's due, as shown; null when nothing is due. */
-  due: string | null;
-  modeLabel: (mode: VisitPaymentMode) => string;
-  actions: VisitFlowActions;
-}) {
-  const { t } = useTranslation(VISIT_FLOW_NS);
-  const { collect } = actions;
-  return (
-    <div className="flex flex-wrap items-center gap-2">
-      {collect && due
-        ? VISIT_PAYMENT_MODES.map((mode) => (
-            <Button
-              key={mode}
-              type="button"
-              size="sm"
-              onClick={() => collect(mode)}
-              data-testid={ids.collect(mode)}
-              className={cn(
-                'text-detail font-semibold',
-                TONE_CLASSES[MODE_TONES[mode]].surface,
-                MODE_PRESS[mode],
-              )}
-            >
-              {mode === 'upi' ? t(K.collect.upi, { amount: due }) : modeLabel(mode)}
-            </Button>
-          ))
-        : null}
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        onClick={actions.share}
-        data-testid={ids.share}
-        className="border-tone-sage-border text-tone-sage-foreground hover:text-tone-sage-foreground text-detail shadow-none"
-      >
-        <WhatsAppMark aria-hidden="true" className="size-3.5 flex-none" />
-        {t(K.collect.share)}
-      </Button>
     </div>
   );
 }

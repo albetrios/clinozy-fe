@@ -12,6 +12,7 @@ import {
   fetchAppointmentRange,
   fetchAppointmentSlots,
   fetchBookableTreatments,
+  fetchPersonAppointments,
   listAppointments,
   moveAppointment,
   updateAppointment,
@@ -214,6 +215,16 @@ export function useAppointmentDayCounts(
     enabled: window !== null && organizationId !== null && (options.enabled ?? true),
     placeholderData: keepPreviousData,
     notifyOnError: options.notifyOnError ?? true,
+  });
+}
+
+/** A person's bookings, newest first — the patient file's Visits; idle without a contact. */
+export function usePersonAppointments(contactId: string | undefined) {
+  const organizationId = useOrganizationId();
+  return useAppQuery({
+    queryKey: appointmentQueryKeys.person(organizationId, contactId ?? ''),
+    queryFn: () => fetchPersonAppointments(contactId ?? ''),
+    enabled: Boolean(contactId) && organizationId !== null,
   });
 }
 

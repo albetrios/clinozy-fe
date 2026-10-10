@@ -10,7 +10,6 @@ import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import type { PatientRow, PatientView } from '@/shared/api/clinic/patients-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import {
-  GENDER_TONES,
   PATIENT_CONVERSION_TONES,
   PATIENT_STATUS_TONES,
   PATIENT_TYPE_TONES,
@@ -18,23 +17,12 @@ import {
 import type { DataTableFeatures } from '@/shared/components/DataTable/index.ts';
 import { DataTableColumnChooser } from '@/shared/components/DataTableColumnChooser/index.ts';
 import {
-  PERSON_CARD_KEYS,
-  PERSON_CARD_NS,
-} from '@/shared/components/PersonCard/person-card.constants.ts';
-import {
   type RoomFilterCopy,
   RoomToolbar,
   type RoomViewTab,
   RoomViewTabs,
 } from '@/shared/components/RoomToolbar/index.ts';
-import {
-  type AppIcon,
-  Bell,
-  House,
-  RefreshCw,
-  Users,
-  Wallet,
-} from '@/shared/icons/index.ts';
+import { type AppIcon, Bell, RefreshCw, Users } from '@/shared/icons/index.ts';
 
 import {
   PATIENT_FILTER_FIELDS,
@@ -47,8 +35,6 @@ import { PATIENT_FILTER_VALUES, PATIENT_VIEWS } from '../../patients.search.ts';
 /** Each view tab's 14px icon (`patients.md:203–207`). */
 const VIEW_ICONS: Readonly<Record<PatientView, AppIcon>> = {
   all: Users,
-  today: House,
-  dues: Wallet,
   follow: Bell,
   recall: RefreshCw,
 };
@@ -64,11 +50,10 @@ export interface PatientsToolbarProps {
   onNewPatient?: () => void;
 }
 
-/** The Filters popover's sections (`patients.md:133`): Gender · Type · Status · Conversion, each value in its badge's tone. */
+/** The Filters popover's sections (`patients.md:133`): Type · Status · Conversion, each value in its badge's tone. */
 function useFilterCopy(): Readonly<Record<string, RoomFilterCopy>> {
   const { t } = useTranslation(PATIENTS_NS);
   const { t: tClinic } = useTranslation(CLINIC_NS);
-  const { t: tCard } = useTranslation(PERSON_CARD_NS);
   const labelled = <T extends string>(
     values: readonly T[],
     labelOf: (value: T) => string,
@@ -78,14 +63,6 @@ function useFilterCopy(): Readonly<Record<string, RoomFilterCopy>> {
       values.map((value) => [value, { label: labelOf(value), tone: tones[value] }]),
     );
   return {
-    gender: {
-      label: t(PATIENTS_KEYS.columns.gender),
-      options: labelled(
-        PATIENT_FILTER_VALUES.gender,
-        (gender) => tCard(PERSON_CARD_KEYS.gender[gender]),
-        GENDER_TONES,
-      ),
-    },
     types: {
       label: t(PATIENTS_KEYS.columns.types),
       options: labelled(
@@ -115,8 +92,8 @@ function useFilterCopy(): Readonly<Record<string, RoomFilterCopy>> {
 
 /**
  * The Patients toolbar (KICKOFF §6.5 Toolbar; `patients.md:17`) on the shared
- * room toolbar: h1 "Patients" · the five view tabs · search "Name, mobile or
- * #ID" · saved views · Filters (Gender · Type · Status · Conversion · Created ·
+ * room toolbar: h1 "Patients" · the three view tabs · search "Name, mobile or
+ * #ID" · saved views · Filters (Type · Status · Conversion · Created ·
  * Follow-up date) · Columns · "New patient" — a floating pill on a phone.
  */
 export function PatientsToolbar({

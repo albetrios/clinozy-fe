@@ -25,8 +25,8 @@ import {
 } from './credits-contracts.ts';
 import { assertDayOpen } from './day-close-api.ts';
 import { isLeadNotPatient } from './patient-search-api.ts';
-import { listPatients } from './patients-api.ts';
-import { patientName } from './patients-contracts.ts';
+import { listPatients } from './patients-fixture-api.ts';
+import { patientName } from './patients-fixture-contracts.ts';
 import type { PaymentRecord } from './payments-contracts.ts';
 import { createTask } from './tasks-api.ts';
 

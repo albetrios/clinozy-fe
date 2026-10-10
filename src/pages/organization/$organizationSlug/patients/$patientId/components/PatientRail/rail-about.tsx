@@ -7,11 +7,13 @@ import {
   localDateOf,
 } from '@/shared/api/clinic/clinic-time.ts';
 import type { PatientFile } from '@/shared/api/clinic/patient-file-contracts.ts';
+import { CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import {
   ConsentChips,
   PERSON_CARD_KEYS,
   PERSON_CARD_NS,
 } from '@/shared/components/PersonCard/index.ts';
+import { CONTACT_EDITOR_KEYS } from '@/shared/forms/ContactEditor/contact-editor.constants.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { Calendar, MapPin, MessageSquare, Shield, Users } from '@/shared/icons/index.ts';
 
@@ -49,12 +51,13 @@ function useGenderAge(file: PatientFile, today: string): string | null {
 
 /**
  * About (H:720): gender and age; the birth date with the birthday chip within
- * 45 days ("🎂 in 24 days" / "🎂 today", lav); the language (a backend
- * request); the address or "No address"; the consent chips (the person card's).
+ * 45 days ("🎂 in 24 days" / "🎂 today", lav); the language the person asked
+ * for (their language tag); the address or "No address"; the consent chips
+ * (the person card's).
  * The date, the language and the address read in their own direction.
  */
 export function RailAbout({ file }: { file: PatientFile }) {
-  const { t } = useTranslation(PATIENT_RAIL_NS);
+  const { t } = useTranslation([PATIENT_RAIL_NS, CLINIC_NS]);
   const { formatDate } = useLocaleFormat();
   const today = clinicToday();
   const genderAge = useGenderAge(file, today);
@@ -94,7 +97,9 @@ export function RailAbout({ file }: { file: PatientFile }) {
         ) : null}
         {file.language ? (
           <AboutRow icon={<MessageSquare />}>
-            <span dir="auto">{file.language}</span>
+            <span dir="auto">
+              {t(CONTACT_EDITOR_KEYS.preferences[file.language], { ns: CLINIC_NS })}
+            </span>
           </AboutRow>
         ) : null}
         <AboutRow icon={<MapPin />}>

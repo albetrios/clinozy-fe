@@ -2,7 +2,7 @@
 
 Route: `/organization/$organizationSlug/patients/$patientId/reports/create` (`S:42`; KICKOFF §6.6 Drawers, D24) — Upload report — the 560px Report drawer over Reports.
 
-A URL-driven dialog: the route renders nothing; the section page reads the URL (`../../shared/hooks/usePatientRecordRoute/`) and opens `ReportDrawer` (`../components/ReportDrawer/`) over itself. Uploading needs Patients edit (`S:42`); anyone else who follows the link lands back on Reports with the permission toast.
+A URL-driven dialog: the route renders nothing; the section page reads the URL (`../../shared/hooks/usePatientRecordRoute/`) and opens `ReportDrawer` (`../components/ReportDrawer/`) over itself. The save is `POST /app/patients/:patient_id/reports` (a 400 outlines its field); each picked file then goes through the upload tray and is attached as it is confirmed (`PATCH …/reports/:patient_report_id` with the report's `file_keys` plus its key). Uploading needs `patient:update`; anyone else who follows the link lands back on Reports with the permission toast.
 Registered in `src/app/routes/routeTree.tsx` under the reports route, through the file's one
 lazy module (`../../patient-id.sections.ts`).
 

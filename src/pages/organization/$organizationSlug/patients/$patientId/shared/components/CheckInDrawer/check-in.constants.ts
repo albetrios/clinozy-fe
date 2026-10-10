@@ -34,13 +34,13 @@ export const CHECK_IN_KEYS = {
   offeringsPlaceholder: 'checkIn.offeringsPlaceholder',
   /** An offering's sub line: "₹4,800 · 7 sessions" (plural). */
   offeringSessions: 'checkIn.offeringSessions',
-  /** The stored `context` (`S:510`): "Visit check-in", "… · Appt #2790", "Aftercare after LHR Full Face". */
-  contextVisit: 'checkIn.contextVisit',
-  contextAppointment: 'checkIn.contextAppointment',
-  contextAftercare: 'checkIn.contextAftercare',
+  /** An edit's offerings, read-only — the plan changes in the plan (TR10). */
+  offeringsPlanned: 'checkIn.offeringsPlanned',
   save: 'checkIn.save',
   saveEdit: 'checkIn.saveEdit',
   noFeel: 'checkIn.noFeel',
+  /** A score is required, 1–10 (Q18). */
+  noScore: 'checkIn.noScore',
   /** "Check-in saved for Dharti Galani". */
   saved: 'checkIn.saved',
   /** " · 2 added to suggestions". */

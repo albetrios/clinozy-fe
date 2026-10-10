@@ -110,7 +110,7 @@ export function useFloorActions(organizationSlug: string): FloorActions {
     waiting: (card) => (canEditBookings ? () => void sendIn(card) : null),
     with_doctor: () => null,
     treatment: ({ row }) =>
-      openPatientVisit(row, passesPatientFileGate(access.roles, 'treatments')),
+      openPatientVisit(row, passesPatientFileGate(access, 'treatments')),
     checkout: ({ row }) => openPatientVisit(row, access.can('payments', 'create')),
     pharmacy: ({ row }) => dispense(row),
   };

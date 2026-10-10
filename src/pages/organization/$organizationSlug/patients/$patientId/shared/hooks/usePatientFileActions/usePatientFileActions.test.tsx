@@ -1,11 +1,15 @@
-import { screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import { fetchPatientFile } from '@/shared/api/clinic/patient-file-api.ts';
-import type { PatientFile } from '@/shared/api/clinic/patient-file-contracts.ts';
+import type { OrganizationPermission } from '@/core/types/permissions.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import {
+  patientFile,
+  TEST_CONTACT_ID,
+  TEST_PATIENT_ID,
+} from '@/tests/utils/patient-doubles.ts';
 import { shownLocation } from '@/tests/utils/shown-location.ts';
 
 import {
@@ -14,13 +18,7 @@ import {
 } from '../../../__tests__/integration/patient-file-test-router.tsx';
 import { usePatientFileActions } from './usePatientFileActions.ts';
 
-const { notifyMock } = vi.hoisted(() => ({
-  notifyMock: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
-}));
-vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
-
-const DHARTI = patientRef('Dharti Galani');
-let file: PatientFile;
+const FILE = `/organization/acme/patients/${TEST_PATIENT_ID}`;
 
 /** Each item as a button, and each section's primary item. */
 function ActionsProbe() {
@@ -33,7 +31,20 @@ function ActionsProbe() {
         </button>
       ))}
       <output data-testid="primaries">
-        {(['visits', 'images', 'timeline', 'packages', 'notes'] as const)
+        {(
+          [
+            'visits',
+            'prescriptions',
+            'treatments',
+            'images',
+            'reports',
+            'invoices',
+            'payments',
+            'timeline',
+            'packages',
+            'notes',
+          ] as const
+        )
           .map((section) => `${section}:${primaryFor(section)?.id ?? '-'}`)
           .join(' ')}
       </output>
@@ -41,11 +52,14 @@ function ActionsProbe() {
   );
 }
 
-/** Moves the visit `A1`. */
+/** Moves the visit `appt_next…`. */
 function RescheduleProbe() {
   const { reschedule } = usePatientFileActions();
   return (
-    <button type="button" onClick={() => reschedule({ appointmentId: 'A1' })}>
+    <button
+      type="button"
+      onClick={() => reschedule({ appointmentId: 'appt_next00000000000000000' })}
+    >
       reschedule
     </button>
   );
@@ -57,155 +71,183 @@ const itemIds = () =>
     .map((button) => button.textContent)
     .filter(Boolean);
 
-beforeEach(async () => {
-  notifyMock.info.mockReset();
-  resetClinicFixtures();
-  file = await fetchPatientFile(DHARTI);
-});
+/** End View-as: the member signed in, holding exactly these codes. */
+function signedInWith(codes: OrganizationPermission[]) {
+  act(() => {
+    useUIStore.setState({ previewRole: null });
+    useOrganizationStore.getState().setPermissions(['organization:read', ...codes]);
+  });
+}
+
 afterEach(() => {
   resetPatientFile();
-  resetClinicFixtures();
 });
 
 describe('usePatientFileActions', () => {
-  it('offers the Owner the eight items in the menu’s order, each section its own', async () => {
-    renderInPatientFile(<ActionsProbe />, { file, role: 'owner' });
+  it('offers the Owner the six items in the menu’s order — no Invoice or Payment', async () => {
+    renderInPatientFile(<ActionsProbe />, { file: patientFile(), role: 'owner' });
     await screen.findByRole('button', { name: 'prescription' });
     expect(itemIds()).toEqual([
       'prescription',
       'treatment',
-      'invoice',
-      'payment',
       'photo',
       'appointment',
       'report',
       'note',
     ]);
+  });
+
+  it('gives each section its own primary, and none to the billing sections', async () => {
+    renderInPatientFile(<ActionsProbe />, { file: patientFile(), role: 'owner' });
+    await screen.findByRole('button', { name: 'prescription' });
     expect(screen.getByTestId('primaries')).toHaveTextContent(
-      'visits:appointment images:photo timeline:- packages:- notes:-',
+      [
+        'visits:appointment',
+        'prescriptions:prescription',
+        'treatments:treatment',
+        'images:photo',
+        'reports:report',
+        'invoices:-',
+        'payments:-',
+        'timeline:-',
+        'packages:-',
+        'notes:-',
+      ].join(' '),
     );
   });
 
-  it('gives an Admin the Rx but not the treatment (S:35, 38; Owner always passes)', async () => {
-    renderInPatientFile(<ActionsProbe />, { file });
+  it('gives a previewed Admin the Rx but not the treatment (S:35, 38; Owner always passes)', async () => {
+    renderInPatientFile(<ActionsProbe />, { file: patientFile() });
     await screen.findByRole('button', { name: 'prescription' });
     expect(itemIds()).not.toContain('treatment');
   });
 
-  it('keeps the Rx and treatment items to their named roles (S:35, 38)', async () => {
-    renderInPatientFile(<ActionsProbe />, { file, role: 'front_desk' });
-    await screen.findByRole('button', { name: 'invoice' });
-    expect(itemIds()).not.toContain('prescription');
-    expect(itemIds()).not.toContain('treatment');
+  it('keeps the Rx and treatment items to their named roles in View-as (S:35, 38)', async () => {
+    renderInPatientFile(<ActionsProbe />, { file: patientFile(), role: 'front_desk' });
+    await screen.findByRole('button', { name: 'appointment' });
+    expect(itemIds()).toEqual(['photo', 'appointment', 'report', 'note']);
   });
 
-  it('opens a record’s drawer over its section, and the invoice drawer keeping the file behind it', async () => {
+  it('asks a signed-in member’s own codes for every item', async () => {
+    renderInPatientFile(<ActionsProbe />, { file: patientFile() });
+    await screen.findByRole('button', { name: 'prescription' });
+
+    signedInWith(['patient:read']);
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('button', { name: 'prescription' }),
+      ).not.toBeInTheDocument(),
+    );
+    expect(screen.queryAllByRole('button')).toHaveLength(0);
+
+    signedInWith(['patient:read', 'patient_treatment:create', 'appointment:create']);
+    expect(await screen.findByRole('button', { name: 'treatment' })).toBeInTheDocument();
+    expect(itemIds()).toEqual(['treatment', 'appointment']);
+
+    signedInWith([
+      'patient:read',
+      'patient:create',
+      'patient:update',
+      'patient_prescription:create',
+    ]);
+    expect(
+      await screen.findByRole('button', { name: 'prescription' }),
+    ).toBeInTheDocument();
+    expect(itemIds()).toEqual(['prescription', 'photo', 'report', 'note']);
+  });
+
+  it('opens a record’s drawer over its section', async () => {
     const user = userEvent.setup();
-    const { router } = renderInPatientFile(<ActionsProbe />, { file, role: 'owner' });
+    const { router } = renderInPatientFile(<ActionsProbe />, {
+      file: patientFile(),
+      role: 'owner',
+    });
     for (const [item, path] of [
       ['prescription', 'prescriptions/create'],
       ['treatment', 'treatments/create'],
       ['report', 'reports/create'],
     ] as const) {
       await user.click(await screen.findByRole('button', { name: item }));
-      await waitFor(() =>
-        expect(router.state.location.pathname).toBe(
-          `/organization/acme/patients/${DHARTI}/${path}`,
-        ),
-      );
+      await waitFor(() => expect(router.state.location.pathname).toBe(`${FILE}/${path}`));
     }
-
-    await user.click(screen.getByRole('button', { name: 'invoice' }));
-    await waitFor(() =>
-      expect(shownLocation(router).pathname).toBe('/organization/acme/invoices/create'),
-    );
-    // Over the file's section, which stays behind it (A-P1).
-    expect(router.state.location.pathname).toBe(
-      `/organization/acme/patients/${DHARTI}/visits`,
-    );
-    expect(shownLocation(router).search).toEqual({
-      type: 'clinic',
-      patient: DHARTI,
-      from: `patients/${DHARTI}/visits`,
-    });
   });
 
-  it('books an appointment for this patient', async () => {
+  it('books an appointment for the patient’s person', async () => {
     const user = userEvent.setup();
-    const { router } = renderInPatientFile(<ActionsProbe />, { file });
+    const { router } = renderInPatientFile(<ActionsProbe />, { file: patientFile() });
     await user.click(await screen.findByRole('button', { name: 'appointment' }));
     await waitFor(() =>
       expect(shownLocation(router).pathname).toBe(
         '/organization/acme/appointments/create',
       ),
     );
-    expect(shownLocation(router).search).toMatchObject({ who: DHARTI });
-    expect(router.state.location.pathname).toBe(
-      `/organization/acme/patients/${DHARTI}/visits`,
-    );
+    // `who=` the contact id — the booking is the person's.
+    expect(shownLocation(router).search).toEqual({
+      who: TEST_CONTACT_ID,
+      from: `patients/${TEST_PATIENT_ID}/visits`,
+    });
   });
 
-  it('says "Nothing due" for a payment when nothing is owed, else opens Receive payment', async () => {
+  it('keeps the file behind the booking (A-P1)', async () => {
     const user = userEvent.setup();
-    const paid = renderInPatientFile(<ActionsProbe />, { file: { ...file, due: 0 } });
-    await user.click(await screen.findByRole('button', { name: 'payment' }));
-    expect(notifyMock.info).toHaveBeenCalledWith('Nothing due for Dharti Galani');
-    expect(paid.router.state.location.pathname).toBe(
-      `/organization/acme/patients/${DHARTI}/visits`,
-    );
-    paid.unmount();
-
-    const { router } = renderInPatientFile(<ActionsProbe />, {
-      file: { ...file, due: 120_000 },
-    });
-    await user.click(await screen.findByRole('button', { name: 'payment' }));
+    const { router } = renderInPatientFile(<ActionsProbe />, { file: patientFile() });
+    await user.click(await screen.findByRole('button', { name: 'appointment' }));
     await waitFor(() =>
-      expect(shownLocation(router).pathname).toBe('/organization/acme/payments/receive'),
+      expect(shownLocation(router).pathname).toBe(
+        '/organization/acme/appointments/create',
+      ),
     );
-    expect(shownLocation(router).search).toEqual({
-      patient: DHARTI,
-      from: `patients/${DHARTI}/visits`,
-    });
-    expect(router.state.location.pathname).toBe(
-      `/organization/acme/patients/${DHARTI}/visits`,
-    );
+    expect(router.state.location.pathname).toBe(`${FILE}/visits`);
   });
 
   it('opens the photo picker for General, then Photos (KICKOFF §6.6 Add menu)', async () => {
     const user = userEvent.setup();
     const photos = { pick: vi.fn(), upload: vi.fn() };
-    const { router } = renderInPatientFile(<ActionsProbe />, { file, photos });
+    const { router } = renderInPatientFile(<ActionsProbe />, {
+      file: patientFile(),
+      photos,
+    });
     await user.click(await screen.findByRole('button', { name: 'photo' }));
     expect(photos.pick).toHaveBeenCalledWith('general');
-    await waitFor(() =>
-      expect(router.state.location.pathname).toBe(
-        `/organization/acme/patients/${DHARTI}/images`,
-      ),
-    );
+    await waitFor(() => expect(router.state.location.pathname).toBe(`${FILE}/images`));
+  });
+
+  it('opens Team notes for a note', async () => {
+    const user = userEvent.setup();
+    const { router } = renderInPatientFile(<ActionsProbe />, { file: patientFile() });
+    await user.click(await screen.findByRole('button', { name: 'note' }));
+    await waitFor(() => expect(router.state.location.pathname).toBe(`${FILE}/notes`));
   });
 
   it('moves a booked visit: the appointment form in reschedule mode, the file behind it', async () => {
     const user = userEvent.setup();
     const { router } = renderInPatientFile(<RescheduleProbe />, {
-      file,
+      file: patientFile(),
       section: 'timeline',
     });
     await user.click(await screen.findByRole('button', { name: 'reschedule' }));
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe('/organization/acme/appointments/A1'),
+      expect(shownLocation(router).pathname).toBe(
+        '/organization/acme/appointments/appt_next00000000000000000',
+      ),
     );
-    expect(router.state.location.search).toEqual({
+    expect(shownLocation(router).search).toEqual({
       mode: 'reschedule',
-      from: `patients/${DHARTI}/timeline`,
+      from: `patients/${TEST_PATIENT_ID}/timeline`,
     });
   });
 
   it('moves a visit from outside a section with no way back', async () => {
     const user = userEvent.setup();
-    const { router } = renderInPatientFile(<RescheduleProbe />, { file, section: null });
+    const { router } = renderInPatientFile(<RescheduleProbe />, {
+      file: patientFile(),
+      section: null,
+    });
     await user.click(await screen.findByRole('button', { name: 'reschedule' }));
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe('/organization/acme/appointments/A1'),
+      expect(router.state.location.pathname).toBe(
+        '/organization/acme/appointments/appt_next00000000000000000',
+      ),
     );
     expect(router.state.location.search).toEqual({ mode: 'reschedule' });
   });

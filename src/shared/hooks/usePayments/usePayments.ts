@@ -6,7 +6,7 @@ import { creditQueryKeys } from '@/shared/api/clinic/credits-api.ts';
 import { dayCloseQueryKeys } from '@/shared/api/clinic/day-close-api.ts';
 import { invoiceQueryKeys } from '@/shared/api/clinic/invoices-api.ts';
 import { MEDICAL_ROOM_QUERY_KEY } from '@/shared/api/clinic/medicines-api.ts';
-import { patientQueryKeys } from '@/shared/api/clinic/patients-api.ts';
+import { fixturePatientQueryKeys } from '@/shared/api/clinic/patients-fixture-api.ts';
 import {
   deletePayment,
   fetchPayment,
@@ -46,7 +46,7 @@ import { useCursorList } from '@/shared/hooks/useCursorList/index.ts';
 export const MONEY_WRITE_KEYS: readonly QueryKey[] = [
   paymentQueryKeys.all,
   creditQueryKeys.all,
-  patientQueryKeys.all,
+  fixturePatientQueryKeys.all,
   invoiceQueryKeys.all,
   commandSearchQueryKeys.all,
   dayCloseQueryKeys.all,

@@ -14,9 +14,11 @@ import type { OrganizationSummary } from '@/shared/tenancy/me-context.ts';
 import { ensureMyOrganizationSummaries } from '@/shared/tenancy/my-organization-summaries.ts';
 
 import {
+  contactActivityQueryKeys,
   fetchContactMessagingStatus,
   fetchContactTemplateValues,
   fetchContactThread,
+  listContactActivities,
   resendContactActivity,
   sendContactActivity,
 } from './contact-activities-api.ts';
@@ -414,5 +416,147 @@ describe('fetchContactTemplateValues', () => {
       organization('org_other', 'Other Clinic'),
     ]);
     expect((await fetchContactTemplateValues()).clinicName).toBe('');
+  });
+});
+
+/** A record link column of an entry, none set — `patch` sets the one it is about. */
+const NO_LINKS = {
+  appointment_id: null,
+  invoice_id: null,
+  payment_id: null,
+  patient_prescription_id: null,
+  patient_offering_id: null,
+  patient_review_id: null,
+  patient_check_in_id: null,
+  patient_treatment_id: null,
+  patient_clinical_note_id: null,
+  patient_image_id: null,
+  patient_report_id: null,
+};
+
+/** A server event of the stream, as clinozy-be answers it (the live shape, 2026-10-10). */
+const event = (id: string, patch: Record<string, unknown> = {}) =>
+  activity(id, {
+    type: 'system',
+    direction: null,
+    delivery_status: null,
+    body: 'Treatment recorded: Back Peeling',
+    group: 'clinical',
+    ...NO_LINKS,
+    ...patch,
+  });
+
+describe('listContactActivities (§6 #2, #3)', () => {
+  it('reads one page of a filter, newest first, as the file’s entries with their record link', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce({
+      data: [
+        event('msg_treat', { patient_treatment_id: 'trt_peel' }),
+        event('msg_bill', {
+          body: 'Invoice 2026-27/0001 billed: ₹3,540.00',
+          group: 'money',
+          invoice_id: 'invc_one',
+        }),
+        event('msg_note', {
+          type: 'note',
+          group: 'messages',
+          body: 'Call before the next session',
+          author_membership_id: RIYA,
+        }),
+      ],
+      meta: {
+        request_id: 'req',
+        pagination: {
+          per_page: 20,
+          next: 'cursor-2',
+          has_more: true,
+          estimated_total: 8,
+        },
+      },
+    } as never);
+
+    const page = await listContactActivities({
+      contactId: CONTACT_ID,
+      filter: { type: ['system', 'note'], group: ['clinical', 'messages'] },
+      limit: 20,
+    });
+
+    expect(api.get).toHaveBeenCalledWith('/app/contacts/{contact_id}/activities', {
+      params: { contact_id: CONTACT_ID },
+      query: {
+        type: 'system,note',
+        group: 'clinical,messages',
+        order: 'desc',
+        limit: 20,
+        after: undefined,
+      },
+    });
+    expect(page).toEqual({
+      rows: [
+        {
+          id: 'msg_treat',
+          type: 'system',
+          group: 'clinical',
+          body: 'Treatment recorded: Back Peeling',
+          occurredAt: '2026-10-03T04:00:00.000Z',
+          authorId: null,
+          link: { kind: 'treatment', id: 'trt_peel' },
+        },
+        {
+          id: 'msg_bill',
+          type: 'system',
+          group: 'money',
+          body: 'Invoice 2026-27/0001 billed: ₹3,540.00',
+          occurredAt: '2026-10-03T04:00:00.000Z',
+          authorId: null,
+          link: { kind: 'invoice', id: 'invc_one' },
+        },
+        {
+          id: 'msg_note',
+          type: 'note',
+          group: 'messages',
+          body: 'Call before the next session',
+          occurredAt: '2026-10-03T04:00:00.000Z',
+          authorId: RIYA,
+          link: null,
+        },
+      ],
+      next: 'cursor-2',
+      hasMore: true,
+      total: 8,
+    });
+  });
+
+  it('reads the page after a cursor, with no filter left in the query', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce(page([]) as never);
+    const read = await listContactActivities({
+      contactId: CONTACT_ID,
+      filter: {},
+      limit: 3,
+      after: 'cursor-2',
+    });
+    expect(api.get).toHaveBeenCalledWith('/app/contacts/{contact_id}/activities', {
+      params: { contact_id: CONTACT_ID },
+      query: { order: 'desc', limit: 3, after: 'cursor-2' },
+    });
+    expect(read).toEqual({ rows: [], next: null, hasMore: false, total: null });
+  });
+
+  it('keys each filter and page size apart, under the person’s stream and the thread’s key', () => {
+    const notes = contactActivityQueryKeys.list(
+      'org_a',
+      CONTACT_ID,
+      { type: ['note'] },
+      3,
+    );
+    expect(notes.slice(0, 2)).toEqual(['clinic', 'messages']);
+    expect(notes).toEqual([
+      ...contactActivityQueryKeys.contact('org_a', CONTACT_ID),
+      'list',
+      { type: 'note' },
+      3,
+    ]);
+    expect(
+      contactActivityQueryKeys.list('org_a', CONTACT_ID, { type: ['note'] }),
+    ).toEqual(notes.slice(0, -1));
   });
 });

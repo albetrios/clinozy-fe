@@ -1,175 +1,364 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
-import { staffRef } from '@/shared/api/clinic/fixtures/staff.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import { MEDICAL_ROOM_QUERY_KEY } from '@/shared/api/clinic/medicines-api.ts';
+import type { OrganizationPermission } from '@/core/rbac/policies.ts';
+import type { PrescriptionItem } from '@/shared/api/clinic/clinic-schema.ts';
+import type * as PrescriptionsApiModule from '@/shared/api/clinic/prescriptions-api.ts';
 import {
-  type PrescriptionInput,
+  approvePrescription,
+  createPrescription,
+  deletePrescription,
+  fetchRxSheetClinic,
+  listPatientPrescriptions,
+  listPrescriptionKits,
+  listRxMedicines,
   prescriptionQueryKeys,
+  restorePrescription,
+  updatePrescription,
 } from '@/shared/api/clinic/prescriptions-api.ts';
+import type {
+  PrescriptionFields,
+  PrescriptionRecord,
+} from '@/shared/api/clinic/prescriptions-contracts.ts';
+import { todayQueryKeys } from '@/shared/api/clinic/today-api.ts';
+import { HttpError } from '@/shared/errors/HttpError.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import {
   useCreatePrescription,
   useDeletePrescription,
-  useLoadRxSheetContext,
+  useLoadRxSheetClinic,
   usePatientPrescriptions,
-  usePrescription,
+  usePrescriptionAccess,
+  usePrescriptionKits,
   useRestorePrescription,
   useRxCatalog,
-  useRxSheetContext,
+  useRxSheetClinic,
   useUpdatePrescription,
 } from './usePrescriptions.ts';
 
-const DHARTI = patientRef('Dharti Galani');
-let client: QueryClient;
+vi.mock('@/shared/api/clinic/prescriptions-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof PrescriptionsApiModule>()),
+  listPatientPrescriptions: vi.fn(),
+  createPrescription: vi.fn(),
+  updatePrescription: vi.fn(),
+  approvePrescription: vi.fn(),
+  deletePrescription: vi.fn(),
+  restorePrescription: vi.fn(),
+  listPrescriptionKits: vi.fn(),
+  listRxMedicines: vi.fn(),
+  fetchRxSheetClinic: vi.fn(),
+}));
 
-function wrapper({ children }: { children: ReactNode }) {
-  return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
-}
+const PATIENT_ID = 'pat_priya0000000000000000';
+const ORG = 'org_test';
 
-const INPUT: PrescriptionInput = {
-  patientId: DHARTI,
+const line = (medicineName: string): PrescriptionItem => ({
+  medicineId: null,
+  medicineName,
+  doseMorning: 0,
+  doseAfternoon: 0,
+  doseNight: 1,
+  sos: false,
+  meal: 'after',
+  timing: null,
+  timingText: null,
+  bodyPart: null,
+  bodyPartText: null,
+  qty: 8,
+  remarks: null,
+});
+
+const DRAFT: PrescriptionRecord = {
+  id: 'rx_rx50000000000000000000',
+  seq: 500,
+  patientId: PATIENT_ID,
   appointmentId: null,
-  doctorId: staffRef('DD'),
-  date: '2026-10-03',
-  items: [
-    {
-      medicineId: null,
-      medicineName: 'Epriva Tab',
-      doseMorning: 1,
-      doseAfternoon: 0,
-      doseNight: 1,
-      sos: false,
-      meal: 'after',
-      timing: null,
-      timingText: null,
-      bodyPart: null,
-      bodyPartText: null,
-      qty: 20,
-      remarks: '10 days',
-    },
-  ],
+  doctorId: 'mem_nisha0000000000000000',
+  date: '2026-10-01',
+  items: [line('Flubolt 400')],
   advice: null,
   labReport: null,
   procedureToday: null,
   followUpDate: null,
+  status: 'draft',
+  approvedAt: null,
+  approvedById: null,
+  createdAt: '2026-10-01T05:00:00.000Z',
+  updatedAt: '2026-10-01T05:00:00.000Z',
+};
+const APPROVED: PrescriptionRecord = {
+  ...DRAFT,
+  status: 'approved',
+  approvedAt: '2026-10-01T06:00:00.000Z',
 };
 
-function useRxProbe() {
-  return {
-    list: usePatientPrescriptions(DHARTI),
-    create: useCreatePrescription(),
-    update: useUpdatePrescription(),
-    remove: useDeletePrescription(),
-    restore: useRestorePrescription(),
-  };
+const FIELDS: PrescriptionFields = {
+  doctorId: DRAFT.doctorId,
+  date: '2026-10-03',
+  items: [line('Flubolt 400')],
+  advice: null,
+  labReport: null,
+  procedureToday: null,
+};
+
+let client: QueryClient;
+function wrapper({ children }: { children: ReactNode }) {
+  return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
+}
+
+/** The member's own codes (no View-as). */
+function holding(...codes: OrganizationPermission[]) {
+  useUIStore.setState({ previewRole: null });
+  useOrganizationStore.getState().setPermissions(['organization:read', ...codes]);
 }
 
 beforeEach(() => {
-  resetClinicFixtures();
-  client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  client = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+  signInTestMember();
+  holding();
+  vi.mocked(listPatientPrescriptions).mockReset().mockResolvedValue([DRAFT]);
+  vi.mocked(createPrescription).mockReset().mockResolvedValue(DRAFT);
+  vi.mocked(updatePrescription).mockReset().mockResolvedValue(DRAFT);
+  vi.mocked(approvePrescription).mockReset().mockResolvedValue(APPROVED);
+  vi.mocked(deletePrescription).mockReset().mockResolvedValue();
+  vi.mocked(restorePrescription).mockReset().mockResolvedValue(DRAFT);
+  vi.mocked(listPrescriptionKits).mockReset().mockResolvedValue([]);
+  vi.mocked(listRxMedicines).mockReset().mockResolvedValue([]);
+  vi.mocked(fetchRxSheetClinic)
+    .mockReset()
+    .mockResolvedValue({
+      organization: { name: 'Cresence', specialties: ['skin'] },
+      branch: { phone: '', gstNumber: null },
+    });
 });
 afterEach(() => {
   client.clear();
-  resetClinicFixtures();
+  useUIStore.setState({ previewRole: null });
+  useOrganizationStore.getState().clearPermissions();
 });
 
-describe('usePrescriptions', () => {
-  it('reads the patient’s prescriptions and refreshes them after each write', async () => {
-    const { result } = renderHook(useRxProbe, { wrapper });
-    await waitFor(() => expect(result.current.list.data).toHaveLength(1));
-
-    const saved = await act(() => result.current.create.mutateAsync(INPUT));
-    await waitFor(() => expect(result.current.list.data).toHaveLength(2));
-
-    await act(() =>
-      result.current.update.mutateAsync({
-        id: saved.id,
-        input: { ...INPUT, advice: 'Avoid scrubs' },
-      }),
-    );
-    await waitFor(() =>
-      expect(result.current.list.data?.find((rx) => rx.id === saved.id)?.advice).toBe(
-        'Avoid scrubs',
+describe('usePrescriptionAccess', () => {
+  it('answers from the member’s own codes', async () => {
+    holding('patient_prescription:create', 'medicine:read');
+    const { result } = renderHook(() => usePrescriptionAccess(), { wrapper });
+    await waitFor(() => expect(result.current.resolved).toBe(true));
+    expect(result.current).toEqual({
+      resolved: true,
+      writes: true,
+      approves: false,
+      deletes: false,
+      readsMedicines: true,
+      readsBranch: false,
+    });
+    act(() =>
+      holding(
+        'patient_prescription:create',
+        'patient_prescription:update',
+        'patient_prescription:delete',
+        'branch:read',
       ),
     );
-
-    await act(() =>
-      result.current.remove.mutateAsync({ id: saved.id, reason: 'mistake', note: null }),
-    );
-    await waitFor(() => expect(result.current.list.data).toHaveLength(1));
-    await act(() => result.current.restore.mutateAsync(saved.id));
-    await waitFor(() => expect(result.current.list.data).toHaveLength(2));
+    await waitFor(() => expect(result.current.approves).toBe(true));
+    expect(result.current).toMatchObject({ deletes: true, readsBranch: true });
   });
 
-  it('reads one prescription, the drawer’s medicines and the sheet’s context', async () => {
-    const { result } = renderHook(
-      () => ({
-        catalog: useRxCatalog(DHARTI),
-        sheet: useRxSheetContext(DHARTI, staffRef('DD')),
-        list: usePatientPrescriptions(DHARTI),
-      }),
-      { wrapper },
-    );
-    await waitFor(() =>
-      expect(result.current.catalog.data?.often).toContain('Sunscreen SPF 50'),
-    );
-    await waitFor(() =>
-      expect(result.current.sheet.data?.doctor?.firstName).toBe('Dr. Drashti'),
-    );
-    await waitFor(() => expect(result.current.list.data).toHaveLength(1));
-    const id = result.current.list.data?.[0]?.id ?? '';
-    const one = renderHook(() => usePrescription(id), { wrapper });
-    await waitFor(() => expect(one.result.current.data?.seq).toBe(497));
-  });
-
-  it('refreshes Medical’s “Prescriptions to fill” after a new prescription and a delete', async () => {
-    // Medical's list sits under the room's prefix (`useMedicalFlows`), fresh for 5 minutes.
-    const toFill = [...MEDICAL_ROOM_QUERY_KEY, 'prescriptions-to-fill'];
-    const { result } = renderHook(useRxProbe, { wrapper });
-    client.setQueryData(toFill, []);
-    const saved = await act(() => result.current.create.mutateAsync(INPUT));
-    expect(client.getQueryState(toFill)?.isInvalidated).toBe(true);
-
-    client.setQueryData(toFill, []);
-    await act(() =>
-      result.current.remove.mutateAsync({ id: saved.id, reason: 'mistake', note: null }),
-    );
-    expect(client.getQueryState(toFill)?.isInvalidated).toBe(true);
-  });
-
-  it('loads the sheet’s context on demand, keeping it for the hook', async () => {
-    const doctor = staffRef('DD');
-    const { result } = renderHook(useLoadRxSheetContext, { wrapper });
-    const sheet = await act(() => result.current(DHARTI, doctor));
-    expect(sheet.doctor?.firstName).toBe('Dr. Drashti');
-    expect(client.getQueryData(prescriptionQueryKeys.sheet(DHARTI, doctor))).toBe(sheet);
-  });
-
-  it('serves the context the hook already keeps instead of reading it again', async () => {
-    const doctor = staffRef('DD');
-    const { result } = renderHook(useLoadRxSheetContext, { wrapper });
-    const read = await act(() => result.current(DHARTI, doctor));
-    expect(read.doctor?.firstName).toBe('Dr. Drashti');
-    // Swap the kept copy for one the server never sends: a second call serves it, not a read.
-    client.setQueryData(prescriptionQueryKeys.sheet(DHARTI, doctor), {
-      ...read,
-      doctor: null,
+  it('previews a role by its gate during View-as', async () => {
+    useUIStore.setState({ previewRole: 'doctor' });
+    const { result } = renderHook(() => usePrescriptionAccess(), { wrapper });
+    await waitFor(() => expect(result.current.resolved).toBe(true));
+    expect(result.current).toMatchObject({
+      writes: true,
+      approves: true,
+      readsMedicines: true,
+      readsBranch: false,
     });
-    const kept = await act(() => result.current(DHARTI, doctor));
-    expect(kept.doctor).toBeNull();
+    act(() => useUIStore.setState({ previewRole: 'front_desk' }));
+    await waitFor(() => expect(result.current.writes).toBe(false));
+    expect(result.current).toMatchObject({ approves: false, deletes: false });
+  });
+});
+
+describe('reads', () => {
+  it('reads a patient’s prescriptions under the organization; idle without one', async () => {
+    const { result } = renderHook(() => usePatientPrescriptions(PATIENT_ID), { wrapper });
+    await waitFor(() => expect(result.current.data).toEqual([DRAFT]));
+    expect(listPatientPrescriptions).toHaveBeenCalledWith(PATIENT_ID);
+    expect(client.getQueryData(prescriptionQueryKeys.list(ORG, PATIENT_ID))).toEqual([
+      DRAFT,
+    ]);
+    renderHook(() => usePatientPrescriptions(''), { wrapper });
+    renderHook(() => usePatientPrescriptions(PATIENT_ID, { enabled: false }), {
+      wrapper,
+    });
+    expect(listPatientPrescriptions).toHaveBeenCalledTimes(1);
   });
 
-  it('stays idle without a patient or a prescription', () => {
-    const { result } = renderHook(
-      () => ({ list: usePatientPrescriptions(''), one: usePrescription('') }),
-      { wrapper },
+  it('reads the member’s kits when asked', async () => {
+    renderHook(() => usePrescriptionKits({ enabled: false }), { wrapper });
+    expect(listPrescriptionKits).not.toHaveBeenCalled();
+    const { result } = renderHook(() => usePrescriptionKits(), { wrapper });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+  });
+
+  it('composes the drawer’s medicines: the store only with medicine:read', async () => {
+    vi.mocked(listRxMedicines).mockResolvedValue([
+      { id: 'med_tranexa', name: 'Tranexa 500', composition: null, stock: 3 },
+    ]);
+    const { result, rerender } = renderHook(() => useRxCatalog(PATIENT_ID), { wrapper });
+    await waitFor(() => expect(result.current.data).toBeDefined());
+    expect(listRxMedicines).not.toHaveBeenCalled();
+    expect(result.current.data?.medicines.map((medicine) => medicine.name)).toEqual([
+      'Flubolt 400',
+    ]);
+
+    act(() => holding('medicine:read'));
+    rerender();
+    await waitFor(() =>
+      expect(result.current.data?.medicines.map((medicine) => medicine.name)).toEqual([
+        'Flubolt 400',
+        'Tranexa 500',
+      ]),
     );
-    expect(result.current.list.fetchStatus).toBe('idle');
-    expect(result.current.one.fetchStatus).toBe('idle');
+    expect(result.current.data?.medicines[0]?.last).toEqual(line('Flubolt 400'));
+  });
+
+  it('reads the sheet’s clinic with the branch per branch:read, and loads it for a print', async () => {
+    holding('branch:read');
+    const { result } = renderHook(() => useRxSheetClinic('brn_main'), { wrapper });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(fetchRxSheetClinic).toHaveBeenCalledWith({
+      branchId: 'brn_main',
+      readsBranch: true,
+    });
+    const load = renderHook(() => useLoadRxSheetClinic(), { wrapper });
+    await expect(load.result.current('brn_main')).resolves.toMatchObject({
+      organization: { name: 'Cresence' },
+    });
+    // The copy the hook keeps serves the print.
+    expect(fetchRxSheetClinic).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('writes', () => {
+  it('writes a draft, or approves it on the write’s key + ":approve" (Q19)', async () => {
+    const invalidate = vi.spyOn(client, 'invalidateQueries');
+    const { result } = renderHook(() => useCreatePrescription(), { wrapper });
+    let saved: PrescriptionRecord | undefined;
+    await act(async () => {
+      saved = await result.current.mutateAsync({ patientId: PATIENT_ID, fields: FIELDS });
+    });
+    expect(saved).toEqual(DRAFT);
+    expect(approvePrescription).not.toHaveBeenCalled();
+    const [{ idempotencyKey: key }] = vi.mocked(createPrescription).mock.calls[0] ?? [
+      { idempotencyKey: '' },
+    ];
+    expect(createPrescription).toHaveBeenCalledWith({
+      patientId: PATIENT_ID,
+      fields: FIELDS,
+      appointmentId: undefined,
+      idempotencyKey: key,
+    });
+    expect(invalidate).toHaveBeenCalledWith({
+      queryKey: prescriptionQueryKeys.lists(ORG),
+    });
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: todayQueryKeys.floors() });
+
+    await act(async () => {
+      saved = await result.current.mutateAsync({
+        patientId: PATIENT_ID,
+        fields: FIELDS,
+        appointmentId: 'appt_sana0000000000000000',
+        approve: true,
+      });
+    });
+    expect(saved).toEqual(APPROVED);
+    const create = vi.mocked(createPrescription).mock.lastCall?.[0];
+    expect(create?.appointmentId).toBe('appt_sana0000000000000000');
+    expect(approvePrescription).toHaveBeenCalledWith({
+      patientId: PATIENT_ID,
+      prescriptionId: DRAFT.id,
+      idempotencyKey: `${create?.idempotencyKey}:approve`,
+    });
+  });
+
+  it('keeps the draft in the list when its approval fails', async () => {
+    vi.mocked(approvePrescription).mockRejectedValueOnce(
+      new HttpError('Bad request', 400, '/approve', 'POST'),
+    );
+    const invalidate = vi.spyOn(client, 'invalidateQueries');
+    const { result } = renderHook(() => useCreatePrescription({ notifyOnError: false }), {
+      wrapper,
+    });
+    await act(async () => {
+      await expect(
+        result.current.mutateAsync({
+          patientId: PATIENT_ID,
+          fields: FIELDS,
+          approve: true,
+        }),
+      ).rejects.toBeInstanceOf(HttpError);
+    });
+    expect(invalidate).toHaveBeenCalledWith({
+      queryKey: prescriptionQueryKeys.lists(ORG),
+    });
+  });
+
+  it('saves a draft with its updated_at, then approves it', async () => {
+    const { result } = renderHook(() => useUpdatePrescription(), { wrapper });
+    await act(async () => {
+      await result.current.mutateAsync({
+        prescription: DRAFT,
+        fields: FIELDS,
+        approve: true,
+      });
+    });
+    const save = vi.mocked(updatePrescription).mock.lastCall?.[0];
+    expect(save).toMatchObject({
+      patientId: PATIENT_ID,
+      prescriptionId: DRAFT.id,
+      fields: FIELDS,
+      expectedUpdatedAt: DRAFT.updatedAt,
+    });
+    expect(approvePrescription).toHaveBeenCalledWith(
+      expect.objectContaining({ idempotencyKey: `${save?.idempotencyKey}:approve` }),
+    );
+  });
+
+  it('deletes with the reason — refreshing the lists, not the record’s own read — and restores', async () => {
+    const invalidate = vi.spyOn(client, 'invalidateQueries');
+    const remove = renderHook(() => useDeletePrescription(), { wrapper });
+    await act(async () => {
+      await remove.result.current.mutateAsync({
+        prescription: DRAFT,
+        reason: 'not_needed',
+        note: null,
+      });
+    });
+    expect(deletePrescription).toHaveBeenCalledWith({
+      patientId: PATIENT_ID,
+      prescriptionId: DRAFT.id,
+      reason: 'not_needed',
+      note: null,
+    });
+    expect(invalidate).not.toHaveBeenCalledWith({
+      queryKey: prescriptionQueryKeys.details(ORG),
+    });
+
+    const restore = renderHook(() => useRestorePrescription(), { wrapper });
+    await act(async () => {
+      await restore.result.current.mutateAsync(DRAFT);
+    });
+    expect(restorePrescription).toHaveBeenCalledWith({
+      patientId: PATIENT_ID,
+      prescriptionId: DRAFT.id,
+      idempotencyKey: expect.any(String),
+    });
   });
 });

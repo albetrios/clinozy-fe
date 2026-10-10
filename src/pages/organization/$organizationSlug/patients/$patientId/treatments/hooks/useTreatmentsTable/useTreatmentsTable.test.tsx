@@ -1,51 +1,57 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { Treatment } from '@/shared/api/clinic/clinic-schema.ts';
-import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import {
-  listPatientTreatments,
-  listTreatmentCheckIns,
-  type TreatmentCheckIn,
-} from '@/shared/api/clinic/treatments-api.ts';
+import type * as DirectoryApiModule from '@/shared/api/clinic/directory-api.ts';
+import type { TreatmentRecord } from '@/shared/api/clinic/treatments-contracts.ts';
 import { useDevicePrefsStore } from '@/shared/store/useDevicePrefsStore/index.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
+import { TEAM, treatmentRecord } from '../../__tests__/integration/treatment-doubles.ts';
 import { useTreatmentsTable } from './useTreatmentsTable.tsx';
 
+vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof DirectoryApiModule>()),
+  fetchTeamDirectory: vi.fn(async () => TEAM),
+}));
+vi.mock('@/shared/tenancy/my-membership.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  findMyMembershipId: vi.fn(async () => TEAM[0]?.id ?? null),
+}));
+
 let client: QueryClient;
-let rows: Treatment[] = [];
-let checkIns: Record<string, TreatmentCheckIn> = {};
 function wrapper({ children }: { children: ReactNode }) {
   return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
 }
 
-const DHARTI = patientRef('Dharti Galani');
+/** The session with its latest check-in, "Better · 7/10". */
+const LHR = treatmentRecord({
+  latestCheckIn: {
+    id: 'chk_one00000000000000000',
+    date: '2026-10-02',
+    feel: 'better',
+    score: 7,
+  },
+});
+const rows = [LHR];
+const lhr = (changes: Partial<TreatmentRecord> = {}): TreatmentRecord => ({
+  ...LHR,
+  ...changes,
+});
 
-beforeEach(async () => {
-  resetClinicFixtures();
+beforeEach(() => {
+  signInTestMember();
   useDevicePrefsStore.setState({ hiddenColumns: {} });
   client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  rows = await listPatientTreatments(DHARTI);
-  checkIns = await listTreatmentCheckIns(DHARTI);
 });
 afterEach(() => {
   client.clear();
-  resetClinicFixtures();
 });
-
-/** The first treatment, as another template or call would leave it. */
-const lhr = (changes: Partial<Treatment> = {}): Treatment => {
-  const [first] = rows;
-  if (!first) throw new Error('no treatment');
-  return { ...first, ...changes };
-};
 
 describe('useTreatmentsTable (H:4754)', () => {
   it('lays out Treatment · Area · Team · Session · Details · Feedback · Date, Team and Details hidden', () => {
-    const { result } = renderHook(() => useTreatmentsTable(rows, checkIns), { wrapper });
+    const { result } = renderHook(() => useTreatmentsTable(rows), { wrapper });
     const table = result.current;
     expect(table.getAllLeafColumns().map((column) => column.id)).toEqual([
       'treatment',
@@ -66,8 +72,8 @@ describe('useTreatmentsTable (H:4754)', () => {
     expect(table.getColumn('treatment')?.columnDef.meta?.primary).toBe(true);
   });
 
-  it('reads the areas, the session and the latest check-in', () => {
-    const { result } = renderHook(() => useTreatmentsTable(rows, checkIns), { wrapper });
+  it('reads the areas, the session and the server’s latest check-in', () => {
+    const { result } = renderHook(() => useTreatmentsTable(rows), { wrapper });
     const column = (id: string) => result.current.getColumn(id);
     expect(column('area')?.accessorFn?.(lhr(), 0)).toBe('Face');
     expect(column('session')?.columnDef.meta?.foldValue?.(lhr())).toMatchObject({
@@ -82,31 +88,43 @@ describe('useTreatmentsTable (H:4754)', () => {
   });
 
   it('owes the call before any check-in: "Call next day", "Call in 2 days", else "—"', () => {
-    const { result } = renderHook(() => useTreatmentsTable(rows, {}), { wrapper });
-    const feedback = (treatment: Treatment) =>
+    const { result } = renderHook(() => useTreatmentsTable(rows), { wrapper });
+    const feedback = (treatment: TreatmentRecord) =>
       result.current.getColumn('feedback')?.accessorFn?.(treatment, 0);
-    expect(feedback(lhr({ aftercareCall: 'next_day' }))).toBe('Call next day');
-    expect(feedback(lhr({ aftercareCall: 'in_2_days' }))).toBe('Call in 2 days');
-    expect(feedback(lhr({ aftercareCall: 'in_week' }))).toBe('Call in 7 days');
-    expect(feedback(lhr({ aftercareCall: 'none' }))).toBe('—');
+    const owed = (aftercareCall: TreatmentRecord['aftercareCall']) =>
+      lhr({ aftercareCall, latestCheckIn: null });
+    expect(feedback(owed('next_day'))).toBe('Call next day');
+    expect(feedback(owed('in_two_days'))).toBe('Call in 2 days');
+    expect(feedback(owed('in_week'))).toBe('Call in 7 days');
+    expect(feedback(owed('none'))).toBe('—');
     expect(
-      result.current
-        .getColumn('feedback')
-        ?.columnDef.meta?.foldValue?.(lhr({ aftercareCall: 'none' })),
+      result.current.getColumn('feedback')?.columnDef.meta?.foldValue?.(owed('none')),
     ).toBeNull();
   });
 
+  it('marks a reversed session, its reason on hover', () => {
+    const { result } = renderHook(() => useTreatmentsTable(rows), { wrapper });
+    const reversed = lhr({ status: 'reversed', reversedReason: 'Wrong patient' });
+    // The copy is new (locales-C.json); the test bundle still holds the key.
+    expect(result.current.getColumn('feedback')?.accessorFn?.(reversed, 0)).toMatch(
+      /Reversed|treatment\.reverse\.status/,
+    );
+    expect(
+      result.current.getColumn('feedback')?.columnDef.meta?.foldValue?.(reversed),
+    ).toMatchObject({ dotClassName: expect.stringMatching(/^bg-tone-blush/) });
+  });
+
   it('names a dental treatment’s teeth as its area, and its other values as details', () => {
-    const { result } = renderHook(() => useTreatmentsTable(rows, {}), { wrapper });
+    const { result } = renderHook(() => useTreatmentsTable(rows), { wrapper });
     const dental = lhr({
       template: 'dental',
-      params: { procedure: 'Filling', teeth: '1112', material: 'Composite' },
+      parameters: { procedure: 'Filling', teeth: '1112', material: 'Composite' },
     });
     expect(result.current.getColumn('area')?.accessorFn?.(dental, 0)).toBe('#11, #12');
     expect(result.current.getColumn('details')?.accessorFn?.(dental, 0)).toBe(
       'Filling · Composite',
     );
-    const bare = lhr({ template: 'general', params: {}, bodyParts: [] });
+    const bare = lhr({ template: 'general', parameters: {}, bodyParts: [] });
     expect(result.current.getColumn('area')?.accessorFn?.(bare, 0)).toBe('');
     expect(result.current.getColumn('details')?.accessorFn?.(bare, 0)).toBe('—');
     expect(

@@ -61,7 +61,10 @@ export function TreatmentTypeSwitch({
             aria-checked={on}
             tabIndex={on ? 0 : -1}
             disabled={disabled}
-            onClick={() => onChange(template)}
+            // The picked one again changes nothing (a switch clears the template's fields).
+            onClick={() => {
+              if (!on) onChange(template);
+            }}
             onKeyDown={onKeyDown}
             data-testid={`${testId}-${template}`}
             className={cn(

@@ -1,199 +1,198 @@
 import { z } from 'zod';
 
-import { compareText, validateClinicInput } from './clinic-fixture-store.ts';
-import {
-  aftercareCallSchema,
-  bodyPartSchema,
-  type CheckinFeel,
-  type DeleteReason,
-  isoDateTimeSchema,
-  type Treatment,
-  treatmentTemplateSchema,
-} from './clinic-schema.ts';
+import { api } from '@/core/http/api.ts';
+import { collectAllPages } from '@/shared/api/fetch-all-pages.ts';
+
 import { patientQueryKeys } from './patients-api.ts';
+import {
+  toTreatmentCheckIn,
+  toTreatmentRecord,
+  type TreatmentCheckIn,
+  treatmentCheckInWire,
+  treatmentCreateBodyOf,
+  type TreatmentCreateInput,
+  type TreatmentFields,
+  type TreatmentRecord,
+  treatmentUpdateBodyOf,
+  treatmentWire,
+} from './treatments-contracts.ts';
 
 /*
- * The patient file's treatments (`S:1642`; KICKOFF §6.6 Drawers), on the
- * fixture world until clinozy-be serves them — every call is REPLACE_WITH_API
- * (D6). An aftercare call is scheduled server-side from the treatment (the
- * task rules derive it, `S:739`), and a treatment that uses a package session
- * counts it there.
+ * A patient's treatments on clinozy-be (`/app/patients/:patient_id/treatments`, api-integration
+ * §5.4): the list (every page, newest first), one session, a new one, a change that carries the
+ * read's `updated_at`, and the reverse with its reason — the delete and Undo the design drew
+ * become Reverse: the row stays, marked reversed, and a package session it spent comes back.
+ * "Feedback on this treatment" reads the session's check-ins (`GET …/check-ins
+ * ?patient_treatment_id=`), one read for the open drawer. Every write carries the action's key.
  */
 
-/** TanStack Query keys for treatments — under the patients' key (the file's counts). */
+/**
+ * TanStack Query keys for the treatments — under the patients' key, so a write that refreshes
+ * the patient (its packages, its check-ins) refreshes these too; each carries the organization.
+ */
 export const treatmentQueryKeys = {
   all: [...patientQueryKeys.all, 'treatments'] as const,
-  /** One patient's treatments, newest first. */
-  patient: (patientId: string) =>
-    [...treatmentQueryKeys.all, 'patient', patientId] as const,
-  detail: (id: string) => [...treatmentQueryKeys.all, 'detail', id] as const,
-  /** Each of a patient's treatments' latest check-in — the table's Feedback. */
-  checkIns: (patientId: string) =>
-    [...treatmentQueryKeys.all, 'check-ins', patientId] as const,
+  /** One patient's sessions, newest first. */
+  patient: (organizationId: string | null, patientId: string) =>
+    [...treatmentQueryKeys.all, organizationId, 'patient', patientId] as const,
+  detail: (organizationId: string | null, patientId: string, treatmentId: string) =>
+    [
+      ...treatmentQueryKeys.all,
+      organizationId,
+      'detail',
+      patientId,
+      treatmentId,
+    ] as const,
+  /** A session's check-ins — "Feedback on this treatment". */
+  checkIns: (organizationId: string | null, patientId: string, treatmentId: string) =>
+    [
+      ...treatmentQueryKeys.all,
+      organizationId,
+      'check-ins',
+      patientId,
+      treatmentId,
+    ] as const,
 };
 
-const fixtureWorld = () => import('./fixtures/world.fixtures.ts');
+/** The most one page takes. */
+const PAGE_SIZE = 100;
 
-/** The drawer's limits (`patient-file.md:127–137`; the contract's, `S:404–414`). */
-const TREATMENT_LIMITS = {
-  name: 120,
-  /** The Remark — the UI's 1,000 inside the contract's 2,000. */
-  remark: 1000,
-  /** Each template field's value (`S:411`). */
-  param: 80,
-  bodyParts: 12,
-  session: { min: 1, max: 99 },
-} as const;
+/** A cursor page's next cursor, or null on the last. */
+const nextOf = (pagination?: { has_more?: boolean; next?: string | null }) =>
+  pagination?.has_more ? (pagination.next ?? null) : null;
 
-/** What a create or an update sends (`createTreatment` / `updateTreatment`, `S:1642`). */
-const treatmentInputSchema = z.object({
-  patientId: z.uuid(),
-  appointmentId: z.uuid().nullable(),
-  offeringId: z.uuid().nullable(),
-  name: z.string().trim().min(1).max(TREATMENT_LIMITS.name),
-  template: treatmentTemplateSchema,
-  performedAt: isoDateTimeSchema,
-  doctorId: z.uuid().nullable(),
-  therapistId: z.uuid().nullable(),
-  bodyParts: z.array(bodyPartSchema).max(TREATMENT_LIMITS.bodyParts),
-  sessionNo: z
-    .number()
-    .int()
-    .min(TREATMENT_LIMITS.session.min)
-    .max(TREATMENT_LIMITS.session.max),
-  params: z.record(z.string(), z.string().max(TREATMENT_LIMITS.param)),
-  remark: z.string().max(TREATMENT_LIMITS.remark).nullable(),
-  aftercareCall: aftercareCallSchema,
-  packageId: z.uuid().nullable(),
-});
-
-/** A treatment write's fields. */
-export type TreatmentInput = z.infer<typeof treatmentInputSchema>;
-
-/** One check-in on a treatment, as "Feedback on this treatment" lists it. */
-export interface TreatmentCheckIn {
-  date: string;
-  feel: CheckinFeel;
-  score: number;
+/** Every session of a patient, newest first — the reversed ones too (every page). */
+export async function listPatientTreatments(
+  patientId: string,
+): Promise<TreatmentRecord[]> {
+  return collectAllPages(async (after) => {
+    const response = await api.get('/app/patients/{patient_id}/treatments', {
+      params: { patient_id: patientId },
+      query: {
+        sort: 'performed_at',
+        order: 'desc',
+        limit: PAGE_SIZE,
+        after: after ?? undefined,
+      },
+    });
+    return {
+      rows: z
+        .array(treatmentWire)
+        .parse(response.data ?? [])
+        .map(toTreatmentRecord),
+      next: nextOf(response.meta?.pagination),
+    };
+  }, 'patient-treatments');
 }
 
-/** A treatment with the check-ins logged on it, newest first. */
-export interface TreatmentDetail {
-  treatment: Treatment;
-  checkIns: TreatmentCheckIn[];
-}
-
-type World = Awaited<ReturnType<typeof fixtureWorld>>['clinicFixtures'];
-
-/** Use (+1) or give back (−1) one session of a package, within its total. */
-async function countSession(world: World, packageId: string | null, step: 1 | -1) {
-  if (!packageId) return;
-  const [found] = world.patientPackages.snapshot((row) => row.id === packageId);
-  if (!found) return;
-  const sessionsUsed = Math.min(
-    found.sessionsTotal,
-    Math.max(0, found.sessionsUsed + step),
+/** One session — a 404 when it is unknown or another patient's. */
+export async function fetchTreatment(
+  patientId: string,
+  treatmentId: string,
+): Promise<TreatmentRecord> {
+  const response = await api.get(
+    '/app/patients/{patient_id}/treatments/{patient_treatment_id}',
+    { params: { patient_id: patientId, patient_treatment_id: treatmentId } },
   );
-  if (sessionsUsed !== found.sessionsUsed) {
-    await world.patientPackages.update(packageId, { sessionsUsed });
-  }
+  return toTreatmentRecord(treatmentWire.parse(response.data));
 }
 
-/** One patient's treatments, newest first (REPLACE_WITH_API). */
-export async function listPatientTreatments(patientId: string): Promise<Treatment[]> {
-  const { clinicFixtures } = await fixtureWorld();
-  return clinicFixtures.treatments
-    .snapshot((treatment) => treatment.patientId === patientId)
-    .sort((a, b) => compareText(b.performedAt, a.performedAt));
-}
-
-/**
- * The latest check-in of each of a patient's treatments, by treatment —
- * the Treatments table's Feedback ("Better · 7/10"; REPLACE_WITH_API).
- */
+/** A session's check-ins, newest first (every page) — "Feedback on this treatment". */
 export async function listTreatmentCheckIns(
   patientId: string,
-): Promise<Record<string, TreatmentCheckIn>> {
-  const { clinicFixtures } = await fixtureWorld();
-  const latest: Record<string, TreatmentCheckIn> = {};
-  for (const checkIn of clinicFixtures.checkIns
-    .snapshot((row) => row.patientId === patientId && row.treatmentId !== null)
-    .sort(
-      (a, b) => compareText(a.date, b.date) || compareText(a.createdAt, b.createdAt),
-    )) {
-    if (checkIn.treatmentId) {
-      latest[checkIn.treatmentId] = {
-        date: checkIn.date,
-        feel: checkIn.feel,
-        score: checkIn.score,
-      };
-    }
-  }
-  return latest;
-}
-
-/** One treatment and its check-ins — a 404 when it is unknown or deleted (REPLACE_WITH_API). */
-export async function fetchTreatment(id: string): Promise<TreatmentDetail> {
-  const { clinicFixtures } = await fixtureWorld();
-  const treatment = await clinicFixtures.treatments.get(id);
-  const checkIns = clinicFixtures.checkIns
-    .snapshot((checkIn) => checkIn.treatmentId === id)
-    .sort((a, b) => compareText(b.date, a.date) || compareText(b.createdAt, a.createdAt))
-    .map(({ date, feel, score }) => ({ date, feel, score }));
-  return { treatment, checkIns };
+  treatmentId: string,
+): Promise<TreatmentCheckIn[]> {
+  return collectAllPages(async (after) => {
+    const response = await api.get('/app/patients/{patient_id}/check-ins', {
+      params: { patient_id: patientId },
+      query: {
+        patient_treatment_id: treatmentId,
+        sort: 'check_in_date',
+        order: 'desc',
+        limit: PAGE_SIZE,
+        after: after ?? undefined,
+      },
+    });
+    return {
+      rows: z
+        .array(treatmentCheckInWire)
+        .parse(response.data ?? [])
+        .map(toTreatmentCheckIn),
+      next: nextOf(response.meta?.pagination),
+    };
+  }, 'treatment-check-ins');
 }
 
 /**
- * Record a treatment (`createTreatment`, `S:1642`; REPLACE_WITH_API): its
- * aftercare call follows from it, and a package it uses counts the session.
+ * Record a session. One for a package spends a session of it — `409 offering_used_up` when none
+ * is left, `409 offering_expired` past its validity; the aftercare call and the file's activity
+ * entry follow on the server.
  */
-export async function createTreatment(input: TreatmentInput): Promise<Treatment> {
-  const { clinicFixtures } = await fixtureWorld();
-  const fields = validateClinicInput(treatmentInputSchema, input);
-  await clinicFixtures.patients.get(fields.patientId);
-  const saved = await clinicFixtures.treatments.create(fields);
-  await countSession(clinicFixtures, saved.packageId, 1);
-  // Today's session at the patient's open visit moves it to Checkout.
-  const { advanceVisitAfter } = await import('./visits-api.ts');
-  await advanceVisitAfter(saved.patientId, 'treatment');
-  return saved;
+export async function createTreatment({
+  patientId,
+  input,
+  idempotencyKey,
+}: {
+  patientId: string;
+  input: TreatmentCreateInput;
+  idempotencyKey: string;
+}): Promise<TreatmentRecord> {
+  const response = await api.post('/app/patients/{patient_id}/treatments', {
+    params: { patient_id: patientId },
+    body: treatmentCreateBodyOf(input),
+    idempotencyKey,
+  });
+  return toTreatmentRecord(treatmentWire.parse(response.data));
 }
 
 /**
- * Save a treatment's changes (`updateTreatment`, `S:1642`; REPLACE_WITH_API):
- * moving it to another package (or off one) moves the session with it.
+ * Save a session's changes with the read's `updated_at` — `409 record_changed` when someone saved
+ * it meanwhile, `409 treatment_reversed` once it is reversed.
  */
-export async function updateTreatment(
-  id: string,
-  input: TreatmentInput,
-): Promise<Treatment> {
-  const { clinicFixtures } = await fixtureWorld();
-  const before = await clinicFixtures.treatments.get(id);
-  const fields = validateClinicInput(treatmentInputSchema, input);
-  const saved = await clinicFixtures.treatments.update(id, fields);
-  if (before.packageId !== saved.packageId) {
-    await countSession(clinicFixtures, before.packageId, -1);
-    await countSession(clinicFixtures, saved.packageId, 1);
-  }
-  return saved;
+export async function updateTreatment({
+  treatment,
+  fields,
+  idempotencyKey,
+}: {
+  /** The session as the drawer read it. */
+  treatment: TreatmentRecord;
+  fields: TreatmentFields;
+  idempotencyKey: string;
+}): Promise<TreatmentRecord> {
+  const response = await api.patch(
+    '/app/patients/{patient_id}/treatments/{patient_treatment_id}',
+    {
+      params: { patient_id: treatment.patientId, patient_treatment_id: treatment.id },
+      body: {
+        ...treatmentUpdateBodyOf(fields, { fromPackage: treatment.packageId !== null }),
+        expected_updated_at: treatment.updatedAt,
+      },
+      idempotencyKey,
+    },
+  );
+  return toTreatmentRecord(treatmentWire.parse(response.data));
 }
 
-/** Soft-delete a treatment (`S:1546`); a package session it used is given back. */
-export async function deleteTreatment(
-  id: string,
-  reason: DeleteReason,
-  note: string | null,
-): Promise<Treatment> {
-  const { clinicFixtures } = await fixtureWorld();
-  const removed = await clinicFixtures.treatments.remove(id, reason, note);
-  await countSession(clinicFixtures, removed.packageId, -1);
-  return removed;
-}
-
-/** Restore a deleted treatment — the Undo of its toast (D32); its session counts again. */
-export async function restoreTreatment(id: string): Promise<Treatment> {
-  const { clinicFixtures } = await fixtureWorld();
-  const restored = await clinicFixtures.treatments.restore(id);
-  await countSession(clinicFixtures, restored.packageId, 1);
-  return restored;
+/**
+ * Reverse a session with its reason (1–280): it stays in the file, marked reversed, and a
+ * package session it spent comes back. Final — there is no way back.
+ */
+export async function reverseTreatment({
+  treatment,
+  reason,
+  idempotencyKey,
+}: {
+  treatment: TreatmentRecord;
+  reason: string;
+  idempotencyKey: string;
+}): Promise<TreatmentRecord> {
+  const response = await api.post(
+    '/app/patients/{patient_id}/treatments/{patient_treatment_id}/reverse',
+    {
+      params: { patient_id: treatment.patientId, patient_treatment_id: treatment.id },
+      body: { reason },
+      idempotencyKey,
+    },
+  );
+  return toTreatmentRecord(treatmentWire.parse(response.data));
 }

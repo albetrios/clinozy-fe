@@ -3,40 +3,71 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import type * as PatientsApiModule from '@/shared/api/clinic/patients-api.ts';
-import { patientQueryKeys } from '@/shared/api/clinic/patients-api.ts';
-import { taskQueryKeys } from '@/shared/api/clinic/tasks-api.ts';
+vi.mock('@/shared/api/clinic/patients-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  listPatients: vi.fn(),
+  fetchPatient: vi.fn(),
+  createPatient: vi.fn(),
+  updatePatient: vi.fn(),
+  deletePatient: vi.fn(),
+  restorePatient: vi.fn(),
+}));
+vi.mock('@/shared/api/clinic/contacts-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  findContactByPhone: vi.fn(),
+}));
+vi.mock('@/shared/notify/index.ts', () => ({
+  notify: { success: vi.fn(), error: vi.fn(), info: vi.fn(), undo: vi.fn() },
+}));
+import { findContactByPhone } from '@/shared/api/clinic/contacts-api.ts';
+import {
+  createPatient,
+  deletePatient,
+  fetchPatient,
+  listPatients,
+  patientQueryKeys,
+  restorePatient,
+  updatePatient,
+} from '@/shared/api/clinic/patients-api.ts';
+import type { PatientFields } from '@/shared/api/clinic/patients-contracts.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { contactHit } from '@/tests/utils/appointment-doubles.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { EMPTY_CONTACT_PROFILE } from '@/tests/utils/contact-doubles.ts';
+import {
+  patientRecord,
+  patientRow,
+  TEST_PATIENT_ID,
+} from '@/tests/utils/patient-doubles.ts';
 
 import {
   useCreatePatient,
   useDeletePatient,
   usePatient,
-  usePatientByPhone,
   usePatientList,
+  usePersonByPhone,
   useRestorePatient,
   useUpdatePatient,
 } from './usePatients.ts';
 
-/** Holds a write until a test lets it land, so the optimistic patch can be seen. */
-const gate = vi.hoisted(() => ({ hold: null as Promise<void> | null }));
-
-vi.mock('@/shared/api/clinic/patients-api.ts', async (importOriginal) => {
-  const actual = await importOriginal<typeof PatientsApiModule>();
-  return {
-    ...actual,
-    deletePatient: async (...args: Parameters<typeof actual.deletePatient>) => {
-      await gate.hold;
-      return actual.deletePatient(...args);
-    },
-  };
-});
-vi.mock('@/shared/notify/index.ts', () => ({
-  notify: { success: vi.fn(), error: vi.fn(), info: vi.fn(), undo: vi.fn() },
-}));
-
-const DHARTI = patientRef('Dharti Galani');
+const FIELDS: PatientFields = {
+  firstName: 'Priya',
+  lastName: 'Shah',
+  phone: '+919876543210',
+  phone2: null,
+  gender: 'female',
+  dateOfBirth: null,
+  address: null,
+  referralSource: null,
+  referredByName: null,
+  homeBranchId: 'brn_main0000000000000000',
+  types: ['aesthetic'],
+  status: 'new',
+  conversion: null,
+  followUpAt: null,
+  notes: null,
+  consents: [],
+};
 
 let client: QueryClient;
 function wrapper({ children }: { children: ReactNode }) {
@@ -44,117 +75,151 @@ function wrapper({ children }: { children: ReactNode }) {
 }
 
 beforeEach(() => {
-  resetClinicFixtures();
-  gate.hold = null;
+  vi.resetAllMocks();
+  signInTestMember();
   client = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
 });
 afterEach(() => {
   client.clear();
-  resetClinicFixtures();
+  useOrganizationStore.getState().clearOrganization();
 });
 
 describe('usePatientList', () => {
-  it('reads a cursor page under the domain key, rows that keep their identity', async () => {
-    const { result, rerender } = renderHook(() => usePatientList({ view: 'all' }), {
-      wrapper,
-    });
-    await waitFor(() => expect(result.current.rows).toHaveLength(30));
-    const first = result.current.rows;
-    rerender();
-    expect(result.current.rows).toBe(first);
+  it('reads cursor pages for the params, under the organization', async () => {
+    vi.mocked(listPatients)
+      .mockResolvedValueOnce({ rows: [patientRow()], next: 'cur_2', total: 2 })
+      .mockResolvedValueOnce({
+        rows: [patientRow({ id: 'pat_kavya0000000000000000', seq: 3507 })],
+        next: null,
+        total: 2,
+      });
+    const { result } = renderHook(() => usePatientList({ view: 'follow' }), { wrapper });
+
+    await waitFor(() => expect(result.current.rows).toHaveLength(1));
+    expect(listPatients).toHaveBeenCalledWith({ view: 'follow' }, undefined);
+    expect(result.current.hasNextPage).toBe(true);
+
+    await act(() => result.current.fetchNextPage());
+    await waitFor(() => expect(result.current.rows).toHaveLength(2));
+    expect(listPatients).toHaveBeenLastCalledWith({ view: 'follow' }, 'cur_2');
     expect(result.current.hasNextPage).toBe(false);
-    expect(client.getQueryState(patientQueryKeys.list({ view: 'all' }))?.status).toBe(
-      'success',
-    );
+  });
+
+  it('waits for an organization', () => {
+    useOrganizationStore.getState().clearOrganization();
+    renderHook(() => usePatientList({}), { wrapper });
+    expect(listPatients).not.toHaveBeenCalled();
   });
 });
 
-describe('usePatient / usePatientByPhone', () => {
-  it('reads one patient, and the patient already on a mobile; idle without either', async () => {
-    const idle = renderHook(() => usePatient(undefined), { wrapper });
-    expect(idle.result.current.fetchStatus).toBe('idle');
-    const { result } = renderHook(() => usePatient(DHARTI), { wrapper });
-    await waitFor(() => expect(result.current.data?.seq).toBe(3508));
-
-    const lookup = renderHook(() => usePatientByPhone('+918200603212', null), {
+describe('usePatient', () => {
+  it('reads one patient, and stays idle without an id', async () => {
+    vi.mocked(fetchPatient).mockResolvedValue(patientRecord());
+    const { result, rerender } = renderHook(({ id }) => usePatient(id), {
       wrapper,
+      initialProps: { id: undefined as string | undefined },
     });
-    await waitFor(() => expect(lookup.result.current.data?.id).toBe(DHARTI));
-    const none = renderHook(() => usePatientByPhone(null, null), { wrapper });
-    expect(none.result.current.fetchStatus).toBe('idle');
+    expect(fetchPatient).not.toHaveBeenCalled();
+
+    rerender({ id: TEST_PATIENT_ID });
+    await waitFor(() => expect(result.current.data?.name).toBe('Priya Shah'));
+    expect(fetchPatient).toHaveBeenCalledWith(TEST_PATIENT_ID);
   });
 });
 
-describe('the patient writes', () => {
-  it('creates a patient and refreshes the patients and the tasks', async () => {
+describe('usePersonByPhone', () => {
+  it('looks the number up once there is one', async () => {
+    vi.mocked(findContactByPhone).mockResolvedValue({
+      ...contactHit({ patientId: TEST_PATIENT_ID }),
+      ...EMPTY_CONTACT_PROFILE,
+      patientNumber: 3508,
+    });
+    const { result, rerender } = renderHook(({ phone }) => usePersonByPhone(phone), {
+      wrapper,
+      initialProps: { phone: null as string | null },
+    });
+    expect(findContactByPhone).not.toHaveBeenCalled();
+
+    rerender({ phone: '+919825011241' });
+    await waitFor(() => expect(result.current.data?.patientNumber).toBe(3508));
+    expect(findContactByPhone).toHaveBeenCalledWith('+919825011241');
+  });
+});
+
+describe('writes', () => {
+  it('creates with the action key and refreshes the lists', async () => {
+    vi.mocked(createPatient).mockResolvedValue(patientRecord());
     const invalidate = vi.spyOn(client, 'invalidateQueries');
     const { result } = renderHook(() => useCreatePatient(), { wrapper });
-    let created: Awaited<ReturnType<typeof result.current.mutateAsync>> | undefined;
-    await act(async () => {
-      created = await result.current.mutateAsync({
-        firstName: 'Priya',
-        phone: '+919876543210',
-      });
-    });
-    expect(created?.patient.firstName).toBe('Priya');
-    expect(created?.onboardingTaskId).toEqual(expect.any(String));
-    const keys = invalidate.mock.calls.map(([filters]) => filters?.queryKey);
-    expect(keys).toContainEqual(patientQueryKeys.all);
-    expect(keys).toContainEqual(taskQueryKeys.all);
-  });
 
-  it('saves a patient', async () => {
-    const { result } = renderHook(() => useUpdatePatient(), { wrapper });
-    await act(async () => {
-      await result.current.mutateAsync({
-        id: DHARTI,
-        patch: { notes: 'Prefers mornings' },
-      });
+    await act(() => result.current.mutateAsync({ fields: FIELDS, person: 'new' }));
+
+    expect(createPatient).toHaveBeenCalledWith({
+      fields: FIELDS,
+      person: 'new',
+      idempotencyKey: expect.any(String),
     });
-    const detail = renderHook(() => usePatient(DHARTI), { wrapper });
-    await waitFor(() =>
-      expect(detail.result.current.data?.notes).toBe('Prefers mornings'),
+    expect(invalidate).toHaveBeenCalledWith(
+      expect.objectContaining({ queryKey: patientQueryKeys.all }),
     );
   });
 
-  it('removes a row from every list at once, and Undo brings it back', async () => {
-    let release = () => {};
-    gate.hold = new Promise<void>((resolve) => {
-      release = resolve;
+  it('saves the record as read with the drawer fields', async () => {
+    const record = patientRecord();
+    vi.mocked(updatePatient).mockResolvedValue(record);
+    const { result } = renderHook(() => useUpdatePatient(), { wrapper });
+
+    await act(() => result.current.mutateAsync({ record, fields: FIELDS }));
+
+    expect(updatePatient).toHaveBeenCalledWith({
+      record,
+      fields: FIELDS,
+      idempotencyKey: expect.any(String),
+    });
+  });
+
+  it('takes a deleted patient out of every list at once, and puts them back with restore', async () => {
+    let land: () => void = () => undefined;
+    vi.mocked(deletePatient).mockReturnValue(
+      new Promise<void>((resolve) => {
+        land = resolve;
+      }),
+    );
+    vi.mocked(restorePatient).mockResolvedValue(patientRecord());
+    const key = patientQueryKeys.list('org_test', { view: 'all' });
+    client.setQueryData(key, {
+      pages: [{ rows: [patientRow()], next: null, hasMore: false }],
+      pageParams: [null],
     });
     const { result } = renderHook(
-      () => ({
-        list: usePatientList({ view: 'all' }),
-        remove: useDeletePatient(),
-        restore: useRestorePatient(),
-      }),
+      () => ({ remove: useDeletePatient(), restore: useRestorePatient() }),
       { wrapper },
     );
-    await waitFor(() => expect(result.current.list.rows).toHaveLength(30));
 
+    let deleting: Promise<void> = Promise.resolve();
     act(() => {
-      result.current.remove.mutate({ id: DHARTI, reason: 'duplicate', note: null });
+      deleting = result.current.remove.mutateAsync({
+        id: TEST_PATIENT_ID,
+        reason: 'duplicate',
+        note: null,
+      });
     });
     await waitFor(() =>
-      expect(result.current.list.rows.some((patient) => patient.id === DHARTI)).toBe(
-        false,
-      ),
+      expect(
+        client.getQueryData<{ pages: { rows: unknown[] }[] }>(key)?.pages[0]?.rows,
+      ).toEqual([]),
     );
-    await act(async () => {
-      release();
-      await gate.hold;
+    land();
+    await act(() => deleting);
+    expect(deletePatient).toHaveBeenCalledWith({
+      patientId: TEST_PATIENT_ID,
+      reason: 'duplicate',
+      note: null,
     });
-    await waitFor(() => expect(result.current.remove.isSuccess).toBe(true));
 
-    await act(async () => {
-      await result.current.restore.mutateAsync(DHARTI);
-    });
-    await waitFor(() =>
-      expect(result.current.list.rows.some((patient) => patient.id === DHARTI)).toBe(
-        true,
-      ),
-    );
+    await act(() => result.current.restore.mutateAsync(TEST_PATIENT_ID));
+    expect(restorePatient).toHaveBeenCalledWith(TEST_PATIENT_ID, expect.any(String));
   });
 });

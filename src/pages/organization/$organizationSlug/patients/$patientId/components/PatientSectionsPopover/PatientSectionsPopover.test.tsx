@@ -3,7 +3,6 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { PatientFileCounts } from '@/shared/api/clinic/patient-file-contracts.ts';
 import {
   PATIENT_FILE_SECTIONS,
   type PatientFileSectionSlug,
@@ -17,10 +16,6 @@ import {
   type PatientSectionsPopoverProps,
 } from './PatientSectionsPopover.tsx';
 
-const COUNTS = Object.fromEntries(
-  PATIENT_FILE_SECTIONS.map((section) => [section, section === 'packages' ? 0 : 2]),
-) as PatientFileCounts;
-
 /** The popover under its folder button, opened. */
 function Harness(props: Partial<PatientSectionsPopoverProps>) {
   const [open, setOpen] = useState(true);
@@ -29,10 +24,9 @@ function Harness(props: Partial<PatientSectionsPopoverProps>) {
       open={open}
       onOpenChange={setOpen}
       trigger={<button type="button">Sections</button>}
-      patientName="Dharti Galani"
+      patientName="Priya Shah"
       current="visits"
       viewable={PATIENT_FILE_SECTIONS}
-      counts={COUNTS}
       pins={['overview', 'visits']}
       onPick={vi.fn()}
       onTogglePin={vi.fn()}
@@ -49,7 +43,7 @@ describe('PatientSectionsPopover', () => {
     const { baseElement } = renderWithProviders(<Harness />);
     const panel = await screen.findByTestId('patient-file-sections-panel');
     expect(panel).toHaveTextContent('Patient file');
-    expect(panel).toHaveTextContent('Dharti Galani');
+    expect(panel).toHaveTextContent('Priya Shah');
     expect(panel).toHaveTextContent('Pinned sections stay in the bar');
     expect(
       within(panel)
@@ -59,15 +53,21 @@ describe('PatientSectionsPopover', () => {
     expect(await axeForDialog(baseElement)).toHaveNoViolations();
   });
 
-  it('says what each section holds: open now, empty, or has records', async () => {
-    renderWithProviders(<Harness counts={{ ...COUNTS, timeline: 0 }} />);
+  it('marks the open section "Open now", and counts no section’s records', async () => {
+    renderWithProviders(<Harness />);
     await screen.findByTestId('patient-file-sections-panel');
     expect(tile('visits')).toHaveTextContent('Open now');
     expect(tile('visits')).toHaveAttribute('aria-current', 'page');
-    expect(tile('packages')).toHaveTextContent('Empty');
-    expect(tile('reports')).toHaveTextContent('Has records');
-    // The Overview is never empty.
-    expect(tile('timeline')).toHaveTextContent('Has records');
+    for (const section of PATIENT_FILE_SECTIONS.filter((slug) => slug !== 'visits')) {
+      expect(tile(section)).not.toHaveAttribute('aria-current');
+      expect(tile(section)).not.toHaveTextContent(/Open now|Empty|Has records/);
+    }
+  });
+
+  it('marks no tile open over a drawer outside the sections', async () => {
+    renderWithProviders(<Harness current={null} />);
+    const panel = await screen.findByTestId('patient-file-sections-panel');
+    expect(panel).not.toHaveTextContent('Open now');
   });
 
   it('pins and unpins from the bar, naming the section', async () => {

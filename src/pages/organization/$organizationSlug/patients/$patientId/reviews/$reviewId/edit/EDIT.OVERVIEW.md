@@ -8,6 +8,12 @@ review drawer, prefilled, over it (`../../../shared/components/ReviewDrawer/`) �
 record's visit and day. An id that names no review goes back with "Review not found · it may
 have been deleted" (`useDialogRouteRecord`).
 
+Data: clinozy-be — the record is `GET /app/patients/{patient_id}/reviews/{patient_review_id}`
+(`fetchReview`, `@/shared/api/clinic/feedback-api.ts`; `patient:read`), the save a `PATCH` with
+`expected_updated_at` (`patient:update`): a `409 record_changed` offers Reload. Its files show
+as a count only — their names are not kept and none can be read back (B1); new ones are added
+through the upload tray.
+
 Gated by the file layout (membership, the `clinic-patients` module, the org status); in-room
 Patients edit is `useClinicAccess` — anyone without it who follows the link lands back on the
 section with the permission toast.

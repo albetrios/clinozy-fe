@@ -2,9 +2,11 @@ import { useQueryClient } from '@tanstack/react-query';
 import type { FieldPath, UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import type { PatientReport } from '@/shared/api/clinic/clinic-schema.ts';
-import { attachPatientReportFile } from '@/shared/api/clinic/patient-reports-api.ts';
-import { patientQueryKeys } from '@/shared/api/clinic/patients-api.ts';
+import {
+  attachPatientReportFile,
+  patientReportQueryKeys,
+} from '@/shared/api/clinic/patient-reports-api.ts';
+import type { PatientReport } from '@/shared/api/clinic/patient-reports-contracts.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useCreatePatientReport } from '@/shared/hooks/usePatientReports/index.ts';
 import { useUploadQueue } from '@/shared/hooks/useUploadQueue/index.ts';
@@ -24,8 +26,8 @@ const FIELD_STEPS: readonly [FieldPath<ReportFormValues>, ReportStepId][] = [
   ['note', 'notes'],
 ];
 
-/** The contract's names the form spells differently. */
-const SERVER_FIELDS = { notes: 'note' } as const;
+/** The API's names the form spells differently (the 400's `errors[].field`, camel-cased). */
+const SERVER_FIELDS = { notes: 'note', reportDate: 'date', fileKeys: 'files' } as const;
 
 /** Options of {@link useReportSave}. */
 export interface UseReportSaveOptions {
@@ -37,9 +39,10 @@ export interface UseReportSaveOptions {
 
 /**
  * Upload report's write on the shared drawer save (KICKOFF §6.6): a blank
- * name → "Name the report" and the Report step opens; else `createReport`
- * (`S:1644`), then each picked file goes to the upload tray and is attached
- * to the report as the tray confirms it — the prototype saves neither the
+ * name → "Name the report" and the Report step opens; else `POST …/reports`
+ * (a 400 outlines its field and opens its step), then each picked file goes
+ * to the upload tray and is attached to the report (`PATCH …/reports/:id`
+ * `file_keys`) as the tray confirms it — the prototype saves neither the
  * files nor the note (H:4831); the build saves both (§7.3, F17). The tray
  * outlives the drawer, so the attach does not depend on it staying open.
  */
@@ -64,14 +67,19 @@ export function useReportSave({ form, patientId, onStep, onDone }: UseReportSave
           ([name]) => field === name || field.startsWith(`${name}.`),
         )?.[1] ?? 'report',
       ),
-    write: () => create.mutateAsync(reportInputOf(form.getValues(), patientId)),
+    write: () =>
+      create.mutateAsync({ patientId, input: reportInputOf(form.getValues()) }),
     onDone: (report) => {
       const files = form.getValues('files').map((picked) => picked.file);
       if (files.length > 0) {
         enqueue(files, {
           onUploaded: async (key) => {
-            await attachPatientReportFile(report.id, key);
-            void queryClient.invalidateQueries({ queryKey: patientQueryKeys.all });
+            await attachPatientReportFile({
+              patientId,
+              reportId: report.id,
+              fileKey: key,
+            });
+            void queryClient.invalidateQueries({ queryKey: patientReportQueryKeys.all });
           },
         });
       }

@@ -24,8 +24,8 @@ import { manifest } from './payments.manifest.ts';
  * `patient-file.md:34–46`): the patient's receipts and refunds, newest
  * first — a refund with the blush start bar — "3 transactions" and "All
  * transactions loaded"; a billing section, so it also needs billing view
- * (`S:33`). A row opens nothing. "Record payment" opens Receive payment for
- * the open invoices, or says nothing is due.
+ * (`S:33`). A row opens nothing. Record payment comes back with Payments on
+ * clinozy-be (§5.7); the receipts are still the fixture world's.
  */
 export function PatientPaymentsPage() {
   const { t } = useTranslation(PATIENT_TABLE_NS);

@@ -1,9 +1,13 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { cn } from '@/lib/utils.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { type PillTone, TonePill } from '@/shared/components/Cells/index.ts';
+import { EmptyState } from '@/shared/components/EmptyState/index.ts';
+import { RetryError } from '@/shared/components/RetryError/index.ts';
+import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { type AppIcon, ChevronRight, Plus } from '@/shared/icons/index.ts';
 
@@ -14,6 +18,7 @@ import {
   TIMELINE_NS,
   TIMELINE_TEST_IDS,
 } from '../../timeline.constants.ts';
+import type { BentoRead } from './bento-read.ts';
 
 /** A card's 28px ghost square: its "New …" plus and its "Open <Card>" chevron. */
 function SquareButton({
@@ -43,7 +48,7 @@ function SquareButton({
   );
 }
 
-/** A card's outline 28px action: "Book", "Upload", "Use session". */
+/** A card's outline 28px action: "Book", "Reschedule", "Upload". */
 export function BentoButton({
   onClick,
   testId,
@@ -183,4 +188,40 @@ export function BentoRow({
       ) : null}
     </button>
   );
+}
+
+/**
+ * A card's read in place while it holds nothing to list: two bars while it loads, its failure
+ * with Retry (the card's own, no toast of its own), else its empty line once read.
+ */
+export function BentoReadState({
+  read,
+  empty,
+  label,
+  emptyTitle,
+  testId,
+}: {
+  read: BentoRead;
+  /** Nothing to list — the state shows only then. */
+  empty: boolean;
+  /** What is loading, for screen readers: the card's title. */
+  label: string;
+  emptyTitle: string;
+  /** The card's test id — the empty line is `<card>-empty`. */
+  testId: string;
+}) {
+  const { t } = useTranslation(ERRORS_NS);
+  if (!empty) return null;
+  if (read.isError) {
+    return (
+      <RetryError
+        message={t(ERRORS_KEYS.frontend.query.loadFailed)}
+        onRetry={read.retry}
+      />
+    );
+  }
+  if (read.isPending) return <SkeletonRows rows={2} label={label} />;
+  return read.isSuccess ? (
+    <EmptyState variant="inline" testId={`${testId}-empty`} title={emptyTitle} />
+  ) : null;
 }

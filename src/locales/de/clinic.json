@@ -331,7 +331,7 @@
     },
     "missing": "Geben Sie Name und Mobilnummer ein",
     "mobileInvalid": "Geben Sie eine 10-stellige Mobilnummer ein",
-    "created": "Patient {{id}} angelegt · Onboarding-Aufgabe hinzugefügt",
+    "created": "Patient {{id}} angelegt",
     "openFile": "Akte öffnen",
     "saved": "{{name}} gespeichert",
     "registered": "{{name}} als Patient {{id}} registriert",
@@ -339,7 +339,8 @@
     "registeredPhotos_other": "{{name}} als Patient {{id}} registriert · {{count}} Fotos abgelegt",
     "duplicate": "Gleiche Mobilnummer wie {{name}} · {{id}}",
     "useExisting": "Vorhandenen verwenden",
-    "summaryEmpty": "Neuer Patient"
+    "summaryEmpty": "Neuer Patient",
+    "knownPerson": "{{name}} ist schon in Ihren Kontakten · die Akte wird für diese Person angelegt"
   },
   "recordDrawer": {
     "cancel": "Abbrechen",
@@ -810,9 +811,6 @@
     "pricesHiddenHint": "Preise ausgeblendet · mit dem Auge einblenden",
     "showPrices": "Preise anzeigen",
     "hidePrices": "Preise ausblenden",
-    "savesOnList": "Spart {{amount}} gegenüber dem Listenpreis",
-    "invoicedAmount": "{{amount}} abgerechnet",
-    "atListPrice": "Zum Listenpreis",
     "columns": {
       "suggested": "Vorgeschlagen",
       "qty": "Menge",
@@ -823,7 +821,7 @@
     "more": "Mehr",
     "quantity": "Menge",
     "finalPrice": "Endpreis",
-    "belowFloor": "Unter dem niedrigsten Preis {{price}}",
+    "belowFloor": "Unter dem niedrigsten Preis",
     "tooMuchDiscount": "Zu viel Rabatt · fragen Sie einen Administrator",
     "details": "Leistungsdetails",
     "statuses": {
@@ -841,8 +839,6 @@
     "statusLabel": "Status · {{status}}",
     "invoiced": "Abgerechnet",
     "invoicedOf": "Abgerechnet · {{done}} von {{total}}",
-    "linkInvoice": "Rechnung verknüpfen",
-    "linkInvoiceHint": "Rechnung manuell verknüpfen",
     "remove": "Entfernen",
     "empty": "Für {{first}} wurde noch nichts vorgeschlagen.",
     "whyIdea": "Warum diese Idee",
@@ -852,15 +848,10 @@
     "addHint": "Zu den Vorschlägen hinzufügen",
     "addOffering": "Leistung hinzufügen",
     "purchasesTitle": "Letzte Käufe von {{first}}",
-    "purchasesSummary_one": "{{count}} Position · {{paid}} bisher bezahlt",
-    "purchasesSummary_other": "{{count}} Positionen · {{paid}} bisher bezahlt",
     "purchaseColumns": {
       "date": "Datum",
       "bought": "Gekauft",
-      "qty": "Menge",
-      "paid": "Bezahlt",
-      "sessions": "Sitzungen",
-      "invoice": "Rechnung"
+      "sessions": "Sitzungen"
     },
     "sessionsUsed": "{{used}} von {{total}} genutzt",
     "activityTitle": "Kontaktaktivität",
@@ -899,17 +890,7 @@
       "lowest": "mindestens {{price}}"
     },
     "ideaReasons": {
-      "history": "Idee aus dem Verlauf",
-      "note": "Arztnotiz · „{{text}}“",
-      "complaint": "Beschwerde · {{text}}",
-      "visits_one": "{{count}} Besuch bisher · ein Paket spart bei jeder Sitzung",
-      "visits_other": "{{count}} Besuche bisher · ein Paket spart bei jeder Sitzung",
-      "renew": "Paket fast aufgebraucht · verlängern",
-      "first": "Erstbesuch · mit einer Beratung beginnen"
-    },
-    "purchaseKinds": {
-      "medicine": "Medikament",
-      "item": "Artikel"
+      "history": "Idee aus dem Verlauf"
     },
     "delivery": {
       "queued": "In Warteschlange",
@@ -919,7 +900,9 @@
       "failed": "Nicht zugestellt",
       "received": "Empfangen"
     },
-    "activityLead": "Lead {{id}}"
+    "activityLead": "Lead {{id}}",
+    "purchasesCount_one": "{{count}} Position",
+    "purchasesCount_other": "{{count}} Positionen"
   },
   "contactEditor": {
     "title": "Kontakt bearbeiten",

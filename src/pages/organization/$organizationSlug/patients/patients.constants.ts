@@ -17,8 +17,6 @@ export const PATIENTS_KEYS = {
     /** The view tabs' accessible name. */
     label: 'views.label',
     all: 'views.all',
-    today: 'views.today',
-    dues: 'views.dues',
     follow: 'views.follow',
     recall: 'views.recall',
   },
@@ -34,7 +32,6 @@ export const PATIENTS_KEYS = {
     conversion: 'columns.conversion',
     age: 'columns.age',
     followUp: 'columns.followUp',
-    due: 'columns.due',
     updated: 'columns.updated',
   },
   table: {
@@ -44,8 +41,6 @@ export const PATIENTS_KEYS = {
     age: 'table.age',
   },
   rowActions: {
-    newInvoice: 'rowActions.newInvoice',
-    collect: 'rowActions.collect',
     edit: 'rowActions.edit',
     delete: 'rowActions.delete',
   },
@@ -62,16 +57,18 @@ export const PATIENTS_TABLE_ID = 'patients';
 
 /**
  * The Filters popover's fields by URL key, in its section order
- * (`patients.md:119–133`): Gender · Type · Status · Conversion, then Created and
- * Follow-up date. The badge sections list each enum's values (the server
- * pages; contract over source, §6.5) and take any number of picks. Room-only, so
- * it stays out of `patients.search.ts`, which rides the entry chunk.
+ * (`patients.md:119–133`): Type (any number) · Status and Conversion (one each, as the API
+ * filters them) · Created and Follow-up date (no "Not set"). Room-only, so it stays out of
+ * `patients.search.ts`, which rides the entry chunk.
  */
 export const PATIENT_FILTER_FIELDS = {
-  gender: { kind: 'options', values: PATIENT_FILTER_VALUES.gender },
   types: { kind: 'options', values: PATIENT_FILTER_VALUES.types },
-  status: { kind: 'options', values: PATIENT_FILTER_VALUES.status },
-  conversion: { kind: 'options', values: PATIENT_FILTER_VALUES.conversion },
+  status: { kind: 'options', values: PATIENT_FILTER_VALUES.status, single: true },
+  conversion: {
+    kind: 'options',
+    values: PATIENT_FILTER_VALUES.conversion,
+    single: true,
+  },
   created: { kind: 'date', presets: 'created' },
-  followUp: { kind: 'date', presets: 'followUp' },
+  followUp: { kind: 'date', presets: 'followUp', without: ['not_set'] },
 } as const satisfies RoomFilterFields;

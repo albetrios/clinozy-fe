@@ -4,6 +4,7 @@ import {
   PATIENT_FILE_SECTIONS,
   viewablePatientFileSections,
 } from '@/shared/clinic/patient-file-sections.ts';
+import { TEST_PATIENT_ID } from '@/tests/utils/patient-doubles.ts';
 
 import {
   PATIENT_FILE_GROUPS,
@@ -50,24 +51,38 @@ describe('togglePatientFilePin', () => {
 });
 
 describe('patientFileSectionOf', () => {
-  const file = '/organization/acme/patients/p1';
+  const file = `/organization/acme/patients/${TEST_PATIENT_ID}`;
 
   it('reads the section from the URL, a record’s dialog included', () => {
-    expect(patientFileSectionOf(`${file}/visits`, 'p1', undefined)).toBe('visits');
-    expect(patientFileSectionOf(`${file}/prescriptions/create`, 'p1', undefined)).toBe(
-      'prescriptions',
+    expect(patientFileSectionOf(`${file}/visits`, TEST_PATIENT_ID, undefined)).toBe(
+      'visits',
     );
+    expect(
+      patientFileSectionOf(`${file}/prescriptions/create`, TEST_PATIENT_ID, undefined),
+    ).toBe('prescriptions');
   });
 
   it('keeps the section a file-level drawer opened over, Clinical notes otherwise', () => {
-    expect(patientFileSectionOf(`${file}/edit`, 'p1', 'images')).toBe('images');
-    expect(patientFileSectionOf(`${file}/edit`, 'p1', 'nowhere')).toBe('overview');
+    expect(patientFileSectionOf(`${file}/edit`, TEST_PATIENT_ID, 'images')).toBe(
+      'images',
+    );
+    expect(patientFileSectionOf(`${file}/edit`, TEST_PATIENT_ID, 'nowhere')).toBe(
+      'overview',
+    );
+    expect(
+      patientFileSectionOf(`${file}/check-ins/create`, TEST_PATIENT_ID, 'visits'),
+    ).toBe('visits');
+    expect(
+      patientFileSectionOf(`${file}/reviews/create`, TEST_PATIENT_ID, undefined),
+    ).toBe('overview');
   });
 
   it('is none for anything else', () => {
-    expect(patientFileSectionOf(`${file}/secret`, 'p1', 'images')).toBeNull();
-    expect(patientFileSectionOf(file, 'p1', undefined)).toBeNull();
-    expect(patientFileSectionOf(`${file}/visits`, 'p2', undefined)).toBeNull();
+    expect(patientFileSectionOf(`${file}/secret`, TEST_PATIENT_ID, 'images')).toBeNull();
+    expect(patientFileSectionOf(file, TEST_PATIENT_ID, undefined)).toBeNull();
+    expect(
+      patientFileSectionOf(`${file}/visits`, 'pat_other0000000000000000', undefined),
+    ).toBeNull();
   });
 });
 

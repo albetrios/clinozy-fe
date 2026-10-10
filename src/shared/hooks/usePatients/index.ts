@@ -1,11 +1,12 @@
 export {
+  type PatientCreateVars,
   type PatientDeleteVars,
   type PatientUpdateVars,
   useCreatePatient,
   useDeletePatient,
   usePatient,
-  usePatientByPhone,
   usePatientList,
+  usePersonByPhone,
   useRestorePatient,
   useUpdatePatient,
 } from './usePatients.ts';

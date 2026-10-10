@@ -2,9 +2,17 @@ import { useNavigate, useParams, useSearch } from '@tanstack/react-router';
 import { useCallback } from 'react';
 
 import { organizationPatientSection } from '@/lib/routes/patient-file-builders.ts';
-import type { VisitRecord } from '@/shared/api/clinic/visits-contracts.ts';
+import {
+  isSessionDue,
+  stageAfterRecord,
+  type VisitRecord,
+  type VisitRecordKind,
+} from '@/shared/api/clinic/visits-contracts.ts';
 import { CLINIC_SECTION_ROUTES } from '@/shared/clinic/clinic-home.ts';
 import { VISIT_REFERRER } from '@/shared/clinic/clinic-referrer.ts';
+import { usePatientPackages } from '@/shared/hooks/usePatientPackages/index.ts';
+import { useTodayMoves } from '@/shared/hooks/useTodayFloor/index.ts';
+import { usePatientTreatments } from '@/shared/hooks/useTreatments/index.ts';
 import { useOpenVisit } from '@/shared/hooks/useVisits/index.ts';
 
 import { usePatientFileContext } from '../../patient-file-context.ts';
@@ -38,14 +46,54 @@ export interface VisitFlowReturn {
   backToFlow: () => void;
   /** Out of the flow: Today when it came from there, else the Overview. */
   leaveFlow: () => void;
+  /**
+   * Move the open visit on after a record written in it (Q8 — the plan's proposal, pending the
+   * user: the client calls `…/stage` after the write): an Rx to Treatment while a session is
+   * due, else to Checkout; a session to Checkout; never backwards, nothing outside the flow.
+   */
+  advanceAfter: (kind: VisitRecordKind) => void;
 }
 
 /**
- * The visit flow's place in the URL (KICKOFF §6.6, D18; L-64): a record drawer
- * opened from the flow (`prescriptions/create?visit=open`) knows the open visit
- * — the booking a new Rx is written at — and closes back to the flow; the
- * flow's exits (Pause, Complete visit) and the file's way back return to Today
- * when Today's card opened it (`from=today`).
+ * The visit's stage move after a record (Q8): what decides whether a session is still due — the
+ * sessions recorded at it and the patient's packages (the server's counts) — read only in the
+ * flow, and Today's own stage move.
+ */
+function useAdvanceAfter(patientId: string, visit: VisitRecord | null) {
+  const { viewable } = usePatientFileContext();
+  const reads = visit !== null;
+  const packages = usePatientPackages(patientId, { enabled: reads });
+  const treatments = usePatientTreatments(patientId, {
+    enabled: reads && viewable.includes('treatments'),
+    // Only a stage decision reads it; the flow's Treatment card shows its failure.
+    notifyOnError: false,
+  });
+  const { moveStage } = useTodayMoves();
+  const { mutate } = moveStage;
+  return useCallback(
+    (kind: VisitRecordKind) => {
+      if (!visit) return;
+      const sessionRecorded = (treatments.data ?? []).some(
+        (row) => row.appointmentId === visit.appointmentId && row.status === 'done',
+      );
+      const sessionDue = isSessionDue({
+        visit,
+        sessionRecorded,
+        packages: packages.data ?? [],
+      });
+      const stage = stageAfterRecord(kind, { visit, sessionDue });
+      if (stage) mutate({ appointmentId: visit.appointmentId, stage });
+    },
+    [visit, treatments.data, packages.data, mutate],
+  );
+}
+
+/**
+ * The visit flow's place in the URL (KICKOFF §6.6; L-64): a record drawer opened from the flow
+ * (`prescriptions/create?visit=open`) knows the open visit — the booking a new record is written
+ * at — moves it on once it has written one, and closes back to the flow; the flow's exits
+ * (Pause, Complete visit) and the file's way back return to Today when Today's card opened it
+ * (`from=today`).
  */
 export function useVisitFlowReturn(): VisitFlowReturn {
   const search: { visit?: unknown; from?: unknown } = useSearch({ strict: false });
@@ -55,6 +103,8 @@ export function useVisitFlowReturn(): VisitFlowReturn {
   const inFlow = search.visit === 'open';
   const fromToday = search.from === VISIT_REFERRER;
   const open = useOpenVisit(inFlow ? patientId : '');
+  const visit = inFlow ? (open.data ?? null) : null;
+  const advanceAfter = useAdvanceAfter(patientId, visit);
 
   const backToFlow = useCallback(() => {
     void navigate({
@@ -78,10 +128,11 @@ export function useVisitFlowReturn(): VisitFlowReturn {
 
   return {
     inFlow,
-    visit: inFlow ? (open.data ?? null) : null,
+    visit,
     ready: !(inFlow && open.isPending),
     fromToday,
     backToFlow,
     leaveFlow,
+    advanceAfter,
   };
 }

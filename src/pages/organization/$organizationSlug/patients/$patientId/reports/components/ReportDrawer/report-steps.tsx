@@ -3,7 +3,7 @@ import type { UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { REPORT_TYPE_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
-import { REPORT_LIMITS } from '@/shared/api/clinic/patient-reports-api.ts';
+import { REPORT_LIMITS } from '@/shared/api/clinic/patient-reports-contracts.ts';
 import { UPLOAD_MAX_BYTES } from '@/shared/api/uploads-api.ts';
 import {
   DrawerChips,
@@ -95,17 +95,19 @@ export function ReportDateFields({
 }: ReportStepFieldsProps & { today: string }) {
   const { t } = useTranslation(REPORT_NS);
   const ids = useId();
+  const date = useDrawerFieldIds(form, ids)('date');
   return (
     <DrawerStepBody readOnly={false}>
       <DrawerFieldGrid>
         <DrawerField
           label={t(K.date)}
-          htmlFor={`${ids}-date`}
+          htmlFor={date.id}
+          error={date.error}
           span="half"
           stretch={false}
         >
           <DatePicker
-            id={`${ids}-date`}
+            id={date.id}
             label={t(K.date)}
             value={values.date}
             onChange={(date) =>
@@ -134,12 +136,15 @@ export function ReportNotesFields({ form, values }: ReportStepFieldsProps) {
   const { t: tTray } = useTranslation(UPLOAD_TRAY_NS);
   const { formatNumber } = useLocaleFormat();
   const ids = useId();
+  const field = useDrawerFieldIds(form, ids);
+  const files = field('files');
+  const note = field('note');
   return (
     <DrawerStepBody readOnly={false}>
       <DrawerFieldGrid>
-        <DrawerField label={t(K.file)} htmlFor={`${ids}-file`} span="full">
+        <DrawerField label={t(K.file)} htmlFor={files.id} error={files.error} span="full">
           <DrawerFilesField
-            id={`${ids}-file`}
+            id={files.id}
             files={values.files}
             onChange={(files) =>
               form.setValue('files', files.slice(0, REPORT_LIMITS.files), {
@@ -159,9 +164,14 @@ export function ReportNotesFields({ form, values }: ReportStepFieldsProps) {
             testId={`${TEST_ID}-file`}
           />
         </DrawerField>
-        <DrawerField label={t(K.upload.note)} htmlFor={`${ids}-note`} span="full">
+        <DrawerField
+          label={t(K.upload.note)}
+          htmlFor={note.id}
+          error={note.error}
+          span="full"
+        >
           <DrawerTextarea
-            id={`${ids}-note`}
+            {...note.control}
             rows={3}
             maxLength={REPORT_LIMITS.notes}
             placeholder={t(K.upload.notePlaceholder)}

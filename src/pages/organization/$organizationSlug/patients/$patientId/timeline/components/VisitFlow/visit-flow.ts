@@ -1,11 +1,9 @@
-import { invoiceTotals } from '@/shared/api/clinic/clinic-money.ts';
-import type { Treatment } from '@/shared/api/clinic/clinic-schema.ts';
-import type { TreatmentInput } from '@/shared/api/clinic/treatments-api.ts';
-import type {
-  VisitDetail,
-  VisitPack,
-  VisitRecord,
-} from '@/shared/api/clinic/visits-contracts.ts';
+import type { PatientPackageRow } from '@/shared/api/clinic/patient-packages-contracts.ts';
+import {
+  TREATMENT_LIMITS,
+  type TreatmentCreateInput,
+  type TreatmentRecord,
+} from '@/shared/api/clinic/treatments-contracts.ts';
 
 import { VISIT_FLOW_STEPS, type VisitFlowStep } from './visit-flow.constants.ts';
 
@@ -16,94 +14,84 @@ export const OUTLINE_BUTTON = {
   className: 'text-foreground hover:bg-muted text-detail shadow-none',
 } as const;
 
-/** A 32px dark step button ("✓ Complete visit", "Create invoice from visit"): the props a `Button` spreads. */
+/** A 32px dark step button ("✓ Complete visit"): the props a `Button` spreads. */
 export const DARK_BUTTON = { size: 'sm', className: 'text-detail' } as const;
 
 /** Where a step stands: done (✓), current (the first not done after the done ones), or later. */
 export type VisitFlowStepState = 'done' | 'current' | 'later';
 
 /**
- * Each step's state (H:4880–4886): a step is done by its record — the checks
- * all ticked, an Rx and a session written at the visit, its invoice, the
- * share — and the current one is the first not done whose steps before it are
- * all done. Every card stays open; only Treatment waits for the checks.
+ * Each shown step's state (H:4880–4886): a step is done by its record at the visit — the three
+ * checks' notes, an Rx, a session — and the current one is the first not done whose steps before
+ * it are all done. Every card stays open; only Treatment waits for the checks.
  */
 export function stepStates(
-  visit: Pick<VisitRecord, 'checks' | 'sharedAt'>,
-  detail: Pick<VisitDetail, 'prescription' | 'treatment' | 'invoice'> | undefined,
-): Readonly<Record<VisitFlowStep, VisitFlowStepState>> {
-  const done: Readonly<Record<VisitFlowStep, boolean>> = {
-    checks: Object.values(visit.checks).every(Boolean),
-    rx: Boolean(detail?.prescription),
-    treatment: Boolean(detail?.treatment),
-    invoice: Boolean(detail?.invoice),
-    collect: visit.sharedAt !== null,
-  };
-  const states = {} as Record<VisitFlowStep, VisitFlowStepState>;
+  done: Readonly<Partial<Record<VisitFlowStep, boolean>>>,
+): Partial<Record<VisitFlowStep, VisitFlowStepState>> {
+  const states: Partial<Record<VisitFlowStep, VisitFlowStepState>> = {};
   let before = true;
   for (const step of VISIT_FLOW_STEPS) {
-    if (done[step]) states[step] = 'done';
+    const isDone = done[step];
+    if (isDone === undefined) continue;
+    if (isDone) states[step] = 'done';
     else states[step] = before ? 'current' : 'later';
-    before = before && done[step];
+    before = before && isDone;
   }
   return states;
 }
 
 /**
- * "Remembered for this patient: Soprano Ice · 10 J · 3 Hz · 810 nm · Type IV"
- * (H:4875): the last session's machine, power, wavelength and skin type.
+ * "Remembered for this patient: Soprano Ice · 10 J · 3 Hz · 810 nm · Type IV" (H:4875): the last
+ * session's machine, power, wavelength and skin type, as its parameters hold them.
  */
-export function rememberedSettings(treatment: Treatment | null): string {
+export function rememberedSettings(treatment: TreatmentRecord | null): string {
   if (!treatment) return '';
-  const { machine, power, wavelength, skinType } = treatment.params;
+  const { machine, power, wavelength, skinType } = treatment.parameters;
   return [machine, power, wavelength ? `${wavelength} nm` : null, skinType]
     .filter(Boolean)
     .join(' · ');
 }
 
-/** The visit's bill as the Invoice step shows it: the lines' finals and the total, in paise. */
-export function flowInvoice(detail: Pick<VisitDetail, 'billLines'>): {
-  lines: { name: string; amount: number }[];
-  total: number;
-  /** Every line comes out of a package — "Covered by package · nothing to bill". */
-  covered: boolean;
-} {
-  const lines = detail.billLines.map((line) => ({
-    name: line.name,
-    amount: invoiceTotals({ items: [line], overallDiscount: 0 }).bill,
-  }));
-  return {
-    lines,
-    total: invoiceTotals({ items: detail.billLines, overallDiscount: 0 }).bill,
-    covered:
-      detail.billLines.length > 0 && detail.billLines.every((line) => line.fromPack),
-  };
+/** A package the next session can spend: active, with a session left (the server's counts). */
+export function spendablePackage(
+  packages: readonly PatientPackageRow[],
+  packageId: string | null,
+): PatientPackageRow | null {
+  if (!packageId) return null;
+  return (
+    packages.find(
+      (row) => row.id === packageId && row.status === 'active' && row.sessionsLeft > 0,
+    ) ?? null
+  );
+}
+
+/** The session after `last`, as the client numbers one off a package (at most the API's 999). */
+export function nextSessionNumber(last: Pick<TreatmentRecord, 'sessionNumber'>): number {
+  return Math.min(last.sessionNumber + 1, TREATMENT_LIMITS.session.max);
 }
 
 /**
- * "⚡ Repeat" (H:4875): the last session again at this visit, one session on,
- * with its settings, areas and team — on its package only while that package
- * still has a session left.
+ * "⚡ Repeat" (H:4875): the last session again at this visit, with its settings, areas and team —
+ * on its package while that package can still spend a session (the server then numbers it and
+ * takes its offering), else as its next session. Aftercare follows the last session's.
  */
 export function repeatedSession(
-  last: Treatment,
-  pack: VisitPack | null,
-  at: Pick<TreatmentInput, 'patientId' | 'appointmentId' | 'performedAt'>,
-): TreatmentInput {
-  const onPack =
-    pack !== null && pack.id === last.packageId && pack.sessionsUsed < pack.sessionsTotal;
+  last: TreatmentRecord,
+  onPackage: PatientPackageRow | null,
+  appointmentId: string,
+): TreatmentCreateInput {
   return {
-    ...at,
-    offeringId: last.offeringId,
     name: last.name,
     template: last.template,
+    offeringId: last.offeringId,
     doctorId: last.doctorId,
     therapistId: last.therapistId,
     bodyParts: last.bodyParts,
-    sessionNo: last.sessionNo + 1,
-    params: { ...last.params },
+    sessionNumber: nextSessionNumber(last),
+    parameters: { ...last.parameters },
     remark: null,
     aftercareCall: last.aftercareCall,
-    packageId: onPack ? pack.id : null,
+    appointmentId,
+    packageId: onPackage?.id ?? null,
   };
 }

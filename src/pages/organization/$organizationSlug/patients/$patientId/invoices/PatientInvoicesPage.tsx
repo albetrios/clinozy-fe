@@ -38,8 +38,8 @@ const keys = PATIENT_TABLE_KEYS;
  * also needs billing view (`S:33`). A row opens Edit invoice — the shared
  * Invoice drawer (L-40), the file kept behind it (`from`, §4) — or, without
  * edit, its preview; the row's actions print, preview, record a payment,
- * edit and delete it ("Delete this invoice?", Undo). "New invoice" opens the
- * drawer for this patient.
+ * edit and delete it ("Delete this invoice?", Undo). New invoice comes back
+ * with Payments on clinozy-be (§5.7); the invoices are still the fixture world's.
  */
 export function PatientInvoicesPage() {
   const { t } = useTranslation([PATIENT_TABLE_NS, INVOICE_DRAWER_NS]);

@@ -1,17 +1,27 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { PatientReport } from '@/shared/api/clinic/clinic-schema.ts';
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import type * as ReportsApiModule from '@/shared/api/clinic/patient-reports-api.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
+import {
+  reportDouble,
+  seedReports,
+  storedReports,
+} from '../../__tests__/integration/report-api-double.ts';
 import { ReportDeleteConfirm } from './ReportDeleteConfirm.tsx';
+
+vi.mock('@/shared/api/clinic/patient-reports-api.ts', async (importOriginal) => {
+  const double = await import('../../__tests__/integration/report-api-double.ts');
+  return {
+    ...(await importOriginal<typeof ReportsApiModule>()),
+    deletePatientReport: vi.fn(double.deletePatientReport),
+    restorePatientReport: vi.fn(double.restorePatientReport),
+  };
+});
 
 const { notifyMock } = vi.hoisted(() => ({
   notifyMock: {
@@ -23,24 +33,25 @@ const { notifyMock } = vi.hoisted(() => ({
     dismiss: vi.fn(),
   },
 }));
-vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
+vi.mock('@/shared/notify/index.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  notify: notifyMock,
+}));
 
-/** Dharti's CBC + Thyroid profile. */
-let report: PatientReport;
-const live = () => clinicFixtures.patientReports.snapshot((row) => row.id === report.id);
+const REPORT = reportDouble();
+const deleted = () => storedReports()[0]?.deleted ?? null;
 
-beforeEach(async () => {
+beforeEach(() => {
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetClinicFixtures();
-  report = await clinicFixtures.patientReports.get(ref.patientReport(1));
+  signInTestMember();
+  seedReports([REPORT]);
 });
-afterEach(() => resetClinicFixtures());
 
 describe('ReportDeleteConfirm', () => {
   it('asks with the report’s name and the delete reasons', async () => {
     const { baseElement } = renderWithProviders(
       <ReportDeleteConfirm
-        report={report}
+        report={REPORT}
         open
         onOpenChange={vi.fn()}
         onDeleted={vi.fn()}
@@ -59,7 +70,7 @@ describe('ReportDeleteConfirm', () => {
     const onDeleted = vi.fn();
     renderWithProviders(
       <ReportDeleteConfirm
-        report={report}
+        report={REPORT}
         open
         onOpenChange={vi.fn()}
         onDeleted={onDeleted}
@@ -69,7 +80,7 @@ describe('ReportDeleteConfirm', () => {
     await user.click(within(dialog).getByTestId('confirm-reason-not-needed'));
     await user.click(within(dialog).getByTestId('confirm-accept'));
     await waitFor(() => expect(onDeleted).toHaveBeenCalledOnce());
-    expect(live()).toHaveLength(0);
+    expect(deleted()).toEqual({ reason: 'not_needed', note: null });
     expect(notifyMock.undo).toHaveBeenCalledWith('Report deleted', {
       onUndo: expect.any(Function),
     });
@@ -78,6 +89,6 @@ describe('ReportDeleteConfirm', () => {
       { onUndo: () => void },
     ];
     onUndo();
-    await waitFor(() => expect(live()).toHaveLength(1));
+    await waitFor(() => expect(deleted()).toBeNull());
   });
 });

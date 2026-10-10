@@ -7,7 +7,7 @@ export const TIMELINE_NS = I18N_NAMESPACES.patientFile;
 /**
  * The Overview's copy (KICKOFF §6.6 Overview; H:769–779, H:4840–4864,
  * H:4980–4999), verbatim — reusing the file's own words where they are the
- * same (the section names, the rail's visit words, Team notes' empty line).
+ * same (the section names, the rail's visit words, Team notes' lines).
  */
 export const TIMELINE_KEYS = {
   /** "Open Clinical" — a card's ›. */
@@ -19,7 +19,6 @@ export const TIMELINE_KEYS = {
     packages: 'sections.packages',
     prescriptions: 'sections.prescriptions',
     treatments: 'sections.treatments',
-    billing: 'sectionsPopover.groups.billing',
     reports: 'sections.reports',
     notes: 'sections.notes',
   },
@@ -43,8 +42,6 @@ export const TIMELINE_KEYS = {
   visits: {
     book: 'rail.book',
     reschedule: 'rail.reschedule',
-    /** "Hydrafacial · 45 min". */
-    service: 'rail.visitService',
     empty: 'timeline.visits.empty',
   },
   photos: {
@@ -59,14 +56,13 @@ export const TIMELINE_KEYS = {
   packages: {
     /** "1 / 7". */
     progress: 'timeline.packages.progress',
-    /** "Next · 8 Oct". */
-    next: 'timeline.packages.next',
-    /** "Session 2 overdue". */
-    overdue: 'timeline.packages.overdue',
+    /** The server's `used_up`. */
     done: 'timeline.packages.done',
-    use: 'timeline.packages.use',
-    /** "Valid till 24 Sep 2027" — when no visit is booked on it. */
+    /** The server's `expired`. */
+    expired: 'package.card.statuses.expired',
+    /** "Valid till 24 Sep 2027". */
     validTill: 'package.card.validTill',
+    noExpiry: 'package.card.noExpiry',
     empty: 'timeline.packages.empty',
   },
   prescriptions: {
@@ -80,19 +76,6 @@ export const TIMELINE_KEYS = {
     /** "Session 2 · 24 Sep 2026 · 15:00". */
     sub: 'timeline.treatments.sub',
     empty: 'tables.treatments.empty',
-  },
-  billing: {
-    new: 'section.primary.invoices',
-    due: 'timeline.billing.due',
-    paid: 'timeline.billing.paid',
-    masked: 'rail.maskedAmount',
-    show: 'timeline.billing.show',
-    hide: 'timeline.billing.hide',
-    /** "Clinic invoice #1042". */
-    invoice: 'timeline.billing.invoice',
-    /** "24 Sep · ₹ ••••". */
-    sub: 'timeline.billing.sub',
-    collect: 'timeline.billing.collect',
   },
   reports: {
     new: 'section.primary.reports',
@@ -117,42 +100,16 @@ export const TIMELINE_KEYS = {
   activity: {
     title: 'fileBar.activity',
     filtersLabel: 'timeline.activity.filtersLabel',
+    /** The views — the stream's own filters (§6 #2). */
     filters: {
       all: 'feedback.types.all',
-      visit: 'sections.visits',
-      rx: 'sections.prescriptions',
-      treat: 'sections.treatments',
-      inv: 'sections.invoices',
-      pay: 'sections.payments',
-      photo: 'sections.images',
-      note: 'timeline.activity.notes',
+      clinical: 'sectionsPopover.groups.clinical',
+      money: 'sectionsPopover.groups.billing',
+      notes: 'timeline.activity.notes',
     },
-    /** "Visits · 3" — a chip's name. */
-    filterTitle: 'timeline.activity.filterTitle',
-    /** "Rx #500 · Flubolt 400, Clonix-B Lotion". */
-    rx: 'timeline.activity.rx',
-    /** "2 medicines" (plural). */
-    medicines: 'rx.medicines',
-    /** "LHR Full Face · session 2". */
-    treatment: 'timeline.activity.treatment',
-    /** A treatment's template — its row's sub line ("Skin · laser"). */
-    templates: {
-      skin: 'treatment.templates.skin',
-      dental: 'treatment.templates.dental',
-      physio: 'treatment.templates.physio',
-      gynac: 'treatment.templates.gynac',
-      general: 'treatment.templates.general',
-    },
-    /** "Received ₹2,000 · UPI". */
-    received: 'timeline.activity.received',
-    /** "Refund ₹500 · Cash". */
-    refund: 'timeline.activity.refund',
-    /** "Against #1042". */
-    against: 'timeline.activity.against',
-    /** "₹1,500 due". */
-    due: 'tables.invoices.due',
-    /** "3 photos" (plural). */
-    photos: 'photos.count',
+    /** "₹ ••••" — an amount in the server's line while the file is masked (Q-F4). */
+    masked: 'timeline.activity.masked',
+    loadMore: 'feedback.loadMore',
     empty: 'timeline.activity.empty',
   },
 } as const;
@@ -165,7 +122,6 @@ export type OverviewCard =
   | 'packages'
   | 'prescriptions'
   | 'treatments'
-  | 'billing'
   | 'reports'
   | 'notes';
 
@@ -177,7 +133,6 @@ export const OVERVIEW_CARD_TONES: Readonly<Record<OverviewCard, Tone>> = {
   packages: 'lav',
   prescriptions: 'sage',
   treatments: 'lav',
-  billing: 'butter',
   reports: 'stone',
   notes: 'butter',
 };
@@ -194,7 +149,9 @@ export const TIMELINE_TEST_IDS = {
   activity: 'overview-activity',
   /** The filter tabs' row. */
   filters: 'overview-activity-filters',
-  /** A filter tab: `overview-activity-filter-<kind>`. */
-  filter: (kind: string) => `overview-activity-filter-${kind}`,
+  /** A view tab: `overview-activity-filter-<view>`. */
+  filter: (view: string) => `overview-activity-filter-${view}`,
   activityRow: 'overview-activity-row',
+  /** "Load more" — the next page of the timeline. */
+  activityMore: 'overview-activity-more',
 } as const;

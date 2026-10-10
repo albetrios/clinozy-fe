@@ -1,5 +1,4 @@
 import { useParams } from '@tanstack/react-router';
-import { useTranslation } from 'react-i18next';
 
 import { organizationAppointment } from '@/lib/routes/appointments-builders.ts';
 import {
@@ -10,7 +9,6 @@ import {
 } from '@/lib/routes/patient-file-builders.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import type { PatientNextVisit } from '@/shared/api/clinic/patient-file-contracts.ts';
-import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
 import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
 import {
   passesPatientFileGate,
@@ -25,24 +23,19 @@ import {
   ClipboardList,
   FileIcon,
   MessageSquare,
-  Receipt,
   Sparkles,
-  Wallet,
 } from '@/shared/icons/index.ts';
-import { notify } from '@/shared/notify/index.ts';
 
 import { usePatientFileContext } from '../../patient-file-context.ts';
-import {
-  PATIENT_FILE_ACTIONS_KEYS,
-  PATIENT_FILE_ACTIONS_NS,
-} from './patient-file-actions.constants.ts';
 
-/** The Add-to-record menu's items, in its order (H:4865; `patient-file.md:267`). */
+/**
+ * The Add-to-record menu's items, in its order (H:4865; `patient-file.md:267`). Invoice and
+ * Payment come back with Payments on clinozy-be: its drawers still read the fixture patients
+ * (D152).
+ */
 export const PATIENT_ADD_ITEMS = [
   'prescription',
   'treatment',
-  'invoice',
-  'payment',
   'photo',
   'appointment',
   'report',
@@ -58,8 +51,6 @@ export const PATIENT_ADD_ITEM_LOOK: Readonly<
 > = {
   prescription: { tone: 'sage', icon: FileIcon },
   treatment: { tone: 'lav', icon: Sparkles },
-  invoice: { tone: 'butter', icon: Receipt },
-  payment: { tone: 'mint', icon: Wallet },
   photo: { tone: 'blush', icon: Camera },
   appointment: { tone: 'sky', icon: Calendar },
   report: { tone: 'stone', icon: ClipboardList },
@@ -76,8 +67,9 @@ export interface PatientAddItem {
 
 /**
  * Each section's split primary "New …" (H:4746–4764; `patient-file.md:512`):
- * the Add-menu item it runs. Overview, Clinical notes and Team notes have
- * none; Packages passes its own, "Add package" (no Add-menu item).
+ * the Add-menu item it runs. Overview, Clinical notes, Packages (a package
+ * comes from its invoice — G4) and Team notes have none; Invoices and Payments
+ * come back with Payments on clinozy-be.
  */
 export const SECTION_PRIMARY_ITEM: Readonly<
   Partial<Record<PatientFileSectionSlug, PatientAddItemId>>
@@ -87,8 +79,6 @@ export const SECTION_PRIMARY_ITEM: Readonly<
   treatments: 'treatment',
   images: 'photo',
   reports: 'report',
-  invoices: 'invoice',
-  payments: 'payment',
 };
 
 /** What the file's add actions read: the access in force and the open file. */
@@ -107,14 +97,13 @@ export interface PatientFileActions {
 /**
  * The patient file's add actions (KICKOFF §6.6 Add-to-record menu; the
  * sections' split "New …"): each item checks its own permission — the
- * role-named Rx and treatment gates (`S:35, 38`), billing create for an
- * invoice or a payment, appointments create for a booking, patients create or
- * edit for a photo, a report or a note — and runs its action: the record's
- * drawer, the invoice drawer or receive payment keeping the file behind them
- * (`from`, §4), the appointment form for this patient, or the section.
+ * Rx and treatment gates (the member's `patient_prescription:create` /
+ * `patient_treatment:create`), appointments create for a booking, patients
+ * create or edit for a photo, a report or a note — and runs its action: the
+ * record's drawer keeping the file behind it (`from`, §4), the appointment form
+ * for this patient's person, or the section.
  */
 export function usePatientFileActions(): PatientFileActions {
-  const { t } = useTranslation(PATIENT_FILE_ACTIONS_NS);
   const navigate = useClinicNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
   const { patientId, file, section, photos } = usePatientFileContext();
@@ -126,7 +115,7 @@ export function usePatientFileActions(): PatientFileActions {
     action: 'create' | 'edit',
   ) => access.isResolved && access.can(area, action);
   const passes = (gate: 'prescriptions' | 'treatments') =>
-    access.isResolved && passesPatientFileGate(access.roles, gate);
+    access.isResolved && passesPatientFileGate(access, gate);
 
   const openSection = (target: PatientFileSectionSlug) => () =>
     void navigate(organizationPatientSection(organizationSlug, patientId, target));
@@ -143,37 +132,6 @@ export function usePatientFileActions(): PatientFileActions {
       allowed: passes('treatments'),
       run: () => void navigate(organizationTreatmentCreate(organizationSlug, patientId)),
     },
-    invoice: {
-      allowed: can('payments', 'create'),
-      run: () =>
-        go(
-          clinicCommandNavigation('newInvoice', {
-            organizationSlug,
-            referrer,
-            search: { type: 'clinic', patient: patientId },
-          }),
-        ),
-    },
-    payment: {
-      allowed: can('payments', 'create'),
-      run: () => {
-        if (!file || file.due === 0) {
-          notify.info(
-            t(PATIENT_FILE_ACTIONS_KEYS.nothingDue, {
-              name: file ? patientName(file.patient) : '',
-            }),
-          );
-          return;
-        }
-        go(
-          clinicCommandNavigation('newReceipt', {
-            organizationSlug,
-            referrer,
-            search: { patient: patientId },
-          }),
-        );
-      },
-    },
     photo: {
       allowed: can('patients', 'create'),
       // The picker first, inside the click — the browser opens it only there.
@@ -189,7 +147,8 @@ export function usePatientFileActions(): PatientFileActions {
           clinicCommandNavigation('newAppointment', {
             organizationSlug,
             referrer,
-            search: { who: patientId },
+            // The booking is the person's (`who=` a contact id).
+            search: file ? { who: file.patient.contactId } : {},
           }),
         ),
     },

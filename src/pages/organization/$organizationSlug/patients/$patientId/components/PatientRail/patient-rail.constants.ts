@@ -18,7 +18,6 @@ export const PATIENT_RAIL_KEYS = {
   reach: 'rail.reach',
   reachSub: {
     whatsappPrimary: 'rail.reachSub.whatsappPrimary',
-    fromLead: 'rail.reachSub.fromLead',
     mobile: 'rail.reachSub.mobile',
     instagram: 'rail.reachSub.instagram',
   },
@@ -37,22 +36,10 @@ export const PATIENT_RAIL_KEYS = {
   birthdayToday: 'rail.birthdayToday',
   noAddress: 'rail.noAddress',
   upNext: 'rail.upNext',
-  /** "Hydrafacial · 45 min". */
-  visitService: 'rail.visitService',
   reschedule: 'rail.reschedule',
   book: 'rail.book',
   notBooked: 'rail.notBooked',
   noUpcoming: 'rail.noUpcoming',
-  /** "₹ ••••" — money while the file is masked (Q-F4). */
-  maskedAmount: 'rail.maskedAmount',
-  /** "since 12 days" (plural). */
-  dueSince: 'rail.dueSince',
-  showAmount: 'rail.showAmount',
-  hideAmount: 'rail.hideAmount',
-  collect: 'rail.collect',
-  /** "₹500 to return". */
-  creditToReturn: 'rail.creditToReturn',
-  allPaid: 'rail.allPaid',
   feedback: 'rail.feedback',
   /** "Better · 7/10". */
   feedbackScore: 'rail.feedbackScore',

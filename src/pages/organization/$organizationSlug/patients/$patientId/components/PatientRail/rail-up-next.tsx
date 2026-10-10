@@ -1,13 +1,8 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { isolateJoin, isolateText } from '@/lib/bidi-isolate.ts';
 import { cn } from '@/lib/utils.ts';
-import {
-  civilDayOffset,
-  clinicToday,
-  localDateOf,
-} from '@/shared/api/clinic/clinic-time.ts';
+import { localDateOf } from '@/shared/api/clinic/clinic-time.ts';
 import type {
   PatientFile,
   PatientNextVisit,
@@ -15,16 +10,7 @@ import type {
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
-import {
-  Calendar,
-  ChevronRight,
-  Eye,
-  EyeOff,
-  MessageSquare,
-  RefreshCw,
-  Wallet,
-} from '@/shared/icons/index.ts';
+import { Calendar, ChevronRight, MessageSquare } from '@/shared/icons/index.ts';
 
 import { feedbackCountsText } from '../../shared/patient-feedback.ts';
 import { useVisitWhen } from '../../shared/patient-visit.ts';
@@ -36,20 +22,16 @@ const K = PATIENT_RAIL_KEYS;
 export interface RailUpNextActions {
   /** "Reschedule" the next visit, or "Book" one. */
   onBook?: (nextVisit: PatientNextVisit | null) => void;
-  /** "Collect" → receive payment. */
-  onCollect?: () => void;
   /** The Feedback row → Clinical notes with Feedback open. */
   onFeedback?: () => void;
 }
 
-/** A 28px card button: outline (Reschedule / Book) or primary (Collect). */
+/** A 28px outline card button (Reschedule / Book). */
 function CardButton({
-  primary = false,
   onClick,
   children,
   testId,
 }: {
-  primary?: boolean;
   onClick: () => void;
   children: ReactNode;
   testId: string;
@@ -57,14 +39,11 @@ function CardButton({
   return (
     <Button
       type="button"
-      variant={primary ? 'default' : 'outline'}
+      variant="outline"
       size="xs"
       onClick={onClick}
       data-testid={testId}
-      className={cn(
-        'text-xs',
-        !primary && 'bg-card text-foreground hover:bg-muted shadow-none',
-      )}
+      className="bg-card text-foreground hover:bg-muted text-xs shadow-none"
     >
       {children}
     </Button>
@@ -110,13 +89,8 @@ function NextVisitCard({
         >
           {visit ? when(visit) : t(K.notBooked)}
         </span>
-        <span className="text-muted-foreground truncate text-xs">
-          {visit
-            ? t(K.visitService, {
-                service: isolateText(visit.serviceLabel),
-                minutes: visit.durationMin,
-              })
-            : t(K.noUpcoming)}
+        <span dir="auto" className="text-muted-foreground truncate text-xs">
+          {visit ? visit.serviceLabel : t(K.noUpcoming)}
         </span>
       </span>
       {onBook ? (
@@ -128,85 +102,19 @@ function NextVisitCard({
   );
 }
 
-/** What they owe (H:724): "₹ ••••" with its eye while the file is masked, "since 12 days", Collect. */
-function DueCard({
-  file,
-  masked,
-  onToggleMasked,
-  onCollect,
-}: {
-  file: PatientFile;
-  masked: boolean;
-  onToggleMasked: () => void;
-  onCollect?: () => void;
-}) {
-  const { t } = useTranslation(PATIENT_RAIL_NS);
-  const formatPaise = usePaiseFormat();
-  const eyeLabel = t(masked ? K.showAmount : K.hideAmount);
-  const Eyes = masked ? Eye : EyeOff;
-  const days = file.dueSince
-    ? Math.max(0, civilDayOffset(file.dueSince, clinicToday()))
-    : 0;
-  return (
-    <div
-      data-slot="rail-due"
-      className="bg-card border-destructive-border flex items-center gap-2.5 rounded-xl border p-2"
-    >
-      <span className="bg-tone-blush text-tone-blush-foreground flex size-11 flex-none items-center justify-center rounded-lg">
-        <Wallet aria-hidden="true" className="size-4" />
-      </span>
-      <span className="flex min-w-0 flex-1 flex-col gap-px">
-        <span className="flex items-center gap-1">
-          <span
-            dir="auto"
-            data-testid="patient-rail-due"
-            className="text-body font-semibold tabular-nums"
-          >
-            {masked ? t(K.maskedAmount) : formatPaise(file.due)}
-          </span>
-          <button
-            type="button"
-            onClick={onToggleMasked}
-            aria-label={eyeLabel}
-            aria-pressed={!masked}
-            title={eyeLabel}
-            data-testid="patient-rail-due-eye"
-            className="text-muted-foreground hover:bg-foreground/5 hover:text-foreground flex size-5.5 flex-none items-center justify-center rounded-md transition-colors"
-          >
-            <Eyes aria-hidden="true" className="size-3.5" />
-          </button>
-        </span>
-        <span className="text-tone-blush-foreground text-xs">
-          {t(K.dueSince, { count: days })}
-        </span>
-      </span>
-      {onCollect ? (
-        <CardButton primary onClick={onCollect} testId="patient-rail-collect">
-          {t(K.collect)}
-        </CardButton>
-      ) : null}
-    </div>
-  );
-}
-
 /**
- * The rail's fixed bottom (H:722–726; `patient-file.md:22`): the next visit;
- * what they owe or "All paid · nothing due"; what the clinic holds to give
- * back; the Feedback row. "Give back" waits for the give-back drawer (§6.9).
+ * The rail's fixed bottom (H:722–726; `patient-file.md:22`): the next visit and the Feedback
+ * row. What they owe and what the clinic holds to give back go until the API reads them for a
+ * patient (G4).
  */
 export function RailUpNext({
   file,
-  masked,
-  onToggleMasked,
   actions,
 }: {
   file: PatientFile;
-  masked: boolean;
-  onToggleMasked: () => void;
   actions: RailUpNextActions;
 }) {
   const { t } = useTranslation([PATIENT_RAIL_NS, CLINIC_NS]);
-  const formatPaise = usePaiseFormat();
   const { feedback } = file;
   const worse = feedback.feel === 'worse';
   const feedbackValue = (() => {
@@ -234,44 +142,6 @@ export function RailUpNext({
         {t(K.upNext)}
       </span>
       <NextVisitCard visit={file.nextVisit} onBook={actions.onBook} />
-      {file.due > 0 ? (
-        <DueCard
-          file={file}
-          masked={masked}
-          onToggleMasked={onToggleMasked}
-          onCollect={actions.onCollect}
-        />
-      ) : (
-        <div className="text-tone-sage-foreground flex items-center gap-1.5 px-1 text-xs">
-          <span aria-hidden="true" className="bg-success size-1.5 rounded-full" />
-          {t(K.allPaid)}
-        </div>
-      )}
-      {file.credit ? (
-        <div
-          data-slot="rail-credit"
-          className="bg-card border-tone-butter-border flex items-center gap-2.5 rounded-xl border p-2"
-        >
-          <span className="bg-tone-butter text-tone-butter-foreground flex size-11 flex-none items-center justify-center rounded-lg">
-            <RefreshCw aria-hidden="true" className="size-4" />
-          </span>
-          <span className="flex min-w-0 flex-1 flex-col gap-px">
-            <span className="text-body font-semibold tabular-nums">
-              {t(K.creditToReturn, {
-                amount: isolateText(
-                  masked ? t(K.maskedAmount) : formatPaise(file.credit.amount),
-                ),
-              })}
-            </span>
-            <span
-              className="text-tone-butter-foreground truncate text-xs"
-              title={isolateJoin(file.credit.reasons)}
-            >
-              {isolateJoin(file.credit.reasons)}
-            </span>
-          </span>
-        </div>
-      ) : null}
       <button
         type="button"
         onClick={actions.onFeedback}

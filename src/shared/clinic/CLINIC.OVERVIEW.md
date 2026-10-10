@@ -44,9 +44,12 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
 - `task-rule-icons.ts` — each task rule's icon (Payment due and Recall: AMBER).
 - `visit-redirect.ts` — where a visit's work happens: the patient's own page
   with the visit flow open (`patientVisitTarget`: `timeline?visit=open&from=today`,
-  Today's "Open session" and "Checkout") and an old Visit sheet link's redirect
-  (`visitRedirect`: its patient's page, else — on a 404 only — Today with "Visit
-  not found"; any other failure is thrown for the route's error boundary; L-64).
+  Today's "Open session" and "Checkout") and an old Visit link's redirect
+  (`visitRedirect`: there is no Visit resource, so its id is read as a booking's —
+  `GET /app/appointments/:appointment_id` — and lands on that booking's patient's
+  page; an id the server doesn't know (a 404, or a 400 for an id that is not a
+  booking's) or a person with no patient file goes to Today with "Visit not
+  found"; any other failure is thrown for the route's error boundary; L-64).
 - `clinic-phone.ts` — a typed or pasted mobile as the contract stores it
   (`toClinicPhone`: E.164, a pasted 91 stripped), a stored one as the design
   shows it (`+91 98250 44120`) and the channel links (call, WhatsApp,
@@ -75,9 +78,14 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
   dialog-route hooks read it through `useCrossRoomDialog`.
 - `patient-file-sections.ts` — the patient file's eleven section slugs (its
   URL segments, `timeline` the Overview it lands on), the billing ones, the
-  sections a member may open (Q-F1: billing alone for an Accountant) and the
-  role-named gates — Rx Doctor / Admin, treatments Doctor / Therapist, the
-  Private album Doctor / Admin, the Owner always passing (`S:35–40`, D22).
+  sections a member may open (Q-F1: billing alone for an Accountant; each care
+  section's own read code beside Patients view — `patient:clinical_record:read`,
+  `patient_prescription:read`, `patient_treatment:read`) and the file's gates
+  (`passesPatientFileGate`): the signed-in member by their own code —
+  `patient_prescription:create`, `patient_treatment:create`,
+  `patient:private_album:read` — a View-as preview by the role-named gates (Rx
+  Doctor / Admin, treatments Doctor / Therapist, the Private album Doctor /
+  Admin, the Owner always passing; `S:35–40`, D22).
 - `clinic-command-targets.ts` — where ⌘K's clinic rows go (`/leads/create`,
   `/appointments/create`, `/patients/create`, `/payments/receive`, `/tasks`,
   `/patients/$patientId`, `/leads/$leadId`, `/invoices/$invoiceId`) — and

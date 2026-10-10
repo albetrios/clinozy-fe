@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import type { RxCatalogMedicine } from '@/shared/api/clinic/prescriptions-api.ts';
+import type { RxCatalogMedicine } from '@/shared/api/clinic/prescriptions-contracts.ts';
 import {
   nameNumbers,
   QUICK_LINE_MATCH_LIMIT,
@@ -22,7 +22,6 @@ function medicine(
     name,
     medicineId: null,
     composition: null,
-    mrp: null,
     stock: null,
     form: /lotion|shampoo|cream|gel|sunscreen/i.test(name) ? 'topical' : 'oral',
     last: null,
@@ -151,17 +150,13 @@ describe('matchRxMedicines — the quick line’s matches', () => {
     expect(ranked.map((row) => row.name)).toEqual(['Soap Free Wash', 'Acnelak Soap']);
   });
 
-  it('lists the often prescribed first while nothing is typed', () => {
-    expect(
-      matchRxMedicines(CATALOG, [], ['Tranexa 500', 'Flubolt 400']).map(
-        (row) => row.name,
-      ),
-    ).toEqual([
-      'Tranexa 500',
-      'Flubolt 400',
+  it('lists the catalogue in its order while nothing is typed (no "Often prescribed", G4)', () => {
+    expect(matchRxMedicines(CATALOG, []).map((row) => row.name)).toEqual([
       'Clonix-B Lotion',
       'Densyl-AD Shampoo',
+      'Flubolt 400',
       'Sunscreen SPF 50',
+      'Tranexa 500',
     ]);
   });
 
@@ -187,15 +182,13 @@ describe('typedRxName — “Not in the list · add as typed”', () => {
 });
 
 describe('browseRxMedicines — Browse’s tiles', () => {
-  it('splits Oral and Topical, and shows the often prescribed', () => {
+  it('splits Oral and Topical, and shows them all', () => {
     expect(browseRxMedicines(CATALOG, 'oral', []).map((row) => row.name)).toEqual([
       'Flubolt 400',
       'Tranexa 500',
     ]);
     expect(browseRxMedicines(CATALOG, 'topical', [])).toHaveLength(3);
-    expect(
-      browseRxMedicines(CATALOG, 'often', [], ['Flubolt 400']).map((row) => row.name),
-    ).toEqual(['Flubolt 400']);
+    expect(browseRxMedicines(CATALOG, 'all', [])).toHaveLength(CATALOG.length);
   });
 
   it('narrows to the medicines holding every typed word', () => {

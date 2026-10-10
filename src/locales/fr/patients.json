@@ -5,8 +5,6 @@
   "views": {
     "label": "Vues des patients",
     "all": "Tous",
-    "today": "À la clinique aujourd’hui",
-    "dues": "Avec impayés",
     "follow": "Suivi à faire",
     "recall": "Rappel"
   },
@@ -26,7 +24,6 @@
     "conversion": "Conversion",
     "age": "Âge",
     "followUp": "Suivi",
-    "due": "Dû",
     "updated": "Mis à jour"
   },
   "table": {
@@ -36,8 +33,6 @@
     "age_other": "{{count}} ans"
   },
   "rowActions": {
-    "newInvoice": "Nouvelle facture",
-    "collect": "Encaisser {{amount}}",
     "edit": "Modifier",
     "delete": "Supprimer"
   },

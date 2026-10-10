@@ -99,8 +99,8 @@ describe('useClinicAccess — a room on the API answers from the member’s code
   });
 
   it('a live room loses what the codes do not grant, whatever the matrix says', async () => {
-    // The org owner's codes without any lead or appointment code: the matrix gives Owner
-    // everything.
+    // The org owner's codes without any lead, appointment or patient code: the matrix gives
+    // Owner everything, and a room still on fixtures keeps it.
     signIn(['organization:read', 'organization:delete', 'membership:read', 'role:read']);
 
     const { result } = renderAccess();
@@ -109,7 +109,8 @@ describe('useClinicAccess — a room on the API answers from the member’s code
     expect(result.current.roles).toEqual(['owner']);
     expect(result.current.can('leads', 'view')).toBe(false);
     expect(result.current.can('appointments', 'view')).toBe(false);
-    expect(result.current.can('patients', 'view')).toBe(true);
+    expect(result.current.can('patients', 'view')).toBe(false);
+    expect(result.current.can('medical', 'view')).toBe(true);
   });
 
   it('keeps Today on the fixture matrix — the owner acts on it with no code of its own', async () => {

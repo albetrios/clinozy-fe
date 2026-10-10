@@ -3,26 +3,35 @@ import { renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { FIXTURE_ACTOR_ID } from '@/shared/api/clinic/clinic-fixture-store.ts';
-import { staffRef } from '@/shared/api/clinic/fixtures/staff.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import type * as TeamHooks from '@/shared/hooks/useTeam/index.ts';
+import { fetchTeamDirectory } from '@/shared/api/clinic/directory-api.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { findMyMembershipId } from '@/shared/tenancy/my-membership.ts';
+import {
+  DOCTOR_ARJUN,
+  DOCTOR_NISHA,
+  teamDoctor,
+} from '@/tests/utils/appointment-doubles.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import { useStaffLookup } from './useStaffLookup.ts';
 
-/** The signed-in member: Riya, the front desk. */
-const me = vi.hoisted(() => ({
-  data: {
-    id: 'me-0000-4000-8000-000000000001',
-    firstName: 'Riya',
-    lastName: 'Shah',
-    initials: 'RS',
-    tone: 'blush',
-  } as const,
+// The team (`GET /app/memberships`) and the signed-in member's own membership.
+vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchTeamDirectory: vi.fn(),
 }));
-vi.mock('@/shared/hooks/useTeam/index.ts', async (importOriginal) => {
-  const actual = await importOriginal<typeof TeamHooks>();
-  return { ...actual, useMyStaffProfile: () => me };
+vi.mock('@/shared/tenancy/my-membership.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  findMyMembershipId: vi.fn(),
+}));
+
+/** The signed-in member: Riya, the front desk. */
+const RIYA = teamDoctor({
+  id: 'mem_riya00000000000000000',
+  userId: 'usr_test',
+  name: 'Riya Shah',
+  initials: 'RS',
+  tone: 'blush',
 });
 
 let client: QueryClient;
@@ -30,46 +39,69 @@ function wrapper({ children }: { children: ReactNode }) {
   return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
 }
 
+/** The lookup once the team and the member's membership have answered. */
+async function renderLookup() {
+  const view = renderHook(() => useStaffLookup(), { wrapper });
+  await waitFor(() => expect(view.result.current('')).not.toBeNull());
+  return view;
+}
+
 beforeEach(() => {
-  resetClinicFixtures();
+  signInTestMember();
   client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  vi.mocked(fetchTeamDirectory).mockResolvedValue([DOCTOR_ARJUN, DOCTOR_NISHA, RIYA]);
+  vi.mocked(findMyMembershipId).mockResolvedValue(RIYA.id);
 });
 afterEach(() => {
   client.clear();
-  resetClinicFixtures();
+  useOrganizationStore.getState().clearOrganization();
 });
 
 describe('useStaffLookup', () => {
-  it('names a staff member a record points at, in their tone', async () => {
-    const { result } = renderHook(() => useStaffLookup(), { wrapper });
-    await waitFor(() => expect(result.current(staffRef('DD'))).not.toBeNull());
-    expect(result.current(staffRef('DD'))).toMatchObject({
-      id: staffRef('DD'),
-      name: 'Dr. Drashti Moradiya',
-      initials: 'DM',
+  it('names the team member a record points at, in their tone', async () => {
+    const { result } = await renderLookup();
+    expect(result.current(DOCTOR_NISHA.id)).toEqual({
+      id: DOCTOR_NISHA.id,
+      name: 'Nisha Shah',
+      initials: 'NS',
+      tone: 'sky',
+    });
+    expect(result.current(DOCTOR_ARJUN.id)).toMatchObject({
+      name: 'Arjun Rao',
+      tone: 'sage',
     });
   });
 
-  it('reads a record written in this session as the signed-in member', async () => {
-    const { result } = renderHook(() => useStaffLookup(), { wrapper });
-    expect(result.current(FIXTURE_ACTOR_ID)).toEqual({
-      id: me.data.id,
+  it('reads a record still on its way (no author yet) as the signed-in member', async () => {
+    const { result } = await renderLookup();
+    expect(result.current('')).toEqual({
+      id: RIYA.id,
       name: 'Riya Shah',
       initials: 'RS',
       tone: 'blush',
     });
+    expect(findMyMembershipId).toHaveBeenCalledWith('usr_test');
   });
 
-  it('reads a note still on its way (no author yet) as the signed-in member', () => {
-    const { result } = renderHook(() => useStaffLookup(), { wrapper });
-    expect(result.current('')).toMatchObject({ id: me.data.id, initials: 'RS' });
-  });
-
-  it('knows nobody for no id, or an id it has never seen', async () => {
-    const { result } = renderHook(() => useStaffLookup(), { wrapper });
-    await waitFor(() => expect(result.current(staffRef('DD'))).not.toBeNull());
+  it('knows nobody for no id, or someone no longer on the team', async () => {
+    const { result } = await renderLookup();
     expect(result.current(null)).toBeNull();
     expect(result.current(undefined)).toBeNull();
-    expect(result.current('00000000-0000-4000-8000-00000000dead')).toBeNull();
+    expect(result.current('mem_dev00000000000000000')).toBeNull();
+  });
+
+  it('knows nobody while the team loads', () => {
+    vi.mocked(fetchTeamDirectory).mockReturnValue(new Promise(() => undefined));
+    const { result } = renderHook(() => useStaffLookup(), { wrapper });
+    expect(result.current(DOCTOR_NISHA.id)).toBeNull();
+    expect(result.current('')).toBeNull();
+  });
+
+  it('names nobody for an unsaved record when the member has no membership here', async () => {
+    vi.mocked(findMyMembershipId).mockResolvedValue(null);
+    const { result } = renderHook(() => useStaffLookup(), { wrapper });
+    await waitFor(() => expect(result.current(DOCTOR_NISHA.id)).not.toBeNull());
+    await waitFor(() => expect(findMyMembershipId).toHaveBeenCalled());
+    expect(result.current('')).toBeNull();
   });
 });

@@ -33,7 +33,7 @@
     "activity": "활동",
     "showActivity": "메시지 및 활동 보기",
     "hideActivity": "메시지 및 활동 숨기기",
-    "unread_other": "읽지 않은 메시지 {{count}}개"
+    "awaitingReply": "답장 대기 중"
   },
   "sectionsPopover": {
     "trigger": "환자 파일 · 모든 섹션",
@@ -46,8 +46,6 @@
       "team": "팀"
     },
     "openNow": "열려 있음",
-    "empty": "비어 있음",
-    "hasRecords": "기록 있음",
     "pin": "바에 고정",
     "unpin": "바에서 고정 해제",
     "pinAria": "바에 고정 · {{section}}",
@@ -63,14 +61,11 @@
     "items": {
       "prescription": "처방전",
       "treatment": "시술",
-      "invoice": "청구서",
-      "payment": "결제",
       "photo": "사진",
       "appointment": "예약",
       "report": "검사 결과",
       "note": "메모"
-    },
-    "nothingDue": "{{name}}님의 미납 금액이 없습니다"
+    }
   },
   "section": {
     "primary": {
@@ -80,8 +75,7 @@
       "images": "이미지 업로드",
       "reports": "검사 결과 업로드",
       "invoices": "새 청구서",
-      "payments": "결제 기록",
-      "packages": "패키지 추가"
+      "payments": "결제 기록"
     },
     "more": "{{name}}님 더 보기"
   },
@@ -96,7 +90,6 @@
     "reach": "연락 방법",
     "reachSub": {
       "whatsappPrimary": "WhatsApp · 기본",
-      "fromLead": "휴대폰 · 리드에서",
       "mobile": "휴대폰",
       "instagram": "Instagram"
     },
@@ -113,18 +106,10 @@
     "birthdayToday": "🎂 오늘",
     "noAddress": "주소 없음",
     "upNext": "다음 일정",
-    "visitService": "{{service}} · {{minutes}}분",
     "reschedule": "일정 변경",
     "book": "예약",
     "notBooked": "예약 없음",
     "noUpcoming": "예정된 방문 없음",
-    "maskedAmount": "₹ ••••",
-    "dueSince_other": "{{count}}일째 미납",
-    "showAmount": "금액 보기",
-    "hideAmount": "금액 숨기기",
-    "collect": "수납",
-    "creditToReturn": "돌려줄 금액 {{amount}}",
-    "allPaid": "모두 결제됨 · 미납 없음",
     "feedback": "피드백",
     "feedbackScore": "{{feel}} · {{score}}/10",
     "feedbackReview": "{{source}} {{rating}}★",
@@ -148,8 +133,7 @@
       "none": "방문에 연결되지 않음",
       "noneSub": "차트에서 업로드함",
       "visit": "{{day}} · {{service}}",
-      "visitSub": "#{{seq}} · {{status}}",
-      "visitMeta_other": "사진 {{count}}장"
+      "visitSub": "#{{seq}} · {{status}}"
     },
     "sizes": {
       "label": "썸네일 크기",
@@ -160,7 +144,6 @@
       "mediumShort": "M",
       "largeShort": "L"
     },
-    "groupWithVisit": "{{photos}} · {{visit}}",
     "tile": {
       "open": "{{name}} 열기",
       "edit": "세부 정보 편집",
@@ -195,17 +178,16 @@
       "underarm": "겨드랑이",
       "legs": "다리",
       "arms": "팔",
-      "other": "기타"
+      "other": "기타",
+      "upperLip": "인중",
+      "chin": "턱",
+      "neck": "목",
+      "hands": "손",
+      "fullBody": "전신"
     },
     "viewer": {
       "label": "사진 뷰어",
       "position": "{{total}}장 중 {{index}}",
-      "zoom": "확대/축소",
-      "zoomOut": "축소",
-      "zoomOutHint": "축소 (−)",
-      "zoomIn": "확대",
-      "zoomInHint": "확대 (+)",
-      "zoomReset": "화면에 맞추기 (0)",
       "close": "뷰어 닫기",
       "closeHint": "닫기 (Esc)",
       "previous": "이전 사진",
@@ -214,11 +196,9 @@
       "nextHint": "다음 (→)",
       "hints": {
         "browse": "← → 넘기기",
-        "zoom": "스크롤 또는 + − 로 확대/축소",
-        "pan": "끌어서 이동 · 두 번 클릭해 초기화",
         "close": "Esc 닫기"
       },
-      "missing": "샘플 사진 · 첨부된 파일 없음",
+      "missing": "미리 보기를 사용할 수 없음",
       "notFoundRecord": "사진"
     },
     "details": {
@@ -234,9 +214,14 @@
       "visitHint": "선택 · 해당 예약에 사진을 연결합니다",
       "notAttached": "연결 안 함",
       "save": "세부 정보 저장",
-      "saved": "사진 세부 정보를 저장했습니다"
+      "saved": "사진 세부 정보를 저장했습니다",
+      "stage": "단계"
     },
-    "loading": "사진을 불러오는 중"
+    "loading": "사진을 불러오는 중",
+    "stages": {
+      "before": "시술 전",
+      "after": "시술 후"
+    }
   },
   "rx": {
     "record": "처방전",
@@ -248,16 +233,7 @@
     "medicines_other": "약 {{count}}개",
     "quickFill": {
       "print": "처방전 인쇄",
-      "repeat": "지난 처방전 {{number}} 반복",
-      "kits": {
-        "hairFall": "탈모 키트",
-        "postPeel": "필링 후 키트",
-        "pigmentation": "색소 키트"
-      }
-    },
-    "kit": {
-      "reapply": "3시간마다 다시 바르기",
-      "avoidSun": "48시간 동안 햇빛과 스크럽 피하기"
+      "repeat": "지난 처방전 {{number}} 반복"
     },
     "steps": {
       "prescription": "처방전",
@@ -270,10 +246,8 @@
     "quick": {
       "placeholder": "약, 용량, 시간 입력 · 예: flu 0-0-1 af 10d",
       "hint": "od · bd · tds · hs · af/bf · 5d · x8",
-      "often": "자주 처방",
       "groups": {
         "all": "전체",
-        "often": "자주 처방",
         "oral": "경구",
         "topical": "외용"
       },
@@ -361,13 +335,20 @@
       "summary": "{{medicines}} · {{doctor}}",
       "noMedicine": "약을 추가하세요",
       "saved": "처방전을 저장했습니다",
-      "savedNumber": "처방전 {{number}}을(를) 저장했습니다"
+      "savedNumber": "처방전 {{number}}을(를) 저장했습니다",
+      "approve": "저장 후 승인",
+      "approvedNumber": "처방전 {{number}}을(를) 승인했습니다"
     },
     "delete": {
       "title": "이 처방전을 삭제할까요?",
       "deleted": "처방전을 삭제했습니다"
     },
-    "preview": "처방전 {{number}}"
+    "preview": "처방전 {{number}}",
+    "status": {
+      "draft": "초안",
+      "approved": "승인됨"
+    },
+    "approvedNote": "승인됨 · 승인된 처방전은 변경할 수 없습니다"
   },
   "treatment": {
     "record": "시술",
@@ -379,7 +360,6 @@
     "session": "{{session}}회차",
     "quickFill": {
       "next": "{{name}} 다음 회차",
-      "package": "{{name}} · {{session}}회차",
       "checkIn": "경과 기록"
     },
     "type": "종류",
@@ -519,8 +499,8 @@
       "calls": {
         "none": "전화 안 함",
         "next_day": "다음 날",
-        "in_2_days": "2일 후",
-        "in_week": "1주일 후"
+        "in_week": "1주일 후",
+        "in_two_days": "2일 후"
       },
       "feedback": "이 시술에 대한 피드백",
       "feedbackItem": "{{date}} · {{feel}} {{score}}/10",
@@ -531,9 +511,25 @@
       "edit": "변경 사항 저장",
       "saved": "시술을 저장했습니다"
     },
-    "delete": {
-      "title": "이 시술을 삭제할까요?",
-      "deleted": "시술을 삭제했습니다"
+    "package": {
+      "label": "패키지에서",
+      "hint": "저장하면 1회를 사용합니다",
+      "option": "{{name}} · {{total}}회 중 {{used}}회 사용",
+      "numbered": "패키지에서 정해집니다",
+      "uses": "{{name}} 1회 사용"
+    },
+    "reverse": {
+      "title": "이 시술을 취소할까요?",
+      "body": "기록은 파일에 남고 취소됨으로 표시되며, 사용한 패키지 회차는 돌아옵니다. 되돌릴 수 없습니다.",
+      "action": "취소하기",
+      "done": "시술을 취소했습니다",
+      "status": "취소됨",
+      "note": "{{date}} 취소 · {{reason}}",
+      "reasons": {
+        "mistake": "실수로 기록",
+        "wrongPatient": "다른 환자",
+        "notDone": "시술 미진행"
+      }
     }
   },
   "report": {
@@ -569,34 +565,30 @@
     },
     "view": {
       "sub": "{{name}} · {{date}}",
-      "addedBy": "추가한 사람",
-      "fileLine": "{{name}} · {{format}} · 요청 시 환자와 공유",
       "notes": "메모",
-      "noNotes": "이 결과에 메모가 없습니다",
-      "download": "다운로드",
-      "downloading": "{{name}} 다운로드 중"
+      "noNotes": "이 결과에 메모가 없습니다"
     }
   },
   "package": {
-    "title": "패키지 추가",
-    "step": "패키지 선택",
-    "option": "{{name}} · {{sessions}}회 · {{price}}",
-    "empty": "아직 여러 회차 서비스가 없습니다",
+    "title": "패키지 편집",
     "summary": "시술이 완료되면 회차가 차감됩니다",
-    "save": "패키지 추가",
-    "noPick": "패키지를 선택하세요",
-    "added": "패키지를 추가했습니다 · 청구서에서 청구하세요",
+    "save": "변경 사항 저장",
     "card": {
       "left_other": "{{count}}회 남음",
       "used": "{{total}}회 중 {{used}}회 사용",
       "validTill": "{{date}}까지 유효",
-      "next": "다음: {{date}}",
-      "use": "1회 사용",
       "book": "다음 예약",
       "empty": "아직 패키지가 없습니다",
-      "sessionUsed": "{{total}}회 중 {{used}}회차를 사용했습니다",
-      "noneLeft": "남은 회차가 없습니다"
-    }
+      "noExpiry": "만료 없음",
+      "statuses": {
+        "used_up": "모두 사용",
+        "expired": "만료됨"
+      },
+      "edit": "편집"
+    },
+    "validUntil": "유효 기간",
+    "sessions": "회차",
+    "saved": "패키지를 저장했습니다"
   },
   "clinical": {
     "titles": {
@@ -610,7 +602,8 @@
     "placeholder": "입력 후 Enter로 추가",
     "add": "{{title}} 추가",
     "remove": "{{name}} 삭제",
-    "newCount_other": "새 항목 {{count}}개"
+    "newCount_other": "새 항목 {{count}}개",
+    "removed": "{{name}}을(를) 삭제했습니다"
   },
   "feedback": {
     "title": "피드백",
@@ -642,7 +635,6 @@
     "linkLabel": "링크",
     "noNext": "기록된 다음 단계 없음",
     "noLink": "링크 없음",
-    "files": "▶ {{files}}",
     "actions": "작업",
     "edit": "수정",
     "remove": "삭제",
@@ -668,7 +660,8 @@
     "removeReview": "이 리뷰를 삭제할까요?",
     "checkInRemoved": "체크인을 삭제했습니다",
     "reviewRemoved": "리뷰를 삭제했습니다",
-    "more_other": "{{count}}개 더"
+    "more_other": "{{count}}개 더",
+    "files_other": "▶ 파일 {{count}}개"
   },
   "checkIn": {
     "titles": {
@@ -703,9 +696,6 @@
     "offeringsHint": "선택 · 환자의 제안에 계획됨으로 추가",
     "offeringsPlaceholder": "서비스 검색",
     "offeringSessions_other": "{{price}} · {{count}}회",
-    "contextVisit": "방문 체크인",
-    "contextAppointment": "방문 체크인 · 예약 {{number}}",
-    "contextAftercare": "{{treatment}} 이후 사후 관리",
     "save": "체크인 저장",
     "saveEdit": "변경 사항 저장",
     "noFeel": "지금 상태를 선택하세요",
@@ -713,7 +703,9 @@
     "added": " · 제안에 {{count}}개 추가",
     "callBack": " · 의사 회신 전화 작업 생성",
     "updated": "체크인을 업데이트했습니다",
-    "record": "체크인"
+    "record": "체크인",
+    "noScore": "환자 본인 점수를 선택하세요",
+    "offeringsPlanned": "제안에 추가됨"
   },
   "review": {
     "title": "리뷰 기록",
@@ -742,7 +734,8 @@
     "updated": "리뷰를 업데이트했습니다",
     "badLink": "https:// 링크를 추가하세요",
     "notRated": "평가 없음",
-    "record": "리뷰"
+    "record": "리뷰",
+    "attachedFiles_other": "파일 {{count}}개"
   },
   "logFeedback": {
     "title": "피드백 기록",
@@ -827,7 +820,6 @@
       "feedback": "피드백",
       "report": "리포트",
       "type": "유형",
-      "uploadedBy": "업로드한 사람",
       "invoice": "청구서",
       "items": "항목",
       "bill": "청구액",
@@ -857,8 +849,6 @@
     "placeholder": "팀에 남길 메모 추가",
     "add": "메모 추가",
     "by": "{{name}} · {{date}}",
-    "delete": "메모 삭제",
-    "deleted": "메모를 삭제했습니다",
     "empty": "아직 메모가 없습니다"
   },
   "timeline": {
@@ -882,10 +872,7 @@
     },
     "packages": {
       "progress": "{{used}} / {{total}}",
-      "next": "다음 · {{date}}",
-      "overdue": "{{session}}회차 기한 지남",
       "done": "모든 회차 완료",
-      "use": "1회 사용",
       "empty": "활성 패키지가 없습니다"
     },
     "prescriptions": {
@@ -893,15 +880,6 @@
     },
     "treatments": {
       "sub": "{{session}}회차 · {{date}}"
-    },
-    "billing": {
-      "due": "미수",
-      "paid": "수납 완료",
-      "show": "금액 보기",
-      "hide": "금액 숨기기",
-      "invoice": "{{type}} 청구서 {{number}}",
-      "sub": "{{date}} · {{amount}}",
-      "collect": "결제 받기"
     },
     "reports": {
       "sub": "{{type}} · {{date}}"
@@ -914,13 +892,8 @@
     "activity": {
       "filtersLabel": "활동 필터",
       "notes": "메모",
-      "filterTitle": "{{label}} · {{count}}",
-      "rx": "처방전 {{number}} · {{medicines}}",
-      "treatment": "{{name}} · {{session}}회차",
-      "received": "{{amount}} 수납 · {{mode}}",
-      "refund": "환불 {{amount}} · {{mode}}",
-      "against": "{{number}} 대상",
-      "empty": "아직 활동이 없습니다"
+      "empty": "아직 활동이 없습니다",
+      "masked": "₹ ••••"
     }
   },
   "visitFlow": {
@@ -935,9 +908,7 @@
     "steps": {
       "checks": "체크인 및 안전",
       "rx": "처방전",
-      "treatment": "시술",
-      "invoice": "청구서",
-      "collect": "수납 및 공유"
+      "treatment": "시술"
     },
     "checks": {
       "labels": {
@@ -968,27 +939,10 @@
       "empty": "오늘 시술 회차 기록",
       "last": "지난 설정: {{memo}}",
       "done": "{{name}} · {{session}}회차",
-      "repeated": "지난 설정으로 {{session}}회차를 기록했습니다"
+      "repeated": "지난 설정으로 {{session}}회차를 기록했습니다",
+      "repeatPackage": "⚡ 반복 · {{name}}"
     },
-    "invoice": {
-      "total": "합계",
-      "create": "방문으로 청구서 만들기",
-      "custom": "직접 작성 청구서",
-      "created": "방문으로 청구서 {{number}} 생성됨",
-      "nothing": "청구할 항목 없음",
-      "ready_other": "{{count}}개 항목 준비됨 · {{total}}",
-      "covered": "패키지로 처리 · 청구할 항목 없음",
-      "empty": "아직 청구할 항목이 없습니다",
-      "done": "{{number}} · {{total}}"
-    },
-    "collect": {
-      "upi": "{{amount}} 수납 · UPI",
-      "received": "{{amount}} 수납 ({{mode}})",
-      "share": "처방전, 청구서, 사진 공유",
-      "shared": "처방전, 청구서, 사진을 WhatsApp으로 {{name}}님에게 보냈습니다",
-      "due": "미수 {{amount}}",
-      "nothing": "미수 없음",
-      "sent": "WhatsApp으로 전송됨"
-    }
+    "paused": "방문 일시 중지됨",
+    "resume": "계속하기"
   }
 }

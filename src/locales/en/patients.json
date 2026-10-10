@@ -5,8 +5,6 @@
   "views": {
     "label": "Patient views",
     "all": "All",
-    "today": "In clinic today",
-    "dues": "With dues",
     "follow": "Follow-up due",
     "recall": "Recall"
   },
@@ -26,7 +24,6 @@
     "conversion": "Conversion",
     "age": "Age",
     "followUp": "Follow-up",
-    "due": "Due",
     "updated": "Updated"
   },
   "table": {
@@ -35,8 +32,6 @@
     "age_other": "{{count}} yrs"
   },
   "rowActions": {
-    "newInvoice": "New invoice",
-    "collect": "Collect {{amount}}",
     "edit": "Edit",
     "delete": "Delete"
   },

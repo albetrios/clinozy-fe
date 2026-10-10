@@ -1,16 +1,17 @@
-import { screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import { fetchPatientFile } from '@/shared/api/clinic/patient-file-api.ts';
-import type {
-  PatientFile,
-  PatientNextVisit,
-} from '@/shared/api/clinic/patient-file-contracts.ts';
-import { fetchOpenVisit, startVisit } from '@/shared/api/clinic/visits-api.ts';
+import type { OrganizationPermission } from '@/core/types/permissions.ts';
+import type { PatientNextVisit } from '@/shared/api/clinic/patient-file-contracts.ts';
 import { viewablePatientFileSections } from '@/shared/clinic/patient-file-sections.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import {
+  patientFile,
+  TEST_CONTACT_ID,
+  TEST_PATIENT_ID,
+} from '@/tests/utils/patient-doubles.ts';
 import { shownLocation } from '@/tests/utils/shown-location.ts';
 
 import {
@@ -19,16 +20,31 @@ import {
 } from '../../__tests__/integration/patient-file-test-router.tsx';
 import { usePatientFileNavigation } from './usePatientFileNavigation.ts';
 
-const DHARTI = patientRef('Dharti Galani');
-const FILE = `/organization/acme/patients/${DHARTI}`;
+// The open visit (today's checked-in booking) and Start visit over an in-memory booking —
+// their own reads and writes are `useVisits`' to test.
+const visits = vi.hoisted(() => ({
+  open: null as { appointmentId: string } | null,
+  start: (() => undefined) as (vars: { patientId: string }) => void,
+}));
+vi.mock('@/shared/hooks/useVisits/index.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  useOpenVisit: () => ({ data: visits.open }),
+  useStartVisit: () => ({
+    mutate: (vars: { patientId: string }, options?: { onSuccess?: () => void }) => {
+      visits.start(vars);
+      visits.open = { appointmentId: 'appt_priya000000000000000' };
+      options?.onSuccess?.();
+    },
+  }),
+}));
+
+const FILE = `/organization/acme/patients/${TEST_PATIENT_ID}`;
 const NEXT: PatientNextVisit = {
-  appointmentId: 'appointment-next',
+  appointmentId: 'appt_next00000000000000000',
   date: '2026-10-10',
   startTime: '11:00',
   serviceLabel: 'Hydrafacial',
-  durationMin: 45,
 };
-let file: PatientFile;
 
 /** Each link as a button; a hidden one is left out. */
 function NavigationProbe() {
@@ -42,16 +58,18 @@ function NavigationProbe() {
     book: navigation.railActions.onBook && (() => navigation.railActions.onBook?.(null)),
     reschedule:
       navigation.railActions.onBook && (() => navigation.railActions.onBook?.(NEXT)),
-    collect: navigation.railActions.onCollect,
     feedback: navigation.railActions.onFeedback,
     historySection: () =>
       navigation.openHistory({
         kind: 'patientFile',
-        patientId: DHARTI,
+        patientId: TEST_PATIENT_ID,
         section: 'invoices',
       }),
     historyVisit: () =>
-      navigation.openHistory({ kind: 'appointment', appointmentId: 'appointment-old' }),
+      navigation.openHistory({
+        kind: 'appointment',
+        appointmentId: 'appt_old000000000000000000',
+      }),
     bookAppointment: navigation.bookAppointment,
   };
   return (
@@ -74,7 +92,7 @@ async function follow(
 ) {
   const user = userEvent.setup();
   const { router, unmount } = renderInPatientFile(<NavigationProbe />, {
-    file,
+    file: patientFile(),
     ...options,
   });
   const start = shownLocation(router).href;
@@ -87,13 +105,20 @@ async function follow(
   return { pathname, search, page };
 }
 
-beforeEach(async () => {
-  resetClinicFixtures();
-  file = await fetchPatientFile(DHARTI);
+/** End View-as: the member signed in, holding exactly these codes. */
+function signedInWith(codes: OrganizationPermission[]) {
+  act(() => {
+    useUIStore.setState({ previewRole: null });
+    useOrganizationStore.getState().setPermissions(['organization:read', ...codes]);
+  });
+}
+
+beforeEach(() => {
+  visits.open = null;
+  visits.start = vi.fn();
 });
 afterEach(() => {
   resetPatientFile();
-  resetClinicFixtures();
 });
 
 describe('usePatientFileNavigation', () => {
@@ -103,17 +128,18 @@ describe('usePatientFileNavigation', () => {
   });
 
   it('starts a visit and opens its flow on the Overview (D18)', async () => {
-    expect(await fetchOpenVisit(DHARTI)).toBeNull();
     const started = await follow('startVisit');
+    expect(visits.start).toHaveBeenCalledWith(
+      expect.objectContaining({ patientId: TEST_PATIENT_ID }),
+    );
     expect(started.pathname).toBe(`${FILE}/timeline`);
     expect(started.search).toEqual({ visit: 'open' });
-    expect(await fetchOpenVisit(DHARTI)).not.toBeNull();
   });
 
   it('offers Resume instead of Start visit while a visit is open', async () => {
-    await startVisit({ patientId: DHARTI });
+    visits.open = { appointmentId: 'appt_priya000000000000000' };
     const { unmount } = renderInPatientFile(<NavigationProbe />, {
-      file,
+      file: patientFile(),
       section: 'visits',
     });
     expect(
@@ -129,55 +155,109 @@ describe('usePatientFileNavigation', () => {
     });
   });
 
+  it('offers no Start visit to a member who can’t open the Overview', async () => {
+    renderInPatientFile(<NavigationProbe />, {
+      file: patientFile(),
+      section: 'visits',
+      viewable: ['visits', 'invoices'],
+    });
+    await screen.findByRole('button', { name: 'list' });
+    expect(screen.queryByRole('button', { name: 'startVisit' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'feedback' })).not.toBeInTheDocument();
+  });
+
   it('opens Edit patient over the open section (A-F1)', async () => {
     const location = await follow('editContact', { section: 'prescriptions' });
     expect(location.pathname).toBe(`${FILE}/edit`);
     expect(location.search).toEqual({ from: 'prescriptions' });
   });
 
-  it('books a new visit for this patient, or reschedules the next one, keeping the file', async () => {
+  it('books a new visit for the patient’s person, or reschedules the next one, keeping the file', async () => {
     const book = await follow('book');
     expect(book.pathname).toBe('/organization/acme/appointments/create');
-    // The file stays behind the booking (A-P1).
-    expect(book.page).toBe(`${FILE}/visits`);
-    expect(book.search).toEqual({ who: DHARTI, from: `patients/${DHARTI}/visits` });
+    // The booking is the person's: `who=` their contact id.
+    expect(book.search).toEqual({
+      who: TEST_CONTACT_ID,
+      from: `patients/${TEST_PATIENT_ID}/visits`,
+    });
 
     const reschedule = await follow('reschedule');
-    expect(reschedule.pathname).toBe('/organization/acme/appointments/appointment-next');
+    expect(reschedule.pathname).toBe(
+      '/organization/acme/appointments/appt_next00000000000000000',
+    );
     expect(reschedule.search).toEqual({
       mode: 'reschedule',
-      from: `patients/${DHARTI}/visits`,
+      from: `patients/${TEST_PATIENT_ID}/visits`,
     });
   });
 
-  it('collects a payment and opens Feedback on Clinical notes', async () => {
-    const collect = await follow('collect');
-    expect(collect.pathname).toBe('/organization/acme/payments/receive');
-    expect(collect.search).toEqual({
-      patient: DHARTI,
-      from: `patients/${DHARTI}/visits`,
-    });
+  it('keeps the file behind the booking and the reschedule (A-P1)', async () => {
+    // The file's `from` (`patients/pat_…/visits`) names the page the drawer opens over.
+    expect((await follow('book')).page).toBe(`${FILE}/visits`);
+    expect((await follow('reschedule')).page).toBe(`${FILE}/visits`);
+  });
 
+  it('books from the Activity column for the person too', async () => {
+    const book = await follow('bookAppointment', { section: 'overview' });
+    expect(book.pathname).toBe('/organization/acme/appointments/create');
+    expect(book.search).toEqual({
+      who: TEST_CONTACT_ID,
+      from: `patients/${TEST_PATIENT_ID}/overview`,
+    });
+  });
+
+  it('books with no person while the file is still loading', async () => {
+    const book = await follow('book', { file: undefined });
+    expect(book.pathname).toBe('/organization/acme/appointments/create');
+    expect(book.search).not.toHaveProperty('who');
+  });
+
+  it('opens Feedback on Clinical notes, and offers no Collect', async () => {
     expect((await follow('feedback')).pathname).toBe(`${FILE}/overview`);
+    renderInPatientFile(<NavigationProbe />, { file: patientFile() });
+    await screen.findByRole('button', { name: 'feedback' });
+    expect(screen.queryByRole('button', { name: /collect/i })).not.toBeInTheDocument();
   });
 
   it('follows a history chip to the section or the appointment', async () => {
     expect((await follow('historySection')).pathname).toBe(`${FILE}/invoices`);
     const visit = await follow('historyVisit');
-    expect(visit.pathname).toBe('/organization/acme/appointments/appointment-old');
-    expect(visit.search).toEqual({ from: `patients/${DHARTI}/visits` });
+    expect(visit.pathname).toBe(
+      '/organization/acme/appointments/appt_old000000000000000000',
+    );
+    expect(visit.search).toEqual({ from: `patients/${TEST_PATIENT_ID}/visits` });
   });
 
   it('leaves out what an Accountant can’t do (Q-F1, A-F14)', async () => {
     renderInPatientFile(<NavigationProbe />, {
-      file,
+      file: patientFile(),
       role: 'accountant',
       section: 'invoices',
       viewable: viewablePatientFileSections({ patients: false, billing: true }),
     });
-    await screen.findByRole('button', { name: 'collect' });
+    await screen.findByRole('button', { name: 'historySection' });
     for (const hidden of ['startVisit', 'editContact', 'book', 'feedback']) {
       expect(screen.queryByRole('button', { name: hidden })).not.toBeInTheDocument();
     }
+  });
+
+  it('asks a signed-in member’s own codes for Edit contact and Book', async () => {
+    renderInPatientFile(<NavigationProbe />, { file: patientFile() });
+    await screen.findByRole('button', { name: 'editContact' });
+
+    signedInWith(['patient:read']);
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('button', { name: 'editContact' }),
+      ).not.toBeInTheDocument(),
+    );
+    expect(screen.queryByRole('button', { name: 'book' })).not.toBeInTheDocument();
+
+    signedInWith(['patient:read', 'patient:update', 'appointment:create']);
+    expect(
+      await screen.findByRole('button', { name: 'editContact' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'book' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'bookAppointment' })).toBeInTheDocument();
   });
 });

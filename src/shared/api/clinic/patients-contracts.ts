@@ -1,266 +1,403 @@
 import { z } from 'zod';
 
+import type { ApiBody, ApiData } from '@/core/http/api.ts';
+import { wireSchema } from '@/core/http/wire-schema.ts';
+
+import type { CreatedFilter, FollowUpFilter } from './clinic-list-filters.ts';
 import {
-  type CreatedFilter,
-  type FollowUpFilter,
-  readCreatedFilter,
-  readFollowUpFilter,
-} from './clinic-list-filters.ts';
-import {
-  civilDateSchema,
-  genderSchema,
-  isoDateTimeSchema,
-  paiseSchema,
-  patientConversionSchema,
-  patientSchema,
-  patientStatusSchema,
-  patientTypeSchema,
-  phoneSchema,
-  referralSourceSchema,
-  toneSchema,
+  type Gender,
+  PATIENT_CONVERSION_VALUES,
+  PATIENT_STATUS_VALUES,
+  PATIENT_TYPE_VALUES,
+  type PatientConversion,
+  type PatientStatus,
+  type PatientType,
+  type ReferralSource,
 } from './clinic-schema.ts';
-import { clinicToday } from './clinic-time.ts';
+import type {
+  ApiContactChange,
+  ApiContactCreate,
+  Contact,
+  ContactProfile,
+  ContactSummary,
+} from './contacts-contracts.ts';
 
 /*
- * The Patients domain beyond the generated contract (KICKOFF §6.5, §3.6, D22):
- * the plan-only fields the list and the patient drawer show — each a fixture
- * field until clinozy-be serves it (Appendix F › Patients, REPLACE_WITH_API) —
- * what a client sends to create or update a patient, and the list read's
- * params. Read by the Patients room, the patient file, the patient pickers'
- * quick-add and ⌘K.
+ * The Patients domain on clinozy-be (`/app/patients`, api-integration §5.4). A patient file
+ * keeps the clinical side — the types, status, conversion, home branch, doctor, follow-up,
+ * consents and notes — and points at its person with `contact_id`; the name, the numbers, the
+ * gender, the birth date, the address and the referral are the contact's (§3). The rooms read
+ * the two together, flattened, so a row renders from one object.
  */
 
-// ── Records ──
+// ── The wire ──
 
-/** The consent chips the drawer offers (Appendix F: a set replacing `consentGiven`). */
+type ApiPatient = NonNullable<ApiData<'/app/patients/{patient_id}', 'get'>>;
+type ApiPatientRow = NonNullable<ApiData<'/app/patients', 'get'>>[number];
+/** A new patient as `POST /app/patients` takes it. */
+export type ApiPatientCreate = NonNullable<ApiBody<'/app/patients', 'post'>>;
+/** A patient change as `PATCH /app/patients/:patient_id` takes it. */
+export type ApiPatientChange = NonNullable<
+  ApiBody<'/app/patients/{patient_id}', 'patch'>
+>;
+
+const patientFieldsWire = {
+  id: z.string(),
+  patient_number: z.number().int(),
+  contact_id: z.string(),
+  home_branch_id: z.string(),
+  types: z.array(z.enum(PATIENT_TYPE_VALUES)),
+  status: z.enum(PATIENT_STATUS_VALUES),
+  conversion: z.enum(PATIENT_CONVERSION_VALUES),
+  doctor_membership_id: z.string().nullable(),
+  follow_up_at: z.string().nullable(),
+  notes: z.string().nullable(),
+  lead_id: z.string().nullable(),
+  has_data_consent: z.boolean(),
+  has_photo_consent: z.boolean(),
+  allergies: z.array(z.string()),
+  contraindications: z.array(z.string()),
+  created_at: z.string(),
+  updated_at: z.string(),
+};
+
+/** One patient (`GET /app/patients/:patient_id`). */
+export const patientWire = wireSchema<ApiPatient>()(z.object(patientFieldsWire));
+
+/** A patients list row (`GET /app/patients`). */
+export const patientRowWire = wireSchema<ApiPatientRow>()(z.object(patientFieldsWire));
+
+// ── The rooms' shapes ──
+
+/** The consent chips the drawer offers — Data and Photos are the file's, Marketing the person's. */
 export const PATIENT_CONSENT_VALUES = ['data', 'photos', 'marketing'] as const;
 
-/** Zod enum of one consent chip. */
-const patientConsentSchema = z.enum(PATIENT_CONSENT_VALUES);
-
 /** One consent the patient signed. */
-export type PatientConsent = z.infer<typeof patientConsentSchema>;
+export type PatientConsent = (typeof PATIENT_CONSENT_VALUES)[number];
 
-/** "Referred by" is a free-text name of at most 30 characters (`patients.md:55`). */
-const REFERRED_BY_MAX = 30;
+/** The patient file's own fields, as clinozy-be keeps them. */
+interface PatientFileFields {
+  /** The patient's id (`pat_…`). */
+  id: string;
+  /** "#3508" is this number. */
+  seq: number;
+  contactId: string;
+  homeBranchId: string;
+  types: PatientType[];
+  status: PatientStatus;
+  conversion: PatientConversion;
+  /** Their doctor's membership id. */
+  doctorId: string | null;
+  followUpAt: string | null;
+  notes: string | null;
+  /** The lead they came from. */
+  leadId: string | null;
+  allergies: string[];
+  contraindications: string[];
+  createdAt: string;
+  /** What a file change sends back as `expected_updated_at`. */
+  updatedAt: string;
+}
 
-/**
- * A patient as the rooms read it: the contract's `Patient` (`S:287–320`) with
- * the plan's fields (Appendix F, REPLACE_WITH_API) — the free-text "Referred
- * by", the Data / Photos / Marketing consent set (the contract's
- * `consentGiven` follows its Data chip), and who last saved the record
- * (`updatedById` on `_Common`). `conversion` keeps the contract's non-null
- * shape: a cleared chip saves as the contract default until clinozy-be makes it
- * nullable (Appendix F).
- */
-export const patientRecordSchema = patientSchema.extend({
-  referredByName: z.string().nullable(),
-  consents: z.array(patientConsentSchema),
-  updatedById: z.uuid(),
-});
+/** The person a patient is, from their contact (the file's number is the record's `seq`). */
+export interface PatientPerson extends Omit<ContactProfile, 'patientNumber'> {
+  contactNumber: number;
+  firstName: string;
+  lastName: string | null;
+  /** "Priya Shah". */
+  name: string;
+  /** The primary number, E.164. */
+  phone: string;
+  email: string | null;
+  /** Data and Photos from the file, Marketing from the person. */
+  consents: PatientConsent[];
+  /** Their last message is newer than ours — the Activity dot. */
+  isAwaitingReply: boolean;
+  /** What a person change sends back as `expected_updated_at`. */
+  contactUpdatedAt: string;
+}
 
-/** A patient record — the contract's fields and the plan's. */
-export type PatientRecord = z.infer<typeof patientRecordSchema>;
+/** A Patients list row: the file and the person, with the primary number. */
+export interface PatientRow extends PatientFileFields, PatientPerson {}
 
-/** The team member a row's "Updated" cell shows — embedded so a row renders without a join. */
-const patientUpdaterSchema = z.object({
-  id: z.uuid(),
-  name: z.string(),
-  initials: z.string(),
-  tone: toneSchema,
-});
+/** One patient as the file reads them: the row with every number. */
+export interface PatientRecord extends PatientRow {
+  /** The second number, if any — the drawer's "Mobile 2". */
+  phone2: string | null;
+  /** Every number, the primary first. */
+  phones: Contact['phones'];
+}
 
-/** Who last saved a patient. */
-export type PatientUpdater = z.infer<typeof patientUpdaterSchema>;
+/** A patient's full name as every room shows it: "Priya Shah", or the first name alone. */
+export function patientName(patient: Pick<PatientPerson, 'firstName' | 'lastName'>) {
+  return [patient.firstName, patient.lastName].filter(Boolean).join(' ').trim();
+}
 
-/**
- * A list row: the record, what the patient owes the clinic across their open
- * invoices (integer paise; "per-row `dueTotal`", Appendix F) and the member who
- * last saved it (REPLACE_WITH_API: embed both in `listPatients`).
- * @public A contract shape the API wire-up parses with (REPLACE_WITH_API); until then only its type is read.
- */
-export const patientRowSchema = patientRecordSchema.extend({
-  dueTotal: paiseSchema,
-  updatedBy: patientUpdaterSchema.nullable(),
-});
+/** The file's fields from the wire. */
+function toFileFields(row: z.output<typeof patientRowWire>): PatientFileFields {
+  return {
+    id: row.id,
+    seq: row.patient_number,
+    contactId: row.contact_id,
+    homeBranchId: row.home_branch_id,
+    types: row.types,
+    status: row.status,
+    conversion: row.conversion,
+    doctorId: row.doctor_membership_id,
+    followUpAt: row.follow_up_at,
+    notes: row.notes,
+    leadId: row.lead_id,
+    allergies: row.allergies,
+    contraindications: row.contraindications,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
 
-/** A Patients list row. */
-export type PatientRow = z.infer<typeof patientRowSchema>;
+/** The consents a file and its person hold, in the chips' order. */
+function consentsOf(
+  row: Pick<z.output<typeof patientRowWire>, 'has_data_consent' | 'has_photo_consent'>,
+  person: Pick<ContactProfile, 'hasMarketingConsent'> | null,
+): PatientConsent[] {
+  const held: Record<PatientConsent, boolean> = {
+    data: row.has_data_consent,
+    photos: row.has_photo_consent,
+    marketing: person?.hasMarketingConsent ?? false,
+  };
+  return PATIENT_CONSENT_VALUES.filter((consent) => held[consent]);
+}
 
-// ── Writes ──
-
-/** The form's own limits, inside the contract's (`patients.md:44–58`; `S:295–312`). */
-const PATIENT_FIELD_LIMITS = {
-  name: 60,
-  /** The contract allows 240; the drawer's textarea stops at 200. */
-  address: 240,
-  /** The contract allows 2,000; the drawer's textarea stops at 1,000. */
-  notes: 2000,
-  /** The clinical bento cards (`complaints` … `futureSuggestions`). */
-  clinical: 4000,
-  email: 120,
-} as const;
-
-const MOBILE_MESSAGE = 'Enter a 10-digit mobile';
-const BIRTH_DATE_MESSAGE = 'A birth date can’t be in the future';
-
-/** An Indian mobile in E.164 — "Enter a 10-digit mobile" otherwise (`patients.md:74`). */
-const mobileSchema = z
-  .string()
-  .refine((value) => phoneSchema.safeParse(value).success, MOBILE_MESSAGE);
-
-/**
- * Every field a client sends for a patient (`createPatient` / `updatePatient`,
- * `S:1623, S:1640`) with the contract's ranges, plus the plan's (Appendix F):
- * `followUpAt` on create, a clearable `conversion` (none saves as the
- * contract's default, "T-Not converted"), `referredByName` and the consent
- * set. A birth date is never in the future (`S:301`).
- */
-export const patientFieldsSchema = z.object({
-  firstName: z.string().trim().min(1, 'Add a first name').max(PATIENT_FIELD_LIMITS.name),
-  lastName: z.string().trim().max(PATIENT_FIELD_LIMITS.name).nullable(),
-  phone: mobileSchema,
-  phone2: mobileSchema.nullable(),
-  email: z.email('Check the email').max(PATIENT_FIELD_LIMITS.email).nullable(),
-  gender: genderSchema.nullable(),
-  dateOfBirth: civilDateSchema
-    .refine((date) => date <= clinicToday(), BIRTH_DATE_MESSAGE)
-    .nullable(),
-  address: z.string().trim().max(PATIENT_FIELD_LIMITS.address).nullable(),
-  homeBranchId: z.uuid(),
-  types: z.array(patientTypeSchema).max(6),
-  status: patientStatusSchema,
-  conversion: patientConversionSchema.nullable(),
-  referralSource: referralSourceSchema.nullable(),
-  referredByName: z.string().trim().max(REFERRED_BY_MAX).nullable(),
-  referredByPatientId: z.uuid().nullable(),
-  consents: z.array(patientConsentSchema),
-  doctorId: z.uuid().nullable(),
-  followUpAt: isoDateTimeSchema.nullable(),
-  notes: z.string().trim().max(PATIENT_FIELD_LIMITS.notes).nullable(),
-  leadId: z.uuid().nullable(),
-});
-
-/** A patient's full input — what a create stores and an update re-checks once merged. */
-export type PatientFields = z.infer<typeof patientFieldsSchema>;
-
-/** The clinical bento's four notes, written from the patient file (`updatePatient`, `S:1640`). */
-export const patientClinicalSchema = z.object({
-  complaints: z.string().trim().max(PATIENT_FIELD_LIMITS.clinical).nullable(),
-  diagnosis: z.string().trim().max(PATIENT_FIELD_LIMITS.clinical).nullable(),
-  treatmentSuggestions: z.string().trim().max(PATIENT_FIELD_LIMITS.clinical).nullable(),
-  futureSuggestions: z.string().trim().max(PATIENT_FIELD_LIMITS.clinical).nullable(),
-});
-
-/** The clinical notes a patient-file save may send. */
-export type PatientClinical = z.infer<typeof patientClinicalSchema>;
-
-/**
- * A new patient's starting values (`S:295–312`; `patients.md:53`): New, no
- * types, no conversion until someone picks one, nothing signed; the home
- * branch is the caller's (the current branch, else the main one).
- */
-export const PATIENT_DEFAULTS: Readonly<
-  Omit<PatientFields, 'firstName' | 'phone' | 'homeBranchId'>
-> = {
+/** A person the join could not read (a contact gone since) — the row keeps its number. */
+const UNKNOWN_PERSON: Omit<PatientPerson, 'consents'> = {
+  contactNumber: 0,
+  firstName: '',
   lastName: null,
-  phone2: null,
+  name: '',
+  phone: '',
   email: null,
   gender: null,
   dateOfBirth: null,
   address: null,
-  types: [],
-  status: 'new',
-  conversion: null,
   referralSource: null,
+  referredByContactId: null,
   referredByName: null,
-  referredByPatientId: null,
-  consents: [],
-  doctorId: null,
-  followUpAt: null,
-  notes: null,
-  leadId: null,
+  hasMarketingConsent: false,
+  isAwaitingReply: false,
+  contactUpdatedAt: '',
 };
 
-/**
- * A create: the first name and the mobile are enough to start; the home branch
- * falls back to the main one and the rest to {@link PATIENT_DEFAULTS}.
- */
-export type PatientCreateInput = Pick<PatientFields, 'firstName' | 'phone'> &
-  Partial<PatientFields>;
+/** A contact as a patient's person. */
+function personOf(
+  contact: (ContactSummary & ContactProfile) | null,
+): Omit<PatientPerson, 'consents'> {
+  if (!contact) return UNKNOWN_PERSON;
+  return {
+    contactNumber: contact.contactNumber,
+    firstName: contact.firstName,
+    lastName: contact.lastName,
+    name: contact.name,
+    phone: contact.primaryPhone,
+    email: contact.email,
+    gender: contact.gender,
+    dateOfBirth: contact.dateOfBirth,
+    address: contact.address,
+    referralSource: contact.referralSource,
+    referredByContactId: contact.referredByContactId,
+    referredByName: contact.referredByName,
+    hasMarketingConsent: contact.hasMarketingConsent,
+    isAwaitingReply: contact.isAwaitingReply,
+    contactUpdatedAt: contact.updatedAt,
+  };
+}
 
-/** An update: any field of the drawer or the clinical bento; the server re-checks the merged record. */
-export type PatientPatch = Partial<PatientFields & PatientClinical>;
+/** A list row with its person (null when the contact could not be read). */
+export function toPatientRow(
+  row: z.output<typeof patientRowWire>,
+  contact: (ContactSummary & ContactProfile) | null,
+): PatientRow {
+  return {
+    ...toFileFields(row),
+    ...personOf(contact),
+    consents: consentsOf(row, contact),
+  };
+}
+
+/** One patient with their person and every number. */
+export function toPatientRecord(
+  row: z.output<typeof patientWire>,
+  contact: Contact,
+): PatientRecord {
+  const secondary = contact.phones.find((entry) => !entry.isPrimary);
+  return {
+    ...toPatientRow(row, contact),
+    phone2: secondary?.phone ?? null,
+    phones: contact.phones,
+  };
+}
+
+// ── Writes ──
 
 /**
- * What a create answers: the patient, and the onboarding task it opened — "New
- * patient. Collect consent, DOB and a first photo." (H:4718; an Onboarding task
- * kind, Appendix F).
+ * Everything the patient drawer writes: the person's fields (the contact) and the file's. A
+ * missing conversion saves as the API's default, Not converted.
  */
-export interface PatientCreateResult {
-  patient: PatientRecord;
-  onboardingTaskId: string;
+export interface PatientFields {
+  firstName: string;
+  lastName: string | null;
+  /** E.164. */
+  phone: string;
+  /** E.164, or none. */
+  phone2: string | null;
+  gender: Gender | null;
+  /** `YYYY-MM-DD`. */
+  dateOfBirth: string | null;
+  address: string | null;
+  referralSource: ReferralSource | null;
+  referredByName: string | null;
+  homeBranchId: string;
+  types: PatientType[];
+  status: PatientStatus;
+  conversion: PatientConversion | null;
+  followUpAt: string | null;
+  notes: string | null;
+  consents: PatientConsent[];
+}
+
+/** Who a new patient is: someone the clinic already knows (a lead's person), or a new person. */
+export type PatientPersonInput = { contactId: string } | 'new';
+
+/** The person's part of the drawer's fields as the contact routes take it. */
+function personBodyOf(
+  fields: PatientFields,
+  phones: ApiContactCreate['phones'],
+): Omit<ApiContactCreate, 'phones'> & { phones: ApiContactCreate['phones'] } {
+  return {
+    first_name: fields.firstName,
+    last_name: fields.lastName,
+    phones,
+    gender: fields.gender,
+    date_of_birth: fields.dateOfBirth,
+    address: fields.address,
+    referral_source: fields.referralSource,
+    referred_by_name: fields.referredByName,
+    has_marketing_consent: fields.consents.includes('marketing'),
+  };
+}
+
+/** The file's part of the drawer's fields as the patient routes take it. */
+function fileBodyOf(fields: PatientFields) {
+  return {
+    home_branch_id: fields.homeBranchId,
+    types: fields.types,
+    status: fields.status,
+    conversion: fields.conversion ?? ('not_converted' as const),
+    follow_up_at: fields.followUpAt,
+    notes: fields.notes,
+    has_data_consent: fields.consents.includes('data'),
+    has_photo_consent: fields.consents.includes('photos'),
+  } satisfies ApiPatientChange;
+}
+
+/** A new patient as `POST /app/patients` takes it — on their known contact, or a new one. */
+export function patientCreateBodyOf(
+  fields: PatientFields,
+  person: PatientPersonInput,
+): ApiPatientCreate {
+  if (person !== 'new') return { contact_id: person.contactId, ...fileBodyOf(fields) };
+  const phones = [fields.phone, fields.phone2]
+    .filter((phone): phone is string => Boolean(phone))
+    .map((phone, index) => ({ phone, is_primary: index === 0, is_on_whatsapp: true }));
+  return { contact: personBodyOf(fields, phones), ...fileBodyOf(fields) };
+}
+
+/** Whether any pair differs — what each half of an edit compares, value by value. */
+const anyChanged = (pairs: ReadonlyArray<readonly [unknown, unknown]>) =>
+  pairs.some(([next, saved]) => next !== saved);
+
+/**
+ * The person's numbers after an edit: the drawer's two first (the first primary), then any others
+ * they had, each keeping whether it is on WhatsApp (a new number is).
+ */
+function editedPhones(record: PatientRecord, fields: PatientFields) {
+  const kept = record.phones.filter(
+    (entry) => entry.phone !== record.phone && entry.phone !== record.phone2,
+  );
+  const whatsapp = (phone: string) =>
+    record.phones.find((entry) => entry.phone === phone)?.isOnWhatsapp ?? true;
+  const edited = [fields.phone, fields.phone2].filter((phone): phone is string =>
+    Boolean(phone),
+  );
+  return [...edited, ...kept.map((entry) => entry.phone)].map((phone, index) => ({
+    phone,
+    is_primary: index === 0,
+    is_on_whatsapp: whatsapp(phone),
+  }));
+}
+
+/**
+ * An edit as the two writes it makes — the file's change and the person's — each null when
+ * nothing of it changed. The drawer edits the first two numbers; any others stay, after them.
+ */
+export function patientChangeOf(
+  record: PatientRecord,
+  fields: PatientFields,
+): { file: ApiPatientChange | null; person: ApiContactChange | null } {
+  const file = fileBodyOf(fields);
+  const fileChanged = anyChanged([
+    [file.home_branch_id, record.homeBranchId],
+    [file.types.join(), record.types.join()],
+    [file.status, record.status],
+    [file.conversion, record.conversion],
+    [file.follow_up_at, record.followUpAt],
+    [file.notes, record.notes],
+    [file.has_data_consent, record.consents.includes('data')],
+    [file.has_photo_consent, record.consents.includes('photos')],
+  ]);
+  const person = personBodyOf(fields, editedPhones(record, fields));
+  const personChanged = anyChanged([
+    [person.first_name, record.firstName],
+    [person.last_name, record.lastName],
+    [fields.phone, record.phone],
+    [fields.phone2, record.phone2],
+    [person.gender, record.gender],
+    [person.date_of_birth, record.dateOfBirth],
+    [person.address, record.address],
+    [person.referral_source, record.referralSource],
+    [person.referred_by_name, record.referredByName],
+    [person.has_marketing_consent, record.hasMarketingConsent],
+  ]);
+  return { file: fileChanged ? file : null, person: personChanged ? person : null };
 }
 
 // ── List reads ──
 
 /**
- * The list's views (`view`, `S:30`): everyone; in clinic today (checked in
- * today, Q-P4); with dues; follow-up due (past or today); Recall (status
- * Inactive — prototype-only, a backend request, Appendix F).
+ * The list's views: everyone; follow-up due (today or before); Recall (status Inactive). The
+ * design's In clinic today and With dues go — the API has no filter for either (G4, Q22).
  */
-export const PATIENT_VIEW_VALUES = ['all', 'today', 'dues', 'follow', 'recall'] as const;
+export const PATIENT_VIEW_VALUES = ['all', 'follow', 'recall'] as const;
 
 /** One list view. */
 export type PatientView = (typeof PATIENT_VIEW_VALUES)[number];
 
 /**
- * The sortable columns (`patients.md:30`): ID, Patient, Type, Status,
- * Conversion, Age, Follow-up, Due, Updated — each column's id. Without one the
- * list runs by `updatedAt`, newest first (`S:1619`).
+ * The sortable columns as the API sorts them: ID (`patient_number`) and Follow-up
+ * (`follow_up_at`). Without one the list runs newest first (`created_at`).
  */
-export const PATIENT_SORT_KEYS = [
-  'seq',
-  'name',
-  'types',
-  'status',
-  'conversion',
-  'age',
-  'followUp',
-  'due',
-  'updated',
-] as const;
+export const PATIENT_SORT_KEYS = ['seq', 'followUp'] as const;
 
 /** One sortable column. */
 export type PatientSortKey = (typeof PATIENT_SORT_KEYS)[number];
 
-/**
- * `listPatients`' params (`S:1619`) and the plan's (`recall`, `gender`,
- * `conversion` and the extra sort keys — backend requests, Appendix F). The
- * badge filters take any number of values each.
- * @public A contract shape the API wire-up parses with (REPLACE_WITH_API); until then only its type is read.
- */
-export const patientListParamsSchema = z.object({
-  view: z.enum(PATIENT_VIEW_VALUES).optional(),
-  q: z.string().max(80).optional(),
-  types: z.array(patientTypeSchema).optional(),
-  status: z.array(patientStatusSchema).optional(),
-  gender: z.array(genderSchema).optional(),
-  conversion: z.array(patientConversionSchema).optional(),
-  created: z
-    .custom<CreatedFilter>((value) => readCreatedFilter(value) !== undefined)
-    .optional(),
-  followUp: z
-    .custom<FollowUpFilter>((value) => readFollowUpFilter(value) !== undefined)
-    .optional(),
-  sort: z.enum(PATIENT_SORT_KEYS).optional(),
-  order: z.enum(['asc', 'desc']).optional(),
-});
-
-/** Params of the patients list read. */
-export type PatientListParams = z.infer<typeof patientListParamsSchema>;
-
-/** A patient's full name as every room shows it: "Priya Shah", or the first name alone. */
-export function patientName(patient: Pick<PatientRecord, 'firstName' | 'lastName'>) {
-  return [patient.firstName, patient.lastName].filter(Boolean).join(' ').trim();
+/** The list read's params, from the URL. The status and the conversion take one value each. */
+export interface PatientListParams {
+  view?: PatientView;
+  q?: string;
+  types?: PatientType[];
+  status?: PatientStatus;
+  conversion?: PatientConversion;
+  created?: CreatedFilter;
+  followUp?: FollowUpFilter;
+  sort?: PatientSortKey;
+  order?: 'asc' | 'desc';
 }

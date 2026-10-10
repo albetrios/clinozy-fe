@@ -2,7 +2,7 @@ import { type KeyboardEvent, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type { PatientPhotoVisit } from '@/shared/api/clinic/patient-images-api.ts';
+import type { PatientPhotoAlbumCounts } from '@/shared/api/clinic/patient-images-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
 import { RoomViewTabs } from '@/shared/components/RoomToolbar/index.ts';
@@ -20,7 +20,7 @@ import {
   PHOTO_SIZE_LOOK,
   PHOTO_SIZES,
 } from '../../shared/photo-looks.ts';
-import type { PhotoVisitOption } from '../../shared/photo-view.ts';
+import type { PhotoVisit } from '../../shared/photo-view.ts';
 import { PHOTO_TOOLBAR_TEST_IDS } from './photo-toolbar.constants.ts';
 
 const K = PATIENT_PHOTOS_KEYS;
@@ -40,13 +40,14 @@ export interface PhotoToolbarProps {
   /** The albums the member sees (Private only for Doctor, Admin, Owner). */
   albums: readonly PhotoAlbum[];
   onAlbumChange: (album: PhotoAlbum) => void;
-  /** Photos of the album under the filter; none shows no count. */
-  count: number;
-  /** Photos of the album, for "All photos" · "3 in General". */
-  albumCount: number;
+  /** The server's count of each album's photos (`meta.album_counts`): the tabs' chips; null until read. */
+  albumCounts: PatientPhotoAlbumCounts | null;
+  /** The server's count of the album's photos under the filter; none (0, or not told) shows no count. */
+  count: number | null;
   /** The filter: a visit id, "none", or every photo (undefined). */
   appointment: string | undefined;
-  visits: readonly PhotoVisitOption[];
+  /** The visits a photo can be filed under, latest first. */
+  visits: readonly PhotoVisit[];
   onAppointmentChange: (appointment: string | undefined) => void;
   /** "24 Sep" / "Today" for a visit's day. */
   dayLabel: (date: string) => string;
@@ -54,13 +55,16 @@ export interface PhotoToolbarProps {
   onSizeChange: (size: PhotoSize) => void;
 }
 
-/** "#2790 · Completed": a visit's number and status. */
+/**
+ * "24 Sep · Hydrafacial" over "#2790 · Completed": a visit's day, service, number and status.
+ * The design's per-visit photo count goes — the API counts photos by album only (G4).
+ */
 function useVisitOptions(
-  visits: readonly PhotoVisitOption[],
+  visits: readonly PhotoVisit[],
   dayLabel: (date: string) => string,
 ): PickerOption[] {
   const { t } = useTranslation([PATIENT_PHOTOS_NS, CLINIC_NS]);
-  return visits.map(({ visit, count }: { visit: PatientPhotoVisit; count: number }) => ({
+  return visits.map((visit) => ({
     key: visit.appointmentId,
     label: t(K.visitFilter.visit, {
       day: dayLabel(visit.date),
@@ -70,9 +74,25 @@ function useVisitOptions(
       seq: visit.seq,
       status: t(CLINIC_KEYS.appointments.statuses[visit.status], { ns: CLINIC_NS }),
     }),
-    meta: t(K.visitFilter.visitMeta, { count }),
     tone: 'sky' as const,
   }));
+}
+
+/** An album tab's count chip — the server's count — with its spoken "3 photos". */
+function AlbumCount({ count }: { count: number }) {
+  const { t } = useTranslation(PATIENT_PHOTOS_NS);
+  return (
+    <>
+      <span
+        aria-hidden="true"
+        data-slot="pill"
+        className="bg-muted text-muted-foreground text-tiny min-w-4 rounded-full px-1.25 text-center leading-[1.45] tabular-nums"
+      >
+        {count}
+      </span>
+      <span className="sr-only">{t(K.count, { count })}</span>
+    </>
+  );
 }
 
 /** S / M / L — radios that move with the arrow keys, focus following the pick. */
@@ -140,17 +160,17 @@ function PhotoSizeRadios({
 
 /**
  * The Photos toolbar (H:828; `patient-file.md:61`): the album tabs on the
- * segmented track — General `ImageIcon`, Private `Lock`, LHR `Sparkles` —
- * "3 photos", the visit filter "All photos ⌄" ("All photos" · "Not attached
- * to a visit" · each visit with photos), then the S / M / L radios at the end.
- * It wraps on a phone.
+ * segmented track — General `ImageIcon`, Private `Lock`, LHR `Sparkles` — each
+ * with the server's count, "3 photos", the visit filter "All photos ⌄" ("All
+ * photos" · "Not attached to a visit" · each visit a photo can be filed under),
+ * then the S / M / L radios at the end. It wraps on a phone.
  */
 export function PhotoToolbar({
   album,
   albums,
   onAlbumChange,
+  albumCounts,
   count,
-  albumCount,
   appointment,
   visits,
   onAppointmentChange,
@@ -161,11 +181,15 @@ export function PhotoToolbar({
   const { t } = useTranslation(PATIENT_PHOTOS_NS);
   const albumLabel = t(K.albums[album]);
   const visitOptions = useVisitOptions(visits, dayLabel);
+  const albumCount = albumCounts?.[album] ?? null;
   const options: PickerOption[] = [
     {
       key: ALL,
       label: t(K.visitFilter.all),
-      sub: t(K.visitFilter.allSub, { count: albumCount, album: albumLabel }),
+      sub:
+        albumCount === null
+          ? undefined
+          : t(K.visitFilter.allSub, { count: albumCount, album: albumLabel }),
     },
     { key: NO_VISIT, label: t(K.visitFilter.none), sub: t(K.visitFilter.noneSub) },
     ...visitOptions,
@@ -176,17 +200,21 @@ export function PhotoToolbar({
       <div className="min-w-0 flex-none">
         <RoomViewTabs
           label={t(K.albumTabs)}
-          tabs={albums.map((id) => ({
-            id,
-            label: t(K.albums[id]),
-            icon: PHOTO_ALBUM_LOOK[id].icon,
-          }))}
+          tabs={albums.map((id) => {
+            const tabCount = albumCounts?.[id] ?? null;
+            return {
+              id,
+              label: t(K.albums[id]),
+              icon: PHOTO_ALBUM_LOOK[id].icon,
+              badge: tabCount === null ? undefined : <AlbumCount count={tabCount} />,
+            };
+          })}
           value={album}
           onValueChange={(id) => onAlbumChange(id as PhotoAlbum)}
           testIdPrefix={PHOTO_TOOLBAR_TEST_IDS.prefix}
         />
       </div>
-      {count > 0 ? (
+      {count ? (
         <span className="text-detail text-muted-foreground whitespace-nowrap">
           {t(K.count, { count })}
         </span>

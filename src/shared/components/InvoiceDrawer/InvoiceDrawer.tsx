@@ -17,18 +17,17 @@ import type {
   DrawerStep,
 } from '@/shared/components/DrawerSteps/index.ts';
 import { OfferingQuickCreate } from '@/shared/components/OfferingQuickCreate/index.ts';
-import { PatientDrawer } from '@/shared/components/PatientDrawer/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
+import { useFixturePlan as usePlan } from '@/shared/hooks/useFixturePlan/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import {
   useDeleteInvoice,
   useOftenBilled,
   useRestoreInvoice,
 } from '@/shared/hooks/useInvoices/index.ts';
-import { usePlan } from '@/shared/hooks/usePlan/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
 import { useStaffProfiles } from '@/shared/hooks/useTeam/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -212,7 +211,6 @@ function invoiceSteps(input: StepsInput): DrawerStep[] {
           lockedParty={input.editing}
           onParty={input.stacks.setParty}
           onTeamChange={input.onTeamChange}
-          onNewPatient={input.stacks.patient.open}
         />
       ),
     },
@@ -452,28 +450,22 @@ function InvoiceDrawerSession(props: InvoiceDrawerProps) {
   );
 }
 
-/** The drawers stacked on the invoice: New patient (Q-P2) and New offering (L-30e). */
+/**
+ * The drawer stacked on the invoice: New offering (L-30e). New patient (Q-P2) comes back with
+ * Payments on clinozy-be — this drawer still reads the fixture patients (D152).
+ */
 function InvoiceStackedDrawers({
   stacks,
 }: {
   stacks: ReturnType<typeof useInvoiceStacks>;
 }) {
   return (
-    <>
-      <PatientDrawer
-        mode="quick"
-        open={stacks.patient.isOpen}
-        query={stacks.patient.query}
-        onClose={stacks.patient.close}
-        onPick={stacks.patient.complete}
-      />
-      <OfferingQuickCreate
-        open={stacks.offering.isOpen}
-        query={stacks.offering.query}
-        onClose={stacks.offering.close}
-        onCreated={stacks.offering.complete}
-      />
-    </>
+    <OfferingQuickCreate
+      open={stacks.offering.isOpen}
+      query={stacks.offering.query}
+      onClose={stacks.offering.close}
+      onCreated={stacks.offering.complete}
+    />
   );
 }
 

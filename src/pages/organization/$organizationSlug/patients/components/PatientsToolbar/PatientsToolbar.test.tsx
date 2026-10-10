@@ -25,7 +25,7 @@ function Harness(props: Omit<PatientsToolbarProps, 'table'>) {
 }
 
 describe('PatientsToolbar', () => {
-  it('draws the h1, the five view tabs with their icons, search, Filters, Columns and New patient', async () => {
+  it('draws the h1, the three view tabs with their icons, search, Filters, Columns and New patient', async () => {
     const { container } = renderWithProviders(
       <Harness view="all" onViewChange={vi.fn()} onNewPatient={vi.fn()} />,
     );
@@ -33,10 +33,9 @@ describe('PatientsToolbar', () => {
       await screen.findByRole('heading', { level: 1, name: 'Patients' }),
     ).toBeInTheDocument();
     const tabs = within(screen.getByRole('tablist', { name: 'Patient views' }));
+    // In clinic today and With dues go: the API has no read for either.
     expect(tabs.getAllByRole('tab').map((tab) => tab.textContent)).toEqual([
       'All',
-      'In clinic today',
-      'With dues',
       'Follow-up due',
       'Recall',
     ]);
@@ -72,15 +71,15 @@ describe('PatientsToolbar', () => {
   });
 
   it('hides New patient without Create', async () => {
-    renderWithProviders(<Harness view="dues" onViewChange={vi.fn()} />);
-    expect(await screen.findByTestId('patients-tab-dues')).toHaveAttribute(
+    renderWithProviders(<Harness view="recall" onViewChange={vi.fn()} />);
+    expect(await screen.findByTestId('patients-tab-recall')).toHaveAttribute(
       'aria-selected',
       'true',
     );
     expect(screen.queryByTestId('patients-new')).not.toBeInTheDocument();
   });
 
-  it('lists the room’s filter sections in their order, each value in its tone', async () => {
+  it('lists the room’s filter sections in their order, each value in its tone — no Gender', async () => {
     const user = userEvent.setup();
     renderWithProviders(
       <Harness view="all" onViewChange={vi.fn()} onNewPatient={vi.fn()} />,
@@ -88,17 +87,16 @@ describe('PatientsToolbar', () => {
     await user.click(await screen.findByTestId('patients-filters-trigger'));
     const panel = await screen.findByTestId('patients-filters');
     const groups = within(panel).getAllByRole('group');
-    expect(
-      groups.map(
-        (group) =>
-          document.getElementById(group.getAttribute('aria-labelledby') ?? '')
-            ?.textContent,
-      ),
-    ).toEqual(['Gender', 'Type', 'Status', 'Conversion', 'Created', 'Follow-up date']);
-    expect(within(panel).getByText('Female').closest('[data-tone]')).toHaveAttribute(
-      'data-tone',
-      'blush',
-    );
+    const labelOf = (group: HTMLElement) =>
+      document.getElementById(group.getAttribute('aria-labelledby') ?? '')?.textContent;
+    expect(groups.map(labelOf)).toEqual([
+      'Type',
+      'Status',
+      'Conversion',
+      'Created',
+      'Follow-up date',
+    ]);
+    expect(within(panel).queryByText('Female')).not.toBeInTheDocument();
     expect(within(panel).getByText('Gynac').closest('[data-tone]')).toHaveAttribute(
       'data-tone',
       'butter',
@@ -107,5 +105,12 @@ describe('PatientsToolbar', () => {
       'data-tone',
       'sage',
     );
+    // The API cannot read a follow-up that is not set.
+    const followUp = groups.find((group) => labelOf(group) === 'Follow-up date');
+    expect(followUp).toBeDefined();
+    expect(within(followUp as HTMLElement).getByText('Overdue')).toBeInTheDocument();
+    expect(
+      within(followUp as HTMLElement).queryByText('Not set'),
+    ).not.toBeInTheDocument();
   });
 });

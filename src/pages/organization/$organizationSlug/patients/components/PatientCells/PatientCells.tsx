@@ -1,19 +1,12 @@
 import { useTranslation } from 'react-i18next';
 
-import { cn } from '@/lib/utils.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import { localDateOf } from '@/shared/api/clinic/clinic-time.ts';
 import { patientName, type PatientRow } from '@/shared/api/clinic/patients-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
-import {
-  AvatarStack,
-  IdPill,
-  MoneyCell,
-  PersonChip,
-  TonePill,
-} from '@/shared/components/Cells/index.ts';
+import { IdPill, PersonChip, TonePill } from '@/shared/components/Cells/index.ts';
 import {
   ContactCard,
   type ContactCardActions,
@@ -50,7 +43,10 @@ export function PatientBadges({
   );
 }
 
-/** What the person card shows of a patient row (the schema's `contactCard`, S:1566). */
+/**
+ * What the person card shows of a patient row: the person and the file. A row carries the
+ * primary number only, and no dues — the API answers neither for a list (G4).
+ */
 function useContactCardData(patient: PatientRow, today: string): ContactCardData {
   const { t } = useTranslation(CLINIC_NS);
   return {
@@ -59,10 +55,7 @@ function useContactCardData(patient: PatientRow, today: string): ContactCardData
     displayId: displayId.patient(patient.seq),
     since: patient.createdAt,
     tags: patient.types.map((type) => t(CLINIC_KEYS.patients.types[type])),
-    reach: [
-      { channel: 'whatsapp', phone: patient.phone },
-      ...(patient.phone2 ? [{ channel: 'phone' as const, phone: patient.phone2 }] : []),
-    ],
+    reach: [{ channel: 'whatsapp', phone: patient.phone }],
     about: {
       gender: patient.gender,
       age: patientAge(patient.dateOfBirth, today),
@@ -70,7 +63,6 @@ function useContactCardData(patient: PatientRow, today: string): ContactCardData
       source: patient.referralSource
         ? t(CLINIC_KEYS.patients.referralSources[patient.referralSource])
         : null,
-      owedByThem: patient.dueTotal,
       consent: {
         data: patient.consents.includes('data'),
         photos: patient.consents.includes('photos'),
@@ -158,44 +150,12 @@ export function PatientFollowUpCell({
   );
 }
 
-/** The Due cell: "₹2,000" 600 in the blush ink at the inline end, or a muted "—". */
-export function PatientDueCell({ dueTotal }: { dueTotal: number }) {
-  if (dueTotal <= 0) return <span className="text-muted-foreground">—</span>;
-  return (
-    <MoneyCell paise={dueTotal} className="text-tone-blush-foreground font-semibold" />
-  );
-}
-
-/**
- * The Updated cell: who last saved the record in a 28px pill ("Riya S."), then
- * when, by the rooms' one time rule ("3:39 pm", "Yesterday 3:39 pm", "24 Sep").
- */
+/** The Updated cell: when the file was last saved, by the rooms' one time rule ("3:39 pm", "Yesterday 3:39 pm", "24 Sep"). */
 export function PatientUpdatedCell({ patient }: { patient: PatientRow }) {
   const clock = useClinicClock();
   return (
-    <span className="flex min-w-0 items-center gap-2">
-      {patient.updatedBy ? (
-        <AvatarStack
-          nameFirst
-          people={[
-            {
-              id: patient.updatedBy.id,
-              name: patient.updatedBy.name,
-              initials: patient.updatedBy.initials,
-              tone: patient.updatedBy.tone,
-            },
-          ]}
-          className="min-w-0 flex-none"
-        />
-      ) : null}
-      <span
-        className={cn(
-          'text-caption text-muted-foreground min-w-0 truncate tabular-nums',
-          !patient.updatedBy && 'text-body',
-        )}
-      >
-        {clock.moment(patient.updatedAt)}
-      </span>
+    <span className="text-body text-muted-foreground min-w-0 truncate tabular-nums">
+      {clock.moment(patient.updatedAt)}
     </span>
   );
 }

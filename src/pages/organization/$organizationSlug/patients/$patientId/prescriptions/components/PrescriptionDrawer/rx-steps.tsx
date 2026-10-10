@@ -57,7 +57,6 @@ export function RxPrescriptionFields({
         <DrawerField label={t(K.doctor)} htmlFor={`${ids}-doctor`} span="half">
           <PatientStaffPicker
             id={`${ids}-doctor`}
-            staffRole="doctor"
             label={t(K.doctor)}
             placeholder={t(K.doctorPlaceholder)}
             value={values.doctorId}

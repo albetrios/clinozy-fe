@@ -1,10 +1,14 @@
 export {
+  type SuggestionAddVars,
   type SuggestionRemoveVars,
+  type SuggestionRestoreVars,
   type SuggestionUpdateVars,
   useAddSuggestion,
   usePlan,
+  usePlanActivity,
+  usePlanIdeas,
+  usePlanOfferings,
   useRemoveSuggestion,
   useRestoreSuggestion,
   useUpdateSuggestion,
-  withSuggestionPatch,
 } from './usePlan.ts';

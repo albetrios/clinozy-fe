@@ -33,7 +33,7 @@
     "activity": "动态",
     "showActivity": "显示消息和动态",
     "hideActivity": "隐藏消息和动态",
-    "unread_other": "{{count}} 条未读消息"
+    "awaitingReply": "等待回复"
   },
   "sectionsPopover": {
     "trigger": "患者档案 · 全部分区",
@@ -46,8 +46,6 @@
       "team": "团队"
     },
     "openNow": "当前打开",
-    "empty": "空",
-    "hasRecords": "有记录",
     "pin": "固定到栏",
     "unpin": "从栏中取消固定",
     "pinAria": "固定到栏 · {{section}}",
@@ -63,14 +61,11 @@
     "items": {
       "prescription": "处方",
       "treatment": "治疗",
-      "invoice": "发票",
-      "payment": "付款",
       "photo": "照片",
       "appointment": "预约",
       "report": "报告",
       "note": "笔记"
-    },
-    "nothingDue": "{{name}} 没有待付款项"
+    }
   },
   "section": {
     "primary": {
@@ -80,8 +75,7 @@
       "images": "上传图片",
       "reports": "上传报告",
       "invoices": "新建发票",
-      "payments": "记录付款",
-      "packages": "添加套餐"
+      "payments": "记录付款"
     },
     "more": "{{name}} 的更多操作"
   },
@@ -96,7 +90,6 @@
     "reach": "联系方式",
     "reachSub": {
       "whatsappPrimary": "WhatsApp · 主要",
-      "fromLead": "手机 · 来自线索",
       "mobile": "手机",
       "instagram": "Instagram"
     },
@@ -113,18 +106,10 @@
     "birthdayToday": "🎂 今天",
     "noAddress": "无地址",
     "upNext": "即将到来",
-    "visitService": "{{service}} · {{minutes}} 分钟",
     "reschedule": "改期",
     "book": "预约",
     "notBooked": "未预约",
     "noUpcoming": "暂无即将到来的就诊",
-    "maskedAmount": "₹ ••••",
-    "dueSince_other": "已欠 {{count}} 天",
-    "showAmount": "显示金额",
-    "hideAmount": "隐藏金额",
-    "collect": "收款",
-    "creditToReturn": "待退还 {{amount}}",
-    "allPaid": "已全部付清 · 无欠款",
     "feedback": "反馈",
     "feedbackScore": "{{feel}} · {{score}}/10",
     "feedbackReview": "{{source}} 上 {{rating}}★",
@@ -148,8 +133,7 @@
       "none": "未关联就诊",
       "noneSub": "从档案上传",
       "visit": "{{day}} · {{service}}",
-      "visitSub": "#{{seq}} · {{status}}",
-      "visitMeta_other": "{{count}} 张照片"
+      "visitSub": "#{{seq}} · {{status}}"
     },
     "sizes": {
       "label": "缩略图大小",
@@ -160,7 +144,6 @@
       "mediumShort": "M",
       "largeShort": "L"
     },
-    "groupWithVisit": "{{photos}} · {{visit}}",
     "tile": {
       "open": "打开 {{name}}",
       "edit": "编辑详情",
@@ -195,17 +178,16 @@
       "underarm": "腋下",
       "legs": "腿部",
       "arms": "手臂",
-      "other": "其他"
+      "other": "其他",
+      "upperLip": "上唇",
+      "chin": "下巴",
+      "neck": "颈部",
+      "hands": "手部",
+      "fullBody": "全身"
     },
     "viewer": {
       "label": "照片查看器",
       "position": "第 {{index}} 张，共 {{total}} 张",
-      "zoom": "缩放",
-      "zoomOut": "缩小",
-      "zoomOutHint": "缩小 (−)",
-      "zoomIn": "放大",
-      "zoomInHint": "放大 (+)",
-      "zoomReset": "适应屏幕 (0)",
       "close": "关闭查看器",
       "closeHint": "关闭 (Esc)",
       "previous": "上一张",
@@ -214,11 +196,9 @@
       "nextHint": "下一张 (→)",
       "hints": {
         "browse": "← → 浏览",
-        "zoom": "滚动或 + − 缩放",
-        "pan": "拖动以移动 · 双击重置",
         "close": "Esc 关闭"
       },
-      "missing": "示例照片 · 未附带文件",
+      "missing": "无法预览",
       "notFoundRecord": "照片"
     },
     "details": {
@@ -234,9 +214,14 @@
       "visitHint": "可选 · 将照片归入该预约",
       "notAttached": "未关联",
       "save": "保存详情",
-      "saved": "照片详情已保存"
+      "saved": "照片详情已保存",
+      "stage": "阶段"
     },
-    "loading": "正在加载照片"
+    "loading": "正在加载照片",
+    "stages": {
+      "before": "治疗前",
+      "after": "治疗后"
+    }
   },
   "rx": {
     "record": "处方",
@@ -248,16 +233,7 @@
     "medicines_other": "{{count}} 种药",
     "quickFill": {
       "print": "打印处方",
-      "repeat": "重复上次处方 {{number}}",
-      "kits": {
-        "hairFall": "脱发套装",
-        "postPeel": "换肤后套装",
-        "pigmentation": "色素套装"
-      }
-    },
-    "kit": {
-      "reapply": "每 3 小时重新涂抹",
-      "avoidSun": "48 小时内避免日晒和磨砂"
+      "repeat": "重复上次处方 {{number}}"
     },
     "steps": {
       "prescription": "处方",
@@ -270,10 +246,8 @@
     "quick": {
       "placeholder": "输入药物、剂量、时间 · 例如 flu 0-0-1 af 10d",
       "hint": "od · bd · tds · hs · af/bf · 5d · x8",
-      "often": "常开药物",
       "groups": {
         "all": "全部",
-        "often": "常开药物",
         "oral": "口服",
         "topical": "外用"
       },
@@ -361,13 +335,20 @@
       "summary": "{{medicines}} · {{doctor}}",
       "noMedicine": "请添加药物",
       "saved": "处方已保存",
-      "savedNumber": "处方 {{number}} 已保存"
+      "savedNumber": "处方 {{number}} 已保存",
+      "approve": "保存并批准",
+      "approvedNumber": "处方 {{number}} 已批准"
     },
     "delete": {
       "title": "删除此处方？",
       "deleted": "处方已删除"
     },
-    "preview": "处方 {{number}}"
+    "preview": "处方 {{number}}",
+    "status": {
+      "draft": "草稿",
+      "approved": "已批准"
+    },
+    "approvedNote": "已批准 · 已批准的处方无法更改"
   },
   "treatment": {
     "record": "治疗",
@@ -379,7 +360,6 @@
     "session": "第 {{session}} 次",
     "quickFill": {
       "next": "{{name}} 的下一次",
-      "package": "{{name}} · 第 {{session}} 次",
       "checkIn": "记录回访"
     },
     "type": "类型",
@@ -519,8 +499,8 @@
       "calls": {
         "none": "不回访",
         "next_day": "第二天",
-        "in_2_days": "2 天后",
-        "in_week": "一周后"
+        "in_week": "一周后",
+        "in_two_days": "2 天后"
       },
       "feedback": "本次治疗的反馈",
       "feedbackItem": "{{date}} · {{feel}} {{score}}/10",
@@ -531,9 +511,25 @@
       "edit": "保存更改",
       "saved": "治疗已保存"
     },
-    "delete": {
-      "title": "删除此治疗？",
-      "deleted": "治疗已删除"
+    "package": {
+      "label": "来自套餐",
+      "hint": "保存时使用其中 1 次",
+      "option": "{{name}} · 已用 {{used}}/{{total}} 次",
+      "numbered": "由套餐决定",
+      "uses": "使用 1 次 {{name}}"
+    },
+    "reverse": {
+      "title": "撤销此治疗？",
+      "body": "记录保留在档案中并标记为已撤销，所用的套餐次数会退回。此操作无法撤回。",
+      "action": "撤销",
+      "done": "治疗已撤销",
+      "status": "已撤销",
+      "note": "{{date}} 已撤销 · {{reason}}",
+      "reasons": {
+        "mistake": "误记录",
+        "wrongPatient": "患者错误",
+        "notDone": "未进行治疗"
+      }
     }
   },
   "report": {
@@ -569,34 +565,30 @@
     },
     "view": {
       "sub": "{{name}} · {{date}}",
-      "addedBy": "添加人",
-      "fileLine": "{{name}} · {{format}} · 应患者要求共享",
       "notes": "备注",
-      "noNotes": "此报告没有备注",
-      "download": "下载",
-      "downloading": "正在下载 {{name}}"
+      "noNotes": "此报告没有备注"
     }
   },
   "package": {
-    "title": "添加套餐",
-    "step": "选择套餐",
-    "option": "{{name}} · {{sessions}} 次 · {{price}}",
-    "empty": "暂无多次服务项目",
+    "title": "编辑套餐",
     "summary": "完成治疗后计入次数",
-    "save": "添加套餐",
-    "noPick": "请选择套餐",
-    "added": "套餐已添加 · 请在发票中开票",
+    "save": "保存更改",
     "card": {
       "left_other": "剩 {{count}} 次",
       "used": "已用 {{used}}/{{total}} 次",
       "validTill": "有效期至 {{date}}",
-      "next": "下次：{{date}}",
-      "use": "使用一次",
       "book": "预约下次",
       "empty": "暂无套餐",
-      "sessionUsed": "已使用第 {{used}}/{{total}} 次",
-      "noneLeft": "没有剩余次数"
-    }
+      "noExpiry": "无有效期",
+      "statuses": {
+        "used_up": "已用完",
+        "expired": "已过期"
+      },
+      "edit": "编辑"
+    },
+    "validUntil": "有效期至",
+    "sessions": "次数",
+    "saved": "套餐已保存"
   },
   "clinical": {
     "titles": {
@@ -610,7 +602,8 @@
     "placeholder": "输入后按 Enter 添加",
     "add": "添加{{title}}",
     "remove": "移除{{name}}",
-    "newCount_other": "{{count}} 条新增"
+    "newCount_other": "{{count}} 条新增",
+    "removed": "已移除{{name}}"
   },
   "feedback": {
     "title": "反馈",
@@ -642,7 +635,6 @@
     "linkLabel": "链接",
     "noNext": "未记录下一步",
     "noLink": "未添加链接",
-    "files": "▶ {{files}}",
     "actions": "操作",
     "edit": "编辑",
     "remove": "移除",
@@ -668,7 +660,8 @@
     "removeReview": "移除这条评价？",
     "checkInRemoved": "回访已移除",
     "reviewRemoved": "评价已移除",
-    "more_other": "还有 {{count}} 条"
+    "more_other": "还有 {{count}} 条",
+    "files_other": "▶ {{count}} 个文件"
   },
   "checkIn": {
     "titles": {
@@ -703,9 +696,6 @@
     "offeringsHint": "可选 · 以“计划中”加入患者的建议",
     "offeringsPlaceholder": "搜索服务",
     "offeringSessions_other": "{{price}} · {{count}} 次",
-    "contextVisit": "就诊回访",
-    "contextAppointment": "就诊回访 · 预约 {{number}}",
-    "contextAftercare": "{{treatment}}后的术后回访",
     "save": "保存回访",
     "saveEdit": "保存更改",
     "noFeel": "请选择目前情况",
@@ -713,7 +703,9 @@
     "added": " · {{count}} 项已加入建议",
     "callBack": " · 已创建医生回电任务",
     "updated": "回访已更新",
-    "record": "回访"
+    "record": "回访",
+    "noScore": "请选择患者自评分",
+    "offeringsPlanned": "已加入服务建议"
   },
   "review": {
     "title": "记录评价",
@@ -742,7 +734,8 @@
     "updated": "评价已更新",
     "badLink": "请添加 https:// 链接",
     "notRated": "未评分",
-    "record": "评价"
+    "record": "评价",
+    "attachedFiles_other": "{{count}} 个文件"
   },
   "logFeedback": {
     "title": "记录反馈",
@@ -827,7 +820,6 @@
       "feedback": "反馈",
       "report": "报告",
       "type": "类型",
-      "uploadedBy": "上传人",
       "invoice": "账单",
       "items": "项目明细",
       "bill": "金额",
@@ -857,8 +849,6 @@
     "placeholder": "给团队添加备注",
     "add": "添加备注",
     "by": "{{name}} · {{date}}",
-    "delete": "删除备注",
-    "deleted": "已删除备注",
     "empty": "暂无备注"
   },
   "timeline": {
@@ -882,10 +872,7 @@
     },
     "packages": {
       "progress": "{{used}} / {{total}}",
-      "next": "下次 · {{date}}",
-      "overdue": "第 {{session}} 次已逾期",
       "done": "所有疗程已完成",
-      "use": "使用一次",
       "empty": "暂无有效套餐"
     },
     "prescriptions": {
@@ -893,15 +880,6 @@
     },
     "treatments": {
       "sub": "第 {{session}} 次 · {{date}}"
-    },
-    "billing": {
-      "due": "待付",
-      "paid": "已付",
-      "show": "显示金额",
-      "hide": "隐藏金额",
-      "invoice": "{{type}}发票 {{number}}",
-      "sub": "{{date}} · {{amount}}",
-      "collect": "收款"
     },
     "reports": {
       "sub": "{{type}} · {{date}}"
@@ -914,13 +892,8 @@
     "activity": {
       "filtersLabel": "动态筛选",
       "notes": "备注",
-      "filterTitle": "{{label}} · {{count}}",
-      "rx": "处方 {{number}} · {{medicines}}",
-      "treatment": "{{name}} · 第 {{session}} 次",
-      "received": "已收 {{amount}} · {{mode}}",
-      "refund": "退款 {{amount}} · {{mode}}",
-      "against": "对应 {{number}}",
-      "empty": "暂无动态"
+      "empty": "暂无动态",
+      "masked": "₹ ••••"
     }
   },
   "visitFlow": {
@@ -935,9 +908,7 @@
     "steps": {
       "checks": "签到与安全",
       "rx": "处方",
-      "treatment": "治疗",
-      "invoice": "发票",
-      "collect": "收款与分享"
+      "treatment": "治疗"
     },
     "checks": {
       "labels": {
@@ -968,27 +939,10 @@
       "empty": "记录今天的治疗",
       "last": "上次参数：{{memo}}",
       "done": "{{name}} · 第 {{session}} 次",
-      "repeated": "已按上次参数记录第 {{session}} 次"
+      "repeated": "已按上次参数记录第 {{session}} 次",
+      "repeatPackage": "⚡ 重复 · {{name}}"
     },
-    "invoice": {
-      "total": "合计",
-      "create": "根据就诊创建发票",
-      "custom": "自定义发票",
-      "created": "已根据就诊创建发票 {{number}}",
-      "nothing": "无可开票项目",
-      "ready_other": "{{count}} 项已就绪 · {{total}}",
-      "covered": "已由套餐覆盖 · 无需开票",
-      "empty": "暂无可开票项目",
-      "done": "{{number}} · {{total}}"
-    },
-    "collect": {
-      "upi": "收款 {{amount}} · UPI",
-      "received": "已通过{{mode}}收款 {{amount}}",
-      "share": "分享处方、发票和照片",
-      "shared": "已通过 WhatsApp 将处方、发票和照片发送给 {{name}}",
-      "due": "欠款 {{amount}}",
-      "nothing": "无欠款",
-      "sent": "已通过 WhatsApp 发送"
-    }
+    "paused": "就诊已暂停",
+    "resume": "继续"
   }
 }

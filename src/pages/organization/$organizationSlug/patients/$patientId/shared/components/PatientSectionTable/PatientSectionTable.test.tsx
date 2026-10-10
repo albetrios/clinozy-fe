@@ -4,7 +4,6 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import {
   type DataTableFeatures,
   dataTableFeatures,
@@ -48,14 +47,14 @@ interface Visit {
 }
 
 const DRASHTI: StaffChip = {
-  id: 'staff-dd',
+  id: 'mem_drashti00000000000000',
   name: 'Dr. Drashti Moradiya',
   initials: 'DM',
   tone: 'sky',
 };
 const VISITS: Visit[] = [
-  { id: 'v1', when: 'Today · 11:00', doctor: DRASHTI },
-  { id: 'v2', when: 'Sep 24 · 14:50', doctor: null },
+  { id: 'appt_visitone00000000000000', when: 'Today · 11:00', doctor: DRASHTI },
+  { id: 'appt_visittwo00000000000000', when: 'Sep 24 · 14:50', doctor: null },
 ];
 
 /** A two-column table as the sections build theirs: When, and the doctor's pill folding to nothing. */
@@ -100,11 +99,9 @@ function VisitsProbe({ rows, loading = false }: { rows: Visit[]; loading?: boole
 beforeEach(() => {
   exportMock.mockReset();
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetClinicFixtures();
 });
 afterEach(() => {
   resetPatientFile();
-  resetClinicFixtures();
 });
 
 describe('PatientSectionTable (KICKOFF §6.6 Section tables)', () => {
@@ -162,7 +159,10 @@ describe('the section tables’ cells', () => {
         </span>
         <span data-testid="team">
           <TeamCell
-            people={[DRASHTI, { ...DRASHTI, id: 'staff-kp', name: 'Kiran Patel' }]}
+            people={[
+              DRASHTI,
+              { ...DRASHTI, id: 'mem_kiran000000000000000', name: 'Kiran Patel' },
+            ]}
           />
         </span>
         <span data-testid="nobody">

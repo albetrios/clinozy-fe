@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import type {
   RxCatalog,
   RxCatalogMedicine,
-} from '@/shared/api/clinic/prescriptions-api.ts';
+} from '@/shared/api/clinic/prescriptions-contracts.ts';
 import type { PickerOption } from '@/shared/components/Picker/index.ts';
 import { QuickLine } from '@/shared/components/QuickLine/index.ts';
 import {
@@ -13,7 +13,6 @@ import {
   ItemsPickerCell,
   ItemsQtyCell,
 } from '@/shared/forms/ItemsField/index.ts';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 
 import { RX_KEYS, RX_NS } from '../../prescriptions.constants.ts';
 import {
@@ -49,7 +48,6 @@ function useRxColumns({
   readOnly,
 }: Pick<RxMedicinesFieldProps, 'form' | 'catalog' | 'readOnly'>) {
   const { t } = useTranslation(RX_NS);
-  const money = usePaiseFormat();
   const dayWords = t(K.dayWords)
     .split(',')
     .map((word) => word.trim());
@@ -74,7 +72,6 @@ function useRxColumns({
         key: medicine.name,
         label: medicine.name,
         sub: [medicine.composition, stock].filter(Boolean).join(' · ') || undefined,
-        meta: medicine.mrp === null ? undefined : money(medicine.mrp),
         data: medicine,
       };
     });
@@ -195,8 +192,9 @@ function useRxColumns({
 
 /**
  * Step 2 "Medicines" (H:4806–4807; `patient-file.md:111–112`): the quick line
- * and Browse above the item rows — Medicine (the store's, or typed: "Add
- * medicine") · "Dose · M A N" · Meal · Where (14 places, or typed: "Use") ·
+ * and Browse above the item rows — Medicine (the store's with its composition
+ * and stock, or typed: "Add medicine"; no MRP until F10) · "Dose · M A N" ·
+ * Meal · Where (14 places, or typed: "Use") ·
  * Qty · × — each with its dashed note line, where "10 days" recomputes the
  * quantity from the dose; "+ Add medicine". The table keeps one row.
  */

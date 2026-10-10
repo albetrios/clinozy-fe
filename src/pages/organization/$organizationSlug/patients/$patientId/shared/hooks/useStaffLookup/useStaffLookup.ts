@@ -1,9 +1,8 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 
-import { FIXTURE_ACTOR_ID } from '@/shared/api/clinic/clinic-fixture-store.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import { personFullName } from '@/shared/components/Cells/index.ts';
-import { useMyStaffProfile, useStaffProfiles } from '@/shared/hooks/useTeam/index.ts';
+import { useMyMembershipId } from '@/shared/hooks/useMyMembership/index.ts';
+import { useTeamDirectory } from '@/shared/hooks/useTeamDirectory/index.ts';
 
 /** A staff member as a record's chip shows them: name, initials, tone. */
 export interface StaffChip {
@@ -14,32 +13,27 @@ export interface StaffChip {
 }
 
 /**
- * The staff member a record names — its doctor, team, author — from the
- * clinic's staff profiles (KICKOFF §6.6 Section tables, Team notes). A
- * record written in this session carries the fixture actor, and one still on
- * its way (an optimistic note) no author yet: both stand for the signed-in
- * member (REPLACE_WITH_API: the server stamps the member). Null while the
- * profiles load, for no id, and for an id they do not know.
+ * The team member a record names — its doctor, therapist, author — by membership id, from the
+ * team (`GET /app/memberships`; KICKOFF §6.6 Section tables, Team notes). A record still on
+ * its way (an optimistic note, no author yet) stands for the signed-in member. Null while the
+ * team loads, for no id, and for someone no longer on it.
  */
 export function useStaffLookup(): (id: string | null | undefined) => StaffChip | null {
-  const staff = useStaffProfiles();
-  const me = useMyStaffProfile();
-  const byId = useMemo(
-    () => new Map((staff.data ?? []).map((profile) => [profile.id, profile])),
-    [staff.data],
-  );
+  const team = useTeamDirectory();
+  const me = useMyMembershipId();
+  const { byId } = team;
   return useCallback(
     (id) => {
       if (id === null || id === undefined) return null;
-      const profile = id === FIXTURE_ACTOR_ID || id === '' ? me.data : byId.get(id);
-      if (!profile) return null;
+      const member = byId.get(id === '' ? (me ?? '') : id);
+      if (!member) return null;
       return {
-        id: profile.id,
-        name: personFullName(profile),
-        initials: profile.initials,
-        tone: profile.tone,
+        id: member.id,
+        name: member.name,
+        initials: member.initials,
+        tone: member.tone,
       };
     },
-    [byId, me.data],
+    [byId, me],
   );
 }

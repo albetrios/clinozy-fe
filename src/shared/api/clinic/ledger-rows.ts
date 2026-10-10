@@ -1,6 +1,6 @@
 import { FIXTURE_ACTOR_ID } from './clinic-fixture-store.ts';
 import { invoiceBalance } from './clinic-money.ts';
-import { patientName } from './patients-contracts.ts';
+import { patientName } from './patients-fixture-contracts.ts';
 import type { LedgerPerson, LedgerRow, PaymentRecord } from './payments-contracts.ts';
 
 /*

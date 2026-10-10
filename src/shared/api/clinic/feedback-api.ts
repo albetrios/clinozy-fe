@@ -1,509 +1,453 @@
-import { isHttpError } from '@/shared/errors/HttpError.ts';
+import { z } from 'zod';
 
-import { compareText, validateClinicInput } from './clinic-fixture-store.ts';
-import type { CheckIn, DeleteReason, FeedbackAction, Review } from './clinic-schema.ts';
+import { api } from '@/core/http/api.ts';
+import { collectAllPages } from '@/shared/api/fetch-all-pages.ts';
+
+import type { DeleteReason, FeedbackActionKind } from './clinic-schema.ts';
 import {
-  type CheckInContext,
-  type CheckInFeedback,
-  type CheckInInput,
-  checkInInputSchema,
-  type CheckInSaved,
-  FEEDBACK_PAGE_SIZE,
-  type FeedbackActionInput,
-  feedbackActionInputSchema,
+  checkInBodyOf,
+  type CheckInCreateInput,
+  type CheckInFields,
+  type CheckInOffering,
+  checkInOfferingWire,
+  checkInRowWire,
+  checkInWire,
   type FeedbackItem,
-  type FeedbackLoggedAction,
-  type FeedbackPerson,
-  type FeedbackType,
-  type PatientFeedbackPage,
-  type ReviewFeedback,
-  type ReviewInput,
-  reviewInputSchema,
-  type ReviewSaved,
+  type FeedbackKind,
+  type PatientCheckIn,
+  type PatientReview,
+  reviewBodyOf,
+  type ReviewCreateInput,
+  type ReviewFields,
+  reviewRowWire,
+  reviewWire,
+  toCheckInOffering,
+  toPatientCheckIn,
+  toPatientReview,
 } from './feedback-contracts.ts';
 import { patientQueryKeys } from './patients-api.ts';
-import { addSuggestion } from './plan-api.ts';
-import { createTask } from './tasks-api.ts';
-import type { StaffProfile } from './users-contracts.ts';
 
 /*
- * The patient file's feedback (KICKOFF §6.6 Feedback; `S:1636, 1648–1650`), on
- * the fixture world until clinozy-be serves it — REPLACE_WITH_API (D6).
+ * The patient file's feedback on clinozy-be (api-integration §5.4): `…/check-ins` and
+ * `…/reviews` under the patient, each record with its follow-ups embedded. A write sets off
+ * the rest server-side — the doctor call-back a bad check-in or a low review opens, the plan
+ * rows a new check-in's next offerings become (TR4, TR10) — so nothing here writes a task or a
+ * suggestion. Read `patient:read`, write `patient:update`.
  */
 
-/** TanStack Query keys for feedback — under the patients' key (the file's counts and rail). */
+/** TanStack Query keys for feedback — under the patients' key, scoped to the organization. */
 export const feedbackQueryKeys = {
   all: [...patientQueryKeys.all, 'feedback'] as const,
-  /** One page of a patient's cards of one type. */
-  patient: (patientId: string, type: FeedbackType, limit: number) =>
-    [...feedbackQueryKeys.all, 'patient', patientId, type, limit] as const,
-  checkIn: (id: string) => [...feedbackQueryKeys.all, 'check-in', id] as const,
-  review: (id: string) => [...feedbackQueryKeys.all, 'review', id] as const,
-  context: (
-    patientId: string,
-    appointmentId: string,
-    treatmentId: string,
-    editing: string,
-  ) =>
-    [
-      ...feedbackQueryKeys.all,
-      'context',
-      patientId,
-      appointmentId,
-      treatmentId,
-      editing,
-    ] as const,
+  /** Every check-in and review of a patient — the Feedback card. */
+  patient: (organizationId: string | null, patientId: string) =>
+    [...feedbackQueryKeys.all, organizationId, 'patient', patientId] as const,
+  checkIn: (organizationId: string | null, checkInId: string) =>
+    [...feedbackQueryKeys.all, organizationId, 'check-in', checkInId] as const,
+  review: (organizationId: string | null, reviewId: string) =>
+    [...feedbackQueryKeys.all, organizationId, 'review', reviewId] as const,
+  /** The check-in before a new one (`editingId` ''), or before the one being edited. */
+  previous: (organizationId: string | null, patientId: string, editingId: string) =>
+    [...feedbackQueryKeys.all, organizationId, 'previous', patientId, editingId] as const,
+  /** The offerings a new check-in can plan. */
+  offerings: (organizationId: string | null) =>
+    [...feedbackQueryKeys.all, organizationId, 'offerings'] as const,
 };
 
-const fixtureWorld = () => import('./fixtures/world.fixtures.ts');
-const fixtureStaff = () => import('./fixtures/staff.fixtures.ts');
+/** The most rows the API sends a page — the card reads every page of a patient's feedback. */
+const PAGE_SIZE = 100;
 
-type World = Awaited<ReturnType<typeof fixtureWorld>>['clinicFixtures'];
+/** How many of the newest check-ins the drawer looks through for the one before (same-day ones). */
+const PREVIOUS_LOOKBACK = 10;
 
-/** A call-back after a bad check-in is due in 3 hours (`S:1648`), after a low review in 4 (`S:1649`). */
-const CALL_BACK_HOURS = { checkIn: 3, review: 4 } as const;
-
-/** Worse, or a score of 4 or less (`S:520`); 0 is "not rated" (A-F12). */
-export function checkInNeedsAction(checkIn: Pick<CheckIn, 'feel' | 'score'>): boolean {
-  return checkIn.feel === 'worse' || (checkIn.score > 0 && checkIn.score <= 4);
+/** The next page's cursor, or null on the last. */
+function nextCursor(
+  pagination: { has_more?: boolean; next?: string | null } | undefined,
+) {
+  return pagination?.has_more ? (pagination.next ?? null) : null;
 }
 
-/** A rating of 3 or less (`S:538`). */
-export function reviewNeedsAction(review: Pick<Review, 'rating'>): boolean {
-  return review.rating !== null && review.rating <= 3;
+/** Newest first: the day, then when it was logged (both ISO, so text order is time order). */
+function newestFirst(
+  a: { date: string; createdAt: string },
+  b: { date: string; createdAt: string },
+): number {
+  if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+  if (a.createdAt === b.createdAt) return 0;
+  return a.createdAt < b.createdAt ? 1 : -1;
 }
 
-/** Newest first: the day, then when it was logged. */
-const newestFirst = (a: { date: string; createdAt: string }, b: typeof a) =>
-  compareText(b.date, a.date) || compareText(b.createdAt, a.createdAt);
-
-function personOf(profile: StaffProfile | undefined): FeedbackPerson | null {
-  if (!profile) return null;
-  return {
-    id: profile.id,
-    name: [profile.firstName, profile.lastName].filter(Boolean).join(' '),
-    initials: profile.initials,
-    tone: profile.tone,
-  };
-}
-
-/** The joins every card makes: people, visits, treatments, the actions logged. */
-function joins(world: World) {
-  const staff = new Map(world.staff.snapshot().map((profile) => [profile.id, profile]));
-  const appointments = new Map(world.appointments.snapshot().map((row) => [row.id, row]));
-  const treatments = new Map(world.treatments.snapshot().map((row) => [row.id, row]));
-  const actions = world.feedbackActions
-    .snapshot()
-    .sort((a, b) => compareText(b.createdAt, a.createdAt));
-  const visitOf = (id: string | null) => {
-    const row = id ? appointments.get(id) : undefined;
-    return row ? { seq: row.seq, service: row.serviceLabel || null } : null;
-  };
-  const actionOf = (
-    match: (action: FeedbackAction) => boolean,
-  ): FeedbackLoggedAction | null => {
-    const action = actions.find(match);
-    return action
-      ? {
-          action: action.action,
-          note: action.note,
-          by: personOf(staff.get(action.byId)),
-          at: action.createdAt,
-        }
-      : null;
-  };
-  return {
-    by: (id: string) => personOf(staff.get(id)),
-    visitOf,
-    treatmentName: (id: string | null) =>
-      id ? (treatments.get(id)?.name ?? null) : null,
-    actionOf,
-  };
-}
-
-/** Which type chip a card answers to. */
-function typeOf(item: FeedbackItem): FeedbackType {
-  if (item.kind === 'review') return item.review.source;
-  return item.checkIn.treatmentId ? 'treatment' : 'visit';
-}
-
-/** Every feedback card of a patient, newest first (REPLACE_WITH_API). */
-async function allFeedback(patientId: string): Promise<FeedbackItem[]> {
-  const { clinicFixtures } = await fixtureWorld();
-  const join = joins(clinicFixtures);
-  const checkIns = clinicFixtures.checkIns
-    .snapshot((row) => row.patientId === patientId)
-    .sort(newestFirst);
-  const scored = checkIns.filter((row) => row.score > 0);
-  const cards: FeedbackItem[] = [
-    ...checkIns.map((checkIn): CheckInFeedback => {
-      const earlier = scored.find(
-        (row) => row !== checkIn && newestFirst(checkIn, row) < 0,
-      );
-      return {
-        kind: 'checkIn',
-        id: checkIn.id,
-        date: checkIn.date,
-        checkIn,
-        treatmentName: join.treatmentName(checkIn.treatmentId),
-        appointment: join.visitOf(checkIn.appointmentId),
-        previousScore: checkIn.score > 0 && earlier ? earlier.score : null,
-        needsAction: checkInNeedsAction(checkIn),
-        action: join.actionOf((action) => action.checkInId === checkIn.id),
-        by: join.by(checkIn.byId),
-      };
-    }),
-    ...clinicFixtures.reviews
-      .snapshot((row) => row.patientId === patientId)
-      .map((review): ReviewFeedback => ({
-        kind: 'review',
-        id: review.id,
-        date: review.date,
-        review,
-        appointment: join.visitOf(review.appointmentId),
-        needsAction: reviewNeedsAction(review),
-        action: join.actionOf((action) => action.reviewId === review.id),
-        by: join.by(review.byId),
-      })),
-  ];
-  return cards.sort((a, b) =>
-    newestFirst(
-      { date: a.date, createdAt: recordOf(a).createdAt },
-      { date: b.date, createdAt: recordOf(b).createdAt },
-    ),
-  );
-}
-
+/** A card's record — the day and the logging time its order reads. */
 const recordOf = (item: FeedbackItem) =>
   item.kind === 'checkIn' ? item.checkIn : item.review;
 
-/**
- * One page of a patient's feedback (`listFeedback`, `S:1636`; REPLACE_WITH_API):
- * the cards of a type, newest first, up to `limit` — "Load more" asks for six
- * more — with the counts and the types the chips offer.
- */
-export async function listPatientFeedback(
-  patientId: string,
-  {
-    type = 'all',
-    limit = FEEDBACK_PAGE_SIZE,
-  }: { type?: FeedbackType; limit?: number } = {},
-): Promise<PatientFeedbackPage> {
-  const all = await allFeedback(patientId);
-  const shown = type === 'all' ? all : all.filter((item) => typeOf(item) === type);
-  const present = new Set(all.map(typeOf));
-  return {
-    items: shown.slice(0, limit),
-    total: shown.length,
-    counts: {
-      checkIns: all.filter((item) => item.kind === 'checkIn').length,
-      reviews: all.filter((item) => item.kind === 'review').length,
-    },
-    types: (
-      [
-        'visit',
-        'treatment',
-        'google',
-        'video',
-        'instagram',
-        'internal_form',
-        'whatsapp',
-      ] as const
-    ).filter((kind) => present.has(kind)),
-  };
-}
+// ── Reads ──
 
-/** One check-in — a 404 when it is unknown or removed (REPLACE_WITH_API). */
-export async function fetchCheckIn(id: string): Promise<CheckIn> {
-  const { clinicFixtures } = await fixtureWorld();
-  return clinicFixtures.checkIns.get(id);
-}
-
-/** One review — a 404 when it is unknown or removed (REPLACE_WITH_API). */
-export async function fetchReview(id: string): Promise<Review> {
-  const { clinicFixtures } = await fixtureWorld();
-  return clinicFixtures.reviews.get(id);
-}
-
-/**
- * What the check-in drawer heads with (H:4396): the patient's latest check-in
- * before this one ("last check-in 24 Sep: Same", the "Last time: …"
- * placeholders), the treatment it follows and the visit (REPLACE_WITH_API).
- */
-export async function fetchCheckInContext(
-  patientId: string,
-  {
-    appointmentId = null,
-    treatmentId = null,
-    editingId = null,
-  }: {
-    appointmentId?: string | null;
-    treatmentId?: string | null;
-    editingId?: string | null;
-  } = {},
-): Promise<CheckInContext> {
-  const { clinicFixtures } = await fixtureWorld();
-  const editing = editingId
-    ? clinicFixtures.checkIns.snapshot((row) => row.id === editingId)[0]
-    : undefined;
-  const previous =
-    clinicFixtures.checkIns
-      .snapshot(
-        (row) =>
-          row.patientId === patientId &&
-          row.id !== editingId &&
-          (!editing || newestFirst(editing, row) < 0),
-      )
-      .sort(newestFirst)[0] ?? null;
-  const treatment = treatmentId
-    ? clinicFixtures.treatments.snapshot((row) => row.id === treatmentId)[0]
-    : undefined;
-  const appointment = appointmentId
-    ? clinicFixtures.appointments.snapshot((row) => row.id === appointmentId)[0]
-    : undefined;
-  return {
-    previous,
-    treatment: treatment
-      ? { id: treatment.id, name: treatment.name, doctorId: treatment.doctorId }
-      : null,
-    appointment: appointment
-      ? {
-          id: appointment.id,
-          seq: appointment.seq,
-          service: appointment.serviceLabel || null,
-        }
-      : null,
-  };
-}
-
-/** The doctor a call-back goes to: the treatment's, the visit's, else the patient's usual one. */
-function callBackDoctor(
-  world: World,
-  {
-    patientId,
-    appointmentId,
-    treatmentId,
-  }: { patientId: string; appointmentId: string | null; treatmentId?: string | null },
-): string | null {
-  const treatment = treatmentId
-    ? world.treatments.snapshot((row) => row.id === treatmentId)[0]
-    : undefined;
-  const appointment = appointmentId
-    ? world.appointments.snapshot((row) => row.id === appointmentId)[0]
-    : undefined;
-  const patient = world.patients.snapshot((row) => row.id === patientId)[0];
-  return treatment?.doctorId ?? appointment?.doctorId ?? patient?.doctorId ?? null;
-}
-
-/** Create the call-back task a bad check-in or a low review sets off (`S:1648–1649`). */
-async function createCallBack(
-  world: World,
-  input: {
-    patientId: string;
-    appointmentId: string | null;
-    treatmentId?: string | null;
-    hours: number;
-    why: string;
-  },
-): Promise<void> {
-  const patient = await world.patients.get(input.patientId);
-  const name = [patient.firstName, patient.lastName].filter(Boolean).join(' ');
-  await createTask({
-    title: `Call back ${name}`,
-    why: input.why,
-    ownerId: callBackDoctor(world, input),
-    ownerRole: 'doctor',
-    patientId: input.patientId,
-    dueAt: new Date(Date.now() + input.hours * 3_600_000).toISOString(),
-    kind: 'callback',
-    manualType: 'call_back',
-    priority: 'high',
-  });
-}
-
-/**
- * Each offering a check-in names becomes a Planned suggestion (`S:519`); one
- * already in the plan stays as it is (the server's 409) and is not counted.
- */
-async function planOfferings(input: CheckInInput, offeringIds: readonly string[]) {
-  let added = 0;
-  for (const offeringId of offeringIds) {
-    try {
-      await addSuggestion({
-        patientId: input.patientId,
-        offeringId,
-        appointmentId: input.appointmentId,
-        sourceLabel: input.context,
-        reason: input.nextPlan,
-      });
-      added += 1;
-    } catch (error) {
-      if (!(isHttpError(error) && error.status === 409)) throw error;
-    }
-  }
-  return added;
-}
-
-/**
- * Save a new check-in (`createCheckIn`, `S:1648`; REPLACE_WITH_API): the
- * record, a Planned suggestion per offering it names, and — when it is Worse
- * or scores 4 or less — a doctor call-back due in 3 hours.
- */
-export async function createCheckIn(input: CheckInInput): Promise<CheckInSaved> {
-  const [{ clinicFixtures }, { FIXTURE_VIEWER_ID }] = await Promise.all([
-    fixtureWorld(),
-    fixtureStaff(),
-  ]);
-  const fields = validateClinicInput(checkInInputSchema, input);
-  await clinicFixtures.patients.get(fields.patientId);
-  const checkIn = await clinicFixtures.checkIns.create({
-    ...fields,
-    byId: FIXTURE_VIEWER_ID,
-  });
-  const suggestionsAdded = await planOfferings(fields, fields.nextOfferingIds);
-  const callBackCreated = checkInNeedsAction(checkIn);
-  if (callBackCreated) {
-    await createCallBack(clinicFixtures, {
-      ...fields,
-      hours: CALL_BACK_HOURS.checkIn,
-      why: fields.context,
+/** Every check-in of a patient, newest first (`GET …/check-ins`, every page). */
+async function listCheckIns(patientId: string): Promise<PatientCheckIn[]> {
+  return collectAllPages(async (after) => {
+    const response = await api.get('/app/patients/{patient_id}/check-ins', {
+      params: { patient_id: patientId },
+      query: {
+        sort: 'check_in_date',
+        order: 'desc',
+        limit: PAGE_SIZE,
+        after: after ?? undefined,
+      },
     });
-  }
-  return { checkIn, suggestionsAdded, callBackCreated };
+    return {
+      rows: z
+        .array(checkInRowWire)
+        .parse(response.data ?? [])
+        .map(toPatientCheckIn),
+      next: nextCursor(response.meta?.pagination),
+    };
+  }, 'patient-check-ins');
+}
+
+/** Every review of a patient, newest first (`GET …/reviews`, every page). */
+async function listReviews(patientId: string): Promise<PatientReview[]> {
+  return collectAllPages(async (after) => {
+    const response = await api.get('/app/patients/{patient_id}/reviews', {
+      params: { patient_id: patientId },
+      query: {
+        sort: 'review_date',
+        order: 'desc',
+        limit: PAGE_SIZE,
+        after: after ?? undefined,
+      },
+    });
+    return {
+      rows: z
+        .array(reviewRowWire)
+        .parse(response.data ?? [])
+        .map(toPatientReview),
+      next: nextCursor(response.meta?.pagination),
+    };
+  }, 'patient-reviews');
 }
 
 /**
- * Save an edited check-in (`updateCheckIn`, `S:1648`; REPLACE_WITH_API): the
- * offerings it newly names become suggestions, and a call-back is set off
- * only when it turns bad — a bad one already has its call-back.
+ * Every feedback card of a patient — the check-ins and the reviews, newest first. The card
+ * shows them all (its type chips and "Load more" work on what is read), so every page is read.
  */
-export async function updateCheckIn(
-  id: string,
-  input: CheckInInput,
-): Promise<CheckInSaved> {
-  const { clinicFixtures } = await fixtureWorld();
-  const fields = validateClinicInput(checkInInputSchema, input);
-  const before = await clinicFixtures.checkIns.get(id);
-  const checkIn = await clinicFixtures.checkIns.update(id, fields);
-  const added = fields.nextOfferingIds.filter(
-    (offeringId) => !before.nextOfferingIds.includes(offeringId),
+export async function listPatientFeedback(patientId: string): Promise<FeedbackItem[]> {
+  const [checkIns, reviews] = await Promise.all([
+    listCheckIns(patientId),
+    listReviews(patientId),
+  ]);
+  const items: FeedbackItem[] = [
+    ...checkIns.map((checkIn) => ({ kind: 'checkIn' as const, id: checkIn.id, checkIn })),
+    ...reviews.map((review) => ({ kind: 'review' as const, id: review.id, review })),
+  ];
+  return items.sort((a, b) => newestFirst(recordOf(a), recordOf(b)));
+}
+
+/** One check-in — a 404 when it is unknown or removed. */
+export async function fetchCheckIn(
+  patientId: string,
+  checkInId: string,
+): Promise<PatientCheckIn> {
+  const response = await api.get(
+    '/app/patients/{patient_id}/check-ins/{patient_check_in_id}',
+    { params: { patient_id: patientId, patient_check_in_id: checkInId } },
   );
-  const suggestionsAdded = await planOfferings(fields, added);
-  const callBackCreated = checkInNeedsAction(checkIn) && !checkInNeedsAction(before);
-  if (callBackCreated) {
-    await createCallBack(clinicFixtures, {
-      ...fields,
-      hours: CALL_BACK_HOURS.checkIn,
-      why: fields.context,
-    });
-  }
-  return { checkIn, suggestionsAdded, callBackCreated };
+  return toPatientCheckIn(checkInWire.parse(response.data));
 }
 
-/** Remove a check-in with its reason ("Remove this check-in?"; D32); Undo restores it. */
-export async function deleteCheckIn(
-  id: string,
-  reason: DeleteReason,
-  note: string | null,
-): Promise<CheckIn> {
-  const { clinicFixtures } = await fixtureWorld();
-  return clinicFixtures.checkIns.remove(id, reason, note);
-}
-
-/** Restore a removed check-in — its toast's Undo. */
-export async function restoreCheckIn(id: string): Promise<CheckIn> {
-  const { clinicFixtures } = await fixtureWorld();
-  return clinicFixtures.checkIns.restore(id);
-}
-
-/** A review's call-back reason: "3★ Google review". */
-const reviewWhy = (review: Pick<Review, 'rating' | 'source'>) =>
-  `${review.rating ?? 0}★ ${review.source.replace('_', ' ')} review`;
-
-/**
- * Save a new review (`createReview`, `S:1649`; REPLACE_WITH_API): the record,
- * and a call-back due in 4 hours when it rates 3 or less. Its files follow
- * through the upload tray (`attachReviewFile`).
- */
-export async function createReview(input: ReviewInput): Promise<ReviewSaved> {
-  const [{ clinicFixtures }, { FIXTURE_VIEWER_ID }] = await Promise.all([
-    fixtureWorld(),
-    fixtureStaff(),
-  ]);
-  const fields = validateClinicInput(reviewInputSchema, input);
-  await clinicFixtures.patients.get(fields.patientId);
-  const review = await clinicFixtures.reviews.create({
-    ...fields,
-    files: [],
-    byId: FIXTURE_VIEWER_ID,
-  });
-  const callBackCreated = reviewNeedsAction(review);
-  if (callBackCreated) {
-    await createCallBack(clinicFixtures, {
-      ...fields,
-      hours: CALL_BACK_HOURS.review,
-      why: reviewWhy(review),
-    });
-  }
-  return { review, callBackCreated };
-}
-
-/** Save an edited review (`updateReview`, `S:1649`); a call-back only when it turns low. */
-export async function updateReview(id: string, input: ReviewInput): Promise<ReviewSaved> {
-  const { clinicFixtures } = await fixtureWorld();
-  const fields = validateClinicInput(reviewInputSchema, input);
-  const before = await clinicFixtures.reviews.get(id);
-  const review = await clinicFixtures.reviews.update(id, fields);
-  const callBackCreated = reviewNeedsAction(review) && !reviewNeedsAction(before);
-  if (callBackCreated) {
-    await createCallBack(clinicFixtures, {
-      ...fields,
-      hours: CALL_BACK_HOURS.review,
-      why: reviewWhy(review),
-    });
-  }
-  return { review, callBackCreated };
+/** One review — a 404 when it is unknown or removed. */
+export async function fetchReview(
+  patientId: string,
+  reviewId: string,
+): Promise<PatientReview> {
+  const response = await api.get(
+    '/app/patients/{patient_id}/reviews/{patient_review_id}',
+    {
+      params: { patient_id: patientId, patient_review_id: reviewId },
+    },
+  );
+  return toPatientReview(reviewWire.parse(response.data));
 }
 
 /**
- * Attach an uploaded file to a review — the key the upload tray confirmed
- * (REPLACE_WITH_API). A key already on it is not added twice; ten at most.
+ * The patient's check-in before a new one — or, given the one being edited, before that one:
+ * the newest few up to its day (`check_in_date_to`), the latest of them logged earlier.
  */
-export async function attachReviewFile(reviewId: string, key: string): Promise<Review> {
-  const { clinicFixtures } = await fixtureWorld();
-  const review = await clinicFixtures.reviews.get(reviewId);
-  if (review.files.includes(key)) return review;
-  return clinicFixtures.reviews.update(reviewId, {
-    files: [...review.files, key].slice(0, 10),
+export async function fetchPreviousCheckIn(
+  patientId: string,
+  editing: Pick<PatientCheckIn, 'id' | 'date' | 'createdAt'> | null,
+): Promise<PatientCheckIn | null> {
+  const response = await api.get('/app/patients/{patient_id}/check-ins', {
+    params: { patient_id: patientId },
+    query: {
+      sort: 'check_in_date',
+      order: 'desc',
+      limit: PREVIOUS_LOOKBACK,
+      check_in_date_to: editing?.date,
+    },
+  });
+  const earlier = z
+    .array(checkInRowWire)
+    .parse(response.data ?? [])
+    .map(toPatientCheckIn)
+    .filter((row) => !editing || (row.id !== editing.id && newestFirst(editing, row) < 0))
+    .sort(newestFirst);
+  return earlier[0] ?? null;
+}
+
+/**
+ * The clinic's offerings, by name (`GET /app/offerings`, every page) — a new check-in's
+ * "Add to offering suggestions" offers the active ones; an edit names the ones it planned.
+ */
+export async function listCheckInOfferings(): Promise<CheckInOffering[]> {
+  const rows = await collectAllPages(async (after) => {
+    const response = await api.get('/app/offerings', {
+      query: { sort: 'name', order: 'asc', limit: PAGE_SIZE, after: after ?? undefined },
+    });
+    return {
+      rows: z.array(checkInOfferingWire).parse(response.data ?? []),
+      next: nextCursor(response.meta?.pagination),
+    };
+  }, 'check-in-offerings');
+  return rows.map(toCheckInOffering);
+}
+
+// ── Writes ──
+
+/**
+ * Log a check-in (`POST …/check-ins`): its fields, the visit and the session it follows, its day
+ * and the offerings to plan. The server words its `context` (TR9), plans the offerings (one the
+ * plan holds is skipped, TR10) and — Worse or a score of 4 or less — opens the doctor call-back.
+ */
+export async function createCheckIn({
+  patientId,
+  input,
+  idempotencyKey,
+}: {
+  patientId: string;
+  input: CheckInCreateInput;
+  idempotencyKey: string;
+}): Promise<PatientCheckIn> {
+  const response = await api.post('/app/patients/{patient_id}/check-ins', {
+    params: { patient_id: patientId },
+    body: {
+      ...checkInBodyOf(input),
+      appointment_id: input.appointmentId,
+      patient_treatment_id: input.treatmentId,
+      check_in_date: input.date,
+      next_offering_ids: input.nextOfferingIds,
+    },
+    idempotencyKey,
+  });
+  return toPatientCheckIn(checkInWire.parse(response.data));
+}
+
+/**
+ * Change a check-in (`PATCH …/check-ins/:patient_check_in_id`) — refused as stale
+ * (`409 record_changed`) when someone saved it since `expectedUpdatedAt`. Its next offerings
+ * stay as planned: the plan changes in the plan (TR10).
+ */
+export async function updateCheckIn({
+  patientId,
+  checkInId,
+  fields,
+  expectedUpdatedAt,
+  idempotencyKey,
+}: {
+  patientId: string;
+  checkInId: string;
+  fields: CheckInFields;
+  expectedUpdatedAt: string;
+  idempotencyKey: string;
+}): Promise<PatientCheckIn> {
+  const response = await api.patch(
+    '/app/patients/{patient_id}/check-ins/{patient_check_in_id}',
+    {
+      params: { patient_id: patientId, patient_check_in_id: checkInId },
+      body: { ...checkInBodyOf(fields), expected_updated_at: expectedUpdatedAt },
+      idempotencyKey,
+    },
+  );
+  return toPatientCheckIn(checkInWire.parse(response.data));
+}
+
+/**
+ * Log a review (`POST …/reviews`) — a rating of 3 or less opens the doctor call-back
+ * server-side. Its files follow through the upload tray (`attachReviewFile`).
+ */
+export async function createReview({
+  patientId,
+  input,
+  idempotencyKey,
+}: {
+  patientId: string;
+  input: ReviewCreateInput;
+  idempotencyKey: string;
+}): Promise<PatientReview> {
+  const response = await api.post('/app/patients/{patient_id}/reviews', {
+    params: { patient_id: patientId },
+    body: {
+      ...reviewBodyOf(input),
+      appointment_id: input.appointmentId,
+      review_date: input.date,
+    },
+    idempotencyKey,
+  });
+  return toPatientReview(reviewWire.parse(response.data));
+}
+
+/** Change a review (`PATCH …/reviews/:patient_review_id`) — stale-checked like a check-in. */
+export async function updateReview({
+  patientId,
+  reviewId,
+  fields,
+  expectedUpdatedAt,
+  idempotencyKey,
+}: {
+  patientId: string;
+  reviewId: string;
+  fields: ReviewFields;
+  expectedUpdatedAt: string;
+  idempotencyKey: string;
+}): Promise<PatientReview> {
+  const response = await api.patch(
+    '/app/patients/{patient_id}/reviews/{patient_review_id}',
+    {
+      params: { patient_id: patientId, patient_review_id: reviewId },
+      body: { ...reviewBodyOf(fields), expected_updated_at: expectedUpdatedAt },
+      idempotencyKey,
+    },
+  );
+  return toPatientReview(reviewWire.parse(response.data));
+}
+
+/** Each review's file attaches, run one after another — a PATCH sends the whole list. */
+const attaching = new Map<string, Promise<unknown>>();
+
+/**
+ * File an uploaded file on a review — the key the upload tray confirmed. `file_keys` is the
+ * whole list, so each attach reads the review and adds its key (a key already on it is not
+ * added twice), one review's attaches in turn so two finishing together never drop each other.
+ */
+export function attachReviewFile({
+  patientId,
+  reviewId,
+  fileKey,
+}: {
+  patientId: string;
+  reviewId: string;
+  fileKey: string;
+}): Promise<PatientReview> {
+  const before = attaching.get(reviewId) ?? Promise.resolve();
+  const attach = before
+    .catch(() => undefined)
+    .then(async () => {
+      const review = await fetchReview(patientId, reviewId);
+      if (review.fileKeys.includes(fileKey)) return review;
+      const response = await api.patch(
+        '/app/patients/{patient_id}/reviews/{patient_review_id}',
+        {
+          params: { patient_id: patientId, patient_review_id: reviewId },
+          body: {
+            file_keys: [...review.fileKeys, fileKey],
+            expected_updated_at: review.updatedAt,
+          },
+        },
+      );
+      return toPatientReview(reviewWire.parse(response.data));
+    });
+  attaching.set(reviewId, attach);
+  void attach
+    .finally(() => {
+      if (attaching.get(reviewId) === attach) attaching.delete(reviewId);
+    })
+    .catch(() => undefined);
+  return attach;
+}
+
+/** Remove a check-in or a review with the confirm's reason (`DELETE`; `other` carries a note). */
+export async function deleteFeedback({
+  patientId,
+  kind,
+  id,
+  reason,
+  note,
+}: {
+  patientId: string;
+  kind: FeedbackKind;
+  id: string;
+  reason: DeleteReason;
+  note: string | null;
+}): Promise<void> {
+  const why = { reason, note: note ?? undefined };
+  if (kind === 'checkIn') {
+    await api.delete('/app/patients/{patient_id}/check-ins/{patient_check_in_id}', {
+      params: { patient_id: patientId, patient_check_in_id: id },
+      ...why,
+    });
+    return;
+  }
+  await api.delete('/app/patients/{patient_id}/reviews/{patient_review_id}', {
+    params: { patient_id: patientId, patient_review_id: id },
+    ...why,
   });
 }
 
-/** Remove a review with its reason ("Remove this review?"); Undo restores it. */
-export async function deleteReview(
-  id: string,
-  reason: DeleteReason,
-  note: string | null,
-): Promise<Review> {
-  const { clinicFixtures } = await fixtureWorld();
-  return clinicFixtures.reviews.remove(id, reason, note);
+/** Bring a removed check-in or review back — its toast's Undo (`POST …/restore`). */
+export async function restoreFeedback({
+  patientId,
+  kind,
+  id,
+  idempotencyKey,
+}: {
+  patientId: string;
+  kind: FeedbackKind;
+  id: string;
+  idempotencyKey: string;
+}): Promise<void> {
+  if (kind === 'checkIn') {
+    await api.post('/app/patients/{patient_id}/check-ins/{patient_check_in_id}/restore', {
+      params: { patient_id: patientId, patient_check_in_id: id },
+      idempotencyKey,
+    });
+    return;
+  }
+  await api.post('/app/patients/{patient_id}/reviews/{patient_review_id}/restore', {
+    params: { patient_id: patientId, patient_review_id: id },
+    idempotencyKey,
+  });
 }
 
-/** Restore a removed review — its toast's Undo. */
-export async function restoreReview(id: string): Promise<Review> {
-  const { clinicFixtures } = await fixtureWorld();
-  return clinicFixtures.reviews.restore(id);
-}
-
-/** Log the follow-up on a card ("✓ Doctor called · logged"; `S:1650`; REPLACE_WITH_API). */
-export async function logFeedbackAction(
-  input: FeedbackActionInput,
-): Promise<FeedbackAction> {
-  const [{ clinicFixtures }, { FIXTURE_VIEWER_ID }] = await Promise.all([
-    fixtureWorld(),
-    fixtureStaff(),
-  ]);
-  const fields = validateClinicInput(feedbackActionInputSchema, input);
-  if (fields.checkInId) await clinicFixtures.checkIns.get(fields.checkInId);
-  if (fields.reviewId) await clinicFixtures.reviews.get(fields.reviewId);
-  return clinicFixtures.feedbackActions.create({ ...fields, byId: FIXTURE_VIEWER_ID });
+/**
+ * Log the follow-up on a card ("✓ Doctor called · logged"; `POST …/actions`) — the first one
+ * clears its `needs_action`. `other` needs a note (the API refuses one without).
+ */
+export async function logFeedbackAction({
+  patientId,
+  kind,
+  id,
+  action,
+  note,
+  idempotencyKey,
+}: {
+  patientId: string;
+  kind: FeedbackKind;
+  id: string;
+  action: FeedbackActionKind;
+  note: string | null;
+  idempotencyKey: string;
+}): Promise<void> {
+  const body = { action, note: note ?? undefined };
+  if (kind === 'checkIn') {
+    await api.post('/app/patients/{patient_id}/check-ins/{patient_check_in_id}/actions', {
+      params: { patient_id: patientId, patient_check_in_id: id },
+      body,
+      idempotencyKey,
+    });
+    return;
+  }
+  await api.post('/app/patients/{patient_id}/reviews/{patient_review_id}/actions', {
+    params: { patient_id: patientId, patient_review_id: id },
+    body,
+    idempotencyKey,
+  });
 }

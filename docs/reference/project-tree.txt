@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2138 src files · ~1052 tests in src/ · 48 E2E specs · 26 shadcn UI primitives
+Stats: ~2124 src files · ~1045 tests in src/ · 48 E2E specs · 26 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -1374,7 +1374,6 @@ clinozy-fe/
 │   │   │   ├── clinic/
 │   │   │   │   ├── fixtures/
 │   │   │   │   │   ├── appointment-status.fixtures.ts
-│   │   │   │   │   ├── appointments-server.fixtures.ts
 │   │   │   │   │   ├── appointments.fixtures.ts
 │   │   │   │   │   ├── contact-threads.fixtures.ts
 │   │   │   │   │   ├── invoices-server.fixtures.ts
@@ -1384,7 +1383,6 @@ clinozy-fe/
 │   │   │   │   │   ├── money.fixtures.ts
 │   │   │   │   │   ├── offerings.fixtures.ts
 │   │   │   │   │   ├── organization.fixtures.ts
-│   │   │   │   │   ├── patient-file.fixtures.ts
 │   │   │   │   │   ├── patient-records.fixtures.ts
 │   │   │   │   │   ├── patients.fixtures.ts
 │   │   │   │   │   ├── plan-server.fixtures.ts
@@ -1394,8 +1392,6 @@ clinozy-fe/
 │   │   │   │   │   ├── task-rules.fixtures.ts
 │   │   │   │   │   ├── tasks-server.fixtures.ts
 │   │   │   │   │   ├── tasks.fixtures.ts
-│   │   │   │   │   ├── visits-server.fixtures.ts
-│   │   │   │   │   ├── visits.fixtures.ts
 │   │   │   │   │   ├── world.fixtures.ts
 │   │   │   │   │   └── [2 test files]
 │   │   │   │   ├── access-api.ts
@@ -1403,7 +1399,8 @@ clinozy-fe/
 │   │   │   │   ├── access.fixtures.ts
 │   │   │   │   ├── appointment-status.ts
 │   │   │   │   ├── appointment-views.ts
-│   │   │   │   ├── appointments-fixture-api.ts
+│   │   │   │   ├── appointments-api.ts
+│   │   │   │   ├── appointments-contracts.ts
 │   │   │   │   ├── appointments-fixture-contracts.ts
 │   │   │   │   ├── branches-api.ts
 │   │   │   │   ├── branches-contracts.ts
@@ -1451,13 +1448,12 @@ clinozy-fe/
 │   │   │   │   ├── patient-file-api.ts
 │   │   │   │   ├── patient-file-contracts.ts
 │   │   │   │   ├── patient-images-api.ts
-│   │   │   │   ├── patient-notes-api.ts
 │   │   │   │   ├── patient-packages-api.ts
 │   │   │   │   ├── patient-packages-contracts.ts
 │   │   │   │   ├── patient-reports-api.ts
 │   │   │   │   ├── patient-search-api.ts
-│   │   │   │   ├── patients-api.ts
-│   │   │   │   ├── patients-contracts.ts
+│   │   │   │   ├── patients-fixture-api.ts
+│   │   │   │   ├── patients-fixture-contracts.ts
 │   │   │   │   ├── payments-api.ts
 │   │   │   │   ├── payments-contracts.ts
 │   │   │   │   ├── plan-api.ts
@@ -1476,7 +1472,7 @@ clinozy-fe/
 │   │   │   │   ├── users-contracts.ts
 │   │   │   │   ├── visits-api.ts
 │   │   │   │   ├── visits-contracts.ts
-│   │   │   │   └── [56 test files]
+│   │   │   │   └── [55 test files]
 │   │   │   ├── API.OVERVIEW.md
 │   │   │   ├── auth-api.ts
 │   │   │   ├── auth-contracts.ts
@@ -2548,10 +2544,6 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── usePatientFile.ts
 │   │   │   │   └── [1 test file]
-│   │   │   ├── usePatientNotes/
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── usePatientNotes.ts
-│   │   │   │   └── [1 test file]
 │   │   │   ├── usePatientPackages/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── usePatientPackages.ts
@@ -2867,10 +2859,12 @@ clinozy-fe/
 │   │   └── [8 test files]
 │   ├── utils/
 │   │   ├── app-nav-fixture.ts
+│   │   ├── appointment-doubles.ts
 │   │   ├── auth-api-paths.ts
 │   │   ├── axe-for-dialog.ts
 │   │   ├── bidi-marks.ts
 │   │   ├── clinic-shell-doubles.ts
+│   │   ├── contact-doubles.ts
 │   │   ├── e2e-api-retry.ts
 │   │   ├── e2e-auth.ts
 │   │   ├── e2e-captcha.ts

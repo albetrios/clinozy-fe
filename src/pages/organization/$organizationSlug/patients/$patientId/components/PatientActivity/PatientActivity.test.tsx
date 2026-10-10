@@ -3,14 +3,13 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import { fetchPatientFile } from '@/shared/api/clinic/patient-file-api.ts';
-import type { PatientFile } from '@/shared/api/clinic/patient-file-contracts.ts';
+import { fetchContactThread } from '@/shared/api/clinic/contact-activities-api.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { resetOutboxes } from '@/shared/hooks/useThread/index.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { patientFile, TEST_CONTACT_ID } from '@/tests/utils/patient-doubles.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { PatientActivity, type PatientActivityProps } from './PatientActivity.tsx';
@@ -20,42 +19,72 @@ vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
   useViewportTier: () => viewport.tier,
   readViewportTier: () => viewport.tier,
 }));
-
-let file: PatientFile;
+// The person's stream is clinozy-be's (`/app/contacts/:contact_id/activities`).
+vi.mock('@/shared/api/clinic/contact-activities-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchContactThread: vi.fn(),
+  fetchContactMessagingStatus: vi.fn(async () => ({ whatsappDown: false })),
+  fetchContactTemplateValues: vi.fn(async () => ({
+    clinicName: 'Cresence Skin',
+    address: '',
+    mapsLink: '',
+    reviewLink: '',
+    freeSlots: [],
+  })),
+}));
 
 function renderActivity(props: Partial<PatientActivityProps> = {}) {
   return renderWithProviders(
     <TooltipProvider>
-      <PatientActivity file={file} masked onOpenHistory={vi.fn()} {...props} />
+      <PatientActivity
+        file={patientFile({ instagram: 'priya.shah' })}
+        masked
+        onOpenHistory={vi.fn()}
+        {...props}
+      />
     </TooltipProvider>,
   );
 }
 
-beforeEach(async () => {
+beforeEach(() => {
   viewport.tier = 'desktop';
-  useAuthStore.setState({
-    user: { id: 'user-1', email: 'riya@cresence.skin', role: 'user', name: 'Riya Shah' },
-  });
-  resetClinicFixtures();
+  signInTestMember();
   resetOutboxes();
-  file = await fetchPatientFile(patientRef('Dharti Galani'));
+  vi.mocked(fetchContactThread).mockResolvedValue({
+    thread: null,
+    messages: [
+      {
+        id: 'msg_priya0000000000000001',
+        channel: 'whatsapp',
+        direction: 'received',
+        body: 'Can I come in on Saturday?',
+        deliveryStatus: 'delivered',
+        isSystem: false,
+        authorId: null,
+        taskId: null,
+        sentAt: '2026-10-02T05:10:00.000Z',
+      },
+    ],
+    authors: {},
+  });
 });
 afterEach(() => {
   cleanup();
   useAuthStore.setState({ user: null });
-  resetClinicFixtures();
   resetOutboxes();
 });
 
 describe('PatientActivity', () => {
-  it('holds the patient’s conversation in its own card', async () => {
+  it('holds the person’s conversation in its own card, read from their contact', async () => {
     const { container } = renderActivity();
     const column = await screen.findByTestId('patient-file-activity-column');
     expect(column).toHaveAttribute('data-slot', 'card');
     expect(await within(column).findByTestId('chat-column-header')).toHaveTextContent(
-      'Dharti Galani',
+      'Priya Shah',
     );
     expect(await within(column).findByTestId('chat-textarea')).toBeInTheDocument();
+    expect(await within(column).findByText('Can I come in on Saturday?')).toBeVisible();
+    expect(fetchContactThread).toHaveBeenCalledWith(TEST_CONTACT_ID);
     expect(await axe(container)).toHaveNoViolations();
   });
 

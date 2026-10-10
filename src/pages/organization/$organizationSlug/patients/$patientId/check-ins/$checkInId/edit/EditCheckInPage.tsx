@@ -7,6 +7,7 @@ import { feedbackQueryKeys, fetchCheckIn } from '@/shared/api/clinic/feedback-ap
 import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDialogRouteRecord } from '@/shared/hooks/useDialogRouteRecord/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 import { PATIENT_FILE_SECTION_PAGES } from '../../../patient-id.sections.ts';
 import {
@@ -32,10 +33,11 @@ export function EditCheckInPage() {
   const access = useClinicAccess();
   const canEdit = access.isResolved ? access.can('patients', 'edit') : undefined;
   const { behind, back } = usePatientFileDialog({ canOpen: canEdit });
+  const organizationId = useOrganizationStore((state) => state.organizationId);
   const { record } = useDialogRouteRecord({
     id: checkInId,
-    queryKey: feedbackQueryKeys.checkIn,
-    fetchRecord: fetchCheckIn,
+    queryKey: (id) => feedbackQueryKeys.checkIn(organizationId, id),
+    fetchRecord: (id) => fetchCheckIn(patientId, id),
     recordLabel: t(CHECK_IN_KEYS.record),
     onMissing: back,
   });

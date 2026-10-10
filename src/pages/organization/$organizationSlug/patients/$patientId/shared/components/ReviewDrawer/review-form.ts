@@ -1,5 +1,8 @@
-import type { Review, ReviewSource } from '@/shared/api/clinic/clinic-schema.ts';
-import type { ReviewInput } from '@/shared/api/clinic/feedback-contracts.ts';
+import type { ReviewSource } from '@/shared/api/clinic/clinic-schema.ts';
+import type {
+  PatientReview,
+  ReviewFields,
+} from '@/shared/api/clinic/feedback-contracts.ts';
 import type { PickedFile } from '@/shared/components/DrawerField/index.ts';
 
 import { REVIEW_FILE_TYPES } from './review.constants.ts';
@@ -24,7 +27,7 @@ export function newReviewForm(source: ReviewSource = 'google'): ReviewFormValues
 }
 
 /** A saved review as the edit drawer opens it — its files stay on it. */
-export function reviewFormOf(review: Review): ReviewFormValues {
+export function reviewFormOf(review: PatientReview): ReviewFormValues {
   return {
     source: review.source,
     rating: review.rating,
@@ -34,19 +37,11 @@ export function reviewFormOf(review: Review): ReviewFormValues {
   };
 }
 
-/** Where a review sits: the patient, the visit it follows, its day. */
-export interface ReviewPlace {
-  patientId: string;
-  appointmentId: string | null;
-  date: string;
-}
-
 const textOrNull = (text: string) => text.trim() || null;
 
-/** What a save sends (`createReview`, `S:1649`); a blank link or text is none. */
-export function reviewInputOf(values: ReviewFormValues, place: ReviewPlace): ReviewInput {
+/** What a save sends — a blank link or text is none. */
+export function reviewFieldsOf(values: ReviewFormValues): ReviewFields {
   return {
-    ...place,
     source: values.source,
     rating: values.rating,
     link: textOrNull(values.link),
@@ -54,7 +49,7 @@ export function reviewInputOf(values: ReviewFormValues, place: ReviewPlace): Rev
   };
 }
 
-/** A link the contract takes: https, no spaces (`S:532`). */
+/** A link the API takes: https, no spaces (TR11). */
 export function isReviewLink(link: string): boolean {
   return /^https:\/\/\S+$/.test(link.trim());
 }

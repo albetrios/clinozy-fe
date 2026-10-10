@@ -13,7 +13,6 @@ export const PATIENT_SECTION_KEYS = {
     reports: 'section.primary.reports',
     invoices: 'section.primary.invoices',
     payments: 'section.primary.payments',
-    packages: 'section.primary.packages',
   },
   /** "More for Dharti" — the split's "⌄". */
   more: 'section.more',

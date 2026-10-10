@@ -5,8 +5,6 @@
   "views": {
     "label": "Viste pazienti",
     "all": "Tutti",
-    "today": "In clinica oggi",
-    "dues": "Con saldo da pagare",
     "follow": "Follow-up da fare",
     "recall": "Richiamo"
   },
@@ -26,7 +24,6 @@
     "conversion": "Conversione",
     "age": "Età",
     "followUp": "Follow-up",
-    "due": "Da pagare",
     "updated": "Aggiornato"
   },
   "table": {
@@ -36,8 +33,6 @@
     "age_other": "{{count}} anni"
   },
   "rowActions": {
-    "newInvoice": "Nuova fattura",
-    "collect": "Incassa {{amount}}",
     "edit": "Modifica",
     "delete": "Elimina"
   },

@@ -1,12 +1,9 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import { fetchPatientFile } from '@/shared/api/clinic/patient-file-api.ts';
-import type { PatientFile } from '@/shared/api/clinic/patient-file-contracts.ts';
+import { patientFile, TEST_CONTACT_ID } from '@/tests/utils/patient-doubles.ts';
 import { shownLocation } from '@/tests/utils/shown-location.ts';
 
 import {
@@ -15,16 +12,10 @@ import {
 } from '../../../__tests__/integration/patient-file-test-router.tsx';
 import { PatientSection } from './PatientSection.tsx';
 
-const DHARTI = patientRef('Dharti Galani');
-let file: PatientFile;
+const file = patientFile();
 
-beforeEach(async () => {
-  resetClinicFixtures();
-  file = await fetchPatientFile(DHARTI);
-});
 afterEach(() => {
   resetPatientFile();
-  resetClinicFixtures();
 });
 
 describe('PatientSection', () => {
@@ -54,10 +45,10 @@ describe('PatientSection', () => {
       { file },
     );
     const more = await screen.findByTestId('patient-section-more');
-    expect(more).toHaveAccessibleName('More for Dharti');
+    expect(more).toHaveAccessibleName('More for Priya');
     await user.click(more);
     const menu = await screen.findByRole('menu');
-    expect(within(menu).getByText('For Dharti · already selected')).toBeInTheDocument();
+    expect(within(menu).getByText('For Priya · already selected')).toBeInTheDocument();
     await user.keyboard('{Escape}');
 
     await user.click(screen.getByTestId('patient-section-primary'));
@@ -66,6 +57,8 @@ describe('PatientSection', () => {
         '/organization/acme/appointments/create',
       ),
     );
+    // The booking is the patient's person's.
+    expect(shownLocation(router).search).toMatchObject({ who: TEST_CONTACT_ID });
   });
 
   it('takes a primary the Add menu has no item for (Add package)', async () => {
@@ -96,6 +89,28 @@ describe('PatientSection', () => {
     await waitFor(() =>
       expect(screen.queryByTestId('patient-section-primary')).not.toBeInTheDocument(),
     );
+  });
+
+  it('has no "New …" on the billing sections, whose drawers come back with Payments', async () => {
+    renderInPatientFile(
+      <PatientSection section="invoices" data-testid="patient-section-invoices" />,
+      { file, role: 'owner', section: 'invoices' },
+    );
+    await screen.findByTestId('patient-section-invoices');
+    await waitFor(() =>
+      expect(screen.queryByTestId('patient-section-primary')).not.toBeInTheDocument(),
+    );
+  });
+
+  it('waits for the file before offering its "New …"', async () => {
+    renderInPatientFile(
+      <PatientSection section="visits" data-testid="patient-section-visits" />,
+      { file: undefined },
+    );
+    expect(await screen.findByTestId('patient-section-visits')).toHaveAccessibleName(
+      'Visits',
+    );
+    expect(screen.queryByTestId('patient-section-primary')).not.toBeInTheDocument();
   });
 
   it('keeps only a heading for screen readers when headerless (the Overview)', async () => {

@@ -24,9 +24,9 @@ export interface PatientActivityProps {
 
 /**
  * The patient file's Activity column (KICKOFF §6.6; H:837–873): the shared
- * chat column in its own card — the patient's thread, their lead's or the
- * contact thread their first message opens (Q-F6), with the history pills
- * and the composer; "Send via" shows icons only, the column being under
+ * chat column in its own card — the person's activity on clinozy-be (their
+ * contact's, which their lead shares), with the history pills and the
+ * composer; "Send via" shows icons only, the column being under
  * 460px. Below `md` the card loses its radius and side borders and takes the
  * whole body (the layout hides the main card).
  */
@@ -49,7 +49,7 @@ export function PatientActivity({
       )}
     >
       <ChatColumn
-        person={{ kind: 'patient', patientId: patient.id }}
+        person={{ kind: 'contact', contactId: patient.contactId }}
         contact={{
           name: patientName(patient),
           phone: patient.phone,

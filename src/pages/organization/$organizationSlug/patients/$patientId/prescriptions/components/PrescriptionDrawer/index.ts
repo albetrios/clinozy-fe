@@ -1,5 +1,6 @@
 export {
   PrescriptionDrawer,
+  type PrescriptionDrawerAccess,
   type PrescriptionDrawerProps,
 } from './PrescriptionDrawer.tsx';
 export { RxDeleteConfirm } from './rx-delete-confirm.tsx';

@@ -23,10 +23,4 @@ export const PATIENT_FILE_KEYS = {
     packages: 'sections.packages',
     notes: 'sections.notes',
   },
-  /** A package's session used by hand — Packages and the Overview. */
-  package: {
-    /** "Session 2 of 7 used". */
-    sessionUsed: 'package.card.sessionUsed',
-    noneLeft: 'package.card.noneLeft',
-  },
 } as const;

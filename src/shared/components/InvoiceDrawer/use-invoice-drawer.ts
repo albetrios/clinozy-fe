@@ -8,16 +8,13 @@ import type {
   InvoiceSaveResult,
 } from '@/shared/api/clinic/invoices-contracts.ts';
 import type { OfferingRecord } from '@/shared/api/clinic/offerings-contracts.ts';
-import {
-  patientName,
-  type PatientRecord,
-} from '@/shared/api/clinic/patients-contracts.ts';
+import { patientName } from '@/shared/api/clinic/patients-fixture-contracts.ts';
+import { useFixturePatient } from '@/shared/hooks/useFixturePatients/index.ts';
 import {
   useInvoicePresets,
   usePrescriptionPreset,
 } from '@/shared/hooks/useInvoices/index.ts';
 import { useOffers } from '@/shared/hooks/useOffers/index.ts';
-import { usePatient } from '@/shared/hooks/usePatients/index.ts';
 import { useStackedDrawer } from '@/shared/hooks/useStackedDrawer/index.ts';
 import { useMyStaffProfile } from '@/shared/hooks/useTeam/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -45,7 +42,7 @@ type InvoiceForm = UseFormReturn<InvoiceFormValues>;
 /** A prefilled patient (`?patient=`) arrives as an id: their name and mobile follow once read. */
 export function usePrefillPatientName(form: InvoiceForm): void {
   const party = form.getValues('party');
-  const patient = usePatient(
+  const patient = useFixturePatient(
     party?.kind === 'patient' && !party.name ? party.id : undefined,
   );
   useEffect(() => {
@@ -145,14 +142,6 @@ export function useInvoiceStacks(form: InvoiceForm, today: string) {
   const offers = useOffers();
   const setParty = (party: InvoicePartyForm | null) =>
     form.setValue('party', party, { shouldDirty: true });
-  const patient = useStackedDrawer<PatientRecord>((created) =>
-    setParty({
-      kind: 'patient',
-      id: created.id,
-      name: patientName(created),
-      phone: created.phone,
-    }),
-  );
   const rowRef = useRef<number | null>(null);
   const offering = useStackedDrawer<OfferingRecord>((created) => {
     const index = rowRef.current;
@@ -172,7 +161,6 @@ export function useInvoiceStacks(form: InvoiceForm, today: string) {
   });
   return {
     setParty,
-    patient,
     offering,
     openNewOffering: (rowIndex: number, query: string) => {
       rowRef.current = rowIndex;

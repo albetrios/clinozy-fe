@@ -1,35 +1,63 @@
 import { describe, expect, it } from 'vitest';
 
-import { checkInInputOf, newCheckInForm } from './check-in-form.ts';
-
-const PLACE = {
-  patientId: 'P1',
-  appointmentId: null,
-  treatmentId: 'T1',
-  context: 'Aftercare after LHR Full Face',
-  date: '2026-10-04',
-};
+import { checkInFieldsOf, checkInFormOf, newCheckInForm } from './check-in-form.ts';
 
 describe('the check-in form', () => {
-  it('sends the place, the feel and the words — blanks as none', () => {
+  it('sends the feel, the score and the words — blanks as none', () => {
     expect(
-      checkInInputOf(
-        { ...newCheckInForm(), feel: 'same', score: 6, now: '  Better  ', nextPlan: ' ' },
-        PLACE,
-      ),
+      checkInFieldsOf({
+        ...newCheckInForm(),
+        feel: 'same',
+        score: 6,
+        currentState: '  Better  ',
+        followedNote: '',
+        nextPlan: ' ',
+      }),
     ).toEqual({
-      ...PLACE,
       feel: 'same',
       score: 6,
-      now: 'Better',
+      currentState: 'Better',
       followed: null,
       followedNote: null,
       nextPlan: null,
-      nextOfferingIds: [],
     });
   });
 
-  it('never sends a check-in without a feel (A-F12 keeps 0 as no score)', () => {
-    expect(() => checkInInputOf(newCheckInForm(), PLACE)).toThrow();
+  it('never sends a check-in without a feel or a score (Q18: 1–10, no “not rated”)', () => {
+    expect(() => checkInFieldsOf(newCheckInForm())).toThrow();
+    expect(() => checkInFieldsOf({ ...newCheckInForm(), feel: 'better' })).toThrow();
+  });
+
+  it('opens a saved one on its own words', () => {
+    expect(
+      checkInFormOf({
+        id: 'chk_saved',
+        patientId: 'pat_priya',
+        appointmentId: null,
+        treatmentId: null,
+        context: 'Visit · 24 Sep',
+        feel: 'worse',
+        score: 3,
+        scoreChange: -4,
+        followed: 'partly',
+        followedNote: null,
+        currentState: 'Itching',
+        nextPlan: null,
+        nextOfferingIds: ['off_a'],
+        date: '2026-09-24',
+        needsAction: true,
+        actions: [],
+        createdAt: '2026-09-24T05:00:00.000Z',
+        updatedAt: '2026-09-24T05:00:00.000Z',
+      }),
+    ).toEqual({
+      feel: 'worse',
+      score: 3,
+      currentState: 'Itching',
+      followed: 'partly',
+      followedNote: '',
+      nextPlan: '',
+      nextOfferingIds: ['off_a'],
+    });
   });
 });

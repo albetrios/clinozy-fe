@@ -33,8 +33,7 @@
     "activity": "गतिविधि",
     "showActivity": "संदेश और गतिविधि दिखाएँ",
     "hideActivity": "संदेश और गतिविधि छिपाएँ",
-    "unread_one": "{{count}} अपठित संदेश",
-    "unread_other": "{{count}} अपठित संदेश"
+    "awaitingReply": "जवाब का इंतज़ार"
   },
   "sectionsPopover": {
     "trigger": "मरीज़ की फ़ाइल · सभी सेक्शन",
@@ -47,8 +46,6 @@
       "team": "टीम"
     },
     "openNow": "अभी खुला",
-    "empty": "खाली",
-    "hasRecords": "रिकॉर्ड हैं",
     "pin": "बार में पिन करें",
     "unpin": "बार से हटाएँ",
     "pinAria": "बार में पिन करें · {{section}}",
@@ -64,14 +61,11 @@
     "items": {
       "prescription": "पर्चा",
       "treatment": "उपचार",
-      "invoice": "इनवॉइस",
-      "payment": "भुगतान",
       "photo": "फ़ोटो",
       "appointment": "अपॉइंटमेंट",
       "report": "रिपोर्ट",
       "note": "नोट"
-    },
-    "nothingDue": "{{name}} का कुछ भी बकाया नहीं है"
+    }
   },
   "section": {
     "primary": {
@@ -81,8 +75,7 @@
       "images": "इमेज अपलोड करें",
       "reports": "रिपोर्ट अपलोड करें",
       "invoices": "नया इनवॉइस",
-      "payments": "भुगतान दर्ज करें",
-      "packages": "पैकेज जोड़ें"
+      "payments": "भुगतान दर्ज करें"
     },
     "more": "{{name}} के लिए और"
   },
@@ -99,7 +92,6 @@
     "reach": "संपर्क के तरीके",
     "reachSub": {
       "whatsappPrimary": "WhatsApp · मुख्य",
-      "fromLead": "मोबाइल · लीड से",
       "mobile": "मोबाइल",
       "instagram": "Instagram"
     },
@@ -117,19 +109,10 @@
     "birthdayToday": "🎂 आज",
     "noAddress": "कोई पता नहीं",
     "upNext": "आगे",
-    "visitService": "{{service}} · {{minutes}} मिनट",
     "reschedule": "समय बदलें",
     "book": "बुक करें",
     "notBooked": "बुक नहीं",
     "noUpcoming": "कोई आगामी विज़िट नहीं",
-    "maskedAmount": "₹ ••••",
-    "dueSince_one": "{{count}} दिन से",
-    "dueSince_other": "{{count}} दिनों से",
-    "showAmount": "राशि दिखाएँ",
-    "hideAmount": "राशि छिपाएँ",
-    "collect": "वसूलें",
-    "creditToReturn": "{{amount}} लौटाने हैं",
-    "allPaid": "सब भुगतान हो गया · कुछ बकाया नहीं",
     "feedback": "फ़ीडबैक",
     "feedbackScore": "{{feel}} · {{score}}/10",
     "feedbackReview": "{{source}} पर {{rating}}★",
@@ -156,9 +139,7 @@
       "none": "किसी विज़िट से जुड़ी नहीं",
       "noneSub": "फ़ाइल से अपलोड की गईं",
       "visit": "{{day}} · {{service}}",
-      "visitSub": "#{{seq}} · {{status}}",
-      "visitMeta_one": "{{count}} फ़ोटो",
-      "visitMeta_other": "{{count}} फ़ोटो"
+      "visitSub": "#{{seq}} · {{status}}"
     },
     "sizes": {
       "label": "थंबनेल का आकार",
@@ -169,7 +150,6 @@
       "mediumShort": "M",
       "largeShort": "L"
     },
-    "groupWithVisit": "{{photos}} · {{visit}}",
     "tile": {
       "open": "{{name}} खोलें",
       "edit": "विवरण बदलें",
@@ -206,17 +186,16 @@
       "underarm": "बगल",
       "legs": "पैर",
       "arms": "बाँहें",
-      "other": "अन्य"
+      "other": "अन्य",
+      "upperLip": "ऊपरी होंठ",
+      "chin": "ठोड़ी",
+      "neck": "गर्दन",
+      "hands": "हाथ",
+      "fullBody": "पूरा शरीर"
     },
     "viewer": {
       "label": "फ़ोटो व्यूअर",
       "position": "{{total}} में से {{index}}",
-      "zoom": "ज़ूम",
-      "zoomOut": "ज़ूम आउट",
-      "zoomOutHint": "ज़ूम आउट (−)",
-      "zoomIn": "ज़ूम इन",
-      "zoomInHint": "ज़ूम इन (+)",
-      "zoomReset": "स्क्रीन पर फ़िट करें (0)",
       "close": "व्यूअर बंद करें",
       "closeHint": "बंद करें (Esc)",
       "previous": "पिछली फ़ोटो",
@@ -225,11 +204,9 @@
       "nextHint": "अगली (→)",
       "hints": {
         "browse": "← → देखें",
-        "zoom": "स्क्रॉल या + − से ज़ूम",
-        "pan": "खिसकाने के लिए खींचें · रीसेट के लिए डबल-क्लिक",
         "close": "Esc से बंद"
       },
-      "missing": "नमूना फ़ोटो · कोई फ़ाइल नहीं जुड़ी",
+      "missing": "पूर्वावलोकन उपलब्ध नहीं है",
       "notFoundRecord": "फ़ोटो"
     },
     "details": {
@@ -245,9 +222,14 @@
       "visitHint": "वैकल्पिक · फ़ोटो को उस अपॉइंटमेंट में रखता है",
       "notAttached": "जुड़ी नहीं",
       "save": "विवरण सहेजें",
-      "saved": "फ़ोटो का विवरण सहेजा गया"
+      "saved": "फ़ोटो का विवरण सहेजा गया",
+      "stage": "चरण"
     },
-    "loading": "फ़ोटो लोड हो रही हैं"
+    "loading": "फ़ोटो लोड हो रही हैं",
+    "stages": {
+      "before": "पहले",
+      "after": "बाद में"
+    }
   },
   "rx": {
     "record": "पर्चा",
@@ -260,16 +242,7 @@
     "medicines_other": "{{count}} दवाएँ",
     "quickFill": {
       "print": "पर्चा प्रिंट करें",
-      "repeat": "पिछला पर्चा {{number}} दोहराएँ",
-      "kits": {
-        "hairFall": "बाल झड़ने का किट",
-        "postPeel": "पील के बाद का किट",
-        "pigmentation": "पिगमेंटेशन किट"
-      }
-    },
-    "kit": {
-      "reapply": "हर 3 घंटे में फिर लगाएँ",
-      "avoidSun": "48 घंटे धूप और स्क्रब से बचें"
+      "repeat": "पिछला पर्चा {{number}} दोहराएँ"
     },
     "steps": {
       "prescription": "पर्चा",
@@ -282,10 +255,8 @@
     "quick": {
       "placeholder": "दवा, खुराक, समय लिखें · जैसे flu 0-0-1 af 10d",
       "hint": "od · bd · tds · hs · af/bf · 5d · x8",
-      "often": "अक्सर लिखी जाने वाली",
       "groups": {
         "all": "सभी",
-        "often": "अक्सर लिखी जाने वाली",
         "oral": "मुँह से",
         "topical": "लगाने वाली"
       },
@@ -375,13 +346,20 @@
       "summary": "{{medicines}} · {{doctor}}",
       "noMedicine": "कोई दवा जोड़ें",
       "saved": "पर्चा सहेजा गया",
-      "savedNumber": "पर्चा {{number}} सहेजा गया"
+      "savedNumber": "पर्चा {{number}} सहेजा गया",
+      "approve": "सहेजें और स्वीकृत करें",
+      "approvedNumber": "पर्चा {{number}} स्वीकृत किया गया"
     },
     "delete": {
       "title": "यह पर्चा हटाएँ?",
       "deleted": "पर्चा हटाया गया"
     },
-    "preview": "पर्चा {{number}}"
+    "preview": "पर्चा {{number}}",
+    "status": {
+      "draft": "ड्राफ़्ट",
+      "approved": "स्वीकृत"
+    },
+    "approvedNote": "स्वीकृत · स्वीकृत पर्चा बदला नहीं जा सकता"
   },
   "treatment": {
     "record": "उपचार",
@@ -393,7 +371,6 @@
     "session": "सेशन {{session}}",
     "quickFill": {
       "next": "{{name}} का अगला सेशन",
-      "package": "{{name}} · सेशन {{session}}",
       "checkIn": "चेक-इन दर्ज करें"
     },
     "type": "प्रकार",
@@ -533,8 +510,8 @@
       "calls": {
         "none": "कोई कॉल नहीं",
         "next_day": "अगले दिन",
-        "in_2_days": "2 दिन में",
-        "in_week": "एक हफ़्ते में"
+        "in_week": "एक हफ़्ते में",
+        "in_two_days": "2 दिन में"
       },
       "feedback": "इस उपचार पर फ़ीडबैक",
       "feedbackItem": "{{date}} · {{feel}} {{score}}/10",
@@ -545,9 +522,25 @@
       "edit": "बदलाव सहेजें",
       "saved": "उपचार सहेजा गया"
     },
-    "delete": {
-      "title": "यह उपचार हटाएँ?",
-      "deleted": "उपचार हटाया गया"
+    "package": {
+      "label": "पैकेज से",
+      "hint": "सेव करने पर इसका एक सेशन इस्तेमाल होगा",
+      "option": "{{name}} · {{total}} में से {{used}} इस्तेमाल",
+      "numbered": "पैकेज से तय",
+      "uses": "{{name}} का 1 सेशन इस्तेमाल हुआ"
+    },
+    "reverse": {
+      "title": "यह उपचार रद्द करें?",
+      "body": "यह फ़ाइल में रहेगा, रद्द के रूप में चिह्नित, और इस्तेमाल हुआ पैकेज सेशन वापस मिल जाएगा। इसे पहले जैसा नहीं किया जा सकता।",
+      "action": "रद्द करें",
+      "done": "उपचार रद्द किया गया",
+      "status": "रद्द",
+      "note": "{{date}} को रद्द · {{reason}}",
+      "reasons": {
+        "mistake": "गलती से दर्ज किया गया",
+        "wrongPatient": "गलत मरीज़",
+        "notDone": "सेशन नहीं हुआ"
+      }
     }
   },
   "report": {
@@ -584,35 +577,31 @@
     },
     "view": {
       "sub": "{{name}} · {{date}}",
-      "addedBy": "किसने जोड़ा",
-      "fileLine": "{{name}} · {{format}} · माँगने पर मरीज़ को दी जाती है",
       "notes": "नोट्स",
-      "noNotes": "इस रिपोर्ट पर कोई नोट नहीं",
-      "download": "डाउनलोड करें",
-      "downloading": "{{name}} डाउनलोड हो रही है"
+      "noNotes": "इस रिपोर्ट पर कोई नोट नहीं"
     }
   },
   "package": {
-    "title": "पैकेज जोड़ें",
-    "step": "पैकेज चुनें",
-    "option": "{{name}} · {{sessions}} सेशन · {{price}}",
-    "empty": "अभी कई सेशन वाली कोई सेवा नहीं",
+    "title": "पैकेज संपादित करें",
     "summary": "ट्रीटमेंट पूरा होने पर सेशन गिने जाते हैं",
-    "save": "पैकेज जोड़ें",
-    "noPick": "पैकेज चुनें",
-    "added": "पैकेज जुड़ गया · इसका बिल इनवॉइस से बनाएँ",
+    "save": "बदलाव सेव करें",
     "card": {
       "left_one": "{{count}} बाकी",
       "left_other": "{{count}} बाकी",
       "used": "{{total}} में से {{used}} इस्तेमाल",
       "validTill": "{{date}} तक मान्य",
-      "next": "अगला: {{date}}",
-      "use": "एक सेशन इस्तेमाल करें",
       "book": "अगला बुक करें",
       "empty": "अभी कोई पैकेज नहीं",
-      "sessionUsed": "{{total}} में से सेशन {{used}} इस्तेमाल हुआ",
-      "noneLeft": "कोई सेशन बाकी नहीं"
-    }
+      "noExpiry": "कोई समाप्ति नहीं",
+      "statuses": {
+        "used_up": "पूरा इस्तेमाल हुआ",
+        "expired": "समाप्त"
+      },
+      "edit": "संपादित करें"
+    },
+    "validUntil": "इस तारीख तक मान्य",
+    "sessions": "सत्र",
+    "saved": "पैकेज सेव हो गया"
   },
   "clinical": {
     "titles": {
@@ -627,7 +616,8 @@
     "add": "{{title}} जोड़ें",
     "remove": "{{name}} हटाएँ",
     "newCount_one": "{{count}} नया",
-    "newCount_other": "{{count}} नए"
+    "newCount_other": "{{count}} नए",
+    "removed": "{{name}} हटाया गया"
   },
   "feedback": {
     "title": "फ़ीडबैक",
@@ -659,7 +649,6 @@
     "linkLabel": "लिंक",
     "noNext": "अगला कदम नहीं लिखा",
     "noLink": "कोई लिंक नहीं",
-    "files": "▶ {{files}}",
     "actions": "कार्रवाइयाँ",
     "edit": "बदलें",
     "remove": "हटाएँ",
@@ -686,7 +675,9 @@
     "checkInRemoved": "चेक-इन हटाया गया",
     "reviewRemoved": "रिव्यू हटाया गया",
     "more_one": "{{count}} और",
-    "more_other": "{{count}} और"
+    "more_other": "{{count}} और",
+    "files_one": "▶ {{count}} फ़ाइल",
+    "files_other": "▶ {{count}} फ़ाइलें"
   },
   "checkIn": {
     "titles": {
@@ -722,9 +713,6 @@
     "offeringsPlaceholder": "ऑफ़रिंग खोजें",
     "offeringSessions_one": "{{price}} · {{count}} सेशन",
     "offeringSessions_other": "{{price}} · {{count}} सेशन",
-    "contextVisit": "विज़िट चेक-इन",
-    "contextAppointment": "विज़िट चेक-इन · अपॉइंटमेंट {{number}}",
-    "contextAftercare": "{{treatment}} के बाद आफ़्टरकेयर",
     "save": "चेक-इन सहेजें",
     "saveEdit": "बदलाव सहेजें",
     "noFeel": "चुनें कि अभी कैसा है",
@@ -732,7 +720,9 @@
     "added": " · {{count}} सुझावों में जोड़े गए",
     "callBack": " · डॉक्टर कॉल-बैक टास्क बनाया गया",
     "updated": "चेक-इन अपडेट हुआ",
-    "record": "चेक-इन"
+    "record": "चेक-इन",
+    "noScore": "मरीज़ का स्कोर चुनें",
+    "offeringsPlanned": "ऑफ़रिंग सुझावों में जोड़ा गया"
   },
   "review": {
     "title": "रिव्यू दर्ज करें",
@@ -761,7 +751,9 @@
     "updated": "रिव्यू अपडेट हुआ",
     "badLink": "https:// लिंक जोड़ें",
     "notRated": "रेटिंग नहीं",
-    "record": "रिव्यू"
+    "record": "रिव्यू",
+    "attachedFiles_one": "{{count}} फ़ाइल",
+    "attachedFiles_other": "{{count}} फ़ाइलें"
   },
   "logFeedback": {
     "title": "फ़ीडबैक दर्ज करें",
@@ -856,7 +848,6 @@
       "feedback": "फ़ीडबैक",
       "report": "रिपोर्ट",
       "type": "प्रकार",
-      "uploadedBy": "अपलोड किया",
       "invoice": "इनवॉइस",
       "items": "आइटम",
       "bill": "बिल",
@@ -886,8 +877,6 @@
     "placeholder": "टीम के लिए नोट जोड़ें",
     "add": "नोट जोड़ें",
     "by": "{{name}} · {{date}}",
-    "delete": "नोट हटाएँ",
-    "deleted": "नोट हटाया गया",
     "empty": "अभी कोई नोट नहीं"
   },
   "timeline": {
@@ -912,10 +901,7 @@
     },
     "packages": {
       "progress": "{{used}} / {{total}}",
-      "next": "अगला · {{date}}",
-      "overdue": "सेशन {{session}} में देरी",
       "done": "सभी सेशन पूरे",
-      "use": "सेशन इस्तेमाल करें",
       "empty": "कोई सक्रिय पैकेज नहीं"
     },
     "prescriptions": {
@@ -923,15 +909,6 @@
     },
     "treatments": {
       "sub": "सेशन {{session}} · {{date}}"
-    },
-    "billing": {
-      "due": "बाकी",
-      "paid": "चुकाया",
-      "show": "राशियाँ दिखाएँ",
-      "hide": "राशियाँ छिपाएँ",
-      "invoice": "{{type}} इनवॉइस {{number}}",
-      "sub": "{{date}} · {{amount}}",
-      "collect": "भुगतान लें"
     },
     "reports": {
       "sub": "{{type}} · {{date}}"
@@ -944,13 +921,8 @@
     "activity": {
       "filtersLabel": "गतिविधि फ़िल्टर",
       "notes": "नोट्स",
-      "filterTitle": "{{label}} · {{count}}",
-      "rx": "पर्चा {{number}} · {{medicines}}",
-      "treatment": "{{name}} · सेशन {{session}}",
-      "received": "{{amount}} प्राप्त · {{mode}}",
-      "refund": "रिफ़ंड {{amount}} · {{mode}}",
-      "against": "{{number}} के लिए",
-      "empty": "अभी कोई गतिविधि नहीं"
+      "empty": "अभी कोई गतिविधि नहीं",
+      "masked": "₹ ••••"
     }
   },
   "visitFlow": {
@@ -965,9 +937,7 @@
     "steps": {
       "checks": "चेक-इन और सुरक्षा",
       "rx": "पर्चा",
-      "treatment": "उपचार",
-      "invoice": "इनवॉइस",
-      "collect": "वसूली और शेयर"
+      "treatment": "उपचार"
     },
     "checks": {
       "labels": {
@@ -999,28 +969,10 @@
       "empty": "आज का सेशन दर्ज करें",
       "last": "पिछली सेटिंग: {{memo}}",
       "done": "{{name}} · सेशन {{session}}",
-      "repeated": "सेशन {{session}} पिछली सेटिंग के साथ दर्ज हुआ"
+      "repeated": "सेशन {{session}} पिछली सेटिंग के साथ दर्ज हुआ",
+      "repeatPackage": "⚡ दोहराएँ · {{name}}"
     },
-    "invoice": {
-      "total": "कुल",
-      "create": "विज़िट से इनवॉइस बनाएँ",
-      "custom": "कस्टम इनवॉइस",
-      "created": "विज़िट से इनवॉइस {{number}} बनाया गया",
-      "nothing": "बिल करने को कुछ नहीं",
-      "ready_one": "{{count}} आइटम तैयार · {{total}}",
-      "ready_other": "{{count}} आइटम तैयार · {{total}}",
-      "covered": "पैकेज में शामिल · बिल करने को कुछ नहीं",
-      "empty": "अभी बिल करने को कुछ नहीं",
-      "done": "{{number}} · {{total}}"
-    },
-    "collect": {
-      "upi": "{{amount}} वसूलें · UPI",
-      "received": "{{amount}} प्राप्त ({{mode}})",
-      "share": "पर्चा, इनवॉइस और फ़ोटो शेयर करें",
-      "shared": "पर्चा, इनवॉइस और फ़ोटो WhatsApp पर {{name}} को भेजे गए",
-      "due": "{{amount}} बाकी",
-      "nothing": "कुछ बाकी नहीं",
-      "sent": "WhatsApp पर भेजा गया"
-    }
+    "paused": "विज़िट रुकी हुई है",
+    "resume": "फिर से शुरू करें"
   }
 }

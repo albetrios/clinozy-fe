@@ -155,11 +155,12 @@ describe('useRoomLanding (Q-U11)', () => {
   });
 
   it('lands "Exit preview" on the first room the member’s own access views', async () => {
-    // Reenal is a Doctor; previewing Pharmacist, she opens Medical. Leads and Appointments are
-    // on the API and answer from her codes, which hold neither: Patients is her first room.
+    // Reenal is a Doctor; previewing Pharmacist, she opens Medical. Leads, Appointments and
+    // Patients are on the API and answer from her codes, which hold `patient:read` alone:
+    // Patients is her first room.
     const { router } = renderLayout('medical', {
       email: 'reenal@cresence.skin',
-      codes: MEMBER_CODES,
+      codes: [...MEMBER_CODES, 'patient:read'],
       previewRole: 'pharmacist',
     });
     await expectPage('medical');

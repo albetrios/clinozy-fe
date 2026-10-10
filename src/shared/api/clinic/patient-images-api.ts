@@ -1,155 +1,192 @@
 import { z } from 'zod';
 
+import { api } from '@/core/http/api.ts';
+
+import type { DeleteReason } from './clinic-schema.ts';
 import {
-  clinicHttpError,
-  definedFields,
-  validateClinicInput,
-} from './clinic-fixture-store.ts';
-import {
-  type AppointmentStatus,
-  bodyPartSchema,
-  civilDateSchema,
-  type DeleteReason,
-  imageAlbumSchema,
-  type PatientImage,
-} from './clinic-schema.ts';
+  PATIENT_PHOTO_DISPLAY_NAME_MAX,
+  patientImageRowWire,
+  patientImageWire,
+  type PatientPhoto,
+  type PatientPhotoAlbum,
+  type PatientPhotoChange,
+  type PatientPhotoListParams,
+  type PatientPhotoPage,
+  photoChangeBodyOf,
+  photoListMetaWire,
+  photoListQuery,
+  toAlbumCounts,
+  toPatientPhoto,
+} from './patient-images-contracts.ts';
 import { patientQueryKeys } from './patients-api.ts';
 
 /*
- * A patient's photos (`listImages` / `updateImage`, `S:1632, 1643`), on the
- * fixture world until clinozy-be serves them — every call is REPLACE_WITH_API
- * (D6). The contract pages an album by 60; "Load more · 4 left" and the counts
- * need per-album totals (a backend request, KICKOFF §6.6), so the build reads
- * the patient's photos at once and reveals them 12 at a time.
+ * A patient's photos on clinozy-be (`/app/patients/:patient_id/images`, api-integration §5.4):
+ * a page of the list for its filters, with the server's total and album counts; one photo; an
+ * attach of an uploaded file; a change carrying the read's `updated_at`; delete with its reason
+ * and restore. Every write carries the action's key. B1: no call reads a file back.
  */
 
-/** TanStack Query keys of the photos — under the patients key, so a patient write refreshes them. */
+/**
+ * TanStack Query keys for the photos — under the patients' key, so a patient write refreshes
+ * them; each carries the organization and the patient.
+ */
 export const patientImageQueryKeys = {
   all: [...patientQueryKeys.all, 'images'] as const,
-  list: (patientId: string, privateAlbum: boolean) =>
-    [...patientImageQueryKeys.all, patientId, { privateAlbum }] as const,
+  /** Everything of one patient's photos — a photo write invalidates it. */
+  patient: (organizationId: string | null, patientId: string) =>
+    [...patientImageQueryKeys.all, organizationId, patientId] as const,
+  list: (
+    organizationId: string | null,
+    patientId: string,
+    params: PatientPhotoListParams,
+  ) =>
+    [
+      ...patientImageQueryKeys.patient(organizationId, patientId),
+      'list',
+      params,
+    ] as const,
+  detail: (organizationId: string | null, patientId: string, imageId: string) =>
+    [
+      ...patientImageQueryKeys.patient(organizationId, patientId),
+      'detail',
+      imageId,
+    ] as const,
 };
 
-/** A visit a photo can be filed under — the patient's appointment, as the Photos filter and Photo details name it. */
-export interface PatientPhotoVisit {
-  appointmentId: string;
-  seq: number;
-  /** The visit's civil date, `YYYY-MM-DD`. */
-  date: string;
-  serviceLabel: string;
-  status: AppointmentStatus;
-}
-
-/** One photo as the Photos section reads it: the contract's image and the visit it is filed under. */
-export interface PatientPhoto extends PatientImage {
-  visit: PatientPhotoVisit | null;
-}
-
-/** A patient's photos, newest first, and their visits, latest first (derived display, `S:432`). */
-export interface PatientPhotos {
-  photos: PatientPhoto[];
-  visits: PatientPhotoVisit[];
-}
-
-/** The name a photo goes by: its caption, else its file name (`S:429–432`). */
-export function photoName(photo: Pick<PatientImage, 'caption' | 'fileName'>): string {
-  return (photo.caption?.trim() ?? '') || photo.fileName;
-}
-
-const fixtureWorld = () => import('./fixtures/world.fixtures.ts');
-
-/** Newest photo first: by the day it was taken, then by when it was filed. */
-const byTakenDesc = (a: PatientImage, b: PatientImage) =>
-  b.takenOn.localeCompare(a.takenOn) || b.createdAt.localeCompare(a.createdAt);
-
-/**
- * A patient's photos and their visits (`listImages`, `S:1632`; REPLACE_WITH_API).
- * Without the Private album (Doctor and Admin only, `S:40`) its photos are
- * left out, as the server will leave them out. A deleted or unknown patient
- * answers 404.
- */
+/** One page of the patient's photos for the params; `after` is the cursor. */
 export async function listPatientPhotos(
   patientId: string,
-  { privateAlbum }: { privateAlbum: boolean },
-): Promise<PatientPhotos> {
-  const { clinicFixtures } = await fixtureWorld();
-  await clinicFixtures.patients.get(patientId);
-  const visits = clinicFixtures.appointments
-    .snapshot((appointment) => appointment.patientId === patientId)
-    .sort(
-      (a, b) => b.date.localeCompare(a.date) || b.startTime.localeCompare(a.startTime),
-    )
-    .map((appointment): PatientPhotoVisit => ({
-      appointmentId: appointment.id,
-      seq: appointment.seq,
-      date: appointment.date,
-      serviceLabel: appointment.serviceLabel,
-      status: appointment.status,
-    }));
-  const visitOf = new Map(visits.map((visit) => [visit.appointmentId, visit]));
-  const photos = clinicFixtures.patientImages
-    .snapshot(
-      (image) =>
-        image.patientId === patientId && (privateAlbum || image.album !== 'private'),
-    )
-    .sort(byTakenDesc)
-    .map((image) => ({
-      ...image,
-      visit: image.appointmentId ? (visitOf.get(image.appointmentId) ?? null) : null,
-    }));
-  return { photos, visits };
+  params: PatientPhotoListParams,
+  after?: string,
+): Promise<PatientPhotoPage> {
+  const response = await api.get('/app/patients/{patient_id}/images', {
+    params: { patient_id: patientId },
+    query: photoListQuery(params, after),
+  });
+  const rows = z.array(patientImageRowWire).parse(response.data ?? []);
+  const pagination = response.meta?.pagination;
+  const meta = photoListMetaWire.safeParse(response.meta ?? {});
+  return {
+    rows: rows.map(toPatientPhoto),
+    next: pagination?.has_more ? (pagination.next ?? null) : null,
+    hasMore: pagination?.has_more === true && Boolean(pagination.next),
+    total: pagination?.estimated_total ?? null,
+    albumCounts: meta.success ? toAlbumCounts(meta.data) : null,
+  };
 }
 
-/** What Photo details may change (`updateImage`, `S:1643`): blank fields are left out. */
-const patientPhotoPatchSchema = z
-  .object({
-    /** Shown over the file name; at most 60 in the drawer (the contract allows 200). */
-    caption: z.string().trim().min(1).max(60),
-    takenOn: civilDateSchema,
-    album: imageAlbumSchema,
-    bodyPart: bodyPartSchema.nullable(),
-    appointmentId: z.uuid().nullable(),
-  })
-  .partial();
-/** A Photo details save. */
-export type PatientPhotoPatch = z.infer<typeof patientPhotoPatchSchema>;
+/** One photo — a 404 when it is deleted, unknown, or in an album the member may not open. */
+export async function fetchPatientPhoto({
+  patientId,
+  imageId,
+}: {
+  patientId: string;
+  imageId: string;
+}): Promise<PatientPhoto> {
+  const response = await api.get('/app/patients/{patient_id}/images/{patient_image_id}', {
+    params: { patient_id: patientId, patient_image_id: imageId },
+  });
+  return toPatientPhoto(patientImageWire.parse(response.data));
+}
+
+/** "IMG_5100.jpg" → "IMG_5100", cut to the API's 60: the name a new photo is filed under. */
+function displayNameOf(fileName: string): string {
+  const bare = fileName.replace(/\.[a-z0-9]+$/i, '') || fileName;
+  return bare.slice(0, PATIENT_PHOTO_DISPLAY_NAME_MAX);
+}
 
 /**
- * Save Photo details (`updateImage`, `S:1643`; REPLACE_WITH_API). A visit
- * must be this patient's; an unknown photo answers 404.
+ * File an uploaded photo on a patient (`POST /app/patients/:patient_id/images`) — the storage
+ * key the upload tray confirmed, into an album (General unless told), named as the file was
+ * (without its extension), taken today (the server's default). One photo per call; its key is
+ * the stored object's, so a retried attach files it once. The server takes a JPG or PNG only.
  */
-export async function updatePatientPhoto(
-  id: string,
-  patch: PatientPhotoPatch,
-): Promise<PatientImage> {
-  const fields = validateClinicInput(patientPhotoPatchSchema, definedFields(patch));
-  const { clinicFixtures } = await fixtureWorld();
-  const photo = await clinicFixtures.patientImages.get(id);
-  if (fields.appointmentId) {
-    const [visit] = clinicFixtures.appointments.snapshot(
-      (appointment) => appointment.id === fields.appointmentId,
-    );
-    if (visit?.patientId !== photo.patientId) {
-      throw clinicHttpError(422, 'validation', 'Pick one of this patient’s visits', {
-        appointmentId: ['Pick one of this patient’s visits'],
-      });
-    }
-  }
-  return clinicFixtures.patientImages.update(id, fields);
+export async function attachPatientImage({
+  patientId,
+  fileKey,
+  fileName,
+  album = 'general',
+  appointmentId,
+}: {
+  patientId: string;
+  fileKey: string;
+  /** The file's name as it was picked. */
+  fileName: string;
+  album?: PatientPhotoAlbum;
+  /** The visit the photo was taken at (checked in or completed). */
+  appointmentId?: string;
+}): Promise<PatientPhoto> {
+  const response = await api.post('/app/patients/{patient_id}/images', {
+    params: { patient_id: patientId },
+    body: {
+      file_key: fileKey,
+      album,
+      display_name: displayNameOf(fileName),
+      appointment_id: appointmentId,
+    },
+    idempotencyKey: `image:${fileKey}`,
+  });
+  return toPatientPhoto(patientImageWire.parse(response.data));
 }
 
-/** Delete a photo with the confirm's reason (`S:1490–1496`; REPLACE_WITH_API). */
-export async function deletePatientPhoto(
-  id: string,
-  reason: DeleteReason,
-  note: string | null,
-): Promise<PatientImage> {
-  const { clinicFixtures } = await fixtureWorld();
-  return clinicFixtures.patientImages.remove(id, reason, note);
+/**
+ * Save Photo details (`PATCH …/images/:patient_image_id`) — only what changed, with the read's
+ * `updated_at`: `409 record_changed` when someone saved it since. A visit must be one of the
+ * patient's, checked in or completed; the date taken can't be in the future (400 on the field).
+ */
+export async function updatePatientPhoto({
+  photo,
+  change,
+  idempotencyKey,
+}: {
+  photo: PatientPhoto;
+  change: PatientPhotoChange;
+  idempotencyKey: string;
+}): Promise<PatientPhoto> {
+  const response = await api.patch(
+    '/app/patients/{patient_id}/images/{patient_image_id}',
+    {
+      params: { patient_id: photo.patientId, patient_image_id: photo.id },
+      body: photoChangeBodyOf(change, photo.updatedAt),
+      idempotencyKey,
+    },
+  );
+  return toPatientPhoto(patientImageWire.parse(response.data));
 }
 
-/** Put a deleted photo back — the Undo of "Photo deleted" (D32; REPLACE_WITH_API). */
-export async function restorePatientPhoto(id: string): Promise<PatientImage> {
-  const { clinicFixtures } = await fixtureWorld();
-  return clinicFixtures.patientImages.restore(id);
+/** Delete a photo with the confirm's reason (restorable — "Photo deleted" offers Undo). */
+export async function deletePatientPhoto({
+  patientId,
+  imageId,
+  reason,
+  note,
+}: {
+  patientId: string;
+  imageId: string;
+  reason: DeleteReason;
+  note: string | null;
+}): Promise<void> {
+  await api.delete('/app/patients/{patient_id}/images/{patient_image_id}', {
+    params: { patient_id: patientId, patient_image_id: imageId },
+    reason,
+    note: note ?? undefined,
+  });
+}
+
+/** Put a deleted photo back — the Undo of "Photo deleted" (`409 record_not_deleted` when it is not). */
+export async function restorePatientPhoto({
+  patientId,
+  imageId,
+  idempotencyKey,
+}: {
+  patientId: string;
+  imageId: string;
+  idempotencyKey: string;
+}): Promise<PatientPhoto> {
+  const response = await api.post(
+    '/app/patients/{patient_id}/images/{patient_image_id}/restore',
+    { params: { patient_id: patientId, patient_image_id: imageId }, idempotencyKey },
+  );
+  return toPatientPhoto(patientImageWire.parse(response.data));
 }

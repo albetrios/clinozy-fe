@@ -1,228 +1,482 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { isHttpError } from '@/shared/errors/HttpError.ts';
+vi.mock('@/core/http/api.ts', () => ({
+  api: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
+}));
+import { api } from '@/core/http/api.ts';
 
-import { clinicToday } from './clinic-time.ts';
 import {
-  checkInNeedsAction,
+  attachReviewFile,
   createCheckIn,
   createReview,
-  deleteCheckIn,
-  fetchCheckInContext,
+  deleteFeedback,
+  fetchCheckIn,
+  fetchPreviousCheckIn,
+  listCheckInOfferings,
   listPatientFeedback,
   logFeedbackAction,
-  restoreCheckIn,
-  reviewNeedsAction,
+  restoreFeedback,
   updateCheckIn,
   updateReview,
 } from './feedback-api.ts';
-import type { CheckInInput, ReviewInput } from './feedback-contracts.ts';
-import { patientRef } from './fixtures/patients.fixtures.ts';
-import { ref } from './fixtures/refs.fixtures.ts';
-import { clinicFixtures, resetClinicFixtures } from './fixtures/world.fixtures.ts';
+import type { CheckInFields } from './feedback-contracts.ts';
 
-const DHARTI = patientRef('Dharti Galani');
-const LHR = ref.treatment(498);
+const PATIENT = 'pat_priya0000000000000000';
+const CHECK_IN = 'chk_priya0000000000000000';
+const REVIEW = 'rev_priya0000000000000000';
+const KEY = 'key-0000-0000-0000';
 
-const checkIn = (fields: Partial<CheckInInput> = {}): CheckInInput => ({
-  patientId: DHARTI,
-  appointmentId: null,
-  treatmentId: LHR,
-  context: 'Aftercare after LHR Full Face',
+/** A check-in as clinozy-be answers it (the live shape, 2026-10-10). */
+const checkInRow = (patch: Record<string, unknown> = {}) => ({
+  id: CHECK_IN,
+  patient_id: PATIENT,
+  appointment_id: null,
+  patient_treatment_id: null,
+  context: 'Visit · 10 Oct',
+  feel: 'worse',
+  score: 3,
+  score_change: -4,
+  followed: null,
+  followed_note: null,
+  current_state: 'Itching again',
+  next_plan: null,
+  next_offering_ids: ['off_hydra0000000000000000'],
+  check_in_date: '2026-10-10',
+  needs_action: false,
+  actions: [
+    {
+      id: 'fba_called000000000000000',
+      action: 'doctor_called',
+      note: 'Spoke at 4pm',
+      author_membership_id: 'mem_nisha0000000000000000',
+      created_at: '2026-10-10T01:43:17.495Z',
+    },
+  ],
+  created_at: '2026-10-10T01:43:09.892Z',
+  updated_at: '2026-10-10T01:43:09.892Z',
+  ...patch,
+});
+
+/** A review as clinozy-be answers it. */
+const reviewRow = (patch: Record<string, unknown> = {}) => ({
+  id: REVIEW,
+  patient_id: PATIENT,
+  appointment_id: null,
+  source: 'google',
+  rating: 2,
+  text: 'Waited an hour',
+  link: 'https://g.page/r/abc',
+  file_keys: [],
+  review_date: '2026-10-10',
+  needs_action: true,
+  actions: [],
+  created_at: '2026-10-10T01:43:34.671Z',
+  updated_at: '2026-10-10T01:43:34.671Z',
+  ...patch,
+});
+
+/** One list page as clinozy-be answers it. */
+const page = (rows: unknown[], next: string | null = null) => ({
+  data: rows,
+  meta: {
+    request_id: 'req',
+    pagination: {
+      per_page: 100,
+      next,
+      has_more: next !== null,
+      estimated_total: rows.length,
+    },
+  },
+});
+
+const FIELDS: CheckInFields = {
   feel: 'better',
   score: 7,
+  currentState: 'Less redness',
   followed: 'mostly',
   followedNote: null,
-  now: 'Redness settled',
-  nextPlan: null,
-  nextOfferingIds: [],
-  date: clinicToday(),
-  ...fields,
-});
+  nextPlan: 'Second session in 3 weeks',
+};
 
-const review = (fields: Partial<ReviewInput> = {}): ReviewInput => ({
-  patientId: DHARTI,
-  appointmentId: null,
-  source: 'google',
-  rating: 5,
-  text: 'Lovely staff',
-  link: null,
-  date: clinicToday(),
-  ...fields,
-});
+afterEach(() => vi.resetAllMocks());
 
-const callBacks = () =>
-  clinicFixtures.tasks.snapshot(
-    (task) => task.patientId === DHARTI && task.kind === 'callback',
-  );
-
-beforeEach(() => resetClinicFixtures());
-afterEach(() => resetClinicFixtures());
-
-describe('the Feedback card’s read (S:1636)', () => {
-  it('lists a patient’s check-ins and reviews newest first, with the counts and types', async () => {
-    const page = await listPatientFeedback(DHARTI);
-    expect(page.counts.reviews).toBe(1);
-    expect(page.counts.checkIns).toBeGreaterThan(0);
-    expect(page.total).toBe(page.counts.checkIns + page.counts.reviews);
-    const dates = page.items.map((item) => item.date);
-    expect(dates).toEqual([...dates].sort().reverse());
-    expect(page.types).toContain('google');
-    const google = await listPatientFeedback(DHARTI, { type: 'google' });
-    expect(google.items.map((item) => item.kind)).toEqual(['review']);
-    expect(google.total).toBe(1);
-  });
-
-  it('pages six at a time', async () => {
-    for (let index = 0; index < 7; index += 1) {
-      await createCheckIn(checkIn({ treatmentId: null, context: `Visit ${index}` }));
-    }
-    const first = await listPatientFeedback(DHARTI, { type: 'visit' });
-    expect(first.items).toHaveLength(6);
-    expect(first.total).toBeGreaterThanOrEqual(7);
-    const more = await listPatientFeedback(DHARTI, { type: 'visit', limit: 12 });
-    expect(more.items).toHaveLength(more.total);
-  });
-
-  it('carries the trend, the treatment and who logged it', async () => {
-    await createCheckIn(checkIn({ score: 9 }));
-    const { items } = await listPatientFeedback(DHARTI, { type: 'treatment' });
-    const [latest] = items;
-    expect(latest).toMatchObject({
-      kind: 'checkIn',
-      treatmentName: 'LHR Full Face',
-      needsAction: false,
+describe('the feedback reads', () => {
+  it('reads every check-in and review of a patient, newest first, mapped', async () => {
+    vi.mocked(api.get).mockImplementation(async (path: string, init?: unknown) => {
+      const after = (init as { query?: { after?: string } }).query?.after;
+      if (path === '/app/patients/{patient_id}/check-ins') {
+        return after
+          ? page([checkInRow({ id: 'chk_old', check_in_date: '2026-09-24' })])
+          : page([checkInRow()], 'cursor');
+      }
+      return page([reviewRow({ review_date: '2026-10-01' })]);
     });
-    expect(latest?.kind === 'checkIn' && latest.previousScore).toBeTypeOf('number');
-    expect(latest?.by?.initials).toBeTruthy();
-  });
-});
 
-describe('the call-back task rules (S:1648–1649)', () => {
-  it('needs action on Worse or a score of 4 or less, never on "not rated"', () => {
-    expect(checkInNeedsAction({ feel: 'worse', score: 8 })).toBe(true);
-    expect(checkInNeedsAction({ feel: 'same', score: 4 })).toBe(true);
-    expect(checkInNeedsAction({ feel: 'same', score: 5 })).toBe(false);
-    expect(checkInNeedsAction({ feel: 'better', score: 0 })).toBe(false);
-    expect(reviewNeedsAction({ rating: 3 })).toBe(true);
-    expect(reviewNeedsAction({ rating: 4 })).toBe(false);
-    expect(reviewNeedsAction({ rating: null })).toBe(false);
-  });
+    const items = await listPatientFeedback(PATIENT);
 
-  it('creates a doctor call-back due in 3 hours after a bad check-in', async () => {
-    const before = callBacks().length;
-    const saved = await createCheckIn(checkIn({ feel: 'worse', score: 3 }));
-    expect(saved.callBackCreated).toBe(true);
-    const tasks = callBacks();
-    expect(tasks).toHaveLength(before + 1);
-    const task = tasks.at(-1);
-    expect(task?.ownerRole).toBe('doctor');
-    const hours = (Date.parse(task?.dueAt ?? '') - Date.now()) / 3_600_000;
-    expect(hours).toBeGreaterThan(2.9);
-    expect(hours).toBeLessThanOrEqual(3);
-  });
-
-  it('creates none after a good check-in, and one when an edit turns it bad', async () => {
-    const before = callBacks().length;
-    const saved = await createCheckIn(checkIn());
-    expect(saved.callBackCreated).toBe(false);
-    expect(callBacks()).toHaveLength(before);
-    const worse = await updateCheckIn(saved.checkIn.id, checkIn({ feel: 'worse' }));
-    expect(worse.callBackCreated).toBe(true);
-    const again = await updateCheckIn(
-      saved.checkIn.id,
-      checkIn({ feel: 'worse', score: 2 }),
-    );
-    expect(again.callBackCreated).toBe(false);
-    expect(callBacks()).toHaveLength(before + 1);
-  });
-
-  it('creates a call-back due in 4 hours after a review of 3 stars or less', async () => {
-    const before = callBacks().length;
-    const low = await createReview(review({ rating: 3 }));
-    expect(low.callBackCreated).toBe(true);
-    const task = callBacks().at(-1);
-    const hours = (Date.parse(task?.dueAt ?? '') - Date.now()) / 3_600_000;
-    expect(hours).toBeGreaterThan(3.9);
-    const high = await createReview(review({ rating: 5 }));
-    expect(high.callBackCreated).toBe(false);
-    expect(callBacks()).toHaveLength(before + 1);
-    const edited = await updateReview(high.review.id, review({ rating: 2 }));
-    expect(edited.callBackCreated).toBe(true);
-  });
-});
-
-describe('the check-in’s side effects and the card actions', () => {
-  it('adds each named offering to the suggestions as Planned', async () => {
-    const suggested = new Set(
-      clinicFixtures.offeringSuggestions
-        .snapshot((row) => row.patientId === DHARTI)
-        .map((row) => row.offeringId),
-    );
-    const fresh = clinicFixtures.offerings
-      .snapshot((row) => row.active && !suggested.has(row.id))
-      .slice(0, 2);
-    const [already] = suggested;
-    const saved = await createCheckIn(
-      checkIn({
-        nextOfferingIds: [
-          ...fresh.map((offering) => offering.id),
-          ...(already ? [already] : []),
+    expect(api.get).toHaveBeenCalledWith('/app/patients/{patient_id}/check-ins', {
+      params: { patient_id: PATIENT },
+      query: { sort: 'check_in_date', order: 'desc', limit: 100, after: undefined },
+    });
+    expect(api.get).toHaveBeenCalledWith('/app/patients/{patient_id}/check-ins', {
+      params: { patient_id: PATIENT },
+      query: { sort: 'check_in_date', order: 'desc', limit: 100, after: 'cursor' },
+    });
+    expect(api.get).toHaveBeenCalledWith('/app/patients/{patient_id}/reviews', {
+      params: { patient_id: PATIENT },
+      query: { sort: 'review_date', order: 'desc', limit: 100, after: undefined },
+    });
+    expect(items.map((item) => item.id)).toEqual([CHECK_IN, REVIEW, 'chk_old']);
+    expect(items[0]).toEqual({
+      kind: 'checkIn',
+      id: CHECK_IN,
+      checkIn: {
+        id: CHECK_IN,
+        patientId: PATIENT,
+        appointmentId: null,
+        treatmentId: null,
+        context: 'Visit · 10 Oct',
+        feel: 'worse',
+        score: 3,
+        scoreChange: -4,
+        followed: null,
+        followedNote: null,
+        currentState: 'Itching again',
+        nextPlan: null,
+        nextOfferingIds: ['off_hydra0000000000000000'],
+        date: '2026-10-10',
+        needsAction: false,
+        actions: [
+          {
+            id: 'fba_called000000000000000',
+            action: 'doctor_called',
+            note: 'Spoke at 4pm',
+            authorId: 'mem_nisha0000000000000000',
+            at: '2026-10-10T01:43:17.495Z',
+          },
         ],
+        createdAt: '2026-10-10T01:43:09.892Z',
+        updatedAt: '2026-10-10T01:43:09.892Z',
+      },
+    });
+    expect(items[1]).toMatchObject({
+      kind: 'review',
+      review: { source: 'google', rating: 2, fileKeys: [], needsAction: true },
+    });
+  });
+
+  it('reads one check-in by the patient', async () => {
+    vi.mocked(api.get).mockResolvedValue({
+      data: checkInRow(),
+      meta: { request_id: 'r' },
+    });
+    await expect(fetchCheckIn(PATIENT, CHECK_IN)).resolves.toMatchObject({ score: 3 });
+    expect(api.get).toHaveBeenCalledWith(
+      '/app/patients/{patient_id}/check-ins/{patient_check_in_id}',
+      { params: { patient_id: PATIENT, patient_check_in_id: CHECK_IN } },
+    );
+  });
+
+  it('finds the check-in before a new one, and before the one being edited', async () => {
+    vi.mocked(api.get).mockResolvedValue(
+      page([
+        checkInRow({ id: 'chk_same_later', created_at: '2026-10-10T09:00:00.000Z' }),
+        checkInRow({ id: CHECK_IN }),
+        checkInRow({ id: 'chk_same_earlier', created_at: '2026-10-10T00:10:00.000Z' }),
+        checkInRow({ id: 'chk_old', check_in_date: '2026-09-24' }),
+      ]),
+    );
+    await expect(fetchPreviousCheckIn(PATIENT, null)).resolves.toMatchObject({
+      id: 'chk_same_later',
+    });
+    expect(api.get).toHaveBeenLastCalledWith('/app/patients/{patient_id}/check-ins', {
+      params: { patient_id: PATIENT },
+      query: {
+        sort: 'check_in_date',
+        order: 'desc',
+        limit: 10,
+        check_in_date_to: undefined,
+      },
+    });
+
+    await expect(
+      fetchPreviousCheckIn(PATIENT, {
+        id: CHECK_IN,
+        date: '2026-10-10',
+        createdAt: '2026-10-10T01:43:09.892Z',
       }),
-    );
-    // One already in the plan stays as it is and is not counted.
-    expect(saved.suggestionsAdded).toBe(2);
-    const planned = clinicFixtures.offeringSuggestions.snapshot(
-      (row) =>
-        row.patientId === DHARTI && row.sourceLabel === 'Aftercare after LHR Full Face',
-    );
-    expect(planned.map((row) => row.status)).toEqual(['planned', 'planned']);
+    ).resolves.toMatchObject({ id: 'chk_same_earlier' });
+    expect(api.get).toHaveBeenLastCalledWith('/app/patients/{patient_id}/check-ins', {
+      params: { patient_id: PATIENT },
+      query: {
+        sort: 'check_in_date',
+        order: 'desc',
+        limit: 10,
+        check_in_date_to: '2026-10-10',
+      },
+    });
   });
 
-  it('refuses a review link that is not https', async () => {
-    const refused = await createReview(review({ link: 'http://example.com' })).catch(
-      (error: unknown) => error,
+  it('reads the offerings a check-in can plan, in rupees', async () => {
+    vi.mocked(api.get).mockResolvedValue(
+      page([
+        {
+          id: 'off_lhr00000000000000000',
+          name: 'LHR Full Face',
+          category: 'package',
+          tone: 'lav',
+          price: 4800,
+          sessions: 7,
+          search_terms: ['laser'],
+          is_active: true,
+        },
+      ]),
     );
-    expect(isHttpError(refused) && refused.status).toBe(422);
+    await expect(listCheckInOfferings()).resolves.toEqual([
+      {
+        id: 'off_lhr00000000000000000',
+        name: 'LHR Full Face',
+        category: 'package',
+        tone: 'lav',
+        price: 4800,
+        sessions: 7,
+        searchTerms: ['laser'],
+        isActive: true,
+      },
+    ]);
+    expect(api.get).toHaveBeenCalledWith('/app/offerings', {
+      query: { sort: 'name', order: 'asc', limit: 100, after: undefined },
+    });
+  });
+});
+
+describe('the feedback writes', () => {
+  it('logs a check-in with its place and the offerings to plan — no context of its own', async () => {
+    vi.mocked(api.post).mockResolvedValue({
+      data: checkInRow(),
+      meta: { request_id: 'r' },
+    });
+    await createCheckIn({
+      patientId: PATIENT,
+      input: {
+        ...FIELDS,
+        appointmentId: 'appt_x',
+        treatmentId: 'trt_x',
+        date: '2026-10-10',
+        nextOfferingIds: ['off_a'],
+      },
+      idempotencyKey: KEY,
+    });
+    expect(api.post).toHaveBeenCalledWith('/app/patients/{patient_id}/check-ins', {
+      params: { patient_id: PATIENT },
+      body: {
+        feel: 'better',
+        score: 7,
+        current_state: 'Less redness',
+        followed: 'mostly',
+        followed_note: null,
+        next_plan: 'Second session in 3 weeks',
+        appointment_id: 'appt_x',
+        patient_treatment_id: 'trt_x',
+        check_in_date: '2026-10-10',
+        next_offering_ids: ['off_a'],
+      },
+      idempotencyKey: KEY,
+    });
   });
 
-  it('logs an action on one card, and refuses one on none or both', async () => {
-    const saved = await createCheckIn(checkIn({ feel: 'worse' }));
+  it('changes a check-in stale-checked, without next offerings', async () => {
+    vi.mocked(api.patch).mockResolvedValue({
+      data: checkInRow(),
+      meta: { request_id: 'r' },
+    });
+    await updateCheckIn({
+      patientId: PATIENT,
+      checkInId: CHECK_IN,
+      fields: FIELDS,
+      expectedUpdatedAt: '2026-10-10T01:43:09.892Z',
+      idempotencyKey: KEY,
+    });
+    expect(api.patch).toHaveBeenCalledWith(
+      '/app/patients/{patient_id}/check-ins/{patient_check_in_id}',
+      {
+        params: { patient_id: PATIENT, patient_check_in_id: CHECK_IN },
+        body: {
+          feel: 'better',
+          score: 7,
+          current_state: 'Less redness',
+          followed: 'mostly',
+          followed_note: null,
+          next_plan: 'Second session in 3 weeks',
+          expected_updated_at: '2026-10-10T01:43:09.892Z',
+        },
+        idempotencyKey: KEY,
+      },
+    );
+  });
+
+  it('logs and changes a review', async () => {
+    vi.mocked(api.post).mockResolvedValue({
+      data: reviewRow(),
+      meta: { request_id: 'r' },
+    });
+    vi.mocked(api.patch).mockResolvedValue({
+      data: reviewRow(),
+      meta: { request_id: 'r' },
+    });
+    const fields = { source: 'video', rating: 5, text: null, link: null } as const;
+    await createReview({
+      patientId: PATIENT,
+      input: { ...fields, appointmentId: null, date: '2026-10-10' },
+      idempotencyKey: KEY,
+    });
+    expect(api.post).toHaveBeenCalledWith('/app/patients/{patient_id}/reviews', {
+      params: { patient_id: PATIENT },
+      body: { ...fields, appointment_id: null, review_date: '2026-10-10' },
+      idempotencyKey: KEY,
+    });
+    await updateReview({
+      patientId: PATIENT,
+      reviewId: REVIEW,
+      fields,
+      expectedUpdatedAt: 'at',
+      idempotencyKey: KEY,
+    });
+    expect(api.patch).toHaveBeenCalledWith(
+      '/app/patients/{patient_id}/reviews/{patient_review_id}',
+      {
+        params: { patient_id: PATIENT, patient_review_id: REVIEW },
+        body: { ...fields, expected_updated_at: 'at' },
+        idempotencyKey: KEY,
+      },
+    );
+  });
+
+  it('files each uploaded key on the review in turn, never twice', async () => {
+    let keys: string[] = ['organization-files/org/one.png'];
+    let updated = 0;
+    vi.mocked(api.get).mockImplementation(async () => ({
+      data: reviewRow({ file_keys: keys, updated_at: `v${updated}` }),
+      meta: { request_id: 'r' },
+    }));
+    vi.mocked(api.patch).mockImplementation(async (_path, init) => {
+      const body = (init as { body: { file_keys: string[] } }).body;
+      keys = body.file_keys;
+      updated += 1;
+      return { data: reviewRow({ file_keys: keys }), meta: { request_id: 'r' } };
+    });
+
+    await Promise.all([
+      attachReviewFile({ patientId: PATIENT, reviewId: REVIEW, fileKey: 'k/two.mp4' }),
+      attachReviewFile({ patientId: PATIENT, reviewId: REVIEW, fileKey: 'k/three.png' }),
+      attachReviewFile({
+        patientId: PATIENT,
+        reviewId: REVIEW,
+        fileKey: 'organization-files/org/one.png',
+      }),
+    ]);
+
+    expect(keys).toEqual(['organization-files/org/one.png', 'k/two.mp4', 'k/three.png']);
+    expect(api.patch).toHaveBeenCalledTimes(2);
+    expect(api.patch).toHaveBeenLastCalledWith(
+      '/app/patients/{patient_id}/reviews/{patient_review_id}',
+      {
+        params: { patient_id: PATIENT, patient_review_id: REVIEW },
+        body: {
+          file_keys: ['organization-files/org/one.png', 'k/two.mp4', 'k/three.png'],
+          expected_updated_at: 'v1',
+        },
+      },
+    );
+  });
+
+  it('removes with the reason, restores and logs a follow-up on the record’s own route', async () => {
+    await deleteFeedback({
+      patientId: PATIENT,
+      kind: 'checkIn',
+      id: CHECK_IN,
+      reason: 'other',
+      note: 'Wrong patient',
+    });
+    expect(api.delete).toHaveBeenCalledWith(
+      '/app/patients/{patient_id}/check-ins/{patient_check_in_id}',
+      {
+        params: { patient_id: PATIENT, patient_check_in_id: CHECK_IN },
+        reason: 'other',
+        note: 'Wrong patient',
+      },
+    );
+    await deleteFeedback({
+      patientId: PATIENT,
+      kind: 'review',
+      id: REVIEW,
+      reason: 'duplicate',
+      note: null,
+    });
+    expect(api.delete).toHaveBeenLastCalledWith(
+      '/app/patients/{patient_id}/reviews/{patient_review_id}',
+      {
+        params: { patient_id: PATIENT, patient_review_id: REVIEW },
+        reason: 'duplicate',
+        note: undefined,
+      },
+    );
+
+    await restoreFeedback({
+      patientId: PATIENT,
+      kind: 'review',
+      id: REVIEW,
+      idempotencyKey: KEY,
+    });
+    expect(api.post).toHaveBeenLastCalledWith(
+      '/app/patients/{patient_id}/reviews/{patient_review_id}/restore',
+      { params: { patient_id: PATIENT, patient_review_id: REVIEW }, idempotencyKey: KEY },
+    );
+    await restoreFeedback({
+      patientId: PATIENT,
+      kind: 'checkIn',
+      id: CHECK_IN,
+      idempotencyKey: KEY,
+    });
+    expect(api.post).toHaveBeenLastCalledWith(
+      '/app/patients/{patient_id}/check-ins/{patient_check_in_id}/restore',
+      {
+        params: { patient_id: PATIENT, patient_check_in_id: CHECK_IN },
+        idempotencyKey: KEY,
+      },
+    );
+
     await logFeedbackAction({
-      checkInId: saved.checkIn.id,
-      reviewId: null,
+      patientId: PATIENT,
+      kind: 'checkIn',
+      id: CHECK_IN,
       action: 'doctor_called',
       note: null,
+      idempotencyKey: KEY,
     });
-    const { items } = await listPatientFeedback(DHARTI, { type: 'treatment' });
-    const card = items.find((item) => item.id === saved.checkIn.id);
-    expect(card?.action?.action).toBe('doctor_called');
-    const refused = await logFeedbackAction({
-      checkInId: null,
-      reviewId: null,
-      action: 'other',
-      note: null,
-    }).catch((error: unknown) => error);
-    expect(isHttpError(refused) && refused.status).toBe(422);
-  });
-
-  it('removes a check-in and restores it', async () => {
-    const saved = await createCheckIn(checkIn());
-    await deleteCheckIn(saved.checkIn.id, 'mistake', null);
-    let page = await listPatientFeedback(DHARTI, { type: 'treatment', limit: 50 });
-    expect(page.items.some((item) => item.id === saved.checkIn.id)).toBe(false);
-    await restoreCheckIn(saved.checkIn.id);
-    page = await listPatientFeedback(DHARTI, { type: 'treatment', limit: 50 });
-    expect(page.items.some((item) => item.id === saved.checkIn.id)).toBe(true);
-  });
-
-  it('heads the drawer with the last check-in, the treatment and the visit', async () => {
-    const context = await fetchCheckInContext(DHARTI, { treatmentId: LHR });
-    expect(context.treatment).toMatchObject({ name: 'LHR Full Face' });
-    expect(context.previous?.patientId).toBe(DHARTI);
-    const saved = await createCheckIn(checkIn());
-    const editing = await fetchCheckInContext(DHARTI, { editingId: saved.checkIn.id });
-    expect(editing.previous?.id).not.toBe(saved.checkIn.id);
+    expect(api.post).toHaveBeenLastCalledWith(
+      '/app/patients/{patient_id}/check-ins/{patient_check_in_id}/actions',
+      {
+        params: { patient_id: PATIENT, patient_check_in_id: CHECK_IN },
+        body: { action: 'doctor_called', note: undefined },
+        idempotencyKey: KEY,
+      },
+    );
+    await logFeedbackAction({
+      patientId: PATIENT,
+      kind: 'review',
+      id: REVIEW,
+      action: 'replied_google',
+      note: 'Thanked them',
+      idempotencyKey: KEY,
+    });
+    expect(api.post).toHaveBeenLastCalledWith(
+      '/app/patients/{patient_id}/reviews/{patient_review_id}/actions',
+      {
+        params: { patient_id: PATIENT, patient_review_id: REVIEW },
+        body: { action: 'replied_google', note: 'Thanked them' },
+        idempotencyKey: KEY,
+      },
+    );
   });
 });

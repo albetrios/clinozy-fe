@@ -331,7 +331,7 @@
     },
     "missing": "Adicione nome e celular",
     "mobileInvalid": "Digite um celular de 10 dígitos",
-    "created": "Paciente {{id}} criado · tarefa de boas-vindas adicionada",
+    "created": "Paciente {{id}} criado",
     "openFile": "Abrir ficha",
     "saved": "Alterações de {{name}} salvas",
     "registered": "Ficha de paciente {{id}} criada para {{name}}",
@@ -340,7 +340,8 @@
     "registeredPhotos_other": "Ficha de paciente {{id}} criada para {{name}} · {{count}} fotos arquivadas",
     "duplicate": "Mesmo celular de {{name}} · {{id}}",
     "useExisting": "Usar o existente",
-    "summaryEmpty": "Novo paciente"
+    "summaryEmpty": "Novo paciente",
+    "knownPerson": "{{name}} já está nos seus contatos · a ficha abre no nome dessa pessoa"
   },
   "recordDrawer": {
     "cancel": "Cancelar",
@@ -818,9 +819,6 @@
     "pricesHiddenHint": "Preços ocultos · use o olho para mostrar",
     "showPrices": "Mostrar preços",
     "hidePrices": "Ocultar preços",
-    "savesOnList": "Economiza {{amount}} sobre o preço de tabela",
-    "invoicedAmount": "{{amount}} faturado",
-    "atListPrice": "Pelo preço de tabela",
     "columns": {
       "suggested": "Sugerido",
       "qty": "Qtd.",
@@ -831,7 +829,7 @@
     "more": "Mais",
     "quantity": "Quantidade",
     "finalPrice": "Preço final",
-    "belowFloor": "Abaixo do preço mínimo {{price}}",
+    "belowFloor": "Abaixo do preço mínimo",
     "tooMuchDiscount": "Desconto demais · peça a um administrador",
     "details": "Detalhes do serviço",
     "statuses": {
@@ -849,8 +847,6 @@
     "statusLabel": "Status · {{status}}",
     "invoiced": "Faturado",
     "invoicedOf": "Faturado · {{done}} de {{total}}",
-    "linkInvoice": "Vincular uma fatura",
-    "linkInvoiceHint": "Vincular uma fatura manualmente",
     "remove": "Remover",
     "empty": "Nada sugerido para {{first}} ainda.",
     "whyIdea": "Por que esta ideia",
@@ -860,16 +856,10 @@
     "addHint": "Adicionar às sugestões",
     "addOffering": "Adicionar serviço",
     "purchasesTitle": "Últimas compras de {{first}}",
-    "purchasesSummary_one": "{{count}} linha · {{paid}} pago até agora",
-    "purchasesSummary_many": "{{count}} linhas · {{paid}} pago até agora",
-    "purchasesSummary_other": "{{count}} linhas · {{paid}} pago até agora",
     "purchaseColumns": {
       "date": "Data",
       "bought": "Comprado",
-      "qty": "Qtd.",
-      "paid": "Pago",
-      "sessions": "Sessões",
-      "invoice": "Fatura"
+      "sessions": "Sessões"
     },
     "sessionsUsed": "{{used}} de {{total}} usadas",
     "activityTitle": "Atividade do contato",
@@ -910,18 +900,7 @@
       "lowest": "mínimo {{price}}"
     },
     "ideaReasons": {
-      "history": "Ideia do histórico",
-      "note": "Nota do médico · “{{text}}”",
-      "complaint": "Queixa · {{text}}",
-      "visits_one": "{{count}} visita até agora · um pacote economiza em cada sessão",
-      "visits_many": "{{count}} visitas até agora · um pacote economiza em cada sessão",
-      "visits_other": "{{count}} visitas até agora · um pacote economiza em cada sessão",
-      "renew": "Pacote quase no fim · renovar",
-      "first": "Primeira visita · comece com uma consulta"
-    },
-    "purchaseKinds": {
-      "medicine": "Medicamento",
-      "item": "Item"
+      "history": "Ideia do histórico"
     },
     "delivery": {
       "queued": "Na fila",
@@ -931,7 +910,10 @@
       "failed": "Não entregue",
       "received": "Recebida"
     },
-    "activityLead": "Lead {{id}}"
+    "activityLead": "Lead {{id}}",
+    "purchasesCount_one": "{{count}} linha",
+    "purchasesCount_many": "{{count}} linhas",
+    "purchasesCount_other": "{{count}} linhas"
   },
   "contactEditor": {
     "title": "Editar contato",

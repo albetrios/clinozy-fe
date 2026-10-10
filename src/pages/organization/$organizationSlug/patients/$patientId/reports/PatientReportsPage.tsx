@@ -8,19 +8,20 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { organizationReport } from '@/lib/routes/patient-file-builders.ts';
-import type { PatientReport } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import {
   fetchPatientReport,
-  type PatientReportDetail,
   patientReportQueryKeys,
 } from '@/shared/api/clinic/patient-reports-api.ts';
+import type { PatientReport } from '@/shared/api/clinic/patient-reports-contracts.ts';
 import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
 import { DataTableColumnChooser } from '@/shared/components/DataTableColumnChooser/index.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
+import { RetryError } from '@/shared/components/RetryError/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { usePatientReports } from '@/shared/hooks/usePatientReports/index.ts';
 import { FileIcon, Trash } from '@/shared/icons/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 import { PatientSection } from '../shared/components/PatientSection/index.ts';
 import {
@@ -38,10 +39,15 @@ import { useReportsTable } from './hooks/useReportsTable/index.ts';
 import { REPORT_KEYS, REPORT_NS } from './reports.constants.ts';
 import { manifest } from './reports.manifest.ts';
 
+/** No reports yet — one array, so the table keeps its row model while it loads. */
+const NO_REPORTS: readonly PatientReport[] = [];
+
 /**
  * The Reports table (KICKOFF §6.6 Section tables; H:4760) in the section: the
- * patient's reports newest first; a row opens nothing — "Open" shows the
- * report, "Delete" (`patients.delete`) asks "Delete this report?".
+ * patient's reports newest first — every page of `GET …/reports`, as the
+ * table shows them all ("All reports loaded") — with the server's count; a
+ * row opens nothing — "Open" shows the report, "Delete" (`patient:update`)
+ * asks "Delete this report?".
  */
 function ReportsTable({ canDelete }: { canDelete: boolean }) {
   const { t } = useTranslation(PATIENT_TABLE_NS);
@@ -49,7 +55,8 @@ function ReportsTable({ canDelete }: { canDelete: boolean }) {
   const { organizationSlug = '' } = useParams({ strict: false });
   const { patientId } = usePatientFileContext();
   const reports = usePatientReports(patientId);
-  const rows = reports.data ?? [];
+  const rows = reports.data?.reports ?? NO_REPORTS;
+  const total = reports.data?.total ?? 0;
   const table = useReportsTable(rows);
   const [deleting, setDeleting] = useState<PatientReport | null>(null);
   const rowActions = (report: PatientReport): DataTableRowAction[] => [
@@ -85,18 +92,22 @@ function ReportsTable({ canDelete }: { canDelete: boolean }) {
       }
       className="flex flex-col"
     >
-      <PatientSectionTable
-        section="reports"
-        table={table}
-        loading={reports.isPending}
-        countLabel={
-          rows.length > 0
-            ? t(PATIENT_TABLE_KEYS.reports.count, { count: rows.length })
-            : undefined
-        }
-        minWidth={760}
-        rowActions={rowActions}
-      />
+      {reports.isError && !reports.data ? (
+        // A failed first read is not an empty list: say so, with Retry.
+        <RetryError onRetry={() => void reports.refetch()} />
+      ) : (
+        <PatientSectionTable
+          section="reports"
+          table={table}
+          loading={reports.isPending}
+          countLabel={
+            total > 0 ? t(PATIENT_TABLE_KEYS.reports.count, { count: total }) : undefined
+          }
+          // The design's 760 less its "Uploaded by" (G4).
+          minWidth={580}
+          rowActions={rowActions}
+        />
+      )}
       {deleting ? (
         <ReportDeleteConfirm
           report={deleting}
@@ -114,28 +125,31 @@ function ReportsTable({ canDelete }: { canDelete: boolean }) {
 /**
  * Patient file › Reports (KICKOFF §6.6; H:4760; `patient-file.md:34–46`): the
  * section's table in the file's content column and its URL-driven dialogs
- * (`S:42–43`): Upload report (`patients.edit`) and Report view (anyone who
- * reads the file).
+ * (`S:42–43`): Upload report and Report view (`GET …/reports/:id`, anyone who
+ * reads the file — `patient:clinical_record:read`). Every write is
+ * `patient:update`: Upload report and delete.
  */
 export function PatientReportsPage() {
   const { t } = useTranslation(REPORT_NS);
   const { reportId } = useParams({ strict: false });
   const { patientId, file } = usePatientFileContext();
+  const organizationId = useOrganizationStore((state) => state.organizationId);
   const access = useClinicAccess();
   const [today] = useState(() => clinicToday());
-  const route = usePatientRecordRoute<PatientReportDetail>({
+  const canWrite = access.isResolved && access.can('patients', 'edit');
+  const route = usePatientRecordRoute<PatientReport>({
     section: 'reports',
     id: reportId,
-    queryKey: patientReportQueryKeys.detail,
-    fetchRecord: fetchPatientReport,
+    queryKey: (id) => patientReportQueryKeys.detail(organizationId, patientId, id),
+    fetchRecord: (id) => fetchPatientReport({ patientId, reportId: id }),
     recordLabel: t(REPORT_KEYS.record),
-    canCreate: access.isResolved ? access.can('patients', 'edit') : undefined,
+    canCreate: access.isResolved ? canWrite : undefined,
   });
   const name = file ? patientName(file.patient) : '';
 
   return (
     <>
-      <ReportsTable canDelete={access.isResolved && access.can('patients', 'delete')} />
+      <ReportsTable canDelete={canWrite} />
       {route.mode === 'create' && file && access.isResolved ? (
         <ReportDrawer
           patientId={patientId}
@@ -145,7 +159,7 @@ export function PatientReportsPage() {
         />
       ) : null}
       {route.mode === 'view' && route.record && file ? (
-        <ReportView detail={route.record} patientName={name} onClose={route.close} />
+        <ReportView report={route.record} patientName={name} onClose={route.close} />
       ) : null}
     </>
   );

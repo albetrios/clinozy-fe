@@ -331,7 +331,7 @@
     },
     "missing": "أضف الاسم والجوال",
     "mobileInvalid": "أدخل رقم جوال من 10 أرقام",
-    "created": "تم إنشاء المريض {{id}} · أُضيفت مهمة الاستقبال",
+    "created": "تم إنشاء المريض {{id}}",
     "openFile": "فتح الملف",
     "saved": "تم حفظ {{name}}",
     "registered": "تم تسجيل {{name}} كمريض {{id}}",
@@ -343,7 +343,8 @@
     "registeredPhotos_other": "تم تسجيل {{name}} كمريض {{id}} · {{count}} صورة محفوظة",
     "duplicate": "نفس رقم الجوال لدى {{name}} · {{id}}",
     "useExisting": "استخدام الموجود",
-    "summaryEmpty": "مريض جديد"
+    "summaryEmpty": "مريض جديد",
+    "knownPerson": "{{name}} موجود بالفعل في جهات الاتصال · سيُفتح الملف باسمه"
   },
   "recordDrawer": {
     "cancel": "إلغاء",
@@ -842,9 +843,6 @@
     "pricesHiddenHint": "الأسعار مخفية · استخدم العين لإظهارها",
     "showPrices": "إظهار الأسعار",
     "hidePrices": "إخفاء الأسعار",
-    "savesOnList": "توفير {{amount}} عن سعر القائمة",
-    "invoicedAmount": "{{amount}} مُفوتر",
-    "atListPrice": "بسعر القائمة",
     "columns": {
       "suggested": "المقترح",
       "qty": "الكمية",
@@ -855,7 +853,7 @@
     "more": "أكثر",
     "quantity": "الكمية",
     "finalPrice": "السعر النهائي",
-    "belowFloor": "أقل من أدنى سعر {{price}}",
+    "belowFloor": "أقل من أدنى سعر",
     "tooMuchDiscount": "خصم كبير جدًا · اسأل مسؤولًا",
     "details": "تفاصيل الخدمة",
     "statuses": {
@@ -873,8 +871,6 @@
     "statusLabel": "الحالة · {{status}}",
     "invoiced": "مُفوتر",
     "invoicedOf": "مُفوتر · {{done}} من {{total}}",
-    "linkInvoice": "ربط فاتورة",
-    "linkInvoiceHint": "ربط فاتورة يدويًا",
     "remove": "إزالة",
     "empty": "لا اقتراحات لـ {{first}} بعد.",
     "whyIdea": "لماذا هذه الفكرة",
@@ -884,19 +880,10 @@
     "addHint": "إضافة إلى الاقتراحات",
     "addOffering": "إضافة خدمة",
     "purchasesTitle": "آخر مشتريات {{first}}",
-    "purchasesSummary_zero": "لا بنود · {{paid}} مدفوع حتى الآن",
-    "purchasesSummary_one": "بند واحد · {{paid}} مدفوع حتى الآن",
-    "purchasesSummary_two": "بندان · {{paid}} مدفوع حتى الآن",
-    "purchasesSummary_few": "{{count}} بنود · {{paid}} مدفوع حتى الآن",
-    "purchasesSummary_many": "{{count}} بندًا · {{paid}} مدفوع حتى الآن",
-    "purchasesSummary_other": "{{count}} بند · {{paid}} مدفوع حتى الآن",
     "purchaseColumns": {
       "date": "التاريخ",
       "bought": "المشترى",
-      "qty": "الكمية",
-      "paid": "المدفوع",
-      "sessions": "الجلسات",
-      "invoice": "الفاتورة"
+      "sessions": "الجلسات"
     },
     "sessionsUsed": "استُخدم {{used}} من {{total}}",
     "activityTitle": "نشاط جهة الاتصال",
@@ -943,21 +930,7 @@
       "lowest": "الأدنى {{price}}"
     },
     "ideaReasons": {
-      "history": "فكرة من السجل",
-      "note": "ملاحظة الطبيب · «{{text}}»",
-      "complaint": "الشكوى · {{text}}",
-      "visits_zero": "لا زيارات حتى الآن · الباقة توفّر في كل جلسة",
-      "visits_one": "زيارة واحدة حتى الآن · الباقة توفّر في كل جلسة",
-      "visits_two": "زيارتان حتى الآن · الباقة توفّر في كل جلسة",
-      "visits_few": "{{count}} زيارات حتى الآن · الباقة توفّر في كل جلسة",
-      "visits_many": "{{count}} زيارة حتى الآن · الباقة توفّر في كل جلسة",
-      "visits_other": "{{count}} زيارة حتى الآن · الباقة توفّر في كل جلسة",
-      "renew": "الباقة على وشك النفاد · جدّدها",
-      "first": "الزيارة الأولى · ابدأ باستشارة"
-    },
-    "purchaseKinds": {
-      "medicine": "دواء",
-      "item": "منتج"
+      "history": "فكرة من السجل"
     },
     "delivery": {
       "queued": "في الانتظار",
@@ -967,7 +940,13 @@
       "failed": "لم تصل",
       "received": "مستلمة"
     },
-    "activityLead": "عميل محتمل {{id}}"
+    "activityLead": "عميل محتمل {{id}}",
+    "purchasesCount_zero": "لا بنود",
+    "purchasesCount_one": "بند واحد",
+    "purchasesCount_two": "بندان",
+    "purchasesCount_few": "{{count}} بنود",
+    "purchasesCount_many": "{{count}} بندًا",
+    "purchasesCount_other": "{{count}} بند"
   },
   "contactEditor": {
     "title": "تعديل جهة الاتصال",

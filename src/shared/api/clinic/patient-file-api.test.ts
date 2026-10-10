@@ -1,111 +1,145 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { isHttpError } from '@/shared/errors/HttpError.ts';
+vi.mock('@/core/http/api.ts', () => ({
+  api: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
+}));
+import { api } from '@/core/http/api.ts';
 
-import { invoiceBalance } from './clinic-money.ts';
-import { patientRef } from './fixtures/patients.fixtures.ts';
-import { clinicFixtures, resetClinicFixtures } from './fixtures/world.fixtures.ts';
-import { fetchPatientFile, patientFileQueryKeys } from './patient-file-api.ts';
-import { patientFileSchema } from './patient-file-contracts.ts';
+import { fetchPatientFile } from './patient-file-api.ts';
 
-/** 10:00 on 3 Oct, clinic time — the seed day is today. */
-const NOW = new Date('2026-10-03T04:30:00Z');
-const DHARTI = patientRef('Dharti Galani');
+const PATIENT_ID = 'pat_priya0000000000000000';
+const CONTACT_ID = 'con_priya0000000000000000';
+
+const patientWireRow = {
+  id: PATIENT_ID,
+  patient_number: 3508,
+  contact_id: CONTACT_ID,
+  home_branch_id: 'brn_main0000000000000000',
+  types: ['aesthetic'],
+  status: 'regular',
+  conversion: 'converted',
+  doctor_membership_id: null,
+  follow_up_at: null,
+  notes: null,
+  lead_id: null,
+  has_data_consent: true,
+  has_photo_consent: true,
+  allergies: [],
+  contraindications: [],
+  created_at: '2026-09-20T05:00:00.000Z',
+  updated_at: '2026-10-01T08:00:00.000Z',
+};
+
+const contactWire = {
+  id: CONTACT_ID,
+  contact_number: 1188,
+  first_name: 'Priya',
+  last_name: 'Shah',
+  primary_phone: '+919876543210',
+  email: null,
+  instagram_handles: ['priya.glow'],
+  default_channel: 'whatsapp',
+  preference_tags: ['evenings', 'gujarati', 'english'],
+  patient_id: PATIENT_ID,
+  open_lead_id: null,
+  last_activity_at: null,
+  last_received_at: '2026-10-02T09:00:00.000Z',
+  is_awaiting_reply: true,
+  updated_at: '2026-10-01T07:00:00.000Z',
+  gender: 'female',
+  date_of_birth: null,
+  address: null,
+  referral_source: null,
+  referred_by_contact_id: null,
+  referred_by_name: null,
+  has_marketing_consent: false,
+  patient_number: 3508,
+  phones: [{ phone: '+919876543210', is_primary: true, is_on_whatsapp: true }],
+};
+
+/** Answer each read of the file by its path. */
+function answer({
+  next = null,
+  checkIns = [] as unknown[],
+  reviews = [] as unknown[],
+}: {
+  next?: unknown;
+  checkIns?: unknown[];
+  reviews?: unknown[];
+} = {}) {
+  vi.mocked(api.get).mockImplementation((async (path: string) => {
+    if (path === '/app/patients/{patient_id}') return { data: patientWireRow };
+    if (path === '/app/contacts/{contact_id}') return { data: contactWire };
+    if (path === '/app/contacts/{contact_id}/preview')
+      return { data: { next_appointment: next } };
+    if (path === '/app/patients/{patient_id}/check-ins')
+      return {
+        data: checkIns,
+        meta: { pagination: { estimated_total: checkIns.length * 2 } },
+      };
+    if (path === '/app/patients/{patient_id}/reviews')
+      return { data: reviews, meta: { pagination: { estimated_total: reviews.length } } };
+    throw new Error(`unexpected read ${path}`);
+  }) as never);
+}
 
 beforeEach(() => {
-  vi.useFakeTimers({ toFake: ['Date'] });
-  vi.setSystemTime(NOW);
-  resetClinicFixtures();
-});
-afterEach(() => {
-  vi.useRealTimers();
-  resetClinicFixtures();
-});
-
-describe('patientFileQueryKeys', () => {
-  it('sits under the patients key, so a patient write refreshes the file', () => {
-    expect(patientFileQueryKeys.detail(DHARTI)).toEqual([
-      'clinic',
-      'patients',
-      'file',
-      DHARTI,
-    ]);
-  });
+  vi.resetAllMocks();
 });
 
 describe('fetchPatientFile', () => {
-  it('reads the patient with the rail facts, in the contract-plus-plan shape', async () => {
-    const file = await fetchPatientFile(DHARTI);
-    expect(patientFileSchema.safeParse(file).success).toBe(true);
-    expect(file.patient.seq).toBe(3508);
-    expect(file.language).toBe('Gujarati');
-    expect(file.instagram).toBe('@dharti');
-  });
+  it('reads the patient, their person, the next booking and the newest feedback', async () => {
+    answer({
+      next: {
+        id: 'appt_next0000000000000000',
+        appointment_date: '2026-10-10',
+        start_time: '12:00:00',
+        service_label: 'Consultation',
+        status: 'confirmed',
+      },
+      checkIns: [{ feel: 'better', score: 7 }],
+      reviews: [{ source: 'google', rating: 5 }],
+    });
 
-  it('sums what they owe over their open invoices and dates it from the oldest', async () => {
-    const payments = clinicFixtures.payments.snapshot();
-    const open = clinicFixtures.invoices
-      .snapshot((invoice) => invoice.patientId === DHARTI)
-      .filter((invoice) => invoiceBalance(invoice, payments).due > 0);
-    const file = await fetchPatientFile(DHARTI);
-    expect(file.due).toBe(
-      open.reduce((sum, invoice) => sum + invoiceBalance(invoice, payments).due, 0),
-    );
-    expect(file.dueSince).toBe(
-      open.length ? open.map((invoice) => invoice.date).sort()[0] : null,
-    );
-  });
+    const file = await fetchPatientFile(PATIENT_ID);
 
-  it('picks the earliest visit still to come as the next one', async () => {
-    const file = await fetchPatientFile(DHARTI);
-    const upcoming = clinicFixtures.appointments
-      .snapshot(
-        (appointment) =>
-          appointment.patientId === DHARTI &&
-          appointment.date >= '2026-10-03' &&
-          ['scheduled', 'confirmed', 'checked_in'].includes(appointment.status),
-      )
-      .sort((a, b) => `${a.date}${a.startTime}`.localeCompare(`${b.date}${b.startTime}`));
-    expect(file.nextVisit?.appointmentId ?? null).toBe(upcoming[0]?.id ?? null);
-  });
-
-  it('summarises feedback from the latest check-in and counts each kind', async () => {
-    const file = await fetchPatientFile(DHARTI);
-    expect(file.feedback).toMatchObject({
-      feel: 'better',
-      score: 7,
-      checkIns: 2,
-      reviews: 1,
+    expect(api.get).toHaveBeenCalledWith('/app/patients/{patient_id}/check-ins', {
+      params: { patient_id: PATIENT_ID },
+      query: { limit: 1, sort: 'check_in_date', order: 'desc' },
+    });
+    expect(file).toMatchObject({
+      patient: { id: PATIENT_ID, name: 'Priya Shah', consents: ['data', 'photos'] },
+      instagram: 'priya.glow',
+      language: 'gujarati',
+      nextVisit: {
+        appointmentId: 'appt_next0000000000000000',
+        date: '2026-10-10',
+        startTime: '12:00',
+        serviceLabel: 'Consultation',
+      },
+      feedback: {
+        feel: 'better',
+        score: 7,
+        review: { source: 'google', rating: 5 },
+        checkIns: 2,
+        reviews: 1,
+      },
+      awaitingReply: true,
     });
   });
 
-  it('counts each section’s records and leaves Overview and Clinical notes at none', async () => {
-    const { counts } = await fetchPatientFile(DHARTI);
-    expect(counts).toMatchObject({
-      timeline: 0,
-      overview: 0,
-      prescriptions: 1,
-      treatments: 1,
-      images: 3,
-      reports: 2,
-      packages: 2,
-      notes: 2,
-    });
-    expect(counts.invoices).toBeGreaterThan(0);
-  });
+  it('answers no next visit and no feedback for a new patient', async () => {
+    answer();
 
-  it('holds an open credit to give back and none for a patient without one', async () => {
-    const tanvi = await fetchPatientFile(patientRef('Tanvi Shah'));
-    expect(tanvi.credit).toEqual({
-      amount: 50_000,
-      reasons: ['Charged twice for corn removal'],
-    });
-    expect((await fetchPatientFile(DHARTI)).credit).toBeNull();
-  });
+    const file = await fetchPatientFile(PATIENT_ID);
 
-  it('answers a deleted or unknown patient with a 404', async () => {
-    await clinicFixtures.patients.remove(DHARTI, 'mistake', null);
-    const error = await fetchPatientFile(DHARTI).catch((caught: unknown) => caught);
-    expect(isHttpError(error) && error.status).toBe(404);
+    expect(file.nextVisit).toBeNull();
+    expect(file.feedback).toEqual({
+      feel: null,
+      score: null,
+      review: null,
+      checkIns: 0,
+      reviews: 0,
+    });
   });
 });

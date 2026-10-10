@@ -331,14 +331,15 @@
     },
     "missing": "氏名と携帯番号を入力してください",
     "mobileInvalid": "10桁の携帯番号を入力してください",
-    "created": "患者 {{id}} を作成しました · オンボーディングのタスクを追加しました",
+    "created": "患者 {{id}} を作成しました",
     "openFile": "ファイルを開く",
     "saved": "{{name}} を保存しました",
     "registered": "{{name}} を患者 {{id}} として登録しました",
     "registeredPhotos_other": "{{name}} を患者 {{id}} として登録しました · 写真 {{count}} 枚を保存",
     "duplicate": "{{name}} と同じ携帯番号 · {{id}}",
     "useExisting": "既存の患者を使う",
-    "summaryEmpty": "新規患者"
+    "summaryEmpty": "新規患者",
+    "knownPerson": "{{name}} はすでに連絡先にいます · この方のカルテとして作成します"
   },
   "recordDrawer": {
     "cancel": "キャンセル",
@@ -802,9 +803,6 @@
     "pricesHiddenHint": "価格は非表示 · 目のアイコンで表示",
     "showPrices": "価格を表示",
     "hidePrices": "価格を非表示",
-    "savesOnList": "定価より {{amount}} お得",
-    "invoicedAmount": "{{amount}} 請求済み",
-    "atListPrice": "定価",
     "columns": {
       "suggested": "提案",
       "qty": "数量",
@@ -815,7 +813,7 @@
     "more": "増やす",
     "quantity": "数量",
     "finalPrice": "最終価格",
-    "belowFloor": "最低価格 {{price}} を下回っています",
+    "belowFloor": "最低価格を下回っています",
     "tooMuchDiscount": "割引が大きすぎます · 管理者に確認してください",
     "details": "サービスの詳細",
     "statuses": {
@@ -833,8 +831,6 @@
     "statusLabel": "ステータス · {{status}}",
     "invoiced": "請求済み",
     "invoicedOf": "請求済み · {{total}} 件中 {{done}} 件",
-    "linkInvoice": "請求書を紐づける",
-    "linkInvoiceHint": "請求書を手動で紐づける",
     "remove": "削除",
     "empty": "{{first}} さんへの提案はまだありません。",
     "whyIdea": "このアイデアの理由",
@@ -844,14 +840,10 @@
     "addHint": "提案に追加",
     "addOffering": "サービスを追加",
     "purchasesTitle": "{{first}} さんの最近の購入",
-    "purchasesSummary_other": "{{count}} 件 · これまでの支払い {{paid}}",
     "purchaseColumns": {
       "date": "日付",
       "bought": "購入品",
-      "qty": "数量",
-      "paid": "支払額",
-      "sessions": "回数",
-      "invoice": "請求書"
+      "sessions": "回数"
     },
     "sessionsUsed": "{{total}} 回中 {{used}} 回使用",
     "activityTitle": "連絡先のアクティビティ",
@@ -888,16 +880,7 @@
       "lowest": "最低 {{price}}"
     },
     "ideaReasons": {
-      "history": "履歴からの提案",
-      "note": "医師のメモ ·「{{text}}」",
-      "complaint": "主訴 · {{text}}",
-      "visits_other": "これまで {{count}} 回来院 · パッケージなら毎回お得",
-      "renew": "パッケージの残りわずか · 更新",
-      "first": "初来院 · まずは診察から"
-    },
-    "purchaseKinds": {
-      "medicine": "薬",
-      "item": "商品"
+      "history": "履歴からの提案"
     },
     "delivery": {
       "queued": "送信待ち",
@@ -907,7 +890,8 @@
       "failed": "未配信",
       "received": "受信"
     },
-    "activityLead": "リード {{id}}"
+    "activityLead": "リード {{id}}",
+    "purchasesCount_other": "{{count}} 件"
   },
   "contactEditor": {
     "title": "連絡先を編集",

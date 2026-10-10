@@ -28,9 +28,9 @@ interface RailReach {
 }
 
 /**
- * The rows the rail lists (H:4967–4970): the primary mobile on WhatsApp, the
- * second number, the lead's number when it differs, then Instagram — the
- * last two a plan addition (Appendix F).
+ * The rows the rail lists (H:4967–4970): the primary mobile on WhatsApp, the person's other
+ * numbers, then their Instagram handle. A lead and its patient share one person, so there is no
+ * separate lead number any more.
  */
 function useReachRows(file: PatientFile): RailReach[] {
   const { t } = useTranslation(PATIENT_RAIL_NS);
@@ -40,22 +40,12 @@ function useReachRows(file: PatientFile): RailReach[] {
       reach: { channel: 'whatsapp', phone: patient.phone },
       sub: t(K.reachSub.whatsappPrimary),
     },
-    ...(patient.phone2
-      ? [
-          {
-            reach: { channel: 'phone', phone: patient.phone2 } as const,
-            sub: t(K.reachSub.mobile),
-          },
-        ]
-      : []),
-    ...(file.leadPhone
-      ? [
-          {
-            reach: { channel: 'phone', phone: file.leadPhone } as const,
-            sub: t(K.reachSub.fromLead),
-          },
-        ]
-      : []),
+    ...patient.phones
+      .filter((entry) => entry.phone !== patient.phone)
+      .map((entry) => ({
+        reach: { channel: 'phone', phone: entry.phone } as const,
+        sub: t(K.reachSub.mobile),
+      })),
     ...(file.instagram
       ? [
           {
