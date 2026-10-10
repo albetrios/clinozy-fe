@@ -148,12 +148,20 @@ Comma-separated **product module keys** (e.g. `billing,members`). Disabled modul
 
 See module catalog in [`docs/reference/frontend-platform.md`](../../reference/frontend-platform.md).
 
-### Deployment mode overrides
+### Deployment mode (`VITE_PERSONAL_ORGANIZATIONS`, `VITE_TEAM_ORGANIZATIONS`)
 
-Optional tri-state env overrides (when set, override API flags from `me/context`):
+Tri-state (`true` / `false` / unset). clinozy-be serves no deployment flags, so these decide the
+mode; unset, the client assumes both kinds (hybrid). Set them to match the backend's
+`PERSONAL_ORGANIZATION_ENABLED` / `TEAM_ORGANIZATION_ENABLED` — Clinozy is team-only:
 
-- `VITE_PERSONAL_ORGANIZATIONS`
-- `VITE_TEAM_ORGANIZATIONS`
+- `VITE_PERSONAL_ORGANIZATIONS=false`
+- `VITE_TEAM_ORGANIZATIONS=true`
+
+Locally `pnpm setup:local` writes these (`envProfiles.local.defaults`). In a deploy they are GitHub
+Environment **variables** (`deployVariables` in `tooling/setup/setup.config.json`): put them in
+`.env.development` / `.env.production` and run `pnpm github:sync`; the deploy and preview builds
+write them into the build's env file. Keep them out of the dev / prod `envProfiles` defaults —
+`github:sync` prunes a variable equal to its default, and the build would then run hybrid.
 
 ### Diagnostics / dev tooling — named flags (no build-mode sniffing)
 

@@ -83,6 +83,8 @@ jobs:
           VITE_DEVTOOLS: ${{ vars.VITE_DEVTOOLS }}
           VITE_E2E_HOOKS: ${{ vars.VITE_E2E_HOOKS }}
           VITE_VERSION_CHECK: ${{ vars.VITE_VERSION_CHECK }}
+          VITE_PERSONAL_ORGANIZATIONS: ${{ vars.VITE_PERSONAL_ORGANIZATIONS }}
+          VITE_TEAM_ORGANIZATIONS: ${{ vars.VITE_TEAM_ORGANIZATIONS }}
         run: pnpm validate:client-env --env "$DEPLOY_ENV"
 
       - name: Resolve app version from release-please manifest
@@ -117,13 +119,16 @@ jobs:
           VITE_DEVTOOLS: ${{ vars.VITE_DEVTOOLS }}
           VITE_E2E_HOOKS: ${{ vars.VITE_E2E_HOOKS }}
           VITE_VERSION_CHECK: ${{ vars.VITE_VERSION_CHECK }}
+          VITE_PERSONAL_ORGANIZATIONS: ${{ vars.VITE_PERSONAL_ORGANIZATIONS }}
+          VITE_TEAM_ORGANIZATIONS: ${{ vars.VITE_TEAM_ORGANIZATIONS }}
         run: |
           set -euo pipefail
           : > .env.production.local
           for key in VITE_API_BASE_URL VITE_APP_ENV VITE_APP_VERSION VITE_CAPTCHA_DISABLED \
             VITE_TURNSTILE_SITE_KEY VITE_STRIPE_PUBLISHABLE_KEY VITE_POSTHOG_KEY VITE_POSTHOG_HOST \
             VITE_PRIVACY_POLICY_URL VITE_CSP_REPORT_URI \
-            VITE_DEBUG_LOGGING VITE_DEVTOOLS VITE_E2E_HOOKS VITE_VERSION_CHECK; do
+            VITE_DEBUG_LOGGING VITE_DEVTOOLS VITE_E2E_HOOKS VITE_VERSION_CHECK \
+            VITE_PERSONAL_ORGANIZATIONS VITE_TEAM_ORGANIZATIONS; do
             value="${!key}"
             if [ -n "$value" ]; then
               printf '%s=%s\n' "$key" "$value" >> .env.production.local

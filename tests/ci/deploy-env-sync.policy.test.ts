@@ -80,6 +80,28 @@ describe('deploy env sync policy', () => {
     expect(preview).toContain('VITE_APP_ENV: development');
   });
 
+  it('deployed and preview builds receive the organization mode', () => {
+    // clinozy-be serves no deployment flags, so these two decide the mode; a build without them
+    // falls back to both kinds (hybrid) whatever the backend runs.
+    const config = JSON.parse(
+      readFileSync(join(process.cwd(), 'tooling/setup/setup.config.json'), 'utf8'),
+    ) as { environments: { name: string; deployVariables: string[] }[] };
+    for (const key of ['VITE_PERSONAL_ORGANIZATIONS', 'VITE_TEAM_ORGANIZATIONS']) {
+      for (const [name, source] of [
+        ['reusable-netlify-deploy.yml', reusable],
+        ['preview.yml', preview],
+      ] as const) {
+        expect(materializeList(source), `${name} must materialize ${key}`).toContain(key);
+      }
+      for (const environment of config.environments) {
+        expect(
+          environment.deployVariables,
+          `${environment.name} must sync ${key} as a variable`,
+        ).toContain(key);
+      }
+    }
+  });
+
   it('every materialized key is supplied by the build step env block', () => {
     for (const [source, stepName] of [
       [reusable, 'Build'],

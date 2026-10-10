@@ -4,7 +4,12 @@ How clinozy-fe should adapt signup, sign-in, onboarding, routing, and the org
 switcher when the backend deployment toggles **personal** and **team**
 organizations independently.
 
-> **Status:** Implemented (Phases 0–5). Deployment flags come from clinozy-be `GET /auth/me/context`.
+> **Status:** Implemented (Phases 0–5). clinozy-be does **not** serve the deployment flags — `GET /auth/me/context`
+> and `GET /users/me` carry no `capabilities` — so the build decides: `VITE_PERSONAL_ORGANIZATIONS` /
+> `VITE_TEAM_ORGANIZATIONS`, set to match the backend's `PERSONAL_ORGANIZATION_ENABLED` /
+> `TEAM_ORGANIZATION_ENABLED`. Unset, the client assumes both kinds (hybrid). Deployed and preview builds
+> take them from the GitHub Environment's variables (`reusable-netlify-deploy.yml`, `preview.yml`); Clinozy
+> runs team-only (`false` / `true`).
 >
 > **Implemented naming:** the proposed `capabilities` API shipped as
 > `src/shared/tenancy/deployment-mode.ts` (pure `resolveDeploymentMode` /
@@ -81,7 +86,8 @@ export function useDeploymentCapabilities(): DeploymentCapabilities;
    clinozy-be exposes on `user` (nested or top-level — confirm in Phase 0).
 2. **`GET /users/me`** — fallback: `personal_organization_id` +
    deployment booleans if present on profile.
-3. **Build-time defaults** — optional `VITE_*` mirrors for Storybook overrides; never override live API values in production.
+3. **Build-time values** — `VITE_PERSONAL_ORGANIZATIONS` / `VITE_TEAM_ORGANIZATIONS`. While clinozy-be serves no
+   flags (sources 1 and 2 find none), these are what decides the mode, in every environment.
 
 **E2E matrix:** run Playwright with clinozy-be toggling `PERSONAL_ORGANIZATION_ENABLED` /
 `TEAM_ORGANIZATION_ENABLED` (scheduled workflow) or unit-test `deployment-mode.ts` with
@@ -187,15 +193,14 @@ Implement via `useOnboardingStore` step list derived from `deploymentMode` +
 
 ## Build-time vs runtime
 
-| Flag                | Runtime (API)                        | Build-time (optional override)                                     |
-| ------------------- | ------------------------------------ | ------------------------------------------------------------------ |
-| Org mode            | **Always** from `me/context`         | `VITE_PERSONAL_ORGANIZATIONS` / `VITE_TEAM_ORGANIZATIONS` when set |
-| Auth methods        | **Not from API** — env-only on FE    | `VITE_AUTH_*` per method / OAuth provider                          |
-| Org switcher chrome | Hidden at runtime when personal-only | Tree-shaking not required — conditional render is enough           |
+| Flag                | Runtime (API)                        | Build-time (optional override)                                       |
+| ------------------- | ------------------------------------ | -------------------------------------------------------------------- |
+| Org mode            | Not served by clinozy-be today       | `VITE_PERSONAL_ORGANIZATIONS` / `VITE_TEAM_ORGANIZATIONS` — set both |
+| Auth methods        | **Not from API** — env-only on FE    | `VITE_AUTH_*` per method / OAuth provider                            |
+| Org switcher chrome | Hidden at runtime when personal-only | Tree-shaking not required — conditional render is enough             |
 
-Do **not** fork separate production builds per mode unless product explicitly
-requires it; one bundle reading runtime capabilities is simpler and matches
-backend deployment toggles.
+One bundle per environment: until clinozy-be serves the capabilities, the mode is a build-time
+setting, so each environment's two variables must match its backend's toggles.
 
 ---
 
