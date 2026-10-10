@@ -27,7 +27,7 @@ export interface RolesNavigation {
  * The Roles page's moves (KICKOFF §6.12 Routes): the selected role lives in the
  * URL (`role`, its id; default Front desk), a member opens in their drawer with
  * the page kept behind it, and "Preview as" narrows the app to the role's codes
- * — any role but a locked one (Admin). A role that can't view Users is then taken to its first room by
+ * — any role but a locked one (Owner, Admin). A role that can't view Users is then taken to its first room by
  * the org layout (Q-U11).
  */
 export function useRolesNavigation(): RolesNavigation {

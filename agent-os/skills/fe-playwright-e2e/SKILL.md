@@ -77,20 +77,21 @@ signed in through `page.request` so a cold `page.goto` (a deep link) restores th
 
 ## File layout
 
-| File                               | Scope                                     |
-| ---------------------------------- | ----------------------------------------- |
-| `auth.e2e.test.ts`                 | Unified login, OAuth, guards, email OTP   |
-| `home.e2e.test.ts`                 | Landing on Today in the clinic shell      |
-| `clinic-rooms.e2e.test.ts`         | Launch smoke: every room, desktop + phone |
-| `clinic-dialog-routes.e2e.test.ts` | Dialog-route deep links (`S:115`)         |
-| `settings.e2e.test.ts`             | Hash modal `#settings/...`                |
-| `navigation.e2e.test.ts`           | 404, auth guards                          |
-| `organization.e2e.test.ts`         | Picker at `/organization`                 |
-| `notifications.e2e.test.ts`        | Notification center                       |
-| `org-switching.e2e.test.ts`        | Account menu › Switch clinic              |
-| `responsive.e2e.test.ts`           | 320px overflow                            |
-| `accessibility.e2e.test.ts`        | Axe WCAG gate                             |
-| `visual.e2e.test.ts`               | Screenshots (reduced motion)              |
+| File                               | Scope                                                              |
+| ---------------------------------- | ------------------------------------------------------------------ |
+| `auth.e2e.test.ts`                 | Unified login, OAuth, guards, email OTP                            |
+| `home.e2e.test.ts`                 | Landing on Today in the clinic shell                               |
+| `clinic-rooms.e2e.test.ts`         | Launch smoke: every room, desktop + phone                          |
+| `clinic-roles.e2e.test.ts`         | Role QA: four presets' rooms, homes and controls by code (View-as) |
+| `clinic-dialog-routes.e2e.test.ts` | Dialog-route deep links (`S:115`)                                  |
+| `settings.e2e.test.ts`             | Hash modal `#settings/...`                                         |
+| `navigation.e2e.test.ts`           | 404, auth guards                                                   |
+| `organization.e2e.test.ts`         | Picker at `/organization`                                          |
+| `notifications.e2e.test.ts`        | Notification center                                                |
+| `org-switching.e2e.test.ts`        | Account menu › Switch clinic                                       |
+| `responsive.e2e.test.ts`           | 320px overflow                                                     |
+| `accessibility.e2e.test.ts`        | Axe WCAG gate                                                      |
+| `visual.e2e.test.ts`               | Screenshots (reduced motion)                                       |
 
 ## Workflow (new spec)
 
@@ -244,7 +245,7 @@ await page.getByTestId('login-submit').click();
 
 | Resource          | Path                                      |
 | ----------------- | ----------------------------------------- |
-| Test IDs + naming | `agent-os/skills/fe-e2e-testids/SKILL.md`    |
+| Test IDs + naming | `agent-os/skills/fe-e2e-testids/SKILL.md` |
 | Hybrid helpers    | `tests/utils/e2e-hybrid.ts`               |
 | Auth helper       | `tests/utils/e2e-auth.ts`                 |
 | Config            | `playwright.config.ts`                    |
