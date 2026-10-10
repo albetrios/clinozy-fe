@@ -186,6 +186,24 @@ Paths drop `/api/v1`. "Gap Gn" points into §8, "Mn" into §9, "Qn" into §10.
 - **Gaps:** G3 (rooms and machines need pickers — Q9; staff names, initials and presence; the "P"
   badge has no patient number; "Plan ready" and reminder delivered / read per row).
 - **Gate:** `appointment:*`; photos `patient:update`; the Private album `patient:private_album:read`.
+- **Appointments room (D151, AS-BUILT #98):** built as above with these outcomes — the Agenda pages
+  by date and start, its day headers read `daily-counts` (confirmed, and Scheduled as "awaiting
+  reply"; the status, search and created filters do not narrow them), and Filters' calendar dots read
+  them too; Day, Week and Month read every page of their range; one doctor in the filter and the
+  picker, "All doctors" to go back; the team (`GET /app/memberships`) is who can be booked; each
+  status move is its route, Check in's Undo `undo-check-in`, Cancel's Undo `reinstate`; the form
+  books a contact (`who=<contact_id>`; a new person is `POST /app/contacts` first), a Copy that
+  changed nothing but the slot is `…/copy`, an edit is `PATCH` with `expected_updated_at` then the
+  tile's move; the grid shows the server's free starts on a 30 or 15 minute step and a closed day by
+  its reason (a holiday by name); "From offerings" reads `GET /app/offerings?category=treatment`;
+  the person's open lead is one chip (`GET /app/leads/:lead_id`). Removed: the multi-doctor and
+  follow-up filters, the per-day sort (G3); the plan pills and flag, reminder delivered / read (G3);
+  the package picker (§6 #20); the Lead radios (the server links the one open lead, A1); un-confirm
+  and the one-step complete; roles and presence on doctors (M41); struck-through taken slots and
+  "except this booking" (G3); "Not a patient yet" (the check-in opens the patient file). Visit
+  photos and the plan's suggestions wait for §5.4 (the image list has no viewable URL, B1); a
+  treatment's price waits for the rupee formatter (F10). Leads' "Book an appointment" and
+  "+ Appointment" are back. Leads and Appointments leave `FIXTURE_BACKED_CLINIC_MODULES`.
 
 ### 5.4 Patients and the patient file
 
@@ -451,6 +469,8 @@ around. "Doc" is the OpenAPI document.
 | M41 | Backend         | `GET /app/memberships` (the person picker) carries `role_ids` but no role names, and nobody can read another member's presence: the Leads team cards, people popover and Team filter show names only                                                                                                                                                                                                                                                                       |
 | M42 | Backend         | nothing on a contact says the person wrote in on Instagram, though an Instagram send needs their Instagram-scoped id (else it fails at delivery): the composer cannot hold Instagram back until they wrote in, as §5.2 planned — a send to a handle queues, then shows "Not sent" with the worker's reason                                                                                                                                                                 |
 | M43 | Backend         | `GET /app/branches/my` has no address, `maps_link` or `review_link` (only `GET /app/branches/:id`, `branch:read`), and the free slots need a booking length for `/app/appointments/slots`: the composer's templates fill in the clinic's name only                                                                                                                                                                                                                         |
+| M44 | OpenAPI         | `GET /app/appointments/slots` and `GET /app/appointments/daily-counts` have no 200 body in the document (`data` is `{ [key: string]: unknown }`), though the routes answer `{appointment_date, is_open, closed_reason, closed_label, slots[{start_time, end_time}]}` and `[{appointment_date, total, by_status}]`; the client parses the routes' descriptions (no generated type)                                                                                          |
+| M45 | Backend         | `POST /app/appointments/:appointment_id/undo-check-in` always sets `confirmed`, so undoing the check-in of a Scheduled booking leaves it Confirmed — an Undo should put back the status it had (e.g. `scheduled` when it was never confirmed)                                                                                                                                                                                                                              |
 
 ## 10. Open questions
 
