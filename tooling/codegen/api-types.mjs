@@ -63,13 +63,17 @@ export function resolveSource(argv, env) {
   return join(backendDir, 'docs/openapi/openapi.json');
 }
 
-/** A deep copy of `node` without its prose keys. */
-export function stripProse(node) {
-  if (Array.isArray(node)) return node.map(stripProse);
+/**
+ * A deep copy of `node` without its prose keys. A `properties` map's keys are field names, not
+ * keywords: a field called `description` (an offering's, a plan's) is kept.
+ */
+export function stripProse(node, isNameMap = false) {
+  if (Array.isArray(node)) return node.map((item) => stripProse(item));
   if (node === null || typeof node !== 'object') return node;
   const copy = {};
   for (const [key, value] of Object.entries(node)) {
-    if (!PROSE_KEYS.has(key)) copy[key] = stripProse(value);
+    if (isNameMap) copy[key] = stripProse(value);
+    else if (!PROSE_KEYS.has(key)) copy[key] = stripProse(value, key === 'properties');
   }
   return copy;
 }

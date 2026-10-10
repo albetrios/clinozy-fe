@@ -60,6 +60,23 @@ describe('api-types: stripProse', () => {
       },
     });
   });
+
+  it('keeps a field named description or example — a properties map holds names', () => {
+    const stripped = stripProse({
+      type: 'object',
+      properties: {
+        description: { type: 'string', description: 'what the offering is' },
+        example: { type: 'object', properties: { description: { type: 'string' } } },
+      },
+    });
+    assert.deepEqual(stripped, {
+      type: 'object',
+      properties: {
+        description: { type: 'string' },
+        example: { type: 'object', properties: { description: { type: 'string' } } },
+      },
+    });
+  });
 });
 
 describe('api-types: shareErrorResponses', () => {
