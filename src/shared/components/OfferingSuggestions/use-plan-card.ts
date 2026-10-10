@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
+import { paiseOfRupees, rupeesOfPaise } from '@/lib/number-text.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
 import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
@@ -57,9 +58,6 @@ const CHANNEL_TONES: Readonly<Record<PlanActivityRow['channel'], Tone>> = {
   instagram: 'blush',
   call: 'sky',
 };
-
-/** The API's rupees in the card's unit, paise — the formatter's and the price box's. */
-const paiseOf = (rupees: number) => Math.round(rupees * 100);
 
 /** What the host says about where the card sits. */
 export interface PlanCardHost {
@@ -119,10 +117,10 @@ const categoryOf = (
 /** One unit's list and lowest price, as the details tooltip reads them (the lowest only when served). */
 function pricesText(f: Formatters, offering: PlanOffering | undefined): string[] {
   if (!offering) return [];
-  const list = f.t(KEYS.info.list, { price: f.money(paiseOf(offering.price)) });
+  const list = f.t(KEYS.info.list, { price: f.money(paiseOfRupees(offering.price)) });
   const { minPrice } = offering;
   if (minPrice === null || minPrice <= 0 || minPrice >= offering.price) return [list];
-  return [list, f.t(KEYS.info.lowest, { price: f.money(paiseOf(minPrice)) })];
+  return [list, f.t(KEYS.info.lowest, { price: f.money(paiseOfRupees(minPrice)) })];
 }
 
 function lineOf(
@@ -145,8 +143,8 @@ function lineOf(
       .filter(Boolean)
       .join(' · '),
     qty: row.quantity,
-    price: row.price === null ? null : paiseOf(row.price),
-    listPrice: offering ? paiseOf(billedPrice(offering)) : 0,
+    price: row.price === null ? null : paiseOfRupees(row.price),
+    listPrice: offering ? paiseOfRupees(billedPrice(offering)) : 0,
     status: row.status,
     invoicedQty: row.invoicedQuantity,
     fullyInvoiced: row.isFullyInvoiced,
@@ -175,7 +173,7 @@ function ideaOf(idea: PlanIdeaRow, f: Formatters): SuggestionIdea {
     ]
       .filter(Boolean)
       .join(' · '),
-    listPrice: paiseOf(idea.price),
+    listPrice: paiseOfRupees(idea.price),
   };
 }
 
@@ -237,7 +235,7 @@ function changeOf(patch: SuggestionPatch): SuggestionChange {
   return {
     ...(patch.qty !== undefined && { quantity: patch.qty }),
     ...(patch.price !== undefined && {
-      price: patch.price === null ? null : patch.price / 100,
+      price: patch.price === null ? null : rupeesOfPaise(patch.price),
     }),
     ...(patch.status !== undefined && { status: patch.status }),
   };
@@ -247,7 +245,7 @@ function changeOf(patch: SuggestionPatch): SuggestionChange {
 function minPriceText(f: Formatters, offering: PlanOffering): string {
   const { minPrice } = offering;
   if (minPrice === null || minPrice <= 0 || minPrice >= offering.price) return '';
-  return f.t(KEYS.minPrice, { price: f.money(paiseOf(minPrice)) });
+  return f.t(KEYS.minPrice, { price: f.money(paiseOfRupees(minPrice)) });
 }
 
 /**
@@ -272,7 +270,7 @@ function offeringOptionsOf(
       ]
         .filter(Boolean)
         .join(' · '),
-      meta: f.money(paiseOf(offering.price)),
+      meta: f.money(paiseOfRupees(offering.price)),
       group: categoryOf(f.t, offering),
       tone: OFFERING_CATEGORY_TONES[offering.category],
       disabled: held.has(offering.id),
@@ -385,7 +383,7 @@ export function usePlanCard(host: PlanCardHost): PlanCard {
       lines: data.suggestions.map((row) =>
         lineOf(row, byOffering.get(row.offeringId), memberOf(row), f),
       ),
-      total: paiseOf(data.planTotal),
+      total: paiseOfRupees(data.planTotal),
       ideas: (ideas.data ?? []).map((idea) => ideaOf(idea, f)),
       purchases: (purchases.data ?? []).map((row) =>
         purchaseOf(row, byOffering.get(row.offeringId), f),

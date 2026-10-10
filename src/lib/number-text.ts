@@ -9,6 +9,19 @@
 export const MONEY_SCALE = 100;
 
 /**
+ * Rupees as clinozy-be sends them (a JSON number with two places) → whole paise, the unit the
+ * money formatter and the number fields work in; rounded, so `0.1 + 0.2` rupees is 30 paise.
+ */
+export function paiseOfRupees(rupees: number): number {
+  return Math.round(rupees * MONEY_SCALE);
+}
+
+/** Whole paise from a money field → rupees with two places, as clinozy-be takes them. */
+export function rupeesOfPaise(paise: number): number {
+  return Math.round(paise) / MONEY_SCALE;
+}
+
+/**
  * Keeps what a number cell can hold: digits and, when it takes `decimals`,
  * one point with at most that many digits after it. Anything else typed or
  * pasted ("₹", spaces, a second point) is dropped.

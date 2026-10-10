@@ -5,6 +5,8 @@ import {
   clampNumber,
   MONEY_SCALE,
   numberFromText,
+  paiseOfRupees,
+  rupeesOfPaise,
   sanitizeNumberText,
   textFromNumber,
 } from './number-text.ts';
@@ -75,5 +77,19 @@ describe('cellNumber and clampNumber', () => {
     expect(clampNumber(0, 1, 999)).toBe(1);
     expect(clampNumber(1200, 1, 999)).toBe(999);
     expect(clampNumber(40, 1, 999)).toBe(40);
+  });
+});
+
+describe('paiseOfRupees / rupeesOfPaise — clinozy-be’s rupees and the fields’ paise', () => {
+  it('turns two-place rupees into whole paise, rounding the float', () => {
+    expect(paiseOfRupees(4800.5)).toBe(480050);
+    expect(paiseOfRupees(0.1 + 0.2)).toBe(30);
+    expect(paiseOfRupees(-12.34)).toBe(-1234);
+  });
+
+  it('turns whole paise back into rupees with two places', () => {
+    expect(rupeesOfPaise(480050)).toBeCloseTo(4800.5, 2);
+    expect(rupeesOfPaise(30)).toBeCloseTo(0.3, 2);
+    expect(rupeesOfPaise(1234.4)).toBeCloseTo(12.34, 2);
   });
 });

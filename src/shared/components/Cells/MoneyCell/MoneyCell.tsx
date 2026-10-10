@@ -1,15 +1,28 @@
 import type { ComponentProps } from 'react';
 
+import { paiseOfRupees } from '@/lib/number-text.ts';
 import { cn } from '@/lib/utils.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 
-/** Props for {@link MoneyCell}: an amount in paise, optionally signed. */
-export interface MoneyCellProps extends Omit<ComponentProps<'span'>, 'children'> {
-  /** The amount in integer paise, as the contract carries money (S:4). */
-  paise: number;
-  /** Prefix a positive amount with "+" (ledgers that show the direction). */
-  signed?: boolean;
-}
+/** The amount a {@link MoneyCell} shows: clinozy-be's rupees, or a fixture room's paise. */
+type MoneyCellAmount =
+  | {
+      /** Rupees as clinozy-be sends them (two places) — the rooms on the API (D148 Q10). */
+      rupees: number;
+      paise?: never;
+    }
+  | {
+      /** Integer paise — the rooms still on fixtures, until they move (S:4). */
+      paise: number;
+      rupees?: never;
+    };
+
+/** Props for {@link MoneyCell}: an amount, optionally signed. */
+export type MoneyCellProps = Omit<ComponentProps<'span'>, 'children'> &
+  MoneyCellAmount & {
+    /** Prefix a positive amount with "+" (ledgers that show the direction). */
+    signed?: boolean;
+  };
 
 /**
  * The money cell: ₹ in the user's format locale (Indian grouping on `en-IN`),
@@ -18,19 +31,21 @@ export interface MoneyCellProps extends Omit<ComponentProps<'span'>, 'children'>
  */
 export function MoneyCell({
   paise,
+  rupees,
   signed = false,
   className,
   ...props
 }: MoneyCellProps) {
   const formatPaise = usePaiseFormat();
-  const amount = formatPaise(paise);
+  const minor = rupees === undefined ? paise : paiseOfRupees(rupees);
+  const amount = formatPaise(minor);
   return (
     <span
       data-slot="money"
       className={cn('whitespace-nowrap tabular-nums', className)}
       {...props}
     >
-      {signed && paise > 0 ? `+${amount}` : amount}
+      {signed && minor > 0 ? `+${amount}` : amount}
     </span>
   );
 }

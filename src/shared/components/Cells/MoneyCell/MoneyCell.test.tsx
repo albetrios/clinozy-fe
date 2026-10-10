@@ -22,6 +22,11 @@ describe('MoneyCell', () => {
     expect(cell).toHaveAttribute('data-slot', 'money');
   });
 
+  it('shows clinozy-be’s rupees as the same amount in paise would show', () => {
+    render(<MoneyCell rupees={2399.5} signed />);
+    expect(screen.getByText('+₹2,399.50')).toBeInTheDocument();
+  });
+
   it('keeps paise when there are some', () => {
     render(<MoneyCell paise={239950} />);
     expect(screen.getByText('₹2,399.50')).toBeInTheDocument();
