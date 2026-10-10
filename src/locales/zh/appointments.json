@@ -46,7 +46,6 @@
     "dayBooked_other": "{{date}} · 已预约 {{count}} 个",
     "appointedTo": "负责人",
     "allDoctors": "所有医生",
-    "doctors_other": "{{count}} 位医生",
     "searchTeam": "搜索团队",
     "showAll": "显示全部",
     "done": "完成",
@@ -85,10 +84,6 @@
       "hint": "{{confirmed}} · {{waiting}}"
     },
     "latest": {
-      "planReady": "✓ 方案已就绪",
-      "planPending": "○ 方案待定",
-      "reminderRead": "✓ 提醒已读",
-      "reminderDelivered": "✓ 提醒已送达",
       "reminderSent": "✓ 提醒已发送",
       "repliedYes": "✓ 已回复“是”",
       "moved": "✓ 已改期",
@@ -96,10 +91,6 @@
       "checkedIn": "✓ 已签到"
     },
     "latestHints": {
-      "planReady": "服务建议中有 {{suggestions}} 项",
-      "planPending": "打开预约并添加服务建议",
-      "reminderRead": "提醒已在 WhatsApp 上读取",
-      "reminderDelivered": "提醒已送达",
       "reminderSent": "提醒已发送",
       "repliedYes": "通过 WhatsApp 回复“是”自动确认",
       "moved": "从 {{day}} {{time}} 改期",

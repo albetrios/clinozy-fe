@@ -16,7 +16,8 @@ import {
 /*
  * The person on clinozy-be (`/app/contacts`, api-integration §3): one read with every number, a
  * search, and a change that carries the read's `updated_at` (a stale one is
- * `409 record_changed`). A new person is created with their lead (`POST /app/leads`).
+ * `409 record_changed`). A new person is created with their lead (`POST /app/leads`), or on
+ * their own before a booking (`POST /app/contacts`).
  */
 
 /** TanStack Query keys for contacts, each carrying the organization. */
@@ -82,6 +83,24 @@ export async function searchContacts(typed: string): Promise<ContactSummary[]> {
   const q = typed.trim();
   if (!isContactSearchable(q)) return [];
   return listContacts({ q, limit: SEARCH_LIMIT });
+}
+
+/**
+ * A new person (`POST /app/contacts`) — what a booking for someone the search did not find
+ * points at; `409 contact_phone_exists` when the number is someone else's.
+ */
+export async function createContact({
+  fields,
+  idempotencyKey,
+}: {
+  fields: ContactFields;
+  idempotencyKey: string;
+}): Promise<Contact> {
+  const response = await api.post('/app/contacts', {
+    body: contactBodyOf(fields),
+    idempotencyKey,
+  });
+  return toContact(contactWire.parse(response.data));
 }
 
 /** A change to a contact, refused (`409 record_changed`) when it changed since `expectedUpdatedAt`. */

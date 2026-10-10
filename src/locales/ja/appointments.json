@@ -46,7 +46,6 @@
     "dayBooked_other": "{{date}} · 予約 {{count}} 件",
     "appointedTo": "担当者",
     "allDoctors": "すべての医師",
-    "doctors_other": "医師 {{count}} 名",
     "searchTeam": "チームを検索",
     "showAll": "すべて表示",
     "done": "完了",
@@ -85,10 +84,6 @@
       "hint": "{{confirmed}} · {{waiting}}"
     },
     "latest": {
-      "planReady": "✓ プラン準備完了",
-      "planPending": "○ プラン未作成",
-      "reminderRead": "✓ リマインダー既読",
-      "reminderDelivered": "✓ リマインダー配信済み",
       "reminderSent": "✓ リマインダー送信済み",
       "repliedYes": "✓ 「はい」と返信",
       "moved": "✓ 日時変更済み",
@@ -96,10 +91,6 @@
       "checkedIn": "✓ 受付済み"
     },
     "latestHints": {
-      "planReady": "サービス提案に {{suggestions}} 件",
-      "planPending": "予約を開いてサービス提案を追加してください",
-      "reminderRead": "WhatsApp でリマインダーが既読になりました",
-      "reminderDelivered": "リマインダーが配信されました",
       "reminderSent": "リマインダーを送信しました",
       "repliedYes": "WhatsApp の「はい」の返信で自動的に確認済み",
       "moved": "{{day}} {{time}} から変更",

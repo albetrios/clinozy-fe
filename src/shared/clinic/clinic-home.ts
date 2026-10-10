@@ -3,7 +3,7 @@ import { isModuleEnabled } from '@/core/security/gates/require-module.ts';
 import {
   clinicRolesForMember,
   fetchClinicAccessMatrix,
-  resolveClinicAccess,
+  resolveMemberClinicAccess,
 } from '@/shared/api/clinic/access-api.ts';
 import {
   type ClinicRoleKey,
@@ -61,8 +61,9 @@ export function clinicHomeSection(
 /**
  * The signed-in member's home route in this organization — the org index and
  * an unknown in-org path send them here (`S:115`). Uses the access in force —
- * their staff profile's roles, View-as included, the Users room by their
- * clinozy-be codes (D17) — and the deployment's enabled modules; null when no
+ * `resolveMemberClinicAccess`: a room on clinozy-be by their codes, a room on
+ * fixtures by their staff profile's roles, View-as included — and the
+ * deployment's enabled modules; null when no
  * clinic room is open, and the org home shows its "nothing is switched on"
  * state instead (L-63).
  */
@@ -76,11 +77,12 @@ export async function clinicHomeRoute(organizationSlug: string) {
         staffRoles: (await fetchMyStaffProfile(email))?.roleKeys ?? null,
         permissions,
       });
-  const access = resolveClinicAccess(
-    await fetchClinicAccessMatrix(),
-    roles,
-    previewRole ? {} : { platformCodes: permissions },
-  );
+  const access = resolveMemberClinicAccess({
+    matrix: await fetchClinicAccessMatrix(),
+    roleKeys: roles,
+    permissions,
+    previewing: Boolean(previewRole),
+  });
   const section = clinicHomeSection(
     roles,
     (candidate) =>

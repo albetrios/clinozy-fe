@@ -3,8 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   allowedNext,
   APPOINTMENT_FLOW,
-  APPOINTMENT_STATUS_EFFECTS,
-  type AppointmentFormCancelReason,
+  APPOINTMENT_FORM_CANCEL_REASONS,
   type AppointmentGuardSubject,
   type AppointmentMove,
   appointmentMoveOptions,
@@ -273,18 +272,38 @@ describe('formTiles (the form’s Visit status, H:6038)', () => {
     expect(steps(list)).toEqual(['current', 'upcoming', 'upcoming', 'upcoming']);
   });
 
-  it('offers only Scheduled and Confirmed on other days', () => {
-    const list = tiles({ saved: 'confirmed', date: TOMORROW });
+  it('offers Scheduled and Confirmed on other days', () => {
+    const list = tiles({ saved: 'scheduled', date: TOMORROW });
     expect(pickable(list)).toEqual(['scheduled', 'confirmed']);
     expect(reasons(list)).toMatchObject({
+      checked_in: 'visit_day',
+      completed: 'after_check_in',
+    });
+  });
+
+  it('never steps a Confirmed booking back to Scheduled — there is no un-confirm', () => {
+    const list = tiles({ saved: 'confirmed', date: TOMORROW });
+    expect(pickable(list)).toEqual(['confirmed']);
+    expect(reasons(list)).toMatchObject({
+      scheduled: 'booked',
       checked_in: 'visit_day',
       completed: 'after_check_in',
     });
     expect(steps(list)).toEqual(['done', 'current', 'upcoming', 'upcoming']);
   });
 
-  it('offers Checked in and Completed after check-in — the draft’s, like the prototype', () => {
+  it('offers from the saved status, not the draft — a check-in picked is not yet a visit to complete', () => {
     const list = tiles({ saved: 'confirmed', draft: 'checked_in' });
+    expect(pickable(list)).toEqual(['confirmed', 'checked_in']);
+    expect(reasons(list)).toMatchObject({
+      scheduled: 'booked',
+      completed: 'after_check_in',
+    });
+    expect(steps(list)).toEqual(['done', 'done', 'current', 'upcoming']);
+  });
+
+  it('offers Checked in and Completed once checked in', () => {
+    const list = tiles({ saved: 'checked_in', date: YESTERDAY });
     expect(pickable(list)).toEqual(['checked_in', 'completed']);
     expect(reasons(list)).toMatchObject({ scheduled: 'booked', confirmed: 'said_yes' });
     expect(steps(list)).toEqual(['done', 'done', 'current', 'upcoming']);
@@ -347,34 +366,41 @@ describe('formStatusGuard (a form save that changes the status)', () => {
     overrides: Partial<typeof context> = {},
   ) => formStatusGuard(saved, next, { ...context, ...overrides });
 
-  it('keeps the saved status and confirms or un-confirms before arrival', () => {
+  it('keeps the saved status, and confirms a Scheduled booking — never back', () => {
     for (const status of APPOINTMENT_STATUS_VALUES) {
       expect(verdict(status, status).allowed).toBe(true);
     }
-    expect(verdict('scheduled', 'confirmed').allowed).toBe(true);
-    expect(verdict('confirmed', 'scheduled', { date: TOMORROW }).allowed).toBe(true);
-    expect(verdict('checked_in', 'scheduled')).toEqual({
-      allowed: false,
-      reason: 'not_allowed',
-    });
+    expect(verdict('scheduled', 'confirmed', { date: TOMORROW }).allowed).toBe(true);
+    for (const saved of ['confirmed', 'checked_in'] as const) {
+      expect(verdict(saved, 'scheduled', { date: TOMORROW })).toEqual({
+        allowed: false,
+        reason: 'not_allowed',
+      });
+    }
+    expect(verdict('checked_in', 'confirmed').reason).toBe('not_allowed');
   });
 
-  it('checks in on the visit day and completes after check-in, patients only', () => {
+  it('checks a Scheduled or Confirmed booking in on the visit day only', () => {
+    expect(verdict('scheduled', 'checked_in').allowed).toBe(true);
     expect(verdict('confirmed', 'checked_in').allowed).toBe(true);
     expect(verdict('confirmed', 'checked_in', { date: TOMORROW })).toEqual({
       allowed: false,
       reason: 'visit_day',
     });
+  });
+
+  it('completes only a checked-in patient’s visit — there is no one-step complete', () => {
     expect(verdict('checked_in', 'completed', { date: YESTERDAY }).allowed).toBe(true);
-    expect(verdict('scheduled', 'completed').allowed).toBe(true);
-    expect(verdict('scheduled', 'completed', { date: TOMORROW })).toEqual({
-      allowed: false,
-      reason: 'visit_day',
-    });
     expect(verdict('checked_in', 'completed', { isPatient: false })).toEqual({
       allowed: false,
       reason: 'needs_patient',
     });
+    for (const saved of ['scheduled', 'confirmed'] as const) {
+      expect(verdict(saved, 'completed')).toEqual({
+        allowed: false,
+        reason: 'not_allowed',
+      });
+    }
   });
 
   it('never cancels or marks a no-show through an edit, and moves nothing out of a final status', () => {
@@ -397,49 +423,49 @@ describe('cancel reasons (D32, A-A3)', () => {
     ]);
   });
 
-  it('stores the form’s reasons as the contract’s, the extras as Other with their label', () => {
-    const stored = (reason: AppointmentFormCancelReason) =>
-      cancelReasonToContract(reason, {
-        note: 'Out of town',
-        label: `Label of ${reason}`,
-      });
-    expect(stored('patient_cancelled')).toEqual({ reason: 'patient_asked', note: null });
-    expect(stored('doctor_unavailable')).toEqual({
-      reason: 'doctor_unavailable',
+  it('stores Patient cancelled as the API’s patient_asked, and the form’s other reasons as they are', () => {
+    expect(cancelReasonToContract('patient_cancelled', 'Out of town')).toEqual({
+      reason: 'patient_asked',
       note: null,
     });
-    expect(stored('rescheduling_later')).toEqual({
+    for (const reason of [
+      'rescheduling_later',
+      'doctor_unavailable',
+      'booked_by_mistake',
+    ] as const) {
+      expect(cancelReasonToContract(reason, 'Out of town')).toEqual({
+        reason,
+        note: null,
+      });
+    }
+  });
+
+  it('keeps the member’s note on Other, trimmed — a blank one is no note', () => {
+    expect(cancelReasonToContract('other', '  Out of town ')).toEqual({
       reason: 'other',
-      note: 'Label of rescheduling_later',
+      note: 'Out of town',
     });
-    expect(stored('booked_by_mistake')).toEqual({
+    expect(cancelReasonToContract('other', '  ')).toEqual({
       reason: 'other',
-      note: 'Label of booked_by_mistake',
+      note: null,
     });
-    expect(stored('other')).toEqual({ reason: 'other', note: 'Out of town' });
-    expect(cancelReasonToContract('other', { note: '  ', label: 'Other' })).toEqual({
+    expect(cancelReasonToContract('other', null)).toEqual({
       reason: 'other',
       note: null,
     });
   });
-});
 
-describe('APPOINTMENT_STATUS_EFFECTS (KICKOFF §6.4 Side effects)', () => {
-  it('names every status’s effects', () => {
-    expect(Object.keys(APPOINTMENT_STATUS_EFFECTS).sort()).toEqual(
-      [...APPOINTMENT_STATUS_VALUES].sort(),
-    );
-    expect(APPOINTMENT_STATUS_EFFECTS.scheduled).toContain('confirmTask');
-    expect(APPOINTMENT_STATUS_EFFECTS.no_show).toEqual(['noShowTask']);
-    expect(APPOINTMENT_STATUS_EFFECTS.completed).toEqual([
-      'completeStamp',
-      'leadsVisited',
-      'feedbackTask',
-    ]);
-    expect(APPOINTMENT_STATUS_EFFECTS.checked_in).toContain('leadsVisited');
-    expect(APPOINTMENT_STATUS_EFFECTS.cancelled).toEqual([
-      'releaseSlot',
-      'stopReminders',
+  it('maps each of the form’s five reasons', () => {
+    expect(
+      APPOINTMENT_FORM_CANCEL_REASONS.map(
+        (reason) => cancelReasonToContract(reason, null).reason,
+      ),
+    ).toEqual([
+      'patient_asked',
+      'rescheduling_later',
+      'doctor_unavailable',
+      'booked_by_mistake',
+      'other',
     ]);
   });
 });

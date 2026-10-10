@@ -1,9 +1,9 @@
 /**
  * How the Appointments room paints and words a booking (KICKOFF §6.4): the
  * person's avatar tone, the Agenda's day-group words and tone, and the
- * "Latest update" pills. Pure — every view (Agenda, the card, the calendar
- * blocks) reads these, and the tests pin them. The doctor's name and the
- * service tone are shared with the appointment form
+ * "Latest update" pill. Pure — every view (Agenda, the card, the calendar
+ * blocks) reads these, and the tests pin them. The service tone and the
+ * contact card are shared with the appointment form
  * (`@/shared/clinic/appointment-display.ts`).
  */
 import type {
@@ -93,12 +93,12 @@ export function agendaGroupLabel(
 
 // ── "Latest update" ──
 
-/** One "Latest update" pill: what it says and its tone. */
+/**
+ * One "Latest update" pill: what it says and its tone — the reminder the
+ * server sent, a WhatsApp "Yes", a move, a check-in. The plan pills and the
+ * reminder's delivered / read went with the backend (G3).
+ */
 export type LatestUpdate =
-  | { kind: 'planReady'; tone: 'sage'; suggestions: number }
-  | { kind: 'planPending'; tone: 'butter' }
-  | { kind: 'reminderRead'; tone: 'sage' }
-  | { kind: 'reminderDelivered'; tone: 'sky' }
   | { kind: 'reminderSent'; tone: 'stone' }
   | { kind: 'repliedYes'; tone: 'lav' }
   | { kind: 'moved'; tone: 'butter'; times: number; from: string | null }
@@ -107,11 +107,7 @@ export type LatestUpdate =
 /** The events a booking has had, oldest to newest — the last is its latest (H:5971). */
 function bookingEvents(appointment: AppointmentRow): LatestUpdate[] {
   const events: LatestUpdate[] = [];
-  if (appointment.reminder === 'read')
-    events.push({ kind: 'reminderRead', tone: 'sage' });
-  else if (appointment.reminder === 'delivered') {
-    events.push({ kind: 'reminderDelivered', tone: 'sky' });
-  } else if (appointment.reminder === 'sent') {
+  if (appointment.reminder === 'reminder_sent') {
     events.push({ kind: 'reminderSent', tone: 'stone' });
   }
   if (appointment.repliedYes && appointment.status === 'confirmed') {
@@ -132,30 +128,10 @@ function bookingEvents(appointment: AppointmentRow): LatestUpdate[] {
 }
 
 /**
- * The booking's latest event alone — the card's "last update" line; `null`
- * is "No update yet".
+ * The booking's latest event (H:5971) — the Agenda's "Latest update" pill and
+ * the card's "last update" line: "Reminder sent", "Replied Yes", "Moved" (×n)
+ * or "Checked in"; `null` is "—" in the Agenda, "No update yet" on the card.
  */
 export function latestEvent(appointment: AppointmentRow): LatestUpdate | null {
   return bookingEvents(appointment).at(-1) ?? null;
-}
-
-/**
- * The Agenda's "Latest update" pills (H:5971): the plan's — "✓ Plan ready"
- * once this visit has offering suggestions, else "○ Plan pending" — unless
- * the booking is Cancelled or No show, then its latest event: a reminder read
- * / delivered / sent, "Replied Yes", "Moved" (×n) or "Checked in". None → "—".
- */
-export function latestUpdates(appointment: AppointmentRow): LatestUpdate[] {
-  const pills: LatestUpdate[] = [];
-  const closed = appointment.status === 'cancelled' || appointment.status === 'no_show';
-  if (!closed) {
-    pills.push(
-      appointment.plan.visit > 0
-        ? { kind: 'planReady', tone: 'sage', suggestions: appointment.plan.patient }
-        : { kind: 'planPending', tone: 'butter' },
-    );
-  }
-  const latest = latestEvent(appointment);
-  if (latest) pills.push(latest);
-  return pills;
 }

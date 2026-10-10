@@ -2,7 +2,12 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
+import {
+  APPOINTMENT_NOW,
+  appointmentRow,
+  contactHit,
+  DOCTOR_NISHA,
+} from '@/tests/utils/appointment-doubles.ts';
 
 import {
   APPOINTMENTS_PAGE,
@@ -37,6 +42,9 @@ describe('isCurrentPeriod', () => {
   });
 });
 
+const WHO = contactHit().id;
+const BOOKING = appointmentRow().id;
+
 /** Buttons for each move the hook makes. */
 function Probe() {
   const navigation = useAppointmentsNavigation();
@@ -58,13 +66,25 @@ function Probe() {
       >
         create
       </button>
+      <button
+        type="button"
+        onClick={() => navigation.openCreate({ who: WHO, copyOf: BOOKING })}
+      >
+        copy
+      </button>
+      <button
+        type="button"
+        onClick={() => navigation.openAppointment(BOOKING, 'reschedule')}
+      >
+        reschedule
+      </button>
     </>
   );
 }
 
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] });
-  vi.setSystemTime(new Date(clinicInstant('2026-10-03', '10:00')));
+  vi.setSystemTime(APPOINTMENT_NOW);
 });
 afterEach(() => vi.useRealTimers());
 
@@ -102,20 +122,45 @@ describe('useAppointmentsNavigation', () => {
     );
   });
 
-  it('opens New appointment with the prefill, the page’s params kept', async () => {
+  it('opens New appointment with the prefill, the page’s params — its one doctor — kept', async () => {
     const user = userEvent.setup();
     const { router } = renderAppointmentsRoutes(
-      `${APPOINTMENTS_PAGE}?view=day&doctor=${'0'.repeat(8)}-0000-4000-8000-000000000009`,
+      `${APPOINTMENTS_PAGE}?view=day&doctor=${DOCTOR_NISHA.id}`,
       Probe,
     );
     await user.click(await screen.findByRole('button', { name: 'create' }));
     await waitFor(() =>
       expect(router.state.location.pathname).toBe(`${APPOINTMENTS_PAGE}/create`),
     );
-    expect(router.state.location.search).toMatchObject({
+    expect(router.state.location.search).toEqual({
       view: 'day',
+      doctor: DOCTOR_NISHA.id,
       date: '2026-10-09',
       time: '10:15',
     });
+  });
+
+  it('carries the contact and the booking copied by their public ids', async () => {
+    const user = userEvent.setup();
+    const { router } = renderAppointmentsRoutes(`${APPOINTMENTS_PAGE}?status=all`, Probe);
+    await user.click(await screen.findByRole('button', { name: 'copy' }));
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe(`${APPOINTMENTS_PAGE}/create`),
+    );
+    expect(router.state.location.search).toEqual({
+      status: 'all',
+      who: WHO,
+      copyOf: BOOKING,
+    });
+  });
+
+  it('opens a booking’s drawer in Reschedule, the page’s params kept', async () => {
+    const user = userEvent.setup();
+    const { router } = renderAppointmentsRoutes(`${APPOINTMENTS_PAGE}?view=month`, Probe);
+    await user.click(await screen.findByRole('button', { name: 'reschedule' }));
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe(`${APPOINTMENTS_PAGE}/${BOOKING}`),
+    );
+    expect(router.state.location.search).toEqual({ view: 'month', mode: 'reschedule' });
   });
 });

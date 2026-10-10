@@ -1,13 +1,15 @@
-import type {
-  AppointmentDaySummary,
-  AppointmentRow,
-  AppointmentView,
+import {
+  APPOINTMENT_COUNTS_MAX_DAYS,
+  type AppointmentDayCount,
+  type AppointmentRow,
+  type AppointmentView,
 } from './appointments-contracts.ts';
 import { addCivilDays, civilMonthStart } from './clinic-time.ts';
 
 /*
- * What each view reads (KICKOFF §6.4): the Agenda pages from today on and
- * groups its rows by day; Day, Week and Month read the range they show. Pure.
+ * What each view reads (KICKOFF §6.4): the Agenda pages from today on, groups
+ * its rows by day and reads the day counts for the days it has loaded; Day,
+ * Week and Month read the range they show. Pure.
  */
 
 /** A calendar view — every view but the Agenda. */
@@ -57,7 +59,7 @@ export function monthCells(anchor: string): (string | null)[] {
 }
 
 /**
- * The days a calendar view reads (`listAppointmentsRange`) around its anchor
+ * The days a calendar view reads (`fetchAppointmentRange`) around its anchor
  * date: Day the date; Week Sunday to Saturday; Month the calendar month (the
  * board leaves the cells around it blank).
  */
@@ -77,41 +79,46 @@ export function appointmentViewRange(
 export interface AppointmentDayGroup {
   date: string;
   rows: AppointmentRow[];
-  /** The day's counts across every page (Appendix F) — the loaded rows' when the summary is not in yet. */
-  summary: AppointmentDaySummary;
+  /** The day's counts from the server (`daily-counts`); none while they are not in. */
+  counts: AppointmentDayCount | undefined;
 }
 
 /**
  * The Agenda's day groups (the sticky headers): the loaded rows by day in the
- * read's order, each with the day's counts from the per-day summary — a day
- * can straddle two cursor pages, so its header never counts only the rows
- * loaded so far.
+ * read's order, each with its day's counts from `GET /app/appointments/daily-counts`
+ * — a day can straddle two cursor pages, and the counts ignore the status,
+ * search and created filters, so a header never counts the loaded rows itself.
  */
 export function groupAppointmentsByDay(
   rows: readonly AppointmentRow[],
-  summaries: readonly AppointmentDaySummary[] = [],
+  counts: readonly AppointmentDayCount[] = [],
 ): AppointmentDayGroup[] {
-  const counted = new Map(summaries.map((summary) => [summary.date, summary]));
+  const counted = new Map(counts.map((day) => [day.date, day]));
   const groups: AppointmentDayGroup[] = [];
   for (const row of rows) {
     let group = groups.at(-1);
     if (group?.date !== row.date) {
-      group = {
-        date: row.date,
-        rows: [],
-        summary: { date: row.date, total: 0, confirmed: 0, scheduled: 0 },
-      };
+      group = { date: row.date, rows: [], counts: counted.get(row.date) };
       groups.push(group);
     }
     group.rows.push(row);
   }
-  for (const group of groups) {
-    group.summary = counted.get(group.date) ?? {
-      date: group.date,
-      total: group.rows.length,
-      confirmed: group.rows.filter((row) => row.status === 'confirmed').length,
-      scheduled: group.rows.filter((row) => row.status === 'scheduled').length,
-    };
-  }
   return groups;
+}
+
+/**
+ * The days the Agenda's day counts cover: the one day picked in Filters, else
+ * the loaded rows' first day to their last — at most 62 days (the read's cap;
+ * a later day's header shows no counts); none before a row has loaded.
+ */
+export function agendaCountsWindow(
+  rows: readonly Pick<AppointmentRow, 'date'>[],
+  date?: string,
+): { from: string; to: string } | null {
+  if (date) return { from: date, to: date };
+  const first = rows[0]?.date;
+  const last = rows.at(-1)?.date;
+  if (!(first && last)) return null;
+  const cap = addCivilDays(first, APPOINTMENT_COUNTS_MAX_DAYS - 1);
+  return { from: first, to: last < cap ? last : cap };
 }

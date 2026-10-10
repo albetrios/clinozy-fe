@@ -47,8 +47,6 @@
     "dayBooked_other": "{{date}} · {{count}} gebucht",
     "appointedTo": "Zugewiesen an",
     "allDoctors": "Alle Ärzte",
-    "doctors_one": "{{count}} Arzt",
-    "doctors_other": "{{count}} Ärzte",
     "searchTeam": "Team durchsuchen",
     "showAll": "Alle anzeigen",
     "done": "Fertig",
@@ -94,10 +92,6 @@
       "hint": "{{confirmed}} · {{waiting}}"
     },
     "latest": {
-      "planReady": "✓ Plan bereit",
-      "planPending": "○ Plan ausstehend",
-      "reminderRead": "✓ Erinnerung gelesen",
-      "reminderDelivered": "✓ Erinnerung zugestellt",
       "reminderSent": "✓ Erinnerung gesendet",
       "repliedYes": "✓ Mit Ja geantwortet",
       "moved": "✓ Verschoben",
@@ -105,10 +99,6 @@
       "checkedIn": "✓ Eingecheckt"
     },
     "latestHints": {
-      "planReady": "{{suggestions}} in den Leistungsvorschlägen",
-      "planPending": "Öffnen Sie den Termin und fügen Sie die Leistungsvorschläge hinzu",
-      "reminderRead": "Erinnerung auf WhatsApp gelesen",
-      "reminderDelivered": "Erinnerung zugestellt",
       "reminderSent": "Erinnerung gesendet",
       "repliedYes": "Automatisch durch ein Ja auf WhatsApp bestätigt",
       "moved": "Verschoben von {{day}} {{time}}",

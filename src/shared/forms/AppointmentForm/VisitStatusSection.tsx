@@ -16,21 +16,13 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip.tsx';
-import {
-  Calendar,
-  Check,
-  CheckCircle,
-  Copy,
-  Info,
-  XCircle,
-} from '@/shared/icons/index.ts';
+import { Calendar, Check, Copy, XCircle } from '@/shared/icons/index.ts';
 
 import {
   APPOINTMENT_FORM_KEYS,
   APPOINTMENT_FORM_NS,
   APPOINTMENT_FORM_TEST_IDS,
 } from './appointment-form.constants.ts';
-import type { PlanFlag } from './appointment-form-model.ts';
 
 const K = APPOINTMENT_FORM_KEYS.status;
 const IDS = APPOINTMENT_FORM_TEST_IDS;
@@ -60,7 +52,7 @@ export interface VisitStatusSectionProps {
   isPatient: boolean;
   canEdit: boolean;
   onPick: (status: AppointmentStatus) => void;
-  /** A blocked Completed: "Create the patient record first" with its action. */
+  /** A blocked Completed: the patient file opens at check-in, so this says to check in first. */
   onNeedsPatient: () => void;
   /** The cancelled banner's reason (a label or the note), `null` without one. */
   cancelReason: string | null;
@@ -71,8 +63,6 @@ export interface VisitStatusSectionProps {
   /** Copy — or Rebook for a No-show (a new booking either way, Q-A6). */
   onCopy?: () => void;
   onCancelVisit?: () => void;
-  plan: PlanFlag | null;
-  onPlan?: () => void;
 }
 
 /** A tile's look by its step: current solid in the tone, done on its tint, upcoming plain. */
@@ -222,46 +212,6 @@ function CancelledBanner({
   );
 }
 
-/** The plan flag's tooltip: what is planned for this visit, from earlier ones, and "open suggestions". */
-function planHintOf(
-  t: (key: string, values?: Record<string, unknown>) => string,
-  plan: PlanFlag,
-) {
-  if (plan.total === 0) return t(K.planEmpty);
-  const earlier = plan.total - plan.forVisit;
-  const parts = [t(K.planOpen)];
-  if (earlier > 0) parts.unshift(t(K.planEarlier, { count: earlier }));
-  if (plan.forVisit > 0) parts.unshift(t(K.planVisit, { count: plan.forVisit }));
-  return parts.join(' · ');
-}
-
-/** "Plan ready · <n> offerings" (sage) or "Plan not prepared" (butter) — opens the suggestions (H:4136). */
-function PlanChip({ plan, onPlan }: { plan: PlanFlag; onPlan: () => void }) {
-  const { t } = useTranslation(APPOINTMENT_FORM_NS);
-  const ready = plan.total > 0;
-  const Icon = ready ? CheckCircle : Info;
-  return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <button
-          type="button"
-          data-slot="pill"
-          data-testid={IDS.plan}
-          onClick={onPlan}
-          className={cn(
-            'inline-flex h-6.5 items-center gap-1.5 rounded-full px-2.5 text-xs font-semibold whitespace-nowrap',
-            ready ? TONE_CLASSES.sage.surface : TONE_CLASSES.butter.surface,
-          )}
-        >
-          <Icon aria-hidden="true" className="size-3.25" />
-          {ready ? t(K.planReady, { count: plan.total }) : t(K.planNotPrepared)}
-        </button>
-      </TooltipTrigger>
-      <TooltipContent>{planHintOf(t, plan)}</TooltipContent>
-    </Tooltip>
-  );
-}
-
 /** One 30px action of the row (Copy / Rebook, Cancel visit) with its tooltip. */
 function VisitAction({
   label,
@@ -304,10 +254,10 @@ function VisitAction({
 /**
  * Visit status (Edit; H:2756–2762, H:4135–4150; `appointments.md:92–95`):
  * four tiles Scheduled → Confirmed → Checked in → Completed under the status
- * machine's rules (`formTiles`) — Completed asks for a patient record first and
- * is final once saved — the cancelled banner with Restore, the Rescheduled
- * note, the plan flag, Copy (Rebook for a No-show) and Cancel visit, and the
- * hint line.
+ * machine's rules (`formTiles`; each tile one route on clinozy-be) — Completed
+ * after check-in and final once saved — the cancelled banner with Restore, the
+ * Rescheduled note, Copy (Rebook for a No-show) and Cancel visit, and the hint
+ * line. The plan flag went with the backend (no plan on a booking, G3).
  */
 export function VisitStatusSection({
   saved,
@@ -324,8 +274,6 @@ export function VisitStatusSection({
   rescheduled,
   onCopy,
   onCancelVisit,
-  plan,
-  onPlan,
 }: VisitStatusSectionProps) {
   const { t } = useTranslation([APPOINTMENT_FORM_NS, CLINIC_NS]);
   const tiles = formTiles({ saved, draft, date, today, isPatient, canEdit });
@@ -369,9 +317,7 @@ export function VisitStatusSection({
           <span className="min-w-0 text-pretty">{rescheduled}</span>
         </div>
       ) : null}
-      <div className="flex flex-wrap items-center gap-2">
-        {plan && onPlan ? <PlanChip plan={plan} onPlan={onPlan} /> : null}
-        <span className="flex-1" />
+      <div className="flex flex-wrap items-center justify-end gap-2">
         {onCopy ? (
           <VisitAction
             label={rebook ? t(APPT.nextActions.rebook, { ns: CLINIC_NS }) : t(K.copy)}

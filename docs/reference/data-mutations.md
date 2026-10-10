@@ -95,14 +95,16 @@ and restored on error, like `optimisticInfinite`; it is checked after it and bef
 the single-key path, so pass one optimistic config per hook.
 
 ```ts
-export function useSetAppointmentStatus() {
+export function useMoveAppointment() {
   return useAppMutation({
-    mutationFn: setAppointmentStatus,
+    mutationFn: ({ appointment, route }, action) =>
+      moveAppointment({ appointmentId: appointment.id, route, ...action }),
     invalidateKeys: APPOINTMENT_WRITE_KEYS,
     optimisticQueries: {
-      queryKey: appointmentQueryKeys.all,
+      queryKey: [...appointmentQueryKeys.all, organizationId],
       // (oneCachedValue, vars) => nextValue — pages, lists and the record alike
-      update: (data, { id, status }) => withAppointmentStatus(data, id, status),
+      update: (data, { appointment, route }) =>
+        withAppointmentStatus(data, appointment.id, MOVE_STATUSES[route]),
     },
   });
 }
@@ -218,7 +220,7 @@ stored as `other` with its label leading the note.
 | Offerings     | `useDeleteOffering`                                               | `optimistic`                     |
 | Leads         | `useDeleteLead` (every cached list page at once)                  | `optimisticInfinite`             |
 | Offers        | `useSetOfferPaused`, `useDeleteOffer`                             | `optimistic`                     |
-| Appointments  | `useSetAppointmentStatus` (Agenda, calendars and drawer at once)  | `optimisticQueries`              |
+| Appointments  | `useMoveAppointment` (Agenda, calendars and drawer at once)       | `optimisticQueries`              |
 | Notifications | `useMarkNotificationRead`                                         | hand-rolled on raw `useMutation` |
 
 The cursor-paginated panels (members, roles, API keys) are `optimisticInfinite`; the
@@ -231,9 +233,9 @@ behind the undo toast by their panels (see above), which is why all three take a
 
 **Non-optimistic** (must show in-progress) — creates + shapes we can't safely patch:
 
-- **Creates:** `useInviteMember`, `useCreateRole`, `useCreateApiKey`, `useCreateWebhook`, `useRegisterPasskey`, `useCreateOffering`, `useCreateOffer`, `useCreateLead`, `useCreateAppointment`
-- **Clinic saves and restores:** `useUpdateOffering`, `useUpdateOffer`, `useUpdateLead`, `useUpdateAppointment` (the drawer shows "Saving…"; the server re-checks the merged record), `useRestoreOffering`, `useRestoreOffer`, `useRestoreLead` (the Undo of the Reason confirm's "removed" toast — the row returns with the refetch), `useRestoreAppointment` (a cancelled booking back to Scheduled)
-- **Appointment status:** `useCancelAppointment` (`S:1611`: not optimistic) and the optimistic `useSetAppointmentStatus` answer an Undo token — their toast's Undo (`useUndoAppointmentChange`) reverts the status and every side effect (open leads → Clinic visited, the rule tasks)
+- **Creates:** `useInviteMember`, `useCreateRole`, `useCreateApiKey`, `useCreateWebhook`, `useRegisterPasskey`, `useCreateOffering`, `useCreateOffer`, `useCreateLead`, `useCreateAppointment`, `useCopyAppointment`, `useCreateContact` (a new person before their booking)
+- **Clinic saves and restores:** `useUpdateOffering`, `useUpdateOffer`, `useUpdateLead`, `useUpdateAppointment` (the drawer shows "Saving…"; sends `expected_updated_at`), `useRestoreOffering`, `useRestoreOffer`, `useRestoreLead` (the Undo of the Reason confirm's "removed" toast — the row returns with the refetch), `useReinstateAppointment` (a cancelled booking back to Scheduled, `POST …/reinstate`)
+- **Appointment status:** one route per move (`useMoveAppointment`, optimistic) and `useCancelAppointment` (not optimistic); clinozy-be has a way back for two of them, so only their toasts carry Undo — a check-in's runs `undo-check-in`, a cancel's `reinstate`
 - **Lead ownership:** `useClaimLead`, `useAssignLead`, `useReleaseLead`, `useSetLeadInvolved` — clinozy-be has no undo for a claim, an assign or a release, so their toasts carry none, and neither does a status save's "<name> → <status>" (`useUpdateLead`)
 - **Contacts:** `useUpdateContact` (the lead drawer's Edit contact; sends `expected_updated_at`, a `409 record_changed` offers Reload)
 - `useResendInvitation` (clinozy-be sets the new expiry), `useMarkAllNotificationsRead`, `useUpdateNotificationPreferences`, `useUpdateOrganization`, billing/MFA

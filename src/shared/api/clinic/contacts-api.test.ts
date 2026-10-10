@@ -6,6 +6,7 @@ vi.mock('@/core/http/api.ts', () => ({
 import { api } from '@/core/http/api.ts';
 
 import {
+  createContact,
   fetchContact,
   isContactSearchable,
   searchContacts,
@@ -156,6 +157,55 @@ describe('searchContacts', () => {
   it('reads an answer without rows as nobody', async () => {
     vi.mocked(api.get).mockResolvedValueOnce({ data: undefined } as never);
     expect(await searchContacts('anaya')).toEqual([]);
+  });
+});
+
+describe('createContact', () => {
+  it('creates a person the API’s way — the first number the primary — with the action’s key', async () => {
+    vi.mocked(api.post).mockResolvedValueOnce({
+      data: contactWithPhones({
+        id: 'con_meera0000000000000000',
+        contact_number: 10301,
+        first_name: 'Meera',
+        last_name: null,
+        email: null,
+        instagram_handles: [],
+        preference_tags: [],
+        open_lead_id: null,
+        phones: [{ phone: '+919825011241', is_primary: true, is_on_whatsapp: true }],
+      }),
+    } as never);
+
+    const created = await createContact({
+      fields: {
+        firstName: 'Meera',
+        lastName: null,
+        phones: [{ phone: '+919825011241', isOnWhatsapp: true }],
+        instagramHandles: [],
+        defaultChannel: 'whatsapp',
+        preferenceTags: [],
+      },
+      idempotencyKey: 'key-new-contact',
+    });
+
+    expect(api.post).toHaveBeenCalledWith('/app/contacts', {
+      body: {
+        first_name: 'Meera',
+        last_name: null,
+        phones: [{ phone: '+919825011241', is_primary: true, is_on_whatsapp: true }],
+        instagram_handles: [],
+        default_channel: 'whatsapp',
+        preference_tags: [],
+      },
+      idempotencyKey: 'key-new-contact',
+    });
+    expect(created).toMatchObject({
+      id: 'con_meera0000000000000000',
+      contactNumber: 10301,
+      name: 'Meera',
+      openLeadId: null,
+      phones: [{ phone: '+919825011241', isPrimary: true, isOnWhatsapp: true }],
+    });
   });
 });
 

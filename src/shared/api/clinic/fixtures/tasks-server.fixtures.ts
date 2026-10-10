@@ -1,5 +1,5 @@
 import { PRODUCT_NAME } from '@/lib/product-identity.ts';
-import type { AppointmentRecord } from '@/shared/api/clinic/appointments-contracts.ts';
+import type { AppointmentRecord } from '@/shared/api/clinic/appointments-fixture-contracts.ts';
 import { fixtureUuid } from '@/shared/api/clinic/clinic-fixture-seed.ts';
 import {
   clinicHttpError,

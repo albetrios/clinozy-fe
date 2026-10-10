@@ -4,9 +4,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import type { AppointmentView } from '@/shared/api/clinic/appointments-contracts.ts';
-import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+import { APPOINTMENT_NOW } from '@/tests/utils/appointment-doubles.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import {
   APPOINTMENTS_PAGE,
@@ -33,14 +33,11 @@ function renderToolbar(view: AppointmentView, url = APPOINTMENTS_PAGE) {
 beforeEach(() => {
   viewport.tier = 'desktop';
   vi.useFakeTimers({ toFake: ['Date'] });
-  vi.setSystemTime(new Date(clinicInstant('2026-10-03', '10:00')));
-  resetClinicFixtures();
+  vi.setSystemTime(APPOINTMENT_NOW);
+  signInTestMember();
   grantClinicAccess('owner');
 });
-afterEach(() => {
-  vi.useRealTimers();
-  resetClinicFixtures();
-});
+afterEach(() => vi.useRealTimers());
 
 describe('AppointmentsToolbar (KICKOFF §6.4 Toolbar)', () => {
   it('heads the room with the view tabs, the search, Filters and New appointment', async () => {

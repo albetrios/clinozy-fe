@@ -48,9 +48,6 @@
     "dayBooked_other": "{{date}} · {{count}} prenotati",
     "appointedTo": "Assegnato a",
     "allDoctors": "Tutti i medici",
-    "doctors_one": "{{count}} medico",
-    "doctors_many": "{{count}} di medici",
-    "doctors_other": "{{count}} medici",
     "searchTeam": "Cerca nel team",
     "showAll": "Mostra tutti",
     "done": "Fatto",
@@ -103,10 +100,6 @@
       "hint": "{{confirmed}} · {{waiting}}"
     },
     "latest": {
-      "planReady": "✓ Piano pronto",
-      "planPending": "○ Piano in sospeso",
-      "reminderRead": "✓ Promemoria letto",
-      "reminderDelivered": "✓ Promemoria consegnato",
       "reminderSent": "✓ Promemoria inviato",
       "repliedYes": "✓ Ha risposto Sì",
       "moved": "✓ Spostato",
@@ -114,10 +107,6 @@
       "checkedIn": "✓ Arrivato"
     },
     "latestHints": {
-      "planReady": "{{suggestions}} nei suggerimenti di servizi",
-      "planPending": "Apri l’appuntamento e aggiungi i suggerimenti di servizi",
-      "reminderRead": "Promemoria letto su WhatsApp",
-      "reminderDelivered": "Promemoria consegnato",
       "reminderSent": "Promemoria inviato",
       "repliedYes": "Confermato automaticamente da un Sì su WhatsApp",
       "moved": "Spostato da {{day}} {{time}}",

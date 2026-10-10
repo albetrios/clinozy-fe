@@ -17,6 +17,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip.tsx';
+import {
+  AppointmentForm,
+  type AppointmentFormPrefill,
+  leadBookingPrefill,
+} from '@/shared/forms/AppointmentForm/index.ts';
 import { useContact } from '@/shared/hooks/useContacts/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useViewportWidth } from '@/shared/hooks/useViewportWidth/index.ts';
@@ -54,6 +59,8 @@ export interface LeadDrawerProps {
   canEditContact: boolean;
   /** The person's contact card actions — "+ Lead", "+ Appointment", the file. */
   contactActions?: ContactCardActions;
+  /** May book (`appointment:create`) — the chat's "Book an appointment". */
+  canBook: boolean;
   /** Closing settled (nothing unsaved, or "Discard"): back to the list. */
   onClose: () => void;
   /** The phone pane — the Leads page keeps it between leads (Chat first). */
@@ -139,6 +146,7 @@ export function LeadDrawer({
   canDelete,
   canEditContact,
   contactActions,
+  canBook,
   onClose,
   pane,
   onPaneChange,
@@ -152,6 +160,7 @@ export function LeadDrawer({
   const draft = useLeadDraft(lead);
   const contact = useContact(lead.contactId).data;
   const [removing, setRemoving] = useState(false);
+  const [booking, setBooking] = useState<AppointmentFormPrefill | null>(null);
 
   const chat = (
     <div
@@ -187,6 +196,11 @@ export function LeadDrawer({
             contact,
           ),
         }}
+        onBookAppointment={
+          canBook
+            ? ({ reason }) => setBooking(leadBookingPrefill(lead, reason))
+            : undefined
+        }
       />
     </div>
   );
@@ -245,6 +259,12 @@ export function LeadDrawer({
         open={removing}
         onOpenChange={setRemoving}
         onRemoved={onClose}
+      />
+      <AppointmentForm
+        open={booking !== null}
+        mode="create"
+        prefill={booking ?? undefined}
+        onClose={() => setBooking(null)}
       />
     </TooltipProvider>
   );

@@ -1,7 +1,7 @@
 import { type ColumnDef, useTable } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 
-import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
+import type { AppointmentRow } from '@/shared/api/clinic/appointments-fixture-contracts.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import { serviceTone } from '@/shared/clinic/appointment-display.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
+import type { AppointmentDayCount } from '@/shared/api/clinic/appointments-contracts.ts';
 import {
   addCivilDays,
   civilDateOf,
@@ -15,7 +15,7 @@ import {
   LocalizedCalendar,
 } from '@/shared/components/LocalizedCalendar/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { useAppointmentRange } from '@/shared/hooks/useAppointments/index.ts';
+import { useAppointmentDayCounts } from '@/shared/hooks/useAppointments/index.ts';
 
 import { loadDots } from '../../appointments.calendar.ts';
 import {
@@ -32,13 +32,12 @@ const DOT_COLOURS = {
   3: 'bg-now-indicator',
 } as const;
 
-/** Bookings that hold a slot on each day — every one but a cancelled one (`perDay`, H:5893). */
-function bookedByDay(rows: readonly AppointmentRow[]): Map<string, number> {
-  const booked = new Map<string, number>();
-  for (const row of rows) {
-    if (row.status !== 'cancelled') booked.set(row.date, (booked.get(row.date) ?? 0) + 1);
-  }
-  return booked;
+/**
+ * Bookings that hold a slot on each day — every one but a cancelled one
+ * (`perDay`, H:5893), from the server's day counts.
+ */
+function bookedByDay(days: readonly AppointmentDayCount[]): Map<string, number> {
+  return new Map(days.map((day) => [day.date, day.total - day.byStatus.cancelled]));
 }
 
 /** Props for {@link FiltersCalendar}. */
@@ -55,24 +54,24 @@ export interface FiltersCalendarProps {
  * app's month grid in its `regular` look: "‹ <Mon YYYY> ›", the two-letter
  * weekdays Sunday first (Q-A10), 32px days with one to three load dots, past
  * days at 60%, today grey, the pick dark; each day's tooltip "<date> · <n>
- * booked". A second press on the picked day clears it; "Upcoming (default)"
- * goes back to every day from today. It keeps its own month — the prototype
- * shared one with the Month board (H:5919, §7.3).
+ * booked" — the month's `daily-counts` within the header's branches, every
+ * doctor and status. A second press on the picked day clears it; "Upcoming
+ * (default)" goes back to every day from today. It keeps its own month — the
+ * prototype shared one with the Month board (H:5919, §7.3).
  */
 export function FiltersCalendar({ value, onChange, branchIds }: FiltersCalendarProps) {
   const { t } = useTranslation(APPOINTMENTS_NS);
   const today = clinicToday();
   const [month, setMonth] = useState(() => civilMonthStart(value ?? today));
-  const range = useAppointmentRange(
+  const counts = useAppointmentDayCounts(
     {
       from: month,
       to: addCivilDays(shiftAnchor(month, 'month', 1), -1),
-      status: 'all',
-      branchIds: [...branchIds],
+      branchIds,
     },
     { notifyOnError: false },
   );
-  const booked = bookedByDay(range.data ?? []);
+  const booked = bookedByDay(counts.data ?? []);
   const keys = APPOINTMENTS_KEYS.filters;
   const dots = (date: string): CalendarDayDots | undefined => {
     const level = loadDots(booked.get(date) ?? 0);

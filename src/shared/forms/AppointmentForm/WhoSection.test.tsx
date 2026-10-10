@@ -5,50 +5,77 @@ import type { ReactElement } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type { AppointmentConnectedLead } from '@/shared/api/clinic/appointments-contracts.ts';
+import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
-import { fsi } from '@/tests/utils/bidi-marks.ts';
+import {
+  contactHit,
+  DOCTOR_NISHA,
+  TEST_BRANCH_ID,
+} from '@/tests/utils/appointment-doubles.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
-const { notifyMock } = vi.hoisted(() => ({
+const { notifyMock, searchContactsMock, fetchLeadMock } = vi.hoisted(() => ({
   notifyMock: { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() },
+  searchContactsMock: vi.fn(),
+  fetchLeadMock: vi.fn(),
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
+vi.mock('@/shared/api/clinic/contacts-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  searchContacts: searchContactsMock,
+}));
+vi.mock('@/shared/api/clinic/leads-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchLead: fetchLeadMock,
+}));
+vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchTeamDirectory: vi.fn(async () => [DOCTOR_NISHA]),
+}));
 
 import { APPOINTMENT_FORM_TEST_IDS as IDS } from './appointment-form.constants.ts';
 import {
   type AppointmentDraft,
   emptyDraft,
   type WhoDraft,
+  whoOfContact,
 } from './appointment-form-model.ts';
 import { WhoSection, type WhoSectionProps } from './WhoSection.tsx';
 
-const PRIYA: WhoDraft = {
-  kind: 'patient',
-  name: 'Priya Shah',
-  phone: '+919876543210',
-  patientId: 'patient-1',
-  leadId: null,
-  seq: 3508,
-};
+/** Riya with a patient file and no open lead — the person-card tests' person. */
+const RIYA_PATIENT: WhoDraft = whoOfContact(
+  contactHit({ patientId: 'pat_riya00000000000000000', openLeadId: null }),
+);
 
-const lead = (
-  overrides: Partial<AppointmentConnectedLead>,
-): AppointmentConnectedLead => ({
-  id: 'lead-1',
-  seq: 2401,
-  status: 'new',
-  kind: 'enquiry',
-  source: 'instagram',
-  interests: ['LHR'],
-  ownerName: 'Reenal Shah',
+/** Riya's open lead: #2371, Contacted, from WhatsApp, Nisha's. */
+const RIYA_LEAD: LeadRecord = {
+  id: 'lead_riya00000000000000000',
+  leadNumber: 2371,
+  contactId: 'con_riya00000000000000000',
+  person: null,
+  name: 'Riya Mehta',
+  phone: '+919825011241',
   patientId: null,
+  status: 'contacted',
+  source: 'whatsapp',
+  interests: ['clinical'],
+  kind: 'enquiry',
+  retargetReason: null,
+  ownerId: DOCTOR_NISHA.id,
+  involvedIds: [],
+  heldUntil: null,
+  followUpAt: null,
+  branchId: TEST_BRANCH_ID,
+  notes: null,
+  lastActivityAt: null,
+  isAwaitingReply: false,
   createdAt: '2026-09-30T10:00:00.000Z',
-  ...overrides,
-});
+  updatedAt: '2026-09-30T10:00:00.000Z',
+};
 
 const draftOf = (patch: Partial<AppointmentDraft> = {}): AppointmentDraft => ({
   ...emptyDraft('2026-10-05'),
-  who: PRIYA,
+  who: RIYA_PATIENT,
   ...patch,
 });
 
@@ -64,7 +91,6 @@ function renderWho(props: Partial<WhoSectionProps> = {}) {
           <WhoSection
             draft={draftOf()}
             onChange={onChange}
-            leads={[]}
             canChange
             disabled={false}
             onOpenLead={onOpenLead}
@@ -81,13 +107,96 @@ function renderWho(props: Partial<WhoSectionProps> = {}) {
 
 /** Hover the person's card and press one of its actions. */
 async function cardAction(user: ReturnType<typeof userEvent.setup>, name: string) {
-  await user.hover(screen.getByRole('button', { name: /Priya Shah/ }));
+  await user.hover(screen.getByRole('button', { name: /Riya Mehta/ }));
   const card = await screen.findByRole('dialog', { name: 'Contact' });
   await user.click(within(card).getByRole('button', { name }));
 }
 
 beforeEach(() => {
+  signInTestMember();
   for (const fn of Object.values(notifyMock)) fn.mockReset();
+  searchContactsMock.mockReset();
+  searchContactsMock.mockResolvedValue([]);
+  fetchLeadMock.mockReset();
+  fetchLeadMock.mockResolvedValue(RIYA_LEAD);
+});
+
+describe('WhoSection — the person search (H:2749–2753)', () => {
+  it('searches the contacts from three letters — five hits, a patient says so', async () => {
+    const user = userEvent.setup();
+    searchContactsMock.mockResolvedValue([
+      contactHit(),
+      contactHit({
+        id: 'con_riyan0000000000000000',
+        name: 'Riyan Shah',
+        primaryPhone: '+919825044120',
+        patientId: 'pat_riyan0000000000000000',
+        openLeadId: null,
+      }),
+    ]);
+    const { container } = renderWho({ draft: draftOf({ who: null }) });
+    const search = screen.getByTestId(IDS.whoSearch);
+    expect(search).toHaveAccessibleName('Search person');
+    await user.type(search, 'ri');
+    expect(screen.getByTestId(IDS.whoCreate)).toHaveTextContent('+ Create contact “ri”');
+    expect(searchContactsMock).not.toHaveBeenCalled();
+    await user.type(search, 'y');
+    const hits = await screen.findAllByTestId(IDS.whoHit);
+    expect(searchContactsMock).toHaveBeenCalledWith('riy');
+    expect(hits).toHaveLength(2);
+    expect(hits[0]).toHaveTextContent('Riya Mehta+91 98250 11241Use contact');
+    // A patient's hit says so (its avatar carries the "P"), not their number.
+    expect(hits[1]).toHaveTextContent('Riyan ShahPatientUse contact');
+    expect(hits[1]).not.toHaveTextContent('+91');
+    // The section sits inside the drawer's dialog in the app: no page landmarks here.
+    expect(
+      await axe(container, { rules: { region: { enabled: false } } }),
+    ).toHaveNoViolations();
+  });
+
+  it('shows at most five hits', async () => {
+    const user = userEvent.setup();
+    searchContactsMock.mockResolvedValue(
+      ['a', 'b', 'c', 'd', 'e', 'f'].map((letter) =>
+        contactHit({ id: `con_riya${letter}0000000000000000`, name: `Riya ${letter}` }),
+      ),
+    );
+    renderWho({ draft: draftOf({ who: null }) });
+    await user.type(screen.getByTestId(IDS.whoSearch), 'riya');
+    expect(await screen.findAllByTestId(IDS.whoHit)).toHaveLength(5);
+  });
+
+  it('picks a hit as the person — a lead while they have an open one', async () => {
+    const user = userEvent.setup();
+    searchContactsMock.mockResolvedValue([contactHit()]);
+    const { onChange } = renderWho({ draft: draftOf({ who: null }) });
+    await user.type(screen.getByTestId(IDS.whoSearch), 'Riya');
+    await user.click(await screen.findByTestId(IDS.whoHit));
+    expect(onChange).toHaveBeenCalledExactlyOnceWith({
+      kind: 'who',
+      who: whoOfContact(contactHit()),
+    });
+    expect(screen.getByTestId(IDS.whoSearch)).toHaveValue('');
+  });
+
+  it('creates a contact the search did not find, named as typed', async () => {
+    const user = userEvent.setup();
+    const { onChange } = renderWho({ draft: draftOf({ who: null }) });
+    await user.type(screen.getByTestId(IDS.whoSearch), '  Meera Iyer ');
+    await user.click(screen.getByTestId(IDS.whoCreate));
+    expect(onChange).toHaveBeenCalledExactlyOnceWith({
+      kind: 'who',
+      who: {
+        kind: 'new',
+        contactId: null,
+        name: 'Meera Iyer',
+        phone: null,
+        patientId: null,
+        leadId: null,
+        contactNumber: null,
+      },
+    });
+  });
 });
 
 describe('WhoSection — the person (H:2748–2755)', () => {
@@ -98,14 +207,14 @@ describe('WhoSection — the person (H:2748–2755)', () => {
     const editor = screen.getByTestId(IDS.whoEdit);
     const name = within(editor).getByTestId(IDS.whoEditName);
     const mobile = within(editor).getByTestId(IDS.whoEditMobile);
-    expect(name).toHaveValue('Priya Shah');
-    expect(mobile).toHaveValue('98765 43210');
+    expect(name).toHaveValue('Riya Mehta');
+    expect(mobile).toHaveValue('98250 11241');
 
     await user.clear(name);
     await user.click(within(editor).getByTestId(IDS.whoEditSave));
     expect(notifyMock.warning).toHaveBeenCalledWith('Add a name');
 
-    await user.type(name, 'Priya Patel');
+    await user.type(name, 'Riya Patel');
     await user.clear(mobile);
     await user.type(mobile, '98765');
     await user.click(within(editor).getByTestId(IDS.whoEditSave));
@@ -114,8 +223,8 @@ describe('WhoSection — the person (H:2748–2755)', () => {
 
     await user.type(mobile, '00001');
     await user.click(within(editor).getByTestId(IDS.whoEditSave));
-    expect(onSaveContact).toHaveBeenCalledExactlyOnceWith(PRIYA, {
-      name: 'Priya Patel',
+    expect(onSaveContact).toHaveBeenCalledExactlyOnceWith(RIYA_PATIENT, {
+      name: 'Riya Patel',
       phone: '9876500001',
     });
     expect(screen.queryByTestId(IDS.whoEdit)).not.toBeInTheDocument();
@@ -123,11 +232,11 @@ describe('WhoSection — the person (H:2748–2755)', () => {
 
   it('keeps the name and the mobile whole on a right-to-left page, in order', () => {
     const { container } = renderWho();
-    const name = screen.getByText('Priya Shah');
+    const name = screen.getByText('Riya Mehta');
     expect(name).toHaveAttribute('dir', 'auto');
     expect(name).toHaveClass('[text-align:match-parent]');
-    expect(screen.getByText('+91 98765 43210')).toHaveAttribute('dir', 'ltr');
-    expect(container).toHaveTextContent('Priya Shah+91 98765 43210');
+    expect(screen.getByText('+91 98250 11241')).toHaveAttribute('dir', 'ltr');
+    expect(container).toHaveTextContent('Riya Mehta+91 98250 11241');
   });
 
   it('closes the editor on Esc without saving', async () => {
@@ -150,60 +259,66 @@ describe('WhoSection — the person (H:2748–2755)', () => {
     const user = userEvent.setup();
     const { onChange } = renderWho({
       draft: draftOf({
-        who: { ...PRIYA, kind: 'new', patientId: null, phone: null, seq: null },
+        who: {
+          kind: 'new',
+          contactId: null,
+          name: 'Meera Iyer',
+          phone: null,
+          patientId: null,
+          leadId: null,
+          contactNumber: null,
+        },
       }),
     });
     expect(screen.getByTestId(IDS.whoCard)).toHaveTextContent(
-      'New contact · add mobile at check-in',
+      'New contact · add their mobile to book',
     );
     await user.type(screen.getByTestId(IDS.whoMobile), '9');
     expect(onChange).toHaveBeenCalledWith({ kind: 'newPhone', digits: '9' });
   });
 });
 
-describe('WhoSection — connected leads (S:330, H:4139, H:5996)', () => {
-  it('shows each lead as a chip that opens it, and the move at check-in', async () => {
+describe('WhoSection — the connected lead (H:2754, H:4139)', () => {
+  it('shows the person’s open lead as one chip that opens it, and the move at check-in', async () => {
     const user = userEvent.setup();
     const { onOpenLead } = renderWho({
-      leads: [
-        lead({ id: 'a', seq: 2365 }),
-        lead({ id: 'b', seq: 2210, status: 'clinic_visited' }),
-      ],
+      draft: draftOf({ who: whoOfContact(contactHit()) }),
     });
-    const chips = screen.getAllByTestId(IDS.connectedLead);
-    expect(chips.map((chip) => chip.textContent)).toEqual([
-      '#2365 · New',
-      '#2210 · Clinic visited',
-    ]);
-    expect(screen.getByText('· moves to Clinic visited at check-in')).toBeInTheDocument();
-    await user.click(chips[0]!);
-    expect(onOpenLead).toHaveBeenCalledWith('a');
-    expect(screen.queryByRole('radiogroup', { name: 'Lead' })).not.toBeInTheDocument();
+    const chip = await screen.findByTestId(IDS.connectedLead);
+    expect(fetchLeadMock).toHaveBeenCalledWith('lead_riya00000000000000000');
+    expect(screen.getAllByTestId(IDS.connectedLead)).toHaveLength(1);
+    expect(chip).toHaveTextContent('#2371 · Contacted');
+    expect(screen.getByText('Connected lead')).toBeVisible();
+    expect(screen.getByText('· moves to Clinic visited at check-in')).toBeVisible();
+    // No "Lead" radios: the server links the one open lead.
+    expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument();
+    await user.click(chip);
+    expect(onOpenLead).toHaveBeenCalledExactlyOnceWith('lead_riya00000000000000000');
   });
 
-  it('offers the "Lead" radios when two or more are open, the first picked', async () => {
+  it('names the lead’s source and owner on hover', async () => {
     const user = userEvent.setup();
-    const { onChange, container } = renderWho({
-      leads: [
-        lead({ id: 'a', seq: 2365 }),
-        lead({ id: 'b', seq: 2366, source: null, interests: [] }),
-      ],
-    });
-    const radios = within(screen.getByRole('radiogroup', { name: 'Lead' })).getAllByRole(
-      'radio',
+    renderWho({ draft: draftOf({ who: whoOfContact(contactHit()) }) });
+    await user.hover(await screen.findByTestId(IDS.connectedLead));
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(
+      'Lead #2371 · WhatsApp · owner Nisha Shah',
     );
-    expect(radios.map((radio) => radio.getAttribute('aria-checked'))).toEqual([
-      'true',
-      'false',
-    ]);
-    expect(radios[0]).toHaveTextContent('Lead #2365');
-    // Each part isolated: a Latin interest or a date stays whole on a right-to-left page.
-    expect(radios[0]).toHaveTextContent(`${fsi('Instagram')} · ${fsi('LHR')}`);
-    await user.click(radios[1]!);
-    expect(onChange).toHaveBeenCalledWith({ kind: 'lead', leadId: 'b' });
-    // The section sits inside the drawer's dialog in the app: no page landmarks here.
+  });
+
+  it('drops the move at check-in once the visit is checked in', async () => {
+    renderWho({
+      draft: draftOf({ who: whoOfContact(contactHit()), status: 'checked_in' }),
+    });
+    expect(await screen.findByTestId(IDS.connectedLead)).toBeVisible();
     expect(
-      await axe(container, { rules: { region: { enabled: false } } }),
-    ).toHaveNoViolations();
+      screen.queryByText('· moves to Clinic visited at check-in'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows no lead for a person without an open one', () => {
+    renderWho();
+    expect(screen.queryByTestId(IDS.connectedLead)).not.toBeInTheDocument();
+    expect(screen.queryByText('Connected lead')).not.toBeInTheDocument();
+    expect(fetchLeadMock).not.toHaveBeenCalled();
   });
 });

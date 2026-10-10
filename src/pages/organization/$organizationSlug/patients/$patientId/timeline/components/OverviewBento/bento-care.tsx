@@ -9,11 +9,9 @@ import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { APPOINTMENT_STATUS_TONES, TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { TonePill } from '@/shared/components/Cells/index.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
-import {
-  useAppointmentSlotLabel,
-  usePatientAppointments,
-} from '@/shared/hooks/useAppointments/index.ts';
+import { useAppointmentSlotLabel } from '@/shared/hooks/useAppointments/index.ts';
 import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import { useFixturePatientAppointments } from '@/shared/hooks/useFixtureAppointments/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { usePatientPackages } from '@/shared/hooks/usePatientPackages/index.ts';
 import { usePatientPrescriptions } from '@/shared/hooks/usePrescriptions/index.ts';
@@ -93,7 +91,7 @@ export function VisitsBentoCard({
 }) {
   const { t } = useTranslation([TIMELINE_NS, CLINIC_NS]);
   const { patientId, file } = usePatientFileContext();
-  const visits = usePatientAppointments(patientId);
+  const visits = useFixturePatientAppointments(patientId);
   const slot = useAppointmentSlotLabel();
   const rows = visits.data ?? [];
   const past = rows.filter((row) => row.status === 'completed').slice(0, LISTED);

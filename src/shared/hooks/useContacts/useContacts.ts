@@ -2,6 +2,7 @@ import { keepPreviousData } from '@tanstack/react-query';
 
 import {
   contactQueryKeys,
+  createContact,
   fetchContact,
   isContactSearchable,
   searchContacts,
@@ -21,7 +22,8 @@ import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.
 
 /*
  * The person on clinozy-be (`/app/contacts`): one contact with every number, the person search
- * New lead and the pickers read, and the contact editor's save.
+ * New lead and the pickers read, a new person before their booking, and the contact editor's
+ * save.
  */
 
 /** The active organization — every key carries it. */
@@ -90,6 +92,20 @@ export function useUpdateContact(
         ...action,
       }),
     invalidateKeys: [contactQueryKeys.all, leadQueryKeys.all],
+    ...options,
+  });
+}
+
+/**
+ * A new person (`POST /app/contacts`) — the appointment form books someone the search did not
+ * find; silent, the booking's toast says it. `409 contact_phone_exists` shows the server's words.
+ */
+export function useCreateContact(
+  options: CrudMutationOptions<Contact, ContactFields> = {},
+) {
+  return useAppMutation<Contact, ContactFields>({
+    mutationFn: (fields, action) => createContact({ fields, ...action }),
+    invalidateKeys: [contactQueryKeys.all],
     ...options,
   });
 }

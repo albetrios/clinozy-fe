@@ -29,7 +29,7 @@ export interface AppointmentCreatePrefill {
   time?: string;
   /** Rebook / Copy: a new appointment from this one (Q-A6). */
   copyOf?: string;
-  /** Who: a patient's or a lead's id (the contact card's "+ Appointment"). */
+  /** Who: the contact (`con_…`, the contact card's "+ Appointment"). */
   who?: string;
 }
 

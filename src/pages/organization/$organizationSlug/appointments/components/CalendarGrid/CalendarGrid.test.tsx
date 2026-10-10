@@ -2,12 +2,15 @@ import { fireEvent, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { fetchAppointment } from '@/shared/api/clinic/appointments-api.ts';
 import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
-import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import {
+  APPOINTMENT_NOW,
+  APPOINTMENT_TODAY,
+  appointmentRow,
+} from '@/tests/utils/appointment-doubles.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
+import { publicId } from '../../__tests__/integration/appointments-test-data.ts';
 import {
   grantClinicAccess,
   renderInAppointments,
@@ -23,28 +26,24 @@ vi.mock('@/shared/notify/index.ts', () => ({
   UNDO_TOAST_DURATION_MS: 10_000,
 }));
 
-const TODAY = '2026-10-03';
+const TODAY = APPOINTMENT_TODAY;
 /** The clinic clock at 10:00 on the test's today. */
 const CLOCK = { today: TODAY, minutes: 600 };
 
-let base: AppointmentRow;
-const booking = (overrides: Partial<AppointmentRow>): AppointmentRow => ({
-  ...base,
-  id: crypto.randomUUID(),
-  ...overrides,
-});
+let made = 0;
+/** A booking of its own id today, as a test asks. */
+const booking = (overrides: Partial<AppointmentRow>): AppointmentRow => {
+  made += 1;
+  return appointmentRow({ id: publicId('appt', `b${made}`), date: TODAY, ...overrides });
+};
 
-beforeEach(async () => {
+beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] });
-  vi.setSystemTime(new Date(clinicInstant(TODAY, '10:00')));
-  resetClinicFixtures();
+  vi.setSystemTime(APPOINTMENT_NOW);
+  signInTestMember();
   grantClinicAccess('owner');
-  base = await fetchAppointment(ref.appointment(2858));
 });
-afterEach(() => {
-  vi.useRealTimers();
-  resetClinicFixtures();
-});
+afterEach(() => vi.useRealTimers());
 
 describe('HourRail (H:2060)', () => {
   it('labels 9 AM to 9 PM, one per 88px', async () => {

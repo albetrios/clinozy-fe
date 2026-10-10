@@ -2,7 +2,6 @@
 // The cells read TanStack Table's live column and row objects (see DataTable).
 
 import type { CellContext } from '@tanstack/react-table';
-import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
@@ -19,7 +18,6 @@ import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
 import {
   PersonAvatar,
   PersonChip,
-  personFullName,
   shortPersonName,
   TonePill,
 } from '@/shared/components/Cells/index.ts';
@@ -42,7 +40,7 @@ import {
   APPOINTMENTS_NS,
   APPOINTMENTS_TEST_IDS,
 } from '../../appointments.constants.ts';
-import { latestUpdates, PERSON_TONES } from '../../appointments.display.ts';
+import { latestEvent, PERSON_TONES } from '../../appointments.display.ts';
 import { useLatestUpdateWords } from '../../hooks/useLatestUpdateWords/index.ts';
 import { AppointmentQuickView } from '../AppointmentCard/index.ts';
 import { AppointmentStatusPill } from '../AppointmentStatusPill/index.ts';
@@ -51,17 +49,18 @@ import { useAgendaCells } from './agenda-cells-context.ts';
 
 type AgendaCell = CellContext<DataTableFeatures, AppointmentRow, unknown>;
 
-/** The doctor as the team card reads them — presence, real roles (§7.3). */
-function teamCardOf(doctor: AppointmentStaff, t: TFunction): TeamCardData {
+/**
+ * The doctor as the team card reads them — the team directory's name, initials
+ * and tone; it carries no role or presence, so the card shows neither
+ * (api-integration M41). `updatedAt` is when the team was read.
+ */
+function teamCardOf(doctor: AppointmentStaff, updatedAt: string | null): TeamCardData {
   return {
-    name: personFullName(doctor),
+    name: doctor.name,
     initials: doctor.initials,
     tone: doctor.tone,
-    role: doctor.roles
-      .map((role) => t(CLINIC_KEYS.roles[role], { ns: CLINIC_NS }))
-      .join(' · '),
-    online: doctor.presence === 'online',
-    updatedAt: new Date().toISOString(),
+    role: '',
+    updatedAt,
   };
 }
 
@@ -110,30 +109,22 @@ export function ServiceCell({ row }: AgendaCell) {
   );
 }
 
-/** The 28px doctor chip: 22px avatar with the presence dot, the short name (H:2042). */
+/** The 28px doctor chip: 22px avatar and the short name (H:2042) — no presence dot (M41). */
 export function DoctorCell({ row }: AgendaCell) {
-  const { t } = useTranslation(CLINIC_NS);
+  const { teamUpdatedAt } = useAgendaCells();
   const { doctor } = row.original;
   if (!doctor) return null;
   return (
     // The chip is not the row (H:5915): a press only opens the team card.
     <span className="flex max-w-full min-w-0" data-row-click="ignore">
-      <TeamCard
-        load={() => Promise.resolve(teamCardOf(doctor, t))}
-        triggerClassName="max-w-full"
-      >
+      <TeamCard data={teamCardOf(doctor, teamUpdatedAt)} triggerClassName="max-w-full">
         <span
           data-slot="pill"
           className="border-border bg-card inline-flex h-7 max-w-full min-w-0 items-center gap-1.5 rounded-full border ps-0.75 pe-2.5 whitespace-nowrap"
         >
-          <PersonAvatar
-            size="chip"
-            initials={doctor.initials}
-            tone={doctor.tone}
-            presence={doctor.presence === 'online' ? 'online' : 'offline'}
-          />
+          <PersonAvatar size="chip" initials={doctor.initials} tone={doctor.tone} />
           <span className="text-detail min-w-0 truncate font-medium">
-            {shortPersonName(personFullName(doctor))}
+            {shortPersonName(doctor.name)}
           </span>
         </span>
       </TeamCard>
@@ -141,11 +132,11 @@ export function DoctorCell({ row }: AgendaCell) {
   );
 }
 
-/** The "Latest update" pills, each with its tooltip; "—" when there is none. */
+/** The "Latest update" pill — the booking's latest event — with its tooltip; "—" when there is none. */
 export function LatestCell({ row }: AgendaCell) {
   const words = useLatestUpdateWords();
-  const pills = latestUpdates(row.original);
-  if (pills.length === 0) {
+  const pill = latestEvent(row.original);
+  if (!pill) {
     return (
       <span data-latest-empty="" className="text-detail text-muted-foreground">
         —
@@ -154,18 +145,16 @@ export function LatestCell({ row }: AgendaCell) {
   }
   return (
     <span className="flex min-w-0 flex-wrap items-center gap-1">
-      {pills.map((pill) => (
-        <Tooltip key={pill.kind}>
-          <TooltipTrigger asChild>
-            <span className="flex max-w-full min-w-0">
-              <TonePill tone={pill.tone} className="text-caption gap-1 px-2.25">
-                {words.label(pill)}
-              </TonePill>
-            </span>
-          </TooltipTrigger>
-          <TooltipContent>{words.hint(pill)}</TooltipContent>
-        </Tooltip>
-      ))}
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className="flex max-w-full min-w-0">
+            <TonePill tone={pill.tone} className="text-caption gap-1 px-2.25">
+              {words.label(pill)}
+            </TonePill>
+          </span>
+        </TooltipTrigger>
+        <TooltipContent>{words.hint(pill)}</TooltipContent>
+      </Tooltip>
     </span>
   );
 }

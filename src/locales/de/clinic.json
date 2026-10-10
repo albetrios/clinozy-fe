@@ -150,6 +150,8 @@
       "unreachable": "Patient nicht erreichbar",
       "doctor_unavailable": "Arzt nicht verfügbar",
       "resource_unavailable": "Gerät oder Raum nicht verfügbar",
+      "rescheduling_later": "Wird später neu geplant",
+      "booked_by_mistake": "Versehentlich gebucht",
       "other": "Sonstiges"
     },
     "cancelSides": {
@@ -172,7 +174,9 @@
     "toasts": {
       "booked": "{{id}} gebucht · {{day}} {{time}} · Bestätigungsanfrage per WhatsApp gesendet",
       "bookedQueued": "{{id}} gebucht · {{day}} {{time}} · Erinnerung eingeplant",
+      "bookedOnly": "{{id}} gebucht · {{day}} {{time}}",
       "moved": "{{id}} verschoben auf {{day}} {{time}} · Bestätigungsanfrage gesendet",
+      "movedOnly": "{{id}} verschoben auf {{day}} {{time}}",
       "updated": "{{id}} aktualisiert",
       "statusChanged": "{{name}} → {{status}}",
       "statusConfirmed": "{{name}} → {{status}} · Erinnerung eingeplant",
@@ -1010,10 +1014,8 @@
       "searchLabel": "Person suchen",
       "useContact": "Kontakt verwenden",
       "patient": "Patient",
-      "patientCare": "Patient · {{care}}",
-      "lead": "Lead {{id}} · {{phone}}",
       "createContact": "+ Kontakt „{{query}}“ anlegen",
-      "newContact": "Neuer Kontakt · Mobilnummer beim Einchecken ergänzen",
+      "newContact": "Neuer Kontakt · Mobilnummer zum Buchen ergänzen",
       "mobile": "Mobilnummer",
       "name": "Name",
       "mobileLabel": "Mobilnummer",
@@ -1025,9 +1027,7 @@
       "connected": "Verknüpfter Lead",
       "chip": "{{id}} · {{status}}",
       "chipHint": "Lead {{id}} · {{source}} · Inhaber {{owner}}",
-      "movesAtCheckIn": "· wechselt beim Einchecken zu „Klinik besucht“",
-      "lead": "Lead",
-      "leadOption": "Lead {{id}}"
+      "movesAtCheckIn": "· wechselt beim Einchecken zu „Klinik besucht“"
     },
     "status": {
       "section": "Besuchsstatus",
@@ -1043,14 +1043,10 @@
       "rescheduled": "Verschoben · war {{day}} {{time}} · beim Speichern geht eine neue Erinnerung raus",
       "planReady_one": "Plan bereit · {{count}} Leistung",
       "planReady_other": "Plan bereit · {{count}} Leistungen",
-      "planNotPrepared": "Plan nicht vorbereitet",
       "planVisit_one": "{{count}} für diesen Besuch geplant",
       "planVisit_other": "{{count}} für diesen Besuch geplant",
       "planEarlier_one": "{{count}} aus früheren Besuchen",
-      "planEarlier_other": "{{count}} aus früheren Besuchen",
-      "planOpen": "Vorschläge öffnen",
-      "planEmpty": "Noch nichts vorgeschlagen · öffnen Sie die Leistungsvorschläge zur Vorbereitung",
-      "createPatient": "Patientenakte anlegen"
+      "planEarlier_other": "{{count}} aus früheren Besuchen"
     },
     "details": {
       "title": "Termin",
@@ -1075,7 +1071,6 @@
       "typeLines": {
         "consultation": "Die Beratungsgebühr wird beim Abschluss zur Rechnung hinzugefügt",
         "follow_up": "Meist kostenlos · keine Rechnung, außer es kommt etwas hinzu",
-        "package_session": "Kostenlos · Sitzung {{next}} von {{total}} wird beim Abschluss des Besuchs genutzt",
         "other": "Beschreiben Sie es unten in den Notizen"
       },
       "treatment": "Behandlung",
@@ -1083,12 +1078,6 @@
       "searchTreatments": "Behandlungen suchen",
       "common": "Häufig",
       "fromOfferings": "Aus den Leistungen",
-      "package": "Paket",
-      "packageNext": "Als Nächstes Sitzung {{next}} von {{total}} · gültig bis {{date}}",
-      "packageLeft": "{{count}} übrig",
-      "noPackage": "{{name}} hat kein aktives Paket",
-      "pickContactPackages": "Wählen Sie einen Kontakt, um seine Pakete zu sehen",
-      "asTreatment": "Als Behandlung buchen",
       "doctor": "Arzt",
       "pickDoctor": "Arzt wählen",
       "searchDoctors": "Ärzte und Therapeuten suchen",
@@ -1111,51 +1100,20 @@
       "time": "Uhrzeit",
       "pickDate": "Wählen Sie ein Datum, um Zeiten zu sehen",
       "none": "An diesem Tag sind keine Zeiten buchbar · wählen Sie ein anderes Datum",
+      "closed": {
+        "past": "Dieser Tag ist vorbei · wählen Sie ein anderes Datum",
+        "branchInactive": "Diese Filiale nimmt keine Buchungen an",
+        "closedDay": "An diesem Tag ist die Klinik geschlossen · wählen Sie ein anderes Datum",
+        "holiday": "Geschlossen wegen {{label}} · wählen Sie ein anderes Datum",
+        "doctorOff": "Der Arzt arbeitet an diesem Tag nicht · wählen Sie ein anderes Datum oder einen anderen Arzt"
+      },
       "am": "AM",
       "pm": "PM",
       "hour": "{{hour}} {{period}}",
       "free": "{{time}} · frei",
-      "booked": "{{time}} · gebucht",
       "locked": "Gesperrt",
       "lockedSummary": "{{day}} · {{time}} · nach dem Einchecken gesperrt",
       "lockedToast": "Datum und Uhrzeit sind gesperrt, sobald der Patient eingecheckt ist"
-    },
-    "notPatient": {
-      "section": "Nächster Schritt · Patientenakte",
-      "title": "Noch kein Patient",
-      "body": "Legen Sie die Patientenakte an, um fortzufahren · schaltet Fotos, Leistungsvorschläge, Feedback und „Abgeschlossen“ frei",
-      "action": "Patientenakte anlegen",
-      "done": "{{name}} ist jetzt Patient · Sie können „Abgeschlossen“ setzen"
-    },
-    "photos": {
-      "title": "Fotos von diesem Besuch",
-      "section": "Besuchsfotos",
-      "locked": "Fotos sind verfügbar, sobald der Patient in der Klinik ist · checken Sie ihn zuerst ein",
-      "checkIn": "Jetzt einchecken",
-      "album": "Album",
-      "albums": {
-        "general": "Allgemein",
-        "private": "Privat",
-        "lhr": "LHR"
-      },
-      "upload": "Fotos hochladen",
-      "add": "Hinzufügen",
-      "open": "{{name}} öffnen",
-      "edit": "Details bearbeiten",
-      "delete": "Foto löschen",
-      "count_one": "{{count}} Foto · erscheint in der Akte von {{first}} unter diesem Besuch",
-      "count_other": "{{count}} Fotos · erscheinen in der Akte von {{first}} unter diesem Besuch",
-      "empty": "Machen Sie Vorher-/Nachher-Fotos, während {{first}} in der Klinik ist · sie werden unter diesem Besuch abgelegt",
-      "attached_one": "{{count}} Foto an diesen Besuch angehängt",
-      "attached_other": "{{count}} Fotos an diesen Besuch angehängt",
-      "deleteTitle": "Dieses Foto löschen?",
-      "deleted": "Foto gelöscht",
-      "reasons": {
-        "wrongPatient": "Falscher Patient",
-        "blurry": "Unscharf / neu aufnehmen",
-        "duplicate": "Duplikat",
-        "other": "Sonstiges"
-      }
     },
     "footer": {
       "pickTime": "Uhrzeit wählen",
@@ -1169,7 +1127,8 @@
       "slot": "Wählen Sie Datum und Uhrzeit",
       "passed": "Diese Zeit ist vorbei · wählen Sie eine spätere",
       "taken": "Gerade vergeben · wählen Sie eine andere Zeit",
-      "doctor": "Wählen Sie einen Arzt"
+      "doctor": "Wählen Sie einen Arzt",
+      "branch": "Keine geöffnete Filiale für die Buchung"
     },
     "copied": "Kopiert · wählen Sie Datum und Uhrzeit"
   },

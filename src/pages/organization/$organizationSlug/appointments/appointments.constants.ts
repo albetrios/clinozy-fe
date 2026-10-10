@@ -50,7 +50,6 @@ export const APPOINTMENTS_KEYS = {
     dayBooked: 'filters.dayBooked',
     appointedTo: 'filters.appointedTo',
     allDoctors: 'filters.allDoctors',
-    doctors: 'filters.doctors',
     searchTeam: 'filters.searchTeam',
     /** The Day doctor picker's footer. */
     showAll: 'filters.showAll',
@@ -94,10 +93,6 @@ export const APPOINTMENTS_KEYS = {
     },
     /** "Latest update" pills, mark included (`appointments.md:359`). */
     latest: {
-      planReady: 'agenda.latest.planReady',
-      planPending: 'agenda.latest.planPending',
-      reminderRead: 'agenda.latest.reminderRead',
-      reminderDelivered: 'agenda.latest.reminderDelivered',
       reminderSent: 'agenda.latest.reminderSent',
       repliedYes: 'agenda.latest.repliedYes',
       moved: 'agenda.latest.moved',
@@ -106,10 +101,6 @@ export const APPOINTMENTS_KEYS = {
     },
     /** Each pill's tooltip (`appointments.md:360`). */
     latestHints: {
-      planReady: 'agenda.latestHints.planReady',
-      planPending: 'agenda.latestHints.planPending',
-      reminderRead: 'agenda.latestHints.reminderRead',
-      reminderDelivered: 'agenda.latestHints.reminderDelivered',
       reminderSent: 'agenda.latestHints.reminderSent',
       repliedYes: 'agenda.latestHints.repliedYes',
       moved: 'agenda.latestHints.moved',

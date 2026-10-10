@@ -3,13 +3,18 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { fetchAppointment } from '@/shared/api/clinic/appointments-api.ts';
+import type * as AppointmentsApiModule from '@/shared/api/clinic/appointments-api.ts';
+import { cancelAppointment } from '@/shared/api/clinic/appointments-api.ts';
 import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
-import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import { APPOINTMENT_NOW, appointmentRow } from '@/tests/utils/appointment-doubles.ts';
 import { fsi, withoutBidiMarks } from '@/tests/utils/bidi-marks.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
+import {
+  type AppointmentsWorld,
+  publicId,
+  seededAppointmentsWorld,
+} from '../../__tests__/integration/appointments-test-data.ts';
 import {
   APPOINTMENTS_PAGE,
   grantClinicAccess,
@@ -27,28 +32,32 @@ vi.mock('@/shared/notify/index.ts', () => ({
   UNDO_TOAST_DURATION_MS: 10_000,
 }));
 
-let base: AppointmentRow;
-
-/** Jalpa's booking (#2858), moved to what a test asks. */
-const booking = (overrides: Partial<AppointmentRow> = {}): AppointmentRow => ({
-  ...base,
-  ...overrides,
+const world = vi.hoisted(() => ({}) as AppointmentsWorld);
+vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => {
+  const { appointmentsApiDouble } =
+    await import('../../__tests__/integration/appointments-test-data.ts');
+  return {
+    ...(await importOriginal<typeof AppointmentsApiModule>()),
+    ...appointmentsApiDouble(world),
+  };
 });
+
+/** Riya's booking (#2861) — with Dr. Nisha tomorrow at 10:30 — as a test asks. */
+const base = appointmentRow();
+const booking = (overrides: Partial<AppointmentRow> = {}): AppointmentRow =>
+  appointmentRow(overrides);
 
 const block = () => screen.getByTestId('appointments-block');
 
-beforeEach(async () => {
+beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] });
-  vi.setSystemTime(new Date(clinicInstant('2026-10-03', '10:00')));
-  for (const spy of Object.values(notifyMock)) spy.mockReset();
-  resetClinicFixtures();
+  vi.setSystemTime(APPOINTMENT_NOW);
+  vi.resetAllMocks();
+  Object.assign(world, seededAppointmentsWorld());
+  signInTestMember();
   grantClinicAccess('owner');
-  base = await fetchAppointment(ref.appointment(2858));
 });
-afterEach(() => {
-  vi.useRealTimers();
-  resetClinicFixtures();
-});
+afterEach(() => vi.useRealTimers());
 
 describe('CalendarBlock (KICKOFF §6.4 Blocks; H:2063)', () => {
   it('draws the person, the doctor, the time and both pills on its status tint', async () => {
@@ -73,10 +82,10 @@ describe('CalendarBlock (KICKOFF §6.4 Blocks; H:2063)', () => {
     expect(block().className).toContain('bg-tone-butter');
     expect(block().className).toContain('border-s-tone-butter-foreground');
     expect(block().className).toContain('flex-wrap');
-    expect(block()).toHaveTextContent('Jalpa Sheladiya');
+    expect(block()).toHaveTextContent('Riya Mehta');
     // The time is an isolated token; the name reads in its own direction.
     expect(block()).toHaveTextContent(`${fsi('10:30 AM')} · 60m`);
-    expect(within(block()).getByText('Jalpa Sheladiya')).toHaveAttribute('dir', 'auto');
+    expect(within(block()).getByText('Riya Mehta')).toHaveAttribute('dir', 'auto');
     expect(block()).toHaveTextContent(appointment.serviceLabel);
     expect(block()).toHaveTextContent('Scheduled');
     expect(within(block()).getByTestId('patient-badge')).toHaveTextContent('P');
@@ -103,7 +112,7 @@ describe('CalendarBlock (KICKOFF §6.4 Blocks; H:2063)', () => {
     expect(block().className).toContain('flex-nowrap');
     // The tooltip's tokens are isolated; its words and order as read:
     expect(withoutBidiMarks(block().getAttribute('title'))).toMatch(
-      /^Jalpa Sheladiya · .+ · 20 min · .+ · overlaps another booking$/,
+      /^Riya Mehta · .+ · 20 min · .+ · overlaps another booking$/,
     );
   });
 
@@ -112,7 +121,7 @@ describe('CalendarBlock (KICKOFF §6.4 Blocks; H:2063)', () => {
       <>
         <CalendarBlock appointment={booking()} variant="chip" />
         <CalendarBlock
-          appointment={booking({ id: crypto.randomUUID() })}
+          appointment={booking({ id: publicId('appt', 'copy') })}
           variant="list"
         />
       </>,
@@ -130,13 +139,13 @@ describe('CalendarBlock (KICKOFF §6.4 Blocks; H:2063)', () => {
     const { router } = renderInAppointments(
       <CalendarBlock appointment={booking()} variant="chip" />,
     );
-    await user.click(await screen.findByRole('button', { name: /Jalpa Sheladiya/ }));
+    await user.click(await screen.findByRole('button', { name: /Riya Mehta/ }));
     await waitFor(() =>
       expect(router.state.location.pathname).toBe(`${APPOINTMENTS_PAGE}/${base.id}`),
     );
   });
 
-  it('shows the card on hover; its Cancel opens Change status on the cancel view, under the block', async () => {
+  it('shows the card on hover; its Cancel opens Change status on the cancel view, under the block, and a reason cancels', async () => {
     const user = userEvent.setup();
     renderInAppointments(
       <CalendarBlock appointment={booking({ status: 'scheduled' })} variant="chip" />,
@@ -146,6 +155,16 @@ describe('CalendarBlock (KICKOFF §6.4 Blocks; H:2063)', () => {
     await user.click(within(card).getByTestId('appointment-card-move-cancelled'));
     const popover = await screen.findByTestId('appointments-status-popover');
     expect(popover).toHaveTextContent('Why is it cancelled?');
+    await user.click(
+      within(popover).getByTestId('appointments-cancel-reason-patient_asked'),
+    );
+    await waitFor(() =>
+      expect(cancelAppointment).toHaveBeenCalledExactlyOnceWith({
+        appointmentId: base.id,
+        cancel: { reason: 'patient_asked', note: null },
+        idempotencyKey: expect.any(String),
+      }),
+    );
   });
 
   it('has no accessibility violations', async () => {

@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type * as ContactsApiModule from '@/shared/api/clinic/contacts-api.ts';
 import {
+  createContact,
   fetchContact,
   searchContacts,
   updateContact,
@@ -17,12 +18,18 @@ import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
-import { useContact, useContactSearch, useUpdateContact } from './useContacts.ts';
+import {
+  useContact,
+  useContactSearch,
+  useCreateContact,
+  useUpdateContact,
+} from './useContacts.ts';
 
 vi.mock('@/shared/api/clinic/contacts-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof ContactsApiModule>()),
   fetchContact: vi.fn(),
   searchContacts: vi.fn(),
+  createContact: vi.fn(),
   updateContact: vi.fn(),
 }));
 vi.mock('@/shared/notify/index.ts', async (importOriginal) => ({
@@ -61,6 +68,16 @@ const EDITED: ContactFields = {
   preferenceTags: ['evenings'],
 };
 
+/** A person the search did not find, as the appointment form creates them. */
+const MEERA_FIELDS: ContactFields = {
+  firstName: 'Meera',
+  lastName: 'Joshi',
+  phones: [{ phone: '+919825011241', isOnWhatsapp: true }],
+  instagramHandles: [],
+  defaultChannel: 'whatsapp',
+  preferenceTags: [],
+};
+
 let client: QueryClient;
 function wrapper({ children }: { children: ReactNode }) {
   return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
@@ -80,6 +97,15 @@ beforeEach(() => {
       ? [ANAYA]
       : [],
   );
+  vi.mocked(createContact).mockImplementation(async ({ fields }) => ({
+    ...ANAYA,
+    id: 'con_meera0000000000000000',
+    contactNumber: 10301,
+    firstName: fields.firstName,
+    lastName: fields.lastName,
+    name: `${fields.firstName} ${fields.lastName}`,
+    openLeadId: null,
+  }));
   vi.mocked(updateContact).mockImplementation(async ({ fields }) => ({
     ...ANAYA,
     lastName: fields.lastName,
@@ -159,6 +185,44 @@ describe('useContactSearch', () => {
     await waitFor(() => expect(result.current.hits).toEqual([ANAYA]));
     rerender({ query: 'an' });
     expect(result.current).toEqual({ hits: [], noMatch: false });
+  });
+});
+
+describe('useCreateContact', () => {
+  it('creates a person with the action’s key, silently — the booking’s toast says it', async () => {
+    const { result } = renderHook(() => useCreateContact(), { wrapper });
+    const created = await act(() => result.current.mutateAsync(MEERA_FIELDS));
+    expect(createContact).toHaveBeenCalledWith({
+      fields: MEERA_FIELDS,
+      idempotencyKey: expect.any(String),
+    });
+    expect(created).toMatchObject({
+      id: 'con_meera0000000000000000',
+      name: 'Meera Joshi',
+    });
+    expect(notify.success).not.toHaveBeenCalled();
+  });
+
+  it('refreshes the contact reads once the person exists', async () => {
+    const { result } = renderHook(
+      () => ({ contact: useContact(ANAYA.id), create: useCreateContact() }),
+      { wrapper },
+    );
+    await waitFor(() => expect(result.current.contact.isSuccess).toBe(true));
+
+    await act(() => result.current.create.mutateAsync(MEERA_FIELDS));
+
+    await waitFor(() => expect(fetchContact).toHaveBeenCalledTimes(2));
+  });
+
+  it('says why a create was refused — the number is someone else’s', async () => {
+    vi.mocked(createContact).mockRejectedValueOnce(new Error('contact_phone_exists'));
+    const { result } = renderHook(() => useCreateContact(), { wrapper });
+    await act(async () => {
+      await result.current.mutateAsync(MEERA_FIELDS).catch(() => undefined);
+    });
+    expect(notify.error).toHaveBeenCalledTimes(1);
+    expect(notify.success).not.toHaveBeenCalled();
   });
 });
 

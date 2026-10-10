@@ -1,105 +1,260 @@
 import { z } from 'zod';
 
-import {
-  type CreatedFilter,
-  type FollowUpFilter,
-  readCreatedFilter,
-  readFollowUpFilter,
-} from './clinic-list-filters.ts';
+import type { ApiBody, ApiData } from '@/core/http/api.ts';
+import { wireSchema } from '@/core/http/wire-schema.ts';
+
+import type { CreatedFilter } from './clinic-list-filters.ts';
 import {
   APPOINTMENT_STATUS_VALUES,
-  appointmentSchema,
   type AppointmentStatus,
+  appointmentStatusSchema,
   type AppointmentType,
   appointmentTypeSchema,
-  cancelReasonSchema,
   civilDateSchema,
   clockTimeSchema,
-  deliveryStatusSchema,
-  type ImageAlbum,
-  isoDateTimeSchema,
-  type LeadKind,
-  type LeadStatus,
-  type PatientType,
-  type Presence,
-  type Role,
-  roomSchema,
+  type OfferingSpecialty,
+  offeringSpecialtySchema,
   type Tone,
+  toneSchema,
 } from './clinic-schema.ts';
-import type { LeadRecordSource } from './leads-fixture-contracts.ts';
+import { contactNameOf } from './contacts-contracts.ts';
+import type { DirectoryMember } from './directory-api.ts';
 
 /*
- * The Appointments domain beyond the generated contract (KICKOFF §6.4, D22):
- * the plan's fields the screens show — each a fixture field until clinozy-be
- * serves it (Appendix F, REPLACE_WITH_API) — the rows the views read (the
- * person and the doctor joined, the plan counts), the Agenda / range / slot
- * reads' params, and what a client sends to book, edit, move, cancel and
- * restore. Read by Appointments, Today, the patient file, Tasks and the
- * appointment form wherever it is stacked.
+ * The Appointments domain on clinozy-be (KICKOFF §6.4; api-integration §5.3): a booking points
+ * at its contact (`contact_id`, the row's `contact` summary) and carries the contact's patient
+ * file and open lead (`patient_id`, `lead_id`, A1), the branch, doctor, therapist, room and
+ * machine, the slot and length, the status with its stamps, the floor stage, and the reminder
+ * state the server keeps. The design's package link, plan counts, per-row reminder delivered /
+ * read and the client's own slot maths went with the backend (route map §4, G3).
  */
 
 // ── Records ──
 
-/**
- * An appointment as the rooms read it: the contract's `Appointment`
- * (`S:321–353`) plus the "Latest update" data and the package link the plan
- * asks for (Appendix F, REPLACE_WITH_API).
- */
-export const appointmentRecordSchema = appointmentSchema.extend({
-  /**
-   * The latest WhatsApp message about this slot — the confirm request, then
-   * the reminder — by its delivery state ("✓ Reminder sent / delivered /
-   * read"); null until one goes out. A booking or a move starts it again.
-   */
-  reminder: deliveryStatusSchema.nullable(),
-  /** Confirmed automatically by a WhatsApp "Yes" ("✓ Replied Yes"). */
-  repliedYes: z.boolean(),
-  /** How many times the booking moved to another slot ("✓ Moved ×<n>"). */
-  moveCount: z.number().int().nonnegative(),
-  /** The package a Package session uses a session of (C19). */
-  patientPackageId: z.uuid().nullable(),
-});
-/** An appointment record — the contract's fields and the plan's. */
-export type AppointmentRecord = z.infer<typeof appointmentRecordSchema>;
-
-/** Who a booking is for: a patient, a lead, or a contact (a contact-thread lead, D32). */
+/** Who a booking is for: a patient (their file exists), a lead (an open enquiry) or a contact. */
 export type AppointmentPersonKind = 'patient' | 'lead' | 'contact';
 
 /** The booked person as every view shows them (avatar, name, mobile, "P" badge). */
 export interface AppointmentPerson {
   kind: AppointmentPersonKind;
+  contactId: string;
+  /** "Riya Shah" — "" if the contact is gone. */
   name: string;
-  /** An Indian mobile in E.164. */
+  /** Their primary number, E.164. */
   phone: string | null;
   patientId: string | null;
   leadId: string | null;
-  /** The patient's or the lead's `seq`; null for a contact. */
-  seq: number | null;
+  /** The contact number ("C-12345"); null if the contact is gone. */
+  contactNumber: number | null;
 }
 
-/** A bookable staff member — the doctor chip, the doctor pickers, the Day strip. */
-export interface AppointmentStaff {
+/** The reminder state the server keeps on a booking — the "Latest update" pill. */
+const APPOINTMENT_REMINDER_VALUES = [
+  'not_sent',
+  'confirm_requested',
+  'reminder_queued',
+  'reminder_sent',
+  'failed',
+] as const;
+/** One reminder state. */
+type AppointmentReminder = (typeof APPOINTMENT_REMINDER_VALUES)[number];
+
+/** A checked-in visit's floor stage, forward only. */
+const APPOINTMENT_VISIT_STAGES = [
+  'waiting',
+  'with_doctor',
+  'treatment',
+  'checkout',
+  'pharmacy',
+] as const;
+/** One floor stage. */
+type AppointmentVisitStage = (typeof APPOINTMENT_VISIT_STAGES)[number];
+
+/** Why a booking was cancelled — the API's seven (the design's five plus two of the form's). */
+const APPOINTMENT_CANCEL_REASONS = [
+  'patient_asked',
+  'unreachable',
+  'doctor_unavailable',
+  'resource_unavailable',
+  'rescheduling_later',
+  'booked_by_mistake',
+  'other',
+] as const;
+/** One cancel reason. */
+export type AppointmentCancelReason = (typeof APPOINTMENT_CANCEL_REASONS)[number];
+
+/** A booking as every Appointments view reads it. */
+export interface AppointmentRecord {
   id: string;
-  firstName: string;
-  lastName: string | null;
-  initials: string;
-  tone: Tone;
-  /** Real roles — a therapist reads "Therapist", never "Doctor" (§7.3). */
-  roles: Role[];
-  presence: Presence;
-  active: boolean;
+  /** "#2841". */
+  seq: number;
+  contactId: string;
+  person: AppointmentPerson;
+  patientId: string | null;
+  leadId: string | null;
+  branchId: string;
+  type: AppointmentType;
+  offeringId: string | null;
+  serviceLabel: string;
+  doctorId: string;
+  therapistId: string | null;
+  roomId: string | null;
+  machineId: string | null;
+  /** The visit day, clinic-local. */
+  date: string;
+  /** `HH:mm`, clinic-local. */
+  startTime: string;
+  endTime: string;
+  durationMin: number;
+  status: AppointmentStatus;
+  cancelReason: AppointmentCancelReason | null;
+  cancelNote: string | null;
+  /** The slot it moved from, as an instant — set by a move. */
+  rescheduledFrom: string | null;
+  reason: string | null;
+  notes: string | null;
+  followUpAt: string | null;
+  checkedInAt: string | null;
+  completedAt: string | null;
+  copiedFromId: string | null;
+  reminder: AppointmentReminder;
+  /** Confirmed by a WhatsApp "Yes". */
+  repliedYes: boolean;
+  /** How many times it moved to another slot. */
+  moveCount: number;
+  visitStage: AppointmentVisitStage | null;
+  isWalkIn: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
-/**
- * One appointment as a view reads it: the record, the person and the doctor
- * joined, and the plan behind "Plan ready · <n> offerings" — the suggestions
- * for this visit and the patient's whole plan (`S:352`, derived, never stored).
- */
-export type AppointmentRow = AppointmentRecord & {
-  person: AppointmentPerson;
-  doctor: AppointmentStaff | null;
-  plan: { visit: number; patient: number };
+/** A bookable member — the team directory's member (no role or presence, api-integration M41). */
+export type AppointmentStaff = DirectoryMember;
+
+/** One booking as a view draws it: the record and its doctor from the team directory. */
+export type AppointmentRow = AppointmentRecord & { doctor: AppointmentStaff | null };
+
+// ── The wire ──
+
+type ApiAppointmentRow = NonNullable<ApiData<'/app/appointments', 'get'>>[number];
+type ApiAppointment = NonNullable<ApiData<'/app/appointments/{appointment_id}', 'get'>>;
+/** A change as `PATCH /app/appointments/:appointment_id` takes it. */
+export type ApiAppointmentChange = NonNullable<
+  ApiBody<'/app/appointments/{appointment_id}', 'patch'>
+>;
+
+const appointmentFieldsWire = {
+  id: z.string(),
+  appointment_number: z.number().int(),
+  contact_id: z.string(),
+  contact: z
+    .object({
+      contact_number: z.number().int(),
+      first_name: z.string(),
+      last_name: z.string().nullable(),
+      primary_phone: z.string(),
+    })
+    .nullable(),
+  patient_id: z.string().nullable(),
+  lead_id: z.string().nullable(),
+  branch_id: z.string(),
+  type: appointmentTypeSchema,
+  offering_id: z.string().nullable(),
+  service_label: z.string(),
+  doctor_membership_id: z.string(),
+  therapist_membership_id: z.string().nullable(),
+  branch_room_id: z.string().nullable(),
+  branch_machine_id: z.string().nullable(),
+  appointment_date: civilDateSchema,
+  start_time: clockTimeSchema,
+  end_time: clockTimeSchema,
+  duration_minutes: z.number().int(),
+  status: appointmentStatusSchema,
+  cancel_reason: z.enum(APPOINTMENT_CANCEL_REASONS).nullable(),
+  cancel_note: z.string().nullable(),
+  rescheduled_from: z.string().nullable(),
+  reason: z.string().nullable(),
+  notes: z.string().nullable(),
+  follow_up_at: z.string().nullable(),
+  checked_in_at: z.string().nullable(),
+  completed_at: z.string().nullable(),
+  copied_from_appointment_id: z.string().nullable(),
+  reminder_status: z.enum(APPOINTMENT_REMINDER_VALUES),
+  is_confirmed_by_reply: z.boolean(),
+  move_count: z.number().int(),
+  visit_stage: z.enum(APPOINTMENT_VISIT_STAGES).nullable(),
+  is_walk_in: z.boolean(),
+  created_at: z.string(),
+  updated_at: z.string(),
 };
+
+/** A list row (`GET /app/appointments`). */
+export const appointmentRowWire = wireSchema<ApiAppointmentRow>()(
+  z.object(appointmentFieldsWire),
+);
+
+/** One booking (`GET /app/appointments/:appointment_id`, and every write's answer). */
+export const appointmentWire = wireSchema<ApiAppointment>()(
+  z.object(appointmentFieldsWire),
+);
+
+/** A booking as the API sends it. */
+type AppointmentWire = z.output<typeof appointmentRowWire>;
+
+/** Whom a booking is for, by the files the contact has. */
+function personKindOf(row: AppointmentWire): AppointmentPersonKind {
+  if (row.patient_id) return 'patient';
+  return row.lead_id ? 'lead' : 'contact';
+}
+
+/** A booking as the rooms read it. */
+export function toAppointmentRecord(row: AppointmentWire): AppointmentRecord {
+  return {
+    id: row.id,
+    seq: row.appointment_number,
+    contactId: row.contact_id,
+    person: {
+      kind: personKindOf(row),
+      contactId: row.contact_id,
+      name: row.contact ? contactNameOf(row.contact) : '',
+      phone: row.contact?.primary_phone ?? null,
+      patientId: row.patient_id,
+      leadId: row.lead_id,
+      contactNumber: row.contact?.contact_number ?? null,
+    },
+    patientId: row.patient_id,
+    leadId: row.lead_id,
+    branchId: row.branch_id,
+    type: row.type,
+    offeringId: row.offering_id,
+    serviceLabel: row.service_label,
+    doctorId: row.doctor_membership_id,
+    therapistId: row.therapist_membership_id,
+    roomId: row.branch_room_id,
+    machineId: row.branch_machine_id,
+    date: row.appointment_date,
+    startTime: row.start_time,
+    endTime: row.end_time,
+    durationMin: row.duration_minutes,
+    status: row.status,
+    cancelReason: row.cancel_reason,
+    cancelNote: row.cancel_note,
+    rescheduledFrom: row.rescheduled_from,
+    reason: row.reason,
+    notes: row.notes,
+    followUpAt: row.follow_up_at,
+    checkedInAt: row.checked_in_at,
+    completedAt: row.completed_at,
+    copiedFromId: row.copied_from_appointment_id,
+    reminder: row.reminder_status,
+    repliedYes: row.is_confirmed_by_reply,
+    moveCount: row.move_count,
+    visitStage: row.visit_stage,
+    isWalkIn: row.is_walk_in,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
 
 // ── Lengths and slots ──
 
@@ -113,8 +268,8 @@ export const APPOINTMENT_TYPE_MINUTES: Readonly<Record<AppointmentType, number>>
 };
 
 /**
- * A booking's service when neither an offering nor a label names one: its
- * type's (`AP_TYPE`, H:3418) — stored text, as the design writes it.
+ * A booking's service when neither an offering nor a label names one: its type's (`AP_TYPE`,
+ * H:3418) — stored text, as the design writes it.
  */
 export const APPOINTMENT_TYPE_SERVICES: Readonly<Record<AppointmentType, string>> = {
   consultation: 'Consultation',
@@ -127,17 +282,86 @@ export const APPOINTMENT_TYPE_SERVICES: Readonly<Record<AppointmentType, string>
 /** The form's length chips, in minutes (`appointments.md:76`). */
 export const APPOINTMENT_LENGTHS = [15, 20, 30, 45, 60, 90, 120] as const;
 
-/** The slot grid's step, 30 minutes by default (`appointments.md:85`). */
+/** The slot grid's step (`step_minutes`), 30 minutes by default (`appointments.md:85`). */
 export const APPOINTMENT_SLOT_STEPS = [30, 15] as const;
 /** One slot step. */
 export type AppointmentSlotStep = (typeof APPOINTMENT_SLOT_STEPS)[number];
 
+/** Why a day takes no booking (`GET /app/appointments/slots`'s `closed_reason`). */
+const APPOINTMENT_CLOSED_REASONS = [
+  'past',
+  'branch_inactive',
+  'closed_day',
+  'holiday',
+  'doctor_off',
+] as const;
+/** One closed reason. */
+export type AppointmentClosedReason = (typeof APPOINTMENT_CLOSED_REASONS)[number];
+
+/** One free start in the slot grid — the server lists free starts only. */
+export interface AppointmentSlot {
+  time: string;
+  endTime: string;
+}
+
+/** A day's free starts for a doctor and a length, or why the day is closed. */
+export interface AppointmentSlotDay {
+  date: string;
+  isOpen: boolean;
+  closedReason: AppointmentClosedReason | null;
+  /** A holiday's name ("Diwali"). */
+  closedLabel: string | null;
+  slots: AppointmentSlot[];
+}
+
+/** What the slot grid asks for: the day, branch, doctor, length and step. */
+export interface AppointmentSlotParams {
+  date: string;
+  branchId: string;
+  doctorId: string;
+  durationMin: number;
+  step: AppointmentSlotStep;
+}
+
+/** The slots wire — `GET /app/appointments/slots` (the OpenAPI document leaves it untyped, M44). */
+export const appointmentSlotDayWire = z.object({
+  appointment_date: civilDateSchema,
+  is_open: z.boolean(),
+  closed_reason: z.enum(APPOINTMENT_CLOSED_REASONS).nullable(),
+  closed_label: z.string().nullable(),
+  slots: z.array(z.object({ start_time: clockTimeSchema, end_time: clockTimeSchema })),
+});
+
+/**
+ * A treatment the form offers under "From offerings" (`GET /app/offerings?category=treatment`):
+ * its name becomes the service label, its length the booking's.
+ */
+export interface AppointmentTreatment {
+  id: string;
+  name: string;
+  durationMin: number;
+  specialty: OfferingSpecialty;
+  tone: Tone;
+}
+
+type ApiOfferingRow = NonNullable<ApiData<'/app/offerings', 'get'>>[number];
+
+/** The parts of an offering row the treatment picker reads. */
+export const appointmentTreatmentWire = wireSchema<ApiOfferingRow>()(
+  z.object({
+    id: z.string(),
+    name: z.string(),
+    duration_minutes: z.number().int(),
+    specialty: offeringSpecialtySchema,
+    tone: toneSchema,
+  }),
+);
+
 // ── Views ──
 
 /**
- * The room's four views (D27; `view=agenda*|day|week|month` — the schema's
- * `day|week|list`, default `day`, is stale, Appendix F). Week is not offered
- * on a phone: a Week link renders Day there.
+ * The room's four views (D27; `view=agenda*|day|week|month`). Week is not offered on a phone:
+ * a Week link renders Day there.
  */
 export const APPOINTMENT_VIEWS = ['agenda', 'day', 'week', 'month'] as const;
 /** One view. */
@@ -170,304 +394,99 @@ export function statusesForFilter(
   return [filter];
 }
 
-/** The Agenda's sortable columns, sorted inside each day (Contact A–Z, Service, Status). */
-export const APPOINTMENT_SORT_KEYS = ['contact', 'service', 'status'] as const;
-/** One Agenda sort key. */
-export type AppointmentSortKey = (typeof APPOINTMENT_SORT_KEYS)[number];
-
-/** The search a list read takes: name, mobile or "#seq", spaces and "#" ignored (Q-A12). */
-export const APPOINTMENT_SEARCH_MAX = 80;
-
-/** The filters every appointment read shares (Filters, the toolbar search, the branch picker). */
-const appointmentFiltersSchema = z.object({
-  status: z.enum(APPOINTMENT_STATUS_FILTERS).default('active'),
-  /** "APPOINTED TO": any of these doctors; empty = every doctor. */
-  doctorIds: z.array(z.uuid()).max(50).default([]),
-  created: z
-    .custom<CreatedFilter>((value) => readCreatedFilter(value) !== undefined)
-    .optional(),
-  followUp: z
-    .custom<FollowUpFilter>((value) => readFollowUpFilter(value) !== undefined)
-    .optional(),
-  q: z.string().max(APPOINTMENT_SEARCH_MAX).optional(),
+/**
+ * The filters every list read shares: the status chips, one doctor ("APPOINTED TO" — the API
+ * takes one, G3), the created range, the search and the header's branches.
+ */
+export interface AppointmentFilters {
+  status: AppointmentStatusFilter;
+  /** One doctor's bookings; none = every doctor. */
+  doctorId?: string;
+  created?: CreatedFilter;
+  q?: string;
   /** The header branch picker; empty = every branch. */
-  branchIds: z.array(z.uuid()).max(20).default([]),
-});
+  branchIds: readonly string[];
+}
+
+/** The Agenda's read: from today on — or the one day picked in Filters, past days included. */
+export interface AppointmentListParams extends AppointmentFilters {
+  date?: string;
+}
+
+/** A calendar's read: every booking from `from` to `to`, both included. */
+export interface AppointmentRangeParams extends AppointmentFilters {
+  from: string;
+  to: string;
+}
 
 /**
- * The Agenda's read (`listAppointments`, `S:1603`; Appendix F's plan
- * changes): from today on — or the one day picked in Filters, past days
- * included — by day, then the sort inside the day, then the time; cursor
- * pages of 50.
+ * One day's counts (`GET /app/appointments/daily-counts`): every status, zeros included —
+ * within the branches and the doctor, whatever the status, search and created filters say.
  */
-export const appointmentListParamsSchema = appointmentFiltersSchema.extend({
-  date: civilDateSchema.optional(),
-  /** A column sorted inside each day (asc → desc → off); none is by time. */
-  sort: z.enum(APPOINTMENT_SORT_KEYS).optional(),
-  order: z.enum(['asc', 'desc']).optional(),
+export interface AppointmentDayCount {
+  date: string;
+  total: number;
+  byStatus: Readonly<Record<AppointmentStatus, number>>;
+}
+
+/** The daily-counts wire (the OpenAPI document leaves it untyped, M44). */
+export const appointmentDayCountWire = z.object({
+  appointment_date: civilDateSchema,
+  total: z.number().int(),
+  by_status: z.partialRecord(appointmentStatusSchema, z.number().int()),
 });
-/** Agenda params, defaults filled. */
-export type AppointmentListParams = z.infer<typeof appointmentListParamsSchema>;
-/** Agenda params as callers write them. */
-export type AppointmentListParamsInput = z.input<typeof appointmentListParamsSchema>;
 
-/** The longest range one calendar read covers — a Month board's six weeks. */
-export const APPOINTMENT_RANGE_MAX_DAYS = 42;
-
-/**
- * The calendars' read (`listAppointmentsRange`, `S:1602`): every booking from
- * `from` to `to` (both included) — a day, a week or a month board — by date
- * and time, no paging.
- */
-export const appointmentRangeParamsSchema = appointmentFiltersSchema
-  .extend({ from: civilDateSchema, to: civilDateSchema })
-  .refine((range) => range.to >= range.from, {
-    message: 'The range ends before it starts',
-    path: ['to'],
-  });
-/** Range params, defaults filled. */
-export type AppointmentRangeParams = z.infer<typeof appointmentRangeParamsSchema>;
-/** Range params as callers write them. */
-export type AppointmentRangeParamsInput = z.input<typeof appointmentRangeParamsSchema>;
-
-/**
- * One Agenda day's counts (Appendix F's per-day summary — a day can straddle
- * two cursor pages): its bookings in view, how many are confirmed and how many
- * still wait for a reply (Scheduled) — "<n> confirmed · <n> awaiting reply".
- * @public A contract shape the API wire-up parses with (REPLACE_WITH_API); until then only its type is read.
- */
-export const appointmentDaySummarySchema = z.object({
-  date: civilDateSchema,
-  total: z.number().int().nonnegative(),
-  confirmed: z.number().int().nonnegative(),
-  scheduled: z.number().int().nonnegative(),
-});
-/** One day's counts. */
-export type AppointmentDaySummary = z.infer<typeof appointmentDaySummarySchema>;
-
-/**
- * The slot grid's read (`availableSlots`, `S:1605`; Q-A3, Q-A4): the starts
- * a doctor can take on a day for a length — inside the branch's opening hours
- * and the doctor's working days and hours, every `step` minutes, the passed
- * ones left out — each free or taken by an overlapping booking of the same
- * doctor. `exceptId` is the booking being moved (its own slot reads free).
- */
-export const availableSlotsParamsSchema = z.object({
-  date: civilDateSchema,
-  doctorId: z.uuid(),
-  durationMin: z.number().int().min(5).max(240),
-  branchId: z.uuid().optional(),
-  step: z.union([z.literal(30), z.literal(15)]).default(30),
-  exceptId: z.uuid().optional(),
-});
-/** Slot params as callers write them. */
-export type AvailableSlotsParamsInput = z.input<typeof availableSlotsParamsSchema>;
-
-/**
- * One start in the slot grid.
- * @public A contract shape the API wire-up parses with (REPLACE_WITH_API); until then only its type is read.
- */
-export const appointmentSlotSchema = z.object({
-  time: clockTimeSchema,
-  free: z.boolean(),
-});
-/** One start in the slot grid. */
-export type AppointmentSlot = z.infer<typeof appointmentSlotSchema>;
+/** The longest window one daily-counts read covers. */
+export const APPOINTMENT_COUNTS_MAX_DAYS = 62;
 
 // ── Writes ──
 
-/** "Length" (`S:340`): 5–240 minutes, in steps of 5. */
-const durationSchema = z
-  .number()
-  .int()
-  .min(5, 'Pick a length of at least 5 minutes')
-  .max(240, 'Pick a length up to 240 minutes')
-  .refine((minutes) => minutes % 5 === 0, 'Pick a length in steps of 5 minutes');
-
-/**
- * Every field a client sends for a booking, with the contract's ranges
- * (`S:321–353`): the person (a patient, a lead or a contact thread — at least
- * one), the service, the doctor, the slot, Reason (≤ 160) and Notes (≤ 2,000)
- * — saved on create too (Q-A9).
- */
-export const appointmentFieldsSchema = z.object({
-  patientId: z.uuid().nullable(),
-  leadId: z.uuid().nullable(),
-  branchId: z.uuid(),
-  type: appointmentTypeSchema,
-  offeringId: z.uuid().nullable(),
-  serviceLabel: z.string().trim().min(1, 'Pick a service').max(120),
-  doctorId: z.uuid({ message: 'Pick a doctor' }),
-  therapistId: z.uuid().nullable(),
-  room: roomSchema.nullable(),
-  date: civilDateSchema,
-  startTime: clockTimeSchema,
-  durationMin: durationSchema,
-  reason: z.string().trim().max(160).nullable(),
-  notes: z.string().trim().max(2000).nullable(),
-  followUpAt: isoDateTimeSchema.nullable(),
-  patientPackageId: z.uuid().nullable(),
-});
-/** A booking's fields. */
-export type AppointmentFields = z.infer<typeof appointmentFieldsSchema>;
-
-/** {@link appointmentFieldsSchema} with its whole-record rule: someone to book. */
-export const appointmentInputSchema = appointmentFieldsSchema.refine(
-  (fields) => fields.patientId !== null || fields.leadId !== null,
-  { message: 'Pick who the appointment is for', path: ['patientId'] },
-);
-
-/**
- * A person the search did not find (`createAppointment`, `S:1609`: "new contact
- * name+phone → contact-thread Lead"): booking them opens their contact thread
- * — or finds the one already on that mobile.
- */
-export interface AppointmentNewContact {
-  name: string;
-  /** E.164 — the contract's Lead needs a mobile. */
-  phone: string;
-}
-
-/**
- * A new booking (`createAppointment`, `S:1609`): who, the doctor and the slot
- * are required; the type defaults to Consultation and its length, the service
- * to the offering's name, the branch to the member's. Who is a patient, a lead
- * or `newContact`. `copyOf` names the booking a Copy or Rebook starts from (the
- * server sets `copiedFromId`). It saves as Scheduled.
- */
-export type AppointmentCreateInput = Pick<
-  AppointmentFields,
-  'doctorId' | 'date' | 'startTime'
-> &
-  Partial<AppointmentFields> & { copyOf?: string; newContact?: AppointmentNewContact };
-
-/**
- * An edit (`updateAppointment`, `S:1610`): any field, and the status the
- * form's tiles picked. A new date or time on a Scheduled or Confirmed booking
- * moves it — back to Scheduled, with `rescheduledFrom` (`S:344`).
- */
-export type AppointmentPatch = Partial<AppointmentFields> & {
-  status?: AppointmentStatus;
-};
-
-/** The status moves a client asks for directly (the popover, the card, Today). */
-const APPOINTMENT_STATUS_MOVES = [
-  'confirmed',
-  'checked_in',
-  'completed',
-  'no_show',
-] as const satisfies readonly AppointmentStatus[];
-
-/** A status change (`setAppointmentStatus`, `S:1582`); Cancel and Restore have their own writes. */
-export const appointmentStatusInputSchema = z.object({
-  id: z.uuid(),
-  status: z.enum(APPOINTMENT_STATUS_MOVES),
-});
-/** A status change. */
-export type AppointmentStatusInput = z.infer<typeof appointmentStatusInputSchema>;
-
-/** A cancel note's limit (`cancelNote`, `S:343`). */
-const APPOINTMENT_CANCEL_NOTE_MAX = 280;
-
-/**
- * A cancel (`cancelAppointment`, `S:1611`): one of the contract's reasons
- * (D32) and a note — required for "Other" (`S:1154`).
- */
-export const appointmentCancelInputSchema = z
-  .object({
-    id: z.uuid(),
-    reason: cancelReasonSchema,
-    note: z.string().trim().max(APPOINTMENT_CANCEL_NOTE_MAX).nullable(),
-  })
-  .refine((cancel) => cancel.reason !== 'other' || Boolean(cancel.note), {
-    message: 'Add a short note for "Other"',
-    path: ['note'],
-  });
-/** A cancel. */
-export type AppointmentCancelInput = z.input<typeof appointmentCancelInputSchema>;
-
-/**
- * A status write's answer: the row after it, and the token that undoes it —
- * the status and every side effect (the toast's Undo, 10s, D32).
- */
-export interface AppointmentChange {
-  appointment: AppointmentRow;
-  undoToken: string;
-}
-
-/** An edit's answer: the row after it, and whether the slot moved. */
-export interface AppointmentUpdate {
-  appointment: AppointmentRow;
-  moved: boolean;
-}
-
-// ── The appointment form's reads ──
-
-/**
- * The person a booking prefill names (`create/?who=<patientId|leadId>`, `S:27`)
- * — the booked person, plus what the form defaults from them: the patient's
- * usual doctor (`Patient.doctorId`, `S:335`) and their care types ("Patient ·
- * <care>").
- */
-export interface AppointmentBookingPerson extends AppointmentPerson {
-  usualDoctorId: string | null;
-  types: readonly PatientType[];
-}
-
-/**
- * Whom a read is about: any of the person's ids and their mobile — a patient,
- * a lead, a contact thread, or someone found by phone.
- */
-export interface AppointmentPersonLookup {
-  patientId: string | null;
-  leadId: string | null;
-  /** E.164. */
-  phone: string | null;
-}
-
-/**
- * A lead connected to the booked person (`getAppointment`'s "connected leads",
- * `S:1604`): their own, the leads on their patient record and the enquiries on
- * their mobile — the form's "Connected lead" chips and its "Lead" radios. Never
- * a contact thread.
- */
-export interface AppointmentConnectedLead {
-  id: string;
-  seq: number;
-  status: LeadStatus | null;
-  kind: LeadKind;
-  source: LeadRecordSource | null;
-  /** The contract's interests' values and the custom ones, as typed. */
-  interests: readonly string[];
-  ownerName: string | null;
-  patientId: string | null;
-  /** ISO instant the lead came in. */
-  createdAt: string;
-}
-
-/**
- * A paid package a Package session can use a session of (C19, Appendix F):
- * its offering, the sessions used of the total and the last day it is valid.
- */
-export interface AppointmentPackageOption {
-  id: string;
-  offeringId: string;
-  name: string;
-  tone: Tone;
-  /** The offering's session length — what picking the package sets the length to. */
+/** The booking's own fields a member edits (the person's are the contact's). */
+export interface AppointmentFields {
+  branchId: string;
+  doctorId: string;
+  type: AppointmentType;
+  offeringId: string | null;
+  serviceLabel: string;
   durationMin: number;
-  sessionsTotal: number;
-  sessionsUsed: number;
-  validUntil: string;
+  date: string;
+  startTime: string;
+  reason: string | null;
+  notes: string | null;
+}
+
+/** A new booking: the contact, and the fields. */
+export interface AppointmentCreateInput extends AppointmentFields {
+  contactId: string;
+}
+
+/** The fields as the API names them. */
+export function appointmentBodyOf(
+  fields: Partial<AppointmentFields>,
+): ApiAppointmentChange {
+  const body: ApiAppointmentChange = {};
+  if (fields.branchId !== undefined) body.branch_id = fields.branchId;
+  if (fields.doctorId !== undefined) body.doctor_membership_id = fields.doctorId;
+  if (fields.type !== undefined) body.type = fields.type;
+  if (fields.offeringId !== undefined) body.offering_id = fields.offeringId;
+  if (fields.serviceLabel !== undefined) body.service_label = fields.serviceLabel;
+  if (fields.durationMin !== undefined) body.duration_minutes = fields.durationMin;
+  if (fields.date !== undefined) body.appointment_date = fields.date;
+  if (fields.startTime !== undefined) body.start_time = fields.startTime;
+  if (fields.reason !== undefined) body.reason = fields.reason;
+  if (fields.notes !== undefined) body.notes = fields.notes;
+  return body;
 }
 
 /**
- * A photo to file under a visit (`uploadVisitPhotos`, `S:1613`): the booking,
- * the album and the storage key the upload tray confirmed.
+ * A status move — one route each (`POST …/confirm`, `/check-in`, `/complete`, `/no-show`,
+ * `/reinstate`, `/undo-check-in`); Cancel takes its reason through {@link AppointmentCancel}.
  */
-export interface VisitPhotoInput {
-  appointmentId: string;
-  album: ImageAlbum;
-  key: string;
-  fileName: string;
+export type AppointmentMoveRoute =
+  'confirm' | 'check-in' | 'complete' | 'no-show' | 'reinstate' | 'undo-check-in';
+
+/** A cancel: one of the API's reasons and an optional note. */
+export interface AppointmentCancel {
+  reason: AppointmentCancelReason;
+  note: string | null;
 }

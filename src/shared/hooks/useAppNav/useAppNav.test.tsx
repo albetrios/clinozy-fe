@@ -149,6 +149,20 @@ describe('useAppNav', () => {
     expect(await screen.findByText('today')).toBeInTheDocument();
   });
 
+  it('opens Leads by the member’s lead codes — a room on the API — whatever their clinic role', async () => {
+    useOrganizationStore.getState().setPermissions(['organization:read', 'lead:read']);
+    renderNav();
+    expect(await screen.findByText('today,leads')).toBeInTheDocument();
+  });
+
+  it('hides Leads from an owner who holds no lead code', async () => {
+    useOrganizationStore
+      .getState()
+      .setPermissions(OWNER_CODES.filter((code) => !code.startsWith('lead:')));
+    renderNav();
+    expect(await screen.findByText('today,users')).toBeInTheDocument();
+  });
+
   it('follows a View-as preview', async () => {
     useOrganizationStore.getState().setPermissions(OWNER_CODES);
     renderNav();

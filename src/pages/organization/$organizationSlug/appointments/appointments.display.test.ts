@@ -1,29 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
-import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
+import { appointmentRow as booking } from '@/tests/utils/appointment-doubles.ts';
 
 import {
   agendaGroupLabel,
   blockPersonTone,
   dayGroupTone,
   latestEvent,
-  latestUpdates,
+  PERSON_TONES,
 } from './appointments.display.ts';
-
-/** Just the fields the display helpers read. */
-function booking(overrides: Partial<AppointmentRow> = {}): AppointmentRow {
-  return {
-    status: 'scheduled',
-    reminder: null,
-    repliedYes: false,
-    moveCount: 0,
-    rescheduledFrom: null,
-    plan: { visit: 0, patient: 0 },
-    serviceLabel: 'Consultation',
-    type: 'consultation',
-    ...overrides,
-  } as AppointmentRow;
-}
 
 describe('blockPersonTone (avTone, H:5892)', () => {
   it('paints a patient sage and everyone else lav on a calendar block', () => {
@@ -60,54 +45,72 @@ describe('agendaGroupLabel (H:5906)', () => {
   });
 });
 
-describe('latestUpdates (H:5971)', () => {
-  it('leads with the plan: ready once this visit has suggestions, else pending', () => {
-    expect(latestUpdates(booking()).map((pill) => pill.kind)).toEqual(['planPending']);
-    expect(latestUpdates(booking({ plan: { visit: 2, patient: 3 } }))).toEqual([
-      { kind: 'planReady', tone: 'sage', suggestions: 3 },
-    ]);
+describe('PERSON_TONES (H:5972)', () => {
+  it('paints the Agenda’s patients sage, leads lav and anyone else grey', () => {
+    expect(PERSON_TONES).toEqual({ patient: 'sage', lead: 'lav', contact: 'stone' });
+  });
+});
+
+describe('latestEvent — the "Latest update" pill (H:5971)', () => {
+  it('is nothing ("—") for a booking without an event', () => {
+    expect(latestEvent(booking())).toBeNull();
+    expect(latestEvent(booking({ status: 'cancelled' }))).toBeNull();
   });
 
-  it('then the latest event: check-in over a move over a Yes over the reminder', () => {
-    const base = { reminder: 'read' as const };
-    expect(latestUpdates(booking(base)).at(-1)?.kind).toBe('reminderRead');
+  it('says "Reminder sent" once the server has sent it — nothing for the other reminder states', () => {
+    expect(latestEvent(booking({ reminder: 'reminder_sent' }))).toEqual({
+      kind: 'reminderSent',
+      tone: 'stone',
+    });
+    for (const reminder of [
+      'not_sent',
+      'confirm_requested',
+      'reminder_queued',
+      'failed',
+    ] as const) {
+      expect(latestEvent(booking({ reminder }))).toBeNull();
+    }
+  });
+
+  it('says "Replied Yes" only while the WhatsApp Yes still holds it Confirmed', () => {
+    expect(latestEvent(booking({ status: 'confirmed', repliedYes: true }))).toEqual({
+      kind: 'repliedYes',
+      tone: 'lav',
+    });
+    expect(latestEvent(booking({ repliedYes: true }))).toBeNull();
+  });
+
+  it('counts the moves and keeps the slot it moved from', () => {
     expect(
-      latestUpdates(booking({ ...base, status: 'confirmed', repliedYes: true })).at(-1)
-        ?.kind,
-    ).toBe('repliedYes');
-    // A Yes counts only while the booking is Confirmed.
-    expect(latestUpdates(booking({ ...base, repliedYes: true })).at(-1)?.kind).toBe(
-      'reminderRead',
-    );
-    expect(
-      latestUpdates(
-        booking({ ...base, moveCount: 2, rescheduledFrom: '2026-10-02T05:00:00.000Z' }),
-      ).at(-1),
+      latestEvent(booking({ moveCount: 2, rescheduledFrom: '2026-10-02T05:00:00.000Z' })),
     ).toEqual({
       kind: 'moved',
       tone: 'butter',
       times: 2,
       from: '2026-10-02T05:00:00.000Z',
     });
+  });
+
+  it('says "Checked in" once the patient has arrived, completed visits included', () => {
+    expect(latestEvent(booking({ status: 'checked_in' }))).toEqual({
+      kind: 'checkedIn',
+      tone: 'mint',
+    });
+    expect(latestEvent(booking({ status: 'completed' }))?.kind).toBe('checkedIn');
+  });
+
+  it('shows the latest: a check-in over a move over a Yes over the reminder', () => {
+    const sent = { reminder: 'reminder_sent' as const };
     expect(
-      latestUpdates(booking({ ...base, moveCount: 1, status: 'checked_in' })).at(-1)
-        ?.kind,
+      latestEvent(booking({ ...sent, status: 'confirmed', repliedYes: true }))?.kind,
+    ).toBe('repliedYes');
+    expect(
+      latestEvent(
+        booking({ ...sent, status: 'confirmed', repliedYes: true, moveCount: 1 }),
+      )?.kind,
+    ).toBe('moved');
+    expect(
+      latestEvent(booking({ ...sent, moveCount: 1, status: 'checked_in' }))?.kind,
     ).toBe('checkedIn');
-  });
-
-  it('words the reminder by its delivery: read, delivered, sent — nothing queued or failed', () => {
-    expect(latestEvent(booking({ reminder: 'delivered' }))?.kind).toBe(
-      'reminderDelivered',
-    );
-    expect(latestEvent(booking({ reminder: 'sent' }))?.kind).toBe('reminderSent');
-    expect(latestEvent(booking({ reminder: 'queued' }))).toBeNull();
-    expect(latestEvent(booking({ reminder: 'failed' }))).toBeNull();
-  });
-
-  it('drops the plan for Cancelled and No show, leaving nothing ("—") without events', () => {
-    expect(latestUpdates(booking({ status: 'cancelled' }))).toEqual([]);
-    expect(latestUpdates(booking({ status: 'no_show', reminder: 'sent' }))).toEqual([
-      { kind: 'reminderSent', tone: 'stone' },
-    ]);
   });
 });

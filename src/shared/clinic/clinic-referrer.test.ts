@@ -17,7 +17,9 @@ import {
 import { PATIENT_FILE_SECTIONS } from './patient-file-sections.ts';
 
 const PATIENT = '0b6d2f0e-5c7a-4c1e-9b2a-3d4e5f6a7b8c';
-const LEAD = '7c1d2e3f-4a5b-4c6d-8e7f-9a0b1c2d3e4f';
+/** A lead and a booking are clinozy-be public ids; the fixture rooms' records stay UUIDs. */
+const LEAD = 'lead_riya00000000000000000';
+const BOOKING = 'appt_riya00000000000000000';
 const INVOICE = '1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d';
 const ORG = '/organization/acme';
 
@@ -65,7 +67,8 @@ describe('the drawer referrer allow-list', () => {
     `patients/${PATIENT}/timeline?visit=open&from=leads`,
     `patients/${PATIENT}/invoices?visit=open`,
     `patients/${PATIENT}/timeline?visit=open&x=//evil.example`,
-    'leads/not-a-uuid',
+    'leads/not-a-lead',
+    'leads/7c1d2e3f-4a5b-4c6d-8e7f-9a0b1c2d3e4f',
     `leads/${LEAD}/edit`,
   ])('rejects %j', (from) => {
     expect(isAllowedReferrer(from)).toBe(false);
@@ -247,13 +250,19 @@ describe('crossRoomDialogOf (A-P1)', () => {
 
   const ROUTES = [
     ['appointments/create', 'appointmentCreate'],
-    [`appointments/${INVOICE}`, 'appointment'],
+    [`appointments/${BOOKING}`, 'appointment'],
     ['payments/receive', 'paymentReceive'],
     ['invoices/create', 'invoiceCreate'],
     [`invoices/${INVOICE}`, 'invoice'],
     [`invoices/${INVOICE}/edit`, 'invoiceEdit'],
     ['medical/sales/create', 'saleCreate'],
   ] as const;
+
+  it('knows no booking drawer by a UUID — a booking is a public id', () => {
+    expect(
+      crossRoomDialogOf({ [CROSS_ROOM_PARAM]: `appointments/${INVOICE}` }, 'acme'),
+    ).toBeNull();
+  });
 
   it.each(ROUTES)('knows %s as %s', (path, name) => {
     expect(crossRoomDialogOf({ [CROSS_ROOM_PARAM]: path }, 'acme')?.route.name).toBe(

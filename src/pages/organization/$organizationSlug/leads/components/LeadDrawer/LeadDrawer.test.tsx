@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
+import type * as AppointmentsApiModule from '@/shared/api/clinic/appointments-api.ts';
 import type * as ContactActivitiesApiModule from '@/shared/api/clinic/contact-activities-api.ts';
 import { fetchContactThread } from '@/shared/api/clinic/contact-activities-api.ts';
 import type * as ContactsApiModule from '@/shared/api/clinic/contacts-api.ts';
@@ -54,11 +55,13 @@ const viewport = vi.hoisted(() => ({ tier: 'desktop' as ViewportTier }));
 vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
   useViewportTier: () => viewport.tier,
 }));
+/** Whether the member may book (`appointment:create`) — every other ability is granted. */
+const access = vi.hoisted(() => ({ book: true }));
 vi.mock('@/shared/hooks/useClinicAccess/index.ts', () => ({
   useClinicAccess: () => ({
     roles: ['admin'],
     previewRole: null,
-    can: () => true,
+    can: (section: string) => section !== 'appointments' || access.book,
     canAbility: () => true,
     canCode: () => true,
     viewableSections: [],
@@ -97,6 +100,17 @@ vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => {
     ...directoryApiDouble(),
   };
 });
+// The stacked appointment form's reads: the day's free starts, no treatments.
+vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => {
+  const { slotDay } = await import('@/tests/utils/appointment-doubles.ts');
+  return {
+    ...(await importOriginal<typeof AppointmentsApiModule>()),
+    fetchAppointmentSlots: vi.fn(async ({ date }: { date: string }) =>
+      slotDay(date, ['10:00', '10:30']),
+    ),
+    fetchBookableTreatments: vi.fn(async () => []),
+  };
+});
 vi.mock('@/shared/tenancy/my-membership.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof MyMembershipModule>()),
   findMyMembershipId: vi.fn(async () => world.viewerId),
@@ -116,6 +130,7 @@ beforeEach(() => {
   Object.assign(world, seededLeadsWorld());
   Object.assign(people, { contacts: [contactRecord()] });
   vi.resetAllMocks();
+  access.book = true;
   signInTestMember();
 });
 afterEach(() => {
@@ -325,6 +340,63 @@ describe('LeadDrawer (KICKOFF §6.3)', () => {
       await screen.findByRole('region', { name: 'Lead details' }),
     ).toBeInTheDocument();
     expect(screen.queryByTestId('lead-drawer-chat')).toBeNull();
+  });
+
+  it('books an appointment from the chat: the form stacks on the lead’s contact, step 1 collapsed', async () => {
+    const user = userEvent.setup();
+    world.leads = [leadRecord({ interests: ['lhr'] })];
+    const { drawer } = await openAnaya();
+    const chat = within(drawer).getByTestId('lead-drawer-chat');
+    await user.click(await within(chat).findByTestId('chat-book'));
+    const booking = await screen.findByTestId('new-appointment-drawer');
+    expect(within(booking).getByTestId('new-appointment-drawer-title')).toHaveTextContent(
+      'New appointment',
+    );
+    // Who is the lead's contact, read by its id.
+    expect(
+      await within(booking).findByTestId('appointment-form-who-card'),
+    ).toHaveTextContent('Anaya Desai');
+    expect(fetchContact).toHaveBeenLastCalledWith(ANAYA.contactId);
+    // A laser interest books LHR Treatment for 20 minutes, today, Date & time open.
+    const details = within(booking).getByTestId('appointment-form-details');
+    expect(details).toHaveAttribute('data-open', 'false');
+    expect(details).toHaveTextContent('LHR Treatment');
+    expect(details).toHaveTextContent('20 min');
+    expect(within(booking).getByTestId('appointment-form-slot')).toHaveAttribute(
+      'data-open',
+      'true',
+    );
+    expect(within(booking).getByTestId('appointment-form-quick-today')).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    // Closing the form leaves the lead open behind it.
+    await user.click(within(booking).getByTestId('new-appointment-drawer-close'));
+    await waitFor(() =>
+      expect(screen.queryByTestId('new-appointment-drawer')).not.toBeInTheDocument(),
+    );
+    expect(screen.getByTestId('lead-drawer')).toBeInTheDocument();
+  });
+
+  it('books a Consultation for a lead with no laser interest', async () => {
+    const user = userEvent.setup();
+    const { drawer } = await openAnaya();
+    const chat = within(drawer).getByTestId('lead-drawer-chat');
+    await user.click(await within(chat).findByTestId('chat-book'));
+    const booking = await screen.findByTestId('new-appointment-drawer');
+    await within(booking).findByTestId('appointment-form-who-card');
+    expect(within(booking).getByTestId('appointment-form-details')).toHaveTextContent(
+      'Consultation',
+    );
+  });
+
+  it('offers no booking from the chat without the right to book', async () => {
+    access.book = false;
+    const { drawer } = await openAnaya();
+    const chat = within(drawer).getByTestId('lead-drawer-chat');
+    await within(chat).findByText(/^Lead created/);
+    expect(within(chat).queryByTestId('chat-book')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('new-appointment-drawer')).not.toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

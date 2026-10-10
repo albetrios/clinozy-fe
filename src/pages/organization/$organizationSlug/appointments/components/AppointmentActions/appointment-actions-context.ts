@@ -4,8 +4,10 @@ import type {
   AppointmentGuardOptions,
   AppointmentMove,
 } from '@/shared/api/clinic/appointment-status.ts';
-import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
-import type { CancelReason } from '@/shared/api/clinic/clinic-schema.ts';
+import type {
+  AppointmentCancelReason,
+  AppointmentRow,
+} from '@/shared/api/clinic/appointments-contracts.ts';
 
 /** What every booking surface of the room can do to a booking (the popover, the card, the blocks). */
 export interface AppointmentActionsValue {
@@ -16,20 +18,22 @@ export interface AppointmentActionsValue {
   /** The guards' clock and access, read when a surface opens. */
   guardOptions: () => AppointmentGuardOptions;
   /**
-   * A move from the transition table: a status (optimistic, Undo for 10s) or
-   * "Move to another time" (the drawer in Reschedule). Cancel has its own write.
+   * A move from the transition table: a status — its own route (optimistic; a
+   * check-in's toast offers Undo for 10s) — or "Move to another time" (the
+   * drawer in Reschedule). Cancel has its own write.
    */
   move: (
     appointment: AppointmentRow,
     move: Exclude<AppointmentMove, 'cancelled'>,
   ) => void;
   /**
-   * Cancel with one of the contract's reasons — "Other" with the note the
-   * contract requires (`S:1154`), typed in the cancel view itself (L-64: one ask).
+   * Cancel with one of the API's reasons — "Other" with the note the contract
+   * requires (`S:1154`), typed in the cancel view itself (L-64: one ask); the
+   * toast offers Undo for 10s (a reinstate).
    */
   cancel: (
     appointment: AppointmentRow,
-    reason: CancelReason,
+    reason: AppointmentCancelReason,
     note?: string | null,
   ) => void;
   /** The card's next step: Check in · Confirm · Complete, or Rebook — a new booking (Q-A6). */

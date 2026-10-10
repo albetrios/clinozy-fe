@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2126 src files · ~1045 tests in src/ · 48 E2E specs · 26 shadcn UI primitives
+Stats: ~2138 src files · ~1052 tests in src/ · 48 E2E specs · 26 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -1403,13 +1403,14 @@ clinozy-fe/
 │   │   │   │   ├── access.fixtures.ts
 │   │   │   │   ├── appointment-status.ts
 │   │   │   │   ├── appointment-views.ts
-│   │   │   │   ├── appointments-api.ts
-│   │   │   │   ├── appointments-contracts.ts
+│   │   │   │   ├── appointments-fixture-api.ts
+│   │   │   │   ├── appointments-fixture-contracts.ts
 │   │   │   │   ├── branches-api.ts
 │   │   │   │   ├── branches-contracts.ts
 │   │   │   │   ├── branches-manage-api.ts
 │   │   │   │   ├── clinic-display-id.ts
 │   │   │   │   ├── clinic-filter-match.ts
+│   │   │   │   ├── clinic-filter-ranges.ts
 │   │   │   │   ├── clinic-fixture-seed.ts
 │   │   │   │   ├── clinic-fixture-store.ts
 │   │   │   │   ├── clinic-list-filters.ts
@@ -1418,7 +1419,10 @@ clinozy-fe/
 │   │   │   │   ├── clinic-time.ts
 │   │   │   │   ├── command-search-api.ts
 │   │   │   │   ├── command-search-contracts.ts
+│   │   │   │   ├── contact-activities-api.ts
 │   │   │   │   ├── contact-threads-api.ts
+│   │   │   │   ├── contacts-api.ts
+│   │   │   │   ├── contacts-contracts.ts
 │   │   │   │   ├── credits-api.ts
 │   │   │   │   ├── credits-contracts.ts
 │   │   │   │   ├── day-close-api.ts
@@ -1430,6 +1434,9 @@ clinozy-fe/
 │   │   │   │   ├── invoices-contracts.ts
 │   │   │   │   ├── leads-api.ts
 │   │   │   │   ├── leads-contracts.ts
+│   │   │   │   ├── leads-fixture-api.ts
+│   │   │   │   ├── leads-fixture-contracts.ts
+│   │   │   │   ├── leads-fixture-hold.ts
 │   │   │   │   ├── leads-hold.ts
 │   │   │   │   ├── ledger-filter-values.ts
 │   │   │   │   ├── ledger-rows.ts
@@ -1469,7 +1476,7 @@ clinozy-fe/
 │   │   │   │   ├── users-contracts.ts
 │   │   │   │   ├── visits-api.ts
 │   │   │   │   ├── visits-contracts.ts
-│   │   │   │   └── [51 test files]
+│   │   │   │   └── [56 test files]
 │   │   │   ├── API.OVERVIEW.md
 │   │   │   ├── auth-api.ts
 │   │   │   ├── auth-contracts.ts
@@ -2208,12 +2215,11 @@ clinozy-fe/
 │   │   │   │   ├── AppointmentStep.tsx
 │   │   │   │   ├── DateTimeStep.tsx
 │   │   │   │   ├── index.ts
-│   │   │   │   ├── PatientSections.tsx
 │   │   │   │   ├── use-appointment-form-state.ts
 │   │   │   │   ├── use-appointment-save.ts
 │   │   │   │   ├── VisitStatusSection.tsx
 │   │   │   │   ├── WhoSection.tsx
-│   │   │   │   └── [8 test files]
+│   │   │   │   └── [7 test files]
 │   │   │   ├── AuthForm/
 │   │   │   │   ├── components/
 │   │   │   │   │   ├── AuthAutoGooglePending/
@@ -2349,6 +2355,10 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useConsumedSearchToken.ts
 │   │   │   │   └── [1 test file]
+│   │   │   ├── useContacts/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useContacts.ts
+│   │   │   │   └── [1 test file]
 │   │   │   ├── useContactThread/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useContactThread.ts
@@ -2416,6 +2426,10 @@ clinozy-fe/
 │   │   │   ├── useFeedback/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useFeedback.ts
+│   │   │   │   └── [1 test file]
+│   │   │   ├── useFixtureLeads/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useFixtureLeads.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── useFormValues/
 │   │   │   │   ├── index.ts
@@ -2629,6 +2643,10 @@ clinozy-fe/
 │   │   │   ├── useTeam/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useTeam.ts
+│   │   │   │   └── [1 test file]
+│   │   │   ├── useTeamDirectory/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useTeamDirectory.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── useThread/
 │   │   │   │   ├── index.ts

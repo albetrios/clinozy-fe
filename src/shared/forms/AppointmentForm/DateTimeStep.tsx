@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils.ts';
 import {
   APPOINTMENT_SLOT_STEPS,
-  type AppointmentSlot,
+  type AppointmentClosedReason,
+  type AppointmentSlotDay,
   type AppointmentSlotStep,
 } from '@/shared/api/clinic/appointments-contracts.ts';
 import {
@@ -52,8 +53,11 @@ export interface DateTimeStepProps {
   onChange: (change: AppointmentFormChange) => void;
   /** The saved slot (Edit) — a move back to it restores the status. */
   saved: SavedSlot | null;
-  /** The doctor's starts that day (`availableSlots`) — undefined until a date and a doctor are set. */
-  slots: readonly AppointmentSlot[] | undefined;
+  /**
+   * The doctor's free starts that day, or why the day is closed (`GET /app/appointments/slots`)
+   * — undefined until a date and a doctor are set.
+   */
+  slots: AppointmentSlotDay | undefined;
   slotStep: AppointmentSlotStep;
   onSlotStepChange: (step: AppointmentSlotStep) => void;
   /** The calendar's month, `YYYY-MM-01` — its own, not the date's. */
@@ -210,7 +214,10 @@ function SlotStepSwitch({
   );
 }
 
-/** One hour of the grid (H:2785–2787): its label — solid once a start in it is picked — and its starts. */
+/**
+ * One hour of the grid (H:2785–2787): its label — solid once a start in it is picked — and its
+ * free starts (the server lists no taken ones, G3).
+ */
 function HourRow({
   row,
   step,
@@ -236,10 +243,7 @@ function HourRow({
   return (
     <div
       data-testid={IDS.slotHour}
-      className={cn(
-        'grid grid-cols-[52px_minmax(0,1fr)] items-center gap-1.5',
-        row.free === 0 && 'opacity-55',
-      )}
+      className="grid grid-cols-[52px_minmax(0,1fr)] items-center gap-1.5"
     >
       <span
         className={cn(
@@ -272,19 +276,21 @@ function HourRow({
               role="radio"
               aria-checked={on}
               aria-label={time}
-              title={t(slot.free ? K.free : K.booked, { time })}
-              disabled={!slot.free || disabled}
+              title={t(K.free, { time })}
+              disabled={disabled}
               data-testid={IDS.slotTime}
               data-time={slot.time}
               onClick={() => onPick(slot.time)}
               className={cn(
                 'text-caption h-6.5 min-w-0 rounded-md border px-1 font-medium whitespace-nowrap tabular-nums transition-shadow',
-                on && cn(tone.fill, 'border-transparent'),
-                !on &&
-                  slot.free &&
-                  cn('bg-card', tone.ink, tone.border, 'hover:ring-1 hover:ring-current'),
-                !slot.free &&
-                  'bg-canvas text-disabled border-border cursor-not-allowed line-through',
+                on
+                  ? cn(tone.fill, 'border-transparent')
+                  : cn(
+                      'bg-card',
+                      tone.ink,
+                      tone.border,
+                      'hover:ring-1 hover:ring-current',
+                    ),
               )}
             >
               :{slot.time.slice(3)}
@@ -296,24 +302,38 @@ function HourRow({
   );
 }
 
+/** Each closed reason's line. */
+const CLOSED_KEYS: Readonly<Record<AppointmentClosedReason, string>> = {
+  past: K.closed.past,
+  branch_inactive: K.closed.branchInactive,
+  closed_day: K.closed.closedDay,
+  holiday: K.closed.holiday,
+  doctor_off: K.closed.doctorOff,
+};
+
 /**
  * The line in place of the grid: no date yet — "Pick a date to see times" —
- * or a day the read answered with no start at all (the branch closed, the
- * doctor off, every time already passed), which says so instead of leaving
- * the space under the day blank. A full day still draws its taken slots.
+ * a day the server closed, by its reason (past, the branch inactive, a closed
+ * day, a holiday by its name, the doctor off), or an open day with no free
+ * start left ("No times to book on this day"); null when the grid shows.
  */
-function slotHint(
-  date: string | null,
-  slots: readonly AppointmentSlot[] | undefined,
-): 'pickDate' | 'none' | null {
-  if (!date) return 'pickDate';
-  return slots?.length === 0 ? 'none' : null;
+function useSlotHint(date: string | null, slots: AppointmentSlotDay | undefined) {
+  const { t } = useTranslation(APPOINTMENT_FORM_NS);
+  if (!date) return t(K.pickDate);
+  if (!slots) return null;
+  if (!slots.isOpen) {
+    const reason = slots.closedReason ?? 'closed_day';
+    if (reason === 'holiday' && !slots.closedLabel) return t(K.closed.closedDay);
+    return t(CLOSED_KEYS[reason], { label: slots.closedLabel ?? '' });
+  }
+  return slots.slots.length === 0 ? t(K.none) : null;
 }
 
 /**
  * Step 2 · Date & time's body (H:2777–2790; `appointments.md:83–86`): the
  * quick days, the month calendar and the slot grid — one row per hour with
- * free starts and the taken ones struck through, two columns past six hours.
+ * free starts, two columns past six hours (the server computes them; no
+ * struck-through taken slots, G3).
  * In a form column under 520px (480px inside the body's sides) the calendar
  * sits above the slots.
  */
@@ -335,9 +355,9 @@ export function DateTimeStep({
     onChange({ kind: 'date', date });
     onMonthChange(civilMonthStart(date));
   };
-  const hours = slotHours(slots ?? []);
+  const hours = slotHours(slots?.slots ?? []);
   const columns = slotColumns(hours);
-  const hint = slotHint(draft.date, slots);
+  const hint = useSlotHint(draft.date, slots);
   return (
     <div className="flex flex-col gap-2.5">
       <QuickDates draft={draft} today={today} disabled={disabled} onPick={pickDate} />
@@ -388,7 +408,9 @@ export function DateTimeStep({
               ))}
             </div>
           ) : (
-            <span className="text-muted-foreground text-xs">{t(K[hint])}</span>
+            <span data-testid={IDS.slotHint} className="text-muted-foreground text-xs">
+              {hint}
+            </span>
           )}
         </div>
       </div>

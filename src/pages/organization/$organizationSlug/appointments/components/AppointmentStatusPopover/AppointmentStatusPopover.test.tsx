@@ -3,13 +3,27 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { fetchAppointment } from '@/shared/api/clinic/appointments-api.ts';
+import type * as AppointmentsApiModule from '@/shared/api/clinic/appointments-api.ts';
+import {
+  cancelAppointment,
+  moveAppointment,
+} from '@/shared/api/clinic/appointments-api.ts';
 import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
-import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { notify } from '@/shared/notify/index.ts';
+import {
+  APPOINTMENT_NOW,
+  APPOINTMENT_TODAY,
+  APPOINTMENT_TOMORROW,
+  appointmentRow,
+} from '@/tests/utils/appointment-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
+import {
+  type AppointmentsWorld,
+  seededAppointmentsWorld,
+} from '../../__tests__/integration/appointments-test-data.ts';
 import {
   APPOINTMENTS_PAGE,
   grantClinicAccess,
@@ -26,12 +40,28 @@ vi.mock('@/shared/notify/index.ts', () => ({
   UNDO_TOAST_DURATION_MS: 10_000,
 }));
 
-let base: AppointmentRow;
+const world = vi.hoisted(() => ({}) as AppointmentsWorld);
+vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => {
+  const { appointmentsApiDouble } =
+    await import('../../__tests__/integration/appointments-test-data.ts');
+  return {
+    ...(await importOriginal<typeof AppointmentsApiModule>()),
+    ...appointmentsApiDouble(world),
+  };
+});
 
-/** A trigger and the popover, open state and view kept here as the Agenda keeps them. */
+/** Riya's booking (#2861) — Scheduled with Dr. Nisha tomorrow at 10:30. */
+const base = appointmentRow();
+
+/**
+ * A trigger and the popover, open state and view kept here as the Agenda keeps them — the
+ * trigger once the member's access is known, as the guards read it.
+ */
 function Harness({ appointment }: { appointment: AppointmentRow }) {
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<AppointmentStatusView>('moves');
+  const access = useClinicAccess();
+  if (!access.isResolved) return null;
   return (
     <AppointmentStatusPopover
       appointment={appointment}
@@ -61,21 +91,22 @@ const optionMoves = (popover: HTMLElement) =>
     .queryAllByTestId(/^appointments-status-option-/)
     .map((option) => option.dataset.testid?.replace('appointments-status-option-', ''));
 
-beforeEach(async () => {
+beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] });
-  vi.setSystemTime(new Date(clinicInstant('2026-10-03', '10:00')));
-  resetClinicFixtures();
+  vi.setSystemTime(APPOINTMENT_NOW);
+  vi.resetAllMocks();
+  Object.assign(world, seededAppointmentsWorld());
+  signInTestMember();
   grantClinicAccess('owner');
-  base = await fetchAppointment(ref.appointment(2858));
 });
-afterEach(() => {
-  vi.useRealTimers();
-  resetClinicFixtures();
-});
+afterEach(() => vi.useRealTimers());
 
 describe('AppointmentStatusPopover (appointments.md:165–179)', () => {
   it('lists the moves out of Scheduled, each with its reason line', async () => {
-    const { popover } = await openFor({ status: 'scheduled', date: '2026-10-04' });
+    const { popover } = await openFor({
+      status: 'scheduled',
+      date: APPOINTMENT_TOMORROW,
+    });
     expect(popover).toHaveAccessibleName('Change status');
     expect(popover).toHaveTextContent(/^Now: Scheduled/);
     expect(optionMoves(popover)).toEqual([
@@ -93,7 +124,10 @@ describe('AppointmentStatusPopover (appointments.md:165–179)', () => {
   });
 
   it('keeps Checked in to the visit day, saying which day', async () => {
-    const { popover } = await openFor({ status: 'confirmed', date: '2026-10-04' });
+    const { popover } = await openFor({
+      status: 'confirmed',
+      date: APPOINTMENT_TOMORROW,
+    });
     expect(optionMoves(popover)).toEqual([
       'checked_in',
       'reschedule',
@@ -108,7 +142,7 @@ describe('AppointmentStatusPopover (appointments.md:165–179)', () => {
   it('completes only a patient’s visit', async () => {
     const { popover } = await openFor({
       status: 'checked_in',
-      date: '2026-10-03',
+      date: APPOINTMENT_TODAY,
       person: { ...base.person, kind: 'lead', patientId: null },
     });
     expect(optionMoves(popover)).toEqual(['completed']);
@@ -130,7 +164,10 @@ describe('AppointmentStatusPopover (appointments.md:165–179)', () => {
   });
 
   it('opens the cancel view on Cancel, on its Back button, and goes back', async () => {
-    const { popover, user } = await openFor({ status: 'scheduled', date: '2026-10-04' });
+    const { popover, user } = await openFor({
+      status: 'scheduled',
+      date: APPOINTMENT_TOMORROW,
+    });
     await user.click(within(popover).getByTestId('appointments-status-option-cancelled'));
     const back = await screen.findByTestId('appointments-status-back');
     await waitFor(() => expect(back).toHaveFocus());
@@ -155,26 +192,91 @@ describe('AppointmentStatusPopover (appointments.md:165–179)', () => {
   it('moves to another time through the drawer’s Reschedule mode', async () => {
     const { popover, user, router } = await openFor({
       status: 'scheduled',
-      date: '2026-10-04',
+      date: APPOINTMENT_TOMORROW,
     });
     await user.click(
       within(popover).getByTestId('appointments-status-option-reschedule'),
     );
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe(
-        `${APPOINTMENTS_PAGE}/${ref.appointment(2858)}`,
-      ),
+      expect(router.state.location.pathname).toBe(`${APPOINTMENTS_PAGE}/${base.id}`),
     );
     expect(router.state.location.search).toEqual({ mode: 'reschedule' });
   });
 
+  it('moves a status through its own route, then closes', async () => {
+    const { popover, user } = await openFor({
+      status: 'scheduled',
+      date: APPOINTMENT_TOMORROW,
+    });
+    await user.click(within(popover).getByTestId('appointments-status-option-confirmed'));
+    await waitFor(() =>
+      expect(screen.queryByTestId('appointments-status-popover')).toBeNull(),
+    );
+    await waitFor(() =>
+      expect(moveAppointment).toHaveBeenCalledExactlyOnceWith({
+        appointmentId: base.id,
+        route: 'confirm',
+        idempotencyKey: expect.any(String),
+      }),
+    );
+    expect(notify.success).toHaveBeenCalledWith('Riya Mehta → Confirmed');
+  });
+
+  it('cancels with one tap on a reason, through the cancel write', async () => {
+    const { popover, user } = await openFor({
+      status: 'scheduled',
+      date: APPOINTMENT_TOMORROW,
+    });
+    await user.click(within(popover).getByTestId('appointments-status-option-cancelled'));
+    await user.click(await screen.findByTestId('appointments-cancel-reason-unreachable'));
+    await waitFor(() =>
+      expect(cancelAppointment).toHaveBeenCalledExactlyOnceWith({
+        appointmentId: base.id,
+        cancel: { reason: 'unreachable', note: null },
+        idempotencyKey: expect.any(String),
+      }),
+    );
+    expect(moveAppointment).not.toHaveBeenCalled();
+    await waitFor(() =>
+      expect(notify.undo).toHaveBeenCalledWith(
+        'Riya Mehta → Cancelled · Could not reach patient · slot freed, reminders stopped',
+        expect.objectContaining({ onUndo: expect.any(Function) }),
+      ),
+    );
+  });
+
+  it('cancels "Other" once its note is typed', async () => {
+    const { popover, user } = await openFor({
+      status: 'confirmed',
+      date: APPOINTMENT_TOMORROW,
+    });
+    await user.click(within(popover).getByTestId('appointments-status-option-cancelled'));
+    await user.click(await screen.findByTestId('appointments-cancel-reason-other'));
+    const submit = screen.getByTestId('appointments-cancel-submit');
+    expect(submit).toHaveAttribute('aria-disabled', 'true');
+    await user.click(submit);
+    expect(cancelAppointment).not.toHaveBeenCalled();
+    await user.type(screen.getByTestId('appointments-cancel-note'), 'Power cut{Enter}');
+    await waitFor(() =>
+      expect(cancelAppointment).toHaveBeenCalledWith(
+        expect.objectContaining({ cancel: { reason: 'other', note: 'Power cut' } }),
+      ),
+    );
+  });
+
   it('has no axe violations', async () => {
-    const { popover } = await openFor({ status: 'scheduled', date: '2026-10-04' });
+    const { popover } = await openFor({
+      status: 'scheduled',
+      date: APPOINTMENT_TOMORROW,
+    });
     expect(await axeForDialog(popover)).toHaveNoViolations();
   });
 
   it('opens "Other"’s note in the cancel view; Back closes it again', async () => {
-    const { popover, user } = await openFor({ status: 'scheduled', date: '2026-10-04' });
+    const { popover, user } = await openFor({
+      status: 'scheduled',
+      date: APPOINTMENT_TOMORROW,
+    });
     await user.click(within(popover).getByTestId('appointments-status-option-cancelled'));
     await user.click(await screen.findByTestId('appointments-cancel-reason-other'));
     const note = screen.getByTestId('appointments-cancel-note');

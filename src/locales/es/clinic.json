@@ -150,6 +150,8 @@
       "unreachable": "No se pudo contactar al paciente",
       "doctor_unavailable": "Médico no disponible",
       "resource_unavailable": "Máquina o sala no disponible",
+      "rescheduling_later": "Se reprogramará más tarde",
+      "booked_by_mistake": "Reservada por error",
       "other": "Otro"
     },
     "cancelSides": {
@@ -172,7 +174,9 @@
     "toasts": {
       "booked": "Reservada {{id}} · {{day}} {{time}} · solicitud de confirmación enviada por WhatsApp",
       "bookedQueued": "Reservada {{id}} · {{day}} {{time}} · recordatorio programado",
+      "bookedOnly": "Reservada {{id}} · {{day}} {{time}}",
       "moved": "{{id}} movida a {{day}} {{time}} · solicitud de confirmación enviada",
+      "movedOnly": "{{id}} movida a {{day}} {{time}}",
       "updated": "{{id}} actualizada",
       "statusChanged": "{{name}} → {{status}}",
       "statusConfirmed": "{{name}} → {{status}} · recordatorio programado",
@@ -1022,10 +1026,8 @@
       "searchLabel": "Buscar persona",
       "useContact": "Usar contacto",
       "patient": "Paciente",
-      "patientCare": "Paciente · {{care}}",
-      "lead": "Prospecto {{id}} · {{phone}}",
       "createContact": "+ Crear contacto «{{query}}»",
-      "newContact": "Contacto nuevo · añade el móvil al llegar",
+      "newContact": "Contacto nuevo · añade el móvil para reservar",
       "mobile": "Número de móvil",
       "name": "Nombre",
       "mobileLabel": "Móvil",
@@ -1037,9 +1039,7 @@
       "connected": "Prospecto vinculado",
       "chip": "{{id}} · {{status}}",
       "chipHint": "Prospecto {{id}} · {{source}} · responsable {{owner}}",
-      "movesAtCheckIn": "· pasa a Visitó la clínica al registrar la llegada",
-      "lead": "Prospecto",
-      "leadOption": "Prospecto {{id}}"
+      "movesAtCheckIn": "· pasa a Visitó la clínica al registrar la llegada"
     },
     "status": {
       "section": "Estado de la visita",
@@ -1056,16 +1056,12 @@
       "planReady_one": "Plan listo · {{count}} servicio",
       "planReady_many": "Plan listo · {{count}} servicios",
       "planReady_other": "Plan listo · {{count}} servicios",
-      "planNotPrepared": "Plan sin preparar",
       "planVisit_one": "{{count}} planificado para esta visita",
       "planVisit_many": "{{count}} planificados para esta visita",
       "planVisit_other": "{{count}} planificados para esta visita",
       "planEarlier_one": "{{count}} de visitas anteriores",
       "planEarlier_many": "{{count}} de visitas anteriores",
-      "planEarlier_other": "{{count}} de visitas anteriores",
-      "planOpen": "abrir sugerencias",
-      "planEmpty": "Aún no hay sugerencias · abre Sugerencias de servicios para prepararlas",
-      "createPatient": "Crear ficha de paciente"
+      "planEarlier_other": "{{count}} de visitas anteriores"
     },
     "details": {
       "title": "Cita",
@@ -1090,7 +1086,6 @@
       "typeLines": {
         "consultation": "La tarifa de consulta se añade a la factura al cobrar",
         "follow_up": "Normalmente gratis · sin factura salvo que se añada algo",
-        "package_session": "Sin cargo · se usa la sesión {{next}} de {{total}} al completar la visita",
         "other": "Indica qué es en Notas, abajo"
       },
       "treatment": "Tratamiento",
@@ -1098,12 +1093,6 @@
       "searchTreatments": "Buscar tratamientos",
       "common": "Habituales",
       "fromOfferings": "De los servicios",
-      "package": "Paquete",
-      "packageNext": "Siguiente: sesión {{next}} de {{total}} · válido hasta {{date}}",
-      "packageLeft": "Quedan {{count}}",
-      "noPackage": "{{name}} no tiene ningún paquete activo",
-      "pickContactPackages": "Elige un contacto para ver sus paquetes",
-      "asTreatment": "Reservar como tratamiento",
       "doctor": "Médico",
       "pickDoctor": "Elige un médico",
       "searchDoctors": "Buscar médicos y terapeutas",
@@ -1126,53 +1115,20 @@
       "time": "Hora",
       "pickDate": "Elige una fecha para ver horarios",
       "none": "No hay horarios para reservar este día · elige otra fecha",
+      "closed": {
+        "past": "Este día ya pasó · elige otra fecha",
+        "branchInactive": "Esta sede no acepta reservas",
+        "closedDay": "La clínica cierra este día · elige otra fecha",
+        "holiday": "Cerrado por {{label}} · elige otra fecha",
+        "doctorOff": "El médico no trabaja este día · elige otra fecha u otro médico"
+      },
       "am": "a. m.",
       "pm": "p. m.",
       "hour": "{{hour}} {{period}}",
       "free": "{{time}} · libre",
-      "booked": "{{time}} · reservado",
       "locked": "Bloqueado",
       "lockedSummary": "{{day}} · {{time}} · bloqueado tras registrar la llegada",
       "lockedToast": "La fecha y la hora se bloquean cuando el paciente ha llegado"
-    },
-    "notPatient": {
-      "section": "Siguiente paso · ficha de paciente",
-      "title": "Aún no es paciente",
-      "body": "Crea la ficha de paciente para continuar · desbloquea fotos, sugerencias de servicios, opiniones y Completada",
-      "action": "Crear ficha de paciente",
-      "done": "{{name}} ya es paciente · puedes marcar Completada"
-    },
-    "photos": {
-      "title": "Fotos de esta visita",
-      "section": "Fotos de la visita",
-      "locked": "Las fotos se abren cuando el paciente está en la clínica · registra primero su llegada",
-      "checkIn": "Registrar llegada",
-      "album": "Álbum",
-      "albums": {
-        "general": "General",
-        "private": "Privado",
-        "lhr": "LHR"
-      },
-      "upload": "Subir fotos",
-      "add": "Añadir",
-      "open": "Abrir {{name}}",
-      "edit": "Editar detalles",
-      "delete": "Eliminar foto",
-      "count_one": "{{count}} foto · aparece en la ficha de {{first}} bajo esta visita",
-      "count_many": "{{count}} fotos · aparecen en la ficha de {{first}} bajo esta visita",
-      "count_other": "{{count}} fotos · aparecen en la ficha de {{first}} bajo esta visita",
-      "empty": "Haz fotos de antes / después mientras {{first}} está en la clínica · se archivan en esta visita",
-      "attached_one": "{{count}} foto añadida a esta visita",
-      "attached_many": "{{count}} fotos añadidas a esta visita",
-      "attached_other": "{{count}} fotos añadidas a esta visita",
-      "deleteTitle": "¿Eliminar esta foto?",
-      "deleted": "Foto eliminada",
-      "reasons": {
-        "wrongPatient": "Paciente equivocado",
-        "blurry": "Borrosa / repetir",
-        "duplicate": "Duplicada",
-        "other": "Otro"
-      }
     },
     "footer": {
       "pickTime": "Elige una hora",
@@ -1186,7 +1142,8 @@
       "slot": "Elige fecha y hora",
       "passed": "Esa hora ya pasó · elige un horario futuro",
       "taken": "Acaba de ocuparse · elige otro horario",
-      "doctor": "Elige un médico"
+      "doctor": "Elige un médico",
+      "branch": "No hay ninguna sede abierta para reservar"
     },
     "copied": "Copiada · elige fecha y hora"
   },

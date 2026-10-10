@@ -1,18 +1,31 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type * as AppointmentsApiModule from '@/shared/api/clinic/appointments-api.ts';
 import {
-  fetchAppointment,
-  fetchAppointmentPage,
+  cancelAppointment,
+  moveAppointment,
 } from '@/shared/api/clinic/appointments-api.ts';
 import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
 import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { notify } from '@/shared/notify/index.ts';
+import {
+  APPOINTMENT_NOW,
+  APPOINTMENT_TODAY,
+  APPOINTMENT_TOMORROW,
+  appointmentRow,
+} from '@/tests/utils/appointment-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { fsi, withoutBidiMarks } from '@/tests/utils/bidi-marks.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
+import {
+  type AppointmentsWorld,
+  seededAppointmentsWorld,
+} from '../../__tests__/integration/appointments-test-data.ts';
 import {
   APPOINTMENTS_PAGE,
   grantClinicAccess,
@@ -20,68 +33,86 @@ import {
 } from '../../__tests__/integration/appointments-test-router.tsx';
 import { AppointmentCardContent, AppointmentQuickView } from './AppointmentCard.tsx';
 
-const { notifyMock } = vi.hoisted(() => ({
-  notifyMock: { success: vi.fn(), error: vi.fn(), info: vi.fn(), undo: vi.fn() },
-}));
 vi.mock('@/shared/notify/index.ts', () => ({
-  notify: notifyMock,
+  notify: { success: vi.fn(), error: vi.fn(), info: vi.fn(), undo: vi.fn() },
   TOAST_DURATION_MS: { default: 5_200, error: 9_000 },
   UNDO_TOAST_DURATION_MS: 10_000,
 }));
 
-let base: AppointmentRow;
-
-/** A booking for the card: Jalpa's (#2858), moved to the status and slot asked. */
-const booking = (overrides: Partial<AppointmentRow> = {}): AppointmentRow => ({
-  ...base,
-  ...overrides,
+const world = vi.hoisted(() => ({}) as AppointmentsWorld);
+vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => {
+  const { appointmentsApiDouble } =
+    await import('../../__tests__/integration/appointments-test-data.ts');
+  return {
+    ...(await importOriginal<typeof AppointmentsApiModule>()),
+    ...appointmentsApiDouble(world),
+  };
 });
 
-beforeEach(async () => {
-  vi.useFakeTimers({ toFake: ['Date'] });
-  vi.setSystemTime(new Date(clinicInstant('2026-10-03', '10:00')));
-  for (const spy of Object.values(notifyMock)) spy.mockReset();
-  resetClinicFixtures();
-  grantClinicAccess('owner');
-  base = await fetchAppointment(ref.appointment(2858));
-});
-afterEach(() => {
-  vi.useRealTimers();
-  resetClinicFixtures();
-});
+/** Riya's booking (#2861) — Scheduled with Dr. Nisha tomorrow at 10:30 — as a test asks. */
+const booking = (overrides: Partial<AppointmentRow> = {}) => appointmentRow(overrides);
+
+/** The card once the member's access is known — the guards read it. */
+function WhenResolved({ children }: { children: ReactNode }) {
+  const access = useClinicAccess();
+  return access.isResolved ? children : null;
+}
 
 function renderCard(appointment: AppointmentRow, onCancel = vi.fn()) {
   const close = vi.fn();
   const view = renderInAppointments(
-    <div data-testid="card">
-      <AppointmentCardContent
-        appointment={appointment}
-        close={close}
-        onCancel={onCancel}
-      />
-    </div>,
+    <WhenResolved>
+      <div data-testid="card">
+        <AppointmentCardContent
+          appointment={appointment}
+          close={close}
+          onCancel={onCancel}
+        />
+      </div>
+    </WhenResolved>,
   );
   return { ...view, close, onCancel };
 }
 
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(APPOINTMENT_NOW);
+  vi.resetAllMocks();
+  Object.assign(world, seededAppointmentsWorld());
+  signInTestMember();
+  grantClinicAccess('owner');
+});
+afterEach(() => vi.useRealTimers());
+
 describe('AppointmentCardContent (appointments.md:149–163)', () => {
   it('names the person, the booking, the slot, the doctor and the last update', async () => {
-    renderCard(booking({ status: 'confirmed', date: '2026-10-04', startTime: '10:30' }));
+    renderCard(booking({ status: 'confirmed', reminder: 'reminder_sent' }));
     const card = await screen.findByTestId('card');
-    expect(card).toHaveTextContent('Jalpa Sheladiya');
-    expect(card).toHaveTextContent('#2858');
+    expect(card).toHaveTextContent('Riya Mehta');
+    expect(card).toHaveTextContent('#2861');
     expect(card).toHaveTextContent('Confirmed');
     expect(withoutBidiMarks(card.textContent)).toMatch(/Tomorrow · 10:30 AM · 20 min/);
-    expect(card).toHaveTextContent('Dr. Drashti');
+    expect(card).toHaveTextContent('Nisha S.');
+    expect(card).toHaveTextContent('Reminder sent');
+  });
+
+  it('says where a moved booking came from, and "No update yet" without an event', async () => {
+    const moved = renderCard(
+      booking({ moveCount: 1, rescheduledFrom: clinicInstant('2026-10-02', '16:30') }),
+    );
+    expect(withoutBidiMarks((await screen.findByTestId('card')).textContent)).toMatch(
+      /Moved from .+ 4:30\sPM/,
+    );
+    moved.unmount();
+    renderCard(booking());
+    expect(await screen.findByTestId('card')).toHaveTextContent('No update yet');
   });
 
   it('keeps the name, phone, id, slot and doctor whole on a right-to-left page', async () => {
     renderCard(
       booking({
         status: 'confirmed',
-        date: '2026-10-04',
-        startTime: '10:30',
-        person: { ...base.person, name: 'Riya S.', phone: '+919825044120' },
+        person: { ...booking().person, name: 'Riya S.', phone: '+919825044120' },
       }),
     );
     const card = await screen.findByTestId('card');
@@ -89,15 +120,15 @@ describe('AppointmentCardContent (appointments.md:149–163)', () => {
     expect(name).toHaveAttribute('dir', 'auto');
     expect(name).toHaveClass('[text-align:match-parent]');
     expect(within(card).getByText('+91 98250 44120')).toHaveAttribute('dir', 'ltr');
-    expect(within(card).getByText('#2858')).toHaveAttribute('dir', 'ltr');
-    expect(within(card).getByText('Dr. Drashti')).toHaveAttribute('dir', 'auto');
+    expect(within(card).getByText('#2861')).toHaveAttribute('dir', 'ltr');
+    expect(within(card).getByText('Nisha S.')).toHaveAttribute('dir', 'auto');
     // The day and the time are tokens inside the translated line.
     expect(card).toHaveTextContent(`${fsi('Tomorrow')} · ${fsi('10:30 AM')} · 20 min`);
-    expect(card).toHaveTextContent('Riya S.+91 98250 44120#2858');
+    expect(card).toHaveTextContent('Riya S.+91 98250 44120#2861');
   });
 
   it('marks the tracker: done steps checked, the current one numbered', async () => {
-    renderCard(booking({ status: 'confirmed', date: '2026-10-04' }));
+    renderCard(booking({ status: 'confirmed' }));
     const tracker = await screen.findByRole('list');
     const steps = within(tracker).getAllByRole('listitem');
     expect(steps).toHaveLength(4);
@@ -108,17 +139,11 @@ describe('AppointmentCardContent (appointments.md:149–163)', () => {
 
   it('offers the next step and the other moves, each through the guards (Q-A7)', async () => {
     const user = userEvent.setup();
-    // A booking the server holds as Scheduled for tomorrow, so the move lands.
-    const page = await fetchAppointmentPage({ status: 'scheduled', date: '2026-10-04' });
-    const scheduled = page.rows[0];
-    if (!scheduled)
-      throw new Error('the fixture world has no booking scheduled tomorrow');
-    const { close } = renderCard(scheduled);
+    const { close } = renderCard(booking());
     const next = await screen.findByTestId('appointment-card-next');
     expect(next).toHaveTextContent('Confirm');
-    // Checked in only on the visit day; No show only after the start. (The
-    // moves wait for the member's access to resolve.)
-    expect(await screen.findByTestId('appointment-card-move-checked_in')).toHaveAttribute(
+    // Checked in only on the visit day; No show only after the start.
+    expect(screen.getByTestId('appointment-card-move-checked_in')).toHaveAttribute(
       'aria-disabled',
       'true',
     );
@@ -128,40 +153,62 @@ describe('AppointmentCardContent (appointments.md:149–163)', () => {
     );
     await user.click(screen.getByTestId('appointment-card-move-checked_in'));
     expect(close).not.toHaveBeenCalled();
+    expect(moveAppointment).not.toHaveBeenCalled();
 
     await user.click(next);
     expect(close).toHaveBeenCalled();
     await waitFor(() =>
-      expect(notifyMock.undo).toHaveBeenCalledWith(
-        `${scheduled.person.name} → Confirmed · reminder queued`,
-        expect.anything(),
+      expect(moveAppointment).toHaveBeenCalledExactlyOnceWith({
+        appointmentId: booking().id,
+        route: 'confirm',
+        idempotencyKey: expect.any(String),
+      }),
+    );
+    await waitFor(() =>
+      expect(notify.success).toHaveBeenCalledWith('Riya Mehta → Confirmed'),
+    );
+  });
+
+  it('checks in on the visit day through `check-in`, with Undo', async () => {
+    const user = userEvent.setup();
+    const today = booking({
+      status: 'confirmed',
+      date: APPOINTMENT_TODAY,
+      startTime: '11:30',
+    });
+    world.rows = [today];
+    renderCard(today);
+    const next = await screen.findByTestId('appointment-card-next');
+    expect(next).toHaveTextContent('Check in');
+    await user.click(next);
+    await waitFor(() =>
+      expect(moveAppointment).toHaveBeenCalledWith(
+        expect.objectContaining({ appointmentId: today.id, route: 'check-in' }),
+      ),
+    );
+    await waitFor(() =>
+      expect(notify.undo).toHaveBeenCalledWith(
+        'Riya Mehta → Checked in',
+        expect.objectContaining({ onUndo: expect.any(Function) }),
       ),
     );
   });
 
-  it('checks in on the visit day', async () => {
-    renderCard(booking({ status: 'confirmed', date: '2026-10-03', startTime: '11:30' }));
-    expect(await screen.findByTestId('appointment-card-next')).toHaveTextContent(
-      'Check in',
-    );
-  });
-
-  it('hands "Cancel" to the status popover’s cancel view', async () => {
+  it('hands "Cancel" to the status popover’s cancel view — no cancel of its own', async () => {
     const user = userEvent.setup();
-    const appointment = booking({ status: 'scheduled', date: '2026-10-04' });
+    const appointment = booking({ status: 'scheduled', date: APPOINTMENT_TOMORROW });
     const { onCancel } = renderCard(appointment);
     await user.click(await screen.findByTestId('appointment-card-move-cancelled'));
     expect(onCancel).toHaveBeenCalledWith(appointment);
+    expect(cancelAppointment).not.toHaveBeenCalled();
   });
 
-  it('opens Reschedule and Rebook in the drawer', async () => {
+  it('opens Reschedule in the drawer', async () => {
     const user = userEvent.setup();
-    const { router } = renderCard(booking({ status: 'scheduled', date: '2026-10-04' }));
+    const { router } = renderCard(booking());
     await user.click(await screen.findByTestId('appointment-card-move-reschedule'));
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe(
-        `${APPOINTMENTS_PAGE}/${ref.appointment(2858)}`,
-      ),
+      expect(router.state.location.pathname).toBe(`${APPOINTMENTS_PAGE}/${booking().id}`),
     );
     expect(router.state.location.search).toEqual({ mode: 'reschedule' });
   });
@@ -178,14 +225,19 @@ describe('AppointmentCardContent (appointments.md:149–163)', () => {
     await waitFor(() =>
       expect(router.state.location.pathname).toBe(`${APPOINTMENTS_PAGE}/create`),
     );
-    expect(router.state.location.search).toEqual({ copyOf: ref.appointment(2858) });
+    expect(router.state.location.search).toEqual({ copyOf: booking().id });
+    expect(moveAppointment).not.toHaveBeenCalled();
   });
 
   it('keeps the moves away from a member without Edit', async () => {
     grantClinicAccess('none');
-    renderCard(booking({ status: 'scheduled', date: '2026-10-04' }));
+    renderCard(booking());
     await screen.findByTestId('appointment-card-open');
     expect(screen.queryByTestId('appointment-card-move-reschedule')).toBeNull();
+    expect(screen.getByTestId('appointment-card-next')).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
   });
 });
 

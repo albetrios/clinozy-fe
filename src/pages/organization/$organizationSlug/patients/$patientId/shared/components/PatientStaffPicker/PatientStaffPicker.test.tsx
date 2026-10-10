@@ -32,8 +32,8 @@ const staff = vi.hoisted(() => ({
   data: undefined as unknown,
   me: undefined as { id: string } | undefined,
 }));
-vi.mock('@/shared/hooks/useAppointments/index.ts', () => ({
-  useBookableStaff: () => ({
+vi.mock('@/shared/hooks/useFixtureAppointments/index.ts', () => ({
+  useFixtureBookableStaff: () => ({
     data: staff.data,
     isSuccess: staff.data !== undefined,
     isError: false,

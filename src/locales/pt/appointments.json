@@ -48,9 +48,6 @@
     "dayBooked_other": "{{date}} · {{count}} agendadas",
     "appointedTo": "Atribuída a",
     "allDoctors": "Todos os médicos",
-    "doctors_one": "{{count}} médico",
-    "doctors_many": "{{count}} de médicos",
-    "doctors_other": "{{count}} médicos",
     "searchTeam": "Pesquisar na equipe",
     "showAll": "Mostrar todos",
     "done": "Concluir",
@@ -103,10 +100,6 @@
       "hint": "{{confirmed}} · {{waiting}}"
     },
     "latest": {
-      "planReady": "✓ Plano pronto",
-      "planPending": "○ Plano pendente",
-      "reminderRead": "✓ Lembrete lido",
-      "reminderDelivered": "✓ Lembrete entregue",
       "reminderSent": "✓ Lembrete enviado",
       "repliedYes": "✓ Respondeu Sim",
       "moved": "✓ Movida",
@@ -114,10 +107,6 @@
       "checkedIn": "✓ Chegou"
     },
     "latestHints": {
-      "planReady": "{{suggestions}} nas sugestões de serviços",
-      "planPending": "Abra a consulta e adicione as sugestões de serviços",
-      "reminderRead": "Lembrete lido no WhatsApp",
-      "reminderDelivered": "Lembrete entregue",
       "reminderSent": "Lembrete enviado",
       "repliedYes": "Confirmada automaticamente por um Sim no WhatsApp",
       "moved": "Movida de {{day}} {{time}}",

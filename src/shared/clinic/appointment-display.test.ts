@@ -10,11 +10,12 @@ import {
 
 const person = (overrides: Partial<AppointmentPerson>): AppointmentPerson => ({
   kind: 'patient',
+  contactId: 'con_dharti000000000000000',
   name: 'Dharti Galani',
   phone: '+919825044120',
-  patientId: '5f0c4c1e-4f7e-4c9a-8a51-3a0c2b1d9e01',
+  patientId: 'pat_dharti000000000000000',
   leadId: null,
-  seq: 3508,
+  contactNumber: 10234,
   ...overrides,
 });
 
@@ -46,21 +47,31 @@ describe('serviceTone', () => {
 });
 
 describe('appointmentContactCard', () => {
-  it('reads a patient with their display id and WhatsApp number', () => {
+  it('reads a patient with their contact number and WhatsApp number', () => {
     expect(appointmentContactCard(person({}))).toEqual({
       kind: 'patient',
       name: 'Dharti Galani',
-      displayId: '#3508',
+      displayId: 'C-10234',
       reach: [{ channel: 'whatsapp', phone: '+919825044120' }],
     });
   });
 
-  it('reads a lead by its lead id and a contact with no id or reach', () => {
-    expect(appointmentContactCard(person({ kind: 'lead', seq: 2352 })).displayId).toBe(
-      '#2352',
-    );
+  it('names a lead and a contact by their contact number too — a booking carries no other', () => {
     expect(
-      appointmentContactCard(person({ kind: 'contact', seq: null, phone: null })),
+      appointmentContactCard(
+        person({ kind: 'lead', patientId: null, leadId: 'lead_dharti00000000000000' }),
+      ).displayId,
+    ).toBe('C-10234');
+    expect(
+      appointmentContactCard(person({ kind: 'contact', patientId: null })).displayId,
+    ).toBe('C-10234');
+  });
+
+  it('shows no id and no reach once the contact is gone', () => {
+    expect(
+      appointmentContactCard(
+        person({ kind: 'contact', name: '', contactNumber: null, phone: null }),
+      ),
     ).toMatchObject({ kind: 'contact', displayId: null, reach: [] });
   });
 });

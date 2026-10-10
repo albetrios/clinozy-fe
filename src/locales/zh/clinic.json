@@ -150,6 +150,8 @@
       "unreachable": "无法联系到患者",
       "doctor_unavailable": "医生没空",
       "resource_unavailable": "设备或房间不可用",
+      "rescheduling_later": "稍后再改期",
+      "booked_by_mistake": "误预约",
       "other": "其他"
     },
     "cancelSides": {
@@ -172,7 +174,9 @@
     "toasts": {
       "booked": "已预约 {{id}} · {{day}} {{time}} · 已通过 WhatsApp 发送确认请求",
       "bookedQueued": "已预约 {{id}} · {{day}} {{time}} · 提醒已排队",
+      "bookedOnly": "已预约 {{id}} · {{day}} {{time}}",
       "moved": "{{id}} 已改到 {{day}} {{time}} · 已发送确认请求",
+      "movedOnly": "{{id}} 已改到 {{day}} {{time}}",
       "updated": "{{id}} 已更新",
       "statusChanged": "{{name}} → {{status}}",
       "statusConfirmed": "{{name}} → {{status}} · 提醒已排队",
@@ -998,10 +1002,8 @@
       "searchLabel": "搜索人员",
       "useContact": "使用联系人",
       "patient": "患者",
-      "patientCare": "患者 · {{care}}",
-      "lead": "潜在客户 {{id}} · {{phone}}",
       "createContact": "+ 新建联系人“{{query}}”",
-      "newContact": "新联系人 · 签到时补充手机号",
+      "newContact": "新联系人 · 预约需补充手机号",
       "mobile": "手机号码",
       "name": "姓名",
       "mobileLabel": "手机号",
@@ -1013,9 +1015,7 @@
       "connected": "关联的潜在客户",
       "chip": "{{id}} · {{status}}",
       "chipHint": "潜在客户 {{id}} · {{source}} · 负责人 {{owner}}",
-      "movesAtCheckIn": "· 签到时转为“已到诊”",
-      "lead": "潜在客户",
-      "leadOption": "潜在客户 {{id}}"
+      "movesAtCheckIn": "· 签到时转为“已到诊”"
     },
     "status": {
       "section": "就诊状态",
@@ -1030,12 +1030,8 @@
       "rescheduledConfirm": "已改期 · 原为 {{day}} {{time}} · 需要重新确认 · 保存后会发送新提醒",
       "rescheduled": "已改期 · 原为 {{day}} {{time}} · 保存后会发送新提醒",
       "planReady_other": "方案已就绪 · {{count}} 项服务",
-      "planNotPrepared": "方案未准备",
       "planVisit_other": "本次就诊计划 {{count}} 项",
-      "planEarlier_other": "来自之前就诊 {{count}} 项",
-      "planOpen": "打开建议",
-      "planEmpty": "尚无建议 · 打开服务建议进行准备",
-      "createPatient": "创建患者档案"
+      "planEarlier_other": "来自之前就诊 {{count}} 项"
     },
     "details": {
       "title": "预约",
@@ -1060,7 +1056,6 @@
       "typeLines": {
         "consultation": "结账时问诊费会加入账单",
         "follow_up": "通常免费 · 除非另有添加，否则不开账单",
-        "package_session": "不收费 · 就诊完成时使用第 {{next}} 次（共 {{total}} 次）",
         "other": "请在下方备注中说明"
       },
       "treatment": "治疗",
@@ -1068,12 +1063,6 @@
       "searchTreatments": "搜索治疗",
       "common": "常用",
       "fromOfferings": "来自服务项目",
-      "package": "套餐",
-      "packageNext": "下次为第 {{next}} 次（共 {{total}} 次）· 有效期至 {{date}}",
-      "packageLeft": "剩余 {{count}} 次",
-      "noPackage": "{{name}} 没有有效套餐",
-      "pickContactPackages": "选择联系人以查看其套餐",
-      "asTreatment": "按治疗预约",
       "doctor": "医生",
       "pickDoctor": "选择医生",
       "searchDoctors": "搜索医生和治疗师",
@@ -1096,49 +1085,20 @@
       "time": "时间",
       "pickDate": "选择日期以查看时间",
       "none": "当天没有可预约的时间 · 请选择其他日期",
+      "closed": {
+        "past": "这一天已经过去 · 请选择其他日期",
+        "branchInactive": "该分院不接受预约",
+        "closedDay": "诊所当天休息 · 请选择其他日期",
+        "holiday": "{{label}}休息 · 请选择其他日期",
+        "doctorOff": "医生当天不出诊 · 请选择其他日期或医生"
+      },
       "am": "上午",
       "pm": "下午",
       "hour": "{{period}}{{hour}}点",
       "free": "{{time}} · 空闲",
-      "booked": "{{time}} · 已预约",
       "locked": "已锁定",
       "lockedSummary": "{{day}} · {{time}} · 签到后锁定",
       "lockedToast": "患者签到后日期和时间即被锁定"
-    },
-    "notPatient": {
-      "section": "下一步 · 患者档案",
-      "title": "尚未成为患者",
-      "body": "创建患者档案以继续 · 可解锁照片、服务建议、反馈和“已完成”",
-      "action": "创建患者档案",
-      "done": "{{name}} 现已成为患者 · 可以标记为“已完成”"
-    },
-    "photos": {
-      "title": "本次就诊的照片",
-      "section": "就诊照片",
-      "locked": "患者到诊后才能使用照片 · 请先签到",
-      "checkIn": "立即签到",
-      "album": "相册",
-      "albums": {
-        "general": "常规",
-        "private": "私密",
-        "lhr": "LHR"
-      },
-      "upload": "上传照片",
-      "add": "添加",
-      "open": "打开 {{name}}",
-      "edit": "编辑详情",
-      "delete": "删除照片",
-      "count_other": "{{count}} 张照片 · 显示在 {{first}} 档案中的本次就诊下",
-      "empty": "趁 {{first}} 在诊所时拍摄治疗前 / 后照片 · 照片归档到本次就诊",
-      "attached_other": "已为本次就诊添加 {{count}} 张照片",
-      "deleteTitle": "删除这张照片？",
-      "deleted": "照片已删除",
-      "reasons": {
-        "wrongPatient": "患者错误",
-        "blurry": "模糊 / 重拍",
-        "duplicate": "重复",
-        "other": "其他"
-      }
     },
     "footer": {
       "pickTime": "选择时间",
@@ -1152,7 +1112,8 @@
       "slot": "请选择日期和时间",
       "passed": "该时间已过 · 请选择之后的时段",
       "taken": "刚被约走 · 请选择其他时段",
-      "doctor": "请选择医生"
+      "doctor": "请选择医生",
+      "branch": "没有可预约的营业分院"
     },
     "copied": "已复制 · 请选择日期和时间"
   },

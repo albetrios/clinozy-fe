@@ -150,6 +150,8 @@
       "unreachable": "Could not reach patient",
       "doctor_unavailable": "Doctor unavailable",
       "resource_unavailable": "Machine or room unavailable",
+      "rescheduling_later": "Rescheduling later",
+      "booked_by_mistake": "Booked by mistake",
       "other": "Other"
     },
     "cancelSides": {
@@ -172,7 +174,9 @@
     "toasts": {
       "booked": "Booked {{id}} · {{day}} {{time}} · confirm request sent on WhatsApp",
       "bookedQueued": "Booked {{id}} · {{day}} {{time}} · reminder queued",
+      "bookedOnly": "Booked {{id}} · {{day}} {{time}}",
       "moved": "{{id}} moved to {{day}} {{time}} · confirm request sent",
+      "movedOnly": "{{id}} moved to {{day}} {{time}}",
       "updated": "{{id}} updated",
       "statusChanged": "{{name}} → {{status}}",
       "statusConfirmed": "{{name}} → {{status}} · reminder queued",
@@ -1010,10 +1014,8 @@
       "searchLabel": "Search person",
       "useContact": "Use contact",
       "patient": "Patient",
-      "patientCare": "Patient · {{care}}",
-      "lead": "Lead {{id}} · {{phone}}",
       "createContact": "+ Create contact “{{query}}”",
-      "newContact": "New contact · add mobile at check-in",
+      "newContact": "New contact · add their mobile to book",
       "mobile": "Mobile number",
       "name": "Name",
       "mobileLabel": "Mobile",
@@ -1025,9 +1027,7 @@
       "connected": "Connected lead",
       "chip": "{{id}} · {{status}}",
       "chipHint": "Lead {{id}} · {{source}} · owner {{owner}}",
-      "movesAtCheckIn": "· moves to Clinic visited at check-in",
-      "lead": "Lead",
-      "leadOption": "Lead {{id}}"
+      "movesAtCheckIn": "· moves to Clinic visited at check-in"
     },
     "status": {
       "section": "Visit status",
@@ -1043,14 +1043,10 @@
       "rescheduled": "Rescheduled · was {{day}} {{time}} · a new reminder goes out on save",
       "planReady_one": "Plan ready · {{count}} offering",
       "planReady_other": "Plan ready · {{count}} offerings",
-      "planNotPrepared": "Plan not prepared",
       "planVisit_one": "{{count}} planned for this visit",
       "planVisit_other": "{{count}} planned for this visit",
       "planEarlier_one": "{{count}} from earlier visits",
-      "planEarlier_other": "{{count}} from earlier visits",
-      "planOpen": "open suggestions",
-      "planEmpty": "Nothing suggested yet · open Offering suggestions to prepare",
-      "createPatient": "Create patient record"
+      "planEarlier_other": "{{count}} from earlier visits"
     },
     "details": {
       "title": "Appointment",
@@ -1075,7 +1071,6 @@
       "typeLines": {
         "consultation": "Consultation fee is added to the invoice at checkout",
         "follow_up": "Usually free · no invoice unless something is added",
-        "package_session": "No charge · session {{next}} of {{total}} is used when the visit is completed",
         "other": "Say what it is in Notes below"
       },
       "treatment": "Treatment",
@@ -1083,12 +1078,6 @@
       "searchTreatments": "Search treatments",
       "common": "Common",
       "fromOfferings": "From offerings",
-      "package": "Package",
-      "packageNext": "Next is session {{next}} of {{total}} · valid till {{date}}",
-      "packageLeft": "{{count}} left",
-      "noPackage": "{{name}} has no active package",
-      "pickContactPackages": "Pick a contact to see their packages",
-      "asTreatment": "Book as treatment",
       "doctor": "Doctor",
       "pickDoctor": "Pick a doctor",
       "searchDoctors": "Search doctors and therapists",
@@ -1111,51 +1100,20 @@
       "time": "Time",
       "pickDate": "Pick a date to see times",
       "none": "No times to book on this day · pick another date",
+      "closed": {
+        "past": "This day has passed · pick another date",
+        "branchInactive": "This branch is not taking bookings",
+        "closedDay": "The clinic is closed on this day · pick another date",
+        "holiday": "Closed for {{label}} · pick another date",
+        "doctorOff": "The doctor is off on this day · pick another date or doctor"
+      },
       "am": "AM",
       "pm": "PM",
       "hour": "{{hour}} {{period}}",
       "free": "{{time}} · free",
-      "booked": "{{time}} · booked",
       "locked": "Locked",
       "lockedSummary": "{{day}} · {{time}} · locked after check-in",
       "lockedToast": "Date & time are locked once the patient is checked in"
-    },
-    "notPatient": {
-      "section": "Next step · patient record",
-      "title": "Not a patient yet",
-      "body": "Create the patient record to continue · unlocks photos, offering suggestions, feedback and Completed",
-      "action": "Create patient record",
-      "done": "{{name}} is now a patient · you can mark Completed"
-    },
-    "photos": {
-      "title": "Photos from this visit",
-      "section": "Visit photos",
-      "locked": "Photos open once the patient is at the clinic · check them in first",
-      "checkIn": "Check in now",
-      "album": "Album",
-      "albums": {
-        "general": "General",
-        "private": "Private",
-        "lhr": "LHR"
-      },
-      "upload": "Upload photos",
-      "add": "Add",
-      "open": "Open {{name}}",
-      "edit": "Edit details",
-      "delete": "Delete photo",
-      "count_one": "{{count}} photo · they show in {{first}}’s file under this visit",
-      "count_other": "{{count}} photos · they show in {{first}}’s file under this visit",
-      "empty": "Take before / after photos while {{first}} is at the clinic · they file under this visit",
-      "attached_one": "{{count}} photo attached to this visit",
-      "attached_other": "{{count}} photos attached to this visit",
-      "deleteTitle": "Delete this photo?",
-      "deleted": "Photo deleted",
-      "reasons": {
-        "wrongPatient": "Wrong patient",
-        "blurry": "Blurry / retake",
-        "duplicate": "Duplicate",
-        "other": "Other"
-      }
     },
     "footer": {
       "pickTime": "Pick a time",
@@ -1169,7 +1127,8 @@
       "slot": "Pick a date and time",
       "passed": "That time has passed · pick a future slot",
       "taken": "Just taken · pick another slot",
-      "doctor": "Pick a doctor"
+      "doctor": "Pick a doctor",
+      "branch": "No open branch to book at"
     },
     "copied": "Copied · pick a date and time"
   },

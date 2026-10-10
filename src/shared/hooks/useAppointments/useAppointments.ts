@@ -3,49 +3,35 @@ import { useCallback } from 'react';
 
 import i18n from '@/lib/i18n/i18n.ts';
 import {
-  APPOINTMENT_SIDE_EFFECT_KEYS,
   appointmentQueryKeys,
   cancelAppointment,
+  copyAppointment,
   createAppointment,
-  deleteVisitPhoto,
-  fetchActivePackages,
   fetchAppointment,
-  fetchAppointmentDaySummaries,
-  fetchAppointmentPage,
+  fetchAppointmentDayCounts,
   fetchAppointmentRange,
-  fetchAvailableSlots,
-  fetchBookableStaff,
-  fetchBookingPerson,
-  fetchConnectedLeads,
-  fetchPatientAppointments,
-  fetchVisitPhotos,
-  normalizeAppointmentListParams,
-  restoreAppointment,
-  restoreVisitPhoto,
-  setAppointmentStatus,
-  undoAppointmentChange,
+  fetchAppointmentSlots,
+  fetchBookableTreatments,
+  listAppointments,
+  moveAppointment,
   updateAppointment,
 } from '@/shared/api/clinic/appointments-api.ts';
 import type {
-  AppointmentCancelInput,
-  AppointmentChange,
+  AppointmentCancel,
   AppointmentCreateInput,
-  AppointmentListParamsInput,
-  AppointmentPatch,
-  AppointmentPersonLookup,
-  AppointmentRangeParamsInput,
+  AppointmentFields,
+  AppointmentListParams,
+  AppointmentMoveRoute,
+  AppointmentRangeParams,
   AppointmentRow,
-  AppointmentStatusInput,
-  AppointmentUpdate,
-  AvailableSlotsParamsInput,
+  AppointmentSlotParams,
 } from '@/shared/api/clinic/appointments-contracts.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type {
-  AppointmentStatus,
-  DeleteReason,
-  PatientImage,
-} from '@/shared/api/clinic/clinic-schema.ts';
+import type { AppointmentStatus } from '@/shared/api/clinic/clinic-schema.ts';
 import { civilDayOffset, clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import { contactQueryKeys } from '@/shared/api/clinic/contacts-api.ts';
+import { leadQueryKeys } from '@/shared/api/clinic/leads-api.ts';
+import { messageQueryKeys } from '@/shared/api/clinic/messages-api.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { PICKER_KEYS, PICKER_NS } from '@/shared/components/Picker/picker.constants.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
@@ -60,13 +46,14 @@ import {
 } from '@/shared/hooks/useCursorList/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { notify } from '@/shared/notify/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 /**
- * Appointments' server state (KICKOFF §6.4): the Agenda in cursor pages of 50,
- * its per-day counts, the calendars' range reads, one booking, the slot grid
- * and who can be booked; writes that refetch every appointment read and the
- * records a write can change (tasks, leads, threads, patients), with the
- * spec's toasts. Status moves are optimistic and offer Undo for 10s (D32).
+ * Appointments' server state on clinozy-be (KICKOFF §6.4; api-integration §5.3): the Agenda in
+ * cursor pages of 50, the day counts, the calendars' ranges, one booking and the free slots;
+ * writes that refetch every appointment read and what a booking changes (the contact's lead and
+ * patient file, their activity), with the spec's toasts. A status move is optimistic; Undo is
+ * offered where the API has a way back — a check-in (`undo-check-in`) and a cancel (`reinstate`).
  */
 
 const KEYS = CLINIC_KEYS.appointments;
@@ -74,7 +61,10 @@ const KEYS = CLINIC_KEYS.appointments;
 /** What every appointment write may have changed. */
 const APPOINTMENT_WRITE_KEYS = [
   appointmentQueryKeys.all,
-  ...APPOINTMENT_SIDE_EFFECT_KEYS,
+  leadQueryKeys.all,
+  contactQueryKeys.all,
+  messageQueryKeys.all,
+  ['clinic', 'patients'],
 ];
 
 /** A phrase in the clinic vocabulary (the namespace loads with the org shell). */
@@ -83,6 +73,9 @@ function clinicText(key: string, values: Record<string, string> = {}): string {
 }
 
 const statusLabel = (status: AppointmentStatus) => clinicText(KEYS.statuses[status]);
+
+/** The active organization — every key carries it. */
+const useOrganizationId = () => useOrganizationStore((state) => state.organizationId);
 
 /** Options for the reads. */
 export interface AppointmentQueryOptions {
@@ -152,8 +145,8 @@ function withRowStatus<T>(rows: readonly T[], id: string, status: AppointmentSta
 /**
  * A cached appointment read with one booking's status moved — an Agenda's
  * pages, a calendar range or the booking itself — and anything else (the day
- * counts, the slots, the staff) as it was. The optimistic side of a status
- * move; the refetch brings the server's truth.
+ * counts, the slots) as it was. The optimistic side of a status move; the
+ * refetch brings the server's truth.
  */
 export function withAppointmentStatus(
   data: unknown,
@@ -177,335 +170,331 @@ export function withAppointmentStatus(
 // ── Reads ──
 
 /**
- * The Agenda (`listAppointments`): from today on, or the one day picked in
- * Filters, by day and the sort inside each day — 50 a page (D7). While new
- * params load the previous rows stay on screen (`isRefreshing`).
+ * The Agenda (`GET /app/appointments`): from today on, or the one day picked in Filters, by
+ * date and start — 50 a page (D7). While new params load the previous rows stay on screen.
  */
 export function useAppointmentList(
-  params: AppointmentListParamsInput,
+  params: AppointmentListParams,
   options: AppointmentQueryOptions = {},
 ): CursorListResult<AppointmentRow> {
-  const normalized = normalizeAppointmentListParams(params);
+  const organizationId = useOrganizationId();
   return useCursorList({
-    queryKey: appointmentQueryKeys.list(normalized),
-    queryFn: (after) => fetchAppointmentPage(normalized, after),
-    ...options,
-  });
-}
-
-/** Each Agenda day's counts for its header — "<n> confirmed · <n> awaiting reply" (Appendix F). */
-export function useAppointmentDaySummaries(
-  params: AppointmentListParamsInput,
-  options: AppointmentQueryOptions = {},
-) {
-  return useAppQuery({
-    queryKey: appointmentQueryKeys.daySummaries(params),
-    queryFn: () => fetchAppointmentDaySummaries(params),
-    enabled: options.enabled ?? true,
+    queryKey: appointmentQueryKeys.list(organizationId, params),
+    queryFn: async (after) => {
+      const page = await listAppointments(params, after);
+      return { rows: page.rows, next: page.next, hasMore: page.next !== null };
+    },
+    enabled: (options.enabled ?? true) && organizationId !== null,
     notifyOnError: options.notifyOnError ?? true,
   });
 }
 
+/** The days a counts read covers, the branches and the doctor; idle without one. */
+export interface AppointmentCountsWindow {
+  from: string;
+  to: string;
+  doctorId?: string;
+  branchIds: readonly string[];
+}
+
 /**
- * Every booking a Day, Week or Month board shows (`listAppointmentsRange`);
- * idle without a range. A new range or filter keeps the last board's bookings
- * (`isPlaceholderData`) while it loads, so the board shows them as the
- * in-place skeleton instead of going blank (KICKOFF §6.4 States).
+ * Each day's counts for the Agenda's day headers — "<n> confirmed · <n> awaiting reply"
+ * (`GET /app/appointments/daily-counts`); idle without a window.
  */
-export function useAppointmentRange(
-  params: AppointmentRangeParamsInput | null,
+export function useAppointmentDayCounts(
+  window: AppointmentCountsWindow | null,
   options: AppointmentQueryOptions = {},
 ) {
+  const organizationId = useOrganizationId();
   return useAppQuery({
-    queryKey: params
-      ? appointmentQueryKeys.range(params)
-      : [...appointmentQueryKeys.ranges(), 'none'],
-    queryFn: () => (params ? fetchAppointmentRange(params) : Promise.resolve([])),
-    enabled: params !== null && (options.enabled ?? true),
+    queryKey: window
+      ? appointmentQueryKeys.counts(organizationId, window)
+      : [...appointmentQueryKeys.all, organizationId, 'counts', 'none'],
+    queryFn: () => (window ? fetchAppointmentDayCounts(window) : Promise.resolve([])),
+    enabled: window !== null && organizationId !== null && (options.enabled ?? true),
     placeholderData: keepPreviousData,
     notifyOnError: options.notifyOnError ?? true,
   });
 }
 
 /**
- * One booking (`getAppointment`); idle without an id. The dialog route reads
- * the same entry, so a drawer opened from a deep link fetches it once.
+ * Every booking a Day, Week or Month board shows; idle without a range. A new range or filter
+ * keeps the last board's bookings (`isPlaceholderData`) while it loads, so the board shows them
+ * as the in-place skeleton instead of going blank (KICKOFF §6.4 States).
  */
-export function useAppointment(id: string | undefined) {
-  return useAppQuery({
-    queryKey: appointmentQueryKeys.detail(id ?? ''),
-    queryFn: () => fetchAppointment(id ?? ''),
-    enabled: Boolean(id),
-  });
-}
-
-/** The slot grid for a doctor, a day and a length (`availableSlots`); idle until all three are set. */
-export function useAvailableSlots(params: AvailableSlotsParamsInput | null) {
+export function useAppointmentRange(
+  params: AppointmentRangeParams | null,
+  options: AppointmentQueryOptions = {},
+) {
+  const organizationId = useOrganizationId();
   return useAppQuery({
     queryKey: params
-      ? appointmentQueryKeys.slots(params)
-      : [...appointmentQueryKeys.all, 'slots', 'none'],
-    queryFn: () => (params ? fetchAvailableSlots(params) : Promise.resolve([])),
-    enabled: params !== null,
+      ? appointmentQueryKeys.range(organizationId, params)
+      : [...appointmentQueryKeys.all, organizationId, 'range', 'none'],
+    queryFn: () => (params ? fetchAppointmentRange(params) : Promise.resolve([])),
+    enabled: params !== null && organizationId !== null && (options.enabled ?? true),
+    placeholderData: keepPreviousData,
+    notifyOnError: options.notifyOnError ?? true,
   });
 }
 
-/** Who can be booked — the doctors, then the therapists, with their real roles. */
-export function useBookableStaff() {
+/**
+ * One booking; idle without an id. The dialog route reads the same entry, so a drawer opened
+ * from a deep link fetches it once.
+ */
+export function useAppointment(id: string | undefined) {
+  const organizationId = useOrganizationId();
   return useAppQuery({
-    queryKey: appointmentQueryKeys.staff(),
-    queryFn: fetchBookableStaff,
+    queryKey: appointmentQueryKeys.detail(organizationId, id ?? ''),
+    queryFn: () => fetchAppointment(id ?? ''),
+    enabled: Boolean(id) && organizationId !== null,
+  });
+}
+
+/** A day's free starts for a doctor and a length, or why it is closed; idle until all are set. */
+export function useAppointmentSlots(params: AppointmentSlotParams | null) {
+  const organizationId = useOrganizationId();
+  return useAppQuery({
+    queryKey: params
+      ? appointmentQueryKeys.slots(organizationId, params)
+      : [...appointmentQueryKeys.slotDays(organizationId), 'none'],
+    queryFn: () =>
+      params ? fetchAppointmentSlots(params) : Promise.reject(new Error('no slot read')),
+    enabled: params !== null && organizationId !== null,
+  });
+}
+
+/** The clinic's active treatments — the form's "From offerings"; kept five minutes. */
+export function useBookableTreatments() {
+  const organizationId = useOrganizationId();
+  return useAppQuery({
+    queryKey: appointmentQueryKeys.treatments(organizationId),
+    queryFn: fetchBookableTreatments,
+    enabled: organizationId !== null,
     staleTime: 5 * 60_000,
   });
 }
 
 // ── Writes ──
 
-/** The Undo of a status move — its side effects included; silent unless it fails. */
-export function useUndoAppointmentChange() {
-  return useAppMutation<void, string>({
-    mutationFn: undoAppointmentChange,
-    invalidateKeys: APPOINTMENT_WRITE_KEYS,
-  });
+/** "Booked #2870 · <day> <time>", with what the server sent the person. */
+function bookedToast(row: AppointmentRow, slot: { day: string; time: string }): string {
+  const values = { id: displayId.appointment(row.seq), ...slot };
+  if (row.reminder === 'confirm_requested') return clinicText(KEYS.toasts.booked, values);
+  if (row.reminder === 'reminder_queued') {
+    return clinicText(KEYS.toasts.bookedQueued, values);
+  }
+  return clinicText(KEYS.toasts.bookedOnly, values);
 }
 
+/** Who a new booking is for, and its fields. */
+export type AppointmentCreateVars = AppointmentCreateInput;
+
 /**
- * Book — not optimistic (the form shows "Saving…"): "Booked #2870 · <day>
- * <time> · confirm request sent on WhatsApp", or "… · reminder queued" when it
- * did not save as Scheduled. The list stays where it is (D28).
+ * Book — not optimistic (the form shows "Saving…"): "Booked #2870 · <day> <time> · confirm
+ * request sent on WhatsApp" when the server sent one. The list stays where it is (D28).
  */
 export function useCreateAppointment(
-  options: CrudMutationOptions<AppointmentRow, AppointmentCreateInput> = {},
+  options: CrudMutationOptions<AppointmentRow, AppointmentCreateVars> = {},
 ) {
   const slotLabel = useAppointmentSlotLabel();
-  return useAppMutation<AppointmentRow, AppointmentCreateInput>({
-    mutationFn: createAppointment,
+  return useAppMutation<AppointmentRow, AppointmentCreateVars>({
+    mutationFn: (input, action) => createAppointment({ input, ...action }),
     invalidateKeys: APPOINTMENT_WRITE_KEYS,
-    successMessage: (row) =>
-      clinicText(
-        row.status === 'scheduled' ? KEYS.toasts.booked : KEYS.toasts.bookedQueued,
-        {
-          id: displayId.appointment(row.seq),
-          ...slotLabel(row.date, row.startTime),
-        },
-      ),
+    successMessage: (row) => bookedToast(row, slotLabel(row.date, row.startTime)),
     ...options,
   });
 }
 
-/** What an edit sends: the booking and the changed fields (a new slot moves it). */
-export interface AppointmentUpdateVars {
-  id: string;
-  patch: AppointmentPatch;
+/** What a Copy or Rebook sends: the booking it starts from and the new slot. */
+export interface AppointmentCopyVars {
+  appointmentId: string;
+  date: string;
+  startTime: string;
 }
 
-/**
- * Save an edit — not optimistic: "#2861 moved to <day> <time> · confirm
- * request sent" when the slot moved, else "#2861 updated".
- */
-export function useUpdateAppointment(
-  options: CrudMutationOptions<AppointmentUpdate, AppointmentUpdateVars> = {},
+/** Copy or Rebook (`POST …/copy`) — the same toast as a booking. */
+export function useCopyAppointment(
+  options: CrudMutationOptions<AppointmentRow, AppointmentCopyVars> = {},
 ) {
   const slotLabel = useAppointmentSlotLabel();
-  return useAppMutation<AppointmentUpdate, AppointmentUpdateVars>({
-    mutationFn: ({ id, patch }) => updateAppointment(id, patch),
+  return useAppMutation<AppointmentRow, AppointmentCopyVars>({
+    mutationFn: (vars, action) => copyAppointment({ ...vars, ...action }),
     invalidateKeys: APPOINTMENT_WRITE_KEYS,
-    successMessage: ({ appointment, moved }) => {
-      const id = displayId.appointment(appointment.seq);
-      return moved
-        ? clinicText(KEYS.toasts.moved, {
-            id,
-            ...slotLabel(appointment.date, appointment.startTime),
-          })
-        : clinicText(KEYS.toasts.updated, { id });
+    successMessage: (row) => bookedToast(row, slotLabel(row.date, row.startTime)),
+    ...options,
+  });
+}
+
+/** What an edit sends: the booking as read and the changed fields. */
+export interface AppointmentUpdateVars {
+  appointment: AppointmentRow;
+  fields: Partial<AppointmentFields>;
+}
+
+/** Whether a saved edit moved the booking to another slot. */
+const movedBy = ({ appointment }: AppointmentUpdateVars, row: AppointmentRow) =>
+  row.date !== appointment.date || row.startTime !== appointment.startTime;
+
+/**
+ * Save an edit — not optimistic, refused when someone saved the booking meanwhile
+ * (`409 record_changed`): "#2861 moved to <day> <time> · confirm request sent" when the slot
+ * moved, else "#2861 updated".
+ */
+export function useUpdateAppointment(
+  options: CrudMutationOptions<AppointmentRow, AppointmentUpdateVars> = {},
+) {
+  const slotLabel = useAppointmentSlotLabel();
+  return useAppMutation<AppointmentRow, AppointmentUpdateVars>({
+    mutationFn: ({ appointment, fields }, action) =>
+      updateAppointment({
+        appointmentId: appointment.id,
+        fields,
+        expectedUpdatedAt: appointment.updatedAt,
+        ...action,
+      }),
+    invalidateKeys: APPOINTMENT_WRITE_KEYS,
+    successMessage: (row, vars) => {
+      const id = displayId.appointment(row.seq);
+      if (!movedBy(vars, row)) return clinicText(KEYS.toasts.updated, { id });
+      const values = { id, ...slotLabel(row.date, row.startTime) };
+      return row.reminder === 'confirm_requested'
+        ? clinicText(KEYS.toasts.moved, values)
+        : clinicText(KEYS.toasts.movedOnly, values);
     },
     ...options,
   });
 }
 
-/** "<name> → <status>", and " · reminder queued" for Confirmed. */
+/** The status each move route arrives at — what the optimistic flip shows. */
+const MOVE_STATUSES: Readonly<Record<AppointmentMoveRoute, AppointmentStatus>> = {
+  confirm: 'confirmed',
+  'check-in': 'checked_in',
+  complete: 'completed',
+  'no-show': 'no_show',
+  reinstate: 'scheduled',
+  'undo-check-in': 'confirmed',
+};
+
+/** What a status move sends: the booking and the route. */
+export interface AppointmentMoveVars {
+  appointment: AppointmentRow;
+  route: AppointmentMoveRoute;
+}
+
+/** "<name> → <status>", and " · reminder queued" when the server queued one. */
 function statusToast(row: AppointmentRow): string {
   const values = { name: row.person.name, status: statusLabel(row.status) };
   return clinicText(
-    row.status === 'confirmed' ? KEYS.toasts.statusConfirmed : KEYS.toasts.statusChanged,
+    row.status === 'confirmed' && row.reminder === 'reminder_queued'
+      ? KEYS.toasts.statusConfirmed
+      : KEYS.toasts.statusChanged,
     values,
   );
 }
 
-/** Options for {@link useSetAppointmentStatus}. */
-export interface AppointmentStatusOptions extends CrudMutationOptions<
-  AppointmentChange,
-  AppointmentStatusInput
+/** Options for {@link useMoveAppointment}. */
+export interface AppointmentMoveOptions extends CrudMutationOptions<
+  AppointmentRow,
+  AppointmentMoveVars
 > {
-  /**
-   * The toast's own words, still with Undo — Today's "<name> checked in · Dr.
-   * queue and room notified" (KICKOFF §6.2). Default: "<name> → <status>".
-   */
-  announce?: (change: AppointmentChange) => string;
+  /** The toast's own words — Default: "<name> → <status>". */
+  announce?: (row: AppointmentRow) => string;
 }
 
 /**
- * Move a status — the popover, the card's next step, Today. Optimistic: every
- * cached read shows the new status at once and goes back if the server
- * refuses (409 with the guard's words). "<name> → <status>" with Undo for 10s,
- * which reverts the status and its side effects.
+ * Move a status — the popover, the card's next step, the form. Optimistic: every cached read
+ * shows the new status at once and goes back if the server refuses (409 with its reason).
+ * "<name> → <status>"; a check-in's toast offers Undo for 10s (`undo-check-in`).
  */
-export function useSetAppointmentStatus({
+export function useMoveAppointment({
   announce,
   ...options
-}: AppointmentStatusOptions = {}) {
-  const undo = useUndoAppointmentChange();
-  return useAppMutation<AppointmentChange, AppointmentStatusInput>({
-    mutationFn: setAppointmentStatus,
+}: AppointmentMoveOptions = {}) {
+  const organizationId = useOrganizationId();
+  const undo = useAppMutation<AppointmentRow, AppointmentRow>({
+    mutationFn: (row, action) =>
+      moveAppointment({ appointmentId: row.id, route: 'undo-check-in', ...action }),
+    invalidateKeys: APPOINTMENT_WRITE_KEYS,
+  });
+  return useAppMutation<AppointmentRow, AppointmentMoveVars>({
+    mutationFn: ({ appointment, route }, action) =>
+      moveAppointment({ appointmentId: appointment.id, route, ...action }),
     invalidateKeys: APPOINTMENT_WRITE_KEYS,
     optimisticQueries: {
-      queryKey: appointmentQueryKeys.all,
-      update: (data, { id, status }) => withAppointmentStatus(data, id, status),
+      queryKey: [...appointmentQueryKeys.all, organizationId],
+      update: (data, { appointment, route }) =>
+        withAppointmentStatus(data, appointment.id, MOVE_STATUSES[route]),
     },
-    ...withUndoToast(options, (change) =>
-      notify.undo(announce ? announce(change) : statusToast(change.appointment), {
-        onUndo: () => undo.mutate(change.undoToken),
-      }),
-    ),
+    ...withUndoToast(options, (row, { route }) => {
+      const message = announce ? announce(row) : statusToast(row);
+      if (route === 'check-in') {
+        notify.undo(message, { onUndo: () => undo.mutate(row) });
+        return;
+      }
+      notify.success(message);
+    }),
   });
+}
+
+/** What a cancel sends: the booking and the reason. */
+export interface AppointmentCancelVars {
+  appointment: AppointmentRow;
+  cancel: AppointmentCancel;
 }
 
 /** Options for {@link useCancelAppointment}. */
 export interface AppointmentCancelOptions extends CrudMutationOptions<
-  AppointmentChange,
-  AppointmentCancelInput
+  AppointmentRow,
+  AppointmentCancelVars
 > {
   /**
-   * How the toast names it: the popover's "<name> → Cancelled · <reason> ·
-   * slot freed, reminders stopped", or the form's "Appointment #<seq>
-   * cancelled" (the default).
+   * How the toast names it: the popover's "<name> → Cancelled · <reason> · slot freed,
+   * reminders stopped", or the form's "Appointment #<seq> cancelled" (the default).
    */
   announce?: 'status' | 'record';
 }
 
 /**
- * Cancel with one of the contract's reasons (D32) — not optimistic (`S:1611`).
- * The toast offers Undo for 10s, which brings back the status it had.
+ * Cancel with one of the API's reasons — not optimistic. The toast offers Undo for 10s, which
+ * reinstates it (`POST …/reinstate`: Scheduled again while its slot is still bookable).
  */
 export function useCancelAppointment({
   announce = 'record',
   ...options
 }: AppointmentCancelOptions = {}) {
-  const undo = useUndoAppointmentChange();
-  return useAppMutation<AppointmentChange, AppointmentCancelInput>({
-    mutationFn: cancelAppointment,
+  const reinstate = useAppMutation<AppointmentRow, AppointmentRow>({
+    mutationFn: (row, action) =>
+      moveAppointment({ appointmentId: row.id, route: 'reinstate', ...action }),
     invalidateKeys: APPOINTMENT_WRITE_KEYS,
-    ...withUndoToast(options, ({ appointment, undoToken }) => {
+  });
+  return useAppMutation<AppointmentRow, AppointmentCancelVars>({
+    mutationFn: ({ appointment, cancel }, action) =>
+      cancelAppointment({ appointmentId: appointment.id, cancel, ...action }),
+    invalidateKeys: APPOINTMENT_WRITE_KEYS,
+    ...withUndoToast(options, (row) => {
       const message =
         announce === 'status'
           ? clinicText(KEYS.toasts.statusCancelled, {
-              name: appointment.person.name,
-              status: statusLabel(appointment.status),
-              reason: clinicText(KEYS.cancelReasons[appointment.cancelReason ?? 'other']),
+              name: row.person.name,
+              status: statusLabel(row.status),
+              reason: clinicText(KEYS.cancelReasons[row.cancelReason ?? 'other']),
             })
-          : clinicText(KEYS.toasts.cancelled, {
-              id: displayId.appointment(appointment.seq),
-            });
-      notify.undo(message, { onUndo: () => undo.mutate(undoToken) });
+          : clinicText(KEYS.toasts.cancelled, { id: displayId.appointment(row.seq) });
+      notify.undo(message, { onUndo: () => reinstate.mutate(row) });
     }),
   });
 }
 
-/** Restore a cancelled booking to Scheduled — "Appointment restored · reminder goes out again". */
-export function useRestoreAppointment(
-  options: CrudMutationOptions<AppointmentRow, string> = {},
+/** Reinstate a cancelled booking — "Appointment restored · reminder goes out again". */
+export function useReinstateAppointment(
+  options: CrudMutationOptions<AppointmentRow, AppointmentRow> = {},
 ) {
-  return useAppMutation<AppointmentRow, string>({
-    mutationFn: restoreAppointment,
+  return useAppMutation<AppointmentRow, AppointmentRow>({
+    mutationFn: (row, action) =>
+      moveAppointment({ appointmentId: row.id, route: 'reinstate', ...action }),
     invalidateKeys: APPOINTMENT_WRITE_KEYS,
     successMessage: () => clinicText(KEYS.toasts.restored),
-    ...options,
-  });
-}
-
-// ── The appointment form's reads and the visit's photos ──
-
-/**
- * The person a booking prefill names (`who=<patientId|leadId>`, `S:27`) — the
- * patient or the lead, with the patient's usual doctor; idle without an id.
- */
-export function useBookingPerson(id: string | undefined) {
-  return useAppQuery({
-    queryKey: appointmentQueryKeys.person(id ?? ''),
-    queryFn: () => fetchBookingPerson(id ?? ''),
-    enabled: Boolean(id),
-  });
-}
-
-/** A person's connected leads — the form's "Connected lead" chips and "Lead" radios; idle without one. */
-export function useConnectedLeads(person: AppointmentPersonLookup | null) {
-  return useAppQuery({
-    queryKey: person
-      ? appointmentQueryKeys.connectedLeads(person)
-      : [...appointmentQueryKeys.all, 'connected-leads', 'none'],
-    queryFn: () => (person ? fetchConnectedLeads(person) : Promise.resolve([])),
-    enabled: person !== null,
-  });
-}
-
-/** A patient's packages with a session left — the Package session radios; idle without a patient. */
-export function useActivePackages(patientId: string | null) {
-  return useAppQuery({
-    queryKey: appointmentQueryKeys.packages(patientId ?? ''),
-    queryFn: () => fetchActivePackages(patientId ?? ''),
-    enabled: patientId !== null,
-  });
-}
-
-/** A patient's bookings, newest first — the patient file's Visits; idle without a patient. */
-export function usePatientAppointments(patientId: string) {
-  return useAppQuery({
-    queryKey: appointmentQueryKeys.patient(patientId),
-    queryFn: () => fetchPatientAppointments(patientId),
-    enabled: patientId !== '',
-  });
-}
-
-/** The photos filed under a visit; idle without one. */
-export function useVisitPhotos(appointmentId: string | null) {
-  return useAppQuery({
-    queryKey: appointmentQueryKeys.photos(appointmentId ?? ''),
-    queryFn: () => fetchVisitPhotos(appointmentId ?? ''),
-    enabled: appointmentId !== null,
-  });
-}
-
-/** What a confirmed photo delete sends: the photo and the reason confirm's choice. */
-export interface VisitPhotoDeleteVars {
-  id: string;
-  reason: DeleteReason;
-  note: string | null;
-}
-
-/** What a visit photo write may have changed: the visit's photos and the patient file. */
-export const VISIT_PHOTO_WRITE_KEYS = [appointmentQueryKeys.all, ['clinic', 'patients']];
-
-/**
- * Delete a visit photo — no toast of its own: the reason confirm's `undo`
- * shows "Photo deleted" with Undo, which runs {@link useRestoreVisitPhoto}.
- */
-export function useDeleteVisitPhoto(
-  options: CrudMutationOptions<PatientImage, VisitPhotoDeleteVars> = {},
-) {
-  return useAppMutation<PatientImage, VisitPhotoDeleteVars>({
-    mutationFn: ({ id, reason, note }) => deleteVisitPhoto(id, reason, note),
-    invalidateKeys: VISIT_PHOTO_WRITE_KEYS,
-    ...options,
-  });
-}
-
-/** Put a deleted visit photo back — the Undo of its toast; silent on success. */
-export function useRestoreVisitPhoto(
-  options: CrudMutationOptions<PatientImage, string> = {},
-) {
-  return useAppMutation<PatientImage, string>({
-    mutationFn: restoreVisitPhoto,
-    invalidateKeys: VISIT_PHOTO_WRITE_KEYS,
     ...options,
   });
 }

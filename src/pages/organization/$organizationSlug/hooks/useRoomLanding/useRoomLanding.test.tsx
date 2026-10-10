@@ -155,7 +155,8 @@ describe('useRoomLanding (Q-U11)', () => {
   });
 
   it('lands "Exit preview" on the first room the member’s own access views', async () => {
-    // Reenal is a Doctor; previewing Pharmacist, she opens Medical.
+    // Reenal is a Doctor; previewing Pharmacist, she opens Medical. Leads and Appointments are
+    // on the API and answer from her codes, which hold neither: Patients is her first room.
     const { router } = renderLayout('medical', {
       email: 'reenal@cresence.skin',
       codes: MEMBER_CODES,
@@ -163,8 +164,20 @@ describe('useRoomLanding (Q-U11)', () => {
     });
     await expectPage('medical');
     act(() => useUIStore.getState().setPreviewRole(null));
-    await expectPage('leads');
-    expect(router.state.location.pathname).toBe('/organization/acme/leads');
+    await expectPage('patients');
+    expect(router.state.location.pathname).toBe('/organization/acme/patients');
+  });
+
+  it('opens a room on the API by the member’s own codes on "Exit preview"', async () => {
+    const { router } = renderLayout('medical', {
+      email: 'reenal@cresence.skin',
+      codes: [...MEMBER_CODES, 'appointment:read'],
+      previewRole: 'pharmacist',
+    });
+    await expectPage('medical');
+    act(() => useUIStore.getState().setPreviewRole(null));
+    await expectPage('appointments');
+    expect(router.state.location.pathname).toBe('/organization/acme/appointments');
   });
 
   it('never lands on a room the deployment turns off', async () => {

@@ -3,15 +3,12 @@ import type { CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type { AppointmentStaff } from '@/shared/api/clinic/appointments-contracts.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
-import { personFullName, shortPersonName } from '@/shared/components/Cells/index.ts';
-import {
-  useAppointmentSlotLabel,
-  useBookableStaff,
-} from '@/shared/hooks/useAppointments/index.ts';
+import { shortPersonName } from '@/shared/components/Cells/index.ts';
+import { useAppointmentSlotLabel } from '@/shared/hooks/useAppointments/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
+import { useTeamDirectory } from '@/shared/hooks/useTeamDirectory/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -46,7 +43,6 @@ interface StripOption {
  * picked a solid fill of its tone, the others its tint, each with that day's
  * live bookings. Counts ignore the doctor filter, so every pill keeps its
  * count once one is picked (A-A2; the prototype counts through the filter).
- * Two or more doctors picked in Filters leave every pill unpicked.
  */
 function DayStrip({
   options,
@@ -101,8 +97,9 @@ function DayStrip({
  * Doctor strip, a 44px rail and roomier blocks. An empty spot books its slot
  * to the nearest 15 minutes ("New appointment · <day> · <time>"), never on a
  * past day ("Past dates can’t be booked") and only with Create. The Day reads
- * every doctor — the picker and the strip count each one — and shows the
- * picked ones.
+ * every doctor — the picker and the strip count each one, every active member
+ * of the team directory (the API names no doctor role) — and shows the picked
+ * one.
  */
 export function AppointmentsDay() {
   const { t } = useTranslation(APPOINTMENTS_NS);
@@ -112,14 +109,11 @@ export function AppointmentsDay() {
   const clock = useCalendarClock();
   const slotLabel = useAppointmentSlotLabel();
   const { formatNumber } = useLocaleFormat();
-  const staff = useBookableStaff();
+  const team = useTeamDirectory();
   const read = useCalendarRange('day', 'every');
   const day = navigation.anchor;
-  const picked = navigation.search.doctor ?? [];
-  const shown =
-    picked.length > 0
-      ? read.rows.filter((row) => picked.includes(row.doctorId))
-      : read.rows;
+  const picked = navigation.search.doctor;
+  const shown = picked ? read.rows.filter((row) => row.doctorId === picked) : read.rows;
   const live = read.rows.filter((row) => row.status !== 'cancelled');
   const bookedBy = (doctorId: string) =>
     live.filter((row) => row.doctorId === doctorId).length;
@@ -127,8 +121,7 @@ export function AppointmentsDay() {
   const loading = read.pending || read.refreshing;
   const keys = APPOINTMENTS_KEYS.calendar;
 
-  const pickDoctors = (ids: string[]) =>
-    navigation.patch({ doctor: ids.length > 0 ? ids : undefined });
+  const pickDoctor = (doctor: string | undefined) => navigation.patch({ doctor });
   const bookSlot = (time: string) => {
     if (day < clock.today) {
       notify.info(t(keys.pastDay));
@@ -139,12 +132,6 @@ export function AppointmentsDay() {
     notify.info(t(keys.newAt, { day: label.day, time: label.time }));
   };
 
-  const people: AppointmentStaff[] = staff.data ?? [];
-  // "All doctors", the one doctor picked — or none of the pills for two or more.
-  let stripValue = '';
-  if (picked.length === 0) stripValue = ALL_DOCTORS;
-  else if (picked.length === 1) stripValue = picked[0] ?? '';
-
   return (
     <CalendarCard view="day">
       <div
@@ -153,8 +140,8 @@ export function AppointmentsDay() {
       >
         {tier === 'phone' ? (
           <DayStrip
-            value={stripValue}
-            onPick={(value) => pickDoctors(value === ALL_DOCTORS ? [] : [value])}
+            value={picked ?? ALL_DOCTORS}
+            onPick={(value) => pickDoctor(value === ALL_DOCTORS ? undefined : value)}
             options={[
               {
                 value: ALL_DOCTORS,
@@ -162,11 +149,11 @@ export function AppointmentsDay() {
                 tone: 'stone',
                 count: live.length,
               },
-              ...people.map((person) => ({
-                value: person.id,
-                label: shortPersonName(personFullName(person)),
-                tone: person.tone,
-                count: bookedBy(person.id),
+              ...team.members.map((member) => ({
+                value: member.id,
+                label: shortPersonName(member.name),
+                tone: member.tone,
+                count: bookedBy(member.id),
               })),
             ]}
           />
@@ -197,7 +184,7 @@ export function AppointmentsDay() {
               <span className="flex-1" />
               <DoctorPicker
                 value={picked}
-                onChange={pickDoctors}
+                onChange={pickDoctor}
                 size="sm"
                 meta={(doctorId) => {
                   const count = bookedBy(doctorId);

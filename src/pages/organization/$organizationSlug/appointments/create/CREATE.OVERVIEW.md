@@ -6,9 +6,9 @@ the Appointments page (KICKOFF §4, D24): the route renders nothing; the page re
 (`@/shared/forms/AppointmentForm/`, New mode), so a refresh or a shared link reopens it. A
 booking closes onto its day.
 
-Prefill: the page's own `date` and `doctor` (one doctor picked prefills the doctor), plus
-`time`, `who` (a patient's or a lead's id), `copyOf` (Copy and Rebook — a new booking, the old
-one stays), the plan's `source` (`chat` or `task`: step 1 collapsed, Date & time open) and
+Prefill: the page's own `date` and `doctor` (the one doctor picked prefills the doctor), plus
+`time`, `who` (the contact's id, `con_…`), `copyOf` (the booking's id — Copy and Rebook, a new
+booking, the old one stays), the plan's `source` (`chat` or `task`: step 1 collapsed, Date & time open) and
 `from` (the room it was opened from — allow-listed, the drawer closes back to it).
 `validateAppointmentCreateSearch` in the parent's `../appointments.dialog-search.ts` parses them.
 

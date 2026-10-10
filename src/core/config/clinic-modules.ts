@@ -22,8 +22,18 @@ export type ClinicModuleKey = (typeof CLINIC_MODULES)[keyof typeof CLINIC_MODULE
 /**
  * Rooms that still read fixtures (`REPLACE_WITH_API`). Production keeps them
  * disabled until clinozy-be serves their API (D8); L-60 removes a room from
- * this list as its endpoints land. Users is here too: its staff profiles,
- * branches and clinic matrix are fixtures even though members are real.
+ * this list as its endpoints land — Leads and Appointments have (D150, D151).
+ * Today stays until Tasks: its work queue is the tasks' (D149). Users is here
+ * too: its staff profiles, branches and clinic matrix are fixtures even though
+ * members are real.
  */
-export const FIXTURE_BACKED_CLINIC_MODULES: readonly ClinicModuleKey[] =
-  Object.values(CLINIC_MODULES);
+export const FIXTURE_BACKED_CLINIC_MODULES: readonly ClinicModuleKey[] = [
+  CLINIC_MODULES.today,
+  CLINIC_MODULES.patients,
+  CLINIC_MODULES.medical,
+  CLINIC_MODULES.stock,
+  CLINIC_MODULES.payments,
+  CLINIC_MODULES.tasks,
+  CLINIC_MODULES.offerings,
+  CLINIC_MODULES.users,
+];

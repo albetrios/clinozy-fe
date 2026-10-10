@@ -3,10 +3,9 @@ import {
   APPOINTMENT_LENGTHS,
   APPOINTMENT_TYPE_MINUTES,
   APPOINTMENT_TYPE_SERVICES,
-  type AppointmentConnectedLead,
   type AppointmentCreateInput,
-  type AppointmentPackageOption,
-  type AppointmentPatch,
+  type AppointmentFields,
+  type AppointmentMoveRoute,
   type AppointmentPerson,
   type AppointmentRow,
   type AppointmentSlot,
@@ -16,7 +15,7 @@ import type {
   AppointmentType,
 } from '@/shared/api/clinic/clinic-schema.ts';
 import { clockMinutes } from '@/shared/api/clinic/clinic-time.ts';
-import { LEAD_CLOSED_STATUSES } from '@/shared/api/clinic/leads-fixture-contracts.ts';
+import type { ContactSummary } from '@/shared/api/clinic/contacts-contracts.ts';
 import { toClinicPhone } from '@/shared/clinic/clinic-phone.ts';
 
 /*
@@ -42,7 +41,7 @@ export type AppointmentFormMode = 'create' | 'edit' | 'reschedule';
  * service, length and reason, step 1 collapsed.
  */
 export interface AppointmentFormPrefill {
-  /** `who=<patientId|leadId>` — the person, looked up. */
+  /** `who=<contactId>` — the person, looked up (`GET /app/contacts/:contact_id`). */
   whoId?: string;
   /** The day, clinic-local; a past day starts today. */
   date?: string;
@@ -71,12 +70,12 @@ const LEAD_BOOKING_REASON = 80;
  * open; Reason the first 80 characters of their last inbound message.
  */
 export function leadBookingPrefill(
-  lead: { id: string; interests: readonly string[] },
+  lead: { contactId: string; interests: readonly string[] },
   reason: string | null,
 ): AppointmentFormPrefill {
   const laser = lead.interests.some((interest) => /lhr|laser/i.test(interest));
   return {
-    whoId: lead.id,
+    whoId: lead.contactId,
     collapsed: true,
     ...(laser
       ? { type: 'treatment' as const, serviceLabel: 'LHR Treatment' }
@@ -89,18 +88,22 @@ export function leadBookingPrefill(
 // ── The draft ──
 
 /**
- * Who the booking is for: a patient, a lead, a contact (a contact-thread
- * lead, D32) — or `new`, a contact the search did not find, saved as their
- * contact thread with the booking (`S:1609`).
+ * Who the booking is for: a contact — a patient once their file exists, a lead
+ * while they have an open one — or `new`, a person the search did not find,
+ * created as a contact before the booking (`POST /app/contacts`).
  */
 export interface WhoDraft {
   kind: AppointmentPerson['kind'] | 'new';
+  /** The contact a booking points at; null for a new person. */
+  contactId: string | null;
   name: string;
   /** E.164; a new contact's mobile is the draft's `newPhone`. */
   phone: string | null;
   patientId: string | null;
+  /** Their open lead — it moves to Clinic visited at check-in. */
   leadId: string | null;
-  seq: number | null;
+  /** "C-12345"; null for a new person. */
+  contactNumber: number | null;
 }
 
 /** Everything the form edits — what a save sends. */
@@ -108,12 +111,9 @@ export interface AppointmentDraft {
   who: WhoDraft | null;
   /** A new contact's mobile, its digits (≤ 10). */
   newPhone: string;
-  /** The "Lead" radio's pick; `null` keeps the first open lead (`S:330`). */
-  leadPick: string | null;
   type: AppointmentType;
   serviceLabel: string;
   offeringId: string | null;
-  packageId: string | null;
   doctorId: string | null;
   durationMin: number;
   reason: string;
@@ -160,14 +160,31 @@ export function snapLength(minutes: number): number {
 }
 
 /** The booked person as the form holds them. */
-export function whoOf(person: AppointmentPerson): WhoDraft {
+function whoOf(person: AppointmentPerson): WhoDraft {
   return {
     kind: person.kind,
+    contactId: person.contactId,
     name: person.name,
     phone: person.phone,
     patientId: person.patientId,
     leadId: person.leadId,
-    seq: person.seq,
+    contactNumber: person.contactNumber,
+  };
+}
+
+/** A person the search found, as the form holds them — a patient, a lead or a contact. */
+export function whoOfContact(contact: ContactSummary): WhoDraft {
+  let kind: WhoDraft['kind'] = 'contact';
+  if (contact.patientId) kind = 'patient';
+  else if (contact.openLeadId) kind = 'lead';
+  return {
+    kind,
+    contactId: contact.id,
+    name: contact.name,
+    phone: contact.primaryPhone,
+    patientId: contact.patientId,
+    leadId: contact.openLeadId,
+    contactNumber: contact.contactNumber,
   };
 }
 
@@ -176,11 +193,9 @@ export function emptyDraft(date: string | null): AppointmentDraft {
   return {
     who: null,
     newPhone: '',
-    leadPick: null,
     type: 'consultation',
     serviceLabel: APPOINTMENT_TYPE_SERVICES.consultation,
     offeringId: null,
-    packageId: null,
     doctorId: null,
     durationMin: APPOINTMENT_TYPE_MINUTES.consultation,
     reason: '',
@@ -196,11 +211,9 @@ export function draftOf(row: AppointmentRow): AppointmentDraft {
   return {
     who: whoOf(row.person),
     newPhone: '',
-    leadPick: row.leadId,
     type: row.type,
     serviceLabel: row.serviceLabel,
     offeringId: row.offeringId,
-    packageId: row.patientPackageId,
     doctorId: row.doctorId,
     durationMin: row.durationMin,
     reason: row.reason ?? '',
@@ -227,8 +240,6 @@ export function rescheduleDraftOf(row: AppointmentRow, today: string): Appointme
 export function copyDraftOf(row: AppointmentRow, today: string): AppointmentDraft {
   return {
     ...draftOf(row),
-    leadPick: null,
-    packageId: null,
     date: today,
     time: null,
     status: 'scheduled',
@@ -246,8 +257,8 @@ export function savedDraftOf(
 
 /**
  * The doctor a New form starts with — the first one known of: the prefill's,
- * the copied booking's, the person's usual doctor (`S:335`), the branch's
- * default, the first bookable one.
+ * the copied booking's, the first bookable one. A contact carries no usual
+ * doctor and a branch no default one (api-integration §8 G5).
  */
 export function startingDoctorId(
   candidates: readonly (string | null | undefined)[],
@@ -258,7 +269,7 @@ export function startingDoctorId(
 /** What a New form loaded besides its prefill. */
 export interface NewDraftContext {
   /** The person `whoId` names. */
-  person: AppointmentPerson | undefined;
+  person: WhoDraft | undefined;
   /** The booking `copyOf` names. */
   source: AppointmentRow | undefined;
   today: string;
@@ -278,16 +289,11 @@ export function newDraftOf(
   const date = prefill.date && prefill.date >= today ? prefill.date : today;
   let draft: AppointmentDraft = {
     ...emptyDraft(date),
-    who: person ? whoOf(person) : null,
+    who: person ?? null,
     doctorId,
   };
-  if (prefill.type) {
-    draft = applyAppointmentChange(draft, {
-      kind: 'type',
-      type: prefill.type,
-      packages: [],
-    });
-  }
+  if (prefill.type)
+    draft = applyAppointmentChange(draft, { kind: 'type', type: prefill.type });
   if (prefill.serviceLabel) draft = { ...draft, serviceLabel: prefill.serviceLabel };
   if (prefill.durationMin) {
     draft = applyAppointmentChange(draft, {
@@ -308,15 +314,8 @@ export function newDraftOf(
 export type AppointmentFormChange =
   | { kind: 'who'; who: WhoDraft | null }
   | { kind: 'newPhone'; digits: string }
-  | { kind: 'lead'; leadId: string }
-  | {
-      kind: 'type';
-      type: AppointmentType;
-      /** The person's active packages — a Package session picks one. */
-      packages: readonly AppointmentPackageOption[];
-    }
+  | { kind: 'type'; type: AppointmentType }
   | { kind: 'treatment'; label: string; offeringId: string | null; minutes: number }
-  | { kind: 'package'; option: AppointmentPackageOption }
   | { kind: 'doctor'; doctorId: string }
   | { kind: 'length'; minutes: number }
   | { kind: 'reason'; text: string }
@@ -333,53 +332,29 @@ function plainType(draft: AppointmentDraft, type: AppointmentType): AppointmentD
     type,
     serviceLabel: APPOINTMENT_TYPE_SERVICES[type],
     offeringId: null,
-    packageId: null,
     durationMin: APPOINTMENT_TYPE_MINUTES[type],
-  };
-}
-
-function pickPackage(
-  draft: AppointmentDraft,
-  option: AppointmentPackageOption,
-): AppointmentDraft {
-  return {
-    ...draft,
-    type: 'package_session',
-    packageId: option.id,
-    offeringId: option.offeringId,
-    serviceLabel: option.name,
-    durationMin: snapLength(option.durationMin),
   };
 }
 
 /**
  * Picking a type (`apTypeVals`, H:3893–3899): Treatment keeps a treatment
- * already picked, else "Treatment" 60; Package session takes the picked or
- * the first active package; the rest take their own service and length.
+ * already picked, else "Treatment" 60; Package session keeps the length (the
+ * package picker went with the backend, A12); the rest take their own service
+ * and length.
  */
-function changeType(
-  draft: AppointmentDraft,
-  type: AppointmentType,
-  packages: readonly AppointmentPackageOption[],
-): AppointmentDraft {
+function changeType(draft: AppointmentDraft, type: AppointmentType): AppointmentDraft {
   if (type === 'treatment') {
     if (draft.type === 'treatment') return draft;
-    const keep =
-      !NON_TREATMENT_SERVICES.has(draft.serviceLabel) && draft.packageId === null;
-    if (keep) return { ...draft, type, packageId: null };
+    if (!NON_TREATMENT_SERVICES.has(draft.serviceLabel)) return { ...draft, type };
     return {
       ...draft,
       type,
       serviceLabel: APPOINTMENT_TYPE_SERVICES.treatment,
       offeringId: null,
-      packageId: null,
       durationMin: APPOINTMENT_TYPE_MINUTES.treatment,
     };
   }
   if (type === 'package_session') {
-    const option =
-      packages.find((candidate) => candidate.id === draft.packageId) ?? packages[0];
-    if (option) return pickPackage(draft, option);
     return { ...plainType(draft, type), durationMin: draft.durationMin };
   }
   return plainType(draft, type);
@@ -426,24 +401,19 @@ export function applyAppointmentChange(
 ): AppointmentDraft {
   switch (change.kind) {
     case 'who':
-      return { ...draft, who: change.who, leadPick: null, newPhone: '' };
+      return { ...draft, who: change.who, newPhone: '' };
     case 'newPhone':
       return { ...draft, newPhone: change.digits.replace(/\D/g, '').slice(0, 10) };
-    case 'lead':
-      return { ...draft, leadPick: change.leadId };
     case 'type':
-      return changeType(draft, change.type, change.packages);
+      return changeType(draft, change.type);
     case 'treatment':
       return {
         ...draft,
         type: 'treatment',
         serviceLabel: change.label,
         offeringId: change.offeringId,
-        packageId: null,
         durationMin: snapLength(change.minutes),
       };
-    case 'package':
-      return pickPackage(draft, change.option);
     case 'doctor':
       return changeSlotOwner(draft, { doctorId: change.doctorId });
     case 'length':
@@ -488,14 +458,12 @@ export function rescheduleNote(
 function fingerprint(draft: AppointmentDraft) {
   return {
     who: draft.who
-      ? `${draft.who.kind}:${draft.who.patientId}:${draft.who.leadId}:${draft.who.name}`
+      ? `${draft.who.kind}:${draft.who.contactId}:${draft.who.patientId}:${draft.who.name}`
       : '',
     newPhone: draft.newPhone,
-    leadPick: draft.leadPick,
     type: draft.type,
     serviceLabel: draft.serviceLabel,
     offeringId: draft.offeringId,
-    packageId: draft.packageId,
     doctorId: draft.doctorId,
     durationMin: draft.durationMin,
     reason: draft.reason.trim(),
@@ -531,12 +499,10 @@ export function rebaseDraft(
     rebased[key] = next[key];
   };
   if (a.who === b.who) take('who');
-  if (a.leadPick === b.leadPick) take('leadPick');
   if (a.type === b.type && a.serviceLabel === b.serviceLabel) {
     take('type');
     take('serviceLabel');
     take('offeringId');
-    take('packageId');
   }
   if (a.doctorId === b.doctorId) take('doctorId');
   if (a.durationMin === b.durationMin) take('durationMin');
@@ -583,91 +549,17 @@ export function draftComplete(draft: AppointmentDraft): boolean {
   return draft.who !== null && slotDone(draft);
 }
 
-// ── The plan flag (H:4136) ──
-
-/** The plan flag (patients, Confirmed and on): ready with its counts, or not prepared. */
-export interface PlanFlag {
-  /** Suggestions still live (Planned, Accepted, Next time). */
-  total: number;
-  /** Of them, made for this visit. */
-  forVisit: number;
-}
-
-const PLAN_FLAG_STATUSES: ReadonlySet<AppointmentStatus> = new Set([
-  'confirmed',
-  'checked_in',
-  'completed',
-]);
+// ── The person's lead (`lead_id`, A1) ──
 
 /**
- * The plan flag in Edit for a patient from Confirmed on: the live
- * suggestions, and how many were made for this visit; `null` where it does not
- * show.
- */
-export function planFlagOf(
-  visit: {
-    edit: boolean;
-    isPatient: boolean;
-    status: AppointmentStatus;
-    appointmentId: string | undefined;
-  },
-  suggestions: readonly { status: string; appointmentId: string | null }[] | undefined,
-): PlanFlag | null {
-  if (!(visit.edit && visit.isPatient && PLAN_FLAG_STATUSES.has(visit.status))) {
-    return null;
-  }
-  const live = (suggestions ?? []).filter((line) => line.status !== 'declined');
-  return {
-    total: live.length,
-    forVisit: live.filter((line) => line.appointmentId === visit.appointmentId).length,
-  };
-}
-
-// ── Connected leads (`S:330`, H:4139, H:5987–5996) ──
-
-const CLOSED_LEAD = new Set<string>(LEAD_CLOSED_STATUSES);
-
-/** A lead still open: not closed by its status and not linked to a patient. */
-export function isOpenLead(lead: Pick<AppointmentConnectedLead, 'status' | 'patientId'>) {
-  return (
-    (lead.status === null || !CLOSED_LEAD.has(lead.status)) && lead.patientId === null
-  );
-}
-
-/** The leads the "Lead" radios offer — shown when two or more are open (H:5996). */
-export function leadChoices(
-  leads: readonly AppointmentConnectedLead[],
-): AppointmentConnectedLead[] {
-  return leads.filter(isOpenLead);
-}
-
-/**
- * The lead the booking links to (`Appointment.leadId`, `S:330`): the radio's
- * pick, else the first open lead, else the person's own lead.
- */
-export function linkedLeadId(
-  draft: AppointmentDraft,
-  leads: readonly AppointmentConnectedLead[],
-): string | null {
-  const open = leadChoices(leads);
-  if (draft.leadPick && open.some((lead) => lead.id === draft.leadPick)) {
-    return draft.leadPick;
-  }
-  return open[0]?.id ?? draft.who?.leadId ?? null;
-}
-
-/**
- * " · moves to Clinic visited at check-in" — while one of the person's leads
- * is still open and the visit is not checked in (H:4139).
+ * " · moves to Clinic visited at check-in" — while the person has an open lead
+ * and the visit is not checked in (H:4139); the server moves it (A1).
  */
 export function movesAtCheckIn(
-  leads: readonly AppointmentConnectedLead[],
+  leadId: string | null,
   status: AppointmentStatus,
 ): boolean {
-  return (
-    leads.some((lead) => lead.status === null || !CLOSED_LEAD.has(lead.status)) &&
-    !slotLocked(status)
-  );
+  return leadId !== null && !slotLocked(status);
 }
 
 // ── The slot grid (H:6001–6002) ──
@@ -676,23 +568,21 @@ export function movesAtCheckIn(
 export interface SlotHour {
   /** 0–23. */
   hour: number;
+  /** Its free starts — the server lists free starts only (G3). */
   slots: AppointmentSlot[];
-  /** How many of its starts are free — a full hour sits at 55%. */
-  free: number;
 }
 
-/** The slots by hour, in order — one row per hour that has a start. */
+/** The free starts by hour, in order — one row per hour that has one. */
 export function slotHours(slots: readonly AppointmentSlot[]): SlotHour[] {
   const hours: SlotHour[] = [];
   for (const slot of slots) {
     const hour = Math.floor(clockMinutes(slot.time) / 60);
     let row = hours.at(-1);
     if (row?.hour !== hour) {
-      row = { hour, slots: [], free: 0 };
+      row = { hour, slots: [] };
       hours.push(row);
     }
     row.slots.push(slot);
-    if (slot.free) row.free += 1;
   }
   return hours;
 }
@@ -717,17 +607,11 @@ export function newContactPhone(draft: AppointmentDraft): string | null {
 }
 
 /** The fields a booking shares between New and Edit. */
-function bookingFields(
-  draft: AppointmentDraft,
-  leads: readonly AppointmentConnectedLead[],
-) {
+function bookingFields(draft: AppointmentDraft) {
   return {
-    patientId: draft.who?.patientId ?? null,
-    leadId: draft.who?.kind === 'new' ? null : linkedLeadId(draft, leads),
     type: draft.type,
     serviceLabel: draft.serviceLabel.trim(),
     offeringId: draft.offeringId,
-    patientPackageId: draft.type === 'package_session' ? draft.packageId : null,
     durationMin: draft.durationMin,
     reason: draft.reason.trim() || null,
     notes: draft.notes.trim() || null,
@@ -735,66 +619,90 @@ function bookingFields(
 }
 
 /**
- * A new booking (`createAppointment`, `S:1609`) from a complete draft — the
- * caller has checked who, the slot and the doctor first.
+ * A new booking (`POST /app/appointments`) from a complete draft for a contact —
+ * the caller has checked who, the slot and the doctor first, and created a new
+ * person's contact.
  */
 export function createInputOf(
   draft: AppointmentDraft,
-  context: {
-    branchId: string | null;
-    leads: readonly AppointmentConnectedLead[];
-    copyOf?: string;
-  },
+  context: { branchId: string; contactId: string },
 ): AppointmentCreateInput {
-  const who = draft.who;
-  const phone = newContactPhone(draft);
   return {
-    ...bookingFields(draft, context.leads),
+    ...bookingFields(draft),
+    contactId: context.contactId,
+    branchId: context.branchId,
     doctorId: draft.doctorId ?? '',
     date: draft.date ?? '',
     startTime: draft.time ?? '',
-    ...(context.branchId ? { branchId: context.branchId } : {}),
-    ...(context.copyOf ? { copyOf: context.copyOf } : {}),
-    ...(who?.kind === 'new' && phone ? { newContact: { name: who.name, phone } } : {}),
   };
+}
+
+/**
+ * Whether a Copy can go as `POST …/copy` — the booking it starts from booked again on another
+ * slot: the same doctor, branch, service, length and reason, and no notes (the copy carries
+ * none). Anything else changed is a new booking for the same person.
+ */
+export function copiesAsIs(
+  draft: AppointmentDraft,
+  source: AppointmentRow,
+  branchId: string,
+): boolean {
+  const fields = bookingFields(draft);
+  return (
+    draft.doctorId === source.doctorId &&
+    branchId === source.branchId &&
+    fields.type === source.type &&
+    fields.serviceLabel === source.serviceLabel &&
+    fields.offeringId === source.offeringId &&
+    fields.durationMin === source.durationMin &&
+    fields.reason === source.reason &&
+    fields.notes === null
+  );
 }
 
 /** The booking fields an edit compares with the saved booking. */
 const BOOKING_KEYS = [
-  'patientId',
-  'leadId',
   'type',
   'serviceLabel',
   'offeringId',
-  'patientPackageId',
   'durationMin',
   'reason',
   'notes',
 ] as const;
 
-/** The doctor, slot and status an edit changed. */
-function slotPatchOf(draft: AppointmentDraft, row: AppointmentRow): AppointmentPatch {
-  const patch: AppointmentPatch = {};
-  if (draft.doctorId && draft.doctorId !== row.doctorId) patch.doctorId = draft.doctorId;
-  if (draft.date && draft.date !== row.date) patch.date = draft.date;
-  if (draft.time && draft.time !== row.startTime) patch.startTime = draft.time;
-  if (draft.status !== row.status) patch.status = draft.status;
-  return patch;
-}
-
 /**
- * An edit (`updateAppointment`, `S:1610`): the fields that changed, and the
- * status when a tile moved it — a moved slot saves Scheduled on the server.
+ * An edit (`PATCH /app/appointments/:appointment_id`): the fields that changed —
+ * a new doctor, date or start moves the booking (a moved Confirmed one is
+ * Scheduled again, the server's rule). The status is not a field: see
+ * {@link moveRouteOf}.
  */
 export function patchOf(
   draft: AppointmentDraft,
   row: AppointmentRow,
-  leads: readonly AppointmentConnectedLead[],
-): AppointmentPatch {
-  const fields = bookingFields(draft, leads);
-  const patch: AppointmentPatch = {};
+): Partial<AppointmentFields> {
+  const fields = bookingFields(draft);
+  const patch: Partial<AppointmentFields> = {};
   for (const key of BOOKING_KEYS) {
     if (fields[key] !== row[key]) Object.assign(patch, { [key]: fields[key] });
   }
-  return { ...patch, ...slotPatchOf(draft, row) };
+  if (draft.doctorId && draft.doctorId !== row.doctorId) patch.doctorId = draft.doctorId;
+  if (draft.date && draft.date !== row.date) patch.date = draft.date;
+  if (draft.time && draft.time !== row.startTime) patch.startTime = draft.time;
+  return patch;
+}
+
+/**
+ * The move a status tile asks for over the saved status — one route each (`POST …/confirm`,
+ * `/check-in`, `/complete`); none when the tiles stayed, or when a move of the slot set it
+ * back to Scheduled (the server does that itself).
+ */
+export function moveRouteOf(
+  draft: AppointmentDraft,
+  row: AppointmentRow,
+): AppointmentMoveRoute | null {
+  if (draft.status === row.status) return null;
+  if (draft.status === 'confirmed' && row.status === 'scheduled') return 'confirm';
+  if (draft.status === 'checked_in') return 'check-in';
+  if (draft.status === 'completed' && row.status === 'checked_in') return 'complete';
+  return null;
 }

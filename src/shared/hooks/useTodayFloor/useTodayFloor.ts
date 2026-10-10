@@ -1,12 +1,13 @@
-import { appointmentQueryKeys } from '@/shared/api/clinic/appointments-api.ts';
+import {
+  appointmentQueryKeys,
+  moveAppointment,
+} from '@/shared/api/clinic/appointments-api.ts';
 import { leadQueryKeys } from '@/shared/api/clinic/leads-api.ts';
 import {
-  checkInAppointment,
   fetchTodayEnquiries,
   fetchTodayFloor,
   moveFloorStage,
   todayQueryKeys,
-  undoCheckIn,
 } from '@/shared/api/clinic/today-api.ts';
 import {
   type FloorStage,
@@ -78,12 +79,12 @@ const MOVE_REFRESHES = [appointmentQueryKeys.all, leadQueryKeys.all];
 export function useTodayMoves() {
   const checkIn = useAppMutation({
     mutationFn: (appointmentId: string, action) =>
-      checkInAppointment({ appointmentId, ...action }),
+      moveAppointment({ appointmentId, route: 'check-in', ...action }),
     invalidateKeys: MOVE_REFRESHES,
   });
   const undo = useAppMutation({
     mutationFn: (appointmentId: string, action) =>
-      undoCheckIn({ appointmentId, ...action }),
+      moveAppointment({ appointmentId, route: 'undo-check-in', ...action }),
     invalidateKeys: MOVE_REFRESHES,
   });
   const moveStage = useAppMutation({

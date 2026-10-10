@@ -10,7 +10,8 @@ import type { ContactCardData } from '@/shared/components/PersonCard/index.ts';
  * How every surface paints and names a booking — the Appointments room's
  * views and card, and the appointment form wherever it is stacked (KICKOFF
  * §6.4): the service tone and the person as the contact card reads them. A
- * doctor's name is `personFullName` (the Cells' name helpers). Pure.
+ * doctor is the team directory's member (`row.doctor.name`, api-integration
+ * M41). Pure.
  */
 
 /**
@@ -51,19 +52,17 @@ export function serviceTone(
   );
 }
 
-/** The booked person as the contact card reads them (D32 — a patient, a lead or a contact thread). */
+/**
+ * The booked person as the contact card reads them (D32 — a patient, a lead or
+ * a contact thread): their contact number ("C-12345") for everyone — a booking
+ * carries no patient or lead number (G3).
+ */
 export function appointmentContactCard(person: AppointmentPerson): ContactCardData {
-  let id: string | null = null;
-  if (person.seq !== null) {
-    id =
-      person.kind === 'patient'
-        ? displayId.patient(person.seq)
-        : displayId.lead(person.seq);
-  }
   return {
     kind: person.kind,
     name: person.name,
-    displayId: id,
+    displayId:
+      person.contactNumber === null ? null : displayId.contact(person.contactNumber),
     reach: person.phone ? [{ channel: 'whatsapp', phone: person.phone }] : [],
   };
 }

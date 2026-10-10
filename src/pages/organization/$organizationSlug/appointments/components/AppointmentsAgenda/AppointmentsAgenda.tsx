@@ -3,14 +3,17 @@
 // would serve stale (see DataTable).
 
 import { useNavigate, useParams } from '@tanstack/react-router';
-import { type SortingState, type Updater, useTable } from '@tanstack/react-table';
+import { useTable } from '@tanstack/react-table';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { organizationLeadCreate } from '@/lib/routes/leads-builders.ts';
-import { groupAppointmentsByDay } from '@/shared/api/clinic/appointment-views.ts';
+import {
+  agendaCountsWindow,
+  groupAppointmentsByDay,
+} from '@/shared/api/clinic/appointment-views.ts';
 import type {
-  AppointmentDaySummary,
+  AppointmentDayCount,
   AppointmentPerson,
   AppointmentRow,
 } from '@/shared/api/clinic/appointments-contracts.ts';
@@ -24,17 +27,14 @@ import {
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import {
-  useAppointmentDaySummaries,
+  useAppointmentDayCounts,
   useAppointmentList,
   useAppointmentSlotLabel,
 } from '@/shared/hooks/useAppointments/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
-import {
-  sortingFromSearch,
-  sortingToSearch,
-} from '@/shared/hooks/useDataTableUrlState/useDataTableUrlState.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
+import { useTeamDirectory } from '@/shared/hooks/useTeamDirectory/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 
 import {
@@ -43,7 +43,6 @@ import {
   APPOINTMENTS_TEST_IDS,
 } from '../../appointments.constants.ts';
 import { appointmentListParamsOf } from '../../appointments.params.ts';
-import type { AppointmentsSort } from '../../appointments.search.ts';
 import { useAppointmentsNavigation } from '../../hooks/useAppointmentsNavigation/index.ts';
 import { useAppointmentActions } from '../AppointmentActions/index.ts';
 import {
@@ -93,19 +92,19 @@ function AgendaEmpty({ onBook }: { onBook?: () => void }) {
 
 /**
  * A day's sticky header — the table calls it for each run of one day's rows,
- * with the day's own count from `summaryOf`.
+ * with the day's counts from `countsOf`.
  */
 function agendaDayHeader(
   { key, index }: DataTableGroup<AppointmentRow>,
   today: string,
-  summaryOf: ReadonlyMap<string, AppointmentDaySummary>,
+  countsOf: ReadonlyMap<string, AppointmentDayCount | undefined>,
 ) {
   return (
     <AgendaDayHeader
       date={key}
       today={today}
       groupIndex={index}
-      summary={summaryOf.get(key)}
+      counts={countsOf.get(key)}
     />
   );
 }
@@ -113,11 +112,12 @@ function agendaDayHeader(
 /**
  * The Agenda (KICKOFF §6.4; H:2031–2052, `appointments.md:26–40`): the shared
  * table grouped by day under sticky headers — from today on, or the one day
- * picked in Filters — in cursor pages of 50 with infinite scroll and "All
- * appointments loaded" (D7). Contact, Service and Status sort inside each day
- * through the URL; a row opens the booking's drawer. While a search, sort or
- * filter loads, the rows stay as bars (`refreshing`). A tablet drops Latest
- * update; a phone re-grids each row (`regrid`).
+ * picked in Filters — by date and start (the API's order, no column sort) in
+ * cursor pages of 50 with infinite scroll and "All appointments loaded" (D7),
+ * within the header's branches; each day header counts the day from
+ * `daily-counts` over the days loaded. A row opens the booking's drawer. While
+ * a search or filter loads, the rows stay as bars (`refreshing`). A tablet
+ * drops Latest update; a phone re-grids each row (`regrid`).
  */
 export function AppointmentsAgenda() {
   const { t } = useTranslation([APPOINTMENTS_NS]);
@@ -129,30 +129,31 @@ export function AppointmentsAgenda() {
   const { organizationSlug = '' } = useParams({ strict: false });
   const slotLabel = useAppointmentSlotLabel();
   const { preferences } = usePreferences();
+  const team = useTeamDirectory();
   const [statusTarget, setStatusTarget] = useState<AgendaStatusTarget | null>(null);
 
-  const params = {
-    ...appointmentListParamsOf(navigation.search),
-    branchIds: preferences.branchFilter,
-  };
+  const params = appointmentListParamsOf(navigation.search, preferences.branchFilter);
   const list = useAppointmentList(params, { notifyOnError: false });
-  const summaries = useAppointmentDaySummaries(params, { notifyOnError: false });
   useListLoadError(list, TABLE_ID);
-  // Each day header counts the whole day (Appendix F) — the loaded rows' own
-  // counts until the per-day summary is in.
-  const summaryOf = new Map(
-    groupAppointmentsByDay(list.rows, summaries.data).map((group) => [
+  // Each day header counts the whole day from the server, over the days loaded
+  // (or the one day picked) — within the branches and the doctor; the status,
+  // search and created filters do not narrow them (the API's rule).
+  const countsWindow = agendaCountsWindow(list.rows, params.date);
+  const counts = useAppointmentDayCounts(
+    countsWindow && {
+      ...countsWindow,
+      doctorId: params.doctorId,
+      branchIds: params.branchIds,
+    },
+    { notifyOnError: false },
+  );
+  const countsOf = new Map(
+    groupAppointmentsByDay(list.rows, counts.data).map((group) => [
       group.date,
-      group.summary,
+      group.counts,
     ]),
   );
   const today = clinicToday();
-
-  const sorting = sortingFromSearch(navigation.search.sort);
-  const setSorting = (updater: Updater<SortingState>) => {
-    const next = typeof updater === 'function' ? updater(sorting) : updater;
-    navigation.patch({ sort: sortingToSearch(next) as AppointmentsSort | undefined });
-  };
 
   const { openCreate } = navigation;
   const { canEdit, canCreate } = actions;
@@ -163,8 +164,7 @@ export function AppointmentsAgenda() {
   const columns = useMemo(() => agendaColumns(t, tier), [t, tier]);
   const cells = useMemo<AgendaCellsValue>(() => {
     const newAppointment = (person: AppointmentPerson) => {
-      const who = person.patientId ?? person.leadId;
-      openCreate(who ? { who } : {});
+      openCreate({ who: person.contactId });
     };
     const newLead = (person: AppointmentPerson) => {
       void navigate({
@@ -175,6 +175,7 @@ export function AppointmentsAgenda() {
     return {
       timeOf: (row) => slotLabel(row.date, row.startTime).time,
       canEdit,
+      teamUpdatedAt: team.updatedAt,
       statusTarget,
       setStatusTarget,
       onNewAppointment: canCreate ? newAppointment : undefined,
@@ -183,6 +184,7 @@ export function AppointmentsAgenda() {
   }, [
     slotLabel,
     canEdit,
+    team.updatedAt,
     canCreate,
     canCreateLead,
     statusTarget,
@@ -198,11 +200,7 @@ export function AppointmentsAgenda() {
     getRowId: (row: AppointmentRow) => row.id,
     manualSorting: true,
     manualPagination: true,
-    state: {
-      sorting,
-      columnVisibility: { latest: tier !== 'tablet' },
-    },
-    onSortingChange: setSorting,
+    state: { columnVisibility: { latest: tier !== 'tablet' } },
   });
 
   return (
@@ -220,7 +218,7 @@ export function AppointmentsAgenda() {
         onRowClick={(row) => actions.open(row.original)}
         groups={{
           keyOf: (row) => row.date,
-          header: (group) => agendaDayHeader(group, today, summaryOf),
+          header: (group) => agendaDayHeader(group, today, countsOf),
         }}
         refreshing={list.isRefreshing}
         hasNextPage={list.hasNextPage}

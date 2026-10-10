@@ -1,31 +1,27 @@
 import { useState } from 'react';
 
+import { PUBLIC_ID } from '@/lib/routes/search-params.ts';
 import { isAppointmentSlotLocked } from '@/shared/api/clinic/appointment-status.ts';
 import type {
-  AppointmentConnectedLead,
-  AppointmentPackageOption,
-  AppointmentPersonLookup,
   AppointmentRow,
-  AppointmentSlot,
+  AppointmentSlotDay,
+  AppointmentSlotParams,
   AppointmentSlotStep,
   AppointmentStaff,
-  AvailableSlotsParamsInput,
+  AppointmentTreatment,
 } from '@/shared/api/clinic/appointments-contracts.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import type { OfferingRecord } from '@/shared/api/clinic/offerings-contracts.ts';
 import { defaultBranchId } from '@/shared/clinic/clinic-branch.ts';
 import {
-  useActivePackages,
   useAppointment,
-  useAvailableSlots,
-  useBookableStaff,
-  useBookingPerson,
-  useConnectedLeads,
+  useAppointmentSlots,
+  useBookableTreatments,
 } from '@/shared/hooks/useAppointments/index.ts';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
-import { useOfferings } from '@/shared/hooks/useOfferings/index.ts';
+import { useContact } from '@/shared/hooks/useContacts/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
+import { useTeamDirectory } from '@/shared/hooks/useTeamDirectory/index.ts';
 
 import {
   applyAppointmentChange,
@@ -40,7 +36,7 @@ import {
   savedDraftOf,
   type SavedSlot,
   startingDoctorId,
-  type WhoDraft,
+  whoOfContact,
 } from './appointment-form-model.ts';
 
 /** What opens the form: its mode, the booking (Edit, Reschedule), the prefill (New). */
@@ -72,6 +68,8 @@ export interface AppointmentFormState {
   mode: AppointmentFormMode;
   /** The saved booking (Edit, Reschedule). */
   row: AppointmentRow | undefined;
+  /** The booking a Copy or Rebook starts from (New). */
+  source: AppointmentRow | undefined;
   prefill: AppointmentFormPrefill;
   readOnly: boolean;
   today: string;
@@ -81,18 +79,17 @@ export interface AppointmentFormState {
   change: (change: AppointmentFormChange) => void;
   /** The draft differs from where it started (Q-P1). */
   dirty: boolean;
+  /** Who can be booked — the team (the API names no doctor role, M41). */
   staff: readonly AppointmentStaff[];
-  offerings: readonly OfferingRecord[];
+  /** The clinic's active treatments ("From offerings"). */
+  treatments: readonly AppointmentTreatment[];
   branchId: string | null;
-  /** The person's connected leads (`S:330`). */
-  leads: readonly AppointmentConnectedLead[];
-  /** The patient's active packages. */
-  packages: readonly AppointmentPackageOption[];
   isPatient: boolean;
   saved: SavedSlot | null;
   /** Date & time locked — checked in or later (`S:352`). */
   locked: boolean;
-  slots: readonly AppointmentSlot[] | undefined;
+  /** The day's free starts, or why it is closed; undefined while it loads or nothing is asked. */
+  slots: AppointmentSlotDay | undefined;
   slotStep: AppointmentSlotStep;
   setSlotStep: (step: AppointmentSlotStep) => void;
   canEdit: boolean;
@@ -101,15 +98,10 @@ export interface AppointmentFormState {
   /** Read-only or closed — every control inert. */
   inert: boolean;
   edit: boolean;
-  /** The member's roles — a Private photo album is the doctors' and admins'. */
-  roles: readonly string[];
 }
 
 const NO_PREFILL: AppointmentFormPrefill = {};
-const NO_LEADS: readonly AppointmentConnectedLead[] = [];
-const NO_PACKAGES: readonly AppointmentPackageOption[] = [];
-const NO_STAFF: readonly AppointmentStaff[] = [];
-const NO_OFFERINGS: readonly OfferingRecord[] = [];
+const NO_TREATMENTS: readonly AppointmentTreatment[] = [];
 
 /** Reschedule is a move: a booking that can no longer move opens as Edit. */
 function effectiveMode(
@@ -120,32 +112,28 @@ function effectiveMode(
   return mode;
 }
 
-/** The person's leads are looked up by their ids and mobile — a new contact has none. */
-function lookupOf(who: WhoDraft | null): AppointmentPersonLookup | null {
-  if (!who || who.kind === 'new') return null;
-  return { patientId: who.patientId, leadId: who.leadId, phone: who.phone };
-}
-
-/** The doctor's starts that day — asked once a date and a doctor are set, never once locked. */
+/**
+ * The doctor's free starts that day at the branch — asked once a date, a doctor and a branch
+ * are set, never once locked. The booking being moved still holds its own slot, so its saved
+ * start is not among them (G3: no "except this booking").
+ */
 function slotQueryOf(
   draft: AppointmentDraft,
-  context: {
-    locked: boolean;
-    step: AppointmentSlotStep;
-    branchId: string | null;
-    exceptId: string | undefined;
-  },
-): AvailableSlotsParamsInput | null {
-  if (!(draft.date && draft.doctorId) || context.locked) return null;
+  context: { locked: boolean; step: AppointmentSlotStep; branchId: string | null },
+): AppointmentSlotParams | null {
+  if (!(draft.date && draft.doctorId && context.branchId) || context.locked) return null;
   return {
     date: draft.date,
+    branchId: context.branchId,
     doctorId: draft.doctorId,
     durationMin: draft.durationMin,
     step: context.step,
-    ...(context.branchId ? { branchId: context.branchId } : {}),
-    ...(context.exceptId ? { exceptId: context.exceptId } : {}),
   };
 }
+
+/** A `who=` that names a contact (`con_…`) — anything else names nobody on clinozy-be. */
+const contactIdOf = (id: string | undefined) =>
+  id && PUBLIC_ID.test(id) && id.startsWith('con_') ? id : undefined;
 
 /** The saved booking's slot and status. */
 const savedOf = (row: AppointmentRow | undefined): SavedSlot | null =>
@@ -154,11 +142,16 @@ const savedOf = (row: AppointmentRow | undefined): SavedSlot | null =>
 /** What a New form loads before its first draft — the person, the booking it copies. */
 function useNewFormSources(mode: AppointmentFormMode, prefill: AppointmentFormPrefill) {
   const create = mode === 'create';
-  const person = useBookingPerson(create ? prefill.whoId : undefined);
+  const contactId = create ? contactIdOf(prefill.whoId) : undefined;
+  const person = useContact(contactId);
   const source = useAppointment(create ? prefill.copyOf : undefined);
   const settled =
-    (!prefill.whoId || person.isFetched) && (!prefill.copyOf || source.isFetched);
-  return { person: person.data, source: source.data, settled };
+    (!contactId || person.isFetched) && (!prefill.copyOf || source.isFetched);
+  return {
+    person: person.data ? whoOfContact(person.data) : undefined,
+    source: source.data,
+    settled,
+  };
 }
 
 /**
@@ -213,14 +206,14 @@ function useDraftSession({
   return { session, change };
 }
 
-/** The staff and offerings the form picks from, and whether the staff has loaded. */
+/** The team and treatments the form picks from, and whether the team has loaded. */
 function useCatalogs() {
-  const staff = useBookableStaff();
-  const offerings = useOfferings();
+  const team = useTeamDirectory();
+  const treatments = useBookableTreatments();
   return {
-    staff: staff.data ?? NO_STAFF,
-    staffFetched: staff.isFetched,
-    offerings: offerings.data ?? NO_OFFERINGS,
+    staff: team.members,
+    staffFetched: !team.isPending,
+    treatments: treatments.data ?? NO_TREATMENTS,
   };
 }
 
@@ -234,26 +227,19 @@ function bookingFlags(
   return { closed, inert: readOnly || closed, canEdit: !readOnly && mayEdit };
 }
 
-/** What hangs off the draft: the person's leads, a patient's packages, the free slots. */
+/** What hangs off the draft: the free slots. */
 function useDraftReads(
   draft: AppointmentDraft,
   row: AppointmentRow | undefined,
   branchId: string | null,
 ) {
-  const who = draft.who;
-  const isPatient = who?.kind === 'patient';
-  const leads = useConnectedLeads(lookupOf(who)).data ?? NO_LEADS;
-  const patientId = isPatient ? who.patientId : null;
-  const packages = useActivePackages(patientId).data ?? NO_PACKAGES;
   const locked = row !== undefined && isAppointmentSlotLocked(draft.status);
   const [slotStep, setSlotStep] = useState<AppointmentSlotStep>(30);
-  const slots = useAvailableSlots(
-    slotQueryOf(draft, { locked, step: slotStep, branchId, exceptId: row?.id }),
+  const slots = useAppointmentSlots(
+    slotQueryOf(draft, { locked, step: slotStep, branchId }),
   );
   return {
-    isPatient,
-    leads,
-    packages,
+    isPatient: draft.who?.kind === 'patient',
     locked,
     slots: slots.data,
     slotStep,
@@ -280,16 +266,15 @@ function startNewDraft({
     doctorId: startingDoctorId([
       prefill.doctorId,
       sources.source?.doctorId,
-      sources.person?.usualDoctorId,
       firstStaffId,
     ]),
   });
 }
 
 /**
- * One opening of the appointment form (KICKOFF §6.4): the staff, offerings,
+ * One opening of the appointment form (KICKOFF §6.4): the team, treatments,
  * branch, person and copied booking it reads; the draft, started once they
- * have loaded; and the leads, packages and free slots that hang off it.
+ * have loaded; and the free slots that hang off it.
  */
 export function useAppointmentFormState(
   input: AppointmentFormInput,
@@ -302,7 +287,8 @@ export function useAppointmentFormState(
   const readOnly = input.readOnly ?? false;
   const catalogs = useCatalogs();
   const sources = useNewFormSources(input.mode, prefill);
-  const branch = useBookingBranch(row);
+  // An Edit keeps its booking's branch, a Copy its source's; a New one is the member's.
+  const branch = useBookingBranch(row ?? sources.source);
   const createReady = catalogs.staffFetched && sources.settled;
   const { session, change } = useDraftSession({
     ready: row !== undefined || (input.mode === 'create' && createReady),
@@ -323,6 +309,7 @@ export function useAppointmentFormState(
     ...bookingFlags(row, readOnly, access.can('appointments', 'edit')),
     mode,
     row,
+    source: sources.source,
     prefill,
     readOnly,
     today,
@@ -331,10 +318,9 @@ export function useAppointmentFormState(
     change,
     dirty: session !== null && isDraftDirty(draft, session.start),
     staff: catalogs.staff,
-    offerings: catalogs.offerings,
+    treatments: catalogs.treatments,
     branchId: branch.branchId,
     saved: savedOf(row),
     edit: mode === 'edit',
-    roles: access.roles,
   };
 }

@@ -14,6 +14,7 @@ import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDialogRouteLocation } from '@/shared/hooks/useCrossRoomDialog/index.ts';
 import { useDialogRouteRecord } from '@/shared/hooks/useDialogRouteRecord/index.ts';
 import { notify } from '@/shared/notify/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 import { APPOINTMENTS_KEYS, APPOINTMENTS_NS } from '../../appointments.constants.ts';
 import {
@@ -25,7 +26,7 @@ import { validateAppointmentsSearch } from '../../appointments.search.ts';
 
 /**
  * A booking's prefill (`S:27`): the create route's own params, and the page's
- * day and — when Filters name exactly one — its doctor.
+ * day and doctor.
  */
 export interface AppointmentPrefill extends AppointmentCreateSearch {
   date?: string;
@@ -86,6 +87,7 @@ export function useAppointmentsDialogRoute(): AppointmentsDialogRouteState {
   const navigate = useNavigate();
   const { t } = useTranslation([APPOINTMENTS_NS, ERRORS_NS]);
   const access = useClinicAccess();
+  const organizationId = useOrganizationStore((state) => state.organizationId);
 
   const backToPage = useCallback(
     (date?: string) => {
@@ -110,7 +112,7 @@ export function useAppointmentsDialogRoute(): AppointmentsDialogRouteState {
 
   const drawer = useDialogRouteRecord({
     id: appointmentId,
-    queryKey: appointmentQueryKeys.detail,
+    queryKey: (id) => appointmentQueryKeys.detail(organizationId, id),
     fetchRecord: fetchAppointment,
     recordLabel: t(APPOINTMENTS_KEYS.record, { ns: APPOINTMENTS_NS }),
     onMissing: leaveDeadLink,
@@ -169,7 +171,7 @@ export function useAppointmentsDialogRoute(): AppointmentsDialogRouteState {
         prefill: {
           ...validateAppointmentCreateSearch(search),
           date: page.date,
-          doctorId: page.doctor?.length === 1 ? page.doctor[0] : undefined,
+          doctorId: page.doctor,
         },
       },
       close,

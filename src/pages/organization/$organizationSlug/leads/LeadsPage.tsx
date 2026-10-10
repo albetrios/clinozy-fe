@@ -274,6 +274,7 @@ export function LeadsPage() {
             canEdit={canEdit}
             canDelete={access.can('leads', 'delete')}
             canEditContact={access.canCode('contact:update')}
+            canBook={access.can('appointments', 'create')}
             pane={pane}
             onPaneChange={setPane}
             onClose={closeDrawer}

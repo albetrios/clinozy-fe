@@ -1,65 +1,150 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { act, renderHook, waitFor } from '@testing-library/react';
+import { act, cleanup, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type * as AppointmentsApiModule from '@/shared/api/clinic/appointments-api.ts';
-import { appointmentQueryKeys } from '@/shared/api/clinic/appointments-api.ts';
-import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
-import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
-import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { staffRef } from '@/shared/api/clinic/fixtures/staff.fixtures.ts';
 import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+  appointmentQueryKeys,
+  cancelAppointment,
+  copyAppointment,
+  createAppointment,
+  fetchAppointment,
+  fetchAppointmentDayCounts,
+  fetchAppointmentRange,
+  fetchAppointmentSlots,
+  fetchBookableTreatments,
+  listAppointments,
+  moveAppointment,
+  updateAppointment,
+} from '@/shared/api/clinic/appointments-api.ts';
+import type {
+  AppointmentCreateInput,
+  AppointmentMoveRoute,
+  AppointmentRow,
+} from '@/shared/api/clinic/appointments-contracts.ts';
+import type { AppointmentStatus } from '@/shared/api/clinic/clinic-schema.ts';
+import type * as NotifyModule from '@/shared/notify/index.ts';
 import { notify } from '@/shared/notify/index.ts';
+import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import {
+  APPOINTMENT_NOW,
+  APPOINTMENT_TODAY,
+  APPOINTMENT_TOMORROW,
+  appointmentRow,
+  dayCount,
+  DOCTOR_ARJUN,
+  DOCTOR_NISHA,
+  slotDay,
+  TEST_BRANCH_ID,
+} from '@/tests/utils/appointment-doubles.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import {
-  useActivePackages,
   useAppointment,
-  useAppointmentDaySummaries,
+  useAppointmentDayCounts,
   useAppointmentList,
   useAppointmentRange,
   useAppointmentSlotLabel,
-  useAvailableSlots,
-  useBookableStaff,
-  useBookingPerson,
+  useAppointmentSlots,
+  useBookableTreatments,
   useCancelAppointment,
-  useConnectedLeads,
+  useCopyAppointment,
   useCreateAppointment,
-  useDeleteVisitPhoto,
-  usePatientAppointments,
-  useRestoreAppointment,
-  useRestoreVisitPhoto,
-  useSetAppointmentStatus,
+  useMoveAppointment,
+  useReinstateAppointment,
   useUpdateAppointment,
-  useVisitPhotos,
   withAppointmentStatus,
 } from './useAppointments.ts';
 
-/** Holds a status write until a test lets it land, so the optimistic patch can be seen. */
-const gate = vi.hoisted(() => ({ hold: null as Promise<void> | null }));
-
-vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => {
-  const actual = await importOriginal<typeof AppointmentsApiModule>();
-  return {
-    ...actual,
-    setAppointmentStatus: async (
-      ...args: Parameters<typeof actual.setAppointmentStatus>
-    ) => {
-      await gate.hold;
-      return actual.setAppointmentStatus(...args);
-    },
-  };
-});
-vi.mock('@/shared/notify/index.ts', () => ({
+vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof AppointmentsApiModule>()),
+  listAppointments: vi.fn(),
+  fetchAppointmentRange: vi.fn(),
+  fetchAppointmentDayCounts: vi.fn(),
+  fetchAppointment: vi.fn(),
+  fetchAppointmentSlots: vi.fn(),
+  fetchBookableTreatments: vi.fn(),
+  createAppointment: vi.fn(),
+  copyAppointment: vi.fn(),
+  updateAppointment: vi.fn(),
+  moveAppointment: vi.fn(),
+  cancelAppointment: vi.fn(),
+}));
+vi.mock('@/shared/notify/index.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof NotifyModule>()),
   notify: { success: vi.fn(), error: vi.fn(), info: vi.fn(), undo: vi.fn() },
 }));
 
-const TODAY = '2026-10-03';
-const DR = staffRef('DR');
+/** Riya Mehta's consultation with Dr. Nisha, Scheduled for tomorrow at 10:30. */
+const RIYA = appointmentRow();
+/** Kabir Shah's booking with Dr. Arjun, the same day. */
+const KABIR = appointmentRow({
+  id: 'appt_kabir0000000000000000',
+  seq: 2862,
+  contactId: 'con_kabir0000000000000000',
+  person: { ...RIYA.person, contactId: 'con_kabir0000000000000000', name: 'Kabir Shah' },
+  doctorId: DOCTOR_ARJUN.id,
+  doctor: DOCTOR_ARJUN,
+  startTime: '11:30',
+  endTime: '11:50',
+});
+
+/** The status each move route lands on. */
+const ROUTE_STATUSES: Readonly<Record<AppointmentMoveRoute, AppointmentStatus>> = {
+  confirm: 'confirmed',
+  'check-in': 'checked_in',
+  complete: 'completed',
+  'no-show': 'no_show',
+  reinstate: 'scheduled',
+  'undo-check-in': 'confirmed',
+};
+
+/** The server the mocked API serves: its bookings, a page size, a write held until let go. */
+const server = {
+  rows: [] as AppointmentRow[],
+  pageSize: 1,
+  hold: null as Promise<void> | null,
+};
+
+/** Hold the next writes until the returned function lets them land. */
+function holdWrites(): () => void {
+  let release: () => void = () => undefined;
+  server.hold = new Promise((resolve) => {
+    release = resolve;
+  });
+  return release;
+}
+
+/** The booking on the server with this id. */
+function stored(id: string): AppointmentRow {
+  const row = server.rows.find((candidate) => candidate.id === id);
+  if (!row) throw new Error(`no booking ${id}`);
+  return row;
+}
+
+/** Replace a booking on the server with its change applied. */
+function patchStored(id: string, patch: Partial<AppointmentRow>): AppointmentRow {
+  const saved = { ...stored(id), ...patch, updatedAt: '2026-10-03T03:30:00.000Z' };
+  server.rows = server.rows.map((row) => (row.id === id ? saved : row));
+  return saved;
+}
+
+/** What a booking sends. */
+const NEW_BOOKING: AppointmentCreateInput = {
+  contactId: 'con_meera0000000000000000',
+  branchId: TEST_BRANCH_ID,
+  doctorId: DOCTOR_NISHA.id,
+  type: 'consultation',
+  offeringId: null,
+  serviceLabel: 'Consultation',
+  durationMin: 20,
+  date: APPOINTMENT_TOMORROW,
+  startTime: '10:30',
+  reason: null,
+  notes: null,
+};
 
 let client: QueryClient;
 function wrapper({ children }: { children: ReactNode }) {
@@ -73,99 +158,236 @@ function lastUndo(): { message: string; onUndo: () => void } {
   return { message, onUndo: options.onUndo };
 }
 
-const statusOf = (seq: number) =>
-  clinicFixtures.appointments.snapshot((row) => row.seq === seq)[0]?.status;
-const priti = () =>
-  clinicFixtures.patients.snapshot((row) => row.firstName === 'Priti')[0]?.id ?? '';
+/** The last success toast's words. */
+const lastSuccess = () => vi.mocked(notify.success).mock.lastCall?.[0];
+
+/** The route the last move sent. */
+const lastRoute = () => vi.mocked(moveAppointment).mock.lastCall?.[0].route;
+
+const statusIn = (rows: readonly AppointmentRow[] | undefined, id: string) =>
+  rows?.find((row) => row.id === id)?.status;
 
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] });
-  vi.setSystemTime(new Date(clinicInstant(TODAY, '10:00')));
-  client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  gate.hold = null;
-  for (const fn of Object.values(notify)) vi.mocked(fn).mockClear();
-  resetClinicFixtures();
-  for (const collection of Object.values(clinicFixtures)) collection.snapshot();
+  vi.setSystemTime(APPOINTMENT_NOW);
+  client = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+  signInTestMember();
+  Object.assign(server, { rows: [RIYA, KABIR], pageSize: 1, hold: null });
+  for (const fn of Object.values(notify)) vi.mocked(fn).mockReset();
+
+  vi.mocked(listAppointments).mockImplementation(async (_params, after) => {
+    const start = after ? Number(after.replace('cursor-', '')) : 0;
+    const end = start + server.pageSize;
+    return {
+      rows: server.rows.slice(start, end),
+      next: end < server.rows.length ? `cursor-${end}` : null,
+      total: server.rows.length,
+    };
+  });
+  vi.mocked(fetchAppointmentRange).mockImplementation(async ({ from, to }) =>
+    server.rows.filter((row) => row.date >= from && row.date <= to),
+  );
+  vi.mocked(fetchAppointmentDayCounts).mockResolvedValue([
+    dayCount(APPOINTMENT_TOMORROW, { scheduled: 2 }),
+  ]);
+  vi.mocked(fetchAppointment).mockImplementation(async (id) => stored(id));
+  vi.mocked(fetchAppointmentSlots).mockImplementation(async ({ date }) =>
+    slotDay(date, ['10:00', '11:00']),
+  );
+  vi.mocked(fetchBookableTreatments).mockResolvedValue([
+    {
+      id: 'off_hydra000000000000000',
+      name: 'Hydrafacial',
+      durationMin: 60,
+      specialty: 'skin',
+      tone: 'mint',
+    },
+  ]);
+  vi.mocked(createAppointment).mockImplementation(async ({ input }) => {
+    const created = appointmentRow({
+      ...input,
+      id: 'appt_meera0000000000000000',
+      seq: 2870,
+      reminder: 'confirm_requested',
+    });
+    server.rows = [...server.rows, created];
+    return created;
+  });
+  vi.mocked(copyAppointment).mockImplementation(async ({ appointmentId, ...slot }) => {
+    const copy = {
+      ...stored(appointmentId),
+      id: 'appt_copy00000000000000000',
+      seq: 2871,
+      date: slot.date,
+      startTime: slot.startTime,
+      copiedFromId: appointmentId,
+      reminder: 'not_sent' as const,
+    };
+    server.rows = [...server.rows, copy];
+    return copy;
+  });
+  vi.mocked(updateAppointment).mockImplementation(async ({ appointmentId, fields }) =>
+    patchStored(appointmentId, fields),
+  );
+  vi.mocked(moveAppointment).mockImplementation(async ({ appointmentId, route }) => {
+    await server.hold;
+    return patchStored(appointmentId, { status: ROUTE_STATUSES[route] });
+  });
+  vi.mocked(cancelAppointment).mockImplementation(async ({ appointmentId, cancel }) =>
+    patchStored(appointmentId, {
+      status: 'cancelled',
+      cancelReason: cancel.reason,
+      cancelNote: cancel.note,
+    }),
+  );
 });
 afterEach(() => {
+  cleanup();
   client.clear();
   vi.useRealTimers();
-  resetClinicFixtures();
+  useOrganizationStore.getState().clearOrganization();
+  useAuthStore.setState({ user: null });
 });
 
-describe('appointment reads', () => {
-  it('reads the Agenda a page at a time, equal params sharing one entry', async () => {
-    const { result } = renderHook(
-      () => ({
-        one: useAppointmentList({ doctorIds: [DR, staffRef('DN')] }),
-        two: useAppointmentList({ doctorIds: [staffRef('DN'), DR], q: ' ' }),
-      }),
-      { wrapper },
-    );
-    await waitFor(() => expect(result.current.one.isPending).toBe(false));
-    expect(result.current.one.rows.length).toBeGreaterThan(5);
-    expect(result.current.one.hasNextPage).toBe(false);
+describe('the reads', () => {
+  it('reads the Agenda a cursor page at a time, under the organization', async () => {
+    const params = { status: 'active', branchIds: [] } as const;
+    const { result } = renderHook(() => useAppointmentList(params), { wrapper });
+    await waitFor(() => expect(result.current.isPending).toBe(false));
+    expect(result.current.rows).toEqual([RIYA]);
+    expect(result.current.hasNextPage).toBe(true);
+    expect(listAppointments).toHaveBeenLastCalledWith(params, undefined);
+
+    act(() => result.current.fetchNextPage());
+
+    await waitFor(() => expect(result.current.rows).toEqual([RIYA, KABIR]));
+    expect(result.current.hasNextPage).toBe(false);
+    expect(listAppointments).toHaveBeenLastCalledWith(params, 'cursor-1');
     expect(
-      client.getQueryCache().findAll({ queryKey: appointmentQueryKeys.lists() }),
+      client
+        .getQueryCache()
+        .findAll({ queryKey: appointmentQueryKeys.lists('org_test') }),
     ).toHaveLength(1);
   });
 
-  it('reads the day counts, a range, one booking, the slots and the bookable staff', async () => {
+  it('reads the day counts, a range, one booking, the slots and the treatments', async () => {
+    const window = { from: APPOINTMENT_TODAY, to: APPOINTMENT_TOMORROW, branchIds: [] };
+    const slots = {
+      date: APPOINTMENT_TOMORROW,
+      branchId: TEST_BRANCH_ID,
+      doctorId: DOCTOR_NISHA.id,
+      durationMin: 20,
+      step: 30,
+    } as const;
     const { result } = renderHook(
       () => ({
-        days: useAppointmentDaySummaries({}),
-        week: useAppointmentRange({ from: TODAY, to: '2026-10-09' }),
-        one: useAppointment(ref.appointment(2861)),
-        slots: useAvailableSlots({ date: '2026-10-05', doctorId: DR, durationMin: 30 }),
-        staff: useBookableStaff(),
+        counts: useAppointmentDayCounts(window),
+        range: useAppointmentRange({
+          status: 'active',
+          branchIds: [],
+          from: APPOINTMENT_TODAY,
+          to: APPOINTMENT_TOMORROW,
+        }),
+        one: useAppointment(KABIR.id),
+        slots: useAppointmentSlots(slots),
+        treatments: useBookableTreatments(),
       }),
       { wrapper },
     );
-    await waitFor(() => expect(result.current.staff.data).toBeDefined());
-    await waitFor(() => expect(result.current.slots.data).toBeDefined());
-    expect(result.current.days.data?.[0]).toMatchObject({ date: TODAY, total: 8 });
-    expect(result.current.week.data?.map((row) => row.seq)).toContain(2861);
-    expect(result.current.one.data).toMatchObject({ seq: 2861 });
-    expect(result.current.slots.data?.[0]).toEqual({ time: '10:00', free: true });
-    expect(result.current.staff.data?.[0]?.roles).toContain('doctor');
+
+    await waitFor(() => expect(result.current.treatments.isSuccess).toBe(true));
+    await waitFor(() => expect(result.current.slots.isSuccess).toBe(true));
+    await waitFor(() => expect(result.current.one.isSuccess).toBe(true));
+    await waitFor(() => expect(result.current.range.isSuccess).toBe(true));
+    await waitFor(() => expect(result.current.counts.isSuccess).toBe(true));
+    expect(fetchAppointmentDayCounts).toHaveBeenCalledWith(window);
+    expect(result.current.counts.data).toEqual([
+      dayCount(APPOINTMENT_TOMORROW, { scheduled: 2 }),
+    ]);
+    expect(result.current.range.data).toEqual([RIYA, KABIR]);
+    expect(result.current.one.data).toEqual(KABIR);
+    expect(fetchAppointmentSlots).toHaveBeenCalledWith(slots);
+    expect(result.current.slots.data?.slots.map((slot) => slot.time)).toEqual([
+      '10:00',
+      '11:00',
+    ]);
+    expect(result.current.treatments.data?.[0]?.name).toBe('Hydrafacial');
   });
 
   it('keeps the last range’s bookings while the next range loads', async () => {
     const { result, rerender } = renderHook(
-      ({ from, to }) => useAppointmentRange({ from, to }),
-      { wrapper, initialProps: { from: TODAY, to: TODAY } },
+      ({ from, to }) => useAppointmentRange({ status: 'all', branchIds: [], from, to }),
+      { wrapper, initialProps: { from: APPOINTMENT_TOMORROW, to: APPOINTMENT_TOMORROW } },
     );
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    const today = result.current.data;
-    expect(today?.length).toBeGreaterThan(0);
+    const tomorrow = result.current.data;
+    expect(tomorrow).toHaveLength(2);
 
-    rerender({ from: '2026-10-04', to: '2026-10-10' });
+    rerender({ from: '2026-10-05', to: '2026-10-11' });
     expect(result.current.isPlaceholderData).toBe(true);
-    expect(result.current.data).toBe(today);
+    expect(result.current.data).toBe(tomorrow);
     await waitFor(() => expect(result.current.isPlaceholderData).toBe(false));
-    expect(result.current.data?.every((row) => row.date >= '2026-10-04')).toBe(true);
+    expect(result.current.data).toEqual([]);
   });
 
-  it('stays idle without a range, an id or slot params', () => {
+  it('stays idle without a window, a range, an id or slot params', () => {
     const { result } = renderHook(
       () => ({
+        counts: useAppointmentDayCounts(null),
         range: useAppointmentRange(null),
         one: useAppointment(undefined),
-        slots: useAvailableSlots(null),
+        slots: useAppointmentSlots(null),
       }),
       { wrapper },
     );
-    expect(result.current.range.fetchStatus).toBe('idle');
+    for (const read of Object.values(result.current)) {
+      expect(read.fetchStatus).toBe('idle');
+    }
+    expect(fetchAppointmentDayCounts).not.toHaveBeenCalled();
+    expect(fetchAppointmentRange).not.toHaveBeenCalled();
+    expect(fetchAppointment).not.toHaveBeenCalled();
+    expect(fetchAppointmentSlots).not.toHaveBeenCalled();
+  });
+
+  it('reads nothing outside an organization', () => {
+    useOrganizationStore.getState().clearOrganization();
+    const { result } = renderHook(
+      () => ({
+        list: useAppointmentList({ status: 'active', branchIds: [] }),
+        one: useAppointment(RIYA.id),
+        treatments: useBookableTreatments(),
+      }),
+      { wrapper },
+    );
+    expect(result.current.list.isPending).toBe(true);
     expect(result.current.one.fetchStatus).toBe('idle');
-    expect(result.current.slots.fetchStatus).toBe('idle');
+    expect(result.current.treatments.fetchStatus).toBe('idle');
+    expect(listAppointments).not.toHaveBeenCalled();
+    expect(fetchAppointment).not.toHaveBeenCalled();
+    expect(fetchBookableTreatments).not.toHaveBeenCalled();
+  });
+
+  it('keeps each organization’s bookings apart', async () => {
+    const { result } = renderHook(() => useAppointment(RIYA.id), { wrapper });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(client.getQueryData(appointmentQueryKeys.detail('org_test', RIYA.id))).toEqual(
+      RIYA,
+    );
+    expect(
+      client.getQueryData(appointmentQueryKeys.detail('org_else', RIYA.id)),
+    ).toBeUndefined();
   });
 });
 
 describe('useAppointmentSlotLabel', () => {
   it('names today and tomorrow, else the date, with the start as written', () => {
     const { result } = renderHook(() => useAppointmentSlotLabel(), { wrapper });
-    expect(result.current(TODAY, '12:30')).toMatchObject({ day: 'Today' });
-    expect(result.current('2026-10-04', '09:05')).toMatchObject({ day: 'Tomorrow' });
+    expect(result.current(APPOINTMENT_TODAY, '12:30')).toMatchObject({ day: 'Today' });
+    expect(result.current(APPOINTMENT_TOMORROW, '09:05')).toMatchObject({
+      day: 'Tomorrow',
+    });
     const later = result.current('2026-10-12', '16:00');
     expect(later.day).toMatch(/Mon/);
     expect(later.day).toMatch(/12/);
@@ -174,284 +396,349 @@ describe('useAppointmentSlotLabel', () => {
 });
 
 describe('withAppointmentStatus (the optimistic flip)', () => {
-  const row = { id: 'a', seq: 1, status: 'scheduled' } as unknown as AppointmentRow;
-  const other = { id: 'b', seq: 2, status: 'scheduled' } as unknown as AppointmentRow;
-
   it('moves the booking in pages, lists and the record, and leaves the rest alone', () => {
-    expect(withAppointmentStatus([row, other], 'a', 'confirmed')).toEqual([
-      { ...row, status: 'confirmed' },
-      other,
+    expect(withAppointmentStatus([RIYA, KABIR], RIYA.id, 'confirmed')).toEqual([
+      { ...RIYA, status: 'confirmed' },
+      KABIR,
     ]);
     expect(
       withAppointmentStatus(
-        { pages: [{ rows: [row] }], pageParams: [undefined] },
-        'a',
+        { pages: [{ rows: [RIYA], next: null }], pageParams: [undefined] },
+        RIYA.id,
         'no_show',
       ),
     ).toEqual({
-      pages: [{ rows: [{ ...row, status: 'no_show' }] }],
+      pages: [{ rows: [{ ...RIYA, status: 'no_show' }], next: null }],
       pageParams: [undefined],
     });
-    expect(withAppointmentStatus(row, 'a', 'confirmed')).toEqual({
-      ...row,
+    expect(withAppointmentStatus(RIYA, RIYA.id, 'confirmed')).toEqual({
+      ...RIYA,
       status: 'confirmed',
     });
-    const summaries = [{ date: TODAY, total: 1, confirmed: 0, scheduled: 1 }];
-    expect(withAppointmentStatus(summaries, 'a', 'confirmed')).toBe(summaries);
-    expect(withAppointmentStatus(other, 'a', 'confirmed')).toBe(other);
+    const counts = [dayCount(APPOINTMENT_TOMORROW, { scheduled: 2 })];
+    expect(withAppointmentStatus(counts, RIYA.id, 'confirmed')).toBe(counts);
+    const slots = slotDay(APPOINTMENT_TOMORROW, ['10:00']);
+    expect(withAppointmentStatus(slots, RIYA.id, 'confirmed')).toBe(slots);
+    expect(withAppointmentStatus(KABIR, RIYA.id, 'confirmed')).toBe(KABIR);
   });
 });
 
-describe('useSetAppointmentStatus', () => {
-  it('flips the status everywhere at once, toasts with Undo, and Undo puts it back', async () => {
-    let release = () => {};
-    gate.hold = new Promise((resolve) => {
-      release = resolve;
-    });
+describe('useCreateAppointment', () => {
+  it('books with the action’s key and refreshes the Agenda', async () => {
     const { result } = renderHook(
       () => ({
-        list: useAppointmentList({}),
-        week: useAppointmentRange({ from: TODAY, to: '2026-10-09' }),
-        set: useSetAppointmentStatus(),
+        list: useAppointmentList({ status: 'active', branchIds: [] }),
+        book: useCreateAppointment(),
       }),
       { wrapper },
     );
-    await waitFor(() => expect(result.current.week.data).toBeDefined());
-    await waitFor(() => expect(result.current.list.rows.length).toBeGreaterThan(0));
+    await waitFor(() => expect(result.current.list.isPending).toBe(false));
 
-    act(() => {
-      result.current.set.mutate({ id: ref.appointment(2848), status: 'confirmed' });
+    await act(() => result.current.book.mutateAsync(NEW_BOOKING));
+
+    expect(createAppointment).toHaveBeenCalledWith({
+      input: NEW_BOOKING,
+      idempotencyKey: expect.any(String),
     });
-    const shown = (rows: readonly AppointmentRow[] | undefined) =>
-      rows?.find((row) => row.seq === 2848)?.status;
-    await waitFor(() => expect(shown(result.current.list.rows)).toBe('confirmed'));
-    expect(shown(result.current.week.data)).toBe('confirmed');
-    expect(statusOf(2848)).toBe('scheduled');
-
-    await act(async () => release());
-    await waitFor(() => expect(notify.undo).toHaveBeenCalled());
-    expect(statusOf(2848)).toBe('confirmed');
-    const undo = lastUndo();
-    expect(undo.message).toBe('Priti Soni → Confirmed · reminder queued');
-
-    act(() => undo.onUndo());
-    await waitFor(() => expect(statusOf(2848)).toBe('scheduled'));
+    await waitFor(() => expect(listAppointments).toHaveBeenCalledTimes(2));
   });
 
-  it('puts every read back and toasts the guard when the server refuses', async () => {
-    const { result } = renderHook(
-      () => ({
-        week: useAppointmentRange({ from: TODAY, to: '2026-10-09' }),
-        set: useSetAppointmentStatus(),
-      }),
-      { wrapper },
-    );
-    await waitFor(() => expect(result.current.week.data).toBeDefined());
-    await act(async () => {
-      await result.current.set
-        .mutateAsync({ id: ref.appointment(2848), status: 'no_show' })
-        .catch(() => undefined);
-    });
-    expect(result.current.week.data?.find((row) => row.seq === 2848)?.status).toBe(
-      'scheduled',
-    );
-    expect(notify.error).toHaveBeenCalledWith('Available after 11:30 am on Today');
-    expect(notify.undo).not.toHaveBeenCalled();
-  });
-});
+  it.each([
+    ['confirm_requested', ' · confirm request sent on WhatsApp'],
+    ['reminder_queued', ' · reminder queued'],
+    ['not_sent', ''],
+    ['failed', ''],
+  ] as const)(
+    'says "Booked #N · <day> <time>" for a %s reminder',
+    async (reminder, tail) => {
+      vi.mocked(createAppointment).mockResolvedValueOnce(
+        appointmentRow({ seq: 2870, reminder }),
+      );
+      const { result } = renderHook(() => useCreateAppointment(), { wrapper });
 
-describe('useSetAppointmentStatus with its own words', () => {
-  it('toasts the caller’s message — Today’s check-in — still with Undo', async () => {
-    const { result } = renderHook(
-      () =>
-        useSetAppointmentStatus({
-          announce: ({ appointment }) => `${appointment.person.name} checked in`,
-        }),
-      { wrapper },
-    );
-    await act(async () => {
-      await result.current.mutateAsync({
-        id: ref.appointment(2869),
-        status: 'checked_in',
-      });
-    });
-    expect(statusOf(2869)).toBe('checked_in');
-    const undo = lastUndo();
-    expect(undo.message).toBe('Faizan Shaikh checked in');
-    act(() => undo.onUndo());
-    await waitFor(() => expect(statusOf(2869)).toBe('confirmed'));
-  });
-});
+      await act(() => result.current.mutateAsync(NEW_BOOKING));
 
-describe('booking and editing', () => {
-  it('books with "Booked #<seq> · <day> <time> · confirm request sent on WhatsApp"', async () => {
+      expect(lastSuccess()).toMatch(
+        new RegExp(`^Booked #2870 · Tomorrow 10:30\\s?(AM|am)${tail}$`),
+      );
+      expect(notify.undo).not.toHaveBeenCalled();
+    },
+  );
+
+  it('says why a booking was refused, and books nothing', async () => {
+    vi.mocked(createAppointment).mockRejectedValueOnce(new Error('connection dropped'));
     const { result } = renderHook(() => useCreateAppointment(), { wrapper });
     await act(async () => {
-      await result.current.mutateAsync({
-        patientId: priti(),
-        doctorId: DR,
-        date: TODAY,
-        startTime: '12:30',
-      });
+      await result.current.mutateAsync(NEW_BOOKING).catch(() => undefined);
     });
-    const [message] = vi.mocked(notify.success).mock.lastCall ?? [];
-    expect(message).toMatch(
-      /^Booked #2870 · Today 12:30\s?(PM|pm) · confirm request sent on WhatsApp$/,
-    );
-  });
-
-  it('names a move "#<seq> moved to …" and any other save "#<seq> updated"', async () => {
-    const { result } = renderHook(() => useUpdateAppointment(), { wrapper });
-    await act(async () => {
-      await result.current.mutateAsync({
-        id: ref.appointment(2861),
-        patch: { notes: 'Prefers evenings' },
-      });
-    });
-    expect(notify.success).toHaveBeenLastCalledWith('#2861 updated');
-    await act(async () => {
-      await result.current.mutateAsync({
-        id: ref.appointment(2861),
-        patch: { date: '2026-10-12', startTime: '11:00' },
-      });
-    });
-    const [message] = vi.mocked(notify.success).mock.lastCall ?? [];
-    expect(message).toMatch(/^#2861 moved to Mon.* · confirm request sent$/);
+    expect(notify.error).toHaveBeenCalledTimes(1);
+    expect(notify.success).not.toHaveBeenCalled();
   });
 });
 
-describe('cancel and restore', () => {
-  it('cancels from the form with "Appointment #<seq> cancelled" and Undo', async () => {
-    const { result } = renderHook(() => useCancelAppointment(), { wrapper });
-    await act(async () => {
-      await result.current.mutateAsync({
-        id: ref.appointment(2858),
-        reason: 'patient_asked',
-        note: null,
-      });
+describe('useCopyAppointment', () => {
+  it('books the same again on the new slot, with the booking’s toast', async () => {
+    const { result } = renderHook(() => useCopyAppointment(), { wrapper });
+
+    await act(() =>
+      result.current.mutateAsync({
+        appointmentId: RIYA.id,
+        date: APPOINTMENT_TODAY,
+        startTime: '16:00',
+      }),
+    );
+
+    expect(copyAppointment).toHaveBeenCalledWith({
+      appointmentId: RIYA.id,
+      date: APPOINTMENT_TODAY,
+      startTime: '16:00',
+      idempotencyKey: expect.any(String),
     });
-    const undo = lastUndo();
-    expect(undo.message).toBe('Appointment #2858 cancelled');
-    act(() => undo.onUndo());
-    await waitFor(() => expect(statusOf(2858)).toBe('confirmed'));
+    expect(lastSuccess()).toMatch(/^Booked #2871 · Today 4:00\s?(PM|pm)$/);
+  });
+});
+
+describe('useUpdateAppointment', () => {
+  it('sends the changed fields with the read’s updatedAt — "#2861 updated" on the same slot', async () => {
+    const { result } = renderHook(() => useUpdateAppointment(), { wrapper });
+
+    await act(() =>
+      result.current.mutateAsync({
+        appointment: RIYA,
+        fields: { notes: 'Prefers evenings' },
+      }),
+    );
+
+    expect(updateAppointment).toHaveBeenCalledWith({
+      appointmentId: RIYA.id,
+      fields: { notes: 'Prefers evenings' },
+      expectedUpdatedAt: RIYA.updatedAt,
+      idempotencyKey: expect.any(String),
+    });
+    expect(notify.success).toHaveBeenLastCalledWith('#2861 updated');
   });
 
-  it('cancels from the popover naming the person and the reason', async () => {
+  it('names a move "#2861 moved to <day> <time>", saying when a confirm request went out', async () => {
+    const { result } = renderHook(() => useUpdateAppointment(), { wrapper });
+
+    await act(() =>
+      result.current.mutateAsync({
+        appointment: RIYA,
+        fields: { date: '2026-10-12', startTime: '11:00' },
+      }),
+    );
+    expect(lastSuccess()).toMatch(/^#2861 moved to Mon.*12.* 11:00\s?(AM|am)$/);
+
+    vi.mocked(updateAppointment).mockResolvedValueOnce({
+      ...RIYA,
+      date: '2026-10-13',
+      reminder: 'confirm_requested',
+    });
+    await act(() =>
+      result.current.mutateAsync({ appointment: RIYA, fields: { date: '2026-10-13' } }),
+    );
+    expect(lastSuccess()).toMatch(/^#2861 moved to Tue.* · confirm request sent$/);
+  });
+
+  it('says why a stale save was refused', async () => {
+    vi.mocked(updateAppointment).mockRejectedValueOnce(new Error('record_changed'));
+    const { result } = renderHook(() => useUpdateAppointment(), { wrapper });
+    await act(async () => {
+      await result.current
+        .mutateAsync({ appointment: RIYA, fields: { notes: 'x' } })
+        .catch(() => undefined);
+    });
+    expect(notify.error).toHaveBeenCalledTimes(1);
+    expect(notify.success).not.toHaveBeenCalled();
+  });
+});
+
+describe('useMoveAppointment', () => {
+  /** The Agenda, a calendar range and the booking itself beside the move, sharing one cache. */
+  function renderWithReads() {
+    return renderHook(
+      () => ({
+        list: useAppointmentList({ status: 'active', branchIds: [] }),
+        range: useAppointmentRange({
+          status: 'active',
+          branchIds: [],
+          from: APPOINTMENT_TOMORROW,
+          to: APPOINTMENT_TOMORROW,
+        }),
+        one: useAppointment(RIYA.id),
+        move: useMoveAppointment(),
+      }),
+      { wrapper },
+    );
+  }
+
+  it('shows the new status on every cached read at once, then "<name> → <status>"', async () => {
+    const { result } = renderWithReads();
+    await waitFor(() => expect(result.current.list.rows).toHaveLength(1));
+    await waitFor(() => expect(result.current.range.isSuccess).toBe(true));
+    await waitFor(() => expect(result.current.one.isSuccess).toBe(true));
+    const release = holdWrites();
+
+    let landed: Promise<unknown> = Promise.resolve();
+    act(() => {
+      landed = result.current.move.mutateAsync({ appointment: RIYA, route: 'confirm' });
+    });
+
+    await waitFor(() =>
+      expect(statusIn(result.current.list.rows, RIYA.id)).toBe('confirmed'),
+    );
+    expect(statusIn(result.current.range.data, RIYA.id)).toBe('confirmed');
+    expect(result.current.one.data?.status).toBe('confirmed');
+    expect(statusIn(result.current.range.data, KABIR.id)).toBe('scheduled');
+    expect(stored(RIYA.id).status).toBe('scheduled');
+
+    release();
+    await act(() => landed);
+    expect(moveAppointment).toHaveBeenCalledWith({
+      appointmentId: RIYA.id,
+      route: 'confirm',
+      idempotencyKey: expect.any(String),
+    });
+    expect(notify.success).toHaveBeenCalledWith('Riya Mehta → Confirmed');
+    expect(notify.undo).not.toHaveBeenCalled();
+  });
+
+  it('adds " · reminder queued" to a confirm the server queued one for', async () => {
+    vi.mocked(moveAppointment).mockResolvedValueOnce({
+      ...RIYA,
+      status: 'confirmed',
+      reminder: 'reminder_queued',
+    });
+    const { result } = renderHook(() => useMoveAppointment(), { wrapper });
+
+    await act(() => result.current.mutateAsync({ appointment: RIYA, route: 'confirm' }));
+
+    expect(notify.success).toHaveBeenCalledWith(
+      'Riya Mehta → Confirmed · reminder queued',
+    );
+  });
+
+  it('puts every read back and says why when the server refuses', async () => {
+    vi.mocked(moveAppointment).mockRejectedValueOnce(new Error('transition_not_allowed'));
+    const { result } = renderWithReads();
+    await waitFor(() => expect(result.current.range.isSuccess).toBe(true));
+    await waitFor(() => expect(result.current.one.isSuccess).toBe(true));
+
+    await act(async () => {
+      await result.current.move
+        .mutateAsync({ appointment: RIYA, route: 'no-show' })
+        .catch(() => undefined);
+    });
+
+    expect(statusIn(result.current.range.data, RIYA.id)).toBe('scheduled');
+    expect(result.current.one.data?.status).toBe('scheduled');
+    expect(notify.error).toHaveBeenCalledTimes(1);
+    expect(notify.success).not.toHaveBeenCalled();
+    expect(notify.undo).not.toHaveBeenCalled();
+  });
+
+  it('offers Undo on a check-in, which takes it back through undo-check-in', async () => {
+    const today = patchStored(RIYA.id, { date: APPOINTMENT_TODAY, status: 'confirmed' });
+    const { result } = renderHook(() => useMoveAppointment(), { wrapper });
+
+    await act(() =>
+      result.current.mutateAsync({ appointment: today, route: 'check-in' }),
+    );
+
+    const undo = lastUndo();
+    expect(undo.message).toBe('Riya Mehta → Checked in');
+    expect(notify.success).not.toHaveBeenCalled();
+
+    act(() => undo.onUndo());
+    await waitFor(() => expect(lastRoute()).toBe('undo-check-in'));
+    expect(vi.mocked(moveAppointment).mock.lastCall?.[0]).toMatchObject({
+      appointmentId: RIYA.id,
+    });
+    await waitFor(() => expect(stored(RIYA.id).status).toBe('confirmed'));
+  });
+
+  it.each<AppointmentMoveRoute>(['complete', 'no-show', 'reinstate'])(
+    'offers no Undo on %s — the API has no way back',
+    async (route) => {
+      const { result } = renderHook(() => useMoveAppointment(), { wrapper });
+
+      await act(() => result.current.mutateAsync({ appointment: RIYA, route }));
+
+      expect(notify.success).toHaveBeenCalledTimes(1);
+      expect(notify.undo).not.toHaveBeenCalled();
+    },
+  );
+
+  it('toasts the caller’s own words — Today’s check-in — still with Undo', async () => {
+    const { result } = renderHook(
+      () => useMoveAppointment({ announce: (row) => `${row.person.name} checked in` }),
+      { wrapper },
+    );
+
+    await act(() => result.current.mutateAsync({ appointment: RIYA, route: 'check-in' }));
+
+    expect(lastUndo().message).toBe('Riya Mehta checked in');
+  });
+});
+
+describe('useCancelAppointment', () => {
+  it('cancels with the reason — "Appointment #2861 cancelled" — and Undo reinstates it', async () => {
+    const { result } = renderHook(() => useCancelAppointment(), { wrapper });
+
+    await act(() =>
+      result.current.mutateAsync({
+        appointment: RIYA,
+        cancel: { reason: 'patient_asked', note: null },
+      }),
+    );
+
+    expect(cancelAppointment).toHaveBeenCalledWith({
+      appointmentId: RIYA.id,
+      cancel: { reason: 'patient_asked', note: null },
+      idempotencyKey: expect.any(String),
+    });
+    expect(stored(RIYA.id).status).toBe('cancelled');
+    const undo = lastUndo();
+    expect(undo.message).toBe('Appointment #2861 cancelled');
+
+    act(() => undo.onUndo());
+    await waitFor(() => expect(lastRoute()).toBe('reinstate'));
+    await waitFor(() => expect(stored(RIYA.id).status).toBe('scheduled'));
+  });
+
+  it('names the person and the API’s reason from the popover', async () => {
     const { result } = renderHook(() => useCancelAppointment({ announce: 'status' }), {
       wrapper,
     });
-    await act(async () => {
-      await result.current.mutateAsync({
-        id: ref.appointment(2858),
-        reason: 'unreachable',
-        note: null,
-      });
-    });
+
+    await act(() =>
+      result.current.mutateAsync({
+        appointment: RIYA,
+        cancel: { reason: 'unreachable', note: null },
+      }),
+    );
+
     expect(lastUndo().message).toBe(
-      'Jalpa Sheladiya → Cancelled · Could not reach patient · slot freed, reminders stopped',
+      'Riya Mehta → Cancelled · Could not reach patient · slot freed, reminders stopped',
     );
   });
+});
 
-  it('restores with "Appointment restored · reminder goes out again"', async () => {
-    const { result } = renderHook(
-      () => ({ cancel: useCancelAppointment(), restore: useRestoreAppointment() }),
-      { wrapper },
-    );
-    await act(async () => {
-      await result.current.cancel.mutateAsync({
-        id: ref.appointment(2858),
-        reason: 'patient_asked',
-        note: null,
-      });
-      await result.current.restore.mutateAsync(ref.appointment(2858));
+describe('useReinstateAppointment', () => {
+  it('reinstates through its route — "Appointment restored · reminder goes out again"', async () => {
+    const cancelled = patchStored(RIYA.id, { status: 'cancelled' });
+    const { result } = renderHook(() => useReinstateAppointment(), { wrapper });
+
+    await act(() => result.current.mutateAsync(cancelled));
+
+    expect(moveAppointment).toHaveBeenCalledWith({
+      appointmentId: RIYA.id,
+      route: 'reinstate',
+      idempotencyKey: expect.any(String),
     });
     expect(notify.success).toHaveBeenLastCalledWith(
       'Appointment restored · reminder goes out again',
     );
-    expect(statusOf(2858)).toBe('scheduled');
-  });
-});
-
-describe('the appointment form’s reads and the visit’s photos', () => {
-  const dharti = () =>
-    clinicFixtures.patients.snapshot((row) => row.firstName === 'Dharti')[0]?.id ?? '';
-
-  it('reads the prefill’s person, their leads, a patient’s packages and a visit’s photos', async () => {
-    const patientId = dharti();
-    const { result } = renderHook(
-      () => ({
-        person: useBookingPerson(patientId),
-        leads: useConnectedLeads({ patientId, leadId: null, phone: null }),
-        packages: useActivePackages(patientId),
-        photos: useVisitPhotos(ref.appointment(2790)),
-      }),
-      { wrapper },
-    );
-    await waitFor(() => expect(result.current.photos.data).toBeDefined());
-    await waitFor(() => expect(result.current.packages.data).toBeDefined());
-    await waitFor(() => expect(result.current.leads.data).toBeDefined());
-    await waitFor(() => expect(result.current.person.data).toBeDefined());
-    expect(result.current.person.data).toMatchObject({ kind: 'patient', patientId });
-    expect(result.current.packages.data?.length).toBeGreaterThan(0);
-    expect(result.current.photos.data).toHaveLength(3);
-  });
-
-  it('stays idle without a person, a patient or a visit', () => {
-    const { result } = renderHook(
-      () => ({
-        person: useBookingPerson(undefined),
-        leads: useConnectedLeads(null),
-        packages: useActivePackages(null),
-        photos: useVisitPhotos(null),
-      }),
-      { wrapper },
-    );
-    expect(result.current.person.fetchStatus).toBe('idle');
-    expect(result.current.leads.fetchStatus).toBe('idle');
-    expect(result.current.packages.fetchStatus).toBe('idle');
-    expect(result.current.photos.fetchStatus).toBe('idle');
-  });
-
-  it('deletes a visit photo, and its Undo brings it back', async () => {
-    const visit = ref.appointment(2790);
-    const { result } = renderHook(
-      () => ({
-        photos: useVisitPhotos(visit),
-        remove: useDeleteVisitPhoto(),
-        restore: useRestoreVisitPhoto(),
-      }),
-      { wrapper },
-    );
-    await waitFor(() => expect(result.current.photos.data).toHaveLength(3));
-    const photo = result.current.photos.data?.[0];
-    if (!photo) throw new Error('no photo');
-    await act(async () => {
-      await result.current.remove.mutateAsync({
-        id: photo.id,
-        reason: 'duplicate',
-        note: null,
-      });
-    });
-    await waitFor(() => expect(result.current.photos.data).toHaveLength(2));
-    await act(async () => {
-      await result.current.restore.mutateAsync(photo.id);
-    });
-    await waitFor(() => expect(result.current.photos.data).toHaveLength(3));
-  });
-});
-
-describe('usePatientAppointments', () => {
-  it('reads one patient’s bookings, newest first; idle without one', async () => {
-    const { result } = renderHook(
-      () => usePatientAppointments(patientRef('Dharti Galani')),
-      { wrapper },
-    );
-    await waitFor(() => expect(result.current.data?.length).toBeGreaterThan(1));
-    const slots = (result.current.data ?? []).map(
-      (row) => `${row.date} ${row.startTime}`,
-    );
-    expect(slots).toEqual([...slots].sort().reverse());
-    const idle = renderHook(() => usePatientAppointments(''), { wrapper });
-    expect(idle.result.current.fetchStatus).toBe('idle');
+    expect(stored(RIYA.id).status).toBe('scheduled');
   });
 });

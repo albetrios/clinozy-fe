@@ -59,8 +59,8 @@ export const AGENDA_PHONE_GRID =
 
 /**
  * The Agenda's columns (KICKOFF §6.4 Agenda; H:2032–2045): Time · Contact ·
- * Service · Appointed to · Latest update · Quick view · Status — Contact,
- * Service and Status sortable inside each day (asc → desc → off). A tablet
+ * Service · Appointed to · Latest update · Quick view · Status — none
+ * sortable: the API sorts by date and start (api-integration §5.3). A tablet
  * drops Latest update (H:144–147); a phone re-grids each row (H:120–128) and
  * leaves out the quick view. The cells read `AgendaCellsContext`.
  */
@@ -84,6 +84,7 @@ export function agendaColumns(
       id: 'contact',
       accessorFn: (row) => row.person.name,
       header: header(columns.contact),
+      enableSorting: false,
       cell: ContactCell,
       meta: {
         track: tracks.contact,
@@ -96,12 +97,13 @@ export function agendaColumns(
       id: 'service',
       accessorFn: (row) => row.serviceLabel,
       header: header(columns.service),
+      enableSorting: false,
       cell: ServiceCell,
       meta: { track: tracks.service, phoneClassName: PHONE_AREAS.service },
     },
     {
       id: 'doctor',
-      accessorFn: (row) => row.doctor?.firstName ?? '',
+      accessorFn: (row) => row.doctor?.name ?? '',
       header: header(columns.doctor),
       enableSorting: false,
       cell: DoctorCell,
@@ -129,6 +131,7 @@ export function agendaColumns(
       id: 'status',
       accessorFn: (row) => row.status,
       header: header(columns.status),
+      enableSorting: false,
       cell: StatusCell,
       meta: { track: tracks.status, phoneClassName: PHONE_AREAS.status },
     },

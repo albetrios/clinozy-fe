@@ -5,7 +5,6 @@ import type {
 } from '@/shared/api/clinic/appointments-contracts.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { personFullName } from '@/shared/components/Cells/index.ts';
 
 import { APPOINTMENT_FORM_KEYS } from './appointment-form.constants.ts';
 import type {
@@ -49,7 +48,7 @@ export function footerSummary(
     draft.who?.name,
     draft.serviceLabel,
     t(K.footer.minutes, { minutes: draft.durationMin }),
-    doctor ? personFullName(doctor) : '',
+    doctor?.name ?? '',
   ]);
 }
 
@@ -72,7 +71,7 @@ export function detailsSummaryText(
   const reason = draft.reason.trim();
   const summary = isolateJoin([
     draft.serviceLabel,
-    doctor ? personFullName(doctor) : '',
+    doctor?.name ?? '',
     t(K.footer.minutes, { minutes: draft.durationMin }),
     reason ? `“${reason.slice(0, 40)}”` : '',
   ]);

@@ -1,7 +1,7 @@
-import type { AppointmentStaff } from '@/shared/api/clinic/appointments-contracts.ts';
+import type { AppointmentStaff } from '@/shared/api/clinic/appointments-fixture-contracts.ts';
 import { personFullName } from '@/shared/components/Cells/index.ts';
 import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
-import { useBookableStaff } from '@/shared/hooks/useAppointments/index.ts';
+import { useFixtureBookableStaff } from '@/shared/hooks/useFixtureAppointments/index.ts';
 
 /** Props of {@link PatientStaffPicker}. */
 export interface PatientStaffPickerProps {
@@ -35,7 +35,7 @@ export function PatientStaffPicker({
   id,
   testId,
 }: PatientStaffPickerProps) {
-  const staff = useBookableStaff();
+  const staff = useFixtureBookableStaff();
   const people = (staff.data ?? []).filter(
     (person) =>
       person.roles.includes(staffRole) && (person.active || person.id === value),

@@ -13,14 +13,14 @@ const KEYS = APPOINTMENTS_KEYS.agenda;
 
 /** A "Latest update" in words: the pill's label (its mark included) and its line. */
 export interface LatestUpdateWords {
-  /** "✓ Plan ready", "○ Plan pending", "✓ Moved ×2" (`appointments.md:359`). */
+  /** "✓ Reminder sent", "✓ Moved ×2" (`appointments.md:359`). */
   label: (update: LatestUpdate) => string;
-  /** "Reminder read on WhatsApp", "Moved from Sat 3 Oct 10:30 am" (`appointments.md:360`). */
+  /** "Reminder sent", "Moved from Sat 3 Oct 10:30 am" (`appointments.md:360`). */
   hint: (update: LatestUpdate) => string;
 }
 
 /**
- * The "Latest update" pills' words — the Agenda's pills and tooltips, and the
+ * The "Latest update" pill's words — the Agenda's pill and tooltip, and the
  * appointment card's last-update line. "Moved from" names the old slot
  * clinic-local, as the toasts do — its day and time isolated, so they stay
  * whole on a right-to-left page.
@@ -41,9 +41,6 @@ export function useLatestUpdateWords(): LatestUpdateWords {
 
   const hint = useCallback(
     (update: LatestUpdate) => {
-      if (update.kind === 'planReady') {
-        return t(KEYS.latestHints.planReady, { suggestions: update.suggestions });
-      }
       if (update.kind === 'moved') {
         // A move whose old slot is not on record says only that it moved.
         if (!update.from) return label(update);

@@ -1,7 +1,7 @@
 import { Trans, useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type { AppointmentDaySummary } from '@/shared/api/clinic/appointments-contracts.ts';
+import type { AppointmentDayCount } from '@/shared/api/clinic/appointments-contracts.ts';
 import { localDateOf } from '@/shared/api/clinic/clinic-time.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
@@ -39,22 +39,25 @@ export interface AgendaDayHeaderProps {
   today: string;
   /** The group's place among the loaded days — its tone cycles by it. */
   groupIndex: number;
-  /** The day’s counts across every page (Appendix F); no counts while unknown. */
-  summary: AppointmentDaySummary | undefined;
+  /**
+   * The day’s counts from the server (`daily-counts`) — every booking that day,
+   * whatever the status, search and created filters say; no counts while unknown.
+   */
+  counts: AppointmentDayCount | undefined;
 }
 
 /**
  * One Agenda day's sticky header (H:2036; `appointments.md:40`): a 34px date
  * tile — sage today, else sky · lav · blush · butter · mint by the day's place
  * — "Today" / "Tomorrow" / the weekday over its sub line, and at the inline end
- * "<n> confirmed" · "<n> awaiting reply" (or "· all set"), the band the day's
- * tone at 55%.
+ * "<n> confirmed" · "<n> awaiting reply" (or "· all set") — Confirmed and
+ * Scheduled in the server's counts — the band the day's tone at 55%.
  */
 export function AgendaDayHeader({
   date,
   today,
   groupIndex,
-  summary,
+  counts,
 }: AgendaDayHeaderProps) {
   const { t } = useTranslation(APPOINTMENTS_NS);
   const { formatDate } = useLocaleFormat();
@@ -67,8 +70,8 @@ export function AgendaDayHeader({
   if (label === 'today') title = t(keys.day.today);
   else if (label === 'tomorrow') title = t(keys.day.tomorrow);
   const subLine = subText(sub, weekday, t);
-  const waiting = summary?.scheduled ?? 0;
-  const confirmed = summary?.confirmed ?? 0;
+  const waiting = counts?.byStatus.scheduled ?? 0;
+  const confirmed = counts?.byStatus.confirmed ?? 0;
   const counted = waiting + confirmed > 0;
 
   return (

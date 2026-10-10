@@ -13,10 +13,10 @@ import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
 import { passesPatientFileGate } from '@/shared/clinic/patient-file-sections.ts';
 import { personFullName } from '@/shared/components/Cells/index.ts';
-import { usePatientAppointments } from '@/shared/hooks/useAppointments/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
+import { useFixturePatientAppointments } from '@/shared/hooks/useFixtureAppointments/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { usePatientNotes } from '@/shared/hooks/usePatientNotes/index.ts';
 import { usePatientPhotos } from '@/shared/hooks/usePatientPhotos/index.ts';
@@ -84,7 +84,7 @@ export function useActivityFeed(): { entries: ActivityEntry[]; loading: boolean 
   const billing = viewable.includes('invoices');
   const privateAlbum =
     access.isResolved && passesPatientFileGate(access.roles, 'privateAlbum');
-  const visits = usePatientAppointments(patientId);
+  const visits = useFixturePatientAppointments(patientId);
   const prescriptions = usePatientPrescriptions(patientId);
   const treatments = usePatientTreatments(patientId);
   const invoices = usePatientInvoices(billing ? patientId : null);

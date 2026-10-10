@@ -3,5 +3,6 @@ export {
   type ContactUpdateVars,
   useContact,
   useContactSearch,
+  useCreateContact,
   useUpdateContact,
 } from './useContacts.ts';

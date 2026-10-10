@@ -1,4 +1,4 @@
-import type { AppointmentRecord } from '@/shared/api/clinic/appointments-contracts.ts';
+import type { AppointmentRecord } from '@/shared/api/clinic/appointments-fixture-contracts.ts';
 import type {
   CreateInput,
   FixtureChange,

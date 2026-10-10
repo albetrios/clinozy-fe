@@ -23,11 +23,11 @@ export interface CalendarRead {
 }
 
 /**
- * A calendar's bookings (`listAppointmentsRange`): the days the view shows
- * around the URL's anchor, with the page's filters and the header's branches
- * — every doctor when the view counts each doctor itself (the Day). A failed
- * read keeps the last copy and toasts "Couldn’t load this list" with Retry
- * (§6.0), as the Agenda does.
+ * A calendar's bookings (`GET /app/appointments`, every page of the range):
+ * the days the view shows around the URL's anchor, with the page's filters and
+ * the header's branches — every doctor when the view counts each doctor
+ * itself (the Day). A failed read keeps the last copy and toasts "Couldn’t
+ * load this list" with Retry (§6.0), as the Agenda does.
  */
 export function useCalendarRange(
   view: AppointmentCalendarView,
@@ -37,10 +37,11 @@ export function useCalendarRange(
   const { preferences } = usePreferences();
   const range = appointmentViewRange(view, navigation.anchor);
   const read = useAppointmentRange(
-    {
-      ...appointmentRangeParamsOf(navigation.search, range, doctors),
+    appointmentRangeParamsOf(navigation.search, {
+      ...range,
       branchIds: preferences.branchFilter,
-    },
+      doctors,
+    }),
     { notifyOnError: false },
   );
   useListLoadError(read, 'appointments');

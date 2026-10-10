@@ -245,12 +245,14 @@ export const CLINIC_KEYS = {
       cancelled: 'appointments.hints.cancelled',
       closed: 'appointments.hints.closed',
     },
-    /** The contract's `cancel_reason` (D32), by side. */
+    /** The API's `cancel_reason` — the contract's five (D32) and two of the form's. */
     cancelReasons: {
       patient_asked: 'appointments.cancelReasons.patient_asked',
       unreachable: 'appointments.cancelReasons.unreachable',
       doctor_unavailable: 'appointments.cancelReasons.doctor_unavailable',
       resource_unavailable: 'appointments.cancelReasons.resource_unavailable',
+      rescheduling_later: 'appointments.cancelReasons.rescheduling_later',
+      booked_by_mistake: 'appointments.cancelReasons.booked_by_mistake',
       other: 'appointments.cancelReasons.other',
     },
     cancelSides: {
@@ -279,7 +281,11 @@ export const CLINIC_KEYS = {
     toasts: {
       booked: 'appointments.toasts.booked',
       bookedQueued: 'appointments.toasts.bookedQueued',
+      /** Booked, and the server sent the person nothing yet. */
+      bookedOnly: 'appointments.toasts.bookedOnly',
       moved: 'appointments.toasts.moved',
+      /** Moved, and the server sent the person nothing yet. */
+      movedOnly: 'appointments.toasts.movedOnly',
       updated: 'appointments.toasts.updated',
       statusChanged: 'appointments.toasts.statusChanged',
       statusConfirmed: 'appointments.toasts.statusConfirmed',

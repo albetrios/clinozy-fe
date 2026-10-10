@@ -2,13 +2,7 @@ import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type { AppointmentStaff } from '@/shared/api/clinic/appointments-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import {
-  PersonAvatar,
-  personFullName,
-  shortPersonName,
-} from '@/shared/components/Cells/index.ts';
+import { PersonAvatar, shortPersonName } from '@/shared/components/Cells/index.ts';
 import {
   Picker,
   PICKER_KEYS,
@@ -16,16 +10,19 @@ import {
   type PickerOption,
 } from '@/shared/components/Picker/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { useBookableStaff } from '@/shared/hooks/useAppointments/index.ts';
+import { useTeamDirectory } from '@/shared/hooks/useTeamDirectory/index.ts';
 import { ChevronDown } from '@/shared/icons/index.ts';
 
 import { APPOINTMENTS_KEYS, APPOINTMENTS_NS } from '../../appointments.constants.ts';
 
+/** The "All doctors" option's key — a doctor's is their membership id (`mem_…`). */
+const ALL_DOCTORS = 'all';
+
 /** Props for {@link DoctorPicker}. */
 export interface DoctorPickerProps {
-  /** The doctors picked; none is "All doctors". */
-  value: readonly string[];
-  onChange: (ids: string[]) => void;
+  /** The doctor picked (`mem_…`); none is "All doctors". */
+  value: string | undefined;
+  onChange: (id: string | undefined) => void;
   /** 32px (the Day header, 240px) or 36px (Filters, the field's width). */
   size: 'sm' | 'md';
   /** A doctor's line at the inline end — the Day header's "<n> booked" / "free". */
@@ -71,10 +68,11 @@ function doctorPickerFooter(
 }
 
 /**
- * Who a view shows — "All doctors" / "<name>" / "<n> doctors" with the picked
- * doctors' avatars stacked before it (H:2010, H:2057) — on the one Picker:
- * "Search team", each doctor and therapist with their real role (the
- * prototype wrote "Doctor" for everyone, §7.3), any number picked.
+ * Who a view shows — "All doctors" or "<name>" with the doctor's avatar before
+ * it (H:2010, H:2057) — on the one Picker: "Search team", "All doctors", then
+ * every active member of the team directory (the API names no doctor role, so
+ * each is bookable; no role line, api-integration M41). One doctor or everyone:
+ * the API's `doctor_membership_id` takes one (G3).
  */
 export function DoctorPicker({
   value,
@@ -87,35 +85,34 @@ export function DoctorPicker({
   testId,
   className,
 }: DoctorPickerProps) {
-  const { t } = useTranslation([APPOINTMENTS_NS, CLINIC_NS, PICKER_NS]);
-  const staff = useBookableStaff();
+  const { t } = useTranslation([APPOINTMENTS_NS, PICKER_NS]);
+  const team = useTeamDirectory();
   const keys = APPOINTMENTS_KEYS.filters;
-  const people = staff.data ?? [];
-  const options: PickerOption<AppointmentStaff>[] = people.map((person) => ({
-    key: person.id,
-    label: personFullName(person),
-    sub: person.roles
-      .map((role) => t(CLINIC_KEYS.roles[role], { ns: CLINIC_NS }))
-      .join(' · '),
-    meta: meta?.(person.id),
-    tone: person.tone,
-    leading: { kind: 'avatar', initials: person.initials },
-    keywords: [person.initials],
-    data: person,
-  }));
-  const picked = people.filter((person) => value.includes(person.id));
-  let label = t(keys.allDoctors);
-  if (picked.length === 1 && picked[0])
-    label = shortPersonName(personFullName(picked[0]));
-  else if (picked.length > 1) label = t(keys.doctors, { count: picked.length });
+  const options: PickerOption[] = [
+    {
+      key: ALL_DOCTORS,
+      label: t(keys.allDoctors),
+      tone: 'stone',
+      leading: { kind: 'none' },
+    },
+    ...team.members.map((member) => ({
+      key: member.id,
+      label: member.name,
+      meta: meta?.(member.id),
+      tone: member.tone,
+      leading: { kind: 'avatar' as const, initials: member.initials },
+      keywords: [member.initials],
+    })),
+  ];
+  const picked = value ? team.byId.get(value) : undefined;
+  const label = picked ? shortPersonName(picked.name) : t(keys.allDoctors);
 
   return (
     <Picker
-      multiple
       label={t(keys.appointedTo)}
       options={options}
-      value={[...value]}
-      onChange={(ids) => onChange(ids)}
+      value={value ?? ALL_DOCTORS}
+      onChange={(id) => onChange(id && id !== ALL_DOCTORS ? id : undefined)}
       searchable
       searchPlaceholder={t(keys.searchTeam)}
       minWidth={minWidth}
@@ -126,7 +123,7 @@ export function DoctorPicker({
         withFooter
           ? (close) =>
               doctorPickerFooter(close, {
-                onShowAll: () => onChange([]),
+                onShowAll: () => onChange(undefined),
                 showAllLabel: t(keys.showAll),
                 doneLabel: t(keys.done),
               })
@@ -147,25 +144,17 @@ export function DoctorPicker({
             open && 'border-disabled',
           )}
         >
-          {picked.length > 0 ? (
+          {picked ? (
             <span className="[&_[data-slot=avatar]]:ring-card flex flex-none items-center pe-1.5 [&_[data-slot=avatar]]:ring-[1.5px]">
-              {picked.map((person) => (
-                <PersonAvatar
-                  key={person.id}
-                  size="line"
-                  initials={person.initials}
-                  tone={person.tone}
-                  className="-me-1.5"
-                />
-              ))}
+              <PersonAvatar
+                size="line"
+                initials={picked.initials}
+                tone={picked.tone}
+                className="-me-1.5"
+              />
             </span>
           ) : null}
-          <span
-            className={cn(
-              'min-w-0 truncate',
-              picked.length === 0 && 'text-muted-foreground',
-            )}
-          >
+          <span className={cn('min-w-0 truncate', !picked && 'text-muted-foreground')}>
             {label}
           </span>
           <ChevronDown

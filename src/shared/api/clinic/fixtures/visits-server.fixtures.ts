@@ -1,4 +1,4 @@
-import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
+import type { AppointmentRow } from '@/shared/api/clinic/appointments-fixture-contracts.ts';
 import {
   clinicHttpError,
   compareText,

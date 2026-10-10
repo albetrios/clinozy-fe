@@ -1,9 +1,8 @@
 import { screen, waitFor } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+import { appointmentRow } from '@/tests/utils/appointment-doubles.ts';
 
 import { renderAppointmentsRoutes } from '../../__tests__/integration/appointments-test-router.tsx';
 import { useAppointmentsView } from './useAppointmentsView.ts';
@@ -22,9 +21,7 @@ function Probe() {
 
 beforeEach(() => {
   tier.current = 'desktop';
-  resetClinicFixtures();
 });
-afterEach(() => resetClinicFixtures());
 
 describe('useAppointmentsView (D27)', () => {
   it('shows the Agenda by default and every view as the URL asks', async () => {
@@ -53,7 +50,7 @@ describe('useAppointmentsView (D27)', () => {
 
   it('keeps an open drawer when it replaces Week on a phone', async () => {
     tier.current = 'phone';
-    const id = ref.appointment(2861);
+    const { id } = appointmentRow();
     const { router } = renderAppointmentsRoutes(
       `${PAGE}/${id}?view=week&mode=reschedule`,
       Probe,

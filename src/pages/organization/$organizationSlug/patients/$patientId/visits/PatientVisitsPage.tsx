@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 import { APPOINTMENT_STATUS_TONES } from '@/shared/clinic/clinic-tones.ts';
 import { DataTableColumnChooser } from '@/shared/components/DataTableColumnChooser/index.ts';
-import { usePatientAppointments } from '@/shared/hooks/useAppointments/index.ts';
+import { useFixturePatientAppointments } from '@/shared/hooks/useFixtureAppointments/index.ts';
 
 import { PatientSection } from '../shared/components/PatientSection/index.ts';
 import {
@@ -31,7 +31,7 @@ import { manifest } from './visits.manifest.ts';
 export function PatientVisitsPage() {
   const { t } = useTranslation(PATIENT_TABLE_NS);
   const { patientId } = usePatientFileContext();
-  const visits = usePatientAppointments(patientId);
+  const visits = useFixturePatientAppointments(patientId);
   const rows = visits.data ?? [];
   const table = useVisitsTable(rows);
 

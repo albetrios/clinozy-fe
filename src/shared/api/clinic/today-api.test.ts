@@ -12,13 +12,11 @@ import { clinicInstant } from './clinic-time.ts';
 import { fetchMemberNames, fetchRoomNames } from './directory-api.ts';
 import { leadQueryKeys } from './leads-api.ts';
 import {
-  checkInAppointment,
   fetchTodayEnquiries,
   fetchTodayFloor,
   moveFloorStage,
   normalizeTodayFloorParams,
   todayQueryKeys,
-  undoCheckIn,
 } from './today-api.ts';
 
 /** The seed day, 10:42 on the clinic clock. */
@@ -243,36 +241,20 @@ describe('fetchTodayEnquiries', () => {
   });
 });
 
-describe('the moves', () => {
-  it('check in, undo it and move a stage on the booking, each with its action’s key', async () => {
+describe('moveFloorStage', () => {
+  it('moves a checked-in visit to a later stage with its action’s key', async () => {
     vi.mocked(api.post).mockResolvedValue({ data: {} } as never);
 
-    await checkInAppointment({ appointmentId: 'appt_1', idempotencyKey: 'key-1' });
-    await undoCheckIn({ appointmentId: 'appt_1', idempotencyKey: 'key-2' });
     await moveFloorStage({
       appointmentId: 'appt_1',
       stage: 'with_doctor',
-      idempotencyKey: 'key-3',
+      idempotencyKey: 'key-1',
     });
 
-    expect(api.post).toHaveBeenNthCalledWith(
-      1,
-      '/app/appointments/{appointment_id}/check-in',
-      { params: { appointment_id: 'appt_1' }, idempotencyKey: 'key-1' },
-    );
-    expect(api.post).toHaveBeenNthCalledWith(
-      2,
-      '/app/appointments/{appointment_id}/undo-check-in',
-      { params: { appointment_id: 'appt_1' }, idempotencyKey: 'key-2' },
-    );
-    expect(api.post).toHaveBeenNthCalledWith(
-      3,
-      '/app/appointments/{appointment_id}/stage',
-      {
-        params: { appointment_id: 'appt_1' },
-        body: { visit_stage: 'with_doctor' },
-        idempotencyKey: 'key-3',
-      },
-    );
+    expect(api.post).toHaveBeenCalledWith('/app/appointments/{appointment_id}/stage', {
+      params: { appointment_id: 'appt_1' },
+      body: { visit_stage: 'with_doctor' },
+      idempotencyKey: 'key-1',
+    });
   });
 });

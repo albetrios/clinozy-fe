@@ -3,11 +3,25 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
+import type * as AppointmentsApiModule from '@/shared/api/clinic/appointments-api.ts';
 import { fetchAppointmentRange } from '@/shared/api/clinic/appointments-api.ts';
-import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
 import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import type * as DirectoryApiModule from '@/shared/api/clinic/directory-api.ts';
+import {
+  APPOINTMENT_NOW,
+  APPOINTMENT_TODAY,
+  APPOINTMENT_TOMORROW,
+  appointmentRow,
+  DOCTOR_NISHA,
+} from '@/tests/utils/appointment-doubles.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
+import {
+  type AppointmentsWorld,
+  MEERA_BOOKING,
+  publicId,
+  seededAppointmentsWorld,
+} from '../../__tests__/integration/appointments-test-data.ts';
 import {
   APPOINTMENTS_PAGE,
   grantClinicAccess,
@@ -16,33 +30,46 @@ import {
 import { weekLoad } from '../../appointments.calendar.ts';
 import { AppointmentsWeek } from './AppointmentsWeek.tsx';
 
-const { notifyMock } = vi.hoisted(() => ({
-  notifyMock: { success: vi.fn(), error: vi.fn(), info: vi.fn(), undo: vi.fn() },
-}));
 vi.mock('@/shared/notify/index.ts', () => ({
-  notify: notifyMock,
+  notify: { success: vi.fn(), error: vi.fn(), info: vi.fn(), undo: vi.fn() },
   TOAST_DURATION_MS: { default: 5_200, error: 9_000 },
   UNDO_TOAST_DURATION_MS: 10_000,
 }));
 
-/** Sat 3 Oct 2026: its week runs Sun 27 Sep to Sat 3 Oct. */
-const TODAY = '2026-10-03';
-const URL = `${APPOINTMENTS_PAGE}?view=week`;
-let week: AppointmentRow[];
+const world = vi.hoisted(() => ({}) as AppointmentsWorld);
+vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => {
+  const { appointmentsApiDouble } =
+    await import('../../__tests__/integration/appointments-test-data.ts');
+  return {
+    ...(await importOriginal<typeof AppointmentsApiModule>()),
+    ...appointmentsApiDouble(world),
+  };
+});
+vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => {
+  const { directoryApiDouble } =
+    await import('../../__tests__/integration/appointments-test-data.ts');
+  return {
+    ...(await importOriginal<typeof DirectoryApiModule>()),
+    ...directoryApiDouble(),
+  };
+});
 
-beforeEach(async () => {
-  vi.useFakeTimers({ toFake: ['Date'] });
-  vi.setSystemTime(new Date(clinicInstant(TODAY, '10:00')));
-  resetClinicFixtures();
-  grantClinicAccess('owner');
-  week = await fetchAppointmentRange({ from: '2026-09-27', to: TODAY });
-});
-afterEach(() => {
-  vi.useRealTimers();
-  resetClinicFixtures();
-});
+/** Sat 3 Oct 2026: its week runs Sun 27 Sep to Sat 3 Oct. */
+const URL = `${APPOINTMENTS_PAGE}?view=week`;
+/** The next week, Sun 4 to Sat 10 Oct. */
+const NEXT_WEEK = `${APPOINTMENTS_PAGE}?view=week&date=${APPOINTMENT_TOMORROW}`;
 
 const headers = () => screen.getAllByTestId('appointments-week-day');
+
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(APPOINTMENT_NOW);
+  vi.resetAllMocks();
+  Object.assign(world, seededAppointmentsWorld());
+  signInTestMember();
+  grantClinicAccess('owner');
+});
+afterEach(() => vi.useRealTimers());
 
 describe('AppointmentsWeek (KICKOFF §6.4 Week)', () => {
   it('heads seven days, Sunday first, today in red and the past dimmed', async () => {
@@ -64,17 +91,34 @@ describe('AppointmentsWeek (KICKOFF §6.4 Week)', () => {
     expect(headers()[0]?.className).toContain('opacity-45');
   });
 
-  it('draws each day’s bookings in its own column, none bookable', async () => {
+  it('reads Sunday to Saturday with the page’s filters, the picked doctor’s bookings only', async () => {
+    renderInAppointments(<AppointmentsWeek />, `${URL}&doctor=${DOCTOR_NISHA.id}`);
+    await waitFor(() =>
+      expect(screen.getAllByTestId('appointments-block')).toHaveLength(1),
+    );
+    expect(fetchAppointmentRange).toHaveBeenLastCalledWith({
+      from: '2026-09-27',
+      to: '2026-10-03',
+      status: 'active',
+      doctorId: DOCTOR_NISHA.id,
+      q: undefined,
+      created: undefined,
+      branchIds: [],
+    });
+    expect(screen.getByTestId('appointments-block')).toHaveTextContent('Meera Iyer');
+  });
+
+  it('draws each day’s bookings in its own column, none bookable, today’s with the now line', async () => {
+    // An hour into the rail, so the now line has a place on it.
+    vi.setSystemTime(new Date(clinicInstant(APPOINTMENT_TODAY, '10:00')));
     renderInAppointments(<AppointmentsWeek />, URL);
     await waitFor(() =>
-      expect(screen.getAllByTestId('appointments-block')).toHaveLength(week.length),
+      expect(screen.getAllByTestId('appointments-block')).toHaveLength(2),
     );
     const todayColumn = screen
       .getAllByTestId('appointments-day-column')
-      .find((column) => column.dataset.date === TODAY) as HTMLElement;
-    expect(within(todayColumn).getAllByTestId('appointments-block')).toHaveLength(
-      week.filter((row) => row.date === TODAY).length,
-    );
+      .find((column) => column.dataset.date === APPOINTMENT_TODAY) as HTMLElement;
+    expect(within(todayColumn).getAllByTestId('appointments-block')).toHaveLength(2);
     expect(
       todayColumn.querySelector('[data-testid="appointments-day-slots"]'),
     ).toBeNull();
@@ -82,19 +126,30 @@ describe('AppointmentsWeek (KICKOFF §6.4 Week)', () => {
   });
 
   it('shows each day’s chair-time load and a double-booked doctor', async () => {
-    renderInAppointments(<AppointmentsWeek />, URL);
+    // Dr. Nisha holds Riya at 10:30 and a second booking at 10:40 tomorrow.
+    const clash = appointmentRow({
+      id: publicId('appt', 'clash'),
+      seq: 2870,
+      startTime: '10:40',
+      endTime: '11:00',
+    });
+    world.rows = [...world.rows, clash];
+    renderInAppointments(<AppointmentsWeek />, NEXT_WEEK);
     await waitFor(() =>
-      expect(screen.getAllByTestId('appointments-block')).toHaveLength(week.length),
+      expect(screen.getAllByTestId('appointments-block')).toHaveLength(4),
     );
+    const shown = vi.mocked(fetchAppointmentRange).mock.lastCall?.[0];
+    expect(shown).toMatchObject({ from: '2026-10-04', to: '2026-10-10' });
+    const rows = world.rows.filter((row) => row.status !== 'cancelled');
     for (const header of headers()) {
-      const load = weekLoad(week.filter((row) => row.date === header.dataset.date));
+      const load = weekLoad(rows.filter((row) => row.date === header.dataset.date));
       const bar = header.querySelector('[title]') as HTMLElement;
       expect(bar.getAttribute('title')).toBe(
         `${load.booked} booked · ${load.percent}% of chair time${load.overlap ? ' · overlapping booking' : ''}`,
       );
       expect(
         within(header).queryByRole('img', { name: 'Overlapping booking' }) !== null,
-      ).toBe(load.overlap);
+      ).toBe(header.dataset.date === APPOINTMENT_TOMORROW);
     }
   });
 
@@ -112,10 +167,25 @@ describe('AppointmentsWeek (KICKOFF §6.4 Week)', () => {
     );
   });
 
+  it('opens a booking’s drawer from its block', async () => {
+    const user = userEvent.setup();
+    const { router } = renderInAppointments(<AppointmentsWeek />, URL);
+    await waitFor(() =>
+      expect(screen.getAllByTestId('appointments-block')).toHaveLength(2),
+    );
+    await user.click(screen.getByRole('button', { name: /^Meera Iyer/ }));
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe(
+        `${APPOINTMENTS_PAGE}/${MEERA_BOOKING.id}`,
+      ),
+    );
+    expect(router.state.location.search).toEqual({ view: 'week' });
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = renderInAppointments(<AppointmentsWeek />, URL);
     await waitFor(() =>
-      expect(screen.getAllByTestId('appointments-block')).toHaveLength(week.length),
+      expect(screen.getAllByTestId('appointments-block')).toHaveLength(2),
     );
     expect(await axe(container)).toHaveNoViolations();
   });

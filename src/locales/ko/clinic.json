@@ -150,6 +150,8 @@
       "unreachable": "환자와 연락 불가",
       "doctor_unavailable": "의사 일정 불가",
       "resource_unavailable": "장비 또는 방 사용 불가",
+      "rescheduling_later": "나중에 다시 일정 조정",
+      "booked_by_mistake": "실수로 예약함",
       "other": "기타"
     },
     "cancelSides": {
@@ -172,7 +174,9 @@
     "toasts": {
       "booked": "{{id}} 예약됨 · {{day}} {{time}} · WhatsApp으로 확인 요청을 보냈습니다",
       "bookedQueued": "{{id}} 예약됨 · {{day}} {{time}} · 알림 예약됨",
+      "bookedOnly": "{{id}} 예약됨 · {{day}} {{time}}",
       "moved": "{{id}} 이동됨 · {{day}} {{time}} · 확인 요청을 보냈습니다",
+      "movedOnly": "{{id}} 이동됨 · {{day}} {{time}}",
       "updated": "{{id}} 업데이트됨",
       "statusChanged": "{{name}} → {{status}}",
       "statusConfirmed": "{{name}} → {{status}} · 알림 예약됨",
@@ -998,10 +1002,8 @@
       "searchLabel": "사람 검색",
       "useContact": "연락처 사용",
       "patient": "환자",
-      "patientCare": "환자 · {{care}}",
-      "lead": "리드 {{id}} · {{phone}}",
       "createContact": "+ 연락처 “{{query}}” 만들기",
-      "newContact": "새 연락처 · 체크인 때 휴대폰 번호 추가",
+      "newContact": "새 연락처 · 예약하려면 휴대폰 번호 추가",
       "mobile": "휴대폰 번호",
       "name": "이름",
       "mobileLabel": "휴대폰",
@@ -1013,9 +1015,7 @@
       "connected": "연결된 리드",
       "chip": "{{id}} · {{status}}",
       "chipHint": "리드 {{id}} · {{source}} · 담당 {{owner}}",
-      "movesAtCheckIn": "· 체크인 시 “내원함”으로 이동",
-      "lead": "리드",
-      "leadOption": "리드 {{id}}"
+      "movesAtCheckIn": "· 체크인 시 “내원함”으로 이동"
     },
     "status": {
       "section": "방문 상태",
@@ -1030,12 +1030,8 @@
       "rescheduledConfirm": "일정 변경됨 · 이전 {{day}} {{time}} · 다시 확인 필요 · 저장하면 새 알림이 발송됩니다",
       "rescheduled": "일정 변경됨 · 이전 {{day}} {{time}} · 저장하면 새 알림이 발송됩니다",
       "planReady_other": "플랜 준비됨 · 서비스 {{count}}개",
-      "planNotPrepared": "플랜 미준비",
       "planVisit_other": "이번 방문에 {{count}}개 계획",
-      "planEarlier_other": "이전 방문에서 {{count}}개",
-      "planOpen": "제안 열기",
-      "planEmpty": "아직 제안이 없습니다 · 서비스 제안을 열어 준비하세요",
-      "createPatient": "환자 기록 만들기"
+      "planEarlier_other": "이전 방문에서 {{count}}개"
     },
     "details": {
       "title": "예약",
@@ -1060,7 +1056,6 @@
       "typeLines": {
         "consultation": "결제 시 상담료가 청구서에 추가됩니다",
         "follow_up": "보통 무료 · 추가 항목이 없으면 청구서 없음",
-        "package_session": "비용 없음 · 방문 완료 시 {{total}}회 중 {{next}}회차 사용",
         "other": "아래 메모에 내용을 적어 주세요"
       },
       "treatment": "시술",
@@ -1068,12 +1063,6 @@
       "searchTreatments": "시술 검색",
       "common": "자주 쓰는 항목",
       "fromOfferings": "서비스에서",
-      "package": "패키지",
-      "packageNext": "다음: {{total}}회 중 {{next}}회차 · {{date}}까지 유효",
-      "packageLeft": "{{count}}회 남음",
-      "noPackage": "{{name}} 님은 활성 패키지가 없습니다",
-      "pickContactPackages": "연락처를 선택하면 패키지를 볼 수 있습니다",
-      "asTreatment": "시술로 예약",
       "doctor": "의사",
       "pickDoctor": "의사 선택",
       "searchDoctors": "의사 및 치료사 검색",
@@ -1096,49 +1085,20 @@
       "time": "시간",
       "pickDate": "날짜를 선택하면 시간이 표시됩니다",
       "none": "이 날은 예약할 수 있는 시간이 없습니다 · 다른 날짜를 선택하세요",
+      "closed": {
+        "past": "지난 날짜입니다 · 다른 날짜를 선택하세요",
+        "branchInactive": "이 지점은 예약을 받지 않습니다",
+        "closedDay": "이 날은 휴진입니다 · 다른 날짜를 선택하세요",
+        "holiday": "{{label}} 휴진 · 다른 날짜를 선택하세요",
+        "doctorOff": "이 날은 의사가 근무하지 않습니다 · 다른 날짜나 의사를 선택하세요"
+      },
       "am": "오전",
       "pm": "오후",
       "hour": "{{period}} {{hour}}시",
       "free": "{{time}} · 비어 있음",
-      "booked": "{{time}} · 예약됨",
       "locked": "잠김",
       "lockedSummary": "{{day}} · {{time}} · 체크인 후 잠김",
       "lockedToast": "환자가 체크인하면 날짜와 시간이 잠깁니다"
-    },
-    "notPatient": {
-      "section": "다음 단계 · 환자 기록",
-      "title": "아직 환자가 아닙니다",
-      "body": "계속하려면 환자 기록을 만드세요 · 사진, 서비스 제안, 피드백, “완료”를 사용할 수 있습니다",
-      "action": "환자 기록 만들기",
-      "done": "{{name}} 님이 이제 환자입니다 · “완료”로 표시할 수 있습니다"
-    },
-    "photos": {
-      "title": "이번 방문 사진",
-      "section": "방문 사진",
-      "locked": "환자가 병원에 있을 때 사진을 쓸 수 있습니다 · 먼저 체크인하세요",
-      "checkIn": "지금 체크인",
-      "album": "앨범",
-      "albums": {
-        "general": "일반",
-        "private": "비공개",
-        "lhr": "LHR"
-      },
-      "upload": "사진 업로드",
-      "add": "추가",
-      "open": "{{name}} 열기",
-      "edit": "세부 정보 수정",
-      "delete": "사진 삭제",
-      "count_other": "사진 {{count}}장 · {{first}} 님 파일의 이번 방문 아래에 표시됩니다",
-      "empty": "{{first}} 님이 병원에 있는 동안 전후 사진을 찍으세요 · 이번 방문 아래에 저장됩니다",
-      "attached_other": "이번 방문에 사진 {{count}}장 첨부됨",
-      "deleteTitle": "이 사진을 삭제할까요?",
-      "deleted": "사진이 삭제되었습니다",
-      "reasons": {
-        "wrongPatient": "다른 환자",
-        "blurry": "흐림 / 다시 촬영",
-        "duplicate": "중복",
-        "other": "기타"
-      }
     },
     "footer": {
       "pickTime": "시간 선택",
@@ -1152,7 +1112,8 @@
       "slot": "날짜와 시간을 선택하세요",
       "passed": "지난 시간입니다 · 이후 시간을 선택하세요",
       "taken": "방금 예약되었습니다 · 다른 시간을 선택하세요",
-      "doctor": "의사를 선택하세요"
+      "doctor": "의사를 선택하세요",
+      "branch": "예약할 수 있는 운영 중인 지점이 없습니다"
     },
     "copied": "복사됨 · 날짜와 시간을 선택하세요"
   },

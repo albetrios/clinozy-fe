@@ -5,17 +5,12 @@ import { useTranslation } from 'react-i18next';
 import { organizationLead } from '@/lib/routes/leads-builders.ts';
 import { isAppointmentSlotLocked } from '@/shared/api/clinic/appointment-status.ts';
 import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import { civilMonthStart } from '@/shared/api/clinic/clinic-time.ts';
 import { CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import {
   ChatColumn,
   type ChatHistoryTarget,
 } from '@/shared/components/ChatColumn/index.ts';
-import {
-  type PlanCard,
-  usePlanCard,
-} from '@/shared/components/OfferingSuggestions/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
@@ -38,8 +33,6 @@ import {
   type AppointmentFormExits,
   type AppointmentFormUi,
   CancelVisitConfirm,
-  PatientBlock,
-  StackedPatientForm,
   StatusBlock,
   StepsBlock,
   WhoBlock,
@@ -96,26 +89,16 @@ function useFormUi(state: AppointmentFormState) {
   const setDetailsOpen = (next: boolean | ((open: boolean) => boolean)) =>
     setDetailsToggled(typeof next === 'function' ? next(detailsOpen) : next);
   const [pagedMonth, setPagedMonth] = useState<string | null>(null);
-  const [planOpen, setPlanOpen] = useState(true);
-  const [pricesShown, setPricesShown] = useState(true);
-  const [stackPatient, setStackPatient] = useState(false);
   const [asking, setAsking] = useState(false);
   const ui: AppointmentFormUi = {
     detailsOpen,
     setDetailsOpen,
     month: pagedMonth ?? civilMonthStart(state.draft.date ?? state.today),
     setMonth: setPagedMonth,
-    planOpen,
-    setPlanOpen,
-    pricesShown,
-    setPricesShown,
-    openPatientForm: () => setStackPatient(true),
     askCancel: () => setAsking(true),
   };
   return {
     ui,
-    stackPatient,
-    closePatientForm: () => setStackPatient(false),
     asking,
     closeCancel: () => setAsking(false),
   };
@@ -149,12 +132,10 @@ function useFormExits(onClose: () => void): AppointmentFormExits {
   };
 }
 
-/** The person's thread for the chat column: their patient record's, else their lead's. */
+/** The person's thread for the chat column: their contact's activity. */
 function chatPersonOf(state: AppointmentFormState) {
-  const who = state.draft.who;
-  if (who?.patientId) return { kind: 'patient', patientId: who.patientId } as const;
-  if (who?.leadId) return { kind: 'lead', leadId: who.leadId } as const;
-  return null;
+  const contactId = state.draft.who?.contactId;
+  return contactId ? ({ kind: 'contact', contactId } as const) : null;
 }
 
 /**
@@ -209,20 +190,6 @@ function useFooterWords(state: AppointmentFormState) {
   };
 }
 
-/** The patient's offering suggestions for this visit (Edit, a patient). */
-function useVisitPlan(state: AppointmentFormState, exits: AppointmentFormExits) {
-  const { row, draft } = state;
-  const patientId = state.edit && state.isPatient ? draft.who?.patientId : undefined;
-  return usePlanCard({
-    patientId: patientId ?? '',
-    firstName: draft.who?.name.split(/\s+/)[0] ?? '',
-    sourceLabel: row ? `${displayId.appointment(row.seq)} · ${row.serviceLabel}` : '',
-    appointmentId: row?.id ?? null,
-    canEdit: state.canEdit,
-    onOpenChat: exits.openLead,
-  });
-}
-
 /** The save: checked, sent, then the host closes (or the form, without `onSaved`). */
 function useFormSave(
   state: AppointmentFormState,
@@ -233,9 +200,8 @@ function useFormSave(
   return useAppointmentSave({
     mode: state.mode,
     row: state.row ?? null,
-    copyOf: state.mode === 'create' ? state.prefill.copyOf : undefined,
+    source: state.mode === 'create' ? state.source : undefined,
     branchId: state.branchId,
-    leads: state.leads,
     onProblem: (problem) => {
       if (problem === 'doctor') ui.setDetailsOpen(true);
     },
@@ -243,29 +209,20 @@ function useFormSave(
   });
 }
 
-/** The form's sections, in order — Edit adds the status tiles and the patient's visit. */
+/** The form's sections, in order — Edit adds the status tiles. */
 function FormBody({
   state,
   ui,
-  planCard,
   exits,
   onCopy,
 }: {
   state: AppointmentFormState;
   ui: AppointmentFormUi;
-  planCard: PlanCard;
   exits: AppointmentFormExits;
   onCopy?: (row: AppointmentRow) => void;
 }) {
   const idPrefix = `appointment-${useId().replace(/:/g, '')}`;
-  const planRef = useRef<HTMLDivElement>(null);
   const row = state.edit ? state.row : undefined;
-  const onPlan = () => {
-    ui.setPlanOpen(true);
-    requestAnimationFrame(() =>
-      planRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
-    );
-  };
   return (
     <div data-testid={IDS.form} className="@container flex flex-col gap-3">
       <WhoBlock state={state} exits={exits} />
@@ -273,23 +230,11 @@ function FormBody({
         <StatusBlock
           state={state}
           row={row}
-          plan={planCard.plan}
           ui={ui}
           onCopy={onCopy ? () => onCopy(row) : undefined}
-          onPlan={onPlan}
         />
       ) : null}
       <StepsBlock state={state} ui={ui} idPrefix={idPrefix} />
-      {row ? (
-        <PatientBlock
-          state={state}
-          row={row}
-          planCard={planCard}
-          planRef={planRef}
-          ui={ui}
-          exits={exits}
-        />
-      ) : null}
     </div>
   );
 }
@@ -298,14 +243,13 @@ function FormBody({
 function AppointmentFormSession(props: SessionProps) {
   const { t } = useTranslation([APPOINTMENT_FORM_NS, CLINIC_NS]);
   const state = useAppointmentFormState(props);
-  const { ui, stackPatient, closePatientForm, asking, closeCancel } = useFormUi(state);
+  const { ui, asking, closeCancel } = useFormUi(state);
   useCopiedToast(state);
   const exits = useFormExits(props.onClose);
   const { saveState, save } = useFormSave(state, ui, {
     onSaved: props.onSaved,
     onClose: props.onClose,
   });
-  const planCard = useVisitPlan(state, exits);
   const chat = useChatAside(state, { onOpenAppointment: props.onOpenAppointment }, exits);
   const footer = useFooterWords(state);
   const { row, draft } = state;
@@ -337,7 +281,6 @@ function AppointmentFormSession(props: SessionProps) {
             <FormBody
               state={state}
               ui={ui}
-              planCard={planCard}
               exits={exits}
               onCopy={state.readOnly ? undefined : copy}
             />
@@ -346,17 +289,7 @@ function AppointmentFormSession(props: SessionProps) {
           )}
         </TooltipProvider>
       </RecordDrawer>
-      {row ? (
-        <>
-          <StackedPatientForm
-            draft={draft}
-            row={row}
-            open={stackPatient}
-            onClose={closePatientForm}
-          />
-          <CancelVisitConfirm row={row} open={asking} onClose={closeCancel} />
-        </>
-      ) : null}
+      {row ? <CancelVisitConfirm row={row} open={asking} onClose={closeCancel} /> : null}
     </>
   );
 }
@@ -364,11 +297,12 @@ function AppointmentFormSession(props: SessionProps) {
 /**
  * The appointment form (KICKOFF §6.4; `appointments.md:57–101, 121–133`,
  * H:2741–2866, H:5983–6051) — New, Edit and Reschedule on the record drawer:
- * who the booking is for (search, card, connected leads), the Visit status
- * tiles in Edit, step 1 Appointment, step 2 Date & time with the real slot
- * grid, then for a lead step 3 "Not a patient yet" (the New patient form
- * stacked), for a patient the visit's photos and the offering suggestions,
- * and the chat column beside it all in Edit from `md`. The width follows
+ * who the booking is for (the contact search, their card, their open lead),
+ * the Visit status tiles in Edit, step 1 Appointment and step 2 Date & time
+ * with the server's free slots, and the person's chat column beside it all in
+ * Edit from `md`. A visit's photos and the plan's suggestions come back with
+ * the patient file on clinozy-be (api-integration §5.4, B1); "Not a patient
+ * yet" went — the check-in opens the patient file. The width follows
  * `appointmentFormWidths` — never wider than the window minus its 56px
  * gutter, so the floating × always shows. Every opening starts a fresh draft;
  * a closed form renders nothing and loads nothing.

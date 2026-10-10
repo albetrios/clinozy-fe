@@ -9,10 +9,7 @@ import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
 import type { AppointmentView } from '@/shared/api/clinic/appointments-contracts.ts';
-import {
-  readCreatedFilter,
-  readFollowUpFilter,
-} from '@/shared/api/clinic/clinic-list-filters.ts';
+import { readCreatedFilter } from '@/shared/api/clinic/clinic-list-filters.ts';
 import { APPOINTMENT_STATUS_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { APPOINTMENT_STATUS_TONES } from '@/shared/clinic/clinic-tones.ts';
@@ -100,8 +97,9 @@ export interface AppointmentFiltersProps {
  * The Appointments Filters (KICKOFF §6.4 Filters; H:1997–2025,
  * `appointments.md:103–117, 135–147`): the shared Filters button with its
  * count and joined ×, opening a 560px popover from `md` — the mini calendar
- * in a 250px column; then APPOINTED TO, STATUS (Active by default), CREATED
- * and FOLLOW-UP DATE — and "Apply filter" after a hairline. Below `md` the 82%
+ * in a 250px column; then APPOINTED TO (one doctor), STATUS (Active by
+ * default) and CREATED — no FOLLOW-UP DATE: the API has no follow-up filter on
+ * bookings (G3) — and "Apply filter" after a hairline. Below `md` the 82%
  * bottom sheet, in one column with the calendar on top (the prototype kept the
  * 250px column in a 375px sheet, §7.3). Choices stay pending until Apply;
  * "Clear all" and the × apply at once; Esc or a tap outside drops them (D33).
@@ -123,22 +121,16 @@ export function AppointmentFilters({ view, className }: AppointmentFiltersProps)
     if (next) setPending(applied);
     setOpen(next);
   };
-  const dateValues: RoomFilterValues = {
-    ...(pending.created ? { created: [pending.created] } : {}),
-    ...(pending.followUp ? { followUp: [pending.followUp] } : {}),
-  };
+  const dateValues: RoomFilterValues = pending.created
+    ? { created: [pending.created] }
+    : {};
   const setDateValues: Dispatch<SetStateAction<RoomFilterValues>> = (update) =>
     setPending((current) => {
-      const before: RoomFilterValues = {
-        ...(current.created ? { created: [current.created] } : {}),
-        ...(current.followUp ? { followUp: [current.followUp] } : {}),
-      };
+      const before: RoomFilterValues = current.created
+        ? { created: [current.created] }
+        : {};
       const next = typeof update === 'function' ? update(before) : update;
-      return {
-        ...current,
-        created: readCreatedFilter(next.created?.[0]),
-        followUp: readFollowUpFilter(next.followUp?.[0]),
-      };
+      return { ...current, created: readCreatedFilter(next.created?.[0]) };
     });
 
   const statusLabel = (value: (typeof STATUS_CHIPS)[number]) => {
@@ -220,12 +212,6 @@ export function AppointmentFilters({ view, className }: AppointmentFiltersProps)
             <RoomDateFilter
               fieldKey="created"
               kind="created"
-              values={dateValues}
-              onChange={setDateValues}
-            />
-            <RoomDateFilter
-              fieldKey="followUp"
-              kind="followUp"
               values={dateValues}
               onChange={setDateValues}
             />

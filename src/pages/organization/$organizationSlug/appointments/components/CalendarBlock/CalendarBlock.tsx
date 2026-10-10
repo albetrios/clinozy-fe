@@ -10,7 +10,6 @@ import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { APPOINTMENT_STATUS_TONES, TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import {
   PersonAvatar,
-  personFullName,
   personInitials,
   TonePill,
 } from '@/shared/components/Cells/index.ts';
@@ -115,7 +114,7 @@ export function CalendarBlock({
   const statusLabel = t(CLINIC_KEYS.appointments.statuses[appointment.status], {
     ns: CLINIC_NS,
   });
-  const doctorName = doctor ? personFullName(doctor) : '';
+  const doctorName = doctor?.name ?? '';
   // The tooltip's name, time, service and doctor are isolated tokens.
   const title = t(
     clash ? APPOINTMENTS_KEYS.calendar.blockClash : APPOINTMENTS_KEYS.calendar.block,

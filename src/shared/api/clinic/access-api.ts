@@ -1,3 +1,7 @@
+import {
+  CLINIC_MODULES,
+  FIXTURE_BACKED_CLINIC_MODULES,
+} from '@/core/config/clinic-modules.ts';
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import { CLINIC_SECTION_ORDER } from '@/shared/clinic/clinic-sections.ts';
 
@@ -645,6 +649,60 @@ export function resolveAccessFromCodes(codes: readonly string[]): ResolvedClinic
     can,
     // A room on the API asks for its exact codes (`canCode`), never an ability (§6 #11–#12).
     canAbility: () => false,
+    viewableSections: CLINIC_SECTION_ORDER.filter((section) => can(section, 'view')),
+  };
+}
+
+/**
+ * The sections whose room is on clinozy-be's API (out of `FIXTURE_BACKED_CLINIC_MODULES`): their
+ * access is the member's own codes.
+ */
+const LIVE_SECTIONS: ReadonlySet<Section> = new Set(
+  (Object.entries(CLINIC_MODULES) as [Section, string][])
+    .filter(
+      ([, module]) =>
+        !(FIXTURE_BACKED_CLINIC_MODULES as readonly string[]).includes(module),
+    )
+    .map(([section]) => section),
+);
+
+/**
+ * The clinic access in force for a member — what the screens offer and where the clinic home
+ * lands: a room on clinozy-be answers from their own codes ({@link resolveAccessFromCodes}), a
+ * room still on fixtures from the matrix over their clinic roles ({@link resolveClinicAccess}). A
+ * View-as preview narrows all of it to the previewed role's matrix.
+ *
+ * @remarks
+ * One rule for `useClinicAccess` and `clinicHomeRoute`, so the home never sends a member to a
+ * room the room itself would turn them away from. It switches per room as the room leaves
+ * `FIXTURE_BACKED_CLINIC_MODULES`.
+ */
+export function resolveMemberClinicAccess({
+  matrix,
+  roleKeys,
+  permissions,
+  previewing,
+}: {
+  matrix: ClinicAccessMatrix;
+  roleKeys: readonly ClinicRoleKey[];
+  permissions: readonly string[];
+  /** A View-as preview is running: the matrix alone. */
+  previewing: boolean;
+}): ResolvedClinicAccess {
+  const fromMatrix = resolveClinicAccess(
+    matrix,
+    roleKeys,
+    previewing ? {} : { platformCodes: permissions },
+  );
+  if (previewing) return fromMatrix;
+  const fromCodes = resolveAccessFromCodes(permissions);
+  const can = (section: Section, action: ClinicAction) =>
+    LIVE_SECTIONS.has(section)
+      ? fromCodes.can(section, action)
+      : fromMatrix.can(section, action);
+  return {
+    can,
+    canAbility: fromMatrix.canAbility,
     viewableSections: CLINIC_SECTION_ORDER.filter((section) => can(section, 'view')),
   };
 }

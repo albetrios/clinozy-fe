@@ -35,54 +35,57 @@ vi.mock('@/shared/notify/index.ts', () => ({
 }));
 
 /** The floor the mocked Today API serves and moves; `failing` fails its read. */
-const floor = vi.hoisted(() => ({
-  failing: false,
-  rows: [] as TodayFloorRow[],
-  enquiries: [] as TodayEnquiry[],
-}));
-vi.mock('@/shared/api/clinic/today-api.ts', async (importOriginal) => {
-  const actual = await importOriginal<typeof TodayApiModule>();
-  const move = (id: string, patch: Partial<TodayFloorRow>) => {
-    floor.rows = floor.rows.map((row) => (row.id === id ? { ...row, ...patch } : row));
-  };
-  return {
-    ...actual,
-    fetchTodayFloor: async () => {
-      if (floor.failing) throw new Error('connection dropped');
-      return structuredClone(floor.rows);
-    },
-    fetchTodayEnquiries: async () => structuredClone(floor.enquiries),
-    checkInAppointment: async ({ appointmentId }: { appointmentId: string }) => {
-      const at = new Date().toISOString();
-      move(appointmentId, {
-        status: 'checked_in',
-        visitStage: 'waiting',
-        checkedInAt: at,
-        visitStageChangedAt: at,
-      });
-    },
-    undoCheckIn: async ({ appointmentId }: { appointmentId: string }) => {
-      move(appointmentId, {
-        status: 'confirmed',
-        visitStage: null,
-        checkedInAt: null,
-        visitStageChangedAt: null,
-      });
-    },
-    moveFloorStage: async ({
-      appointmentId,
-      stage,
-    }: {
-      appointmentId: string;
-      stage: TodayFloorRow['visitStage'];
-    }) => {
-      move(appointmentId, {
-        visitStage: stage,
-        visitStageChangedAt: new Date().toISOString(),
-      });
+const floor = vi.hoisted(() => {
+  const state = {
+    failing: false,
+    rows: [] as TodayFloorRow[],
+    enquiries: [] as TodayEnquiry[],
+    /** Apply a move to one row of the floor. */
+    move: (id: string, patch: Partial<TodayFloorRow>) => {
+      state.rows = state.rows.map((row) => (row.id === id ? { ...row, ...patch } : row));
     },
   };
+  return state;
 });
+vi.mock('@/shared/api/clinic/today-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof TodayApiModule>()),
+  fetchTodayFloor: async () => {
+    if (floor.failing) throw new Error('connection dropped');
+    return structuredClone(floor.rows);
+  },
+  fetchTodayEnquiries: async () => structuredClone(floor.enquiries),
+  moveFloorStage: async ({
+    appointmentId,
+    stage,
+  }: {
+    appointmentId: string;
+    stage: TodayFloorRow['visitStage'];
+  }) => {
+    floor.move(appointmentId, {
+      visitStage: stage,
+      visitStageChangedAt: new Date().toISOString(),
+    });
+  },
+}));
+/** Today checks in, and undoes it, through the booking's own move routes. */
+vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  moveAppointment: async ({
+    appointmentId,
+    route,
+  }: {
+    appointmentId: string;
+    route: 'check-in' | 'undo-check-in';
+  }) => {
+    const at = route === 'check-in' ? new Date().toISOString() : null;
+    floor.move(appointmentId, {
+      status: route === 'check-in' ? 'checked_in' : 'confirmed',
+      visitStage: route === 'check-in' ? 'waiting' : null,
+      checkedInAt: at,
+      visitStageChangedAt: at,
+    });
+  },
+}));
 
 /** The shared booking form, as a stub that shows how it was opened. */
 vi.mock('@/shared/forms/AppointmentForm/index.ts', () => ({

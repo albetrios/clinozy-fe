@@ -46,7 +46,6 @@
     "dayBooked_other": "{{date}} · {{count}}건 예약됨",
     "appointedTo": "담당자",
     "allDoctors": "모든 의사",
-    "doctors_other": "의사 {{count}}명",
     "searchTeam": "팀 검색",
     "showAll": "모두 보기",
     "done": "완료",
@@ -85,10 +84,6 @@
       "hint": "{{confirmed}} · {{waiting}}"
     },
     "latest": {
-      "planReady": "✓ 플랜 준비됨",
-      "planPending": "○ 플랜 대기 중",
-      "reminderRead": "✓ 알림 읽음",
-      "reminderDelivered": "✓ 알림 전달됨",
       "reminderSent": "✓ 알림 발송됨",
       "repliedYes": "✓ ‘예’로 답장",
       "moved": "✓ 일정 변경됨",
@@ -96,10 +91,6 @@
       "checkedIn": "✓ 체크인"
     },
     "latestHints": {
-      "planReady": "서비스 제안 {{suggestions}}개",
-      "planPending": "예약을 열어 서비스 제안을 추가하세요",
-      "reminderRead": "WhatsApp에서 알림을 읽음",
-      "reminderDelivered": "알림이 전달됨",
       "reminderSent": "알림이 발송됨",
       "repliedYes": "WhatsApp의 ‘예’ 답장으로 자동 확정됨",
       "moved": "{{day}} {{time}}에서 변경됨",

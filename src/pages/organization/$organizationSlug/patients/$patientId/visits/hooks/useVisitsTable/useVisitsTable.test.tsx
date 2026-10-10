@@ -3,8 +3,8 @@ import { renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { fetchPatientAppointments } from '@/shared/api/clinic/appointments-api.ts';
-import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
+import { fetchFixturePatientAppointments } from '@/shared/api/clinic/appointments-fixture-api.ts';
+import type { AppointmentRow } from '@/shared/api/clinic/appointments-fixture-contracts.ts';
 import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import { useDevicePrefsStore } from '@/shared/store/useDevicePrefsStore/index.ts';
@@ -21,7 +21,7 @@ beforeEach(async () => {
   resetClinicFixtures();
   useDevicePrefsStore.setState({ hiddenColumns: {} });
   client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  rows = await fetchPatientAppointments(patientRef('Dharti Galani'));
+  rows = await fetchFixturePatientAppointments(patientRef('Dharti Galani'));
 });
 afterEach(() => {
   client.clear();

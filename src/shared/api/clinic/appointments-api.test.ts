@@ -1,911 +1,754 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { isHttpError } from '@/shared/errors/HttpError.ts';
+vi.mock('@/core/http/api.ts', () => ({
+  api: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
+}));
+vi.mock('./directory-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchTeamDirectory: vi.fn(),
+  fetchMemberNames: vi.fn(),
+}));
+import { api } from '@/core/http/api.ts';
+import { queryClient } from '@/core/http/queryClient.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import {
+  APPOINTMENT_NOW,
+  APPOINTMENT_TODAY,
+  APPOINTMENT_TOMORROW,
+  appointmentRow,
+  dayCount,
+  DOCTOR_ARJUN,
+  DOCTOR_NISHA,
+  slotDay,
+  TEST_BRANCH_ID,
+} from '@/tests/utils/appointment-doubles.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import {
-  APPOINTMENT_SIDE_EFFECT_KEYS,
+  appointmentListQuery,
   appointmentQueryKeys,
-  attachVisitPhoto,
   cancelAppointment,
+  copyAppointment,
   createAppointment,
-  deleteVisitPhoto,
-  fetchActivePackages,
   fetchAppointment,
-  fetchAppointmentDaySummaries,
-  fetchAppointmentPage,
+  fetchAppointmentDayCounts,
   fetchAppointmentRange,
-  fetchAvailableSlots,
-  fetchBookableStaff,
-  fetchBookingPerson,
-  fetchConnectedLeads,
-  fetchVisitPhotos,
-  normalizeAppointmentListParams,
-  restoreAppointment,
-  restoreVisitPhoto,
-  setAppointmentStatus,
-  undoAppointmentChange,
+  fetchAppointmentSlots,
+  fetchBookableTreatments,
+  listAppointments,
+  moveAppointment,
   updateAppointment,
 } from './appointments-api.ts';
-import type { AppointmentRecord } from './appointments-contracts.ts';
-import { clinicInstant } from './clinic-time.ts';
-import { ref } from './fixtures/refs.fixtures.ts';
-import { staffRef } from './fixtures/staff.fixtures.ts';
-import { clinicFixtures, resetClinicFixtures } from './fixtures/world.fixtures.ts';
-import type { LeadRecord } from './leads-fixture-contracts.ts';
-import { messageQueryKeys } from './messages-api.ts';
+import type {
+  AppointmentFilters,
+  AppointmentMoveRoute,
+} from './appointments-contracts.ts';
+import { fetchMemberNames, fetchTeamDirectory } from './directory-api.ts';
 
-const TODAY = '2026-10-03';
-const DR = staffRef('DR');
-const DD = staffRef('DD');
-const DN = staffRef('DN');
+const APPOINTMENT_ID = 'appt_riya00000000000000000';
+const CONTACT_ID = 'con_riya00000000000000000';
+const LEAD_ID = 'lead_riya00000000000000000';
+const PATIENT_ID = 'pat_riya000000000000000000';
+const OTHER_BRANCH_ID = 'brn_west0000000000000000';
+const FORMER_DOCTOR_ID = 'mem_dev00000000000000000';
 
-/** Set the clinic clock. */
-const clock = (date: string, time: string) =>
-  vi.setSystemTime(new Date(clinicInstant(date, time)));
+/** No filter but Active, every branch — the room's first read. */
+const ACTIVE: AppointmentFilters = { status: 'active', branchIds: [] };
 
-/** The rejection a call ends in, so its status and fields can be read. */
-async function failureOf(call: Promise<unknown>) {
-  const error = await call.then(
-    () => null,
-    (caught: unknown) => caught,
-  );
-  if (!isHttpError(error)) throw new Error('expected an HTTP error');
-  const body = (
-    error.data as { error: { code: string; detail: string; fields?: object } }
-  ).error;
-  return { status: error.status, ...body };
+/** A booking as clinozy-be answers it — the wire of `appointmentRow()`. */
+const wireRow = (patch: Record<string, unknown> = {}) => ({
+  id: APPOINTMENT_ID,
+  appointment_number: 2861,
+  contact_id: CONTACT_ID,
+  contact: {
+    contact_number: 1201,
+    first_name: 'Riya',
+    last_name: 'Mehta',
+    primary_phone: '+919825011241',
+  },
+  patient_id: null,
+  lead_id: LEAD_ID,
+  branch_id: TEST_BRANCH_ID,
+  type: 'consultation',
+  offering_id: null,
+  service_label: 'Consultation',
+  doctor_membership_id: DOCTOR_NISHA.id,
+  therapist_membership_id: null,
+  branch_room_id: null,
+  branch_machine_id: null,
+  appointment_date: APPOINTMENT_TOMORROW,
+  start_time: '10:30',
+  end_time: '10:50',
+  duration_minutes: 20,
+  status: 'scheduled',
+  cancel_reason: null,
+  cancel_note: null,
+  rescheduled_from: null,
+  reason: null,
+  notes: null,
+  follow_up_at: null,
+  checked_in_at: null,
+  completed_at: null,
+  copied_from_appointment_id: null,
+  reminder_status: 'not_sent',
+  is_confirmed_by_reply: false,
+  move_count: 0,
+  visit_stage: null,
+  is_walk_in: false,
+  created_at: '2026-10-01T08:00:00.000Z',
+  updated_at: '2026-10-01T08:00:00.000Z',
+  ...patch,
+});
+
+/** One list page as clinozy-be answers it. */
+const page = (
+  rows: unknown[],
+  pagination: { next?: string | null; has_more?: boolean; estimated_total?: number } = {},
+) => ({
+  data: rows,
+  meta: {
+    request_id: 'req',
+    pagination: { per_page: 50, next: null, has_more: false, ...pagination },
+  },
+});
+
+/** The query the last GET sent. */
+function lastQuery(): Record<string, unknown> {
+  const init = vi.mocked(api.get).mock.lastCall?.[1] as
+    { query?: Record<string, unknown> } | undefined;
+  return init?.query ?? {};
 }
 
-const visit = (seq: number): AppointmentRecord => {
-  const found = clinicFixtures.appointments.snapshot((row) => row.seq === seq)[0];
-  if (!found) throw new Error(`no appointment #${seq}`);
-  return found;
-};
-const patientId = (firstName: string) => {
-  const found = clinicFixtures.patients.snapshot((row) => row.firstName === firstName)[0];
-  if (!found) throw new Error(`no patient ${firstName}`);
-  return found.id;
-};
-const seqs = (rows: readonly { seq: number }[]) => rows.map((row) => row.seq);
-
 beforeEach(() => {
+  vi.resetAllMocks();
   vi.useFakeTimers({ toFake: ['Date'] });
-  clock(TODAY, '10:00');
-  resetClinicFixtures();
-  // Seed every collection now: the seeds date themselves from the clock at
-  // their first read, and some tests move the clock before reading.
-  for (const collection of Object.values(clinicFixtures)) collection.snapshot();
+  vi.setSystemTime(APPOINTMENT_NOW);
+  queryClient.clear();
+  signInTestMember();
+  vi.mocked(fetchTeamDirectory).mockResolvedValue([DOCTOR_NISHA, DOCTOR_ARJUN]);
+  vi.mocked(fetchMemberNames).mockResolvedValue(new Map());
 });
 afterEach(() => {
   vi.useRealTimers();
-  resetClinicFixtures();
+  queryClient.clear();
+  useOrganizationStore.getState().clearOrganization();
 });
 
-describe('the Agenda (listAppointments, S:1603)', () => {
-  it('lists Active bookings from today on, by day and time', async () => {
-    const page = await fetchAppointmentPage({});
-    expect(seqs(page.rows)).toEqual([
-      2864, 2865, 2866, 2867, 2868, 2847, 2869, 2848, 2858, 2857, 2855, 2850, 2849, 2853,
-      2861, 2854, 2856, 2859, 2852,
-    ]);
-    expect(page).toMatchObject({ next: null, hasMore: false });
-  });
-
-  it('reads the one day picked in Filters, past days included', async () => {
-    expect(seqs((await fetchAppointmentPage({ date: '2026-10-04' })).rows)).toEqual([
-      2858, 2857,
-    ]);
-    expect(
-      seqs((await fetchAppointmentPage({ date: '2026-10-02', status: 'all' })).rows),
-    ).toEqual([2841, 2843]);
-  });
-
-  it('filters by status, doctor and branch', async () => {
-    const confirmed = await fetchAppointmentPage({ status: 'confirmed' });
-    expect(seqs(confirmed.rows)).toEqual([2869, 2858, 2861, 2859]);
-    const all = await fetchAppointmentPage({ status: 'all', date: TODAY });
-    expect(seqs(all.rows)).toContain(2862);
-    const nisha = await fetchAppointmentPage({ doctorIds: [DN] });
-    expect(new Set(nisha.rows.map((row) => row.doctorId))).toEqual(new Set([DN]));
-    const elsewhere = await fetchAppointmentPage({ branchIds: [ref.branch(2)] });
-    expect(elsewhere.rows).toEqual([]);
-  });
-
-  it('searches name, mobile and #ID, spaces and "#" ignored (Q-A12)', async () => {
-    const search = async (q: string) => seqs((await fetchAppointmentPage({ q })).rows);
-    expect(await search('rhea')).toEqual([2867, 2861]);
-    expect(await search('#2861')).toEqual([2861]);
-    expect(await search('98250 11241')).toEqual([2867, 2861]);
-    expect(await search('meera j')).toEqual([2847]);
-    expect(await search('   ')).toHaveLength(19);
-  });
-
-  it('sorts inside each day — Contact, Service or Status, either way — the days stay in order', async () => {
-    const sorted = async (key: 'contact' | 'service' | 'status', order: 'asc' | 'desc') =>
-      (await fetchAppointmentPage({ sort: key, order })).rows;
-    const contacts = await sorted('contact', 'asc');
-    expect(contacts.slice(0, 8).map((row) => row.person.name)).toEqual([
-      'Dhruv Patel',
-      'Faizan Shaikh',
-      'Ishita Vora',
-      'Meera Joshi',
-      'Nikhil Rao',
-      'Priti Soni',
-      'Rhea Shah',
-      'Sana Kapoor',
-    ]);
-    expect(contacts.map((row) => row.date)).toEqual(
-      [...contacts.map((row) => row.date)].sort(),
-    );
-    const backwards = await sorted('contact', 'desc');
-    expect(backwards[0]?.person.name).toBe('Sana Kapoor');
-    const statuses = await sorted('status', 'asc');
-    expect(seqs(statuses.slice(0, 3))).toEqual([2848, 2869, 2864]);
-  });
-
-  it('filters by Created and Follow-up (S:1540–1541)', async () => {
-    expect(seqs((await fetchAppointmentPage({ followUp: 'overdue' })).rows)).toEqual([
-      2858, 2857,
-    ]);
-    expect(seqs((await fetchAppointmentPage({ followUp: 'tomorrow' })).rows)).toEqual([
-      2855,
-    ]);
-    const booked = await createAppointment({
-      patientId: patientId('Priti'),
-      doctorId: DR,
-      date: '2026-10-05',
-      startTime: '10:00',
+describe('appointmentListQuery (the Agenda)', () => {
+  it('reads the Active bookings from today on, fifty a page', () => {
+    expect(appointmentListQuery(ACTIVE, APPOINTMENT_TODAY)).toEqual({
+      status: 'scheduled,confirmed,checked_in',
+      limit: 50,
+      appointment_date_from: APPOINTMENT_TODAY,
     });
-    expect(seqs((await fetchAppointmentPage({ created: 'today' })).rows)).toEqual([
-      booked.seq,
+  });
+
+  it('reads every status for All, and one status by itself', () => {
+    expect(
+      appointmentListQuery({ ...ACTIVE, status: 'all' }, APPOINTMENT_TODAY).status,
+    ).toBeUndefined();
+    expect(
+      appointmentListQuery({ ...ACTIVE, status: 'no_show' }, APPOINTMENT_TODAY),
+    ).toMatchObject({ status: 'no_show' });
+  });
+
+  it('reads only the one day picked in Filters, past days included', () => {
+    expect(
+      appointmentListQuery({ ...ACTIVE, date: '2026-10-01' }, APPOINTMENT_TODAY),
+    ).toMatchObject({
+      appointment_date_from: '2026-10-01',
+      appointment_date_to: '2026-10-01',
+    });
+  });
+
+  it('sends the one doctor, the branches joined, the search trimmed and the Created range', () => {
+    expect(
+      appointmentListQuery(
+        {
+          status: 'confirmed',
+          doctorId: DOCTOR_ARJUN.id,
+          branchIds: [TEST_BRANCH_ID, OTHER_BRANCH_ID],
+          q: '  riya ',
+          created: 'today',
+        },
+        APPOINTMENT_TODAY,
+      ),
+    ).toEqual({
+      status: 'confirmed',
+      doctor_membership_id: DOCTOR_ARJUN.id,
+      branch_ids: `${TEST_BRANCH_ID},${OTHER_BRANCH_ID}`,
+      q: 'riya',
+      created_from: '2026-10-02T18:30:00.000Z',
+      created_to: '2026-10-03T18:30:00.000Z',
+      limit: 50,
+      appointment_date_from: APPOINTMENT_TODAY,
+    });
+  });
+
+  it('sends no search for blank typing, and reads from the clinic’s today by default', () => {
+    expect(appointmentListQuery({ ...ACTIVE, q: '   ' }).q).toBeUndefined();
+    expect(appointmentListQuery(ACTIVE)).toEqual(
+      appointmentListQuery(ACTIVE, APPOINTMENT_TODAY),
+    );
+  });
+});
+
+describe('listAppointments', () => {
+  it('reads one page after the cursor, each booking with its doctor from the team', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce(
+      page([wireRow()], {
+        next: 'cursor-2',
+        has_more: true,
+        estimated_total: 120,
+      }) as never,
+    );
+
+    const result = await listAppointments(ACTIVE, 'cursor-1');
+
+    expect(api.get).toHaveBeenCalledWith('/app/appointments', {
+      query: { ...appointmentListQuery(ACTIVE), after: 'cursor-1' },
+    });
+    expect(result).toEqual({ rows: [appointmentRow()], next: 'cursor-2', total: 120 });
+    expect(fetchMemberNames).not.toHaveBeenCalled();
+  });
+
+  it('ends at the last page, and has no total when the API counts none', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce({
+      data: [wireRow()],
+      meta: {
+        request_id: 'req',
+        pagination: { per_page: 50, next: 'x', has_more: false },
+      },
+    } as never);
+
+    expect(await listAppointments(ACTIVE)).toMatchObject({ next: null, total: null });
+  });
+
+  it('reads the team once and keeps it for the next page', async () => {
+    vi.mocked(api.get).mockResolvedValue(page([wireRow()]) as never);
+
+    await listAppointments(ACTIVE);
+    await listAppointments(ACTIVE, 'cursor-2');
+
+    expect(fetchTeamDirectory).toHaveBeenCalledTimes(1);
+  });
+
+  it('reads no team for an empty page', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce(page([]) as never);
+
+    expect((await listAppointments(ACTIVE)).rows).toEqual([]);
+    expect(fetchTeamDirectory).not.toHaveBeenCalled();
+  });
+
+  it('names a doctor who has left from the member names, and leaves an unknown one empty', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce(
+      page([
+        wireRow({ doctor_membership_id: FORMER_DOCTOR_ID }),
+        wireRow({ id: 'appt_gone00000000000000000', doctor_membership_id: 'mem_gone' }),
+      ]) as never,
+    );
+    vi.mocked(fetchMemberNames).mockResolvedValueOnce(
+      new Map([[FORMER_DOCTOR_ID, 'Dev Shah']]),
+    );
+
+    const { rows } = await listAppointments(ACTIVE);
+
+    expect(fetchMemberNames).toHaveBeenCalledWith([FORMER_DOCTOR_ID, 'mem_gone']);
+    expect(rows[0]?.doctor).toEqual({
+      id: FORMER_DOCTOR_ID,
+      userId: '',
+      name: 'Dev Shah',
+      initials: 'DS',
+      tone: expect.any(String),
+      roleIds: [],
+      branchIds: [],
+    });
+    expect(rows[1]?.doctor).toBeNull();
+  });
+
+  it('names whom a booking is for by the files the contact has', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce(
+      page([
+        wireRow({ patient_id: PATIENT_ID }),
+        wireRow(),
+        wireRow({ lead_id: null }),
+        wireRow({ lead_id: null, contact: null }),
+      ]) as never,
+    );
+
+    const { rows } = await listAppointments(ACTIVE);
+
+    expect(rows.map((row) => row.person.kind)).toEqual([
+      'patient',
+      'lead',
+      'contact',
+      'contact',
     ]);
-  });
-
-  it('pages 50 at a time, the cursor carrying the order', async () => {
-    const template = visit(2849);
-    for (let index = 0; index < 55; index += 1) {
-      await clinicFixtures.appointments.create({
-        ...template,
-        date: '2026-10-05',
-        startTime: `1${index % 10}:00`,
-      });
-    }
-    const first = await fetchAppointmentPage({});
-    expect(first.rows).toHaveLength(50);
-    expect(first.hasMore).toBe(true);
-    const second = await fetchAppointmentPage({}, first.next ?? undefined);
-    expect(first.rows.length + second.rows.length).toBe(19 + 55);
-    expect(second.hasMore).toBe(false);
-    const dates = [...first.rows, ...second.rows].map((row) => row.date);
-    expect(dates).toEqual([...dates].sort());
-  });
-
-  it('joins the person, the doctor and the plan', async () => {
-    const rows = (await fetchAppointmentPage({})).rows;
-    const dharti = rows.find((row) => row.seq === 2859);
-    expect(dharti?.person).toMatchObject({ kind: 'patient', name: 'Dharti Galani' });
-    expect(dharti?.plan.patient).toBeGreaterThan(0);
-    const faizan = rows.find((row) => row.seq === 2869);
-    expect(faizan?.person).toMatchObject({
+    expect(rows[0]?.person).toMatchObject({ patientId: PATIENT_ID, leadId: LEAD_ID });
+    // A contact who is gone keeps the booking, without a name, number or contact number.
+    expect(rows[3]?.person).toEqual({
       kind: 'contact',
-      name: 'Faizan Shaikh',
+      contactId: CONTACT_ID,
+      name: '',
+      phone: null,
       patientId: null,
-      seq: null,
-    });
-    expect(faizan?.doctor).toMatchObject({ id: DN, roles: ['doctor', 'admin'] });
-  });
-
-  it('counts each day for its header, however the pages split it (Appendix F)', async () => {
-    const days = await fetchAppointmentDaySummaries({});
-    expect(days[0]).toEqual({ date: TODAY, total: 8, confirmed: 1, scheduled: 1 });
-    expect(days[1]).toEqual({ date: '2026-10-04', total: 2, confirmed: 1, scheduled: 1 });
-    expect(days.map((day) => day.date)).toEqual([...days.map((day) => day.date)].sort());
-  });
-});
-
-describe('the calendars (listAppointmentsRange, S:1602)', () => {
-  it('reads every booking in the range by date and time, no paging', async () => {
-    const week = await fetchAppointmentRange({ from: TODAY, to: '2026-10-09' });
-    expect(seqs(week)).toEqual([
-      2864, 2865, 2866, 2867, 2868, 2847, 2869, 2848, 2858, 2857, 2855, 2850, 2849, 2853,
-      2861,
-    ]);
-    const all = await fetchAppointmentRange({
-      from: '2026-10-01',
-      to: TODAY,
-      status: 'all',
-    });
-    expect(seqs(all).slice(0, 3)).toEqual([2838, 2841, 2843]);
-  });
-
-  it('applies the doctor, Created and Follow-up filters there too (§7.3)', async () => {
-    const reenal = await fetchAppointmentRange({
-      from: TODAY,
-      to: '2026-10-31',
-      doctorIds: [DR],
-    });
-    expect(seqs(reenal)).toEqual([2847, 2848, 2861]);
-    const overdue = await fetchAppointmentRange({
-      from: TODAY,
-      to: '2026-10-31',
-      followUp: 'overdue',
-    });
-    expect(seqs(overdue)).toEqual([2858, 2857]);
-  });
-
-  it('refuses a range past six weeks or one that ends before it starts (422)', async () => {
-    const long = await failureOf(
-      fetchAppointmentRange({ from: TODAY, to: '2026-11-14' }),
-    );
-    expect(long).toMatchObject({ status: 422, code: 'validation' });
-    await expect(
-      fetchAppointmentRange({ from: TODAY, to: '2026-10-02' }),
-    ).rejects.toThrow();
-  });
-});
-
-describe('one booking (getAppointment, S:1604)', () => {
-  it('reads a booking, and answers 404 for an unknown, malformed or deleted id', async () => {
-    expect(await fetchAppointment(ref.appointment(2861))).toMatchObject({
-      seq: 2861,
-      repliedYes: true,
-      moveCount: 1,
-      person: { name: 'Rhea Shah' },
-    });
-    expect((await failureOf(fetchAppointment(ref.appointment(1)))).status).toBe(404);
-    expect((await failureOf(fetchAppointment('not-an-id'))).status).toBe(404);
-    await clinicFixtures.appointments.remove(ref.appointment(2861), 'mistake', null);
-    expect((await failureOf(fetchAppointment(ref.appointment(2861)))).status).toBe(404);
-  });
-});
-
-describe('who can be booked', () => {
-  it('lists the doctors, then the therapists, with their real roles', async () => {
-    const staff = await fetchBookableStaff();
-    expect(
-      staff.map((member) => `${member.firstName} ${member.lastName ?? ''}`.trim()),
-    ).toEqual([
-      'Dr. Drashti Moradiya',
-      'Dr. Karan Shah',
-      'Dr. Nisha Mavani',
-      'Dr. Reenal Chaniyara',
-      'Kiran P.',
-      'Ridhi Sohaliya',
-    ]);
-    expect(staff.at(-1)?.roles).toEqual(['therapist']);
-  });
-});
-
-describe('the slot grid (availableSlots, S:1605; Q-A3, Q-A4)', () => {
-  it('offers the doctor’s hours inside the branch’s, every step', async () => {
-    const slots = await fetchAvailableSlots({
-      date: '2026-10-05',
-      doctorId: DR,
-      durationMin: 30,
-    });
-    expect(slots[0]).toEqual({ time: '10:00', free: true });
-    expect(slots.at(-1)).toEqual({ time: '18:30', free: true });
-    expect(slots).toHaveLength(18);
-    const quarters = await fetchAvailableSlots({
-      date: '2026-10-05',
-      doctorId: DR,
-      durationMin: 30,
-      step: 15,
-    });
-    expect(quarters.slice(0, 3).map((slot) => slot.time)).toEqual([
-      '10:00',
-      '10:15',
-      '10:30',
-    ]);
-  });
-
-  it('marks a slot taken when the same doctor’s booking overlaps it', async () => {
-    const slots = await fetchAvailableSlots({
-      date: '2026-10-09',
-      doctorId: DR,
-      durationMin: 60,
-    });
-    const at = (time: string) => slots.find((slot) => slot.time === time)?.free;
-    expect(at('15:00')).toBe(true);
-    expect(at('15:30')).toBe(false);
-    expect(at('16:30')).toBe(false);
-    expect(at('17:00')).toBe(true);
-    const ownSlot = await fetchAvailableSlots({
-      date: '2026-10-09',
-      doctorId: DR,
-      durationMin: 60,
-      exceptId: ref.appointment(2861),
-    });
-    expect(ownSlot.find((slot) => slot.time === '16:00')?.free).toBe(true);
-  });
-
-  it('leaves out the passed starts, past days and days off', async () => {
-    const today = await fetchAvailableSlots({
-      date: TODAY,
-      doctorId: DR,
-      durationMin: 30,
-    });
-    expect(today[0]?.time).toBe('10:30');
-    expect(today.find((slot) => slot.time === '11:00')?.free).toBe(false);
-    expect(
-      await fetchAvailableSlots({ date: '2026-10-02', doctorId: DR, durationMin: 30 }),
-    ).toEqual([]);
-    // Saturday: Dr. Drashti works Monday to Friday; Sunday: the branch is closed.
-    expect(
-      await fetchAvailableSlots({ date: TODAY, doctorId: DD, durationMin: 30 }),
-    ).toEqual([]);
-    expect(
-      await fetchAvailableSlots({ date: '2026-10-04', doctorId: DR, durationMin: 30 }),
-    ).toEqual([]);
-  });
-
-  it('refuses a staff member who can’t be booked (422)', async () => {
-    const desk = await failureOf(
-      fetchAvailableSlots({
-        date: '2026-10-05',
-        doctorId: staffRef('RS'),
-        durationMin: 30,
-      }),
-    );
-    expect(desk).toMatchObject({ status: 422, fields: { doctorId: ['Pick a doctor'] } });
-  });
-});
-
-describe('booking (createAppointment, S:1609)', () => {
-  it('books a patient as Scheduled, the type’s length and Reason and Notes kept (Q-A9)', async () => {
-    const booked = await createAppointment({
-      patientId: patientId('Priti'),
-      doctorId: DR,
-      date: '2026-10-05',
-      startTime: '10:00',
-      type: 'follow_up',
-      serviceLabel: 'Follow-up',
-      reason: 'Pigmentation on cheeks',
-      notes: '  ',
-    });
-    expect(booked).toMatchObject({
-      seq: 2870,
-      status: 'scheduled',
-      durationMin: 15,
-      reason: 'Pigmentation on cheeks',
-      notes: null,
-      reminder: null,
-      repliedYes: false,
-      moveCount: 0,
-      person: { kind: 'patient', name: 'Priti Soni' },
-    });
-    expect(await fetchAppointment(booked.id)).toMatchObject({ seq: 2870 });
-  });
-
-  it('names the service after the offering, and links a copy to its source', async () => {
-    const offering = clinicFixtures.offerings.snapshot()[0];
-    if (!offering) throw new Error('no offering');
-    const booked = await createAppointment({
-      leadId: visit(2857).leadId,
-      doctorId: DR,
-      date: '2026-10-05',
-      startTime: '11:00',
-      type: 'treatment',
-      offeringId: offering.id,
-      copyOf: ref.appointment(2857),
-    });
-    expect(booked).toMatchObject({
-      serviceLabel: offering.name,
-      durationMin: 60,
-      copiedFromId: ref.appointment(2857),
-      person: { kind: 'contact', name: 'Ridhi Delvadiya' },
+      leadId: null,
+      contactNumber: null,
     });
   });
 
-  it('raises the rule job’s "Confirm visits" task with the booking (48 hours ahead)', async () => {
-    const booked = await createAppointment({
-      patientId: patientId('Priti'),
-      doctorId: DR,
-      date: '2026-10-05',
-      startTime: '10:00',
-    });
-    expect(
-      clinicFixtures.tasks.snapshot(
-        (task) => task.rule === 'confirm' && task.sourceId === booked.id,
-      ),
-    ).toHaveLength(1);
-  });
-
-  it('refuses no one to book, an unknown doctor and a past, closed or taken slot', async () => {
-    const base = { patientId: patientId('Priti'), doctorId: DR, date: '2026-10-05' };
-    expect(
-      await failureOf(
-        createAppointment({ doctorId: DR, date: '2026-10-05', startTime: '10:00' }),
-      ),
-    ).toMatchObject({ status: 422, detail: 'Pick who the appointment is for' });
-    expect(
-      await failureOf(
-        createAppointment({ ...base, doctorId: staffRef('RS'), startTime: '10:00' }),
-      ),
-    ).toMatchObject({ status: 422, detail: 'Pick a doctor' });
-    expect(
-      await failureOf(createAppointment({ ...base, date: TODAY, startTime: '09:00' })),
-    ).toMatchObject({ status: 422, detail: 'That time has passed · pick a future slot' });
-    expect(
-      await failureOf(createAppointment({ ...base, startTime: '19:50' })),
-    ).toMatchObject({ status: 422, detail: 'Pick a time inside clinic hours' });
-    expect(
-      await failureOf(
-        createAppointment({ ...base, date: '2026-10-04', startTime: '11:00' }),
-      ),
-    ).toMatchObject({ status: 422, detail: 'Pick a time inside clinic hours' });
-    expect(
-      await failureOf(
-        createAppointment({ ...base, date: '2026-10-09', startTime: '16:30' }),
-      ),
-    ).toMatchObject({
-      status: 409,
-      code: 'slot_taken',
-      detail: 'Just taken · pick another slot',
-    });
-    expect(
-      await failureOf(createAppointment({ ...base, startTime: '10:00', durationMin: 7 })),
-    ).toMatchObject({
-      status: 422,
-      fields: { durationMin: ['Pick a length in steps of 5 minutes'] },
-    });
-  });
-});
-
-describe('editing (updateAppointment, S:1610)', () => {
-  it('saves fields on the same slot — not a move', async () => {
-    const { appointment, moved } = await updateAppointment(ref.appointment(2861), {
-      notes: 'Prefers the evening',
-    });
-    expect(moved).toBe(false);
-    expect(appointment).toMatchObject({
-      status: 'confirmed',
-      notes: 'Prefers the evening',
-    });
-  });
-
-  it('moves a Confirmed booking back to Scheduled, from the old slot, one move more', async () => {
-    const { appointment, moved } = await updateAppointment(ref.appointment(2861), {
-      date: '2026-10-12',
-      startTime: '11:00',
-    });
-    expect(moved).toBe(true);
-    expect(appointment).toMatchObject({
-      status: 'scheduled',
-      date: '2026-10-12',
-      startTime: '11:00',
-      rescheduledFrom: clinicInstant('2026-10-09', '16:00'),
-      moveCount: 2,
-      repliedYes: false,
-      reminder: null,
-    });
-  });
-
-  it('locks the slot once checked in, and refuses a move onto a taken slot', async () => {
-    expect(
-      await failureOf(updateAppointment(ref.appointment(2847), { startTime: '12:00' })),
-    ).toMatchObject({
-      status: 409,
-      detail: 'Date & time are locked once the patient is checked in',
-    });
-    expect(
-      await failureOf(
-        updateAppointment(ref.appointment(2848), {
-          date: '2026-10-09',
-          startTime: '16:00',
+  it('reads the server’s reminder, reply, moves and floor stage', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce(
+      page([
+        wireRow({
+          status: 'checked_in',
+          reminder_status: 'reminder_sent',
+          is_confirmed_by_reply: true,
+          move_count: 2,
+          visit_stage: 'with_doctor',
+          rescheduled_from: '2026-10-02T05:00:00.000Z',
+          copied_from_appointment_id: 'appt_first0000000000000000',
         }),
-      ),
-    ).toMatchObject({ status: 409, code: 'slot_taken' });
-  });
+      ]) as never,
+    );
 
-  it('takes the form’s status — a patient’s visit completes on its day, both stamps at once', async () => {
-    const { appointment } = await updateAppointment(ref.appointment(2848), {
-      status: 'completed',
-    });
-    expect(appointment.status).toBe('completed');
-    expect(appointment.checkedInAt).toBe(new Date().toISOString());
-    expect(appointment.completedAt).toBe(new Date().toISOString());
-  });
+    const [row] = (await listAppointments(ACTIVE)).rows;
 
-  it('refuses a status the tiles would not offer (409 with the guard’s words)', async () => {
-    expect(
-      await failureOf(updateAppointment(ref.appointment(2869), { status: 'completed' })),
-    ).toMatchObject({
-      status: 409,
-      detail: 'Create the patient record first · Completed needs a patient',
-    });
-    expect(
-      await failureOf(updateAppointment(ref.appointment(2858), { status: 'checked_in' })),
-    ).toMatchObject({ status: 409, detail: 'Only on Tomorrow' });
-    expect(
-      await failureOf(updateAppointment(ref.appointment(2863), { status: 'checked_in' })),
-    ).toMatchObject({
-      status: 409,
-      detail: 'Final status. Use Rebook to make a new appointment.',
-    });
-  });
-
-  it('takes no edit on a cancelled or no-show booking, and 404s an unknown one', async () => {
-    await cancelAppointment({
-      id: ref.appointment(2857),
-      reason: 'unreachable',
-      note: null,
-    });
-    expect(
-      (await failureOf(updateAppointment(ref.appointment(2857), { notes: 'x' }))).status,
-    ).toBe(409);
-    expect(
-      (await failureOf(updateAppointment(ref.appointment(2862), { notes: 'x' }))).status,
-    ).toBe(409);
-    expect(
-      (await failureOf(updateAppointment(ref.appointment(1), { notes: 'x' }))).status,
-    ).toBe(404);
-  });
-});
-
-describe('status moves (setAppointmentStatus, S:1582) and their Undo', () => {
-  it('confirms, and Undo puts it back', async () => {
-    const { appointment, undoToken } = await setAppointmentStatus({
-      id: ref.appointment(2848),
-      status: 'confirmed',
-    });
-    expect(appointment.status).toBe('confirmed');
-    await undoAppointmentChange(undoToken);
-    expect(visit(2848).status).toBe('scheduled');
-    expect((await failureOf(undoAppointmentChange(undoToken))).status).toBe(409);
-  });
-
-  it('refuses the guarded moves with the popover’s words (409)', async () => {
-    expect(
-      await failureOf(
-        setAppointmentStatus({ id: ref.appointment(2848), status: 'no_show' }),
-      ),
-    ).toMatchObject({ status: 409, detail: 'Available after 11:30 am on Today' });
-    expect(
-      await failureOf(
-        setAppointmentStatus({ id: ref.appointment(2857), status: 'checked_in' }),
-      ),
-    ).toMatchObject({ status: 409, detail: 'Only on Tomorrow' });
-    expect(
-      await failureOf(
-        setAppointmentStatus({ id: ref.appointment(2848), status: 'completed' }),
-      ),
-    ).toMatchObject({ status: 409, detail: 'Scheduled can’t move to Completed' });
-    expect(
-      await failureOf(
-        setAppointmentStatus({ id: ref.appointment(2863), status: 'confirmed' }),
-      ),
-    ).toMatchObject({
-      status: 409,
-      detail: 'Final status. Use Rebook to make a new appointment.',
-    });
-  });
-
-  it('marks a no-show after the start; the Rebook task follows, and Undo takes both back', async () => {
-    clock(TODAY, '11:45');
-    const { undoToken } = await setAppointmentStatus({
-      id: ref.appointment(2848),
-      status: 'no_show',
-    });
-    const rebook = () =>
-      clinicFixtures.tasks.snapshot(
-        (task) => task.rule === 'rebook' && task.sourceId === ref.appointment(2848),
-      );
-    expect(rebook().map((task) => task.title)).toEqual(['Rebook Priti']);
-    await undoAppointmentChange(undoToken);
-    expect(visit(2848).status).toBe('scheduled');
-    expect(rebook()).toEqual([]);
-  });
-
-  it('checks in: the stamp, and the person’s open leads → Clinic visited with a line; Undo reverts all', async () => {
-    clock('2026-10-09', '15:50');
-    const lead = () => clinicFixtures.leads.snapshot((row) => row.seq === 2365)[0];
-    const lines = () =>
-      clinicFixtures.leadMessages.snapshot(
-        (message) => message.leadId === lead()?.id && message.isSystem,
-      );
-    const before = lines().length;
-    const { appointment, undoToken } = await setAppointmentStatus({
-      id: ref.appointment(2861),
+    expect(row).toMatchObject({
       status: 'checked_in',
+      reminder: 'reminder_sent',
+      repliedYes: true,
+      moveCount: 2,
+      visitStage: 'with_doctor',
+      rescheduledFrom: '2026-10-02T05:00:00.000Z',
+      copiedFromId: 'appt_first0000000000000000',
     });
-    expect(appointment.checkedInAt).toBe(new Date().toISOString());
-    expect(lead()?.status).toBe('clinic_visited');
-    expect(lines().at(-1)?.body).toBe(
-      'Status → Clinic visited · checked in for appointment #2861',
-    );
-    // A closed lead of the same person stays as it was.
-    expect(clinicFixtures.leads.snapshot((row) => row.seq === 2210)[0]?.status).toBe(
-      'clinic_visited',
-    );
-    await undoAppointmentChange(undoToken);
-    expect(visit(2861)).toMatchObject({ status: 'confirmed', checkedInAt: null });
-    expect(lead()?.status).toBe('new');
-    expect(lines()).toHaveLength(before);
-  });
-
-  it('completes a checked-in patient’s visit', async () => {
-    const { appointment } = await setAppointmentStatus({
-      id: ref.appointment(2847),
-      status: 'completed',
-    });
-    expect(appointment.completedAt).toBe(new Date().toISOString());
-    expect(appointment.checkedInAt).toBe(visit(2847).checkedInAt);
   });
 });
 
-describe('cancel and restore (S:1611–1612)', () => {
-  it('cancels with the contract’s reason, and Undo brings back the status it had', async () => {
-    const { appointment, undoToken } = await cancelAppointment({
-      id: ref.appointment(2858),
-      reason: 'patient_asked',
-      note: null,
-    });
-    expect(appointment).toMatchObject({
-      status: 'cancelled',
-      cancelReason: 'patient_asked',
-      cancelNote: null,
-    });
-    await undoAppointmentChange(undoToken);
-    expect(visit(2858)).toMatchObject({ status: 'confirmed', cancelReason: null });
-  });
-
-  it('needs a note for "Other" (422) and keeps it', async () => {
-    expect(
-      await failureOf(
-        cancelAppointment({ id: ref.appointment(2858), reason: 'other', note: null }),
-      ),
-    ).toMatchObject({ status: 422, fields: { note: ['Add a short note for "Other"'] } });
-    const { appointment } = await cancelAppointment({
-      id: ref.appointment(2858),
-      reason: 'other',
-      note: 'Booked by mistake',
-    });
-    expect(appointment).toMatchObject({
-      cancelReason: 'other',
-      cancelNote: 'Booked by mistake',
-    });
-  });
-
-  it('cancels nothing final', async () => {
-    expect(
-      (
-        await failureOf(
-          cancelAppointment({
-            id: ref.appointment(2863),
-            reason: 'patient_asked',
-            note: null,
+describe('fetchAppointmentRange (the calendars)', () => {
+  it('reads every page of the range, a hundred at a time, with the filters', async () => {
+    vi.mocked(api.get)
+      .mockResolvedValueOnce(
+        page([wireRow()], { next: 'cursor-2', has_more: true }) as never,
+      )
+      .mockResolvedValueOnce(
+        page([
+          wireRow({
+            id: 'appt_arjun0000000000000000',
+            doctor_membership_id: DOCTOR_ARJUN.id,
           }),
-        )
-      ).status,
-    ).toBe(409);
-  });
+        ]) as never,
+      );
 
-  it('restores to Scheduled while the time is ahead, the reminder going out again', async () => {
-    await cancelAppointment({
-      id: ref.appointment(2858),
-      reason: 'unreachable',
-      note: null,
+    const rows = await fetchAppointmentRange({
+      ...ACTIVE,
+      doctorId: DOCTOR_ARJUN.id,
+      from: APPOINTMENT_TODAY,
+      to: '2026-10-09',
     });
-    const restored = await restoreAppointment(ref.appointment(2858));
-    expect(restored).toMatchObject({
-      status: 'scheduled',
-      cancelReason: null,
-      cancelNote: null,
-      reminder: null,
-    });
-  });
 
-  it('refuses a restore once the time passed, onto a taken slot, or of a live booking', async () => {
-    await cancelAppointment({
-      id: ref.appointment(2848),
-      reason: 'unreachable',
-      note: null,
+    expect(api.get).toHaveBeenNthCalledWith(1, '/app/appointments', {
+      query: {
+        status: 'scheduled,confirmed,checked_in',
+        doctor_membership_id: DOCTOR_ARJUN.id,
+        limit: 100,
+        appointment_date_from: APPOINTMENT_TODAY,
+        appointment_date_to: '2026-10-09',
+      },
     });
-    clock(TODAY, '11:45');
-    expect(await failureOf(restoreAppointment(ref.appointment(2848)))).toMatchObject({
-      status: 409,
-      detail: 'This time has passed · book a new appointment',
-    });
-    await cancelAppointment({
-      id: ref.appointment(2861),
-      reason: 'unreachable',
-      note: null,
-    });
-    await createAppointment({
-      patientId: patientId('Priti'),
-      doctorId: DR,
-      date: '2026-10-09',
-      startTime: '16:00',
-    });
-    expect(await failureOf(restoreAppointment(ref.appointment(2861)))).toMatchObject({
-      status: 409,
-      detail: 'Just taken · pick another slot',
-    });
-    expect(await failureOf(restoreAppointment(ref.appointment(2859)))).toMatchObject({
-      status: 409,
-      detail: 'Only a cancelled appointment can be restored',
-    });
+    expect(lastQuery()).toMatchObject({ after: 'cursor-2' });
+    expect(rows.map((row) => row.doctor?.name)).toEqual(['Nisha Shah', 'Arjun Rao']);
+    expect(fetchTeamDirectory).toHaveBeenCalledTimes(1);
   });
 });
 
-describe('the appointment form’s reads (S:27, S:1604)', () => {
-  const lead = (where: (row: LeadRecord) => boolean) => {
-    const found = clinicFixtures.leads.snapshot(where)[0];
-    if (!found) throw new Error('no such lead');
-    return found;
+describe('fetchAppointmentDayCounts (the Agenda’s day headers)', () => {
+  /** A day's counts as clinozy-be answers them — every status, zeros included. */
+  const countsWire = (date: string, counts: Record<string, number> = {}) => {
+    const byStatus = {
+      scheduled: 0,
+      confirmed: 0,
+      checked_in: 0,
+      completed: 0,
+      cancelled: 0,
+      no_show: 0,
+      ...counts,
+    };
+    return {
+      appointment_date: date,
+      total: Object.values(byStatus).reduce((sum, count) => sum + count, 0),
+      by_status: byStatus,
+    };
   };
 
-  it('reads the person a prefill names — a patient with their usual doctor and care types', async () => {
-    const dharti = clinicFixtures.patients.snapshot(
-      (row) => row.firstName === 'Dharti',
-    )[0];
-    if (!dharti) throw new Error('no Dharti');
-    expect(await fetchBookingPerson(dharti.id)).toMatchObject({
-      kind: 'patient',
-      name: 'Dharti Galani',
-      patientId: dharti.id,
-      usualDoctorId: dharti.doctorId,
-      types: dharti.types,
-    });
-  });
+  it('reads each day’s counts for the doctor and the branches, every status', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce({
+      data: [
+        countsWire(APPOINTMENT_TODAY, { scheduled: 1, confirmed: 2 }),
+        countsWire(APPOINTMENT_TOMORROW),
+      ],
+    } as never);
 
-  it('reads a lead as a lead, and a converted lead as its patient', async () => {
-    const open = lead((row) => !row.isContactThread && row.patientId === null);
-    expect(await fetchBookingPerson(open.id)).toMatchObject({
-      kind: 'lead',
-      leadId: open.id,
-      seq: open.seq,
-      patientId: null,
-      usualDoctorId: null,
-      types: [],
+    const counts = await fetchAppointmentDayCounts({
+      from: APPOINTMENT_TODAY,
+      to: APPOINTMENT_TOMORROW,
+      doctorId: DOCTOR_NISHA.id,
+      branchIds: [TEST_BRANCH_ID, OTHER_BRANCH_ID],
     });
-    const converted = lead((row) => !row.isContactThread && row.patientId !== null);
-    expect(await fetchBookingPerson(converted.id)).toMatchObject({
-      kind: 'patient',
-      patientId: converted.patientId,
-      leadId: converted.id,
+
+    expect(api.get).toHaveBeenCalledWith('/app/appointments/daily-counts', {
+      query: {
+        date_from: APPOINTMENT_TODAY,
+        date_to: APPOINTMENT_TOMORROW,
+        doctor_membership_id: DOCTOR_NISHA.id,
+        branch_ids: `${TEST_BRANCH_ID},${OTHER_BRANCH_ID}`,
+      },
     });
-    expect(await failureOf(fetchBookingPerson(ref.lead(1)))).toMatchObject({
-      status: 404,
-    });
-  });
-
-  it('lists a person’s connected leads — theirs and their mobile’s, never a contact thread — newest first', async () => {
-    const converted = lead((row) => !row.isContactThread && row.patientId !== null);
-    const leads = await fetchConnectedLeads({
-      patientId: converted.patientId,
-      leadId: null,
-      phone: converted.phone,
-    });
-    const expected = clinicFixtures.leads
-      .snapshot(
-        (row) =>
-          !row.isContactThread &&
-          (row.patientId === converted.patientId || row.phone === converted.phone),
-      )
-      .map((row) => row.id);
-    expect(leads.map((row) => row.id)).toContain(converted.id);
-    expect(leads.map((row) => row.id).sort()).toEqual([...expected].sort());
-    const created = leads.map((row) => row.createdAt);
-    expect(created).toEqual([...created].sort().reverse());
-    expect(
-      await fetchConnectedLeads({
-        patientId: null,
-        leadId: null,
-        phone: '+910000000000',
-      }),
-    ).toEqual([]);
-  });
-
-  it('lists a patient’s packages with a session left, the soonest to expire first', async () => {
-    const packages = await fetchActivePackages(patientId('Dharti'));
-    expect(packages.length).toBeGreaterThan(0);
-    for (const option of packages) {
-      expect(option.sessionsUsed).toBeLessThan(option.sessionsTotal);
-      expect(option.validUntil >= TODAY).toBe(true);
-    }
-    const until = packages.map((option) => option.validUntil);
-    expect(until).toEqual([...until].sort());
-    expect(await fetchActivePackages(patientId('Priti'))).toEqual([]);
-  });
-});
-
-describe('a new contact on a booking (S:1609)', () => {
-  it('books them as their contact thread, in the same change', async () => {
-    const booked = await createAppointment({
-      doctorId: DR,
-      date: '2026-10-05',
-      startTime: '12:00',
-      newContact: { name: 'Kavya Mehta', phone: '+919811122233' },
-    });
-    expect(booked.person).toMatchObject({ kind: 'contact', name: 'Kavya Mehta' });
-    expect(booked.leadId).not.toBeNull();
-    const thread = clinicFixtures.leads.snapshot((row) => row.id === booked.leadId)[0];
-    expect(thread).toMatchObject({ isContactThread: true, phone: '+919811122233' });
-  });
-
-  it('refuses a new contact without a name or a ten-digit mobile (422)', async () => {
-    const base = { doctorId: DR, date: '2026-10-05', startTime: '12:00' };
-    expect(
-      await failureOf(
-        createAppointment({ ...base, newContact: { name: ' ', phone: '+919811122233' } }),
-      ),
-    ).toMatchObject({ status: 422, fields: { name: ['Add a name'] } });
-    expect(
-      await failureOf(
-        createAppointment({ ...base, newContact: { name: 'Kavya', phone: '98111' } }),
-      ),
-    ).toMatchObject({ status: 422, fields: { phone: ['Mobile needs 10 digits'] } });
-  });
-});
-
-describe('visit photos (S:1613)', () => {
-  it('lists a visit’s photos, newest first', async () => {
-    const photos = await fetchVisitPhotos(ref.appointment(2790));
-    expect(photos).toHaveLength(3);
-    const created = photos.map((photo) => photo.createdAt);
-    expect(created).toEqual([...created].sort().reverse());
-    expect(await fetchVisitPhotos(ref.appointment(2861))).toEqual([]);
-  });
-
-  it('files a photo only once the patient is in — then deletes it and brings it back', async () => {
-    expect(
-      await failureOf(
-        attachVisitPhoto({
-          appointmentId: ref.appointment(2859),
-          album: 'general',
-          key: 'uploads/before.jpg',
-          fileName: 'before.jpg',
-        }),
-      ),
-    ).toMatchObject({ status: 409, code: 'not_checked_in' });
-    const photo = await attachVisitPhoto({
-      appointmentId: ref.appointment(2790),
-      album: 'lhr',
-      key: 'uploads/after.jpg',
-      fileName: 'after.jpg',
-    });
-    expect(photo).toMatchObject({
-      appointmentId: ref.appointment(2790),
-      patientId: patientId('Dharti'),
-      album: 'lhr',
-      takenOn: visit(2790).date,
-    });
-    expect((await fetchVisitPhotos(ref.appointment(2790)))[0]?.id).toBe(photo.id);
-    await deleteVisitPhoto(photo.id, 'duplicate', null);
-    expect(await fetchVisitPhotos(ref.appointment(2790))).toHaveLength(3);
-    await restoreVisitPhoto(photo.id);
-    expect(await fetchVisitPhotos(ref.appointment(2790))).toHaveLength(4);
-  });
-});
-
-describe('query keys', () => {
-  it('keep every read under the prefix task writes invalidate, equal filters alike', () => {
-    expect(appointmentQueryKeys.all).toEqual(['clinic', 'appointments']);
-    expect(appointmentQueryKeys.list({ doctorIds: [DR, DN, DR] })).toEqual(
-      appointmentQueryKeys.list({ doctorIds: [DN, DR], q: '  ' }),
-    );
-    expect(appointmentQueryKeys.detail('x').slice(0, 2)).toEqual([
-      'clinic',
-      'appointments',
+    expect(counts).toEqual([
+      dayCount(APPOINTMENT_TODAY, { scheduled: 1, confirmed: 2 }),
+      dayCount(APPOINTMENT_TOMORROW),
     ]);
-    expect(normalizeAppointmentListParams()).toMatchObject({
-      status: 'active',
-      doctorIds: [],
+  });
+
+  it('counts a status the day leaves out as none', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce({
+      data: [
+        { appointment_date: APPOINTMENT_TODAY, total: 2, by_status: { confirmed: 2 } },
+      ],
+    } as never);
+
+    const [today] = await fetchAppointmentDayCounts({
+      from: APPOINTMENT_TODAY,
+      to: APPOINTMENT_TODAY,
+      branchIds: [],
+    });
+
+    expect(today).toEqual(dayCount(APPOINTMENT_TODAY, { confirmed: 2 }));
+  });
+
+  it('sends no doctor and no branch for everyone everywhere', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce({ data: [] } as never);
+
+    await fetchAppointmentDayCounts({
+      from: APPOINTMENT_TODAY,
+      to: APPOINTMENT_TODAY,
+      branchIds: [],
+    });
+
+    expect(lastQuery()).toEqual({
+      date_from: APPOINTMENT_TODAY,
+      date_to: APPOINTMENT_TODAY,
+    });
+  });
+});
+
+describe('fetchAppointment', () => {
+  it('reads one booking by its id, with its doctor', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce({ data: wireRow() } as never);
+
+    expect(await fetchAppointment(APPOINTMENT_ID)).toEqual(appointmentRow());
+    expect(api.get).toHaveBeenCalledWith('/app/appointments/{appointment_id}', {
+      params: { appointment_id: APPOINTMENT_ID },
+    });
+  });
+});
+
+describe('fetchAppointmentSlots (the slot grid)', () => {
+  const params = {
+    date: APPOINTMENT_TOMORROW,
+    branchId: TEST_BRANCH_ID,
+    doctorId: DOCTOR_NISHA.id,
+    durationMin: 20,
+    step: 30,
+  } as const;
+
+  it('asks for the day’s free starts for the doctor, branch, length and step', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce({
+      data: {
+        appointment_date: APPOINTMENT_TOMORROW,
+        is_open: true,
+        closed_reason: null,
+        closed_label: null,
+        slots: [
+          { start_time: '10:00', end_time: '10:20' },
+          { start_time: '11:30', end_time: '11:50' },
+        ],
+      },
+    } as never);
+
+    const day = await fetchAppointmentSlots(params);
+
+    expect(api.get).toHaveBeenCalledWith('/app/appointments/slots', {
+      query: {
+        appointment_date: APPOINTMENT_TOMORROW,
+        branch_id: TEST_BRANCH_ID,
+        doctor_membership_id: DOCTOR_NISHA.id,
+        duration_minutes: 20,
+        step_minutes: 30,
+      },
+    });
+    expect(day).toEqual(slotDay(APPOINTMENT_TOMORROW, ['10:00', '11:30']));
+  });
+
+  it('reads a closed day by its reason and a holiday’s name', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce({
+      data: {
+        appointment_date: APPOINTMENT_TOMORROW,
+        is_open: false,
+        closed_reason: 'holiday',
+        closed_label: 'Diwali',
+        slots: [],
+      },
+    } as never);
+
+    expect(await fetchAppointmentSlots(params)).toEqual(
+      slotDay(APPOINTMENT_TOMORROW, [], {
+        closedReason: 'holiday',
+        closedLabel: 'Diwali',
+      }),
+    );
+  });
+});
+
+describe('fetchBookableTreatments (the form’s "From offerings")', () => {
+  it('reads every page of the active treatments by name, with their length', async () => {
+    const treatment = (id: string, name: string, minutes: number) => ({
+      id,
+      name,
+      duration_minutes: minutes,
+      specialty: 'skin',
+      tone: 'mint',
+    });
+    vi.mocked(api.get)
+      .mockResolvedValueOnce(
+        page([treatment('off_hydra000000000000000', 'Hydrafacial', 60)], {
+          next: 'cursor-2',
+          has_more: true,
+        }) as never,
+      )
+      .mockResolvedValueOnce(
+        page([treatment('off_peel0000000000000000', 'Peel', 45)]) as never,
+      );
+
+    const treatments = await fetchBookableTreatments();
+
+    expect(api.get).toHaveBeenNthCalledWith(1, '/app/offerings', {
+      query: { category: 'treatment', is_active: 'true', sort: 'name', limit: 100 },
+    });
+    expect(lastQuery()).toMatchObject({ after: 'cursor-2' });
+    expect(treatments).toEqual([
+      {
+        id: 'off_hydra000000000000000',
+        name: 'Hydrafacial',
+        durationMin: 60,
+        specialty: 'skin',
+        tone: 'mint',
+      },
+      {
+        id: 'off_peel0000000000000000',
+        name: 'Peel',
+        durationMin: 45,
+        specialty: 'skin',
+        tone: 'mint',
+      },
+    ]);
+  });
+});
+
+describe('the writes', () => {
+  it('books the contact with the fields the API’s way and the action’s key', async () => {
+    vi.mocked(api.post).mockResolvedValueOnce({ data: wireRow() } as never);
+
+    const row = await createAppointment({
+      input: {
+        contactId: CONTACT_ID,
+        branchId: TEST_BRANCH_ID,
+        doctorId: DOCTOR_NISHA.id,
+        type: 'treatment',
+        offeringId: 'off_hydra000000000000000',
+        serviceLabel: 'Hydrafacial',
+        durationMin: 60,
+        date: APPOINTMENT_TOMORROW,
+        startTime: '10:30',
+        reason: 'Dull skin',
+        notes: null,
+      },
+      idempotencyKey: 'key-book',
+    });
+
+    expect(api.post).toHaveBeenCalledWith('/app/appointments', {
+      body: {
+        contact_id: CONTACT_ID,
+        branch_id: TEST_BRANCH_ID,
+        doctor_membership_id: DOCTOR_NISHA.id,
+        type: 'treatment',
+        offering_id: 'off_hydra000000000000000',
+        service_label: 'Hydrafacial',
+        duration_minutes: 60,
+        appointment_date: APPOINTMENT_TOMORROW,
+        start_time: '10:30',
+        reason: 'Dull skin',
+        notes: null,
+      },
+      idempotencyKey: 'key-book',
+    });
+    expect(row).toEqual(appointmentRow());
+  });
+
+  it('copies a booking onto a new day and start', async () => {
+    vi.mocked(api.post).mockResolvedValueOnce({
+      data: wireRow({ copied_from_appointment_id: 'appt_first0000000000000000' }),
+    } as never);
+
+    const row = await copyAppointment({
+      appointmentId: 'appt_first0000000000000000',
+      date: APPOINTMENT_TOMORROW,
+      startTime: '10:30',
+      idempotencyKey: 'key-copy',
+    });
+
+    expect(api.post).toHaveBeenCalledWith('/app/appointments/{appointment_id}/copy', {
+      params: { appointment_id: 'appt_first0000000000000000' },
+      body: { appointment_date: APPOINTMENT_TOMORROW, start_time: '10:30' },
+      idempotencyKey: 'key-copy',
+    });
+    expect(row.copiedFromId).toBe('appt_first0000000000000000');
+  });
+
+  it('changes only the fields given, with the read’s updated_at and the key', async () => {
+    vi.mocked(api.patch).mockResolvedValueOnce({
+      data: wireRow({ doctor_membership_id: DOCTOR_ARJUN.id, move_count: 1 }),
+    } as never);
+
+    const row = await updateAppointment({
+      appointmentId: APPOINTMENT_ID,
+      fields: {
+        doctorId: DOCTOR_ARJUN.id,
+        date: '2026-10-05',
+        startTime: '11:00',
+        reason: null,
+      },
+      expectedUpdatedAt: '2026-10-01T08:00:00.000Z',
+      idempotencyKey: 'key-edit',
+    });
+
+    expect(api.patch).toHaveBeenCalledWith('/app/appointments/{appointment_id}', {
+      params: { appointment_id: APPOINTMENT_ID },
+      body: {
+        doctor_membership_id: DOCTOR_ARJUN.id,
+        appointment_date: '2026-10-05',
+        start_time: '11:00',
+        reason: null,
+        expected_updated_at: '2026-10-01T08:00:00.000Z',
+      },
+      idempotencyKey: 'key-edit',
+    });
+    expect(row.doctor).toEqual(DOCTOR_ARJUN);
+  });
+
+  it.each<AppointmentMoveRoute>([
+    'confirm',
+    'check-in',
+    'complete',
+    'no-show',
+    'reinstate',
+    'undo-check-in',
+  ])('moves the status through its own route — %s', async (route) => {
+    vi.mocked(api.post).mockResolvedValueOnce({ data: wireRow() } as never);
+
+    const row = await moveAppointment({
+      appointmentId: APPOINTMENT_ID,
+      route,
+      idempotencyKey: `key-${route}`,
+    });
+
+    expect(api.post).toHaveBeenCalledWith(`/app/appointments/{appointment_id}/${route}`, {
+      params: { appointment_id: APPOINTMENT_ID },
+      idempotencyKey: `key-${route}`,
+    });
+    expect(row.doctor).toEqual(DOCTOR_NISHA);
+  });
+
+  it('cancels with the API’s reason and the note', async () => {
+    vi.mocked(api.post).mockResolvedValue({
+      data: wireRow({ status: 'cancelled', cancel_reason: 'other', cancel_note: 'Away' }),
+    } as never);
+
+    const row = await cancelAppointment({
+      appointmentId: APPOINTMENT_ID,
+      cancel: { reason: 'other', note: 'Away' },
+      idempotencyKey: 'key-cancel',
+    });
+
+    expect(api.post).toHaveBeenCalledWith('/app/appointments/{appointment_id}/cancel', {
+      params: { appointment_id: APPOINTMENT_ID },
+      body: { cancel_reason: 'other', cancel_note: 'Away' },
+      idempotencyKey: 'key-cancel',
+    });
+    expect(row).toMatchObject({
+      status: 'cancelled',
+      cancelReason: 'other',
+      cancelNote: 'Away',
     });
   });
 
-  it('refresh the chat column after a write — its system line, history and offered slots', () => {
-    const reads = [
-      messageQueryKeys.thread('lead:x'),
-      messageQueryKeys.history('lead:x'),
-      messageQueryKeys.templateValues('lead:x'),
-    ];
-    const refreshed = (key: readonly string[]) =>
-      APPOINTMENT_SIDE_EFFECT_KEYS.some((prefix) =>
-        prefix.every((part, index) => key[index] === part),
-      );
-    for (const key of reads) expect(refreshed(key)).toBe(true);
+  it('leaves the note out of a cancel without one', async () => {
+    vi.mocked(api.post).mockResolvedValueOnce({
+      data: wireRow({ status: 'cancelled', cancel_reason: 'patient_asked' }),
+    } as never);
+
+    await cancelAppointment({
+      appointmentId: APPOINTMENT_ID,
+      cancel: { reason: 'patient_asked', note: null },
+      idempotencyKey: 'key-cancel',
+    });
+
+    const init = vi.mocked(api.post).mock.lastCall?.[1] as {
+      body: Record<string, unknown>;
+    };
+    expect(init.body).toEqual({ cancel_reason: 'patient_asked' });
+    expect(init.body.cancel_note).toBeUndefined();
+  });
+});
+
+describe('appointmentQueryKeys', () => {
+  const range = { ...ACTIVE, from: APPOINTMENT_TODAY, to: APPOINTMENT_TOMORROW };
+  const slots = {
+    date: APPOINTMENT_TOMORROW,
+    branchId: TEST_BRANCH_ID,
+    doctorId: DOCTOR_NISHA.id,
+    durationMin: 20,
+    step: 30,
+  } as const;
+
+  it('keep every read under the organization’s prefix, so a write refreshes them all', () => {
+    const prefix = [...appointmentQueryKeys.all, 'org_test'];
+    for (const key of [
+      appointmentQueryKeys.list('org_test', ACTIVE),
+      appointmentQueryKeys.counts('org_test', {
+        from: APPOINTMENT_TODAY,
+        to: APPOINTMENT_TOMORROW,
+        branchIds: [],
+      }),
+      appointmentQueryKeys.range('org_test', range),
+      appointmentQueryKeys.detail('org_test', APPOINTMENT_ID),
+      appointmentQueryKeys.slots('org_test', slots),
+      appointmentQueryKeys.treatments('org_test'),
+    ]) {
+      expect(key.slice(0, 3)).toEqual(prefix);
+    }
+    expect(appointmentQueryKeys.list('org_test', ACTIVE).slice(0, 4)).toEqual(
+      appointmentQueryKeys.lists('org_test'),
+    );
+    expect(appointmentQueryKeys.slots('org_test', slots).slice(0, 4)).toEqual(
+      appointmentQueryKeys.slotDays('org_test'),
+    );
+  });
+
+  it('carry the organization, so two never share a read', () => {
+    expect(appointmentQueryKeys.detail('org_one', APPOINTMENT_ID)).not.toEqual(
+      appointmentQueryKeys.detail('org_two', APPOINTMENT_ID),
+    );
   });
 });

@@ -1,4 +1,4 @@
-import type { AppointmentRecord } from '@/shared/api/clinic/appointments-contracts.ts';
+import type { AppointmentRecord } from '@/shared/api/clinic/appointments-fixture-contracts.ts';
 import { createFixtureCollection } from '@/shared/api/clinic/clinic-fixture-store.ts';
 import type {
   Branch,
@@ -121,7 +121,7 @@ export const clinicFixtures = {
     seed: () => leadMessageSeed(),
     sequenced: false,
   }),
-  // The appointments carry the plan's fields (Appendix F) — see appointments-contracts.ts.
+  // The appointments carry the plan's fields (Appendix F) — see appointments-fixture-contracts.ts.
   appointments: createFixtureCollection<AppointmentRecord>({
     resource: 'Appointment',
     seed: () => appointmentSeed(),

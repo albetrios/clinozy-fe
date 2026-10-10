@@ -18,6 +18,8 @@ export interface AgendaCellsValue {
   /** The slot as the toasts name it — the Time column's "10:30 am". */
   timeOf: (appointment: AppointmentRow) => string;
   canEdit: boolean;
+  /** When the team was read — the doctor's team card's "Updated HH:MM". */
+  teamUpdatedAt: string | null;
   statusTarget: AgendaStatusTarget | null;
   setStatusTarget: (target: AgendaStatusTarget | null) => void;
   /** The contact card's "+ Lead" and "+ Appointment", where the member may. */

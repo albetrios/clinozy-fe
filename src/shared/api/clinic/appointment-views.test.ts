@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
+import { dayCount } from '@/tests/utils/appointment-doubles.ts';
+
 import {
+  agendaCountsWindow,
   appointmentViewRange,
   groupAppointmentsByDay,
   monthCells,
@@ -70,19 +73,15 @@ describe('appointmentViewRange', () => {
 });
 
 describe('groupAppointmentsByDay', () => {
-  const row = (seq: number, date: string, status: AppointmentRow['status']) =>
-    ({ seq, date, status }) as AppointmentRow;
+  const row = (seq: number, date: string) => ({ seq, date }) as AppointmentRow;
 
-  it('groups the rows by day in order, each with its day’s counts from the summary', () => {
-    const rows = [
-      row(1, '2026-10-03', 'scheduled'),
-      row(2, '2026-10-03', 'confirmed'),
-      row(3, '2026-10-04', 'confirmed'),
-    ];
+  it('groups the loaded rows by day in the read’s order, each with its day’s counts', () => {
+    const rows = [row(1, '2026-10-03'), row(2, '2026-10-03'), row(3, '2026-10-04')];
+    // The 4th straddles the next page: its counts are the whole day's, loaded or not.
+    const fourth = dayCount('2026-10-04', { scheduled: 2, confirmed: 3 });
     const groups = groupAppointmentsByDay(rows, [
-      { date: '2026-10-03', total: 2, confirmed: 1, scheduled: 1 },
-      // The 4th straddles the next page: its header counts every row, loaded or not.
-      { date: '2026-10-04', total: 5, confirmed: 3, scheduled: 2 },
+      dayCount('2026-10-03', { scheduled: 1, confirmed: 1 }),
+      fourth,
     ]);
     expect(
       groups.map((group) => [group.date, group.rows.map((item) => item.seq)]),
@@ -90,25 +89,43 @@ describe('groupAppointmentsByDay', () => {
       ['2026-10-03', [1, 2]],
       ['2026-10-04', [3]],
     ]);
-    expect(groups[1]?.summary).toEqual({
-      date: '2026-10-04',
-      total: 5,
-      confirmed: 3,
-      scheduled: 2,
+    expect(groups[1]?.counts).toEqual(fourth);
+  });
+
+  it('never counts the loaded rows itself: a day without the server’s counts has none', () => {
+    const groups = groupAppointmentsByDay([row(1, '2026-10-03'), row(2, '2026-10-03')]);
+    expect(groups).toHaveLength(1);
+    expect(groups[0]?.counts).toBeUndefined();
+    expect(groupAppointmentsByDay([])).toEqual([]);
+  });
+});
+
+describe('agendaCountsWindow', () => {
+  const rows = (...dates: string[]) => dates.map((date) => ({ date }));
+
+  it('covers the loaded rows’ first day to their last', () => {
+    expect(agendaCountsWindow(rows('2026-10-03', '2026-10-04', '2026-10-09'))).toEqual({
+      from: '2026-10-03',
+      to: '2026-10-09',
     });
   });
 
-  it('counts the loaded rows until the summary is in', () => {
-    const groups = groupAppointmentsByDay([
-      row(1, '2026-10-03', 'scheduled'),
-      row(2, '2026-10-03', 'checked_in'),
-    ]);
-    expect(groups[0]?.summary).toEqual({
-      date: '2026-10-03',
-      total: 2,
-      confirmed: 0,
-      scheduled: 1,
+  it('covers only the day picked in Filters, rows or not', () => {
+    expect(agendaCountsWindow(rows('2026-10-05'), '2026-10-05')).toEqual({
+      from: '2026-10-05',
+      to: '2026-10-05',
     });
-    expect(groupAppointmentsByDay([])).toEqual([]);
+    expect(agendaCountsWindow([], '2026-09-28')).toEqual({
+      from: '2026-09-28',
+      to: '2026-09-28',
+    });
+  });
+
+  it('stops at the read’s 62 days, and reads nothing before a row has loaded', () => {
+    expect(agendaCountsWindow(rows('2026-10-03', '2027-01-20'))).toEqual({
+      from: '2026-10-03',
+      to: '2026-12-03',
+    });
+    expect(agendaCountsWindow([])).toBeNull();
   });
 });

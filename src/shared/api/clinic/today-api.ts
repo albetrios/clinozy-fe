@@ -218,25 +218,6 @@ export interface TodayMove {
   idempotencyKey: string;
 }
 
-/**
- * Check a booking in: it becomes `checked_in` at stage `waiting`; the server opens the contact's
- * patient file and moves their open lead to `clinic_visited`.
- */
-export async function checkInAppointment({ appointmentId, idempotencyKey }: TodayMove) {
-  await api.post('/app/appointments/{appointment_id}/check-in', {
-    params: { appointment_id: appointmentId },
-    idempotencyKey,
-  });
-}
-
-/** Undo a mistaken check-in while the visit still waits (`409 visit_started` after). */
-export async function undoCheckIn({ appointmentId, idempotencyKey }: TodayMove) {
-  await api.post('/app/appointments/{appointment_id}/undo-check-in', {
-    params: { appointment_id: appointmentId },
-    idempotencyKey,
-  });
-}
-
 /** Move a checked-in visit to a later floor stage — forward only, so it has no Undo. */
 export async function moveFloorStage({
   appointmentId,

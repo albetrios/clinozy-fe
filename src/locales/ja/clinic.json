@@ -150,6 +150,8 @@
       "unreachable": "患者に連絡がつかない",
       "doctor_unavailable": "医師の都合がつかない",
       "resource_unavailable": "機器または部屋が使えない",
+      "rescheduling_later": "後日再調整",
+      "booked_by_mistake": "誤って予約",
       "other": "その他"
     },
     "cancelSides": {
@@ -172,7 +174,9 @@
     "toasts": {
       "booked": "{{id}} を予約しました · {{day}} {{time}} · WhatsAppで確認依頼を送信しました",
       "bookedQueued": "{{id}} を予約しました · {{day}} {{time}} · リマインダーを予約しました",
+      "bookedOnly": "{{id}} を予約しました · {{day}} {{time}}",
       "moved": "{{id}} を {{day}} {{time}} に移動しました · 確認依頼を送信しました",
+      "movedOnly": "{{id}} を {{day}} {{time}} に移動しました",
       "updated": "{{id}} を更新しました",
       "statusChanged": "{{name}} → {{status}}",
       "statusConfirmed": "{{name}} → {{status}} · リマインダーを予約しました",
@@ -998,10 +1002,8 @@
       "searchLabel": "人を検索",
       "useContact": "連絡先を使う",
       "patient": "患者",
-      "patientCare": "患者 · {{care}}",
-      "lead": "リード {{id}} · {{phone}}",
       "createContact": "+ 連絡先「{{query}}」を作成",
-      "newContact": "新しい連絡先 · 携帯番号は受付時に追加",
+      "newContact": "新しい連絡先 · 予約には携帯番号を追加",
       "mobile": "携帯番号",
       "name": "名前",
       "mobileLabel": "携帯",
@@ -1013,9 +1015,7 @@
       "connected": "関連リード",
       "chip": "{{id}} · {{status}}",
       "chipHint": "リード {{id}} · {{source}} · 担当 {{owner}}",
-      "movesAtCheckIn": "· 受付時に「来院済み」へ移動",
-      "lead": "リード",
-      "leadOption": "リード {{id}}"
+      "movesAtCheckIn": "· 受付時に「来院済み」へ移動"
     },
     "status": {
       "section": "来院ステータス",
@@ -1030,12 +1030,8 @@
       "rescheduledConfirm": "日時変更済み · 変更前 {{day}} {{time}} · 再確認が必要 · 保存すると新しいリマインダーを送信",
       "rescheduled": "日時変更済み · 変更前 {{day}} {{time}} · 保存すると新しいリマインダーを送信",
       "planReady_other": "プラン準備済み · サービス {{count}} 件",
-      "planNotPrepared": "プラン未準備",
       "planVisit_other": "この来院で {{count}} 件予定",
-      "planEarlier_other": "以前の来院から {{count}} 件",
-      "planOpen": "提案を開く",
-      "planEmpty": "まだ提案はありません · サービスの提案を開いて準備しましょう",
-      "createPatient": "患者記録を作成"
+      "planEarlier_other": "以前の来院から {{count}} 件"
     },
     "details": {
       "title": "予約",
@@ -1060,7 +1056,6 @@
       "typeLines": {
         "consultation": "会計時に診察料が請求書に追加されます",
         "follow_up": "通常は無料 · 追加がなければ請求書なし",
-        "package_session": "料金なし · 来院完了時に {{total}} 回中 {{next}} 回目を使用",
         "other": "内容を下のメモに記入してください"
       },
       "treatment": "施術",
@@ -1068,12 +1063,6 @@
       "searchTreatments": "施術を検索",
       "common": "よく使う",
       "fromOfferings": "提供サービスから",
-      "package": "パッケージ",
-      "packageNext": "次回は {{total}} 回中 {{next}} 回目 · {{date}} まで有効",
-      "packageLeft": "残り {{count}} 回",
-      "noPackage": "{{name}} さんに有効なパッケージはありません",
-      "pickContactPackages": "連絡先を選ぶとパッケージが表示されます",
-      "asTreatment": "施術として予約",
       "doctor": "医師",
       "pickDoctor": "医師を選択",
       "searchDoctors": "医師・セラピストを検索",
@@ -1096,49 +1085,20 @@
       "time": "時刻",
       "pickDate": "日付を選ぶと時刻が表示されます",
       "none": "この日は予約できる時間がありません · 別の日付を選んでください",
+      "closed": {
+        "past": "この日は過ぎています · 別の日付を選んでください",
+        "branchInactive": "この院は予約を受け付けていません",
+        "closedDay": "この日は休診日です · 別の日付を選んでください",
+        "holiday": "{{label}}のため休診 · 別の日付を選んでください",
+        "doctorOff": "この日は医師が休みです · 別の日付か医師を選んでください"
+      },
       "am": "午前",
       "pm": "午後",
       "hour": "{{period}}{{hour}}時",
       "free": "{{time}} · 空き",
-      "booked": "{{time}} · 予約済み",
       "locked": "ロック中",
       "lockedSummary": "{{day}} · {{time}} · 受付後はロック",
       "lockedToast": "患者の受付後は日時がロックされます"
-    },
-    "notPatient": {
-      "section": "次のステップ · 患者記録",
-      "title": "まだ患者ではありません",
-      "body": "続けるには患者記録を作成してください · 写真、サービスの提案、フィードバック、「完了」が使えるようになります",
-      "action": "患者記録を作成",
-      "done": "{{name}} さんが患者になりました · 「完了」にできます"
-    },
-    "photos": {
-      "title": "この来院の写真",
-      "section": "来院の写真",
-      "locked": "写真は患者が来院してから使えます · 先に受付してください",
-      "checkIn": "今すぐ受付",
-      "album": "アルバム",
-      "albums": {
-        "general": "一般",
-        "private": "非公開",
-        "lhr": "LHR"
-      },
-      "upload": "写真をアップロード",
-      "add": "追加",
-      "open": "{{name}} を開く",
-      "edit": "詳細を編集",
-      "delete": "写真を削除",
-      "count_other": "写真 {{count}} 枚 · {{first}} さんのファイルのこの来院の下に表示されます",
-      "empty": "{{first}} さんの来院中にビフォー / アフター写真を撮影 · この来院の下に保存されます",
-      "attached_other": "この来院に写真 {{count}} 枚を追加しました",
-      "deleteTitle": "この写真を削除しますか？",
-      "deleted": "写真を削除しました",
-      "reasons": {
-        "wrongPatient": "患者違い",
-        "blurry": "ぼやけている / 撮り直し",
-        "duplicate": "重複",
-        "other": "その他"
-      }
     },
     "footer": {
       "pickTime": "時刻を選択",
@@ -1152,7 +1112,8 @@
       "slot": "日付と時刻を選んでください",
       "passed": "その時刻は過ぎています · 今後の枠を選んでください",
       "taken": "ちょうど埋まりました · 別の枠を選んでください",
-      "doctor": "医師を選んでください"
+      "doctor": "医師を選んでください",
+      "branch": "予約できる営業中の院がありません"
     },
     "copied": "コピーしました · 日付と時刻を選んでください"
   },

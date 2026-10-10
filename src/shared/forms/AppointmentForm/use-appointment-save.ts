@@ -4,10 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { appointmentQueryKeys } from '@/shared/api/clinic/appointments-api.ts';
-import type {
-  AppointmentConnectedLead,
-  AppointmentRow,
-} from '@/shared/api/clinic/appointments-contracts.ts';
+import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
 import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
 import type { DrawerSaveState } from '@/shared/components/DrawerFooter/index.ts';
 import {
@@ -17,10 +14,18 @@ import {
 import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
 import { isHttpError } from '@/shared/errors/HttpError.ts';
 import {
+  contactFieldsOf,
+  emptyContactValue,
+} from '@/shared/forms/ContactEditor/index.ts';
+import {
+  useCopyAppointment,
   useCreateAppointment,
+  useMoveAppointment,
   useUpdateAppointment,
 } from '@/shared/hooks/useAppointments/index.ts';
+import { useCreateContact } from '@/shared/hooks/useContacts/index.ts';
 import { notify } from '@/shared/notify/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 import {
   APPOINTMENT_FORM_KEYS,
@@ -29,7 +34,9 @@ import {
 import {
   type AppointmentDraft,
   type AppointmentFormMode,
+  copiesAsIs,
   createInputOf,
+  moveRouteOf,
   newContactPhone,
   patchOf,
   type SavedSlot,
@@ -45,7 +52,7 @@ export type AppointmentSaveOutcome =
 
 /** What the save checks before it asks (`appointments.md:249`; KICKOFF §6.4 Save). */
 export type AppointmentSaveProblem =
-  'who' | 'mobile' | 'slot' | 'doctor' | 'passed' | null;
+  'who' | 'mobile' | 'slot' | 'doctor' | 'passed' | 'branch' | null;
 
 /**
  * The first thing a save would refuse, checked before the request — the
@@ -70,14 +77,13 @@ export function saveProblem(
   return null;
 }
 
-/** The fixture server's code, or clinozy-be's `reason`, of a refused write. */
-function refusalCode(error: unknown): string | undefined {
-  if (!isHttpError(error)) return undefined;
-  const reason = apiErrorReason(error);
-  if (reason) return reason;
-  const data = error.data as { error?: { code?: unknown } } | undefined;
-  return typeof data?.error?.code === 'string' ? data.error.code : undefined;
-}
+/** The slot refusals (`409`): the grid is read again, and each says why in the server's words. */
+const SLOT_REFUSALS = new Set([
+  'slot_taken',
+  'slot_in_past',
+  'slot_closed',
+  'slot_outside_hours',
+]);
 
 /** Options of {@link useAppointmentSave}. */
 export interface UseAppointmentSaveOptions {
@@ -85,9 +91,8 @@ export interface UseAppointmentSaveOptions {
   /** The saved booking (Edit, Reschedule). */
   row: AppointmentRow | null;
   /** The booking a Copy or Rebook starts from. */
-  copyOf?: string;
+  source?: AppointmentRow;
   branchId: string | null;
-  leads: readonly AppointmentConnectedLead[];
   /** A check failed: the form opens the step that holds it. */
   onProblem: (problem: Exclude<AppointmentSaveProblem, null>) => void;
   onDone: (outcome: AppointmentSaveOutcome) => void;
@@ -97,37 +102,43 @@ export interface UseAppointmentSaveOptions {
  * The appointment form's write (KICKOFF §6.4 Save, §6.0 States): the checks
  * first, with their toasts — "Pick who the appointment is for", "Pick a date
  * and time", "That time has passed · pick a future slot" — then "Saving…".
- * A slot someone took meanwhile (409) toasts "Just taken · pick another slot"
- * and refreshes the grid; any other refusal toasts the server's reason and
- * keeps the draft; a dropped connection keeps it with "Not saved · your
- * changes are kept", "Retry save" and a toast whose "Retry" saves again.
+ * New: a new person becomes a contact first (`POST /app/contacts`); a Copy
+ * that changed nothing but the slot books again through `…/copy`. Edit: the
+ * changed fields (`PATCH`, with the read's `updated_at`), then the tile's
+ * move (`…/confirm`, `/check-in`, `/complete`). A slot someone took meanwhile
+ * toasts "Just taken · pick another slot"; the other slot refusals and any
+ * other 4xx toast the server's reason — the grid is read again and the draft
+ * kept; a dropped connection keeps it with "Not saved · your changes are
+ * kept", "Retry save" and a toast whose "Retry" saves again.
  */
 export function useAppointmentSave({
   mode,
   row,
-  copyOf,
+  source,
   branchId,
-  leads,
   onProblem,
   onDone,
 }: UseAppointmentSaveOptions) {
   const { t } = useTranslation([APPOINTMENT_FORM_NS, ERRORS_NS]);
   const queryClient = useQueryClient();
+  const organizationId = useOrganizationStore((state) => state.organizationId);
   const [saveState, setSaveState] = useState<DrawerSaveState>('idle');
+  const createContact = useCreateContact({ notifyOnError: false });
   const create = useCreateAppointment({ notifyOnError: false });
+  const copy = useCopyAppointment({ notifyOnError: false });
   const update = useUpdateAppointment({ notifyOnError: false });
+  const move = useMoveAppointment({ notifyOnError: false });
 
   const failed = (error: unknown, retry: () => void) => {
     if (isHttpError(error) && error.status < 500) {
       setSaveState('idle');
-      if (refusalCode(error) === 'slot_taken') {
-        notify.error(t(V.taken));
+      const reason = apiErrorReason(error);
+      if (reason && SLOT_REFUSALS.has(reason)) {
         void queryClient.invalidateQueries({
-          queryKey: [...appointmentQueryKeys.all, 'slots'],
+          queryKey: appointmentQueryKeys.slotDays(organizationId),
         });
-        return;
       }
-      notify.error(mapApiError(error));
+      notify.error(reason === 'slot_taken' ? t(V.taken) : mapApiError(error));
       return;
     }
     setSaveState('failed');
@@ -137,11 +148,50 @@ export function useAppointmentSave({
     });
   };
 
+  /** The contact a new booking points at — a new person's is created first. */
+  const contactIdOf = async (draft: AppointmentDraft): Promise<string> => {
+    const who = draft.who;
+    if (who?.contactId) return who.contactId;
+    const phone = newContactPhone(draft);
+    const contact = await createContact.mutateAsync(
+      contactFieldsOf(emptyContactValue(who?.name ?? '', phone)),
+    );
+    return contact.id;
+  };
+
+  /** Book: a Copy as is through `…/copy`, else a new booking for the contact. */
+  const book = async (draft: AppointmentDraft, branch: string) => {
+    if (source && copiesAsIs(draft, source, branch)) {
+      return copy.mutateAsync({
+        appointmentId: source.id,
+        date: draft.date ?? '',
+        startTime: draft.time ?? '',
+      });
+    }
+    const contactId = await contactIdOf(draft);
+    return create.mutateAsync(createInputOf(draft, { branchId: branch, contactId }));
+  };
+
+  /** Edit: the changed fields, then the tile's move. */
+  const edit = async (draft: AppointmentDraft, saved: AppointmentRow) => {
+    const fields = patchOf(draft, saved);
+    const route = moveRouteOf(draft, saved);
+    let appointment = saved;
+    if (Object.keys(fields).length > 0) {
+      appointment = await update.mutateAsync({ appointment, fields });
+    }
+    if (route) appointment = await move.mutateAsync({ appointment, route });
+    return appointment;
+  };
+
   const save = async (draft: AppointmentDraft): Promise<void> => {
     const saved = row
       ? { date: row.date, time: row.startTime, status: row.status }
       : null;
-    const problem = saveProblem(mode, draft, saved, new Date());
+    const creating = mode === 'create' || !row;
+    const problem =
+      saveProblem(mode, draft, saved, new Date()) ??
+      (creating && !branchId ? 'branch' : null);
     if (problem) {
       onProblem(problem);
       const message = {
@@ -150,24 +200,19 @@ export function useAppointmentSave({
         slot: V.slot,
         doctor: V.doctor,
         passed: V.passed,
+        branch: V.branch,
       }[problem];
       notify.warning(t(message));
       return;
     }
     setSaveState('saving');
     try {
-      if (mode === 'create' || !row) {
-        const appointment = await create.mutateAsync(
-          createInputOf(draft, { branchId, leads, copyOf }),
-        );
+      if (creating) {
+        const appointment = await book(draft, branchId ?? '');
         onDone({ kind: 'created', appointment });
         return;
       }
-      const { appointment } = await update.mutateAsync({
-        id: row.id,
-        patch: patchOf(draft, row, leads),
-      });
-      onDone({ kind: 'updated', appointment });
+      onDone({ kind: 'updated', appointment: await edit(draft, row) });
     } catch (error) {
       failed(error, () => void save(draft));
     }

@@ -47,8 +47,6 @@
     "dayBooked_other": "{{date}} · {{count}} बुक",
     "appointedTo": "किसे सौंपा गया",
     "allDoctors": "सभी डॉक्टर",
-    "doctors_one": "{{count}} डॉक्टर",
-    "doctors_other": "{{count}} डॉक्टर",
     "searchTeam": "टीम में खोजें",
     "showAll": "सभी दिखाएँ",
     "done": "हो गया",
@@ -94,10 +92,6 @@
       "hint": "{{confirmed}} · {{waiting}}"
     },
     "latest": {
-      "planReady": "✓ प्लान तैयार",
-      "planPending": "○ प्लान बाकी",
-      "reminderRead": "✓ रिमाइंडर पढ़ा गया",
-      "reminderDelivered": "✓ रिमाइंडर पहुँचा",
       "reminderSent": "✓ रिमाइंडर भेजा गया",
       "repliedYes": "✓ हाँ में जवाब",
       "moved": "✓ समय बदला",
@@ -105,10 +99,6 @@
       "checkedIn": "✓ चेक-इन हुआ"
     },
     "latestHints": {
-      "planReady": "सेवा सुझावों में {{suggestions}}",
-      "planPending": "अपॉइंटमेंट खोलें और सेवा सुझाव जोड़ें",
-      "reminderRead": "WhatsApp पर रिमाइंडर पढ़ा गया",
-      "reminderDelivered": "रिमाइंडर पहुँच गया",
       "reminderSent": "रिमाइंडर भेजा गया",
       "repliedYes": "WhatsApp पर “हाँ” के जवाब से अपने आप पुष्ट",
       "moved": "{{day}} {{time}} से बदला गया",

@@ -1,264 +1,424 @@
-import type { ListPage } from '@/shared/api/fetch-list-page.ts';
+import { z } from 'zod';
+
+import { api } from '@/core/http/api.ts';
+import { queryClient } from '@/core/http/queryClient.ts';
+import { collectAllPages } from '@/shared/api/fetch-all-pages.ts';
+import { toneForLabel } from '@/shared/clinic/clinic-tones.ts';
+import { personInitials } from '@/shared/components/Cells/PersonAvatar/person-name.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 import {
-  APPOINTMENT_SEARCH_MAX,
-  type AppointmentBookingPerson,
-  type AppointmentCancelInput,
-  type AppointmentChange,
-  type AppointmentConnectedLead,
+  appointmentBodyOf,
+  type AppointmentCancel,
   type AppointmentCreateInput,
-  type AppointmentDaySummary,
+  type AppointmentDayCount,
+  appointmentDayCountWire,
+  type AppointmentFields,
+  type AppointmentFilters,
   type AppointmentListParams,
-  type AppointmentListParamsInput,
-  appointmentListParamsSchema,
-  type AppointmentPackageOption,
-  type AppointmentPatch,
-  type AppointmentPersonLookup,
+  type AppointmentMoveRoute,
   type AppointmentRangeParams,
-  type AppointmentRangeParamsInput,
-  appointmentRangeParamsSchema,
+  type AppointmentRecord,
   type AppointmentRow,
-  type AppointmentSlot,
+  appointmentRowWire,
+  type AppointmentSlotDay,
+  appointmentSlotDayWire,
+  type AppointmentSlotParams,
   type AppointmentStaff,
-  type AppointmentStatusInput,
-  type AppointmentUpdate,
-  type AvailableSlotsParamsInput,
-  availableSlotsParamsSchema,
-  type VisitPhotoInput,
+  type AppointmentTreatment,
+  appointmentTreatmentWire,
+  appointmentWire,
+  statusesForFilter,
+  toAppointmentRecord,
 } from './appointments-contracts.ts';
-import type { DeleteReason, PatientImage } from './clinic-schema.ts';
+import { createdRangeOf } from './clinic-filter-ranges.ts';
+import { clinicToday } from './clinic-time.ts';
+import {
+  fetchMemberNames,
+  fetchTeamDirectory,
+  teamDirectoryQueryKey,
+} from './directory-api.ts';
 
 /*
- * The Appointments API (KICKOFF §6.4; `schema-routes.md` S:1582, 1600–1612,
- * plus Appendix F). REPLACE_WITH_API: every call runs on the fixture server,
- * loaded on demand so the seed data never lands in a room's chunk; when
- * clinozy-be serves appointments, these bodies become `apiClient` calls and
- * nothing else moves.
+ * The Appointments domain on clinozy-be (`/app/appointments`, api-integration §5.3): the Agenda
+ * in pages, the calendars' ranges, the day counts, one booking, the free slots, and the writes —
+ * book, copy, change (with the read's `updated_at`), one route per status move, cancel with its
+ * reason. Every row carries its doctor from the team directory. Every write carries the action's
+ * key.
  */
 
-const server = () => import('./fixtures/appointments-server.fixtures.ts');
-
-/** Ids in a stable order, each once — equal filters share one cache entry. */
-const idSet = (ids: readonly string[]) =>
-  [...new Set(ids)].sort((a, b) => a.localeCompare(b));
-
-/** The search trimmed to its limit; an empty one is none. */
-const searchOf = (q: string | undefined) =>
-  (q?.trim().slice(0, APPOINTMENT_SEARCH_MAX) ?? '') || undefined;
-
-/** Agenda params with their defaults filled, the search trimmed and the ids in order. */
-export function normalizeAppointmentListParams(
-  params: AppointmentListParamsInput = {},
-): AppointmentListParams {
-  const parsed = appointmentListParamsSchema.parse({ ...params, q: searchOf(params.q) });
-  return {
-    ...parsed,
-    doctorIds: idSet(parsed.doctorIds),
-    branchIds: idSet(parsed.branchIds),
-  };
-}
-
-/** Range params with their defaults filled, the search trimmed and the ids in order. */
-export function normalizeAppointmentRangeParams(
-  params: AppointmentRangeParamsInput,
-): AppointmentRangeParams {
-  const parsed = appointmentRangeParamsSchema.parse({ ...params, q: searchOf(params.q) });
-  return {
-    ...parsed,
-    doctorIds: idSet(parsed.doctorIds),
-    branchIds: idSet(parsed.branchIds),
-  };
-}
-
-/** TanStack Query keys for appointments — every one under `['clinic', 'appointments']`, which task writes invalidate. */
+/** TanStack Query keys for the bookings, each carrying the organization. */
 export const appointmentQueryKeys = {
   all: ['clinic', 'appointments'] as const,
-  lists: () => [...appointmentQueryKeys.all, 'list'] as const,
-  list: (params: AppointmentListParamsInput = {}) =>
-    [...appointmentQueryKeys.lists(), normalizeAppointmentListParams(params)] as const,
-  daySummaries: (params: AppointmentListParamsInput = {}) =>
-    [
-      ...appointmentQueryKeys.all,
-      'day-summaries',
-      normalizeAppointmentListParams(params),
-    ] as const,
-  ranges: () => [...appointmentQueryKeys.all, 'range'] as const,
-  range: (params: AppointmentRangeParamsInput) =>
-    [...appointmentQueryKeys.ranges(), normalizeAppointmentRangeParams(params)] as const,
-  details: () => [...appointmentQueryKeys.all, 'detail'] as const,
-  detail: (id: string) => [...appointmentQueryKeys.details(), id] as const,
-  slots: (params: AvailableSlotsParamsInput) =>
-    [
-      ...appointmentQueryKeys.all,
-      'slots',
-      availableSlotsParamsSchema.parse(params),
-    ] as const,
-  staff: () => [...appointmentQueryKeys.all, 'staff'] as const,
-  /** The person a booking prefill names (`who=`). */
-  person: (id: string) => [...appointmentQueryKeys.all, 'person', id] as const,
-  /** A person's connected leads — the form's chips and Lead radios. */
-  connectedLeads: (person: AppointmentPersonLookup) =>
-    [
-      ...appointmentQueryKeys.all,
-      'connected-leads',
-      person.patientId,
-      person.leadId,
-      person.phone,
-    ] as const,
-  /** A patient's active packages — the Package session radios. */
-  packages: (patientId: string) =>
-    [...appointmentQueryKeys.all, 'packages', patientId] as const,
-  /** A patient's bookings — the patient file's Visits. */
-  patient: (patientId: string) =>
-    [...appointmentQueryKeys.all, 'patient', patientId] as const,
-  /** The photos filed under one visit. */
-  photos: (appointmentId: string) =>
-    [...appointmentQueryKeys.all, 'photos', appointmentId] as const,
+  /** Every Agenda read — a write invalidates them all. */
+  lists: (organizationId: string | null) =>
+    [...appointmentQueryKeys.all, organizationId, 'list'] as const,
+  list: (organizationId: string | null, params: AppointmentListParams) =>
+    [...appointmentQueryKeys.lists(organizationId), params] as const,
+  counts: (
+    organizationId: string | null,
+    window: { from: string; to: string; doctorId?: string; branchIds: readonly string[] },
+  ) => [...appointmentQueryKeys.all, organizationId, 'counts', window] as const,
+  range: (organizationId: string | null, params: AppointmentRangeParams) =>
+    [...appointmentQueryKeys.all, organizationId, 'range', params] as const,
+  detail: (organizationId: string | null, appointmentId: string) =>
+    [...appointmentQueryKeys.all, organizationId, 'detail', appointmentId] as const,
+  /** Every slot grid — a refused booking refreshes them. */
+  slotDays: (organizationId: string | null) =>
+    [...appointmentQueryKeys.all, organizationId, 'slots'] as const,
+  slots: (organizationId: string | null, params: AppointmentSlotParams) =>
+    [...appointmentQueryKeys.slotDays(organizationId), params] as const,
+  /** The treatments the form offers. */
+  treatments: (organizationId: string | null) =>
+    [...appointmentQueryKeys.all, organizationId, 'treatments'] as const,
 };
 
+/** One page of the Agenda — the design's 50. */
+const PAGE_SIZE = 50;
+/** One page of a calendar's range — the API's most. */
+const RANGE_PAGE_SIZE = 100;
+
+/** The filters every list read shares, as the API names them. */
+function filterQuery(filters: AppointmentFilters, today: string) {
+  const created = filters.created ? createdRangeOf(filters.created, today) : {};
+  const q = filters.q?.trim();
+  return {
+    status:
+      filters.status === 'all' ? undefined : statusesForFilter(filters.status).join(','),
+    doctor_membership_id: filters.doctorId,
+    branch_ids: filters.branchIds.length ? filters.branchIds.join(',') : undefined,
+    q: q || undefined,
+    created_from: created.from,
+    created_to: created.to,
+  };
+}
+
 /**
- * The other records an appointment write can change, by the `['clinic',
- * <domain>]` key prefix each room keeps its queries under: tasks (the rule
- * job), leads and contact threads (Clinic visited), the chat column's reads
- * (`messageQueryKeys`: the thread's system line, the contact history's
- * booking lines, the free slots its templates offer), patients.
+ * The Agenda's query: from today on, or the one day picked in Filters — by date, then start
+ * (the API's default sort).
  */
-export const APPOINTMENT_SIDE_EFFECT_KEYS = [
-  ['clinic', 'tasks'],
-  ['clinic', 'leads'],
-  ['clinic', 'messages'],
-  ['clinic', 'contact-threads'],
-  ['clinic', 'patients'],
-] as const;
+export function appointmentListQuery(
+  params: AppointmentListParams,
+  today: string = clinicToday(),
+) {
+  return {
+    ...filterQuery(params, today),
+    limit: PAGE_SIZE,
+    appointment_date_from: params.date ?? today,
+    appointment_date_to: params.date,
+  };
+}
 
-/** One Agenda page (`listAppointments`), from `after` — the previous page's cursor. */
-export async function fetchAppointmentPage(
-  params: AppointmentListParamsInput,
+/** The organization the cached team belongs to. */
+const activeOrganizationId = () => useOrganizationStore.getState().organizationId;
+
+/** A member who left, from their name alone. */
+function formerMember(id: string, name: string): AppointmentStaff {
+  return {
+    id,
+    userId: '',
+    name,
+    initials: personInitials(name),
+    tone: toneForLabel(name),
+    roleIds: [],
+    branchIds: [],
+  };
+}
+
+/**
+ * The bookings with their doctors: the team directory (cached five minutes), and the names of
+ * any who have left since.
+ */
+async function withDoctors(records: AppointmentRecord[]): Promise<AppointmentRow[]> {
+  if (records.length === 0) return [];
+  const team = await queryClient.fetchQuery({
+    queryKey: teamDirectoryQueryKey(activeOrganizationId()),
+    queryFn: fetchTeamDirectory,
+    staleTime: 5 * 60_000,
+  });
+  const byId = new Map(team.map((member) => [member.id, member]));
+  const missing = records.map((row) => row.doctorId).filter((id) => !byId.has(id));
+  const names = missing.length ? await fetchMemberNames(missing) : new Map();
+  return records.map((row) => {
+    const name = names.get(row.doctorId);
+    const doctor =
+      byId.get(row.doctorId) ?? (name ? formerMember(row.doctorId, name) : null);
+    return { ...row, doctor };
+  });
+}
+
+/** One page of the Agenda; `after` is the previous page's cursor. */
+export async function listAppointments(
+  params: AppointmentListParams,
   after?: string,
-): Promise<ListPage<AppointmentRow>> {
-  return (await server()).listAppointments(normalizeAppointmentListParams(params), after);
+): Promise<{ rows: AppointmentRow[]; next: string | null; total: number | null }> {
+  const response = await api.get('/app/appointments', {
+    query: { ...appointmentListQuery(params), after },
+  });
+  const pagination = response.meta?.pagination;
+  const records = z
+    .array(appointmentRowWire)
+    .parse(response.data ?? [])
+    .map(toAppointmentRecord);
+  return {
+    rows: await withDoctors(records),
+    next: pagination?.has_more ? (pagination.next ?? null) : null,
+    total: pagination?.estimated_total ?? null,
+  };
 }
 
-/** The Agenda's per-day counts for the same filters (Appendix F). */
-export async function fetchAppointmentDaySummaries(
-  params: AppointmentListParamsInput,
-): Promise<AppointmentDaySummary[]> {
-  return (await server()).listAppointmentDaySummaries(
-    normalizeAppointmentListParams(params),
-  );
-}
-
-/** Every booking in a calendar range (`listAppointmentsRange`) — Day, Week or Month. */
+/** Every booking a Day, Week or Month board shows — every page of the range. */
 export async function fetchAppointmentRange(
-  params: AppointmentRangeParamsInput,
+  params: AppointmentRangeParams,
 ): Promise<AppointmentRow[]> {
-  return (await server()).listAppointmentsRange(normalizeAppointmentRangeParams(params));
+  const query = {
+    ...filterQuery(params, clinicToday()),
+    limit: RANGE_PAGE_SIZE,
+    appointment_date_from: params.from,
+    appointment_date_to: params.to,
+  };
+  const records = await collectAllPages(async (after) => {
+    const response = await api.get('/app/appointments', {
+      query: { ...query, after: after ?? undefined },
+    });
+    return {
+      rows: z
+        .array(appointmentRowWire)
+        .parse(response.data ?? [])
+        .map(toAppointmentRecord),
+      next: response.meta?.pagination?.has_more
+        ? (response.meta.pagination.next ?? null)
+        : null,
+    };
+  }, 'appointments-range');
+  return withDoctors(records);
 }
 
-/** One booking (`getAppointment`) — a 404 when it is unknown or deleted. */
-export async function fetchAppointment(id: string): Promise<AppointmentRow> {
-  return (await server()).getAppointment(id);
+/**
+ * Each day's counts from `from` to `to` (both included, up to 62 days) — within the branches and
+ * the doctor; the status, search and created filters do not narrow them.
+ */
+export async function fetchAppointmentDayCounts({
+  from,
+  to,
+  doctorId,
+  branchIds,
+}: {
+  from: string;
+  to: string;
+  doctorId?: string;
+  branchIds: readonly string[];
+}): Promise<AppointmentDayCount[]> {
+  const response = await api.get('/app/appointments/daily-counts', {
+    query: {
+      date_from: from,
+      date_to: to,
+      doctor_membership_id: doctorId,
+      branch_ids: branchIds.length ? branchIds.join(',') : undefined,
+    },
+  });
+  return z
+    .array(appointmentDayCountWire)
+    .parse(response.data ?? [])
+    .map((day) => ({
+      date: day.appointment_date,
+      total: day.total,
+      byStatus: {
+        scheduled: day.by_status.scheduled ?? 0,
+        confirmed: day.by_status.confirmed ?? 0,
+        checked_in: day.by_status.checked_in ?? 0,
+        completed: day.by_status.completed ?? 0,
+        cancelled: day.by_status.cancelled ?? 0,
+        no_show: day.by_status.no_show ?? 0,
+      },
+    }));
 }
 
-/** A patient's bookings, newest first — the patient file's Visits (REPLACE_WITH_API). */
-export async function fetchPatientAppointments(
-  patientId: string,
-): Promise<AppointmentRow[]> {
-  return (await server()).listPatientAppointments(patientId);
+/** One booking — a 404 when it is gone or in a branch the member cannot see. */
+export async function fetchAppointment(appointmentId: string): Promise<AppointmentRow> {
+  const response = await api.get('/app/appointments/{appointment_id}', {
+    params: { appointment_id: appointmentId },
+  });
+  const [row] = await withDoctors([
+    toAppointmentRecord(appointmentWire.parse(response.data)),
+  ]);
+  if (!row) throw new Error('appointment read without a row');
+  return row;
 }
 
-/** The slot grid for a doctor, a day and a length (`availableSlots`). */
-export async function fetchAvailableSlots(
-  params: AvailableSlotsParamsInput,
-): Promise<AppointmentSlot[]> {
-  return (await server()).listAvailableSlots(params);
+/**
+ * A day's free starts for a doctor and a length (`GET /app/appointments/slots`) — or why the
+ * day takes none: past, the branch inactive, a closed day, a holiday, the doctor off.
+ */
+export async function fetchAppointmentSlots(
+  params: AppointmentSlotParams,
+): Promise<AppointmentSlotDay> {
+  const response = await api.get('/app/appointments/slots', {
+    query: {
+      appointment_date: params.date,
+      branch_id: params.branchId,
+      doctor_membership_id: params.doctorId,
+      duration_minutes: params.durationMin,
+      step_minutes: params.step,
+    },
+  });
+  const day = appointmentSlotDayWire.parse(response.data);
+  return {
+    date: day.appointment_date,
+    isOpen: day.is_open,
+    closedReason: day.closed_reason,
+    closedLabel: day.closed_label,
+    slots: day.slots.map((slot) => ({ time: slot.start_time, endTime: slot.end_time })),
+  };
 }
 
-/** The doctors and therapists who can be booked. */
-export async function fetchBookableStaff(): Promise<AppointmentStaff[]> {
-  return (await server()).listBookableStaff();
+/** The clinic's active treatments, by name — the form's "From offerings" (every page). */
+export async function fetchBookableTreatments(): Promise<AppointmentTreatment[]> {
+  const rows = await collectAllPages(async (after) => {
+    const response = await api.get('/app/offerings', {
+      query: {
+        category: 'treatment',
+        is_active: 'true',
+        sort: 'name',
+        limit: RANGE_PAGE_SIZE,
+        after: after ?? undefined,
+      },
+    });
+    return {
+      rows: z.array(appointmentTreatmentWire).parse(response.data ?? []),
+      next: response.meta?.pagination?.has_more
+        ? (response.meta.pagination.next ?? null)
+        : null,
+    };
+  }, 'appointment-treatments');
+  return rows.map((row) => ({
+    id: row.id,
+    name: row.name,
+    durationMin: row.duration_minutes,
+    specialty: row.specialty,
+    tone: row.tone,
+  }));
 }
 
-/** Book (`createAppointment`) — Scheduled; 422 on a broken field, 409 on a taken slot. */
-export async function createAppointment(
-  input: AppointmentCreateInput,
-): Promise<AppointmentRow> {
-  return (await server()).createAppointment(input);
+// ── Writes ──
+
+/** The written booking with its doctor. */
+async function rowOf(data: unknown): Promise<AppointmentRow> {
+  const [row] = await withDoctors([toAppointmentRecord(appointmentWire.parse(data))]);
+  if (!row) throw new Error('appointment write without a row');
+  return row;
 }
 
-/** Save an edit (`updateAppointment`) — a new slot moves the booking back to Scheduled. */
-export async function updateAppointment(
-  id: string,
-  patch: AppointmentPatch,
-): Promise<AppointmentUpdate> {
-  return (await server()).updateAppointment(id, patch);
+/**
+ * Book a contact — `409 slot_taken`, `slot_in_past`, `slot_closed` or `slot_outside_hours`
+ * when the slot cannot take it.
+ */
+export async function createAppointment({
+  input,
+  idempotencyKey,
+}: {
+  input: AppointmentCreateInput;
+  idempotencyKey: string;
+}): Promise<AppointmentRow> {
+  const { contactId, ...fields } = input;
+  const body = appointmentBodyOf(fields);
+  const response = await api.post('/app/appointments', {
+    body: {
+      ...body,
+      contact_id: contactId,
+      branch_id: fields.branchId,
+      doctor_membership_id: fields.doctorId,
+    },
+    idempotencyKey,
+  });
+  return rowOf(response.data);
 }
 
-/** Move a status (`setAppointmentStatus`) through the status machine; answers an Undo token. */
-export async function setAppointmentStatus(
-  input: AppointmentStatusInput,
-): Promise<AppointmentChange> {
-  return (await server()).setAppointmentStatus(input);
+/** Book the same again on another day and start (Copy, Rebook) — the create's 409s apply. */
+export async function copyAppointment({
+  appointmentId,
+  date,
+  startTime,
+  idempotencyKey,
+}: {
+  appointmentId: string;
+  date: string;
+  startTime: string;
+  idempotencyKey: string;
+}): Promise<AppointmentRow> {
+  const response = await api.post('/app/appointments/{appointment_id}/copy', {
+    params: { appointment_id: appointmentId },
+    body: { appointment_date: date, start_time: startTime },
+    idempotencyKey,
+  });
+  return rowOf(response.data);
 }
 
-/** Cancel with a reason (`cancelAppointment`); answers an Undo token. */
-export async function cancelAppointment(
-  input: AppointmentCancelInput,
-): Promise<AppointmentChange> {
-  return (await server()).cancelAppointment(input);
+/**
+ * A change — refused (`409 record_changed`) when the booking changed since `expectedUpdatedAt`;
+ * a new slot moves it (`409 appointment_not_movable` after check-in) and a moved confirmed
+ * booking is scheduled again.
+ */
+export async function updateAppointment({
+  appointmentId,
+  fields,
+  expectedUpdatedAt,
+  idempotencyKey,
+}: {
+  appointmentId: string;
+  fields: Partial<AppointmentFields>;
+  expectedUpdatedAt: string;
+  idempotencyKey: string;
+}): Promise<AppointmentRow> {
+  const response = await api.patch('/app/appointments/{appointment_id}', {
+    params: { appointment_id: appointmentId },
+    body: { ...appointmentBodyOf(fields), expected_updated_at: expectedUpdatedAt },
+    idempotencyKey,
+  });
+  return rowOf(response.data);
 }
 
-/** Restore a cancelled booking to Scheduled (`restoreAppointment`). */
-export async function restoreAppointment(id: string): Promise<AppointmentRow> {
-  return (await server()).restoreAppointment(id);
+/** Each move's route. */
+const MOVE_PATHS = {
+  confirm: '/app/appointments/{appointment_id}/confirm',
+  'check-in': '/app/appointments/{appointment_id}/check-in',
+  complete: '/app/appointments/{appointment_id}/complete',
+  'no-show': '/app/appointments/{appointment_id}/no-show',
+  reinstate: '/app/appointments/{appointment_id}/reinstate',
+  'undo-check-in': '/app/appointments/{appointment_id}/undo-check-in',
+} as const satisfies Record<AppointmentMoveRoute, string>;
+
+/** One status move — `409 transition_not_allowed` (or `appointment_not_due`) when it cannot run. */
+export async function moveAppointment({
+  appointmentId,
+  route,
+  idempotencyKey,
+}: {
+  appointmentId: string;
+  route: AppointmentMoveRoute;
+  idempotencyKey: string;
+}): Promise<AppointmentRow> {
+  const response = await api.post(MOVE_PATHS[route], {
+    params: { appointment_id: appointmentId },
+    idempotencyKey,
+  });
+  return rowOf(response.data);
 }
 
-/** Undo a status write by the token it answered — its side effects included. */
-export async function undoAppointmentChange(undoToken: string): Promise<void> {
-  return (await server()).undoAppointmentChange(undoToken);
-}
-
-// ── The appointment form's reads and the visit's photos ──
-
-/** The person a booking prefill names (`who=<patientId|leadId>`, `S:27`) — a 404 when it names neither. */
-export async function fetchBookingPerson(id: string): Promise<AppointmentBookingPerson> {
-  return (await server()).getBookingPerson(id);
-}
-
-/** A person's connected leads (`getAppointment`'s "connected leads", `S:1604`). */
-export async function fetchConnectedLeads(
-  person: AppointmentPersonLookup,
-): Promise<AppointmentConnectedLead[]> {
-  return (await server()).listConnectedLeads(person);
-}
-
-/** A patient's packages with a session left (C19, Appendix F). */
-export async function fetchActivePackages(
-  patientId: string,
-): Promise<AppointmentPackageOption[]> {
-  return (await server()).listActivePackages(patientId);
-}
-
-/** The photos filed under a visit, newest first. */
-export async function fetchVisitPhotos(appointmentId: string): Promise<PatientImage[]> {
-  return (await server()).listVisitPhotos(appointmentId);
-}
-
-/** File an uploaded photo under a visit (`uploadVisitPhotos`, `S:1613`) — 409 before check-in. */
-export async function attachVisitPhoto(input: VisitPhotoInput): Promise<PatientImage> {
-  return (await server()).attachVisitPhoto(input);
-}
-
-/** Delete a visit photo with the reason confirm's choice. */
-export async function deleteVisitPhoto(
-  id: string,
-  reason: DeleteReason,
-  note: string | null,
-): Promise<PatientImage> {
-  return (await server()).deleteVisitPhoto(id, reason, note);
-}
-
-/** Bring a deleted visit photo back (the Undo). */
-export async function restoreVisitPhoto(id: string): Promise<PatientImage> {
-  return (await server()).restoreVisitPhoto(id);
+/** Cancel a scheduled or confirmed booking with its reason; its slot frees. */
+export async function cancelAppointment({
+  appointmentId,
+  cancel,
+  idempotencyKey,
+}: {
+  appointmentId: string;
+  cancel: AppointmentCancel;
+  idempotencyKey: string;
+}): Promise<AppointmentRow> {
+  const response = await api.post('/app/appointments/{appointment_id}/cancel', {
+    params: { appointment_id: appointmentId },
+    body: { cancel_reason: cancel.reason, cancel_note: cancel.note ?? undefined },
+    idempotencyKey,
+  });
+  return rowOf(response.data);
 }

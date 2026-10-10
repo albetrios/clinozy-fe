@@ -1,19 +1,9 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
-// Leads and Payments are on the API in this file; every other room still reads fixtures.
-vi.mock('@/core/config/clinic-modules.ts', async (importOriginal) => {
-  const actual = await importOriginal<{ CLINIC_MODULES: Record<string, string> }>();
-  return {
-    ...actual,
-    FIXTURE_BACKED_CLINIC_MODULES: Object.values(actual.CLINIC_MODULES).filter(
-      (module) => module !== 'clinic-leads' && module !== 'clinic-payments',
-    ),
-  };
-});
-
+// Leads and Appointments are on the API; every other room still reads fixtures.
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import {
   resetClinicAccessFixture,
@@ -84,10 +74,16 @@ describe('resolveAccessFromCodes', () => {
 });
 
 describe('useClinicAccess — a room on the API answers from the member’s codes', () => {
-  it('opens a live room by its codes and keeps the fixture rooms on the matrix', async () => {
-    // A member with only Leads and Payments codes: no clinic role and no staff profile, so the
-    // fixture matrix would show them Today only.
-    signIn(['organization:read', 'lead:read', 'lead:create', 'payment:read']);
+  it('opens Leads and Appointments by their codes and keeps the fixture rooms on the matrix', async () => {
+    // A member with only lead and appointment codes: no clinic role and no staff profile, so
+    // the fixture matrix would show them Today only.
+    signIn([
+      'organization:read',
+      'lead:read',
+      'lead:create',
+      'appointment:read',
+      'appointment:update',
+    ]);
 
     const { result } = renderAccess();
     await waitFor(() => expect(result.current.isResolved).toBe(true));
@@ -95,14 +91,16 @@ describe('useClinicAccess — a room on the API answers from the member’s code
     expect(result.current.can('leads', 'view')).toBe(true);
     expect(result.current.can('leads', 'create')).toBe(true);
     expect(result.current.can('leads', 'delete')).toBe(false);
-    expect(result.current.can('payments', 'view')).toBe(true);
-    expect(result.current.can('payments', 'create')).toBe(false);
+    expect(result.current.can('appointments', 'view')).toBe(true);
+    expect(result.current.can('appointments', 'edit')).toBe(true);
+    expect(result.current.can('appointments', 'create')).toBe(false);
     expect(result.current.can('patients', 'view')).toBe(false);
-    expect(result.current.viewableSections).toEqual(['today', 'leads', 'payments']);
+    expect(result.current.viewableSections).toEqual(['today', 'leads', 'appointments']);
   });
 
   it('a live room loses what the codes do not grant, whatever the matrix says', async () => {
-    // The org owner's codes without any lead code: the matrix gives Owner everything.
+    // The org owner's codes without any lead or appointment code: the matrix gives Owner
+    // everything.
     signIn(['organization:read', 'organization:delete', 'membership:read', 'role:read']);
 
     const { result } = renderAccess();
@@ -110,7 +108,18 @@ describe('useClinicAccess — a room on the API answers from the member’s code
 
     expect(result.current.roles).toEqual(['owner']);
     expect(result.current.can('leads', 'view')).toBe(false);
+    expect(result.current.can('appointments', 'view')).toBe(false);
     expect(result.current.can('patients', 'view')).toBe(true);
+  });
+
+  it('keeps Today on the fixture matrix — the owner acts on it with no code of its own', async () => {
+    signIn(['organization:read', 'organization:delete', 'membership:read', 'role:read']);
+
+    const { result } = renderAccess();
+    await waitFor(() => expect(result.current.isResolved).toBe(true));
+
+    expect(result.current.can('today', 'view')).toBe(true);
+    expect(result.current.can('today', 'edit')).toBe(true);
   });
 
   it('canCode answers one exact code, and nothing while View-as runs', async () => {
@@ -119,7 +128,7 @@ describe('useClinicAccess — a room on the API answers from the member’s code
     const { result, rerender } = renderAccess();
     await waitFor(() => expect(result.current.isResolved).toBe(true));
     expect(result.current.canCode('lead:export')).toBe(true);
-    expect(result.current.canCode('payment:export')).toBe(false);
+    expect(result.current.canCode('appointment:export')).toBe(false);
 
     useUIStore.getState().setPreviewRole('doctor');
     rerender();

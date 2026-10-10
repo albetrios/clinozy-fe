@@ -1,4 +1,4 @@
-import { useBookableStaff } from '@/shared/hooks/useAppointments/index.ts';
+import { useFixtureBookableStaff } from '@/shared/hooks/useFixtureAppointments/index.ts';
 import { useMyStaffProfile } from '@/shared/hooks/useTeam/index.ts';
 
 /** Who a new record starts with, and whether the staff list has answered. */
@@ -18,7 +18,7 @@ export function useDefaultStaff(
   staffRole: 'doctor' | 'therapist',
   lastId: string | null | undefined,
 ): DefaultStaff {
-  const staff = useBookableStaff();
+  const staff = useFixtureBookableStaff();
   const me = useMyStaffProfile();
   const people = (staff.data ?? []).filter(
     (person) => person.active && person.roles.includes(staffRole),

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import type { AppointmentRow } from './appointments-contracts.ts';
+import type { AppointmentRow } from './appointments-fixture-contracts.ts';
 import {
   clinicCommonSchema,
   isoDateTimeSchema,

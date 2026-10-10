@@ -1,12 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
-import type {
-  AppointmentRow,
-  AppointmentStaff,
-} from '@/shared/api/clinic/appointments-contracts.ts';
+import {
+  APPOINTMENT_TOMORROW,
+  appointmentRow,
+  contactHit,
+  DOCTOR_NISHA,
+} from '@/tests/utils/appointment-doubles.ts';
 import { fsi } from '@/tests/utils/bidi-marks.ts';
 
-import { emptyDraft } from './appointment-form-model.ts';
+import { emptyDraft, whoOfContact } from './appointment-form-model.ts';
 import {
   cancelReasonText,
   detailsSummaryText,
@@ -20,43 +22,30 @@ import {
 const t = (key: string, values?: Record<string, unknown>) =>
   values ? `${key}${JSON.stringify(values)}` : key;
 
-const row = (overrides: Partial<AppointmentRow> = {}) =>
-  ({ seq: 2861, cancelReason: null, cancelNote: null, ...overrides }) as AppointmentRow;
-
-const doctor = {
-  firstName: 'Reenal',
-  lastName: 'Shah',
-} as AppointmentStaff;
-
 describe('the form’s words', () => {
   it('titles New, Edit and Reschedule — "Appointment" while the booking loads', () => {
     expect(formTitle(t, 'create', undefined)).toBe('appointmentForm.title.create');
     expect(formTitle(t, 'edit', undefined)).toBe('appointmentForm.title.loading');
-    expect(formTitle(t, 'edit', row())).toBe('appointmentForm.title.edit{"id":"#2861"}');
-    expect(formTitle(t, 'reschedule', row())).toBe(
+    expect(formTitle(t, 'edit', appointmentRow())).toBe(
+      'appointmentForm.title.edit{"id":"#2861"}',
+    );
+    expect(formTitle(t, 'reschedule', appointmentRow())).toBe(
       'appointmentForm.title.reschedule{"id":"#2861"}',
     );
   });
 
-  it('sums the booking up in the footer: who · service · length · doctor', () => {
+  it('sums the booking up in the footer: who · service · length · the doctor’s name', () => {
     const draft = {
-      ...emptyDraft('2026-10-05'),
-      who: {
-        kind: 'patient' as const,
-        name: 'Dharti Galani',
-        phone: null,
-        patientId: 'p',
-        leadId: null,
-        seq: 3508,
-      },
+      ...emptyDraft(APPOINTMENT_TOMORROW),
+      who: whoOfContact(contactHit()),
     };
     // Each part isolated, so a name stays whole on a right-to-left page.
-    expect(footerSummary(t, draft, doctor)).toBe(
+    expect(footerSummary(t, draft, DOCTOR_NISHA)).toBe(
       [
-        fsi('Dharti Galani'),
+        fsi('Riya Mehta'),
         fsi('Consultation'),
         fsi('appointmentForm.footer.minutes{"minutes":20}'),
-        fsi('Reenal Shah'),
+        fsi('Nisha Shah'),
       ].join(' · '),
     );
     expect(footerSummary(t, { ...draft, who: null }, undefined)).toBe(
@@ -73,14 +62,17 @@ describe('the form’s words', () => {
     expect(saveLabelText(t, 'book', slot)).toBe(
       `appointmentForm.footer.book{"day":"${fsi('Mon 5 Oct')}","time":"${fsi('10:15 am')}"}`,
     );
+    expect(saveLabelText(t, 'move', slot)).toBe(
+      `appointmentForm.footer.move{"day":"${fsi('Mon 5 Oct')}","time":"${fsi('10:15 am')}"}`,
+    );
   });
 
   it('sums step 1 up with the reason quoted, cut at 40 characters', () => {
     const draft = { ...emptyDraft(null), reason: ` ${'r'.repeat(50)} ` };
-    expect(detailsSummaryText(t, draft, doctor)).toBe(
+    expect(detailsSummaryText(t, draft, DOCTOR_NISHA)).toBe(
       [
         fsi('Consultation'),
-        fsi('Reenal Shah'),
+        fsi('Nisha Shah'),
         fsi('appointmentForm.footer.minutes{"minutes":20}'),
         fsi(`“${'r'.repeat(40)}”`),
       ].join(' · '),
@@ -99,14 +91,23 @@ describe('the form’s words', () => {
     );
   });
 
-  it('names a cancel’s reason — an "Other"’s own note', () => {
+  it('names a cancel’s reason — one of the API’s, or an "Other"’s own note', () => {
     expect(cancelReasonText(t, undefined)).toBeNull();
-    expect(cancelReasonText(t, row())).toBeNull();
+    expect(cancelReasonText(t, appointmentRow())).toBeNull();
     expect(
-      cancelReasonText(t, row({ cancelReason: 'other', cancelNote: 'Moved city' })),
+      cancelReasonText(
+        t,
+        appointmentRow({ cancelReason: 'other', cancelNote: 'Moved city' }),
+      ),
     ).toBe('Moved city');
-    expect(cancelReasonText(t, row({ cancelReason: 'patient_asked' }))).toBe(
+    expect(cancelReasonText(t, appointmentRow({ cancelReason: 'other' }))).toBe(
+      'appointments.cancelReasons.other{"ns":"clinic"}',
+    );
+    expect(cancelReasonText(t, appointmentRow({ cancelReason: 'patient_asked' }))).toBe(
       'appointments.cancelReasons.patient_asked{"ns":"clinic"}',
     );
+    expect(
+      cancelReasonText(t, appointmentRow({ cancelReason: 'resource_unavailable' })),
+    ).toBe('appointments.cancelReasons.resource_unavailable{"ns":"clinic"}');
   });
 });

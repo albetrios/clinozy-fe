@@ -24,14 +24,22 @@ import { AppointmentActionsProvider } from '../../components/AppointmentActions/
 export const APPOINTMENTS_PAGE = '/organization/acme/appointments';
 
 /**
- * Sign the test member in as the org's owner (every clinic action), or with no
- * clinic role at all — `useClinicAccess` reads the platform codes.
+ * The test member's codes on clinozy-be — `useClinicAccess` reads the Appointments room's from
+ * them: every booking action (read, create, update, delete, and a lead from the contact card),
+ * or read only (no Edit, no Create).
  */
 export function grantClinicAccess(level: 'owner' | 'none' = 'owner') {
   useOrganizationStore.setState({
     permissions: (level === 'owner'
-      ? ['organization:read', 'organization:delete']
-      : ['organization:read']) as never,
+      ? [
+          'organization:read',
+          'appointment:read',
+          'appointment:create',
+          'appointment:update',
+          'appointment:delete',
+          'lead:create',
+        ]
+      : ['organization:read', 'appointment:read']) as never,
     permissionsResolved: true,
   });
 }

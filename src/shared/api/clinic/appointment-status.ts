@@ -1,3 +1,4 @@
+import type { AppointmentCancelReason } from './appointments-contracts.ts';
 import type { AppointmentStatus, CancelReason } from './clinic-schema.ts';
 import { clinicClockTime, clinicToday } from './clinic-time.ts';
 
@@ -6,8 +7,8 @@ import { clinicClockTime, clinicToday } from './clinic-time.ts';
  * H:5899–5900, H:5974, H:6038): ONE transition table and ONE guard set for the
  * Change status popover, the appointment card, the form's status tiles, the
  * cancel view and Today (Q-A7) — the prototype's card skipped the popover's
- * guards and its form let Completed step back (§7.3). Pure: the fixture server
- * answers with these same rules, so no screen offers a move the server refuses.
+ * guards and its form let Completed step back (§7.3). Pure, and the moves are
+ * clinozy-be's (one route each), so no screen offers a move the server refuses.
  * Guards return reason codes; each screen words them (`appointment-status.constants.ts`).
  */
 
@@ -252,26 +253,35 @@ const TILE_REASONS: Readonly<Record<AppointmentTileStatus, AppointmentTileReason
   completed: 'after_check_in',
 };
 
-function tilesOnOffer(draft: AppointmentStatus, date: string, today: string) {
-  if (draft === 'checked_in' || draft === 'completed') return ['checked_in', 'completed'];
-  return date === today
-    ? ['scheduled', 'confirmed', 'checked_in']
-    : ['scheduled', 'confirmed'];
+/**
+ * The tiles a booking can move to from its saved status — the API's moves (one route each): a
+ * Scheduled booking confirms, and checks in on the visit day; a Confirmed one checks in on the
+ * visit day (there is no un-confirm); a Checked-in one completes (there is no one-step complete).
+ */
+function tilesOnOffer(
+  saved: AppointmentStatus,
+  date: string,
+  today: string,
+): readonly AppointmentTileStatus[] {
+  if (saved === 'checked_in') return ['checked_in', 'completed'];
+  const visitDay = date === today;
+  if (saved === 'confirmed')
+    return visitDay ? ['confirmed', 'checked_in'] : ['confirmed'];
+  return visitDay ? ['scheduled', 'confirmed', 'checked_in'] : ['scheduled', 'confirmed'];
 }
 
 /**
- * The form's tiles (`formTiles`, H:6038): on the visit day Scheduled ·
- * Confirmed · Checked in; on other days Scheduled · Confirmed; after check-in
- * Checked in · Completed — Completed for patients only. Completed is final once
- * saved (the prototype let it step back, §7.3); Cancelled and No show leave
- * every tile inert.
+ * The form's tiles (`formTiles`, H:6038): the moves out of the saved status
+ * ({@link tilesOnOffer}) and the saved status itself — Completed for patients
+ * only. Completed is final once saved (the prototype let it step back, §7.3);
+ * Cancelled and No show leave every tile inert.
  */
 export function formTiles(input: AppointmentTilesInput): AppointmentTile[] {
   const closed = input.saved === 'cancelled' || input.saved === 'no_show';
   const position = closed
     ? -1
     : APPOINTMENT_TILE_STATUSES.indexOf(input.draft as AppointmentTileStatus);
-  const onOffer: readonly string[] = tilesOnOffer(input.draft, input.date, input.today);
+  const onOffer: readonly string[] = tilesOnOffer(input.saved, input.date, input.today);
   const reasonFor = (status: AppointmentTileStatus): AppointmentTileReason | null => {
     if (closed) return 'closed';
     if (input.saved === 'completed') return 'final';
@@ -318,11 +328,10 @@ export function formStatusHint(
 }
 
 /**
- * Whether a form save may set `next` over the saved status (`updateAppointment`
- * with a status, `S:1610`): un-confirm and confirm freely before check-in;
- * check in on the visit day; complete after check-in — or straight from the
- * visit day's Scheduled or Confirmed, both stamps at once — patients only.
- * Cancel and No show have their own writes; a final status takes none.
+ * Whether a form save may move the saved status to `next` — each move is its own route on
+ * clinozy-be: confirm a Scheduled booking; check in a Scheduled or Confirmed one on the visit
+ * day; complete a Checked-in one. There is no un-confirm and no one-step complete (G3); Cancel
+ * and No show have their own writes; a final status takes none.
  */
 export function formStatusGuard(
   saved: AppointmentStatus,
@@ -331,15 +340,18 @@ export function formStatusGuard(
 ): AppointmentGuard {
   if (next === saved) return ALLOWED;
   if (isFinalAppointmentStatus(saved)) return blocked('final');
-  if (next === 'cancelled' || next === 'no_show') return blocked('not_allowed');
   const beforeArrival = saved === 'scheduled' || saved === 'confirmed';
-  if (next === 'scheduled' || next === 'confirmed') {
-    return beforeArrival ? ALLOWED : blocked('not_allowed');
+  if (next === 'confirmed')
+    return saved === 'scheduled' ? ALLOWED : blocked('not_allowed');
+  if (next === 'checked_in') {
+    if (!beforeArrival) return blocked('not_allowed');
+    return context.date === context.today ? ALLOWED : blocked('visit_day');
   }
-  const onVisitDay = context.date === context.today;
-  if (next === 'checked_in') return onVisitDay ? ALLOWED : blocked('visit_day');
-  if (beforeArrival && !onVisitDay) return blocked('visit_day');
-  return context.isPatient ? ALLOWED : blocked('needs_patient');
+  if (next === 'completed') {
+    if (saved !== 'checked_in') return blocked('not_allowed');
+    return context.isPatient ? ALLOWED : blocked('needs_patient');
+  }
+  return blocked('not_allowed');
 }
 
 // ── Cancel reasons ──
@@ -369,67 +381,14 @@ export type AppointmentFormCancelReason =
   (typeof APPOINTMENT_FORM_CANCEL_REASONS)[number];
 
 /**
- * How a form reason is stored (D32, AMBER A-A3; `cancelReasonToContract`):
- * Patient cancelled → `patient_asked`; Doctor unavailable →
- * `doctor_unavailable`; Rescheduling later and Booked by mistake → `other` with
- * their label as the note; Other → `other` with the member's note.
- *
- * @param label The reason's label as the member read it (the note for the two `other` mappings).
+ * How a form reason is stored — the API has each one (`cancel_reason`): Patient cancelled →
+ * `patient_asked`, the rest as they are; Other carries the member's note.
  */
 export function cancelReasonToContract(
   reason: AppointmentFormCancelReason,
-  { note, label }: { note: string | null; label: string },
-): { reason: CancelReason; note: string | null } {
-  switch (reason) {
-    case 'patient_cancelled':
-      return { reason: 'patient_asked', note: null };
-    case 'doctor_unavailable':
-      return { reason: 'doctor_unavailable', note: null };
-    case 'rescheduling_later':
-    case 'booked_by_mistake':
-      return { reason: 'other', note: label };
-    case 'other':
-      return { reason: 'other', note: (note?.trim() ?? '') || null };
-  }
+  note: string | null,
+): { reason: AppointmentCancelReason; note: string | null } {
+  if (reason === 'patient_cancelled') return { reason: 'patient_asked', note: null };
+  if (reason === 'other') return { reason, note: (note?.trim() ?? '') || null };
+  return { reason, note: null };
 }
-
-// ── Effects ──
-
-/**
- * What a status brings with it (KICKOFF §6.4 "Side effects"; Q-T3): the
- * record effects the server writes with the status, and the tasks its rule
- * job raises — a fixture job now, inside the same write so Undo takes them
- * back too.
- *
- * - `confirmRequest` — the WhatsApp confirm request goes out (new, moved or restored).
- * - `confirmTask` — "Confirm visits" (`confirm_visit`, `S:1506`) when it comes close.
- * - `reminderQueued` — the reminder goes out ("· reminder queued").
- * - `checkInStamp` / `completeStamp` — `checkedInAt` / `completedAt`.
- * - `leadsVisited` — every open lead of the person → Clinic visited, plus a system line (`S:1610`, H:6047).
- * - `feedbackTask` — "Collect feedback" the day after (H:5899).
- * - `releaseSlot` / `stopReminders` — the slot frees and reminders stop.
- * - `noShowTask` — "Rebook no-shows" (outcomes Rebooked · Not interested · No answer).
- */
-export type AppointmentEffect =
-  | 'confirmRequest'
-  | 'confirmTask'
-  | 'reminderQueued'
-  | 'checkInStamp'
-  | 'completeStamp'
-  | 'leadsVisited'
-  | 'feedbackTask'
-  | 'releaseSlot'
-  | 'stopReminders'
-  | 'noShowTask';
-
-/** The effects of arriving at each status. */
-export const APPOINTMENT_STATUS_EFFECTS: Readonly<
-  Record<AppointmentStatus, readonly AppointmentEffect[]>
-> = {
-  scheduled: ['confirmRequest', 'confirmTask'],
-  confirmed: ['reminderQueued'],
-  checked_in: ['checkInStamp', 'leadsVisited'],
-  completed: ['completeStamp', 'leadsVisited', 'feedbackTask'],
-  cancelled: ['releaseSlot', 'stopReminders'],
-  no_show: ['noShowTask'],
-};

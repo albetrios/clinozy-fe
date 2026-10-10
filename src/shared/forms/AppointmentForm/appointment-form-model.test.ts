@@ -1,19 +1,19 @@
-import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-import { fetchAppointment } from '@/shared/api/clinic/appointments-api.ts';
-import type {
-  AppointmentConnectedLead,
-  AppointmentPackageOption,
-  AppointmentRow,
-  AppointmentSlot,
-} from '@/shared/api/clinic/appointments-contracts.ts';
-import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import {
+  APPOINTMENT_TODAY,
+  APPOINTMENT_TOMORROW,
+  appointmentRow,
+  contactHit,
+  DOCTOR_ARJUN,
+  DOCTOR_NISHA,
+  TEST_BRANCH_ID,
+} from '@/tests/utils/appointment-doubles.ts';
 
 import {
   applyAppointmentChange,
   type AppointmentDraft,
+  copiesAsIs,
   copyDraftOf,
   createInputOf,
   detailsDone,
@@ -22,15 +22,12 @@ import {
   emptyDraft,
   hourLabel,
   isDraftDirty,
-  isOpenLead,
   leadBookingPrefill,
-  leadChoices,
-  linkedLeadId,
+  moveRouteOf,
   movesAtCheckIn,
   newContactPhone,
   newDraftOf,
   patchOf,
-  planFlagOf,
   rebaseDraft,
   rescheduleDraftOf,
   rescheduleNote,
@@ -43,84 +40,91 @@ import {
   snapLength,
   startingDoctorId,
   type WhoDraft,
-  whoOf,
+  whoOfContact,
 } from './appointment-form-model.ts';
 
-const TODAY = '2026-10-03';
+const TODAY = APPOINTMENT_TODAY;
 
-/** Dharti's Peel on 8 Oct, Confirmed — the Edit tests' booking. */
-let peel: AppointmentRow;
-
-beforeAll(async () => {
-  vi.useFakeTimers({ toFake: ['Date'] });
-  vi.setSystemTime(new Date(clinicInstant(TODAY, '10:00')));
-  resetClinicFixtures();
-  peel = await fetchAppointment(ref.appointment(2859));
-  vi.useRealTimers();
+/** Riya's Peel tomorrow at 11:00, Confirmed — the Edit tests' booking. */
+const peel = appointmentRow({
+  type: 'treatment',
+  serviceLabel: 'Peel',
+  durationMin: 30,
+  startTime: '11:00',
+  endTime: '11:30',
+  status: 'confirmed',
+  reason: 'Acne scars',
 });
 
-const PRIYA: WhoDraft = {
-  kind: 'lead',
-  name: 'Priya Shah',
-  phone: '+919876543210',
-  patientId: null,
-  leadId: 'lead-1',
-  seq: 2401,
-};
-
-const lead = (
-  overrides: Partial<AppointmentConnectedLead>,
-): AppointmentConnectedLead => ({
-  id: 'lead-1',
-  seq: 2401,
-  status: 'new',
-  kind: 'enquiry',
-  source: 'instagram',
-  interests: ['LHR'],
-  ownerName: 'Reenal Shah',
-  patientId: null,
-  createdAt: '2026-09-30T10:00:00.000Z',
-  ...overrides,
-});
-
-const PACKAGE: AppointmentPackageOption = {
-  id: 'pack-1',
-  offeringId: 'off-1',
-  name: 'LHR Full Face · 6',
-  tone: 'blush',
-  durationMin: 50,
-  sessionsTotal: 6,
-  sessionsUsed: 2,
-  validUntil: '2027-03-23',
-};
+/** Riya as the form holds her — a lead, her contact found by the search. */
+const RIYA: WhoDraft = whoOfContact(contactHit());
 
 const booked = (draft: Partial<AppointmentDraft> = {}): AppointmentDraft => ({
   ...emptyDraft(TODAY),
-  who: PRIYA,
-  doctorId: 'dr-1',
+  who: RIYA,
+  doctorId: DOCTOR_NISHA.id,
   time: '11:00',
   ...draft,
 });
 
+describe('who the booking is for', () => {
+  it('holds a contact the search found: a lead while they have an open one', () => {
+    expect(RIYA).toEqual({
+      kind: 'lead',
+      contactId: 'con_riya00000000000000000',
+      name: 'Riya Mehta',
+      phone: '+919825011241',
+      patientId: null,
+      leadId: 'lead_riya00000000000000000',
+      contactNumber: 1201,
+    });
+  });
+
+  it('holds a contact with a patient file as a patient, and one with neither as a contact', () => {
+    expect(
+      whoOfContact(contactHit({ patientId: 'pat_riya00000000000000000' })),
+    ).toMatchObject({ kind: 'patient', patientId: 'pat_riya00000000000000000' });
+    expect(whoOfContact(contactHit({ openLeadId: null }))).toMatchObject({
+      kind: 'contact',
+      leadId: null,
+    });
+  });
+});
+
 describe('starting a draft', () => {
-  it('starts a New form on its day as a 20-minute Consultation', () => {
-    expect(emptyDraft('2026-10-05')).toMatchObject({
+  it('starts a New form on its day as a 20-minute Consultation, no one picked', () => {
+    expect(emptyDraft('2026-10-05')).toEqual({
       who: null,
+      newPhone: '',
       type: 'consultation',
       serviceLabel: 'Consultation',
+      offeringId: null,
+      doctorId: null,
       durationMin: 20,
+      reason: '',
+      notes: '',
       date: '2026-10-05',
       time: null,
       status: 'scheduled',
     });
   });
 
-  it('reads a booking back for Edit, its person, service, slot and status', () => {
+  it('reads a booking back for Edit: its person, service, doctor, slot and status', () => {
     expect(draftOf(peel)).toMatchObject({
-      who: whoOf(peel.person),
+      who: {
+        kind: 'lead',
+        contactId: peel.contactId,
+        name: 'Riya Mehta',
+        leadId: peel.leadId,
+        contactNumber: 1201,
+      },
+      type: 'treatment',
       serviceLabel: 'Peel',
+      doctorId: DOCTOR_NISHA.id,
       durationMin: 30,
-      date: peel.date,
+      reason: 'Acne scars',
+      notes: '',
+      date: APPOINTMENT_TOMORROW,
       time: '11:00',
       status: 'confirmed',
     });
@@ -128,26 +132,21 @@ describe('starting a draft', () => {
   });
 
   it('reschedules from the booking’s day, or from today once it has passed', () => {
-    expect(rescheduleDraftOf(peel, TODAY).date).toBe(peel.date);
+    expect(rescheduleDraftOf(peel, TODAY).date).toBe(APPOINTMENT_TOMORROW);
     expect(rescheduleDraftOf(peel, '2026-12-01').date).toBe('2026-12-01');
     expect(savedDraftOf(peel, 'reschedule', '2026-12-01').date).toBe('2026-12-01');
   });
 
-  it('copies a booking — same person, service, doctor and length — today, no time (Q-A6)', () => {
-    expect(copyDraftOf(peel, TODAY)).toMatchObject({
-      who: whoOf(peel.person),
-      serviceLabel: 'Peel',
-      doctorId: peel.doctorId,
-      durationMin: 30,
+  it('copies a booking — same person, service, doctor, length and reason — today, no time', () => {
+    expect(copyDraftOf(peel, TODAY)).toEqual({
+      ...draftOf(peel),
       date: TODAY,
       time: null,
       status: 'scheduled',
-      packageId: null,
-      leadPick: null,
     });
   });
 
-  it('starts a New form from its prefill: the day, the slot, the type, the reason', () => {
+  it('starts a New form from its prefill: the person, the day, the slot, the type, the reason', () => {
     const draft = newDraftOf(
       {
         date: '2026-10-05',
@@ -157,15 +156,15 @@ describe('starting a draft', () => {
         durationMin: 35,
         reason: 'Upper lip and chin',
       },
-      { person: peel.person, source: undefined, today: TODAY, doctorId: 'dr-1' },
+      { person: RIYA, source: undefined, today: TODAY, doctorId: DOCTOR_ARJUN.id },
     );
     expect(draft).toMatchObject({
-      who: whoOf(peel.person),
+      who: RIYA,
       type: 'treatment',
       serviceLabel: 'LHR Treatment',
       durationMin: 30,
       reason: 'Upper lip and chin',
-      doctorId: 'dr-1',
+      doctorId: DOCTOR_ARJUN.id,
       date: '2026-10-05',
       time: '10:15',
     });
@@ -179,30 +178,40 @@ describe('starting a draft', () => {
     expect(past).toMatchObject({ date: TODAY, time: null, who: null });
     const copy = newDraftOf(
       { date: '2026-10-09', time: '12:00' },
-      { person: undefined, source: peel, today: TODAY, doctorId: 'dr-9' },
+      { person: undefined, source: peel, today: TODAY, doctorId: DOCTOR_ARJUN.id },
     );
     expect(copy).toEqual(copyDraftOf(peel, TODAY));
   });
 
-  it('takes the first doctor known: the prefill’s, the copy’s, the usual, the branch’s, the first', () => {
-    expect(startingDoctorId([undefined, null, 'usual', 'branch'])).toBe('usual');
-    expect(startingDoctorId(['prefill', 'usual'])).toBe('prefill');
+  it('takes the first doctor known: the prefill’s, the copy’s, the first of the team', () => {
+    expect(startingDoctorId([undefined, null, DOCTOR_NISHA.id, DOCTOR_ARJUN.id])).toBe(
+      DOCTOR_NISHA.id,
+    );
+    expect(startingDoctorId([DOCTOR_ARJUN.id, DOCTOR_NISHA.id])).toBe(DOCTOR_ARJUN.id);
     expect(startingDoctorId([undefined, null])).toBeNull();
   });
 
-  it('books from the lead drawer: LHR Treatment for a laser interest, else Consultation (§6.3)', () => {
+  it('books from the lead drawer: the lead’s contact, LHR Treatment for a laser interest (§6.3)', () => {
     expect(
-      leadBookingPrefill({ id: 'l1', interests: ['Laser hair'] }, 'x'.repeat(120)),
+      leadBookingPrefill(
+        { contactId: 'con_riya00000000000000000', interests: ['Laser hair'] },
+        'x'.repeat(120),
+      ),
     ).toEqual({
-      whoId: 'l1',
+      whoId: 'con_riya00000000000000000',
       collapsed: true,
       type: 'treatment',
       serviceLabel: 'LHR Treatment',
       durationMin: 20,
       reason: 'x'.repeat(80),
     });
-    expect(leadBookingPrefill({ id: 'l2', interests: ['Peel'] }, null)).toEqual({
-      whoId: 'l2',
+    expect(
+      leadBookingPrefill(
+        { contactId: 'con_dev000000000000000000', interests: ['Peel'] },
+        null,
+      ),
+    ).toEqual({
+      whoId: 'con_dev000000000000000000',
       collapsed: true,
       type: 'consultation',
       durationMin: 20,
@@ -217,84 +226,80 @@ describe('each control’s change (updA, H:5976)', () => {
     expect(snapLength(200)).toBe(120);
   });
 
-  it('a new person clears the Lead pick and a new contact’s mobile', () => {
-    const draft = applyAppointmentChange(booked({ leadPick: 'x', newPhone: '98' }), {
+  it('a new person clears a new contact’s mobile; the mobile keeps ten digits', () => {
+    const draft = applyAppointmentChange(booked({ newPhone: '98' }), {
       kind: 'who',
       who: null,
     });
-    expect(draft).toMatchObject({ who: null, leadPick: null, newPhone: '' });
+    expect(draft).toMatchObject({ who: null, newPhone: '' });
     expect(
       applyAppointmentChange(draft, { kind: 'newPhone', digits: '+91 98765-43210 99' })
         .newPhone,
     ).toBe('9198765432');
-    expect(applyAppointmentChange(draft, { kind: 'lead', leadId: 'l2' }).leadPick).toBe(
-      'l2',
-    );
   });
 
   it('a type sets its service and length; Treatment keeps a treatment already picked', () => {
     const treatment = applyAppointmentChange(booked(), {
       kind: 'type',
       type: 'treatment',
-      packages: [],
     });
-    expect(treatment).toMatchObject({ serviceLabel: 'Treatment', durationMin: 60 });
+    expect(treatment).toMatchObject({
+      serviceLabel: 'Treatment',
+      offeringId: null,
+      durationMin: 60,
+    });
     const hydra = applyAppointmentChange(treatment, {
       kind: 'treatment',
       label: 'Hydrafacial',
-      offeringId: 'off-h',
-      minutes: 45,
+      offeringId: 'off_hydra000000000000000',
+      minutes: 50,
     });
-    const followUp = applyAppointmentChange(hydra, {
-      kind: 'type',
-      type: 'follow_up',
-      packages: [],
+    expect(hydra).toMatchObject({
+      type: 'treatment',
+      serviceLabel: 'Hydrafacial',
+      offeringId: 'off_hydra000000000000000',
+      durationMin: 45,
     });
-    expect(followUp).toMatchObject({ serviceLabel: 'Follow-up', durationMin: 15 });
+    expect(applyAppointmentChange(hydra, { kind: 'type', type: 'treatment' })).toBe(
+      hydra,
+    );
     expect(
-      applyAppointmentChange(hydra, { kind: 'type', type: 'treatment', packages: [] }),
-    ).toBe(hydra);
+      applyAppointmentChange(hydra, { kind: 'type', type: 'follow_up' }),
+    ).toMatchObject({ serviceLabel: 'Follow-up', offeringId: null, durationMin: 15 });
     const custom = { ...booked(), serviceLabel: 'Microneedling', type: 'other' as const };
     expect(
-      applyAppointmentChange(custom, { kind: 'type', type: 'treatment', packages: [] }),
+      applyAppointmentChange(custom, { kind: 'type', type: 'treatment' }),
     ).toMatchObject({ type: 'treatment', serviceLabel: 'Microneedling' });
   });
 
-  it('a Package session takes the picked or the first package, its length snapped', () => {
-    const pkg = applyAppointmentChange(booked(), {
-      kind: 'type',
-      type: 'package_session',
-      packages: [PACKAGE],
+  it('a Package session takes its own service and keeps the length', () => {
+    const hydra = applyAppointmentChange(booked(), {
+      kind: 'treatment',
+      label: 'Hydrafacial',
+      offeringId: 'off_hydra000000000000000',
+      minutes: 45,
     });
-    expect(pkg).toMatchObject({
+    expect(
+      applyAppointmentChange(hydra, { kind: 'type', type: 'package_session' }),
+    ).toMatchObject({
       type: 'package_session',
-      packageId: 'pack-1',
-      offeringId: 'off-1',
-      serviceLabel: 'LHR Full Face · 6',
+      serviceLabel: 'Package session',
+      offeringId: null,
       durationMin: 45,
     });
-    const none = applyAppointmentChange(booked({ durationMin: 30 }), {
-      kind: 'type',
-      type: 'package_session',
-      packages: [],
-    });
-    expect(none).toMatchObject({ packageId: null, durationMin: 30 });
-    expect(
-      applyAppointmentChange(booked(), { kind: 'package', option: PACKAGE }).packageId,
-    ).toBe('pack-1');
   });
 
   it('a new doctor or day clears the time; the same one keeps the draft', () => {
     const draft = booked();
     expect(
-      applyAppointmentChange(draft, { kind: 'doctor', doctorId: 'dr-2' }).time,
-    ).toBeNull();
-    expect(applyAppointmentChange(draft, { kind: 'doctor', doctorId: 'dr-1' })).toBe(
-      draft,
-    );
+      applyAppointmentChange(draft, { kind: 'doctor', doctorId: DOCTOR_ARJUN.id }),
+    ).toMatchObject({ doctorId: DOCTOR_ARJUN.id, time: null });
     expect(
-      applyAppointmentChange(draft, { kind: 'date', date: '2026-10-04' }).time,
-    ).toBeNull();
+      applyAppointmentChange(draft, { kind: 'doctor', doctorId: DOCTOR_NISHA.id }),
+    ).toBe(draft);
+    expect(
+      applyAppointmentChange(draft, { kind: 'date', date: APPOINTMENT_TOMORROW }),
+    ).toMatchObject({ date: APPOINTMENT_TOMORROW, time: null });
     expect(applyAppointmentChange(draft, { kind: 'date', date: TODAY })).toBe(draft);
   });
 
@@ -328,11 +333,7 @@ describe('each control’s change (updA, H:5976)', () => {
     expect(
       applyAppointmentChange(
         { ...start, status: 'checked_in' },
-        {
-          kind: 'time',
-          time: '12:00',
-          saved: checkedIn,
-        },
+        { kind: 'time', time: '12:00', saved: checkedIn },
       ).status,
     ).toBe('checked_in');
     expect(
@@ -366,15 +367,21 @@ describe('what the form derives', () => {
     expect(isDraftDirty({ ...start, reason: '   ' }, start)).toBe(false);
     expect(isDraftDirty({ ...start, reason: 'Acne' }, start)).toBe(true);
     expect(isDraftDirty({ ...start, who: null }, start)).toBe(true);
+    expect(
+      isDraftDirty(
+        { ...start, who: { ...RIYA, contactId: 'con_other000000000000000' } },
+        start,
+      ),
+    ).toBe(true);
   });
 
   it('rebases onto the booking’s new values, keeping every edit', () => {
     const previous = draftOf(peel);
-    const edited = { ...previous, reason: 'Cheeks', doctorId: 'dr-9' };
+    const edited = { ...previous, reason: 'Cheeks', doctorId: DOCTOR_ARJUN.id };
     const next = { ...previous, status: 'checked_in' as const, notes: 'Arrived early' };
     expect(rebaseDraft(edited, previous, next)).toMatchObject({
       reason: 'Cheeks',
-      doctorId: 'dr-9',
+      doctorId: DOCTOR_ARJUN.id,
       status: 'checked_in',
       notes: 'Arrived early',
     });
@@ -392,68 +399,35 @@ describe('what the form derives', () => {
     expect(saveLabelKind('edit', booked({ time: '12:00' }), saved)).toBe('move');
   });
 
-  it('shows the plan flag in Edit for a patient from Confirmed on, counting this visit’s', () => {
-    const visit = {
-      edit: true,
-      isPatient: true,
-      status: 'confirmed' as const,
-      appointmentId: 'a1',
-    };
-    const lines = [
-      { status: 'planned', appointmentId: 'a1' },
-      { status: 'accepted', appointmentId: 'a0' },
-      { status: 'declined', appointmentId: 'a1' },
-    ];
-    expect(planFlagOf(visit, lines)).toEqual({ total: 2, forVisit: 1 });
-    expect(planFlagOf(visit, undefined)).toEqual({ total: 0, forVisit: 0 });
-    expect(planFlagOf({ ...visit, status: 'scheduled' }, lines)).toBeNull();
-    expect(planFlagOf({ ...visit, isPatient: false }, lines)).toBeNull();
-  });
-});
-
-describe('connected leads (S:330, H:4139)', () => {
-  it('offers the open leads not on a patient record, and links the pick or the first', () => {
-    const open = lead({ id: 'a' });
-    const closed = lead({ id: 'b', status: 'lost' });
-    const converted = lead({ id: 'c', patientId: 'p1' });
-    const thread = lead({ id: 'd', status: null });
-    expect(isOpenLead(open)).toBe(true);
-    expect(isOpenLead(closed)).toBe(false);
-    expect(isOpenLead(converted)).toBe(false);
-    expect(leadChoices([open, closed, converted, thread]).map((row) => row.id)).toEqual([
-      'a',
-      'd',
-    ]);
-    const leads = [open, thread];
-    expect(linkedLeadId(booked(), leads)).toBe('a');
-    expect(linkedLeadId(booked({ leadPick: 'd' }), leads)).toBe('d');
-    expect(linkedLeadId(booked({ leadPick: 'b' }), leads)).toBe('a');
-    expect(linkedLeadId(booked(), [])).toBe('lead-1');
-  });
-
-  it('says a lead moves to Clinic visited at check-in only before check-in', () => {
-    expect(movesAtCheckIn([lead({})], 'scheduled')).toBe(true);
-    expect(movesAtCheckIn([lead({})], 'checked_in')).toBe(false);
-    expect(movesAtCheckIn([lead({ status: 'clinic_visited' })], 'scheduled')).toBe(false);
+  it('says the person’s open lead moves to Clinic visited at check-in, until they are checked in', () => {
+    expect(movesAtCheckIn('lead_riya00000000000000000', 'scheduled')).toBe(true);
+    expect(movesAtCheckIn('lead_riya00000000000000000', 'confirmed')).toBe(true);
+    expect(movesAtCheckIn('lead_riya00000000000000000', 'checked_in')).toBe(false);
+    expect(movesAtCheckIn('lead_riya00000000000000000', 'completed')).toBe(false);
+    expect(movesAtCheckIn(null, 'scheduled')).toBe(false);
   });
 });
 
 describe('the slot grid (H:6001–6002)', () => {
-  const slot = (time: string, free = true): AppointmentSlot => ({ time, free });
+  const slot = (time: string, endTime: string) => ({ time, endTime });
 
-  it('groups the starts by hour, counting the free ones', () => {
-    const hours = slotHours([slot('09:00'), slot('09:30', false), slot('10:00')]);
-    expect(hours).toEqual([
-      { hour: 9, slots: [slot('09:00'), slot('09:30', false)], free: 1 },
-      { hour: 10, slots: [slot('10:00')], free: 1 },
+  it('groups the free starts by hour, in order — no row for an hour without one', () => {
+    const hours = slotHours([
+      slot('09:00', '09:20'),
+      slot('09:30', '09:50'),
+      slot('11:00', '11:20'),
     ]);
+    expect(hours).toEqual([
+      { hour: 9, slots: [slot('09:00', '09:20'), slot('09:30', '09:50')] },
+      { hour: 11, slots: [slot('11:00', '11:20')] },
+    ]);
+    expect(slotHours([])).toEqual([]);
   });
 
   it('splits more than six hours into two columns, the first holding the extra one', () => {
     const hours = Array.from({ length: 7 }, (_, index) => ({
       hour: 9 + index,
       slots: [],
-      free: 0,
     }));
     expect(slotColumns(hours).map((column) => column.length)).toEqual([4, 3]);
     expect(slotColumns(hours.slice(0, 6))).toHaveLength(1);
@@ -467,50 +441,94 @@ describe('the slot grid (H:6001–6002)', () => {
 });
 
 describe('what a save sends', () => {
-  it('books the draft — a new contact as the contract’s new contact (S:1609)', () => {
+  it('reads a new contact’s mobile as E.164 once it has ten digits', () => {
     const fresh = booked({
-      who: { ...PRIYA, kind: 'new', leadId: null, phone: null, seq: null },
+      who: { ...RIYA, kind: 'new', contactId: null, leadId: null, contactNumber: null },
       newPhone: '9876543210',
-      reason: '  Acne  ',
     });
     expect(newContactPhone(fresh)).toBe('+919876543210');
     expect(newContactPhone({ ...fresh, newPhone: '98765' })).toBeNull();
-    expect(createInputOf(fresh, { branchId: 'b1', leads: [] })).toMatchObject({
-      patientId: null,
-      leadId: null,
-      doctorId: 'dr-1',
-      date: TODAY,
-      startTime: '11:00',
-      branchId: 'b1',
-      reason: 'Acne',
-      notes: null,
-      newContact: { name: 'Priya Shah', phone: '+919876543210' },
-    });
-    const copy = createInputOf(booked(), {
-      branchId: null,
-      leads: [lead({})],
-      copyOf: 'a9',
-    });
-    expect(copy).toMatchObject({ leadId: 'lead-1', copyOf: 'a9' });
-    expect(copy).not.toHaveProperty('branchId');
-    expect(copy).not.toHaveProperty('newContact');
   });
 
-  it('sends only what changed in Edit, the status when a tile moved it', () => {
-    const start = draftOf(peel);
-    expect(patchOf(start, peel, [])).toEqual({});
-    const edited = {
-      ...start,
-      reason: 'Cheeks',
-      time: '12:00',
-      doctorId: 'dr-9',
-      status: 'scheduled' as const,
-    };
-    expect(patchOf(edited, peel, [])).toEqual({
-      reason: 'Cheeks',
-      startTime: '12:00',
-      doctorId: 'dr-9',
-      status: 'scheduled',
+  it('books the draft for a contact on a branch, its text trimmed', () => {
+    const draft = booked({ reason: '  Acne  ', notes: '   ' });
+    expect(
+      createInputOf(draft, {
+        branchId: TEST_BRANCH_ID,
+        contactId: 'con_riya00000000000000000',
+      }),
+    ).toEqual({
+      contactId: 'con_riya00000000000000000',
+      branchId: TEST_BRANCH_ID,
+      doctorId: DOCTOR_NISHA.id,
+      type: 'consultation',
+      serviceLabel: 'Consultation',
+      offeringId: null,
+      durationMin: 20,
+      date: TODAY,
+      startTime: '11:00',
+      reason: 'Acne',
+      notes: null,
     });
+  });
+
+  it('copies as is only for the same doctor, branch, service, length and reason — and no notes', () => {
+    const copy = { ...copyDraftOf(peel, TODAY), time: '12:00' };
+    expect(copiesAsIs(copy, peel, TEST_BRANCH_ID)).toBe(true);
+    expect(copiesAsIs(copy, peel, 'brn_other000000000000000')).toBe(false);
+    expect(copiesAsIs({ ...copy, doctorId: DOCTOR_ARJUN.id }, peel, TEST_BRANCH_ID)).toBe(
+      false,
+    );
+    expect(copiesAsIs({ ...copy, durationMin: 45 }, peel, TEST_BRANCH_ID)).toBe(false);
+    expect(copiesAsIs({ ...copy, reason: 'Cheeks' }, peel, TEST_BRANCH_ID)).toBe(false);
+    expect(copiesAsIs({ ...copy, notes: 'Bring the report' }, peel, TEST_BRANCH_ID)).toBe(
+      false,
+    );
+  });
+
+  it('sends only what changed in Edit — the doctor, the day and the start among them', () => {
+    const start = draftOf(peel);
+    expect(patchOf(start, peel)).toEqual({});
+    expect(
+      patchOf(
+        {
+          ...start,
+          reason: 'Cheeks',
+          notes: ' Bring the report ',
+          doctorId: DOCTOR_ARJUN.id,
+          date: '2026-10-06',
+          time: '12:00',
+          status: 'scheduled',
+        },
+        peel,
+      ),
+    ).toEqual({
+      reason: 'Cheeks',
+      notes: 'Bring the report',
+      doctorId: DOCTOR_ARJUN.id,
+      date: '2026-10-06',
+      startTime: '12:00',
+    });
+    expect(patchOf({ ...start, reason: '' }, peel)).toEqual({ reason: null });
+  });
+
+  it('asks the route for a status tile: confirm, check-in, complete — none for the rest', () => {
+    const scheduled = appointmentRow();
+    const checkedIn = appointmentRow({ status: 'checked_in' });
+    expect(moveRouteOf(draftOf(scheduled), scheduled)).toBeNull();
+    expect(moveRouteOf({ ...draftOf(scheduled), status: 'confirmed' }, scheduled)).toBe(
+      'confirm',
+    );
+    expect(moveRouteOf({ ...draftOf(scheduled), status: 'checked_in' }, scheduled)).toBe(
+      'check-in',
+    );
+    expect(moveRouteOf({ ...draftOf(peel), status: 'checked_in' }, peel)).toBe(
+      'check-in',
+    );
+    expect(moveRouteOf({ ...draftOf(checkedIn), status: 'completed' }, checkedIn)).toBe(
+      'complete',
+    );
+    // A move of the slot set a Confirmed booking back to Scheduled — the server does that itself.
+    expect(moveRouteOf({ ...draftOf(peel), status: 'scheduled' }, peel)).toBeNull();
   });
 });

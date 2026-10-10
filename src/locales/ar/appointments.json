@@ -51,12 +51,6 @@
     "dayBooked_other": "{{date}} · {{count}} حجز",
     "appointedTo": "مُسنَد إلى",
     "allDoctors": "كل الأطباء",
-    "doctors_zero": "لا أطباء",
-    "doctors_one": "طبيب واحد",
-    "doctors_two": "طبيبان",
-    "doctors_few": "{{count}} أطباء",
-    "doctors_many": "{{count}} طبيبًا",
-    "doctors_other": "{{count}} طبيب",
     "searchTeam": "البحث في الفريق",
     "showAll": "عرض الكل",
     "done": "تم",
@@ -130,10 +124,6 @@
       "hint": "{{confirmed}} · {{waiting}}"
     },
     "latest": {
-      "planReady": "✓ الخطة جاهزة",
-      "planPending": "○ الخطة معلّقة",
-      "reminderRead": "✓ قُرئ التذكير",
-      "reminderDelivered": "✓ وصل التذكير",
       "reminderSent": "✓ أُرسل التذكير",
       "repliedYes": "✓ ردّ بنعم",
       "moved": "✓ نُقل",
@@ -141,10 +131,6 @@
       "checkedIn": "✓ حضر"
     },
     "latestHints": {
-      "planReady": "{{suggestions}} في اقتراحات الخدمات",
-      "planPending": "افتح الموعد وأضف اقتراحات الخدمات",
-      "reminderRead": "قُرئ التذكير على WhatsApp",
-      "reminderDelivered": "وصل التذكير",
       "reminderSent": "أُرسل التذكير",
       "repliedYes": "تأكّد تلقائيًا بردّ «نعم» على WhatsApp",
       "moved": "نُقل من {{day}} {{time}}",

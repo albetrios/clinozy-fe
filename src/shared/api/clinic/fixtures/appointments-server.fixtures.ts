@@ -38,7 +38,7 @@ import {
   availableSlotsParamsSchema,
   statusesForFilter,
   type VisitPhotoInput,
-} from '@/shared/api/clinic/appointments-contracts.ts';
+} from '@/shared/api/clinic/appointments-fixture-contracts.ts';
 import {
   createdFilterMatches,
   followUpFilterMatches,
@@ -91,7 +91,7 @@ import { clinicFixtures, onClinicFixturesReset } from './world.fixtures.ts';
  * Appendix F's per-day summary, bookable staff and Undo). It answers the way
  * clinozy-be will: 422 for a broken field, 409 for a refused move or a taken
  * slot, 404 for an unknown booking. Every write runs the task rule job inside
- * its own change, so a status's tasks come and go with it. `appointments-api.ts`
+ * its own change, so a status's tasks come and go with it. `appointments-fixture-api.ts`
  * loads this module on demand; when the API lands, it goes.
  */
 

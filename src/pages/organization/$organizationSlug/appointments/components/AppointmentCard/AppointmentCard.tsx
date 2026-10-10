@@ -22,7 +22,6 @@ import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
 import { APPOINTMENT_STATUS_TONES, TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import {
   PersonAvatar,
-  personFullName,
   personInitials,
   shortPersonName,
   TonePill,
@@ -177,7 +176,7 @@ export function AppointmentCardContent({
   const moves = allowedNext(status).filter((move) => move !== stepMove);
   const closed = status === 'cancelled' || status === 'no_show';
   const event = latestEvent(appointment);
-  const doctorName = doctor ? shortPersonName(personFullName(doctor)) : '';
+  const doctorName = doctor ? shortPersonName(doctor.name) : '';
   const run = (action: () => void) => () => {
     close();
     action();

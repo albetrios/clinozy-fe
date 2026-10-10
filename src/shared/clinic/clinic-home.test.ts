@@ -72,6 +72,18 @@ describe('clinicHomeRoute', () => {
     });
   });
 
+  it('skips a room on clinozy-be the member holds no codes for', async () => {
+    // Today off: the owner's fallback walks the nav order, and Leads and Appointments answer
+    // from the codes (the room would turn them away otherwise), not from the full-access matrix.
+    disabled.modules = new Set(['clinic-today']);
+    useOrganizationStore
+      .getState()
+      .setPermissions(['organization:read', 'organization:delete', 'appointment:read']);
+    expect((await clinicHomeRoute('acme'))?.to).toBe(
+      '/organization/$organizationSlug/appointments',
+    );
+  });
+
   it('follows a View-as preview', async () => {
     useOrganizationStore
       .getState()

@@ -1,5 +1,5 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
-import type { AppointmentType, ImageAlbum } from '@/shared/api/clinic/clinic-schema.ts';
+import type { AppointmentType } from '@/shared/api/clinic/clinic-schema.ts';
 
 /**
  * The appointment form's copy lives in `clinic`, not the room's
@@ -18,12 +18,6 @@ const TYPE_KEYS = (prefix: string): Readonly<Record<AppointmentType, string>> =>
   other: `${prefix}.other`,
 });
 
-const ALBUM_KEYS: Readonly<Record<ImageAlbum, string>> = {
-  general: 'appointmentForm.photos.albums.general',
-  private: 'appointmentForm.photos.albums.private',
-  lhr: 'appointmentForm.photos.albums.lhr',
-};
-
 /** Key paths for the appointment form (`appointments.md` › Copy, verbatim). */
 export const APPOINTMENT_FORM_KEYS = {
   title: {
@@ -40,11 +34,8 @@ export const APPOINTMENT_FORM_KEYS = {
     search: 'appointmentForm.who.search',
     searchLabel: 'appointmentForm.who.searchLabel',
     useContact: 'appointmentForm.who.useContact',
-    /** "Patient · <care>" — the care types joined; "Patient" without one. */
+    /** A search hit with a patient file. */
     patient: 'appointmentForm.who.patient',
-    patientCare: 'appointmentForm.who.patientCare',
-    /** "Lead #<seq> · <mobile>". */
-    lead: 'appointmentForm.who.lead',
     /** "+ Create contact “<query>”". */
     createContact: 'appointmentForm.who.createContact',
     newContact: 'appointmentForm.who.newContact',
@@ -62,9 +53,6 @@ export const APPOINTMENT_FORM_KEYS = {
     /** A chip's tooltip: "Lead #<seq> · <source> · owner <name>". */
     chipHint: 'appointmentForm.links.chipHint',
     movesAtCheckIn: 'appointmentForm.links.movesAtCheckIn',
-    lead: 'appointmentForm.links.lead',
-    /** A radio: "Lead #<seq>". */
-    leadOption: 'appointmentForm.links.leadOption',
   },
   status: {
     section: 'appointmentForm.status.section',
@@ -80,15 +68,6 @@ export const APPOINTMENT_FORM_KEYS = {
     /** "Rescheduled · was <day> <time> …" — Confirmed, then Scheduled. */
     rescheduledConfirm: 'appointmentForm.status.rescheduledConfirm',
     rescheduled: 'appointmentForm.status.rescheduled',
-    /** "Plan ready · <n> offering(s)". */
-    planReady: 'appointmentForm.status.planReady',
-    planNotPrepared: 'appointmentForm.status.planNotPrepared',
-    /** The plan flag's tooltip, its parts joined with " · ". */
-    planVisit: 'appointmentForm.status.planVisit',
-    planEarlier: 'appointmentForm.status.planEarlier',
-    planOpen: 'appointmentForm.status.planOpen',
-    planEmpty: 'appointmentForm.status.planEmpty',
-    createPatient: 'appointmentForm.status.createPatient',
   },
   details: {
     title: 'appointmentForm.details.title',
@@ -99,11 +78,10 @@ export const APPOINTMENT_FORM_KEYS = {
     types: TYPE_KEYS('appointmentForm.details.types'),
     /** Each type chip's tooltip. */
     typeHints: TYPE_KEYS('appointmentForm.details.typeHints'),
-    /** The line under the chips; Package session takes `{{next}}` and `{{total}}`. */
+    /** The line under the chips (Treatment and Package session have none). */
     typeLines: {
       consultation: 'appointmentForm.details.typeLines.consultation',
       follow_up: 'appointmentForm.details.typeLines.follow_up',
-      package_session: 'appointmentForm.details.typeLines.package_session',
       other: 'appointmentForm.details.typeLines.other',
     },
     treatment: 'appointmentForm.details.treatment',
@@ -111,12 +89,6 @@ export const APPOINTMENT_FORM_KEYS = {
     searchTreatments: 'appointmentForm.details.searchTreatments',
     common: 'appointmentForm.details.common',
     fromOfferings: 'appointmentForm.details.fromOfferings',
-    package: 'appointmentForm.details.package',
-    packageNext: 'appointmentForm.details.packageNext',
-    packageLeft: 'appointmentForm.details.packageLeft',
-    noPackage: 'appointmentForm.details.noPackage',
-    pickContactPackages: 'appointmentForm.details.pickContactPackages',
-    asTreatment: 'appointmentForm.details.asTreatment',
     doctor: 'appointmentForm.details.doctor',
     pickDoctor: 'appointmentForm.details.pickDoctor',
     searchDoctors: 'appointmentForm.details.searchDoctors',
@@ -140,49 +112,24 @@ export const APPOINTMENT_FORM_KEYS = {
     stepOption: 'appointmentForm.slot.stepOption',
     time: 'appointmentForm.slot.time',
     pickDate: 'appointmentForm.slot.pickDate',
-    /** The day offers no start: closed, the doctor off, or every time passed. */
+    /** An open day with no free start left. */
     none: 'appointmentForm.slot.none',
+    /** Why the server closed the day (`closed_reason`); `holiday` takes `{{label}}`. */
+    closed: {
+      past: 'appointmentForm.slot.closed.past',
+      branchInactive: 'appointmentForm.slot.closed.branchInactive',
+      closedDay: 'appointmentForm.slot.closed.closedDay',
+      holiday: 'appointmentForm.slot.closed.holiday',
+      doctorOff: 'appointmentForm.slot.closed.doctorOff',
+    },
     am: 'appointmentForm.slot.am',
     pm: 'appointmentForm.slot.pm',
     /** "<hour> <AM/PM>" — a row's name. */
     hour: 'appointmentForm.slot.hour',
     free: 'appointmentForm.slot.free',
-    booked: 'appointmentForm.slot.booked',
     locked: 'appointmentForm.slot.locked',
     lockedSummary: 'appointmentForm.slot.lockedSummary',
     lockedToast: 'appointmentForm.slot.lockedToast',
-  },
-  notPatient: {
-    section: 'appointmentForm.notPatient.section',
-    title: 'appointmentForm.notPatient.title',
-    body: 'appointmentForm.notPatient.body',
-    action: 'appointmentForm.notPatient.action',
-    done: 'appointmentForm.notPatient.done',
-  },
-  photos: {
-    title: 'appointmentForm.photos.title',
-    section: 'appointmentForm.photos.section',
-    locked: 'appointmentForm.photos.locked',
-    checkIn: 'appointmentForm.photos.checkIn',
-    album: 'appointmentForm.photos.album',
-    albums: ALBUM_KEYS,
-    upload: 'appointmentForm.photos.upload',
-    add: 'appointmentForm.photos.add',
-    open: 'appointmentForm.photos.open',
-    edit: 'appointmentForm.photos.edit',
-    delete: 'appointmentForm.photos.delete',
-    /** "<n> photo(s) · they show in <first>’s file under this visit". */
-    count: 'appointmentForm.photos.count',
-    empty: 'appointmentForm.photos.empty',
-    attached: 'appointmentForm.photos.attached',
-    deleteTitle: 'appointmentForm.photos.deleteTitle',
-    deleted: 'appointmentForm.photos.deleted',
-    reasons: {
-      wrongPatient: 'appointmentForm.photos.reasons.wrongPatient',
-      blurry: 'appointmentForm.photos.reasons.blurry',
-      duplicate: 'appointmentForm.photos.reasons.duplicate',
-      other: 'appointmentForm.photos.reasons.other',
-    },
   },
   footer: {
     pickTime: 'appointmentForm.footer.pickTime',
@@ -197,6 +144,8 @@ export const APPOINTMENT_FORM_KEYS = {
     passed: 'appointmentForm.validation.passed',
     taken: 'appointmentForm.validation.taken',
     doctor: 'appointmentForm.validation.doctor',
+    /** No open branch to book at. */
+    branch: 'appointmentForm.validation.branch',
   },
   copied: 'appointmentForm.copied',
 } as const;
@@ -222,7 +171,6 @@ export const APPOINTMENT_FORM_TEST_IDS = {
   whoEditMobile: 'appointment-form-who-edit-mobile',
   whoEditSave: 'appointment-form-who-edit-save',
   connectedLead: 'appointment-form-connected-lead',
-  leadOption: 'appointment-form-lead-option',
   status: 'appointment-form-status',
   statusTile: (status: string) => `appointment-form-status-${status}`,
   statusHint: 'appointment-form-status-hint',
@@ -232,13 +180,10 @@ export const APPOINTMENT_FORM_TEST_IDS = {
   copy: 'appointment-form-copy',
   rebook: 'appointment-form-rebook',
   cancelVisit: 'appointment-form-cancel-visit',
-  plan: 'appointment-form-plan',
   details: 'appointment-form-details',
   detailsToggle: 'appointment-form-details-toggle',
   type: 'appointment-form-type',
   treatment: 'appointment-form-treatment',
-  package: 'appointment-form-package',
-  packageAsTreatment: 'appointment-form-package-as-treatment',
   doctor: 'appointment-form-doctor',
   length: 'appointment-form-length',
   reason: 'appointment-form-reason',
@@ -254,12 +199,7 @@ export const APPOINTMENT_FORM_TEST_IDS = {
   slotStep: 'appointment-form-slot-step',
   slotHour: 'appointment-form-slot-hour',
   slotTime: 'appointment-form-slot-time',
-  notPatient: 'appointment-form-not-patient',
-  createPatient: 'appointment-form-create-patient',
-  photos: 'appointment-form-photos',
-  photosCheckIn: 'appointment-form-photos-check-in',
-  photosUpload: 'appointment-form-photos-upload',
-  photoTile: 'appointment-form-photo',
-  photoDelete: 'appointment-form-photo-delete',
+  /** The line in place of the grid: no date, a closed day, no free start. */
+  slotHint: 'appointment-form-slot-hint',
   chat: 'appointment-form-chat',
 } as const;

@@ -7,7 +7,7 @@
  * (`dialogSearch` in `routeTree.tsx`); the page that opens the drawer parses it,
  * and this module loads with the room.
  */
-import { matchOf, oneOf, RECORD_ID, textOf } from '@/lib/routes/search-params.ts';
+import { matchOf, oneOf, PUBLIC_ID, textOf } from '@/lib/routes/search-params.ts';
 
 const SOURCES = ['chat', 'task'] as const;
 const MODES = ['reschedule'] as const;
@@ -20,9 +20,9 @@ const CLOCK_TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
 export interface AppointmentCreateSearch {
   /** The start, `HH:mm` — an empty Day slot's time, rounded to 15 minutes. */
   time?: string;
-  /** Who: a patient's or a lead's id. */
+  /** Who: the contact (`con_…`) — a booking points at its contact (api-integration §5.3). */
   who?: string;
-  /** The booking a Copy or Rebook starts from — a new appointment, the old one stays. */
+  /** The booking (`appt_…`) a Copy or Rebook starts from — a new appointment, the old one stays. */
   copyOf?: string;
   /** Opened from a chat or a task: step 1 collapsed, Date & time open (plan-only). */
   source?: 'chat' | 'task';
@@ -40,8 +40,8 @@ export function validateAppointmentCreateSearch(
 ): AppointmentCreateSearch {
   return {
     time: matchOf(CLOCK_TIME, search.time),
-    who: matchOf(RECORD_ID, search.who),
-    copyOf: matchOf(RECORD_ID, search.copyOf),
+    who: matchOf(PUBLIC_ID, search.who),
+    copyOf: matchOf(PUBLIC_ID, search.copyOf),
     source: oneOf(SOURCES, search.source),
     from: textOf(search.from) || undefined,
   };

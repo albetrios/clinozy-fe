@@ -35,8 +35,9 @@ const VISIT_FLOW_REFERRER =
 const REFERRER_PATTERNS: readonly RegExp[] = [
   /^today$/,
   /^leads$/,
-  // The lead drawer: a booking from its contact card opens over it (A-P1).
-  /^leads\/[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i,
+  // The lead drawer: a booking from its contact card opens over it (A-P1). A lead is a
+  // clinozy-be public id (`lead_<21 [a-z0-9]>`).
+  /^leads\/lead_[a-z0-9]{21}$/,
   /^appointments$/,
   /^patients$/,
   PATIENT_FILE_REFERRER,
@@ -129,7 +130,8 @@ export const CROSS_ROOM_ROUTES: readonly CrossRoomRoute[] = [
   },
   {
     name: 'appointment',
-    path: /^appointments\/([\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12})$/i,
+    // A booking is a clinozy-be public id (`appt_<21 [a-z0-9]>`).
+    path: /^appointments\/(appt_[a-z0-9]{21})$/,
     param: 'appointmentId',
     room: 'appointments',
   },

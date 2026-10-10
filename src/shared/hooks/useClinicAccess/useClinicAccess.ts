@@ -1,15 +1,10 @@
 import { useMemo } from 'react';
 
 import {
-  CLINIC_MODULES,
-  FIXTURE_BACKED_CLINIC_MODULES,
-} from '@/core/config/clinic-modules.ts';
-import {
   clinicAccessQueryKeys,
   clinicRolesForMember,
   fetchClinicAccessMatrix,
-  resolveAccessFromCodes,
-  resolveClinicAccess,
+  resolveMemberClinicAccess,
 } from '@/shared/api/clinic/access-api.ts';
 import {
   type ClinicAbility,
@@ -18,7 +13,6 @@ import {
   isPresetRole,
 } from '@/shared/api/clinic/access-contracts.ts';
 import type { Role, Section } from '@/shared/api/clinic/clinic-schema.ts';
-import { CLINIC_SECTION_ORDER } from '@/shared/clinic/clinic-sections.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import { useMyStaffProfile } from '@/shared/hooks/useTeam/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
@@ -73,19 +67,6 @@ const NOTHING_YET = {
 };
 
 /**
- * The sections whose room is on clinozy-be's API (out of
- * `FIXTURE_BACKED_CLINIC_MODULES`): their access is the member's own codes.
- */
-const LIVE_SECTIONS: ReadonlySet<Section> = new Set(
-  (Object.entries(CLINIC_MODULES) as [Section, string][])
-    .filter(
-      ([, module]) =>
-        !(FIXTURE_BACKED_CLINIC_MODULES as readonly string[]).includes(module),
-    )
-    .map(([section]) => section),
-);
-
-/**
  * In-room access for the clinic screens. A room on clinozy-be's API answers from
  * the member's own permission codes (`my_permissions`; `resolveAccessFromCodes`,
  * L-60 / D148) — it switches when the room leaves `FIXTURE_BACKED_CLINIC_MODULES`,
@@ -115,33 +96,20 @@ export function useClinicAccess(): ClinicAccess {
     if (!(matrix && permissionsResolved && profileResolved)) {
       return { roles, previewRole, ...NOTHING_YET };
     }
-    const fromMatrix = resolveClinicAccess(
+    const access = resolveMemberClinicAccess({
       matrix,
       roleKeys,
-      previewRole ? {} : { platformCodes: permissions },
-    );
-    if (previewRole) {
-      return {
-        roles,
-        previewRole,
-        isResolved: true,
-        ...fromMatrix,
-        canCode: () => false,
-      };
-    }
-    const fromCodes = resolveAccessFromCodes(permissions);
-    const can = (section: Section, action: ClinicAction) =>
-      LIVE_SECTIONS.has(section)
-        ? fromCodes.can(section, action)
-        : fromMatrix.can(section, action);
+      permissions,
+      previewing: previewRole !== null,
+    });
     return {
       roles,
       previewRole,
       isResolved: true,
-      can,
-      canAbility: fromMatrix.canAbility,
-      canCode: (code: string) => permissions.includes(code as never),
-      viewableSections: CLINIC_SECTION_ORDER.filter((section) => can(section, 'view')),
+      ...access,
+      canCode: previewRole
+        ? () => false
+        : (code: string) => permissions.includes(code as never),
     };
   }, [
     matrix,

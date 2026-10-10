@@ -19,18 +19,19 @@ vi.mock('@/shared/api/clinic/today-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchTodayFloor: vi.fn(),
   fetchTodayEnquiries: vi.fn(),
-  checkInAppointment: vi.fn(),
-  undoCheckIn: vi.fn(),
   moveFloorStage: vi.fn(),
 }));
+vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  moveAppointment: vi.fn(),
+}));
 
+import { moveAppointment } from '@/shared/api/clinic/appointments-api.ts';
 import {
-  checkInAppointment,
   fetchTodayEnquiries,
   fetchTodayFloor,
   moveFloorStage,
   todayQueryKeys,
-  undoCheckIn,
 } from '@/shared/api/clinic/today-api.ts';
 import { TODAY_REFETCH_MS } from '@/shared/api/clinic/today-contracts.ts';
 
@@ -94,7 +95,7 @@ describe('useTodayFloor / useTodayEnquiries (KICKOFF §6.2)', () => {
 });
 
 describe('useTodayMoves', () => {
-  it('sends each move with one key per action and refreshes the floor', async () => {
+  it('checks in and undoes it through the booking’s move routes, each with its own key, and refreshes the floor', async () => {
     const { result } = renderHook(useTodayMoves, { wrapper });
     const refresh = vi.spyOn(client, 'invalidateQueries');
 
@@ -107,12 +108,18 @@ describe('useTodayMoves', () => {
       }),
     );
 
-    const checkInKey = vi.mocked(checkInAppointment).mock.calls[0]?.[0].idempotencyKey;
-    expect(checkInAppointment).toHaveBeenCalledWith({
+    const [checkIn, undo] = vi.mocked(moveAppointment).mock.calls.map(([vars]) => vars);
+    expect(checkIn).toEqual({
       appointmentId: 'appt_1',
+      route: 'check-in',
       idempotencyKey: expect.any(String),
     });
-    expect(vi.mocked(undoCheckIn).mock.calls[0]?.[0].idempotencyKey).not.toBe(checkInKey);
+    expect(undo).toEqual({
+      appointmentId: 'appt_1',
+      route: 'undo-check-in',
+      idempotencyKey: expect.any(String),
+    });
+    expect(undo?.idempotencyKey).not.toBe(checkIn?.idempotencyKey);
     expect(moveFloorStage).toHaveBeenCalledWith({
       appointmentId: 'appt_1',
       stage: 'with_doctor',

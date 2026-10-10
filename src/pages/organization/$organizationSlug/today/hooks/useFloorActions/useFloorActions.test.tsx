@@ -2,14 +2,11 @@ import { act, waitFor } from '@testing-library/react';
 import { useEffect } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { moveAppointment } from '@/shared/api/clinic/appointments-api.ts';
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import {
-  checkInAppointment,
-  moveFloorStage,
-  undoCheckIn,
-} from '@/shared/api/clinic/today-api.ts';
+import { moveFloorStage } from '@/shared/api/clinic/today-api.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import {
@@ -31,9 +28,11 @@ vi.mock('@/shared/notify/index.ts', () => ({
 }));
 vi.mock('@/shared/api/clinic/today-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
-  checkInAppointment: vi.fn(),
-  undoCheckIn: vi.fn(),
   moveFloorStage: vi.fn(),
+}));
+vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  moveAppointment: vi.fn(),
 }));
 
 /** A row's id for the tests. */
@@ -119,23 +118,25 @@ describe('useFloorActions (KICKOFF §6.2 lanes table; §3.7, §6.13)', () => {
     expect(probe.actions?.actionOf(cardIn('enquiries'))).toBeNull();
   });
 
-  it('checks in with Today’s own words, and its Undo undoes the check-in', async () => {
+  it('checks in through the booking’s check-in route with Today’s own words, and its Undo undoes it', async () => {
     await actionsFor('front_desk');
     await waitFor(() =>
       expect(probe.actions?.actionOf(cardIn('arriving'))).toBeTypeOf('function'),
     );
     act(() => probe.actions?.actionOf(cardIn('arriving'))?.());
     await waitFor(() => expect(notify.undo).toHaveBeenCalled());
-    expect(checkInAppointment).toHaveBeenCalledWith({
+    expect(moveAppointment).toHaveBeenCalledWith({
       appointmentId: rowId(1),
+      route: 'check-in',
       idempotencyKey: expect.any(String),
     });
     const [message, options] = vi.mocked(notify.undo).mock.lastCall ?? [];
     expect(message).toBe('Faizan Shaikh checked in · Dr. queue and room notified');
     act(() => options?.onUndo());
     await waitFor(() =>
-      expect(undoCheckIn).toHaveBeenCalledWith({
+      expect(moveAppointment).toHaveBeenLastCalledWith({
         appointmentId: rowId(1),
+        route: 'undo-check-in',
         idempotencyKey: expect.any(String),
       }),
     );
@@ -159,7 +160,7 @@ describe('useFloorActions (KICKOFF §6.2 lanes table; §3.7, §6.13)', () => {
   });
 
   it('keeps the card where it is when the server refuses the move', async () => {
-    vi.mocked(checkInAppointment).mockRejectedValueOnce(new Error('not due'));
+    vi.mocked(moveAppointment).mockRejectedValueOnce(new Error('not due'));
     await actionsFor('front_desk');
     await waitFor(() =>
       expect(probe.actions?.actionOf(cardIn('arriving'))).toBeTypeOf('function'),
