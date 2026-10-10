@@ -32957,15 +32957,15 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: {
+                            /** @enum {string|null} */
+                            analytics_consent: "granted" | "denied" | null;
                             /** Format: date-time */
-                            created_at?: string;
-                            is_dark_mode_enabled?: boolean;
-                            is_notifications_enabled?: boolean;
-                            language?: string;
-                            preferred_locales?: string[];
-                            /** Format: date-time */
-                            updated_at?: string;
-                            user_id?: string;
+                            analytics_consent_at: string | null;
+                            analytics_consent_version: number | null;
+                            is_dark_mode_enabled: boolean;
+                            is_notifications_enabled: boolean;
+                            language: string;
+                            preferred_locales: string[];
                         };
                         meta?: {
                             request_id: string;
@@ -32992,6 +32992,9 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    /** @enum {string} */
+                    analytics_consent?: "granted" | "denied";
+                    analytics_consent_version?: number;
                     is_dark_mode_enabled?: boolean;
                     is_notifications_enabled?: boolean;
                     language?: string;
@@ -33008,15 +33011,15 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: {
+                            /** @enum {string|null} */
+                            analytics_consent: "granted" | "denied" | null;
                             /** Format: date-time */
-                            created_at?: string;
-                            is_dark_mode_enabled?: boolean;
-                            is_notifications_enabled?: boolean;
-                            language?: string;
-                            preferred_locales?: string[];
-                            /** Format: date-time */
-                            updated_at?: string;
-                            user_id?: string;
+                            analytics_consent_at: string | null;
+                            analytics_consent_version: number | null;
+                            is_dark_mode_enabled: boolean;
+                            is_notifications_enabled: boolean;
+                            language: string;
+                            preferred_locales: string[];
                         };
                         meta?: {
                             request_id: string;
