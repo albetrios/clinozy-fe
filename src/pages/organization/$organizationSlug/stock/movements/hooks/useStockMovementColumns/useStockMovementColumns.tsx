@@ -10,6 +10,7 @@ import {
   REASON_CONFIRM_NS,
 } from '@/shared/components/ConfirmDialog/reason-confirm.constants.ts';
 import type { DataTableFeatures } from '@/shared/components/DataTable/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 
 import { useStockWords } from '../../../shared/hooks/useStockWords/index.ts';
 import type {
@@ -103,14 +104,16 @@ function movementNote(
   if (purchase?.seq == null) return remark;
   return (
     <>
-      <button
+      <Button
         type="button"
+        variant="link"
+        size="xs"
         data-testid={PURCHASE_LINK_TEST_ID}
         onClick={() => onOpenPurchase(purchase.id)}
-        className="text-muted-foreground-strong hover:text-foreground focus-visible:ring-ring/50 rounded-xs underline-offset-2 outline-none hover:underline focus-visible:ring-[3px]"
+        className="text-muted-foreground-strong hover:text-foreground h-auto rounded-xs p-0 font-normal whitespace-normal underline-offset-2"
       >
         {text.purchaseLine(purchase)}
-      </button>
+      </Button>
       {remark === null ? null : ` · ${remark}`}
     </>
   );

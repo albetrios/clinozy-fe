@@ -156,16 +156,16 @@ report_hits "bg-card/bg-popover without data-slot (within 4 lines)" \
 
 # 6 — `rounded-full` with nothing for the Sharp shape to grab. Dropped before the
 # look-back, because they are indicators and not surfaces: comment lines, blurred
-# glows, the ping halo, pseudo-element markers, and dots of at most 10px
-# (`size-2.5`, `h-2 w-2`). Prettier's Tailwind plugin fixes the class order, so
-# `h-N w-N` is the only spelling a dot can have.
+# glows, the ping halo, pseudo-element markers, and dots of at most 10px — every
+# quarter step up to `size-2.5` (`size-1.75`, `h-2 w-2`). Prettier's Tailwind plugin
+# fixes the class order, so `h-N w-N` is the only spelling a dot can have.
 PILL_RAW=$(grep -rEn 'rounded-full' src --include='*.tsx' --include='*.ts' \
   | grep -v '^src/shared/components/ui/' \
   | grep -v '\.test\.' \
   | grep -v '\.fixtures\.' \
   | grep -Ev ':[0-9]+:[[:space:]]*(//|\*|/\*|\{/\*)' \
   | grep -Ev 'blur-|animate-ping|(before|after):rounded-full' \
-  | grep -Ev "(^|[\"'\` ])(size-(1|1\.5|2|2\.5)|h-(1|1\.5|2|2\.5) w-(1|1\.5|2|2\.5))([^0-9.]|\$)" \
+  | grep -Ev "(^|[\"'\` ])(size-(1|1\.25|1\.5|1\.75|2|2\.25|2\.5)|h-(1|1\.25|1\.5|1\.75|2|2\.25|2\.5) w-(1|1\.25|1\.5|1\.75|2|2\.25|2\.5))([^0-9.]|\$)" \
   || true)
 report_hits "rounded-full the Sharp shape cannot square (add data-slot=\"pill\")" \
   "$(without_nearby "$PILL_RAW" 5 'data-slot=|<(Button|Avatar|AvatarFallback|Skeleton)([[:space:]/>]|$)')"
