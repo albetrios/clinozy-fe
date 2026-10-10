@@ -11,21 +11,21 @@ import {
   fetchAppointmentDayCounts,
   fetchAppointmentRange,
   fetchAppointmentSlots,
-  fetchBookableTreatments,
   fetchPersonAppointments,
   listAppointments,
   moveAppointment,
   updateAppointment,
 } from '@/shared/api/clinic/appointments-api.ts';
-import type {
-  AppointmentCancel,
-  AppointmentCreateInput,
-  AppointmentFields,
-  AppointmentListParams,
-  AppointmentMoveRoute,
-  AppointmentRangeParams,
-  AppointmentRow,
-  AppointmentSlotParams,
+import {
+  type AppointmentCancel,
+  type AppointmentCreateInput,
+  type AppointmentFields,
+  type AppointmentListParams,
+  type AppointmentMoveRoute,
+  type AppointmentRangeParams,
+  type AppointmentRow,
+  type AppointmentSlotParams,
+  bookableTreatmentsOf,
 } from '@/shared/api/clinic/appointments-contracts.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import type { AppointmentStatus } from '@/shared/api/clinic/clinic-schema.ts';
@@ -46,6 +46,7 @@ import {
   useCursorList,
 } from '@/shared/hooks/useCursorList/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
+import { useOfferings } from '@/shared/hooks/useOfferings/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
@@ -275,15 +276,12 @@ export function useAppointmentSlots(params: AppointmentSlotParams | null) {
   });
 }
 
-/** The clinic's active treatments — the form's "From offerings"; kept five minutes. */
+/**
+ * The clinic's active treatments, A to Z — the form's "From offerings", out of the one offerings
+ * catalogue (`useOfferings`); taken as fresh for five minutes, refreshed by any offering write.
+ */
 export function useBookableTreatments() {
-  const organizationId = useOrganizationId();
-  return useAppQuery({
-    queryKey: appointmentQueryKeys.treatments(organizationId),
-    queryFn: fetchBookableTreatments,
-    enabled: organizationId !== null,
-    staleTime: 5 * 60_000,
-  });
+  return useOfferings({ select: bookableTreatmentsOf, staleTime: 5 * 60_000 });
 }
 
 // ── Writes ──

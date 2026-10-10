@@ -9,36 +9,53 @@ import {
 } from '@tanstack/react-router';
 import { render } from '@testing-library/react';
 
+import type { OrganizationPermission } from '@/core/rbac/policies.ts';
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import { validateOfferingCreateSearch } from '../../offerings.dialog-search.ts';
 import { validateOfferingsSearch } from '../../offerings.search.ts';
 import { OfferingsPage } from '../../OfferingsPage.tsx';
-import { validateOffersSearch } from '../../offers/offers.search.ts';
-import { OffersPage } from '../../offers/OffersPage.tsx';
 
 /** The Offerings tab's URL in the harness's organization. */
 export const OFFERINGS_URL = '/organization/acme/offerings';
 
-/** The Offers tab's URL in the harness's organization. */
-export const OFFERS_URL = '/organization/acme/offerings/offers';
+/**
+ * Every code an Owner or Admin holds in the room (research §7) — the harness's member unless a
+ * test names others: see, create, edit, delete, export, and see the lowest price.
+ */
+export const OFFERINGS_ADMIN_CODES: readonly OrganizationPermission[] = [
+  'organization:read',
+  'offering:create',
+  'offering:update',
+  'offering:delete',
+  'offering:export',
+  'offering:lower_price:read',
+];
 
 /**
- * The Offerings family as `routeTree.tsx` registers it — the Offerings tab
- * and, beside it, the Offers tab, each with its search schema and its two
- * dialog routes (`create`, `$offeringId/edit` / `$offerId/edit`, rendering
- * nothing) —
- * opened at `url` for a member previewed as `role` (View-as narrows the
- * clinic access to that role's matrix). Every other path lands on a catch-all.
+ * The Offerings tab as `routeTree.tsx` registers it — its search schema and its
+ * two dialog routes (`create`, `$offeringId/edit`, rendering nothing) — opened
+ * at `url` for the test member (`signInTestMember`:
+ * organization `org_test`, slug `acme` — every offerings read and key carries
+ * the organization) holding `permissions` (their clinozy-be codes; the Admin's
+ * by default). `role` runs View-as instead: the clinic access narrows to that
+ * role's matrix and every code reads false. Every other path (the Offers tab
+ * included — its suites have their own harness, `offers-test-router.tsx`) lands
+ * on a catch-all.
  */
 export function renderOfferingsRoutes(
   url: string,
-  { role = 'admin' }: { role?: Role } = {},
+  {
+    permissions = OFFERINGS_ADMIN_CODES,
+    role,
+  }: { permissions?: readonly OrganizationPermission[]; role?: Role } = {},
 ) {
-  useOrganizationStore.getState().setPermissions(['organization:read']);
-  useUIStore.setState({ previewRole: role });
+  signInTestMember();
+  useOrganizationStore.getState().setPermissions([...permissions]);
+  useUIStore.setState({ previewRole: role ?? null });
 
   const root = createRootRoute({ component: () => <Outlet /> });
   const offerings = createRoute({
@@ -58,33 +75,13 @@ export function renderOfferingsRoutes(
     path: '$offeringId/edit',
     component: () => null,
   });
-  const offers = createRoute({
-    getParentRoute: () => root,
-    path: '/organization/$organizationSlug/offerings/offers',
-    validateSearch: validateOffersSearch,
-    component: OffersPage,
-  });
-  const offerCreate = createRoute({
-    getParentRoute: () => offers,
-    path: 'create',
-    component: () => null,
-  });
-  const offerEdit = createRoute({
-    getParentRoute: () => offers,
-    path: '$offerId/edit',
-    component: () => null,
-  });
   const elsewhere = createRoute({
     getParentRoute: () => root,
     path: '$',
     component: () => <p>elsewhere</p>,
   });
   const router = createRouter({
-    routeTree: root.addChildren([
-      offerings.addChildren([create, edit]),
-      offers.addChildren([offerCreate, offerEdit]),
-      elsewhere,
-    ]),
+    routeTree: root.addChildren([offerings.addChildren([create, edit]), elsewhere]),
     history: createMemoryHistory({ initialEntries: [url] }),
   });
   const queryClient = new QueryClient({
@@ -101,5 +98,5 @@ export function renderOfferingsRoutes(
 /** Put the stores the harness touched back as they were. */
 export function resetOfferingsRoutes() {
   useUIStore.setState({ previewRole: null });
-  useOrganizationStore.getState().clearPermissions();
+  useOrganizationStore.getState().clearOrganization();
 }

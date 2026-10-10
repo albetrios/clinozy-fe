@@ -15,6 +15,7 @@ import {
   type DataTableFeatures,
   dataTableFeatures,
 } from '@/shared/components/DataTable/index.ts';
+import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import {
   sortingFromSearch,
   sortingToSearch,
@@ -36,11 +37,15 @@ import {
   OFFERINGS_NS,
   OFFERINGS_TABLE_ID,
 } from '../../offerings.constants.ts';
-import { type OfferingRow, offeringStatus } from '../../offerings.rows.ts';
+import {
+  offeringDuration,
+  type OfferingRow,
+  offeringStatus,
+} from '../../offerings.rows.ts';
 import type { OfferingsSort } from '../../offerings.search.ts';
 import {
   BranchChips,
-  SavedByCell,
+  UpdatedCell,
   useBranchFold,
 } from '../../shared/components/CatalogueCells/index.ts';
 import type { OfferingsCatalogue } from '../../shared/hooks/useOfferingsCatalogue/index.ts';
@@ -58,23 +63,26 @@ const K = OFFERINGS_KEYS.columns;
  * (Price is the phone key). The ids are the URL's sort keys.
  */
 function useOfferingColumns(
-  catalogue: Pick<OfferingsCatalogue, 'branches' | 'savedBy'>,
+  catalogue: Pick<OfferingsCatalogue, 'branches'>,
 ): ColumnDef<DataTableFeatures, OfferingRow>[] {
   const { t } = useTranslation(OFFERINGS_NS);
   const text = useOfferingText();
   const branchFold = useBranchFold();
+  const clock = useClinicClock();
 
   return [
     {
       id: 'seq',
-      accessorKey: 'seq',
+      accessorKey: 'offeringNumber',
       header: t(K.seq),
       enableHiding: false,
-      cell: ({ row }) => <IdPill>{displayId.offering(row.original.seq)}</IdPill>,
+      cell: ({ row }) => (
+        <IdPill>{displayId.offering(row.original.offeringNumber)}</IdPill>
+      ),
       meta: {
         track: '64px',
         kind: 'id',
-        foldValue: (original) => displayId.offering(rowOf(original).seq),
+        foldValue: (original) => displayId.offering(rowOf(original).offeringNumber),
       },
     },
     {
@@ -145,12 +153,14 @@ function useOfferingColumns(
     },
     {
       id: 'duration',
-      accessorKey: 'durationMin',
+      accessorFn: offeringDuration,
       header: t(K.duration),
-      cell: ({ row }) => <OfferingDurationCell minutes={row.original.durationMin} />,
+      cell: ({ row }) => (
+        <OfferingDurationCell minutes={offeringDuration(row.original)} />
+      ),
       meta: {
         track: '84px',
-        foldValue: (original) => text.duration(rowOf(original).durationMin),
+        foldValue: (original) => text.duration(offeringDuration(rowOf(original))),
       },
     },
     {
@@ -170,16 +180,16 @@ function useOfferingColumns(
       id: 'status',
       accessorFn: offeringStatus,
       header: t(K.status),
-      cell: ({ row }) => <OfferingStatusPill active={row.original.active} />,
+      cell: ({ row }) => <OfferingStatusPill isActive={row.original.isActive} />,
       meta: {
         track: '104px',
         kind: 'badges',
         foldValue: (original) => {
-          const { active } = rowOf(original);
+          const { isActive } = rowOf(original);
           return {
-            value: text.status(active),
-            dotClassName: active ? TONE_CLASSES.sage.fill : 'bg-muted-foreground',
-            quiet: active,
+            value: text.status(isActive),
+            dotClassName: isActive ? TONE_CLASSES.sage.fill : 'bg-muted-foreground',
+            quiet: isActive,
           };
         },
       },
@@ -188,14 +198,13 @@ function useOfferingColumns(
       id: 'updated',
       accessorKey: 'updatedAt',
       header: t(K.updated),
-      cell: ({ row }) => (
-        <SavedByCell
-          person={catalogue.savedBy(row.original.updatedById)}
-          updatedAt={row.original.updatedAt}
-        />
-      ),
-      // The avatar pill folds to nothing (H:4115).
-      meta: { track: 'minmax(150px,1fr)', defaultHidden: true, foldValue: () => null },
+      // When it was last saved — no one is named: clinozy-be keeps no saver on a record (G10).
+      cell: ({ row }) => <UpdatedCell updatedAt={row.original.updatedAt} />,
+      meta: {
+        track: 'minmax(150px,1fr)',
+        defaultHidden: true,
+        foldValue: (original) => clock.moment(rowOf(original).updatedAt),
+      },
     },
   ];
 }
@@ -208,8 +217,8 @@ export interface OfferingsTableInput {
   sort: OfferingsSort | undefined;
   /** Write a new sort to the URL (`undefined` clears it). */
   onSortChange: (sort: string | undefined) => void;
-  /** The branches (for the chips) and the team (for the Updated cells). */
-  catalogue: Pick<OfferingsCatalogue, 'branches' | 'savedBy'>;
+  /** The open branches, for the Branches chips. */
+  catalogue: Pick<OfferingsCatalogue, 'branches'>;
 }
 
 /**

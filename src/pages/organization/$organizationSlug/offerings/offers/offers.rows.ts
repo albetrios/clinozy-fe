@@ -1,15 +1,10 @@
 import { createdFilterMatches } from '@/shared/api/clinic/clinic-filter-match.ts';
 import type { CreatedFilter } from '@/shared/api/clinic/clinic-list-filters.ts';
-import {
-  compareOffersForList,
-  offerMatchesSearch,
-} from '@/shared/api/clinic/offerings-api.ts';
+import { offerMatchesSearch } from '@/shared/api/clinic/offerings-api.ts';
 import type {
   OfferingRecord,
   OfferRecord,
-  OfferState,
 } from '@/shared/api/clinic/offerings-contracts.ts';
-import { offerState } from '@/shared/api/clinic/offerings-pricing.ts';
 import type {
   RoomFilterField,
   RoomFilterFields,
@@ -25,30 +20,28 @@ import {
 import { OFFER_STATE_FILTER } from './offers.search.ts';
 
 /*
- * The Offers tab's rows (KICKOFF §6.11 Offers tab; H:5470–5484): every offer
- * with its derived state, searched, filtered and kept in the tab's fixed
- * order — Running → Scheduled → Paused → Ended, newest first in each.
+ * The Offers tab's rows (KICKOFF §6.11 Offers tab; H:5470–5484): every offer as
+ * clinozy-be answers it — its `status` and its place in the list are the
+ * server's (Running → Scheduled → Paused → Ended, newest first in each, O10) —
+ * searched and filtered in place.
  */
 
-/** An Offers row: the record, its state today and its Branches chips. */
+/** An Offers row: the record, its `status` the server's, and its Branches chips. */
 export interface OfferRow extends OfferRecord {
-  /** Paused, Scheduled, Ended or Running (`live`) on the clinic's today. */
-  state: OfferState;
   /** The Branches cell's values (`branchValues`): branch ids, `all`, or none. */
   branches: string[];
 }
 
 /** What the rows need beside the records. */
 export interface OfferRowsContext {
-  /** The clinic-local day states are read on. */
-  today: string;
   /** The open branches' ids, main first. */
   openBranchIds: readonly string[];
 }
 
 /**
- * The offers a search keeps — name, code or an offering's name (H:5476) — as
- * rows, in the tab's fixed order (H:5477).
+ * The offers a search keeps — name, code or an offering's name (H:5476; the
+ * server's `q` reads the first two only) — as rows, in the order the server
+ * listed them.
  */
 export function offerRows(
   offers: readonly OfferRecord[],
@@ -59,10 +52,8 @@ export function offerRows(
   const names = new Map(offerings.map((offering) => [offering.id, offering.name]));
   return offers
     .filter((offer) => !query || offerMatchesSearch(offer, query, (id) => names.get(id)))
-    .sort(compareOffersForList(context.today))
     .map((offer) => ({
       ...offer,
-      state: offerState(offer, context.today),
       branches: branchValues(offer.branchIds, context.openBranchIds),
     }));
 }
@@ -70,7 +61,7 @@ export function offerRows(
 /** What each filterable column shows for a row. */
 const COLUMN_VALUES = {
   branch: (row: OfferRow) => row.branches,
-  status: (row: OfferRow) => [row.state],
+  status: (row: OfferRow) => [row.status],
 } as const;
 
 /**
@@ -79,7 +70,7 @@ const COLUMN_VALUES = {
  */
 export function offerFilterFields(
   rows: readonly OfferRow[],
-  context: Pick<OfferRowsContext, 'openBranchIds'>,
+  context: OfferRowsContext,
 ): RoomFilterFields {
   const sections = {
     branch: presentValuesField(
@@ -96,7 +87,10 @@ export function offerFilterFields(
   return fields;
 }
 
-/** The rows the applied filters keep (only the sections the rows hold apply). */
+/**
+ * The rows the applied filters keep (only the sections the rows hold apply);
+ * Created reads its presets on the clinic's `today`.
+ */
 export function filterOfferRows(
   rows: readonly OfferRow[],
   applied: RoomFilterValues,

@@ -1,8 +1,14 @@
-import { MONEY_SCALE, numberFromText, textFromNumber } from '@/lib/number-text.ts';
+import {
+  MONEY_SCALE,
+  numberFromText,
+  paiseOfRupees,
+  rupeesOfPaise,
+  textFromNumber,
+} from '@/lib/number-text.ts';
 import type { OfferKind, Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import {
   OFFER_DEFAULTS,
-  type OfferInput,
+  type OfferFields,
   type OfferRecord,
 } from '@/shared/api/clinic/offerings-contracts.ts';
 
@@ -10,12 +16,12 @@ import {
  * The Offer drawer's form (`offerings.md:91–112`; KICKOFF §6.11): text as
  * typed, the value as its field shows it — a whole number for "% off" and
  * "Extra sessions", rupees for "₹ off" and "Fixed price" — dates as civil
- * `YYYY-MM-DD` (empty = "Now" / "no end"). {@link offerInputOf} turns it into
- * the contract's fields.
+ * `YYYY-MM-DD` (empty = "Now" / "no end"). {@link offerFieldsOf} turns it into
+ * the fields clinozy-be takes (money in rupees, at the form's boundary).
  */
 export interface OfferFormValues {
   name: string;
-  /** Upper-cased and stripped of spaces as typed. */
+  /** Upper-cased, letters and digits only, as typed. */
   code: string;
   kind: OfferKind;
   /** The value as its field holds it: "20" (%, sessions) or "500" (₹). */
@@ -28,18 +34,21 @@ export interface OfferFormValues {
   startsOn: string | null;
   endsOn: string | null;
   note: string;
-  /** Status "Live · applies automatically"; off = "Paused". */
+  /** Status "Live · applies automatically" (`is_active`); off = "Paused". */
   live: boolean;
 }
 
-/** The form's own limits (`offerings.md:95–110`): the contract allows a longer name (80) and code (16). */
+/**
+ * The form's own limits (`offerings.md:95–110`): the API allows a longer name (80) and code
+ * (16); free sessions 1–99 and a note of 280 are the API's (`/app/offers`).
+ */
 export const OFFER_FORM_LIMITS = {
   name: 60,
   code: 12,
   money: 7,
   percent: 100,
-  extraSessions: 20,
-  note: 1000,
+  extraSessions: 99,
+  note: 280,
   /** Preview boxes shown, in pick order (`offerings.md:105`). */
   previews: 6,
 } as const;
@@ -76,16 +85,25 @@ export const KIND_START_VALUES: Readonly<Record<OfferKind, string>> = {
   extra: '1',
 };
 
-/** A code as the field keeps it: upper case, no spaces, at most 12 characters (H:5511). */
+/**
+ * A code as the field keeps it (H:5511): upper case, at most 12 characters — and only letters
+ * and digits, all the API takes (`[A-Za-z0-9]`), so a space or a dash never reaches it.
+ */
 export function codeOf(text: string): string {
-  return text.replace(/\s/g, '').toUpperCase().slice(0, OFFER_FORM_LIMITS.code);
+  return text
+    .replace(/[^A-Za-z0-9]/g, '')
+    .toUpperCase()
+    .slice(0, OFFER_FORM_LIMITS.code);
 }
 
-/** The value in the contract's unit: a whole number, or paise for money. */
+/**
+ * The value in the API's unit: a whole number for "% off" and "Extra sessions", rupees to the
+ * paisa for "₹ off" and "Fixed price".
+ */
 export function offerValueOf(values: Pick<OfferFormValues, 'kind' | 'value'>): number {
   return isCountedKind(values.kind)
     ? Math.round(Number.parseFloat(values.value) || 0)
-    : numberFromText(values.value, MONEY_SCALE);
+    : rupeesOfPaise(numberFromText(values.value, MONEY_SCALE));
 }
 
 /** A new offer's form: "% off" at 10, blush, every branch, no dates, Live (`offerings.md:316`). */
@@ -101,7 +119,7 @@ export function emptyOfferForm(): OfferFormValues {
     startsOn: OFFER_DEFAULTS.startsOn,
     endsOn: OFFER_DEFAULTS.endsOn,
     note: '',
-    live: !OFFER_DEFAULTS.paused,
+    live: OFFER_DEFAULTS.isActive,
   };
 }
 
@@ -113,22 +131,26 @@ export function offerFormOf(offer: OfferRecord): OfferFormValues {
     kind: offer.kind,
     value: isCountedKind(offer.kind)
       ? String(offer.value)
-      : textFromNumber(offer.value, MONEY_SCALE),
+      : textFromNumber(paiseOfRupees(offer.value), MONEY_SCALE),
     tone: offer.tone,
     offeringIds: [...offer.offeringIds],
     branchIds: [...offer.branchIds],
     startsOn: offer.startsOn,
     endsOn: offer.endsOn,
     note: offer.note ?? '',
-    live: !offer.paused,
+    live: offer.isActive,
   };
 }
 
-/** The contract's fields for a form (`createOffer` / `updateOffer`). */
-export function offerInputOf(values: OfferFormValues): OfferInput {
+/**
+ * The fields a form writes (`useCreateOffer` / `useUpdateOffer`): an empty code or note is
+ * none, Paused is `isActive: false`. An edit sends only what changed (`offerChangeOf`).
+ */
+export function offerFieldsOf(values: OfferFormValues): OfferFields {
+  const note = values.note.trim();
   return {
     name: values.name.trim(),
-    code: values.code || null,
+    code: values.code === '' ? null : values.code,
     kind: values.kind,
     value: offerValueOf(values),
     tone: values.tone,
@@ -136,8 +158,8 @@ export function offerInputOf(values: OfferFormValues): OfferInput {
     branchIds: values.branchIds,
     startsOn: values.startsOn,
     endsOn: values.endsOn,
-    paused: !values.live,
-    note: values.note.trim() || null,
+    isActive: values.live,
+    note: note === '' ? null : note,
   };
 }
 

@@ -32,6 +32,11 @@ vi.mock('@/shared/api/clinic/contact-activities-api.ts', async (importOriginal) 
     freeSlots: [],
   })),
 }));
+// The chat names offerings from the one catalogue: none here.
+vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchAllOfferings: vi.fn(async () => []),
+}));
 
 function renderActivity(props: Partial<PatientActivityProps> = {}) {
   return renderWithProviders(

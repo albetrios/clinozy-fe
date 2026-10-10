@@ -3,6 +3,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type * as OfferingsApiModule from '@/shared/api/clinic/offerings-api.ts';
 import type * as PlanApiModule from '@/shared/api/clinic/plan-api.ts';
 import type {
   PatientPlan,
@@ -10,6 +11,7 @@ import type {
 } from '@/shared/api/clinic/plan-contracts.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { offeringRecord } from '@/tests/utils/offering-doubles.ts';
 
 vi.mock('@/shared/notify/index.ts', () => ({
   notify: { success: vi.fn(), error: vi.fn(), info: vi.fn(), undo: vi.fn() },
@@ -18,21 +20,24 @@ vi.mock('@/shared/api/clinic/plan-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof PlanApiModule>()),
   fetchPlan: vi.fn(),
   fetchPlanIdeas: vi.fn(),
-  fetchPlanOfferings: vi.fn(),
   fetchPlanActivity: vi.fn(),
   createPlanSuggestion: vi.fn(),
   updatePlanSuggestion: vi.fn(),
   deletePlanSuggestion: vi.fn(),
   restorePlanSuggestion: vi.fn(),
 }));
+vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof OfferingsApiModule>()),
+  fetchAllOfferings: vi.fn(),
+}));
 
+import { fetchAllOfferings } from '@/shared/api/clinic/offerings-api.ts';
 import {
   createPlanSuggestion,
   deletePlanSuggestion,
   fetchPlan,
   fetchPlanActivity,
   fetchPlanIdeas,
-  fetchPlanOfferings,
   restorePlanSuggestion,
   updatePlanSuggestion,
 } from '@/shared/api/clinic/plan-api.ts';
@@ -84,7 +89,7 @@ beforeEach(() => {
   server.plan = { suggestions: [row()], planTotal: 4800 };
   vi.mocked(fetchPlan).mockImplementation(async () => structuredClone(server.plan!));
   vi.mocked(fetchPlanIdeas).mockResolvedValue([]);
-  vi.mocked(fetchPlanOfferings).mockResolvedValue([]);
+  vi.mocked(fetchAllOfferings).mockResolvedValue([]);
   vi.mocked(fetchPlanActivity).mockResolvedValue([]);
 });
 afterEach(() => {
@@ -94,6 +99,10 @@ afterEach(() => {
 
 describe('the plan reads', () => {
   it('reads a patient’s plan, its ideas, the catalogue and a contact’s messages', async () => {
+    vi.mocked(fetchAllOfferings).mockResolvedValue([
+      offeringRecord({ name: 'Research Peel', isActive: false }),
+      offeringRecord({ id: 'off_lhr00000000000000000', name: 'LHR Full Face' }),
+    ]);
     const { result } = renderHook(
       () => ({
         plan: usePlan(PATIENT),
@@ -105,8 +114,14 @@ describe('the plan reads', () => {
     );
     await waitFor(() => expect(result.current.plan.data?.planTotal).toBe(4800));
     await waitFor(() => expect(result.current.activity.isSuccess).toBe(true));
+    await waitFor(() => expect(result.current.offerings.isSuccess).toBe(true));
     expect(fetchPlanIdeas).toHaveBeenCalledWith(PATIENT);
-    expect(fetchPlanOfferings).toHaveBeenCalledOnce();
+    expect(fetchAllOfferings).toHaveBeenCalledOnce();
+    // The one offerings catalogue, active or not, A to Z.
+    expect(result.current.offerings.data?.map((offering) => offering.name)).toEqual([
+      'LHR Full Face',
+      'Research Peel',
+    ]);
     expect(fetchPlanActivity).toHaveBeenCalledWith('con_dharti000000000000000');
   });
 

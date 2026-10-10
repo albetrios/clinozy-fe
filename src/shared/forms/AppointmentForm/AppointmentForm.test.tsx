@@ -150,7 +150,6 @@ vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => {
         world.slots.get(params.date) ??
         day(params.date, ['10:00', '10:30', '11:00', '14:00', '14:30']),
     ),
-    fetchBookableTreatments: vi.fn(async () => []),
     createAppointment: vi.fn(
       async ({ input }: { input: Partial<AppointmentRow>; idempotencyKey: string }) =>
         booked(input),
@@ -301,6 +300,12 @@ vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => ({
           .map((member) => [member.id, member.name]),
       ),
   ),
+}));
+
+// The one offerings catalogue — "From offerings" and the chat's offering names: empty here.
+vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchAllOfferings: vi.fn(async () => []),
 }));
 
 // The person's chat beside an Edit: a quiet stream.

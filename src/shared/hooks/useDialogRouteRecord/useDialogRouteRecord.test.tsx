@@ -27,23 +27,29 @@ async function fetchRecord(id: string) {
   return record;
 }
 
-function renderRecord(id: string | undefined, onMissing = vi.fn()) {
+function renderRecord(
+  id: string | undefined,
+  onMissing = vi.fn(),
+  isWellFormed?: (id: string) => boolean,
+) {
   const client = new QueryClient();
   const wrapper = ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={client}>{children}</QueryClientProvider>
   );
+  const read = vi.fn(fetchRecord);
   const hook = renderHook(
     (props: { id: string | undefined }) =>
       useDialogRouteRecord({
         id: props.id,
         queryKey: (key) => ['lead', key],
-        fetchRecord,
+        fetchRecord: read,
         recordLabel: 'Lead',
         onMissing,
+        isWellFormed,
       }),
     { wrapper, initialProps: { id } },
   );
-  return { ...hook, onMissing };
+  return { ...hook, onMissing, read };
 }
 
 beforeEach(() => notifyMock.info.mockReset());
@@ -74,6 +80,31 @@ describe('useDialogRouteRecord', () => {
     );
     rerender({ id: 'gone' });
     expect(notifyMock.info).toHaveBeenCalledTimes(1);
+  });
+
+  it('turns an id `isWellFormed` refuses away as not found, toasting once, without a read', async () => {
+    const isLead = (id: string) => id.startsWith('l');
+    const { result, onMissing, read, rerender } = renderRecord(
+      '3f2a8c1e-uuid',
+      vi.fn(),
+      isLead,
+    );
+    await waitFor(() => expect(onMissing).toHaveBeenCalledTimes(1));
+    expect(result.current).toMatchObject({
+      isOpen: false,
+      isPending: false,
+      isError: false,
+    });
+    expect(notifyMock.info).toHaveBeenCalledWith(
+      'Lead not found · it may have been deleted',
+    );
+    rerender({ id: '3f2a8c1e-uuid' });
+    expect(notifyMock.info).toHaveBeenCalledTimes(1);
+    expect(read).not.toHaveBeenCalled();
+
+    rerender({ id: 'l1' });
+    await waitFor(() => expect(result.current.record).toEqual(RECORDS.l1));
+    expect(read).toHaveBeenCalledWith('l1');
   });
 
   it('reports another failure as an error, stays open and reads again on refetch', async () => {

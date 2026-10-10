@@ -45,7 +45,7 @@ import { medicineRecordSchema } from '@/shared/api/clinic/medicines-contracts.ts
 import {
   offeringRecordSchema,
   offerRecordSchema,
-} from '@/shared/api/clinic/offerings-contracts.ts';
+} from '@/shared/api/clinic/offerings-fixture-contracts.ts';
 import { patientRecordSchema } from '@/shared/api/clinic/patients-fixture-contracts.ts';
 import { paymentRecordSchema } from '@/shared/api/clinic/payments-contracts.ts';
 import { taskRecordSchema } from '@/shared/api/clinic/tasks-contracts.ts';
@@ -264,10 +264,7 @@ const LINKS: { [K in CollectionKey]: (row: RowOf<K>) => Targets } = {
     ['reviews', [r.reviewId]],
     ['staff', [r.byId]],
   ],
-  offerings: (r) => [
-    ['staff', [r.defaultDoctorId]],
-    ['branches', r.branchIds],
-  ],
+  offerings: (r) => [['branches', r.branchIds]],
   offers: (r) => [
     ['offerings', r.offeringIds],
     ['branches', r.branchIds],

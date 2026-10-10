@@ -33,7 +33,7 @@ const offer = (overrides: Partial<OfferRow> = {}) =>
     note: 'Festival offer on peels and facials',
     startsOn: '2026-09-29',
     endsOn: '2026-10-09',
-    state: 'live',
+    status: 'live',
     ...overrides,
   }) as OfferRow;
 
@@ -62,19 +62,19 @@ describe('the Offers cells (offerings.md:47)', () => {
     expect(screen.queryByText('GLOW20')).not.toBeInTheDocument();
   });
 
-  it('words each kind’s value over the kind', () => {
+  it('words each kind’s value over the kind — amounts in rupees, as the API sends them', () => {
     render(
       <>
         <OfferTypeCell offer={{ kind: 'percent', value: 20 }} />
-        <OfferTypeCell offer={{ kind: 'amount', value: 50_000 }} />
-        <OfferTypeCell offer={{ kind: 'fixed', value: 399_900 }} />
+        <OfferTypeCell offer={{ kind: 'amount', value: 100.5 }} />
+        <OfferTypeCell offer={{ kind: 'fixed', value: 3999 }} />
         <OfferTypeCell offer={{ kind: 'extra', value: 2 }} />
       </>,
     );
     for (const text of [
       '20% off',
       '% off',
-      '₹500 off',
+      '₹100.50 off',
       '₹ off',
       'at ₹3,999',
       'Fixed price',
@@ -91,14 +91,19 @@ describe('the Offers cells (offerings.md:47)', () => {
     expect(screen.getByText('Festival offer on peels and facials')).toBeInTheDocument();
   });
 
+  it('says so when no offering is left (OFFERINGS-M4)', () => {
+    render(<OfferAppliesCell offer={offer({ offeringIds: [] })} nameOf={nameOf} />);
+    expect(screen.getByText('No offerings')).toBeInTheDocument();
+  });
+
   it('reads the dates and what they mean today', () => {
     render(<OfferValidCell row={offer()} today={TODAY} />);
     expect(screen.getByText('29 Sept 2026 – 9 Oct 2026')).toBeInTheDocument();
     expect(screen.getByText('Ends in 5 days')).toBeInTheDocument();
   });
 
-  it('pills the state in its tone with a dot', () => {
-    render(<OfferStatePill state="paused" />);
+  it('pills the server’s status in its tone with a dot', () => {
+    render(<OfferStatePill status="paused" />);
     expect(screen.getByText('Paused').closest('[data-slot="pill"]')).toHaveAttribute(
       'data-tone',
       'butter',
@@ -107,20 +112,18 @@ describe('the Offers cells (offerings.md:47)', () => {
 });
 
 describe('useOfferText', () => {
-  it('reads open ends and every sub-line', () => {
+  it('reads open ends and every sub-line by the server’s status', () => {
     const { result } = renderHook(() => useOfferText());
     const text = result.current;
     expect(text.valid({ startsOn: null, endsOn: null })).toBe('Now – no end');
-    expect(text.validSub(offer({ endsOn: TODAY }), 'live', TODAY)).toBe('Ends today');
-    expect(text.validSub(offer({ endsOn: '2026-10-05' }), 'live', TODAY)).toBe(
-      'Ends tomorrow',
-    );
-    expect(text.validSub(offer({ endsOn: null }), 'live', TODAY)).toBe('');
-    expect(text.validSub(offer({ startsOn: '2026-11-01' }), 'scheduled', TODAY)).toBe(
-      'Starts 1 Nov 2026',
-    );
-    expect(text.validSub(offer(), 'ended', TODAY)).toBe('Over');
-    expect(text.validSub(offer(), 'paused', TODAY)).toBe('');
+    expect(text.validSub(offer({ endsOn: TODAY }), TODAY)).toBe('Ends today');
+    expect(text.validSub(offer({ endsOn: '2026-10-05' }), TODAY)).toBe('Ends tomorrow');
+    expect(text.validSub(offer({ endsOn: null }), TODAY)).toBe('');
+    expect(
+      text.validSub(offer({ startsOn: '2026-11-01', status: 'scheduled' }), TODAY),
+    ).toBe('Starts 1 Nov 2026');
+    expect(text.validSub(offer({ status: 'ended' }), TODAY)).toBe('Over');
+    expect(text.validSub(offer({ status: 'paused' }), TODAY)).toBe('');
   });
 
   it('leaves out an offering the catalogue no longer holds', () => {

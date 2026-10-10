@@ -283,7 +283,6 @@ export function appointmentsApiDouble(world: AppointmentsWorld) {
     fetchAppointmentSlots: vi.fn(async (params: AppointmentSlotParams) =>
       slotDay(params.date, ['10:00', '10:30', '11:00']),
     ),
-    fetchBookableTreatments: vi.fn(async () => []),
     createAppointment: vi.fn(
       async ({ input }: { input: AppointmentCreateInput; idempotencyKey: string }) => {
         const seq = nextSeq();

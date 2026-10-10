@@ -9,14 +9,14 @@ import {
   fetchCheckIn,
   updateCheckIn,
 } from '@/shared/api/clinic/feedback-api.ts';
-import type {
-  CheckInOffering,
-  PatientCheckIn,
-} from '@/shared/api/clinic/feedback-contracts.ts';
+import type { PatientCheckIn } from '@/shared/api/clinic/feedback-contracts.ts';
+import type * as OfferingsApiModule from '@/shared/api/clinic/offerings-api.ts';
+import type { OfferingRecord } from '@/shared/api/clinic/offerings-contracts.ts';
 import type * as TreatmentsApiModule from '@/shared/api/clinic/treatments-api.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { appointmentRow } from '@/tests/utils/appointment-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { offeringRecord } from '@/tests/utils/offering-doubles.ts';
 import { patientFile, TEST_PATIENT_ID } from '@/tests/utils/patient-doubles.ts';
 
 import {
@@ -68,25 +68,30 @@ function checkIn(overrides: Partial<PatientCheckIn> = {}): PatientCheckIn {
   };
 }
 
-const offering = (overrides: Partial<CheckInOffering>): CheckInOffering => ({
-  id: HYDRAFACIAL,
-  name: 'Hydrafacial',
-  category: 'treatment',
-  tone: 'sky',
-  price: 3500,
-  sessions: 1,
-  searchTerms: [],
-  isActive: true,
-  ...overrides,
-});
+/** An offering of the one catalogue (`fetchAllOfferings`) the drawer picks from. */
+const offering = (overrides: Partial<OfferingRecord>): OfferingRecord =>
+  offeringRecord({
+    id: HYDRAFACIAL,
+    name: 'Hydrafacial',
+    category: 'treatment',
+    tone: 'sky',
+    price: 3500,
+    sessions: 1,
+    searchTerms: [],
+    isActive: true,
+    ...overrides,
+  });
 
 vi.mock('@/shared/api/clinic/feedback-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof FeedbackApiModule>()),
   fetchPreviousCheckIn: vi.fn(),
-  listCheckInOfferings: vi.fn(),
   fetchCheckIn: vi.fn(),
   createCheckIn: vi.fn(),
   updateCheckIn: vi.fn(),
+}));
+vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof OfferingsApiModule>()),
+  fetchAllOfferings: vi.fn(),
 }));
 vi.mock('@/shared/api/clinic/treatments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof TreatmentsApiModule>()),
@@ -123,7 +128,8 @@ beforeEach(async () => {
   for (const fn of Object.values(notifyMock)) fn.mockReset();
   const api = await import('@/shared/api/clinic/feedback-api.ts');
   vi.mocked(api.fetchPreviousCheckIn).mockResolvedValue(checkIn());
-  vi.mocked(api.listCheckInOfferings).mockResolvedValue([
+  const catalogue = await import('@/shared/api/clinic/offerings-api.ts');
+  vi.mocked(catalogue.fetchAllOfferings).mockResolvedValue([
     offering({}),
     offering({ id: 'off_old', name: 'Old peel', isActive: false }),
   ]);

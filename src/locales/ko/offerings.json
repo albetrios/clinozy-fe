@@ -88,7 +88,8 @@
       "endsTomorrow": "내일 종료",
       "endsIn_other": "{{count}}일 후 종료",
       "startsOn": "{{date}} 시작",
-      "over": "종료됨"
+      "over": "종료됨",
+      "noOfferings": "서비스 없음"
     },
     "rowActions": {
       "edit": "편집",
@@ -179,7 +180,9 @@
       "descriptionPlaceholder": "포함 내용",
       "status": "상태",
       "active": "활성 · 예약 가능",
-      "inactive": "비활성 · 숨김"
+      "inactive": "비활성 · 숨김",
+      "gstChip": "{{value}}%",
+      "gstHint": "상담은 0%, 그 외는 18% — 세율을 고르기 전까지"
     },
     "offerTill": "{{date}}까지",
     "untitled": "이름 없음",
@@ -192,7 +195,10 @@
       "addName": "이름을 입력하세요",
       "addPrice": "가격을 입력하세요",
       "offerAbovePrice": "판매가는 가격보다 높을 수 없습니다",
-      "floorAboveOffer": "최저가는 판매가보다 높을 수 없습니다"
+      "floorAboveOffer": "최저가는 판매가보다 높을 수 없습니다",
+      "offerBelowFloor": "이 서비스의 최저가보다 낮습니다 — 소유자나 관리자에게 요청하세요",
+      "floorAbovePrice": "최저가는 가격보다 높을 수 없습니다",
+      "floorNeedsPermission": "내 역할로는 최저가를 변경할 수 없습니다 — 소유자나 관리자에게 요청하세요"
     }
   },
   "offerDrawer": {
@@ -253,7 +259,8 @@
         "fixed": "금액을 입력하세요",
         "extra": "무료 회차를 입력하세요"
       },
-      "endsBeforeStart": "시작 전에 종료됩니다"
+      "endsBeforeStart": "시작 전에 종료됩니다",
+      "offeringInactive": "{{name}}은(는) 더 이상 활성 상태가 아닙니다 — 빼거나 다른 서비스를 고르세요"
     }
   }
 }

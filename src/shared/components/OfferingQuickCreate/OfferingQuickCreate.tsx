@@ -16,7 +16,7 @@ import {
 import {
   OFFERING_DEFAULTS,
   type OfferingRecord,
-} from '@/shared/api/clinic/offerings-contracts.ts';
+} from '@/shared/api/clinic/offerings-fixture-contracts.ts';
 import { CLINIC_KEYS } from '@/shared/clinic/clinic.constants.ts';
 import { OFFERING_CATEGORY_TONES, SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
 import {
@@ -34,7 +34,7 @@ import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { RECORD_DRAWER_KEYS } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
-import { useCreateOffering } from '@/shared/hooks/useOfferings/index.ts';
+import { useCreateFixtureOffering } from '@/shared/hooks/useFixtureOfferings/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -259,7 +259,7 @@ function QuickCreateSession({
   const values = { ...form.getValues(), ...watched } as QuickOfferingValues;
   const { isDirty } = useFormState({ control: form.control });
   const [openStep, setOpenStep] = useState<string>('offering');
-  const create = useCreateOffering({
+  const create = useCreateFixtureOffering({
     notifyOnError: false,
     successMessage: (offering) => t(K.toasts.added, { name: offering.name }),
   });

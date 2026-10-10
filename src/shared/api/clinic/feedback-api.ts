@@ -8,8 +8,6 @@ import {
   checkInBodyOf,
   type CheckInCreateInput,
   type CheckInFields,
-  type CheckInOffering,
-  checkInOfferingWire,
   checkInRowWire,
   checkInWire,
   type FeedbackItem,
@@ -21,7 +19,6 @@ import {
   type ReviewFields,
   reviewRowWire,
   reviewWire,
-  toCheckInOffering,
   toPatientCheckIn,
   toPatientReview,
 } from './feedback-contracts.ts';
@@ -48,9 +45,6 @@ export const feedbackQueryKeys = {
   /** The check-in before a new one (`editingId` ''), or before the one being edited. */
   previous: (organizationId: string | null, patientId: string, editingId: string) =>
     [...feedbackQueryKeys.all, organizationId, 'previous', patientId, editingId] as const,
-  /** The offerings a new check-in can plan. */
-  offerings: (organizationId: string | null) =>
-    [...feedbackQueryKeys.all, organizationId, 'offerings'] as const,
 };
 
 /** The most rows the API sends a page — the card reads every page of a patient's feedback. */
@@ -192,23 +186,6 @@ export async function fetchPreviousCheckIn(
     .filter((row) => !editing || (row.id !== editing.id && newestFirst(editing, row) < 0))
     .sort(newestFirst);
   return earlier[0] ?? null;
-}
-
-/**
- * The clinic's offerings, by name (`GET /app/offerings`, every page) — a new check-in's
- * "Add to offering suggestions" offers the active ones; an edit names the ones it planned.
- */
-export async function listCheckInOfferings(): Promise<CheckInOffering[]> {
-  const rows = await collectAllPages(async (after) => {
-    const response = await api.get('/app/offerings', {
-      query: { sort: 'name', order: 'asc', limit: PAGE_SIZE, after: after ?? undefined },
-    });
-    return {
-      rows: z.array(checkInOfferingWire).parse(response.data ?? []),
-      next: nextCursor(response.meta?.pagination),
-    };
-  }, 'check-in-offerings');
-  return rows.map(toCheckInOffering);
 }
 
 // ── Writes ──

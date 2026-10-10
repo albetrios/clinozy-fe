@@ -102,7 +102,8 @@
       "endsIn_many": "Termina tra {{count}} giorni",
       "endsIn_other": "Termina tra {{count}} giorni",
       "startsOn": "Inizia il {{date}}",
-      "over": "Terminata"
+      "over": "Terminata",
+      "noOfferings": "Nessun servizio"
     },
     "rowActions": {
       "edit": "Modifica",
@@ -199,7 +200,9 @@
       "descriptionPlaceholder": "Cosa è incluso",
       "status": "Stato",
       "active": "Attivo · prenotabile",
-      "inactive": "Inattivo · nascosto"
+      "inactive": "Inattivo · nascosto",
+      "gstChip": "{{value}}%",
+      "gstHint": "0% per una consulenza, 18% per il resto — finché non ne scegli una"
     },
     "offerTill": "fino al {{date}}",
     "untitled": "Senza nome",
@@ -212,7 +215,10 @@
       "addName": "Aggiungi un nome",
       "addPrice": "Aggiungi un prezzo",
       "offerAbovePrice": "Il prezzo offerta non può superare il prezzo",
-      "floorAboveOffer": "Il prezzo minimo non può superare il prezzo offerta"
+      "floorAboveOffer": "Il prezzo minimo non può superare il prezzo offerta",
+      "offerBelowFloor": "Sotto il prezzo minimo di questo servizio — chiedi a un titolare o a un admin",
+      "floorAbovePrice": "Il prezzo minimo non può superare il prezzo",
+      "floorNeedsPermission": "Il tuo ruolo non può modificare il prezzo minimo — chiedi a un titolare o a un admin"
     }
   },
   "offerDrawer": {
@@ -277,7 +283,8 @@
         "fixed": "Imposta l’importo",
         "extra": "Imposta le sedute gratuite"
       },
-      "endsBeforeStart": "Finisce prima di iniziare"
+      "endsBeforeStart": "Finisce prima di iniziare",
+      "offeringInactive": "{{name}} non è più attivo — toglilo o scegline un altro"
     }
   }
 }

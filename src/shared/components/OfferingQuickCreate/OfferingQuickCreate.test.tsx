@@ -7,7 +7,7 @@ import {
   clinicFixtures,
   resetClinicFixtures,
 } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import type { OfferingRecord } from '@/shared/api/clinic/offerings-contracts.ts';
+import type { OfferingRecord } from '@/shared/api/clinic/offerings-fixture-contracts.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { useStackedDrawer } from '@/shared/hooks/useStackedDrawer/index.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';

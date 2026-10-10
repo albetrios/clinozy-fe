@@ -7,20 +7,21 @@ import {
   fetchPlan,
   fetchPlanActivity,
   fetchPlanIdeas,
-  fetchPlanOfferings,
   planContextQueryKeys,
   planQueryKeys,
   restorePlanSuggestion,
   updatePlanSuggestion,
 } from '@/shared/api/clinic/plan-api.ts';
-import type {
-  PatientPlan,
-  PlanSuggestionRow,
-  SuggestionChange,
+import {
+  type PatientPlan,
+  planOfferingsOf,
+  type PlanSuggestionRow,
+  type SuggestionChange,
 } from '@/shared/api/clinic/plan-contracts.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
+import { useOfferings } from '@/shared/hooks/useOfferings/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 /*
@@ -57,16 +58,20 @@ export function usePlanIdeas(patientId: string | null) {
   });
 }
 
-/** How long the offerings catalogue stays fresh — it changes in the Offerings room only. */
+/**
+ * How long the plan card takes the offerings catalogue as fresh — it changes in the Offerings
+ * room only, whose writes refresh it anyway.
+ */
 const CATALOGUE_STALE_MS = 5 * 60_000;
 
-/** The clinic's offerings, active or not — what the card names its rows by and adds from. */
+/**
+ * The clinic's offerings, active or not, A to Z — what the card names its rows by and adds
+ * from, out of the one offerings catalogue (`useOfferings`).
+ */
 export function usePlanOfferings({ enabled = true }: { enabled?: boolean } = {}) {
-  const organizationId = useOrganizationId();
-  return useAppQuery({
-    queryKey: planContextQueryKeys.offerings(organizationId),
-    queryFn: fetchPlanOfferings,
-    enabled: enabled && organizationId !== null,
+  return useOfferings({
+    select: planOfferingsOf,
+    enabled,
     staleTime: CATALOGUE_STALE_MS,
   });
 }

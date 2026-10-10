@@ -88,7 +88,8 @@
       "endsTomorrow": "明日終了",
       "endsIn_other": "{{count}}日後に終了",
       "startsOn": "{{date}}開始",
-      "over": "終了"
+      "over": "終了",
+      "noOfferings": "サービスなし"
     },
     "rowActions": {
       "edit": "編集",
@@ -179,7 +180,9 @@
       "descriptionPlaceholder": "含まれる内容",
       "status": "ステータス",
       "active": "有効・予約可",
-      "inactive": "無効・非表示"
+      "inactive": "無効・非表示",
+      "gstChip": "{{value}}%",
+      "gstHint": "診察は0%、それ以外は18% — 税率を選ぶまで"
     },
     "offerTill": "{{date}}まで",
     "untitled": "名称未設定",
@@ -192,7 +195,10 @@
       "addName": "名称を入力してください",
       "addPrice": "料金を入力してください",
       "offerAbovePrice": "提供価格は料金を超えられません",
-      "floorAboveOffer": "最低価格は提供価格を超えられません"
+      "floorAboveOffer": "最低価格は提供価格を超えられません",
+      "offerBelowFloor": "このサービスの最低価格を下回っています — オーナーまたは管理者に依頼してください",
+      "floorAbovePrice": "最低価格は料金を超えられません",
+      "floorNeedsPermission": "あなたのロールでは最低価格を変更できません — オーナーまたは管理者に依頼してください"
     }
   },
   "offerDrawer": {
@@ -253,7 +259,8 @@
         "fixed": "金額を設定してください",
         "extra": "無料回数を設定してください"
       },
-      "endsBeforeStart": "開始日より前に終了しています"
+      "endsBeforeStart": "開始日より前に終了しています",
+      "offeringInactive": "{{name}} は現在無効です — 外すか別のものを選んでください"
     }
   }
 }

@@ -123,7 +123,8 @@
       "endsIn_many": "ينتهي خلال {{count}} يومًا",
       "endsIn_other": "ينتهي خلال {{count}} يوم",
       "startsOn": "يبدأ {{date}}",
-      "over": "انتهى"
+      "over": "انتهى",
+      "noOfferings": "لا توجد خدمات"
     },
     "rowActions": {
       "edit": "تعديل",
@@ -229,7 +230,9 @@
       "descriptionPlaceholder": "ما الذي تشمله",
       "status": "الحالة",
       "active": "نشطة · قابلة للحجز",
-      "inactive": "غير نشطة · مخفية"
+      "inactive": "غير نشطة · مخفية",
+      "gstChip": "{{value}}%",
+      "gstHint": "0% للاستشارة و18% لغيرها — إلى أن تختار نسبة"
     },
     "offerTill": "حتى {{date}}",
     "untitled": "بلا اسم",
@@ -242,7 +245,10 @@
       "addName": "أضف اسمًا",
       "addPrice": "أضف سعرًا",
       "offerAbovePrice": "لا يمكن أن يزيد سعر العرض على السعر",
-      "floorAboveOffer": "لا يمكن أن يزيد أدنى سعر على سعر العرض"
+      "floorAboveOffer": "لا يمكن أن يزيد أدنى سعر على سعر العرض",
+      "offerBelowFloor": "أقل من أدنى سعر لهذه الخدمة — اطلب ذلك من المالك أو المسؤول",
+      "floorAbovePrice": "لا يمكن أن يزيد أدنى سعر على السعر",
+      "floorNeedsPermission": "لا يسمح دورك بتغيير أدنى سعر — اطلب ذلك من المالك أو المسؤول"
     }
   },
   "offerDrawer": {
@@ -313,7 +319,8 @@
         "fixed": "حدّد المبلغ",
         "extra": "حدّد الجلسات المجانية"
       },
-      "endsBeforeStart": "ينتهي قبل أن يبدأ"
+      "endsBeforeStart": "ينتهي قبل أن يبدأ",
+      "offeringInactive": "{{name}} لم تعد نشطة — أزلها أو اختر غيرها"
     }
   }
 }

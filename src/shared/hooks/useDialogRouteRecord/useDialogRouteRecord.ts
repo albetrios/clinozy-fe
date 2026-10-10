@@ -19,13 +19,16 @@ export interface DialogRouteRecord<T> {
   refetch: () => void;
 }
 
+/** Every id may name a record — the default for a room still on fixtures (uuid ids). */
+const ANY_ID = () => true;
+
 /**
  * The dialog-route deep-link pattern (KICKOFF §4, `S:115`). A URL-driven drawer
  * route renders nothing; its parent page passes the route's id here and opens
  * the drawer from the result. An id that matches no record — a stale link, a
- * deleted record — leaves the parent page behind with no drawer: one toast,
- * "<Record> not found · it may have been deleted", and `onMissing` (navigate
- * back to the parent, replacing the dead URL).
+ * deleted record, or one `isWellFormed` turns away unread — leaves the parent
+ * page behind with no drawer: one toast, "<Record> not found · it may have been
+ * deleted", and `onMissing` (navigate back to the parent, replacing the dead URL).
  */
 export function useDialogRouteRecord<T>({
   id,
@@ -33,6 +36,7 @@ export function useDialogRouteRecord<T>({
   fetchRecord,
   recordLabel,
   onMissing,
+  isWellFormed = ANY_ID,
 }: {
   /** The dialog route's id param; undefined while the route is not matched. */
   id: string | undefined;
@@ -41,15 +45,23 @@ export function useDialogRouteRecord<T>({
   /** The record's name in the toast ("Lead", "Appointment"). */
   recordLabel: string;
   onMissing: () => void;
+  /**
+   * Whether the id can name a record at all. A room on clinozy-be passes its public-id shape
+   * (`PUBLIC_ID`): a link from the fixture days or a mistyped one is then "not found" at once
+   * and never sent — the API would refuse it with a 400, not a 404. Every id by default.
+   */
+  isWellFormed?: (id: string) => boolean;
 }): DialogRouteRecord<T> {
   const { t } = useTranslation(ERRORS_NS);
+  const malformed = id !== undefined && !isWellFormed(id);
+  const readId = malformed ? undefined : id;
   const query = useQuery({
-    queryKey: id === undefined ? ['dialog-route', 'none'] : queryKey(id),
-    queryFn: () => fetchRecord(id as string),
-    enabled: id !== undefined,
+    queryKey: readId === undefined ? ['dialog-route', 'none'] : queryKey(readId),
+    queryFn: () => fetchRecord(readId as string),
+    enabled: readId !== undefined,
     retry: (failures, error) => !isNotFound(error) && failures < 2,
   });
-  const missing = id !== undefined && isNotFound(query.error);
+  const missing = malformed || (id !== undefined && isNotFound(query.error));
   const reportedFor = useRef<string | null>(null);
 
   useEffect(() => {
@@ -60,10 +72,10 @@ export function useDialogRouteRecord<T>({
   }, [missing, id, recordLabel, onMissing, t]);
 
   return {
-    record: id === undefined ? undefined : query.data,
+    record: readId === undefined ? undefined : query.data,
     isOpen: id !== undefined && !missing,
-    isPending: id !== undefined && query.isPending,
-    isError: id !== undefined && query.isError && !missing,
+    isPending: readId !== undefined && query.isPending,
+    isError: readId !== undefined && query.isError && !missing,
     refetch: () => void query.refetch(),
   };
 }

@@ -1,4 +1,7 @@
-import type { OfferRecord, OfferState } from '@/shared/api/clinic/offerings-contracts.ts';
+import type {
+  OfferRecord,
+  OfferStatus,
+} from '@/shared/api/clinic/offerings-contracts.ts';
 import { OFFER_STATE_TONES } from '@/shared/clinic/clinic-tones.ts';
 import { TonePill } from '@/shared/components/Cells/index.ts';
 
@@ -33,7 +36,10 @@ export function OfferTypeCell({ offer }: { offer: Pick<OfferRecord, 'kind' | 'va
   );
 }
 
-/** The Applies to cell: the first two offerings' names and "+N", over the offer's note. */
+/**
+ * The Applies to cell: the first two offerings' names and "+N" — "No offerings"
+ * once every one was deleted (OFFERINGS-M4) — over the offer's note.
+ */
 export function OfferAppliesCell({
   offer,
   nameOf,
@@ -45,24 +51,30 @@ export function OfferAppliesCell({
   return <CellText text={text.appliesTo(offer, nameOf)} sub={offer.note ?? undefined} />;
 }
 
-/** The Valid cell: "22 Sep 2026 – 2 Oct 2026" over "Ends in 28 days", "Starts …", "Over". */
+/**
+ * The Valid cell: "22 Sep 2026 – 2 Oct 2026" over "Ends in 28 days", "Starts …",
+ * "Over" — by the server's status.
+ */
 export function OfferValidCell({ row, today }: { row: OfferRow; today: string }) {
   const text = useOfferText();
   return (
     <CellText
       text={text.valid(row)}
-      sub={text.validSub(row, row.state, today) || undefined}
+      sub={text.validSub(row, today) || undefined}
       className="text-foreground-soft"
     />
   );
 }
 
-/** The Status cell: "Running" sage · "Scheduled" sky · "Paused" butter · "Ended" stone, with a dot. */
-export function OfferStatePill({ state }: { state: OfferState }) {
+/**
+ * The Status cell, the server's status: "Running" sage · "Scheduled" sky ·
+ * "Paused" butter · "Ended" stone, with a dot.
+ */
+export function OfferStatePill({ status }: { status: OfferStatus }) {
   const labels = useOfferLabels();
   return (
-    <TonePill tone={OFFER_STATE_TONES[state]} dot>
-      {labels.state(state)}
+    <TonePill tone={OFFER_STATE_TONES[status]} dot>
+      {labels.state(status)}
     </TonePill>
   );
 }

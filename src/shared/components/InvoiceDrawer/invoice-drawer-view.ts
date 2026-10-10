@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import type { OfferingRecord } from '@/shared/api/clinic/offerings-contracts.ts';
+import type { OfferingRecord } from '@/shared/api/clinic/offerings-fixture-contracts.ts';
 import { CLINIC_KEYS } from '@/shared/clinic/clinic.constants.ts';
 import {
   type DrawerPeekItem,

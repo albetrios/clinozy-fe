@@ -13,7 +13,6 @@ import {
   fetchAppointmentDayCounts,
   fetchAppointmentRange,
   fetchAppointmentSlots,
-  fetchBookableTreatments,
   fetchPersonAppointments,
   listAppointments,
   moveAppointment,
@@ -25,6 +24,8 @@ import type {
   AppointmentRow,
 } from '@/shared/api/clinic/appointments-contracts.ts';
 import type { AppointmentStatus } from '@/shared/api/clinic/clinic-schema.ts';
+import type * as OfferingsApiModule from '@/shared/api/clinic/offerings-api.ts';
+import { fetchAllOfferings } from '@/shared/api/clinic/offerings-api.ts';
 import type * as NotifyModule from '@/shared/notify/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
@@ -41,6 +42,7 @@ import {
   TEST_BRANCH_ID,
 } from '@/tests/utils/appointment-doubles.ts';
 import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { offeringRecord } from '@/tests/utils/offering-doubles.ts';
 
 import {
   useAppointment,
@@ -67,13 +69,16 @@ vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => ({
   fetchAppointmentDayCounts: vi.fn(),
   fetchAppointment: vi.fn(),
   fetchAppointmentSlots: vi.fn(),
-  fetchBookableTreatments: vi.fn(),
   fetchPersonAppointments: vi.fn(),
   createAppointment: vi.fn(),
   copyAppointment: vi.fn(),
   updateAppointment: vi.fn(),
   moveAppointment: vi.fn(),
   cancelAppointment: vi.fn(),
+}));
+vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof OfferingsApiModule>()),
+  fetchAllOfferings: vi.fn(),
 }));
 vi.mock('@/shared/notify/index.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof NotifyModule>()),
@@ -202,14 +207,17 @@ beforeEach(() => {
   vi.mocked(fetchAppointmentSlots).mockImplementation(async ({ date }) =>
     slotDay(date, ['10:00', '11:00']),
   );
-  vi.mocked(fetchBookableTreatments).mockResolvedValue([
-    {
+  vi.mocked(fetchAllOfferings).mockResolvedValue([
+    offeringRecord({
       id: 'off_hydra000000000000000',
       name: 'Hydrafacial',
       durationMin: 60,
-      specialty: 'skin',
-      tone: 'mint',
-    },
+    }),
+    offeringRecord({
+      id: 'off_serum000000000000000',
+      name: 'Aloe serum',
+      category: 'product',
+    }),
   ]);
   vi.mocked(createAppointment).mockImplementation(async ({ input }) => {
     const created = appointmentRow({
@@ -319,7 +327,10 @@ describe('the reads', () => {
       '10:00',
       '11:00',
     ]);
-    expect(result.current.treatments.data?.[0]?.name).toBe('Hydrafacial');
+    // The one offerings catalogue, its active treatments only (the product is not bookable).
+    expect(result.current.treatments.data?.map((treatment) => treatment.name)).toEqual([
+      'Hydrafacial',
+    ]);
   });
 
   it('keeps the last range’s bookings while the next range loads', async () => {
@@ -372,7 +383,7 @@ describe('the reads', () => {
     expect(result.current.treatments.fetchStatus).toBe('idle');
     expect(listAppointments).not.toHaveBeenCalled();
     expect(fetchAppointment).not.toHaveBeenCalled();
-    expect(fetchBookableTreatments).not.toHaveBeenCalled();
+    expect(fetchAllOfferings).not.toHaveBeenCalled();
   });
 
   it('keeps each organization’s bookings apart', async () => {

@@ -4,8 +4,9 @@ Route: `/organization/$organizationSlug/offerings/offers/create` — a URL-drive
 Offers tab (KICKOFF §4, D24; `S:102`). The route renders nothing: the Offers page reads the URL
 and opens the New offer drawer over the list, so a refresh or a shared link reopens it. Gated like
 the room — membership (`organization:read`) and the `clinic-offerings` module, then
-`requireOrgStatus`; in-room, a new offer needs Offerings Create and the `prices` ability (Q-U8) —
-without them the list sends the link back with the permission toast. The drawer is the tab's
+`requireOrgStatus`; in-room, a new offer needs the member's `offering:create` — without it (or
+during View-as) the list sends the link back with the permission toast. The drawer writes
+`POST /app/offers`. The drawer is the tab's
 `OfferDrawer` (`../components/OfferDrawer/`), opened by the page through
 `../hooks/useOffersDialogRoute/`; saving or closing it returns to the list with the list's own
 params.

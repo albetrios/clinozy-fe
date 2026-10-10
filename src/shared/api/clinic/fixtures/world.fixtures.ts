@@ -36,7 +36,7 @@ import type { MedicineRecord } from '@/shared/api/clinic/medicines-contracts.ts'
 import type {
   OfferingRecord,
   OfferRecord,
-} from '@/shared/api/clinic/offerings-contracts.ts';
+} from '@/shared/api/clinic/offerings-fixture-contracts.ts';
 import type { PatientRecord } from '@/shared/api/clinic/patients-fixture-contracts.ts';
 import type { PaymentRecord } from '@/shared/api/clinic/payments-contracts.ts';
 import type { TaskRecord } from '@/shared/api/clinic/tasks-contracts.ts';
@@ -169,7 +169,7 @@ export const clinicFixtures = {
     seed: () => feedbackActionSeed(),
     sequenced: false,
   }),
-  // The offerings domain carries the plan's fields (Appendix F) — see offerings-contracts.ts.
+  // The offerings domain carries the plan's fields (offerings-fixture-contracts.ts).
   offerings: createFixtureCollection<OfferingRecord>({
     resource: 'Offering',
     seed: () => offeringSeed(),

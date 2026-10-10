@@ -9,6 +9,7 @@ import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { useMessageTranslator } from '@/shared/hooks/useMessageTranslator/index.ts';
 import { useOfferings } from '@/shared/hooks/useOfferings/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 import { useTemplateValues } from '@/shared/hooks/useThread/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 
@@ -42,8 +43,8 @@ function senderOf(user: AuthUser | null): ChatSender {
 /**
  * What a person's starters, smart chips and templates put in a message, and
  * the "Fill in" values: the clinic's name, branch address and links and free
- * slots (`useTemplateValues`), the offering their interest names
- * (`useOfferings`), the signed-in member, their next visit.
+ * slots (`useTemplateValues`), the offering their interest names and what it bills before any
+ * offer, in clinozy-be's rupees (`useOfferings`), the signed-in member, their next visit.
  */
 export function useMessageContext({
   person,
@@ -60,7 +61,7 @@ export function useMessageContext({
   const values = useTemplateValues(person).data;
   const offerings = useOfferings().data;
   const user = useAuthStore((state) => state.user);
-  const money = usePaiseFormat();
+  const rupees = useRupeeFormat();
   return useMemo(() => {
     const interest = interestPhrase(contact.interests, tm);
     const offering = offeringFor(offerings ?? [], interest);
@@ -74,7 +75,7 @@ export function useMessageContext({
       offering: offering
         ? {
             name: offering.name,
-            price: money(basePrice(offering)),
+            price: rupees(basePrice(offering)),
             sessions: offering.sessions,
           }
         : null,
@@ -87,5 +88,5 @@ export function useMessageContext({
       reviewLink: values?.reviewLink ?? '',
     });
     return { ctx, fill };
-  }, [contact, tm, values, offerings, user, money, clock, upcoming]);
+  }, [contact, tm, values, offerings, user, rupees, clock, upcoming]);
 }

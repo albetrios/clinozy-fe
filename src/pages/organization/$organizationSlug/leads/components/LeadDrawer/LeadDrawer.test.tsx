@@ -108,9 +108,13 @@ vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => {
     fetchAppointmentSlots: vi.fn(async ({ date }: { date: string }) =>
       slotDay(date, ['10:00', '10:30']),
     ),
-    fetchBookableTreatments: vi.fn(async () => []),
   };
 });
+// The one offerings catalogue — the booking step's "From offerings": empty here.
+vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchAllOfferings: vi.fn(async () => []),
+}));
 vi.mock('@/shared/tenancy/my-membership.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof MyMembershipModule>()),
   findMyMembershipId: vi.fn(async () => world.viewerId),

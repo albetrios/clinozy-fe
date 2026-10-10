@@ -24,7 +24,7 @@ import type {
   Tone,
 } from '@/shared/api/clinic/clinic-schema.ts';
 import type { LeadRecordSource } from '@/shared/api/clinic/leads-fixture-contracts.ts';
-import type { OfferState } from '@/shared/api/clinic/offerings-contracts.ts';
+import type { OfferStatus } from '@/shared/api/clinic/offerings-contracts.ts';
 
 /** Each clinic section's tone — one per section, never shared (`shell.md:42`). */
 export const SECTION_TONES: Readonly<Record<Section, Tone>> = {
@@ -183,10 +183,10 @@ export const OFFER_KIND_TONES: Readonly<Record<OfferKind, Tone>> = {
 };
 
 /**
- * Each derived offer state's tone (`ST_T`, H:5474): Running sage, Scheduled
- * sky, Paused butter, Ended stone.
+ * Each offer status's tone (`ST_T`, H:5474): Running sage, Scheduled sky,
+ * Paused butter, Ended stone.
  */
-export const OFFER_STATE_TONES: Readonly<Record<OfferState, Tone>> = {
+export const OFFER_STATE_TONES: Readonly<Record<OfferStatus, Tone>> = {
   live: 'sage',
   scheduled: 'sky',
   paused: 'butter',

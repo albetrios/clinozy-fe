@@ -49,6 +49,10 @@ export const OFFERING_DRAWER_KEYS = {
     sessions: 'offeringDrawer.fields.sessions',
     sessionsHint: 'offeringDrawer.fields.sessionsHint',
     gstRate: 'offeringDrawer.fields.gstRate',
+    /** "18%" — one GST rate chip. */
+    gstChip: 'offeringDrawer.fields.gstChip',
+    /** Under the chips while none is picked: the rate the server applies by category. */
+    gstHint: 'offeringDrawer.fields.gstHint',
     gst: 'offeringDrawer.fields.gst',
     gstInclusive: 'offeringDrawer.fields.gstInclusive',
     gstExclusive: 'offeringDrawer.fields.gstExclusive',
@@ -94,12 +98,20 @@ export const OFFERING_DRAWER_KEYS = {
     edit: 'offeringDrawer.save.edit',
     createAnother: 'offeringDrawer.save.createAnother',
   },
-  /** The save's toasts (H:5507): what is missing, then the price rules. */
+  /**
+   * The save's toasts (H:5507): what is missing, then the price rules — and the
+   * lowest-price refusals a member is told in their own words.
+   */
   toasts: {
     addName: 'offeringDrawer.toasts.addName',
     addPrice: 'offeringDrawer.toasts.addPrice',
     offerAbovePrice: 'offeringDrawer.toasts.offerAbovePrice',
     floorAboveOffer: 'offeringDrawer.toasts.floorAboveOffer',
+    floorAbovePrice: 'offeringDrawer.toasts.floorAbovePrice',
+    /** A price under the lowest price the member cannot see (gap 7). */
+    offerBelowFloor: 'offeringDrawer.toasts.offerBelowFloor',
+    /** `403 field_permission_required`: the member's role no longer sets the lowest price. */
+    floorNeedsPermission: 'offeringDrawer.toasts.floorNeedsPermission',
   },
 } as const;
 

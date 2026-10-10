@@ -25,8 +25,6 @@ import {
   appointmentSlotDayWire,
   type AppointmentSlotParams,
   type AppointmentStaff,
-  type AppointmentTreatment,
-  appointmentTreatmentWire,
   appointmentWire,
   statusesForFilter,
   toAppointmentRecord,
@@ -68,9 +66,6 @@ export const appointmentQueryKeys = {
     [...appointmentQueryKeys.all, organizationId, 'slots'] as const,
   slots: (organizationId: string | null, params: AppointmentSlotParams) =>
     [...appointmentQueryKeys.slotDays(organizationId), params] as const,
-  /** The treatments the form offers. */
-  treatments: (organizationId: string | null) =>
-    [...appointmentQueryKeys.all, organizationId, 'treatments'] as const,
   /** A person's bookings — the patient file's Visits. */
   person: (organizationId: string | null, contactId: string) =>
     [...appointmentQueryKeys.all, organizationId, 'person', contactId] as const,
@@ -300,34 +295,6 @@ export async function fetchAppointmentSlots(
     closedLabel: day.closed_label,
     slots: day.slots.map((slot) => ({ time: slot.start_time, endTime: slot.end_time })),
   };
-}
-
-/** The clinic's active treatments, by name — the form's "From offerings" (every page). */
-export async function fetchBookableTreatments(): Promise<AppointmentTreatment[]> {
-  const rows = await collectAllPages(async (after) => {
-    const response = await api.get('/app/offerings', {
-      query: {
-        category: 'treatment',
-        is_active: 'true',
-        sort: 'name',
-        limit: RANGE_PAGE_SIZE,
-        after: after ?? undefined,
-      },
-    });
-    return {
-      rows: z.array(appointmentTreatmentWire).parse(response.data ?? []),
-      next: response.meta?.pagination?.has_more
-        ? (response.meta.pagination.next ?? null)
-        : null,
-    };
-  }, 'appointment-treatments');
-  return rows.map((row) => ({
-    id: row.id,
-    name: row.name,
-    durationMin: row.duration_minutes,
-    specialty: row.specialty,
-    tone: row.tone,
-  }));
 }
 
 // ── Writes ──

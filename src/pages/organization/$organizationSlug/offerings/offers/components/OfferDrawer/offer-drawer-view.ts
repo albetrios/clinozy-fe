@@ -14,7 +14,7 @@ import {
   RECORD_DRAWER_KEYS,
   RECORD_DRAWER_NS,
 } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 
 import { OFFERINGS_KEYS } from '../../../offerings.constants.ts';
 import { CATALOGUE_CELLS_KEYS } from '../../../shared/components/CatalogueCells/index.ts';
@@ -75,8 +75,8 @@ function useViewWords() {
   const { t } = useTranslation(OFFER_DRAWER_NS);
   const { t: tClinic } = useTranslation(RECORD_DRAWER_NS);
   const labels = useOfferLabels();
-  const formatPaise = usePaiseFormat();
-  return { t, tClinic, labels, formatPaise };
+  const formatRupees = useRupeeFormat();
+  return { t, tClinic, labels, formatRupees };
 }
 
 type ViewWords = ReturnType<typeof useViewWords>;
@@ -89,7 +89,7 @@ function valueText(values: OfferFormValues, words: ViewWords): string | undefine
   if (values.kind === 'extra') {
     return words.t(OFFERINGS_KEYS.cells.sessions, { count: value });
   }
-  return words.formatPaise(value);
+  return words.formatRupees(value);
 }
 
 /** Step 1, "Offer": Name · Code · Type · the value · Colour. */
@@ -201,7 +201,10 @@ function notesStepOf(values: OfferFormValues, words: ViewWords): OfferStepView {
   };
 }
 
-/** The preview boxes: the offer alone on each picked offering, never below its lowest price. */
+/**
+ * The preview boxes — a preview of what is being typed: the offer alone on each picked
+ * offering, in rupees, never below its lowest price when the member can see it.
+ */
 function previewsOf(
   values: OfferFormValues,
   offerings: readonly OfferingRecord[],
@@ -219,8 +222,8 @@ function previewsOf(
           preview.unit === 'sessions'
             ? words.t(F.previewSessions, { before: preview.before, count: preview.after })
             : words.t(F.previewPrice, {
-                before: words.formatPaise(preview.before),
-                after: words.formatPaise(preview.after),
+                before: words.formatRupees(preview.before),
+                after: words.formatRupees(preview.after),
               }),
       };
     });

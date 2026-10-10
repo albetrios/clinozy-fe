@@ -7,21 +7,24 @@
  * "To" pickers, `leads.md:180`).
  *
  * Beside them the Branches filter every schema with a Branches section reads:
- * branch ids, or `all` ("All branches").
+ * branch ids (`brn_…`), or `all` ("All branches").
  *
  * Dependency-free on purpose (the shared URL readers aside): the rooms' URL
  * search schemas read it, and those run in the router (`routeTree.tsx` is the
  * entry chunk). The matching lives in `clinic-filter-match.ts`.
  */
 
-import { listOf, RECORD_ID } from '@/lib/routes/search-params.ts';
+import { listOf, PUBLIC_ID } from '@/lib/routes/search-params.ts';
 
 /** A Branches filter's value for a record sold or usable at every branch ("All branches"). */
 export const ALL_BRANCHES = 'all';
 
-/** A Branches filter in the URL: branch ids, or `all` ("All branches"); none left is no filter. */
+/**
+ * A Branches filter in the URL: branch ids (clinozy-be's `brn_…`), or `all` ("All branches");
+ * none left is no filter.
+ */
 export function readBranchFilter(value: unknown): string[] | undefined {
-  return listOf(value, (entry) => entry === ALL_BRANCHES || RECORD_ID.test(entry));
+  return listOf(value, (entry) => entry === ALL_BRANCHES || PUBLIC_ID.test(entry));
 }
 
 /** The Created presets ("Any" is no filter). */

@@ -34,7 +34,7 @@ import {
   RECORD_DRAWER_KEYS,
   RECORD_DRAWER_NS,
 } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 
 import { CATALOGUE_CELLS_KEYS } from '../../../shared/components/CatalogueCells/index.ts';
 import { OFFER_DRAWER_KEYS, OFFER_DRAWER_NS } from './offer-drawer.constants.ts';
@@ -132,8 +132,8 @@ function OfferValueField({
 }
 
 /**
- * Step 1, "Offer" (`offerings.md:95–99`): Name* · Code (upper-cased, spaces
- * stripped), Type — switching resets the value (10 · 500 · empty · 1, H:5512)
+ * Step 1, "Offer" (`offerings.md:95–99`): Name* · Code (upper-cased, letters
+ * and digits only), Type — switching resets the value (10 · 500 · empty · 1, H:5512)
  * — the value, and the eight colours.
  */
 export function OfferMainFields(props: OfferFieldsProps) {
@@ -239,18 +239,18 @@ export function OfferMainFields(props: OfferFieldsProps) {
 /**
  * The Offerings picker's options (`offerings.md:101`): the active offerings —
  * and any picked one since made inactive — grouped by category, each with its
- * colour dot, its category and its base price.
+ * colour dot, its category and its base price in rupees.
  */
 function useOfferingOptions(
   offerings: readonly OfferingRecord[],
   picked: readonly string[],
 ): PickerOption<OfferingRecord>[] {
   const { t: tClinic } = useTranslation(CLINIC_NS);
-  const formatPaise = usePaiseFormat();
+  const formatRupees = useRupeeFormat();
   const rank = (offering: OfferingRecord) =>
     OFFERING_CATEGORY_VALUES.indexOf(offering.category);
   return offerings
-    .filter((offering) => offering.active || picked.includes(offering.id))
+    .filter((offering) => offering.isActive || picked.includes(offering.id))
     .sort((a, b) => rank(a) - rank(b))
     .map((offering) => {
       const category = tClinic(CLINIC_KEYS.offerings.categories[offering.category]);
@@ -258,7 +258,7 @@ function useOfferingOptions(
         key: offering.id,
         label: offering.name,
         sub: category,
-        meta: formatPaise(basePrice(offering)),
+        meta: formatRupees(basePrice(offering)),
         group: category,
         groupTone: OFFERING_CATEGORY_TONES[offering.category],
         tone: offering.tone,
@@ -417,7 +417,10 @@ export function OfferWhereFields({
   );
 }
 
-/** Step 3, "Notes" (`offerings.md:106–107`): the Note and the Live / Paused status. */
+/**
+ * Step 3, "Notes" (`offerings.md:106–107`): the Note (up to 280, the API's) and
+ * the Live / Paused status (`is_active`).
+ */
 export function OfferNotesFields({ form, idPrefix, testId }: OfferFieldsProps) {
   const { t } = useTranslation(OFFER_DRAWER_NS);
   const note = useDrawerFieldIds(form, idPrefix)('note');

@@ -10,10 +10,14 @@ import {
 import { render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import type { OrganizationPermission } from '@/core/types/permissions.ts';
+import type * as OfferingsApiModule from '@/shared/api/clinic/offerings-api.ts';
+import { fetchOffer } from '@/shared/api/clinic/offerings-api.ts';
+import { HttpError } from '@/shared/errors/HttpError.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { offerRecord, TEST_OFFER_ID } from '@/tests/utils/offering-doubles.ts';
 
 import { validateOffersSearch } from '../../offers.search.ts';
 import { type OffersDialogRoute, useOffersDialogRoute } from './useOffersDialogRoute.ts';
@@ -21,12 +25,22 @@ import { type OffersDialogRoute, useOffersDialogRoute } from './useOffersDialogR
 const { notifyMock } = vi.hoisted(() => ({ notifyMock: { info: vi.fn() } }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 
+vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof OfferingsApiModule>()),
+  fetchOffer: vi.fn(),
+}));
+
 const OFFERS = '/organization/acme/offerings/offers';
 
 /** What the hook answered, minus the record itself (its name stands in). */
 function summary(route: OffersDialogRoute) {
   if (route.kind !== 'edit') return route;
-  return { kind: route.kind, offerId: route.offerId, name: route.offer?.name };
+  return {
+    kind: route.kind,
+    offerId: route.offerId,
+    name: route.offer?.name,
+    failed: route.failed,
+  };
 }
 
 /** Renders the hook's answer as JSON for the tests to read. */
@@ -41,9 +55,19 @@ function seen(): unknown {
 }
 
 /** The Offers tab and its two dialog routes, the probe on the list page. */
-function renderRoutes(url: string, role: 'admin' | 'counsellor' = 'admin') {
-  useOrganizationStore.getState().setPermissions(['organization:read']);
-  useUIStore.setState({ previewRole: role });
+function renderRoutes(
+  url: string,
+  {
+    codes = ['offering:create', 'offering:update'],
+    previewRole = null,
+  }: {
+    codes?: OrganizationPermission[];
+    previewRole?: 'admin' | null;
+  } = {},
+) {
+  signInTestMember();
+  useOrganizationStore.getState().setPermissions(['organization:read', ...codes]);
+  useUIStore.setState({ previewRole });
   const root = createRootRoute({ component: () => <Outlet /> });
   const list = createRoute({
     getParentRoute: () => root,
@@ -81,12 +105,17 @@ function renderRoutes(url: string, role: 'admin' | 'counsellor' = 'admin') {
 
 beforeEach(() => {
   notifyMock.info.mockReset();
-  resetClinicFixtures();
+  vi.mocked(fetchOffer).mockReset();
+  vi.mocked(fetchOffer).mockImplementation(async (offerId) => {
+    if (offerId === TEST_OFFER_ID) return offerRecord();
+    throw new HttpError('HTTP 404', 404, `/api/v1/app/offers/${offerId}`, 'GET', {
+      error: { code: 'not_found', detail: 'Offer not found' },
+    });
+  });
 });
 afterEach(() => {
-  resetClinicFixtures();
   useUIStore.setState({ previewRole: null });
-  useOrganizationStore.getState().clearPermissions();
+  useOrganizationStore.getState().clearOrganization();
 });
 
 describe('useOffersDialogRoute', () => {
@@ -96,23 +125,30 @@ describe('useOffersDialogRoute', () => {
     expect(seen()).toEqual({ kind: 'none' });
   });
 
-  it('opens New offer (S:102)', async () => {
+  it('opens New offer with `offering:create` (S:102)', async () => {
     renderRoutes(`${OFFERS}/create`);
     await screen.findByTestId('probe');
     expect(seen()).toEqual({ kind: 'create' });
   });
 
-  it('opens the offer’s drawer and resolves the offer, for a viewer too (S:103)', async () => {
-    const id = ref.offer(31);
-    renderRoutes(`${OFFERS}/${id}/edit`, 'counsellor');
+  it('reads the offer by its public id and opens it, for a viewer too (S:103)', async () => {
+    renderRoutes(`${OFFERS}/${TEST_OFFER_ID}/edit`, { codes: [] });
     await waitFor(() =>
-      expect(seen()).toEqual({ kind: 'edit', offerId: id, name: 'Navratri glow' }),
+      expect(seen()).toEqual({
+        kind: 'edit',
+        offerId: TEST_OFFER_ID,
+        name: 'Research Diwali glow',
+        failed: false,
+      }),
     );
+    expect(fetchOffer).toHaveBeenCalledWith(TEST_OFFER_ID);
     expect(notifyMock.info).not.toHaveBeenCalled();
   });
 
-  it('sends an unknown id back to the list, its filters kept (S:115)', async () => {
-    const { router } = renderRoutes(`${OFFERS}/${ref.offer(1)}/edit?status=live`);
+  it('sends a deleted offer back to the list, its filters kept (404, S:115)', async () => {
+    const { router } = renderRoutes(
+      `${OFFERS}/ofr_gonegonegonegonegone00/edit?status=live`,
+    );
     await waitFor(() => expect(router.state.location.pathname).toBe(OFFERS));
     expect(router.state.location.search).toMatchObject({ status: ['live'] });
     expect(notifyMock.info).toHaveBeenCalledExactlyOnceWith(
@@ -120,10 +156,29 @@ describe('useOffersDialogRoute', () => {
     );
   });
 
-  it('refuses a create link to a role that cannot price offers (Q-U8)', async () => {
-    const { router } = renderRoutes(`${OFFERS}/create`, 'counsellor');
+  it('sends an id that is no public id back without asking the API', async () => {
+    const { router } = renderRoutes(
+      `${OFFERS}/3f9b0c6e-1d2a-4c5b-8e7f-0a1b2c3d4e5f/edit`,
+    );
+    await waitFor(() => expect(router.state.location.pathname).toBe(OFFERS));
+    expect(notifyMock.info).toHaveBeenCalledExactlyOnceWith(
+      'Offer not found · it may have been deleted',
+    );
+    expect(fetchOffer).not.toHaveBeenCalled();
+  });
+
+  it('turns a create link away without `offering:create`', async () => {
+    const { router } = renderRoutes(`${OFFERS}/create`, { codes: ['offering:update'] });
+    await waitFor(() => expect(router.state.location.pathname).toBe(OFFERS));
+    expect(notifyMock.info).toHaveBeenCalledExactlyOnceWith(
+      'You do not have permission to perform this action.',
+    );
+    expect(seen()).toEqual({ kind: 'none' });
+  });
+
+  it('turns a create link away during View-as — no code counts there', async () => {
+    const { router } = renderRoutes(`${OFFERS}/create`, { previewRole: 'admin' });
     await waitFor(() => expect(router.state.location.pathname).toBe(OFFERS));
     expect(notifyMock.info).toHaveBeenCalledTimes(1);
-    expect(seen()).toEqual({ kind: 'none' });
   });
 });

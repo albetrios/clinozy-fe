@@ -9,8 +9,10 @@ import {
   validateOfferingsSearch,
 } from './offerings.search.ts';
 
-const BRANCH = '3f9b0c6e-1d2a-4c5b-8e7f-0a1b2c3d4e5f';
-const OFFER = '9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d';
+const BRANCH = 'brn_thsaog1i8bv6m9rd9ucoy';
+const OFFER = 'ofr_w28ixe5gwcf3crpeed4zu';
+/** The fixture world's ids — no record of clinozy-be's. */
+const UUID = '3f9b0c6e-1d2a-4c5b-8e7f-0a1b2c3d4e5f';
 
 describe('the contract’s values, declared for the entry chunk', () => {
   it('match the contract’s categories', () => {
@@ -74,8 +76,8 @@ describe('validateOfferingsSearch (S:98, D22)', () => {
       validateOfferingsSearch({
         q: '',
         category: ['massage'],
-        offer: ['GLOW20'],
-        branch: ['vesu'],
+        offer: ['GLOW20', UUID],
+        branch: ['vesu', UUID],
         status: ['paused'],
         created: 'last_year',
         sort: 'offer:asc',

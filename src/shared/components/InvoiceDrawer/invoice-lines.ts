@@ -10,11 +10,11 @@ import {
 import type {
   OfferingRecord,
   OfferRecord,
-} from '@/shared/api/clinic/offerings-contracts.ts';
+} from '@/shared/api/clinic/offerings-fixture-contracts.ts';
 import {
   effectivePrice,
   invoiceLineRate,
-} from '@/shared/api/clinic/offerings-pricing.ts';
+} from '@/shared/api/clinic/offerings-fixture-pricing.ts';
 import type { QuickLineSearchable } from '@/shared/components/QuickLine/index.ts';
 
 import type { InvoiceLineForm } from './invoice-form.ts';

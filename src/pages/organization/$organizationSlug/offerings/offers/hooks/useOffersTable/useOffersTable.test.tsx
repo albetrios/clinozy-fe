@@ -16,7 +16,7 @@ const scrollerAt = (viewport: number) => viewport - 2 * 12 - 2;
 function useTable() {
   return useOffersTable({
     rows: [],
-    catalogue: { branches: [], savedBy: () => undefined, today: '2026-10-04' },
+    catalogue: { branches: [], today: '2026-10-04' },
     nameOf: () => undefined,
   });
 }

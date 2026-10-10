@@ -95,7 +95,8 @@
       "endsIn_one": "Endet in {{count}} Tag",
       "endsIn_other": "Endet in {{count}} Tagen",
       "startsOn": "Beginnt am {{date}}",
-      "over": "Vorbei"
+      "over": "Vorbei",
+      "noOfferings": "Keine Leistungen"
     },
     "rowActions": {
       "edit": "Bearbeiten",
@@ -189,7 +190,9 @@
       "descriptionPlaceholder": "Was enthalten ist",
       "status": "Status",
       "active": "Aktiv · buchbar",
-      "inactive": "Inaktiv · ausgeblendet"
+      "inactive": "Inaktiv · ausgeblendet",
+      "gstChip": "{{value}} %",
+      "gstHint": "0 % für eine Beratung, sonst 18 % — bis Sie einen Satz wählen"
     },
     "offerTill": "bis {{date}}",
     "untitled": "Ohne Namen",
@@ -202,7 +205,10 @@
       "addName": "Geben Sie einen Namen ein",
       "addPrice": "Geben Sie einen Preis ein",
       "offerAbovePrice": "Der Angebotspreis darf nicht über dem Preis liegen",
-      "floorAboveOffer": "Der Mindestpreis darf nicht über dem Angebotspreis liegen"
+      "floorAboveOffer": "Der Mindestpreis darf nicht über dem Angebotspreis liegen",
+      "offerBelowFloor": "Unter dem Mindestpreis dieser Leistung — fragen Sie einen Inhaber oder Admin",
+      "floorAbovePrice": "Der Mindestpreis darf nicht über dem Preis liegen",
+      "floorNeedsPermission": "Ihre Rolle darf den Mindestpreis nicht ändern — fragen Sie einen Inhaber oder Admin"
     }
   },
   "offerDrawer": {
@@ -265,7 +271,8 @@
         "fixed": "Legen Sie den Betrag fest",
         "extra": "Legen Sie die Gratissitzungen fest"
       },
-      "endsBeforeStart": "Endet vor dem Beginn"
+      "endsBeforeStart": "Endet vor dem Beginn",
+      "offeringInactive": "{{name}} ist nicht mehr aktiv — entfernen Sie die Leistung oder wählen Sie eine andere"
     }
   }
 }

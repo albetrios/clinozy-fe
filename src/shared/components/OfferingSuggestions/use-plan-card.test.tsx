@@ -7,6 +7,7 @@ import type * as DirectoryApiModule from '@/shared/api/clinic/directory-api.ts';
 import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
 import type * as LeadsApiModule from '@/shared/api/clinic/leads-api.ts';
 import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
+import type * as OfferingsApiModule from '@/shared/api/clinic/offerings-api.ts';
 import type * as PackagesApiModule from '@/shared/api/clinic/patient-packages-api.ts';
 import type { PatientPurchaseRow } from '@/shared/api/clinic/patient-packages-contracts.ts';
 import type * as PlanApiModule from '@/shared/api/clinic/plan-api.ts';
@@ -17,6 +18,7 @@ import type {
   PlanSuggestionRow,
 } from '@/shared/api/clinic/plan-contracts.ts';
 import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { offeringRecord } from '@/tests/utils/offering-doubles.ts';
 
 const { notifyMock } = vi.hoisted(() => ({
   notifyMock: {
@@ -47,12 +49,15 @@ vi.mock('@/shared/api/clinic/plan-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof PlanApiModule>()),
   fetchPlan: vi.fn(),
   fetchPlanIdeas: vi.fn(),
-  fetchPlanOfferings: vi.fn(),
   fetchPlanActivity: vi.fn(),
   createPlanSuggestion: vi.fn(),
   updatePlanSuggestion: vi.fn(),
   deletePlanSuggestion: vi.fn(),
   restorePlanSuggestion: vi.fn(),
+}));
+vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof OfferingsApiModule>()),
+  fetchAllOfferings: vi.fn(),
 }));
 vi.mock('@/shared/api/clinic/patient-packages-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof PackagesApiModule>()),
@@ -69,6 +74,7 @@ vi.mock('@/shared/api/clinic/leads-api.ts', async (importOriginal) => ({
 
 import { fetchTeamDirectory } from '@/shared/api/clinic/directory-api.ts';
 import { fetchLead } from '@/shared/api/clinic/leads-api.ts';
+import { fetchAllOfferings } from '@/shared/api/clinic/offerings-api.ts';
 import { listPatientPurchases } from '@/shared/api/clinic/patient-packages-api.ts';
 import {
   createPlanSuggestion,
@@ -76,7 +82,6 @@ import {
   fetchPlan,
   fetchPlanActivity,
   fetchPlanIdeas,
-  fetchPlanOfferings,
   restorePlanSuggestion,
   updatePlanSuggestion,
 } from '@/shared/api/clinic/plan-api.ts';
@@ -248,7 +253,9 @@ beforeEach(() => {
     planTotal: 11_000.5,
   });
   vi.mocked(fetchPlanIdeas).mockResolvedValue([IDEA]);
-  vi.mocked(fetchPlanOfferings).mockResolvedValue([LHR, HYDRA, PEEL, RETIRED]);
+  vi.mocked(fetchAllOfferings).mockResolvedValue(
+    [LHR, HYDRA, PEEL, RETIRED].map((offering) => offeringRecord(offering)),
+  );
   vi.mocked(fetchPlanActivity).mockResolvedValue([MESSAGE]);
   vi.mocked(listPatientPurchases).mockResolvedValue([
     PURCHASE,
@@ -331,7 +338,7 @@ describe('usePlanCard — the plan rows (api-integration §5.4)', () => {
     const { result } = renderCard({ patientId: '' });
     expect(result.current.status).toBe('pending');
     expect(fetchPlan).not.toHaveBeenCalled();
-    expect(fetchPlanOfferings).not.toHaveBeenCalled();
+    expect(fetchAllOfferings).not.toHaveBeenCalled();
   });
 
   it('passes the lowest-price code through, and the host’s edit', async () => {
@@ -445,17 +452,18 @@ describe('usePlanCard — the writes', () => {
     const props = await readyProps(result);
     const options = props.addOffering?.options ?? [];
     expect(options.map((option) => [option.label, option.disabled])).toEqual([
-      // Planned: held. Accepted and invoiced in full, or declined: free again (PK9).
-      ['LHR Full Face', true],
+      // A to Z, as the catalogue reads. Planned: held. Accepted and invoiced in full, or
+      // declined: free again (PK9).
       ['Hydrafacial', false],
+      ['LHR Full Face', true],
       ['Peel', false],
     ]);
-    expect(options[0]).toMatchObject({
+    expect(options[1]).toMatchObject({
       sub: '7 sessions · min ₹4,000',
       meta: '₹4,800',
       group: 'Package',
     });
-    expect(options[1]?.sub).toBe('Single');
+    expect(options[0]?.sub).toBe('Single');
     act(() => props.addOffering?.onPick(HYDRA.id));
     await waitFor(() =>
       expect(createPlanSuggestion).toHaveBeenCalledWith(

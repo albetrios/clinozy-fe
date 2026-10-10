@@ -88,7 +88,8 @@
       "endsTomorrow": "明天结束",
       "endsIn_other": "{{count}} 天后结束",
       "startsOn": "{{date}} 开始",
-      "over": "已结束"
+      "over": "已结束",
+      "noOfferings": "无服务项目"
     },
     "rowActions": {
       "edit": "编辑",
@@ -179,7 +180,9 @@
       "descriptionPlaceholder": "包含哪些内容",
       "status": "状态",
       "active": "启用 · 可预约",
-      "inactive": "停用 · 已隐藏"
+      "inactive": "停用 · 已隐藏",
+      "gstChip": "{{value}}%",
+      "gstHint": "问诊为 0%，其余为 18% — 直到您选择税率"
     },
     "offerTill": "至 {{date}}",
     "untitled": "未命名",
@@ -192,7 +195,10 @@
       "addName": "请填写名称",
       "addPrice": "请填写价格",
       "offerAbovePrice": "优惠价不能高于价格",
-      "floorAboveOffer": "最低价不能高于优惠价"
+      "floorAboveOffer": "最低价不能高于优惠价",
+      "offerBelowFloor": "低于该服务项目的最低价 — 请联系所有者或管理员",
+      "floorAbovePrice": "最低价不能高于价格",
+      "floorNeedsPermission": "您的角色无法修改最低价 — 请联系所有者或管理员"
     }
   },
   "offerDrawer": {
@@ -253,7 +259,8 @@
         "fixed": "请设置金额",
         "extra": "请设置赠送次数"
       },
-      "endsBeforeStart": "结束日期早于开始日期"
+      "endsBeforeStart": "结束日期早于开始日期",
+      "offeringInactive": "{{name}} 已停用 — 请移除或选择其他服务项目"
     }
   }
 }

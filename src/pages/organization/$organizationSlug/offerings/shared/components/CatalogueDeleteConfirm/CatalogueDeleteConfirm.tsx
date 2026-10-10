@@ -20,7 +20,7 @@ export type CatalogueDeleteTarget =
       kind: 'offering';
       id: string;
       /** Its display id — "Offering #272 removed". */
-      seq: number;
+      offeringNumber: number;
       /**
        * The grey pill under the title: the name from a row, the drawer's
        * summary line from a drawer.
@@ -51,9 +51,10 @@ export interface CatalogueDeleteConfirmProps {
  * `offerings.md:205–219`): the shared reason confirm — a panel at the inline
  * end from `md`, a bottom sheet below — titled "Delete this offering?" /
  * "Delete this offer?", the record in a grey pill, the schema's
- * `delete_reason` chips. The soft delete is optimistic (the row leaves at
- * once); "Offering #272 removed" / "Navratri glow removed" offers Undo for
- * 10s, which restores it (D32, `S:1546`).
+ * `delete_reason` chips. The delete is optimistic (the row leaves at once) and
+ * answers nothing (204); "Offering #272 removed" / "Navratri glow removed"
+ * offers Undo for 10s, which restores it with the Undo's own idempotency key
+ * (D32, `POST …/restore`).
  */
 export function CatalogueDeleteConfirm({
   target,
@@ -70,7 +71,7 @@ export function CatalogueDeleteConfirm({
   const removed = (record: CatalogueDeleteTarget) =>
     record.kind === 'offering'
       ? tClinic(CLINIC_KEYS.offerings.toasts.offeringRemoved, {
-          id: displayId.offering(record.seq),
+          id: displayId.offering(record.offeringNumber),
         })
       : tClinic(CLINIC_KEYS.offerings.toasts.offerRemoved, { name: record.name });
 

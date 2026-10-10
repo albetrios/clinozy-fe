@@ -102,7 +102,8 @@
       "endsIn_many": "Se termine dans {{count}} jours",
       "endsIn_other": "Se termine dans {{count}} jours",
       "startsOn": "Commence le {{date}}",
-      "over": "Terminée"
+      "over": "Terminée",
+      "noOfferings": "Aucune prestation"
     },
     "rowActions": {
       "edit": "Modifier",
@@ -199,7 +200,9 @@
       "descriptionPlaceholder": "Ce qui est inclus",
       "status": "Statut",
       "active": "Active · réservable",
-      "inactive": "Inactive · masquée"
+      "inactive": "Inactive · masquée",
+      "gstChip": "{{value}} %",
+      "gstHint": "0 % pour une consultation, 18 % sinon — tant que vous n’en choisissez pas"
     },
     "offerTill": "jusqu’au {{date}}",
     "untitled": "Sans nom",
@@ -212,7 +215,10 @@
       "addName": "Ajoutez un nom",
       "addPrice": "Ajoutez un prix",
       "offerAbovePrice": "Le prix proposé ne peut pas dépasser le prix",
-      "floorAboveOffer": "Le prix plancher ne peut pas dépasser le prix proposé"
+      "floorAboveOffer": "Le prix plancher ne peut pas dépasser le prix proposé",
+      "offerBelowFloor": "Sous le prix plancher de cette prestation — demandez à un propriétaire ou un admin",
+      "floorAbovePrice": "Le prix plancher ne peut pas dépasser le prix",
+      "floorNeedsPermission": "Votre rôle ne permet pas de modifier le prix plancher — demandez à un propriétaire ou un admin"
     }
   },
   "offerDrawer": {
@@ -277,7 +283,8 @@
         "fixed": "Indiquez le montant",
         "extra": "Indiquez les séances offertes"
       },
-      "endsBeforeStart": "Se termine avant de commencer"
+      "endsBeforeStart": "Se termine avant de commencer",
+      "offeringInactive": "{{name}} n’est plus active — retirez-la ou choisissez-en une autre"
     }
   }
 }

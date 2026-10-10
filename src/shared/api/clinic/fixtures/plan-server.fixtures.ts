@@ -11,7 +11,7 @@ import {
   type Patient,
   suggestionStatusSchema,
 } from '@/shared/api/clinic/clinic-schema.ts';
-import type { OfferingRecord } from '@/shared/api/clinic/offerings-contracts.ts';
+import type { OfferingRecord } from '@/shared/api/clinic/offerings-fixture-contracts.ts';
 import {
   type PatientPlan,
   PLAN_QTY,

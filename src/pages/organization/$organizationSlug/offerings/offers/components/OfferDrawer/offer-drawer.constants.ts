@@ -72,6 +72,8 @@ export const OFFER_DRAWER_KEYS = {
       extra: 'offerDrawer.toasts.value.extra',
     },
     endsBeforeStart: 'offerDrawer.toasts.endsBeforeStart',
+    /** "Research Peel is no longer active — remove it or pick another" (O12, OFFERINGS-M5). */
+    offeringInactive: 'offerDrawer.toasts.offeringInactive',
   },
 } as const;
 

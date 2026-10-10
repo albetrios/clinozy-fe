@@ -1,80 +1,95 @@
 import { describe, expect, it } from 'vitest';
 
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import {
-  offeringSeed,
-  offerSeed,
-} from '@/shared/api/clinic/fixtures/offerings.fixtures.ts';
-import { branchRef } from '@/shared/api/clinic/fixtures/organization.fixtures.ts';
+import { offeringRecord, offerRecord } from '@/tests/utils/offering-doubles.ts';
 
 import { filterOfferRows, offerFilterFields, offerRows } from './offers.rows.ts';
 
-const TODAY = clinicToday();
-const OPEN = [branchRef('Adajan'), branchRef('Vesu'), branchRef('Varachha')];
-const offers = offerSeed(TODAY);
-const offerings = offeringSeed(TODAY);
-const context = { today: TODAY, openBranchIds: OPEN };
+const TODAY = '2026-10-10';
+const VESU = 'brn_thsaog1i8bv6m9rd9ucoy';
+const ADAJAN = 'brn_53j4b7hz7nfb0otr2d920';
+const context = { openBranchIds: [ADAJAN, VESU] };
+
+const offerings = [
+  offeringRecord(),
+  offeringRecord({ id: 'off_facialfacialfacial0000', name: 'D-Tan Facial' }),
+];
+
+/** Four offers in the server's order: live, scheduled, paused, ended. */
+const offers = [
+  offerRecord({ id: 'ofr_one', name: 'Ended first?', status: 'live', code: 'RAIN500' }),
+  offerRecord({
+    id: 'ofr_two',
+    name: 'Peel pack',
+    status: 'scheduled',
+    branchIds: [VESU],
+  }),
+  offerRecord({
+    id: 'ofr_three',
+    name: 'Glow',
+    status: 'paused',
+    isActive: false,
+    offeringIds: ['off_facialfacialfacial0000'],
+  }),
+  offerRecord({ id: 'ofr_four', name: 'Monsoon', status: 'ended', code: null }),
+];
 const names = (list: readonly { name: string }[]) => list.map((offer) => offer.name);
 
 describe('offerRows (H:5476–5479)', () => {
-  it('keeps the tab’s order: Running → Scheduled → Paused → Ended, newest first in each', () => {
+  it('keeps the server’s order and its status, whatever the names or dates say', () => {
     const rows = offerRows(offers, offerings, undefined, context);
-    expect(names(rows)).toEqual([
-      'Navratri glow',
-      'LHR launch · Vesu',
-      'Peel pack + 1 free',
-      'Monsoon ₹500 off',
-    ]);
-    expect(rows.map((row) => row.state)).toEqual(['live', 'live', 'scheduled', 'ended']);
-  });
-
-  it('puts a paused offer after the scheduled ones', () => {
-    const paused = offers.map((offer) =>
-      offer.name === 'Navratri glow' ? { ...offer, paused: true } : offer,
-    );
-    expect(names(offerRows(paused, offerings, undefined, context))).toEqual([
-      'LHR launch · Vesu',
-      'Peel pack + 1 free',
-      'Navratri glow',
-      'Monsoon ₹500 off',
+    expect(names(rows)).toEqual(['Ended first?', 'Peel pack', 'Glow', 'Monsoon']);
+    expect(rows.map((row) => row.status)).toEqual([
+      'live',
+      'scheduled',
+      'paused',
+      'ended',
     ]);
   });
 
   it('searches the name, the code and the offerings’ names', () => {
     expect(names(offerRows(offers, offerings, 'rain500', context))).toEqual([
-      'Monsoon ₹500 off',
+      'Ended first?',
     ]);
-    expect(names(offerRows(offers, offerings, 'facial', context))).toEqual([
-      'Navratri glow',
-    ]);
+    expect(names(offerRows(offers, offerings, 'facial', context))).toEqual(['Glow']);
   });
 
-  it('chips the branches: "all" for none', () => {
+  it('chips the branches: "all" for none, none with one open branch', () => {
     const rows = offerRows(offers, offerings, undefined, context);
-    expect(rows.find((row) => row.name === 'Peel pack + 1 free')?.branches).toEqual([
-      'all',
-    ]);
+    expect(rows[0]?.branches).toEqual(['all']);
+    expect(rows[1]?.branches).toEqual([VESU]);
+    expect(
+      offerRows(offers, offerings, undefined, { openBranchIds: [VESU] })[0]?.branches,
+    ).toEqual([]);
   });
 });
 
 describe('offerFilterFields and filterOfferRows (offerings.md:187)', () => {
-  it('offers Branches and Status from the rows, then Created', () => {
+  it('offers Branches from the rows, Status only with fewer statuses than rows, then Created', () => {
     const rows = offerRows(offers, offerings, undefined, context);
-    const fields = offerFilterFields(rows, context);
-    expect(Object.keys(fields)).toEqual(['branch', 'status', 'created']);
-    expect(fields.status).toEqual({
+    expect(Object.keys(offerFilterFields(rows, context))).toEqual(['branch', 'created']);
+    const more = offerRows(
+      [...offers, offerRecord({ id: 'ofr_five', status: 'live' })],
+      offerings,
+      undefined,
+      context,
+    );
+    expect(offerFilterFields(more, context).status).toEqual({
       kind: 'options',
-      values: ['live', 'scheduled', 'ended'],
+      values: ['live', 'scheduled', 'paused', 'ended'],
     });
   });
 
   it('keeps the rows the picks match', () => {
     const rows = offerRows(offers, offerings, undefined, context);
     expect(names(filterOfferRows(rows, { status: ['ended'] }, undefined, TODAY))).toEqual(
-      ['Monsoon ₹500 off'],
+      ['Monsoon'],
     );
+    expect(names(filterOfferRows(rows, { branch: [VESU] }, undefined, TODAY))).toEqual([
+      'Peel pack',
+    ]);
     expect(
-      names(filterOfferRows(rows, { branch: [branchRef('Vesu')] }, undefined, TODAY)),
-    ).toEqual(['Navratri glow', 'LHR launch · Vesu']);
+      names(filterOfferRows(rows, {}, '2026-10-10..2026-10-10', TODAY)),
+    ).toHaveLength(4);
+    expect(names(filterOfferRows(rows, {}, '2026-09-01..2026-09-30', TODAY))).toEqual([]);
   });
 });

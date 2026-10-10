@@ -8,7 +8,7 @@ import {
   medicineForm,
   type MedicineRecord,
 } from '@/shared/api/clinic/medicines-contracts.ts';
-import type { OfferingRecord } from '@/shared/api/clinic/offerings-contracts.ts';
+import type { OfferingRecord } from '@/shared/api/clinic/offerings-fixture-contracts.ts';
 
 import { blankLine } from './invoice-form.ts';
 import {

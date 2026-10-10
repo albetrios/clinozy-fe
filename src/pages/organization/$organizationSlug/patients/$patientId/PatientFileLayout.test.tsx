@@ -57,6 +57,11 @@ vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchTeamDirectory: vi.fn(),
 }));
+// The Activity chat names offerings from the one catalogue: none here.
+vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchAllOfferings: vi.fn(async () => []),
+}));
 vi.mock('@/shared/tenancy/my-membership.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   findMyMembershipId: vi.fn(),

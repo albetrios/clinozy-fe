@@ -2,7 +2,6 @@ import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
 import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
-import { compareOffersForList } from '@/shared/api/clinic/offerings-api.ts';
 import type {
   OfferingRecord,
   OfferRecord,
@@ -10,7 +9,6 @@ import type {
 import {
   type EffectivePrice,
   effectivePrice,
-  offerState,
 } from '@/shared/api/clinic/offerings-pricing.ts';
 import { OFFERING_CATEGORY_TONES } from '@/shared/clinic/clinic-tones.ts';
 import {
@@ -22,7 +20,7 @@ import {
   RECORD_DRAWER_KEYS,
   RECORD_DRAWER_NS,
 } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 
 import { OFFERINGS_KEYS } from '../../offerings.constants.ts';
 import { CATALOGUE_CELLS_KEYS } from '../../shared/components/CatalogueCells/index.ts';
@@ -33,7 +31,7 @@ import {
   missingOfferingFields,
   type OfferingFormValues,
   offeringPricesOf,
-  paiseOfText,
+  rupeesOfText,
   VALIDITY_QUICK_PICKS,
 } from './offering-form.ts';
 
@@ -97,24 +95,20 @@ export interface OfferingDrawerViewInput {
   branches: readonly BranchOption[];
   /** The header's pricing branch (`pricingBranch`). */
   pricingBranchId: string | null;
-  today: string;
 }
 
-/** The offers on this offering that have not ended, Running first (H:5499). */
+/**
+ * The offers on this offering that the server does not call ended, in its order — Running
+ * first, then scheduled, then paused (H:5499).
+ */
 function offersNotEnded(
   offering: OfferingRecord | null,
   offers: readonly OfferRecord[],
-  today: string,
 ): OfferRecord[] {
   if (!offering) return [];
-  return offers
-    .filter(
-      (offer) =>
-        !offer.deletedAt &&
-        offer.offeringIds.includes(offering.id) &&
-        offerState(offer, today) !== 'ended',
-    )
-    .sort(compareOffersForList(today));
+  return offers.filter(
+    (offer) => offer.offeringIds.includes(offering.id) && offer.status !== 'ended',
+  );
 }
 
 /** The words the view puts together, from the room's and the clinic's copy. */
@@ -123,17 +117,17 @@ function useViewWords() {
   const { t: tClinic } = useTranslation(RECORD_DRAWER_NS);
   const text = useOfferingText();
   const labels = useOfferLabels();
-  const formatPaise = usePaiseFormat();
-  return { t, tClinic, text, labels, formatPaise };
+  const formatRupees = useRupeeFormat();
+  return { t, tClinic, text, labels, formatRupees };
 }
 
 type ViewWords = ReturnType<typeof useViewWords>;
 
 /** "₹7,500 · Navratri glow · +1 free session · 17% below list" (H:5498). */
 function billedTodayText(priced: EffectivePrice<OfferRecord>, words: ViewWords): string {
-  const { t, formatPaise } = words;
+  const { t, formatRupees } = words;
   return [
-    formatPaise(priced.final),
+    formatRupees(priced.final),
     priced.priceOffer?.name,
     priced.extraSessions > 0 ? t(F.freeSessions, { count: priced.extraSessions }) : '',
     priced.final < priced.list ? t(F.belowList, { percent: priced.percentOff }) : '',
@@ -155,16 +149,18 @@ function mainStepOf(
   billedToday: string | null,
   words: ViewWords,
 ): OfferingStepView {
-  const { t, tClinic, text, formatPaise } = words;
-  const price = paiseOfText(values.price);
-  const offerPrice = paiseOfText(values.offerPrice);
+  const { t, tClinic, text, formatRupees } = words;
+  const price = rupeesOfText(values.price);
+  const offerPrice = rupeesOfText(values.offerPrice);
   const category = text.category(values.category);
   const picked = branches.filter((branch) => values.branchIds.includes(branch.id));
   const branchesShown = branches.length > 1;
   const allBranches = t(CATALOGUE_CELLS_KEYS.allBranches);
-  const gst = t(values.gstInclusive ? F.gstInclusive : F.gstExclusive);
-  const money = (paise: number) => (paise > 0 ? formatPaise(paise) : undefined);
-  const gstRate = `${Number.parseFloat(values.gstPct) || 0}%`;
+  const gst = t(values.isGstInclusive ? F.gstInclusive : F.gstExclusive);
+  const money = (rupees: number) => (rupees > 0 ? formatRupees(rupees) : undefined);
+  // None picked yet: the server applies the category's rate — the step names none.
+  const gstRate =
+    values.gstPercent === '' ? undefined : t(F.gstChip, { value: values.gstPercent });
 
   const peek: DrawerPeekItem[] = [
     { kind: 'value', label: t(F.name), value: values.name.trim() },
@@ -228,7 +224,7 @@ function mainStepOf(
 /** TIME & VALIDITY: Duration · Validity (read-only boxes never peek, H:3834). */
 function timePartOf(values: OfferingFormValues, words: ViewWords): StepPart {
   const { t } = words;
-  const duration = t(OFFERINGS_KEYS.cells.minutes, { minutes: values.durationMin });
+  const duration = t(OFFERINGS_KEYS.cells.minutes, { minutes: values.durationMinutes });
   const validity = validityText(values.validityDays, words);
   return {
     peek: [
@@ -242,7 +238,7 @@ function timePartOf(values: OfferingFormValues, words: ViewWords): StepPart {
 /** DETAILS: Search terms · Description · Status. */
 function detailsPartOf(values: OfferingFormValues, words: ViewWords): StepPart {
   const { t } = words;
-  const status = t(values.active ? F.active : F.inactive);
+  const status = t(values.isActive ? F.active : F.inactive);
   const terms = values.searchTerms.trim();
   const description = values.description.trim();
   return {
@@ -299,25 +295,23 @@ export function useOfferingDrawerView({
   offers,
   branches,
   pricingBranchId,
-  today,
 }: OfferingDrawerViewInput): OfferingDrawerView {
   const words = useViewWords();
-  const { t, text, labels, formatPaise } = words;
+  const { t, text, labels, formatRupees } = words;
 
   const prices = offeringPricesOf(values);
   const priced = effectivePrice(
     { id: offering?.id ?? null, ...prices },
     pricingBranchId,
     offers,
-    today,
   );
   const billedToday = prices.price > 0 ? billedTodayText(priced, words) : null;
-  const offer = paiseOfText(values.offerPrice);
-  const offersOnThis = offersNotEnded(offering, offers, today).map((entry) => ({
+  const offer = rupeesOfText(values.offerPrice);
+  const offersOnThis = offersNotEnded(offering, offers).map((entry) => ({
     offer: entry,
     text: [
       labels.value(entry),
-      labels.state(offerState(entry, today)),
+      labels.state(entry.status),
       entry.endsOn ? t(K.offerTill, { date: labels.date(entry.endsOn) }) : '',
     ]
       .filter(Boolean)
@@ -326,7 +320,7 @@ export function useOfferingDrawerView({
 
   const category = text.category(values.category);
   const sessions = values.sessions > 1 ? text.sessions(values.sessions, 0) : '';
-  const billed = prices.price > 0 ? formatPaise(priced.final) : '';
+  const billed = prices.price > 0 ? formatRupees(priced.final) : '';
 
   return {
     priced,

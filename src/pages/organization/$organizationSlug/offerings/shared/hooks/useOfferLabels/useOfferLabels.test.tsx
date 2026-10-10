@@ -10,17 +10,18 @@ afterEach(() => {
 });
 
 describe('useOfferLabels (H:5460)', () => {
-  it('words each kind’s value, money in clinic rupees', () => {
+  it('words each kind’s value, money in clinozy-be’s rupees', () => {
     useLocaleStore.setState({ formatLocale: 'en-IN' });
     const { result } = renderHook(() => useOfferLabels());
     expect(result.current.value({ kind: 'percent', value: 20 })).toBe('20% off');
-    expect(result.current.value({ kind: 'amount', value: 50_000 })).toBe('₹500 off');
-    expect(result.current.value({ kind: 'fixed', value: 399_900 })).toBe('at ₹3,999');
+    expect(result.current.value({ kind: 'amount', value: 500 })).toBe('₹500 off');
+    expect(result.current.value({ kind: 'fixed', value: 3999 })).toBe('at ₹3,999');
+    expect(result.current.value({ kind: 'amount', value: 99.5 })).toBe('₹99.50 off');
     expect(result.current.value({ kind: 'extra', value: 1 })).toBe('+1 session');
     expect(result.current.value({ kind: 'extra', value: 2 })).toBe('+2 sessions');
   });
 
-  it('names the kinds and the derived states in the clinic vocabulary', () => {
+  it('names the kinds and the server’s statuses in the clinic vocabulary', () => {
     const { result } = renderHook(() => useOfferLabels());
     expect(result.current.kind('fixed')).toBe('Fixed price');
     expect(result.current.kind('extra')).toBe('Extra sessions');

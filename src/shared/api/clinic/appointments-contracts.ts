@@ -13,12 +13,11 @@ import {
   civilDateSchema,
   clockTimeSchema,
   type OfferingSpecialty,
-  offeringSpecialtySchema,
   type Tone,
-  toneSchema,
 } from './clinic-schema.ts';
 import { contactNameOf } from './contacts-contracts.ts';
 import type { DirectoryMember } from './directory-api.ts';
+import { type OfferingRecord, offeringsByName } from './offerings-contracts.ts';
 
 /*
  * The Appointments domain on clinozy-be (KICKOFF §6.4; api-integration §5.3): a booking points
@@ -333,8 +332,8 @@ export const appointmentSlotDayWire = z.object({
 });
 
 /**
- * A treatment the form offers under "From offerings" (`GET /app/offerings?category=treatment`):
- * its name becomes the service label, its length the booking's.
+ * A treatment the form offers under "From offerings" — an active treatment of the clinic's
+ * offerings catalogue: its name becomes the service label, its length the booking's.
  */
 export interface AppointmentTreatment {
   id: string;
@@ -344,18 +343,25 @@ export interface AppointmentTreatment {
   tone: Tone;
 }
 
-type ApiOfferingRow = NonNullable<ApiData<'/app/offerings', 'get'>>[number];
-
-/** The parts of an offering row the treatment picker reads. */
-export const appointmentTreatmentWire = wireSchema<ApiOfferingRow>()(
-  z.object({
-    id: z.string(),
-    name: z.string(),
-    duration_minutes: z.number().int(),
-    specialty: offeringSpecialtySchema,
-    tone: toneSchema,
-  }),
-);
+/**
+ * The form's "From offerings" out of the clinic's one offerings catalogue (`useOfferings`): its
+ * active treatments, A to Z.
+ */
+export function bookableTreatmentsOf(
+  catalogue: readonly OfferingRecord[],
+): AppointmentTreatment[] {
+  return offeringsByName(
+    catalogue.filter(
+      (offering) => offering.category === 'treatment' && offering.isActive,
+    ),
+  ).map(({ id, name, durationMin, specialty, tone }) => ({
+    id,
+    name,
+    durationMin,
+    specialty,
+    tone,
+  }));
+}
 
 // ── Views ──
 

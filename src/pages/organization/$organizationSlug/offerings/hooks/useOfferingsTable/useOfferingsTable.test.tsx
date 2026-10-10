@@ -6,7 +6,9 @@ import {
   rowActionsWidth,
 } from '@/shared/components/DataTable/data-table-fold.ts';
 import { toFoldColumn } from '@/shared/components/DataTable/data-table-layout.ts';
+import { offeringRecord } from '@/tests/utils/offering-doubles.ts';
 
+import { offeringRows } from '../../offerings.rows.ts';
 import { useOfferingsTable } from './useOfferingsTable.tsx';
 
 /** The table card's inner width at a viewport: compact margins 12px a side, 1px borders. */
@@ -19,7 +21,7 @@ function useTable() {
     rows: [],
     sort: undefined,
     onSortChange: vi.fn(),
-    catalogue: { branches: [], savedBy: () => undefined },
+    catalogue: { branches: [] },
   });
 }
 
@@ -74,6 +76,41 @@ describe('useOfferingsTable (KICKOFF §6.11 Offerings tab)', () => {
     expect(planFold(columns, DESKTOP_SCROLLER).folded).toHaveLength(0);
   });
 
+  it('reads the live record: the ID from `offering_number`, a product’s duration as none, the time it was saved', () => {
+    const rows = offeringRows(
+      [
+        offeringRecord({ offeringNumber: 12 }),
+        offeringRecord({
+          id: 'off_sunscreenspffifty0004',
+          offeringNumber: 4,
+          category: 'product',
+          isActive: false,
+          updatedAt: '2026-09-24T09:20:00.000Z',
+        }),
+      ],
+      [],
+      { branchId: null, openBranchIds: [] },
+    );
+    const { result } = renderHook(() =>
+      useOfferingsTable({
+        rows,
+        sort: undefined,
+        onSortChange: vi.fn(),
+        catalogue: { branches: [] },
+      }),
+    );
+    const [peel, sunscreen] = result.current.getRowModel().rows;
+    const fold = (row: typeof peel, columnId: string) =>
+      result.current.getColumn(columnId)?.columnDef.meta?.foldValue?.(row?.original);
+    expect(fold(peel, 'seq')).toBe('#12');
+    expect(sunscreen?.getValue('duration')).toBeNull();
+    expect(fold(sunscreen, 'duration')).toBe('—');
+    expect(sunscreen?.getValue('status')).toBe('inactive');
+    expect(fold(sunscreen, 'status')).toMatchObject({ value: 'Inactive' });
+    // The Updated column folds to when it was saved — no one is named (G10).
+    expect(fold(sunscreen, 'updated')).toMatch(/Sep 24/);
+  });
+
   it('writes the sort to the URL through the header cycle', () => {
     const onSortChange = vi.fn();
     const { result } = renderHook(() =>
@@ -81,7 +118,7 @@ describe('useOfferingsTable (KICKOFF §6.11 Offerings tab)', () => {
         rows: [],
         sort: 'price:asc',
         onSortChange,
-        catalogue: { branches: [], savedBy: () => undefined },
+        catalogue: { branches: [] },
       }),
     );
     expect(result.current.getColumn('price')?.getIsSorted()).toBe('asc');

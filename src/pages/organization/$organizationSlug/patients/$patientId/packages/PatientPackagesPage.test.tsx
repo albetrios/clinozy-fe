@@ -3,9 +3,10 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
+import type * as OfferingsApiModule from '@/shared/api/clinic/offerings-api.ts';
 import type * as PackagesApiModule from '@/shared/api/clinic/patient-packages-api.ts';
 import type { PatientPackageRow } from '@/shared/api/clinic/patient-packages-contracts.ts';
-import type * as PlanApiModule from '@/shared/api/clinic/plan-api.ts';
+import { offeringRecord } from '@/tests/utils/offering-doubles.ts';
 import {
   patientFile,
   TEST_CONTACT_ID,
@@ -48,13 +49,13 @@ vi.mock('@/shared/api/clinic/patient-packages-api.ts', async (importOriginal) =>
   listPatientPackages: vi.fn(),
   updatePatientPackage: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/plan-api.ts', async (importOriginal) => ({
-  ...(await importOriginal<typeof PlanApiModule>()),
-  fetchPlanOfferings: vi.fn(),
+vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof OfferingsApiModule>()),
+  fetchAllOfferings: vi.fn(),
 }));
 
+import { fetchAllOfferings } from '@/shared/api/clinic/offerings-api.ts';
 import { listPatientPackages } from '@/shared/api/clinic/patient-packages-api.ts';
-import { fetchPlanOfferings } from '@/shared/api/clinic/plan-api.ts';
 
 import { PatientPackagesPage } from './PatientPackagesPage.tsx';
 
@@ -97,8 +98,8 @@ beforeEach(() => {
   access.book = true;
   access.codes = new Set(['payment:update']);
   vi.mocked(listPatientPackages).mockResolvedValue([LHR, PEEL]);
-  vi.mocked(fetchPlanOfferings).mockResolvedValue([
-    {
+  vi.mocked(fetchAllOfferings).mockResolvedValue([
+    offeringRecord({
       id: LHR.offeringId,
       name: 'LHR Full Face · B4G7',
       category: 'package',
@@ -108,7 +109,7 @@ beforeEach(() => {
       offerPrice: null,
       minPrice: null,
       isActive: true,
-    },
+    }),
   ]);
 });
 afterEach(() => {

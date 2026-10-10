@@ -7,14 +7,14 @@ import type {
   InvoiceRxPreset,
   InvoiceSaveResult,
 } from '@/shared/api/clinic/invoices-contracts.ts';
-import type { OfferingRecord } from '@/shared/api/clinic/offerings-contracts.ts';
+import type { OfferingRecord } from '@/shared/api/clinic/offerings-fixture-contracts.ts';
 import { patientName } from '@/shared/api/clinic/patients-fixture-contracts.ts';
+import { useFixtureOffers } from '@/shared/hooks/useFixtureOfferings/index.ts';
 import { useFixturePatient } from '@/shared/hooks/useFixturePatients/index.ts';
 import {
   useInvoicePresets,
   usePrescriptionPreset,
 } from '@/shared/hooks/useInvoices/index.ts';
-import { useOffers } from '@/shared/hooks/useOffers/index.ts';
 import { useStackedDrawer } from '@/shared/hooks/useStackedDrawer/index.ts';
 import { useMyStaffProfile } from '@/shared/hooks/useTeam/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -139,7 +139,7 @@ export function useTeamPrefill(
  * from a row's picker fills that row with the new offering.
  */
 export function useInvoiceStacks(form: InvoiceForm, today: string) {
-  const offers = useOffers();
+  const offers = useFixtureOffers();
   const setParty = (party: InvoicePartyForm | null) =>
     form.setValue('party', party, { shouldDirty: true });
   const rowRef = useRef<number | null>(null);

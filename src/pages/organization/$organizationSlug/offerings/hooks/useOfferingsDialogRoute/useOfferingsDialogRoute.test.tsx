@@ -10,11 +10,18 @@ import {
 import { render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import type { OrganizationPermission } from '@/core/rbac/policies.ts';
+import type * as OfferingsApiModule from '@/shared/api/clinic/offerings-api.ts';
+import { fetchOffering } from '@/shared/api/clinic/offerings-api.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
+import {
+  OFFERING_IDS,
+  type OfferingsTabWorld,
+} from '../../__tests__/integration/offerings-tab-test-data.ts';
+import { OFFERINGS_ADMIN_CODES } from '../../__tests__/integration/offerings-test-router.tsx';
 import { validateOfferingCreateSearch } from '../../offerings.dialog-search.ts';
 import { validateOfferingsSearch } from '../../offerings.search.ts';
 import {
@@ -24,6 +31,16 @@ import {
 
 const { notifyMock } = vi.hoisted(() => ({ notifyMock: { info: vi.fn() } }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
+
+const world = vi.hoisted(() => ({}) as OfferingsTabWorld);
+vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => {
+  const { offeringsApiDouble } =
+    await import('../../__tests__/integration/offerings-tab-test-data.ts');
+  return {
+    ...(await importOriginal<typeof OfferingsApiModule>()),
+    ...offeringsApiDouble(world),
+  };
+});
 
 const OFFERINGS = '/organization/acme/offerings';
 
@@ -44,10 +61,13 @@ function seen(): unknown {
   return JSON.parse(screen.getByTestId('probe').textContent ?? 'null');
 }
 
-/** The Offerings tab and its two dialog routes, the probe on the list page. */
-function renderRoutes(url: string, role: 'admin' | 'counsellor' = 'admin') {
-  useOrganizationStore.getState().setPermissions(['organization:read']);
-  useUIStore.setState({ previewRole: role });
+/** The Offerings tab and its two dialog routes, the probe on the list page, for a member holding `permissions`. */
+function renderRoutes(
+  url: string,
+  permissions: readonly OrganizationPermission[] = OFFERINGS_ADMIN_CODES,
+) {
+  signInTestMember();
+  useOrganizationStore.getState().setPermissions([...permissions]);
   const root = createRootRoute({ component: () => <Outlet /> });
   const list = createRoute({
     getParentRoute: () => root,
@@ -84,14 +104,16 @@ function renderRoutes(url: string, role: 'admin' | 'counsellor' = 'admin') {
   return { router };
 }
 
-beforeEach(() => {
+beforeEach(async () => {
   notifyMock.info.mockReset();
-  resetClinicFixtures();
+  vi.mocked(fetchOffering).mockClear();
+  const { seededOfferingsTabWorld } =
+    await import('../../__tests__/integration/offerings-tab-test-data.ts');
+  Object.assign(world, seededOfferingsTabWorld());
 });
 afterEach(() => {
-  resetClinicFixtures();
   useUIStore.setState({ previewRole: null });
-  useOrganizationStore.getState().clearPermissions();
+  useOrganizationStore.getState().clearOrganization();
 });
 
 describe('useOfferingsDialogRoute', () => {
@@ -107,27 +129,49 @@ describe('useOfferingsDialogRoute', () => {
     expect(seen()).toEqual({ kind: 'create', prefill: { name: 'Hydra facial' } });
   });
 
-  it('opens the offering’s drawer and resolves the offering (S:100)', async () => {
-    const id = ref.offering(270);
-    renderRoutes(`${OFFERINGS}/${id}/edit`, 'counsellor');
+  it('reads the offering by its public id and opens its drawer, view only for a reader (S:100)', async () => {
+    const id = OFFERING_IDS.sunscreen;
+    renderRoutes(`${OFFERINGS}/${id}/edit`, ['organization:read']);
     await waitFor(() =>
-      expect(seen()).toEqual({ kind: 'edit', offeringId: id, name: 'Corn Removal' }),
+      expect(seen()).toEqual({
+        kind: 'edit',
+        offeringId: id,
+        name: 'Sunscreen SPF 50',
+      }),
     );
+    expect(fetchOffering).toHaveBeenCalledWith(id);
     expect(notifyMock.info).not.toHaveBeenCalled();
   });
 
-  it('sends an unknown id back to the list, its search kept (S:115)', async () => {
-    const { router } = renderRoutes(`${OFFERINGS}/${ref.offering(1)}/edit?q=peel`);
+  it('sends an id the API answers 404 back to the list, its search kept (S:115)', async () => {
+    const gone = 'off_deletedlongago0000099';
+    const { router } = renderRoutes(`${OFFERINGS}/${gone}/edit?q=peel`);
     await waitFor(() => expect(router.state.location.pathname).toBe(OFFERINGS));
     expect(router.state.location.search).toMatchObject({ q: 'peel' });
+    expect(fetchOffering).toHaveBeenCalledWith(gone);
     expect(notifyMock.info).toHaveBeenCalledExactlyOnceWith(
       'Offering not found · it may have been deleted',
     );
     expect(seen()).toEqual({ kind: 'none' });
   });
 
-  it('refuses a create link to a role without Create, once', async () => {
-    const { router } = renderRoutes(`${OFFERINGS}/create?name=Peel`, 'counsellor');
+  it('never reads an id that is no public id (an old link) — it goes back the same way', async () => {
+    const { router } = renderRoutes(
+      `${OFFERINGS}/3f2a8c1e-1111-4111-8111-111111111111/edit`,
+    );
+    await waitFor(() => expect(router.state.location.pathname).toBe(OFFERINGS));
+    expect(fetchOffering).not.toHaveBeenCalled();
+    expect(notifyMock.info).toHaveBeenCalledExactlyOnceWith(
+      'Offering not found · it may have been deleted',
+    );
+    expect(seen()).toEqual({ kind: 'none' });
+  });
+
+  it('refuses a create link to a member without `offering:create`, once', async () => {
+    const { router } = renderRoutes(`${OFFERINGS}/create?name=Peel`, [
+      'organization:read',
+      'offering:update',
+    ]);
     await waitFor(() => expect(router.state.location.pathname).toBe(OFFERINGS));
     expect(notifyMock.info).toHaveBeenCalledTimes(1);
     expect(router.state.location.search).not.toHaveProperty('name');

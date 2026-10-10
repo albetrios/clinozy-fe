@@ -5,6 +5,7 @@ import { axe } from 'vitest-axe';
 import type { OfferRecord } from '@/shared/api/clinic/offerings-contracts.ts';
 import type { EffectivePrice } from '@/shared/api/clinic/offerings-pricing.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
+import { offerRecord } from '@/tests/utils/offering-doubles.ts';
 
 import type { OfferingRow } from '../../offerings.rows.ts';
 import {
@@ -18,19 +19,14 @@ import {
 } from './OfferingCells.tsx';
 import { useOfferingText } from './use-offering-text.ts';
 
-const OFFER = {
-  id: 'o1',
-  name: 'Navratri glow',
-  tone: 'blush',
-  kind: 'percent',
-  value: 20,
-} as unknown as OfferRecord;
+const OFFER = offerRecord({ name: 'Navratri glow', kind: 'percent', value: 20 });
 
+/** A row's price in rupees, as `effectivePrice` works it out. */
 const priced = (overrides: Partial<EffectivePrice<OfferRecord>> = {}) =>
   ({
-    list: 150_000,
-    base: 120_000,
-    final: 115_000,
+    list: 1500,
+    base: 1200,
+    final: 1150,
     percentOff: 23,
     priceOffer: OFFER,
     extraOffer: null,
@@ -66,7 +62,7 @@ describe('the Offerings cells (offerings.md:31)', () => {
     expect(screen.getByText('Face and neck')).toBeInTheDocument();
   });
 
-  it('shows the billed price over "was … · N% off" in sage, or "list price"', () => {
+  it('shows the billed rupees over "was … · N% off" in sage, or "list price"', () => {
     const { unmount } = render(<OfferingPriceCell priced={priced()} />);
     expect(screen.getByText('₹1,150')).toBeInTheDocument();
     expect(screen.getByText('was ₹1,500 · 23% off')).toHaveClass(
@@ -76,13 +72,16 @@ describe('the Offerings cells (offerings.md:31)', () => {
     render(
       <OfferingPriceCell
         priced={priced({
-          final: 150_000,
-          base: 150_000,
+          list: 125_000.5,
+          final: 125_000.5,
+          base: 125_000.5,
           percentOff: 0,
           winningOffer: null,
         })}
       />,
     );
+    // Rupees with their paise, in Indian grouping on en-IN.
+    expect(screen.getByText('₹1,25,000.50')).toBeInTheDocument();
     expect(screen.getByText('list price')).toHaveClass('text-muted-foreground');
   });
 
@@ -91,8 +90,8 @@ describe('the Offerings cells (offerings.md:31)', () => {
       <>
         <OfferingCategoryPill category="package" />
         <OfferingOfferCell offer={OFFER} />
-        <OfferingStatusPill active />
-        <OfferingStatusPill active={false} />
+        <OfferingStatusPill isActive />
+        <OfferingStatusPill isActive={false} />
       </>,
     );
     expect(screen.getByText('Package').closest('[data-slot="pill"]')).toHaveAttribute(
@@ -118,11 +117,11 @@ describe('the Offerings cells (offerings.md:31)', () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('reads the duration and the sessions, free ones included', () => {
+  it('reads the duration (none for a product) and the sessions, free ones included', () => {
     render(
       <>
         <OfferingDurationCell minutes={45} />
-        <OfferingDurationCell minutes={0} />
+        <OfferingDurationCell minutes={null} />
         <OfferingSessionsCell
           row={row({
             sessions: 6,

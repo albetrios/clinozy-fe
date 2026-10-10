@@ -1,3 +1,4 @@
+import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 
 /** The Offerings room's namespace, as its Offers tab reads it. */
@@ -41,6 +42,8 @@ export const OFFERS_KEYS = {
     startsOn: 'offers.cells.startsOn',
     /** An ended offer. */
     over: 'offers.cells.over',
+    /** Applies to once every offering it named was deleted (OFFERINGS-M4). */
+    noOfferings: 'offers.cells.noOfferings',
   },
   rowActions: {
     edit: 'offers.rowActions.edit',
@@ -63,3 +66,18 @@ export const OFFERS_KEYS = {
 
 /** The Offers table's id: the test-id prefix and the device prefs' key. */
 export const OFFERS_TABLE_ID = 'offers';
+
+/**
+ * The clinozy-be permission code each offer action needs (research §7; `/app/offers` routes):
+ * offers share the offerings' codes (O2) — reading them is `organization:read`, the room's gate.
+ */
+export const OFFER_PERMISSIONS = {
+  /** New offer. */
+  create: 'offering:create',
+  /** Edit, Pause and Resume. */
+  update: 'offering:update',
+  /** Delete, and the toast's Undo (restore). */
+  delete: 'offering:delete',
+  /** Export the selected rows — no offers export route; the offerings' code (research §7). */
+  export: 'offering:export',
+} as const satisfies Readonly<Record<string, OrganizationPermission>>;

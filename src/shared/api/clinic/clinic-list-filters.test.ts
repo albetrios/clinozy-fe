@@ -63,9 +63,9 @@ describe('reading a filter from the URL or the list params', () => {
 });
 
 describe('reading a Branches filter from the URL', () => {
-  const BRANCH = '3f9b0c6e-1d2a-4c5b-8e7f-0a1b2c3d4e5f';
+  const BRANCH = 'brn_thsaog1i8bv6m9rd9ucoy';
 
-  it('keeps branch ids and "All branches", once each', () => {
+  it('keeps branch ids (`brn_…`) and "All branches", once each', () => {
     expect(readBranchFilter([BRANCH, ALL_BRANCHES, BRANCH].join(','))).toEqual([
       BRANCH,
       ALL_BRANCHES,
@@ -75,6 +75,7 @@ describe('reading a Branches filter from the URL', () => {
 
   it('drops anything that is neither', () => {
     expect(readBranchFilter('vesu')).toBeUndefined();
+    expect(readBranchFilter('3f9b0c6e-1d2a-4c5b-8e7f-0a1b2c3d4e5f')).toBeUndefined();
     expect(readBranchFilter('')).toBeUndefined();
     expect(readBranchFilter(undefined)).toBeUndefined();
   });

@@ -4,7 +4,7 @@ import { axe } from 'vitest-axe';
 
 import type { Branch } from '@/shared/api/clinic/clinic-schema.ts';
 
-import { BranchChips, CellText, SavedByCell } from './CatalogueCells.tsx';
+import { BranchChips, CellText, UpdatedCell } from './CatalogueCells.tsx';
 import { useBranchFilterCopy, useBranchFold } from './use-branch-copy.ts';
 
 const ADAJAN = { id: 'b-adajan', name: 'Adajan', tone: 'sage' } as Branch;
@@ -39,16 +39,11 @@ describe('the cells both Offerings tables share', () => {
     expect(screen.getByText('list price')).toHaveClass('text-muted-foreground');
   });
 
-  it('shows who saved a record and when', () => {
-    render(
-      <SavedByCell
-        person={{ id: 'p1', name: 'Riya Shah', initials: 'RS', tone: 'lav' }}
-        updatedAt="2026-09-24T09:20:00.000Z"
-      />,
-    );
-    expect(screen.getByText('Riya Shah')).toBeInTheDocument();
+  it('shows when a record was last saved — no one is named (G10)', () => {
+    const { container } = render(<UpdatedCell updatedAt="2026-09-24T09:20:00.000Z" />);
     // A week or more back: the date alone (the rooms' one time rule).
     expect(screen.getByText(/Sep 24/)).toBeInTheDocument();
+    expect(container.querySelector('[data-slot="avatar"]')).toBeNull();
   });
 
   it('folds the branches into the meta line, "All branches" quiet with its grey dot', () => {

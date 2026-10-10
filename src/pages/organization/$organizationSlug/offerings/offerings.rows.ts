@@ -1,9 +1,6 @@
 import { createdFilterMatches } from '@/shared/api/clinic/clinic-filter-match.ts';
 import type { CreatedFilter } from '@/shared/api/clinic/clinic-list-filters.ts';
-import {
-  compareOffersForList,
-  offeringMatchesSearch,
-} from '@/shared/api/clinic/offerings-api.ts';
+import { offeringMatchesSearch } from '@/shared/api/clinic/offerings-api.ts';
 import type {
   OfferingRecord,
   OfferRecord,
@@ -34,8 +31,9 @@ import {
 
 /*
  * The Offerings tab's rows (KICKOFF §6.11 Offerings tab; H:5450–5469): every
- * offering priced for the header's branch, then searched, filtered and sorted
- * in place — the catalogue is read whole (§6.11 Lists).
+ * offering clinozy-be holds, in its order (newest first), priced for the
+ * header's branch, then searched, filtered and sorted in place — the catalogue
+ * is read whole (§6.11 Lists).
  */
 
 /** An Offerings row: the record, its price today and its Branches chips. */
@@ -50,13 +48,14 @@ export interface OfferingRow extends OfferingRecord {
 export interface OfferingRowsContext {
   /** The pricing branch (`pricingBranch`), `null` for no single branch. */
   branchId: string | null;
-  /** The clinic-local day prices are for. */
-  today: string;
   /** The open branches' ids, main first. */
   openBranchIds: readonly string[];
 }
 
-/** Every offering as a row, priced on `today` for `branchId`. */
+/**
+ * Every offering as a row, in the catalogue's order, priced for `branchId` by
+ * the offers the server calls live.
+ */
 export function offeringRows(
   offerings: readonly OfferingRecord[],
   offers: readonly OfferRecord[],
@@ -64,7 +63,7 @@ export function offeringRows(
 ): OfferingRow[] {
   return offerings.map((offering) => ({
     ...offering,
-    priced: effectivePrice(offering, context.branchId, offers, context.today),
+    priced: effectivePrice(offering, context.branchId, offers),
     branches: branchValues(offering.branchIds, context.openBranchIds),
   }));
 }
@@ -79,9 +78,19 @@ export function searchOfferingRows(
 
 /** A row's status as the Status chips name it. */
 export function offeringStatus(
-  row: Pick<OfferingRecord, 'active'>,
+  row: Pick<OfferingRecord, 'isActive'>,
 ): OfferingStatusFilter {
-  return row.active ? 'active' : 'inactive';
+  return row.isActive ? 'active' : 'inactive';
+}
+
+/**
+ * The minutes a row's Duration shows — none for a product, which takes no
+ * chair time (the API still holds 5–480 for it; research gap 11).
+ */
+export function offeringDuration(
+  row: Pick<OfferingRecord, 'category' | 'durationMin'>,
+): number | null {
+  return row.category === 'product' ? null : row.durationMin;
 }
 
 /** What each filterable column shows for a row — the values its chips match. */
@@ -96,16 +105,15 @@ const COLUMN_VALUES = {
 /**
  * The Filters sections the rows hold (`offerings.md:187`): Category · Offer ·
  * Branches · Status, each only with 2–10 values across the rows, then
- * Created, always. The offer chips follow the Offers tab's order.
+ * Created, always. The offer chips follow the Offers tab's order — the
+ * server's (live, scheduled, paused, ended).
  */
 export function offeringFilterFields(
   rows: readonly OfferingRow[],
   offers: readonly OfferRecord[],
-  context: Pick<OfferingRowsContext, 'today' | 'openBranchIds'>,
+  context: Pick<OfferingRowsContext, 'openBranchIds'>,
 ): RoomFilterFields {
-  const offerOrder = [...offers]
-    .sort(compareOffersForList(context.today))
-    .map((offer) => offer.id);
+  const offerOrder = offers.map((offer) => offer.id);
   const sections = {
     category: presentValuesField(
       rows.map(COLUMN_VALUES.category),
@@ -142,37 +150,40 @@ export function filterOfferingRows(
   );
 }
 
-/** Each sortable column's comparison (H:5455): the billed price, Active before Inactive. */
+/**
+ * Each sortable column's comparison (H:5455): the billed price, a product's
+ * duration as none, Active before Inactive.
+ */
 const SORT_COMPARE: Readonly<
   Record<OfferingSortKey, (a: OfferingRow, b: OfferingRow) => number>
 > = {
-  seq: (a, b) => a.seq - b.seq,
+  seq: (a, b) => a.offeringNumber - b.offeringNumber,
   name: (a, b) => {
     const [x, y] = [a.name.toLowerCase(), b.name.toLowerCase()];
     return Number(x > y) - Number(x < y);
   },
   category: (a, b) => Number(a.category > b.category) - Number(a.category < b.category),
   price: (a, b) => a.priced.final - b.priced.final,
-  duration: (a, b) => a.durationMin - b.durationMin,
+  duration: (a, b) => (offeringDuration(a) ?? 0) - (offeringDuration(b) ?? 0),
   sessions: (a, b) => a.sessions - b.sessions,
-  status: (a, b) => Number(!a.active) - Number(!b.active),
+  status: (a, b) => Number(!a.isActive) - Number(!b.isActive),
   updated: (a, b) =>
     Number(a.updatedAt > b.updatedAt) - Number(a.updatedAt < b.updatedAt),
 };
 
 /**
- * The rows in the URL's order (`offerings.md:33`): newest ID first by default;
- * a column sort runs ascending from that order and descending reverses it,
- * ties included, as the prototype's stable sort does (H:5456).
+ * The rows in the URL's order (`offerings.md:33`): the server's — newest first
+ * — by default; a column sort runs ascending from that order and descending
+ * reverses it, ties included, as the prototype's stable sort does (H:5456).
  */
 export function sortOfferingRows(
   rows: readonly OfferingRow[],
   sort: OfferingsSort | undefined,
 ): OfferingRow[] {
-  const newestFirst = [...rows].sort((a, b) => b.seq - a.seq);
-  if (!sort) return newestFirst;
+  const sorted = [...rows];
+  if (!sort) return sorted;
   const [key, direction] = sort.split(':') as [OfferingSortKey, 'asc' | 'desc'];
-  newestFirst.sort(SORT_COMPARE[key]);
-  if (direction === 'desc') newestFirst.reverse();
-  return newestFirst;
+  sorted.sort(SORT_COMPARE[key]);
+  if (direction === 'desc') sorted.reverse();
+  return sorted;
 }

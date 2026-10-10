@@ -3,14 +3,13 @@ import type {
   OfferingCategory,
   OfferingSpecialty,
   OfferKind,
-  Room,
   Tone,
 } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import type {
   OfferingRecord,
   OfferRecord,
-} from '@/shared/api/clinic/offerings-contracts.ts';
+} from '@/shared/api/clinic/offerings-fixture-contracts.ts';
 
 import { type BranchName, branchRef } from './organization.fixtures.ts';
 import { must, paise, ref, seedAt, seedDay } from './refs.fixtures.ts';
@@ -31,13 +30,6 @@ const SPECIALTIES: Record<string, OfferingSpecialty> = {
   Physio: 'physio',
   General: 'general',
 };
-/** `OF_ROOMS` (H:3549). */
-const ROOMS: Record<string, Room> = {
-  'Room 1': 'room_1',
-  'Room 2': 'room_2',
-  'Laser room': 'laser_room',
-  'Any room': 'any',
-};
 /** `OFX_KINDS` (H:3580). */
 const OFFER_KINDS: Record<string, OfferKind> = {
   pct: 'percent',
@@ -57,16 +49,16 @@ interface OfferingRow {
   minutes: number;
   sessions: number;
   validDays: number;
-  doctor: StaffKey;
-  room: string;
   updated: string;
   by: StaffKey;
 }
 
 /**
- * `OF_SEED` (H:3550–3562), verbatim. The prototype's seventh column is unused —
- * it hard-codes GST 0 for every offering — and only #272 is inactive. The offer
- * price and branch availability are plan-only fields (Appendix F), below.
+ * `OF_SEED` (H:3550–3562), verbatim but for the default doctor and room, which
+ * clinozy-be has no field for (§6 #10, O6). The prototype's seventh column is
+ * unused — it hard-codes GST 0 for every offering — and only #272 is inactive.
+ * The offer price and branch availability are plan-only fields (Appendix F),
+ * below.
  */
 const OFFERING_ROWS: readonly OfferingRow[] = [
   {
@@ -79,8 +71,6 @@ const OFFERING_ROWS: readonly OfferingRow[] = [
     minutes: 45,
     sessions: 2,
     validDays: 60,
-    doctor: 'DN',
-    room: 'Room 2',
     updated: 'Sep 25 · 11:44',
     by: 'DD',
   },
@@ -94,8 +84,6 @@ const OFFERING_ROWS: readonly OfferingRow[] = [
     minutes: 60,
     sessions: 6,
     validDays: 180,
-    doctor: 'DD',
-    room: 'Room 1',
     updated: 'Sep 23 · 15:36',
     by: 'DD',
   },
@@ -109,8 +97,6 @@ const OFFERING_ROWS: readonly OfferingRow[] = [
     minutes: 30,
     sessions: 1,
     validDays: 0,
-    doctor: 'DD',
-    room: 'Room 1',
     updated: 'Sep 23 · 15:32',
     by: 'DD',
   },
@@ -124,8 +110,6 @@ const OFFERING_ROWS: readonly OfferingRow[] = [
     minutes: 60,
     sessions: 1,
     validDays: 0,
-    doctor: 'DN',
-    room: 'Room 2',
     updated: 'Sep 21 · 12:36',
     by: 'DD',
   },
@@ -139,8 +123,6 @@ const OFFERING_ROWS: readonly OfferingRow[] = [
     minutes: 20,
     sessions: 1,
     validDays: 0,
-    doctor: 'DR',
-    room: 'Room 1',
     updated: 'Sep 14 · 11:30',
     by: 'RS',
   },
@@ -154,8 +136,6 @@ const OFFERING_ROWS: readonly OfferingRow[] = [
     minutes: 45,
     sessions: 7,
     validDays: 365,
-    doctor: 'KP',
-    room: 'Laser room',
     updated: 'Aug 25 · 17:22',
     by: 'DD',
   },
@@ -169,8 +149,6 @@ const OFFERING_ROWS: readonly OfferingRow[] = [
     minutes: 60,
     sessions: 10,
     validDays: 365,
-    doctor: 'KP',
-    room: 'Laser room',
     updated: 'Aug 23 · 11:33',
     by: 'DD',
   },
@@ -184,8 +162,6 @@ const OFFERING_ROWS: readonly OfferingRow[] = [
     minutes: 50,
     sessions: 1,
     validDays: 0,
-    doctor: 'KP',
-    room: 'Laser room',
     updated: 'Aug 23 · 11:32',
     by: 'DD',
   },
@@ -199,8 +175,6 @@ const OFFERING_ROWS: readonly OfferingRow[] = [
     minutes: 20,
     sessions: 1,
     validDays: 0,
-    doctor: 'DN',
-    room: 'Any room',
     updated: 'Jul 18 · 16:33',
     by: 'DN',
   },
@@ -214,8 +188,6 @@ const OFFERING_ROWS: readonly OfferingRow[] = [
     minutes: 40,
     sessions: 1,
     validDays: 0,
-    doctor: 'DR',
-    room: 'Room 2',
     updated: 'Jul 12 · 10:02',
     by: 'DR',
   },
@@ -229,8 +201,6 @@ const OFFERING_ROWS: readonly OfferingRow[] = [
     minutes: 45,
     sessions: 8,
     validDays: 60,
-    doctor: 'KS',
-    room: 'Room 1',
     updated: 'Jul 08 · 09:12',
     by: 'DD',
   },
@@ -302,8 +272,6 @@ export function offeringSeed(today: string = clinicToday()): OfferingRecord[] {
     durationMin: row.minutes,
     sessions: row.sessions,
     validityDays: row.validDays,
-    defaultDoctorId: staffRef(row.doctor),
-    room: must(ROOMS[row.room], `room ${row.room}`),
     gstPct: 0,
     active: row.seq !== 272,
     offerPrice: offerPriceOf(row.seq),

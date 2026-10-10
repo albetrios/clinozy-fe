@@ -10,7 +10,7 @@ import { useHiddenColumns } from '@/shared/hooks/useHiddenColumns/index.ts';
 
 import {
   BranchChips,
-  SavedByCell,
+  UpdatedCell,
   useBranchFold,
 } from '../../../shared/components/CatalogueCells/index.ts';
 import type { OfferingsCatalogue } from '../../../shared/hooks/useOfferingsCatalogue/index.ts';
@@ -35,10 +35,11 @@ const K = OFFERS_KEYS.columns;
  * The Offers columns (KICKOFF §6.11 Offers tab; `offerings.md:47–49`): Offer ·
  * Type · Applies to · Branches · Valid · Status · Updated (hidden by default),
  * their tracks and what each folds to — Type is the phone key. Nothing sorts:
- * the tab keeps Running → Scheduled → Paused → Ended.
+ * the tab keeps the server's Running → Scheduled → Paused → Ended. Status is
+ * the server's; Updated is the time alone (no one is named on a record, G10).
  */
 function useOfferColumns(
-  catalogue: Pick<OfferingsCatalogue, 'branches' | 'savedBy' | 'today'>,
+  catalogue: Pick<OfferingsCatalogue, 'branches' | 'today'>,
   nameOf: (offeringId: string) => string | undefined,
 ): ColumnDef<DataTableFeatures, OfferRow>[] {
   const { t } = useTranslation(OFFERS_NS);
@@ -101,17 +102,17 @@ function useOfferColumns(
     },
     {
       id: 'status',
-      accessorKey: 'state',
+      accessorKey: 'status',
       header: t(K.status),
-      cell: ({ row }) => <OfferStatePill state={row.original.state} />,
+      cell: ({ row }) => <OfferStatePill status={row.original.status} />,
       meta: {
         track: '110px',
         kind: 'badges',
         foldValue: (original) => {
-          const { state } = rowOf(original);
+          const { status } = rowOf(original);
           return {
-            value: labels.state(state),
-            dotClassName: TONE_CLASSES[OFFER_STATE_TONES[state]].fill,
+            value: labels.state(status),
+            dotClassName: TONE_CLASSES[OFFER_STATE_TONES[status]].fill,
           };
         },
       },
@@ -120,12 +121,7 @@ function useOfferColumns(
       id: 'updated',
       accessorKey: 'updatedAt',
       header: t(K.updated),
-      cell: ({ row }) => (
-        <SavedByCell
-          person={catalogue.savedBy(row.original.updatedById)}
-          updatedAt={row.original.updatedAt}
-        />
-      ),
+      cell: ({ row }) => <UpdatedCell updatedAt={row.original.updatedAt} />,
       meta: { track: 'minmax(140px,.9fr)', defaultHidden: true, foldValue: () => null },
     },
   ];
@@ -135,15 +131,15 @@ function useOfferColumns(
 export interface OffersTableInput {
   /** The rows on screen — searched, filtered and in the tab's order already. */
   rows: readonly OfferRow[];
-  /** The branches (chips), the team (Updated) and the clinic's today (Valid). */
-  catalogue: Pick<OfferingsCatalogue, 'branches' | 'savedBy' | 'today'>;
+  /** The branches (chips) and the clinic's today (Valid). */
+  catalogue: Pick<OfferingsCatalogue, 'branches' | 'today'>;
   /** An offering's name by id, for Applies to — none once it is deleted. */
   nameOf: (offeringId: string) => string | undefined;
 }
 
 /**
  * The Offers table instance (KICKOFF §6.11): no sorting — the rows keep the
- * tab's fixed order; the Columns choice is a device pref (recommended set:
+ * server's order; the Columns choice is a device pref (recommended set:
  * Updated hidden — "Columns · 5 of 6 shown"); rows are keyed by the offer's id.
  */
 export function useOffersTable({ rows, catalogue, nameOf }: OffersTableInput) {

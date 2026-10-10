@@ -1,36 +1,31 @@
 import { describe, expect, it } from 'vitest';
 
-import { offeringSeed } from '@/shared/api/clinic/fixtures/offerings.fixtures.ts';
-import type { OfferingRecord } from '@/shared/api/clinic/offerings-contracts.ts';
+import { offeringRecord } from '@/tests/utils/offering-doubles.ts';
 
 import {
   emptyOfferingForm,
+  gstPercentOf,
   missingOfferingFields,
   OFFERING_QUICK_FILLS,
+  offeringFieldsOf,
   offeringFormOf,
   type OfferingFormValues,
-  offeringInputOf,
   offeringPriceProblem,
   offeringPricesOf,
+  rupeesOfText,
   splitSearchTerms,
 } from './offering-form.ts';
-
-const TODAY = '2026-10-03';
-
-/** A seeded offering by its display number. */
-function seeded(seq: number): OfferingRecord {
-  const offering = offeringSeed(TODAY).find((record) => record.seq === seq);
-  if (!offering) throw new Error(`no offering #${seq}`);
-  return offering;
-}
 
 const form = (values: Partial<OfferingFormValues> = {}): OfferingFormValues => ({
   ...emptyOfferingForm(),
   ...values,
 });
 
+const SEES_FLOOR = { canSeeFloor: true };
+const NO_FLOOR = { canSeeFloor: false };
+
 describe('emptyOfferingForm (offerings.md:315)', () => {
-  it('starts Treatment, sage, 1 session, 30 min, no validity, GST 0 exclusive, Active', () => {
+  it('starts Treatment, sage, 1 session, 30 min, no validity, no GST rate picked, exclusive, Active', () => {
     expect(emptyOfferingForm()).toEqual({
       name: '',
       category: 'treatment',
@@ -39,14 +34,14 @@ describe('emptyOfferingForm (offerings.md:315)', () => {
       price: '',
       offerPrice: '',
       sessions: 1,
-      gstPct: '',
-      gstInclusive: false,
+      gstPercent: '',
+      isGstInclusive: false,
       minPrice: '',
-      durationMin: 30,
+      durationMinutes: 30,
       validityDays: 0,
       searchTerms: '',
       description: '',
-      active: true,
+      isActive: true,
     });
   });
 
@@ -57,49 +52,98 @@ describe('emptyOfferingForm (offerings.md:315)', () => {
 });
 
 describe('offeringFormOf', () => {
-  it('reads a saved offering back as the fields show it — rupees, terms, an empty GST', () => {
-    const peel = seeded(273);
-    const values = offeringFormOf(peel);
-    expect(values.name).toBe(peel.name);
-    expect(values.price).toBe(String(peel.price / 100));
-    expect(values.offerPrice).toBe(
-      peel.offerPrice === null ? '' : String(peel.offerPrice / 100),
-    );
-    expect(values.gstPct).toBe(peel.gstPct === 0 ? '' : String(peel.gstPct));
-    expect(values.searchTerms).toBe(peel.searchTerms.join(', '));
-    expect(offeringInputOf(values)).toMatchObject({
-      name: peel.name,
-      price: peel.price,
-      sessions: peel.sessions,
-      category: peel.category,
+  it('reads a saved offering back as the fields show it — rupees, its GST chip, its terms', () => {
+    expect(offeringFormOf(offeringRecord({ price: 2000.5, isActive: false }))).toEqual({
+      name: 'Research Peel',
+      category: 'treatment',
+      tone: 'sage',
+      branchIds: ['brn_thsaog1i8bv6m9rd9ucoy'],
+      price: '2000.5',
+      offerPrice: '1800',
+      sessions: 1,
+      gstPercent: '18',
+      isGstInclusive: false,
+      minPrice: '1500',
+      durationMinutes: 30,
+      validityDays: 0,
+      searchTerms: 'chemical, glow',
+      description: 'Research row (offerings room brief)',
+      isActive: false,
     });
+  });
+
+  it('reads a lowest price the member cannot see (null) as empty, and a 0% rate as its chip', () => {
+    const values = offeringFormOf(
+      offeringRecord({ minPrice: null, offerPrice: null, gstPercent: 0 }),
+    );
+    expect(values).toMatchObject({ minPrice: '', offerPrice: '', gstPercent: '0' });
   });
 });
 
-describe('offeringInputOf', () => {
-  it('sends money in paise, at least one session and the terms split on commas', () => {
-    const input = offeringInputOf(
+describe('rupeesOfText', () => {
+  it('reads typed rupees to the paisa; empty is 0', () => {
+    expect(rupeesOfText('1200.5')).toBeCloseTo(1200.5, 2);
+    expect(rupeesOfText('0.1')).toBeCloseTo(0.1, 2);
+    expect(rupeesOfText('')).toBe(0);
+  });
+});
+
+describe('gstPercentOf', () => {
+  it('reads a chip as the API’s rate, and none while nothing is picked', () => {
+    expect(gstPercentOf('18')).toBe(18);
+    expect(gstPercentOf('0')).toBe(0);
+    expect(gstPercentOf('')).toBeNull();
+    expect(gstPercentOf('7')).toBeNull();
+  });
+});
+
+describe('offeringFieldsOf', () => {
+  it('sends rupees, at least one session, five minutes, the terms split on commas', () => {
+    const fields = offeringFieldsOf(
       form({
         name: '  LHR Full Face ',
         price: '1500',
         offerPrice: '1200.5',
         minPrice: '1000',
         sessions: 0,
-        gstPct: '18',
+        durationMinutes: 0,
+        gstPercent: '18',
+        isGstInclusive: true,
         searchTerms: 'laser, , face ,hair removal',
         description: '   ',
+        isActive: false,
       }),
+      SEES_FLOOR,
     );
-    expect(input).toMatchObject({
+    expect(fields).toEqual({
       name: 'LHR Full Face',
-      price: 150_000,
-      offerPrice: 120_050,
-      minPrice: 100_000,
+      category: 'treatment',
+      tone: 'sage',
+      branchIds: [],
+      price: 1500,
+      offerPrice: 1200.5,
+      minPrice: 1000,
       sessions: 1,
-      gstPct: 18,
+      gstPercent: 18,
+      isGstInclusive: true,
+      durationMin: 5,
+      validityDays: 0,
       searchTerms: ['laser', 'face', 'hair removal'],
       description: null,
+      isActive: false,
     });
+  });
+
+  it('leaves the GST rate to the server while no chip is picked', () => {
+    expect(offeringFieldsOf(form({ price: '500' }), SEES_FLOOR).gstPercent).toBeNull();
+  });
+
+  it('never names the lowest price for a member without offering:lower_price:read (gap 6)', () => {
+    expect(
+      offeringFieldsOf(form({ price: '1500', minPrice: '1000' }), NO_FLOOR).minPrice,
+    ).toBeNull();
+    // A member who sees it and empties it removes the floor (0 = none).
+    expect(offeringFieldsOf(form({ price: '1500' }), SEES_FLOOR).minPrice).toBe(0);
   });
 
   it('bills the list price when the offer price is empty or not below it (offerings.md:66)', () => {
@@ -129,11 +173,11 @@ describe('missingOfferingFields (H:3852)', () => {
       'name',
       'price',
     ]);
-    expect(missingOfferingFields(form({ name: 'Peel', price: '900' }))).toEqual([]);
+    expect(missingOfferingFields(form({ name: 'Peel', price: '0.5' }))).toEqual([]);
   });
 });
 
-describe('offeringPriceProblem (H:5507)', () => {
+describe('offeringPriceProblem (H:5507, the API’s min ≤ offer ≤ price)', () => {
   it('refuses an offer price above the price', () => {
     expect(offeringPriceProblem(form({ price: '1000', offerPrice: '1200' }))).toEqual({
       field: 'offerPrice',
@@ -147,20 +191,24 @@ describe('offeringPriceProblem (H:5507)', () => {
     ).toEqual({ field: 'minPrice', rule: 'floorAboveOffer' });
     expect(offeringPriceProblem(form({ price: '1000', minPrice: '1100' }))).toEqual({
       field: 'minPrice',
-      rule: 'floorAboveOffer',
+      rule: 'floorAbovePrice',
     });
+    // An offer price equal to the price bills the list price: the floor is weighed against it.
+    expect(
+      offeringPriceProblem(form({ price: '1000', offerPrice: '1000', minPrice: '1100' })),
+    ).toEqual({ field: 'minPrice', rule: 'floorAbovePrice' });
   });
 
   it('lets a consistent set through', () => {
     expect(
-      offeringPriceProblem(form({ price: '1000', offerPrice: '800', minPrice: '700' })),
+      offeringPriceProblem(form({ price: '1000', offerPrice: '800', minPrice: '800' })),
     ).toBeNull();
     expect(offeringPriceProblem(form({ price: '1000' }))).toBeNull();
   });
 });
 
 describe('OFFERING_QUICK_FILLS (offerings.md:240)', () => {
-  it('prefills each preset as the design does', () => {
+  it('prefills each preset as the design does — every duration within the API’s 5–480', () => {
     const fills = Object.fromEntries(
       OFFERING_QUICK_FILLS.map((fill) => [fill.id, { tone: fill.tone, ...fill.values }]),
     );
@@ -170,28 +218,28 @@ describe('OFFERING_QUICK_FILLS (offerings.md:240)', () => {
         category: 'treatment',
         sessions: 1,
         validityDays: 0,
-        durationMin: 30,
+        durationMinutes: 30,
       },
       pack: {
         tone: 'lav',
         category: 'package',
         sessions: 6,
         validityDays: 180,
-        durationMin: 45,
+        durationMinutes: 45,
       },
       lhr: {
         tone: 'blush',
         category: 'lhr',
         sessions: 10,
         validityDays: 365,
-        durationMin: 60,
+        durationMinutes: 60,
       },
       consultation: {
         tone: 'sky',
         category: 'consultation',
         sessions: 1,
         validityDays: 0,
-        durationMin: 20,
+        durationMinutes: 20,
       },
     });
   });

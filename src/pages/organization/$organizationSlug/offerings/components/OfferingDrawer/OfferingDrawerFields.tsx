@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
 import { ALL_BRANCHES } from '@/shared/api/clinic/clinic-list-filters.ts';
 import { OFFERING_CATEGORY_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
+import { GST_PERCENT_VALUES } from '@/shared/api/clinic/offerings-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { OFFERING_CATEGORY_TONES } from '@/shared/clinic/clinic-tones.ts';
 import {
@@ -82,6 +83,7 @@ export function OfferingIdentityFields({
   const { t: tClinic } = useTranslation(CLINIC_NS);
   const field = useDrawerFieldIds(form, idPrefix);
   const name = field('name');
+  const branchField = field('branchIds');
   // A saved offering in a colour outside the six keeps it, picked, at the end.
   const tones = OFFERING_TONES.includes(values.tone)
     ? OFFERING_TONES
@@ -145,7 +147,11 @@ export function OfferingIdentityFields({
         />
       </DrawerField>
       {branches.length > 1 ? (
-        <DrawerField label={t(F.availableAt)} hint={t(F.availableAtHint)}>
+        <DrawerField
+          label={t(F.availableAt)}
+          hint={t(F.availableAtHint)}
+          error={branchField.error}
+        >
           <Controller
             control={form.control}
             name="branchIds"
@@ -174,24 +180,51 @@ export function OfferingIdentityFields({
 }
 
 /**
+ * The GST rate chips — the rates the API takes (0 · 5 · 12 · 18 · 28). A new
+ * offering starts with none picked: the server then applies the category's rate,
+ * as the field's hint says; once picked, a rate stays picked.
+ */
+function GstRateChips({ form, testId }: Omit<OfferingFieldsProps, 'idPrefix'>) {
+  const { t } = useTranslation(OFFERING_DRAWER_NS);
+  return (
+    <Controller
+      control={form.control}
+      name="gstPercent"
+      render={({ field: control }) => (
+        <DrawerChips
+          label={t(F.gstRate)}
+          options={GST_PERCENT_VALUES.map((value) => ({
+            value: String(value),
+            label: t(F.gstChip, { value }),
+          }))}
+          value={control.value === '' ? null : control.value}
+          onChange={(next) => {
+            if (next) control.onChange(next);
+          }}
+          testId={`${testId}-gst-rate`}
+        />
+      )}
+    />
+  );
+}
+
+/**
  * The PRICE & SESSIONS section (`offerings.md:67–75`): Price* · Offer price ·
- * Sessions, GST rate · GST · Lowest price (with "See the lowest price", and
- * its ₹ field while it reads Shown), then "Billed today" once a price is set.
- * Without the `prices` ability the two prices are locked (Q-U8).
+ * Sessions, GST rate (chips) · GST · Lowest price (with "See the lowest price",
+ * and its ₹ field while it reads Shown), then "Billed today" once a price is
+ * set. The Lowest price shows only to a member with
+ * `offering:lower_price:read`; prices need no code of their own (O3).
  */
 export function OfferingPriceFields({
   form,
   values,
   idPrefix,
   testId,
-  pricesLocked,
   floor,
   offerPriceHint,
   billedToday,
 }: OfferingValueFieldsProps & {
-  /** Price and Offer price can't change (no `prices` ability). */
-  pricesLocked: boolean;
-  /** The Lowest price control — only with the `floor` ability; Hidden on every open. */
+  /** The Lowest price control — only with `offering:lower_price:read`; Hidden on every open. */
   floor: { shown: boolean; onShownChange: (shown: boolean) => void } | null;
   offerPriceHint: string;
   /** The read-only "Billed today" line, once Price is above 0. */
@@ -203,7 +236,7 @@ export function OfferingPriceFields({
   const price = field('price');
   const offer = field('offerPrice');
   const sessions = field('sessions');
-  const gst = field('gstPct');
+  const gst = field('gstPercent');
   const floorField = field('minPrice');
   const currency = tDrawer(RECORD_DRAWER_KEYS.currency);
 
@@ -230,7 +263,6 @@ export function OfferingPriceFields({
               prefix={currency}
               placeholder="0"
               maxLength={OFFERING_FORM_LIMITS.money}
-              disabled={pricesLocked}
               data-testid={`${testId}-price`}
             />
           )}
@@ -255,7 +287,6 @@ export function OfferingPriceFields({
               prefix={currency}
               placeholder={values.price || '0'}
               maxLength={OFFERING_FORM_LIMITS.money}
-              disabled={pricesLocked}
               data-testid={`${testId}-offer-price`}
             />
           )}
@@ -266,6 +297,7 @@ export function OfferingPriceFields({
         label={t(F.sessions)}
         htmlFor={sessions.id}
         hint={t(F.sessionsHint)}
+        error={sessions.error}
       >
         <Controller
           control={form.control}
@@ -276,6 +308,7 @@ export function OfferingPriceFields({
               label={t(F.sessions)}
               value={control.value}
               onValueChange={control.onChange}
+              min={OFFERING_FORM_LIMITS.sessionsMin}
               max={OFFERING_FORM_LIMITS.sessions}
               quick={SESSION_QUICK_PICKS.map((count) => ({
                 label: String(count),
@@ -286,28 +319,18 @@ export function OfferingPriceFields({
           )}
         />
       </DrawerField>
-      <DrawerField span="third" label={t(F.gstRate)} htmlFor={gst.id} error={gst.error}>
-        <Controller
-          control={form.control}
-          name="gstPct"
-          render={({ field: control }) => (
-            <DrawerNumberInput
-              {...gst.control}
-              value={control.value}
-              onValueChange={control.onChange}
-              onBlur={control.onBlur}
-              suffix="%"
-              placeholder="0"
-              max={OFFERING_FORM_LIMITS.gstPct}
-              data-testid={`${testId}-gst-rate`}
-            />
-          )}
-        />
+      <DrawerField
+        span="half"
+        label={t(F.gstRate)}
+        hint={values.gstPercent === '' ? t(F.gstHint) : undefined}
+        error={gst.error}
+      >
+        <GstRateChips form={form} testId={testId} />
       </DrawerField>
       <DrawerField span="third" label={t(F.gst)}>
         <Controller
           control={form.control}
-          name="gstInclusive"
+          name="isGstInclusive"
           render={({ field: control }) => (
             <DrawerToggle
               aria-label={t(F.gst)}
@@ -395,21 +418,27 @@ export function OffersOnThisFields({
 export function OfferingTimeFields({ form, idPrefix, testId }: OfferingFieldsProps) {
   const { t } = useTranslation(OFFERING_DRAWER_NS);
   const field = useDrawerFieldIds(form, idPrefix);
-  const duration = field('durationMin');
+  const duration = field('durationMinutes');
   const validity = field('validityDays');
   return (
     <DrawerFieldGrid title={t(K.time)}>
-      <DrawerField span="half" label={t(F.duration)} htmlFor={duration.id}>
+      <DrawerField
+        span="half"
+        label={t(F.duration)}
+        htmlFor={duration.id}
+        error={duration.error}
+      >
         <Controller
           control={form.control}
-          name="durationMin"
+          name="durationMinutes"
           render={({ field: control }) => (
             <DrawerStepper
               id={duration.id}
               label={t(F.duration)}
               value={control.value}
               onValueChange={control.onChange}
-              max={OFFERING_FORM_LIMITS.durationMin}
+              min={OFFERING_FORM_LIMITS.durationMinutesMin}
+              max={OFFERING_FORM_LIMITS.durationMinutes}
               suffix={t(F.minutesUnit)}
               quick={DURATION_QUICK_PICKS.map((minutes) => ({
                 label: t(F.durationQuick, { minutes }),
@@ -425,6 +454,7 @@ export function OfferingTimeFields({ form, idPrefix, testId }: OfferingFieldsPro
         label={t(F.validity)}
         htmlFor={validity.id}
         hint={t(F.validityHint)}
+        error={validity.error}
       >
         <Controller
           control={form.control}
@@ -500,7 +530,7 @@ export function OfferingDetailsFields({
       <DrawerField label={t(F.status)}>
         <Controller
           control={form.control}
-          name="active"
+          name="isActive"
           render={({ field: control }) => (
             <DrawerToggle
               aria-label={t(F.status)}

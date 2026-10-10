@@ -1,9 +1,11 @@
+import { useQueryClient } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
 import { type ReactNode, useId, useState } from 'react';
 import { useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
+import { fetchOffering, offeringQueryKeys } from '@/shared/api/clinic/offerings-api.ts';
 import type { OfferingRecord } from '@/shared/api/clinic/offerings-contracts.ts';
 import { SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
 import { DrawerStepBody } from '@/shared/components/DrawerField/index.ts';
@@ -13,10 +15,13 @@ import {
   RecordDrawer,
   RecordDrawerPending,
 } from '@/shared/components/RecordDrawer/index.ts';
+import { mapApiError } from '@/shared/errors/errorHandler.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
+import { resetFormInPlace } from '@/shared/hooks/useEditingRecord/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import { notify } from '@/shared/notify/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 import { OFFERINGS_KEYS, OFFERINGS_NS } from '../../offerings.constants.ts';
 import { CatalogueDeleteConfirm } from '../../shared/components/CatalogueDeleteConfirm/index.ts';
@@ -60,7 +65,7 @@ const CONTENT_PROFILE = { fieldCount: 17, hasHeavyField: true } as const;
 /** The room's reads the drawer prices and words the draft with. */
 export type OfferingDrawerCatalogue = Pick<
   OfferingsCatalogue,
-  'offers' | 'branches' | 'pricingBranchId' | 'today'
+  'offers' | 'branches' | 'pricingBranchId'
 >;
 
 /** What every use of the drawer passes. */
@@ -68,7 +73,7 @@ interface OfferingDrawerBaseProps {
   open: boolean;
   /** Every exit, once the dirty guard lets it through — and after a save or a delete (D28). */
   onClose: () => void;
-  /** The room's reads: offers, branches, the pricing branch, today. */
+  /** The room's reads: offers, branches, the pricing branch. */
   catalogue: OfferingDrawerCatalogue;
 }
 
@@ -110,7 +115,8 @@ function quickFillItems(
     label: t(K.quickFill[fill.id]),
     tone: fill.tone,
     onSelect: () =>
-      form.reset(
+      resetFormInPlace(
+        form,
         { ...form.getValues(), ...fill.values },
         { keepDefaultValues: true, keepErrors: true },
       ),
@@ -118,11 +124,11 @@ function quickFillItems(
 }
 
 /**
- * Who may do what here (D9, Q-U8): view only without Offerings Edit (or
- * Create on a new one); Delete with Offerings Delete; a saved offering's
- * prices locked without `prices` ("prices → offering edits" — a new
- * offering's first price is part of creating it); the Lowest price control
- * with `floor`.
+ * Who may do what here (D9, research §7): view only without `offering:update`
+ * (or `offering:create` on a new one) — prices included, they need no code of
+ * their own (O3); Delete with `offering:delete`; the Lowest price only with
+ * `offering:lower_price:read` — hidden from everyone else, and never sent for
+ * them (gap 6). View-as hides it too (`canCode` is false while it runs).
  */
 function useDrawerAccess(editing: boolean) {
   const access = useClinicAccess();
@@ -131,8 +137,62 @@ function useDrawerAccess(editing: boolean) {
   return {
     readOnly,
     canDelete: editing && !readOnly && access.can('offerings', 'delete'),
-    pricesLocked: editing && access.isResolved && !access.canAbility('prices'),
-    canSeeFloor: access.isResolved && access.canAbility('floor'),
+    canSeeFloor: access.isResolved && access.canCode('offering:lower_price:read'),
+  };
+}
+
+/**
+ * The session's form over the offering it edits (a new one's defaults and
+ * prefill otherwise), kept in step with a reload: a save refused as stale (`409
+ * record_changed`) offers Reload (`onStale`), which reads the offering again and
+ * restarts the form on what was saved — its `updated_at` guards the next save.
+ */
+function useOfferingForm(
+  offering: OfferingRecord | null,
+  prefill: { name?: string } | undefined,
+) {
+  const queryClient = useQueryClient();
+  const organizationId = useOrganizationStore((state) => state.organizationId);
+  const form = useForm<OfferingFormValues>({
+    defaultValues: offering ? offeringFormOf(offering) : emptyOfferingForm(prefill),
+  });
+  const [record, setRecord] = useState(offering);
+  const reload = async (saved: OfferingRecord) => {
+    try {
+      const fresh = await queryClient.query({
+        queryKey: offeringQueryKeys.detail(organizationId, saved.id),
+        queryFn: () => fetchOffering(saved.id),
+        staleTime: 0,
+      });
+      setRecord(fresh);
+      // In place: every input shows what was saved, not what was typed (`resetFormInPlace`).
+      resetFormInPlace(form, offeringFormOf(fresh));
+      // The list behind the drawer shows what was saved too (as the Offer drawer's Reload).
+      await queryClient.invalidateQueries({
+        queryKey: offeringQueryKeys.list(organizationId),
+      });
+    } catch (error) {
+      notify.error(mapApiError(error));
+    }
+  };
+  return {
+    form,
+    record,
+    onStale: record ? () => void reload(record) : undefined,
+  };
+}
+
+/**
+ * The Lowest price control — only for a member with `offering:lower_price:read`
+ * (`null` otherwise). It reads Hidden on every open (H:5457), Shown in a
+ * view-only drawer, whose toggle is locked with the rest; a rule or a refusal on
+ * the field shows it (`show`).
+ */
+function useFloorControl(canSeeFloor: boolean, readOnly: boolean) {
+  const [shown, setShown] = useState(false);
+  return {
+    floor: canSeeFloor ? { shown: shown || readOnly, onShownChange: setShown } : null,
+    show: () => setShown(true),
   };
 }
 
@@ -141,8 +201,8 @@ function stepOfField(
   field: keyof OfferingFormValues,
   threeSteps: boolean,
 ): OfferingStepId {
-  if (field === 'durationMin' || field === 'validityDays') return 'time';
-  if (field === 'searchTerms' || field === 'description' || field === 'active') {
+  if (field === 'durationMinutes' || field === 'validityDays') return 'time';
+  if (field === 'searchTerms' || field === 'description' || field === 'isActive') {
     return threeSteps ? 'details' : 'time';
   }
   return 'offering';
@@ -158,7 +218,6 @@ interface StepBodiesInput {
   };
   view: OfferingDrawerView;
   branches: OfferingDrawerCatalogue['branches'];
-  pricesLocked: boolean;
   floor: { shown: boolean; onShownChange: (shown: boolean) => void } | null;
 }
 
@@ -167,7 +226,6 @@ function stepBodies({
   fields,
   view,
   branches,
-  pricesLocked,
   floor,
 }: StepBodiesInput): Record<OfferingStepId, ReactNode> {
   const threeSteps = view.offersOnThis.length > 0;
@@ -177,7 +235,6 @@ function stepBodies({
         <OfferingIdentityFields {...fields} branches={branches} />
         <OfferingPriceFields
           {...fields}
-          pricesLocked={pricesLocked}
           floor={floor}
           offerPriceHint={view.offerPriceHint}
           billedToday={view.billedToday}
@@ -237,7 +294,14 @@ function OfferingDeleteConfirm({
   return (
     <CatalogueDeleteConfirm
       target={
-        open ? { kind: 'offering', id: offering.id, seq: offering.seq, record } : null
+        open
+          ? {
+              kind: 'offering',
+              id: offering.id,
+              offeringNumber: offering.offeringNumber,
+              record,
+            }
+          : null
       }
       onClose={onClose}
       onDeleted={onDeleted}
@@ -248,19 +312,20 @@ function OfferingDeleteConfirm({
 /** One opening of the drawer: the form, its checks and its save. */
 function OfferingDrawerSession(props: SessionProps) {
   const { t } = useTranslation(OFFERING_DRAWER_NS);
-  const { catalogue, offering } = props;
+  const { catalogue } = props;
   const idPrefix = `offering-${useId().replace(/:/g, '')}`;
   const testId = OFFERING_DRAWER_TEST_ID;
-  const creating = offering === null;
-  const { readOnly, canDelete, pricesLocked, canSeeFloor } = useDrawerAccess(!creating);
+  const creating = props.offering === null;
+  const { readOnly, canDelete, canSeeFloor } = useDrawerAccess(!creating);
 
-  const form = useForm<OfferingFormValues>({
-    defaultValues: offering ? offeringFormOf(offering) : emptyOfferingForm(props.prefill),
-  });
+  const {
+    form,
+    record: offering,
+    onStale,
+  } = useOfferingForm(props.offering, props.prefill);
   const values = useFormValues(form);
   const { isDirty } = useFormState({ control: form.control });
-  // "Lowest price" reads Hidden on every open (H:5457).
-  const [floorShown, setFloorShown] = useState(false);
+  const floor = useFloorControl(canSeeFloor, readOnly);
   const [deleting, setDeleting] = useState(false);
 
   const view = useOfferingDrawerView({ values, offering, ...catalogue });
@@ -272,8 +337,13 @@ function OfferingDrawerSession(props: SessionProps) {
   });
   const { saveState, save } = useOfferingSave({
     form,
-    offeringId: offering?.id ?? null,
-    onField: (field) => selectStep(stepOfField(field, view.offersOnThis.length > 0)),
+    record: offering,
+    canSeeFloor,
+    onField: (field) => {
+      if (field === 'minPrice') floor.show();
+      selectStep(stepOfField(field, view.offersOnThis.length > 0));
+    },
+    onStale,
     onDone: (_outcome, another) => (another ? props.onAnother() : props.onClose()),
   });
 
@@ -281,8 +351,7 @@ function OfferingDrawerSession(props: SessionProps) {
     fields: { form, values, idPrefix, testId },
     view,
     branches: catalogue.branches,
-    pricesLocked,
-    floor: canSeeFloor ? { shown: floorShown, onShownChange: setFloorShown } : null,
+    floor: floor.floor,
   });
 
   return (
@@ -291,7 +360,7 @@ function OfferingDrawerSession(props: SessionProps) {
         open={props.open}
         onClose={props.onClose}
         title={t(creating ? K.title.create : K.title.edit)}
-        tag={offering ? displayId.offering(offering.seq) : undefined}
+        tag={offering ? displayId.offering(offering.offeringNumber) : undefined}
         sub={t(K.sub)}
         badges={view.badges}
         quickFill={creating ? quickFillItems(form, t) : undefined}
@@ -328,17 +397,20 @@ function OfferingDrawerSession(props: SessionProps) {
 
 /**
  * The Offering drawer (KICKOFF §6.11; `offerings.md:59–89, 131–143, 237–244`)
- * on the shared record drawer: New offering over the list — with the Quick
+ * on the shared record drawer and clinozy-be (`POST /app/offerings`, `PATCH
+ * /app/offerings/{offering_id}`): New offering over the list — with the Quick
  * fill presets and "Create & add another" — and Edit offering, view only
- * without Offerings Edit. Its steps are "Offering, price & sessions" →
- * "Time, validity & details", or three — "… → Offers on this, time &
- * validity → Details" — while an offer that has not ended names it; reopening
- * the same record returns to the step it had open. The draft is priced live
- * for the header's branch ("Billed today", the badges, the footer). Save is
- * never disabled: an empty Name or Price opens step 1 with "Add a name" / "Add
- * a price"; the price rules toast before the write. A save closes the drawer
- * onto the list (D28) with "Offering #275 created" / "Offering #273 saved".
- * Every opening starts a fresh form.
+ * without `offering:update`. Money is rupees, typed and shown; GST is one of
+ * the API's rates (chips), the category's until one is picked; the Lowest price
+ * is there only for `offering:lower_price:read`. Its steps are "Offering, price
+ * & sessions" → "Time, validity & details", or three — "… → Offers on this,
+ * time & validity → Details" — while an offer the server does not call ended
+ * names it; reopening the same record returns to the step it had open. The
+ * draft is priced live for the header's branch ("Billed today", the badges, the
+ * footer). Save is never disabled: an empty Name or Price opens step 1 with "Add
+ * a name" / "Add a price"; the price rules toast before the write; a refusal
+ * lands on its field. A save closes the drawer onto the list (D28) with
+ * "Offering #8 created" / "Offering #5 saved". Every opening starts a fresh form.
  */
 export function OfferingDrawer(props: OfferingDrawerProps) {
   const { session, fresh, restart } = useDrawerSession(props.open);

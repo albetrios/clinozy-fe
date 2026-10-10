@@ -118,9 +118,9 @@ organization picker and the 404 draw the same frame.
 | `new-task-drawer`                                          | New task — `/tasks/create` opens it over the list (L-47d)                                                                                        | `pages/organization/$organizationSlug/tasks/`                  |
 | `task-drawer`                                              | Task drawer — `/tasks/$taskId` opens it over the list (L-47c)                                                                                    | `pages/organization/$organizationSlug/tasks/`                  |
 | `patient-file-layout`                                      | Patient file — `/patients/$patientId/<section>` (L-42; ids below)                                                                                | `pages/…/patients/$patientId/`                                 |
-| `offerings-page`                                           | Clinic room page: the Offerings tab (`offerings-…` ids, `offerings-new-button`)                                                                  | `pages/organization/$organizationSlug/offerings/`              |
+| `offerings-page`                                           | Clinic room page: the Offerings tab (`offerings-…` ids, `offerings-new-button`); `retry-error` when its read fails                               | `pages/organization/$organizationSlug/offerings/`              |
 | `offering-drawer`                                          | Offering drawer — `/offerings/create`, `…/$offeringId/edit` over the list (L-30c)                                                                | `pages/organization/$organizationSlug/offerings/`              |
-| `offers-page`                                              | Clinic room page: the Offers tab (`offers-…` ids, `offers-new-button`)                                                                           | `offerings/offers/` (child of the above)                       |
+| `offers-page`                                              | Clinic room page: the Offers tab (`offers-…` ids, `offers-new-button`); `retry-error` when its read fails                                        | `offerings/offers/` (child of the above)                       |
 | `offer-drawer`                                             | Offer drawer — `/offers/create`, `…/$offerId/edit` over the Offers tab (L-30d)                                                                   | `offerings/offers/` (child of the above)                       |
 | `offering-quick-create`                                    | Stacked "New offering" — over the Invoice drawer's line picker (L-30e, L-40)                                                                     | `shared/components/OfferingQuickCreate/`                       |
 | `users-page`                                               | Clinic room page: Users                                                                                                                          | `pages/organization/$organizationSlug/users/`                  |
@@ -614,7 +614,7 @@ lead or the lead drawer; `<c>` is `contact-editor`. Its steps are `identity` and
 ### Offering drawer (Offerings room, launch L-30c)
 
 New offering and Edit offering are one `OfferingDrawer`; `<d>` is `offering-drawer`. Its steps
-are `main` and `time`, plus `details` while an offer that has not ended names the offering. A
+are `offering` and `time`, plus `details` while an offer that has not ended names the offering. A
 chip group's chips are `<group>-<value>` (`offering-drawer-category-lhr`,
 `offering-drawer-branches-all`), a swatch is `<d>-colour-<tone>`, and a stepper's parts are
 `<field>-decrease` / `-increase` / `-quick-<value>` (`offering-drawer-sessions-quick-6`).
@@ -623,8 +623,8 @@ chip group's chips are `<group>-<value>` (`offering-drawer-category-lhr`,
 | ----------------------------------------------------------- | ------------------------------------------------------------------------------ | -------------------------------------- |
 | `<d>-name` / `<d>-category` / `<d>-colour` / `<d>-branches` | Step 1: Name, Category chips, Colour swatches, Available at (several branches) | `offerings/components/OfferingDrawer/` |
 | `<d>-price` / `<d>-offer-price` / `<d>-sessions`            | Price and Offer price (₹ fields), the Sessions stepper                         | OfferingDrawer                         |
-| `<d>-gst-rate` / `<d>-gst`                                  | GST rate ("%") and the Inclusive / Exclusive toggle                            | OfferingDrawer                         |
-| `<d>-floor-toggle` / `<d>-floor`                            | Lowest price toggle (`floor` ability) and its ₹ field while Shown              | OfferingDrawer                         |
+| `<d>-gst-rate-<rate>` / `<d>-gst`                           | GST rate chips 0 · 5 · 12 · 18 · 28 (none on a new offering), Inclusive toggle | OfferingDrawer                         |
+| `<d>-floor-toggle` / `<d>-floor`                            | Lowest price toggle and its ₹ field (`offering:lower_price:read` only)         | OfferingDrawer                         |
 | `<d>-billed-today` / `<d>-offer-<offerId>`                  | "Billed today" and one "Offers on this" box                                    | OfferingDrawer                         |
 | `<d>-duration` / `<d>-validity`                             | Duration and Validity steppers                                                 | OfferingDrawer                         |
 | `<d>-search-terms` / `<d>-description` / `<d>-status`       | Search terms, Description, the Status toggle                                   | OfferingDrawer                         |
@@ -643,9 +643,10 @@ tab's rows add `offers-row-action-edit` / `-pause` / `-resume` beside `-delete`.
 | `<o>-name` / `<o>-code` / `<o>-kind` / `<o>-value` / `<o>-colour` | Step 1: Name, Code, Type chips, the value (stepper or ₹ field), Colour | `offers/components/OfferDrawer/` |
 | `<o>-offerings` / `<o>-branches`                                  | Step 2: the Offerings picker, Branches chips (several branches)        | OfferDrawer                      |
 | `<o>-starts` / `<o>-ends`                                         | Starts and Ends date pickers (empty = "Now" / "no end")                | OfferDrawer                      |
-| `<o>-preview-<offeringId>`                                        | One picked offering's preview box ("₹1,200 → ₹1,080")                  | OfferDrawer                      |
+| `<o>-preview-<offeringId>`                                        | One picked offering's preview box ("₹1,800 → ₹1,620")                  | OfferDrawer                      |
 | `<o>-note` / `<o>-status`                                         | Step 3: Note and the Live / Paused toggle                              | OfferDrawer                      |
 | `<o>-skeleton`                                                    | Edit offer while a deep-linked offer loads                             | OfferDrawer                      |
+| `retry-error` / `retry-button` (inside `<o>`)                     | Edit offer when a deep-linked offer's own read failed                  | OfferDrawer                      |
 
 ### Stacked New offering (shared, launch L-30e)
 

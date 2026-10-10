@@ -1,12 +1,13 @@
 export {
+  type OfferActiveVars,
+  type OfferCreateVars,
   type OfferDeleteVars,
-  type OfferPauseVars,
   type OfferUpdateVars,
   useCreateOffer,
   useDeleteOffer,
   useOffer,
   useOffers,
   useRestoreOffer,
-  useSetOfferPaused,
+  useSetOfferActive,
   useUpdateOffer,
 } from './useOffers.ts';

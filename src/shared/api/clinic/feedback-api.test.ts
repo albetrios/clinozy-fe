@@ -4,6 +4,7 @@ vi.mock('@/core/http/api.ts', () => ({
   api: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
 }));
 import { api } from '@/core/http/api.ts';
+import { offeringRecord } from '@/tests/utils/offering-doubles.ts';
 
 import {
   attachReviewFile,
@@ -12,14 +13,13 @@ import {
   deleteFeedback,
   fetchCheckIn,
   fetchPreviousCheckIn,
-  listCheckInOfferings,
   listPatientFeedback,
   logFeedbackAction,
   restoreFeedback,
   updateCheckIn,
   updateReview,
 } from './feedback-api.ts';
-import type { CheckInFields } from './feedback-contracts.ts';
+import { type CheckInFields, checkInOfferingsOf } from './feedback-contracts.ts';
 
 const PATIENT = 'pat_priya0000000000000000';
 const CHECK_IN = 'chk_priya0000000000000000';
@@ -216,23 +216,33 @@ describe('the feedback reads', () => {
       },
     });
   });
+});
 
-  it('reads the offerings a check-in can plan, in rupees', async () => {
-    vi.mocked(api.get).mockResolvedValue(
-      page([
-        {
-          id: 'off_lhr00000000000000000',
-          name: 'LHR Full Face',
-          category: 'package',
-          tone: 'lav',
-          price: 4800,
-          sessions: 7,
-          search_terms: ['laser'],
-          is_active: true,
-        },
-      ]),
-    );
-    await expect(listCheckInOfferings()).resolves.toEqual([
+describe('checkInOfferingsOf (the drawer’s "Add to offering suggestions")', () => {
+  it('takes every offering of the one catalogue, active or not, A to Z, in rupees', () => {
+    const catalogue = [
+      offeringRecord({
+        id: 'off_lhr00000000000000000',
+        name: 'LHR Full Face',
+        category: 'package',
+        tone: 'lav',
+        price: 4800,
+        sessions: 7,
+        searchTerms: ['laser'],
+      }),
+      offeringRecord({ id: 'off_glow00000000000000000', name: 'Glow', isActive: false }),
+    ];
+    expect(checkInOfferingsOf(catalogue)).toEqual([
+      {
+        id: 'off_glow00000000000000000',
+        name: 'Glow',
+        category: 'treatment',
+        tone: 'sage',
+        price: 2000,
+        sessions: 1,
+        searchTerms: ['chemical', 'glow'],
+        isActive: false,
+      },
       {
         id: 'off_lhr00000000000000000',
         name: 'LHR Full Face',
@@ -244,9 +254,6 @@ describe('the feedback reads', () => {
         isActive: true,
       },
     ]);
-    expect(api.get).toHaveBeenCalledWith('/app/offerings', {
-      query: { sort: 'name', order: 'asc', limit: 100, after: undefined },
-    });
   });
 });
 

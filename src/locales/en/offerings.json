@@ -95,7 +95,8 @@
       "endsIn_one": "Ends in {{count}} day",
       "endsIn_other": "Ends in {{count}} days",
       "startsOn": "Starts {{date}}",
-      "over": "Over"
+      "over": "Over",
+      "noOfferings": "No offerings"
     },
     "rowActions": {
       "edit": "Edit",
@@ -189,7 +190,9 @@
       "descriptionPlaceholder": "What is included",
       "status": "Status",
       "active": "Active · bookable",
-      "inactive": "Inactive · hidden"
+      "inactive": "Inactive · hidden",
+      "gstChip": "{{value}}%",
+      "gstHint": "0% for a consultation, 18% otherwise — until you pick one"
     },
     "offerTill": "till {{date}}",
     "untitled": "Untitled",
@@ -202,7 +205,10 @@
       "addName": "Add a name",
       "addPrice": "Add a price",
       "offerAbovePrice": "Offer price can’t be above the price",
-      "floorAboveOffer": "Lowest price can’t be above the offer price"
+      "floorAboveOffer": "Lowest price can’t be above the offer price",
+      "offerBelowFloor": "Below this offering’s lowest price — ask an Owner or Admin",
+      "floorAbovePrice": "Lowest price can’t be above the price",
+      "floorNeedsPermission": "Your role can’t change the lowest price — ask an Owner or Admin"
     }
   },
   "offerDrawer": {
@@ -265,7 +271,8 @@
         "fixed": "Set the amount",
         "extra": "Set the free sessions"
       },
-      "endsBeforeStart": "Ends before it starts"
+      "endsBeforeStart": "Ends before it starts",
+      "offeringInactive": "{{name}} is no longer active — remove it or pick another"
     }
   }
 }

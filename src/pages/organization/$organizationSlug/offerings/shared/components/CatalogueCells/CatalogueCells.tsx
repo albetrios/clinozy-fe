@@ -3,11 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils.ts';
 import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
 import { ALL_BRANCHES } from '@/shared/api/clinic/clinic-list-filters.ts';
-import {
-  AvatarStack,
-  type AvatarStackPerson,
-  TonePill,
-} from '@/shared/components/Cells/index.ts';
+import { TonePill } from '@/shared/components/Cells/index.ts';
 import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 
 import { CATALOGUE_CELLS_KEYS, CATALOGUE_CELLS_NS } from './catalogue-cells.constants.ts';
@@ -124,25 +120,16 @@ export function BranchChips({
 }
 
 /**
- * The Updated cell (`offerings.md:31`): who saved the record — a 22px avatar
- * in its pill — then when, by the rooms' one time rule ("11:44 am", "Yesterday
- * 11:44 am", "25 Sep"). Hidden by default (Columns brings it).
+ * The Updated cell (`offerings.md:31`): when the record was last saved, by the
+ * rooms' one time rule ("11:44 am", "Yesterday 11:44 am", "25 Sep"). The design's
+ * avatar of who saved it is gone — clinozy-be names no one on a record (G10).
+ * Hidden by default (Columns brings it).
  */
-export function SavedByCell({
-  person,
-  updatedAt,
-}: {
-  /** The team member who last saved it; none while the team loads. */
-  person: AvatarStackPerson | undefined;
-  updatedAt: string;
-}) {
+export function UpdatedCell({ updatedAt }: { updatedAt: string }) {
   const clock = useClinicClock();
   return (
-    <span className="flex min-w-0 items-center gap-2">
-      {person ? <AvatarStack people={[person]} className="min-w-0 flex-none" /> : null}
-      <span className="text-caption text-muted-foreground min-w-0 truncate tabular-nums">
-        {clock.moment(updatedAt)}
-      </span>
+    <span className="text-caption text-muted-foreground min-w-0 truncate tabular-nums">
+      {clock.moment(updatedAt)}
     </span>
   );
 }

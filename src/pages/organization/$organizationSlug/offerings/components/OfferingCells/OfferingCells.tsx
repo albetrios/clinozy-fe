@@ -56,14 +56,14 @@ export function OfferingOfferCell({ offer }: { offer: OfferRecord | null }) {
   );
 }
 
-/** The Duration cell: "45 min", or a grey "—". */
-export function OfferingDurationCell({ minutes }: { minutes: number }) {
+/** The Duration cell: "45 min", or a grey "—" for a product (`offeringDuration`). */
+export function OfferingDurationCell({ minutes }: { minutes: number | null }) {
   const text = useOfferingText();
   return (
     <span
       className={cn(
         'text-body truncate leading-[1.3] tabular-nums',
-        minutes > 0 ? 'text-foreground' : 'text-muted-foreground',
+        minutes === null ? 'text-muted-foreground' : 'text-foreground',
       )}
     >
       {text.duration(minutes)}
@@ -83,11 +83,11 @@ export function OfferingSessionsCell({ row }: { row: OfferingRow }) {
 }
 
 /** The Status cell: "Active" sage with a dot, or "Inactive" grey with a dot. */
-export function OfferingStatusPill({ active }: { active: boolean }) {
+export function OfferingStatusPill({ isActive }: { isActive: boolean }) {
   const text = useOfferingText();
   return (
-    <TonePill tone={active ? 'sage' : 'neutral'} dot>
-      {text.status(active)}
+    <TonePill tone={isActive ? 'sage' : 'neutral'} dot>
+      {text.status(isActive)}
     </TonePill>
   );
 }

@@ -1,14 +1,22 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { isHttpError } from '@/shared/errors/HttpError.ts';
-
-import { clinicToday } from './clinic-time.ts';
-import { branchRef } from './fixtures/organization.fixtures.ts';
-import { ref } from './fixtures/refs.fixtures.ts';
-import { FIXTURE_VIEWER_ID, staffRef } from './fixtures/staff.fixtures.ts';
-import { clinicFixtures, resetClinicFixtures } from './fixtures/world.fixtures.ts';
+vi.mock('@/core/http/api.ts', () => ({
+  api: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
+}));
+import { api } from '@/core/http/api.ts';
+import { queryClient } from '@/core/http/queryClient.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import {
-  compareOffersForList,
+  offeringRecord,
+  offeringWireRow,
+  offerRecord,
+  offerWireRow,
+  TEST_OFFER_ID,
+  TEST_OFFERING_BRANCH_ID,
+  TEST_OFFERING_ID,
+} from '@/tests/utils/offering-doubles.ts';
+
+import {
   createOffer,
   createOffering,
   deleteOffer,
@@ -17,497 +25,429 @@ import {
   fetchAllOffers,
   fetchOffer,
   fetchOffering,
-  listOfferings,
-  listOffers,
   offeringMatchesSearch,
   offerMatchesSearch,
   restoreOffer,
   restoreOffering,
-  setOfferPaused,
+  setOfferActive,
   updateOffer,
   updateOffering,
 } from './offerings-api.ts';
+import type { OfferFields, OfferingFields } from './offerings-contracts.ts';
 
-const NAVRATRI = ref.offer(31);
-const LHR_LAUNCH = ref.offer(30);
-const PEEL_PACK = ref.offer(29);
-const MONSOON = ref.offer(28);
+const KEY = 'key-offerings-test';
+const ADAJAN = 'brn_53j4b7hz7nfb0otr2d920';
+const DEFAULT_GST = 'off_nl9wbfq42fsg6543qmwk7';
 
-/** The rejection a call ends in, so its status and fields can be read. */
-async function failureOf(call: Promise<unknown>) {
-  const error = await call.then(
-    () => null,
-    (caught: unknown) => caught,
-  );
-  if (!isHttpError(error)) throw new Error('expected an HTTP error');
-  const body = (
-    error.data as { error: { code: string; detail: string; fields?: object } }
-  ).error;
-  return { status: error.status, ...body };
-}
+/** A page of rows as clinozy-be answers a list. */
+const page = (rows: unknown[], next: string | null = null) => ({
+  data: rows,
+  meta: { pagination: { per_page: 100, next, has_more: next !== null } },
+});
+
+/** Research Peel's fields as its drawer reads them. */
+const peelFields = (patch: Partial<OfferingFields> = {}): OfferingFields => ({
+  name: 'Research Peel',
+  category: 'treatment',
+  tone: 'sage',
+  branchIds: [TEST_OFFERING_BRANCH_ID],
+  price: 2000,
+  offerPrice: 1800,
+  minPrice: 1500,
+  sessions: 1,
+  gstPercent: 18,
+  isGstInclusive: false,
+  durationMin: 30,
+  validityDays: 0,
+  searchTerms: ['chemical', 'glow'],
+  description: 'Research row (offerings room brief)',
+  isActive: true,
+  ...patch,
+});
+
+/** The offer's fields as its drawer reads them. */
+const glowFields = (patch: Partial<OfferFields> = {}): OfferFields => ({
+  name: 'Research Diwali glow',
+  code: 'DIWALI25',
+  kind: 'percent',
+  value: 15,
+  offeringIds: [TEST_OFFERING_ID],
+  branchIds: [],
+  startsOn: null,
+  endsOn: null,
+  isActive: true,
+  tone: 'blush',
+  note: null,
+  ...patch,
+});
 
 beforeEach(() => {
-  vi.useFakeTimers({ toFake: ['Date'] });
-  vi.setSystemTime(new Date('2026-10-03T04:30:00Z'));
-  resetClinicFixtures();
+  vi.resetAllMocks();
+  signInTestMember();
 });
 afterEach(() => {
-  vi.useRealTimers();
-  resetClinicFixtures();
+  queryClient.clear();
 });
 
-describe('the offerings list (listOfferings, S:1734)', () => {
-  it('reads one page of live offerings, last updated first', async () => {
-    const page = await listOfferings();
-    expect(page.nextCursor).toBeNull();
-    expect(page.items.map((row) => row.seq)).toEqual([
-      274, 273, 272, 271, 270, 268, 267, 266, 265, 264, 263,
+describe('the offerings reads', () => {
+  it('reads the whole catalogue a hundred at a time, in rupees', async () => {
+    vi.mocked(api.get)
+      .mockResolvedValueOnce(page([offeringWireRow()], 'cur_2'))
+      .mockResolvedValueOnce(
+        page([offeringWireRow({ id: DEFAULT_GST, offering_number: 6, price: 999.5 })]),
+      );
+
+    const rows = await fetchAllOfferings();
+
+    expect(api.get).toHaveBeenNthCalledWith(1, '/app/offerings', {
+      query: { limit: 100, after: undefined },
+    });
+    expect(api.get).toHaveBeenNthCalledWith(2, '/app/offerings', {
+      query: { limit: 100, after: 'cur_2' },
+    });
+    expect(rows).toEqual([
+      offeringRecord(),
+      offeringRecord({ id: DEFAULT_GST, offeringNumber: 6, price: 999.5 }),
     ]);
   });
 
-  it('filters by category and specialty', async () => {
-    const packages = await listOfferings({ category: 'package' });
-    expect(packages.items.map((row) => row.seq)).toEqual([273, 268, 263]);
-    const dental = await listOfferings({ specialty: 'dental' });
-    expect(dental.items.map((row) => row.name)).toEqual(['Scaling & Polishing']);
+  it('reads a hidden lowest price as null (O15)', async () => {
+    vi.mocked(api.get).mockResolvedValue({ data: offeringWireRow({ min_price: null }) });
+    expect((await fetchOffering(TEST_OFFERING_ID)).minPrice).toBeNull();
+    expect(api.get).toHaveBeenCalledWith('/app/offerings/{offering_id}', {
+      params: { offering_id: TEST_OFFERING_ID },
+    });
   });
 
-  it('searches the name, the search terms and "#id" (H:5454)', async () => {
-    await updateOffering(ref.offering(270), { searchTerms: ['foot', 'callus'] });
-    const seqs = async (q: string) =>
-      (await listOfferings({ q })).items.map((row) => row.seq);
-    expect(await seqs('lhr')).toEqual([268, 267, 266]);
-    expect(await seqs('CALLUS')).toEqual([270]);
-    expect(await seqs('#265')).toEqual([265]);
-    expect(await seqs('  ')).toHaveLength(11);
-  });
-
-  it('sorts by name, price or category, ascending unless told otherwise', async () => {
-    const byPrice = await listOfferings({ sort: 'price' });
-    expect(byPrice.items.slice(0, 3).map((row) => row.seq)).toEqual([265, 266, 270]);
-    const priciest = await listOfferings({ sort: 'price', order: 'desc' });
-    expect(priciest.items[0]?.seq).toBe(273);
-    const byName = await listOfferings({ sort: 'name' });
-    expect(byName.items[0]?.name).toBe('B1G1 D-Tan Facial');
-    const byCategory = await listOfferings({ sort: 'category' });
-    expect(byCategory.items[0]?.category).toBe('consultation');
-  });
-
-  it('reads every cursor page when the catalogue outgrows one', async () => {
-    for (let index = 0; index < 45; index += 1) {
-      await createOffering({
-        name: `Extra offering ${String.fromCharCode(65 + (index % 26))}${index}`,
-        price: 10000,
-      });
-    }
-    const firstPage = await listOfferings();
-    expect(firstPage.items).toHaveLength(50);
-    expect(firstPage.nextCursor).not.toBeNull();
-    const all = await fetchAllOfferings();
-    expect(all).toHaveLength(56);
-    expect(new Set(all.map((row) => row.id)).size).toBe(56);
+  it('refuses a row the API never answers — a GST rate it does not take', async () => {
+    vi.mocked(api.get).mockResolvedValue({ data: offeringWireRow({ gst_percent: 7 }) });
+    await expect(fetchOffering(TEST_OFFERING_ID)).rejects.toThrow();
   });
 });
 
-describe('one offering', () => {
-  it('reads it by id, and answers 404 for an unknown one', async () => {
-    expect((await fetchOffering(ref.offering(274))).name).toBe('B1G1 D-Tan Facial');
-    expect((await failureOf(fetchOffering(ref.offering(1)))).status).toBe(404);
-  });
-});
-
-describe('createOffering (S:1739)', () => {
-  it('creates a fresh record from the name and price — the defaults, never a copy', async () => {
-    const created = await createOffering({ name: 'Hydra facial', price: 250000 });
-    expect(created).toMatchObject({
-      seq: 275,
-      name: 'Hydra facial',
-      price: 250000,
-      category: 'treatment',
-      specialty: 'skin',
-      tone: 'sage',
-      offerPrice: null,
-      minPrice: 0,
-      durationMin: 30,
-      sessions: 1,
-      validityDays: 0,
-      gstPct: 0,
-      gstInclusive: false,
-      active: true,
-      branchIds: [],
-      searchTerms: [],
-      description: null,
-      deletedAt: null,
+describe('createOffering', () => {
+  beforeEach(() => {
+    vi.mocked(api.get).mockResolvedValue({
+      data: { name: 'Demo Organization', specialties: ['dental', 'skin'] },
     });
-    expect((await fetchAllOfferings()).map((row) => row.seq)).toContain(275);
+    vi.mocked(api.post).mockResolvedValue({ data: offeringWireRow() });
   });
 
-  it('keeps an offer price below the price, and bills the list price when it is empty or equal', async () => {
-    const below = await createOffering({
-      name: 'Peel A',
-      price: 150000,
-      offerPrice: 120000,
-    });
-    expect(below.offerPrice).toBe(120000);
-    const equal = await createOffering({
-      name: 'Peel B',
-      price: 150000,
-      offerPrice: 150000,
-    });
-    expect(equal.offerPrice).toBeNull();
-    const zero = await createOffering({ name: 'Peel C', price: 150000, offerPrice: 0 });
-    expect(zero.offerPrice).toBeNull();
-  });
-
-  it('trims the name, drops blank search terms and keeps no empty description', async () => {
+  it('creates in the clinic’s first specialty, with the lowest price from a member who may set it', async () => {
     const created = await createOffering({
-      name: '  Glow peel  ',
-      price: 90000,
-      searchTerms: ['glow', ' ', 'peel '],
-      description: '   ',
-      category: undefined,
+      fields: peelFields({
+        searchTerms: [' chemical ', '', 'glow'],
+        description: '  ',
+      }),
+      canSetLowestPrice: true,
+      idempotencyKey: KEY,
     });
-    expect(created).toMatchObject({
-      name: 'Glow peel',
-      searchTerms: ['glow', 'peel'],
+
+    expect(api.get).toHaveBeenCalledWith('/tenancy/organization');
+    expect(api.post).toHaveBeenCalledWith('/app/offerings', {
+      body: {
+        name: 'Research Peel',
+        category: 'treatment',
+        tone: 'sage',
+        branch_ids: [TEST_OFFERING_BRANCH_ID],
+        price: 2000,
+        offer_price: 1800,
+        sessions: 1,
+        is_gst_inclusive: false,
+        duration_minutes: 30,
+        validity_days: 0,
+        search_terms: ['chemical', 'glow'],
+        description: null,
+        is_active: true,
+        specialty: 'dental',
+        gst_percent: 18,
+        min_price: 1500,
+      },
+      idempotencyKey: KEY,
+    });
+    expect(created.offeringNumber).toBe(5);
+  });
+
+  it('never sends the lowest price without offering:lower_price:read, and leaves the GST to the server', async () => {
+    await createOffering({
+      fields: peelFields({ gstPercent: null }),
+      canSetLowestPrice: false,
+      idempotencyKey: KEY,
+    });
+    const body = vi.mocked(api.post).mock.calls[0]?.[1]?.body ?? {};
+    expect(body).not.toHaveProperty('min_price');
+    expect(body).not.toHaveProperty('gst_percent');
+  });
+
+  it('lets the server choose the specialty when the clinic has none, and reads them once', async () => {
+    vi.mocked(api.get).mockResolvedValue({ data: { name: 'Demo', specialties: [] } });
+    await createOffering({
+      fields: peelFields(),
+      canSetLowestPrice: true,
+      idempotencyKey: KEY,
+    });
+    await createOffering({
+      fields: peelFields(),
+      canSetLowestPrice: true,
+      idempotencyKey: KEY,
+    });
+    expect(vi.mocked(api.post).mock.calls[0]?.[1]?.body).not.toHaveProperty('specialty');
+    expect(api.get).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('updateOffering', () => {
+  beforeEach(() => {
+    vi.mocked(api.patch).mockResolvedValue({ data: offeringWireRow({ price: 2200 }) });
+  });
+
+  it('sends only what changed, with the read’s updated_at', async () => {
+    const saved = await updateOffering({
+      record: offeringRecord(),
+      fields: peelFields({ price: 2200, branchIds: [TEST_OFFERING_BRANCH_ID] }),
+      canSetLowestPrice: true,
+      idempotencyKey: KEY,
+    });
+
+    expect(api.patch).toHaveBeenCalledWith('/app/offerings/{offering_id}', {
+      params: { offering_id: TEST_OFFERING_ID },
+      body: { price: 2200, expected_updated_at: '2026-10-10T04:50:29.931Z' },
+      idempotencyKey: KEY,
+    });
+    expect(saved.price).toBe(2200);
+  });
+
+  it('reads the branches as a set and keeps a null GST rate as saved', async () => {
+    const record = offeringRecord({ branchIds: [TEST_OFFERING_BRANCH_ID, ADAJAN] });
+    const saved = await updateOffering({
+      record,
+      fields: peelFields({
+        branchIds: [ADAJAN, TEST_OFFERING_BRANCH_ID],
+        gstPercent: null,
+      }),
+      canSetLowestPrice: true,
+      idempotencyKey: KEY,
+    });
+    expect(api.patch).not.toHaveBeenCalled();
+    expect(saved).toBe(record);
+  });
+
+  it('sends a changed lowest price only from a member who may set it', async () => {
+    await updateOffering({
+      record: offeringRecord({ minPrice: null }),
+      fields: peelFields({ minPrice: 0, name: 'Research Peel Plus' }),
+      canSetLowestPrice: false,
+      idempotencyKey: KEY,
+    });
+    expect(vi.mocked(api.patch).mock.calls[0]?.[1]?.body).toEqual({
+      name: 'Research Peel Plus',
+      expected_updated_at: '2026-10-10T04:50:29.931Z',
+    });
+
+    vi.mocked(api.patch).mockClear();
+    await updateOffering({
+      record: offeringRecord(),
+      fields: peelFields({ minPrice: 1200 }),
+      canSetLowestPrice: true,
+      idempotencyKey: KEY,
+    });
+    expect(vi.mocked(api.patch).mock.calls[0]?.[1]?.body).toEqual({
+      min_price: 1200,
+      expected_updated_at: '2026-10-10T04:50:29.931Z',
+    });
+  });
+
+  it('sends an emptied offer price, the search terms in their new order and a cleared description', async () => {
+    await updateOffering({
+      record: offeringRecord(),
+      fields: peelFields({
+        offerPrice: null,
+        searchTerms: ['glow', 'chemical'],
+        description: null,
+      }),
+      canSetLowestPrice: true,
+      idempotencyKey: KEY,
+    });
+    expect(vi.mocked(api.patch).mock.calls[0]?.[1]?.body).toEqual({
+      offer_price: null,
+      search_terms: ['glow', 'chemical'],
       description: null,
-      category: 'treatment',
+      expected_updated_at: '2026-10-10T04:50:29.931Z',
     });
-  });
-
-  it('refuses an offer price above the price, and a lowest price above the offer price (422)', async () => {
-    const above = await failureOf(
-      createOffering({ name: 'Peel D', price: 100000, offerPrice: 120000 }),
-    );
-    expect(above).toMatchObject({
-      status: 422,
-      code: 'validation',
-      detail: 'Offer price can’t be above the price',
-    });
-    expect(above.fields).toHaveProperty('offerPrice');
-    const floor = await failureOf(
-      createOffering({
-        name: 'Peel E',
-        price: 100000,
-        offerPrice: 80000,
-        minPrice: 90000,
-      }),
-    );
-    expect(floor.fields).toEqual({
-      minPrice: ['Lowest price can’t be above the offer price'],
-    });
-  });
-
-  it('refuses an empty name and the contract ranges (422)', async () => {
-    const empty = await failureOf(createOffering({ name: '   ', price: 1000 }));
-    expect(empty).toMatchObject({ status: 422, detail: 'Add a name' });
-    const ranges = await failureOf(
-      createOffering({ name: 'Peel F', price: 1000, sessions: 0, gstPct: 120 }),
-    );
-    expect(Object.keys(ranges.fields ?? {}).sort()).toEqual(['gstPct', 'sessions']);
-  });
-
-  it('accepts any GST rate up to 100 (Appendix F)', async () => {
-    const created = await createOffering({
-      name: 'Sunscreen',
-      price: 45000,
-      gstPct: 2.5,
-    });
-    expect(created.gstPct).toBe(2.5);
-  });
-
-  it('refuses a taken name, whatever its case (409), and a branch the clinic lacks (422)', async () => {
-    const taken = await failureOf(createOffering({ name: 'back PEELING', price: 1000 }));
-    expect(taken).toMatchObject({ status: 409, code: 'conflict' });
-    expect(taken.fields).toHaveProperty('name');
-    const branch = await failureOf(
-      createOffering({ name: 'Peel G', price: 1000, branchIds: [ref.offering(1)] }),
-    );
-    expect(branch).toMatchObject({ status: 422 });
-    expect(branch.fields).toHaveProperty('branchIds');
   });
 });
 
-describe('updateOffering (S:1739)', () => {
-  it('merges the patch and keeps the rest', async () => {
-    const saved = await updateOffering(ref.offering(272), {
-      price: 160000,
-      branchIds: [branchRef('Vesu')],
+describe('deleting and restoring an offering', () => {
+  it('deletes with the reason and its note', async () => {
+    vi.mocked(api.delete).mockResolvedValue({ data: undefined });
+    await deleteOffering({ offeringId: TEST_OFFERING_ID, reason: 'other', note: 'old' });
+    await deleteOffering({ offeringId: TEST_OFFERING_ID, reason: 'mistake', note: null });
+    expect(api.delete).toHaveBeenNthCalledWith(1, '/app/offerings/{offering_id}', {
+      params: { offering_id: TEST_OFFERING_ID },
+      reason: 'other',
+      note: 'old',
     });
-    expect(saved).toMatchObject({
-      seq: 272,
-      name: 'Underarm Peel',
-      price: 160000,
-      active: false,
+    expect(api.delete).toHaveBeenNthCalledWith(2, '/app/offerings/{offering_id}', {
+      params: { offering_id: TEST_OFFERING_ID },
+      reason: 'mistake',
+      note: undefined,
     });
-    expect(saved.branchIds).toEqual([branchRef('Vesu')]);
   });
 
-  it('checks the merged record — a price under the saved offer price is refused', async () => {
-    // #274 bills ₹1,200 against ₹1,500.
-    const failure = await failureOf(updateOffering(ref.offering(274), { price: 100000 }));
-    expect(failure).toMatchObject({ status: 422 });
-    expect(failure.fields).toHaveProperty('offerPrice');
-  });
-
-  it('lets an offering keep its own name but not take another (409)', async () => {
-    const same = await updateOffering(ref.offering(271), { name: 'Back Peeling' });
-    expect(same.name).toBe('Back Peeling');
-    const taken = await failureOf(
-      updateOffering(ref.offering(271), { name: 'corn removal' }),
-    );
-    expect(taken.status).toBe(409);
-  });
-
-  it('answers 404 for a deleted offering', async () => {
-    await deleteOffering(ref.offering(270), 'duplicate', null);
-    expect(
-      (await failureOf(updateOffering(ref.offering(270), { price: 1 }))).status,
-    ).toBe(404);
+  it('restores with the Undo’s key', async () => {
+    vi.mocked(api.post).mockResolvedValue({ data: offeringWireRow() });
+    expect(await restoreOffering(TEST_OFFERING_ID, KEY)).toEqual(offeringRecord());
+    expect(api.post).toHaveBeenCalledWith('/app/offerings/{offering_id}/restore', {
+      params: { offering_id: TEST_OFFERING_ID },
+      idempotencyKey: KEY,
+    });
   });
 });
 
-describe('deleteOffering and restoreOffering (S:1546)', () => {
-  it('soft-deletes with the reason, hides the offering, and restores it', async () => {
-    const removed = await deleteOffering(
-      ref.offering(272),
-      'not_needed',
-      'Replaced by #273',
-    );
-    expect(removed).toMatchObject({
-      deleteReason: 'not_needed',
-      deleteNote: 'Replaced by #273',
-    });
-    expect((await fetchAllOfferings()).map((row) => row.seq)).not.toContain(272);
-    // Offers keep naming it, so Undo puts everything back.
-    expect((await fetchOffer(NAVRATRI)).offeringIds).toContain(ref.offering(272));
-    const restored = await restoreOffering(ref.offering(272));
-    expect(restored.deletedAt).toBeNull();
-    expect((await fetchAllOfferings()).map((row) => row.seq)).toContain(272);
-  });
-
-  it('refuses "Other" without a note (422 on the note)', async () => {
-    const failure = await failureOf(deleteOffering(ref.offering(272), 'other', ' '));
-    expect(failure.status).toBe(422);
-    expect(failure.fields).toHaveProperty('note');
-  });
-});
-
-describe('the offers list (listOffers, S:1735)', () => {
-  it('reads every live offer, the latest start first', async () => {
-    const all = await fetchAllOffers();
-    expect(all.map((offer) => offer.id)).toEqual([
-      PEEL_PACK,
-      NAVRATRI,
-      LHR_LAUNCH,
-      MONSOON,
-    ]);
-  });
-
-  it('filters by the derived state on the clinic’s today', async () => {
-    const ids = async (state: 'live' | 'scheduled' | 'paused' | 'ended') =>
-      (await listOffers({ state })).items.map((offer) => offer.id);
-    expect(await ids('live')).toEqual([NAVRATRI, LHR_LAUNCH]);
-    expect(await ids('scheduled')).toEqual([PEEL_PACK]);
-    expect(await ids('ended')).toEqual([MONSOON]);
-    expect(await ids('paused')).toEqual([]);
-    await setOfferPaused(LHR_LAUNCH, true);
-    expect(await ids('paused')).toEqual([LHR_LAUNCH]);
-  });
-
-  it('searches the name, the code and the offerings’ names (H:5476)', async () => {
-    const ids = async (q: string) =>
-      (await listOffers({ q })).items.map((offer) => offer.id);
-    expect(await ids('glow20')).toEqual([NAVRATRI]);
-    expect(await ids('rain')).toEqual([MONSOON]);
-    expect(await ids('back peeling')).toEqual([NAVRATRI, MONSOON]);
-    expect(await ids('monsoon')).toEqual([MONSOON]);
-  });
-
-  it('orders the Offers tab Running → Scheduled → Paused → Ended, newest first in each', async () => {
-    await setOfferPaused(NAVRATRI, true);
-    const today = clinicToday();
-    const ordered = [...(await fetchAllOffers())].sort(compareOffersForList(today));
-    expect(ordered.map((offer) => offer.id)).toEqual([
-      LHR_LAUNCH,
-      PEEL_PACK,
-      NAVRATRI,
-      MONSOON,
-    ]);
-    const second = await createOffer({
-      name: 'Diwali glow',
-      offeringIds: [ref.offering(274)],
-    });
-    const running = [...(await fetchAllOffers())].sort(compareOffersForList(today));
-    expect(running.slice(0, 2).map((offer) => offer.id)).toEqual([second.id, LHR_LAUNCH]);
-  });
-});
-
-describe('createOffer and updateOffer (S:1740)', () => {
-  it('creates from the name and offerings with the defaults, and no display id', async () => {
-    const created = await createOffer({
-      name: 'Diwali glow',
-      offeringIds: [ref.offering(271)],
-    });
-    expect(created).toMatchObject({
-      name: 'Diwali glow',
-      code: null,
-      kind: 'percent',
-      value: 10,
-      branchIds: [],
-      startsOn: null,
-      endsOn: null,
-      paused: false,
-      tone: 'blush',
-      note: null,
-    });
-    expect(created).not.toHaveProperty('seq');
-    expect((await fetchOffer(created.id)).name).toBe('Diwali glow');
-  });
-
-  it('upper-cases the code without spaces, and keeps an empty one as none', async () => {
-    const coded = await createOffer({
-      name: 'A',
-      offeringIds: [ref.offering(271)],
-      code: 'diwali 25',
-    });
-    expect(coded.code).toBe('DIWALI25');
-    const plain = await createOffer({
-      name: 'B',
-      offeringIds: [ref.offering(271)],
-      code: '  ',
-    });
-    expect(plain.code).toBeNull();
-  });
-
-  it.each([
-    ['percent', 0, 'Set the discount'],
-    ['percent', 101, 'Set the discount'],
-    ['amount', 0, 'Set the amount'],
-    ['fixed', 0, 'Set the amount'],
-    ['extra', 21, 'Set the free sessions'],
-  ] as const)('refuses a %s value of %i — "%s"', async (kind, value, message) => {
-    const failure = await failureOf(
-      createOffer({ name: 'C', offeringIds: [ref.offering(271)], kind, value }),
-    );
-    expect(failure).toMatchObject({ status: 422, detail: message });
-  });
-
-  it('refuses no offerings, an end before the start, and unknown offerings or branches', async () => {
-    expect((await failureOf(createOffer({ name: 'D', offeringIds: [] }))).detail).toBe(
-      'Pick at least one offering',
-    );
-    const dates = await failureOf(
-      createOffer({
-        name: 'E',
-        offeringIds: [ref.offering(271)],
-        startsOn: '2026-10-10',
-        endsOn: '2026-10-09',
-      }),
-    );
-    expect(dates).toMatchObject({
-      status: 422,
-      fields: { endsOn: ['Ends before it starts'] },
-    });
-    expect(
-      (await failureOf(createOffer({ name: 'F', offeringIds: [ref.offering(1)] })))
-        .fields,
-    ).toHaveProperty('offeringIds');
-    expect(
-      (
-        await failureOf(
-          createOffer({
-            name: 'G',
-            offeringIds: [ref.offering(271)],
-            branchIds: [ref.offer(1)],
+describe('the offers', () => {
+  it('reads every offer in the server’s order, with its status', async () => {
+    vi.mocked(api.get)
+      .mockResolvedValueOnce(page([offerWireRow()], 'cur_2'))
+      .mockResolvedValueOnce(
+        page([
+          offerWireRow({
+            id: 'ofr_ztlz67deab7f5yeztz3kl',
+            kind: 'amount',
+            value: 250.5,
+            status: 'ended',
           }),
-        )
-      ).fields,
-    ).toHaveProperty('branchIds');
+        ]),
+      );
+    const offers = await fetchAllOffers();
+    expect(api.get).toHaveBeenLastCalledWith('/app/offers', {
+      query: { limit: 100, after: 'cur_2' },
+    });
+    expect(offers.map((offer) => [offer.status, offer.value])).toEqual([
+      ['live', 15],
+      ['ended', 250.5],
+    ]);
   });
 
-  it('refuses a code another offer uses (409), but not the offer’s own', async () => {
-    const taken = await failureOf(
-      createOffer({ name: 'H', offeringIds: [ref.offering(271)], code: 'GLOW20' }),
+  it('reads one offer', async () => {
+    vi.mocked(api.get).mockResolvedValue({ data: offerWireRow() });
+    expect(await fetchOffer(TEST_OFFER_ID)).toEqual(offerRecord());
+  });
+
+  it('creates an offer with its code and note trimmed — the server upper-cases the code', async () => {
+    vi.mocked(api.post).mockResolvedValue({ data: offerWireRow() });
+    await createOffer({
+      fields: glowFields({
+        code: ' diwali25 ',
+        note: '  ',
+        name: ' Research Diwali glow ',
+      }),
+      idempotencyKey: KEY,
+    });
+    expect(api.post).toHaveBeenCalledWith('/app/offers', {
+      body: {
+        name: 'Research Diwali glow',
+        code: 'diwali25',
+        kind: 'percent',
+        value: 15,
+        offering_ids: [TEST_OFFERING_ID],
+        branch_ids: [],
+        starts_on: null,
+        ends_on: null,
+        is_active: true,
+        tone: 'blush',
+        note: null,
+      },
+      idempotencyKey: KEY,
+    });
+  });
+
+  it('sends the offerings only when the set changed (OFFERINGS-M5)', async () => {
+    vi.mocked(api.patch).mockResolvedValue({ data: offerWireRow() });
+    const record = offerRecord({ offeringIds: [TEST_OFFERING_ID, DEFAULT_GST] });
+    await updateOffer({
+      record,
+      fields: glowFields({
+        name: 'Diwali glow',
+        code: 'diwali25',
+        offeringIds: [DEFAULT_GST, TEST_OFFERING_ID],
+      }),
+      idempotencyKey: KEY,
+    });
+    expect(api.patch).toHaveBeenCalledWith('/app/offers/{offer_id}', {
+      params: { offer_id: TEST_OFFER_ID },
+      body: { name: 'Diwali glow', expected_updated_at: '2026-10-10T04:51:04.269Z' },
+      idempotencyKey: KEY,
+    });
+
+    vi.mocked(api.patch).mockClear();
+    await updateOffer({
+      record,
+      fields: glowFields({ offeringIds: [TEST_OFFERING_ID] }),
+      idempotencyKey: KEY,
+    });
+    expect(vi.mocked(api.patch).mock.calls[0]?.[1]?.body).toEqual({
+      offering_ids: [TEST_OFFERING_ID],
+      expected_updated_at: '2026-10-10T04:51:04.269Z',
+    });
+  });
+
+  it('sends nothing for an offer nothing changed on', async () => {
+    const record = offerRecord();
+    expect(await updateOffer({ record, fields: glowFields(), idempotencyKey: KEY })).toBe(
+      record,
     );
-    expect(taken).toMatchObject({ status: 409, code: 'conflict' });
-    const own = await updateOffer(NAVRATRI, { code: 'GLOW20', note: 'Festival offer' });
-    expect(own.code).toBe('GLOW20');
+    expect(api.patch).not.toHaveBeenCalled();
   });
 
-  it('checks the merged record and pauses or resumes', async () => {
-    const failure = await failureOf(updateOffer(MONSOON, { endsOn: '2026-01-01' }));
-    expect(failure.fields).toHaveProperty('endsOn');
-    expect((await setOfferPaused(NAVRATRI, true)).paused).toBe(true);
-    expect((await setOfferPaused(NAVRATRI, false)).paused).toBe(false);
+  it('pauses with is_active alone, and reads the status the server worked out', async () => {
+    vi.mocked(api.patch).mockResolvedValue({
+      data: offerWireRow({ is_active: false, status: 'paused' }),
+    });
+    const paused = await setOfferActive({
+      offerId: TEST_OFFER_ID,
+      isActive: false,
+      idempotencyKey: KEY,
+    });
+    expect(api.patch).toHaveBeenCalledWith('/app/offers/{offer_id}', {
+      params: { offer_id: TEST_OFFER_ID },
+      body: { is_active: false },
+      idempotencyKey: KEY,
+    });
+    expect(paused).toMatchObject({ isActive: false, status: 'paused' });
+  });
+
+  it('deletes an offer with its reason and restores it with the Undo’s key', async () => {
+    vi.mocked(api.delete).mockResolvedValue({ data: undefined });
+    vi.mocked(api.post).mockResolvedValue({ data: offerWireRow() });
+    await deleteOffer({ offerId: TEST_OFFER_ID, reason: 'duplicate', note: null });
+    await restoreOffer(TEST_OFFER_ID, KEY);
+    expect(api.delete).toHaveBeenCalledWith('/app/offers/{offer_id}', {
+      params: { offer_id: TEST_OFFER_ID },
+      reason: 'duplicate',
+      note: undefined,
+    });
+    expect(api.post).toHaveBeenCalledWith('/app/offers/{offer_id}/restore', {
+      params: { offer_id: TEST_OFFER_ID },
+      idempotencyKey: KEY,
+    });
   });
 });
 
-describe('deleteOffer and restoreOffer (S:1546)', () => {
-  it('soft-deletes with the reason and restores', async () => {
-    await deleteOffer(MONSOON, 'not_needed', null);
-    expect((await fetchAllOffers()).map((offer) => offer.id)).not.toContain(MONSOON);
-    expect((await failureOf(fetchOffer(MONSOON))).status).toBe(404);
-    await restoreOffer(MONSOON);
-    expect((await fetchOffer(MONSOON)).deletedAt).toBeNull();
-  });
-
-  it('refuses "Other" without a note (422)', async () => {
-    expect((await failureOf(deleteOffer(MONSOON, 'other', null))).status).toBe(422);
-  });
-});
-
-describe('the search matchers', () => {
-  it('matches an offering by name, term or #id, ignoring case and edges', () => {
-    const peel = { name: 'Underarm Peel', searchTerms: ['armpit'], seq: 272 };
-    expect(offeringMatchesSearch(peel, ' ARMPIT ')).toBe(true);
-    expect(offeringMatchesSearch(peel, '#272')).toBe(true);
+describe('searching in place', () => {
+  it('finds an offering by its name, a search term or its number', () => {
+    const peel = offeringRecord();
+    expect(offeringMatchesSearch(peel, 'PEEL')).toBe(true);
+    expect(offeringMatchesSearch(peel, 'chemical')).toBe(true);
+    expect(offeringMatchesSearch(peel, '#5')).toBe(true);
+    expect(offeringMatchesSearch(peel, '  ')).toBe(true);
     expect(offeringMatchesSearch(peel, 'laser')).toBe(false);
   });
 
-  it('matches an offer by name, code or an offering’s name', () => {
-    const offer = { name: 'Navratri glow', code: 'GLOW20', offeringIds: ['a', 'b'] };
-    const names = (id: string) => ({ a: 'Back Peeling' })[id];
-    expect(offerMatchesSearch(offer, 'glow20', names)).toBe(true);
-    expect(offerMatchesSearch(offer, 'peeling', names)).toBe(true);
-    expect(offerMatchesSearch({ ...offer, code: null }, 'facial', names)).toBe(false);
-  });
-});
-
-describe('the fixture world behind it', () => {
-  it('keeps the offers collection free of display ids', () => {
-    expect(clinicFixtures.offers.snapshot().every((offer) => !('seq' in offer))).toBe(
-      true,
-    );
-  });
-
-  it('seeds only records the save rules accept — each saves unchanged, by the viewer', async () => {
-    for (const offering of clinicFixtures.offerings.snapshot()) {
-      const saved = await updateOffering(offering.id, {});
-      expect(saved, `#${offering.seq}`).toEqual({
-        ...offering,
-        updatedAt: saved.updatedAt,
-        updatedById: FIXTURE_VIEWER_ID,
-      });
-    }
-    for (const offer of clinicFixtures.offers.snapshot()) {
-      const saved = await updateOffer(offer.id, {});
-      expect(saved, offer.name).toEqual({
-        ...offer,
-        updatedAt: saved.updatedAt,
-        updatedById: FIXTURE_VIEWER_ID,
-      });
-    }
-  });
-
-  it('seeds who last saved each record (the prototype’s `by`)', () => {
-    const navratri = clinicFixtures.offers
-      .snapshot()
-      .find((offer) => offer.name === 'Navratri glow');
-    expect(navratri?.updatedById).toBe(staffRef('RS'));
-    const facial = clinicFixtures.offerings
-      .snapshot()
-      .find((offering) => offering.seq === 274);
-    expect(facial?.updatedById).toBe(staffRef('DD'));
+  it('finds an offer by its name, its code or an offering’s name', () => {
+    const names = new Map([[TEST_OFFERING_ID, 'Research Peel']]);
+    const glow = offerRecord();
+    expect(offerMatchesSearch(glow, 'diwali25', (id) => names.get(id))).toBe(true);
+    expect(offerMatchesSearch(glow, 'peel', (id) => names.get(id))).toBe(true);
+    expect(offerMatchesSearch(glow, 'peel', () => undefined)).toBe(false);
   });
 });

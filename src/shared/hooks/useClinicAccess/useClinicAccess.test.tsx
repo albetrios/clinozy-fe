@@ -76,11 +76,13 @@ describe('useClinicAccess', () => {
     expect(result.current.canAbility('perms')).toBe(true);
   });
 
-  it('shows a member with no clinic role Today only', async () => {
+  it('shows a member with no clinic role Today — and Offerings, which every member reads', async () => {
+    // Offerings is on the API: its view is `organization:read` (research §7), not the matrix.
     signIn(null, ['organization:read']);
     const { result } = renderAccess();
     await waitFor(() => expect(result.current.isResolved).toBe(true));
-    expect(result.current.viewableSections).toEqual(['today']);
+    expect(result.current.viewableSections).toEqual(['today', 'offerings']);
+    expect(result.current.can('offerings', 'create')).toBe(false);
   });
 
   it('narrows to the View-as role, and widens again on exit', async () => {
@@ -136,7 +138,8 @@ describe('useClinicAccess', () => {
 
 describe('useClinicAccess — the staff profile’s roles (L-31)', () => {
   it('takes the signed-in member’s clinic roles from their staff profile', async () => {
-    // Patients answers from the member's codes (it is on the API); the rest from the matrix.
+    // Patients and Offerings answer from the member's codes (they are on the API); the rest
+    // from the matrix.
     signIn('farah@cresence.skin', [...VIEWER_CODES, 'patient:read']);
     const { result } = renderAccess();
     await waitFor(() => expect(result.current.isResolved).toBe(true));
@@ -147,6 +150,7 @@ describe('useClinicAccess — the staff profile’s roles (L-31)', () => {
       'medical',
       'stock',
       'tasks',
+      'offerings',
     ]);
     expect(result.current.canAbility('void')).toBe(true);
   });

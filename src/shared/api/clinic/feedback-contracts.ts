@@ -10,13 +10,12 @@ import {
   type CheckinFollowed,
   FEEDBACK_ACTION_VALUES,
   type FeedbackActionKind,
-  OFFERING_CATEGORY_VALUES,
   type OfferingCategory,
   REVIEW_SOURCE_VALUES,
   type ReviewSource,
   type Tone,
-  toneSchema,
 } from './clinic-schema.ts';
+import { type OfferingRecord, offeringsByName } from './offerings-contracts.ts';
 
 /*
  * The patient file's feedback on clinozy-be (api-integration §5.4): a patient's check-ins
@@ -228,7 +227,6 @@ type ApiReviewRow = NonNullable<
 type ApiReview = NonNullable<
   ApiData<'/app/patients/{patient_id}/reviews/{patient_review_id}', 'get'>
 >;
-type ApiOfferingRow = NonNullable<ApiData<'/app/offerings', 'get'>>[number];
 
 const actionWire = z.object({
   id: z.string(),
@@ -287,20 +285,6 @@ export const reviewRowWire = wireSchema<ApiReviewRow>()(z.object(reviewFieldsWir
 /** One review (`GET …/reviews/:patient_review_id`, and every write's answer). */
 export const reviewWire = wireSchema<ApiReview>()(z.object(reviewFieldsWire));
 
-/** The parts of an offering row the check-in drawer's picker reads (`GET /app/offerings`). */
-export const checkInOfferingWire = wireSchema<ApiOfferingRow>()(
-  z.object({
-    id: z.string(),
-    name: z.string(),
-    category: z.enum(OFFERING_CATEGORY_VALUES),
-    tone: toneSchema,
-    price: z.number(),
-    sessions: z.number().int(),
-    search_terms: z.array(z.string()),
-    is_active: z.boolean(),
-  }),
-);
-
 function toLoggedAction(row: z.output<typeof actionWire>): FeedbackLoggedAction {
   return {
     id: row.id,
@@ -354,18 +338,23 @@ export function toPatientReview(row: z.output<typeof reviewRowWire>): PatientRev
   };
 }
 
-/** An offering as the check-in drawer's picker reads it. */
-export function toCheckInOffering(
-  row: z.output<typeof checkInOfferingWire>,
-): CheckInOffering {
-  return {
-    id: row.id,
-    name: row.name,
-    category: row.category,
-    tone: row.tone,
-    price: row.price,
-    sessions: row.sessions,
-    searchTerms: row.search_terms,
-    isActive: row.is_active,
-  };
+/**
+ * The check-in drawer's offerings out of the clinic's one offerings catalogue (`useOfferings`),
+ * active or not, A to Z — a new check-in offers the active ones, an edit names what it planned.
+ */
+export function checkInOfferingsOf(
+  catalogue: readonly OfferingRecord[],
+): CheckInOffering[] {
+  return offeringsByName(catalogue).map(
+    ({ id, name, category, tone, price, sessions, searchTerms, isActive }) => ({
+      id,
+      name,
+      category,
+      tone,
+      price,
+      sessions,
+      searchTerms,
+      isActive,
+    }),
+  );
 }

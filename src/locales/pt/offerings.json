@@ -102,7 +102,8 @@
       "endsIn_many": "Termina em {{count}} dias",
       "endsIn_other": "Termina em {{count}} dias",
       "startsOn": "Começa em {{date}}",
-      "over": "Encerrada"
+      "over": "Encerrada",
+      "noOfferings": "Nenhum serviço"
     },
     "rowActions": {
       "edit": "Editar",
@@ -199,7 +200,9 @@
       "descriptionPlaceholder": "O que está incluído",
       "status": "Status",
       "active": "Ativo · agendável",
-      "inactive": "Inativo · oculto"
+      "inactive": "Inativo · oculto",
+      "gstChip": "{{value}}%",
+      "gstHint": "0% para uma consulta, 18% para o resto — até você escolher uma"
     },
     "offerTill": "até {{date}}",
     "untitled": "Sem nome",
@@ -212,7 +215,10 @@
       "addName": "Adicione um nome",
       "addPrice": "Adicione um preço",
       "offerAbovePrice": "O preço da oferta não pode ser maior que o preço",
-      "floorAboveOffer": "O preço mínimo não pode ser maior que o preço da oferta"
+      "floorAboveOffer": "O preço mínimo não pode ser maior que o preço da oferta",
+      "offerBelowFloor": "Abaixo do preço mínimo deste serviço — peça a um proprietário ou administrador",
+      "floorAbovePrice": "O preço mínimo não pode ser maior que o preço",
+      "floorNeedsPermission": "Sua função não pode alterar o preço mínimo — peça a um proprietário ou administrador"
     }
   },
   "offerDrawer": {
@@ -277,7 +283,8 @@
         "fixed": "Defina o valor",
         "extra": "Defina as sessões grátis"
       },
-      "endsBeforeStart": "Termina antes de começar"
+      "endsBeforeStart": "Termina antes de começar",
+      "offeringInactive": "{{name}} não está mais ativo — remova ou escolha outro"
     }
   }
 }

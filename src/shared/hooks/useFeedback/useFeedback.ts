@@ -10,22 +10,22 @@ import {
   deleteFeedback,
   feedbackQueryKeys,
   fetchPreviousCheckIn,
-  listCheckInOfferings,
   listPatientFeedback,
   logFeedbackAction,
   restoreFeedback,
   updateCheckIn,
   updateReview,
 } from '@/shared/api/clinic/feedback-api.ts';
-import type {
-  CheckInContext,
-  CheckInCreateInput,
-  CheckInFields,
-  FeedbackKind,
-  PatientCheckIn,
-  PatientReview,
-  ReviewCreateInput,
-  ReviewFields,
+import {
+  type CheckInContext,
+  type CheckInCreateInput,
+  type CheckInFields,
+  checkInOfferingsOf,
+  type FeedbackKind,
+  type PatientCheckIn,
+  type PatientReview,
+  type ReviewCreateInput,
+  type ReviewFields,
 } from '@/shared/api/clinic/feedback-contracts.ts';
 import { patientFileQueryKeys } from '@/shared/api/clinic/patient-file-api.ts';
 import { planQueryKeys } from '@/shared/api/clinic/plan-api.ts';
@@ -38,6 +38,7 @@ import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppointment } from '@/shared/hooks/useAppointments/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
+import { useOfferings } from '@/shared/hooks/useOfferings/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 /** The active organization — every key carries it. */
@@ -120,13 +121,14 @@ export function useCheckInContext(
   };
 }
 
-/** The offerings a new check-in can put in the plan — read once and kept a few minutes. */
+/**
+ * The offerings a new check-in can put in the plan, A to Z — out of the one offerings catalogue
+ * (`useOfferings`), taken as fresh for a few minutes and refreshed by any offering write. Quiet
+ * on failure: the picker shows its own "couldn't load" line.
+ */
 export function useCheckInOfferings() {
-  const organizationId = useOrganizationId();
-  return useAppQuery({
-    queryKey: feedbackQueryKeys.offerings(organizationId),
-    queryFn: listCheckInOfferings,
-    enabled: organizationId !== null,
+  return useOfferings({
+    select: checkInOfferingsOf,
     staleTime: 5 * 60_000,
     notifyOnError: false,
   });

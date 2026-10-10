@@ -13,8 +13,8 @@
 import {
   listIn,
   listOf,
+  PUBLIC_ID,
   queryOf,
-  RECORD_ID,
   sortOf,
 } from '@/lib/routes/search-params.ts';
 import {
@@ -63,9 +63,9 @@ export interface OfferingsSearch {
   q?: string;
   /** Any of these categories. */
   category?: OfferingCategory[];
-  /** Any of these winning offers (offer ids). */
+  /** Any of these winning offers (offer ids, `ofr_…`). */
   offer?: string[];
-  /** Sold at any of these branches (ids), or at every branch (`all`). */
+  /** Sold at any of these branches (ids, `brn_…`), or at every branch (`all`). */
   branch?: string[];
   /** Active, Inactive or both. */
   status?: OfferingStatusFilter[];
@@ -85,7 +85,7 @@ export function validateOfferingsSearch(
   return {
     q: queryOf(search.q, 80),
     category: listIn(OFFERING_CATEGORY_FILTER, search.category),
-    offer: listOf(search.offer, (entry) => RECORD_ID.test(entry)),
+    offer: listOf(search.offer, (entry) => PUBLIC_ID.test(entry)),
     branch: readBranchFilter(search.branch),
     status: listIn(OFFERING_STATUS_FILTER, search.status),
     created: readCreatedFilter(search.created),

@@ -6,9 +6,12 @@ URL and opens the offer's drawer over the list, so a refresh or a shared link re
 click and a row's Edit come here. The `$offerId` segment has no page of its own — its folder holds
 only this island. Gated like the room — membership (`organization:read`) and the
 `clinic-offerings` module, then `requireOrgStatus`. The route stays reachable for a viewer: without
-Offerings Edit or the `prices` ability (Q-U8) the drawer is view only, and without Offerings Delete
-it has no Delete. An id that names no offer goes back to the list in place with "Offer not found ·
-it may have been deleted" (`S:115`). The drawer is the tab's `OfferDrawer`
+`offering:update` the drawer is view only, and without `offering:delete` it has no Delete. The offer is
+the list's copy, or — for a deep link the list does not hold yet — its own read
+(`GET /app/offers/:offer_id`), with Retry in the drawer when that read fails. An id that names no offer
+(a deleted offer's 404, or no `ofr_…` public id at all, which the API refuses with a 400) goes back to
+the list in place with "Offer not found · it may have been deleted" (`S:115`). A save sends only what
+changed with the read's `updated_at` (`PATCH /app/offers/:offer_id`). The drawer is the tab's `OfferDrawer`
 (`../../components/OfferDrawer/`), opened by the page through `../../hooks/useOffersDialogRoute/`.
 
 ## Files

@@ -4,6 +4,7 @@ vi.mock('@/core/http/api.ts', () => ({
   api: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
 }));
 import { api } from '@/core/http/api.ts';
+import { offeringRecord } from '@/tests/utils/offering-doubles.ts';
 
 import { patientQueryKeys } from './patients-api.ts';
 import {
@@ -12,13 +13,12 @@ import {
   fetchPlan,
   fetchPlanActivity,
   fetchPlanIdeas,
-  fetchPlanOfferings,
   planContextQueryKeys,
   planQueryKeys,
   restorePlanSuggestion,
   updatePlanSuggestion,
 } from './plan-api.ts';
-import { billedPrice } from './plan-contracts.ts';
+import { billedPrice, planOfferingsOf } from './plan-contracts.ts';
 
 const PATIENT = 'pat_dharti000000000000000';
 const SUGGESTION = 'osug_lhr0000000000000000000';
@@ -88,7 +88,7 @@ describe('plan keys', () => {
     expect(planQueryKeys.ideas('org', PATIENT).slice(0, 5)).toEqual([
       ...planQueryKeys.patient('org', PATIENT),
     ]);
-    expect(planContextQueryKeys.offerings('org')[0]).toBe('clinic');
+    expect(planContextQueryKeys.all[0]).toBe('clinic');
     expect(planContextQueryKeys.activity('org', 'con_x')).not.toEqual(
       expect.arrayContaining([...planQueryKeys.all]),
     );
@@ -165,29 +165,21 @@ describe('fetchPlanIdeas', () => {
   });
 });
 
-describe('fetchPlanOfferings', () => {
-  it('reads every offering by name, with its prices', async () => {
-    vi.mocked(api.get).mockResolvedValueOnce(
-      page([
-        {
-          id: 'off_lhr',
-          offering_number: 1,
-          name: 'LHR Full Face',
-          category: 'package',
-          specialty: 'skin',
-          tone: 'lav',
-          price: 4800,
-          min_price: null,
-          offer_price: 4500,
-          sessions: 7,
-          is_active: true,
-        },
-      ]),
-    );
-    const [lhr] = await fetchPlanOfferings();
-    expect(api.get).toHaveBeenCalledWith('/app/offerings', {
-      query: { sort: 'name', order: 'asc', limit: 100, after: undefined },
-    });
+describe('planOfferingsOf', () => {
+  it('takes every offering of the one catalogue, active or not, A to Z, with its prices', () => {
+    const [lhr, peel] = planOfferingsOf([
+      offeringRecord({ name: 'Research Peel', isActive: false }),
+      offeringRecord({
+        id: 'off_lhr',
+        name: 'LHR Full Face',
+        category: 'package',
+        tone: 'lav',
+        price: 4800,
+        minPrice: null,
+        offerPrice: 4500,
+        sessions: 7,
+      }),
+    ]);
     expect(lhr).toEqual({
       id: 'off_lhr',
       name: 'LHR Full Face',
@@ -199,6 +191,7 @@ describe('fetchPlanOfferings', () => {
       minPrice: null,
       isActive: true,
     });
+    expect(peel).toMatchObject({ name: 'Research Peel', isActive: false });
     expect(lhr && billedPrice(lhr)).toBe(4500);
     expect(billedPrice({ price: 3500, offerPrice: null })).toBe(3500);
   });

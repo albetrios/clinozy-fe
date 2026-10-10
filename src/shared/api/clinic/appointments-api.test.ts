@@ -23,6 +23,7 @@ import {
   TEST_BRANCH_ID,
 } from '@/tests/utils/appointment-doubles.ts';
 import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { offeringRecord } from '@/tests/utils/offering-doubles.ts';
 
 import {
   appointmentListQuery,
@@ -34,15 +35,15 @@ import {
   fetchAppointmentDayCounts,
   fetchAppointmentRange,
   fetchAppointmentSlots,
-  fetchBookableTreatments,
   fetchPersonAppointments,
   listAppointments,
   moveAppointment,
   updateAppointment,
 } from './appointments-api.ts';
-import type {
-  AppointmentFilters,
-  AppointmentMoveRoute,
+import {
+  type AppointmentFilters,
+  type AppointmentMoveRoute,
+  bookableTreatmentsOf,
 } from './appointments-contracts.ts';
 import { fetchMemberNames, fetchTeamDirectory } from './directory-api.ts';
 
@@ -580,33 +581,25 @@ describe('fetchAppointmentSlots (the slot grid)', () => {
   });
 });
 
-describe('fetchBookableTreatments (the form’s "From offerings")', () => {
-  it('reads every page of the active treatments by name, with their length', async () => {
-    const treatment = (id: string, name: string, minutes: number) => ({
-      id,
-      name,
-      duration_minutes: minutes,
-      specialty: 'skin',
-      tone: 'mint',
-    });
-    vi.mocked(api.get)
-      .mockResolvedValueOnce(
-        page([treatment('off_hydra000000000000000', 'Hydrafacial', 60)], {
-          next: 'cursor-2',
-          has_more: true,
-        }) as never,
-      )
-      .mockResolvedValueOnce(
-        page([treatment('off_peel0000000000000000', 'Peel', 45)]) as never,
-      );
+describe('bookableTreatmentsOf (the form’s "From offerings")', () => {
+  it('takes the active treatments of the one catalogue, A to Z, with their length', () => {
+    const catalogue = [
+      offeringRecord({ id: 'off_peel0000000000000000', name: 'Peel', durationMin: 45 }),
+      offeringRecord({
+        id: 'off_hydra000000000000000',
+        name: 'Hydrafacial',
+        durationMin: 60,
+        tone: 'mint',
+      }),
+      offeringRecord({ id: 'off_retired0000000000000', name: 'Glow', isActive: false }),
+      offeringRecord({
+        id: 'off_serum00000000000000',
+        name: 'Serum',
+        category: 'product',
+      }),
+    ];
 
-    const treatments = await fetchBookableTreatments();
-
-    expect(api.get).toHaveBeenNthCalledWith(1, '/app/offerings', {
-      query: { category: 'treatment', is_active: 'true', sort: 'name', limit: 100 },
-    });
-    expect(lastQuery()).toMatchObject({ after: 'cursor-2' });
-    expect(treatments).toEqual([
+    expect(bookableTreatmentsOf(catalogue)).toEqual([
       {
         id: 'off_hydra000000000000000',
         name: 'Hydrafacial',
@@ -619,7 +612,7 @@ describe('fetchBookableTreatments (the form’s "From offerings")', () => {
         name: 'Peel',
         durationMin: 45,
         specialty: 'skin',
-        tone: 'mint',
+        tone: 'sage',
       },
     ]);
   });
@@ -803,7 +796,6 @@ describe('appointmentQueryKeys', () => {
       appointmentQueryKeys.range('org_test', range),
       appointmentQueryKeys.detail('org_test', APPOINTMENT_ID),
       appointmentQueryKeys.slots('org_test', slots),
-      appointmentQueryKeys.treatments('org_test'),
       appointmentQueryKeys.person('org_test', CONTACT_ID),
     ]) {
       expect(key.slice(0, 3)).toEqual(prefix);

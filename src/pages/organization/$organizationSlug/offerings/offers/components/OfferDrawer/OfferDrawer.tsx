@@ -1,5 +1,5 @@
 import type { TFunction } from 'i18next';
-import { type ReactNode, useId, useState } from 'react';
+import { type ReactNode, useId, useMemo, useState } from 'react';
 import { useForm, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -11,6 +11,7 @@ import {
   RecordDrawer,
   RecordDrawerPending,
 } from '@/shared/components/RecordDrawer/index.ts';
+import { RetryError } from '@/shared/components/RetryError/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
@@ -22,7 +23,7 @@ import {
   type StepMemory,
   useRememberedStep,
 } from '../../../shared/hooks/useRememberedStep/index.ts';
-import { OFFERS_KEYS, OFFERS_NS } from '../../offers.constants.ts';
+import { OFFER_PERMISSIONS, OFFERS_KEYS, OFFERS_NS } from '../../offers.constants.ts';
 import {
   OFFER_DRAWER_KEYS,
   OFFER_DRAWER_NS,
@@ -75,6 +76,8 @@ export interface OfferCreateDrawerProps extends OfferDrawerBaseProps {
 export interface OfferEditDrawerProps extends OfferDrawerBaseProps {
   mode: 'edit';
   offer: OfferRecord | undefined;
+  /** The offer's own read failed: Retry stands in for the form until it arrives. */
+  onRetry?: () => void;
 }
 
 /** Props of {@link OfferDrawer}. */
@@ -104,18 +107,19 @@ const FIELD_STEPS: Readonly<Record<keyof OfferFormValues, OfferStepId>> = {
 };
 
 /**
- * Who may do what here (D9, Q-U8): the drawer is editable with Offerings Edit
- * (Create for a new offer) and the `prices` ability, else view only; Delete
- * with Offerings Delete.
+ * Who may do what here, by the member's codes (research §7): the drawer is
+ * editable with `offering:update` (`offering:create` for a new offer), else
+ * view only; Delete with `offering:delete`. During View-as nothing is.
  */
 function useDrawerAccess(editing: boolean) {
   const access = useClinicAccess();
-  const canWrite =
-    access.can('offerings', editing ? 'edit' : 'create') && access.canAbility('prices');
+  const canWrite = access.canCode(
+    editing ? OFFER_PERMISSIONS.update : OFFER_PERMISSIONS.create,
+  );
   const readOnly = access.isResolved && !canWrite;
   return {
     readOnly,
-    canDelete: editing && !readOnly && access.can('offerings', 'delete'),
+    canDelete: editing && !readOnly && access.canCode(OFFER_PERMISSIONS.delete),
   };
 }
 
@@ -160,9 +164,14 @@ function OfferDrawerSession(props: SessionProps) {
     key: offer?.id ?? 'new',
     steps: view.steps.map((step) => step.id),
   });
+  const names = useMemo(
+    () => new Map(catalogue.offerings.map((offering) => [offering.id, offering.name])),
+    [catalogue.offerings],
+  );
   const { saveState, save } = useOfferSave({
     form,
-    offerId: offer?.id ?? null,
+    offer,
+    nameOf: (offeringId) => names.get(offeringId),
     onField: (field) => selectStep(FIELD_STEPS[field]),
     onDone: props.onClose,
   });
@@ -225,37 +234,67 @@ function OfferDrawerSession(props: SessionProps) {
 }
 
 /**
- * The Offer drawer (KICKOFF §6.11; `offerings.md:91–112, 145–157, 246–253`)
- * on the shared record drawer: New offer over the Offers tab and Edit offer —
- * editable with Offerings Edit and the `prices` ability (Q-U8), else view
- * only. Always three steps, "Offer" → "Where it applies" → "Notes"; reopening
- * the same offer returns to the step it had open. The value field follows the
- * Type, and switching Type resets it (10 · 500 · empty · 1); each picked
- * offering previews the offer on it ("₹1,200 → ₹1,080", "2 → 3 sessions").
- * Save is never disabled: an empty Name or no offering opens its step with
- * "Name the offer" / "Pick at least one offering"; a value of nothing and an
- * end before the start toast before the write. A save closes the drawer onto
- * the list (D28) with "<name> created · applies automatically" / "<name>
- * saved". Esc closes it (§7.3). No "Create & add another".
+ * Edit offer before its offer is here: the skeleton while its own read is in
+ * flight, Retry in place when it failed (a deep link whose read dropped).
  */
-export function OfferDrawer(props: OfferDrawerProps) {
-  const { session } = useDrawerSession(props.open);
-  const [memory, setMemory] = useState<StepMemory<OfferStepId> | null>(null);
+function OfferDrawerWaiting({
+  open,
+  onClose,
+  onRetry,
+}: Pick<OfferEditDrawerProps, 'open' | 'onClose' | 'onRetry'>) {
   const { t } = useTranslation(OFFER_DRAWER_NS);
   const { t: tRoom } = useTranslation(OFFERS_NS);
-
-  const { open, onClose, catalogue } = props;
-  if (props.mode === 'edit' && !props.offer) {
+  if (onRetry) {
     return (
-      <RecordDrawerPending
+      <RecordDrawer
         open={open}
         onClose={onClose}
         title={t(K.title.edit)}
         sub={t(K.sub)}
-        recordLabel={tRoom(OFFERS_KEYS.record)}
+        content={CONTENT_PROFILE}
         testId={OFFER_DRAWER_TEST_ID}
-      />
+      >
+        <RetryError onRetry={onRetry} />
+      </RecordDrawer>
     );
+  }
+  return (
+    <RecordDrawerPending
+      open={open}
+      onClose={onClose}
+      title={t(K.title.edit)}
+      sub={t(K.sub)}
+      recordLabel={tRoom(OFFERS_KEYS.record)}
+      content={CONTENT_PROFILE}
+      testId={OFFER_DRAWER_TEST_ID}
+    />
+  );
+}
+
+/**
+ * The Offer drawer (KICKOFF §6.11; `offerings.md:91–112, 145–157, 246–253`)
+ * on the shared record drawer: New offer over the Offers tab and Edit offer —
+ * editable with `offering:create` / `offering:update`, else view only; Delete
+ * with `offering:delete`. Always three steps, "Offer" → "Where it applies" →
+ * "Notes"; reopening the same offer returns to the step it had open. The value field follows the
+ * Type, and switching Type resets it (10 · 500 · empty · 1); each picked
+ * offering previews the offer on it ("₹1,200 → ₹1,080", "2 → 3 sessions").
+ * Save is never disabled: an empty Name or no offering opens its step with
+ * "Name the offer" / "Pick at least one offering"; a value of nothing and an
+ * end before the start toast before the write; the server's refusals land on
+ * their fields (a taken code on Code, an offering no longer active on
+ * Offerings by name), a stale save offers "Reload". A save — only what
+ * changed — closes the drawer onto the list (D28) with "<name> created ·
+ * applies automatically" / "<name> saved". Esc closes it (§7.3). No "Create &
+ * add another".
+ */
+export function OfferDrawer(props: OfferDrawerProps) {
+  const { session } = useDrawerSession(props.open);
+  const [memory, setMemory] = useState<StepMemory<OfferStepId> | null>(null);
+
+  const { open, onClose, catalogue } = props;
+  if (props.mode === 'edit' && !props.offer) {
+    return <OfferDrawerWaiting open={open} onClose={onClose} onRetry={props.onRetry} />;
   }
   const offer = props.mode === 'edit' ? (props.offer ?? null) : null;
   return (

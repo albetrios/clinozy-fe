@@ -10,23 +10,23 @@ import {
   readBranchFilter,
   readCreatedFilter,
 } from '@/shared/api/clinic/clinic-list-filters.ts';
-import type { OfferState } from '@/shared/api/clinic/offerings-contracts.ts';
+import type { OfferStatus } from '@/shared/api/clinic/offerings-contracts.ts';
 
-/** The derived offer states, in the tab's order (`S:101`; the test pins them). */
+/** The offer statuses, in the tab's order (`S:101`; the test pins them). */
 export const OFFER_STATE_FILTER = [
   'live',
   'scheduled',
   'paused',
   'ended',
-] as const satisfies readonly OfferState[];
+] as const satisfies readonly OfferStatus[];
 
 /** Validated `?…` search params for `/offerings/offers` and its dialog routes. */
 export interface OffersSearch {
   /** Name, code or an offering's name (≤ 80 characters). */
   q?: string;
-  /** Any of these derived states. */
-  status?: OfferState[];
-  /** Usable at any of these branches (ids), or at every branch (`all`). */
+  /** Any of these statuses. */
+  status?: OfferStatus[];
+  /** Usable at any of these branches (ids, `brn_…`), or at every branch (`all`). */
   branch?: string[];
   created?: CreatedFilter;
 }

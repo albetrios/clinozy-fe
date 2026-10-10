@@ -1,14 +1,24 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
+vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  deleteOffering: vi.fn(),
+  restoreOffering: vi.fn(),
+  deleteOffer: vi.fn(),
+  restoreOffer: vi.fn(),
+}));
 import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+  deleteOffer,
+  deleteOffering,
+  restoreOffer,
+  restoreOffering,
+} from '@/shared/api/clinic/offerings-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { offeringRecord, offerRecord } from '@/tests/utils/offering-doubles.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { CatalogueDeleteConfirm } from './CatalogueDeleteConfirm.tsx';
@@ -24,19 +34,27 @@ const { notifyMock } = vi.hoisted(() => ({
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 
-const CORN = ref.offering(270);
-const MONSOON = ref.offer(28);
-const liveOffering = () =>
-  clinicFixtures.offerings.snapshot((offering) => offering.id === CORN).length === 1;
-const liveOffer = () =>
-  clinicFixtures.offers.snapshot((offer) => offer.id === MONSOON).length === 1;
+const CORN = offeringRecord({ offeringNumber: 270, name: 'Corn Removal' });
+const MONSOON = offerRecord({ name: 'Monsoon ₹500 off' });
 
 beforeEach(() => {
+  vi.resetAllMocks();
   viewport.tier = 'desktop';
-  for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetClinicFixtures();
+  signInTestMember();
+  vi.mocked(deleteOffering).mockResolvedValue();
+  vi.mocked(restoreOffering).mockResolvedValue(CORN);
+  vi.mocked(deleteOffer).mockResolvedValue();
+  vi.mocked(restoreOffer).mockResolvedValue(MONSOON);
 });
-afterEach(() => resetClinicFixtures());
+
+/** The Undo the "removed" toast offered. */
+function undoOfToast() {
+  const [, { onUndo }] = notifyMock.undo.mock.calls[0] as [
+    string,
+    { onUndo: () => Promise<unknown> },
+  ];
+  return onUndo;
+}
 
 describe('CatalogueDeleteConfirm (KICKOFF §6.11 Delete confirm)', () => {
   it('deletes an offering with the reason, then offers Undo for "Offering #270 removed"', async () => {
@@ -45,7 +63,12 @@ describe('CatalogueDeleteConfirm (KICKOFF §6.11 Delete confirm)', () => {
     const onDeleted = vi.fn();
     renderWithProviders(
       <CatalogueDeleteConfirm
-        target={{ kind: 'offering', id: CORN, seq: 270, record: 'Corn Removal' }}
+        target={{
+          kind: 'offering',
+          id: CORN.id,
+          offeringNumber: 270,
+          record: 'Corn Removal',
+        }}
         onClose={onClose}
         onDeleted={onDeleted}
       />,
@@ -65,25 +88,28 @@ describe('CatalogueDeleteConfirm (KICKOFF §6.11 Delete confirm)', () => {
     await user.click(within(dialog).getByTestId('confirm-reason-not-needed'));
     await user.click(within(dialog).getByTestId('confirm-accept'));
     await waitFor(() => expect(onDeleted).toHaveBeenCalledTimes(1));
-    expect(liveOffering()).toBe(false);
+    expect(deleteOffering).toHaveBeenCalledWith({
+      offeringId: CORN.id,
+      reason: 'not_needed',
+      note: null,
+    });
     expect(notifyMock.undo).toHaveBeenCalledWith('Offering #270 removed', {
       onUndo: expect.any(Function),
     });
-    const [, { onUndo }] = notifyMock.undo.mock.calls[0] as [
-      string,
-      { onUndo: () => Promise<unknown> },
-    ];
-    await onUndo();
-    await waitFor(() => expect(liveOffering()).toBe(true));
+
+    await undoOfToast()();
+    await waitFor(() =>
+      expect(restoreOffering).toHaveBeenCalledWith(CORN.id, expect.any(String)),
+    );
   });
 
-  it('deletes an offer, naming it in the pill and the toast', async () => {
+  it('deletes an offer, naming it in the pill and the toast, and restores it on Undo', async () => {
     const user = userEvent.setup();
     renderWithProviders(
       <CatalogueDeleteConfirm
         target={{
           kind: 'offer',
-          id: MONSOON,
+          id: MONSOON.id,
           name: 'Monsoon ₹500 off',
           record: 'Monsoon ₹500 off',
         }}
@@ -94,10 +120,21 @@ describe('CatalogueDeleteConfirm (KICKOFF §6.11 Delete confirm)', () => {
     expect(within(dialog).getByText('Delete this offer?')).toBeInTheDocument();
     await user.click(within(dialog).getByTestId('confirm-reason-duplicate'));
     await user.click(within(dialog).getByTestId('confirm-accept'));
-    await waitFor(() => expect(liveOffer()).toBe(false));
+    await waitFor(() =>
+      expect(deleteOffer).toHaveBeenCalledWith({
+        offerId: MONSOON.id,
+        reason: 'duplicate',
+        note: null,
+      }),
+    );
     expect(notifyMock.undo).toHaveBeenCalledWith('Monsoon ₹500 off removed', {
       onUndo: expect.any(Function),
     });
+
+    await undoOfToast()();
+    await waitFor(() =>
+      expect(restoreOffer).toHaveBeenCalledWith(MONSOON.id, expect.any(String)),
+    );
   });
 
   it('stays closed without a target, and "Keep it" closes it', async () => {
@@ -110,13 +147,18 @@ describe('CatalogueDeleteConfirm (KICKOFF §6.11 Delete confirm)', () => {
     unmount();
     renderWithProviders(
       <CatalogueDeleteConfirm
-        target={{ kind: 'offering', id: CORN, seq: 270, record: 'Corn Removal' }}
+        target={{
+          kind: 'offering',
+          id: CORN.id,
+          offeringNumber: 270,
+          record: 'Corn Removal',
+        }}
         onClose={onClose}
       />,
     );
     const dialog = await screen.findByTestId('confirm-dialog');
     await user.click(within(dialog).getByRole('button', { name: 'Keep it' }));
     expect(onClose).toHaveBeenCalled();
-    expect(liveOffering()).toBe(true);
+    expect(deleteOffering).not.toHaveBeenCalled();
   });
 });

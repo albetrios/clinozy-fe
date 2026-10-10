@@ -11,8 +11,8 @@ import {
   SUGGESTION_STATUS_VALUES,
   type SuggestionStatus,
   type Tone,
-  TONE_VALUES,
 } from './clinic-schema.ts';
+import { type OfferingRecord, offeringsByName } from './offerings-contracts.ts';
 
 /*
  * A patient's plan on clinozy-be (api-integration §5.4; route map `getPlan`): the offering
@@ -20,7 +20,7 @@ import {
  * (`meta.plan_total`, the planned and accepted rows), what each row invoiced
  * (`invoiced_quantity`, `is_fully_invoiced`), its lowest-price flag (`is_below_lowest_price`)
  * and where it was made (`source_label`); the ideas (`…/offering-ideas`); the offerings the card
- * names and adds from (`/app/offerings`); and the contact's last messages
+ * names and adds from (the one catalogue, `useOfferings`); and the contact's last messages
  * (`/app/contacts/:contact_id/activities`). The client computes none of these (§7). Money is in
  * rupees, as the API sends it.
  */
@@ -28,7 +28,6 @@ import {
 type ApiSuggestion = NonNullable<
   ApiData<'/app/patients/{patient_id}/offering-suggestions', 'get'>
 >[number];
-type ApiOffering = NonNullable<ApiData<'/app/offerings', 'get'>>[number];
 type ApiActivity = NonNullable<
   ApiData<'/app/contacts/{contact_id}/activities', 'get'>
 >[number];
@@ -147,21 +146,6 @@ export function toPlanIdeaRow(row: z.output<typeof planIdeaWire>): PlanIdeaRow {
   };
 }
 
-/** An offering as the catalogue answers it — the parts the plan card reads. */
-export const planOfferingWire = wireSchema<ApiOffering>()(
-  z.object({
-    id: z.string(),
-    name: z.string(),
-    category: z.enum(OFFERING_CATEGORY_VALUES),
-    tone: z.enum(TONE_VALUES),
-    sessions: z.number().int(),
-    price: z.number(),
-    offer_price: z.number().nullable(),
-    min_price: z.number().nullable(),
-    is_active: z.boolean(),
-  }),
-);
-
 /** An offering the card names a row by, prices it with, and adds from ("Add offering"). */
 export interface PlanOffering {
   id: string;
@@ -179,19 +163,24 @@ export interface PlanOffering {
   isActive: boolean;
 }
 
-/** A catalogue row from the wire. */
-export function toPlanOffering(row: z.output<typeof planOfferingWire>): PlanOffering {
-  return {
-    id: row.id,
-    name: row.name,
-    category: row.category,
-    tone: row.tone,
-    sessions: row.sessions,
-    price: row.price,
-    offerPrice: row.offer_price,
-    minPrice: row.min_price,
-    isActive: row.is_active,
-  };
+/**
+ * The plan card's offerings out of the clinic's one offerings catalogue (`useOfferings`), active
+ * or not, A to Z — what it names a row by, prices it with and adds from.
+ */
+export function planOfferingsOf(catalogue: readonly OfferingRecord[]): PlanOffering[] {
+  return offeringsByName(catalogue).map(
+    ({ id, name, category, tone, sessions, price, offerPrice, minPrice, isActive }) => ({
+      id,
+      name,
+      category,
+      tone,
+      sessions,
+      price,
+      offerPrice,
+      minPrice,
+      isActive,
+    }),
+  );
 }
 
 /** One unit's billed price — the offer price, else the list price (PK9). */

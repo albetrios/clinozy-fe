@@ -76,7 +76,8 @@ describe('resolveAccessFromCodes', () => {
 describe('useClinicAccess — a room on the API answers from the member’s codes', () => {
   it('opens Leads and Appointments by their codes and keeps the fixture rooms on the matrix', async () => {
     // A member with only lead and appointment codes: no clinic role and no staff profile, so
-    // the fixture matrix would show them Today only.
+    // the fixture matrix would show them Today only. Offerings is on the API too and every
+    // member reads it (`organization:read`, research §7).
     signIn([
       'organization:read',
       'lead:read',
@@ -95,7 +96,13 @@ describe('useClinicAccess — a room on the API answers from the member’s code
     expect(result.current.can('appointments', 'edit')).toBe(true);
     expect(result.current.can('appointments', 'create')).toBe(false);
     expect(result.current.can('patients', 'view')).toBe(false);
-    expect(result.current.viewableSections).toEqual(['today', 'leads', 'appointments']);
+    expect(result.current.viewableSections).toEqual([
+      'today',
+      'leads',
+      'appointments',
+      'offerings',
+    ]);
+    expect(result.current.can('offerings', 'edit')).toBe(false);
   });
 
   it('a live room loses what the codes do not grant, whatever the matrix says', async () => {

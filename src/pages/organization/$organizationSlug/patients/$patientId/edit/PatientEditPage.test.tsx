@@ -52,6 +52,11 @@ vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchPersonAppointments: vi.fn(),
 }));
+// The Activity chat behind the drawer names offerings from the one catalogue: none here.
+vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchAllOfferings: vi.fn(async () => []),
+}));
 
 const LIST = '/organization/acme/patients';
 

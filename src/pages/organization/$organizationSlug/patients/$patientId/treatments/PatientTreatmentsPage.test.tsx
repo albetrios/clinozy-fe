@@ -3,12 +3,13 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type * as AppointmentsApiModule from '@/shared/api/clinic/appointments-api.ts';
 import type * as DirectoryApiModule from '@/shared/api/clinic/directory-api.ts';
+import type * as OfferingsApiModule from '@/shared/api/clinic/offerings-api.ts';
 import type * as PatientPackagesApiModule from '@/shared/api/clinic/patient-packages-api.ts';
 import type * as TreatmentsApiModule from '@/shared/api/clinic/treatments-api.ts';
 import { createTreatment, reverseTreatment } from '@/shared/api/clinic/treatments-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+import { offeringRecord } from '@/tests/utils/offering-doubles.ts';
 import { patientFile } from '@/tests/utils/patient-doubles.ts';
 
 import {
@@ -61,9 +62,11 @@ vi.mock('@/shared/api/clinic/patient-packages-api.ts', async (importOriginal) =>
     ...packagesApiDouble(world),
   };
 });
-vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => ({
-  ...(await importOriginal<typeof AppointmentsApiModule>()),
-  fetchBookableTreatments: vi.fn(async () => BOOKABLE_TREATMENTS),
+vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof OfferingsApiModule>()),
+  fetchAllOfferings: vi.fn(async () =>
+    BOOKABLE_TREATMENTS.map((treatment) => offeringRecord(treatment)),
+  ),
 }));
 vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof DirectoryApiModule>()),

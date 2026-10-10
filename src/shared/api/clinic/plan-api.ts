@@ -12,25 +12,22 @@ import {
   planActivityWire,
   type PlanIdeaRow,
   planIdeaWire,
-  type PlanOffering,
-  planOfferingWire,
   type PlanSuggestionRow,
   planSuggestionWire,
   type SuggestionChange,
   type SuggestionCreateInput,
   toPlanActivityRow,
   toPlanIdeaRow,
-  toPlanOffering,
   toPlanSuggestionRow,
 } from './plan-contracts.ts';
 
 /*
  * A patient's plan on clinozy-be (api-integration §5.4): the rows and their total
- * (`…/offering-suggestions`, every page), the ideas (`…/offering-ideas`), the offerings
- * catalogue the card names and adds from, the contact's last messages — and the row writes:
- * add (409 `suggestion_exists`), change (`expected_updated_at`), remove with a reason, restore.
- * Linking an invoice line to a row is the invoice's `patient_offering_suggestion_id` — no call
- * here.
+ * (`…/offering-suggestions`, every page), the ideas (`…/offering-ideas`), the contact's last
+ * messages — and the row writes: add (409 `suggestion_exists`), change (`expected_updated_at`),
+ * remove with a reason, restore. The offerings the card names and adds from are the one
+ * catalogue (`useOfferings`). Linking an invoice line to a row is the invoice's
+ * `patient_offering_suggestion_id` — no call here.
  */
 
 /** TanStack Query keys for the plans — under the patients' key. */
@@ -44,13 +41,12 @@ export const planQueryKeys = {
 };
 
 /**
- * TanStack Query keys for what the card reads around a plan — the offerings catalogue and the
- * contact's last messages — apart from the plan's, so a plan write does not refetch them.
+ * TanStack Query keys for what the card reads around a plan — the contact's last messages —
+ * apart from the plan's, so a plan write does not refetch them. (The offerings catalogue is the
+ * Offerings room's own entry, `offeringQueryKeys.list`.)
  */
 export const planContextQueryKeys = {
   all: ['clinic', 'plan-context'] as const,
-  offerings: (organizationId: string | null) =>
-    [...planContextQueryKeys.all, organizationId, 'offerings'] as const,
   activity: (organizationId: string | null, contactId: string) =>
     [...planContextQueryKeys.all, organizationId, 'activity', contactId] as const,
 };
@@ -100,20 +96,6 @@ export async function fetchPlanIdeas(patientId: string): Promise<PlanIdeaRow[]> 
     params: { patient_id: patientId },
   });
   return z.array(planIdeaWire).parse(response.data).map(toPlanIdeaRow);
-}
-
-/** Every offering of the clinic, active or not, by name (every page). */
-export async function fetchPlanOfferings(): Promise<PlanOffering[]> {
-  const rows = await collectAllPages(async (after) => {
-    const response = await api.get('/app/offerings', {
-      query: { sort: 'name', order: 'asc', limit: PAGE_SIZE, after: after ?? undefined },
-    });
-    return {
-      rows: z.array(planOfferingWire).parse(response.data ?? []),
-      next: nextCursor(response.meta),
-    };
-  }, 'plan-offerings');
-  return rows.map(toPlanOffering);
 }
 
 /** The contact's last five messages and calls, newest first. */

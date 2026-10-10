@@ -4,11 +4,13 @@ import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { organizationOfferings } from '@/lib/routes/offerings-builders.ts';
+import { PUBLIC_ID } from '@/lib/routes/search-params.ts';
 import { fetchOffering, offeringQueryKeys } from '@/shared/api/clinic/offerings-api.ts';
 import type { OfferingRecord } from '@/shared/api/clinic/offerings-contracts.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDialogRouteRecord } from '@/shared/hooks/useDialogRouteRecord/index.ts';
 import { notify } from '@/shared/notify/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 import { OFFERINGS_KEYS, OFFERINGS_NS } from '../../offerings.constants.ts';
 import {
@@ -35,13 +37,16 @@ const CREATE_PATH = /\/offerings\/create\/?$/;
 
 /**
  * Which dialog the URL opens over the Offerings list — the room's dialog
- * routes render nothing, so the page reads them here. A member without Create
- * who follows a create link lands back on the list with the permission toast.
- * An offering id that names no offering (a stale link, a deleted offering)
- * opens nothing: the URL goes back to the list in place, with "Offering not
- * found · it may have been deleted" (`S:115`). The edit route stays open to a
- * viewer — the drawer is view only (`S:100`). `close` returns to the list with
- * its search, filters and sort, and drops the prefill.
+ * routes render nothing, so the page reads them here. A member without
+ * `offering:create` who follows a create link lands back on the list with the
+ * permission toast. The offering is read by its public id
+ * (`GET /app/offerings/:offering_id`, the cache entry the drawer's writes
+ * refresh); an id that names no offering (a stale link, a deleted offering —
+ * 404 — or no public id at all) opens nothing: the URL goes back to the list
+ * in place, with "Offering not found · it may have been deleted" (`S:115`).
+ * The edit route stays open to a viewer — the drawer is view only (`S:100`).
+ * `close` returns to the list with its search, filters and sort, and drops the
+ * prefill.
  */
 export function useOfferingsDialogRoute(): OfferingsDialogRouteState {
   const { organizationSlug = '', offeringId } = useParams({ strict: false });
@@ -51,6 +56,7 @@ export function useOfferingsDialogRoute(): OfferingsDialogRouteState {
   const { t } = useTranslation(ERRORS_NS);
   const { t: tRoom } = useTranslation(OFFERINGS_NS);
   const access = useClinicAccess();
+  const organizationId = useOrganizationStore((state) => state.organizationId);
 
   const close = useCallback(() => {
     void navigate({
@@ -61,16 +67,19 @@ export function useOfferingsDialogRoute(): OfferingsDialogRouteState {
     });
   }, [navigate, organizationSlug]);
 
+  const recordLabel = tRoom(OFFERINGS_KEYS.record);
   const drawer = useDialogRouteRecord({
     id: offeringId,
-    queryKey: offeringQueryKeys.detail,
+    queryKey: (id) => offeringQueryKeys.detail(organizationId, id),
     fetchRecord: fetchOffering,
-    recordLabel: tRoom(OFFERINGS_KEYS.record),
+    recordLabel,
     onMissing: close,
+    // An old uuid link or a mistyped one: "not found", never sent (the API answers it 400).
+    isWellFormed: (id) => PUBLIC_ID.test(id),
   });
 
   const isCreate = CREATE_PATH.test(pathname);
-  const refused = isCreate && access.isResolved && !access.can('offerings', 'create');
+  const refused = isCreate && access.isResolved && !access.canCode('offering:create');
   const refusedFor = useRef<string | null>(null);
   useEffect(() => {
     if (!refused || refusedFor.current === pathname) return;

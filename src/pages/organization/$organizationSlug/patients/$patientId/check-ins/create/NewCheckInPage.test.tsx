@@ -12,6 +12,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import type * as FeedbackApiModule from '@/shared/api/clinic/feedback-api.ts';
+import type * as OfferingsApiModule from '@/shared/api/clinic/offerings-api.ts';
 import type * as TreatmentsApiModule from '@/shared/api/clinic/treatments-api.ts';
 import { PATIENT_FILE_SECTIONS } from '@/shared/clinic/patient-file-sections.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
@@ -46,10 +47,13 @@ vi.mock('../../patient-id.sections.ts', async () => {
     ),
   };
 });
+vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof OfferingsApiModule>()),
+  fetchAllOfferings: vi.fn(async () => []),
+}));
 vi.mock('@/shared/api/clinic/feedback-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof FeedbackApiModule>()),
   fetchPreviousCheckIn: vi.fn(async () => null),
-  listCheckInOfferings: vi.fn(async () => []),
 }));
 vi.mock('@/shared/api/clinic/treatments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof TreatmentsApiModule>()),

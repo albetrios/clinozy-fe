@@ -3,13 +3,42 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
+vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchAllOffers: vi.fn(),
+  fetchOffer: vi.fn(),
+  createOffer: vi.fn(),
+  updateOffer: vi.fn(),
+  setOfferActive: vi.fn(),
+  deleteOffer: vi.fn(),
+  restoreOffer: vi.fn(),
+}));
+vi.mock('@/shared/notify/index.ts', () => ({
+  notify: { success: vi.fn(), error: vi.fn(), info: vi.fn(), undo: vi.fn() },
+}));
 import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import type * as OfferingsApiModule from '@/shared/api/clinic/offerings-api.ts';
+  createOffer,
+  deleteOffer,
+  fetchAllOffers,
+  fetchOffer,
+  offerQueryKeys,
+  restoreOffer,
+  setOfferActive,
+  updateOffer,
+} from '@/shared/api/clinic/offerings-api.ts';
+import {
+  OFFER_DEFAULTS,
+  type OfferFields,
+  type OfferRecord,
+} from '@/shared/api/clinic/offerings-contracts.ts';
 import { notify } from '@/shared/notify/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import {
+  offerRecord,
+  TEST_OFFER_ID,
+  TEST_OFFERING_ID,
+} from '@/tests/utils/offering-doubles.ts';
 
 import {
   useCreateOffer,
@@ -17,188 +46,170 @@ import {
   useOffer,
   useOffers,
   useRestoreOffer,
-  useSetOfferPaused,
+  useSetOfferActive,
   useUpdateOffer,
 } from './useOffers.ts';
 
-/** Holds a pause until a test lets it land, so the optimistic flip can be seen. */
-const gate = vi.hoisted(() => ({ hold: null as Promise<void> | null }));
-
-vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => {
-  const actual = await importOriginal<typeof OfferingsApiModule>();
-  return {
-    ...actual,
-    setOfferPaused: async (...args: Parameters<typeof actual.setOfferPaused>) => {
-      await gate.hold;
-      return actual.setOfferPaused(...args);
-    },
-  };
-});
-vi.mock('@/shared/notify/index.ts', () => ({
-  notify: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
-}));
-
-const NAVRATRI = ref.offer(31);
-const MONSOON = ref.offer(28);
+const FIELDS: OfferFields = {
+  ...OFFER_DEFAULTS,
+  name: 'Research Diwali glow',
+  offeringIds: [TEST_OFFERING_ID],
+};
+const LIST = offerQueryKeys.list('org_test');
 
 let client: QueryClient;
 function wrapper({ children }: { children: ReactNode }) {
   return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
 }
 
-/** The offers hook beside the write under test, sharing one cache. */
-function renderWith<T>(useWrite: () => T) {
-  return renderHook(() => ({ list: useOffers(), write: useWrite() }), { wrapper });
+/** A write that lands when the test says so. */
+function held<T>(value: T) {
+  let land: () => void = () => undefined;
+  const promise = new Promise<T>((resolve) => {
+    land = () => resolve(value);
+  });
+  return { promise, land: () => land() };
 }
 
-const pausedOf = (offers: { id: string; paused: boolean }[] | undefined, id: string) =>
-  offers?.find((offer) => offer.id === id)?.paused;
+const cachedOffer = () => client.getQueryData<OfferRecord[]>(LIST)?.[0];
 
 beforeEach(() => {
-  client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  gate.hold = null;
-  vi.mocked(notify.success).mockClear();
-  vi.mocked(notify.error).mockClear();
-  resetClinicFixtures();
+  vi.resetAllMocks();
+  signInTestMember();
+  client = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
 });
 afterEach(() => {
   client.clear();
-  resetClinicFixtures();
+  useOrganizationStore.getState().clearOrganization();
 });
 
-describe('useOffers', () => {
-  it('reads every offer into one cache entry', async () => {
-    const { result } = renderHook(() => useOffers(), { wrapper });
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data?.map((offer) => offer.name)).toEqual([
-      'Peel pack + 1 free',
-      'Navratri glow',
-      'LHR launch · Vesu',
-      'Monsoon ₹500 off',
-    ]);
-  });
-});
-
-describe('useOffer', () => {
-  it('reads one offer, and stays idle without an id', async () => {
-    const { result } = renderHook(() => useOffer(NAVRATRI), { wrapper });
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data?.code).toBe('GLOW20');
-
-    const idle = renderHook(() => useOffer(undefined), { wrapper });
-    expect(idle.result.current.fetchStatus).toBe('idle');
-  });
-});
-
-describe('useCreateOffer and useUpdateOffer', () => {
-  it('creates and says "<name> created · applies automatically"', async () => {
-    const { result } = renderWith(() => useCreateOffer());
-    await waitFor(() => expect(result.current.list.isSuccess).toBe(true));
-
-    await act(() =>
-      result.current.write.mutateAsync({
-        name: 'Diwali glow',
-        offeringIds: [ref.offering(274)],
-      }),
-    );
-
-    expect(notify.success).toHaveBeenCalledWith(
-      'Diwali glow created · applies automatically',
-    );
-    await waitFor(() => expect(result.current.list.data).toHaveLength(5));
-  });
-
-  it('saves and says "<name> saved"', async () => {
-    const { result } = renderHook(() => useUpdateOffer(), { wrapper });
-    await act(() =>
-      result.current.mutateAsync({ id: NAVRATRI, patch: { note: 'Festival only' } }),
-    );
-    expect(notify.success).toHaveBeenCalledWith('Navratri glow saved');
-  });
-});
-
-describe('useSetOfferPaused', () => {
-  it('flips the offer at once, then says "Navratri glow paused" / "… running again"', async () => {
-    const { result } = renderWith(() => useSetOfferPaused());
-    await waitFor(() => expect(result.current.list.isSuccess).toBe(true));
-    let release: () => void = () => undefined;
-    gate.hold = new Promise((resolve) => {
-      release = resolve;
-    });
-
-    let landed: Promise<unknown> = Promise.resolve();
-    act(() => {
-      landed = result.current.write.mutateAsync({ id: NAVRATRI, paused: true });
-    });
-    await waitFor(() => expect(pausedOf(result.current.list.data, NAVRATRI)).toBe(true));
-    expect(notify.success).not.toHaveBeenCalled();
-
-    release();
-    await act(() => landed);
-    expect(notify.success).toHaveBeenCalledWith('Navratri glow paused', {
-      id: 'clinic-offer-paused',
-    });
-    await waitFor(() => expect(result.current.list.isFetching).toBe(false));
-    expect(pausedOf(result.current.list.data, NAVRATRI)).toBe(true);
-
-    gate.hold = null;
-    await act(() => result.current.write.mutateAsync({ id: NAVRATRI, paused: false }));
-    expect(notify.success).toHaveBeenLastCalledWith('Navratri glow running again', {
-      id: 'clinic-offer-paused',
-    });
-  });
-
-  it('flips back and says why when the write fails', async () => {
-    const { result } = renderWith(() => useSetOfferPaused());
-    await waitFor(() => expect(result.current.list.isSuccess).toBe(true));
-    // Gone on the server while this screen still shows it.
-    await clinicFixtures.offers.remove(MONSOON, 'duplicate', null);
-
-    await act(async () => {
-      await result.current.write
-        .mutateAsync({ id: MONSOON, paused: true })
-        .catch(() => undefined);
-    });
-
-    expect(pausedOf(result.current.list.data, MONSOON)).toBe(false);
-    expect(notify.error).toHaveBeenCalledTimes(1);
-  });
-});
-
-describe('useDeleteOffer and useRestoreOffer', () => {
-  it('drops the offer at once and brings it back on Undo, both silently', async () => {
+describe('the offers reads', () => {
+  it('reads every offer under the organization, and one by id', async () => {
+    vi.mocked(fetchAllOffers).mockResolvedValue([offerRecord()]);
+    vi.mocked(fetchOffer).mockResolvedValue(offerRecord());
     const { result } = renderHook(
-      () => ({ list: useOffers(), remove: useDeleteOffer(), restore: useRestoreOffer() }),
+      () => ({ list: useOffers(), one: useOffer(TEST_OFFER_ID) }),
       { wrapper },
     );
-    await waitFor(() => expect(result.current.list.isSuccess).toBe(true));
-    const ids = () => result.current.list.data?.map((offer) => offer.id) ?? [];
-
-    await act(() =>
-      result.current.remove.mutateAsync({
-        id: NAVRATRI,
-        reason: 'not_needed',
-        note: null,
-      }),
-    );
-    await waitFor(() => expect(ids()).not.toContain(NAVRATRI));
-
-    await act(() => result.current.restore.mutateAsync(NAVRATRI));
-    await waitFor(() => expect(ids()).toContain(NAVRATRI));
-    expect(notify.success).not.toHaveBeenCalled();
+    await waitFor(() => expect(result.current.list.data).toHaveLength(1));
+    await waitFor(() => expect(result.current.one.data?.status).toBe('live'));
+    expect(fetchOffer).toHaveBeenCalledWith(TEST_OFFER_ID);
   });
 
-  it('puts the offer back and says why when the delete is refused', async () => {
-    const { result } = renderWith(() => useDeleteOffer());
-    await waitFor(() => expect(result.current.list.isSuccess).toBe(true));
+  it('waits for an organization', () => {
+    useOrganizationStore.getState().clearOrganization();
+    renderHook(() => useOffers(), { wrapper });
+    expect(fetchAllOffers).not.toHaveBeenCalled();
+  });
+});
 
+describe('the writes', () => {
+  it('creates and saves with the action’s key, naming the offer in the toast', async () => {
+    const record = offerRecord();
+    vi.mocked(createOffer).mockResolvedValue(record);
+    vi.mocked(updateOffer).mockResolvedValue(record);
+    const { result } = renderHook(
+      () => ({ create: useCreateOffer(), update: useUpdateOffer() }),
+      { wrapper },
+    );
+
+    await act(() => result.current.create.mutateAsync({ fields: FIELDS }));
+    await act(() => result.current.update.mutateAsync({ record, fields: FIELDS }));
+
+    expect(createOffer).toHaveBeenCalledWith({
+      fields: FIELDS,
+      idempotencyKey: expect.any(String),
+    });
+    expect(updateOffer).toHaveBeenCalledWith({
+      record,
+      fields: FIELDS,
+      idempotencyKey: expect.any(String),
+    });
+    expect(notify.success).toHaveBeenCalledWith(
+      'Research Diwali glow created · applies automatically',
+    );
+    expect(notify.success).toHaveBeenCalledWith('Research Diwali glow saved');
+  });
+
+  it('pauses at once, then reads the server’s answer into the row', async () => {
+    const paused = offerRecord({ isActive: false, status: 'paused', updatedAt: 'later' });
+    const write = held(paused);
+    vi.mocked(setOfferActive).mockReturnValue(write.promise);
+    client.setQueryData(LIST, [offerRecord()]);
+    const { result } = renderHook(() => useSetOfferActive(), { wrapper });
+
+    let pausing: Promise<OfferRecord> = Promise.resolve(paused);
+    act(() => {
+      pausing = result.current.mutateAsync({ id: TEST_OFFER_ID, isActive: false });
+    });
+    await waitFor(() =>
+      expect(cachedOffer()).toMatchObject({ isActive: false, status: 'paused' }),
+    );
+    write.land();
+    await act(() => pausing);
+
+    expect(setOfferActive).toHaveBeenCalledWith({
+      offerId: TEST_OFFER_ID,
+      isActive: false,
+      idempotencyKey: expect.any(String),
+    });
+    expect(cachedOffer()?.updatedAt).toBe('later');
+    expect(notify.success).toHaveBeenCalledWith('Research Diwali glow paused', {
+      id: 'clinic-offer-paused',
+    });
+  });
+
+  it('resumes with the status the server works out, and flips back when the write fails', async () => {
+    client.setQueryData(LIST, [offerRecord({ isActive: false, status: 'paused' })]);
+    vi.mocked(setOfferActive).mockResolvedValueOnce(
+      offerRecord({ isActive: true, status: 'scheduled' }),
+    );
+    const onSuccess = vi.fn();
+    const { result } = renderHook(() => useSetOfferActive({ onSuccess }), { wrapper });
+
+    await act(() => result.current.mutateAsync({ id: TEST_OFFER_ID, isActive: true }));
+    expect(cachedOffer()).toMatchObject({ isActive: true, status: 'scheduled' });
+    expect(onSuccess).toHaveBeenCalledTimes(1);
+
+    vi.mocked(setOfferActive).mockRejectedValueOnce(new Error('offline'));
     await act(async () => {
-      await result.current.write
-        .mutateAsync({ id: NAVRATRI, reason: 'other', note: '  ' })
+      await result.current
+        .mutateAsync({ id: TEST_OFFER_ID, isActive: false })
         .catch(() => undefined);
     });
+    expect(cachedOffer()).toMatchObject({ isActive: true, status: 'scheduled' });
+  });
 
-    expect(result.current.list.data?.map((offer) => offer.id)).toContain(NAVRATRI);
-    expect(notify.error).toHaveBeenCalledTimes(1);
+  it('takes a deleted offer out at once and restores it with the Undo’s key', async () => {
+    const write = held(undefined);
+    vi.mocked(deleteOffer).mockReturnValue(write.promise);
+    vi.mocked(restoreOffer).mockResolvedValue(offerRecord());
+    client.setQueryData(LIST, [offerRecord()]);
+    const { result } = renderHook(
+      () => ({ remove: useDeleteOffer(), restore: useRestoreOffer() }),
+      { wrapper },
+    );
+
+    let deleting: Promise<void> = Promise.resolve();
+    act(() => {
+      deleting = result.current.remove.mutateAsync({
+        id: TEST_OFFER_ID,
+        reason: 'duplicate',
+        note: null,
+      });
+    });
+    await waitFor(() => expect(client.getQueryData(LIST)).toEqual([]));
+    write.land();
+    await act(() => deleting);
+    expect(deleteOffer).toHaveBeenCalledWith({
+      offerId: TEST_OFFER_ID,
+      reason: 'duplicate',
+      note: null,
+    });
+
+    await act(() => result.current.restore.mutateAsync(TEST_OFFER_ID));
+    expect(restoreOffer).toHaveBeenCalledWith(TEST_OFFER_ID, expect.any(String));
   });
 });

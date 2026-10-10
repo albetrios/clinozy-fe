@@ -4,12 +4,14 @@ Route: `/organization/$organizationSlug/offerings/$offeringId/edit` — a URL-dr
 over the Offerings tab (KICKOFF §4, D24; `S:100`). The route renders nothing: the Offerings
 page reads the URL and opens the offering's drawer over the list, so a refresh or a shared
 link reopens it. A row click and a row's Edit come here. The `$offeringId` segment has no
-page of its own — its folder holds only this island. Gated like the room — membership
-(`organization:read`) and the `clinic-offerings` module, then `requireOrgStatus`. The route
-stays reachable for a viewer: without Offerings Edit the drawer is view only ("View only ·
-your role can’t change this"), and without Offerings Delete it has no Delete. An id that names
-no offering (a stale link, a deleted offering) goes back to the list in place with "Offering
-not found · it may have been deleted" (`S:115`). The drawer is the room's `OfferingDrawer`
+page of its own — its folder holds only this island. `$offeringId` is the offering's public
+id (`off_…`); the page reads it with `GET /app/offerings/:offering_id`. Gated like the room —
+membership (`organization:read`) and the `clinic-offerings` module, then `requireOrgStatus`.
+The route stays reachable for a viewer: without `offering:update` the drawer is view only
+("View only · your role can’t change this"), and without `offering:delete` it has no Delete.
+An id that names no offering (a stale link, a deleted offering — the API's 404 — or no public
+id at all, never sent to the API) goes back to the list in place with "Offering not found · it
+may have been deleted" (`S:115`). The drawer is the room's `OfferingDrawer`
 (`../../components/OfferingDrawer/`), opened by the page through
 `../../hooks/useOfferingsDialogRoute/`; saving, deleting or closing it returns to the list with
 the list's own params.
