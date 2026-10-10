@@ -53,9 +53,13 @@ vi.mock(
   '@/pages/organization/$organizationSlug/payments/components/PaymentsDrawers/index.ts',
   () => ({ PaymentsDialogHost: probe('payments') }),
 );
+// Slow, as a real chunk is: the host is still loading when the drawer's gate has passed.
 vi.mock(
   '@/pages/organization/$organizationSlug/appointments/components/AppointmentDialog/index.ts',
-  () => ({ AppointmentDialog: probe('appointments') }),
+  async () => {
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    return { AppointmentDialog: probe('appointments') };
+  },
 );
 vi.mock(
   '@/pages/organization/$organizationSlug/medical/sales/components/SaleDrawers/index.ts',
@@ -68,6 +72,10 @@ const NEW_INVOICE = clinicCommandNavigation('newInvoice', {
   organizationSlug: 'acme',
   referrer: 'today',
   search: { type: 'clinic' },
+});
+const NEW_APPOINTMENT = clinicCommandNavigation('newAppointment', {
+  organizationSlug: 'acme',
+  referrer: 'today',
 });
 
 /** What a room's host reads of its drawer route. */
@@ -93,6 +101,9 @@ function renderShell(
         <button type="button" onClick={() => void navigate(NEW_INVOICE)}>
           New invoice
         </button>
+        <button type="button" onClick={() => void navigate(NEW_APPOINTMENT)}>
+          New appointment
+        </button>
       </>
     );
   }
@@ -115,8 +126,14 @@ function renderShell(
     beforeLoad: ({ location }) => handOverToReferrer(location),
     component: () => <p data-testid="payments-page">Payments</p>,
   });
+  const appointmentCreate = createRoute({
+    getParentRoute: () => root,
+    path: '/organization/$organizationSlug/appointments/create',
+    beforeLoad: ({ location }) => handOverToReferrer(location),
+    component: () => <p data-testid="appointments-page">Appointments</p>,
+  });
   const router = createRouter({
-    routeTree: root.addChildren([today, invoiceCreate]),
+    routeTree: root.addChildren([today, invoiceCreate, appointmentCreate]),
     history,
   });
   const view = render(<RouterProvider router={router} />);
@@ -164,6 +181,22 @@ describe('CrossRoomDialogs (KICKOFF §4, A-P1)', () => {
     expect(router.state.location.search).toEqual({ lane: 'checkout' });
     expect(router.history.location.href).toBe(`${TODAY}?lane=checkout`);
     expect(mounted).toHaveBeenCalledOnce();
+  });
+
+  it('loads the room’s host before it renders — never suspending through use() outside the router', async () => {
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      renderShell(TODAY);
+      await screen.findByTestId('today-page');
+      fireEvent.click(screen.getByRole('button', { name: 'New appointment' }));
+      await screen.findByTestId('probe-appointments', undefined, { timeout: 3000 });
+      const uses = errors.mock.calls.filter((call) =>
+        call.some((part) => String(part).includes('did not call use()')),
+      );
+      expect(uses).toEqual([]);
+    } finally {
+      errors.mockRestore();
+    }
   });
 
   it('refuses a drawer its gate denies: the permission toast, and the page alone', async () => {

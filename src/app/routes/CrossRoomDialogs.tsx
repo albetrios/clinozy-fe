@@ -98,6 +98,13 @@ function CrossRoomDialogHost({ dialog }: { dialog: CrossRoomDialogLocation }) {
 
   useEffect(() => {
     let live = true;
+    // The room's host loads while the gate runs: rendered here, outside the router's chunk
+    // preloader, a lazy host still loading suspends through `use()` and React warns that it
+    // "did not call use() when it finished" (preloadAppShell). A failed load is left to the
+    // host's own render — its error boundary — not read as a refusal.
+    const host = Promise.resolve(HOSTS[dialog.route.name].preload?.()).catch(
+      () => undefined,
+    );
     const gate = async () => {
       const { DIALOG_ROUTES } = await import('./dialog-routes.ts');
       const { manifest } = DIALOG_ROUTES[dialog.route.name];
@@ -107,6 +114,7 @@ function CrossRoomDialogHost({ dialog }: { dialog: CrossRoomDialogLocation }) {
           dialog.params,
         ),
       );
+      await host;
     };
     gate().then(
       () => {
