@@ -109,11 +109,19 @@ async function renderMenu(path = '/organization/acme/today') {
   return { ...utils, router, user };
 }
 
+/** The codes clinozy-be gives Owner and Admin for the rooms already on it (Leads, Appointments). */
+const LIVE_ROOM_CODES: OrganizationPermission[] = [
+  'lead:read',
+  'lead:create',
+  'appointment:read',
+  'appointment:create',
+];
+
 /** The member: Owner and Admin from their platform codes, any other role by View-as. */
 function signIn(role: Role) {
   const permissions: Partial<Record<Role, OrganizationPermission[]>> = {
-    owner: ['organization:read', 'organization:delete'],
-    admin: ['organization:read', 'role:manage'],
+    owner: ['organization:read', 'organization:delete', ...LIVE_ROOM_CODES],
+    admin: ['organization:read', 'role:manage', ...LIVE_ROOM_CODES],
   };
   useOrganizationStore
     .getState()

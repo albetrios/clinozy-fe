@@ -63,7 +63,7 @@ vi.mock(
 );
 
 const TODAY = '/organization/acme/today';
-const APPOINTMENT = '2b3c4d5e-6f7a-4b8c-9d0e-1f2a3b4c5d6e';
+const APPOINTMENT = 'appt_riya00000000000000000';
 const NEW_INVOICE = clinicCommandNavigation('newInvoice', {
   organizationSlug: 'acme',
   referrer: 'today',
