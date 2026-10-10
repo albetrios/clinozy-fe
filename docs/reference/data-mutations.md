@@ -208,20 +208,21 @@ stored as `other` with its label leading the note.
 
 **Optimistic** (instant, auto-rollback) — all safe removals + field-patches:
 
-| Domain        | Mutation                                                          | Mode                             |
-| ------------- | ----------------------------------------------------------------- | -------------------------------- |
-| Roles         | `useUpdateRole`, `useDeleteRole`                                  | `optimisticInfinite`             |
-| API keys      | `useRenameApiKey`, `useRevokeApiKey`                              | `optimisticInfinite`             |
-| Members       | `useUpdateMemberRole`, `useUpdateMemberStatus`, `useRemoveMember` | `optimisticInfinite`             |
-| Invitations   | `useRevokeInvitation` (patches the members list)                  | `optimisticInfinite`             |
-| Sessions      | `useRevokeSession`                                                | `optimistic`                     |
-| Passkeys      | `useRemovePasskey`                                                | `optimistic`                     |
-| Webhooks      | `useDeleteWebhook`                                                | `optimistic`                     |
-| Offerings     | `useDeleteOffering`                                               | `optimistic`                     |
-| Leads         | `useDeleteLead` (every cached list page at once)                  | `optimisticInfinite`             |
-| Offers        | `useSetOfferPaused`, `useDeleteOffer`                             | `optimistic`                     |
-| Appointments  | `useMoveAppointment` (Agenda, calendars and drawer at once)       | `optimisticQueries`              |
-| Notifications | `useMarkNotificationRead`                                         | hand-rolled on raw `useMutation` |
+| Domain        | Mutation                                                                                   | Mode                             |
+| ------------- | ------------------------------------------------------------------------------------------ | -------------------------------- |
+| Roles         | `useUpdateRole`, `useDeleteRole`                                                           | `optimisticInfinite`             |
+| API keys      | `useRenameApiKey`, `useRevokeApiKey`                                                       | `optimisticInfinite`             |
+| Members       | `useUpdateMemberRole`, `useUpdateMemberStatus`, `useRemoveMember`                          | `optimisticInfinite`             |
+| Invitations   | `useRevokeInvitation` (patches the members list)                                           | `optimisticInfinite`             |
+| Sessions      | `useRevokeSession`                                                                         | `optimistic`                     |
+| Passkeys      | `useRemovePasskey`                                                                         | `optimistic`                     |
+| Webhooks      | `useDeleteWebhook`                                                                         | `optimistic`                     |
+| Offerings     | `useDeleteOffering`                                                                        | `optimistic`                     |
+| Leads         | `useDeleteLead` (every cached list page at once)                                           | `optimisticInfinite`             |
+| Offers        | `useSetOfferActive`, `useDeleteOffer`                                                      | `optimistic`                     |
+| Clinic stock  | `useDeleteStockItem`, `useDeleteStockPurchase`, `useDeleteStockVendor` (each list's pages) | `optimisticInfinite`             |
+| Appointments  | `useMoveAppointment` (Agenda, calendars and drawer at once)                                | `optimisticQueries`              |
+| Notifications | `useMarkNotificationRead`                                                                  | hand-rolled on raw `useMutation` |
 
 The cursor-paginated panels (members, roles, API keys) are `optimisticInfinite`; the
 single-key lists are `optimistic`. `useMarkNotificationRead` is the one write that does
