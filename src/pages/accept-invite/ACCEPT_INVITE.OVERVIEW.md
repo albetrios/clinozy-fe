@@ -8,18 +8,22 @@ a guest never sees it.
 
 ## Files
 
-| File                        | Responsibility                                                                                                                                                                                                                                                                             |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `accept-invite.route.tsx`   | Route marker — exports `Component` rendering `AcceptInvitePage`.                                                                                                                                                                                                                           |
-| `accept-invite.manifest.ts` | Page manifest (`path: '/accept-invite/$invitationId'`, `testId`, `kind: leaf`, no permission).                                                                                                                                                                                             |
-| `AcceptInvitePage.tsx`      | Calls `acceptInvitation(invitationId)`, refreshes the session, sets the active tenant, and redirects to the org home (the member's role home). Shows loading / partial / error states, retries a failed accept single-flight, and renders the status card inside a `SectionErrorBoundary`. |
+| File                        | Responsibility                                                                                                                                                                                                                                                                                                                                            |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `accept-invite.route.tsx`   | Route marker — exports `Component` rendering `AcceptInvitePage`.                                                                                                                                                                                                                                                                                          |
+| `accept-invite.manifest.ts` | Page manifest (`path: '/accept-invite/$invitationId'`, `testId`, `kind: leaf`, no permission).                                                                                                                                                                                                                                                            |
+| `AcceptInvitePage.tsx`      | Calls `acceptInvitationAndOpenClinic(invitationId, token)` (`shared/tenancy/accept-invitation.ts` — the accept, then the switch and session refresh), and redirects to the org home (the member's role home). Shows loading / partial / error states, retries a failed accept single-flight, and renders the status card inside a `SectionErrorBoundary`. |
 
 ## Flow
 
 1. Read `invitationId` from the route params and the single-use `?token=`.
 2. No session yet → `/login` carrying this page (token included) as the redirect.
-3. Accept the invitation (server resolves the org + role).
+3. Accept the invitation (server resolves the org + role). The token is optional since
+   clinozy-be launch D84: the signed-in owner of the invited, verified email accepts without it,
+   so a link missing its token still works; a token that is sent must match.
 4. Switch to the organization and refresh the session, then land on its home (the role home).
+   Someone who has not finished onboarding meets its profile steps on the way — never the
+   create-a-clinic step, because they now belong to a clinic (D84).
 5. If that follow-up fails, the membership still stands: report the error, warn the user
    (`partial` state + `notify.warning`), and hand off to `/` — the resolver — never to
    `/login` (INV-1). See `agent-os/rules/fe-resilient-interactions.mdc` section 6.

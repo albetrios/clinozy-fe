@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { organizationHome, organizationPicker } from '@/lib/routes/index.ts';
 import { cn } from '@/lib/utils.ts';
+import { CountBadge } from '@/shared/components/Cells/CountBadge/index.ts';
 import { CreateOrganizationDialog } from '@/shared/components/CreateOrganizationDialog/index.ts';
 import { Spinner } from '@/shared/components/Spinner/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
@@ -31,6 +32,7 @@ import {
   shouldShowOrganizationSwitcher,
 } from '@/shared/tenancy/deployment-mode.ts';
 import type { OrganizationSummary } from '@/shared/tenancy/me-context.ts';
+import { type MyInvitation, useMyInvitations } from '@/shared/tenancy/my-invitations.ts';
 import { useMyOrganizationSummaries } from '@/shared/tenancy/my-organization-summaries.ts';
 import { switchToPersonal } from '@/shared/tenancy/switch.ts';
 
@@ -142,16 +144,56 @@ function OrganizationOption({
   );
 }
 
+/**
+ * One pending invitation in the menu (D84): the clinic's initial and name, "Invited · <roles>".
+ * Choosing it opens the organization picker, where it is accepted or declined.
+ */
+function InvitedOption({
+  invitation,
+  onChoose,
+}: {
+  invitation: MyInvitation;
+  onChoose: () => void;
+}) {
+  const { t } = useTranslation(LAYOUT_NS);
+  const { name } = invitation.organization;
+  return (
+    <DropdownMenuItem
+      onSelect={onChoose}
+      data-testid={`organization-switcher-invitation-${invitation.id}`}
+      className="gap-2"
+    >
+      <span
+        data-slot="icon-chip"
+        className="bg-muted text-muted-foreground flex size-7 shrink-0 items-center justify-center text-xs font-semibold"
+      >
+        {initialOf(name)}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-sm font-medium">{name}</span>
+        <span className="text-muted-foreground block truncate text-xs">
+          {t(LAYOUT_KEYS.app.orgSwitcher.invitedRow, {
+            roles: invitation.roleNames.join(', '),
+          })}
+        </span>
+      </span>
+    </DropdownMenuItem>
+  );
+}
+
 /** The menu's body: the personal section (when there is one), the organizations, and "Add". */
 function OrganizationMenuSections({
   personalOptions,
   teamOptions,
+  invitedOptions,
   teamOnly,
   showCreateTeam,
   onCreate,
 }: {
   personalOptions: ReactNode[];
   teamOptions: ReactNode[];
+  /** The pending invitations (D84), listed first so they are seen. */
+  invitedOptions: ReactNode[];
   teamOnly: boolean;
   showCreateTeam: boolean;
   onCreate: () => void;
@@ -159,6 +201,15 @@ function OrganizationMenuSections({
   const { t } = useTranslation(LAYOUT_NS);
   return (
     <>
+      {invitedOptions.length > 0 ? (
+        <>
+          <DropdownMenuLabel className="text-muted-foreground text-xs font-medium">
+            {t(LAYOUT_KEYS.app.orgSwitcher.invited)}
+          </DropdownMenuLabel>
+          {invitedOptions}
+          <DropdownMenuSeparator />
+        </>
+      ) : null}
       {personalOptions.length > 0 ? (
         <>
           <DropdownMenuLabel className="text-muted-foreground text-xs font-medium">
@@ -198,6 +249,7 @@ function OrganizationSubmenu({
   label,
   activeName,
   busy,
+  invitationCount,
   children,
 }: {
   open: boolean;
@@ -205,8 +257,11 @@ function OrganizationSubmenu({
   label: string | undefined;
   activeName: string;
   busy: boolean;
+  /** Pending invitations (D84): a count beside the label while there are any. */
+  invitationCount: number;
   children: ReactNode;
 }) {
+  const { t } = useTranslation(LAYOUT_NS);
   return (
     <DropdownMenuSub open={open} onOpenChange={onOpenChange}>
       <DropdownMenuSubTrigger
@@ -216,8 +271,18 @@ function OrganizationSubmenu({
         data-testid="organization-switcher-trigger"
         data-layout="submenu"
       >
-        <span className="min-w-0 flex-1 truncate">{label}</span>
-        <span className="text-muted-foreground text-caption max-w-28 truncate">
+        {/* The label keeps its width; the clinic name gives way to the invitation count. */}
+        <span className="shrink-0 whitespace-nowrap">{label}</span>
+        {invitationCount > 0 ? (
+          <CountBadge
+            count={invitationCount}
+            srLabel={t(LAYOUT_KEYS.app.orgSwitcher.invitationCount, {
+              count: invitationCount,
+            })}
+            data-testid="organization-switcher-invitation-count"
+          />
+        ) : null}
+        <span className="text-muted-foreground text-caption ml-auto max-w-28 min-w-0 truncate">
           {activeName}
         </span>
       </DropdownMenuSubTrigger>
@@ -381,6 +446,9 @@ function useSwitcherModel(onSwitched: (() => void) | undefined) {
   const { data: ctx, isLoading } = useMeContext({ notifyOnError: true });
   const deploymentFlags = useDeploymentFlags();
   const orgs = useMyOrganizationSummaries().data ?? [];
+  const visible = shouldShowOrganizationSwitcher(deploymentFlags);
+  const invitations = useMyInvitations({ enabled: visible }).data ?? [];
+  const navigate = useNavigate();
   const activeId = ctx?.activeOrganization?.id;
   const switching = useOrganizationSwitch({
     activeId,
@@ -400,9 +468,23 @@ function useSwitcherModel(onSwitched: (() => void) | undefined) {
     />
   );
 
+  const renderInvitation = (invitation: MyInvitation) => (
+    <InvitedOption
+      key={invitation.id}
+      invitation={invitation}
+      onChoose={() => {
+        // Accept and Decline live on the picker; a parent menu closes on the way.
+        onSwitched?.();
+        void navigate(organizationPicker());
+      }}
+    />
+  );
+
   return {
     ...switching,
-    visible: shouldShowOrganizationSwitcher(deploymentFlags),
+    visible,
+    invitations,
+    renderInvitation,
     teamOnly: resolveDeploymentMode(deploymentFlags) === 'team-only',
     showCreateTeam: shouldAllowCreateTeam(deploymentFlags),
     personalOrgs: deploymentFlags.personalOrganizations
@@ -426,7 +508,9 @@ function OrganizationSwitcherSubmenu({
   onSwitched,
 }: Pick<OrganizationSwitcherProps, 'submenuLabel' | 'onSwitched'>) {
   const model = useSwitcherModel(onSwitched);
-  if (!model.visible || model.personalOrgs.length + model.teamOrgs.length <= 1) {
+  const workspaces = model.personalOrgs.length + model.teamOrgs.length;
+  // Shown with somewhere to switch to — or an invitation to answer (D84).
+  if (!model.visible || (workspaces <= 1 && model.invitations.length === 0)) {
     return null;
   }
   return (
@@ -436,10 +520,12 @@ function OrganizationSwitcherSubmenu({
       label={submenuLabel}
       activeName={model.activeName}
       busy={model.busy}
+      invitationCount={model.invitations.length}
     >
       <OrganizationMenuSections
         personalOptions={model.personalOrgs.map(model.renderOrg)}
         teamOptions={model.teamOrgs.map(model.renderOrg)}
+        invitedOptions={model.invitations.map(model.renderInvitation)}
         teamOnly={model.teamOnly}
         showCreateTeam={false}
         onCreate={() => undefined}
@@ -491,6 +577,8 @@ function OrganizationSwitcherMenu({
     teamOnly,
     showCreateTeam,
     renderOrg,
+    invitations,
+    renderInvitation,
   } = useSwitcherModel(onSwitched);
 
   if (!visible) return null;
@@ -524,6 +612,7 @@ function OrganizationSwitcherMenu({
           <OrganizationMenuSections
             personalOptions={personalOrgs.map(renderOrg)}
             teamOptions={teamOrgs.map(renderOrg)}
+            invitedOptions={invitations.map(renderInvitation)}
             teamOnly={teamOnly}
             showCreateTeam={showCreateTeam}
             onCreate={() => setCreateOpen(true)}

@@ -20,7 +20,10 @@
       "personal": "个人",
       "yourOrganizations": "您的组织",
       "organizations": "组织",
-      "addOrganization": "添加组织"
+      "addOrganization": "添加组织",
+      "invited": "邀请",
+      "invitedRow": "已邀请 · {{roles}}",
+      "invitationCount": "邀请：{{count}}"
     },
     "notifications": {
       "title": "通知",

@@ -17,7 +17,11 @@ import {
   isPasskeySignInAvailable,
   signInWithPasskey,
 } from '@/shared/auth/passkey-sign-in.ts';
-import { isSafeExternalHttpsUrl, stashReturnTo } from '@/shared/auth/redirect-safety.ts';
+import {
+  isSafeExternalHttpsUrl,
+  isSafeRedirectPath,
+  stashReturnTo,
+} from '@/shared/auth/redirect-safety.ts';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import { mapFrontendError } from '@/shared/errors/map-frontend-error.ts';
 import { FormError } from '@/shared/forms/FormError/index.ts';
@@ -435,7 +439,13 @@ export function AuthForm() {
     setPending({ method: 'passkey' });
     try {
       await signInWithPasskey();
-      void navigate({ to: '/', replace: true });
+      // The page the person signed in for, when it is a safe in-app path (an
+      // invitation link among them) — else `/`, whose resolver decides.
+      const { redirect } = location.search as { redirect?: unknown };
+      void navigate({
+        to: typeof redirect === 'string' && isSafeRedirectPath(redirect) ? redirect : '/',
+        replace: true,
+      });
     } catch (err) {
       surfaceError(err);
     } finally {

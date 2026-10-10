@@ -55,11 +55,21 @@ vi.mock('@/core/security/gates/require-module.ts', async (importOriginal) => ({
 vi.mock('@/shared/components/OrganizationSwitcher/index.ts', () => ({
   OrganizationSwitcher: () => null,
 }));
+// Pending invitations to other clinics (D84): none unless a test sets a count.
+const invitationsRef = vi.hoisted(() => ({ count: 0 }));
+vi.mock('@/shared/tenancy/my-invitations.ts', () => ({
+  useMyInvitations: () => ({
+    data: Array.from({ length: invitationsRef.count }, (_, index) => ({
+      id: `inv_${index}`,
+    })),
+  }),
+}));
 vi.mock('@/shared/notify/index.ts', () => ({
   notify: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
 }));
 
 beforeEach(() => {
+  invitationsRef.count = 0;
   presenceServer.presence = 'online';
   disabledModules.clear();
   platformOverrides.themeLock = false;
@@ -97,6 +107,22 @@ describe('AccountMenu', () => {
     expect(identity).toHaveTextContent('Riya Shah');
     expect(identity).toHaveTextContent('riya@acme.test');
     expect(identity).toHaveTextContent(/owner/i);
+  });
+
+  it('counts pending invitations on the avatar, and says so in its name (D84)', async () => {
+    invitationsRef.count = 2;
+    renderWithProviders(<AccountMenu onOpenNotifications={vi.fn()} />);
+
+    const trigger = await screen.findByTestId('user-menu-trigger');
+    expect(trigger).toHaveAccessibleName('Riya Shah · Online · Invitations: 2');
+    expect(screen.getByTestId('user-menu-invitation-count')).toHaveTextContent('2');
+  });
+
+  it('shows no count without invitations', async () => {
+    renderWithProviders(<AccountMenu onOpenNotifications={vi.fn()} />);
+
+    expect(await screen.findByTestId('user-menu-trigger')).toBeInTheDocument();
+    expect(screen.queryByTestId('user-menu-invitation-count')).not.toBeInTheDocument();
   });
 
   it('names a custom main role by its own name, and shows no role line without one', async () => {

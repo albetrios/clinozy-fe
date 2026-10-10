@@ -20,7 +20,10 @@
       "personal": "Personal",
       "yourOrganizations": "Your organizations",
       "organizations": "Organizations",
-      "addOrganization": "Add organization"
+      "addOrganization": "Add organization",
+      "invited": "Invited",
+      "invitedRow": "Invited · {{roles}}",
+      "invitationCount": "Invitations: {{count}}"
     },
     "notifications": {
       "title": "Notifications",

@@ -7,7 +7,11 @@ import { parseOrganizationSlugParam } from '@/lib/routes/params.ts';
 import { useOnboardingStore } from '@/shared/store/useOnboardingStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { mergeDeploymentFlags } from '@/shared/tenancy/deployment-mode.ts';
-import { type MeContext, meContextQueryKey } from '@/shared/tenancy/me-context.ts';
+import {
+  type MeContext,
+  meContextQueryKey,
+  needsOnboarding,
+} from '@/shared/tenancy/me-context.ts';
 import type { Organization } from '@/shared/tenancy/my-organizations.ts';
 import { syncOrganizationFromRoute } from '@/shared/tenancy/organization-context.ts';
 import {
@@ -16,7 +20,8 @@ import {
 } from '@/shared/tenancy/organization-membership.ts';
 import type { RootTarget } from '@/shared/tenancy/organization-resolver.ts';
 import {
-  resolveRootTarget,
+  countLandingInvitations,
+  resolveRootTargetWithInvitations,
   workspaceRedirectForTeamEntry,
 } from '@/shared/tenancy/organization-resolver.ts';
 import { ensureSessionContext } from '@/shared/tenancy/session-context.ts';
@@ -168,7 +173,8 @@ export async function requireOnboardingWorkspace(): Promise<void> {
   // user's name and workspace for a frame first (ONB-4). `claimForUser` is a
   // no-op once the store already belongs to this user.
   useOnboardingStore.getState().claimForUser(ctx.user.id);
-  const target = resolveRootTarget(ctx);
+  // With invitations and no clinic, the picker lists them first (D84) — not the wizard.
+  const target = await resolveRootTargetWithInvitations(ctx);
   if (target.to !== '/onboarding') throwWorkspaceRedirect(target);
 }
 
@@ -182,6 +188,11 @@ export async function requireProvisionedTeamWorkspace(options?: {
   redirectFrom?: string;
 }): Promise<void> {
   const ctx = await ensureSessionContext();
-  const redirectTarget = workspaceRedirectForTeamEntry(ctx);
+  // Only an onboarding redirect is decided here, so the invitations are read only for someone
+  // who still needs onboarding: invited with no clinic, they stay on the picker (D84).
+  const pendingInvitations = needsOnboarding(ctx)
+    ? await countLandingInvitations(ctx)
+    : 0;
+  const redirectTarget = workspaceRedirectForTeamEntry(ctx, { pendingInvitations });
   if (redirectTarget) throwWorkspaceRedirect(redirectTarget, options?.redirectFrom);
 }

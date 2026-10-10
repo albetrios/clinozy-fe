@@ -49,6 +49,7 @@ import { notify } from '@/shared/notify/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { useMyInvitations } from '@/shared/tenancy/my-invitations.ts';
 
 const keys = LAYOUT_KEYS.app.sectionBar;
 
@@ -322,6 +323,9 @@ export function AccountMenu({
   const user = useAuthStore((state) => state.user);
   const { presence } = usePresence();
   const [mainRole] = useRolesInForce();
+  // Pending invitations to other clinics (D84): a count on the avatar, so they are seen without
+  // opening the menu; "Switch clinic" lists them.
+  const invitationCount = useMyInvitations().data?.length ?? 0;
   const [open, setOpen] = useState(false);
   // The inbox opens as this menu closes; the menu must not hand focus back to
   // the avatar then, or the inbox would read that as a click outside.
@@ -343,17 +347,32 @@ export function AccountMenu({
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          aria-label={t(keys.avatarLabel, { name, status: t(keys.presence[presence]) })}
+          aria-label={[
+            t(keys.avatarLabel, { name, status: t(keys.presence[presence]) }),
+            invitationCount > 0
+              ? t(LAYOUT_KEYS.app.orgSwitcher.invitationCount, { count: invitationCount })
+              : null,
+          ]
+            .filter(Boolean)
+            .join(' · ')}
           data-testid="user-menu-trigger"
           data-slot="pill"
           className={cn(
-            'flex flex-none rounded-full transition-shadow',
+            'relative flex flex-none rounded-full transition-shadow',
             open
               ? 'shadow-[0_0_0_2px_var(--color-card),0_0_0_3.5px_var(--color-disabled)]'
               : 'hover:shadow-[0_0_0_2px_var(--color-card),0_0_0_3.5px_var(--color-border-strong)]',
           )}
         >
           {avatar('cell')}
+          {invitationCount > 0 ? (
+            <CountBadge
+              count={invitationCount}
+              aria-hidden="true"
+              className="absolute -end-1.5 -top-1.5"
+              data-testid="user-menu-invitation-count"
+            />
+          ) : null}
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent

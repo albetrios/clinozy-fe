@@ -99,14 +99,21 @@ export async function hideDevtools(page: Page): Promise<void> {
  * `page.goto` (a deep link) restores the session. The page takes the token
  * already scoped to the clinic, so the guards meet a provisioned owner. Skips
  * when the live clinozy-be has team organizations turned off — there is no
- * clinic to open then.
+ * clinic to open then. `email` signs in a given address instead of a fresh one —
+ * someone a spec has already invited elsewhere, say.
  */
-export async function openNewClinic(page: Page): Promise<{ slug: string }> {
+export async function openNewClinic(
+  page: Page,
+  options: { email?: string } = {},
+): Promise<{ slug: string; email: string }> {
   await hideDevtools(page);
   await gotoApp(page, '/login');
   await expectLoginFormReady(page);
 
-  const { accessToken } = await createSessionViaEmailCode(page.request);
+  const { accessToken, email } = await createSessionViaEmailCode(
+    page.request,
+    options.email,
+  );
   const { flags } = await probeLiveDeployment(page.request, accessToken);
   test.skip(
     !flags.teamOrganizations,
@@ -123,7 +130,7 @@ export async function openNewClinic(page: Page): Promise<{ slug: string }> {
 
   await navigateInApp(page, `/organization/${slug}`);
   await expectRoomReady(page, 'today');
-  return { slug };
+  return { slug, email };
 }
 
 /**

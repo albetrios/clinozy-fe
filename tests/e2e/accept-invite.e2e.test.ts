@@ -45,7 +45,8 @@ test.describe('Accept invite', () => {
     );
     await registerNewUserAndGoToToday(page);
 
-    // No `?token` — the page reports it without spending an API call.
+    // No `?token` — the page tries the in-app accept (D84), and clinozy-be refuses an
+    // invitation it does not know.
     await navigateInApp(page, '/accept-invite/inv_expired');
     await expect(page.getByTestId('accept-invite-page')).toBeVisible({ timeout: 15000 });
     await expect(page.getByTestId('accept-invite-error')).toBeVisible({ timeout: 10000 });

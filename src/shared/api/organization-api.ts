@@ -71,25 +71,26 @@ const acceptedInvitationWire = wireSchema<ApiAcceptedInvitation>()(
 );
 
 /**
- * Accept an invitation with the token from its link (`POST
- * /tenancy/membership-invitations/:id/accept`). The answer names the organization only — the
- * caller reads its slug from the switch that follows.
+ * Accept an invitation (`POST /tenancy/membership-invitations/:id/accept`) — with the token from
+ * its link, or, from the app's invitations list, without one: clinozy-be lets the signed-in
+ * owner of the invited, verified email accept on their own (launch D84). The answer names the
+ * organization only — the caller reads its slug from the switch that follows.
  *
  * @remarks
- * A 401 here is clinozy-be refusing the link for this account, not an expired session, so the
- * refresh-and-replay is skipped.
+ * A 401 here is clinozy-be refusing the invitation for this account, not an expired session, so
+ * the refresh-and-replay is skipped.
  *
  * @returns The joined organization's id.
  */
 export async function acceptInvitation(
   invitationId: string,
-  token: string,
+  token?: string,
 ): Promise<{ organizationId: string }> {
   const response = await api.post(
     '/tenancy/membership-invitations/{membership_invitation_id}/accept',
     {
       params: { membership_invitation_id: invitationId },
-      body: { token },
+      body: token === undefined ? {} : { token },
       skip401: true,
     },
   );

@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { MeContext, OrganizationType } from '@/shared/tenancy/me-context.ts';
+import type { MyInvitation } from '@/shared/tenancy/my-invitations.ts';
 import type * as MyOrganizationSummariesModule from '@/shared/tenancy/my-organization-summaries.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
@@ -12,6 +13,7 @@ import { ORG_SWITCH_TOAST_ID, OrganizationSwitcher } from './OrganizationSwitche
 const {
   useMeContextMock,
   useMyOrganizationSummariesMock,
+  useMyInvitationsMock,
   switchToPersonalMock,
   navigateMock,
   deploymentFlagsMock,
@@ -20,6 +22,7 @@ const {
 } = vi.hoisted(() => ({
   useMeContextMock: vi.fn(),
   useMyOrganizationSummariesMock: vi.fn(),
+  useMyInvitationsMock: vi.fn(),
   switchToPersonalMock: vi.fn(),
   navigateMock: vi.fn(async () => undefined),
   deploymentFlagsMock: {
@@ -55,6 +58,9 @@ vi.mock('@/shared/errors/errorHandler.ts', async (importOriginal) => {
 vi.mock('@/shared/tenancy/my-organization-summaries.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof MyOrganizationSummariesModule>()),
   useMyOrganizationSummaries: useMyOrganizationSummariesMock,
+}));
+vi.mock('@/shared/tenancy/my-invitations.ts', () => ({
+  useMyInvitations: useMyInvitationsMock,
 }));
 vi.mock('@/shared/hooks/useMeContext/index.ts', () => ({
   useMeContext: useMeContextMock,
@@ -112,7 +118,16 @@ beforeEach(() => {
   switchToPersonalMock.mockResolvedValue(undefined);
   useMeContextMock.mockReturnValue({ data: CTX, isLoading: false });
   useMyOrganizationSummariesMock.mockReturnValue({ data: ORGS, isPending: false });
+  useMyInvitationsMock.mockReturnValue({ data: [] });
 });
+
+const INVITATION: MyInvitation = {
+  id: `inv_${'i'.repeat(21)}`,
+  organization: { id: 'org_beta', name: 'Beta Clinic', slug: 'beta', logoUrl: null },
+  roleNames: ['Doctor'],
+  inviterName: null,
+  expiresAt: '2026-10-17T10:00:00.000Z',
+};
 
 describe('OrganizationSwitcher', () => {
   it('shows the active organization name', async () => {
@@ -186,6 +201,23 @@ describe('OrganizationSwitcher', () => {
     ).not.toBeInTheDocument();
     expect(screen.getByTestId('organization-switcher-option-acme')).toBeInTheDocument();
     expect(screen.getByTestId('organization-switcher-create')).toBeInTheDocument();
+  });
+
+  it('lists pending invitations first, each opening the picker to answer it (D84)', async () => {
+    useMyInvitationsMock.mockReturnValue({ data: [INVITATION] });
+    const user = userEvent.setup();
+    renderWithProviders(<OrganizationSwitcher />);
+    await user.click(await screen.findByTestId('organization-switcher-trigger'));
+
+    const invited = await screen.findByTestId(
+      `organization-switcher-invitation-${INVITATION.id}`,
+    );
+    expect(invited).toHaveTextContent('Beta Clinic');
+    expect(invited).toHaveTextContent('Invited · Doctor');
+    expect(screen.getByText('Invited')).toBeInTheDocument();
+
+    await user.click(invited);
+    expect(navigateMock).toHaveBeenCalledWith({ to: '/organization' });
   });
 
   it('opens the create-organization dialog from the menu', async () => {

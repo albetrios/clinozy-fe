@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2196 src files · ~1068 tests in src/ · 49 E2E specs · 26 shadcn UI primitives
+Stats: ~2200 src files · ~1071 tests in src/ · 50 E2E specs · 26 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -1362,6 +1362,11 @@ clinozy-fe/
 │   │       │   ├── ORGANIZATION_SLUG.OVERVIEW.md
 │   │       │   ├── OrganizationLayout.tsx
 │   │       │   └── [1 test file]
+│   │       ├── components/
+│   │       │   └── InvitationList/
+│   │       │       ├── index.ts
+│   │       │       ├── InvitationList.tsx
+│   │       │       └── [1 test file]
 │   │       ├── organization.manifest.ts
 │   │       ├── ORGANIZATION.OVERVIEW.md
 │   │       ├── organization.route.tsx
@@ -2848,8 +2853,10 @@ clinozy-fe/
 │   │   │       ├── useWorkspaceSwitchStore.ts
 │   │   │       └── [1 test file]
 │   │   ├── tenancy/
+│   │   │   ├── accept-invitation.ts
 │   │   │   ├── deployment-mode.ts
 │   │   │   ├── me-context.ts
+│   │   │   ├── my-invitations.ts
 │   │   │   ├── my-membership.ts
 │   │   │   ├── my-organization-summaries.ts
 │   │   │   ├── my-organizations.ts
@@ -2863,7 +2870,7 @@ clinozy-fe/
 │   │   │   ├── TENANCY.OVERVIEW.md
 │   │   │   ├── TENANCY.PATTERNS.md
 │   │   │   ├── TENANCY.POLICIES.md
-│   │   │   └── [14 test files]
+│   │   │   └── [16 test files]
 │   │   └── theme/
 │   │       ├── catalog-doc.ts
 │   │       ├── index.ts
@@ -2894,7 +2901,7 @@ clinozy-fe/
 │   │   │   ├── login-theme-extremes-chromium-darwin.png
 │   │   │   └── today-chromium-darwin.png
 │   │   ├── global-setup.ts
-│   │   └── [39 test files]
+│   │   └── [40 test files]
 │   ├── factories/
 │   │   └── README.md
 │   ├── fixtures/

@@ -20,7 +20,10 @@
       "personal": "شخصي",
       "yourOrganizations": "مؤسساتك",
       "organizations": "المؤسسات",
-      "addOrganization": "إضافة مؤسسة"
+      "addOrganization": "إضافة مؤسسة",
+      "invited": "دعوات",
+      "invitedRow": "مدعو · {{roles}}",
+      "invitationCount": "الدعوات: {{count}}"
     },
     "notifications": {
       "title": "الإشعارات",

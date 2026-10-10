@@ -1,9 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { MeContext, OrganizationType } from './me-context.ts';
+import { ensureMyInvitations, type MyInvitation } from './my-invitations.ts';
 import {
+  countLandingInvitations,
   resolveRootRedirect,
   resolveRootTarget,
+  resolveRootTargetWithInvitations,
   workspaceRedirectForTeamEntry,
 } from './organization-resolver.ts';
 import { ensureSessionContext } from './session-context.ts';
@@ -12,6 +15,11 @@ vi.mock('./session-context.ts', async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>();
   return { ...actual, ensureSessionContext: vi.fn() };
 });
+
+// No invitations unless a test says so.
+vi.mock('./my-invitations.ts', () => ({ ensureMyInvitations: vi.fn(async () => []) }));
+
+const AN_INVITATION = { id: 'inv_x' } as MyInvitation;
 
 function meCtx(
   activeOrganization: MeContext['activeOrganization'],
@@ -208,5 +216,72 @@ describe('workspace surface guards (URL vs me/context)', () => {
 
   it('allows team entry when a team org is active', () => {
     expect(workspaceRedirectForTeamEntry(meCtx(activeOrg('TEAM', 'acme')))).toBeNull();
+  });
+});
+
+describe('pending invitations (D84)', () => {
+  beforeEach(() => {
+    vi.mocked(ensureMyInvitations).mockReset().mockResolvedValue([]);
+  });
+
+  it('lands an invited person with no clinic on the picker — before onboarding', () => {
+    expect(resolveRootTarget(meCtx(null, false), { pendingInvitations: 1 })).toEqual({
+      to: '/organization',
+    });
+    expect(
+      workspaceRedirectForTeamEntry(meCtx(null, false), { pendingInvitations: 1 }),
+    ).toBeNull();
+  });
+
+  it('keeps a member of a clinic where they are — the invitation waits in the switcher', () => {
+    expect(
+      resolveRootTarget(meCtx(activeOrg('TEAM', 'acme')), { pendingInvitations: 2 }),
+    ).toEqual({
+      to: '/organization/$organizationSlug',
+      params: { organizationSlug: 'acme' },
+    });
+  });
+
+  it('after an accept the clinic is active, so onboarding (profile only) runs next', () => {
+    expect(
+      resolveRootTarget(meCtx(activeOrg('TEAM', 'acme'), false), {
+        pendingInvitations: 1,
+      }),
+    ).toEqual({ to: '/onboarding' });
+  });
+
+  it('ignores invitations in a personal-only deployment', () => {
+    const ctx = meCtx(null, false);
+    ctx.deploymentFlags = { personalOrganizations: true, teamOrganizations: false };
+    expect(resolveRootTarget(ctx, { pendingInvitations: 1 })).toEqual({
+      to: '/onboarding',
+    });
+  });
+
+  it('reads the invitations only when they could change the answer', async () => {
+    vi.mocked(ensureMyInvitations).mockResolvedValue([AN_INVITATION]);
+
+    expect(await countLandingInvitations(meCtx(activeOrg('TEAM', 'acme')))).toBe(0);
+    expect(ensureMyInvitations).not.toHaveBeenCalled();
+
+    expect(await resolveRootTargetWithInvitations(meCtx(null, false))).toEqual({
+      to: '/organization',
+    });
+    expect(ensureMyInvitations).toHaveBeenCalledOnce();
+  });
+
+  it('decides as if there were none when the invitations cannot be read', async () => {
+    vi.mocked(ensureMyInvitations).mockRejectedValue(new Error('network'));
+
+    expect(await resolveRootTargetWithInvitations(meCtx(null, false))).toEqual({
+      to: '/onboarding',
+    });
+  });
+
+  it('sends `/` to the picker for an invited person with no clinic', async () => {
+    vi.mocked(ensureMyInvitations).mockResolvedValue([AN_INVITATION]);
+    vi.mocked(ensureSessionContext).mockResolvedValue(meCtx(null, false));
+
+    expect(await resolveRootRedirect()).toEqual({ to: '/organization' });
   });
 });

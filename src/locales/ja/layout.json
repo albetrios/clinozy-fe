@@ -20,7 +20,10 @@
       "personal": "個人",
       "yourOrganizations": "あなたの組織",
       "organizations": "組織",
-      "addOrganization": "組織を追加"
+      "addOrganization": "組織を追加",
+      "invited": "招待",
+      "invitedRow": "招待中 · {{roles}}",
+      "invitationCount": "招待: {{count}}"
     },
     "notifications": {
       "title": "通知",

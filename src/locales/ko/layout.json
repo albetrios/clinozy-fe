@@ -20,7 +20,10 @@
       "personal": "개인",
       "yourOrganizations": "내 조직",
       "organizations": "조직",
-      "addOrganization": "조직 추가"
+      "addOrganization": "조직 추가",
+      "invited": "초대",
+      "invitedRow": "초대됨 · {{roles}}",
+      "invitationCount": "초대: {{count}}"
     },
     "notifications": {
       "title": "알림",

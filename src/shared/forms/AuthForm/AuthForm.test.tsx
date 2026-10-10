@@ -74,21 +74,27 @@ vi.mock('@/shared/auth/service.ts', () => ({
   establishSession: vi.fn(async () => undefined),
 }));
 
-function createTestRouter() {
+function createTestRouter(initialEntry = '/') {
   const rootRoute = createRootRoute({ component: () => <Outlet /> });
   const indexRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/',
     component: () => <AuthForm />,
   });
-  const tree = rootRoute.addChildren([indexRoute]);
-  const history = createMemoryHistory({ initialEntries: ['/'] });
+  // Where a sign-in carrying `?redirect=` should land (an invitation link).
+  const inviteRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/accept-invite/$invitationId',
+    component: () => <div data-testid="landed-on-invite" />,
+  });
+  const tree = rootRoute.addChildren([indexRoute, inviteRoute]);
+  const history = createMemoryHistory({ initialEntries: [initialEntry] });
   return createRouter({ routeTree: tree, history });
 }
 
 describe('AuthForm', () => {
-  const renderForm = () => {
-    const router = createTestRouter();
+  const renderForm = (initialEntry?: string) => {
+    const router = createTestRouter(initialEntry);
     return render(<RouterProvider router={router} />);
   };
 
@@ -294,6 +300,15 @@ describe('AuthForm', () => {
 
     resolvePasskey?.();
     await waitFor(() => expect(signInWithPasskey).toHaveBeenCalledOnce());
+  });
+
+  it('lands a passkey sign-in on the page it was asked for, like the email sign-in (D84)', async () => {
+    const user = userEvent.setup();
+    renderForm(`/?redirect=${encodeURIComponent('/accept-invite/inv_test')}`);
+
+    await user.click(await screen.findByTestId('auth-continue-passkey'));
+
+    expect(await screen.findByTestId('landed-on-invite')).toBeInTheDocument();
   });
 
   it('keeps the provider label while OAuth is in flight and isolates the clicked method', async () => {

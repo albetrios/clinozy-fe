@@ -89,6 +89,7 @@ signed in through `page.request` so a cold `page.goto` (a deep link) restores th
 | `organization.e2e.test.ts`         | Picker at `/organization`                                          |
 | `notifications.e2e.test.ts`        | Notification center                                                |
 | `org-switching.e2e.test.ts`        | Account menu › Switch clinic                                       |
+| `invitations.e2e.test.ts` | Invitations at sign-in: picker, accept, decline, Invited row (D84) |
 | `responsive.e2e.test.ts`           | 320px overflow                                                     |
 | `accessibility.e2e.test.ts`        | Axe WCAG gate                                                      |
 | `visual.e2e.test.ts`               | Screenshots (reduced motion)                                       |
@@ -206,9 +207,11 @@ mid-close is swallowed.
 freshly issued code on `send-code` in its local/TEST mode (`debug_verification_code` — the
 field the sign-in form itself prefills from). `echoedVerificationCode(response)` in
 `tests/utils/e2e-session.ts` returns it, or `null` on a backend that does not echo;
-`createSessionViaEmailCode` prefers it and falls back to polling `auth.mail_outbox`. The
+`createSessionViaEmailCode` prefers it and falls back to polling `auth.mail_outbox`, and
+`loginViaEmailCodeUI` reads it from the form's own `send-code` answer the same way. The
 outbox is a second system with its own lag: late in a long suite that lag was the MFA spec's
-entire 90 s budget, while the backend had answered every request. A spec that needs a
+entire 90 s budget, while the backend had answered every request — and once the mail worker
+has sent a row it scrubs the row's HTML, so a poll that starts late finds nothing. A spec that needs a
 _fresh_ code still loops (the backend has a per-email issue window) — it just reads the
 answer it already has.
 

@@ -32,7 +32,7 @@ import { FormError } from '@/shared/forms/FormError/index.ts';
 import { useCooldownClock } from '@/shared/hooks/useCooldownClock/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { type MeContext, meContextQueryKey } from '@/shared/tenancy/me-context.ts';
-import { resolveRootTarget } from '@/shared/tenancy/organization-resolver.ts';
+import { resolveRootTargetWithInvitations } from '@/shared/tenancy/organization-resolver.ts';
 
 import {
   AUTH_CHALLENGE_KEYS,
@@ -99,16 +99,20 @@ function getRedirectPath(location: {
  * `/` resolver re-runs `hydrateSessionContext()` (a redundant me/context fetch —
  * `establishSession` populated it moments ago) and then throws a second redirect,
  * and `/login` stays mounted for that whole round-trip — the "flash of login"
- * after entering the code. `resolveRootTarget` is the exact decision the resolver
- * makes, run here on the context we already hold. A fresh signup still routes to
- * onboarding before any saved `redirect`.
+ * after entering the code. `resolveRootTargetWithInvitations` is the exact decision the
+ * resolver makes, run here on the context we already hold. A fresh signup still routes to
+ * onboarding before any saved `redirect` — unless they were invited and have no clinic,
+ * when the picker lists their invitations first.
  */
-function navigateAfterEmailLogin(
+async function navigateAfterEmailLogin(
   navigate: ReturnType<typeof useNavigate>,
   location: ReturnType<typeof useLocation>,
 ): Promise<void> {
   const ctx = queryClient.getQueryData<MeContext>(meContextQueryKey);
-  const rootTarget = ctx ? resolveRootTarget(ctx) : ({ to: '/' } as const);
+  // With pending invitations and no clinic, the picker lists them before onboarding (D84).
+  const rootTarget = ctx
+    ? await resolveRootTargetWithInvitations(ctx)
+    : ({ to: '/' } as const);
   if (rootTarget.to === '/onboarding') {
     // Forward the saved deep link through the wizard instead of dropping it —
     // finishing onboarding returns the user to the page they signed in for.

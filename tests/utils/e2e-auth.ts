@@ -181,12 +181,21 @@ export async function loginViaEmailCodeUI(
   await gotoApp(page, '/login');
   await installE2eCaptchaHeadersOnAuthApi(page);
   await fillTestId(page, 'auth-email', email);
+  // The form's own send-code answer carries the code where clinozy-be echoes it; the
+  // outbox is the fallback (the mail worker scrubs a row's HTML once it is sent).
+  const sent = page.waitForResponse(
+    (response) =>
+      response.url().includes('/auth/email/send-code') &&
+      response.request().method() === 'POST',
+  );
   await clickTestId(page, 'auth-email-submit');
   await expect(page.getByTestId('auth-email-verify-panel')).toBeVisible({
     timeout: 10000,
   });
 
-  const code = await pollVerificationCodeFromMailOutbox(email);
+  const code =
+    (await echoedVerificationCode(await sent)) ??
+    (await pollVerificationCodeFromMailOutbox(email));
   await watchForEmailStepReappearing(page);
   await fillEmailVerificationCode(page, code);
 

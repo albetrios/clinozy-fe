@@ -3,11 +3,7 @@ import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 
 import { organizationHome } from '@/lib/routes/index.ts';
-import { ANALYTICS_EVENTS } from '@/shared/analytics/analytics.constants.ts';
-import { captureAnalyticsEvent } from '@/shared/analytics/capture.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import { acceptInvitation } from '@/shared/api/organization-api.ts';
-import { silentRefresh } from '@/shared/auth/service.ts';
 import { getAccessToken } from '@/shared/auth/token.ts';
 import { EmptyState, EmptyStateAction } from '@/shared/components/EmptyState/index.ts';
 import { PublicCard } from '@/shared/components/PublicFrame/index.ts';
@@ -19,7 +15,7 @@ import { mapFrontendError } from '@/shared/errors/map-frontend-error.ts';
 import { useConsumedSearchToken } from '@/shared/hooks/useConsumedSearchToken/index.ts';
 import { CheckCircle, XCircle } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
-import { switchToOrganization } from '@/shared/tenancy/switch.ts';
+import { acceptInvitationAndOpenClinic } from '@/shared/tenancy/accept-invitation.ts';
 
 import {
   ACCEPT_INVITE_REDIRECT_MS,
@@ -175,11 +171,6 @@ export function AcceptInvitePage() {
     };
 
     try {
-      if (!invitationToken) {
-        setError(t(AUTH_KEYS.acceptInvite.errors.invalidOrExpired));
-        setStatus('error');
-        return;
-      }
       // Accepting requires a signed-in session whose email matches the
       // invite — and the email recipient is usually NOT signed in yet. Send
       // them to login first, carrying this page (token included) as the
@@ -189,26 +180,18 @@ export function AcceptInvitePage() {
         void navigate(loginRecovery);
         return;
       }
-      const accepted = await acceptInvitation(invitationId, invitationToken);
+      // A link without its token still works: clinozy-be lets the signed-in
+      // owner of the invited, verified email accept on their own (D84).
+      const accepted = await acceptInvitationAndOpenClinic(
+        invitationId,
+        invitationToken || undefined,
+      );
 
-      // The membership exists from here on, whatever the switch does next.
-      // Worth recording even if the user has left — the join really happened.
-      captureAnalyticsEvent(ANALYTICS_EVENTS.inviteAccepted, {
-        invitation_id: invitationId,
-        organization_id: accepted.organizationId,
-      });
-
-      // The accept names the organization only; its slug comes from the switch.
-      let slug = '';
-      try {
-        const ctx = await switchToOrganization(accepted.organizationId);
-        await silentRefresh();
-        slug = ctx?.activeOrganization?.slug ?? '';
-      } catch (switchError) {
+      if (accepted.switchError) {
         // Joined, but this tab could not be moved into the new org. Report it,
         // say so, and hand off to the index resolver — signing the user out of
         // their own successful join would be the worst possible recovery.
-        reportError(switchError, {
+        reportError(accepted.switchError, {
           scope: 'accept-invite.switch',
           invitation_id: invitationId,
           organization_id: accepted.organizationId,
@@ -222,6 +205,9 @@ export function AcceptInvitePage() {
 
       if (!aliveRef.current) return;
       setStatus('success');
+      // The clinic's home; for someone who has not finished onboarding its guard
+      // runs the profile steps first — never the create-a-clinic step (D84).
+      const { slug } = accepted;
       redirectAfterDelay(() => {
         if (slug) {
           void navigate({ ...organizationHome(slug), replace: true });
@@ -310,7 +296,7 @@ export function AcceptInvitePage() {
         <InviteStatusCard
           status={status}
           error={error}
-          canRetry={Boolean(invitationToken)}
+          canRetry
           isRetrying={isRetrying}
           onRetry={handleRetry}
         />

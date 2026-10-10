@@ -20,7 +20,10 @@
       "personal": "Persönlich",
       "yourOrganizations": "Ihre Organisationen",
       "organizations": "Organisationen",
-      "addOrganization": "Organisation hinzufügen"
+      "addOrganization": "Organisation hinzufügen",
+      "invited": "Eingeladen",
+      "invitedRow": "Eingeladen · {{roles}}",
+      "invitationCount": "Einladungen: {{count}}"
     },
     "notifications": {
       "title": "Benachrichtigungen",

@@ -42,9 +42,14 @@ volume — a real concern for a clinic app). Internal DB ids never appear in URL
   appointment belongs to a patient **or** a lead, so it cannot nest under either. The patient
   file and the lead drawer link into it, keeping the page they came from behind the drawer
   (`from`). Never add a second detail URL for the same resource.
-- **`/` (root):** a resolver route — reads `me/context` and redirects. **Onboarding first:**
+- **`/` (root):** a resolver route — reads `me/context` and redirects. **Invitations first
+  (D84):** someone with pending invitations (`GET /users/me/membership-invitations`, read only
+  when there is no active team org) and no clinic to enter → the `/organization` picker, which
+  lists them with Accept / Decline — never the onboarding whose team-only finish would create a
+  second, empty clinic. **Then onboarding:**
   a not-yet-onboarded user (`!user.onboarding_completed`) → `/onboarding` in every deployment
-  mode (even personal, whose org is auto-provisioned). Once onboarded: an active TEAM →
+  mode (even personal, whose org is auto-provisioned); after an accept the wizard asks only for
+  the profile. Once onboarded: an active TEAM →
   `/organization/$organizationSlug` (the clinic's home, which sends the member on to their
   role home — Today for most roles), else the `/organization` picker. Personal workspaces
   have no clinic (D44), so a PERSONAL active org lands on the picker too: its list and
@@ -181,14 +186,16 @@ store, organization APIs, and storage — so it lives in `shared/`, exactly like
 src/shared/tenancy/
 ├── TENANCY.OVERVIEW.md            (+ FLOWS / PATTERNS / POLICIES docs)
 ├── organization-context.ts        read canonical organization from route → sync store
-├── organization-resolver.ts       "/" resolver logic (me/context → my-organizations → onboarding)
+├── organization-resolver.ts       "/" resolver logic (me/context → invitations → onboarding → my-organizations)
 ├── organization-membership.ts     membership + per-organization permission loading
 ├── deployment-mode.ts             personal/team deployment-mode model (two flags → three modes)
 ├── me-context.ts                  GET /auth/me/context schema + query
 ├── session-context.ts             session hydrate/invalidate
 ├── switch.ts                      /auth/switch-to-organization (token re-mint, generation guard)
 ├── tenancy-service.ts             (moved from shared/api/)
-└── my-organizations.ts            (moved from shared/api/my-orgs.ts)
+├── my-organizations.ts            (moved from shared/api/my-orgs.ts)
+├── my-invitations.ts              the person's pending invitations + decline (D84)
+└── accept-invitation.ts           accept (link token or none) → switch → refresh (D84)
 ```
 
 Slug parsing lives in `lib/routes/params.ts` (`parseOrganizationSlugParam`), not in this module;

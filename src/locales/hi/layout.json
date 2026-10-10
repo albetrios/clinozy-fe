@@ -20,7 +20,10 @@
       "personal": "व्यक्तिगत",
       "yourOrganizations": "आपके संगठन",
       "organizations": "संगठन",
-      "addOrganization": "संगठन जोड़ें"
+      "addOrganization": "संगठन जोड़ें",
+      "invited": "आमंत्रित",
+      "invitedRow": "आमंत्रित · {{roles}}",
+      "invitationCount": "आमंत्रण: {{count}}"
     },
     "notifications": {
       "title": "सूचनाएँ",

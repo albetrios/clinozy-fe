@@ -11,7 +11,14 @@ Where a bare `/` lands, decided from the JWT-backed session context.
 1. `resolveRootRedirect()` → `ensureSessionContext()` (cache-first read of
    `me/context`: onboarding flag + deployment flags + active org; refetches only
    on a cold boot).
-2. `resolveRootTarget(ctx)`:
+2. `resolveRootTarget(ctx, { pendingInvitations })` (`resolveRootTargetWithInvitations` reads the
+   invitations only when there is no active team org — a failed read counts as none):
+   - **Invited with no clinic (D84):** pending invitations, a team deployment and no active team
+     org → `/organization`, the picker, which lists them with Accept / Decline. Checked _before_
+     onboarding: team-only onboarding creates a clinic, and an invitee must not get a second,
+     empty one. After an accept the clinic is active, so the next decision is onboarding (its
+     profile steps only — the workspace step is skipped for someone who belongs to a clinic) or
+     the clinic's home.
    - **Onboarding first, every mode:** `needsOnboarding(ctx)` (i.e.
      `!user.onboarding_completed`) → `/onboarding`. This is checked _before_ any
      active-org routing, so a personal deployment's auto-provisioned org does not

@@ -459,6 +459,24 @@ Paths drop `/api/v1`. "Gap Gn" points into §8, "Mn" into §9, "Qn" into §10.
   allow, and one who opens neither is not listed. The Account menu's Status reads `GET /users/me`
   and saves `PUT /users/me/presence`. The fixture leads' API, hooks and hold are removed.
 
+### 5.12 Invitations at sign-in (D159)
+
+Not a design screen: the launch drew only "create a clinic" for someone with none. clinozy-be D84
+(ROUTE #172–#175) serves what an invited person needs.
+
+| Operation             | Route                                                       | What changes in the screen                                                                                            |
+| --------------------- | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| my invitations        | `GET /users/me/membership-invitations`                      | the picker's Invitations, the avatar's count, Switch clinic's Invited rows; `/` lands on the picker before onboarding |
+| accept in the app     | `POST /tenancy/membership-invitations/:id/accept` (no body) | then switch into the clinic; onboarding asks only for the profile                                                     |
+| accept from the email | the same, with `token`                                      | `/accept-invite/:id` — a missing token is no longer an error                                                          |
+| decline               | `POST /tenancy/membership-invitations/:id/decline`          | behind a confirm; the inviter is told (`membership.invite_declined`)                                                  |
+
+- **Where it is read:** only where it can change the landing — `/`, the onboarding guard, the
+  team-entry guard and the sign-in hand-off, when there is no clinic to enter — and by the picker,
+  the switcher and the avatar. A failed read counts as none.
+- **The seat:** an invitation 7 days past its expiry is ended by clinozy-be's daily sweep
+  (`invitation_expired`), which frees its seat; the client shows only what is pending.
+
 ## 6. The design features dropped (route map section 4)
 
 | #   | Feature                             | Removed from                                                                                                                                                                                                                                                                                                                        | Instead                                                                                        |

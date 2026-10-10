@@ -96,6 +96,9 @@ export const LAYOUT_KEYS = {
       yourOrganizations: 'app.orgSwitcher.yourOrganizations',
       organizations: 'app.orgSwitcher.organizations',
       addOrganization: 'app.orgSwitcher.addOrganization',
+      invited: 'app.orgSwitcher.invited',
+      invitedRow: 'app.orgSwitcher.invitedRow',
+      invitationCount: 'app.orgSwitcher.invitationCount',
     },
     notifications: {
       title: 'app.notifications.title',

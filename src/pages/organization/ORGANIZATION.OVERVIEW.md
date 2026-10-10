@@ -6,13 +6,23 @@ redirects here when the user has organizations but no (valid) last-used one, and
 active workspace is personal — a personal workspace has no clinic (D44), so the list and
 "Create organization" are its way in. Spec: `docs/reference/routing-and-tenancy.md`.
 
+**Invitations (clinozy-be launch D84).** Above the list, the person's pending invitations
+(`GET /users/me/membership-invitations`): the clinic, the roles, who invited them and the
+expiry, each with **Accept** (no token needed — the signed-in owner of the invited, verified
+email) and **Decline** (after a confirm; the inviter is told). An invited person with no clinic
+lands here **before** onboarding — the resolver sends them — and reads "You're invited", with
+"Create my own organization instead" as the way out; a member of another clinic reaches it from
+the switcher's "Invited" rows. Accepting hands off to `/`: onboarding's profile steps for someone
+who has not finished it (never the create-a-clinic step), else the clinic's home.
+
 ## Files
 
-| File                         | Responsibility                                                                                                                                                                                                                       |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `organization.route.tsx`     | Route marker — exports `Component` rendering `OrganizationPickerPage`.                                                                                                                                                               |
-| `organization.manifest.ts`   | Manifest — `kind: 'leaf'`, `children: []`, `permission: null` (bespoke guards in routeTree).                                                                                                                                         |
-| `OrganizationPickerPage.tsx` | Picker UI — the signed-out canvas (`PublicFrame`) and its 360px card: the organizations as All sections rows (tone tile, name, slug; the active one is the current row) + the create drawer. Owns `data-testid="organization-page"`. |
+| File                         | Responsibility                                                                                                                                                                                                                                                |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `organization.route.tsx`     | Route marker — exports `Component` rendering `OrganizationPickerPage`.                                                                                                                                                                                        |
+| `organization.manifest.ts`   | Manifest — `kind: 'leaf'`, `children: []`, `permission: null` (bespoke guards in routeTree).                                                                                                                                                                  |
+| `OrganizationPickerPage.tsx` | Picker UI — the signed-out canvas (`PublicFrame`) and its 360px card: the pending invitations, the organizations as All sections rows (tone tile, name, slug; the active one is the current row) + the create drawer. Owns `data-testid="organization-page"`. |
+| `components/InvitationList/` | The pending invitations (D84): a row per invitation — clinic, roles · inviter, expiry, Accept / Decline (confirm) — and the accept / decline flow (`acceptInvitationAndOpenClinic`, `declineInvitation`).                                                     |
 
 ## Children
 

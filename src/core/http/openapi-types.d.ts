@@ -4296,6 +4296,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/tenancy/membership-invitations/{membership_invitation_id}/decline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Decline invitation */
+        post: operations["postTenancyMembershipInvitationsBymembership_invitation_idDecline"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/tenancy/organization": {
         parameters: {
             query?: never;
@@ -4906,6 +4923,23 @@ export interface paths {
         };
         /** Get GDPR data export status */
         get: operations["getUsersMeDataExportBydata_export_id"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/me/membership-invitations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List my invitations */
+        get: operations["getUsersMeMembershipInvitations"];
         put?: never;
         post?: never;
         delete?: never;
@@ -29522,10 +29556,63 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    token: string;
+                    token?: string;
                 };
             };
         };
+        responses: {
+            200: {
+                headers: {
+                    "X-Idempotency-Replay"?: "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            /** Format: date-time */
+                            accepted_at?: string | null;
+                            /** Format: date-time */
+                            created_at?: string;
+                            /** Format: email */
+                            email?: string;
+                            /** Format: date-time */
+                            expires_at?: string;
+                            id?: string;
+                            membership_id?: string;
+                            organization_id?: string;
+                            /** Format: date-time */
+                            revoked_at?: string | null;
+                        };
+                        meta?: {
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["ApiError"];
+            401: components["responses"]["ApiError"];
+            403: components["responses"]["ApiError"];
+            404: components["responses"]["ApiError"];
+            409: components["responses"]["ApiError"];
+            413: components["responses"]["ApiError"];
+            415: components["responses"]["ApiError"];
+            422: components["responses"]["ApiError"];
+            429: components["responses"]["ApiError"];
+            500: components["responses"]["ApiError"];
+        };
+    };
+    postTenancyMembershipInvitationsBymembership_invitation_idDecline: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Idempotency-Key": string;
+            };
+            path: {
+                membership_invitation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             200: {
                 headers: {
@@ -30219,7 +30306,7 @@ export interface operations {
                             created_at?: string;
                             display_name?: string;
                             /** @enum {string|null} */
-                            end_reason?: "mistake" | "duplicate" | "not_needed" | "other" | "left" | "account_deleted" | null;
+                            end_reason?: "mistake" | "duplicate" | "not_needed" | "other" | "left" | "account_deleted" | "declined" | "invitation_expired" | null;
                             /** Format: date-time */
                             ended_at?: string | null;
                             id?: string;
@@ -30316,7 +30403,7 @@ export interface operations {
                             created_at?: string;
                             display_name?: string;
                             /** @enum {string|null} */
-                            end_reason?: "mistake" | "duplicate" | "not_needed" | "other" | "left" | "account_deleted" | null;
+                            end_reason?: "mistake" | "duplicate" | "not_needed" | "other" | "left" | "account_deleted" | "declined" | "invitation_expired" | null;
                             /** Format: date-time */
                             ended_at?: string | null;
                             id?: string;
@@ -30393,7 +30480,7 @@ export interface operations {
                             created_at?: string;
                             display_name?: string;
                             /** @enum {string|null} */
-                            end_reason?: "mistake" | "duplicate" | "not_needed" | "other" | "left" | "account_deleted" | null;
+                            end_reason?: "mistake" | "duplicate" | "not_needed" | "other" | "left" | "account_deleted" | "declined" | "invitation_expired" | null;
                             /** Format: date-time */
                             ended_at?: string | null;
                             id?: string;
@@ -30519,7 +30606,7 @@ export interface operations {
                             created_at?: string;
                             display_name?: string;
                             /** @enum {string|null} */
-                            end_reason?: "mistake" | "duplicate" | "not_needed" | "other" | "left" | "account_deleted" | null;
+                            end_reason?: "mistake" | "duplicate" | "not_needed" | "other" | "left" | "account_deleted" | "declined" | "invitation_expired" | null;
                             /** Format: date-time */
                             ended_at?: string | null;
                             id?: string;
@@ -30721,7 +30808,7 @@ export interface operations {
                             created_at?: string;
                             display_name?: string;
                             /** @enum {string|null} */
-                            end_reason?: "mistake" | "duplicate" | "not_needed" | "other" | "left" | "account_deleted" | null;
+                            end_reason?: "mistake" | "duplicate" | "not_needed" | "other" | "left" | "account_deleted" | "declined" | "invitation_expired" | null;
                             /** Format: date-time */
                             ended_at?: string | null;
                             id?: string;
@@ -30837,7 +30924,7 @@ export interface operations {
                     /** Format: date-time */
                     muted_until?: string | null;
                     /** @enum {string} */
-                    notification_type: "system.welcome" | "system.maintenance" | "security.alert" | "billing.usage_threshold" | "billing.payment_succeeded" | "billing.payment_failed" | "membership.invite_accepted" | "subscription.updated" | "webhook.delivery_failed";
+                    notification_type: "system.welcome" | "system.maintenance" | "security.alert" | "billing.usage_threshold" | "billing.payment_succeeded" | "billing.payment_failed" | "membership.invite_accepted" | "membership.invite_declined" | "subscription.updated" | "webhook.delivery_failed";
                 };
             };
         };
@@ -31559,7 +31646,7 @@ export interface operations {
                             created_at?: string;
                             display_name?: string;
                             /** @enum {string|null} */
-                            end_reason?: "mistake" | "duplicate" | "not_needed" | "other" | "left" | "account_deleted" | null;
+                            end_reason?: "mistake" | "duplicate" | "not_needed" | "other" | "left" | "account_deleted" | "declined" | "invitation_expired" | null;
                             /** Format: date-time */
                             ended_at?: string | null;
                             id?: string;
@@ -32569,6 +32656,58 @@ export interface operations {
             500: components["responses"]["ApiError"];
         };
     };
+    getUsersMeMembershipInvitations: {
+        parameters: {
+            query?: {
+                after?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            /** Format: date-time */
+                            created_at?: string;
+                            /** Format: date-time */
+                            expires_at?: string;
+                            id?: string;
+                            inviter_name?: string | null;
+                            organization?: {
+                                id?: string;
+                                logo_url?: string | null;
+                                name?: string;
+                                slug?: string | null;
+                            };
+                            role_names?: string[];
+                        }[];
+                        meta?: {
+                            pagination: {
+                                has_more?: boolean;
+                                next?: string | null;
+                                per_page?: number;
+                            };
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["ApiError"];
+            401: components["responses"]["ApiError"];
+            403: components["responses"]["ApiError"];
+            404: components["responses"]["ApiError"];
+            429: components["responses"]["ApiError"];
+            500: components["responses"]["ApiError"];
+        };
+    };
     getUsersMeNotificationPreferences: {
         parameters: {
             query?: never;
@@ -32620,7 +32759,7 @@ export interface operations {
                         channel: "EMAIL" | "SMS" | "WEB_PUSH" | "IN_APP";
                         is_enabled: boolean;
                         /** @enum {string} */
-                        notification_type: "system.welcome" | "system.maintenance" | "security.alert" | "billing.usage_threshold" | "billing.payment_succeeded" | "billing.payment_failed" | "membership.invite_accepted" | "subscription.updated" | "webhook.delivery_failed";
+                        notification_type: "system.welcome" | "system.maintenance" | "security.alert" | "billing.usage_threshold" | "billing.payment_succeeded" | "billing.payment_failed" | "membership.invite_accepted" | "membership.invite_declined" | "subscription.updated" | "webhook.delivery_failed";
                     }[];
                 };
             };

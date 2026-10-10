@@ -18,10 +18,13 @@ import { ThemeModeToggle } from '@/shared/components/ThemeModeToggle/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import { Building, ChevronRight, Plus } from '@/shared/icons/index.ts';
+import { useMyInvitations } from '@/shared/tenancy/my-invitations.ts';
 import {
   type MyOrganizationSummary,
   useMyOrganizationSummaries,
 } from '@/shared/tenancy/my-organization-summaries.ts';
+
+import { InvitationList } from './components/InvitationList/index.ts';
 
 /**
  * One organization as an All sections row (`shell.md:43`; H:532): the 28px
@@ -81,7 +84,7 @@ function OrganizationRow({
  * matters because this screen is where the resolver sends a user who has
  * nowhere else to land.
  */
-function OrganizationList() {
+function OrganizationList({ invited }: { invited: boolean }) {
   const { t } = useTranslation(AUTH_NS);
   /*
    * The same list, under the same cache key, that the guard chain and the
@@ -96,7 +99,8 @@ function OrganizationList() {
     (org): org is MyOrganizationSummary & { slug: string } => org.slug !== null,
   );
 
-  const isEmpty = !(isLoading || isError) && organizations.length === 0;
+  // Someone who is only invited has their invitations above, not "you're not part of any yet".
+  const isEmpty = !(isLoading || isError || invited) && organizations.length === 0;
 
   return (
     <>
@@ -154,12 +158,23 @@ function OrganizationList() {
  * Organization picker — choose which organization to enter. Selecting one
  * navigates to its home (the member's role home); the organization guard syncs
  * context from the URL and persists the choice for the `/` resolver. The
- * signed-out canvas and its 360px card: the heading, the list as All sections
- * rows, then "Create organization".
+ * signed-out canvas and its 360px card: the heading, the pending invitations
+ * (D84 — Accept or Decline each), the list as All sections rows, then "Create
+ * organization". Someone invited into no organization yet reads "You're
+ * invited", and the create action becomes "Create my own organization instead".
  */
 export function OrganizationPickerPage() {
   const { t } = useTranslation(AUTH_NS);
   const [createOpen, setCreateOpen] = useState(false);
+  const invitations = useMyInvitations().data ?? [];
+  const organizations = useMyOrganizationSummaries().data;
+  const invited = invitations.length > 0;
+  // Invited and in no organization yet: this screen is their invitations (D84), with
+  // "create my own" as the way out instead of the main path.
+  const onlyInvited =
+    invited &&
+    organizations !== undefined &&
+    !organizations.some((org) => org.slug !== null);
 
   return (
     <PublicFrame
@@ -169,16 +184,35 @@ export function OrganizationPickerPage() {
     >
       <PublicCard>
         <PublicCardHeader
-          title={t(AUTH_KEYS.organizationPicker.heading)}
-          description={t(AUTH_KEYS.organizationPicker.subheading)}
+          title={t(
+            onlyInvited
+              ? AUTH_KEYS.organizationPicker.invitedHeading
+              : AUTH_KEYS.organizationPicker.heading,
+          )}
+          description={t(
+            onlyInvited
+              ? AUTH_KEYS.organizationPicker.invitedSubheading
+              : AUTH_KEYS.organizationPicker.subheading,
+          )}
         />
+
+        {invited ? (
+          <div className="-mx-1.5">
+            <SectionErrorBoundary
+              title={t(AUTH_KEYS.organizationPicker.invitationsTitle)}
+              testId="organization-picker-invitations-error"
+            >
+              <InvitationList invitations={invitations} />
+            </SectionErrorBoundary>
+          </div>
+        ) : null}
 
         <div className="-mx-1.5 flex flex-col gap-0.5">
           <SectionErrorBoundary
             title={t(AUTH_KEYS.organizationPicker.listTitle)}
             testId="organization-picker-list-error"
           >
-            <OrganizationList />
+            <OrganizationList invited={invited} />
           </SectionErrorBoundary>
         </div>
 
@@ -189,7 +223,11 @@ export function OrganizationPickerPage() {
           data-testid="organization-picker-create"
         >
           <Plus className="size-4" />
-          {t(AUTH_KEYS.organizationPicker.create)}
+          {t(
+            onlyInvited
+              ? AUTH_KEYS.organizationPicker.createOwn
+              : AUTH_KEYS.organizationPicker.create,
+          )}
         </Button>
       </PublicCard>
 
