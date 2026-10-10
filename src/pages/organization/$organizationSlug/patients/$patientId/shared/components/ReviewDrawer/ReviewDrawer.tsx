@@ -1,4 +1,3 @@
-import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useForm, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -18,9 +17,9 @@ import {
   RECORD_DRAWER_KEYS,
   RECORD_DRAWER_NS,
 } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
+import { useEditingRecord } from '@/shared/hooks/useEditingRecord/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import { notify } from '@/shared/notify/index.ts';
-import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 import { ratingTone } from '../../patient-feedback.ts';
 import { REVIEW_KEYS, REVIEW_NS, REVIEW_TEST_ID } from './review.constants.ts';
@@ -55,29 +54,11 @@ export interface ReviewDrawerProps {
   onClose: () => void;
 }
 
-/**
- * An edit's record, kept in step with a reload: a save refused as stale (`409
- * record_changed`) reads the review again and restarts the form on what was saved.
- */
-function useEditingReview(
-  review: PatientReview | null,
-  reset: (record: PatientReview) => void,
-) {
-  const queryClient = useQueryClient();
-  const organizationId = useOrganizationStore((state) => state.organizationId);
-  const [record, setRecord] = useState(review);
-  const reload = async () => {
-    if (!record) return;
-    const fresh = await queryClient.query({
-      queryKey: feedbackQueryKeys.review(organizationId, record.id),
-      queryFn: () => fetchReview(record.patientId, record.id),
-      staleTime: 0,
-    });
-    setRecord(fresh);
-    reset(fresh);
-  };
-  return { record, reload };
-}
+/** An edit's review read again — the stale save's "Reload". */
+const readReview = (review: PatientReview, organizationId: string | null) => ({
+  queryKey: feedbackQueryKeys.review(organizationId, review.id),
+  queryFn: () => fetchReview(review.patientId, review.id),
+});
 
 /**
  * Log a review — `reviews/create/`, `reviews/$reviewId/edit/` (KICKOFF §6.6
@@ -103,9 +84,12 @@ export function ReviewDrawer({
   const form = useForm<ReviewFormValues>({
     defaultValues: review ? reviewFormOf(review) : newReviewForm(source ?? undefined),
   });
-  const { record, reload } = useEditingReview(review, (fresh) =>
-    form.reset(reviewFormOf(fresh)),
-  );
+  const { record, reload } = useEditingRecord({
+    record: review,
+    form,
+    formOf: reviewFormOf,
+    read: readReview,
+  });
   const values = useFormValues(form);
   const { isDirty } = useFormState({ control: form.control });
   const [step, setStep] = useState<string>('review');

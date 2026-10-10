@@ -1,4 +1,3 @@
-import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from '@tanstack/react-router';
 import type { TFunction } from 'i18next';
 import { useId, useState } from 'react';
@@ -24,12 +23,15 @@ import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
+import {
+  resetFormInPlace,
+  useEditingRecord,
+} from '@/shared/hooks/useEditingRecord/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import { useLead } from '@/shared/hooks/useLeads/index.ts';
 import { usePatient, usePersonByPhone } from '@/shared/hooks/usePatients/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
 import { notify } from '@/shared/notify/index.ts';
-import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 import {
   PATIENT_DRAWER_KEYS,
@@ -173,29 +175,11 @@ function usePersonInput(
   };
 }
 
-/**
- * An edit's record, kept in step with a reload: a save refused as stale (`409
- * record_changed`) reads the patient again and restarts the form on what was saved.
- */
-function useEditingRecord(
-  patient: PatientRecord | null,
-  reset: (record: PatientRecord) => void,
-) {
-  const queryClient = useQueryClient();
-  const organizationId = useOrganizationStore((state) => state.organizationId);
-  const [record, setRecord] = useState(patient);
-  const reload = async () => {
-    if (!record) return;
-    const fresh = await queryClient.query({
-      queryKey: patientQueryKeys.detail(organizationId, record.id),
-      queryFn: () => fetchPatient(record.id),
-      staleTime: 0,
-    });
-    setRecord(fresh);
-    reset(fresh);
-  };
-  return { record, reload };
-}
+/** An edit's patient read again — the stale save's "Reload". */
+const readPatient = (patient: PatientRecord, organizationId: string | null) => ({
+  queryKey: patientQueryKeys.detail(organizationId, patient.id),
+  queryFn: () => fetchPatient(patient.id),
+});
 
 /** The Quick fill chips: each presets fields and keeps the rest; none saves. */
 function quickFillItems(
@@ -207,7 +191,8 @@ function quickFillItems(
     label: t(K.quickFill[fill.id]),
     tone: fill.tone,
     onSelect: () =>
-      form.reset(
+      resetFormInPlace(
+        form,
         { ...form.getValues(), ...fill.values },
         { keepDefaultValues: true, keepErrors: true },
       ),
@@ -366,9 +351,12 @@ function PatientDrawerSession(props: SessionProps) {
   const form = useForm<PatientFormValues>({
     defaultValues: editing ? patientFormOf(editing) : emptyPatientForm(prefill),
   });
-  const { record, reload } = useEditingRecord(editing, (fresh) =>
-    form.reset(patientFormOf(fresh)),
-  );
+  const { record, reload } = useEditingRecord({
+    record: editing,
+    form,
+    formOf: patientFormOf,
+    read: readPatient,
+  });
   const values = useFormValues(form);
   const { isDirty } = useFormState({ control: form.control });
   const [openStep, setOpenStep] = useState<string>('contact');

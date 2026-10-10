@@ -35,6 +35,7 @@ import { useBranches } from '@/shared/hooks/useBranches/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
+import { resetFormInPlace } from '@/shared/hooks/useEditingRecord/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import {
   useOpenSupplierBills,
@@ -134,7 +135,8 @@ function quickFillItems(
       label,
       tone: fill.tone,
       onSelect: () =>
-        form.reset(
+        resetFormInPlace(
+          form,
           {
             ...form.getValues(),
             category: fill.values.category,
@@ -381,7 +383,9 @@ function stepBodies({
           bills={bills ?? []}
           picked={values.bill ? supplierBillKey(values.bill) : null}
           onPick={(bill) =>
-            form.reset(withBill(form.getValues(), bill), { keepDefaultValues: true })
+            resetFormInPlace(form, withBill(form.getValues(), bill), {
+              keepDefaultValues: true,
+            })
           }
           readOnly={readOnly}
           testId={SEND_DRAWER_TEST_ID}

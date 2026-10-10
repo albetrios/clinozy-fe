@@ -14,6 +14,7 @@ import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
 import { useClinicAccessMatrix } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
+import { resetFormInPlace } from '@/shared/hooks/useEditingRecord/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import { useResendInvitation } from '@/shared/hooks/useInvitations/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
@@ -108,7 +109,8 @@ function quickFillItems(
     label: t(K.quickFill[fill.id]),
     tone: fill.tone,
     onSelect: () =>
-      form.reset(
+      resetFormInPlace(
+        form,
         { ...form.getValues(), ...fill.values },
         { keepDefaultValues: true, keepErrors: true },
       ),

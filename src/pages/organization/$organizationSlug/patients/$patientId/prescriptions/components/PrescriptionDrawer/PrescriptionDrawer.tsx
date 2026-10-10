@@ -1,4 +1,3 @@
-import { useQueryClient } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
 import { useState } from 'react';
 import { useForm, type UseFormReturn, useFormState } from 'react-hook-form';
@@ -32,9 +31,12 @@ import {
   RECORD_DRAWER_KEYS,
   RECORD_DRAWER_NS,
 } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
+import {
+  resetFormInPlace,
+  useEditingRecord,
+} from '@/shared/hooks/useEditingRecord/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
-import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 import { useStaffMember } from '../../../shared/components/PatientStaffPicker/index.ts';
 import {
@@ -219,7 +221,8 @@ function quickFillItems({
   t: TFunction;
 }): QuickFillItem[] {
   const fill = (values: Partial<RxFormValues>) =>
-    form.reset(
+    resetFormInPlace(
+      form,
       { ...form.getValues(), ...values },
       { keepDefaultValues: true, keepErrors: true },
     );
@@ -252,30 +255,22 @@ function quickFillItems({
   return items;
 }
 
-/**
- * An edit's draft, kept in step with a reload: a save refused as stale (`409 record_changed`)
- * reads the prescription again and restarts the form on what was saved.
- */
-function useEditingRecord(
-  prescription: PrescriptionRecord | null,
-  reset: (record: PrescriptionRecord) => void,
-) {
-  const queryClient = useQueryClient();
-  const organizationId = useOrganizationStore((state) => state.organizationId);
-  const [record, setRecord] = useState(prescription);
-  const reload = async () => {
-    if (!record) return;
-    const fresh = await queryClient.query({
-      queryKey: prescriptionQueryKeys.detail(organizationId, record.patientId, record.id),
-      queryFn: () =>
-        fetchPrescription({ patientId: record.patientId, prescriptionId: record.id }),
-      staleTime: 0,
-    });
-    setRecord(fresh);
-    reset(fresh);
-  };
-  return { record, reload };
-}
+/** An edit's draft read again — the stale save's "Reload". */
+const readPrescription = (
+  prescription: PrescriptionRecord,
+  organizationId: string | null,
+) => ({
+  queryKey: prescriptionQueryKeys.detail(
+    organizationId,
+    prescription.patientId,
+    prescription.id,
+  ),
+  queryFn: () =>
+    fetchPrescription({
+      patientId: prescription.patientId,
+      prescriptionId: prescription.id,
+    }),
+});
 
 /** What the drawer allows for the record it holds (Q19): a draft is changed by an approver only. */
 function rxDrawerMode(
@@ -404,9 +399,12 @@ export function PrescriptionDrawer({
       catalog: catalog?.medicines ?? [],
     }),
   });
-  const { record, reload } = useEditingRecord(prescription, (fresh) =>
-    form.reset(rxFormOf(fresh)),
-  );
+  const { record, reload } = useEditingRecord({
+    record: prescription,
+    form,
+    formOf: rxFormOf,
+    read: readPrescription,
+  });
   const values = useFormValues(form);
   const { isDirty } = useFormState({ control: form.control });
   const [step, setStep] = useState<string>('prescription');

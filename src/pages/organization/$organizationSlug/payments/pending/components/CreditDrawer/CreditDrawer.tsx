@@ -19,6 +19,7 @@ import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useCreateCredit, useUpdateCredit } from '@/shared/hooks/useCredits/index.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
+import { resetFormInPlace } from '@/shared/hooks/useEditingRecord/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { usePatientInvoices } from '@/shared/hooks/usePayments/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -296,7 +297,7 @@ function CreditSession({
   });
   const summary = useSummary(values);
   const replace = (next: CreditFormValues) =>
-    form.reset(next, { keepDefaultValues: true });
+    resetFormInPlace(form, next, { keepDefaultValues: true });
   const fieldsProps = { form, values, idPrefix, testId: CREDIT_DRAWER_TEST_ID, readOnly };
 
   const steps = useSteps({

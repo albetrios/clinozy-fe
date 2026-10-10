@@ -1,4 +1,3 @@
-import { useQueryClient } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
 import { useState } from 'react';
 import { useForm, type UseFormReturn, useFormState } from 'react-hook-form';
@@ -22,10 +21,13 @@ import {
   RecordDrawer,
 } from '@/shared/components/RecordDrawer/index.ts';
 import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import {
+  resetFormInPlace,
+  useEditingRecord,
+} from '@/shared/hooks/useEditingRecord/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import { useTreatmentFeedback } from '@/shared/hooks/useTreatments/index.ts';
 import { notify } from '@/shared/notify/index.ts';
-import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 import { useStaffMember } from '../../../shared/components/PatientStaffPicker/index.ts';
 import {
@@ -116,7 +118,7 @@ function quickFillItems({
   t: TFunction;
 }): QuickFillItem[] {
   const fill = (values: TreatmentFormValues) =>
-    form.reset(values, { keepDefaultValues: true, keepErrors: true });
+    resetFormInPlace(form, values, { keepDefaultValues: true, keepErrors: true });
   const items: QuickFillItem[] = [];
   if (editing && onLogCheckIn) {
     items.push({
@@ -153,29 +155,11 @@ function quickFillItems({
   return items;
 }
 
-/**
- * An edit's session, kept in step with a reload: a save refused as stale (`409
- * record_changed`) reads it again and restarts the form on what was saved.
- */
-function useEditingTreatment(
-  treatment: TreatmentRecord | null,
-  reset: (fresh: TreatmentRecord) => void,
-) {
-  const queryClient = useQueryClient();
-  const organizationId = useOrganizationStore((state) => state.organizationId);
-  const [record, setRecord] = useState(treatment);
-  const reload = async () => {
-    if (!record) return;
-    const fresh = await queryClient.query({
-      queryKey: treatmentQueryKeys.detail(organizationId, record.patientId, record.id),
-      queryFn: () => fetchTreatment(record.patientId, record.id),
-      staleTime: 0,
-    });
-    setRecord(fresh);
-    reset(fresh);
-  };
-  return { record, reload };
-}
+/** An edit's session read again — the stale save's "Reload". */
+const readTreatment = (treatment: TreatmentRecord, organizationId: string | null) => ({
+  queryKey: treatmentQueryKeys.detail(organizationId, treatment.patientId, treatment.id),
+  queryFn: () => fetchTreatment(treatment.patientId, treatment.id),
+});
 
 /** "Reversed 10 Oct · Recorded by mistake" — under the header of a reversed session. */
 function ReversedBand({ treatment }: { treatment: TreatmentRecord }) {
@@ -381,9 +365,12 @@ export function TreatmentDrawer({
       : newTreatmentForm(template, staff, last),
   });
   const words = DRAWER_WORDS[opened ? 'edit' : 'create'];
-  const { record: treatment, reload } = useEditingTreatment(opened, (fresh) =>
-    form.reset(treatmentFormOf(fresh)),
-  );
+  const { record: treatment, reload } = useEditingRecord({
+    record: opened,
+    form,
+    formOf: treatmentFormOf,
+    read: readTreatment,
+  });
   const values = useFormValues(form);
   const { isDirty } = useFormState({ control: form.control });
   const [step, setStep] = useState<string>('session');
@@ -464,7 +451,7 @@ export function TreatmentDrawer({
         <TreatmentTypeSwitch
           value={values.template}
           onChange={(next) =>
-            form.reset(withTemplate(form.getValues(), next), {
+            resetFormInPlace(form, withTemplate(form.getValues(), next), {
               keepDefaultValues: true,
               keepErrors: true,
             })

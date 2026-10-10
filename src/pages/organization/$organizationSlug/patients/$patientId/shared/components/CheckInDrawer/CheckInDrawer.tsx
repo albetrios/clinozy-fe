@@ -1,4 +1,3 @@
-import { useQueryClient } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
 import { useState } from 'react';
 import { useForm, useFormState } from 'react-hook-form';
@@ -8,13 +7,13 @@ import { feedbackQueryKeys, fetchCheckIn } from '@/shared/api/clinic/feedback-ap
 import type { PatientCheckIn } from '@/shared/api/clinic/feedback-contracts.ts';
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
+import { useEditingRecord } from '@/shared/hooks/useEditingRecord/index.ts';
 import {
   useCheckInContext,
   useCheckInOfferings,
 } from '@/shared/hooks/useFeedback/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import { notify } from '@/shared/notify/index.ts';
-import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 import { CHECK_IN_KEYS, CHECK_IN_NS, CHECK_IN_TEST_ID } from './check-in.constants.ts';
 import {
@@ -67,29 +66,11 @@ function savedMessage(t: TFunction, patientName: string, saved: PatientCheckIn):
   ].join('');
 }
 
-/**
- * An edit's record, kept in step with a reload: a save refused as stale (`409
- * record_changed`) reads the check-in again and restarts the form on what was saved.
- */
-function useEditingCheckIn(
-  checkIn: PatientCheckIn | null,
-  reset: (record: PatientCheckIn) => void,
-) {
-  const queryClient = useQueryClient();
-  const organizationId = useOrganizationStore((state) => state.organizationId);
-  const [record, setRecord] = useState(checkIn);
-  const reload = async () => {
-    if (!record) return;
-    const fresh = await queryClient.query({
-      queryKey: feedbackQueryKeys.checkIn(organizationId, record.id),
-      queryFn: () => fetchCheckIn(record.patientId, record.id),
-      staleTime: 0,
-    });
-    setRecord(fresh);
-    reset(fresh);
-  };
-  return { record, reload };
-}
+/** An edit's check-in read again — the stale save's "Reload". */
+const readCheckIn = (checkIn: PatientCheckIn, organizationId: string | null) => ({
+  queryKey: feedbackQueryKeys.checkIn(organizationId, checkIn.id),
+  queryFn: () => fetchCheckIn(checkIn.patientId, checkIn.id),
+});
 
 /**
  * Visit / Aftercare check-in — `check-ins/create/`, `check-ins/$checkInId/edit/`
@@ -115,9 +96,12 @@ export function CheckInDrawer({
   const form = useForm<CheckInFormValues>({
     defaultValues: checkIn ? checkInFormOf(checkIn) : newCheckInForm(),
   });
-  const { record, reload } = useEditingCheckIn(checkIn, (fresh) =>
-    form.reset(checkInFormOf(fresh)),
-  );
+  const { record, reload } = useEditingRecord({
+    record: checkIn,
+    form,
+    formOf: checkInFormOf,
+    read: readCheckIn,
+  });
   const context = useCheckInContext(patientId, {
     appointmentId,
     treatmentId,

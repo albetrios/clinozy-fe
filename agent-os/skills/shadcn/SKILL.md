@@ -74,7 +74,9 @@ clobbers this section — restore it and re-run `pnpm agent-os:lock`.
     the Picker's and ⌘K's own one-line empties stay.
   - A side drawer (a record, a form, a detail view) → **`RecordDrawer`** (steps, an `aside`
     column with phone `panes`, `headerStart` / `titleEnd` / `band` / `footerStart`,
-    `hideFooter`; `dirty` asks before discarding — `useDrawerSave`, `useDrawerSession`).
+    `hideFooter`; `dirty` asks before discarding — `useDrawerSave`, `useDrawerSession`;
+    a stale save's "Reload" through `useEditingRecord`, every other restart of a mounted
+    form through `resetFormInPlace`, never a bare `form.reset`).
     Never a hand-built `ui/sheet` or Radix Dialog panel. Every overlay is a `RecordDrawer`,
     the confirm frame (`ConfirmPanel`, through `ConfirmDialog`) or the ⌘K palette — menus,
     popovers and the `Picker`'s own sheet aside. There is no `ui/dialog` (retired once
