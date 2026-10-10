@@ -58,8 +58,8 @@ route renders nothing — this page reads the URL and opens the drawer over the 
 The data is the shared leads domain on clinozy-be: `@/shared/api/clinic/leads-api.ts`, its
 contracts and the hold (`@/shared/api/clinic/leads-hold.ts`, from `held_until`) beside it, the hooks in
 `@/shared/hooks/useLeads/`; the person in `@/shared/api/clinic/contacts-api.ts` / `@/shared/hooks/useContacts/`;
-the chat's stream in `@/shared/api/clinic/contact-activities-api.ts`; the team in `useTeamDirectory`. The rooms
-still on fixtures keep the fixture leads (`leads-fixture-*.ts`, `useFixtureLeads`).
+the chat's stream in `@/shared/api/clinic/contact-activities-api.ts`; the team in `useTeamDirectory`. The lead
+record itself lives in `@/shared/api/clinic/leads-fixture-contracts.ts`, beside the fixtures that store it.
 
 ## Files
 

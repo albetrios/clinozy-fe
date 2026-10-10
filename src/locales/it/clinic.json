@@ -547,9 +547,7 @@
     "groups": {
       "actions": "Azioni",
       "goTo": "Vai a",
-      "patients": "Pazienti",
-      "leads": "Lead",
-      "invoices": "Fatture"
+      "people": "Persone"
     },
     "actions": {
       "newLead": "Nuovo lead",
@@ -559,18 +557,11 @@
       "openTasks": "Apri attività"
     },
     "screen": "Schermata",
-    "patientSub": "{{id}} · •••• {{lastDigits}}",
-    "leadSub": "{{id}} · {{status}}",
-    "invoiceTitle": {
-      "clinic": "Fattura clinica {{id}}",
-      "medical": "Fattura farmacia {{id}}",
-      "consultation": "Fattura di consulenza {{id}}"
-    },
-    "invoiceSub": "{{person}} · {{date}}",
     "move": "spostarsi",
     "open": "aprire",
-    "hint": "Digita almeno 2 lettere per cercare pazienti, lead e fatture",
-    "empty": "Nessuna corrispondenza. Prova con un nome, un telefono o un #ID."
+    "hint": "Digita 3+ lettere o 4+ cifre per cercare persone",
+    "empty": "Nessun risultato. Prova un nome, un telefono o un numero C.",
+    "personSub": "{{id}} · •••• {{lastDigits}}"
   },
   "lists": {
     "loadError": "Impossibile caricare questo elenco · connessione persa. Viene mostrata l’ultima copia.",

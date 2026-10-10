@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2200 src files · ~1071 tests in src/ · 49 E2E specs · 26 shadcn UI primitives
+Stats: ~2196 src files · ~1068 tests in src/ · 49 E2E specs · 26 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -1434,9 +1434,7 @@ clinozy-fe/
 │   │   │   │   ├── invoices-fixture-contracts.ts
 │   │   │   │   ├── leads-api.ts
 │   │   │   │   ├── leads-contracts.ts
-│   │   │   │   ├── leads-fixture-api.ts
 │   │   │   │   ├── leads-fixture-contracts.ts
-│   │   │   │   ├── leads-fixture-hold.ts
 │   │   │   │   ├── leads-hold.ts
 │   │   │   │   ├── ledger-filter-values.ts
 │   │   │   │   ├── medicine-stock.ts
@@ -1487,7 +1485,7 @@ clinozy-fe/
 │   │   │   │   ├── users-contracts.ts
 │   │   │   │   ├── visits-api.ts
 │   │   │   │   ├── visits-contracts.ts
-│   │   │   │   └── [62 test files]
+│   │   │   │   └── [60 test files]
 │   │   │   ├── API.OVERVIEW.md
 │   │   │   ├── auth-api.ts
 │   │   │   ├── auth-contracts.ts
@@ -2455,10 +2453,6 @@ clinozy-fe/
 │   │   │   ├── useFeedback/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useFeedback.ts
-│   │   │   │   └── [1 test file]
-│   │   │   ├── useFixtureLeads/
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── useFixtureLeads.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── useFixtureLedger/
 │   │   │   │   ├── index.ts

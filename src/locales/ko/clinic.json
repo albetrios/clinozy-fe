@@ -541,9 +541,7 @@
     "groups": {
       "actions": "액션",
       "goTo": "이동",
-      "patients": "환자",
-      "leads": "리드",
-      "invoices": "청구서"
+      "people": "사람"
     },
     "actions": {
       "newLead": "새 리드",
@@ -553,18 +551,11 @@
       "openTasks": "작업 열기"
     },
     "screen": "화면",
-    "patientSub": "{{id}} · •••• {{lastDigits}}",
-    "leadSub": "{{id}} · {{status}}",
-    "invoiceTitle": {
-      "clinic": "클리닉 청구서 {{id}}",
-      "medical": "약국 청구서 {{id}}",
-      "consultation": "상담 청구서 {{id}}"
-    },
-    "invoiceSub": "{{person}} · {{date}}",
     "move": "이동",
     "open": "열기",
-    "hint": "환자, 리드, 청구서를 검색하려면 2글자 이상 입력하세요",
-    "empty": "일치하는 항목이 없습니다. 이름, 전화번호 또는 #ID로 검색해 보세요."
+    "hint": "사람을 검색하려면 3자 이상 또는 숫자 4자리 이상을 입력하세요",
+    "empty": "일치하는 항목이 없습니다. 이름, 전화번호 또는 C 번호로 시도해 보세요.",
+    "personSub": "{{id}} · •••• {{lastDigits}}"
   },
   "lists": {
     "loadError": "이 목록을 불러오지 못했습니다 · 연결이 끊겼습니다. 마지막 사본을 표시합니다.",

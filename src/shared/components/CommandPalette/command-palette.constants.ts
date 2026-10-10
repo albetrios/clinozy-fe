@@ -13,9 +13,7 @@ export const COMMAND_MENU_KEYS = {
   groups: {
     actions: 'commandMenu.groups.actions',
     goTo: 'commandMenu.groups.goTo',
-    patients: 'commandMenu.groups.patients',
-    leads: 'commandMenu.groups.leads',
-    invoices: 'commandMenu.groups.invoices',
+    people: 'commandMenu.groups.people',
   },
   actions: {
     newLead: 'commandMenu.actions.newLead',
@@ -25,25 +23,15 @@ export const COMMAND_MENU_KEYS = {
     openTasks: 'commandMenu.actions.openTasks',
   },
   screen: 'commandMenu.screen',
-  patientSub: 'commandMenu.patientSub',
-  leadSub: 'commandMenu.leadSub',
-  invoiceTitle: {
-    clinic: 'commandMenu.invoiceTitle.clinic',
-    medical: 'commandMenu.invoiceTitle.medical',
-    consultation: 'commandMenu.invoiceTitle.consultation',
-  },
-  invoiceSub: 'commandMenu.invoiceSub',
+  personSub: 'commandMenu.personSub',
   move: 'commandMenu.move',
   open: 'commandMenu.open',
   hint: 'commandMenu.hint',
   empty: 'commandMenu.empty',
 } as const;
 
-/** Rows per group (H:4608): the search returns ten of each type, the menu shows fewer. */
+/** Rows per group (H:4608); People shows every person the search answers (`COMMAND_SEARCH_LIMIT`). */
 export const COMMAND_MENU_LIMITS = {
   actions: 5,
   goTo: 4,
-  patients: 6,
-  leads: 5,
-  invoices: 4,
 } as const;

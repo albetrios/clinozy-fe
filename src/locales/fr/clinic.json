@@ -547,9 +547,7 @@
     "groups": {
       "actions": "Actions",
       "goTo": "Aller à",
-      "patients": "Patients",
-      "leads": "Prospects",
-      "invoices": "Factures"
+      "people": "Personnes"
     },
     "actions": {
       "newLead": "Nouveau prospect",
@@ -559,18 +557,11 @@
       "openTasks": "Ouvrir les tâches"
     },
     "screen": "Écran",
-    "patientSub": "{{id}} · •••• {{lastDigits}}",
-    "leadSub": "{{id}} · {{status}}",
-    "invoiceTitle": {
-      "clinic": "Facture clinique {{id}}",
-      "medical": "Facture de pharmacie {{id}}",
-      "consultation": "Facture de consultation {{id}}"
-    },
-    "invoiceSub": "{{person}} · {{date}}",
     "move": "naviguer",
     "open": "ouvrir",
-    "hint": "Tapez au moins 2 lettres pour rechercher des patients, des prospects et des factures",
-    "empty": "Aucun résultat. Essayez un nom, un téléphone ou un #ID."
+    "hint": "Saisissez 3+ lettres ou 4+ chiffres pour rechercher des personnes",
+    "empty": "Aucun résultat. Essayez un nom, un téléphone ou un numéro C.",
+    "personSub": "{{id}} · •••• {{lastDigits}}"
   },
   "lists": {
     "loadError": "Impossible de charger cette liste · connexion interrompue. Affichage de la dernière copie.",

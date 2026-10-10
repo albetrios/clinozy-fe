@@ -113,7 +113,7 @@ function PersonalCommandMenu() {
 
 /**
  * The menu itself. The clinic groups lead: "Actions" alone until something is
- * typed, then "Go to" and, from two characters, Patients / Leads / Invoices.
+ * typed, then "Go to" and, once the contacts search takes the query, People.
  * The platform rows (settings, workspaces, shortcuts, theme, sign out) follow
  * once typing — the relocation table keeps them here (§3.2) — or at once
  * where the clinic offers nothing.

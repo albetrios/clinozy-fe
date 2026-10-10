@@ -541,9 +541,7 @@
     "groups": {
       "actions": "アクション",
       "goTo": "移動",
-      "patients": "患者",
-      "leads": "リード",
-      "invoices": "請求書"
+      "people": "人物"
     },
     "actions": {
       "newLead": "新規リード",
@@ -553,18 +551,11 @@
       "openTasks": "タスクを開く"
     },
     "screen": "画面",
-    "patientSub": "{{id}} · •••• {{lastDigits}}",
-    "leadSub": "{{id}} · {{status}}",
-    "invoiceTitle": {
-      "clinic": "クリニック請求書 {{id}}",
-      "medical": "薬局請求書 {{id}}",
-      "consultation": "診察請求書 {{id}}"
-    },
-    "invoiceSub": "{{person}} · {{date}}",
     "move": "移動",
     "open": "開く",
-    "hint": "患者・リード・請求書を検索するには2文字以上入力してください",
-    "empty": "一致するものがありません。名前、電話番号、#IDで試してください。"
+    "hint": "人物を検索するには3文字以上または4桁以上を入力してください",
+    "empty": "一致するものがありません。名前、電話番号、または C 番号でお試しください。",
+    "personSub": "{{id}} · •••• {{lastDigits}}"
   },
   "lists": {
     "loadError": "このリストを読み込めませんでした · 接続が切れました。最後のコピーを表示しています。",

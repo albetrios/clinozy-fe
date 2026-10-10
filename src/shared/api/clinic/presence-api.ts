@@ -1,24 +1,27 @@
-import type { Presence } from './clinic-schema.ts';
+import { api } from '@/core/http/api.ts';
 
-let stored: Presence = 'online';
+import { type Presence, presenceSchema } from './clinic-schema.ts';
 
 /** TanStack Query keys for the signed-in member's presence. */
 export const presenceQueryKeys = {
   mine: () => ['clinic', 'presence', 'mine'] as const,
 };
 
-/** Read my presence. REPLACE_WITH_API: the staff profile's `presence` (S:206). */
+/** A presence as clinozy-be answers it; Online when it names none. */
+const presenceOf = (value: unknown): Presence =>
+  presenceSchema.catch('online').parse(value);
+
+/**
+ * Read my presence — Online · Away · Busy, the Account menu's Status — from my own user
+ * (`GET /users/me`). Others' presence is not served (G5): only your own.
+ */
 export async function fetchMyPresence(): Promise<Presence> {
-  return stored;
+  const response = await api.get('/users/me');
+  return presenceOf(response.data?.presence);
 }
 
-/** Set my presence. REPLACE_WITH_API: `setPresence` (S:1571). */
+/** Set my presence (`PUT /users/me/presence`); answers the presence clinozy-be saved. */
 export async function saveMyPresence(presence: Presence): Promise<Presence> {
-  stored = presence;
-  return stored;
-}
-
-/** Test-only: put the fixture back to Online. */
-export function resetPresenceFixture(): void {
-  stored = 'online';
+  const response = await api.put('/users/me/presence', { body: { presence } });
+  return presenceOf(response.data?.presence);
 }

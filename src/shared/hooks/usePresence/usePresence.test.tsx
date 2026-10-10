@@ -3,9 +3,22 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import * as presenceApi from '@/shared/api/clinic/presence-api.ts';
+import type { Presence } from '@/shared/api/clinic/clinic-schema.ts';
+import type * as PresenceApiModule from '@/shared/api/clinic/presence-api.ts';
 
 import { usePresence } from './usePresence.ts';
+
+/** clinozy-be's copy of my presence (`GET /users/me`, `PUT /users/me/presence`). */
+const server = vi.hoisted(() => ({
+  presence: 'online' as Presence,
+  fetchMyPresence: vi.fn(),
+  saveMyPresence: vi.fn(),
+}));
+vi.mock('@/shared/api/clinic/presence-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof PresenceApiModule>()),
+  fetchMyPresence: server.fetchMyPresence,
+  saveMyPresence: server.saveMyPresence,
+}));
 
 const { reportErrorMock } = vi.hoisted(() => ({ reportErrorMock: vi.fn() }));
 vi.mock('@/shared/errors/errorHandler.ts', () => ({ reportError: reportErrorMock }));
@@ -19,13 +32,19 @@ function renderPresence() {
 }
 
 beforeEach(() => {
-  presenceApi.resetPresenceFixture();
+  server.presence = 'online';
+  server.fetchMyPresence.mockReset();
+  server.fetchMyPresence.mockImplementation(async () => server.presence);
+  server.saveMyPresence.mockReset();
+  server.saveMyPresence.mockImplementation(async (next: Presence) => {
+    server.presence = next;
+    return next;
+  });
   reportErrorMock.mockReset();
 });
 
 afterEach(() => {
   vi.useRealTimers();
-  vi.restoreAllMocks();
 });
 
 describe('usePresence', () => {
@@ -34,14 +53,13 @@ describe('usePresence', () => {
     await waitFor(() => expect(result.current.presence).toBe('online'));
     act(() => result.current.setPresence('away'));
     await waitFor(() => expect(result.current.presence).toBe('away'));
-    expect(await presenceApi.fetchMyPresence()).toBe('away');
+    await waitFor(() => expect(server.presence).toBe('away'));
   });
 
   it('retries a failed save, then rolls back and reports it', async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
-    const save = vi
-      .spyOn(presenceApi, 'saveMyPresence')
-      .mockRejectedValue(new Error('offline'));
+    const save = server.saveMyPresence;
+    save.mockRejectedValue(new Error('offline'));
     const { result } = renderPresence();
     await waitFor(() => expect(result.current.presence).toBe('online'));
     act(() => result.current.setPresence('busy'));

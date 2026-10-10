@@ -544,9 +544,7 @@
     "groups": {
       "actions": "Actions",
       "goTo": "Go to",
-      "patients": "Patients",
-      "leads": "Leads",
-      "invoices": "Invoices"
+      "people": "People"
     },
     "actions": {
       "newLead": "New lead",
@@ -556,18 +554,11 @@
       "openTasks": "Open tasks"
     },
     "screen": "Screen",
-    "patientSub": "{{id}} · •••• {{lastDigits}}",
-    "leadSub": "{{id}} · {{status}}",
-    "invoiceTitle": {
-      "clinic": "Clinic invoice {{id}}",
-      "medical": "Medical invoice {{id}}",
-      "consultation": "Consultation invoice {{id}}"
-    },
-    "invoiceSub": "{{person}} · {{date}}",
     "move": "move",
     "open": "open",
-    "hint": "Type 2+ letters to search patients, leads and invoices",
-    "empty": "No matches. Try a name, phone or #ID."
+    "hint": "Type 3+ letters or 4+ digits to search people",
+    "empty": "No matches. Try a name, phone or C-number.",
+    "personSub": "{{id}} · •••• {{lastDigits}}"
   },
   "lists": {
     "loadError": "Couldn’t load this list · connection dropped. Showing the last copy.",

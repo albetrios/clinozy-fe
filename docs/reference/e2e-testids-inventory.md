@@ -185,24 +185,22 @@ organization picker and the 404 draw the same frame.
 
 Groups and rows render only for what the access in force (View-as included) may see.
 
-| Test ID                                  | Element                                                                                      | File                                            |
-| ---------------------------------------- | -------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| `command-palette`                        | The dialog ("Command menu"; 12vh from the top, `min(640px, 100% − 32px)`)                    | `components/CommandPalette/CommandPaletteShell` |
-| `command-palette-search`                 | The search input ("Search or jump to…", name "Search")                                       | `CommandPalette.tsx`                            |
-| `command-palette-searching`              | Spinner while the search waits out its 250ms debounce or loads                               | `CommandPalette.tsx`                            |
-| `command-palette-group-<id>`             | A group: `actions`, `go-to`, `patients`, `leads`, `invoices`; platform `settings`, `theme` … | `CommandPaletteGroup.tsx`                       |
-| `command-palette-action-<action>`        | Action row: `new-lead`, `new-appointment`, `new-patient`, `new-receipt`, `open-tasks`        | `clinic-command-groups.ts`                      |
-| `command-palette-go-to-<navId>`          | "Go to" room row (`nav.id` of the room's manifest)                                           | `clinic-command-groups.ts`                      |
-| `command-palette-patient-<patientId>`    | Patient result ("#3508 · •••• 3212")                                                         | `clinic-command-groups.ts`                      |
-| `command-palette-lead-<leadId>`          | Lead result ("#2352 · Clinic visited")                                                       | `clinic-command-groups.ts`                      |
-| `command-palette-invoice-<invoiceId>`    | Invoice result ("Clinic invoice #787")                                                       | `clinic-command-groups.ts`                      |
-| `command-palette-org-<slug \| personal>` | Workspace switch row                                                                         | `CommandPaletteOrgGroup.tsx`                    |
-| `command-palette-item-spinner`           | A row's own work in flight (workspace switch)                                                | `CommandPaletteItem.tsx`                        |
-| `command-palette-empty`                  | Empty line ("No matches. Try a name, phone or #ID." in an organization)                      | `CommandPalette.tsx`                            |
-| `command-palette-footer`                 | Footer: ↑ ↓ move · ↵ open                                                                    | `CommandPaletteFooter.tsx`                      |
-| `command-palette-hint`                   | "Type 2+ letters to search patients, leads and invoices" (until two letters)                 | `CommandPaletteFooter.tsx`                      |
-| `command-palette-pending`                | Skeleton list while the command engine chunk loads                                           | `CommandPaletteLazy.tsx`                        |
-| `command-palette-error`                  | The chunk failed to load (Retry)                                                             | `CommandPaletteLazy.tsx`                        |
+| Test ID                                  | Element                                                                                                                                             | File                                            |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| `command-palette`                        | The dialog ("Command menu"; 12vh from the top, `min(640px, 100% − 32px)`)                                                                           | `components/CommandPalette/CommandPaletteShell` |
+| `command-palette-search`                 | The search input ("Search or jump to…", name "Search")                                                                                              | `CommandPalette.tsx`                            |
+| `command-palette-searching`              | Spinner while the search waits out its 250ms debounce or loads                                                                                      | `CommandPalette.tsx`                            |
+| `command-palette-group-<id>`             | A group: `actions`, `go-to`, `people`; platform `settings`, `theme` …                                                                               | `CommandPaletteGroup.tsx`                       |
+| `command-palette-action-<action>`        | Action row: `new-lead`, `new-appointment`, `new-patient`, `new-receipt`, `open-tasks`                                                               | `clinic-command-groups.ts`                      |
+| `command-palette-go-to-<navId>`          | "Go to" room row (`nav.id` of the room's manifest)                                                                                                  | `clinic-command-groups.ts`                      |
+| `command-palette-person-<contactId>`     | A person the contacts search found ("#3508 · •••• 3212", or "C-1310 · •••• 4120" with only a lead) — opens their patient file, else their open lead | `clinic-command-groups.ts`                      |
+| `command-palette-org-<slug \| personal>` | Workspace switch row                                                                                                                                | `CommandPaletteOrgGroup.tsx`                    |
+| `command-palette-item-spinner`           | A row's own work in flight (workspace switch)                                                                                                       | `CommandPaletteItem.tsx`                        |
+| `command-palette-empty`                  | Empty line ("No matches. Try a name, phone or #ID." in an organization)                                                                             | `CommandPalette.tsx`                            |
+| `command-palette-footer`                 | Footer: ↑ ↓ move · ↵ open                                                                                                                           | `CommandPaletteFooter.tsx`                      |
+| `command-palette-hint`                   | "Type 3+ letters or 4+ digits to search people" (until the contacts search takes the query)                                                         | `CommandPaletteFooter.tsx`                      |
+| `command-palette-pending`                | Skeleton list while the command engine chunk loads                                                                                                  | `CommandPaletteLazy.tsx`                        |
+| `command-palette-error`                  | The chunk failed to load (Retry)                                                                                                                    | `CommandPaletteLazy.tsx`                        |
 
 ---
 

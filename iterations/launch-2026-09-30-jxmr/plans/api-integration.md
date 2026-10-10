@@ -453,6 +453,11 @@ Paths drop `/api/v1`. "Gap Gn" points into §8, "Mn" into §9, "Qn" into §10.
 | `setPresence`       | `PUT /users/me/presence`                                                                                                | your own only (G5)                                                                                                                          |
 
 - **Removed:** §6 #1, #25.
+- **The shell (D158, AS-BUILT #106):** built as above with these outcomes — ⌘K is one People group
+  from `GET /app/contacts?q=` under the contacts search's own minimum (3+ letters, 4+ digits or a
+  `C-` number); a person opens their patient file, else their open lead, as the member's codes
+  allow, and one who opens neither is not listed. The Account menu's Status reads `GET /users/me`
+  and saves `PUT /users/me/presence`. The fixture leads' API, hooks and hold are removed.
 
 ## 6. The design features dropped (route map section 4)
 

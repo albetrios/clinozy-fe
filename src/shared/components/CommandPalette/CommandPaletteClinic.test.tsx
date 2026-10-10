@@ -14,9 +14,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { PageManifest } from '@/lib/routes/page-manifest.ts';
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import type * as CommandSearchApiModule from '@/shared/api/clinic/command-search-api.ts';
-import { searchClinicCommands } from '@/shared/api/clinic/command-search-api.ts';
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import type { CommandSearchPerson } from '@/shared/api/clinic/command-search-contracts.ts';
 import type { AuthUser } from '@/shared/auth/types.ts';
 import { CROSS_ROOM_PARAM } from '@/shared/clinic/clinic-referrer.ts';
 import { CLINIC_SECTION_ORDER } from '@/shared/clinic/clinic-sections.ts';
@@ -32,10 +30,9 @@ import { CommandPalette } from './CommandPalette.tsx';
 
 /*
  * The command menu inside an organization (KICKOFF §6.0, L-28) on a real
- * router with the ten rooms' manifests — the nav, the access matrix, View-as
- * and the fixture search all run for real. Owner and Admin come from the
- * platform permissions; every other role through View-as (staff roles join
- * with L-31).
+ * router with the ten rooms' manifests — the nav, the codes and View-as run for
+ * real; the search is clinozy-be's contacts search (`GET /app/contacts?q=`,
+ * D158) over the people below.
  */
 
 const tier = vi.hoisted(() => ({ current: 'desktop' as 'phone' | 'tablet' | 'desktop' }));
@@ -51,11 +48,57 @@ vi.mock('@/shared/auth/service.ts', async (importOriginal) => ({
 vi.mock('@/shared/hooks/useMeContext/index.ts', () => ({
   useMeContext: () => ({ data: { activeOrganization: { type: 'TEAM' } } }),
 }));
-// The fixture search, wrapped: one test hands back a clinozy-be invoice id.
-vi.mock('@/shared/api/clinic/command-search-api.ts', async (importOriginal) => {
-  const actual = await importOriginal<typeof CommandSearchApiModule>();
-  return { ...actual, searchClinicCommands: vi.fn(actual.searchClinicCommands) };
+/** A person the contacts search knows. */
+const person = (
+  key: string,
+  name: string,
+  overrides: Partial<CommandSearchPerson> = {},
+): CommandSearchPerson => ({
+  id: `con_${key.padEnd(21, '0')}`,
+  name,
+  contactNumber: 1000,
+  phone: '+919825043212',
+  patientId: null,
+  patientNumber: null,
+  openLeadId: null,
+  ...overrides,
 });
+
+/** A patient (#3508), a person with only an open lead, one with neither, and a second patient. */
+const DHARTI = person('dharti', 'Dharti Galani', {
+  contactNumber: 1204,
+  patientId: 'pat_dharti0000000000000000',
+  patientNumber: 3508,
+});
+const RAVI = person('ravi', 'Ravi Galani', {
+  contactNumber: 1310,
+  phone: '+919825044120',
+  openLeadId: 'lead_ravi00000000000000000',
+});
+const NEHA = person('neha', 'Neha Galani', { contactNumber: 1402 });
+const PRONOTI = person('pronoti', 'Pronoti Sen', {
+  contactNumber: 1500,
+  patientId: 'pat_pronoti000000000000000',
+  patientNumber: 3430,
+});
+const PEOPLE = [DHARTI, RAVI, NEHA, PRONOTI];
+
+// `GET /app/contacts?q=`: a name part starting with the query, best match first; the
+// minimum is the real module's.
+vi.mock('@/shared/api/clinic/command-search-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof CommandSearchApiModule>()),
+  searchClinicCommands: async (query: string) => {
+    const q = query.trim().toLowerCase();
+    return {
+      people: PEOPLE.filter(({ name }) =>
+        name
+          .toLowerCase()
+          .split(' ')
+          .some((part) => part.startsWith(q)),
+      ),
+    };
+  },
+}));
 vi.mock('@/shared/tenancy/my-organization-summaries.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof MyOrganizationSummariesModule>()),
   useMyOrganizationSummaries: () => ({ data: [], isPending: false }),
@@ -127,8 +170,7 @@ const rowIds = (id: string, prefix: string) =>
   within(group(id) ?? document.createElement('div'))
     .queryAllByRole('option')
     .map((row) => row.dataset.testid?.replace(prefix, ''));
-const resultGroups = () =>
-  ['patients', 'leads', 'invoices'].filter((id) => group(id) !== null);
+const peopleShown = () => rowIds('people', 'command-palette-person-');
 const activeRow = () =>
   screen
     .getAllByRole('option')
@@ -137,7 +179,6 @@ const activeRow = () =>
 beforeEach(() => {
   tier.current = 'desktop';
   logoutMock.mockReset().mockResolvedValue(undefined);
-  resetClinicFixtures();
   useAuthStore.setState({
     user: { id: 'usr_1', email: 'o@e.com', role: 'user' } as AuthUser,
   });
@@ -160,54 +201,51 @@ const ALL_ACTIONS = [
 ];
 
 /** What each preset is offered by its codes (`PRESET_CODES`; KICKOFF §3.7). */
-const BY_ROLE: Record<
-  Role,
-  { actions: string[]; goTo: string[]; results: ('patients' | 'leads' | 'invoices')[] }
-> = {
+const BY_ROLE: Record<Role, { actions: string[]; goTo: string[]; people: string[] }> = {
   owner: {
     actions: ALL_ACTIONS,
     goTo: ['leads', 'appointments', 'patients', 'stock'],
-    results: ['patients', 'leads', 'invoices'],
+    people: [DHARTI.id, RAVI.id],
   },
   admin: {
     actions: ALL_ACTIONS,
     goTo: ['leads', 'appointments', 'patients', 'stock'],
-    results: ['patients', 'leads', 'invoices'],
+    people: [DHARTI.id, RAVI.id],
   },
   doctor: {
     actions: ['new-lead', 'new-appointment', 'new-patient', 'open-tasks'],
     goTo: ['leads', 'appointments', 'patients', 'payments'],
-    results: ['patients', 'leads', 'invoices'],
+    people: [DHARTI.id, RAVI.id],
   },
   therapist: {
     actions: ['new-appointment', 'new-patient', 'open-tasks'],
     goTo: ['appointments', 'patients', 'stock', 'tasks'],
-    results: ['patients'],
+    people: [DHARTI.id],
   },
   front_desk: {
     actions: ALL_ACTIONS,
     goTo: ['leads', 'appointments', 'patients', 'stock'],
-    results: ['patients', 'leads', 'invoices'],
+    people: [DHARTI.id, RAVI.id],
   },
   counsellor: {
     actions: ALL_ACTIONS,
     goTo: ['leads', 'appointments', 'patients', 'payments'],
-    results: ['patients', 'leads', 'invoices'],
+    people: [DHARTI.id, RAVI.id],
   },
   pharmacist: {
     actions: ['new-receipt', 'open-tasks'],
     goTo: ['appointments', 'patients', 'stock', 'payments'],
-    results: ['patients', 'invoices'],
+    people: [DHARTI.id],
   },
   accountant: {
     actions: ['new-receipt'],
     goTo: ['patients', 'stock', 'payments', 'offerings'],
-    results: ['patients', 'invoices'],
+    people: [DHARTI.id],
   },
   marketing: {
     actions: ['new-lead', 'open-tasks'],
     goTo: ['leads', 'patients', 'tasks', 'offerings'],
-    results: ['patients', 'leads'],
+    people: [DHARTI.id, RAVI.id],
   },
 };
 
@@ -228,10 +266,11 @@ describe('the command menu per role (L-28 acceptance)', () => {
       await user.type(search(), 's');
       expect(rowIds('go-to', 'command-palette-go-to-')).toEqual(expected.goTo);
 
-      // From two letters, only the groups its access can read.
+      // People once the contacts search takes the query: those the role can open — a patient
+      // file with Patients view, a lead with Leads view; Neha, with neither, never.
       await user.clear(search());
-      await user.type(search(), 'dh');
-      await waitFor(() => expect(resultGroups()).toEqual(expected.results), {
+      await user.type(search(), 'gal');
+      await waitFor(() => expect(peopleShown()).toEqual(expected.people), {
         timeout: 3000,
       });
     },
@@ -265,7 +304,7 @@ describe('the command menu (KICKOFF §6.0; _patterns.md:195–207)', () => {
     const footer = screen.getByTestId('command-palette-footer');
     expect(footer).toHaveTextContent('↑↓move↵open');
     expect(within(footer).getByTestId('command-palette-hint')).toHaveTextContent(
-      'Type 2+ letters to search patients, leads and invoices',
+      'Type 3+ letters or 4+ digits to search people',
     );
   });
 
@@ -304,6 +343,9 @@ describe('the command menu (KICKOFF §6.0; _patterns.md:195–207)', () => {
         .getAllByRole('option')
         .map((row) => row.textContent),
     ).toEqual(['PatientsScreen', 'PaymentsScreen']);
+    // Two letters search nobody yet: the hint stays until the third.
+    expect(screen.getByTestId('command-palette-hint')).toBeVisible();
+    await user.type(search(), 't');
     expect(screen.queryByTestId('command-palette-hint')).toBeNull();
   });
 
@@ -316,17 +358,18 @@ describe('the command menu (KICKOFF §6.0; _patterns.md:195–207)', () => {
     expect(await screen.findByText('Log out')).toBeVisible();
   });
 
-  it("shows patients, leads and invoices with the design's subs, capped per group", async () => {
+  it("shows the people the member can open, with the design's subs, the first active", async () => {
     const { user } = await renderMenu();
     await screen.findByTestId('command-palette-group-actions');
 
-    await user.type(search(), 'dh');
+    await user.type(search(), 'gal');
 
     const dharti = await screen.findByTestId(
-      `command-palette-patient-${ref.patient(3508)}`,
+      `command-palette-person-${DHARTI.id}`,
       undefined,
       { timeout: 3000 },
     );
+    expect(within(group('people')!).getByText('People')).toBeVisible();
     // Each sub token isolated; the name and the sub read in their own direction.
     expect(dharti).toHaveTextContent(
       `Dharti Galani${fsi('#3508')} · •••• ${fsi('3212')}`,
@@ -335,41 +378,26 @@ describe('the command menu (KICKOFF §6.0; _patterns.md:195–207)', () => {
     expect(
       within(dharti).getByText(`${fsi('#3508')} · •••• ${fsi('3212')}`),
     ).toHaveAttribute('dir', 'auto');
+    // A lead's person by their contact number.
     expect(
       withoutBidiMarks(
-        screen.getByTestId(`command-palette-lead-${ref.lead(2352)}`).textContent,
+        screen.getByTestId(`command-palette-person-${RAVI.id}`).textContent,
       ),
-    ).toBe('Dharti Galani#2352 · Clinic visited');
-    const invoice = screen.getByTestId(`command-palette-invoice-${ref.invoice(787)}`);
-    expect(withoutBidiMarks(invoice.textContent)).toMatch(
-      /^Clinic invoice #787Dharti Galani · /,
-    );
+    ).toBe('Ravi GalaniC-1310 · •••• 4120');
+    // Neither a patient file nor a lead: nothing to open.
+    expect(screen.queryByTestId(`command-palette-person-${NEHA.id}`)).toBeNull();
     expect(activeRow()).toBe(dharti);
-
-    await user.clear(search());
-    await user.type(search(), 'an');
-    await waitFor(() => expect(rowIds('patients', '')).toHaveLength(6));
-    expect(rowIds('leads', '').length).toBeLessThanOrEqual(5);
-    expect(rowIds('invoices', '').length).toBeLessThanOrEqual(4);
   });
 
-  it('names a re-target lead still New "Re-targeted" and never lists a contact thread', async () => {
+  it('searches nothing below 3 letters — the hint stays', async () => {
     const { user } = await renderMenu();
     await screen.findByTestId('command-palette-group-actions');
 
-    await user.type(search(), 'kavya');
-    expect(
-      await screen.findByTestId(`command-palette-lead-${ref.lead(2371)}`, undefined, {
-        timeout: 3000,
-      }),
-    ).toHaveTextContent(`${fsi('#2371')} · ${fsi('Re-targeted')}`);
+    await user.type(search(), 'ga');
 
-    await user.clear(search());
-    await user.type(search(), 'neha');
-    await screen.findByTestId(`command-palette-patient-${ref.patient(551)}`, undefined, {
-      timeout: 3000,
-    });
-    expect(group('leads')).toBeNull();
+    expect(screen.getByTestId('command-palette-hint')).toBeVisible();
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    expect(group('people')).toBeNull();
   });
 
   it('says "No matches" once the search has answered with nothing', async () => {
@@ -379,7 +407,7 @@ describe('the command menu (KICKOFF §6.0; _patterns.md:195–207)', () => {
     await user.type(search(), 'zzqx');
 
     expect(
-      await screen.findByText('No matches. Try a name, phone or #ID.', undefined, {
+      await screen.findByText('No matches. Try a name, phone or C-number.', undefined, {
         timeout: 3000,
       }),
     ).toBeVisible();
@@ -430,66 +458,33 @@ describe('the command menu opens the routes (D24, D19 / D26; §7.3)', () => {
 
       await user.type(search(), 'dharti');
       await user.click(
-        await screen.findByTestId(
-          `command-palette-patient-${ref.patient(3508)}`,
-          undefined,
-          {
-            timeout: 3000,
-          },
-        ),
+        await screen.findByTestId(`command-palette-person-${DHARTI.id}`, undefined, {
+          timeout: 3000,
+        }),
       );
 
       await waitFor(() =>
         expect(router.state.location.pathname).toBe(
-          `/organization/acme/patients/${ref.patient(3508)}`,
+          `/organization/acme/patients/${DHARTI.patientId}`,
         ),
       );
       expect(router.state.location.search).toEqual({ activity });
     },
   );
 
-  it('opens a lead on its drawer route, an invoice over the page it came from (A-P1)', async () => {
-    // ⌘K still finds invoices in the fixture world (the shell's search moves later); the
-    // invoice drawer opens over the page for a clinozy-be invoice — an `invc_…` id.
-    const liveInvoice = 'invc_commandmenu0000000000';
-    const fixture = vi.mocked(searchClinicCommands).getMockImplementation();
-    if (!fixture) throw new Error('the fixture search is not wrapped');
-    vi.mocked(searchClinicCommands).mockImplementation(async (query) => {
-      const found = await fixture(query);
-      return {
-        ...found,
-        invoices: found.invoices.map((hit) =>
-          hit.id === ref.invoice(787) ? { ...hit, id: liveInvoice } : hit,
-        ),
-      };
-    });
+  it('opens a person with only a lead on the lead’s drawer route', async () => {
     const { router, user } = await renderMenu('/organization/acme/patients');
     await screen.findByTestId('command-palette-group-actions');
 
-    await user.type(search(), '#787');
+    await user.type(search(), 'ravi');
     await user.click(
-      await screen.findByTestId(`command-palette-invoice-${liveInvoice}`, undefined, {
-        timeout: 3000,
-      }),
-    );
-    vi.mocked(searchClinicCommands).mockImplementation(fixture);
-    const invoice = `invoices/${liveInvoice}?from=patients`;
-    await waitFor(() =>
-      expect(router.history.location.href).toBe(`/organization/acme/${invoice}`),
-    );
-    expect(router.state.location.pathname).toBe('/organization/acme/patients');
-    expect(router.state.location.search).toEqual({ [CROSS_ROOM_PARAM]: invoice });
-
-    act(() => useUIStore.getState().setCommandPaletteOpen(true));
-    await user.type(await screen.findByRole('combobox', { name: 'Search' }), 'galani');
-    await user.click(
-      await screen.findByTestId(`command-palette-lead-${ref.lead(2352)}`, undefined, {
+      await screen.findByTestId(`command-palette-person-${RAVI.id}`, undefined, {
         timeout: 3000,
       }),
     );
     await waitFor(() =>
       expect(router.state.location.pathname).toBe(
-        `/organization/acme/leads/${ref.lead(2352)}`,
+        `/organization/acme/leads/${RAVI.openLeadId}`,
       ),
     );
   });
@@ -526,16 +521,16 @@ describe('the command menu keys (↑↓ wrap · ↵ opens · Esc closes)', () =>
   });
 
   it('keeps the first row active when the search answers above the platform rows', async () => {
-    // "ro" reaches the "Profile" settings row at once and Rohan Pillai a beat
+    // "pro" reaches the "Profile" settings row at once and Pronoti Sen a beat
     // later, above it: Enter opens the patient the design puts first, not
     // whatever cmdk had picked before the search answered.
     const { router, user } = await renderMenu();
     await screen.findByTestId('command-palette-group-actions');
 
-    await user.type(search(), 'ro');
+    await user.type(search(), 'pro');
     expect(await screen.findByText('Profile')).toBeVisible();
     const first = await screen.findByTestId(
-      `command-palette-patient-${ref.patient(3430)}`,
+      `command-palette-person-${PRONOTI.id}`,
       undefined,
       { timeout: 3000 },
     );
@@ -545,7 +540,7 @@ describe('the command menu keys (↑↓ wrap · ↵ opens · Esc closes)', () =>
     await user.keyboard('{Enter}');
     await waitFor(() =>
       expect(router.state.location.pathname).toBe(
-        `/organization/acme/patients/${ref.patient(3430)}`,
+        `/organization/acme/patients/${PRONOTI.patientId}`,
       ),
     );
   });
@@ -554,8 +549,8 @@ describe('the command menu keys (↑↓ wrap · ↵ opens · Esc closes)', () =>
     const { user } = await renderMenu();
     await screen.findByTestId('command-palette-group-actions');
 
-    await user.type(search(), 'ro');
-    await screen.findByTestId(`command-palette-patient-${ref.patient(3430)}`, undefined, {
+    await user.type(search(), 'pro');
+    await screen.findByTestId(`command-palette-person-${PRONOTI.id}`, undefined, {
       timeout: 3000,
     });
     await user.keyboard('{ArrowDown}');
@@ -580,8 +575,8 @@ describe('the command menu — accessibility', () => {
   it('has no violations with every group open', async () => {
     const { baseElement, user } = await renderMenu();
     await screen.findByTestId('command-palette-group-actions');
-    await user.type(search(), 'dh');
-    await screen.findByTestId('command-palette-group-invoices', undefined, {
+    await user.type(search(), 'gal');
+    await screen.findByTestId('command-palette-group-people', undefined, {
       timeout: 3000,
     });
 

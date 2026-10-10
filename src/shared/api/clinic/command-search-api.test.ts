@@ -1,153 +1,104 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('@/core/http/api.ts', () => ({ api: { get: vi.fn() } }));
+import { api } from '@/core/http/api.ts';
 
 import {
-  COMMAND_SEARCH_PER_TYPE,
-  commandSearchQueryKeys,
+  COMMAND_SEARCH_LIMIT,
   isCommandSearchQuery,
-  matchesCommandSearch,
   searchClinicCommands,
 } from './command-search-api.ts';
-import { commandSearchResultSchema } from './command-search-contracts.ts';
-import { clinicFixtures, resetClinicFixtures } from './fixtures/world.fixtures.ts';
 
-const names = (hits: { name: string }[]) => hits.map((hit) => hit.name);
+/** A contact list row as clinozy-be answers it. */
+const contactRow = (patch: Record<string, unknown> = {}) => ({
+  id: 'con_dharti0000000000000000',
+  contact_number: 1204,
+  first_name: 'Dharti',
+  last_name: 'Galani',
+  primary_phone: '+919825043212',
+  email: null,
+  instagram_handles: [],
+  default_channel: 'whatsapp',
+  preference_tags: [],
+  patient_id: 'pat_dharti0000000000000000',
+  open_lead_id: null,
+  last_activity_at: null,
+  last_received_at: null,
+  is_awaiting_reply: false,
+  updated_at: '2026-10-02T04:30:00.000Z',
+  gender: 'female',
+  date_of_birth: null,
+  address: null,
+  referral_source: null,
+  referred_by_contact_id: null,
+  referred_by_name: null,
+  has_marketing_consent: false,
+  patient_number: 3508,
+  ...patch,
+});
 
-describe('matchesCommandSearch (H:4605–4607)', () => {
-  const dharti = { names: ['Dharti Galani'], phone: '+918200603212', seq: 3508 };
+beforeEach(() => {
+  vi.mocked(api.get).mockReset();
+});
 
-  it.each([
-    ['a part of the name, any case', 'GALA'],
-    ['the display id', '#3508'],
-    ['the id without its #', '3508'],
-    ['a part of the id', '#35'],
-    ['three digits of the phone', '032'],
-    ['the phone as shown', '82006 03212'],
-    ['the phone with its country code', '+91 82006 03212'],
-    ['a number being typed after +91', '+91 8200'],
-  ])('matches %s', (_label, query) => {
-    expect(matchesCommandSearch(dharti, query)).toBe(true);
-  });
-
-  it.each([
-    ['two digits of a phone', '12'],
-    ['another name', 'rhea'],
-    ['an empty query', '   '],
-  ])('does not match %s', (_label, query) => {
-    expect(matchesCommandSearch({ ...dharti, seq: 1 }, query)).toBe(false);
-  });
-
-  it('matches no phone a record does not have', () => {
-    expect(matchesCommandSearch({ names: [], phone: null, seq: 787 }, '8200')).toBe(
+describe('isCommandSearchQuery — the contacts search’s rule (CT9)', () => {
+  it('takes 3+ letters, 4+ digits of a number, or a whole contact number', () => {
+    expect(
+      ['dha', '9825', '+91 9825', 'C-12', '#3508'].map(isCommandSearchQuery),
+    ).toEqual([true, true, true, true, true]);
+    expect(['', 'dh', '982', '  d '].map(isCommandSearchQuery)).toEqual([
       false,
-    );
-  });
-});
-
-describe('isCommandSearchQuery', () => {
-  it('searches from two characters, ignoring spaces around them', () => {
-    expect(isCommandSearchQuery('d')).toBe(false);
-    expect(isCommandSearchQuery(' d ')).toBe(false);
-    expect(isCommandSearchQuery('dh')).toBe(true);
-  });
-});
-
-describe('commandSearchQueryKeys', () => {
-  it('keys each query under the clinic search', () => {
-    expect(commandSearchQueryKeys.search('dh')).toEqual([
-      'clinic',
-      'command-search',
-      'dh',
+      false,
+      false,
+      false,
     ]);
   });
 });
 
-describe('searchClinicCommands (S:1565)', () => {
-  beforeEach(() => {
-    resetClinicFixtures();
-  });
-
-  it('answers in the contract shape', async () => {
-    const result = await searchClinicCommands('dh');
-    expect(commandSearchResultSchema.safeParse(result).success).toBe(true);
-  });
-
-  it('searches nothing below two characters', async () => {
-    expect(await searchClinicCommands('d')).toEqual({
-      patients: [],
-      leads: [],
-      invoices: [],
+describe('searchClinicCommands', () => {
+  it('reads the people GET /app/contacts?q= finds, with their patient file and open lead', async () => {
+    vi.mocked(api.get).mockResolvedValue({
+      data: [
+        contactRow(),
+        contactRow({
+          id: 'con_ravi000000000000000000',
+          contact_number: 1310,
+          first_name: 'Ravi',
+          last_name: null,
+          patient_id: null,
+          patient_number: null,
+          open_lead_id: 'lead_ravi00000000000000000',
+        }),
+      ],
+    } as never);
+    const result = await searchClinicCommands(' dha ');
+    expect(api.get).toHaveBeenCalledWith('/app/contacts', {
+      query: { q: 'dha', limit: COMMAND_SEARCH_LIMIT },
     });
-  });
-
-  it('finds patients, leads and invoices by name, newest first', async () => {
-    const result = await searchClinicCommands('dh');
-
-    expect(names(result.patients)).toEqual([
-      'Dharti Galani',
-      'Drashtik Baldha',
-      'Dhruv Patel',
-    ]);
-    expect(result.patients[0]).toMatchObject({ seq: 3508, phone: '+918200603212' });
-    expect(result.leads).toEqual([
-      expect.objectContaining({
+    expect(result.people).toEqual([
+      {
+        id: 'con_dharti0000000000000000',
         name: 'Dharti Galani',
-        seq: 2352,
-        status: 'clinic_visited',
-        kind: 'enquiry',
-      }),
-    ]);
-    expect(result.invoices.map((hit) => [hit.seq, hit.type, hit.personName])).toEqual(
-      expect.arrayContaining([
-        [787, 'clinic', 'Dharti Galani'],
-        [786, 'consultation', 'Dharti Galani'],
-        [781, 'clinic', 'Dhruv Patel'],
-      ]),
-    );
-    const seqs = result.invoices.map((hit) => hit.seq);
-    expect(seqs).toEqual([...seqs].sort((a, b) => b - a));
-  });
-
-  it('finds a patient by phone digits and by display id', async () => {
-    expect(names((await searchClinicCommands('82006')).patients)).toEqual([
-      'Dharti Galani',
-    ]);
-    expect(names((await searchClinicCommands('#3508')).patients)).toEqual([
-      'Dharti Galani',
+        contactNumber: 1204,
+        phone: '+919825043212',
+        patientId: 'pat_dharti0000000000000000',
+        patientNumber: 3508,
+        openLeadId: null,
+      },
+      {
+        id: 'con_ravi000000000000000000',
+        name: 'Ravi',
+        contactNumber: 1310,
+        phone: '+919825043212',
+        patientId: null,
+        patientNumber: null,
+        openLeadId: 'lead_ravi00000000000000000',
+      },
     ]);
   });
 
-  it('never returns a contact thread as a lead (H:4606)', async () => {
-    const result = await searchClinicCommands('neha');
-
-    expect(names(result.patients)).toEqual(['Neha Gupta']);
-    expect(result.leads).toEqual([]);
-  });
-
-  it('finds an invoice by its id and by the walk-in buyer of a sale', async () => {
-    const byId = await searchClinicCommands('#787');
-    expect(byId.invoices.map((hit) => hit.seq)).toEqual([787]);
-
-    const walkIn = await searchClinicCommands('viral');
-    expect(walkIn.invoices).toEqual([
-      expect.objectContaining({ type: 'medical', personName: 'Viral Sheth' }),
-    ]);
-  });
-
-  it('leaves out deleted records', async () => {
-    const [dharti] = clinicFixtures.patients.snapshot((patient) => patient.seq === 3508);
-    await clinicFixtures.patients.remove(dharti?.id ?? '', 'mistake', null);
-
-    expect(names((await searchClinicCommands('dharti')).patients)).toEqual([]);
-  });
-
-  it('returns at most ten of each type', async () => {
-    const result = await searchClinicCommands('a');
-    expect(result.patients).toEqual([]);
-
-    const wide = await searchClinicCommands('an');
-    expect(wide.patients.length).toBeLessThanOrEqual(COMMAND_SEARCH_PER_TYPE);
-    expect(wide.leads.length).toBeLessThanOrEqual(COMMAND_SEARCH_PER_TYPE);
-    expect(wide.invoices.length).toBeLessThanOrEqual(COMMAND_SEARCH_PER_TYPE);
-    expect(wide.patients).toHaveLength(COMMAND_SEARCH_PER_TYPE);
+  it('asks nothing for a query the contacts search would refuse', async () => {
+    expect(await searchClinicCommands('dh')).toEqual({ people: [] });
+    expect(api.get).not.toHaveBeenCalled();
   });
 });

@@ -17,7 +17,7 @@ export interface CommandSearch {
   /**
    * The hits on screen: the answer to the query as typed, or — while the next
    * answer is on its way — to an earlier query that one extends or shortens.
-   * Undefined below two characters and before any related answer.
+   * Undefined below the contacts search's minimum and before any related answer.
    */
   data: CommandSearchResult | undefined;
   /** A search is waiting out the debounce or in flight for the query as typed. */
@@ -29,7 +29,7 @@ interface Answer {
   result: CommandSearchResult;
 }
 
-/** One query extends or shortens the other ("dh" → "dha", "dha" → "dh"). */
+/** One query extends or shortens the other ("dha" → "dhar", "dhar" → "dha"). */
 function isRelated(a: string, b: string): boolean {
   const left = a.toLowerCase();
   const right = b.toLowerCase();
@@ -37,10 +37,11 @@ function isRelated(a: string, b: string): boolean {
 }
 
 /**
- * ⌘K's search (`commandSearch`, `S:1565`): debounced 250ms, from two
- * characters. The previous answer stays up while the next one loads, so the
- * groups do not blink on every keystroke — but only when the two queries are
- * related, so "rh"'s patients never stand in for "dh".
+ * ⌘K's search (`commandSearch`; D158): the people `GET /app/contacts?q=` finds, debounced
+ * 250ms, once the query is one the contacts search takes (3+ letters, 4+ digits or a contact
+ * number). The previous answer stays up while the next one loads, so the group does not blink on
+ * every keystroke — but only when the two queries are related, so "rhe"'s people never stand in
+ * for "dha".
  */
 export function useCommandSearch(
   query: string,

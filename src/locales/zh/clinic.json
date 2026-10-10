@@ -541,9 +541,7 @@
     "groups": {
       "actions": "操作",
       "goTo": "跳转到",
-      "patients": "患者",
-      "leads": "潜在客户",
-      "invoices": "发票"
+      "people": "人员"
     },
     "actions": {
       "newLead": "新建潜在客户",
@@ -553,18 +551,11 @@
       "openTasks": "打开任务"
     },
     "screen": "页面",
-    "patientSub": "{{id}} · •••• {{lastDigits}}",
-    "leadSub": "{{id}} · {{status}}",
-    "invoiceTitle": {
-      "clinic": "诊所发票 {{id}}",
-      "medical": "药房发票 {{id}}",
-      "consultation": "问诊发票 {{id}}"
-    },
-    "invoiceSub": "{{person}} · {{date}}",
     "move": "移动",
     "open": "打开",
-    "hint": "输入至少 2 个字符以搜索患者、潜在客户和发票",
-    "empty": "没有匹配项。试试姓名、电话或 #ID。"
+    "hint": "输入 3 个以上字母或 4 位以上数字以搜索人员",
+    "empty": "没有匹配项。请尝试姓名、电话或 C 编号。",
+    "personSub": "{{id}} · •••• {{lastDigits}}"
   },
   "lists": {
     "loadError": "无法加载此列表 · 连接已断开。正在显示最近一次的副本。",

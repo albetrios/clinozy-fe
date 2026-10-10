@@ -5,28 +5,20 @@ import { isolateValues } from '@/lib/bidi-isolate.ts';
 import type { ClinicAction } from '@/shared/api/clinic/access-contracts.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import type { Section } from '@/shared/api/clinic/clinic-schema.ts';
-import { clinicToday, localDateOf } from '@/shared/api/clinic/clinic-time.ts';
 import { isCommandSearchQuery } from '@/shared/api/clinic/command-search-api.ts';
-import type {
-  CommandSearchInvoice,
-  CommandSearchLead,
-  CommandSearchPatient,
-} from '@/shared/api/clinic/command-search-contracts.ts';
+import type { CommandSearchPerson } from '@/shared/api/clinic/command-search-contracts.ts';
 import { CLINIC_KEYS } from '@/shared/clinic/clinic.constants.ts';
 import {
   type ClinicCommandNavigation,
   clinicCommandNavigation,
 } from '@/shared/clinic/clinic-command-targets.ts';
-import { clinicLeadStatusKey } from '@/shared/clinic/clinic-lead-status.ts';
 import { referrerFromPath } from '@/shared/clinic/clinic-referrer.ts';
 import { CLINIC_SECTION_ICONS } from '@/shared/clinic/clinic-section-icons.ts';
-import { PICKER_KEYS, PICKER_NS } from '@/shared/components/Picker/picker.constants.ts';
 import type { AppNavEntry } from '@/shared/hooks/useAppNav/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useCommandSearch } from '@/shared/hooks/useCommandSearch/index.ts';
-import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { readViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
-import { Receipt, UserPlus, Users } from '@/shared/icons/index.ts';
+import { UserPlus, Users } from '@/shared/icons/index.ts';
 
 import {
   COMMAND_MENU_KEYS,
@@ -89,9 +81,9 @@ const NOT_A_GO_TO: Section = 'today';
 
 /** The clinic half of the command menu. */
 export interface ClinicCommandGroups {
-  /** Actions, Go to, Patients, Leads, Invoices — the non-empty ones, in that order. */
+  /** Actions, Go to, People — the non-empty ones, in that order. */
   groups: CommandRowGroup[];
-  /** The member may search Patients, Leads or Invoices — the footer hint and the empty line name them. */
+  /** The member may search people — they can open a patient file or a lead; the footer hint says how. */
   searchable: boolean;
   /** The search is waiting out its debounce or in flight. */
   isSearching: boolean;
@@ -112,9 +104,10 @@ const lastDigits = (phone: string) => phone.replace(/\D/g, '').slice(-4);
  * H:4598–4611), access- and View-as-aware (§3.7): a group shows only what the
  * access in force may see — the nav's rooms (module, route permission and
  * clinic View) and, for an action, Create in its room. "Actions" always, "Go
- * to" once typing, "Patients" / "Leads" / "Invoices" from two characters on
- * the schema's `commandSearch`; each capped per the design. Only an
- * organization's menu calls it — a personal workspace has no clinic.
+ * to" once typing, "People" once the contacts search takes the query (3+
+ * letters, 4+ digits or a contact number; D158) — each person opening their
+ * patient file, else their open lead, whichever the access in force may view.
+ * Only an organization's menu calls it — a personal workspace has no clinic.
  *
  * @param navEntries The primary nav (`useAppNav`) — the rooms the access in force can reach.
  * @param go Closes the menu and navigates.
@@ -134,22 +127,19 @@ export function useClinicCommandGroups({
   // Read at the pick, not subscribed: only the page the menu opened over
   // matters, and only to the drawers that keep it behind them (`from`).
   const router = useRouter({ warn: false });
-  const { formatDate } = useLocaleFormat();
   const access = useClinicAccess();
   const rooms = new Set(navEntries.map((entry) => entry.section));
   const allowed = (section: Section, grant: ClinicAction) =>
     access.isResolved && rooms.has(section) && access.can(section, grant);
-  const searchFor = {
+  const opens = {
     patients: allowed('patients', 'view'),
     leads: allowed('leads', 'view'),
-    invoices: allowed('payments', 'view'),
   };
-  const searchable = searchFor.patients || searchFor.leads || searchFor.invoices;
+  const searchable = opens.patients || opens.leads;
   const search = useCommandSearch(query, { enabled: searchable });
 
   const typed = query.trim();
   const fromHere = () => referrerFromPath(router.state.location.pathname);
-  const today = clinicToday();
 
   const actionRows: CommandRow[] = CLINIC_ACTIONS.filter(({ section, grant }) =>
     allowed(section, grant),
@@ -181,83 +171,48 @@ export function useClinicCommandGroups({
         .slice(0, COMMAND_MENU_LIMITS.goTo)
     : [];
 
-  const patientRow = (hit: CommandSearchPatient): CommandRow => ({
-    value: `patient:${hit.id}`,
-    label: hit.name,
-    sub: t(
-      COMMAND_MENU_KEYS.patientSub,
-      isolateValues({
-        id: displayId.patient(hit.seq),
-        lastDigits: lastDigits(hit.phone),
-      }),
-    ),
-    icon: Users,
-    testId: `command-palette-patient-${hit.id}`,
-    // Activity open on tablet and desktop, closed on a phone (H:4605, §6.6).
-    onSelect: () =>
-      go(
-        clinicCommandNavigation('patient', {
-          organizationSlug,
-          recordId: hit.id,
-          search: { activity: readViewportTier() === 'phone' ? 'closed' : 'open' },
-        }),
-      ),
-  });
-
-  const leadRow = (hit: CommandSearchLead): CommandRow => {
-    const id = displayId.lead(hit.seq);
-    const statusKey = clinicLeadStatusKey(hit);
-    return {
-      value: `lead:${hit.id}`,
-      label: hit.name,
-      sub: statusKey
-        ? t(COMMAND_MENU_KEYS.leadSub, isolateValues({ id, status: t(statusKey) }))
-        : id,
-      icon: UserPlus,
-      testId: `command-palette-lead-${hit.id}`,
-      onSelect: () =>
-        go(clinicCommandNavigation('lead', { organizationSlug, recordId: hit.id })),
-    };
-  };
-
-  // "Today" or "24 Sep" (the year once it is not this one) — the clinic's calendar day.
-  const invoiceDay = (date: string) =>
-    date === today
-      ? t(PICKER_KEYS.date.today, { ns: PICKER_NS })
-      : formatDate(
-          localDateOf(date),
-          {
-            day: 'numeric',
-            month: 'short',
-            ...(date.slice(0, 4) === today.slice(0, 4) ? {} : { year: 'numeric' }),
-          },
-          { civilDay: true },
-        );
-
-  const invoiceRow = (hit: CommandSearchInvoice): CommandRow => {
-    const day = invoiceDay(hit.date);
-    return {
-      value: `invoice:${hit.id}`,
-      label: t(COMMAND_MENU_KEYS.invoiceTitle[hit.type], {
-        id: displayId.invoiceNumber(hit.seq),
-      }),
-      sub: hit.personName
-        ? t(
-            COMMAND_MENU_KEYS.invoiceSub,
-            isolateValues({ person: hit.personName, date: day }),
-          )
-        : day,
-      icon: Receipt,
-      testId: `command-palette-invoice-${hit.id}`,
-      onSelect: () =>
-        go(
-          clinicCommandNavigation('invoice', {
-            organizationSlug,
-            recordId: hit.id,
-            referrer: fromHere(),
-          }),
-        ),
-    };
+  /**
+   * A person: their patient file when they have one and the member views Patients — the activity
+   * open on tablet and desktop, closed on a phone (H:4605, §6.6) — else their open lead when the
+   * member views Leads; null when neither opens for this member.
+   */
+  const personRow = (hit: CommandSearchPerson): CommandRow | null => {
+    const sub = (id: string) =>
+      t(
+        COMMAND_MENU_KEYS.personSub,
+        isolateValues({ id, lastDigits: lastDigits(hit.phone) }),
+      );
+    if (hit.patientId && opens.patients) {
+      const patientId = hit.patientId;
+      return {
+        value: `person:${hit.id}`,
+        label: hit.name,
+        sub: sub(displayId.patient(hit.patientNumber ?? 0)),
+        icon: Users,
+        testId: `command-palette-person-${hit.id}`,
+        onSelect: () =>
+          go(
+            clinicCommandNavigation('patient', {
+              organizationSlug,
+              recordId: patientId,
+              search: { activity: readViewportTier() === 'phone' ? 'closed' : 'open' },
+            }),
+          ),
+      };
+    }
+    if (hit.openLeadId && opens.leads) {
+      const leadId = hit.openLeadId;
+      return {
+        value: `person:${hit.id}`,
+        label: hit.name,
+        sub: sub(displayId.contact(hit.contactNumber)),
+        icon: UserPlus,
+        testId: `command-palette-person-${hit.id}`,
+        onSelect: () =>
+          go(clinicCommandNavigation('lead', { organizationSlug, recordId: leadId })),
+      };
+    }
+    return null;
   };
 
   const hits = isCommandSearchQuery(typed) ? search.data : undefined;
@@ -265,28 +220,11 @@ export function useClinicCommandGroups({
     { id: 'actions', heading: t(COMMAND_MENU_KEYS.groups.actions), rows: actionRows },
     { id: 'go-to', heading: t(COMMAND_MENU_KEYS.groups.goTo), rows: goToRows },
     {
-      id: 'patients',
-      heading: t(COMMAND_MENU_KEYS.groups.patients),
-      rows:
-        searchFor.patients && hits
-          ? hits.patients.slice(0, COMMAND_MENU_LIMITS.patients).map(patientRow)
-          : [],
-    },
-    {
-      id: 'leads',
-      heading: t(COMMAND_MENU_KEYS.groups.leads),
-      rows:
-        searchFor.leads && hits
-          ? hits.leads.slice(0, COMMAND_MENU_LIMITS.leads).map(leadRow)
-          : [],
-    },
-    {
-      id: 'invoices',
-      heading: t(COMMAND_MENU_KEYS.groups.invoices),
-      rows:
-        searchFor.invoices && hits
-          ? hits.invoices.slice(0, COMMAND_MENU_LIMITS.invoices).map(invoiceRow)
-          : [],
+      id: 'people',
+      heading: t(COMMAND_MENU_KEYS.groups.people),
+      rows: (hits?.people ?? [])
+        .map(personRow)
+        .filter((row): row is CommandRow => row !== null),
     },
   ];
 

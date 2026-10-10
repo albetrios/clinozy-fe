@@ -547,9 +547,7 @@
     "groups": {
       "actions": "Ações",
       "goTo": "Ir para",
-      "patients": "Pacientes",
-      "leads": "Leads",
-      "invoices": "Faturas"
+      "people": "Pessoas"
     },
     "actions": {
       "newLead": "Novo lead",
@@ -559,18 +557,11 @@
       "openTasks": "Abrir tarefas"
     },
     "screen": "Tela",
-    "patientSub": "{{id}} · •••• {{lastDigits}}",
-    "leadSub": "{{id}} · {{status}}",
-    "invoiceTitle": {
-      "clinic": "Fatura da clínica {{id}}",
-      "medical": "Fatura da farmácia {{id}}",
-      "consultation": "Fatura de consulta {{id}}"
-    },
-    "invoiceSub": "{{person}} · {{date}}",
     "move": "mover",
     "open": "abrir",
-    "hint": "Digite 2 ou mais letras para pesquisar pacientes, leads e faturas",
-    "empty": "Nenhuma correspondência. Tente um nome, telefone ou #ID."
+    "hint": "Digite 3+ letras ou 4+ dígitos para pesquisar pessoas",
+    "empty": "Nenhum resultado. Tente um nome, telefone ou número C.",
+    "personSub": "{{id}} · •••• {{lastDigits}}"
   },
   "lists": {
     "loadError": "Não foi possível carregar esta lista · conexão perdida. Mostrando a última cópia.",
