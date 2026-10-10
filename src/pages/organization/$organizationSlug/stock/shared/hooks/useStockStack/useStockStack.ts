@@ -1,8 +1,9 @@
-import type { StockItem, StockVendor } from '@/shared/api/clinic/clinic-schema.ts';
 import {
   type StackedRequests,
   useStackedRequest,
 } from '@/shared/hooks/useStackedDrawer/index.ts';
+
+import type { StockItemRecord, StockVendorRecord } from '../../stock-contracts.ts';
 
 /**
  * A picker's "New clinic vendor · “q”" / "New clinic item · “q”" + "full
@@ -10,17 +11,17 @@ import {
  * named from the picker's text, and the field its save selects it in.
  */
 export type StockStackRequest =
-  | { kind: 'vendor'; query: string; onCreated: (record: StockVendor) => void }
+  | { kind: 'vendor'; query: string; onCreated: (record: StockVendorRecord) => void }
   | {
       kind: 'item';
       query: string;
       /** The purchase's vendor, the new item's supplier. */
       vendorId?: string | null;
-      onCreated: (record: StockItem) => void;
+      onCreated: (record: StockItemRecord) => void;
     };
 
 /** What a stacked child saves. */
-export type StockStackRecord = StockVendor | StockItem;
+export type StockStackRecord = StockVendorRecord | StockItemRecord;
 
 /** How a drawer asks for a stacked child; without it the pickers offer no "full details". */
 export type OpenStockChild = (request: StockStackRequest) => void;

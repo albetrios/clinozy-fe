@@ -2,12 +2,15 @@ import { useState } from 'react';
 import { useForm, type UseFormReturn, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { numberFromText, sanitizeNumberText } from '@/lib/number-text.ts';
 import { cn } from '@/lib/utils.ts';
 import { SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
 import { type PillTone, TonePill } from '@/shared/components/Cells/index.ts';
 import { DrawerChips } from '@/shared/components/DrawerField/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
+import { RetryError } from '@/shared/components/RetryError/index.ts';
+import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
@@ -16,13 +19,12 @@ import { notify } from '@/shared/notify/index.ts';
 import { useStockItemCatalogue } from '../../hooks/useStockLists/index.ts';
 import { useStockWords } from '../../hooks/useStockWords/index.ts';
 import { useSaveStockCount } from '../../hooks/useStockWrites/index.ts';
-import type { StockItemRow } from '../../stock-contracts.ts';
+import type { StockCountResult, StockItemRow } from '../../stock-contracts.ts';
 import {
   STOCK_DRAWER_KEYS,
   STOCK_DRAWER_TEST_IDS,
   STOCK_DRAWERS_NS,
 } from '../../stock-drawers.constants.ts';
-import type { StockCountResult } from '../../stock-records-contracts.ts';
 import { fromMilli, MILLI, STOCK_CATEGORY_TONES } from '../../stock-units.ts';
 
 const K = STOCK_DRAWER_KEYS.check;
@@ -178,16 +180,57 @@ function CountRow({
   );
 }
 
+/** Where the item list stands: read, still loading, failed, or read with nothing in it. */
+type CatalogueState = 'ready' | 'pending' | 'failed' | 'empty';
+
+/** The count list's place while it cannot show rows: bars, the failure with Retry, or the empty line. */
+function CountListState({
+  state,
+  onRetry,
+  testId,
+}: {
+  state: Exclude<CatalogueState, 'ready'>;
+  onRetry: () => void;
+  testId: string;
+}) {
+  const { t } = useTranslation([STOCK_DRAWERS_NS, ERRORS_NS]);
+  if (state === 'pending') {
+    return (
+      <SkeletonRows rows={4} label={t(K.title)} rowClassName="px-(--drawer-pad-x) py-3" />
+    );
+  }
+  if (state === 'failed') {
+    return (
+      <RetryError
+        message={t(ERRORS_KEYS.frontend.query.loadFailed, { ns: ERRORS_NS })}
+        onRetry={onRetry}
+      />
+    );
+  }
+  return (
+    <p
+      className="text-detail text-muted-foreground px-(--drawer-pad-x) py-8 text-center"
+      data-testid={`${testId}-empty`}
+    >
+      {t(K.empty)}
+    </p>
+  );
+}
+
 /** One opening of Stock check: the counts, the category on and the save. */
 function CheckSession({
   open,
   onClose,
   items,
+  catalogue,
+  onRetry,
   testId,
 }: {
   open: boolean;
   onClose: () => void;
   items: readonly StockItemRow[];
+  catalogue: CatalogueState;
+  onRetry: () => void;
   testId: string;
 }) {
   const { t } = useTranslation(STOCK_DRAWERS_NS);
@@ -287,9 +330,13 @@ function CheckSession({
             testId={`${testId}-category`}
           />
         </div>
+        {catalogue === 'ready' ? null : (
+          <CountListState state={catalogue} onRetry={onRetry} testId={testId} />
+        )}
         <div // NOSONAR(S6819): grid ARIA table, see the note above ROW_GRID
           role="table"
           aria-label={t(K.title)}
+          hidden={catalogue !== 'ready'}
           className="flex flex-col"
         >
           <div // NOSONAR(S6819): grid ARIA table, see the note above ROW_GRID
@@ -342,17 +389,31 @@ export interface StockCheckDrawerProps {
   testId?: string;
 }
 
+/** Where the item list stands, from its read. */
+function catalogueState(read: {
+  isPending: boolean;
+  isError: boolean;
+  data: readonly StockItemRow[] | undefined;
+}): CatalogueState {
+  if (read.data) return read.data.length > 0 ? 'ready' : 'empty';
+  if (read.isError) return 'failed';
+  return read.isPending ? 'pending' : 'empty';
+}
+
 /**
  * Stock check (KICKOFF §6.8; `clinic-stock.md:73–85, 159–172, 261–273`) — the
  * `items/check` route's drawer, 840px: "Type what is on the shelf. Only items
  * that differ are saved, each as an Adjust entry." with "2 of 10 counted" at
  * the header's end; the category chips ("All items" + the six) and "Fill rest
- * as matching"; then a row per item — what the system holds, the counted
+ * as matching"; then a row per item of the whole item list (every page of
+ * `GET /app/stock-items`, latest first) — what the system holds, the counted
  * figure (✓ copies the system's; "= 90 g" for an item with contents) and the
- * difference ("Not counted", "Matches", "+0.5 tube" sky, "−0.5 tube" blush).
+ * difference ("Not counted", "Matches", "+0.5 tube" sky, "−0.5 tube" blush), a
+ * preview. While the list loads, bars; a failed read offers Retry in place.
  * Below `md` each item is a 2 × 2 card. "Save count" waits for a count that
- * differs (`saveStockCount`, `S:1690`) — "Stock check saved · 1 item updated";
- * a failed save keeps the counts ("Not saved · your counts are kept").
+ * differs and sends only those (`POST /app/stock-counts`, each an Adjust noted
+ * "Stock check") — "Stock check saved · 1 item updated", the server's count; a
+ * failed save keeps the counts ("Not saved · your counts are kept").
  */
 export function StockCheckDrawer({
   open,
@@ -360,13 +421,15 @@ export function StockCheckDrawer({
   testId = STOCK_DRAWER_TEST_IDS.check,
 }: StockCheckDrawerProps) {
   const { session } = useDrawerSession(open);
-  const items = useStockItemCatalogue().data ?? [];
+  const read = useStockItemCatalogue();
   return (
     <CheckSession
       key={session}
       open={open}
       onClose={onClose}
-      items={items}
+      items={read.data ?? []}
+      catalogue={catalogueState(read)}
+      onRetry={() => void read.refetch()}
       testId={testId}
     />
   );

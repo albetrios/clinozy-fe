@@ -8,14 +8,18 @@ import { sortParamsOf } from '@/lib/routes/search-params.ts';
 import type { StockPurchaseListParams } from '../shared/stock-contracts.ts';
 import type { StockSearch } from '../stock.search.ts';
 
-/** The list read's params for the URL as it stands — what the tab hands `useStockPurchaseList`. */
+/**
+ * The list read's params for the URL as it stands — what the tab hands
+ * `useStockPurchaseList`. The API sorts by number, bill and due; by supplier
+ * it does not, so a `vendor` sort is dropped.
+ */
 export function purchaseParamsOf(search: StockSearch): StockPurchaseListParams {
   return {
     q: search.q,
     status: search.status,
     vendor: search.vendor,
     created: search.created,
-    ...sortParamsOf(search.sort, ['seq', 'vendor', 'bill', 'due'] as const),
+    ...sortParamsOf(search.sort, ['seq', 'bill', 'due'] as const),
   };
 }
 

@@ -10,8 +10,12 @@
     "vendors": "Fournisseurs"
   },
   "search": {
-    "placeholder": "Rechercher un article, une catégorie ou un fournisseur…",
-    "label": "Rechercher dans le stock"
+    "label": "Rechercher dans le stock",
+    "placeholder": {
+      "items": "Rechercher un nom d’article ou un #ID…",
+      "purchases": "Rechercher une facture, un #ID ou un fournisseur…",
+      "vendors": "Rechercher un nom de fournisseur…"
+    }
   },
   "create": {
     "item": "Nouvel article",
@@ -26,7 +30,11 @@
     "category": "Catégorie",
     "lasts": "Durée",
     "status": "Statut",
-    "type": "Type"
+    "type": "Type",
+    "lastsWithin": {
+      "week": "Sous une semaine",
+      "three_weeks": "Sous 3 semaines"
+    }
   },
   "table": {
     "addPhone": "Ajouter un téléphone",
@@ -100,7 +108,8 @@
       "category": "Catégorie",
       "stock": "Stock",
       "lasts": "Durée",
-      "vendor": "Fournisseur"
+      "vendor": "Fournisseur",
+      "lastRate": "Dernier prix"
     },
     "sub": "par {{unit}} · utilise ~{{usage}}/semaine",
     "subContents": "par {{unit}} de {{contents}} · utilise ~{{usage}}/semaine",
@@ -130,13 +139,21 @@
     },
     "statuses": {
       "paid": "Payé",
-      "partly": "Payé en partie",
-      "unpaid": "Non payé"
+      "unpaid": "Non payé",
+      "partial": "Payé en partie"
     },
     "rowActions": {
       "edit": "Modifier",
-      "delete": "Supprimer",
-      "pay": "Payer {{amount}}"
+      "delete": "Supprimer"
+    },
+    "vendorFilter": {
+      "any": "Tous les fournisseurs",
+      "count_one": "{{count}} fournisseur",
+      "count_other": "{{count}} fournisseurs",
+      "count_many": "{{count}} fournisseurs",
+      "search": "Rechercher des fournisseurs",
+      "noMatch": "Aucun résultat",
+      "clear": "Effacer"
     }
   },
   "movements": {
@@ -158,14 +175,24 @@
       "damaged": "Endommagé",
       "returned": "Retourné",
       "reverted": "Annulé",
-      "payment": "Paiement"
+      "opening": "Stock initial"
     },
     "reverted": "Annulé",
-    "purchase": "Achat #{{seq}}",
-    "paymentSub": "{{purchase}} · {{billNo}}",
+    "purchase": "De l’achat #{{seq}}",
     "change": "{{sign}} {{amount}}",
     "rowActions": {
       "revert": "Annuler"
+    },
+    "purchaseBill": "De l’achat #{{seq}} · facture {{billNo}}",
+    "deletedItem": "Article supprimé",
+    "itemFilter": {
+      "any": "Tous les articles",
+      "search": "Rechercher des articles",
+      "noMatch": "Aucun résultat",
+      "clear": "Effacer",
+      "count_one": "{{count}} article",
+      "count_other": "{{count}} articles",
+      "count_many": "{{count}} d’articles"
     }
   },
   "vendors": {
@@ -185,8 +212,7 @@
     "noPurchases": "Aucun achat",
     "rowActions": {
       "edit": "Modifier",
-      "delete": "Supprimer",
-      "pay": "Payer {{amount}}"
+      "delete": "Supprimer"
     }
   },
   "drawers": {
@@ -238,7 +264,8 @@
         "vendor": "Fournisseur"
       },
       "save": "Ajouter l’article",
-      "saved": "Article enregistré"
+      "saved": "Article enregistré",
+      "nameTaken": "Un article porte déjà ce nom"
     },
     "quickItem": {
       "title": "Nouvel article de la clinique",
@@ -262,7 +289,8 @@
       },
       "save": "Ajouter le fournisseur",
       "added": "Fournisseur {{name}} ajouté",
-      "saved": "Fournisseur enregistré"
+      "saved": "Fournisseur enregistré",
+      "nameTaken": "Un fournisseur porte déjà ce nom"
     },
     "movement": {
       "title": {
@@ -293,7 +321,8 @@
       "summary": "{{name}} · {{change}}",
       "enterQuantity": "Saisissez une quantité",
       "onlyInStock": "Seulement {{quantity}} en stock",
-      "saved": "{{type}} enregistré · reste {{quantity}}"
+      "saved": "{{type}} enregistré · reste {{quantity}}",
+      "notEnoughStock": "Il n’y en a plus autant en stock — quelqu’un en a utilisé entre-temps. Vérifiez la quantité et réessayez."
     },
     "use": {
       "label": "Utiliser {{name}}",
@@ -347,7 +376,14 @@
         "peek_other": "{{count}} articles · {{amount}}",
         "quickLine": "Saisissez article et quantité · ex. gloves 10 @250",
         "quickHint": "10 = quantité · @250 = prix",
-        "lowStockChip": "{{name}} · reste {{quantity}}"
+        "lowStockChip": "{{name}} · reste {{quantity}}",
+        "mode": "Mode",
+        "branch": "Payé depuis",
+        "paidSoFar": "{{amount}} payé · {{status}}",
+        "moreThanBill": "Le montant payé dépasse la facture",
+        "dayClosed": "La journée de cette agence est clôturée — aucun paiement ne peut en partir aujourd’hui",
+        "addLine": "Ajoutez au moins un article",
+        "tooManyLines": "Un achat compte au plus {{max}} articles"
       },
       "save": "Créer l’achat",
       "pickSupplier": "Choisissez un fournisseur",
@@ -380,7 +416,8 @@
       "failed": "Non enregistré · vos comptages sont conservés",
       "saved_one": "Inventaire enregistré · {{count}} article mis à jour",
       "saved_many": "Inventaire enregistré · {{count}} d’articles mis à jour",
-      "saved_other": "Inventaire enregistré · {{count}} articles mis à jour"
+      "saved_other": "Inventaire enregistré · {{count}} articles mis à jour",
+      "empty": "Aucun article à compter pour l’instant"
     },
     "confirm": {
       "deleteItem": "Supprimer cet article ?",
@@ -400,7 +437,17 @@
           "wrongQty": "Mauvaise quantité"
         },
         "done": "{{type}} annulé · {{name}} revient à {{quantity}}",
-        "note": "Annule {{type}} du {{when}} · {{reason}}"
+        "note": "Annule {{type}} du {{when}} · {{reason}}",
+        "blocked": {
+          "alreadyReverted": "Ce mouvement a déjà été annulé",
+          "notEnoughStock": "Il ne reste pas assez de stock pour annuler cette entrée"
+        }
+      },
+      "blocked": {
+        "itemHasStock": "Seul un article sans stock peut être supprimé — ajustez-le d’abord à 0",
+        "purchasePaid": "Un achat sur lequel un paiement a été fait ne peut pas être supprimé",
+        "vendorHasDues": "Réglez d’abord les achats de ce fournisseur",
+        "stockUsed": "Une partie de ce qu’a reçu cet achat a déjà été utilisée — il ne peut pas être annulé"
       }
     }
   }

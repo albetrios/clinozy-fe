@@ -1,8 +1,8 @@
 import { screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import { HttpError } from '@/shared/errors/HttpError.ts';
+import { stockItemRow, TEST_STOCK_ITEM_ID } from '@/tests/utils/stock-doubles.ts';
 
 import {
   renderStockRoutes,
@@ -10,6 +10,11 @@ import {
 } from '../../../__tests__/integration/stock-test-router.tsx';
 import { fetchStockItem, stockQueryKeys } from '../../stock-api.ts';
 import { useStockDialogRoute } from './useStockDialogRoute.ts';
+
+vi.mock('../../stock-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchStockItem: vi.fn(),
+}));
 
 const { notifyMock } = vi.hoisted(() => ({
   notifyMock: {
@@ -27,6 +32,7 @@ vi.mock('@/shared/notify/index.ts', () => ({
 }));
 
 const ITEMS = '/organization/acme/stock/items';
+const UNKNOWN = 'sitm_gone0000000000000000';
 
 /** The dialog the Items URL names, written out. */
 function Probe() {
@@ -47,12 +53,12 @@ function Probe() {
 
 beforeEach(() => {
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetClinicFixtures();
+  vi.mocked(fetchStockItem).mockImplementation(async (id) => {
+    if (id === TEST_STOCK_ITEM_ID) return stockItemRow();
+    throw new HttpError('Not found', 404, `/app/stock-items/${id}`, 'GET');
+  });
 });
-afterEach(() => {
-  resetStockRoutes();
-  resetClinicFixtures();
-});
+afterEach(() => resetStockRoutes());
 
 describe('useStockDialogRoute (KICKOFF §6.8 Routes)', () => {
   it('reads the list, New item with its name, Stock check and Edit item', async () => {
@@ -68,17 +74,22 @@ describe('useStockDialogRoute (KICKOFF §6.8 Routes)', () => {
     expect(await screen.findByTestId('dialog')).toHaveTextContent('action check');
     check.unmount();
 
-    renderStockRoutes(`${ITEMS}/${ref.stockItem(167)}/edit`, { items: Probe });
+    const { queryClient } = renderStockRoutes(`${ITEMS}/${TEST_STOCK_ITEM_ID}/edit`, {
+      items: Probe,
+    });
     await waitFor(() =>
       expect(screen.getByTestId('dialog')).toHaveTextContent(
         'record edit Soframycin 30 gm',
       ),
     );
+    // The record's read is the organization's.
+    expect(
+      queryClient.getQueryData(stockQueryKeys.item('org_test', TEST_STOCK_ITEM_ID)),
+    ).toMatchObject({ seq: 167 });
   });
 
   it('goes back to the list, its search kept, with "Item not found" for an unknown id', async () => {
-    const unknown = '0b9c7a3e-2f6d-4f8a-9c1e-5d4b3a2f1e0d';
-    const { router } = renderStockRoutes(`${ITEMS}/${unknown}/edit?q=soft`, {
+    const { router } = renderStockRoutes(`${ITEMS}/${UNKNOWN}/edit?q=soft`, {
       items: Probe,
     });
     await waitFor(() => expect(router.state.location.pathname).toBe(ITEMS));
@@ -88,11 +99,11 @@ describe('useStockDialogRoute (KICKOFF §6.8 Routes)', () => {
     );
   });
 
-  it('a member who only uses stock is sent back from New item and Stock check', async () => {
+  it('New item takes Create, Stock check takes Edit — the Accountant goes back from both', async () => {
     const create = renderStockRoutes(
       `${ITEMS}/create`,
       { items: Probe },
-      { role: 'therapist' },
+      { role: 'accountant' },
     );
     await waitFor(() => expect(create.router.state.location.pathname).toBe(ITEMS));
     expect(notifyMock.info).toHaveBeenCalledTimes(1);
@@ -101,7 +112,7 @@ describe('useStockDialogRoute (KICKOFF §6.8 Routes)', () => {
     const check = renderStockRoutes(
       `${ITEMS}/check`,
       { items: Probe },
-      { role: 'therapist' },
+      { role: 'accountant' },
     );
     await waitFor(() => expect(check.router.state.location.pathname).toBe(ITEMS));
     expect(screen.getByTestId('dialog')).toHaveTextContent('none');
@@ -109,9 +120,9 @@ describe('useStockDialogRoute (KICKOFF §6.8 Routes)', () => {
 
     // A record still opens — view only.
     renderStockRoutes(
-      `${ITEMS}/${ref.stockItem(167)}/edit`,
+      `${ITEMS}/${TEST_STOCK_ITEM_ID}/edit`,
       { items: Probe },
-      { role: 'therapist' },
+      { role: 'accountant' },
     );
     await waitFor(() =>
       expect(screen.getByTestId('dialog')).toHaveTextContent(
@@ -120,7 +131,26 @@ describe('useStockDialogRoute (KICKOFF §6.8 Routes)', () => {
     );
   });
 
-  it('a member who keeps the stock opens Stock check', async () => {
+  it('a member who creates without Edit opens New item but not Stock check', async () => {
+    const create = renderStockRoutes(
+      `${ITEMS}/create`,
+      { items: Probe },
+      { role: 'therapist' },
+    );
+    expect(await screen.findByTestId('dialog')).toHaveTextContent('create');
+    expect(notifyMock.info).not.toHaveBeenCalled();
+    create.unmount();
+
+    const check = renderStockRoutes(
+      `${ITEMS}/check`,
+      { items: Probe },
+      { role: 'therapist' },
+    );
+    await waitFor(() => expect(check.router.state.location.pathname).toBe(ITEMS));
+    expect(notifyMock.info).toHaveBeenCalledTimes(1);
+  });
+
+  it('a member who edits stock opens Stock check', async () => {
     renderStockRoutes(`${ITEMS}/check`, { items: Probe }, { role: 'pharmacist' });
     await waitFor(() =>
       expect(screen.getByTestId('dialog')).toHaveTextContent('action check'),

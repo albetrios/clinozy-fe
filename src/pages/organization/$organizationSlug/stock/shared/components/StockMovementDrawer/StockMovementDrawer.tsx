@@ -26,11 +26,8 @@ import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { useStockWords } from '../../hooks/useStockWords/index.ts';
-import {
-  useLogStockMovement,
-  useUndoStockMovement,
-} from '../../hooks/useStockWrites/index.ts';
-import type { StockItemRow } from '../../stock-contracts.ts';
+import { useLogStockMovement } from '../../hooks/useStockWrites/index.ts';
+import type { StockItemRow, StockMovementRecord } from '../../stock-contracts.ts';
 import {
   STOCK_DRAWER_KEYS,
   STOCK_DRAWER_TEST_IDS,
@@ -50,9 +47,9 @@ import {
 import {
   STOCK_MOVEMENT_INPUT_TYPES,
   type StockMovementInputType,
-  type StockMovementResult,
 } from '../../stock-records-contracts.ts';
 import { fromMilli, STOCK_MOVEMENT_TONES, toMilli } from '../../stock-units.ts';
+import { useMovementRefusal, useMovementUndo } from './use-movement-outcome.ts';
 
 const K = STOCK_DRAWER_KEYS.movement;
 
@@ -62,7 +59,7 @@ const K = STOCK_DRAWER_KEYS.movement;
  */
 const CONTENT_PROFILE = { fieldCount: 5 } as const;
 
-/** The longest remark the drawer takes. */
+/** The longest remark the drawer takes — the API's 280 less the measured figure it carries. */
 const NOTE_MAX = 200;
 
 /** The form: the type, the quantity as typed and what it counts, what it was for, a remark. */
@@ -159,6 +156,8 @@ function MovementFields({ form, item, idPrefix, testId }: BodyProps) {
                   value === 'adjust' ? String(fromMilli(item.qtyMilli)) : '1',
                 );
                 form.setValue('mode', 'unit');
+                // Only a use says what it was for (`used_for`).
+                if (value !== 'used') form.setValue('usedFor', null);
               }}
               testId={`${testId}-type`}
             />
@@ -242,7 +241,7 @@ function MovementFields({ form, item, idPrefix, testId }: BodyProps) {
   );
 }
 
-/** DETAILS: Used for — optional, one at a time (`clinic-stock.md:133`). */
+/** DETAILS: Used for — optional, one at a time, a use's only (`clinic-stock.md:133`). */
 function DetailsFields({ form, testId }: StepProps) {
   const { t } = useTranslation(STOCK_DRAWERS_NS);
   return (
@@ -277,7 +276,7 @@ function NotesFields({ form, idPrefix, testId }: TypedStepProps) {
   const note = useDrawerFieldIds(form, idPrefix)('note');
   return (
     <DrawerFieldGrid>
-      <DrawerField label={t(K.fields.remark)} htmlFor={note.id}>
+      <DrawerField label={t(K.fields.remark)} htmlFor={note.id} error={note.error}>
         <DrawerTextarea
           {...note.control}
           {...form.register('note')}
@@ -291,15 +290,18 @@ function NotesFields({ form, idPrefix, testId }: TypedStepProps) {
   );
 }
 
-/** One opening of the drawer for one item: the form, its three steps and its save. */
+/** One opening of the drawer for one item: the form, its steps and its save. */
 function MovementSession({
   open,
   onClose,
   item,
   type,
+  undo,
   testId,
 }: Omit<StockMovementDrawerProps, 'item' | 'testId'> & {
   item: StockItemRow;
+  /** The saved movement's toast with its Undo — the drawer's, which outlives this opening. */
+  undo: (message: string, movement: StockMovementRecord) => void;
   testId: string;
 }) {
   const { t } = useTranslation(STOCK_DRAWERS_NS);
@@ -311,7 +313,7 @@ function MovementSession({
   const { isDirty } = useFormState({ control: form.control });
   const [openStep, setOpenStep] = useState<string>('movement');
   const log = useLogStockMovement({ notifyOnError: false });
-  const undo = useUndoStockMovement();
+  const refusal = useMovementRefusal();
 
   const qtyMilli = quantityMilliOf(values.quantity, values.mode, item);
   const after = stockAfter(values.type, item, qtyMilli);
@@ -322,9 +324,10 @@ function MovementSession({
       : words.unit(item.unit);
   const typed = words.amount(Number.parseFloat(values.quantity) || 0, unitOrMeasure);
 
-  const { saveState, save } = useDrawerSave<MovementFormValues, StockMovementResult>({
+  const { saveState, save } = useDrawerSave<MovementFormValues, StockMovementRecord>({
     form,
     fieldOrder: ['type', 'quantity', 'mode', 'usedFor', 'note'],
+    onConflict: (error) => notify.error(refusal(error)),
     toastId: 'stock-movement-save-failed',
     check: (current) => {
       const milli = quantityMilliOf(current.quantity, current.mode, item);
@@ -357,17 +360,18 @@ function MovementSession({
         itemId: item.id,
         type: current.type,
         quantityMilli: quantityMilliOf(current.quantity, current.mode, item),
-        usedFor: current.usedFor,
+        usedFor: current.type === 'used' ? current.usedFor : null,
         note: [measured, current.note.trim()].filter(Boolean).join(' · ') || null,
       });
     },
-    onDone: ({ movement, item: saved }) => {
-      notify.undo(
+    // "Used saved · 2 tube left" — what is left is the server's (`quantity_after`).
+    onDone: (movement) => {
+      undo(
         t(K.saved, {
-          type: typeLabel.label,
-          quantity: words.units(saved, saved.qtyMilli),
+          type: words.movementType(movement.kind).label,
+          quantity: words.units(item, movement.afterMilli),
         }),
-        { onUndo: () => undo.mutate(movement.id) },
+        movement,
       );
       onClose();
     },
@@ -376,6 +380,23 @@ function MovementSession({
   const body = { form, item, idPrefix, testId };
   const notFilled = tDrawer(RECORD_DRAWER_KEYS.step.notFilled);
   const treatment = TREATMENTS.find((entry) => entry.name === values.usedFor);
+  const details: DrawerStep = {
+    id: 'details',
+    title: t(K.steps.details),
+    summary: treatment ? t(STOCK_DRAWER_KEYS.treatments[treatment.key]) : notFilled,
+    peek: [
+      {
+        kind: 'value',
+        label: t(K.fields.usedFor),
+        value: treatment ? t(STOCK_DRAWER_KEYS.treatments[treatment.key]) : '',
+      },
+    ],
+    content: (
+      <DrawerStepBody readOnly={false}>
+        <DetailsFields {...body} />
+      </DrawerStepBody>
+    ),
+  };
   const steps: DrawerStep[] = [
     {
       id: 'movement',
@@ -400,23 +421,8 @@ function MovementSession({
         </DrawerStepBody>
       ),
     },
-    {
-      id: 'details',
-      title: t(K.steps.details),
-      summary: treatment ? t(STOCK_DRAWER_KEYS.treatments[treatment.key]) : notFilled,
-      peek: [
-        {
-          kind: 'value',
-          label: t(K.fields.usedFor),
-          value: treatment ? t(STOCK_DRAWER_KEYS.treatments[treatment.key]) : '',
-        },
-      ],
-      content: (
-        <DrawerStepBody readOnly={false}>
-          <DetailsFields {...body} />
-        </DrawerStepBody>
-      ),
-    },
+    // Details (Used for) is a use's alone — the API takes `used_for` on `used` only.
+    ...(values.type === 'used' ? [details] : []),
     {
       id: 'notes',
       title: t(K.steps.notes),
@@ -470,11 +476,13 @@ function MovementSession({
  * `clinic-stock.md:126–140, 233–245`) on the shared record drawer, 560px,
  * component state (no URL): "Movement" — Type (switching it retitles the
  * drawer), Quantity or, for Adjust, the counted quantity with its quick chips,
- * and "Measure in" for an item with contents — "Details" (Used for) and
- * "Notes" (Remark). The badges say the type and the stock after it ("After: 2
- * tube · 60 g", butter at or below the minimum). "Used saved · 2 tube left" +
- * Undo. Hand-entered Received / Adjust / Damaged / Returned and the remark are
- * a backend request (C27).
+ * and "Measure in" for an item with contents — "Details" (Used for, a use's
+ * only) and "Notes" (Remark). The badges say the type and the stock after it
+ * ("After: 2 tube · 60 g", butter at or below the minimum) — a preview; the
+ * saved balance is the server's. "Save movement" posts it (`POST
+ * /app/stock-items/:id/movements`; a measured figure rides in the remark) —
+ * "Used saved · 2 tube left" + Undo, which reverts it as "Logged by mistake".
+ * Someone having used some since is said in the room's words.
  */
 export function StockMovementDrawer({
   item,
@@ -482,12 +490,14 @@ export function StockMovementDrawer({
   ...props
 }: StockMovementDrawerProps) {
   const { session } = useDrawerSession(props.open);
+  const undo = useMovementUndo();
   if (!item) return null;
   return (
     <MovementSession
       key={`${session}-${item.id}-${props.type}`}
       {...props}
       item={item}
+      undo={undo}
       testId={testId}
     />
   );

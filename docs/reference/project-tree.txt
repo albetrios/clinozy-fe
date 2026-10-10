@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2173 src files · ~1063 tests in src/ · 48 E2E specs · 26 shadcn UI primitives
+Stats: ~2180 src files · ~1067 tests in src/ · 48 E2E specs · 26 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -1192,7 +1192,7 @@ clinozy-fe/
 │   │       │   │   │   ├── items.params.ts
 │   │       │   │   │   ├── items.route.tsx
 │   │       │   │   │   ├── ItemsPage.tsx
-│   │       │   │   │   └── [1 test file]
+│   │       │   │   │   └── [2 test files]
 │   │       │   │   ├── movements/
 │   │       │   │   │   ├── hooks/
 │   │       │   │   │   ├── movements.manifest.ts
@@ -1210,7 +1210,7 @@ clinozy-fe/
 │   │       │   │   │   ├── purchases.params.ts
 │   │       │   │   │   ├── purchases.route.tsx
 │   │       │   │   │   ├── PurchasesPage.tsx
-│   │       │   │   │   └── [1 test file]
+│   │       │   │   │   └── [2 test files]
 │   │       │   │   ├── shared/
 │   │       │   │   │   ├── components/
 │   │       │   │   │   ├── hooks/
@@ -1232,7 +1232,7 @@ clinozy-fe/
 │   │       │   │   │   ├── vendors.params.ts
 │   │       │   │   │   ├── vendors.route.tsx
 │   │       │   │   │   ├── VendorsPage.tsx
-│   │       │   │   │   └── [1 test file]
+│   │       │   │   │   └── [2 test files]
 │   │       │   │   ├── stock.constants.ts
 │   │       │   │   ├── stock.dialog-search.ts
 │   │       │   │   ├── stock.manifest.ts
@@ -2924,6 +2924,7 @@ clinozy-fe/
 │   │   ├── renderWithProviders.tsx
 │   │   ├── setup.ts
 │   │   ├── shown-location.ts
+│   │   ├── stock-doubles.ts
 │   │   └── task-row-fixture.ts
 │   └── README.md
 ├── tooling/

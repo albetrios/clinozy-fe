@@ -10,8 +10,12 @@
     "vendors": "الموردون"
   },
   "search": {
-    "placeholder": "ابحث عن صنف أو فئة أو مورد…",
-    "label": "البحث في المخزون"
+    "label": "البحث في المخزون",
+    "placeholder": {
+      "items": "ابحث باسم الصنف أو #ID…",
+      "purchases": "ابحث برقم الفاتورة أو #ID أو المورد…",
+      "vendors": "ابحث باسم المورد…"
+    }
   },
   "create": {
     "item": "صنف جديد",
@@ -26,7 +30,11 @@
     "category": "الفئة",
     "lasts": "يكفي",
     "status": "الحالة",
-    "type": "النوع"
+    "type": "النوع",
+    "lastsWithin": {
+      "week": "خلال أسبوع",
+      "three_weeks": "خلال 3 أسابيع"
+    }
   },
   "table": {
     "addPhone": "إضافة هاتف",
@@ -109,7 +117,8 @@
       "category": "الفئة",
       "stock": "المخزون",
       "lasts": "يكفي",
-      "vendor": "المورد"
+      "vendor": "المورد",
+      "lastRate": "آخر سعر"
     },
     "sub": "لكل {{unit}} · استخدام ~{{usage}}/أسبوع",
     "subContents": "لكل {{unit}} من {{contents}} · استخدام ~{{usage}}/أسبوع",
@@ -142,13 +151,24 @@
     },
     "statuses": {
       "paid": "مدفوع",
-      "partly": "مدفوع جزئيًا",
-      "unpaid": "غير مدفوع"
+      "unpaid": "غير مدفوع",
+      "partial": "مدفوع جزئيًا"
     },
     "rowActions": {
       "edit": "تعديل",
-      "delete": "حذف",
-      "pay": "ادفع {{amount}}"
+      "delete": "حذف"
+    },
+    "vendorFilter": {
+      "any": "أي مورد",
+      "count_one": "مورد واحد",
+      "count_other": "{{count}} مورد",
+      "count_zero": "{{count}} موردين",
+      "count_two": "موردان",
+      "count_few": "{{count}} موردين",
+      "count_many": "{{count}} موردًا",
+      "search": "ابحث عن الموردين",
+      "noMatch": "لا توجد نتيجة",
+      "clear": "مسح"
     }
   },
   "movements": {
@@ -173,14 +193,27 @@
       "damaged": "تالف",
       "returned": "مُرتجع",
       "reverted": "مُلغى",
-      "payment": "دفعة"
+      "opening": "رصيد افتتاحي"
     },
     "reverted": "مُلغى",
-    "purchase": "مشتريات #{{seq}}",
-    "paymentSub": "{{purchase}} · {{billNo}}",
+    "purchase": "من المشتريات #{{seq}}",
     "change": "{{sign}} {{amount}}",
     "rowActions": {
       "revert": "تراجع"
+    },
+    "purchaseBill": "من المشتريات #{{seq}} · فاتورة {{billNo}}",
+    "deletedItem": "صنف محذوف",
+    "itemFilter": {
+      "any": "أي صنف",
+      "search": "ابحث في الأصناف",
+      "noMatch": "لا تطابق",
+      "clear": "مسح",
+      "count_one": "{{count}} صنف",
+      "count_other": "{{count}} صنف",
+      "count_zero": "{{count}} أصناف",
+      "count_two": "{{count}} صنفان",
+      "count_few": "{{count}} أصناف",
+      "count_many": "{{count}} صنفًا"
     }
   },
   "vendors": {
@@ -206,8 +239,7 @@
     "noPurchases": "لا مشتريات",
     "rowActions": {
       "edit": "تعديل",
-      "delete": "حذف",
-      "pay": "ادفع {{amount}}"
+      "delete": "حذف"
     }
   },
   "drawers": {
@@ -259,7 +291,8 @@
         "vendor": "المورد"
       },
       "save": "إضافة الصنف",
-      "saved": "تم حفظ الصنف"
+      "saved": "تم حفظ الصنف",
+      "nameTaken": "يوجد صنف بهذا الاسم بالفعل"
     },
     "quickItem": {
       "title": "صنف عيادة جديد",
@@ -283,7 +316,8 @@
       },
       "save": "إضافة المورد",
       "added": "تمت إضافة المورد {{name}}",
-      "saved": "تم حفظ المورد"
+      "saved": "تم حفظ المورد",
+      "nameTaken": "يوجد مورد بهذا الاسم بالفعل"
     },
     "movement": {
       "title": {
@@ -314,7 +348,8 @@
       "summary": "{{name}} · {{change}}",
       "enterQuantity": "أدخل كمية",
       "onlyInStock": "المتوفر {{quantity}} فقط",
-      "saved": "تم حفظ {{type}} · المتبقي {{quantity}}"
+      "saved": "تم حفظ {{type}} · المتبقي {{quantity}}",
+      "notEnoughStock": "لم تعد هذه الكمية متوفرة في المخزون — استخدم أحدهم جزءًا منها. تحقّق من العدد وحاول مرة أخرى."
     },
     "use": {
       "label": "استخدام {{name}}",
@@ -371,7 +406,14 @@
         "peek_other": "{{count}} صنف · {{amount}}",
         "quickLine": "اكتب الصنف والكمية · مثال: gloves 10 @250",
         "quickHint": "10 = الكمية · @250 = السعر",
-        "lowStockChip": "{{name}} · متبقٍ {{quantity}}"
+        "lowStockChip": "{{name}} · متبقٍ {{quantity}}",
+        "mode": "الطريقة",
+        "branch": "دُفع من",
+        "paidSoFar": "{{amount}} مدفوع · {{status}}",
+        "moreThanBill": "المبلغ المدفوع أكبر من الفاتورة",
+        "dayClosed": "يوم هذا الفرع مُغلق — لا يمكن الدفع منه اليوم",
+        "addLine": "أضف صنفًا واحدًا على الأقل",
+        "tooManyLines": "تقبل عملية الشراء {{max}} صنفًا كحد أقصى"
       },
       "save": "إنشاء المشتريات",
       "pickSupplier": "اختر موردًا",
@@ -410,7 +452,8 @@
       "saved_two": "تم حفظ الجرد · تم تحديث صنفين",
       "saved_few": "تم حفظ الجرد · تم تحديث {{count}} أصناف",
       "saved_many": "تم حفظ الجرد · تم تحديث {{count}} صنفًا",
-      "saved_other": "تم حفظ الجرد · تم تحديث {{count}} صنف"
+      "saved_other": "تم حفظ الجرد · تم تحديث {{count}} صنف",
+      "empty": "لا توجد أصناف لعدّها بعد"
     },
     "confirm": {
       "deleteItem": "هل تريد حذف هذا الصنف؟",
@@ -430,7 +473,17 @@
           "wrongQty": "كمية خاطئة"
         },
         "done": "تم التراجع عن {{type}} · عاد {{name}} إلى {{quantity}}",
-        "note": "تراجع عن {{type}} بتاريخ {{when}} · {{reason}}"
+        "note": "تراجع عن {{type}} بتاريخ {{when}} · {{reason}}",
+        "blocked": {
+          "alreadyReverted": "تم التراجع عن هذه الحركة من قبل",
+          "notEnoughStock": "لا يكفي المتبقي في المخزون للتراجع عن هذا القيد"
+        }
+      },
+      "blocked": {
+        "itemHasStock": "لا يمكن حذف إلا صنف لا مخزون له — عدّله إلى 0 أولًا",
+        "purchasePaid": "لا يمكن حذف مشترى دُفع عليه مبلغ",
+        "vendorHasDues": "سدّد مشتريات هذا المورّد أولًا",
+        "stockUsed": "استُخدم بعض ما استُلم في هذا المشترى منذ ذلك الحين — لا يمكن استرجاعه"
       }
     }
   }

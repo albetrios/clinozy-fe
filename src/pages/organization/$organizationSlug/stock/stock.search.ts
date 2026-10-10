@@ -6,17 +6,17 @@
  * reads only its own keys — so the entry chunk carries one parser. A value
  * the URL can't hold is dropped, never an error; defaults stay out of the URL.
  *
- * The contract's values are declared here, not imported: `routeTree.tsx` is
- * the entry chunk, and the generated schema module is pages of zod. The test
- * pins each list to the contract's enum.
+ * The API's values are declared here, not imported: `routeTree.tsx` is the
+ * entry chunk, and the generated schema module is pages of zod — the room's
+ * other modules read them from here. The test pins each list to clinozy-be's
+ * enum, and the ids are its public ids (`svnd_…`, `sitm_…`).
  */
 import {
   listIn,
-  listOf,
   matchOf,
   oneOf,
+  PUBLIC_ID,
   queryOf,
-  RECORD_ID,
   sortOf,
 } from '@/lib/routes/search-params.ts';
 import {
@@ -26,6 +26,12 @@ import {
 
 /** Items' Stock filter beyond All (`clinic-stock.md:39`). */
 export const STOCK_LEVEL_FILTERS = ['low'] as const;
+
+/**
+ * Items' Lasts filter: what runs out within a week or within three weeks — the
+ * Lasts pill's blush and butter bands, each one upper bound (`lasts_days_to`).
+ */
+export const STOCK_LASTS_FILTERS = ['week', 'three_weeks'] as const;
 
 /** The contract's `stock_category` values — Items' automatic Category section. */
 export const STOCK_CATEGORIES = [
@@ -37,12 +43,12 @@ export const STOCK_CATEGORIES = [
   'other',
 ] as const;
 
-/** A purchase's status — Purchases' automatic Status section (`clinic-stock.md:55`). */
-export const STOCK_PURCHASE_STATUSES = ['paid', 'partly', 'unpaid'] as const;
+/** A purchase's `payment_status` — Purchases' Status section (`clinic-stock.md:55`). */
+export const STOCK_PURCHASE_STATUSES = ['paid', 'partial', 'unpaid'] as const;
 
 /**
- * A Movements row's type — the contract's `stock_movement_type` and the
- * derived Payment rows (`clinic-stock.md:71`).
+ * A movement's `type` — Movements' Type section, in the order it lists them:
+ * the five a member logs, an item's opening quantity and a revert.
  */
 export const STOCK_MOVEMENT_KINDS = [
   'used',
@@ -50,21 +56,20 @@ export const STOCK_MOVEMENT_KINDS = [
   'adjust',
   'damaged',
   'returned',
+  'opening',
   'reverted',
-  'payment',
 ] as const;
 
-/** How long an item lasts as Items' automatic Lasts section reads it: `d5`, `w6`, `none`. */
-const LASTS_VALUE = /^(?:[dw]\d{1,4}|none)$/;
-
-/** Every tab's sortable columns — a tab reads the ones it has (`clinic-stock.md:31–80`). */
+/**
+ * Every tab's sortable columns the API sorts by — a tab reads the ones it has
+ * (`clinic-stock.md:31–80`). Purchases by supplier is not among the API's sorts.
+ */
 const SORT_KEYS = [
   'seq',
   'name',
   'category',
   'stock',
   'lasts',
-  'vendor',
   'bill',
   'due',
   'payable',
@@ -78,7 +83,7 @@ type StockSort = `${StockSortKey}:${'asc' | 'desc'}`;
 
 /** Validated `?…` search params for the Clinic stock tabs. */
 export interface StockSearch {
-  /** The tab's search (≤ 80 characters, the contract's `q`). */
+  /** The tab's search (≤ 80 characters, the API's `q`) — Items, Purchases and Vendors; Movements has none. */
   q?: string;
   created?: CreatedFilter;
   sort?: StockSort;
@@ -86,15 +91,15 @@ export interface StockSearch {
   stock?: (typeof STOCK_LEVEL_FILTERS)[number];
   /** Items: any of these categories (`S:73`). */
   category?: (typeof STOCK_CATEGORIES)[number][];
-  /** Items: any of these runways (`d5` ~5 days, `w6` ~6 weeks, `none` No usage). */
-  lasts?: string[];
+  /** Items: what runs out within a week or three weeks. */
+  lasts?: (typeof STOCK_LASTS_FILTERS)[number];
   /** Purchases: any of these statuses. */
   status?: (typeof STOCK_PURCHASE_STATUSES)[number][];
-  /** Purchases: one vendor's (`S:79`). */
+  /** Purchases: one vendor's (`S:79`) — a public id. */
   vendor?: string;
   /** Movements: any of these types. */
   type?: (typeof STOCK_MOVEMENT_KINDS)[number][];
-  /** Movements: one item's (`S:77`). */
+  /** Movements: one item's (`S:77`) — a public id. */
   item?: string;
 }
 
@@ -110,10 +115,10 @@ export function validateStockSearch(search: Record<string, unknown>): StockSearc
     sort: sortOf(SORT_KEYS, search.sort),
     stock: oneOf(STOCK_LEVEL_FILTERS, search.stock),
     category: listIn(STOCK_CATEGORIES, search.category),
-    lasts: listOf<string>(search.lasts, (entry) => LASTS_VALUE.test(entry)),
+    lasts: oneOf(STOCK_LASTS_FILTERS, search.lasts),
     status: listIn(STOCK_PURCHASE_STATUSES, search.status),
-    vendor: matchOf(RECORD_ID, search.vendor),
+    vendor: matchOf(PUBLIC_ID, search.vendor),
     type: listIn(STOCK_MOVEMENT_KINDS, search.type),
-    item: matchOf(RECORD_ID, search.item),
+    item: matchOf(PUBLIC_ID, search.item),
   };
 }

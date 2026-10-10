@@ -10,8 +10,12 @@
     "vendors": "거래처"
   },
   "search": {
-    "placeholder": "품목, 카테고리 또는 공급업체 검색…",
-    "label": "재고 내 검색"
+    "label": "재고 내 검색",
+    "placeholder": {
+      "items": "품목 이름 또는 #ID 검색…",
+      "purchases": "청구서, #ID 또는 공급업체 검색…",
+      "vendors": "거래처 이름 검색…"
+    }
   },
   "create": {
     "item": "새 품목",
@@ -26,7 +30,11 @@
     "category": "카테고리",
     "lasts": "사용 가능 기간",
     "status": "상태",
-    "type": "유형"
+    "type": "유형",
+    "lastsWithin": {
+      "week": "1주 이내",
+      "three_weeks": "3주 이내"
+    }
   },
   "table": {
     "addPhone": "전화번호 추가",
@@ -94,7 +102,8 @@
       "category": "카테고리",
       "stock": "재고",
       "lasts": "사용 가능 기간",
-      "vendor": "공급업체"
+      "vendor": "공급업체",
+      "lastRate": "최근 단가"
     },
     "sub": "{{unit}}당 · 주당 약 {{usage}} 사용",
     "subContents": "{{contents}} {{unit}}당 · 주당 약 {{usage}} 사용",
@@ -122,13 +131,19 @@
     },
     "statuses": {
       "paid": "결제 완료",
-      "partly": "부분 결제",
-      "unpaid": "미결제"
+      "unpaid": "미결제",
+      "partial": "부분 결제"
     },
     "rowActions": {
       "edit": "편집",
-      "delete": "삭제",
-      "pay": "{{amount}} 지불"
+      "delete": "삭제"
+    },
+    "vendorFilter": {
+      "any": "모든 공급처",
+      "count_other": "공급처 {{count}}곳",
+      "search": "공급처 검색",
+      "noMatch": "일치하는 항목 없음",
+      "clear": "지우기"
     }
   },
   "movements": {
@@ -148,14 +163,22 @@
       "damaged": "파손",
       "returned": "반품",
       "reverted": "되돌림",
-      "payment": "결제"
+      "opening": "기초 재고"
     },
     "reverted": "되돌림",
-    "purchase": "구매 #{{seq}}",
-    "paymentSub": "{{purchase}} · {{billNo}}",
+    "purchase": "구매 #{{seq}}에서",
     "change": "{{sign}} {{amount}}",
     "rowActions": {
       "revert": "되돌리기"
+    },
+    "purchaseBill": "구매 #{{seq}}에서 · 청구서 {{billNo}}",
+    "deletedItem": "삭제된 품목",
+    "itemFilter": {
+      "any": "모든 품목",
+      "search": "품목 검색",
+      "noMatch": "일치 항목 없음",
+      "clear": "지우기",
+      "count_other": "{{count}}개 품목"
     }
   },
   "vendors": {
@@ -171,8 +194,7 @@
     "noPurchases": "구매 없음",
     "rowActions": {
       "edit": "편집",
-      "delete": "삭제",
-      "pay": "{{amount}} 지불"
+      "delete": "삭제"
     }
   },
   "drawers": {
@@ -224,7 +246,8 @@
         "vendor": "공급업체"
       },
       "save": "품목 추가",
-      "saved": "품목을 저장했습니다"
+      "saved": "품목을 저장했습니다",
+      "nameTaken": "같은 이름의 품목이 이미 있습니다"
     },
     "quickItem": {
       "title": "새 클리닉 품목",
@@ -248,7 +271,8 @@
       },
       "save": "거래처 추가",
       "added": "거래처 {{name}}을(를) 추가했습니다",
-      "saved": "거래처를 저장했습니다"
+      "saved": "거래처를 저장했습니다",
+      "nameTaken": "이 이름의 거래처가 이미 있습니다"
     },
     "movement": {
       "title": {
@@ -279,7 +303,8 @@
       "summary": "{{name}} · {{change}}",
       "enterQuantity": "수량을 입력하세요",
       "onlyInStock": "재고는 {{quantity}}뿐입니다",
-      "saved": "{{type}} 저장됨 · {{quantity}} 남음"
+      "saved": "{{type}} 저장됨 · {{quantity}} 남음",
+      "notEnoughStock": "재고가 더 이상 그만큼 없습니다. 그사이 누군가 사용했습니다. 수량을 확인하고 다시 시도하세요."
     },
     "use": {
       "label": "{{name}} 사용",
@@ -331,7 +356,14 @@
         "peek_other": "품목 {{count}}개 · {{amount}}",
         "quickLine": "품목과 수량 입력 · 예: gloves 10 @250",
         "quickHint": "10 = 수량 · @250 = 단가",
-        "lowStockChip": "{{name}} · {{quantity}}개 남음"
+        "lowStockChip": "{{name}} · {{quantity}}개 남음",
+        "mode": "결제 수단",
+        "branch": "결제 지점",
+        "paidSoFar": "{{amount}} 결제됨 · {{status}}",
+        "moreThanBill": "결제 금액이 청구액보다 많아요",
+        "dayClosed": "이 지점의 오늘 마감이 끝났어요. 오늘은 여기서 결제할 수 없어요",
+        "addLine": "품목을 하나 이상 추가하세요",
+        "tooManyLines": "한 번의 구매에는 최대 {{max}}개 품목까지 넣을 수 있어요"
       },
       "save": "구매 만들기",
       "pickSupplier": "공급업체를 선택하세요",
@@ -360,7 +392,8 @@
       "nothing": "아직 변경 사항이 없습니다",
       "save": "실사 저장",
       "failed": "저장되지 않음 · 입력한 수량은 유지됩니다",
-      "saved_other": "재고 점검 저장됨 · 품목 {{count}}개 업데이트"
+      "saved_other": "재고 점검 저장됨 · 품목 {{count}}개 업데이트",
+      "empty": "아직 셀 품목이 없습니다"
     },
     "confirm": {
       "deleteItem": "이 품목을 삭제할까요?",
@@ -380,7 +413,17 @@
           "wrongQty": "잘못된 수량"
         },
         "done": "{{type}} 되돌림 · {{name}} {{quantity}}(으)로 복원",
-        "note": "{{when}} {{type}} 되돌림 · {{reason}}"
+        "note": "{{when}} {{type}} 되돌림 · {{reason}}",
+        "blocked": {
+          "alreadyReverted": "이 입출고는 이미 되돌려졌습니다",
+          "notEnoughStock": "이 기록을 되돌릴 만큼 재고가 남아 있지 않습니다"
+        }
+      },
+      "blocked": {
+        "itemHasStock": "재고가 없는 품목만 삭제할 수 있어요. 먼저 0으로 조정하세요",
+        "purchasePaid": "결제된 금액이 있는 구매는 삭제할 수 없어요",
+        "vendorHasDues": "먼저 이 공급업체의 구매 대금을 정산하세요",
+        "stockUsed": "이 구매로 입고된 일부가 이미 사용되어 되돌릴 수 없어요"
       }
     }
   }

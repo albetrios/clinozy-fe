@@ -20,16 +20,18 @@ const rowOf = (original: unknown) => original as StockPurchaseRow;
 /**
  * The Purchases columns (KICKOFF §6.8 Tables; `clinic-stock.md:45–47`): ID ·
  * Supplier · Invoice (hidden) · Date · Bill · Due · Status — tracks `60px
- * minmax(200px,1.4fr) 120px 110px 110px 110px 110px`. On a phone the Supplier
- * leads, the Bill is the key and the meta line reads Due, Date, Status and
- * the ID ("—" dues skipped). The column ids are the URL's sort keys.
+ * minmax(200px,1.4fr) 120px 110px 110px 110px 110px`. The bill, what is due and
+ * the status are clinozy-be's, in rupees. On a phone the Supplier leads, the
+ * Bill is the key and the meta line reads Due, Date, Status and the ID ("—"
+ * dues skipped). The column ids are the URL's sort keys: ID, Bill and Due —
+ * the API does not sort by supplier.
  */
 export function useStockPurchaseColumns(): ColumnDef<
   DataTableFeatures,
   StockPurchaseRow
 >[] {
   const words = useStockWords();
-  const { t, formatPaise } = words;
+  const { t, formatRupees } = words;
   const keys = STOCK_KEYS.purchases;
   const noValue = t(STOCK_KEYS.table.noValue);
   return [
@@ -50,6 +52,7 @@ export function useStockPurchaseColumns(): ColumnDef<
       accessorFn: (purchase) => purchase.vendor?.name ?? '',
       header: t(keys.columns.vendor),
       enableHiding: false,
+      enableSorting: false,
       cell: ({ row }) => {
         const vendor = row.original.vendor;
         return (
@@ -96,12 +99,12 @@ export function useStockPurchaseColumns(): ColumnDef<
       accessorKey: 'bill',
       header: t(keys.columns.bill),
       cell: ({ row }) => (
-        <MoneyCell paise={row.original.bill} className="font-semibold" />
+        <MoneyCell rupees={row.original.bill} className="font-semibold" />
       ),
       meta: {
         track: '110px',
         align: 'end',
-        foldValue: (original) => formatPaise(rowOf(original).bill),
+        foldValue: (original) => formatRupees(rowOf(original).bill),
       },
     },
     {
@@ -111,7 +114,7 @@ export function useStockPurchaseColumns(): ColumnDef<
       cell: ({ row }) =>
         row.original.due > 0 ? (
           <MoneyCell
-            paise={row.original.due}
+            rupees={row.original.due}
             className="text-tone-blush-foreground font-semibold"
           />
         ) : (
@@ -122,7 +125,7 @@ export function useStockPurchaseColumns(): ColumnDef<
         align: 'end',
         foldValue: (original) => {
           const due = rowOf(original).due;
-          return due > 0 ? formatPaise(due) : noValue;
+          return due > 0 ? formatRupees(due) : noValue;
         },
       },
     },

@@ -57,10 +57,12 @@ export interface StockToolbarProps<TRow extends RowData> {
 /**
  * The Clinic stock toolbar (KICKOFF §6.8 Toolbar; `clinic-stock.md:17`) on the
  * shared room toolbar: h1 "Clinic stock" · the four tabs, every one kept — the
- * track scrolls sideways when short (H:93) · search · saved views · Filters ·
- * Columns · "Stock check" on Items · the tab's "+ New …" — the floating pill
- * on a phone, where "Stock check" joins the tabs' row. Keeping the stock
- * (Create with Edit) shows the creates and Stock check.
+ * track scrolls sideways when short (H:93) · search, its placeholder worded as
+ * the API searches the tab (Movements has none — the API does not search
+ * movements; its Item filter narrows them) · saved views ·
+ * Filters · Columns · "Stock check" on Items · the tab's "+ New …" — the
+ * floating pill on a phone, where "Stock check" joins the tabs' row. Create
+ * (`stock_item:create`) shows the creates; Edit (`stock_item:update`) Stock check.
  */
 export function StockToolbar<TRow extends RowData>({
   tab,
@@ -80,7 +82,7 @@ export function StockToolbar<TRow extends RowData>({
     ...organizationStockTab(nav.organizationSlug, entry.id),
   }));
   const check =
-    tab === 'items' && access.canManage ? (
+    tab === 'items' && access.canEdit ? (
       <RoomViewAction
         actionId="check"
         tableId={tableId}
@@ -91,7 +93,8 @@ export function StockToolbar<TRow extends RowData>({
         onClick={nav.check}
       />
     ) : null;
-  const createTab = tab === 'movements' ? null : tab;
+  // Movements neither searches (the API has no `q` there) nor creates.
+  const recordTab = tab === 'movements' ? null : tab;
 
   return (
     <RoomToolbar
@@ -103,22 +106,26 @@ export function StockToolbar<TRow extends RowData>({
           {phone ? check : null}
         </div>
       }
-      search={{
-        placeholder: t(STOCK_KEYS.search.placeholder),
-        label: t(STOCK_KEYS.search.label),
-      }}
+      search={
+        recordTab
+          ? {
+              placeholder: t(STOCK_KEYS.search.placeholder[recordTab]),
+              label: t(STOCK_KEYS.search.label),
+            }
+          : undefined
+      }
       filters={filters}
       columns={
         table ? <DataTableColumnChooser table={table} tableId={tableId} /> : undefined
       }
       actions={phone ? undefined : check}
       primary={
-        createTab && access.canManage
+        recordTab && access.canCreate
           ? {
               action: {
                 id: 'new',
-                label: t(PRIMARY_CREATE[createTab]),
-                onSelect: () => nav.create(createTab),
+                label: t(PRIMARY_CREATE[recordTab]),
+                onSelect: () => nav.create(recordTab),
               },
             }
           : undefined

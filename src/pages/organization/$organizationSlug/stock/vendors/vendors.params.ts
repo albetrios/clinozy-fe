@@ -1,6 +1,7 @@
 /**
  * The read Clinic stock › Vendors makes from the URL (KICKOFF §6.8, `S:81`;
- * Q-K1): its search and sort. Kept out of `stock.search.ts`, which rides the
+ * Q-K1): its search (the name) and sort — Vendor or Payable, both clinozy-be's
+ * (`sort=name`, `sort=payable`). Kept out of `stock.search.ts`, which rides the
  * entry chunk; this module loads with the tab.
  */
 import { sortParamsOf } from '@/lib/routes/search-params.ts';

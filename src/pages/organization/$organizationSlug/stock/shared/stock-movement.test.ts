@@ -4,7 +4,6 @@ import {
   contentsOf,
   exceedsStock,
   hasMeasure,
-  movementDelta,
   quantityMilliOf,
   quantityStep,
   quickQuantities,
@@ -75,13 +74,6 @@ describe('the stock after a movement (`clinic-stock.md:97, 237`)', () => {
     expect(stockAfter('adjust', TUBE, 2500)).toBe(2500);
     expect(stockAfter('used', TUBE, 1000)).toBe(2000);
     expect(stockAfter('damaged', TUBE, 5000)).toBe(0);
-  });
-
-  it('signs the change: out is negative, a count is the difference', () => {
-    expect(movementDelta('used', TUBE, 1000)).toBe(-1000);
-    expect(movementDelta('returned', TUBE, 500)).toBe(-500);
-    expect(movementDelta('received', TUBE, 1000)).toBe(1000);
-    expect(movementDelta('adjust', TUBE, 2500)).toBe(-500);
   });
 
   it('flags taking out more than the shelf holds — not a receipt or a count', () => {

@@ -10,8 +10,12 @@
     "vendors": "वेंडर"
   },
   "search": {
-    "placeholder": "आइटम, कैटेगरी या सप्लायर खोजें…",
-    "label": "स्टॉक में खोजें"
+    "label": "स्टॉक में खोजें",
+    "placeholder": {
+      "items": "आइटम का नाम या #ID खोजें…",
+      "purchases": "इनवॉइस, #ID या सप्लायर खोजें…",
+      "vendors": "वेंडर का नाम खोजें…"
+    }
   },
   "create": {
     "item": "नया आइटम",
@@ -26,7 +30,11 @@
     "category": "कैटेगरी",
     "lasts": "चलेगा",
     "status": "स्थिति",
-    "type": "प्रकार"
+    "type": "प्रकार",
+    "lastsWithin": {
+      "week": "एक हफ़्ते के भीतर",
+      "three_weeks": "3 हफ़्तों के भीतर"
+    }
   },
   "table": {
     "addPhone": "फ़ोन जोड़ें",
@@ -97,7 +105,8 @@
       "category": "कैटेगरी",
       "stock": "स्टॉक",
       "lasts": "चलेगा",
-      "vendor": "सप्लायर"
+      "vendor": "सप्लायर",
+      "lastRate": "पिछली दर"
     },
     "sub": "प्रति {{unit}} · उपयोग ~{{usage}}/हफ़्ता",
     "subContents": "प्रति {{unit}} ({{contents}}) · उपयोग ~{{usage}}/हफ़्ता",
@@ -126,13 +135,20 @@
     },
     "statuses": {
       "paid": "भुगतान हो गया",
-      "partly": "आंशिक भुगतान",
-      "unpaid": "बकाया"
+      "unpaid": "बकाया",
+      "partial": "आंशिक भुगतान"
     },
     "rowActions": {
       "edit": "संपादित करें",
-      "delete": "हटाएँ",
-      "pay": "{{amount}} का भुगतान करें"
+      "delete": "हटाएँ"
+    },
+    "vendorFilter": {
+      "any": "कोई भी सप्लायर",
+      "count_one": "{{count}} सप्लायर",
+      "count_other": "{{count}} सप्लायर",
+      "search": "सप्लायर खोजें",
+      "noMatch": "कोई मेल नहीं",
+      "clear": "साफ़ करें"
     }
   },
   "movements": {
@@ -153,14 +169,23 @@
       "damaged": "क्षतिग्रस्त",
       "returned": "वापस",
       "reverted": "पलटा गया",
-      "payment": "भुगतान"
+      "opening": "प्रारंभिक स्टॉक"
     },
     "reverted": "पलटा गया",
-    "purchase": "ख़रीद #{{seq}}",
-    "paymentSub": "{{purchase}} · {{billNo}}",
+    "purchase": "ख़रीद #{{seq}} से",
     "change": "{{sign}} {{amount}}",
     "rowActions": {
       "revert": "उलटें"
+    },
+    "purchaseBill": "ख़रीद #{{seq}} से · बिल {{billNo}}",
+    "deletedItem": "हटाया गया आइटम",
+    "itemFilter": {
+      "any": "कोई भी आइटम",
+      "search": "आइटम खोजें",
+      "noMatch": "कोई मेल नहीं",
+      "clear": "साफ़ करें",
+      "count_one": "{{count}} आइटम",
+      "count_other": "{{count}} आइटम"
     }
   },
   "vendors": {
@@ -178,8 +203,7 @@
     "noPurchases": "कोई ख़रीद नहीं",
     "rowActions": {
       "edit": "संपादित करें",
-      "delete": "हटाएँ",
-      "pay": "{{amount}} का भुगतान करें"
+      "delete": "हटाएँ"
     }
   },
   "drawers": {
@@ -231,7 +255,8 @@
         "vendor": "सप्लायर"
       },
       "save": "आइटम जोड़ें",
-      "saved": "आइटम सेव हो गया"
+      "saved": "आइटम सेव हो गया",
+      "nameTaken": "इस नाम का आइटम पहले से मौजूद है"
     },
     "quickItem": {
       "title": "नया क्लिनिक आइटम",
@@ -255,7 +280,8 @@
       },
       "save": "वेंडर जोड़ें",
       "added": "वेंडर {{name}} जोड़ा गया",
-      "saved": "वेंडर सेव हो गया"
+      "saved": "वेंडर सेव हो गया",
+      "nameTaken": "इस नाम का वेंडर पहले से मौजूद है"
     },
     "movement": {
       "title": {
@@ -286,7 +312,8 @@
       "summary": "{{name}} · {{change}}",
       "enterQuantity": "मात्रा दर्ज करें",
       "onlyInStock": "स्टॉक में सिर्फ़ {{quantity}}",
-      "saved": "{{type}} सेव हुआ · {{quantity}} बचा"
+      "saved": "{{type}} सेव हुआ · {{quantity}} बचा",
+      "notEnoughStock": "स्टॉक में अब इतना नहीं है — इस बीच किसी ने कुछ इस्तेमाल किया है। गिनती जाँचें और फिर कोशिश करें।"
     },
     "use": {
       "label": "{{name}} उपयोग करें",
@@ -339,7 +366,14 @@
         "peek_other": "{{count}} आइटम · {{amount}}",
         "quickLine": "आइटम और मात्रा लिखें · जैसे gloves 10 @250",
         "quickHint": "10 = मात्रा · @250 = दर",
-        "lowStockChip": "{{name}} · {{quantity}} बचे"
+        "lowStockChip": "{{name}} · {{quantity}} बचे",
+        "mode": "तरीका",
+        "branch": "कहाँ से भुगतान",
+        "paidSoFar": "{{amount}} भुगतान · {{status}}",
+        "moreThanBill": "भुगतान बिल से ज़्यादा है",
+        "dayClosed": "इस शाखा का दिन बंद हो चुका है — आज यहाँ से कोई भुगतान नहीं हो सकता",
+        "addLine": "कम से कम एक आइटम जोड़ें",
+        "tooManyLines": "एक ख़रीद में अधिकतम {{max}} आइटम हो सकते हैं"
       },
       "save": "ख़रीद बनाएँ",
       "pickSupplier": "सप्लायर चुनें",
@@ -370,7 +404,8 @@
       "save": "गिनती सेव करें",
       "failed": "सेव नहीं हुआ · आपकी गिनती रखी गई है",
       "saved_one": "स्टॉक जाँच सेव हुई · {{count}} आइटम अपडेट हुआ",
-      "saved_other": "स्टॉक जाँच सेव हुई · {{count}} आइटम अपडेट हुए"
+      "saved_other": "स्टॉक जाँच सेव हुई · {{count}} आइटम अपडेट हुए",
+      "empty": "गिनने के लिए अभी कोई आइटम नहीं"
     },
     "confirm": {
       "deleteItem": "यह आइटम हटाएँ?",
@@ -390,7 +425,17 @@
           "wrongQty": "गलत मात्रा"
         },
         "done": "{{type}} उलटा गया · {{name}} फिर {{quantity}}",
-        "note": "{{when}} का {{type}} उलटा · {{reason}}"
+        "note": "{{when}} का {{type}} उलटा · {{reason}}",
+        "blocked": {
+          "alreadyReverted": "यह मूवमेंट पहले ही वापस लिया जा चुका है",
+          "notEnoughStock": "इस एंट्री को वापस लेने के लिए स्टॉक में पर्याप्त नहीं बचा है"
+        }
+      },
+      "blocked": {
+        "itemHasStock": "केवल वही आइटम हटाया जा सकता है जिसका स्टॉक शून्य हो — पहले इसे 0 पर समायोजित करें",
+        "purchasePaid": "जिस खरीद पर भुगतान हो चुका है, उसे हटाया नहीं जा सकता",
+        "vendorHasDues": "पहले इस विक्रेता की खरीदों का भुगतान करें",
+        "stockUsed": "इस खरीद से मिला कुछ सामान तब से इस्तेमाल हो चुका है — इसे वापस नहीं लिया जा सकता"
       }
     }
   }

@@ -59,6 +59,8 @@ export const STOCK_DRAWER_KEYS = {
     },
     save: 'drawers.item.save',
     saved: 'drawers.item.saved',
+    /** `409 record_already_exists`: "An item with this name already exists". */
+    nameTaken: 'drawers.item.nameTaken',
   },
   /** The stacked "New clinic item" (`clinic-stock.md:187–201`). */
   quickItem: {
@@ -83,6 +85,8 @@ export const STOCK_DRAWER_KEYS = {
     /** "Vendor Ankit Traders added". */
     added: 'drawers.vendor.added',
     saved: 'drawers.vendor.saved',
+    /** `409 record_already_exists`: "A vendor with this name already exists". */
+    nameTaken: 'drawers.vendor.nameTaken',
   },
   movement: {
     title: {
@@ -120,6 +124,8 @@ export const STOCK_DRAWER_KEYS = {
     onlyInStock: 'drawers.movement.onlyInStock',
     /** "Used saved · 2 tube left". */
     saved: 'drawers.movement.saved',
+    /** `409 not_enough_stock`: someone moved some since the row was read. */
+    notEnoughStock: 'drawers.movement.notEnoughStock',
   },
   /** The Use popover (`clinic-stock.md:89–103, 205–217`). */
   use: {
@@ -175,6 +181,20 @@ export const STOCK_DRAWER_KEYS = {
       paid: 'drawers.purchase.fields.paid',
       full: 'drawers.purchase.fields.full',
       nothing: 'drawers.purchase.fields.nothing',
+      /** How "Paid" was paid: Cash · UPI · Card. */
+      mode: 'drawers.purchase.fields.mode',
+      /** The branch whose money paid it. */
+      branch: 'drawers.purchase.fields.branch',
+      /** Edit purchase's Paid, the server's: "₹892.50 paid · Partly paid". */
+      paidSoFar: 'drawers.purchase.fields.paidSoFar',
+      /** `409 more_than_due`: "Paid is more than the bill". */
+      moreThanBill: 'drawers.purchase.fields.moreThanBill',
+      /** `409 day_closed`: the paying branch's day is closed. */
+      dayClosed: 'drawers.purchase.fields.dayClosed',
+      /** A purchase receives one item at least (the API's `items`, 1–50). */
+      addLine: 'drawers.purchase.fields.addLine',
+      /** "A purchase takes up to 50 items". */
+      tooManyLines: 'drawers.purchase.fields.tooManyLines',
       enterRate: 'drawers.purchase.fields.enterRate',
       /** "2 items · ₹1,710". */
       peek: 'drawers.purchase.fields.peek',
@@ -218,6 +238,8 @@ export const STOCK_DRAWER_KEYS = {
     failed: 'drawers.check.failed',
     /** "Stock check saved · 1 item updated" (plural). */
     saved: 'drawers.check.saved',
+    /** No item to count yet. */
+    empty: 'drawers.check.empty',
   },
   confirm: {
     deleteItem: 'drawers.confirm.deleteItem',
@@ -229,6 +251,17 @@ export const STOCK_DRAWER_KEYS = {
     deleted: 'drawers.confirm.deleted',
     /** "Purchase #15 deleted". */
     purchaseDeleted: 'drawers.confirm.purchaseDeleted',
+    /** Why a delete cannot go — the API's 409 reasons, said before it is asked. */
+    blocked: {
+      /** `item_has_stock`: "Only an item with nothing in stock can be deleted — adjust it to 0 first". */
+      itemHasStock: 'drawers.confirm.blocked.itemHasStock',
+      /** `purchase_paid`: "A purchase with money paid on it can’t be deleted". */
+      purchasePaid: 'drawers.confirm.blocked.purchasePaid',
+      /** `vendor_has_dues`: "Settle this vendor’s purchases first". */
+      vendorHasDues: 'drawers.confirm.blocked.vendorHasDues',
+      /** `not_enough_stock`: "Some of what this purchase received has been used since". */
+      stockUsed: 'drawers.confirm.blocked.stockUsed',
+    },
     revert: {
       title: 'drawers.confirm.revert.title',
       /** "used of 1 tube Noprik Plus numbing cream 50 gm". */
@@ -244,6 +277,13 @@ export const STOCK_DRAWER_KEYS = {
       done: 'drawers.confirm.revert.done',
       /** A Reverted row's note: "Reverts used of Today 11:05 · Logged by mistake". */
       note: 'drawers.confirm.revert.note',
+      /** Why a revert cannot go — the API's 409 reasons. */
+      blocked: {
+        /** `already_reverted`: "This movement has been reverted already". */
+        alreadyReverted: 'drawers.confirm.revert.blocked.alreadyReverted',
+        /** `not_enough_stock`: "Not enough is left in stock to take this entry back". */
+        notEnoughStock: 'drawers.confirm.revert.blocked.notEnoughStock',
+      },
     },
   },
 } as const;

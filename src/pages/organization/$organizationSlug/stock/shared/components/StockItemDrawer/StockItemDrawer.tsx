@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 
 import { numberFromText } from '@/lib/number-text.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { StockItem } from '@/shared/api/clinic/clinic-schema.ts';
 import { SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
 import {
   DrawerFieldGrid,
@@ -21,6 +20,7 @@ import {
 } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
+import { useEditingRecord } from '@/shared/hooks/useEditingRecord/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -32,14 +32,18 @@ import {
   useCreateStockItem,
   useUpdateStockItem,
 } from '../../hooks/useStockWrites/index.ts';
-import type { StockItemRow } from '../../stock-contracts.ts';
+import type { StockItemRecord, StockItemRow } from '../../stock-contracts.ts';
 import {
   STOCK_DRAWER_KEYS,
   STOCK_DRAWER_TEST_IDS,
   STOCK_DRAWERS_NS,
 } from '../../stock-drawers.constants.ts';
 import { MILLI } from '../../stock-units.ts';
-import { StockDeleteConfirm } from '../StockDeleteConfirm/index.ts';
+import {
+  itemDeleteBlock,
+  StockDeleteConfirm,
+  useStockDeleteBlockText,
+} from '../StockDeleteConfirm/index.ts';
 import {
   ItemCategoryField,
   ItemContentsField,
@@ -58,6 +62,7 @@ import {
   newItemForm,
   type StockItemFormValues,
 } from './stock-item-form.ts';
+import { ITEM_SERVER_FIELDS, readStockItem, useItemConflict } from './use-item-save.ts';
 
 const K = STOCK_DRAWER_KEYS.item;
 
@@ -182,6 +187,19 @@ function useSteps(
   ];
 }
 
+/**
+ * The red Delete: only an item with nothing in stock goes (`409 item_has_stock`),
+ * so one with stock says why — "adjust it to 0 first" — instead of asking.
+ */
+function useItemDelete(record: StockItemRecord | null, ask: () => void) {
+  const blockText = useStockDeleteBlockText();
+  return () => {
+    const block = record ? itemDeleteBlock(record) : null;
+    if (block) notify.info(blockText(block));
+    else ask();
+  };
+}
+
 /** One opening of the drawer: the form, its steps and its save. */
 function ItemSession({
   open,
@@ -202,15 +220,26 @@ function ItemSession({
   const form: UseFormReturn<StockItemFormValues> = useForm<StockItemFormValues>({
     defaultValues: item ? itemFormOf(item) : newItemForm(prefill?.name?.trim() ?? ''),
   });
+  const { record, reload } = useEditingRecord({
+    record: item,
+    form,
+    formOf: itemFormOf,
+    read: readStockItem,
+  });
   const values = useFormValues(form);
   const { isDirty } = useFormState({ control: form.control });
   const [openStep, setOpenStep] = useState<string>('item');
   const [deleting, setDeleting] = useState(false);
+  const askDelete = useItemDelete(record, () => setDeleting(true));
+  const onConflict = useItemConflict(form, () => setOpenStep('item'));
 
   const create = useCreateStockItem({ notifyOnError: false, successMessage: t(K.saved) });
   const update = useUpdateStockItem({ notifyOnError: false, successMessage: t(K.saved) });
-  const { saveState, save } = useDrawerSave<StockItemFormValues, StockItem>({
+  const { saveState, save } = useDrawerSave<StockItemFormValues, StockItemRecord>({
     form,
+    serverFields: ITEM_SERVER_FIELDS,
+    onConflict,
+    onStale: record ? () => void reload() : undefined,
     fieldOrder: [
       'name',
       'category',
@@ -227,9 +256,7 @@ function ItemSession({
     onField: (field) => setOpenStep(stepOfField(field)),
     write: () => {
       const input = itemInputOf(form.getValues());
-      return item
-        ? update.mutateAsync({ id: item.id, patch: input })
-        : create.mutateAsync(input);
+      return record ? update.mutateAsync({ record, input }) : create.mutateAsync(input);
     },
     onDone: () => onClose(),
   });
@@ -258,20 +285,20 @@ function ItemSession({
         saveLabel={t(item ? STOCK_DRAWER_KEYS.saveChanges : K.save)}
         onSave={() => void save()}
         saveState={saveState}
-        onDelete={canDelete ? () => setDeleting(true) : undefined}
+        onDelete={canDelete ? askDelete : undefined}
         onMissing={() => notify.warning(t(STOCK_DRAWER_KEYS.addName))}
         dirty={isDirty}
         testId={testId}
       />
-      {item ? (
+      {record ? (
         <StockDeleteConfirm
           target={
             deleting
               ? {
                   kind: 'item',
-                  id: item.id,
-                  name: item.name,
-                  record: values.name.trim() || item.name,
+                  id: record.id,
+                  name: record.name,
+                  record: values.name.trim() || record.name,
                   from: 'drawer',
                 }
               : null
@@ -289,9 +316,14 @@ function ItemSession({
  * the shared record drawer, 680px: "Item" — Name*, Category, Unit, Contents
  * per <unit> and what they are measured in — "Levels" — In stock, Usage per
  * week, Minimum, Maximum — and "Supplier", a clinic vendor ("New clinic
- * vendor" stacked). The header carries "#167" and the category pill. In stock
- * is the opening quantity; a changed one becomes an Adjust movement. "Item
- * saved"; editing adds the red Delete — "Soframycin 30 gm deleted" + Undo.
+ * vendor" stacked). The header carries "#167" and the category pill. On
+ * clinozy-be: New item posts the item with In stock as its opening quantity
+ * (`POST /app/stock-items`); Edit patches what changed with the read's
+ * `updated_at`, then a changed In stock is an Adjust movement — the item's
+ * quantity moves only with movements. A name another item has goes on Name; a
+ * save over someone else's offers "Reload". "Item saved"; editing adds the red
+ * Delete (Stock Delete) — at zero "Soframycin 30 gm deleted" + Undo, with
+ * stock "adjust it to 0 first".
  */
 export function StockItemDrawer(props: StockItemDrawerProps) {
   const { session } = useDrawerSession(props.open);

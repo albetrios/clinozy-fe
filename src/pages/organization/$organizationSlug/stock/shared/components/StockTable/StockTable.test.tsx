@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
@@ -91,5 +91,27 @@ describe('StockTable', () => {
     await user.click(within(bar).getByRole('button', { name: /Export/ }));
     await waitFor(() => expect(csv.downloadCsv).toHaveBeenCalledOnce());
     expect(notifyMock.success).toHaveBeenCalledWith('1 row exported as CSV');
+  });
+
+  it('asks a signed-in member for `stock_item:export`, whatever their roles allow', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<Table rows={[{ id: 'a', name: 'Gauze swabs' }]} />);
+    act(() => {
+      useUIStore.setState({ previewRole: null });
+      useOrganizationStore
+        .getState()
+        .setPermissions(['organization:read', 'stock_item:read']);
+    });
+    await user.click(await screen.findByTestId('stock-items-table-select-all'));
+    expect(screen.queryByTestId('stock-items-table-bulk-export')).not.toBeInTheDocument();
+
+    act(() =>
+      useOrganizationStore
+        .getState()
+        .setPermissions(['organization:read', 'stock_item:read', 'stock_item:export']),
+    );
+    expect(
+      await screen.findByTestId('stock-items-table-bulk-export'),
+    ).toBeInTheDocument();
   });
 });

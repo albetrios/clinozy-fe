@@ -10,8 +10,12 @@
     "vendors": "供应商"
   },
   "search": {
-    "placeholder": "搜索物品、类别或供应商…",
-    "label": "在库存中搜索"
+    "label": "在库存中搜索",
+    "placeholder": {
+      "items": "搜索物品名称或 #ID…",
+      "purchases": "搜索发票、#ID 或供应商…",
+      "vendors": "搜索供应商名称…"
+    }
   },
   "create": {
     "item": "新建物品",
@@ -26,7 +30,11 @@
     "category": "类别",
     "lasts": "可用",
     "status": "状态",
-    "type": "类型"
+    "type": "类型",
+    "lastsWithin": {
+      "week": "一周内",
+      "three_weeks": "三周内"
+    }
   },
   "table": {
     "addPhone": "添加电话",
@@ -94,7 +102,8 @@
       "category": "类别",
       "stock": "库存",
       "lasts": "可用",
-      "vendor": "供应商"
+      "vendor": "供应商",
+      "lastRate": "上次单价"
     },
     "sub": "每{{unit}} · 每周约用 {{usage}}",
     "subContents": "每{{unit}} {{contents}} · 每周约用 {{usage}}",
@@ -122,13 +131,19 @@
     },
     "statuses": {
       "paid": "已付款",
-      "partly": "部分付款",
-      "unpaid": "未付款"
+      "unpaid": "未付款",
+      "partial": "部分付款"
     },
     "rowActions": {
       "edit": "编辑",
-      "delete": "删除",
-      "pay": "支付 {{amount}}"
+      "delete": "删除"
+    },
+    "vendorFilter": {
+      "any": "任意供应商",
+      "count_other": "{{count}} 个供应商",
+      "search": "搜索供应商",
+      "noMatch": "无匹配项",
+      "clear": "清除"
     }
   },
   "movements": {
@@ -148,14 +163,22 @@
       "damaged": "损坏",
       "returned": "退回",
       "reverted": "已撤销",
-      "payment": "付款"
+      "opening": "期初库存"
     },
     "reverted": "已撤销",
-    "purchase": "采购 #{{seq}}",
-    "paymentSub": "{{purchase}} · {{billNo}}",
+    "purchase": "来自采购 #{{seq}}",
     "change": "{{sign}} {{amount}}",
     "rowActions": {
       "revert": "撤销"
+    },
+    "purchaseBill": "来自采购 #{{seq}} · 账单 {{billNo}}",
+    "deletedItem": "已删除的物品",
+    "itemFilter": {
+      "any": "任意物品",
+      "search": "搜索物品",
+      "noMatch": "无匹配",
+      "clear": "清除",
+      "count_other": "{{count}} 个物品"
     }
   },
   "vendors": {
@@ -171,8 +194,7 @@
     "noPurchases": "无采购",
     "rowActions": {
       "edit": "编辑",
-      "delete": "删除",
-      "pay": "支付 {{amount}}"
+      "delete": "删除"
     }
   },
   "drawers": {
@@ -224,7 +246,8 @@
         "vendor": "供应商"
       },
       "save": "添加物品",
-      "saved": "物品已保存"
+      "saved": "物品已保存",
+      "nameTaken": "已有同名物品"
     },
     "quickItem": {
       "title": "新建诊所物品",
@@ -248,7 +271,8 @@
       },
       "save": "添加供应商",
       "added": "已添加供应商 {{name}}",
-      "saved": "供应商已保存"
+      "saved": "供应商已保存",
+      "nameTaken": "已存在同名供应商"
     },
     "movement": {
       "title": {
@@ -279,7 +303,8 @@
       "summary": "{{name}} · {{change}}",
       "enterQuantity": "请输入数量",
       "onlyInStock": "库存仅有 {{quantity}}",
-      "saved": "已保存{{type}} · 剩余 {{quantity}}"
+      "saved": "已保存{{type}} · 剩余 {{quantity}}",
+      "notEnoughStock": "库存已不足——有人在此期间用掉了一些。请核对数量后重试。"
     },
     "use": {
       "label": "使用 {{name}}",
@@ -331,7 +356,14 @@
         "peek_other": "{{count}} 件物品 · {{amount}}",
         "quickLine": "输入物品和数量 · 例如 gloves 10 @250",
         "quickHint": "10 = 数量 · @250 = 单价",
-        "lowStockChip": "{{name}} · 剩 {{quantity}}"
+        "lowStockChip": "{{name}} · 剩 {{quantity}}",
+        "mode": "方式",
+        "branch": "付款分店",
+        "paidSoFar": "已付 {{amount}} · {{status}}",
+        "moreThanBill": "已付金额超过账单金额",
+        "dayClosed": "该分店今日已结账——今天无法从这里付款",
+        "addLine": "请至少添加一个物品",
+        "tooManyLines": "一次采购最多 {{max}} 个物品"
       },
       "save": "创建采购",
       "pickSupplier": "请选择供应商",
@@ -360,7 +392,8 @@
       "nothing": "暂无变更",
       "save": "保存盘点",
       "failed": "未保存 · 已保留你的盘点",
-      "saved_other": "盘点已保存 · 已更新 {{count}} 件物品"
+      "saved_other": "盘点已保存 · 已更新 {{count}} 件物品",
+      "empty": "暂无可盘点的物品"
     },
     "confirm": {
       "deleteItem": "删除此物品？",
@@ -380,7 +413,17 @@
           "wrongQty": "数量错误"
         },
         "done": "已撤销{{type}} · {{name}} 恢复为 {{quantity}}",
-        "note": "撤销 {{when}} 的{{type}} · {{reason}}"
+        "note": "撤销 {{when}} 的{{type}} · {{reason}}",
+        "blocked": {
+          "alreadyReverted": "此记录已被撤销",
+          "notEnoughStock": "库存不足，无法撤销此记录"
+        }
+      },
+      "blocked": {
+        "itemHasStock": "只能删除库存为零的物品——请先将其调整为 0",
+        "purchasePaid": "已有付款的采购不能删除",
+        "vendorHasDues": "请先结清该供应商的采购款",
+        "stockUsed": "该采购入库的部分已被使用，无法撤回"
       }
     }
   }

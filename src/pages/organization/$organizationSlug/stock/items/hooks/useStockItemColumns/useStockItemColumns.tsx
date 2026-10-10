@@ -5,6 +5,7 @@ import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import {
   IdPill,
+  MoneyCell,
   PersonChip,
   StockBarCell,
   TextCell,
@@ -22,10 +23,11 @@ const rowOf = (original: unknown) => original as StockItemRow;
 /**
  * The Items columns (KICKOFF §6.8 Tables; `clinic-stock.md:29–31`): ID · Item ·
  * Category · Stock · Lasts · Supplier (hidden) — tracks `60px
- * minmax(200px,1.5fr) 150px 170px 110px minmax(150px,1fr)`. On a phone the
- * Item leads, the Category pill is the key and the meta line reads Stock,
- * Lasts and the ID; at 820 Item and Category stay. The column ids are the
- * URL's sort keys.
+ * minmax(200px,1.5fr) 150px 170px 110px minmax(150px,1fr)` — and, hidden too,
+ * Last rate: the rupees of its latest purchase line (clinozy-be's `last_rate`).
+ * Stock reads the server's level, Lasts its runway. On a phone the Item leads,
+ * the Category pill is the key and the meta line reads Stock, Lasts and the
+ * ID; at 820 Item and Category stay. The column ids are the URL's sort keys.
  */
 export function useStockItemColumns(): ColumnDef<DataTableFeatures, StockItemRow>[] {
   const words = useStockWords();
@@ -149,6 +151,30 @@ export function useStockItemColumns(): ColumnDef<DataTableFeatures, StockItemRow
         kind: 'person',
         defaultHidden: true,
         foldValue: (original) => rowOf(original).vendor?.name ?? null,
+      },
+    },
+    {
+      id: 'lastRate',
+      accessorKey: 'lastRate',
+      header: t(keys.columns.lastRate),
+      enableSorting: false,
+      cell: ({ row }) => {
+        const rate = row.original.lastRate;
+        if (rate === null) {
+          return (
+            <span className="text-muted-foreground">{t(STOCK_KEYS.table.noValue)}</span>
+          );
+        }
+        return <MoneyCell rupees={rate} />;
+      },
+      meta: {
+        track: '110px',
+        align: 'end',
+        defaultHidden: true,
+        foldValue: (original) => {
+          const rate = rowOf(original).lastRate;
+          return rate === null ? null : words.formatRupees(rate);
+        },
       },
     },
   ];

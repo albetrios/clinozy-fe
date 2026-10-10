@@ -133,6 +133,7 @@ export function ItemContentsField({ form, idPrefix, testId }: ItemFieldProps) {
       label={t(K.contents, { unit })}
       hint={t(K.contentsHint, { unit })}
       htmlFor={contents.id}
+      error={contents.error}
     >
       <Controller
         control={form.control}
@@ -195,6 +196,7 @@ export function ItemQuantityField({
       label={t(name === 'inStock' ? K.inStock : K.usage)}
       hint={name === 'inStock' ? t(K.decimals) : undefined}
       htmlFor={ids.id}
+      error={ids.error}
     >
       <Controller
         control={form.control}
@@ -216,7 +218,11 @@ export function ItemQuantityField({
   );
 }
 
-/** Minimum or Maximum: a whole-number stepper (`clinic-stock.md:116–117`). */
+/**
+ * Minimum or Maximum: a stepper of whole steps (`clinic-stock.md:116–117`) —
+ * a level saved with decimals keeps them; a maximum under the minimum is the
+ * API's 400, said here.
+ */
 export function ItemLevelField({
   form,
   idPrefix,
@@ -225,14 +231,15 @@ export function ItemLevelField({
 }: ItemFieldProps & { name: 'minQty' | 'maxQty' }) {
   const { t } = useTranslation(STOCK_DRAWERS_NS);
   const label = t(name === 'minQty' ? K.min : K.max);
+  const ids = useDrawerFieldIds(form, idPrefix)(name);
   return (
-    <DrawerField label={label} htmlFor={`${idPrefix}-${name}`}>
+    <DrawerField label={label} htmlFor={ids.id} error={ids.error}>
       <Controller
         control={form.control}
         name={name}
         render={({ field: control }) => (
           <DrawerStepper
-            id={`${idPrefix}-${name}`}
+            id={ids.id}
             value={control.value}
             onValueChange={control.onChange}
             min={0}
@@ -260,6 +267,7 @@ export function ItemVendorField({
       label={t(K.vendor)}
       hint={t(STOCK_DRAWER_KEYS.pickers.vendorsHint)}
       htmlFor={vendor.id}
+      error={vendor.error}
     >
       <Controller
         control={form.control}

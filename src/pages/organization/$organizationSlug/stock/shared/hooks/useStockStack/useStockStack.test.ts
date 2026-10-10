@@ -1,12 +1,12 @@
 import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { StockItem, StockVendor } from '@/shared/api/clinic/clinic-schema.ts';
+import { stockItemRow, stockVendorRow } from '@/tests/utils/stock-doubles.ts';
 
 import { useStockStack } from './useStockStack.ts';
 
-const ANKIT = { id: 'v9', name: 'Ankit Traders', phone: null } as StockVendor;
-const COTTON = { id: 'i9', name: 'Cotton' } as StockItem;
+const ANKIT = stockVendorRow({ name: 'Ankit Traders', phone: null });
+const COTTON = stockItemRow({ name: 'Cotton' });
 
 describe('useStockStack', () => {
   it('opens one child — a vendor or an item — named from the picker', () => {

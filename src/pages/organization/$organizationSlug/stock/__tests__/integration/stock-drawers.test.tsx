@@ -1,24 +1,60 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
+import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
+vi.mock('../../shared/stock-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  listStockItems: vi.fn(),
+  listStockPurchases: vi.fn(),
+  listStockMovements: vi.fn(),
+  listStockVendors: vi.fn(),
+  stockListSummary: vi.fn(),
+  fetchAllStockItems: vi.fn(),
+  fetchAllStockVendors: vi.fn(),
+  fetchStockItem: vi.fn(),
+  fetchStockPurchase: vi.fn(),
+  fetchStockVendor: vi.fn(),
+}));
+vi.mock('../../shared/stock-records-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  revertStockMovement: vi.fn(),
+}));
+import type { OrganizationPermission } from '@/core/types/permissions.ts';
+import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+  stockMovementRow,
+  TEST_STOCK_ITEM_ID,
+  TEST_STOCK_MOVEMENT_ID,
+  TEST_STOCK_PURCHASE_ID,
+  TEST_STOCK_VENDOR_ID,
+} from '@/tests/utils/stock-doubles.ts';
 
 import { ItemsPage } from '../../items/ItemsPage.tsx';
 import { MovementsPage } from '../../movements/MovementsPage.tsx';
 import { PurchasesPage } from '../../purchases/PurchasesPage.tsx';
+import { useStockAccess } from '../../shared/hooks/useStockAccess/index.ts';
+import {
+  fetchStockItem,
+  fetchStockPurchase,
+  fetchStockVendor,
+} from '../../shared/stock-api.ts';
+import { revertStockMovement } from '../../shared/stock-records-api.ts';
 import { VendorsPage } from '../../vendors/VendorsPage.tsx';
-import { renderStockRoutes, resetStockRoutes } from './stock-test-router.tsx';
+import {
+  primeStockRoom,
+  STOCK_NARROW_CODES,
+  STOCK_ROOM_URL as ROOM,
+} from './stock-room-test-data.ts';
+import {
+  renderStockRoutes,
+  resetStockRoutes,
+  type StockTestTab,
+} from './stock-test-router.tsx';
 
-const viewport = vi.hoisted(() => ({ tier: 'desktop' as ViewportTier }));
 vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
-  useViewportTier: () => viewport.tier,
-  readViewportTier: () => viewport.tier,
+  useViewportTier: () => 'desktop',
+  readViewportTier: () => 'desktop',
 }));
 
 const { notifyMock } = vi.hoisted(() => ({
@@ -36,288 +72,296 @@ vi.mock('@/shared/notify/index.ts', () => ({
   TOAST_DURATION_MS: { default: 5200, error: 9000, undo: 10_000 },
 }));
 
-const PAGES = {
-  items: ItemsPage,
-  purchases: PurchasesPage,
-  movements: MovementsPage,
-  vendors: VendorsPage,
-};
-const ROOM = '/organization/acme/stock';
 const setup = () =>
   userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
 
-const rowOf = (tab: string, text: string) => {
+/** A tab page with a mark once the member's access is known — the gates' answers are final then. */
+const withAccess = (Page: () => ReactNode) =>
+  function TabWithAccess() {
+    const { resolved } = useStockAccess();
+    return (
+      <>
+        {resolved ? <span data-testid="access-resolved" hidden /> : null}
+        <Page />
+      </>
+    );
+  };
+
+const PAGES = {
+  items: withAccess(ItemsPage),
+  purchases: withAccess(PurchasesPage),
+  movements: withAccess(MovementsPage),
+  vendors: withAccess(VendorsPage),
+};
+
+const rowOf = (tab: StockTestTab, text: string) => {
   const row = screen
     .getAllByTestId(`stock-${tab}-table-row`)
     .find((candidate) => candidate.textContent?.includes(text));
   if (!row) throw new Error(`no ${tab} row with ${text}`);
   return row;
 };
-/** The row's action buttons, by id. */
-const actionsOf = (tab: string, text: string) =>
-  within(rowOf(tab, text))
-    .queryAllByTestId(/-row-action-/)
-    .map((button) => button.dataset.testid?.split('-row-action-')[1]);
-const action = (tab: string, text: string, id: string) =>
+const action = (tab: StockTestTab, text: string, id: string) =>
   within(rowOf(tab, text)).getByTestId(`stock-${tab}-row-action-${id}`);
 
-/** Open a tab and wait for `text` in its rows. */
-async function openTab(
-  tab: keyof typeof PAGES,
+/** Open the room at `path` for a member and wait for `text` in the tab's rows and the access. */
+async function openAt(
+  path: string,
+  tab: StockTestTab,
   text: string,
-  role?: 'therapist' | 'accountant',
+  permissions?: readonly OrganizationPermission[],
 ) {
-  const view = renderStockRoutes(`${ROOM}/${tab}`, PAGES, role ? { role } : {});
+  const view = renderStockRoutes(`${ROOM}/${path}`, PAGES, { permissions });
   await waitFor(() => expect(rowOf(tab, text)).toBeInTheDocument());
+  await screen.findByTestId('access-resolved');
   return view;
 }
 
+/** A drawer is gone, or sliding out. */
+const closed = (testId: string) =>
+  (screen.queryByTestId(testId)?.getAttribute('data-state') ?? 'closed') === 'closed';
+
 beforeEach(() => {
+  vi.resetAllMocks();
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  viewport.tier = 'desktop';
-  resetClinicFixtures();
+  primeStockRoom();
 });
-afterEach(() => {
-  resetStockRoutes();
-  resetClinicFixtures();
-});
+afterEach(() => resetStockRoutes());
 
-describe('Clinic stock › Items row actions (clinic-stock.md:34)', () => {
-  it('offers Use · Receive stock · Log usage… · Adjust count · Edit · Delete to Admin', async () => {
-    await openTab('items', 'Soframycin');
-    expect(actionsOf('items', 'Soframycin')).toEqual([
-      'use',
-      'receive',
-      'log',
-      'adjust',
-      'edit',
-      'delete',
-    ]);
-  });
-
-  it('a member who uses stock gets Use and Log usage…; a viewer only Edit', async () => {
-    const therapist = await openTab('items', 'Soframycin', 'therapist');
-    await waitFor(() =>
-      expect(actionsOf('items', 'Soframycin')).toEqual(['use', 'log', 'edit']),
-    );
-    therapist.unmount();
-    await openTab('items', 'Soframycin', 'accountant');
-    await waitFor(() => expect(actionsOf('items', 'Soframycin')).toEqual(['edit']));
-  });
-
-  it('Use opens the popover at the row; the use moves the stock and its runway', async () => {
+describe('Clinic stock — a drawer from each tab', () => {
+  it('Items: a row opens Edit item from its own read; New item and Stock check open on their routes', async () => {
     const user = setup();
-    await openTab('items', 'Soframycin');
-    expect(rowOf('items', 'Soframycin')).toHaveTextContent('~6 weeks');
-    await user.click(action('items', 'Soframycin', 'use'));
-    const popover = await screen.findByTestId('stock-use-popover');
-    await user.click(within(popover).getByTestId('stock-use-popover-save'));
-    await waitFor(() =>
-      expect(rowOf('items', 'Soframycin')).toHaveTextContent('2 tube · 60 g · OK'),
-    );
-    // 2 tubes at half a tube a week: four weeks left.
-    expect(rowOf('items', 'Soframycin')).toHaveTextContent('~4 weeks');
-    expect(notifyMock.undo).toHaveBeenCalledWith(
-      '1 tube of Soframycin 30 gm used · 2 tube left',
-      expect.anything(),
-    );
-  });
-
-  it('an item out of stock never opens the popover', async () => {
-    const user = setup();
-    await openTab('items', 'D-Tan Mask');
-    await user.click(action('items', 'D-Tan Mask', 'use'));
-    expect(notifyMock.info).toHaveBeenCalledWith('D-Tan Mask is out of stock');
-    expect(screen.queryByTestId('stock-use-popover')).not.toBeInTheDocument();
-  });
-
-  it('"More details" moves the use into the Log usage drawer', async () => {
-    const user = setup();
-    await openTab('items', 'Soframycin');
-    await user.click(action('items', 'Soframycin', 'use'));
-    await user.click(await screen.findByTestId('stock-use-popover-more-details'));
-    const drawer = await screen.findByTestId('stock-movement-drawer');
-    expect(within(drawer).getByTestId('stock-movement-drawer-title')).toHaveTextContent(
-      'Log usage',
-    );
-    await waitFor(() =>
-      expect(screen.queryByTestId('stock-use-popover')).not.toBeInTheDocument(),
-    );
-  });
-
-  it('Receive stock, Log usage… and Adjust count open the movement drawer on their type', async () => {
-    const user = setup();
-    await openTab('items', 'Soframycin');
-    const titles: [string, string][] = [
-      ['receive', 'Receive stock'],
-      ['log', 'Log usage'],
-      ['adjust', 'Adjust stock'],
-    ];
-    for (const [id, title] of titles) {
-      await user.click(action('items', 'Soframycin', id));
-      const drawer = await screen.findByTestId('stock-movement-drawer');
-      expect(within(drawer).getByTestId('stock-movement-drawer-title')).toHaveTextContent(
-        title,
-      );
-      await user.click(within(drawer).getByTestId('stock-movement-drawer-dismiss'));
-      await waitFor(() =>
-        expect(
-          screen.queryByTestId('stock-movement-drawer')?.getAttribute('data-state') ??
-            'closed',
-        ).toBe('closed'),
-      );
-    }
-  });
-
-  it('a row’s Delete asks for a reason, then the item leaves the list', async () => {
-    const user = setup();
-    await openTab('items', 'Fucibet');
-    await user.click(action('items', 'Fucibet', 'delete'));
-    const confirm = await screen.findByRole('alertdialog');
-    expect(confirm).toHaveTextContent('Delete this item?');
-    await user.click(within(confirm).getByRole('radio', { name: 'No longer needed' }));
-    await user.click(within(confirm).getByRole('button', { name: 'Delete' }));
-    await waitFor(() =>
-      expect(
-        screen
-          .getAllByTestId('stock-items-table-row')
-          .some((row) => row.textContent?.includes('Fucibet')),
-      ).toBe(false),
-    );
-    expect(notifyMock.undo).toHaveBeenCalledWith('Fucibet removed', expect.anything());
-  });
-});
-
-describe('Clinic stock › the drawers on their routes (KICKOFF §6.8 Routes)', () => {
-  it('opens New item named from the URL, then closes back to the list', async () => {
-    const user = setup();
-    const { router } = renderStockRoutes(`${ROOM}/items/create?name=Cotton&q=co`, PAGES);
-    const drawer = await screen.findByTestId('stock-item-drawer');
-    expect(within(drawer).getByTestId('stock-item-drawer-name')).toHaveValue('Cotton');
-    await user.click(within(drawer).getByTestId('stock-item-drawer-dismiss'));
-    await waitFor(() => expect(router.state.location.pathname).toBe(`${ROOM}/items`));
-    expect(router.state.location.search).toMatchObject({ q: 'co' });
-  });
-
-  it('a row opens Edit item; Stock check opens from its route', async () => {
-    const user = setup();
-    const { router } = await openTab('items', 'Soframycin');
+    const { router } = await openAt('items?q=sof', 'items', 'Soframycin');
     await user.click(within(rowOf('items', 'Soframycin')).getByText('Soframycin 30 gm'));
     const drawer = await screen.findByTestId('stock-item-drawer');
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe(
+        `${ROOM}/items/${TEST_STOCK_ITEM_ID}/edit`,
+      ),
+    );
     await waitFor(() =>
       expect(within(drawer).getByTestId('stock-item-drawer-tag')).toHaveTextContent(
         '#167',
       ),
     );
+    expect(fetchStockItem).toHaveBeenCalledWith(TEST_STOCK_ITEM_ID);
+    expect(within(drawer).getByTestId('stock-item-drawer-save')).toBeInTheDocument();
+    expect(await axeForDialog(drawer)).toHaveNoViolations();
+    await user.click(within(drawer).getByTestId('stock-item-drawer-dismiss'));
+    await waitFor(() => expect(router.state.location.pathname).toBe(`${ROOM}/items`));
+    expect(router.state.location.search).toMatchObject({ q: 'sof' });
 
-    await router.navigate({ to: `${ROOM}/items/check` });
+    await user.click(screen.getByTestId('stock-items-new'));
+    const created = await screen.findByTestId('stock-item-drawer');
+    expect(within(created).getByTestId('stock-item-drawer-title')).toHaveTextContent(
+      'New item',
+    );
+    expect(router.state.location.pathname).toBe(`${ROOM}/items/create`);
+    await user.click(within(created).getByTestId('stock-item-drawer-dismiss'));
+    await waitFor(() => expect(closed('stock-item-drawer')).toBe(true));
+
+    await user.click(screen.getByTestId('stock-items-view-action-check'));
     const check = await screen.findByTestId('stock-check-drawer');
     await waitFor(() =>
       expect(within(check).getByTestId('stock-check-drawer-counter')).toHaveTextContent(
-        '0 of 10 counted',
+        '0 of 3 counted',
       ),
     );
+    expect(router.state.location.pathname).toBe(`${ROOM}/items/check`);
   });
 
-  it('`purchases/create?reorder=low` opens the reordered purchase; a row deletes one', async () => {
+  it('Items: Use opens the popover at the row; Receive stock opens the movement drawer', async () => {
     const user = setup();
-    renderStockRoutes(`${ROOM}/purchases/create?reorder=low`, PAGES);
-    await waitFor(() =>
-      expect(screen.getAllByTestId('stock-purchase-drawer-lines-row')).toHaveLength(2),
+    await openAt('items', 'items', 'Soframycin');
+    await user.click(action('items', 'Soframycin', 'use'));
+    expect(await screen.findByTestId('stock-use-popover')).toHaveAccessibleName(
+      'Use Soframycin 30 gm',
     );
-    await user.click(screen.getByTestId('stock-purchase-drawer-dismiss'));
-    await waitFor(() => expect(rowOf('purchases', 'Cranix')).toBeInTheDocument());
-
-    await user.click(action('purchases', 'Cranix', 'delete'));
-    const confirm = await screen.findByRole('alertdialog');
-    expect(confirm).toHaveTextContent('Delete this purchase?');
-    expect(confirm).toHaveTextContent('Cranix Pharma');
-    await user.click(within(confirm).getByRole('radio', { name: 'Duplicate' }));
-    await user.click(within(confirm).getByRole('button', { name: 'Delete' }));
+    await user.keyboard('{Escape}');
     await waitFor(() =>
-      expect(notifyMock.undo).toHaveBeenCalledWith(
-        'Purchase #15 deleted',
-        expect.anything(),
+      expect(screen.queryByTestId('stock-use-popover')).not.toBeInTheDocument(),
+    );
+
+    await user.click(action('items', 'Soframycin', 'receive'));
+    const drawer = await screen.findByTestId('stock-movement-drawer');
+    expect(within(drawer).getByTestId('stock-movement-drawer-title')).toHaveTextContent(
+      'Receive stock',
+    );
+  });
+
+  it('Purchases: a row opens Edit purchase — its lines as received, Paid the server’s; New purchase from the toolbar', async () => {
+    const user = setup();
+    const { router } = await openAt('purchases', 'purchases', '#16');
+    await user.click(within(rowOf('purchases', '#16')).getByText('Ankur Pharma'));
+    const drawer = await screen.findByTestId('stock-purchase-drawer');
+    await waitFor(() =>
+      expect(within(drawer).getByTestId('stock-purchase-drawer-tag')).toHaveTextContent(
+        '#16',
       ),
     );
-  });
+    expect(router.state.location.pathname).toBe(
+      `${ROOM}/purchases/${TEST_STOCK_PURCHASE_ID}/edit`,
+    );
+    expect(fetchStockPurchase).toHaveBeenCalledWith(TEST_STOCK_PURCHASE_ID);
+    await user.click(
+      within(drawer).getByTestId('stock-purchase-drawer-step-items-trigger'),
+    );
+    expect(
+      within(drawer).queryByTestId('stock-purchase-drawer-lines-add'),
+    ).not.toBeInTheDocument();
+    await user.click(
+      within(drawer).getByTestId('stock-purchase-drawer-step-payment-trigger'),
+    );
+    expect(
+      await within(drawer).findByTestId('stock-purchase-drawer-paid'),
+    ).toHaveTextContent('₹892.50 paid · Partly paid');
+    await user.click(within(drawer).getByTestId('stock-purchase-drawer-dismiss'));
+    await waitFor(() => expect(router.state.location.pathname).toBe(`${ROOM}/purchases`));
 
-  it('Edit purchase opens from its route with the bill', async () => {
-    renderStockRoutes(`${ROOM}/purchases/${ref.stockPurchase(16)}/edit`, PAGES);
+    await user.click(screen.getByTestId('stock-purchases-new'));
     await waitFor(() =>
-      expect(screen.getByTestId('stock-purchase-drawer-tag')).toHaveTextContent('#16'),
+      expect(router.state.location.pathname).toBe(`${ROOM}/purchases/create`),
+    );
+    const created = await screen.findByTestId('stock-purchase-drawer');
+    await waitFor(() =>
+      expect(
+        within(created).getByTestId('stock-purchase-drawer-title'),
+      ).toHaveTextContent('New purchase'),
     );
   });
-});
 
-describe('Clinic stock › Movements Revert (clinic-stock.md:65)', () => {
-  it('reverts a use; both rows lose Revert and the new one says what it undid', async () => {
+  it('Movements: Revert opens its confirm and reverts; “From purchase #16” opens Edit purchase', async () => {
     const user = setup();
-    await openTab('movements', 'Noprik');
-    await user.click(action('movements', 'Noprik', 'revert'));
+    vi.mocked(revertStockMovement).mockResolvedValue(
+      stockMovementRow({
+        id: 'smov_reverting000000000000',
+        kind: 'reverted',
+        deltaMilli: 500,
+        afterMilli: 3500,
+        revertsId: TEST_STOCK_MOVEMENT_ID,
+      }),
+    );
+    const { router } = await openAt('movements', 'movements', 'LHR');
+    await user.click(action('movements', 'LHR', 'revert'));
     const confirm = await screen.findByRole('alertdialog');
+    expect(confirm).toHaveTextContent('Revert this movement?');
     await user.click(within(confirm).getByRole('radio', { name: 'Logged by mistake' }));
     await user.click(within(confirm).getByRole('button', { name: 'Revert' }));
-    // The revert is found by what it says: a seeded entry later today can sort above it.
-    const isRevert = (row: HTMLElement) =>
-      /Reverts used of .+ · Logged by mistake/.test(row.textContent ?? '');
     await waitFor(() =>
-      expect(screen.getAllByTestId('stock-movements-table-row').some(isRevert)).toBe(
-        true,
+      expect(revertStockMovement).toHaveBeenCalledWith(
+        expect.objectContaining({
+          input: expect.objectContaining({
+            itemId: TEST_STOCK_ITEM_ID,
+            movementId: TEST_STOCK_MOVEMENT_ID,
+            reason: 'mistake',
+          }),
+          idempotencyKey: expect.any(String),
+        }),
       ),
     );
-    const noprik = screen
-      .getAllByTestId('stock-movements-table-row')
-      .filter((row) => row.textContent?.includes('Noprik'));
-    const reverting = noprik.find(isRevert);
-    const original = noprik.find((row) => !isRevert(row));
-    expect(
-      within(reverting as HTMLElement).queryByTestId(/-row-action-revert/),
-    ).toBeNull();
-    expect(
-      within(original as HTMLElement).queryByTestId(/-row-action-revert/),
-    ).toBeNull();
-    expect(original).toHaveTextContent('Reverted');
-    // A payment is never reverted.
-    expect(
-      within(rowOf('movements', 'Shivam Water')).queryByTestId(/-row-action-revert/),
-    ).toBeNull();
+    await waitFor(() => expect(notifyMock.success).toHaveBeenCalled());
+
+    await user.click(screen.getByTestId('stock-movements-purchase'));
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe(
+        `${ROOM}/purchases/${TEST_STOCK_PURCHASE_ID}/edit`,
+      ),
+    );
+    const drawer = await screen.findByTestId('stock-purchase-drawer');
+    await waitFor(() =>
+      expect(within(drawer).getByTestId('stock-purchase-drawer-tag')).toHaveTextContent(
+        '#16',
+      ),
+    );
   });
 
-  it('only a member with Stock Delete reverts', async () => {
-    await openTab('movements', 'Noprik', 'therapist');
-    await waitFor(() => expect(actionsOf('movements', 'Noprik')).toEqual([]));
+  it('Vendors: a row opens Edit clinic vendor; New clinic vendor opens from the toolbar', async () => {
+    const user = setup();
+    const { router } = await openAt('vendors', 'vendors', 'Ankur Pharma');
+    await user.click(within(rowOf('vendors', 'Ankur Pharma')).getByText('Ankur Pharma'));
+    const drawer = await screen.findByTestId('stock-vendor-drawer');
+    await waitFor(() =>
+      expect(within(drawer).getByTestId('stock-vendor-drawer-name')).toHaveValue(
+        'Ankur Pharma',
+      ),
+    );
+    expect(router.state.location.pathname).toBe(
+      `${ROOM}/vendors/${TEST_STOCK_VENDOR_ID}/edit`,
+    );
+    expect(fetchStockVendor).toHaveBeenCalledWith(TEST_STOCK_VENDOR_ID);
+    await user.click(within(drawer).getByTestId('stock-vendor-drawer-dismiss'));
+    await waitFor(() => expect(router.state.location.pathname).toBe(`${ROOM}/vendors`));
+
+    await user.click(screen.getByTestId('stock-vendors-new'));
+    const created = await screen.findByTestId('stock-vendor-drawer');
+    expect(within(created).getByTestId('stock-vendor-drawer-name')).toHaveValue('');
+    expect(router.state.location.pathname).toBe(`${ROOM}/vendors/create`);
   });
 });
 
-describe('Clinic stock › Vendors (Q-K1)', () => {
-  it('Delete shows only for a vendor nothing is owed; New clinic vendor opens from its route', async () => {
-    const user = setup();
-    const { router } = await openTab('vendors', 'Ibreia');
-    expect(actionsOf('vendors', 'Ibreia')).toEqual(['edit', 'delete']);
-    // Cranix is owed: Pay, never Delete (Q-M1).
-    expect(actionsOf('vendors', 'Cranix')).toEqual(['pay', 'edit']);
-
-    await user.click(action('vendors', 'Ibreia', 'delete'));
-    const confirm = await screen.findByRole('alertdialog');
-    expect(confirm).toHaveTextContent('Delete this clinic vendor?');
-    await user.click(within(confirm).getByRole('button', { name: 'Keep it' }));
-
-    await router.navigate({ to: `${ROOM}/vendors/create`, search: { name: 'Ankit' } });
-    const drawer = await screen.findByTestId('stock-vendor-drawer');
-    expect(within(drawer).getByTestId('stock-vendor-drawer-name')).toHaveValue('Ankit');
-    await user.click(within(drawer).getByTestId('stock-vendor-drawer-save'));
-    await waitFor(() => expect(router.state.location.pathname).toBe(`${ROOM}/vendors`));
-    expect(
-      clinicFixtures.stockVendors.snapshot((vendor) => vendor.name === 'Ankit'),
-    ).toHaveLength(1);
+describe('Clinic stock drawers for a narrow member', () => {
+  it('a member who may only look opens every record view only — no Save, no Delete', async () => {
+    const viewer = STOCK_NARROW_CODES.viewer;
+    /** Each record's route, its tab, a row to wait for, its drawer, and how it shows once read. */
+    const records: [
+      string,
+      StockTestTab,
+      string,
+      string,
+      (drawer: HTMLElement) => void,
+    ][] = [
+      [
+        `items/${TEST_STOCK_ITEM_ID}/edit`,
+        'items',
+        'Soframycin',
+        'stock-item-drawer',
+        (drawer) =>
+          expect(within(drawer).getByTestId('stock-item-drawer-tag')).toHaveTextContent(
+            '#167',
+          ),
+      ],
+      [
+        `purchases/${TEST_STOCK_PURCHASE_ID}/edit`,
+        'purchases',
+        '#16',
+        'stock-purchase-drawer',
+        (drawer) =>
+          expect(
+            within(drawer).getByTestId('stock-purchase-drawer-tag'),
+          ).toHaveTextContent('#16'),
+      ],
+      [
+        `vendors/${TEST_STOCK_VENDOR_ID}/edit`,
+        'vendors',
+        'Ibreia',
+        'stock-vendor-drawer',
+        (drawer) =>
+          expect(within(drawer).getByTestId('stock-vendor-drawer-name')).toHaveValue(
+            'Ankur Pharma',
+          ),
+      ],
+    ];
+    for (const [path, tab, text, drawerId, loaded] of records) {
+      const view = await openAt(path, tab, text, viewer);
+      const drawer = await screen.findByTestId(drawerId);
+      await waitFor(() => loaded(drawer));
+      expect(within(drawer).queryByTestId(`${drawerId}-save`)).not.toBeInTheDocument();
+      expect(within(drawer).queryByTestId(`${drawerId}-delete`)).not.toBeInTheDocument();
+      view.unmount();
+      resetStockRoutes();
+    }
   });
 
-  it('Edit clinic vendor opens from its route once the vendor loads', async () => {
-    renderStockRoutes(`${ROOM}/vendors/${ref.stockVendor(4)}/edit`, PAGES);
-    // The pending drawer gives way to the form once the vendor is in.
-    await waitFor(() =>
-      expect(screen.getByTestId('stock-vendor-drawer-name')).toHaveValue('Ibreia'),
+  it('Therapist’s codes record a purchase, but without `payment:create` it has no Paid', async () => {
+    const user = setup();
+    await openAt('purchases/create', 'purchases', '#16', STOCK_NARROW_CODES.keeper);
+    const drawer = await screen.findByTestId('stock-purchase-drawer');
+    expect(within(drawer).getByTestId('stock-purchase-drawer-save')).toBeInTheDocument();
+    await user.click(
+      within(drawer).getByTestId('stock-purchase-drawer-step-payment-trigger'),
     );
+    expect(
+      within(drawer).queryByTestId('stock-purchase-drawer-paid'),
+    ).not.toBeInTheDocument();
   });
 });

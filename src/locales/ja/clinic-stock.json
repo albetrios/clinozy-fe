@@ -10,8 +10,12 @@
     "vendors": "取引先"
   },
   "search": {
-    "placeholder": "品目・カテゴリ・仕入先を検索…",
-    "label": "在庫内を検索"
+    "label": "在庫内を検索",
+    "placeholder": {
+      "items": "品目名・#ID で検索…",
+      "purchases": "請求書・#ID・仕入先で検索…",
+      "vendors": "取引先名で検索…"
+    }
   },
   "create": {
     "item": "新しい品目",
@@ -26,7 +30,11 @@
     "category": "カテゴリ",
     "lasts": "持ち",
     "status": "ステータス",
-    "type": "種類"
+    "type": "種類",
+    "lastsWithin": {
+      "week": "1週間以内",
+      "three_weeks": "3週間以内"
+    }
   },
   "table": {
     "addPhone": "電話番号を追加",
@@ -94,7 +102,8 @@
       "category": "カテゴリ",
       "stock": "在庫",
       "lasts": "持ち",
-      "vendor": "仕入先"
+      "vendor": "仕入先",
+      "lastRate": "前回単価"
     },
     "sub": "{{unit}}あたり · 週あたり約{{usage}}使用",
     "subContents": "{{contents}}の{{unit}}あたり · 週あたり約{{usage}}使用",
@@ -122,13 +131,19 @@
     },
     "statuses": {
       "paid": "支払済み",
-      "partly": "一部支払済み",
-      "unpaid": "未払い"
+      "unpaid": "未払い",
+      "partial": "一部支払済み"
     },
     "rowActions": {
       "edit": "編集",
-      "delete": "削除",
-      "pay": "{{amount}} を支払う"
+      "delete": "削除"
+    },
+    "vendorFilter": {
+      "any": "すべての仕入先",
+      "count_other": "仕入先 {{count}} 件",
+      "search": "仕入先を検索",
+      "noMatch": "該当なし",
+      "clear": "クリア"
     }
   },
   "movements": {
@@ -148,14 +163,22 @@
       "damaged": "破損",
       "returned": "返品",
       "reverted": "取り消し",
-      "payment": "支払い"
+      "opening": "初期在庫"
     },
     "reverted": "取り消し済み",
-    "purchase": "仕入れ #{{seq}}",
-    "paymentSub": "{{purchase}} · {{billNo}}",
+    "purchase": "仕入れ #{{seq}} から",
     "change": "{{sign}} {{amount}}",
     "rowActions": {
       "revert": "取り消す"
+    },
+    "purchaseBill": "仕入れ #{{seq}} から · 請求書 {{billNo}}",
+    "deletedItem": "削除された品目",
+    "itemFilter": {
+      "any": "すべての品目",
+      "search": "品目を検索",
+      "noMatch": "一致なし",
+      "clear": "クリア",
+      "count_other": "{{count}} 品目"
     }
   },
   "vendors": {
@@ -171,8 +194,7 @@
     "noPurchases": "仕入れなし",
     "rowActions": {
       "edit": "編集",
-      "delete": "削除",
-      "pay": "{{amount}} を支払う"
+      "delete": "削除"
     }
   },
   "drawers": {
@@ -224,7 +246,8 @@
         "vendor": "仕入先"
       },
       "save": "品目を追加",
-      "saved": "品目を保存しました"
+      "saved": "品目を保存しました",
+      "nameTaken": "同じ名前の品目がすでにあります"
     },
     "quickItem": {
       "title": "新しいクリニック品目",
@@ -248,7 +271,8 @@
       },
       "save": "取引先を追加",
       "added": "取引先 {{name}} を追加しました",
-      "saved": "取引先を保存しました"
+      "saved": "取引先を保存しました",
+      "nameTaken": "この名前の取引先はすでに存在します"
     },
     "movement": {
       "title": {
@@ -279,7 +303,8 @@
       "summary": "{{name}} · {{change}}",
       "enterQuantity": "数量を入力してください",
       "onlyInStock": "在庫は {{quantity}} のみです",
-      "saved": "{{type}}を保存しました · 残り {{quantity}}"
+      "saved": "{{type}}を保存しました · 残り {{quantity}}",
+      "notEnoughStock": "在庫がもうそれほどありません。その間に誰かが使用しました。数量を確認してもう一度お試しください。"
     },
     "use": {
       "label": "{{name}} を使用",
@@ -331,7 +356,14 @@
         "peek_other": "{{count}} 品目 · {{amount}}",
         "quickLine": "品目と数量を入力 · 例: gloves 10 @250",
         "quickHint": "10 = 数量 · @250 = 単価",
-        "lowStockChip": "{{name}} · 残り {{quantity}}"
+        "lowStockChip": "{{name}} · 残り {{quantity}}",
+        "mode": "支払方法",
+        "branch": "支払元",
+        "paidSoFar": "{{amount}} 支払済み · {{status}}",
+        "moreThanBill": "支払額が請求額を超えています",
+        "dayClosed": "この院の本日の締めは完了しています。今日はここから支払えません",
+        "addLine": "品目を1つ以上追加してください",
+        "tooManyLines": "1件の仕入れは最大 {{max}} 品目までです"
       },
       "save": "仕入れを作成",
       "pickSupplier": "仕入先を選択してください",
@@ -360,7 +392,8 @@
       "nothing": "まだ変更はありません",
       "save": "棚卸しを保存",
       "failed": "保存されていません · 入力した数は残っています",
-      "saved_other": "棚卸しを保存しました · {{count}} 品目を更新"
+      "saved_other": "棚卸しを保存しました · {{count}} 品目を更新",
+      "empty": "数える品目はまだありません"
     },
     "confirm": {
       "deleteItem": "この品目を削除しますか？",
@@ -380,7 +413,17 @@
           "wrongQty": "数量違い"
         },
         "done": "{{type}}を取り消しました · {{name}} は {{quantity}} に戻りました",
-        "note": "{{when}} の{{type}}を取り消し · {{reason}}"
+        "note": "{{when}} の{{type}}を取り消し · {{reason}}",
+        "blocked": {
+          "alreadyReverted": "この入出庫はすでに取り消されています",
+          "notEnoughStock": "この記録を取り消すだけの在庫が残っていません"
+        }
+      },
+      "blocked": {
+        "itemHasStock": "在庫のない品目だけを削除できます。先に在庫を0に調整してください",
+        "purchasePaid": "支払いのある仕入れは削除できません",
+        "vendorHasDues": "先にこの仕入先の仕入れを精算してください",
+        "stockUsed": "この仕入れで入荷した分の一部がすでに使用されているため、取り消せません"
       }
     }
   }

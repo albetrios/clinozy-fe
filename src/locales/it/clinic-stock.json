@@ -10,8 +10,12 @@
     "vendors": "Fornitori"
   },
   "search": {
-    "placeholder": "Cerca articolo, categoria o fornitore…",
-    "label": "Cerca nel magazzino"
+    "label": "Cerca nel magazzino",
+    "placeholder": {
+      "items": "Cerca nome articolo o #ID…",
+      "purchases": "Cerca fattura, #ID o fornitore…",
+      "vendors": "Cerca nome fornitore…"
+    }
   },
   "create": {
     "item": "Nuovo articolo",
@@ -26,7 +30,11 @@
     "category": "Categoria",
     "lasts": "Durata",
     "status": "Stato",
-    "type": "Tipo"
+    "type": "Tipo",
+    "lastsWithin": {
+      "week": "Entro una settimana",
+      "three_weeks": "Entro 3 settimane"
+    }
   },
   "table": {
     "addPhone": "Aggiungi telefono",
@@ -100,7 +108,8 @@
       "category": "Categoria",
       "stock": "Scorte",
       "lasts": "Durata",
-      "vendor": "Fornitore"
+      "vendor": "Fornitore",
+      "lastRate": "Ultimo prezzo"
     },
     "sub": "per {{unit}} · usa ~{{usage}}/settimana",
     "subContents": "per {{unit}} da {{contents}} · usa ~{{usage}}/settimana",
@@ -130,13 +139,21 @@
     },
     "statuses": {
       "paid": "Pagato",
-      "partly": "Pagato in parte",
-      "unpaid": "Non pagato"
+      "unpaid": "Non pagato",
+      "partial": "Pagato in parte"
     },
     "rowActions": {
       "edit": "Modifica",
-      "delete": "Elimina",
-      "pay": "Paga {{amount}}"
+      "delete": "Elimina"
+    },
+    "vendorFilter": {
+      "any": "Qualsiasi fornitore",
+      "count_one": "{{count}} fornitore",
+      "count_other": "{{count}} fornitori",
+      "count_many": "{{count}} fornitori",
+      "search": "Cerca fornitori",
+      "noMatch": "Nessun risultato",
+      "clear": "Cancella"
     }
   },
   "movements": {
@@ -158,14 +175,24 @@
       "damaged": "Danneggiato",
       "returned": "Reso",
       "reverted": "Annullato",
-      "payment": "Pagamento"
+      "opening": "Giacenza iniziale"
     },
     "reverted": "Annullato",
-    "purchase": "Acquisto #{{seq}}",
-    "paymentSub": "{{purchase}} · {{billNo}}",
+    "purchase": "Dall’acquisto #{{seq}}",
     "change": "{{sign}} {{amount}}",
     "rowActions": {
       "revert": "Annulla"
+    },
+    "purchaseBill": "Dall’acquisto #{{seq}} · fattura {{billNo}}",
+    "deletedItem": "Articolo eliminato",
+    "itemFilter": {
+      "any": "Qualsiasi articolo",
+      "search": "Cerca articoli",
+      "noMatch": "Nessun risultato",
+      "clear": "Cancella",
+      "count_one": "{{count}} articolo",
+      "count_other": "{{count}} articoli",
+      "count_many": "{{count}} di articoli"
     }
   },
   "vendors": {
@@ -185,8 +212,7 @@
     "noPurchases": "Nessun acquisto",
     "rowActions": {
       "edit": "Modifica",
-      "delete": "Elimina",
-      "pay": "Paga {{amount}}"
+      "delete": "Elimina"
     }
   },
   "drawers": {
@@ -238,7 +264,8 @@
         "vendor": "Fornitore"
       },
       "save": "Aggiungi articolo",
-      "saved": "Articolo salvato"
+      "saved": "Articolo salvato",
+      "nameTaken": "Esiste già un articolo con questo nome"
     },
     "quickItem": {
       "title": "Nuovo articolo della clinica",
@@ -262,7 +289,8 @@
       },
       "save": "Aggiungi fornitore",
       "added": "Fornitore {{name}} aggiunto",
-      "saved": "Fornitore salvato"
+      "saved": "Fornitore salvato",
+      "nameTaken": "Esiste già un fornitore con questo nome"
     },
     "movement": {
       "title": {
@@ -293,7 +321,8 @@
       "summary": "{{name}} · {{change}}",
       "enterQuantity": "Inserisci una quantità",
       "onlyInStock": "Solo {{quantity}} in magazzino",
-      "saved": "{{type}} salvato · restano {{quantity}}"
+      "saved": "{{type}} salvato · restano {{quantity}}",
+      "notEnoughStock": "Non ce n’è più così tanto in magazzino — qualcuno ne ha usato nel frattempo. Controlla la quantità e riprova."
     },
     "use": {
       "label": "Usa {{name}}",
@@ -347,7 +376,14 @@
         "peek_other": "{{count}} articoli · {{amount}}",
         "quickLine": "Scrivi articolo e quantità · es. gloves 10 @250",
         "quickHint": "10 = quantità · @250 = prezzo",
-        "lowStockChip": "{{name}} · ne restano {{quantity}}"
+        "lowStockChip": "{{name}} · ne restano {{quantity}}",
+        "mode": "Modalità",
+        "branch": "Pagato da",
+        "paidSoFar": "{{amount}} pagato · {{status}}",
+        "moreThanBill": "Il pagato supera la fattura",
+        "dayClosed": "La giornata di questa sede è chiusa: oggi non si può pagare da qui",
+        "addLine": "Aggiungi almeno un articolo",
+        "tooManyLines": "Un acquisto accetta fino a {{max}} articoli"
       },
       "save": "Crea acquisto",
       "pickSupplier": "Scegli un fornitore",
@@ -380,7 +416,8 @@
       "failed": "Non salvato · i conteggi restano",
       "saved_one": "Inventario salvato · {{count}} articolo aggiornato",
       "saved_many": "Inventario salvato · {{count}} di articoli aggiornati",
-      "saved_other": "Inventario salvato · {{count}} articoli aggiornati"
+      "saved_other": "Inventario salvato · {{count}} articoli aggiornati",
+      "empty": "Ancora nessun articolo da contare"
     },
     "confirm": {
       "deleteItem": "Eliminare questo articolo?",
@@ -400,7 +437,17 @@
           "wrongQty": "Quantità sbagliata"
         },
         "done": "{{type}} annullato · {{name}} torna a {{quantity}}",
-        "note": "Annulla {{type}} del {{when}} · {{reason}}"
+        "note": "Annulla {{type}} del {{when}} · {{reason}}",
+        "blocked": {
+          "alreadyReverted": "Questo movimento è già stato annullato",
+          "notEnoughStock": "Non è rimasta abbastanza giacenza per annullare questa voce"
+        }
+      },
+      "blocked": {
+        "itemHasStock": "Si può eliminare solo un articolo senza giacenza: prima regolalo a 0",
+        "purchasePaid": "Non si può eliminare un acquisto su cui è stato pagato qualcosa",
+        "vendorHasDues": "Prima salda gli acquisti di questo fornitore",
+        "stockUsed": "Parte di quanto ricevuto con questo acquisto è già stata usata: non si può annullare"
       }
     }
   }

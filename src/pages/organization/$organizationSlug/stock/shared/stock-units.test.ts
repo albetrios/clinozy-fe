@@ -1,25 +1,18 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  STOCK_CATEGORY_VALUES,
-  STOCK_MOVEMENT_TYPE_VALUES,
-} from '@/shared/api/clinic/clinic-schema.ts';
+import { STOCK_CATEGORY_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
 
+import { STOCK_MOVEMENT_KINDS, STOCK_PURCHASE_STATUSES } from '../stock.search.ts';
 import {
   fromMilli,
-  lastsDays,
   measuredQuantity,
-  purchaseStatus,
   reorderUnits,
-  runwayDays,
-  runwayFromKey,
-  runwayKey,
   runwayOf,
   runwayTone,
   STOCK_CATEGORY_TONES,
   STOCK_MOVEMENT_TONES,
+  STOCK_PURCHASE_STATUS_TONES,
   stockBarPercent,
-  stockLevel,
   toMilli,
 } from './stock-units.ts';
 
@@ -28,13 +21,6 @@ describe('the stock arithmetic (KICKOFF §6.8 Data)', () => {
     expect(toMilli(1.5)).toBe(1500);
     expect(toMilli(0.333_3)).toBe(333);
     expect(fromMilli(2500)).toBe(2.5);
-  });
-
-  it('reads the level: Out at 0, Low at or below the minimum, else OK', () => {
-    expect(stockLevel(0, 1)).toBe('out');
-    expect(stockLevel(1000, 1)).toBe('low');
-    expect(stockLevel(1500, 1)).toBe('ok');
-    expect(stockLevel(500, 0)).toBe('ok');
   });
 
   it('fills the bar to stock ÷ maximum, capped', () => {
@@ -50,29 +36,13 @@ describe('the stock arithmetic (KICKOFF §6.8 Data)', () => {
     expect(measuredQuantity(3000, null)).toBeNull();
   });
 
-  it('runs the stock out at its weekly use, in days then weeks', () => {
-    expect(lastsDays(3000, 500)).toBe(42);
-    expect(lastsDays(8000, 300)).toBe(186);
-    expect(lastsDays(0, 800)).toBe(0);
-    expect(lastsDays(3000, 0)).toBeNull();
+  it('says the server’s runway in days, then weeks', () => {
+    expect(runwayOf(0)).toEqual({ kind: 'days', count: 0 });
     expect(runwayOf(5)).toEqual({ kind: 'days', count: 5 });
     expect(runwayOf(7)).toEqual({ kind: 'days', count: 7 });
     expect(runwayOf(42)).toEqual({ kind: 'weeks', count: 6 });
     expect(runwayOf(186)).toEqual({ kind: 'weeks', count: 27 });
     expect(runwayOf(null)).toEqual({ kind: 'none' });
-  });
-
-  it('keys a runway for the Lasts filter and reads it back', () => {
-    expect(runwayKey(runwayOf(5))).toBe('d5');
-    expect(runwayKey(runwayOf(42))).toBe('w6');
-    expect(runwayKey(runwayOf(null))).toBe('none');
-    expect(runwayFromKey('w6')).toEqual({ kind: 'weeks', count: 6 });
-    expect(runwayFromKey('d0')).toEqual({ kind: 'days', count: 0 });
-    expect(runwayFromKey('none')).toEqual({ kind: 'none' });
-    expect(runwayFromKey('x6')).toBeNull();
-    expect(runwayDays({ kind: 'weeks', count: 3 })).toBe(21);
-    expect(runwayDays({ kind: 'days', count: 4 })).toBe(4);
-    expect(runwayDays({ kind: 'none' })).toBeNull();
   });
 
   it('tones the runway: a week blush, three butter, longer sage, no usage plain', () => {
@@ -92,19 +62,14 @@ describe('the stock arithmetic (KICKOFF §6.8 Data)', () => {
     expect(reorderUnits(20_000, 20)).toBe(1);
   });
 
-  it('settles a purchase: Paid, Partly paid or Unpaid', () => {
-    expect(purchaseStatus(171_000, 0)).toBe('unpaid');
-    expect(purchaseStatus(120_000, 60_000)).toBe('partly');
-    expect(purchaseStatus(275_000, 275_000)).toBe('paid');
-    expect(purchaseStatus(10_000, 20_000)).toBe('paid');
-  });
-
-  it('tones every category and movement type of the contract, and payments', () => {
+  it('tones every category, movement type and purchase status the API has', () => {
     expect(Object.keys(STOCK_CATEGORY_TONES).sort()).toEqual(
       [...STOCK_CATEGORY_VALUES].sort(),
     );
-    expect(Object.keys(STOCK_MOVEMENT_TONES).sort()).toEqual(
-      [...STOCK_MOVEMENT_TYPE_VALUES, 'payment'].sort(),
-    );
+    expect(Object.keys(STOCK_MOVEMENT_TONES)).toEqual([...STOCK_MOVEMENT_KINDS]);
+    expect(Object.keys(STOCK_PURCHASE_STATUS_TONES)).toEqual([
+      ...STOCK_PURCHASE_STATUSES,
+    ]);
+    expect(STOCK_MOVEMENT_TONES.opening).toBe('mint');
   });
 });

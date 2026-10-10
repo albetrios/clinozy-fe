@@ -1,11 +1,18 @@
+import type { ReactElement } from 'react';
 import { Controller, type UseFormReturn, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { MONEY_SCALE, textFromNumber } from '@/lib/number-text.ts';
+import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
+import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+import { PAYMENT_MODE_TONES } from '@/shared/clinic/clinic-tones.ts';
 import { MoneyCell } from '@/shared/components/Cells/index.ts';
 import {
+  DrawerChips,
   DrawerField,
   DrawerFieldGrid,
+  DrawerInfo,
   DrawerInput,
   DrawerNumberInput,
   DrawerQuickChips,
@@ -26,23 +33,36 @@ import {
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 
 import type { OpenStockChild } from '../../hooks/useStockStack/index.ts';
+import { useStockWords } from '../../hooks/useStockWords/index.ts';
+import type { StockPurchaseRow } from '../../stock-contracts.ts';
 import { STOCK_DRAWER_KEYS, STOCK_DRAWERS_NS } from '../../stock-drawers.constants.ts';
 import { StockItemPicker, StockVendorPicker } from '../StockPickers/index.ts';
 import {
+  BILL_NO_MAX,
   billOf,
   emptyLine,
+  lineAmount,
   linesTotal,
+  PURCHASE_LINES_MAX,
+  PURCHASE_PAYMENT_MODES,
   type StockPurchaseFormValues,
 } from './stock-purchase-form.ts';
 import { usePurchaseQuickLine } from './use-purchase-quick-line.ts';
 
 const K = STOCK_DRAWER_KEYS.purchase.fields;
 
-/** An invoice number's longest text. */
-const BILL_NO_MAX = 40;
-
 /** A money field's longest text (₹ 9,99,99,999). */
 const MONEY_MAX_LENGTH = 9;
+
+/**
+ * What a new purchase's "Paid" offers a member who may pay (`payment:create`):
+ * the branches they work in and the one it starts on.
+ */
+export interface PurchasePayment {
+  branches: readonly BranchOption[];
+  /** The member's default branch — the header's one branch, else the main one. */
+  branchId: string | null;
+}
 
 /** What the step bodies read. */
 export interface PurchaseFieldsProps {
@@ -51,9 +71,13 @@ export interface PurchaseFieldsProps {
   readOnly: boolean;
   openChild?: OpenStockChild;
   testId: string;
+  /** Edit purchase: the purchase as saved — its lines fixed, its Paid the server's. */
+  saved: StockPurchaseRow | null;
+  /** A new purchase's "Paid"; null without `payment:create` (and on an edit). */
+  payment: PurchasePayment | null;
 }
 
-/** BILL: Supplier* · Invoice no. · Bill date (`clinic-stock.md:146–148`). */
+/** BILL: Supplier* · Invoice no. (≤ 30) · Bill date, never after today (`clinic-stock.md:146–148`). */
 export function BillFields({
   form,
   idPrefix,
@@ -94,7 +118,12 @@ export function BillFields({
           )}
         />
       </DrawerField>
-      <DrawerField span="third" label={t(K.billNo)} htmlFor={billNo.id}>
+      <DrawerField
+        span="third"
+        label={t(K.billNo)}
+        htmlFor={billNo.id}
+        error={billNo.error}
+      >
         <DrawerInput
           {...billNo.control}
           {...form.register('billNo')}
@@ -104,7 +133,7 @@ export function BillFields({
           data-testid={`${testId}-bill-no`}
         />
       </DrawerField>
-      <DrawerField span="third" label={t(K.date)} htmlFor={date.id}>
+      <DrawerField span="third" label={t(K.date)} htmlFor={date.id} error={date.error}>
         <Controller
           control={form.control}
           name="date"
@@ -114,6 +143,9 @@ export function BillFields({
               label={t(K.date)}
               value={control.value}
               onChange={control.onChange}
+              max={clinicToday()}
+              invalid={Boolean(date.error)}
+              aria-describedby={date.control['aria-describedby']}
               disabled={readOnly}
               testId={`${testId}-date`}
             />
@@ -124,7 +156,10 @@ export function BillFields({
   );
 }
 
-/** The rows: Item · Qty · Rate* · Amount (`clinic-stock.md:149`; H:5276). */
+/**
+ * The rows: Item · Qty · Rate* · Amount (`clinic-stock.md:149`; H:5276) — a
+ * saved line's amount the server's, a new one's quantity × rate as typed.
+ */
 function useLineColumns({
   form,
   openChild,
@@ -182,22 +217,23 @@ function useLineColumns({
       header: t(K.amount),
       track: '96px',
       align: 'end',
-      cell: (row) => (
-        <MoneyCell
-          paise={row.row.itemId ? row.row.qty * row.row.rate : 0}
-          className="text-body font-medium"
-        />
-      ),
+      cell: (row) =>
+        row.row.amount === null ? (
+          <MoneyCell paise={lineAmount(row.row)} className="text-body font-medium" />
+        ) : (
+          <MoneyCell rupees={row.row.amount} className="text-body font-medium" />
+        ),
     },
   ];
 }
 
 /**
- * ITEMS RECEIVED (`clinic-stock.md:149`): the quick line — "gloves 10 @250",
- * the Low stock chips and Browse (`usePurchaseQuickLine`) — over the bill's
- * rows: an item ("Select item…"; "New clinic item · “q”" stacked), its
- * quantity, the rate it was bought at (required once an item is picked) and
- * the amount — "+ Add item" and the total.
+ * ITEMS RECEIVED (`clinic-stock.md:149`): on a new purchase the quick line —
+ * "gloves 10 @250", the Low stock chips and Browse (`usePurchaseQuickLine`) —
+ * over the bill's rows: an item ("Select item…"; "New clinic item · “q”"
+ * stacked), its quantity, the rate it was bought at (required once an item is
+ * picked) and the amount — "+ Add item" up to 50 rows, and the total. A saved
+ * purchase's lines were received into stock and stay as they are.
  */
 export function ItemsFields(props: PurchaseFieldsProps) {
   const { t } = useTranslation(STOCK_DRAWERS_NS);
@@ -210,37 +246,149 @@ export function ItemsFields(props: PurchaseFieldsProps) {
     vendorId,
     testId: props.testId,
   });
+  const fixed = props.readOnly || props.saved !== null;
+  const full = lines.length >= PURCHASE_LINES_MAX;
   return (
     <ItemsField
       control={props.form.control}
       name="lines"
       label={t(K.items)}
       columns={useLineColumns(props)}
-      newRow={emptyLine}
+      newRow={full ? undefined : emptyLine}
       addLabel={t(K.addItem)}
       total={formatPaise(linesTotal(lines))}
       totalLabel={t(K.total)}
-      readOnly={props.readOnly}
+      readOnly={fixed}
       testId={`${props.testId}-lines`}
-      toolbar={props.readOnly ? undefined : <QuickLine {...quickLine} />}
+      toolbar={fixed ? undefined : <QuickLine {...quickLine} />}
     />
   );
 }
 
-/** PAYMENT: Bill amount (the lines' total until typed) · Paid with "Full" · "Nothing" (`clinic-stock.md:150–151`). */
-export function PaymentFields({ form, idPrefix, testId }: PurchaseFieldsProps) {
+/** "Paid" on a new purchase: its amount with "Full" · "Nothing", how it was paid, and from which branch. */
+function usePaidNowFields({
+  form,
+  idPrefix,
+  testId,
+  saved,
+  payment,
+}: PurchaseFieldsProps): ReactElement[] {
   const { t } = useTranslation(STOCK_DRAWERS_NS);
+  const { t: tClinic } = useTranslation(CLINIC_NS);
   const { t: tDrawer } = useTranslation(RECORD_DRAWER_NS);
   const field = useDrawerFieldIds(form, idPrefix);
-  const bill = field('bill');
+  const values = useWatch({ control: form.control });
+  if (saved || !payment) return [];
   const paid = field('paid');
+  const branch = field('paidBranchId');
+  const total = billOf({ bill: values.bill ?? '', lines: form.getValues('lines') });
+  const fields = [
+    <DrawerField
+      key="paid"
+      span="third"
+      label={t(K.paid)}
+      htmlFor={paid.id}
+      error={paid.error}
+    >
+      <div className="flex flex-col gap-2">
+        <Controller
+          control={form.control}
+          name="paid"
+          render={({ field: control }) => (
+            <DrawerNumberInput
+              {...paid.control}
+              value={control.value}
+              onValueChange={control.onChange}
+              onBlur={control.onBlur}
+              prefix={tDrawer(RECORD_DRAWER_KEYS.currency)}
+              placeholder="0"
+              maxLength={MONEY_MAX_LENGTH}
+              data-testid={`${testId}-paid`}
+            />
+          )}
+        />
+        <DrawerQuickChips
+          label={t(K.paid)}
+          options={[
+            { value: 'full', label: t(K.full) },
+            { value: 'nothing', label: t(K.nothing) },
+          ]}
+          value={null}
+          onChange={(value) =>
+            form.setValue(
+              'paid',
+              value === 'full' ? textFromNumber(total, MONEY_SCALE) : '',
+              { shouldDirty: true },
+            )
+          }
+          testId={`${testId}-paid-quick`}
+        />
+      </div>
+    </DrawerField>,
+    <DrawerField key="mode" span="third" label={t(K.mode)}>
+      <DrawerChips
+        label={t(K.mode)}
+        options={PURCHASE_PAYMENT_MODES.map((mode) => ({
+          value: mode,
+          label: tClinic(CLINIC_KEYS.paymentModes[mode]),
+          tone: PAYMENT_MODE_TONES[mode],
+        }))}
+        value={values.paidMode ?? 'cash'}
+        onChange={(mode) => {
+          if (mode) form.setValue('paidMode', mode, { shouldDirty: true });
+        }}
+        testId={`${testId}-paid-mode`}
+      />
+    </DrawerField>,
+  ];
+  // One open branch shows no branch UI (KICKOFF §6.12): the payment is that branch's.
+  if (payment.branches.length > 1) {
+    fields.push(
+      <DrawerField key="branch" span="full" label={t(K.branch)} error={branch.error}>
+        <DrawerChips
+          label={t(K.branch)}
+          options={payment.branches.map((option) => ({
+            value: option.id,
+            label: option.name,
+            tone: option.tone,
+          }))}
+          value={values.paidBranchId ?? payment.branchId}
+          onChange={(branchId) => {
+            if (branchId) form.setValue('paidBranchId', branchId, { shouldDirty: true });
+          }}
+          testId={`${testId}-paid-branch`}
+        />
+      </DrawerField>,
+    );
+  }
+  return fields;
+}
+
+/**
+ * PAYMENT (`clinic-stock.md:150–151`): Bill amount — the lines' total until
+ * typed — then, on a new purchase for a member who may pay, "Paid": an amount,
+ * its mode (Cash · UPI · Card) and the paying branch, recorded as a
+ * supplier-bill payment with the purchase. A saved purchase shows what is paid
+ * on it as the server has it ("₹892.50 paid · Partly paid"); paying the rest
+ * waits for Payments.
+ */
+export function PaymentFields(props: PurchaseFieldsProps) {
+  const { form, idPrefix, testId, saved } = props;
+  const { t } = useTranslation(STOCK_DRAWERS_NS);
+  const { t: tDrawer } = useTranslation(RECORD_DRAWER_NS);
+  const words = useStockWords();
+  const field = useDrawerFieldIds(form, idPrefix);
+  const bill = field('bill');
   const lines = useWatch({ control: form.control, name: 'lines' });
-  const billText = useWatch({ control: form.control, name: 'bill' });
-  const total = billOf({ bill: billText, lines });
-  const currency = tDrawer(RECORD_DRAWER_KEYS.currency);
+  const paidNow = usePaidNowFields(props);
   return (
     <DrawerFieldGrid>
-      <DrawerField span="third" label={t(K.billAmount)} htmlFor={bill.id}>
+      <DrawerField
+        span="third"
+        label={t(K.billAmount)}
+        htmlFor={bill.id}
+        error={bill.error}
+      >
         <Controller
           control={form.control}
           name="bill"
@@ -250,7 +398,7 @@ export function PaymentFields({ form, idPrefix, testId }: PurchaseFieldsProps) {
               value={control.value}
               onValueChange={control.onChange}
               onBlur={control.onBlur}
-              prefix={currency}
+              prefix={tDrawer(RECORD_DRAWER_KEYS.currency)}
               placeholder={textFromNumber(linesTotal(lines), MONEY_SCALE) || '0'}
               maxLength={MONEY_MAX_LENGTH}
               data-testid={`${testId}-bill`}
@@ -258,42 +406,17 @@ export function PaymentFields({ form, idPrefix, testId }: PurchaseFieldsProps) {
           )}
         />
       </DrawerField>
-      <DrawerField span="third" label={t(K.paid)} htmlFor={paid.id}>
-        <div className="flex flex-col gap-2">
-          <Controller
-            control={form.control}
-            name="paid"
-            render={({ field: control }) => (
-              <DrawerNumberInput
-                {...paid.control}
-                value={control.value}
-                onValueChange={control.onChange}
-                onBlur={control.onBlur}
-                prefix={currency}
-                placeholder="0"
-                maxLength={MONEY_MAX_LENGTH}
-                data-testid={`${testId}-paid`}
-              />
-            )}
-          />
-          <DrawerQuickChips
-            label={t(K.paid)}
-            options={[
-              { value: 'full', label: t(K.full) },
-              { value: 'nothing', label: t(K.nothing) },
-            ]}
-            value={null}
-            onChange={(value) =>
-              form.setValue(
-                'paid',
-                value === 'full' ? textFromNumber(total, MONEY_SCALE) : '',
-                { shouldDirty: true },
-              )
-            }
-            testId={`${testId}-paid-quick`}
-          />
-        </div>
-      </DrawerField>
+      {saved ? (
+        <DrawerField span="third" label={t(K.paid)}>
+          <DrawerInfo testId={`${testId}-paid`}>
+            {t(K.paidSoFar, {
+              amount: words.formatRupees(saved.paid),
+              status: words.status(saved.status).label,
+            })}
+          </DrawerInfo>
+        </DrawerField>
+      ) : null}
+      {paidNow}
     </DrawerFieldGrid>
   );
 }

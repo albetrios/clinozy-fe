@@ -2,7 +2,6 @@ import { useId, useState } from 'react';
 import { useForm, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import type { StockItem } from '@/shared/api/clinic/clinic-schema.ts';
 import { SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
 import {
   DrawerFieldGrid,
@@ -21,6 +20,7 @@ import { notify } from '@/shared/notify/index.ts';
 
 import { useStockWords } from '../../hooks/useStockWords/index.ts';
 import { useQuickCreateStockItem } from '../../hooks/useStockWrites/index.ts';
+import type { StockItemRecord } from '../../stock-contracts.ts';
 import {
   STOCK_DRAWER_KEYS,
   STOCK_DRAWER_TEST_IDS,
@@ -39,6 +39,7 @@ import {
   QUICK_ITEM_UNITS,
   type StockItemFormValues,
 } from './stock-item-form.ts';
+import { ITEM_SERVER_FIELDS, useItemConflict } from './use-item-save.ts';
 
 const K = STOCK_DRAWER_KEYS.quickItem;
 const F = STOCK_DRAWER_KEYS.item.fields;
@@ -56,7 +57,7 @@ export interface StockNewItemDrawerProps {
   /** The purchase's vendor — the new item comes from them. */
   vendorId?: string | null;
   /** The new item, selected in the purchase row that asked. */
-  onSaved: (item: StockItem) => void;
+  onSaved: (item: StockItemRecord) => void;
   testId?: string;
 }
 
@@ -64,8 +65,10 @@ export interface StockNewItemDrawerProps {
  * New clinic item, stacked on a purchase (KICKOFF §6.8; `clinic-stock.md:187–201,
  * 275–287`): "Item" — Name* (the picker's text), Category (Creams & Serums),
  * Unit (piece · box · bottle · tube · pack · ml) — then "Details", Minimum 1 and
- * Maximum 5. "Back" · "Add item"; "Cotton added to clinic items", and the item
- * lands on the purchase row that asked.
+ * Maximum 5. "Back" · "Add item" posts the item at once with these and the
+ * purchase's vendor (`POST /app/stock-items`, nothing in stock — the purchase
+ * line receives it); a name another item has goes on Name. "Cotton added to
+ * clinic items", and the item lands on the purchase row that asked.
  */
 export function StockNewItemDrawer({
   open,
@@ -115,12 +118,15 @@ function NewItemSession({
   const values = useFormValues(form);
   const { isDirty } = useFormState({ control: form.control });
   const [openStep, setOpenStep] = useState<string>('item');
+  const onConflict = useItemConflict(form, () => setOpenStep('item'));
   const create = useQuickCreateStockItem({
     notifyOnError: false,
     successMessage: (item) => t(K.added, { name: item.name }),
   });
-  const { saveState, save } = useDrawerSave<StockItemFormValues, StockItem>({
+  const { saveState, save } = useDrawerSave<StockItemFormValues, StockItemRecord>({
     form,
+    serverFields: ITEM_SERVER_FIELDS,
+    onConflict,
     fieldOrder: ['name', 'category', 'unit', 'minQty', 'maxQty'],
     toastId: 'stock-new-item-save-failed',
     onField: (field) =>

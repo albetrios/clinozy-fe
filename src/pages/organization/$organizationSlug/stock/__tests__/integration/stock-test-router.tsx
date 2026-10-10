@@ -10,10 +10,12 @@ import {
 import { render } from '@testing-library/react';
 import type { ReactNode } from 'react';
 
+import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { validateStockCreateSearch } from '../../stock.dialog-search.ts';
@@ -30,6 +32,39 @@ const TAB_DIALOGS = {
 /** A Clinic stock tab. */
 export type StockTestTab = keyof typeof TAB_DIALOGS;
 
+/**
+ * Every code an Owner or Admin holds in the room (api-integration §5.6 Roles) — the
+ * harness's member unless a test names others: see, add, change and move stock, delete,
+ * export, and pay a bill ("Paid" on a new purchase).
+ */
+const STOCK_ADMIN_CODES: readonly OrganizationPermission[] = [
+  'organization:read',
+  'stock_item:read',
+  'stock_item:create',
+  'stock_item:update',
+  'stock_item:delete',
+  'stock_item:export',
+  'payment:create',
+];
+
+/** Who the harness signs in: their clinozy-be codes, or View-as a clinic role. */
+export interface StockTestMember {
+  /** The member's codes (the room answers from them); the Admin's by default. */
+  permissions?: readonly OrganizationPermission[];
+  /**
+   * View-as instead: the clinic access narrows to that role's matrix and every
+   * code reads false (`canCode`).
+   */
+  role?: Role;
+}
+
+/** Sign the test member in as `member` says. */
+function signInStockMember({ permissions = STOCK_ADMIN_CODES, role }: StockTestMember) {
+  signInTestMember();
+  useOrganizationStore.getState().setPermissions([...permissions]);
+  useUIStore.setState({ previewRole: role ?? null });
+}
+
 /** A query client for one test: no retries, nothing cached between tests. */
 const testQueryClient = () =>
   new QueryClient({
@@ -39,17 +74,18 @@ const testQueryClient = () =>
 /**
  * The Clinic stock family as `routeTree.tsx` registers it — every tab with the
  * room's search schema and its dialog routes, which render nothing — with
- * `pages[tab]` as each tab's component, opened at `url`, for a member
- * previewed as `role` (View-as narrows the clinic access to that role's
- * matrix). Every other path lands on a catch-all.
+ * `pages[tab]` as each tab's component, opened at `url`, for the test member
+ * (`signInTestMember`: organization `org_test`, slug `acme` — every stock read
+ * and key carries the organization) holding `member.permissions` (the Admin's
+ * codes by default), or previewed as `member.role` (View-as). Every other path
+ * lands on a catch-all.
  */
 export function renderStockRoutes(
   url: string,
   pages: Partial<Record<StockTestTab, () => ReactNode>>,
-  { role = 'admin' }: { role?: Role } = {},
+  member: StockTestMember = {},
 ) {
-  useOrganizationStore.getState().setPermissions(['organization:read']);
-  useUIStore.setState({ previewRole: role });
+  signInStockMember(member);
 
   const root = createRootRoute({
     component: () => (
@@ -100,21 +136,17 @@ export function renderStockRoutes(
 
 /**
  * One Clinic stock drawer, popover or confirm (any part of the room outside a
- * tab's route) for a member previewed as `role`, with the router, query client
- * and tooltips the room's shell provides — a drawer's dirty guard reads the
- * router.
+ * tab's route) for the test member — the Admin's codes, `member.permissions`,
+ * or View-as `member.role` — with the router, query client and tooltips the
+ * room's shell provides — a drawer's dirty guard reads the router.
  */
-export function renderStockDrawer(
-  ui: ReactNode,
-  { role = 'admin' }: { role?: Role } = {},
-) {
-  useOrganizationStore.getState().setPermissions(['organization:read']);
-  useUIStore.setState({ previewRole: role });
+export function renderStockDrawer(ui: ReactNode, member: StockTestMember = {}) {
+  signInStockMember(member);
   return renderWithProviders(<TooltipProvider>{ui}</TooltipProvider>);
 }
 
 /** Put the stores the harness touched back as they were. */
 export function resetStockRoutes() {
   useUIStore.setState({ previewRole: null });
-  useOrganizationStore.getState().clearPermissions();
+  useOrganizationStore.getState().clearOrganization();
 }

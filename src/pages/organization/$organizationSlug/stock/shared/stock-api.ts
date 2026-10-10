@@ -1,518 +1,519 @@
-import { createdFilterMatches } from '@/shared/api/clinic/clinic-filter-match.ts';
-import {
-  clinicHttpError,
-  compareText,
-  type CursorPage,
-  cursorPageOf,
-  directedCompare,
-  searchMatches,
-} from '@/shared/api/clinic/clinic-fixture-store.ts';
-import type { CreatedFilter } from '@/shared/api/clinic/clinic-list-filters.ts';
-import type { StockItem, StockVendor } from '@/shared/api/clinic/clinic-schema.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import { STOCK_ROOM_QUERY_KEY } from '@/shared/api/clinic/stock-room-query-key.ts';
-import { personFullName } from '@/shared/components/Cells/index.ts';
+import { z } from 'zod';
 
-import type {
-  StockChangeRow,
-  StockItemListParams,
-  StockItemRow,
-  StockListSummary,
-  StockMovementListParams,
-  StockMovementRow,
-  StockPurchaseListParams,
-  StockPurchaseRow,
-  StockStaffRef,
-  StockVendorListParams,
-  StockVendorRef,
-  StockVendorRow,
-} from './stock-contracts.ts';
+import { api } from '@/core/http/api.ts';
+import { queryClient } from '@/core/http/queryClient.ts';
+import { createdRangeOf } from '@/shared/api/clinic/clinic-filter-ranges.ts';
+import type { CreatedFilter } from '@/shared/api/clinic/clinic-list-filters.ts';
+import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import {
-  lastsDays,
-  purchaseStatus,
-  runwayKey,
-  runwayOf,
-  STOCK_MOVEMENT_TONES,
-  stockLevel,
-  type StockMovementKind,
-  type StockPurchaseStatus,
-} from './stock-units.ts';
+  fetchTeamDirectory,
+  teamDirectoryQueryKey,
+} from '@/shared/api/clinic/directory-api.ts';
+import { STOCK_ROOM_QUERY_KEY } from '@/shared/api/clinic/stock-room-query-key.ts';
+import { collectAllPages } from '@/shared/api/fetch-all-pages.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+
+import {
+  type StockItemListParams,
+  type StockItemRecord,
+  type StockItemRow,
+  stockItemRowWire,
+  stockItemWire,
+  type StockListSummary,
+  type StockMovementListParams,
+  type StockMovementRow,
+  stockMovementRowWire,
+  stockPurchaseListMetaWire,
+  type StockPurchaseListParams,
+  type StockPurchaseRecord,
+  type StockPurchaseRow,
+  stockPurchaseRowWire,
+  stockPurchaseWire,
+  type StockStaffRef,
+  stockVendorListMetaWire,
+  type StockVendorListParams,
+  type StockVendorRef,
+  type StockVendorRow,
+  stockVendorRowWire,
+  toStockItemRecord,
+  toStockMovementItem,
+  toStockMovementRow,
+  toStockPurchaseRecord,
+  toStockVendorRef,
+  toStockVendorRow,
+} from './stock-contracts.ts';
 
 /*
- * The Clinic stock family's reads (`S:1680–1693`), on the fixture world until
- * clinozy-be serves them — every call is REPLACE_WITH_API (D6). The world is
- * imported on demand, so its seed data never lands in a route chunk. Each row
- * carries what the server derives (Appendix F): the level and runway, a
- * purchase's due and status, the Movements' payment rows and a vendor's
- * payable.
+ * Clinic stock's reads on clinozy-be (api-integration §5.6): the four tabs in
+ * cursor pages of 50, one record of each, the whole item and vendor lists the
+ * pickers and Stock check read (every page, 100 at a time), and the footer
+ * figures. A row's vendor, a movement's item and its author are joined from
+ * those lists and the team directory — one cached read per list, never one per
+ * row. Every key carries the organization.
  */
 
-/** TanStack Query keys for Clinic stock — all under `['clinic', 'stock']`. */
+/** TanStack Query keys for Clinic stock — all under `['clinic', 'stock']`, each carrying the organization. */
 export const stockQueryKeys = {
   all: STOCK_ROOM_QUERY_KEY,
-  items: (params: StockItemListParams) =>
-    [...stockQueryKeys.all, 'items', params] as const,
-  item: (id: string) => [...stockQueryKeys.all, 'item', id] as const,
-  purchases: (params: StockPurchaseListParams) =>
-    [...stockQueryKeys.all, 'purchases', params] as const,
-  purchase: (id: string) => [...stockQueryKeys.all, 'purchase', id] as const,
-  movements: (params: StockMovementListParams) =>
-    [...stockQueryKeys.all, 'movements', params] as const,
-  vendors: (params: StockVendorListParams) =>
-    [...stockQueryKeys.all, 'vendors', params] as const,
-  vendor: (id: string) => [...stockQueryKeys.all, 'vendor', id] as const,
-  /** A list's footer figures, by tab and params. */
-  summary: (tab: StockSummaryTab, params: object) =>
-    [...stockQueryKeys.all, 'summary', tab, params] as const,
-  /** A tab's automatic Filters sections — the values its whole list holds. */
-  facets: (tab: StockFacetTab) => [...stockQueryKeys.all, 'facets', tab] as const,
-  /** A whole list the pickers, chips and Stock check read. */
-  catalogue: (kind: 'items' | 'vendors') =>
-    [...stockQueryKeys.all, 'catalogue', kind] as const,
+  /** Every Items read — a delete patches and refreshes them all. */
+  itemLists: (organizationId: string | null) =>
+    [...stockQueryKeys.all, organizationId, 'items'] as const,
+  items: (organizationId: string | null, params: StockItemListParams) =>
+    [...stockQueryKeys.itemLists(organizationId), params] as const,
+  item: (organizationId: string | null, id: string) =>
+    [...stockQueryKeys.all, organizationId, 'item', id] as const,
+  /** Every Purchases read. */
+  purchaseLists: (organizationId: string | null) =>
+    [...stockQueryKeys.all, organizationId, 'purchases'] as const,
+  purchases: (organizationId: string | null, params: StockPurchaseListParams) =>
+    [...stockQueryKeys.purchaseLists(organizationId), params] as const,
+  purchase: (organizationId: string | null, id: string) =>
+    [...stockQueryKeys.all, organizationId, 'purchase', id] as const,
+  /** Every Movements read. */
+  movementLists: (organizationId: string | null) =>
+    [...stockQueryKeys.all, organizationId, 'movements'] as const,
+  movements: (organizationId: string | null, params: StockMovementListParams) =>
+    [...stockQueryKeys.movementLists(organizationId), params] as const,
+  /** Every Vendors read. */
+  vendorLists: (organizationId: string | null) =>
+    [...stockQueryKeys.all, organizationId, 'vendors'] as const,
+  vendors: (organizationId: string | null, params: StockVendorListParams) =>
+    [...stockQueryKeys.vendorLists(organizationId), params] as const,
+  vendor: (organizationId: string | null, id: string) =>
+    [...stockQueryKeys.all, organizationId, 'vendor', id] as const,
+  /** Every footer figure. */
+  summaries: (organizationId: string | null) =>
+    [...stockQueryKeys.all, organizationId, 'summary'] as const,
+  /** A tab's footer figures, by tab and params. */
+  summary: (organizationId: string | null, tab: StockSummaryTab, params: object) =>
+    [...stockQueryKeys.summaries(organizationId), tab, params] as const,
+  /** Both whole lists. */
+  catalogues: (organizationId: string | null) =>
+    [...stockQueryKeys.all, organizationId, 'catalogue'] as const,
+  /** A whole list the pickers, chips, Stock check and the rows' joins read. */
+  catalogue: (organizationId: string | null, kind: 'items' | 'vendors') =>
+    [...stockQueryKeys.catalogues(organizationId), kind] as const,
 };
 
-const fixtureWorld = () => import('@/shared/api/clinic/fixtures/world.fixtures.ts');
+/**
+ * Every read of one organization but the records' own — what a delete refreshes:
+ * the deleted record's read would only answer 404 while its drawer closes.
+ */
+export const stockListReadKeys = (organizationId: string | null) => [
+  stockQueryKeys.itemLists(organizationId),
+  stockQueryKeys.purchaseLists(organizationId),
+  stockQueryKeys.movementLists(organizationId),
+  stockQueryKeys.vendorLists(organizationId),
+  stockQueryKeys.summaries(organizationId),
+  stockQueryKeys.catalogues(organizationId),
+];
 
-type FixtureWorld = Awaited<ReturnType<typeof fixtureWorld>>['clinicFixtures'];
+/** One page of a tab — the design's 50. */
+const PAGE_SIZE = 50;
 
-/** Whether `createdAt` passes the Created filter (none set passes). */
-function createdOk(createdAt: string, created: CreatedFilter | undefined, today: string) {
-  return !created || createdFilterMatches(createdAt, created, today);
+/** One page of a whole list — the API's most. */
+const CATALOGUE_PAGE_SIZE = 100;
+
+/** The organization the cached lists belong to. */
+const activeOrganizationId = () => useOrganizationStore.getState().organizationId;
+
+/** A list page's cursor: the next one while there is more. */
+function nextOf(
+  meta: { pagination?: { has_more?: boolean; next?: string | null } } | undefined,
+) {
+  return meta?.pagination?.has_more ? (meta.pagination.next ?? null) : null;
 }
 
-/** A category as the search reads it: `creams_serums` → "creams serums". */
-const categoryWords = (item: StockItem) => item.category.replace('_', ' ');
+/** The API's estimated count of the whole list — on its first page; null when left out. */
+const pageTotal = (meta: { pagination?: { estimated_total?: number } } | undefined) =>
+  meta?.pagination?.estimated_total ?? null;
 
-/** Every live vendor as a row names them. */
-function vendorRefs(world: FixtureWorld): Map<string, StockVendorRef> {
-  return new Map(
-    world.stockVendors
-      .snapshot()
-      .map((vendor) => [
-        vendor.id,
-        { id: vendor.id, name: vendor.name, phone: vendor.phone },
-      ]),
-  );
+/** The Created filter as the API's range, on the clinic's `today`. */
+function createdQuery(created: CreatedFilter | undefined, today: string) {
+  const range = created ? createdRangeOf(created, today) : {};
+  return { created_from: range.from, created_to: range.to };
 }
 
-/** Every member as the Movements "By" cell shows them. */
-function staffRefs(world: FixtureWorld): Map<string, StockStaffRef> {
-  return new Map(
-    world.staff.snapshot().map((profile) => [
-      profile.id,
-      {
-        id: profile.id,
-        name: personFullName(profile),
-        initials: profile.initials,
-        tone: profile.tone,
+/** A search as the API takes it — none when blank. */
+const searchOf = (q: string | undefined) => (q?.trim() ? q.trim() : undefined);
+
+/** A list filter as the API takes it — comma-joined, none when empty. */
+const listOf = (values: readonly string[] | undefined) =>
+  values?.length ? values.join(',') : undefined;
+
+/** A page of rows with the cursor of the next and the API's estimated total. */
+export interface StockPage<T> {
+  rows: T[];
+  next: string | null;
+  total: number | null;
+}
+
+// ── The whole lists ──
+
+/** Every live clinic vendor as their row, by name (`GET /app/stock-vendors`, every page). */
+export async function fetchAllStockVendors(): Promise<StockVendorRow[]> {
+  return collectAllPages(async (after) => {
+    const response = await api.get('/app/stock-vendors', {
+      query: { limit: CATALOGUE_PAGE_SIZE, after: after ?? undefined, sort: 'name' },
+    });
+    return {
+      rows: z
+        .array(stockVendorRowWire)
+        .parse(response.data ?? [])
+        .map(toStockVendorRow),
+      next: nextOf(response.meta),
+    };
+  }, 'stock-vendors');
+}
+
+/** The vendors by id as the rows name them — the vendor list, read once and cached. */
+async function vendorRefs(): Promise<ReadonlyMap<string, StockVendorRef>> {
+  const vendors = await queryClient.query({
+    queryKey: stockQueryKeys.catalogue(activeOrganizationId(), 'vendors'),
+    queryFn: fetchAllStockVendors,
+  });
+  return new Map(vendors.map((vendor) => [vendor.id, toStockVendorRef(vendor)]));
+}
+
+/** An item with its vendor (null for a vendor deleted since). */
+const itemRowOf = (
+  item: StockItemRecord,
+  vendors: ReadonlyMap<string, StockVendorRef>,
+): StockItemRow => ({
+  ...item,
+  vendor: item.vendorId ? (vendors.get(item.vendorId) ?? null) : null,
+});
+
+/** Items with their vendors, from the vendor list. */
+async function withVendors(items: StockItemRecord[]): Promise<StockItemRow[]> {
+  if (items.length === 0) return [];
+  const vendors = await vendorRefs();
+  return items.map((item) => itemRowOf(item, vendors));
+}
+
+/** Every live item as its row, the latest first (`GET /app/stock-items`, every page). */
+export async function fetchAllStockItems(): Promise<StockItemRow[]> {
+  const items = await collectAllPages(async (after) => {
+    const response = await api.get('/app/stock-items', {
+      query: {
+        limit: CATALOGUE_PAGE_SIZE,
+        after: after ?? undefined,
+        sort: 'stock_item_number',
+        order: 'desc',
       },
-    ]),
-  );
+    });
+    return {
+      rows: z
+        .array(stockItemRowWire)
+        .parse(response.data ?? [])
+        .map(toStockItemRecord),
+      next: nextOf(response.meta),
+    };
+  }, 'stock-items');
+  return withVendors(items);
 }
 
 // ── Items ──
 
-/** An item as its row: its vendor, its level and how many days it lasts. */
-function toItemRow(item: StockItem, vendors: Map<string, StockVendorRef>): StockItemRow {
+/** The Items sorts as the API names them. */
+const ITEM_SORTS = {
+  seq: 'stock_item_number',
+  name: 'name',
+  category: 'category',
+  stock: 'quantity',
+  lasts: 'lasts_days',
+} as const;
+
+/** The Items read's query for the URL's params, on the clinic's `today` — by name by default. */
+export function stockItemListQuery(
+  params: StockItemListParams,
+  today: string = clinicToday(),
+) {
   return {
-    ...item,
-    vendor: item.vendorId ? (vendors.get(item.vendorId) ?? null) : null,
-    level: stockLevel(item.qtyMilli, item.minQty),
-    lastsDays: lastsDays(item.qtyMilli, item.usagePerWeekMilli),
+    limit: PAGE_SIZE,
+    q: searchOf(params.q),
+    // Low stock is everything at or below its minimum — the empty shelves too.
+    stock_level: params.stock === 'low' ? 'low,out' : undefined,
+    lasts_days_to: params.lastsDaysTo,
+    category: listOf(params.category),
+    ...createdQuery(params.created, today),
+    sort: params.sort ? ITEM_SORTS[params.sort] : undefined,
+    order: params.sort ? params.order : undefined,
   };
 }
 
-/** Every live item as its row. */
-function itemRows(world: FixtureWorld): StockItemRow[] {
-  const vendors = vendorRefs(world);
-  return world.stockItems.snapshot().map((item) => toItemRow(item, vendors));
-}
-
-/** No usage sorts after every runway. */
-const lastsRank = (row: StockItemRow) => row.lastsDays ?? Number.POSITIVE_INFINITY;
-
-const ITEM_ORDER = {
-  seq: (a: StockItemRow, b: StockItemRow) => a.seq - b.seq,
-  name: (a: StockItemRow, b: StockItemRow) => a.name.localeCompare(b.name),
-  category: (a: StockItemRow, b: StockItemRow) => compareText(a.category, b.category),
-  stock: (a: StockItemRow, b: StockItemRow) => a.qtyMilli - b.qtyMilli,
-  lasts: (a: StockItemRow, b: StockItemRow) => {
-    const left = lastsRank(a);
-    const right = lastsRank(b);
-    if (left === right) return 0;
-    return left < right ? -1 : 1;
-  },
-};
-
-/** The items a list read matches, in its order (name, A to Z, by default — `S:1681`). */
-async function itemsFor(params: StockItemListParams): Promise<StockItemRow[]> {
-  const { clinicFixtures } = await fixtureWorld();
-  const today = clinicToday();
-  return itemRows(clinicFixtures)
-    .filter(
-      (row) =>
-        searchMatches(params.q, [row.name, categoryWords(row), row.vendor?.name ?? '']) &&
-        (params.stock !== 'low' || row.level !== 'ok') &&
-        (!params.category?.length || params.category.includes(row.category)) &&
-        (!params.lasts?.length ||
-          params.lasts.includes(runwayKey(runwayOf(row.lastsDays)))) &&
-        createdOk(row.createdAt, params.created, today),
-    )
-    .sort(
-      (a, b) =>
-        directedCompare(ITEM_ORDER[params.sort ?? 'name'], params.order)(a, b) ||
-        b.seq - a.seq,
-    );
-}
-
-/** One cursor page of items (`listStockItems`, `S:1681`; REPLACE_WITH_API). */
+/** One page of items, each with its vendor; `after` is the cursor. */
 export async function listStockItems(
-  params: StockItemListParams = {},
-  cursor: string | null = null,
-): Promise<CursorPage<StockItemRow>> {
-  return cursorPageOf(await itemsFor(params), cursor);
-}
-
-/** Every live item as its row, in inventory order (the latest first) — the pickers and Stock check. */
-export async function fetchAllStockItems(): Promise<StockItemRow[]> {
-  const { clinicFixtures } = await fixtureWorld();
-  return itemRows(clinicFixtures).sort((a, b) => b.seq - a.seq);
+  params: StockItemListParams,
+  after?: string,
+): Promise<StockPage<StockItemRow>> {
+  const response = await api.get('/app/stock-items', {
+    query: { ...stockItemListQuery(params), after },
+  });
+  const items = z
+    .array(stockItemRowWire)
+    .parse(response.data ?? [])
+    .map(toStockItemRecord);
+  return {
+    rows: await withVendors(items),
+    next: nextOf(response.meta),
+    total: pageTotal(response.meta),
+  };
 }
 
 /** One item as its row — a 404 when it is unknown or deleted. */
 export async function fetchStockItem(id: string): Promise<StockItemRow> {
-  const { clinicFixtures } = await fixtureWorld();
-  const item = await clinicFixtures.stockItems.get(id);
-  return toItemRow(item, vendorRefs(clinicFixtures));
+  const response = await api.get('/app/stock-items/{stock_item_id}', {
+    params: { stock_item_id: id },
+  });
+  const item = toStockItemRecord(stockItemWire.parse(response.data));
+  return itemRowOf(item, await vendorRefs());
 }
 
 // ── Purchases ──
 
-/** Every live purchase as its row: its vendor, what is due and its status. */
-function purchaseRows(world: FixtureWorld): StockPurchaseRow[] {
-  const vendors = vendorRefs(world);
-  return world.stockPurchases.snapshot().map((purchase) => ({
-    ...purchase,
-    vendor: vendors.get(purchase.vendorId) ?? null,
-    due: Math.max(0, purchase.bill - purchase.paid),
-    status: purchaseStatus(purchase.bill, purchase.paid),
-  }));
+/** The Purchases sorts as the API names them; none is the bill date, the latest first. */
+const PURCHASE_SORTS = {
+  seq: 'stock_purchase_number',
+  bill: 'bill_amount',
+  due: 'due_amount',
+} as const;
+
+/** The Purchases filters as the API takes them, on the clinic's `today`. */
+function purchaseFilterQuery(
+  params: Pick<StockPurchaseListParams, 'q' | 'status' | 'vendor' | 'created'>,
+  today: string,
+) {
+  return {
+    q: searchOf(params.q),
+    payment_status: listOf(params.status),
+    stock_vendor_id: params.vendor,
+    ...createdQuery(params.created, today),
+  };
 }
 
-const PURCHASE_ORDER = {
-  seq: (a: StockPurchaseRow, b: StockPurchaseRow) => a.seq - b.seq,
-  vendor: (a: StockPurchaseRow, b: StockPurchaseRow) =>
-    (a.vendor?.name ?? '').localeCompare(b.vendor?.name ?? ''),
-  bill: (a: StockPurchaseRow, b: StockPurchaseRow) => a.bill - b.bill,
-  due: (a: StockPurchaseRow, b: StockPurchaseRow) => a.due - b.due,
-};
-
-/** The purchases a list read matches, in its order (the latest bill first — `S:1683`). */
-async function purchasesFor(
+/** The Purchases read's query for the URL's params, on the clinic's `today`. */
+export function stockPurchaseListQuery(
   params: StockPurchaseListParams,
-): Promise<StockPurchaseRow[]> {
-  const { clinicFixtures } = await fixtureWorld();
-  const today = clinicToday();
-  const rows = purchaseRows(clinicFixtures).filter(
-    (row) =>
-      searchMatches(params.q, [
-        row.vendor?.name ?? '',
-        row.billNo ?? '',
-        `#${row.seq}`,
-      ]) &&
-      (!params.status?.length || params.status.includes(row.status)) &&
-      (!params.vendor || row.vendorId === params.vendor) &&
-      createdOk(row.createdAt, params.created, today),
-  );
-  return rows.sort((a, b) =>
-    params.sort
-      ? directedCompare(PURCHASE_ORDER[params.sort], params.order)(a, b) || b.seq - a.seq
-      : compareText(b.date, a.date) || b.seq - a.seq,
-  );
+  today: string = clinicToday(),
+) {
+  return {
+    limit: PAGE_SIZE,
+    ...purchaseFilterQuery(params, today),
+    sort: params.sort ? PURCHASE_SORTS[params.sort] : undefined,
+    order: params.sort ? params.order : undefined,
+  };
 }
 
-/** One cursor page of purchases (`listStockPurchases`, `S:1683`; REPLACE_WITH_API). */
+/** A purchase with its vendor (null for a vendor deleted since). */
+const purchaseRowOf = (
+  purchase: StockPurchaseRecord,
+  vendors: ReadonlyMap<string, StockVendorRef>,
+): StockPurchaseRow => ({ ...purchase, vendor: vendors.get(purchase.vendorId) ?? null });
+
+/** One page of purchases, each with its vendor; `after` is the cursor. */
 export async function listStockPurchases(
-  params: StockPurchaseListParams = {},
-  cursor: string | null = null,
-): Promise<CursorPage<StockPurchaseRow>> {
-  return cursorPageOf(await purchasesFor(params), cursor);
+  params: StockPurchaseListParams,
+  after?: string,
+): Promise<StockPage<StockPurchaseRow>> {
+  const response = await api.get('/app/stock-purchases', {
+    query: { ...stockPurchaseListQuery(params), after },
+  });
+  const purchases = z
+    .array(stockPurchaseRowWire)
+    .parse(response.data ?? [])
+    .map(toStockPurchaseRecord);
+  const vendors =
+    purchases.length > 0 ? await vendorRefs() : new Map<string, StockVendorRef>();
+  return {
+    rows: purchases.map((purchase) => purchaseRowOf(purchase, vendors)),
+    next: nextOf(response.meta),
+    total: pageTotal(response.meta),
+  };
 }
 
 /** One purchase as its row — a 404 when it is unknown or deleted. */
 export async function fetchStockPurchase(id: string): Promise<StockPurchaseRow> {
-  const { clinicFixtures } = await fixtureWorld();
-  const [row] = purchaseRows(clinicFixtures).filter((purchase) => purchase.id === id);
-  if (!row) throw clinicHttpError(404, 'not_found', 'Purchase not found');
-  return row;
+  const response = await api.get('/app/stock-purchases/{stock_purchase_id}', {
+    params: { stock_purchase_id: id },
+  });
+  const purchase = toStockPurchaseRecord(stockPurchaseWire.parse(response.data));
+  return purchaseRowOf(purchase, await vendorRefs());
 }
 
 // ── Movements ──
 
-/** A Movements row's instant, for the newest-first order and the Created filter. */
-const rowInstant = (row: StockMovementRow) =>
-  row.kind === 'payment' ? row.createdAt : row.at;
-
-/**
- * Every Movements row: each live movement — struck through once a later one
- * reverts it — and one Payment per purchase with money paid
- * (`clinic-stock.md:71`), derived until `listMovements` serves them
- * (Appendix F), by the member who recorded the purchase.
- */
-function movementRows(world: FixtureWorld): StockMovementRow[] {
-  const staff = staffRefs(world);
-  const items = new Map(world.stockItems.snapshot().map((item) => [item.id, item]));
-  const vendors = vendorRefs(world);
-  const all = world.stockMovements.snapshot();
-  const byId = new Map(all.map((movement) => [movement.id, movement]));
-  const movements = all.flatMap((movement) => {
-    const item = items.get(movement.itemId);
-    if (!item) return [];
-    const original = movement.revertsId ? byId.get(movement.revertsId) : undefined;
-    return [
-      {
-        id: movement.id,
-        kind: movement.type,
-        movement,
-        item: {
-          id: item.id,
-          name: item.name,
-          unit: item.unit,
-          sizePerUnit: item.sizePerUnit,
-          measureUnit: item.measureUnit,
-        },
-        note: movement.usedFor,
-        at: movement.createdAt,
-        by: staff.get(movement.createdById) ?? null,
-        deltaMilli: movement.deltaMilli,
-        reverted: movement.revertedById !== null,
-        reverts:
-          original && original.type !== 'reverted'
-            ? {
-                kind: original.type,
-                at: original.createdAt,
-                reason: movement.revertReason,
-              }
-            : null,
-      } satisfies StockChangeRow,
-    ];
-  });
-  const payments = world.stockPurchases
-    .snapshot((purchase) => purchase.paid > 0)
-    .map(
-      (purchase) =>
-        ({
-          id: `payment-${purchase.id}`,
-          kind: 'payment',
-          purchase: { id: purchase.id, seq: purchase.seq, billNo: purchase.billNo },
-          vendorName: vendors.get(purchase.vendorId)?.name ?? '',
-          date: purchase.date,
-          createdAt: purchase.createdAt,
-          by: staff.get(purchase.createdById) ?? null,
-          amount: purchase.paid,
-        }) satisfies StockMovementRow,
-    );
-  return [...movements, ...payments];
-}
-
-/** A row's searchable words: the item or party and its note or bill. */
-function movementWords(row: StockMovementRow): string[] {
-  if (row.kind === 'payment') {
-    return [row.vendorName, `#${row.purchase.seq}`, row.purchase.billNo ?? ''];
-  }
-  return [row.item.name, row.note ?? ''];
-}
-
-/** The rows a Movements read matches, newest first (`S:1682`). */
-async function movementsFor(
+/** The Movements read's query for the URL's params, on the clinic's `today` — newest first. */
+export function stockMovementListQuery(
   params: StockMovementListParams,
-): Promise<StockMovementRow[]> {
-  const { clinicFixtures } = await fixtureWorld();
-  const today = clinicToday();
-  return movementRows(clinicFixtures)
-    .filter(
-      (row) =>
-        searchMatches(params.q, movementWords(row)) &&
-        (!params.type?.length || params.type.includes(row.kind)) &&
-        (!params.item || (row.kind !== 'payment' && row.item.id === params.item)) &&
-        createdOk(rowInstant(row), params.created, today),
-    )
-    .sort((a, b) => compareText(rowInstant(b), rowInstant(a)) || compareText(b.id, a.id));
+  today: string = clinicToday(),
+) {
+  return {
+    limit: PAGE_SIZE,
+    type: listOf(params.type),
+    stock_item_id: params.item,
+    ...createdQuery(params.created, today),
+  };
 }
 
-/** One cursor page of Movements rows (`listMovements`, `S:1682`; REPLACE_WITH_API). */
+/** The team by membership id as the "By" cell shows them — the team directory, cached. */
+async function staffRefs(): Promise<ReadonlyMap<string, StockStaffRef>> {
+  const team = await queryClient.query({
+    queryKey: teamDirectoryQueryKey(activeOrganizationId()),
+    queryFn: fetchTeamDirectory,
+    staleTime: 5 * 60_000,
+  });
+  return new Map(
+    team.map((member) => [
+      member.id,
+      { id: member.id, name: member.name, initials: member.initials, tone: member.tone },
+    ]),
+  );
+}
+
+/** One page of Movements rows, each with its item and author; `after` is the cursor. */
 export async function listStockMovements(
-  params: StockMovementListParams = {},
-  cursor: string | null = null,
-): Promise<CursorPage<StockMovementRow>> {
-  return cursorPageOf(await movementsFor(params), cursor);
+  params: StockMovementListParams,
+  after?: string,
+): Promise<StockPage<StockMovementRow>> {
+  const response = await api.get('/app/stock-item-movements', {
+    query: { ...stockMovementListQuery(params), after },
+  });
+  const movements = z.array(stockMovementRowWire).parse(response.data ?? []);
+  if (movements.length === 0) {
+    return { rows: [], next: nextOf(response.meta), total: pageTotal(response.meta) };
+  }
+  const [items, staff] = await Promise.all([
+    queryClient.query({
+      queryKey: stockQueryKeys.catalogue(activeOrganizationId(), 'items'),
+      queryFn: fetchAllStockItems,
+    }),
+    staffRefs(),
+  ]);
+  const byId = new Map(items.map((item) => [item.id, toStockMovementItem(item)]));
+  return {
+    rows: movements.map((movement) =>
+      toStockMovementRow(movement, {
+        item: byId.get(movement.stock_item_id) ?? null,
+        by: movement.author_membership_id
+          ? (staff.get(movement.author_membership_id) ?? null)
+          : null,
+      }),
+    ),
+    next: nextOf(response.meta),
+    total: pageTotal(response.meta),
+  };
 }
 
 // ── Vendors ──
 
-/** Every live vendor as their row (Q-K1): their purchases and what they are owed. */
-function vendorRows(world: FixtureWorld): StockVendorRow[] {
-  const purchases = purchaseRows(world);
-  return world.stockVendors.snapshot().map((vendor: StockVendor) => {
-    const own = purchases.filter((purchase) => purchase.vendorId === vendor.id);
-    const [oldest] = own
-      .filter((purchase) => purchase.due > 0)
-      .sort((a, b) => compareText(a.date, b.date) || a.seq - b.seq);
-    return {
-      ...vendor,
-      purchaseCount: own.length,
-      payable: own.reduce((sum, purchase) => sum + purchase.due, 0),
-      oldestOpenPurchase: oldest
-        ? { id: oldest.id, seq: oldest.seq, due: oldest.due }
-        : null,
-    };
-  });
-}
-
-const VENDOR_ORDER = {
-  name: (a: StockVendorRow, b: StockVendorRow) => a.name.localeCompare(b.name),
-  payable: (a: StockVendorRow, b: StockVendorRow) => a.payable - b.payable,
-};
-
-/** The vendors a list read matches, in its order (name, A to Z, by default — `S:1684`). */
-async function vendorsFor(params: StockVendorListParams): Promise<StockVendorRow[]> {
-  const { clinicFixtures } = await fixtureWorld();
-  return vendorRows(clinicFixtures)
-    .filter((row) => searchMatches(params.q, [row.name, row.phone ?? '']))
-    .sort(directedCompare(VENDOR_ORDER[params.sort ?? 'name'], params.order));
-}
-
-/** One cursor page of vendors (`listVendors`, `S:1684`; REPLACE_WITH_API). */
+/** One page of vendors, by name; `after` is the cursor. */
 export async function listStockVendors(
-  params: StockVendorListParams = {},
-  cursor: string | null = null,
-): Promise<CursorPage<StockVendorRow>> {
-  return cursorPageOf(await vendorsFor(params), cursor);
-}
-
-/** Every live vendor as their row, by name — the pickers' list. */
-export function fetchAllStockVendors(): Promise<StockVendorRow[]> {
-  return vendorsFor({});
+  params: StockVendorListParams,
+  after?: string,
+): Promise<StockPage<StockVendorRow>> {
+  const response = await api.get('/app/stock-vendors', {
+    query: {
+      limit: PAGE_SIZE,
+      q: searchOf(params.q),
+      sort: params.sort,
+      order: params.sort ? params.order : undefined,
+      after,
+    },
+  });
+  return {
+    rows: z
+      .array(stockVendorRowWire)
+      .parse(response.data ?? [])
+      .map(toStockVendorRow),
+    next: nextOf(response.meta),
+    total: pageTotal(response.meta),
+  };
 }
 
 /** One vendor as their row — a 404 when they are unknown or deleted. */
 export async function fetchStockVendor(id: string): Promise<StockVendorRow> {
-  const { clinicFixtures } = await fixtureWorld();
-  const [row] = vendorRows(clinicFixtures).filter((vendor) => vendor.id === id);
-  if (!row) throw clinicHttpError(404, 'not_found', 'Vendor not found');
-  return row;
+  const response = await api.get('/app/stock-vendors/{stock_vendor_id}', {
+    params: { stock_vendor_id: id },
+  });
+  return toStockVendorRow(stockVendorRowWire.parse(response.data));
 }
 
-// ── Footer figures and Filters ──
+// ── Footer figures ──
 
 /** A tab with footer figures (Items has none, `clinic-stock.md:19`). */
 export type StockSummaryTab = 'purchases' | 'movements' | 'vendors';
 
-/**
- * A list's footer figures (`clinic-stock.md:19`): how many rows the read
- * matches and, on Purchases and Vendors, what is due on them — a fixture
- * `total` until the list contract carries one (C31, Appendix F;
- * REPLACE_WITH_API).
- */
-export async function stockListSummary(
-  tab: StockSummaryTab,
-  params: object,
+/** The params each tab's footer reads. */
+export type StockSummaryParams = {
+  purchases: StockPurchaseListParams;
+  movements: StockMovementListParams;
+  vendors: StockVendorListParams;
+};
+
+/** How many purchases match and what is due on them (`meta.due_total`), one row read. */
+async function purchaseSummary(
+  params: StockPurchaseListParams,
+  today: string,
 ): Promise<StockListSummary> {
-  switch (tab) {
-    case 'purchases': {
-      const rows = await purchasesFor(params);
-      return { total: rows.length, due: rows.reduce((sum, row) => sum + row.due, 0) };
-    }
-    case 'vendors': {
-      const rows = await vendorsFor(params);
-      return { total: rows.length, due: rows.reduce((sum, row) => sum + row.payable, 0) };
-    }
-    default:
-      return { total: (await movementsFor(params)).length, due: 0 };
-  }
+  const response = await api.get('/app/stock-purchases', {
+    query: { ...purchaseFilterQuery(params, today), limit: 1 },
+  });
+  const meta = stockPurchaseListMetaWire.safeParse(response.meta);
+  return {
+    total: pageTotal(response.meta),
+    due: meta.success ? meta.data.due_total : null,
+  };
 }
 
-/** A tab with automatic Filters sections. */
-export type StockFacetTab = 'items' | 'purchases' | 'movements';
+/** How many vendors match and what is owed to them (`meta.payable_total`, follows the search). */
+async function vendorSummary(params: StockVendorListParams): Promise<StockListSummary> {
+  const response = await api.get('/app/stock-vendors', {
+    query: { q: searchOf(params.q), limit: 1 },
+  });
+  const meta = stockVendorListMetaWire.safeParse(response.meta);
+  return {
+    total: pageTotal(response.meta),
+    due: meta.success ? meta.data.payable_total : null,
+  };
+}
+
+/** How many movements match — they owe nothing. */
+async function movementSummary(
+  params: StockMovementListParams,
+  today: string,
+): Promise<StockListSummary> {
+  const response = await api.get('/app/stock-item-movements', {
+    query: { ...stockMovementListQuery(params, today), limit: 1 },
+  });
+  return { total: pageTotal(response.meta), due: null };
+}
+
+/** Each tab's footer read. */
+const SUMMARY_READERS: {
+  [T in StockSummaryTab]: (
+    params: StockSummaryParams[T],
+    today: string,
+  ) => Promise<StockListSummary>;
+} = {
+  purchases: purchaseSummary,
+  movements: movementSummary,
+  vendors: vendorSummary,
+};
 
 /**
- * A tab's automatic Filters sections (`clinic-stock.md:39–71`): the values
- * its whole list holds — Items' categories and runways, Purchases' statuses,
- * Movements' types — in display order, and how many rows it holds, for the
- * "2–10 values, fewer than rows" rule (REPLACE_WITH_API).
+ * A tab's footer figures (`clinic-stock.md:19`): how many rows match and, on
+ * Purchases and Vendors, what is due — each one read of a single row, for the
+ * list's own filters.
  */
-export interface StockFacets {
-  rows: number;
-  values: Readonly<Record<string, readonly string[]>>;
-}
-
-/** The runway keys present, shortest first, No usage last. */
-function runwayKeys(rows: readonly StockItemRow[]): string[] {
-  const byKey = new Map<string, number>();
-  for (const row of rows) {
-    byKey.set(runwayKey(runwayOf(row.lastsDays)), lastsRank(row));
-  }
-  return [...byKey.entries()]
-    .sort(([, left], [, right]) => {
-      if (left === right) return 0;
-      return left < right ? -1 : 1;
-    })
-    .map(([key]) => key);
-}
-
-/** The values present in `rows`, in `order`. */
-const presentIn = <T extends string>(order: readonly T[], present: readonly T[]) =>
-  order.filter((value) => present.includes(value));
-
-const CATEGORY_ORDER = [
-  'creams_serums',
-  'peels',
-  'masks',
-  'consumables',
-  'equipment',
-  'other',
-] as const satisfies readonly StockItem['category'][];
-
-const STATUS_ORDER: readonly StockPurchaseStatus[] = ['paid', 'partly', 'unpaid'];
-
-const MOVEMENT_ORDER = Object.keys(STOCK_MOVEMENT_TONES) as StockMovementKind[];
-
-/** A tab's automatic sections' values (`StockFacets`; REPLACE_WITH_API). */
-export async function stockFacets(tab: StockFacetTab): Promise<StockFacets> {
-  const { clinicFixtures } = await fixtureWorld();
-  if (tab === 'items') {
-    const rows = itemRows(clinicFixtures);
-    return {
-      rows: rows.length,
-      values: {
-        category: presentIn(
-          CATEGORY_ORDER,
-          rows.map((row) => row.category),
-        ),
-        lasts: runwayKeys(rows),
-      },
-    };
-  }
-  if (tab === 'purchases') {
-    const rows = purchaseRows(clinicFixtures);
-    return {
-      rows: rows.length,
-      values: {
-        status: presentIn(
-          STATUS_ORDER,
-          rows.map((row) => row.status),
-        ),
-      },
-    };
-  }
-  const rows = movementRows(clinicFixtures);
-  return {
-    rows: rows.length,
-    values: {
-      type: presentIn(
-        MOVEMENT_ORDER,
-        rows.map((row) => row.kind),
-      ),
-    },
-  };
+export function stockListSummary<T extends StockSummaryTab>(
+  tab: T,
+  params: StockSummaryParams[T],
+  today: string = clinicToday(),
+): Promise<StockListSummary> {
+  const read: (
+    params: StockSummaryParams[T],
+    today: string,
+  ) => Promise<StockListSummary> = SUMMARY_READERS[tab];
+  return read(params, today);
 }

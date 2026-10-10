@@ -17,7 +17,18 @@ export const STOCK_KEYS = {
     movements: 'tabs.movements',
     vendors: 'tabs.vendors',
   },
-  search: { placeholder: 'search.placeholder', label: 'search.label' },
+  search: {
+    /**
+     * Each searchable tab's placeholder, worded as the API searches (`q`): Items the
+     * name or `#n`, Purchases the bill no., `#n` or the vendor's name, Vendors the name.
+     */
+    placeholder: {
+      items: 'search.placeholder.items',
+      purchases: 'search.placeholder.purchases',
+      vendors: 'search.placeholder.vendors',
+    },
+    label: 'search.label',
+  },
   create: {
     item: 'create.item',
     purchase: 'create.purchase',
@@ -31,6 +42,11 @@ export const STOCK_KEYS = {
     lowStock: 'filters.lowStock',
     category: 'filters.category',
     lasts: 'filters.lasts',
+    /** The Lasts tiers: "Within a week" (≤ 7 days), "Within 3 weeks" (≤ 21 days). */
+    lastsWithin: {
+      week: 'filters.lastsWithin.week',
+      three_weeks: 'filters.lastsWithin.three_weeks',
+    },
     status: 'filters.status',
     type: 'filters.type',
   },
@@ -106,6 +122,8 @@ export const STOCK_KEYS = {
       stock: 'items.columns.stock',
       lasts: 'items.columns.lasts',
       vendor: 'items.columns.vendor',
+      /** The rate of its latest purchase line (hidden by default). */
+      lastRate: 'items.columns.lastRate',
     },
     /** "per tube · uses ~0.5/week". */
     sub: 'items.sub',
@@ -135,16 +153,25 @@ export const STOCK_KEYS = {
       due: 'purchases.columns.due',
       status: 'purchases.columns.status',
     },
+    /** `payment_status` labels. */
     statuses: {
       paid: 'purchases.statuses.paid',
-      partly: 'purchases.statuses.partly',
+      partial: 'purchases.statuses.partial',
       unpaid: 'purchases.statuses.unpaid',
     },
     rowActions: {
-      /** "Pay ₹1,710" (Q-M1). */
-      pay: 'purchases.rowActions.pay',
       edit: 'purchases.rowActions.edit',
       delete: 'purchases.rowActions.delete',
+    },
+    /** The Filters' Supplier section — one vendor's bills (`stock_vendor_id`). */
+    vendorFilter: {
+      /** The picker with nothing picked ("Any supplier"). */
+      any: 'purchases.vendorFilter.any',
+      /** "1 supplier" (plural) — a vendor the list no longer has. */
+      count: 'purchases.vendorFilter.count',
+      search: 'purchases.vendorFilter.search',
+      noMatch: 'purchases.vendorFilter.noMatch',
+      clear: 'purchases.vendorFilter.clear',
     },
   },
   movements: {
@@ -158,21 +185,34 @@ export const STOCK_KEYS = {
       by: 'movements.columns.by',
       change: 'movements.columns.change',
     },
+    /** A movement's `type` labels. */
     types: {
       used: 'movements.types.used',
       received: 'movements.types.received',
       adjust: 'movements.types.adjust',
       damaged: 'movements.types.damaged',
       returned: 'movements.types.returned',
+      opening: 'movements.types.opening',
       reverted: 'movements.types.reverted',
-      payment: 'movements.types.payment',
     },
     /** The grey pill a reverted entry adds. */
     reverted: 'movements.reverted',
-    /** "Purchase #16". */
+    /** "From purchase #16" — a receipt's purchase, which it opens. */
     purchase: 'movements.purchase',
-    /** "Purchase #16 · SW-77". */
-    paymentSub: 'movements.paymentSub',
+    /** "From purchase #16 · bill AP-1042". */
+    purchaseBill: 'movements.purchaseBill',
+    /** The Item / party of an entry whose item is deleted. */
+    deletedItem: 'movements.deletedItem',
+    /** The Filters' Item section — one item's entries (`stock_item_id`). */
+    itemFilter: {
+      /** The picker with nothing picked ("Any item"). */
+      any: 'movements.itemFilter.any',
+      /** "1 item" (plural) — an item the list no longer has. */
+      count: 'movements.itemFilter.count',
+      search: 'movements.itemFilter.search',
+      noMatch: 'movements.itemFilter.noMatch',
+      clear: 'movements.itemFilter.clear',
+    },
     /** "− 1 tube", "+ 24 bottle" — the sign, then the amount. */
     change: 'movements.change',
     rowActions: { revert: 'movements.rowActions.revert' },
@@ -190,9 +230,8 @@ export const STOCK_KEYS = {
     /** "1 purchase" (plural). */
     purchases: 'vendors.purchases',
     noPurchases: 'vendors.noPurchases',
+    /** No "Pay ₹X" while Payments is on fixtures (Q-S3) — it comes back with Payments. */
     rowActions: {
-      /** "Pay ₹2,310" (Q-M1). */
-      pay: 'vendors.rowActions.pay',
       edit: 'vendors.rowActions.edit',
       delete: 'vendors.rowActions.delete',
     },

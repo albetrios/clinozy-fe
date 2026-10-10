@@ -1,5 +1,6 @@
 export {
   type StockDeleteVars,
+  type StockQuickItemVars,
   type StockUpdateVars,
   useCreateStockItem,
   useCreateStockPurchase,
@@ -14,7 +15,6 @@ export {
   useRestoreStockVendor,
   useRevertStockMovement,
   useSaveStockCount,
-  useUndoStockMovement,
   useUpdateStockItem,
   useUpdateStockPurchase,
   useUpdateStockVendor,

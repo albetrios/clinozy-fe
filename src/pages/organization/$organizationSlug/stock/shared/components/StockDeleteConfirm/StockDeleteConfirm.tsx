@@ -1,6 +1,9 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
+import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
+import { notify } from '@/shared/notify/index.ts';
 
 import {
   useDeleteStockItem,
@@ -10,7 +13,9 @@ import {
   useRestoreStockPurchase,
   useRestoreStockVendor,
 } from '../../hooks/useStockWrites/index.ts';
+import { stockQueryKeys } from '../../stock-api.ts';
 import { STOCK_DRAWER_KEYS, STOCK_DRAWERS_NS } from '../../stock-drawers.constants.ts';
+import { isStockDeleteBlock, useStockDeleteBlockText } from './stock-delete-blocks.ts';
 
 /** The records a Clinic stock delete confirm can remove. */
 export type StockDeleteKind = 'item' | 'purchase' | 'vendor';
@@ -48,12 +53,16 @@ const TITLES = {
   vendor: K.deleteVendor,
 } as const;
 
-/** Each kind's delete and its Undo restore. */
+/** Each kind's delete — its failure told here, by reason — and its Undo restore. */
 function useWrites() {
+  const quiet = { notifyOnError: false };
   return {
-    item: { remove: useDeleteStockItem(), restore: useRestoreStockItem() },
-    purchase: { remove: useDeleteStockPurchase(), restore: useRestoreStockPurchase() },
-    vendor: { remove: useDeleteStockVendor(), restore: useRestoreStockVendor() },
+    item: { remove: useDeleteStockItem(quiet), restore: useRestoreStockItem() },
+    purchase: {
+      remove: useDeleteStockPurchase(quiet),
+      restore: useRestoreStockPurchase(),
+    },
+    vendor: { remove: useDeleteStockVendor(quiet), restore: useRestoreStockVendor() },
   };
 }
 
@@ -71,7 +80,10 @@ function useDoneMessage() {
  * `clinic-stock.md:289–301`): the shared reason confirm — a panel at the inline
  * end from `md`, a bottom sheet below — titled "Delete this item?" and so on,
  * the record in a grey pill, the schema's `delete_reason` chips. The toast
- * offers Undo for 10s, which restores it (D32, `S:1546`).
+ * offers Undo for 10s, which restores it (D32, `S:1546`). A delete clinozy-be
+ * refuses (`409` — stock left, money paid, dues owed, received stock used
+ * since) closes the confirm, says why and reads the room again; any other
+ * failure keeps it open.
  */
 export function StockDeleteConfirm({
   target,
@@ -81,6 +93,8 @@ export function StockDeleteConfirm({
   const { t } = useTranslation(STOCK_DRAWERS_NS);
   const writes = useWrites();
   const done = useDoneMessage();
+  const blockText = useStockDeleteBlockText();
+  const queryClient = useQueryClient();
   return (
     <ConfirmDialog
       open={target !== null}
@@ -99,7 +113,20 @@ export function StockDeleteConfirm({
       }}
       onConfirm={async ({ reason, note }) => {
         if (!target) return;
-        await writes[target.kind].remove.mutateAsync({ id: target.id, reason, note });
+        try {
+          await writes[target.kind].remove.mutateAsync({ id: target.id, reason, note });
+        } catch (error) {
+          const block = apiErrorReason(error);
+          if (isStockDeleteBlock(block)) {
+            notify.error(blockText(block));
+            // The row was read before the record changed (paid, stock moved): read it again.
+            void queryClient.invalidateQueries({ queryKey: stockQueryKeys.all });
+            onClose();
+          } else {
+            notify.error(mapApiError(error));
+          }
+          throw error;
+        }
         onDeleted?.();
       }}
     />

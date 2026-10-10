@@ -14,11 +14,8 @@ import { ToggleGroup, ToggleGroupItem } from '@/shared/components/ui/toggle-grou
 import { notify } from '@/shared/notify/index.ts';
 
 import { useStockWords } from '../../hooks/useStockWords/index.ts';
-import {
-  useLogStockMovement,
-  useUndoStockMovement,
-} from '../../hooks/useStockWrites/index.ts';
-import type { StockItemRow } from '../../stock-contracts.ts';
+import { useLogStockMovement } from '../../hooks/useStockWrites/index.ts';
+import type { StockItemRow, StockMovementRecord } from '../../stock-contracts.ts';
 import {
   STOCK_DRAWER_KEYS,
   STOCK_DRAWER_TEST_IDS,
@@ -37,6 +34,10 @@ import {
   treatmentTone,
 } from '../../stock-movement.ts';
 import { fromMilli, toMilli } from '../../stock-units.ts';
+import {
+  useMovementRefusal,
+  useMovementUndo,
+} from '../StockMovementDrawer/use-movement-outcome.ts';
 
 const K = STOCK_DRAWER_KEYS.use;
 
@@ -224,10 +225,13 @@ function UseBody({
   item,
   onClose,
   onMoreDetails,
+  undo,
   inputRef,
   testId,
 }: Omit<StockUsePopoverProps, 'item' | 'anchor'> & {
   item: StockItemRow;
+  /** The use's toast with its Undo — the popover's, which outlives this body. */
+  undo: (message: string, movement: StockMovementRecord) => void;
   inputRef: RefObject<HTMLInputElement | null>;
   testId: string;
 }) {
@@ -236,8 +240,8 @@ function UseBody({
   const [mode, setMode] = useState<QuantityMode>('unit');
   const [quantity, setQuantity] = useState('1');
   const [usedFor, setUsedFor] = useState<string | null>(null);
-  const log = useLogStockMovement();
-  const undo = useUndoStockMovement();
+  const log = useLogStockMovement({ notifyOnError: false });
+  const refusal = useMovementRefusal();
 
   const qtyMilli = quantityMilliOf(quantity, mode, item);
   const over = exceedsStock('used', item, qtyMilli);
@@ -251,21 +255,29 @@ function UseBody({
 
   const save = async () => {
     if (disabled) return;
-    const { movement, item: saved } = await log.mutateAsync({
-      itemId: item.id,
-      type: 'used',
-      quantityMilli: qtyMilli,
-      usedFor,
-      note: mode === 'measure' ? typed : null,
-    });
+    let movement: StockMovementRecord;
+    try {
+      movement = await log.mutateAsync({
+        itemId: item.id,
+        type: 'used',
+        quantityMilli: qtyMilli,
+        usedFor,
+        note: mode === 'measure' ? typed : null,
+      });
+    } catch (error) {
+      // Refused (someone used some since) or not sent: the popover stays, with what was typed.
+      notify.error(refusal(error));
+      return;
+    }
     onClose();
-    notify.undo(
+    // "… used · 2 tube left": what is left is the server's (`quantity_after`).
+    undo(
       t(K.used, {
         quantity: typed,
         name: item.name,
-        left: words.units(saved, saved.qtyMilli),
+        left: words.units(item, movement.afterMilli),
       }),
-      { onUndo: () => undo.mutate(movement.id) },
+      movement,
     );
   };
 
@@ -361,9 +373,12 @@ function UseBody({
  * sheet. The item and what is in stock; "Measure in" for an item with
  * contents ("1 tube = 30 g"); the quantity with − / + (44px), its quick chips
  * and "Used for"; the stock after it ("After · 2 tube · 60 g", butter at or
- * below the minimum, red over stock). "Use 1 tube" or Enter saves (`useStock`,
- * `S:1688`) — "1 tube of Soframycin 30 gm used · 2 tube left" + Undo; "More
- * details" opens the Log usage drawer. An outside click or Esc closes it.
+ * below the minimum, red over stock — a preview). "Use 1 tube" or Enter saves a
+ * `used` movement (`POST /app/stock-items/:id/movements`; a figure in the
+ * measure rides in its remark) — "1 tube of Soframycin 30 gm used · 2 tube
+ * left" + Undo, which reverts it as "Logged by mistake"; someone having used
+ * some since is said in the room's words. "More details" opens the Log usage
+ * drawer. An outside click or Esc closes it.
  */
 export function StockUsePopover({
   item,
@@ -375,6 +390,7 @@ export function StockUsePopover({
   const { t } = useTranslation(STOCK_DRAWERS_NS);
   const anchorRef = useMemo(() => ({ current: anchor }), [anchor]);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const undo = useMovementUndo();
   const open = item !== null && anchor !== null;
   return (
     <Popover
@@ -405,6 +421,7 @@ export function StockUsePopover({
             item={item}
             onClose={onClose}
             onMoreDetails={onMoreDetails}
+            undo={undo}
             inputRef={inputRef}
             testId={testId}
           />

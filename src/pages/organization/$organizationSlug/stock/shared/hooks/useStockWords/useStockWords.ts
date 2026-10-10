@@ -3,36 +3,32 @@ import { useTranslation } from 'react-i18next';
 import type {
   MeasureUnit,
   StockCategory,
-  StockItem,
   StockUnit,
   Tone,
 } from '@/shared/api/clinic/clinic-schema.ts';
 import { localDateOf } from '@/shared/api/clinic/clinic-time.ts';
 import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 
 import { STOCK_KEYS, STOCK_NS } from '../../../stock.constants.ts';
-import type { StockMovementRow } from '../../stock-contracts.ts';
+import type { StockItemRecord, StockMovementRow } from '../../stock-contracts.ts';
 import {
   fromMilli,
   measuredQuantity,
   type Runway,
-  runwayDays,
-  runwayKey,
   runwayOf,
   runwayTone,
   STOCK_CATEGORY_TONES,
   STOCK_LEVEL_TONES,
   STOCK_MOVEMENT_TONES,
   STOCK_PURCHASE_STATUS_TONES,
-  stockLevel,
   type StockMovementKind,
   type StockPurchaseStatus,
 } from '../../stock-units.ts';
 
 /** What a quantity is measured against: the item's unit and its contents. */
-export type StockMeasure = Pick<StockItem, 'unit' | 'sizePerUnit' | 'measureUnit'>;
+export type StockMeasure = Pick<StockItemRecord, 'unit' | 'sizePerUnit' | 'measureUnit'>;
 
 /** A word and its tone — a pill's. */
 export interface StockLabel {
@@ -42,15 +38,16 @@ export interface StockLabel {
 
 /**
  * The Clinic stock words (KICKOFF §6.8; `clinic-stock.md:29–71`) every tab,
- * popover and drawer shares: "3 tube · 90 g", "3 tube · 90 g · OK", "per tube
- * of 30 g · uses ~0.5/week", "~6 weeks", the categories, statuses and
- * movement types in their tones, and a movement's change ("− 1 tube",
- * "− ₹600"). Figures keep up to two decimals in the viewer's locale.
+ * popover and drawer shares: "3 tube · 90 g", "3 tube · 90 g · OK" (the
+ * server's level), "per tube of 30 g · uses ~0.5/week", "~6 weeks", the
+ * categories, statuses and movement types in their tones, a movement's change
+ * ("− 1 tube") and money as clinozy-be sends it — rupees ("₹1,710"). Figures
+ * keep up to two decimals in the viewer's locale.
  */
 export function useStockWords() {
   const { t } = useTranslation(STOCK_NS);
   const { formatNumber, formatDate } = useLocaleFormat();
-  const formatPaise = usePaiseFormat();
+  const formatRupees = useRupeeFormat();
   const clock = useClinicClock();
   const figure = (value: number) => formatNumber(value, { maximumFractionDigits: 2 });
   const unit = (value: StockUnit) => t(STOCK_KEYS.units[value]);
@@ -79,23 +76,24 @@ export function useStockWords() {
 
   return {
     t,
-    formatPaise,
+    /** Rupees as clinozy-be sends them: "₹1,710", "₹92.50". */
+    formatRupees,
     figure,
     unit,
     measure,
     /** A figure with its label: "1.5 tube", "30 g". */
     amount,
     /** A stock in units alone: "6 tube" — the toasts' "… left". */
-    units: (item: Pick<StockItem, 'unit'>, qtyMilli: number) =>
+    units: (item: Pick<StockItemRecord, 'unit'>, qtyMilli: number) =>
       amount(fromMilli(qtyMilli), unit(item.unit)),
     quantity,
     category: (value: StockCategory): StockLabel => ({
       label: t(STOCK_KEYS.categories[value]),
       tone: STOCK_CATEGORY_TONES[value],
     }),
-    /** The Stock cell's line and level: "3 tube · 90 g · OK" in sage. */
-    stock: (item: StockMeasure & Pick<StockItem, 'qtyMilli' | 'minQty'>) => {
-      const level = stockLevel(item.qtyMilli, item.minQty);
+    /** The Stock cell's line and the server's level: "3 tube · 90 g · OK" in sage. */
+    stock: (item: StockMeasure & Pick<StockItemRecord, 'qtyMilli' | 'level'>) => {
+      const { level } = item;
       return {
         level,
         tone: STOCK_LEVEL_TONES[level],
@@ -106,7 +104,7 @@ export function useStockWords() {
       };
     },
     /** The Item cell's sub line: "per tube of 30 g · uses ~0.5/week". */
-    itemSub: (item: StockMeasure & Pick<StockItem, 'usagePerWeekMilli'>) => {
+    itemSub: (item: StockMeasure & Pick<StockItemRecord, 'usagePerWeekMilli'>) => {
       const usage = figure(fromMilli(item.usagePerWeekMilli));
       if (item.sizePerUnit && item.measureUnit) {
         return t(STOCK_KEYS.items.subContents, {
@@ -117,19 +115,10 @@ export function useStockWords() {
       }
       return t(STOCK_KEYS.items.sub, { unit: unit(item.unit), usage });
     },
-    /** The Lasts pill: "~6 weeks", "~5 days" or "No usage", its tone and filter key. */
-    runway: (days: number | null): StockLabel & { key: string } => {
-      const runway = runwayOf(days);
-      return {
-        label: runwayLabel(runway),
-        tone: runwayTone(days),
-        key: runwayKey(runway),
-      };
-    },
-    /** A Lasts filter chip from its key, toned by its length. */
-    runwayChip: (runway: Runway): StockLabel => ({
-      label: runwayLabel(runway),
-      tone: runwayTone(runwayDays(runway)),
+    /** The Lasts pill for the server's runway: "~6 weeks", "~5 days" or "No usage", in its tone. */
+    runway: (days: number | null): StockLabel => ({
+      label: runwayLabel(runwayOf(days)),
+      tone: runwayTone(days),
     }),
     /**
      * A movement's "When" by the rooms' one time rule, days alone: "11:05 am"
@@ -153,15 +142,13 @@ export function useStockWords() {
       label: t(STOCK_KEYS.movements.types[value]),
       tone: STOCK_MOVEMENT_TONES[value],
     }),
-    /** A Movements row's change: "− 1 tube", "+ 24 bottle", "− ₹600". */
-    change: (row: StockMovementRow) => {
-      if (row.kind === 'payment') {
-        return t(STOCK_KEYS.movements.change, {
-          sign: '−',
-          amount: formatPaise(row.amount),
-        });
-      }
-      const units = amount(fromMilli(Math.abs(row.deltaMilli)), unit(row.item.unit));
+    /**
+     * A Movements row's change: "− 1 tube", "+ 24 bottle" — the bare figure once
+     * its item is deleted (its unit is gone with it).
+     */
+    change: (row: Pick<StockMovementRow, 'deltaMilli' | 'item'>) => {
+      const size = fromMilli(Math.abs(row.deltaMilli));
+      const units = row.item ? amount(size, unit(row.item.unit)) : figure(size);
       if (row.deltaMilli === 0) return units;
       return t(STOCK_KEYS.movements.change, {
         sign: row.deltaMilli > 0 ? '+' : '−',

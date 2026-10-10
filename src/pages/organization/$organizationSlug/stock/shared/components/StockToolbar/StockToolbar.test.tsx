@@ -69,15 +69,18 @@ describe('StockToolbar', () => {
     expect(screen.queryByTestId('stock-purchases-view-action-check')).toBeNull();
   });
 
-  it('offers no create on Movements and "New clinic vendor" on Vendors', async () => {
+  it('offers no create and no search on Movements, "New clinic vendor" on Vendors', async () => {
     const { unmount } = renderStockRoutes(`${ROOM}/movements`, PAGES);
     await screen.findByRole('navigation', { name: 'Clinic stock sections' });
     expect(screen.queryByTestId('stock-movements-new')).toBeNull();
+    // The API does not search movements; their Item filter narrows them.
+    expect(screen.queryByTestId('stock-movements-search')).toBeNull();
     unmount();
     renderStockRoutes(`${ROOM}/vendors`, PAGES);
     expect(await screen.findByTestId('stock-vendors-new')).toHaveTextContent(
       'New clinic vendor',
     );
+    expect(screen.getByTestId('stock-vendors-search')).toBeInTheDocument();
   });
 
   it('puts Stock check in the tabs’ row on a phone', async () => {
@@ -89,19 +92,23 @@ describe('StockToolbar', () => {
     );
   });
 
-  it('hides the creates and Stock check from those who only use stock (Q-K2)', async () => {
-    renderStockRoutes(
-      `${ROOM}/items`,
-      {
-        items: () => (
-          <>
-            <StockToolbar tab="items" />
-            <AccessResolved />
-          </>
-        ),
-      },
-      { role: 'therapist' },
-    );
+  it('shows the creates on Create and Stock check on Edit', async () => {
+    const items = {
+      items: () => (
+        <>
+          <StockToolbar tab="items" />
+          <AccessResolved />
+        </>
+      ),
+    };
+    // The design's Therapist creates without Edit.
+    const therapist = renderStockRoutes(`${ROOM}/items`, items, { role: 'therapist' });
+    await screen.findByTestId('access-resolved');
+    expect(screen.getByTestId('stock-items-new')).toBeInTheDocument();
+    expect(screen.queryByTestId('stock-items-view-action-check')).toBeNull();
+    therapist.unmount();
+
+    renderStockRoutes(`${ROOM}/items`, items, { role: 'accountant' });
     await screen.findByTestId('access-resolved');
     expect(screen.queryByTestId('stock-items-new')).toBeNull();
     expect(screen.queryByTestId('stock-items-view-action-check')).toBeNull();

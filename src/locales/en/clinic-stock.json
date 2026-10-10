@@ -10,8 +10,12 @@
     "vendors": "Vendors"
   },
   "search": {
-    "placeholder": "Search item, category or supplier…",
-    "label": "Search inside stock"
+    "label": "Search inside stock",
+    "placeholder": {
+      "items": "Search item name or #ID…",
+      "purchases": "Search invoice, #ID or supplier…",
+      "vendors": "Search vendor name…"
+    }
   },
   "create": {
     "item": "New item",
@@ -26,7 +30,11 @@
     "category": "Category",
     "lasts": "Lasts",
     "status": "Status",
-    "type": "Type"
+    "type": "Type",
+    "lastsWithin": {
+      "week": "Within a week",
+      "three_weeks": "Within 3 weeks"
+    }
   },
   "table": {
     "addPhone": "Add phone",
@@ -97,7 +105,8 @@
       "category": "Category",
       "stock": "Stock",
       "lasts": "Lasts",
-      "vendor": "Supplier"
+      "vendor": "Supplier",
+      "lastRate": "Last rate"
     },
     "sub": "per {{unit}} · uses ~{{usage}}/week",
     "subContents": "per {{unit}} of {{contents}} · uses ~{{usage}}/week",
@@ -126,13 +135,20 @@
     },
     "statuses": {
       "paid": "Paid",
-      "partly": "Partly paid",
-      "unpaid": "Unpaid"
+      "unpaid": "Unpaid",
+      "partial": "Partly paid"
     },
     "rowActions": {
       "edit": "Edit",
-      "delete": "Delete",
-      "pay": "Pay {{amount}}"
+      "delete": "Delete"
+    },
+    "vendorFilter": {
+      "any": "Any supplier",
+      "count_one": "{{count}} supplier",
+      "count_other": "{{count}} suppliers",
+      "search": "Search suppliers",
+      "noMatch": "No match",
+      "clear": "Clear"
     }
   },
   "movements": {
@@ -153,14 +169,23 @@
       "damaged": "Damaged",
       "returned": "Returned",
       "reverted": "Reverted",
-      "payment": "Payment"
+      "opening": "Opening stock"
     },
     "reverted": "Reverted",
-    "purchase": "Purchase #{{seq}}",
-    "paymentSub": "{{purchase}} · {{billNo}}",
+    "purchase": "From purchase #{{seq}}",
     "change": "{{sign}} {{amount}}",
     "rowActions": {
       "revert": "Revert"
+    },
+    "purchaseBill": "From purchase #{{seq}} · bill {{billNo}}",
+    "deletedItem": "Deleted item",
+    "itemFilter": {
+      "any": "Any item",
+      "search": "Search items",
+      "noMatch": "No match",
+      "clear": "Clear",
+      "count_one": "{{count}} item",
+      "count_other": "{{count}} items"
     }
   },
   "vendors": {
@@ -178,8 +203,7 @@
     "noPurchases": "No purchases",
     "rowActions": {
       "edit": "Edit",
-      "delete": "Delete",
-      "pay": "Pay {{amount}}"
+      "delete": "Delete"
     }
   },
   "drawers": {
@@ -231,7 +255,8 @@
         "vendor": "Supplier"
       },
       "save": "Add item",
-      "saved": "Item saved"
+      "saved": "Item saved",
+      "nameTaken": "An item with this name already exists"
     },
     "quickItem": {
       "title": "New clinic item",
@@ -255,7 +280,8 @@
       },
       "save": "Add vendor",
       "added": "Vendor {{name}} added",
-      "saved": "Vendor saved"
+      "saved": "Vendor saved",
+      "nameTaken": "A vendor with this name already exists"
     },
     "movement": {
       "title": {
@@ -286,7 +312,8 @@
       "summary": "{{name}} · {{change}}",
       "enterQuantity": "Enter a quantity",
       "onlyInStock": "Only {{quantity}} in stock",
-      "saved": "{{type}} saved · {{quantity}} left"
+      "saved": "{{type}} saved · {{quantity}} left",
+      "notEnoughStock": "Not that much in stock any more — someone used some since. Check the count and try again."
     },
     "use": {
       "label": "Use {{name}}",
@@ -339,7 +366,14 @@
         "peek_other": "{{count}} items · {{amount}}",
         "quickLine": "Type item and qty · e.g. gloves 10 @250",
         "quickHint": "10 = qty · @250 = rate",
-        "lowStockChip": "{{name}} · {{quantity}} left"
+        "lowStockChip": "{{name}} · {{quantity}} left",
+        "mode": "Mode",
+        "branch": "Paid from",
+        "paidSoFar": "{{amount}} paid · {{status}}",
+        "moreThanBill": "Paid is more than the bill",
+        "dayClosed": "This branch’s day is closed — nothing can be paid from it today",
+        "addLine": "Add at least one item",
+        "tooManyLines": "A purchase takes up to {{max}} items"
       },
       "save": "Create purchase",
       "pickSupplier": "Pick a supplier",
@@ -370,7 +404,8 @@
       "save": "Save count",
       "failed": "Not saved · your counts are kept",
       "saved_one": "Stock check saved · {{count}} item updated",
-      "saved_other": "Stock check saved · {{count}} items updated"
+      "saved_other": "Stock check saved · {{count}} items updated",
+      "empty": "No items to count yet"
     },
     "confirm": {
       "deleteItem": "Delete this item?",
@@ -390,7 +425,17 @@
           "wrongQty": "Wrong quantity"
         },
         "done": "{{type}} reverted · {{name}} back to {{quantity}}",
-        "note": "Reverts {{type}} of {{when}} · {{reason}}"
+        "note": "Reverts {{type}} of {{when}} · {{reason}}",
+        "blocked": {
+          "alreadyReverted": "This movement has been reverted already",
+          "notEnoughStock": "Not enough is left in stock to take this entry back"
+        }
+      },
+      "blocked": {
+        "itemHasStock": "Only an item with nothing in stock can be deleted — adjust it to 0 first",
+        "purchasePaid": "A purchase with money paid on it can’t be deleted",
+        "vendorHasDues": "Settle this vendor’s purchases first",
+        "stockUsed": "Some of what this purchase received has been used since — it can’t be taken back"
       }
     }
   }

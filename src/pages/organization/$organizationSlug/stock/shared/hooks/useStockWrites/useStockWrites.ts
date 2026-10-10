@@ -1,16 +1,21 @@
 import type { QueryKey } from '@tanstack/react-query';
 
-import type {
-  DeleteReason,
-  StockItem,
-  StockPurchase,
-  StockVendor,
-} from '@/shared/api/clinic/clinic-schema.ts';
 import { paymentQueryKeys } from '@/shared/api/clinic/payments-api.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
-import { stockQueryKeys } from '../../stock-api.ts';
+import { stockListReadKeys, stockQueryKeys } from '../../stock-api.ts';
+import type {
+  StockCountResult,
+  StockItemRecord,
+  StockItemRow,
+  StockMovementRecord,
+  StockPurchaseRecord,
+  StockPurchaseRow,
+  StockVendorRecord,
+  StockVendorRow,
+} from '../../stock-contracts.ts';
 import {
   createStockItem,
   createStockPurchase,
@@ -25,210 +30,268 @@ import {
   restoreStockVendor,
   revertStockMovement,
   saveStockCount,
-  undoStockMovement,
+  type StockDeleteRequest,
   updateStockItem,
   updateStockPurchase,
   updateStockVendor,
 } from '../../stock-records-api.ts';
 import type {
+  quickStockItemInput,
   StockCountInput,
-  StockCountResult,
   StockItemInput,
   StockMovementInput,
-  StockMovementResult,
+  StockPurchaseChange,
   StockPurchaseInput,
   StockRevertInput,
   StockVendorInput,
 } from '../../stock-records-contracts.ts';
 
 /*
- * Clinic stock's writes for the drawers, the Use popover and Stock check
- * (KICKOFF §6.8): every write refreshes the room — its lists join item, vendor
- * and staff names — and a purchase or vendor write the supplier bills Send
- * payment offers (`/payments/pay?bill=is:…`).
+ * Clinic stock's writes for the drawers, the Use popover, the confirms and
+ * Stock check, each carrying its action's idempotency key. A write refreshes
+ * the room — its rows join item and vendor names, and a movement moves an
+ * item's level — and a purchase or vendor write the supplier bills Send
+ * payment offers (`/payments/pay?bill=is:…`). A delete takes its row out of the
+ * list at once and puts it back if the write fails.
  */
 
-/** A record save: the record and its fields. */
-export interface StockUpdateVars<TInput> {
-  id: string;
-  patch: TInput;
+/** A record save: the record as read — its `updated_at` guards the save — and the drawer's fields. */
+export interface StockUpdateVars<TRecord, TInput> {
+  record: TRecord;
+  input: TInput;
 }
 
 /** A record delete: the record and the reason confirm's choice. */
-export interface StockDeleteVars {
-  id: string;
-  reason: DeleteReason;
-  note: string | null;
-}
+export type StockDeleteVars = StockDeleteRequest;
 
 /** What every stock write refreshes; bills add Send payment's open bills. */
 const ROOM_KEYS: readonly QueryKey[] = [stockQueryKeys.all];
 const BILL_KEYS: readonly QueryKey[] = [stockQueryKeys.all, paymentQueryKeys.openBills()];
 
-/** One write of the room, refreshing what it joins. */
-function useStockWrite<TData, TVars>(
-  mutationFn: (vars: TVars) => Promise<TData>,
-  options: CrudMutationOptions<TData, TVars>,
-  keys: readonly QueryKey[] = ROOM_KEYS,
+/** The active organization — a delete patches its lists. */
+const useOrganizationId = () => useOrganizationStore((state) => state.organizationId);
+
+// ── Vendors ──
+
+/** New clinic vendor. */
+export function useCreateStockVendor(
+  options: CrudMutationOptions<StockVendorRecord, StockVendorInput> = {},
 ) {
-  return useAppMutation<TData, TVars>({
-    mutationFn,
-    invalidateKeys: [...keys],
+  return useAppMutation<StockVendorRecord, StockVendorInput>({
+    mutationFn: (input, action) => createStockVendor({ input, ...action }),
+    invalidateKeys: [...BILL_KEYS],
     ...options,
   });
 }
 
-// ── Vendors ──
-
-/** New clinic vendor (`S:1693`). */
-export function useCreateStockVendor(
-  options: CrudMutationOptions<StockVendor, StockVendorInput> = {},
-) {
-  return useStockWrite(createStockVendor, options, BILL_KEYS);
-}
-
-/** Save a clinic vendor (`S:1693`). */
+/** Save a clinic vendor — refused when someone saved them since (`409 record_changed`). */
 export function useUpdateStockVendor(
-  options: CrudMutationOptions<StockVendor, StockUpdateVars<StockVendorInput>> = {},
+  options: CrudMutationOptions<
+    StockVendorRecord,
+    StockUpdateVars<StockVendorRecord, StockVendorInput>
+  > = {},
 ) {
-  return useStockWrite(
-    ({ id, patch }: StockUpdateVars<StockVendorInput>) => updateStockVendor(id, patch),
-    options,
-    BILL_KEYS,
-  );
+  return useAppMutation<
+    StockVendorRecord,
+    StockUpdateVars<StockVendorRecord, StockVendorInput>
+  >({
+    mutationFn: (vars, action) => updateStockVendor({ ...vars, ...action }),
+    invalidateKeys: [...BILL_KEYS],
+    ...options,
+  });
 }
 
-/** Delete a clinic vendor with a reason (`S:1546`). */
+/** Delete a clinic vendor with a reason — optimistic on the Vendors list. */
 export function useDeleteStockVendor(
-  options: CrudMutationOptions<StockVendor, StockDeleteVars> = {},
+  options: CrudMutationOptions<void, StockDeleteVars> = {},
 ) {
-  return useStockWrite(
-    ({ id, reason, note }: StockDeleteVars) => deleteStockVendor(id, reason, note),
-    options,
-    BILL_KEYS,
-  );
+  const organizationId = useOrganizationId();
+  return useAppMutation<void, StockDeleteVars, unknown, StockVendorRow>({
+    mutationFn: (vars) => deleteStockVendor(vars),
+    invalidateKeys: [...stockListReadKeys(organizationId), paymentQueryKeys.openBills()],
+    optimisticInfinite: {
+      queryKey: stockQueryKeys.vendorLists(organizationId),
+      update: (rows, { id }) => rows.filter((vendor) => vendor.id !== id),
+    },
+    ...options,
+  });
 }
 
 /** Restore a deleted vendor — the toast's Undo. */
 export function useRestoreStockVendor(
-  options: CrudMutationOptions<StockVendor, string> = {},
+  options: CrudMutationOptions<StockVendorRecord, string> = {},
 ) {
-  return useStockWrite(restoreStockVendor, options, BILL_KEYS);
+  return useAppMutation<StockVendorRecord, string>({
+    mutationFn: (id, action) => restoreStockVendor(id, action.idempotencyKey),
+    invalidateKeys: [...BILL_KEYS],
+    ...options,
+  });
 }
 
 // ── Items ──
 
-/** New item (`S:1685`). */
+/** New item — In stock is its opening quantity. */
 export function useCreateStockItem(
-  options: CrudMutationOptions<StockItem, StockItemInput> = {},
+  options: CrudMutationOptions<StockItemRecord, StockItemInput> = {},
 ) {
-  return useStockWrite(createStockItem, options);
+  return useAppMutation<StockItemRecord, StockItemInput>({
+    mutationFn: (input, action) => createStockItem({ input, ...action }),
+    invalidateKeys: [...ROOM_KEYS],
+    ...options,
+  });
 }
 
-/** Save an item (`S:1685`); a changed In stock is an Adjust movement. */
+/** Save an item — its changed fields, then a changed In stock as an Adjust movement. */
 export function useUpdateStockItem(
-  options: CrudMutationOptions<StockItem, StockUpdateVars<StockItemInput>> = {},
+  options: CrudMutationOptions<
+    StockItemRecord,
+    StockUpdateVars<StockItemRecord, StockItemInput>
+  > = {},
 ) {
-  return useStockWrite(
-    ({ id, patch }: StockUpdateVars<StockItemInput>) => updateStockItem(id, patch),
-    options,
-  );
+  return useAppMutation<
+    StockItemRecord,
+    StockUpdateVars<StockItemRecord, StockItemInput>
+  >({
+    mutationFn: (vars, action) => updateStockItem({ ...vars, ...action }),
+    invalidateKeys: [...ROOM_KEYS],
+    ...options,
+  });
 }
+
+/** What "add as typed" and the stacked New clinic item send. */
+export type StockQuickItemVars = Parameters<typeof quickStockItemInput>[0];
 
 /** "Not in the list · add as typed" and the stacked New clinic item. */
 export function useQuickCreateStockItem(
-  options: CrudMutationOptions<
-    StockItem,
-    Parameters<typeof quickCreateStockItem>[0]
-  > = {},
+  options: CrudMutationOptions<StockItemRecord, StockQuickItemVars> = {},
 ) {
-  return useStockWrite(quickCreateStockItem, options);
+  return useAppMutation<StockItemRecord, StockQuickItemVars>({
+    mutationFn: (input, action) => quickCreateStockItem({ input, ...action }),
+    invalidateKeys: [...ROOM_KEYS],
+    ...options,
+  });
 }
 
-/** Delete an item with a reason (`S:1546`). */
+/** Delete an item with a reason — only at zero; optimistic on the Items list. */
 export function useDeleteStockItem(
-  options: CrudMutationOptions<StockItem, StockDeleteVars> = {},
+  options: CrudMutationOptions<void, StockDeleteVars> = {},
 ) {
-  return useStockWrite(
-    ({ id, reason, note }: StockDeleteVars) => deleteStockItem(id, reason, note),
-    options,
-  );
+  const organizationId = useOrganizationId();
+  return useAppMutation<void, StockDeleteVars, unknown, StockItemRow>({
+    mutationFn: (vars) => deleteStockItem(vars),
+    invalidateKeys: stockListReadKeys(organizationId),
+    optimisticInfinite: {
+      queryKey: stockQueryKeys.itemLists(organizationId),
+      update: (rows, { id }) => rows.filter((item) => item.id !== id),
+    },
+    ...options,
+  });
 }
 
 /** Restore a deleted item — the toast's Undo. */
 export function useRestoreStockItem(
-  options: CrudMutationOptions<StockItem, string> = {},
+  options: CrudMutationOptions<StockItemRecord, string> = {},
 ) {
-  return useStockWrite(restoreStockItem, options);
+  return useAppMutation<StockItemRecord, string>({
+    mutationFn: (id, action) => restoreStockItem(id, action.idempotencyKey),
+    invalidateKeys: [...ROOM_KEYS],
+    ...options,
+  });
 }
 
 // ── Movements ──
 
-/** A use, receipt, adjustment, damage or return (`useStock`, `S:1688`). */
+/** A use, receipt, adjustment, damage or return — the answer's `afterMilli` is what is left. */
 export function useLogStockMovement(
-  options: CrudMutationOptions<StockMovementResult, StockMovementInput> = {},
+  options: CrudMutationOptions<StockMovementRecord, StockMovementInput> = {},
 ) {
-  return useStockWrite(logStockMovement, options);
+  return useAppMutation<StockMovementRecord, StockMovementInput>({
+    mutationFn: (input, action) => logStockMovement({ input, ...action }),
+    invalidateKeys: [...ROOM_KEYS],
+    ...options,
+  });
 }
 
-/** The Undo of a use, a movement or a revert: it goes, the stock comes back. */
-export function useUndoStockMovement(
-  options: CrudMutationOptions<StockItem, string> = {},
-) {
-  return useStockWrite(undoStockMovement, options);
-}
-
-/** Revert a movement (`revertMovement`, `S:1689`). */
+/**
+ * Revert a movement — the Revert confirm, and the Undo of a use, a receipt or
+ * an adjustment (reason `mistake`): both entries stay in the history.
+ */
 export function useRevertStockMovement(
-  options: CrudMutationOptions<StockMovementResult, StockRevertInput> = {},
+  options: CrudMutationOptions<StockMovementRecord, StockRevertInput> = {},
 ) {
-  return useStockWrite(revertStockMovement, options);
+  return useAppMutation<StockMovementRecord, StockRevertInput>({
+    mutationFn: (input, action) => revertStockMovement({ input, ...action }),
+    invalidateKeys: [...ROOM_KEYS],
+    ...options,
+  });
 }
 
 // ── Purchases ──
 
-/** New purchase (`S:1686`): its lines are received into stock. */
+/** New purchase: its lines are received into stock; "Paid" is a supplier-bill payment. */
 export function useCreateStockPurchase(
-  options: CrudMutationOptions<StockPurchase, StockPurchaseInput> = {},
+  options: CrudMutationOptions<StockPurchaseRecord, StockPurchaseInput> = {},
 ) {
-  return useStockWrite(createStockPurchase, options, BILL_KEYS);
+  return useAppMutation<StockPurchaseRecord, StockPurchaseInput>({
+    mutationFn: (input, action) => createStockPurchase({ input, ...action }),
+    invalidateKeys: [...BILL_KEYS],
+    ...options,
+  });
 }
 
-/** Save a purchase (`S:1686`). */
+/** Save a purchase's details — never its lines. */
 export function useUpdateStockPurchase(
-  options: CrudMutationOptions<StockPurchase, StockUpdateVars<StockPurchaseInput>> = {},
+  options: CrudMutationOptions<
+    StockPurchaseRecord,
+    StockUpdateVars<StockPurchaseRecord, StockPurchaseChange>
+  > = {},
 ) {
-  return useStockWrite(
-    ({ id, patch }: StockUpdateVars<StockPurchaseInput>) =>
-      updateStockPurchase(id, patch),
-    options,
-    BILL_KEYS,
-  );
+  return useAppMutation<
+    StockPurchaseRecord,
+    StockUpdateVars<StockPurchaseRecord, StockPurchaseChange>
+  >({
+    mutationFn: (vars, action) => updateStockPurchase({ ...vars, ...action }),
+    invalidateKeys: [...BILL_KEYS],
+    ...options,
+  });
 }
 
-/** Delete a purchase with a reason (`S:1546`). */
+/** Delete a purchase with a reason — only an unpaid one; optimistic on the Purchases list. */
 export function useDeleteStockPurchase(
-  options: CrudMutationOptions<StockPurchase, StockDeleteVars> = {},
+  options: CrudMutationOptions<void, StockDeleteVars> = {},
 ) {
-  return useStockWrite(
-    ({ id, reason, note }: StockDeleteVars) => deleteStockPurchase(id, reason, note),
-    options,
-    BILL_KEYS,
-  );
+  const organizationId = useOrganizationId();
+  return useAppMutation<void, StockDeleteVars, unknown, StockPurchaseRow>({
+    mutationFn: (vars) => deleteStockPurchase(vars),
+    invalidateKeys: [...stockListReadKeys(organizationId), paymentQueryKeys.openBills()],
+    optimisticInfinite: {
+      queryKey: stockQueryKeys.purchaseLists(organizationId),
+      update: (rows, { id }) => rows.filter((purchase) => purchase.id !== id),
+    },
+    ...options,
+  });
 }
 
-/** Restore a deleted purchase — the toast's Undo. */
+/** Restore a deleted purchase — the toast's Undo; its stock is received again. */
 export function useRestoreStockPurchase(
-  options: CrudMutationOptions<StockPurchase, string> = {},
+  options: CrudMutationOptions<StockPurchaseRecord, string> = {},
 ) {
-  return useStockWrite(restoreStockPurchase, options, BILL_KEYS);
+  return useAppMutation<StockPurchaseRecord, string>({
+    mutationFn: (id, action) => restoreStockPurchase(id, action.idempotencyKey),
+    invalidateKeys: [...BILL_KEYS],
+    ...options,
+  });
 }
 
 // ── Stock check ──
 
-/** Save a Stock check (`saveStockCount`, `S:1690`). */
+/** Save a Stock check — each changed count an Adjust movement noted "Stock check". */
 export function useSaveStockCount(
   options: CrudMutationOptions<StockCountResult, StockCountInput> = {},
 ) {
-  return useStockWrite(saveStockCount, options);
+  return useAppMutation<StockCountResult, StockCountInput>({
+    mutationFn: (input, action) => saveStockCount({ input, ...action }),
+    invalidateKeys: [...ROOM_KEYS],
+    ...options,
+  });
 }

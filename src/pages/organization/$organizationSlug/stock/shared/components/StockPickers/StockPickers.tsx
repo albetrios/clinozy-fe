@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { StockItem, StockVendor } from '@/shared/api/clinic/clinic-schema.ts';
 import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
 import { personInitials } from '@/shared/components/Cells/index.ts';
 import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
@@ -12,6 +11,7 @@ import {
 } from '../../hooks/useStockLists/index.ts';
 import type { OpenStockChild } from '../../hooks/useStockStack/index.ts';
 import { useStockWords } from '../../hooks/useStockWords/index.ts';
+import type { StockItemRecord, StockVendorRecord } from '../../stock-contracts.ts';
 import { STOCK_DRAWER_KEYS, STOCK_DRAWERS_NS } from '../../stock-drawers.constants.ts';
 import { fromMilli } from '../../stock-units.ts';
 
@@ -57,11 +57,10 @@ export function StockVendorPicker({
 }: StockPickerFieldProps) {
   const { t } = useTranslation(STOCK_DRAWERS_NS);
   const catalogue = useStockVendorCatalogue().data ?? [];
-  const [added, setAdded] = useState<StockVendor[]>([]);
-  const options: PickerOption[] = withAdded<Pick<StockVendor, 'id' | 'name' | 'phone'>>(
-    catalogue,
-    added,
-  ).map((vendor) => ({
+  const [added, setAdded] = useState<StockVendorRecord[]>([]);
+  const options: PickerOption[] = withAdded<
+    Pick<StockVendorRecord, 'id' | 'name' | 'phone'>
+  >(catalogue, added).map((vendor) => ({
     key: vendor.id,
     label: vendor.name,
     sub: vendor.phone ? formatClinicPhone(vendor.phone) : undefined,
@@ -123,9 +122,9 @@ export function StockItemPicker({
   const { t } = useTranslation(STOCK_DRAWERS_NS);
   const words = useStockWords();
   const catalogue = useStockItemCatalogue().data ?? [];
-  const [added, setAdded] = useState<StockItem[]>([]);
+  const [added, setAdded] = useState<StockItemRecord[]>([]);
   const options: PickerOption[] = withAdded<
-    Pick<StockItem, 'id' | 'name' | 'qtyMilli' | 'category'>
+    Pick<StockItemRecord, 'id' | 'name' | 'qtyMilli' | 'category'>
   >(catalogue, added).map((item) => ({
     key: item.id,
     label: item.name,

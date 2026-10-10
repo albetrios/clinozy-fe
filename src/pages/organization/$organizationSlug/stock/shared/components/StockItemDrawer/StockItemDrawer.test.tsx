@@ -1,20 +1,49 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { renderHook, screen, waitFor, within } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
+import { useTranslation } from 'react-i18next';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+vi.mock('../../stock-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchStockItem: vi.fn(),
+  fetchAllStockItems: vi.fn(),
+  fetchAllStockVendors: vi.fn(),
+}));
+vi.mock('../../stock-records-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  createStockItem: vi.fn(),
+  updateStockItem: vi.fn(),
+  quickCreateStockItem: vi.fn(),
+  deleteStockItem: vi.fn(),
+  restoreStockItem: vi.fn(),
+}));
+import { HttpError } from '@/shared/errors/HttpError.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import {
+  stockItemRow,
+  stockVendorRow,
+  TEST_STOCK_ITEM_ID,
+  TEST_STOCK_VENDOR_ID,
+} from '@/tests/utils/stock-doubles.ts';
 
 import {
   renderStockDrawer,
   resetStockRoutes,
 } from '../../../__tests__/integration/stock-test-router.tsx';
-import { fetchStockItem } from '../../stock-api.ts';
+import {
+  fetchAllStockItems,
+  fetchAllStockVendors,
+  fetchStockItem,
+} from '../../stock-api.ts';
+import { STOCK_DRAWER_KEYS, STOCK_DRAWERS_NS } from '../../stock-drawers.constants.ts';
+import {
+  createStockItem,
+  deleteStockItem,
+  quickCreateStockItem,
+  updateStockItem,
+} from '../../stock-records-api.ts';
+import { useStockDeleteBlockText } from '../StockDeleteConfirm/index.ts';
 import { StockItemDrawer } from './StockItemDrawer.tsx';
 import { StockNewItemDrawer } from './StockNewItemDrawer.tsx';
 
@@ -43,17 +72,21 @@ const D = 'stock-item-drawer';
 const setup = () =>
   userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
 
-const itemNamed = (name: string) =>
-  clinicFixtures.stockItems.snapshot((row) => row.name === name)[0];
+/** A refusal or a field error as clinozy-be answers it. */
+const refusal = (status: number, error: Record<string, unknown>) =>
+  new HttpError('refused', status, '/app/stock-items', 'POST', { error });
+
+/** The room's words for a key, as the drawer says them. */
+const wordsOf = (key: string) =>
+  renderHook(() => useTranslation(STOCK_DRAWERS_NS)).result.current.t(key);
 
 beforeEach(() => {
+  vi.resetAllMocks();
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetClinicFixtures();
+  vi.mocked(fetchAllStockVendors).mockResolvedValue([stockVendorRow()]);
+  vi.mocked(fetchAllStockItems).mockResolvedValue([stockItemRow()]);
 });
-afterEach(() => {
-  resetStockRoutes();
-  resetClinicFixtures();
-});
+afterEach(() => resetStockRoutes());
 
 describe('StockItemDrawer (clinic-stock.md:105–124, 219–231)', () => {
   it('opens New item on Consumables · pack and refuses no name', async () => {
@@ -76,6 +109,7 @@ describe('StockItemDrawer (clinic-stock.md:105–124, 219–231)', () => {
 
     await user.click(within(drawer).getByTestId(`${D}-save`));
     expect(notifyMock.warning).toHaveBeenCalledWith('Add a name');
+    expect(createStockItem).not.toHaveBeenCalled();
     expect(onClose).not.toHaveBeenCalled();
     expect(await axeForDialog(drawer)).toHaveNoViolations();
   });
@@ -83,6 +117,7 @@ describe('StockItemDrawer (clinic-stock.md:105–124, 219–231)', () => {
   it('adds an item with its contents, its opening stock and its levels', async () => {
     const user = setup();
     const onClose = vi.fn();
+    vi.mocked(createStockItem).mockResolvedValue(stockItemRow({ name: 'Lidocaine gel' }));
     renderStockDrawer(
       <StockItemDrawer
         mode="create"
@@ -109,15 +144,21 @@ describe('StockItemDrawer (clinic-stock.md:105–124, 219–231)', () => {
     await user.click(within(drawer).getByTestId(`${D}-save`));
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(notifyMock.success).toHaveBeenCalledWith('Item saved');
-    expect(itemNamed('Lidocaine gel')).toMatchObject({
-      category: 'creams_serums',
-      unit: 'tube',
-      sizePerUnit: 30_000,
-      measureUnit: 'g',
-      qtyMilli: 2500,
-      usagePerWeekMilli: 500,
-      minQty: 1,
-      maxQty: 9,
+    // In stock is the opening quantity (`opening_quantity`).
+    expect(createStockItem).toHaveBeenCalledWith({
+      input: {
+        name: 'Lidocaine gel',
+        category: 'creams_serums',
+        unit: 'tube',
+        sizePerUnit: 30_000,
+        measureUnit: 'g',
+        minQty: 1,
+        maxQty: 9,
+        usagePerWeekMilli: 500,
+        vendorId: null,
+        qtyMilli: 2500,
+      },
+      idempotencyKey: expect.any(String),
     });
   });
 
@@ -147,10 +188,11 @@ describe('StockItemDrawer (clinic-stock.md:105–124, 219–231)', () => {
     expect(columns('vendor')).toBe('3');
   });
 
-  it('edits an item: "#167" and its pill, a changed count saved as an Adjust', async () => {
+  it('edits an item: "#167" and its pill; the save hands the read and the fields over', async () => {
     const user = setup();
     const onClose = vi.fn();
-    const item = await fetchStockItem(ref.stockItem(167));
+    const item = stockItemRow();
+    vi.mocked(updateStockItem).mockResolvedValue(stockItemRow({ qtyMilli: 2000 }));
     renderStockDrawer(<StockItemDrawer mode="edit" item={item} open onClose={onClose} />);
     const drawer = await screen.findByTestId(D);
     expect(within(drawer).getByTestId(`${D}-title`)).toHaveTextContent('Edit item');
@@ -159,8 +201,10 @@ describe('StockItemDrawer (clinic-stock.md:105–124, 219–231)', () => {
       'Creams & Serums',
     );
     // The supplier peeks while its step is closed.
-    expect(within(drawer).getByTestId(`${D}-step-vendor`)).toHaveTextContent(
-      'Ankur Pharma',
+    await waitFor(() =>
+      expect(within(drawer).getByTestId(`${D}-step-vendor`)).toHaveTextContent(
+        'Ankur Pharma',
+      ),
     );
 
     await user.click(within(drawer).getByTestId(`${D}-step-levels-trigger`));
@@ -168,17 +212,111 @@ describe('StockItemDrawer (clinic-stock.md:105–124, 219–231)', () => {
     await user.type(within(drawer).getByTestId(`${D}-in-stock`), '2');
     await user.click(within(drawer).getByTestId(`${D}-save`));
     await waitFor(() => expect(onClose).toHaveBeenCalled());
-    expect(itemNamed('Soframycin 30 gm')?.qtyMilli).toBe(2000);
-    expect(
-      clinicFixtures.stockMovements.snapshot((row) => row.itemId === item.id).at(-1),
-    ).toMatchObject({ type: 'adjust', deltaMilli: -1000 });
+    // The item's changed fields (with its `updated_at`), then In stock as an Adjust.
+    expect(updateStockItem).toHaveBeenCalledWith({
+      record: item,
+      input: expect.objectContaining({ name: 'Soframycin 30 gm', qtyMilli: 2000 }),
+      idempotencyKey: expect.any(String),
+    });
+    expect(notifyMock.success).toHaveBeenCalledWith('Item saved');
   });
 
-  it('deletes from the drawer with a reason: "… deleted" + Undo', async () => {
+  it('puts the API’s field errors on their fields and opens their step', async () => {
+    const user = setup();
+    vi.mocked(updateStockItem).mockRejectedValue(
+      refusal(400, {
+        type: 'validation_error',
+        errors: [
+          { field: 'body.max_quantity', message: 'Maximum can’t be under the minimum' },
+        ],
+      }),
+    );
+    renderStockDrawer(
+      <StockItemDrawer mode="edit" item={stockItemRow()} open onClose={vi.fn()} />,
+    );
+    const drawer = await screen.findByTestId(D);
+    await user.click(within(drawer).getByTestId(`${D}-step-levels-trigger`));
+    await user.click(within(drawer).getByTestId(`${D}-max-decrease`));
+    await user.click(within(drawer).getByTestId(`${D}-step-item-trigger`));
+    await user.click(within(drawer).getByTestId(`${D}-save`));
+    await waitFor(() =>
+      expect(notifyMock.error).toHaveBeenCalledWith('Maximum can’t be under the minimum'),
+    );
+    expect(within(drawer).getByTestId(`${D}-step-levels`)).toHaveTextContent(
+      'Maximum can’t be under the minimum',
+    );
+  });
+
+  it('a name another item has goes on Name in the room’s words (`409 record_already_exists`)', async () => {
+    const user = setup();
+    vi.mocked(createStockItem).mockRejectedValue(
+      refusal(409, {
+        type: 'request_error',
+        code: 'conflict',
+        reason: 'record_already_exists',
+        detail: 'Already exists',
+      }),
+    );
+    renderStockDrawer(
+      <StockItemDrawer
+        mode="create"
+        prefill={{ name: 'Gauze' }}
+        open
+        onClose={vi.fn()}
+      />,
+    );
+    const drawer = await screen.findByTestId(D);
+    await user.click(within(drawer).getByTestId(`${D}-save`));
+    const taken = wordsOf(STOCK_DRAWER_KEYS.item.nameTaken);
+    await waitFor(() => expect(notifyMock.error).toHaveBeenCalledWith(taken));
+    expect(within(drawer).getByTestId(`${D}-name`)).toHaveAttribute(
+      'aria-invalid',
+      'true',
+    );
+  });
+
+  it('a save over someone else’s (`409 record_changed`) offers Reload, which reads the item again', async () => {
+    const user = setup();
+    vi.mocked(updateStockItem).mockRejectedValue(
+      refusal(409, {
+        type: 'request_error',
+        code: 'conflict',
+        reason: 'record_changed',
+        detail: 'Someone changed this item since you opened it',
+      }),
+    );
+    vi.mocked(fetchStockItem).mockResolvedValue(
+      stockItemRow({ name: 'Soframycin 30 gm tube', updatedAt: '2026-10-10T06:00:00Z' }),
+    );
+    renderStockDrawer(
+      <StockItemDrawer mode="edit" item={stockItemRow()} open onClose={vi.fn()} />,
+    );
+    const drawer = await screen.findByTestId(D);
+    await user.click(within(drawer).getByTestId(`${D}-category-masks`));
+    await user.click(within(drawer).getByTestId(`${D}-save`));
+    await waitFor(() => expect(notifyMock.error).toHaveBeenCalled());
+    const [message, options] = notifyMock.error.mock.calls[0] as [
+      string,
+      { action: { onClick: () => void } },
+    ];
+    expect(message).toBe('Someone changed this item since you opened it');
+    options.action.onClick();
+    await waitFor(() =>
+      expect(within(drawer).getByTestId(`${D}-name`)).toHaveValue(
+        'Soframycin 30 gm tube',
+      ),
+    );
+    expect(fetchStockItem).toHaveBeenCalledWith(TEST_STOCK_ITEM_ID);
+  });
+
+  it('Delete goes at zero with a reason: "… deleted" + Undo', async () => {
     const user = setup();
     const onClose = vi.fn();
-    const item = await fetchStockItem(ref.stockItem(167));
-    renderStockDrawer(<StockItemDrawer mode="edit" item={item} open onClose={onClose} />);
+    vi.mocked(deleteStockItem).mockResolvedValue(undefined);
+    const empty = stockItemRow({ qtyMilli: 0, level: 'out' });
+    renderStockDrawer(
+      <StockItemDrawer mode="edit" item={empty} open onClose={onClose} />,
+    );
     const drawer = await screen.findByTestId(D);
     await user.click(within(drawer).getByTestId(`${D}-delete`));
     const confirm = await screen.findByRole('alertdialog');
@@ -186,17 +324,33 @@ describe('StockItemDrawer (clinic-stock.md:105–124, 219–231)', () => {
     await user.click(within(confirm).getByRole('radio', { name: 'Duplicate' }));
     await user.click(within(confirm).getByRole('button', { name: 'Delete' }));
     await waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect(deleteStockItem).toHaveBeenCalledWith({
+      id: TEST_STOCK_ITEM_ID,
+      reason: 'duplicate',
+      note: null,
+    });
     expect(notifyMock.undo).toHaveBeenCalledWith(
       'Soframycin 30 gm deleted',
       expect.objectContaining({ onUndo: expect.any(Function) }),
     );
-    expect(itemNamed('Soframycin 30 gm')).toBeUndefined();
+  });
+
+  it('Delete on an item with stock says to adjust it to 0 first, and asks nothing', async () => {
+    const user = setup();
+    renderStockDrawer(
+      <StockItemDrawer mode="edit" item={stockItemRow()} open onClose={vi.fn()} />,
+    );
+    const drawer = await screen.findByTestId(D);
+    await user.click(within(drawer).getByTestId(`${D}-delete`));
+    const blockText = renderHook(() => useStockDeleteBlockText()).result.current;
+    expect(notifyMock.info).toHaveBeenCalledWith(blockText('item_has_stock'));
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+    expect(deleteStockItem).not.toHaveBeenCalled();
   });
 
   it('is view only without Edit, and waits for a record still loading', async () => {
-    const item = await fetchStockItem(ref.stockItem(167));
     const view = renderStockDrawer(
-      <StockItemDrawer mode="edit" item={item} open onClose={vi.fn()} />,
+      <StockItemDrawer mode="edit" item={stockItemRow()} open onClose={vi.fn()} />,
       { role: 'accountant' },
     );
     const drawer = await screen.findByTestId(D);
@@ -214,16 +368,19 @@ describe('StockItemDrawer (clinic-stock.md:105–124, 219–231)', () => {
 });
 
 describe('StockNewItemDrawer (clinic-stock.md:187–201)', () => {
+  const N = 'stock-new-item-drawer-stacked';
+
   it('adds a piece of Creams & Serums named from the picker, 1 to 5, from the vendor', async () => {
     const user = setup();
     const onSaved = vi.fn();
-    const N = 'stock-new-item-drawer-stacked';
+    const cotton = stockItemRow({ name: 'Cotton', unit: 'piece', qtyMilli: 0 });
+    vi.mocked(quickCreateStockItem).mockResolvedValue(cotton);
     renderStockDrawer(
       <StockNewItemDrawer
         open
         onClose={vi.fn()}
         name=" Cotton "
-        vendorId={ref.stockVendor(1)}
+        vendorId={TEST_STOCK_VENDOR_ID}
         onSaved={onSaved}
       />,
     );
@@ -254,21 +411,24 @@ describe('StockNewItemDrawer (clinic-stock.md:187–201)', () => {
 
     await user.click(within(drawer).getByTestId(`${N}-save`));
     await waitFor(() => expect(onSaved).toHaveBeenCalled());
-    expect(onSaved.mock.calls[0]?.[0]).toMatchObject({ name: 'Cotton' });
+    expect(onSaved.mock.calls[0]?.[0]).toBe(cotton);
     expect(notifyMock.success).toHaveBeenCalledWith('Cotton added to clinic items');
-    expect(itemNamed('Cotton')).toMatchObject({
-      category: 'creams_serums',
-      unit: 'piece',
-      minQty: 1,
-      maxQty: 5,
-      vendorId: ref.stockVendor(1),
+    expect(quickCreateStockItem).toHaveBeenCalledWith({
+      input: {
+        name: 'Cotton',
+        category: 'creams_serums',
+        unit: 'piece',
+        minQty: 1,
+        maxQty: 5,
+        vendorId: TEST_STOCK_VENDOR_ID,
+      },
+      idempotencyKey: expect.any(String),
     });
   });
 
   it('asks for a name before it adds anything', async () => {
     const user = setup();
     const onSaved = vi.fn();
-    const N = 'stock-new-item-drawer-stacked';
     renderStockDrawer(
       <StockNewItemDrawer open onClose={vi.fn()} name="" onSaved={onSaved} />,
     );
@@ -277,5 +437,32 @@ describe('StockNewItemDrawer (clinic-stock.md:187–201)', () => {
     await user.click(within(drawer).getByTestId(`${N}-save`));
     expect(notifyMock.warning).toHaveBeenCalledWith('Add a name');
     expect(onSaved).not.toHaveBeenCalled();
+    expect(quickCreateStockItem).not.toHaveBeenCalled();
+  });
+
+  it('a name another item has goes on Name', async () => {
+    const user = setup();
+    vi.mocked(quickCreateStockItem).mockRejectedValue(
+      refusal(409, {
+        type: 'request_error',
+        code: 'conflict',
+        reason: 'record_already_exists',
+        detail: 'Already exists',
+      }),
+    );
+    renderStockDrawer(
+      <StockNewItemDrawer open onClose={vi.fn()} name="Gauze" onSaved={vi.fn()} />,
+    );
+    const drawer = await screen.findByTestId(N);
+    await user.click(within(drawer).getByTestId(`${N}-save`));
+    await waitFor(() =>
+      expect(notifyMock.error).toHaveBeenCalledWith(
+        wordsOf(STOCK_DRAWER_KEYS.item.nameTaken),
+      ),
+    );
+    expect(within(drawer).getByTestId(`${N}-name`)).toHaveAttribute(
+      'aria-invalid',
+      'true',
+    );
   });
 });

@@ -1,7 +1,8 @@
 import { numberFromText } from '@/lib/number-text.ts';
-import type { StockItem, Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import { toneForLabel } from '@/shared/clinic/clinic-tones.ts';
 
+import type { StockItemRecord } from './stock-contracts.ts';
 import type { StockMovementInputType } from './stock-records-contracts.ts';
 import { fromMilli, MILLI } from './stock-units.ts';
 
@@ -9,7 +10,9 @@ import { fromMilli, MILLI } from './stock-units.ts';
  * The arithmetic the Use popover and the movement drawer share
  * (`clinic-stock.md:89–140`; H:5265, H:5286–5295): a quantity typed in the
  * item's unit or — for an item with contents — in its measure, the steps and
- * quick chips each offers, and the stock after the movement.
+ * quick chips each offers, and the stock after the movement — a preview of
+ * what the member is typing; the saved movement's balance is the server's
+ * (`afterMilli`).
  */
 
 /** What a typed quantity counts: the item's unit ("tube") or its measure ("g"). */
@@ -38,12 +41,12 @@ type Treatment = (typeof TREATMENTS)[number];
 export const treatmentTone = (treatment: Treatment): Tone => toneForLabel(treatment.name);
 
 /** An item's contents in its measure — 30 for a 30 g tube; `null` without them. */
-export function contentsOf(item: Pick<StockItem, 'sizePerUnit'>): number | null {
+export function contentsOf(item: Pick<StockItemRecord, 'sizePerUnit'>): number | null {
   return item.sizePerUnit ? fromMilli(item.sizePerUnit) : null;
 }
 
 /** Whether the item can be counted in its measure (it has contents). */
-export const hasMeasure = (item: Pick<StockItem, 'sizePerUnit' | 'measureUnit'>) =>
+export const hasMeasure = (item: Pick<StockItemRecord, 'sizePerUnit' | 'measureUnit'>) =>
   Boolean(item.sizePerUnit && item.measureUnit);
 
 /**
@@ -53,7 +56,7 @@ export const hasMeasure = (item: Pick<StockItem, 'sizePerUnit' | 'measureUnit'>)
 export function quantityMilliOf(
   text: string,
   mode: QuantityMode,
-  item: Pick<StockItem, 'sizePerUnit'>,
+  item: Pick<StockItemRecord, 'sizePerUnit'>,
 ): number {
   if (mode === 'measure' && item.sizePerUnit) {
     return Math.round(
@@ -69,7 +72,7 @@ export function quantityMilliOf(
  */
 export function quantityStep(
   mode: QuantityMode,
-  item: Pick<StockItem, 'sizePerUnit'>,
+  item: Pick<StockItemRecord, 'sizePerUnit'>,
 ): number {
   const contents = contentsOf(item);
   if (mode === 'unit' || contents === null) return 0.5;
@@ -83,7 +86,7 @@ export function quantityStep(
  */
 export function quickQuantities(
   mode: QuantityMode,
-  item: Pick<StockItem, 'sizePerUnit'>,
+  item: Pick<StockItemRecord, 'sizePerUnit'>,
   surface: 'popover' | 'drawer',
 ): number[] {
   const contents = contentsOf(item);
@@ -96,7 +99,7 @@ export function quickQuantities(
 /** Switching to the measure starts at min(contents, 10) (`clinic-stock.md:93`); back to units, 1. */
 export function startQuantity(
   mode: QuantityMode,
-  item: Pick<StockItem, 'sizePerUnit'>,
+  item: Pick<StockItemRecord, 'sizePerUnit'>,
 ): number {
   const contents = contentsOf(item);
   return mode === 'measure' && contents !== null ? Math.min(contents, 10) : 1;
@@ -105,7 +108,7 @@ export function startQuantity(
 /** The stock after a movement of `qtyMilli` (Adjust: the counted quantity), never below 0. */
 export function stockAfter(
   type: StockMovementInputType,
-  item: Pick<StockItem, 'qtyMilli'>,
+  item: Pick<StockItemRecord, 'qtyMilli'>,
   qtyMilli: number,
 ): number {
   if (type === 'received') return item.qtyMilli + qtyMilli;
@@ -113,19 +116,9 @@ export function stockAfter(
   return Math.max(0, item.qtyMilli - qtyMilli);
 }
 
-/** The movement's signed change in the item's units ×1000. */
-export function movementDelta(
-  type: StockMovementInputType,
-  item: Pick<StockItem, 'qtyMilli'>,
-  qtyMilli: number,
-): number {
-  if (type === 'adjust') return qtyMilli - item.qtyMilli;
-  return TAKES_OUT.has(type) ? -qtyMilli : qtyMilli;
-}
-
 /** More is being taken out than the shelf holds ("Only 3 tube · 90 g in stock"). */
 export const exceedsStock = (
   type: StockMovementInputType,
-  item: Pick<StockItem, 'qtyMilli'>,
+  item: Pick<StockItemRecord, 'qtyMilli'>,
   qtyMilli: number,
 ) => TAKES_OUT.has(type) && qtyMilli > item.qtyMilli;

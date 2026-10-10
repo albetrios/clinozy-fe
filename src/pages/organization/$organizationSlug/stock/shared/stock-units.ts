@@ -1,14 +1,16 @@
-import type {
-  StockCategory,
-  StockMovementType,
-  Tone,
-} from '@/shared/api/clinic/clinic-schema.ts';
+import type { StockCategory, Tone } from '@/shared/api/clinic/clinic-schema.ts';
+
+import type { STOCK_MOVEMENT_KINDS, STOCK_PURCHASE_STATUSES } from '../stock.search.ts';
 
 /*
- * The Clinic stock arithmetic (KICKOFF §6.8 Data): pure, so the tables, the
- * Use popover, the movement drawer and Stock check read one set of rules —
- * and clinozy-be mirrors them. Quantities are stored ×1000 (`qtyMilli`,
- * `usagePerWeekMilli`, `sizePerUnit`; `S:886`): a tube and a half is 1500.
+ * The Clinic stock arithmetic the screens still do themselves (KICKOFF §6.8
+ * Data; api-integration §7): pure, so the tables, the Use popover, the
+ * movement drawer and Stock check read one set of rules. What clinozy-be
+ * derives — an item's level and runway, a purchase's status and due, a
+ * movement's change and the balance it left — is read from the API, never
+ * worked out here. The room keeps quantities ×1000 (`qtyMilli`,
+ * `usagePerWeekMilli`, `sizePerUnit`; the mapper converts the API's decimals):
+ * a tube and a half is 1500.
  */
 
 /** Stored quantities are thousandths of a unit. */
@@ -30,12 +32,6 @@ export const STOCK_LEVEL_TONES: Readonly<Record<StockLevel, Tone>> = {
   out: 'blush',
 };
 
-/** The level of `qtyMilli` against the whole-unit minimum. */
-export function stockLevel(qtyMilli: number, minQty: number): StockLevel {
-  if (qtyMilli <= 0) return 'out';
-  return qtyMilli <= toMilli(minQty) ? 'low' : 'ok';
-}
-
 /** The bar's fill: stock ÷ the maximum, a whole percent capped at 100. */
 export function stockBarPercent(qtyMilli: number, maxQty: number): number {
   if (maxQty <= 0) return qtyMilli > 0 ? 100 : 0;
@@ -51,15 +47,6 @@ export function measuredQuantity(
   return (qtyMilli / MILLI) * (sizePerUnit / MILLI);
 }
 
-/**
- * How many days the stock lasts at its weekly use: ⌊stock ÷ weekly use × 7⌋
- * (`clinic-stock.md:29`); `null` when nothing is used ("No usage").
- */
-export function lastsDays(qtyMilli: number, usagePerWeekMilli: number): number | null {
-  if (usagePerWeekMilli <= 0) return null;
-  return Math.floor((qtyMilli / usagePerWeekMilli) * 7);
-}
-
 /** The runway as the pill says it: "~5 days" up to a week, else "~6 weeks", or "No usage". */
 export type Runway =
   { kind: 'days'; count: number } | { kind: 'weeks'; count: number } | { kind: 'none' };
@@ -70,26 +57,6 @@ export function runwayOf(days: number | null): Runway {
   return days <= 7
     ? { kind: 'days', count: days }
     : { kind: 'weeks', count: Math.round(days / 7) };
-}
-
-/** A runway as the URL's Lasts filter keeps it: `d5`, `w6`, `none`. */
-export function runwayKey(runway: Runway): string {
-  if (runway.kind === 'none') return 'none';
-  return `${runway.kind === 'days' ? 'd' : 'w'}${runway.count}`;
-}
-
-/** The runway a Lasts key names — `null` for a key the filter cannot hold. */
-export function runwayFromKey(key: string): Runway | null {
-  if (key === 'none') return { kind: 'none' };
-  const match = /^([dw])(\d{1,4})$/.exec(key);
-  if (!match) return null;
-  return { kind: match[1] === 'd' ? 'days' : 'weeks', count: Number(match[2]) };
-}
-
-/** A runway's length in days — a week counts seven; `null` with no usage. */
-export function runwayDays(runway: Runway): number | null {
-  if (runway.kind === 'none') return null;
-  return runway.kind === 'days' ? runway.count : runway.count * 7;
 }
 
 /**
@@ -117,32 +84,29 @@ export const STOCK_CATEGORY_TONES: Readonly<Record<StockCategory, Tone>> = {
   other: 'stone',
 };
 
-/** A Movements row's type: the contract's, or a payment on a purchase. */
-export type StockMovementKind = StockMovementType | 'payment';
+/**
+ * A movement's type as clinozy-be names it (`type`): the five a member logs, an
+ * item's `opening` quantity and a `reverted` undo.
+ */
+export type StockMovementKind = (typeof STOCK_MOVEMENT_KINDS)[number];
 
-/** Each movement type's tone (`clinic-stock.md:61`). */
+/** Each movement type's tone (`clinic-stock.md:61`); an opening reads as stock coming in. */
 export const STOCK_MOVEMENT_TONES: Readonly<Record<StockMovementKind, Tone>> = {
   used: 'blush',
   received: 'sage',
   adjust: 'sky',
   damaged: 'butter',
   returned: 'lav',
+  opening: 'mint',
   reverted: 'stone',
-  payment: 'sky',
 };
 
-/** A purchase's settlement: Paid, Partly paid or Unpaid. */
-export type StockPurchaseStatus = 'paid' | 'partly' | 'unpaid';
+/** A purchase's settlement as clinozy-be names it (`payment_status`): Paid, Partly paid or Unpaid. */
+export type StockPurchaseStatus = (typeof STOCK_PURCHASE_STATUSES)[number];
 
 /** Each status's tone — the pill and the row's edge (`clinic-stock.md:45`). */
 export const STOCK_PURCHASE_STATUS_TONES: Readonly<Record<StockPurchaseStatus, Tone>> = {
   paid: 'sage',
-  partly: 'butter',
+  partial: 'butter',
   unpaid: 'blush',
 };
-
-/** A purchase's status from its bill and what was paid. */
-export function purchaseStatus(bill: number, paid: number): StockPurchaseStatus {
-  if (bill - paid <= 0) return 'paid';
-  return paid > 0 ? 'partly' : 'unpaid';
-}

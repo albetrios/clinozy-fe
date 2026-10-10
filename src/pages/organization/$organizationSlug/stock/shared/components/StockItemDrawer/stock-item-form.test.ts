@@ -1,22 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import type { StockItemRow } from '../../stock-contracts.ts';
+import { stockItemRow, TEST_STOCK_VENDOR_ID } from '@/tests/utils/stock-doubles.ts';
+
 import { itemFormOf, itemInputOf, newItemForm } from './stock-item-form.ts';
 
-const SOFRAMYCIN = {
-  id: 'i1',
-  seq: 167,
-  name: 'Soframycin 30 gm',
-  category: 'creams_serums',
-  unit: 'tube',
-  sizePerUnit: 30_000,
-  measureUnit: 'g',
-  qtyMilli: 2500,
-  minQty: 1,
-  maxQty: 10,
-  usagePerWeekMilli: 500,
-  vendorId: 'v1',
-} as StockItemRow;
+/** Soframycin as the API keeps it: 2.5 tubes of 30 g, half a tube a week, 1 to 10. */
+const SOFRAMYCIN = stockItemRow({ qtyMilli: 2500, maxQty: 10 });
 
 describe('the item form (clinic-stock.md:105–124)', () => {
   it('starts a new item on Consumables · pack in ml, 1 to 10, with nothing in stock', () => {
@@ -51,9 +40,15 @@ describe('the item form (clinic-stock.md:105–124)', () => {
       minQty: 1,
       maxQty: 10,
       usagePerWeekMilli: 500,
-      vendorId: 'v1',
+      vendorId: TEST_STOCK_VENDOR_ID,
       qtyMilli: 2500,
     });
+  });
+
+  it('keeps the levels as the API sent them — decimals too', () => {
+    const form = itemFormOf({ ...SOFRAMYCIN, minQty: 1.5, maxQty: 4.5 });
+    expect(form).toMatchObject({ minQty: 1.5, maxQty: 4.5 });
+    expect(itemInputOf(form)).toMatchObject({ minQty: 1.5, maxQty: 4.5 });
   });
 
   it('sends contents and their measure together, or neither', () => {

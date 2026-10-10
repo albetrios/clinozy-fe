@@ -1,20 +1,24 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { renderHook, screen, waitFor, within } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
+import { useTranslation } from 'react-i18next';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+vi.mock('../../stock-records-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  logStockMovement: vi.fn(),
+  revertStockMovement: vi.fn(),
+}));
+import { HttpError } from '@/shared/errors/HttpError.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { stockItemRow, TEST_STOCK_ITEM_ID } from '@/tests/utils/stock-doubles.ts';
 
 import {
   renderStockDrawer,
   resetStockRoutes,
 } from '../../../__tests__/integration/stock-test-router.tsx';
-import { fetchStockItem } from '../../stock-api.ts';
-import type { StockItemRow } from '../../stock-contracts.ts';
+import type { StockItemRow, StockMovementRecord } from '../../stock-contracts.ts';
+import { STOCK_DRAWER_KEYS, STOCK_DRAWERS_NS } from '../../stock-drawers.constants.ts';
+import { logStockMovement, revertStockMovement } from '../../stock-records-api.ts';
 import { StockUsePopover } from './StockUsePopover.tsx';
 
 const { notifyMock } = vi.hoisted(() => ({
@@ -33,12 +37,38 @@ vi.mock('@/shared/notify/index.ts', () => ({
 }));
 
 const P = 'stock-use-popover';
-const SOFRAMYCIN = ref.stockItem(167);
+const MOVEMENT_ID = 'smov_used0000000000000000';
 const setup = () =>
   userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
 
-const qtyOf = (id: string) =>
-  clinicFixtures.stockItems.snapshot((item) => item.id === id)[0]?.qtyMilli;
+/** A saved use as the API answers it: what it took and what it left (×1000). */
+const usedMovement = (deltaMilli: number, afterMilli: number): StockMovementRecord => ({
+  id: MOVEMENT_ID,
+  itemId: TEST_STOCK_ITEM_ID,
+  kind: 'used',
+  deltaMilli,
+  afterMilli,
+  usedFor: null,
+  note: null,
+  patientTreatmentId: null,
+  purchaseId: null,
+  stockCountId: null,
+  revertsId: null,
+  revertedById: null,
+  revertReason: null,
+  authorId: null,
+  createdAt: '2026-10-10T05:35:00.000Z',
+});
+
+/** A refusal as clinozy-be answers it. */
+const conflict = (reason: string) =>
+  new HttpError('refused', 409, '/app/stock-items/x/movements', 'POST', {
+    error: { type: 'request_error', code: 'conflict', reason, detail: 'refused' },
+  });
+
+/** The room's words for a key, as the popover says them. */
+const wordsOf = (key: string) =>
+  renderHook(() => useTranslation(STOCK_DRAWERS_NS)).result.current.t(key);
 
 /** The rows' Use buttons the popovers anchored to, removed after each test. */
 const anchors: HTMLButtonElement[] = [];
@@ -53,34 +83,38 @@ function anchorButton() {
 }
 
 /** Open the popover for `item` (Soframycin, 3 tubes of 30 g, by default). */
-async function openFor(item?: StockItemRow) {
+async function openFor(item: StockItemRow = stockItemRow()) {
   const onClose = vi.fn();
   const onMoreDetails = vi.fn();
-  const row = item ?? (await fetchStockItem(SOFRAMYCIN));
   renderStockDrawer(
     <StockUsePopover
-      item={row}
+      item={item}
       anchor={anchorButton()}
       onClose={onClose}
       onMoreDetails={onMoreDetails}
     />,
   );
-  return { popover: await screen.findByTestId(P), onClose, onMoreDetails, row };
+  return { popover: await screen.findByTestId(P), onClose, onMoreDetails, item };
 }
 
+/** The Undo the toast offered. */
+const undoOf = () =>
+  (notifyMock.undo.mock.calls[0] as [string, { onUndo: () => void }])[1].onUndo;
+
 beforeEach(() => {
+  vi.resetAllMocks();
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetClinicFixtures();
 });
 afterEach(() => {
   resetStockRoutes();
-  resetClinicFixtures();
   for (const anchor of anchors.splice(0)) anchor.remove();
 });
 
 describe('StockUsePopover (clinic-stock.md:89–103, 205–217)', () => {
-  it('opens on one unit, focused, and uses it — with Undo', async () => {
+  it('opens on one unit, focused, and uses it — "… left" the server’s — with Undo, a revert', async () => {
     const user = setup();
+    vi.mocked(logStockMovement).mockResolvedValue(usedMovement(-1000, 2000));
+    vi.mocked(revertStockMovement).mockResolvedValue(usedMovement(1000, 3000));
     const { popover, onClose } = await openFor();
     expect(popover).toHaveAccessibleName('Use Soframycin 30 gm');
     expect(popover).toHaveTextContent('In stock · 3 tube · 90 g');
@@ -96,14 +130,63 @@ describe('StockUsePopover (clinic-stock.md:89–103, 205–217)', () => {
 
     await user.click(within(popover).getByTestId(`${P}-save`));
     await waitFor(() => expect(onClose).toHaveBeenCalled());
-    expect(qtyOf(SOFRAMYCIN)).toBe(2000);
+    expect(logStockMovement).toHaveBeenCalledWith({
+      input: {
+        itemId: TEST_STOCK_ITEM_ID,
+        type: 'used',
+        quantityMilli: 1000,
+        usedFor: null,
+        note: null,
+      },
+      idempotencyKey: expect.any(String),
+    });
     expect(notifyMock.undo).toHaveBeenCalledWith(
       '1 tube of Soframycin 30 gm used · 2 tube left',
       expect.objectContaining({ onUndo: expect.any(Function) }),
     );
-    const [, options] = notifyMock.undo.mock.calls[0] as [string, { onUndo: () => void }];
-    options.onUndo();
-    await waitFor(() => expect(qtyOf(SOFRAMYCIN)).toBe(3000));
+    undoOf()();
+    await waitFor(() =>
+      expect(revertStockMovement).toHaveBeenCalledWith({
+        input: {
+          itemId: TEST_STOCK_ITEM_ID,
+          movementId: MOVEMENT_ID,
+          reason: 'mistake',
+          note: null,
+        },
+        idempotencyKey: expect.any(String),
+      }),
+    );
+    expect(notifyMock.error).not.toHaveBeenCalled();
+  });
+
+  it('an Undo refused — undone already — says so in the room’s words', async () => {
+    const user = setup();
+    vi.mocked(logStockMovement).mockResolvedValue(usedMovement(-1000, 2000));
+    vi.mocked(revertStockMovement).mockRejectedValue(conflict('already_reverted'));
+    const { popover, onClose } = await openFor();
+    await user.click(within(popover).getByTestId(`${P}-save`));
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    undoOf()();
+    await waitFor(() =>
+      expect(notifyMock.error).toHaveBeenCalledWith(
+        wordsOf(STOCK_DRAWER_KEYS.confirm.revert.blocked.alreadyReverted),
+      ),
+    );
+  });
+
+  it('a use the shelf no longer holds (`409 not_enough_stock`) stays open and says why', async () => {
+    const user = setup();
+    vi.mocked(logStockMovement).mockRejectedValue(conflict('not_enough_stock'));
+    const { popover, onClose } = await openFor();
+    await user.click(within(popover).getByTestId(`${P}-save`));
+    await waitFor(() =>
+      expect(notifyMock.error).toHaveBeenCalledWith(
+        wordsOf(STOCK_DRAWER_KEYS.movement.notEnoughStock),
+      ),
+    );
+    expect(onClose).not.toHaveBeenCalled();
+    expect(notifyMock.undo).not.toHaveBeenCalled();
+    expect(within(popover).getByTestId(`${P}-quantity`)).toHaveValue('1');
   });
 
   it('steps half a tube, picks a quick chip, and stops at what is in stock', async () => {
@@ -134,10 +217,12 @@ describe('StockUsePopover (clinic-stock.md:89–103, 205–217)', () => {
       'Enter a quantity',
     );
     expect(within(popover).getByTestId(`${P}-save`)).toBeDisabled();
+    expect(logStockMovement).not.toHaveBeenCalled();
   });
 
-  it('counts in grams, notes it with what it was for, and Enter saves', async () => {
+  it('counts in grams — the figure in its remark — with what it was for, and Enter saves', async () => {
     const user = setup();
+    vi.mocked(logStockMovement).mockResolvedValue(usedMovement(-500, 2500));
     const { popover, onClose } = await openFor();
     await user.click(within(popover).getByRole('radio', { name: 'g' }));
     const quantity = within(popover).getByTestId(`${P}-quantity`);
@@ -150,24 +235,33 @@ describe('StockUsePopover (clinic-stock.md:89–103, 205–217)', () => {
 
     await user.type(quantity, '{Enter}');
     await waitFor(() => expect(onClose).toHaveBeenCalled());
-    expect(qtyOf(SOFRAMYCIN)).toBe(2500);
-    expect(
-      clinicFixtures.stockMovements
-        .snapshot((movement) => movement.itemId === SOFRAMYCIN)
-        .at(-1),
-    ).toMatchObject({ type: 'used', usedFor: 'Peel · 15 g' });
+    expect(logStockMovement).toHaveBeenCalledWith({
+      input: {
+        itemId: TEST_STOCK_ITEM_ID,
+        type: 'used',
+        quantityMilli: 500,
+        usedFor: 'Peel',
+        note: '15 g',
+      },
+      idempotencyKey: expect.any(String),
+    });
+    expect(notifyMock.undo).toHaveBeenCalledWith(
+      '15 g of Soframycin 30 gm used · 2.5 tube left',
+      expect.anything(),
+    );
   });
 
   it('"More details" hands the item to the Log usage drawer', async () => {
     const user = setup();
-    const { popover, onMoreDetails, row } = await openFor();
+    const { popover, onMoreDetails, item } = await openFor();
     await user.click(within(popover).getByTestId(`${P}-more-details`));
-    expect(onMoreDetails).toHaveBeenCalledWith(row);
+    expect(onMoreDetails).toHaveBeenCalledWith(item);
   });
 
   it('an item without contents counts in units only', async () => {
-    const item = await fetchStockItem(SOFRAMYCIN);
-    const { popover } = await openFor({ ...item, sizePerUnit: null, measureUnit: null });
+    const { popover } = await openFor(
+      stockItemRow({ sizePerUnit: null, measureUnit: null }),
+    );
     expect(within(popover).queryByTestId(`${P}-mode`)).not.toBeInTheDocument();
     expect(popover).toHaveTextContent('In stock · 3 tube');
   });

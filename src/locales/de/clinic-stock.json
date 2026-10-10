@@ -10,8 +10,12 @@
     "vendors": "Händler"
   },
   "search": {
-    "placeholder": "Artikel, Kategorie oder Lieferant suchen…",
-    "label": "Im Bestand suchen"
+    "label": "Im Bestand suchen",
+    "placeholder": {
+      "items": "Artikelname oder #ID suchen…",
+      "purchases": "Rechnung, #ID oder Lieferant suchen…",
+      "vendors": "Händlername suchen…"
+    }
   },
   "create": {
     "item": "Neuer Artikel",
@@ -26,7 +30,11 @@
     "category": "Kategorie",
     "lasts": "Reicht",
     "status": "Status",
-    "type": "Typ"
+    "type": "Typ",
+    "lastsWithin": {
+      "week": "Innerhalb einer Woche",
+      "three_weeks": "Innerhalb von 3 Wochen"
+    }
   },
   "table": {
     "addPhone": "Telefon hinzufügen",
@@ -97,7 +105,8 @@
       "category": "Kategorie",
       "stock": "Bestand",
       "lasts": "Reicht",
-      "vendor": "Lieferant"
+      "vendor": "Lieferant",
+      "lastRate": "Letzter Preis"
     },
     "sub": "pro {{unit}} · Verbrauch ~{{usage}}/Woche",
     "subContents": "pro {{unit}} zu {{contents}} · Verbrauch ~{{usage}}/Woche",
@@ -126,13 +135,20 @@
     },
     "statuses": {
       "paid": "Bezahlt",
-      "partly": "Teilweise bezahlt",
-      "unpaid": "Unbezahlt"
+      "unpaid": "Unbezahlt",
+      "partial": "Teilweise bezahlt"
     },
     "rowActions": {
       "edit": "Bearbeiten",
-      "delete": "Löschen",
-      "pay": "{{amount}} zahlen"
+      "delete": "Löschen"
+    },
+    "vendorFilter": {
+      "any": "Beliebiger Lieferant",
+      "count_one": "{{count}} Lieferant",
+      "count_other": "{{count}} Lieferanten",
+      "search": "Lieferanten suchen",
+      "noMatch": "Kein Treffer",
+      "clear": "Löschen"
     }
   },
   "movements": {
@@ -153,14 +169,23 @@
       "damaged": "Beschädigt",
       "returned": "Zurückgegeben",
       "reverted": "Storniert",
-      "payment": "Zahlung"
+      "opening": "Anfangsbestand"
     },
     "reverted": "Storniert",
-    "purchase": "Einkauf #{{seq}}",
-    "paymentSub": "{{purchase}} · {{billNo}}",
+    "purchase": "Aus Einkauf #{{seq}}",
     "change": "{{sign}} {{amount}}",
     "rowActions": {
       "revert": "Rückgängig machen"
+    },
+    "purchaseBill": "Aus Einkauf #{{seq}} · Rechnung {{billNo}}",
+    "deletedItem": "Gelöschter Artikel",
+    "itemFilter": {
+      "any": "Jeder Artikel",
+      "search": "Artikel suchen",
+      "noMatch": "Kein Treffer",
+      "clear": "Leeren",
+      "count_one": "{{count}} Artikel",
+      "count_other": "{{count}} Artikel"
     }
   },
   "vendors": {
@@ -178,8 +203,7 @@
     "noPurchases": "Keine Einkäufe",
     "rowActions": {
       "edit": "Bearbeiten",
-      "delete": "Löschen",
-      "pay": "{{amount}} zahlen"
+      "delete": "Löschen"
     }
   },
   "drawers": {
@@ -231,7 +255,8 @@
         "vendor": "Lieferant"
       },
       "save": "Artikel hinzufügen",
-      "saved": "Artikel gespeichert"
+      "saved": "Artikel gespeichert",
+      "nameTaken": "Ein Artikel mit diesem Namen existiert bereits"
     },
     "quickItem": {
       "title": "Neuer Praxisartikel",
@@ -255,7 +280,8 @@
       },
       "save": "Händler hinzufügen",
       "added": "Händler {{name}} hinzugefügt",
-      "saved": "Händler gespeichert"
+      "saved": "Händler gespeichert",
+      "nameTaken": "Ein Händler mit diesem Namen existiert bereits"
     },
     "movement": {
       "title": {
@@ -286,7 +312,8 @@
       "summary": "{{name}} · {{change}}",
       "enterQuantity": "Geben Sie eine Menge ein",
       "onlyInStock": "Nur {{quantity}} auf Lager",
-      "saved": "{{type}} gespeichert · noch {{quantity}}"
+      "saved": "{{type}} gespeichert · noch {{quantity}}",
+      "notEnoughStock": "So viel ist nicht mehr auf Lager — inzwischen wurde etwas verbraucht. Prüfe den Bestand und versuche es erneut."
     },
     "use": {
       "label": "{{name}} verbrauchen",
@@ -339,7 +366,14 @@
         "peek_other": "{{count}} Artikel · {{amount}}",
         "quickLine": "Artikel und Menge eingeben · z. B. gloves 10 @250",
         "quickHint": "10 = Menge · @250 = Preis",
-        "lowStockChip": "{{name}} · noch {{quantity}}"
+        "lowStockChip": "{{name}} · noch {{quantity}}",
+        "mode": "Zahlungsart",
+        "branch": "Bezahlt von",
+        "paidSoFar": "{{amount}} bezahlt · {{status}}",
+        "moreThanBill": "Bezahlt ist mehr als die Rechnung",
+        "dayClosed": "Der Tag dieser Filiale ist abgeschlossen – heute kann von hier nichts bezahlt werden",
+        "addLine": "Füge mindestens einen Artikel hinzu",
+        "tooManyLines": "Ein Einkauf umfasst höchstens {{max}} Artikel"
       },
       "save": "Einkauf anlegen",
       "pickSupplier": "Wählen Sie einen Lieferanten",
@@ -370,7 +404,8 @@
       "save": "Zählung speichern",
       "failed": "Nicht gespeichert · Ihre Zählung bleibt erhalten",
       "saved_one": "Inventur gespeichert · {{count}} Artikel aktualisiert",
-      "saved_other": "Inventur gespeichert · {{count}} Artikel aktualisiert"
+      "saved_other": "Inventur gespeichert · {{count}} Artikel aktualisiert",
+      "empty": "Noch keine Artikel zum Zählen"
     },
     "confirm": {
       "deleteItem": "Diesen Artikel löschen?",
@@ -390,7 +425,17 @@
           "wrongQty": "Falsche Menge"
         },
         "done": "{{type}} rückgängig gemacht · {{name}} wieder bei {{quantity}}",
-        "note": "Hebt „{{type}}“ ({{when}}) auf · {{reason}}"
+        "note": "Hebt „{{type}}“ ({{when}}) auf · {{reason}}",
+        "blocked": {
+          "alreadyReverted": "Diese Bewegung wurde bereits rückgängig gemacht",
+          "notEnoughStock": "Es ist nicht mehr genug auf Lager, um diesen Eintrag rückgängig zu machen"
+        }
+      },
+      "blocked": {
+        "itemHasStock": "Nur ein Artikel ohne Bestand kann gelöscht werden – korrigiere ihn zuerst auf 0",
+        "purchasePaid": "Ein Einkauf, auf den schon gezahlt wurde, kann nicht gelöscht werden",
+        "vendorHasDues": "Begleiche zuerst die Einkäufe dieses Lieferanten",
+        "stockUsed": "Ein Teil dieses Einkaufs wurde inzwischen verbraucht – er kann nicht zurückgenommen werden"
       }
     }
   }
