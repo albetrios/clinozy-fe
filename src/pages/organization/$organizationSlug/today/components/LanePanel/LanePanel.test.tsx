@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
+import i18n from '@/lib/i18n/i18n.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
@@ -14,9 +15,16 @@ import {
 
 /** A row's id for the tests. */
 const rowId = (n: number) => publicId('appt', n);
+import { useCheckoutDues } from '../../hooks/useCheckoutDues/index.ts';
 import { rememberVisitCard, takeVisitCard } from '../../today.focus.ts';
 import { groupTodayLanes, type TodayCard } from '../../today.lanes.ts';
 import { LanePanel, type LanePanelProps } from './LanePanel.tsx';
+
+/** Today's open bills by person — its own read is `useCheckoutDues`' to test. */
+const dues = vi.hoisted(() => ({ byContact: new Map<string, number>() }));
+vi.mock('../../hooks/useCheckoutDues/index.ts', () => ({
+  useCheckoutDues: vi.fn(() => dues.byContact),
+}));
 
 /** 10:42 in the clinic (IST) on the seed day. */
 const NOW = new Date('2026-10-03T05:12:00.000Z');
@@ -48,6 +56,12 @@ const LANES = groupTodayLanes(
       visitStage: 'with_doctor',
       startTime: '09:50',
     }),
+    floorRow({
+      id: rowId(5),
+      status: 'checked_in',
+      visitStage: 'checkout',
+      startTime: '09:20',
+    }),
   ],
   [enquiry({ id: rowId(3) })],
 );
@@ -67,7 +81,11 @@ function renderPanel(props: Partial<LanePanelProps> = {}) {
 }
 
 const initialHourCycle = useLocaleStore.getState().hourCycle;
-beforeEach(() => useLocaleStore.setState({ hourCycle: 'h23' }));
+beforeEach(() => {
+  useLocaleStore.setState({ hourCycle: 'h23' });
+  dues.byContact = new Map();
+  vi.mocked(useCheckoutDues).mockClear();
+});
 afterEach(() => useLocaleStore.setState({ hourCycle: initialHourCycle }));
 
 describe('LanePanel (KICKOFF §6.2 Selected lane panel, Visit cards)', () => {
@@ -105,6 +123,37 @@ describe('LanePanel (KICKOFF §6.2 Selected lane panel, Visit cards)', () => {
     );
     expect(asked).toHaveTextContent('WhatsApp');
     expect(asked).toHaveTextContent('New lead');
+  });
+
+  it('says what a Checkout card owes on today’s bills, read once for the lane', async () => {
+    // The flag's words, as the locale spec adds them.
+    i18n.addResource('en', 'today', 'flags.toPay', '{{amount}} to pay');
+    const [checkout] = LANES.checkout;
+    if (checkout?.kind !== 'booking') throw new Error('no checkout card');
+    dues.byContact = new Map([[checkout.row.contactId, 1500.5]]);
+    renderPanel({ lane: 'checkout', cards: LANES.checkout });
+    const card = await screen.findByTestId('today-card');
+    expect(card).toHaveTextContent('₹1,500.50 to pay');
+    expect(useCheckoutDues).toHaveBeenLastCalledWith({
+      enabled: true,
+      today: '2026-10-03',
+    });
+  });
+
+  it('reads no bills outside Checkout, nor while the floor loads', async () => {
+    const { unmount } = renderPanel();
+    await screen.findByTestId('today-card');
+    expect(useCheckoutDues).toHaveBeenLastCalledWith({
+      enabled: false,
+      today: '2026-10-03',
+    });
+    unmount();
+    renderPanel({ lane: 'checkout', cards: LANES.checkout, loading: true });
+    await screen.findByTestId('today-panel');
+    expect(useCheckoutDues).toHaveBeenLastCalledWith({
+      enabled: false,
+      today: '2026-10-03',
+    });
   });
 
   it('opens the person from the name area and runs the lane action', async () => {

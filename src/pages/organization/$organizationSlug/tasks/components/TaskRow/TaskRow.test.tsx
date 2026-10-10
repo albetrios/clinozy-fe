@@ -5,16 +5,40 @@ import { describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import { PRODUCT_NAME } from '@/lib/product-identity.ts';
+import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
 import type { TaskRow as TaskRowRecord } from '@/shared/api/clinic/tasks-contracts.ts';
 import { fsi } from '@/tests/utils/bidi-marks.ts';
-import { ASHA, RIYA, taskRowFixture } from '@/tests/utils/task-row-fixture.ts';
+import { taskPerson, taskRow, TEST_TASK_MEMBER_ID } from '@/tests/utils/task-doubles.ts';
 
-import { TaskRow, type TaskRowProps } from './TaskRow.tsx';
+import { TaskRow, type TaskRowProps, type TaskRowTeam } from './TaskRow.tsx';
 
 vi.mock('@/shared/hooks/useCanHover/index.ts', () => ({ useCanHover: () => true }));
 
-/** 10:30 in the clinic on Sun 4 Oct 2026; the fixture is due at 10:50. */
-const NOW = new Date('2026-10-04T05:00:00.000Z');
+/** 01:30 in the clinic on Sat 10 Oct 2026; the reply task was due at 02:01. */
+const NOW = new Date('2026-10-09T20:00:00.000Z');
+
+const member = (id: string, name: string, initials: string): DirectoryMember => ({
+  id,
+  userId: `usr_${id}`,
+  name,
+  initials,
+  tone: 'sky',
+  roleIds: [],
+  branchIds: [],
+});
+
+/** The front desk member signed in, and a counsellor. */
+const RIYA = member(TEST_TASK_MEMBER_ID, 'Riya Shah', 'RS');
+const ASHA = member('mem_asha', 'Asha Mehta', 'AM');
+
+const TEAM: TaskRowTeam = {
+  byId: new Map([
+    [RIYA.id, RIYA],
+    [ASHA.id, ASHA],
+  ]),
+  myMembershipId: RIYA.id,
+  updatedAt: null,
+};
 
 /** The row inside the table and row group the list gives it. */
 function Table({ children }: { children: ReactNode }) {
@@ -25,45 +49,63 @@ function Table({ children }: { children: ReactNode }) {
   );
 }
 
+function rowProps(row: TaskRowRecord, props: Partial<TaskRowProps> = {}): TaskRowProps {
+  return {
+    row,
+    due: 'in 31 min',
+    now: NOW,
+    handled: false,
+    team: TEAM,
+    onOpen: vi.fn(),
+    ...props,
+  };
+}
+
 function renderRow(row: TaskRowRecord, props: Partial<TaskRowProps> = {}) {
-  const onOpen = vi.fn();
+  const all = rowProps(row, props);
   const view = render(
     <Table>
-      <TaskRow
-        row={row}
-        due="in 20 min"
-        now={NOW}
-        handled={false}
-        onOpen={onOpen}
-        {...props}
-      />
+      <TaskRow {...all} />
     </Table>,
   );
-  return { ...view, onOpen, row: screen.getByTestId('tasks-row') };
+  const rerenderRow = (next: TaskRowRecord, patch: Partial<TaskRowProps> = {}) =>
+    view.rerender(
+      <Table>
+        <TaskRow {...rowProps(next, patch)} />
+      </Table>,
+    );
+  return {
+    ...view,
+    rerenderRow,
+    onOpen: all.onOpen,
+    row: screen.getByTestId('tasks-row'),
+  };
 }
+
+const cells = () => within(screen.getByTestId('tasks-row')).getAllByRole('cell');
 
 describe('TaskRow (tasks.md:24–38)', () => {
   it('lays out the five cells: tile · title and why · person and source · owner · due', () => {
-    const { row } = renderRow(taskRowFixture());
-    const cells = within(row).getAllByRole('cell');
-    expect(cells).toHaveLength(5);
-    expect(cells[1]).toHaveTextContent('Confirm Priti’s visit');
-    expect(cells[1]).toHaveTextContent('Laser session not confirmed');
-    expect(cells[2]).toHaveTextContent('Priti Soni');
-    expect(cells[2]).toHaveTextContent('Appt #2848');
-    expect(cells[3]).toHaveTextContent('Riya S.');
-    expect(cells[4]).toHaveTextContent('in 20 min');
-    // The edge takes the rule's tone; the tile its surface (Confirm visits: sky).
-    expect(row).toHaveClass('border-s-tone-sky-dot');
-    expect(cells[0]).toHaveClass('bg-tone-sky');
-    // A patient: the sage avatar with the "P" badge.
-    expect(
-      within(cells[2] as HTMLElement).getByTestId('patient-badge'),
-    ).toBeInTheDocument();
+    const { row } = renderRow(taskRow());
+    expect(cells()).toHaveLength(5);
+    expect(cells()[1]).toHaveTextContent('Reply to Anaya');
+    expect(cells()[1]).toHaveTextContent('Their message is waiting for a reply');
+    expect(cells()[2]).toHaveTextContent('Anaya Desai');
+    expect(cells()[4]).toHaveTextContent('in 31 min');
+    expect(row).toHaveAttribute('data-type', 'reply');
+    expect(row).toHaveAttribute('data-task-id', 'task_h7etxlhnxwzy1e2dxrins');
+    // The edge takes the type's tone; the tile its surface (Unreplied messages: lav).
+    expect(row).toHaveClass('border-s-tone-lav-dot');
+    expect(cells()[0]).toHaveClass('bg-tone-lav');
+    // A lead's person: the lav avatar, no "P" badge; the chip names the linked lead.
+    expect(within(cells()[2] as HTMLElement).queryByTestId('patient-badge')).toBeNull();
+    const chip = within(cells()[2] as HTMLElement).getByText(/Lead/);
+    expect(chip).toHaveAttribute('data-source', 'lead');
+    expect(chip).toHaveClass('text-tone-lav-foreground');
   });
 
   it('turns the edge and the due label red when overdue', () => {
-    const { row } = renderRow(taskRowFixture({ dueAt: '2026-10-04T04:20:00.000Z' }), {
+    const { row } = renderRow(taskRow({ dueAt: '2026-10-09T19:20:00.000Z' }), {
       due: '40 min overdue',
     });
     expect(row).toHaveClass('border-s-now-indicator');
@@ -74,90 +116,140 @@ describe('TaskRow (tasks.md:24–38)', () => {
     );
   });
 
-  it('marks a rule handed to the product, and shows a Done row’s result instead', () => {
-    const { rerender } = renderRow(taskRowFixture(), { handled: true });
+  it('marks a rule handed to the product, and shows a member’s Done result instead', () => {
+    const { rerenderRow } = renderRow(taskRow(), { handled: true });
     expect(screen.getByText(`${PRODUCT_NAME} can do this`)).toBeInTheDocument();
-    rerender(
-      <Table>
-        <TaskRow
-          row={taskRowFixture({
-            status: 'done',
-            result: 'Confirmed on call',
-            resolvedBy: 'member',
-          })}
-          due="Done · Now"
-          now={NOW}
-          handled
-          onOpen={vi.fn()}
-        />
-      </Table>,
+    rerenderRow(
+      taskRow({
+        status: 'done',
+        outcome: 'done',
+        resultText: 'Booked a visit',
+        resolvedAt: '2026-10-09T19:59:40.000Z',
+        resolvedById: RIYA.id,
+      }),
+      { due: 'Done · Now', handled: true },
     );
     expect(screen.queryByText(`${PRODUCT_NAME} can do this`)).toBeNull();
-    expect(screen.getByText('✓ Confirmed on call')).toHaveClass('text-success-strong');
+    expect(screen.getByText('✓ Booked a visit')).toHaveClass('text-success-strong');
     expect(screen.getByTestId('tasks-row')).toHaveClass('border-s-border');
     expect(screen.getByText('Done · Now')).toHaveClass('text-muted-foreground');
   });
 
-  it('reads "Anyone" without an owner, and "· was <first>" after a reassign', () => {
-    const { rerender } = renderRow(taskRowFixture({ owner: null, ownerId: null }));
-    expect(screen.getByText('Anyone')).toHaveClass('bg-tone-butter');
-    rerender(
-      <Table>
-        <TaskRow
-          row={taskRowFixture({ owner: ASHA, previousOwners: [RIYA] })}
-          due="in 20 min"
-          now={NOW}
-          handled={false}
-          onOpen={vi.fn()}
-        />
-      </Table>,
+  it('reads a task the server closed by its due cell alone — no "✓ Done by <product>" twice', () => {
+    renderRow(
+      taskRow({
+        status: 'done',
+        outcome: 'done',
+        resultText: `Done by ${PRODUCT_NAME}`,
+        isResolvedAutomatically: true,
+      }),
+      { due: `Done by ${PRODUCT_NAME}` },
+    );
+    expect(screen.queryByText(`✓ Done by ${PRODUCT_NAME}`)).toBeNull();
+    expect(cells()[4]).toHaveTextContent(`Done by ${PRODUCT_NAME}`);
+  });
+
+  it('names a member owner from the team, "(you)" for the signed-in member', () => {
+    const { rerenderRow } = renderRow(taskRow({ ownerId: ASHA.id, ownerRole: null }));
+    expect(cells()[3]).toHaveTextContent('Asha M.');
+    // A lone name reads in its own direction.
+    expect(screen.getByText('Asha M.')).toHaveAttribute('dir', 'auto');
+    rerenderRow(taskRow({ ownerId: RIYA.id, ownerRole: null }));
+    expect(cells()[3]).toHaveTextContent('Riya S. (you)');
+  });
+
+  it('reads the role queue an unowned task waits in, and "Anyone" without one', () => {
+    const { rerenderRow } = renderRow(
+      taskRow({ ownerId: null, ownerRole: 'front_desk' }),
+    );
+    const queue = within(cells()[3] as HTMLElement).getByText('Front desk');
+    expect(queue.closest('[data-owner="queue"]')).toHaveClass('bg-tone-butter');
+    rerenderRow(taskRow({ ownerId: null, ownerRole: null }));
+    expect(screen.getByText('Anyone').closest('[data-owner="queue"]')).toHaveClass(
+      'bg-tone-butter',
+    );
+  });
+
+  it('adds "· was <first>" after a move — from a member or from a queue', () => {
+    const move = {
+      toId: ASHA.id,
+      toRole: null,
+      changedById: RIYA.id,
+      at: '2026-10-09T19:00:00.000Z',
+    };
+    const { rerenderRow } = renderRow(
+      taskRow({
+        ownerId: ASHA.id,
+        ownerRole: null,
+        ownerChanges: [{ ...move, fromId: RIYA.id, fromRole: null }],
+      }),
     );
     // Both names isolated: "Asha M." keeps its full stop at its end on a right-to-left page.
     expect(
       screen.getByText(`${fsi('Asha M.')} · was ${fsi('Riya')}`),
     ).toBeInTheDocument();
+    rerenderRow(
+      taskRow({
+        ownerId: ASHA.id,
+        ownerRole: null,
+        ownerChanges: [{ ...move, fromId: null, fromRole: 'front_desk' }],
+      }),
+    );
+    expect(
+      screen.getByText(`${fsi('Asha M.')} · was ${fsi('Front desk')}`),
+    ).toBeInTheDocument();
   });
 
-  it('reads a lone owner’s name in its own direction', () => {
-    renderRow(taskRowFixture({ owner: ASHA }));
-    expect(screen.getByText('Asha M.')).toHaveAttribute('dir', 'auto');
+  it('leaves the owner cell empty for a member no longer on the team', () => {
+    renderRow(taskRow({ ownerId: 'mem_gone', ownerRole: null }));
+    expect(cells()[3]).toBeEmptyDOMElement();
   });
 
-  it('names a lead’s, a treatment’s and a chat-only person’s source in its ink', () => {
-    const { rerender } = renderRow(
-      taskRowFixture({ source: { kind: 'lead', id: null, seq: 2363 } }),
+  it('shows a patient with the "P" badge, and names the record kind or the person', () => {
+    const { rerenderRow } = renderRow(
+      taskRow({
+        type: 'aftercare',
+        ruleKey: 'aftercare',
+        link: { kind: 'treatment', id: 'ptr_one' },
+        person: taskPerson(),
+      }),
     );
-    expect(screen.getByText('Lead #2363')).toHaveClass('text-tone-lav-foreground');
-    rerender(
-      <Table>
-        <TaskRow
-          row={taskRowFixture({ source: { kind: 'treatment', id: null, seq: null } })}
-          due="in 20 min"
-          now={NOW}
-          handled={false}
-          onOpen={vi.fn()}
-        />
-      </Table>,
-    );
+    expect(
+      within(cells()[2] as HTMLElement).getByTestId('patient-badge'),
+    ).toBeInTheDocument();
     expect(screen.getByText('Treatment')).toHaveClass('text-tone-mint-foreground');
-    rerender(
-      <Table>
-        <TaskRow
-          row={taskRowFixture({ source: { kind: 'contact', id: null, seq: null } })}
-          due="in 20 min"
-          now={NOW}
-          handled={false}
-          onOpen={vi.fn()}
-        />
-      </Table>,
+    // A task with no record link names what its person is — here a chat-only contact.
+    rerenderRow(
+      taskRow({
+        type: 'by_hand',
+        ruleKey: null,
+        kind: 'manual',
+        link: null,
+        person: taskPerson({ patientId: null, patientNumber: null }),
+      }),
     );
     expect(screen.getByText('Contact')).toHaveClass('text-tone-sage-foreground');
+    expect(screen.getByTestId('tasks-row')).toHaveClass('border-s-tone-plum-dot');
+  });
+
+  it('shows the chip alone for a task about nobody', () => {
+    renderRow(
+      taskRow({
+        type: 'medical_rep_visit',
+        ruleKey: 'medical_rep_visit',
+        contact: null,
+        person: null,
+        link: { kind: 'medicalRep', id: 'mrep_one' },
+      }),
+    );
+    expect(within(cells()[2] as HTMLElement).queryByRole('button')).toBeNull();
+    expect(cells()[2]?.querySelector('[data-source="medicalRep"]')).not.toBeNull();
   });
 
   it('opens on a click, Enter or Space — and is focusable', async () => {
     const user = userEvent.setup();
-    const { row, onOpen } = renderRow(taskRowFixture());
-    await user.click(within(row).getByText('Confirm Priti’s visit'));
+    const { row, onOpen } = renderRow(taskRow());
+    await user.click(within(row).getByText('Reply to Anaya'));
     expect(onOpen).toHaveBeenCalledTimes(1);
     row.focus();
     await user.keyboard('{Enter}');
@@ -166,7 +258,9 @@ describe('TaskRow (tasks.md:24–38)', () => {
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = renderRow(taskRowFixture(), { handled: true });
+    const { container } = renderRow(taskRow({ ownerId: RIYA.id, ownerRole: null }), {
+      handled: true,
+    });
     expect(await axe(container)).toHaveNoViolations();
   });
 });

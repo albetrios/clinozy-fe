@@ -1,8 +1,9 @@
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import {
-  type CreateTaskInput,
   TASK_FOLLOW_UP_SPANS,
+  type TaskFields,
   type TaskFollowUpWhen,
+  type TaskRecord,
   taskTimeAfter,
 } from '@/shared/api/clinic/tasks-contracts.ts';
 
@@ -36,48 +37,60 @@ export interface WhatsNextForm {
   note: string;
 }
 
+/** A required pick of the form. */
+export type WhatsNextRequired = 'step' | 'when' | 'ownerId';
+
 /** The form as it opens: nothing picked, the member assigned. */
 export function emptyWhatsNextForm(): WhatsNextForm {
   return { step: null, when: null, ownerId: null, note: '' };
 }
 
-/** The required picks still missing, in the form's order. */
-export function whatsNextMissing(form: WhatsNextForm): ('step' | 'when')[] {
-  const missing: ('step' | 'when')[] = [];
+/** The required picks still missing, in the form's order — the owner being the one in effect. */
+export function whatsNextMissing(
+  form: WhatsNextForm,
+  ownerId: string | null,
+): WhatsNextRequired[] {
+  const missing: WhatsNextRequired[] = [];
   if (!form.step) missing.push('step');
   if (!form.when) missing.push('when');
+  if (!ownerId) missing.push('ownerId');
   return missing;
 }
 
 /**
- * The follow-up the form creates (`createTask`, S:1727): a "Follow-ups you set"
- * task after the closed one — its source copied — titled "<step> · <first>",
- * due in 3 h, tomorrow 11:00, in 3 or 7 days; its why line the note, else
- * "Planned after: <task> · <result>". Null while a pick is missing.
+ * The follow-up the form creates (`POST /app/tasks`, research-tasks Q2 — the
+ * second of two steps, after the close): a task made by hand for the closed
+ * task's person and record — so it files under the same branch — titled
+ * "<step> · <first>", due in 3 h, tomorrow 11:00, in 3 or 7 days from `now`;
+ * its why line the note, else "Planned after: <task> · <result>"; for the
+ * member picked (the member themself by default), at normal priority. Null
+ * while a pick is missing.
  */
-export function whatsNextInputOf(
+export function whatsNextFieldsOf(
   form: WhatsNextForm,
   {
-    followsTaskId,
+    closed,
     ownerId,
     title,
     plannedAfter,
     now,
   }: {
-    followsTaskId: string;
+    /** The task just closed — its person and the record it points at. */
+    closed: Pick<TaskRecord, 'contact' | 'link'>;
     ownerId: string | null;
     title: string;
     plannedAfter: string;
     now: Date;
   },
-): CreateTaskInput | null {
-  if (!(form.step && form.when)) return null;
+): TaskFields | null {
+  if (!(form.step && form.when && ownerId)) return null;
   return {
     title,
     why: form.note.trim() || plannedAfter,
-    ownerId,
     dueAt: taskTimeAfter(TASK_FOLLOW_UP_SPANS[form.when], now),
-    rule: 'manual',
-    followsTaskId,
+    assignee: { membershipId: ownerId },
+    priority: 'normal',
+    contactId: closed.contact?.id ?? null,
+    link: closed.link,
   };
 }

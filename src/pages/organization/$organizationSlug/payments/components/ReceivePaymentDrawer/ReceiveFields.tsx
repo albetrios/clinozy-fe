@@ -1,9 +1,9 @@
+import type { TFunction } from 'i18next';
 import { Controller, type UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { Branch } from '@/shared/api/clinic/clinic-schema.ts';
-import type { OpenInvoice } from '@/shared/api/clinic/payments-contracts.ts';
+import type { Branch, InvoiceType } from '@/shared/api/clinic/clinic-schema.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import {
   DrawerChips,
@@ -26,8 +26,24 @@ import type { ReceiveFormValues } from './receive-form.ts';
 
 const K = PAYMENTS_KEYS.receive;
 
-/** Reference and Note limits — the contract's (`payments-contracts`). */
-const LIMITS = { reference: 30, note: 280 } as const;
+/** Reference and Note limits — the API's (`reference` ≤ 60, `note` ≤ 280). */
+const LIMITS = { reference: 60, note: 280 } as const;
+
+/** An invoice the receipt can be against: its number, its type and its due (paise). */
+export interface ReceiveInvoiceChoice {
+  id: string;
+  seq: number;
+  type: InvoiceType;
+  due: number;
+}
+
+/** The invoice field's state: the choices, their read failing (with Retry), or a fixed receipt's. */
+export type ReceiveInvoices =
+  | { kind: 'choices'; choices: readonly ReceiveInvoiceChoice[] }
+  /** No patient picked yet. */
+  | { kind: 'waiting' }
+  /** The open invoices' read failed: Retry reads them again. */
+  | { kind: 'failed'; retry: () => void };
 
 /** Props of {@link ReceiveFields}. */
 export interface ReceiveFieldsProps {
@@ -37,15 +53,16 @@ export interface ReceiveFieldsProps {
   testId: string;
   /** The branches to choose from — the field shows with two or more. */
   branches: readonly Pick<Branch, 'id' | 'name' | 'tone'>[];
-  /** The picked patient's open invoices, oldest first; null while none is picked. */
-  invoices: readonly OpenInvoice[] | null;
-  /** The due the rows may reach — the picked invoice's; null without one. */
+  /** The picked patient's open invoices, oldest first — or the edited receipt's own. */
+  invoices: ReceiveInvoices;
+  /** The due the rows may reach — the picked invoice's, in paise; null without one (an advance). */
   due: number | null;
   /** An edit: the patient and the invoice are the entry's. */
   editing: boolean;
   readOnly: boolean;
   onPatient: (patient: PatientPick | null) => void;
-  onInvoice: (invoice: OpenInvoice) => void;
+  /** An invoice picked — or none: an advance. */
+  onInvoice: (invoice: ReceiveInvoiceChoice | null) => void;
 }
 
 /** "Pick the patient first" / "Nothing due": the inert chip the invoice field shows instead. */
@@ -61,30 +78,61 @@ function InertChip({ label, testId }: { label: string; testId: string }) {
   );
 }
 
-/** "Against invoice": the open invoices as chips, peach once picked, each typed in its tooltip. */
+/** The open invoices' read failed: the field says so, with Retry in place. */
+function RetryChip({ onRetry, testId }: { onRetry: () => void; testId: string }) {
+  const { t } = useTranslation(PAYMENTS_NS);
+  const { t: tClinic } = useTranslation(CLINIC_NS);
+  return (
+    <span className="flex flex-wrap items-center gap-2" data-testid={testId}>
+      <span className="text-caption text-destructive">{t(K.invoicesFailed)}</span>
+      <button
+        type="button"
+        onClick={onRetry}
+        data-testid={`${testId}-retry`}
+        className="text-caption text-foreground font-medium underline underline-offset-2"
+      >
+        {tClinic(CLINIC_KEYS.lists.retry)}
+      </button>
+    </span>
+  );
+}
+
+/**
+ * "Against invoice": the open invoices as chips, peach once picked, each typed in its tooltip;
+ * the picked one again clears it — an advance.
+ */
 function InvoiceChips({
   invoices,
   picked,
   onPick,
   disabled,
+  editing,
   testId,
 }: {
-  invoices: readonly OpenInvoice[] | null;
+  invoices: ReceiveInvoices;
   picked: string | null;
-  onPick: (invoice: OpenInvoice) => void;
+  onPick: (invoice: ReceiveInvoiceChoice | null) => void;
   disabled: boolean;
+  editing: boolean;
   testId: string;
 }) {
   const { t } = useTranslation(PAYMENTS_NS);
   const { t: tClinic } = useTranslation(CLINIC_NS);
   const formatPaise = usePaiseFormat();
-  if (invoices === null)
+  if (invoices.kind === 'waiting') {
     return <InertChip label={t(K.pickPatientFirst)} testId={testId} />;
-  if (invoices.length === 0) return <InertChip label={t(K.nothingDue)} testId={testId} />;
+  }
+  if (invoices.kind === 'failed') {
+    return <RetryChip onRetry={invoices.retry} testId={testId} />;
+  }
+  const { choices } = invoices;
+  if (choices.length === 0) {
+    return <InertChip label={t(editing ? K.advance : K.nothingDue)} testId={testId} />;
+  }
   return (
     <DrawerChips
       label={t(K.invoice)}
-      options={invoices.map((invoice) => ({
+      options={choices.map((invoice) => ({
         value: invoice.id,
         label: t(K.invoiceChip, {
           id: displayId.invoiceNumber(invoice.seq),
@@ -94,22 +142,34 @@ function InvoiceChips({
         hint: tClinic(CLINIC_KEYS.invoiceTypes[invoice.type]),
       }))}
       value={picked}
-      onChange={(id) => {
-        const invoice = invoices.find((open) => open.id === id);
-        if (invoice) onPick(invoice);
-      }}
+      clearable
+      onChange={(id) => onPick(choices.find((choice) => choice.id === id) ?? null)}
       disabled={disabled}
       testId={testId}
     />
   );
 }
 
+/** The total under the rows: "Total ₹8,550", "· due ₹8,550" against an invoice, "· advance" without. */
+function totalLabel(
+  values: ReceiveFormValues,
+  due: number | null,
+  t: TFunction,
+  formatPaise: (paise: number) => string,
+): string {
+  const total = formatPaise(splitsTotal(values.splits));
+  if (due !== null) return t(K.totalDue, { total, due: formatPaise(due) });
+  return values.contactId && values.invoiceId === null
+    ? t(K.totalAdvance, { total })
+    : t(K.total, { total });
+}
+
 /**
  * Receive payment's one section, "Who is paying" (`payments.md:95–104`;
  * H:5069–5071): Branch (with two or more open branches) · Patient (only
  * patients, with their dues) · Against invoice (the open ones, peach once
- * picked) · Amount received (Mode · Amount rows, "+ Split · add a mode" until
- * every mode is used, "Total ₹8,550 · due ₹8,550") · Reference · Note.
+ * picked; none picked is an advance) · Amount received (Mode · Amount rows, "+ Split · add a
+ * mode" until every mode is used, "Total ₹8,550 · due ₹8,550") · Reference · Note.
  */
 export function ReceiveFields({
   form,
@@ -129,10 +189,10 @@ export function ReceiveFields({
   const formatPaise = usePaiseFormat();
   const field = useDrawerFieldIds(form, idPrefix);
   const patient = field('patientId');
+  const splits = field('splits');
   const reference = field('reference');
   const note = field('note');
-  const total = splitsTotal(values.splits);
-  const openCount = invoices?.length ?? 0;
+  const openCount = invoices.kind === 'choices' ? invoices.choices.length : 0;
 
   return (
     <DrawerFieldGrid title={t(K.section)}>
@@ -180,17 +240,20 @@ export function ReceiveFields({
       </DrawerField>
       <DrawerField
         label={t(K.invoice)}
-        hint={openCount > 1 ? t(K.invoiceOpen, { count: openCount }) : undefined}
+        hint={
+          openCount > 1 && !editing ? t(K.invoiceOpen, { count: openCount }) : undefined
+        }
       >
         <InvoiceChips
           invoices={invoices}
           picked={values.invoiceId}
           onPick={onInvoice}
           disabled={readOnly || editing}
+          editing={editing}
           testId={`${testId}-invoice`}
         />
       </DrawerField>
-      <DrawerField label={t(K.amount)} required>
+      <DrawerField label={t(K.amount)} required error={splits.error}>
         <SplitRowsField
           control={form.control}
           label={t(K.amount)}
@@ -198,11 +261,7 @@ export function ReceiveFields({
           limit={due}
           compact
           addLabel={t(K.split)}
-          total={
-            due === null
-              ? t(K.total, { total: formatPaise(total) })
-              : t(K.totalDue, { total: formatPaise(total), due: formatPaise(due) })
-          }
+          total={totalLabel(values, due, t, formatPaise)}
           readOnly={readOnly}
           testId={`${testId}-splits`}
         />
@@ -212,6 +271,7 @@ export function ReceiveFields({
         label={t(K.reference)}
         htmlFor={reference.id}
         hint={t(K.referenceHint)}
+        error={reference.error}
       >
         <DrawerInput
           {...reference.control}
@@ -224,7 +284,7 @@ export function ReceiveFields({
           data-testid={`${testId}-reference`}
         />
       </DrawerField>
-      <DrawerField span="half" label={t(K.note)} htmlFor={note.id}>
+      <DrawerField span="half" label={t(K.note)} htmlFor={note.id} error={note.error}>
         <DrawerInput
           {...note.control}
           {...form.register('note')}

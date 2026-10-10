@@ -6,6 +6,7 @@ import {
   organizationTreatmentCreate,
 } from '@/lib/routes/patient-file-builders.ts';
 import { clinicToday, localDateOf } from '@/shared/api/clinic/clinic-time.ts';
+import type { InvoiceRecord } from '@/shared/api/clinic/invoices-contracts.ts';
 import type { PatientPackageRow } from '@/shared/api/clinic/patient-packages-contracts.ts';
 import type {
   PrescriptionKit,
@@ -18,12 +19,16 @@ import {
   visitChecksOf,
   type VisitRecord,
 } from '@/shared/api/clinic/visits-contracts.ts';
+import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
+import { visitFlowReferrer } from '@/shared/clinic/clinic-referrer.ts';
 import { passesPatientFileGate } from '@/shared/clinic/patient-file-sections.ts';
 import { useMoveAppointment } from '@/shared/hooks/useAppointments/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
+import { useInvoiceList } from '@/shared/hooks/useInvoices/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { usePatientPackages } from '@/shared/hooks/usePatientPackages/index.ts';
+import { usePaymentAccess } from '@/shared/hooks/usePaymentAccess/index.ts';
 import {
   useCreatePrescription,
   usePatientPrescriptions,
@@ -49,7 +54,12 @@ import {
 } from '../../../shared/hooks/useVisitFlowReturn/index.ts';
 import { usePatientFileContext } from '../../../shared/patient-file-context.ts';
 import { VISIT_FLOW_KEYS, VISIT_FLOW_NS } from './visit-flow.constants.ts';
-import { repeatedSession, spendablePackage } from './visit-flow.ts';
+import {
+  repeatedSession,
+  spendablePackage,
+  type VisitBill,
+  visitBill,
+} from './visit-flow.ts';
 
 const K = VISIT_FLOW_KEYS;
 
@@ -78,6 +88,11 @@ export interface VisitFlowRecords {
   pack: PatientPackageRow | null;
   /** The member's Rx kits (`GET /app/prescription-kits`). */
   kits: readonly PrescriptionKit[];
+  /**
+   * What the visit has to bill and its invoice (D156) — undefined without `payment:read` or the
+   * treatments' read (the visit's invoice is the one billing its sessions).
+   */
+  bill?: VisitFlowRead<VisitBill>;
 }
 
 /** What the flow may do — each action left out when the member can't. */
@@ -96,6 +111,12 @@ export interface VisitFlowActions {
   pause?: () => void;
   resume?: () => void;
   complete?: () => void;
+  /** "Create invoice from visit" — the Invoice drawer on its sessions (`payment:create`). */
+  createInvoice?: () => void;
+  /** "Custom invoice" — the Invoice drawer for this patient (`payment:create`). */
+  customInvoice?: () => void;
+  /** "Collect ₹X" — Receive payment against the visit's invoice while it owes (`payment:create`). */
+  collect?: () => void;
 }
 
 /** A list read narrowed to one of its rows. */
@@ -121,22 +142,58 @@ function useFlowAccess() {
   const { viewable } = usePatientFileContext();
   const access = useClinicAccess();
   const rx = usePrescriptionAccess();
+  const money = usePaymentAccess();
   const resolved = access.isResolved;
   // The clinical record's code opens the Clinical notes section (its read).
   const readsClinical = viewable.includes('overview');
+  const readsTreatments = viewable.includes('treatments');
   return {
     readsClinical,
     writesChecks: readsClinical && resolved && access.can('patients', 'edit'),
     readsRx: viewable.includes('prescriptions'),
     rx,
-    readsTreatments: viewable.includes('treatments'),
+    readsTreatments,
     treats: resolved && passesPatientFileGate(access, 'treatments'),
     movesVisit: resolved && access.can('appointments', 'edit'),
+    // The visit's invoice is found by the sessions it bills: both reads are needed.
+    readsBill: readsTreatments && money.canRead,
+    bills: money.canCreate,
   };
 }
 
 /** The flow's access to the visit's records. */
 type FlowAccess = ReturnType<typeof useFlowAccess>;
+
+/** The visit's bill as one read: the sessions and the day's invoices, loading, failed and Retry together. */
+function billRead(
+  treatments: {
+    data: unknown;
+    isPending: boolean;
+    isError: boolean;
+    refetch: () => Promise<unknown>;
+  },
+  invoices: {
+    rows: InvoiceRecord[];
+    isPending: boolean;
+    isError: boolean;
+    refetch: () => void;
+  },
+  sessions: readonly TreatmentRecord[],
+): VisitFlowRead<VisitBill> {
+  const failed =
+    (treatments.isError && treatments.data === undefined) ||
+    (invoices.isError && invoices.rows.length === 0);
+  const ready = treatments.data !== undefined && !invoices.isPending;
+  return {
+    data: ready ? visitBill({ sessions, invoices: invoices.rows }) : undefined,
+    isLoading: !(failed || ready),
+    isError: failed,
+    retry: () => {
+      treatments.refetch().catch(() => undefined);
+      invoices.refetch();
+    },
+  };
+}
 
 /** What every part of the flow's actions starts from: the visit, its records, the access, the URL. */
 interface FlowBase {
@@ -169,11 +226,14 @@ function useFlowRecords(visit: VisitRecord, can: FlowAccess): VisitFlowRecords {
   });
   const packages = usePatientPackages(patientId, { enabled: can.readsTreatments });
   const kits = usePrescriptionKits({ enabled: can.rx.writes });
+  // The patient's invoices of the visit's day — the visit's own is among them.
+  const invoices = useInvoiceList({ patientId, day: visit.booking.date }, can.readsBill);
 
   const atVisit = (row: { appointmentId: string | null }) =>
     row.appointmentId === appointmentId;
   const sessions = (treatments.data ?? []).filter((row) => row.status === 'done');
-  const visitSession = sessions.find(atVisit) ?? null;
+  const visitSessions = sessions.filter(atVisit);
+  const visitSession = visitSessions[0] ?? null;
   const lastTreatment = sessions.find((row) => !atVisit(row)) ?? null;
   const owned = packages.data ?? [];
   const pack = visitSession
@@ -189,6 +249,7 @@ function useFlowRecords(visit: VisitRecord, can: FlowAccess): VisitFlowRecords {
     lastTreatment,
     pack,
     kits: kits.data ?? [],
+    bill: can.readsBill ? billRead(treatments, invoices, visitSessions) : undefined,
   };
 }
 
@@ -338,6 +399,62 @@ function useRecordActions({
   };
 }
 
+/**
+ * Invoice and Collect (D156; `payment:create`): "Create invoice from visit" opens the Invoice
+ * drawer on the visit's sessions still to bill (`?appointment=`) — "Nothing to bill" when it has
+ * none — and "Custom invoice" on the patient alone, until the visit has its invoice; "Collect ₹X"
+ * opens Receive payment against that invoice while it owes. Each drawer opens over the flow and
+ * closes back into it.
+ */
+function useMoneyActions({
+  visit,
+  records,
+  can,
+  flow,
+}: FlowBase): Pick<VisitFlowActions, 'createInvoice' | 'customInvoice' | 'collect'> {
+  const { t } = useTranslation(VISIT_FLOW_NS);
+  const navigate = useClinicNavigate();
+  const { organizationSlug = '' } = useParams({ strict: false });
+  const { patientId } = usePatientFileContext();
+  const bill = records.bill?.data;
+  if (!(can.readsBill && can.bills && bill)) return {};
+  const referrer = visitFlowReferrer(patientId, flow.fromToday);
+  const newInvoice = (search: Record<string, string>) =>
+    void navigate(
+      clinicCommandNavigation('newInvoice', {
+        organizationSlug,
+        referrer,
+        search: { type: 'clinic', patient: patientId, ...search },
+      }),
+    );
+  const { invoice } = bill;
+  if (invoice) {
+    return {
+      collect:
+        invoice.due > 0
+          ? () =>
+              void navigate(
+                clinicCommandNavigation('newReceipt', {
+                  organizationSlug,
+                  referrer,
+                  search: { patient: patientId, invoice: invoice.id },
+                }),
+              )
+          : undefined,
+    };
+  }
+  return {
+    createInvoice: () => {
+      if (bill.toBill.length === 0) {
+        notify.info(t(K.invoice.nothing));
+        return;
+      }
+      newInvoice({ appointment: visit.appointmentId });
+    },
+    customInvoice: () => newInvoice({}),
+  };
+}
+
 /** Tick or untick a safety check — one note per check at the visit. */
 function useCheckActions({
   visit,
@@ -363,8 +480,8 @@ function useCheckActions({
 
 /**
  * The visit flow (KICKOFF §6.6 Visit flow; H:4871–4898) on clinozy-be: the visit's records — its
- * safety checks, the Rx and the session written at it — and what the member may do with them,
- * each toasting in the flow's words.
+ * safety checks, the Rx and the session written at it, its invoice — and what the member may do
+ * with them, each toasting in the flow's words.
  */
 export function useVisitFlow(visit: VisitRecord): {
   records: VisitFlowRecords;
@@ -380,6 +497,7 @@ export function useVisitFlow(visit: VisitRecord): {
       ...useCheckActions(base),
       ...useRecordActions(base),
       ...useVisitMoves(base),
+      ...useMoneyActions(base),
     },
   };
 }

@@ -32,7 +32,8 @@
   },
   "rowActions": {
     "edit": "編集",
-    "delete": "削除"
+    "delete": "削除",
+    "newInvoice": "新規請求書"
   },
   "bulk": {
     "export": "エクスポート",

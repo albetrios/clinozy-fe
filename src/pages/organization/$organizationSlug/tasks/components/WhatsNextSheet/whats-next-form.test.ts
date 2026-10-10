@@ -1,23 +1,27 @@
 import { describe, expect, it } from 'vitest';
 
 import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
+import {
+  taskRecord,
+  TEST_TASK_CONTACT_ID,
+  TEST_TASK_LEAD_ID,
+} from '@/tests/utils/task-doubles.ts';
 
 import {
   emptyWhatsNextForm,
   WHATS_NEXT_STEP_TONES,
   WHATS_NEXT_STEPS,
-  whatsNextInputOf,
+  whatsNextFieldsOf,
   whatsNextMissing,
 } from './whats-next-form.ts';
 
 const NOW = new Date(clinicInstant('2026-10-03', '10:00'));
-const TASK = '11111111-1111-4111-8111-111111111111';
-const ME = '22222222-2222-4222-8222-222222222222';
+const ME = 'mem_yls33gz5jj66ful8q4ads';
 const context = {
-  followsTaskId: TASK,
+  closed: taskRecord(),
   ownerId: ME,
-  title: 'Call again · Priti',
-  plannedAfter: 'Planned after: Confirm Priti’s visit · Confirmed on call',
+  title: 'Call again · Anaya',
+  plannedAfter: 'Planned after: Reply to Anaya · Booked a visit',
   now: NOW,
 };
 
@@ -32,30 +36,37 @@ describe('the What’s next form (H:4054)', () => {
     ]);
   });
 
-  it('asks for the step, then when', () => {
-    expect(whatsNextMissing(emptyWhatsNextForm())).toEqual(['step', 'when']);
-    expect(whatsNextMissing({ ...emptyWhatsNextForm(), step: 'callAgain' })).toEqual([
+  it('asks for the step, then when, then who — the member by default', () => {
+    expect(whatsNextMissing(emptyWhatsNextForm(), ME)).toEqual(['step', 'when']);
+    expect(whatsNextMissing({ ...emptyWhatsNextForm(), step: 'callAgain' }, ME)).toEqual([
       'when',
     ]);
-    expect(whatsNextInputOf(emptyWhatsNextForm(), context)).toBeNull();
+    expect(
+      whatsNextMissing(
+        { ...emptyWhatsNextForm(), step: 'callAgain', when: 'tomorrow' },
+        null,
+      ),
+    ).toEqual(['ownerId']);
+    expect(whatsNextFieldsOf(emptyWhatsNextForm(), context)).toBeNull();
   });
 
-  it('creates a follow-up after the closed task, due by the When chip', () => {
+  it('creates a task by hand for the closed task’s person and record, due by the When chip', () => {
     const form = {
       ...emptyWhatsNextForm(),
       step: 'callAgain' as const,
       when: 'tomorrow' as const,
     };
-    expect(whatsNextInputOf(form, context)).toEqual({
-      title: 'Call again · Priti',
-      why: 'Planned after: Confirm Priti’s visit · Confirmed on call',
-      ownerId: ME,
+    expect(whatsNextFieldsOf(form, context)).toEqual({
+      title: 'Call again · Anaya',
+      why: 'Planned after: Reply to Anaya · Booked a visit',
       dueAt: clinicInstant('2026-10-04', '11:00'),
-      rule: 'manual',
-      followsTaskId: TASK,
+      assignee: { membershipId: ME },
+      priority: 'normal',
+      contactId: TEST_TASK_CONTACT_ID,
+      link: { kind: 'lead', id: TEST_TASK_LEAD_ID },
     });
     expect(
-      whatsNextInputOf(
+      whatsNextFieldsOf(
         { ...form, when: 'inThreeHours', note: '  Ask about the peel ' },
         context,
       ),
@@ -63,5 +74,20 @@ describe('the What’s next form (H:4054)', () => {
       why: 'Ask about the peel',
       dueAt: new Date(NOW.getTime() + 3 * 3_600_000).toISOString(),
     });
+  });
+
+  it('leaves the person and record out for a task about nobody', () => {
+    const form = {
+      ...emptyWhatsNextForm(),
+      step: 'sendOffer' as const,
+      when: 'nextWeek' as const,
+    };
+    expect(
+      whatsNextFieldsOf(form, {
+        ...context,
+        closed: taskRecord({ contact: null, link: null }),
+      }),
+    ).toMatchObject({ contactId: null, link: null });
+    expect(whatsNextFieldsOf(form, { ...context, ownerId: null })).toBeNull();
   });
 });

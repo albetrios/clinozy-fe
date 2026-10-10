@@ -22,7 +22,7 @@ export function organizationTask(organizationSlug: string, taskId: string) {
   } as const;
 }
 
-/** New task over the list; `?lead=` / `?patient=` name whom it is for (KICKOFF §6.10). */
+/** New task over the list; `?lead=` (`lead_…`) or `?contact=` (`con_…`) names whom it is for (KICKOFF §6.10). */
 export function organizationTaskCreate(organizationSlug: string) {
   return {
     to: '/organization/$organizationSlug/tasks/create',

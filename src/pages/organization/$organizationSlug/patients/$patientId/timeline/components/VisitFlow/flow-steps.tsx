@@ -14,7 +14,7 @@ import {
   VISIT_FLOW_TEST_IDS,
   type VisitFlowStep,
 } from './visit-flow.constants.ts';
-import { nextSessionNumber, OUTLINE_BUTTON } from './visit-flow.ts';
+import { DARK_BUTTON, nextSessionNumber, OUTLINE_BUTTON } from './visit-flow.ts';
 
 const K = VISIT_FLOW_KEYS;
 const ids = VISIT_FLOW_TEST_IDS;
@@ -198,6 +198,73 @@ export function TreatmentStep({
           {t(K.treatment.pack, { name: pack.name })}
         </span>
       ) : null}
+    </div>
+  );
+}
+
+/**
+ * Step 4 (H:765; D156): "Create invoice from visit" — the Invoice drawer on the visit's sessions
+ * still to bill, priced by the server there — and "Custom invoice", until the visit has its
+ * invoice; nothing for a member who may not bill.
+ */
+export function InvoiceStep({
+  actions,
+}: {
+  actions: Pick<VisitFlowActions, 'createInvoice' | 'customInvoice'>;
+}) {
+  const { t } = useTranslation(VISIT_FLOW_NS);
+  const { createInvoice, customInvoice } = actions;
+  if (!(createInvoice || customInvoice)) return null;
+  return (
+    <div className="flex flex-wrap gap-2">
+      {createInvoice ? (
+        <Button
+          type="button"
+          {...DARK_BUTTON}
+          onClick={createInvoice}
+          data-testid={ids.createInvoice}
+        >
+          {t(K.invoice.create)}
+        </Button>
+      ) : null}
+      {customInvoice ? (
+        <Button
+          type="button"
+          {...OUTLINE_BUTTON}
+          onClick={customInvoice}
+          data-testid={ids.customInvoice}
+        >
+          {t(K.invoice.custom)}
+        </Button>
+      ) : null}
+    </div>
+  );
+}
+
+/**
+ * Step 5 (H:766; D156): "Collect ₹1,500" — Receive payment against the visit's invoice while it
+ * owes (the share goes, §6 #26); nothing once it is paid or for a member who may not collect.
+ */
+export function CollectStep({
+  due,
+  onCollect,
+}: {
+  /** What the visit's invoice still owes, as shown (masked with the file); null when nothing. */
+  due: string | null;
+  onCollect: VisitFlowActions['collect'];
+}) {
+  const { t } = useTranslation(VISIT_FLOW_NS);
+  if (!(onCollect && due)) return null;
+  return (
+    <div className="flex flex-wrap gap-2">
+      <Button
+        type="button"
+        {...DARK_BUTTON}
+        onClick={onCollect}
+        data-testid={ids.collect}
+      >
+        {t(K.collect.action, { amount: due })}
+      </Button>
     </div>
   );
 }

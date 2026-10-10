@@ -10,7 +10,7 @@ import {
   CREDIT_NOTE_MAX,
   type CreditPartyRow,
 } from '@/shared/api/clinic/credits-contracts.ts';
-import type { OpenInvoice } from '@/shared/api/clinic/payments-contracts.ts';
+import type { InvoiceRecord } from '@/shared/api/clinic/invoices-contracts.ts';
 import { CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { CREDIT_DIRECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
 import {
@@ -24,7 +24,8 @@ import {
 import { DatePicker } from '@/shared/components/Picker/DatePicker/index.ts';
 import { Picker } from '@/shared/components/Picker/index.ts';
 import { RECORD_DRAWER_KEYS } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 import { PAYMENTS_KEYS, PAYMENTS_NS } from '../../../payments.constants.ts';
 import { useDayLabel } from '../../../shared/hooks/useDayLabel/index.ts';
@@ -60,8 +61,8 @@ interface CreditFieldsProps {
 /**
  * Step 1, "Which way" (H:4023–4024): Which way — "Give" blush, "Take" sky,
  * each saying what it means in its tooltip; switching drops the reason — ·
- * Who — patients, contacts and suppliers, or a name typed in ("Add “q”") · the
- * Amount in ₹.
+ * Who — the clinic's people (`GET /app/contacts`), then its stock vendors and
+ * Medical suppliers, or a name typed in ("Add “q”") · the Amount in ₹.
  */
 export function CreditWayFields({
   form,
@@ -77,6 +78,7 @@ export function CreditWayFields({
 }) {
   const { t } = useTranslation(PAYMENTS_NS);
   const { t: tClinic } = useTranslation(CLINIC_NS);
+  const organizationId = useOrganizationStore((state) => state.organizationId);
   const field = useDrawerFieldIds(form, idPrefix);
   const who = field('party');
   const amount = field('amount');
@@ -113,7 +115,7 @@ export function CreditWayFields({
           label={t(K.who)}
           placeholder={t(K.whoPlaceholder)}
           searchPlaceholder={t(K.whoPlaceholder)}
-          loadOptionsKey={creditQueryKeys.parties()}
+          loadOptionsKey={creditQueryKeys.parties(organizationId)}
           loadOptions={async (query, cursor) => {
             const page = await searchCreditParties(query, cursor ?? null);
             return {
@@ -169,7 +171,7 @@ export function CreditWayFields({
 
 /**
  * Step 2, "Why" (H:4025–4031): the Reason chips of the way picked · For
- * invoice — a patient's invoices, when they have any ("optional · links the
+ * invoice — the person's invoices, when they have any ("optional · links the
  * credit to a bill") · Settle by — a task falls due that day · Note (300;
  * required for "Other", its placeholder by the way).
  */
@@ -182,12 +184,12 @@ export function CreditWhyFields({
   invoices,
   today,
 }: CreditFieldsProps & {
-  /** The picked patient's invoices, newest first; null for anyone else. */
-  invoices: readonly OpenInvoice[] | null;
+  /** The picked person's invoices, newest first; null for a supplier. */
+  invoices: readonly InvoiceRecord[] | null;
   today: string;
 }) {
   const { t } = useTranslation(PAYMENTS_NS);
-  const formatPaise = usePaiseFormat();
+  const formatRupees = useRupeeFormat();
   const formatDay = useDayLabel();
   const field = useDrawerFieldIds(form, idPrefix);
   const reason = field('reasonKey');
@@ -233,7 +235,7 @@ export function CreditWhyFields({
                 id={invoice.id}
                 label={t(K.invoice)}
                 placeholder={t(K.noInvoice)}
-                options={invoiceOptions(invoices, t, formatPaise, formatDay)}
+                options={invoiceOptions({ invoices, t, formatRupees, formatDay })}
                 value={control.value ?? NO_INVOICE}
                 onChange={(key) => control.onChange(key === NO_INVOICE ? null : key)}
                 disabled={readOnly}

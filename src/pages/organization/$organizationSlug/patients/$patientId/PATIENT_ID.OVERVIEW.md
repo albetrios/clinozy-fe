@@ -37,8 +37,10 @@ A column on `canvas` inside the room gutter (`PatientFileLayout.tsx`):
   Invoices — D26). A bottom sheet on a phone.
 - **Main card** — the rail (`components/PatientRail/`, 288px: identity; Reach — the
   primary number, the person's other numbers and Instagram, masked; About — gender and age,
-  birthday, the language tag, address, consents; Up next — the next visit and the feedback
-  row; no dues, credit or Collect — G4) and the open section. The rail and the breadcrumb show from `lg`
+  birthday, the language tag, address, consents; Up next — the next visit, what she owes for a
+  member who sees billing (the server's `meta.due_total`, masked with the file, its eye, and
+  Collect — Receive payment, `payment:create` — or "All paid · nothing due"; no credit to give
+  back — G-P8) and the feedback row) and the open section. The rail and the breadcrumb show from `lg`
   while Activity is closed and from `xl` while open (D23) — CSS on `data-activity`, no
   width reads.
 - **Activity** (`components/PatientActivity/`) — the shared chat column in its own card,
@@ -49,8 +51,8 @@ A column on `canvas` inside the room gutter (`PatientFileLayout.tsx`):
 The file's money mask (Q-F4) is one flag held by the layout — masked by default, never
 persisted, reset per patient — handed down with the file through
 `shared/patient-file-context.ts`: the Activity column and the Overview's timeline mask the
-rupee amounts in the server's lines. Nothing toggles it until the Overview's Billing card comes
-back with Payments on clinozy-be. Esc goes back to the list when no surface above takes it
+rupee amounts in the server's lines; the rail's due card and the Overview's Billing card toggle it.
+Esc goes back to the list when no surface above takes it
 (`hooks/useEscapeBack/`). A patient that is gone toasts "Patient not found · it may have been
 deleted" and goes back to the list; another failure keeps the screen and toasts Retry.
 
@@ -99,12 +101,12 @@ one loader for the whole file.
 | `components/PatientRail/`                | The rail: identity, Reach, About, Up next; `components/PatientRail/patient-rail.ts` holds the tenure, birthday and masked-number rules.                                                                               |
 | `components/PatientActivity/`            | The Activity column's card around `ChatColumn`.                                                                                                                                                                       |
 | `hooks/usePatientFileActivity/`          | Whether Activity is open, and its toggle.                                                                                                                                                                             |
-| `hooks/usePatientFileNavigation/`        | The file's links: sections, the list, Start visit / Resume (the flow), Edit patient, Book / Reschedule, Feedback, history chips.                                                                                      |
+| `hooks/usePatientFileNavigation/`        | The file's links: sections, the list, Start visit / Resume (the flow), Edit patient, Book / Reschedule, Collect (Receive payment), Feedback, history chips.                                                           |
 | `hooks/useEscapeBack/`                   | Esc back to the list when nothing else handled it.                                                                                                                                                                    |
 | `shared/patient-file-context.ts`         | The file's context for its sections and drawers (`usePatientFileContext`).                                                                                                                                            |
 | `shared/patient-file-nav.ts`             | Section tones, icons and groups; the tab strip; pin toggling; the section a URL shows.                                                                                                                                |
 | `shared/patient-file.constants.ts`       | `PATIENT_FILE_NS` / `PATIENT_FILE_KEYS` — the section names.                                                                                                                                                          |
-| `shared/hooks/usePatientFileActions/`    | The Add-to-record items the member may use and what each runs; each section's primary item.                                                                                                                           |
+| `shared/hooks/usePatientFileActions/`    | The Add-to-record items the member may use and what each runs (Invoice and Payment on `payment:create`; "Nothing due" from the server's due); each section's primary item.                                            |
 | `shared/hooks/usePatientPhotoUpload/`    | The photo uploads and the hidden picker: drop, "Upload images", the Add menu's "Photo".                                                                                                                               |
 | `shared/patient-photos.constants.ts`     | `PATIENT_PHOTOS_NS` / `PATIENT_PHOTOS_KEYS` — Photos, the viewer and Photo details.                                                                                                                                   |
 | `shared/components/PatientAddMenu/`      | The Add-to-record menu ("+" and a section's "⌄").                                                                                                                                                                     |

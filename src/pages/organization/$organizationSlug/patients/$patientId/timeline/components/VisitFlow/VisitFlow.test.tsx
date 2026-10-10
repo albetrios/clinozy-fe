@@ -6,6 +6,8 @@ import { axe } from 'vitest-axe';
 import { moveAppointment } from '@/shared/api/clinic/appointments-api.ts';
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import type { ClinicalNote } from '@/shared/api/clinic/clinical-notes-contracts.ts';
+import { listInvoices } from '@/shared/api/clinic/invoices-api.ts';
+import type { InvoiceRecord } from '@/shared/api/clinic/invoices-contracts.ts';
 import type { PatientPackageRow } from '@/shared/api/clinic/patient-packages-contracts.ts';
 import {
   approvePrescription,
@@ -38,6 +40,8 @@ import {
   TEST_CONTACT_ID,
   TEST_PATIENT_ID,
 } from '@/tests/utils/patient-doubles.ts';
+import { invoiceRecord } from '@/tests/utils/payments-doubles.ts';
+import { shownLocation } from '@/tests/utils/shown-location.ts';
 
 import {
   patientFileUrl,
@@ -69,7 +73,17 @@ const world = vi.hoisted(() => ({
   treatments: [] as TreatmentRecord[],
   packages: [] as PatientPackageRow[],
   kits: [] as PrescriptionKit[],
+  invoices: [] as InvoiceRecord[],
   failNotes: false,
+}));
+vi.mock('@/shared/api/clinic/invoices-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  listInvoices: vi.fn(async () => ({
+    rows: world.invoices,
+    next: null,
+    total: world.invoices.length,
+    totals: null,
+  })),
 }));
 vi.mock('@/shared/api/clinic/visits-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
@@ -341,6 +355,7 @@ beforeEach(() => {
     treatments: [lastSession()],
     packages: [],
     kits: [HAIR_FALL_KIT],
+    invoices: [],
     failNotes: false,
   });
 });
@@ -356,18 +371,22 @@ afterEach(() => {
   vi.mocked(removeVisitCheck).mockClear();
   vi.mocked(setVisitPaused).mockClear();
   vi.mocked(fetchVisitCheckNotes).mockClear();
+  vi.mocked(listInvoices).mockClear();
 });
 
 describe('VisitFlow (KICKOFF §6.6 Visit flow; H:758–768) on clinozy-be', () => {
-  it('shows the three steps on the visit’s records, the checks current', async () => {
+  it('shows the five steps on the visit’s records, the checks current', async () => {
     const { container } = await openFlow();
     const flow = screen.getByTestId('visit-flow');
     expect(within(flow).getByText('Visit in progress')).toBeInTheDocument();
-    expect(
-      within(flow)
-        .getAllByRole('heading', { level: 3 })
-        .map((heading) => heading.textContent),
-    ).toEqual(['Check-in & safety', 'Prescription', 'Treatment']);
+    // Invoice and Collect join once the member's Payments access is known.
+    await waitFor(() =>
+      expect(
+        within(flow)
+          .getAllByRole('heading', { level: 3 })
+          .map((heading) => heading.textContent),
+      ).toEqual(['Check-in & safety', 'Prescription', 'Treatment', 'Invoice', 'Collect']),
+    );
     await waitFor(() => expect(step('checks')).toHaveTextContent('3 checks left'));
     expect(stateOf()).toEqual({ checks: 'current', rx: 'later', treatment: 'later' });
     expect(step('rx')).toHaveTextContent('One tap from a kit, or write one');
@@ -377,8 +396,14 @@ describe('VisitFlow (KICKOFF §6.6 Visit flow; H:758–768) on clinozy-be', () =
     expect(step('treatment')).toHaveTextContent(
       'Last settings: GentleMax · 18 J/cm² · 755 nm',
     );
-    // Invoice and "Collect & share" wait for Payments on the API; the share goes (§6 #26).
-    expect(screen.queryByText('Invoice')).not.toBeInTheDocument();
+    // Nothing recorded at the visit yet: nothing to bill, nothing to collect (D156).
+    await waitFor(() => expect(step('invoice')).toHaveTextContent('Nothing to bill yet'));
+    expect(step('collect')).toHaveTextContent('Invoice the visit first');
+    expect(listInvoices).toHaveBeenCalledWith(
+      { patientId: TEST_PATIENT_ID, day: APPOINTMENT_TODAY },
+      undefined,
+    );
+    // The share goes (§6 #26).
     expect(screen.queryByText('Share Rx, invoice & photos')).not.toBeInTheDocument();
     expect(await axe(container)).toHaveNoViolations();
   });
@@ -594,6 +619,119 @@ describe('VisitFlow (KICKOFF §6.6 Visit flow; H:758–768) on clinozy-be', () =
     expect(moveAppointment).toHaveBeenCalledWith(
       expect.objectContaining({ appointmentId: APPOINTMENT_ID, route: 'complete' }),
     );
+  });
+
+  it('says "Nothing to bill" while the visit has no session to bill, opening nothing', async () => {
+    const { user, router } = await openFlow();
+    await waitFor(() => expect(step('invoice')).toHaveTextContent('Nothing to bill yet'));
+    await user.click(screen.getByTestId('visit-flow-create-invoice'));
+    expect(notifyMock.info).toHaveBeenCalledWith('Nothing to bill');
+    expect(router.state.location.search).toEqual({ visit: 'open' });
+  });
+
+  it('bills the visit’s sessions in the Invoice drawer over the flow', async () => {
+    world.treatments = [
+      lastSession({ id: 'trt_today0000000000000000', appointmentId: APPOINTMENT_ID }),
+      lastSession(),
+    ];
+    const { user, router } = await openFlow();
+    await waitFor(() => expect(step('invoice')).toHaveTextContent('1 item ready'));
+    await user.click(screen.getByTestId('visit-flow-create-invoice'));
+    await waitFor(() =>
+      expect(shownLocation(router).pathname).toBe('/organization/acme/invoices/create'),
+    );
+    expect(shownLocation(router).search).toEqual({
+      type: 'clinic',
+      patient: TEST_PATIENT_ID,
+      appointment: APPOINTMENT_ID,
+      from: `patients/${TEST_PATIENT_ID}/timeline?visit=open`,
+    });
+    // The flow stays behind the drawer.
+    expect(router.state.location.pathname).toBe(
+      patientFileUrl(TEST_PATIENT_ID, '/timeline'),
+    );
+  });
+
+  it('opens a custom invoice for the patient, the flow kept behind it', async () => {
+    const { user, router } = await openFlow();
+    await user.click(await screen.findByTestId('visit-flow-custom-invoice'));
+    await waitFor(() =>
+      expect(shownLocation(router).search).toEqual({
+        type: 'clinic',
+        patient: TEST_PATIENT_ID,
+        from: `patients/${TEST_PATIENT_ID}/timeline?visit=open`,
+      }),
+    );
+  });
+
+  it('shows the visit’s invoice — masked with the file — and collects what it owes against it', async () => {
+    world.treatments = [
+      lastSession({
+        id: 'trt_today0000000000000000',
+        appointmentId: APPOINTMENT_ID,
+        isBilled: true,
+        packageId: PACKAGE_ID,
+      }),
+    ];
+    const billed = invoiceRecord();
+    world.invoices = [
+      invoiceRecord({
+        id: 'invc_visit0000000000000000',
+        seq: 7,
+        total: 1533.41,
+        paid: 0,
+        due: 1533.41,
+        status: 'unpaid',
+        items: billed.items.map((line) => ({
+          ...line,
+          treatmentIds: ['trt_today0000000000000000'],
+        })),
+      }),
+    ];
+    const { user, router } = await openFlow();
+    await waitFor(() => expect(step('invoice')).toHaveAttribute('data-state', 'done'));
+    expect(step('invoice')).toHaveTextContent('#7 · ₹ ••••');
+    expect(screen.queryByTestId('visit-flow-create-invoice')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('visit-flow-custom-invoice')).not.toBeInTheDocument();
+    expect(step('collect')).toHaveTextContent('₹ •••• due');
+    expect(step('collect')).not.toHaveAttribute('data-state', 'done');
+
+    await user.click(screen.getByTestId('visit-flow-collect'));
+    await waitFor(() =>
+      expect(shownLocation(router).pathname).toBe('/organization/acme/payments/receive'),
+    );
+    expect(shownLocation(router).search).toEqual({
+      patient: TEST_PATIENT_ID,
+      invoice: 'invc_visit0000000000000000',
+      from: `patients/${TEST_PATIENT_ID}/timeline?visit=open`,
+    });
+  });
+
+  it('is done once the visit’s invoice is paid, and when a package covered every session', async () => {
+    world.treatments = [
+      lastSession({
+        id: 'trt_today0000000000000000',
+        appointmentId: APPOINTMENT_ID,
+        isBilled: true,
+        packageId: PACKAGE_ID,
+      }),
+    ];
+    await openFlow();
+    // A package bought before covered it: nothing to bill, nothing to collect.
+    await waitFor(() =>
+      expect(step('invoice')).toHaveTextContent('Covered by package · nothing to bill'),
+    );
+    expect(step('invoice')).toHaveAttribute('data-state', 'done');
+    expect(step('collect')).toHaveTextContent('Nothing due');
+    expect(screen.queryByTestId('visit-flow-collect')).not.toBeInTheDocument();
+  });
+
+  it('shows no Invoice or Collect to a member who can’t see Payments', async () => {
+    await openFlow({ role: 'doctor' });
+    await screen.findByTestId('visit-flow-step-treatment');
+    expect(screen.queryByTestId('visit-flow-step-invoice')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('visit-flow-step-collect')).not.toBeInTheDocument();
+    expect(listInvoices).not.toHaveBeenCalled();
   });
 
   it('leaves a therapist the treatment — the checks read-only, no Pause or Complete', async () => {

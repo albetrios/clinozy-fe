@@ -1,4 +1,10 @@
-import { MONEY_SCALE, numberFromText, textFromNumber } from '@/lib/number-text.ts';
+import {
+  MONEY_SCALE,
+  numberFromText,
+  paiseOfRupees,
+  rupeesOfPaise,
+  textFromNumber,
+} from '@/lib/number-text.ts';
 import type { ExpenseCategory, Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import {
   EXPENSE_MODE_VALUES,
@@ -7,27 +13,35 @@ import {
   type PayExpenseInput,
   type PaymentPatch,
   supplierBillKey,
+  type SupplierBillRef,
 } from '@/shared/api/clinic/payments-contracts.ts';
 
 /*
  * Send payment's form (`payments.md:112–130`; H:5126–5134) — pure, so the
  * drawer, its steps' heads, its badges and its checks read one set of rules.
+ * The amount is typed in rupees and held as text; the checks read it in paise;
+ * what the API sends and answers is rupees, converted here at the form's edge.
  */
 
 /** A mode Send payment offers: Cash, UPI, Card. */
 export type SendMode = (typeof EXPENSE_MODE_VALUES)[number];
 
-/** The bill a payment settles: a Medical PO or a Clinic stock purchase, by id. */
-interface SendBillRef {
-  kind: OpenSupplierBill['kind'];
-  purchaseId: string;
-  billNo: string;
+/**
+ * The supplier bill a payment settles — a Medical PO or a Clinic stock purchase by its public id
+ * — with what its label shows: its number, the supplier's bill number and the supplier.
+ */
+interface SendBill extends SupplierBillRef {
+  seq: number;
+  billNo: string | null;
+  supplierName: string;
 }
 
 /** The drawer's form — the amount in rupees as typed ("3200", "12.5"), the day as `YYYY-MM-DD`. */
 export interface SendFormValues {
   branchId: string | null;
-  bill: SendBillRef | null;
+  /** The supplier bill it pays; none for clinic spend, which has a category instead. */
+  bill: SendBill | null;
+  /** Clinic spend's category — a supplier bill has none (`400 "Only an expense has a category"`). */
   category: ExpenseCategory;
   payeeName: string;
   note: string;
@@ -63,31 +77,35 @@ export function emptySendForm(branchId: string | null, today: string): SendFormV
 const isSendMode = (mode: string): mode is SendMode =>
   (EXPENSE_MODE_VALUES as readonly string[]).includes(mode);
 
-/** An expense or a supplier bill's payment as its edit form; its bill and day are fixed. */
+/**
+ * An expense or a supplier bill's payment as its edit form: its bill (the supplier is its payee),
+ * its category for an expense, its one split as the amount and the mode; its day is fixed.
+ */
 export function sendFormOf(entry: LedgerRow, paidOn: string): SendFormValues {
   const mode = entry.splits[0]?.mode;
   return {
     branchId: entry.branchId,
-    bill: null,
+    bill: entry.bill
+      ? {
+          kind: entry.bill.kind,
+          purchaseId: entry.bill.purchaseId,
+          seq: entry.bill.seq,
+          billNo: entry.bill.billNo,
+          supplierName: entry.payeeName ?? entry.partyName,
+        }
+      : null,
     category: entry.expenseCategory ?? 'misc',
     payeeName: entry.payeeName ?? entry.partyName,
     note: entry.note ?? '',
-    amount: amountText(entry.amount),
+    amount: amountText(paiseOfRupees(entry.amount)),
     paidOn,
     mode: mode && isSendMode(mode) ? mode : 'cash',
   };
 }
 
-/** A bill's category: a Medical PO's medicines, a Clinic stock purchase's consumables. */
-const BILL_CATEGORY: Readonly<Record<OpenSupplierBill['kind'], ExpenseCategory>> = {
-  medical_po: 'medicines',
-  stock_po: 'consumables',
-};
-
 /**
- * The form once a bill is picked (`payments.md:116`): its supplier as Paid to,
- * its due as the amount and its category — or, with no bill ("Other spend"),
- * the fields as they were.
+ * The form once a bill is picked (`payments.md:116`): its supplier as Paid to and its due as the
+ * amount — a bill has no category — or, with no bill ("Other spend"), the fields as they were.
  */
 export function withBill(
   values: SendFormValues,
@@ -96,14 +114,19 @@ export function withBill(
   if (!bill) return { ...values, bill: null };
   return {
     ...values,
-    bill: { kind: bill.kind, purchaseId: bill.purchaseId, billNo: bill.billNo },
+    bill: {
+      kind: bill.kind,
+      purchaseId: bill.purchaseId,
+      seq: bill.seq,
+      billNo: bill.billNo,
+      supplierName: bill.supplierName,
+    },
     payeeName: bill.supplierName,
-    amount: amountText(bill.due),
-    category: BILL_CATEGORY[bill.kind],
+    amount: amountText(paiseOfRupees(bill.due)),
   };
 }
 
-/** The bill `?bill=md:<id>|is:<id>` names among the open ones. */
+/** The bill a `?bill=<mpo_… | spur_…>` link names among the open ones. */
 export function billOf(
   bills: readonly OpenSupplierBill[],
   key: string | undefined,
@@ -164,32 +187,39 @@ export function sendMissing(values: SendFormValues): SendRequiredField[] {
   return missing;
 }
 
-/** What Send payment sends (`payExpense`, `S:1709`). */
+/**
+ * What Send payment sends (`POST /app/payments`): a supplier bill's payment — its purchase, no
+ * category — or clinic spend in its category; the amount in rupees, the payee and the note
+ * trimmed there.
+ */
 export function sendInputOf(
   values: SendFormValues,
   defaultBranchId: string,
-  attachmentKeys: readonly string[] = [],
 ): PayExpenseInput {
-  return {
+  const fields = {
     branchId: values.branchId ?? defaultBranchId,
-    billRef: values.bill,
-    payeeName: values.payeeName.trim(),
-    expenseCategory: values.category,
-    amount: sendAmount(values),
+    payeeName: values.payeeName,
+    amount: rupeesOfPaise(sendAmount(values)),
     mode: values.mode,
     paidOn: values.paidOn,
-    note: values.note.trim() || null,
-    attachmentKeys: [...attachmentKeys],
+    note: values.note,
+    attachmentKeys: [],
   };
+  return values.bill
+    ? { ...fields, bill: { kind: values.bill.kind, purchaseId: values.bill.purchaseId } }
+    : { ...fields, bill: null, expenseCategory: values.category };
 }
 
-/** What an edit sends (`updatePayment`, `S:1710`): payee, category, amount, mode, note. */
+/**
+ * What an edit asks for — payee, category (an expense's only), amount and mode in rupees, note;
+ * the API sends only what differs from the entry (`updatePayment`).
+ */
 export function sendPatchOf(values: SendFormValues): PaymentPatch {
   return {
-    payeeName: values.payeeName.trim(),
+    payeeName: values.payeeName,
     expenseCategory: values.category,
-    amount: sendAmount(values),
+    amount: rupeesOfPaise(sendAmount(values)),
     mode: values.mode,
-    note: values.note.trim() || null,
+    note: values.note,
   };
 }

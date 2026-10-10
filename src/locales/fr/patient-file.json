@@ -64,8 +64,11 @@
       "photo": "Photo",
       "appointment": "Rendez-vous",
       "report": "Compte rendu",
-      "note": "Note"
-    }
+      "note": "Note",
+      "invoice": "Facture",
+      "payment": "Paiement"
+    },
+    "nothingDue": "Rien à régler pour {{name}}"
   },
   "section": {
     "primary": {
@@ -126,7 +129,11 @@
     "reviews_many": "{{count}} d’avis",
     "reviews_other": "{{count}} avis",
     "feedbackCounts": "{{checkIns}} · {{reviews}}",
-    "noFeedback": "Pas encore d’avis"
+    "noFeedback": "Pas encore d’avis",
+    "showAmount": "Afficher le montant",
+    "hideAmount": "Masquer le montant",
+    "collect": "Encaisser",
+    "allPaid": "Tout est réglé · rien à payer"
   },
   "photos": {
     "albums": {
@@ -952,6 +959,15 @@
       "notes": "Notes",
       "empty": "Aucune activité pour le moment",
       "masked": "₹ ••••"
+    },
+    "billing": {
+      "due": "Dû",
+      "paid": "Payé",
+      "show": "Afficher les montants",
+      "hide": "Masquer les montants",
+      "invoice": "Facture {{type}} {{number}}",
+      "sub": "{{date}} · {{amount}}",
+      "collect": "Encaisser le paiement"
     }
   },
   "visitFlow": {
@@ -966,7 +982,9 @@
     "steps": {
       "checks": "Arrivée et sécurité",
       "rx": "Ordonnance",
-      "treatment": "Traitement"
+      "treatment": "Traitement",
+      "invoice": "Facture",
+      "collect": "Encaisser"
     },
     "checks": {
       "labels": {
@@ -1003,6 +1021,23 @@
       "repeatPackage": "⚡ Répéter · {{name}}"
     },
     "paused": "Visite en pause",
-    "resume": "Reprendre"
+    "resume": "Reprendre",
+    "invoice": {
+      "create": "Créer la facture depuis la visite",
+      "custom": "Facture personnalisée",
+      "nothing": "Rien à facturer",
+      "covered": "Couvert par le forfait · rien à facturer",
+      "empty": "Rien à facturer pour l’instant",
+      "done": "{{number}} · {{total}}",
+      "ready_many": "{{count}} lignes prêtes",
+      "ready_one": "{{count}} ligne prête",
+      "ready_other": "{{count}} lignes prêtes"
+    },
+    "collect": {
+      "action": "Encaisser {{amount}}",
+      "due": "{{amount}} dû",
+      "nothing": "Rien à payer",
+      "waiting": "Facturez d’abord la visite"
+    }
   }
 }

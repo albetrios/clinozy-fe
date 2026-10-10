@@ -156,7 +156,8 @@
     },
     "rowActions": {
       "edit": "تعديل",
-      "delete": "حذف"
+      "delete": "حذف",
+      "pay": "ادفع {{amount}}"
     },
     "vendorFilter": {
       "any": "أي مورد",
@@ -239,8 +240,10 @@
     "noPurchases": "لا مشتريات",
     "rowActions": {
       "edit": "تعديل",
-      "delete": "حذف"
-    }
+      "delete": "حذف",
+      "pay": "ادفع {{amount}}"
+    },
+    "paidUp": "لا يوجد مبلغ مستحق لـ {{name}} الآن"
   },
   "drawers": {
     "records": {

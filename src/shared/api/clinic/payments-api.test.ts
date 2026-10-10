@@ -1,469 +1,598 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { isHttpError } from '@/shared/errors/HttpError.ts';
-
-import { invoiceBalance } from './clinic-money.ts';
-import { settleCredit } from './credits-api.ts';
-import { branchRef, MAIN_BRANCH } from './fixtures/organization.fixtures.ts';
-import { patientRef } from './fixtures/patients.fixtures.ts';
-import { ref } from './fixtures/refs.fixtures.ts';
-import { staffRef } from './fixtures/staff.fixtures.ts';
-import { clinicFixtures, resetClinicFixtures } from './fixtures/world.fixtures.ts';
+vi.mock('@/core/http/api.ts', () => ({
+  api: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
+}));
+vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchTeamDirectory: vi.fn(),
+}));
+import { api } from '@/core/http/api.ts';
+import { queryClient } from '@/core/http/queryClient.ts';
+import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
+import { fetchTeamDirectory } from '@/shared/api/clinic/directory-api.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import {
-  attachPaymentFile,
+  ledgerRow,
+  paymentWire,
+  TEST_INVOICE_ID,
+  TEST_MONEY_AUTHOR_ID,
+  TEST_MONEY_BRANCH_ID,
+  TEST_MONEY_CONTACT_ID,
+  TEST_MONEY_PATIENT_ID,
+  TEST_PAYMENT_ID,
+} from '@/tests/utils/payments-doubles.ts';
+
+import {
   deletePayment,
+  fetchLedgerCount,
   fetchPayment,
+  ledgerListQuery,
+  listDayPayments,
+  listInvoicePayments,
   listLedger,
-  listOpenInvoices,
   listOpenSupplierBills,
-  listPatientInvoices,
+  listPatientPayments,
+  listPaymentEdits,
   payExpense,
-  paymentQueryKeys,
   receivePayment,
   restorePayment,
+  reversePayment,
   updatePayment,
 } from './payments-api.ts';
-import type { LedgerListParams } from './payments-contracts.ts';
+import { editSidesOf } from './payments-contracts.ts';
 
-/** 10:00 on 3 Oct, clinic time — the seed day (27 Sep) is today. */
-const NOW = new Date('2026-10-03T04:30:00Z');
-const MAIN = branchRef(MAIN_BRANCH);
-const RHEA = patientRef('Rhea Shah');
-const KIRAN = patientRef('Kiran Desai');
-const DHRUV = patientRef('Dhruv Patel');
+/** The clinic's day every range here is read on. */
+const TODAY = '2026-10-10';
 
-/** The rejection a call ends in, so its status and fields can be read. */
-async function failureOf(call: Promise<unknown>) {
-  const error = await call.then(
-    () => null,
-    (caught: unknown) => caught,
-  );
-  if (!isHttpError(error)) throw new Error('expected an HTTP error');
-  const body = (
-    error.data as { error: { code: string; detail: string; fields?: object } }
-  ).error;
-  return { status: error.status, ...body };
+const STOCK_PURCHASE_ID = 'spur_0irgmlbrv8akvoipmawa8';
+const MEDICAL_ORDER_ID = 'mpo_0irgmlbrv8akvoipmawa8';
+const VENDOR_ID = 'svnd_ankur0000000000000000';
+
+/** A list page as the API answers it. */
+const page = (
+  data: unknown[],
+  pagination: Record<string, unknown> = {},
+  meta: Record<string, unknown> = {},
+) => ({
+  data,
+  meta: {
+    request_id: 'req',
+    pagination: { per_page: 50, next: null, has_more: false, ...pagination },
+    ...meta,
+  },
+});
+
+/** Answer each GET by its path. */
+function answer(byPath: Record<string, (query: Record<string, unknown>) => unknown>) {
+  vi.mocked(api.get).mockImplementation(((path: string, init?: { query?: object }) => {
+    const reply = byPath[path];
+    if (!reply) throw new Error(`unexpected GET ${path}`);
+    return Promise.resolve(reply((init?.query ?? {}) as Record<string, unknown>));
+  }) as never);
 }
 
-const seqs = async (params: LedgerListParams = {}) =>
-  (await listLedger(params)).items.map((row) => row.seq);
+/** The query a GET to `path` was sent with (the last one). */
+function queryOf(path: string) {
+  const call = vi
+    .mocked(api.get)
+    .mock.calls.filter(([called]) => called === path)
+    .at(-1);
+  return (call?.[1] as { query?: Record<string, unknown> } | undefined)?.query;
+}
+
+/** Nisha, who recorded the entries. */
+const NISHA = {
+  id: TEST_MONEY_AUTHOR_ID,
+  userId: 'usr_nisha',
+  name: 'Nisha Shah',
+  initials: 'NS',
+  tone: 'sage' as const,
+  roleIds: [],
+  branchIds: [],
+};
 
 beforeEach(() => {
+  vi.resetAllMocks();
+  queryClient.clear();
+  signInTestMember();
+  vi.mocked(fetchTeamDirectory).mockResolvedValue([NISHA]);
   vi.useFakeTimers({ toFake: ['Date'] });
-  vi.setSystemTime(NOW);
-  resetClinicFixtures();
+  vi.setSystemTime(new Date(clinicInstant(TODAY, '10:00')));
 });
 afterEach(() => {
   vi.useRealTimers();
-  resetClinicFixtures();
+  useOrganizationStore.getState().clearOrganization();
 });
 
-describe('paymentQueryKeys', () => {
-  it('nests every key under ["clinic", "payments"], so one invalidation reaches them all', () => {
-    expect(paymentQueryKeys.list({ direction: 'paid' })).toEqual([
-      'clinic',
-      'payments',
-      'list',
-      { direction: 'paid' },
-    ]);
-    for (const key of [
-      paymentQueryKeys.detail('X'),
-      paymentQueryKeys.openInvoices('P'),
-      paymentQueryKeys.openBills(),
-    ]) {
-      expect(key.slice(0, 2)).toEqual(paymentQueryKeys.all);
-    }
-  });
-});
-
-describe('the ledger (listLedger, S:1699)', () => {
-  it('merges receipts, refunds and expenses, newest first', async () => {
-    expect(await seqs()).toEqual([
-      5509, 309, 310, 5513, 5512, 311, 306, 5507, 305, 5505, 301, 5488, 5501, 5480, 5470,
-      5466,
-    ]);
-  });
-
-  it('names each row: its party, invoice, author, and whether its day is closed', async () => {
-    const rows = (await listLedger()).items;
-    const bySeq = (seq: number) => rows.find((row) => row.seq === seq);
-    expect(bySeq(5512)).toMatchObject({
-      partyName: 'Rhea Shah',
-      patientSeq: expect.any(Number),
-      invoice: { seq: 785, type: 'medical', due: 70_000 },
-      by: { id: staffRef('FA'), initials: 'FA' },
-      locked: false,
+describe('ledgerListQuery', () => {
+  it('reads 50 a page, newest first, with nothing filtered by default', () => {
+    expect(ledgerListQuery({}, TODAY)).toEqual({
+      limit: 50,
+      direction: undefined,
+      kind: undefined,
+      mode: undefined,
+      branch_id: undefined,
+      q: undefined,
+      paid_date_from: undefined,
+      paid_date_to: undefined,
+      created_from: undefined,
+      created_to: undefined,
     });
-    expect(bySeq(311)).toMatchObject({
-      partyName: 'Medline Surgicals',
-      patientSeq: null,
-      expenseCategory: 'consumables',
-      locked: false,
-    });
-    // Yesterday stays open until tonight's midnight (Q-G2); older days are closed.
-    expect(bySeq(306)?.locked).toBe(false);
-    expect(bySeq(305)?.locked).toBe(true);
-    expect(bySeq(5466)?.locked).toBe(true);
   });
 
-  it('closes every past day before yesterday — the auto-close job (Q-G2)', async () => {
-    await listLedger();
-    const closes = clinicFixtures.dayCloses.snapshot();
-    const auto = closes.filter((close) => close.openingAcceptedAt === null);
-    expect(auto.map((close) => close.date).sort()).toEqual([
-      '2026-06-10',
-      '2026-06-12',
-      '2026-08-29',
-      '2026-09-01',
-      '2026-09-03',
-      '2026-09-07',
-    ]);
-    // Cash taken as expected: 12 Jun opens on 10 Jun's ₹2,000 and takes ₹400 in.
-    expect(auto.find((close) => close.date === '2026-06-12')).toMatchObject({
-      openingCash: 200_000,
-      openingSource: 'carried',
-      countedCash: 240_000,
-      closedById: null,
-    });
-    // Idempotent: a second read closes nothing more.
-    await listLedger();
-    expect(clinicFixtures.dayCloses.snapshot()).toHaveLength(closes.length);
-  });
-
-  it('filters by Show, What, Mode, the day under review and the branch', async () => {
-    expect(await seqs({ direction: 'paid' })).toEqual([
-      309, 310, 311, 306, 305, 301, 5466,
-    ]);
-    expect(await seqs({ kind: ['refund'] })).toEqual([5466]);
-    // A supplier bill is an expense.
-    expect(await seqs({ kind: ['expense'], mode: ['cash'] })).toEqual([310, 306]);
-    expect(await seqs({ mode: ['card'] })).toEqual([5509, 309]);
-    expect(await seqs({ day: '2026-10-02' })).toEqual([306, 5507]);
-    expect(await seqs({ branchIds: [ref.branch(99)] })).toEqual([]);
-  });
-
-  it('searches the PAY- number, the party, an invoice number and the note', async () => {
-    expect(await seqs({ q: 'PAY-5512' })).toEqual([5512]);
-    expect(await seqs({ q: 'medline' })).toEqual([311]);
-    expect(await seqs({ q: '#785' })).toEqual([5512]);
-    expect(await seqs({ q: 'gauze' })).toEqual([311]);
-  });
-
-  it('reads one entry, or a 404 for an unknown one', async () => {
-    expect((await fetchPayment(ref.payment(310))).partyName).toBe('Tea & snacks');
-    expect((await failureOf(fetchPayment(ref.payment(1)))).status).toBe(404);
-  });
-});
-
-describe('Receive payment (receivePayment, S:1708)', () => {
-  it('records a receipt against an invoice; the invoice’s due follows', async () => {
-    const row = await receivePayment({
-      branchId: MAIN,
-      patientId: KIRAN,
-      invoiceId: ref.invoice(784),
-      splits: [
-        { mode: 'cash', amount: 400_000 },
-        { mode: 'upi', amount: 455_000 },
-      ],
-      reference: '4321',
-      note: null,
-    });
-    expect(row).toMatchObject({
-      seq: 5514,
-      direction: 'received',
-      kind: 'receipt',
-      amount: 855_000,
-      reference: '4321',
-      partyName: 'Kiran Desai',
-      locked: false,
-    });
-    const invoice = await clinicFixtures.invoices.get(ref.invoice(784));
-    expect(invoiceBalance(invoice, clinicFixtures.payments.snapshot()).due).toBe(0);
-  });
-
-  it('requires a patient — the prototype saved without one (§7.3)', async () => {
-    const failure = await failureOf(
-      receivePayment({
-        branchId: MAIN,
-        patientId: '' as string,
-        invoiceId: null,
-        splits: [{ mode: 'cash', amount: 50_000 }],
-        reference: null,
-        note: null,
-      }),
-    );
-    expect(failure).toMatchObject({ status: 422, detail: 'Pick a patient' });
-  });
-
-  it('refuses an amount above the invoice’s due (S:1708)', async () => {
-    const failure = await failureOf(
-      receivePayment({
-        branchId: MAIN,
-        patientId: RHEA,
-        invoiceId: ref.invoice(785),
-        splits: [{ mode: 'upi', amount: 70_100 }],
-        reference: null,
-        note: null,
-      }),
-    );
-    expect(failure.status).toBe(422);
-    expect(failure.fields).toHaveProperty('splits');
-  });
-
-  it('refuses an invoice of another patient, and an empty amount', async () => {
-    const other = await failureOf(
-      receivePayment({
-        branchId: MAIN,
-        patientId: RHEA,
-        invoiceId: ref.invoice(784),
-        splits: [{ mode: 'upi', amount: 100 }],
-        reference: null,
-        note: null,
-      }),
-    );
-    expect(other.fields).toHaveProperty('invoiceId');
-    const empty = await failureOf(
-      receivePayment({
-        branchId: MAIN,
-        patientId: RHEA,
-        invoiceId: null,
-        splits: [{ mode: 'upi', amount: 0 }],
-        reference: null,
-        note: null,
-      }),
-    );
-    expect(empty).toMatchObject({ status: 422, detail: 'Enter an amount' });
-  });
-
-  it('answers a closed day with a conflict', async () => {
-    await clinicFixtures.dayCloses.create({
-      branchId: MAIN,
-      date: '2026-10-03',
-      openingCash: 200_000,
-      openingSource: 'default_float',
-      openingAcceptedAt: NOW.toISOString(),
-      countedCash: 200_000,
-      closedAt: NOW.toISOString(),
-      closedById: staffRef('RS'),
-    });
-    const failure = await failureOf(
-      receivePayment({
-        branchId: MAIN,
-        patientId: RHEA,
-        invoiceId: null,
-        splits: [{ mode: 'cash', amount: 10_000 }],
-        reference: null,
-        note: null,
-      }),
-    );
-    expect(failure).toMatchObject({ status: 409, code: 'conflict' });
-  });
-});
-
-describe('Send payment (payExpense, S:1709)', () => {
-  it('adds clinic spend on the day it was paid', async () => {
-    const row = await payExpense({
-      branchId: MAIN,
-      billRef: null,
-      payeeName: 'Tea & snacks',
-      expenseCategory: 'misc',
-      amount: 26_000,
-      mode: 'cash',
-      paidOn: '2026-10-02',
-      note: null,
-      attachmentKeys: ['uploads/bill-1.jpg'],
-    });
-    expect(row).toMatchObject({
-      kind: 'expense',
+  it('sends Show, What (an expense reads supplier bills too), Mode, the branches, the day and Created', () => {
+    expect(
+      ledgerListQuery(
+        {
+          direction: 'paid',
+          kind: ['expense', 'refund'],
+          mode: ['cash', 'upi'],
+          branchIds: [TEST_MONEY_BRANCH_ID, 'brn_vesu00000000000000000'],
+          q: '  Kavya ',
+          day: '2026-10-09',
+          created: 'today',
+        },
+        TODAY,
+      ),
+    ).toEqual({
+      limit: 50,
       direction: 'paid',
-      splits: [{ mode: 'cash', amount: 26_000 }],
-      attachmentKeys: ['uploads/bill-1.jpg'],
-    });
-    expect(row.paidAt.startsWith('2026-10-02')).toBe(true);
-  });
-
-  it('pays a supplier bill: the PO’s paid rises and a settled Medical PO is Paid (Q-M1)', async () => {
-    const bill = (await listOpenSupplierBills()).find((open) => open.seq === 431);
-    expect(bill).toMatchObject({ kind: 'medical_po', due: 298_000, billNo: '1631' });
-    const row = await payExpense({
-      branchId: MAIN,
-      billRef: { kind: 'medical_po', purchaseId: ref.purchaseOrder(431), billNo: '1631' },
-      payeeName: 'Shree Ramdev Medical Agency',
-      expenseCategory: 'medicines',
-      amount: 298_000,
-      mode: 'upi',
-      paidOn: '2026-10-03',
-      note: null,
-      attachmentKeys: [],
-    });
-    expect(row).toMatchObject({
-      kind: 'supplier_bill',
-      bill: { kind: 'medical_po', seq: 431, billNo: '1631' },
-    });
-    const order = await clinicFixtures.purchaseOrders.get(ref.purchaseOrder(431));
-    expect(order).toMatchObject({ paid: 298_000, stage: 'paid' });
-    expect((await listOpenSupplierBills()).map((open) => open.seq)).not.toContain(431);
-  });
-
-  it('lists the open bills oldest first, and refuses more than a bill’s due', async () => {
-    const bills = await listOpenSupplierBills();
-    expect(bills.map((open) => [open.kind, open.seq, open.due])).toEqual([
-      ['stock_po', 15, 171_000],
-      // The same day: a Medical PO before a Clinic stock purchase, as drawn.
-      ['medical_po', 431, 298_000],
-      ['stock_po', 16, 60_000],
-    ]);
-    const failure = await failureOf(
-      payExpense({
-        branchId: MAIN,
-        billRef: { kind: 'stock_po', purchaseId: ref.stockPurchase(16), billNo: 'SW-77' },
-        payeeName: 'Vendor',
-        expenseCategory: 'consumables',
-        amount: 60_100,
-        mode: 'cash',
-        paidOn: '2026-10-03',
-        note: null,
-        attachmentKeys: [],
-      }),
-    );
-    expect(failure.status).toBe(422);
-  });
-
-  it('asks who was paid and the amount', async () => {
-    const failure = await failureOf(
-      payExpense({
-        branchId: MAIN,
-        billRef: null,
-        payeeName: ' ',
-        expenseCategory: 'misc',
-        amount: 0,
-        mode: 'cash',
-        paidOn: '2026-10-03',
-        note: null,
-        attachmentKeys: [],
-      }),
-    );
-    expect(failure).toMatchObject({
-      status: 422,
-      detail: 'Add who was paid and the amount',
+      kind: 'expense,supplier_bill,refund',
+      mode: 'cash,upi',
+      branch_id: `${TEST_MONEY_BRANCH_ID},brn_vesu00000000000000000`,
+      q: 'Kavya',
+      paid_date_from: '2026-10-09',
+      paid_date_to: '2026-10-09',
+      created_from: clinicInstant(TODAY, '00:00'),
+      created_to: clinicInstant('2026-10-11', '00:00'),
     });
   });
 });
 
-describe('changing and deleting an entry (S:1710, S:1546)', () => {
-  it('logs a change of the amount or the modes on the entry', async () => {
-    const row = await updatePayment(ref.payment(5512), {
-      splits: [{ mode: 'upi', amount: 70_000 }],
+describe('listLedger', () => {
+  it('reads one page, each row with its link numbers and its author from the team', async () => {
+    answer({
+      '/app/payments': () =>
+        page([paymentWire()], { next: 'cur_2', has_more: true, estimated_total: 12 }),
     });
-    expect(row.amount).toBe(70_000);
-    expect(row.edits).toEqual([
+
+    const result = await listLedger({ q: 'Kavya' }, 'cur_1');
+
+    expect(queryOf('/app/payments')).toMatchObject({
+      q: 'Kavya',
+      after: 'cur_1',
+      limit: 50,
+    });
+    expect(result).toEqual({ rows: [ledgerRow()], next: 'cur_2', total: 12 });
+    expect(fetchTeamDirectory).toHaveBeenCalledTimes(1);
+  });
+
+  it('reads no team for an empty page, and keeps a member who left as no one', async () => {
+    answer({ '/app/payments': () => page([]) });
+    expect(await listLedger({})).toEqual({ rows: [], next: null, total: null });
+    expect(fetchTeamDirectory).not.toHaveBeenCalled();
+
+    answer({
+      '/app/payments': () =>
+        page([paymentWire({ created_by_membership_id: 'mem_left00000000000000000' })]),
+    });
+    const [row] = (await listLedger({})).rows;
+    expect(row?.by).toBeNull();
+    expect(row?.createdById).toBe('mem_left00000000000000000');
+  });
+});
+
+describe('fetchLedgerCount', () => {
+  it('reads one row with the ledger’s params for the API’s count; none when left out', async () => {
+    answer({ '/app/payments': () => page([paymentWire()], { estimated_total: 13 }) });
+    expect(await fetchLedgerCount({ direction: 'paid', q: 'Kavya' })).toBe(13);
+    expect(queryOf('/app/payments')).toMatchObject({
+      direction: 'paid',
+      q: 'Kavya',
+      limit: 1,
+    });
+    answer({ '/app/payments': () => page([]) });
+    expect(await fetchLedgerCount({})).toBeNull();
+  });
+});
+
+describe('fetchPayment', () => {
+  it('names a stock bill payment by its purchase, bill number and payee', async () => {
+    answer({
+      '/app/payments/{payment_id}': () => ({
+        data: paymentWire({
+          direction: 'paid',
+          kind: 'supplier_bill',
+          contact: null,
+          patient_id: null,
+          invoice_id: null,
+          invoice: null,
+          stock_purchase_id: STOCK_PURCHASE_ID,
+          stock_purchase: { stock_purchase_number: 8, bill_number: 'ZZ-0001' },
+          payee_name: 'Ankur Pharma',
+          last_edit: null,
+          edit_count: 0,
+        }),
+        meta: { request_id: 'req' },
+      }),
+    });
+
+    const row = await fetchPayment(TEST_PAYMENT_ID);
+
+    expect(api.get).toHaveBeenCalledWith('/app/payments/{payment_id}', {
+      params: { payment_id: TEST_PAYMENT_ID },
+    });
+    expect(row).toMatchObject({
+      partyName: 'Ankur Pharma',
+      contactId: null,
+      bill: {
+        kind: 'stock_po',
+        purchaseId: STOCK_PURCHASE_ID,
+        seq: 8,
+        billNo: 'ZZ-0001',
+      },
+      stockPurchaseId: STOCK_PURCHASE_ID,
+      lastEdit: null,
+    });
+  });
+
+  it('names a Medical PO payment by its order and supplier bill number', async () => {
+    answer({
+      '/app/payments/{payment_id}': () => ({
+        data: paymentWire({
+          kind: 'supplier_bill',
+          medical_purchase_order_id: MEDICAL_ORDER_ID,
+          medical_purchase_order: {
+            purchase_order_number: 431,
+            supplier_bill_number: null,
+          },
+        }),
+        meta: { request_id: 'req' },
+      }),
+    });
+
+    expect((await fetchPayment(TEST_PAYMENT_ID)).bill).toEqual({
+      kind: 'medical_po',
+      purchaseId: MEDICAL_ORDER_ID,
+      seq: 431,
+      billNo: null,
+    });
+  });
+});
+
+describe('the edit log', () => {
+  it('reads every change, oldest first, and words the money of one as its two sides', async () => {
+    answer({
+      '/app/payments/{payment_id}/edits': () =>
+        page([
+          {
+            id: 'pedit_koemr3ulrnhby9q904rcb',
+            changes: {
+              splits: {
+                from: [{ mode: 'upi', amount: 600 }],
+                to: [{ mode: 'upi', amount: 700 }],
+              },
+            },
+            author_membership_id: TEST_MONEY_AUTHOR_ID,
+            created_at: '2026-10-10T05:00:00.000Z',
+          },
+        ]),
+    });
+
+    const [edit] = await listPaymentEdits(TEST_PAYMENT_ID);
+
+    expect(queryOf('/app/payments/{payment_id}/edits')).toEqual({
+      limit: 100,
+      after: undefined,
+    });
+    expect(edit).toMatchObject({ authorId: TEST_MONEY_AUTHOR_ID });
+    expect(edit && editSidesOf(edit)).toEqual({
+      from: { amount: 600, modes: ['upi'] },
+      to: { amount: 700, modes: ['upi'] },
+    });
+    expect(editSidesOf({ changes: { note: { from: null, to: 'x' } } })).toBeNull();
+  });
+});
+
+describe('one record’s entries', () => {
+  it('reads a patient’s, an invoice’s and a branch-day’s, every page', async () => {
+    answer({ '/app/payments': () => page([paymentWire()]) });
+
+    expect(await listPatientPayments(TEST_MONEY_PATIENT_ID)).toEqual([ledgerRow()]);
+    expect(queryOf('/app/payments')).toMatchObject({
+      patient_id: TEST_MONEY_PATIENT_ID,
+      limit: 100,
+    });
+    await listInvoicePayments(TEST_INVOICE_ID);
+    expect(queryOf('/app/payments')).toMatchObject({ invoice_id: TEST_INVOICE_ID });
+    await listDayPayments(TEST_MONEY_BRANCH_ID, '2026-10-09');
+    expect(queryOf('/app/payments')).toMatchObject({
+      branch_id: TEST_MONEY_BRANCH_ID,
+      paid_date_from: '2026-10-09',
+      paid_date_to: '2026-10-09',
+    });
+  });
+});
+
+describe('listOpenSupplierBills', () => {
+  it('lists Medical POs and stock purchases with a balance, oldest first, Medical first on a day', async () => {
+    answer({
+      '/app/stock-purchases': () =>
+        page([
+          {
+            id: STOCK_PURCHASE_ID,
+            stock_purchase_number: 8,
+            stock_vendor_id: VENDOR_ID,
+            bill_number: 'ZZ-0001',
+            purchase_date: '2026-10-02',
+            due_amount: 2392.5,
+          },
+        ]),
+      '/app/stock-vendors': () => page([{ id: VENDOR_ID, name: 'Ankur Pharma' }]),
+      '/app/medical-purchase-orders': () =>
+        page([
+          {
+            id: MEDICAL_ORDER_ID,
+            purchase_order_number: 431,
+            supplier: { id: 'sup_ramdev000000000000000', name: 'Shree Ramdev' },
+            supplier_bill_number: '1631',
+            order_date: '2026-10-02',
+            due_amount: 2980,
+          },
+        ]),
+    });
+
+    const bills = await listOpenSupplierBills({ stock: true, medical: true });
+
+    expect(queryOf('/app/stock-purchases')).toMatchObject({
+      payment_status: 'unpaid,partial',
+      sort: 'purchase_date',
+      order: 'asc',
+    });
+    expect(queryOf('/app/medical-purchase-orders')).toMatchObject({
+      stage: 'received',
+      payment_status: 'unpaid,partial',
+    });
+    expect(bills).toEqual([
       {
-        at: NOW.toISOString(),
-        byId: staffRef('RS'),
-        from: { amount: 60_000, modes: ['upi'] },
-        to: { amount: 70_000, modes: ['upi'] },
+        kind: 'medical_po',
+        purchaseId: MEDICAL_ORDER_ID,
+        seq: 431,
+        billNo: '1631',
+        supplierName: 'Shree Ramdev',
+        date: '2026-10-02',
+        due: 2980,
+        daysPending: 8,
+      },
+      {
+        kind: 'stock_po',
+        purchaseId: STOCK_PURCHASE_ID,
+        seq: 8,
+        billNo: 'ZZ-0001',
+        supplierName: 'Ankur Pharma',
+        date: '2026-10-02',
+        due: 2392.5,
+        daysPending: 8,
       },
     ]);
-    // A note alone is no logged change.
-    const again = await updatePayment(ref.payment(5512), { note: 'Paid at the desk' });
-    expect(again.edits).toHaveLength(1);
   });
 
-  it('keeps a receipt within its invoice’s due, its own amount counted back', async () => {
-    const failure = await failureOf(
-      updatePayment(ref.payment(5512), { splits: [{ mode: 'upi', amount: 130_100 }] }),
-    );
-    expect(failure.status).toBe(422);
-  });
-
-  it('changes an expense’s payee, amount and mode', async () => {
-    const row = await updatePayment(ref.payment(310), { amount: 30_000, mode: 'upi' });
-    expect(row).toMatchObject({
-      amount: 30_000,
-      splits: [{ mode: 'upi', amount: 30_000 }],
-    });
-    expect(row.edits.at(-1)?.from).toEqual({ amount: 26_000, modes: ['cash'] });
-  });
-
-  it('refuses to touch a closed day’s entry: "PAY-305 · Day closed"', async () => {
-    const edit = await failureOf(updatePayment(ref.payment(305), { amount: 1 }));
-    expect(edit).toMatchObject({ status: 409, detail: 'PAY-305 · Day closed' });
-    const removal = await failureOf(deletePayment(ref.payment(305), 'mistake', null));
-    expect(removal.status).toBe(409);
-  });
-
-  it('refuses to touch an entry a pending credit settled: it is the credit’s', async () => {
-    const { paymentSeq } = await settleCredit(ref.pendingCredit(2), {
-      action: 'give_back',
-      splits: [{ mode: 'cash', amount: 50_000 }],
-    });
-    const settled = clinicFixtures.payments.snapshot((row) => row.seq === paymentSeq)[0];
-    if (!settled) throw new Error('the settlement wrote an entry');
-    const edit = await failureOf(updatePayment(settled.id, { note: 'Changed' }));
-    expect(edit).toMatchObject({ status: 409, detail: `PAY-${paymentSeq} · From CR-2` });
-    const removal = await failureOf(deletePayment(settled.id, 'mistake', null));
-    expect(removal.status).toBe(409);
-  });
-
-  it('files an uploaded bill photo on its entry, after the save', async () => {
-    const row = await payExpense({
-      branchId: MAIN,
-      billRef: null,
-      payeeName: 'Courier',
-      expenseCategory: 'misc',
-      amount: 15_000,
-      mode: 'cash',
-      paidOn: '2026-10-03',
-      note: null,
-      attachmentKeys: [],
-    });
-    await attachPaymentFile({ paymentId: row.id, key: 'org/bills/bill-1.jpg' });
-    await attachPaymentFile({ paymentId: row.id, key: 'org/bills/bill-2.jpg' });
-    expect((await clinicFixtures.payments.get(row.id)).attachmentKeys).toEqual([
-      'org/bills/bill-1.jpg',
-      'org/bills/bill-2.jpg',
-    ]);
-  });
-
-  it('deletes an open-day entry and restores it, a supplier bill’s purchase following', async () => {
-    const row = await payExpense({
-      branchId: MAIN,
-      billRef: { kind: 'stock_po', purchaseId: ref.stockPurchase(15), billNo: 'CX-118' },
-      payeeName: 'Cranix Pharma',
-      expenseCategory: 'consumables',
-      amount: 171_000,
-      mode: 'cash',
-      paidOn: '2026-10-03',
-      note: null,
-      attachmentKeys: [],
-    });
-    const paid = async () =>
-      (await clinicFixtures.stockPurchases.get(ref.stockPurchase(15))).paid;
-    expect(await paid()).toBe(171_000);
-    await deletePayment(row.id, 'duplicate', null);
-    expect(await paid()).toBe(0);
-    expect(await seqs({ q: `PAY-${row.seq}` })).toEqual([]);
-    await restorePayment(row.id);
-    expect(await paid()).toBe(171_000);
-    expect(await seqs({ q: `PAY-${row.seq}` })).toEqual([row.seq]);
+  it('reads only the kinds the member may read', async () => {
+    expect(await listOpenSupplierBills({ stock: false, medical: false })).toEqual([]);
+    expect(api.get).not.toHaveBeenCalled();
   });
 });
 
-describe('listOpenInvoices (S:1702)', () => {
-  it('lists a patient’s invoices with a due, oldest first', async () => {
-    expect(await listOpenInvoices(RHEA)).toEqual([
-      expect.objectContaining({ seq: 785, type: 'medical', bill: 130_000, due: 70_000 }),
-    ]);
-    expect(await listOpenInvoices(DHRUV)).toEqual([]);
+describe('the writes', () => {
+  const written = () => ({ data: paymentWire(), meta: { request_id: 'req' } });
+
+  it('receives a payment against an invoice, with the action’s key', async () => {
+    vi.mocked(api.post).mockResolvedValue(written() as never);
+
+    const row = await receivePayment({
+      input: {
+        branchId: TEST_MONEY_BRANCH_ID,
+        contactId: TEST_MONEY_CONTACT_ID,
+        invoiceId: TEST_INVOICE_ID,
+        splits: [
+          { mode: 'cash', amount: 100 },
+          { mode: 'upi', amount: 50 },
+        ],
+        reference: ' REF9 ',
+        note: '  ',
+      },
+      idempotencyKey: 'key-receive',
+    });
+
+    expect(api.post).toHaveBeenCalledWith('/app/payments', {
+      body: {
+        kind: 'receipt',
+        branch_id: TEST_MONEY_BRANCH_ID,
+        contact_id: TEST_MONEY_CONTACT_ID,
+        invoice_id: TEST_INVOICE_ID,
+        splits: [
+          { mode: 'cash', amount: 100 },
+          { mode: 'upi', amount: 50 },
+        ],
+        reference: 'REF9',
+        note: null,
+      },
+      idempotencyKey: 'key-receive',
+    });
+    expect(row).toEqual(ledgerRow());
   });
 
-  it('lists every invoice of a patient for Add pending, paid ones too, newest first', async () => {
-    const dhruv = await listPatientInvoices(DHRUV);
-    expect(dhruv.length).toBeGreaterThan(0);
-    expect(dhruv.every((invoice) => invoice.due === 0)).toBe(true);
-    const tanvi = await listPatientInvoices(patientRef('Tanvi Shah'));
-    expect(tanvi[0]).toMatchObject({ seq: 772, bill: 100_000, due: 60_000 });
-    const days = tanvi.map((invoice) => invoice.date);
-    expect(days).toEqual([...days].sort().reverse());
+  it('pays an expense in its category, on an earlier day at the clock’s time', async () => {
+    vi.mocked(api.post).mockResolvedValue(written() as never);
+
+    await payExpense({
+      input: {
+        branchId: TEST_MONEY_BRANCH_ID,
+        bill: null,
+        expenseCategory: 'consumables',
+        payeeName: ' Tea & snacks ',
+        amount: 120.5,
+        mode: 'cash',
+        paidOn: '2026-10-09',
+        note: null,
+        attachmentKeys: ['uploads/bill.jpg'],
+      },
+      idempotencyKey: 'key-pay',
+    });
+
+    expect(api.post).toHaveBeenCalledWith('/app/payments', {
+      body: {
+        kind: 'expense',
+        expense_category: 'consumables',
+        branch_id: TEST_MONEY_BRANCH_ID,
+        splits: [{ mode: 'cash', amount: 120.5 }],
+        payee_name: 'Tea & snacks',
+        paid_at: clinicInstant('2026-10-09', '10:00'),
+        note: null,
+        attachment_keys: ['uploads/bill.jpg'],
+      },
+      idempotencyKey: 'key-pay',
+    });
+  });
+
+  it('pays a supplier bill with its purchase and payee, never a category, today', async () => {
+    vi.mocked(api.post).mockResolvedValue(written() as never);
+    const fields = {
+      branchId: TEST_MONEY_BRANCH_ID,
+      payeeName: 'Ankur Pharma',
+      amount: 500,
+      mode: 'upi' as const,
+      paidOn: TODAY,
+      note: null,
+      attachmentKeys: [],
+    };
+
+    await payExpense({
+      input: { ...fields, bill: { kind: 'stock_po', purchaseId: STOCK_PURCHASE_ID } },
+      idempotencyKey: 'key-stock',
+    });
+    await payExpense({
+      input: { ...fields, bill: { kind: 'medical_po', purchaseId: MEDICAL_ORDER_ID } },
+      idempotencyKey: 'key-medical',
+    });
+
+    const [stock, medical] = vi
+      .mocked(api.post)
+      .mock.calls.map(([, init]) => (init as { body: Record<string, unknown> }).body);
+    expect(stock).toMatchObject({
+      kind: 'supplier_bill',
+      stock_purchase_id: STOCK_PURCHASE_ID,
+      payee_name: 'Ankur Pharma',
+      paid_at: undefined,
+    });
+    expect(stock).not.toHaveProperty('expense_category');
+    expect(medical).toMatchObject({
+      kind: 'supplier_bill',
+      medical_purchase_order_id: MEDICAL_ORDER_ID,
+    });
+    expect(medical).not.toHaveProperty('expense_category');
+  });
+
+  it('changes only what differs, with the read’s updated_at — and sends nothing for no change', async () => {
+    vi.mocked(api.patch).mockResolvedValue(written() as never);
+    const record = ledgerRow();
+
+    expect(
+      await updatePayment({
+        record,
+        patch: { splits: record.splits, reference: 'REF9', note: 'At the desk' },
+        idempotencyKey: 'key-none',
+      }),
+    ).toBe(record);
+    expect(api.patch).not.toHaveBeenCalled();
+
+    await updatePayment({
+      record,
+      patch: {
+        splits: [{ mode: 'card', amount: 150 }],
+        reference: 'REF9',
+        note: ' ',
+      },
+      idempotencyKey: 'key-edit',
+    });
+    expect(api.patch).toHaveBeenCalledWith('/app/payments/{payment_id}', {
+      params: { payment_id: TEST_PAYMENT_ID },
+      body: {
+        splits: [{ mode: 'card', amount: 150 }],
+        note: null,
+        expected_updated_at: record.updatedAt,
+      },
+      idempotencyKey: 'key-edit',
+    });
+  });
+
+  it('changes money out’s one split from its amount and mode; a category only on an expense', async () => {
+    vi.mocked(api.patch).mockResolvedValue(written() as never);
+    const expense = ledgerRow({
+      direction: 'paid',
+      kind: 'expense',
+      amount: 120,
+      splits: [{ mode: 'cash', amount: 120 }],
+      expenseCategory: 'misc',
+      payeeName: 'Tea',
+    });
+
+    await updatePayment({
+      record: expense,
+      patch: { amount: 150, expenseCategory: 'consumables', paidOn: '2026-10-09' },
+      idempotencyKey: 'key-expense',
+    });
+    expect(vi.mocked(api.patch).mock.calls.at(-1)?.[1]).toMatchObject({
+      body: {
+        splits: [{ mode: 'cash', amount: 150 }],
+        expense_category: 'consumables',
+        paid_at: clinicInstant('2026-10-09', '10:00'),
+      },
+    });
+
+    await updatePayment({
+      record: { ...expense, kind: 'supplier_bill' },
+      patch: { expenseCategory: 'consumables', mode: 'upi' },
+      idempotencyKey: 'key-bill',
+    });
+    expect(vi.mocked(api.patch).mock.calls.at(-1)?.[1]).toEqual({
+      params: { payment_id: TEST_PAYMENT_ID },
+      body: {
+        splits: [{ mode: 'upi', amount: 120 }],
+        expected_updated_at: expense.updatedAt,
+      },
+      idempotencyKey: 'key-bill',
+    });
+  });
+
+  it('deletes with the reason and note, restores and reverses with the action’s key', async () => {
+    vi.mocked(api.delete).mockResolvedValue({ data: undefined } as never);
+    vi.mocked(api.post).mockResolvedValue(written() as never);
+
+    await deletePayment({ paymentId: TEST_PAYMENT_ID, reason: 'duplicate', note: null });
+    expect(api.delete).toHaveBeenCalledWith('/app/payments/{payment_id}', {
+      params: { payment_id: TEST_PAYMENT_ID },
+      reason: 'duplicate',
+      note: undefined,
+    });
+
+    await restorePayment(TEST_PAYMENT_ID, 'key-restore');
+    expect(api.post).toHaveBeenCalledWith('/app/payments/{payment_id}/restore', {
+      params: { payment_id: TEST_PAYMENT_ID },
+      idempotencyKey: 'key-restore',
+    });
+
+    await reversePayment({
+      paymentId: TEST_PAYMENT_ID,
+      reason: ' Entered on the wrong day ',
+      idempotencyKey: 'key-reverse',
+    });
+    expect(api.post).toHaveBeenCalledWith('/app/payments/{payment_id}/reverse', {
+      params: { payment_id: TEST_PAYMENT_ID },
+      body: { reason: 'Entered on the wrong day' },
+      idempotencyKey: 'key-reverse',
+    });
   });
 });

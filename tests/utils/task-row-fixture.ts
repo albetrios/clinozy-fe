@@ -1,91 +1,72 @@
-import type { TaskRow, TaskStaff } from '@/shared/api/clinic/tasks-contracts.ts';
+/**
+ * Today's work-queue test data on clinozy-be's shapes (`/app/tasks`): the front desk member Riya
+ * and a counsellor colleague as the team directory names them, and an open "Confirm visits" task
+ * for the patient Priti Soni, owned by Riya — the card the queue suites draw. The Tasks room's
+ * rows are `tests/utils/task-doubles.ts`; this one is built on them.
+ */
+import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
+import type { TaskRow } from '@/shared/api/clinic/tasks-contracts.ts';
 
-/** Riya Shah, the fixture viewer, as a row's owner. */
-export const RIYA: TaskStaff = {
-  id: '11111111-1111-4111-8111-111111111111',
-  firstName: 'Riya',
-  lastName: 'Shah',
-  initials: 'RS',
+import { taskPerson, taskRow } from './task-doubles.ts';
+
+/** A team member as `useTeamDirectory` reads them. */
+const teamMember = (id: string, name: string, initials: string): DirectoryMember => ({
+  id,
+  userId: `usr_${id.slice(4)}`,
+  name,
+  initials,
   tone: 'sage',
-  active: true,
-  roles: ['front_desk'],
-  presence: 'online',
-  phone: '+919876500012',
-  email: 'riya@example.test',
-};
+  roleIds: [],
+  branchIds: [],
+});
 
-/** Asha Mehta, a second team member. */
-export const ASHA: TaskStaff = {
-  ...RIYA,
-  id: '22222222-2222-4222-8222-222222222222',
-  firstName: 'Asha',
-  lastName: 'Mehta',
-  initials: 'AM',
-  tone: 'lav',
-  roles: ['counsellor'],
-  presence: 'away',
-};
+/** Riya Shah, the signed-in front desk member. */
+export const RIYA = teamMember('mem_riya00000000000000000', 'Riya Shah', 'RS');
+
+/** Asha Mehta, a counsellor colleague. */
+export const ASHA = teamMember('mem_asha00000000000000000', 'Asha Mehta', 'AM');
+
+/** Priti Soni's confirm task's visit. */
+export const PRITI_VISIT_ID = 'appt_priti0000000000000000';
+
+/** Priti Soni, a patient (#3508, C-31) with no open lead. */
+export const PRITI = taskPerson({
+  id: 'con_priti0000000000000000',
+  name: 'Priti Soni',
+  phone: '+919812345678',
+  firstName: 'Priti',
+  contactNumber: 31,
+  patientId: 'pat_priti0000000000000000',
+  patientNumber: 3508,
+  openLeadId: null,
+});
 
 /**
- * A list row as `listTasks` answers it — an open Confirm visits task for a
- * patient, owned by Riya — with `overrides` on top.
+ * An open "Confirm visits" task for Priti's laser session, owned by Riya, due 10:50 on 4 Oct
+ * (clinic time) — as a list row with its person — with `overrides` on top.
  */
 export function taskRowFixture(overrides: Partial<TaskRow> = {}): TaskRow {
-  const stamp = '2026-10-04T03:00:00.000Z';
-  return {
-    id: '33333333-3333-4333-8333-333333333333',
-    organizationId: '44444444-4444-4444-8444-444444444444',
-    createdById: RIYA.id,
-    createdAt: stamp,
-    updatedAt: stamp,
-    deletedAt: null,
-    deleteReason: null,
-    deleteNote: null,
-    kind: 'confirm_visit',
+  return taskRow({
+    id: 'task_priticonfirm000000000',
+    kind: 'rule',
+    ruleKey: 'confirm',
+    type: 'confirm',
     title: 'Confirm Priti’s visit',
     why: 'Laser session not confirmed. Reminder read at 08:10, no reply.',
     ownerId: RIYA.id,
     ownerRole: null,
-    patientId: '55555555-5555-4555-8555-555555555555',
-    leadId: null,
-    sourceType: 'appointment',
-    sourceId: '66666666-6666-4666-8666-666666666666',
+    contact: {
+      id: PRITI.id,
+      name: PRITI.name,
+      phone: PRITI.phone,
+      preferenceTags: [],
+    },
+    link: { kind: 'appointment', id: PRITI_VISIT_ID },
     dueAt: '2026-10-04T05:20:00.000Z',
-    status: 'open',
-    snoozedUntil: null,
-    outcome: null,
-    resolvedAt: null,
-    rule: 'confirm',
-    ruleKey: null,
-    ruleOutcome: null,
-    result: null,
-    note: null,
-    resolvedBy: null,
-    resolvedById: null,
-    snoozeLabel: null,
-    previousOwnerIds: [],
-    manualType: null,
     priority: 'normal',
-    remindMinutesBefore: null,
-    person: {
-      name: 'Priti Soni',
-      firstName: 'Priti',
-      patientId: '55555555-5555-4555-8555-555555555555',
-      leadId: null,
-      isPatient: true,
-      kind: 'patient',
-      seq: 3508,
-      phone: '+919812345678',
-    },
-    source: {
-      kind: 'appointment',
-      id: '66666666-6666-4666-8666-666666666666',
-      seq: 2848,
-    },
-    owner: RIYA,
-    previousOwners: [],
-    ownedByViewer: true,
-    exists: true,
+    createdAt: '2026-10-04T02:40:00.000Z',
+    updatedAt: '2026-10-04T02:40:00.000Z',
+    person: PRITI,
     ...overrides,
-  };
+  });
 }

@@ -1,4 +1,9 @@
-export { personFullName, personInitials, shortPersonName } from './person-name.ts';
+export {
+  personFirstName,
+  personFullName,
+  personInitials,
+  shortPersonName,
+} from './person-name.ts';
 export {
   PersonAvatar,
   type PersonAvatarProps,

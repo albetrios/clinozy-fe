@@ -15,7 +15,7 @@ import {
 } from '@/shared/components/Cells/index.ts';
 import { DatePicker } from '@/shared/components/Picker/DatePicker/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 import { ChevronDown } from '@/shared/icons/index.ts';
 
 import {
@@ -40,7 +40,7 @@ export interface DayCloseBarProps {
   today: string;
   /** The day's view; the bar shows only the day dropdown while it loads. */
   view: DayCloseView | undefined;
-  /** "Close day" shows: the working state and the `dayclose` ability. */
+  /** "Close day" shows: the working state and `payment:update`. */
   canClose: boolean;
   closing: boolean;
   onDayChange: (date: string) => void;
@@ -72,7 +72,7 @@ function HistoryChip({
   onPick: (date: string) => void;
 }) {
   const { t } = useTranslation(PAYMENTS_NS);
-  const formatPaise = usePaiseFormat();
+  const formatRupees = useRupeeFormat();
   const dayLabel = useDayLabel({ relative: false });
   const day = dayLabel(item.date);
   const matched = !item.autoClosed && item.difference === 0;
@@ -93,14 +93,45 @@ function HistoryChip({
       ) : null}
       <span className="font-semibold">{day}</span>
       <span className="text-foreground-soft tabular-nums">
-        {t(K.previousCash, { amount: formatPaise(item.countedCash) })}
+        {t(K.previousCash, {
+          amount: item.countedCash === null ? '—' : formatRupees(item.countedCash),
+        })}
       </span>
       <TonePill tone={matched ? 'sage' : 'blush'} size="xs" className="tabular-nums">
         {item.autoClosed
           ? t(K.previousAuto)
-          : differenceText(item.difference, formatPaise)}
+          : differenceText(item.difference, formatRupees)}
       </TonePill>
     </button>
+  );
+}
+
+/** "Previous closes ⌄" opened: up to six chips, or a line before the branch's first close. */
+function PreviousCloses({
+  history,
+  onPick,
+}: {
+  history: readonly DayCloseHistoryItem[];
+  onPick: (date: string) => void;
+}) {
+  const { t } = useTranslation(PAYMENTS_NS);
+  return (
+    <div
+      className="animate-reveal flex flex-wrap gap-2"
+      data-testid={`${T}-previous-list`}
+    >
+      {history.length === 0 ? (
+        <span
+          data-testid={`${T}-previous-none`}
+          className="text-muted-foreground text-xs"
+        >
+          {t(K.previousNone)}
+        </span>
+      ) : null}
+      {history.map((item) => (
+        <HistoryChip key={item.date} item={item} onPick={onPick} />
+      ))}
+    </div>
   );
 }
 
@@ -209,21 +240,13 @@ export function DayCloseBar({
         ) : null}
       </div>
       {historyOpen && view ? (
-        <div
-          className="animate-reveal flex flex-wrap gap-2"
-          data-testid={`${T}-previous-list`}
-        >
-          {view.history.map((item) => (
-            <HistoryChip
-              key={item.date}
-              item={item}
-              onPick={(day) => {
-                setHistoryOpen(false);
-                onDayChange(day);
-              }}
-            />
-          ))}
-        </div>
+        <PreviousCloses
+          history={view.history}
+          onPick={(day) => {
+            setHistoryOpen(false);
+            onDayChange(day);
+          }}
+        />
       ) : null}
     </div>
   );

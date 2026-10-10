@@ -80,6 +80,8 @@ export const TODAY_KEYS = {
     unconfirmed: 'flags.unconfirmed',
     waiting: 'flags.waiting',
     inRoom: 'flags.inRoom',
+    /** "₹1,500 to pay" — a Checkout card's open bill today. */
+    toPay: 'flags.toPay',
     rxApproved: 'flags.rxApproved',
   },
   toasts: {

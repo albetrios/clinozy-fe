@@ -64,8 +64,11 @@
       "photo": "Foto",
       "appointment": "Consulta",
       "report": "Relatório",
-      "note": "Nota"
-    }
+      "note": "Nota",
+      "invoice": "Fatura",
+      "payment": "Pagamento"
+    },
+    "nothingDue": "Nada pendente para {{name}}"
   },
   "section": {
     "primary": {
@@ -126,7 +129,11 @@
     "reviews_many": "{{count}} de avaliações",
     "reviews_other": "{{count}} avaliações",
     "feedbackCounts": "{{checkIns}} · {{reviews}}",
-    "noFeedback": "Ainda sem feedback"
+    "noFeedback": "Ainda sem feedback",
+    "showAmount": "Mostrar valor",
+    "hideAmount": "Ocultar valor",
+    "collect": "Receber",
+    "allPaid": "Tudo pago · nada pendente"
   },
   "photos": {
     "albums": {
@@ -952,6 +959,15 @@
       "notes": "Notas",
       "empty": "Nenhuma atividade ainda",
       "masked": "₹ ••••"
+    },
+    "billing": {
+      "due": "Pendente",
+      "paid": "Pago",
+      "show": "Mostrar valores",
+      "hide": "Ocultar valores",
+      "invoice": "Fatura {{type}} {{number}}",
+      "sub": "{{date}} · {{amount}}",
+      "collect": "Receber pagamento"
     }
   },
   "visitFlow": {
@@ -966,7 +982,9 @@
     "steps": {
       "checks": "Chegada e segurança",
       "rx": "Receita",
-      "treatment": "Tratamento"
+      "treatment": "Tratamento",
+      "invoice": "Fatura",
+      "collect": "Receber"
     },
     "checks": {
       "labels": {
@@ -1003,6 +1021,23 @@
       "repeatPackage": "⚡ Repetir · {{name}}"
     },
     "paused": "Visita pausada",
-    "resume": "Retomar"
+    "resume": "Retomar",
+    "invoice": {
+      "create": "Criar fatura a partir da visita",
+      "custom": "Fatura personalizada",
+      "nothing": "Nada a faturar",
+      "covered": "Coberto pelo pacote · nada a faturar",
+      "empty": "Nada a faturar ainda",
+      "done": "{{number}} · {{total}}",
+      "ready_many": "{{count}} itens prontos",
+      "ready_one": "{{count}} item pronto",
+      "ready_other": "{{count}} itens prontos"
+    },
+    "collect": {
+      "action": "Receber {{amount}}",
+      "due": "{{amount}} pendente",
+      "nothing": "Nada pendente",
+      "waiting": "Fature a visita primeiro"
+    }
   }
 }

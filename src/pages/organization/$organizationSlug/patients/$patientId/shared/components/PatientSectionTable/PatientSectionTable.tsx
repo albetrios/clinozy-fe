@@ -45,6 +45,12 @@ export interface PatientSectionTableProps<TRow extends { id: string }> {
   /** The 3px start bar's tone (Visits and Invoices: the status; Payments: refunds). */
   rowTone?: (row: TRow) => Tone | undefined;
   rowActions?: (row: TRow) => readonly DataTableRowAction[];
+  /** Infinite scroll over cursor pages (the Invoices section's 50 a page); none reads at once. */
+  paging?: {
+    hasNextPage: boolean;
+    isFetchingNextPage: boolean;
+    fetchNextPage: () => void;
+  };
 }
 
 /**
@@ -71,8 +77,9 @@ const sectionExportCode = (section: PatientTableSection) =>
  * One of the patient file's section tables (KICKOFF §6.6 Section tables;
  * H:4746–4760): the shared table in the section's content — folded columns on
  * a tablet, rows with the key column at the end on a phone, selection and the
- * bulk bar's Export (CSV, the `export` ability) from `md`, the row actions,
- * the footer count and "All <records> loaded" — or the section's empty state.
+ * bulk bar's Export (CSV, the section's export code) from `md`, the row actions,
+ * the footer count, the next page on scroll and "All <records> loaded" — or the section's empty
+ * state.
  */
 export function PatientSectionTable<TRow extends { id: string }>({
   section,
@@ -83,6 +90,7 @@ export function PatientSectionTable<TRow extends { id: string }>({
   onRowClick,
   rowTone,
   rowActions,
+  paging,
 }: PatientSectionTableProps<TRow>) {
   const { t } = useTranslation(PATIENT_TABLE_NS);
   const access = useClinicAccess();
@@ -125,6 +133,9 @@ export function PatientSectionTable<TRow extends { id: string }>({
         getRowTone={rowTone ? (row) => rowTone(row.original) : undefined}
         rowActions={rowActions ? (row) => rowActions(row.original) : undefined}
         bulkActions={bulkActions}
+        hasNextPage={paging?.hasNextPage}
+        isFetchingNextPage={paging?.isFetchingNextPage}
+        fetchNextPage={paging?.fetchNextPage}
         empty={
           <RoomTableEmpty
             loading={loading}

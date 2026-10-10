@@ -160,6 +160,8 @@ export const STOCK_KEYS = {
       unpaid: 'purchases.statuses.unpaid',
     },
     rowActions: {
+      /** "Pay ₹1,710" — what is due, paid through Payments › Send payment (Q-S3). */
+      pay: 'purchases.rowActions.pay',
       edit: 'purchases.rowActions.edit',
       delete: 'purchases.rowActions.delete',
     },
@@ -230,11 +232,14 @@ export const STOCK_KEYS = {
     /** "1 purchase" (plural). */
     purchases: 'vendors.purchases',
     noPurchases: 'vendors.noPurchases',
-    /** No "Pay ₹X" while Payments is on fixtures (Q-S3) — it comes back with Payments. */
     rowActions: {
+      /** "Pay ₹2,310" — what is owed; it pays their oldest open bill through Payments (Q-S3). */
+      pay: 'vendors.rowActions.pay',
       edit: 'vendors.rowActions.edit',
       delete: 'vendors.rowActions.delete',
     },
+    /** "Nothing is owed to Ankur Pharma now" — "Pay ₹X" found no open bill (paid meanwhile). */
+    paidUp: 'vendors.paidUp',
   },
 } as const;
 

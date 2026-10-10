@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { PatientInvoiceRow } from '@/shared/api/clinic/payments-contracts.ts';
+import type { InvoiceRecord } from '@/shared/api/clinic/invoices-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import {
   INVOICE_STATUS_TONES,
@@ -16,7 +16,7 @@ import {
   dataTableFeatures,
 } from '@/shared/components/DataTable/index.ts';
 import { useHiddenColumns } from '@/shared/hooks/useHiddenColumns/index.ts';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 
 import {
   PATIENT_SECTION_TABLE_IDS,
@@ -31,27 +31,29 @@ import {
 } from '../../../shared/hooks/useStaffLookup/index.ts';
 
 const keys = PATIENT_TABLE_KEYS;
-const rowOf = (original: unknown) => original as PatientInvoiceRow;
+const rowOf = (original: unknown) => original as InvoiceRecord;
 
 /**
  * The Invoices columns (KICKOFF §6.6 Section tables; H:4748): Invoice ("#787"
- * and its type) · Items (the names over the remark, or "1 item") · Team
- * (hidden) · Bill · Paid / due · Status · Date, 1120px in all. On a phone
- * Items leads, Bill is the key and Paid / due, the invoice, the status and
- * the date fold under it.
+ * and its type) · Items (the billed names over the remark, or "1 item") · Team
+ * (hidden) · Bill · Paid / due · Status · Date, 1120px in all — every figure
+ * the server's, in rupees (`total`, `paid_amount`, `due_amount`,
+ * `payment_status`). On a phone Items leads, Bill is the key and Paid / due,
+ * the invoice, the status and the date fold under it.
  */
-function useInvoicesColumns(): ColumnDef<DataTableFeatures, PatientInvoiceRow>[] {
+function useInvoicesColumns(): ColumnDef<DataTableFeatures, InvoiceRecord>[] {
   const { t } = useTranslation(PATIENT_TABLE_NS);
   const { t: tClinic } = useTranslation(CLINIC_NS);
   const day = useTableDay();
   const staff = useStaffLookup();
-  const formatPaise = usePaiseFormat();
-  const type = (invoice: PatientInvoiceRow) =>
+  const formatRupees = useRupeeFormat();
+  const type = (invoice: InvoiceRecord) =>
     tClinic(CLINIC_KEYS.invoiceTypes[invoice.type]);
-  const status = (invoice: PatientInvoiceRow) =>
+  const status = (invoice: InvoiceRecord) =>
     tClinic(CLINIC_KEYS.invoiceStatuses[invoice.status]);
-  const items = (invoice: PatientInvoiceRow) => invoice.items.join(', ');
-  const team = (invoice: PatientInvoiceRow) =>
+  const items = (invoice: InvoiceRecord) =>
+    invoice.items.map((line) => line.name).join(', ');
+  const team = (invoice: InvoiceRecord) =>
     invoice.teamIds
       .map((id) => staff(id))
       .filter((person): person is StaffChip => person !== null);
@@ -109,24 +111,24 @@ function useInvoicesColumns(): ColumnDef<DataTableFeatures, PatientInvoiceRow>[]
     },
     {
       id: 'bill',
-      accessorFn: (row) => formatPaise(row.bill),
+      accessorFn: (row) => formatRupees(row.total),
       header: t(keys.columns.bill),
       enableSorting: false,
       cell: ({ row }) => (
-        <MoneyCell paise={row.original.bill} className="font-semibold" />
+        <MoneyCell rupees={row.original.total} className="font-semibold" />
       ),
       meta: { track: '100px', align: 'end' },
     },
     {
       id: 'paid',
-      accessorFn: (row) => formatPaise(row.paid),
+      accessorFn: (row) => formatRupees(row.paid),
       header: t(keys.columns.paid),
       enableSorting: false,
       cell: ({ row }) => {
         const { paid, due } = row.original;
         return (
           <span className="flex min-w-0 flex-col items-end">
-            <MoneyCell paise={paid} />
+            <MoneyCell rupees={paid} />
             <span
               className={cn(
                 'text-caption truncate',
@@ -134,7 +136,7 @@ function useInvoicesColumns(): ColumnDef<DataTableFeatures, PatientInvoiceRow>[]
               )}
             >
               {due > 0
-                ? t(keys.invoices.due, { amount: formatPaise(due) })
+                ? t(keys.invoices.due, { amount: formatRupees(due) })
                 : t(keys.invoices.nothingDue)}
             </span>
           </span>
@@ -177,12 +179,12 @@ function useInvoicesColumns(): ColumnDef<DataTableFeatures, PatientInvoiceRow>[]
 }
 
 /** The Invoices table: the patient's invoices, newest first; the Columns choice is a device pref. */
-export function useInvoicesTable(rows: readonly PatientInvoiceRow[]) {
+export function useInvoicesTable(rows: readonly InvoiceRecord[]) {
   const columns = useInvoicesColumns();
   const visibility = useHiddenColumns(PATIENT_SECTION_TABLE_IDS.invoices, columns);
   return useTable({
     features: dataTableFeatures,
-    data: rows as PatientInvoiceRow[],
+    data: rows as InvoiceRecord[],
     columns,
     manualPagination: true,
     manualSorting: true,

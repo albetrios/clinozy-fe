@@ -112,6 +112,14 @@ export const PAYMENTS_KEYS = {
     pickPatient: 'receive.pickPatient',
     /** "More than the ₹8,550 due" (AMBER copy, KICKOFF §6.9). */
     aboveDue: 'receive.aboveDue',
+    /** `409 more_than_due`: the invoice was paid meanwhile. */
+    moreThanDue: 'receive.moreThanDue',
+    /** "Total ₹500 · advance" — a receipt against no invoice. */
+    totalAdvance: 'receive.totalAdvance',
+    /** An edited advance's invoice field: "Advance · no invoice". */
+    advance: 'receive.advance',
+    /** The open invoices' read failed (the field's Retry follows it). */
+    invoicesFailed: 'receive.invoicesFailed',
   },
   /** Send payment (`payments.md:112–130, 212–224`). */
   send: {
@@ -168,10 +176,16 @@ export const PAYMENTS_KEYS = {
     paidBill: 'send.paidBill',
     saved: 'send.saved',
     missing: 'send.missing',
+    /** `409 more_than_due`: the bill was paid meanwhile. */
+    moreThanDue: 'send.moreThanDue',
+    /** The open bills' read failed (the step's Retry follows it). */
+    billsFailed: 'send.billsFailed',
   },
   pending: {
     /** "All pending loaded". */
     records: 'pending.records',
+    /** The search's placeholder: "Person, supplier or CR-". */
+    search: 'pending.search',
     patient: 'pending.patient',
     party: 'pending.party',
     ways: { give: 'pending.ways.give', take: 'pending.ways.take' },
@@ -184,18 +198,34 @@ export const PAYMENTS_KEYS = {
     },
     /** "Returned · Today". */
     settledToday: 'pending.settledToday',
-    /** "Adjusted · Invoice #785" — a credit used on a bill in full (Q-G9). */
-    settledInvoice: 'pending.settledInvoice',
+    /** "CR-1 · ₹50 settled · it can’t change now" — a part-settled credit's click and edit link. */
+    settledLocked: 'pending.settledLocked',
     /** "₹500 of CR-2 adjusted on invoice #785" — Use on next bill (Q-G9). */
     adjustedOn: 'pending.adjustedOn',
     /** "Nothing due for Tanvi Shah to adjust against". */
     nothingDue: 'pending.nothingDue',
     /** "₹200 adjusted". */
     adjusted: 'pending.adjusted',
-    /** "From PAY-5466 · Received". */
-    source: 'pending.source',
-    invoice: 'pending.invoice',
+    /**
+     * The Why cell's sub line — "From a ledger entry", "For an invoice" (the API serves the
+     * links' ids, not their numbers, PAY-G2), "By hand".
+     */
+    fromEntry: 'pending.fromEntry',
+    forInvoice: 'pending.forInvoice',
     byHand: 'pending.byHand',
+    /** "Invoice #785" — For invoice's options. */
+    invoice: 'pending.invoice',
+    /** A refusal (`409`) in the room's words. */
+    conflicts: {
+      /** `credit_settled`: "Part of CR-1 is settled now · it can’t change or be deleted". */
+      settled: 'pending.conflicts.settled',
+      /** `credit_closed`: "CR-1 is already settled". */
+      closed: 'pending.conflicts.closed',
+      /** Use on next bill's `day_closed`: today is closed at invoice #785's branch. */
+      dayClosed: 'pending.conflicts.dayClosed',
+      /** Use on next bill's `more_than_due`: invoice #785's due changed meanwhile. */
+      dueChanged: 'pending.conflicts.dueChanged',
+    },
     /** The credit delete confirm: "Delete this pending?" and "CR-2 deleted". */
     deleteTitle: 'pending.deleteTitle',
     deleted: 'pending.deleted',
@@ -295,17 +325,29 @@ export const PAYMENTS_KEYS = {
     previousCash: 'dayClose.previousCash',
     previousAuto: 'dayClose.previousAuto',
     previousTitle: 'dayClose.previousTitle',
+    /** "Previous closes" before the branch's first close. */
+    previousNone: 'dayClose.previousNone',
     closeDay: 'dayClose.closeDay',
     countFirst: 'dayClose.countFirst',
     /** "Day closed · summary sent to admin on WhatsApp". */
     closed: 'dayClose.closed',
     reopened: 'dayClose.reopened',
+    /** clinozy-be's `409`s, in the room's words — each re-reads the day. */
+    refusals: {
+      /** Accept on a day someone opened meanwhile (`record_already_exists`). */
+      alreadyOpened: 'dayClose.refusals.alreadyOpened',
+      /** Close on a day someone closed meanwhile (`transition_not_allowed`). */
+      alreadyClosed: 'dayClose.refusals.alreadyClosed',
+      /** Reopen on a day someone reopened meanwhile (`transition_not_allowed`). */
+      alreadyOpen: 'dayClose.refusals.alreadyOpen',
+    },
     /** The gate (H:5114–5116). */
     gate: {
       title: 'dayClose.gate.title',
       sources: {
-        default_float: 'dayClose.gate.sources.default_float',
         carried: 'dayClose.gate.sources.carried',
+        /** A branch's first day: no close before it to carry, so ₹0. */
+        first: 'dayClose.gate.sources.first',
         recounted: 'dayClose.gate.sources.recounted',
       },
       recount: 'dayClose.gate.recount',
@@ -332,10 +374,15 @@ export const PAYMENTS_KEYS = {
       countPlaceholder: 'dayClose.strip.countPlaceholder',
       countLabel: 'dayClose.strip.countLabel',
       netByMode: 'dayClose.strip.netByMode',
-      /** "In ₹600 · out ₹0". */
-      modeTitle: 'dayClose.strip.modeTitle',
-      /** "Farah A. · 1 receipt · ₹600" (plural). */
+      /** "Farah A. · 3 entries · ₹600" (plural) — the server's count and net. */
       staffTitle: 'dayClose.strip.staffTitle',
+      /** A staff chip for entries no current member wrote (an API key, a member who left). */
+      staffOther: 'dayClose.strip.staffOther',
+      /** The difference's reason, needed when the count is off (`difference_reason`, 1–280). */
+      reason: 'dayClose.strip.reason',
+      reasonPlaceholder: 'dayClose.strip.reasonPlaceholder',
+      /** "Close day" with a count that is off and no reason. */
+      reasonFirst: 'dayClose.strip.reasonFirst',
     },
     /** The closed day's report (H:5117–5121). */
     report: {
@@ -345,11 +392,11 @@ export const PAYMENTS_KEYS = {
       autoClosed: 'dayClose.report.autoClosed',
       reopen: 'dayClose.report.reopen',
       acceptedBy: 'dayClose.report.acceptedBy',
+      /** The opening of a day the worker opened: nobody accepted it. */
+      openedAuto: 'dayClose.report.openedAuto',
       takenAsExpected: 'dayClose.report.takenAsExpected',
-      collected: 'dayClose.report.collected',
-      /** "1 received" / "2 paid" (plural). */
+      /** "1 received" / "2 paid" (plural) — the day's entries each way. */
       received: 'dayClose.report.received',
-      paidOut: 'dayClose.report.paidOut',
       paid: 'dayClose.report.paid',
       cashCounted: 'dayClose.report.cashCounted',
       expected: 'dayClose.report.expected',
@@ -357,25 +404,45 @@ export const PAYMENTS_KEYS = {
       matched: 'dayClose.report.matched',
       extra: 'dayClose.report.extra',
       short: 'dayClose.report.short',
+      /** An auto-closed day's difference: nobody counted the drawer. */
+      notCounted: 'dayClose.report.notCounted',
       log: 'dayClose.report.log',
+      /** The day's events, by `kind` (`opened`, `recounted`, `closed`, `auto_closed`, `reopened`). */
       logAccepted: 'dayClose.report.logAccepted',
+      logOpened: 'dayClose.report.logOpened',
       logRecounted: 'dayClose.report.logRecounted',
-      /** "3 of 3 entries reviewed" (plural on the total). */
-      logReviewed: 'dayClose.report.logReviewed',
       logMatched: 'dayClose.report.logMatched',
       logExtra: 'dayClose.report.logExtra',
       logShort: 'dayClose.report.logShort',
       logClosed: 'dayClose.report.logClosed',
       logAuto: 'dayClose.report.logAuto',
+      /** "Riya S. reopened the day · Counted wrong" — the reason as typed (PAY-M4). */
+      logReopened: 'dayClose.report.logReopened',
+      /** The difference's reason under the close, in quotes. */
+      logReason: 'dayClose.report.logReason',
+      /** An event by someone no longer on the team. */
+      someone: 'dayClose.report.someone',
+    },
+    /** Reopen (`POST …/reopen`, `payment:delete`): the reason confirm. */
+    reopen: {
+      title: 'dayClose.reopen.title',
+      effect: 'dayClose.reopen.effect',
+      action: 'dayClose.reopen.action',
+      /** The record pill: "Vesu · Oct 9". */
+      record: 'dayClose.reopen.record',
+      reasons: {
+        miscounted: 'dayClose.reopen.reasons.miscounted',
+        missed: 'dayClose.reopen.reasons.missed',
+        wrongEntry: 'dayClose.reopen.reasons.wrongEntry',
+      },
     },
     /** "Review every entry" (`payments.md:57–67`). */
     review: {
       title: 'dayClose.review.title',
-      /** "0 of 3 checked" (plural on the total) / "No entries". */
-      progress: 'dayClose.review.progress',
+      /** "3 entries" (plural) / "No entries". */
+      count: 'dayClose.review.count',
       none: 'dayClose.review.none',
       empty: 'dayClose.review.empty',
-      check: 'dayClose.review.check',
       /** The State pill: "Can edit", "Day closed", "From CR-2" — and the tooltips. */
       states: {
         canEdit: 'dayClose.review.states.canEdit',

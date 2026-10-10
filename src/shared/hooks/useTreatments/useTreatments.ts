@@ -4,6 +4,7 @@ import {
   createTreatment,
   listPatientTreatments,
   listTreatmentCheckIns,
+  listVisitTreatmentsToBill,
   reverseTreatment,
   treatmentQueryKeys,
   updateTreatment,
@@ -36,6 +37,27 @@ const TREATMENT_WRITE_KEYS = [
 ];
 
 // ── Reads ──
+
+/**
+ * A visit's sessions still to bill, oldest first (`GET …/treatments?appointment_id=
+ * &is_billed=false`) — the Invoice drawer's "Create invoice from visit"; idle without a patient
+ * and a visit.
+ */
+export function useVisitTreatmentsToBill(
+  patientId: string | null,
+  appointmentId: string | null,
+) {
+  const organizationId = useOrganizationId();
+  return useAppQuery({
+    queryKey: treatmentQueryKeys.toBill(
+      organizationId,
+      patientId ?? '',
+      appointmentId ?? '',
+    ),
+    queryFn: () => listVisitTreatmentsToBill(patientId ?? '', appointmentId ?? ''),
+    enabled: Boolean(patientId) && Boolean(appointmentId) && organizationId !== null,
+  });
+}
 
 /**
  * One patient's sessions, newest first, reversed ones included (`GET …/treatments`, every page);

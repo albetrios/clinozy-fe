@@ -29,6 +29,7 @@ import {
   TEST_CONTACT_ID,
   TEST_PATIENT_ID,
 } from '@/tests/utils/patient-doubles.ts';
+import { invoiceRecord } from '@/tests/utils/payments-doubles.ts';
 import { shownLocation } from '@/tests/utils/shown-location.ts';
 
 import {
@@ -118,6 +119,11 @@ vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchPersonAppointments: vi.fn(),
 }));
+vi.mock('@/shared/api/clinic/invoices-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  listInvoices: vi.fn(),
+  fetchInvoiceTotals: vi.fn(),
+}));
 vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchTeamDirectory: vi.fn(async () => [DOCTOR_NISHA]),
@@ -136,6 +142,7 @@ import {
   listContactActivities,
   sendContactActivity,
 } from '@/shared/api/clinic/contact-activities-api.ts';
+import { fetchInvoiceTotals, listInvoices } from '@/shared/api/clinic/invoices-api.ts';
 import { listPatientPhotos } from '@/shared/api/clinic/patient-images-api.ts';
 import { listPatientPackages } from '@/shared/api/clinic/patient-packages-api.ts';
 import { listPatientReports } from '@/shared/api/clinic/patient-reports-api.ts';
@@ -289,6 +296,22 @@ const REPORT: PatientReport = {
   updatedAt: '2026-09-20T05:00:00.000Z',
 };
 
+/** Her invoices, newest first: #8 owes ₹100 of ₹500, #7 and #6 are paid, #5 is older. */
+const INVOICES = [
+  invoiceRecord({ id: 'invc_eight000000000000000', seq: 8, date: '2026-10-09' }),
+  invoiceRecord({
+    id: 'invc_seven000000000000000',
+    seq: 7,
+    type: 'clinic',
+    total: 4800,
+    paid: 4800,
+    due: 0,
+    status: 'paid',
+  }),
+  invoiceRecord({ id: 'invc_six00000000000000000', seq: 6, type: 'medical', due: 0 }),
+  invoiceRecord(),
+];
+
 /** Says when the member's access is known — before then every gate reads "not allowed". */
 function AccessProbe() {
   const access = useClinicAccess();
@@ -300,10 +323,14 @@ async function openBento({
   role,
   viewable = PATIENT_FILE_SECTIONS,
   nextVisit = true,
+  masked = true,
+  toggleMasked,
 }: {
-  role?: 'admin' | 'owner' | 'therapist';
+  role?: 'admin' | 'owner' | 'therapist' | 'doctor';
   viewable?: readonly PatientFileSectionSlug[];
   nextVisit?: boolean;
+  masked?: boolean;
+  toggleMasked?: () => void;
 } = {}) {
   const user = userEvent.setup();
   const view = renderInPatientFile(
@@ -314,6 +341,8 @@ async function openBento({
     {
       role,
       viewable,
+      masked,
+      ...(toggleMasked ? { toggleMasked } : {}),
       section: 'timeline',
       file: patientFile({
         nextVisit: nextVisit
@@ -356,6 +385,13 @@ beforeEach(() => {
     albumCounts: { general: 4, lhr: 5, private: null },
   });
   vi.mocked(listPatientReports).mockResolvedValue({ reports: [REPORT], total: 4 });
+  vi.mocked(listInvoices).mockResolvedValue({
+    rows: INVOICES,
+    next: null,
+    total: INVOICES.length,
+    totals: null,
+  });
+  vi.mocked(fetchInvoiceTotals).mockResolvedValue({ due: 100, paid: 5700.5, count: 4 });
   vi.mocked(fetchPersonAppointments).mockResolvedValue([
     appointmentRow({
       id: 'appt_done0000000000000000',
@@ -372,7 +408,7 @@ afterEach(() => {
 });
 
 describe('OverviewBento (KICKOFF §6.6 Overview, H:769–779)', () => {
-  it('lays out the eight cards from their reads — no Billing card until Payments (G4)', async () => {
+  it('lays out the nine cards from their reads', async () => {
     const { container, user, router } = await openBento();
     for (const name of [
       'clinical',
@@ -381,14 +417,14 @@ describe('OverviewBento (KICKOFF §6.6 Overview, H:769–779)', () => {
       'packages',
       'prescriptions',
       'treatments',
+      'billing',
       'reports',
       'notes',
     ]) {
       expect(await card(name)).toBeInTheDocument();
     }
-    expect(screen.queryByTestId('overview-card-billing')).not.toBeInTheDocument();
-    expect(screen.queryByText('₹ ••••')).not.toBeInTheDocument();
     await within(await card('notes')).findByText('Prefers evening slots');
+    await within(await card('billing')).findAllByTestId('overview-card-billing-row');
     expect(await axe(container)).toHaveNoViolations();
 
     await user.click(screen.getByRole('button', { name: 'Open Visits' }));
@@ -642,5 +678,111 @@ describe('OverviewBento (KICKOFF §6.6 Overview, H:769–779)', () => {
       await user.click(within(await card(name)).getByRole('button', { name: label }));
       await waitFor(() => expect(path(router)).toBe(`${FILE}/${target}`));
     }
+  });
+
+  it('shows her money from the server — Due and Paid masked with the file, her newest three invoices', async () => {
+    await openBento();
+    const billing = await card('billing');
+    const rows = await within(billing).findAllByTestId('overview-card-billing-row');
+    expect(rows).toHaveLength(3);
+    // The server's status on each (the titles' copy lands with the locale spec).
+    expect(rows[0]).toHaveTextContent('Partly paid');
+    expect(rows[1]).toHaveTextContent('Paid');
+    // Every amount masked with the file (Q-F4), the server's count beside the title.
+    expect(within(billing).getByTestId('overview-card-billing-due')).toHaveTextContent(
+      '₹ ••••',
+    );
+    expect(within(billing).getByTestId('overview-card-billing-paid')).toHaveTextContent(
+      '₹ ••••',
+    );
+    expect(within(billing).getByText('4')).toBeInTheDocument();
+    expect(fetchInvoiceTotals).toHaveBeenCalledWith({ patientId: TEST_PATIENT_ID });
+    expect(listInvoices).toHaveBeenCalledWith({ patientId: TEST_PATIENT_ID }, undefined);
+  });
+
+  it('shows the server’s figures once the file is unmasked, and the eye toggles the mask', async () => {
+    const toggleMasked = vi.fn();
+    const { user } = await openBento({ masked: false, toggleMasked });
+    const billing = await card('billing');
+    await waitFor(() =>
+      expect(within(billing).getByTestId('overview-card-billing-due')).toHaveTextContent(
+        '₹100',
+      ),
+    );
+    expect(within(billing).getByTestId('overview-card-billing-paid')).toHaveTextContent(
+      '₹5,700.50',
+    );
+    await user.click(within(billing).getByTestId('overview-card-billing-eye'));
+    expect(toggleMasked).toHaveBeenCalledTimes(1);
+  });
+
+  it('collects what she owes and opens an invoice over the file', async () => {
+    const { user, router } = await openBento({ role: 'owner' });
+    const billing = await card('billing');
+    await user.click(await within(billing).findByTestId('overview-card-billing-collect'));
+    await waitFor(() => expect(path(router)).toBe('/organization/acme/payments/receive'));
+    expect(shownLocation(router).search).toEqual({
+      patient: TEST_PATIENT_ID,
+      from: `patients/${TEST_PATIENT_ID}/timeline`,
+    });
+
+    router.history.back();
+    const [row] = await within(await card('billing')).findAllByTestId(
+      'overview-card-billing-row',
+    );
+    await user.click(row!);
+    await waitFor(() =>
+      expect(path(router)).toBe(
+        '/organization/acme/invoices/invc_eight000000000000000/edit',
+      ),
+    );
+
+    router.history.back();
+    await user.click(
+      within(await card('billing')).getByRole('button', { name: 'New invoice' }),
+    );
+    await waitFor(() => expect(path(router)).toBe('/organization/acme/invoices/create'));
+    expect(shownLocation(router).search).toMatchObject({
+      type: 'clinic',
+      patient: TEST_PATIENT_ID,
+    });
+  });
+
+  it('offers no Collect while nothing is due, and says when there are no invoices', async () => {
+    vi.mocked(fetchInvoiceTotals).mockResolvedValue({ due: 0, paid: 0, count: 0 });
+    vi.mocked(listInvoices).mockResolvedValue({
+      rows: [],
+      next: null,
+      total: 0,
+      totals: null,
+    });
+    await openBento({ role: 'owner' });
+    const billing = await card('billing');
+    expect(await within(billing).findByText('No invoices yet')).toBeInTheDocument();
+    expect(
+      within(billing).queryByTestId('overview-card-billing-collect'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('says when the money read failed, and Retry reads it again', async () => {
+    vi.mocked(listInvoices).mockRejectedValueOnce(new Error('offline'));
+    const { user } = await openBento();
+    const billing = await card('billing');
+    await user.click(await within(billing).findByTestId('retry-button'));
+    expect(
+      await within(billing).findAllByTestId('overview-card-billing-row'),
+    ).toHaveLength(3);
+    expect(listInvoices).toHaveBeenCalledTimes(2);
+  });
+
+  it('leaves Billing out — and reads no money — for a member without billing view', async () => {
+    await openBento({
+      viewable: PATIENT_FILE_SECTIONS.filter(
+        (section) => section !== 'invoices' && section !== 'payments',
+      ),
+    });
+    await card('visits');
+    expect(screen.queryByTestId('overview-card-billing')).not.toBeInTheDocument();
+    expect(listInvoices).not.toHaveBeenCalled();
   });
 });

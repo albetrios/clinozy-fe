@@ -27,7 +27,10 @@ export interface PaymentsSearch {
   /** Mode: any entry with a split in these modes. */
   mode?: PaymentMode[];
   created?: CreatedFilter;
-  /** A PAY- number, the party or an invoice number (≤ 80 characters). */
+  /**
+   * The person (their name, mobile or contact number), the payee or a PAY- number (D81; ≤ 80
+   * characters) — the API's `q`, which does not search invoice numbers.
+   */
   q?: string;
 }
 

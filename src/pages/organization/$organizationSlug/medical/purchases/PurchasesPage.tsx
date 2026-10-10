@@ -10,9 +10,9 @@ import {
 } from '@/shared/components/RoomToolbar/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
+import { useFixtureOpenSupplierBills } from '@/shared/hooks/useFixtureLedger/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { usePayBill } from '@/shared/hooks/usePayBill/index.ts';
-import { useOpenSupplierBills } from '@/shared/hooks/usePayments/index.ts';
 import { useRoomList } from '@/shared/hooks/useRoomList/index.ts';
 import { useRoomTable } from '@/shared/hooks/useRoomTable/index.ts';
 import { Eye, PenLine, SquareCheck, Trash, Wallet } from '@/shared/icons/index.ts';
@@ -128,7 +128,7 @@ function OrderDrawers({
 function PayAllReceived({ onPay }: { onPay: (purchaseId: string) => void }) {
   const { t } = useTranslation(MEDICAL_NS);
   const formatPaise = usePaiseFormat();
-  const bills = (useOpenSupplierBills().data ?? []).filter(
+  const bills = (useFixtureOpenSupplierBills().data ?? []).filter(
     (bill) => bill.kind === 'medical_po',
   );
   const [oldest] = bills;

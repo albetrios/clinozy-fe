@@ -72,13 +72,16 @@ export function useLeadList(
   return list;
 }
 
-/** A lead's open tasks — the drawer's Info count; idle without an id. */
-export function useOpenLeadTasks(id: string | undefined) {
+/**
+ * A lead's open tasks — the drawer's Info count; idle without an id, and while `enabled` is false
+ * (a member without `task:read` would get a 403).
+ */
+export function useOpenLeadTasks(id: string | undefined, { enabled = true } = {}) {
   const organizationId = useOrganizationId();
   return useAppQuery({
     queryKey: leadQueryKeys.openTasks(organizationId, id ?? ''),
     queryFn: () => countOpenLeadTasks(id ?? ''),
-    enabled: id !== undefined,
+    enabled: id !== undefined && enabled,
   });
 }
 

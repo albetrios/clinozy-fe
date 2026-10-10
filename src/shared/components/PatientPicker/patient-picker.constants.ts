@@ -18,8 +18,6 @@ export const PATIENT_PICKER_KEYS = {
   due: 'patientPicker.due',
   /** "Nothing due". */
   nothingDue: 'patientPicker.nothingDue',
-  /** "Lead #2363 · not a patient yet" — a lead's option, which the field won't take. */
-  lead: 'patientPicker.lead',
 } as const;
 
 /** The field's base test id; its parts derive theirs (`-option-<id>` …). */

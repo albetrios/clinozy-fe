@@ -138,8 +138,8 @@ describe('useClinicAccess', () => {
 
 describe('useClinicAccess — the staff profile’s roles (L-31)', () => {
   it('takes the signed-in member’s clinic roles from their staff profile', async () => {
-    // Patients, Offerings and Stock answer from the member's codes (they are on the API); the
-    // rest from the matrix.
+    // Patients, Offerings, Stock and Tasks answer from the member's codes (they are on the API) —
+    // these codes hold no task code, so Tasks is not viewable; the rest from the matrix.
     signIn('farah@cresence.skin', [...VIEWER_CODES, 'patient:read', 'stock_item:read']);
     const { result } = renderAccess();
     await waitFor(() => expect(result.current.isResolved).toBe(true));
@@ -149,7 +149,6 @@ describe('useClinicAccess — the staff profile’s roles (L-31)', () => {
       'patients',
       'medical',
       'stock',
-      'tasks',
       'offerings',
     ]);
     expect(result.current.canAbility('void')).toBe(true);

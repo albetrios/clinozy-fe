@@ -3,28 +3,30 @@ import type {
   TaskFollowUpWhen,
   TaskOutcomeIdOf,
   TaskRuleGroup,
-  TaskRuleId,
   TaskSnoozeOption,
+  TaskType,
 } from '@/shared/api/clinic/tasks-contracts.ts';
 
 /**
- * The task rule catalogue's copy (`src/shared/api/clinic/tasks-contracts.ts`)
- * lives in the Tasks room's namespace — the Rules popover, the type filter, the
- * drawer's how-to and outcome buttons, and Today's work-queue aside (which
- * loads `tasks` beside `today`) all read it here.
+ * The task catalogue's copy (`src/shared/api/clinic/tasks-contracts.ts`) lives in the Tasks room's
+ * namespace — the Rules popover, the type filter, the drawer's how-to and outcome buttons, and
+ * Today's work queue (which loads `tasks` beside `today`) all read it here.
  */
 export const TASK_RULES_NS = I18N_NAMESPACES.tasks;
 
-/** One rule's keys: its name, its Rules-popover line, its automation, its steps and its outcomes. */
-interface TaskRuleKeySet<R extends TaskRuleId> {
+/** One type's keys: its name, its Rules-popover line, its automation, its steps and its outcomes. */
+interface TaskTypeKeySet<T extends TaskType> {
   readonly label: string;
   readonly description: string;
-  /** "Let Clinozy handle" / "Clinozy can do this" — null when Clinozy can't. */
+  /**
+   * "Let Clinozy handle" — the step the server takes for a rule it can do (`can_be_automatic`:
+   * confirm, feedback, payment due, regulars gone quiet; route map §4 #21); null for the others.
+   */
   readonly automation: string | null;
-  /** The drawer's "2 · How" steps (none for Today's two kinds). */
+  /** The drawer's "2 · How" steps (none for the rules the design did not draw). */
   readonly how: readonly string[];
   readonly outcomes: {
-    readonly [O in TaskOutcomeIdOf<R>]: {
+    readonly [O in TaskOutcomeIdOf<T>]: {
       readonly label: string;
       readonly effect: string;
     };
@@ -32,10 +34,10 @@ interface TaskRuleKeySet<R extends TaskRuleId> {
 }
 
 /**
- * Keys in the `tasks` namespace for the rules (`tasks.md:42–56, 314–346`), their
- * outcomes and effect lines (`tasks.md:185–227`; Payment due and Recall:
- * `today.md:238–242`), the Snooze options and "What’s next" When chips — every
- * English value verbatim from the design. `{{owner}}`, `{{doctor}}` and
+ * Keys in the `tasks` namespace for the types (`tasks.md:42–56, 314–346`), their outcomes and
+ * effect lines (`tasks.md:185–227`), the Snooze options and "What’s next" When chips. Each type's
+ * copy keeps the design's rule id as its key segment (`follow_up` → `rules.follow`, `call_back` →
+ * `rules.unhappy`, "Follow-ups you set" → `rules.manual`, …); `{{owner}}`, `{{doctor}}` and
  * `{{first}}` interpolate names.
  */
 export const TASK_RULE_KEYS = {
@@ -47,12 +49,13 @@ export const TASK_RULE_KEYS = {
     patients: 'ruleGroups.patients',
     team: 'ruleGroups.team',
     payments: 'ruleGroups.payments',
+    medical: 'ruleGroups.medical',
   },
   rules: {
     reply: {
       label: 'rules.reply.label',
       description: 'rules.reply.description',
-      automation: 'rules.reply.automation',
+      automation: null,
       how: ['rules.reply.how.first', 'rules.reply.how.second', 'rules.reply.how.third'],
       outcomes: {
         bookedVisit: {
@@ -69,10 +72,10 @@ export const TASK_RULE_KEYS = {
         },
       },
     },
-    follow: {
+    follow_up: {
       label: 'rules.follow.label',
       description: 'rules.follow.description',
-      automation: 'rules.follow.automation',
+      automation: null,
       how: [
         'rules.follow.how.first',
         'rules.follow.how.second',
@@ -113,10 +116,10 @@ export const TASK_RULE_KEYS = {
         },
       },
     },
-    failed: {
+    failed_message: {
       label: 'rules.failed.label',
       description: 'rules.failed.description',
-      automation: 'rules.failed.automation',
+      automation: null,
       how: [
         'rules.failed.how.first',
         'rules.failed.how.second',
@@ -192,7 +195,7 @@ export const TASK_RULE_KEYS = {
     rebook: {
       label: 'rules.rebook.label',
       description: 'rules.rebook.description',
-      automation: 'rules.rebook.automation',
+      automation: null,
       how: [
         'rules.rebook.how.first',
         'rules.rebook.how.second',
@@ -241,10 +244,30 @@ export const TASK_RULE_KEYS = {
         },
       },
     },
+    call_back: {
+      label: 'rules.unhappy.label',
+      description: 'rules.unhappy.description',
+      automation: null,
+      how: [
+        'rules.unhappy.how.first',
+        'rules.unhappy.how.second',
+        'rules.unhappy.how.third',
+      ],
+      outcomes: {
+        calledResolved: {
+          label: 'rules.unhappy.outcomes.calledResolved.label',
+          effect: 'rules.unhappy.outcomes.calledResolved.effect',
+        },
+        offeredReviewVisit: {
+          label: 'rules.unhappy.outcomes.offeredReviewVisit.label',
+          effect: 'rules.unhappy.outcomes.offeredReviewVisit.effect',
+        },
+      },
+    },
     aftercare: {
       label: 'rules.aftercare.label',
       description: 'rules.aftercare.description',
-      automation: 'rules.aftercare.automation',
+      automation: null,
       how: [
         'rules.aftercare.how.first',
         'rules.aftercare.how.second',
@@ -265,30 +288,10 @@ export const TASK_RULE_KEYS = {
         },
       },
     },
-    unhappy: {
-      label: 'rules.unhappy.label',
-      description: 'rules.unhappy.description',
-      automation: null,
-      how: [
-        'rules.unhappy.how.first',
-        'rules.unhappy.how.second',
-        'rules.unhappy.how.third',
-      ],
-      outcomes: {
-        calledResolved: {
-          label: 'rules.unhappy.outcomes.calledResolved.label',
-          effect: 'rules.unhappy.outcomes.calledResolved.effect',
-        },
-        offeredReviewVisit: {
-          label: 'rules.unhappy.outcomes.offeredReviewVisit.label',
-          effect: 'rules.unhappy.outcomes.offeredReviewVisit.effect',
-        },
-      },
-    },
-    nextvisit: {
+    next_visit: {
       label: 'rules.nextvisit.label',
       description: 'rules.nextvisit.description',
-      automation: 'rules.nextvisit.automation',
+      automation: null,
       how: [
         'rules.nextvisit.how.first',
         'rules.nextvisit.how.second',
@@ -309,10 +312,10 @@ export const TASK_RULE_KEYS = {
         },
       },
     },
-    noreply: {
+    gone_quiet: {
       label: 'rules.noreply.label',
       description: 'rules.noreply.description',
-      automation: null,
+      automation: 'rules.noreply.automation',
       how: [
         'rules.noreply.how.first',
         'rules.noreply.how.second',
@@ -333,7 +336,7 @@ export const TASK_RULE_KEYS = {
         },
       },
     },
-    manual: {
+    by_hand: {
       label: 'rules.manual.label',
       description: 'rules.manual.description',
       automation: null,
@@ -357,10 +360,10 @@ export const TASK_RULE_KEYS = {
         },
       },
     },
-    payment: {
+    payment_due: {
       label: 'rules.payment.label',
       description: 'rules.payment.description',
-      automation: null,
+      automation: 'rules.payment.automation',
       how: [],
       outcomes: {
         collectAtCheckout: {
@@ -377,19 +380,27 @@ export const TASK_RULE_KEYS = {
         },
       },
     },
-    recall: {
-      label: 'rules.recall.label',
-      description: 'rules.recall.description',
+    settle_by: {
+      label: 'rules.settleBy.label',
+      description: 'rules.settleBy.description',
       automation: null,
       how: [],
       outcomes: {
-        booked: {
-          label: 'rules.recall.outcomes.booked.label',
-          effect: 'rules.recall.outcomes.booked.effect',
+        done: {
+          label: 'rules.settleBy.outcomes.done.label',
+          effect: 'rules.settleBy.outcomes.done.effect',
         },
-        later: {
-          label: 'rules.recall.outcomes.later.label',
-          effect: 'rules.recall.outcomes.later.effect',
+      },
+    },
+    medical_rep_visit: {
+      label: 'rules.medicalRepVisit.label',
+      description: 'rules.medicalRepVisit.description',
+      automation: null,
+      how: [],
+      outcomes: {
+        done: {
+          label: 'rules.medicalRepVisit.outcomes.done.label',
+          effect: 'rules.medicalRepVisit.outcomes.done.effect',
         },
       },
     },
@@ -408,7 +419,7 @@ export const TASK_RULE_KEYS = {
   },
 } as const satisfies {
   readonly groups: Readonly<Record<TaskRuleGroup, string>>;
-  readonly rules: { readonly [R in TaskRuleId]: TaskRuleKeySet<R> };
+  readonly rules: { readonly [T in TaskType]: TaskTypeKeySet<T> };
   readonly snoozeOptions: Readonly<Record<TaskSnoozeOption, string>>;
   readonly followUpWhen: Readonly<Record<TaskFollowUpWhen, string>>;
 };
@@ -440,8 +451,13 @@ export const TASK_DUE_KEYS = {
 export const TASK_QUEUE_KEYS = {
   /** "Mine" · "Everyone". */
   scope: { mine: 'scope.mine', everyone: 'scope.everyone' },
-  /** An unowned task's owner. */
+  /** A task with no owner and no queue. */
   anyone: 'row.anyone',
   /** To do's empty line — Today's work queue shows it too (its design has none; AMBER). */
   empty: 'empty.queue',
+  /**
+   * An outcome on a task someone — or the rules — closed first (`409 transition_not_allowed`):
+   * the task drawer's and Today's card's words.
+   */
+  alreadyClosed: 'toasts.alreadyClosed',
 } as const;

@@ -9,13 +9,13 @@
     "treatments": "施術",
     "patients": "患者",
     "team": "チーム",
-    "payments": "支払い"
+    "payments": "支払い",
+    "medical": "医薬"
   },
   "rules": {
     "reply": {
       "label": "未返信のメッセージ",
       "description": "リードからメッセージがあり、まだ誰も返信していません",
-      "automation": "料金と空き枠を添えて最初の返信を送る",
       "how": {
         "first": "右側で最新のメッセージを読む",
         "second": "料金と2つの空き枠を添えて返信する",
@@ -39,7 +39,6 @@
     "follow": {
       "label": "リードのフォローアップ",
       "description": "フォローアップ日になりました",
-      "automation": "WhatsAppで気軽な確認メッセージを送る",
       "how": {
         "first": "何に興味があったか確認する",
         "second": "電話かWhatsAppで気軽に声をかける",
@@ -56,7 +55,7 @@
         },
         "noAnswer": {
           "label": "応答なし",
-          "effect": "通話を記録 · タスクを2時間スヌーズ"
+          "effect": "通話を記録 · タスクを3時間スヌーズ"
         },
         "notInterested": {
           "label": "興味なし",
@@ -75,7 +74,7 @@
       "outcomes": {
         "claimIt": {
           "label": "引き継ぐ",
-          "effect": "あなたが担当者になります · {{owner}}さんも引き続き関与します"
+          "effect": "あなたが担当者になります"
         },
         "leaveWithOwner": {
           "label": "担当者に任せる",
@@ -86,7 +85,6 @@
     "failed": {
       "label": "未配信のメッセージ",
       "description": "プロバイダーがメッセージを配信できませんでした",
-      "automation": "SMSで再送し、だめなら電話対応のフラグを立てる",
       "how": {
         "first": "携帯番号を確認する",
         "second": "WhatsAppまたはSMSで再送する",
@@ -99,11 +97,11 @@
         },
         "calledInstead": {
           "label": "代わりに電話した",
-          "effect": "リードに通話を記録"
+          "effect": "通話を記録"
         },
         "fixTheNumber": {
           "label": "番号を修正する",
-          "effect": "リードを開いて編集します"
+          "effect": "記録を開いて編集します"
         }
       }
     },
@@ -131,7 +129,7 @@
         },
         "noAnswer": {
           "label": "応答なし",
-          "effect": "通話を記録 · タスクを2時間スヌーズ"
+          "effect": "通話を記録 · タスクを3時間スヌーズ"
         }
       }
     },
@@ -161,7 +159,6 @@
     "rebook": {
       "label": "無断キャンセルの再予約",
       "description": "患者が来院しませんでした",
-      "automation": "WhatsAppで次の空き枠を2つ提案する",
       "how": {
         "first": "空き枠2つを添えて電話かWhatsAppで連絡する",
         "second": "選ばれた枠を予約する",
@@ -194,7 +191,7 @@
       "outcomes": {
         "happy": {
           "label": "満足 · 4–5★",
-          "effect": "Googleレビューのリンクを送信 · レビュー記録を開く"
+          "effect": "レビュー記録を開く"
         },
         "unhappy": {
           "label": "不満",
@@ -206,14 +203,13 @@
         },
         "sentTheForm": {
           "label": "フォームを送った",
-          "effect": "記録済み · 明日までスヌーズ"
+          "effect": "明日までスヌーズ"
         }
       }
     },
     "aftercare": {
       "label": "アフターケアの電話",
       "description": "施術後のフォローアップ電話が必要です",
-      "automation": "WhatsAppでアフターケアの確認を送り、返信を記録する",
       "how": {
         "first": "電話して肌の調子を尋ねる",
         "second": "アフターケアを守れたか確認する",
@@ -236,7 +232,7 @@
     },
     "unhappy": {
       "label": "不満のある患者",
-      "description": "評価が3★以下でした",
+      "description": "患者が低い評価を付けたか、不満を示しました",
       "how": {
         "first": "まずフィードバックを読む",
         "second": "医師またはマネージャーが折り返す",
@@ -256,7 +252,6 @@
     "nextvisit": {
       "label": "次回来院が未設定",
       "description": "来院は完了しましたが、フォローアップ日も次の予約もありません",
-      "automation": "WhatsAppで2つの枠を提案し、選ばれたらフォローアップを設定する",
       "how": {
         "first": "医師の指示を確認する",
         "second": "次回来院の枠を2つ提案する",
@@ -279,7 +274,7 @@
     },
     "noreply": {
       "label": "連絡が途絶えた常連患者",
-      "description": "常連またはパッケージ利用の患者が30日以上予約しておらず、定期リマインダーにも返信がありません",
+      "description": "パッケージの残り回数がある患者が30日以上来院せず、予約もありません",
       "how": {
         "first": "パッケージと最終来院を確認する",
         "second": "一度電話し、その後カムバック特典を送る",
@@ -292,13 +287,14 @@
         },
         "sendOffer": {
           "label": "特典を送る",
-          "effect": "WhatsAppでカムバック特典を送信 · 1週間スヌーズ"
+          "effect": "1週間スヌーズ"
         },
         "notComingBack": {
           "label": "戻ってこない",
           "effect": "理由を付けてクローズ"
         }
-      }
+      },
+      "automation": "チーム向けに再アプローチのリードを作成"
     },
     "manual": {
       "label": "設定したフォローアップ",
@@ -329,29 +325,36 @@
       "outcomes": {
         "collectAtCheckout": {
           "label": "会計時に回収",
-          "effect": "本日の会計に追加"
+          "effect": "クローズ · 会計時に回収"
         },
         "sendUpiLink": {
           "label": "UPIリンクを送る",
-          "effect": "UPIリンクをWhatsAppで送信予定"
+          "effect": "クローズ · リンクはチャットから送信"
         },
         "called": {
           "label": "電話した",
-          "effect": "支払いの約束を記録"
+          "effect": "メモを付けてクローズ"
+        }
+      },
+      "automation": "WhatsAppで支払いリマインダーを送る"
+    },
+    "settleBy": {
+      "label": "精算待ちのクレジット",
+      "description": "保留中のクレジットの精算日になりました",
+      "outcomes": {
+        "done": {
+          "label": "完了",
+          "effect": "クローズ · 支払いで精算"
         }
       }
     },
-    "recall": {
-      "label": "リコール",
-      "description": "患者の再診時期です",
+    "medicalRepVisit": {
+      "label": "MRの訪問",
+      "description": "MRの訪問予定があります",
       "outcomes": {
-        "booked": {
-          "label": "予約済み",
-          "effect": "予約済み · 確認を送信予定"
-        },
-        "later": {
-          "label": "後で",
-          "effect": "7日間スヌーズ"
+        "done": {
+          "label": "完了",
+          "effect": "クローズ · 訪問は医薬で記録"
         }
       }
     }
@@ -416,12 +419,16 @@
     "result": "✓ {{result}}"
   },
   "sources": {
-    "lead": "リード {{id}}",
-    "appointment": "予約 {{id}}",
+    "lead": "リード",
+    "appointment": "予約",
     "treatment": "施術",
-    "patient": "患者 {{id}}",
-    "invoice": "請求書 {{id}}",
-    "contact": "連絡先"
+    "patient": "患者",
+    "invoice": "請求書",
+    "contact": "連絡先",
+    "checkIn": "チェックイン",
+    "review": "レビュー",
+    "pendingCredit": "クレジット",
+    "medicalRep": "MR"
   },
   "due": {
     "snoozed": "スヌーズ · {{label}}",
@@ -446,7 +453,7 @@
   "newTask": {
     "title": "新しいタスク",
     "sub": "{{person}} 向け · タスクとこの人のタイムラインに表示されます",
-    "subNoPerson": "タスクとその人のタイムラインに表示されます",
+    "subNoPerson": "タスクに表示され、対象者がいればその人のタイムラインにも表示されます",
     "steps": {
       "what": "やること",
       "when": "いつ・誰が",
@@ -454,24 +461,15 @@
     },
     "forField": {
       "label": "対象",
-      "placeholder": "患者またはリードを選択",
+      "placeholder": "人を選択",
       "search": "名前、携帯番号、番号で検索",
-      "empty": "名前、携帯番号、患者番号を入力してください",
-      "missing": "タスクの対象者を選んでください"
-    },
-    "type": {
-      "label": "種類",
-      "callBack": "折り返し電話",
-      "followUp": "フォローアップ",
-      "sendPrice": "料金を送る",
-      "askForPhotos": "写真を依頼",
-      "feedback": "フィードバック",
-      "paymentReminder": "支払いリマインダー"
+      "empty": "名前、携帯番号、連絡先番号を入力してください"
     },
     "titleField": {
       "label": "タイトル",
       "placeholder": "やること",
-      "fallback": "{{type}} · {{first}}"
+      "fallback": "フォローアップ · {{first}}",
+      "missing": "タイトルを入力するか、タスクの対象者を選んでください"
     },
     "due": {
       "label": "期限",
@@ -491,7 +489,6 @@
       "normal": "通常",
       "high": "高"
     },
-    "remind": "{{minutes}}分前に通知",
     "notes": {
       "label": "タスクのメモ",
       "placeholder": "メモ（任意）"
@@ -513,11 +510,13 @@
     },
     "quote": "「{{message}}」",
     "source": {
-      "appointment": "予約を開く · {{record}}",
-      "lead": "リードを開く · {{record}}",
-      "treatment": "患者を開く · {{record}}",
-      "patient": "患者を開く · {{record}}",
-      "invoice": "請求書を開く · {{record}}"
+      "appointment": "予約を開く",
+      "lead": "リードを開く",
+      "treatment": "施術を開く",
+      "patient": "患者を開く",
+      "invoice": "請求書を開く",
+      "checkIn": "チェックインを開く",
+      "review": "レビューを開く"
     },
     "tiles": {
       "visit": "来院",
@@ -537,29 +536,32 @@
       "visit": "{{day}} · {{time}} · {{minutes}}分",
       "session": "#{{number}}"
     },
-    "automation": {
-      "title": "{{productName}} が対応できます",
-      "action": "{{productName}} に任せる"
-    },
     "outcomeNote": {
       "label": "結果メモ",
       "placeholder": "結果にメモを追加（任意）"
     },
     "snooze": "スヌーズ",
     "assigned": "担当",
-    "assignTip": "このタスクを別の人に移す · 前の担当者も関わり続けます",
+    "assignTip": "このタスクを別の人に移す",
     "searchTeam": "チームを検索",
     "was": "以前 {{names}}",
-    "close": "閉じる"
+    "close": "閉じる",
+    "subByHand": "手動で追加",
+    "assignGroups": {
+      "team": "チーム",
+      "queues": "役割ごとのキュー"
+    },
+    "deleteTitle": "このタスクを削除しますか？"
   },
   "toasts": {
     "closed": "{{title}} · {{result}}",
     "snoozed": "スヌーズ · {{label}}",
-    "claimed": "{{name}} の担当になりました · {{owner}} も関わり続けます",
-    "claimedUnowned": "{{name}} の担当になりました",
-    "moved": "{{title}} → {{name}} · {{previous}} も関わり続けます",
-    "movedUnowned": "{{title}} → {{name}}",
-    "automation": "{{productName}} が対応中 · {{automation}}"
+    "claimed": "{{name}} の担当になりました",
+    "moved": "{{title}} → {{name}}",
+    "removed": "{{title}} を削除しました",
+    "alreadyClosed": "このタスクはすでに完了しています",
+    "claimNeedsLeads": "リードを引き受けるにはリードの編集権限が必要です。オーナーまたは管理者に依頼してください",
+    "reassignNeedsLeads": "リードのタスクを移すにはリードの編集権限が必要です。オーナーまたは管理者に依頼してください"
   },
   "whatsNext": {
     "title": "{{first}} さんの次は？",
@@ -585,6 +587,7 @@
     "pickWhen": "いつかを選んでください",
     "created": "次のタスクを設定しました · {{step}} · {{when}}",
     "taskTitle": "{{step}} · {{first}}",
-    "plannedAfter": "次の後に予定: {{after}}"
+    "plannedAfter": "次の後に予定: {{after}}",
+    "titleNoPerson": "次は何をしますか？"
   }
 }

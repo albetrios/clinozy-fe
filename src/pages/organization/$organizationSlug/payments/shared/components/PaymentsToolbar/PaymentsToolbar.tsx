@@ -34,6 +34,8 @@ export interface PaymentsToolbarProps<TData extends RowData> {
   table: ReactTable<DataTableFeatures, TData>;
   /** The tab's table id: the toolbar's test-id prefix and its saved views' key. */
   tableId: string;
+  /** What the tab's search finds, when it is not the room's "Patient, invoice or receipt". */
+  searchPlaceholder?: string;
   /** The tab's Filters and the copy of their chips. */
   filters: {
     fields: RoomFilterFields;
@@ -52,14 +54,15 @@ export interface PaymentsToolbarProps<TData extends RowData> {
 /**
  * The Payments toolbar (KICKOFF §6.9 Toolbar; `payments.md:17`) on the shared
  * room toolbar: h1 "Payments" · the tabs "Payments" · "Pending", folding into
- * "More" when the measured space runs out · search "Patient, invoice or
- * receipt" · saved views · Filters · Columns · "Day close" · the tab's create
+ * "More" when the measured space runs out · the tab's search ("Patient, invoice or
+ * receipt"; the ledger's "Patient, payee or PAY-") · saved views · Filters · Columns · "Day close" · the tab's create
  * actions — on a phone the search row, then the tabs with "Day close", and the
  * create actions as floating pills.
  */
 export function PaymentsToolbar<TData extends RowData>({
   table,
   tableId,
+  searchPlaceholder,
   filters,
   onDayClose,
   primary,
@@ -97,7 +100,7 @@ export function PaymentsToolbar<TData extends RowData>({
         />
       }
       search={{
-        placeholder: t(PAYMENTS_KEYS.search.placeholder),
+        placeholder: searchPlaceholder ?? t(PAYMENTS_KEYS.search.placeholder),
         label: t(PAYMENTS_KEYS.search.label),
       }}
       filters={filters}

@@ -9,13 +9,13 @@
     "treatments": "Soins",
     "patients": "Patients",
     "team": "Équipe",
-    "payments": "Paiements"
+    "payments": "Paiements",
+    "medical": "Médical"
   },
   "rules": {
     "reply": {
       "label": "Messages sans réponse",
       "description": "Un prospect a écrit et personne n’a répondu",
-      "automation": "Envoyer la première réponse avec les prix et les créneaux libres",
       "how": {
         "first": "Lisez son dernier message à droite",
         "second": "Répondez avec les prix et deux créneaux libres",
@@ -39,7 +39,6 @@
     "follow": {
       "label": "Relances de prospects",
       "description": "La date de relance est arrivée",
-      "automation": "Envoyer un message de suivi amical sur WhatsApp",
       "how": {
         "first": "Vérifiez ce qui l’intéressait",
         "second": "Appelez ou écrivez sur WhatsApp pour une relance amicale",
@@ -56,7 +55,7 @@
         },
         "noAnswer": {
           "label": "Pas de réponse",
-          "effect": "Appel enregistré · la tâche est reportée de 2 heures"
+          "effect": "Appel enregistré · la tâche est reportée de 3 heures"
         },
         "notInterested": {
           "label": "Pas intéressé",
@@ -75,7 +74,7 @@
       "outcomes": {
         "claimIt": {
           "label": "Le reprendre",
-          "effect": "Vous devenez responsable · {{owner}} reste impliqué"
+          "effect": "Vous devenez responsable"
         },
         "leaveWithOwner": {
           "label": "Laisser au responsable",
@@ -86,7 +85,6 @@
     "failed": {
       "label": "Messages non distribués",
       "description": "Le fournisseur n’a pas pu distribuer un message",
-      "automation": "Réessayer par SMS, puis signaler pour un appel",
       "how": {
         "first": "Vérifiez le numéro de mobile",
         "second": "Renvoyez par WhatsApp ou SMS",
@@ -99,11 +97,11 @@
         },
         "calledInstead": {
           "label": "Appelé à la place",
-          "effect": "Appel enregistré sur le prospect"
+          "effect": "Appel enregistré"
         },
         "fixTheNumber": {
           "label": "Corriger le numéro",
-          "effect": "Ouvre le prospect pour le modifier"
+          "effect": "Ouvre sa fiche pour la modifier"
         }
       }
     },
@@ -131,7 +129,7 @@
         },
         "noAnswer": {
           "label": "Pas de réponse",
-          "effect": "Appel enregistré · la tâche est reportée de 2 heures"
+          "effect": "Appel enregistré · la tâche est reportée de 3 heures"
         }
       }
     },
@@ -161,7 +159,6 @@
     "rebook": {
       "label": "Reprogrammer les absents",
       "description": "Le patient a manqué la visite",
-      "automation": "Proposer les deux prochains créneaux libres sur WhatsApp",
       "how": {
         "first": "Appelez ou écrivez sur WhatsApp avec deux créneaux libres",
         "second": "Réservez celui qu’il choisit",
@@ -194,7 +191,7 @@
       "outcomes": {
         "happy": {
           "label": "Satisfait · 4–5★",
-          "effect": "Envoie le lien d’avis Google · ouvre le journal des avis"
+          "effect": "Ouvre le journal des avis"
         },
         "unhappy": {
           "label": "Insatisfait",
@@ -206,14 +203,13 @@
         },
         "sentTheForm": {
           "label": "Formulaire envoyé",
-          "effect": "Enregistré · reporté à demain"
+          "effect": "Reporté à demain"
         }
       }
     },
     "aftercare": {
       "label": "Appels de suivi post-soin",
       "description": "Un soin a demandé un appel de suivi",
-      "automation": "Envoyer le suivi post-soin sur WhatsApp et enregistrer la réponse",
       "how": {
         "first": "Appelez et demandez comment se sent la peau",
         "second": "Vérifiez que les consignes ont été suivies",
@@ -236,7 +232,7 @@
     },
     "unhappy": {
       "label": "Patients insatisfaits",
-      "description": "L’avis était de 3★ ou moins",
+      "description": "Un patient a laissé une note basse ou était mécontent",
       "how": {
         "first": "Lisez d’abord l’avis",
         "second": "Le médecin ou le responsable rappelle",
@@ -256,7 +252,6 @@
     "nextvisit": {
       "label": "Prochaine visite non fixée",
       "description": "Une visite est terminée mais il n’y a ni date de suivi ni prochaine réservation",
-      "automation": "Proposer deux créneaux sur WhatsApp et fixer le suivi quand il en choisit un",
       "how": {
         "first": "Vérifiez ce que le médecin a conseillé",
         "second": "Proposez deux créneaux pour la prochaine visite",
@@ -279,7 +274,7 @@
     },
     "noreply": {
       "label": "Habitués devenus silencieux",
-      "description": "Un patient habitué ou avec forfait n’a pas réservé depuis plus de 30 jours et n’a pas répondu aux rappels périodiques",
+      "description": "Un patient avec forfait a des séances restantes, aucune visite depuis plus de 30 jours et rien de réservé",
       "how": {
         "first": "Consultez le forfait et la dernière visite",
         "second": "Appelez une fois, puis envoyez une offre de retour",
@@ -292,13 +287,14 @@
         },
         "sendOffer": {
           "label": "Envoyer une offre",
-          "effect": "Envoie une offre de retour sur WhatsApp · reporté d’une semaine"
+          "effect": "Reporté d’une semaine"
         },
         "notComingBack": {
           "label": "Ne reviendra pas",
           "effect": "Clôturé avec un motif"
         }
-      }
+      },
+      "automation": "Ouvrir un prospect de relance pour l’équipe"
     },
     "manual": {
       "label": "Relances que vous avez planifiées",
@@ -329,29 +325,36 @@
       "outcomes": {
         "collectAtCheckout": {
           "label": "Encaisser au départ",
-          "effect": "Ajouté à l’encaissement du jour"
+          "effect": "Clôturé · encaissez-le au départ"
         },
         "sendUpiLink": {
           "label": "Envoyer le lien UPI",
-          "effect": "Lien UPI en attente d’envoi sur WhatsApp"
+          "effect": "Clôturé · envoyez le lien depuis la discussion"
         },
         "called": {
           "label": "Appelé",
-          "effect": "Promesse de paiement enregistrée"
+          "effect": "Clôturé avec votre note"
+        }
+      },
+      "automation": "Envoyer un rappel de paiement sur WhatsApp"
+    },
+    "settleBy": {
+      "label": "Crédits à régler",
+      "description": "La date de règlement d’un crédit en attente est arrivée",
+      "outcomes": {
+        "done": {
+          "label": "Fait",
+          "effect": "Clôturé · réglez-le dans Paiements"
         }
       }
     },
-    "recall": {
-      "label": "Rappel de contrôle",
-      "description": "Un patient doit revenir pour un contrôle",
+    "medicalRepVisit": {
+      "label": "Visites de délégués médicaux",
+      "description": "Un délégué médical doit passer",
       "outcomes": {
-        "booked": {
-          "label": "Réservé",
-          "effect": "Réservé · confirmation en attente d’envoi"
-        },
-        "later": {
-          "label": "Plus tard",
-          "effect": "Reporté de 7 jours"
+        "done": {
+          "label": "Fait",
+          "effect": "Clôturé · enregistrez la visite dans Médical"
         }
       }
     }
@@ -418,12 +421,16 @@
     "result": "✓ {{result}}"
   },
   "sources": {
-    "lead": "Prospect {{id}}",
-    "appointment": "RDV {{id}}",
+    "lead": "Prospect",
+    "appointment": "RDV",
     "treatment": "Soin",
-    "patient": "Patient {{id}}",
-    "invoice": "Facture {{id}}",
-    "contact": "Contact"
+    "patient": "Patient",
+    "invoice": "Facture",
+    "contact": "Contact",
+    "checkIn": "Suivi",
+    "review": "Avis",
+    "pendingCredit": "Crédit",
+    "medicalRep": "Délégué médical"
   },
   "due": {
     "snoozed": "Reportée · {{label}}",
@@ -458,7 +465,7 @@
   "newTask": {
     "title": "Nouvelle tâche",
     "sub": "Pour {{person}} · visible dans Tâches et sur la chronologie de cette personne",
-    "subNoPerson": "Visible dans Tâches et sur la chronologie de la personne",
+    "subNoPerson": "Visible dans Tâches — et sur la chronologie de la personne quand elle concerne quelqu’un",
     "steps": {
       "what": "Ce qu’il faut faire",
       "when": "Quand et qui",
@@ -466,24 +473,15 @@
     },
     "forField": {
       "label": "Pour",
-      "placeholder": "Choisissez un patient ou un prospect",
+      "placeholder": "Choisissez une personne",
       "search": "Rechercher par nom, mobile ou numéro",
-      "empty": "Saisissez un nom, un mobile ou un numéro de patient",
-      "missing": "Choisissez pour qui est la tâche"
-    },
-    "type": {
-      "label": "Type",
-      "callBack": "Rappeler",
-      "followUp": "Relance",
-      "sendPrice": "Envoyer le prix",
-      "askForPhotos": "Demander des photos",
-      "feedback": "Avis",
-      "paymentReminder": "Rappel de paiement"
+      "empty": "Saisissez un nom, un mobile ou un numéro de contact"
     },
     "titleField": {
       "label": "Titre",
       "placeholder": "Ce qu’il faut faire",
-      "fallback": "{{type}} · {{first}}"
+      "fallback": "Relance · {{first}}",
+      "missing": "Ajoutez un titre ou choisissez pour qui est la tâche"
     },
     "due": {
       "label": "Échéance",
@@ -503,7 +501,6 @@
       "normal": "Normale",
       "high": "Haute"
     },
-    "remind": "Rappeler {{minutes}} min avant",
     "notes": {
       "label": "Notes de la tâche",
       "placeholder": "Notes (facultatif)"
@@ -525,11 +522,13 @@
     },
     "quote": "« {{message}} »",
     "source": {
-      "appointment": "Ouvrir le rendez-vous · {{record}}",
-      "lead": "Ouvrir le prospect · {{record}}",
-      "treatment": "Ouvrir le patient · {{record}}",
-      "patient": "Ouvrir le patient · {{record}}",
-      "invoice": "Ouvrir la facture · {{record}}"
+      "appointment": "Ouvrir le rendez-vous",
+      "lead": "Ouvrir le prospect",
+      "treatment": "Ouvrir le soin",
+      "patient": "Ouvrir le patient",
+      "invoice": "Ouvrir la facture",
+      "checkIn": "Ouvrir le suivi",
+      "review": "Ouvrir l’avis"
     },
     "tiles": {
       "visit": "Visite",
@@ -549,29 +548,32 @@
       "visit": "{{day}} · {{time}} · {{minutes}} min",
       "session": "n° {{number}}"
     },
-    "automation": {
-      "title": "{{productName}} peut s’en charger",
-      "action": "Laisser {{productName}} le faire"
-    },
     "outcomeNote": {
       "label": "Note sur le résultat",
       "placeholder": "Ajoutez une note au résultat (facultatif)"
     },
     "snooze": "Reporter",
     "assigned": "Attribuée",
-    "assignTip": "Confier cette tâche à quelqu’un d’autre · la personne précédente reste impliquée",
+    "assignTip": "Confier cette tâche à quelqu’un d’autre",
     "searchTeam": "Rechercher dans l’équipe",
     "was": "Avant {{names}}",
-    "close": "Fermer"
+    "close": "Fermer",
+    "subByHand": "Ajoutée à la main",
+    "assignGroups": {
+      "team": "Équipe",
+      "queues": "Files par rôle"
+    },
+    "deleteTitle": "Supprimer cette tâche ?"
   },
   "toasts": {
     "closed": "{{title}} · {{result}}",
     "snoozed": "Reportée · {{label}}",
-    "claimed": "{{name}} est maintenant à vous · {{owner}} reste impliqué",
-    "claimedUnowned": "{{name}} est maintenant à vous",
-    "moved": "{{title}} → {{name}} · {{previous}} reste impliqué",
-    "movedUnowned": "{{title}} → {{name}}",
-    "automation": "{{productName}} s’en occupe · {{automation}}"
+    "claimed": "{{name}} est maintenant à vous",
+    "moved": "{{title}} → {{name}}",
+    "removed": "{{title}} supprimée",
+    "alreadyClosed": "Cette tâche est déjà clôturée",
+    "claimNeedsLeads": "Prendre un prospect nécessite le droit de modifier les prospects — demandez à un propriétaire ou un administrateur",
+    "reassignNeedsLeads": "Déplacer la tâche d’un prospect nécessite le droit de modifier les prospects — demandez à un propriétaire ou un administrateur"
   },
   "whatsNext": {
     "title": "Et ensuite pour {{first}} ?",
@@ -597,6 +599,7 @@
     "pickWhen": "Choisissez quand",
     "created": "Tâche suivante prévue · {{step}} · {{when}}",
     "taskTitle": "{{step}} · {{first}}",
-    "plannedAfter": "Prévue après : {{after}}"
+    "plannedAfter": "Prévue après : {{after}}",
+    "titleNoPerson": "Et ensuite ?"
   }
 }

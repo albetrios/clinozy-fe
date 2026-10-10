@@ -5,8 +5,9 @@ import { axe } from 'vitest-axe';
 
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import type * as DirectoryApiModule from '@/shared/api/clinic/directory-api.ts';
+import type * as TasksApiModule from '@/shared/api/clinic/tasks-api.ts';
+import { listTasks, recordTaskOutcome } from '@/shared/api/clinic/tasks-api.ts';
 import type * as TodayApiModule from '@/shared/api/clinic/today-api.ts';
 import type {
   TodayEnquiry,
@@ -17,10 +18,22 @@ import { CROSS_ROOM_PARAM } from '@/shared/clinic/clinic-referrer.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import type * as MyMembershipModule from '@/shared/tenancy/my-membership.ts';
 
 import { TodayPage } from '../../TodayPage.tsx';
-import { publicId, seededFloor } from './today-fixtures.ts';
-import { renderTodayRoute, resetTodayRoute, TODAY_PATH } from './today-test-router.tsx';
+import {
+  publicId,
+  type QueueWorld,
+  seededFloor,
+  seededQueue,
+  VIKRAM_VISIT_ID,
+} from './today-fixtures.ts';
+import {
+  renderTodayRoute,
+  resetTodayRoute,
+  TODAY_FRONT_DESK_CODES,
+  TODAY_PATH,
+} from './today-test-router.tsx';
 
 vi.mock('@/shared/notify/index.ts', () => ({
   notify: {
@@ -87,6 +100,30 @@ vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => ({
   },
 }));
 
+/** The work queue's server (`tasks-api.ts`), the team and the member's membership. */
+const queue = vi.hoisted(() => ({ tasks: [] }) as QueueWorld);
+vi.mock('@/shared/api/clinic/tasks-api.ts', async (importOriginal) => {
+  const { queueApiDouble } = await import('./today-fixtures.ts');
+  return {
+    ...(await importOriginal<typeof TasksApiModule>()),
+    ...queueApiDouble(queue),
+  };
+});
+vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => {
+  const { QUEUE_TEAM } = await import('./today-fixtures.ts');
+  return {
+    ...(await importOriginal<typeof DirectoryApiModule>()),
+    fetchTeamDirectory: async () => structuredClone([...QUEUE_TEAM]),
+  };
+});
+vi.mock('@/shared/tenancy/my-membership.ts', async (importOriginal) => {
+  const { RIYA } = await import('@/tests/utils/task-row-fixture.ts');
+  return {
+    ...(await importOriginal<typeof MyMembershipModule>()),
+    findMyMembershipId: async () => RIYA.id,
+  };
+});
+
 /** The shared booking form, as a stub that shows how it was opened. */
 vi.mock('@/shared/forms/AppointmentForm/index.ts', () => ({
   AppointmentForm: (props: {
@@ -143,13 +180,13 @@ beforeEach(() => {
   vi.setSystemTime(new Date(clinicInstant('2026-10-03', '10:42')));
   useLocaleStore.setState({ hourCycle: 'h23' });
   Object.assign(floor, seededFloor(), { failing: false });
+  Object.assign(queue, seededQueue());
   for (const fn of Object.values(notify)) vi.mocked(fn).mockReset();
-  // The work queue still reads the fixture world's tasks.
-  resetClinicFixtures();
+  vi.mocked(listTasks).mockClear();
+  vi.mocked(recordTaskOutcome).mockClear();
 });
 afterEach(() => {
   resetTodayRoute();
-  resetClinicFixtures();
   useLocaleStore.setState({ hourCycle: initialHourCycle });
   useUIStore.setState({ commandPaletteOpen: false });
   vi.useRealTimers();
@@ -341,52 +378,102 @@ describe('the Today room (KICKOFF §6.2)', () => {
     );
   });
 
-  it('shows my work queue, everyone’s through the URL, and counts every open task', async () => {
+  it('shows my work queue and my queue’s, everyone’s through the URL, and counts every open task', async () => {
     const user = userEvent.setup();
-    const { router } = renderTodayRoute(TODAY_PATH, TodayPage);
+    const { router, container } = renderTodayRoute(TODAY_PATH, TodayPage, {
+      permissions: TODAY_FRONT_DESK_CODES,
+    });
     await loaded();
     const titles = () =>
       screen
-        .getAllByTestId('today-queue-card')
+        .queryAllByTestId('today-queue-card')
         .map((card) => card.querySelector('p')?.textContent);
-    await waitFor(() => expect(titles()).toContain('Confirm Priti’s visit'));
-    expect(titles()).not.toContain('Call Kabir back');
-    const sub = screen.getByRole('complementary', { name: 'Work queue' });
-    const count = Number.parseInt(sub.querySelector('p')?.textContent ?? '', 10);
+    // Mine (the server's `scope=mine`): Riya's, the front desk queue's, and the one closed today.
+    await waitFor(() =>
+      expect(titles()).toEqual([
+        'Ask Meera how it went',
+        'Rebook Vikram',
+        'Confirm Priti’s visit',
+      ]),
+    );
+    expect(listTasks).toHaveBeenCalledWith(
+      { tab: 'open', scope: 'mine', branchIds: [] },
+      undefined,
+    );
+    const aside = screen.getByRole('complementary', { name: 'Work queue' });
+    // "<n> open" counts every open task, Asha's too.
+    expect(aside).toHaveTextContent('3 open · each has an owner and a due time');
+    const rebook = screen.getAllByTestId('today-queue-card')[1] as HTMLElement;
+    expect(rebook).toHaveTextContent('Owner: Front desk');
+    expect(screen.getAllByTestId('today-queue-card')[0]).toHaveTextContent('✓ Happy');
+    expect(await axe(container)).toHaveNoViolations();
+
     await user.click(screen.getByTestId('today-queue-scope-everyone'));
     await waitFor(() =>
       expect(router.state.location.search).toMatchObject({ queue: 'everyone' }),
     );
     await waitFor(() => expect(titles()).toContain('Call Kabir back'));
-    expect(
-      screen.getAllByTestId('today-queue-card').filter((card) => !card.dataset.closed),
-    ).toHaveLength(count);
+    const kabir = screen
+      .getAllByTestId('today-queue-card')
+      .find((card) => card.textContent?.includes('Call Kabir back'));
+    expect(kabir).toHaveTextContent('Owner: Asha M.');
   });
 
-  it('closes a task in place with "<name>: <result>" and Undo; a booking follow-on stacks the form', async () => {
+  it('closes a task in place with "<name>: <result>" — no Undo; a booking follow-on stacks the form', async () => {
     const user = userEvent.setup();
-    renderTodayRoute(TODAY_PATH, TodayPage);
+    renderTodayRoute(TODAY_PATH, TodayPage, { permissions: TODAY_FRONT_DESK_CODES });
     await loaded();
-    const rebook = await waitFor(() => {
-      const card = screen
+    const rebookCard = () =>
+      screen
         .getAllByTestId('today-queue-card')
         .find((candidate) => candidate.textContent?.includes('Rebook Vikram'));
+    const rebook = await waitFor(() => {
+      const card = rebookCard();
       if (!card) throw new Error('no rebook card');
       return card;
     });
     await user.click(within(rebook).getByRole('button', { name: 'Rebooked' }));
-    await waitFor(() => expect(notify.undo).toHaveBeenCalled());
-    expect(lastUndo().message).toBe('Vikram Bhatt: Rebooked');
     await waitFor(() =>
-      expect(
-        screen
-          .getAllByTestId('today-queue-card')
-          .find((card) => card.textContent?.includes('Rebook Vikram')),
-      ).toHaveTextContent('✓ Rebooked'),
+      expect(notify.success).toHaveBeenCalledWith('Vikram Bhatt: Rebooked'),
     );
+    expect(notify.undo).not.toHaveBeenCalled();
+    expect(recordTaskOutcome).toHaveBeenCalledWith(
+      expect.objectContaining({ outcomeId: 'rebooked', words: 'Rebooked' }),
+    );
+    await waitFor(() => expect(rebookCard()).toHaveTextContent('✓ Rebooked'));
     const booking = await screen.findByRole('dialog', { name: 'Booking' });
     expect(booking).toHaveAttribute('data-mode', 'create');
-    expect(booking).toHaveTextContent(ref.appointment(2862));
+    expect(booking).toHaveTextContent(VIKRAM_VISIT_ID);
+  });
+
+  it('reads the queue only without task:update, and hides it without task:read', async () => {
+    const reader = TODAY_FRONT_DESK_CODES.filter((code) => code !== 'task:update');
+    const { unmount } = renderTodayRoute(TODAY_PATH, TodayPage, { permissions: reader });
+    await loaded();
+    await waitFor(() =>
+      expect(screen.getAllByTestId('today-queue-card')).toHaveLength(3),
+    );
+    expect(screen.queryByTestId('today-queue-outcome')).not.toBeInTheDocument();
+    unmount();
+    resetTodayRoute();
+    vi.mocked(listTasks).mockClear();
+
+    // The Accountant holds no task code: Today is the floor alone.
+    renderTodayRoute(TODAY_PATH, TodayPage, {
+      permissions: ['organization:read', 'appointment:read'],
+    });
+    await loaded();
+    expect(screen.queryByTestId('today-queue')).not.toBeInTheDocument();
+    expect(listTasks).not.toHaveBeenCalled();
+  });
+
+  it('draws the queue read-only in a View-as preview — a preview holds no code', async () => {
+    renderTodayRoute(TODAY_PATH, TodayPage, { role: 'front_desk' });
+    await loaded();
+    await waitFor(() =>
+      expect(screen.getAllByTestId('today-queue-card')).toHaveLength(3),
+    );
+    expect(screen.queryByTestId('today-queue-outcome')).not.toBeInTheDocument();
   });
 
   it('toasts a failed read with Retry and keeps what it has', async () => {

@@ -11,10 +11,10 @@ import {
   resetClinicFixtures,
 } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import {
-  listLedger,
-  listOpenSupplierBills,
-  payExpense,
-} from '@/shared/api/clinic/payments-api.ts';
+  listFixtureLedger,
+  listFixtureOpenSupplierBills,
+  payFixtureExpense,
+} from '@/shared/api/clinic/payments-fixture-api.ts';
 import { isHttpError } from '@/shared/errors/HttpError.ts';
 
 import {
@@ -63,7 +63,7 @@ async function batchOf(medicineSeq: number, batchNo: string) {
 
 /** The Medical ledger's entries for an invoice or a bill. */
 async function medicalLedger() {
-  return (await listLedger({ scope: 'medical' })).items;
+  return (await listFixtureLedger({ scope: 'medical' })).items;
 }
 
 beforeEach(() => {
@@ -178,7 +178,7 @@ describe('receive goods (receivePO, S:1672)', () => {
     });
     expect((await batchOf(455, 'DS-25045'))?.qty).toBe(5 + 12);
     // Send payment can settle it now: 4 × ₹529 + 10 × ₹212, free units cost nothing.
-    const bill = (await listOpenSupplierBills()).find(
+    const bill = (await listFixtureOpenSupplierBills()).find(
       (open) => open.purchaseId === ref.purchaseOrder(430),
     );
     expect(bill).toMatchObject({ kind: 'medical_po', due: 423_600 });
@@ -231,7 +231,7 @@ describe('receive goods (receivePO, S:1672)', () => {
       purchaseRate: 44_000,
     });
     // The bill counts it with the order's lines: 4 × ₹529 + 10 × ₹212 + 3 × ₹440.
-    const bill = (await listOpenSupplierBills()).find(
+    const bill = (await listFixtureOpenSupplierBills()).find(
       (open) => open.purchaseId === ref.purchaseOrder(430),
     );
     expect(bill).toMatchObject({ due: 423_600 + 132_000 });
@@ -340,7 +340,7 @@ describe('every money action reaches the ledger (Q-M1)', () => {
   });
 
   it('a supplier bill paid through Send payment is Medical’s too', async () => {
-    const paid = await payExpense({
+    const paid = await payFixtureExpense({
       branchId: MAIN,
       billRef: { kind: 'medical_po', purchaseId: ref.purchaseOrder(431), billNo: '1631' },
       payeeName: 'Shree Ramdev Medical Agency',
@@ -349,7 +349,6 @@ describe('every money action reaches the ledger (Q-M1)', () => {
       mode: 'upi',
       paidOn: '2026-10-03',
       note: null,
-      attachmentKeys: [],
     });
     expect((await medicalLedger()).map((row) => row.id)).toContain(paid.id);
     expect((await fetchSupplier(SHREE_RAMDEV)).payable).toBe(0);
@@ -358,7 +357,7 @@ describe('every money action reaches the ledger (Q-M1)', () => {
   it('keeps the clinic’s own entries out of the Medical scope', async () => {
     const rows = await medicalLedger();
     expect(rows.length).toBeGreaterThan(0);
-    expect(rows.length).toBeLessThan((await listLedger()).items.length);
+    expect(rows.length).toBeLessThan((await listFixtureLedger()).items.length);
     for (const row of rows) {
       expect(
         row.invoice?.type === 'medical' ||
@@ -380,10 +379,11 @@ describe('return from patient (returnSale, S:1667)', () => {
     expect(result).toEqual({ amount: 55_000, refunded: 55_000, restocked: true });
     expect((await batchOf(454, 'ASC002'))?.qty).toBe(3);
     const refund = (await medicalLedger()).find((row) => row.kind === 'refund');
+    // The ledger rows read in rupees, as the live ledger's do.
     expect(refund).toMatchObject({
       direction: 'paid',
-      amount: 55_000,
-      splits: [{ mode: 'cash', amount: 55_000 }],
+      amount: 550,
+      splits: [{ mode: 'cash', amount: 550 }],
       invoice: { seq: 790 },
     });
     expect(refund?.creditNoteSeq).not.toBeNull();
@@ -409,14 +409,14 @@ describe('return from patient (returnSale, S:1667)', () => {
   });
 
   it('lowers an unpaid sale’s due and pays nothing back', async () => {
-    const before = (await listLedger()).items.length;
+    const before = (await listFixtureLedger()).items.length;
     const result = await returnSale(ref.medicalSale(978), {
       lines: [{ medicineId: ref.medicine(456), batchNo: '026-312', qty: 1 }],
       reason: 'rx_changed',
       mode: 'cash',
     });
     expect(result).toEqual({ amount: 16_200, refunded: 0, restocked: true });
-    expect((await listLedger()).items).toHaveLength(before);
+    expect((await listFixtureLedger()).items).toHaveLength(before);
     expect((await fetchMedicalSale(ref.medicalSale(978))).due).toBe(40_100);
   });
 

@@ -2,16 +2,17 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { createCredit, fetchCredit } from '@/shared/api/clinic/credits-api.ts';
-import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import i18n from '@/lib/i18n/i18n.ts';
+import { settleCredit } from '@/shared/api/clinic/credits-api.ts';
+import type { CreditRow } from '@/shared/api/clinic/credits-contracts.ts';
+import { branchRef } from '@/shared/api/clinic/fixtures/organization.fixtures.ts';
+import { HttpError } from '@/shared/errors/HttpError.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { fsi } from '@/tests/utils/bidi-marks.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { creditRow, TEST_CREDIT_ID } from '@/tests/utils/payments-doubles.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { SettleCreditDrawer } from './SettleCreditDrawer.tsx';
@@ -33,20 +34,62 @@ const { notifyMock } = vi.hoisted(() => ({
   },
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
+vi.mock('@/shared/api/clinic/credits-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  settleCredit: vi.fn(),
+}));
 
-/** 10:00 on 3 Oct, clinic time — the seed day (27 Sep) is today. */
-const NOW = new Date('2026-10-03T04:30:00Z');
+/** 10:00 on 10 Oct, clinic time. */
+const NOW = new Date('2026-10-10T04:30:00Z');
 const D = 'settle-credit-drawer';
-const CR_TWO = ref.pendingCredit(2);
-const CR_ONE = ref.pendingCredit(1);
+
+/** CR-1: give Kavya Mehta ₹80, ₹50 of it settled — ₹30 left. */
+const KAVYA_CREDIT = creditRow();
+
+/** CR-7: take ₹800 from a supplier named by hand, nothing settled. */
+const SUPPLIER_CREDIT = creditRow({
+  id: 'pcr_supplier0000000000007',
+  seq: 7,
+  direction: 'take',
+  contactId: null,
+  contact: null,
+  patientId: null,
+  partyName: 'Medline Surgicals',
+  amount: 800,
+  settled: 0,
+  left: 800,
+  reason: 'damaged_goods',
+  reasonKey: 'damaged_goods',
+  invoiceId: null,
+  paymentIds: [],
+});
 
 const part = (id: string) => screen.getByTestId(`${D}-${id}`);
-/** The ledger entries a credit's settlements wrote. */
-const entriesOf = (creditId: string) =>
-  clinicFixtures.payments.snapshot((row) => row.pendingCreditId === creditId);
+const words = (key: string, options: Record<string, unknown> = {}) =>
+  i18n.t(key, { ns: 'clinic', ...options });
+
+/** A refusal as clinozy-be answers it. */
+const conflict = (reason: string) =>
+  new HttpError('Refused', 409, `/app/pending-credits/${TEST_CREDIT_ID}/settle`, 'POST', {
+    error: { type: 'request_error', code: 'conflict', reason, detail: 'Refused' },
+  });
 
 function setUser() {
   return userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
+}
+
+function renderDrawer(credit: CreditRow = KAVYA_CREDIT, onClose = vi.fn()) {
+  const view = renderWithProviders(
+    <SettleCreditDrawer credit={credit} reasonLabel="Overpaid" onClose={onClose} />,
+  );
+  return { ...view, onClose };
+}
+
+/** The amount of the one row, typed in rupees. */
+async function typeAmount(user: ReturnType<typeof setUser>, amount: string) {
+  const input = await screen.findByTestId(`${D}-splits-amount`);
+  await user.clear(input);
+  await user.type(input, amount);
 }
 
 beforeEach(() => {
@@ -54,151 +97,162 @@ beforeEach(() => {
   vi.setSystemTime(NOW);
   viewport.tier = 'desktop';
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetClinicFixtures();
+  vi.mocked(settleCredit)
+    .mockReset()
+    .mockImplementation(async ({ credit }) => ({
+      credit: { ...credit, settled: credit.amount, left: 0, status: 'given_back' },
+      amount: 30,
+      paymentSeq: 6,
+      invoiceSeq: 5,
+      creditNoteSeq: 3,
+    }));
+  signInTestMember();
 });
 afterEach(() => {
   vi.useRealTimers();
-  resetClinicFixtures();
+  useOrganizationStore.getState().clearOrganization();
 });
 
 describe('SettleCreditDrawer — Give back (payments.md:170–180)', () => {
-  it('opens on everything owed in UPI, stacked with "Back" and "Return ₹500"', async () => {
-    const credit = await fetchCredit(CR_TWO);
-    const { baseElement } = renderWithProviders(
-      <SettleCreditDrawer credit={credit} onClose={vi.fn()} />,
-    );
+  it('opens on what is left in UPI, today, at the main branch — stacked, "Return ₹30"', async () => {
+    const { baseElement } = renderDrawer();
     const drawer = await screen.findByTestId(D);
     expect(within(drawer).getByText('Give back')).toBeInTheDocument();
-    expect(part('tag')).toHaveTextContent('CR-2');
+    expect(part('tag')).toHaveTextContent('CR-1');
     expect(
       within(drawer).getByText(
-        `To ${fsi('Tanvi Shah')} · ${fsi('Charged twice for corn removal')} · adds an Out entry to Payments`,
+        `To ${fsi('Kavya Mehta')} · ${fsi('Overpaid')} · adds an Out entry to Payments`,
       ),
     ).toBeInTheDocument();
     expect(within(drawer).getByText('How it goes back')).toBeInTheDocument();
-    expect(within(drawer).getAllByText('Paid back by').length).toBeGreaterThan(0);
     expect(part('splits-mode')).toHaveTextContent('UPI');
-    expect(part('splits-amount')).toHaveValue('500');
-    expect(part('splits-total')).toHaveTextContent('Total ₹500 · of ₹500');
+    expect(part('splits-amount')).toHaveValue('30');
+    expect(part('splits-total')).toHaveTextContent('Total ₹30 · of ₹30');
+    expect(part(`branch-${branchRef('Adajan')}`)).toHaveAttribute('aria-pressed', 'true');
+    expect(part('date')).toHaveTextContent('Today');
     expect(part('dismiss')).toHaveTextContent('Back');
-    expect(part('save')).toHaveTextContent('Return ₹500');
+    expect(part('save')).toHaveTextContent('Return ₹30');
     expect(await axeForDialog(baseElement)).toHaveNoViolations();
   });
 
-  it('gives it all back: the Out entry, the credit returned', async () => {
+  it('gives part of it back in cash at the branch picked, with the action’s key, and says so', async () => {
     const user = setUser();
-    const onClose = vi.fn();
-    const credit = await fetchCredit(CR_TWO);
-    renderWithProviders(<SettleCreditDrawer credit={credit} onClose={onClose} />);
-    await user.click(await screen.findByTestId(`${D}-save`));
-    await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
-    expect(notifyMock.success).toHaveBeenCalledWith(
-      '₹500 given back to Tanvi Shah · Out entry added',
-    );
-    expect(entriesOf(CR_TWO)).toEqual([
-      expect.objectContaining({ direction: 'paid', kind: 'refund', amount: 50_000 }),
-    ]);
-    expect((await fetchCredit(CR_TWO)).status).toBe('given_back');
-  });
-
-  it('gives back part of it in two modes, the rest staying open', async () => {
-    const user = setUser();
-    const credit = await fetchCredit(CR_TWO);
-    renderWithProviders(<SettleCreditDrawer credit={credit} onClose={vi.fn()} />);
-    const amount = await screen.findByTestId(`${D}-splits-amount`);
-    await user.clear(amount);
-    await user.type(amount, '100');
-    await user.click(part('splits-add'));
-    // The added row takes the next mode and what is left of the ₹500.
-    expect(screen.getAllByTestId(`${D}-splits-amount`)[1]).toHaveValue('400');
-    await user.clear(screen.getAllByTestId(`${D}-splits-amount`)[1] as HTMLElement);
-    await user.type(screen.getAllByTestId(`${D}-splits-amount`)[1] as HTMLElement, '50');
-    expect(part('save')).toHaveTextContent('Return ₹150');
+    const { onClose } = renderDrawer();
+    await user.click(await screen.findByTestId(`${D}-branch-${branchRef('Vesu')}`));
+    await user.click(part('splits-mode'));
+    await user.click(await screen.findByTestId(`${D}-splits-mode-option-cash`));
+    await typeAmount(user, '20.5');
     await user.click(part('save'));
+    await waitFor(() => expect(settleCredit).toHaveBeenCalledTimes(1));
+    expect(settleCredit).toHaveBeenCalledWith({
+      credit: KAVYA_CREDIT,
+      settlement: {
+        action: 'give_back',
+        branchId: branchRef('Vesu'),
+        splits: [{ mode: 'cash', amount: 20.5 }],
+      },
+      idempotencyKey: expect.any(String),
+    });
     await waitFor(() =>
       expect(notifyMock.success).toHaveBeenCalledWith(
-        '₹150 given back to Tanvi Shah · Out entry added',
+        words('settleCredit.done.give', {
+          amount: '₹30',
+          name: 'Kavya Mehta',
+          entry: 'PAY-6 · CN-003',
+        }),
       ),
     );
-    expect(await fetchCredit(CR_TWO)).toMatchObject({ status: 'open', adjusted: 15_000 });
-    expect(entriesOf(CR_TWO)[0]?.splits).toEqual([
-      { mode: 'upi', amount: 10_000 },
-      { mode: 'cash', amount: 5_000 },
-    ]);
+    expect(onClose).toHaveBeenCalled();
   });
 
-  it('wants an amount, and never more than is owed', async () => {
+  it('records an earlier day as that day, and an entry whose numbers did not come back as added', async () => {
+    vi.mocked(settleCredit).mockImplementation(async ({ credit }) => ({
+      credit,
+      amount: 30,
+      paymentSeq: null,
+      invoiceSeq: null,
+      creditNoteSeq: null,
+    }));
     const user = setUser();
-    const onClose = vi.fn();
-    const credit = await fetchCredit(CR_TWO);
-    renderWithProviders(<SettleCreditDrawer credit={credit} onClose={onClose} />);
-    const amount = await screen.findByTestId(`${D}-splits-amount`);
-    await user.clear(amount);
+    renderDrawer();
+    await user.click(await screen.findByTestId(`${D}-date`));
+    await user.click(await screen.findByTestId(`${D}-date-option-2026-10-09`));
     await user.click(part('save'));
-    expect(notifyMock.warning).toHaveBeenLastCalledWith('Enter the amount');
-    await user.type(amount, '600');
-    await user.click(part('save'));
-    expect(notifyMock.warning).toHaveBeenLastCalledWith('More than the ₹500 owed');
-    expect(onClose).not.toHaveBeenCalled();
-    expect(entriesOf(CR_TWO)).toEqual([]);
-  });
-
-  it('writes the credit note for a patient’s credit on an invoice', async () => {
-    const user = setUser();
-    const credit = await createCredit({
-      direction: 'give',
-      partyName: 'Rhea Shah',
-      patientId: patientRef('Rhea Shah'),
-      amount: 30_000,
-      reasonKey: 'overpaid',
-      invoiceId: ref.invoice(785),
-      settleBy: null,
-      note: null,
+    await waitFor(() => expect(settleCredit).toHaveBeenCalledTimes(1));
+    expect(vi.mocked(settleCredit).mock.calls[0]?.[0].settlement).toMatchObject({
+      paidAt: '2026-10-09T04:30:00.000Z',
     });
-    renderWithProviders(
-      <SettleCreditDrawer credit={credit} reasonLabel="Overpaid" onClose={vi.fn()} />,
-    );
-    expect(
-      await screen.findByText(
-        `To ${fsi('Rhea Shah')} · ${fsi('Overpaid')} · adds an Out entry to Payments`,
+    await waitFor(() =>
+      expect(notifyMock.success).toHaveBeenCalledWith(
+        words('settleCredit.done.give', {
+          amount: '₹30',
+          name: 'Kavya Mehta',
+          entry: words('settleCredit.entry.give'),
+        }),
       ),
-    ).toBeInTheDocument();
+    );
+  });
+
+  it('refuses more than is owed before anything is sent', async () => {
+    const user = setUser();
+    renderDrawer();
+    await typeAmount(user, '40');
     await user.click(part('save'));
-    await waitFor(() => expect(notifyMock.success).toHaveBeenCalled());
-    expect(clinicFixtures.creditNotes.snapshot()).toEqual([
-      expect.objectContaining({ invoiceId: ref.invoice(785), amount: 30_000 }),
-    ]);
+    expect(notifyMock.warning).toHaveBeenCalledWith('More than the ₹30 owed');
+    expect(settleCredit).not.toHaveBeenCalled();
+  });
+
+  it('says a closed day on the Date and keeps the drawer open (409 day_closed)', async () => {
+    vi.mocked(settleCredit).mockRejectedValue(conflict('day_closed'));
+    const user = setUser();
+    const { onClose } = renderDrawer();
+    await user.click(await screen.findByTestId(`${D}-save`));
+    await waitFor(() =>
+      expect(notifyMock.error).toHaveBeenCalledWith(words('settleCredit.dayClosed')),
+    );
+    expect(screen.getByTestId(D)).toHaveTextContent(words('settleCredit.dayClosed'));
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it('says more than its invoice has paid on the rows (409 more_than_paid)', async () => {
+    vi.mocked(settleCredit).mockRejectedValue(conflict('more_than_paid'));
+    const user = setUser();
+    renderDrawer();
+    await user.click(await screen.findByTestId(`${D}-save`));
+    await waitFor(() =>
+      expect(notifyMock.error).toHaveBeenCalledWith(words('settleCredit.moreThanPaid')),
+    );
+  });
+
+  it('closes on a credit settled in full meanwhile (409 credit_closed)', async () => {
+    vi.mocked(settleCredit).mockRejectedValue(conflict('credit_closed'));
+    const user = setUser();
+    const { onClose } = renderDrawer();
+    await user.click(await screen.findByTestId(`${D}-save`));
+    await waitFor(() =>
+      expect(notifyMock.info).toHaveBeenCalledWith(
+        words('settleCredit.closed', { ref: 'CR-1' }),
+      ),
+    );
+    expect(onClose).toHaveBeenCalled();
   });
 });
 
 describe('SettleCreditDrawer — Got it back', () => {
-  it('records a party’s money coming in: the In entry, the credit received', async () => {
+  it('records money coming back from a supplier: "Got it back", "Record ₹800"', async () => {
     const user = setUser();
-    const credit = await fetchCredit(CR_ONE);
-    renderWithProviders(<SettleCreditDrawer credit={credit} onClose={vi.fn()} />);
+    renderDrawer(SUPPLIER_CREDIT);
     const drawer = await screen.findByTestId(D);
     expect(within(drawer).getByText('Got it back')).toBeInTheDocument();
-    expect(
-      within(drawer).getByText(
-        `From ${fsi('Medline Surgicals')} · ${fsi('Returned a box of damaged gloves')} · adds an In entry to Payments`,
-      ),
-    ).toBeInTheDocument();
     expect(within(drawer).getByText('How it came in')).toBeInTheDocument();
     expect(part('save')).toHaveTextContent('Record ₹800');
     await user.click(part('save'));
     await waitFor(() =>
-      expect(notifyMock.success).toHaveBeenCalledWith(
-        '₹800 got back from Medline Surgicals · In entry added',
-      ),
+      expect(vi.mocked(settleCredit).mock.calls[0]?.[0].settlement).toEqual({
+        action: 'got_back',
+        branchId: branchRef('Adajan'),
+        splits: [{ mode: 'upi', amount: 800 }],
+      }),
     );
-    expect(entriesOf(CR_ONE)).toEqual([
-      expect.objectContaining({ direction: 'received', kind: 'money_back' }),
-    ]);
-    expect((await fetchCredit(CR_ONE)).status).toBe('got_back');
-  });
-
-  it('stays shut without a credit', () => {
-    renderWithProviders(<SettleCreditDrawer credit={null} onClose={vi.fn()} />);
-    expect(screen.queryByTestId(D)).toBeNull();
   });
 });

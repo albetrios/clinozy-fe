@@ -1,4 +1,10 @@
-import { MONEY_SCALE, numberFromText, textFromNumber } from '@/lib/number-text.ts';
+import {
+  MONEY_SCALE,
+  numberFromText,
+  paiseOfRupees,
+  rupeesOfPaise,
+  textFromNumber,
+} from '@/lib/number-text.ts';
 import type { CreditDirection, Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import {
   CREDIT_REASON_VALUES,
@@ -11,18 +17,18 @@ import {
 /*
  * Add pending / Edit pending's form (`payments.md:152–168`; H:4022–4034) —
  * pure, so the drawer, its steps' heads, its footer and its checks read one
- * set of rules.
+ * set of rules. The amount is typed in rupees; the checks read it in paise.
  */
 
 /**
- * Who the credit is with: a patient by id, or anyone by name — a contact, a
- * supplier, or a name typed in ("Add “q”"). The key is the picker's: a
- * patient's id, else the name, so a typed name and a listed one are the same
- * pick (the prototype matches by name).
+ * Who the credit is with: a person by their contact (`con_…`) — a patient also by their file
+ * (`pat_…`) — or a supplier by name: a clinic vendor, a Medical supplier, or a name typed in
+ * ("Add “q”"). The key is the picker's: `patient:<pat_…>`, `contact:<con_…>`, else the name.
  */
 export interface CreditParty {
   key: string;
   name: string;
+  contactId: string | null;
   patientId: string | null;
 }
 
@@ -50,15 +56,33 @@ export function partyByName(name: string): CreditParty {
   const trimmed = name.trim();
   const slug = trimmed
     .toLowerCase()
-    .replace(/[^\p{L}\p{N}]+/gu, '-')
-    .replace(/(?:^-)|(?:-$)/g, '');
-  return { key: `name:${slug}`, name: trimmed, patientId: null };
+    .replaceAll(/[^\p{L}\p{N}]+/gu, '-')
+    .replaceAll(/(?:^-)|(?:-$)/g, '');
+  return { key: `name:${slug}`, name: trimmed, contactId: null, patientId: null };
+}
+
+/** A person by their contact — a patient keyed by their file, anyone else by the contact. */
+function partyOfContact({
+  contactId,
+  patientId,
+  name,
+}: {
+  contactId: string;
+  patientId: string | null;
+  name: string;
+}): CreditParty {
+  return {
+    key: patientId ? `patient:${patientId}` : `contact:${contactId}`,
+    name,
+    contactId,
+    patientId,
+  };
 }
 
 /** A row of the Who picker as the form keeps it. */
 export function partyOf(row: CreditPartyRow): CreditParty {
-  if (row.kind === 'patient')
-    return { key: `patient:${row.id}`, name: row.name, patientId: row.id };
+  if (row.kind === 'patient') return partyOfContact(row);
+  if (row.kind === 'contact') return partyOfContact({ ...row, patientId: null });
   return partyByName(row.name);
 }
 
@@ -76,26 +100,26 @@ export function emptyCreditForm(direction: CreditDirection = 'give'): CreditForm
 }
 
 /**
- * An open credit as its edit form. A seeded credit's reason is free text with
- * no chip: it opens on "Other" with that text as the note, so a save keeps it
- * (the stored reason is the chip's label, or the note for "Other" — D22).
+ * An open credit as its edit form. A reason that is no chip's ("Other", or a free text the
+ * API stored) opens on "Other" with that text as the note when there is no note, so a save
+ * keeps it (an "Other" reason is its note's text — G-P10).
  */
 export function creditFormOf(credit: CreditRow): CreditFormValues {
-  const freeText = credit.reasonKey === null;
+  const other = credit.reasonKey === 'other';
   return {
     direction: credit.direction,
-    party: credit.patientId
-      ? {
-          key: `patient:${credit.patientId}`,
-          name: credit.partyName,
+    party: credit.contactId
+      ? partyOfContact({
+          contactId: credit.contactId,
           patientId: credit.patientId,
-        }
+          name: credit.partyName,
+        })
       : partyByName(credit.partyName),
-    amount: textFromNumber(credit.amount, MONEY_SCALE),
-    reasonKey: freeText ? 'other' : credit.reasonKey,
+    amount: textFromNumber(paiseOfRupees(credit.amount), MONEY_SCALE),
+    reasonKey: credit.reasonKey,
     invoiceId: credit.invoiceId,
     settleBy: credit.settleBy,
-    note: (freeText ? (credit.note ?? credit.reason) : credit.note) ?? '',
+    note: (other ? (credit.note ?? credit.reason) : credit.note) ?? '',
   };
 }
 
@@ -108,7 +132,7 @@ export function withDirection(
   return { ...values, direction, reasonKey: null };
 }
 
-/** Another party: an invoice belongs to a patient, so the picked one goes. */
+/** Another party: an invoice belongs to a person, so the picked one goes. */
 export function withParty(
   values: CreditFormValues,
   party: CreditParty | null,
@@ -158,17 +182,22 @@ export function creditProblem(values: CreditFormValues): CreditProblem | null {
   return null;
 }
 
-/** What Add / Edit pending sends (`create/update PendingCredit`, `S:1712`). */
+/**
+ * What Add / Edit pending sends: the person's contact — or, for a supplier, the name — the
+ * amount in rupees, the reason chip, For invoice (a person's only), Settle by and Note.
+ */
 export function creditInputOf(values: CreditFormValues): CreditInput {
+  const contactId = values.party?.contactId ?? null;
+  const note = values.note.trim();
   return {
     direction: values.direction,
+    contactId,
     partyName: values.party?.name.trim() ?? '',
-    patientId: values.party?.patientId ?? null,
-    amount: creditAmount(values),
+    amount: rupeesOfPaise(creditAmount(values)),
     // creditProblem has run: a reason is picked.
     reasonKey: values.reasonKey ?? 'other',
-    invoiceId: values.party?.patientId ? values.invoiceId : null,
+    invoiceId: contactId ? values.invoiceId : null,
     settleBy: values.settleBy,
-    note: values.note.trim() || null,
+    note: note === '' ? null : note,
   };
 }

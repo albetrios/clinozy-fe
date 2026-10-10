@@ -41,9 +41,10 @@
     "noNotes": "No additional notes",
     "paymentSummary": "Payment Summary",
     "totalAmount": "Total Amount:",
-    "overallDiscount": "Overall Discount:",
     "billAmount": "Bill Amount:",
-    "balanceDue": "Balance Due:"
+    "balanceDue": "Balance Due:",
+    "taxableAmount": "Taxable Amount:",
+    "gstTotal": "GST:"
   },
   "prescription": {
     "patientId": "Patient ID:",

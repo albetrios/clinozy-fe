@@ -64,8 +64,11 @@
       "photo": "Foto",
       "appointment": "Cita",
       "report": "Informe",
-      "note": "Nota"
-    }
+      "note": "Nota",
+      "invoice": "Factura",
+      "payment": "Pago"
+    },
+    "nothingDue": "Nada pendiente para {{name}}"
   },
   "section": {
     "primary": {
@@ -126,7 +129,11 @@
     "reviews_many": "{{count}} de reseñas",
     "reviews_other": "{{count}} reseñas",
     "feedbackCounts": "{{checkIns}} · {{reviews}}",
-    "noFeedback": "Aún sin opiniones"
+    "noFeedback": "Aún sin opiniones",
+    "showAmount": "Mostrar importe",
+    "hideAmount": "Ocultar importe",
+    "collect": "Cobrar",
+    "allPaid": "Todo pagado · nada pendiente"
   },
   "photos": {
     "albums": {
@@ -952,6 +959,15 @@
       "notes": "Notas",
       "empty": "Aún no hay actividad",
       "masked": "₹ ••••"
+    },
+    "billing": {
+      "due": "Pendiente",
+      "paid": "Pagado",
+      "show": "Mostrar importes",
+      "hide": "Ocultar importes",
+      "invoice": "Factura {{type}} {{number}}",
+      "sub": "{{date}} · {{amount}}",
+      "collect": "Cobrar pago"
     }
   },
   "visitFlow": {
@@ -966,7 +982,9 @@
     "steps": {
       "checks": "Llegada y seguridad",
       "rx": "Receta",
-      "treatment": "Tratamiento"
+      "treatment": "Tratamiento",
+      "invoice": "Factura",
+      "collect": "Cobrar"
     },
     "checks": {
       "labels": {
@@ -1003,6 +1021,23 @@
       "repeatPackage": "⚡ Repetir · {{name}}"
     },
     "paused": "Visita en pausa",
-    "resume": "Reanudar"
+    "resume": "Reanudar",
+    "invoice": {
+      "create": "Crear factura desde la visita",
+      "custom": "Factura personalizada",
+      "nothing": "Nada que facturar",
+      "covered": "Cubierto por el paquete · nada que facturar",
+      "empty": "Aún no hay nada que facturar",
+      "done": "{{number}} · {{total}}",
+      "ready_many": "{{count}} conceptos listos",
+      "ready_one": "{{count}} concepto listo",
+      "ready_other": "{{count}} conceptos listos"
+    },
+    "collect": {
+      "action": "Cobrar {{amount}}",
+      "due": "{{amount}} pendiente",
+      "nothing": "Nada pendiente",
+      "waiting": "Primero factura la visita"
+    }
   }
 }

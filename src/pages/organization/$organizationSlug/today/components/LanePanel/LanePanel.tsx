@@ -9,9 +9,16 @@ import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
 import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 
+import { useCheckoutDues } from '../../hooks/useCheckoutDues/index.ts';
 import { TODAY_KEYS, TODAY_NS, TODAY_TEST_IDS } from '../../today.constants.ts';
-import { TODAY_FLAG_TONES, todayCardFlags, type TodayFlag } from '../../today.flags.ts';
+import {
+  TODAY_FLAG_TONES,
+  todayCardFlags,
+  type TodayDues,
+  type TodayFlag,
+} from '../../today.flags.ts';
 import { takeVisitCard } from '../../today.focus.ts';
 import { TODAY_LANE_META, type TodayCard } from '../../today.lanes.ts';
 import { useCardServiceLine } from './use-card-service-line.ts';
@@ -37,6 +44,7 @@ function useFlagWords(today: string): (flag: TodayFlag) => string {
   const { t } = useTranslation(TODAY_NS);
   const { t: tClinic } = useTranslation(CLINIC_NS);
   const { formatNumber } = useLocaleFormat();
+  const formatRupees = useRupeeFormat();
   const clock = useClinicClock();
   const K = TODAY_KEYS.flags;
   return (flag) => {
@@ -47,6 +55,8 @@ function useFlagWords(today: string): (flag: TodayFlag) => string {
         return t(K.waiting, { minutes: formatNumber(flag.minutes) });
       case 'inRoom':
         return t(K.inRoom, { minutes: formatNumber(flag.minutes) });
+      case 'toPay':
+        return t(K.toPay, { amount: formatRupees(flag.rupees) });
       case 'rxApproved':
         return t(K.rxApproved, { time: clock.wallTime(today, flag.time) });
       default:
@@ -64,12 +74,15 @@ function VisitCard({
   card,
   now,
   today,
+  dues,
   action,
   onOpen,
 }: {
   card: TodayCard;
   now: Date;
   today: string;
+  /** Today's open bills by person — a Checkout card's "₹n to pay". */
+  dues: TodayDues;
   action: (() => void) | null;
   onOpen: (card: TodayCard) => void;
 }) {
@@ -79,7 +92,7 @@ function VisitCard({
   const service = useCardServiceLine();
   const meta = TODAY_LANE_META[card.lane];
   const paint = TONE_CLASSES[meta.tone];
-  const flags = todayCardFlags(card, now);
+  const flags = todayCardFlags(card, now, dues);
   const line = service(card);
   return (
     <div
@@ -188,7 +201,8 @@ function useVisitCardFocus(loading: boolean) {
  * visit cards on an `auto-fill` 210px grid (four across at 1440, two at 1024
  * and 820, one on a phone), or "No one here right now.". From `md` it fills
  * the rest of the column and its cards scroll inside; on a phone it grows with
- * its cards and the page scrolls.
+ * its cards and the page scrolls. The Checkout lane reads today's open bills
+ * once for its cards' "₹n to pay" (`useCheckoutDues`).
  */
 export function LanePanel({
   lane,
@@ -202,6 +216,10 @@ export function LanePanel({
   const { t } = useTranslation(TODAY_NS);
   const headingId = useId();
   const panel = useVisitCardFocus(loading);
+  const dues = useCheckoutDues({
+    enabled: lane === 'checkout' && !loading && cards.length > 0,
+    today,
+  });
   const paint = TONE_CLASSES[TODAY_LANE_META[lane].tone];
   return (
     <section
@@ -238,6 +256,7 @@ export function LanePanel({
                 card={card}
                 now={now}
                 today={today}
+                dues={dues}
                 action={actionOf(card)}
                 onOpen={onOpen}
               />

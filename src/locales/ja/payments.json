@@ -49,7 +49,8 @@
     "receipt": "入金",
     "refund": "患者への返金",
     "expense": "出金",
-    "money_back": "返金受領"
+    "money_back": "返金受領",
+    "reversal": "取消"
   },
   "ledger": {
     "records": "記録",
@@ -66,18 +67,25 @@
       "moneyBack": "返金受領",
       "medicalBill": "薬局発注 #{{seq}} · 請求 {{bill}}",
       "stockBill": "在庫発注 #{{seq}} · 請求 {{bill}}",
-      "fromCredit": "{{ref}} から"
+      "fromCredit": "{{ref}} から",
+      "reversed": "取消済み",
+      "medicalOrder": "医薬品発注 #{{seq}}",
+      "stockPurchase": "在庫発注 #{{seq}}"
     },
     "dayClosed": "{{ref}} · 日締め済み",
     "dayClosedEdited_other": "{{ref}} · 日締め済み · {{count}}回編集",
-    "creditEntry": "{{ref}} · {{credit}} から"
+    "creditEntry": "{{ref}} · {{credit}} から",
+    "fixedEntry": "{{ref}} · 金額は変更できません · 取り消すには当日中に削除してください",
+    "search": "患者、支払先、PAY- 番号",
+    "count_other": "{{count}} 件"
   },
   "rowActions": {
     "edit": "編集",
     "delete": "削除",
     "giveBack": "返金する",
     "gotBack": "回収した",
-    "useOnBill": "次回の請求に充当"
+    "useOnBill": "次回の請求に充当",
+    "reverse": "取消"
   },
   "bulk": {
     "export": "エクスポート",
@@ -99,7 +107,11 @@
       "party": "患者または支払先の誤り"
     },
     "removed": "{{ref}} を削除しました",
-    "removedInvoice": "{{ref}} を削除しました · 請求書の残高を戻しました"
+    "removedInvoice": "{{ref}} を削除しました · 請求書の残高を戻しました",
+    "blocked": {
+      "dayClosed": "{{ref}} · この日はすでに締められました · 代わりに取消してください",
+      "moreThanPaid": "{{ref}} · この金額はすでに返金されています · 先に返金を削除してください"
+    }
   },
   "dialog": {
     "record": "支払い",
@@ -126,7 +138,6 @@
     },
     "settledToday": "{{state}} · 今日",
     "adjusted": "{{amount}} 充当済み",
-    "source": "{{ref}} から · {{direction}}",
     "invoice": "請求書 #{{seq}}",
     "byHand": "手入力",
     "deleteTitle": "この保留中の項目を削除しますか?",
@@ -143,9 +154,18 @@
       "loan_to_staff": "職員への貸付",
       "other": "その他"
     },
-    "settledInvoice": "{{state}} · 請求書 #{{seq}}",
     "adjustedOn": "{{ref}} の {{amount}} を請求書 #{{seq}} に充当しました",
-    "nothingDue": "{{name}} には充当できる未払いがありません"
+    "nothingDue": "{{name}} には充当できる未払いがありません",
+    "search": "人、仕入先、CR-",
+    "fromEntry": "台帳の記録から",
+    "forInvoice": "請求書に対して",
+    "settledLocked": "{{ref}} · {{amount}} 精算済み · もう変更できません",
+    "conflicts": {
+      "settled": "{{ref}} の一部が精算されました · 変更も削除もできません",
+      "closed": "{{ref}} は精算済みです",
+      "dayClosed": "請求書 #{{seq}} の店舗は本日の日締め済みです · この残高を使うには再開してください",
+      "dueChanged": "請求書 #{{seq}} の未払い額が変わりました · もう一度お試しください"
+    }
   },
   "receive": {
     "title": "入金を受け取る",
@@ -180,7 +200,11 @@
     "updated": "{{ref}} を更新 · 変更を記録しました",
     "enterAmount": "金額を入力してください",
     "pickPatient": "患者を選んでください",
-    "aboveDue": "未払い {{due}} を超えています"
+    "aboveDue": "未払い {{due}} を超えています",
+    "moreThanDue": "請求書の現在の未払額を超えています · その間に支払われました",
+    "totalAdvance": "合計 {{total}} · 前受金",
+    "advance": "前受金 · 請求書なし",
+    "invoicesFailed": "未払いの請求書を読み込めませんでした"
   },
   "send": {
     "title": "支払いを記録",
@@ -237,7 +261,9 @@
     "added": "支出 {{ref}} を追加しました",
     "paidBill": "{{bill}} に {{amount}} を支払いました",
     "saved": "{{ref}} を保存 · 変更を記録しました",
-    "missing": "支払先と金額を入力してください"
+    "missing": "支払先と金額を入力してください",
+    "moreThanDue": "請求の現在の未払額を超えています · その間に支払われました",
+    "billsFailed": "未払いの請求を読み込めませんでした"
   },
   "credit": {
     "title": "保留中を追加",
@@ -322,9 +348,9 @@
     "gate": {
       "title": "開始時の現金 · {{day}}",
       "sources": {
-        "default_float": "既定の釣り銭",
         "carried": "{{day}} の締めから繰越",
-        "recounted": "再計数"
+        "recounted": "再計数",
+        "first": "以前の締めはありません · 繰越なし"
       },
       "recount": "再計数",
       "recountLabel": "開始時の現金を再計数",
@@ -345,8 +371,11 @@
       "countPlaceholder": "レジを数える",
       "countLabel": "数えた現金",
       "netByMode": "方法別の差引",
-      "modeTitle": "入 {{in}} · 出 {{out}}",
-      "staffTitle_other": "{{name}} · 受領 {{count}} 件 · {{amount}}"
+      "staffTitle_other": "{{name}} · 記録 {{count}} 件 · {{amount}}",
+      "staffOther": "チーム外",
+      "reason": "計数が合わない理由",
+      "reasonPlaceholder": "何があったか · 例：レジから ₹20 をおつりに使用",
+      "reasonFirst": "先に計数が合わない理由を入力してください"
     },
     "report": {
       "title": "{{day}} は締め済み",
@@ -355,9 +384,7 @@
       "reopen": "再開",
       "acceptedBy": "{{name}} が承認",
       "takenAsExpected": "見込み額のまま",
-      "collected": "受領",
       "received_other": "受領 {{count}} 件",
-      "paidOut": "支払",
       "paid_other": "支払 {{count}} 件",
       "cashCounted": "計数した現金",
       "expected": "見込み {{amount}}",
@@ -368,26 +395,58 @@
       "log": "経過",
       "logAccepted": "{{name}} が開始時の現金 {{amount}} を承認",
       "logRecounted": "{{name}} が開始時の現金 {{amount}} を承認（再計数）",
-      "logReviewed_other": "{{count}} 件中 {{checked}} 件を確認",
       "logMatched": "レジ計数 {{amount}} · 一致",
       "logExtra": "レジ計数 {{amount}} · {{diff}} 過剰",
       "logShort": "レジ計数 {{amount}} · {{diff}} 不足",
-      "logClosed": "{{name}} が日次を締め · 概要を WhatsApp で管理者に送信",
-      "logAuto": "猶予期間後に自動締め · 現金は見込み額のまま"
+      "logClosed": "{{name}} が日次を締め",
+      "logAuto": "猶予期間後に自動締め · 現金は見込み額のまま",
+      "openedAuto": "自動で開始",
+      "notCounted": "未計数",
+      "logOpened": "{{name}} が日次を開始",
+      "logReopened": "{{name}} が日次を再開 · {{reason}}",
+      "logReason": "「{{reason}}」",
+      "someone": "誰か"
     },
     "review": {
       "title": "すべての記録を確認",
-      "progress_other": "{{count}} 件中 {{checked}} 件確認済み",
       "none": "記録なし",
       "empty": "この日の記録はありません",
-      "check": "確認済みにする",
       "states": {
         "canEdit": "編集可",
         "canEditTitle": "日次を締めるまで編集・削除できます",
         "dayClosed": "締め済み",
         "dayClosedTitle": "この日は締め済み · 記録は変更できません",
         "fromCredit": "{{credit}} から"
+      },
+      "count_other": "記録 {{count}} 件"
+    },
+    "previousNone": "この日より前の締めはありません",
+    "refusals": {
+      "alreadyOpened": "この間に別の人がこの日を開始しました · 最新の状態を表示しています",
+      "alreadyClosed": "この間に別の人がこの日を締めました · 最新の状態を表示しています",
+      "alreadyOpen": "この日はすでに再開されています · 最新の状態を表示しています"
+    },
+    "reopen": {
+      "title": "この日を再開しますか？",
+      "effect": "計数は消去され、締めるまでこの日の記録を再び変更できます。",
+      "action": "日次を再開",
+      "record": "{{branch}} · {{day}}",
+      "reasons": {
+        "miscounted": "数え間違い",
+        "missed": "記録漏れがあった",
+        "wrongEntry": "誤った記録がある"
       }
+    }
+  },
+  "reverseEntry": {
+    "title": "この支払いを取消しますか?",
+    "effect": "この日は締められているため、記録はそのまま残ります。同額の取消が本日、その院の台帳に記録され、支払った分が戻ります。両方の記録が残ります。",
+    "action": "取消する",
+    "reversed": "{{ref}} を取消しました · {{reversal}}",
+    "blocked": {
+      "alreadyReversed": "{{ref}} はすでに取消済みです",
+      "dayOpen": "{{ref}} の日は再び開いています · 代わりに削除してください",
+      "dayClosed": "{{ref}} の院では本日が締められています · 取消すには再度開いてください"
     }
   }
 }

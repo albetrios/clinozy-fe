@@ -1,70 +1,80 @@
-import { useEffect } from 'react';
-
-import type { TaskDetail } from '@/shared/api/clinic/tasks-contracts.ts';
+import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
+import type { TaskPerson } from '@/shared/api/clinic/tasks-contracts.ts';
 import {
   ChatColumn,
-  chatContactOfLead,
+  chatContactOfContact,
   composerShowsLabels,
 } from '@/shared/components/ChatColumn/index.ts';
 import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
-import { RetryError } from '@/shared/components/RetryError/index.ts';
-import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
-import { useEnsureContactThread } from '@/shared/hooks/useContactThread/index.ts';
+import { useContact } from '@/shared/hooks/useContacts/index.ts';
 
 import { taskContactCard } from '../../tasks.display.ts';
 
-/**
- * The task drawer's chat column (D32; `tasks.md` › Chat column): the person's
- * one thread — the task's lead, their lead, their contact thread — bound by id;
- * a person with none gets a contact thread opened (seeded "Task · <title>",
- * an appointment task its visit's line) by the idempotent lookup-or-create, so
- * a second open never makes a second thread. Skeleton bars until it is bound;
- * the task column stays readable meanwhile.
- */
-export function TaskDrawerChat({
-  detail,
-  viewportWidth,
-  chatWidth,
-  contactActions,
-  onBookAppointment,
-}: {
-  detail: TaskDetail;
+/** Props of {@link TaskDrawerChat}. */
+interface TaskDrawerChatProps {
+  /** The person the task is about — their contact's one stream. */
+  person: TaskPerson;
+  /** The lead the task points at — the thread's divider names it and the composer its interests. */
+  lead: LeadRecord | null;
+  /** The member may read their contact record (`contact:read`): the composer knows their channels. */
+  canReadContact: boolean;
   viewportWidth: number;
   /** The width last dragged in the lead drawer — the labels beside "Send via" follow it. */
   chatWidth: number;
   contactActions?: ContactCardActions;
+  /** "Book an appointment" — hidden without it (no `appointment:create`). */
   onBookAppointment?: () => void;
-}) {
-  const ensure = useEnsureContactThread();
-  const row = detail.task;
-  const thread = detail.thread ?? ensure.data?.lead ?? null;
-  const { mutate } = ensure;
-  const unbound = detail.thread === null;
-  const idle = ensure.isIdle;
-  useEffect(() => {
-    if (!(unbound && idle)) return;
-    mutate({
-      name: row.person.name,
-      patientId: row.person.patientId,
-      leadId: row.person.leadId,
-      phone: row.person.phone,
-      context: { kind: 'task', taskId: row.id },
-    });
-  }, [unbound, idle, mutate, row]);
+  /** A message went out — the task is read again once the rules have run (D81 T7). */
+  onSent: () => void;
+}
 
-  if (!thread) {
-    if (ensure.isError) {
-      return <RetryError onRetry={() => ensure.reset()} />;
-    }
-    return <SkeletonRows rows={6} className="p-(--table-pad-x)" />;
-  }
+/**
+ * The task drawer's chat column (D32; `tasks.md` › Chat column): the person's
+ * one stream on clinozy-be, by their contact (`{ kind: 'contact' }`, as the
+ * patient file's Activity) — the history, the composer and its channels from
+ * their contact record, the lead the task points at on the thread's divider. A message sent here asks the rules to run: a "Reply
+ * to" task closes right after (D81 T7), so the drawer reads its task again
+ * (`onSent`) and closes itself once it is done. The column loads, fails and
+ * retries on its own.
+ */
+export function TaskDrawerChat({
+  person,
+  lead,
+  canReadContact,
+  viewportWidth,
+  chatWidth,
+  contactActions,
+  onBookAppointment,
+  onSent,
+}: TaskDrawerChatProps) {
+  const contact = useContact(canReadContact ? person.id : undefined).data;
   return (
     <ChatColumn
-      person={{ kind: 'lead', leadId: thread.id }}
-      contact={chatContactOfLead(thread)}
+      person={{ kind: 'contact', contactId: person.id }}
+      contact={chatContactOfContact(
+        {
+          name: person.name,
+          phone: person.phone,
+          isPatient: person.patientId !== null,
+          interests: lead?.interests,
+        },
+        contact,
+      )}
+      lead={
+        lead
+          ? {
+              leadId: lead.id,
+              kind: lead.kind,
+              createdAt: lead.createdAt,
+              source: lead.source,
+              patientId: lead.patientId,
+            }
+          : undefined
+      }
       showModeLabels={composerShowsLabels(viewportWidth, chatWidth)}
-      contactCard={{ data: taskContactCard(row), ...contactActions }}
+      contactCard={{ data: taskContactCard({ person }) ?? undefined, ...contactActions }}
       onBookAppointment={onBookAppointment ? () => onBookAppointment() : undefined}
+      onSent={onSent}
     />
   );
 }

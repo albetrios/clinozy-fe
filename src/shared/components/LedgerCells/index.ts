@@ -1,7 +1,10 @@
 export { LEDGER_KEYS, LEDGER_NS } from './ledger-cells.constants.ts';
 export {
   editSideLabel,
+  ledgerEntryEditable,
+  ledgerEntryFixed,
   ledgerEntryLock,
+  ledgerEntryReversible,
   ledgerModes,
   ledgerModesLabel,
   ledgerSubLine,

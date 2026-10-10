@@ -32,7 +32,8 @@
   },
   "rowActions": {
     "edit": "편집",
-    "delete": "삭제"
+    "delete": "삭제",
+    "newInvoice": "새 청구서"
   },
   "bulk": {
     "export": "내보내기",

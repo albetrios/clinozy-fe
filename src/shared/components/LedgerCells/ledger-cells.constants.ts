@@ -31,6 +31,8 @@ export const LEDGER_KEYS = {
     refund: 'kinds.refund',
     expense: 'kinds.expense',
     money_back: 'kinds.money_back',
+    /** A closed day's entry undone — the What pill of a `reversal` entry. */
+    reversal: 'kinds.reversal',
   },
   ledger: {
     /** "All entries loaded" — the plural noun the end line names. */
@@ -52,16 +54,31 @@ export const LEDGER_KEYS = {
       moneyBack: 'ledger.sub.moneyBack',
       medicalBill: 'ledger.sub.medicalBill',
       stockBill: 'ledger.sub.stockBill',
+      /** "Medical PO #431" / "Stock PO #8" — a supplier bill without its bill number. */
+      medicalOrder: 'ledger.sub.medicalOrder',
+      stockPurchase: 'ledger.sub.stockPurchase',
       fromCredit: 'ledger.sub.fromCredit',
+      /** "Reversed" — an entry a reversal undid. */
+      reversed: 'ledger.sub.reversed',
     },
     /** A closed day's row click: "PAY-5509 · Day closed" (+ " · edited 2×"). */
     dayClosed: 'ledger.dayClosed',
     dayClosedEdited: 'ledger.dayClosedEdited',
     /** A settled credit's entry: "PAY-5601 · From CR-2" — it is the credit's (H:5105). */
     creditEntry: 'ledger.creditEntry',
+    /** A refund's or a reversal's row click: its money is another write's — "PAY-9 · …". */
+    fixedEntry: 'ledger.fixedEntry',
+    /** The ledger's search — the person, the payee or the PAY- number (D81). */
+    search: 'ledger.search',
+    /** The footer: "13 entries" (plural) — the server's count over the filters. */
+    count: 'ledger.count',
   },
-  /** An open-day entry's row actions (`payments.md:34`). */
-  rowActions: { edit: 'rowActions.edit', delete: 'rowActions.delete' },
+  /** An entry's row actions (`payments.md:34`): Edit and Delete on an open day, Reverse on a closed one. */
+  rowActions: {
+    edit: 'rowActions.edit',
+    delete: 'rowActions.delete',
+    reverse: 'rowActions.reverse',
+  },
   /** Delete an entry (`payments.md:34, 282–294`). */
   deleteEntry: {
     title: 'deleteEntry.title',
@@ -74,5 +91,24 @@ export const LEDGER_KEYS = {
     },
     removed: 'deleteEntry.removed',
     removedInvoice: 'deleteEntry.removedInvoice',
+    /** clinozy-be's `409` reasons for a delete, in the room's words. */
+    blocked: {
+      dayClosed: 'deleteEntry.blocked.dayClosed',
+      moreThanPaid: 'deleteEntry.blocked.moreThanPaid',
+    },
+  },
+  /** Reverse a closed day's entry (`POST /app/payments/:id/reverse`, research §2). */
+  reverseEntry: {
+    title: 'reverseEntry.title',
+    effect: 'reverseEntry.effect',
+    action: 'reverseEntry.action',
+    /** "PAY-8 reversed · PAY-9". */
+    reversed: 'reverseEntry.reversed',
+    /** clinozy-be's `409` reasons for a reversal, in the room's words. */
+    blocked: {
+      alreadyReversed: 'reverseEntry.blocked.alreadyReversed',
+      dayOpen: 'reverseEntry.blocked.dayOpen',
+      dayClosed: 'reverseEntry.blocked.dayClosed',
+    },
   },
 } as const;

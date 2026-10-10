@@ -6,7 +6,7 @@ import { PATIENT_RAIL_TEST_ID } from './patient-rail.constants.ts';
 import { RailAbout } from './rail-about.tsx';
 import { RailIdentity } from './rail-identity.tsx';
 import { RailReach } from './rail-reach.tsx';
-import { RailUpNext, type RailUpNextActions } from './rail-up-next.tsx';
+import { type RailMoney, RailUpNext, type RailUpNextActions } from './rail-up-next.tsx';
 
 /** Props of {@link PatientRail}. */
 export interface PatientRailProps {
@@ -18,8 +18,10 @@ export interface PatientRailProps {
   limited?: boolean;
   /** "Edit contact" — hidden without Patients edit. */
   onEditContact?: () => void;
-  /** Book / Reschedule and Feedback — each hidden when the member can't. */
+  /** Book / Reschedule, Collect and Feedback — each hidden when the member can't. */
   actions: RailUpNextActions;
+  /** What she owes, masked with the file — only for a member who sees billing. */
+  money?: RailMoney;
   /** The rail's tier rule (the layout's: from `lg` with Activity closed, from `xl` open). */
   className?: string;
 }
@@ -35,6 +37,7 @@ export function PatientRail({
   limited = false,
   onEditContact,
   actions,
+  money,
   className,
 }: PatientRailProps) {
   return (
@@ -53,7 +56,7 @@ export function PatientRail({
             <RailReach file={file} />
             <RailAbout file={file} />
           </div>
-          <RailUpNext file={file} actions={actions} />
+          <RailUpNext file={file} actions={actions} money={money} />
         </>
       )}
     </aside>

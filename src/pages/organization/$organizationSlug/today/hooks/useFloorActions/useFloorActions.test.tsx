@@ -201,6 +201,22 @@ describe('useFloorActions (KICKOFF §6.2 lanes table; §3.7, §6.13)', () => {
     expect(router.state.location.search).toEqual({ visit: 'open', from: 'today' });
   });
 
+  it('asks a signed-in member’s own payment:create for Checkout', async () => {
+    const codes = ['organization:read', 'patient:read', 'appointment:update'] as const;
+    const first = renderTodayRoute(TODAY_PATH, Probe, { permissions: [...codes] });
+    // Send in (`appointment:update`) shows once the member's codes are known.
+    await waitFor(() =>
+      expect(probe.actions?.actionOf(cardIn('waiting'))).toBeTypeOf('function'),
+    );
+    expect(probe.actions?.actionOf(cardIn('checkout'))).toBeNull();
+    first.unmount();
+
+    renderTodayRoute(TODAY_PATH, Probe, { permissions: [...codes, 'payment:create'] });
+    await waitFor(() =>
+      expect(probe.actions?.actionOf(cardIn('checkout'))).toBeTypeOf('function'),
+    );
+  });
+
   it('offers no consult: With doctor has no action, even for a doctor (L-64)', async () => {
     await actionsFor('doctor');
     await waitFor(() =>

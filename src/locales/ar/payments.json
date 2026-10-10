@@ -49,7 +49,8 @@
     "receipt": "مستلَم",
     "refund": "استرداد للمريض",
     "expense": "مدفوع",
-    "money_back": "مبلغ مُعاد"
+    "money_back": "مبلغ مُعاد",
+    "reversal": "عكس قيد"
   },
   "ledger": {
     "records": "القيود",
@@ -71,7 +72,10 @@
       "moneyBack": "مبلغ مُعاد",
       "medicalBill": "أمر شراء طبي #{{seq}} · فاتورة {{bill}}",
       "stockBill": "أمر شراء مخزون #{{seq}} · فاتورة {{bill}}",
-      "fromCredit": "من {{ref}}"
+      "fromCredit": "من {{ref}}",
+      "reversed": "معكوس",
+      "medicalOrder": "أمر شراء طبي #{{seq}}",
+      "stockPurchase": "أمر شراء مخزون #{{seq}}"
     },
     "dayClosed": "{{ref}} · اليوم مُقفل",
     "dayClosedEdited_zero": "{{ref}} · اليوم مُقفل · عُدّل {{count}} مرة",
@@ -80,14 +84,23 @@
     "dayClosedEdited_few": "{{ref}} · اليوم مُقفل · عُدّل {{count}} مرة",
     "dayClosedEdited_many": "{{ref}} · اليوم مُقفل · عُدّل {{count}} مرة",
     "dayClosedEdited_other": "{{ref}} · اليوم مُقفل · عُدّل {{count}} مرة",
-    "creditEntry": "{{ref}} · من {{credit}}"
+    "creditEntry": "{{ref}} · من {{credit}}",
+    "fixedEntry": "{{ref}} · لا يمكن تغيير مبلغه · احذفه في يومه للتراجع عنه",
+    "search": "مريض أو مستفيد أو رقم PAY-",
+    "count_one": "قيد واحد",
+    "count_other": "{{count}} قيد",
+    "count_zero": "لا قيود",
+    "count_two": "قيدان",
+    "count_few": "{{count}} قيود",
+    "count_many": "{{count}} قيدًا"
   },
   "rowActions": {
     "edit": "تعديل",
     "delete": "حذف",
     "giveBack": "ردّ المبلغ",
     "gotBack": "تم الاستلام",
-    "useOnBill": "استخدام في الفاتورة التالية"
+    "useOnBill": "استخدام في الفاتورة التالية",
+    "reverse": "عكس"
   },
   "bulk": {
     "export": "تصدير",
@@ -114,7 +127,11 @@
       "party": "مريض أو مستفيد خاطئ"
     },
     "removed": "تمت إزالة {{ref}}",
-    "removedInvoice": "تمت إزالة {{ref}} · أُعيد رصيد الفاتورة"
+    "removedInvoice": "تمت إزالة {{ref}} · أُعيد رصيد الفاتورة",
+    "blocked": {
+      "dayClosed": "{{ref}} · أُقفل يومه الآن · اعكسه بدلًا من ذلك",
+      "moreThanPaid": "{{ref}} · أعاد استرداد هذا المبلغ بالفعل · احذف الاسترداد أولًا"
+    }
   },
   "dialog": {
     "record": "الدفعة",
@@ -141,7 +158,6 @@
     },
     "settledToday": "{{state}} · اليوم",
     "adjusted": "سُوّي {{amount}}",
-    "source": "من {{ref}} · {{direction}}",
     "invoice": "فاتورة #{{seq}}",
     "byHand": "يدويًا",
     "deleteTitle": "حذف هذا المعلّق؟",
@@ -158,9 +174,18 @@
       "loan_to_staff": "قرض لموظف",
       "other": "أخرى"
     },
-    "settledInvoice": "{{state}} · فاتورة #{{seq}}",
     "adjustedOn": "سُوّي {{amount}} من {{ref}} على الفاتورة #{{seq}}",
-    "nothingDue": "لا مستحقات على {{name}} للتسوية"
+    "nothingDue": "لا مستحقات على {{name}} للتسوية",
+    "search": "شخص أو مورد أو CR-",
+    "fromEntry": "من قيد في السجل",
+    "forInvoice": "لفاتورة",
+    "settledLocked": "{{ref}} · سُوّي {{amount}} · لا يمكن تغييره الآن",
+    "conflicts": {
+      "settled": "سُوّي جزء من {{ref}} الآن · لا يمكن تغييره أو حذفه",
+      "closed": "سُوّي {{ref}} بالكامل بالفعل",
+      "dayClosed": "اليوم مُقفل في فرع الفاتورة #{{seq}} · أعد فتحه لاستخدام هذا الرصيد",
+      "dueChanged": "تغيّر المستحق على الفاتورة #{{seq}} · حاول مرة أخرى"
+    }
   },
   "receive": {
     "title": "استلام دفعة",
@@ -200,7 +225,11 @@
     "updated": "تم تحديث {{ref}} · سُجّل التغيير",
     "enterAmount": "أدخل مبلغًا",
     "pickPatient": "اختر مريضًا",
-    "aboveDue": "أكثر من المستحق {{due}}"
+    "aboveDue": "أكثر من المستحق {{due}}",
+    "moreThanDue": "أكثر من المستحق على الفاتورة الآن · دُفع منها شيء في الأثناء",
+    "totalAdvance": "الإجمالي {{total}} · دفعة مقدمة",
+    "advance": "دفعة مقدمة · دون فاتورة",
+    "invoicesFailed": "تعذر تحميل الفواتير المفتوحة"
   },
   "send": {
     "title": "إرسال دفعة",
@@ -267,7 +296,9 @@
     "added": "تمت إضافة المصروف {{ref}}",
     "paidBill": "تم دفع {{amount}} مقابل {{bill}}",
     "saved": "تم حفظ {{ref}} · سُجّل التغيير",
-    "missing": "أضف المستفيد والمبلغ"
+    "missing": "أضف المستفيد والمبلغ",
+    "moreThanDue": "أكثر من المستحق على الفاتورة الآن · دُفع منها شيء في الأثناء",
+    "billsFailed": "تعذر تحميل الفواتير المفتوحة"
   },
   "credit": {
     "title": "إضافة معلّق",
@@ -367,9 +398,9 @@
     "gate": {
       "title": "نقد الافتتاح · {{day}}",
       "sources": {
-        "default_float": "المبلغ الافتراضي",
         "carried": "منقول من إغلاق {{day}}",
-        "recounted": "أُعيد عدّه"
+        "recounted": "أُعيد عدّه",
+        "first": "لا إغلاق سابق · لا شيء يُنقل"
       },
       "recount": "إعادة العدّ",
       "recountLabel": "أعِد عدّ نقد الافتتاح",
@@ -390,13 +421,16 @@
       "countPlaceholder": "عُدّ الدرج",
       "countLabel": "النقد المعدود",
       "netByMode": "الصافي حسب الطريقة",
-      "modeTitle": "داخل {{in}} · خارج {{out}}",
-      "staffTitle_zero": "{{name}} · لا إيصالات · {{amount}}",
-      "staffTitle_one": "{{name}} · إيصال واحد · {{amount}}",
-      "staffTitle_two": "{{name}} · إيصالان · {{amount}}",
-      "staffTitle_few": "{{name}} · {{count}} إيصالات · {{amount}}",
-      "staffTitle_many": "{{name}} · {{count}} إيصالًا · {{amount}}",
-      "staffTitle_other": "{{name}} · {{count}} إيصال · {{amount}}"
+      "staffTitle_zero": "{{name}} · لا قيود · {{amount}}",
+      "staffTitle_one": "{{name}} · قيد واحد · {{amount}}",
+      "staffTitle_two": "{{name}} · قيدان · {{amount}}",
+      "staffTitle_few": "{{name}} · {{count}} قيود · {{amount}}",
+      "staffTitle_many": "{{name}} · {{count}} قيدًا · {{amount}}",
+      "staffTitle_other": "{{name}} · {{count}} قيد · {{amount}}",
+      "staffOther": "ليس من الفريق",
+      "reason": "لماذا يختلف العدّ؟",
+      "reasonPlaceholder": "ماذا حدث · مثلًا أُعطي ₹20 فكّةً من الدرج",
+      "reasonFirst": "اذكر أولًا سبب اختلاف العدّ"
     },
     "report": {
       "title": "أُغلق {{day}}",
@@ -405,14 +439,12 @@
       "reopen": "إعادة الفتح",
       "acceptedBy": "اعتمده {{name}}",
       "takenAsExpected": "اعتُبر كما هو متوقع",
-      "collected": "المحصَّل",
       "received_zero": "لا مقبوضات",
       "received_one": "مقبوض واحد",
       "received_two": "مقبوضان",
       "received_few": "{{count}} مقبوضات",
       "received_many": "{{count}} مقبوضًا",
       "received_other": "{{count}} مقبوض",
-      "paidOut": "المدفوع",
       "paid_zero": "لا مدفوعات",
       "paid_one": "دفعة واحدة",
       "paid_two": "دفعتان",
@@ -428,36 +460,63 @@
       "log": "ما حدث",
       "logAccepted": "اعتمد {{name}} نقد الافتتاح {{amount}}",
       "logRecounted": "اعتمد {{name}} نقد الافتتاح {{amount}} (بعد إعادة العدّ)",
-      "logReviewed_zero": "رُوجع {{checked}} من {{count}} قيد",
-      "logReviewed_one": "رُوجع {{checked}} من {{count}} قيد",
-      "logReviewed_two": "رُوجع {{checked}} من {{count}} قيد",
-      "logReviewed_few": "رُوجع {{checked}} من {{count}} قيد",
-      "logReviewed_many": "رُوجع {{checked}} من {{count}} قيد",
-      "logReviewed_other": "رُوجع {{checked}} من {{count}} قيد",
       "logMatched": "عُدّ الدرج عند {{amount}} · مطابق",
       "logExtra": "عُدّ الدرج عند {{amount}} · زيادة {{diff}}",
       "logShort": "عُدّ الدرج عند {{amount}} · نقص {{diff}}",
-      "logClosed": "أغلق {{name}} اليوم · أُرسل الملخص إلى المسؤول عبر WhatsApp",
-      "logAuto": "أُغلق تلقائيًا بعد فترة السماح · اعتُبر النقد كما هو متوقع"
+      "logClosed": "أغلق {{name}} اليوم",
+      "logAuto": "أُغلق تلقائيًا بعد فترة السماح · اعتُبر النقد كما هو متوقع",
+      "openedAuto": "فُتح تلقائيًا",
+      "notCounted": "لم يُعدّ",
+      "logOpened": "فتح {{name}} اليوم",
+      "logReopened": "أعاد {{name}} فتح اليوم · {{reason}}",
+      "logReason": "«{{reason}}»",
+      "someone": "شخص ما"
     },
     "review": {
       "title": "راجِع كل قيد",
-      "progress_zero": "تم التحقق من {{checked}} من {{count}}",
-      "progress_one": "تم التحقق من {{checked}} من {{count}}",
-      "progress_two": "تم التحقق من {{checked}} من {{count}}",
-      "progress_few": "تم التحقق من {{checked}} من {{count}}",
-      "progress_many": "تم التحقق من {{checked}} من {{count}}",
-      "progress_other": "تم التحقق من {{checked}} من {{count}}",
       "none": "لا قيود",
       "empty": "لا قيود في هذا اليوم",
-      "check": "وضع علامة كمُراجَع",
       "states": {
         "canEdit": "قابل للتعديل",
         "canEditTitle": "يمكن تعديله أو حذفه حتى إغلاق اليوم",
         "dayClosed": "اليوم مغلق",
         "dayClosedTitle": "اليوم مغلق · لا يمكن تغيير قيوده",
         "fromCredit": "من {{credit}}"
+      },
+      "count_zero": "لا قيود",
+      "count_one": "قيد واحد",
+      "count_two": "قيدان",
+      "count_few": "{{count}} قيود",
+      "count_many": "{{count}} قيدًا",
+      "count_other": "{{count}} قيد"
+    },
+    "previousNone": "لا إغلاقات قبل هذا اليوم",
+    "refusals": {
+      "alreadyOpened": "فتح شخص آخر هذا اليوم في الأثناء · يُعرض الآن",
+      "alreadyClosed": "أغلق شخص آخر هذا اليوم في الأثناء · يُعرض الآن",
+      "alreadyOpen": "أُعيد فتح هذا اليوم بالفعل · يُعرض الآن"
+    },
+    "reopen": {
+      "title": "إعادة فتح هذا اليوم؟",
+      "effect": "يُمسح العدّ ويمكن تعديل قيود اليوم مجددًا حتى يُغلق.",
+      "action": "إعادة فتح اليوم",
+      "record": "{{branch}} · {{day}}",
+      "reasons": {
+        "miscounted": "عُدّ بشكل خاطئ",
+        "missed": "فات تسجيل قيد",
+        "wrongEntry": "قيد غير صحيح"
       }
+    }
+  },
+  "reverseEntry": {
+    "title": "عكس هذه الدفعة؟",
+    "effect": "يومه مُقفل، لذا يبقى كما هو. يُضاف قيد عكسي بالمبلغ نفسه إلى سجل اليوم في فرعه، ويعود ما دفعه. يُحتفظ بالقيدين.",
+    "action": "عكس",
+    "reversed": "تم عكس {{ref}} · {{reversal}}",
+    "blocked": {
+      "alreadyReversed": "{{ref}} معكوس بالفعل",
+      "dayOpen": "يوم {{ref}} مفتوح مجددًا · احذفه بدلًا من ذلك",
+      "dayClosed": "اليوم مُقفل في فرع {{ref}} · أعد فتحه للعكس"
     }
   }
 }

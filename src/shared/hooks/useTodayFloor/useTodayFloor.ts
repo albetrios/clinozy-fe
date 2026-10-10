@@ -17,6 +17,7 @@ import {
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useRefreshTasksAfterRules } from '@/shared/hooks/useTasks/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 /**
@@ -75,17 +76,25 @@ export function useTodayEnquiries(
  */
 const MOVE_REFRESHES = [appointmentQueryKeys.all, leadQueryKeys.all];
 
-/** The floor's moves: check in, its Undo, and a later floor stage — each one user action, one key. */
+/**
+ * The floor's moves: check in, its Undo, and a later floor stage — each one user action, one key.
+ * A check-in and its Undo move the booking's status, so the server's rules run on them (D81 T7:
+ * an Arriving task closes, or opens again): the work queue beside the floor reads its tasks again
+ * once they have. A stage move leaves the status — no rules run.
+ */
 export function useTodayMoves() {
+  const refreshTasksAfterRules = useRefreshTasksAfterRules();
   const checkIn = useAppMutation({
     mutationFn: (appointmentId: string, action) =>
       moveAppointment({ appointmentId, route: 'check-in', ...action }),
     invalidateKeys: MOVE_REFRESHES,
+    onSuccess: refreshTasksAfterRules,
   });
   const undo = useAppMutation({
     mutationFn: (appointmentId: string, action) =>
       moveAppointment({ appointmentId, route: 'undo-check-in', ...action }),
     invalidateKeys: MOVE_REFRESHES,
+    onSuccess: refreshTasksAfterRules,
   });
   const moveStage = useAppMutation({
     mutationFn: (

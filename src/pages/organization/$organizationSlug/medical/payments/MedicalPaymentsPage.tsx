@@ -4,10 +4,8 @@ import { useTranslation } from 'react-i18next';
 
 import { organizationPaymentEdit } from '@/lib/routes/payments-builders.ts';
 import { LEDGER_FILTER_VALUES } from '@/shared/api/clinic/ledger-filter-values.ts';
-import type {
-  LedgerListParams,
-  LedgerRow,
-} from '@/shared/api/clinic/payments-contracts.ts';
+import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
+import type { FixtureLedgerListParams } from '@/shared/api/clinic/payments-fixture-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { PAYMENT_KIND_TONES, PAYMENT_MODE_TONES } from '@/shared/clinic/clinic-tones.ts';
 import {
@@ -25,9 +23,9 @@ import {
   useRoomFilters,
 } from '@/shared/components/RoomToolbar/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useFixtureLedgerList } from '@/shared/hooks/useFixtureLedger/index.ts';
 import { useLedgerRowActions } from '@/shared/hooks/useLedgerRowActions/index.ts';
 import { ledgerRowTone, useLedgerTable } from '@/shared/hooks/useLedgerTable/index.ts';
-import { useLedgerList } from '@/shared/hooks/usePayments/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
 import { useRoomList } from '@/shared/hooks/useRoomList/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -86,7 +84,7 @@ function useFilterCopy(): Readonly<Record<string, RoomFilterCopy>> {
 function ledgerParamsOf(
   search: MedicalPaymentsSearch,
   branchIds: readonly string[],
-): LedgerListParams {
+): FixtureLedgerListParams {
   return {
     kind: search.kind,
     mode: search.mode,
@@ -120,7 +118,7 @@ export function MedicalPaymentsPage() {
   const filterCopy = useFilterCopy();
   const [deleting, setDeleting] = useState<PaymentDeleteTarget | null>(null);
 
-  const list = useLedgerList(ledgerParamsOf(search, preferences.branchFilter));
+  const list = useFixtureLedgerList(ledgerParamsOf(search, preferences.branchFilter));
   const { rows, loading } = useRoomList(
     list,
     TABLE_ID,
@@ -167,7 +165,7 @@ export function MedicalPaymentsPage() {
         exportName="medical-payments.csv"
         avatar
       />
-      <PaymentDeleteConfirm target={deleting} onClose={() => setDeleting(null)} />
+      <PaymentDeleteConfirm target={deleting} onClose={() => setDeleting(null)} fixture />
       <Outlet />
     </section>
   );

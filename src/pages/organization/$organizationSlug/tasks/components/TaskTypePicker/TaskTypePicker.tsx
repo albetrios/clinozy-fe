@@ -2,9 +2,9 @@ import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
 import {
-  LISTED_TASK_RULES,
-  TASK_RULES,
-  type TaskRuleId,
+  TASK_TYPE_VALUES,
+  TASK_TYPES,
+  type TaskType,
 } from '@/shared/api/clinic/tasks-contracts.ts';
 import { TASK_RULE_KEYS, TASK_RULES_NS } from '@/shared/clinic/task-rules.constants.ts';
 import {
@@ -21,31 +21,33 @@ import { TASKS_KEYS, TASKS_NS, TASKS_TEST_IDS } from '../../tasks.constants.ts';
 
 /** Props for {@link TaskTypePicker}. */
 export interface TaskTypePickerProps {
-  /** The rules the list is filtered to; none is "All types". */
-  value: readonly TaskRuleId[];
-  onChange: (rules: TaskRuleId[]) => void;
+  /** The types the list is filtered to; none is "All types". */
+  value: readonly TaskType[];
+  onChange: (types: TaskType[]) => void;
 }
 
 /**
  * The type dropdown (KICKOFF §6.10 Dropdowns; `tasks.md:164–178`; H:2134): a
  * 36px trigger reading "All types", the one rule's name, or "<n> types" — its
  * border darkening while open or filtered, its chevron turning — over the
- * shared picker: the thirteen rules grouped by source (Leads · Appointments ·
- * Feedback · Treatments · Patients · Team), each in its tone, multi-select,
- * searchable, at least 280px; a bottom sheet on a phone. A × clears the pick.
+ * shared picker: the API's rules and "Follow-ups you set" grouped by source
+ * (Leads · Appointments · Feedback · Treatments · Patients · Team, then
+ * Payments and Medical), each in its tone, multi-select, searchable, at least
+ * 280px; a bottom sheet on a phone. A × clears the pick. The server matches a
+ * task of any type picked — "Follow-ups you set" with rules too (D81 T6).
  */
 export function TaskTypePicker({ value, onChange }: TaskTypePickerProps) {
   const { t } = useTranslation(TASKS_NS);
   const { t: tRules } = useTranslation(TASK_RULES_NS);
   const { t: tPicker } = useTranslation(PICKER_NS);
-  const options: PickerOption[] = LISTED_TASK_RULES.map((rule) => {
-    const group = tRules(TASK_RULE_KEYS.groups[TASK_RULES[rule].group]);
+  const options: PickerOption[] = TASK_TYPE_VALUES.map((type) => {
+    const group = tRules(TASK_RULE_KEYS.groups[TASK_TYPES[type].group]);
     return {
-      key: rule,
-      label: tRules(TASK_RULE_KEYS.rules[rule].label),
+      key: type,
+      label: tRules(TASK_RULE_KEYS.rules[type].label),
       sub: group,
       group,
-      tone: TASK_RULES[rule].tone,
+      tone: TASK_TYPES[type].tone,
       leading: { kind: 'dot' },
     };
   });
@@ -60,7 +62,7 @@ export function TaskTypePicker({ value, onChange }: TaskTypePickerProps) {
       <Picker
         multiple
         value={value}
-        onChange={(keys) => onChange(keys as TaskRuleId[])}
+        onChange={(keys) => onChange(keys as TaskType[])}
         options={options}
         label={t(TASKS_KEYS.type.label)}
         minWidth={280}

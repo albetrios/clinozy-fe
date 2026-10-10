@@ -20,7 +20,7 @@ const open = (dueAt: string): TaskDueLabelInput => ({
   status: 'open',
   dueAt,
   snoozeLabel: null,
-  resolvedBy: null,
+  isResolvedAutomatically: false,
   resolvedAt: null,
 });
 
@@ -61,14 +61,14 @@ describe('useTaskDueLabel (tasks.md:58, 309)', () => {
     expect(
       label({ ...open(at(-30)), status: 'snoozed', snoozeLabel: '2 h · no answer' }),
     ).toBe('Snoozed · 2 h · no answer');
-    expect(label({ ...open(at(-30)), status: 'done', resolvedBy: 'clinozy' })).toBe(
-      `Done by ${PRODUCT_NAME}`,
-    );
+    expect(
+      label({ ...open(at(-30)), status: 'done', isResolvedAutomatically: true }),
+    ).toBe(`Done by ${PRODUCT_NAME}`);
     expect(
       label({
         ...open(at(-30)),
         status: 'done',
-        resolvedBy: 'member',
+        isResolvedAutomatically: false,
         resolvedAt: at(0),
       }),
     ).toBe('Done · Now');
@@ -76,7 +76,7 @@ describe('useTaskDueLabel (tasks.md:58, 309)', () => {
       label({
         ...open(at(-30)),
         status: 'done',
-        resolvedBy: 'member',
+        isResolvedAutomatically: false,
         resolvedAt: at(-90),
       }),
     ).toBe('Done · Today 09:00');
@@ -85,7 +85,7 @@ describe('useTaskDueLabel (tasks.md:58, 309)', () => {
       label({
         ...open(at(-30)),
         status: 'done',
-        resolvedBy: 'member',
+        isResolvedAutomatically: false,
         resolvedAt: '2026-10-03T12:00:00.000Z',
       }),
     ).toBe('Done · Yesterday 17:30');
@@ -103,7 +103,12 @@ describe('useTaskDueLabel under today (the Today aside, Tasks’ "Due today")', 
     );
     expect(
       result.current(
-        { ...open(at(-30)), status: 'done', resolvedBy: 'member', resolvedAt: at(-90) },
+        {
+          ...open(at(-30)),
+          status: 'done',
+          isResolvedAutomatically: false,
+          resolvedAt: at(-90),
+        },
         NOW,
       ),
     ).toBe('Done · 09:00');

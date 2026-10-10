@@ -1116,8 +1116,7 @@
     "placeholder": "환자 검색",
     "hint": "환자만 선택할 수 있음",
     "due": "미수 {{amount}}",
-    "nothingDue": "미수 없음",
-    "lead": "리드 {{id}} · 아직 환자 아님"
+    "nothingDue": "미수 없음"
   },
   "splitRows": {
     "mode": "수단",
@@ -1149,8 +1148,17 @@
     "enterAmount": "금액을 입력하세요",
     "moreThanOwed": "남은 {{amount}}보다 많습니다",
     "done": {
-      "give": "{{name}}에게 {{amount}} 돌려줌 · 출금 항목 추가됨",
-      "take": "{{name}}에게서 {{amount}} 돌려받음 · 입금 항목 추가됨"
+      "give": "{{name}}에게 {{amount}} 돌려줌 · {{entry}}",
+      "take": "{{name}}에게서 {{amount}} 돌려받음 · {{entry}}"
+    },
+    "branch": "지점",
+    "date": "날짜",
+    "dayClosed": "이 지점에서 그날은 마감되었습니다 · 열린 날을 고르세요",
+    "moreThanPaid": "청구서에 결제된 금액보다 많습니다",
+    "closed": "{{ref}}은(는) 이미 정산되었습니다",
+    "entry": {
+      "give": "출금 항목 추가됨",
+      "take": "입금 항목 추가됨"
     }
   },
   "quickLine": {
@@ -1218,7 +1226,8 @@
       "quickFill": "빠른 입력",
       "paidNow": "지금 결제",
       "remark": "비고",
-      "remarkPlaceholder": "인쇄된 청구서에 표시됩니다"
+      "remarkPlaceholder": "인쇄된 청구서에 표시됩니다",
+      "paid": "지금까지 결제"
     },
     "customerGroups": {
       "patient": "환자",
@@ -1258,9 +1267,11 @@
       "inStock": "재고 {{count}}",
       "outOfStock": "재고 없음",
       "belowFloor": "{{name}}의 최저가 {{amount}}보다 낮습니다",
-      "tooMuchDiscount": "{{name}} 할인이 너무 큽니다 · 관리자에게 문의하세요",
       "newMedicineName": "새 의약품 이름",
-      "medicineAdded": "{{name}} 추가됨 · 최대 소매가는 나중에 재고에서 설정"
+      "medicineAdded": "{{name}} 추가됨 · 최대 소매가는 나중에 재고에서 설정",
+      "hintInvoice": "2 = 수량 · 10% = 할인",
+      "belowLowest": "{{name}}의 최저가보다 낮음",
+      "offerApplied": "적용된 오퍼: {{offer}}"
     },
     "payment": {
       "full": "전액 · {{mode}}로 {{amount}}",
@@ -1277,7 +1288,12 @@
       "discountGst": "할인 + GST",
       "discountGstValue": "{{discount}} · +{{gst}}",
       "bill": "청구액",
-      "dueAfter": "이후 미수"
+      "dueAfter": "이후 미수",
+      "preview": "저장될 금액 그대로 계산됨",
+      "pending": "금액 계산 중…",
+      "refused": "계산되지 않음 · 표시된 줄을 수정하세요",
+      "failed": "이 청구서의 금액을 계산하지 못했습니다",
+      "retry": "다시 시도"
     },
     "badges": {
       "bill": "청구액 {{amount}}",
@@ -1311,7 +1327,7 @@
       "paidAboveBill": "결제액 {{paid}}이(가) 청구액 {{bill}}보다 많습니다",
       "stock": "{{name}} 재고가 {{count}}개뿐입니다",
       "belowFloor": "{{name}}이(가) 최저가 {{amount}}보다 낮습니다 · 최종 가격을 올리세요",
-      "tooMuchDiscount": "{{name}}의 할인이 허용치를 넘습니다 · 최종 가격을 올리거나 관리자에게 문의하세요"
+      "belowLowest": "{{name}}이(가) 최저가보다 낮습니다 · 최종 가격을 올리세요"
     },
     "toasts": {
       "created": {
@@ -1334,7 +1350,22 @@
       "medical": "의약품 청구서 #{{seq}}",
       "consultation": "상담 청구서 #{{seq}}"
     },
-    "record": "청구서"
+    "record": "청구서",
+    "refusals": {
+      "moreThanDue": "지금 결제액이 청구액보다 많습니다",
+      "dayClosed": "그날은 마감되었습니다 · 결제를 추가할 수 없습니다",
+      "settled": "이 청구서는 정산되었습니다 · 결제 중 하나가 마감된 날에 있습니다",
+      "belowPaid": "청구액은 이미 결제된 금액보다 낮을 수 없습니다",
+      "offeringInUse": "이 패키지의 세션이 이미 사용되었습니다 · 해당 줄을 유지하세요",
+      "treatmentBilled": "이 청구서의 시술이 그 사이 청구되었습니다 · 제거하고 다시 저장하세요",
+      "ofSale": "이 청구서는 의약품 판매 건입니다 · 의약품에서 변경하세요",
+      "paid": "이 청구서에는 결제 또는 대변 메모가 있습니다 · 삭제할 수 없습니다",
+      "inUseDelete": "이 패키지의 세션이 이미 사용되었습니다 · 청구서를 삭제할 수 없습니다"
+    },
+    "notices": {
+      "settled": "정산됨 · 이 청구서의 결제가 마감된 날에 있어 변경할 수 없습니다",
+      "sale": "의약품 판매 청구서 · 의약품에서 변경하세요"
+    }
   },
   "printPreview": {
     "title": "인쇄 미리보기 · {{title}}",

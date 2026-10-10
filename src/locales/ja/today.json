@@ -51,7 +51,8 @@
     "unconfirmed": "未確認",
     "waiting": "待ち {{minutes}}分",
     "inRoom": "入室 {{minutes}}分",
-    "rxApproved": "処方承認 {{time}}"
+    "rxApproved": "処方承認 {{time}}",
+    "toPay": "支払い {{amount}}"
   },
   "toasts": {
     "checkedIn": "{{name}}さんを受付 · 医師の待ち行列と部屋に通知しました",

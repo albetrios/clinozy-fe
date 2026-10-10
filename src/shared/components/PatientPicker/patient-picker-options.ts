@@ -1,10 +1,9 @@
 import type { TFunction } from 'i18next';
 
-import { isolateJoin, isolateText } from '@/lib/bidi-isolate.ts';
+import { isolateJoin } from '@/lib/bidi-isolate.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import type { PatientPickRow } from '@/shared/api/clinic/patient-search-api.ts';
-import type { PatientRow } from '@/shared/api/clinic/patients-fixture-contracts.ts';
-import { patientName } from '@/shared/api/clinic/patients-fixture-contracts.ts';
+import type { PatientRow } from '@/shared/api/clinic/patients-contracts.ts';
 import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
 import { personInitials } from '@/shared/components/Cells/index.ts';
 import type { PickerOption } from '@/shared/components/Picker/index.ts';
@@ -12,39 +11,36 @@ import type { PickerOption } from '@/shared/components/Picker/index.ts';
 import { PATIENT_PICKER_KEYS } from './patient-picker.constants.ts';
 
 /** A patient the field can take, as its options carry it. */
-export type PatientPick = Extract<PatientPickRow, { kind: 'patient' }>;
+export type PatientPick = PatientPickRow;
+
+/** The dues part of an option's line: "₹8,550 due", "Nothing due", or none when not read. */
+function duePart(
+  due: number | null,
+  t: TFunction,
+  formatRupees: (rupees: number) => string,
+) {
+  if (due === null) return '';
+  return due > 0
+    ? t(PATIENT_PICKER_KEYS.due, { amount: formatRupees(due) })
+    : t(PATIENT_PICKER_KEYS.nothingDue);
+}
 
 /**
- * One row of the patient field (`payments.md:101`): a patient with its dues,
- * display id and mobile — "₹8,550 due · #3441 · +91 98791 22840", or "Nothing
- * due · …" — on a 26px avatar with the "P" badge; a lead greyed out, "Lead
- * #2363 · not a patient yet", which the field never takes.
+ * One row of the patient field (`payments.md:101`): a patient with their display id and mobile —
+ * and their dues once read (the picked one) — "₹8,550 due · #3441 · +91 98791 22840" — on a
+ * 26px avatar with the "P" badge.
  */
 export function patientPickOption(
   row: PatientPickRow,
   t: TFunction,
-  formatPaise: (paise: number) => string,
+  formatRupees: (rupees: number) => string,
 ): PickerOption<PatientPickRow> {
-  if (row.kind === 'lead') {
-    return {
-      key: row.id,
-      label: row.name,
-      sub: t(PATIENT_PICKER_KEYS.lead, { id: isolateText(displayId.lead(row.seq)) }),
-      leading: { kind: 'avatar', initials: personInitials(row.name) },
-      disabled: true,
-      data: row,
-    };
-  }
-  const due =
-    row.due > 0
-      ? t(PATIENT_PICKER_KEYS.due, { amount: formatPaise(row.due) })
-      : t(PATIENT_PICKER_KEYS.nothingDue);
   return {
     key: row.id,
     label: row.name,
     // Each part isolated: the phone stays whole on a right-to-left page.
     sub: isolateJoin([
-      due,
+      duePart(row.due, t, formatRupees),
       displayId.patient(row.seq),
       row.phone ? formatClinicPhone(row.phone) : '',
     ]),
@@ -53,14 +49,18 @@ export function patientPickOption(
   };
 }
 
-/** A patient read on its own (the field's current value) as the field's row. */
-export function patientPickOf(patient: PatientRow): PatientPick {
+/** A patient read on its own (the field's current value) as the field's row, with their dues. */
+export function patientPickOf(
+  patient: Pick<PatientRow, 'id' | 'seq' | 'contactId' | 'name' | 'phone'>,
+  due: number | null,
+): PatientPick {
   return {
     kind: 'patient',
     id: patient.id,
+    contactId: patient.contactId,
     seq: patient.seq,
-    name: patientName(patient),
+    name: patient.name,
     phone: patient.phone,
-    due: patient.dueTotal,
+    due,
   };
 }

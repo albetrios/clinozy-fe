@@ -1,30 +1,31 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { taskQueryKeys } from '@/shared/api/clinic/tasks-api.ts';
 import {
   findTaskOutcome,
-  TASK_RULES,
-  type TaskChange,
+  type TaskAssignee,
   type TaskDetail,
+  type TaskOutcomePlan,
+  type TaskRecord,
   type TaskRow,
-  type TaskRuleOutcome,
   type TaskSnoozeOption,
 } from '@/shared/api/clinic/tasks-contracts.ts';
+import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { TASK_RULE_KEYS, TASK_RULES_NS } from '@/shared/clinic/task-rules.constants.ts';
 import { taskFollowOnTarget, type TaskTarget } from '@/shared/clinic/task-targets.ts';
-import { personFullName, shortPersonName } from '@/shared/components/Cells/index.ts';
+import { shortPersonName } from '@/shared/components/Cells/index.ts';
+import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
+import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import {
-  useHandTaskToClinozy,
   useReassignTask,
   useSnoozeTask,
   useTaskOutcome,
-  useUndoTaskChange,
 } from '@/shared/hooks/useTasks/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
-import { taskContextLead } from '../../components/TaskDrawer/use-task-context-tiles.ts';
 import { TASKS_KEYS, TASKS_NS } from '../../tasks.constants.ts';
-import { lowerFirst } from '../../tasks.display.ts';
 import type { TaskAssignees } from '../useTaskAssignees/index.ts';
 
 /** "What’s next" opens this long after a closing outcome (`tasks.md:180–233`, H:4293). */
@@ -32,7 +33,9 @@ export const WHATS_NEXT_DELAY_MS = 380;
 
 /** The task a closing outcome closed, for "What’s next for <first>?". */
 export interface WhatsNextFor {
+  /** The closed task, with its person. */
   task: TaskRow;
+  /** What closed it, in words ("Confirmed on call"). */
   result: string;
 }
 
@@ -47,27 +50,64 @@ export interface TaskActionsOptions {
   openWhatsNext: (next: WhatsNextFor) => void;
 }
 
+/** An outcome as the drawer records it: which one, its note, and the screen's clock. */
+export interface TaskOutcomeChoice {
+  outcomeId: string;
+  note: string;
+  /** The screen's "now" — the times the outcome sets count from it, so a retry sends the same. */
+  now: Date;
+}
+
 /** What the task drawer does with a task. */
 export interface TaskActions {
   /** A write is in flight: the drawer's actions wait (one write at a time). */
   busy: boolean;
-  /** Close, snooze or act on the task with one of its rule's outcomes. */
-  recordOutcome: (detail: TaskDetail, outcomeId: string, note: string) => void;
-  snooze: (row: TaskRow, option: TaskSnoozeOption) => void;
-  reassign: (row: TaskRow, ownerId: string) => void;
-  /** "Let Clinozy do it". */
-  handOver: (row: TaskRow) => void;
+  /** Close, snooze or act on the task with one of its type's outcomes. */
+  recordOutcome: (detail: TaskDetail, choice: TaskOutcomeChoice) => void;
+  /** Snooze it with one of the footer's options, counted from the screen's `now`. */
+  snooze: (row: TaskRow, option: TaskSnoozeOption, now: Date) => void;
+  /** Give it to a member or a role's queue. */
+  reassign: (row: TaskRow, assignee: TaskAssignee) => void;
 }
+
+/** The refusal reason of a lead move the member's codes don't cover (D81 TASKS-M3). */
+const MISSING_PERMISSION = 'missing_permission';
+
+/** The refusal reason of a write on a task that is already done. */
+const ALREADY_DONE = 'transition_not_allowed';
+
+/** An outcome's button words in the `tasks` namespace — its result, call note and snooze label. */
+function outcomeLabelKey(row: TaskRow, outcomeId: string): string | undefined {
+  const copy = TASK_RULE_KEYS.rules[row.type].outcomes as Readonly<
+    Record<string, { label: string; effect: string } | undefined>
+  >;
+  return copy[outcomeId]?.label;
+}
+
+/** Whether a reassign would leave the task where it is. */
+function sameOwner(row: TaskRow, assignee: TaskAssignee): boolean {
+  return 'membershipId' in assignee
+    ? row.ownerId === assignee.membershipId
+    : row.ownerId === null && row.ownerRole === assignee.role;
+}
+
+/** The task after a write: the record's fields over the row the drawer read (its person stays). */
+const rowAfter = (row: TaskRow, record: TaskRecord): TaskRow => ({ ...row, ...record });
 
 /**
  * The task drawer's writes and what follows them (KICKOFF §6.10 Outcome flow;
- * `tasks.md:180–233`): every write toasts with Undo — "<task> · <result>",
- * "Snoozed · <label>", "You now own <name> · <owner> stays involved",
- * "<task> → <name> · <first> stays on it", "Clinozy is on it · <automation>".
- * An outcome, a snooze, a claim and "Let Clinozy do it" close the drawer; a
- * reassign keeps it. A closing outcome's follow-on opens its screen (a
- * booking, the person's record) — or, 380ms later, "What’s next". A failed
- * write toasts its error and leaves the drawer as it was.
+ * `tasks.md:180–233`) on clinozy-be — each toasts once it lands, with no Undo
+ * (the API has no way back, research-tasks Q7): "<task> · <result>",
+ * "Snoozed · <label>" (an outcome the server snoozes too — "No answer"),
+ * "You now own <name>", "<task> → <name>". An outcome runs its plan
+ * (`useTaskOutcome`: the record writes, then the task's resolve or snooze),
+ * its words the button's label and its times counted from the screen's `now`;
+ * an outcome, a snooze and a claim close the drawer, a reassign keeps it. A
+ * closing outcome's follow-on opens its screen (a booking, a check-in or
+ * review, the person's record) — or, 380ms later, "What’s next" for a member
+ * who may create tasks. A refusal toasts in the room's words where it has
+ * them — a task already closed (read again), a lead's task the member may not
+ * move or claim — and leaves the drawer as it was.
  */
 export function useTaskActions({
   assignees,
@@ -77,11 +117,12 @@ export function useTaskActions({
 }: TaskActionsOptions): TaskActions {
   const { t } = useTranslation(TASKS_NS);
   const { t: tRules } = useTranslation(TASK_RULES_NS);
-  const outcomeWrite = useTaskOutcome();
-  const snoozeWrite = useSnoozeTask();
-  const reassignWrite = useReassignTask();
-  const handWrite = useHandTaskToClinozy();
-  const undo = useUndoTaskChange();
+  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const queryClient = useQueryClient();
+  const access = useClinicAccess();
+  const outcomeWrite = useTaskOutcome({ notifyOnError: false });
+  const snoozeWrite = useSnoozeTask({ notifyOnError: false });
+  const reassignWrite = useReassignTask({ notifyOnError: false });
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(
     () => () => {
@@ -90,138 +131,147 @@ export function useTaskActions({
     [],
   );
 
-  const busy =
-    outcomeWrite.isPending ||
-    snoozeWrite.isPending ||
-    reassignWrite.isPending ||
-    handWrite.isPending;
-  const undoable = (message: string, change: TaskChange) =>
-    notify.undo(message, { onUndo: () => undo.mutate(change.undoToken) });
-  const shortName = (id: string | null) => {
-    const staff = id ? assignees.byId.get(id) : undefined;
-    return staff ? shortPersonName(personFullName(staff)) : null;
+  const busy = outcomeWrite.isPending || snoozeWrite.isPending || reassignWrite.isPending;
+
+  /** A refusal in the room's words: a lead the member may not move, a task already closed. */
+  const refused = (error: unknown, needsLeads: string | null) => {
+    const reason = apiErrorReason(error);
+    if (reason === ALREADY_DONE) {
+      // Someone — or the rules — closed it first: read it again (the drawer closes itself).
+      void queryClient.invalidateQueries({ queryKey: taskQueryKeys.all });
+      notify.info(t(TASKS_KEYS.toasts.alreadyClosed));
+      return;
+    }
+    notify.error(
+      reason === MISSING_PERMISSION && needsLeads ? needsLeads : mapApiError(error),
+    );
   };
-  /** Run a write; a failure has already toasted (the hooks' error toast), so it ends there. */
-  const attempt = async (write: () => Promise<TaskChange>) => {
+
+  /** Run a write; a refusal toasts (`needsLeads`: the words for a lead it may not touch). */
+  const attempt = async <T>(
+    write: () => Promise<T>,
+    needsLeads: string | null = null,
+  ): Promise<T | null> => {
     try {
       return await write();
-    } catch {
+    } catch (error) {
+      refused(error, needsLeads);
       return null;
     }
   };
 
-  /** An outcome's toast: its snooze, the claim, or "<task> · <result>". */
+  /** Who a task goes to, in words: the member's short name, else the role's queue. */
+  const assigneeName = (assignee: TaskAssignee) => {
+    if ('role' in assignee) return tClinic(CLINIC_KEYS.roles[assignee.role]);
+    const member = assignees.byId.get(assignee.membershipId);
+    return member ? shortPersonName(member.name) : '';
+  };
+
+  /** An outcome's toast: a snooze (the server's or the plan's), the claim, or "<task> · <result>". */
   const outcomeToast = (
     detail: TaskDetail,
-    outcome: TaskRuleOutcome,
-    change: TaskChange,
-    previousOwner: string | null,
+    plan: TaskOutcomePlan,
+    record: TaskRecord,
+    words: string,
   ): string => {
-    if (outcome.disposition.type === 'snooze') {
-      return t(TASKS_KEYS.toasts.snoozed, { label: change.task.snoozeLabel ?? '' });
+    if (record.status === 'snoozed') {
+      return t(TASKS_KEYS.toasts.snoozed, { label: record.snoozeLabel ?? words });
     }
-    if (outcome.effects.some((effect) => effect.type === 'claimLead')) {
-      const name = taskContextLead(detail)?.name ?? detail.task.person.name;
-      return previousOwner
-        ? t(TASKS_KEYS.toasts.claimed, { name, owner: previousOwner })
-        : t(TASKS_KEYS.toasts.claimedUnowned, { name });
+    if (detail.task.type === 'claim' && plan.write.type === 'resolve') {
+      const lead = detail.source?.kind === 'lead' ? detail.source.lead.name : '';
+      return t(TASKS_KEYS.toasts.claimed, {
+        name: lead || (detail.task.person?.name ?? detail.task.title),
+      });
     }
     return t(TASKS_KEYS.toasts.closed, {
       title: detail.task.title,
-      result: change.task.result ?? '',
+      result: record.resultText ?? words,
     });
   };
 
   /** After the write: the follow-on screen, else back to the list — and "What’s next" 380ms on. */
-  const followOnAfter = (outcome: TaskRuleOutcome, row: TaskRow, change: TaskChange) => {
-    const { followOn, disposition } = outcome;
-    const target = followOn.opens ? taskFollowOnTarget(followOn.opens, row) : null;
+  const followOnAfter = (plan: TaskOutcomePlan, row: TaskRow, record: TaskRecord) => {
+    const target = plan.opens ? taskFollowOnTarget(plan.opens, row) : null;
     if (target) {
       openTarget(target);
       return;
     }
     close();
-    if (!(followOn.whatsNext && disposition.type === 'close')) return;
+    const closed = record.status === 'done';
+    if (!(plan.whatsNext && closed && access.canCode('task:create'))) return;
+    const task = rowAfter(row, record);
     timer.current = setTimeout(
-      () => openWhatsNext({ task: change.task, result: change.task.result ?? '' }),
+      () => openWhatsNext({ task, result: record.resultText ?? '' }),
       WHATS_NEXT_DELAY_MS,
     );
   };
 
-  const recordOutcome = async (detail: TaskDetail, outcomeId: string, note: string) => {
+  const recordOutcome = async (detail: TaskDetail, choice: TaskOutcomeChoice) => {
     const row = detail.task;
-    const outcome = findTaskOutcome(row.rule, outcomeId);
-    if (!outcome || busy) return;
+    const plan = findTaskOutcome(row.type, choice.outcomeId);
+    if (!plan || busy) return;
     // "Fix the number" writes nothing: it only opens the person's record.
-    if (outcome.disposition.type === 'none' && outcome.effects.length === 0) {
-      const target = outcome.followOn.opens
-        ? taskFollowOnTarget(outcome.followOn.opens, row)
-        : null;
+    if (plan.write.type === 'none' && plan.steps.length === 0) {
+      const target = plan.opens ? taskFollowOnTarget(plan.opens, row) : null;
       if (target) openTarget(target);
       else close();
       return;
     }
-    // The owner a claim leaves involved, named before the write moves the lead.
-    const previousOwner = shortName(taskContextLead(detail)?.ownerId ?? null);
-    const change = await attempt(() =>
-      outcomeWrite.mutateAsync({
-        taskId: row.id,
-        outcome: outcomeId,
-        note: note.trim() || undefined,
-      }),
+    const labelKey = outcomeLabelKey(row, plan.id);
+    const words = labelKey ? tRules(labelKey) : plan.id;
+    const claims = row.type === 'claim' && plan.write.type === 'resolve';
+    const record = await attempt(
+      () =>
+        outcomeWrite.mutateAsync({
+          task: row,
+          outcomeId: plan.id,
+          words,
+          note: choice.note.trim() || null,
+          now: choice.now.toISOString(),
+          // "Retry send" queues the message the drawer quoted.
+          failedActivityId:
+            row.type === 'failed_message' ? (detail.quote?.activityId ?? null) : null,
+        }),
+      claims ? t(TASKS_KEYS.toasts.claimNeedsLeads) : null,
     );
-    if (!change) return;
-    undoable(outcomeToast(detail, outcome, change, previousOwner), change);
-    followOnAfter(outcome, row, change);
+    if (!record) return;
+    notify.success(outcomeToast(detail, plan, record, words));
+    followOnAfter(plan, row, record);
   };
 
-  const snooze = async (row: TaskRow, option: TaskSnoozeOption) => {
+  const snooze = async (row: TaskRow, option: TaskSnoozeOption, now: Date) => {
     if (busy) return;
-    const change = await attempt(() =>
-      snoozeWrite.mutateAsync({ taskId: row.id, option }),
+    const label = tRules(TASK_RULE_KEYS.snoozeOptions[option]);
+    const record = await attempt(() =>
+      snoozeWrite.mutateAsync({ taskId: row.id, option, now: now.toISOString(), label }),
     );
-    if (!change) return;
-    undoable(
-      t(TASKS_KEYS.toasts.snoozed, { label: change.task.snoozeLabel ?? '' }),
-      change,
-    );
+    if (!record) return;
+    notify.success(t(TASKS_KEYS.toasts.snoozed, { label: record.snoozeLabel ?? label }));
     close();
   };
 
-  const reassign = async (row: TaskRow, ownerId: string) => {
-    if (busy || ownerId === row.ownerId) return;
-    const change = await attempt(() =>
-      reassignWrite.mutateAsync({ taskId: row.id, ownerId }),
+  const reassign = async (row: TaskRow, assignee: TaskAssignee) => {
+    if (busy || sameOwner(row, assignee)) return;
+    const record = await attempt(
+      () => reassignWrite.mutateAsync({ taskId: row.id, assignee }),
+      t(TASKS_KEYS.toasts.reassignNeedsLeads),
     );
-    if (!change) return;
-    const name = shortName(ownerId) ?? '';
-    const previous = row.owner?.firstName;
-    undoable(
-      previous
-        ? t(TASKS_KEYS.toasts.moved, { title: row.title, name, previous })
-        : t(TASKS_KEYS.toasts.movedUnowned, { title: row.title, name }),
-      change,
+    if (!record) return;
+    notify.success(
+      t(TASKS_KEYS.toasts.moved, { title: row.title, name: assigneeName(assignee) }),
     );
-  };
-
-  const handOver = async (row: TaskRow) => {
-    const key = TASK_RULE_KEYS.rules[row.rule].automation;
-    if (busy || !key || !TASK_RULES[row.rule].automation) return;
-    const change = await attempt(() => handWrite.mutateAsync(row.id));
-    if (!change) return;
-    undoable(
-      t(TASKS_KEYS.toasts.automation, { automation: lowerFirst(tRules(key)) }),
-      change,
-    );
-    close();
   };
 
   return {
     busy,
-    recordOutcome: (detail, outcomeId, note) =>
-      void recordOutcome(detail, outcomeId, note),
-    snooze: (row, option) => void snooze(row, option),
-    reassign: (row, ownerId) => void reassign(row, ownerId),
-    handOver: (row) => void handOver(row),
+    recordOutcome: (detail, choice) => {
+      void recordOutcome(detail, choice);
+    },
+    snooze: (row, option, now) => {
+      void snooze(row, option, now);
+    },
+    reassign: (row, assignee) => {
+      void reassign(row, assignee);
+    },
   };
 }

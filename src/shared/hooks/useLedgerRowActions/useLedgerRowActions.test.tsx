@@ -3,50 +3,62 @@ import { renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import { fetchPayment } from '@/shared/api/clinic/payments-api.ts';
+import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { ledgerRow } from '@/tests/utils/payments-doubles.ts';
 
 import { useLedgerRowActions } from './useLedgerRowActions.ts';
 
-/** 10:00 on 3 Oct, clinic time — the seed day (27 Sep) is today. */
-const NOW = new Date('2026-10-03T04:30:00Z');
+/** Every code an Owner holds in the ledger. */
+const ALL: readonly OrganizationPermission[] = [
+  'organization:read',
+  'payment:read',
+  'payment:create',
+  'payment:update',
+  'payment:delete',
+];
 
 let client: QueryClient;
 function wrapper({ children }: { children: ReactNode }) {
   return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
 }
 
-function renderActions(role: Role) {
-  useUIStore.setState({ previewRole: role });
+/** The hook for a member holding `codes`, with Reverse offered unless `reverse` is false. */
+function renderActions(codes: readonly OrganizationPermission[], reverse = true) {
+  signInTestMember();
+  useOrganizationStore.getState().setPermissions([...codes]);
   const onEdit = vi.fn();
   const onDelete = vi.fn();
-  const hook = renderHook(() => useLedgerRowActions({ onEdit, onDelete }), { wrapper });
-  return { ...hook, onEdit, onDelete };
+  const onReverse = vi.fn();
+  const hook = renderHook(
+    () =>
+      useLedgerRowActions({
+        onEdit,
+        onDelete,
+        onReverse: reverse ? onReverse : undefined,
+      }),
+    { wrapper },
+  );
+  return { ...hook, onEdit, onDelete, onReverse };
 }
 
+const ids = (actions: readonly { id: string }[]) => actions.map((action) => action.id);
+
 beforeEach(() => {
-  vi.useFakeTimers({ toFake: ['Date'], shouldAdvanceTime: true });
-  vi.setSystemTime(NOW);
-  resetClinicFixtures();
-  useOrganizationStore.getState().setPermissions(['organization:read']);
   client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
 });
 afterEach(() => {
-  vi.useRealTimers();
   client.clear();
   useUIStore.setState({ previewRole: null });
-  useOrganizationStore.getState().clearPermissions();
-  resetClinicFixtures();
+  useOrganizationStore.getState().clearOrganization();
 });
 
 describe('useLedgerRowActions (payments.md:34)', () => {
   it('offers Edit and Delete on an open day’s entry; Delete names what the invoice goes back to', async () => {
-    const entry = await fetchPayment(ref.payment(5512));
-    const { result, onEdit, onDelete } = renderActions('admin');
+    const entry = ledgerRow();
+    const { result, onEdit, onDelete } = renderActions(ALL);
     await waitFor(() => expect(result.current(entry)).toHaveLength(2));
     const [edit, remove] = result.current(entry);
     expect(edit).toMatchObject({ id: 'edit', label: 'Edit' });
@@ -54,18 +66,52 @@ describe('useLedgerRowActions (payments.md:34)', () => {
     edit?.onSelect();
     expect(onEdit).toHaveBeenCalledWith(entry);
     remove?.onSelect();
-    expect(onDelete).toHaveBeenCalledWith({
-      entry,
-      dueAfter: (entry.invoice?.due ?? 0) + entry.amount,
-    });
+    // Invoice #5's ₹100 due, with this receipt's ₹150 back on it.
+    expect(onDelete).toHaveBeenCalledWith({ entry, dueAfter: 250 });
   });
 
-  it('keeps Delete to the room’s Delete, and offers nothing on a closed day', async () => {
-    const open = await fetchPayment(ref.payment(310));
-    const locked = await fetchPayment(ref.payment(305));
-    const { result } = renderActions('front_desk');
-    await waitFor(() => expect(result.current(open)).toHaveLength(1));
-    expect(result.current(open)[0]).toMatchObject({ id: 'edit' });
-    expect(result.current(locked)).toEqual([]);
+  it('gates each action on its own code: Edit on payment:update, Delete on payment:delete', async () => {
+    const entry = ledgerRow();
+    const { result } = renderActions(['payment:read', 'payment:update']);
+    await waitFor(() => expect(ids(result.current(entry))).toEqual(['edit']));
+    const deleter = renderActions(['payment:read', 'payment:delete']);
+    await waitFor(() => expect(ids(deleter.result.current(entry))).toEqual(['delete']));
+  });
+
+  it('offers a refund or a reversal on its day only Delete — its money is fixed', async () => {
+    const { result } = renderActions(ALL);
+    await waitFor(() =>
+      expect(ids(result.current(ledgerRow({ kind: 'reversal' })))).toEqual(['delete']),
+    );
+    expect(ids(result.current(ledgerRow({ kind: 'refund', direction: 'paid' })))).toEqual(
+      ['delete'],
+    );
+  });
+
+  it('offers Reverse on a closed day’s entry — once, never on a reversal, with payment:delete', async () => {
+    const settled = ledgerRow({ isSettled: true });
+    const { result, onReverse } = renderActions(ALL);
+    await waitFor(() => expect(ids(result.current(settled))).toEqual(['reverse']));
+    const [reverse] = result.current(settled);
+    expect(reverse).toMatchObject({ destructive: true });
+    reverse?.onSelect();
+    expect(onReverse).toHaveBeenCalledWith(settled);
+    expect(
+      result.current({ ...settled, reversedByPaymentId: 'pay_4xxwn45a73pygol64wr2b' }),
+    ).toEqual([]);
+    expect(result.current({ ...settled, kind: 'reversal' })).toEqual([]);
+    // A pending credit's entry on an open day offers nothing: it is the credit's.
+    expect(result.current(ledgerRow({ pendingCreditSeq: 1 }))).toEqual([]);
+    const reader = renderActions(['payment:read', 'payment:update']);
+    await waitFor(() =>
+      expect(ids(reader.result.current(ledgerRow()))).toEqual(['edit']),
+    );
+    expect(reader.result.current(settled)).toEqual([]);
+  });
+
+  it('offers no Reverse where none is asked for (Day close’s review)', async () => {
+    const { result } = renderActions(ALL, false);
+    await waitFor(() => expect(result.current(ledgerRow())).toHaveLength(2));
+    expect(result.current(ledgerRow({ isSettled: true }))).toEqual([]);
   });
 });

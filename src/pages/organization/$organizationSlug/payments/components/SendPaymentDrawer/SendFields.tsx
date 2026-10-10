@@ -27,6 +27,7 @@ import { DatePicker } from '@/shared/components/Picker/DatePicker/index.ts';
 import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
 import { RECORD_DRAWER_KEYS } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 
 import { PAYMENTS_KEYS, PAYMENTS_NS } from '../../payments.constants.ts';
 import {
@@ -58,7 +59,7 @@ export interface SendFieldsProps {
 /** The bill picker's rows (`payments.md:116`): "Other spend", then the bills oldest first. */
 function useBillOptions(bills: readonly OpenSupplierBill[]): PickerOption[] {
   const { t } = useTranslation(PAYMENTS_NS);
-  const formatPaise = usePaiseFormat();
+  const formatRupees = useRupeeFormat();
   const age = useBillAge();
   const label = useBillLabel();
   return [
@@ -75,23 +76,47 @@ function useBillOptions(bills: readonly OpenSupplierBill[]): PickerOption[] {
       sub: [bill.billNo ? t(K.billNo, { bill: bill.billNo }) : '', age(bill.daysPending)]
         .filter(Boolean)
         .join(' · '),
-      meta: formatPaise(bill.due),
+      meta: formatRupees(bill.due),
       group: t(bill.kind === 'medical_po' ? K.groups.medical : K.groups.stock),
       tone: bill.kind === 'medical_po' ? ('blush' as const) : ('mint' as const),
     })),
   ];
 }
 
+/** The open bills' read failed: the step says so, with Retry in place. */
+function BillsFailed({ onRetry, testId }: { onRetry: () => void; testId: string }) {
+  const { t } = useTranslation(PAYMENTS_NS);
+  const { t: tClinic } = useTranslation(CLINIC_NS);
+  return (
+    <DrawerFieldGrid>
+      <DrawerField label={t(K.bill)}>
+        <span className="flex flex-wrap items-center gap-2" data-testid={testId}>
+          <span className="text-caption text-destructive">{t(K.billsFailed)}</span>
+          <button
+            type="button"
+            onClick={onRetry}
+            data-testid={`${testId}-retry`}
+            className="text-caption text-foreground font-medium underline underline-offset-2"
+          >
+            {tClinic(CLINIC_KEYS.lists.retry)}
+          </button>
+        </span>
+      </DrawerField>
+    </DrawerFieldGrid>
+  );
+}
+
 /**
  * Step 1, "Pay against a bill" (new, while bills are open; H:5129–5130): the
  * Supplier bill picker — "Other spend", then each open bill — and, while
  * nothing is picked, "Pending longest": the three oldest as chips in their
- * age's tone.
+ * age's tone. A failed read says so, with Retry.
  */
 export function SendBillFields({
   bills,
   picked,
   onPick,
+  onRetry,
   readOnly,
   testId,
   idPrefix,
@@ -99,15 +124,18 @@ export function SendBillFields({
   bills: readonly OpenSupplierBill[];
   picked: string | null;
   onPick: (bill: OpenSupplierBill | null) => void;
+  /** The open bills' read failed: read them again. */
+  onRetry?: () => void;
   readOnly: boolean;
   testId: string;
   idPrefix: string;
 }) {
   const { t } = useTranslation(PAYMENTS_NS);
-  const formatPaise = usePaiseFormat();
+  const formatRupees = useRupeeFormat();
   const age = useBillAge();
   const options = useBillOptions(bills);
   const id = `${idPrefix}-bill`;
+  if (onRetry) return <BillsFailed onRetry={onRetry} testId={`${testId}-bill`} />;
   return (
     <DrawerFieldGrid>
       <DrawerField
@@ -141,7 +169,7 @@ export function SendBillFields({
               label: t(K.oldestChip, {
                 seq: bill.seq,
                 supplier: bill.supplierName.split(' ')[0] ?? bill.supplierName,
-                due: formatPaise(bill.due),
+                due: formatRupees(bill.due),
                 age: age(bill.daysPending),
               }),
               tone: ageTone(bill.daysPending),
@@ -159,10 +187,44 @@ export function SendBillFields({
   );
 }
 
+/** Clinic spend's Category chips (Consumables first picked) — a supplier bill has none. */
+function CategoryField({
+  form,
+  testId,
+  readOnly,
+}: Pick<SendFieldsProps, 'form' | 'testId' | 'readOnly'>) {
+  const { t } = useTranslation(PAYMENTS_NS);
+  const { t: tClinic } = useTranslation(CLINIC_NS);
+  return (
+    <DrawerField label={t(K.category)}>
+      <Controller
+        control={form.control}
+        name="category"
+        render={({ field: control }) => (
+          <DrawerChips
+            label={t(K.category)}
+            options={EXPENSE_CATEGORY_VALUES.map((category) => ({
+              value: category,
+              label: tClinic(CLINIC_KEYS.expenseCategories[category]),
+              tone: EXPENSE_CATEGORY_TONES[category],
+            }))}
+            value={control.value}
+            onChange={(next) => {
+              if (next) control.onChange(next);
+            }}
+            disabled={readOnly}
+            testId={`${testId}-category`}
+          />
+        )}
+      />
+    </DrawerField>
+  );
+}
+
 /**
- * Step 2, "Expense" (H:5131): Category chips (Consumables first picked) ·
- * Paid to — required, with "Medline Surgicals" · "Meta ads" · "Electricity" —
- * and Note ("What was bought").
+ * Step 2, "Expense" (H:5131): Category chips (Consumables first picked) — or, paying a supplier
+ * bill, the bill itself ("Stock PO #15 · Cranix Pharma"), which takes no category · Paid to —
+ * required, with "Medline Surgicals" · "Meta ads" · "Electricity" — and Note ("What was bought").
  */
 export function SendExpenseFields({
   form,
@@ -172,35 +234,22 @@ export function SendExpenseFields({
   readOnly,
 }: SendFieldsProps) {
   const { t } = useTranslation(PAYMENTS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const billLabel = useBillLabel();
   const field = useDrawerFieldIds(form, idPrefix);
   const payee = field('payeeName');
   const note = field('note');
   const quick = [...PAID_TO_QUICK, t(K.electricity)];
   return (
     <DrawerFieldGrid>
-      <DrawerField label={t(K.category)}>
-        <Controller
-          control={form.control}
-          name="category"
-          render={({ field: control }) => (
-            <DrawerChips
-              label={t(K.category)}
-              options={EXPENSE_CATEGORY_VALUES.map((category) => ({
-                value: category,
-                label: tClinic(CLINIC_KEYS.expenseCategories[category]),
-                tone: EXPENSE_CATEGORY_TONES[category],
-              }))}
-              value={control.value}
-              onChange={(next) => {
-                if (next) control.onChange(next);
-              }}
-              disabled={readOnly}
-              testId={`${testId}-category`}
-            />
-          )}
-        />
-      </DrawerField>
+      {values.bill ? (
+        <DrawerField label={t(K.bill)}>
+          <span className="text-body font-medium" data-testid={`${testId}-bill-label`}>
+            {billLabel(values.bill)}
+          </span>
+        </DrawerField>
+      ) : (
+        <CategoryField form={form} testId={testId} readOnly={readOnly} />
+      )}
       <DrawerField
         span="half"
         label={t(K.paidTo)}

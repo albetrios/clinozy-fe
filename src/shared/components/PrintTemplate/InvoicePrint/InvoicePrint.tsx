@@ -1,22 +1,12 @@
+import { paiseOfRupees } from '@/lib/number-text.ts';
 import { cn } from '@/lib/utils.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import {
-  type InvoiceBalance,
-  invoiceBalance,
-  invoiceLineAmounts,
-  type InvoiceTotals,
-  invoiceTotals,
-} from '@/shared/api/clinic/clinic-money.ts';
 import type {
-  Branch,
-  Invoice,
-  InvoiceItem,
-  MedicalContact,
-  MedicalSale,
-  Organization,
-  Patient,
-  Payment,
-} from '@/shared/api/clinic/clinic-schema.ts';
+  InvoiceLine,
+  InvoiceParty,
+  InvoiceRecord,
+  InvoiceSheet,
+} from '@/shared/api/clinic/invoices-contracts.ts';
 import {
   usePrintFormat,
   usePrintTranslation,
@@ -83,7 +73,7 @@ function isPackWord(word: string): boolean {
  * The pack size a line prints: its own, else the one in its name — "60g", or a
  * number and its unit across two words, "50 ml" (H:4416).
  */
-function packSize(item: Pick<InvoiceItem, 'packSize' | 'name'>): string {
+function packSize(item: Pick<InvoiceLine, 'packSize' | 'name'>): string {
   if (item.packSize) return item.packSize;
   const words = item.name.split(' ');
   for (const [index, word] of words.entries()) {
@@ -94,45 +84,39 @@ function packSize(item: Pick<InvoiceItem, 'packSize' | 'name'>): string {
   return '';
 }
 
-const fullName = (person: Pick<Patient, 'firstName' | 'lastName'>) =>
-  [person.firstName, person.lastName].filter(Boolean).join(' ');
-
 type PrintFormat = ReturnType<typeof usePrintFormat>;
 
 /** What the invoice and sale sheets print from. */
 export interface InvoicePrintProps {
-  /** The invoice. A Medical invoice prints in the sheet's Medical form (H:4416). */
-  invoice: Invoice;
+  /** The invoice as clinozy-be keeps it. A Medical invoice prints in the sheet's Medical form (H:4416). */
+  invoice: InvoiceRecord;
   /**
-   * The Medical sale the invoice belongs to — the sale print. Its number
-   * ("S-983") is the one printed; without it the invoice's ("INV-787") is.
+   * The Medical sale the invoice belongs to — the sale print. Its number ("S-983") is the one
+   * printed; without it the invoice's statutory number ("2026-27/0005") is.
    */
-  sale?: Pick<MedicalSale, 'seq'> | null;
-  /** Ledger entries: those against this invoice give what has been paid. */
-  payments: readonly Payment[];
-  /** The patient billed … */
-  patient?: Pick<Patient, 'firstName' | 'lastName' | 'phone'> | null;
-  /** … or the Medical walk-in customer. */
-  contact?: Pick<MedicalContact, 'name' | 'phone'> | null;
+  sale?: { seq: number } | null;
+  /** Who it bills — the patient, or a Medical walk-in. */
+  party: Pick<InvoiceParty, 'name' | 'phone'> | null;
   /** The clinic: its name and specialties for the footer, its currency. */
-  organization: Pick<Organization, 'name' | 'specialties' | 'currency'>;
-  /** The invoice's branch: its phone and GSTIN for the footer. */
-  branch: Pick<Branch, 'phone' | 'gstNumber'>;
+  organization: InvoiceSheet['organization'];
+  /** The invoice's branch: its phone and GSTIN for the footer; null when not readable. */
+  branch: InvoiceSheet['branch'];
 }
 
+/** A footer for a branch the member's list no longer has: no phone, no GSTIN. */
+const NO_BRANCH = { phone: '', gstNumber: null } as const;
+
 /**
- * The A4 invoice — and, for a Medical invoice, the sale sheet (KICKOFF §6.7,
- * §6.9; H:435–454): who is billed and the invoice details, the items with each
- * line's amount, discount, GST and net and their totals, the remark, the
- * payment summary from the ledger, and the clinic's footer. Presentational —
- * the caller passes every record; nothing is fetched here.
+ * The A4 invoice — and, for a Medical invoice, the sale sheet (KICKOFF §6.7, §6.9; H:435–454):
+ * who is billed and the invoice details, the items with each line's amount, discount, GST and
+ * net and their totals, the remark, the payment summary, and the clinic's footer. Every figure
+ * is the server's (the line amounts, the totals, what is paid and due); presentational — the
+ * caller passes the invoice as read; nothing is fetched or worked out here.
  */
 export function InvoicePrint({
   invoice,
   sale = null,
-  payments,
-  patient = null,
-  contact = null,
+  party,
   organization,
   branch,
 }: InvoicePrintProps) {
@@ -140,10 +124,6 @@ export function InvoicePrint({
   const format = usePrintFormat(organization.currency);
   const medical = invoice.type === 'medical';
   const form = FORM_KEYS[medical ? 'medical' : 'clinic'];
-  const totals = invoiceTotals(invoice);
-  const balance = invoiceBalance(invoice, payments);
-  const name = patient ? fullName(patient) : contact?.name;
-  const phone = (patient ?? contact)?.phone;
   const boxClassName = 'min-h-[26.5mm] px-[2.28mm] pt-[2.3mm]';
 
   return (
@@ -158,7 +138,7 @@ export function InvoicePrint({
             <PrintField
               className="gap-[3mm]"
               label={t(PRINT_TEMPLATE_KEYS.name)}
-              value={name || '—'} // NOSONAR(S6606): a blank name prints the dash
+              value={party?.name || '—'} // NOSONAR(S6606): a blank name prints the dash
               strong
               valueClassName="uppercase"
             />
@@ -166,7 +146,7 @@ export function InvoicePrint({
               className="gap-[3mm]"
               label={t(keys.phone)}
               // "91" and the ten digits, as the sheet prints a phone (H:4415).
-              value={phone ? phone.replace(/^\+/, '') : '—'}
+              value={party?.phone ? party.phone.replace(/^\+/, '') : '—'}
             />
           </dl>
         </PrintBox>
@@ -185,13 +165,13 @@ export function InvoicePrint({
             <PrintField
               className="gap-[3mm]"
               label={t(form.number)}
-              value={sale ? displayId.sale(sale.seq) : displayId.invoice(invoice.seq)}
+              value={sale ? displayId.sale(sale.seq) : invoice.number}
               strong
             />
             <PrintField
               className="gap-[3mm]"
               label={t(keys.status)}
-              value={t(keys.statuses[balance.status])}
+              value={t(keys.statuses[invoice.status])}
               valueClassName="uppercase"
             />
           </dl>
@@ -201,12 +181,7 @@ export function InvoicePrint({
       <div className="mt-[2.44mm] h-[3.9mm] leading-[3.9mm] font-bold">
         {t(form.items)}
       </div>
-      <InvoiceItemsTable
-        items={invoice.items}
-        itemNameKey={form.itemName}
-        totals={totals}
-        format={format}
-      />
+      <InvoiceItemsTable invoice={invoice} itemNameKey={form.itemName} format={format} />
 
       <div className="mt-[4.55mm] grid grid-cols-[80.5mm_80.2mm] gap-x-[8.8mm]">
         <PrintBox
@@ -221,39 +196,30 @@ export function InvoicePrint({
             }
           </p>
         </PrintBox>
-        <InvoicePaymentSummary totals={totals} balance={balance} format={format} />
+        <InvoicePaymentSummary invoice={invoice} format={format} />
       </div>
 
       <PrintFooter
         kind="invoice"
         organization={organization}
-        branch={branch}
+        branch={branch ?? NO_BRANCH}
         medical={medical}
       />
     </PrintSheet>
   );
 }
 
-/** The items table with its totals row (H:441–445). */
+/** The items table with its totals row (H:441–445), each figure the server's. */
 function InvoiceItemsTable({
-  items,
+  invoice,
   itemNameKey,
-  totals,
   format,
 }: {
-  items: readonly InvoiceItem[];
+  invoice: InvoiceRecord;
   itemNameKey: string;
-  totals: InvoiceTotals;
   format: PrintFormat;
 }) {
   const { t } = usePrintTranslation();
-  // A line is known by its position — the contract's own line identity
-  // (`invoiceLineIndex`); a printed list never reorders.
-  const lines = items.map((item, lineIndex) => ({
-    item,
-    lineIndex,
-    amounts: invoiceLineAmounts(item),
-  }));
   return (
     <div className="border-border-strong mt-[1.95mm] overflow-hidden rounded-md border">
       <table
@@ -292,9 +258,9 @@ function InvoiceItemsTable({
           </tr>
         </thead>
         <tbody>
-          {lines.map(({ item, lineIndex, amounts }) => (
+          {invoice.items.map((line, lineIndex) => (
             <tr
-              key={lineIndex}
+              key={line.id}
               // A rule above every line but the first; its 1px comes out of the
               // padding so the row keeps the design's 7.65mm (H:443).
               className={cn(
@@ -302,14 +268,17 @@ function InvoiceItemsTable({
                 lineIndex > 0 && '*:border-border *:border-t *:pt-[calc(1.7mm-1px)]',
               )}
             >
-              <td className="ps-[4.4mm] pe-[1mm] uppercase">{item.name}</td>
-              <td className="text-center uppercase">{packSize(item)}</td>
-              <td className="text-center">{format.count(item.qty)}</td>
-              <td className="text-center">{format.money(amounts.base)}</td>
-              <td className="text-center">{format.percent(item.discountPct)}</td>
-              <td className="pe-[2mm] text-end">{format.percent(item.gstPct)}</td>
+              <td className="ps-[4.4mm] pe-[1mm] uppercase">{line.name}</td>
+              <td className="text-center uppercase">{packSize(line)}</td>
+              <td className="text-center">{format.count(line.qty)}</td>
+              {/* The line's gross — its quantity at the rate the server billed. */}
+              <td className="text-center">
+                {format.money(paiseOfRupees(line.rate) * line.qty)}
+              </td>
+              <td className="text-center">{format.percent(line.discountPct)}</td>
+              <td className="pe-[2mm] text-end">{format.percent(line.gstPct)}</td>
               <td className="pe-[4.4mm] text-end font-bold">
-                {format.money(amounts.net)}
+                {format.money(paiseOfRupees(line.amount))}
               </td>
             </tr>
           ))}
@@ -319,11 +288,19 @@ function InvoiceItemsTable({
         <tfoot className="table-row-group">
           <tr className="*:border-border-strong h-[8.8mm] font-bold *:border-t">
             <td colSpan={3} />
-            <td className="text-center">{format.money(totals.subtotal)}</td>
+            <td className="text-center">
+              {format.money(paiseOfRupees(invoice.subtotal))}
+            </td>
             {/* The discount total carries no ₹ (payments.md:88). */}
-            <td className="text-center">{format.amount(totals.lineDiscount)}</td>
-            <td className="pe-[2mm] text-end">{format.money(totals.gst)}</td>
-            <td className="pe-[4.4mm] text-end">{format.money(totals.lineNet)}</td>
+            <td className="text-center">
+              {format.amount(paiseOfRupees(invoice.discountTotal))}
+            </td>
+            <td className="pe-[2mm] text-end">
+              {format.money(paiseOfRupees(invoice.gstTotal))}
+            </td>
+            <td className="pe-[4.4mm] text-end">
+              {format.money(paiseOfRupees(invoice.total))}
+            </td>
           </tr>
         </tfoot>
       </table>
@@ -331,14 +308,15 @@ function InvoiceItemsTable({
   );
 }
 
-/** Total, overall discount, bill and what is still due (H:448–451). */
+/**
+ * The taxable amount, GST, the bill and what is still due (H:448–451) — as the server keeps
+ * them: the taxable amount and its GST make the bill exactly, every discount already taken.
+ */
 function InvoicePaymentSummary({
-  totals,
-  balance,
+  invoice,
   format,
 }: {
-  totals: InvoiceTotals;
-  balance: InvoiceBalance;
+  invoice: InvoiceRecord;
   format: PrintFormat;
 }) {
   const { t } = usePrintTranslation();
@@ -351,22 +329,22 @@ function InvoicePaymentSummary({
       <div data-testid={PRINT_TEMPLATE_TEST_IDS.invoiceSummary}>
         <dl className="border-border-strong mt-[1.3mm] flex flex-col border-b-[0.3mm] pb-[1.3mm] leading-[4.23mm]">
           <div className="flex justify-between font-bold">
-            <dt>{t(keys.totalAmount)}</dt>
-            <dd>{format.money(totals.lineNet)}</dd>
+            <dt>{t(keys.taxableAmount)}</dt>
+            <dd>{format.money(paiseOfRupees(invoice.taxableTotal))}</dd>
           </div>
           <div className="flex justify-between">
-            <dt>{t(keys.overallDiscount)}</dt>
-            <dd className="font-bold">{format.money(-totals.overallDiscount)}</dd>
+            <dt>{t(keys.gstTotal)}</dt>
+            <dd className="font-bold">{format.money(paiseOfRupees(invoice.gstTotal))}</dd>
           </div>
         </dl>
         <dl className="flex flex-col leading-[4.7mm] font-bold">
           <div className="mt-[2.6mm] flex justify-between text-[3.6mm]">
             <dt>{t(keys.billAmount)}</dt>
-            <dd>{format.money(balance.bill)}</dd>
+            <dd>{format.money(paiseOfRupees(invoice.total))}</dd>
           </div>
           <div className="flex justify-between">
             <dt>{t(keys.balanceDue)}</dt>
-            <dd>{format.money(balance.due)}</dd>
+            <dd>{format.money(paiseOfRupees(invoice.due))}</dd>
           </div>
         </dl>
       </div>

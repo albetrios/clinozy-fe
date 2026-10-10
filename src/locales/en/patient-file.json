@@ -64,8 +64,11 @@
       "photo": "Photo",
       "appointment": "Appointment",
       "report": "Report",
-      "note": "Note"
-    }
+      "note": "Note",
+      "invoice": "Invoice",
+      "payment": "Payment"
+    },
+    "nothingDue": "Nothing due for {{name}}"
   },
   "section": {
     "primary": {
@@ -121,7 +124,11 @@
     "reviews_one": "{{count}} review",
     "reviews_other": "{{count}} reviews",
     "feedbackCounts": "{{checkIns}} · {{reviews}}",
-    "noFeedback": "No feedback yet"
+    "noFeedback": "No feedback yet",
+    "showAmount": "Show amount",
+    "hideAmount": "Hide amount",
+    "collect": "Collect",
+    "allPaid": "All paid · nothing due"
   },
   "photos": {
     "albums": {
@@ -923,6 +930,15 @@
       "notes": "Notes",
       "empty": "No activity yet",
       "masked": "₹ ••••"
+    },
+    "billing": {
+      "due": "Due",
+      "paid": "Paid",
+      "show": "Show amounts",
+      "hide": "Hide amounts",
+      "invoice": "{{type}} invoice {{number}}",
+      "sub": "{{date}} · {{amount}}",
+      "collect": "Collect payment"
     }
   },
   "visitFlow": {
@@ -937,7 +953,9 @@
     "steps": {
       "checks": "Check-in & safety",
       "rx": "Prescription",
-      "treatment": "Treatment"
+      "treatment": "Treatment",
+      "invoice": "Invoice",
+      "collect": "Collect"
     },
     "checks": {
       "labels": {
@@ -973,6 +991,22 @@
       "repeatPackage": "⚡ Repeat · {{name}}"
     },
     "paused": "Visit paused",
-    "resume": "Resume"
+    "resume": "Resume",
+    "invoice": {
+      "create": "Create invoice from visit",
+      "custom": "Custom invoice",
+      "nothing": "Nothing to bill",
+      "covered": "Covered by package · nothing to bill",
+      "empty": "Nothing to bill yet",
+      "done": "{{number}} · {{total}}",
+      "ready_one": "{{count}} item ready",
+      "ready_other": "{{count}} items ready"
+    },
+    "collect": {
+      "action": "Collect {{amount}}",
+      "due": "{{amount}} due",
+      "nothing": "Nothing due",
+      "waiting": "Invoice the visit first"
+    }
   }
 }

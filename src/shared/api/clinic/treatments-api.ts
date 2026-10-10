@@ -43,6 +43,15 @@ export const treatmentQueryKeys = {
       patientId,
       treatmentId,
     ] as const,
+  /** A visit's sessions still to bill — the Invoice drawer's "Create invoice from visit". */
+  toBill: (organizationId: string | null, patientId: string, appointmentId: string) =>
+    [
+      ...treatmentQueryKeys.all,
+      organizationId,
+      'to-bill',
+      patientId,
+      appointmentId,
+    ] as const,
   /** A session's check-ins — "Feedback on this treatment". */
   checkIns: (organizationId: string | null, patientId: string, treatmentId: string) =>
     [
@@ -83,6 +92,37 @@ export async function listPatientTreatments(
       next: nextOf(response.meta?.pagination),
     };
   }, 'patient-treatments');
+}
+
+/**
+ * The sessions a visit still has to bill (every page) — done at its booking, of an offering and
+ * on no package (`GET …/treatments?appointment_id=&is_billed=false`, TR13): the visit flow's
+ * "Create invoice from visit" bills them.
+ */
+export async function listVisitTreatmentsToBill(
+  patientId: string,
+  appointmentId: string,
+): Promise<TreatmentRecord[]> {
+  return collectAllPages(async (after) => {
+    const response = await api.get('/app/patients/{patient_id}/treatments', {
+      params: { patient_id: patientId },
+      query: {
+        appointment_id: appointmentId,
+        is_billed: 'false',
+        sort: 'performed_at',
+        order: 'asc',
+        limit: PAGE_SIZE,
+        after: after ?? undefined,
+      },
+    });
+    return {
+      rows: z
+        .array(treatmentWire)
+        .parse(response.data ?? [])
+        .map(toTreatmentRecord),
+      next: nextOf(response.meta?.pagination),
+    };
+  }, 'visit-treatments-to-bill');
 }
 
 /** One session — a 404 when it is unknown or another patient's. */

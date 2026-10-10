@@ -129,4 +129,34 @@ describe('useTodayMoves', () => {
       expect.objectContaining({ queryKey: ['clinic', 'appointments'] }),
     );
   });
+
+  it('reads the tasks again once the rules have run on a check-in or its Undo — not on a stage move (D81 T7)', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout'] });
+    try {
+      const { result } = renderHook(useTodayMoves, { wrapper });
+      const refresh = vi.spyOn(client, 'invalidateQueries');
+      const taskReads = () =>
+        refresh.mock.calls.filter(([filters]) => filters?.queryKey?.[1] === 'tasks');
+
+      await act(() => result.current.checkIn.mutateAsync('appt_1'));
+      expect(taskReads()).toHaveLength(0);
+      await act(() => vi.advanceTimersByTimeAsync(1_500));
+      expect(taskReads()).toHaveLength(1);
+
+      await act(() => result.current.undoCheckIn.mutateAsync('appt_1'));
+      await act(() => vi.advanceTimersByTimeAsync(1_500));
+      expect(taskReads()).toHaveLength(2);
+
+      await act(() =>
+        result.current.moveStage.mutateAsync({
+          appointmentId: 'appt_1',
+          stage: 'treatment',
+        }),
+      );
+      await act(() => vi.advanceTimersByTimeAsync(1_500));
+      expect(taskReads()).toHaveLength(2);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });

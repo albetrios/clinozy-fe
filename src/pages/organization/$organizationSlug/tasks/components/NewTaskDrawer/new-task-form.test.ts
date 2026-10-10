@@ -3,117 +3,166 @@ import { describe, expect, it } from 'vitest';
 import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
 
 import {
+  defaultAssigneeKey,
+  newTaskFieldsOf,
+  type NewTaskForm,
   newTaskForm,
-  newTaskInputOf,
-  newTaskOwnerId,
-  type NewTaskPerson,
   withDuePreset,
 } from './new-task-form.ts';
+import type { NewTaskPerson } from './new-task-person.ts';
 
-const TODAY = '2026-10-03';
-const PRITI: NewTaskPerson = {
-  kind: 'patient',
-  id: '55555555-5555-4555-8555-555555555555',
-  name: 'Priti Soni',
-  seq: 3508,
-  contact: false,
-  ownerId: null,
-};
-const KABIR: NewTaskPerson = {
+const TODAY = '2026-10-10';
+const RIYA = 'mem_yls33gz5jj66ful8q4ads';
+const ASHA = 'mem_asha0000000000000000';
+
+/** Anaya — a lead: her task points at her lead. */
+const ANAYA: NewTaskPerson = {
+  contactId: 'con_8hb15isod6txlpljrn1f7',
+  name: 'Anaya Desai',
+  firstName: 'Anaya',
   kind: 'lead',
-  id: '66666666-6666-4666-8666-666666666666',
-  name: 'Kabir Mehta',
-  seq: 2370,
-  contact: false,
-  ownerId: '77777777-7777-4777-8777-777777777777',
+  phone: '+919826005869',
+  openLeadId: 'lead_hplz5ew0h3tw99ntqf39w',
+  leadId: 'lead_hplz5ew0h3tw99ntqf39w',
 };
-const ME = '88888888-8888-4888-8888-888888888888';
 
-describe('newTaskForm (H:6063)', () => {
-  it('opens on Call back, due tomorrow 11 am, Normal, reminded 15 min before', () => {
-    expect(newTaskForm(TODAY)).toEqual({
-      person: null,
-      type: 'call_back',
-      title: '',
-      duePreset: 'tomorrow',
-      dueDate: '2026-10-04',
-      dueTime: '11:00',
-      ownerId: null,
-      priority: 'normal',
-      remind: true,
-      notes: '',
-    });
-    expect(newTaskForm(TODAY, PRITI).person).toBe(PRITI);
-  });
+/** Kavya — a patient: her task points at her only. */
+const KAVYA: NewTaskPerson = {
+  contactId: 'con_ebj92x3oamfu4qjwim3wq',
+  name: 'Kavya Mehta',
+  firstName: 'Kavya',
+  kind: 'patient',
+  phone: '+919825005865',
+  openLeadId: null,
+  leadId: null,
+};
+
+const form = (patch: Partial<NewTaskForm> = {}): NewTaskForm => ({
+  ...newTaskForm(TODAY),
+  ...patch,
 });
 
-describe('withDuePreset (H:6057)', () => {
-  it('sets each chip’s day and clinic time', () => {
-    const form = newTaskForm(TODAY);
-    expect(withDuePreset(form, 'today', TODAY)).toMatchObject({
+describe('newTaskForm (H:6063)', () => {
+  it('opens on the URL’s person, no title, due tomorrow 11:00, the default assignee, Normal', () => {
+    expect(newTaskForm(TODAY)).toEqual({
+      person: undefined,
+      title: '',
+      duePreset: 'tomorrow',
+      dueDate: '2026-10-11',
+      dueTime: '11:00',
+      owner: null,
+      priority: 'normal',
+      notes: '',
+    });
+  });
+
+  it('sets each Due chip’s clinic day and time', () => {
+    expect(withDuePreset(form(), 'today', TODAY)).toMatchObject({
       duePreset: 'today',
       dueDate: TODAY,
       dueTime: '17:00',
     });
-    expect(withDuePreset(form, 'inThreeDays', TODAY)).toMatchObject({
-      dueDate: '2026-10-06',
-      dueTime: '11:00',
-    });
-    expect(withDuePreset(form, 'nextWeek', TODAY).dueDate).toBe('2026-10-10');
+    expect(withDuePreset(form(), 'inThreeDays', TODAY).dueDate).toBe('2026-10-13');
+    expect(withDuePreset(form(), 'nextWeek', TODAY).dueDate).toBe('2026-10-17');
   });
 });
 
-describe('newTaskOwnerId', () => {
-  it('takes the pick, else the lead’s owner, else the member', () => {
-    const form = newTaskForm(TODAY, KABIR);
-    expect(newTaskOwnerId({ ...form, ownerId: ME }, null)).toBe(ME);
-    expect(newTaskOwnerId(form, ME)).toBe(KABIR.ownerId);
-    expect(newTaskOwnerId(newTaskForm(TODAY, PRITI), ME)).toBe(ME);
-    expect(newTaskOwnerId(newTaskForm(TODAY), null)).toBeNull();
-  });
-});
-
-describe('newTaskInputOf', () => {
-  it('waits for a person and an assignee', () => {
-    const form = newTaskForm(TODAY);
-    expect(newTaskInputOf(form, { ownerId: ME, fallbackTitle: 'Call back' })).toBeNull();
+describe('defaultAssigneeKey (H:6056)', () => {
+  it('defaults to the lead’s owner when they can work tasks, else the member', () => {
+    const workerIds = new Set([RIYA, ASHA]);
     expect(
-      newTaskInputOf(newTaskForm(TODAY, PRITI), { ownerId: null, fallbackTitle: 'x' }),
+      defaultAssigneeKey({ leadOwnerId: ASHA, myMembershipId: RIYA, workerIds }),
+    ).toBe(ASHA);
+    expect(
+      defaultAssigneeKey({ leadOwnerId: null, myMembershipId: RIYA, workerIds }),
+    ).toBe(RIYA);
+    // A lead owned by someone who can't work tasks (say, Marketing) falls back to the member.
+    expect(
+      defaultAssigneeKey({
+        leadOwnerId: 'mem_marketing000000000000',
+        myMembershipId: RIYA,
+        workerIds,
+      }),
+    ).toBe(RIYA);
+    expect(
+      defaultAssigneeKey({ leadOwnerId: null, myMembershipId: undefined, workerIds }),
+    ).toBeNull();
+    expect(
+      defaultAssigneeKey({
+        leadOwnerId: null,
+        myMembershipId: RIYA,
+        workerIds: new Set(),
+      }),
     ).toBeNull();
   });
+});
 
-  it('writes a patient’s task: the clinic instant, the plan fields, the notes as why', () => {
-    const form = {
-      ...withDuePreset(newTaskForm(TODAY, PRITI), 'today', TODAY),
-      title: '  Share the laser price ',
-      type: 'send_price' as const,
-      priority: 'high' as const,
-      notes: '  Asked yesterday  ',
-    };
-    expect(newTaskInputOf(form, { ownerId: ME, fallbackTitle: 'unused' })).toEqual({
+describe('newTaskFieldsOf (POST /app/tasks)', () => {
+  it('writes a lead’s task on her contact and her lead, due at the picked clinic time', () => {
+    const fields = newTaskFieldsOf(
+      form({
+        title: '  Share the laser price ',
+        notes: ' Asked on Instagram ',
+        priority: 'high',
+      }),
+      { person: ANAYA, owner: RIYA, fallbackTitle: 'Follow up · Anaya' },
+    );
+    expect(fields).toEqual({
       title: 'Share the laser price',
-      why: 'Asked yesterday',
-      ownerId: ME,
-      patientId: PRITI.id,
-      leadId: null,
-      dueAt: clinicInstant(TODAY, '17:00'),
-      rule: 'manual',
-      manualType: 'send_price',
+      why: 'Asked on Instagram',
+      dueAt: clinicInstant('2026-10-11', '11:00'),
+      assignee: { membershipId: RIYA },
       priority: 'high',
-      remindMinutesBefore: 15,
+      contactId: ANAYA.contactId,
+      link: { kind: 'lead', id: ANAYA.leadId },
     });
   });
 
-  it('writes a lead’s task with the fallback title, no notes and no reminder', () => {
-    const form = { ...newTaskForm(TODAY, KABIR), remind: false };
+  it('points a patient’s task at the person alone, into a role queue', () => {
     expect(
-      newTaskInputOf(form, { ownerId: ME, fallbackTitle: 'Call back · Kabir' }),
+      newTaskFieldsOf(form({ title: 'Call about the package' }), {
+        person: KAVYA,
+        owner: 'role:front_desk',
+        fallbackTitle: 'Follow up · Kavya',
+      }),
     ).toMatchObject({
-      title: 'Call back · Kabir',
+      assignee: { role: 'front_desk' },
+      contactId: KAVYA.contactId,
+      link: null,
       why: null,
-      patientId: null,
-      leadId: KABIR.id,
-      remindMinutesBefore: null,
     });
+  });
+
+  it('saves an empty title as the person’s fallback', () => {
+    expect(
+      newTaskFieldsOf(form(), {
+        person: KAVYA,
+        owner: RIYA,
+        fallbackTitle: 'Follow up · Kavya',
+      })?.title,
+    ).toBe('Follow up · Kavya');
+  });
+
+  it('writes a task about no one from its title alone', () => {
+    expect(
+      newTaskFieldsOf(form({ title: 'Order more gloves' }), {
+        person: null,
+        owner: RIYA,
+        fallbackTitle: '',
+      }),
+    ).toMatchObject({ title: 'Order more gloves', contactId: null, link: null });
+  });
+
+  it('asks for nothing without a title or an assignee', () => {
+    expect(
+      newTaskFieldsOf(form(), { person: null, owner: RIYA, fallbackTitle: '' }),
+    ).toBeNull();
+    expect(
+      newTaskFieldsOf(form({ title: 'Order more gloves' }), {
+        person: null,
+        owner: null,
+        fallbackTitle: '',
+      }),
+    ).toBeNull();
   });
 });

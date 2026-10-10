@@ -136,7 +136,8 @@
     },
     "rowActions": {
       "edit": "편집",
-      "delete": "삭제"
+      "delete": "삭제",
+      "pay": "{{amount}} 지불"
     },
     "vendorFilter": {
       "any": "모든 공급처",
@@ -194,8 +195,10 @@
     "noPurchases": "구매 없음",
     "rowActions": {
       "edit": "편집",
-      "delete": "삭제"
-    }
+      "delete": "삭제",
+      "pay": "{{amount}} 지불"
+    },
+    "paidUp": "이제 {{name}}에게 지불할 금액이 없습니다"
   },
   "drawers": {
     "records": {

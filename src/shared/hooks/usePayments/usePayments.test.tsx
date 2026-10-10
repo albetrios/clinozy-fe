@@ -3,43 +3,94 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import type * as PaymentsApiModule from '@/shared/api/clinic/payments-api.ts';
-import { paymentQueryKeys } from '@/shared/api/clinic/payments-api.ts';
-import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
+vi.mock('@/shared/api/clinic/payments-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  listLedger: vi.fn(),
+  fetchPayment: vi.fn(),
+  listPaymentEdits: vi.fn(),
+  listPatientPayments: vi.fn(),
+  listOpenSupplierBills: vi.fn(),
+  receivePayment: vi.fn(),
+  payExpense: vi.fn(),
+  updatePayment: vi.fn(),
+  deletePayment: vi.fn(),
+  restorePayment: vi.fn(),
+  reversePayment: vi.fn(),
+}));
+vi.mock('@/shared/api/clinic/invoices-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  listOpenInvoices: vi.fn(),
+  fetchAllInvoices: vi.fn(),
+}));
+const access = vi.hoisted(() => ({ codes: new Set<string>(), isResolved: true }));
+vi.mock('@/shared/hooks/useClinicAccess/index.ts', () => ({
+  useClinicAccess: () => ({
+    isResolved: access.isResolved,
+    canCode: (code: string) => access.codes.has(code),
+  }),
+}));
+vi.mock('@/shared/notify/index.ts', () => ({
+  notify: { success: vi.fn(), error: vi.fn(), info: vi.fn(), undo: vi.fn() },
+}));
+import { creditQueryKeys } from '@/shared/api/clinic/credits-api.ts';
+import {
+  fetchAllInvoices,
+  invoiceQueryKeys,
+  listOpenInvoices,
+} from '@/shared/api/clinic/invoices-api.ts';
+import { patientQueryKeys } from '@/shared/api/clinic/patients-api.ts';
+import {
+  deletePayment,
+  fetchPayment,
+  listLedger,
+  listOpenSupplierBills,
+  listPatientPayments,
+  listPaymentEdits,
+  payExpense,
+  paymentQueryKeys,
+  receivePayment,
+  restorePayment,
+  reversePayment,
+  updatePayment,
+} from '@/shared/api/clinic/payments-api.ts';
+import type { ReceivePaymentInput } from '@/shared/api/clinic/payments-contracts.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import {
+  invoiceRecord,
+  ledgerRow,
+  TEST_INVOICE_ID,
+  TEST_MONEY_BRANCH_ID,
+  TEST_MONEY_CONTACT_ID,
+  TEST_MONEY_PATIENT_ID,
+  TEST_PAYMENT_ID,
+} from '@/tests/utils/payments-doubles.ts';
 
 import {
   MONEY_WRITE_KEYS,
+  useContactInvoices,
   useDeletePayment,
   useLedgerList,
   useOpenInvoices,
   useOpenSupplierBills,
-  usePatientInvoices,
   usePatientPayments,
+  usePayExpense,
   usePayment,
+  usePaymentEdits,
+  useReceivePayment,
   useRestorePayment,
+  useReversePayment,
+  useUpdatePayment,
 } from './usePayments.ts';
 
-/** Holds a delete until a test lets it land, so the optimistic patch can be seen. */
-const gate = vi.hoisted(() => ({ hold: null as Promise<void> | null }));
-vi.mock('@/shared/api/clinic/payments-api.ts', async (importOriginal) => {
-  const actual = await importOriginal<typeof PaymentsApiModule>();
-  return {
-    ...actual,
-    deletePayment: async (...args: Parameters<typeof actual.deletePayment>) => {
-      await gate.hold;
-      return actual.deletePayment(...args);
-    },
-  };
-});
-vi.mock('@/shared/notify/index.ts', () => ({
-  notify: { success: vi.fn(), error: vi.fn(), info: vi.fn(), undo: vi.fn() },
-}));
-
-/** 10:00 on 3 Oct, clinic time — the seed day (27 Sep) is today. */
-const NOW = new Date('2026-10-03T04:30:00Z');
+const RECEIPT: ReceivePaymentInput = {
+  branchId: TEST_MONEY_BRANCH_ID,
+  contactId: TEST_MONEY_CONTACT_ID,
+  invoiceId: TEST_INVOICE_ID,
+  splits: [{ mode: 'cash', amount: 100 }],
+  reference: null,
+  note: null,
+};
 
 let client: QueryClient;
 function wrapper({ children }: { children: ReactNode }) {
@@ -47,113 +98,213 @@ function wrapper({ children }: { children: ReactNode }) {
 }
 
 beforeEach(() => {
-  vi.useFakeTimers({ toFake: ['Date'] });
-  vi.setSystemTime(NOW);
-  resetClinicFixtures();
-  gate.hold = null;
+  vi.resetAllMocks();
+  signInTestMember();
+  access.codes = new Set();
+  access.isResolved = true;
   client = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
 });
 afterEach(() => {
-  vi.useRealTimers();
   client.clear();
-  resetClinicFixtures();
+  useOrganizationStore.getState().clearOrganization();
 });
 
 describe('MONEY_WRITE_KEYS', () => {
-  it('refreshes the ledger, the credits, the patients’ dues and the invoices', () => {
-    expect(MONEY_WRITE_KEYS).toContainEqual(paymentQueryKeys.all);
-    expect(MONEY_WRITE_KEYS).toContainEqual(['clinic', 'credits']);
-    expect(MONEY_WRITE_KEYS).toContainEqual(['clinic', 'fixture-patients']);
-    expect(MONEY_WRITE_KEYS).toContainEqual(['clinic', 'invoices']);
+  it('refreshes the ledger, credits, invoices and every patient read', () => {
+    expect(MONEY_WRITE_KEYS).toEqual(
+      expect.arrayContaining([
+        paymentQueryKeys.all,
+        creditQueryKeys.all,
+        invoiceQueryKeys.all,
+        patientQueryKeys.all,
+      ]),
+    );
   });
 });
 
-describe('the ledger reads', () => {
-  it('pages the ledger under the domain key', async () => {
-    const { result } = renderHook(() => useLedgerList({ direction: 'paid' }), {
+describe('the reads', () => {
+  it('reads the ledger in cursor pages, under the organization', async () => {
+    vi.mocked(listLedger)
+      .mockResolvedValueOnce({ rows: [ledgerRow()], next: 'cur_2', total: 2 })
+      .mockResolvedValueOnce({
+        rows: [ledgerRow({ id: 'pay_other000000000000000', seq: 4 })],
+        next: null,
+        total: 2,
+      });
+    const { result } = renderHook(() => useLedgerList({ direction: 'received' }), {
       wrapper,
     });
-    await waitFor(() => expect(result.current.rows).toHaveLength(7));
-    expect(result.current.hasNextPage).toBe(false);
-    expect(
-      client.getQueryCache().findAll({ queryKey: paymentQueryKeys.lists() })[0],
-    ).toBeTruthy();
+
+    await waitFor(() => expect(result.current.rows).toHaveLength(1));
+    expect(listLedger).toHaveBeenCalledWith({ direction: 'received' }, undefined);
+    await act(() => result.current.fetchNextPage());
+    await waitFor(() => expect(result.current.rows).toHaveLength(2));
+    expect(listLedger).toHaveBeenLastCalledWith({ direction: 'received' }, 'cur_2');
   });
 
-  it('reads one entry, and stays idle without an id', async () => {
-    const { result } = renderHook(() => usePayment(ref.payment(310)), { wrapper });
-    await waitFor(() => expect(result.current.data?.partyName).toBe('Tea & snacks'));
-    const idle = renderHook(() => usePayment(undefined), { wrapper });
-    expect(idle.result.current.fetchStatus).toBe('idle');
+  it('waits for an organization', () => {
+    useOrganizationStore.getState().clearOrganization();
+    renderHook(() => useLedgerList({}), { wrapper });
+    expect(listLedger).not.toHaveBeenCalled();
   });
 
-  it('reads a patient’s open invoices and the open supplier bills', async () => {
-    const invoices = renderHook(() => useOpenInvoices(patientRef('Rhea Shah')), {
-      wrapper,
-    });
-    await waitFor(() => expect(invoices.result.current.data?.[0]?.seq).toBe(785));
-    const none = renderHook(() => useOpenInvoices(null), { wrapper });
-    expect(none.result.current.fetchStatus).toBe('idle');
-    const bills = renderHook(() => useOpenSupplierBills(), { wrapper });
-    await waitFor(() => expect(bills.result.current.data).toHaveLength(3));
+  it('reads one entry and its edit log, idle without an id', async () => {
+    vi.mocked(fetchPayment).mockResolvedValue(ledgerRow());
+    vi.mocked(listPaymentEdits).mockResolvedValue([]);
+    const { result, rerender } = renderHook(
+      ({ id }) => ({ entry: usePayment(id), edits: usePaymentEdits(id) }),
+      { wrapper, initialProps: { id: undefined as string | undefined } },
+    );
+    expect(fetchPayment).not.toHaveBeenCalled();
+
+    rerender({ id: TEST_PAYMENT_ID });
+    await waitFor(() => expect(result.current.entry.data?.seq).toBe(5));
+    await waitFor(() => expect(result.current.edits.data).toEqual([]));
+    expect(listPaymentEdits).toHaveBeenCalledWith(TEST_PAYMENT_ID);
+  });
+
+  it('reads a patient’s open invoices and their entries; a contact’s invoices', async () => {
+    vi.mocked(listOpenInvoices).mockResolvedValue([invoiceRecord()]);
+    vi.mocked(fetchAllInvoices).mockResolvedValue([invoiceRecord()]);
+    vi.mocked(listPatientPayments).mockResolvedValue([ledgerRow()]);
+    const { result } = renderHook(
+      () => ({
+        open: useOpenInvoices(TEST_MONEY_PATIENT_ID),
+        contact: useContactInvoices(TEST_MONEY_CONTACT_ID),
+        payments: usePatientPayments(TEST_MONEY_PATIENT_ID),
+        idle: useOpenInvoices(null),
+      }),
+      { wrapper },
+    );
+
+    await waitFor(() => expect(result.current.payments.data).toHaveLength(1));
+    await waitFor(() => expect(result.current.contact.data).toHaveLength(1));
+    expect(result.current.open.data).toEqual([invoiceRecord()]);
+    expect(listOpenInvoices).toHaveBeenCalledTimes(1);
+    expect(fetchAllInvoices).toHaveBeenCalledWith({ contactId: TEST_MONEY_CONTACT_ID });
+    expect(result.current.idle.fetchStatus).toBe('idle');
+  });
+
+  it('reads the supplier bills the member may read', async () => {
+    access.codes = new Set(['stock_item:read']);
+    vi.mocked(listOpenSupplierBills).mockResolvedValue([]);
+    const { result } = renderHook(() => useOpenSupplierBills(), { wrapper });
+
+    await waitFor(() => expect(result.current.data).toEqual([]));
+    expect(listOpenSupplierBills).toHaveBeenCalledWith({ stock: true, medical: false });
   });
 });
 
-describe('the ledger writes', () => {
-  it('drops a deleted entry from every cached page at once, and Undo puts it back', async () => {
-    const list = renderHook(() => useLedgerList({}), { wrapper });
-    await waitFor(() => expect(list.result.current.rows).toHaveLength(16));
-    let release: () => void = () => undefined;
-    gate.hold = new Promise((resolve) => {
-      release = resolve;
+describe('the writes', () => {
+  it('receives, pays and changes with the action’s key, refreshing every money read', async () => {
+    vi.mocked(receivePayment).mockResolvedValue(ledgerRow());
+    vi.mocked(payExpense).mockResolvedValue(ledgerRow({ kind: 'expense' }));
+    vi.mocked(updatePayment).mockResolvedValue(ledgerRow());
+    const invalidate = vi.spyOn(client, 'invalidateQueries');
+    const { result } = renderHook(
+      () => ({
+        receive: useReceivePayment(),
+        pay: usePayExpense(),
+        update: useUpdatePayment(),
+      }),
+      { wrapper },
+    );
+
+    await act(() => result.current.receive.mutateAsync(RECEIPT));
+    expect(receivePayment).toHaveBeenCalledWith({
+      input: RECEIPT,
+      idempotencyKey: expect.any(String),
     });
-    const remove = renderHook(() => useDeletePayment(), { wrapper });
+    expect(invalidate).toHaveBeenCalledWith(
+      expect.objectContaining({ queryKey: invoiceQueryKeys.all }),
+    );
+
+    const expense = {
+      branchId: TEST_MONEY_BRANCH_ID,
+      bill: null,
+      expenseCategory: 'misc' as const,
+      payeeName: 'Tea',
+      amount: 120,
+      mode: 'cash' as const,
+      paidOn: '2026-10-10',
+      note: null,
+      attachmentKeys: [],
+    };
+    await act(() => result.current.pay.mutateAsync(expense));
+    expect(payExpense).toHaveBeenCalledWith({
+      input: expense,
+      idempotencyKey: expect.any(String),
+    });
+
+    const record = ledgerRow();
+    await act(() =>
+      result.current.update.mutateAsync({ record, patch: { note: 'Moved' } }),
+    );
+    expect(updatePayment).toHaveBeenCalledWith({
+      record,
+      patch: { note: 'Moved' },
+      idempotencyKey: expect.any(String),
+    });
+  });
+
+  it('takes a deleted entry out of every ledger page at once, puts it back with restore', async () => {
+    let land: () => void = () => undefined;
+    vi.mocked(deletePayment).mockReturnValue(
+      new Promise<void>((resolve) => {
+        land = resolve;
+      }),
+    );
+    vi.mocked(restorePayment).mockResolvedValue(ledgerRow());
+    const key = paymentQueryKeys.list('org_test', {});
+    client.setQueryData(key, {
+      pages: [{ rows: [ledgerRow()], next: null, hasMore: false }],
+      pageParams: [null],
+    });
+    const { result } = renderHook(
+      () => ({ remove: useDeletePayment(), restore: useRestorePayment() }),
+      { wrapper },
+    );
+
+    let deleting: Promise<void> = Promise.resolve();
     act(() => {
-      remove.result.current.mutate({
-        id: ref.payment(310),
+      deleting = result.current.remove.mutateAsync({
+        id: TEST_PAYMENT_ID,
         reason: 'duplicate',
         note: null,
       });
     });
-    await waitFor(() => expect(list.result.current.rows).toHaveLength(15));
-    const has310 = (rows: readonly LedgerRow[]) => rows.some((row) => row.seq === 310);
-    expect(has310(list.result.current.rows)).toBe(false);
-    release();
-    await waitFor(() => expect(remove.result.current.isSuccess).toBe(true));
-
-    const restore = renderHook(() => useRestorePayment(), { wrapper });
-    await act(() => restore.result.current.mutateAsync(ref.payment(310)));
-    await waitFor(() => expect(has310(list.result.current.rows)).toBe(true));
-  });
-});
-
-describe('the patient file’s money reads', () => {
-  const dharti = patientRef('Dharti Galani');
-
-  it('reads her receipts and refunds, newest first; idle without her', async () => {
-    const { result } = renderHook(() => usePatientPayments(dharti), { wrapper });
-    await waitFor(() => expect(result.current.data).toBeDefined());
-    expect(result.current.data?.map((row) => row.seq)).toEqual([5505]);
-    expect(result.current.data?.[0]).toMatchObject({
-      direction: 'received',
-      invoice: { seq: 782 },
+    await waitFor(() =>
+      expect(
+        client.getQueryData<{ pages: { rows: unknown[] }[] }>(key)?.pages[0]?.rows,
+      ).toEqual([]),
+    );
+    land();
+    await act(() => deleting);
+    expect(deletePayment).toHaveBeenCalledWith({
+      paymentId: TEST_PAYMENT_ID,
+      reason: 'duplicate',
+      note: null,
     });
-    const idle = renderHook(() => usePatientPayments(''), { wrapper });
-    expect(idle.result.current.fetchStatus).toBe('idle');
+
+    await act(() => result.current.restore.mutateAsync(TEST_PAYMENT_ID));
+    expect(restorePayment).toHaveBeenCalledWith(TEST_PAYMENT_ID, expect.any(String));
   });
 
-  it('reads every invoice of hers with its items, team, status and sale', async () => {
-    const { result } = renderHook(() => usePatientInvoices(dharti), { wrapper });
-    await waitFor(() => expect(result.current.data).toBeDefined());
-    const lhr = result.current.data?.find((row) => row.seq === 787);
-    expect(lhr).toMatchObject({
-      items: ['LHR Full Face · B4G7'],
-      status: 'unpaid',
-      saleId: null,
+  it('reverses a settled entry with why', async () => {
+    vi.mocked(reversePayment).mockResolvedValue(ledgerRow({ kind: 'reversal' }));
+    const { result } = renderHook(() => useReversePayment(), { wrapper });
+
+    await act(() =>
+      result.current.mutateAsync({ id: TEST_PAYMENT_ID, reason: 'Wrong patient' }),
+    );
+
+    expect(reversePayment).toHaveBeenCalledWith({
+      paymentId: TEST_PAYMENT_ID,
+      reason: 'Wrong patient',
+      paidAt: undefined,
+      idempotencyKey: expect.any(String),
     });
-    const sale = result.current.data?.find((row) => row.seq === 788);
-    expect(sale?.saleId).not.toBeNull();
   });
 });

@@ -51,7 +51,8 @@
     "unconfirmed": "미확정",
     "waiting": "대기 {{minutes}}분",
     "inRoom": "진료실 {{minutes}}분",
-    "rxApproved": "처방 승인 {{time}}"
+    "rxApproved": "처방 승인 {{time}}",
+    "toPay": "결제 {{amount}}"
   },
   "toasts": {
     "checkedIn": "{{name}} 체크인 · 의사 대기열과 진료실에 알림",

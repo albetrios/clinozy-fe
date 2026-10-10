@@ -1,520 +1,598 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { isHttpError } from '@/shared/errors/HttpError.ts';
-
-import { invoicePaid } from './clinic-money.ts';
-import { branchRef, MAIN_BRANCH } from './fixtures/organization.fixtures.ts';
-import { patientRef } from './fixtures/patients.fixtures.ts';
-import { ref } from './fixtures/refs.fixtures.ts';
-import { staffRef } from './fixtures/staff.fixtures.ts';
-import { clinicFixtures, resetClinicFixtures } from './fixtures/world.fixtures.ts';
+vi.mock('@/core/http/api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  api: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
+}));
+vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchTeamDirectory: vi.fn(),
+}));
+import { api } from '@/core/http/api.ts';
+import { queryClient } from '@/core/http/queryClient.ts';
+import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
+import { fetchTeamDirectory } from '@/shared/api/clinic/directory-api.ts';
+import { HttpError } from '@/shared/errors/HttpError.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import {
-  addMedicalContact,
+  invoiceRecord,
+  invoiceWire,
+  paymentWire,
+  TEST_INVOICE_ID,
+  TEST_MONEY_BRANCH_ID,
+  TEST_MONEY_CONTACT_ID,
+  TEST_MONEY_PATIENT_ID,
+} from '@/tests/utils/payments-doubles.ts';
+
+import {
   createInvoice,
-  createSale,
   deleteInvoice,
+  fetchAllInvoices,
   fetchInvoice,
   fetchInvoicePresets,
-  fetchOftenBilled,
-  invoiceQueryKeys,
+  fetchInvoiceTotals,
+  listInvoices,
+  listOpenInvoices,
+  previewInvoice,
+  previewInvoiceChange,
   restoreInvoice,
-  searchSaleCustomers,
-  setMedicalContactPhone,
   updateInvoice,
 } from './invoices-api.ts';
-import type { InvoiceInput, InvoiceLineInput } from './invoices-contracts.ts';
+import { belowLowestPriceLines, type InvoiceInput } from './invoices-contracts.ts';
 
-/** 10:00 on 3 Oct, clinic time. */
-const NOW = new Date('2026-10-03T04:30:00Z');
-const TODAY = '2026-10-03';
-const MAIN = branchRef(MAIN_BRANCH);
-const DHARTI = patientRef('Dharti Galani');
-const RHEA = patientRef('Rhea Shah');
-const DOCTOR = staffRef('DD');
+const TODAY = '2026-10-10';
+const CONSULTATION = 'off_3f4nzxf53tfyf9k6hlna1';
+const HYDRAFACIAL = 'off_hydra000000000000000';
 
-/** The rejection a call ends in, so its status and fields can be read. */
-async function failureOf(call: Promise<unknown>) {
-  const error = await call.then(
-    () => null,
-    (caught: unknown) => caught,
-  );
-  if (!isHttpError(error)) throw new Error('expected an HTTP error');
-  const body = (
-    error.data as { error: { code: string; detail: string; fields?: object } }
-  ).error;
-  return { status: error.status, ...body };
-}
-
-const offering = (seq: number) => {
-  const found = clinicFixtures.offerings.snapshot().find((row) => row.seq === seq);
-  if (!found) throw new Error(`offering #${seq}`);
-  return found;
-};
-
-const medicine = (seq: number) => {
-  const found = clinicFixtures.medicines.snapshot().find((row) => row.seq === seq);
-  if (!found) throw new Error(`medicine #${seq}`);
-  return found;
-};
-
-/** An offering's line at a rate, no discount. */
-const offeringLine = (seq: number, overrides: Partial<InvoiceLineInput> = {}) => {
-  const row = offering(seq);
-  return {
-    offeringId: row.id,
-    medicineId: null,
-    name: row.name,
-    packSize: null,
-    qty: 1,
-    rate: row.offerPrice ?? row.price,
-    discountPct: 0,
-    gstPct: row.gstPct,
-    ...overrides,
-  } satisfies InvoiceLineInput;
-};
-
-/** A medicine's line at its MRP, GST included (D45). */
-const medicineLine = (seq: number, qty: number) => {
-  const row = medicine(seq);
-  return {
-    offeringId: null,
-    medicineId: row.id,
-    name: row.name,
-    packSize: null,
-    qty,
-    rate: row.mrp,
-    discountPct: 0,
-    gstPct: 0,
-  } satisfies InvoiceLineInput;
-};
-
-const clinicInvoice = (overrides: Partial<InvoiceInput> = {}): InvoiceInput => ({
-  type: 'clinic',
-  branchId: MAIN,
-  patientId: DHARTI,
-  medicalContactId: null,
-  leadId: null,
-  teamIds: [DOCTOR],
-  items: [offeringLine(271)],
-  overallDiscount: 0,
-  date: TODAY,
-  remark: null,
-  prescriptionId: null,
-  paidNow: [],
-  ...overrides,
+/** A list page as the API answers it. */
+const page = (
+  data: unknown[],
+  pagination: Record<string, unknown> = {},
+  meta: Record<string, unknown> = {},
+) => ({
+  data,
+  meta: {
+    request_id: 'req',
+    pagination: { per_page: 50, next: null, has_more: false, ...pagination },
+    ...meta,
+  },
 });
 
-const sale = (overrides: Partial<InvoiceInput> = {}): InvoiceInput =>
-  clinicInvoice({ type: 'medical', patientId: RHEA, teamIds: [], ...overrides });
+/** One record as the API answers it. */
+const one = (data: unknown) => ({ data, meta: { request_id: 'req' } });
+
+/** Answer each GET by its path. */
+function answer(byPath: Record<string, (query: Record<string, unknown>) => unknown>) {
+  vi.mocked(api.get).mockImplementation(((path: string, init?: { query?: object }) => {
+    const reply = byPath[path];
+    if (!reply) throw new Error(`unexpected GET ${path}`);
+    return Promise.resolve(reply((init?.query ?? {}) as Record<string, unknown>));
+  }) as never);
+}
+
+/** Every query a GET to `path` was sent with. */
+const queriesOf = (path: string) =>
+  vi
+    .mocked(api.get)
+    .mock.calls.filter(([called]) => called === path)
+    .map(([, init]) => (init as { query?: Record<string, unknown> } | undefined)?.query);
+
+/** The clinic and the Adajan branch, as the sheet reads them. */
+const SHEET_ANSWERS = {
+  '/tenancy/organization': () =>
+    one({ name: 'Glow Clinic', specialties: ['skin'], currency: 'INR' }),
+  '/app/branches/my': () =>
+    page([
+      {
+        id: TEST_MONEY_BRANCH_ID,
+        name: 'Adajan',
+        phone: '+912612345678',
+        gst_number: '24ABCDE1234F1Z5',
+        address_line_one: '12 Ring Road',
+        address_line_two: null,
+        area: 'Adajan',
+        city: 'Surat',
+        state: 'Gujarat',
+        postal_code: '395009',
+      },
+    ]),
+};
+
+/** What the drawer holds for invoice #5, as an input. */
+const invoiceInput = (patch: Partial<InvoiceInput> = {}): InvoiceInput => ({
+  type: 'consultation',
+  branchId: TEST_MONEY_BRANCH_ID,
+  contactId: TEST_MONEY_CONTACT_ID,
+  teamIds: [],
+  items: [
+    {
+      id: 'iitm_7ocmisga5mzisg1w1uok1',
+      offeringId: CONSULTATION,
+      qty: 1,
+      discountPct: 0,
+      suggestionId: null,
+      treatmentIds: [],
+    },
+  ],
+  overallDiscount: 0,
+  date: '2026-10-10',
+  remark: 'Paid at the desk',
+  prescriptionId: null,
+  paidNow: [],
+  ...patch,
+});
 
 beforeEach(() => {
+  vi.resetAllMocks();
+  queryClient.clear();
+  signInTestMember();
+  vi.mocked(fetchTeamDirectory).mockResolvedValue([]);
   vi.useFakeTimers({ toFake: ['Date'] });
-  vi.setSystemTime(NOW);
-  resetClinicFixtures();
+  vi.setSystemTime(new Date(clinicInstant(TODAY, '10:00')));
 });
 afterEach(() => {
   vi.useRealTimers();
-  resetClinicFixtures();
+  useOrganizationStore.getState().clearOrganization();
 });
 
-describe('invoiceQueryKeys', () => {
-  it('nests every key under ["clinic", "invoices"], so one invalidation reaches them all', () => {
-    for (const key of [
-      invoiceQueryKeys.detail('X'),
-      invoiceQueryKeys.presets('P'),
-      invoiceQueryKeys.oftenBilled('medical'),
-      invoiceQueryKeys.customers(),
-    ]) {
-      expect(key.slice(0, 2)).toEqual(['clinic', 'invoices']);
-    }
-  });
-});
-
-describe('createInvoice (S:1716)', () => {
-  it('stores the invoice and answers its totals, party and balance', async () => {
-    const { detail } = await createInvoice(
-      clinicInvoice({ items: [offeringLine(271, { qty: 2 })], remark: 'Two sittings' }),
-    );
-    expect(detail.invoice).toMatchObject({
-      type: 'clinic',
-      patientId: DHARTI,
-      teamIds: [DOCTOR],
-      remark: 'Two sittings',
-      saleId: null,
-    });
-    expect(detail.invoice.seq).toBeGreaterThan(791);
-    expect(detail.party).toMatchObject({ kind: 'patient', name: 'Dharti Galani' });
-    expect(detail.balance).toEqual({
-      bill: 600_000,
-      paid: 0,
-      due: 600_000,
-      status: 'unpaid',
-    });
-    expect((await fetchInvoice(detail.invoice.id)).invoice.id).toBe(detail.invoice.id);
-  });
-
-  it('records "Paid now" as one receipt with a split per mode (Appendix F)', async () => {
-    const { detail } = await createInvoice(
-      clinicInvoice({
-        paidNow: [
-          { mode: 'cash', amount: 100_000 },
-          { mode: 'upi', amount: 200_000 },
-        ],
-      }),
-    );
-    expect(detail.payments).toHaveLength(1);
-    expect(detail.payments[0]).toMatchObject({
-      direction: 'received',
-      kind: 'receipt',
-      amount: 300_000,
-      patientId: DHARTI,
-      invoiceId: detail.invoice.id,
-      splits: [
-        { mode: 'cash', amount: 100_000 },
-        { mode: 'upi', amount: 200_000 },
-      ],
-    });
-    expect(detail.balance).toMatchObject({ paid: 300_000, due: 0, status: 'paid' });
-  });
-
-  it('opens one "Payment due" task for a balance (Q-T3)', async () => {
-    const { detail } = await createInvoice(
-      clinicInvoice({ paidNow: [{ mode: 'upi', amount: 100_000 }] }),
-    );
-    const tasks = clinicFixtures.tasks.snapshot(
-      (row) => row.sourceId === detail.invoice.id,
-    );
-    expect(tasks).toHaveLength(1);
-    expect(tasks[0]).toMatchObject({
-      rule: 'payment',
-      kind: 'payment_reminder',
-      title: 'Collect ₹2,000 from Dharti',
-      why: `Clinic invoice #${detail.invoice.seq} has a balance.`,
-      sourceType: 'invoice',
-      ownerRole: 'front_desk',
-      status: 'open',
-    });
-    // A paid invoice opens none.
-    const paid = await createInvoice(
-      clinicInvoice({ paidNow: [{ mode: 'cash', amount: 300_000 }] }),
-    );
-    expect(
-      clinicFixtures.tasks.snapshot((row) => row.sourceId === paid.detail.invoice.id),
-    ).toHaveLength(0);
-  });
-
-  it('opens a package per unit of a multi-session offering, valid for its validity (H:5065)', async () => {
-    const { detail } = await createInvoice(
-      clinicInvoice({ items: [offeringLine(273, { qty: 2 })] }),
-    );
-    const packs = clinicFixtures.patientPackages.snapshot(
-      (row) => row.invoiceId === detail.invoice.id,
-    );
-    expect(packs).toHaveLength(2);
-    expect(packs[0]).toMatchObject({
-      patientId: DHARTI,
-      offeringId: offering(273).id,
-      sessionsTotal: 6,
-      sessionsUsed: 0,
-      validUntil: '2027-04-01',
-    });
-  });
-
-  it('marks the patient’s plan rows invoiced and counts them (H:4410)', async () => {
-    const planned = clinicFixtures.offeringSuggestions
-      .snapshot((row) => row.patientId === DHARTI)
-      .find((row) => row.status === 'planned');
-    if (!planned) throw new Error('a planned suggestion');
-    const line = offeringLine(270);
-    const plannedOffering = clinicFixtures.offerings
-      .snapshot()
-      .find((row) => row.id === planned.offeringId);
-    if (!plannedOffering) throw new Error('the planned offering');
-    const { planLinked, detail } = await createInvoice(
-      clinicInvoice({
-        items: [line, offeringLine(plannedOffering.seq, { qty: planned.qty })],
-      }),
-    );
-    expect(planLinked).toBe(1);
-    const after = await clinicFixtures.offeringSuggestions.get(planned.id);
-    expect(after.status).toBe('accepted');
-    expect(after.invoiceLinks).toEqual([
-      { invoiceId: detail.invoice.id, invoiceLineIndex: 1, qty: planned.qty },
-    ]);
-  });
-
-  it('refuses without a patient or a line, the first problem named (422)', async () => {
-    expect(
-      await failureOf(createInvoice(clinicInvoice({ patientId: null }))),
-    ).toMatchObject({
-      status: 422,
-      detail: 'Pick a patient',
-    });
-    expect(await failureOf(createInvoice(clinicInvoice({ items: [] })))).toMatchObject({
-      status: 422,
-      detail: 'Add at least one item',
-    });
-  });
-
-  it('refuses a line below its lowest price (H:5059)', async () => {
-    // Back Peeling: ₹3,000, lowest ₹2,250 — 30% off is ₹2,100.
-    const failure = await failureOf(
-      createInvoice(clinicInvoice({ items: [offeringLine(271, { discountPct: 30 })] })),
-    );
-    expect(failure).toMatchObject({
-      status: 422,
-      fields: { 'items.0.discountPct': [expect.any(String)] },
-    });
-    expect(failure.detail).toContain('Back Peeling');
-  });
-
-  it('refuses "Paid now" above the bill, and a payment on a closed day (409)', async () => {
-    expect(
-      await failureOf(
-        createInvoice(clinicInvoice({ paidNow: [{ mode: 'cash', amount: 400_000 }] })),
-      ),
-    ).toMatchObject({ status: 409, detail: 'Paid ₹4,000 is more than the bill ₹3,000' });
-    const today = await clinicFixtures.dayCloses.create({
-      branchId: MAIN,
-      date: TODAY,
-      openingCash: 200_000,
-      openingSource: 'default_float',
-      openingAcceptedAt: NOW.toISOString(),
-      countedCash: 200_000,
-      closedAt: NOW.toISOString(),
-      closedById: DOCTOR,
-    });
-    expect(today.closedAt).not.toBeNull();
-    const before = clinicFixtures.invoices.snapshot().length;
-    expect(
-      await failureOf(
-        createInvoice(clinicInvoice({ paidNow: [{ mode: 'cash', amount: 100_000 }] })),
-      ),
-    ).toMatchObject({ status: 409 });
-    expect(clinicFixtures.invoices.snapshot()).toHaveLength(before);
-    // With nothing paid now, the invoice itself is not the day's.
-    await expect(createInvoice(clinicInvoice())).resolves.toBeDefined();
-  });
-
-  it('sends a Medical invoice to the sale path', async () => {
-    const { detail } = await createInvoice(sale({ items: [medicineLine(450, 1)] }));
-    expect(detail.sale).not.toBeNull();
-  });
-});
-
-describe('createSale (S:1666)', () => {
-  it('draws the stock by earliest expiry, writes the sale and stamps each line’s batch', async () => {
-    const { detail } = await createSale(
-      sale({
-        items: [medicineLine(450, 2)],
-        paidNow: [{ mode: 'cash', amount: 57_000 }],
-      }),
-    );
-    expect(detail.invoice).toMatchObject({ type: 'medical', patientId: RHEA });
-    expect(detail.invoice.items[0]?.batchNo).toBe('AZ771');
-    expect(detail.sale).not.toBeNull();
-    const savedSale = await clinicFixtures.medicalSales.get(detail.sale?.id ?? '');
-    expect(savedSale.invoiceId).toBe(detail.invoice.id);
-    expect(medicine(450).batches[0]?.qty).toBe(4);
-    expect(detail.balance.status).toBe('paid');
-  });
-
-  it('refuses more than the stock, naming the medicine (409)', async () => {
-    expect(
-      await failureOf(createSale(sale({ items: [medicineLine(456, 4)] }))),
-    ).toMatchObject({
-      status: 409,
-      detail: 'Only 3 of Glycolac Cream in stock',
-    });
-    expect(medicine(456).batches[0]?.qty).toBe(3);
-  });
-
-  it('sells to a Medical contact, the receipt naming them as the payer', async () => {
-    const viral = clinicFixtures.medicalContacts.snapshot()[0];
-    if (!viral) throw new Error('a contact');
-    const { detail } = await createSale(
-      sale({
-        patientId: null,
-        medicalContactId: viral.id,
-        items: [medicineLine(450, 1)],
-        paidNow: [{ mode: 'upi', amount: 28_500 }],
-      }),
-    );
-    expect(detail.party).toMatchObject({ kind: 'contact', name: 'Viral Sheth' });
-    expect(detail.payments[0]).toMatchObject({
-      patientId: null,
-      payeeName: 'Viral Sheth',
-    });
-  });
-
-  it('saves a lead bought as a customer as a Medical contact (C24)', async () => {
-    const lead = clinicFixtures.leads.snapshot(
-      (row) => row.patientId === null && !row.isContactThread && row.phone !== null,
-    )[0];
-    if (!lead) throw new Error('a lead');
-    const before = clinicFixtures.medicalContacts.snapshot().length;
-    const { detail } = await createSale(
-      sale({ patientId: null, leadId: lead.id, items: [medicineLine(450, 1)] }),
-    );
-    expect(detail.party).toMatchObject({ kind: 'contact', name: lead.name });
-    expect(clinicFixtures.medicalContacts.snapshot()).toHaveLength(before + 1);
-  });
-
-  it('asks for a customer and for a medicine on every line', async () => {
-    expect(
-      await failureOf(
-        createSale(sale({ patientId: null, items: [medicineLine(450, 1)] })),
-      ),
-    ).toMatchObject({ status: 422, detail: 'Pick a customer' });
-    expect(
-      await failureOf(
-        createSale(sale({ items: [{ ...medicineLine(450, 1), medicineId: null }] })),
-      ),
-    ).toMatchObject({
-      status: 422,
-      fields: { 'items.0.medicineId': ['Pick a medicine'] },
-    });
-  });
-});
-
-describe('updateInvoice (S:1716)', () => {
-  it('saves new lines, records a payment now and keeps the packages in step', async () => {
-    const { detail } = await createInvoice(
-      clinicInvoice({ items: [offeringLine(273, { qty: 2 })] }),
-    );
-    const { detail: changed } = await updateInvoice(
-      detail.invoice.id,
-      clinicInvoice({
-        items: [offeringLine(273, { qty: 1 })],
-        paidNow: [{ mode: 'card', amount: 50_000 }],
-      }),
-    );
-    expect(changed.invoice.items).toHaveLength(1);
-    expect(changed.balance).toMatchObject({ bill: 750_000, paid: 50_000 });
-    expect(
-      clinicFixtures.patientPackages.snapshot(
-        (row) => row.invoiceId === detail.invoice.id,
-      ),
-    ).toHaveLength(1);
-  });
-
-  it('refuses a bill below what is already paid (409)', async () => {
-    const { detail } = await createInvoice(
-      clinicInvoice({ paidNow: [{ mode: 'cash', amount: 300_000 }] }),
-    );
-    expect(
-      await failureOf(
-        updateInvoice(
-          detail.invoice.id,
-          clinicInvoice({ items: [offeringLine(271, { discountPct: 20 })] }),
+describe('the lists', () => {
+  it('reads a person’s page with what is due and paid over all of them', async () => {
+    answer({
+      '/app/invoices': () =>
+        page(
+          [invoiceWire()],
+          { next: 'cur_2', has_more: true, estimated_total: 5 },
+          { due_total: 14289.95, paid_total: 4004 },
         ),
-      ),
-    ).toMatchObject({ status: 409, detail: 'Paid ₹3,000 is more than the bill ₹2,400' });
+    });
+
+    const result = await listInvoices({ patientId: TEST_MONEY_PATIENT_ID }, 'cur_1');
+
+    expect(queriesOf('/app/invoices')[0]).toEqual({
+      patient_id: TEST_MONEY_PATIENT_ID,
+      contact_id: undefined,
+      payment_status: undefined,
+      sort: undefined,
+      order: undefined,
+      limit: 50,
+      after: 'cur_1',
+    });
+    expect(result).toEqual({
+      rows: [invoiceRecord()],
+      next: 'cur_2',
+      total: 5,
+      totals: { due: 14289.95, paid: 4004 },
+    });
   });
 
-  it('keeps a sale’s medicines (S:51) but takes its Remark', async () => {
-    const { detail } = await createSale(sale({ items: [medicineLine(450, 1)] }));
+  it('reads a patient’s invoices with a due oldest first, and the totals in one row', async () => {
+    answer({
+      '/app/invoices': () =>
+        page([invoiceWire()], {}, { due_total: 100, paid_total: 400 }),
+    });
+
+    expect(await listOpenInvoices(TEST_MONEY_PATIENT_ID)).toEqual([invoiceRecord()]);
+    expect(queriesOf('/app/invoices')[0]).toMatchObject({
+      patient_id: TEST_MONEY_PATIENT_ID,
+      payment_status: 'unpaid,partial',
+      sort: 'invoice_date',
+      order: 'asc',
+      limit: 100,
+    });
+
+    expect(await fetchInvoiceTotals({ contactId: TEST_MONEY_CONTACT_ID })).toEqual({
+      due: 100,
+      paid: 400,
+    });
+    expect(queriesOf('/app/invoices')[1]).toMatchObject({
+      contact_id: TEST_MONEY_CONTACT_ID,
+      limit: 1,
+    });
+
+    answer({ '/app/invoices': () => page([]) });
+    expect(await fetchInvoiceTotals({ patientId: TEST_MONEY_PATIENT_ID })).toBeNull();
+  });
+
+  it('counts a person’s invoices with their totals, from the same one-row read', async () => {
+    answer({
+      '/app/invoices': () =>
+        page(
+          [invoiceWire()],
+          { has_more: true, estimated_total: 4 },
+          { due_total: 4800, paid_total: 1200 },
+        ),
+    });
+
+    expect(await fetchInvoiceTotals({ patientId: TEST_MONEY_PATIENT_ID })).toEqual({
+      due: 4800,
+      paid: 1200,
+      count: 4,
+    });
+  });
+
+  it('reads one day’s open invoices at the header’s branches (Today’s checkout)', async () => {
+    answer({ '/app/invoices': () => page([invoiceWire()]) });
+
     expect(
-      await failureOf(
-        updateInvoice(detail.invoice.id, sale({ items: [medicineLine(450, 2)] })),
-      ),
-    ).toMatchObject({ status: 409 });
-    const { detail: changed } = await updateInvoice(
-      detail.invoice.id,
-      sale({ items: [medicineLine(450, 1)], remark: 'Collect tomorrow' }),
-    );
-    expect(changed.invoice.remark).toBe('Collect tomorrow');
-    expect(changed.invoice.items[0]?.batchNo).toBe('AZ771');
+      await fetchAllInvoices({
+        status: ['unpaid', 'partial'],
+        branchIds: [TEST_MONEY_BRANCH_ID, 'brn_thsaog1i8bv6m9rd9ucoy'],
+        day: TODAY,
+      }),
+    ).toEqual([invoiceRecord()]);
+    expect(queriesOf('/app/invoices')[0]).toMatchObject({
+      payment_status: 'unpaid,partial',
+      branch_id: `${TEST_MONEY_BRANCH_ID},brn_thsaog1i8bv6m9rd9ucoy`,
+      invoice_date_from: TODAY,
+      invoice_date_to: TODAY,
+      limit: 100,
+    });
   });
 });
 
-describe('deleteInvoice / restoreInvoice (S:1546)', () => {
-  it('deletes an unpaid invoice with its unused packages, and Undo brings both back', async () => {
-    const { detail } = await createInvoice(clinicInvoice({ items: [offeringLine(273)] }));
-    await deleteInvoice(detail.invoice.id, 'mistake', null);
-    expect(
-      clinicFixtures.invoices.snapshot((row) => row.id === detail.invoice.id),
-    ).toEqual([]);
-    expect(
-      clinicFixtures.patientPackages.snapshot(
-        (row) => row.invoiceId === detail.invoice.id,
-      ),
-    ).toEqual([]);
-    await restoreInvoice(detail.invoice.id);
-    expect(
-      clinicFixtures.patientPackages.snapshot(
-        (row) => row.invoiceId === detail.invoice.id,
-      ),
-    ).toHaveLength(1);
-  });
+describe('fetchInvoice', () => {
+  it('reads the invoice with its ledger entries and the sheet’s clinic and branch, once', async () => {
+    answer({
+      '/app/invoices/{invoice_id}': () => one(invoiceWire()),
+      '/app/payments': () => page([paymentWire()]),
+      ...SHEET_ANSWERS,
+    });
 
-  it('refuses an invoice with payments, and a sale’s (409)', async () => {
-    const paid = await createInvoice(
-      clinicInvoice({ paidNow: [{ mode: 'cash', amount: 100_000 }] }),
-    );
-    expect(
-      await failureOf(deleteInvoice(paid.detail.invoice.id, 'other', null)),
-    ).toMatchObject({
-      status: 409,
-      detail: `Invoice #${paid.detail.invoice.seq} has payments · refund them first`,
+    const detail = await fetchInvoice(TEST_INVOICE_ID);
+    await fetchInvoice(TEST_INVOICE_ID);
+
+    expect(detail.invoice).toEqual(invoiceRecord());
+    expect(detail.party).toEqual({
+      contactId: TEST_MONEY_CONTACT_ID,
+      patientId: TEST_MONEY_PATIENT_ID,
+      name: 'Kavya Mehta',
+      phone: '+919825005865',
     });
-    const sold = await createSale(sale({ items: [medicineLine(450, 1)] }));
-    expect(
-      await failureOf(deleteInvoice(sold.detail.invoice.id, 'other', null)),
-    ).toMatchObject({
-      status: 409,
+    expect(detail.sale).toBeNull();
+    expect(detail.payments.map((row) => row.seq)).toEqual([5]);
+    expect(queriesOf('/app/payments')[0]).toMatchObject({ invoice_id: TEST_INVOICE_ID });
+    expect(detail.sheet).toEqual({
+      organization: { name: 'Glow Clinic', specialties: ['skin'], currency: 'INR' },
+      branch: {
+        id: TEST_MONEY_BRANCH_ID,
+        name: 'Adajan',
+        phone: '+912612345678',
+        gstNumber: '24ABCDE1234F1Z5',
+        address: {
+          lineOne: '12 Ring Road',
+          lineTwo: null,
+          area: 'Adajan',
+          city: 'Surat',
+          state: 'Gujarat',
+          postalCode: '395009',
+        },
+      },
     });
+    expect(queriesOf('/tenancy/organization')).toHaveLength(1);
+    expect(queriesOf('/app/branches/my')).toHaveLength(1);
   });
 });
 
-describe('the drawer’s reads', () => {
-  it('reads Quick fill’s presets: packages, the last invoice of each type, the latest Rx', async () => {
-    const presets = await fetchInvoicePresets(DHARTI);
-    expect(presets.lastByType.clinic?.seq).toBe(787);
-    expect(presets.lastByType.consultation?.seq).toBe(786);
-    expect(presets.packages.length).toBeGreaterThan(0);
-    expect(presets.latestRx?.seq).toBe(497);
-    expect(presets.recentTeamIds.length).toBeGreaterThan(0);
-  });
+describe('fetchInvoicePresets', () => {
+  it('reads the packages with sessions left, the last invoice of each type and its team', async () => {
+    answer({
+      '/app/patients/{patient_id}/offerings': () =>
+        page([
+          {
+            id: 'pof_peel0000000000000000',
+            offering_id: HYDRAFACIAL,
+            offering_name: 'Hydrafacial',
+            sessions_total: 6,
+            sessions_used: 2,
+            sessions_left: 4,
+            is_package: true,
+            status: 'active',
+            valid_until: null,
+            invoice_id: TEST_INVOICE_ID,
+            created_at: '2026-10-01T05:00:00.000Z',
+            updated_at: '2026-10-01T05:00:00.000Z',
+          },
+        ]),
+      '/app/invoices': (query) =>
+        query.type === 'clinic'
+          ? page([
+              invoiceWire({
+                id: 'invc_clinic0000000000000',
+                invoice_sequence: 4,
+                type: 'clinic',
+                member_ids: ['mem_therapist000000000000'],
+              }),
+            ])
+          : page([invoiceWire({ member_ids: ['mem_doctor0000000000000000'] })]),
+    });
 
-  it('lists the names billed most, medicines apart from offerings (H:5058)', async () => {
-    const medical = await fetchOftenBilled('medical');
-    const clinic = await fetchOftenBilled('clinic');
-    expect(clinic.slice(0, 3)).toEqual(['LHR Half Leg', 'Underarm Peel', 'Back Peeling']);
-    expect(clinic).not.toContain('Flubolt 400');
-    expect(medical).not.toContain('Back Peeling');
-    expect(medical).toContain('Flubolt 400');
-  });
+    const presets = await fetchInvoicePresets(TEST_MONEY_PATIENT_ID);
 
-  it('finds Medical customers: patients, leads not yet patients, contacts', async () => {
-    const page = await searchSaleCustomers('viral');
-    expect(page.items).toEqual([
-      expect.objectContaining({ kind: 'contact', name: 'Viral Sheth' }),
+    expect(presets.packages).toEqual([{ offeringId: HYDRAFACIAL }]);
+    expect(presets.lastByType.clinic).toMatchObject({ seq: 4, type: 'clinic' });
+    expect(presets.lastByType.consultation).toMatchObject({ seq: 5 });
+    expect(presets.recentTeamIds).toEqual(['mem_doctor0000000000000000']);
+    expect(queriesOf('/app/invoices')).toEqual([
+      { patient_id: TEST_MONEY_PATIENT_ID, type: 'clinic', limit: 1 },
+      { patient_id: TEST_MONEY_PATIENT_ID, type: 'consultation', limit: 1 },
     ]);
-    const kinds = new Set((await searchSaleCustomers('')).items.map((row) => row.kind));
-    expect(kinds.has('patient')).toBe(true);
+  });
+});
+
+/** The preview as the API answers it. */
+const previewWire = {
+  type: 'clinic',
+  invoice_date: TODAY,
+  items: [
+    {
+      id: null,
+      line_number: 1,
+      offering_id: HYDRAFACIAL,
+      medicine_id: null,
+      name: 'Hydrafacial',
+      pack_size: null,
+      quantity: 1,
+      rate: 3500,
+      discount_percent: 0,
+      discount_amount: 0,
+      gst_percent: 18,
+      is_gst_inclusive: false,
+      taxable_amount: 3500,
+      gst_amount: 630,
+      amount: 4130,
+      patient_offering_suggestion_id: null,
+      batch_number: null,
+      offer_ids: ['ofr_diwali00000000000000'],
+      sessions_total: null,
+    },
+  ],
+  overall_discount: 0,
+  subtotal: 3500,
+  discount_total: 0,
+  taxable_total: 3500,
+  gst_total: 630,
+  total: 4130,
+  paid_amount: 0,
+  due_amount: 4130,
+};
+
+describe('the previews', () => {
+  it('previews a bill — no "Paid now", the person once picked — as the server prices it', async () => {
+    vi.mocked(api.post).mockResolvedValue(one(previewWire) as never);
+    const input = invoiceInput({
+      type: 'clinic',
+      contactId: null,
+      items: [
+        {
+          id: null,
+          offeringId: HYDRAFACIAL,
+          qty: 1,
+          discountPct: 12.345,
+          suggestionId: null,
+          treatmentIds: [],
+        },
+      ],
+      paidNow: [{ mode: 'cash', amount: 100 }],
+    });
+
+    const preview = await previewInvoice(input);
+
+    expect(api.post).toHaveBeenCalledWith('/app/invoices/preview', {
+      body: {
+        branch_id: TEST_MONEY_BRANCH_ID,
+        type: 'clinic',
+        invoice_date: '2026-10-10',
+        member_ids: [],
+        items: [
+          {
+            offering_id: HYDRAFACIAL,
+            quantity: 1,
+            discount_percent: 12.35,
+            patient_offering_suggestion_id: null,
+            patient_treatment_ids: [],
+          },
+        ],
+        overall_discount: 0,
+        remark: 'Paid at the desk',
+        patient_prescription_id: null,
+      },
+    });
+    expect(preview).toMatchObject({
+      total: 4130,
+      due: 4130,
+      items: [{ id: null, rate: 3500, offerIds: ['ofr_diwali00000000000000'] }],
+    });
   });
 
-  it('adds a Medical contact and saves its mobile on it', async () => {
-    const contact = await addMedicalContact('Neha Rao');
-    expect(contact).toMatchObject({ name: 'Neha Rao', phone: null });
-    await expect(
-      setMedicalContactPhone(contact.id, '+919876543210'),
-    ).resolves.toMatchObject({
-      phone: '+919876543210',
+  it('previews a change with only what differs', async () => {
+    vi.mocked(api.post).mockResolvedValue(one(previewWire) as never);
+
+    await previewInvoiceChange({
+      invoice: invoiceRecord(),
+      input: invoiceInput({ overallDiscount: 50 }),
     });
-    expect(await failureOf(setMedicalContactPhone(contact.id, '12345'))).toMatchObject({
-      status: 422,
+
+    expect(api.post).toHaveBeenCalledWith('/app/invoices/{invoice_id}/preview', {
+      params: { invoice_id: TEST_INVOICE_ID },
+      body: { overall_discount: 50 },
+    });
+  });
+});
+
+describe('the writes', () => {
+  it('bills with the lines by offering, the discount to two places and "Paid now"', async () => {
+    answer({ '/app/payments': () => page([]), ...SHEET_ANSWERS });
+    vi.mocked(api.post).mockResolvedValue(
+      one(
+        invoiceWire({
+          items: [
+            {
+              ...invoiceWire().items[0],
+              patient_offering_suggestion_id: 'psug_peel00000000000000000',
+            },
+          ],
+        }),
+      ) as never,
+    );
+
+    const result = await createInvoice({
+      input: invoiceInput({
+        items: [
+          {
+            id: null,
+            offeringId: CONSULTATION,
+            qty: 1,
+            discountPct: 0,
+            suggestionId: 'psug_peel00000000000000000',
+            treatmentIds: ['ptrt_peel0000000000000000'],
+          },
+        ],
+        paidNow: [{ mode: 'upi', amount: 400 }],
+      }),
+      idempotencyKey: 'key-bill',
+    });
+
+    expect(api.post).toHaveBeenCalledWith('/app/invoices', {
+      body: {
+        branch_id: TEST_MONEY_BRANCH_ID,
+        contact_id: TEST_MONEY_CONTACT_ID,
+        type: 'consultation',
+        invoice_date: '2026-10-10',
+        member_ids: [],
+        items: [
+          {
+            offering_id: CONSULTATION,
+            quantity: 1,
+            discount_percent: 0,
+            patient_offering_suggestion_id: 'psug_peel00000000000000000',
+            patient_treatment_ids: ['ptrt_peel0000000000000000'],
+          },
+        ],
+        overall_discount: 0,
+        remark: 'Paid at the desk',
+        patient_prescription_id: null,
+        payment: { splits: [{ mode: 'upi', amount: 400 }] },
+      },
+      idempotencyKey: 'key-bill',
+    });
+    expect(result.planLinked).toBe(1);
+    expect(result.detail.invoice.seq).toBe(5);
+  });
+
+  it('changes only what differs — every line, the kept ones by id, when one moved', async () => {
+    answer({ '/app/payments': () => page([]), ...SHEET_ANSWERS });
+    vi.mocked(api.patch).mockResolvedValue(one(invoiceWire()) as never);
+    const invoice = invoiceRecord();
+
+    await updateInvoice({
+      invoice,
+      input: invoiceInput({
+        teamIds: ['mem_doctor0000000000000000'],
+        items: [
+          {
+            id: 'iitm_7ocmisga5mzisg1w1uok1',
+            offeringId: CONSULTATION,
+            qty: 2,
+            discountPct: 0,
+            suggestionId: null,
+            treatmentIds: [],
+          },
+          {
+            id: null,
+            offeringId: HYDRAFACIAL,
+            qty: 1,
+            discountPct: 10,
+            suggestionId: null,
+            treatmentIds: [],
+          },
+        ],
+        remark: ' ',
+      }),
+      idempotencyKey: 'key-change',
+    });
+
+    expect(api.patch).toHaveBeenCalledWith('/app/invoices/{invoice_id}', {
+      params: { invoice_id: TEST_INVOICE_ID },
+      body: {
+        member_ids: ['mem_doctor0000000000000000'],
+        items: [
+          {
+            id: 'iitm_7ocmisga5mzisg1w1uok1',
+            offering_id: CONSULTATION,
+            quantity: 2,
+            discount_percent: 0,
+            patient_offering_suggestion_id: null,
+            patient_treatment_ids: [],
+          },
+          {
+            offering_id: HYDRAFACIAL,
+            quantity: 1,
+            discount_percent: 10,
+            patient_offering_suggestion_id: null,
+            patient_treatment_ids: [],
+          },
+        ],
+        remark: null,
+        expected_updated_at: invoice.updatedAt,
+      },
+      idempotencyKey: 'key-change',
     });
   });
 
-  it('answers a stored invoice’s ledger entries — what the print reads', async () => {
-    const detail = await fetchInvoice(ref.invoice(785));
-    expect(detail.balance).toMatchObject({
-      bill: 130_000,
-      paid: 60_000,
-      status: 'partial',
+  it('sends nothing when nothing changed', async () => {
+    answer({ '/app/payments': () => page([]), ...SHEET_ANSWERS });
+
+    const result = await updateInvoice({
+      invoice: invoiceRecord(),
+      input: invoiceInput(),
+      idempotencyKey: 'key-none',
     });
-    expect(invoicePaid(detail.invoice.id, detail.payments)).toBe(60_000);
+
+    expect(api.patch).not.toHaveBeenCalled();
+    expect(result.detail.invoice).toEqual(invoiceRecord());
+  });
+
+  it('deletes with the reason and note, restores with the action’s key', async () => {
+    vi.mocked(api.delete).mockResolvedValue({ data: undefined } as never);
+    vi.mocked(api.post).mockResolvedValue(one(invoiceWire()) as never);
+
+    await deleteInvoice({
+      invoiceId: TEST_INVOICE_ID,
+      reason: 'mistake',
+      note: 'Billed twice',
+    });
+    expect(api.delete).toHaveBeenCalledWith('/app/invoices/{invoice_id}', {
+      params: { invoice_id: TEST_INVOICE_ID },
+      reason: 'mistake',
+      note: 'Billed twice',
+    });
+
+    expect(await restoreInvoice(TEST_INVOICE_ID, 'key-restore')).toEqual(invoiceRecord());
+    expect(api.post).toHaveBeenCalledWith('/app/invoices/{invoice_id}/restore', {
+      params: { invoice_id: TEST_INVOICE_ID },
+      idempotencyKey: 'key-restore',
+    });
+  });
+});
+
+describe('belowLowestPriceLines', () => {
+  const refusal = (reason: string, fields: string[]) =>
+    new HttpError('Bad Request', 400, '/api/v1/app/invoices', 'POST', {
+      error: {
+        reason,
+        errors: fields.map((field) => ({ field, message: 'Below its lowest price' })),
+      },
+    });
+
+  it('names the lines a bill was refused for, by index', () => {
+    expect(
+      belowLowestPriceLines(refusal('below_lowest_price', ['items/0', 'body.items/2'])),
+    ).toEqual([0, 2]);
+  });
+
+  it('is empty for any other refusal', () => {
+    expect(belowLowestPriceLines(refusal('validation_failed', ['items/0']))).toEqual([]);
+    expect(belowLowestPriceLines(new Error('offline'))).toEqual([]);
   });
 });

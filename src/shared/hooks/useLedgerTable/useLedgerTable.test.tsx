@@ -2,8 +2,8 @@ import { renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import { listLedger } from '@/shared/api/clinic/payments-api.ts';
 import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
+import { listFixtureLedger } from '@/shared/api/clinic/payments-fixture-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useDevicePrefsStore } from '@/shared/store/useDevicePrefsStore/index.ts';
 
@@ -26,7 +26,7 @@ beforeEach(async () => {
   viewport.tier = 'desktop';
   resetClinicFixtures();
   useDevicePrefsStore.setState({ hiddenColumns: {} });
-  rows = [...(await listLedger({})).items];
+  rows = [...(await listFixtureLedger({})).items];
 });
 afterEach(() => {
   vi.useRealTimers();

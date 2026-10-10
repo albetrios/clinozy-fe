@@ -52,11 +52,6 @@ export const ensureContactThreadResultSchema = z.object({
 /** The person's thread, and whether this call opened it. */
 export type EnsureContactThreadResult = z.infer<typeof ensureContactThreadResultSchema>;
 
-/** TanStack Query keys for contact threads. */
-export const contactThreadQueryKeys = {
-  all: ['clinic', 'contact-threads'] as const,
-};
-
 /**
  * The person's thread: their lead, else their existing contact thread, else a
  * new contact thread (status and source empty, owner the signed-in member,

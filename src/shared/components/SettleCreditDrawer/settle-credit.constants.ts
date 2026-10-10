@@ -26,8 +26,19 @@ export const SETTLE_CREDIT_KEYS = {
   enterAmount: 'settleCredit.enterAmount',
   /** "More than the ₹500 owed". */
   moreThanOwed: 'settleCredit.moreThanOwed',
-  /** "₹500 given back to Tanvi Shah · Out entry added" / "₹800 got back from … · In entry added". */
+  /** The Branch chips (two or more open branches) and the Date the money moved on. */
+  branch: 'settleCredit.branch',
+  date: 'settleCredit.date',
+  /** "₹500 given back to Tanvi Shah · PAY-6 · CN-003" / "₹800 got back from … · PAY-7". */
   done: { give: 'settleCredit.done.give', take: 'settleCredit.done.take' },
+  /** The toast's entry when its numbers did not come back: "Out entry added" / "In entry added". */
+  entry: { give: 'settleCredit.entry.give', take: 'settleCredit.entry.take' },
+  /** `409 day_closed`: the day picked is closed at that branch — "pick an open day". */
+  dayClosed: 'settleCredit.dayClosed',
+  /** `409 more_than_paid`: a refund on the credit's invoice above what that invoice has paid. */
+  moreThanPaid: 'settleCredit.moreThanPaid',
+  /** `409 credit_closed`: settled in full meanwhile — "CR-2 is already settled". */
+  closed: 'settleCredit.closed',
 } as const;
 
 /** The drawer's base test id; its parts derive theirs (`-save`, `-splits-row` …). */

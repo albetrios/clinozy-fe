@@ -29,7 +29,7 @@ import {
 } from '@/shared/components/LedgerCells/index.ts';
 import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { useHiddenColumns } from '@/shared/hooks/useHiddenColumns/index.ts';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 
 /** The table's row as the meta line and the phone key read it. */
@@ -46,7 +46,7 @@ const rowOf = (original: unknown) => original as LedgerRow;
 function useLedgerColumns(): ColumnDef<DataTableFeatures, LedgerRow>[] {
   const { t } = useTranslation(LEDGER_NS);
   const { t: tClinic } = useTranslation(CLINIC_NS);
-  const formatPaise = usePaiseFormat();
+  const formatRupees = useRupeeFormat();
   const clock = useClinicClock();
   const phone = useViewportTier() === 'phone';
 
@@ -140,7 +140,7 @@ function useLedgerColumns(): ColumnDef<DataTableFeatures, LedgerRow>[] {
             row.direction === 'received'
               ? LEDGER_KEYS.ledger.received
               : LEDGER_KEYS.ledger.paid,
-            { amount: formatPaise(row.amount) },
+            { amount: formatRupees(row.amount) },
           );
         },
       },

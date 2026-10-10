@@ -1,51 +1,36 @@
 import { describe, expect, it } from 'vitest';
 
-import { lowerFirst, taskContactCard, taskSourceId } from './tasks.display.ts';
+import { taskPerson } from '@/tests/utils/task-doubles.ts';
 
-describe('taskSourceId', () => {
-  it('numbers a record with a seq, an invoice its own way', () => {
-    expect(taskSourceId({ kind: 'lead', seq: 2363 })).toBe('#2363');
-    expect(taskSourceId({ kind: 'appointment', seq: 2848 })).toBe('#2848');
-    expect(taskSourceId({ kind: 'treatment', seq: null })).toBe('');
-    expect(taskSourceId({ kind: 'invoice', seq: 12 })).toMatch(/12/);
+import { lowerFirst, taskContactCard, taskPersonKind } from './tasks.display.ts';
+
+describe('taskPersonKind', () => {
+  it('reads a patient file first, then an open lead, else a contact', () => {
+    expect(taskPersonKind({ patientId: 'pat_a', openLeadId: 'lead_b' })).toBe('patient');
+    expect(taskPersonKind({ patientId: null, openLeadId: 'lead_b' })).toBe('lead');
+    expect(taskPersonKind({ patientId: null, openLeadId: null })).toBe('contact');
   });
 });
 
 describe('taskContactCard (D32)', () => {
-  it('reads the person as their card does: kind, record and WhatsApp', () => {
-    expect(
-      taskContactCard({
-        person: {
-          name: 'Priti Soni',
-          firstName: 'Priti',
-          patientId: '11111111-1111-4111-8111-111111111111',
-          leadId: null,
-          isPatient: true,
-          kind: 'patient',
-          seq: 3508,
-          phone: '+919812345678',
-        },
-      }),
-    ).toEqual({
+  it('reads the person as their card does: kind, number and WhatsApp', () => {
+    expect(taskContactCard({ person: taskPerson() })).toEqual({
       kind: 'patient',
-      name: 'Priti Soni',
-      displayId: '#3508',
-      reach: [{ channel: 'whatsapp', phone: '+919812345678' }],
+      name: 'Kavya Mehta',
+      displayId: '#2',
+      reach: [{ channel: 'whatsapp', phone: '+919825005865' }],
     });
     expect(
       taskContactCard({
-        person: {
-          name: 'Zoya',
-          firstName: 'Zoya',
+        person: taskPerson({
           patientId: null,
-          leadId: '22222222-2222-4222-8222-222222222222',
-          isPatient: false,
-          kind: 'contact',
-          seq: null,
+          patientNumber: null,
+          openLeadId: 'lead_hplz5ew0h3tw99ntqf39w',
           phone: null,
-        },
+        }),
       }),
-    ).toMatchObject({ kind: 'contact', displayId: null, reach: [] });
+    ).toEqual({ kind: 'lead', name: 'Kavya Mehta', displayId: 'C-4', reach: [] });
+    expect(taskContactCard({ person: null })).toBeNull();
   });
 });
 

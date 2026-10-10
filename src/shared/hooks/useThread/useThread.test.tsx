@@ -94,7 +94,7 @@ const RECIPIENTS: Record<string, ChatRecipient> = {
  * The thread's fields are read during render, as a component would: TanStack
  * re-renders only for the fields a render read.
  */
-function renderChat(person: ChatPerson) {
+function renderChat(person: ChatPerson, onSent?: () => void) {
   const recipient = RECIPIENTS[chatPersonKey(person)] ?? { name: 'Someone', phone: null };
   return renderHook(
     () => {
@@ -102,7 +102,7 @@ function renderChat(person: ChatPerson) {
       return {
         thread: { data, isSuccess, isFetching },
         outbox: useThreadOutbox(person),
-        chat: useSendMessage(person, recipient),
+        chat: useSendMessage(person, recipient, { onSent }),
       };
     },
     { wrapper },
@@ -337,6 +337,24 @@ describe('a contact’s stream', () => {
       ]),
     );
     expect(notify.error).not.toHaveBeenCalled();
+  });
+
+  it('tells the host once the server took a message — never for a failed send (D81 T7)', async () => {
+    const onSent = vi.fn();
+    vi.mocked(sendContactActivity).mockRejectedValueOnce(new Error('offline'));
+    const { result } = renderChat(CONTACT, onSent);
+    await waitFor(() => expect(result.current.thread.isSuccess).toBe(true));
+
+    act(() => result.current.chat.send('whatsapp', 'Hello'));
+    await waitFor(() =>
+      expect(result.current.outbox).toEqual([
+        expect.objectContaining({ body: 'Hello', state: 'failed' }),
+      ]),
+    );
+    expect(onSent).not.toHaveBeenCalled();
+
+    act(() => result.current.chat.send('call', 'Called back'));
+    await waitFor(() => expect(onSent).toHaveBeenCalledOnce());
   });
 
   it('resends a failed entry through clinozy-be and refetches the stream', async () => {

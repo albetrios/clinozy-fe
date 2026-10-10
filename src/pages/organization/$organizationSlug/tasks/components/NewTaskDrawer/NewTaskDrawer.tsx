@@ -3,45 +3,33 @@ import { useForm, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { isolateText } from '@/lib/bidi-isolate.ts';
+import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import {
-  TASK_REMIND_MINUTES,
-  type TaskChange,
-} from '@/shared/api/clinic/tasks-contracts.ts';
-import { personFullName, shortPersonName } from '@/shared/components/Cells/index.ts';
-import { firstNameOf } from '@/shared/components/ChatColumn/index.ts';
+import type { TaskRecord } from '@/shared/api/clinic/tasks-contracts.ts';
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
-import { useFixtureLead } from '@/shared/hooks/useFixtureLeads/index.ts';
-import { useFixturePatient } from '@/shared/hooks/useFixturePatients/index.ts';
+import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useContact } from '@/shared/hooks/useContacts/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
-import { useNow } from '@/shared/hooks/useNow/index.ts';
+import { useLead } from '@/shared/hooks/useLeads/index.ts';
 import { useTaskDueAtWords } from '@/shared/hooks/useTaskDueLabel/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
-import {
-  type TaskAssignees,
-  useTaskAssignees,
-} from '../../hooks/useTaskAssignees/index.ts';
 import { TASKS_KEYS, TASKS_NS, TASKS_TEST_IDS } from '../../tasks.constants.ts';
 import type { TaskCreateSearch } from '../../tasks.dialog-search.ts';
+import { newTaskFieldsOf, type NewTaskForm, newTaskForm } from './new-task-form.ts';
 import {
-  type NewTaskForm,
-  newTaskForm,
-  newTaskInputOf,
-  newTaskOwnerId,
   type NewTaskPerson,
-} from './new-task-form.ts';
-import {
+  personOfContact,
   personOfLead,
-  personOfPatient,
-  usePersonRecordLabel,
+  usePersonKindLabel,
 } from './new-task-person.ts';
 import {
   NewTaskHowFields,
   NewTaskWhatFields,
   NewTaskWhenFields,
 } from './NewTaskDrawerFields.tsx';
+import { useNewTaskOwner } from './use-new-task-owner.ts';
 import { useNewTaskSave } from './use-new-task-save.ts';
 
 const K = TASKS_KEYS.newTask;
@@ -52,21 +40,19 @@ type NewTaskStepId = 'what' | 'when' | 'how';
 /** Which step holds each field — the server's refusal opens it. */
 const FIELD_STEPS: Readonly<Record<keyof NewTaskForm, NewTaskStepId>> = {
   person: 'what',
-  type: 'what',
   title: 'what',
   duePreset: 'when',
   dueDate: 'when',
   dueTime: 'when',
-  ownerId: 'when',
+  owner: 'when',
   priority: 'how',
-  remind: 'how',
   notes: 'how',
 };
 
 /** What New task hands the room once the task exists (D28: the list stays). */
 export interface NewTaskCreated {
-  change: TaskChange;
-  /** The assignee's short name ("Riya S."). */
+  task: TaskRecord;
+  /** The assignee's short name ("Riya S.") or queue ("Front desk"). */
   owner: string;
   /** The due as its chip reads ("Tomorrow 11 am"), else the picked day and time in words. */
   due: string;
@@ -74,58 +60,55 @@ export interface NewTaskCreated {
 
 /** Props of {@link NewTaskDrawer}. */
 export interface NewTaskDrawerProps {
-  /** `?lead=` / `?patient=` — whom the task is for, when opened from them. */
+  /** `?lead=` / `?contact=` — whom the task is for, when opened from them. */
   prefill: TaskCreateSearch;
   /** ×, Cancel, the backdrop, Esc — asking first once something was entered. */
   onClose: () => void;
   onCreated: (created: NewTaskCreated) => void;
 }
 
-/** The lead or patient the URL names, once read. */
+/**
+ * The person the URL names, once read: `?lead=` (`GET /app/leads/:id`, `lead:read`) — the task
+ * points at that lead — else `?contact=` (`GET /app/contacts/:id`). A link the member may not
+ * read, or a record gone, leaves "For" empty.
+ */
 function usePrefilledPerson(prefill: TaskCreateSearch): NewTaskPerson | null {
-  const patient = useFixturePatient(prefill.patient);
-  const lead = useFixtureLead(prefill.patient ? undefined : prefill.lead);
-  if (patient.data) return personOfPatient(patient.data);
-  if (lead.data) return personOfLead(lead.data);
-  return null;
+  const access = useClinicAccess();
+  const canReadLeads = access.isResolved && access.canCode('lead:read');
+  const lead = useLead(canReadLeads ? prefill.lead : undefined);
+  const contact = useContact(prefill.lead ? undefined : prefill.contact);
+  if (prefill.lead) return lead.data ? personOfLead(lead.data) : null;
+  return contact.data ? personOfContact(contact.data) : null;
 }
 
 /** The words the step heads, the footer and the toast read. */
 interface NewTaskWords {
-  typeLabel: string;
-  /** The assignee's short name ("Riya S."). */
+  /** The assignee's short name ("Riya S.") or queue ("Front desk"). */
   owner: string;
   due: string;
-  /** What an empty Title saves as ("Call back · Priti", H:6072). */
+  /** What an empty Title saves as ("Follow up · Priti", H:6072) — nothing without a person. */
   fallbackTitle: string;
 }
 
 function useNewTaskWords({
   values,
   person,
-  ownerId,
-  assignees,
-  now,
+  ownerName,
+  openedAt,
 }: {
   values: NewTaskForm;
   person: NewTaskPerson | null;
-  ownerId: string | null;
-  assignees: TaskAssignees;
-  now: Date;
+  ownerName: string;
+  openedAt: Date;
 }): NewTaskWords {
   const { t } = useTranslation(TASKS_NS);
   const dueAtWords = useTaskDueAtWords();
-  const owner = ownerId ? assignees.byId.get(ownerId) : undefined;
-  const typeLabel = t(K.type[values.type]);
   return {
-    typeLabel,
-    owner: owner ? shortPersonName(personFullName(owner)) : '',
+    owner: ownerName,
     due: values.duePreset
       ? t(K.due[values.duePreset])
-      : dueAtWords(values.dueDate, values.dueTime, now),
-    fallbackTitle: person
-      ? t(K.titleField.fallback, { type: typeLabel, first: firstNameOf(person.name) })
-      : typeLabel,
+      : dueAtWords(values.dueDate, values.dueTime, openedAt),
+    fallbackTitle: person ? t(K.titleField.fallback, { first: person.firstName }) : '',
   };
 }
 
@@ -133,81 +116,100 @@ function useNewTaskWords({
 function useStepHeads({
   values,
   person,
-  ownerId,
+  owner,
   openStep,
   words,
 }: {
   values: NewTaskForm;
   person: NewTaskPerson | null;
-  ownerId: string | null;
+  owner: string | null;
   openStep: string;
   words: NewTaskWords;
 }): Record<NewTaskStepId, Omit<DrawerStep, 'id' | 'content'>> {
   const { t } = useTranslation(TASKS_NS);
   const sum = (stepId: NewTaskStepId, parts: readonly (string | null | undefined)[]) =>
     openStep === stepId ? undefined : parts.filter(Boolean).join(' · ');
+  const title = values.title.trim();
+  // A title, or a person to name it after ("Follow up · <first name>").
+  const named = person !== null || title !== '';
   return {
     what: {
       title: t(K.steps.what),
-      missing: person ? [] : [t(K.forField.label)],
-      complete: Boolean(person && values.title.trim()),
-      summary: sum('what', [person?.name, values.title.trim() || words.typeLabel]),
+      missing: named ? [] : [t(K.titleField.label)],
+      complete: named,
+      summary: sum('what', [person?.name, title || words.fallbackTitle]),
     },
     when: {
       title: t(K.steps.when),
-      missing: ownerId ? [] : [t(K.owner.label)],
+      missing: owner ? [] : [t(K.owner.label)],
       summary: sum('when', [words.due, words.owner]),
     },
     how: {
       title: t(K.steps.how),
-      summary: sum('how', [
-        t(K.priority[values.priority]),
-        values.remind ? t(K.remind, { minutes: TASK_REMIND_MINUTES }) : null,
-      ]),
+      summary: sum('how', [t(K.priority[values.priority])]),
     },
   };
 }
 
 /**
- * New task (KICKOFF §6.10 New task, Q-T4; the design's unreachable 720px
- * drawer, H:1869–1882, H:6052–6074) on the shared record drawer: "New task"
- * over "For <person> · shows in Tasks and on this person’s timeline", and
- * three steps — "What needs doing" (For: the Picker over patients and leads,
- * prefilled by `?lead=` / `?patient=`; Type; Title), "When & who" (Due chips,
- * the date and "Due time"; "Assign to", the team picker — the lead's owner,
- * else the member) and "How & notes" (Normal · High, "Remind 15 min before",
- * Notes). The footer reads "↔ <record>" with "Add task". An empty title saves
- * as "<type> · <first name>". Exits ask before discarding what was entered.
- * Mounted per opening — the room renders it for `/tasks/create` alone.
+ * New task (KICKOFF §6.10 New task, Q-T4; the design's unreachable 720px drawer, H:1869–1882,
+ * H:6052–6074) on clinozy-be (`POST /app/tasks`, `task:create`), on the shared record drawer:
+ * "New task" over "For <person> · shows in Tasks and on this person’s timeline", and three steps —
+ * "What needs doing" (For: the person search, prefilled by `?lead=` / `?contact=`, optional; Title,
+ * required without a person), "When & who" (Due chips, the date and "Due time"; "Assign to": the
+ * team who can work tasks, then the role queues — the person's lead's owner by default, else the
+ * member) and "How & notes" (Normal · High, Notes). The footer reads "↔ <person> · <kind>" with
+ * "Add task". An empty title saves as "Follow up · <first name>". The task points at the person
+ * and, for a lead, at their lead. The day the chips count from is read once, when the drawer
+ * opens, so a retry sends the same body. Exits ask before discarding what was entered. Mounted
+ * per opening — the room renders it for `/tasks/create` alone.
  */
 export function NewTaskDrawer({ prefill, onClose, onCreated }: NewTaskDrawerProps) {
   const { t } = useTranslation(TASKS_NS);
-  const now = useNow();
+  const { t: tErrors } = useTranslation(ERRORS_NS);
+  const [openedAt] = useState(() => new Date());
+  const today = clinicToday(openedAt);
   const idPrefix = `new-task-${useId().replace(/:/g, '')}`;
-  const form = useForm<NewTaskForm>({ defaultValues: newTaskForm(clinicToday()) });
+  const form = useForm<NewTaskForm>({ defaultValues: newTaskForm(today) });
   const values = useFormValues(form);
   const { isDirty } = useFormState({ control: form.control });
   const [openStep, setOpenStep] = useState<string>('what');
+  const access = useClinicAccess();
   const prefilled = usePrefilledPerson(prefill);
-  const assignees = useTaskAssignees();
-  const viewer = assignees.viewer;
-  const recordLabel = usePersonRecordLabel();
+  const kindLabel = usePersonKindLabel();
 
-  // The URL's person arrives after the drawer opens; it holds until another is picked.
-  const person = values.person ?? prefilled;
-  const ownerId = newTaskOwnerId({ ...values, person }, viewer?.id ?? null);
-  const words = useNewTaskWords({ values, person, ownerId, assignees, now });
-  const heads = useStepHeads({ values, person, ownerId, openStep, words });
+  // The URL's person arrives after the drawer opens; it holds until another is picked or cleared.
+  const person = values.person === undefined ? prefilled : values.person;
+  const ownerPicker = useNewTaskOwner(person);
+  const owner = values.owner ?? ownerPicker.defaultKey;
+  const words = useNewTaskWords({
+    values,
+    person,
+    ownerName: ownerPicker.nameOf(owner),
+    openedAt,
+  });
+  const heads = useStepHeads({ values, person, owner, openStep, words });
   const { saveState, save } = useNewTaskSave({
     form,
-    input: () =>
-      newTaskInputOf(
-        { ...form.getValues(), person },
-        { ownerId, fallbackTitle: words.fallbackTitle },
-      ),
+    fields: () =>
+      newTaskFieldsOf(form.getValues(), {
+        person,
+        owner,
+        fallbackTitle: words.fallbackTitle,
+      }),
     onField: (field) => setOpenStep(FIELD_STEPS[field]),
-    onDone: (change) => onCreated({ change, owner: words.owner, due: words.due }),
+    onDone: (task) => onCreated({ task, owner: words.owner, due: words.due }),
   });
+
+  // Only a member with `task:create` writes (a View-as preview holds no code); the list offers
+  // New task to no one else.
+  const onSave = () => {
+    if (access.isResolved && !access.canCode('task:create')) {
+      notify.info(tErrors(ERRORS_KEYS.api.http403));
+      return;
+    }
+    void save();
+  };
 
   const fields = { form, values, idPrefix };
   const steps: DrawerStep[] = [
@@ -222,9 +224,9 @@ export function NewTaskDrawer({ prefill, onClose, onCreated }: NewTaskDrawerProp
       content: (
         <NewTaskWhenFields
           {...fields}
-          ownerId={ownerId}
-          ownerOptions={assignees.options}
-          today={clinicToday(now)}
+          owner={owner}
+          ownerOptions={ownerPicker.options}
+          today={today}
         />
       ),
     },
@@ -244,11 +246,17 @@ export function NewTaskDrawer({ prefill, onClose, onCreated }: NewTaskDrawerProp
       openStep={openStep}
       onOpenStepChange={setOpenStep}
       onMissing={(stepId) =>
-        notify.warning(t(stepId === 'what' ? K.forField.missing : K.owner.missing))
+        notify.warning(t(stepId === 'what' ? K.titleField.missing : K.owner.missing))
       }
-      summary={person ? t(K.footer, { person: recordLabel(person) }) : undefined}
+      summary={
+        person
+          ? t(K.footer, {
+              person: `${isolateText(person.name)} · ${kindLabel(person)}`,
+            })
+          : undefined
+      }
       saveLabel={t(K.save)}
-      onSave={() => void save()}
+      onSave={onSave}
       saveState={saveState}
       dirty={isDirty}
       testId={TASKS_TEST_IDS.newTask.drawer}

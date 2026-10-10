@@ -6,10 +6,10 @@ import { isolateJoin } from '@/lib/bidi-isolate.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import type { Branch, Role } from '@/shared/api/clinic/clinic-schema.ts';
 import {
-  invoiceQueryKeys,
+  fixtureInvoiceQueryKeys,
   searchSaleCustomers,
-} from '@/shared/api/clinic/invoices-api.ts';
-import type { SaleCustomerRow } from '@/shared/api/clinic/invoices-contracts.ts';
+} from '@/shared/api/clinic/invoices-fixture-api.ts';
+import type { SaleCustomerRow } from '@/shared/api/clinic/invoices-fixture-contracts.ts';
 import type { StaffProfile } from '@/shared/api/clinic/users-contracts.ts';
 import { CLINIC_KEYS } from '@/shared/clinic/clinic.constants.ts';
 import { formatClinicPhone, toClinicPhone } from '@/shared/clinic/clinic-phone.ts';
@@ -32,6 +32,7 @@ import {
   useSetMedicalContactPhone,
 } from '@/shared/hooks/useInvoices/index.ts';
 import { useStaffProfiles } from '@/shared/hooks/useTeam/index.ts';
+import { useTeamDirectory } from '@/shared/hooks/useTeamDirectory/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import {
@@ -55,13 +56,17 @@ const teamRank = (person: StaffProfile) => {
 };
 
 /**
- * The Team (Medical: "Prescribed by") options (`payments.md:139`): the active
- * team, doctors first, then therapists, counsellors and the rest — and anyone
- * already picked who has since left — each on their avatar with their role.
+ * A Medical sale's "Prescribed by" options (`payments.md:139`): the fixture world's active
+ * staff, doctors first, then therapists, counsellors and the rest — and anyone already picked
+ * who has since left — each on their avatar with their role.
  */
-function useTeamOptions(picked: readonly string[]): PickerOption<StaffProfile>[] {
+function useSaleTeamOptions(
+  picked: readonly string[],
+  enabled: boolean,
+): PickerOption<StaffProfile>[] {
   const { t } = useTranslation(INVOICE_DRAWER_NS);
   const staff = useStaffProfiles();
+  if (!enabled) return [];
   return (staff.data ?? [])
     .filter((person) => person.active || picked.includes(person.id))
     .sort(
@@ -77,6 +82,21 @@ function useTeamOptions(picked: readonly string[]): PickerOption<StaffProfile>[]
       keywords: [person.initials],
       data: person,
     }));
+}
+
+/**
+ * An invoice's Team options (`payments.md:139`): clinozy-be's active members by name, each on
+ * their avatar in their own tone — the team carries no roles to order by (M41).
+ */
+function useInvoiceTeamOptions(): PickerOption[] {
+  const team = useTeamDirectory();
+  return team.members.map((member) => ({
+    key: member.id,
+    label: member.name,
+    tone: member.tone,
+    leading: { kind: 'avatar', initials: member.initials },
+    keywords: [member.initials],
+  }));
 }
 
 /**
@@ -112,7 +132,7 @@ export interface InvoicePartyFieldsProps {
   idPrefix: string;
   branches: readonly Pick<Branch, 'id' | 'name' | 'tone'>[];
   readOnly: boolean;
-  /** An edit: the invoice keeps the patient or customer it bills. */
+  /** An edit: the invoice keeps the patient or customer it bills, and its branch. */
   lockedParty: boolean;
   /** The patient or customer was picked: the drawer prefills the team. */
   onParty: (party: InvoicePartyForm | null) => void;
@@ -123,12 +143,13 @@ export interface InvoicePartyFieldsProps {
 }
 
 /**
- * The first step, "Patient & team" (`payments.md:136–139`; H:5051): Branch
- * (two or more open branches), then Patient — the shared remote search, leads
- * shown but never taken, "New patient · “q”" stacking the full form — or, for
- * Medical, Customer: patients, leads and Medical contacts, "Add contact “q”"
- * saving one at once with a Mobile field under it — then Team ("Prescribed by"),
- * multi, "from Rhea’s team" once a patient is picked.
+ * The first step, "Patient & team" (`payments.md:136–139`; H:5051): Branch (two or more open
+ * branches; a saved invoice keeps its own), then Patient — the shared search over clinozy-be's
+ * patients (`GET /app/contacts?is_patient=true`), a pick carrying the contact the invoice bills
+ * — or, for a Medical sale, Customer: the fixture world's patients, leads and Medical contacts,
+ * "Add contact “q”" saving one at once with a Mobile field under it — then Team (clinozy-be's
+ * members; a sale's "Prescribed by" the fixture staff), multi, "from Rhea’s team" once a patient
+ * is picked.
  */
 export function InvoicePartyFields({
   form,
@@ -144,7 +165,9 @@ export function InvoicePartyFields({
   const { t } = useTranslation(INVOICE_DRAWER_NS);
   const medical = values.type === 'medical';
   const party = values.party;
-  const teamOptions = useTeamOptions(values.teamIds);
+  const saleTeam = useSaleTeamOptions(values.teamIds, medical);
+  const invoiceTeam = useInvoiceTeamOptions();
+  const teamOptions: PickerOption<unknown>[] = medical ? saleTeam : invoiceTeam;
   const partyId = `${idPrefix}-party`;
   const teamId = `${idPrefix}-team`;
   const firstName = party?.name.split(' ')[0];
@@ -164,7 +187,7 @@ export function InvoicePartyFields({
             onChange={(branchId) => {
               if (branchId) form.setValue('branchId', branchId, { shouldDirty: true });
             }}
-            disabled={readOnly}
+            disabled={readOnly || lockedParty}
             testId={INVOICE_DRAWER_TEST_IDS.branch}
           />
         </DrawerField>
@@ -179,35 +202,15 @@ export function InvoicePartyFields({
           onParty={onParty}
         />
       ) : (
-        <DrawerField
+        <PatientField
           span="half"
           stretch={false}
-          label={t(PATIENT_PICKER_KEYS.label)}
-          htmlFor={partyId}
-          required
-          hint={t(PATIENT_PICKER_KEYS.hint)}
-        >
-          <PatientPicker
-            id={partyId}
-            value={party?.kind === 'patient' ? party.id : null}
-            onChange={(patient) =>
-              onParty(
-                patient
-                  ? {
-                      kind: 'patient',
-                      id: patient.id,
-                      name: patient.name,
-                      phone: patient.phone,
-                    }
-                  : null,
-              )
-            }
-            disabled={readOnly || lockedParty}
-            onCreateFull={readOnly ? undefined : onNewPatient}
-            createFullLabel={t(K.fields.newPatient)}
-            testId={INVOICE_DRAWER_TEST_IDS.patient}
-          />
-        </DrawerField>
+          id={partyId}
+          party={party}
+          disabled={readOnly || lockedParty}
+          onParty={onParty}
+          onNewPatient={readOnly ? undefined : onNewPatient}
+        />
       )}
       {medical && party?.kind === 'contact' ? (
         <ContactMobileField
@@ -226,7 +229,7 @@ export function InvoicePartyFields({
           firstName ? t(K.fields.teamFrom, { name: firstName }) : t(K.fields.teamHint)
         }
       >
-        <Picker<StaffProfile>
+        <Picker
           id={teamId}
           multiple
           label={t(medical ? K.fields.prescribedBy : K.fields.team)}
@@ -251,6 +254,56 @@ export function InvoicePartyFields({
  * off the element it holds, so it rides on the component, not inside it.
  */
 type GridWidth = Pick<DrawerFieldProps, 'span' | 'stretch'>;
+
+/**
+ * An invoice's Patient: clinozy-be's patients (`GET /app/contacts?is_patient=true`) — a pick
+ * carries the contact the invoice bills.
+ */
+function PatientField({
+  id,
+  party,
+  disabled,
+  onParty,
+  onNewPatient,
+}: GridWidth & {
+  id: string;
+  party: InvoicePartyForm | null;
+  disabled: boolean;
+  onParty: (party: InvoicePartyForm | null) => void;
+  onNewPatient?: (query: string) => void;
+}) {
+  const { t } = useTranslation(INVOICE_DRAWER_NS);
+  return (
+    <DrawerField
+      label={t(PATIENT_PICKER_KEYS.label)}
+      htmlFor={id}
+      required
+      hint={t(PATIENT_PICKER_KEYS.hint)}
+    >
+      <PatientPicker
+        id={id}
+        value={party?.kind === 'patient' ? party.id : null}
+        onChange={(patient) =>
+          onParty(
+            patient
+              ? {
+                  kind: 'patient',
+                  id: patient.id,
+                  contactId: patient.contactId,
+                  name: patient.name,
+                  phone: patient.phone,
+                }
+              : null,
+          )
+        }
+        disabled={disabled}
+        onCreateFull={onNewPatient}
+        createFullLabel={t(K.fields.newPatient)}
+        testId={INVOICE_DRAWER_TEST_IDS.patient}
+      />
+    </DrawerField>
+  );
+}
 
 /**
  * A Medical sale's Customer (`payments.md:138`): patients, leads and Medical
@@ -298,7 +351,7 @@ function CustomerField({
         label={t(K.fields.customer)}
         placeholder={t(K.fields.customerPlaceholder)}
         searchPlaceholder={t(K.fields.customerPlaceholder)}
-        loadOptionsKey={invoiceQueryKeys.customers()}
+        loadOptionsKey={fixtureInvoiceQueryKeys.customers()}
         loadOptions={async (query, cursor) => {
           const page = await searchSaleCustomers(query, cursor ?? null);
           return {
@@ -312,12 +365,26 @@ function CustomerField({
         onChange={(_key, option) => {
           const row = option?.data;
           onParty(
-            row ? { kind: row.kind, id: row.id, name: row.name, phone: row.phone } : null,
+            row
+              ? {
+                  kind: row.kind,
+                  id: row.id,
+                  contactId: null,
+                  name: row.name,
+                  phone: row.phone,
+                }
+              : null,
           );
         }}
         onCreate={async (query) => {
           const contact = await addContact.mutateAsync(query.trim());
-          onParty({ kind: 'contact', id: contact.id, name: contact.name, phone: null });
+          onParty({
+            kind: 'contact',
+            id: contact.id,
+            contactId: null,
+            name: contact.name,
+            phone: null,
+          });
           notify.success(t(K.toasts.contactSaved, { name: contact.name }));
         }}
         createLabel={t(K.fields.addContact)}

@@ -55,7 +55,8 @@
     "unconfirmed": "Non confirmé",
     "waiting": "Attend depuis {{minutes}} min",
     "inRoom": "En salle depuis {{minutes}} min",
-    "rxApproved": "Ordonnance validée {{time}}"
+    "rxApproved": "Ordonnance validée {{time}}",
+    "toPay": "{{amount}} à payer"
   },
   "toasts": {
     "checkedIn": "Arrivée de {{name}} enregistrée · file du médecin et salle prévenues",

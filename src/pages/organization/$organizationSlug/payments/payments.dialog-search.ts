@@ -7,7 +7,7 @@
  * (`dialogSearch` in `routeTree.tsx`); the page that opens the drawer parses it,
  * and this module loads with the room.
  */
-import { matchOf, RECORD_ID, textOf } from '@/lib/routes/search-params.ts';
+import { matchOf, PUBLIC_ID, textOf } from '@/lib/routes/search-params.ts';
 import { CALENDAR_DATE } from '@/shared/api/clinic/clinic-list-filters.ts';
 
 /**
@@ -27,14 +27,17 @@ export function validatePaymentReceiveSearch(
   search: Record<string, unknown>,
 ): PaymentReceiveSearch {
   return {
-    patient: matchOf(RECORD_ID, search.patient),
-    invoice: matchOf(RECORD_ID, search.invoice),
+    patient: matchOf(PUBLIC_ID, search.patient),
+    invoice: matchOf(PUBLIC_ID, search.invoice),
     from: textOf(search.from) || undefined,
   };
 }
 
-/** A supplier bill in the URL: `md:<poId>` (Medical) or `is:<purchaseId>` (Clinic stock). */
-const BILL_PARAM = /^(md|is):[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i;
+/**
+ * A supplier bill in the URL: its purchase's public id — `mpo_…` (a Medical PO) or `spur_…` (a
+ * Clinic stock purchase); the prefix names the kind (`supplierBillRefOf`).
+ */
+const BILL_PARAM = /^(?:mpo|spur)_[a-z0-9]{21}$/;
 
 /** `/payments/pay` (`S:86`): the supplier bill Medical or Clinic stock's "Pay ₹X" opens it on. */
 export interface PaymentPaySearch {
@@ -58,6 +61,6 @@ export interface DayCloseSearch {
 export function validateDayCloseSearch(search: Record<string, unknown>): DayCloseSearch {
   return {
     date: matchOf(CALENDAR_DATE, search.date),
-    branch: matchOf(RECORD_ID, search.branch),
+    branch: matchOf(PUBLIC_ID, search.branch),
   };
 }

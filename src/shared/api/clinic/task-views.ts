@@ -6,7 +6,9 @@ import type { TaskRow, TaskTab } from './tasks-contracts.ts';
  * What the Tasks list derives from its rows (KICKOFF §6.10; `tasks.md:19, 30,
  * 58`): the groups a view shows and each row's due label — one model with
  * Today's aside (Q-T3). Pure, in the clinic's timezone, so they are tested
- * apart from React; the room turns the label into words.
+ * apart from React; the room turns the label into words. The server keeps the
+ * times — due, snoozed until, resolved — and the snooze's words; nothing here
+ * computes one.
  */
 
 /** One group of the list: To do's three by due time, then Snoozed and Done's one each. */
@@ -33,11 +35,14 @@ export interface TaskGroup<T> {
 /** What grouping and labelling read of a row. */
 type TaskTiming = Pick<
   TaskRow,
-  'status' | 'dueAt' | 'snoozeLabel' | 'resolvedBy' | 'resolvedAt'
+  'status' | 'dueAt' | 'snoozeLabel' | 'isResolvedAutomatically' | 'resolvedAt'
 >;
 
 /** An open task whose due time has passed — its edge and due label turn red. */
-export function isTaskOverdue(task: TaskTiming, now: Date): boolean {
+export function isTaskOverdue(
+  task: Pick<TaskRow, 'status' | 'dueAt'>,
+  now: Date,
+): boolean {
   return task.status === 'open' && Date.parse(task.dueAt) < now.getTime();
 }
 
@@ -51,7 +56,7 @@ const byDue = <T extends Pick<TaskRow, 'dueAt'>>(a: T, b: T) =>
  * the To do empty state. Snoozed and Done are one group each, kept even when
  * empty: their empty line renders under the header (§7.3).
  */
-export function groupTasks<T extends TaskTiming>(
+export function groupTasks<T extends Pick<TaskRow, 'dueAt'>>(
   rows: readonly T[],
   tab: TaskTab,
   now: Date,
@@ -82,7 +87,7 @@ type TaskDueUnit = 'minutes' | 'hours' | 'days';
  * A row's due label as data (`tasks.md:58, 309`; H:4219): overdue by minutes,
  * hours or days; due within 12 hours ("in 40 min", "in 3 h"); later on a day
  * and a clinic-local clock time; snoozed with the server's label; or done —
- * by Clinozy, or by a member at an instant.
+ * by Clinozy (the server closed it), or by a member at an instant.
  */
 export type TaskDueLabel =
   | { kind: 'overdue'; unit: TaskDueUnit; count: number }
@@ -128,7 +133,7 @@ export function taskDueAt(date: string, time: string): TaskDueAt {
  */
 export function taskDueLabel(task: TaskTiming, now: Date): TaskDueLabel {
   if (task.status === 'done') {
-    return task.resolvedBy === 'clinozy'
+    return task.isResolvedAutomatically
       ? { kind: 'doneByClinozy' }
       : { kind: 'done', at: task.resolvedAt };
   }

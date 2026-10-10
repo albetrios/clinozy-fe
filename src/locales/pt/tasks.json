@@ -9,13 +9,13 @@
     "treatments": "Tratamentos",
     "patients": "Pacientes",
     "team": "Equipe",
-    "payments": "Pagamentos"
+    "payments": "Pagamentos",
+    "medical": "Médico"
   },
   "rules": {
     "reply": {
       "label": "Mensagens sem resposta",
       "description": "Um lead escreveu e ninguém respondeu",
-      "automation": "Enviar a primeira resposta com preços e horários livres",
       "how": {
         "first": "Leia a última mensagem à direita",
         "second": "Responda com preços e dois horários livres",
@@ -39,7 +39,6 @@
     "follow": {
       "label": "Acompanhamentos de leads",
       "description": "A data de acompanhamento chegou",
-      "automation": "Enviar um contato amigável pelo WhatsApp",
       "how": {
         "first": "Veja o que interessava ao lead",
         "second": "Ligue ou mande WhatsApp com um lembrete amigável",
@@ -56,7 +55,7 @@
         },
         "noAnswer": {
           "label": "Sem resposta",
-          "effect": "Ligação registrada · tarefa adiada por 2 horas"
+          "effect": "Ligação registrada · tarefa adiada por 3 horas"
         },
         "notInterested": {
           "label": "Sem interesse",
@@ -75,7 +74,7 @@
       "outcomes": {
         "claimIt": {
           "label": "Assumir",
-          "effect": "Você passa a ser o responsável · {{owner}} continua envolvido"
+          "effect": "Você passa a ser o responsável"
         },
         "leaveWithOwner": {
           "label": "Deixar com o responsável",
@@ -86,7 +85,6 @@
     "failed": {
       "label": "Mensagens não entregues",
       "description": "O provedor não conseguiu entregar uma mensagem",
-      "automation": "Tentar novamente por SMS e depois marcar para ligação",
       "how": {
         "first": "Confira o número do celular",
         "second": "Reenvie por WhatsApp ou SMS",
@@ -99,11 +97,11 @@
         },
         "calledInstead": {
           "label": "Liguei em vez disso",
-          "effect": "Ligação registrada no lead"
+          "effect": "Ligação registrada"
         },
         "fixTheNumber": {
           "label": "Corrigir o número",
-          "effect": "Abre o lead para edição"
+          "effect": "Abre o cadastro para editar"
         }
       }
     },
@@ -131,7 +129,7 @@
         },
         "noAnswer": {
           "label": "Sem resposta",
-          "effect": "Ligação registrada · tarefa adiada por 2 horas"
+          "effect": "Ligação registrada · tarefa adiada por 3 horas"
         }
       }
     },
@@ -161,7 +159,6 @@
     "rebook": {
       "label": "Reagendar faltas",
       "description": "O paciente faltou à visita",
-      "automation": "Oferecer os próximos dois horários livres pelo WhatsApp",
       "how": {
         "first": "Ligue ou mande WhatsApp com dois horários livres",
         "second": "Agende o que escolherem",
@@ -194,7 +191,7 @@
       "outcomes": {
         "happy": {
           "label": "Satisfeito · 4–5★",
-          "effect": "Envia o link de avaliação do Google · abre o registro de avaliações"
+          "effect": "Abre o registro de avaliações"
         },
         "unhappy": {
           "label": "Insatisfeito",
@@ -206,14 +203,13 @@
         },
         "sentTheForm": {
           "label": "Formulário enviado",
-          "effect": "Registrado · adiado até amanhã"
+          "effect": "Adiado até amanhã"
         }
       }
     },
     "aftercare": {
       "label": "Ligações de pós-tratamento",
       "description": "Um tratamento pediu uma ligação de acompanhamento",
-      "automation": "Enviar o check-in de pós-tratamento pelo WhatsApp e registrar a resposta",
       "how": {
         "first": "Ligue e pergunte como está a pele",
         "second": "Confira se seguiram os cuidados",
@@ -236,7 +232,7 @@
     },
     "unhappy": {
       "label": "Pacientes insatisfeitos",
-      "description": "O feedback foi de 3★ ou menos",
+      "description": "Um paciente deu uma nota baixa ou ficou insatisfeito",
       "how": {
         "first": "Leia o feedback primeiro",
         "second": "O médico ou o gerente retorna a ligação",
@@ -256,7 +252,6 @@
     "nextvisit": {
       "label": "Próxima visita não definida",
       "description": "Uma visita foi concluída, mas não há data de acompanhamento nem próximo agendamento",
-      "automation": "Sugerir dois horários pelo WhatsApp e definir o acompanhamento quando escolherem um",
       "how": {
         "first": "Veja o que o médico recomendou",
         "second": "Ofereça dois horários para a próxima visita",
@@ -279,7 +274,7 @@
     },
     "noreply": {
       "label": "Pacientes regulares sumidos",
-      "description": "Um paciente regular ou com pacote não agenda há mais de 30 dias e não respondeu aos lembretes periódicos",
+      "description": "Um paciente com pacote tem sessões restantes, sem visita há mais de 30 dias e nada agendado",
       "how": {
         "first": "Veja o pacote e a última visita",
         "second": "Ligue uma vez e depois envie uma oferta de retorno",
@@ -292,13 +287,14 @@
         },
         "sendOffer": {
           "label": "Enviar oferta",
-          "effect": "Envia uma oferta de retorno pelo WhatsApp · adiado por uma semana"
+          "effect": "Adiado por uma semana"
         },
         "notComingBack": {
           "label": "Não vai voltar",
           "effect": "Fechado com motivo"
         }
-      }
+      },
+      "automation": "Abrir um lead de recaptação para a equipe"
     },
     "manual": {
       "label": "Acompanhamentos que você definiu",
@@ -329,29 +325,36 @@
       "outcomes": {
         "collectAtCheckout": {
           "label": "Cobrar no checkout",
-          "effect": "Adicionado ao checkout de hoje"
+          "effect": "Fechado · receba na saída"
         },
         "sendUpiLink": {
           "label": "Enviar link UPI",
-          "effect": "Link UPI na fila do WhatsApp"
+          "effect": "Fechado · envie o link pelo chat"
         },
         "called": {
           "label": "Ligado",
-          "effect": "Promessa de pagamento registrada"
+          "effect": "Fechado com sua nota"
+        }
+      },
+      "automation": "Enviar um lembrete de pagamento pelo WhatsApp"
+    },
+    "settleBy": {
+      "label": "Créditos a acertar",
+      "description": "Chegou a data de acerto de um crédito pendente",
+      "outcomes": {
+        "done": {
+          "label": "Concluído",
+          "effect": "Fechado · acerte em Pagamentos"
         }
       }
     },
-    "recall": {
-      "label": "Retorno",
-      "description": "Um paciente deve voltar para uma revisão",
+    "medicalRepVisit": {
+      "label": "Visitas de representantes",
+      "description": "Um representante tem visita prevista",
       "outcomes": {
-        "booked": {
-          "label": "Agendado",
-          "effect": "Agendado · confirmação na fila"
-        },
-        "later": {
-          "label": "Mais tarde",
-          "effect": "Adiado por 7 dias"
+        "done": {
+          "label": "Concluído",
+          "effect": "Fechado · registre a visita em Médico"
         }
       }
     }
@@ -418,12 +421,16 @@
     "result": "✓ {{result}}"
   },
   "sources": {
-    "lead": "Lead {{id}}",
-    "appointment": "Consulta {{id}}",
+    "lead": "Lead",
+    "appointment": "Consulta",
     "treatment": "Tratamento",
-    "patient": "Paciente {{id}}",
-    "invoice": "Fatura {{id}}",
-    "contact": "Contato"
+    "patient": "Paciente",
+    "invoice": "Fatura",
+    "contact": "Contato",
+    "checkIn": "Check-in",
+    "review": "Avaliação",
+    "pendingCredit": "Crédito",
+    "medicalRep": "Representante"
   },
   "due": {
     "snoozed": "Adiada · {{label}}",
@@ -458,7 +465,7 @@
   "newTask": {
     "title": "Nova tarefa",
     "sub": "Para {{person}} · aparece em Tarefas e na linha do tempo desta pessoa",
-    "subNoPerson": "Aparece em Tarefas e na linha do tempo da pessoa",
+    "subNoPerson": "Aparece em Tarefas — e na linha do tempo da pessoa quando é para alguém",
     "steps": {
       "what": "O que precisa ser feito",
       "when": "Quando e quem",
@@ -466,24 +473,15 @@
     },
     "forField": {
       "label": "Para",
-      "placeholder": "Escolha um paciente ou lead",
+      "placeholder": "Escolha uma pessoa",
       "search": "Busque por nome, celular ou número",
-      "empty": "Digite um nome, celular ou número do paciente",
-      "missing": "Escolha para quem é a tarefa"
-    },
-    "type": {
-      "label": "Tipo",
-      "callBack": "Retornar ligação",
-      "followUp": "Acompanhamento",
-      "sendPrice": "Enviar preço",
-      "askForPhotos": "Pedir fotos",
-      "feedback": "Feedback",
-      "paymentReminder": "Lembrete de pagamento"
+      "empty": "Digite um nome, celular ou número de contato"
     },
     "titleField": {
       "label": "Título",
       "placeholder": "O que precisa ser feito",
-      "fallback": "{{type}} · {{first}}"
+      "fallback": "Acompanhamento · {{first}}",
+      "missing": "Adicione um título ou escolha para quem é a tarefa"
     },
     "due": {
       "label": "Prazo",
@@ -503,7 +501,6 @@
       "normal": "Normal",
       "high": "Alta"
     },
-    "remind": "Lembrar {{minutes}} min antes",
     "notes": {
       "label": "Notas da tarefa",
       "placeholder": "Notas (opcional)"
@@ -525,11 +522,13 @@
     },
     "quote": "“{{message}}”",
     "source": {
-      "appointment": "Abrir consulta · {{record}}",
-      "lead": "Abrir lead · {{record}}",
-      "treatment": "Abrir paciente · {{record}}",
-      "patient": "Abrir paciente · {{record}}",
-      "invoice": "Abrir fatura · {{record}}"
+      "appointment": "Abrir consulta",
+      "lead": "Abrir lead",
+      "treatment": "Abrir tratamento",
+      "patient": "Abrir paciente",
+      "invoice": "Abrir fatura",
+      "checkIn": "Abrir check-in",
+      "review": "Abrir avaliação"
     },
     "tiles": {
       "visit": "Visita",
@@ -549,29 +548,32 @@
       "visit": "{{day}} · {{time}} · {{minutes}} min",
       "session": "nº {{number}}"
     },
-    "automation": {
-      "title": "O {{productName}} pode fazer isso",
-      "action": "Deixar o {{productName}} fazer"
-    },
     "outcomeNote": {
       "label": "Nota do resultado",
       "placeholder": "Adicione uma nota ao resultado (opcional)"
     },
     "snooze": "Adiar",
     "assigned": "Atribuída",
-    "assignTip": "Passe esta tarefa para outra pessoa · a anterior continua envolvida",
+    "assignTip": "Passe esta tarefa para outra pessoa",
     "searchTeam": "Buscar na equipe",
     "was": "Antes {{names}}",
-    "close": "Fechar"
+    "close": "Fechar",
+    "subByHand": "Adicionada manualmente",
+    "assignGroups": {
+      "team": "Equipe",
+      "queues": "Filas por função"
+    },
+    "deleteTitle": "Excluir esta tarefa?"
   },
   "toasts": {
     "closed": "{{title}} · {{result}}",
     "snoozed": "Adiada · {{label}}",
-    "claimed": "Agora {{name}} é seu · {{owner}} continua envolvido",
-    "claimedUnowned": "Agora {{name}} é seu",
-    "moved": "{{title}} → {{name}} · {{previous}} continua envolvido",
-    "movedUnowned": "{{title}} → {{name}}",
-    "automation": "O {{productName}} está cuidando disso · {{automation}}"
+    "claimed": "Agora {{name}} é seu",
+    "moved": "{{title}} → {{name}}",
+    "removed": "{{title}} removida",
+    "alreadyClosed": "Esta tarefa já foi encerrada",
+    "claimNeedsLeads": "Assumir um lead exige acesso para editar leads — peça a um proprietário ou administrador",
+    "reassignNeedsLeads": "Mover a tarefa de um lead exige acesso para editar leads — peça a um proprietário ou administrador"
   },
   "whatsNext": {
     "title": "Qual o próximo passo com {{first}}?",
@@ -597,6 +599,7 @@
     "pickWhen": "Escolha quando",
     "created": "Próxima tarefa definida · {{step}} · {{when}}",
     "taskTitle": "{{step}} · {{first}}",
-    "plannedAfter": "Planejada após: {{after}}"
+    "plannedAfter": "Planejada após: {{after}}",
+    "titleNoPerson": "E agora?"
   }
 }

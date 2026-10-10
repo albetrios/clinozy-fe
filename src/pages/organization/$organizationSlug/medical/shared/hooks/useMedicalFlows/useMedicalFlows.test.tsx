@@ -8,7 +8,7 @@ import {
   clinicFixtures,
   resetClinicFixtures,
 } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import { paymentQueryKeys } from '@/shared/api/clinic/payments-api.ts';
+import { fixtureLedgerQueryKeys } from '@/shared/api/clinic/payments-fixture-api.ts';
 
 import { medicalQueryKeys } from '../../medical-api.ts';
 import {
@@ -113,7 +113,7 @@ describe('the purchase-order writes', () => {
         input: { lines: [{ arrived: true, batchNo: 'B-1', expiry: '12/27' }] },
       });
     });
-    expect(invalidated(spy)).toContainEqual(paymentQueryKeys.openBills());
+    expect(invalidated(spy)).toContainEqual(fixtureLedgerQueryKeys.openBills());
 
     await act(async () => {
       await result.current.cancel.mutateAsync({
@@ -135,7 +135,7 @@ describe('the sale writes', () => {
     await act(async () => {
       await result.current.collect.mutateAsync(ref.medicalSale(978));
     });
-    expect(invalidated(spy)).toContainEqual(paymentQueryKeys.all);
+    expect(invalidated(spy)).toContainEqual(fixtureLedgerQueryKeys.all);
 
     await act(async () => {
       const back = await result.current.returnSale.mutateAsync({

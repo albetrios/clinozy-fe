@@ -12,7 +12,6 @@ import { patientRef } from './fixtures/patients.fixtures.ts';
 import { ref } from './fixtures/refs.fixtures.ts';
 import { FIXTURE_VIEWER_ID } from './fixtures/staff.fixtures.ts';
 import { clinicFixtures, resetClinicFixtures } from './fixtures/world.fixtures.ts';
-import { fetchTaskPage } from './tasks-api.ts';
 
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] });
@@ -106,7 +105,7 @@ describe('ensureContactThread — opening a thread', () => {
   });
 
   it('seeds a task’s thread with its appointment, or else the task’s title', async () => {
-    const tasks = (await fetchTaskPage({ scope: 'everyone' })).rows;
+    const tasks = clinicFixtures.tasks.snapshot();
     const recall = tasks.find((row) => row.title === 'Recall Tanvi');
     const { lead } = await ensureContactThread({
       name: 'Tanvi Shah',
@@ -128,28 +127,6 @@ describe('ensureContactThread — opening a thread', () => {
         (message) => message.leadId === meera.lead.id,
       )[0]?.body,
     ).toBe('Appointment #2841 · Hydrafacial');
-  });
-
-  it('keeps the new thread out of the task rules — an inbound message there needs no Reply task', async () => {
-    const { lead } = await ensureContactThread({
-      name: 'Meera Joshi',
-      patientId: patientRef('Meera Joshi'),
-    });
-    await clinicFixtures.leadMessages.create({
-      leadId: lead.id,
-      channel: 'whatsapp',
-      direction: 'received',
-      body: 'Can I come Friday?',
-      deliveryStatus: 'delivered',
-      isSystem: false,
-      authorId: null,
-      taskId: null,
-      sentAt: clinicInstant('2026-10-03', '09:59'),
-    });
-    const titles = (await fetchTaskPage({ scope: 'everyone', type: ['reply'] })).rows.map(
-      (row) => row.title,
-    );
-    expect(titles).not.toContain('Reply to Meera');
   });
 
   it('refuses a person it cannot identify, an unknown patient, or a contact with no mobile', async () => {

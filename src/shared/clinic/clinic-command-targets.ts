@@ -11,7 +11,10 @@ import {
   organizationPatientEdit,
 } from '@/lib/routes/patient-file-builders.ts';
 import { organizationPatientCreate } from '@/lib/routes/patients-builders.ts';
-import { organizationPaymentReceive } from '@/lib/routes/payments-builders.ts';
+import {
+  organizationPaymentEdit,
+  organizationPaymentReceive,
+} from '@/lib/routes/payments-builders.ts';
 
 import { CLINIC_SECTION_ROUTES } from './clinic-home.ts';
 
@@ -21,6 +24,7 @@ export type ClinicCommandTarget =
   | 'newAppointment'
   | 'newPatient'
   | 'newReceipt'
+  | 'paymentEdit'
   | 'newInvoice'
   | 'openTasks'
   | 'patient'
@@ -46,6 +50,7 @@ export type ClinicCommandTarget =
  * | `newAppointment` | `/appointments/create`         | live (L-36; the form L-38)     |
  * | `newPatient`     | `/patients/create`             | live (L-32; the drawer L-32b)  |
  * | `newReceipt`     | `/payments/receive`            | live (L-39; the drawer L-39b)  |
+ * | `paymentEdit`    | `/payments/$paymentId/edit`    | live (the file's Payments)     |
  * | `newInvoice`     | `/invoices/create`             | live (L-40)                    |
  * | `openTasks`      | `/tasks`                       | live                           |
  * | `patient`        | `/patients/$patientId`         | live (L-42; lands on Overview) |
@@ -65,6 +70,7 @@ export const CLINIC_COMMAND_TARGETS: Readonly<Record<ClinicCommandTarget, string
   newAppointment: organizationAppointmentCreate('').to,
   newPatient: organizationPatientCreate('').to,
   newReceipt: organizationPaymentReceive('').to,
+  paymentEdit: organizationPaymentEdit('', '').to,
   newInvoice: organizationInvoiceCreate('').to,
   openTasks: CLINIC_SECTION_ROUTES.tasks,
   patient: organizationPatient('', '').to,
@@ -82,16 +88,19 @@ const RECORD_PARAM: Readonly<Partial<Record<ClinicCommandTarget, string>>> = {
   lead: 'leadId',
   invoice: 'invoiceId',
   invoiceEdit: 'invoiceId',
+  paymentEdit: 'paymentId',
 };
 
 /**
  * The drawers that keep the page they open from behind them through `from`
- * (KICKOFF §4: `/invoices/*`, `/payments/receive`, `/appointments/create`,
- * `/medical/sales/create`); the others open over their own room.
+ * (KICKOFF §4: `/invoices/*`, `/payments/receive`, an entry's
+ * `/payments/$paymentId/edit`, `/appointments/create`, `/medical/sales/create`);
+ * the others open over their own room.
  */
 const KEEPS_REFERRER: ReadonlySet<ClinicCommandTarget> = new Set([
   'newAppointment',
   'newReceipt',
+  'paymentEdit',
   'newInvoice',
   'invoice',
   'invoiceEdit',

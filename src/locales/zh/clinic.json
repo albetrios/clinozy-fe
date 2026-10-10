@@ -1116,8 +1116,7 @@
     "placeholder": "搜索患者",
     "hint": "只能选择患者",
     "due": "欠款 {{amount}}",
-    "nothingDue": "无欠款",
-    "lead": "线索 {{id}} · 还不是患者"
+    "nothingDue": "无欠款"
   },
   "splitRows": {
     "mode": "方式",
@@ -1149,8 +1148,17 @@
     "enterAmount": "请输入金额",
     "moreThanOwed": "超过应结的 {{amount}}",
     "done": {
-      "give": "已退还 {{amount}} 给 {{name}} · 已新增支出",
-      "take": "已从 {{name}} 收回 {{amount}} · 已新增收入"
+      "give": "已退还 {{amount}} 给 {{name}} · {{entry}}",
+      "take": "已从 {{name}} 收回 {{amount}} · {{entry}}"
+    },
+    "branch": "分店",
+    "date": "日期",
+    "dayClosed": "该分店当日已结账 · 请选择未结账的日期",
+    "moreThanPaid": "超过其发票已付金额",
+    "closed": "{{ref}} 已结清",
+    "entry": {
+      "give": "已新增支出",
+      "take": "已新增收入"
     }
   },
   "quickLine": {
@@ -1218,7 +1226,8 @@
       "quickFill": "快速填写",
       "paidNow": "本次已付",
       "remark": "备注",
-      "remarkPlaceholder": "显示在打印的发票上"
+      "remarkPlaceholder": "显示在打印的发票上",
+      "paid": "已付金额"
     },
     "customerGroups": {
       "patient": "患者",
@@ -1258,9 +1267,11 @@
       "inStock": "库存 {{count}}",
       "outOfStock": "缺货",
       "belowFloor": "低于 {{name}} 的最低价 {{amount}}",
-      "tooMuchDiscount": "{{name}} 折扣过大 · 请询问管理员",
       "newMedicineName": "新药品名称",
-      "medicineAdded": "已添加 {{name}} · 稍后在库存中设置零售价"
+      "medicineAdded": "已添加 {{name}} · 稍后在库存中设置零售价",
+      "hintInvoice": "2 = 数量 · 10% = 折扣",
+      "belowLowest": "低于 {{name}} 的最低价",
+      "offerApplied": "已应用优惠：{{offer}}"
     },
     "payment": {
       "full": "全额 · {{mode}} {{amount}}",
@@ -1277,7 +1288,12 @@
       "discountGst": "折扣 + GST",
       "discountGstValue": "{{discount}} · +{{gst}}",
       "bill": "账单",
-      "dueAfter": "本次后欠款"
+      "dueAfter": "本次后欠款",
+      "preview": "按保存时的价格计算",
+      "pending": "正在计算价格…",
+      "refused": "无法计价 · 请修正标记的行",
+      "failed": "无法计算此发票",
+      "retry": "重试"
     },
     "badges": {
       "bill": "账单 {{amount}}",
@@ -1311,7 +1327,7 @@
       "paidAboveBill": "已付 {{paid}} 超过账单 {{bill}}",
       "stock": "{{name}} 仅剩 {{count}}",
       "belowFloor": "{{name}} 低于最低价 {{amount}} · 请提高最终价格",
-      "tooMuchDiscount": "{{name}} 折扣超出允许范围 · 请提高最终价格或询问管理员"
+      "belowLowest": "{{name}} 低于其最低价 · 请提高最终价格"
     },
     "toasts": {
       "created": {
@@ -1334,7 +1350,22 @@
       "medical": "药品发票 #{{seq}}",
       "consultation": "问诊发票 #{{seq}}"
     },
-    "record": "发票"
+    "record": "发票",
+    "refusals": {
+      "moreThanDue": "本次付款超过账单金额",
+      "dayClosed": "该日已结账 · 无法添加付款",
+      "settled": "此发票已结清 · 其中一笔付款位于已结账的日期",
+      "belowPaid": "账单不能低于已付金额",
+      "offeringInUse": "此套餐已有疗程被使用 · 请保留该行",
+      "treatmentBilled": "此发票中的一项治疗已在其他发票中计费 · 请移除后重新保存",
+      "ofSale": "此发票属于药品销售 · 请在药品中修改",
+      "paid": "此发票已有付款或贷项通知单 · 无法删除",
+      "inUseDelete": "此套餐已有疗程被使用 · 无法删除发票"
+    },
+    "notices": {
+      "settled": "已结清 · 此发票有一笔付款位于已结账的日期，因此无法修改",
+      "sale": "药品销售的发票 · 请在药品中修改"
+    }
   },
   "printPreview": {
     "title": "打印预览 · {{title}}",

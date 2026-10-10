@@ -1,8 +1,9 @@
 import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
+import { fetchInvoiceTotals } from '@/shared/api/clinic/invoices-api.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 import {
@@ -17,6 +18,22 @@ import {
   resetPatientFile,
 } from '../../../__tests__/integration/patient-file-test-router.tsx';
 import { usePatientFileActions } from './usePatientFileActions.ts';
+
+const { notifyMock } = vi.hoisted(() => ({
+  notifyMock: {
+    success: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    warning: vi.fn(),
+    undo: vi.fn(),
+    dismiss: vi.fn(),
+  },
+}));
+vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
+vi.mock('@/shared/api/clinic/invoices-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchInvoiceTotals: vi.fn(),
+}));
 
 const FILE = `/organization/acme/patients/${TEST_PATIENT_ID}`;
 
@@ -79,17 +96,25 @@ function signedInWith(codes: OrganizationPermission[]) {
   });
 }
 
+beforeEach(() => {
+  for (const fn of Object.values(notifyMock)) fn.mockReset();
+  // She owes ₹100 over every invoice of hers — the server's `meta.due_total`.
+  vi.mocked(fetchInvoiceTotals).mockReset();
+  vi.mocked(fetchInvoiceTotals).mockResolvedValue({ due: 100, paid: 400, count: 1 });
+});
 afterEach(() => {
   resetPatientFile();
 });
 
 describe('usePatientFileActions', () => {
-  it('offers the Owner the six items in the menu’s order — no Invoice or Payment', async () => {
+  it('offers the Owner the eight items in the menu’s order', async () => {
     renderInPatientFile(<ActionsProbe />, { file: patientFile(), role: 'owner' });
     await screen.findByRole('button', { name: 'prescription' });
     expect(itemIds()).toEqual([
       'prescription',
       'treatment',
+      'invoice',
+      'payment',
       'photo',
       'appointment',
       'report',
@@ -97,7 +122,7 @@ describe('usePatientFileActions', () => {
     ]);
   });
 
-  it('gives each section its own primary, and none to the billing sections', async () => {
+  it('gives each section its own primary — New invoice, Record payment on the billing ones', async () => {
     renderInPatientFile(<ActionsProbe />, { file: patientFile(), role: 'owner' });
     await screen.findByRole('button', { name: 'prescription' });
     expect(screen.getByTestId('primaries')).toHaveTextContent(
@@ -107,8 +132,8 @@ describe('usePatientFileActions', () => {
         'treatments:treatment',
         'images:photo',
         'reports:report',
-        'invoices:-',
-        'payments:-',
+        'invoices:invoice',
+        'payments:payment',
         'timeline:-',
         'packages:-',
         'notes:-',
@@ -125,7 +150,14 @@ describe('usePatientFileActions', () => {
   it('keeps the Rx and treatment items to their named roles in View-as (S:35, 38)', async () => {
     renderInPatientFile(<ActionsProbe />, { file: patientFile(), role: 'front_desk' });
     await screen.findByRole('button', { name: 'appointment' });
-    expect(itemIds()).toEqual(['photo', 'appointment', 'report', 'note']);
+    expect(itemIds()).toEqual([
+      'invoice',
+      'payment',
+      'photo',
+      'appointment',
+      'report',
+      'note',
+    ]);
   });
 
   it('asks a signed-in member’s own codes for every item', async () => {
@@ -154,6 +186,63 @@ describe('usePatientFileActions', () => {
       await screen.findByRole('button', { name: 'prescription' }),
     ).toBeInTheDocument();
     expect(itemIds()).toEqual(['prescription', 'photo', 'report', 'note']);
+
+    signedInWith(['patient:read', 'payment:read', 'payment:create']);
+    expect(await screen.findByRole('button', { name: 'invoice' })).toBeInTheDocument();
+    expect(itemIds()).toEqual(['invoice', 'payment']);
+  });
+
+  it('bills the patient in the Invoice drawer over her section (A-P1)', async () => {
+    const user = userEvent.setup();
+    const { router } = renderInPatientFile(<ActionsProbe />, {
+      file: patientFile(),
+      section: 'invoices',
+    });
+    await user.click(await screen.findByRole('button', { name: 'invoice' }));
+    await waitFor(() =>
+      expect(shownLocation(router).pathname).toBe('/organization/acme/invoices/create'),
+    );
+    expect(shownLocation(router).search).toEqual({
+      type: 'clinic',
+      patient: TEST_PATIENT_ID,
+      from: `patients/${TEST_PATIENT_ID}/invoices`,
+    });
+    expect(router.state.location.pathname).toBe(`${FILE}/invoices`);
+  });
+
+  it('receives a payment from her while the server says she owes', async () => {
+    const user = userEvent.setup();
+    const { router } = renderInPatientFile(<ActionsProbe />, {
+      file: patientFile(),
+      section: 'payments',
+    });
+    await waitFor(() => expect(fetchInvoiceTotals).toHaveBeenCalled());
+    await user.click(await screen.findByRole('button', { name: 'payment' }));
+    await waitFor(() =>
+      expect(shownLocation(router).pathname).toBe('/organization/acme/payments/receive'),
+    );
+    expect(shownLocation(router).search).toEqual({
+      patient: TEST_PATIENT_ID,
+      from: `patients/${TEST_PATIENT_ID}/payments`,
+    });
+    expect(fetchInvoiceTotals).toHaveBeenCalledWith({ patientId: TEST_PATIENT_ID });
+  });
+
+  it('says "Nothing due" instead of Receive when the server says she owes nothing', async () => {
+    vi.mocked(fetchInvoiceTotals).mockResolvedValue({ due: 0, paid: 400, count: 1 });
+    const user = userEvent.setup();
+    const { router } = renderInPatientFile(<ActionsProbe />, {
+      file: patientFile(),
+      section: 'payments',
+    });
+    await waitFor(() => expect(fetchInvoiceTotals).toHaveBeenCalled());
+    const payment = await screen.findByRole('button', { name: 'payment' });
+    await waitFor(async () => {
+      await user.click(payment);
+      expect(notifyMock.info).toHaveBeenCalled();
+    });
+    expect(router.state.location.pathname).toBe(`${FILE}/payments`);
+    expect(shownLocation(router).pathname).toBe(`${FILE}/payments`);
   });
 
   it('opens a record’s drawer over its section', async () => {

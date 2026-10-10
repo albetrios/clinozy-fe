@@ -9,13 +9,13 @@
     "treatments": "Behandlungen",
     "patients": "Patienten",
     "team": "Team",
-    "payments": "Zahlungen"
+    "payments": "Zahlungen",
+    "medical": "Medizin"
   },
   "rules": {
     "reply": {
       "label": "Unbeantwortete Nachrichten",
       "description": "Ein Lead hat geschrieben und niemand hat geantwortet",
-      "automation": "Die erste Antwort mit Preisen und freien Terminen senden",
       "how": {
         "first": "Die letzte Nachricht rechts lesen",
         "second": "Mit Preisen und zwei freien Terminen antworten",
@@ -39,7 +39,6 @@
     "follow": {
       "label": "Lead-Nachfassungen",
       "description": "Das Nachfassdatum ist erreicht",
-      "automation": "Eine freundliche Nachfrage per WhatsApp senden",
       "how": {
         "first": "Prüfen, wofür Interesse bestand",
         "second": "Freundlich anrufen oder per WhatsApp erinnern",
@@ -56,7 +55,7 @@
         },
         "noAnswer": {
           "label": "Keine Antwort",
-          "effect": "Anruf protokolliert · Aufgabe pausiert 2 Stunden"
+          "effect": "Anruf protokolliert · Aufgabe pausiert 3 Stunden"
         },
         "notInterested": {
           "label": "Kein Interesse",
@@ -75,7 +74,7 @@
       "outcomes": {
         "claimIt": {
           "label": "Übernehmen",
-          "effect": "Du wirst verantwortlich · {{owner}} bleibt beteiligt"
+          "effect": "Du wirst verantwortlich"
         },
         "leaveWithOwner": {
           "label": "Beim Verantwortlichen lassen",
@@ -86,7 +85,6 @@
     "failed": {
       "label": "Nicht zugestellte Nachrichten",
       "description": "Der Anbieter konnte eine Nachricht nicht zustellen",
-      "automation": "Per SMS erneut versuchen, dann für einen Anruf markieren",
       "how": {
         "first": "Die Mobilnummer prüfen",
         "second": "Per WhatsApp oder SMS erneut senden",
@@ -99,11 +97,11 @@
         },
         "calledInstead": {
           "label": "Stattdessen angerufen",
-          "effect": "Anruf am Lead protokolliert"
+          "effect": "Anruf protokolliert"
         },
         "fixTheNumber": {
           "label": "Nummer korrigieren",
-          "effect": "Öffnet den Lead zum Bearbeiten"
+          "effect": "Öffnet den Datensatz zum Bearbeiten"
         }
       }
     },
@@ -131,7 +129,7 @@
         },
         "noAnswer": {
           "label": "Keine Antwort",
-          "effect": "Anruf protokolliert · Aufgabe pausiert 2 Stunden"
+          "effect": "Anruf protokolliert · Aufgabe pausiert 3 Stunden"
         }
       }
     },
@@ -161,7 +159,6 @@
     "rebook": {
       "label": "Nicht Erschienene neu buchen",
       "description": "Der Patient hat den Besuch verpasst",
-      "automation": "Die nächsten zwei freien Termine per WhatsApp anbieten",
       "how": {
         "first": "Mit zwei freien Terminen anrufen oder per WhatsApp schreiben",
         "second": "Den gewählten Termin buchen",
@@ -194,7 +191,7 @@
       "outcomes": {
         "happy": {
           "label": "Zufrieden · 4–5★",
-          "effect": "Sendet den Google-Bewertungslink · öffnet das Bewertungsprotokoll"
+          "effect": "Öffnet das Bewertungsprotokoll"
         },
         "unhappy": {
           "label": "Unzufrieden",
@@ -206,14 +203,13 @@
         },
         "sentTheForm": {
           "label": "Formular gesendet",
-          "effect": "Protokolliert · pausiert bis morgen"
+          "effect": "Pausiert bis morgen"
         }
       }
     },
     "aftercare": {
       "label": "Nachsorgeanrufe",
       "description": "Eine Behandlung erfordert einen Nachsorgeanruf",
-      "automation": "Den Nachsorge-Check-in per WhatsApp senden und die Antwort erfassen",
       "how": {
         "first": "Anrufen und fragen, wie sich die Haut anfühlt",
         "second": "Prüfen, ob die Nachsorge befolgt wurde",
@@ -236,7 +232,7 @@
     },
     "unhappy": {
       "label": "Unzufriedene Patienten",
-      "description": "Das Feedback war 3★ oder schlechter",
+      "description": "Ein Patient hat schlecht bewertet oder war unzufrieden",
       "how": {
         "first": "Zuerst das Feedback lesen",
         "second": "Arzt oder Leitung ruft zurück",
@@ -256,7 +252,6 @@
     "nextvisit": {
       "label": "Nächster Besuch nicht festgelegt",
       "description": "Ein Besuch ist abgeschlossen, aber es gibt weder ein Nachsorgedatum noch eine nächste Buchung",
-      "automation": "Zwei Termine per WhatsApp vorschlagen und das Nachsorgedatum bei Auswahl setzen",
       "how": {
         "first": "Prüfen, was der Arzt empfohlen hat",
         "second": "Zwei Termine für den nächsten Besuch anbieten",
@@ -279,7 +274,7 @@
     },
     "noreply": {
       "label": "Stammpatienten ohne Rückmeldung",
-      "description": "Ein Stamm- oder Paketpatient hat seit über 30 Tagen nicht gebucht und auf die regelmäßigen Erinnerungen nicht geantwortet",
+      "description": "Ein Paketpatient hat noch Sitzungen, seit über 30 Tagen keinen Besuch und nichts gebucht",
       "how": {
         "first": "Paket und letzten Besuch ansehen",
         "second": "Einmal anrufen, dann ein Rückkehrangebot senden",
@@ -292,13 +287,14 @@
         },
         "sendOffer": {
           "label": "Angebot senden",
-          "effect": "Sendet ein Rückkehrangebot per WhatsApp · pausiert eine Woche"
+          "effect": "Pausiert eine Woche"
         },
         "notComingBack": {
           "label": "Kommt nicht wieder",
           "effect": "Mit Grund geschlossen"
         }
-      }
+      },
+      "automation": "Einen Retargeting-Lead für das Team anlegen"
     },
     "manual": {
       "label": "Von dir geplante Nachfassungen",
@@ -329,29 +325,36 @@
       "outcomes": {
         "collectAtCheckout": {
           "label": "Beim Checkout kassieren",
-          "effect": "Zum heutigen Checkout hinzugefügt"
+          "effect": "Geschlossen · beim Checkout kassieren"
         },
         "sendUpiLink": {
           "label": "UPI-Link senden",
-          "effect": "UPI-Link für WhatsApp eingeplant"
+          "effect": "Geschlossen · Link im Chat senden"
         },
         "called": {
           "label": "Angerufen",
-          "effect": "Zahlungszusage erfasst"
+          "effect": "Mit deiner Notiz geschlossen"
+        }
+      },
+      "automation": "Eine Zahlungserinnerung per WhatsApp senden"
+    },
+    "settleBy": {
+      "label": "Offene Guthaben",
+      "description": "Das Fälligkeitsdatum eines offenen Guthabens ist erreicht",
+      "outcomes": {
+        "done": {
+          "label": "Erledigt",
+          "effect": "Geschlossen · in Zahlungen ausgleichen"
         }
       }
     },
-    "recall": {
-      "label": "Wiedervorstellung",
-      "description": "Ein Patient ist zur Kontrolle fällig",
+    "medicalRepVisit": {
+      "label": "Pharmareferenten-Besuche",
+      "description": "Ein Pharmareferent kommt zu Besuch",
       "outcomes": {
-        "booked": {
-          "label": "Gebucht",
-          "effect": "Gebucht · Bestätigung eingeplant"
-        },
-        "later": {
-          "label": "Später",
-          "effect": "7 Tage pausiert"
+        "done": {
+          "label": "Erledigt",
+          "effect": "Geschlossen · Besuch unter Medizin erfassen"
         }
       }
     }
@@ -417,12 +420,16 @@
     "result": "✓ {{result}}"
   },
   "sources": {
-    "lead": "Lead {{id}}",
-    "appointment": "Termin {{id}}",
+    "lead": "Lead",
+    "appointment": "Termin",
     "treatment": "Behandlung",
-    "patient": "Patient {{id}}",
-    "invoice": "Rechnung {{id}}",
-    "contact": "Kontakt"
+    "patient": "Patient",
+    "invoice": "Rechnung",
+    "contact": "Kontakt",
+    "checkIn": "Check-in",
+    "review": "Bewertung",
+    "pendingCredit": "Guthaben",
+    "medicalRep": "Pharmareferent"
   },
   "due": {
     "snoozed": "Zurückgestellt · {{label}}",
@@ -452,7 +459,7 @@
   "newTask": {
     "title": "Neue Aufgabe",
     "sub": "Für {{person}} · erscheint in Aufgaben und in der Zeitleiste dieser Person",
-    "subNoPerson": "Erscheint in Aufgaben und in der Zeitleiste der Person",
+    "subNoPerson": "Erscheint in Aufgaben – und in der Zeitleiste der Person, wenn sie jemandem gilt",
     "steps": {
       "what": "Was zu tun ist",
       "when": "Wann & wer",
@@ -460,24 +467,15 @@
     },
     "forField": {
       "label": "Für",
-      "placeholder": "Patient oder Lead wählen",
+      "placeholder": "Eine Person auswählen",
       "search": "Nach Name, Mobilnummer oder Nummer suchen",
-      "empty": "Geben Sie einen Namen, eine Mobilnummer oder eine Patientennummer ein",
-      "missing": "Wählen Sie, für wen die Aufgabe ist"
-    },
-    "type": {
-      "label": "Art",
-      "callBack": "Rückruf",
-      "followUp": "Nachfassen",
-      "sendPrice": "Preis senden",
-      "askForPhotos": "Fotos anfragen",
-      "feedback": "Feedback",
-      "paymentReminder": "Zahlungserinnerung"
+      "empty": "Geben Sie einen Namen, eine Mobilnummer oder eine Kontaktnummer ein"
     },
     "titleField": {
       "label": "Titel",
       "placeholder": "Was zu tun ist",
-      "fallback": "{{type}} · {{first}}"
+      "fallback": "Nachfassen · {{first}}",
+      "missing": "Geben Sie einen Titel ein oder wählen Sie, für wen die Aufgabe ist"
     },
     "due": {
       "label": "Fällig",
@@ -497,7 +495,6 @@
       "normal": "Normal",
       "high": "Hoch"
     },
-    "remind": "{{minutes}} Min. vorher erinnern",
     "notes": {
       "label": "Aufgabennotizen",
       "placeholder": "Notizen (optional)"
@@ -519,11 +516,13 @@
     },
     "quote": "„{{message}}“",
     "source": {
-      "appointment": "Termin öffnen · {{record}}",
-      "lead": "Lead öffnen · {{record}}",
-      "treatment": "Patient öffnen · {{record}}",
-      "patient": "Patient öffnen · {{record}}",
-      "invoice": "Rechnung öffnen · {{record}}"
+      "appointment": "Termin öffnen",
+      "lead": "Lead öffnen",
+      "treatment": "Behandlung öffnen",
+      "patient": "Patient öffnen",
+      "invoice": "Rechnung öffnen",
+      "checkIn": "Check-in öffnen",
+      "review": "Bewertung öffnen"
     },
     "tiles": {
       "visit": "Besuch",
@@ -543,29 +542,32 @@
       "visit": "{{day}} · {{time}} · {{minutes}} Min.",
       "session": "#{{number}}"
     },
-    "automation": {
-      "title": "{{productName}} kann das erledigen",
-      "action": "{{productName}} erledigen lassen"
-    },
     "outcomeNote": {
       "label": "Notiz zum Ergebnis",
       "placeholder": "Notiz zum Ergebnis hinzufügen (optional)"
     },
     "snooze": "Zurückstellen",
     "assigned": "Zugewiesen",
-    "assignTip": "Diese Aufgabe jemand anderem geben · die bisherige Person bleibt beteiligt",
+    "assignTip": "Diese Aufgabe jemand anderem geben",
     "searchTeam": "Team durchsuchen",
     "was": "Vorher {{names}}",
-    "close": "Schließen"
+    "close": "Schließen",
+    "subByHand": "Von Hand angelegt",
+    "assignGroups": {
+      "team": "Team",
+      "queues": "Rollen-Warteschlangen"
+    },
+    "deleteTitle": "Diese Aufgabe löschen?"
   },
   "toasts": {
     "closed": "{{title}} · {{result}}",
     "snoozed": "Zurückgestellt · {{label}}",
-    "claimed": "{{name}} gehört jetzt Ihnen · {{owner}} bleibt beteiligt",
-    "claimedUnowned": "{{name}} gehört jetzt Ihnen",
-    "moved": "{{title}} → {{name}} · {{previous}} bleibt beteiligt",
-    "movedUnowned": "{{title}} → {{name}}",
-    "automation": "{{productName}} kümmert sich darum · {{automation}}"
+    "claimed": "{{name}} gehört jetzt Ihnen",
+    "moved": "{{title}} → {{name}}",
+    "removed": "{{title}} entfernt",
+    "alreadyClosed": "Diese Aufgabe ist bereits abgeschlossen",
+    "claimNeedsLeads": "Einen Lead zu übernehmen erfordert Bearbeitungsrechte für Leads – frag einen Inhaber oder Admin",
+    "reassignNeedsLeads": "Die Aufgabe eines Leads zu verschieben erfordert Bearbeitungsrechte für Leads – frag einen Inhaber oder Admin"
   },
   "whatsNext": {
     "title": "Wie geht es mit {{first}} weiter?",
@@ -591,6 +593,7 @@
     "pickWhen": "Wählen Sie, wann",
     "created": "Nächste Aufgabe gesetzt · {{step}} · {{when}}",
     "taskTitle": "{{step}} · {{first}}",
-    "plannedAfter": "Geplant nach: {{after}}"
+    "plannedAfter": "Geplant nach: {{after}}",
+    "titleNoPerson": "Wie geht es weiter?"
   }
 }

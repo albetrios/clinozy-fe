@@ -4,26 +4,18 @@ import type { InvoiceDetail } from '@/shared/api/clinic/invoices-contracts.ts';
 import { InvoicePrint, printDocument } from '@/shared/components/PrintTemplate/index.ts';
 
 /**
- * A saved invoice's A4 sheet (L-22, KICKOFF §6.9 Print): the patient — or a
- * Medical sale's walk-in customer, with the sale's number — its lines, the
- * Remark (the one note that prints, §7.3), the payment summary from the
- * ledger, and the clinic's own footer.
+ * A saved invoice's A4 sheet (L-22, KICKOFF §6.9 Print), from the invoice as read once
+ * (`fetchInvoice`): who it bills — the patient, or a Medical sale's walk-in, with the sale's
+ * number — its lines and every figure as the server keeps them, the Remark (the one note that
+ * prints, §7.3), what is paid and due, and the clinic's own footer with the branch's phone and
+ * GSTIN (`GET /app/branches/my`).
  */
 export function invoiceSheet(detail: InvoiceDetail): ReactElement {
-  const { party } = detail;
   return (
     <InvoicePrint
       invoice={detail.invoice}
       sale={detail.sale}
-      payments={detail.payments}
-      patient={
-        party?.kind === 'patient'
-          ? { firstName: party.firstName, lastName: party.lastName, phone: party.phone }
-          : null
-      }
-      contact={
-        party?.kind === 'contact' ? { name: party.name, phone: party.phone } : null
-      }
+      party={detail.party}
       organization={detail.sheet.organization}
       branch={detail.sheet.branch}
     />

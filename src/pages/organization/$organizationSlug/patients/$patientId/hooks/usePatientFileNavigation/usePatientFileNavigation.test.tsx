@@ -38,6 +38,12 @@ vi.mock('@/shared/hooks/useVisits/index.ts', async (importOriginal) => ({
   }),
 }));
 
+// What she owes, for the Add menu's Payment — its own reads are `useInvoices`' to test.
+vi.mock('@/shared/api/clinic/invoices-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchInvoiceTotals: vi.fn(async () => ({ due: 100, paid: 0, count: 1 })),
+}));
+
 const FILE = `/organization/acme/patients/${TEST_PATIENT_ID}`;
 const NEXT: PatientNextVisit = {
   appointmentId: 'appt_next00000000000000000',
@@ -59,6 +65,7 @@ function NavigationProbe() {
     reschedule:
       navigation.railActions.onBook && (() => navigation.railActions.onBook?.(NEXT)),
     feedback: navigation.railActions.onFeedback,
+    collect: navigation.railActions.onCollect,
     historySection: () =>
       navigation.openHistory({
         kind: 'patientFile',
@@ -212,11 +219,18 @@ describe('usePatientFileNavigation', () => {
     expect(book.search).not.toHaveProperty('who');
   });
 
-  it('opens Feedback on Clinical notes, and offers no Collect', async () => {
+  it('opens Feedback on Clinical notes', async () => {
     expect((await follow('feedback')).pathname).toBe(`${FILE}/overview`);
-    renderInPatientFile(<NavigationProbe />, { file: patientFile() });
-    await screen.findByRole('button', { name: 'feedback' });
-    expect(screen.queryByRole('button', { name: /collect/i })).not.toBeInTheDocument();
+  });
+
+  it('collects from her in Receive payment over the open section (A-P1)', async () => {
+    const collect = await follow('collect', { section: 'invoices' });
+    expect(collect.pathname).toBe('/organization/acme/payments/receive');
+    expect(collect.search).toEqual({
+      patient: TEST_PATIENT_ID,
+      from: `patients/${TEST_PATIENT_ID}/invoices`,
+    });
+    expect(collect.page).toBe(`${FILE}/invoices`);
   });
 
   it('follows a history chip to the section or the appointment', async () => {
@@ -253,11 +267,17 @@ describe('usePatientFileNavigation', () => {
     );
     expect(screen.queryByRole('button', { name: 'book' })).not.toBeInTheDocument();
 
+    expect(screen.queryByRole('button', { name: 'collect' })).not.toBeInTheDocument();
+
     signedInWith(['patient:read', 'patient:update', 'appointment:create']);
     expect(
       await screen.findByRole('button', { name: 'editContact' }),
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'book' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'bookAppointment' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'collect' })).not.toBeInTheDocument();
+
+    signedInWith(['patient:read', 'payment:create']);
+    expect(await screen.findByRole('button', { name: 'collect' })).toBeInTheDocument();
   });
 });

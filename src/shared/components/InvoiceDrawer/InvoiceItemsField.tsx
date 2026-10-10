@@ -1,14 +1,11 @@
 import { type UseFormReturn, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import {
-  belowFloor,
-  discountForFinal,
-  lineFinal,
-} from '@/shared/api/clinic/clinic-money.ts';
+import { cn } from '@/lib/utils.ts';
 import type { OfferingCategory } from '@/shared/api/clinic/clinic-schema.ts';
 import { INVOICE_QTY_MAX } from '@/shared/api/clinic/invoices-contracts.ts';
 import { CLINIC_KEYS } from '@/shared/clinic/clinic.constants.ts';
+import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { MoneyCell } from '@/shared/components/Cells/index.ts';
 import type { PickerOption } from '@/shared/components/Picker/index.ts';
 import {
@@ -32,7 +29,6 @@ import {
   ItemsQtyCell,
 } from '@/shared/forms/ItemsField/index.ts';
 import { useQuickCreateMedicine } from '@/shared/hooks/useMedicines/index.ts';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 
 import {
   INVOICE_DRAWER_KEYS,
@@ -55,31 +51,53 @@ import type { InvoiceCatalog } from './use-invoice-catalog.ts';
 
 const K = INVOICE_DRAWER_KEYS.items;
 
-/** What an invoice line reads (`payments.md:140`): "2 = qty · 10% = discount · @500 = rate". */
-const INVOICE_LINE_TERMS: readonly QuickLineTerm[] = ['qty', 'discount', 'rate'];
+/** What a sale's line reads (`payments.md:140`): "2 = qty · 10% = discount · @500 = rate". */
+const SALE_LINE_TERMS: readonly QuickLineTerm[] = ['qty', 'discount', 'rate'];
+
+/** What an invoice's line reads: "2 = qty · 10% = discount" — the server sets the rate (B9). */
+const INVOICE_LINE_TERMS: readonly QuickLineTerm[] = ['qty', 'discount'];
+
+/** What a row's read-only cells show — in paise, null while not known — and why it is refused. */
+export interface InvoiceRowFigures {
+  /** The rate per unit. */
+  rate: number | null;
+  gstPct: number | null;
+  /** What the line comes to. */
+  final: number | null;
+  /** The live offers that priced it, by name. */
+  offers: readonly string[];
+  /** The figures answer an older form of the row: a new preview is on its way. */
+  stale: boolean;
+  /** Why the server refuses the row — under its lowest price. */
+  error?: string;
+}
 
 /** Props of {@link InvoiceItemsField}. */
 export interface InvoiceItemsFieldProps {
   form: UseFormReturn<InvoiceFormValues>;
   values: InvoiceFormValues;
   catalog: InvoiceCatalog;
-  /** The row's lowest Final (H:5059; `disc`, Q-U8) — null without one. */
-  floorOf: (row: InvoiceLineForm) => number | null;
-  /** The role sees the floor's price (`floor`, Q-U8): the tooltip names it. */
-  floorVisible: boolean;
+  /**
+   * A row's Rate, GST and Final — an invoice's from the server's preview, a sale's from the
+   * fixture world's own sums.
+   */
+  rowFigures: (row: InvoiceLineForm, index: number) => InvoiceRowFigures;
+  /** A Final typed on a row: the discount that brings the line to it (paise). */
+  onFinal: (index: number, final: number) => void;
   /** "Often billed" (H:5058), as catalogue entries. */
   oftenBilled: readonly InvoiceCatalogItem[];
   /** The bill the table's footer shows (H:5059). */
   total: number;
   readOnly: boolean;
-  /** A sale's medicines are never changed (`S:51`): the rows show, nothing edits them. */
+  /** A saved invoice's lines that never change here — a Medical sale's (`S:51`). */
   locked: boolean;
   /** A medicine the store lacks may become a quick draft (Q-M4): Medical's create. */
   canAddMedicine: boolean;
-  /** "New offering · “q”" on a row's picker — the stacked offering form (L-30e). */
-  onNewOffering: (rowIndex: number, query: string) => void;
-  /** A picked offering with a live offer: "<offer> applied to <offering>". */
-  onPromo: (item: InvoiceCatalogItem) => void;
+  /**
+   * "New offering · “q”" on a row's picker — the stacked offering form (L-30e); none without
+   * `offering:create`.
+   */
+  onNewOffering?: (rowIndex: number, query: string) => void;
 }
 
 /** The quick line's entry for a catalogue entry — its sub line and price. */
@@ -120,15 +138,13 @@ function ItemPickerCellOf({
   medical,
   readOnly,
   onNewOffering,
-  onPromo,
 }: {
   row: Parameters<ItemsColumn<InvoiceFormValues, 'items'>['cell']>[0];
   form: UseFormReturn<InvoiceFormValues>;
   catalog: InvoiceCatalog;
   medical: boolean;
   readOnly: boolean;
-  onNewOffering: (rowIndex: number, query: string) => void;
-  onPromo: (item: InvoiceCatalogItem) => void;
+  onNewOffering?: (rowIndex: number, query: string) => void;
 }) {
   const { t } = useTranslation(INVOICE_DRAWER_NS);
   const key = medical ? row.row.medicineId : row.row.offeringId;
@@ -148,7 +164,9 @@ function ItemPickerCellOf({
       placeholder={t(K.pickItem)}
       searchPlaceholder={t(medical ? K.selectMedicine : K.selectOffering)}
       onCreateFull={
-        medical || readOnly ? undefined : (query) => onNewOffering(row.index, query)
+        medical || readOnly || !onNewOffering
+          ? undefined
+          : (query) => onNewOffering(row.index, query)
       }
       createFullLabel={t(K.newOffering)}
       disabled={readOnly}
@@ -170,7 +188,6 @@ function ItemPickerCellOf({
           { ...lineFromCatalog(item), qty: row.row.qty },
           { shouldDirty: true },
         );
-        if (item.promo) onPromo(item);
       }}
     />
   );
@@ -182,20 +199,54 @@ type ItemColumnsProps = Omit<
   'oftenBilled' | 'total' | 'canAddMedicine'
 >;
 
+/** A figure the row does not know yet: "—". */
+const NO_FIGURE = '—';
+
+/**
+ * The Rate cell: the rate per unit — on an invoice the server's, its live offer named beside it
+ * (a sage dot; the name spoken and on hover) — dimmed while a new preview is on its way.
+ */
+function RateCell({ figures }: { figures: InvoiceRowFigures }) {
+  const { t } = useTranslation(INVOICE_DRAWER_NS);
+  if (figures.rate === null) {
+    return <span className="text-body text-muted-foreground">{NO_FIGURE}</span>;
+  }
+  const offers = figures.offers.join(', ');
+  return (
+    <span
+      className={cn(
+        'text-body inline-flex items-center gap-1 tabular-nums',
+        figures.stale && 'opacity-60',
+      )}
+      title={offers || undefined}
+    >
+      {offers ? (
+        <>
+          <span
+            aria-hidden="true"
+            data-slot="pill"
+            className={cn('size-1.5 flex-none rounded-full', TONE_CLASSES.sage.fill)}
+          />
+          <span className="sr-only">{t(K.offerApplied, { offer: offers })}</span>
+        </>
+      ) : null}
+      <MoneyCell paise={figures.rate} />
+    </span>
+  );
+}
+
 /** The table's columns (H:5059): Offering · Qty · Rate · Disc % · GST · Final, then the ×. */
 function useItemColumns({
   form,
   values,
   catalog,
-  floorOf,
-  floorVisible,
+  rowFigures,
+  onFinal,
   readOnly,
   locked,
   onNewOffering,
-  onPromo,
 }: ItemColumnsProps): ItemsColumn<InvoiceFormValues, 'items'>[] {
   const { t } = useTranslation(INVOICE_DRAWER_NS);
-  const formatPaise = usePaiseFormat();
   const medical = values.type === 'medical';
   const editable = !(readOnly || locked);
   return [
@@ -211,7 +262,6 @@ function useItemColumns({
           medical={medical}
           readOnly={!editable}
           onNewOffering={onNewOffering}
-          onPromo={onPromo}
         />
       ),
     },
@@ -229,7 +279,7 @@ function useItemColumns({
       header: t(K.columns.rate),
       track: '84px',
       align: 'end',
-      cell: (row) => <MoneyCell paise={row.row.rate} />,
+      cell: (row) => <RateCell figures={rowFigures(row.row, row.index)} />,
     },
     {
       id: 'discount',
@@ -251,11 +301,14 @@ function useItemColumns({
       header: t(K.columns.gst),
       track: '52px',
       align: 'end',
-      cell: (row) => (
-        <span className="text-body text-muted-foreground tabular-nums">
-          {row.row.gstPct}%
-        </span>
-      ),
+      cell: (row) => {
+        const { gstPct } = rowFigures(row.row, row.index);
+        return (
+          <span className="text-body text-muted-foreground tabular-nums">
+            {gstPct === null ? NO_FIGURE : `${gstPct}%`}
+          </span>
+        );
+      },
     },
     {
       id: 'final',
@@ -263,35 +316,18 @@ function useItemColumns({
       track: '100px',
       align: 'end',
       cell: (row) => {
+        const figures = rowFigures(row.row, row.index);
         const named = row.row.name.trim() !== '';
-        const floor = named ? floorOf(row.row) : null;
-        const below = belowFloor(row.row, floor);
-        let message: string | undefined;
-        if (below && floor !== null) {
-          message = floorVisible
-            ? t(K.belowFloor, {
-                amount: formatPaise(Math.round(floor)),
-                name: row.row.name,
-              })
-            : t(K.tooMuchDiscount, { name: row.row.name });
-        }
         return (
           <ItemsNumberInput
             money
             label={row.label}
             testId={row.testId}
-            value={named ? lineFinal(row.row) : 0}
-            readOnly={!(editable && named)}
-            error={message}
-            onValueChange={(final) =>
-              form.setValue(
-                `items.${row.index}.discountPct`,
-                discountForFinal(row.row, final),
-                {
-                  shouldDirty: true,
-                },
-              )
-            }
+            value={named ? (figures.final ?? 0) : 0}
+            readOnly={!(editable && named && figures.final !== null)}
+            error={figures.error}
+            className={figures.stale ? 'opacity-60' : undefined}
+            onValueChange={(final) => onFinal(row.index, final)}
           />
         );
       },
@@ -339,15 +375,14 @@ export function InvoiceItemsField({
   form,
   values,
   catalog,
-  floorOf,
-  floorVisible,
+  rowFigures,
+  onFinal,
   oftenBilled,
   total,
   readOnly,
   locked,
   canAddMedicine,
   onNewOffering,
-  onPromo,
 }: InvoiceItemsFieldProps) {
   const { t } = useTranslation(INVOICE_DRAWER_NS);
   const medical = values.type === 'medical';
@@ -357,17 +392,16 @@ export function InvoiceItemsField({
     form,
     values,
     catalog,
-    floorOf,
-    floorVisible,
+    rowFigures,
+    onFinal,
     readOnly,
     locked,
     onNewOffering,
-    onPromo,
   });
   const groups = useBrowseGroups(catalog, oftenBilled, medical);
   const parse = useQuickLineTerms({
     numbers: nameNumbers(catalog.items.map((item) => item.label)),
-    terms: INVOICE_LINE_TERMS,
+    terms: medical ? SALE_LINE_TERMS : INVOICE_LINE_TERMS,
     max: INVOICE_QTY_MAX,
   });
   const setRows = (next: InvoiceLineForm[]) =>
@@ -375,7 +409,6 @@ export function InvoiceItemsField({
 
   const add = (item: InvoiceCatalogItem, values: QuickLineTermValues) => {
     setRows(withAddedLine(form.getValues('items'), item, values));
-    if (item.promo) onPromo(item);
   };
   const addMedicine = useMedicineDraft(medical && canAddMedicine, add);
 
@@ -420,7 +453,7 @@ export function InvoiceItemsField({
         editable ? (
           <QuickLine<InvoiceCatalogItem, QuickLineTermValues>
             placeholder={t(medical ? K.quickLineMedical : K.quickLine)}
-            hint={t(K.hint)}
+            hint={t(medical ? K.hint : K.hintInvoice)}
             parse={parse}
             matches={(words) =>
               quickLineMatches(catalog.items, words, oftenBilled).map((item) =>

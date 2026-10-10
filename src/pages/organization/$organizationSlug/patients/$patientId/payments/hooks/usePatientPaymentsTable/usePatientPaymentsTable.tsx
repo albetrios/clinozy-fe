@@ -13,7 +13,7 @@ import {
 } from '@/shared/components/DataTable/index.ts';
 import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { useHiddenColumns } from '@/shared/hooks/useHiddenColumns/index.ts';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 
 import {
   EmptyCell,
@@ -29,15 +29,16 @@ const rowOf = (original: unknown) => original as LedgerRow;
 /**
  * The Payments columns (KICKOFF §6.6 Section tables; H:4751): Receipt
  * ("PAY-5600", the schema's prefix — D32) · When · Invoice · Mode · Amount
- * ("+ ₹2,000" sage, "− ₹500" blush) · By, 760px in all. On a phone When
- * leads, Amount is the key and the mode, receipt and invoice fold under it;
- * the recorder's pill folds to nothing (H:4115).
+ * ("+ ₹2,000" sage, "− ₹500" blush — the entry's rupees as the API sends them) ·
+ * By (who recorded it, from the team), 760px in all. On a phone When leads,
+ * Amount is the key and the mode, receipt and invoice fold under it; the
+ * recorder's pill folds to nothing (H:4115).
  */
 function usePatientPaymentsColumns(): ColumnDef<DataTableFeatures, LedgerRow>[] {
   const { t } = useTranslation(PATIENT_TABLE_NS);
   const { t: tClinic } = useTranslation(CLINIC_NS);
   const clock = useClinicClock();
-  const formatPaise = usePaiseFormat();
+  const formatRupees = useRupeeFormat();
   // "Cash + UPI" — each split's mode once, as the ledger's Mode pill joins them.
   const modes = (row: LedgerRow) => [...new Set(row.splits.map((split) => split.mode))];
   const modeLabel = (row: LedgerRow) =>
@@ -50,7 +51,7 @@ function usePatientPaymentsColumns(): ColumnDef<DataTableFeatures, LedgerRow>[] 
   };
   const amount = (row: LedgerRow) =>
     t(row.direction === 'received' ? keys.payments.received : keys.payments.paid, {
-      amount: formatPaise(row.amount),
+      amount: formatRupees(row.amount),
     });
 
   return [

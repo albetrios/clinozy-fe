@@ -5,10 +5,13 @@ import {
   organizationPatientSection,
   organizationTreatmentEdit,
 } from '@/lib/routes/patient-file-builders.ts';
+import type { InvoiceRecord } from '@/shared/api/clinic/invoices-contracts.ts';
+import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
 import type { PatientFileSectionSlug } from '@/shared/clinic/patient-file-sections.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
 import { useContactActivityAccess } from '@/shared/hooks/useContactActivities/index.ts';
+import { usePaymentAccess } from '@/shared/hooks/usePaymentAccess/index.ts';
 
 import { useClinicalLists } from '../../../shared/hooks/useClinicalLists/index.ts';
 import {
@@ -21,6 +24,7 @@ import {
   TIMELINE_NS,
   TIMELINE_TEST_IDS,
 } from '../../timeline.constants.ts';
+import { BillingBentoCard } from './bento-billing.tsx';
 import {
   PackagesBentoCard,
   PrescriptionsBentoCard,
@@ -34,15 +38,16 @@ import { useSmartNote } from './use-smart-note.ts';
 /**
  * The Overview's bento (KICKOFF §6.6 Overview, D19; H:769–779, H:4980–4999):
  * Clinical (with the smart note), Visits, Photos, Packages, Prescriptions,
- * Treatments, Reports and Team notes — one column, two from 640px of the
- * content column, three from 1100px (container variants on the column, row
- * dense; the prototype estimates the width from the viewport, H:4923),
+ * Treatments, Billing, Reports and Team notes — one column, two from 640px of
+ * the content column, three from 1100px (container variants on the column,
+ * row dense; the prototype estimates the width from the viewport, H:4923),
  * Clinical, Photos and Team notes two columns wide. A card shows only for a
- * member whose codes read it (its section's, `contact_activity:read` for Team
- * notes), so no read is refused; each opens its section and adds its record
- * through the file's Add-to-record items, for the member who may. Billing
- * comes back with Payments on clinozy-be: its invoices and payments are still
- * the fixture world's, and the file has no dues read (G4).
+ * member whose codes read it (its section's — billing view for Billing —
+ * `contact_activity:read` for Team notes), so no read is refused; each opens
+ * its section and adds its record through the file's Add-to-record items, for
+ * the member who may. A Billing invoice opens Edit invoice for a member who
+ * may change it (`payment:update`, never a sale's or a settled one's), else its
+ * preview, over the file (`from`, A-P1).
  */
 export function OverviewBento() {
   const { t } = useTranslation(TIMELINE_NS);
@@ -50,6 +55,7 @@ export function OverviewBento() {
   const { organizationSlug = '' } = useParams({ strict: false });
   const { patientId, file, viewable } = usePatientFileContext();
   const access = useClinicAccess();
+  const money = usePaymentAccess();
   const stream = useContactActivityAccess();
   const { items, reschedule } = usePatientFileActions();
   const lists = useClinicalLists(file?.patient);
@@ -68,6 +74,16 @@ export function OverviewBento() {
           void navigate(organizationPatientSection(organizationSlug, patientId, section))
       : null;
   const canBook = can('appointments', 'create');
+  const openInvoice = (invoice: InvoiceRecord) => {
+    const editable = money.canEdit && invoice.type !== 'medical' && !invoice.isSettled;
+    void navigate(
+      clinicCommandNavigation(editable ? 'invoiceEdit' : 'invoice', {
+        organizationSlug,
+        recordId: invoice.id,
+        referrer: `patients/${patientId}/timeline`,
+      }),
+    );
+  };
 
   return (
     <div
@@ -114,6 +130,14 @@ export function OverviewBento() {
               organizationTreatmentEdit(organizationSlug, patientId, treatmentId),
             )
           }
+        />
+      ) : null}
+      {shows('invoices') ? (
+        <BillingBentoCard
+          onOpen={open('invoices')}
+          onNew={newOf('invoice', TIMELINE_KEYS.billing.new)}
+          onInvoice={openInvoice}
+          onCollect={run('payment')}
         />
       ) : null}
       {shows('reports') ? (

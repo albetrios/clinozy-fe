@@ -2,16 +2,24 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import { invoiceQueryKeys } from '@/shared/api/clinic/invoices-api.ts';
+vi.mock('@/shared/api/clinic/invoices-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchInvoice: vi.fn(),
+}));
+
+import { fetchInvoice, invoiceQueryKeys } from '@/shared/api/clinic/invoices-api.ts';
 import { CROSS_ROOM_PARAM } from '@/shared/clinic/clinic-referrer.ts';
+import { HttpError } from '@/shared/errors/HttpError.ts';
 import {
   type CrossRoomDialog,
   CrossRoomDialogContext,
 } from '@/shared/hooks/useCrossRoomDialog/index.ts';
+import { invoiceDetail } from '@/tests/utils/invoice-doubles.ts';
 import { TEST_PATIENT_ID } from '@/tests/utils/patient-doubles.ts';
+import {
+  TEST_INVOICE_ID,
+  TEST_MONEY_PATIENT_ID,
+} from '@/tests/utils/payments-doubles.ts';
 
 import {
   renderInvoicesRoutes,
@@ -24,11 +32,14 @@ const { notifyMock } = vi.hoisted(() => ({
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 
-/** 10:00 on 3 Oct, clinic time. */
-const NOW = new Date('2026-10-03T04:30:00Z');
+/** 10:00 on 10 Oct, clinic time. */
+const NOW = new Date('2026-10-10T04:30:00Z');
 const BASE = '/organization/acme/invoices';
-const DHARTI = patientRef('Dharti Galani');
-const MISSING = '3f9b0c6e-1d2a-4c5b-8e7f-0a1b2c3d4e5f';
+const KAVYA = TEST_MONEY_PATIENT_ID;
+/** A public id clinozy-be knows no invoice by (404). */
+const MISSING = 'invc_gone00000000000000000';
+/** A fixture-day link: no public id — "not found" at once, never sent. */
+const FIXTURE_ID = '3f9b0c6e-1d2a-4c5b-8e7f-0a1b2c3d4e5f';
 
 /** Shows what the hook reads (an invoice by its seq), and closes through it. */
 function Probe() {
@@ -45,7 +56,7 @@ function Probe() {
       <button type="button" onClick={close}>
         Close
       </button>
-      <button type="button" onClick={() => openEdit(ref.invoice(787))}>
+      <button type="button" onClick={() => openEdit(TEST_INVOICE_ID)}>
         Edit
       </button>
     </>
@@ -58,33 +69,35 @@ beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'], shouldAdvanceTime: true });
   vi.setSystemTime(NOW);
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetClinicFixtures();
+  vi.mocked(fetchInvoice).mockImplementation(async (id) => {
+    if (id !== TEST_INVOICE_ID) {
+      throw new HttpError('not found', 404, `/app/invoices/${id}`, 'GET', {});
+    }
+    return invoiceDetail();
+  });
 });
 afterEach(() => {
   vi.useRealTimers();
+  vi.mocked(fetchInvoice).mockReset();
   resetInvoicesRoutes();
-  resetClinicFixtures();
 });
 
 describe('useInvoicesDialogRoute (KICKOFF §4, D24; S:92–94)', () => {
   it('reads New invoice and its prefill: the type, the patient, the referrer', async () => {
-    renderInvoicesRoutes(
-      `${BASE}/create?type=consultation&patient=${DHARTI}&from=today`,
-      {
-        host: Probe,
-      },
-    );
+    renderInvoicesRoutes(`${BASE}/create?type=consultation&patient=${KAVYA}&from=today`, {
+      host: Probe,
+    });
     await waitFor(() =>
       expect(read()).toEqual({
         kind: 'create',
-        prefill: { type: 'consultation', patient: DHARTI, from: 'today' },
+        prefill: { type: 'consultation', patient: KAVYA, from: 'today' },
       }),
     );
   });
 
   it('reads a copy: New invoice opens once the invoice it copies is read (Copy invoice)', async () => {
     renderInvoicesRoutes(
-      `${BASE}/create?type=clinic&patient=${DHARTI}&copyOf=${ref.invoice(787)}&from=today`,
+      `${BASE}/create?type=clinic&patient=${KAVYA}&copyOf=${TEST_INVOICE_ID}&from=today`,
       { host: Probe },
     );
     await waitFor(() =>
@@ -92,11 +105,11 @@ describe('useInvoicesDialogRoute (KICKOFF §4, D24; S:92–94)', () => {
         kind: 'create',
         prefill: {
           type: 'clinic',
-          patient: DHARTI,
-          copyOf: ref.invoice(787),
+          patient: KAVYA,
+          copyOf: TEST_INVOICE_ID,
           from: 'today',
         },
-        source: 787,
+        source: 5,
       }),
     );
   });
@@ -116,22 +129,22 @@ describe('useInvoicesDialogRoute (KICKOFF §4, D24; S:92–94)', () => {
   });
 
   it('reads an invoice’s preview and its edit once the invoice is read', async () => {
-    const preview = renderInvoicesRoutes(`${BASE}/${ref.invoice(787)}`, { host: Probe });
-    await waitFor(() => expect(read()).toEqual({ kind: 'preview', seq: 787 }));
+    const preview = renderInvoicesRoutes(`${BASE}/${TEST_INVOICE_ID}`, { host: Probe });
+    await waitFor(() => expect(read()).toEqual({ kind: 'preview', seq: 5 }));
     preview.unmount();
-    renderInvoicesRoutes(`${BASE}/${ref.invoice(787)}/edit`, { host: Probe });
-    await waitFor(() => expect(read()).toEqual({ kind: 'edit', seq: 787 }));
+    renderInvoicesRoutes(`${BASE}/${TEST_INVOICE_ID}/edit`, { host: Probe });
+    await waitFor(() => expect(read()).toEqual({ kind: 'edit', seq: 5 }));
   });
 
   it('keeps `from` from the preview to the edit, and closes back to it', async () => {
     const user = userEvent.setup();
-    const { router } = renderInvoicesRoutes(`${BASE}/${ref.invoice(787)}?from=payments`, {
+    const { router } = renderInvoicesRoutes(`${BASE}/${TEST_INVOICE_ID}?from=payments`, {
       host: Probe,
     });
-    await waitFor(() => expect(read()).toEqual({ kind: 'preview', seq: 787 }));
+    await waitFor(() => expect(read()).toEqual({ kind: 'preview', seq: 5 }));
     await user.click(screen.getByRole('button', { name: 'Edit' }));
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe(`${BASE}/${ref.invoice(787)}/edit`),
+      expect(router.state.location.pathname).toBe(`${BASE}/${TEST_INVOICE_ID}/edit`),
     );
     expect(router.state.location.search).toEqual({ from: 'payments' });
     await user.click(screen.getByRole('button', { name: 'Close' }));
@@ -144,22 +157,22 @@ describe('useInvoicesDialogRoute (KICKOFF §4, D24; S:92–94)', () => {
     const user = userEvent.setup();
     // The patient file is on clinozy-be: its referrer names a `pat_…` id.
     const file = `patients/${TEST_PATIENT_ID}/invoices`;
-    const preview = renderInvoicesRoutes(`${BASE}/${ref.invoice(787)}?from=${file}`, {
+    const preview = renderInvoicesRoutes(`${BASE}/${TEST_INVOICE_ID}?from=${file}`, {
       host: Probe,
     });
-    await waitFor(() => expect(read()).toEqual({ kind: 'preview', seq: 787 }));
+    await waitFor(() => expect(read()).toEqual({ kind: 'preview', seq: 5 }));
     await user.click(screen.getByRole('button', { name: 'Close' }));
     await waitFor(() =>
       expect(preview.router.state.location.pathname).toBe(`/organization/acme/${file}`),
     );
     preview.unmount();
 
-    const { router } = renderInvoicesRoutes(`${BASE}/${ref.invoice(787)}?from=${file}`, {
+    const { router } = renderInvoicesRoutes(`${BASE}/${TEST_INVOICE_ID}?from=${file}`, {
       host: Probe,
     });
-    await waitFor(() => expect(read()).toEqual({ kind: 'preview', seq: 787 }));
+    await waitFor(() => expect(read()).toEqual({ kind: 'preview', seq: 5 }));
     await user.click(screen.getByRole('button', { name: 'Edit' }));
-    const edit = `${BASE}/${ref.invoice(787)}/edit?from=${encodeURIComponent(file)}`;
+    const edit = `${BASE}/${TEST_INVOICE_ID}/edit?from=${encodeURIComponent(file)}`;
     await waitFor(() => expect(router.history.location.href).toBe(edit));
     expect(router.state.location.pathname).toBe(`/organization/acme/${file}`);
     expect(router.state.location.search).toEqual({
@@ -189,10 +202,38 @@ describe('useInvoicesDialogRoute (KICKOFF §4, D24; S:92–94)', () => {
     );
   });
 
-  it('turns a create link away for a role without Payments Create, with the permission toast', async () => {
+  it('never sends a link that names no public id — not found at once', async () => {
+    const { router } = renderInvoicesRoutes(`${BASE}/${FIXTURE_ID}`, { host: Probe });
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe('/organization/acme/payments'),
+    );
+    expect(fetchInvoice).not.toHaveBeenCalled();
+  });
+
+  it('says a read that failed for another reason, with its Retry', async () => {
+    const user = userEvent.setup();
+    vi.mocked(fetchInvoice)
+      .mockRejectedValueOnce(new HttpError('down', 503, '/app/invoices', 'GET', {}))
+      .mockRejectedValueOnce(new HttpError('down', 503, '/app/invoices', 'GET', {}))
+      .mockRejectedValueOnce(new HttpError('down', 503, '/app/invoices', 'GET', {}));
+    function Failed() {
+      const { dialog } = useInvoicesDialogRoute();
+      if (dialog.kind !== 'preview') return null;
+      return (
+        <button type="button" onClick={dialog.retry}>
+          {dialog.failed ? 'failed' : 'reading'}
+        </button>
+      );
+    }
+    renderInvoicesRoutes(`${BASE}/${TEST_INVOICE_ID}`, { host: Failed });
+    await user.click(await screen.findByRole('button', { name: 'failed' }));
+    await waitFor(() => expect(fetchInvoice).toHaveBeenCalledTimes(4));
+  });
+
+  it('turns a create link away for a member without payment:create, with the permission toast', async () => {
     const { router } = renderInvoicesRoutes(`${BASE}/create`, {
       host: Probe,
-      role: 'doctor',
+      permissions: ['organization:read', 'payment:read'],
     });
     await waitFor(() =>
       expect(router.state.location.pathname).toBe('/organization/acme/payments'),
@@ -200,9 +241,9 @@ describe('useInvoicesDialogRoute (KICKOFF §4, D24; S:92–94)', () => {
     expect(notifyMock.info).toHaveBeenCalledTimes(1);
   });
 
-  it('turns a copy link away for a role without Payments Create, the invoice it copies never read', async () => {
+  it('turns a copy link away for a View-as role without Payments Create, the invoice it copies never read', async () => {
     const { router, queryClient } = renderInvoicesRoutes(
-      `${BASE}/create?copyOf=${ref.invoice(787)}`,
+      `${BASE}/create?copyOf=${TEST_INVOICE_ID}`,
       { host: Probe, role: 'doctor' },
     );
     await waitFor(() =>
@@ -212,7 +253,7 @@ describe('useInvoicesDialogRoute (KICKOFF §4, D24; S:92–94)', () => {
     expect(
       queryClient
         .getQueryCache()
-        .find({ queryKey: invoiceQueryKeys.detail(ref.invoice(787)) }),
+        .find({ queryKey: invoiceQueryKeys.detail('org_test', TEST_INVOICE_ID) }),
     ).toBeUndefined();
   });
 });
@@ -247,7 +288,7 @@ describe('useInvoicesDialogRoute over another room (A-P1)', () => {
       elsewhere: over(
         drawer(
           'create',
-          { type: 'clinic', patient: DHARTI, copyOf: ref.invoice(787), from: 'today' },
+          { type: 'clinic', patient: KAVYA, copyOf: TEST_INVOICE_ID, from: 'today' },
           close,
         ),
       ),
@@ -257,11 +298,11 @@ describe('useInvoicesDialogRoute over another room (A-P1)', () => {
         kind: 'create',
         prefill: {
           type: 'clinic',
-          patient: DHARTI,
-          copyOf: ref.invoice(787),
+          patient: KAVYA,
+          copyOf: TEST_INVOICE_ID,
           from: 'today',
         },
-        source: 787,
+        source: 5,
       }),
     );
     await user.click(screen.getByRole('button', { name: 'Close' }));
@@ -283,7 +324,7 @@ describe('useInvoicesDialogRoute over another room (A-P1)', () => {
     close.mockReset();
     notifyMock.info.mockReset();
     renderInvoicesRoutes('/organization/acme/today', {
-      role: 'doctor',
+      permissions: ['organization:read'],
       elsewhere: over(drawer('create', { from: 'today' }, close)),
     });
     await waitFor(() => expect(close).toHaveBeenCalledOnce());

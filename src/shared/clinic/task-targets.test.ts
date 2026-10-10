@@ -1,45 +1,36 @@
 import { describe, expect, it } from 'vitest';
 
 import type { TaskRow } from '@/shared/api/clinic/tasks-contracts.ts';
+import { taskPerson } from '@/tests/utils/task-doubles.ts';
 
 import { taskFollowOnTarget, taskTargetNavigation } from './task-targets.ts';
 
-const PATIENT = '11111111-1111-4111-8111-111111111111';
-const LEAD = '22222222-2222-4222-8222-222222222222';
-const VISIT = '33333333-3333-4333-8333-333333333333';
-const INVOICE = '44444444-4444-4444-8444-444444444444';
+const PATIENT = 'pat_9e6j52vjb8uhvz44ebe94';
+const CONTACT = 'con_ebj92x3oamfu4qjwim3wq';
+const LEAD = 'lead_hplz5ew0h3tw99ntqf39w';
+const VISIT = 'appt_a4ofy9lzqqyiquwgqpk4y';
+const TREATMENT = 'ptr_q1w2e3r4t5y6u7i8o9p0a';
+const INVOICE = 'inv_z9x8c7v6b5n4m3l2k1j0h';
 
-function row(
-  source: TaskRow['source'],
-  person: Partial<TaskRow['person']> = {},
-): Pick<TaskRow, 'source' | 'person'> {
-  return {
-    source,
-    person: {
-      name: 'Priti Soni',
-      firstName: 'Priti',
-      patientId: PATIENT,
-      leadId: null,
-      isPatient: true,
-      kind: 'patient',
-      seq: 3508,
-      phone: null,
-      ...person,
-    },
-  };
+/** What a follow-on reads of a task: its link and Kavya (a patient) as its person. */
+function task(
+  link: TaskRow['link'],
+  person: Partial<NonNullable<TaskRow['person']>> | null = {},
+): Pick<TaskRow, 'link' | 'person'> {
+  return { link, person: person === null ? null : taskPerson(person) };
 }
 
 describe('taskFollowOnTarget (tasks.md:185–227 "Then")', () => {
-  const visitTask = row({ kind: 'appointment', id: VISIT, seq: 2848 });
+  const visitTask = task({ kind: 'appointment', id: VISIT });
 
-  it('books the person, rebooks the visit and moves it', () => {
+  it('books the person by their contact, rebooks the visit and moves it', () => {
     expect(taskFollowOnTarget('appointmentNew', visitTask)).toEqual({
       kind: 'newAppointment',
-      whoId: PATIENT,
+      whoId: CONTACT,
     });
     expect(taskFollowOnTarget('appointmentRebook', visitTask)).toEqual({
       kind: 'newAppointment',
-      whoId: PATIENT,
+      whoId: CONTACT,
       copyOf: VISIT,
     });
     expect(taskFollowOnTarget('appointmentMove', visitTask)).toEqual({
@@ -48,41 +39,48 @@ describe('taskFollowOnTarget (tasks.md:185–227 "Then")', () => {
       reschedule: true,
     });
     expect(
-      taskFollowOnTarget('appointmentMove', row({ kind: 'lead', id: LEAD, seq: 1 })),
+      taskFollowOnTarget('appointmentMove', task({ kind: 'lead', id: LEAD })),
+    ).toBeNull();
+    expect(taskFollowOnTarget('appointmentNew', task(null, null))).toBeNull();
+  });
+
+  it('logs a review or a check-in on the patient file, tied to the visit or treatment (T5)', () => {
+    expect(taskFollowOnTarget('reviewLog', visitTask)).toEqual({
+      kind: 'review',
+      patientId: PATIENT,
+      appointmentId: VISIT,
+    });
+    expect(taskFollowOnTarget('visitCheckIn', visitTask)).toEqual({
+      kind: 'checkIn',
+      patientId: PATIENT,
+      appointmentId: VISIT,
+    });
+    expect(
+      taskFollowOnTarget('aftercareCheckIn', task({ kind: 'treatment', id: TREATMENT })),
+    ).toEqual({ kind: 'checkIn', patientId: PATIENT, treatmentId: TREATMENT });
+    expect(
+      taskFollowOnTarget(
+        'visitCheckIn',
+        task({ kind: 'appointment', id: VISIT }, { patientId: null }),
+      ),
     ).toBeNull();
   });
 
-  it('opens the person’s record for "Call now" and "Fix the number"; the stacked forms have none yet', () => {
-    for (const form of ['visitCheckIn', 'aftercareCheckIn', 'reviewLog'] as const) {
-      expect(taskFollowOnTarget(form, visitTask)).toBeNull();
-    }
+  it('opens the person’s record for "Call now" and "Fix the number": the file, else the open lead', () => {
     expect(taskFollowOnTarget('patientFile', visitTask)).toEqual({
       kind: 'patient',
       patientId: PATIENT,
       section: 'timeline',
     });
-    const lead = row(
-      { kind: 'lead', id: LEAD, seq: 2363 },
-      { patientId: null, leadId: LEAD, isPatient: false, kind: 'lead' },
-    );
+    const lead = task({ kind: 'lead', id: LEAD }, { patientId: null, openLeadId: LEAD });
     expect(taskFollowOnTarget('personRecord', lead)).toEqual({
       kind: 'lead',
       leadId: LEAD,
     });
-    expect(taskFollowOnTarget('appointmentNew', lead)).toEqual({
-      kind: 'newAppointment',
-      whoId: LEAD,
-    });
     expect(
       taskFollowOnTarget(
         'personRecord',
-        row(
-          { kind: 'contact', id: null, seq: null },
-          {
-            patientId: null,
-            leadId: null,
-          },
-        ),
+        task(null, { patientId: null, openLeadId: null }),
       ),
     ).toBeNull();
   });
@@ -92,14 +90,14 @@ describe('taskTargetNavigation', () => {
   it('keeps the referring room behind a booking, and names the file’s section', () => {
     expect(
       taskTargetNavigation(
-        { kind: 'newAppointment', whoId: PATIENT, copyOf: VISIT },
+        { kind: 'newAppointment', whoId: CONTACT, copyOf: VISIT },
         'acme',
         'tasks',
       ),
     ).toEqual({
       to: '/organization/$organizationSlug/appointments/create',
       params: { organizationSlug: 'acme' },
-      search: { who: PATIENT, source: 'task', from: 'tasks', copyOf: VISIT },
+      search: { who: CONTACT, source: 'task', from: 'tasks', copyOf: VISIT },
     });
     expect(
       taskTargetNavigation(
@@ -127,10 +125,66 @@ describe('taskTargetNavigation', () => {
     ).toEqual({ from: 'tasks' });
   });
 
+  it('opens a new check-in or review over the patient file with its visit or treatment', () => {
+    expect(
+      taskTargetNavigation(
+        { kind: 'checkIn', patientId: PATIENT, treatmentId: TREATMENT },
+        'acme',
+        'tasks',
+      ),
+    ).toEqual({
+      to: '/organization/$organizationSlug/patients/$patientId/check-ins/create',
+      params: { organizationSlug: 'acme', patientId: PATIENT },
+      search: { treatment: TREATMENT },
+    });
+    expect(
+      taskTargetNavigation(
+        { kind: 'review', patientId: PATIENT, appointmentId: VISIT },
+        'acme',
+        'today',
+      ),
+    ).toEqual({
+      to: '/organization/$organizationSlug/patients/$patientId/reviews/create',
+      params: { organizationSlug: 'acme', patientId: PATIENT },
+      search: { appointment: VISIT },
+    });
+  });
+
+  it('opens the check-in or review a task points at, over the patient file', () => {
+    expect(
+      taskTargetNavigation(
+        { kind: 'checkIn', patientId: PATIENT, checkInId: 'chk_kavya00000000000000' },
+        'acme',
+        'tasks',
+      ),
+    ).toEqual({
+      to: '/organization/$organizationSlug/patients/$patientId/check-ins/$checkInId/edit',
+      params: {
+        organizationSlug: 'acme',
+        patientId: PATIENT,
+        checkInId: 'chk_kavya00000000000000',
+      },
+    });
+    expect(
+      taskTargetNavigation(
+        { kind: 'review', patientId: PATIENT, reviewId: 'rev_kavya00000000000000' },
+        'acme',
+        'tasks',
+      ),
+    ).toEqual({
+      to: '/organization/$organizationSlug/patients/$patientId/reviews/$reviewId/edit',
+      params: {
+        organizationSlug: 'acme',
+        patientId: PATIENT,
+        reviewId: 'rev_kavya00000000000000',
+      },
+    });
+  });
+
   it('keeps Today behind a booking opened from the work queue', () => {
     expect(
-      taskTargetNavigation({ kind: 'newAppointment', whoId: PATIENT }, 'acme', 'today')
+      taskTargetNavigation({ kind: 'newAppointment', whoId: CONTACT }, 'acme', 'today')
         .search,
-    ).toEqual({ who: PATIENT, source: 'task', from: 'today' });
+    ).toEqual({ who: CONTACT, source: 'task', from: 'today' });
   });
 });

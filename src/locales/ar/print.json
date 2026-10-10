@@ -41,9 +41,10 @@
     "noNotes": "لا توجد ملاحظات إضافية",
     "paymentSummary": "ملخص الدفع",
     "totalAmount": "المبلغ الإجمالي:",
-    "overallDiscount": "الخصم الإجمالي:",
     "billAmount": "مبلغ الفاتورة:",
-    "balanceDue": "الرصيد المستحق:"
+    "balanceDue": "الرصيد المستحق:",
+    "taxableAmount": "المبلغ الخاضع للضريبة:",
+    "gstTotal": "GST:"
   },
   "prescription": {
     "patientId": "رقم المريض:",

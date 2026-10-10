@@ -49,7 +49,8 @@
     "receipt": "Erhalten",
     "refund": "Erstattung an Patienten",
     "expense": "Bezahlt",
-    "money_back": "Rückzahlung"
+    "money_back": "Rückzahlung",
+    "reversal": "Storno"
   },
   "ledger": {
     "records": "Buchungen",
@@ -67,19 +68,27 @@
       "moneyBack": "Rückzahlung",
       "medicalBill": "Medizin-Bestellung #{{seq}} · Rechnung {{bill}}",
       "stockBill": "Lager-Bestellung #{{seq}} · Rechnung {{bill}}",
-      "fromCredit": "Aus {{ref}}"
+      "fromCredit": "Aus {{ref}}",
+      "reversed": "Storniert",
+      "medicalOrder": "Medizin-Bestellung #{{seq}}",
+      "stockPurchase": "Lager-Bestellung #{{seq}}"
     },
     "dayClosed": "{{ref}} · Tag abgeschlossen",
     "dayClosedEdited_one": "{{ref}} · Tag abgeschlossen · {{count}}× geändert",
     "dayClosedEdited_other": "{{ref}} · Tag abgeschlossen · {{count}}× geändert",
-    "creditEntry": "{{ref}} · Aus {{credit}}"
+    "creditEntry": "{{ref}} · Aus {{credit}}",
+    "fixedEntry": "{{ref}} · der Betrag lässt sich nicht ändern · zum Rückgängigmachen am selben Tag löschen",
+    "search": "Patient, Empfänger oder PAY-Nummer",
+    "count_one": "{{count}} Buchung",
+    "count_other": "{{count}} Buchungen"
   },
   "rowActions": {
     "edit": "Bearbeiten",
     "delete": "Löschen",
     "giveBack": "Zurückgeben",
     "gotBack": "Zurückerhalten",
-    "useOnBill": "Mit nächster Rechnung verrechnen"
+    "useOnBill": "Mit nächster Rechnung verrechnen",
+    "reverse": "Stornieren"
   },
   "bulk": {
     "export": "Exportieren",
@@ -102,7 +111,11 @@
       "party": "Falscher Patient oder Empfänger"
     },
     "removed": "{{ref}} entfernt",
-    "removedInvoice": "{{ref}} entfernt · Rechnungssaldo wiederhergestellt"
+    "removedInvoice": "{{ref}} entfernt · Rechnungssaldo wiederhergestellt",
+    "blocked": {
+      "dayClosed": "{{ref}} · der Tag ist jetzt abgeschlossen · stattdessen stornieren",
+      "moreThanPaid": "{{ref}} · eine Erstattung hat dieses Geld schon zurückgegeben · zuerst die Erstattung löschen"
+    }
   },
   "dialog": {
     "record": "Zahlung",
@@ -129,7 +142,6 @@
     },
     "settledToday": "{{state}} · Heute",
     "adjusted": "{{amount}} verrechnet",
-    "source": "Aus {{ref}} · {{direction}}",
     "invoice": "Rechnung #{{seq}}",
     "byHand": "Manuell",
     "deleteTitle": "Diesen offenen Betrag löschen?",
@@ -146,9 +158,18 @@
       "loan_to_staff": "Darlehen an Mitarbeiter",
       "other": "Sonstiges"
     },
-    "settledInvoice": "{{state}} · Rechnung #{{seq}}",
     "adjustedOn": "{{amount}} aus {{ref}} mit Rechnung #{{seq}} verrechnet",
-    "nothingDue": "Bei {{name}} ist nichts offen, womit verrechnet werden kann"
+    "nothingDue": "Bei {{name}} ist nichts offen, womit verrechnet werden kann",
+    "search": "Person, Lieferant oder CR-",
+    "fromEntry": "Aus einer Buchung",
+    "forInvoice": "Zu einer Rechnung",
+    "settledLocked": "{{ref}} · {{amount}} beglichen · nicht mehr änderbar",
+    "conflicts": {
+      "settled": "Ein Teil von {{ref}} ist jetzt beglichen · nicht mehr änderbar oder löschbar",
+      "closed": "{{ref}} ist bereits beglichen",
+      "dayClosed": "Heute ist in der Filiale von Rechnung #{{seq}} abgeschlossen · zum Verrechnen wieder öffnen",
+      "dueChanged": "Der offene Betrag von Rechnung #{{seq}} hat sich geändert · bitte erneut versuchen"
+    }
   },
   "receive": {
     "title": "Zahlung einnehmen",
@@ -184,7 +205,11 @@
     "updated": "{{ref}} aktualisiert · Änderung protokolliert",
     "enterAmount": "Geben Sie einen Betrag ein",
     "pickPatient": "Wählen Sie einen Patienten",
-    "aboveDue": "Mehr als die offenen {{due}}"
+    "aboveDue": "Mehr als die offenen {{due}}",
+    "moreThanDue": "Mehr als jetzt auf der Rechnung offen ist · sie wurde inzwischen bezahlt",
+    "totalAdvance": "Gesamt {{total}} · Anzahlung",
+    "advance": "Anzahlung · keine Rechnung",
+    "invoicesFailed": "Die offenen Rechnungen konnten nicht geladen werden"
   },
   "send": {
     "title": "Zahlung leisten",
@@ -243,7 +268,9 @@
     "added": "Ausgabe {{ref}} hinzugefügt",
     "paidBill": "{{amount}} auf {{bill}} gezahlt",
     "saved": "{{ref}} gespeichert · Änderung protokolliert",
-    "missing": "Geben Sie Empfänger und Betrag an"
+    "missing": "Geben Sie Empfänger und Betrag an",
+    "moreThanDue": "Mehr als jetzt auf der Rechnung offen ist · sie wurde inzwischen bezahlt",
+    "billsFailed": "Die offenen Rechnungen konnten nicht geladen werden"
   },
   "credit": {
     "title": "Offenen Betrag hinzufügen",
@@ -331,9 +358,9 @@
     "gate": {
       "title": "Anfangsbestand · {{day}}",
       "sources": {
-        "default_float": "Standard-Wechselgeld",
         "carried": "Übernommen vom Abschluss am {{day}}",
-        "recounted": "Neu gezählt"
+        "recounted": "Neu gezählt",
+        "first": "Kein früherer Abschluss · nichts zu übernehmen"
       },
       "recount": "Neu zählen",
       "recountLabel": "Anfangsbestand neu zählen",
@@ -354,9 +381,12 @@
       "countPlaceholder": "Kasse zählen",
       "countLabel": "Gezähltes Bargeld",
       "netByMode": "Netto nach Zahlart",
-      "modeTitle": "Ein {{in}} · aus {{out}}",
-      "staffTitle_one": "{{name}} · {{count}} Einnahme · {{amount}}",
-      "staffTitle_other": "{{name}} · {{count}} Einnahmen · {{amount}}"
+      "staffTitle_one": "{{name}} · {{count}} Buchung · {{amount}}",
+      "staffTitle_other": "{{name}} · {{count}} Buchungen · {{amount}}",
+      "staffOther": "Nicht im Team",
+      "reason": "Warum weicht die Zählung ab?",
+      "reasonPlaceholder": "Was ist passiert · z. B. ₹20 als Wechselgeld aus der Kasse gegeben",
+      "reasonFirst": "Geben Sie zuerst an, warum die Zählung abweicht"
     },
     "report": {
       "title": "{{day}} ist abgeschlossen",
@@ -365,10 +395,8 @@
       "reopen": "Wieder öffnen",
       "acceptedBy": "Übernommen von {{name}}",
       "takenAsExpected": "Wie erwartet übernommen",
-      "collected": "Eingenommen",
       "received_one": "{{count}} eingenommen",
       "received_other": "{{count}} eingenommen",
-      "paidOut": "Ausgezahlt",
       "paid_one": "{{count}} ausgezahlt",
       "paid_other": "{{count}} ausgezahlt",
       "cashCounted": "Gezähltes Bargeld",
@@ -380,28 +408,59 @@
       "log": "Was passiert ist",
       "logAccepted": "{{name}} hat den Anfangsbestand {{amount}} übernommen",
       "logRecounted": "{{name}} hat den Anfangsbestand {{amount}} übernommen (neu gezählt)",
-      "logReviewed_one": "{{checked}} von {{count}} Buchung geprüft",
-      "logReviewed_other": "{{checked}} von {{count}} Buchungen geprüft",
       "logMatched": "Kasse gezählt: {{amount}} · stimmt",
       "logExtra": "Kasse gezählt: {{amount}} · {{diff}} zu viel",
       "logShort": "Kasse gezählt: {{amount}} · {{diff}} zu wenig",
-      "logClosed": "{{name}} hat den Tag abgeschlossen · Zusammenfassung per WhatsApp an den Admin",
-      "logAuto": "Automatisch nach der Kulanzzeit abgeschlossen · Bargeld wie erwartet übernommen"
+      "logClosed": "{{name}} hat den Tag abgeschlossen",
+      "logAuto": "Automatisch nach der Kulanzzeit abgeschlossen · Bargeld wie erwartet übernommen",
+      "openedAuto": "Automatisch geöffnet",
+      "notCounted": "Nicht gezählt",
+      "logOpened": "{{name}} hat den Tag geöffnet",
+      "logReopened": "{{name}} hat den Tag wieder geöffnet · {{reason}}",
+      "logReason": "„{{reason}}“",
+      "someone": "Jemand"
     },
     "review": {
       "title": "Jede Buchung prüfen",
-      "progress_one": "{{checked}} von {{count}} geprüft",
-      "progress_other": "{{checked}} von {{count}} geprüft",
       "none": "Keine Buchungen",
       "empty": "Keine Buchungen an diesem Tag",
-      "check": "Als geprüft markieren",
       "states": {
         "canEdit": "Bearbeitbar",
         "canEditTitle": "Bis zum Tagesabschluss bearbeitbar oder löschbar",
         "dayClosed": "Tag abgeschlossen",
         "dayClosedTitle": "Der Tag ist abgeschlossen · die Buchungen lassen sich nicht ändern",
         "fromCredit": "Aus {{credit}}"
+      },
+      "count_one": "{{count}} Buchung",
+      "count_other": "{{count}} Buchungen"
+    },
+    "previousNone": "Keine Abschlüsse vor diesem Tag",
+    "refusals": {
+      "alreadyOpened": "Jemand hat diesen Tag inzwischen geöffnet · er wird jetzt angezeigt",
+      "alreadyClosed": "Jemand hat diesen Tag inzwischen abgeschlossen · er wird jetzt angezeigt",
+      "alreadyOpen": "Dieser Tag ist bereits wieder geöffnet · er wird jetzt angezeigt"
+    },
+    "reopen": {
+      "title": "Diesen Tag wieder öffnen?",
+      "effect": "Die Zählung wird gelöscht, und die Buchungen des Tages lassen sich wieder ändern, bis er abgeschlossen ist.",
+      "action": "Tag wieder öffnen",
+      "record": "{{branch}} · {{day}}",
+      "reasons": {
+        "miscounted": "Falsch gezählt",
+        "missed": "Eine Buchung fehlte",
+        "wrongEntry": "Eine Buchung ist falsch"
       }
+    }
+  },
+  "reverseEntry": {
+    "title": "Diese Zahlung stornieren?",
+    "effect": "Sein Tag ist abgeschlossen, daher bleibt er unverändert. Ein Storno über denselben Betrag kommt heute in das Journal seiner Filiale, und was er bezahlt hat, wird zurückgebucht. Beide Buchungen bleiben erhalten.",
+    "action": "Stornieren",
+    "reversed": "{{ref}} storniert · {{reversal}}",
+    "blocked": {
+      "alreadyReversed": "{{ref}} ist bereits storniert",
+      "dayOpen": "Der Tag von {{ref}} ist wieder offen · stattdessen löschen",
+      "dayClosed": "Heute ist in der Filiale von {{ref}} abgeschlossen · zum Stornieren wieder öffnen"
     }
   }
 }

@@ -15,7 +15,7 @@ import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 /** What a due label reads of a task. */
 export type TaskDueLabelInput = Pick<
   TaskRow,
-  'status' | 'dueAt' | 'snoozeLabel' | 'resolvedBy' | 'resolvedAt'
+  'status' | 'dueAt' | 'snoozeLabel' | 'isResolvedAutomatically' | 'resolvedAt'
 >;
 
 /** A member's close reads "Done · Now" for its first minute, then the time it happened. */

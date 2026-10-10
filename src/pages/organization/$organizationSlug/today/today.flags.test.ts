@@ -71,7 +71,7 @@ describe('todayCardFlags (today.md:59 — derived, never stored)', () => {
     expect(todayCardFlags(fresh, NOW)).toEqual([{ id: 'waiting', minutes: 0 }]);
   });
 
-  it('names the approved Rx at the pharmacy; Treatment and Checkout carry none', () => {
+  it('names the approved Rx at the pharmacy; Treatment carries none, nor Checkout without dues', () => {
     const atStage = (visitStage: TodayFloorRow['visitStage']) =>
       cardOf(floorRow({ status: 'checked_in', visitStage }));
     expect(todayCardFlags(atStage('treatment'), NOW)).toEqual([]);
@@ -92,6 +92,26 @@ describe('todayCardFlags (today.md:59 — derived, never stored)', () => {
     expect(todayCardFlags(pharmacy, NOW)).toEqual([{ id: 'rxApproved', time: '10:05' }]);
   });
 
+  it('says what a Checkout card’s person owes on today’s bills — the server’s due, by contact', () => {
+    const checkout = cardOf(floorRow({ status: 'checked_in', visitStage: 'checkout' }));
+    if (checkout.kind !== 'booking') throw new Error('not a booking');
+    const { contactId } = checkout.row;
+    expect(todayCardFlags(checkout, NOW, new Map([[contactId, 1500.5]]))).toEqual([
+      { id: 'toPay', rupees: 1500.5 },
+    ]);
+    // Nothing owed, or someone else's bill: no flag.
+    expect(todayCardFlags(checkout, NOW, new Map([[contactId, 0]]))).toEqual([]);
+    expect(todayCardFlags(checkout, NOW, new Map([['con_someone', 900]]))).toEqual([]);
+    // Another lane's card never says "to pay".
+    const waiting = cardOf(floorRow({ status: 'checked_in' }));
+    if (waiting.kind !== 'booking') throw new Error('not a booking');
+    expect(
+      todayCardFlags(waiting, NOW, new Map([[waiting.row.contactId, 900]])).map(
+        (flag) => flag.id,
+      ),
+    ).toEqual(['waiting']);
+  });
+
   it('paints every flag in a tone', () => {
     expect(TODAY_FLAG_TONES).toEqual({
       channel: 'lav',
@@ -100,6 +120,7 @@ describe('todayCardFlags (today.md:59 — derived, never stored)', () => {
       unconfirmed: 'blush',
       waiting: 'butter',
       inRoom: 'blush',
+      toPay: 'butter',
       rxApproved: 'mint',
     });
   });

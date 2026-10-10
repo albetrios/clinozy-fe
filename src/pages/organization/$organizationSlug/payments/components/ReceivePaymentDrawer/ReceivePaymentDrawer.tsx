@@ -1,36 +1,46 @@
 import { useQueryClient } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
 import { useId, useState } from 'react';
-import { useForm, type UseFormReturn, useFormState, useWatch } from 'react-hook-form';
+import { useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { paiseOfRupees } from '@/lib/number-text.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import { listOpenInvoices, paymentQueryKeys } from '@/shared/api/clinic/payments-api.ts';
-import type { LedgerRow, OpenInvoice } from '@/shared/api/clinic/payments-contracts.ts';
+import { invoiceQueryKeys, listOpenInvoices } from '@/shared/api/clinic/invoices-api.ts';
+import type { InvoiceRecord } from '@/shared/api/clinic/invoices-contracts.ts';
+import { fetchPayment, paymentQueryKeys } from '@/shared/api/clinic/payments-api.ts';
+import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { defaultBranchId } from '@/shared/clinic/clinic-branch.ts';
 import { SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
 import type { PatientPick } from '@/shared/components/PatientPicker/index.ts';
 import type { QuickFillItem } from '@/shared/components/QuickFillRow/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
+import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
+import type { HttpError } from '@/shared/errors/HttpError.ts';
 import { splitsModes, splitsTotal } from '@/shared/forms/SplitRowsField/index.ts';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
-import { useFixturePatient } from '@/shared/hooks/useFixturePatients/index.ts';
+import { useEditingRecord } from '@/shared/hooks/useEditingRecord/index.ts';
+import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { usePatient } from '@/shared/hooks/usePatients/index.ts';
+import { usePaymentAccess } from '@/shared/hooks/usePaymentAccess/index.ts';
 import {
   useOpenInvoices,
   useReceivePayment,
   useUpdatePayment,
 } from '@/shared/hooks/usePayments/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 import { notify } from '@/shared/notify/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 import { PAYMENTS_KEYS, PAYMENTS_NS } from '../../payments.constants.ts';
 import type { PaymentReceiveSearch } from '../../payments.dialog-search.ts';
 import {
+  dueInPaise,
   emptyReceiveForm,
   halfOf,
   modesTone,
@@ -44,7 +54,11 @@ import {
   receiveProblem,
   withPatient,
 } from './receive-form.ts';
-import { ReceiveFields } from './ReceiveFields.tsx';
+import {
+  ReceiveFields,
+  type ReceiveInvoiceChoice,
+  type ReceiveInvoices,
+} from './ReceiveFields.tsx';
 
 const K = PAYMENTS_KEYS.receive;
 
@@ -53,6 +67,9 @@ export const RECEIVE_DRAWER_TEST_ID = 'receive-drawer';
 
 /** Six fields, chips and compact rows among them: the 560px of `payments.md:203`. */
 const CONTENT_PROFILE = { fieldCount: 6 } as const;
+
+/** The API's names the form spells differently (the 400's `errors[].field`, camel-cased). */
+const SERVER_FIELDS = { contactId: 'patientId' } as const;
 
 /** What every use of the drawer passes. */
 interface ReceiveDrawerBaseProps {
@@ -79,17 +96,19 @@ interface ReceiveEditDrawerProps extends ReceiveDrawerBaseProps {
 /** Props of {@link ReceivePaymentDrawer}. */
 export type ReceivePaymentDrawerProps = ReceiveCreateDrawerProps | ReceiveEditDrawerProps;
 
-/** What one opening starts from: its values, and the picked patient's open invoices. */
+/** What one opening starts from: its values, and the prefilled patient's open invoices. */
 interface SessionStart {
   values: ReceiveFormValues;
-  invoices: readonly OpenInvoice[] | null;
+  invoices: readonly InvoiceRecord[] | null;
 }
 
-/** The form's values as they stand, every key present. */
-function useFormValues(form: UseFormReturn<ReceiveFormValues>): ReceiveFormValues {
-  const watched = useWatch({ control: form.control });
-  return { ...form.getValues(), ...watched } as ReceiveFormValues;
-}
+/** An open invoice as the field offers it — its due in paise, as the rows hold money. */
+const choiceOf = (invoice: InvoiceRecord): ReceiveInvoiceChoice => ({
+  id: invoice.id,
+  seq: invoice.seq,
+  type: invoice.type,
+  due: dueInPaise(invoice),
+});
 
 /** A save the form stops: its toast. */
 function problemMessage(
@@ -102,7 +121,7 @@ function problemMessage(
   return t(K.aboveDue, { due: formatPaise(problem.due) });
 }
 
-/** The Quick fill chips once an invoice is picked: Full, Half, Cash + UPI. */
+/** The Quick fill chips once an invoice is picked: Full, Half, Cash + UPI (its due in paise). */
 function quickFillItems(
   form: UseFormReturn<ReceiveFormValues>,
   due: number,
@@ -119,62 +138,168 @@ function quickFillItems(
   }));
 }
 
-/** Who may save here: Create for a new receipt, Edit for an entry — else view only. */
+/** Who may save here: `payment:create` for a new receipt, `payment:update` for an entry. */
 function useReadOnly(props: ReceivePaymentDrawerProps): boolean {
-  const access = useClinicAccess();
+  const access = usePaymentAccess();
   if (props.mode === 'edit' && props.readOnly) return true;
-  return (
-    access.isResolved &&
-    !access.can('payments', props.mode === 'edit' ? 'edit' : 'create')
-  );
+  return access.resolved && !(props.mode === 'edit' ? access.canEdit : access.canCreate);
 }
 
 /** The tag beside the title: the entry's `PAY-<seq>`, else the picked patient's `#<seq>`. */
 function useTag(entry: LedgerRow | null, patientId: string | null): string | undefined {
-  const patient = useFixturePatient(entry ? undefined : (patientId ?? undefined));
+  const patient = usePatient(entry ? undefined : (patientId ?? undefined));
   if (entry) return displayId.payment(entry.seq);
   return patient.data ? displayId.patient(patient.data.seq) : undefined;
 }
 
 /**
- * The invoices the field shows: none on an edit (the entry's is fixed), else
- * the picked patient's — as read now, or as the drawer opened with them.
+ * The invoice field and the due the rows may reach (paise): an edit's own invoice — its due with
+ * the entry's own amount back on it — or the picked patient's open invoices, as read now or as
+ * the drawer opened with them; none picked is an advance (no due).
  */
-function shownInvoices(
-  entry: LedgerRow | null,
-  patientId: string | null,
-  read: readonly OpenInvoice[] | undefined,
-  opened: readonly OpenInvoice[] | null,
-): readonly OpenInvoice[] | null {
-  if (entry || !patientId) return null;
-  return read ?? opened;
+function useInvoiceField(
+  record: LedgerRow | null,
+  values: ReceiveFormValues,
+  opened: readonly InvoiceRecord[] | null,
+): { invoices: ReceiveInvoices; due: number | null } {
+  const live = useOpenInvoices(record ? null : values.patientId);
+  if (record) {
+    const choices: ReceiveInvoiceChoice[] =
+      record.invoice && record.invoiceId
+        ? [
+            {
+              id: record.invoiceId,
+              seq: record.invoice.seq,
+              type: record.invoice.type,
+              due: paiseOfRupees(record.invoice.due + record.amount),
+            },
+          ]
+        : [];
+    return { invoices: { kind: 'choices', choices }, due: choices[0]?.due ?? null };
+  }
+  if (!values.patientId) return { invoices: { kind: 'waiting' }, due: null };
+  const read = live.data ?? opened;
+  if (!read) {
+    return live.isError
+      ? { invoices: { kind: 'failed', retry: () => void live.refetch() }, due: null }
+      : { invoices: { kind: 'waiting' }, due: null };
+  }
+  const choices = read.map(choiceOf);
+  const picked = choices.find((choice) => choice.id === values.invoiceId);
+  return { invoices: { kind: 'choices', choices }, due: picked?.due ?? null };
+}
+
+/**
+ * A patient's open invoices for the pick, through the same cache entry `useOpenInvoices` reads;
+ * none when the read fails — the field then offers Retry.
+ */
+async function readOpenInvoices(
+  queryClient: ReturnType<typeof useQueryClient>,
+  organizationId: string | null,
+  patientId: string,
+): Promise<InvoiceRecord[]> {
+  try {
+    return await queryClient.query({
+      queryKey: invoiceQueryKeys.every(organizationId, {
+        patientId,
+        status: ['unpaid', 'partial'],
+        oldestFirst: true,
+      }),
+      queryFn: () => listOpenInvoices(patientId),
+    });
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * The picks that fill the form: a patient — their contact, their oldest open invoice and its due
+ * — or an invoice chip — its due in the mode already chosen; clearing it is an advance.
+ */
+function usePicks(form: UseFormReturn<ReceiveFormValues>) {
+  const queryClient = useQueryClient();
+  const organizationId = useOrganizationStore((state) => state.organizationId);
+  const dirty = { shouldDirty: true } as const;
+  const pickPatient = async (patient: PatientPick | null) => {
+    if (!patient) {
+      form.setValue('patientId', null, dirty);
+      form.setValue('contactId', null, dirty);
+      form.setValue('invoiceId', null, dirty);
+      return;
+    }
+    form.clearErrors('patientId');
+    const open = await readOpenInvoices(queryClient, organizationId, patient.id);
+    const next = withPatient(form.getValues(), patient, open);
+    form.setValue('patientId', next.patientId, dirty);
+    form.setValue('contactId', next.contactId, dirty);
+    form.setValue('invoiceId', next.invoiceId, dirty);
+    form.setValue('splits', next.splits, dirty);
+  };
+  const pickInvoice = (invoice: ReceiveInvoiceChoice | null) => {
+    form.setValue('invoiceId', invoice?.id ?? null, dirty);
+    if (!invoice) return;
+    form.setValue(
+      'splits',
+      [{ mode: form.getValues('splits.0.mode') ?? 'upi', amount: invoice.due }],
+      dirty,
+    );
+  };
+  return { pickPatient, pickInvoice };
+}
+
+/**
+ * A refusal the screen tells apart (`409`): the closed day turns the drawer view only; more than
+ * the invoice's due now (`more_than_due` — paid meanwhile) outlines the rows; any other says the
+ * server's reason.
+ */
+function useConflict(form: UseFormReturn<ReceiveFormValues>, onDayClosed: () => void) {
+  const { t } = useTranslation(PAYMENTS_NS);
+  return (error: HttpError) => {
+    const reason = apiErrorReason(error);
+    if (reason === 'day_closed') {
+      onDayClosed();
+      notify.error(t(PAYMENTS_KEYS.dialog.dayClosed));
+      return;
+    }
+    if (reason === 'more_than_due') {
+      form.setError('splits', { type: 'server', message: t(K.moreThanDue) });
+      notify.error(t(K.moreThanDue));
+      return;
+    }
+    notify.error(mapApiError(error));
+  };
 }
 
 /** The save: the checks in the drawer's order, the write, its toast and the close. */
 function useReceiveSave({
   form,
-  entry,
+  record,
   due,
   onDayClosed,
+  onStale,
   onClose,
 }: {
   form: UseFormReturn<ReceiveFormValues>;
-  entry: LedgerRow | null;
+  record: LedgerRow | null;
   due: number | null;
   onDayClosed: () => void;
+  onStale: () => void;
   onClose: () => void;
 }) {
   const { t } = useTranslation(PAYMENTS_NS);
   const formatPaise = usePaiseFormat();
+  const formatRupees = useRupeeFormat();
   const { openBranches } = useBranches();
   const { preferences } = usePreferences();
   const receive = useReceivePayment({ notifyOnError: false });
   const update = useUpdatePayment({ notifyOnError: false });
+  const onConflict = useConflict(form, onDayClosed);
   const fallbackBranch =
     defaultBranchId(openBranches, preferences.branchFilter) ?? openBranches[0]?.id ?? '';
   return useDrawerSave<ReceiveFormValues, LedgerRow>({
     form,
     fieldOrder: ['patientId', 'splits', 'reference', 'note'],
+    serverFields: SERVER_FIELDS,
     toastId: 'receive-payment-save-failed',
     check: (current) => {
       const problem = receiveProblem(current, due);
@@ -182,57 +307,22 @@ function useReceiveSave({
         ? { fields: [problem.field], message: problemMessage(problem, t, formatPaise) }
         : null;
     },
-    onConflict: () => {
-      onDayClosed();
-      notify.error(t(PAYMENTS_KEYS.dialog.dayClosed));
-    },
+    onConflict,
+    onStale: record ? onStale : undefined,
     onField: () => undefined,
     write: () =>
-      entry
-        ? update.mutateAsync({ id: entry.id, patch: receivePatchOf(form.getValues()) })
+      record
+        ? update.mutateAsync({ record, patch: receivePatchOf(form.getValues()) })
         : receive.mutateAsync(receiveInputOf(form.getValues(), fallbackBranch)),
     onDone: (row) => {
       notify.success(
-        entry
+        record
           ? t(K.updated, { ref: displayId.payment(row.seq) })
-          : t(K.received, { amount: formatPaise(row.amount), name: row.partyName }),
+          : t(K.received, { amount: formatRupees(row.amount), name: row.partyName }),
       );
       onClose();
     },
   });
-}
-
-/**
- * The picks that fill the form: a patient — their oldest open invoice and its
- * due — or an invoice chip — its due in the mode already chosen.
- */
-function usePicks(form: UseFormReturn<ReceiveFormValues>) {
-  const queryClient = useQueryClient();
-  const pickPatient = async (patient: PatientPick | null) => {
-    if (!patient) {
-      form.setValue('patientId', null, { shouldDirty: true });
-      form.setValue('invoiceId', null, { shouldDirty: true });
-      return;
-    }
-    form.clearErrors('patientId');
-    const open = await queryClient.query({
-      queryKey: paymentQueryKeys.openInvoices(patient.id),
-      queryFn: () => listOpenInvoices(patient.id),
-    });
-    const next = withPatient(form.getValues(), patient.id, open);
-    form.setValue('patientId', next.patientId, { shouldDirty: true });
-    form.setValue('invoiceId', next.invoiceId, { shouldDirty: true });
-    form.setValue('splits', next.splits, { shouldDirty: true });
-  };
-  const pickInvoice = (invoice: OpenInvoice) => {
-    form.setValue('invoiceId', invoice.id, { shouldDirty: true });
-    form.setValue(
-      'splits',
-      [{ mode: form.getValues('splits.0.mode') ?? 'upi', amount: invoice.due }],
-      { shouldDirty: true },
-    );
-  };
-  return { pickPatient, pickInvoice };
 }
 
 /** One opening of the drawer: the form, its picks, its checks and its save. */
@@ -248,24 +338,29 @@ function ReceiveSession({
   const formatPaise = usePaiseFormat();
   const { openBranches } = useBranches();
   const idPrefix = `receive-${useId().replace(/:/g, '')}`;
-  const entry = props.mode === 'edit' ? props.entry : null;
   const [dayClosed, setDayClosed] = useState(false);
   const readOnly = useReadOnly(props) || dayClosed;
 
   const form = useForm<ReceiveFormValues>({ defaultValues: start.values });
+  const { record, reload } = useEditingRecord({
+    record: props.mode === 'edit' ? props.entry : null,
+    form,
+    formOf: receiveFormOf,
+    read: (entry, organizationId) => ({
+      queryKey: paymentQueryKeys.detail(organizationId, entry.id),
+      queryFn: () => fetchPayment(entry.id),
+    }),
+  });
   const values = useFormValues(form);
   const { isDirty } = useFormState({ control: form.control });
-  const live = useOpenInvoices(entry ? null : values.patientId);
-  const invoices = shownInvoices(entry, values.patientId, live.data, start.invoices);
-  const picked = invoices?.find((invoice) => invoice.id === values.invoiceId) ?? null;
-  // An edit's own amount goes back onto its invoice's due while it is changed.
-  const due = entry?.invoice ? entry.invoice.due + entry.amount : (picked?.due ?? null);
-  const tag = useTag(entry, values.patientId);
+  const { invoices, due } = useInvoiceField(record, values, start.invoices);
+  const tag = useTag(record, values.patientId);
   const { saveState, save } = useReceiveSave({
     form,
-    entry,
+    record,
     due,
     onDayClosed: () => setDayClosed(true),
+    onStale: () => void reload(),
     onClose: props.onClose,
   });
   const { pickPatient, pickInvoice } = usePicks(form);
@@ -276,15 +371,15 @@ function ReceiveSession({
     .join(' + ');
   const amount = formatPaise(splitsTotal(values.splits));
   const quickFill =
-    picked && !entry ? quickFillItems(form, picked.due, t, formatPaise) : undefined;
+    due !== null && !record ? quickFillItems(form, due, t, formatPaise) : undefined;
 
   return (
     <RecordDrawer
       open={props.open}
       onClose={props.onClose}
-      title={t(entry ? K.titleEdit : K.title)}
+      title={t(record ? K.titleEdit : K.title)}
       tag={tag}
-      sub={t(entry ? K.subEdit : K.sub)}
+      sub={t(record ? K.subEdit : K.sub)}
       badges={[
         { id: 'mode', label: modesLabel, tone: modesTone(modes) },
         { id: 'amount', label: amount },
@@ -294,7 +389,7 @@ function ReceiveSession({
       tone={SECTION_TONES.payments}
       summary={t(K.summary, { modes: modesLabel, amount })}
       readOnly={readOnly}
-      saveLabel={t(entry ? K.saveEdit : K.save, { amount })}
+      saveLabel={t(record ? K.saveEdit : K.save, { amount })}
       onSave={() => void save()}
       saveState={saveState}
       dirty={isDirty}
@@ -308,7 +403,7 @@ function ReceiveSession({
         branches={openBranches}
         invoices={invoices}
         due={due}
-        editing={entry !== null}
+        editing={record !== null}
         readOnly={readOnly}
         onPatient={(patient) => void pickPatient(patient)}
         onInvoice={pickInvoice}
@@ -317,39 +412,56 @@ function ReceiveSession({
   );
 }
 
+/** Where a new receipt starts: empty, or the `?patient=` patient with their oldest open invoice. */
+function createStart(
+  branchId: string | null,
+  prefill: PaymentReceiveSearch,
+  patient: { id: string; contactId: string } | undefined,
+  invoices: readonly InvoiceRecord[] | undefined,
+): SessionStart {
+  const values = emptyReceiveForm(branchId);
+  if (!patient) return { values, invoices: null };
+  return {
+    values: withPatient(values, patient, invoices ?? [], prefill.invoice),
+    invoices: invoices ?? null,
+  };
+}
+
 /**
- * Receive payment (KICKOFF §6.9; `payments.md:95–110, 198–210`; H:5069–5073)
- * on the shared record drawer, 560px: one section, "Who is paying" — Branch,
- * Patient (required; leads shown but never taken), Against invoice, the Mode ·
- * Amount rows, Reference and Note — with Quick fill once an invoice is picked
- * ("⚡ Full · ₹8,550", "⚡ Half · ₹4,275", "⚡ Cash + UPI"). A patient fills
- * their oldest open invoice and its due; `?patient=&invoice=` arrive filled.
- * Save checks in order: a patient ("Pick a patient"), an amount ("Enter an
- * amount"), at most the invoice's due (AMBER copy). "₹8,550 received from Kiran
- * Desai"; an edit — an open day's receipt, its patient and invoice fixed —
- * "PAY-5512 updated · change logged". A day closed meanwhile turns the drawer
- * view only.
+ * Receive payment (KICKOFF §6.9; `payments.md:95–110, 198–210`; H:5069–5073) on clinozy-be
+ * (`POST /app/payments`, `kind: receipt`) and the shared record drawer, 560px: one section, "Who
+ * is paying" — Branch, Patient (required; patients only, their contact is what the receipt
+ * names), Against invoice (their open ones, `GET /app/invoices?patient_id=&payment_status=
+ * unpaid,partial`; none picked is an advance), the Mode · Amount rows, Reference and Note — with
+ * Quick fill once an invoice is picked ("⚡ Full · ₹8,550", "⚡ Half · ₹4,275", "⚡ Cash + UPI").
+ * A patient fills their oldest open invoice and its due; `?patient=&invoice=` arrive filled.
+ * Save checks in order: a patient ("Pick a patient"), an amount ("Enter an amount"), at most the
+ * invoice's due (AMBER copy). "₹8,550 received from Kiran Desai"; an edit — an open day's receipt,
+ * its patient and invoice fixed — sends only what changed with the read's `updated_at`:
+ * "PAY-5512 updated · change logged". A save over a newer change (`409 record_changed`) offers
+ * Reload, which reads the entry again; a day closed meanwhile (`409 day_closed`) turns the drawer
+ * view only; more than is due now (`409 more_than_due`) outlines the rows.
  */
 export function ReceivePaymentDrawer(props: ReceivePaymentDrawerProps) {
   const { session } = useDrawerSession(props.open);
   const { openBranches, isPending } = useBranches();
   const { preferences } = usePreferences();
   const prefill = props.mode === 'create' ? props.prefill : null;
-  // A prefilled patient opens with their invoices read, so the drawer starts filled.
+  // A prefilled patient opens with their contact and invoices read, so the drawer starts filled.
+  const prefilledPatient = usePatient(prefill?.patient);
   const prefilled = useOpenInvoices(prefill?.patient ?? null);
-  if (isPending || (prefill?.patient && !prefilled.isFetched)) return null;
+  const waitingForPrefill =
+    Boolean(prefill?.patient) && (prefilledPatient.isPending || !prefilled.isFetched);
+  if (isPending || waitingForPrefill) return null;
 
-  let start: SessionStart = {
-    values: emptyReceiveForm(defaultBranchId(openBranches, preferences.branchFilter)),
-    invoices: null,
-  };
-  if (props.mode === 'edit') {
-    start = { values: receiveFormOf(props.entry), invoices: null };
-  } else if (prefill?.patient && prefilled.data) {
-    start = {
-      values: withPatient(start.values, prefill.patient, prefilled.data, prefill.invoice),
-      invoices: prefilled.data,
-    };
-  }
+  const start: SessionStart =
+    props.mode === 'edit'
+      ? { values: receiveFormOf(props.entry), invoices: null }
+      : createStart(
+          defaultBranchId(openBranches, preferences.branchFilter),
+          props.prefill,
+          prefilledPatient.data,
+          prefilled.data,
+        );
   return <ReceiveSession key={session} props={props} start={start} />;
 }

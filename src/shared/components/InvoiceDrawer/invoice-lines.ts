@@ -1,6 +1,9 @@
-import { lineFloor } from '@/shared/api/clinic/clinic-money.ts';
-import type { InvoiceType, OfferingCategory } from '@/shared/api/clinic/clinic-schema.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import { paiseOfRupees } from '@/lib/number-text.ts';
+import type {
+  InvoiceType,
+  OfferingCategory,
+  Tone,
+} from '@/shared/api/clinic/clinic-schema.ts';
 import { medicineStock } from '@/shared/api/clinic/medicine-stock.ts';
 import {
   type MedicineForm,
@@ -10,22 +13,19 @@ import {
 import type {
   OfferingRecord,
   OfferRecord,
-} from '@/shared/api/clinic/offerings-fixture-contracts.ts';
-import {
-  effectivePrice,
-  invoiceLineRate,
-} from '@/shared/api/clinic/offerings-fixture-pricing.ts';
+} from '@/shared/api/clinic/offerings-contracts.ts';
+import { effectivePrice } from '@/shared/api/clinic/offerings-pricing.ts';
 import type { QuickLineSearchable } from '@/shared/components/QuickLine/index.ts';
 
 import type { InvoiceLineForm } from './invoice-form.ts';
 
 /*
- * What the Invoice drawer can bill (KICKOFF §6.9 Items): the offerings of the
- * invoice's type — active, sold at its branch, Consultation's alone for a
- * consultation invoice — at their effective price (`effectivePrice`, Q-O2;
- * GST-inclusive ones back-computed, Q-O3), or the medicines at their MRP with
- * GST included (D45) and the near-expiry discount (Q-M3). Each entry knows
- * the line a pick fills, its Browse group, its sessions and its floor.
+ * What the Invoice drawer can bill (KICKOFF §6.9 Items): a clinic or consultation invoice the
+ * clinic's offerings of its type — active and sold at its branch, Consultation's alone for a
+ * consultation invoice — each listed at the price the Offerings room shows as "Billed today"
+ * (the line itself is priced by the server); a Medical sale the fixture world's medicines at MRP
+ * with GST included (D45) and the near-expiry discount (Q-M3). Each entry knows the line a pick
+ * fills, its Browse group and its sessions.
  */
 
 /** One thing the drawer can bill. */
@@ -40,23 +40,24 @@ export interface InvoiceCatalogItem extends QuickLineSearchable {
     InvoiceLineForm,
     'offeringId' | 'medicineId' | 'name' | 'rate' | 'gstPct' | 'discountPct'
   >;
-  /** The price the list shows: the effective price, or the MRP. */
+  /** The price the list shows, in paise: the offering's "Billed today", or the MRP. */
   price: number;
   /** Sessions a unit covers — a package's, plus a live extra-sessions offer's. */
   sessions: number;
   /** A medicine's stock; null for an offering. */
   stock: number | null;
-  /** The live price offer that set the price ("Navratri glow"), if any. */
+  /** The live price offer the list names ("Navratri glow"), if any. */
   promo: string | null;
   /** The offering's category, or the medicine's composition — the sub line's words. */
   detail: string | null;
+  /** The offering's own tone — its Package preset's chip. */
+  tone: Tone | null;
 }
 
 /**
- * The offerings an invoice of `type` lists at `branchId` (`payments.md:142`):
- * active, available there (an offering for every branch is), and of the type —
- * a consultation invoice lists consultations only, a clinic one everything
- * else.
+ * The offerings an invoice of `type` lists at `branchId` (`payments.md:142`): active, sold there
+ * (an offering for every branch is), and of the type — a consultation invoice lists
+ * consultations only, a clinic one everything else.
  */
 export function offeringsFor(
   offerings: readonly OfferingRecord[],
@@ -64,7 +65,7 @@ export function offeringsFor(
   branchId: string | null,
 ): OfferingRecord[] {
   return offerings.filter((offering) => {
-    if (!offering.active || offering.deletedAt !== null) return false;
+    if (!offering.isActive) return false;
     const atBranch =
       branchId === null ||
       offering.branchIds.length === 0 ||
@@ -74,14 +75,16 @@ export function offeringsFor(
   });
 }
 
-/** One offering as the drawer bills it: its effective price, back-computed when inclusive. */
+/**
+ * One offering as the drawer lists it: the price billed today at the branch, as the Offerings
+ * room works it out from the live offers — a guide; the line's rate is the server's preview.
+ */
 export function offeringCatalogItem(
   offering: OfferingRecord,
   branchId: string | null,
   offers: readonly OfferRecord[],
-  today: string = clinicToday(),
 ): InvoiceCatalogItem {
-  const effective = effectivePrice(offering, branchId, offers, today);
+  const billed = effectivePrice(offering, branchId, offers);
   return {
     key: offering.id,
     kind: 'offering',
@@ -92,15 +95,16 @@ export function offeringCatalogItem(
       offeringId: offering.id,
       medicineId: null,
       name: offering.name,
-      rate: invoiceLineRate(effective.final, offering.gstPct, offering.gstInclusive),
-      gstPct: offering.gstPct,
+      rate: 0,
+      gstPct: 0,
       discountPct: 0,
     },
-    price: effective.final,
-    sessions: offering.sessions + effective.extraSessions,
+    price: paiseOfRupees(billed.final),
+    sessions: offering.sessions + billed.extraSessions,
     stock: null,
-    promo: effective.priceOffer?.name ?? null,
+    promo: billed.priceOffer?.name ?? null,
     detail: offering.category,
+    tone: offering.tone,
   };
 }
 
@@ -126,6 +130,7 @@ export function medicineCatalogItem(medicine: MedicineRecord): InvoiceCatalogIte
     stock,
     promo: null,
     detail: medicine.composition,
+    tone: null,
   };
 }
 
@@ -136,49 +141,28 @@ export function lineFromCatalog(
 ): InvoiceLineForm {
   return {
     ...item.line,
+    id: null,
     packSize: null,
     qty: values.qty ?? 1,
     rate: values.rate ?? item.line.rate,
     discountPct: values.discountPct ?? item.line.discountPct,
     batchNo: null,
+    suggestionId: null,
+    treatmentIds: [],
   };
 }
 
-/** The ability that lets a role discount past the offer price (`disc`, Q-U8). */
-export interface FloorAccess {
-  /** Past the offer price, down to the lowest price. */
-  disc: boolean;
-}
-
 /**
- * The lowest Final a row may come to (H:5059; Q-U8): the offering's lowest
- * price for a role with `disc`, else its effective price — no discount past
- * the offer — times the quantity, GST on top unless included. A medicine
- * row and a free row have none.
+ * The sessions the invoice's package lines buy — "Covers 6 sessions" (H:5068): each line the
+ * server priced as more than one session (a package, or an extra-sessions offer), its sessions
+ * as the preview counts them.
  */
-export function rowFloor(
-  row: Pick<InvoiceLineForm, 'offeringId' | 'qty' | 'gstPct'>,
-  offerings: ReadonlyMap<string, OfferingRecord>,
-  catalog: ReadonlyMap<string, InvoiceCatalogItem>,
-  access: FloorAccess,
-): number | null {
-  const offering = row.offeringId ? offerings.get(row.offeringId) : undefined;
-  if (!offering) return null;
-  const effective = catalog.get(offering.id)?.price ?? offering.price;
-  const perUnit = access.disc
-    ? offering.minPrice
-    : Math.max(offering.minPrice, effective);
-  return lineFloor(row, perUnit, offering.gstInclusive);
-}
-
-/** The sessions the invoice's package rows cover — "Covers 6 sessions" (H:5068). */
 export function coveredSessions(
-  items: readonly Pick<InvoiceLineForm, 'offeringId' | 'qty' | 'name'>[],
-  offerings: ReadonlyMap<string, OfferingRecord>,
+  lines: readonly { qty: number; sessionsTotal: number | null }[],
 ): number {
-  return items.reduce((sum, item) => {
-    const offering = item.offeringId ? offerings.get(item.offeringId) : undefined;
-    return offering && offering.sessions > 1 ? sum + offering.sessions * item.qty : sum;
+  return lines.reduce((sum, line) => {
+    const sessions = line.sessionsTotal ?? 0;
+    return sessions > line.qty ? sum + sessions : sum;
   }, 0);
 }
 
@@ -186,9 +170,8 @@ export function coveredSessions(
 const OFTEN_BILLED_LIMIT = 5;
 
 /**
- * "Often billed" (H:5058): the ranked names as catalogue entries — the first
- * the name is, or starts, in catalogue order — those the catalogue lacks
- * skipped, five kept.
+ * "Often billed" (H:5058): the ranked names as catalogue entries — the first the name is, or
+ * starts, in catalogue order — those the catalogue lacks skipped, five kept.
  */
 export function oftenBilledItems(
   names: readonly string[],

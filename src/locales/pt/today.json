@@ -55,7 +55,8 @@
     "unconfirmed": "Não confirmada",
     "waiting": "Aguardando {{minutes}} min",
     "inRoom": "Na sala {{minutes}} min",
-    "rxApproved": "Receita aprovada {{time}}"
+    "rxApproved": "Receita aprovada {{time}}",
+    "toPay": "{{amount}} a pagar"
   },
   "toasts": {
     "checkedIn": "Chegada de {{name}} registrada · fila do médico e sala avisadas",

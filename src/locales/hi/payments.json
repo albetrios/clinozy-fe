@@ -49,7 +49,8 @@
     "receipt": "प्राप्त",
     "refund": "मरीज़ को रिफ़ंड",
     "expense": "भुगतान किया",
-    "money_back": "पैसा वापस"
+    "money_back": "पैसा वापस",
+    "reversal": "रिवर्सल"
   },
   "ledger": {
     "records": "प्रविष्टियाँ",
@@ -67,19 +68,27 @@
       "moneyBack": "पैसा वापस",
       "medicalBill": "मेडिकल PO #{{seq}} · बिल {{bill}}",
       "stockBill": "स्टॉक PO #{{seq}} · बिल {{bill}}",
-      "fromCredit": "{{ref}} से"
+      "fromCredit": "{{ref}} से",
+      "reversed": "रिवर्स किया गया",
+      "medicalOrder": "मेडिकल PO #{{seq}}",
+      "stockPurchase": "स्टॉक PO #{{seq}}"
     },
     "dayClosed": "{{ref}} · दिन बंद",
     "dayClosedEdited_one": "{{ref}} · दिन बंद · {{count}}× बदला गया",
     "dayClosedEdited_other": "{{ref}} · दिन बंद · {{count}}× बदला गया",
-    "creditEntry": "{{ref}} · {{credit}} से"
+    "creditEntry": "{{ref}} · {{credit}} से",
+    "fixedEntry": "{{ref}} · इसकी राशि नहीं बदल सकती · वापस लेने के लिए उसी दिन हटाएँ",
+    "search": "मरीज़, भुगतान पाने वाला या PAY- नंबर",
+    "count_one": "{{count}} प्रविष्टि",
+    "count_other": "{{count}} प्रविष्टियाँ"
   },
   "rowActions": {
     "edit": "संपादित करें",
     "delete": "हटाएँ",
     "giveBack": "वापस दें",
     "gotBack": "वापस मिला",
-    "useOnBill": "अगले बिल में इस्तेमाल करें"
+    "useOnBill": "अगले बिल में इस्तेमाल करें",
+    "reverse": "रिवर्स करें"
   },
   "bulk": {
     "export": "निर्यात करें",
@@ -102,7 +111,11 @@
       "party": "गलत मरीज़ या प्राप्तकर्ता"
     },
     "removed": "{{ref}} हटाया गया",
-    "removedInvoice": "{{ref}} हटाया गया · इनवॉइस बकाया वापस आया"
+    "removedInvoice": "{{ref}} हटाया गया · इनवॉइस बकाया वापस आया",
+    "blocked": {
+      "dayClosed": "{{ref}} · इसका दिन अब बंद है · इसकी जगह रिवर्स करें",
+      "moreThanPaid": "{{ref}} · यह पैसा एक रिफ़ंड से पहले ही लौटाया जा चुका है · पहले रिफ़ंड हटाएँ"
+    }
   },
   "dialog": {
     "record": "भुगतान",
@@ -129,7 +142,6 @@
     },
     "settledToday": "{{state}} · आज",
     "adjusted": "{{amount}} समायोजित",
-    "source": "{{ref}} से · {{direction}}",
     "invoice": "इनवॉइस #{{seq}}",
     "byHand": "हाथ से",
     "deleteTitle": "यह बाकी प्रविष्टि हटाएँ?",
@@ -146,9 +158,18 @@
       "loan_to_staff": "स्टाफ़ को उधार",
       "other": "अन्य"
     },
-    "settledInvoice": "{{state}} · इनवॉइस #{{seq}}",
     "adjustedOn": "{{ref}} के {{amount}} इनवॉइस #{{seq}} में समायोजित",
-    "nothingDue": "{{name}} का कोई बकाया नहीं जिसमें समायोजित करें"
+    "nothingDue": "{{name}} का कोई बकाया नहीं जिसमें समायोजित करें",
+    "search": "व्यक्ति, सप्लायर या CR-",
+    "fromEntry": "एक लेजर एंट्री से",
+    "forInvoice": "एक इनवॉइस के लिए",
+    "settledLocked": "{{ref}} · {{amount}} निपटाए गए · अब बदला नहीं जा सकता",
+    "conflicts": {
+      "settled": "{{ref}} का कुछ हिस्सा अब निपट चुका है · इसे बदला या हटाया नहीं जा सकता",
+      "closed": "{{ref}} पहले ही निपट चुका है",
+      "dayClosed": "इनवॉइस #{{seq}} की शाखा में आज का दिन बंद है · यह क्रेडिट लगाने के लिए उसे फिर खोलें",
+      "dueChanged": "इनवॉइस #{{seq}} का बकाया बदल गया · फिर से कोशिश करें"
+    }
   },
   "receive": {
     "title": "भुगतान प्राप्त करें",
@@ -184,7 +205,11 @@
     "updated": "{{ref}} अपडेट · बदलाव दर्ज",
     "enterAmount": "राशि दर्ज करें",
     "pickPatient": "मरीज़ चुनें",
-    "aboveDue": "{{due}} बकाया से ज़्यादा"
+    "aboveDue": "{{due}} बकाया से ज़्यादा",
+    "moreThanDue": "इनवॉइस की अभी की बकाया राशि से ज़्यादा · इस बीच इसका भुगतान हुआ",
+    "totalAdvance": "कुल {{total}} · अग्रिम",
+    "advance": "अग्रिम · कोई इनवॉइस नहीं",
+    "invoicesFailed": "खुले इनवॉइस लोड नहीं हो सके"
   },
   "send": {
     "title": "भुगतान भेजें",
@@ -243,7 +268,9 @@
     "added": "ख़र्च {{ref}} जोड़ा गया",
     "paidBill": "{{bill}} के बदले {{amount}} दिए गए",
     "saved": "{{ref}} सहेजा गया · बदलाव दर्ज",
-    "missing": "किसे दिया और कितना, यह जोड़ें"
+    "missing": "किसे दिया और कितना, यह जोड़ें",
+    "moreThanDue": "बिल की अभी की बकाया राशि से ज़्यादा · इस बीच इसका भुगतान हुआ",
+    "billsFailed": "खुले बिल लोड नहीं हो सके"
   },
   "credit": {
     "title": "बाकी जोड़ें",
@@ -331,9 +358,9 @@
     "gate": {
       "title": "शुरुआती नकद · {{day}}",
       "sources": {
-        "default_float": "डिफ़ॉल्ट फ़्लोट",
         "carried": "{{day}} के क्लोज़ से आगे लाया गया",
-        "recounted": "दोबारा गिना गया"
+        "recounted": "दोबारा गिना गया",
+        "first": "पहले का कोई क्लोज़ नहीं · आगे लाने को कुछ नहीं"
       },
       "recount": "दोबारा गिनें",
       "recountLabel": "शुरुआती नकद दोबारा गिनें",
@@ -354,9 +381,12 @@
       "countPlaceholder": "दराज़ गिनें",
       "countLabel": "गिना हुआ नकद",
       "netByMode": "माध्यम के अनुसार नेट",
-      "modeTitle": "आया {{in}} · गया {{out}}",
-      "staffTitle_one": "{{name}} · {{count}} रसीद · {{amount}}",
-      "staffTitle_other": "{{name}} · {{count}} रसीदें · {{amount}}"
+      "staffTitle_one": "{{name}} · {{count}} एंट्री · {{amount}}",
+      "staffTitle_other": "{{name}} · {{count}} एंट्री · {{amount}}",
+      "staffOther": "टीम में नहीं",
+      "reason": "गिनती अलग क्यों है?",
+      "reasonPlaceholder": "क्या हुआ · जैसे दराज़ से ₹20 छुट्टे दिए",
+      "reasonFirst": "पहले बताएं कि गिनती अलग क्यों है"
     },
     "report": {
       "title": "{{day}} बंद है",
@@ -365,10 +395,8 @@
       "reopen": "फिर खोलें",
       "acceptedBy": "{{name}} ने स्वीकारा",
       "takenAsExpected": "अपेक्षित के रूप में लिया गया",
-      "collected": "वसूला",
       "received_one": "{{count}} मिला",
       "received_other": "{{count}} मिले",
-      "paidOut": "भुगतान किया",
       "paid_one": "{{count}} भुगतान",
       "paid_other": "{{count}} भुगतान",
       "cashCounted": "गिना नकद",
@@ -380,28 +408,59 @@
       "log": "क्या हुआ",
       "logAccepted": "{{name}} ने शुरुआती नकद {{amount}} स्वीकारा",
       "logRecounted": "{{name}} ने शुरुआती नकद {{amount}} स्वीकारा (दोबारा गिना)",
-      "logReviewed_one": "{{count}} में से {{checked}} एंट्री देखी",
-      "logReviewed_other": "{{count}} में से {{checked}} एंट्री देखी गईं",
       "logMatched": "दराज़ {{amount}} गिनी गई · मेल खाती है",
       "logExtra": "दराज़ {{amount}} गिनी गई · {{diff}} ज़्यादा",
       "logShort": "दराज़ {{amount}} गिनी गई · {{diff}} कम",
-      "logClosed": "{{name}} ने दिन बंद किया · सारांश WhatsApp पर एडमिन को भेजा",
-      "logAuto": "छूट की अवधि के बाद अपने-आप बंद · नकद अपेक्षित के रूप में लिया"
+      "logClosed": "{{name}} ने दिन बंद किया",
+      "logAuto": "छूट की अवधि के बाद अपने-आप बंद · नकद अपेक्षित के रूप में लिया",
+      "openedAuto": "अपने-आप खुला",
+      "notCounted": "गिना नहीं गया",
+      "logOpened": "{{name}} ने दिन खोला",
+      "logReopened": "{{name}} ने दिन फिर से खोला · {{reason}}",
+      "logReason": "“{{reason}}”",
+      "someone": "कोई"
     },
     "review": {
       "title": "हर एंट्री देखें",
-      "progress_one": "{{count}} में से {{checked}} जाँची",
-      "progress_other": "{{count}} में से {{checked}} जाँची गईं",
       "none": "कोई एंट्री नहीं",
       "empty": "इस दिन कोई एंट्री नहीं",
-      "check": "जाँचा हुआ मार्क करें",
       "states": {
         "canEdit": "बदला जा सकता है",
         "canEditTitle": "दिन बंद होने तक बदला या हटाया जा सकता है",
         "dayClosed": "दिन बंद",
         "dayClosedTitle": "दिन बंद है · इसकी एंट्री बदली नहीं जा सकतीं",
         "fromCredit": "{{credit}} से"
+      },
+      "count_one": "{{count}} एंट्री",
+      "count_other": "{{count}} एंट्री"
+    },
+    "previousNone": "इस दिन से पहले कोई क्लोज़ नहीं",
+    "refusals": {
+      "alreadyOpened": "इस बीच किसी ने यह दिन खोल दिया · अब वही दिख रहा है",
+      "alreadyClosed": "इस बीच किसी ने यह दिन बंद कर दिया · अब वही दिख रहा है",
+      "alreadyOpen": "यह दिन पहले ही फिर से खुल चुका है · अब वही दिख रहा है"
+    },
+    "reopen": {
+      "title": "यह दिन फिर से खोलें?",
+      "effect": "गिनती मिट जाती है और दिन बंद होने तक उसकी एंट्री फिर से बदली जा सकती हैं।",
+      "action": "दिन फिर खोलें",
+      "record": "{{branch}} · {{day}}",
+      "reasons": {
+        "miscounted": "गलत गिना",
+        "missed": "एक एंट्री छूट गई",
+        "wrongEntry": "एक एंट्री गलत है"
       }
+    }
+  },
+  "reverseEntry": {
+    "title": "यह भुगतान रिवर्स करें?",
+    "effect": "इसका दिन बंद है, इसलिए यह जैसा है वैसा रहेगा। इसी राशि का एक रिवर्सल आज इसकी शाखा की बही में जुड़ेगा, और इसका भुगतान वापस हो जाएगा। दोनों प्रविष्टियाँ बनी रहेंगी।",
+    "action": "रिवर्स करें",
+    "reversed": "{{ref}} रिवर्स हुआ · {{reversal}}",
+    "blocked": {
+      "alreadyReversed": "{{ref}} पहले ही रिवर्स हो चुका है",
+      "dayOpen": "{{ref}} का दिन फिर से खुला है · इसकी जगह हटाएँ",
+      "dayClosed": "{{ref}} की शाखा में आज का दिन बंद है · रिवर्स करने के लिए इसे फिर से खोलें"
     }
   }
 }

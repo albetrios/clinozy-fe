@@ -1,8 +1,18 @@
+import { vi } from 'vitest';
+
+import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
+import type { TaskOutcomeInput, TaskPage } from '@/shared/api/clinic/tasks-api.ts';
+import type {
+  TaskListQueryInput,
+  TaskRecord,
+  TaskRow,
+} from '@/shared/api/clinic/tasks-contracts.ts';
 import type {
   FloorStage,
   TodayEnquiry,
   TodayFloorRow,
 } from '@/shared/api/clinic/today-contracts.ts';
+import { ASHA, RIYA, taskRowFixture } from '@/tests/utils/task-row-fixture.ts';
 
 /** A public id for the tests' rows: `<prefix>_` and `n` padded to the API's 21 characters. */
 export const publicId = (prefix: string, n: number) =>
@@ -147,3 +157,112 @@ export function seededFloor(): { rows: TodayFloorRow[]; enquiries: TodayEnquiry[
     ],
   };
 }
+
+/** The work queue's server for the room test: its tasks, as each test leaves them. */
+export interface QueueWorld {
+  tasks: TaskRow[];
+}
+
+/** The rebooked visit of Vikram's no-show — the booking form copies it. */
+export const VIKRAM_VISIT_ID = publicId('appt', 2862);
+
+/**
+ * The seed day's work queue (the clinic clock at 10:42): Riya's confirm task, a rebook waiting in
+ * the front desk's queue, Asha's call-back (not Riya's) and a feedback task closed this morning.
+ */
+export function seededQueue(): QueueWorld {
+  return {
+    tasks: [
+      taskRowFixture({ dueAt: '2026-10-03T05:20:00.000Z' }),
+      taskRowFixture({
+        id: publicId('task', 2),
+        ruleKey: 'rebook',
+        type: 'rebook',
+        title: 'Rebook Vikram',
+        why: 'Missed consult. First no-show this year.',
+        ownerId: null,
+        ownerRole: 'front_desk',
+        link: { kind: 'appointment', id: VIKRAM_VISIT_ID },
+        dueAt: '2026-10-03T04:15:00.000Z',
+        person: {
+          id: publicId('con', 2862),
+          name: 'Vikram Bhatt',
+          phone: '+919811122233',
+          preferenceTags: [],
+          firstName: 'Vikram',
+          contactNumber: 12,
+          patientId: publicId('pat', 2862),
+          patientNumber: 3512,
+          openLeadId: null,
+        },
+      }),
+      taskRowFixture({
+        id: publicId('task', 3),
+        ruleKey: 'follow_up',
+        type: 'follow_up',
+        title: 'Call Kabir back',
+        why: 'Asked for a call about hair PRP cost.',
+        ownerId: ASHA.id,
+        link: { kind: 'lead', id: publicId('lead', 2364) },
+        dueAt: '2026-10-03T05:30:00.000Z',
+      }),
+      taskRowFixture({
+        id: publicId('task', 4),
+        ruleKey: 'feedback',
+        type: 'feedback',
+        title: 'Ask Meera how it went',
+        status: 'done',
+        outcome: 'happy',
+        resultText: 'Happy',
+        resolvedAt: '2026-10-03T04:00:00.000Z',
+        resolvedById: RIYA.id,
+        dueAt: '2026-10-03T03:30:00.000Z',
+      }),
+    ],
+  };
+}
+
+/** Riya's Mine: her tasks and the unowned ones in the front desk's queue. */
+const isRiyas = (task: TaskRow) =>
+  task.ownerId === RIYA.id || (task.ownerId === null && task.ownerRole === 'front_desk');
+
+/**
+ * `tasks-api.ts` over a {@link QueueWorld}, as the server answers: To do · Done, Mine · Everyone,
+ * every open task counted; an outcome closes the task with its words (a "No answer" snoozes it).
+ */
+export function queueApiDouble(world: QueueWorld) {
+  return {
+    listTasks: vi.fn(async (query: TaskListQueryInput): Promise<TaskPage> => {
+      const status = query.tab === 'done' ? 'done' : 'open';
+      const rows = world.tasks.filter(
+        (task) => task.status === status && (query.scope === 'everyone' || isRiyas(task)),
+      );
+      return { rows: structuredClone(rows), next: null, total: rows.length };
+    }),
+    countOpenTasks: vi.fn(
+      async () => world.tasks.filter((task) => task.status === 'open').length,
+    ),
+    recordTaskOutcome: vi.fn(async (input: TaskOutcomeInput): Promise<TaskRecord> => {
+      const snoozes = input.outcomeId === 'noAnswer';
+      world.tasks = world.tasks.map((task) =>
+        task.id === input.task.id
+          ? {
+              ...task,
+              status: snoozes ? 'snoozed' : 'done',
+              resultText: snoozes ? null : input.words,
+              snoozeLabel: snoozes ? 'No answer' : null,
+              resolvedAt: snoozes ? null : new Date().toISOString(),
+            }
+          : task,
+      );
+      const record: TaskRecord | undefined = world.tasks.find(
+        (task) => task.id === input.task.id,
+      );
+      if (!record) throw new Error(`no task ${input.task.id}`);
+      return record;
+    }),
+  };
+}
+
+/** The team directory and the signed-in member's membership, for the queue's owner names. */
+export const QUEUE_TEAM: readonly DirectoryMember[] = [RIYA, ASHA];

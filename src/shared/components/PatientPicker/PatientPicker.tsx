@@ -6,8 +6,9 @@ import {
   searchPatientPicker,
 } from '@/shared/api/clinic/patient-search-api.ts';
 import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
-import { useFixturePatient } from '@/shared/hooks/useFixturePatients/index.ts';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { useInvoiceTotals } from '@/shared/hooks/useInvoices/index.ts';
+import { usePatient } from '@/shared/hooks/usePatients/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 
 import {
   PATIENT_PICKER_KEYS,
@@ -24,7 +25,7 @@ import {
 export interface PatientPickerProps {
   /** The picked patient's id. */
   value: string | null;
-  /** A patient picked (never a lead), or the field cleared. */
+  /** A patient picked, or the field cleared. */
   onChange: (patient: PatientPick | null) => void;
   /** The trigger's id, for the field's `<label htmlFor>`. */
   id?: string;
@@ -40,10 +41,11 @@ export interface PatientPickerProps {
 
 /**
  * The patient field (KICKOFF §6.9 Receive payment; `payments.md:101`): a
- * remote search over the patients — name, mobile or display id, 450ms — with
- * each one's dues, the leads it finds greyed out ("not a patient yet"), and
- * the picked patient on its avatar chip in the trigger. Shared by Receive
- * payment and the Invoice drawer.
+ * remote search over the clinic's patients on clinozy-be — name, mobile or
+ * contact number, 450ms — and the picked patient on its avatar chip in the
+ * trigger, with what they still owe (their invoices' total). A pick carries
+ * the patient's contact, which a receipt or an invoice names. Shared by
+ * Receive payment and the Invoice drawer.
  */
 export function PatientPicker({
   value,
@@ -57,10 +59,17 @@ export function PatientPicker({
   ...rest
 }: PatientPickerProps) {
   const { t } = useTranslation(PATIENT_PICKER_NS);
-  const formatPaise = usePaiseFormat();
-  const current = useFixturePatient(value ?? undefined);
+  const formatRupees = useRupeeFormat();
+  const current = usePatient(value ?? undefined);
+  const totals = useInvoiceTotals(value === null ? null : { patientId: value });
   const selected: PickerOption<PatientPickRow>[] = current.data
-    ? [patientPickOption(patientPickOf(current.data), t, formatPaise)]
+    ? [
+        patientPickOption(
+          patientPickOf(current.data, totals.data?.due ?? null),
+          t,
+          formatRupees,
+        ),
+      ]
     : [];
 
   return (
@@ -76,16 +85,14 @@ export function PatientPicker({
       loadOptions={async (query, cursor) => {
         const page = await searchPatientPicker(query, cursor ?? null);
         return {
-          rows: page.items.map((row) => patientPickOption(row, t, formatPaise)),
+          rows: page.items.map((row) => patientPickOption(row, t, formatRupees)),
           next: page.nextCursor,
           hasMore: page.nextCursor !== null,
         };
       }}
       selectedOptions={selected}
       value={value}
-      onChange={(_key, option) =>
-        onChange(option?.data?.kind === 'patient' ? option.data : null)
-      }
+      onChange={(_key, option) => onChange(option?.data ?? null)}
       onCreateFull={onCreateFull}
       createFullLabel={createFullLabel}
       size="md"

@@ -66,6 +66,7 @@ const HOSTS: Readonly<Record<CrossRoomRoute['name'], RouteComponent>> = {
   appointmentCreate: AppointmentsHost,
   appointment: AppointmentsHost,
   paymentReceive: PaymentsHost,
+  paymentEdit: PaymentsHost,
   invoiceCreate: InvoicesHost,
   invoice: InvoicesHost,
   invoiceEdit: InvoicesHost,
@@ -149,8 +150,8 @@ function CrossRoomDialogHost({ dialog }: { dialog: CrossRoomDialogLocation }) {
 
 /**
  * The drawer another room owns, over the room it was opened from (KICKOFF §4,
- * A-P1): the Invoice drawer, Receive payment, the appointment drawers or New
- * sale named in the page's search (`useClinicNavigate`, or the drawer route's
+ * A-P1): the Invoice drawer, Receive payment, a ledger entry's drawer, the
+ * appointment drawers or New sale named in the page's search (`useClinicNavigate`, or the drawer route's
  * hand-over), while the URL bar shows the drawer's own route. The page stays
  * the router's route, mounted behind it, its own guards run; the drawer's
  * route gates it here and its room's host opens it. Mounted once with the org

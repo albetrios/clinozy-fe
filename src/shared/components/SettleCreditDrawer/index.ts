@@ -4,9 +4,9 @@ export {
   SETTLE_CREDIT_TEST_ID,
 } from './settle-credit.constants.ts';
 export {
-  owedOn,
-  type SettleCreditTarget,
+  owedInPaise,
   type SettleFormValues,
+  settlementOf,
   type SettleProblem,
   settleProblem,
   settleStart,

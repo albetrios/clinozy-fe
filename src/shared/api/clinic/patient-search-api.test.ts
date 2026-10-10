@@ -1,39 +1,112 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { clinicFixtures, resetClinicFixtures } from './fixtures/world.fixtures.ts';
+vi.mock('@/core/http/api.ts', () => ({
+  api: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
+}));
+import { api } from '@/core/http/api.ts';
+import {
+  TEST_MONEY_CONTACT_ID,
+  TEST_MONEY_PATIENT_ID,
+} from '@/tests/utils/payments-doubles.ts';
+
 import { searchPatientPicker } from './patient-search-api.ts';
 
-beforeEach(() => resetClinicFixtures());
-afterEach(() => resetClinicFixtures());
+/** A contact row of `GET /app/contacts` — Kavya Mehta, patient #2. */
+const contactRow = (patch: Record<string, unknown> = {}) => ({
+  id: TEST_MONEY_CONTACT_ID,
+  contact_number: 1188,
+  first_name: 'Kavya',
+  last_name: 'Mehta',
+  primary_phone: '+919825005865',
+  email: null,
+  instagram_handles: [],
+  default_channel: 'whatsapp',
+  preference_tags: [],
+  patient_id: TEST_MONEY_PATIENT_ID,
+  open_lead_id: null,
+  last_activity_at: null,
+  last_received_at: null,
+  is_awaiting_reply: false,
+  updated_at: '2026-10-01T07:00:00.000Z',
+  gender: null,
+  date_of_birth: null,
+  address: null,
+  referral_source: null,
+  referred_by_contact_id: null,
+  referred_by_name: null,
+  has_marketing_consent: false,
+  patient_number: 2,
+  ...patch,
+});
+
+/** A page of contacts as the API answers it. */
+const page = (data: unknown[], next: string | null = null) => ({
+  data,
+  meta: {
+    request_id: 'req',
+    pagination: { per_page: 30, next, has_more: next !== null },
+  },
+});
+
+/** The query the contacts read was sent with (the last one). */
+const lastQuery = () =>
+  (
+    vi.mocked(api.get).mock.lastCall?.[1] as
+      { query?: Record<string, unknown> } | undefined
+  )?.query;
+
+beforeEach(() => vi.resetAllMocks());
 
 describe('searchPatientPicker', () => {
-  it('lists the patients A–Z with their dues, and no lead for an empty search', async () => {
-    const page = await searchPatientPicker('');
-    const names = page.items.map((row) => row.name);
-    expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)));
-    expect(page.items.every((row) => row.kind === 'patient')).toBe(true);
-    expect(page.items.find((row) => row.name === 'Rhea Shah')).toMatchObject({
-      kind: 'patient',
-      due: expect.any(Number),
+  it('lists the patients A–Z for an empty search, a page at a time', async () => {
+    vi.mocked(api.get).mockResolvedValue(page([contactRow()], 'cur_2') as never);
+
+    const result = await searchPatientPicker('', 'cur_1');
+
+    expect(api.get).toHaveBeenCalledWith('/app/contacts', {
+      query: {
+        is_patient: 'true',
+        q: undefined,
+        sort: 'name',
+        order: 'asc',
+        limit: 30,
+        after: 'cur_1',
+      },
+    });
+    expect(result).toEqual({
+      items: [
+        {
+          kind: 'patient',
+          id: TEST_MONEY_PATIENT_ID,
+          contactId: TEST_MONEY_CONTACT_ID,
+          seq: 2,
+          name: 'Kavya Mehta',
+          phone: '+919825005865',
+          due: null,
+        },
+      ],
+      nextCursor: 'cur_2',
     });
   });
 
-  it('finds the leads that are not patients yet, after the patients', async () => {
-    const [lead] = clinicFixtures.leads.snapshot(
-      (row) =>
-        row.patientId === null && row.kind !== 'contact_thread' && !row.isContactThread,
+  it('searches by name, number or contact number, best match first', async () => {
+    vi.mocked(api.get).mockResolvedValue(page([contactRow()]) as never);
+
+    await searchPatientPicker(' Kavya ');
+    expect(lastQuery()).toMatchObject({ q: 'Kavya', sort: undefined, order: undefined });
+    await searchPatientPicker('C-1188');
+    expect(lastQuery()).toMatchObject({ q: 'C-1188' });
+  });
+
+  it('finds nothing for a search too short to send, unasked', async () => {
+    expect(await searchPatientPicker('Ka')).toEqual({ items: [], nextCursor: null });
+    expect(api.get).not.toHaveBeenCalled();
+  });
+
+  it('keeps out a contact the answer carries without a patient file', async () => {
+    vi.mocked(api.get).mockResolvedValue(
+      page([contactRow({ patient_id: null, patient_number: null })]) as never,
     );
-    if (!lead) throw new Error('the seed has a lead that is not a patient');
-    const page = await searchPatientPicker(lead.name);
-    const kinds = page.items.map((row) => row.kind);
-    expect(kinds).toContain('lead');
-    // Every patient row comes before the first lead row.
-    expect(kinds.lastIndexOf('patient')).toBeLessThan(kinds.indexOf('lead'));
-    expect(
-      page.items.find((row) => row.kind === 'lead' && row.id === lead.id),
-    ).toMatchObject({
-      name: lead.name,
-      seq: lead.seq,
-    });
+    expect((await searchPatientPicker('Kavya')).items).toEqual([]);
   });
 });

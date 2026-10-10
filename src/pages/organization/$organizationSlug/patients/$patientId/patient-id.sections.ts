@@ -1,6 +1,9 @@
 import { lazyRouteComponent } from '@tanstack/react-router';
 
+import { ensureNamespace } from '@/lib/i18n/load-namespace.ts';
+import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 import type { PatientFileSectionSlug } from '@/shared/clinic/patient-file-sections.ts';
+import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 
 import { Component as PrescriptionEdit } from './prescriptions/$prescriptionId/edit/edit.route.tsx';
 import { Component as Prescription } from './prescriptions/$prescriptionId/prescription-id.route.tsx';
@@ -95,10 +98,14 @@ export const PATIENT_FILE_SECTION_PAGES = {
     () => import('./invoices/invoices.route.tsx'),
     'Component',
   ),
-  payments: lazyRouteComponent(
-    () => import('./payments/payments.route.tsx'),
-    'Component',
-  ),
+  // The ledger's row actions and their confirms speak the Payments room's copy.
+  payments: lazyRouteComponent(async () => {
+    const [module] = await Promise.all([
+      import('./payments/payments.route.tsx'),
+      ensureNamespace(useLocaleStore.getState().locale, I18N_NAMESPACES.payments),
+    ]);
+    return module;
+  }, 'Component'),
   packages: lazyRouteComponent(
     () => import('./packages/packages.route.tsx'),
     'Component',

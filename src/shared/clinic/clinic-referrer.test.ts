@@ -20,7 +20,8 @@ const PATIENT = 'pat_priya0000000000000000';
 /** A lead and a booking are clinozy-be public ids; the fixture rooms' records stay UUIDs. */
 const LEAD = 'lead_riya00000000000000000';
 const BOOKING = 'appt_riya00000000000000000';
-const INVOICE = '1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d';
+const INVOICE = 'invc_4ea44s81zsxncy705mp01';
+const PAYMENT = 'pay_5vstwdmuz5fnklr2jy6aa';
 const ORG = '/organization/acme';
 
 /** A location as the router parses `path` (org-relative) with `search`. */
@@ -252,6 +253,7 @@ describe('crossRoomDialogOf (A-P1)', () => {
     ['appointments/create', 'appointmentCreate'],
     [`appointments/${BOOKING}`, 'appointment'],
     ['payments/receive', 'paymentReceive'],
+    [`payments/${PAYMENT}/edit`, 'paymentEdit'],
     ['invoices/create', 'invoiceCreate'],
     [`invoices/${INVOICE}`, 'invoice'],
     [`invoices/${INVOICE}/edit`, 'invoiceEdit'],

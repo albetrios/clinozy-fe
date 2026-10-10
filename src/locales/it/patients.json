@@ -34,7 +34,8 @@
   },
   "rowActions": {
     "edit": "Modifica",
-    "delete": "Elimina"
+    "delete": "Elimina",
+    "newInvoice": "Nuova fattura"
   },
   "bulk": {
     "export": "Esporta",

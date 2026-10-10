@@ -7,12 +7,19 @@ import { PAYMENT_MODE_TONES } from '@/shared/clinic/clinic-tones.ts';
 import {
   DrawerField,
   DrawerFieldGrid,
+  type DrawerFieldProps,
+  DrawerInfo,
+  DrawerNumberInput,
   DrawerQuickChips,
   DrawerStepper,
   DrawerTextarea,
   useDrawerFieldIds,
 } from '@/shared/components/DrawerField/index.ts';
 import type { PickerOption } from '@/shared/components/Picker/index.ts';
+import {
+  RECORD_DRAWER_KEYS,
+  RECORD_DRAWER_NS,
+} from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import {
   type ItemsColumn,
   ItemsField,
@@ -26,9 +33,9 @@ import {
   INVOICE_DRAWER_NS,
   INVOICE_DRAWER_TEST_IDS,
 } from './invoice-drawer.constants.ts';
+import type { InvoiceFigures } from './invoice-figures.ts';
 import {
   blankPaidNow,
-  type InvoiceDraftFigures,
   type InvoiceFormValues,
   PAID_NOW_MODES,
   type PaidNowMode,
@@ -40,6 +47,9 @@ const K = INVOICE_DRAWER_KEYS;
 
 /** The three presets of "Quick fill" in the Payment step (`payments.md:144`). */
 type PaymentPreset = 'full' | 'split' | 'nothing';
+
+/** The most an overall discount takes as typed — seven digits of rupees. */
+const OVERALL_DISCOUNT_MAX_LENGTH = 10;
 
 /** Cash, UPI, Card — each on its tone's dot. */
 function useModeOptions(): PickerOption[] {
@@ -91,39 +101,97 @@ function nextPaidNowRow(rows: readonly PaidNowRow[], left: number): PaidNowRow |
 export interface InvoicePaymentFieldsProps {
   form: UseFormReturn<InvoiceFormValues>;
   values: InvoiceFormValues;
-  figures: InvoiceDraftFigures;
-  /** What the invoice has already received — an edit's; 0 for a new one. */
-  alreadyPaid: number;
+  figures: InvoiceFigures;
+  /**
+   * `sale` — a Medical sale (the overall discount a percent, Q-G7); `create` — a new invoice
+   * (the overall discount in rupees, "Paid now" with the bill); `edit` — a saved invoice, whose
+   * money is the ledger's: what it has received and what is due, no "Paid now".
+   */
+  mode: 'sale' | 'create' | 'edit';
   idPrefix: string;
   readOnly: boolean;
 }
 
+/** The overall discount: a sale's percent stepper, an invoice's rupees off the bill before tax. */
+function OverallDiscountField({
+  form,
+  mode,
+  idPrefix,
+  readOnly,
+}: Pick<InvoicePaymentFieldsProps, 'form' | 'mode' | 'idPrefix' | 'readOnly'> &
+  Pick<DrawerFieldProps, 'span' | 'stretch'>) {
+  const { t } = useTranslation(INVOICE_DRAWER_NS);
+  const { t: tDrawer } = useTranslation(RECORD_DRAWER_NS);
+  const ids = useDrawerFieldIds(form, idPrefix);
+  const sale = mode === 'sale';
+  const field = ids(sale ? 'overallDiscountPct' : 'overallDiscount');
+  return (
+    <DrawerField
+      span="half"
+      stretch={false}
+      label={t(K.fields.overallDiscount)}
+      htmlFor={field.id}
+      error={field.error}
+    >
+      {sale ? (
+        <Controller
+          control={form.control}
+          name="overallDiscountPct"
+          render={({ field: control }) => (
+            // "−  0 %  +" (H:5063): a stored fraction reads as it is, a typed figure is whole.
+            <DrawerStepper
+              {...field.control}
+              ref={control.ref}
+              value={percentOf(control.value)}
+              onValueChange={(next) => control.onChange(String(next))}
+              onBlur={control.onBlur}
+              suffix="%"
+              max={100}
+              disabled={readOnly}
+              testId={INVOICE_DRAWER_TEST_IDS.overallDiscount}
+            />
+          )}
+        />
+      ) : (
+        <Controller
+          control={form.control}
+          name="overallDiscount"
+          render={({ field: control }) => (
+            <DrawerNumberInput
+              {...field.control}
+              ref={control.ref}
+              value={control.value}
+              onValueChange={control.onChange}
+              onBlur={control.onBlur}
+              prefix={tDrawer(RECORD_DRAWER_KEYS.currency)}
+              placeholder="0"
+              maxLength={OVERALL_DISCOUNT_MAX_LENGTH}
+              readOnly={readOnly}
+              data-testid={INVOICE_DRAWER_TEST_IDS.overallDiscount}
+            />
+          )}
+        />
+      )}
+    </DrawerField>
+  );
+}
+
 /**
- * The Payment step (`payments.md:143–146`; H:5063): the overall discount as a
- * percent — before tax, off the subtotal after line discounts (Q-G7) — the
- * Quick fill presets ("Full · ₹324 in UPI" · "Split cash + UPI" · "Nothing
- * now"), the "Paid now" rows with "Paid ₹324 · due ₹0" and "+ Add another
- * mode", and the Remark — "Shown on the printed invoice", the one note that
- * prints (§7.3).
+ * "Paid now"'s Quick fill (`payments.md:144`): "Full · ₹324 in UPI" · "Split cash + UPI" ·
+ * "Nothing now", and the row "+ Add another mode" adds — from what the bill still needs before
+ * this save (an invoice's is the server's preview).
  */
-export function InvoicePaymentFields({
+function usePaidNowPresets({
   form,
   values,
   figures,
-  alreadyPaid,
-  idPrefix,
-  readOnly,
-}: InvoicePaymentFieldsProps) {
+}: Pick<InvoicePaymentFieldsProps, 'form' | 'values' | 'figures'>) {
   const { t } = useTranslation(INVOICE_DRAWER_NS);
   const formatPaise = usePaiseFormat();
-  const ids = useDrawerFieldIds(form, idPrefix);
-  const columns = usePaidNowColumns();
-  // What is left to take now: the bill less what the ledger already has.
-  const left = Math.max(0, figures.totals.bill - alreadyPaid);
+  const left = Math.max(0, figures.dueBefore);
   const firstMode: PaidNowMode = values.paidNow[0]?.mode ?? 'upi';
   const setPaidNow = (rows: PaidNowRow[]) =>
     form.setValue('paidNow', rows, { shouldDirty: true });
-
   const presets: { label: string; value: PaymentPreset }[] = [
     {
       value: 'full',
@@ -135,7 +203,7 @@ export function InvoicePaymentFields({
     { value: 'split', label: t(K.payment.split) },
     { value: 'nothing', label: t(K.payment.nothing) },
   ];
-  const applyPreset = (preset: PaymentPreset) => {
+  const apply = (preset: PaymentPreset) => {
     if (preset === 'full') setPaidNow([{ mode: firstMode, amount: left }]);
     else if (preset === 'split') {
       const cash = Math.round(left / 2);
@@ -145,69 +213,90 @@ export function InvoicePaymentFields({
       ]);
     } else setPaidNow(blankPaidNow(firstMode));
   };
+  return {
+    presets,
+    apply,
+    firstMode,
+    next: nextPaidNowRow(values.paidNow, left - figures.paidNow),
+  };
+}
 
-  const next = nextPaidNowRow(values.paidNow, left - figures.paidNow);
-  const discount = ids('overallDiscountPct');
+/**
+ * The Payment step (`payments.md:143–146`; H:5063): the overall discount — a sale's percent
+ * (Q-G7), an invoice's rupees off the bill before tax — "Paid now" with its presets on a new
+ * invoice or sale (a saved invoice shows what it has received and what is due: more money is
+ * the ledger's Receive payment), and the Remark — "Shown on the printed invoice", the one note
+ * that prints (§7.3).
+ */
+export function InvoicePaymentFields({
+  form,
+  values,
+  figures,
+  mode,
+  idPrefix,
+  readOnly,
+}: InvoicePaymentFieldsProps) {
+  const { t } = useTranslation(INVOICE_DRAWER_NS);
+  const formatPaise = usePaiseFormat();
+  const ids = useDrawerFieldIds(form, idPrefix);
+  const columns = usePaidNowColumns();
+  const paidNow = usePaidNowPresets({ form, values, figures });
+  const nextRow = paidNow.next;
   const remark = ids('remark');
+  const saved = mode === 'edit';
 
   return (
     <DrawerFieldGrid>
-      <DrawerField
+      <OverallDiscountField
         span="half"
         stretch={false}
-        label={t(K.fields.overallDiscount)}
-        htmlFor={discount.id}
-        error={discount.error}
-      >
-        <Controller
-          control={form.control}
-          name="overallDiscountPct"
-          render={({ field }) => (
-            // "−  0 %  +" (H:5063): a stored fraction reads as it is, a typed figure is whole.
-            <DrawerStepper
-              {...discount.control}
-              ref={field.ref}
-              value={percentOf(field.value)}
-              onValueChange={(next) => field.onChange(String(next))}
-              onBlur={field.onBlur}
-              suffix="%"
-              max={100}
-              disabled={readOnly}
-              testId={INVOICE_DRAWER_TEST_IDS.overallDiscount}
-            />
-          )}
-        />
-      </DrawerField>
-      {readOnly ? null : (
+        form={form}
+        mode={mode}
+        idPrefix={idPrefix}
+        readOnly={readOnly}
+      />
+      {saved ? (
+        <DrawerField span="half" label={t(K.fields.paid)}>
+          <DrawerInfo testId={INVOICE_DRAWER_TEST_IDS.paidNow}>
+            {t(K.payment.paidTotal, {
+              paid: formatPaise(figures.paidBefore),
+              due: formatPaise(figures.due),
+            })}
+          </DrawerInfo>
+        </DrawerField>
+      ) : null}
+      {saved || readOnly ? null : (
         <DrawerField span="full" label={t(K.fields.quickFill)}>
           <DrawerQuickChips
             label={t(K.fields.quickFill)}
-            options={presets}
+            options={paidNow.presets}
             value={null}
-            onChange={applyPreset}
+            onChange={paidNow.apply}
             testId={INVOICE_DRAWER_TEST_IDS.paymentQuickFill}
           />
         </DrawerField>
       )}
-      <DrawerField span="full" label={t(K.fields.paidNow)}>
-        <ItemsField
-          control={form.control}
-          name="paidNow"
-          label={t(K.fields.paidNow)}
-          columns={columns}
-          compact
-          minRows={1}
-          clearRow={() => ({ mode: firstMode, amount: 0 })}
-          newRow={next ? () => next : undefined}
-          addLabel={t(K.payment.addMode)}
-          total={t(K.payment.paidTotal, {
-            paid: formatPaise(alreadyPaid + figures.paidNow),
-            due: formatPaise(figures.balance.due),
-          })}
-          readOnly={readOnly}
-          testId={INVOICE_DRAWER_TEST_IDS.paidNow}
-        />
-      </DrawerField>
+      {saved ? null : (
+        <DrawerField span="full" label={t(K.fields.paidNow)}>
+          <ItemsField
+            control={form.control}
+            name="paidNow"
+            label={t(K.fields.paidNow)}
+            columns={columns}
+            compact
+            minRows={1}
+            clearRow={() => ({ mode: paidNow.firstMode, amount: 0 })}
+            newRow={nextRow ? () => nextRow : undefined}
+            addLabel={t(K.payment.addMode)}
+            total={t(K.payment.paidTotal, {
+              paid: formatPaise(figures.paidBefore + figures.paidNow),
+              due: formatPaise(figures.due),
+            })}
+            readOnly={readOnly}
+            testId={INVOICE_DRAWER_TEST_IDS.paidNow}
+          />
+        </DrawerField>
+      )}
       <DrawerField span="full" label={t(K.fields.remark)} htmlFor={remark.id}>
         <DrawerTextarea
           {...remark.control}

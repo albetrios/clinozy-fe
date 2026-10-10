@@ -341,6 +341,27 @@ export async function fetchStockPurchase(id: string): Promise<StockPurchaseRow> 
   return purchaseRowOf(purchase, await vendorRefs());
 }
 
+/**
+ * A vendor's oldest bill with something due — what Vendors' "Pay ₹X" pays, read once on the
+ * click (never a read per row): `GET /app/stock-purchases?stock_vendor_id=&payment_status=
+ * unpaid,partial&sort=purchase_date&order=asc&limit=1`. Null when nothing is owed to them now.
+ */
+export async function fetchOldestOpenStockPurchase(
+  vendorId: string,
+): Promise<StockPurchaseRecord | null> {
+  const response = await api.get('/app/stock-purchases', {
+    query: {
+      stock_vendor_id: vendorId,
+      payment_status: listOf(['unpaid', 'partial']),
+      sort: 'purchase_date',
+      order: 'asc',
+      limit: 1,
+    },
+  });
+  const [oldest] = z.array(stockPurchaseRowWire).parse(response.data ?? []);
+  return oldest ? toStockPurchaseRecord(oldest) : null;
+}
+
 // ── Movements ──
 
 /** The Movements read's query for the URL's params, on the clinic's `today` — newest first. */

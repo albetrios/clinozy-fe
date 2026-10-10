@@ -1,93 +1,79 @@
-import type { CursorPage } from './clinic-fixture-store.ts';
-import {
-  COMMAND_SEARCH_PER_TYPE,
-  isCommandSearchQuery,
-  matchesCommandSearch,
-} from './command-search-api.ts';
-import type { LeadRecord } from './leads-fixture-contracts.ts';
-import { listPatients } from './patients-fixture-api.ts';
-import { patientName } from './patients-fixture-contracts.ts';
+import { z } from 'zod';
+
+import { api } from '@/core/http/api.ts';
+
+import { isContactSearchable } from './contacts-api.ts';
+import { contactNameOf, contactRowWire } from './contacts-contracts.ts';
+import { nextCursorOf } from './payments-api.ts';
 
 /*
- * The patient field's search (Receive payment, the Invoice drawer — KICKOFF
- * §6.9): patients by name, mobile or display id through `listPatients`
- * (`S:1619`), each with its dues, and — once the patients run out — the leads
- * the same text finds that are not patients yet, which the field shows but
- * will not take ("Lead #2363 · not a patient yet"). On the fixture world until
- * clinozy-be serves it — REPLACE_WITH_API (D6).
+ * The patient field's search (Receive payment, the Invoice drawer — KICKOFF §6.9) on clinozy-be:
+ * the clinic's patients — the contacts with a patient file (`GET /app/contacts?is_patient=true`) —
+ * by name, number or contact number, A–Z when nothing is typed. The list carries no dues (a
+ * per-row read would be one per patient, D148 Q1); the picked patient's comes from their invoices'
+ * total.
  */
 
-/** One row of the patient field's list: a patient it can take, or a lead it can't. */
-export type PatientPickRow =
-  | {
-      kind: 'patient';
-      id: string;
-      seq: number;
-      name: string;
-      phone: string | null;
-      /** Everything the patient still owes, in paise. */
-      due: number;
-    }
-  | { kind: 'lead'; id: string; seq: number; name: string };
+/** One row of the patient field's list: a patient it can take. */
+export interface PatientPickRow {
+  kind: 'patient';
+  /** The patient file (`pat_…`) — the field's value. */
+  id: string;
+  /** Their contact (`con_…`) — what a receipt or an invoice names. */
+  contactId: string;
+  /** "#3508". */
+  seq: number;
+  name: string;
+  phone: string;
+  /** Everything they still owe, in rupees; null when it was not read (a list row). */
+  due: number | null;
+}
 
 /** TanStack Query keys for the patient field's pages. */
 export const patientPickerQueryKeys = {
   all: ['clinic', 'patient-picker'] as const,
 };
 
-const fixtureWorld = () => import('./fixtures/world.fixtures.ts');
-
-/** A lead that never became a patient — a person, never a contact thread (H:4606). */
-export function isLeadNotPatient(
-  lead: Pick<LeadRecord, 'kind' | 'isContactThread' | 'patientId'>,
-): boolean {
-  return (
-    lead.kind !== 'contact_thread' && !lead.isContactThread && lead.patientId === null
-  );
-}
-
-/** The leads `query` finds that never became patients — ten at most, newest first. */
-async function leadsNotPatients(query: string): Promise<PatientPickRow[]> {
-  const { clinicFixtures } = await fixtureWorld();
-  return clinicFixtures.leads
-    .snapshot(
-      (lead) =>
-        isLeadNotPatient(lead) &&
-        matchesCommandSearch(
-          { names: [lead.name], phone: lead.phone, seq: lead.seq },
-          query,
-        ),
-    )
-    .sort((a, b) => b.seq - a.seq)
-    .slice(0, COMMAND_SEARCH_PER_TYPE)
-    .map((lead) => ({ kind: 'lead', id: lead.id, seq: lead.seq, name: lead.name }));
-}
+/** One page of the patient field. */
+const PICKER_PAGE_SIZE = 30;
 
 /**
- * One page of the patient field's list: patients A–Z matching `query` (all of
- * them for an empty one), then — on the last page, for a query of two or more
- * characters — the leads it matches that are not patients yet.
+ * One page of the patient field's list: patients A–Z for an empty search, else those `query`
+ * finds (3+ letters, 4+ digits or a whole `C-` number — anything shorter finds none, M17).
  */
 export async function searchPatientPicker(
   query: string,
   cursor: string | null = null,
-): Promise<CursorPage<PatientPickRow>> {
-  const text = query.trim();
-  const page = await listPatients(
-    { q: text || undefined, sort: 'name', order: 'asc' },
-    cursor,
-  );
-  const patients: PatientPickRow[] = page.items.map((row) => ({
-    kind: 'patient',
-    id: row.id,
-    seq: row.seq,
-    name: patientName(row),
-    phone: row.phone,
-    due: row.dueTotal,
-  }));
-  const leads =
-    page.nextCursor === null && isCommandSearchQuery(text)
-      ? await leadsNotPatients(text)
-      : [];
-  return { items: [...patients, ...leads], nextCursor: page.nextCursor };
+): Promise<{ items: PatientPickRow[]; nextCursor: string | null }> {
+  const q = query.trim();
+  if (q !== '' && !isContactSearchable(q)) return { items: [], nextCursor: null };
+  const response = await api.get('/app/contacts', {
+    query: {
+      is_patient: 'true',
+      q: q === '' ? undefined : q,
+      sort: q === '' ? 'name' : undefined,
+      order: q === '' ? 'asc' : undefined,
+      limit: PICKER_PAGE_SIZE,
+      after: cursor ?? undefined,
+    },
+  });
+  const items = z
+    .array(contactRowWire)
+    .parse(response.data ?? [])
+    .flatMap((row): PatientPickRow[] =>
+      row.patient_id
+        ? [
+            {
+              kind: 'patient',
+              id: row.patient_id,
+              contactId: row.id,
+              seq: row.patient_number ?? 0,
+              name: contactNameOf(row),
+              phone: row.primary_phone,
+              due: null,
+            },
+          ]
+        : [],
+    );
+  return { items, nextCursor: nextCursorOf(response.meta) };
 }

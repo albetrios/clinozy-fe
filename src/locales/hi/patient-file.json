@@ -64,8 +64,11 @@
       "photo": "फ़ोटो",
       "appointment": "अपॉइंटमेंट",
       "report": "रिपोर्ट",
-      "note": "नोट"
-    }
+      "note": "नोट",
+      "invoice": "इनवॉइस",
+      "payment": "भुगतान"
+    },
+    "nothingDue": "{{name}} का कुछ भी बकाया नहीं है"
   },
   "section": {
     "primary": {
@@ -121,7 +124,11 @@
     "reviews_one": "{{count}} समीक्षा",
     "reviews_other": "{{count}} समीक्षाएँ",
     "feedbackCounts": "{{checkIns}} · {{reviews}}",
-    "noFeedback": "अभी कोई फ़ीडबैक नहीं"
+    "noFeedback": "अभी कोई फ़ीडबैक नहीं",
+    "showAmount": "राशि दिखाएँ",
+    "hideAmount": "राशि छिपाएँ",
+    "collect": "वसूलें",
+    "allPaid": "सब भुगतान हो गया · कुछ बकाया नहीं"
   },
   "photos": {
     "albums": {
@@ -923,6 +930,15 @@
       "notes": "नोट्स",
       "empty": "अभी कोई गतिविधि नहीं",
       "masked": "₹ ••••"
+    },
+    "billing": {
+      "due": "बाकी",
+      "paid": "चुकाया",
+      "show": "राशियाँ दिखाएँ",
+      "hide": "राशियाँ छिपाएँ",
+      "invoice": "{{type}} इनवॉइस {{number}}",
+      "sub": "{{date}} · {{amount}}",
+      "collect": "भुगतान लें"
     }
   },
   "visitFlow": {
@@ -937,7 +953,9 @@
     "steps": {
       "checks": "चेक-इन और सुरक्षा",
       "rx": "पर्चा",
-      "treatment": "उपचार"
+      "treatment": "उपचार",
+      "invoice": "इनवॉइस",
+      "collect": "वसूली"
     },
     "checks": {
       "labels": {
@@ -973,6 +991,22 @@
       "repeatPackage": "⚡ दोहराएँ · {{name}}"
     },
     "paused": "विज़िट रुकी हुई है",
-    "resume": "फिर से शुरू करें"
+    "resume": "फिर से शुरू करें",
+    "invoice": {
+      "create": "विज़िट से इनवॉइस बनाएँ",
+      "custom": "कस्टम इनवॉइस",
+      "nothing": "बिल करने को कुछ नहीं",
+      "covered": "पैकेज में शामिल · बिल करने को कुछ नहीं",
+      "empty": "अभी बिल करने को कुछ नहीं",
+      "done": "{{number}} · {{total}}",
+      "ready_one": "{{count}} आइटम तैयार",
+      "ready_other": "{{count}} आइटम तैयार"
+    },
+    "collect": {
+      "action": "{{amount}} वसूलें",
+      "due": "{{amount}} बाकी",
+      "nothing": "कुछ बाकी नहीं",
+      "waiting": "पहले विज़िट का इनवॉइस बनाएँ"
+    }
   }
 }

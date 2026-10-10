@@ -53,7 +53,8 @@
     "unconfirmed": "Unbestätigt",
     "waiting": "Wartet {{minutes}} Min.",
     "inRoom": "Im Raum {{minutes}} Min.",
-    "rxApproved": "Rezept freigegeben {{time}}"
+    "rxApproved": "Rezept freigegeben {{time}}",
+    "toPay": "{{amount}} zu zahlen"
   },
   "toasts": {
     "checkedIn": "{{name}} eingecheckt · Arztliste und Raum benachrichtigt",

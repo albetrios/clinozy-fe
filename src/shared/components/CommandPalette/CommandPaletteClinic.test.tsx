@@ -14,6 +14,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { OrganizationPermission } from '@/core/rbac/policies.ts';
 import type { PageManifest } from '@/lib/routes/page-manifest.ts';
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
+import type * as CommandSearchApiModule from '@/shared/api/clinic/command-search-api.ts';
+import { searchClinicCommands } from '@/shared/api/clinic/command-search-api.ts';
 import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import type { AuthUser } from '@/shared/auth/types.ts';
@@ -49,6 +51,11 @@ vi.mock('@/shared/auth/service.ts', async (importOriginal) => ({
 vi.mock('@/shared/hooks/useMeContext/index.ts', () => ({
   useMeContext: () => ({ data: { activeOrganization: { type: 'TEAM' } } }),
 }));
+// The fixture search, wrapped: one test hands back a clinozy-be invoice id.
+vi.mock('@/shared/api/clinic/command-search-api.ts', async (importOriginal) => {
+  const actual = await importOriginal<typeof CommandSearchApiModule>();
+  return { ...actual, searchClinicCommands: vi.fn(actual.searchClinicCommands) };
+});
 vi.mock('@/shared/tenancy/my-organization-summaries.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof MyOrganizationSummariesModule>()),
   useMyOrganizationSummaries: () => ({ data: [], isPending: false }),
@@ -111,7 +118,7 @@ async function renderMenu(path = '/organization/acme/today') {
 
 /**
  * The codes clinozy-be gives Owner and Admin for the rooms already on it (Leads, Appointments,
- * Patients, Stock; Offerings reads with `organization:read`).
+ * Patients, Stock, Tasks, Payments; Offerings reads with `organization:read`).
  */
 const LIVE_ROOM_CODES: OrganizationPermission[] = [
   'lead:read',
@@ -122,6 +129,9 @@ const LIVE_ROOM_CODES: OrganizationPermission[] = [
   'patient:create',
   'stock_item:read',
   'stock_item:create',
+  'task:read',
+  'payment:read',
+  'payment:create',
 ];
 
 /** The member: Owner and Admin from their platform codes, any other role by View-as. */
@@ -464,20 +474,31 @@ describe('the command menu opens the routes (D24, D19 / D26; §7.3)', () => {
   );
 
   it('opens a lead on its drawer route, an invoice over the page it came from (A-P1)', async () => {
+    // ⌘K still finds invoices in the fixture world (the shell's search moves later); the
+    // invoice drawer opens over the page for a clinozy-be invoice — an `invc_…` id.
+    const liveInvoice = 'invc_commandmenu0000000000';
+    const fixture = vi.mocked(searchClinicCommands).getMockImplementation();
+    if (!fixture) throw new Error('the fixture search is not wrapped');
+    vi.mocked(searchClinicCommands).mockImplementation(async (query) => {
+      const found = await fixture(query);
+      return {
+        ...found,
+        invoices: found.invoices.map((hit) =>
+          hit.id === ref.invoice(787) ? { ...hit, id: liveInvoice } : hit,
+        ),
+      };
+    });
     const { router, user } = await renderMenu('/organization/acme/patients');
     await screen.findByTestId('command-palette-group-actions');
 
     await user.type(search(), '#787');
     await user.click(
-      await screen.findByTestId(
-        `command-palette-invoice-${ref.invoice(787)}`,
-        undefined,
-        {
-          timeout: 3000,
-        },
-      ),
+      await screen.findByTestId(`command-palette-invoice-${liveInvoice}`, undefined, {
+        timeout: 3000,
+      }),
     );
-    const invoice = `invoices/${ref.invoice(787)}?from=patients`;
+    vi.mocked(searchClinicCommands).mockImplementation(fixture);
+    const invoice = `invoices/${liveInvoice}?from=patients`;
     await waitFor(() =>
       expect(router.history.location.href).toBe(`/organization/acme/${invoice}`),
     );

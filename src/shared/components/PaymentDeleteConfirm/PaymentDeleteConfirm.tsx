@@ -1,6 +1,8 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
+import { paymentQueryKeys } from '@/shared/api/clinic/payments-api.ts';
 import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
 import {
   ConfirmDialog,
@@ -8,8 +10,14 @@ import {
 } from '@/shared/components/ConfirmDialog/index.ts';
 import { REASON_CONFIRM_KEYS } from '@/shared/components/ConfirmDialog/reason-confirm.constants.ts';
 import { LEDGER_KEYS, LEDGER_NS } from '@/shared/components/LedgerCells/index.ts';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
+import {
+  useFixtureDeletePayment,
+  useFixtureRestorePayment,
+} from '@/shared/hooks/useFixtureLedger/index.ts';
 import { useDeletePayment, useRestorePayment } from '@/shared/hooks/usePayments/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
+import { notify } from '@/shared/notify/index.ts';
 
 const K = LEDGER_KEYS.deleteEntry;
 
@@ -25,10 +33,18 @@ const LEDGER_REASONS: readonly ConfirmReasonOption[] = [
   { value: 'other', labelKey: REASON_CONFIRM_KEYS.reasons.other },
 ];
 
+/** clinozy-be's `409` reasons for a delete, in the room's words. */
+const DELETE_BLOCK_KEYS: Readonly<Record<string, string>> = {
+  /** Its day closed meanwhile: a closed day's entry is reversed, never deleted. */
+  day_closed: K.blocked.dayClosed,
+  /** A refund already gave this money back: taking it off would leave the invoice below zero. */
+  more_than_paid: K.blocked.moreThanPaid,
+};
+
 /** The entry a delete confirm is about, and the due its invoice goes back to. */
 export interface PaymentDeleteTarget {
   entry: Pick<LedgerRow, 'id' | 'seq' | 'kind' | 'amount' | 'invoice'>;
-  /** A receipt's invoice due once the entry is gone, in paise. */
+  /** A receipt's invoice due once the entry is gone, in rupees. */
   dueAfter?: number;
 }
 
@@ -40,6 +56,21 @@ export interface PaymentDeleteConfirmProps {
   onClose: () => void;
   /** Runs once the entry is removed (a drawer closes itself). */
   onDeleted?: () => void;
+  /** The parked Medical room's entry: deleted and restored on the fixture ledger (D153 seam). */
+  fixture?: boolean;
+}
+
+/** The delete and its Undo — on clinozy-be, or on the fixture ledger for the parked Medical room. */
+function useEntryWrites(fixture: boolean) {
+  const live = {
+    remove: useDeletePayment({ notifyOnError: false }),
+    restore: useRestorePayment(),
+  };
+  const parked = {
+    remove: useFixtureDeletePayment({ notifyOnError: false }),
+    restore: useFixtureRestorePayment(),
+  };
+  return fixture ? parked : live;
 }
 
 /**
@@ -50,18 +81,37 @@ export interface PaymentDeleteConfirmProps {
  * is kept in the audit log." (the invoice sentence only for a receipt against
  * one). The soft delete is optimistic and "PAY-310 removed" — "· invoice
  * balance restored" for such a receipt — offers Undo for 10s (D32, `S:1546`).
+ * A refusal (`409 day_closed` — the day closed meanwhile, the entry is reversed instead;
+ * `409 more_than_paid` — a refund already gave the money back) closes the confirm, says why in
+ * the room's words and refreshes the ledger; any other failure keeps it open.
  */
 export function PaymentDeleteConfirm({
   target,
   onClose,
   onDeleted,
+  fixture = false,
 }: PaymentDeleteConfirmProps) {
   const { t } = useTranslation(LEDGER_NS);
-  const formatPaise = usePaiseFormat();
-  const remove = useDeletePayment();
-  const restore = useRestorePayment();
+  const formatRupees = useRupeeFormat();
+  const { remove, restore } = useEntryWrites(fixture);
+  const queryClient = useQueryClient();
   const entry = target?.entry;
   const ref = entry ? displayId.payment(entry.seq) : '';
+
+  /** Tell a refusal apart from a failure: the first closes the confirm and refreshes the ledger. */
+  const reportFailure = (error: unknown) => {
+    const block = apiErrorReason(error);
+    const blockKey = block === undefined ? undefined : DELETE_BLOCK_KEYS[block];
+    if (blockKey === undefined) {
+      notify.error(mapApiError(error));
+      return;
+    }
+    notify.error(t(blockKey, { ref }));
+    queryClient
+      .invalidateQueries({ queryKey: paymentQueryKeys.all })
+      .catch(() => undefined);
+    onClose();
+  };
   const invoiceSentence =
     entry?.kind === 'receipt' && entry.invoice && target?.dueAfter !== undefined;
   return (
@@ -75,7 +125,7 @@ export function PaymentDeleteConfirm({
         invoiceSentence && entry?.invoice
           ? t(K.effectInvoice, {
               seq: entry.invoice.seq,
-              due: formatPaise(target?.dueAfter ?? 0),
+              due: formatRupees(target?.dueAfter ?? 0),
             })
           : t(K.effect)
       }
@@ -91,7 +141,12 @@ export function PaymentDeleteConfirm({
       }}
       onConfirm={async ({ reason, note }) => {
         if (!entry) return;
-        await remove.mutateAsync({ id: entry.id, reason, note });
+        try {
+          await remove.mutateAsync({ id: entry.id, reason, note });
+        } catch (error) {
+          reportFailure(error);
+          throw error;
+        }
         onDeleted?.();
       }}
     />

@@ -7,7 +7,7 @@
  * `routeTree.tsx`); the page that opens the drawer parses it, and this module
  * loads with the room.
  */
-import { matchOf, oneOf, RECORD_ID, textOf } from '@/lib/routes/search-params.ts';
+import { matchOf, oneOf, PUBLIC_ID, textOf } from '@/lib/routes/search-params.ts';
 import type { InvoiceType } from '@/shared/api/clinic/clinic-schema.ts';
 
 import type { InvoiceSearch } from './invoices.search.ts';
@@ -25,6 +25,8 @@ export interface InvoiceCreateSearch extends InvoiceSearch {
   patient?: string;
   /** The patient file's "Copy invoice": the saved invoice a new one starts as. */
   copyOf?: string;
+  /** The visit flow's "Create invoice from visit": the visit (`appt_…`) whose sessions it bills. */
+  appointment?: string;
 }
 
 /** Parse New invoice's params. */
@@ -33,8 +35,9 @@ export function validateInvoiceCreateSearch(
 ): InvoiceCreateSearch {
   return {
     type: oneOf(INVOICE_TYPE_PARAMS, search.type),
-    patient: matchOf(RECORD_ID, search.patient),
-    copyOf: matchOf(RECORD_ID, search.copyOf),
+    patient: matchOf(PUBLIC_ID, search.patient),
+    copyOf: matchOf(PUBLIC_ID, search.copyOf),
+    appointment: matchOf(PUBLIC_ID, search.appointment),
     from: textOf(search.from) || undefined,
   };
 }

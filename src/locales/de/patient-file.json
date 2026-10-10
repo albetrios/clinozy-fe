@@ -64,8 +64,11 @@
       "photo": "Foto",
       "appointment": "Termin",
       "report": "Befund",
-      "note": "Notiz"
-    }
+      "note": "Notiz",
+      "invoice": "Rechnung",
+      "payment": "Zahlung"
+    },
+    "nothingDue": "Für {{name}} ist nichts offen"
   },
   "section": {
     "primary": {
@@ -121,7 +124,11 @@
     "reviews_one": "{{count}} Bewertung",
     "reviews_other": "{{count}} Bewertungen",
     "feedbackCounts": "{{checkIns}} · {{reviews}}",
-    "noFeedback": "Noch kein Feedback"
+    "noFeedback": "Noch kein Feedback",
+    "showAmount": "Betrag anzeigen",
+    "hideAmount": "Betrag ausblenden",
+    "collect": "Kassieren",
+    "allPaid": "Alles bezahlt · nichts offen"
   },
   "photos": {
     "albums": {
@@ -923,6 +930,15 @@
       "notes": "Notizen",
       "empty": "Noch keine Aktivität",
       "masked": "₹ ••••"
+    },
+    "billing": {
+      "due": "Offen",
+      "paid": "Bezahlt",
+      "show": "Beträge anzeigen",
+      "hide": "Beträge ausblenden",
+      "invoice": "{{type}}-Rechnung {{number}}",
+      "sub": "{{date}} · {{amount}}",
+      "collect": "Zahlung kassieren"
     }
   },
   "visitFlow": {
@@ -937,7 +953,9 @@
     "steps": {
       "checks": "Check-in & Sicherheit",
       "rx": "Rezept",
-      "treatment": "Behandlung"
+      "treatment": "Behandlung",
+      "invoice": "Rechnung",
+      "collect": "Kassieren"
     },
     "checks": {
       "labels": {
@@ -973,6 +991,22 @@
       "repeatPackage": "⚡ Wiederholen · {{name}}"
     },
     "paused": "Besuch pausiert",
-    "resume": "Fortsetzen"
+    "resume": "Fortsetzen",
+    "invoice": {
+      "create": "Rechnung aus dem Besuch erstellen",
+      "custom": "Individuelle Rechnung",
+      "nothing": "Nichts abzurechnen",
+      "covered": "Durch das Paket abgedeckt · nichts abzurechnen",
+      "empty": "Noch nichts abzurechnen",
+      "done": "{{number}} · {{total}}",
+      "ready_one": "{{count}} Position bereit",
+      "ready_other": "{{count}} Positionen bereit"
+    },
+    "collect": {
+      "action": "{{amount}} kassieren",
+      "due": "{{amount}} offen",
+      "nothing": "Nichts offen",
+      "waiting": "Zuerst den Besuch abrechnen"
+    }
   }
 }

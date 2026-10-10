@@ -1,4 +1,5 @@
 import { useLocation, useNavigate, useParams, useSearch } from '@tanstack/react-router';
+import type { TFunction } from 'i18next';
 import { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -7,11 +8,16 @@ import { organizationPayments } from '@/lib/routes/payments-builders.ts';
 import { fetchPayment, paymentQueryKeys } from '@/shared/api/clinic/payments-api.ts';
 import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
 import { safeReferrer } from '@/shared/clinic/clinic-referrer.ts';
-import { ledgerEntryLock } from '@/shared/components/LedgerCells/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import {
+  ledgerEntryEditable,
+  ledgerEntryFixed,
+  ledgerEntryLock,
+} from '@/shared/components/LedgerCells/index.ts';
 import { useDialogRouteLocation } from '@/shared/hooks/useCrossRoomDialog/index.ts';
 import { useDialogRouteRecord } from '@/shared/hooks/useDialogRouteRecord/index.ts';
+import { usePaymentAccess } from '@/shared/hooks/usePaymentAccess/index.ts';
 import { notify } from '@/shared/notify/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 import { PAYMENTS_KEYS, PAYMENTS_NS } from '../../payments.constants.ts';
 import {
@@ -72,16 +78,29 @@ function pathDialog(
   return { kind: 'none' };
 }
 
-/** A closed day's entry can't be edited (`S:87`): back to the ledger, named — once per entry. */
-function useLockedEntryRefusal(entry: LedgerRow | null, back: () => void) {
-  const { t } = useTranslation(PAYMENTS_NS);
+/**
+ * Why an entry the URL names opens no drawer, or null when it opens: its day is closed or a
+ * pending credit settled it (`S:87`), or — a refund, a reversal — its money is another write's.
+ */
+function entryRefusal(entry: LedgerRow, t: TFunction): string | null {
+  const lock = ledgerEntryLock(entry, t);
+  if (lock) return lock;
+  return ledgerEntryEditable(entry) ? null : ledgerEntryFixed(entry, t);
+}
+
+/** An entry that can't be edited: back to the ledger, named — once per entry. */
+function useLockedEntryRefusal(
+  entry: LedgerRow | null,
+  refusal: string | null,
+  back: () => void,
+) {
   const refusedFor = useRef<string | null>(null);
   useEffect(() => {
     if (!entry || refusedFor.current === entry.id) return;
     refusedFor.current = entry.id;
-    notify.info(ledgerEntryLock(entry, t) ?? '');
+    notify.info(refusal ?? '');
     back();
-  }, [entry, back, t]);
+  }, [entry, refusal, back]);
 }
 
 /** A create link the member's role can't follow: back to the ledger with the permission toast. */
@@ -102,7 +121,9 @@ function useRefusal(refused: boolean, pathname: string, back: () => void) {
  * no entry opens nothing: the URL goes back to `/payments`, the ledger's
  * filters kept, with "Payment not found · it may have been deleted" (`S:115`);
  * an entry whose day is closed goes back the same way with "PAY-5509 · Day
- * closed" (`S:87`). A member without Create who follows a Receive or Pay link
+ * closed" (`S:87`), a refund or a reversal with "PAY-9 · its money can’t change"
+ * (it is deleted on its day, never edited). A member without `payment:create` who
+ * follows a Receive or Pay link
  * lands on the ledger with the permission toast. `close` returns to the
  * referrer `from` (allow-listed rooms, A-P1), else to the ledger with its own
  * params and nothing of the drawer's. Over another room's page (A-P1,
@@ -121,7 +142,8 @@ export function usePaymentsDialogRoute(): PaymentsDialogRouteState {
   const { organizationSlug = '', paymentId } = params;
   const navigate = useNavigate();
   const { t } = useTranslation(PAYMENTS_NS);
-  const access = useClinicAccess();
+  const access = usePaymentAccess();
+  const organizationId = useOrganizationStore((state) => state.organizationId);
 
   const backToLedger = useCallback(() => {
     if (crossRoom) {
@@ -139,20 +161,19 @@ export function usePaymentsDialogRoute(): PaymentsDialogRouteState {
 
   const entry = useDialogRouteRecord({
     id: paymentId,
-    queryKey: paymentQueryKeys.detail,
+    queryKey: (id) => paymentQueryKeys.detail(organizationId, id),
     fetchRecord: fetchPayment,
     recordLabel: t(PAYMENTS_KEYS.dialog.record),
     onMissing: backToLedger,
   });
 
-  const lockedEntry =
-    entry.record && ledgerEntryLock(entry.record, t) !== null ? entry.record : null;
-  useLockedEntryRefusal(lockedEntry, backToLedger);
+  const refusal = entry.record ? entryRefusal(entry.record, t) : null;
+  const lockedEntry = refusal === null ? null : (entry.record ?? null);
+  useLockedEntryRefusal(lockedEntry, refusal, backToLedger);
 
   const isReceive = RECEIVE_PATH.test(pathname);
   const isCreate = isReceive || PAY_PATH.test(pathname);
-  const createRefused =
-    isCreate && access.isResolved && !access.can('payments', 'create');
+  const createRefused = isCreate && access.resolved && !access.canCreate;
   useRefusal(createRefused, pathname, backToLedger);
 
   // The drawer's params are parsed again here: from the ledger's own match the
@@ -175,7 +196,7 @@ export function usePaymentsDialogRoute(): PaymentsDialogRouteState {
         kind: 'edit',
         paymentId,
         payment: entry.record,
-        readOnly: access.isResolved && !access.can('payments', 'edit'),
+        readOnly: access.resolved && !access.canEdit,
       },
       close,
     };

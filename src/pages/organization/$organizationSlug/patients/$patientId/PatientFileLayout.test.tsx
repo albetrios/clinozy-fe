@@ -49,6 +49,12 @@ vi.mock('@/shared/api/clinic/patient-file-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchPatientFile: vi.fn(),
 }));
+// What she owes, over all her invoices — nothing (the rail's "All paid", Payment's "Nothing due").
+vi.mock('@/shared/api/clinic/invoices-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchInvoiceTotals: vi.fn(async () => ({ due: 0, paid: 0, count: 0 })),
+  listInvoices: vi.fn(async () => ({ rows: [], next: null, total: 0, totals: null })),
+}));
 vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchPersonAppointments: vi.fn(),
@@ -274,11 +280,15 @@ describe('the patient file layout (KICKOFF §6.6)', () => {
     expect(layout()).toHaveClass('group/file');
   });
 
-  it('fills the rail from the file: the next visit, and no dues', async () => {
+  it('fills the rail from the file: the next visit, and what she owes from the server', async () => {
     renderPatientFile(at('/visits'));
     const upNext = await screen.findByRole('region', { name: 'Up next' });
     expect(upNext).toHaveTextContent('Hydrafacial');
     expect(screen.getByTestId('patient-rail-book')).toHaveTextContent('Reschedule');
+    // `meta.due_total` is 0 here: "All paid", no due card.
+    expect(
+      await within(upNext).findByTestId('patient-rail-all-paid'),
+    ).toBeInTheDocument();
     expect(screen.queryByTestId('patient-rail-due')).not.toBeInTheDocument();
   });
 
@@ -305,19 +315,23 @@ describe('the patient file layout (KICKOFF §6.6)', () => {
     expect(screen.queryByTestId('patient-file-sections-panel')).not.toBeInTheDocument();
   });
 
-  it('offers each Add-to-record item the member may use — no Invoice or Payment', async () => {
+  it('offers each Add-to-record item the member may use', async () => {
     const user = userEvent.setup();
     renderPatientFile(at('/visits'), { role: 'front_desk' });
     await screen.findByTestId('patient-section-visits');
     await user.click(screen.getByTestId('patient-file-add'));
     const menu = await screen.findByTestId('patient-file-add-menu');
     expect(within(menu).getByText('Add for Priya')).toBeInTheDocument();
-    // Front desk: no Rx or treatment (the role-named gates, S:35, 38).
+    // Front desk: no Rx or treatment (the role-named gates, S:35, 38); Invoice and Payment.
     expect(
       within(menu)
         .getAllByRole('menuitem')
-        .map((item) => item.textContent),
-    ).toEqual(['Photo', 'Appointment', 'Report', 'Note']);
+        .map((item) => item.dataset.testid),
+    ).toEqual(
+      ['invoice', 'payment', 'photo', 'appointment', 'report', 'note'].map(
+        (id) => `patient-file-add-menu-${id}`,
+      ),
+    );
   });
 
   it('shows a Therapist the treatment gate alone in the Add menu', async () => {

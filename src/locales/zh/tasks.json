@@ -9,13 +9,13 @@
     "treatments": "治疗",
     "patients": "患者",
     "team": "团队",
-    "payments": "付款"
+    "payments": "付款",
+    "medical": "医药"
   },
   "rules": {
     "reply": {
       "label": "未回复的消息",
       "description": "潜在客户发来消息，但还没有人回复",
-      "automation": "发送附带价格和空闲时段的首次回复",
       "how": {
         "first": "在右侧阅读对方的最新消息",
         "second": "回复价格和两个空闲时段",
@@ -39,7 +39,6 @@
     "follow": {
       "label": "潜在客户跟进",
       "description": "跟进日期已到",
-      "automation": "通过 WhatsApp 发送一条友好的问候",
       "how": {
         "first": "查看对方感兴趣的项目",
         "second": "打电话或发 WhatsApp 友好提醒",
@@ -56,7 +55,7 @@
         },
         "noAnswer": {
           "label": "无人接听",
-          "effect": "已记录通话 · 任务暂缓 2 小时"
+          "effect": "已记录通话 · 任务暂缓 3 小时"
         },
         "notInterested": {
           "label": "不感兴趣",
@@ -75,7 +74,7 @@
       "outcomes": {
         "claimIt": {
           "label": "认领",
-          "effect": "你成为负责人 · {{owner}} 继续参与"
+          "effect": "你成为负责人"
         },
         "leaveWithOwner": {
           "label": "留给负责人",
@@ -86,7 +85,6 @@
     "failed": {
       "label": "未送达的消息",
       "description": "服务商未能送达一条消息",
-      "automation": "通过短信重试，然后标记为需要打电话",
       "how": {
         "first": "核对手机号码",
         "second": "通过 WhatsApp 或短信重新发送",
@@ -99,11 +97,11 @@
         },
         "calledInstead": {
           "label": "改为打电话",
-          "effect": "已在潜在客户上记录通话"
+          "effect": "已记录通话"
         },
         "fixTheNumber": {
           "label": "修改号码",
-          "effect": "打开潜在客户进行编辑"
+          "effect": "打开其记录进行编辑"
         }
       }
     },
@@ -131,7 +129,7 @@
         },
         "noAnswer": {
           "label": "无人接听",
-          "effect": "已记录通话 · 任务暂缓 2 小时"
+          "effect": "已记录通话 · 任务暂缓 3 小时"
         }
       }
     },
@@ -161,7 +159,6 @@
     "rebook": {
       "label": "爽约重新预约",
       "description": "患者错过了到访",
-      "automation": "通过 WhatsApp 提供接下来的两个空闲时段",
       "how": {
         "first": "带上两个空闲时段打电话或发 WhatsApp",
         "second": "预约对方选择的时段",
@@ -194,7 +191,7 @@
       "outcomes": {
         "happy": {
           "label": "满意 · 4–5★",
-          "effect": "发送 Google 评价链接 · 打开评价记录"
+          "effect": "打开评价记录"
         },
         "unhappy": {
           "label": "不满意",
@@ -206,14 +203,13 @@
         },
         "sentTheForm": {
           "label": "已发送表单",
-          "effect": "已记录 · 暂缓到明天"
+          "effect": "暂缓到明天"
         }
       }
     },
     "aftercare": {
       "label": "术后关怀电话",
       "description": "某次治疗需要回访电话",
-      "automation": "通过 WhatsApp 发送术后回访并记录回复",
       "how": {
         "first": "打电话询问皮肤感觉如何",
         "second": "确认是否遵循了术后护理",
@@ -236,7 +232,7 @@
     },
     "unhappy": {
       "label": "不满意的患者",
-      "description": "反馈为 3★ 或更低",
+      "description": "患者给出低评分或表示不满意",
       "how": {
         "first": "先阅读反馈",
         "second": "由医生或经理回电",
@@ -256,7 +252,6 @@
     "nextvisit": {
       "label": "未设置下次到访",
       "description": "到访已完成，但没有跟进日期，也没有下次预约",
-      "automation": "通过 WhatsApp 建议两个时段，对方选定后设置跟进",
       "how": {
         "first": "查看医生的建议",
         "second": "为下次到访提供两个时段",
@@ -279,7 +274,7 @@
     },
     "noreply": {
       "label": "沉寂的老患者",
-      "description": "老患者或套餐患者已超过 30 天未预约，且未回复定期提醒",
+      "description": "套餐尚有剩余次数的患者 30 天以上未到访且无预约",
       "how": {
         "first": "查看套餐和上次到访",
         "second": "先打一次电话，再发送回归优惠",
@@ -292,13 +287,14 @@
         },
         "sendOffer": {
           "label": "发送优惠",
-          "effect": "通过 WhatsApp 发送回归优惠 · 暂缓一周"
+          "effect": "暂缓一周"
         },
         "notComingBack": {
           "label": "不再来了",
           "effect": "附原因关闭"
         }
-      }
+      },
+      "automation": "为团队创建再营销潜在客户"
     },
     "manual": {
       "label": "你设置的跟进",
@@ -329,29 +325,36 @@
       "outcomes": {
         "collectAtCheckout": {
           "label": "结账时收取",
-          "effect": "已加入今天的结账"
+          "effect": "已关闭 · 离店时收取"
         },
         "sendUpiLink": {
           "label": "发送 UPI 链接",
-          "effect": "UPI 链接已排队，将通过 WhatsApp 发送"
+          "effect": "已关闭 · 在聊天中发送链接"
         },
         "called": {
           "label": "已致电",
-          "effect": "已记录付款承诺"
+          "effect": "附你的备注关闭"
+        }
+      },
+      "automation": "通过 WhatsApp 发送付款提醒"
+    },
+    "settleBy": {
+      "label": "待结清的挂账",
+      "description": "一笔挂账已到结清日期",
+      "outcomes": {
+        "done": {
+          "label": "完成",
+          "effect": "已关闭 · 在付款中结清"
         }
       }
     },
-    "recall": {
-      "label": "复诊召回",
-      "description": "患者到了复诊时间",
+    "medicalRepVisit": {
+      "label": "医药代表拜访",
+      "description": "有医药代表即将来访",
       "outcomes": {
-        "booked": {
-          "label": "已预约",
-          "effect": "已预约 · 确认待发送"
-        },
-        "later": {
-          "label": "稍后",
-          "effect": "暂缓 7 天"
+        "done": {
+          "label": "完成",
+          "effect": "已关闭 · 在医药中记录拜访"
         }
       }
     }
@@ -416,12 +419,16 @@
     "result": "✓ {{result}}"
   },
   "sources": {
-    "lead": "潜在客户 {{id}}",
-    "appointment": "预约 {{id}}",
+    "lead": "潜在客户",
+    "appointment": "预约",
     "treatment": "治疗",
-    "patient": "患者 {{id}}",
-    "invoice": "发票 {{id}}",
-    "contact": "联系人"
+    "patient": "患者",
+    "invoice": "发票",
+    "contact": "联系人",
+    "checkIn": "回访",
+    "review": "评价",
+    "pendingCredit": "挂账",
+    "medicalRep": "医药代表"
   },
   "due": {
     "snoozed": "已推迟 · {{label}}",
@@ -446,7 +453,7 @@
   "newTask": {
     "title": "新建任务",
     "sub": "为 {{person}} · 显示在任务和此人的时间线上",
-    "subNoPerson": "显示在任务和此人的时间线上",
+    "subNoPerson": "显示在任务中；如有对象，也会显示在此人的时间线上",
     "steps": {
       "what": "要做什么",
       "when": "时间与负责人",
@@ -454,24 +461,15 @@
     },
     "forField": {
       "label": "对象",
-      "placeholder": "选择患者或潜在客户",
+      "placeholder": "选择人员",
       "search": "按姓名、手机号或编号搜索",
-      "empty": "输入姓名、手机号或患者编号",
-      "missing": "请选择任务对象"
-    },
-    "type": {
-      "label": "类型",
-      "callBack": "回电",
-      "followUp": "跟进",
-      "sendPrice": "发送价格",
-      "askForPhotos": "索取照片",
-      "feedback": "反馈",
-      "paymentReminder": "付款提醒"
+      "empty": "输入姓名、手机号或联系人编号"
     },
     "titleField": {
       "label": "标题",
       "placeholder": "要做什么",
-      "fallback": "{{type}} · {{first}}"
+      "fallback": "跟进 · {{first}}",
+      "missing": "请填写标题，或选择任务对象"
     },
     "due": {
       "label": "截止",
@@ -491,7 +489,6 @@
       "normal": "普通",
       "high": "高"
     },
-    "remind": "提前 {{minutes}} 分钟提醒",
     "notes": {
       "label": "任务备注",
       "placeholder": "备注（可选）"
@@ -513,11 +510,13 @@
     },
     "quote": "“{{message}}”",
     "source": {
-      "appointment": "打开预约 · {{record}}",
-      "lead": "打开潜在客户 · {{record}}",
-      "treatment": "打开患者 · {{record}}",
-      "patient": "打开患者 · {{record}}",
-      "invoice": "打开发票 · {{record}}"
+      "appointment": "打开预约",
+      "lead": "打开潜在客户",
+      "treatment": "打开治疗",
+      "patient": "打开患者",
+      "invoice": "打开发票",
+      "checkIn": "打开回访",
+      "review": "打开评价"
     },
     "tiles": {
       "visit": "就诊",
@@ -537,29 +536,32 @@
       "visit": "{{day}} · {{time}} · {{minutes}} 分钟",
       "session": "第 {{number}} 次"
     },
-    "automation": {
-      "title": "{{productName}} 可以处理",
-      "action": "交给 {{productName}} 处理"
-    },
     "outcomeNote": {
       "label": "结果备注",
       "placeholder": "为结果添加备注（可选）"
     },
     "snooze": "推迟",
     "assigned": "负责人",
-    "assignTip": "将此任务转给其他人 · 之前的负责人仍会参与",
+    "assignTip": "将此任务转给其他人",
     "searchTeam": "搜索团队",
     "was": "之前 {{names}}",
-    "close": "关闭"
+    "close": "关闭",
+    "subByHand": "手动添加",
+    "assignGroups": {
+      "team": "团队",
+      "queues": "角色队列"
+    },
+    "deleteTitle": "删除此任务？"
   },
   "toasts": {
     "closed": "{{title}} · {{result}}",
     "snoozed": "已推迟 · {{label}}",
-    "claimed": "{{name}} 现在由你负责 · {{owner}} 仍会参与",
-    "claimedUnowned": "{{name}} 现在由你负责",
-    "moved": "{{title}} → {{name}} · {{previous}} 仍会参与",
-    "movedUnowned": "{{title}} → {{name}}",
-    "automation": "{{productName}} 正在处理 · {{automation}}"
+    "claimed": "{{name}} 现在由你负责",
+    "moved": "{{title}} → {{name}}",
+    "removed": "已删除 {{title}}",
+    "alreadyClosed": "此任务已关闭",
+    "claimNeedsLeads": "认领潜在客户需要潜在客户编辑权限——请联系所有者或管理员",
+    "reassignNeedsLeads": "转移潜在客户的任务需要潜在客户编辑权限——请联系所有者或管理员"
   },
   "whatsNext": {
     "title": "{{first}} 的下一步是什么？",
@@ -585,6 +587,7 @@
     "pickWhen": "请选择时间",
     "created": "已设定下一个任务 · {{step}} · {{when}}",
     "taskTitle": "{{step}} · {{first}}",
-    "plannedAfter": "计划于此之后：{{after}}"
+    "plannedAfter": "计划于此之后：{{after}}",
+    "titleNoPerson": "下一步做什么？"
   }
 }

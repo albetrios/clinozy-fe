@@ -17,10 +17,11 @@ Conversion (one) · Created · Follow-up date) · Columns · "New patient", whic
 · Gender · Type · Status · Conversion · Age · Follow-up · Updated (the time), Gender /
 Conversion / Age hidden by default (a device pref); only ID and Follow-up sort; folds on a
 tablet (4 columns at 820, 2 at 1024); selection and the bulk bar from `md` (Export as CSV
-with `patient:export`; View-as asks the role's `export` ability); row actions Edit · Delete; infinite scroll over cursor pages,
-"All patients loaded". In clinic today, With dues, the Gender filter, the other sorts, the
-Due column and who saved the record go — the API has no read for them (G4, Q22); New
-invoice and Collect come back with Payments on clinozy-be.
+with `patient:export`; View-as asks the role's `export` ability); row actions New invoice
+(`payment:create` — the shared Invoice drawer for her over the list) · Edit · Delete; infinite
+scroll over cursor pages, "All patients loaded". In clinic today, With dues, the Gender filter,
+the other sorts, the Due column, the row's "Collect ₹…" and who saved the record go — the API
+has no read for them per row (G4, Q22, G-P8).
 
 The view, search, filters and sort live in the URL (`patients.search.ts`); the list read
 follows them — a view or sort change keeps the rows until the new page arrives, a search
@@ -73,6 +74,6 @@ fixtures (Payments, Medical, Tasks) read `@/shared/api/clinic/patients-fixture-a
 
 `patients-page`; the shared toolbar's and table's, prefixed `patients` — `patients-toolbar`,
 `patients-tab-<view>`, `patients-new` (the toolbar button and the phone pill),
-`patients-table`, `patients-table-row`, `patients-row-action-<edit|delete>`,
+`patients-table`, `patients-table-row`, `patients-row-action-<new-invoice|edit|delete>`,
 `patients-table-bulk-export`; the drawer the dialog route opens: `patient-drawer` and its
 parts (`docs/reference/e2e-testids-inventory.md` › Patient drawer).

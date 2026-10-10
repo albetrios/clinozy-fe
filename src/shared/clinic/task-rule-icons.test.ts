@@ -1,32 +1,33 @@
 import { describe, expect, it } from 'vitest';
 
-import { TASK_RULE_IDS } from '@/shared/api/clinic/tasks-contracts.ts';
+import { TASK_TYPE_VALUES } from '@/shared/api/clinic/tasks-contracts.ts';
 
 import { TASK_RULE_ICONS } from './task-rule-icons.ts';
 
 describe('TASK_RULE_ICONS', () => {
-  it('draws every rule with its designed icon (`tasks.md:245–253`)', () => {
+  it('draws every type with its designed icon (`tasks.md:245–253`)', () => {
     expect(
       Object.fromEntries(
-        TASK_RULE_IDS.map((rule) => [rule, TASK_RULE_ICONS[rule].displayName]),
+        TASK_TYPE_VALUES.map((type) => [type, TASK_RULE_ICONS[type].displayName]),
       ),
     ).toEqual({
       reply: 'MessageSquare',
-      follow: 'Phone',
+      follow_up: 'Phone',
       claim: 'Users',
-      failed: 'Info',
+      failed_message: 'Info',
       confirm: 'Calendar',
       arrive: 'Clock',
       rebook: 'RefreshCw',
       feedback: 'Sparkles',
+      call_back: 'Info',
       aftercare: 'Sparkles',
-      unhappy: 'Info',
-      nextvisit: 'Calendar',
-      noreply: 'Phone',
-      manual: 'Bell',
-      // Today's two kinds have no designed icon (AMBER).
-      payment: 'Wallet',
-      recall: 'Calendar',
+      next_visit: 'Calendar',
+      gone_quiet: 'Phone',
+      by_hand: 'Bell',
+      // The rules the design did not draw take their section's icon (AMBER).
+      payment_due: 'Wallet',
+      settle_by: 'ReceiptText',
+      medical_rep_visit: 'Pill',
     });
   });
 });

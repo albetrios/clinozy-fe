@@ -40,6 +40,12 @@ export const PATIENT_RAIL_KEYS = {
   book: 'rail.book',
   notBooked: 'rail.notBooked',
   noUpcoming: 'rail.noUpcoming',
+  /** "₹ ••••" — what she owes while the file is masked (Q-F4). */
+  maskedAmount: 'timeline.activity.masked',
+  showAmount: 'rail.showAmount',
+  hideAmount: 'rail.hideAmount',
+  collect: 'rail.collect',
+  allPaid: 'rail.allPaid',
   feedback: 'rail.feedback',
   /** "Better · 7/10". */
   feedbackScore: 'rail.feedbackScore',

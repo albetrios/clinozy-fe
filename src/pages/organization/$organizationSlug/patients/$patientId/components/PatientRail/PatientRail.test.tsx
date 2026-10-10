@@ -3,9 +3,15 @@ import userEvent from '@testing-library/user-event';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
+import { fetchInvoiceTotals } from '@/shared/api/clinic/invoices-api.ts';
 import type { PatientRecord } from '@/shared/api/clinic/patients-contracts.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
-import { patientFile, patientRecord } from '@/tests/utils/patient-doubles.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import {
+  patientFile,
+  patientRecord,
+  TEST_PATIENT_ID,
+} from '@/tests/utils/patient-doubles.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { PatientRail, type PatientRailProps } from './PatientRail.tsx';
@@ -14,6 +20,10 @@ const { notifyMock } = vi.hoisted(() => ({
   notifyMock: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
+vi.mock('@/shared/api/clinic/invoices-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchInvoiceTotals: vi.fn(),
+}));
 
 /** 10:00 on 3 Oct, clinic time. */
 const NOW = new Date('2026-10-03T04:30:00Z');
@@ -56,6 +66,7 @@ beforeAll(() => {
 afterAll(() => vi.useRealTimers());
 beforeEach(() => {
   for (const fn of Object.values(notifyMock)) fn.mockReset();
+  vi.mocked(fetchInvoiceTotals).mockReset();
 });
 
 describe('PatientRail', () => {
@@ -212,12 +223,56 @@ describe('PatientRail', () => {
     expect(screen.queryByTestId('patient-rail-book')).not.toBeInTheDocument();
   });
 
-  it('keeps no dues, credit or Collect in Up next', async () => {
-    renderRail();
+  it('keeps money out of Up next for a member who does not see billing', async () => {
+    renderRail({ actions: { onCollect: vi.fn() } });
     const upNext = await screen.findByRole('region', { name: 'Up next' });
     expect(screen.queryByTestId('patient-rail-due')).not.toBeInTheDocument();
     expect(screen.queryByTestId('patient-rail-collect')).not.toBeInTheDocument();
-    expect(upNext).not.toHaveTextContent(/All paid|to return|₹/);
+    expect(upNext).not.toHaveTextContent(/to return|₹/);
+    expect(fetchInvoiceTotals).not.toHaveBeenCalled();
+  });
+
+  it('shows what she owes from the server, masked with the file, and collects it', async () => {
+    signInTestMember();
+    vi.mocked(fetchInvoiceTotals).mockResolvedValue({
+      due: 4800.5,
+      paid: 1200,
+      count: 2,
+    });
+    const user = userEvent.setup();
+    const onToggleMasked = vi.fn();
+    const onCollect = vi.fn();
+    const view = renderRail({
+      actions: { onCollect },
+      money: { masked: true, onToggleMasked },
+    });
+    const due = await screen.findByTestId('patient-rail-due');
+    expect(due).toHaveTextContent('₹ ••••');
+    expect(fetchInvoiceTotals).toHaveBeenCalledWith({ patientId: TEST_PATIENT_ID });
+    await user.click(screen.getByTestId('patient-rail-due-eye'));
+    expect(onToggleMasked).toHaveBeenCalledOnce();
+    await user.click(screen.getByTestId('patient-rail-collect'));
+    expect(onCollect).toHaveBeenCalledOnce();
+    expect(await axe(view.container)).toHaveNoViolations();
+
+    view.unmount();
+
+    renderRail({ money: { masked: false, onToggleMasked } });
+    expect(await screen.findByTestId('patient-rail-due')).toHaveTextContent('₹4,800.50');
+    // Without `payment:create`, no Collect.
+    expect(screen.queryByTestId('patient-rail-collect')).not.toBeInTheDocument();
+  });
+
+  it('says all is paid when the server says she owes nothing', async () => {
+    signInTestMember();
+    vi.mocked(fetchInvoiceTotals).mockResolvedValue({ due: 0, paid: 1200, count: 2 });
+    renderRail({
+      actions: { onCollect: vi.fn() },
+      money: { masked: true, onToggleMasked: vi.fn() },
+    });
+    expect(await screen.findByTestId('patient-rail-all-paid')).toBeInTheDocument();
+    expect(screen.queryByTestId('patient-rail-due')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('patient-rail-collect')).not.toBeInTheDocument();
   });
 
   it('sums up their feedback and opens it', async () => {

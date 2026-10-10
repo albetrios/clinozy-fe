@@ -53,7 +53,8 @@
     "unconfirmed": "Unconfirmed",
     "waiting": "Waiting {{minutes}} min",
     "inRoom": "In room {{minutes}} min",
-    "rxApproved": "Rx approved {{time}}"
+    "rxApproved": "Rx approved {{time}}",
+    "toPay": "{{amount}} to pay"
   },
   "toasts": {
     "checkedIn": "{{name}} checked in · Dr. queue and room notified",

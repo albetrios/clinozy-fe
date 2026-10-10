@@ -61,7 +61,8 @@
     "unconfirmed": "غير مؤكَّد",
     "waiting": "ينتظر {{minutes}} د",
     "inRoom": "في الغرفة {{minutes}} د",
-    "rxApproved": "الوصفة معتمدة {{time}}"
+    "rxApproved": "الوصفة معتمدة {{time}}",
+    "toPay": "{{amount}} للدفع"
   },
   "toasts": {
     "checkedIn": "تم تسجيل حضور {{name}} · تم إبلاغ قائمة الطبيب والغرفة",

@@ -41,9 +41,10 @@
     "noNotes": "추가 메모 없음",
     "paymentSummary": "결제 요약",
     "totalAmount": "총액:",
-    "overallDiscount": "전체 할인:",
     "billAmount": "청구 금액:",
-    "balanceDue": "미결제 잔액:"
+    "balanceDue": "미결제 잔액:",
+    "taxableAmount": "과세 금액:",
+    "gstTotal": "GST:"
   },
   "prescription": {
     "patientId": "환자 ID:",

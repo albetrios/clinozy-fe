@@ -19,6 +19,7 @@ export const TIMELINE_KEYS = {
     packages: 'sections.packages',
     prescriptions: 'sections.prescriptions',
     treatments: 'sections.treatments',
+    billing: 'sectionsPopover.groups.billing',
     reports: 'sections.reports',
     notes: 'sections.notes',
   },
@@ -77,6 +78,21 @@ export const TIMELINE_KEYS = {
     sub: 'timeline.treatments.sub',
     empty: 'tables.treatments.empty',
   },
+  billing: {
+    new: 'section.primary.invoices',
+    due: 'timeline.billing.due',
+    paid: 'timeline.billing.paid',
+    /** "₹ ••••" — an amount while the file is masked (Q-F4). */
+    masked: 'timeline.activity.masked',
+    show: 'timeline.billing.show',
+    hide: 'timeline.billing.hide',
+    /** "Clinic invoice #1042". */
+    invoice: 'timeline.billing.invoice',
+    /** "24 Sep · ₹ ••••". */
+    sub: 'timeline.billing.sub',
+    collect: 'timeline.billing.collect',
+    empty: 'tables.invoices.empty',
+  },
   reports: {
     new: 'section.primary.reports',
     types: {
@@ -122,6 +138,7 @@ export type OverviewCard =
   | 'packages'
   | 'prescriptions'
   | 'treatments'
+  | 'billing'
   | 'reports'
   | 'notes';
 
@@ -133,6 +150,7 @@ export const OVERVIEW_CARD_TONES: Readonly<Record<OverviewCard, Tone>> = {
   packages: 'lav',
   prescriptions: 'sage',
   treatments: 'lav',
+  billing: 'butter',
   reports: 'stone',
   notes: 'butter',
 };

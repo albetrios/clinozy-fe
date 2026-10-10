@@ -32,3 +32,12 @@ export function shortPersonName(name: string): string {
   if (first === 'Dr.' || !second) return words.slice(0, 2).join(' ');
   return `${first} ${Array.from(second)[0]}.`;
 }
+
+/**
+ * A display name's first name, as "(you)" and "· was <first>" read it: "Riya Shah" → "Riya", a
+ * doctor keeps the title — "Dr. Drashti Desai" → "Dr. Drashti".
+ */
+export function personFirstName(name: string): string {
+  const short = shortPersonName(name);
+  return short.startsWith('Dr. ') ? short : (short.split(' ')[0] ?? short);
+}

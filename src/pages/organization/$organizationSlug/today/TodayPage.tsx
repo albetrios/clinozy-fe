@@ -2,7 +2,12 @@ import { useNavigate, useParams, useSearch } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { cn } from '@/lib/utils.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import {
+  type TaskRow,
+  visibleTaskOutcomes,
+} from '@/shared/api/clinic/tasks-contracts.ts';
 import type { TodayLane } from '@/shared/api/clinic/today-contracts.ts';
 import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
 import { type TaskTarget, taskTargetNavigation } from '@/shared/clinic/task-targets.ts';
@@ -10,7 +15,9 @@ import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
 import { useMeContext } from '@/shared/hooks/useMeContext/index.ts';
+import { useMyMembershipId } from '@/shared/hooks/useMyMembership/index.ts';
 import { useNow } from '@/shared/hooks/useNow/index.ts';
+import { useTeamDirectory } from '@/shared/hooks/useTeamDirectory/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
 import { LanePanel } from './components/LanePanel/index.ts';
@@ -20,7 +27,7 @@ import {
   type TodayBookingRequest,
 } from './components/TodayBooking/index.ts';
 import { TodayGreeting } from './components/TodayGreeting/index.ts';
-import { WorkQueue } from './components/WorkQueue/index.ts';
+import { WorkQueue, type WorkQueueTeam } from './components/WorkQueue/index.ts';
 import { useFloorActions } from './hooks/useFloorActions/index.ts';
 import { useTodayFloorView } from './hooks/useTodayFloorView/index.ts';
 import { useWorkQueue, type WorkQueueScope } from './hooks/useWorkQueue/index.ts';
@@ -62,6 +69,36 @@ function useFollowOn(
 }
 
 /**
+ * The work queue beside the floor (KICKOFF §6.2; research-tasks §7 flag 3): shown to a member who
+ * reads tasks (`task:read`; while the access resolves its bars stand in) — the Accountant holds no
+ * task code, so Today is the floor alone for them — its cards' outcomes the
+ * ones the member's codes run (`visibleTaskOutcomes`: none without `task:update`, none in a
+ * View-as preview), its owners named from the team and "(you)" from the member's membership.
+ */
+function useTodayWorkQueue(
+  scope: WorkQueueScope,
+  onFollowOn: (target: TaskTarget) => void,
+) {
+  const access = useClinicAccess();
+  const reads = access.isResolved && access.can('tasks', 'view');
+  const queue = useWorkQueue({ scope, enabled: reads, onFollowOn });
+  const { byId } = useTeamDirectory();
+  const myMembershipId = useMyMembershipId();
+  const team: WorkQueueTeam = useMemo(
+    () => ({ byId, myMembershipId }),
+    [byId, myMembershipId],
+  );
+  const canCode = (code: string) => access.isResolved && access.canCode(code);
+  return {
+    ...queue,
+    shown: reads || !access.isResolved,
+    loading: queue.loading || !access.isResolved,
+    team,
+    outcomesOf: (row: TaskRow) => visibleTaskOutcomes(row, canCode),
+  };
+}
+
+/**
  * Today (KICKOFF §6.2; `today.md`): the clinic floor now. The greeting row —
  * the greeting is the title — over the seven lane tiles and the selected
  * lane's cards, with the work queue beside them (under them on a phone). The
@@ -85,11 +122,11 @@ export function TodayPage() {
   const [booking, setBooking] = useState<TodayBookingRequest | null>(null);
   const scope: WorkQueueScope = search.queue ?? 'mine';
   const followOn = useFollowOn(organizationSlug, setBooking);
-  const queue = useWorkQueue({ scope, onFollowOn: followOn });
+  const queue = useTodayWorkQueue(scope, followOn);
 
   const focus = useMemo(() => todayFocus(access.roles), [access.roles]);
   const lane: TodayLane = search.lane ?? defaultTodayLane(floor.lanes, focus);
-  const loading = floor.loading || queue.loading;
+  const loading = floor.loading || (queue.shown && queue.loading);
 
   const newBooking =
     access.isResolved && access.can('leads', 'create')
@@ -103,7 +140,12 @@ export function TodayPage() {
       className="flex flex-col overflow-x-clip md:min-h-0 md:flex-1"
     >
       {loading ? <output className="sr-only">{t(TODAY_KEYS.loading)}</output> : null}
-      <div className="grid grid-cols-1 md:min-h-0 md:flex-1 md:grid-cols-[minmax(0,1fr)_312px]">
+      <div
+        className={cn(
+          'grid grid-cols-1 md:min-h-0 md:flex-1',
+          queue.shown && 'md:grid-cols-[minmax(0,1fr)_312px]',
+        )}
+      >
         <div
           // The first load: bars over every leaf in place (the rooms' one skeleton, index.css).
           data-refreshing={floor.loading || undefined}
@@ -133,17 +175,21 @@ export function TodayPage() {
             onOpen={actions.open}
           />
         </div>
-        <WorkQueue
-          entries={queue.entries}
-          openCount={queue.openCount}
-          loading={queue.loading}
-          scope={scope}
-          onScopeChange={(next) =>
-            patchSearch({ queue: next === 'mine' ? undefined : next })
-          }
-          now={now}
-          onOutcome={queue.record}
-        />
+        {queue.shown ? (
+          <WorkQueue
+            entries={queue.entries}
+            openCount={queue.openCount}
+            loading={queue.loading}
+            scope={scope}
+            onScopeChange={(next) =>
+              patchSearch({ queue: next === 'mine' ? undefined : next })
+            }
+            now={now}
+            team={queue.team}
+            outcomesOf={queue.outcomesOf}
+            onOutcome={queue.record}
+          />
+        ) : null}
       </div>
       <TodayBooking request={booking} onClose={() => setBooking(null)} />
     </section>

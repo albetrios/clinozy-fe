@@ -1130,8 +1130,7 @@
     "placeholder": "Patienten suchen",
     "hint": "nur Patienten wählbar",
     "due": "{{amount}} offen",
-    "nothingDue": "Nichts offen",
-    "lead": "Lead {{id}} · noch kein Patient"
+    "nothingDue": "Nichts offen"
   },
   "splitRows": {
     "mode": "Zahlart",
@@ -1163,8 +1162,17 @@
     "enterAmount": "Geben Sie den Betrag ein",
     "moreThanOwed": "Mehr als die geschuldeten {{amount}}",
     "done": {
-      "give": "{{amount}} an {{name}} zurückgegeben · Ausgabe erfasst",
-      "take": "{{amount}} von {{name}} zurückerhalten · Einnahme erfasst"
+      "give": "{{amount}} an {{name}} zurückgegeben · {{entry}}",
+      "take": "{{amount}} von {{name}} zurückerhalten · {{entry}}"
+    },
+    "branch": "Filiale",
+    "date": "Datum",
+    "dayClosed": "Dieser Tag ist in dieser Filiale abgeschlossen · wähle einen offenen Tag",
+    "moreThanPaid": "Mehr, als auf die Rechnung gezahlt wurde",
+    "closed": "{{ref}} ist bereits beglichen",
+    "entry": {
+      "give": "Ausgabe erfasst",
+      "take": "Einnahme erfasst"
     }
   },
   "quickLine": {
@@ -1233,7 +1241,8 @@
       "quickFill": "Schnell ausfüllen",
       "paidNow": "Jetzt bezahlt",
       "remark": "Bemerkung",
-      "remarkPlaceholder": "Erscheint auf der gedruckten Rechnung"
+      "remarkPlaceholder": "Erscheint auf der gedruckten Rechnung",
+      "paid": "Bisher bezahlt"
     },
     "customerGroups": {
       "patient": "Patienten",
@@ -1274,9 +1283,11 @@
       "inStock": "{{count}} auf Lager",
       "outOfStock": "Nicht auf Lager",
       "belowFloor": "Unter dem Mindestpreis {{amount}} für {{name}}",
-      "tooMuchDiscount": "Zu viel Rabatt auf {{name}} · fragen Sie einen Admin",
       "newMedicineName": "Name des neuen Medikaments",
-      "medicineAdded": "{{name}} hinzugefügt · UVP später unter Bestand setzen"
+      "medicineAdded": "{{name}} hinzugefügt · UVP später unter Bestand setzen",
+      "hintInvoice": "2 = Menge · 10% = Rabatt",
+      "belowLowest": "Unter dem Mindestpreis für {{name}}",
+      "offerApplied": "Angebot angewendet: {{offer}}"
     },
     "payment": {
       "full": "Voll · {{amount}} per {{mode}}",
@@ -1293,7 +1304,12 @@
       "discountGst": "Rabatt + GST",
       "discountGstValue": "{{discount}} · +{{gst}}",
       "bill": "Rechnungsbetrag",
-      "dueAfter": "Danach offen"
+      "dueAfter": "Danach offen",
+      "preview": "Preise, wie sie gespeichert werden",
+      "pending": "Preise werden berechnet…",
+      "refused": "Nicht berechnet · markierte Zeile korrigieren",
+      "failed": "Diese Rechnung konnte nicht berechnet werden",
+      "retry": "Erneut versuchen"
     },
     "badges": {
       "bill": "Betrag {{amount}}",
@@ -1329,7 +1345,7 @@
       "paidAboveBill": "Bezahlt {{paid}} ist mehr als der Rechnungsbetrag {{bill}}",
       "stock": "Nur {{count}} von {{name}} auf Lager",
       "belowFloor": "{{name}} liegt unter dem Mindestpreis {{amount}} · erhöhen Sie den Endpreis",
-      "tooMuchDiscount": "{{name}} hat mehr Rabatt als erlaubt · erhöhen Sie den Endpreis oder fragen Sie einen Admin"
+      "belowLowest": "{{name}} liegt unter dem Mindestpreis · Endpreis erhöhen"
     },
     "toasts": {
       "created": {
@@ -1353,7 +1369,22 @@
       "medical": "Medizinrechnung #{{seq}}",
       "consultation": "Konsultationsrechnung #{{seq}}"
     },
-    "record": "Rechnung"
+    "record": "Rechnung",
+    "refusals": {
+      "moreThanDue": "Jetzt bezahlt ist mehr als die Rechnung",
+      "dayClosed": "Dieser Tag ist abgeschlossen · keine Zahlung mehr möglich",
+      "settled": "Diese Rechnung ist abgerechnet · eine Zahlung liegt auf einem abgeschlossenen Tag",
+      "belowPaid": "Die Rechnung darf nicht unter den bereits bezahlten Betrag fallen",
+      "offeringInUse": "Eine Sitzung dieses Pakets ist bereits genutzt · Zeile beibehalten",
+      "treatmentBilled": "Eine Behandlung wurde inzwischen abgerechnet · entfernen und erneut speichern",
+      "ofSale": "Diese Rechnung gehört zu einem Medizin-Verkauf · in Medical ändern",
+      "paid": "Auf dieser Rechnung gibt es Zahlungen oder eine Gutschrift · sie kann nicht gelöscht werden",
+      "inUseDelete": "Eine Sitzung dieses Pakets ist bereits genutzt · die Rechnung kann nicht gelöscht werden"
+    },
+    "notices": {
+      "settled": "Abgerechnet · eine Zahlung liegt auf einem abgeschlossenen Tag, daher keine Änderung möglich",
+      "sale": "Rechnung eines Medizin-Verkaufs · in Medical ändern"
+    }
   },
   "printPreview": {
     "title": "Druckvorschau · {{title}}",

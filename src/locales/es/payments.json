@@ -49,7 +49,8 @@
     "receipt": "Recibido",
     "refund": "Reembolso al paciente",
     "expense": "Pagado",
-    "money_back": "Devolución"
+    "money_back": "Devolución",
+    "reversal": "Reversión"
   },
   "ledger": {
     "records": "movimientos",
@@ -68,20 +69,29 @@
       "moneyBack": "Devolución",
       "medicalBill": "OC médica #{{seq}} · factura {{bill}}",
       "stockBill": "OC de inventario #{{seq}} · factura {{bill}}",
-      "fromCredit": "De {{ref}}"
+      "fromCredit": "De {{ref}}",
+      "reversed": "Revertido",
+      "medicalOrder": "OC médica #{{seq}}",
+      "stockPurchase": "OC de inventario #{{seq}}"
     },
     "dayClosed": "{{ref}} · Día cerrado",
     "dayClosedEdited_one": "{{ref}} · Día cerrado · editado {{count}}×",
     "dayClosedEdited_many": "{{ref}} · Día cerrado · editado {{count}}×",
     "dayClosedEdited_other": "{{ref}} · Día cerrado · editado {{count}}×",
-    "creditEntry": "{{ref}} · De {{credit}}"
+    "creditEntry": "{{ref}} · De {{credit}}",
+    "fixedEntry": "{{ref}} · su importe no se puede cambiar · elimínalo en su día para deshacerlo",
+    "search": "Paciente, beneficiario o número PAY-",
+    "count_one": "{{count}} movimiento",
+    "count_other": "{{count}} movimientos",
+    "count_many": "{{count}} movimientos"
   },
   "rowActions": {
     "edit": "Editar",
     "delete": "Eliminar",
     "giveBack": "Devolver",
     "gotBack": "Recuperado",
-    "useOnBill": "Usar en la próxima factura"
+    "useOnBill": "Usar en la próxima factura",
+    "reverse": "Revertir"
   },
   "bulk": {
     "export": "Exportar",
@@ -105,7 +115,11 @@
       "party": "Paciente o beneficiario incorrecto"
     },
     "removed": "{{ref}} eliminado",
-    "removedInvoice": "{{ref}} eliminado · saldo de la factura restablecido"
+    "removedInvoice": "{{ref}} eliminado · saldo de la factura restablecido",
+    "blocked": {
+      "dayClosed": "{{ref}} · su día ya está cerrado · revértelo en su lugar",
+      "moreThanPaid": "{{ref}} · un reembolso ya devolvió este dinero · elimina primero el reembolso"
+    }
   },
   "dialog": {
     "record": "Pago",
@@ -132,7 +146,6 @@
     },
     "settledToday": "{{state}} · Hoy",
     "adjusted": "{{amount}} aplicado",
-    "source": "De {{ref}} · {{direction}}",
     "invoice": "Factura #{{seq}}",
     "byHand": "A mano",
     "deleteTitle": "¿Eliminar este pendiente?",
@@ -149,9 +162,18 @@
       "loan_to_staff": "Préstamo al personal",
       "other": "Otro"
     },
-    "settledInvoice": "{{state}} · Factura #{{seq}}",
     "adjustedOn": "{{amount}} de {{ref}} aplicados a la factura #{{seq}}",
-    "nothingDue": "{{name}} no tiene nada pendiente para aplicarlo"
+    "nothingDue": "{{name}} no tiene nada pendiente para aplicarlo",
+    "search": "Persona, proveedor o CR-",
+    "fromEntry": "De un movimiento",
+    "forInvoice": "Para una factura",
+    "settledLocked": "{{ref}} · {{amount}} saldados · ya no se puede cambiar",
+    "conflicts": {
+      "settled": "Parte de {{ref}} ya está saldada · no se puede cambiar ni eliminar",
+      "closed": "{{ref}} ya está saldado",
+      "dayClosed": "Hoy está cerrado en la sucursal de la factura #{{seq}} · reábrelo para aplicar este saldo",
+      "dueChanged": "Cambió lo pendiente de la factura #{{seq}} · inténtalo de nuevo"
+    }
   },
   "receive": {
     "title": "Cobrar pago",
@@ -188,7 +210,11 @@
     "updated": "{{ref}} actualizado · cambio registrado",
     "enterAmount": "Introduce un importe",
     "pickPatient": "Elige un paciente",
-    "aboveDue": "Más que los {{due}} pendientes"
+    "aboveDue": "Más que los {{due}} pendientes",
+    "moreThanDue": "Más de lo que la factura debe ahora · se pagó mientras tanto",
+    "totalAdvance": "Total {{total}} · anticipo",
+    "advance": "Anticipo · sin factura",
+    "invoicesFailed": "No se pudieron cargar las facturas pendientes"
   },
   "send": {
     "title": "Registrar pago",
@@ -249,7 +275,9 @@
     "added": "Gasto {{ref}} añadido",
     "paidBill": "{{amount}} pagados a {{bill}}",
     "saved": "{{ref}} guardado · cambio registrado",
-    "missing": "Indica a quién se pagó y el importe"
+    "missing": "Indica a quién se pagó y el importe",
+    "moreThanDue": "Más de lo que la factura del proveedor debe ahora · se pagó mientras tanto",
+    "billsFailed": "No se pudieron cargar las facturas pendientes"
   },
   "credit": {
     "title": "Añadir pendiente",
@@ -340,9 +368,9 @@
     "gate": {
       "title": "Efectivo inicial · {{day}}",
       "sources": {
-        "default_float": "Fondo por defecto",
         "carried": "Trasladado del cierre del {{day}}",
-        "recounted": "Recontado"
+        "recounted": "Recontado",
+        "first": "Sin cierre anterior · nada que trasladar"
       },
       "recount": "Recontar",
       "recountLabel": "Recontar el efectivo inicial",
@@ -363,10 +391,13 @@
       "countPlaceholder": "Cuenta la caja",
       "countLabel": "Efectivo contado",
       "netByMode": "Neto por forma",
-      "modeTitle": "Entra {{in}} · sale {{out}}",
-      "staffTitle_one": "{{name}} · {{count}} cobro · {{amount}}",
-      "staffTitle_many": "{{name}} · {{count}} cobros · {{amount}}",
-      "staffTitle_other": "{{name}} · {{count}} cobros · {{amount}}"
+      "staffTitle_one": "{{name}} · {{count}} movimiento · {{amount}}",
+      "staffTitle_many": "{{name}} · {{count}} movimientos · {{amount}}",
+      "staffTitle_other": "{{name}} · {{count}} movimientos · {{amount}}",
+      "staffOther": "Fuera del equipo",
+      "reason": "¿Por qué no cuadra el conteo?",
+      "reasonPlaceholder": "Qué pasó · p. ej., ₹20 dados como cambio de la caja",
+      "reasonFirst": "Primero indica por qué no cuadra el conteo"
     },
     "report": {
       "title": "{{day}} está cerrado",
@@ -375,11 +406,9 @@
       "reopen": "Reabrir",
       "acceptedBy": "Aceptado por {{name}}",
       "takenAsExpected": "Tomado según lo esperado",
-      "collected": "Cobrado",
       "received_one": "{{count}} cobrado",
       "received_many": "{{count}} cobrados",
       "received_other": "{{count}} cobrados",
-      "paidOut": "Pagado",
       "paid_one": "{{count}} pagado",
       "paid_many": "{{count}} pagados",
       "paid_other": "{{count}} pagados",
@@ -392,30 +421,60 @@
       "log": "Qué pasó",
       "logAccepted": "{{name}} aceptó el efectivo inicial de {{amount}}",
       "logRecounted": "{{name}} aceptó el efectivo inicial de {{amount}} (recontado)",
-      "logReviewed_one": "{{checked}} de {{count}} movimiento revisado",
-      "logReviewed_many": "{{checked}} de {{count}} movimientos revisados",
-      "logReviewed_other": "{{checked}} de {{count}} movimientos revisados",
       "logMatched": "Caja contada en {{amount}} · cuadra",
       "logExtra": "Caja contada en {{amount}} · sobran {{diff}}",
       "logShort": "Caja contada en {{amount}} · faltan {{diff}}",
-      "logClosed": "{{name}} cerró el día · resumen enviado al admin por WhatsApp",
-      "logAuto": "Cierre automático tras el plazo de gracia · efectivo según lo esperado"
+      "logClosed": "{{name}} cerró el día",
+      "logAuto": "Cierre automático tras el plazo de gracia · efectivo según lo esperado",
+      "openedAuto": "Abierto automáticamente",
+      "notCounted": "Sin contar",
+      "logOpened": "{{name}} abrió el día",
+      "logReopened": "{{name}} reabrió el día · {{reason}}",
+      "logReason": "«{{reason}}»",
+      "someone": "Alguien"
     },
     "review": {
       "title": "Revisa cada movimiento",
-      "progress_one": "{{checked}} de {{count}} revisado",
-      "progress_many": "{{checked}} de {{count}} revisados",
-      "progress_other": "{{checked}} de {{count}} revisados",
       "none": "Sin movimientos",
       "empty": "Sin movimientos este día",
-      "check": "Marcar como revisado",
       "states": {
         "canEdit": "Editable",
         "canEditTitle": "Se puede editar o eliminar hasta que se cierre el día",
         "dayClosed": "Día cerrado",
         "dayClosedTitle": "El día está cerrado · sus movimientos no se pueden cambiar",
         "fromCredit": "De {{credit}}"
+      },
+      "count_one": "{{count}} movimiento",
+      "count_many": "{{count}} movimientos",
+      "count_other": "{{count}} movimientos"
+    },
+    "previousNone": "Sin cierres antes de este día",
+    "refusals": {
+      "alreadyOpened": "Alguien abrió este día mientras tanto · ya se muestra",
+      "alreadyClosed": "Alguien cerró este día mientras tanto · ya se muestra",
+      "alreadyOpen": "Este día ya está abierto de nuevo · ya se muestra"
+    },
+    "reopen": {
+      "title": "¿Reabrir este día?",
+      "effect": "Se borra el conteo y los movimientos del día se pueden volver a cambiar hasta que se cierre.",
+      "action": "Reabrir día",
+      "record": "{{branch}} · {{day}}",
+      "reasons": {
+        "miscounted": "Mal contado",
+        "missed": "Faltó un movimiento",
+        "wrongEntry": "Un movimiento está mal"
       }
+    }
+  },
+  "reverseEntry": {
+    "title": "¿Revertir este pago?",
+    "effect": "Su día está cerrado, así que se queda como está. Una reversión por el mismo importe entra hoy en el libro de su sucursal y lo que pagó se deshace. Se conservan ambos movimientos.",
+    "action": "Revertir",
+    "reversed": "{{ref}} revertido · {{reversal}}",
+    "blocked": {
+      "alreadyReversed": "{{ref}} ya está revertido",
+      "dayOpen": "El día de {{ref}} vuelve a estar abierto · elimínalo en su lugar",
+      "dayClosed": "Hoy está cerrado en la sucursal de {{ref}} · reábrelo para revertir"
     }
   }
 }

@@ -2,21 +2,34 @@ import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
+import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
 import { isTaskOverdue } from '@/shared/api/clinic/task-views.ts';
-import { TASK_RULES, type TaskRow } from '@/shared/api/clinic/tasks-contracts.ts';
+import {
+  TASK_TYPES,
+  type TaskOutcomePlan,
+  type TaskRow,
+} from '@/shared/api/clinic/tasks-contracts.ts';
+import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import {
   TASK_QUEUE_KEYS,
   TASK_RULE_KEYS,
   TASK_RULES_NS,
 } from '@/shared/clinic/task-rules.constants.ts';
-import { personFullName, shortPersonName } from '@/shared/components/Cells/index.ts';
+import { personFirstName, shortPersonName } from '@/shared/components/Cells/index.ts';
 import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { useTaskDueLabel } from '@/shared/hooks/useTaskDueLabel/index.ts';
 
 import type { WorkQueueEntry, WorkQueueScope } from '../../hooks/useWorkQueue/index.ts';
 import { TODAY_KEYS, TODAY_NS, TODAY_TEST_IDS } from '../../today.constants.ts';
+
+/** Who the cards name: the team by membership id, and the signed-in member's own. */
+export interface WorkQueueTeam {
+  byId: ReadonlyMap<string, DirectoryMember>;
+  /** The signed-in member's membership id — "(you)"; undefined while it loads. */
+  myMembershipId: string | null | undefined;
+}
 
 /** Props for {@link WorkQueue}. */
 export interface WorkQueueProps {
@@ -29,6 +42,12 @@ export interface WorkQueueProps {
   onScopeChange: (scope: WorkQueueScope) => void;
   /** The clock the due labels read. */
   now: Date;
+  team: WorkQueueTeam;
+  /**
+   * The outcomes the member can run on a task (`visibleTaskOutcomes` — none without
+   * `task:update` or in a View-as preview: the card reads only).
+   */
+  outcomesOf: (row: TaskRow) => readonly TaskOutcomePlan[];
   onOutcome: (row: TaskRow, outcomeId: string) => void;
   className?: string;
 }
@@ -78,42 +97,96 @@ const QUEUE_CARD_INK = {
   },
 } as const;
 
-/** "Owner: Riya (you)" · "Owner: Kiran P." · "Owner: Anyone". */
-function useOwnerName(): (row: TaskRow) => string {
+/**
+ * "Owner: Riya (you)" · "Owner: Kiran P." — a task in a role's queue reads the role ("Owner: Front
+ * desk", research-tasks Q3), one with neither "Owner: Anyone"; a member no longer on the team (or
+ * still loading) leaves the name empty.
+ */
+function useOwnerName(team: WorkQueueTeam): (row: TaskRow) => string {
   const { t } = useTranslation(TODAY_NS);
   const { t: tTasks } = useTranslation(TASK_RULES_NS);
+  const { t: tClinic } = useTranslation(CLINIC_NS);
   return (row) => {
-    const { owner } = row;
-    if (!owner) return tTasks(TASK_QUEUE_KEYS.anyone);
-    if (row.ownedByViewer) return t(TODAY_KEYS.queue.you, { name: owner.firstName });
-    return shortPersonName(personFullName(owner));
+    if (!row.ownerId) {
+      return row.ownerRole
+        ? tClinic(CLINIC_KEYS.roles[row.ownerRole])
+        : tTasks(TASK_QUEUE_KEYS.anyone);
+    }
+    const owner = team.byId.get(row.ownerId);
+    if (!owner) return '';
+    if (owner.id === team.myMembershipId) {
+      return t(TODAY_KEYS.queue.you, { name: personFirstName(owner.name) });
+    }
+    return shortPersonName(owner.name);
   };
 }
 
+/** The card's outcome buttons, worded by the type's copy (the first one is the type's own first). */
+function QueueOutcomes({
+  row,
+  outcomes,
+  busy,
+  onOutcome,
+}: {
+  row: TaskRow;
+  outcomes: readonly TaskOutcomePlan[];
+  busy: boolean;
+  onOutcome: WorkQueueProps['onOutcome'];
+}) {
+  const { t: tTasks } = useTranslation(TASK_RULES_NS);
+  const copy = TASK_RULE_KEYS.rules[row.type].outcomes as Readonly<
+    Record<string, { label: string } | undefined>
+  >;
+  if (outcomes.length === 0) return null;
+  return (
+    <div className="flex flex-wrap gap-1.25">
+      {outcomes.map((outcome) => {
+        const label = copy[outcome.id]?.label;
+        return (
+          <button
+            key={outcome.id}
+            type="button"
+            disabled={busy}
+            data-testid={TODAY_TEST_IDS.queueOutcome}
+            data-outcome={outcome.id}
+            onClick={() => onOutcome(row, outcome.id)}
+            className="hover:bg-accent hover:border-border-strong rounded-lg border px-2.25 py-1 text-xs leading-[normal] disabled:opacity-50"
+          >
+            {label ? tTasks(label) : outcome.id}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 /**
- * One work-queue card (`today.md:66`; H:620–650): the rule's pill in its tone
+ * One work-queue card (`today.md:66`; H:620–650): the type's pill in its tone
  * and the due label (blush when overdue) · the task · why · "Owner: <name>" ·
- * the rule's outcomes — or, once closed, "✓ <result>" with the card receded
- * ({@link QUEUE_CARD_INK}: the design's 70%, kept at AA contrast).
+ * the outcomes the member can run — or, once closed, "✓ <result>" with the
+ * card receded ({@link QUEUE_CARD_INK}: the design's 70%, kept at AA contrast;
+ * a close the server made reads "Done by Clinozy" as its due label alone).
  */
 function QueueCard({
   entry,
   now,
+  team,
+  outcomesOf,
   onOutcome,
 }: {
   entry: WorkQueueEntry;
   now: Date;
+  team: WorkQueueTeam;
+  outcomesOf: WorkQueueProps['outcomesOf'];
   onOutcome: WorkQueueProps['onOutcome'];
 }) {
   const { t } = useTranslation(TODAY_NS);
   const { t: tTasks } = useTranslation(TASK_RULES_NS);
   // The Today room already is today: today's due times read bare.
   const dueLabel = useTaskDueLabel({ sameDay: true });
-  const ownerName = useOwnerName();
+  const ownerName = useOwnerName(team);
   const { row, result, busy } = entry;
-  const rule = TASK_RULES[row.rule];
-  const copy = TASK_RULE_KEYS.rules[row.rule];
-  const outcomeKeys = copy.outcomes as Readonly<Record<string, { label: string }>>;
+  const owner = ownerName(row);
   const closed = result !== null;
   const overdue = !closed && isTaskOverdue(row, now);
   const ink = QUEUE_CARD_INK[closed ? 'closed' : 'open'];
@@ -130,10 +203,10 @@ function QueueCard({
           data-slot="pill"
           className={cn(
             'text-micro rounded-full px-2 py-px leading-[normal]',
-            TONE_CLASSES[rule.tone].surface,
+            TONE_CLASSES[TASK_TYPES[row.type].tone].surface,
           )}
         >
-          {tTasks(copy.label)}
+          {tTasks(TASK_RULE_KEYS.rules[row.type].label)}
         </span>
         <span
           className={cn(
@@ -148,32 +221,23 @@ function QueueCard({
         {row.title}
       </p>
       {row.why ? <p className={cn('text-xs leading-[1.4]', ink.why)}>{row.why}</p> : null}
-      <p className={cn('text-caption leading-[normal]', ink.meta)}>
-        {t(TODAY_KEYS.queue.owner, { name: ownerName(row) })}
-      </p>
-      {closed ? (
+      {owner ? (
+        <p className={cn('text-caption leading-[normal]', ink.meta)}>
+          {t(TODAY_KEYS.queue.owner, { name: owner })}
+        </p>
+      ) : null}
+      {closed && result ? (
         <p className="text-success-strong text-xs leading-[normal]">
           {t(TODAY_KEYS.queue.closed, { result })}
         </p>
-      ) : (
-        <div className="flex flex-wrap gap-1.25">
-          {rule.outcomes.map((outcome) => {
-            const keys = outcomeKeys[outcome.id];
-            return (
-              <button
-                key={outcome.id}
-                type="button"
-                disabled={busy}
-                data-testid={TODAY_TEST_IDS.queueOutcome}
-                data-outcome={outcome.id}
-                onClick={() => onOutcome(row, outcome.id)}
-                className="hover:bg-accent hover:border-border-strong rounded-lg border px-2.25 py-1 text-xs leading-[normal] disabled:opacity-50"
-              >
-                {keys ? tTasks(keys.label) : outcome.id}
-              </button>
-            );
-          })}
-        </div>
+      ) : null}
+      {closed ? null : (
+        <QueueOutcomes
+          row={row}
+          outcomes={outcomesOf(row)}
+          busy={busy}
+          onOutcome={onOutcome}
+        />
       )}
     </article>
   );
@@ -194,6 +258,8 @@ export function WorkQueue({
   scope,
   onScopeChange,
   now,
+  team,
+  outcomesOf,
   onOutcome,
   className,
 }: WorkQueueProps) {
@@ -253,6 +319,8 @@ export function WorkQueue({
                 key={entry.row.id}
                 entry={entry}
                 now={now}
+                team={team}
+                outcomesOf={outcomesOf}
                 onOutcome={onOutcome}
               />
             ))}

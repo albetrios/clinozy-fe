@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import type { OfferingRecord } from '@/shared/api/clinic/offerings-fixture-contracts.ts';
 import { CLINIC_KEYS } from '@/shared/clinic/clinic.constants.ts';
 import {
   type DrawerPeekItem,
@@ -23,10 +22,11 @@ import {
   INVOICE_DRAWER_NS,
   INVOICE_TYPE_TONES,
 } from './invoice-drawer.constants.ts';
+import type { InvoiceFigures } from './invoice-figures.ts';
 import {
-  type InvoiceDraftFigures,
   type InvoiceFormValues,
   namedLines,
+  overallDiscountPaise,
   paidNowSplits,
   percentOf,
 } from './invoice-form.ts';
@@ -55,12 +55,13 @@ export interface InvoiceDrawerView {
 /** What the view reads besides the form. */
 export interface InvoiceDrawerViewInput {
   values: InvoiceFormValues;
-  figures: InvoiceDraftFigures;
+  figures: InvoiceFigures;
   /** The saved invoice's number on an edit. */
   seq: number | null;
   /** Opened as Medical's New sale: the type locked to Medical. */
   sale: boolean;
-  offerings: ReadonlyMap<string, OfferingRecord>;
+  /** The lines as the server's preview prices them — "Covers 6 sessions". */
+  sessionLines: readonly { qty: number; sessionsTotal: number | null }[];
   /** Team members by id as their peek pills — short name, own tone ("Dr. Drashti"). */
   staff: ReadonlyMap<string, DrawerPeekPill>;
   /** The picked branch — the first step's sub line and its toned peek tile. */
@@ -75,16 +76,19 @@ function badgesOf(
 ): DrawerBadge[] {
   const { values, figures } = input;
   const lines = namedLines(values.items);
+  const shown = figures.status !== 'refused' && figures.status !== 'failed';
   const badges: DrawerBadge[] = [
     {
       id: 'type',
       label: t(CLINIC_KEYS.invoiceTypes[values.type]),
       tone: INVOICE_TYPE_TONES[values.type],
     },
-    { id: 'bill', label: t(K.badges.bill, { amount: formatPaise(figures.totals.bill) }) },
+    {
+      id: 'bill',
+      label: t(K.badges.bill, { amount: shown ? formatPaise(figures.bill) : '—' }),
+    },
   ];
-  const sessions =
-    values.type === 'medical' ? 0 : coveredSessions(lines, input.offerings);
+  const sessions = values.type === 'medical' ? 0 : coveredSessions(input.sessionLines);
   if (sessions > 0) {
     badges.push({
       id: 'sessions',
@@ -97,15 +101,39 @@ function badgesOf(
   );
   if (modes.length > 1)
     badges.push({ id: 'modes', label: modes.join(' + '), tone: 'sky' });
-  if (lines.length === 0) badges.push({ id: 'status', label: t(K.badges.draft) });
-  else if (figures.balance.due > 0) {
+  if (lines.length === 0 || !shown) {
+    badges.push({ id: 'status', label: t(K.badges.draft) });
+  } else if (figures.due > 0) {
     badges.push({
       id: 'status',
-      label: t(K.badges.due, { amount: formatPaise(figures.balance.due) }),
+      label: t(K.badges.due, { amount: formatPaise(figures.due) }),
       tone: 'blush',
     });
   } else badges.push({ id: 'status', label: t(K.badges.paid), tone: 'sage' });
   return badges;
+}
+
+/**
+ * The Payment step's peek between its discount and its remark: "Paid now" on a new invoice
+ * (Quick fill and the modes), what is paid and due on a saved one — paid through Payments.
+ */
+function paymentPeek(
+  input: InvoiceDrawerViewInput,
+  t: TFunction,
+  formatPaise: (paise: number) => string,
+): DrawerPeekItem[] {
+  if (input.seq !== null && !input.sale) {
+    const paid = t(K.payment.paidTotal, {
+      paid: formatPaise(input.figures.paidBefore),
+      due: formatPaise(input.figures.due),
+    });
+    return [{ kind: 'value', label: t(K.fields.paid), value: paid }];
+  }
+  const modes = input.values.paidNow.map((row) => t(CLINIC_KEYS.paymentModes[row.mode]));
+  return [
+    { kind: 'value', label: t(K.fields.quickFill) },
+    { kind: 'items', label: t(K.payment.mode), names: modes },
+  ];
 }
 
 /** The step heads, their sub lines, their collapsed peeks and what each still misses. */
@@ -125,8 +153,10 @@ function stepsOf(
     const pill = input.staff.get(id);
     return pill ? [pill] : [];
   });
-  const percent = `${percentOf(values.overallDiscountPct)}%`;
-  const modes = values.paidNow.map((row) => t(CLINIC_KEYS.paymentModes[row.mode]));
+  // A sale's overall discount is a percent (Q-G7); an invoice's an amount, as the API takes it.
+  const discount = medical
+    ? `${percentOf(values.overallDiscountPct)}%`
+    : formatPaise(overallDiscountPaise(values));
   const paid = paidNowSplits(values.paidNow).map(
     (split) => `${t(CLINIC_KEYS.paymentModes[split.mode])} ${formatPaise(split.amount)}`,
   );
@@ -173,13 +203,12 @@ function stepsOf(
     },
     payment: {
       title: t(K.steps.payment),
-      summary: drawerStepSummary([percent, ...paid, remark], notFilled),
+      summary: drawerStepSummary([discount, ...paid, remark], notFilled),
       missing: [],
       // The prototype's peek lists every field of the step (H:3832–3834).
       peek: [
-        { kind: 'value', label: t(K.fields.overallDiscount), value: percent },
-        { kind: 'value', label: t(K.fields.quickFill) },
-        { kind: 'items', label: t(K.payment.mode), names: modes },
+        { kind: 'value', label: t(K.fields.overallDiscount), value: discount },
+        ...paymentPeek(input, t, formatPaise),
         { kind: 'value', label: t(K.fields.remark), value: remark },
       ],
     },

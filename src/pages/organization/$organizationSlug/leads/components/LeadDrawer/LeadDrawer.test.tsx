@@ -55,13 +55,18 @@ const viewport = vi.hoisted(() => ({ tier: 'desktop' as ViewportTier }));
 vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
   useViewportTier: () => viewport.tier,
 }));
-/** Whether the member may book (`appointment:create`) — every other ability is granted. */
-const access = vi.hoisted(() => ({ book: true }));
+/**
+ * Whether the member may book (`appointment:create`) and read tasks (`task:read`) — every other
+ * ability is granted.
+ */
+const access = vi.hoisted(() => ({ book: true, tasks: true }));
 vi.mock('@/shared/hooks/useClinicAccess/index.ts', () => ({
   useClinicAccess: () => ({
     roles: ['admin'],
     previewRole: null,
-    can: (section: string) => section !== 'appointments' || access.book,
+    can: (section: string) =>
+      (section !== 'appointments' || access.book) &&
+      (section !== 'tasks' || access.tasks),
     canAbility: () => true,
     canCode: () => true,
     viewableSections: [],
@@ -135,6 +140,7 @@ beforeEach(() => {
   Object.assign(people, { contacts: [contactRecord()] });
   vi.resetAllMocks();
   access.book = true;
+  access.tasks = true;
   signInTestMember();
 });
 afterEach(() => {
@@ -196,6 +202,19 @@ describe('LeadDrawer (KICKOFF §6.3)', () => {
       expect(infoCell(drawer, 'Open tasks')).toHaveTextContent(/^Open tasks1$/),
     );
     expect(countOpenLeadTasks).toHaveBeenCalledWith(ANAYA.id);
+  });
+
+  it('leaves Open tasks out for a member who reads no tasks (a role without task:read)', async () => {
+    access.tasks = false;
+    vi.mocked(countOpenLeadTasks).mockClear();
+    const { drawer } = await openAnaya();
+    expect(infoCell(drawer, 'Created')).toBeInTheDocument();
+    expect(
+      within(within(drawer).getByRole('region', { name: 'Info' })).queryByText(
+        'Open tasks',
+      ),
+    ).not.toBeInTheDocument();
+    expect(countOpenLeadTasks).not.toHaveBeenCalled();
   });
 
   it('reads "None yet" before any activity, and "Linked" once a check-in opened a file', async () => {

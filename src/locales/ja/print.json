@@ -41,9 +41,10 @@
     "noNotes": "追加の備考はありません",
     "paymentSummary": "お支払いの概要",
     "totalAmount": "合計金額：",
-    "overallDiscount": "全体割引：",
     "billAmount": "請求金額：",
-    "balanceDue": "未払い残高："
+    "balanceDue": "未払い残高：",
+    "taxableAmount": "課税対象額：",
+    "gstTotal": "GST："
   },
   "prescription": {
     "patientId": "患者ID：",

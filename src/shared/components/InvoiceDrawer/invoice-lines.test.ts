@@ -1,14 +1,16 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  offeringSeed,
-  offerSeed,
-} from '@/shared/api/clinic/fixtures/offerings.fixtures.ts';
-import {
   medicineForm,
   type MedicineRecord,
 } from '@/shared/api/clinic/medicines-contracts.ts';
-import type { OfferingRecord } from '@/shared/api/clinic/offerings-fixture-contracts.ts';
+import {
+  INVOICE_TEST_OFFERINGS,
+  INVOICE_TEST_OFFERS,
+  TEST_CONSULTATION_ID,
+  TEST_LHR_ID,
+  TEST_PEEL_ID,
+} from '@/tests/utils/invoice-doubles.ts';
 
 import { blankLine } from './invoice-form.ts';
 import {
@@ -18,21 +20,16 @@ import {
   offeringCatalogItem,
   offeringsFor,
   oftenBilledItems,
-  rowFloor,
 } from './invoice-lines.ts';
 import { rxLines } from './invoice-presets.ts';
 import { withAddedLine, withSteppedLine } from './invoice-rows.ts';
 
-const TODAY = '2026-10-03';
-const OFFERINGS = offeringSeed(TODAY);
-const OFFERS = offerSeed(TODAY);
-const bySeq = (seq: number): OfferingRecord => {
-  const found = OFFERINGS.find((row) => row.seq === seq);
-  if (!found) throw new Error(`offering #${seq}`);
+const byId = (id: string) => {
+  const found = INVOICE_TEST_OFFERINGS.find((row) => row.id === id);
+  if (!found) throw new Error(`offering ${id}`);
   return found;
 };
-const OFFERINGS_BY_ID = new Map(OFFERINGS.map((row) => [row.id, row]));
-const item = (seq: number) => offeringCatalogItem(bySeq(seq), null, OFFERS, TODAY);
+const item = (id: string) => offeringCatalogItem(byId(id), null, INVOICE_TEST_OFFERS);
 
 const glycolac = {
   id: 'med-456',
@@ -46,45 +43,38 @@ const glycolac = {
 
 describe('what an invoice lists (KICKOFF §6.9 Items)', () => {
   it('lists active offerings of the type: consultations alone for a consultation invoice', () => {
-    const clinic = offeringsFor(OFFERINGS, 'clinic', null).map((row) => row.name);
-    expect(clinic).toContain('Corn Removal');
-    expect(clinic).not.toContain('Consultation · New');
-    // Underarm Peel is inactive.
-    expect(clinic).not.toContain('Underarm Peel');
-    expect(offeringsFor(OFFERINGS, 'consultation', null).map((row) => row.name)).toEqual([
-      'Consultation · New',
-    ]);
+    const inactive = {
+      ...byId(TEST_PEEL_ID),
+      id: 'off_gone',
+      name: 'Gone',
+      isActive: false,
+    };
+    const clinic = offeringsFor([...INVOICE_TEST_OFFERINGS, inactive], 'clinic', null);
+    expect(clinic.map((row) => row.name)).toEqual(['Research Peel', 'LHR Full Face']);
+    expect(
+      offeringsFor(INVOICE_TEST_OFFERINGS, 'consultation', null).map((row) => row.id),
+    ).toEqual([TEST_CONSULTATION_ID]);
   });
 
   it('lists only what a branch sells once one is picked', () => {
-    const halfLeg = bySeq(266);
     const elsewhere = offeringsFor(
-      [{ ...halfLeg, branchIds: ['other-branch'] }],
+      [{ ...byId(TEST_PEEL_ID), branchIds: ['brn_other'] }],
       'clinic',
-      'this-branch',
+      'brn_this',
     );
     expect(elsewhere).toEqual([]);
   });
 
-  it('bills an offering at its effective price, naming the live offer (Q-O2)', () => {
-    const peel = item(271);
-    expect(peel).toMatchObject({
-      label: 'Back Peeling',
-      price: 240_000,
-      promo: 'Navratri glow',
-      line: { rate: 240_000, gstPct: 0, discountPct: 0 },
+  it('lists an offering at its "Billed today", naming the live offer — the line itself unpriced', () => {
+    // ₹1,800 offer price, ₹149.50 off: ₹1,650.50, in paise for the quick line.
+    expect(item(TEST_PEEL_ID)).toMatchObject({
+      label: 'Research Peel',
+      price: 165_050,
+      promo: 'Peel week',
+      tone: 'sage',
+      line: { offeringId: TEST_PEEL_ID, rate: 0, gstPct: 0, discountPct: 0 },
     });
-    expect(item(270)).toMatchObject({ price: 100_000, promo: null });
-  });
-
-  it('backs GST out of a GST-inclusive offering’s rate, so the line comes to its price (Q-O3)', () => {
-    const inclusive = offeringCatalogItem(
-      { ...bySeq(270), gstPct: 18, gstInclusive: true, price: 118_000 },
-      null,
-      OFFERS,
-      TODAY,
-    );
-    expect(inclusive.line.rate).toBe(100_000);
+    expect(item(TEST_LHR_ID)).toMatchObject({ price: 480_000, promo: null, sessions: 7 });
   });
 
   it('bills a medicine at its MRP, no GST on top (D45), the near-expiry discount on (Q-M3)', () => {
@@ -100,73 +90,56 @@ describe('what an invoice lists (KICKOFF §6.9 Items)', () => {
     expect(medicineForm('Admosh UV Sunscreen 60g')).toBe('topical');
   });
 
-  it('floors a row at the lowest price with `disc`, else at the offer price (H:5059, Q-U8)', () => {
-    const catalog = new Map([[item(271).key, item(271)]]);
-    const row = { offeringId: bySeq(271).id, qty: 2, gstPct: 0 };
-    expect(rowFloor(row, OFFERINGS_BY_ID, catalog, { disc: true })).toBe(450_000);
-    expect(rowFloor(row, OFFERINGS_BY_ID, catalog, { disc: false })).toBe(480_000);
+  it('counts the sessions the server prices as more than one a unit — "Covers 7 sessions" (H:5068)', () => {
     expect(
-      rowFloor({ ...row, offeringId: null }, OFFERINGS_BY_ID, catalog, { disc: true }),
-    ).toBeNull();
-  });
-
-  it('counts the sessions the package rows cover — "Covers 6 sessions" (H:5068)', () => {
-    const lines = [
-      { offeringId: bySeq(273).id, qty: 1, name: 'Underarm Peel · 6 sessions' },
-      { offeringId: bySeq(270).id, qty: 3, name: 'Corn Removal' },
-    ];
-    expect(coveredSessions(lines, OFFERINGS_BY_ID)).toBe(6);
+      coveredSessions([
+        { qty: 1, sessionsTotal: 7 },
+        { qty: 3, sessionsTotal: 3 },
+        { qty: 1, sessionsTotal: null },
+      ]),
+    ).toBe(7);
   });
 
   it('finds "Often billed" names in the catalogue, in its order, five at most', () => {
-    const catalog = [item(273), item(270)];
+    const catalog = [item(TEST_LHR_ID), item(TEST_PEEL_ID)];
     expect(
-      oftenBilledItems(['Underarm Peel', 'Corn Removal', 'Gone'], catalog).map(
+      oftenBilledItems(['Research', 'LHR Full Face', 'Gone'], catalog).map(
         (entry) => entry.label,
       ),
-    ).toEqual(['Underarm Peel · 6 sessions', 'Corn Removal']);
-    const all = offeringsFor(OFFERINGS, 'clinic', null).map((row) =>
-      offeringCatalogItem(row, null, OFFERS, TODAY),
-    );
-    const names = [
-      'LHR Half Leg',
-      'Gone',
-      'Underarm Peel',
-      'Back Peeling',
-      'Corn',
-      'B1G1',
-    ];
-    expect(
-      oftenBilledItems([...names, 'LHR Full Face'], all).map((e) => e.label),
-    ).toEqual([
-      // The first in catalogue order the name starts, as the prototype finds it.
-      'LHR Half Leg · 10 sessions',
-      'Underarm Peel · 6 sessions',
-      'Back Peeling',
-      'Corn Removal',
-      'B1G1 D-Tan Facial',
-    ]);
+    ).toEqual(['Research Peel', 'LHR Full Face']);
+    expect(oftenBilledItems(Array(8).fill('LHR'), catalog)).toHaveLength(5);
   });
 });
 
 describe('the quick line’s rows (H:5058 `addI`, `step`)', () => {
   it('adds into the first blank row, else at the end, with the line’s values', () => {
-    const corn = item(270);
-    const first = withAddedLine([blankLine()], corn, { qty: 2, discountPct: 10 });
+    const peel = item(TEST_PEEL_ID);
+    const first = withAddedLine([blankLine()], peel, { qty: 2, discountPct: 10 });
     expect(first).toHaveLength(1);
-    expect(first[0]).toMatchObject({ name: 'Corn Removal', qty: 2, discountPct: 10 });
-    expect(withAddedLine(first, item(271))).toHaveLength(2);
-    expect(lineFromCatalog(corn, { rate: 50_000 }).rate).toBe(50_000);
+    expect(first[0]).toMatchObject({
+      id: null,
+      offeringId: TEST_PEEL_ID,
+      name: 'Research Peel',
+      qty: 2,
+      discountPct: 10,
+      suggestionId: null,
+      treatmentIds: [],
+    });
+    expect(withAddedLine(first, item(TEST_LHR_ID))).toHaveLength(2);
+    // A sale's typed "@500" rate.
+    expect(lineFromCatalog(medicineCatalogItem(glycolac), { rate: 50_000 }).rate).toBe(
+      50_000,
+    );
   });
 
   it('steps a row up and down, dropping it at none and keeping one blank row', () => {
-    const corn = item(270);
-    const one = withSteppedLine([blankLine()], corn, 1);
+    const peel = item(TEST_PEEL_ID);
+    const one = withSteppedLine([blankLine()], peel, 1);
     expect(one[0]?.qty).toBe(1);
-    expect(withSteppedLine(one, corn, 1)[0]?.qty).toBe(2);
-    const none = withSteppedLine(one, corn, -1);
+    expect(withSteppedLine(one, peel, 1)[0]?.qty).toBe(2);
+    const none = withSteppedLine(one, peel, -1);
     expect(none).toEqual([blankLine()]);
-    expect(withSteppedLine([blankLine()], corn, -1)).toEqual([blankLine()]);
+    expect(withSteppedLine([blankLine()], peel, -1)).toEqual([blankLine()]);
   });
 });
 

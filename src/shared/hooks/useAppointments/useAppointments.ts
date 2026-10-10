@@ -47,6 +47,7 @@ import {
 } from '@/shared/hooks/useCursorList/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { useOfferings } from '@/shared/hooks/useOfferings/index.ts';
+import { useRefreshTasksAfterRules } from '@/shared/hooks/useTasks/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
@@ -68,6 +69,25 @@ const APPOINTMENT_WRITE_KEYS = [
   messageQueryKeys.all,
   ['clinic', 'patients'],
 ];
+
+/**
+ * A booking write's options with the task reads refreshed once the server's rules have run on it:
+ * a booking, a move, a status change and its way back each ask for a run (D81 T7 — a confirm, a
+ * check-in or a cancel closes its task, a no-show opens a rebook), so a task list on screen — Today's
+ * work queue beside the floor and the form stacked over it — follows within seconds, not the 60s poll.
+ */
+function withTaskRulesRefresh<TData, TVars>(
+  options: CrudMutationOptions<TData, TVars>,
+  refreshTasks: () => void,
+): CrudMutationOptions<TData, TVars> {
+  return {
+    ...options,
+    onSuccess: async (data, vars) => {
+      refreshTasks();
+      await options.onSuccess?.(data, vars);
+    },
+  };
+}
 
 /** A phrase in the clinic vocabulary (the namespace loads with the org shell). */
 function clinicText(key: string, values: Record<string, string> = {}): string {
@@ -307,11 +327,12 @@ export function useCreateAppointment(
   options: CrudMutationOptions<AppointmentRow, AppointmentCreateVars> = {},
 ) {
   const slotLabel = useAppointmentSlotLabel();
+  const refreshTasks = useRefreshTasksAfterRules();
   return useAppMutation<AppointmentRow, AppointmentCreateVars>({
     mutationFn: (input, action) => createAppointment({ input, ...action }),
     invalidateKeys: APPOINTMENT_WRITE_KEYS,
     successMessage: (row) => bookedToast(row, slotLabel(row.date, row.startTime)),
-    ...options,
+    ...withTaskRulesRefresh(options, refreshTasks),
   });
 }
 
@@ -327,11 +348,12 @@ export function useCopyAppointment(
   options: CrudMutationOptions<AppointmentRow, AppointmentCopyVars> = {},
 ) {
   const slotLabel = useAppointmentSlotLabel();
+  const refreshTasks = useRefreshTasksAfterRules();
   return useAppMutation<AppointmentRow, AppointmentCopyVars>({
     mutationFn: (vars, action) => copyAppointment({ ...vars, ...action }),
     invalidateKeys: APPOINTMENT_WRITE_KEYS,
     successMessage: (row) => bookedToast(row, slotLabel(row.date, row.startTime)),
-    ...options,
+    ...withTaskRulesRefresh(options, refreshTasks),
   });
 }
 
@@ -354,6 +376,7 @@ export function useUpdateAppointment(
   options: CrudMutationOptions<AppointmentRow, AppointmentUpdateVars> = {},
 ) {
   const slotLabel = useAppointmentSlotLabel();
+  const refreshTasks = useRefreshTasksAfterRules();
   return useAppMutation<AppointmentRow, AppointmentUpdateVars>({
     mutationFn: ({ appointment, fields }, action) =>
       updateAppointment({
@@ -371,7 +394,7 @@ export function useUpdateAppointment(
         ? clinicText(KEYS.toasts.moved, values)
         : clinicText(KEYS.toasts.movedOnly, values);
     },
-    ...options,
+    ...withTaskRulesRefresh(options, refreshTasks),
   });
 }
 
@@ -421,10 +444,12 @@ export function useMoveAppointment({
   ...options
 }: AppointmentMoveOptions = {}) {
   const organizationId = useOrganizationId();
+  const refreshTasks = useRefreshTasksAfterRules();
   const undo = useAppMutation<AppointmentRow, AppointmentRow>({
     mutationFn: (row, action) =>
       moveAppointment({ appointmentId: row.id, route: 'undo-check-in', ...action }),
     invalidateKeys: APPOINTMENT_WRITE_KEYS,
+    onSuccess: refreshTasks,
   });
   return useAppMutation<AppointmentRow, AppointmentMoveVars>({
     mutationFn: ({ appointment, route }, action) =>
@@ -435,7 +460,7 @@ export function useMoveAppointment({
       update: (data, { appointment, route }) =>
         withAppointmentStatus(data, appointment.id, MOVE_STATUSES[route]),
     },
-    ...withUndoToast(options, (row, { route }) => {
+    ...withUndoToast(withTaskRulesRefresh(options, refreshTasks), (row, { route }) => {
       const message = announce ? announce(row) : statusToast(row);
       if (route === 'check-in') {
         notify.undo(message, { onUndo: () => undo.mutate(row) });
@@ -472,16 +497,18 @@ export function useCancelAppointment({
   announce = 'record',
   ...options
 }: AppointmentCancelOptions = {}) {
+  const refreshTasks = useRefreshTasksAfterRules();
   const reinstate = useAppMutation<AppointmentRow, AppointmentRow>({
     mutationFn: (row, action) =>
       moveAppointment({ appointmentId: row.id, route: 'reinstate', ...action }),
     invalidateKeys: APPOINTMENT_WRITE_KEYS,
+    onSuccess: refreshTasks,
   });
   return useAppMutation<AppointmentRow, AppointmentCancelVars>({
     mutationFn: ({ appointment, cancel }, action) =>
       cancelAppointment({ appointmentId: appointment.id, cancel, ...action }),
     invalidateKeys: APPOINTMENT_WRITE_KEYS,
-    ...withUndoToast(options, (row) => {
+    ...withUndoToast(withTaskRulesRefresh(options, refreshTasks), (row) => {
       const message =
         announce === 'status'
           ? clinicText(KEYS.toasts.statusCancelled, {
@@ -499,11 +526,12 @@ export function useCancelAppointment({
 export function useReinstateAppointment(
   options: CrudMutationOptions<AppointmentRow, AppointmentRow> = {},
 ) {
+  const refreshTasks = useRefreshTasksAfterRules();
   return useAppMutation<AppointmentRow, AppointmentRow>({
     mutationFn: (row, action) =>
       moveAppointment({ appointmentId: row.id, route: 'reinstate', ...action }),
     invalidateKeys: APPOINTMENT_WRITE_KEYS,
     successMessage: () => clinicText(KEYS.toasts.restored),
-    ...options,
+    ...withTaskRulesRefresh(options, refreshTasks),
   });
 }

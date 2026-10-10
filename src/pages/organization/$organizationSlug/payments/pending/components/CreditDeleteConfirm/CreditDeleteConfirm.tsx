@@ -3,7 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import type { CreditRow } from '@/shared/api/clinic/credits-contracts.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
+import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
 import { useDeleteCredit, useRestoreCredit } from '@/shared/hooks/useCredits/index.ts';
+import { notify } from '@/shared/notify/index.ts';
 
 import { PAYMENTS_KEYS, PAYMENTS_NS } from '../../../payments.constants.ts';
 
@@ -18,10 +20,13 @@ export interface CreditDeleteConfirmProps {
 }
 
 /**
- * Delete a pending credit (KICKOFF §6.9; `payments.md:50, 291`): the shared
- * reason confirm titled "Delete this pending?" — the prototype reused "Delete
- * this payment?" (§7.3) — the party in the grey pill, the schema's
- * `delete_reason` chips. Optimistic; "CR-2 deleted" offers Undo for 10s (D32).
+ * Delete a pending credit (KICKOFF §6.9; `payments.md:50, 291`; `DELETE
+ * /app/pending-credits/:id?reason=&note=`): the shared reason confirm titled
+ * "Delete this pending?" — the prototype reused "Delete this payment?" (§7.3) —
+ * the party in the grey pill, the API's delete reasons ("Other" needs a note).
+ * Optimistic; "CR-2 deleted" offers Undo for 10s (D32, `POST …/restore`). Part
+ * of it settled meanwhile (`409 credit_settled`) closes the confirm and says
+ * so; the row comes back.
  */
 export function CreditDeleteConfirm({
   credit,
@@ -29,7 +34,7 @@ export function CreditDeleteConfirm({
   onDeleted,
 }: CreditDeleteConfirmProps) {
   const { t } = useTranslation(PAYMENTS_NS);
-  const remove = useDeleteCredit();
+  const remove = useDeleteCredit({ notifyOnError: false });
   const restore = useRestoreCredit();
   return (
     <ConfirmDialog
@@ -51,7 +56,22 @@ export function CreditDeleteConfirm({
       }}
       onConfirm={async ({ reason, note }) => {
         if (!credit) return;
-        await remove.mutateAsync({ id: credit.id, reason, note });
+        try {
+          await remove.mutateAsync({ id: credit.id, reason, note });
+        } catch (error) {
+          if (apiErrorReason(error) === 'credit_settled') {
+            // It can't be deleted any more: the confirm goes, with no Undo to offer.
+            notify.error(
+              t(PAYMENTS_KEYS.pending.conflicts.settled, {
+                ref: displayId.pendingCredit(credit.seq),
+              }),
+            );
+            onClose();
+          } else {
+            notify.error(mapApiError(error));
+          }
+          throw error;
+        }
         onDeleted?.();
       }}
     />

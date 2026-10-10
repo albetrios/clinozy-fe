@@ -5,13 +5,13 @@ import type {
   MedicalPurchaseOrder,
   MedicalSale,
 } from '@/shared/api/clinic/clinic-schema.ts';
-import { paymentQueryKeys } from '@/shared/api/clinic/payments-api.ts';
-import type { PaymentRecord } from '@/shared/api/clinic/payments-contracts.ts';
+import { fixtureLedgerQueryKeys } from '@/shared/api/clinic/payments-fixture-api.ts';
+import type { PaymentRecord } from '@/shared/api/clinic/payments-fixture-contracts.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
+import { FIXTURE_MONEY_WRITE_KEYS } from '@/shared/hooks/useFixtureLedger/index.ts';
 import { MEDICINE_WRITE_KEYS } from '@/shared/hooks/useMedicines/index.ts';
-import { MONEY_WRITE_KEYS } from '@/shared/hooks/usePayments/index.ts';
 
 import { medicalQueryKeys } from '../../medical-api.ts';
 import {
@@ -68,11 +68,14 @@ const STOCK_KEYS: readonly QueryKey[] = MEDICINE_WRITE_KEYS;
 /** A receipt makes a bill Send payment can settle. */
 const BILL_KEYS: readonly QueryKey[] = [
   ...MEDICINE_WRITE_KEYS,
-  paymentQueryKeys.openBills(),
+  fixtureLedgerQueryKeys.openBills(),
 ];
 
 /** A sale's money and stock: the ledger and its readers, the room and its medicines. */
-const SALE_KEYS: readonly QueryKey[] = [...MEDICINE_WRITE_KEYS, ...MONEY_WRITE_KEYS];
+const SALE_KEYS: readonly QueryKey[] = [
+  ...MEDICINE_WRITE_KEYS,
+  ...FIXTURE_MONEY_WRITE_KEYS,
+];
 
 /** One write of the room, refreshing what it joins. */
 function useFlowWrite<TData, TVars>(

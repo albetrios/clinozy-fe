@@ -2,10 +2,15 @@
 
 Route: `/organization/$organizationSlug/invoices/create` (`S:92`) — a URL-driven dialog over its
 referrer (KICKOFF §4, D24). The route renders nothing: the invoices island reads the URL and
-opens the shared Invoice drawer. `?type=clinic|medical|consultation&patient=` prefill it and
+opens the shared Invoice drawer. `?type=clinic|medical|consultation&patient=` prefill it,
+`?appointment=` (the visit flow's "Create invoice from visit", D156) fills its lines with the
+visit's sessions still to bill (`GET /app/patients/:patient_id/treatments?appointment_id=
+&is_billed=false`, one line per offering carrying them), `?copyOf=` starts it as a copy, and
 `?from=` keeps the room it was opened from — parsed by `validateInvoiceCreateSearch` in the
-parent's `../invoices.dialog-search.ts`. Without Payments Create the link lands on the ledger with the
-permission toast.
+parent's `../invoices.dialog-search.ts`. The patient is read for their contact (the invoice's
+`contact_id`); each line the member adds is priced by the server's preview as they type; the
+save is `POST /app/invoices`, with "Paid now" as one receipt for a member with `payment:create`.
+Without `payment:create` the link lands on the ledger with the permission toast.
 
 ## Files
 

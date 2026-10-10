@@ -136,7 +136,8 @@
     },
     "rowActions": {
       "edit": "編集",
-      "delete": "削除"
+      "delete": "削除",
+      "pay": "{{amount}} を支払う"
     },
     "vendorFilter": {
       "any": "すべての仕入先",
@@ -194,8 +195,10 @@
     "noPurchases": "仕入れなし",
     "rowActions": {
       "edit": "編集",
-      "delete": "削除"
-    }
+      "delete": "削除",
+      "pay": "{{amount}} を支払う"
+    },
+    "paidUp": "{{name}} への未払いは今はありません"
   },
   "drawers": {
     "records": {

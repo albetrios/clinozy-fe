@@ -21,6 +21,7 @@ import {
   contactFieldsOf,
   contactValueOf,
 } from '@/shared/forms/ContactEditor/index.ts';
+import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { useContact, useUpdateContact } from '@/shared/hooks/useContacts/index.ts';
 import {
@@ -200,12 +201,15 @@ interface LeadFact {
 /**
  * Info (H:1813): Created · Last activity (the person's latest, on any record) · Patient —
  * linked once a check-in opened their file; the design's "Convert to patient" went with the
- * backend (route map §4 #5) · Open tasks · Re-target reason.
+ * backend (route map §4 #5) · Open tasks, for a member who reads tasks (`task:read` — a role
+ * without it would get a 403, research-tasks §7 flag 4) · Re-target reason.
  */
 function LeadInfoCard({ lead }: { lead: LeadRecord }) {
   const { t } = useTranslation(LEADS_NS);
   const clock = useClinicClock();
-  const openTasks = useOpenLeadTasks(lead.id);
+  const access = useClinicAccess();
+  const readsTasks = access.isResolved && access.can('tasks', 'view');
+  const openTasks = useOpenLeadTasks(lead.id, { enabled: readsTasks });
   const facts: LeadFact[] = [
     {
       key: 'created',
@@ -226,12 +230,14 @@ function LeadInfoCard({ lead }: { lead: LeadRecord }) {
         lead.patientId ? LEADS_KEYS.drawer.info.linked : LEADS_KEYS.drawer.info.notYet,
       ),
     },
-    {
+  ];
+  if (readsTasks) {
+    facts.push({
       key: 'tasks',
       label: t(LEADS_KEYS.drawer.info.openTasks),
       value: String(openTasks.data ?? 0),
-    },
-  ];
+    });
+  }
   if (lead.kind === 'retarget' && lead.retargetReason) {
     facts.push({
       key: 'retarget',

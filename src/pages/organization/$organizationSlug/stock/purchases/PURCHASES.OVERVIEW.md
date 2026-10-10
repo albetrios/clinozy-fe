@@ -18,8 +18,9 @@ read that fails shows the error in place with Retry; a later failure keeps the l
 list-error toast.
 
 A row opens Edit purchase; "+ New purchase" (and the empty state's) shows for those who may record one
-(`stock_item:create`). Paying a bill — the design's "Pay ₹1,710" — waits for Payments (research Q-S3): until
-then a purchase is paid by its "Paid" when it is recorded.
+(`stock_item:create`). "Pay ₹1,710", while something is due, opens Payments › Send payment on the bill
+(`usePayBill`, `?bill=spur_…`; `payment:create` and `payment:read`, Q-S3); a new purchase can also be paid by
+its "Paid" when it is recorded.
 
 The search, filters and sort live in the URL (`../stock.search.ts`).
 
@@ -65,7 +66,7 @@ its lists again.
 ## Test ids
 
 `stock-purchases-page`; the shared toolbar and table ids prefixed `stock-purchases` (`stock-purchases-new`,
-`stock-purchases-filters`, `stock-purchases-row-action-edit` / `-delete`). The drawer: `stock-purchase-drawer`
+`stock-purchases-filters`, `stock-purchases-row-action-pay` / `-edit` / `-delete`). The drawer: `stock-purchase-drawer`
 with `-vendor`, `-bill-no`, `-date`, `-lines` (`-lines-row`, `-lines-qty`, `-lines-rate`, `-lines-add`,
 `-lines-error`), `-quick-line-…`, `-bill`, `-paid` (New: the Paid input, `-paid-quick-full` / `-nothing`,
 `-paid-mode-cash` / `-upi` / `-card`, `-paid-branch-<brn_…>`; Edit: the read-only Paid).

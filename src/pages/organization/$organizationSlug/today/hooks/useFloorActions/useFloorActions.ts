@@ -10,6 +10,7 @@ import { taskTargetNavigation } from '@/shared/clinic/task-targets.ts';
 import { patientVisitTarget } from '@/shared/clinic/visit-redirect.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
+import { usePaymentAccess } from '@/shared/hooks/usePaymentAccess/index.ts';
 import { useTodayMoves } from '@/shared/hooks/useTodayFloor/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -42,14 +43,15 @@ export interface FloorActions {
  * action (L-64: the consult is the patient page's — the card's name opens it).
  * Each is hidden from a member who can't take it: Book needs Leads View, Check
  * in and Send in Appointments Edit (`appointment:update`), Open session
- * Patients View and the treatments gate, Checkout Patients View and Payments
- * Create, Dispense Medical Create; a booking with no patient file has no page
- * to open.
+ * Patients View and the treatments gate, Checkout Patients View and
+ * `payment:create` (the visit's bill and its receipt), Dispense Medical Create;
+ * a booking with no patient file has no page to open.
  */
 export function useFloorActions(organizationSlug: string): FloorActions {
   const { t } = useTranslation(TODAY_NS);
   const navigate = useClinicNavigate();
   const access = useClinicAccess();
+  const money = usePaymentAccess();
   const moves = useTodayMoves();
   const go = (navigation: ClinicCommandNavigation) => void navigate(navigation);
   const canEditBookings = access.can('appointments', 'edit');
@@ -111,7 +113,7 @@ export function useFloorActions(organizationSlug: string): FloorActions {
     with_doctor: () => null,
     treatment: ({ row }) =>
       openPatientVisit(row, passesPatientFileGate(access, 'treatments')),
-    checkout: ({ row }) => openPatientVisit(row, access.can('payments', 'create')),
+    checkout: ({ row }) => openPatientVisit(row, money.canCreate),
     pharmacy: ({ row }) => dispense(row),
   };
 

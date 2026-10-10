@@ -3,29 +3,30 @@
  * the rows, New task, the task drawer and "What’s next".
  */
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { TaskRow, TaskSourceRef } from '@/shared/api/clinic/tasks-contracts.ts';
+import type { TaskPerson, TaskRow } from '@/shared/api/clinic/tasks-contracts.ts';
 import type { ContactCardData } from '@/shared/components/PersonCard/index.ts';
 
-/** A source's display id ("#2363"), or nothing where the contract has no `seq`. */
-export function taskSourceId(source: Pick<TaskSourceRef, 'kind' | 'seq'>): string {
-  if (source.seq === null) return '';
-  return source.kind === 'invoice'
-    ? displayId.invoiceNumber(source.seq)
-    : displayId.lead(source.seq);
+/** What a task's person is to the clinic: a patient, a lead, or a chat-only contact. */
+export function taskPersonKind(
+  person: Pick<TaskPerson, 'patientId' | 'openLeadId'>,
+): ContactCardData['kind'] {
+  if (person.patientId) return 'patient';
+  return person.openLeadId ? 'lead' : 'contact';
 }
 
-/** A task's person as their contact card reads them (D32 — a patient, a lead or a contact). */
-export function taskContactCard(row: Pick<TaskRow, 'person'>): ContactCardData {
+/**
+ * A task's person as their contact card reads them (D32 — a patient, a lead or a contact): a
+ * patient by their number ("#3508"), anyone else by their contact number ("C-1188"); null for a
+ * task about nobody.
+ */
+export function taskContactCard(row: Pick<TaskRow, 'person'>): ContactCardData | null {
   const { person } = row;
+  if (!person) return null;
   let id: string | null = null;
-  if (person.seq !== null) {
-    id =
-      person.kind === 'patient'
-        ? displayId.patient(person.seq)
-        : displayId.lead(person.seq);
-  }
+  if (person.patientNumber !== null) id = displayId.patient(person.patientNumber);
+  else if (person.contactNumber !== null) id = displayId.contact(person.contactNumber);
   return {
-    kind: person.kind,
+    kind: taskPersonKind(person),
     name: person.name,
     displayId: id,
     reach: person.phone ? [{ channel: 'whatsapp', phone: person.phone }] : [],

@@ -27,10 +27,11 @@ each renders nothing; this page opens the clinic vendor drawer
 with `409 vendor_has_dues` (a purchase owes them since the list was read) closes with "Settle this
 vendor’s purchases first", and the vendors, the footer and the vendor's own read are read again.
 
-"Pay ₹X" is not offered (Q-S3): the Payments room still reads fixtures and cannot pay a live purchase. It
-comes back with Payments — one read on click for the oldest open bill,
-`GET /app/stock-purchases?stock_vendor_id=…&payment_status=unpaid,partial&sort=purchase_date&order=asc&limit=1`,
-never one read per row.
+"Pay ₹X" (what they are owed), while a vendor is owed, opens Payments › Send payment on their oldest open
+bill — one read on the click (`fetchOldestOpenStockPurchase`,
+`GET /app/stock-purchases?stock_vendor_id=…&payment_status=unpaid,partial&sort=purchase_date&order=asc&limit=1`),
+never one read per row; a vendor paid up meanwhile says "Nothing is owed to … now" and the vendors are read
+again. It shows for `payment:create` and `payment:read` (Q-S3).
 
 ## Files
 
@@ -45,5 +46,5 @@ never one read per row.
 ## Test ids
 
 `stock-vendors-page`; the shared toolbar and table ids prefixed `stock-vendors` (`stock-vendors-new`,
-`stock-vendors-table-row`, `stock-vendors-table-footer`, `stock-vendors-row-action-edit` · `-delete`);
-`retry-error` / `retry-button` for a failed first read. `stock-vendors-row-action-pay` is gone (Q-S3).
+`stock-vendors-table-row`, `stock-vendors-table-footer`, `stock-vendors-row-action-pay` · `-edit` ·
+`-delete`); `retry-error` / `retry-button` for a failed first read.

@@ -11,22 +11,29 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { supplierBillKey } from '@/shared/api/clinic/payments-contracts.ts';
+import {
+  supplierBillKey,
+  supplierBillRefOf,
+} from '@/shared/api/clinic/payments-contracts.ts';
 
 import { usePayBill } from './usePayBill.ts';
 
-/** The member's access: whether Payments Create is granted. */
-const access = vi.hoisted(() => ({ isResolved: true, canCreate: true }));
-vi.mock('@/shared/hooks/useClinicAccess/index.ts', () => ({
-  useClinicAccess: () => ({
-    isResolved: access.isResolved,
-    can: (section: string, action: string) =>
-      section === 'payments' && action === 'create' && access.canCreate,
+/** The member's payment gates: whether they may record a payment and see the Payments room. */
+const access = vi.hoisted(() => ({ resolved: true, canCreate: true, canRead: true }));
+vi.mock('@/shared/hooks/usePaymentAccess/index.ts', () => ({
+  usePaymentAccess: () => ({
+    resolved: access.resolved,
+    canRead: access.resolved && access.canRead,
+    canCreate: access.resolved && access.canCreate,
+    canEdit: false,
+    canDelete: false,
+    canGiveBack: false,
+    canExport: false,
   }),
 }));
 
-const PO = '0b9c7a3e-2f6d-4f8a-9c1e-5d4b3a2f1e0d';
-const PURCHASE = '6f1e2d3c-4b5a-4c9d-8e7f-0a1b2c3d4e5f';
+const PO = 'mpo_0irgmlbrv8akvoipmawa8';
+const PURCHASE = 'spur_0irgmlbrv8akvoipmawa8';
 
 /** The room's Pay buttons, and whether they show. */
 function Probe() {
@@ -78,16 +85,21 @@ function renderRoom() {
 }
 
 beforeEach(() => {
-  access.isResolved = true;
+  access.resolved = true;
   access.canCreate = true;
+  access.canRead = true;
 });
 
-describe('supplierBillKey', () => {
-  it('keys a Medical PO as md: and a Clinic stock purchase as is:', () => {
-    expect(supplierBillKey({ kind: 'medical_po', purchaseId: PO })).toBe(`md:${PO}`);
-    expect(supplierBillKey({ kind: 'stock_po', purchaseId: PURCHASE })).toBe(
-      `is:${PURCHASE}`,
-    );
+describe('supplierBillKey / supplierBillRefOf', () => {
+  it('keys a bill by its purchase’s public id, whose prefix names the kind', () => {
+    expect(supplierBillKey({ kind: 'medical_po', purchaseId: PO })).toBe(PO);
+    expect(supplierBillKey({ kind: 'stock_po', purchaseId: PURCHASE })).toBe(PURCHASE);
+    expect(supplierBillRefOf(PO)).toEqual({ kind: 'medical_po', purchaseId: PO });
+    expect(supplierBillRefOf(PURCHASE)).toEqual({
+      kind: 'stock_po',
+      purchaseId: PURCHASE,
+    });
+    expect(supplierBillRefOf('pay_0irgmlbrv8akvoipmawa8')).toBeNull();
   });
 });
 
@@ -99,26 +111,30 @@ describe('usePayBill', () => {
     await waitFor(() =>
       expect(router.state.location.pathname).toBe('/organization/acme/payments/pay'),
     );
-    expect(router.state.location.search).toEqual({ bill: `md:${PO}` });
+    expect(router.state.location.search).toEqual({ bill: PO });
   });
 
   it('opens Send payment on a Clinic stock purchase’s bill', async () => {
     const user = userEvent.setup();
     const router = renderRoom();
     await user.click(await screen.findByRole('button', { name: 'pay purchase' }));
-    await waitFor(() =>
-      expect(router.state.location.search).toEqual({ bill: `is:${PURCHASE}` }),
-    );
+    await waitFor(() => expect(router.state.location.search).toEqual({ bill: PURCHASE }));
   });
 
-  it('offers nothing without Payments Create', async () => {
+  it('offers nothing without payment:create', async () => {
     access.canCreate = false;
     renderRoom();
     expect(await screen.findByText('no pay')).toBeInTheDocument();
   });
 
+  it('offers nothing without payment:read — Send payment is the Payments room’s (PAY-M3)', async () => {
+    access.canRead = false;
+    renderRoom();
+    expect(await screen.findByText('no pay')).toBeInTheDocument();
+  });
+
   it('offers nothing while access is unresolved', async () => {
-    access.isResolved = false;
+    access.resolved = false;
     renderRoom();
     expect(await screen.findByText('no pay')).toBeInTheDocument();
   });

@@ -41,9 +41,10 @@
     "noNotes": "无其他备注",
     "paymentSummary": "付款摘要",
     "totalAmount": "总金额：",
-    "overallDiscount": "整体折扣：",
     "billAmount": "账单金额：",
-    "balanceDue": "应付余额："
+    "balanceDue": "应付余额：",
+    "taxableAmount": "应税金额：",
+    "gstTotal": "GST："
   },
   "prescription": {
     "patientId": "患者编号：",

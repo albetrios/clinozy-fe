@@ -64,8 +64,11 @@
       "photo": "صورة",
       "appointment": "موعد",
       "report": "تقرير",
-      "note": "ملاحظة"
-    }
+      "note": "ملاحظة",
+      "invoice": "فاتورة",
+      "payment": "دفعة"
+    },
+    "nothingDue": "لا مستحقات على {{name}}"
   },
   "section": {
     "primary": {
@@ -141,7 +144,11 @@
     "reviews_many": "{{count}} مراجعة",
     "reviews_other": "{{count}} مراجعة",
     "feedbackCounts": "{{checkIns}} · {{reviews}}",
-    "noFeedback": "لا ملاحظات بعد"
+    "noFeedback": "لا ملاحظات بعد",
+    "showAmount": "إظهار المبلغ",
+    "hideAmount": "إخفاء المبلغ",
+    "collect": "تحصيل",
+    "allPaid": "تم دفع الكل · لا مستحقات"
   },
   "photos": {
     "albums": {
@@ -1039,6 +1046,15 @@
       "notes": "الملاحظات",
       "empty": "لا نشاط بعد",
       "masked": "₹ ••••"
+    },
+    "billing": {
+      "due": "مستحق",
+      "paid": "مدفوع",
+      "show": "إظهار المبالغ",
+      "hide": "إخفاء المبالغ",
+      "invoice": "فاتورة {{type}} {{number}}",
+      "sub": "{{date}} · {{amount}}",
+      "collect": "تحصيل الدفعة"
     }
   },
   "visitFlow": {
@@ -1053,7 +1069,9 @@
     "steps": {
       "checks": "تسجيل الحضور والسلامة",
       "rx": "الوصفة",
-      "treatment": "العلاج"
+      "treatment": "العلاج",
+      "invoice": "الفاتورة",
+      "collect": "التحصيل"
     },
     "checks": {
       "labels": {
@@ -1093,6 +1111,26 @@
       "repeatPackage": "⚡ تكرار · {{name}}"
     },
     "paused": "الزيارة متوقفة مؤقتًا",
-    "resume": "استئناف"
+    "resume": "استئناف",
+    "invoice": {
+      "create": "إنشاء فاتورة من الزيارة",
+      "custom": "فاتورة مخصصة",
+      "nothing": "لا شيء للفوترة",
+      "covered": "مشمولة بالباقة · لا شيء للفوترة",
+      "empty": "لا شيء للفوترة بعد",
+      "done": "{{number}} · {{total}}",
+      "ready_few": "{{count}} بنود جاهزة",
+      "ready_many": "{{count}} بندًا جاهزًا",
+      "ready_one": "بند واحد جاهز",
+      "ready_other": "{{count}} بند جاهز",
+      "ready_two": "بندان جاهزان",
+      "ready_zero": "لا بنود جاهزة"
+    },
+    "collect": {
+      "action": "تحصيل {{amount}}",
+      "due": "{{amount}} مستحق",
+      "nothing": "لا شيء مستحق",
+      "waiting": "أنشئ فاتورة الزيارة أولًا"
+    }
   }
 }

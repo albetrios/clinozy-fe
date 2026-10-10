@@ -32,7 +32,8 @@
   },
   "rowActions": {
     "edit": "编辑",
-    "delete": "删除"
+    "delete": "删除",
+    "newInvoice": "新建发票"
   },
   "bulk": {
     "export": "导出",

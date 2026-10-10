@@ -246,7 +246,8 @@ function EditActions({
  * "Delete" · close ("Cancel", "Back" in a stacked child, "Close" when
  * read-only) · "Save & add another" · "Not saved · your changes are kept"
  * after a failed save · the primary ("Saving…", "Retry save"). Below `md` it
- * wraps: buttons share the row at 44px, the failure note takes its own row and
+ * wraps: the start controls take a row of their own (the task drawer's Snooze
+ * and Assigned), buttons share the row at 44px, the failure note takes its own row and
  * the summary drops to the last one, centred, hidden when empty. `compact` is
  * the appointment form's footer: 32px buttons and a 13px summary (H:2831).
  */
@@ -266,7 +267,7 @@ export function DrawerFooter({
       {start ? (
         <div
           data-testid={`${actions.testId}-start`}
-          className="flex min-w-0 flex-1 flex-wrap items-center gap-2"
+          className="flex min-w-0 flex-1 flex-wrap items-center gap-2 max-md:basis-full"
         >
           {start}
         </div>

@@ -41,9 +41,10 @@
     "noNotes": "कोई अतिरिक्त नोट नहीं",
     "paymentSummary": "भुगतान सारांश",
     "totalAmount": "कुल राशि:",
-    "overallDiscount": "कुल छूट:",
     "billAmount": "बिल राशि:",
-    "balanceDue": "बकाया राशि:"
+    "balanceDue": "बकाया राशि:",
+    "taxableAmount": "कर योग्य राशि:",
+    "gstTotal": "GST:"
   },
   "prescription": {
     "patientId": "मरीज़ ID:",

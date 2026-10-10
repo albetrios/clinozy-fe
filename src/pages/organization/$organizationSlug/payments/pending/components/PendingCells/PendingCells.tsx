@@ -8,7 +8,7 @@ import {
   CREDIT_STATUS_TONES,
 } from '@/shared/clinic/clinic-tones.ts';
 import { IdPill, PersonChip, TonePill } from '@/shared/components/Cells/index.ts';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 
 import { PAYMENTS_KEYS, PAYMENTS_NS } from '../../../payments.constants.ts';
 import {
@@ -36,7 +36,11 @@ export function PendingRefCell({ seq }: { seq: number }) {
  * The Who cell: a patient as the person chip with the "P" badge over
  * "Patient"; anyone else as 13px/500 text over "Supplier / party".
  */
-export function PendingWhoCell({ credit }: { credit: CreditRow }) {
+export function PendingWhoCell({
+  credit,
+}: {
+  credit: Pick<CreditRow, 'patientId' | 'partyName'>;
+}) {
   const { t } = useTranslation(PAYMENTS_NS);
   if (credit.patientId) {
     return <PersonChip name={credit.partyName} sub={t(K.patient)} tone="sage" patient />;
@@ -66,11 +70,16 @@ export function PendingWayCell({ credit }: { credit: Pick<CreditRow, 'direction'
 
 /**
  * The Amount cell: ₹ in the way's ink, 600 — muted once settled — and "₹X
- * adjusted" under it after a part was settled (`payments.md:45`).
+ * adjusted" under it after a part was settled (`payments.md:45`; the server's
+ * `settled_amount`).
  */
-export function PendingAmountCell({ credit }: { credit: CreditRow }) {
+export function PendingAmountCell({
+  credit,
+}: {
+  credit: Pick<CreditRow, 'status' | 'direction' | 'amount' | 'settled'>;
+}) {
   const { t } = useTranslation(PAYMENTS_NS);
-  const formatPaise = usePaiseFormat();
+  const formatRupees = useRupeeFormat();
   const open = isOpenCredit(credit);
   return (
     <span className="flex min-w-0 flex-col items-end">
@@ -80,11 +89,11 @@ export function PendingAmountCell({ credit }: { credit: CreditRow }) {
           open ? AMOUNT_INK[credit.direction] : 'text-muted-foreground',
         )}
       >
-        {formatPaise(credit.amount)}
+        {formatRupees(credit.amount)}
       </span>
-      {credit.adjusted > 0 && open ? (
+      {credit.settled > 0 && open ? (
         <span className="text-caption text-muted-foreground whitespace-nowrap tabular-nums">
-          {t(K.adjusted, { amount: formatPaise(credit.adjusted) })}
+          {t(K.adjusted, { amount: formatRupees(credit.settled) })}
         </span>
       ) : null}
     </span>
@@ -92,7 +101,11 @@ export function PendingAmountCell({ credit }: { credit: CreditRow }) {
 }
 
 /** The Why cell: the reason, over where it came from. */
-export function PendingWhyCell({ credit }: { credit: CreditRow }) {
+export function PendingWhyCell({
+  credit,
+}: {
+  credit: Pick<CreditRow, 'reasonKey' | 'reason' | 'sourcePaymentId' | 'invoiceId'>;
+}) {
   const { t } = useTranslation(PAYMENTS_NS);
   return (
     <span className="flex min-w-0 flex-col">
@@ -118,7 +131,7 @@ export function PendingSinceCell({ credit }: { credit: Pick<CreditRow, 'createdA
 export function PendingStateCell({
   credit,
 }: {
-  credit: Pick<CreditRow, 'status' | 'settledAt' | 'settledInvoiceSeq'>;
+  credit: Pick<CreditRow, 'status' | 'settledAt'>;
 }) {
   const { t } = useTranslation(PAYMENTS_NS);
   return (

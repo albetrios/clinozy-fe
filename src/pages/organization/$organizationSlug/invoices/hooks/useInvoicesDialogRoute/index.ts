@@ -1,4 +1,5 @@
 export {
+  type InvoiceRead,
   type InvoicesDialogRoute,
   type InvoicesDialogRouteState,
   useInvoicesDialogRoute,

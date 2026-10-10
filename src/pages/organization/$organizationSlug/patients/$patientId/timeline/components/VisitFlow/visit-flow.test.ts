@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { PatientPackageRow } from '@/shared/api/clinic/patient-packages-contracts.ts';
 import type { TreatmentRecord } from '@/shared/api/clinic/treatments-contracts.ts';
+import { invoiceRecord } from '@/tests/utils/payments-doubles.ts';
 
 import {
   nextSessionNumber,
@@ -9,6 +10,7 @@ import {
   repeatedSession,
   spendablePackage,
   stepStates,
+  visitBill,
 } from './visit-flow.ts';
 
 /** Priya's last laser session — session 3, on her package. */
@@ -151,5 +153,53 @@ describe('nextSessionNumber', () => {
   it('is one on, at most the API’s 999', () => {
     expect(nextSessionNumber({ sessionNumber: 3 })).toBe(4);
     expect(nextSessionNumber({ sessionNumber: 999 })).toBe(999);
+  });
+});
+
+describe('visitBill (D156)', () => {
+  const TODAY = { ...LAST, id: 'trt_today0000000000000000', packageId: null };
+  /** An invoice whose one line bills `ids`. */
+  const billing = (ids: string[], id = 'invc_visit0000000000000000') => {
+    const invoice = invoiceRecord({ id });
+    return {
+      ...invoice,
+      items: invoice.items.map((line) => ({ ...line, treatmentIds: ids })),
+    };
+  };
+
+  it('finds the visit’s invoice by a session its lines bill', () => {
+    const other = billing(['trt_other0000000000000000'], 'invc_other0000000000000000');
+    const mine = billing([TODAY.id]);
+    expect(visitBill({ sessions: [TODAY], invoices: [other, mine] })).toEqual({
+      invoice: mine,
+      toBill: [TODAY],
+      covered: false,
+    });
+  });
+
+  it('lists the sessions still to bill while no invoice carries them', () => {
+    expect(visitBill({ sessions: [TODAY], invoices: [billing([])] })).toEqual({
+      invoice: null,
+      toBill: [TODAY],
+      covered: false,
+    });
+  });
+
+  it('is covered when a package bought before took every session; empty with none', () => {
+    const onPackage = { ...TODAY, isBilled: true, packageId: PACKAGE.id };
+    expect(visitBill({ sessions: [onPackage], invoices: [] })).toEqual({
+      invoice: null,
+      toBill: [],
+      covered: true,
+    });
+    // A session of no offering bills nothing — and covers nothing.
+    expect(visitBill({ sessions: [{ ...TODAY, isBilled: null }], invoices: [] })).toEqual(
+      {
+        invoice: null,
+        toBill: [],
+        covered: false,
+      },
+    );
+    expect(visitBill({ sessions: [], invoices: [] }).covered).toBe(false);
   });
 });

@@ -3,31 +3,49 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import type * as PaymentsApiModule from '@/shared/api/clinic/payments-api.ts';
+import { listLedger } from '@/shared/api/clinic/payments-api.ts';
 
 import {
+  LEDGER_NOW,
+  ledgerWorld,
+  seededLedger,
+} from './__tests__/integration/payments-ledger-data.ts';
+import {
+  PAYMENTS_OWNER_CODES,
   renderPaymentsRoutes,
   resetPaymentsRoutes,
 } from './__tests__/integration/payments-test-router.tsx';
 
-/** 10:00 on 3 Oct, clinic time — the seed day (27 Sep) is today. */
-const NOW = new Date('2026-10-03T04:30:00Z');
+vi.mock('@/shared/api/clinic/payments-api.ts', async (importOriginal) => {
+  const { ledgerApiDouble } =
+    await import('./__tests__/integration/payments-ledger-data.ts');
+  const double = ledgerApiDouble();
+  return {
+    ...(await importOriginal<typeof PaymentsApiModule>()),
+    listLedger: vi.fn(double.listLedger),
+    fetchLedgerCount: vi.fn(double.fetchLedgerCount),
+  };
+});
+
 const LEDGER = '/organization/acme/payments';
 
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'], shouldAdvanceTime: true });
-  vi.setSystemTime(NOW);
-  resetClinicFixtures();
+  vi.setSystemTime(LEDGER_NOW);
+  ledgerWorld.rows = seededLedger();
+  vi.mocked(listLedger).mockClear();
 });
 afterEach(() => {
   vi.useRealTimers();
   resetPaymentsRoutes();
-  resetClinicFixtures();
 });
 
 describe('PaymentsPage', () => {
   it('renders the room — toolbar and ledger — with its title', async () => {
-    const { container } = renderPaymentsRoutes(LEDGER);
+    const { container } = renderPaymentsRoutes(LEDGER, {
+      permissions: PAYMENTS_OWNER_CODES,
+    });
     expect(await screen.findByTestId('payments-page')).toBeInTheDocument();
     expect(
       screen.getByRole('heading', { level: 1, name: 'Payments' }),
@@ -35,13 +53,13 @@ describe('PaymentsPage', () => {
     expect(screen.getByTestId('payments-toolbar')).toBeInTheDocument();
     expect(screen.getByTestId('payments-table')).toBeInTheDocument();
     await waitFor(() =>
-      expect(screen.getAllByTestId('payments-table-row').length).toBeGreaterThan(0),
+      expect(screen.getAllByTestId('payments-table-row')).toHaveLength(6),
     );
     expect(await axe(container)).toHaveNoViolations();
   });
 
   it('shows the in-place skeleton while the first page loads', async () => {
-    renderPaymentsRoutes(LEDGER);
+    renderPaymentsRoutes(LEDGER, { permissions: PAYMENTS_OWNER_CODES });
     expect(await screen.findByTestId('skeleton-rows')).toHaveAttribute(
       'aria-busy',
       'true',
@@ -51,7 +69,7 @@ describe('PaymentsPage', () => {
 
   it('offers Show (All by default), What, Mode and Created — each value in its tone', async () => {
     const user = userEvent.setup();
-    renderPaymentsRoutes(LEDGER);
+    renderPaymentsRoutes(LEDGER, { permissions: PAYMENTS_OWNER_CODES });
     await user.click(await screen.findByTestId('payments-filters-trigger'));
     const panel = await screen.findByTestId('payments-filters');
     expect(

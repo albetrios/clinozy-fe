@@ -2,9 +2,13 @@
 
 Route: `/organization/$organizationSlug/invoices/$invoiceId/edit` (`S:94`) — a URL-driven dialog
 over its referrer (KICKOFF §4, D24). The route renders nothing: the invoices island reads the URL
-and opens the shared Invoice drawer on the saved invoice — its number in the header, Print, and
-Delete for a role with `void`. A Medical sale keeps its medicines read only (`S:51`); a role
-without Payments Edit sees it view only.
+and opens the shared Invoice drawer on the saved invoice — its number in the header, the
+server's preview of the change (`POST /app/invoices/{invoice_id}/preview`), Print, and Delete
+with a reason and Undo for a member with `payment:delete` (`409 invoice_paid` keeps an invoice
+with money on it). The save sends only what changed, the lines kept by id, with the read's
+`updated_at`; someone else's save first answers with Reload. A Medical sale's invoice and a
+settled one (a payment on a closed day) open read-only with the reason above the steps; a
+member without `payment:update` sees it view only.
 
 ## Files
 

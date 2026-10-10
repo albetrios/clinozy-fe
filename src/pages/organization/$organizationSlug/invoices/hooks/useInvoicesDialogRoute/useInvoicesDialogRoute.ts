@@ -8,10 +8,12 @@ import {
   organizationInvoiceEdit,
 } from '@/lib/routes/invoice-builders.ts';
 import { organizationPayments } from '@/lib/routes/payments-builders.ts';
+import { PUBLIC_ID } from '@/lib/routes/search-params.ts';
 import { fetchInvoice, invoiceQueryKeys } from '@/shared/api/clinic/invoices-api.ts';
 import type { InvoiceDetail } from '@/shared/api/clinic/invoices-contracts.ts';
 import { safeReferrer } from '@/shared/clinic/clinic-referrer.ts';
 import {
+  canPayment,
   INVOICE_DRAWER_KEYS,
   INVOICE_DRAWER_NS,
 } from '@/shared/components/InvoiceDrawer/index.ts';
@@ -20,6 +22,7 @@ import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
 import { useDialogRouteLocation } from '@/shared/hooks/useCrossRoomDialog/index.ts';
 import { useDialogRouteRecord } from '@/shared/hooks/useDialogRouteRecord/index.ts';
 import { notify } from '@/shared/notify/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 import {
   type InvoiceCreateSearch,
@@ -36,9 +39,18 @@ export type InvoicesDialogRoute =
    */
   | { kind: 'create'; prefill: InvoiceCreateSearch; source?: InvoiceDetail }
   /** `/invoices/$invoiceId` — the preview with Print; `detail` arrives once loaded. */
-  | { kind: 'preview'; invoiceId: string; detail: InvoiceDetail | undefined }
+  | ({ kind: 'preview' } & InvoiceRead)
   /** `/invoices/$invoiceId/edit` — Edit invoice. */
-  | { kind: 'edit'; invoiceId: string; detail: InvoiceDetail | undefined };
+  | ({ kind: 'edit' } & InvoiceRead);
+
+/** A routed invoice's read: the invoice once loaded, or a failure to read it with its Retry. */
+export interface InvoiceRead {
+  invoiceId: string;
+  detail: InvoiceDetail | undefined;
+  /** The read failed for another reason than a missing invoice (a dropped line, a 5xx). */
+  failed: boolean;
+  retry: () => void;
+}
 
 /** The dialog, how it closes, and the moves between the preview and the edit. */
 export interface InvoicesDialogRouteState {
@@ -52,6 +64,9 @@ export interface InvoicesDialogRouteState {
 }
 
 const CREATE_PATH = /\/invoices\/create\/?$/;
+
+/** An invoice id the API can name (`invc_…`) — a fixture-day link is "not found" at once. */
+const isPublicId = (id: string) => PUBLIC_ID.test(id);
 const EDIT_PATH = /\/invoices\/[^/]+\/edit\/?$/;
 
 /**
@@ -59,9 +74,10 @@ const EDIT_PATH = /\/invoices\/[^/]+\/edit\/?$/;
  * dialog routes render nothing, so the island reads them here. An invoice id
  * that names no invoice opens nothing: back to the referrer with "Invoice not
  * found · it may have been deleted" (`S:115`) — and so does a copy
- * (`?copyOf=`, the patient file's "Copy invoice") of an invoice that is gone.
- * A member without Payments Create who follows a create link goes back with
- * the permission toast, the invoice it would copy never read. `from`
+ * (`?copyOf=`, the patient file's "Copy invoice") of an invoice that is gone,
+ * and an id that is no public id (`invc_…`), never sent. A member without
+ * `payment:create` who follows a create link goes back with the permission
+ * toast, the invoice it would copy never read. `from`
  * (the room that opened it, allow-listed — `safeReferrer`) is where `close`
  * goes; without one, the Payments ledger, the island's default referrer. Over
  * that room's page (A-P1, `useCrossRoomDialog`) it reads the drawer's own
@@ -81,6 +97,11 @@ export function useInvoicesDialogRoute(): InvoicesDialogRouteState {
   const navigate = useClinicNavigate();
   const { t } = useTranslation([INVOICE_DRAWER_NS, ERRORS_NS]);
   const access = useClinicAccess();
+  const organizationId = useOrganizationStore((state) => state.organizationId);
+  const detailKey = useCallback(
+    (id: string) => invoiceQueryKeys.detail(organizationId, id),
+    [organizationId],
+  );
 
   const from = safeReferrer(validateInvoiceSearch(search).from, '');
   const close = useCallback(() => {
@@ -124,24 +145,26 @@ export function useInvoicesDialogRoute(): InvoicesDialogRouteState {
 
   const invoice = useDialogRouteRecord({
     id: invoiceId,
-    queryKey: invoiceQueryKeys.detail,
+    queryKey: detailKey,
     fetchRecord: fetchInvoice,
     recordLabel: t(INVOICE_DRAWER_KEYS.record, { ns: INVOICE_DRAWER_NS }),
     onMissing: close,
+    isWellFormed: isPublicId,
   });
 
   const isCreate = invoiceId === undefined && CREATE_PATH.test(pathname);
   const prefill = validateInvoiceCreateSearch(search);
-  const mayCreate = access.isResolved && access.can('payments', 'create');
+  const mayCreate = canPayment(access, 'payment:create');
   const createRefused = isCreate && access.isResolved && !mayCreate;
   // "Copy invoice": the invoice it copies, read once the member may create
   // one; one that is gone closes with the not-found toast.
   const source = useDialogRouteRecord({
     id: isCreate && mayCreate ? prefill.copyOf : undefined,
-    queryKey: invoiceQueryKeys.detail,
+    queryKey: detailKey,
     fetchRecord: fetchInvoice,
     recordLabel: t(INVOICE_DRAWER_KEYS.record, { ns: INVOICE_DRAWER_NS }),
     onMissing: close,
+    isWellFormed: isPublicId,
   });
   const refusedFor = useRef<string | null>(null);
   useEffect(() => {
@@ -155,7 +178,13 @@ export function useInvoicesDialogRoute(): InvoicesDialogRouteState {
   if (invoiceId !== undefined) {
     if (!invoice.isOpen) return { dialog: { kind: 'none' }, ...state };
     const kind = EDIT_PATH.test(pathname) ? 'edit' : 'preview';
-    return { dialog: { kind, invoiceId, detail: invoice.record }, ...state };
+    const read: InvoiceRead = {
+      invoiceId,
+      detail: invoice.record,
+      failed: invoice.isError,
+      retry: invoice.refetch,
+    };
+    return { dialog: { kind, ...read }, ...state };
   }
   if (isCreate && !createRefused) {
     return { dialog: createDialog(prefill, source.record), ...state };

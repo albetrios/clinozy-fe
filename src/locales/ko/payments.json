@@ -49,7 +49,8 @@
     "receipt": "입금",
     "refund": "환자 환불",
     "expense": "출금",
-    "money_back": "환급 입금"
+    "money_back": "환급 입금",
+    "reversal": "취소 분개"
   },
   "ledger": {
     "records": "내역",
@@ -66,18 +67,25 @@
       "moneyBack": "환급 입금",
       "medicalBill": "약국 발주 #{{seq}} · 청구서 {{bill}}",
       "stockBill": "재고 발주 #{{seq}} · 청구서 {{bill}}",
-      "fromCredit": "{{ref}}에서"
+      "fromCredit": "{{ref}}에서",
+      "reversed": "취소됨",
+      "medicalOrder": "의약품 발주 #{{seq}}",
+      "stockPurchase": "재고 발주 #{{seq}}"
     },
     "dayClosed": "{{ref}} · 마감된 날",
     "dayClosedEdited_other": "{{ref}} · 마감된 날 · {{count}}회 수정",
-    "creditEntry": "{{ref}} · {{credit}}에서"
+    "creditEntry": "{{ref}} · {{credit}}에서",
+    "fixedEntry": "{{ref}} · 금액은 바꿀 수 없습니다 · 되돌리려면 당일에 삭제하세요",
+    "search": "환자, 수취인 또는 PAY- 번호",
+    "count_other": "{{count}}건"
   },
   "rowActions": {
     "edit": "편집",
     "delete": "삭제",
     "giveBack": "돌려주기",
     "gotBack": "돌려받음",
-    "useOnBill": "다음 청구서에 사용"
+    "useOnBill": "다음 청구서에 사용",
+    "reverse": "취소 분개"
   },
   "bulk": {
     "export": "내보내기",
@@ -99,7 +107,11 @@
       "party": "환자 또는 수취인 오류"
     },
     "removed": "{{ref}} 삭제됨",
-    "removedInvoice": "{{ref}} 삭제됨 · 청구서 잔액 복원"
+    "removedInvoice": "{{ref}} 삭제됨 · 청구서 잔액 복원",
+    "blocked": {
+      "dayClosed": "{{ref}} · 해당 날짜가 마감되었습니다 · 대신 취소 분개하세요",
+      "moreThanPaid": "{{ref}} · 이 금액은 이미 환불되었습니다 · 먼저 환불을 삭제하세요"
+    }
   },
   "dialog": {
     "record": "결제",
@@ -126,7 +138,6 @@
     },
     "settledToday": "{{state}} · 오늘",
     "adjusted": "{{amount}} 정산됨",
-    "source": "{{ref}}에서 · {{direction}}",
     "invoice": "청구서 #{{seq}}",
     "byHand": "직접 입력",
     "deleteTitle": "이 대기 항목을 삭제할까요?",
@@ -143,9 +154,18 @@
       "loan_to_staff": "직원 대여금",
       "other": "기타"
     },
-    "settledInvoice": "{{state}} · 청구서 #{{seq}}",
     "adjustedOn": "{{ref}}의 {{amount}}을(를) 청구서 #{{seq}}에 정산했습니다",
-    "nothingDue": "{{name}}에게 정산할 미수금이 없습니다"
+    "nothingDue": "{{name}}에게 정산할 미수금이 없습니다",
+    "search": "사람, 공급업체 또는 CR-",
+    "fromEntry": "장부 항목에서",
+    "forInvoice": "청구서 건",
+    "settledLocked": "{{ref}} · {{amount}} 정산됨 · 이제 변경할 수 없습니다",
+    "conflicts": {
+      "settled": "{{ref}}의 일부가 정산되었습니다 · 변경하거나 삭제할 수 없습니다",
+      "closed": "{{ref}}은(는) 이미 정산되었습니다",
+      "dayClosed": "청구서 #{{seq}}의 지점은 오늘 마감되었습니다 · 이 크레딧을 쓰려면 다시 여세요",
+      "dueChanged": "청구서 #{{seq}}의 미수금이 바뀌었습니다 · 다시 시도하세요"
+    }
   },
   "receive": {
     "title": "수납하기",
@@ -180,7 +200,11 @@
     "updated": "{{ref}} 업데이트됨 · 변경 기록됨",
     "enterAmount": "금액을 입력하세요",
     "pickPatient": "환자를 선택하세요",
-    "aboveDue": "미수 {{due}}보다 많음"
+    "aboveDue": "미수 {{due}}보다 많음",
+    "moreThanDue": "청구서의 현재 미수금보다 많습니다 · 그사이 결제되었습니다",
+    "totalAdvance": "합계 {{total}} · 선수금",
+    "advance": "선수금 · 청구서 없음",
+    "invoicesFailed": "미결 청구서를 불러오지 못했습니다"
   },
   "send": {
     "title": "지급하기",
@@ -237,7 +261,9 @@
     "added": "지출 {{ref}} 추가됨",
     "paidBill": "{{bill}}에 {{amount}} 지급",
     "saved": "{{ref}} 저장됨 · 변경 기록됨",
-    "missing": "지급처와 금액을 입력하세요"
+    "missing": "지급처와 금액을 입력하세요",
+    "moreThanDue": "청구서의 현재 미지급금보다 많습니다 · 그사이 지급되었습니다",
+    "billsFailed": "미지급 청구서를 불러오지 못했습니다"
   },
   "credit": {
     "title": "대기 항목 추가",
@@ -322,9 +348,9 @@
     "gate": {
       "title": "시작 현금 · {{day}}",
       "sources": {
-        "default_float": "기본 시재",
         "carried": "{{day}} 마감에서 이월",
-        "recounted": "재집계"
+        "recounted": "재집계",
+        "first": "이전 마감 없음 · 이월할 금액 없음"
       },
       "recount": "재집계",
       "recountLabel": "시작 현금 재집계",
@@ -345,8 +371,11 @@
       "countPlaceholder": "서랍을 세세요",
       "countLabel": "집계한 현금",
       "netByMode": "수단별 순액",
-      "modeTitle": "입금 {{in}} · 출금 {{out}}",
-      "staffTitle_other": "{{name}} · 수납 {{count}}건 · {{amount}}"
+      "staffTitle_other": "{{name}} · 내역 {{count}}건 · {{amount}}",
+      "staffOther": "팀 외",
+      "reason": "집계가 맞지 않는 이유",
+      "reasonPlaceholder": "무슨 일이 있었나요 · 예: 서랍에서 거스름돈 ₹20 지급",
+      "reasonFirst": "먼저 집계가 맞지 않는 이유를 입력하세요"
     },
     "report": {
       "title": "{{day}} 마감됨",
@@ -355,9 +384,7 @@
       "reopen": "다시 열기",
       "acceptedBy": "{{name}} 님 확인",
       "takenAsExpected": "예상액으로 처리",
-      "collected": "수납",
       "received_other": "수납 {{count}}건",
-      "paidOut": "지출",
       "paid_other": "지출 {{count}}건",
       "cashCounted": "집계 현금",
       "expected": "예상 {{amount}}",
@@ -368,26 +395,58 @@
       "log": "진행 내역",
       "logAccepted": "{{name}} 님이 시작 현금 {{amount}} 확인",
       "logRecounted": "{{name}} 님이 시작 현금 {{amount}} 확인 (재집계)",
-      "logReviewed_other": "{{count}}건 중 {{checked}}건 확인",
       "logMatched": "서랍 집계 {{amount}} · 일치",
       "logExtra": "서랍 집계 {{amount}} · {{diff}} 초과",
       "logShort": "서랍 집계 {{amount}} · {{diff}} 부족",
-      "logClosed": "{{name}} 님이 하루 마감 · 요약을 WhatsApp으로 관리자에게 전송",
-      "logAuto": "유예 기간 후 자동 마감 · 현금은 예상액으로 처리"
+      "logClosed": "{{name}} 님이 하루 마감",
+      "logAuto": "유예 기간 후 자동 마감 · 현금은 예상액으로 처리",
+      "openedAuto": "자동으로 열림",
+      "notCounted": "집계 안 함",
+      "logOpened": "{{name}} 님이 하루 시작",
+      "logReopened": "{{name}} 님이 하루 다시 열기 · {{reason}}",
+      "logReason": "“{{reason}}”",
+      "someone": "누군가"
     },
     "review": {
       "title": "모든 내역 확인",
-      "progress_other": "{{count}}건 중 {{checked}}건 확인",
       "none": "내역 없음",
       "empty": "이 날짜의 내역이 없습니다",
-      "check": "확인됨으로 표시",
       "states": {
         "canEdit": "수정 가능",
         "canEditTitle": "하루를 마감할 때까지 수정하거나 삭제할 수 있습니다",
         "dayClosed": "마감됨",
         "dayClosedTitle": "마감된 날짜입니다 · 내역을 변경할 수 없습니다",
         "fromCredit": "{{credit}}에서"
+      },
+      "count_other": "내역 {{count}}건"
+    },
+    "previousNone": "이 날짜 이전 마감이 없습니다",
+    "refusals": {
+      "alreadyOpened": "그사이 다른 사람이 이 날짜를 열었습니다 · 지금 표시합니다",
+      "alreadyClosed": "그사이 다른 사람이 이 날짜를 마감했습니다 · 지금 표시합니다",
+      "alreadyOpen": "이 날짜는 이미 다시 열렸습니다 · 지금 표시합니다"
+    },
+    "reopen": {
+      "title": "이 날짜를 다시 열까요?",
+      "effect": "집계가 지워지고 마감할 때까지 이 날짜의 내역을 다시 바꿀 수 있습니다.",
+      "action": "하루 다시 열기",
+      "record": "{{branch}} · {{day}}",
+      "reasons": {
+        "miscounted": "잘못 집계함",
+        "missed": "누락된 내역이 있음",
+        "wrongEntry": "잘못된 내역이 있음"
       }
+    }
+  },
+  "reverseEntry": {
+    "title": "이 결제를 취소 분개할까요?",
+    "effect": "해당 날짜가 마감되어 기록은 그대로 남습니다. 같은 금액의 취소 분개가 오늘 해당 지점 장부에 기록되고, 결제했던 금액이 되돌려집니다. 두 기록 모두 보관됩니다.",
+    "action": "취소 분개",
+    "reversed": "{{ref}} 취소 분개됨 · {{reversal}}",
+    "blocked": {
+      "alreadyReversed": "{{ref}}은(는) 이미 취소 분개되었습니다",
+      "dayOpen": "{{ref}}의 날짜가 다시 열렸습니다 · 대신 삭제하세요",
+      "dayClosed": "{{ref}} 지점의 오늘이 마감되었습니다 · 취소 분개하려면 다시 여세요"
     }
   }
 }

@@ -2,10 +2,11 @@ import type { TFunction } from 'i18next';
 import type { UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { rupeesOfPaise } from '@/lib/number-text.ts';
 import type { InvoicePresets } from '@/shared/api/clinic/invoices-contracts.ts';
-import type { OfferingRecord } from '@/shared/api/clinic/offerings-fixture-contracts.ts';
-import { invoiceLineRate } from '@/shared/api/clinic/offerings-fixture-pricing.ts';
-import type { PlanSuggestion } from '@/shared/api/clinic/plan-fixture-contracts.ts';
+import type { InvoiceRxPreset } from '@/shared/api/clinic/invoices-fixture-contracts.ts';
+import type { PlanSuggestionRow } from '@/shared/api/clinic/plan-contracts.ts';
+import type { TreatmentRecord } from '@/shared/api/clinic/treatments-contracts.ts';
 import type { QuickFillItem } from '@/shared/components/QuickFillRow/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -27,53 +28,49 @@ export interface InvoiceQuickFillInput {
   form: UseFormReturn<InvoiceFormValues>;
   values: InvoiceFormValues;
   catalog: InvoiceCatalog;
-  /** The patient's packages, last invoices and latest Rx; null before a patient. */
+  /** An invoice's patient: their packages and last invoices; null before a patient. */
   presets: InvoicePresets | null;
-  /** The patient's plan rows; empty before a patient. */
-  plan: readonly PlanSuggestion[];
+  /** A sale's patient's latest prescription; null otherwise. */
+  latestRx: InvoiceRxPreset | null;
+  /** The patient's plan rows; empty before a patient (and on a sale). */
+  plan: readonly PlanSuggestionRow[];
   /** The saved invoice's id on an edit — it never repeats itself. */
   invoiceId: string | null;
   /** "⚡ Print invoice" — a saved invoice only. */
   onPrint: (() => void) | null;
 }
 
+/** A percentage to the two places the API takes. */
+const twoPlaces = (value: number) => Math.round(value * 100) / 100;
+
 /**
- * A plan row as a line (H:5066): the units still to invoice at the list price,
- * the plan's final price as the discount — the whole line's, against the list
- * price of every unit it planned.
+ * A plan row as a line (H:5066): the offering, the units still to invoice, the row it bills —
+ * and, when the plan agreed a price of its own, the discount that brings the offering's billed
+ * price to it (the server's preview shows what it comes to).
  */
 function planLine(
-  row: PlanSuggestion,
-  offering: OfferingRecord,
+  row: PlanSuggestionRow,
+  item: InvoiceCatalogItem,
   left: number,
 ): InvoiceLineForm {
-  const list = row.listPrice * row.qty;
-  const final = row.price ?? list;
+  const billed = rupeesOfPaise(item.price) * row.quantity;
+  const discount = row.price !== null && billed > 0 ? (1 - row.price / billed) * 100 : 0;
   return {
-    ...blankLine(),
-    offeringId: offering.id,
-    name: offering.name,
-    qty: left,
-    rate: invoiceLineRate(row.listPrice, offering.gstPct, offering.gstInclusive),
-    gstPct: offering.gstPct,
-    discountPct: list > 0 ? Math.max(0, Math.min(100, (1 - final / list) * 100)) : 0,
+    ...lineFromCatalog(item, { qty: left }),
+    discountPct: twoPlaces(Math.max(0, Math.min(100, discount))),
+    suggestionId: row.id,
   };
 }
 
-/** "⚡ Plan · <offering> ×2" (lav): each plan row not yet invoiced or on the invoice. */
+/** "⚡ Plan · <offering> ×2" (lav): each plan row not yet invoiced nor on the invoice. */
 function planPresets(input: InvoiceQuickFillInput, t: TFunction): QuickFillItem[] {
   const { values, catalog, plan, form } = input;
   if (values.type === 'medical') return [];
   const onInvoice = new Set(namedLines(values.items).map((line) => line.offeringId));
   return plan.flatMap((row): QuickFillItem[] => {
-    const left = row.qty - row.invoicedQty;
-    const offering = catalog.offerings.get(row.offeringId);
-    if (
-      row.status === 'declined' ||
-      left <= 0 ||
-      !offering ||
-      onInvoice.has(offering.id)
-    ) {
+    const left = row.quantity - row.invoicedQuantity;
+    const item = catalog.byKey.get(row.offeringId);
+    if (row.status === 'declined' || left <= 0 || !item || onInvoice.has(item.key)) {
       return [];
     }
     return [
@@ -81,13 +78,13 @@ function planPresets(input: InvoiceQuickFillInput, t: TFunction): QuickFillItem[
         id: `plan-${row.id}`,
         label:
           left > 1
-            ? t(K.planQty, { name: offering.name, count: left })
-            : t(K.plan, { name: offering.name }),
+            ? t(K.planQty, { name: item.label, count: left })
+            : t(K.plan, { name: item.label }),
         tone: 'lav',
         onSelect: () =>
           form.setValue(
             'items',
-            [...namedLines(form.getValues('items')), planLine(row, offering, left)],
+            [...namedLines(form.getValues('items')), planLine(row, item, left)],
             { shouldDirty: true },
           ),
       },
@@ -104,12 +101,11 @@ function packagePresets(input: InvoiceQuickFillInput, t: TFunction): QuickFillIt
     const item = catalog.byKey.get(pack.offeringId);
     if (!item || seen.has(item.key)) return [];
     seen.add(item.key);
-    const offering = catalog.offerings.get(item.key);
     return [
       {
         id: `package-${item.key}`,
         label: t(K.package, { name: item.label }),
-        tone: offering?.tone,
+        tone: item.tone ?? undefined,
         onSelect: () =>
           form.setValue('items', [lineFromCatalog(item)], { shouldDirty: true }),
       },
@@ -117,22 +113,28 @@ function packagePresets(input: InvoiceQuickFillInput, t: TFunction): QuickFillIt
   });
 }
 
-/** "⚡ Repeat #785" (sky): the patient's last invoice of this type — its lines and team. */
+/**
+ * "⚡ Repeat #785" (sky): the patient's last invoice of this type — its offerings still listed
+ * here, their quantities and discounts — and its team. The server prices them again.
+ */
 function repeatPreset(input: InvoiceQuickFillInput, t: TFunction): QuickFillItem[] {
-  const { values, presets, form, invoiceId } = input;
-  const last = presets?.lastByType[values.type];
+  const { values, catalog, presets, form, invoiceId } = input;
+  const last = values.type === 'medical' ? undefined : presets?.lastByType[values.type];
   if (!last || last.id === invoiceId) return [];
+  const lines = last.items.flatMap((line) => {
+    const item = line.offeringId ? catalog.byKey.get(line.offeringId) : undefined;
+    return item
+      ? [lineFromCatalog(item, { qty: line.qty, discountPct: line.discountPct })]
+      : [];
+  });
+  if (lines.length === 0) return [];
   return [
     {
       id: 'repeat',
       label: t(K.repeat, { seq: last.seq }),
       tone: 'sky',
       onSelect: () => {
-        form.setValue(
-          'items',
-          last.items.map((item) => ({ ...item, batchNo: null })),
-          { shouldDirty: true },
-        );
+        form.setValue('items', lines, { shouldDirty: true });
         if (last.teamIds.length > 0) {
           form.setValue('teamIds', [...last.teamIds], { shouldDirty: true });
         }
@@ -161,9 +163,9 @@ function consultationPreset(
   ];
 }
 
-/** The latest Rx's medicines as lines — matched by id, else by name; the rest named in a toast. */
+/** A prescription's medicines as lines — matched by id, else by name; the rest named in a toast. */
 export function rxLines(
-  rx: NonNullable<InvoicePresets['latestRx']>,
+  rx: InvoiceRxPreset,
   catalog: readonly InvoiceCatalogItem[],
 ): { lines: InvoiceLineForm[]; unmatched: string[] } {
   const lines: InvoiceLineForm[] = [];
@@ -178,11 +180,42 @@ export function rxLines(
   return { lines, unmatched };
 }
 
-/** "⚡ From Rx #500" (sage): the patient's latest prescription, on a Medical invoice. */
+/**
+ * A visit's sessions still to bill as lines (the visit flow's "Create invoice from visit",
+ * D156): one line per offering, enough units for its sessions — a package's unit covers several
+ * — carrying the sessions it bills (`patient_treatment_ids`). An offering the catalogue doesn't
+ * list here (another branch, paused) keeps its session's name; the server says why it can't bill
+ * it. The server prices every line.
+ */
+export function visitLines(
+  sessions: readonly TreatmentRecord[],
+  catalog: readonly InvoiceCatalogItem[],
+): InvoiceLineForm[] {
+  const byOffering = new Map<string, TreatmentRecord[]>();
+  for (const session of sessions) {
+    if (session.offeringId === null) continue;
+    byOffering.set(session.offeringId, [
+      ...(byOffering.get(session.offeringId) ?? []),
+      session,
+    ]);
+  }
+  return [...byOffering].map(([offeringId, billed]) => {
+    const item = catalog.find((entry) => entry.key === offeringId);
+    const line = item
+      ? lineFromCatalog(item)
+      : { ...blankLine(), offeringId, name: billed[0]?.name ?? '' };
+    return {
+      ...line,
+      qty: Math.ceil(billed.length / Math.max(1, item?.sessions ?? 1)),
+      treatmentIds: billed.map((session) => session.id),
+    };
+  });
+}
+
+/** "⚡ From Rx #500" (sage): the patient's latest prescription, on a Medical sale. */
 function rxPreset(input: InvoiceQuickFillInput, t: TFunction): QuickFillItem[] {
-  const { values, presets, catalog, form } = input;
-  const rx = values.type === 'medical' ? presets?.latestRx : null;
-  if (!rx) return [];
+  const { values, latestRx: rx, catalog, form } = input;
+  if (values.type !== 'medical' || !rx) return [];
   return [
     {
       id: 'rx',
@@ -203,17 +236,25 @@ function rxPreset(input: InvoiceQuickFillInput, t: TFunction): QuickFillItem[] {
 }
 
 /**
- * The drawer's Quick fill (H:5066; `payments.md:147`): "Print invoice" for a
- * saved one (peach), then — for the patient picked — their plan rows still
- * to invoice (lav), the packages they hold, a repeat of their last invoice of
- * this type (sky), a new consultation on a consultation invoice, and their
- * latest Rx on a Medical one (sage). None saves.
+ * The drawer's Quick fill (H:5066; `payments.md:147`): "Print invoice" for a saved one (peach,
+ * also on a read-only drawer — printing is a read), then — for the patient picked — their plan
+ * rows still to invoice (lav), the packages they hold, a repeat of their last invoice of this
+ * type (sky), a new consultation on a consultation invoice, and their latest Rx on a Medical
+ * sale (sage). None saves.
  */
 export function useInvoiceQuickFill(input: InvoiceQuickFillInput): QuickFillItem[] {
   const { t } = useTranslation(INVOICE_DRAWER_NS);
   const formatPaise = usePaiseFormat();
   const print: QuickFillItem[] = input.onPrint
-    ? [{ id: 'print', label: t(K.print), tone: 'peach', onSelect: input.onPrint }]
+    ? [
+        {
+          id: 'print',
+          label: t(K.print),
+          tone: 'peach',
+          keepWhenReadOnly: true,
+          onSelect: input.onPrint,
+        },
+      ]
     : [];
   return [
     ...print,

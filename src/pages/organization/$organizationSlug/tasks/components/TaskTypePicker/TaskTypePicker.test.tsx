@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { TaskRuleId } from '@/shared/api/clinic/tasks-contracts.ts';
+import type { TaskType } from '@/shared/api/clinic/tasks-contracts.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
@@ -18,16 +18,16 @@ function Harness({
   initial = [],
   onChange = vi.fn(),
 }: {
-  initial?: TaskRuleId[];
-  onChange?: (rules: TaskRuleId[]) => void;
+  initial?: TaskType[];
+  onChange?: (types: TaskType[]) => void;
 }) {
-  const [value, setValue] = useState<TaskRuleId[]>(initial);
+  const [value, setValue] = useState<TaskType[]>(initial);
   return (
     <TaskTypePicker
       value={value}
-      onChange={(rules) => {
-        setValue(rules);
-        onChange(rules);
+      onChange={(types) => {
+        setValue(types);
+        onChange(types);
       }}
     />
   );
@@ -49,17 +49,18 @@ describe('TaskTypePicker (tasks.md:164–178)', () => {
     );
     expect(trigger()).toHaveClass('border-disabled');
     one.unmount();
-    renderWithProviders(<Harness initial={['confirm', 'rebook']} />);
+    renderWithProviders(<Harness initial={['confirm', 'call_back']} />);
     expect(await screen.findByTestId('tasks-type-trigger')).toHaveTextContent('2 types');
   });
 
-  it('lists the thirteen rules by source and picks several', async () => {
+  it('lists the API’s rules and "Follow-ups you set" by source and picks several', async () => {
     const onChange = vi.fn();
     const user = userEvent.setup();
     renderWithProviders(<Harness onChange={onChange} />);
     await user.click(await screen.findByTestId('tasks-type-trigger'));
     const panel = await screen.findByTestId('tasks-type-panel');
-    expect(within(panel).getAllByRole('option')).toHaveLength(13);
+    // Fifteen rules and the tasks made by hand (`kind` follow_up · manual).
+    expect(within(panel).getAllByRole('option')).toHaveLength(16);
     for (const group of [
       'Leads',
       'Appointments',
@@ -67,12 +68,13 @@ describe('TaskTypePicker (tasks.md:164–178)', () => {
       'Treatments',
       'Patients',
       'Team',
+      'Payments',
     ]) {
       expect(within(panel).getAllByText(group).length).toBeGreaterThan(0);
     }
     await user.click(within(panel).getByRole('option', { name: /Confirm visits/ }));
-    await user.click(within(panel).getByRole('option', { name: /Rebook no-shows/ }));
-    expect(onChange).toHaveBeenLastCalledWith(['confirm', 'rebook']);
+    await user.click(within(panel).getByRole('option', { name: /Follow-ups you set/ }));
+    expect(onChange).toHaveBeenLastCalledWith(['confirm', 'by_hand']);
     // Multi-select stays open.
     expect(screen.getByTestId('tasks-type-panel')).toBeInTheDocument();
   });
@@ -90,7 +92,7 @@ describe('TaskTypePicker (tasks.md:164–178)', () => {
   it('clears the pick with its ×', async () => {
     const onChange = vi.fn();
     const user = userEvent.setup();
-    renderWithProviders(<Harness initial={['manual']} onChange={onChange} />);
+    renderWithProviders(<Harness initial={['by_hand']} onChange={onChange} />);
     await user.click(await screen.findByTestId('tasks-type-clear'));
     expect(onChange).toHaveBeenCalledWith([]);
     expect(trigger()).toHaveTextContent('All types');

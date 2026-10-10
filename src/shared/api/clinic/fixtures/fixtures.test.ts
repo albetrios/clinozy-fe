@@ -38,8 +38,6 @@ import {
   clinicClockTime,
   clinicToday,
 } from '@/shared/api/clinic/clinic-time.ts';
-import { pendingCreditRecordSchema } from '@/shared/api/clinic/credits-contracts.ts';
-import { dayCloseRecordSchema } from '@/shared/api/clinic/day-close-contracts.ts';
 import { leadRecordSchema } from '@/shared/api/clinic/leads-fixture-contracts.ts';
 import { medicineRecordSchema } from '@/shared/api/clinic/medicines-contracts.ts';
 import {
@@ -47,8 +45,12 @@ import {
   offerRecordSchema,
 } from '@/shared/api/clinic/offerings-fixture-contracts.ts';
 import { patientRecordSchema } from '@/shared/api/clinic/patients-fixture-contracts.ts';
-import { paymentRecordSchema } from '@/shared/api/clinic/payments-contracts.ts';
-import { taskRecordSchema } from '@/shared/api/clinic/tasks-contracts.ts';
+import {
+  dayCloseRecordSchema,
+  paymentRecordSchema,
+  pendingCreditRecordSchema,
+} from '@/shared/api/clinic/payments-fixture-contracts.ts';
+import { taskRecordSchema } from '@/shared/api/clinic/tasks-fixture-contracts.ts';
 import { staffProfileSchema } from '@/shared/api/clinic/users-contracts.ts';
 
 /** The fixture's packages: the contract's, and one added before its invoice (`invoiceId` null). */

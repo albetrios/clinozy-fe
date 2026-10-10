@@ -14,9 +14,10 @@ import {
   type OfferingCategory,
 } from '@/shared/api/clinic/clinic-schema.ts';
 import {
+  isOfferingNameTaken,
   OFFERING_DEFAULTS,
   type OfferingRecord,
-} from '@/shared/api/clinic/offerings-fixture-contracts.ts';
+} from '@/shared/api/clinic/offerings-contracts.ts';
 import { CLINIC_KEYS } from '@/shared/clinic/clinic.constants.ts';
 import { OFFERING_CATEGORY_TONES, SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
 import {
@@ -32,9 +33,10 @@ import {
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { RECORD_DRAWER_KEYS } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
+import { mapApiError } from '@/shared/errors/errorHandler.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
-import { useCreateFixtureOffering } from '@/shared/hooks/useFixtureOfferings/index.ts';
+import { useCreateOffering } from '@/shared/hooks/useOfferings/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -57,6 +59,9 @@ interface QuickOfferingValues {
 
 /** The form's own limits (`offerings.md:116–120`, as the full drawer's). */
 const LIMITS = { name: 60, money: 7, durationMin: 480 } as const;
+
+/** The contract's names the form spells differently. */
+const SERVER_FIELDS = { durationMinutes: 'durationMin' } as const;
 
 /** Four fields, none heavy: the light 560px (`offerings.md:165`). */
 const CONTENT_PROFILE = { fieldCount: 4 } as const;
@@ -259,7 +264,7 @@ function QuickCreateSession({
   const values = { ...form.getValues(), ...watched } as QuickOfferingValues;
   const { isDirty } = useFormState({ control: form.control });
   const [openStep, setOpenStep] = useState<string>('offering');
-  const create = useCreateFixtureOffering({
+  const create = useCreateOffering({
     notifyOnError: false,
     successMessage: (offering) => t(K.toasts.added, { name: offering.name }),
   });
@@ -267,15 +272,29 @@ function QuickCreateSession({
   const { saveState, save } = useDrawerSave<QuickOfferingValues, OfferingRecord>({
     form,
     fieldOrder: ['name', 'durationMin', 'category', 'price'],
+    serverFields: SERVER_FIELDS,
     toastId: 'offering-quick-create-failed',
     onField: (name) => setOpenStep(FIELD_STEPS[name as keyof QuickOfferingValues]),
-    // A fresh record: the contract's defaults fill the rest (H:4070, §7.3).
+    // A name another offering has (any case): on the Name, in the server's words.
+    onConflict: (error) => {
+      const message = mapApiError(error);
+      if (isOfferingNameTaken(error)) {
+        form.setError('name', { type: 'server', message });
+        setOpenStep('offering');
+      }
+      notify.error(message);
+    },
+    // A fresh record on clinozy-be (`POST /app/offerings`): the defaults fill the rest —
+    // every branch, one session, GST at the category's rate (H:4070, §7.3).
     write: () =>
       create.mutateAsync({
-        name: form.getValues('name').trim(),
-        price: numberFromText(form.getValues('price'), MONEY_SCALE),
-        durationMin: form.getValues('durationMin'),
-        category: form.getValues('category'),
+        fields: {
+          ...OFFERING_DEFAULTS,
+          name: form.getValues('name').trim(),
+          price: numberFromText(form.getValues('price'), 1, 2),
+          durationMin: form.getValues('durationMin'),
+          category: form.getValues('category'),
+        },
       }),
     onDone: onCreated,
   });
@@ -320,11 +339,12 @@ function QuickCreateSession({
  * `useStackedDrawer`, no URL — `S:116`). Three working steps — "Offering"
  * (Name, prefilled from the picker) → "Details" (Duration 30, Category
  * Treatment) → "Payment" (Price) — and "Back" · "Add offering". "Add a name" /
- * "Enter the price" open the step with the gap. The write is a fresh record
- * with the contract's defaults; "Offering Hydra facial added", the child
- * closes and `onCreated` hands the offering to the invoice line. Esc, Back, ×
- * and the backdrop close only the child (§6.0). Wired into the Invoice drawer
- * at L-40.
+ * "Enter the price" open the step with the gap. The write is a fresh offering on
+ * clinozy-be (`POST /app/offerings`, `offering:create` — the Invoice drawer offers
+ * "New offering" only with it) with the defaults; "Offering Hydra facial added",
+ * the child closes and `onCreated` hands the offering to the invoice line. A name
+ * another offering has answers on the Name. Esc, Back, × and the backdrop close
+ * only the child (§6.0). Wired into the Invoice drawer at L-40.
  */
 export function OfferingQuickCreate(props: OfferingQuickCreateProps) {
   const { session } = useDrawerSession(props.open);

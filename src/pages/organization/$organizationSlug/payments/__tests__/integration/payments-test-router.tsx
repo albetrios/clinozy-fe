@@ -10,9 +10,11 @@ import {
 import { render } from '@testing-library/react';
 import type { ReactNode } from 'react';
 
+import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import {
   validateDayCloseSearch,
@@ -25,23 +27,56 @@ import { validatePendingSearch } from '../../pending/pending.search.ts';
 import { PendingPage } from '../../pending/PendingPage.tsx';
 
 /**
+ * Every code an Owner holds in the ledger (research §7): see, receive and send, change, delete
+ * and reverse, export — and read Clinic stock's bills.
+ */
+export const PAYMENTS_OWNER_CODES: readonly OrganizationPermission[] = [
+  'organization:read',
+  'payment:read',
+  'payment:create',
+  'payment:update',
+  'payment:delete',
+  'payment:export',
+  'stock_item:read',
+  'contact:read',
+];
+
+/** Who the harness signs in, and the pages it mounts. */
+export interface PaymentsRoutesOptions {
+  /** View-as this clinic role (the matrix, no codes) — Admin by default, unless `permissions` is given. */
+  role?: Role;
+  /** The member's own clinozy-be codes instead of View-as — how the room on the API answers. */
+  permissions?: readonly OrganizationPermission[];
+  /** The ledger's component (a hook's probe stands in). */
+  ledger?: () => ReactNode;
+  /** Pending's component. */
+  pending?: () => ReactNode;
+}
+
+/**
  * The Payments family as `routeTree.tsx` registers it — the ledger with its
  * dialog routes (Receive, Pay, an entry's edit, Day close) and Pending with
  * its own (Add pending, Edit pending), each rendering nothing — opened at
- * `url`, for a member previewed as `role` (View-as narrows the clinic access
- * to that role's matrix). `ledger` and `pending` stand in for the two pages (a
+ * `url`, for the test member (`signInTestMember`: organization `org_test`, slug
+ * `acme` — every money read and key carries the organization) holding
+ * `permissions`, or previewed as `role` (View-as narrows the clinic access to
+ * that role's matrix). `ledger` and `pending` stand in for the two pages (a
  * hook's probe). Every other path lands on a catch-all.
  */
 export function renderPaymentsRoutes(
   url: string,
   {
-    role = 'admin',
+    role,
+    permissions,
     ledger = PaymentsPage,
     pending: pendingPage = PendingPage,
-  }: { role?: Role; ledger?: () => ReactNode; pending?: () => ReactNode } = {},
+  }: PaymentsRoutesOptions = {},
 ) {
-  useOrganizationStore.getState().setPermissions(['organization:read']);
-  useUIStore.setState({ previewRole: role });
+  signInTestMember();
+  useOrganizationStore
+    .getState()
+    .setPermissions([...(permissions ?? ['organization:read'])]);
+  useUIStore.setState({ previewRole: permissions && !role ? null : (role ?? 'admin') });
 
   const root = createRootRoute({ component: () => <Outlet /> });
   const payments = createRoute({
@@ -116,5 +151,5 @@ export function renderPaymentsRoutes(
 /** Put the stores the harness touched back as they were. */
 export function resetPaymentsRoutes() {
   useUIStore.setState({ previewRole: null });
-  useOrganizationStore.getState().clearPermissions();
+  useOrganizationStore.getState().clearOrganization();
 }

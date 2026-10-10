@@ -53,7 +53,8 @@
     "unconfirmed": "अपुष्ट",
     "waiting": "{{minutes}} मिनट से प्रतीक्षा",
     "inRoom": "कमरे में {{minutes}} मिनट",
-    "rxApproved": "पर्चा स्वीकृत {{time}}"
+    "rxApproved": "पर्चा स्वीकृत {{time}}",
+    "toPay": "{{amount}} देना है"
   },
   "toasts": {
     "checkedIn": "{{name}} चेक-इन हुए · डॉक्टर की कतार और कमरे को सूचना दी गई",

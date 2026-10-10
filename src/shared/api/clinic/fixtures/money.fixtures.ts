@@ -9,9 +9,11 @@ import type {
   PaymentMode,
 } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import type { PendingCreditRecord } from '@/shared/api/clinic/credits-contracts.ts';
-import type { DayCloseRecord } from '@/shared/api/clinic/day-close-contracts.ts';
-import type { PaymentRecord } from '@/shared/api/clinic/payments-contracts.ts';
+import type {
+  DayCloseRecord,
+  PaymentRecord,
+  PendingCreditRecord,
+} from '@/shared/api/clinic/payments-fixture-contracts.ts';
 
 import { medicineBySeq, SALE_ROWS } from './medical.fixtures.ts';
 import { findOfferingByName, offeringBySeq } from './offerings.fixtures.ts';

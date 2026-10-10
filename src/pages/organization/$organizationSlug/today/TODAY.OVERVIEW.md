@@ -4,12 +4,16 @@ Route: `/organization/$organizationSlug/today`. The clinic floor now — who is 
 arriving, waiting, with the doctor, in treatment, at checkout and at the pharmacy — with the
 desk's work queue beside it (KICKOFF §6.2; L-48).
 
-Gated like every clinic room: membership (`organization:read`) and the `clinic-today` module,
-then `requireOrgStatus`; every role sees Today. In-room actions follow `useClinicAccess`
+Gated like every clinic room: membership (`organization:read`) and the `clinic-today` module
+(on in production since Today and Tasks left `FIXTURE_BACKED_CLINIC_MODULES`, D155), then
+`requireOrgStatus`; every role sees Today. In-room actions follow `useClinicAccess`
 (KICKOFF §3.7): "New booking" needs Leads Create, "Book" Leads View, "Check in" and "Send in"
 Appointments Edit, "Open session" Patients View and the treatments gate (Doctor, Therapist),
-"Checkout" Patients View and Payments Create, "Dispense" Medical Create — each is hidden
-without it. With doctor has no action (L-64): the consult is the patient's own page.
+"Checkout" Patients View and `payment:create`, "Dispense" Medical Create — each is hidden
+without it. With doctor has no action (L-64): the consult is the patient's own page. The work
+queue needs `task:read` (the Accountant holds no task code: Today is the floor alone for
+them) and its outcomes their own codes (`task:update` and each outcome's record
+codes — `visibleTaskOutcomes`); a View-as preview reads it and runs none.
 
 The screen: the greeting is its h1 — no other title ("Good morning, <first name>" on the
 clinic-local clock, `greetingFor`; "there" without a name) — then the pulse ("<n> in clinic ·
@@ -19,13 +23,20 @@ selected lane's panel of visit cards; lanes outside the member's role focus rece
 at 60%, the text a step lighter at AA contrast (`todayFocus`: the union of their clinic roles,
 the View-as role while previewing; Owner and Admin dim nothing). The default lane is the first in focus with people, else the first with
 people, else Enquiries; a picked lane lives in the URL for the session (`?lane=`). The work
-queue (`?queue=everyone`; Mine by default — the tasks the member owns) is the Tasks room's one
-task model: its open tasks by due time and the ones closed today, the rule's pill and
-outcomes, the shared due labels; an outcome closes the card in place ("✓ <result>", each
-line a text step lighter — the design's 70%, kept at AA contrast) and toasts
-"<name>: <result>" with Undo; a booking follow-on stacks the shared appointment form over
-Today (`components/TodayBooking/`), a record follow-on navigates. "What’s next" chains
-only in the Tasks room.
+queue (`?queue=everyone`; Mine by default — the member's tasks and the unowned ones in their
+roles' queues, the server's `scope=mine`) is the Tasks room's one task model: its open tasks by
+due time and the ones closed today, the type's pill and the outcomes the member can run, the
+shared due labels, the owner by name from the team ("Riya (you)", "Kiran P."), a role's queue
+("Front desk", research-tasks Q3) or "Anyone"; "<n> open" counts every open task, whoever owns
+it. An outcome runs the Tasks room's plan (`useTaskOutcome`: the record writes, then the
+task's resolve or snooze), closes the card in place ("✓ <result>", or "Snoozed · <label>"; each
+line a text step lighter — the design's 70%, kept at AA contrast; a task the server closed reads
+"Done by Clinozy" as its due label alone) and toasts "<name>: <result>" — no Undo, the API has
+no way back (Q7); a task someone — or the rules — closed first says so and reads the queue
+again. A booking follow-on stacks the shared appointment form over Today
+(`components/TodayBooking/`) for the person's contact (`who=con_…`), a record follow-on (a
+check-in or review on the patient file, the person's file or lead) navigates. "What’s next"
+chains only in the Tasks room.
 
 Data — clinozy-be (`src/shared/api/clinic/today-api.ts`, api-integration §5.1, D149): every
 page of the day's scheduled, confirmed and checked-in bookings (`GET /app/appointments`, the
@@ -33,7 +44,14 @@ header's branches from the member's preferences, D32), the doctors' and rooms' n
 read per set, cached) and — for a member holding `patient_prescription:read` — the pharmacy
 queue's approved Rx by appointment; the enquiries awaiting a reply whose latest activity is
 today (`GET /app/leads`, for a member who sees Leads). Both poll every 60s, wait for the
-member's access, and are refetched by every booking or lead write. A card's lane is its
+member's access, and are refetched by every booking or lead write. The work queue reads
+`GET /app/tasks?tab=open&scope=mine|everyone` and today's `tab=done` (every page, the header's
+branches as `branch_id`, each page's people from `GET /app/contacts?ids=`) and "<n> open" from
+`GET /app/tasks?tab=open&scope=everyone&limit=1` (`useTaskList`, `useOpenTaskCount`; polled every
+60s); owner names from the team directory (`GET /app/memberships`), "(you)" from the member's
+membership. A check-in, its Undo and every booking write ask the server's rules to run, so the
+queue reads its tasks again 1.5s after them (`useRefreshTasksAfterRules`, D81 T7) — an
+Arriving task closes, a rebook opens. A card's lane is its
 booking's `status` and `visit_stage` (`todayLaneOf`); the pulse is counted from the floor. "Check
 in" is `POST …/check-in` (the server opens the patient file and moves the open lead to
 Clinic visited) with an Undo (`POST …/undo-check-in`, while the visit waits); "Send in" is
@@ -41,33 +59,36 @@ Clinic visited) with an Undo (`POST …/undo-check-in`, while the visit waits); 
 idempotency key and a refusal toasts the server's words. "Open session" and "Checkout" open
 the patient's own page with the visit flow (`patients/$patientId/timeline?visit=open&from=today`,
 §6.6), and the flow's Pause / Complete visit come back here, focus on the card's action
-(`today.focus.ts`). The design's first visit, pack, dues, "₹n to pay", allergies and the
-enquiry's words have no field in the API and are not shown (G1). The work queue still reads
-the Tasks fixtures until the Tasks room goes live, so `clinic-today` stays fixture-backed until
-then. A failed read toasts "Couldn’t load this list · connection dropped. Showing the last
-copy." with Retry and keeps the last copy; the first load wears the in-place skeleton.
+(`today.focus.ts`). The design's first visit, pack, dues, allergies and the enquiry's words
+have no field in the API and are not shown (G1). A Checkout card says "₹1,500 to pay" — what
+the person still owes on today's open invoices at the header's branches, one read while the
+Checkout lane is open (`hooks/useCheckoutDues/`, `payment:read`; G-P17). The role focus
+still reads the member's clinic roles from the Users room's staff profiles (fixtures until
+Users moves, G5) — it only dims lanes. A failed read toasts "Couldn’t load this list · connection dropped. Showing
+the last copy." with Retry and keeps the last copy; the first load wears the in-place skeleton.
 
 ## Files
 
-| File                        | Responsibility                                                                                                                                                                                                   |
-| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `today.route.tsx`           | Route marker — exports `Component` rendering `TodayPage`.                                                                                                                                                        |
-| `today.manifest.ts`         | Manifest — `kind: 'leaf'`, permission `organization:read`, module `clinic-today`, nav section `today`.                                                                                                           |
-| `today.search.ts`           | URL schema (`validateSearch`): `lane` (one of the seven), `queue` (`mine`, `everyone`) — entry-resident, so built on `src/lib/routes/search-params.ts` only.                                                     |
-| `today.constants.ts`        | `TODAY_NS` / `TODAY_KEYS` (the `today` namespace; the work queue's rule copy is the `tasks` namespace's), `TODAY_TEST_IDS`.                                                                                      |
-| `today.lanes.ts`            | Pure: the lanes' tones and actions, the tile paint, `groupTodayLanes`, `todayFocus` / `isLaneInFocus`, `defaultTodayLane`, `laneHint`, `laneFaces`, `todayPulse`.                                                |
-| `today.flags.ts`            | Pure: a card's flags from its record (`todayCardFlags`: channel, new lead, confirmed, minutes waiting or in the room, the Rx) and their tones.                                                                   |
-| `today.focus.ts`            | The card whose lane action opened the patient's visit flow, remembered for its panel to focus again (memory only, handed out once).                                                                              |
-| `TodayPage.tsx`             | Room page — greeting row, tiles, panel, work queue, the stacked booking form. Owns `data-testid="today-page"`.                                                                                                   |
-| `components/TodayGreeting/` | The greeting (the page's h1), the pulse, "New booking" and "Walk-in".                                                                                                                                            |
-| `components/LaneTiles/`     | The seven tiles: count, faces, hint, focus dimming; grid from `md`, snap strip below.                                                                                                                            |
-| `components/LanePanel/`     | The selected lane's panel and its visit cards (`components/LanePanel/use-card-service-line.ts` words the second line).                                                                                           |
-| `components/WorkQueue/`     | The work queue aside: header, Mine · Everyone, task cards with their outcomes or result.                                                                                                                         |
-| `components/TodayBooking/`  | The shared appointment form stacked over Today for a work-queue booking follow-on (lazy chunk, warmed after paint).                                                                                              |
-| `hooks/useTodayFloorView/`  | The floor in the header's branches → lanes, pulse, loading; the list-error toast.                                                                                                                                |
-| `hooks/useFloorActions/`    | The cards' lane actions (gated) and the name-area open.                                                                                                                                                          |
-| `hooks/useWorkQueue/`       | The work queue's rows (queue + closed today), Mine, the outcome write, its toast and follow-on.                                                                                                                  |
-| `__tests__/integration/`    | The room end to end on the fixture world (`__tests__/integration/today-room.test.tsx`), its router (`__tests__/integration/today-test-router.tsx`) and row builders (`__tests__/integration/today-fixtures.ts`). |
+| File                        | Responsibility                                                                                                                                                                                                                                                                                              |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `today.route.tsx`           | Route marker — exports `Component` rendering `TodayPage`.                                                                                                                                                                                                                                                   |
+| `today.manifest.ts`         | Manifest — `kind: 'leaf'`, permission `organization:read`, module `clinic-today`, nav section `today`.                                                                                                                                                                                                      |
+| `today.search.ts`           | URL schema (`validateSearch`): `lane` (one of the seven), `queue` (`mine`, `everyone`) — entry-resident, so built on `src/lib/routes/search-params.ts` only.                                                                                                                                                |
+| `today.constants.ts`        | `TODAY_NS` / `TODAY_KEYS` (the `today` namespace; the work queue's rule copy is the `tasks` namespace's), `TODAY_TEST_IDS`.                                                                                                                                                                                 |
+| `today.lanes.ts`            | Pure: the lanes' tones and actions, the tile paint, `groupTodayLanes`, `todayFocus` / `isLaneInFocus`, `defaultTodayLane`, `laneHint`, `laneFaces`, `todayPulse`.                                                                                                                                           |
+| `today.flags.ts`            | Pure: a card's flags from its record (`todayCardFlags`: channel, new lead, confirmed, minutes waiting or in the room, the Rx) and their tones.                                                                                                                                                              |
+| `today.focus.ts`            | The card whose lane action opened the patient's visit flow, remembered for its panel to focus again (memory only, handed out once).                                                                                                                                                                         |
+| `TodayPage.tsx`             | Room page — greeting row, tiles, panel, work queue, the stacked booking form. Owns `data-testid="today-page"`.                                                                                                                                                                                              |
+| `components/TodayGreeting/` | The greeting (the page's h1), the pulse, "New booking" and "Walk-in".                                                                                                                                                                                                                                       |
+| `components/LaneTiles/`     | The seven tiles: count, faces, hint, focus dimming; grid from `md`, snap strip below.                                                                                                                                                                                                                       |
+| `components/LanePanel/`     | The selected lane's panel and its visit cards (`components/LanePanel/use-card-service-line.ts` words the second line).                                                                                                                                                                                      |
+| `components/WorkQueue/`     | The work queue aside: header, Mine · Everyone, task cards with the outcomes the member can run, or their result.                                                                                                                                                                                            |
+| `components/TodayBooking/`  | The shared appointment form stacked over Today for a work-queue booking follow-on (lazy chunk, warmed after paint).                                                                                                                                                                                         |
+| `hooks/useTodayFloorView/`  | The floor in the header's branches → lanes, pulse, loading; the list-error toast.                                                                                                                                                                                                                           |
+| `hooks/useFloorActions/`    | The cards' lane actions (gated) and the name-area open.                                                                                                                                                                                                                                                     |
+| `hooks/useCheckoutDues/`    | Today's open bills by person — the Checkout cards' "₹n to pay" (one read while the lane is open, `payment:read`).                                                                                                                                                                                           |
+| `hooks/useWorkQueue/`       | The work queue on clinozy-be: To do and today's Done in the scope and the header's branches, "<n> open", the outcome write (no Undo), its toast, the refusal's words and the follow-on.                                                                                                                     |
+| `__tests__/integration/`    | The room end to end over doubles of the floor's and the queue's api modules (`__tests__/integration/today-room.test.tsx`), its router — View-as a role or a member by codes (`__tests__/integration/today-test-router.tsx`) — and the floor and queue builders (`__tests__/integration/today-fixtures.ts`). |
 
 ## Test ids
 

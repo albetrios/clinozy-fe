@@ -41,7 +41,8 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
   follow-on screen (`taskFollowOnTarget`: a new booking, a rebooking, a move,
   the person's record) and its navigation with the room kept behind
   (`taskTargetNavigation`, `from=tasks` / `from=today`).
-- `task-rule-icons.ts` — each task rule's icon (Payment due and Recall: AMBER).
+- `task-rule-icons.ts` — each task rule's icon (the rules the design did not draw take
+  their section's: Payment due, Settle credits, Medical rep visits).
 - `visit-redirect.ts` — where a visit's work happens: the patient's own page
   with the visit flow open (`patientVisitTarget`: `timeline?visit=open&from=today`,
   Today's "Open session" and "Checkout") and an old Visit link's redirect

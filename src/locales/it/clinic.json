@@ -1144,8 +1144,7 @@
     "placeholder": "Cerca pazienti",
     "hint": "si possono scegliere solo pazienti",
     "due": "{{amount}} da saldare",
-    "nothingDue": "Niente da saldare",
-    "lead": "Lead {{id}} · non ancora paziente"
+    "nothingDue": "Niente da saldare"
   },
   "splitRows": {
     "mode": "Modalità",
@@ -1177,8 +1176,17 @@
     "enterAmount": "Inserisci l’importo",
     "moreThanOwed": "Più dei {{amount}} dovuti",
     "done": {
-      "give": "{{amount}} restituiti a {{name}} · uscita aggiunta",
-      "take": "{{amount}} riavuti da {{name}} · entrata aggiunta"
+      "give": "{{amount}} restituiti a {{name}} · {{entry}}",
+      "take": "{{amount}} riavuti da {{name}} · {{entry}}"
+    },
+    "branch": "Sede",
+    "date": "Data",
+    "dayClosed": "Quel giorno è chiuso in questa sede · scegli un giorno aperto",
+    "moreThanPaid": "Più di quanto pagato sulla sua fattura",
+    "closed": "{{ref}} è già saldato",
+    "entry": {
+      "give": "uscita aggiunta",
+      "take": "entrata aggiunta"
     }
   },
   "quickLine": {
@@ -1248,7 +1256,8 @@
       "quickFill": "Compilazione rapida",
       "paidNow": "Pagato ora",
       "remark": "Nota",
-      "remarkPlaceholder": "Compare sulla fattura stampata"
+      "remarkPlaceholder": "Compare sulla fattura stampata",
+      "paid": "Pagato finora"
     },
     "customerGroups": {
       "patient": "Pazienti",
@@ -1290,9 +1299,11 @@
       "inStock": "{{count}} in magazzino",
       "outOfStock": "Esaurito",
       "belowFloor": "Sotto il prezzo minimo di {{amount}} per {{name}}",
-      "tooMuchDiscount": "Troppo sconto su {{name}} · chiedi a un admin",
       "newMedicineName": "Nome del nuovo farmaco",
-      "medicineAdded": "{{name}} aggiunto · imposta il prezzo max. più tardi in Scorte"
+      "medicineAdded": "{{name}} aggiunto · imposta il prezzo max. più tardi in Scorte",
+      "hintInvoice": "2 = quantità · 10% = sconto",
+      "belowLowest": "Sotto il prezzo minimo di {{name}}",
+      "offerApplied": "Offerta applicata: {{offer}}"
     },
     "payment": {
       "full": "Intero · {{amount}} in {{mode}}",
@@ -1309,7 +1320,12 @@
       "discountGst": "Sconto + GST",
       "discountGstValue": "{{discount}} · +{{gst}}",
       "bill": "Totale",
-      "dueAfter": "Da saldare dopo"
+      "dueAfter": "Da saldare dopo",
+      "preview": "Prezzi come verranno salvati",
+      "pending": "Calcolo dei prezzi…",
+      "refused": "Non calcolato · correggi la riga evidenziata",
+      "failed": "Impossibile calcolare questa fattura",
+      "retry": "Riprova"
     },
     "badges": {
       "bill": "Totale {{amount}}",
@@ -1347,7 +1363,7 @@
       "paidAboveBill": "Il pagato ({{paid}}) supera il totale di {{bill}}",
       "stock": "Solo {{count}} di {{name}} in magazzino",
       "belowFloor": "{{name}} è sotto il prezzo minimo di {{amount}} · alza il prezzo finale",
-      "tooMuchDiscount": "{{name}} ha più sconto del consentito · alza il prezzo finale o chiedi a un admin"
+      "belowLowest": "{{name}} è sotto il prezzo minimo · alza il prezzo finale"
     },
     "toasts": {
       "created": {
@@ -1372,7 +1388,22 @@
       "medical": "Fattura medica #{{seq}}",
       "consultation": "Fattura di consulto #{{seq}}"
     },
-    "record": "Fattura"
+    "record": "Fattura",
+    "refusals": {
+      "moreThanDue": "Il pagato ora supera il conto",
+      "dayClosed": "Quel giorno è chiuso · non si possono aggiungere pagamenti",
+      "settled": "Questa fattura è saldata · un suo pagamento cade in un giorno chiuso",
+      "belowPaid": "Il conto non può scendere sotto quanto già pagato",
+      "offeringInUse": "Una seduta di questo pacchetto è già usata · mantieni la riga",
+      "treatmentBilled": "Un trattamento di questa fattura è stato fatturato nel frattempo · rimuovilo e salva di nuovo",
+      "ofSale": "Questa fattura appartiene a una vendita Medical · modificala da Medical",
+      "paid": "Questa fattura ha pagamenti o una nota di credito · non può essere eliminata",
+      "inUseDelete": "Una seduta di questo pacchetto è già usata · la fattura non può essere eliminata"
+    },
+    "notices": {
+      "settled": "Saldata · un pagamento di questa fattura cade in un giorno chiuso, quindi non può cambiare",
+      "sale": "Fattura di una vendita Medical · modificala da Medical"
+    }
   },
   "printPreview": {
     "title": "Anteprima di stampa · {{title}}",

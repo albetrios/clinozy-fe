@@ -1130,8 +1130,7 @@
     "placeholder": "Search patients",
     "hint": "only patients can be picked",
     "due": "{{amount}} due",
-    "nothingDue": "Nothing due",
-    "lead": "Lead {{id}} · not a patient yet"
+    "nothingDue": "Nothing due"
   },
   "splitRows": {
     "mode": "Mode",
@@ -1163,8 +1162,17 @@
     "enterAmount": "Enter the amount",
     "moreThanOwed": "More than the {{amount}} owed",
     "done": {
-      "give": "{{amount}} given back to {{name}} · Out entry added",
-      "take": "{{amount}} got back from {{name}} · In entry added"
+      "give": "{{amount}} given back to {{name}} · {{entry}}",
+      "take": "{{amount}} got back from {{name}} · {{entry}}"
+    },
+    "branch": "Branch",
+    "date": "Date",
+    "dayClosed": "That day is closed at this branch · pick an open day",
+    "moreThanPaid": "More than its invoice has paid",
+    "closed": "{{ref}} is already settled",
+    "entry": {
+      "give": "Out entry added",
+      "take": "In entry added"
     }
   },
   "quickLine": {
@@ -1233,7 +1241,8 @@
       "quickFill": "Quick fill",
       "paidNow": "Paid now",
       "remark": "Remark",
-      "remarkPlaceholder": "Shown on the printed invoice"
+      "remarkPlaceholder": "Shown on the printed invoice",
+      "paid": "Paid so far"
     },
     "customerGroups": {
       "patient": "Patients",
@@ -1274,9 +1283,11 @@
       "inStock": "{{count}} in stock",
       "outOfStock": "Out of stock",
       "belowFloor": "Below the lowest price {{amount}} for {{name}}",
-      "tooMuchDiscount": "Too much discount on {{name}} · ask an admin",
       "newMedicineName": "New medicine name",
-      "medicineAdded": "{{name}} added · set MRP later in Stock"
+      "medicineAdded": "{{name}} added · set MRP later in Stock",
+      "hintInvoice": "2 = qty · 10% = discount",
+      "belowLowest": "Below the lowest price for {{name}}",
+      "offerApplied": "Offer applied: {{offer}}"
     },
     "payment": {
       "full": "Full · {{amount}} in {{mode}}",
@@ -1293,7 +1304,12 @@
       "discountGst": "Discount + GST",
       "discountGstValue": "{{discount}} · +{{gst}}",
       "bill": "Bill",
-      "dueAfter": "Due after this"
+      "dueAfter": "Due after this",
+      "preview": "Priced as the save will write it",
+      "pending": "Pricing…",
+      "refused": "Not priced · fix the marked line",
+      "failed": "Couldn’t price this invoice",
+      "retry": "Retry"
     },
     "badges": {
       "bill": "Bill {{amount}}",
@@ -1329,7 +1345,7 @@
       "paidAboveBill": "Paid {{paid}} is more than the bill {{bill}}",
       "stock": "Only {{count}} of {{name}} in stock",
       "belowFloor": "{{name}} is below its lowest price {{amount}} · raise the final price",
-      "tooMuchDiscount": "{{name}} has more discount than allowed · raise the final price or ask an admin"
+      "belowLowest": "{{name}} is below its lowest price · raise the final price"
     },
     "toasts": {
       "created": {
@@ -1353,7 +1369,22 @@
       "medical": "Medical invoice #{{seq}}",
       "consultation": "Consultation invoice #{{seq}}"
     },
-    "record": "Invoice"
+    "record": "Invoice",
+    "refusals": {
+      "moreThanDue": "Paid now is more than the bill",
+      "dayClosed": "That day is closed · no payment can be added to it",
+      "settled": "This invoice is settled · a payment on it falls on a closed day",
+      "belowPaid": "The bill can’t go below what is already paid",
+      "offeringInUse": "A session of this package is already used · keep its line",
+      "treatmentBilled": "A treatment on this invoice was billed meanwhile · remove it and save again",
+      "ofSale": "This invoice belongs to a Medical sale · change it from Medical",
+      "paid": "This invoice has money paid or a credit note · it can’t be deleted",
+      "inUseDelete": "A session of this package is already used · the invoice can’t be deleted"
+    },
+    "notices": {
+      "settled": "Settled · a payment on this invoice falls on a closed day, so it can’t change",
+      "sale": "A Medical sale’s invoice · change it from Medical"
+    }
   },
   "printPreview": {
     "title": "Print preview · {{title}}",

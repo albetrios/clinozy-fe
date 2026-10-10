@@ -64,8 +64,11 @@
       "photo": "Foto",
       "appointment": "Appuntamento",
       "report": "Referto",
-      "note": "Nota"
-    }
+      "note": "Nota",
+      "invoice": "Fattura",
+      "payment": "Pagamento"
+    },
+    "nothingDue": "Niente da saldare per {{name}}"
   },
   "section": {
     "primary": {
@@ -126,7 +129,11 @@
     "reviews_many": "{{count}} di recensioni",
     "reviews_other": "{{count}} recensioni",
     "feedbackCounts": "{{checkIns}} · {{reviews}}",
-    "noFeedback": "Ancora nessun feedback"
+    "noFeedback": "Ancora nessun feedback",
+    "showAmount": "Mostra importo",
+    "hideAmount": "Nascondi importo",
+    "collect": "Incassa",
+    "allPaid": "Tutto pagato · niente da saldare"
   },
   "photos": {
     "albums": {
@@ -952,6 +959,15 @@
       "notes": "Note",
       "empty": "Ancora nessuna attività",
       "masked": "₹ ••••"
+    },
+    "billing": {
+      "due": "Da pagare",
+      "paid": "Pagato",
+      "show": "Mostra importi",
+      "hide": "Nascondi importi",
+      "invoice": "Fattura {{type}} {{number}}",
+      "sub": "{{date}} · {{amount}}",
+      "collect": "Incassa pagamento"
     }
   },
   "visitFlow": {
@@ -966,7 +982,9 @@
     "steps": {
       "checks": "Arrivo e sicurezza",
       "rx": "Prescrizione",
-      "treatment": "Trattamento"
+      "treatment": "Trattamento",
+      "invoice": "Fattura",
+      "collect": "Incassa"
     },
     "checks": {
       "labels": {
@@ -1003,6 +1021,23 @@
       "repeatPackage": "⚡ Ripeti · {{name}}"
     },
     "paused": "Visita in pausa",
-    "resume": "Riprendi"
+    "resume": "Riprendi",
+    "invoice": {
+      "create": "Crea fattura dalla visita",
+      "custom": "Fattura personalizzata",
+      "nothing": "Niente da fatturare",
+      "covered": "Coperto dal pacchetto · niente da fatturare",
+      "empty": "Ancora niente da fatturare",
+      "done": "{{number}} · {{total}}",
+      "ready_many": "{{count}} voci pronte",
+      "ready_one": "{{count}} voce pronta",
+      "ready_other": "{{count}} voci pronte"
+    },
+    "collect": {
+      "action": "Incassa {{amount}}",
+      "due": "{{amount}} da pagare",
+      "nothing": "Niente da pagare",
+      "waiting": "Prima fattura la visita"
+    }
   }
 }

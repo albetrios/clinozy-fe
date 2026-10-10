@@ -64,8 +64,11 @@
       "photo": "写真",
       "appointment": "予約",
       "report": "検査報告",
-      "note": "メモ"
-    }
+      "note": "メモ",
+      "invoice": "請求書",
+      "payment": "支払い"
+    },
+    "nothingDue": "{{name}}さんの未払いはありません"
   },
   "section": {
     "primary": {
@@ -116,7 +119,11 @@
     "checkIns_other": "経過確認{{count}}件",
     "reviews_other": "レビュー{{count}}件",
     "feedbackCounts": "{{checkIns}} · {{reviews}}",
-    "noFeedback": "フィードバックはまだありません"
+    "noFeedback": "フィードバックはまだありません",
+    "showAmount": "金額を表示",
+    "hideAmount": "金額を隠す",
+    "collect": "集金",
+    "allPaid": "支払い済み · 未払いなし"
   },
   "photos": {
     "albums": {
@@ -894,6 +901,15 @@
       "notes": "メモ",
       "empty": "アクティビティはまだありません",
       "masked": "₹ ••••"
+    },
+    "billing": {
+      "due": "未払い",
+      "paid": "支払済み",
+      "show": "金額を表示",
+      "hide": "金額を隠す",
+      "invoice": "{{type}}請求書 {{number}}",
+      "sub": "{{date}} · {{amount}}",
+      "collect": "支払いを受け取る"
     }
   },
   "visitFlow": {
@@ -908,7 +924,9 @@
     "steps": {
       "checks": "受付と安全確認",
       "rx": "処方箋",
-      "treatment": "施術"
+      "treatment": "施術",
+      "invoice": "請求書",
+      "collect": "集金"
     },
     "checks": {
       "labels": {
@@ -943,6 +961,21 @@
       "repeatPackage": "⚡ 繰り返す · {{name}}"
     },
     "paused": "来院対応を一時停止中",
-    "resume": "再開"
+    "resume": "再開",
+    "invoice": {
+      "create": "来院から請求書を作成",
+      "custom": "カスタム請求書",
+      "nothing": "請求するものはありません",
+      "covered": "パッケージで対応 · 請求なし",
+      "empty": "まだ請求するものはありません",
+      "done": "{{number}} · {{total}}",
+      "ready_other": "{{count}} 品目の準備完了"
+    },
+    "collect": {
+      "action": "{{amount}} を集金",
+      "due": "未払い {{amount}}",
+      "nothing": "未払いなし",
+      "waiting": "先に来院の請求書を作成してください"
+    }
   }
 }

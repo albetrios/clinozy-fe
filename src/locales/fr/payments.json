@@ -49,7 +49,8 @@
     "receipt": "Reçu",
     "refund": "Remboursement au patient",
     "expense": "Payé",
-    "money_back": "Remboursement reçu"
+    "money_back": "Remboursement reçu",
+    "reversal": "Contre-passation"
   },
   "ledger": {
     "records": "écritures",
@@ -68,20 +69,29 @@
       "moneyBack": "Remboursement reçu",
       "medicalBill": "BC médical n° {{seq}} · facture {{bill}}",
       "stockBill": "BC de stock n° {{seq}} · facture {{bill}}",
-      "fromCredit": "De {{ref}}"
+      "fromCredit": "De {{ref}}",
+      "reversed": "Contre-passé",
+      "medicalOrder": "BC médical n° {{seq}}",
+      "stockPurchase": "BC de stock n° {{seq}}"
     },
     "dayClosed": "{{ref}} · Journée clôturée",
     "dayClosedEdited_one": "{{ref}} · Journée clôturée · modifié {{count}}×",
     "dayClosedEdited_many": "{{ref}} · Journée clôturée · modifié {{count}}×",
     "dayClosedEdited_other": "{{ref}} · Journée clôturée · modifié {{count}}×",
-    "creditEntry": "{{ref}} · Issu de {{credit}}"
+    "creditEntry": "{{ref}} · Issu de {{credit}}",
+    "fixedEntry": "{{ref}} · son montant ne peut pas changer · supprimez-le le jour même pour l’annuler",
+    "search": "Patient, bénéficiaire ou numéro PAY-",
+    "count_one": "{{count}} écriture",
+    "count_other": "{{count}} écritures",
+    "count_many": "{{count}} écritures"
   },
   "rowActions": {
     "edit": "Modifier",
     "delete": "Supprimer",
     "giveBack": "Rembourser",
     "gotBack": "Récupéré",
-    "useOnBill": "Utiliser sur la prochaine facture"
+    "useOnBill": "Utiliser sur la prochaine facture",
+    "reverse": "Contre-passer"
   },
   "bulk": {
     "export": "Exporter",
@@ -105,7 +115,11 @@
       "party": "Mauvais patient ou bénéficiaire"
     },
     "removed": "{{ref}} supprimé",
-    "removedInvoice": "{{ref}} supprimé · solde de la facture rétabli"
+    "removedInvoice": "{{ref}} supprimé · solde de la facture rétabli",
+    "blocked": {
+      "dayClosed": "{{ref}} · sa journée est maintenant clôturée · contre-passez-le plutôt",
+      "moreThanPaid": "{{ref}} · un remboursement a déjà rendu cet argent · supprimez d’abord le remboursement"
+    }
   },
   "dialog": {
     "record": "Paiement",
@@ -132,7 +146,6 @@
     },
     "settledToday": "{{state}} · Aujourd’hui",
     "adjusted": "{{amount}} imputé",
-    "source": "De {{ref}} · {{direction}}",
     "invoice": "Facture n° {{seq}}",
     "byHand": "À la main",
     "deleteTitle": "Supprimer cet élément en attente ?",
@@ -149,9 +162,18 @@
       "loan_to_staff": "Prêt au personnel",
       "other": "Autre"
     },
-    "settledInvoice": "{{state}} · Facture n° {{seq}}",
     "adjustedOn": "{{amount}} de {{ref}} imputés sur la facture n° {{seq}}",
-    "nothingDue": "Rien de dû par {{name}} pour l’imputer"
+    "nothingDue": "Rien de dû par {{name}} pour l’imputer",
+    "search": "Personne, fournisseur ou CR-",
+    "fromEntry": "D’une écriture",
+    "forInvoice": "Pour une facture",
+    "settledLocked": "{{ref}} · {{amount}} réglés · il ne peut plus changer",
+    "conflicts": {
+      "settled": "Une partie de {{ref}} est réglée · il ne peut plus être modifié ni supprimé",
+      "closed": "{{ref}} est déjà réglé",
+      "dayClosed": "La journée est clôturée sur le site de la facture n° {{seq}} · rouvrez-la pour imputer ce crédit",
+      "dueChanged": "Le reste dû de la facture n° {{seq}} a changé · réessayez"
+    }
   },
   "receive": {
     "title": "Encaisser un paiement",
@@ -188,7 +210,11 @@
     "updated": "{{ref}} mis à jour · modification tracée",
     "enterAmount": "Saisissez un montant",
     "pickPatient": "Choisissez un patient",
-    "aboveDue": "Plus que les {{due}} dus"
+    "aboveDue": "Plus que les {{due}} dus",
+    "moreThanDue": "Plus que le reste dû de la facture · elle a été réglée entre-temps",
+    "totalAdvance": "Total {{total}} · acompte",
+    "advance": "Acompte · sans facture",
+    "invoicesFailed": "Impossible de charger les factures ouvertes"
   },
   "send": {
     "title": "Envoyer un paiement",
@@ -249,7 +275,9 @@
     "added": "Dépense {{ref}} ajoutée",
     "paidBill": "{{amount}} payés sur {{bill}}",
     "saved": "{{ref}} enregistré · modification tracée",
-    "missing": "Indiquez qui a été payé et le montant"
+    "missing": "Indiquez qui a été payé et le montant",
+    "moreThanDue": "Plus que le reste dû de la facture fournisseur · elle a été réglée entre-temps",
+    "billsFailed": "Impossible de charger les factures ouvertes"
   },
   "credit": {
     "title": "Ajouter en attente",
@@ -340,9 +368,9 @@
     "gate": {
       "title": "Fonds de caisse · {{day}}",
       "sources": {
-        "default_float": "Fonds par défaut",
         "carried": "Reporté de la clôture du {{day}}",
-        "recounted": "Recompté"
+        "recounted": "Recompté",
+        "first": "Aucune clôture précédente · rien à reporter"
       },
       "recount": "Recompter",
       "recountLabel": "Recompter le fonds de caisse",
@@ -363,10 +391,13 @@
       "countPlaceholder": "Comptez la caisse",
       "countLabel": "Espèces comptées",
       "netByMode": "Net par mode",
-      "modeTitle": "Entrées {{in}} · sorties {{out}}",
-      "staffTitle_one": "{{name}} · {{count}} encaissement · {{amount}}",
-      "staffTitle_many": "{{name}} · {{count}} encaissements · {{amount}}",
-      "staffTitle_other": "{{name}} · {{count}} encaissements · {{amount}}"
+      "staffTitle_one": "{{name}} · {{count}} écriture · {{amount}}",
+      "staffTitle_many": "{{name}} · {{count}} écritures · {{amount}}",
+      "staffTitle_other": "{{name}} · {{count}} écritures · {{amount}}",
+      "staffOther": "Hors de l’équipe",
+      "reason": "Pourquoi le comptage ne tombe-t-il pas juste ?",
+      "reasonPlaceholder": "Que s’est-il passé · p. ex. ₹20 rendus en monnaie depuis la caisse",
+      "reasonFirst": "Indiquez d’abord pourquoi le comptage ne tombe pas juste"
     },
     "report": {
       "title": "{{day}} est clôturé",
@@ -375,11 +406,9 @@
       "reopen": "Rouvrir",
       "acceptedBy": "Accepté par {{name}}",
       "takenAsExpected": "Pris comme attendu",
-      "collected": "Encaissé",
       "received_one": "{{count}} encaissé",
       "received_many": "{{count}} encaissés",
       "received_other": "{{count}} encaissés",
-      "paidOut": "Décaissé",
       "paid_one": "{{count}} décaissé",
       "paid_many": "{{count}} décaissés",
       "paid_other": "{{count}} décaissés",
@@ -392,30 +421,60 @@
       "log": "Ce qui s’est passé",
       "logAccepted": "{{name}} a accepté le fonds de caisse de {{amount}}",
       "logRecounted": "{{name}} a accepté le fonds de caisse de {{amount}} (recompté)",
-      "logReviewed_one": "{{checked}} écriture vérifiée sur {{count}}",
-      "logReviewed_many": "{{checked}} écritures vérifiées sur {{count}}",
-      "logReviewed_other": "{{checked}} écritures vérifiées sur {{count}}",
       "logMatched": "Caisse comptée à {{amount}} · juste",
       "logExtra": "Caisse comptée à {{amount}} · {{diff}} en trop",
       "logShort": "Caisse comptée à {{amount}} · {{diff}} manquants",
-      "logClosed": "{{name}} a clôturé la journée · résumé envoyé à l’admin sur WhatsApp",
-      "logAuto": "Clôture automatique après le délai de grâce · espèces prises comme attendu"
+      "logClosed": "{{name}} a clôturé la journée",
+      "logAuto": "Clôture automatique après le délai de grâce · espèces prises comme attendu",
+      "openedAuto": "Ouvert automatiquement",
+      "notCounted": "Non compté",
+      "logOpened": "{{name}} a ouvert la journée",
+      "logReopened": "{{name}} a rouvert la journée · {{reason}}",
+      "logReason": "« {{reason}} »",
+      "someone": "Quelqu’un"
     },
     "review": {
       "title": "Vérifiez chaque écriture",
-      "progress_one": "{{checked}} sur {{count}} vérifiée",
-      "progress_many": "{{checked}} sur {{count}} vérifiées",
-      "progress_other": "{{checked}} sur {{count}} vérifiées",
       "none": "Aucune écriture",
       "empty": "Aucune écriture ce jour-là",
-      "check": "Marquer comme vérifié",
       "states": {
         "canEdit": "Modifiable",
         "canEditTitle": "Modifiable ou supprimable jusqu’à la clôture de la journée",
         "dayClosed": "Journée clôturée",
         "dayClosedTitle": "La journée est clôturée · ses écritures ne peuvent plus changer",
         "fromCredit": "De {{credit}}"
+      },
+      "count_one": "{{count}} écriture",
+      "count_many": "{{count}} écritures",
+      "count_other": "{{count}} écritures"
+    },
+    "previousNone": "Aucune clôture avant ce jour",
+    "refusals": {
+      "alreadyOpened": "Quelqu’un a ouvert cette journée entre-temps · elle s’affiche maintenant",
+      "alreadyClosed": "Quelqu’un a clôturé cette journée entre-temps · elle s’affiche maintenant",
+      "alreadyOpen": "Cette journée est déjà rouverte · elle s’affiche maintenant"
+    },
+    "reopen": {
+      "title": "Rouvrir cette journée ?",
+      "effect": "Le comptage est effacé et les écritures de la journée redeviennent modifiables jusqu’à sa clôture.",
+      "action": "Rouvrir la journée",
+      "record": "{{branch}} · {{day}}",
+      "reasons": {
+        "miscounted": "Mal compté",
+        "missed": "Une écriture manquait",
+        "wrongEntry": "Une écriture est erronée"
       }
+    }
+  },
+  "reverseEntry": {
+    "title": "Contre-passer ce paiement ?",
+    "effect": "Sa journée est clôturée, il reste donc tel quel. Une contre-passation du même montant s’inscrit aujourd’hui au journal de son établissement, et ce qu’il réglait est annulé. Les deux écritures sont conservées.",
+    "action": "Contre-passer",
+    "reversed": "{{ref}} contre-passé · {{reversal}}",
+    "blocked": {
+      "alreadyReversed": "{{ref}} est déjà contre-passé",
+      "dayOpen": "La journée de {{ref}} est rouverte · supprimez-le plutôt",
+      "dayClosed": "Aujourd’hui est clôturé dans l’établissement de {{ref}} · rouvrez-le pour contre-passer"
     }
   }
 }

@@ -32,7 +32,8 @@ vi.mock('@/shared/notify/index.ts', () => ({
 
 /** What the member may do: book (`appointment:create`), edit a package (`payment:update`). */
 const access = vi.hoisted(() => ({ book: true, codes: new Set<string>() }));
-vi.mock('@/shared/hooks/useClinicAccess/index.ts', () => ({
+vi.mock('@/shared/hooks/useClinicAccess/index.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
   useClinicAccess: () => ({
     roles: ['admin'],
     previewRole: null,

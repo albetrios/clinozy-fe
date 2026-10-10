@@ -64,8 +64,11 @@
       "photo": "사진",
       "appointment": "예약",
       "report": "검사 결과",
-      "note": "메모"
-    }
+      "note": "메모",
+      "invoice": "청구서",
+      "payment": "결제"
+    },
+    "nothingDue": "{{name}}님의 미납 금액이 없습니다"
   },
   "section": {
     "primary": {
@@ -116,7 +119,11 @@
     "checkIns_other": "경과 확인 {{count}}건",
     "reviews_other": "리뷰 {{count}}건",
     "feedbackCounts": "{{checkIns}} · {{reviews}}",
-    "noFeedback": "아직 피드백이 없습니다"
+    "noFeedback": "아직 피드백이 없습니다",
+    "showAmount": "금액 보기",
+    "hideAmount": "금액 숨기기",
+    "collect": "수납",
+    "allPaid": "모두 결제됨 · 미납 없음"
   },
   "photos": {
     "albums": {
@@ -894,6 +901,15 @@
       "notes": "메모",
       "empty": "아직 활동이 없습니다",
       "masked": "₹ ••••"
+    },
+    "billing": {
+      "due": "미수",
+      "paid": "수납 완료",
+      "show": "금액 보기",
+      "hide": "금액 숨기기",
+      "invoice": "{{type}} 청구서 {{number}}",
+      "sub": "{{date}} · {{amount}}",
+      "collect": "결제 받기"
     }
   },
   "visitFlow": {
@@ -908,7 +924,9 @@
     "steps": {
       "checks": "체크인 및 안전",
       "rx": "처방전",
-      "treatment": "시술"
+      "treatment": "시술",
+      "invoice": "청구서",
+      "collect": "수납"
     },
     "checks": {
       "labels": {
@@ -943,6 +961,21 @@
       "repeatPackage": "⚡ 반복 · {{name}}"
     },
     "paused": "방문 일시 중지됨",
-    "resume": "계속하기"
+    "resume": "계속하기",
+    "invoice": {
+      "create": "방문으로 청구서 만들기",
+      "custom": "직접 작성 청구서",
+      "nothing": "청구할 항목 없음",
+      "covered": "패키지로 처리 · 청구할 항목 없음",
+      "empty": "아직 청구할 항목이 없습니다",
+      "done": "{{number}} · {{total}}",
+      "ready_other": "{{count}}개 항목 준비됨"
+    },
+    "collect": {
+      "action": "{{amount}} 수납",
+      "due": "미수 {{amount}}",
+      "nothing": "미수 없음",
+      "waiting": "먼저 방문 청구서를 만드세요"
+    }
   }
 }

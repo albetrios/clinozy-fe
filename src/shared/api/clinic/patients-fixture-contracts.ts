@@ -19,8 +19,9 @@ import {
 /*
  * The fixture patients beyond the generated contract (KICKOFF §6.5, §3.6, D22): the plan-only
  * fields — each a fixture field until clinozy-be serves it (Appendix F › Patients,
- * REPLACE_WITH_API) — and the list read's params. Read by the rooms still on fixtures (Payments,
- * Medical, Tasks) and their patient pickers; the Patients room reads `patients-contracts.ts`.
+ * REPLACE_WITH_API) — and the list read's params. Read by the room still on fixtures (Medical:
+ * its fixture ledger and the Invoice drawer's sale mode); every live room reads
+ * `patients-contracts.ts`.
  */
 
 // ── Records ──

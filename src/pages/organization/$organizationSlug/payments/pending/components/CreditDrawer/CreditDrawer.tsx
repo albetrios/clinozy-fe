@@ -6,22 +6,26 @@ import { useTranslation } from 'react-i18next';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import type { CreditDirection } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import type {
-  CreditRow,
-  PendingCreditRecord,
-} from '@/shared/api/clinic/credits-contracts.ts';
-import type { OpenInvoice } from '@/shared/api/clinic/payments-contracts.ts';
+import { creditQueryKeys, fetchCredit } from '@/shared/api/clinic/credits-api.ts';
+import type { CreditRow } from '@/shared/api/clinic/credits-contracts.ts';
+import type { InvoiceRecord } from '@/shared/api/clinic/invoices-contracts.ts';
 import { CREDIT_DIRECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
 import { DrawerStepBody } from '@/shared/components/DrawerField/index.ts';
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
+import type { HttpError } from '@/shared/errors/HttpError.ts';
 import { useCreateCredit, useUpdateCredit } from '@/shared/hooks/useCredits/index.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
-import { resetFormInPlace } from '@/shared/hooks/useEditingRecord/index.ts';
+import {
+  resetFormInPlace,
+  useEditingRecord,
+} from '@/shared/hooks/useEditingRecord/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
-import { usePatientInvoices } from '@/shared/hooks/usePayments/index.ts';
+import { usePaymentAccess } from '@/shared/hooks/usePaymentAccess/index.ts';
+import { useContactInvoices } from '@/shared/hooks/usePayments/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { PAYMENTS_KEYS, PAYMENTS_NS } from '../../../payments.constants.ts';
@@ -49,6 +53,16 @@ export const CREDIT_DRAWER_TEST_ID = 'credit-drawer';
 /** Seven fields, the reason chips and the note among them: the 680px of `payments.md:245`. */
 const CONTENT_PROFILE = { fieldCount: 7, hasHeavyField: true } as const;
 
+/**
+ * The API's names the form spells differently: who is the party (`contact_id`, `party_name`),
+ * the reason its chip.
+ */
+const SERVER_FIELDS = {
+  contactId: 'party',
+  partyName: 'party',
+  reason: 'reasonKey',
+} as const;
+
 /** The drawer's steps, in order (`payments.md:251`). */
 type CreditStepId = 'way' | 'why';
 
@@ -66,7 +80,7 @@ export interface CreditCreateDrawerProps extends CreditDrawerBaseProps {
   direction?: CreditDirection;
 }
 
-/** Edit pending (`/payments/pending/$creditId/edit`, `S:90`) — an open credit. */
+/** Edit pending (`/payments/pending/$creditId/edit`, `S:90`) — an open credit nothing has settled. */
 export interface CreditEditDrawerProps extends CreditDrawerBaseProps {
   mode: 'edit';
   credit: CreditRow;
@@ -83,17 +97,19 @@ function useFormValues(form: UseFormReturn<CreditFormValues>): CreditFormValues 
   return { ...form.getValues(), ...watched } as CreditFormValues;
 }
 
-/** Who may save here: Create for a new credit, Edit (and Delete) for an open one. */
-function useDrawerAccess(props: CreditDrawerProps) {
-  const access = useClinicAccess();
+/**
+ * Who may save here: `payment:create` for a new credit, `payment:update` for an open one (and
+ * `payment:delete` for its Delete) — while nothing of it is settled; part settled meanwhile
+ * (`locked`) turns the drawer view only.
+ */
+function useDrawerAccess(props: CreditDrawerProps, locked: boolean) {
+  const access = usePaymentAccess();
   const editing = props.mode === 'edit';
   const readOnly =
-    (props.mode === 'edit' && props.readOnly === true) ||
-    (access.isResolved && !access.can('payments', editing ? 'edit' : 'create'));
-  return {
-    readOnly,
-    canDelete: editing && !readOnly && access.can('payments', 'delete'),
-  };
+    locked ||
+    (editing && props.readOnly === true) ||
+    (access.resolved && !(editing ? access.canEdit : access.canCreate));
+  return { readOnly, canDelete: editing && !readOnly && access.canDelete };
 }
 
 /** A problem's toast: "Pick who", "Enter the amount", "Pick a reason", "Add a note for “Other”". */
@@ -128,7 +144,7 @@ function useSteps({
   bodies,
 }: {
   values: CreditFormValues;
-  invoices: readonly OpenInvoice[] | null;
+  invoices: readonly InvoiceRecord[] | null;
   settleByLabel: string | undefined;
   bodies: Record<CreditStepId, ReactNode>;
 }): DrawerStep[] {
@@ -203,26 +219,43 @@ function useSteps({
 }
 
 /**
- * The save: who, an amount, a reason and "Other"'s note first, then the write,
- * its toast and the close — "CR-3 saved · give ₹500 to Tanvi Shah", "CR-1
- * updated".
+ * The save: who, an amount, a reason and "Other"'s note first, then the write — a change sends
+ * only what differs, with the read's `updated_at` — its toast and the close: "CR-3 saved · give
+ * ₹500 to Tanvi Shah", "CR-1 updated". A save over a newer change (`409 record_changed`) offers
+ * Reload; part of it settled meanwhile (`409 credit_settled`) turns the drawer view only.
  */
 function useCreditSave({
   form,
   credit,
   onStep,
+  onStale,
+  onLocked,
   onClose,
 }: {
   form: UseFormReturn<CreditFormValues>;
   credit: CreditRow | null;
   onStep: (stepId: CreditStepId) => void;
+  onStale: () => void;
+  onLocked: () => void;
   onClose: () => void;
 }) {
   const { t } = useTranslation(PAYMENTS_NS);
-  const formatPaise = usePaiseFormat();
+  const formatRupees = useRupeeFormat();
   const create = useCreateCredit({ notifyOnError: false });
   const update = useUpdateCredit({ notifyOnError: false });
-  return useDrawerSave<CreditFormValues, PendingCreditRecord>({
+  const onConflict = (error: HttpError) => {
+    if (credit && apiErrorReason(error) === 'credit_settled') {
+      onLocked();
+      notify.error(
+        t(PAYMENTS_KEYS.pending.conflicts.settled, {
+          ref: displayId.pendingCredit(credit.seq),
+        }),
+      );
+      return;
+    }
+    notify.error(mapApiError(error));
+  };
+  return useDrawerSave<CreditFormValues, CreditRow>({
     form,
     fieldOrder: [
       'direction',
@@ -233,7 +266,7 @@ function useCreditSave({
       'settleBy',
       'note',
     ],
-    serverFields: { partyName: 'party', patientId: 'party' },
+    serverFields: SERVER_FIELDS,
     toastId: 'credit-save-failed',
     check: (current) => {
       const problem = creditProblem(current);
@@ -241,15 +274,15 @@ function useCreditSave({
         ? { fields: [problem.field], message: problemMessage(problem, t) }
         : null;
     },
+    onConflict,
+    onStale: credit ? onStale : undefined,
     onField: (name) =>
       onStep(
         name === 'party' || name === 'amount' || name === 'direction' ? 'way' : 'why',
       ),
     write: () => {
       const input = creditInputOf(form.getValues());
-      return credit
-        ? update.mutateAsync({ id: credit.id, input })
-        : create.mutateAsync(input);
+      return credit ? update.mutateAsync({ credit, input }) : create.mutateAsync(input);
     },
     onDone: (saved) => {
       const ref = displayId.pendingCredit(saved.seq);
@@ -258,7 +291,7 @@ function useCreditSave({
           ? t(K.updated, { ref })
           : t(K.saved[saved.direction], {
               ref,
-              amount: formatPaise(saved.amount),
+              amount: formatRupees(saved.amount),
               name: saved.partyName,
             }),
       );
@@ -278,21 +311,32 @@ function CreditSession({
   const { t } = useTranslation(PAYMENTS_NS);
   const idPrefix = `credit-${useId().replace(/:/g, '')}`;
   const [today] = useState(() => clinicToday());
-  const credit = props.mode === 'edit' ? props.credit : null;
-  const { readOnly, canDelete } = useDrawerAccess(props);
+  const [locked, setLocked] = useState(false);
+  const { readOnly, canDelete } = useDrawerAccess(props, locked);
 
   const form = useForm<CreditFormValues>({ defaultValues: start });
+  const { record: credit, reload } = useEditingRecord({
+    record: props.mode === 'edit' ? props.credit : null,
+    form,
+    formOf: creditFormOf,
+    read: (record, organizationId) => ({
+      queryKey: creditQueryKeys.detail(organizationId, record.id),
+      queryFn: () => fetchCredit(record.id),
+    }),
+  });
   const values = useFormValues(form);
   const { isDirty } = useFormState({ control: form.control });
   const [openStep, setOpenStep] = useState<string>('way');
   const [deleting, setDeleting] = useState(false);
-  const patientInvoices = usePatientInvoices(values.party?.patientId ?? null);
-  const invoices = values.party?.patientId ? (patientInvoices.data ?? null) : null;
+  const contactInvoices = useContactInvoices(values.party?.contactId ?? null);
+  const invoices = values.party?.contactId ? (contactInvoices.data ?? null) : null;
   const dayLabel = useDayLabel();
   const { saveState, save } = useCreditSave({
     form,
     credit,
     onStep: setOpenStep,
+    onStale: () => void reload(),
+    onLocked: () => setLocked(true),
     onClose: props.onClose,
   });
   const summary = useSummary(values);
@@ -372,13 +416,16 @@ function CreditSession({
 
 /**
  * Add pending / Edit pending (KICKOFF §6.9; `payments.md:152–168, 240–252`;
- * H:4022–4034) on the shared record drawer, 680px, stacked, in two steps:
- * "Which way" — Give / Take, Who, Amount — and "Why" — the way's Reason
- * chips, For invoice (a patient with invoices), Settle by (a task falls due
- * then), Note (required for "Other"). The drawer takes the way's tone. Save
- * checks who, an amount, a reason and "Other"'s note, in that order: "CR-3
- * saved · give ₹500 to Tanvi Shah", or for an open credit "CR-1 updated", with
- * Delete beside it.
+ * H:4022–4034) on clinozy-be (`POST` / `PATCH /app/pending-credits`) and the
+ * shared record drawer, 680px, stacked, in two steps: "Which way" — Give /
+ * Take, Who (the clinic's people, then its stock vendors and Medical
+ * suppliers, or a typed name), Amount — and "Why" — the way's Reason chips,
+ * For invoice (a person with invoices), Settle by (a task falls due then),
+ * Note (required for "Other"). The drawer takes the way's tone. Save checks
+ * who, an amount, a reason and "Other"'s note, in that order: "CR-3 saved ·
+ * give ₹500 to Tanvi Shah", or for an open credit — only what changed —
+ * "CR-1 updated", with Delete beside it. A save over a newer change offers
+ * Reload, which reads the credit again and starts the form over on it.
  */
 export function CreditDrawer(props: CreditDrawerProps) {
   const { session } = useDrawerSession(props.open);

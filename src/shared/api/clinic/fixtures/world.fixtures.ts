@@ -29,8 +29,6 @@ import type {
   Supplier,
   Treatment,
 } from '@/shared/api/clinic/clinic-schema.ts';
-import type { PendingCreditRecord } from '@/shared/api/clinic/credits-contracts.ts';
-import type { DayCloseRecord } from '@/shared/api/clinic/day-close-contracts.ts';
 import type { LeadRecord } from '@/shared/api/clinic/leads-fixture-contracts.ts';
 import type { MedicineRecord } from '@/shared/api/clinic/medicines-contracts.ts';
 import type {
@@ -38,8 +36,12 @@ import type {
   OfferRecord,
 } from '@/shared/api/clinic/offerings-fixture-contracts.ts';
 import type { PatientRecord } from '@/shared/api/clinic/patients-fixture-contracts.ts';
-import type { PaymentRecord } from '@/shared/api/clinic/payments-contracts.ts';
-import type { TaskRecord } from '@/shared/api/clinic/tasks-contracts.ts';
+import type {
+  DayCloseRecord,
+  PaymentRecord,
+  PendingCreditRecord,
+} from '@/shared/api/clinic/payments-fixture-contracts.ts';
+import type { TaskRecord } from '@/shared/api/clinic/tasks-fixture-contracts.ts';
 import type { StaffProfile } from '@/shared/api/clinic/users-contracts.ts';
 
 import { appointmentSeed } from './appointments.fixtures.ts';
@@ -183,7 +185,7 @@ export const clinicFixtures = {
     resource: 'Invoice',
     seed: () => invoiceSeed(),
   }),
-  // Entries carry the plan's reference, edit log and bill photos — see payments-contracts.ts.
+  // Entries carry the plan's reference, edit log and bill photos — see payments-fixture-contracts.ts.
   payments: createFixtureCollection<PaymentRecord>({
     resource: 'Payment',
     seed: () => paymentSeed(),
@@ -192,12 +194,12 @@ export const clinicFixtures = {
     resource: 'Credit note',
     seed: () => creditNoteSeed(),
   }),
-  // Credits carry the plan's reason chip, note, invoice and settle-by day — see credits-contracts.ts.
+  // Credits carry the plan's reason chip, note, invoice and settle-by day — see payments-fixture-contracts.ts.
   pendingCredits: createFixtureCollection<PendingCreditRecord>({
     resource: 'Pending credit',
     seed: () => pendingCreditSeed(),
   }),
-  // Closes carry the plan's recount, acceptor and review ticks — see day-close-contracts.ts.
+  // Closes carry the plan's recount, acceptor and review ticks — see payments-fixture-contracts.ts.
   dayCloses: createFixtureCollection<DayCloseRecord>({
     resource: 'Day close',
     seed: () => dayCloseSeed(),

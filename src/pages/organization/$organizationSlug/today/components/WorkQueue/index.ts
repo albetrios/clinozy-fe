@@ -1,1 +1,1 @@
-export { WorkQueue, type WorkQueueProps } from './WorkQueue.tsx';
+export { WorkQueue, type WorkQueueProps, type WorkQueueTeam } from './WorkQueue.tsx';

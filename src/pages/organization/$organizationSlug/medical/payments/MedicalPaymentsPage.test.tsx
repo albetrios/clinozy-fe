@@ -9,7 +9,10 @@ import {
 } from '@/shared/api/clinic/fixtures/organization.fixtures.ts';
 import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import { listLedger, payExpense } from '@/shared/api/clinic/payments-api.ts';
+import {
+  listFixtureLedger,
+  payFixtureExpense,
+} from '@/shared/api/clinic/payments-fixture-api.ts';
 
 import {
   renderMedicalRoutes,
@@ -53,7 +56,7 @@ afterEach(() => {
 
 describe('MedicalPaymentsPage', () => {
   it('is the ledger limited to Medical under the Medical toolbar, its New sale primary', async () => {
-    const medical = (await listLedger({ scope: 'medical' })).items;
+    const medical = (await listFixtureLedger({ scope: 'medical' })).items;
     const { container } = renderMedicalRoutes(ROOM, { payments: MedicalPaymentsPage });
     expect(await screen.findByTestId('medical-payments-new')).toHaveTextContent(
       'New sale',
@@ -88,8 +91,8 @@ describe('MedicalPaymentsPage', () => {
 
   it('a closed day’s entry answers with its lock', async () => {
     const user = setup();
-    const locked = (await listLedger({ scope: 'medical' })).items.find(
-      (row) => row.locked,
+    const locked = (await listFixtureLedger({ scope: 'medical' })).items.find(
+      (row) => row.isSettled,
     );
     if (!locked) throw new Error('expected a closed day’s Medical entry in the seed');
     renderMedicalRoutes(ROOM, { payments: MedicalPaymentsPage });
@@ -106,7 +109,7 @@ describe('MedicalPaymentsPage', () => {
   });
 
   it('the What filter narrows the list to money out: a Medical PO paid through Send payment', async () => {
-    await payExpense({
+    await payFixtureExpense({
       branchId: branchRef(MAIN_BRANCH),
       billRef: { kind: 'medical_po', purchaseId: ref.purchaseOrder(431), billNo: '1631' },
       payeeName: 'Shree Ramdev Medical Agency',
@@ -115,7 +118,6 @@ describe('MedicalPaymentsPage', () => {
       mode: 'upi',
       paidOn: '2026-10-03',
       note: null,
-      attachmentKeys: [],
     });
     renderMedicalRoutes(`${ROOM}?kind=expense`, { payments: MedicalPaymentsPage });
     await waitFor(() =>

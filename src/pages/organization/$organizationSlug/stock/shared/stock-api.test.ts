@@ -27,6 +27,7 @@ import {
 import {
   fetchAllStockItems,
   fetchAllStockVendors,
+  fetchOldestOpenStockPurchase,
   fetchStockItem,
   fetchStockPurchase,
   fetchStockVendor,
@@ -311,6 +312,24 @@ describe('purchases', () => {
       seq: 16,
       vendor: { name: 'Ankur Pharma' },
     });
+  });
+
+  it('reads a vendor’s oldest open bill in one row — none when nothing is owed', async () => {
+    answer({ '/app/stock-purchases': () => page([stockPurchaseWire()]) });
+    expect(await fetchOldestOpenStockPurchase(TEST_STOCK_VENDOR_ID)).toMatchObject({
+      id: TEST_STOCK_PURCHASE_ID,
+      due: 1500,
+    });
+    expect(queryOf('/app/stock-purchases')).toEqual({
+      stock_vendor_id: TEST_STOCK_VENDOR_ID,
+      payment_status: 'unpaid,partial',
+      sort: 'purchase_date',
+      order: 'asc',
+      limit: 1,
+    });
+
+    answer({ '/app/stock-purchases': () => page([]) });
+    expect(await fetchOldestOpenStockPurchase(TEST_STOCK_VENDOR_ID)).toBeNull();
   });
 });
 

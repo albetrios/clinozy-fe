@@ -1116,8 +1116,7 @@
     "placeholder": "患者を検索",
     "hint": "選べるのは患者のみ",
     "due": "未払い {{amount}}",
-    "nothingDue": "未払いなし",
-    "lead": "リード {{id}} · まだ患者ではありません"
+    "nothingDue": "未払いなし"
   },
   "splitRows": {
     "mode": "方法",
@@ -1149,8 +1148,17 @@
     "enterAmount": "金額を入力してください",
     "moreThanOwed": "未精算の {{amount}} を超えています",
     "done": {
-      "give": "{{name}} に {{amount}} を返金 · 出金を追加しました",
-      "take": "{{name}} から {{amount}} を回収 · 入金を追加しました"
+      "give": "{{name}} に {{amount}} を返金 · {{entry}}",
+      "take": "{{name}} から {{amount}} を回収 · {{entry}}"
+    },
+    "branch": "店舗",
+    "date": "日付",
+    "dayClosed": "この店舗ではその日は日締め済みです · 締めていない日を選んでください",
+    "moreThanPaid": "請求書の支払済み額を超えています",
+    "closed": "{{ref}} は精算済みです",
+    "entry": {
+      "give": "出金を追加しました",
+      "take": "入金を追加しました"
     }
   },
   "quickLine": {
@@ -1218,7 +1226,8 @@
       "quickFill": "クイック入力",
       "paidNow": "今回の支払い",
       "remark": "備考",
-      "remarkPlaceholder": "印刷した請求書に表示されます"
+      "remarkPlaceholder": "印刷した請求書に表示されます",
+      "paid": "これまでの支払い"
     },
     "customerGroups": {
       "patient": "患者",
@@ -1258,9 +1267,11 @@
       "inStock": "在庫 {{count}}",
       "outOfStock": "在庫切れ",
       "belowFloor": "{{name}} の最低価格 {{amount}} を下回っています",
-      "tooMuchDiscount": "{{name}} の割引が大きすぎます · 管理者に確認してください",
       "newMedicineName": "新しい医薬品名",
-      "medicineAdded": "{{name}} を追加しました · 希望小売価格は後で在庫で設定"
+      "medicineAdded": "{{name}} を追加しました · 希望小売価格は後で在庫で設定",
+      "hintInvoice": "2 = 数量 · 10% = 割引",
+      "belowLowest": "{{name}} の最低価格を下回っています",
+      "offerApplied": "適用中のオファー：{{offer}}"
     },
     "payment": {
       "full": "全額 · {{mode}} で {{amount}}",
@@ -1277,7 +1288,12 @@
       "discountGst": "割引 + GST",
       "discountGstValue": "{{discount}} · +{{gst}}",
       "bill": "請求額",
-      "dueAfter": "この後の未払い"
+      "dueAfter": "この後の未払い",
+      "preview": "保存される内容で計算した金額",
+      "pending": "金額を計算中…",
+      "refused": "計算できません · 印の付いた行を修正してください",
+      "failed": "この請求書の金額を計算できませんでした",
+      "retry": "再試行"
     },
     "badges": {
       "bill": "請求額 {{amount}}",
@@ -1311,7 +1327,7 @@
       "paidAboveBill": "支払額 {{paid}} が請求額 {{bill}} を超えています",
       "stock": "{{name}} の在庫は {{count}} のみです",
       "belowFloor": "{{name}} が最低価格 {{amount}} を下回っています · 最終価格を上げてください",
-      "tooMuchDiscount": "{{name}} の割引が許可を超えています · 最終価格を上げるか管理者に確認してください"
+      "belowLowest": "{{name}} が最低価格を下回っています · 最終価格を上げてください"
     },
     "toasts": {
       "created": {
@@ -1334,7 +1350,22 @@
       "medical": "医薬品の請求書 #{{seq}}",
       "consultation": "診察の請求書 #{{seq}}"
     },
-    "record": "請求書"
+    "record": "請求書",
+    "refusals": {
+      "moreThanDue": "今回の支払いが請求額を超えています",
+      "dayClosed": "その日は締め済みです · 支払いを追加できません",
+      "settled": "この請求書は確定済みです · 支払いの一つが締め済みの日にあります",
+      "belowPaid": "請求額を支払済みの金額より下げることはできません",
+      "offeringInUse": "このパッケージのセッションは使用済みです · 行を残してください",
+      "treatmentBilled": "この請求書の施術が別の請求書で請求済みです · 削除して保存し直してください",
+      "ofSale": "この請求書は医薬品販売のものです · 医薬品から変更してください",
+      "paid": "この請求書には支払いまたはクレジットノートがあります · 削除できません",
+      "inUseDelete": "このパッケージのセッションは使用済みです · 請求書は削除できません"
+    },
+    "notices": {
+      "settled": "確定済み · この請求書の支払いが締め済みの日にあるため変更できません",
+      "sale": "医薬品販売の請求書 · 医薬品から変更してください"
+    }
   },
   "printPreview": {
     "title": "印刷プレビュー · {{title}}",

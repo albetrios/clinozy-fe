@@ -1,76 +1,80 @@
 import { describe, expect, it } from 'vitest';
 
+import type { DayCloseView } from '@/shared/api/clinic/day-close-contracts.ts';
 import type { LedgerPerson } from '@/shared/api/clinic/payments-contracts.ts';
 
 import {
-  cashDifference,
+  countDifference,
+  countNeedsReason,
   dayCloseBranchId,
   dayLog,
   dayStatus,
   differenceText,
   differenceTone,
-  netText,
-  typedPaise,
+  typedRupees,
 } from './day-close-view.ts';
 
-const rupees = (paise: number) => `₹${(paise / 100).toLocaleString('en-IN')}`;
-const RIYA: LedgerPerson = {
-  id: '00000000-0000-4000-8000-000000000001',
-  name: 'Riya Shah',
-  initials: 'RS',
-  tone: 'blush',
+const rupees = (value: number) => `₹${value.toLocaleString('en-IN')}`;
+const NISHA: LedgerPerson = {
+  id: 'mem_yls33gz5jj66ful8q4ads',
+  name: 'Nisha Shah',
+  initials: 'NS',
+  tone: 'sage',
 };
 
 describe('the drawer’s difference (H:5124)', () => {
-  it('is none before a count, else counted less expected', () => {
-    expect(cashDifference(null, 174_000)).toBeNull();
-    expect(cashDifference(170_000, 174_000)).toBe(-4000);
+  it('previews the count against the server’s expected cash, in paise', () => {
+    expect(countDifference(null, 1740)).toBeNull();
+    expect(countDifference(1700, null)).toBeNull();
+    expect(countDifference(1700, 1740)).toBe(-40);
+    expect(countDifference(0.3, 0.1 + 0.2)).toBe(0);
+    expect(countDifference(0, -120)).toBe(120);
+  });
+
+  it('asks why only when the count is off', () => {
+    expect(countNeedsReason(null, 300)).toBe(false);
+    expect(countNeedsReason(300, 300)).toBe(false);
+    expect(countNeedsReason(280, 300)).toBe(true);
   });
 
   it('paints none muted, a match sage and a gap blush', () => {
     expect(differenceTone(null)).toBe('none');
     expect(differenceTone(0)).toBe('match');
-    expect(differenceTone(-4000)).toBe('gap');
-    expect(differenceTone(1000)).toBe('gap');
+    expect(differenceTone(-40)).toBe('gap');
+    expect(differenceTone(10)).toBe('gap');
   });
 
   it('writes "—", "₹0", "+₹10" and "−₹40"', () => {
     expect(differenceText(null, rupees)).toBe('—');
     expect(differenceText(0, rupees)).toBe('₹0');
-    expect(differenceText(1000, rupees)).toBe('+₹10');
-    expect(differenceText(-4000, rupees)).toBe('−₹40');
-  });
-
-  it('nets a mode with a minus only (H:5110)', () => {
-    expect(netText(-26_000, rupees)).toBe('−₹260');
-    expect(netText(60_000, rupees)).toBe('₹600');
-    expect(netText(0, rupees)).toBe('₹0');
+    expect(differenceText(10, rupees)).toBe('+₹10');
+    expect(differenceText(-40, rupees)).toBe('−₹40');
   });
 });
 
 describe('dayCloseBranchId (Q-G6)', () => {
   const branches = [
-    { id: 'main', isMain: true },
-    { id: 'vesu', isMain: false },
-    { id: 'adajan', isMain: false },
+    { id: 'brn_main', isMain: true },
+    { id: 'brn_vesu', isMain: false },
+    { id: 'brn_adajan', isMain: false },
   ];
-  it('takes the URL’s open branch, else the header’s one branch', () => {
+  it('takes the URL’s branch, else the header’s one branch', () => {
     expect(
       dayCloseBranchId({
         branches,
         branchFilter: [],
         ownBranchIds: [],
-        requested: 'vesu',
+        requested: 'brn_vesu',
       }),
-    ).toBe('vesu');
+    ).toBe('brn_vesu');
     expect(
       dayCloseBranchId({
         branches,
-        branchFilter: ['adajan'],
-        ownBranchIds: ['vesu'],
-        requested: 'closed-branch',
+        branchFilter: ['brn_adajan'],
+        ownBranchIds: ['brn_vesu'],
+        requested: 'brn_gone',
       }),
-    ).toBe('adajan');
+    ).toBe('brn_adajan');
   });
 
   it('on "All branches", the member’s own branch, else the main one', () => {
@@ -78,27 +82,27 @@ describe('dayCloseBranchId (Q-G6)', () => {
       dayCloseBranchId({
         branches,
         branchFilter: [],
-        ownBranchIds: ['gone', 'vesu'],
+        ownBranchIds: ['brn_gone', 'brn_vesu'],
         requested: undefined,
       }),
-    ).toBe('vesu');
+    ).toBe('brn_vesu');
     expect(
       dayCloseBranchId({
         branches,
-        branchFilter: ['vesu', 'adajan'],
+        branchFilter: ['brn_vesu', 'brn_adajan'],
         ownBranchIds: [],
         requested: undefined,
       }),
-    ).toBe('main');
+    ).toBe('brn_main');
   });
 });
 
 describe('dayStatus (H:5112)', () => {
   const base = { closedBy: null, autoClosed: false, autoClosesInHours: null };
-  it('names who closed it, or "Force-closed" when the job did — sage', () => {
-    expect(dayStatus({ ...base, state: 'closed', closedBy: RIYA })).toEqual({
+  it('names who closed it, or "Force-closed" when the worker did — sage', () => {
+    expect(dayStatus({ ...base, state: 'closed', closedBy: NISHA })).toEqual({
       kind: 'closedBy',
-      name: 'Riya Shah',
+      name: 'Nisha Shah',
       tone: 'sage',
     });
     expect(dayStatus({ ...base, state: 'closed', autoClosed: true })).toEqual({
@@ -121,44 +125,73 @@ describe('dayStatus (H:5112)', () => {
   });
 });
 
-describe('dayLog (H:5121)', () => {
-  const closed = {
-    openingAcceptedAt: '2026-10-03T03:42:00.000Z',
-    acceptedBy: RIYA,
-    checkedIds: ['a', 'b'],
-    countedCash: 170_000,
-    closedAt: '2026-10-03T14:12:00.000Z',
-    closedBy: RIYA,
-    autoClosed: false,
-  };
-  it('runs accepted → reviewed → counted → closed', () => {
-    expect(dayLog(closed).map((row) => [row.id, row.tone, row.at])).toEqual([
-      ['accepted', 'sky', closed.openingAcceptedAt],
-      ['reviewed', 'lav', null],
-      ['counted', 'butter', closed.closedAt],
-      ['closed', 'sage', closed.closedAt],
+describe('dayLog (H:5121) — the server’s events by kind', () => {
+  type Event = DayCloseView['events'][number];
+  const event = (id: string, kind: Event['kind'], patch: Partial<Event> = {}): Event => ({
+    id,
+    kind,
+    text: 'English from the server',
+    membershipId: NISHA.id,
+    at: '2026-10-09T04:00:00.000Z',
+    by: NISHA,
+    ...patch,
+  });
+  const carried = { cash: 0, source: 'carried' as const, from: null };
+
+  it('words the opening, a close a reopen undid, the reopen’s reason and the standing close', () => {
+    const rows = dayLog({
+      state: 'closed',
+      opening: carried,
+      events: [
+        event('a', 'opened'),
+        event('b', 'closed'),
+        event('c', 'reopened', { text: 'Counted wrong' }),
+        event('d', 'closed'),
+      ],
+    });
+    expect(rows.map((row) => [row.id, row.kind, row.tone, row.reason])).toEqual([
+      ['a', 'accepted', 'sky', null],
+      ['b', 'closed', 'sage', null],
+      ['c', 'reopened', 'butter', 'Counted wrong'],
+      ['d', 'counted', 'sage', null],
     ]);
+    expect(rows[0]?.person).toBe(NISHA);
   });
 
-  it('for a day the job closed, only the close — no count of its own', () => {
-    const auto = dayLog({
-      ...closed,
-      openingAcceptedAt: null,
-      acceptedBy: null,
-      checkedIds: [],
-      closedBy: null,
-      autoClosed: true,
+  it('reads a recounted opening as opened, then recounted', () => {
+    const rows = dayLog({
+      state: 'open',
+      opening: { ...carried, source: 'recounted' },
+      events: [event('a', 'opened'), event('b', 'recounted')],
     });
-    expect(auto.map((row) => row.id)).toEqual(['closed']);
-    expect(auto[0]?.person).toBeNull();
+    expect(rows.map((row) => row.kind)).toEqual(['opened', 'recounted']);
+  });
+
+  it('leaves an open day’s last close without a count, and keeps the worker’s steps no one’s', () => {
+    const open = dayLog({
+      state: 'open',
+      opening: carried,
+      events: [event('a', 'opened'), event('b', 'closed'), event('c', 'reopened')],
+    });
+    expect(open.map((row) => row.kind)).toEqual(['accepted', 'closed', 'reopened']);
+
+    const auto = dayLog({
+      state: 'closed',
+      opening: carried,
+      events: [event('a', 'auto_closed', { membershipId: null, by: null })],
+    });
+    expect(auto).toEqual([
+      expect.objectContaining({ kind: 'auto', byMember: false, person: null }),
+    ]);
   });
 });
 
-describe('typedPaise', () => {
-  it('reads typed rupees as paise, nothing while empty', () => {
-    expect(typedPaise('')).toBeNull();
-    expect(typedPaise('  ')).toBeNull();
-    expect(typedPaise('1700')).toBe(170_000);
-    expect(typedPaise('12.5')).toBe(1250);
+describe('typedRupees', () => {
+  it('reads typed rupees, nothing while empty', () => {
+    expect(typedRupees('')).toBeNull();
+    expect(typedRupees('  ')).toBeNull();
+    expect(typedRupees('1700')).toBe(1700);
+    expect(typedRupees('12.5')).toBe(12.5);
+    expect(typedRupees('0.07')).toBeCloseTo(0.07, 2);
   });
 });

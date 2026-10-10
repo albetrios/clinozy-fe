@@ -1,21 +1,14 @@
 import type { FieldPath, PathValue, UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import {
-  MANUAL_TASK_TYPES,
-  TASK_PRIORITIES,
-  TASK_REMIND_MINUTES,
-  TASK_TITLE_MAX,
-  TASK_WHY_MAX,
-} from '@/shared/api/clinic/tasks-contracts.ts';
-import type { StaffProfile } from '@/shared/api/clinic/users-contracts.ts';
+import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
+import { TASK_TITLE_MAX, TASK_WHY_MAX } from '@/shared/api/clinic/tasks-contracts.ts';
 import {
   DrawerChips,
   DrawerField,
   DrawerFieldGrid,
   DrawerInput,
   DrawerTextarea,
-  DrawerToggle,
   useDrawerFieldIds,
 } from '@/shared/components/DrawerField/index.ts';
 import { DatePicker } from '@/shared/components/Picker/DatePicker/index.ts';
@@ -25,10 +18,11 @@ import { TimePicker } from '@/shared/components/Picker/TimePicker/index.ts';
 import { TASKS_KEYS, TASKS_NS, TASKS_TEST_IDS } from '../../tasks.constants.ts';
 import {
   NEW_TASK_DUE_PRESETS,
+  NEW_TASK_PRIORITIES,
   type NewTaskForm,
-  type NewTaskPerson,
   withDuePreset,
 } from './new-task-form.ts';
+import type { NewTaskPerson } from './new-task-person.ts';
 import { NewTaskPersonField } from './NewTaskPersonField.tsx';
 
 const K = TASKS_KEYS.newTask;
@@ -53,10 +47,9 @@ function setField<N extends FieldPath<NewTaskForm>>(
   form.clearErrors(name);
 }
 
-/** "What needs doing": For, Type, Title. */
+/** "What needs doing": For (optional — a task may be about no one) and Title. */
 export function NewTaskWhatFields({
   form,
-  values,
   idPrefix,
   person,
 }: NewTaskFieldsProps & {
@@ -72,7 +65,6 @@ export function NewTaskWhatFields({
       <DrawerField
         label={t(K.forField.label)}
         htmlFor={forField.id}
-        required
         error={forField.error}
       >
         <NewTaskPersonField
@@ -83,23 +75,10 @@ export function NewTaskWhatFields({
           testId={IDS.person}
         />
       </DrawerField>
-      <DrawerField label={t(K.type.label)}>
-        <DrawerChips
-          label={t(K.type.label)}
-          options={MANUAL_TASK_TYPES.map((type) => ({
-            value: type,
-            label: t(K.type[type]),
-          }))}
-          value={values.type}
-          onChange={(type) => {
-            if (type) setField(form, 'type', type);
-          }}
-          testId={IDS.type}
-        />
-      </DrawerField>
       <DrawerField
         label={t(K.titleField.label)}
         htmlFor={titleField.id}
+        required={!person}
         error={titleField.error}
       >
         <DrawerInput
@@ -114,24 +93,27 @@ export function NewTaskWhatFields({
   );
 }
 
-/** "When & who": the Due chips over the date and "Due time", then "Assign to". */
+/**
+ * "When & who": the Due chips over the date and "Due time" (a clinic day and time, sent as one
+ * instant), then "Assign to" — the team who can work tasks, then the role queues.
+ */
 export function NewTaskWhenFields({
   form,
   values,
   idPrefix,
-  ownerId,
+  owner,
   ownerOptions,
   today,
 }: NewTaskFieldsProps & {
-  /** The assignee — the one picked, else the default. */
-  ownerId: string | null;
-  ownerOptions: PickerOption<StaffProfile>[];
+  /** The assignee's key — the one picked, else the default. */
+  owner: string | null;
+  ownerOptions: PickerOption<DirectoryMember | null>[];
   today: string;
 }) {
   const { t } = useTranslation(TASKS_NS);
   const ids = useDrawerFieldIds(form, idPrefix);
   const dueField = ids('dueDate');
-  const ownerField = ids('ownerId');
+  const ownerField = ids('owner');
   return (
     <DrawerFieldGrid>
       <DrawerField label={t(K.due.label)} error={dueField.error}>
@@ -194,9 +176,9 @@ export function NewTaskWhenFields({
           id={ownerField.id}
           label={t(K.owner.label)}
           options={ownerOptions}
-          value={ownerId}
+          value={owner}
           onChange={(key) => {
-            if (key) setField(form, 'ownerId', key);
+            if (key) setField(form, 'owner', key);
           }}
           searchable
           invalid={Boolean(ownerField.error)}
@@ -207,34 +189,24 @@ export function NewTaskWhenFields({
   );
 }
 
-/** "How & notes": Normal · High beside "Remind 15 min before", then the notes. */
+/** "How & notes": Normal · High, then the notes (the task's why line). */
 export function NewTaskHowFields({ form, values, idPrefix }: NewTaskFieldsProps) {
   const { t } = useTranslation(TASKS_NS);
   const notesField = useDrawerFieldIds(form, idPrefix)('notes');
-  const remind = t(K.remind, { minutes: TASK_REMIND_MINUTES });
   return (
     <div className="flex min-w-0 flex-col gap-(--form-gap)">
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-2.5">
-        <DrawerChips
-          label={t(K.priority.label)}
-          options={TASK_PRIORITIES.map((priority) => ({
-            value: priority,
-            label: t(K.priority[priority]),
-          }))}
-          value={values.priority}
-          onChange={(priority) => {
-            if (priority) setField(form, 'priority', priority);
-          }}
-          testId={IDS.priority}
-        />
-        <DrawerToggle
-          checked={values.remind}
-          onCheckedChange={(next) => setField(form, 'remind', next)}
-          onLabel={remind}
-          offLabel={remind}
-          data-testid={IDS.remind}
-        />
-      </div>
+      <DrawerChips
+        label={t(K.priority.label)}
+        options={NEW_TASK_PRIORITIES.map((priority) => ({
+          value: priority,
+          label: t(K.priority[priority]),
+        }))}
+        value={values.priority}
+        onChange={(priority) => {
+          if (priority) setField(form, 'priority', priority);
+        }}
+        testId={IDS.priority}
+      />
       <DrawerField htmlFor={notesField.id} error={notesField.error}>
         <DrawerTextarea
           {...notesField.control}

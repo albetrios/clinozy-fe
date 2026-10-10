@@ -1,66 +1,83 @@
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type {
-  LeadContactHit,
-  LeadRecord,
-} from '@/shared/api/clinic/leads-fixture-contracts.ts';
-import type { PatientRow } from '@/shared/api/clinic/patients-fixture-contracts.ts';
+import type { ContactSummary } from '@/shared/api/clinic/contacts-contracts.ts';
+import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
+import type { ContactCardData } from '@/shared/components/PersonCard/index.ts';
 
 import { TASKS_KEYS, TASKS_NS } from '../../tasks.constants.ts';
-import type { NewTaskPerson } from './new-task-form.ts';
+import { taskPersonKind } from '../../tasks.display.ts';
 
-/** The person a contact-search hit names (New task's "For"). */
-export function personOfHit(hit: LeadContactHit): NewTaskPerson {
-  return {
-    kind: hit.kind,
-    id: hit.id,
-    name: hit.name,
-    seq: hit.seq,
-    contact: hit.kind === 'lead' && hit.contactThread,
-    ownerId: null,
-  };
+/**
+ * The person a New task is for — a contact (`con_…`), what the task points at — as a patient,
+ * a lead or a contact.
+ */
+export interface NewTaskPerson {
+  contactId: string;
+  name: string;
+  /** "Follow up · <first name>" when the Title is left empty. */
+  firstName: string;
+  kind: ContactCardData['kind'];
+  /** Their primary number, E.164. */
+  phone: string | null;
+  /** Their open lead — its owner is the task's default assignee (H:6056). */
+  openLeadId: string | null;
+  /** That lead's owner, when it was read with the person (`?lead=`); `undefined` until read. */
+  leadOwnerId?: string | null;
+  /**
+   * The lead the task points at (`lead_id`): the one New task was opened from, else a lead's own
+   * open lead — never a patient's, whose task a reassign would otherwise move the lead with
+   * (D81 TASKS-M3). The task takes the lead's branch.
+   */
+  leadId: string | null;
 }
 
-/** The person `?patient=` names. */
-export function personOfPatient(
-  patient: Pick<PatientRow, 'id' | 'firstName' | 'lastName' | 'seq'>,
+/** The first word of a name — a first name when the record has none apart. */
+const firstWordOf = (name: string) => name.trim().split(/\s+/)[0] ?? name;
+
+/** The person a contact-search hit — or the `?contact=` read — names. */
+export function personOfContact(
+  contact: Pick<
+    ContactSummary,
+    'id' | 'name' | 'firstName' | 'primaryPhone' | 'patientId' | 'openLeadId'
+  >,
 ): NewTaskPerson {
+  const kind = taskPersonKind(contact);
   return {
-    kind: 'patient',
-    id: patient.id,
-    name: [patient.firstName, patient.lastName].filter(Boolean).join(' '),
-    seq: patient.seq,
-    contact: false,
-    ownerId: null,
+    contactId: contact.id,
+    name: contact.name,
+    firstName: contact.firstName || firstWordOf(contact.name),
+    kind,
+    phone: contact.primaryPhone || null,
+    openLeadId: contact.openLeadId,
+    leadId: kind === 'lead' ? contact.openLeadId : null,
   };
 }
 
-/** The person `?lead=` names — with the lead's owner, the task's default assignee (H:6056). */
+/** The person `?lead=` names — the task points at that lead, whatever its status. */
 export function personOfLead(
-  lead: Pick<LeadRecord, 'id' | 'name' | 'seq' | 'ownerId' | 'isContactThread'>,
+  lead: Pick<
+    LeadRecord,
+    'id' | 'contactId' | 'name' | 'person' | 'phone' | 'patientId' | 'ownerId'
+  >,
 ): NewTaskPerson {
   return {
-    kind: 'lead',
-    id: lead.id,
+    contactId: lead.contactId,
     name: lead.name,
-    seq: lead.seq,
-    contact: lead.isContactThread,
-    ownerId: lead.ownerId,
+    firstName: lead.person?.firstName ?? firstWordOf(lead.name),
+    kind: lead.patientId ? 'patient' : 'lead',
+    phone: lead.phone,
+    openLeadId: lead.id,
+    leadOwnerId: lead.ownerId,
+    leadId: lead.id,
   };
 }
 
-/** "Patient #3508", "Lead #2363" — or, for a chat-only contact, just the name. */
-export function usePersonRecordLabel(): (person: NewTaskPerson) => string {
+/** "Patient", "Lead", "Contact" — what the person is to the clinic. */
+export function usePersonKindLabel(): (person: Pick<NewTaskPerson, 'kind'>) => string {
   const { t } = useTranslation(TASKS_NS);
   return useCallback(
-    (person: NewTaskPerson) => {
-      if (person.contact || person.seq === null) return person.name;
-      return person.kind === 'patient'
-        ? t(TASKS_KEYS.sources.patient, { id: displayId.patient(person.seq) })
-        : t(TASKS_KEYS.sources.lead, { id: displayId.lead(person.seq) });
-    },
+    (person: Pick<NewTaskPerson, 'kind'>) => t(TASKS_KEYS.sources[person.kind]),
     [t],
   );
 }

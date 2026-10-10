@@ -19,7 +19,7 @@ function task(
     id: string;
     status: 'open' | 'snoozed' | 'done';
     snoozeLabel: string | null;
-    resolvedBy: 'member' | 'clinozy' | null;
+    isResolvedAutomatically: boolean;
     resolvedAt: string | null;
   }> = {},
 ) {
@@ -28,7 +28,7 @@ function task(
     status: overrides.status ?? 'open',
     dueAt,
     snoozeLabel: overrides.snoozeLabel ?? null,
-    resolvedBy: overrides.resolvedBy ?? null,
+    isResolvedAutomatically: overrides.isResolvedAutomatically ?? false,
     resolvedAt: overrides.resolvedAt ?? null,
   } as const;
 }
@@ -119,7 +119,7 @@ describe('taskDueLabel (tasks.md:58, H:4219)', () => {
     ).toEqual({ kind: 'snoozed', label: '2 h · no answer' });
     expect(
       taskDueLabel(
-        task(minutesFromNow(-30), { status: 'done', resolvedBy: 'clinozy' }),
+        task(minutesFromNow(-30), { status: 'done', isResolvedAutomatically: true }),
         NOW,
       ),
     ).toEqual({ kind: 'doneByClinozy' });
@@ -128,7 +128,7 @@ describe('taskDueLabel (tasks.md:58, H:4219)', () => {
       taskDueLabel(
         task(minutesFromNow(-30), {
           status: 'done',
-          resolvedBy: 'member',
+          isResolvedAutomatically: false,
           resolvedAt: at,
         }),
         NOW,
@@ -157,7 +157,7 @@ describe('groupTasks (tasks.md:19, 30)', () => {
       task(minutesFromNow(-120), { id: 'later-late' }),
       task(minutesFromNow(5), { id: 'sooner' }),
     ];
-    const groups = groupTasks(rows, 'queue', NOW);
+    const groups = groupTasks(rows, 'open', NOW);
     expect(groups.map((group) => group.id)).toEqual(['overdue', 'today', 'later']);
     expect(groups.map((group) => group.rows.map((row) => row.id))).toEqual([
       ['later-late', 'late'],
@@ -168,9 +168,9 @@ describe('groupTasks (tasks.md:19, 30)', () => {
 
   it('leaves an empty To do group out, and nothing at all when To do is empty', () => {
     expect(
-      groupTasks([task(minutesFromNow(60))], 'queue', NOW).map((group) => group.id),
+      groupTasks([task(minutesFromNow(60))], 'open', NOW).map((group) => group.id),
     ).toEqual(['today']);
-    expect(groupTasks([], 'queue', NOW)).toEqual([]);
+    expect(groupTasks([], 'open', NOW)).toEqual([]);
   });
 
   it('keeps Snoozed and Done as one group each, even empty', () => {

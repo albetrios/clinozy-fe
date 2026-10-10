@@ -81,6 +81,8 @@ export interface ChatColumnProps {
   onBookAppointment?: (booking: { reason: string | null }) => void;
   /** A history chip was clicked: the host opens the appointment or the patient-file section. */
   onOpenHistory?: (target: ChatHistoryTarget) => void;
+  /** A message went out — the server took it (the task drawer reads its task again, D81 T7). */
+  onSent?: () => void;
   /** The header's contact card on hover (or a tap on touch): its data or loader and its actions. */
   contactCard?: Omit<
     ContactCardProps,
@@ -160,6 +162,7 @@ function ChatLoaded({
   maskMoney = false,
   onBookAppointment,
   onOpenHistory,
+  onSent,
 }: ChatConversationProps & { read: ChatThreadRead }) {
   const personKey = chatPersonKey(person);
   const tier = useViewportTier();
@@ -168,7 +171,7 @@ function ChatLoaded({
   const history = useContactHistory(person).data;
   const whatsappDown = useMessagingStatus(person).data?.whatsappDown ?? false;
   const outbox = useThreadOutbox(person);
-  const { send, retry } = useSendMessage(person, contact);
+  const { send, retry } = useSendMessage(person, contact, { onSent });
   const resend = useResendMessage(person);
 
   const options = composerModes(contact);

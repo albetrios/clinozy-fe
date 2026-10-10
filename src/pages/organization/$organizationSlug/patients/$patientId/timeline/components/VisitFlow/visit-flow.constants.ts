@@ -5,11 +5,16 @@ import type { VisitCheck } from '@/shared/api/clinic/visits-contracts.ts';
 export const VISIT_FLOW_NS = I18N_NAMESPACES.patientFile;
 
 /**
- * The steps, in their fixed order (`patient-file.md:394`). Invoice and "Collect & share" come
- * back with Payments on clinozy-be (the invoices and receipts are still the fixture world's,
- * D152); the WhatsApp share goes (§6 #26).
+ * The steps, in their fixed order (`patient-file.md:394`). Invoice and Collect are back on
+ * clinozy-be's Payments (D156); the WhatsApp share goes (§6 #26), so the last step collects.
  */
-export const VISIT_FLOW_STEPS = ['checks', 'rx', 'treatment'] as const;
+export const VISIT_FLOW_STEPS = [
+  'checks',
+  'rx',
+  'treatment',
+  'invoice',
+  'collect',
+] as const;
 /** One step. */
 export type VisitFlowStep = (typeof VISIT_FLOW_STEPS)[number];
 
@@ -30,10 +35,14 @@ export const VISIT_FLOW_KEYS = {
   packageUsed: 'visitFlow.packageUsed',
   followUp: 'visitFlow.followUp',
   loading: 'visitFlow.loading',
+  /** "₹ ••••" — an amount while the file is masked (Q-F4). */
+  masked: 'timeline.activity.masked',
   steps: {
     checks: 'visitFlow.steps.checks',
     rx: 'visitFlow.steps.rx',
     treatment: 'visitFlow.steps.treatment',
+    invoice: 'visitFlow.steps.invoice',
+    collect: 'visitFlow.steps.collect',
   } satisfies Record<VisitFlowStep, string>,
   checks: {
     labels: {
@@ -75,6 +84,27 @@ export const VISIT_FLOW_KEYS = {
     /** Toast: "Session 2 recorded with last settings". */
     repeated: 'visitFlow.treatment.repeated',
   },
+  invoice: {
+    create: 'visitFlow.invoice.create',
+    custom: 'visitFlow.invoice.custom',
+    /** Toast: "Nothing to bill" — the visit has no session to bill. */
+    nothing: 'visitFlow.invoice.nothing',
+    /** "2 items ready" (plural) — the visit's sessions still to bill. */
+    ready: 'visitFlow.invoice.ready',
+    covered: 'visitFlow.invoice.covered',
+    empty: 'visitFlow.invoice.empty',
+    /** "#7 · ₹1,533.41". */
+    done: 'visitFlow.invoice.done',
+  },
+  collect: {
+    /** "Collect ₹1,500" — Receive payment against the visit's invoice. */
+    action: 'visitFlow.collect.action',
+    /** "₹1,500 due". */
+    due: 'visitFlow.collect.due',
+    nothing: 'visitFlow.collect.nothing',
+    /** "Invoice the visit first". */
+    waiting: 'visitFlow.collect.waiting',
+  },
 } as const;
 
 /** The flow's test ids (`docs/reference/e2e-testids-inventory.md` › Patient file visit flow). */
@@ -91,4 +121,7 @@ export const VISIT_FLOW_TEST_IDS = {
   writeRx: 'visit-flow-write-rx',
   repeat: 'visit-flow-repeat',
   newTreatment: 'visit-flow-new-treatment',
+  createInvoice: 'visit-flow-create-invoice',
+  customInvoice: 'visit-flow-custom-invoice',
+  collect: 'visit-flow-collect',
 } as const;

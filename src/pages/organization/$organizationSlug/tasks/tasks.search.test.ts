@@ -1,23 +1,31 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  LISTED_TASK_RULES,
+  normalizeTaskListQuery,
   TASK_SCOPES,
   TASK_TABS,
+  TASK_TYPE_VALUES,
 } from '@/shared/api/clinic/tasks-contracts.ts';
 
 import {
   TASK_SCOPE_VALUES,
-  TASK_TYPE_VALUES,
+  TASK_TYPE_FILTER_VALUES,
   TASK_VIEWS,
   validateTasksSearch,
 } from './tasks.search.ts';
 
 describe('the contract’s values, declared for the entry chunk', () => {
-  it('match the contract’s views, scopes and the listed rules', () => {
+  it('match the contract’s views, scopes and types', () => {
     expect(TASK_VIEWS).toEqual(TASK_TABS);
     expect(TASK_SCOPE_VALUES).toEqual(TASK_SCOPES);
-    expect(TASK_TYPE_VALUES).toEqual(LISTED_TASK_RULES);
+    expect(TASK_TYPE_FILTER_VALUES).toEqual(TASK_TYPE_VALUES);
+  });
+
+  it('cut the search where the list query does', () => {
+    const long = 'x'.repeat(100);
+    expect(validateTasksSearch({ q: long }).q).toBe(
+      normalizeTaskListQuery({ q: long }).q,
+    );
   });
 });
 
@@ -27,13 +35,13 @@ describe('validateTasksSearch (S:95)', () => {
       validateTasksSearch({
         tab: 'snoozed',
         q: '  Priti ',
-        type: 'confirm,rebook',
+        type: 'confirm,by_hand',
         scope: 'everyone',
       }),
     ).toEqual({
       tab: 'snoozed',
       q: 'Priti',
-      type: ['confirm', 'rebook'],
+      type: ['confirm', 'by_hand'],
       scope: 'everyone',
     });
   });
@@ -43,13 +51,15 @@ describe('validateTasksSearch (S:95)', () => {
       validateTasksSearch({
         tab: 'archived',
         q: '   ',
-        type: ['payment', 'recall', 'nonsense'],
+        // The design's old rule ids are gone with the API's keys (route map §4 #22).
+        type: ['payment', 'recall', 'manual', 'follow'],
         scope: 'team',
       }),
     ).toEqual({ tab: undefined, q: undefined, type: undefined, scope: undefined });
   });
 
-  it('cuts the search to 80 characters (`tasks.md:66`)', () => {
-    expect(validateTasksSearch({ q: 'x'.repeat(100) }).q).toHaveLength(80);
+  it('reads the old To do id `queue` as To do — the default, out of the URL', () => {
+    expect(validateTasksSearch({ tab: 'queue' }).tab).toBeUndefined();
+    expect(validateTasksSearch({ tab: 'open' }).tab).toBe('open');
   });
 });

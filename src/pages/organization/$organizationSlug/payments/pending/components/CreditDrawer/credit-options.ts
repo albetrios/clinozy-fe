@@ -3,7 +3,7 @@ import type { TFunction } from 'i18next';
 import { isolateText } from '@/lib/bidi-isolate.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import type { CreditPartyRow } from '@/shared/api/clinic/credits-contracts.ts';
-import type { OpenInvoice } from '@/shared/api/clinic/payments-contracts.ts';
+import type { InvoiceRecord } from '@/shared/api/clinic/invoices-contracts.ts';
 import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
 import { personInitials } from '@/shared/components/Cells/index.ts';
 import type { PickerOption } from '@/shared/components/Picker/index.ts';
@@ -68,8 +68,13 @@ export function creditPartyOption(
   return { ...base, tone: 'stone' };
 }
 
-/** The picked party as the trigger shows it before its page has loaded. */
+/**
+ * The picked party as the trigger shows it before its page has loaded: a person on their avatar
+ * (a patient with the "P" badge), a supplier on a dot.
+ */
 export function pickedPartyOption(party: CreditParty): PickerOption<CreditPartyRow> {
+  if (party.contactId === null)
+    return { key: party.key, label: party.name, tone: 'stone' };
   return {
     key: party.key,
     label: party.name,
@@ -83,16 +88,21 @@ export function pickedPartyOption(party: CreditParty): PickerOption<CreditPartyR
 }
 
 /**
- * The For invoice picker (`payments.md:160`): "No invoice", then the patient's
+ * The For invoice picker (`payments.md:160`): "No invoice", then the person's
  * invoices newest first — "Invoice #772", "₹1,000 · ₹600 due" or "₹1,534 ·
- * paid", the day at the end.
+ * paid" (the server's total and due), the day at the end.
  */
-export function invoiceOptions(
-  invoices: readonly OpenInvoice[],
-  t: TFunction,
-  formatPaise: (paise: number) => string,
-  formatDay: (day: string) => string,
-): PickerOption[] {
+export function invoiceOptions({
+  invoices,
+  t,
+  formatRupees,
+  formatDay,
+}: {
+  invoices: readonly InvoiceRecord[];
+  t: TFunction;
+  formatRupees: (rupees: number) => string;
+  formatDay: (day: string) => string;
+}): PickerOption[] {
   return [
     { key: NO_INVOICE, label: t(K.noInvoice), tone: 'lav' },
     ...invoices.map((invoice): PickerOption => ({
@@ -101,10 +111,10 @@ export function invoiceOptions(
       sub:
         invoice.due > 0
           ? t(K.invoiceDue, {
-              bill: formatPaise(invoice.bill),
-              due: formatPaise(invoice.due),
+              bill: formatRupees(invoice.total),
+              due: formatRupees(invoice.due),
             })
-          : t(K.invoicePaid, { bill: formatPaise(invoice.bill) }),
+          : t(K.invoicePaid, { bill: formatRupees(invoice.total) }),
       meta: formatDay(invoice.date),
       tone: 'lav',
     })),

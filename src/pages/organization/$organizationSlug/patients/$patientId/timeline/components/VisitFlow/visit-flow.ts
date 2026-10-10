@@ -1,3 +1,4 @@
+import type { InvoiceRecord } from '@/shared/api/clinic/invoices-contracts.ts';
 import type { PatientPackageRow } from '@/shared/api/clinic/patient-packages-contracts.ts';
 import {
   TREATMENT_LIMITS,
@@ -38,6 +39,47 @@ export function stepStates(
     before = before && isDone;
   }
   return states;
+}
+
+/** What the visit has to bill, and the invoice that billed it (D156). */
+export interface VisitBill {
+  /**
+   * The visit's invoice: one of the visit's day whose lines bill a session recorded at it — the
+   * server links a session to the line that bills it (`patient_treatment_ids`, B28).
+   */
+  invoice: InvoiceRecord | null;
+  /** The visit's sessions still to bill: of an offering, on no package (`is_billed` false). */
+  toBill: TreatmentRecord[];
+  /** Every session the visit billed came out of a package bought before: nothing to bill. */
+  covered: boolean;
+}
+
+/**
+ * The visit's bill from its sessions (done at its booking) and the patient's invoices of its day:
+ * the invoice whose lines carry one of the sessions, the sessions still to bill, and whether a
+ * package covered them all.
+ */
+export function visitBill({
+  sessions,
+  invoices,
+}: {
+  sessions: readonly TreatmentRecord[];
+  invoices: readonly InvoiceRecord[];
+}): VisitBill {
+  const ids = new Set(sessions.map((session) => session.id));
+  const invoice =
+    invoices.find((candidate) =>
+      candidate.items.some((line) => line.treatmentIds.some((id) => ids.has(id))),
+    ) ?? null;
+  const toBill = sessions.filter((session) => session.isBilled === false);
+  return {
+    invoice,
+    toBill,
+    covered:
+      invoice === null &&
+      toBill.length === 0 &&
+      sessions.some((session) => session.isBilled === true),
+  };
 }
 
 /**

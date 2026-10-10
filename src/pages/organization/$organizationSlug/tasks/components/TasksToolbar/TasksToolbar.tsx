@@ -1,10 +1,9 @@
 import { useTranslation } from 'react-i18next';
 
 import type {
-  TaskRuleId,
-  TaskRuleSettings,
   TaskScope,
   TaskTab,
+  TaskType,
 } from '@/shared/api/clinic/tasks-contracts.ts';
 import { RoomToolbar, RoomViewTabs } from '@/shared/components/RoomToolbar/index.ts';
 
@@ -15,23 +14,24 @@ import {
   TASKS_TEST_IDS,
 } from '../../tasks.constants.ts';
 import { TASK_SCOPE_VALUES, TASK_VIEWS } from '../../tasks.search.ts';
-import { TaskRulesPopover } from '../TaskRulesPopover/index.ts';
+import {
+  TaskRulesPopover,
+  type TaskRulesPopoverProps,
+} from '../TaskRulesPopover/index.ts';
 import { TaskTypePicker } from '../TaskTypePicker/index.ts';
 
 /** Props for {@link TasksToolbar}. */
 export interface TasksToolbarProps {
   view: TaskTab;
   onViewChange: (view: TaskTab) => void;
-  /** The rules the list is filtered to (the URL's `type`). */
-  types: readonly TaskRuleId[];
-  onTypesChange: (types: TaskRuleId[]) => void;
+  /** The types the list is filtered to (the URL's `type`). */
+  types: readonly TaskType[];
+  onTypesChange: (types: TaskType[]) => void;
   scope: TaskScope;
   onScopeChange: (scope: TaskScope) => void;
-  ruleSettings: TaskRuleSettings | undefined;
-  /** Owner and Admin switch the rules; everyone else reads them. */
-  canEditRules: boolean;
-  onRuleChange: (rule: TaskRuleId, patch: { on?: boolean; handled?: boolean }) => void;
-  /** "New task" — absent without Create (the button and the phone pill hide). */
+  /** The Rules popover: the settings read, and its saves. */
+  rules: TaskRulesPopoverProps;
+  /** "New task" — absent without `task:create` (the button and the phone pill hide). */
   onNewTask?: () => void;
 }
 
@@ -52,9 +52,7 @@ export function TasksToolbar({
   onTypesChange,
   scope,
   onScopeChange,
-  ruleSettings,
-  canEditRules,
-  onRuleChange,
+  rules,
   onNewTask,
 }: TasksToolbarProps) {
   const { t } = useTranslation(TASKS_NS);
@@ -93,11 +91,7 @@ export function TasksToolbar({
               testIdPrefix={TASKS_TEST_IDS.scope}
             />
           </div>
-          <TaskRulesPopover
-            settings={ruleSettings}
-            canEdit={canEditRules}
-            onChange={onRuleChange}
-          />
+          <TaskRulesPopover {...rules} />
         </>
       }
       primary={

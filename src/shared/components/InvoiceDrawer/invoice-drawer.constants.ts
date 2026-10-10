@@ -48,6 +48,8 @@ export const INVOICE_DRAWER_KEYS = {
     overallDiscount: 'invoiceDrawer.fields.overallDiscount',
     quickFill: 'invoiceDrawer.fields.quickFill',
     paidNow: 'invoiceDrawer.fields.paidNow',
+    /** A saved invoice's money so far — its receipts are the ledger's (Receive payment). */
+    paid: 'invoiceDrawer.fields.paid',
     remark: 'invoiceDrawer.fields.remark',
     remarkPlaceholder: 'invoiceDrawer.fields.remarkPlaceholder',
   },
@@ -64,6 +66,8 @@ export const INVOICE_DRAWER_KEYS = {
     quickLine: 'invoiceDrawer.items.quickLine',
     quickLineMedical: 'invoiceDrawer.items.quickLineMedical',
     hint: 'invoiceDrawer.items.hint',
+    /** An invoice's quick line takes a quantity and a discount — the server prices the line. */
+    hintInvoice: 'invoiceDrawer.items.hintInvoice',
     oftenBilled: 'invoiceDrawer.items.oftenBilled',
     browse: {
       all: 'invoiceDrawer.items.browse.all',
@@ -89,9 +93,12 @@ export const INVOICE_DRAWER_KEYS = {
     sessions: 'invoiceDrawer.items.sessions',
     inStock: 'invoiceDrawer.items.inStock',
     outOfStock: 'invoiceDrawer.items.outOfStock',
-    /** The Final cell's tooltip below the floor (H:5059). */
+    /** The Final cell's tooltip under the lowest price, for a member who sees it (H:5059). */
     belowFloor: 'invoiceDrawer.items.belowFloor',
-    tooMuchDiscount: 'invoiceDrawer.items.tooMuchDiscount',
+    /** The same, for a member who may not see the lowest price (`offering:lower_price:read`). */
+    belowLowest: 'invoiceDrawer.items.belowLowest',
+    /** The Rate cell's spoken words for the live offer that priced the line. */
+    offerApplied: 'invoiceDrawer.items.offerApplied',
     /** Browse's inline field for a medicine the store lacks (`medical.md:413`, Q-M4). */
     newMedicineName: 'invoiceDrawer.items.newMedicineName',
     /** "Azel Cream added · set MRP later in Stock" — the quick draft's toast. */
@@ -108,6 +115,12 @@ export const INVOICE_DRAWER_KEYS = {
   },
   totals: {
     label: 'invoiceDrawer.totals.label',
+    /** The preview's caption: the figures are the server's, as the save will write them. */
+    preview: 'invoiceDrawer.totals.preview',
+    pending: 'invoiceDrawer.totals.pending',
+    refused: 'invoiceDrawer.totals.refused',
+    failed: 'invoiceDrawer.totals.failed',
+    retry: 'invoiceDrawer.totals.retry',
     subtotal: 'invoiceDrawer.totals.subtotal',
     discountGst: 'invoiceDrawer.totals.discountGst',
     discountGstValue: 'invoiceDrawer.totals.discountGstValue',
@@ -146,7 +159,24 @@ export const INVOICE_DRAWER_KEYS = {
     paidAboveBill: 'invoiceDrawer.errors.paidAboveBill',
     stock: 'invoiceDrawer.errors.stock',
     belowFloor: 'invoiceDrawer.errors.belowFloor',
-    tooMuchDiscount: 'invoiceDrawer.errors.tooMuchDiscount',
+    belowLowest: 'invoiceDrawer.errors.belowLowest',
+  },
+  /** Why clinozy-be refused a save or a delete — each in the screen's words. */
+  refusals: {
+    moreThanDue: 'invoiceDrawer.refusals.moreThanDue',
+    dayClosed: 'invoiceDrawer.refusals.dayClosed',
+    settled: 'invoiceDrawer.refusals.settled',
+    belowPaid: 'invoiceDrawer.refusals.belowPaid',
+    offeringInUse: 'invoiceDrawer.refusals.offeringInUse',
+    treatmentBilled: 'invoiceDrawer.refusals.treatmentBilled',
+    ofSale: 'invoiceDrawer.refusals.ofSale',
+    paid: 'invoiceDrawer.refusals.paid',
+    inUseDelete: 'invoiceDrawer.refusals.inUseDelete',
+  },
+  /** Why a saved invoice opens read-only: its day closed, or a Medical sale's. */
+  notices: {
+    settled: 'invoiceDrawer.notices.settled',
+    sale: 'invoiceDrawer.notices.sale',
   },
   toasts: {
     /** "Clinic invoice #788 created" — one sentence per type, for the translations. */
@@ -195,6 +225,7 @@ export const INVOICE_DRAWER_TEST_IDS = {
   paidNow: `${INVOICE_DRAWER_TEST_ID}-paid-now`,
   remark: `${INVOICE_DRAWER_TEST_ID}-remark`,
   totals: `${INVOICE_DRAWER_TEST_ID}-totals`,
+  notice: `${INVOICE_DRAWER_TEST_ID}-notice`,
   preview: 'invoice-preview',
 } as const;
 

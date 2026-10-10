@@ -64,8 +64,11 @@
       "photo": "照片",
       "appointment": "预约",
       "report": "报告",
-      "note": "笔记"
-    }
+      "note": "笔记",
+      "invoice": "发票",
+      "payment": "付款"
+    },
+    "nothingDue": "{{name}} 没有待付款项"
   },
   "section": {
     "primary": {
@@ -116,7 +119,11 @@
     "checkIns_other": "{{count}} 次回访",
     "reviews_other": "{{count}} 条评价",
     "feedbackCounts": "{{checkIns}} · {{reviews}}",
-    "noFeedback": "暂无反馈"
+    "noFeedback": "暂无反馈",
+    "showAmount": "显示金额",
+    "hideAmount": "隐藏金额",
+    "collect": "收款",
+    "allPaid": "已全部付清 · 无欠款"
   },
   "photos": {
     "albums": {
@@ -894,6 +901,15 @@
       "notes": "备注",
       "empty": "暂无动态",
       "masked": "₹ ••••"
+    },
+    "billing": {
+      "due": "待付",
+      "paid": "已付",
+      "show": "显示金额",
+      "hide": "隐藏金额",
+      "invoice": "{{type}}发票 {{number}}",
+      "sub": "{{date}} · {{amount}}",
+      "collect": "收款"
     }
   },
   "visitFlow": {
@@ -908,7 +924,9 @@
     "steps": {
       "checks": "签到与安全",
       "rx": "处方",
-      "treatment": "治疗"
+      "treatment": "治疗",
+      "invoice": "发票",
+      "collect": "收款"
     },
     "checks": {
       "labels": {
@@ -943,6 +961,21 @@
       "repeatPackage": "⚡ 重复 · {{name}}"
     },
     "paused": "就诊已暂停",
-    "resume": "继续"
+    "resume": "继续",
+    "invoice": {
+      "create": "根据就诊创建发票",
+      "custom": "自定义发票",
+      "nothing": "无可开票项目",
+      "covered": "已由套餐覆盖 · 无需开票",
+      "empty": "暂无可开票项目",
+      "done": "{{number}} · {{total}}",
+      "ready_other": "{{count}} 项已就绪"
+    },
+    "collect": {
+      "action": "收款 {{amount}}",
+      "due": "欠款 {{amount}}",
+      "nothing": "无欠款",
+      "waiting": "请先为本次就诊开票"
+    }
   }
 }

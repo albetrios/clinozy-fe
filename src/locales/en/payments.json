@@ -49,7 +49,8 @@
     "receipt": "Received",
     "refund": "Refund to patient",
     "expense": "Paid",
-    "money_back": "Money back"
+    "money_back": "Money back",
+    "reversal": "Reversal"
   },
   "ledger": {
     "records": "entries",
@@ -67,19 +68,27 @@
       "moneyBack": "Money back",
       "medicalBill": "Medical PO #{{seq}} · bill {{bill}}",
       "stockBill": "Stock PO #{{seq}} · bill {{bill}}",
-      "fromCredit": "From {{ref}}"
+      "fromCredit": "From {{ref}}",
+      "reversed": "Reversed",
+      "medicalOrder": "Medical PO #{{seq}}",
+      "stockPurchase": "Stock PO #{{seq}}"
     },
     "dayClosed": "{{ref}} · Day closed",
     "dayClosedEdited_one": "{{ref}} · Day closed · edited {{count}}×",
     "dayClosedEdited_other": "{{ref}} · Day closed · edited {{count}}×",
-    "creditEntry": "{{ref}} · From {{credit}}"
+    "creditEntry": "{{ref}} · From {{credit}}",
+    "fixedEntry": "{{ref}} · its amount can’t change · delete it on its day to undo it",
+    "search": "Patient, payee or PAY- number",
+    "count_one": "{{count}} entry",
+    "count_other": "{{count}} entries"
   },
   "rowActions": {
     "edit": "Edit",
     "delete": "Delete",
     "giveBack": "Give back",
     "gotBack": "Got it back",
-    "useOnBill": "Use on next bill"
+    "useOnBill": "Use on next bill",
+    "reverse": "Reverse"
   },
   "bulk": {
     "export": "Export",
@@ -102,7 +111,11 @@
       "party": "Wrong patient or payee"
     },
     "removed": "{{ref}} removed",
-    "removedInvoice": "{{ref}} removed · invoice balance restored"
+    "removedInvoice": "{{ref}} removed · invoice balance restored",
+    "blocked": {
+      "dayClosed": "{{ref}} · its day is closed now · reverse it instead",
+      "moreThanPaid": "{{ref}} · a refund already gave this money back · delete the refund first"
+    }
   },
   "dialog": {
     "record": "Payment",
@@ -129,7 +142,6 @@
     },
     "settledToday": "{{state}} · Today",
     "adjusted": "{{amount}} adjusted",
-    "source": "From {{ref}} · {{direction}}",
     "invoice": "Invoice #{{seq}}",
     "byHand": "By hand",
     "deleteTitle": "Delete this pending?",
@@ -146,9 +158,18 @@
       "loan_to_staff": "Loan to staff",
       "other": "Other"
     },
-    "settledInvoice": "{{state}} · Invoice #{{seq}}",
     "adjustedOn": "{{amount}} of {{ref}} adjusted on invoice #{{seq}}",
-    "nothingDue": "Nothing due for {{name}} to adjust against"
+    "nothingDue": "Nothing due for {{name}} to adjust against",
+    "search": "Person, supplier or CR-",
+    "fromEntry": "From a ledger entry",
+    "forInvoice": "For an invoice",
+    "settledLocked": "{{ref}} · {{amount}} settled · it can’t change now",
+    "conflicts": {
+      "settled": "Part of {{ref}} is settled now · it can’t change or be deleted",
+      "closed": "{{ref}} is already settled",
+      "dayClosed": "Today is closed at invoice #{{seq}}’s branch · reopen it to use this credit",
+      "dueChanged": "Invoice #{{seq}}’s due changed · try again"
+    }
   },
   "receive": {
     "title": "Receive payment",
@@ -184,7 +205,11 @@
     "updated": "{{ref}} updated · change logged",
     "enterAmount": "Enter an amount",
     "pickPatient": "Pick a patient",
-    "aboveDue": "More than the {{due}} due"
+    "aboveDue": "More than the {{due}} due",
+    "moreThanDue": "More than the invoice’s due now · it was paid meanwhile",
+    "totalAdvance": "Total {{total}} · advance",
+    "advance": "Advance · no invoice",
+    "invoicesFailed": "Couldn’t load the open invoices"
   },
   "send": {
     "title": "Send payment",
@@ -243,7 +268,9 @@
     "added": "Expense {{ref}} added",
     "paidBill": "{{amount}} paid against {{bill}}",
     "saved": "{{ref}} saved · change logged",
-    "missing": "Add who was paid and the amount"
+    "missing": "Add who was paid and the amount",
+    "moreThanDue": "More than the bill’s due now · it was paid meanwhile",
+    "billsFailed": "Couldn’t load the open bills"
   },
   "credit": {
     "title": "Add pending",
@@ -331,9 +358,9 @@
     "gate": {
       "title": "Opening cash · {{day}}",
       "sources": {
-        "default_float": "Default float",
         "carried": "Carried from {{day}} close",
-        "recounted": "Recounted"
+        "recounted": "Recounted",
+        "first": "No earlier close · nothing to carry"
       },
       "recount": "Recount",
       "recountLabel": "Recount opening cash",
@@ -354,9 +381,12 @@
       "countPlaceholder": "Count the drawer",
       "countLabel": "Counted cash",
       "netByMode": "Net by mode",
-      "modeTitle": "In {{in}} · out {{out}}",
-      "staffTitle_one": "{{name}} · {{count}} receipt · {{amount}}",
-      "staffTitle_other": "{{name}} · {{count}} receipts · {{amount}}"
+      "staffTitle_one": "{{name}} · {{count}} entry · {{amount}}",
+      "staffTitle_other": "{{name}} · {{count}} entries · {{amount}}",
+      "staffOther": "Not on the team",
+      "reason": "Why is the count off?",
+      "reasonPlaceholder": "What happened · e.g. ₹20 given as change from the drawer",
+      "reasonFirst": "Say why the count is off first"
     },
     "report": {
       "title": "{{day}} is closed",
@@ -365,10 +395,8 @@
       "reopen": "Reopen",
       "acceptedBy": "Accepted by {{name}}",
       "takenAsExpected": "Taken as expected",
-      "collected": "Collected",
       "received_one": "{{count}} received",
       "received_other": "{{count}} received",
-      "paidOut": "Paid out",
       "paid_one": "{{count}} paid",
       "paid_other": "{{count}} paid",
       "cashCounted": "Cash counted",
@@ -380,28 +408,59 @@
       "log": "What happened",
       "logAccepted": "{{name}} accepted the opening cash {{amount}}",
       "logRecounted": "{{name}} accepted the opening cash {{amount}} (recounted)",
-      "logReviewed_one": "{{checked}} of {{count}} entry reviewed",
-      "logReviewed_other": "{{checked}} of {{count}} entries reviewed",
       "logMatched": "Drawer counted at {{amount}} · matched",
       "logExtra": "Drawer counted at {{amount}} · {{diff}} extra",
       "logShort": "Drawer counted at {{amount}} · {{diff}} short",
-      "logClosed": "{{name}} closed the day · summary sent to admin on WhatsApp",
-      "logAuto": "Auto-closed after the grace period · cash taken as expected"
+      "logClosed": "{{name}} closed the day",
+      "logAuto": "Auto-closed after the grace period · cash taken as expected",
+      "openedAuto": "Opened automatically",
+      "notCounted": "Not counted",
+      "logOpened": "{{name}} opened the day",
+      "logReopened": "{{name}} reopened the day · {{reason}}",
+      "logReason": "“{{reason}}”",
+      "someone": "Someone"
     },
     "review": {
       "title": "Review every entry",
-      "progress_one": "{{checked}} of {{count}} checked",
-      "progress_other": "{{checked}} of {{count}} checked",
       "none": "No entries",
       "empty": "No entries on this day",
-      "check": "Mark as checked",
       "states": {
         "canEdit": "Can edit",
         "canEditTitle": "Can be edited or deleted until the day is closed",
         "dayClosed": "Day closed",
         "dayClosedTitle": "The day is closed · its entries can’t be changed",
         "fromCredit": "From {{credit}}"
+      },
+      "count_one": "{{count}} entry",
+      "count_other": "{{count}} entries"
+    },
+    "previousNone": "No closes before this day",
+    "refusals": {
+      "alreadyOpened": "Someone opened this day meanwhile · showing it now",
+      "alreadyClosed": "Someone closed this day meanwhile · showing it now",
+      "alreadyOpen": "This day is already open again · showing it now"
+    },
+    "reopen": {
+      "title": "Reopen this day?",
+      "effect": "The count is cleared and the day’s entries can be changed again until it is closed.",
+      "action": "Reopen day",
+      "record": "{{branch}} · {{day}}",
+      "reasons": {
+        "miscounted": "Counted wrong",
+        "missed": "An entry was missed",
+        "wrongEntry": "An entry is wrong"
       }
+    }
+  },
+  "reverseEntry": {
+    "title": "Reverse this payment?",
+    "effect": "Its day is closed, so it stays as it was. A reversal for the same money goes on today’s ledger at its branch, and what it paid goes back. Both entries are kept.",
+    "action": "Reverse",
+    "reversed": "{{ref}} reversed · {{reversal}}",
+    "blocked": {
+      "alreadyReversed": "{{ref}} is already reversed",
+      "dayOpen": "{{ref}}’s day is open again · delete it instead",
+      "dayClosed": "Today is closed at {{ref}}’s branch · reopen it to reverse"
     }
   }
 }

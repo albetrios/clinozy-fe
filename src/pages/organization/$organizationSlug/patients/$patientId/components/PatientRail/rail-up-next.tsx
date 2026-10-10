@@ -8,9 +8,19 @@ import type {
   PatientNextVisit,
 } from '@/shared/api/clinic/patient-file-contracts.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
+import { useInvoiceTotals } from '@/shared/hooks/useInvoices/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
-import { Calendar, ChevronRight, MessageSquare } from '@/shared/icons/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
+import {
+  Calendar,
+  ChevronRight,
+  Eye,
+  EyeOff,
+  MessageSquare,
+  Wallet,
+} from '@/shared/icons/index.ts';
 
 import { feedbackCountsText } from '../../shared/patient-feedback.ts';
 import { useVisitWhen } from '../../shared/patient-visit.ts';
@@ -22,16 +32,27 @@ const K = PATIENT_RAIL_KEYS;
 export interface RailUpNextActions {
   /** "Reschedule" the next visit, or "Book" one. */
   onBook?: (nextVisit: PatientNextVisit | null) => void;
+  /** "Collect" → Receive payment for her (`payment:create`). */
+  onCollect?: () => void;
   /** The Feedback row → Clinical notes with Feedback open. */
   onFeedback?: () => void;
 }
 
-/** A 28px outline card button (Reschedule / Book). */
+/** What the rail's money card needs — given only to a member who sees billing (Q-F1). */
+export interface RailMoney {
+  /** The file's money mask (Q-F4) and its toggle — the due card's eye. */
+  masked: boolean;
+  onToggleMasked: () => void;
+}
+
+/** A 28px card button: outline (Reschedule / Book) or primary (Collect). */
 function CardButton({
+  primary = false,
   onClick,
   children,
   testId,
 }: {
+  primary?: boolean;
   onClick: () => void;
   children: ReactNode;
   testId: string;
@@ -39,11 +60,14 @@ function CardButton({
   return (
     <Button
       type="button"
-      variant="outline"
+      variant={primary ? 'default' : 'outline'}
       size="xs"
       onClick={onClick}
       data-testid={testId}
-      className="bg-card text-foreground hover:bg-muted text-xs shadow-none"
+      className={cn(
+        'text-xs',
+        !primary && 'bg-card text-foreground hover:bg-muted shadow-none',
+      )}
     >
       {children}
     </Button>
@@ -103,16 +127,92 @@ function NextVisitCard({
 }
 
 /**
- * The rail's fixed bottom (H:722–726; `patient-file.md:22`): the next visit and the Feedback
- * row. What they owe and what the clinic holds to give back go until the API reads them for a
- * patient (G4).
+ * What she owes (H:724), the server's over every invoice of hers (`meta.due_total`; one cached
+ * read shared with the Billing card): "₹ ••••" with its eye while the file is masked, and
+ * Collect; "All paid · nothing due" when nothing is. A bar while it loads; nothing when the read
+ * fails — the file's Invoices and Billing card say so, with Retry.
+ */
+function RailDue({
+  patientId,
+  money,
+  onCollect,
+}: {
+  patientId: string;
+  money: RailMoney;
+  onCollect?: () => void;
+}) {
+  const { t } = useTranslation(PATIENT_RAIL_NS);
+  const formatRupees = useRupeeFormat();
+  const totals = useInvoiceTotals({ patientId });
+  if (totals.isPending) return <SkeletonBar shape="field" className="h-14 rounded-xl" />;
+  if (!totals.data) return null;
+  const { due } = totals.data;
+  if (due <= 0) {
+    return (
+      <div
+        data-testid="patient-rail-all-paid"
+        className="text-tone-sage-foreground flex items-center gap-1.5 px-1 text-xs"
+      >
+        <span aria-hidden="true" className="bg-success size-1.5 rounded-full" />
+        {t(K.allPaid)}
+      </div>
+    );
+  }
+  const { masked, onToggleMasked } = money;
+  const eyeLabel = t(masked ? K.showAmount : K.hideAmount);
+  const Eyes = masked ? Eye : EyeOff;
+  return (
+    <div
+      data-slot="rail-due"
+      className="bg-card border-destructive-border flex items-center gap-2.5 rounded-xl border p-2"
+    >
+      <span className="bg-tone-blush text-tone-blush-foreground flex size-11 flex-none items-center justify-center rounded-lg">
+        <Wallet aria-hidden="true" className="size-4" />
+      </span>
+      <span className="flex min-w-0 flex-1 items-center gap-1">
+        <span
+          dir="auto"
+          data-testid="patient-rail-due"
+          className="text-body font-semibold tabular-nums"
+        >
+          {masked ? t(K.maskedAmount) : formatRupees(due)}
+        </span>
+        <button
+          type="button"
+          onClick={onToggleMasked}
+          aria-label={eyeLabel}
+          aria-pressed={!masked}
+          title={eyeLabel}
+          data-testid="patient-rail-due-eye"
+          className="text-muted-foreground hover:bg-foreground/5 hover:text-foreground flex size-5.5 flex-none items-center justify-center rounded-md transition-colors"
+        >
+          <Eyes aria-hidden="true" className="size-3.5" />
+        </button>
+      </span>
+      {onCollect ? (
+        <CardButton primary onClick={onCollect} testId="patient-rail-collect">
+          {t(K.collect)}
+        </CardButton>
+      ) : null}
+    </div>
+  );
+}
+
+/**
+ * The rail's fixed bottom (H:722–726; `patient-file.md:22`): the next visit; what she owes or
+ * "All paid · nothing due", for a member who sees billing (`money`); the Feedback row. What the
+ * clinic holds to give back has no read for a patient yet (the pending credits' `left_amount`
+ * would be summed here — G-P8).
  */
 export function RailUpNext({
   file,
   actions,
+  money,
 }: {
   file: PatientFile;
   actions: RailUpNextActions;
+  /** The money card's mask — absent for a member who does not see billing. */
+  money?: RailMoney;
 }) {
   const { t } = useTranslation([PATIENT_RAIL_NS, CLINIC_NS]);
   const { feedback } = file;
@@ -142,6 +242,13 @@ export function RailUpNext({
         {t(K.upNext)}
       </span>
       <NextVisitCard visit={file.nextVisit} onBook={actions.onBook} />
+      {money ? (
+        <RailDue
+          patientId={file.patient.id}
+          money={money}
+          onCollect={actions.onCollect}
+        />
+      ) : null}
       <button
         type="button"
         onClick={actions.onFeedback}

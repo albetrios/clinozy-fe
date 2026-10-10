@@ -16,10 +16,9 @@ import { defaultParseSearch, defaultStringifySearch } from '@tanstack/react-rout
 
 /**
  * A patient-file section: `patients/<patient id>/<section>` — a clinozy-be patient (`pat_…`),
- * or a fixture patient (a UUID) while the file's Invoices and Payments sections still read the
- * fixture world (Payments, api-integration §5.7). A literal on purpose (the security lint forbids
- * built RegExps); a test pins its sections to the file's (`PATIENT_FILE_SECTIONS`,
- * `patient-file-sections.ts`).
+ * or a fixture patient (a UUID) that a room still on fixtures (the parked Medical room) names.
+ * A literal on purpose (the security lint forbids built RegExps); a test pins its sections to
+ * the file's (`PATIENT_FILE_SECTIONS`, `patient-file-sections.ts`).
  */
 export const PATIENT_FILE_REFERRER =
   /^patients\/(?:pat_[a-z0-9]{21}|[0-9a-f-]{36})\/(?:timeline|overview|visits|prescriptions|treatments|images|reports|invoices|payments|packages|notes)$/;
@@ -101,8 +100,8 @@ export const CROSS_ROOM_PARAM = 'dialog';
 
 /**
  * A drawer another room's page may open over itself (KICKOFF §4, A-P1): the
- * Invoice drawer (new, preview, edit), Receive payment, the appointment drawers
- * and New sale. Its dialog route keeps its own URL and gate; opened with a
+ * Invoice drawer (new, preview, edit), Receive payment, a ledger entry's drawer
+ * (the patient file's Payments), the appointment drawers and New sale. Its dialog route keeps its own URL and gate; opened with a
  * `from` naming another room, it renders over that room instead of its own.
  */
 export interface CrossRoomRoute {
@@ -112,13 +111,14 @@ export interface CrossRoomRoute {
     | 'invoice'
     | 'invoiceEdit'
     | 'paymentReceive'
+    | 'paymentEdit'
     | 'appointmentCreate'
     | 'appointment'
     | 'saleCreate';
   /** Its path under the organization; a record route's id is the first group. */
   path: RegExp;
   /** The route param that id fills. */
-  param?: 'invoiceId' | 'appointmentId';
+  param?: 'invoiceId' | 'appointmentId' | 'paymentId';
   /** The room it opens over when no other room opened it: its route's own parent. */
   room: string;
 }
@@ -138,17 +138,25 @@ export const CROSS_ROOM_ROUTES: readonly CrossRoomRoute[] = [
     room: 'appointments',
   },
   { name: 'paymentReceive', path: /^payments\/receive$/, room: 'payments' },
+  {
+    name: 'paymentEdit',
+    // A ledger entry is a clinozy-be public id (`pay_<21 [a-z0-9]>`).
+    path: /^payments\/(pay_[a-z0-9]{21})\/edit$/,
+    param: 'paymentId',
+    room: 'payments',
+  },
   // The Invoice drawer's own default referrer is the Payments ledger (§4).
   { name: 'invoiceCreate', path: /^invoices\/create$/, room: 'payments' },
   {
     name: 'invoice',
-    path: /^invoices\/([\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12})$/i,
+    // An invoice is a clinozy-be public id (`invc_<21 [a-z0-9]>`).
+    path: /^invoices\/(invc_[a-z0-9]{21})$/,
     param: 'invoiceId',
     room: 'payments',
   },
   {
     name: 'invoiceEdit',
-    path: /^invoices\/([\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12})\/edit$/i,
+    path: /^invoices\/(invc_[a-z0-9]{21})\/edit$/,
     param: 'invoiceId',
     room: 'payments',
   },

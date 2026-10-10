@@ -41,6 +41,7 @@ export const PATIENTS_KEYS = {
     age: 'table.age',
   },
   rowActions: {
+    newInvoice: 'rowActions.newInvoice',
     edit: 'rowActions.edit',
     delete: 'rowActions.delete',
   },

@@ -33,7 +33,8 @@
   },
   "rowActions": {
     "edit": "Bearbeiten",
-    "delete": "Löschen"
+    "delete": "Löschen",
+    "newInvoice": "Neue Rechnung"
   },
   "bulk": {
     "export": "Exportieren",

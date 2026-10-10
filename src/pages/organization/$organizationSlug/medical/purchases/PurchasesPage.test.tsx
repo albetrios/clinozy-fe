@@ -54,9 +54,8 @@ describe('PurchasesPage', () => {
     expect(pay).toHaveAccessibleName('Pay ₹2,980');
     await user.click(pay);
     await waitFor(() => expect(router.state.location.pathname).toBe(PAY));
-    expect(router.state.location.search).toEqual({
-      bill: `md:${ref.purchaseOrder(431)}`,
-    });
+    // The bill's key is its purchase's id — here the fixture PO's (D153 seam).
+    expect(router.state.location.search).toEqual({ bill: ref.purchaseOrder(431) });
   });
 
   it('"Pay all received · ₹2,980" with Stage Received pays the oldest open bill', async () => {
@@ -68,9 +67,8 @@ describe('PurchasesPage', () => {
     expect(action).toHaveAccessibleName('Pay all received · ₹2,980');
     await user.click(action);
     await waitFor(() => expect(router.state.location.pathname).toBe(PAY));
-    expect(router.state.location.search).toEqual({
-      bill: `md:${ref.purchaseOrder(431)}`,
-    });
+    // The bill's key is its purchase's id — here the fixture PO's (D153 seam).
+    expect(router.state.location.search).toEqual({ bill: ref.purchaseOrder(431) });
   });
 
   it('an Ordered order receives, edits and — for an Admin — cancels with a reason', async () => {

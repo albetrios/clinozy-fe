@@ -66,6 +66,7 @@ vi.mock('@/shared/notify/index.ts', () => ({
 const PURCHASES_URL = '/organization/acme/stock/purchases';
 // Public ids as the URL takes them (`<prefix>_<21 [a-z0-9]>`).
 const UNPAID_ID = 'spur_billfifteen0000000000';
+const PAID_ID = 'spur_billfourteen000000000';
 const CRANIX_ID = 'svnd_cranix000000000000000';
 
 /** A word of the room as i18next answers it — the copy once merged, its key before. */
@@ -134,8 +135,13 @@ describe('PurchasesPage (clinic-stock.md:41–55)', () => {
     expect(screen.getByTestId('stock-purchases-table-end')).toHaveTextContent(
       'All purchases loaded',
     );
-    // Paying a bill waits for Payments (Q-S3).
-    expect(screen.queryByTestId('stock-purchases-row-action-pay')).toBeNull();
+    // Both bills have something due: each offers "Pay ₹X" for what is due on it (Q-S3).
+    expect(
+      within(rowOf('#16')).getByTestId('stock-purchases-row-action-pay'),
+    ).toHaveAccessibleName('Pay ₹1,500');
+    expect(
+      within(rowOf('#15')).getByTestId('stock-purchases-row-action-pay'),
+    ).toHaveAccessibleName('Pay ₹1,710');
     expect(await screen.findByTestId('stock-purchases-new')).toHaveTextContent(
       'New purchase',
     );
@@ -275,6 +281,54 @@ describe('PurchasesPage (clinic-stock.md:41–55)', () => {
       expect(vi.mocked(listStockPurchases).mock.calls.length).toBeGreaterThan(reads),
     );
     await waitFor(() => expect(rows()).toHaveLength(2));
+  });
+
+  it('"Pay ₹X" opens Payments › Send payment on the bill; a paid bill offers none (Q-S3)', async () => {
+    const user = setup();
+    vi.mocked(listStockPurchases).mockResolvedValue({
+      rows: [
+        ...ROWS,
+        stockPurchaseRow({
+          id: PAID_ID,
+          seq: 14,
+          billNo: 'INV-200',
+          paid: 2392.5,
+          due: 0,
+          status: 'paid',
+        }),
+      ],
+      next: null,
+      total: 3,
+    });
+    const { router } = renderStockRoutes(PURCHASES_URL, { purchases: PurchasesPage });
+    await waitFor(() => expect(rows()).toHaveLength(3));
+    expect(
+      within(rowOf('#14')).queryByTestId('stock-purchases-row-action-pay'),
+    ).toBeNull();
+
+    await user.click(within(rowOf('#15')).getByTestId('stock-purchases-row-action-pay'));
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe('/organization/acme/payments/pay'),
+    );
+    expect(router.state.location.search).toEqual({ bill: UNPAID_ID });
+  });
+
+  it('"Pay ₹X" needs payment:create and payment:read — create alone (PAY-M3) shows none', async () => {
+    renderStockRoutes(
+      PURCHASES_URL,
+      { purchases: PurchasesPage },
+      {
+        permissions: [
+          'organization:read',
+          'stock_item:read',
+          'stock_item:create',
+          'payment:create',
+        ],
+      },
+    );
+    await waitFor(() => expect(rows()).toHaveLength(2));
+    expect(screen.getAllByTestId('stock-purchases-row-action-edit')).toHaveLength(2);
+    expect(screen.queryByTestId('stock-purchases-row-action-pay')).toBeNull();
   });
 
   it('a member who only reads (Accountant) gets no New purchase and no Delete', async () => {

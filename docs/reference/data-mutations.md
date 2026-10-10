@@ -222,6 +222,9 @@ stored as `other` with its label leading the note.
 | Offers        | `useSetOfferActive`, `useDeleteOffer`                                                      | `optimistic`                     |
 | Clinic stock  | `useDeleteStockItem`, `useDeleteStockPurchase`, `useDeleteStockVendor` (each list's pages) | `optimisticInfinite`             |
 | Appointments  | `useMoveAppointment` (Agenda, calendars and drawer at once)                                | `optimisticQueries`              |
+| Tasks         | `useTaskOutcome`, `useSnoozeTask`, `useDeleteTask` (every cached list's pages at once)     | `optimisticInfinite`             |
+| Task rules    | `useSaveTaskRuleSettings` (the Rules popover's switches)                                   | `optimistic`                     |
+| Payments      | `useDeletePayment`, `useDeleteCredit` (every cached ledger or Pending page at once)        | `optimisticInfinite`             |
 | Notifications | `useMarkNotificationRead`                                                                  | hand-rolled on raw `useMutation` |
 
 The cursor-paginated panels (members, roles, API keys) are `optimisticInfinite`; the
@@ -239,6 +242,8 @@ behind the undo toast by their panels (see above), which is why all three take a
 - **Appointment status:** one route per move (`useMoveAppointment`, optimistic) and `useCancelAppointment` (not optimistic); clinozy-be has a way back for two of them, so only their toasts carry Undo — a check-in's runs `undo-check-in`, a cancel's `reinstate`
 - **Lead ownership:** `useClaimLead`, `useAssignLead`, `useReleaseLead`, `useSetLeadInvolved` — clinozy-be has no undo for a claim, an assign or a release, so their toasts carry none, and neither does a status save's "<name> → <status>" (`useUpdateLead`)
 - **Contacts:** `useUpdateContact` (the lead drawer's Edit contact; sends `expected_updated_at`, a `409 record_changed` offers Reload)
+- **Tasks:** `useCreateTask` (New task, What's next), `useReassignTask` (a lead's task moves its lead too), `useRestoreTask` (the Undo of a deleted task's toast) — clinozy-be has no way back for an outcome, a snooze or a reassign, so their toasts carry no Undo (Q7); an outcome, a booking write and a floor check-in read the tasks again once the server's rules have run (`useRefreshTasksAfterRules`, D81 T7)
+- **Payments and invoices:** `useReceivePayment`, `usePayExpense`, `useCreateInvoice`, `useCreateCredit` (creates); `useUpdatePayment`, `useUpdateInvoice`, `useUpdateCredit` (send `expected_updated_at`; a `409 record_changed` offers Reload); `useDeleteInvoice` (the drawer's Reason confirm) and `useRestorePayment`, `useRestoreInvoice`, `useRestoreCredit` (the Undo of a deleted row's toast); `useReversePayment` (a closed day's entry — answers the `reversal`), `useSettleCredit` (Give back, Got it back, Use on a bill), and Day close's `useAcceptOpeningCash`, `useCloseDay`, `useReopenDay` — clinozy-be has no way back for a reverse, a settlement or a day's close, so their toasts carry no Undo. Medical's fixture ledger keeps its own `useFixtureDeletePayment` / `useFixtureRestorePayment` until Medical moves
 - `useResendInvitation` (clinozy-be sets the new expiry), `useMarkAllNotificationsRead`, `useUpdateNotificationPreferences`, `useUpdateOrganization`, billing/MFA
 
 > **Invitations ride on memberships.** clinozy-be has no invitation list: an invite is

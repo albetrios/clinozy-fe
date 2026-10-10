@@ -3,40 +3,63 @@ import { renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import { listPatientInvoices } from '@/shared/api/clinic/payments-api.ts';
-import type { PatientInvoiceRow } from '@/shared/api/clinic/payments-contracts.ts';
+import type { InvoiceRecord } from '@/shared/api/clinic/invoices-contracts.ts';
 import { useDevicePrefsStore } from '@/shared/store/useDevicePrefsStore/index.ts';
+import { invoiceRecord } from '@/tests/utils/payments-doubles.ts';
 
 import { useInvoicesTable } from './useInvoicesTable.tsx';
 
 let client: QueryClient;
-let rows: PatientInvoiceRow[] = [];
 function wrapper({ children }: { children: ReactNode }) {
   return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
 }
 
-beforeEach(async () => {
-  resetClinicFixtures();
+/** Kavya Mehta's consultation #5 (₹500, ₹400 paid, ₹100 due) and a clinic invoice paid in full. */
+const CONSULTATION = invoiceRecord();
+const LHR = invoiceRecord({
+  id: 'invc_lhrfullface0000000000',
+  seq: 6,
+  type: 'clinic',
+  items: [
+    {
+      ...invoiceRecord().items[0]!,
+      id: 'iitm_lhr00000000000000000',
+      name: 'LHR Full Face',
+    },
+    {
+      ...invoiceRecord().items[0]!,
+      id: 'iitm_peel0000000000000000',
+      name: 'Research Peel',
+    },
+  ],
+  total: 4800.5,
+  paid: 4800.5,
+  due: 0,
+  status: 'paid',
+  remark: null,
+});
+const ROWS: InvoiceRecord[] = [LHR, CONSULTATION];
+
+beforeEach(() => {
   useDevicePrefsStore.setState({ hiddenColumns: {} });
   client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  rows = await listPatientInvoices(patientRef('Dharti Galani'));
 });
-afterEach(() => {
-  client.clear();
-  resetClinicFixtures();
-});
+afterEach(() => client.clear());
 
-const invoice = (seq: number) => {
-  const found = rows.find((row) => row.seq === seq);
-  if (!found) throw new Error(`no invoice #${seq}`);
-  return found;
-};
+/** A column's accessor and fold for a row, read through the table. */
+function readers() {
+  const { result } = renderHook(() => useInvoicesTable(ROWS), { wrapper });
+  const column = (id: string) => result.current.getColumn(id);
+  return {
+    read: (id: string, row: InvoiceRecord) => column(id)?.accessorFn?.(row, 0),
+    fold: (id: string, row: InvoiceRecord) =>
+      column(id)?.columnDef.meta?.foldValue?.(row),
+  };
+}
 
 describe('useInvoicesTable (H:4748)', () => {
   it('lays out Invoice · Items · Team · Bill · Paid / due · Status · Date, Team hidden', () => {
-    const { result } = renderHook(() => useInvoicesTable(rows), { wrapper });
+    const { result } = renderHook(() => useInvoicesTable(ROWS), { wrapper });
     const table = result.current;
     expect(table.getAllLeafColumns().map((column) => column.id)).toEqual([
       'invoice',
@@ -54,20 +77,25 @@ describe('useInvoicesTable (H:4748)', () => {
     expect(table.getColumn('bill')?.columnDef.meta?.align).toBe('end');
   });
 
-  it('folds the number with the type, and the status with its dot', () => {
-    const { result } = renderHook(() => useInvoicesTable(rows), { wrapper });
-    const lhr = invoice(787);
-    expect(result.current.getColumn('invoice')?.columnDef.meta?.foldValue?.(lhr)).toEqual(
-      { value: '#787, Clinic', dotClassName: expect.stringMatching(/^bg-tone-/) },
-    );
-    expect(result.current.getColumn('status')?.columnDef.meta?.foldValue?.(lhr)).toEqual({
-      value: 'Due',
-      dotClassName: expect.stringMatching(/^bg-tone-blush/),
+  it('folds the number with the type, and the server’s status with its dot', () => {
+    const { read, fold } = readers();
+    expect(fold('invoice', CONSULTATION)).toEqual({
+      value: '#5, Consultation',
+      dotClassName: expect.stringMatching(/^bg-tone-/),
     });
-    expect(result.current.getColumn('items')?.accessorFn?.(lhr, 0)).toBe(
-      'LHR Full Face · B4G7',
-    );
-    expect(result.current.getColumn('bill')?.accessorFn?.(lhr, 0)).toBe('₹4,800');
-    expect(result.current.getColumn('team')?.columnDef.meta?.foldValue?.(lhr)).toBeNull();
+    expect(fold('status', CONSULTATION)).toEqual({
+      value: 'Partly paid',
+      dotClassName: expect.stringMatching(/^bg-tone-butter/),
+    });
+    expect(fold('status', LHR)).toMatchObject({ value: 'Paid' });
+    expect(fold('team', CONSULTATION)).toBeNull();
+    expect(read('items', LHR)).toBe('LHR Full Face, Research Peel');
+  });
+
+  it('reads the bill and what is paid in rupees as the API sends them', () => {
+    const { read } = readers();
+    expect(read('bill', CONSULTATION)).toBe('₹500');
+    expect(read('paid', CONSULTATION)).toBe('₹400');
+    expect(read('bill', LHR)).toBe('₹4,800.50');
   });
 });

@@ -120,14 +120,16 @@ describe('useClinicAccess — a room on the API answers from the member’s code
     expect(result.current.can('medical', 'view')).toBe(true);
   });
 
-  it('keeps Today on the fixture matrix — the owner acts on it with no code of its own', async () => {
+  it('shows Today to every member and gives it no write of its own — its actions ask their rooms’ codes', async () => {
     signIn(['organization:read', 'organization:delete', 'membership:read', 'role:read']);
 
     const { result } = renderAccess();
     await waitFor(() => expect(result.current.isResolved).toBe(true));
 
     expect(result.current.can('today', 'view')).toBe(true);
-    expect(result.current.can('today', 'edit')).toBe(true);
+    expect(result.current.can('today', 'edit')).toBe(false);
+    // Today's work queue is the tasks' (D155): the owner's codes hold no task code here.
+    expect(result.current.can('tasks', 'view')).toBe(false);
   });
 
   it('canCode answers one exact code, and nothing while View-as runs', async () => {

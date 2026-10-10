@@ -1,4 +1,5 @@
 import { useParams } from '@tanstack/react-router';
+import { useTranslation } from 'react-i18next';
 
 import { organizationAppointment } from '@/lib/routes/appointments-builders.ts';
 import {
@@ -9,6 +10,7 @@ import {
 } from '@/lib/routes/patient-file-builders.ts';
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import type { PatientNextVisit } from '@/shared/api/clinic/patient-file-contracts.ts';
+import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
 import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
 import {
   passesPatientFileGate,
@@ -16,6 +18,8 @@ import {
 } from '@/shared/clinic/patient-file-sections.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
+import { useInvoiceTotals } from '@/shared/hooks/useInvoices/index.ts';
+import { usePaymentAccess } from '@/shared/hooks/usePaymentAccess/index.ts';
 import {
   type AppIcon,
   Calendar,
@@ -23,19 +27,24 @@ import {
   ClipboardList,
   FileIcon,
   MessageSquare,
+  Receipt,
   Sparkles,
+  Wallet,
 } from '@/shared/icons/index.ts';
+import { notify } from '@/shared/notify/index.ts';
 
 import { usePatientFileContext } from '../../patient-file-context.ts';
+import {
+  PATIENT_FILE_ACTIONS_KEYS,
+  PATIENT_FILE_ACTIONS_NS,
+} from './patient-file-actions.constants.ts';
 
-/**
- * The Add-to-record menu's items, in its order (H:4865; `patient-file.md:267`). Invoice and
- * Payment come back with Payments on clinozy-be: its drawers still read the fixture patients
- * (D152).
- */
+/** The Add-to-record menu's items, in its order (H:4865; `patient-file.md:267`). */
 export const PATIENT_ADD_ITEMS = [
   'prescription',
   'treatment',
+  'invoice',
+  'payment',
   'photo',
   'appointment',
   'report',
@@ -51,6 +60,8 @@ export const PATIENT_ADD_ITEM_LOOK: Readonly<
 > = {
   prescription: { tone: 'sage', icon: FileIcon },
   treatment: { tone: 'lav', icon: Sparkles },
+  invoice: { tone: 'butter', icon: Receipt },
+  payment: { tone: 'mint', icon: Wallet },
   photo: { tone: 'blush', icon: Camera },
   appointment: { tone: 'sky', icon: Calendar },
   report: { tone: 'stone', icon: ClipboardList },
@@ -68,8 +79,7 @@ export interface PatientAddItem {
 /**
  * Each section's split primary "New …" (H:4746–4764; `patient-file.md:512`):
  * the Add-menu item it runs. Overview, Clinical notes, Packages (a package
- * comes from its invoice — G4) and Team notes have none; Invoices and Payments
- * come back with Payments on clinozy-be.
+ * comes from its invoice — G4) and Team notes have none.
  */
 export const SECTION_PRIMARY_ITEM: Readonly<
   Partial<Record<PatientFileSectionSlug, PatientAddItemId>>
@@ -79,6 +89,8 @@ export const SECTION_PRIMARY_ITEM: Readonly<
   treatments: 'treatment',
   images: 'photo',
   reports: 'report',
+  invoices: 'invoice',
+  payments: 'payment',
 };
 
 /** What the file's add actions read: the access in force and the open file. */
@@ -98,22 +110,28 @@ export interface PatientFileActions {
  * The patient file's add actions (KICKOFF §6.6 Add-to-record menu; the
  * sections' split "New …"): each item checks its own permission — the
  * Rx and treatment gates (the member's `patient_prescription:create` /
- * `patient_treatment:create`), appointments create for a booking, patients
- * create or edit for a photo, a report or a note — and runs its action: the
- * record's drawer keeping the file behind it (`from`, §4), the appointment form
- * for this patient's person, or the section.
+ * `patient_treatment:create`), `payment:create` for an invoice or a payment,
+ * appointments create for a booking, patients create or edit for a photo, a
+ * report or a note — and runs its action: the record's drawer, the Invoice
+ * drawer or Receive payment keeping the file behind it (`from`, §4), the
+ * appointment form for this patient's person, or the section. Payment, when the
+ * server says she owes nothing (`meta.due_total`), says so instead.
  */
 export function usePatientFileActions(): PatientFileActions {
+  const { t } = useTranslation(PATIENT_FILE_ACTIONS_NS);
   const navigate = useClinicNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
   const { patientId, file, section, photos } = usePatientFileContext();
   const access = useClinicAccess();
+  const money = usePaymentAccess();
+  // What she owes, for Payment's "Nothing due" — read only by a member who records and reads money.
+  const totals = useInvoiceTotals(
+    money.canCreate && money.canRead ? { patientId } : null,
+  );
   const referrer = section ? `patients/${patientId}/${section}` : null;
 
-  const can = (
-    area: 'patients' | 'payments' | 'appointments',
-    action: 'create' | 'edit',
-  ) => access.isResolved && access.can(area, action);
+  const can = (area: 'patients' | 'appointments', action: 'create' | 'edit') =>
+    access.isResolved && access.can(area, action);
   const passes = (gate: 'prescriptions' | 'treatments') =>
     access.isResolved && passesPatientFileGate(access, gate);
 
@@ -131,6 +149,37 @@ export function usePatientFileActions(): PatientFileActions {
     treatment: {
       allowed: passes('treatments'),
       run: () => void navigate(organizationTreatmentCreate(organizationSlug, patientId)),
+    },
+    invoice: {
+      allowed: money.canCreate,
+      run: () =>
+        go(
+          clinicCommandNavigation('newInvoice', {
+            organizationSlug,
+            referrer,
+            search: { type: 'clinic', patient: patientId },
+          }),
+        ),
+    },
+    payment: {
+      allowed: money.canCreate,
+      run: () => {
+        if (totals.data?.due === 0) {
+          notify.info(
+            t(PATIENT_FILE_ACTIONS_KEYS.nothingDue, {
+              name: file ? patientName(file.patient) : '',
+            }),
+          );
+          return;
+        }
+        go(
+          clinicCommandNavigation('newReceipt', {
+            organizationSlug,
+            referrer,
+            search: { patient: patientId },
+          }),
+        );
+      },
     },
     photo: {
       allowed: can('patients', 'create'),

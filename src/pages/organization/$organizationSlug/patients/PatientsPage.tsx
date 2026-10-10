@@ -26,9 +26,10 @@ import { canExportRows, useClinicAccess } from '@/shared/hooks/useClinicAccess/i
 import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
 import { usePatientList } from '@/shared/hooks/usePatients/index.ts';
+import { usePaymentAccess } from '@/shared/hooks/usePaymentAccess/index.ts';
 import { useRoomList } from '@/shared/hooks/useRoomList/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
-import { FileIcon, PenLine, Trash, Users } from '@/shared/icons/index.ts';
+import { FileIcon, PenLine, Receipt, Trash, Users } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { PatientsToolbar } from './components/PatientsToolbar/index.ts';
@@ -66,7 +67,7 @@ function filterKeyOf(params: ReturnType<typeof patientListParamsOf>): string {
  * Patients room (KICKOFF §6.5; `patients.md`): the room toolbar — views,
  * search, Filters, saved views, Columns and "New patient" (a floating pill on
  * a phone) — over the shared table: folded columns on a tablet, rows on a
- * phone, selection and the bulk bar from `md`, row actions (Edit · Delete),
+ * phone, selection and the bulk bar from `md`, row actions (New invoice · Edit · Delete),
  * infinite scroll over cursor pages. The view, search, filters and
  * sort live in the URL; the list read follows them. Its dialog route —
  * `create/` — renders nothing: this page reads the URL and opens the drawer.
@@ -79,6 +80,7 @@ export function PatientsPage() {
   const params = patientListParamsOf(search);
   const { patchSearch } = useDataTableUrlState(true);
   const access = useClinicAccess();
+  const money = usePaymentAccess();
   const tier = useViewportTier();
   const filters = useRoomFilters(PATIENT_FILTER_FIELDS);
   const [deleting, setDeleting] = useState<PatientDeleteTarget | null>(null);
@@ -140,8 +142,23 @@ export function PatientsPage() {
 
   const rowActions = (patient: PatientRow): DataTableRowAction[] => {
     const actions: DataTableRowAction[] = [];
-    // New invoice and Collect come back with Payments on clinozy-be: the invoice drawer and
-    // Receive still read the fixture patients, and a row carries no dues (G4).
+    // New invoice bills the patient over the list (`payment:create`). Collect waits for a row's
+    // dues: a patient row carries none, and one totals read per row is not made (G4, G-P8).
+    if (money.canCreate) {
+      actions.push({
+        id: 'new-invoice',
+        label: t(PATIENTS_KEYS.rowActions.newInvoice),
+        icon: Receipt,
+        onSelect: () =>
+          go(
+            clinicCommandNavigation('newInvoice', {
+              organizationSlug,
+              referrer: 'patients',
+              search: { type: 'clinic', patient: patient.id },
+            }),
+          ),
+      });
+    }
     if (can('edit')) {
       actions.push({
         id: 'edit',
@@ -162,28 +179,30 @@ export function PatientsPage() {
     return actions;
   };
 
-  const bulkActions: DataTableBulkAction<PatientRow>[] =
-    canExportRows(access, 'patient:export')
-      ? [
-          {
-            id: 'export',
-            label: t(PATIENTS_KEYS.bulk.export),
-            icon: FileIcon,
-            onSelect: (selected) => {
-              exportTableCsv({
-                table,
-                rows: selected,
-                fileName: EXPORT_FILE_NAME,
-                cell: (columnId, patient) =>
-                  columnId === 'name'
-                    ? `${patientName(patient)} · ${formatClinicPhone(patient.phone)}`
-                    : undefined,
-              });
-              notify.success(t(PATIENTS_KEYS.bulk.exported, { count: selected.length }));
-            },
+  const bulkActions: DataTableBulkAction<PatientRow>[] = canExportRows(
+    access,
+    'patient:export',
+  )
+    ? [
+        {
+          id: 'export',
+          label: t(PATIENTS_KEYS.bulk.export),
+          icon: FileIcon,
+          onSelect: (selected) => {
+            exportTableCsv({
+              table,
+              rows: selected,
+              fileName: EXPORT_FILE_NAME,
+              cell: (columnId, patient) =>
+                columnId === 'name'
+                  ? `${patientName(patient)} · ${formatClinicPhone(patient.phone)}`
+                  : undefined,
+            });
+            notify.success(t(PATIENTS_KEYS.bulk.exported, { count: selected.length }));
           },
-        ]
-      : [];
+        },
+      ]
+    : [];
 
   return (
     <section

@@ -11056,7 +11056,29 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": {
+                    contact_id?: string | null;
+                    /** Format: date */
+                    invoice_date?: string;
+                    items?: {
+                        batch_number?: string | null;
+                        discount_percent?: number;
+                        id?: string;
+                        medicine_id?: string;
+                        offering_id?: string;
+                        patient_offering_suggestion_id?: string | null;
+                        patient_treatment_ids?: string[];
+                        quantity: number;
+                    }[];
+                    member_ids?: string[];
+                    overall_discount?: number;
+                    patient_prescription_id?: string | null;
+                    remark?: string | null;
+                };
+            };
+        };
         responses: {
             200: {
                 headers: {
@@ -11277,7 +11299,31 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": {
+                    branch_id: string;
+                    contact_id?: string | null;
+                    /** Format: date */
+                    invoice_date?: string;
+                    items: {
+                        batch_number?: string | null;
+                        discount_percent?: number;
+                        medicine_id?: string;
+                        offering_id?: string;
+                        patient_offering_suggestion_id?: string | null;
+                        patient_treatment_ids?: string[];
+                        quantity: number;
+                    }[];
+                    member_ids?: string[];
+                    overall_discount?: number;
+                    patient_prescription_id?: string | null;
+                    remark?: string | null;
+                    /** @enum {string} */
+                    type?: "clinic" | "consultation" | "medical";
+                };
+            };
+        };
         responses: {
             200: {
                 headers: {
@@ -27156,7 +27202,13 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": {
+                    code: string;
+                };
+            };
+        };
         responses: {
             200: {
                 headers: {
@@ -27848,7 +27900,15 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": {
+                    password: string;
+                } | {
+                    code: string;
+                };
+            };
+        };
         responses: {
             200: {
                 headers: {

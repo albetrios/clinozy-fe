@@ -28,7 +28,7 @@ export interface PendingSearch {
   /** Any of these states. */
   status?: CreditStatus[];
   created?: CreatedFilter;
-  /** A CR- number, the party or the reason (≤ 80 characters). */
+  /** A CR- number, the supplier's name or the person (D81; ≤ 80 characters). */
   q?: string;
 }
 

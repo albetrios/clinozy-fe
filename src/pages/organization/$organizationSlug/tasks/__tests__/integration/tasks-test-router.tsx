@@ -6,32 +6,74 @@ import {
   createRouter,
   Outlet,
   RouterProvider,
+  useLocation,
+  useNavigate,
+  useParams,
 } from '@tanstack/react-router';
 import { render } from '@testing-library/react';
-import type { ReactNode } from 'react';
+import { type ReactNode, useCallback } from 'react';
 
+import type { OrganizationPermission } from '@/core/types/permissions.ts';
+import { organizationTasks } from '@/lib/routes/tasks-builders.ts';
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import { validateTaskCreateSearch } from '../../tasks.dialog-search.ts';
 import { validateTasksSearch } from '../../tasks.search.ts';
 
 /**
+ * Every code an Owner or Admin holds in the room (research-tasks §7) — the
+ * harness's member unless a test names others: read, create, work and delete
+ * tasks, switch the rules, and open a lead or a booking from a contact card.
+ */
+const TASKS_ADMIN_CODES: readonly OrganizationPermission[] = [
+  'organization:read',
+  'organization:update',
+  'task:read',
+  'task:create',
+  'task:update',
+  'task:delete',
+  'lead:create',
+  'appointment:create',
+];
+
+/** A Front desk member's codes in the room: no delete, no rule switches. */
+export const TASKS_FRONT_DESK_CODES: readonly OrganizationPermission[] = [
+  'organization:read',
+  'task:read',
+  'task:create',
+  'task:update',
+  'lead:create',
+  'appointment:create',
+];
+
+/** Who the harness signs in: their clinozy-be codes, or View-as a clinic role. */
+export interface TasksTestMember {
+  /** The member's codes (the room answers from them); the Admin's by default. */
+  permissions?: readonly OrganizationPermission[];
+  /** View-as instead: the reads follow that role's matrix and every code reads false. */
+  role?: Role;
+}
+
+/**
  * The Tasks family as `routeTree.tsx` registers it — the list with its search
  * schema and its two dialog routes, New task and the task drawer, which render
- * nothing — with `Page` as the list's component, opened at `url`, for a member
- * previewed as `role` (View-as narrows the clinic access to that role's
- * matrix). Every other path lands on a catch-all, so a test can read where a
- * link went.
+ * nothing — with `Page` as the list's component, opened at `url`, for the test
+ * member (`signInTestMember`: organization `org_test`, slug `acme` — every
+ * tasks read and key carries the organization) holding `member.permissions`,
+ * or previewed as `member.role` (View-as). Every other path lands on a
+ * catch-all, so a test can read where a link went.
  */
 export function renderTasksRoutes(
   url: string,
   Page: () => ReactNode,
-  { role = 'admin' }: { role?: Role } = {},
+  { permissions = TASKS_ADMIN_CODES, role }: TasksTestMember = {},
 ) {
-  useOrganizationStore.getState().setPermissions(['organization:read']);
-  useUIStore.setState({ previewRole: role });
+  signInTestMember();
+  useOrganizationStore.getState().setPermissions([...permissions]);
+  useUIStore.setState({ previewRole: role ?? null });
 
   const root = createRootRoute({ component: () => <Outlet /> });
   const tasks = createRoute({
@@ -61,7 +103,7 @@ export function renderTasksRoutes(
     history: createMemoryHistory({ initialEntries: [url] }),
   });
   const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+    defaultOptions: { queries: { retry: false, gcTime: 0 }, mutations: { retry: false } },
   });
   const view = render(
     <QueryClientProvider client={queryClient}>
@@ -74,5 +116,34 @@ export function renderTasksRoutes(
 /** Put the stores the harness touched back as they were. */
 export function resetTasksRoutes() {
   useUIStore.setState({ previewRole: null });
-  useOrganizationStore.getState().clearPermissions();
+  useOrganizationStore.getState().clearOrganization();
+}
+
+/**
+ * A stand-in for `useTasksDialogRoute` (the drawers' package): the dialog the
+ * URL opens as the real one reads it — New task on `/create`, a task on
+ * `/$taskId` — and a close back to the list with its params.
+ */
+export function useTasksDialogRouteStub() {
+  const { organizationSlug = '', taskId } = useParams({ strict: false });
+  const pathname = useLocation({ select: (location) => location.pathname });
+  const navigate = useNavigate();
+  const close = useCallback(() => {
+    void navigate({
+      ...organizationTasks(organizationSlug),
+      search: (current: Record<string, unknown>) => validateTasksSearch(current),
+      hash: true,
+      replace: true,
+    });
+  }, [navigate, organizationSlug]);
+  if (taskId) {
+    return {
+      dialog: { kind: 'task', taskId, detail: undefined, isPending: true },
+      close,
+    };
+  }
+  if (pathname.endsWith('/create')) {
+    return { dialog: { kind: 'create', prefill: {} }, close };
+  }
+  return { dialog: { kind: 'none' }, close };
 }

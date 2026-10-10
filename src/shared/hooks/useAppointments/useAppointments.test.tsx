@@ -807,3 +807,25 @@ describe('useReinstateAppointment', () => {
     expect(stored(RIYA.id).status).toBe('scheduled');
   });
 });
+
+describe('the task rules after a booking write (D81 T7)', () => {
+  it('reads the tasks again once the server’s rules have run on a booking or a status move', async () => {
+    const refresh = vi.spyOn(client, 'invalidateQueries');
+    const taskReads = () =>
+      refresh.mock.calls.filter(([filters]) => filters?.queryKey?.[1] === 'tasks').length;
+    const { result } = renderHook(
+      () => ({ book: useCreateAppointment(), move: useMoveAppointment() }),
+      { wrapper },
+    );
+
+    await act(() => result.current.book.mutateAsync(NEW_BOOKING));
+    // Not at once: the rules run just after the commit.
+    expect(taskReads()).toBe(0);
+    await waitFor(() => expect(taskReads()).toBe(1), { timeout: 3_000 });
+
+    await act(() =>
+      result.current.move.mutateAsync({ appointment: RIYA, route: 'confirm' }),
+    );
+    await waitFor(() => expect(taskReads()).toBe(2), { timeout: 3_000 });
+  });
+});

@@ -2,11 +2,14 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import i18n from '@/lib/i18n/i18n.ts';
 import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
 import {
   clinicFixtures,
   resetClinicFixtures,
 } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import { deletePayment } from '@/shared/api/clinic/payments-api.ts';
+import { HttpError } from '@/shared/errors/HttpError.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
@@ -26,20 +29,24 @@ const { notifyMock } = vi.hoisted(() => ({
   notifyMock: { success: vi.fn(), error: vi.fn(), info: vi.fn(), undo: vi.fn() },
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
+vi.mock('@/shared/api/clinic/payments-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  deletePayment: vi.fn(),
+}));
 
 /** 10:00 on 3 Oct, clinic time — the seed day (27 Sep) is today. */
 const NOW = new Date('2026-10-03T04:30:00Z');
 
-/** Rhea's ₹600 UPI against Sale #785 (₹700 still due). */
+/** Rhea's ₹600 UPI against Sale #785 (₹700 still due) — the parked Medical room's fixture ledger. */
 const RECEIPT: PaymentDeleteTarget = {
   entry: {
     id: ref.payment(5512),
     seq: 5512,
     kind: 'receipt',
-    amount: 60_000,
-    invoice: { seq: 785, type: 'medical', due: 70_000 },
+    amount: 600,
+    invoice: { seq: 785, number: '2026-27/0785', type: 'medical', due: 700 },
   },
-  dueAfter: 130_000,
+  dueAfter: 1300,
 };
 /** "Tea & snacks", ₹260 cash. */
 const EXPENSE: PaymentDeleteTarget = {
@@ -47,10 +54,16 @@ const EXPENSE: PaymentDeleteTarget = {
     id: ref.payment(310),
     seq: 310,
     kind: 'expense',
-    amount: 26_000,
+    amount: 260,
     invoice: null,
   },
 };
+
+/** A refusal as clinozy-be answers it. */
+const conflict = (reason: string, detail: string) =>
+  new HttpError(detail, 409, '/app/payments/x', 'DELETE', {
+    error: { type: 'request_error', code: 'conflict', reason, detail },
+  });
 
 const isLive = (id: string) =>
   clinicFixtures.payments.snapshot((payment) => payment.id === id).length === 1;
@@ -73,7 +86,12 @@ describe('PaymentDeleteConfirm (payments.md:34)', () => {
     const onClose = vi.fn();
     const onDeleted = vi.fn();
     renderWithProviders(
-      <PaymentDeleteConfirm target={RECEIPT} onClose={onClose} onDeleted={onDeleted} />,
+      <PaymentDeleteConfirm
+        target={RECEIPT}
+        onClose={onClose}
+        onDeleted={onDeleted}
+        fixture
+      />,
     );
     const dialog = await screen.findByTestId('confirm-dialog');
     expect(within(dialog).getByText('Delete this payment?')).toBeInTheDocument();
@@ -109,7 +127,9 @@ describe('PaymentDeleteConfirm (payments.md:34)', () => {
 
   it('says only the audit sentence for an expense, and Undo puts it back', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<PaymentDeleteConfirm target={EXPENSE} onClose={vi.fn()} />);
+    renderWithProviders(
+      <PaymentDeleteConfirm target={EXPENSE} onClose={vi.fn()} fixture />,
+    );
     const dialog = await screen.findByTestId('confirm-dialog');
     expect(
       within(dialog).getByText(
@@ -131,10 +151,72 @@ describe('PaymentDeleteConfirm (payments.md:34)', () => {
     await waitFor(() => expect(isLive(ref.payment(310))).toBe(true));
   });
 
-  it('keeps the entry on "Keep it"', async () => {
+  it('deletes a Payments entry on clinozy-be, not on the fixture ledger', async () => {
+    vi.mocked(deletePayment).mockResolvedValue();
+    const user = userEvent.setup();
+    const onDeleted = vi.fn();
+    renderWithProviders(
+      <PaymentDeleteConfirm target={EXPENSE} onClose={vi.fn()} onDeleted={onDeleted} />,
+    );
+    const dialog = await screen.findByTestId('confirm-dialog');
+    await user.click(within(dialog).getByTestId('confirm-reason-duplicate'));
+    await user.click(within(dialog).getByTestId('confirm-accept'));
+    await waitFor(() => expect(onDeleted).toHaveBeenCalledTimes(1));
+    expect(deletePayment).toHaveBeenCalledWith({
+      paymentId: ref.payment(310),
+      reason: 'duplicate',
+      note: null,
+    });
+    expect(isLive(ref.payment(310))).toBe(true);
+  });
+
+  it.each([
+    ['day_closed', 'deleteEntry.blocked.dayClosed'],
+    ['more_than_paid', 'deleteEntry.blocked.moreThanPaid'],
+  ])('closes on a %s refusal and says why in the room’s words', async (reason, key) => {
+    vi.mocked(deletePayment).mockRejectedValue(conflict(reason, 'Server words'));
+    const user = userEvent.setup();
+    const onClose = vi.fn();
+    const onDeleted = vi.fn();
+    renderWithProviders(
+      <PaymentDeleteConfirm target={EXPENSE} onClose={onClose} onDeleted={onDeleted} />,
+    );
+    const dialog = await screen.findByTestId('confirm-dialog');
+    await user.click(within(dialog).getByTestId('confirm-reason-duplicate'));
+    await user.click(within(dialog).getByTestId('confirm-accept'));
+    await waitFor(() =>
+      expect(notifyMock.error).toHaveBeenCalledWith(
+        i18n.t(key, { ns: 'payments', ref: 'PAY-310' }),
+      ),
+    );
+    expect(onClose).toHaveBeenCalled();
+    expect(onDeleted).not.toHaveBeenCalled();
+    expect(notifyMock.undo).not.toHaveBeenCalled();
+  });
+
+  it('keeps the confirm open on any other failure, with the server’s reason', async () => {
+    vi.mocked(deletePayment).mockRejectedValue(
+      new HttpError('Not allowed', 403, '/app/payments/x', 'DELETE', {
+        error: { type: 'request_error', code: 'forbidden', detail: 'Not allowed' },
+      }),
+    );
     const user = userEvent.setup();
     const onClose = vi.fn();
     renderWithProviders(<PaymentDeleteConfirm target={EXPENSE} onClose={onClose} />);
+    const dialog = await screen.findByTestId('confirm-dialog');
+    await user.click(within(dialog).getByTestId('confirm-reason-duplicate'));
+    await user.click(within(dialog).getByTestId('confirm-accept'));
+    await waitFor(() => expect(notifyMock.error).toHaveBeenCalledWith('Not allowed'));
+    expect(onClose).not.toHaveBeenCalled();
+    expect(screen.getByTestId('confirm-dialog')).toBeInTheDocument();
+  });
+
+  it('keeps the entry on "Keep it"', async () => {
+    const user = userEvent.setup();
+    const onClose = vi.fn();
+    renderWithProviders(
+      <PaymentDeleteConfirm target={EXPENSE} onClose={onClose} fixture />,
+    );
     await user.click(await screen.findByTestId('confirm-cancel'));
     expect(onClose).toHaveBeenCalled();
     expect(isLive(ref.payment(310))).toBe(true);

@@ -7,9 +7,10 @@ import { describe, expect, it } from 'vitest';
 import {
   TASK_FOLLOW_UP_WHEN,
   TASK_RULE_GROUPS,
-  TASK_RULE_IDS,
-  TASK_RULES,
   TASK_SNOOZE_OPTIONS,
+  TASK_TYPE_VALUES,
+  TASK_TYPES,
+  type TaskType,
 } from '@/shared/api/clinic/tasks-contracts.ts';
 
 import { TASK_RULE_KEYS, TASK_RULES_NS } from './task-rules.constants.ts';
@@ -24,24 +25,47 @@ const lookup = (tree: unknown, key: string) =>
     .split('.')
     .reduce<unknown>((node, part) => (node as Record<string, unknown>)?.[part], tree);
 
+/** The rules clinozy-be can take a step for itself (`can_be_automatic`, route map §4 #21). */
+const AUTOMATIC_TYPES: readonly TaskType[] = [
+  'confirm',
+  'feedback',
+  'payment_due',
+  'gone_quiet',
+];
+
+/** The rules the design never drew — no "How" steps. */
+const UNDRAWN_TYPES: readonly TaskType[] = [
+  'payment_due',
+  'settle_by',
+  'medical_rep_visit',
+];
+
 describe('TASK_RULE_KEYS', () => {
   it('lives in the tasks namespace', () => {
     expect(TASK_RULES_NS).toBe('tasks');
   });
 
-  it('names every rule and every outcome of the catalogue — no more, no fewer', () => {
-    expect(Object.keys(TASK_RULE_KEYS.rules)).toEqual([...TASK_RULE_IDS]);
+  it('names every type and every outcome of the catalogue — no more, no fewer', () => {
+    expect(Object.keys(TASK_RULE_KEYS.rules)).toEqual([...TASK_TYPE_VALUES]);
     expect(Object.keys(TASK_RULE_KEYS.groups)).toEqual([...TASK_RULE_GROUPS]);
     expect(Object.keys(TASK_RULE_KEYS.snoozeOptions)).toEqual([...TASK_SNOOZE_OPTIONS]);
     expect(Object.keys(TASK_RULE_KEYS.followUpWhen)).toEqual([...TASK_FOLLOW_UP_WHEN]);
-    for (const rule of TASK_RULE_IDS) {
-      const keys = TASK_RULE_KEYS.rules[rule];
-      expect(Object.keys(keys.outcomes), rule).toEqual(
-        TASK_RULES[rule].outcomes.map((outcome) => outcome.id),
+    for (const type of TASK_TYPE_VALUES) {
+      const keys = TASK_RULE_KEYS.rules[type];
+      const outcomes: readonly { id: string }[] = TASK_TYPES[type].outcomes;
+      expect(Object.keys(keys.outcomes), type).toEqual(
+        outcomes.map((outcome) => outcome.id),
       );
-      expect(keys.automation !== null, rule).toBe(TASK_RULES[rule].automation);
-      expect(keys.how, rule).toHaveLength(TASK_RULES[rule].listed ? 3 : 0);
+      expect(keys.automation !== null, type).toBe(AUTOMATIC_TYPES.includes(type));
+      expect(keys.how, type).toHaveLength(UNDRAWN_TYPES.includes(type) ? 0 : 3);
     }
+  });
+
+  it('keeps the design’s rule ids as the copy’s segments', () => {
+    expect(TASK_RULE_KEYS.rules.follow_up.label).toBe('rules.follow.label');
+    expect(TASK_RULE_KEYS.rules.call_back.label).toBe('rules.unhappy.label');
+    expect(TASK_RULE_KEYS.rules.gone_quiet.label).toBe('rules.noreply.label');
+    expect(TASK_RULE_KEYS.rules.by_hand.label).toBe('rules.manual.label');
   });
 
   it('resolves every key to copy in every locale', () => {

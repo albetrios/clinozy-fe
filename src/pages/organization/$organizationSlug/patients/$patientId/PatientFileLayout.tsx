@@ -180,7 +180,7 @@ function PatientFileBody({
   const phone = useViewportTier() === 'phone';
   const { preferences, update } = usePreferences();
   const { items } = usePatientFileActions();
-  const { section, viewable, masked } = usePatientFileContext();
+  const { section, viewable, masked, toggleMasked } = usePatientFileContext();
   const go = usePatientFileNavigation();
 
   return (
@@ -216,6 +216,12 @@ function PatientFileBody({
             limited={!viewable.includes('overview')}
             onEditContact={go.editContact}
             actions={go.railActions}
+            // What she owes — for a member who sees billing (Q-F1), masked with the file.
+            money={
+              viewable.includes('invoices')
+                ? { masked, onToggleMasked: toggleMasked }
+                : undefined
+            }
             className={RAIL_TIER}
           />
           <div className="flex min-h-0 min-w-0 flex-1 flex-col">

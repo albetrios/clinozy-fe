@@ -140,7 +140,8 @@
     },
     "rowActions": {
       "edit": "Edit",
-      "delete": "Delete"
+      "delete": "Delete",
+      "pay": "Pay {{amount}}"
     },
     "vendorFilter": {
       "any": "Any supplier",
@@ -203,8 +204,10 @@
     "noPurchases": "No purchases",
     "rowActions": {
       "edit": "Edit",
-      "delete": "Delete"
-    }
+      "delete": "Delete",
+      "pay": "Pay {{amount}}"
+    },
+    "paidUp": "Nothing is owed to {{name}} now"
   },
   "drawers": {
     "records": {

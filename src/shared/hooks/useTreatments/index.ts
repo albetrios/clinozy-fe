@@ -7,4 +7,5 @@ export {
   useReverseTreatment,
   useTreatmentFeedback,
   useUpdateTreatment,
+  useVisitTreatmentsToBill,
 } from './useTreatments.ts';

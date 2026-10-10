@@ -19,16 +19,20 @@ function renderToolbar(props: Partial<TasksToolbarProps> = {}) {
     onViewChange: vi.fn(),
     onTypesChange: vi.fn(),
     onScopeChange: vi.fn(),
-    onRuleChange: vi.fn(),
     onNewTask: vi.fn(),
   };
   const view = renderWithProviders(
     <TasksToolbar
-      view="queue"
+      view="open"
       types={[]}
       scope="mine"
-      ruleSettings={undefined}
-      canEditRules
+      rules={{
+        settings: undefined,
+        failed: false,
+        onRetry: vi.fn(),
+        canEdit: true,
+        onChange: vi.fn(),
+      }}
       {...handlers}
       {...props}
     />,
@@ -76,7 +80,7 @@ describe('TasksToolbar (tasks.md:17, H:2129–2139)', () => {
     expect(onScopeChange).toHaveBeenCalledWith('everyone');
   });
 
-  it('opens New task, and hides it without Create', async () => {
+  it('opens New task, and hides it without `task:create`', async () => {
     const user = userEvent.setup();
     const { onNewTask, unmount } = renderToolbar();
     await user.click(await screen.findByTestId('tasks-new'));

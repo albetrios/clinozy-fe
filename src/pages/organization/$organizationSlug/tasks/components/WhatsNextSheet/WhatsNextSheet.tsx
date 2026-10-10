@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { useId, useState } from 'react';
 import { useForm, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -6,7 +6,7 @@ import { isolateValues } from '@/lib/bidi-isolate.ts';
 import {
   TASK_FOLLOW_UP_WHEN,
   TASK_WHY_MAX,
-  type TaskChange,
+  type TaskRecord,
   type TaskRow,
 } from '@/shared/api/clinic/tasks-contracts.ts';
 import { TASK_RULE_KEYS, TASK_RULES_NS } from '@/shared/clinic/task-rules.constants.ts';
@@ -31,9 +31,10 @@ import {
   emptyWhatsNextForm,
   WHATS_NEXT_STEP_TONES,
   WHATS_NEXT_STEPS,
+  whatsNextFieldsOf,
   type WhatsNextForm,
-  whatsNextInputOf,
   whatsNextMissing,
+  type WhatsNextRequired,
 } from './whats-next-form.ts';
 
 const K = TASKS_KEYS.whatsNext;
@@ -42,12 +43,28 @@ const IDS = TASKS_TEST_IDS.whatsNext;
 /** Four fields, two of them chip rows: the light 560px (`min(560px, 100vw − 56px)`). */
 const CONTENT_PROFILE = { fieldCount: 4 } as const;
 
-/** The form's fields in order — a client check opens the first one it names. */
+/** The form's fields in order — a client check or a server refusal opens the first one it names. */
 const FIELD_ORDER: readonly (keyof WhatsNextForm)[] = ['step', 'when', 'ownerId', 'note'];
+
+/** The create's fields as the form names them (`POST /app/tasks`). */
+const SERVER_FIELDS: Readonly<Record<string, keyof WhatsNextForm>> = {
+  title: 'step',
+  dueAt: 'when',
+  ownerMembershipId: 'ownerId',
+  ownerRole: 'ownerId',
+  why: 'note',
+};
+
+/** The words a missing pick toasts. */
+const MISSING_KEYS: Readonly<Record<WhatsNextRequired, string>> = {
+  step: K.pickStep,
+  when: K.pickWhen,
+  ownerId: TASKS_KEYS.newTask.owner.missing,
+};
 
 /** Props of {@link WhatsNextSheet}. */
 export interface WhatsNextSheetProps {
-  /** The task just closed, as the close answered it. */
+  /** The task just closed, as the close answered it, with its person. */
   task: TaskRow;
   /** Its result ("Confirmed on call"). */
   result: string;
@@ -60,10 +77,11 @@ export interface WhatsNextSheetProps {
  * H:4054–4055): over the list 380ms after a closing outcome, on the record
  * drawer at 560px — "Closed · <task> · <result>", one section "Next task":
  * Next step (five toned chips) and When (In 3 hours · Tomorrow 11 am · In 3
- * days · Next week), both required, "Assigned to" (the member preselected)
- * and a Note that becomes the why line. "Create task" adds a "Follow-ups you
- * set" task after the closed one and toasts "Next task set · <step> ·
- * <when>"; "Nothing next" closes.
+ * days · Next week), both required, "Assigned to" (the member preselected —
+ * the team who can work tasks) and a Note that becomes the why line. "Create
+ * task" adds a task by hand for the same person and record (`POST /app/tasks`,
+ * the close's second step — research-tasks Q2) and toasts "Next task set ·
+ * <step> · <when>"; a refusal lands on its field; "Nothing next" closes.
  */
 export function WhatsNextSheet({ task, result, onClose }: WhatsNextSheetProps) {
   const { t } = useTranslation(TASKS_NS);
@@ -75,39 +93,39 @@ export function WhatsNextSheet({ task, result, onClose }: WhatsNextSheetProps) {
   const ids = useDrawerFieldIds(form, idPrefix);
   const assignees = useTaskAssignees();
   const create = useCreateTask({ notifyOnError: false });
-  const ownerId = values.ownerId ?? assignees.viewer?.id ?? null;
-  const first = task.person.firstName;
+  // The due time counts from when the sheet opened, so a "Retry save" sends the same body.
+  const [openedAt] = useState(() => new Date());
+  const ownerId = values.ownerId ?? assignees.myMembershipId ?? null;
+  const first = task.person?.firstName ?? '';
   const stepLabel = (step: (typeof WHATS_NEXT_STEPS)[number]) => t(K.step[step]);
   const whenLabel = (when: (typeof TASK_FOLLOW_UP_WHEN)[number]) =>
     tRules(TASK_RULE_KEYS.followUpWhen[when]);
   const closed = t(K.sub, isolateValues({ title: task.title, result }));
+  const titleOf = (step: (typeof WHATS_NEXT_STEPS)[number]) =>
+    first ? t(K.taskTitle, { step: stepLabel(step), first }) : stepLabel(step);
 
-  const { saveState, save } = useDrawerSave<WhatsNextForm, TaskChange>({
+  const { saveState, save } = useDrawerSave<WhatsNextForm, TaskRecord>({
     form,
     fieldOrder: FIELD_ORDER,
+    serverFields: SERVER_FIELDS,
     toastId: 'whats-next-save-failed',
     check: (current) => {
-      const [missing] = whatsNextMissing(current);
-      if (!missing) return null;
-      return {
-        fields: [missing],
-        message: t(missing === 'step' ? K.pickStep : K.pickWhen),
-      };
+      const [missing] = whatsNextMissing(current, ownerId);
+      return missing ? { fields: [missing], message: t(MISSING_KEYS[missing]) } : null;
     },
     onField: () => {},
     write: async () => {
       const current = form.getValues();
-      const input = whatsNextInputOf(current, {
-        followsTaskId: task.id,
+      const fields = whatsNextFieldsOf(current, {
+        closed: task,
         ownerId,
-        title: current.step
-          ? t(K.taskTitle, { step: stepLabel(current.step), first })
-          : '',
+        title: current.step ? titleOf(current.step) : '',
         plannedAfter: t(K.plannedAfter, { after: `${task.title} · ${result}` }),
-        now: new Date(),
+        now: openedAt,
       });
-      if (!input) throw new Error('What’s next saved without a step or a time');
-      return create.mutateAsync(input);
+      if (!fields)
+        throw new Error('What’s next saved without a step, a time or an owner');
+      return create.mutateAsync({ fields });
     },
     onDone: () => {
       const { step, when } = form.getValues();
@@ -133,12 +151,14 @@ export function WhatsNextSheet({ task, result, onClose }: WhatsNextSheetProps) {
     <RecordDrawer
       open
       onClose={onClose}
-      title={t(K.title, { first })}
+      title={first ? t(K.title, { first }) : t(K.titleNoPerson)}
       sub={closed}
       content={CONTENT_PROFILE}
       dismissLabel={t(K.nothingNext)}
       saveLabel={t(K.create)}
-      onSave={() => void save()}
+      onSave={() => {
+        void save();
+      }}
       saveState={saveState}
       dirty={isDirty}
       testId={IDS.drawer}
@@ -172,6 +192,7 @@ export function WhatsNextSheet({ task, result, onClose }: WhatsNextSheetProps) {
         <DrawerField
           label={t(K.owner)}
           htmlFor={ownerField.id}
+          error={ownerField.error}
           span="half"
           stretch={false}
         >
@@ -187,7 +208,12 @@ export function WhatsNextSheet({ task, result, onClose }: WhatsNextSheetProps) {
             testId={IDS.owner}
           />
         </DrawerField>
-        <DrawerField label={t(K.note.label)} htmlFor={noteField.id} span="half">
+        <DrawerField
+          label={t(K.note.label)}
+          htmlFor={noteField.id}
+          error={noteField.error}
+          span="half"
+        >
           <DrawerInput
             {...noteField.control}
             {...form.register('note')}

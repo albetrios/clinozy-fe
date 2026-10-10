@@ -5,6 +5,7 @@ import { axe } from 'vitest-axe';
 
 vi.mock('../shared/stock-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
+  fetchOldestOpenStockPurchase: vi.fn(),
   listStockVendors: vi.fn(),
   fetchStockVendor: vi.fn(),
   stockListSummary: vi.fn(),
@@ -16,7 +17,7 @@ vi.mock('../shared/stock-records-api.ts', async (importOriginal) => ({
 }));
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
-import { stockVendorRow } from '@/tests/utils/stock-doubles.ts';
+import { stockPurchaseRow, stockVendorRow } from '@/tests/utils/stock-doubles.ts';
 
 import {
   renderStockRoutes,
@@ -25,6 +26,7 @@ import {
 import { useStockDeleteBlockText } from '../shared/components/StockDeleteConfirm/index.ts';
 import { useStockAccess } from '../shared/hooks/useStockAccess/index.ts';
 import {
+  fetchOldestOpenStockPurchase,
   fetchStockVendor,
   listStockVendors,
   stockListSummary,
@@ -62,6 +64,7 @@ const VENDORS_URL = '/organization/acme/stock/vendors';
 const ANKUR_ID = 'svnd_ankurpharma000000000';
 const IBREIA_ID = 'svnd_ibreia000000000000000';
 const QUICK_ID = 'svnd_quickvendor000000000';
+const OLDEST_BILL_ID = 'spur_ankuroldest000000000a';
 
 /** Ankur Pharma, owed ₹1,500 over two purchases; Ibreia, owed nothing; a quick vendor with no phone. */
 const ROWS: StockVendorRow[] = [
@@ -179,12 +182,75 @@ describe('VendorsPage (Q-K1)', () => {
     expect(stockListSummary).toHaveBeenCalledTimes(1);
   });
 
-  it('offers no "Pay ₹X" while Payments is on fixtures (Q-S3)', async () => {
-    await openVendors();
-    expect(screen.queryByTestId('stock-vendors-row-action-pay')).not.toBeInTheDocument();
+  it('"Pay ₹X" reads the vendor’s oldest open bill once, on the click, and opens Send payment on it (Q-S3)', async () => {
+    const user = setup();
+    vi.mocked(fetchOldestOpenStockPurchase).mockResolvedValue(
+      stockPurchaseRow({ id: OLDEST_BILL_ID }),
+    );
+    const { router } = await openVendors();
+    const pay = rowNamed('Ankur Pharma').getByTestId('stock-vendors-row-action-pay');
+    expect(pay).toHaveAccessibleName('Pay ₹1,500');
+    // Owed nothing: no Pay. And no read per row before a click.
+    expect(rowNamed('Ibreia').queryByTestId('stock-vendors-row-action-pay')).toBeNull();
+    expect(fetchOldestOpenStockPurchase).not.toHaveBeenCalled();
+
+    await user.click(pay);
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe('/organization/acme/payments/pay'),
+    );
+    expect(router.state.location.search).toEqual({ bill: OLDEST_BILL_ID });
+    expect(fetchOldestOpenStockPurchase).toHaveBeenCalledTimes(1);
+    expect(fetchOldestOpenStockPurchase).toHaveBeenCalledWith(ANKUR_ID);
+  });
+
+  it('"Pay ₹X" on a vendor paid up meanwhile says so and reads the vendors again; a failed read says why', async () => {
+    const user = setup();
+    vi.mocked(fetchOldestOpenStockPurchase).mockResolvedValueOnce(null);
+    const { router } = await openVendors();
+    const reads = vi.mocked(listStockVendors).mock.calls.length;
+
+    await user.click(
+      rowNamed('Ankur Pharma').getByTestId('stock-vendors-row-action-pay'),
+    );
+    await waitFor(() =>
+      expect(notifyMock.info).toHaveBeenCalledWith('Nothing is owed to Ankur Pharma now'),
+    );
+    await waitFor(() =>
+      expect(vi.mocked(listStockVendors).mock.calls.length).toBeGreaterThan(reads),
+    );
+    expect(router.state.location.pathname).toBe(VENDORS_URL);
+
+    vi.mocked(fetchOldestOpenStockPurchase).mockRejectedValueOnce(
+      new HttpError('down', 503, '/app/stock-purchases', 'GET', {}),
+    );
+    await user.click(
+      rowNamed('Ankur Pharma').getByTestId('stock-vendors-row-action-pay'),
+    );
+    await waitFor(() => expect(notifyMock.error).toHaveBeenCalledTimes(1));
+    expect(router.state.location.pathname).toBe(VENDORS_URL);
+  });
+
+  it('"Pay ₹X" needs payment:create and payment:read — create alone (PAY-M3) shows none', async () => {
+    renderStockRoutes(
+      VENDORS_URL,
+      { vendors: VendorsTab },
+      {
+        permissions: [
+          'organization:read',
+          'stock_item:read',
+          'stock_item:create',
+          'payment:create',
+        ],
+      },
+    );
+    await waitFor(() =>
+      expect(screen.getAllByTestId('stock-vendors-table-row')).toHaveLength(ROWS.length),
+    );
+    await screen.findByTestId('access-resolved');
     expect(
       rowNamed('Ankur Pharma').getByTestId('stock-vendors-row-action-edit'),
     ).toBeInTheDocument();
+    expect(screen.queryByTestId('stock-vendors-row-action-pay')).not.toBeInTheDocument();
   });
 
   it('opens Edit clinic vendor from a row, read through the vendor’s own route', async () => {

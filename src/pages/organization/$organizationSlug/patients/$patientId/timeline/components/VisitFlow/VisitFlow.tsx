@@ -5,10 +5,20 @@ import { useTranslation } from 'react-i18next';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
 import { cn } from '@/lib/utils.ts';
+import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
 import type { VisitRecord } from '@/shared/api/clinic/visits-contracts.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 
-import { ChecksStep, RxStep, StepRetry, TreatmentStep } from './flow-steps.tsx';
+import { usePatientFileContext } from '../../../shared/patient-file-context.ts';
+import {
+  ChecksStep,
+  CollectStep,
+  InvoiceStep,
+  RxStep,
+  StepRetry,
+  TreatmentStep,
+} from './flow-steps.tsx';
 import {
   useVisitFlow,
   type VisitFlowRead,
@@ -26,6 +36,7 @@ import {
   OUTLINE_BUTTON,
   rememberedSettings,
   stepStates,
+  type VisitBill,
   type VisitFlowStepState,
 } from './visit-flow.ts';
 
@@ -99,8 +110,62 @@ function readStatus(t: TFunction, read: VisitFlowRead<unknown>): string | null {
   return null;
 }
 
+/** An amount as the flow shows it: "₹ ••••" while the file is masked (Q-F4). */
+type ShowMoney = (rupees: number) => string;
+
+/** Invoice's status: the visit's invoice once made, else what is ready to bill, else why nothing is. */
+function invoiceStatus(t: TFunction, bill: VisitBill, money: ShowMoney): string {
+  if (bill.invoice) {
+    return t(K.invoice.done, {
+      number: displayId.invoiceNumber(bill.invoice.seq),
+      total: money(bill.invoice.total),
+    });
+  }
+  if (bill.toBill.length > 0) return t(K.invoice.ready, { count: bill.toBill.length });
+  return t(bill.covered ? K.invoice.covered : K.invoice.empty);
+}
+
+/** Collect's status: what the visit's invoice owes, nothing once paid (or covered), else wait. */
+function collectStatus(t: TFunction, bill: VisitBill, money: ShowMoney): string {
+  const { invoice } = bill;
+  if (invoice && invoice.due > 0) return t(K.collect.due, { amount: money(invoice.due) });
+  return t(invoice || bill.covered ? K.collect.nothing : K.collect.waiting);
+}
+
+/**
+ * Invoice and Collect (D156): done once the visit has its invoice (or a package covered it all)
+ * and once that invoice owes nothing — each with its status line.
+ */
+function billSteps(
+  t: TFunction,
+  read: VisitFlowRead<VisitBill>,
+  money: ShowMoney,
+): {
+  status: Pick<Record<VisitFlowStep, string>, 'invoice' | 'collect'>;
+  done: Pick<Record<VisitFlowStep, boolean>, 'invoice' | 'collect'>;
+} {
+  const bill = read.data;
+  const waiting = readStatus(t, read);
+  if (!bill || waiting !== null) {
+    return {
+      status: { invoice: waiting ?? '', collect: waiting ?? '' },
+      done: { invoice: false, collect: false },
+    };
+  }
+  return {
+    status: {
+      invoice: invoiceStatus(t, bill, money),
+      collect: collectStatus(t, bill, money),
+    },
+    done: {
+      invoice: bill.invoice !== null || bill.covered,
+      collect: bill.invoice ? bill.invoice.due === 0 : bill.covered,
+    },
+  };
+}
+
 /** Each shown step's status line (H:4881–4885) and whether it is done. */
-function useSteps(records: VisitFlowRecords) {
+function useSteps(records: VisitFlowRecords, money: ShowMoney) {
   const { t } = useTranslation([VISIT_FLOW_NS, ERRORS_NS, LOCALE_NS]);
   const status: Partial<Record<VisitFlowStep, string>> = {};
   const done: Partial<Record<VisitFlowStep, boolean>> = {};
@@ -132,6 +197,11 @@ function useSteps(records: VisitFlowRecords) {
     }
     status.treatment = readStatus(t, treatment) ?? line;
   }
+  if (records.bill) {
+    const bill = billSteps(t, records.bill, money);
+    Object.assign(status, bill.status);
+    Object.assign(done, bill.done);
+  }
   return { status, states: stepStates(done) };
 }
 
@@ -140,14 +210,19 @@ function useSteps(records: VisitFlowRecords) {
  * `patient-file.md:92–101, 392–404`) on `timeline?visit=open`, on the patient's booking checked
  * in today: one column up to 880px — "Visit in progress" (or paused), Pause / Resume and "✓
  * Complete visit", then the step cards, all open, the first unfinished one current: Check-in &
- * safety, Prescription, Treatment (waits for the checks). Each shows for a member who may read
- * its records, its controls for one who may write them. Invoice and "Collect & share" come back
- * with Payments (D152); the share goes (§6 #26).
+ * safety, Prescription, Treatment (waits for the checks), Invoice (the visit's sessions in the
+ * Invoice drawer, or a custom invoice) and Collect (Receive payment against the visit's invoice;
+ * D156). Each shows for a member who may read its records, its controls for one who may write
+ * them; amounts follow the file's mask. The share goes (§6 #26).
  */
 export function VisitFlow({ visit }: { visit: VisitRecord }) {
   const { t } = useTranslation(VISIT_FLOW_NS);
+  const { masked } = usePatientFileContext();
+  const formatRupees = useRupeeFormat();
+  const money: ShowMoney = (rupees) => (masked ? t(K.masked) : formatRupees(rupees));
   const { records, actions } = useVisitFlow(visit);
-  const { status, states } = useSteps(records);
+  const { status, states } = useSteps(records, money);
+  const owed = records.bill?.data?.invoice?.due ?? 0;
   const paused = visit.pausedAt !== null;
   const bodies: Readonly<Record<VisitFlowStep, ReactNode>> = {
     checks: records.checks?.data ? (
@@ -161,11 +236,17 @@ export function VisitFlow({ visit }: { visit: VisitRecord }) {
         actions={actions}
       />
     ),
+    invoice: <InvoiceStep actions={actions} />,
+    collect: (
+      <CollectStep due={owed > 0 ? money(owed) : null} onCollect={actions.collect} />
+    ),
   };
   const reads = {
     checks: records.checks,
     rx: records.prescription,
     treatment: records.treatment,
+    invoice: records.bill,
+    collect: records.bill,
   } satisfies Record<VisitFlowStep, VisitFlowRead<unknown> | undefined>;
   const shown = VISIT_FLOW_STEPS.filter((step) => reads[step] !== undefined);
 

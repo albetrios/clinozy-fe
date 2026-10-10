@@ -1,3 +1,4 @@
+export { canPayment, type PaymentCode } from './invoice-access.ts';
 export {
   INVOICE_DRAWER_KEYS,
   INVOICE_DRAWER_NS,
@@ -14,3 +15,4 @@ export {
   type InvoiceDrawerProps,
   type InvoiceEditDrawerProps,
 } from './InvoiceDrawer.tsx';
+export type { InvoiceDrawerOutcome } from './use-invoice-drawer.ts';

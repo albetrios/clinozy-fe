@@ -1,14 +1,14 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
 import { CrossRoomDialogContext } from '@/shared/hooks/useCrossRoomDialog/index.ts';
+import { TEST_MONEY_PATIENT_ID } from '@/tests/utils/payments-doubles.ts';
 
 import {
+  PAYMENTS_OWNER_CODES,
   renderPaymentsRoutes,
   resetPaymentsRoutes,
 } from '../../__tests__/integration/payments-test-router.tsx';
@@ -33,17 +33,13 @@ vi.mock('../ReceivePaymentDrawer/index.ts', () => ({
 vi.mock('../SendPaymentDrawer/index.ts', () => ({ SendPaymentDrawer: stub('send') }));
 vi.mock('../DayCloseDrawer/index.ts', () => ({ DayCloseDrawer: stub('day-close') }));
 
-const RHEA = patientRef('Rhea Shah');
+const RHEA = TEST_MONEY_PATIENT_ID;
 const props = (name: string) =>
   JSON.parse(screen.getByTestId(name).textContent ?? '{}') as unknown;
 const entry = (direction: 'received' | 'paid') =>
   ({ id: 'e1', seq: 5512, direction }) as unknown as LedgerRow;
 
-beforeEach(() => resetClinicFixtures());
-afterEach(() => {
-  resetPaymentsRoutes();
-  resetClinicFixtures();
-});
+afterEach(() => resetPaymentsRoutes());
 
 describe('PaymentsDrawers', () => {
   it('opens the drawer the dialog names', async () => {
@@ -65,11 +61,15 @@ describe('PaymentsDrawers', () => {
 
     rerender(
       <PaymentsDrawers
-        dialog={{ kind: 'pay', prefill: { bill: 'md:x' } }}
+        dialog={{ kind: 'pay', prefill: { bill: 'spur_ft5aosl5u6tyxqidd2e1a' } }}
         onClose={onClose}
       />,
     );
-    expect(props('send')).toEqual({ open: true, mode: 'create', bill: 'md:x' });
+    expect(props('send')).toEqual({
+      open: true,
+      mode: 'create',
+      bill: 'spur_ft5aosl5u6tyxqidd2e1a',
+    });
 
     for (const [direction, name] of [
       ['received', 'receive'],
@@ -98,17 +98,19 @@ describe('PaymentsDrawers', () => {
     expect(screen.queryByRole('region')).toBeNull();
   });
 
-  it('opens Day close only over the ledger — where its day picker is given', () => {
+  it('opens Day close only over the ledger — where its day picker is given — as it loads', async () => {
     const dialog = { kind: 'dayClose', search: { date: '2026-10-03' } } as const;
     const { rerender } = render(<PaymentsDrawers dialog={dialog} onClose={vi.fn()} />);
     expect(screen.queryByTestId('day-close')).toBeNull();
     rerender(<PaymentsDrawers dialog={dialog} onClose={vi.fn()} onDayChange={vi.fn()} />);
+    await screen.findByTestId('day-close');
     expect(props('day-close')).toMatchObject({ search: { date: '2026-10-03' } });
   });
 
   it('PaymentsDialogHost opens Receive over another room, from the drawer’s own route (A-P1)', async () => {
     const close = vi.fn();
     renderPaymentsRoutes('/organization/acme/payments/pending', {
+      permissions: PAYMENTS_OWNER_CODES,
       pending: () => (
         <CrossRoomDialogContext.Provider
           value={{

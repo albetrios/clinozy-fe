@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
 import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
+import { editSidesOf, type LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
 import { CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { PAYMENT_MODE_TONES } from '@/shared/clinic/clinic-tones.ts';
 import {
@@ -13,7 +13,7 @@ import {
   type TonePillProps,
 } from '@/shared/components/Cells/index.ts';
 import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 
 import { LEDGER_KEYS, LEDGER_NS } from './ledger-cells.constants.ts';
 import {
@@ -56,12 +56,16 @@ export function LedgerWhatCell({
  * 6:40 pm", "27 Sep"), and — once edited — "Edited 1× · last ₹600 UPI → ₹700
  * UPI" in the butter ink under it (`payments.md:29`).
  */
-export function LedgerWhenCell({ row }: { row: Pick<LedgerRow, 'paidAt' | 'edits'> }) {
+export function LedgerWhenCell({
+  row,
+}: {
+  row: Pick<LedgerRow, 'paidAt' | 'editCount' | 'lastEdit'>;
+}) {
   const { t } = useTranslation(LEDGER_NS);
   const { t: tClinic } = useTranslation(CLINIC_NS);
-  const formatPaise = usePaiseFormat();
+  const formatRupees = useRupeeFormat();
   const clock = useClinicClock();
-  const last = row.edits.at(-1);
+  const last = row.lastEdit ? editSidesOf(row.lastEdit) : null;
   return (
     <span className="flex min-w-0 flex-col">
       <span className="text-body text-foreground-soft truncate leading-[1.3] tabular-nums">
@@ -70,9 +74,9 @@ export function LedgerWhenCell({ row }: { row: Pick<LedgerRow, 'paidAt' | 'edits
       {last ? (
         <span className="text-caption text-tone-butter-foreground truncate tabular-nums">
           {t(LEDGER_KEYS.ledger.edited, {
-            count: row.edits.length,
-            from: editSideLabel(last.from, t, tClinic, formatPaise),
-            to: editSideLabel(last.to, t, tClinic, formatPaise),
+            count: row.editCount,
+            from: editSideLabel(last.from, t, tClinic, formatRupees),
+            to: editSideLabel(last.to, t, tClinic, formatRupees),
           })}
         </span>
       ) : null}
@@ -134,7 +138,7 @@ export function LedgerAmountCell({
   className?: string;
 }) {
   const { t } = useTranslation(LEDGER_NS);
-  const formatPaise = usePaiseFormat();
+  const formatRupees = useRupeeFormat();
   const received = row.direction === 'received';
   return (
     <span
@@ -145,7 +149,7 @@ export function LedgerAmountCell({
       )}
     >
       {t(received ? LEDGER_KEYS.ledger.received : LEDGER_KEYS.ledger.paid, {
-        amount: formatPaise(row.amount),
+        amount: formatRupees(row.amount),
       })}
     </span>
   );

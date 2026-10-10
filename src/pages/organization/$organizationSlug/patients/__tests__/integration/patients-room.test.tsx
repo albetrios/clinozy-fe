@@ -197,19 +197,36 @@ describe('the Patients room (KICKOFF §6.5)', () => {
     expect(router.state.location.search).toMatchObject({ activity: 'open' });
   });
 
-  it('offers Edit and Delete on a row — no New invoice or Collect — and opens Edit over the file', async () => {
+  it('offers New invoice, Edit and Delete on a row — no Collect without its dues — and opens Edit over the file', async () => {
     const user = userEvent.setup();
     const { router } = renderPatientsRoutes(PATIENTS, PatientsPage);
     await waitFor(() => expect(rows()).toHaveLength(4));
     const dharti = within(rowOf('Dharti Galani'));
+    expect(dharti.getByTestId('patients-row-action-new-invoice')).toBeInTheDocument();
     expect(dharti.getByTestId('patients-row-action-edit')).toBeInTheDocument();
     expect(dharti.getByTestId('patients-row-action-delete')).toBeInTheDocument();
-    expect(dharti.queryByTestId('patients-row-action-new-invoice')).toBeNull();
     expect(dharti.queryByTestId('patients-row-action-collect')).toBeNull();
     await user.click(dharti.getByTestId('patients-row-action-edit'));
     await waitFor(() =>
       expect(router.state.location.pathname).toBe(`${PATIENTS}/${DHARTI.id}/edit`),
     );
+  });
+
+  it('bills a patient from the row: the Invoice drawer over the list, by her public id', async () => {
+    const user = userEvent.setup();
+    const { router } = renderPatientsRoutes(PATIENTS, PatientsPage);
+    await waitFor(() => expect(rows()).toHaveLength(4));
+    await user.click(
+      within(rowOf('Dharti Galani')).getByTestId('patients-row-action-new-invoice'),
+    );
+    await waitFor(() =>
+      expect(shownLocation(router).pathname).toBe('/organization/acme/invoices/create'),
+    );
+    expect(shownLocation(router).search).toEqual({
+      type: 'clinic',
+      patient: DHARTI.id,
+      from: 'patients',
+    });
   });
 
   it('books the person from the contact card: New appointment over the list with who=<contact>', async () => {
@@ -419,6 +436,9 @@ describe('access (§6.5 Access, D9)', () => {
     expect(screen.queryByTestId('patients-new')).not.toBeInTheDocument();
     expect(screen.queryByTestId('patients-row-action-edit')).not.toBeInTheDocument();
     expect(screen.queryByTestId('patients-row-action-delete')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('patients-row-action-new-invoice'),
+    ).not.toBeInTheDocument();
   });
 
   it('a Front desk member edits but never deletes', async () => {

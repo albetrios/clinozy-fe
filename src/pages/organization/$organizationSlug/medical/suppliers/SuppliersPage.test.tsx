@@ -48,9 +48,8 @@ describe('SuppliersPage', () => {
     await waitFor(() =>
       expect(router.state.location.pathname).toBe('/organization/acme/payments/pay'),
     );
-    expect(router.state.location.search).toEqual({
-      bill: `md:${ref.purchaseOrder(431)}`,
-    });
+    // The bill's key is its purchase's id — here the fixture PO's (D153 seam).
+    expect(router.state.location.search).toEqual({ bill: ref.purchaseOrder(431) });
   });
 
   it('the Supplier drawer offers "⚡ Pay ₹2,980" too', async () => {

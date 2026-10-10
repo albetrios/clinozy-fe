@@ -14,9 +14,10 @@ import {
   useRoomFilters,
 } from '@/shared/components/RoomToolbar/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
+import { usePayBill } from '@/shared/hooks/usePayBill/index.ts';
 import { useRoomList } from '@/shared/hooks/useRoomList/index.ts';
 import { useRoomTable } from '@/shared/hooks/useRoomTable/index.ts';
-import { PenLine, Trash } from '@/shared/icons/index.ts';
+import { PenLine, Trash, Wallet } from '@/shared/icons/index.ts';
 
 import {
   StockDeleteConfirm,
@@ -121,11 +122,17 @@ function useCountLabel(summary: StockListSummary | undefined): string | undefine
   });
 }
 
-/** A row's Edit and — for those who may delete — Delete, which says why a paid bill stays. */
+/**
+ * A row's "Pay ₹X" while something is due — Payments › Send payment on the bill, for a member
+ * who may record a payment and see Payments (`usePayBill`) — Edit, and for those who may
+ * delete, Delete, which says why a paid bill stays.
+ */
 function usePurchaseRowActions() {
   const { t } = useTranslation(STOCK_NS);
   const access = useStockAccess();
   const nav = useStockNav();
+  const { formatRupees } = useStockWords();
+  const { canPay, pay } = usePayBill();
   const [deleting, setDeleting] = useState<StockDeleteTarget | null>(null);
   const askDelete = usePurchaseDelete<StockPurchaseRow>((purchase) =>
     setDeleting({
@@ -137,6 +144,18 @@ function usePurchaseRowActions() {
     }),
   );
   const rowActions = (purchase: StockPurchaseRow): DataTableRowAction[] => [
+    ...(canPay && purchase.due > 0
+      ? [
+          {
+            id: 'pay',
+            label: t(STOCK_KEYS.purchases.rowActions.pay, {
+              amount: formatRupees(purchase.due),
+            }),
+            icon: Wallet,
+            onSelect: () => pay({ kind: 'stock_po', purchaseId: purchase.id }),
+          },
+        ]
+      : []),
     {
       id: 'edit',
       label: t(STOCK_KEYS.purchases.rowActions.edit),
@@ -168,8 +187,9 @@ function usePurchaseRowActions() {
  * bills from clinic vendors: ID, Supplier, Invoice (hidden), Date, Bill, Due
  * and Status, the row's edge in its status. A row opens Edit purchase. The
  * footer counts the purchases and what is due on them (`meta.due_total`).
- * Paying a bill ("Pay ₹1,710") waits for Payments (Q-S3): a purchase is paid
- * by its "Paid" when it is recorded. The dialog routes render nothing: this
+ * "Pay ₹1,710", while something is due, opens Payments › Send payment on the
+ * bill (`?bill=spur_…`, Q-S3); a new purchase can also be paid by its "Paid"
+ * when it is recorded. The dialog routes render nothing: this
  * page opens the Purchase drawer for `create/` — `?reorder=low` presets
  * "Reorder low items" — and `$purchaseId/edit/`, with a vendor or an item
  * stacked on it; Delete asks for a reason, on an unpaid purchase only. A

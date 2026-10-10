@@ -18,6 +18,7 @@ import {
 import type { ChatHistoryTarget } from '@/shared/components/ChatColumn/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
+import { usePaymentAccess } from '@/shared/hooks/usePaymentAccess/index.ts';
 import { useOpenVisit, useStartVisit } from '@/shared/hooks/useVisits/index.ts';
 
 import type { RailUpNextActions } from '../../components/PatientRail/index.ts';
@@ -61,7 +62,7 @@ export interface PatientFileNavigation {
   resumeVisit?: () => void;
   /** The rail's "Edit contact" → `edit/` over this section (A-F1). */
   editContact?: () => void;
-  /** The rail's Up next: Book / Reschedule, Feedback. */
+  /** The rail's Up next: Book / Reschedule, Collect, Feedback. */
   railActions: RailUpNextActions;
   /** A history chip in the Activity column: the appointment or the section. */
   openHistory: (target: ChatHistoryTarget) => void;
@@ -73,9 +74,9 @@ export interface PatientFileNavigation {
  * The patient file's links (KICKOFF §6.6): its sections, the Patients list,
  * Edit patient over the open section, and the drawers of other rooms —
  * the appointment form (new for this patient's person, or the next visit to
- * reschedule) — each keeping the file behind it through `from` (§4, AMBER
- * A-P1). Each is left out when access says no. Receive payment comes back with
- * Payments on clinozy-be (D152).
+ * reschedule) and Receive payment for her (the rail's Collect,
+ * `payment:create`) — each keeping the file behind it through `from` (§4, AMBER
+ * A-P1). Each is left out when access says no.
  */
 export function usePatientFileNavigation(): PatientFileNavigation {
   const navigate = useClinicNavigate();
@@ -83,6 +84,7 @@ export function usePatientFileNavigation(): PatientFileNavigation {
   const search: { visit?: 'open' } = useSearch({ strict: false });
   const { patientId, file, section, viewable } = usePatientFileContext();
   const access = useClinicAccess();
+  const money = usePaymentAccess();
   const actions = usePatientFileActions();
   const openVisit = useOpenVisit(patientId).data ?? null;
   const flowShowing = section === PATIENT_FILE_DEFAULT_SECTION && search.visit === 'open';
@@ -97,10 +99,8 @@ export function usePatientFileNavigation(): PatientFileNavigation {
     });
   const referrer = section ? `patients/${patientId}/${section}` : null;
   const from = referrer ? { from: referrer } : {};
-  const can = (
-    area: 'patients' | 'payments' | 'appointments',
-    action: 'create' | 'edit',
-  ) => access.isResolved && access.can(area, action);
+  const can = (area: 'patients' | 'appointments', action: 'create' | 'edit') =>
+    access.isResolved && access.can(area, action);
 
   const openSection = (target: PatientFileSectionSlug) =>
     void navigate(organizationPatientSection(organizationSlug, patientId, target));
@@ -111,6 +111,14 @@ export function usePatientFileNavigation(): PatientFileNavigation {
         referrer,
         // The booking is the person's (`who=` a contact id).
         search: file ? { who: file.patient.contactId } : {},
+      }),
+    );
+  const collect = () =>
+    void navigate(
+      clinicCommandNavigation('newReceipt', {
+        organizationSlug,
+        referrer,
+        search: { patient: patientId },
       }),
     );
   const editContact = () =>
@@ -148,6 +156,7 @@ export function usePatientFileNavigation(): PatientFileNavigation {
     editContact: can('patients', 'edit') ? editContact : undefined,
     railActions: {
       onBook: canBook ? bookOrReschedule : undefined,
+      onCollect: money.canCreate ? collect : undefined,
       onFeedback: viewable.includes('overview')
         ? () => openSection('overview')
         : undefined,

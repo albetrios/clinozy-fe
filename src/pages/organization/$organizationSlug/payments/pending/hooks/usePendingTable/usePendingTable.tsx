@@ -13,8 +13,9 @@ import {
   type DataTableFeatures,
   dataTableFeatures,
 } from '@/shared/components/DataTable/index.ts';
+import { LedgerByCell } from '@/shared/components/LedgerCells/index.ts';
 import { useHiddenColumns } from '@/shared/hooks/useHiddenColumns/index.ts';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 
 import {
   PAYMENTS_KEYS,
@@ -40,13 +41,14 @@ const rowOf = (original: unknown) => original as CreditRow;
 
 /**
  * The Pending columns (KICKOFF §6.9 Pending; `payments.md:45–46`): Ref · Who ·
- * Which way · Amount · Why · Since · State, their tracks and what each folds
- * to. Who carries the meta line, Amount is the phone's key column; none sorts
- * (newest first).
+ * Which way · Amount · Why · Since · State · By (who added it — the team
+ * directory's name for `created_by_membership_id`, as the ledger's By), their
+ * tracks and what each folds to. Who carries the meta line, Amount is the
+ * phone's key column; none sorts (newest first).
  */
 function usePendingColumns(): ColumnDef<DataTableFeatures, CreditRow>[] {
   const { t } = useTranslation(PAYMENTS_NS);
-  const formatPaise = usePaiseFormat();
+  const formatRupees = useRupeeFormat();
   const since = useCreditSince();
   return [
     {
@@ -102,7 +104,7 @@ function usePendingColumns(): ColumnDef<DataTableFeatures, CreditRow>[] {
       meta: {
         track: '110px',
         align: 'end',
-        foldValue: (original) => formatPaise(rowOf(original).amount),
+        foldValue: (original) => formatRupees(rowOf(original).amount),
       },
     },
     {
@@ -141,6 +143,15 @@ function usePendingColumns(): ColumnDef<DataTableFeatures, CreditRow>[] {
           };
         },
       },
+    },
+    {
+      id: 'by',
+      accessorFn: (row) => row.by?.name ?? '',
+      header: t(PAYMENTS_KEYS.columns.by),
+      enableSorting: false,
+      cell: ({ row }) => <LedgerByCell row={row.original} />,
+      // The 28px people pill folds to nothing, as the ledger's (H:4115).
+      meta: { track: '130px', foldValue: () => null },
     },
   ];
 }

@@ -2,7 +2,9 @@ export {
   creditReason,
   creditSource,
   creditStateLabel,
+  isChangeableCredit,
   isOpenCredit,
+  useCreditLockLabel,
   useCreditSince,
 } from './pending-cells.ts';
 export {

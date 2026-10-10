@@ -41,9 +41,10 @@
     "noNotes": "Sin notas adicionales",
     "paymentSummary": "Resumen de pago",
     "totalAmount": "Importe total:",
-    "overallDiscount": "Descuento general:",
     "billAmount": "Importe de la factura:",
-    "balanceDue": "Saldo pendiente:"
+    "balanceDue": "Saldo pendiente:",
+    "taxableAmount": "Base imponible:",
+    "gstTotal": "GST:"
   },
   "prescription": {
     "patientId": "ID del paciente:",

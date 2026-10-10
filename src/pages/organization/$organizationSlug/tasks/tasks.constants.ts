@@ -1,7 +1,7 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 import type { TaskGroupId } from '@/shared/api/clinic/task-views.ts';
 import type {
-  ManualTaskType,
+  TaskLinkKind,
   TaskPriority,
   TaskTab,
 } from '@/shared/api/clinic/tasks-contracts.ts';
@@ -24,7 +24,8 @@ export const TASKS_KEYS = {
   views: {
     /** The view tabs' accessible name ("Task view"). */
     label: 'views.label',
-    queue: 'views.queue',
+    /** To do — the API's `open`. */
+    open: 'views.queue',
     snoozed: 'views.snoozed',
     done: 'views.done',
   } satisfies Record<TaskTab | 'label', string>,
@@ -67,17 +68,25 @@ export const TASKS_KEYS = {
     /** "✓ <result>" on a Done row. */
     result: 'row.result',
   },
-  /** The source chip under the person's name: "Lead #2363", "Appt #2838", … */
+  /**
+   * The source chip under the person's name — the kind of record the task points at ("Lead",
+   * "Visit", "Treatment"; the API sends no record numbers, research-tasks T10), else the person:
+   * "Patient", "Contact".
+   */
   sources: {
     lead: 'sources.lead',
     appointment: 'sources.appointment',
     treatment: 'sources.treatment',
-    patient: 'sources.patient',
+    checkIn: 'sources.checkIn',
+    review: 'sources.review',
     invoice: 'sources.invoice',
+    pendingCredit: 'sources.pendingCredit',
+    medicalRep: 'sources.medicalRep',
+    patient: 'sources.patient',
     contact: 'sources.contact',
-  },
+  } satisfies Record<TaskLinkKind | 'patient' | 'contact', string>,
   empty: {
-    queue: TASK_QUEUE_KEYS.empty,
+    open: TASK_QUEUE_KEYS.empty,
     snoozed: 'empty.snoozed',
     done: 'empty.done',
   } satisfies Record<TaskTab, string>,
@@ -99,23 +108,14 @@ export const TASKS_KEYS = {
       search: 'newTask.forField.search',
       /** The list before a search is typed. */
       empty: 'newTask.forField.empty',
-      /** Whom New task cannot save without. */
-      missing: 'newTask.forField.missing',
     },
-    type: {
-      label: 'newTask.type.label',
-      call_back: 'newTask.type.callBack',
-      follow_up: 'newTask.type.followUp',
-      send_price: 'newTask.type.sendPrice',
-      ask_for_photos: 'newTask.type.askForPhotos',
-      feedback: 'newTask.type.feedback',
-      payment_reminder: 'newTask.type.paymentReminder',
-    } satisfies Record<ManualTaskType | 'label', string>,
     titleField: {
       label: 'newTask.titleField.label',
       placeholder: 'newTask.titleField.placeholder',
-      /** An empty title saves as "<type> · <first name>" (H:6072). */
+      /** An empty title saves as "Follow up · <first name>" (H:6072; no Type, route map §4 #22). */
       fallback: 'newTask.titleField.fallback',
+      /** What New task cannot save without: a title, or a person to name it after. */
+      missing: 'newTask.titleField.missing',
     },
     due: {
       label: 'newTask.due.label',
@@ -134,9 +134,7 @@ export const TASKS_KEYS = {
       label: 'newTask.priority.label',
       normal: 'newTask.priority.normal',
       high: 'newTask.priority.high',
-    } satisfies Record<TaskPriority | 'label', string>,
-    /** "Remind 15 min before". */
-    remind: 'newTask.remind',
+    } satisfies Record<Exclude<TaskPriority, 'low'> | 'label', string>,
     notes: { label: 'newTask.notes.label', placeholder: 'newTask.notes.placeholder' },
     /** "↔ <person>". */
     footer: 'newTask.footer',
@@ -150,6 +148,8 @@ export const TASKS_KEYS = {
   drawer: {
     /** "Created by <product> · <rule description, lower-case>". */
     sub: 'drawer.sub',
+    /** A task made by hand's sub line — the API names no creator (research-tasks T15). */
+    subByHand: 'drawer.subByHand',
     /** The header chip's name ("Assigned to"). */
     assignedTo: 'drawer.assignedTo',
     sections: {
@@ -159,11 +159,13 @@ export const TASKS_KEYS = {
     },
     /** The quoted message: "“<message>”". */
     quote: 'drawer.quote',
-    /** The source button: "Open appointment · Appt #2848" … */
+    /** The source button: "Open appointment", "Open lead" … (no record numbers, T10). */
     source: {
       appointment: 'drawer.source.appointment',
       lead: 'drawer.source.lead',
       treatment: 'drawer.source.treatment',
+      checkIn: 'drawer.source.checkIn',
+      review: 'drawer.source.review',
       patient: 'drawer.source.patient',
       invoice: 'drawer.source.invoice',
     },
@@ -186,10 +188,6 @@ export const TASKS_KEYS = {
       visit: 'drawer.tileValues.visit',
       session: 'drawer.tileValues.session',
     },
-    automation: {
-      title: 'drawer.automation.title',
-      action: 'drawer.automation.action',
-    },
     outcomeNote: {
       label: 'drawer.outcomeNote.label',
       placeholder: 'drawer.outcomeNote.placeholder',
@@ -199,23 +197,40 @@ export const TASKS_KEYS = {
     /** The Assigned button's tooltip. */
     assignTip: 'drawer.assignTip',
     searchTeam: 'drawer.searchTeam',
+    /** The Assigned list's two groups: the members, then the role queues (owner_role). */
+    assignGroups: {
+      team: 'drawer.assignGroups.team',
+      queues: 'drawer.assignGroups.queues',
+    },
+    /** A task made by hand's delete confirm (`task:delete`): "Delete this task?". */
+    deleteTitle: 'drawer.deleteTitle',
     /** "Was <A> → <B>" after a reassign. */
     was: 'drawer.was',
     close: 'drawer.close',
   },
-  /** The drawer's toasts (`tasks.md:180–233`), each with Undo. */
+  /**
+   * The drawer's toasts (`tasks.md:180–233`) — no Undo: the API has no way back for an outcome,
+   * a snooze, a claim or a move (research-tasks §4, Q7).
+   */
   toasts: {
     closed: 'toasts.closed',
     snoozed: 'toasts.snoozed',
     claimed: 'toasts.claimed',
-    claimedUnowned: 'toasts.claimedUnowned',
     moved: 'toasts.moved',
-    movedUnowned: 'toasts.movedUnowned',
-    automation: 'toasts.automation',
+    /** "<task> removed" with Undo (a restore) after a delete. */
+    removed: 'toasts.removed',
+    /** A write on a task someone — or the rules — closed first (`409 transition_not_allowed`). */
+    alreadyClosed: TASK_QUEUE_KEYS.alreadyClosed,
+    /** A claim without `lead:update` (`403 missing_permission`, D81 TASKS-M3). */
+    claimNeedsLeads: 'toasts.claimNeedsLeads',
+    /** A lead's task moved without `lead:update` (`403 missing_permission`, D81 TASKS-M3). */
+    reassignNeedsLeads: 'toasts.reassignNeedsLeads',
   },
   /** "What’s next for <first>?" (KICKOFF §6.10; `tasks.md:86–99, 134–146`). */
   whatsNext: {
     title: 'whatsNext.title',
+    /** The title for a task about nobody. */
+    titleNoPerson: 'whatsNext.titleNoPerson',
     sub: 'whatsNext.sub',
     section: 'whatsNext.section',
     step: {
@@ -269,8 +284,6 @@ export const TASKS_TEST_IDS = {
     drawer: 'new-task-drawer',
     /** The "For" picker (`-trigger`, `-panel`, `-search` …). */
     person: 'new-task-for',
-    /** Type chips: `new-task-type-<type>`. */
-    type: 'new-task-type',
     title: 'new-task-title',
     /** Due chips: `new-task-due-<preset>`. */
     due: 'new-task-due',
@@ -280,7 +293,6 @@ export const TASKS_TEST_IDS = {
     owner: 'new-task-owner',
     /** Priority chips: `new-task-priority-<priority>`. */
     priority: 'new-task-priority',
-    remind: 'new-task-remind',
     notes: 'new-task-notes',
   },
   /** The task drawer's parts (its root is the manifest's `task-drawer`). */
@@ -294,8 +306,6 @@ export const TASKS_TEST_IDS = {
     quote: 'task-drawer-quote',
     tiles: 'task-drawer-tiles',
     how: 'task-drawer-how',
-    automation: 'task-drawer-automation',
-    automationAction: 'task-drawer-automation-action',
     outcome: (outcome: string) => `task-drawer-outcome-${outcome}`,
     note: 'task-drawer-note',
     /** The Snooze menu (`-panel`, `-option-<option>`). */

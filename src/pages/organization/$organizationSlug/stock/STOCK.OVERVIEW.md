@@ -25,9 +25,10 @@ keeps all four; its track scrolls sideways when short. Its search says what the 
 name or `#ID`, Purchases the invoice, `#ID` or supplier, Vendors the name; Movements has none (the Item
 filter narrows it).
 
-What is not on the screens, and why: paying a purchase later ("Pay ₹X" on Purchases and Vendors) waits for
-the Payments room (Q-S3) — a live purchase is paid by "Paid" when it is recorded; a purchase's payments are
-not Movements rows (G7); a revert is final (no Undo of a revert); delete takes an item at zero and an
+Paying a purchase later is "Pay ₹X" on Purchases and Vendors rows — Payments › Send payment on the bill
+(`?bill=spur_…`; a vendor's at their oldest open bill, read on the click), for `payment:create` and
+`payment:read` (Q-S3, D156). What is not on the screens, and why: a purchase's payments are not Movements rows
+(G7); a revert is final (no Undo of a revert); delete takes an item at zero and an
 unpaid purchase or a vendor owed nothing (`409 item_has_stock` · `purchase_paid` · `vendor_has_dues`).
 
 ## Files

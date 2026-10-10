@@ -4,18 +4,38 @@ import { useState } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
+vi.mock('@/shared/api/clinic/patient-search-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  searchPatientPicker: vi.fn(),
+}));
+vi.mock('@/shared/api/clinic/patients-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchPatient: vi.fn(),
+}));
+vi.mock('@/shared/api/clinic/invoices-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchInvoiceTotals: vi.fn(),
+}));
 import i18n from '@/lib/i18n/i18n.ts';
-import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
+import { fetchInvoiceTotals } from '@/shared/api/clinic/invoices-api.ts';
 import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+  type PatientPickRow,
+  searchPatientPicker,
+} from '@/shared/api/clinic/patient-search-api.ts';
+import { fetchPatient } from '@/shared/api/clinic/patients-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { fsi } from '@/tests/utils/bidi-marks.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { patientRecord, TEST_PATIENT_ID } from '@/tests/utils/patient-doubles.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { PATIENT_PICKER_NS } from './patient-picker.constants.ts';
-import { type PatientPick, patientPickOption } from './patient-picker-options.ts';
+import {
+  type PatientPick,
+  patientPickOf,
+  patientPickOption,
+} from './patient-picker-options.ts';
 import { PatientPicker } from './PatientPicker.tsx';
 
 const viewport = vi.hoisted(() => ({ tier: 'desktop' as ViewportTier }));
@@ -25,7 +45,18 @@ vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
 }));
 
 const t = i18n.getFixedT('en', PATIENT_PICKER_NS);
-const rupees = (paise: number) => `₹${(paise / 100).toLocaleString('en-IN')}`;
+const rupees = (amount: number) => `₹${amount.toLocaleString('en-IN')}`;
+
+/** Kiran Desai as the search finds her. */
+const KIRAN: PatientPickRow = {
+  kind: 'patient',
+  id: 'pat_kiran0000000000000000',
+  contactId: 'con_kiran0000000000000000',
+  seq: 3441,
+  name: 'Kiran Desai',
+  phone: '+919879122840',
+  due: null,
+};
 
 /** The field as a form holds it: the id, and what the last pick handed back. */
 function Field({ onPick }: { onPick: (patient: PatientPick | null) => void }) {
@@ -42,95 +73,71 @@ function Field({ onPick }: { onPick: (patient: PatientPick | null) => void }) {
 }
 
 beforeEach(() => {
+  vi.resetAllMocks();
   viewport.tier = 'desktop';
-  resetClinicFixtures();
+  signInTestMember();
 });
-afterEach(() => resetClinicFixtures());
+afterEach(() => useOrganizationStore.getState().clearOrganization());
 
 describe('patientPickOption (payments.md:101)', () => {
-  it('words a patient with their dues, id and mobile, a lead greyed out', () => {
-    expect(
-      patientPickOption(
-        {
-          kind: 'patient',
-          id: 'p',
-          seq: 3441,
-          name: 'Kiran Desai',
-          phone: '+919879122840',
-          due: 855_000,
-        },
-        t,
-        rupees,
-      ),
-    ).toMatchObject({
+  it('words a patient with their id and mobile, and their dues once read', () => {
+    expect(patientPickOption({ ...KIRAN, due: 8550 }, t, rupees)).toMatchObject({
       label: 'Kiran Desai',
       // Each part isolated, so the phone stays whole on a right-to-left page.
       sub: `${fsi('₹8,550 due')} · ${fsi('#3441')} · ${fsi('+91 98791 22840')}`,
       leading: { kind: 'avatar', initials: 'KD', patient: true },
     });
-    expect(
-      patientPickOption(
-        {
-          kind: 'patient',
-          id: 'p',
-          seq: 3508,
-          name: 'Dharti Galani',
-          phone: null,
-          due: 0,
-        },
-        t,
-        rupees,
-      ).sub,
-    ).toBe(`${fsi('Nothing due')} · ${fsi('#3508')}`);
-    expect(
-      patientPickOption(
-        { kind: 'lead', id: 'l', seq: 2363, name: 'Viral Sheth' },
-        t,
-        rupees,
-      ),
-    ).toMatchObject({ sub: `Lead ${fsi('#2363')} · not a patient yet`, disabled: true });
+    expect(patientPickOption({ ...KIRAN, due: 0 }, t, rupees).sub).toBe(
+      `${fsi('Nothing due')} · ${fsi('#3441')} · ${fsi('+91 98791 22840')}`,
+    );
+    expect(patientPickOption(KIRAN, t, rupees).sub).toBe(
+      `${fsi('#3441')} · ${fsi('+91 98791 22840')}`,
+    );
+  });
+
+  it('reads a patient on their own as the field’s row, with the contact a receipt names', () => {
+    expect(patientPickOf(patientRecord(), 120)).toEqual({
+      kind: 'patient',
+      id: TEST_PATIENT_ID,
+      contactId: patientRecord().contactId,
+      seq: patientRecord().seq,
+      name: 'Priya Shah',
+      phone: patientRecord().phone,
+      due: 120,
+    });
   });
 });
 
 describe('PatientPicker', () => {
-  it('searches the patients and hands back the one picked', async () => {
+  it('searches the patients, hands back the one picked, and shows what they owe', async () => {
+    vi.mocked(searchPatientPicker).mockResolvedValue({
+      items: [KIRAN],
+      nextCursor: null,
+    });
+    vi.mocked(fetchPatient).mockResolvedValue(
+      patientRecord({ id: KIRAN.id, seq: 3441, name: 'Kiran Desai', firstName: 'Kiran' }),
+    );
+    vi.mocked(fetchInvoiceTotals).mockResolvedValue({ due: 8550, paid: 1200 });
     const user = userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
     const onPick = vi.fn();
     const { container } = renderWithProviders(<Field onPick={onPick} />);
     const trigger = await screen.findByTestId('patient-picker');
     expect(trigger).toHaveTextContent('Search patients');
     expect(await axe(container)).toHaveNoViolations();
+
     await user.click(trigger);
-    await user.type(await screen.findByTestId('patient-picker-search'), 'Rhea');
-    const optionId = `patient-picker-option-${patientRef('Rhea Shah')}`;
+    await user.type(await screen.findByTestId('patient-picker-search'), 'Kiran');
+    const optionId = `patient-picker-option-${KIRAN.id}`;
     const option = await screen.findByTestId(optionId);
-    expect(within(option).getByText('Rhea Shah')).toBeInTheDocument();
+    expect(within(option).getByText('Kiran Desai')).toBeInTheDocument();
     // The search's answer can re-render the list between the find and the click (a slow
-    // run) — the click then lands on a node that is gone; click the current option until
-    // the pick arrives.
+    // run) — click the current option until the pick arrives.
     await waitFor(async () => {
       if (onPick.mock.calls.length === 0) await user.click(screen.getByTestId(optionId));
-      expect(onPick).toHaveBeenCalledWith(
-        expect.objectContaining({ kind: 'patient', name: 'Rhea Shah' }),
-      );
+      expect(onPick).toHaveBeenCalledWith(KIRAN);
     });
-    await waitFor(() => expect(trigger).toHaveTextContent('Rhea Shah'));
-  });
-
-  it('shows a lead that is not a patient yet, and never takes it', async () => {
-    const user = userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
-    const [lead] = clinicFixtures.leads.snapshot(
-      (row) =>
-        row.patientId === null && row.kind !== 'contact_thread' && !row.isContactThread,
-    );
-    if (!lead) throw new Error('the seed has a lead that is not a patient');
-    const onPick = vi.fn();
-    renderWithProviders(<Field onPick={onPick} />);
-    await user.click(await screen.findByTestId('patient-picker'));
-    await user.type(await screen.findByTestId('patient-picker-search'), lead.name);
-    const option = await screen.findByTestId(`patient-picker-option-${lead.id}`);
-    expect(option).toHaveAttribute('aria-disabled', 'true');
-    await user.click(option);
-    expect(onPick).not.toHaveBeenCalled();
+    await waitFor(() => expect(trigger).toHaveTextContent('Kiran Desai'));
+    expect(searchPatientPicker).toHaveBeenCalled();
+    expect(fetchInvoiceTotals).toHaveBeenCalledWith({ patientId: KIRAN.id });
   });
 });

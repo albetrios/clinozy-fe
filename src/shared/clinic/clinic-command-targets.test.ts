@@ -26,6 +26,21 @@ describe('CLINIC_COMMAND_TARGETS (KICKOFF §6.0, D24)', () => {
       lead: `${ORG}/leads/$leadId`,
       invoice: `${ORG}/invoices/$invoiceId`,
       invoiceEdit: `${ORG}/invoices/$invoiceId/edit`,
+      paymentEdit: `${ORG}/payments/$paymentId/edit`,
+    });
+  });
+
+  it('opens a ledger entry’s drawer over the patient file’s Payments (A-P1)', () => {
+    expect(
+      clinicCommandNavigation('paymentEdit', {
+        organizationSlug: 'acme',
+        recordId: 'pay_5vstwdmuz5fnklr2jy6aa',
+        referrer: 'patients/pat_9e6j52vjb8uhvz44ebe94/payments',
+      }),
+    ).toEqual({
+      to: `${ORG}/payments/$paymentId/edit`,
+      params: { organizationSlug: 'acme', paymentId: 'pay_5vstwdmuz5fnklr2jy6aa' },
+      search: { from: 'patients/pat_9e6j52vjb8uhvz44ebe94/payments' },
     });
   });
 
@@ -99,6 +114,7 @@ describe('clinicCommandNavigation', () => {
     for (const target of [
       'newAppointment',
       'newReceipt',
+      'paymentEdit',
       'newInvoice',
       'invoice',
       'invoiceEdit',

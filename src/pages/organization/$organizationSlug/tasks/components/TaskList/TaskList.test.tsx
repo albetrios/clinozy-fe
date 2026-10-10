@@ -3,51 +3,71 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { taskRowFixture } from '@/tests/utils/task-row-fixture.ts';
+import type { TaskRow } from '@/shared/api/clinic/tasks-contracts.ts';
+import { taskRow } from '@/tests/utils/task-doubles.ts';
 
+import type { TaskRowTeam } from '../TaskRow/index.ts';
 import { TaskList, type TaskListProps } from './TaskList.tsx';
 
 vi.mock('@/shared/hooks/useCanHover/index.ts', () => ({ useCanHover: () => true }));
 
-/** 10:30 in the clinic on Sun 4 Oct 2026. */
-const NOW = new Date('2026-10-04T05:00:00.000Z');
+/** 10:30 in the clinic on Sat 10 Oct 2026. */
+const NOW = new Date('2026-10-10T05:00:00.000Z');
 
-const LATE = taskRowFixture({
-  id: '00000000-0000-4000-8000-000000000001',
+const LATE = taskRow({
+  id: 'task_late',
   title: 'Rebook Vikram',
-  rule: 'rebook',
-  dueAt: '2026-10-04T04:15:00.000Z',
+  type: 'rebook',
+  ruleKey: 'rebook',
+  dueAt: '2026-10-10T04:15:00.000Z',
 });
-const SOON = taskRowFixture({
-  id: '00000000-0000-4000-8000-000000000002',
+const SOON = taskRow({
+  id: 'task_soon',
   title: 'Confirm Priti’s visit',
-  dueAt: '2026-10-04T05:20:00.000Z',
+  type: 'confirm',
+  ruleKey: 'confirm',
+  dueAt: '2026-10-10T05:20:00.000Z',
 });
-const LATER = taskRowFixture({
-  id: '00000000-0000-4000-8000-000000000003',
-  title: 'Recall Tanvi',
-  rule: 'recall',
-  dueAt: '2026-10-06T05:30:00.000Z',
+const LATER = taskRow({
+  id: 'task_later',
+  title: 'Call Tanvi',
+  type: 'by_hand',
+  ruleKey: null,
+  kind: 'manual',
+  dueAt: '2026-10-12T05:30:00.000Z',
 });
+
+const TEAM: TaskRowTeam = { byId: new Map(), myMembershipId: null, updatedAt: null };
+
+function listProps(props: Partial<TaskListProps> = {}): TaskListProps {
+  return {
+    tab: 'open',
+    rows: [LATER, SOON, LATE],
+    loading: false,
+    refreshing: false,
+    failed: false,
+    onRetry: vi.fn(),
+    now: NOW,
+    handled: () => false,
+    team: TEAM,
+    onOpen: vi.fn(),
+    hasNextPage: false,
+    isFetchingNextPage: false,
+    fetchNextPage: vi.fn(),
+    ...props,
+  };
+}
 
 function renderList(props: Partial<TaskListProps> = {}) {
-  const onOpen = vi.fn();
-  const view = render(
-    <TaskList
-      tab="queue"
-      rows={[LATER, SOON, LATE]}
-      loading={false}
-      refreshing={false}
-      now={NOW}
-      handled={() => false}
-      onOpen={onOpen}
-      hasNextPage={false}
-      isFetchingNextPage={false}
-      fetchNextPage={vi.fn()}
-      {...props}
-    />,
-  );
-  return { ...view, onOpen };
+  const all = listProps(props);
+  const view = render(<TaskList {...all} />);
+  return {
+    ...view,
+    onOpen: all.onOpen,
+    onRetry: all.onRetry,
+    rerenderList: (patch: Partial<TaskListProps>) =>
+      view.rerender(<TaskList {...listProps(patch)} />),
+  };
 }
 
 const titlesIn = (group: string) =>
@@ -68,7 +88,7 @@ describe('TaskList (tasks.md:18–38)', () => {
     ]);
     expect(titlesIn('overdue')).toEqual(['Rebook Vikram']);
     expect(titlesIn('today')).toEqual(['Confirm Priti’s visit']);
-    expect(titlesIn('later')).toEqual(['Recall Tanvi']);
+    expect(titlesIn('later')).toEqual(['Call Tanvi']);
     expect(screen.getByTestId('tasks-group-overdue')).toHaveTextContent('Overdue');
     expect(screen.getByText('Overdue').querySelector('span')).toHaveClass(
       'bg-tone-blush-dot',
@@ -83,6 +103,30 @@ describe('TaskList (tasks.md:18–38)', () => {
     expect(
       within(screen.getByTestId('tasks-group-today')).getByText('in 20 min'),
     ).toBeInTheDocument();
+  });
+
+  it('keeps Snoozed and Done in the server’s order, one group each', () => {
+    renderList({
+      tab: 'done',
+      rows: [
+        { ...SOON, status: 'done', isResolvedAutomatically: true },
+        {
+          ...LATE,
+          status: 'done',
+          resultText: 'Rebooked',
+          resolvedAt: NOW.toISOString(),
+        },
+      ],
+    });
+    expect(titlesIn('done')).toEqual(['Confirm Priti’s visit', 'Rebook Vikram']);
+    expect(screen.getByRole('table', { name: 'Done' })).toBeInTheDocument();
+  });
+
+  it('marks the rows whose rule is handed to the product', () => {
+    renderList({ handled: (row: TaskRow) => row.ruleKey === 'confirm' });
+    const rows = screen.getAllByTestId('tasks-row');
+    const handed = rows.filter((row) => row.textContent?.includes('can do this'));
+    expect(handed.map((row) => row.dataset.taskId)).toEqual(['task_soon']);
   });
 
   it('says nothing needs you, with "New task", when To do is empty', async () => {
@@ -102,26 +146,13 @@ describe('TaskList (tasks.md:18–38)', () => {
   });
 
   it('renders the Snoozed and Done empty lines under their headers (§7.3)', () => {
-    const { rerender } = renderList({ tab: 'snoozed', rows: [] });
+    const { rerenderList } = renderList({ tab: 'snoozed', rows: [] });
     const snoozed = screen.getByTestId('tasks-group-snoozed');
     expect(snoozed).toHaveTextContent('Snoozed');
     expect(within(snoozed).getByTestId('tasks-empty')).toHaveTextContent(
       'No snoozed tasks',
     );
-    rerender(
-      <TaskList
-        tab="done"
-        rows={[]}
-        loading={false}
-        refreshing={false}
-        now={NOW}
-        handled={() => false}
-        onOpen={vi.fn()}
-        hasNextPage={false}
-        isFetchingNextPage={false}
-        fetchNextPage={vi.fn()}
-      />,
-    );
+    rerenderList({ tab: 'done', rows: [] });
     const done = screen.getByTestId('tasks-group-done');
     expect(done).toHaveTextContent('Resolved');
     expect(within(done).getByTestId('tasks-empty')).toHaveTextContent(
@@ -130,23 +161,10 @@ describe('TaskList (tasks.md:18–38)', () => {
   });
 
   it('shows skeleton rows on the first load, and bars in place while a new view loads', () => {
-    const { rerender } = renderList({ loading: true });
+    const { rerenderList } = renderList({ loading: true });
     expect(screen.getByTestId('skeleton-rows')).toBeInTheDocument();
     expect(screen.queryByRole('table')).toBeNull();
-    rerender(
-      <TaskList
-        tab="queue"
-        rows={[SOON]}
-        loading={false}
-        refreshing
-        now={NOW}
-        handled={() => false}
-        onOpen={vi.fn()}
-        hasNextPage={false}
-        isFetchingNextPage={false}
-        fetchNextPage={vi.fn()}
-      />,
-    );
+    rerenderList({ rows: [SOON], refreshing: true });
     const table = screen.getByRole('table');
     expect(table).toHaveAttribute('aria-busy', 'true');
     // Each group's rows are its items: the rooms' one in-place skeleton (index.css).
@@ -155,9 +173,17 @@ describe('TaskList (tasks.md:18–38)', () => {
     }
   });
 
+  it('shows the error with Retry in place when the read failed with nothing to show', async () => {
+    const { onRetry } = renderList({ rows: [], failed: true });
+    expect(screen.queryByRole('table')).toBeNull();
+    expect(screen.getByTestId('retry-error')).toBeInTheDocument();
+    await userEvent.setup().click(screen.getByTestId('retry-button'));
+    expect(onRetry).toHaveBeenCalledOnce();
+  });
+
   it('opens a row', async () => {
     const { onOpen } = renderList();
-    await userEvent.setup().click(screen.getByText('Recall Tanvi'));
+    await userEvent.setup().click(screen.getByText('Call Tanvi'));
     expect(onOpen).toHaveBeenCalledWith(LATER);
   });
 

@@ -1,1 +1,1 @@
-export { TaskRow, type TaskRowProps } from './TaskRow.tsx';
+export { TaskRow, type TaskRowProps, type TaskRowTeam } from './TaskRow.tsx';

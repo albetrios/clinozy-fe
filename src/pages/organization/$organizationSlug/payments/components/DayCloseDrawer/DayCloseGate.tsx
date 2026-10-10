@@ -10,7 +10,7 @@ import {
   RECORD_DRAWER_NS,
 } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 import { Wallet } from '@/shared/icons/index.ts';
 
 import {
@@ -19,7 +19,7 @@ import {
   PAYMENTS_NS,
 } from '../../payments.constants.ts';
 import { useDayLabel } from '../../shared/hooks/useDayLabel/index.ts';
-import { typedPaise } from './day-close-view.ts';
+import { countDifference, typedRupees } from './day-close-view.ts';
 
 const K = PAYMENTS_KEYS.dayClose.gate;
 const T = `${DAY_CLOSE_TEST_ID}-gate`;
@@ -34,17 +34,28 @@ export interface DayCloseGateProps {
   dayTitle: string;
   /** "Riya S." — who the day is stamped with. */
   myName: string;
-  /** The `dayclose` ability: without it the gate only shows the opening. */
+  /** Accept the opening (`payment:update`): without it the gate only shows the opening. */
   canAct: boolean;
   accepting: boolean;
-  /** Accept: the recount in paise when one was typed and differs, else null. */
+  /** Accept: the recount in rupees when one was typed and differs, else null (carried). */
   onAccept: (recount: number | null) => void;
 }
 
+/** The opening's source line: "Carried from Oct 1 close", or the branch's first day at ₹0. */
+function useSourceText(opening: DayOpening): string {
+  const { t } = useTranslation(PAYMENTS_NS);
+  const dayLabel = useDayLabel({ relative: false });
+  if (opening.source === 'recounted') return t(K.sources.recounted);
+  return opening.from
+    ? t(K.sources.carried, { day: dayLabel(opening.from) })
+    : t(K.sources.first);
+}
+
 /**
- * The gate (`payments.md:331`; H:5114–5116): before the day starts, the
- * opening cash — the carried count or the default float — with a Recount box;
- * "Accept ₹2,000" (or "Accept recount") stamps it on the day.
+ * The gate (`payments.md:331`; H:5114–5116): before the day starts, the opening cash clinozy-be
+ * would carry — the last close's count before the day, ₹0 for a branch's first (no default
+ * float, §6 #17) — with a Recount box; "Accept ₹2,000" (or "Accept recount") opens the day
+ * (`POST /app/day-closes`) and stamps who did it.
  */
 export function DayCloseGate({
   opening,
@@ -56,15 +67,12 @@ export function DayCloseGate({
 }: DayCloseGateProps) {
   const { t } = useTranslation(PAYMENTS_NS);
   const { t: tDrawer } = useTranslation(RECORD_DRAWER_NS);
-  const formatPaise = usePaiseFormat();
-  const dayLabel = useDayLabel({ relative: false });
+  const formatRupees = useRupeeFormat();
   const [recount, setRecount] = useState('');
-  const typed = typedPaise(recount);
-  const recounted = typed !== null && typed !== opening.cash;
-  const source =
-    opening.source === 'carried' && opening.from
-      ? t(K.sources.carried, { day: dayLabel(opening.from) })
-      : t(K.sources[opening.source]);
+  const typed = typedRupees(recount);
+  // Compared in paise: a recount equal to the carried amount accepts it as carried.
+  const recounted = typed !== null && countDifference(typed, opening.cash) !== 0;
+  const source = useSourceText(opening);
 
   return (
     <section
@@ -87,7 +95,7 @@ export function DayCloseGate({
         data-testid={`${T}-amount`}
         className="text-display font-semibold tabular-nums"
       >
-        {formatPaise(opening.cash)}
+        {formatRupees(opening.cash)}
       </span>
       <span data-testid={`${T}-source`} className="text-detail text-muted-foreground">
         {source}
@@ -115,7 +123,7 @@ export function DayCloseGate({
           >
             {recounted
               ? t(K.acceptRecount)
-              : t(K.accept, { amount: formatPaise(opening.cash) })}
+              : t(K.accept, { amount: formatRupees(opening.cash) })}
           </Button>
         </div>
       ) : null}

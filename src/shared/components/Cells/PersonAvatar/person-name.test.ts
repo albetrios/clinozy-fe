@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { personFullName, personInitials, shortPersonName } from './person-name.ts';
+import {
+  personFirstName,
+  personFullName,
+  personInitials,
+  shortPersonName,
+} from './person-name.ts';
 
 describe('personFullName', () => {
   it('writes the name in full, without a missing last name', () => {
@@ -19,5 +24,13 @@ describe('personFullName', () => {
     expect(personInitials(personFullName({ firstName: 'Riya', lastName: 'Shah' }))).toBe(
       'RS',
     );
+  });
+});
+
+describe('personFirstName', () => {
+  it('reads the first name, a doctor with the title', () => {
+    expect(personFirstName('Riya Shah')).toBe('Riya');
+    expect(personFirstName('Dr. Drashti Desai')).toBe('Dr. Drashti');
+    expect(personFirstName('Meera')).toBe('Meera');
   });
 });

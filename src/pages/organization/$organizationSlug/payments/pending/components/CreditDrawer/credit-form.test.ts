@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import type { CreditRow } from '@/shared/api/clinic/credits-contracts.ts';
+import {
+  creditRow,
+  TEST_INVOICE_ID,
+  TEST_MONEY_CONTACT_ID,
+  TEST_MONEY_PATIENT_ID,
+} from '@/tests/utils/payments-doubles.ts';
 
 import {
   creditAmount,
@@ -16,41 +21,24 @@ import {
   withParty,
 } from './credit-form.ts';
 
-const PATIENT = '3f9b0c6e-1d2a-4c5b-8e7f-0a1b2c3d4e5f';
-const INVOICE = '7c1e2d3f-4a5b-4c6d-8e9f-0a1b2c3d4e5f';
-
-const TANVI = { key: `patient:${PATIENT}`, name: 'Tanvi Shah', patientId: PATIENT };
-
-/** CR-2 as Pending reads it: a seeded credit, its reason free text. */
-const SEEDED: CreditRow = {
-  id: '00000000-0000-4000-8000-00000000c002',
-  seq: 2,
-  direction: 'give',
-  partyName: 'Tanvi Shah',
-  patientId: PATIENT,
-  amount: 50_000,
-  reason: 'Charged twice for corn removal',
-  sourcePaymentId: null,
-  status: 'open',
-  settledPaymentId: null,
-  reasonKey: null,
-  note: null,
-  invoiceId: null,
-  settleBy: null,
-  adjusted: 0,
-  settledAt: null,
-  patientSeq: 198,
-  source: null,
-  invoiceSeq: null,
-  settledInvoiceSeq: null,
-  organizationId: '00000000-0000-4000-8000-0000000000a1',
-  createdAt: '2026-06-04T05:35:00Z',
-  updatedAt: '2026-06-04T05:35:00Z',
-  createdById: '00000000-0000-4000-8000-0000000000b1',
-  deletedAt: null,
-  deleteReason: null,
-  deleteNote: null,
+/** Kavya Mehta as the Who picker keeps her: her file and her contact. */
+const KAVYA = {
+  key: `patient:${TEST_MONEY_PATIENT_ID}`,
+  name: 'Kavya Mehta',
+  contactId: TEST_MONEY_CONTACT_ID,
+  patientId: TEST_MONEY_PATIENT_ID,
 };
+
+/** A walk-in's contact, no patient file. */
+const WALK_IN = 'con_walkin00000000000000001';
+
+/** CR-1 with a reason no chip has — stored by the API as free text. */
+const FREE_TEXT = creditRow({
+  amount: 1_250.5,
+  reason: 'Charged twice for corn removal',
+  reasonKey: 'other',
+  note: null,
+});
 
 describe('the credit form (payments.md:152–168)', () => {
   it('starts on Give — or the way a link names — with nothing else filled', () => {
@@ -66,52 +54,82 @@ describe('the credit form (payments.md:152–168)', () => {
     expect(emptyCreditForm('take').direction).toBe('take');
   });
 
-  it('keys a patient by id and anyone else by name, typed or listed alike', () => {
+  it('keys a patient by file, a contact by contact, a supplier by name — typed or listed alike', () => {
     expect(
       partyOf({
         kind: 'patient',
-        id: PATIENT,
-        seq: 198,
-        name: 'Tanvi Shah',
-        phone: null,
+        contactId: TEST_MONEY_CONTACT_ID,
+        patientId: TEST_MONEY_PATIENT_ID,
+        seq: 2,
+        name: 'Kavya Mehta',
+        phone: '+919825005865',
       }),
-    ).toEqual(TANVI);
-    expect(partyOf({ kind: 'vendor', id: 'v', name: 'Medline Surgicals' })).toEqual(
+    ).toEqual(KAVYA);
+    expect(
+      partyOf({ kind: 'contact', contactId: WALK_IN, name: 'Ravi Patel', phone: '' }),
+    ).toEqual({
+      key: `contact:${WALK_IN}`,
+      name: 'Ravi Patel',
+      contactId: WALK_IN,
+      patientId: null,
+    });
+    expect(partyOf({ kind: 'vendor', id: 'svnd_x', name: 'Medline Surgicals' })).toEqual(
       partyByName('  Medline Surgicals '),
     );
-    expect(partyByName('Medline Surgicals').key).toBe('name:medline-surgicals');
+    expect(partyByName('Medline Surgicals')).toEqual({
+      key: 'name:medline-surgicals',
+      name: 'Medline Surgicals',
+      contactId: null,
+      patientId: null,
+    });
   });
 
-  it('opens a seeded credit’s free-text reason as "Other" with the text as its note', () => {
-    expect(creditFormOf(SEEDED)).toEqual({
+  it('opens an open credit as its form — the amount typed in rupees', () => {
+    expect(creditFormOf(creditRow())).toEqual({
       direction: 'give',
-      party: TANVI,
-      amount: '500',
+      party: KAVYA,
+      amount: '80',
+      reasonKey: 'overpaid',
+      invoiceId: TEST_INVOICE_ID,
+      settleBy: '2026-10-20',
+      note: 'Paid twice at the desk',
+    });
+    expect(
+      creditFormOf(
+        creditRow({
+          contactId: null,
+          contact: null,
+          patientId: null,
+          partyName: 'Medline',
+        }),
+      ).party,
+    ).toEqual(partyByName('Medline'));
+  });
+
+  it('opens a free-text reason as "Other" with the text as its note, so a save keeps it', () => {
+    expect(creditFormOf(FREE_TEXT)).toMatchObject({
+      amount: '1250.5',
       reasonKey: 'other',
-      invoiceId: null,
-      settleBy: null,
       note: 'Charged twice for corn removal',
     });
-    const chipped = { ...SEEDED, reasonKey: 'overpaid' as const, note: 'Paid twice' };
-    expect(creditFormOf(chipped)).toMatchObject({
-      reasonKey: 'overpaid',
-      note: 'Paid twice',
-    });
+    expect(creditFormOf({ ...FREE_TEXT, note: 'Paid for a friend' }).note).toBe(
+      'Paid for a friend',
+    );
   });
 
   it('drops the reason with the way, and the invoice with the party', () => {
     const picked = {
       ...emptyCreditForm(),
-      party: TANVI,
+      party: KAVYA,
       reasonKey: 'overpaid' as const,
-      invoiceId: INVOICE,
+      invoiceId: TEST_INVOICE_ID,
     };
     expect(withDirection(picked, 'give')).toBe(picked);
     expect(withDirection(picked, 'take')).toMatchObject({
       direction: 'take',
       reasonKey: null,
     });
-    expect(withParty(picked, TANVI)).toBe(picked);
+    expect(withParty(picked, KAVYA)).toBe(picked);
     expect(withParty(picked, partyByName('Medline Surgicals'))).toMatchObject({
       invoiceId: null,
     });
@@ -135,7 +153,7 @@ describe('the credit form (payments.md:152–168)', () => {
   it('checks who, then the amount, then a reason, then "Other"’s note', () => {
     const empty = emptyCreditForm();
     expect(creditProblem(empty)).toEqual({ kind: 'who', field: 'party' });
-    const who = { ...empty, party: TANVI };
+    const who = { ...empty, party: KAVYA };
     expect(creditProblem(who)).toEqual({ kind: 'amount', field: 'amount' });
     const amount = { ...who, amount: '500' };
     expect(creditAmount(amount)).toBe(50_000);
@@ -145,28 +163,28 @@ describe('the credit form (payments.md:152–168)', () => {
     expect(creditProblem({ ...other, note: 'Paid for a friend' })).toBeNull();
   });
 
-  it('sends the party, the amount in paise and an invoice only for a patient', () => {
+  it('sends the contact and the amount in rupees, and an invoice only for a person', () => {
     const values = {
       ...emptyCreditForm(),
-      party: TANVI,
-      amount: '500',
+      party: KAVYA,
+      amount: '500.25',
       reasonKey: 'charged_twice' as const,
-      invoiceId: INVOICE,
-      settleBy: '2026-10-10',
+      invoiceId: TEST_INVOICE_ID,
+      settleBy: '2026-10-20',
       note: '  ',
     };
     expect(creditInputOf(values)).toEqual({
       direction: 'give',
-      partyName: 'Tanvi Shah',
-      patientId: PATIENT,
-      amount: 50_000,
+      contactId: TEST_MONEY_CONTACT_ID,
+      partyName: 'Kavya Mehta',
+      amount: 500.25,
       reasonKey: 'charged_twice',
-      invoiceId: INVOICE,
-      settleBy: '2026-10-10',
+      invoiceId: TEST_INVOICE_ID,
+      settleBy: '2026-10-20',
       note: null,
     });
     expect(
       creditInputOf({ ...values, party: partyByName('Medline Surgicals') }),
-    ).toMatchObject({ partyName: 'Medline Surgicals', patientId: null, invoiceId: null });
+    ).toMatchObject({ contactId: null, partyName: 'Medline Surgicals', invoiceId: null });
   });
 });

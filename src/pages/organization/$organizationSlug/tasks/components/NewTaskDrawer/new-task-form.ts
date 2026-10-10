@@ -1,10 +1,8 @@
 import { addCivilDays, clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
-import {
-  type CreateTaskInput,
-  type ManualTaskType,
-  TASK_REMIND_MINUTES,
-  type TaskPriority,
-} from '@/shared/api/clinic/tasks-contracts.ts';
+import type { TaskFields, TaskPriority } from '@/shared/api/clinic/tasks-contracts.ts';
+
+import { taskAssigneeOfKey } from '../../hooks/useTaskAssignees/index.ts';
+import type { NewTaskPerson } from './new-task-person.ts';
 
 /** New task's Due chips, "Today 5 pm · Tomorrow 11 am · In 3 days · Next week" (H:6057). */
 export const NEW_TASK_DUE_PRESETS = [
@@ -26,23 +24,22 @@ const NEW_TASK_DUE_AT: Readonly<Record<NewTaskDuePreset, { days: number; at: str
     nextWeek: { days: 7, at: '11:00' },
   };
 
-/** The person a New task is for — a patient, or a lead (a chat-only contact too). */
-export interface NewTaskPerson {
-  kind: 'patient' | 'lead';
-  id: string;
-  name: string;
-  /** Their patient number, else their lead's; null for a chat-only contact. */
-  seq: number | null;
-  /** A chat-only contact (a lead record that is only a conversation). */
-  contact: boolean;
-  /** The lead's owner — the default assignee for a lead's task (H:6056). */
-  ownerId: string | null;
-}
+/** The priority chips, "Normal · High" — the API's `low` has no chip (research-tasks §3). */
+export const NEW_TASK_PRIORITIES = [
+  'normal',
+  'high',
+] as const satisfies readonly TaskPriority[];
+
+/** One priority chip. */
+type NewTaskPriority = (typeof NEW_TASK_PRIORITIES)[number];
 
 /** The New task form (KICKOFF §6.10 New task). */
 export interface NewTaskForm {
-  person: NewTaskPerson | null;
-  type: ManualTaskType;
+  /**
+   * Who it is for: `undefined` keeps the person the URL names (`?lead=` / `?contact=`), `null`
+   * is nobody — a task may be about no one.
+   */
+  person: NewTaskPerson | null | undefined;
   title: string;
   /** The Due chip the date and time came from; null once either was picked by hand. */
   duePreset: NewTaskDuePreset | null;
@@ -50,10 +47,9 @@ export interface NewTaskForm {
   dueDate: string;
   /** Clinic-local `HH:mm`. */
   dueTime: string;
-  /** Picked assignee; null keeps the default (the lead's owner, else the member). */
-  ownerId: string | null;
-  priority: TaskPriority;
-  remind: boolean;
+  /** The picked assignee's key (a member or `role:<role>`); null keeps the default. */
+  owner: string | null;
+  priority: NewTaskPriority;
   notes: string;
 }
 
@@ -68,24 +64,19 @@ export function withDuePreset(
 }
 
 /**
- * New task as it opens (H:6063): Call back, no title, due "Tomorrow 11 am",
- * the default assignee, Normal, "Remind 15 min before" on, no notes.
+ * New task as it opens (H:6063): the URL's person, no title, due "Tomorrow 11 am", the default
+ * assignee, Normal, no notes.
  */
-export function newTaskForm(
-  today: string,
-  person: NewTaskPerson | null = null,
-): NewTaskForm {
+export function newTaskForm(today: string): NewTaskForm {
   return withDuePreset(
     {
-      person,
-      type: 'call_back',
+      person: undefined,
       title: '',
       duePreset: null,
       dueDate: today,
       dueTime: '11:00',
-      ownerId: null,
+      owner: null,
       priority: 'normal',
-      remind: true,
       notes: '',
     },
     'tomorrow',
@@ -93,35 +84,48 @@ export function newTaskForm(
   );
 }
 
-/** Who the task goes to: the one picked, else the lead's owner, else the member. */
-export function newTaskOwnerId(
-  form: NewTaskForm,
-  viewerId: string | null,
-): string | null {
-  return form.ownerId ?? form.person?.ownerId ?? viewerId;
+/**
+ * The default assignee (H:6056): the person's lead's owner when they can work tasks, else the
+ * member — null while neither is known, or when neither can work tasks.
+ */
+export function defaultAssigneeKey({
+  leadOwnerId,
+  myMembershipId,
+  workerIds,
+}: {
+  leadOwnerId: string | null;
+  myMembershipId: string | null | undefined;
+  /** The members the picker offers (`task:read` holders). */
+  workerIds: ReadonlySet<string>;
+}): string | null {
+  if (leadOwnerId && workerIds.has(leadOwnerId)) return leadOwnerId;
+  if (myMembershipId && workerIds.has(myMembershipId)) return myMembershipId;
+  return null;
 }
 
 /**
- * The create the form asks for — null until it has a person and an assignee.
- * An empty Title saves as `fallbackTitle` ("Call back · Priti", H:6072).
+ * The create the form asks for — null without a title (typed, or the person's fallback) or an
+ * assignee. An empty Title saves as `fallbackTitle` ("Follow up · Priti", H:6072); the due is
+ * the picked clinic day and time, so a retry sends the same body.
  */
-export function newTaskInputOf(
+export function newTaskFieldsOf(
   form: NewTaskForm,
-  { ownerId, fallbackTitle }: { ownerId: string | null; fallbackTitle: string },
-): CreateTaskInput | null {
-  const { person } = form;
-  if (!(person && ownerId)) return null;
+  {
+    person,
+    owner,
+    fallbackTitle,
+  }: { person: NewTaskPerson | null; owner: string | null; fallbackTitle: string },
+): TaskFields | null {
+  const title = form.title.trim() || fallbackTitle;
+  if (!(title && owner)) return null;
   const notes = form.notes.trim();
   return {
-    title: form.title.trim() || fallbackTitle,
+    title,
     why: notes || null,
-    ownerId,
-    patientId: person.kind === 'patient' ? person.id : null,
-    leadId: person.kind === 'lead' ? person.id : null,
     dueAt: clinicInstant(form.dueDate, form.dueTime),
-    rule: 'manual',
-    manualType: form.type,
+    assignee: taskAssigneeOfKey(owner),
     priority: form.priority,
-    remindMinutesBefore: form.remind ? TASK_REMIND_MINUTES : null,
+    contactId: person?.contactId ?? null,
+    link: person?.leadId ? { kind: 'lead', id: person.leadId } : null,
   };
 }

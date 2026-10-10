@@ -1,80 +1,73 @@
-import { renderHook } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import {
-  personOfHit,
-  personOfLead,
-  personOfPatient,
-  usePersonRecordLabel,
-} from './new-task-person.ts';
+import { personOfContact, personOfLead } from './new-task-person.ts';
 
-const ID = '55555555-5555-4555-8555-555555555555';
-const OWNER = '77777777-7777-4777-8777-777777777777';
+const LEAD = 'lead_hplz5ew0h3tw99ntqf39w';
 
-describe('the New task person', () => {
-  it('reads a contact-search hit: a patient, a lead or a chat-only contact', () => {
-    expect(
-      personOfHit({
-        kind: 'patient',
-        id: ID,
-        seq: 3508,
-        name: 'Priti Soni',
-        phone: '+919812345678',
-        lastVisit: null,
-      }),
-    ).toEqual({
-      kind: 'patient',
-      id: ID,
-      name: 'Priti Soni',
-      seq: 3508,
-      contact: false,
-      ownerId: null,
-    });
-    expect(
-      personOfHit({
-        kind: 'lead',
-        id: ID,
-        seq: 2401,
-        name: 'Zoya',
-        phone: '+919812345679',
-        contactThread: true,
-      }),
-    ).toMatchObject({ kind: 'lead', contact: true });
-  });
+const contact = {
+  id: 'con_8hb15isod6txlpljrn1f7',
+  name: 'Anaya Desai',
+  firstName: 'Anaya',
+  primaryPhone: '+919826005869',
+  patientId: null,
+  openLeadId: LEAD,
+};
 
-  it('reads the patient or lead the URL names — a lead with its owner', () => {
-    expect(
-      personOfPatient({ id: ID, firstName: 'Priti', lastName: 'Soni', seq: 3508 }),
-    ).toMatchObject({ kind: 'patient', name: 'Priti Soni', ownerId: null });
-    expect(
-      personOfLead({
-        id: ID,
-        name: 'Kabir Mehta',
-        seq: 2370,
-        ownerId: OWNER,
-        isContactThread: false,
-      }),
-    ).toEqual({
+describe('personOfContact (a search hit, `?contact=`)', () => {
+  it('reads a lead’s person as a lead, her task pointing at the open lead', () => {
+    expect(personOfContact(contact)).toEqual({
+      contactId: contact.id,
+      name: 'Anaya Desai',
+      firstName: 'Anaya',
       kind: 'lead',
-      id: ID,
-      name: 'Kabir Mehta',
-      seq: 2370,
-      contact: false,
-      ownerId: OWNER,
+      phone: '+919826005869',
+      openLeadId: LEAD,
+      leadId: LEAD,
     });
   });
 
-  it('names the record: "Patient #…", "Lead #…", a contact by name', () => {
-    const { result } = renderHook(() => usePersonRecordLabel());
-    const base = { id: ID, contact: false, ownerId: null };
+  it('never points a patient’s task at their open lead — a reassign would move the lead', () => {
     expect(
-      result.current({ ...base, kind: 'patient', name: 'Priti Soni', seq: 3508 }),
-    ).toBe('Patient #3508');
-    expect(result.current({ ...base, kind: 'lead', name: 'Kabir', seq: 2370 })).toBe(
-      'Lead #2370',
-    );
+      personOfContact({ ...contact, patientId: 'pat_9e6j52vjb8uhvz44ebe94' }),
+    ).toMatchObject({ kind: 'patient', openLeadId: LEAD, leadId: null });
+  });
+
+  it('reads someone with neither as a contact', () => {
+    expect(personOfContact({ ...contact, openLeadId: null })).toMatchObject({
+      kind: 'contact',
+      openLeadId: null,
+      leadId: null,
+    });
+  });
+});
+
+describe('personOfLead (`?lead=`)', () => {
+  const lead = {
+    id: LEAD,
+    contactId: contact.id,
+    name: 'Anaya Desai',
+    person: null,
+    phone: null,
+    patientId: null,
+    ownerId: 'mem_asha0000000000000000',
+  };
+
+  it('points the task at the lead it was opened from', () => {
+    expect(personOfLead(lead)).toEqual({
+      contactId: contact.id,
+      name: 'Anaya Desai',
+      firstName: 'Anaya',
+      kind: 'lead',
+      phone: null,
+      openLeadId: LEAD,
+      leadOwnerId: 'mem_asha0000000000000000',
+      leadId: LEAD,
+    });
+  });
+
+  it('keeps the lead link for a patient’s lead it was opened from', () => {
     expect(
-      result.current({ ...base, kind: 'lead', name: 'Zoya', seq: 2401, contact: true }),
-    ).toBe('Zoya');
+      personOfLead({ ...lead, patientId: 'pat_9e6j52vjb8uhvz44ebe94' }),
+    ).toMatchObject({ kind: 'patient', leadId: LEAD });
   });
 });

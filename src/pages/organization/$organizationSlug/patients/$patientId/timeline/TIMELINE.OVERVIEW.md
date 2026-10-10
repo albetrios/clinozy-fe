@@ -27,9 +27,13 @@ padding inside; row dense), Clinical, Photos and Team notes two columns wide —
   Rx, four of its medicines, its advice. Treatments: the last three sessions done (a reversed
   one stays in Treatments), each opening its edit drawer. Reports: the newest three (one
   page). Team notes: the composer and the newest three notes — the person's `note` entries
-  (§6 #3). **Billing** is not built until Payments is on clinozy-be: its invoices and payments
-  still read the fixture world and the file has no dues read (G4) — and with it goes the
-  file's only "Show amounts" eye.
+  (§6 #3). **Billing** (billing view): "New invoice" (`payment:create`), Due — masked with the
+  file, its "Show amounts" eye — and Paid, the server's over every invoice of hers
+  (`GET /app/invoices?patient_id=&limit=1` → `meta.due_total` / `meta.paid_total`, never summed
+  here; the count beside the title is its `estimated_total`), her newest three invoices (the
+  Invoices section's first page) with the server's status, each opening Edit invoice
+  (`payment:update`, never a sale's or a settled one's) or its preview over the file, and
+  "Collect payment" (`payment:create`) while she owes (`components/OverviewBento/bento-billing.tsx`).
 - **Smart note** (Clinical, for a member who edits the patient): the words it knows — the UI
   language's (`components/OverviewBento/smart-note-words/`, the prototype's keys, H:3702, in all
   11 locales, loaded per locale on first use), then English, which every locale still reads —
@@ -58,13 +62,13 @@ padding inside; row dense), Clinical, Photos and Team notes two columns wide —
   flow; its "Visit in progress · Resume" pill returns to it. One column up to 880px: "Visit in
   progress" (or paused), Pause (`…/pause`, back to the Overview, the visit open), Resume
   (`…/resume`) and "✓ Complete visit" (`…/complete` — "Visit completed · …", naming a package
-  session used and the Rx's follow-up when there was one) — the booking's own routes — then three
+  session used and the Rx's follow-up when there was one) — the booking's own routes — then five
   open step cards, the first unfinished one current: **Check-in & safety** (three ticking checks,
   each a `safety_check` clinical note at the visit; optimistic, an untick deletes the note with
   reason `not_needed`), **Prescription** (the member's one-tap kits saving an Rx at the visit,
   approved for an approver — Q19 — and "Write prescription") and **Treatment** ("⚡ Repeat" the
   last session, on its package while it has a session left, and "New treatment" — both wait for
-  the checks: "Finish check-in first"). A step is done by its record at the visit (the Rx and the
+  the checks: "Finish check-in first"), **Invoice** and **Collect** (D156). A step is done by its record at the visit (the Rx and the
   session carry its booking); a step whose read failed shows Retry. Once an Rx or a session is
   written the client moves the visit's stage on (`…/stage`, Q8: an Rx to Treatment while a session
   is due, else to Checkout; a session to Checkout) — Today's card changes lane (L-64). "Write
@@ -72,8 +76,18 @@ padding inside; row dense), Clinical, Photos and Team notes two columns wide —
   close back to it — the Rx there is "Approve · print · send to pharmacy"; its "Save & sell" opens
   New sale in Medical with the flow as its way back (`from=patients/<id>/timeline?visit=open`).
   "Complete visit" leaves the flow; opened from Today's "Open session" or "Checkout"
-  (`from=today`), Pause and that exit go back to Today. Invoice and "Collect & share" come back
-  with Payments on clinozy-be; the WhatsApp share goes (§6 #26). Each step shows only for a member
+  (`from=today`), Pause and that exit go back to Today. **Invoice** reads the patient's invoices of
+  the visit's day (`GET /app/invoices?patient_id=&invoice_date_from/_to=`) and finds the visit's —
+  the one whose lines bill a session recorded at it (`patient_treatment_ids`; invoices carry no
+  `appointment_id`, PAY-G12): "#7 · ₹ ••••" once made, else "2 items ready" (the sessions still to
+  bill), "Covered by package · nothing to bill" or "Nothing to bill yet"; "Create invoice from
+  visit" opens the Invoice drawer over the flow on `?appointment=` — its lines the visit's
+  sessions still to bill, one per offering, priced by the server — ("Nothing to bill" when there
+  are none) and "Custom invoice" on the patient alone, both until the visit has its invoice.
+  **Collect** says what that invoice owes and "Collect ₹X" opens Receive payment against it over
+  the flow (`?patient=&invoice=`); "Nothing due" once paid or covered, "Invoice the visit first"
+  before. Both need `payment:read` with the treatments' read, their controls `payment:create`;
+  amounts follow the file's mask; the WhatsApp share goes (§6 #26). Each step shows only for a member
   who reads its records, each action only for one who may take it. Without an open visit the
   param is dropped and the Overview stays — a link never starts a visit.
 
@@ -83,28 +97,28 @@ one lazy module (`../patient-id.sections.ts`).
 
 ## Files
 
-| File                                               | Responsibility                                                                                                                                                                                   |
-| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `timeline.route.tsx`                               | Route marker — exports `Component` rendering `PatientTimelinePage`.                                                                                                                              |
-| `timeline.manifest.ts`                             | Manifest — `kind: 'leaf'`, permission `organization:read`, module `clinic-patients`, title "Overview".                                                                                           |
-| `timeline.constants.ts`                            | `TIMELINE_KEYS` (the file's own words reused where they are the same), the cards and tones, test ids.                                                                                            |
-| `PatientTimelinePage.tsx`                          | The section: no header, the bento, then the activity timeline — or the visit flow on `?visit=open`.                                                                                              |
-| `components/OverviewBento/OverviewBento.tsx`       | The grid and what each card opens, adds and does.                                                                                                                                                |
-| `components/OverviewBento/bento-card.tsx`          | A card's frame — head, "New …", "Open" — its rows, outline actions and its read in place (bars, Retry, empty).                                                                                   |
-| `components/OverviewBento/bento-read.ts`           | A query's flags as a card reads them (`BentoRead`).                                                                                                                                              |
-| `components/OverviewBento/bento-clinical.tsx`      | Clinical: the smart note and the four lists.                                                                                                                                                     |
-| `components/OverviewBento/bento-care.tsx`          | Visits, Packages, Prescriptions, Treatments.                                                                                                                                                     |
-| `components/OverviewBento/bento-files.tsx`         | Photos, Reports, Team notes.                                                                                                                                                                     |
-| `components/OverviewBento/smart-note.ts`           | The smart note's keys, per-locale loaders, fold and reader.                                                                                                                                      |
-| `components/OverviewBento/smart-note-words/`       | One dictionary per locale (English the prototype's; the rest machine-translated, for native review).                                                                                             |
-| `components/OverviewBento/use-smart-note.ts`       | The smart note's text and "Add".                                                                                                                                                                 |
-| `components/ActivityTimeline/ActivityTimeline.tsx` | The card on the person's stream: the view tabs, the day headings, the rows and what each opens, "Load more".                                                                                     |
-| `components/ActivityTimeline/activity-timeline.ts` | The views and the stream filter each asks for, a row's tile by its record, the money mask, the day rows.                                                                                         |
-| `components/VisitFlow/VisitFlow.tsx`               | The visit flow: its head (Pause, Resume, Complete visit) and the three step cards with their status lines.                                                                                       |
-| `components/VisitFlow/flow-steps.tsx`              | Each step's controls: the checks, the kits, Repeat / New treatment; a failed read's Retry.                                                                                                       |
-| `components/VisitFlow/use-visit-flow.ts`           | The flow's reads (the visit's checks, its Rx and session, the last session, the package, the kits) and its writes and links, each left out for a member who can't, toasting in the flow's words. |
-| `components/VisitFlow/visit-flow.ts`               | The step states, the remembered settings, the package a repeat spends, the repeated session and the step button classes.                                                                         |
-| `components/VisitFlow/visit-flow.constants.ts`     | `VISIT_FLOW_KEYS` (`patient-file` › `visitFlow.*`), the steps, test ids.                                                                                                                         |
+| File                                               | Responsibility                                                                                                                                                                                                                              |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `timeline.route.tsx`                               | Route marker — exports `Component` rendering `PatientTimelinePage`.                                                                                                                                                                         |
+| `timeline.manifest.ts`                             | Manifest — `kind: 'leaf'`, permission `organization:read`, module `clinic-patients`, title "Overview".                                                                                                                                      |
+| `timeline.constants.ts`                            | `TIMELINE_KEYS` (the file's own words reused where they are the same), the cards and tones, test ids.                                                                                                                                       |
+| `PatientTimelinePage.tsx`                          | The section: no header, the bento, then the activity timeline — or the visit flow on `?visit=open`.                                                                                                                                         |
+| `components/OverviewBento/OverviewBento.tsx`       | The grid and what each card opens, adds and does.                                                                                                                                                                                           |
+| `components/OverviewBento/bento-card.tsx`          | A card's frame — head, "New …", "Open" — its rows, outline actions and its read in place (bars, Retry, empty).                                                                                                                              |
+| `components/OverviewBento/bento-read.ts`           | A query's flags as a card reads them (`BentoRead`).                                                                                                                                                                                         |
+| `components/OverviewBento/bento-clinical.tsx`      | Clinical: the smart note and the four lists.                                                                                                                                                                                                |
+| `components/OverviewBento/bento-care.tsx`          | Visits, Packages, Prescriptions, Treatments.                                                                                                                                                                                                |
+| `components/OverviewBento/bento-files.tsx`         | Photos, Reports, Team notes.                                                                                                                                                                                                                |
+| `components/OverviewBento/smart-note.ts`           | The smart note's keys, per-locale loaders, fold and reader.                                                                                                                                                                                 |
+| `components/OverviewBento/smart-note-words/`       | One dictionary per locale (English the prototype's; the rest machine-translated, for native review).                                                                                                                                        |
+| `components/OverviewBento/use-smart-note.ts`       | The smart note's text and "Add".                                                                                                                                                                                                            |
+| `components/ActivityTimeline/ActivityTimeline.tsx` | The card on the person's stream: the view tabs, the day headings, the rows and what each opens, "Load more".                                                                                                                                |
+| `components/ActivityTimeline/activity-timeline.ts` | The views and the stream filter each asks for, a row's tile by its record, the money mask, the day rows.                                                                                                                                    |
+| `components/VisitFlow/VisitFlow.tsx`               | The visit flow: its head (Pause, Resume, Complete visit) and the five step cards with their status lines (amounts masked with the file).                                                                                                    |
+| `components/VisitFlow/flow-steps.tsx`              | Each step's controls: the checks, the kits, Repeat / New treatment, Create invoice from visit / Custom invoice, Collect; a failed read's Retry.                                                                                             |
+| `components/VisitFlow/use-visit-flow.ts`           | The flow's reads (the visit's checks, its Rx and session, the last session, the package, the kits, the patient's invoices of the visit's day) and its writes and links, each left out for a member who can't, toasting in the flow's words. |
+| `components/VisitFlow/visit-flow.ts`               | The step states, the remembered settings, the package a repeat spends, the repeated session, the visit's bill (`visitBill`) and the step button classes.                                                                                    |
+| `components/VisitFlow/visit-flow.constants.ts`     | `VISIT_FLOW_KEYS` (`patient-file` › `visitFlow.*`), the steps, test ids.                                                                                                                                                                    |
 
 ## Test ids
 
@@ -115,6 +129,7 @@ one lazy module (`../patient-id.sections.ts`).
 `clinical` · `money` · `notes`), `overview-activity-row` (`data-kind`: the record's kind, else
 `note` / `system`), `overview-activity-more` (`docs/reference/e2e-testids-inventory.md`
 › Patient file Overview); the flow's `visit-flow`, `visit-flow-pause` · `-resume` · `-complete`,
-`visit-flow-step-<step>` (`checks` · `rx` · `treatment`), `visit-flow-retry-<step>`,
+`visit-flow-step-<step>` (`checks` · `rx` · `treatment` · `invoice` · `collect`), `visit-flow-retry-<step>`,
 `visit-flow-check-<check>`, `visit-flow-kit`, `visit-flow-write-rx`, `visit-flow-repeat`,
-`visit-flow-new-treatment` (› Patient file visit flow).
+`visit-flow-new-treatment`, `visit-flow-create-invoice`, `visit-flow-custom-invoice`,
+`visit-flow-collect` (› Patient file visit flow).

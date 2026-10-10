@@ -49,7 +49,8 @@
     "receipt": "Ricevuto",
     "refund": "Rimborso al paziente",
     "expense": "Pagato",
-    "money_back": "Rimborso ricevuto"
+    "money_back": "Rimborso ricevuto",
+    "reversal": "Storno"
   },
   "ledger": {
     "records": "movimenti",
@@ -68,20 +69,29 @@
       "moneyBack": "Rimborso ricevuto",
       "medicalBill": "Ordine medico #{{seq}} · fattura {{bill}}",
       "stockBill": "Ordine scorte #{{seq}} · fattura {{bill}}",
-      "fromCredit": "Da {{ref}}"
+      "fromCredit": "Da {{ref}}",
+      "reversed": "Stornato",
+      "medicalOrder": "Ordine medicinali #{{seq}}",
+      "stockPurchase": "Ordine scorte #{{seq}}"
     },
     "dayClosed": "{{ref}} · Giornata chiusa",
     "dayClosedEdited_one": "{{ref}} · Giornata chiusa · modificato {{count}}×",
     "dayClosedEdited_many": "{{ref}} · Giornata chiusa · modificato {{count}}×",
     "dayClosedEdited_other": "{{ref}} · Giornata chiusa · modificato {{count}}×",
-    "creditEntry": "{{ref}} · Da {{credit}}"
+    "creditEntry": "{{ref}} · Da {{credit}}",
+    "fixedEntry": "{{ref}} · l’importo non si può cambiare · eliminalo nel suo giorno per annullarlo",
+    "search": "Paziente, beneficiario o numero PAY-",
+    "count_one": "{{count}} movimento",
+    "count_other": "{{count}} movimenti",
+    "count_many": "{{count}} movimenti"
   },
   "rowActions": {
     "edit": "Modifica",
     "delete": "Elimina",
     "giveBack": "Restituisci",
     "gotBack": "Riavuto",
-    "useOnBill": "Usa nella prossima fattura"
+    "useOnBill": "Usa nella prossima fattura",
+    "reverse": "Storna"
   },
   "bulk": {
     "export": "Esporta",
@@ -105,7 +115,11 @@
       "party": "Paziente o beneficiario errato"
     },
     "removed": "{{ref}} rimosso",
-    "removedInvoice": "{{ref}} rimosso · saldo della fattura ripristinato"
+    "removedInvoice": "{{ref}} rimosso · saldo della fattura ripristinato",
+    "blocked": {
+      "dayClosed": "{{ref}} · la sua giornata ora è chiusa · stornalo invece",
+      "moreThanPaid": "{{ref}} · un rimborso ha già restituito questo denaro · elimina prima il rimborso"
+    }
   },
   "dialog": {
     "record": "Pagamento",
@@ -132,7 +146,6 @@
     },
     "settledToday": "{{state}} · Oggi",
     "adjusted": "{{amount}} compensato",
-    "source": "Da {{ref}} · {{direction}}",
     "invoice": "Fattura #{{seq}}",
     "byHand": "A mano",
     "deleteTitle": "Eliminare questo elemento in sospeso?",
@@ -149,9 +162,18 @@
       "loan_to_staff": "Prestito al personale",
       "other": "Altro"
     },
-    "settledInvoice": "{{state}} · Fattura #{{seq}}",
     "adjustedOn": "{{amount}} di {{ref}} compensati sulla fattura #{{seq}}",
-    "nothingDue": "{{name}} non ha nulla da saldare su cui compensare"
+    "nothingDue": "{{name}} non ha nulla da saldare su cui compensare",
+    "search": "Persona, fornitore o CR-",
+    "fromEntry": "Da un movimento",
+    "forInvoice": "Per una fattura",
+    "settledLocked": "{{ref}} · {{amount}} saldati · non si può più modificare",
+    "conflicts": {
+      "settled": "Una parte di {{ref}} ora è saldata · non si può modificare né eliminare",
+      "closed": "{{ref}} è già saldato",
+      "dayClosed": "Oggi è chiuso nella sede della fattura #{{seq}} · riaprilo per usare questo credito",
+      "dueChanged": "Il dovuto della fattura #{{seq}} è cambiato · riprova"
+    }
   },
   "receive": {
     "title": "Incassa pagamento",
@@ -188,7 +210,11 @@
     "updated": "{{ref}} aggiornato · modifica registrata",
     "enterAmount": "Inserisci un importo",
     "pickPatient": "Scegli un paziente",
-    "aboveDue": "Più dei {{due}} da saldare"
+    "aboveDue": "Più dei {{due}} da saldare",
+    "moreThanDue": "Più di quanto resta ora sulla fattura · è stata pagata nel frattempo",
+    "totalAdvance": "Totale {{total}} · acconto",
+    "advance": "Acconto · nessuna fattura",
+    "invoicesFailed": "Impossibile caricare le fatture aperte"
   },
   "send": {
     "title": "Registra pagamento",
@@ -249,7 +275,9 @@
     "added": "Spesa {{ref}} aggiunta",
     "paidBill": "{{amount}} pagati su {{bill}}",
     "saved": "{{ref}} salvato · modifica registrata",
-    "missing": "Indica chi è stato pagato e l’importo"
+    "missing": "Indica chi è stato pagato e l’importo",
+    "moreThanDue": "Più di quanto resta ora sulla fattura del fornitore · è stata pagata nel frattempo",
+    "billsFailed": "Impossibile caricare le fatture aperte"
   },
   "credit": {
     "title": "Aggiungi in sospeso",
@@ -340,9 +368,9 @@
     "gate": {
       "title": "Fondo cassa iniziale · {{day}}",
       "sources": {
-        "default_float": "Fondo predefinito",
         "carried": "Riportato dalla chiusura del {{day}}",
-        "recounted": "Ricontato"
+        "recounted": "Ricontato",
+        "first": "Nessuna chiusura precedente · niente da riportare"
       },
       "recount": "Riconta",
       "recountLabel": "Riconta il fondo cassa iniziale",
@@ -363,10 +391,13 @@
       "countPlaceholder": "Conta la cassa",
       "countLabel": "Contanti contati",
       "netByMode": "Netto per modalità",
-      "modeTitle": "Entrate {{in}} · uscite {{out}}",
-      "staffTitle_one": "{{name}} · {{count}} incasso · {{amount}}",
-      "staffTitle_many": "{{name}} · {{count}} incassi · {{amount}}",
-      "staffTitle_other": "{{name}} · {{count}} incassi · {{amount}}"
+      "staffTitle_one": "{{name}} · {{count}} movimento · {{amount}}",
+      "staffTitle_many": "{{name}} · {{count}} movimenti · {{amount}}",
+      "staffTitle_other": "{{name}} · {{count}} movimenti · {{amount}}",
+      "staffOther": "Fuori dal team",
+      "reason": "Perché il conteggio non torna?",
+      "reasonPlaceholder": "Cos’è successo · ad es. ₹20 dati come resto dalla cassa",
+      "reasonFirst": "Prima indica perché il conteggio non torna"
     },
     "report": {
       "title": "{{day}} è chiuso",
@@ -375,11 +406,9 @@
       "reopen": "Riapri",
       "acceptedBy": "Accettato da {{name}}",
       "takenAsExpected": "Preso come atteso",
-      "collected": "Incassato",
       "received_one": "{{count}} incassato",
       "received_many": "{{count}} incassati",
       "received_other": "{{count}} incassati",
-      "paidOut": "Pagato",
       "paid_one": "{{count}} pagato",
       "paid_many": "{{count}} pagati",
       "paid_other": "{{count}} pagati",
@@ -392,30 +421,60 @@
       "log": "Cosa è successo",
       "logAccepted": "{{name}} ha accettato il fondo cassa iniziale di {{amount}}",
       "logRecounted": "{{name}} ha accettato il fondo cassa iniziale di {{amount}} (ricontato)",
-      "logReviewed_one": "{{checked}} di {{count}} movimento controllato",
-      "logReviewed_many": "{{checked}} di {{count}} movimenti controllati",
-      "logReviewed_other": "{{checked}} di {{count}} movimenti controllati",
       "logMatched": "Cassa contata a {{amount}} · in pari",
       "logExtra": "Cassa contata a {{amount}} · {{diff}} in più",
       "logShort": "Cassa contata a {{amount}} · {{diff}} in meno",
-      "logClosed": "{{name}} ha chiuso la giornata · riepilogo inviato all’admin su WhatsApp",
-      "logAuto": "Chiusura automatica dopo il periodo di tolleranza · contanti presi come attesi"
+      "logClosed": "{{name}} ha chiuso la giornata",
+      "logAuto": "Chiusura automatica dopo il periodo di tolleranza · contanti presi come attesi",
+      "openedAuto": "Aperto automaticamente",
+      "notCounted": "Non contato",
+      "logOpened": "{{name}} ha aperto la giornata",
+      "logReopened": "{{name}} ha riaperto la giornata · {{reason}}",
+      "logReason": "«{{reason}}»",
+      "someone": "Qualcuno"
     },
     "review": {
       "title": "Controlla ogni movimento",
-      "progress_one": "{{checked}} di {{count}} controllato",
-      "progress_many": "{{checked}} di {{count}} controllati",
-      "progress_other": "{{checked}} di {{count}} controllati",
       "none": "Nessun movimento",
       "empty": "Nessun movimento in questa giornata",
-      "check": "Segna come controllato",
       "states": {
         "canEdit": "Modificabile",
         "canEditTitle": "Modificabile o eliminabile fino alla chiusura della giornata",
         "dayClosed": "Giornata chiusa",
         "dayClosedTitle": "La giornata è chiusa · i suoi movimenti non si possono modificare",
         "fromCredit": "Da {{credit}}"
+      },
+      "count_one": "{{count}} movimento",
+      "count_many": "{{count}} movimenti",
+      "count_other": "{{count}} movimenti"
+    },
+    "previousNone": "Nessuna chiusura prima di questa giornata",
+    "refusals": {
+      "alreadyOpened": "Qualcuno ha aperto questa giornata nel frattempo · ora è visibile",
+      "alreadyClosed": "Qualcuno ha chiuso questa giornata nel frattempo · ora è visibile",
+      "alreadyOpen": "Questa giornata è già stata riaperta · ora è visibile"
+    },
+    "reopen": {
+      "title": "Riaprire questa giornata?",
+      "effect": "Il conteggio viene cancellato e i movimenti della giornata si possono di nuovo modificare finché non viene chiusa.",
+      "action": "Riapri giornata",
+      "record": "{{branch}} · {{day}}",
+      "reasons": {
+        "miscounted": "Contato male",
+        "missed": "Mancava un movimento",
+        "wrongEntry": "Un movimento è sbagliato"
       }
+    }
+  },
+  "reverseEntry": {
+    "title": "Stornare questo pagamento?",
+    "effect": "La sua giornata è chiusa, quindi resta com’è. Uno storno dello stesso importo va oggi nel registro della sua sede e ciò che ha pagato viene annullato. Entrambi i movimenti restano.",
+    "action": "Storna",
+    "reversed": "{{ref}} stornato · {{reversal}}",
+    "blocked": {
+      "alreadyReversed": "{{ref}} è già stornato",
+      "dayOpen": "La giornata di {{ref}} è di nuovo aperta · eliminalo invece",
+      "dayClosed": "Oggi è chiuso nella sede di {{ref}} · riaprilo per stornare"
     }
   }
 }

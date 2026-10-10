@@ -125,9 +125,14 @@ export interface ChatRecipient {
  * and turns "Not sent" with a Retry when it fails — never a toast. A patient's
  * first message opens their thread (`ensureContactThread`, D32 — the same
  * lookup-or-create the task drawer binds with). The send finishes even if the
- * column moves to another person meanwhile.
+ * column moves to another person meanwhile; `onSent` runs once the server has
+ * taken it (the task drawer reads its task again after the rules run, D81 T7).
  */
-export function useSendMessage(person: ChatPerson, recipient: ChatRecipient) {
+export function useSendMessage(
+  person: ChatPerson,
+  recipient: ChatRecipient,
+  { onSent }: { onSent?: () => void } = {},
+) {
   const queryClient = useQueryClient();
   const personKey = chatPersonKey(person);
   const { name, phone } = recipient;
@@ -184,12 +189,13 @@ export function useSendMessage(person: ChatPerson, recipient: ChatRecipient) {
             for (const queryKey of [...MESSAGE_SIDE_EFFECT_KEYS, contactQueryKeys.all]) {
               void queryClient.invalidateQueries({ queryKey });
             }
+            onSent?.();
           },
           onError: () => markOutbox(personKey, message.clientId, 'failed'),
         },
       );
     },
-    [mutate, personKey, queryClient],
+    [mutate, personKey, queryClient, onSent],
   );
 
   /** Send a message; blank text sends nothing. */

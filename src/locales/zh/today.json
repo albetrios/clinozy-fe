@@ -51,7 +51,8 @@
     "unconfirmed": "未确认",
     "waiting": "已等 {{minutes}} 分钟",
     "inRoom": "在诊室 {{minutes}} 分钟",
-    "rxApproved": "处方已批准 {{time}}"
+    "rxApproved": "处方已批准 {{time}}",
+    "toPay": "应付 {{amount}}"
   },
   "toasts": {
     "checkedIn": "{{name}} 已签到 · 已通知医生队列和诊室",

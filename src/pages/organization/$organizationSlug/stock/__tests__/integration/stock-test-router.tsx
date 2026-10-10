@@ -35,7 +35,8 @@ export type StockTestTab = keyof typeof TAB_DIALOGS;
 /**
  * Every code an Owner or Admin holds in the room (api-integration §5.6 Roles) — the
  * harness's member unless a test names others: see, add, change and move stock, delete,
- * export, and pay a bill ("Paid" on a new purchase).
+ * export, and pay a bill ("Paid" on a new purchase; "Pay ₹X" through Payments, which also
+ * needs `payment:read`).
  */
 const STOCK_ADMIN_CODES: readonly OrganizationPermission[] = [
   'organization:read',
@@ -45,6 +46,7 @@ const STOCK_ADMIN_CODES: readonly OrganizationPermission[] = [
   'stock_item:delete',
   'stock_item:export',
   'payment:create',
+  'payment:read',
 ];
 
 /** Who the harness signs in: their clinozy-be codes, or View-as a clinic role. */

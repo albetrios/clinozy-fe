@@ -1,12 +1,15 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
-import { fetchInvoice, invoiceQueryKeys } from '@/shared/api/clinic/invoices-api.ts';
+import {
+  fetchSaleInvoice,
+  fixtureInvoiceQueryKeys,
+} from '@/shared/api/clinic/invoices-fixture-api.ts';
 import { printInvoice } from '@/shared/components/InvoiceDrawer/index.ts';
 import { notifyError } from '@/shared/errors/errorHandler.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useFixtureDeletePayment } from '@/shared/hooks/useFixtureLedger/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
-import { useDeletePayment } from '@/shared/hooks/usePayments/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { useCollectSale } from '../../../shared/hooks/useMedicalFlows/index.ts';
@@ -59,7 +62,7 @@ export function useSaleActions(): SaleActions {
   const formatPaise = usePaiseFormat();
   const access = useClinicAccess();
   const collectSale = useCollectSale();
-  const removeReceipt = useDeletePayment();
+  const removeReceipt = useFixtureDeletePayment();
   const can = (action: 'edit' | 'delete') =>
     access.isResolved && access.can('medical', action);
   return {
@@ -75,8 +78,8 @@ export function useSaleActions(): SaleActions {
     print: (sale) =>
       void queryClient
         .query({
-          queryKey: invoiceQueryKeys.detail(sale.invoiceId),
-          queryFn: () => fetchInvoice(sale.invoiceId),
+          queryKey: fixtureInvoiceQueryKeys.sale(sale.invoiceId),
+          queryFn: () => fetchSaleInvoice(sale.invoiceId),
         })
         .then(printInvoice)
         .catch((error: unknown) => notifyError(error)),

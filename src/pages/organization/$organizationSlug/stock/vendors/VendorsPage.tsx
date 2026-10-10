@@ -5,10 +5,13 @@ import { useTranslation } from 'react-i18next';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
+import { mapApiError } from '@/shared/errors/errorHandler.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
+import { usePayBill } from '@/shared/hooks/usePayBill/index.ts';
 import { useRoomList } from '@/shared/hooks/useRoomList/index.ts';
 import { useRoomTable } from '@/shared/hooks/useRoomTable/index.ts';
-import { PenLine, Trash } from '@/shared/icons/index.ts';
+import { PenLine, Trash, Wallet } from '@/shared/icons/index.ts';
+import { notify } from '@/shared/notify/index.ts';
 
 import {
   StockDeleteConfirm,
@@ -29,7 +32,11 @@ import {
 } from '../shared/hooks/useStockLists/index.ts';
 import { useStockNav } from '../shared/hooks/useStockNav/index.ts';
 import { useStockWords } from '../shared/hooks/useStockWords/index.ts';
-import { fetchStockVendor, stockQueryKeys } from '../shared/stock-api.ts';
+import {
+  fetchOldestOpenStockPurchase,
+  fetchStockVendor,
+  stockQueryKeys,
+} from '../shared/stock-api.ts';
 import type { StockVendorListParams, StockVendorRow } from '../shared/stock-contracts.ts';
 import { STOCK_DRAWER_KEYS } from '../shared/stock-drawers.constants.ts';
 import { STOCK_KEYS, STOCK_NS, STOCK_TABLE_IDS } from '../stock.constants.ts';
@@ -58,7 +65,33 @@ function useVendorCount({ q }: StockVendorListParams): string | undefined {
 }
 
 /**
- * A row's actions: Edit (read-only without Edit), and Delete with Stock Delete
+ * "Pay ₹X" on a vendor: one read on the click — their oldest open bill
+ * (`fetchOldestOpenStockPurchase`), never a read per row — then Payments › Send
+ * payment on it (`?bill=spur_…`). A vendor paid up meanwhile says so and the
+ * vendors are read again; a failed read says why.
+ */
+function useVendorPay() {
+  const { t } = useTranslation(STOCK_NS);
+  const { canPay, pay } = usePayBill();
+  const refresh = useRefreshStockVendors();
+  const payOldest = (vendor: StockVendorRow) => {
+    fetchOldestOpenStockPurchase(vendor.id)
+      .then((purchase) => {
+        if (purchase) {
+          pay({ kind: 'stock_po', purchaseId: purchase.id });
+          return;
+        }
+        notify.info(t(STOCK_KEYS.vendors.paidUp, { name: vendor.name }));
+        refresh(vendor.id);
+      })
+      .catch((error: unknown) => notify.error(mapApiError(error)));
+  };
+  return { canPay, payOldest };
+}
+
+/**
+ * A row's actions: "Pay ₹X" while they are owed something (`payment:create` +
+ * `payment:read`), Edit (read-only without Edit), and Delete with Stock Delete
  * while nothing is owed (`vendor_has_dues`). A confirm that closes without
  * deleting reads the vendors again — a refusal means a purchase owes them since.
  */
@@ -66,11 +99,23 @@ function useVendorActions() {
   const { t } = useTranslation(STOCK_NS);
   const access = useStockAccess();
   const nav = useStockNav();
+  const { formatRupees } = useStockWords();
+  const { canPay, payOldest } = useVendorPay();
   const refresh = useRefreshStockVendors();
   const [deleting, setDeleting] = useState<StockDeleteTarget | null>(null);
   const keys = STOCK_KEYS.vendors.rowActions;
 
   const rowActions = (vendor: StockVendorRow): DataTableRowAction[] => [
+    ...(canPay && vendor.payable > 0
+      ? [
+          {
+            id: 'pay',
+            label: t(keys.pay, { amount: formatRupees(vendor.payable) }),
+            icon: Wallet,
+            onSelect: () => payOldest(vendor),
+          },
+        ]
+      : []),
     {
       id: 'edit',
       label: t(keys.edit),
@@ -115,8 +160,8 @@ function useVendorActions() {
  * over the vendors, how many purchases they have and what they are owed, the
  * server's figures; sort by Vendor or Payable. A row opens Edit clinic vendor;
  * the footer counts the vendors the search matches and what is owed to them.
- * "Pay ₹X" waits for Payments (Q-S3): the Payments room still reads fixtures
- * and cannot pay a live purchase. The dialog routes render nothing: this page
+ * "Pay ₹X", while a vendor is owed, opens Payments › Send payment on their
+ * oldest open bill — one read on the click (Q-S3). The dialog routes render nothing: this page
  * opens the vendor drawer for `create/` (`?name=`) and `$vendorId/edit/`;
  * Delete — only while nothing is owed — asks for a reason. A first read that
  * fails shows in place with Retry.

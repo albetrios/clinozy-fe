@@ -1,9 +1,10 @@
 /**
  * URL search-param schemas for the Tasks room (consumed by routeTree's
- * `validateSearch`): the list's view, search, rule filter and scope (KICKOFF
- * §6.10, `S:95`). A value the URL can't hold — an unknown view, a rule the
- * type filter does not offer — is dropped, never an error. Defaults stay out
- * of the URL (`/tasks` is To do, Mine).
+ * `validateSearch`): the list's view, search, type filter and scope (KICKOFF
+ * §6.10, `S:95`). A value the URL can't hold — an unknown view, a type the
+ * filter does not offer — is dropped, never an error; so is the old To do id
+ * `queue` (now the API's `open`), which reads To do. Defaults stay out of the
+ * URL (`/tasks` is To do, Mine).
  *
  * The contract's values are declared here, not imported: `routeTree.tsx` is the
  * entry chunk, and the tasks contract module is pages of zod. The test pins
@@ -11,42 +12,48 @@
  */
 import { listOf, oneOf, queryOf } from '@/lib/routes/search-params.ts';
 import type {
-  TaskRuleId,
   TaskScope,
   TaskTab,
+  TaskType,
 } from '@/shared/api/clinic/tasks-contracts.ts';
 
-/** The views, "To do · Snoozed · Done" — `queue` is the contract's "Queue" (S:95, D22). */
+/** The views, "To do · Snoozed · Done" — To do is the API's `open` (route map §2 #21). */
 export const TASK_VIEWS = [
-  'queue',
+  'open',
   'snoozed',
   'done',
 ] as const satisfies readonly TaskTab[];
 
-/** "Mine" (mine and unowned) · "Everyone". */
+/** "Mine" (mine and my roles' queues) · "Everyone". */
 export const TASK_SCOPE_VALUES = [
   'mine',
   'everyone',
 ] as const satisfies readonly TaskScope[];
 
-/** The rules the type filter offers — the 13 designed ones, in its order (D42). */
-export const TASK_TYPE_VALUES = [
+/**
+ * The types the type filter offers — the API's rules and "Follow-ups you set"
+ * (`by_hand`), in the Rules popover's order (the contract's `TASK_TYPE_VALUES`).
+ */
+export const TASK_TYPE_FILTER_VALUES = [
   'reply',
-  'follow',
+  'follow_up',
   'claim',
-  'failed',
+  'failed_message',
   'confirm',
   'arrive',
   'rebook',
   'feedback',
+  'call_back',
   'aftercare',
-  'unhappy',
-  'nextvisit',
-  'noreply',
-  'manual',
-] as const satisfies readonly TaskRuleId[];
+  'next_visit',
+  'gone_quiet',
+  'by_hand',
+  'payment_due',
+  'settle_by',
+  'medical_rep_visit',
+] as const satisfies readonly TaskType[];
 
-/** The search field's limit (`tasks.md:66`). */
+/** The search field's limit (`tasks.md:66`) — the list query's. */
 const SEARCH_MAX = 80;
 
 /** Validated `?…` search params for `/tasks` and its dialog routes. */
@@ -55,15 +62,15 @@ export interface TasksSearch {
   tab?: TaskTab;
   /** Task title, person or why line (≤ 80 characters). */
   q?: string;
-  /** Any of these rules. */
-  type?: TaskRuleId[];
+  /** Any of these types. */
+  type?: TaskType[];
   /** Mine (default) · Everyone. */
   scope?: TaskScope;
 }
 
 /** The list's state when the URL says nothing. */
 export const TASKS_SEARCH_DEFAULTS = {
-  tab: 'queue',
+  tab: 'open',
   scope: 'mine',
 } as const satisfies TasksSearch;
 
@@ -75,7 +82,10 @@ export function validateTasksSearch(search: Record<string, unknown>): TasksSearc
   return {
     tab: oneOf(TASK_VIEWS, search.tab),
     q: queryOf(search.q, SEARCH_MAX),
-    type: listOf(search.type, (entry) => oneOf(TASK_TYPE_VALUES, entry) !== undefined),
+    type: listOf(
+      search.type,
+      (entry) => oneOf(TASK_TYPE_FILTER_VALUES, entry) !== undefined,
+    ),
     scope: oneOf(TASK_SCOPE_VALUES, search.scope),
   };
 }

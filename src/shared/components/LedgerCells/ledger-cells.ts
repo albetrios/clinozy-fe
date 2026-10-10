@@ -22,13 +22,19 @@ import { LEDGER_KEYS, LEDGER_NS } from './ledger-cells.constants.ts';
 
 const SUB = LEDGER_KEYS.ledger.sub;
 
-/** The What pill: "Received" or "Paid", in the kind's tone. */
+/**
+ * The What pill: "Received" or "Paid", in the kind's tone — a reversal reads "Reversal", whichever
+ * way its money went.
+ */
 export function ledgerWhat(row: Pick<LedgerRow, 'direction' | 'kind'>): {
   labelKey: string;
   tone: Tone;
 } {
   return {
-    labelKey: LEDGER_KEYS.directions[row.direction],
+    labelKey:
+      row.kind === 'reversal'
+        ? LEDGER_KEYS.kinds.reversal
+        : LEDGER_KEYS.directions[row.direction],
     tone: PAYMENT_KIND_TONES[row.kind],
   };
 }
@@ -69,22 +75,51 @@ function refundParts(
   return parts;
 }
 
+/** A supplier bill's "Medical PO #431 · bill 1631", or "Stock PO #8" while it has no bill number. */
+function billPart(bill: NonNullable<LedgerRow['bill']>, t: TFunction): string {
+  const medical = bill.kind === 'medical_po';
+  if (bill.billNo) {
+    return t(medical ? SUB.medicalBill : SUB.stockBill, {
+      seq: bill.seq,
+      bill: bill.billNo,
+    });
+  }
+  return t(medical ? SUB.medicalOrder : SUB.stockPurchase, { seq: bill.seq });
+}
+
 /** Money out: a supplier bill's "Medical PO #431 · bill 1631", else the expense's category. */
 function paidOutParts(row: LedgerRow, t: TFunction, tClinic: TFunction): string[] {
-  if (row.bill) {
-    const key = row.bill.kind === 'medical_po' ? SUB.medicalBill : SUB.stockBill;
-    return [t(key, { seq: row.bill.seq, bill: row.bill.billNo })];
-  }
+  if (row.bill) return [billPart(row.bill, t)];
   if (!row.expenseCategory) return [];
   return [tClinic(CLINIC_KEYS.expenseCategories[row.expenseCategory])];
+}
+
+/** A reversal's part: what the entry it undid named — its invoice or its supplier bill. */
+function reversalParts(row: LedgerRow, t: TFunction): string[] {
+  if (row.invoice) return [t(SUB.invoice, { seq: row.invoice.seq })];
+  return row.bill ? [billPart(row.bill, t)] : [];
+}
+
+/** The kind's own parts of the sub line, before the credit, the note and the reversal mark. */
+function kindParts(
+  row: LedgerRow,
+  t: TFunction,
+  tClinic: TFunction,
+  creditNote: (seq: number) => string,
+): string[] {
+  if (row.kind === 'refund') return refundParts(row, t, creditNote);
+  if (row.kind === 'money_back') return [t(SUB.moneyBack)];
+  if (row.kind === 'reversal') return reversalParts(row, t);
+  return paidOutParts(row, t, tClinic);
 }
 
 /**
  * The From / to cell's sub line (`payments.md:29`, H:5108): a receipt's
  * "Invoice #785" or "Sale · Invoice #785"; a refund's "Refund · Credit note
  * CN-100 · for Invoice #760"; money back "Money back"; an expense's category or
- * "Medical PO #431 · bill 1631"; then the pending credit it settled ("From
- * CR-1") and " · <note>" (a receipt's note stays off the line).
+ * "Medical PO #431 · bill 1631"; a reversal's invoice or bill and its reason (its note); then
+ * the pending credit it settled ("From CR-1" — a credit used on a bill is a receipt) and
+ * " · <note>" (a receipt's note stays off the line) — and "Reversed" once a reversal undid it.
  */
 export function ledgerSubLine(
   row: LedgerRow,
@@ -92,15 +127,13 @@ export function ledgerSubLine(
   tClinic: TFunction,
   creditNote: (seq: number) => string,
 ): string {
-  if (row.kind === 'receipt') return receiptParts(row, t).join(' · ');
-  const parts: string[] = [];
-  if (row.kind === 'refund') parts.push(...refundParts(row, t, creditNote));
-  else if (row.kind === 'money_back') parts.push(t(SUB.moneyBack));
-  else parts.push(...paidOutParts(row, t, tClinic));
+  const receipt = row.kind === 'receipt';
+  const parts = receipt ? receiptParts(row, t) : kindParts(row, t, tClinic, creditNote);
   if (row.pendingCreditSeq !== null) {
     parts.push(t(SUB.fromCredit, { ref: displayId.pendingCredit(row.pendingCreditSeq) }));
   }
-  if (row.note) parts.push(row.note);
+  if (row.note && !receipt) parts.push(row.note);
+  if (row.reversedByPaymentId !== null) parts.push(t(SUB.reversed));
   return parts.join(' · ');
 }
 
@@ -110,7 +143,7 @@ export function ledgerSubLine(
  * day is closed — "PAY-5509 · Day closed" (+ " · edited 2×", `S:87`).
  */
 export function ledgerEntryLock(
-  row: Pick<LedgerRow, 'seq' | 'locked' | 'pendingCreditSeq' | 'edits'>,
+  row: Pick<LedgerRow, 'seq' | 'isSettled' | 'pendingCreditSeq' | 'editCount'>,
   t: TFunction,
 ): string | null {
   const ref = displayId.payment(row.seq);
@@ -120,21 +153,45 @@ export function ledgerEntryLock(
       credit: displayId.pendingCredit(row.pendingCreditSeq),
     });
   }
-  if (!row.locked) return null;
-  return row.edits.length > 0
-    ? t(LEDGER_KEYS.ledger.dayClosedEdited, { ref, count: row.edits.length })
+  if (!row.isSettled) return null;
+  return row.editCount > 0
+    ? t(LEDGER_KEYS.ledger.dayClosedEdited, { ref, count: row.editCount })
     : t(LEDGER_KEYS.ledger.dayClosed, { ref });
 }
 
-/** "₹600 UPI" — one side of a logged edit. */
+/**
+ * Whether an open day's entry opens in a drawer to be changed: what Receive and Send record — a
+ * receipt, an expense, a supplier bill. A refund's and a reversal's money is another write's (the
+ * server keeps it, a `400`): they are deleted on their day, never edited.
+ */
+export function ledgerEntryEditable(row: Pick<LedgerRow, 'kind'>): boolean {
+  return row.kind === 'receipt' || row.kind === 'expense' || row.kind === 'supplier_bill';
+}
+
+/** A refund's or a reversal's row click: "PAY-9 · its money can’t be changed · delete it on its day". */
+export function ledgerEntryFixed(row: Pick<LedgerRow, 'seq'>, t: TFunction): string {
+  return t(LEDGER_KEYS.ledger.fixedEntry, { ref: displayId.payment(row.seq) });
+}
+
+/**
+ * Whether a closed day's entry can be reversed (`POST …/reverse`): its day is closed, it is no
+ * reversal itself, and nothing reversed it yet.
+ */
+export function ledgerEntryReversible(
+  row: Pick<LedgerRow, 'isSettled' | 'kind' | 'reversedByPaymentId'>,
+): boolean {
+  return row.isSettled && row.kind !== 'reversal' && row.reversedByPaymentId === null;
+}
+
+/** "₹600 UPI" — one side of a logged edit (rupees). */
 export function editSideLabel(
   side: PaymentEditSide,
   t: TFunction,
   tClinic: TFunction,
-  formatPaise: (paise: number) => string,
+  formatRupees: (rupees: number) => string,
 ): string {
   return t(LEDGER_KEYS.ledger.editSide, {
-    amount: formatPaise(side.amount),
+    amount: formatRupees(side.amount),
     modes: ledgerModesLabel(side.modes, tClinic),
   });
 }

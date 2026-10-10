@@ -1,11 +1,34 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { isHttpError } from '@/shared/errors/HttpError.ts';
+vi.mock('@/core/http/api.ts', () => ({
+  api: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
+}));
+vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchTeamDirectory: vi.fn(),
+}));
+import { api } from '@/core/http/api.ts';
+import { queryClient } from '@/core/http/queryClient.ts';
+import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
+import { fetchTeamDirectory } from '@/shared/api/clinic/directory-api.ts';
+import { HttpError } from '@/shared/errors/HttpError.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import {
+  creditRow,
+  creditWire,
+  paymentWire,
+  TEST_CREDIT_ID,
+  TEST_INVOICE_ID,
+  TEST_MONEY_AUTHOR_ID,
+  TEST_MONEY_BRANCH_ID,
+  TEST_MONEY_CONTACT_ID,
+  TEST_MONEY_PATIENT_ID,
+} from '@/tests/utils/payments-doubles.ts';
 
-import { invoiceBalance } from './clinic-money.ts';
 import {
   createCredit,
-  creditQueryKeys,
+  creditListQuery,
   deleteCredit,
   fetchCredit,
   listPendingCredits,
@@ -15,314 +38,449 @@ import {
   updateCredit,
 } from './credits-api.ts';
 import type { CreditInput } from './credits-contracts.ts';
-import { patientRef } from './fixtures/patients.fixtures.ts';
-import { ref } from './fixtures/refs.fixtures.ts';
-import { clinicFixtures, resetClinicFixtures } from './fixtures/world.fixtures.ts';
 
-/** 10:00 on 3 Oct, clinic time — the seed day (27 Sep) is today. */
-const NOW = new Date('2026-10-03T04:30:00Z');
-const TANVI = patientRef('Tanvi Shah');
-const RHEA = patientRef('Rhea Shah');
-const CR_TWO = ref.pendingCredit(2);
-const CR_ONE = ref.pendingCredit(1);
+const TODAY = '2026-10-10';
 
-/** The rejection a call ends in, so its status and fields can be read. */
-async function failureOf(call: Promise<unknown>) {
-  const error = await call.then(
-    () => null,
-    (caught: unknown) => caught,
-  );
-  if (!isHttpError(error)) throw new Error('expected an HTTP error');
-  const body = (
-    error.data as { error: { code: string; detail: string; fields?: object } }
-  ).error;
-  return { status: error.status, ...body };
+/** A list page as the API answers it. */
+const page = (data: unknown[], pagination: Record<string, unknown> = {}) => ({
+  data,
+  meta: {
+    request_id: 'req',
+    pagination: { per_page: 50, next: null, has_more: false, ...pagination },
+  },
+});
+
+/** One record as the API answers it. */
+const one = (data: unknown) => ({ data, meta: { request_id: 'req' } });
+
+/** Answer each GET by its path. */
+function answer(byPath: Record<string, (query: Record<string, unknown>) => unknown>) {
+  vi.mocked(api.get).mockImplementation(((path: string, init?: { query?: object }) => {
+    const reply = byPath[path];
+    if (!reply) throw new Error(`unexpected GET ${path}`);
+    return Promise.resolve(reply((init?.query ?? {}) as Record<string, unknown>));
+  }) as never);
 }
 
-const GIVE: CreditInput = {
+/** The query a GET to `path` was sent with (the last one). */
+function queryOf(path: string) {
+  const call = vi
+    .mocked(api.get)
+    .mock.calls.filter(([called]) => called === path)
+    .at(-1);
+  return (call?.[1] as { query?: Record<string, unknown> } | undefined)?.query;
+}
+
+/** A contact row of `GET /app/contacts`. */
+const contactRow = (patch: Record<string, unknown> = {}) => ({
+  id: TEST_MONEY_CONTACT_ID,
+  contact_number: 1188,
+  first_name: 'Kavya',
+  last_name: 'Mehta',
+  primary_phone: '+919825005865',
+  email: null,
+  instagram_handles: [],
+  default_channel: 'whatsapp',
+  preference_tags: [],
+  patient_id: TEST_MONEY_PATIENT_ID,
+  open_lead_id: null,
+  last_activity_at: null,
+  last_received_at: null,
+  is_awaiting_reply: false,
+  updated_at: '2026-10-01T07:00:00.000Z',
+  gender: null,
+  date_of_birth: null,
+  address: null,
+  referral_source: null,
+  referred_by_contact_id: null,
+  referred_by_name: null,
+  has_marketing_consent: false,
+  patient_number: 2,
+  ...patch,
+});
+
+/** What Add pending holds for CR-1, as an input. */
+const creditInput = (patch: Partial<CreditInput> = {}): CreditInput => ({
   direction: 'give',
-  partyName: 'Rhea Shah',
-  patientId: RHEA,
-  amount: 50_000,
+  contactId: TEST_MONEY_CONTACT_ID,
+  partyName: 'Kavya Mehta',
+  amount: 80,
   reasonKey: 'overpaid',
-  invoiceId: ref.invoice(785),
-  settleBy: null,
-  note: null,
-};
+  invoiceId: TEST_INVOICE_ID,
+  settleBy: '2026-10-20',
+  note: 'Paid twice at the desk',
+  ...patch,
+});
 
 beforeEach(() => {
+  vi.resetAllMocks();
+  queryClient.clear();
+  signInTestMember();
+  vi.mocked(fetchTeamDirectory).mockResolvedValue([
+    {
+      id: TEST_MONEY_AUTHOR_ID,
+      userId: 'usr_nisha',
+      name: 'Nisha Shah',
+      initials: 'NS',
+      tone: 'sage',
+      roleIds: [],
+      branchIds: [],
+    },
+  ]);
   vi.useFakeTimers({ toFake: ['Date'] });
-  vi.setSystemTime(NOW);
-  resetClinicFixtures();
+  vi.setSystemTime(new Date(clinicInstant(TODAY, '10:00')));
 });
 afterEach(() => {
   vi.useRealTimers();
-  resetClinicFixtures();
+  useOrganizationStore.getState().clearOrganization();
 });
 
-describe('creditQueryKeys', () => {
-  it('nests every key under ["clinic", "credits"]', () => {
-    expect(creditQueryKeys.list({ status: ['open'] }).slice(0, 2)).toEqual(
-      creditQueryKeys.all,
-    );
-    expect(creditQueryKeys.detail('X').slice(0, 2)).toEqual(creditQueryKeys.all);
-  });
-});
-
-describe('Pending (listPendingCredits, S:1700)', () => {
-  it('reads the credits newest number first, each naming its patient and source entry', async () => {
-    const { items } = await listPendingCredits();
-    // CR-2 above CR-1 as the prototype lists them, though CR-1's "Since" is later.
-    expect(items.map((credit) => credit.seq)).toEqual([2, 1]);
-    expect(items[0]).toMatchObject({
-      partyName: 'Tanvi Shah',
-      patientId: TANVI,
-      patientSeq: expect.any(Number),
-      source: { seq: 5466, direction: 'paid', kind: 'refund' },
-      status: 'open',
-      adjusted: 0,
-    });
-    expect(items[1]).toMatchObject({ patientSeq: null, source: { seq: 305 } });
-  });
-
-  it('filters by which way, state and search', async () => {
-    const seqsOf = async (params: Parameters<typeof listPendingCredits>[0]) =>
-      (await listPendingCredits(params)).items.map((credit) => credit.seq);
-    expect(await seqsOf({ direction: ['give'] })).toEqual([2]);
-    expect(await seqsOf({ status: ['used'] })).toEqual([]);
-    expect(await seqsOf({ q: 'CR-1' })).toEqual([1]);
-    expect(await seqsOf({ q: 'gloves' })).toEqual([1]);
-  });
-});
-
-describe('the Who picker (searchCreditParties, payments.md:157)', () => {
-  it('lists every patient A–Z for an empty search, then the contacts and suppliers', async () => {
-    let cursor: string | null = null;
-    const rows = [];
-    do {
-      const page = await searchCreditParties('', cursor);
-      rows.push(...page.items);
-      cursor = page.nextCursor;
-    } while (cursor !== null);
-    const patients = rows.filter((row) => row.kind === 'patient');
-    expect(patients).toHaveLength(clinicFixtures.patients.snapshot().length);
-    const names = patients.map((row) => row.name);
-    expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)));
-    // Patients first, then contacts, then suppliers and vendors.
-    const kinds = rows.map((row) => row.kind);
-    expect(kinds.indexOf('contact')).toBeGreaterThan(kinds.lastIndexOf('patient'));
-    expect(kinds.indexOf('vendor')).toBeGreaterThan(kinds.lastIndexOf('contact'));
-  });
-
-  it('finds contacts — leads and Medical walk-ins — and suppliers by name or mobile, never a patient twice', async () => {
-    expect((await searchCreditParties('viral')).items).toEqual([
-      expect.objectContaining({ kind: 'contact', name: 'Viral Sheth' }),
-    ]);
-    expect((await searchCreditParties('Ankur')).items).toEqual([
-      expect.objectContaining({ kind: 'vendor', name: 'Ankur Pharma' }),
-    ]);
-    expect((await searchCreditParties('99706')).items).toEqual([
-      expect.objectContaining({ kind: 'vendor', name: 'Ankur Pharma' }),
-    ]);
-    expect((await searchCreditParties('NH Pharma')).items).toEqual([
-      expect.objectContaining({ kind: 'supplier', name: 'NH Pharma' }),
-    ]);
-    const rhea = (await searchCreditParties('Rhea')).items;
-    expect(rhea.filter((row) => row.name === 'Rhea Shah')).toEqual([
-      expect.objectContaining({ kind: 'patient', id: RHEA }),
-    ]);
-  });
-});
-
-describe('Add / Edit pending (S:1712)', () => {
-  it('stores the chip’s text as the reason, and a Settle by day opens a task', async () => {
-    const tasks = clinicFixtures.tasks.snapshot().length;
-    const credit = await createCredit({ ...GIVE, settleBy: '2026-10-10' });
-    expect(credit).toMatchObject({
-      seq: 3,
-      reason: 'Overpaid',
-      reasonKey: 'overpaid',
-      status: 'open',
-      adjusted: 0,
-    });
-    expect(clinicFixtures.tasks.snapshot()).toHaveLength(tasks + 1);
-  });
-
-  it('stores the note as the reason for "Other", and asks for one', async () => {
-    const credit = await createCredit({
-      ...GIVE,
-      reasonKey: 'other',
-      note: 'Refund to the same UPI id',
-    });
-    expect(credit.reason).toBe('Refund to the same UPI id');
-    const failure = await failureOf(createCredit({ ...GIVE, reasonKey: 'other' }));
-    expect(failure).toMatchObject({ status: 422, detail: 'Add a note for “Other”' });
-  });
-
-  it('asks who and the amount, and refuses another patient’s invoice', async () => {
-    expect((await failureOf(createCredit({ ...GIVE, partyName: '' }))).detail).toBe(
-      'Pick who',
-    );
-    expect((await failureOf(createCredit({ ...GIVE, amount: 0 }))).detail).toBe(
-      'Enter the amount',
-    );
-    const other = await failureOf(createCredit({ ...GIVE, invoiceId: ref.invoice(784) }));
-    expect(other.fields).toHaveProperty('invoiceId');
-  });
-
-  it('edits an open credit; a settled one is a conflict', async () => {
-    const updated = await updateCredit(CR_ONE, {
-      direction: 'take',
-      partyName: 'Medline Surgicals',
-      patientId: null,
-      amount: 90_000,
-      reasonKey: 'damaged_goods',
-      invoiceId: null,
-      settleBy: null,
-      note: null,
-    });
-    expect(updated).toMatchObject({ amount: 90_000, reason: 'Damaged goods returned' });
-    await settleCredit(CR_ONE, {
-      action: 'got_back',
-      splits: [{ mode: 'cash', amount: 90_000 }],
-    });
-    const failure = await failureOf(
-      updateCredit(CR_ONE, {
-        ...GIVE,
-        direction: 'take',
-        patientId: null,
-        invoiceId: null,
-      }),
-    );
-    expect(failure.status).toBe(409);
-  });
-
-  it('deletes and restores a credit', async () => {
-    await deleteCredit(CR_TWO, 'duplicate', null);
-    expect((await failureOf(fetchCredit(CR_TWO))).status).toBe(404);
-    await restoreCredit(CR_TWO);
-    expect((await fetchCredit(CR_TWO)).seq).toBe(2);
-  });
-});
-
-describe('settling a credit (settleCredit, S:1713)', () => {
-  it('gives a patient’s money back as a refund — in part, the rest staying open', async () => {
-    const result = await settleCredit(CR_TWO, {
-      action: 'give_back',
-      splits: [{ mode: 'upi', amount: 20_000 }],
-    });
-    expect(result).toMatchObject({ amount: 20_000, creditNoteSeq: null });
-    expect(result.credit).toMatchObject({ status: 'open', adjusted: 20_000 });
-    const entry = clinicFixtures.payments.snapshot(
-      (row) => row.seq === result.paymentSeq,
-    )[0];
-    expect(entry).toMatchObject({
-      direction: 'paid',
-      kind: 'refund',
-      patientId: TANVI,
-      pendingCreditId: CR_TWO,
-      note: 'Charged twice for corn removal',
-    });
-
-    const rest = await settleCredit(CR_TWO, {
-      action: 'give_back',
-      splits: [{ mode: 'cash', amount: 30_000 }],
-    });
-    expect(rest.credit).toMatchObject({ status: 'given_back', adjusted: 50_000 });
-    expect(rest.credit.settledAt).not.toBeNull();
-  });
-
-  it('writes a credit note when the credit names its invoice', async () => {
-    const credit = await createCredit(GIVE);
-    const result = await settleCredit(credit.id, {
-      action: 'give_back',
-      splits: [{ mode: 'upi', amount: 50_000 }],
-    });
-    expect(result.creditNoteSeq).toBe(1);
-    const note = clinicFixtures.creditNotes.snapshot()[0];
-    expect(note).toMatchObject({ invoiceId: ref.invoice(785), amount: 50_000 });
-  });
-
-  it('refunds against the invoice of the entry a credit came from', async () => {
-    const credit = await createCredit({ ...GIVE, invoiceId: null });
-    await clinicFixtures.pendingCredits.update(credit.id, {
-      sourcePaymentId: ref.payment(5512),
-    });
-    const result = await settleCredit(credit.id, {
-      action: 'give_back',
-      splits: [{ mode: 'cash', amount: 50_000 }],
-    });
-    expect(result.creditNoteSeq).toBe(1);
-    expect(clinicFixtures.creditNotes.snapshot()[0]?.invoiceId).toBe(ref.invoice(785));
-    const entry = clinicFixtures.payments.snapshot(
-      (row) => row.seq === result.paymentSeq,
-    )[0];
-    expect(entry).toMatchObject({ kind: 'refund', invoiceId: ref.invoice(785) });
-    expect((await fetchCredit(credit.id)).settledInvoiceSeq).toBeNull();
-  });
-
-  it('takes a party’s money in as money back', async () => {
-    const result = await settleCredit(CR_ONE, {
-      action: 'got_back',
-      splits: [{ mode: 'cash', amount: 80_000 }],
-    });
-    expect(result.credit.status).toBe('got_back');
-    const entry = clinicFixtures.payments.snapshot(
-      (row) => row.seq === result.paymentSeq,
-    )[0];
-    expect(entry).toMatchObject({
-      direction: 'received',
-      kind: 'money_back',
-      payeeName: 'Medline Surgicals',
-    });
-  });
-
-  it('refuses nothing, and more than what is owed', async () => {
+describe('the Pending reads', () => {
+  it('sends one way (both is none), the states, the search and Created', () => {
     expect(
-      (await failureOf(settleCredit(CR_TWO, { action: 'give_back', splits: [] }))).detail,
-    ).toBe('Enter the amount');
+      creditListQuery(
+        { direction: ['give'], status: ['open', 'used'], q: ' Kavya ', created: 'today' },
+        TODAY,
+      ),
+    ).toEqual({
+      limit: 50,
+      direction: 'give',
+      status: 'open,used',
+      q: 'Kavya',
+      contact_id: undefined,
+      invoice_id: undefined,
+      created_from: clinicInstant(TODAY, '00:00'),
+      created_to: clinicInstant('2026-10-11', '00:00'),
+    });
     expect(
-      (
-        await failureOf(
-          settleCredit(CR_TWO, {
-            action: 'give_back',
-            splits: [{ mode: 'cash', amount: 50_100 }],
+      creditListQuery({ direction: ['give', 'take'] }, TODAY).direction,
+    ).toBeUndefined();
+  });
+
+  it('reads a page and one credit, each with who added it', async () => {
+    answer({
+      '/app/pending-credits': () => page([creditWire()], { estimated_total: 1 }),
+      '/app/pending-credits/{pending_credit_id}': () => one(creditWire()),
+    });
+
+    expect(await listPendingCredits({})).toEqual({
+      rows: [creditRow()],
+      next: null,
+      total: 1,
+    });
+    expect(await fetchCredit(TEST_CREDIT_ID)).toEqual(creditRow());
+  });
+
+  it('reads a supplier’s credit by name, an "Other" reason as its text, a settled one’s day', async () => {
+    answer({
+      '/app/pending-credits/{pending_credit_id}': () =>
+        one(
+          creditWire({
+            contact: null,
+            patient_id: null,
+            party_name: 'Ankur Pharma',
+            reason: 'Returned two cartons',
+            status: 'got_back',
+            updated_at: '2026-10-11T05:00:00.000Z',
           }),
-        )
-      ).detail,
-    ).toBe('More than what is owed');
-  });
-
-  it('uses a give credit on the patient’s oldest due invoice as a Credit receipt (Q-G9)', async () => {
-    const result = await settleCredit(CR_TWO, { action: 'use_on_bill' });
-    // Tanvi's INV-772 owes ₹600; the credit is ₹500 — all of it is used.
-    expect(result).toMatchObject({ amount: 50_000, invoiceSeq: 772 });
-    expect(result.credit).toMatchObject({ status: 'used', adjusted: 50_000 });
-    // The row names the invoice it went on: "Adjusted · Invoice #772".
-    expect((await fetchCredit(CR_TWO)).settledInvoiceSeq).toBe(772);
-    const invoice = await clinicFixtures.invoices.get(ref.invoice(772));
-    expect(invoiceBalance(invoice, clinicFixtures.payments.snapshot()).due).toBe(10_000);
-    const entry = clinicFixtures.payments.snapshot(
-      (row) => row.seq === result.paymentSeq,
-    )[0];
-    expect(entry?.splits).toEqual([{ mode: 'credit', amount: 50_000 }]);
-  });
-
-  it('answers "nothing due" with a conflict, and a take credit never adjusts', async () => {
-    await settleCredit(CR_TWO, { action: 'use_on_bill' });
-    const second = await createCredit({
-      ...GIVE,
-      partyName: 'Tanvi Shah',
-      patientId: TANVI,
-      invoiceId: null,
-      amount: 20_000,
+        ),
     });
-    // INV-772 has ₹100 left: a partial use, the rest open.
-    const partial = await settleCredit(second.id, { action: 'use_on_bill' });
-    expect(partial.credit).toMatchObject({ status: 'open', adjusted: 10_000 });
-    const nothing = await failureOf(settleCredit(second.id, { action: 'use_on_bill' }));
-    expect(nothing).toMatchObject({ status: 409, code: 'conflict' });
-    const take = await failureOf(settleCredit(CR_ONE, { action: 'use_on_bill' }));
-    expect(take.status).toBe(409);
+
+    expect(await fetchCredit(TEST_CREDIT_ID)).toMatchObject({
+      contactId: null,
+      partyName: 'Ankur Pharma',
+      reasonKey: 'other',
+      reason: 'Returned two cartons',
+      settledAt: '2026-10-11T05:00:00.000Z',
+    });
+  });
+});
+
+describe('searchCreditParties', () => {
+  it('finds the people, then on their last page the stock vendors and Medical suppliers', async () => {
+    answer({
+      '/app/contacts': () =>
+        page([
+          contactRow(),
+          contactRow({
+            id: 'con_viral000000000000000000',
+            patient_id: null,
+            first_name: 'Viral',
+          }),
+        ]),
+      '/app/stock-vendors': () =>
+        page([{ id: 'svnd_ankur0000000000000000', name: 'Ankur Pharma' }]),
+      '/app/suppliers': () =>
+        page([
+          { id: 'sup_ankur00000000000000000', name: 'ankur pharma' },
+          { id: 'sup_ramdev000000000000000', name: 'Shree Ramdev' },
+        ]),
+    });
+
+    const result = await searchCreditParties(' Kav ');
+
+    expect(queryOf('/app/contacts')).toMatchObject({ q: 'Kav', limit: 30 });
+    expect(queryOf('/app/suppliers')).toMatchObject({ q: 'Kav', limit: 10 });
+    expect(result).toEqual({
+      items: [
+        {
+          kind: 'patient',
+          contactId: TEST_MONEY_CONTACT_ID,
+          patientId: TEST_MONEY_PATIENT_ID,
+          seq: 2,
+          name: 'Kavya Mehta',
+          phone: '+919825005865',
+        },
+        {
+          kind: 'contact',
+          contactId: 'con_viral000000000000000000',
+          name: 'Viral Mehta',
+          phone: '+919825005865',
+        },
+        { kind: 'vendor', id: 'svnd_ankur0000000000000000', name: 'Ankur Pharma' },
+        { kind: 'supplier', id: 'sup_ramdev000000000000000', name: 'Shree Ramdev' },
+      ],
+      nextCursor: null,
+    });
+  });
+
+  it('lists everyone by name for an empty search, suppliers on the last page only', async () => {
+    answer({
+      '/app/contacts': () => page([contactRow()], { next: 'cur_2', has_more: true }),
+    });
+
+    const result = await searchCreditParties('');
+
+    expect(queryOf('/app/contacts')).toMatchObject({ q: undefined, sort: 'name' });
+    expect(result.nextCursor).toBe('cur_2');
+    expect(api.get).toHaveBeenCalledTimes(1);
+  });
+
+  it('skips a list the member may not read, and asks no person for two letters', async () => {
+    vi.mocked(api.get).mockImplementation(((path: string) => {
+      if (path === '/app/suppliers') {
+        return Promise.reject(new HttpError('Forbidden', 403, path, 'GET'));
+      }
+      return Promise.resolve(
+        page(
+          path === '/app/stock-vendors'
+            ? [{ id: 'svnd_x0000000000000000000', name: 'Ka' }]
+            : [],
+        ),
+      );
+    }) as never);
+
+    expect((await searchCreditParties('Ka')).items).toEqual([
+      { kind: 'vendor', id: 'svnd_x0000000000000000000', name: 'Ka' },
+    ]);
+    expect(queryOf('/app/contacts')).toBeUndefined();
+  });
+});
+
+describe('the writes', () => {
+  it('adds a credit: the chip’s key as the reason, the contact — or a supplier by name', async () => {
+    vi.mocked(api.post).mockResolvedValue(one(creditWire()) as never);
+
+    expect(
+      await createCredit({ input: creditInput(), idempotencyKey: 'key-add' }),
+    ).toEqual(creditRow());
+    expect(api.post).toHaveBeenCalledWith('/app/pending-credits', {
+      body: {
+        direction: 'give',
+        amount: 80,
+        reason: 'overpaid',
+        contact_id: TEST_MONEY_CONTACT_ID,
+        invoice_id: TEST_INVOICE_ID,
+        settle_by: '2026-10-20',
+        note: 'Paid twice at the desk',
+      },
+      idempotencyKey: 'key-add',
+    });
+
+    await createCredit({
+      input: creditInput({
+        direction: 'take',
+        contactId: null,
+        partyName: ' Ankur Pharma ',
+        reasonKey: 'other',
+        invoiceId: null,
+        settleBy: null,
+        note: ' Returned two cartons ',
+      }),
+      idempotencyKey: 'key-supplier',
+    });
+    expect(vi.mocked(api.post).mock.calls.at(-1)?.[1]).toEqual({
+      body: {
+        direction: 'take',
+        amount: 80,
+        reason: 'Returned two cartons',
+        party_name: 'Ankur Pharma',
+        invoice_id: null,
+        settle_by: null,
+        note: 'Returned two cartons',
+      },
+      idempotencyKey: 'key-supplier',
+    });
+  });
+
+  it('changes only what differs with the read’s updated_at; nothing changed sends nothing', async () => {
+    vi.mocked(api.patch).mockResolvedValue(one(creditWire()) as never);
+    const credit = creditRow();
+
+    expect(
+      await updateCredit({ credit, input: creditInput(), idempotencyKey: 'key-none' }),
+    ).toBe(credit);
+    expect(api.patch).not.toHaveBeenCalled();
+
+    await updateCredit({
+      credit,
+      input: creditInput({ amount: 90, reasonKey: 'charged_twice', note: null }),
+      idempotencyKey: 'key-edit',
+    });
+    expect(api.patch).toHaveBeenCalledWith('/app/pending-credits/{pending_credit_id}', {
+      params: { pending_credit_id: TEST_CREDIT_ID },
+      body: {
+        amount: 90,
+        reason: 'charged_twice',
+        note: null,
+        expected_updated_at: credit.updatedAt,
+      },
+      idempotencyKey: 'key-edit',
+    });
+  });
+
+  it('deletes with the reason, restores with the action’s key', async () => {
+    vi.mocked(api.delete).mockResolvedValue({ data: undefined } as never);
+    vi.mocked(api.post).mockResolvedValue(one(creditWire()) as never);
+
+    await deleteCredit({ creditId: TEST_CREDIT_ID, reason: 'duplicate', note: null });
+    expect(api.delete).toHaveBeenCalledWith('/app/pending-credits/{pending_credit_id}', {
+      params: { pending_credit_id: TEST_CREDIT_ID },
+      reason: 'duplicate',
+      note: undefined,
+    });
+    await restoreCredit(TEST_CREDIT_ID, 'key-restore');
+    expect(api.post).toHaveBeenCalledWith(
+      '/app/pending-credits/{pending_credit_id}/restore',
+      {
+        params: { pending_credit_id: TEST_CREDIT_ID },
+        idempotencyKey: 'key-restore',
+      },
+    );
+  });
+
+  it('gives money back at a branch — the amount the splits’ sum — then reads the entry for the toast', async () => {
+    vi.mocked(api.post).mockResolvedValue(
+      one(
+        creditWire({
+          settled_amount: 80,
+          left_amount: 0,
+          status: 'given_back',
+          payment_ids: ['pay_92c7hxmos9ecucof9tzhg', 'pay_refund0000000000000000'],
+        }),
+      ) as never,
+    );
+    answer({
+      '/app/payments/{payment_id}': () =>
+        one(
+          paymentWire({
+            id: 'pay_refund0000000000000000',
+            payment_number: 7,
+            direction: 'paid',
+            kind: 'refund',
+            invoice_credit_note_number: 3,
+          }),
+        ),
+    });
+
+    const result = await settleCredit({
+      credit: creditRow(),
+      settlement: {
+        action: 'give_back',
+        branchId: TEST_MONEY_BRANCH_ID,
+        splits: [
+          { mode: 'cash', amount: 10.1 },
+          { mode: 'upi', amount: 19.9 },
+        ],
+      },
+      idempotencyKey: 'key-settle',
+    });
+
+    expect(api.post).toHaveBeenCalledWith(
+      '/app/pending-credits/{pending_credit_id}/settle',
+      {
+        params: { pending_credit_id: TEST_CREDIT_ID },
+        body: {
+          method: 'money',
+          amount: 30,
+          branch_id: TEST_MONEY_BRANCH_ID,
+          splits: [
+            { mode: 'cash', amount: 10.1 },
+            { mode: 'upi', amount: 19.9 },
+          ],
+        },
+        idempotencyKey: 'key-settle',
+      },
+    );
+    expect(result).toMatchObject({
+      amount: 30,
+      paymentSeq: 7,
+      creditNoteSeq: 3,
+      invoiceSeq: 5,
+      credit: { status: 'given_back', left: 0 },
+    });
+  });
+
+  it('keeps a written settlement when the read of its entry fails — the toast just has no numbers', async () => {
+    vi.mocked(api.post).mockResolvedValue(
+      one(
+        creditWire({
+          settled_amount: 80,
+          left_amount: 0,
+          status: 'given_back',
+          payment_ids: ['pay_92c7hxmos9ecucof9tzhg', 'pay_refund0000000000000000'],
+        }),
+      ) as never,
+    );
+    vi.mocked(api.get).mockRejectedValue(
+      new HttpError('Server error', 500, '/app/payments/{payment_id}', 'GET'),
+    );
+
+    const result = await settleCredit({
+      credit: creditRow(),
+      settlement: {
+        action: 'give_back',
+        branchId: TEST_MONEY_BRANCH_ID,
+        splits: [{ mode: 'cash', amount: 30 }],
+      },
+      idempotencyKey: 'key-settle',
+    });
+
+    expect(result).toMatchObject({
+      amount: 30,
+      paymentSeq: null,
+      creditNoteSeq: null,
+      credit: { status: 'given_back' },
+    });
+  });
+
+  it('uses a credit on a bill with the invoice and amount only — no branch, splits or day', async () => {
+    vi.mocked(api.post).mockResolvedValue(
+      one(creditWire({ settled_amount: 80, left_amount: 0, status: 'used' })) as never,
+    );
+
+    const result = await settleCredit({
+      credit: creditRow(),
+      settlement: { action: 'use_on_bill', invoiceId: TEST_INVOICE_ID, amount: 30 },
+      idempotencyKey: 'key-use',
+    });
+
+    expect(vi.mocked(api.post).mock.calls[0]?.[1]).toEqual({
+      params: { pending_credit_id: TEST_CREDIT_ID },
+      body: { method: 'use_on_bill', amount: 30, invoice_id: TEST_INVOICE_ID },
+      idempotencyKey: 'key-use',
+    });
+    expect(result).toMatchObject({ amount: 30, paymentSeq: null });
+    expect(api.get).not.toHaveBeenCalled();
   });
 });

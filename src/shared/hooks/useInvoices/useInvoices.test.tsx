@@ -3,208 +3,308 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import {
-  branchRef,
-  MAIN_BRANCH,
-} from '@/shared/api/clinic/fixtures/organization.fixtures.ts';
-import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import { invoiceQueryKeys } from '@/shared/api/clinic/invoices-api.ts';
-import type { InvoiceInput } from '@/shared/api/clinic/invoices-contracts.ts';
-import { paymentQueryKeys } from '@/shared/api/clinic/payments-api.ts';
-
-import {
-  INVOICE_WRITE_KEYS,
-  useAddMedicalContact,
-  useCreateInvoice,
-  useDeleteInvoice,
-  useInvoice,
-  useInvoicePresets,
-  useOftenBilled,
-  useRestoreInvoice,
-  useSetMedicalContactPhone,
-  useUpdateInvoice,
-} from './useInvoices.ts';
-
+vi.mock('@/shared/api/clinic/invoices-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchInvoice: vi.fn(),
+  listInvoices: vi.fn(),
+  fetchInvoiceTotals: vi.fn(),
+  fetchInvoicePresets: vi.fn(),
+  previewInvoice: vi.fn(),
+  previewInvoiceChange: vi.fn(),
+  createInvoice: vi.fn(),
+  updateInvoice: vi.fn(),
+  deleteInvoice: vi.fn(),
+  restoreInvoice: vi.fn(),
+}));
+vi.mock('@/shared/api/clinic/invoices-fixture-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  createSale: vi.fn(),
+  fetchPrescriptionPreset: vi.fn(),
+}));
 vi.mock('@/shared/notify/index.ts', () => ({
   notify: { success: vi.fn(), error: vi.fn(), info: vi.fn(), undo: vi.fn() },
 }));
+import { appointmentQueryKeys } from '@/shared/api/clinic/appointments-api.ts';
+import {
+  createInvoice,
+  deleteInvoice,
+  fetchInvoice,
+  fetchInvoicePresets,
+  fetchInvoiceTotals,
+  invoiceQueryKeys,
+  listInvoices,
+  previewInvoice,
+  previewInvoiceChange,
+  restoreInvoice,
+  updateInvoice,
+} from '@/shared/api/clinic/invoices-api.ts';
+import type {
+  InvoiceDetail,
+  InvoiceInput,
+  InvoicePreview,
+} from '@/shared/api/clinic/invoices-contracts.ts';
+import {
+  createSale,
+  fetchPrescriptionPreset,
+  fixtureInvoiceQueryKeys,
+} from '@/shared/api/clinic/invoices-fixture-api.ts';
+import { paymentQueryKeys } from '@/shared/api/clinic/payments-api.ts';
+import { fixtureLedgerQueryKeys } from '@/shared/api/clinic/payments-fixture-api.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import {
+  invoiceRecord,
+  TEST_INVOICE_ID,
+  TEST_MONEY_BRANCH_ID,
+  TEST_MONEY_CONTACT_ID,
+  TEST_MONEY_PATIENT_ID,
+} from '@/tests/utils/payments-doubles.ts';
 
-/** 10:00 on 3 Oct, clinic time. */
-const NOW = new Date('2026-10-03T04:30:00Z');
-const DHARTI = patientRef('Dharti Galani');
+import {
+  INVOICE_WRITE_KEYS,
+  useCreateInvoice,
+  useCreateSale,
+  useDeleteInvoice,
+  useInvoice,
+  useInvoiceList,
+  useInvoicePresets,
+  useInvoicePreview,
+  useInvoiceTotals,
+  usePrescriptionPreset,
+  useRestoreInvoice,
+  useUpdateInvoice,
+} from './useInvoices.ts';
+
+const INPUT: InvoiceInput = {
+  type: 'consultation',
+  branchId: TEST_MONEY_BRANCH_ID,
+  contactId: TEST_MONEY_CONTACT_ID,
+  teamIds: [],
+  items: [
+    {
+      id: null,
+      offeringId: 'off_3f4nzxf53tfyf9k6hlna1',
+      qty: 1,
+      discountPct: 0,
+      suggestionId: null,
+      treatmentIds: [],
+    },
+  ],
+  overallDiscount: 0,
+  date: '2026-10-10',
+  remark: null,
+  prescriptionId: null,
+  paidNow: [],
+};
+
+const DETAIL: InvoiceDetail = {
+  invoice: invoiceRecord(),
+  party: null,
+  sale: null,
+  payments: [],
+  sheet: {
+    organization: { name: 'Glow', specialties: [], currency: 'INR' },
+    branch: null,
+  },
+};
+
+const PREVIEW: InvoicePreview = {
+  type: 'consultation',
+  date: '2026-10-10',
+  items: [],
+  overallDiscount: 0,
+  subtotal: 500,
+  discountTotal: 0,
+  taxableTotal: 500,
+  gstTotal: 0,
+  total: 500,
+  paid: 0,
+  due: 500,
+};
 
 let client: QueryClient;
 function wrapper({ children }: { children: ReactNode }) {
   return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
 }
 
-const backPeeling = () => {
-  const offering = clinicFixtures.offerings.snapshot().find((row) => row.seq === 271);
-  if (!offering) throw new Error('offering #271');
-  return offering;
-};
-
-const input = (overrides: Partial<InvoiceInput> = {}): InvoiceInput => ({
-  type: 'clinic',
-  branchId: branchRef(MAIN_BRANCH),
-  patientId: DHARTI,
-  medicalContactId: null,
-  leadId: null,
-  teamIds: [],
-  items: [
-    {
-      offeringId: backPeeling().id,
-      medicineId: null,
-      name: 'Back Peeling',
-      packSize: null,
-      qty: 1,
-      rate: 300_000,
-      discountPct: 0,
-      gstPct: 0,
-    },
-  ],
-  overallDiscount: 0,
-  date: '2026-10-03',
-  remark: null,
-  prescriptionId: null,
-  paidNow: [],
-  ...overrides,
-});
-
 beforeEach(() => {
-  vi.useFakeTimers({ toFake: ['Date'] });
-  vi.setSystemTime(NOW);
-  resetClinicFixtures();
+  vi.resetAllMocks();
+  signInTestMember();
   client = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
 });
 afterEach(() => {
-  vi.useRealTimers();
   client.clear();
-  resetClinicFixtures();
+  useOrganizationStore.getState().clearOrganization();
 });
 
-describe('useInvoices — reads', () => {
-  it('reads one invoice with its balance, and idles without an id', async () => {
-    const { result } = renderHook(() => useInvoice(ref.invoice(785)), { wrapper });
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data?.balance).toMatchObject({ bill: 130_000, due: 70_000 });
+describe('INVOICE_WRITE_KEYS', () => {
+  it('refreshes every money read, the appointments and the tasks — never the fixture ledger', () => {
+    expect(INVOICE_WRITE_KEYS).toEqual(
+      expect.arrayContaining([
+        paymentQueryKeys.all,
+        invoiceQueryKeys.all,
+        appointmentQueryKeys.all,
+      ]),
+    );
+    expect(INVOICE_WRITE_KEYS).not.toContainEqual(fixtureLedgerQueryKeys.all);
+  });
+});
 
-    const idle = renderHook(() => useInvoice(undefined), { wrapper });
-    expect(idle.result.current.fetchStatus).toBe('idle');
+describe('the reads', () => {
+  it('reads one invoice, a person’s pages, their totals and Quick fill, under the organization', async () => {
+    vi.mocked(fetchInvoice).mockResolvedValue(DETAIL);
+    vi.mocked(listInvoices).mockResolvedValue({
+      rows: [invoiceRecord()],
+      next: null,
+      total: 1,
+      totals: { due: 100, paid: 400 },
+    });
+    vi.mocked(fetchInvoiceTotals).mockResolvedValue({ due: 100, paid: 400 });
+    vi.mocked(fetchInvoicePresets).mockResolvedValue({
+      packages: [],
+      lastByType: {},
+      recentTeamIds: [],
+    });
+    const { result } = renderHook(
+      () => ({
+        one: useInvoice(TEST_INVOICE_ID),
+        list: useInvoiceList({ patientId: TEST_MONEY_PATIENT_ID }),
+        totals: useInvoiceTotals({ patientId: TEST_MONEY_PATIENT_ID }),
+        presets: useInvoicePresets(TEST_MONEY_PATIENT_ID),
+        idle: useInvoiceTotals(null),
+      }),
+      { wrapper },
+    );
+
+    await waitFor(() => expect(result.current.one.data).toEqual(DETAIL));
+    await waitFor(() => expect(result.current.list.rows).toHaveLength(1));
+    await waitFor(() =>
+      expect(result.current.totals.data).toEqual({ due: 100, paid: 400 }),
+    );
+    await waitFor(() => expect(result.current.presets.data?.packages).toEqual([]));
+    expect(listInvoices).toHaveBeenCalledWith(
+      { patientId: TEST_MONEY_PATIENT_ID },
+      undefined,
+    );
+    expect(result.current.idle.fetchStatus).toBe('idle');
   });
 
-  it('reads Quick fill’s presets for a patient, idle without one', async () => {
-    const { result } = renderHook(() => useInvoicePresets(DHARTI), { wrapper });
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data?.lastByType.clinic?.seq).toBe(787);
+  it('previews a bill, or a change of an invoice; idle without one', async () => {
+    vi.mocked(previewInvoice).mockResolvedValue(PREVIEW);
+    vi.mocked(previewInvoiceChange).mockResolvedValue(PREVIEW);
+    const invoice = invoiceRecord();
+    const { result } = renderHook(
+      () => ({
+        bill: useInvoicePreview(INPUT),
+        change: useInvoicePreview(INPUT, invoice),
+        idle: useInvoicePreview(null),
+      }),
+      { wrapper },
+    );
+
+    await waitFor(() => expect(result.current.bill.data?.total).toBe(500));
+    await waitFor(() => expect(result.current.change.data?.total).toBe(500));
+    expect(previewInvoice).toHaveBeenCalledWith(INPUT);
+    expect(previewInvoiceChange).toHaveBeenCalledWith({ invoice, input: INPUT });
+    expect(result.current.idle.fetchStatus).toBe('idle');
+  });
+});
+
+describe('the writes', () => {
+  it('bills, changes, deletes and restores with the action’s key', async () => {
+    vi.mocked(createInvoice).mockResolvedValue({ detail: DETAIL, planLinked: 0 });
+    vi.mocked(updateInvoice).mockResolvedValue({ detail: DETAIL, planLinked: 0 });
+    vi.mocked(deleteInvoice).mockResolvedValue();
+    vi.mocked(restoreInvoice).mockResolvedValue(invoiceRecord());
+    const invalidate = vi.spyOn(client, 'invalidateQueries');
+    const { result } = renderHook(
+      () => ({
+        create: useCreateInvoice(),
+        update: useUpdateInvoice(),
+        remove: useDeleteInvoice(),
+        restore: useRestoreInvoice(),
+      }),
+      { wrapper },
+    );
+
+    await act(() => result.current.create.mutateAsync(INPUT));
+    expect(createInvoice).toHaveBeenCalledWith({
+      input: INPUT,
+      idempotencyKey: expect.any(String),
+    });
+    expect(invalidate).toHaveBeenCalledWith(
+      expect.objectContaining({ queryKey: appointmentQueryKeys.all }),
+    );
+
+    const invoice = invoiceRecord();
+    await act(() => result.current.update.mutateAsync({ invoice, input: INPUT }));
+    expect(updateInvoice).toHaveBeenCalledWith({
+      invoice,
+      input: INPUT,
+      idempotencyKey: expect.any(String),
+    });
+
+    await act(() =>
+      result.current.remove.mutateAsync({
+        id: TEST_INVOICE_ID,
+        reason: 'mistake',
+        note: null,
+      }),
+    );
+    expect(deleteInvoice).toHaveBeenCalledWith({
+      invoiceId: TEST_INVOICE_ID,
+      reason: 'mistake',
+      note: null,
+    });
+
+    await act(() => result.current.restore.mutateAsync(TEST_INVOICE_ID));
+    expect(restoreInvoice).toHaveBeenCalledWith(TEST_INVOICE_ID, expect.any(String));
+  });
+
+  it('never asks the drawer’s preview again after a save — its sessions are billed by then', async () => {
+    vi.mocked(previewInvoice).mockResolvedValue(PREVIEW);
+    vi.mocked(createInvoice).mockResolvedValue({ detail: DETAIL, planLinked: 0 });
+    const { result } = renderHook(
+      () => ({ preview: useInvoicePreview(INPUT), create: useCreateInvoice() }),
+      { wrapper },
+    );
+    await waitFor(() => expect(result.current.preview.data?.total).toBe(500));
+    expect(previewInvoice).toHaveBeenCalledTimes(1);
+
+    await act(() => result.current.create.mutateAsync(INPUT));
+
+    expect(previewInvoice).toHaveBeenCalledTimes(1);
     expect(
-      renderHook(() => useInvoicePresets(null), { wrapper }).result.current.fetchStatus,
-    ).toBe('idle');
-  });
-
-  it('reads the names billed most', async () => {
-    const { result } = renderHook(() => useOftenBilled('clinic'), { wrapper });
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data).toContain('Back Peeling');
+      invoiceQueryKeys.preview('org_x', null, {}).slice(0, invoiceQueryKeys.all.length),
+    ).not.toEqual([...invoiceQueryKeys.all]);
   });
 });
 
-describe('useInvoices — writes', () => {
-  it('refreshes every money read, the plans, tasks and stock after a write', () => {
-    const roots = INVOICE_WRITE_KEYS.map((key) => JSON.stringify(key));
-    expect(roots).toContain(JSON.stringify(paymentQueryKeys.all));
-    expect(roots).toContain(JSON.stringify(invoiceQueryKeys.all));
-    expect(roots).toContain(JSON.stringify(['clinic', 'tasks']));
-    expect(roots).toContain(JSON.stringify(['clinic', 'medicines']));
-  });
+describe('a Medical sale (the fixture world)', () => {
+  it('sells on the fixture server and reads its prescription there', async () => {
+    vi.mocked(createSale).mockResolvedValue({} as never);
+    vi.mocked(fetchPrescriptionPreset).mockResolvedValue({
+      id: 'rx',
+      seq: 500,
+      patientId: 'p',
+      medicines: [],
+    });
+    const invalidate = vi.spyOn(client, 'invalidateQueries');
+    const { result } = renderHook(
+      () => ({ sell: useCreateSale(), preset: usePrescriptionPreset('rx') }),
+      { wrapper },
+    );
 
-  it('creates an invoice and invalidates the ledger', async () => {
-    const ledger = paymentQueryKeys.list({});
-    client.setQueryData(ledger, { pages: [] });
-    const { result } = renderHook(() => useCreateInvoice(), { wrapper });
-    let seq = 0;
-    await act(async () => {
-      seq = (await result.current.mutateAsync(input())).detail.invoice.seq;
-    });
-    expect(seq).toBeGreaterThan(791);
-    expect(client.getQueryState(ledger)?.isInvalidated).toBe(true);
-  });
-
-  it('sends a Medical invoice through the sale', async () => {
-    const azelan = clinicFixtures.medicines.snapshot().find((row) => row.seq === 450);
-    if (!azelan) throw new Error('medicine #450');
-    const { result } = renderHook(() => useCreateInvoice(), { wrapper });
-    let saleId: string | null = null;
-    await act(async () => {
-      const saved = await result.current.mutateAsync(
-        input({
-          type: 'medical',
-          items: [
-            {
-              offeringId: null,
-              medicineId: azelan.id,
-              name: azelan.name,
-              packSize: null,
-              qty: 1,
-              rate: azelan.mrp,
-              discountPct: 0,
-              gstPct: 0,
-            },
-          ],
-        }),
-      );
-      saleId = saved.detail.sale?.id ?? null;
-    });
-    expect(saleId).not.toBeNull();
-  });
-
-  it('updates, deletes and restores an invoice', async () => {
-    const create = renderHook(() => useCreateInvoice(), { wrapper });
-    let id = '';
-    await act(async () => {
-      id = (await create.result.current.mutateAsync(input())).detail.invoice.id;
-    });
-    const update = renderHook(() => useUpdateInvoice(), { wrapper });
-    await act(async () => {
-      await update.result.current.mutateAsync({
-        id,
-        input: input({ remark: 'Paid at desk' }),
-      });
-    });
-    expect((await clinicFixtures.invoices.get(id)).remark).toBe('Paid at desk');
-
-    const remove = renderHook(() => useDeleteInvoice(), { wrapper });
-    await act(async () => {
-      await remove.result.current.mutateAsync({ id, reason: 'mistake', note: null });
-    });
-    expect(clinicFixtures.invoices.snapshot((row) => row.id === id)).toEqual([]);
-
-    const restore = renderHook(() => useRestoreInvoice(), { wrapper });
-    await act(async () => {
-      await restore.result.current.mutateAsync(id);
-    });
-    expect(clinicFixtures.invoices.snapshot((row) => row.id === id)).toHaveLength(1);
-  });
-
-  it('adds a Medical contact and saves its mobile', async () => {
-    const add = renderHook(() => useAddMedicalContact(), { wrapper });
-    let contactId = '';
-    await act(async () => {
-      contactId = (await add.result.current.mutateAsync('Neha Rao')).id;
-    });
-    const phone = renderHook(() => useSetMedicalContactPhone(), { wrapper });
-    await act(async () => {
-      await phone.result.current.mutateAsync({ id: contactId, phone: '+919876543210' });
-    });
-    expect((await clinicFixtures.medicalContacts.get(contactId)).phone).toBe(
-      '+919876543210',
+    await waitFor(() => expect(result.current.preset.data?.seq).toBe(500));
+    await act(() => result.current.sell.mutateAsync({} as never));
+    expect(createSale).toHaveBeenCalled();
+    expect(invalidate).toHaveBeenCalledWith(
+      expect.objectContaining({ queryKey: fixtureLedgerQueryKeys.all }),
+    );
+    expect(invalidate).toHaveBeenCalledWith(
+      expect.objectContaining({ queryKey: fixtureInvoiceQueryKeys.all }),
     );
   });
 });

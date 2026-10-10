@@ -11,6 +11,7 @@ import {
   fetchTreatment,
   listPatientTreatments,
   listTreatmentCheckIns,
+  listVisitTreatmentsToBill,
   reverseTreatment,
   treatmentQueryKeys,
   updateTreatment,
@@ -171,6 +172,51 @@ describe('listPatientTreatments', () => {
       page([{ ...treatmentRow(), session_number: undefined }]) as never,
     );
     await expect(listPatientTreatments(PATIENT_ID)).rejects.toThrow();
+  });
+});
+
+describe('listVisitTreatmentsToBill', () => {
+  it('reads a visit’s sessions still to bill — its booking, `is_billed=false`, every page', async () => {
+    const APPOINTMENT_ID = 'appt_priya000000000000000';
+    vi.mocked(api.get)
+      .mockResolvedValueOnce(
+        page(
+          [
+            treatmentRow({
+              appointment_id: APPOINTMENT_ID,
+              patient_offering_id: null,
+              is_billed: false,
+            }),
+          ],
+          'cursor-2',
+        ) as never,
+      )
+      .mockResolvedValueOnce(page([]) as never);
+
+    const rows = await listVisitTreatmentsToBill(PATIENT_ID, APPOINTMENT_ID);
+
+    expect(rows).toEqual([
+      expect.objectContaining({
+        id: TREATMENT_ID,
+        appointmentId: APPOINTMENT_ID,
+        isBilled: false,
+        packageId: null,
+      }),
+    ]);
+    expect(api.get).toHaveBeenCalledWith('/app/patients/{patient_id}/treatments', {
+      params: { patient_id: PATIENT_ID },
+      query: {
+        appointment_id: APPOINTMENT_ID,
+        is_billed: 'false',
+        sort: 'performed_at',
+        order: 'asc',
+        limit: 100,
+        after: undefined,
+      },
+    });
+    expect(vi.mocked(api.get).mock.calls[1]?.[1]).toMatchObject({
+      query: { after: 'cursor-2' },
+    });
   });
 });
 

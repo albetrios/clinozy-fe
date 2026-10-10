@@ -1,6 +1,7 @@
-import { useRef } from 'react';
+import { type ReactNode, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { cn } from '@/lib/utils.ts';
 import {
   groupTasks,
@@ -9,12 +10,12 @@ import {
 } from '@/shared/api/clinic/task-views.ts';
 import type {
   TaskRow as TaskRowRecord,
-  TaskRuleId,
   TaskTab,
 } from '@/shared/api/clinic/tasks-contracts.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { EmptyState, EmptyStateAction } from '@/shared/components/EmptyState/index.ts';
 import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
+import { RetryError } from '@/shared/components/RetryError/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import {
   type LoadMorePaging,
@@ -23,7 +24,7 @@ import {
 import { useTaskDueLabel } from '@/shared/hooks/useTaskDueLabel/index.ts';
 
 import { TASKS_KEYS, TASKS_NS, TASKS_TEST_IDS } from '../../tasks.constants.ts';
-import { TaskRow } from '../TaskRow/index.ts';
+import { TaskRow, type TaskRowTeam } from '../TaskRow/index.ts';
 
 /** The rows a first load stands in for, at the row's 56px. */
 const SKELETON_ROWS = 8;
@@ -51,10 +52,15 @@ export interface TaskListProps extends LoadMorePaging {
   loading: boolean;
   /** The rows belong to the previous view, search or type: they turn to bars in place. */
   refreshing: boolean;
+  /** The read failed with nothing to show: the card says so, with Retry (KICKOFF §6.0 States). */
+  failed: boolean;
+  onRetry: () => void;
   /** The clock the due labels and the groups read. */
   now: Date;
-  /** The rule is handed to the product (the row's "Clinozy can do this" pill). */
-  handled: (rule: TaskRuleId) => boolean;
+  /** The row's rule is handed to Clinozy (its "Clinozy can do this" pill). */
+  handled: (row: TaskRowRecord) => boolean;
+  /** The team the rows name their owners from. */
+  team: TaskRowTeam;
   onOpen: (row: TaskRowRecord) => void;
   /** "New task" under the To do empty line — absent without Create. */
   onNewTask?: () => void;
@@ -110,7 +116,7 @@ function EmptyLine({ tab, onNewTask }: { tab: TaskTab; onNewTask?: () => void })
           title={t(TASKS_KEYS.empty[tab])}
           className="text-body flex flex-col items-center gap-3 text-center leading-normal text-pretty"
           action={
-            tab === 'queue' && onNewTask ? (
+            tab === 'open' && onNewTask ? (
               <EmptyStateAction data-testid={TASKS_TEST_IDS.emptyNew} onClick={onNewTask}>
                 {t(TASKS_KEYS.primary.newTask)}
               </EmptyStateAction>
@@ -122,6 +128,79 @@ function EmptyLine({ tab, onNewTask }: { tab: TaskTab; onNewTask?: () => void })
   );
 }
 
+/** What {@link GroupedRows} draws: the list's rows and how each reads. */
+type GroupedRowsProps = Pick<
+  TaskListProps,
+  | 'tab'
+  | 'rows'
+  | 'refreshing'
+  | 'now'
+  | 'handled'
+  | 'team'
+  | 'onOpen'
+  | 'onNewTask'
+  | 'contactActions'
+>;
+
+/** The view's groups, each under its sticky header, or the view's empty line. */
+function GroupedRows({
+  tab,
+  rows,
+  refreshing,
+  now,
+  handled,
+  team,
+  onOpen,
+  onNewTask,
+  contactActions,
+}: GroupedRowsProps) {
+  const { t } = useTranslation(TASKS_NS);
+  // Rows sit under "Due today" / "Coming up": today's due times read bare.
+  const dueLabel = useTaskDueLabel({ sameDay: true });
+  const groups = groupTasks(rows, tab, now);
+  return (
+    <div // NOSONAR(S6819): grid ARIA table, see the note above COLUMNS
+      role="table"
+      aria-label={t(TASKS_KEYS.views[tab])}
+      aria-busy={refreshing || undefined}
+      data-testid={TASKS_TEST_IDS.list}
+      data-tab={tab}
+    >
+      {groups.map((group) => (
+        <div // NOSONAR(S6819): grid ARIA table, see the note above COLUMNS
+          key={group.id}
+          role="rowgroup"
+          // Bars in place while a new view loads — the rooms' one skeleton (index.css).
+          data-refreshing={refreshing || undefined}
+          data-testid={TASKS_TEST_IDS.group(group.id)}
+        >
+          <GroupHeader group={group} />
+          {group.rows.map((row) => (
+            <TaskRow
+              key={row.id}
+              row={row}
+              due={dueLabel(row, now)}
+              now={now}
+              handled={handled(row)}
+              team={team}
+              onOpen={onOpen}
+              contactActions={contactActions?.(row)}
+            />
+          ))}
+          {group.rows.length === 0 ? <EmptyLine tab={tab} /> : null}
+        </div>
+      ))}
+      {groups.length === 0 ? (
+        <div // NOSONAR(S6819): grid ARIA table, see the note above COLUMNS
+          role="rowgroup"
+        >
+          <EmptyLine tab={tab} onNewTask={onNewTask} />
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 /**
  * The Tasks list card (KICKOFF §6.10 List card and Rows; `tasks.md:18–38`): a
  * grouped list, not the shared table — no header row, sort, selection or
@@ -129,16 +208,21 @@ function EmptyLine({ tab, onNewTask }: { tab: TaskTab; onNewTask?: () => void })
  * headers (an empty group hidden; none at all is the empty line with "New
  * task"); Snoozed and Done are one group each, their empty line under the
  * header (§7.3). The first load shows skeleton rows; a new view, search or
- * type turns the rows on screen to bars until the next arrive. Cursor pages of
- * 50 load as the end scrolls in (D7) — no end line.
+ * type turns the rows on screen to bars until the next arrive; a read that
+ * fails with nothing to show is the error with Retry, in place. Cursor pages
+ * of 50 (`GET /app/tasks`, the server's due order) load as the end scrolls in
+ * (D7) — no end line.
  */
 export function TaskList({
   tab,
   rows,
   loading,
   refreshing,
+  failed,
+  onRetry,
   now,
   handled,
+  team,
   onOpen,
   onNewTask,
   contactActions,
@@ -148,16 +232,46 @@ export function TaskList({
   className,
 }: TaskListProps) {
   const { t } = useTranslation(TASKS_NS);
-  // Rows sit under "Due today" / "Coming up": today's due times read bare.
-  const dueLabel = useTaskDueLabel({ sameDay: true });
+  const { t: tErrors } = useTranslation(ERRORS_NS);
   const sentinelRef = useRef<HTMLDivElement>(null);
   useLoadMoreSentinel(sentinelRef, {
-    hasNextPage: hasNextPage && !loading && !refreshing,
+    hasNextPage: hasNextPage && !loading && !refreshing && !failed,
     isFetchingNextPage,
     fetchNextPage,
   });
-  const groups = groupTasks(rows, tab, now);
-  const label = t(TASKS_KEYS.views[tab]);
+
+  let body: ReactNode;
+  if (loading) {
+    body = (
+      <SkeletonRows
+        rows={SKELETON_ROWS}
+        avatar
+        label={t(TASKS_KEYS.manifest.title)}
+        rowClassName={SKELETON_ROW}
+      />
+    );
+  } else if (failed) {
+    body = (
+      <RetryError
+        message={tErrors(ERRORS_KEYS.frontend.query.loadFailed)}
+        onRetry={onRetry}
+      />
+    );
+  } else {
+    body = (
+      <GroupedRows
+        tab={tab}
+        rows={rows}
+        refreshing={refreshing}
+        now={now}
+        handled={handled}
+        team={team}
+        onOpen={onOpen}
+        onNewTask={onNewTask}
+        contactActions={contactActions}
+      />
+    );
+  }
 
   return (
     <div
@@ -168,53 +282,7 @@ export function TaskList({
       )}
     >
       <div className="min-h-0 flex-1 overflow-auto">
-        {loading ? (
-          <SkeletonRows
-            rows={SKELETON_ROWS}
-            avatar
-            label={t(TASKS_KEYS.manifest.title)}
-            rowClassName={SKELETON_ROW}
-          />
-        ) : (
-          <div // NOSONAR(S6819): grid ARIA table, see the note above COLUMNS
-            role="table"
-            aria-label={label}
-            aria-busy={refreshing || undefined}
-            data-testid={TASKS_TEST_IDS.list}
-            data-tab={tab}
-          >
-            {groups.map((group) => (
-              <div // NOSONAR(S6819): grid ARIA table, see the note above COLUMNS
-                key={group.id}
-                role="rowgroup"
-                // Bars in place while a new view loads — the rooms' one skeleton (index.css).
-                data-refreshing={refreshing || undefined}
-                data-testid={TASKS_TEST_IDS.group(group.id)}
-              >
-                <GroupHeader group={group} />
-                {group.rows.map((row) => (
-                  <TaskRow
-                    key={row.id}
-                    row={row}
-                    due={dueLabel(row, now)}
-                    now={now}
-                    handled={handled(row.rule)}
-                    onOpen={onOpen}
-                    contactActions={contactActions?.(row)}
-                  />
-                ))}
-                {group.rows.length === 0 ? <EmptyLine tab={tab} /> : null}
-              </div>
-            ))}
-            {groups.length === 0 ? (
-              <div // NOSONAR(S6819): grid ARIA table, see the note above COLUMNS
-                role="rowgroup"
-              >
-                <EmptyLine tab={tab} onNewTask={onNewTask} />
-              </div>
-            ) : null}
-          </div>
-        )}
+        {body}
         {isFetchingNextPage ? (
           <SkeletonRows rows={LOADING_MORE_ROWS} avatar rowClassName={SKELETON_ROW} />
         ) : null}

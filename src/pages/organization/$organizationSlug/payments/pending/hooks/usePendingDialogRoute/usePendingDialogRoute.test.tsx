@@ -3,27 +3,37 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import type { OrganizationPermission } from '@/core/types/permissions.ts';
+import i18n from '@/lib/i18n/i18n.ts';
+import { fetchCredit } from '@/shared/api/clinic/credits-api.ts';
+import { HttpError } from '@/shared/errors/HttpError.ts';
+import { creditRow, TEST_CREDIT_ID } from '@/tests/utils/payments-doubles.ts';
 
 import {
-  renderPaymentsRoutes,
-  resetPaymentsRoutes,
-} from '../../../__tests__/integration/payments-test-router.tsx';
+  renderPendingRoutes,
+  resetPendingRoutes,
+} from '../../__tests__/integration/pending-test-router.tsx';
 import { usePendingDialogRoute } from './usePendingDialogRoute.ts';
 
 const { notifyMock } = vi.hoisted(() => ({
   notifyMock: { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() },
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
+vi.mock('@/shared/api/clinic/credits-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchCredit: vi.fn(),
+}));
 
-/** 10:00 on 3 Oct, clinic time — the seed day (27 Sep) is today. */
-const NOW = new Date('2026-10-03T04:30:00Z');
 const PENDING = '/organization/acme/payments/pending';
+
+/** CR-2: open, nothing settled. */
+const OPEN = creditRow({
+  id: 'pcr_open00000000000000002',
+  seq: 2,
+  settled: 0,
+  left: 80,
+  paymentIds: [],
+});
 
 /** Shows what the hook reads (the credit by its seq), and closes through it. */
 function Probe() {
@@ -45,22 +55,22 @@ function Probe() {
 
 const read = () => JSON.parse(screen.getByRole('status').textContent ?? '{}') as unknown;
 
-/** The Payments routes, the probe standing in for the Pending page. */
-function renderPending(url: string, options: { role?: Role } = {}) {
-  return renderPaymentsRoutes(url, { ...options, pending: Probe });
+/** Pending, the probe standing in for the page, for a member holding `codes`. */
+function renderPending(url: string, codes?: readonly OrganizationPermission[]) {
+  return renderPendingRoutes(url, { Page: Probe, codes });
 }
 
 beforeEach(() => {
-  vi.useFakeTimers({ toFake: ['Date'], shouldAdvanceTime: true });
-  vi.setSystemTime(NOW);
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetClinicFixtures();
+  vi.mocked(fetchCredit)
+    .mockReset()
+    .mockImplementation(async (id) => {
+      if (id === OPEN.id) return OPEN;
+      if (id === TEST_CREDIT_ID) return creditRow();
+      throw new HttpError('Not found', 404, `/app/pending-credits/${id}`, 'GET', {});
+    });
 });
-afterEach(() => {
-  vi.useRealTimers();
-  resetPaymentsRoutes();
-  resetClinicFixtures();
-});
+afterEach(() => resetPendingRoutes());
 
 describe('usePendingDialogRoute (KICKOFF §4, D24)', () => {
   it('opens nothing over Pending', async () => {
@@ -78,24 +88,40 @@ describe('usePendingDialogRoute (KICKOFF §4, D24)', () => {
     await waitFor(() => expect(read()).toEqual({ kind: 'create', prefill: {} }));
   });
 
-  it('opens an open credit; a settled one goes back with its state named (S:90)', async () => {
-    const open = renderPending(`${PENDING}/${ref.pendingCredit(2)}/edit`);
+  it('opens a credit nothing has settled, by its id', async () => {
+    renderPending(`${PENDING}/${OPEN.id}/edit`);
     await waitFor(() =>
       expect(read()).toEqual({
         kind: 'edit',
-        creditId: ref.pendingCredit(2),
+        creditId: OPEN.id,
         credit: 2,
         readOnly: false,
       }),
     );
-    open.unmount();
-    await clinicFixtures.pendingCredits.update(ref.pendingCredit(1), {
-      status: 'got_back',
-      settledAt: NOW.toISOString(),
-    });
-    const settled = renderPending(`${PENDING}/${ref.pendingCredit(1)}/edit?status=open`);
-    await waitFor(() => expect(settled.router.state.location.pathname).toBe(PENDING));
-    expect(settled.router.state.location.search).toEqual({ status: ['open'] });
+    expect(fetchCredit).toHaveBeenCalledWith(OPEN.id);
+  });
+
+  it('opens it view only without payment:update', async () => {
+    renderPending(`${PENDING}/${OPEN.id}/edit`, ['organization:read', 'payment:read']);
+    await waitFor(() => expect(read()).toMatchObject({ kind: 'edit', readOnly: true }));
+  });
+
+  it('sends a credit settled in part back to Pending, saying it can’t change (S:90)', async () => {
+    const { router } = renderPending(`${PENDING}/${TEST_CREDIT_ID}/edit?status=open`);
+    await waitFor(() => expect(router.state.location.pathname).toBe(PENDING));
+    expect(router.state.location.search).toEqual({ status: ['open'] });
+    expect(notifyMock.info).toHaveBeenCalledWith(
+      i18n.t('pending.settledLocked', { ns: 'payments', ref: 'CR-1', amount: '₹50' }),
+    );
+    expect(read()).toEqual({ kind: 'none' });
+  });
+
+  it('sends a settled credit back with its state named', async () => {
+    vi.mocked(fetchCredit).mockResolvedValue(
+      creditRow({ status: 'got_back', settled: 80, left: 0 }),
+    );
+    const { router } = renderPending(`${PENDING}/${TEST_CREDIT_ID}/edit`);
+    await waitFor(() => expect(router.state.location.pathname).toBe(PENDING));
     expect(notifyMock.info).toHaveBeenCalledWith('CR-1 · Received');
   });
 
@@ -108,8 +134,11 @@ describe('usePendingDialogRoute (KICKOFF §4, D24)', () => {
     expect(router.state.location.search).toEqual({ direction: ['take'], q: 'medline' });
   });
 
-  it('refuses Add pending without Create: Pending, with the permission toast once', async () => {
-    const { router } = renderPending(`${PENDING}/create`, { role: 'therapist' });
+  it('refuses Add pending without payment:create: Pending, with the permission toast once', async () => {
+    const { router } = renderPending(`${PENDING}/create`, [
+      'organization:read',
+      'payment:read',
+    ]);
     await waitFor(() => expect(router.state.location.pathname).toBe(PENDING));
     expect(read()).toEqual({ kind: 'none' });
     expect(notifyMock.info).toHaveBeenCalledTimes(1);

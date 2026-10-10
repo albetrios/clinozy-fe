@@ -3,6 +3,12 @@ import {
   organizationAppointmentCreate,
 } from '@/lib/routes/appointments-builders.ts';
 import { organizationLead } from '@/lib/routes/leads-builders.ts';
+import {
+  organizationCheckInCreate,
+  organizationCheckInEdit,
+  organizationReviewCreate,
+  organizationReviewEdit,
+} from '@/lib/routes/patient-file-builders.ts';
 import type { TaskFollowOnForm, TaskRow } from '@/shared/api/clinic/tasks-contracts.ts';
 
 import {
@@ -14,56 +20,110 @@ import {
 /**
  * Where a task's link goes, before it is a route (KICKOFF §6.10): a booking
  * (opened, or moved), a new booking for the person (a copy of the task's visit
- * when it rebooks), the lead drawer, a patient-file section, an invoice. One
- * vocabulary for the Tasks room's drawer and Today's work queue (Q-T3).
+ * when it rebooks), the lead drawer, a patient-file section, a check-in or
+ * review on the patient file — a new one, or the one the task points at
+ * (`checkInId`, `reviewId`) — an invoice. One vocabulary for the Tasks room's
+ * drawer and Today's work queue (Q-T3).
  */
 export type TaskTarget =
   | { kind: 'appointment'; appointmentId: string; reschedule?: boolean }
   | { kind: 'newAppointment'; whoId: string; copyOf?: string }
   | { kind: 'lead'; leadId: string }
   | { kind: 'patient'; patientId: string; section: 'timeline' | 'treatments' }
+  | {
+      kind: 'checkIn';
+      patientId: string;
+      appointmentId?: string;
+      treatmentId?: string;
+      checkInId?: string;
+    }
+  | { kind: 'review'; patientId: string; appointmentId?: string; reviewId?: string }
   | { kind: 'invoice'; invoiceId: string };
 
-/** The person's own record: their patient file, else their lead. */
-function personRecord(row: Pick<TaskRow, 'person'>): TaskTarget | null {
-  const { patientId, leadId } = row.person;
-  if (patientId) return { kind: 'patient', patientId, section: 'timeline' };
-  return leadId ? { kind: 'lead', leadId } : null;
+/** What a follow-on reads of a task: its link and its person. */
+type TaskTargetSource = Pick<TaskRow, 'link' | 'person'>;
+
+/** The person's own record: their patient file, else their open lead. */
+function personRecord({ person }: TaskTargetSource): TaskTarget | null {
+  if (person?.patientId) {
+    return { kind: 'patient', patientId: person.patientId, section: 'timeline' };
+  }
+  return person?.openLeadId ? { kind: 'lead', leadId: person.openLeadId } : null;
+}
+
+/** The record id a task links when it is of `kind`. */
+const linkedId = (task: TaskTargetSource, kind: 'appointment' | 'treatment') =>
+  task.link?.kind === kind ? task.link.id : null;
+
+/** A new check-in or review on the person's patient file, tied to the task's visit or treatment. */
+function feedbackTarget(
+  kind: 'checkIn' | 'review',
+  task: TaskTargetSource,
+): TaskTarget | null {
+  const patientId = task.person?.patientId;
+  if (!patientId) return null;
+  const appointmentId = linkedId(task, 'appointment');
+  const treatmentId = linkedId(task, 'treatment');
+  return {
+    kind,
+    patientId,
+    ...(appointmentId ? { appointmentId } : {}),
+    ...(kind === 'checkIn' && treatmentId ? { treatmentId } : {}),
+  };
+}
+
+/** A new booking for the task's person — a copy of its visit when it rebooks one. */
+function bookingTarget(task: TaskTargetSource, copy: boolean): TaskTarget | null {
+  const whoId = task.person?.id;
+  if (!whoId) return null;
+  const visit = copy ? linkedId(task, 'appointment') : null;
+  return visit
+    ? { kind: 'newAppointment', whoId, copyOf: visit }
+    : { kind: 'newAppointment', whoId };
 }
 
 /**
  * Where an outcome's follow-on screen opens (the outcome table's "Then",
- * `tasks.md:185–227`): a new booking for the person, a rebooking of the task's
- * visit, a move of it, or the person's own record ("Fix the number", "Call
- * now"). The check-ins and the review log are stacked forms with no route
- * (S:116) — none until their shared units (L-43) land.
+ * `tasks.md:185–227`): a new booking for the person (by their contact), a
+ * rebooking of the task's visit, a move of it, a new check-in or review on the
+ * patient file (research-tasks T5), or the person's own record ("Fix the
+ * number", "Call now"). None where the task lacks what it needs.
  */
 export function taskFollowOnTarget(
   form: TaskFollowOnForm,
-  row: Pick<TaskRow, 'source' | 'person'>,
+  task: TaskTargetSource,
 ): TaskTarget | null {
-  const who = row.person.patientId ?? row.person.leadId;
-  const visit = row.source.kind === 'appointment' ? row.source.id : null;
   switch (form) {
     case 'appointmentNew':
-      return who ? { kind: 'newAppointment', whoId: who } : null;
+      return bookingTarget(task, false);
     case 'appointmentRebook':
-      if (!who) return null;
-      return visit
-        ? { kind: 'newAppointment', whoId: who, copyOf: visit }
-        : { kind: 'newAppointment', whoId: who };
-    case 'appointmentMove':
+      return bookingTarget(task, true);
+    case 'appointmentMove': {
+      const visit = linkedId(task, 'appointment');
       return visit
         ? { kind: 'appointment', appointmentId: visit, reschedule: true }
         : null;
+    }
     case 'reviewLog':
+      return feedbackTarget('review', task);
     case 'visitCheckIn':
     case 'aftercareCheckIn':
-      return null;
+      return feedbackTarget('checkIn', task);
     case 'patientFile':
     case 'personRecord':
-      return personRecord(row);
+      return personRecord(task);
   }
+}
+
+/** A check-in or review drawer's prefill. */
+function feedbackSearch(target: {
+  appointmentId?: string;
+  treatmentId?: string;
+}): Record<string, string> {
+  return {
+    ...(target.appointmentId ? { appointment: target.appointmentId } : {}),
+    ...(target.treatmentId ? { treatment: target.treatmentId } : {}),
+  };
 }
 
 /**
@@ -98,6 +158,30 @@ export function taskTargetNavigation(
       return {
         to: `${CLINIC_COMMAND_TARGETS.patient}/${target.section}`,
         params: { organizationSlug, patientId: target.patientId },
+      };
+    case 'checkIn':
+      if (target.checkInId) {
+        return organizationCheckInEdit(
+          organizationSlug,
+          target.patientId,
+          target.checkInId,
+        );
+      }
+      return {
+        ...organizationCheckInCreate(organizationSlug, target.patientId),
+        search: feedbackSearch(target),
+      };
+    case 'review':
+      if (target.reviewId) {
+        return organizationReviewEdit(
+          organizationSlug,
+          target.patientId,
+          target.reviewId,
+        );
+      }
+      return {
+        ...organizationReviewCreate(organizationSlug, target.patientId),
+        search: feedbackSearch(target),
       };
     case 'invoice':
       return clinicCommandNavigation('invoice', {

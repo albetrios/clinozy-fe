@@ -24,7 +24,7 @@ import type {
   Prescription,
 } from '@/shared/api/clinic/clinic-schema.ts';
 import { addCivilDays, clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import { assertDayOpen } from '@/shared/api/clinic/day-close-api.ts';
+import { assertDayOpen } from '@/shared/api/clinic/day-close-fixture-api.ts';
 import {
   INVOICE_CUSTOMER_MESSAGE,
   type InvoiceDetail,
@@ -36,21 +36,21 @@ import {
   type InvoiceRepeatSource,
   type InvoiceRxPreset,
   type InvoiceSaveResult,
+  isLeadNotPatient,
   medicalContactInputSchema,
   type OftenBilledKind,
   type SaleContact,
   type SaleCustomerRow,
-} from '@/shared/api/clinic/invoices-contracts.ts';
+} from '@/shared/api/clinic/invoices-fixture-contracts.ts';
 import {
   fefoTakes,
   medicineStock,
   withTakes,
 } from '@/shared/api/clinic/medicine-stock.ts';
 import { effectivePrice } from '@/shared/api/clinic/offerings-fixture-pricing.ts';
-import { isLeadNotPatient } from '@/shared/api/clinic/patient-search-api.ts';
 import { patientName } from '@/shared/api/clinic/patients-fixture-contracts.ts';
-import { newLedgerEntry } from '@/shared/api/clinic/payments-api.ts';
-import type { TaskRecord } from '@/shared/api/clinic/tasks-contracts.ts';
+import { newLedgerEntry } from '@/shared/api/clinic/payments-fixture-api.ts';
+import type { TaskRecord } from '@/shared/api/clinic/tasks-fixture-contracts.ts';
 
 import { clinicFixtures as world, clinicOrganization } from './world.fixtures.ts';
 

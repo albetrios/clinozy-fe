@@ -1,18 +1,16 @@
 import { seedCommon } from '@/shared/api/clinic/clinic-fixture-seed.ts';
-import type { Appointment, TaskSource } from '@/shared/api/clinic/clinic-schema.ts';
+import type { TaskSource } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import {
-  TASK_RULES,
+  TASK_RULE_KINDS,
   type TaskRecord,
   type TaskRuleId,
-} from '@/shared/api/clinic/tasks-contracts.ts';
+} from '@/shared/api/clinic/tasks-fixture-contracts.ts';
 
-import { appointmentSeed } from './appointments.fixtures.ts';
 import { contactThreadRef } from './leads.fixtures.ts';
 import { patientRef } from './patients.fixtures.ts';
-import { must, ref, seedAt } from './refs.fixtures.ts';
+import { ref, seedAt } from './refs.fixtures.ts';
 import { type StaffKey, staffRef } from './staff.fixtures.ts';
-import { taskRuleKeys } from './task-rules.fixtures.ts';
 
 interface TaskRow {
   key: string;
@@ -31,8 +29,7 @@ interface TaskRow {
 }
 
 /**
- * Today's work queue (`TASKS` H:3460–3469), every task open — one task model
- * with the Tasks room (Q-T3). Each row belongs to the rule its kind is in the
+ * The prototype's work queue (`TASKS` H:3460–3469), every task open. Each row belongs to the rule its kind is in the
  * Tasks room: Confirm → Confirm visits, the no-show → Rebook no-shows, the two
  * after-care checks → Collect feedback (a completed visit) and Aftercare calls,
  * the lead Call back → Lead follow-ups, and Payment due and Recall to the two
@@ -135,31 +132,15 @@ function leadOf(row: TaskRow): string | null {
 }
 
 /**
- * The rule match a seeded task stands for, so the rule job counts it and never
- * makes a second one: the confirm, rebook and feedback seeds are exactly what
- * those rules derive for their visits. The others stay outside the job — no
- * treatment backs Pooja's call, Kabir's lead has no follow-up date, and Payment
- * due and Recall have no rule condition.
+ * The prototype's work queue as fixture task records, with the plan's fields (Appendix F) at rest
+ * — what the fixture chat history and contact threads still read (no rule job runs on them: the
+ * Tasks room and Today read clinozy-be, D155).
  */
-function ruleKeyOf(
-  row: TaskRow,
-  visits: ReadonlyMap<string, Appointment>,
-): string | null {
-  if (row.source?.type !== 'appointment') return null;
-  const visit = must(visits.get(row.source.id), `appointment of task ${row.key}`);
-  if (row.rule === 'confirm') return taskRuleKeys.confirm(visit);
-  if (row.rule === 'rebook') return taskRuleKeys.rebook(visit);
-  if (row.rule === 'feedback') return taskRuleKeys.feedback(visit);
-  return null;
-}
-
-/** Today's work queue as task records, with the plan's fields (Appendix F) at rest. */
 export function taskSeed(today: string = clinicToday()): TaskRecord[] {
-  const visits = new Map(appointmentSeed(today).map((visit) => [visit.id, visit]));
   return TASK_ROWS.map((row) => ({
     ...seedCommon(seedAt(row.created, '08:00', today), staffRef(row.owner)),
     id: ref.task(row.key),
-    kind: TASK_RULES[row.rule].kind,
+    kind: TASK_RULE_KINDS[row.rule],
     title: row.title,
     why: row.why,
     ownerId: staffRef(row.owner),
@@ -174,7 +155,7 @@ export function taskSeed(today: string = clinicToday()): TaskRecord[] {
     outcome: null,
     resolvedAt: null,
     rule: row.rule,
-    ruleKey: ruleKeyOf(row, visits),
+    ruleKey: null,
     ruleOutcome: null,
     result: null,
     note: null,

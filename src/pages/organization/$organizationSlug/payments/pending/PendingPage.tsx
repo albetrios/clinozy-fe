@@ -2,6 +2,7 @@ import { Outlet, useNavigate, useParams, useSearch } from '@tanstack/react-route
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import {
   organizationDayClose,
   organizationPendingCreate,
@@ -19,22 +20,35 @@ import {
 import { DataTable } from '@/shared/components/DataTable/index.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
 import { EmptyState, EmptyStateAction } from '@/shared/components/EmptyState/index.ts';
+import { RetryError } from '@/shared/components/RetryError/index.ts';
 import {
   type RoomFilterCopy,
   useRoomFilters,
 } from '@/shared/components/RoomToolbar/index.ts';
 import { SettleCreditDrawer } from '@/shared/components/SettleCreditDrawer/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useCreditList } from '@/shared/hooks/useCredits/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
+import {
+  type PaymentAccess,
+  usePaymentAccess,
+} from '@/shared/hooks/usePaymentAccess/index.ts';
 import { PenLine, Receipt, RefreshCw, Trash, Wallet } from '@/shared/icons/index.ts';
+import { notify } from '@/shared/notify/index.ts';
 
 import { PAYMENTS_KEYS, PAYMENTS_NS, PENDING_TABLE_ID } from '../payments.constants.ts';
-import { PaymentsToolbar } from '../shared/components/PaymentsToolbar/index.ts';
+import {
+  PaymentsToolbar,
+  type PaymentsToolbarProps,
+} from '../shared/components/PaymentsToolbar/index.ts';
 import { CreditDeleteConfirm } from './components/CreditDeleteConfirm/index.ts';
 import { CreditDrawer } from './components/CreditDrawer/index.ts';
-import { creditReason, isOpenCredit } from './components/PendingCells/index.ts';
+import {
+  creditReason,
+  isChangeableCredit,
+  isOpenCredit,
+  useCreditLockLabel,
+} from './components/PendingCells/index.ts';
 import { canUseOnBill, useCreditOnBill } from './hooks/useCreditOnBill/index.ts';
 import {
   type PendingDialogRoute,
@@ -51,8 +65,8 @@ import {
 /** How many placeholder rows stand in for the list while it loads. */
 const SKELETON_ROWS = 6;
 
-/** Pending's minimum width with every column (`payments.md:46`). */
-const PENDING_MIN_WIDTH = 1240;
+/** Pending's minimum width with every column (`payments.md:46`, and the 130px By). */
+const PENDING_MIN_WIDTH = 1370;
 
 /** The list read's params for the URL as it stands. */
 function creditListParamsOf(search: PendingSearch): CreditListParams {
@@ -161,35 +175,143 @@ function PendingEmpty({
   );
 }
 
+/** The row actions' callbacks. */
+interface PendingRowHandlers {
+  onSettle: (credit: CreditRow) => void;
+  onUseOnBill: (credit: CreditRow) => void;
+  onEdit: (credit: CreditRow) => void;
+  onDelete: (credit: CreditRow) => void;
+}
+
 /**
- * Payments › Pending (KICKOFF §6.9 Pending; `payments.md:41–55`): the room
- * toolbar on its second tab — with "+ Add pending" and its "⌄" (Give · Take) —
- * over the shared table of credits: Ref · Who · Which way · Amount · Why · Since
- * · State, newest first, Who carrying the meta line and Amount the phone's key.
- * An open credit opens Edit pending and offers Edit and Delete; a settled one
- * opens nothing. Its dialog routes render nothing: this page reads the URL and
- * opens their drawers.
+ * An open credit's actions (`payments.md:50`), each for those whose codes allow it: Got it back
+ * (`payment:create` — money comes in), Give back and Use on next bill (money goes back —
+ * `payment:create` and `payment:delete`, clinozy-be D83 (1)), and while nothing of it is settled
+ * Edit (`payment:update`) and Delete (`payment:delete`). A settled credit has none.
+ */
+function usePendingRowActions(
+  access: PaymentAccess,
+  handlers: PendingRowHandlers,
+): (credit: CreditRow) => DataTableRowAction[] {
+  const { t } = useTranslation(PAYMENTS_NS);
+  return (credit) => {
+    if (!isOpenCredit(credit)) return [];
+    const changeable = isChangeableCredit(credit);
+    const actions: DataTableRowAction[] = [];
+    const givesBack = credit.direction === 'give';
+    if (givesBack ? access.canGiveBack : access.canCreate) {
+      actions.push({
+        id: 'settle',
+        label: t(
+          givesBack
+            ? PAYMENTS_KEYS.rowActions.giveBack
+            : PAYMENTS_KEYS.rowActions.gotBack,
+        ),
+        icon: Wallet,
+        onSelect: () => handlers.onSettle(credit),
+      });
+    }
+    if (access.canGiveBack && canUseOnBill(credit)) {
+      actions.push({
+        id: 'use-on-bill',
+        label: t(PAYMENTS_KEYS.rowActions.useOnBill),
+        icon: Receipt,
+        onSelect: () => handlers.onUseOnBill(credit),
+      });
+    }
+    if (access.canEdit && changeable) {
+      actions.push({
+        id: 'edit',
+        label: t(PAYMENTS_KEYS.rowActions.edit),
+        icon: PenLine,
+        onSelect: () => handlers.onEdit(credit),
+      });
+    }
+    if (access.canDelete && changeable) {
+      actions.push({
+        id: 'delete',
+        label: t(PAYMENTS_KEYS.rowActions.delete),
+        icon: Trash,
+        destructive: true,
+        onSelect: () => handlers.onDelete(credit),
+      });
+    }
+    return actions;
+  };
+}
+
+/** "+ Add pending" and its "⌄" (Give · Take), for those who may record money (`payment:create`). */
+function usePendingPrimary(
+  canCreate: boolean,
+  openCreate: (direction?: CreditDirection) => void,
+): PaymentsToolbarProps<CreditRow>['primary'] {
+  const { t } = useTranslation(PAYMENTS_NS);
+  if (!canCreate) return undefined;
+  return {
+    action: {
+      id: 'add',
+      label: t(PAYMENTS_KEYS.toolbar.addPending),
+      onSelect: () => openCreate(),
+    },
+    menu: {
+      actions: [
+        {
+          id: 'give',
+          label: t(PAYMENTS_KEYS.toolbar.give),
+          sub: t(PAYMENTS_KEYS.toolbar.giveSub),
+          icon: RefreshCw,
+          tone: 'blush',
+          onSelect: () => openCreate('give'),
+        },
+        {
+          id: 'take',
+          label: t(PAYMENTS_KEYS.toolbar.take),
+          sub: t(PAYMENTS_KEYS.toolbar.takeSub),
+          icon: Wallet,
+          tone: 'sky',
+          onSelect: () => openCreate('take'),
+        },
+      ],
+    },
+  };
+}
+
+/**
+ * Payments › Pending (KICKOFF §6.9 Pending; `payments.md:41–55`) on clinozy-be
+ * (`GET /app/pending-credits`, 50 a page): the room toolbar on its second tab —
+ * with "+ Add pending" and its "⌄" (Give · Take) — over the shared table of
+ * credits: Ref · Who · Which way · Amount · Why · Since · State · By, newest
+ * first, Who carrying the meta line and Amount the phone's key. Search finds
+ * the person, the supplier's name or a `CR-` number (D81). An open credit
+ * nothing has settled opens Edit pending and offers Edit and Delete; one with a
+ * part settled answers its click with "CR-1 · ₹50 settled · it can’t change
+ * now"; a settled one with its state. Give back / Got it back and Use on next
+ * bill settle an open one. The gates are the member's `payment:*` codes
+ * (`usePaymentAccess`). A first read that fails shows the error in place, with
+ * Retry. Its dialog routes render nothing: this page reads the URL and opens
+ * their drawers.
  */
 export function PendingPage() {
   const { t } = useTranslation(PAYMENTS_NS);
+  const { t: tErrors } = useTranslation(ERRORS_NS);
   const navigate = useNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
   const search = validatePendingSearch(useSearch({ strict: false }));
-  const access = useClinicAccess();
+  const access = usePaymentAccess();
   const filters = useRoomFilters(PENDING_FILTER_FIELDS);
   const filterCopy = usePendingFilterCopy();
   const [deleting, setDeleting] = useState<CreditRow | null>(null);
   const [settling, setSettling] = useState<CreditRow | null>(null);
   const adjustOnBill = useCreditOnBill();
+  const lockLabel = useCreditLockLabel();
   const { dialog, close } = usePendingDialogRoute();
 
   const params = creditListParamsOf(search);
   const list = useCreditList(params);
-  useListLoadError(list, PENDING_TABLE_ID);
-  const table = usePendingTable(list.rows);
+  const rows = useListLoadError(list, PENDING_TABLE_ID);
+  const table = usePendingTable(rows);
+  const failed = list.isError && rows.length === 0 && !list.isPending;
 
-  const can = (action: 'create' | 'edit' | 'delete') =>
-    access.isResolved && access.can('payments', action);
   // Give / Take name the way through Pending's own `direction` (`S:88–89`):
   // the list behind follows it too.
   const openCreate = (direction?: CreditDirection) =>
@@ -201,61 +323,24 @@ export function PendingPage() {
       }),
     });
   const openCredit = (credit: CreditRow) => {
-    if (!isOpenCredit(credit)) return;
+    const lock = lockLabel(credit);
+    if (lock) {
+      // A settled credit says why it stays; a fully settled one stays silent (`payments.md:49`).
+      if (isOpenCredit(credit)) notify.info(lock);
+      return;
+    }
     void navigate({
       ...organizationPendingEdit(organizationSlug, credit.id),
       search: (current: Record<string, unknown>) => validatePendingSearch(current),
     });
   };
-
-  // Give back writes money out to them: the `refund` ability (Q-U8).
-  const canSettle = (credit: CreditRow) =>
-    access.isResolved &&
-    (credit.direction === 'give' ? access.canAbility('refund') : can('create'));
-
-  const rowActions = (credit: CreditRow): DataTableRowAction[] => {
-    // Open credits only (`payments.md:50`).
-    if (!isOpenCredit(credit)) return [];
-    const actions: DataTableRowAction[] = [];
-    if (canSettle(credit)) {
-      actions.push({
-        id: 'settle',
-        label: t(
-          credit.direction === 'give'
-            ? PAYMENTS_KEYS.rowActions.giveBack
-            : PAYMENTS_KEYS.rowActions.gotBack,
-        ),
-        icon: Wallet,
-        onSelect: () => setSettling(credit),
-      });
-    }
-    if (canUseOnBill(credit) && can('create')) {
-      actions.push({
-        id: 'use-on-bill',
-        label: t(PAYMENTS_KEYS.rowActions.useOnBill),
-        icon: Receipt,
-        onSelect: () => void adjustOnBill(credit),
-      });
-    }
-    if (can('edit')) {
-      actions.push({
-        id: 'edit',
-        label: t(PAYMENTS_KEYS.rowActions.edit),
-        icon: PenLine,
-        onSelect: () => openCredit(credit),
-      });
-    }
-    if (can('delete')) {
-      actions.push({
-        id: 'delete',
-        label: t(PAYMENTS_KEYS.rowActions.delete),
-        icon: Trash,
-        destructive: true,
-        onSelect: () => setDeleting(credit),
-      });
-    }
-    return actions;
-  };
+  const rowActions = usePendingRowActions(access, {
+    onSettle: setSettling,
+    onUseOnBill: (credit) => void adjustOnBill(credit),
+    onEdit: openCredit,
+    onDelete: setDeleting,
+  });
+  const primary = usePendingPrimary(access.canCreate, openCreate);
 
   return (
     <section
@@ -265,67 +350,48 @@ export function PendingPage() {
       <PaymentsToolbar
         table={table}
         tableId={PENDING_TABLE_ID}
+        searchPlaceholder={t(PAYMENTS_KEYS.pending.search)}
         filters={{ fields: PENDING_FILTER_FIELDS, copy: filterCopy }}
-        onDayClose={() =>
-          void navigate({ ...organizationDayClose(organizationSlug), search: {} })
-        }
-        primary={
-          can('create')
-            ? {
-                action: {
-                  id: 'add',
-                  label: t(PAYMENTS_KEYS.toolbar.addPending),
-                  onSelect: () => openCreate(),
-                },
-                menu: {
-                  actions: [
-                    {
-                      id: 'give',
-                      label: t(PAYMENTS_KEYS.toolbar.give),
-                      sub: t(PAYMENTS_KEYS.toolbar.giveSub),
-                      icon: RefreshCw,
-                      tone: 'blush',
-                      onSelect: () => openCreate('give'),
-                    },
-                    {
-                      id: 'take',
-                      label: t(PAYMENTS_KEYS.toolbar.take),
-                      sub: t(PAYMENTS_KEYS.toolbar.takeSub),
-                      icon: Wallet,
-                      tone: 'sky',
-                      onSelect: () => openCreate('take'),
-                    },
-                  ],
-                },
-              }
+        onDayClose={
+          access.canRead
+            ? () =>
+                void navigate({ ...organizationDayClose(organizationSlug), search: {} })
             : undefined
         }
+        primary={primary}
       />
-      <DataTable
-        table={table}
-        tableId={PENDING_TABLE_ID}
-        label={t(PAYMENTS_KEYS.tabs.pending)}
-        recordsLabel={t(PAYMENTS_KEYS.pending.records)}
-        fold
-        selectable
-        minWidth={PENDING_MIN_WIDTH}
-        onRowClick={(row) => openCredit(row.original)}
-        getRowTone={(row) => pendingRowTone(row.original)}
-        rowActions={(row) => rowActions(row.original)}
-        hasNextPage={list.hasNextPage}
-        isFetchingNextPage={list.isFetchingNextPage}
-        fetchNextPage={list.fetchNextPage}
-        refreshing={list.isRefreshing}
-        empty={
-          <PendingEmpty
-            loading={list.isPending}
-            filtered={filters.count > 0 || Boolean(search.q)}
-            onClearFilters={() => filters.apply({})}
-            onAdd={can('create') ? () => openCreate() : undefined}
-          />
-        }
-        className="m-(--room-card-margin) flex-1"
-      />
+      {failed ? (
+        <RetryError
+          message={tErrors(ERRORS_KEYS.frontend.query.loadFailed)}
+          onRetry={list.refetch}
+        />
+      ) : (
+        <DataTable
+          table={table}
+          tableId={PENDING_TABLE_ID}
+          label={t(PAYMENTS_KEYS.tabs.pending)}
+          recordsLabel={t(PAYMENTS_KEYS.pending.records)}
+          fold
+          selectable
+          minWidth={PENDING_MIN_WIDTH}
+          onRowClick={(row) => openCredit(row.original)}
+          getRowTone={(row) => pendingRowTone(row.original)}
+          rowActions={(row) => rowActions(row.original)}
+          hasNextPage={list.hasNextPage}
+          isFetchingNextPage={list.isFetchingNextPage}
+          fetchNextPage={list.fetchNextPage}
+          refreshing={list.isRefreshing}
+          empty={
+            <PendingEmpty
+              loading={list.isPending}
+              filtered={filters.count > 0 || Boolean(search.q)}
+              onClearFilters={() => filters.apply({})}
+              onAdd={access.canCreate ? () => openCreate() : undefined}
+            />
+          }
+          className="m-(--room-card-margin) flex-1"
+        />
+      )}
       <CreditDeleteConfirm credit={deleting} onClose={() => setDeleting(null)} />
       <SettleCreditDrawer
         credit={settling}
