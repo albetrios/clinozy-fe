@@ -224,7 +224,15 @@
       "dangerZoneDescription": "Unwiderrufliche Aktionen für Ihr Konto.",
       "deleteHeading": "Konto löschen",
       "deleteBody": "Löschen Sie Ihr Konto und alle zugehörigen Daten dauerhaft.",
-      "deleteAction": "Konto löschen"
+      "deleteAction": "Konto löschen",
+      "privacyTitle": "Datenschutz",
+      "privacyDescription": "Ihre Entscheidung zu Produktanalysen und Sitzungsaufzeichnungen, gespeichert in Ihrem Konto.",
+      "analyticsLabel": "Produktanalysen und Sitzungsaufzeichnungen",
+      "analyticsHint": "PostHog-Analysen und Sentry-Sitzungsaufzeichnungen. Fehlerberichte laufen in jedem Fall.",
+      "consentGrantedOn": "Erlaubt am {{date}}",
+      "consentDeniedOn": "Abgelehnt am {{date}}",
+      "consentUnanswered": "Noch nicht beantwortet",
+      "privacyPolicyLink": "Datenschutzerklärung"
     },
     "general": {
       "namePlaceholder": "Acme Inc.",

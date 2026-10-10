@@ -24,6 +24,10 @@ import {
 } from '@/lib/app-splash.ts';
 import { IDLE_PREFETCH_TIMEOUT_MS } from '@/lib/chunk-prefetch.ts';
 import { registerSignedInShellWarmup } from '@/lib/signed-in-shell-warmup.ts';
+import {
+  purgeAnalyticsOnConsentRevoked,
+  resumeAnalyticsOnConsentGranted,
+} from '@/shared/analytics/capture.ts';
 import { subscribeToAuthBroadcast } from '@/shared/auth/auth-channel.ts';
 import { peekTurnstileToken } from '@/shared/auth/captcha/turnstile-token-store.ts';
 import {
@@ -33,6 +37,7 @@ import {
 } from '@/shared/auth/service.ts';
 import { hasSessionHint } from '@/shared/auth/session-lifetime.ts';
 import {
+  currentAnalyticsConsent,
   hasAnalyticsConsent,
   useConsentStore,
 } from '@/shared/store/useConsentStore/index.ts';
@@ -43,9 +48,10 @@ import App from './App.tsx';
 /**
  * Start cookie-setting analytics (PostHog + web-vitals → PostHog). Idempotent
  * and gated by consent — only ever runs after the user has granted it (boot
- * for returning users, or the moment they Accept the ConsentBanner). Sentry is
- * NOT here: error monitoring runs under legitimate interest (no tracking
- * cookies, masked replay).
+ * for returning users, or the moment they Accept the ConsentBanner). Sentry's
+ * error reports are NOT here — they run under legitimate interest (no tracking
+ * cookies); its session recording and profiling follow the same consent from
+ * `app/observability/sentry.ts` (D161).
  */
 let analyticsStarted = false;
 function startAnalytics(): void {
@@ -64,8 +70,16 @@ function startAnalytics(): void {
  * analytics only with consent. Keeps auth funnels off the critical path.
  */
 function initObservabilityWhenIdle(): void {
-  useConsentStore.subscribe((state) => {
-    if (state.analyticsConsent === 'granted') startAnalytics();
+  // Follow the standing decision, from whichever source it changes — the card, Settings, the
+  // account's answer at sign-in, another tab, a session's end (D161).
+  useConsentStore.subscribe((state, previous) => {
+    const granted = currentAnalyticsConsent(state) === 'granted';
+    const wasGranted = currentAnalyticsConsent(previous) === 'granted';
+    if (granted && !wasGranted) {
+      startAnalytics();
+      resumeAnalyticsOnConsentGranted();
+    }
+    if (!granted && wasGranted) purgeAnalyticsOnConsentRevoked();
   });
 
   const run = () => {
@@ -153,6 +167,13 @@ preloadBootRoutes({ likelySignedIn: hasSessionHint() });
 
 // Initialize observability/analytics after splash dismiss + idle (auth funnels stay lean).
 initObservabilityWhenIdle();
+
+// The analytics consent follows the person: settled at sign-in, saved to the account, forgotten
+// when the session ends (D161). Lazy — the sign-in screen's first paint does not wait for it; a
+// session restored before it loads is settled when it starts.
+import('@/shared/analytics/consent-account-sync.ts')
+  .then((m) => m.startConsentAccountSync())
+  .catch(() => undefined);
 
 // Recover from a lazy chunk that a newer deploy has already renamed away: one
 // reload onto the current build per buildId, never over a field being typed in.

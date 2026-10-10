@@ -205,8 +205,8 @@ See **`docs/reference/cross-browser-support.md`** and **`docs/reference/tools-an
 ## Observability (Sentry)
 
 Production error monitoring is wired whenever **`VITE_SENTRY_DSN` is set**
-(`.env.local` for local QA, Netlify/GitHub for deploys). **Not** consent-gated
-(unlike PostHog). Sentry env: **`local`** in `pnpm dev`, **`production`** on deploy.
+(`.env.local` for local QA, Netlify/GitHub for deploys). Error reports are **not**
+consent-gated; session replay and profiling are, like PostHog (D161). Sentry env: **`local`** in `pnpm dev`, **`production`** on deploy.
 
 | Layer                      | Location                                       | Sentry product                 |
 | -------------------------- | ---------------------------------------------- | ------------------------------ |
@@ -215,13 +215,13 @@ Production error monitoring is wired whenever **`VITE_SENTRY_DSN` is set**
 | Route boundary             | `app/routes/ErrorBoundary.tsx` → `reportError` | Issues                         |
 | Query/mutation failures    | `core/http/queryClient.ts`                     | Issues + query/mutation extras |
 | Router + fetch tracing     | TanStack + `httpClientIntegration`             | Performance                    |
-| Session replay + profiling | prod integrations only                         | Replays, Profiles              |
+| Session replay + profiling | only with the analytics consent (D161)         | Replays, Profiles              |
 | Web Vitals (poor only)     | `app/observability/performance.ts`             | Issues (warning)               |
 | Source maps                | `vite.config.ts` + CI secrets                  | Releases                       |
 
 Full data catalog, env vars, local verification, and Sentry project checklist:
 **[`docs/integrations/sentry-frontend.md`](../integrations/sentry-frontend.md)**.
-PostHog + web-vitals analytics remain consent-gated; Sentry is not. Full PostHog
+PostHog, web-vitals and Sentry's replay and profiling are consent-gated; error reports are not. Full PostHog
 event catalog: **[`docs/integrations/posthog-frontend.md`](../integrations/posthog-frontend.md)**.
 
 ---

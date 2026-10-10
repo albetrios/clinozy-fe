@@ -128,6 +128,43 @@ test.describe('Cookie consent card', () => {
     await expect(byTestId(page, 'consent-banner')).toBeHidden();
   });
 
+  test('closing counts as declining, and is remembered (D161)', async ({ page }) => {
+    await page.goto('/login');
+    await expectLoginFormReady(page);
+
+    // a11y guard: the close button says what closing does.
+    await expect(
+      page.getByRole('button', { name: 'Close (counts as declining)' }),
+    ).toBeVisible();
+    await byTestId(page, 'consent-close').click();
+    await expect(byTestId(page, 'consent-banner')).toBeHidden();
+
+    await page.reload();
+    await expectLoginFormReady(page);
+    await expect(byTestId(page, 'consent-banner')).toBeHidden();
+    const stored = await page.evaluate(() => localStorage.getItem('clinozy-consent'));
+    expect(stored).toContain('"analyticsConsent":"denied"');
+  });
+
+  test('asks again once the answer is six months old (D161)', async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem(
+        'clinozy-consent',
+        JSON.stringify({
+          state: {
+            analyticsConsent: 'granted',
+            decidedAt: '2020-01-01T00:00:00.000Z',
+            policyVersion: 1,
+          },
+          version: 1,
+        }),
+      );
+    });
+    await page.goto('/login');
+    await expectLoginFormReady(page);
+    await expect(byTestId(page, 'consent-banner')).toBeVisible({ timeout: 15_000 });
+  });
+
   test('rides above the mobile tab bar instead of covering it', async ({ page }) => {
     test.setTimeout(120_000);
     expect(

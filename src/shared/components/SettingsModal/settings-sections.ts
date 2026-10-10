@@ -120,7 +120,17 @@ export const SETTINGS_NAV: readonly SettingsNavGroup[] = [
         section: 'account',
         labelKey: SETTINGS_GROUP_LABEL_KEYS.account,
         icon: UserCog,
-        keywords: ['account', 'id', 'email', 'role', 'delete'],
+        keywords: [
+          'account',
+          'id',
+          'email',
+          'role',
+          'delete',
+          'privacy',
+          'analytics',
+          'cookies',
+          'consent',
+        ],
       },
       {
         scope: 'account',

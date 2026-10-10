@@ -180,10 +180,11 @@
     }
   },
   "consent": {
-    "description": "{{productName}} 개선을 위한 제품 분석에 쿠키를 사용합니다. 필수 기능과 오류 모니터링은 쿠키 없이도 작동합니다.",
+    "description": "동의하시면 {{productName}} 개선을 위해 PostHog 분석과 Sentry 세션 기록을 사용합니다. 오류 보고를 포함한 나머지 기능은 이것 없이도 작동합니다. 닫으면 거부로 처리됩니다.",
     "privacyPolicy": "개인정보 처리방침",
     "accept": "동의",
-    "decline": "거부"
+    "decline": "거부",
+    "closeAndDecline": "닫기(거부로 처리됨)"
   },
   "confirm": {
     "accept": "확인",

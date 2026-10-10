@@ -181,10 +181,11 @@
     }
   },
   "consent": {
-    "description": "Wir verwenden Cookies für Produktanalysen, um {{productName}} zu verbessern. Wesentliche Funktionen und die Fehlerüberwachung funktionieren auch ohne sie.",
+    "description": "Mit Ihrer Zustimmung nutzen wir PostHog-Analysen und Sentry-Sitzungsaufzeichnungen, um {{productName}} zu verbessern. Alles andere, auch Fehlerberichte, funktioniert ohne sie. Schließen bedeutet Nein.",
     "privacyPolicy": "Datenschutzerklärung",
     "accept": "Akzeptieren",
-    "decline": "Ablehnen"
+    "decline": "Ablehnen",
+    "closeAndDecline": "Schließen (gilt als Ablehnung)"
   },
   "confirm": {
     "accept": "Bestätigen",

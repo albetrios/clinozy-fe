@@ -227,7 +227,15 @@
       "dangerZoneDescription": "Acciones irreversibles para tu cuenta.",
       "deleteHeading": "Eliminar cuenta",
       "deleteBody": "Elimina permanentemente tu cuenta y todos los datos asociados.",
-      "deleteAction": "Eliminar cuenta"
+      "deleteAction": "Eliminar cuenta",
+      "privacyTitle": "Privacidad",
+      "privacyDescription": "Tu decisión sobre la analítica del producto y las grabaciones de sesión, guardada en tu cuenta.",
+      "analyticsLabel": "Analítica del producto y grabaciones de sesión",
+      "analyticsHint": "Analítica de PostHog y grabaciones de sesión de Sentry. Los informes de errores funcionan en cualquier caso.",
+      "consentGrantedOn": "Permitido el {{date}}",
+      "consentDeniedOn": "Rechazado el {{date}}",
+      "consentUnanswered": "Aún sin responder",
+      "privacyPolicyLink": "Política de privacidad"
     },
     "general": {
       "namePlaceholder": "Acme Inc.",

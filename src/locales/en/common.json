@@ -181,10 +181,11 @@
     }
   },
   "consent": {
-    "description": "We use cookies for product analytics to improve {{productName}}. Essential functionality and error monitoring work without them.",
+    "description": "With your OK, we use PostHog analytics and Sentry session recordings to improve {{productName}}. Everything else, error reports included, works without them. Closing this means no.",
     "privacyPolicy": "Privacy Policy",
     "accept": "Accept",
-    "decline": "Decline"
+    "decline": "Decline",
+    "closeAndDecline": "Close (counts as declining)"
   },
   "confirm": {
     "accept": "Confirm",

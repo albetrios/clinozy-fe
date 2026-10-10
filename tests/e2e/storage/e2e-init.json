@@ -6,7 +6,7 @@
       "localStorage": [
         {
           "name": "clinozy-consent",
-          "value": "{\"state\":{\"analyticsConsent\":\"denied\"},\"version\":0}"
+          "value": "{\"state\":{\"analyticsConsent\":\"denied\",\"decidedAt\":\"STAMPED_AT_RUN_START\",\"policyVersion\":1},\"version\":1}"
         }
       ]
     }

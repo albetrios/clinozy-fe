@@ -22,6 +22,8 @@ import { Copy, ShieldCheck, Trash, TriangleAlert } from '@/shared/icons/index.ts
 import { notify } from '@/shared/notify/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 
+import { AccountPrivacyCard } from './AccountPrivacyCard/index.ts';
+
 /**
  * One fact about the account: the label muted at the start, the value at the
  * end, a table row's `muted` hairline between rows.
@@ -134,6 +136,8 @@ export function AccountPanel() {
           </InfoRow>
         </dl>
       </SettingsCard>
+
+      <AccountPrivacyCard />
 
       <SettingsCard
         variant="danger"

@@ -32,7 +32,9 @@ everything — frontend controls are defense-in-depth and UX, never the only gat
 Sentry and PostHog run in the same JS context as the in-memory token, so their
 capture settings are part of the threat model — verified:
 
-- **Sentry replay** — `maskAllText: true` + `blockAllMedia: true`; inputs are
+- **Sentry replay** — **consent-gated** with profiling (D161: added only while the
+  analytics consent stands, stopped at once on a withdrawal; profiling follows the
+  answer at page load). `maskAllText: true` + `blockAllMedia: true`; inputs are
   masked by default and **network request headers/bodies are not captured**
   (no `networkDetailAllowUrls`), so the `Authorization: Bearer` header never
   reaches Sentry. `beforeSend` filters `ui.input` breadcrumbs and — together
@@ -50,11 +52,20 @@ capture settings are part of the threat model — verified:
   `$current_url`-style properties; and
   `posthog.reset()` runs when the session ends so successive users on a shared
   device never chain into one anonymous profile. Accepting the banner emits a
-  single `analytics_consent_decision` event (`shared/analytics/capture-consent-decision.ts`);
-  decline is stored locally only.
-  ([`app/analytics/posthog.ts`](../../src/app/analytics/posthog.ts)) Error
-  monitoring (Sentry) is **not** gated — no tracking cookies, masked replay,
-  legitimate interest.
+  single `analytics_consent_decision` event (`shared/analytics/capture-consent-decision.ts`).
+  ([`app/analytics/posthog.ts`](../../src/app/analytics/posthog.ts)) Sentry's error
+  reports are **not** gated — no tracking cookies, legitimate interest.
+- **Consent is the person's, not the browser's** (D161, clinozy-be D85) — the answer is
+  stored with its time and the policy version (`CONSENT_POLICY_VERSION`); one older than
+  six months or to an older version counts as not answered, and the card asks again.
+  Closing the card is declining. Signed in, the later of the account's and the
+  browser's answers wins and is kept on both (`PATCH /users/me/settings`; clinozy-be
+  audits each answer as the proof of consent); when the session ends the browser's
+  answer and PostHog's `ph_*` identifiers are removed, so the next person at a shared
+  computer is asked afresh. Tabs follow each other's answer. Settings › Account ›
+  Privacy withdraws it with one switch. `index.html` no longer preconnects to PostHog,
+  so nothing reaches it before a grant.
+  ([`shared/analytics/consent-account-sync.ts`](../../src/shared/analytics/consent-account-sync.ts))
 - **Service worker** — precaches only static build assets + fonts; **no runtime
   caching of `/api`** or auth responses, so a shared device cannot serve one
   user's data to another from the SW cache. ([`src/sw.ts`](../../src/sw.ts))

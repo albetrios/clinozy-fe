@@ -224,7 +224,15 @@
       "dangerZoneDescription": "Irreversible actions for your account.",
       "deleteHeading": "Delete account",
       "deleteBody": "Permanently delete your account and all associated data.",
-      "deleteAction": "Delete account"
+      "deleteAction": "Delete account",
+      "privacyTitle": "Privacy",
+      "privacyDescription": "Your choice about product analytics and session recordings, saved to your account.",
+      "analyticsLabel": "Product analytics and session recordings",
+      "analyticsHint": "PostHog analytics and Sentry session recordings. Error reports run either way.",
+      "consentGrantedOn": "Allowed on {{date}}",
+      "consentDeniedOn": "Declined on {{date}}",
+      "consentUnanswered": "Not answered yet",
+      "privacyPolicyLink": "Privacy policy"
     },
     "general": {
       "namePlaceholder": "Acme Inc.",

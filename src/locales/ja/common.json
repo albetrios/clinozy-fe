@@ -180,10 +180,11 @@
     }
   },
   "consent": {
-    "description": "{{productName}} の改善を目的とした製品分析に Cookie を使用します。基本機能とエラー監視は Cookie がなくても動作します。",
+    "description": "同意いただいた場合、{{productName}} の改善のために PostHog の分析と Sentry のセッション記録を使用します。エラーレポートを含め、その他の機能はこれらなしで動作します。閉じると「拒否」になります。",
     "privacyPolicy": "プライバシーポリシー",
     "accept": "同意する",
-    "decline": "拒否する"
+    "decline": "拒否する",
+    "closeAndDecline": "閉じる（拒否として扱われます）"
   },
   "confirm": {
     "accept": "確認",

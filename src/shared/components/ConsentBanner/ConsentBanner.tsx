@@ -6,8 +6,11 @@ import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
 import { iconChipClassName } from '@/lib/icon-surface.ts';
 import { cn } from '@/lib/utils.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { ShieldCheck } from '@/shared/icons/index.ts';
-import { useConsentStore } from '@/shared/store/useConsentStore/index.ts';
+import { ShieldCheck, X } from '@/shared/icons/index.ts';
+import {
+  selectCurrentConsent,
+  useConsentStore,
+} from '@/shared/store/useConsentStore/index.ts';
 
 /**
  * The card's rendered height, published on `<html>` for as long as it is up.
@@ -22,11 +25,15 @@ import { useConsentStore } from '@/shared/store/useConsentStore/index.ts';
 const CARD_HEIGHT_VAR = '--consent-card-height';
 
 /**
- * Analytics cookie-consent card. Shown only while the decision is undecided;
- * Accept/Decline persist to {@link useConsentStore}. PostHog (the only
- * cookie-setting analytics) does not initialize until consent is granted — the
- * boot sequence in `main.tsx` reacts to the store. Error monitoring (Sentry)
- * runs under legitimate interest and is not gated here.
+ * Analytics consent card. Shown while there is no standing answer — none yet, one older than six
+ * months, or one to an older policy version (D161); Accept/Decline persist to
+ * {@link useConsentStore}, and signed in they are saved to the account. PostHog and Sentry's
+ * session recording and profiling start only on a grant — the boot sequence in `main.tsx` and
+ * `app/observability/sentry.ts` react to the store. Error reports run under legitimate interest
+ * and are not gated here.
+ *
+ * **Closing is declining.** The close button answers No, so the card stops following the person
+ * around; it asks again after six months.
  *
  * **A corner card, not a full-width bar.** The bar spanned the viewport, so its
  * Accept button landed in the bottom-end corner — directly underneath the Sentry
@@ -44,7 +51,7 @@ export function ConsentBanner() {
   const titleId = useId();
   const descriptionId = useId();
   const cardRef = useRef<HTMLElement>(null);
-  const decision = useConsentStore((s) => s.analyticsConsent);
+  const decision = useConsentStore(selectCurrentConsent);
   const setConsent = useConsentStore((s) => s.setAnalyticsConsent);
   const visible = decision === null;
 
@@ -103,7 +110,17 @@ export function ConsentBanner() {
         'animate-in fade-in slide-in-from-bottom-4 duration-300 motion-reduce:animate-none',
       )}
     >
-      <div className="flex items-start gap-3">
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        className="absolute end-2 top-2"
+        aria-label={t(LOCALE_KEYS.consentCloseAndDecline)}
+        onClick={handleDecline}
+        data-testid="consent-close"
+      >
+        <X className="size-4" aria-hidden="true" />
+      </Button>
+      <div className="flex items-start gap-3 pe-6">
         <span
           data-slot="icon-chip"
           className={cn('bg-primary/10 text-primary size-9', iconChipClassName)}

@@ -477,6 +477,21 @@ Not a design screen: the launch drew only "create a clinic" for someone with non
 - **The seat:** an invitation 7 days past its expiry is ended by clinozy-be's daily sweep
   (`invitation_expired`), which frees its seat; the client shows only what is pending.
 
+### 5.13 Cookie consent per account (D161)
+
+Not a design screen: the launch drew a browser-only card. clinozy-be D85 keeps the answer on the
+person's settings.
+
+| Operation       | Route                                                                          | What changes in the screen                                                  |
+| --------------- | ------------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
+| read the answer | `GET /users/me/settings` (`analytics_consent`, `_version`, `_at`)              | at each sign-in: the later of the account's and the browser's answers wins  |
+| save the answer | `PATCH /users/me/settings` (`analytics_consent` + `analytics_consent_version`) | each answer given while signed in — the card, its close, Settings › Privacy |
+
+- **Re-asked** when the answer is six months old or `CONSENT_POLICY_VERSION` moved; the end of a
+  session forgets the browser's answer and PostHog's identifiers.
+- **Covers** PostHog, web-vitals and Sentry's session recording and profiling; error reports are
+  not gated.
+
 ## 6. The design features dropped (route map section 4)
 
 | #   | Feature                             | Removed from                                                                                                                                                                                                                                                                                                                        | Instead                                                                                        |

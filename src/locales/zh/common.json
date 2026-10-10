@@ -180,10 +180,11 @@
     }
   },
   "consent": {
-    "description": "我们使用 Cookie 进行产品分析，以改进 {{productName}}。基本功能和错误监控无需 Cookie 即可运行。",
+    "description": "经您同意，我们会使用 PostHog 分析和 Sentry 会话录制来改进 {{productName}}。其他一切功能（包括错误报告）无需它们即可运行。关闭即表示拒绝。",
     "privacyPolicy": "隐私政策",
     "accept": "接受",
-    "decline": "拒绝"
+    "decline": "拒绝",
+    "closeAndDecline": "关闭（视为拒绝）"
   },
   "confirm": {
     "accept": "确认",

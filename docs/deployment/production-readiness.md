@@ -57,7 +57,7 @@ The frontend **shell** is solid:
 
 ### D. In-repo gaps closed in prior waves
 
-- [x] **Cookie consent** — PostHog gated behind `ConsentBanner` + `useConsentStore`.
+- [x] **Cookie consent** — PostHog and Sentry replay / profiling gated behind `ConsentBanner` + `useConsentStore`; the answer is the person's, kept on their account with its time and policy version, asked again after six months, withdrawn in Settings › Account › Privacy (D161).
 - [x] **robots.txt** — `Disallow: /` (auth-gated admin app).
 - [x] **HTTP-only frontend** — always `apiClient` / `authFetch` → clinozy-be.
 - [x] This document.

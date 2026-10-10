@@ -32,6 +32,7 @@ export const LOCALE_KEYS = {
   consentPrivacyPolicy: 'consent.privacyPolicy',
   consentAccept: 'consent.accept',
   consentDecline: 'consent.decline',
+  consentCloseAndDecline: 'consent.closeAndDecline',
   rowsPerPage: 'a11y.rowsPerPage',
   goFirstPage: 'a11y.goFirstPage',
   goPreviousPage: 'a11y.goPreviousPage',

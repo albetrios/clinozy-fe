@@ -182,10 +182,11 @@
     }
   },
   "consent": {
-    "description": "Usamos cookies de análise de produto para melhorar o {{productName}}. As funções essenciais e o monitoramento de erros funcionam sem eles.",
+    "description": "Com a sua permissão, usamos a análise do PostHog e as gravações de sessão do Sentry para melhorar o {{productName}}. Todo o resto, incluindo os relatórios de erros, funciona sem elas. Fechar equivale a não.",
     "privacyPolicy": "Política de Privacidade",
     "accept": "Aceitar",
-    "decline": "Recusar"
+    "decline": "Recusar",
+    "closeAndDecline": "Fechar (conta como recusar)"
   },
   "confirm": {
     "accept": "Confirmar",

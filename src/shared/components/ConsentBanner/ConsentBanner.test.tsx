@@ -59,7 +59,7 @@ describe('ConsentBanner', () => {
     expect(
       screen.getByRole('region', { name: 'Cookie consent' }),
     ).toHaveAccessibleDescription(
-      `We use cookies for product analytics to improve ${PRODUCT_NAME}. Essential functionality and error monitoring work without them.`,
+      `With your OK, we use PostHog analytics and Sentry session recordings to improve ${PRODUCT_NAME}. Everything else, error reports included, works without them. Closing this means no.`,
     );
   });
 
@@ -89,6 +89,28 @@ describe('ConsentBanner', () => {
     });
     rerender(<ConsentBanner />);
     expect(screen.queryByTestId('consent-banner')).not.toBeInTheDocument();
+  });
+
+  it('Close counts as declining (D161)', async () => {
+    const user = userEvent.setup();
+    render(<ConsentBanner />);
+
+    // a11y guard: the icon button says what closing does.
+    await user.click(screen.getByRole('button', { name: 'Close (counts as declining)' }));
+
+    expect(useConsentStore.getState().analyticsConsent).toBe('denied');
+    await waitFor(() => {
+      expect(captureAnalyticsConsentDecision).toHaveBeenCalledWith('denied');
+    });
+  });
+
+  it('asks again once the answer is six months old', () => {
+    useConsentStore.getState().setAnalyticsConsent('granted', {
+      decidedAt: '2020-01-01T00:00:00.000Z',
+      policyVersion: 1,
+    });
+    render(<ConsentBanner />);
+    expect(screen.getByTestId('consent-banner')).toBeInTheDocument();
   });
 
   it('renders nothing once a decision exists', () => {

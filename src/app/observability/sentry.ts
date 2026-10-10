@@ -5,6 +5,11 @@ import { platformConfig } from '@/core/config/env.ts';
 import { scrubEventUrls } from '@/lib/telemetry-scrub.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
+import {
+  currentAnalyticsConsent,
+  hasAnalyticsConsent,
+  useConsentStore,
+} from '@/shared/store/useConsentStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 type SentryModule = typeof SentryReact;
@@ -29,32 +34,69 @@ function syncOrganizationTags(Sentry: SentryModule): void {
   }
 }
 
-function buildIntegrations(Sentry: SentryModule, router: AnyRouter) {
+/** Session recording, masked: no text, no media. */
+function sessionReplayIntegration(Sentry: SentryModule) {
+  return Sentry.replayIntegration({
+    maskAllText: true,
+    blockAllMedia: true,
+  });
+}
+
+function buildIntegrations(
+  Sentry: SentryModule,
+  router: AnyRouter,
+  options: { recording: boolean },
+) {
   const integrations = [
     Sentry.tanstackRouterBrowserTracingIntegration(router),
     Sentry.httpClientIntegration(),
     Sentry.captureConsoleIntegration({ levels: ['error', 'warn'] }),
     Sentry.reportingObserverIntegration(),
     Sentry.extraErrorDataIntegration({ depth: 5 }),
-  ];
-
-  // Replay, profiling, logs, and feedback whenever a DSN is configured —
-  // including local `pnpm dev` with `.env.local` for full-flow QA.
-  integrations.push(
-    Sentry.replayIntegration({
-      maskAllText: true,
-      blockAllMedia: true,
-    }),
-    Sentry.browserProfilingIntegration(),
     Sentry.consoleLoggingIntegration({ levels: ['warn', 'error'] }),
     Sentry.feedbackIntegration({
       colorScheme: 'system',
       showBranding: false,
       autoInject: true,
     }),
-  );
+  ];
+
+  // Session recording and profiling only with the analytics consent (D161); error reports,
+  // logs and feedback run whenever a DSN is configured — including local `pnpm dev`.
+  if (options.recording) {
+    integrations.push(
+      sessionReplayIntegration(Sentry),
+      Sentry.browserProfilingIntegration(),
+    );
+  }
 
   return integrations;
+}
+
+/**
+ * Follow the analytics consent after init: a grant adds session recording (sampled as
+ * configured), a withdrawal stops it at once.
+ *
+ * @remarks Profiling is decided at init only — the SDK cannot add or stop it mid-session — so a
+ * changed answer reaches it at the next page load. A recording stopped by a withdrawal is not
+ * restarted by a later grant in the same page (the SDK's restart would skip the sampling); it
+ * resumes at the next load.
+ */
+let stopFollowingRecordingConsent: (() => void) | null = null;
+
+function followRecordingConsent(Sentry: SentryModule, recordingAtInit: boolean): void {
+  let replayAdded = recordingAtInit;
+  // One follower per page, even if init runs again.
+  stopFollowingRecordingConsent?.();
+  stopFollowingRecordingConsent = useConsentStore.subscribe((state, previous) => {
+    const granted = currentAnalyticsConsent(state) === 'granted';
+    if (granted === (currentAnalyticsConsent(previous) === 'granted')) return;
+    if (granted && !replayAdded) {
+      Sentry.addIntegration(sessionReplayIntegration(Sentry));
+      replayAdded = true;
+    }
+    if (!granted) void Sentry.getReplay()?.stop();
+  });
 }
 
 /**
@@ -70,13 +112,14 @@ export async function initSentry(router: AnyRouter): Promise<void> {
   if (!platformConfig.sentryDsn) return;
 
   const Sentry = await import('@sentry/react');
+  const recording = hasAnalyticsConsent();
 
   Sentry.init({
     dsn: platformConfig.sentryDsn,
     environment: platformConfig.environment,
     release: platformConfig.appVersion,
     enabled: true,
-    integrations: buildIntegrations(Sentry, router),
+    integrations: buildIntegrations(Sentry, router, { recording }),
 
     // Sentry v11 replaced `sendDefaultPii: false` with `dataCollection`, whose
     // defaults collect everything. Keep the old posture: no IP inference
@@ -167,6 +210,7 @@ export async function initSentry(router: AnyRouter): Promise<void> {
 
   useAuthStore.subscribe(() => syncUserContext(Sentry));
   useOrganizationStore.subscribe(() => syncOrganizationTags(Sentry));
+  followRecordingConsent(Sentry, recording);
 }
 
 /**

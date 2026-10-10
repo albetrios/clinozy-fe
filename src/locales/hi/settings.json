@@ -224,7 +224,15 @@
       "dangerZoneDescription": "आपके खाते के लिए अपरिवर्तनीय क्रियाएँ।",
       "deleteHeading": "खाता हटाएँ",
       "deleteBody": "अपना खाता और उससे जुड़ा सारा डेटा स्थायी रूप से हटाएँ।",
-      "deleteAction": "खाता हटाएँ"
+      "deleteAction": "खाता हटाएँ",
+      "privacyTitle": "गोपनीयता",
+      "privacyDescription": "उत्पाद विश्लेषण और सत्र रिकॉर्डिंग के बारे में आपकी पसंद, आपके खाते में सहेजी गई।",
+      "analyticsLabel": "उत्पाद विश्लेषण और सत्र रिकॉर्डिंग",
+      "analyticsHint": "PostHog विश्लेषण और Sentry सत्र रिकॉर्डिंग। त्रुटि रिपोर्ट हर हाल में चलती हैं।",
+      "consentGrantedOn": "{{date}} को अनुमति दी",
+      "consentDeniedOn": "{{date}} को अस्वीकार किया",
+      "consentUnanswered": "अभी उत्तर नहीं दिया",
+      "privacyPolicyLink": "गोपनीयता नीति"
     },
     "general": {
       "namePlaceholder": "Acme Inc.",
