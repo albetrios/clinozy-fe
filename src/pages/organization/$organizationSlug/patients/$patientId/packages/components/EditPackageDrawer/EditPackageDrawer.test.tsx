@@ -177,10 +177,13 @@ describe('EditPackageDrawer', () => {
     await user.click(await screen.findByTestId('package-drawer-sessions-increase'));
     await user.click(save());
     await waitFor(() =>
-      expect(notifyMock.error).toHaveBeenCalledWith('This record was changed meanwhile', {
-        id: 'package-save-failed',
-        action: { label: 'Reload', onClick: expect.any(Function) },
-      }),
+      expect(notifyMock.error).toHaveBeenCalledWith(
+        'Someone else saved this meanwhile. Reload to see their changes, then make yours again.',
+        {
+          id: 'package-save-failed',
+          action: { label: 'Reload', onClick: expect.any(Function) },
+        },
+      ),
     );
     const [, options] = notifyMock.error.mock.calls[0] as [
       string,

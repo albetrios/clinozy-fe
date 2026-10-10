@@ -5,6 +5,7 @@ import { queryClient } from '@/core/http/queryClient.ts';
 import { collectAllPages } from '@/shared/api/fetch-all-pages.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
+import type { DeleteReason } from './clinic-schema.ts';
 import {
   clinicSpecialtiesWire,
   type LowestPriceAccess,
@@ -200,7 +201,7 @@ export async function deleteOffering({
   note,
 }: {
   offeringId: string;
-  reason: string;
+  reason: DeleteReason;
   note: string | null;
 }): Promise<void> {
   await api.delete('/app/offerings/{offering_id}', {
@@ -319,7 +320,7 @@ export async function deleteOffer({
   note,
 }: {
   offerId: string;
-  reason: string;
+  reason: DeleteReason;
   note: string | null;
 }): Promise<void> {
   await api.delete('/app/offers/{offer_id}', {

@@ -376,7 +376,7 @@ describe('ReceivePaymentDrawer — edit (S:1710)', () => {
     await user.click(part('save'));
     await waitFor(() =>
       expect(notifyMock.error).toHaveBeenCalledWith(
-        'Someone saved it since',
+        'Someone else saved this meanwhile. Reload to see their changes, then make yours again.',
         expect.objectContaining({ action: expect.anything() }),
       ),
     );

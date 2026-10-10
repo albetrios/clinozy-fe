@@ -40,7 +40,10 @@ vi.mock('@/shared/hooks/useTreatments/index.ts', () => ({
   },
 }));
 
-async function openPicker(viewable?: Parameters<typeof renderInPatientFile>[1]) {
+async function openPicker(
+  viewable?: Parameters<typeof renderInPatientFile>[1],
+  access = { checkIns: true, logReview: true },
+) {
   const onClose = vi.fn();
   const user = userEvent.setup();
   const view = renderInPatientFile(
@@ -48,6 +51,7 @@ async function openPicker(viewable?: Parameters<typeof renderInPatientFile>[1]) 
       patientId={TEST_PATIENT_ID}
       patientName="Priya Shah"
       from="overview"
+      access={access}
       onClose={onClose}
     />,
     { file: patientFile(), section: 'overview', ...viewable },
@@ -97,6 +101,25 @@ describe('Log feedback (KICKOFF §6.6; H:4406–4409)', () => {
     );
     expect(within(picker).getByTestId(`${ID}-save`)).toHaveTextContent('Close');
     expect(await axeForDialog(baseElement)).toHaveNoViolations();
+  });
+
+  it('offers Marketing the reviews alone — no check-in, no treatment feedback (D83)', async () => {
+    const { picker } = await openPicker(undefined, { checkIns: false, logReview: true });
+    expect(
+      within(picker).queryByRole('group', { name: 'Check-in' }),
+    ).not.toBeInTheDocument();
+    expect(
+      within(picker).queryByRole('group', { name: 'Treatment feedback' }),
+    ).not.toBeInTheDocument();
+    expect(within(picker).getByTestId(`${ID}-review-google`)).toBeInTheDocument();
+  });
+
+  it('offers no review to a member who may change the file but not log reviews', async () => {
+    const { picker } = await openPicker(undefined, { checkIns: true, logReview: false });
+    expect(within(picker).getByTestId(`${ID}-check-in-visit`)).toBeInTheDocument();
+    expect(
+      within(picker).queryByRole('group', { name: 'Review' }),
+    ).not.toBeInTheDocument();
   });
 
   it('closes and opens a visit check-in over the section', async () => {

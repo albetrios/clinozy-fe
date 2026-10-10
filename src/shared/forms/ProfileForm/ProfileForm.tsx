@@ -18,6 +18,7 @@ import {
 import { useRegisterSettingsDirty } from '@/shared/components/SettingsModal/settings-dirty.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { mapFrontendError } from '@/shared/errors/map-frontend-error.ts';
+import { resetFormInPlace } from '@/shared/hooks/useEditingRecord/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { meContextQueryKey } from '@/shared/tenancy/me-context.ts';
@@ -50,16 +51,16 @@ export function ProfileForm({ email, defaultValues, onValuesChange }: ProfileFor
   const panels = SETTINGS_KEYS.panels.profile;
   const [showConfirm, setShowConfirm] = useState(false);
 
+  const form = useForm<ProfileInput>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: toDefaults(defaultValues),
+  });
   const {
     register,
     handleSubmit,
     watch,
-    reset,
     formState: { errors, isDirty },
-  } = useForm<ProfileInput>({
-    resolver: zodResolver(profileSchema),
-    defaultValues: toDefaults(defaultValues),
-  });
+  } = form;
 
   useRegisterSettingsDirty('profile', isDirty && !showConfirm);
 
@@ -84,11 +85,11 @@ export function ProfileForm({ email, defaultValues, onValuesChange }: ProfileFor
       return;
     }
     seededRef.current = next;
-    if (!isDirty) reset(next);
+    if (!isDirty) resetFormInPlace(form, next);
     // Compare the VALUES, not the object identity: the panel rebuilds this
     // object on every store write.
     // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed on the two fields, not the object
-  }, [defaultValues?.name, defaultValues?.jobTitle, isDirty, reset]);
+  }, [defaultValues?.name, defaultValues?.jobTitle, isDirty, form]);
 
   useEffect(() => {
     if (!onValuesChange) return undefined;
@@ -118,7 +119,7 @@ export function ProfileForm({ email, defaultValues, onValuesChange }: ProfileFor
           jobTitle: values.jobTitle,
         });
       }
-      reset(values);
+      resetFormInPlace(form, values);
       setShowConfirm(false);
       notify.success(i18n.t(ERRORS_KEYS.frontend.profileUpdated, { ns: ERRORS_NS }));
       await queryClient.invalidateQueries({ queryKey: meContextQueryKey });

@@ -56,8 +56,12 @@ vi.mock('@/shared/components/OfferingSuggestions/index.ts', async (importOrigina
   OfferingSuggestions: () => <div data-testid="offering-suggestions" />,
 }));
 vi.mock('./components/FeedbackCard/index.ts', () => ({
-  FeedbackCard: ({ canEdit, onLog, onEdit }: FeedbackCardProps) => (
-    <div data-testid="feedback-card" data-can-edit={canEdit}>
+  FeedbackCard: ({ access, onLog, onEdit }: FeedbackCardProps) => (
+    <div
+      data-testid="feedback-card"
+      data-can-edit={access.checkIns}
+      data-can-log-review={access.logReview}
+    >
       <button type="button" onClick={onLog}>
         Log feedback
       </button>
@@ -183,6 +187,10 @@ describe('PatientOverviewPage — Clinical notes (KICKOFF §6.6; H:780–826)', 
       }),
     );
     expect(screen.getByTestId('feedback-card')).toHaveAttribute('data-can-edit', 'true');
+    expect(screen.getByTestId('feedback-card')).toHaveAttribute(
+      'data-can-log-review',
+      'true',
+    );
     expect(await axe(container)).toHaveNoViolations();
   });
 

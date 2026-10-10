@@ -33,8 +33,10 @@ export interface FeedbackItemCardProps {
   item: FeedbackItem;
   /** Names the visit a review follows, from the patient's bookings. */
   visitOf: (appointmentId: string | null) => FeedbackVisit | null;
-  /** Patients edit: Edit, Remove and Log action. */
+  /** Edit and Log action — a check-in by `patient:update`, a review by `patient_review:update`. */
   canEdit: boolean;
+  /** Remove — a check-in by `patient:update`, a review by `patient_review:delete`. */
+  canRemove: boolean;
   onEdit: (item: FeedbackItem) => void;
   onRemove: (item: FeedbackItem) => void;
   onLogAction: (item: FeedbackItem, action: FeedbackActionKind) => void;
@@ -128,6 +130,56 @@ function ActionLine({
   );
 }
 
+/** A card's Edit and Remove, each by its kind's codes — nothing when neither is allowed. */
+function ItemActions({
+  item,
+  canEdit,
+  canRemove,
+  onEdit,
+  onRemove,
+  testId,
+}: Pick<
+  FeedbackItemCardProps,
+  'item' | 'canEdit' | 'canRemove' | 'onEdit' | 'onRemove' | 'testId'
+>) {
+  const { t } = useTranslation(CLINICAL_NS);
+  if (!(canEdit || canRemove)) return null;
+  return (
+    <fieldset
+      aria-label={t(K.actions)}
+      className="m-0 flex min-w-0 flex-none items-center overflow-hidden rounded-lg border p-0"
+    >
+      {canEdit ? (
+        <button
+          type="button"
+          onClick={() => onEdit(item)}
+          aria-label={t(K.edit)}
+          title={t(K.edit)}
+          data-testid={`${testId}-edit`}
+          className="text-muted-foreground hover:bg-muted hover:text-foreground flex size-6.5 items-center justify-center"
+        >
+          <PenLine aria-hidden="true" className="size-3.25" />
+        </button>
+      ) : null}
+      {canRemove ? (
+        <button
+          type="button"
+          onClick={() => onRemove(item)}
+          aria-label={t(K.remove)}
+          title={t(K.remove)}
+          data-testid={`${testId}-remove`}
+          className={cn(
+            'text-muted-foreground hover:bg-destructive/10 hover:text-destructive flex size-6.5 items-center justify-center',
+            canEdit && 'border-s',
+          )}
+        >
+          <Trash aria-hidden="true" className="size-3.25" />
+        </button>
+      ) : null}
+    </fieldset>
+  );
+}
+
 /**
  * One card of the Feedback carousel (H:4389; `patient-file.md:52–56`): 236px
  * tall — the type's tile, name and sub line with Edit / Remove; the feel or
@@ -140,6 +192,7 @@ export function FeedbackItemCard({
   item,
   visitOf,
   canEdit,
+  canRemove,
   onEdit,
   onRemove,
   onLogAction,
@@ -181,33 +234,14 @@ export function FeedbackItemCard({
           <span className="text-body font-semibold">{view.typeLabel}</span>
           <span className="text-caption text-muted-foreground truncate">{view.sub}</span>
         </span>
-        {canEdit ? (
-          <fieldset
-            aria-label={t(K.actions)}
-            className="m-0 flex min-w-0 flex-none items-center overflow-hidden rounded-lg border p-0"
-          >
-            <button
-              type="button"
-              onClick={() => onEdit(item)}
-              aria-label={t(K.edit)}
-              title={t(K.edit)}
-              data-testid={`${testId}-edit`}
-              className="text-muted-foreground hover:bg-muted hover:text-foreground flex size-6.5 items-center justify-center"
-            >
-              <PenLine aria-hidden="true" className="size-3.25" />
-            </button>
-            <button
-              type="button"
-              onClick={() => onRemove(item)}
-              aria-label={t(K.remove)}
-              title={t(K.remove)}
-              data-testid={`${testId}-remove`}
-              className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive flex size-6.5 items-center justify-center border-s"
-            >
-              <Trash aria-hidden="true" className="size-3.25" />
-            </button>
-          </fieldset>
-        ) : null}
+        <ItemActions
+          item={item}
+          canEdit={canEdit}
+          canRemove={canRemove}
+          onEdit={onEdit}
+          onRemove={onRemove}
+          testId={testId}
+        />
       </div>
       <div className="flex h-6 min-w-0 items-center gap-1.5 overflow-hidden">
         <span

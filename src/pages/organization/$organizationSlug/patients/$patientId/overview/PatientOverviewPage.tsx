@@ -20,10 +20,11 @@ import { notify } from '@/shared/notify/index.ts';
 
 import { PatientSection } from '../shared/components/PatientSection/index.ts';
 import { useClinicalLists } from '../shared/hooks/useClinicalLists/index.ts';
+import { useReviewAccess } from '../shared/hooks/useReviewAccess/index.ts';
 import { CLINICAL_LISTS, type ClinicalChip } from '../shared/patient-clinical.ts';
 import { usePatientFileContext } from '../shared/patient-file-context.ts';
 import { ClinicalChipCard } from './components/ClinicalChipCard/index.ts';
-import { FeedbackCard } from './components/FeedbackCard/index.ts';
+import { type FeedbackAccess, FeedbackCard } from './components/FeedbackCard/index.ts';
 import { LogFeedbackPicker } from './components/LogFeedbackPicker/index.ts';
 import { CLINICAL_KEYS, CLINICAL_NS, OVERVIEW_TEST_IDS } from './overview.constants.ts';
 import { manifest } from './overview.manifest.ts';
@@ -64,6 +65,14 @@ export function PatientOverviewPage() {
   const { patientId, file } = usePatientFileContext();
   const access = useClinicAccess();
   const canEdit = access.isResolved && access.can('patients', 'edit');
+  // Reviews have their own codes (clinozy-be D83 (4)) — Marketing logs them, the file stays shut.
+  const reviews = useReviewAccess();
+  const feedbackAccess: FeedbackAccess = {
+    checkIns: canEdit,
+    logReview: reviews.log,
+    editReview: reviews.edit,
+    removeReview: reviews.remove,
+  };
   const lists = useClinicalLists(file?.patient);
   const [pricesShown, setPricesShown] = useState(false);
   const [logging, setLogging] = useState(false);
@@ -129,7 +138,7 @@ export function PatientOverviewPage() {
           ) : null}
           <FeedbackCard
             patientId={patientId}
-            canEdit={canEdit}
+            access={feedbackAccess}
             onLog={() => setLogging(true)}
             onEdit={edit}
           />
@@ -140,6 +149,7 @@ export function PatientOverviewPage() {
           patientId={patientId}
           patientName={patientName(file.patient)}
           from="overview"
+          access={feedbackAccess}
           onClose={() => setLogging(false)}
         />
       ) : null}

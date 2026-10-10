@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import { feedbackQueryKeys, fetchReview } from '@/shared/api/clinic/feedback-api.ts';
 import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDialogRouteRecord } from '@/shared/hooks/useDialogRouteRecord/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
@@ -16,6 +15,7 @@ import {
   ReviewDrawer,
 } from '../../../shared/components/ReviewDrawer/index.ts';
 import { usePatientFileDialog } from '../../../shared/hooks/usePatientFileDialog/index.ts';
+import { useReviewAccess } from '../../../shared/hooks/useReviewAccess/index.ts';
 import { usePatientFileContext } from '../../../shared/patient-file-context.ts';
 
 /**
@@ -29,8 +29,9 @@ export function EditReviewPage() {
   const { t } = useTranslation(REVIEW_NS);
   const { reviewId } = useParams({ strict: false });
   const { patientId, file } = usePatientFileContext();
-  const access = useClinicAccess();
-  const canEdit = access.isResolved ? access.can('patients', 'edit') : undefined;
+  // Reviews have their own codes (clinozy-be D83 (4)), not the file's `patient:update`.
+  const reviews = useReviewAccess();
+  const canEdit = reviews.resolved ? reviews.edit : undefined;
   const { behind, back } = usePatientFileDialog({ canOpen: canEdit });
   const organizationId = useOrganizationStore((state) => state.organizationId);
   const { record } = useDialogRouteRecord({

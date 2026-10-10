@@ -70,6 +70,10 @@ export const organizationPermissionSchema = z.enum([
   'patient_prescription:delete',
   'patient_prescription:read',
   'patient_prescription:update',
+  // reviews — their own codes, so Marketing logs reviews (clinozy-be D83 (4))
+  'patient_review:create',
+  'patient_review:delete',
+  'patient_review:update',
   'patient_treatment:create',
   'patient_treatment:read',
   'patient_treatment:update',

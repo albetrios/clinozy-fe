@@ -768,7 +768,7 @@ describe('OfferingDrawer — Edit offering', () => {
     await user.click(part('save'));
     await waitFor(() =>
       expect(notifyMock.error).toHaveBeenCalledWith(
-        expect.stringContaining('This record was changed by'),
+        'Someone else saved this meanwhile. Reload to see their changes, then make yours again.',
         expect.objectContaining({ action: expect.objectContaining({ label: 'Reload' }) }),
       ),
     );

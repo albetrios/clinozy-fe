@@ -11,6 +11,7 @@ import { organizationHome } from '@/lib/routes/index.ts';
 import { DrawerField, DrawerInput } from '@/shared/components/DrawerField/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { mapApiError } from '@/shared/errors/errorHandler.ts';
+import { resetFormInPlace } from '@/shared/hooks/useEditingRecord/index.ts';
 import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useWorkspaceSwitchStore } from '@/shared/store/useWorkspaceSwitchStore/index.ts';
@@ -33,6 +34,8 @@ interface CreateOrganizationDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
+/** The empty form a new organization starts on — and is restarted on after a create. */
+const EMPTY_ORGANIZATION: CreateOrganizationInput = { name: '', slug: '' };
 /**
  * The drawer that creates a new organization, from the org switcher or the
  * picker (L-65: every centred modal is a drawer). On success it refreshes the
@@ -56,15 +59,15 @@ export function CreateOrganizationDialog({
   /** The form the footer's Create submits — Enter in either field creates too. */
   const formId = `create-organization-${useId().replace(/:/g, '')}`;
 
+  const form = useForm<CreateOrganizationInput>({
+    resolver: zodResolver(createOrganizationSchema),
+    defaultValues: EMPTY_ORGANIZATION,
+  });
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors, isSubmitting },
-  } = useForm<CreateOrganizationInput>({
-    resolver: zodResolver(createOrganizationSchema),
-    defaultValues: { name: '', slug: '' },
-  });
+  } = form;
   const { ref: registerNameRef, ...nameField } = register('name');
 
   const onSubmit = async (data: CreateOrganizationInput) => {
@@ -94,7 +97,7 @@ export function CreateOrganizationDialog({
       // back to this form: they would "fix" a form that was never wrong and
       // submit again, creating a SECOND organization. Close first, then run the
       // follow-up steps — each failure is recoverable and reported as itself.
-      reset();
+      resetFormInPlace(form, EMPTY_ORGANIZATION);
       setOpen(false);
       notify.success(
         i18n.t(ERRORS_KEYS.frontend.organization.createSuccess, {

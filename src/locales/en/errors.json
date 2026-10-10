@@ -56,7 +56,8 @@
     "http500": "An internal server error occurred. Please try again later.",
     "http502": "The server is temporarily unavailable. Please try again later.",
     "http503": "The service is temporarily unavailable. Please try again later.",
-    "reload": "Reload"
+    "reload": "Reload",
+    "recordChanged": "Someone else saved this meanwhile. Reload to see their changes, then make yours again."
   },
   "frontend": {
     "query": {

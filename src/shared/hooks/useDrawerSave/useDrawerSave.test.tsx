@@ -48,7 +48,7 @@ describe('useDrawerSave', () => {
     vi.resetAllMocks();
   });
 
-  it('a stale save toasts the server message with Reload, which loads the record again', async () => {
+  it('a stale save toasts our own words — never the server’s user id and time — with Reload, which loads the record again', async () => {
     const onStale = vi.fn();
     const onConflict = vi.fn();
     const { result } = renderSave({
@@ -58,7 +58,8 @@ describe('useDrawerSave', () => {
             type: 'request_error',
             code: 'conflict',
             reason: 'record_changed',
-            detail: 'Someone saved this lead after you opened it',
+            detail:
+              'This record was changed by usr_kb5tlncpzg38oat3s7nv7 at 2026-10-10T11:45:34.719Z — reload and try again',
           }),
         ),
       onStale,
@@ -73,7 +74,10 @@ describe('useDrawerSave', () => {
       string,
       { id: string; action: { label: string; onClick: () => void } },
     ];
-    expect(message).toBe('Someone saved this lead after you opened it');
+    expect(message).toBe(
+      'Someone else saved this meanwhile. Reload to see their changes, then make yours again.',
+    );
+    expect(message).not.toMatch(/usr_|\d{4}-\d{2}-\d{2}T/);
     expect(options.id).toBe('lead-save');
     expect(options.action.label).toBe('Reload');
     options.action.onClick();
@@ -90,7 +94,10 @@ describe('useDrawerSave', () => {
 
     await act(() => result.current.drawer.save());
 
-    expect(errorMock).toHaveBeenCalledWith('Changed meanwhile', { id: 'lead-save' });
+    expect(errorMock).toHaveBeenCalledWith(
+      'Someone else saved this meanwhile. Reload to see their changes, then make yours again.',
+      { id: 'lead-save' },
+    );
   });
 
   it("another 409 still goes to the screen's onConflict", async () => {

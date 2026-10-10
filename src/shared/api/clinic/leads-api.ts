@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { api } from '@/core/http/api.ts';
 
 import { createdRangeOf, followUpRangeOf } from './clinic-filter-ranges.ts';
+import type { DeleteReason } from './clinic-schema.ts';
 import { clinicToday } from './clinic-time.ts';
 import type { ContactFields } from './contacts-contracts.ts';
 import { contactBodyOf } from './contacts-contracts.ts';
@@ -205,7 +206,7 @@ export async function deleteLead({
   note,
 }: {
   leadId: string;
-  reason: string;
+  reason: DeleteReason;
   note: string | null;
 }): Promise<void> {
   await api.delete('/app/leads/{lead_id}', {

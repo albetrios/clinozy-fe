@@ -299,7 +299,9 @@ describe('StockItemDrawer (clinic-stock.md:105–124, 219–231)', () => {
       string,
       { action: { onClick: () => void } },
     ];
-    expect(message).toBe('Someone changed this item since you opened it');
+    expect(message).toBe(
+      'Someone else saved this meanwhile. Reload to see their changes, then make yours again.',
+    );
     options.action.onClick();
     await waitFor(() =>
       expect(within(drawer).getByTestId(`${D}-name`)).toHaveValue(

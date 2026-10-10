@@ -6,6 +6,7 @@ import { collectAllPages } from '@/shared/api/fetch-all-pages.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 import { createdRangeOf } from './clinic-filter-ranges.ts';
+import type { DeleteReason } from './clinic-schema.ts';
 import { civilDayOffset, clinicToday } from './clinic-time.ts';
 import { fetchTeamDirectory, teamDirectoryQueryKey } from './directory-api.ts';
 import {
@@ -476,7 +477,7 @@ export async function deletePayment({
   note,
 }: {
   paymentId: string;
-  reason: string;
+  reason: DeleteReason;
   note: string | null;
 }): Promise<void> {
   await api.delete('/app/payments/{payment_id}', {

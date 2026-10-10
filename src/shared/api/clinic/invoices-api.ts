@@ -5,6 +5,7 @@ import { queryClient } from '@/core/http/queryClient.ts';
 import { collectAllPages } from '@/shared/api/fetch-all-pages.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
+import type { DeleteReason } from './clinic-schema.ts';
 import {
   type ClinicInvoiceType,
   invoiceChangeOf,
@@ -375,7 +376,7 @@ export async function deleteInvoice({
   note,
 }: {
   invoiceId: string;
-  reason: string;
+  reason: DeleteReason;
   note: string | null;
 }): Promise<void> {
   await api.delete('/app/invoices/{invoice_id}', {

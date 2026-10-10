@@ -28,6 +28,7 @@ import {
   type AssignablePermissions,
   useAssignablePermissions,
 } from '@/shared/hooks/useAssignablePermissions/index.ts';
+import { resetFormInPlace } from '@/shared/hooks/useEditingRecord/index.ts';
 import {
   useCreateRole,
   useRolePermissions,
@@ -171,16 +172,16 @@ export function CreateRoleDialog({
     ? { name: role.name, description: role.description, permissions: role.permissions }
     : EMPTY_ROLE;
 
+  const form = useForm<RoleInput>({
+    resolver: zodResolver(roleInputSchema),
+    defaultValues: initialValues,
+  });
   const {
     register,
     handleSubmit,
     control,
-    reset,
     formState: { errors, isSubmitting },
-  } = useForm<RoleInput>({
-    resolver: zodResolver(roleInputSchema),
-    defaultValues: initialValues,
-  });
+  } = form;
   const { ref: registerNameRef, ...nameField } = register('name');
 
   /**
@@ -199,12 +200,12 @@ export function CreateRoleDialog({
     }
     if (!rolePermissions.isSuccess || hydratedFor.current === role.id) return;
     hydratedFor.current = role.id;
-    reset({
+    resetFormInPlace(form, {
       name: role.name,
       description: role.description,
       permissions: rolePermissions.data,
     });
-  }, [role, rolePermissions.isSuccess, rolePermissions.data, reset]);
+  }, [role, rolePermissions.isSuccess, rolePermissions.data, form]);
 
   // In edit mode, don't allow a save before the real permissions load.
   const permissionsPending = isEdit && !rolePermissions.isSuccess;
@@ -215,7 +216,7 @@ export function CreateRoleDialog({
     } else {
       await createRole.mutateAsync(data);
     }
-    reset(isEdit ? data : EMPTY_ROLE);
+    resetFormInPlace(form, isEdit ? data : EMPTY_ROLE);
     setOpen(false);
   };
 

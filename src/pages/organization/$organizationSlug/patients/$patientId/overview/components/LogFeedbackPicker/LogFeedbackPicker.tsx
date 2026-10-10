@@ -28,6 +28,7 @@ import {
   LOG_FEEDBACK_KEYS,
   OVERVIEW_TEST_IDS,
 } from '../../overview.constants.ts';
+import type { FeedbackAccess } from '../FeedbackCard/index.ts';
 
 const K = LOG_FEEDBACK_KEYS;
 const ID = OVERVIEW_TEST_IDS.logFeedback;
@@ -51,6 +52,8 @@ export interface LogFeedbackPickerProps {
   patientName: string;
   /** The section it opened over — the drawer a chip opens keeps it behind (`?from=`). */
   from: PatientFileSectionSlug;
+  /** What it may offer: check-ins (`patient:update`), reviews (`patient_review:create`, D83). */
+  access: Pick<FeedbackAccess, 'checkIns' | 'logReview'>;
   onClose: () => void;
 }
 
@@ -67,6 +70,7 @@ export function LogFeedbackPicker({
   patientId,
   patientName,
   from,
+  access,
   onClose,
 }: LogFeedbackPickerProps) {
   const { t } = useTranslation([CLINICAL_NS, CLINIC_NS]);
@@ -78,7 +82,7 @@ export function LogFeedbackPicker({
   // A reversed session is not followed up.
   const treatments = (
     usePatientTreatments(patientId, {
-      enabled: viewable.includes('treatments'),
+      enabled: access.checkIns && viewable.includes('treatments'),
       notifyOnError: false,
     }).data ?? []
   )
@@ -116,25 +120,27 @@ export function LogFeedbackPicker({
     >
       {/* Titled groups 12px apart, no step cards (H:4406 `stepMode: 'off'`). */}
       <div className="flex flex-col gap-3">
-        <DrawerFieldGrid title={t(K.groups.checkIn)}>
-          <DrawerField span="full">
-            <DrawerChips
-              label={t(K.groups.checkIn)}
-              options={[
-                {
-                  value: 'visit',
-                  label: t(K.consultation),
-                  tone: 'sage',
-                  hint: t(K.hints.consultation),
-                },
-              ]}
-              value={null}
-              onChange={() => checkIn()}
-              testId={`${ID}-check-in`}
-            />
-          </DrawerField>
-        </DrawerFieldGrid>
-        {treatments.length > 0 ? (
+        {access.checkIns ? (
+          <DrawerFieldGrid title={t(K.groups.checkIn)}>
+            <DrawerField span="full">
+              <DrawerChips
+                label={t(K.groups.checkIn)}
+                options={[
+                  {
+                    value: 'visit',
+                    label: t(K.consultation),
+                    tone: 'sage',
+                    hint: t(K.hints.consultation),
+                  },
+                ]}
+                value={null}
+                onChange={() => checkIn()}
+                testId={`${ID}-check-in`}
+              />
+            </DrawerField>
+          </DrawerFieldGrid>
+        ) : null}
+        {access.checkIns && treatments.length > 0 ? (
           <DrawerFieldGrid title={t(K.groups.treatment)}>
             <DrawerField span="full">
               <DrawerChips
@@ -156,24 +162,26 @@ export function LogFeedbackPicker({
             </DrawerField>
           </DrawerFieldGrid>
         ) : null}
-        <DrawerFieldGrid title={t(K.groups.review)}>
-          <DrawerField span="full">
-            <DrawerChips
-              label={t(K.groups.review)}
-              options={REVIEW_SOURCE_VALUES.map((source) => ({
-                value: source,
-                label: t(CLINIC_KEYS.reviewSources[source], { ns: CLINIC_NS }),
-                tone: REVIEW_SOURCE_TONES[source],
-                hint: t(SOURCE_HINTS[source]),
-              }))}
-              value={null}
-              onChange={(source) => {
-                if (source) review(source);
-              }}
-              testId={`${ID}-review`}
-            />
-          </DrawerField>
-        </DrawerFieldGrid>
+        {access.logReview ? (
+          <DrawerFieldGrid title={t(K.groups.review)}>
+            <DrawerField span="full">
+              <DrawerChips
+                label={t(K.groups.review)}
+                options={REVIEW_SOURCE_VALUES.map((source) => ({
+                  value: source,
+                  label: t(CLINIC_KEYS.reviewSources[source], { ns: CLINIC_NS }),
+                  tone: REVIEW_SOURCE_TONES[source],
+                  hint: t(SOURCE_HINTS[source]),
+                }))}
+                value={null}
+                onChange={(source) => {
+                  if (source) review(source);
+                }}
+                testId={`${ID}-review`}
+              />
+            </DrawerField>
+          </DrawerFieldGrid>
+        ) : null}
       </div>
     </RecordDrawer>
   );

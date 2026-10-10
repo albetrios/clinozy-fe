@@ -327,9 +327,9 @@ function LockedNotice({ locked }: { locked: InvoiceDrawerAccess['locked'] }) {
   );
 }
 
-/** The figures the totals strip reads of the preview — none on a sale or a read-only invoice. */
-function totalsPreview(preview: DrawerPreview, live: boolean) {
-  return live ? { failure: preview.failure, retry: preview.retry } : null;
+/** The figures the totals strip reads of the preview. */
+function totalsPreview(preview: DrawerPreview) {
+  return { failure: preview.failure, retry: preview.retry };
 }
 
 /** An edit keeps its team, and so does a copy of an invoice that has one (`payments.md:139`). */
@@ -534,7 +534,8 @@ function InvoiceDrawerSession(props: InvoiceDrawerProps) {
         footerStrip={
           <InvoiceTotals
             figures={money.figures}
-            preview={totalsPreview(parts.preview, parts.live)}
+            // None on a sale or a read-only invoice.
+            preview={parts.live ? totalsPreview(parts.preview) : null}
           />
         }
         content={CONTENT_PROFILE}

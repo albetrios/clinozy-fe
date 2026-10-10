@@ -34,6 +34,14 @@ const CODE_TO_AUTH_KEY: Record<string, string> = {
     ERRORS_KEYS.frontend.organization.roleRequired,
 };
 
+/**
+ * clinozy-be `error.reason` codes said in our own words (the `errors` namespace) instead of the
+ * server's English `detail`.
+ */
+const REASON_TO_ERRORS_KEY: Record<string, string> = {
+  record_changed: ERRORS_KEYS.api.recordChanged,
+};
+
 function translateKey(key: string): string {
   if (key.startsWith('frontend.')) {
     return tErrors(key);
@@ -85,6 +93,8 @@ function resolveHttpReason(error: unknown): string | undefined {
     { error?: { reason?: string; detail?: string } } | null | undefined;
   const reason = body?.error?.reason;
   if (typeof reason === 'string') {
+    const errorsKey = REASON_TO_ERRORS_KEY[reason];
+    if (errorsKey) return tErrors(errorsKey);
     const fromReason = resolveByCode(reason);
     if (fromReason) return fromReason;
   }

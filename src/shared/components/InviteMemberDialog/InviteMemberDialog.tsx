@@ -15,6 +15,7 @@ import {
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
+import { resetFormInPlace } from '@/shared/hooks/useEditingRecord/index.ts';
 import { useInviteMember } from '@/shared/hooks/useInvitations/index.ts';
 import { useRoles } from '@/shared/hooks/useRoles/index.ts';
 import { UserPlus } from '@/shared/icons/index.ts';
@@ -50,18 +51,18 @@ export function InviteMemberDialog() {
   const hasRoles = invitableRoles.length > 0;
   const defaultRoleId = leastPrivilegeRoleId(invitableRoles);
 
+  const form = useForm<InviteInput>({
+    resolver: zodResolver(inviteSchema),
+    defaultValues: { email: '', roleId: '' },
+  });
   const {
     register,
     handleSubmit,
     control,
-    reset,
     getValues,
     setValue,
     formState: { errors, isSubmitting },
-  } = useForm<InviteInput>({
-    resolver: zodResolver(inviteSchema),
-    defaultValues: { email: '', roleId: '' },
-  });
+  } = form;
   const { ref: registerEmailRef, ...emailField } = register('email');
 
   // Preselect the least-privileged well-known role once the list loads. Only
@@ -76,7 +77,7 @@ export function InviteMemberDialog() {
 
   const onSubmit = async (data: InviteInput) => {
     await invite.mutateAsync(data);
-    reset({ email: '', roleId: defaultRoleId ?? '' });
+    resetFormInPlace(form, { email: '', roleId: defaultRoleId ?? '' });
     setOpen(false);
   };
 

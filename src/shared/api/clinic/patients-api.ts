@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { api } from '@/core/http/api.ts';
 
 import { createdRangeOf, followUpRangeOf } from './clinic-filter-ranges.ts';
+import type { DeleteReason } from './clinic-schema.ts';
 import { clinicToday } from './clinic-time.ts';
 import { fetchContact, fetchContactsByIds } from './contacts-api.ts';
 import {
@@ -161,7 +162,7 @@ export async function deletePatient({
   note,
 }: {
   patientId: string;
-  reason: string;
+  reason: DeleteReason;
   note: string | null;
 }): Promise<void> {
   await api.delete('/app/patients/{patient_id}', {

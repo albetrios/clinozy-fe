@@ -911,7 +911,7 @@ describe('InvoiceDrawer — Edit invoice on clinozy-be', () => {
     await user.click(screen.getByTestId('invoice-drawer-save'));
     await waitFor(() =>
       expect(notifyMock.error).toHaveBeenCalledWith(
-        'Changed by Nisha Shah',
+        'Someone else saved this meanwhile. Reload to see their changes, then make yours again.',
         expect.objectContaining({ action: expect.objectContaining({ label: 'Reload' }) }),
       ),
     );

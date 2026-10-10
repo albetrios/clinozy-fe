@@ -36,6 +36,11 @@ import {
   FEEDBACK_KEYS,
   OVERVIEW_TEST_IDS,
 } from '../../overview.constants.ts';
+import {
+  canLogFeedback,
+  type FeedbackAccess,
+  feedbackItemAccess,
+} from './feedback-access.ts';
 import { useFeedbackCarousel } from './feedback-carousel.ts';
 import {
   FEEDBACK_TYPE_LOOK,
@@ -87,8 +92,8 @@ function CarouselArrow({
 /** Props of {@link FeedbackCard}. */
 export interface FeedbackCardProps {
   patientId: string;
-  /** Patients edit: log, edit, remove and the follow-ups. */
-  canEdit: boolean;
+  /** What the member may do: check-ins by `patient:update`, reviews by their own codes (D83). */
+  access: FeedbackAccess;
   /** "Log feedback ⌄" and the empty tile — the Log feedback picker. */
   onLog: () => void;
   /** A card's Edit — its drawer over the file. */
@@ -190,7 +195,7 @@ interface FeedbackTrackProps {
   empty: boolean;
   /** Cards of this type not shown yet — the "Load more" tile shows up to six more. */
   left: number;
-  canEdit: boolean;
+  access: FeedbackAccess;
   onLog: () => void;
   onLoadMore: () => void;
   onEdit: (item: FeedbackItem) => void;
@@ -207,7 +212,7 @@ function FeedbackTrack({
   visitOf,
   empty,
   left,
-  canEdit,
+  access,
   onLog,
   onLoadMore,
   onEdit,
@@ -245,8 +250,8 @@ function FeedbackTrack({
         {empty ? (
           <button
             type="button"
-            onClick={canEdit ? onLog : undefined}
-            disabled={!canEdit}
+            onClick={canLogFeedback(access) ? onLog : undefined}
+            disabled={!canLogFeedback(access)}
             data-testid={`${ID}-empty`}
             className="border-border-strong hover:bg-muted/50 col-span-full flex min-h-30 flex-col items-center justify-center gap-1.5 rounded-xl border-[1.5px] border-dashed p-4 text-center"
           >
@@ -261,7 +266,7 @@ function FeedbackTrack({
             key={item.id}
             item={item}
             visitOf={visitOf}
-            canEdit={canEdit}
+            {...feedbackItemAccess(item, access)}
             onEdit={onEdit}
             onRemove={onRemove}
             onLogAction={onLogAction}
@@ -404,7 +409,7 @@ function countsOf(items: readonly FeedbackItem[]) {
  * the type chips ("All" and the types this patient has), then the carousel,
  * six at a time — or the dashed "No feedback yet" tile that opens the picker.
  */
-export function FeedbackCard({ patientId, canEdit, onLog, onEdit }: FeedbackCardProps) {
+export function FeedbackCard({ patientId, access, onLog, onEdit }: FeedbackCardProps) {
   const { t } = useTranslation(CLINICAL_NS);
   const { file } = usePatientFileContext();
   const [open, setOpen] = useState(false);
@@ -476,7 +481,7 @@ export function FeedbackCard({ patientId, canEdit, onLog, onEdit }: FeedbackCard
             )}
           />
         </button>
-        {canEdit ? (
+        {canLogFeedback(access) ? (
           <Button
             type="button"
             size="sm"
@@ -497,7 +502,7 @@ export function FeedbackCard({ patientId, canEdit, onLog, onEdit }: FeedbackCard
           isPending={feedback.isPending}
           onRetry={() => void feedback.refetch()}
           visitOf={visitOf}
-          canEdit={canEdit}
+          access={access}
           onLog={onLog}
           onEdit={onEdit}
           onRemove={setRemoving}

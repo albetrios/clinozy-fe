@@ -56,7 +56,8 @@
     "http500": "Ein interner Serverfehler ist aufgetreten. Bitte später erneut versuchen.",
     "http502": "Der Server ist vorübergehend nicht verfügbar. Bitte später erneut versuchen.",
     "http503": "Der Dienst ist vorübergehend nicht verfügbar. Bitte später erneut versuchen.",
-    "reload": "Neu laden"
+    "reload": "Neu laden",
+    "recordChanged": "Jemand anderes hat das inzwischen gespeichert. Lade neu, um die Änderungen zu sehen, und nimm deine dann erneut vor."
   },
   "frontend": {
     "query": {

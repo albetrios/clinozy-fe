@@ -29,7 +29,16 @@ import {
   renderInPatientFile,
   resetPatientFile,
 } from '../../../__tests__/integration/patient-file-test-router.tsx';
+import { type FeedbackAccess, READ_ONLY_FEEDBACK } from './feedback-access.ts';
 import { FeedbackCard, type FeedbackCardProps } from './FeedbackCard.tsx';
+
+/** A member who may do everything with feedback — check-ins and reviews. */
+const FULL_ACCESS: FeedbackAccess = {
+  checkIns: true,
+  logReview: true,
+  editReview: true,
+  removeReview: true,
+};
 
 const { notifyMock } = vi.hoisted(() => ({
   notifyMock: {
@@ -165,7 +174,7 @@ function renderCard(
   const view = renderInPatientFile(
     <FeedbackCard
       patientId={TEST_PATIENT_ID}
-      canEdit
+      access={FULL_ACCESS}
       onLog={onLog}
       onEdit={onEdit}
       {...props}
@@ -373,9 +382,25 @@ describe('FeedbackCard (KICKOFF §6.6 Feedback)', () => {
   });
 
   it('only reads without Patients edit', async () => {
-    const { card } = await openCard({ canEdit: false });
+    const { card } = await openCard({ access: READ_ONLY_FEEDBACK });
     expect(within(card).queryByTestId(`${ID}-log`)).not.toBeInTheDocument();
     await waitFor(() => expect(items()).toHaveLength(3));
     expect(within(card).queryByTestId(`${ID}-item-edit`)).not.toBeInTheDocument();
+  });
+
+  it('lets Marketing log and change reviews only — the check-ins stay the file’s (D83)', async () => {
+    const { card } = await openCard({
+      access: {
+        ...READ_ONLY_FEEDBACK,
+        logReview: true,
+        editReview: true,
+        removeReview: true,
+      },
+    });
+    expect(within(card).getByTestId(`${ID}-log`)).toBeInTheDocument();
+    await waitFor(() => expect(items()).toHaveLength(3));
+    // Two check-ins and one review: only the review offers Edit and Remove.
+    expect(within(card).getAllByTestId(`${ID}-item-edit`)).toHaveLength(1);
+    expect(within(card).getAllByTestId(`${ID}-item-remove`)).toHaveLength(1);
   });
 });

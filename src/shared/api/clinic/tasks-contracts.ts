@@ -533,7 +533,7 @@ const FOLLOW_ON_CODES: Readonly<Record<TaskFollowOnForm, string | null>> = {
   appointmentNew: 'appointment:create',
   appointmentRebook: 'appointment:create',
   appointmentMove: 'appointment:update',
-  reviewLog: 'patient:update',
+  reviewLog: 'patient_review:create',
   visitCheckIn: 'patient:update',
   aftercareCheckIn: 'patient:update',
   patientFile: null,
@@ -678,7 +678,7 @@ const TASK_SNOOZE_LABEL_MAX = 40;
 /** Words clamped to a server limit, trimmed — `undefined` when nothing is left. */
 function clampText(text: string | null | undefined, max: number): string | undefined {
   const clamped = text?.trim().slice(0, max).trim();
-  return clamped ? clamped : undefined;
+  return clamped === '' ? undefined : clamped;
 }
 
 /** An outcome's words as `result_text` takes them (1–200). */

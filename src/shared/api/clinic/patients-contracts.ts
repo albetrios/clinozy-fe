@@ -55,8 +55,10 @@ const patientFieldsWire = {
   lead_id: z.string().nullable(),
   has_data_consent: z.boolean(),
   has_photo_consent: z.boolean(),
-  allergies: z.array(z.string()),
-  contraindications: z.array(z.string()),
+  // Null to a caller without patient:clinical_record:read, patient:update or
+  // patient_prescription:read (clinozy-be D83 (3)) — "not visible to you", not "none".
+  allergies: z.array(z.string()).nullable(),
+  contraindications: z.array(z.string()).nullable(),
   created_at: z.string(),
   updated_at: z.string(),
 };
@@ -89,11 +91,17 @@ interface PatientFileFields {
   /** Their doctor's membership id. */
   doctorId: string | null;
   followUpAt: string | null;
+  /** The file's notes — also null when the caller may not see the medical details (D83 (3)). */
   notes: string | null;
   /** The lead they came from. */
   leadId: string | null;
-  allergies: string[];
-  contraindications: string[];
+  /**
+   * The medical details — `null` when the caller may not see them (clinozy-be D83 (3): the
+   * Accountant and Marketing), which is not "none recorded" (`[]`).
+   */
+  allergies: string[] | null;
+  /** As {@link PatientFileFields.allergies}: `null` = not visible to the caller. */
+  contraindications: string[] | null;
   createdAt: string;
   /** What a file change sends back as `expected_updated_at`. */
   updatedAt: string;

@@ -56,7 +56,8 @@
     "http500": "Si è verificato un errore interno del server. Riprova più tardi.",
     "http502": "Il server è temporaneamente non disponibile. Riprova più tardi.",
     "http503": "Il servizio è temporaneamente non disponibile. Riprova più tardi.",
-    "reload": "Ricarica"
+    "reload": "Ricarica",
+    "recordChanged": "Qualcun altro l’ha salvato nel frattempo. Ricarica per vedere le sue modifiche, poi rifai le tue."
   },
   "frontend": {
     "query": {

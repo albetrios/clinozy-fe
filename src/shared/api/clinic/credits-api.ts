@@ -5,6 +5,7 @@ import { isHttpError } from '@/shared/errors/HttpError.ts';
 
 import { createdRangeOf } from './clinic-filter-ranges.ts';
 import type { CursorPage } from './clinic-fixture-store.ts';
+import type { DeleteReason } from './clinic-schema.ts';
 import { clinicToday } from './clinic-time.ts';
 import { isContactSearchable } from './contacts-api.ts';
 import { contactNameOf, contactRowWire } from './contacts-contracts.ts';
@@ -283,7 +284,7 @@ export async function deleteCredit({
   note,
 }: {
   creditId: string;
-  reason: string;
+  reason: DeleteReason;
   note: string | null;
 }): Promise<void> {
   await api.delete('/app/pending-credits/{pending_credit_id}', {

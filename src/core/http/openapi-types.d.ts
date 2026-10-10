@@ -5412,7 +5412,10 @@ export interface operations {
     };
     deleteAppAppointmentsByappointment_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -7363,7 +7366,10 @@ export interface operations {
     };
     deleteAppBranchesBybranch_idHolidaysBybranch_holiday_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -7656,7 +7662,10 @@ export interface operations {
     };
     deleteAppBranchesBybranch_idMachinesBybranch_machine_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -8031,7 +8040,10 @@ export interface operations {
     };
     deleteAppBranchesBybranch_idRoomsBybranch_room_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -8476,7 +8488,10 @@ export interface operations {
     };
     deleteAppContactMessageTemplatesBycontact_message_template_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -8907,7 +8922,10 @@ export interface operations {
     };
     deleteAppContactsBycontact_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -10734,7 +10752,10 @@ export interface operations {
     };
     deleteAppInvoicesByinvoice_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -11670,7 +11691,10 @@ export interface operations {
     };
     deleteAppLeadsBylead_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -12262,7 +12286,10 @@ export interface operations {
     };
     deleteAppManufacturersBymanufacturer_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -12866,7 +12893,10 @@ export interface operations {
     };
     deleteAppMedicalPurchaseOrdersBymedical_purchase_order_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "supplier_cant_deliver" | "price_changed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -13409,7 +13439,10 @@ export interface operations {
     };
     deleteAppMedicalRepsBymedical_rep_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -13730,7 +13763,10 @@ export interface operations {
     };
     deleteAppMedicalRepsBymedical_rep_idVisitsBymedical_rep_visit_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -14161,7 +14197,10 @@ export interface operations {
     };
     deleteAppMedicalSalesBymedical_sale_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "billed_by_mistake" | "wrong_items" | "customer_changed_mind" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -14778,7 +14817,10 @@ export interface operations {
     };
     deleteAppMedicinesBymedicine_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -15737,7 +15779,10 @@ export interface operations {
     };
     deleteAppOfferingGroupsByoffering_group_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -16096,7 +16141,10 @@ export interface operations {
     };
     deleteAppOfferingsByoffering_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -16544,7 +16592,10 @@ export interface operations {
     };
     deleteAppOffersByoffer_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -16859,7 +16910,10 @@ export interface operations {
     };
     deleteAppPatientDiagnosesBypatient_diagnosis_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -17202,9 +17256,9 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: {
-                            allergies?: string[];
+                            allergies?: string[] | null;
                             contact_id?: string;
-                            contraindications?: string[];
+                            contraindications?: string[] | null;
                             /** @enum {string} */
                             conversion?: "not_converted" | "converted";
                             /** Format: date-time */
@@ -17312,9 +17366,9 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: {
-                            allergies?: string[];
+                            allergies?: string[] | null;
                             contact_id?: string;
-                            contraindications?: string[];
+                            contraindications?: string[] | null;
                             /** @enum {string} */
                             conversion?: "not_converted" | "converted";
                             /** Format: date-time */
@@ -17371,9 +17425,9 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: {
-                            allergies?: string[];
+                            allergies?: string[] | null;
                             contact_id?: string;
-                            contraindications?: string[];
+                            contraindications?: string[] | null;
                             /** @enum {string} */
                             conversion?: "not_converted" | "converted";
                             /** Format: date-time */
@@ -17410,7 +17464,10 @@ export interface operations {
     };
     deleteAppPatientsBypatient_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -17479,9 +17536,9 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: {
-                            allergies?: string[];
+                            allergies?: string[] | null;
                             contact_id?: string;
-                            contraindications?: string[];
+                            contraindications?: string[] | null;
                             /** @enum {string} */
                             conversion?: "not_converted" | "converted";
                             /** Format: date-time */
@@ -17760,7 +17817,10 @@ export interface operations {
     };
     deleteAppPatientsBypatient_idCheckInsBypatient_check_in_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -18206,7 +18266,10 @@ export interface operations {
     };
     deleteAppPatientsBypatient_idClinicalNotesBypatient_clinical_note_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -18503,7 +18566,10 @@ export interface operations {
     };
     deleteAppPatientsBypatient_idImagesBypatient_image_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -18897,7 +18963,10 @@ export interface operations {
     };
     deleteAppPatientsBypatient_idOfferingSuggestionsBypatient_offering_suggestion_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -19528,7 +19597,10 @@ export interface operations {
     };
     deleteAppPatientsBypatient_idPrescriptionsBypatient_prescription_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -20007,7 +20079,10 @@ export interface operations {
     };
     deleteAppPatientsBypatient_idReportsBypatient_report_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -20178,9 +20253,9 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: {
-                            allergies?: string[];
+                            allergies?: string[] | null;
                             contact_id?: string;
-                            contraindications?: string[];
+                            contraindications?: string[] | null;
                             /** @enum {string} */
                             conversion?: "not_converted" | "converted";
                             /** Format: date-time */
@@ -20438,7 +20513,10 @@ export interface operations {
     };
     deleteAppPatientsBypatient_idReviewsBypatient_review_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -21724,7 +21802,10 @@ export interface operations {
     };
     deleteAppPaymentsBypayment_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -22655,7 +22736,10 @@ export interface operations {
     };
     deleteAppPendingCreditsBypending_credit_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -23132,7 +23216,10 @@ export interface operations {
     };
     deleteAppPrescriptionKitsByprescription_kit_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -23799,7 +23886,10 @@ export interface operations {
     };
     deleteAppStockItemsBystock_item_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -24522,7 +24612,10 @@ export interface operations {
     };
     deleteAppStockPurchasesBystock_purchase_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -24894,7 +24987,10 @@ export interface operations {
     };
     deleteAppStockVendorsBystock_vendor_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -25386,7 +25482,10 @@ export interface operations {
     };
     deleteAppSuppliersBysupplier_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -26034,7 +26133,10 @@ export interface operations {
     };
     deleteAppTasksBytask_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -29081,7 +29183,11 @@ export interface operations {
     };
     getNotifyWebhooks: {
         parameters: {
-            query?: never;
+            query?: {
+                after?: string;
+                include_total?: "true" | "false";
+                limit?: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -29112,6 +29218,7 @@ export interface operations {
                     };
                 };
             };
+            400: components["responses"]["ApiError"];
             401: components["responses"]["ApiError"];
             403: components["responses"]["ApiError"];
             404: components["responses"]["ApiError"];
@@ -30336,7 +30443,10 @@ export interface operations {
     };
     deleteTenancyOrganizationMembershipsBymembership_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };
@@ -31068,7 +31178,10 @@ export interface operations {
     };
     deleteTenancyOrganizationRolesByrole_id: {
         parameters: {
-            query?: never;
+            query: {
+                note?: string;
+                reason: "mistake" | "duplicate" | "not_needed" | "other";
+            };
             header?: {
                 "X-Idempotency-Key"?: string;
             };

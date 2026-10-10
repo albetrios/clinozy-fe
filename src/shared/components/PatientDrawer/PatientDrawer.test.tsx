@@ -762,10 +762,13 @@ describe('PatientDrawer — Edit patient', () => {
     );
     await user.click(within(panel).getByTestId('patient-drawer-save'));
     await waitFor(() =>
-      expect(notifyMock.error).toHaveBeenCalledWith('Someone saved this meanwhile', {
-        id: 'patient-save-failed',
-        action: { label: 'Reload', onClick: expect.any(Function) },
-      }),
+      expect(notifyMock.error).toHaveBeenCalledWith(
+        'Someone else saved this meanwhile. Reload to see their changes, then make yours again.',
+        {
+          id: 'patient-save-failed',
+          action: { label: 'Reload', onClick: expect.any(Function) },
+        },
+      ),
     );
     expect(onSaved).not.toHaveBeenCalled();
 

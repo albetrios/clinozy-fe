@@ -116,7 +116,9 @@ unresolved key leak) — fix it in clinozy-be's serializer, not with a per-key F
   save sends something else than the screen. `{ keepFieldsRef: true }` alone covers only the
   first reset of a session. Use `resetFormInPlace(form, values, options)` — or, for the
   reload, `useEditingRecord` (`src/shared/hooks/useEditingRecord/`); its test does the
-  compiler's memoization by hand, since a drawer test in jsdom cannot see the bug.
+  compiler's memoization by hand, since a drawer test in jsdom cannot see the bug. A `reset`
+  destructured from `useForm(…)` or a `form.reset(` call anywhere in app code fails
+  `tests/ci/form-reset.policy.test.ts`.
 - Inline `isLoading && <Skeleton>` + `isError && <p>` when `QueryBoundary` fits
 - Raw `fetch` for domain APIs (use `apiClient`; auth paths excepted)
 - Storing mutation errors only in Zustand

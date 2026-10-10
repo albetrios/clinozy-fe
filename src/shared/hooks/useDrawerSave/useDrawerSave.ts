@@ -53,7 +53,7 @@ export interface UseDrawerSaveOptions<TValues extends FieldValues, TOutcome> {
  * The screen's client rules run first: a broken one outlines its fields, opens
  * the first one's step and toasts. Then the write, with "Saving…" holding
  * every exit. A `validation` error outlines its fields, opens the first one's
- * step and toasts its message; a stale save (`record_changed`) toasts with "Reload"
+ * step and toasts its message; a stale save (`record_changed`) toasts in our words with "Reload"
  * (`onStale`); a `conflict` goes to the screen; another
  * refusal toasts the server's reason. A dropped connection — or a server
  * failure — keeps the draft with "Not saved · your changes are kept", "Retry
@@ -78,7 +78,8 @@ export function useDrawerSave<TValues extends FieldValues, TOutcome>({
   const refused = (error: unknown) => {
     setSaveState('idle');
     if (apiErrorReason(error) === 'record_changed') {
-      // Someone else saved first: the server's message, and a way to load what they saved.
+      // Someone else saved first: our own words (the server's detail names a user id and a
+      // time — `mapApiError` maps the reason), and a way to load what they saved.
       notify.error(mapApiError(error), {
         id: toastId,
         ...(onStale && {

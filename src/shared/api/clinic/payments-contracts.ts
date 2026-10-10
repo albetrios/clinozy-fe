@@ -498,7 +498,7 @@ interface PaymentOutFields {
 export type PayExpenseInput = PaymentOutFields &
   (
     | { bill: null; expenseCategory: ExpenseCategory }
-    | { bill: SupplierBillRef; expenseCategory?: undefined }
+    | { bill: SupplierBillRef; expenseCategory?: never }
   );
 
 /**

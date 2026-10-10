@@ -3,12 +3,12 @@ import { useState } from 'react';
 
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
 import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 
 import { validatePatientFeedbackSearch } from '../../patient-id.dialog-search.ts';
 import { PATIENT_FILE_SECTION_PAGES } from '../../patient-id.sections.ts';
 import { ReviewDrawer } from '../../shared/components/ReviewDrawer/index.ts';
 import { usePatientFileDialog } from '../../shared/hooks/usePatientFileDialog/index.ts';
+import { useReviewAccess } from '../../shared/hooks/useReviewAccess/index.ts';
 import { usePatientFileContext } from '../../shared/patient-file-context.ts';
 
 /**
@@ -22,8 +22,9 @@ export function NewReviewPage() {
   // The route keeps the raw values (its search is typed only); parsed here.
   const search = validatePatientFeedbackSearch(useSearch({ strict: false }));
   const { patientId, file } = usePatientFileContext();
-  const access = useClinicAccess();
-  const canEdit = access.isResolved ? access.can('patients', 'edit') : undefined;
+  // Reviews have their own codes (clinozy-be D83 (4)), not the file's `patient:update`.
+  const reviews = useReviewAccess();
+  const canEdit = reviews.resolved ? reviews.log : undefined;
   const { behind, back } = usePatientFileDialog({ canOpen: canEdit });
   const [today] = useState(() => clinicToday());
   const Section = PATIENT_FILE_SECTION_PAGES[behind];

@@ -401,7 +401,7 @@ describe('OfferDrawer — Edit offer (PATCH /app/offers/:offer_id)', () => {
     await user.click(part('save'));
     await waitFor(() =>
       expect(notifyMock.error).toHaveBeenCalledWith(
-        'This record was changed by someone else — reload and try again',
+        'Someone else saved this meanwhile. Reload to see their changes, then make yours again.',
         expect.objectContaining({ id: 'offer-save-failed' }),
       ),
     );

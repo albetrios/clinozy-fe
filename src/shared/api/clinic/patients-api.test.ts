@@ -241,6 +241,33 @@ describe('fetchPatient', () => {
     expect(patient.phone2).toBe('+919876500000');
     expect(patient.phones).toHaveLength(2);
   });
+
+  it('reads a file whose medical details are hidden from the caller as null, not as none (D83)', async () => {
+    vi.mocked(api.get)
+      .mockResolvedValueOnce({
+        data: patientWireRow({ allergies: null, contraindications: null, notes: null }),
+      } as never)
+      .mockResolvedValueOnce({ data: contactWithPhones() } as never);
+
+    const patient = await fetchPatient(PATIENT_ID);
+
+    expect(patient.allergies).toBeNull();
+    expect(patient.contraindications).toBeNull();
+    expect(patient.notes).toBeNull();
+  });
+
+  it('keeps an empty list as none recorded', async () => {
+    vi.mocked(api.get)
+      .mockResolvedValueOnce({
+        data: patientWireRow({ allergies: ['Penicillin'] }),
+      } as never)
+      .mockResolvedValueOnce({ data: contactWithPhones() } as never);
+
+    const patient = await fetchPatient(PATIENT_ID);
+
+    expect(patient.allergies).toEqual(['Penicillin']);
+    expect(patient.contraindications).toEqual([]);
+  });
 });
 
 describe('createPatient', () => {

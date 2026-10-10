@@ -69,6 +69,11 @@ export const ERRORS_KEYS = {
     http503: 'api.http503',
     /** A stale save's toast action: load the record again (`409 record_changed`). */
     reload: 'api.reload',
+    /**
+     * A stale save in our own words (`409 record_changed`) — never the server's detail, which
+     * names a user id and an ISO time.
+     */
+    recordChanged: 'api.recordChanged',
   },
   frontend: {
     query: {

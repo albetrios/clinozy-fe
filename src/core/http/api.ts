@@ -72,12 +72,24 @@ export type ApiInit<P extends ApiPath, M extends HttpMethod> = RequiredWhenPrese
 /** The init is optional when nothing in it is required (a list with no required filter). */
 type InitArguments<Init> = Partial<Init> extends Init ? [init?: Init] : [init: Init];
 
+/** A delete route's query, when the document has one. */
+type DeleteQueryOf<P extends ApiPath> = QueryOf<Operation<P, 'delete'>>;
+
+/** The delete reasons a route takes — its documented `reason` values, else any text. */
+type DeleteReasonOf<P extends ApiPath> = [DeleteQueryOf<P>] extends [never]
+  ? string
+  : NonNullable<DeleteQueryOf<P>> extends { reason: infer Reason }
+    ? Reason
+    : string;
+
 /**
- * A delete also takes the record's delete `reason` and an optional `note`. The routes require
- * them (`?reason=&note=`) though the OpenAPI document omits them (api-integration §9 M4).
+ * A delete takes the record's delete `reason` and an optional `note` beside its params — the
+ * routes' `?reason=&note=` (clinozy-be D83 #171 documents them; before it the document omitted
+ * them, api-integration §9 M4). `reason` is typed by the route's own values, so a made-up one
+ * does not compile.
  */
-export type ApiDeleteInit<P extends ApiPath> = ApiInit<P, 'delete'> & {
-  reason?: string;
+export type ApiDeleteInit<P extends ApiPath> = Omit<ApiInit<P, 'delete'>, 'query'> & {
+  reason?: DeleteReasonOf<P>;
   note?: string;
 };
 
