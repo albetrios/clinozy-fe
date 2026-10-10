@@ -968,6 +968,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/app/invoices/{invoice_id}/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Preview a change to an invoice */
+        post: operations["postAppInvoicesByinvoice_idPreview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/app/invoices/{invoice_id}/restore": {
         parameters: {
             query?: never;
@@ -996,6 +1013,23 @@ export interface paths {
         get: operations["getAppInvoicesExports"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/app/invoices/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Preview a bill */
+        post: operations["postAppInvoicesPreview"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2733,6 +2767,23 @@ export interface paths {
         put?: never;
         /** Restore prescription kit */
         post: operations["postAppPrescriptionKitsByprescription_kit_idRestore"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/app/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List roles (directory) */
+        get: operations["getAppRoles"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -8131,11 +8182,19 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: {
+                            address_line_one?: string;
+                            address_line_two?: string | null;
+                            area?: string;
+                            city?: string;
                             closes_at?: string;
+                            gst_number?: string | null;
                             id?: string;
                             is_main?: boolean;
                             name?: string;
                             opens_at?: string;
+                            phone?: string;
+                            postal_code?: string;
+                            state?: string;
                             tone?: string;
                             working_days?: ("mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun")[];
                         }[];
@@ -10385,6 +10444,7 @@ export interface operations {
                             } | null;
                             /** Format: date-time */
                             created_at?: string;
+                            created_by_membership_id?: string | null;
                             discount_total?: number;
                             due_amount?: number;
                             financial_year?: string;
@@ -10434,12 +10494,14 @@ export interface operations {
                             updated_at?: string;
                         }[];
                         meta?: {
+                            due_total?: number;
                             pagination: {
                                 estimated_total?: number;
                                 has_more?: boolean;
                                 next?: string | null;
                                 per_page?: number;
                             };
+                            paid_total?: number;
                             request_id: string;
                         };
                     };
@@ -10514,6 +10576,7 @@ export interface operations {
                             } | null;
                             /** Format: date-time */
                             created_at?: string;
+                            created_by_membership_id?: string | null;
                             discount_total?: number;
                             due_amount?: number;
                             financial_year?: string;
@@ -10606,6 +10669,7 @@ export interface operations {
                             } | null;
                             /** Format: date-time */
                             created_at?: string;
+                            created_by_membership_id?: string | null;
                             discount_total?: number;
                             due_amount?: number;
                             financial_year?: string;
@@ -10750,6 +10814,7 @@ export interface operations {
                             } | null;
                             /** Format: date-time */
                             created_at?: string;
+                            created_by_membership_id?: string | null;
                             discount_total?: number;
                             due_amount?: number;
                             financial_year?: string;
@@ -10980,6 +11045,80 @@ export interface operations {
             500: components["responses"]["ApiError"];
         };
     };
+    postAppInvoicesByinvoice_idPreview: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Idempotency-Key"?: string;
+            };
+            path: {
+                invoice_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    "X-Idempotency-Replay"?: "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            discount_total?: number;
+                            due_amount?: number;
+                            gst_total?: number;
+                            /** Format: date */
+                            invoice_date?: string;
+                            items?: {
+                                amount?: number;
+                                batch_number?: string | null;
+                                discount_amount?: number;
+                                discount_percent?: number;
+                                gst_amount?: number;
+                                /** @enum {integer} */
+                                gst_percent?: 0 | 5 | 12 | 18 | 28;
+                                id?: string | null;
+                                is_gst_inclusive?: boolean;
+                                line_number?: number;
+                                medicine_id?: string | null;
+                                name?: string;
+                                offer_ids?: string[];
+                                offering_id?: string | null;
+                                pack_size?: string | null;
+                                patient_offering_suggestion_id?: string | null;
+                                quantity?: number;
+                                rate?: number;
+                                sessions_total?: number | null;
+                                taxable_amount?: number;
+                            }[];
+                            overall_discount?: number;
+                            paid_amount?: number;
+                            subtotal?: number;
+                            taxable_total?: number;
+                            total?: number;
+                            /** @enum {string} */
+                            type?: "clinic" | "consultation" | "medical";
+                        };
+                        meta?: {
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["ApiError"];
+            401: components["responses"]["ApiError"];
+            403: components["responses"]["ApiError"];
+            404: components["responses"]["ApiError"];
+            409: components["responses"]["ApiError"];
+            413: components["responses"]["ApiError"];
+            415: components["responses"]["ApiError"];
+            422: components["responses"]["ApiError"];
+            429: components["responses"]["ApiError"];
+            500: components["responses"]["ApiError"];
+        };
+    };
     postAppInvoicesByinvoice_idRestore: {
         parameters: {
             query?: never;
@@ -11009,6 +11148,7 @@ export interface operations {
                             } | null;
                             /** Format: date-time */
                             created_at?: string;
+                            created_by_membership_id?: string | null;
                             discount_total?: number;
                             due_amount?: number;
                             financial_year?: string;
@@ -11124,6 +11264,78 @@ export interface operations {
             401: components["responses"]["ApiError"];
             403: components["responses"]["ApiError"];
             404: components["responses"]["ApiError"];
+            429: components["responses"]["ApiError"];
+            500: components["responses"]["ApiError"];
+        };
+    };
+    postAppInvoicesPreview: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    "X-Idempotency-Replay"?: "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            discount_total?: number;
+                            due_amount?: number;
+                            gst_total?: number;
+                            /** Format: date */
+                            invoice_date?: string;
+                            items?: {
+                                amount?: number;
+                                batch_number?: string | null;
+                                discount_amount?: number;
+                                discount_percent?: number;
+                                gst_amount?: number;
+                                /** @enum {integer} */
+                                gst_percent?: 0 | 5 | 12 | 18 | 28;
+                                id?: string | null;
+                                is_gst_inclusive?: boolean;
+                                line_number?: number;
+                                medicine_id?: string | null;
+                                name?: string;
+                                offer_ids?: string[];
+                                offering_id?: string | null;
+                                pack_size?: string | null;
+                                patient_offering_suggestion_id?: string | null;
+                                quantity?: number;
+                                rate?: number;
+                                sessions_total?: number | null;
+                                taxable_amount?: number;
+                            }[];
+                            overall_discount?: number;
+                            paid_amount?: number;
+                            subtotal?: number;
+                            taxable_total?: number;
+                            total?: number;
+                            /** @enum {string} */
+                            type?: "clinic" | "consultation" | "medical";
+                        };
+                        meta?: {
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["ApiError"];
+            401: components["responses"]["ApiError"];
+            403: components["responses"]["ApiError"];
+            404: components["responses"]["ApiError"];
+            409: components["responses"]["ApiError"];
+            413: components["responses"]["ApiError"];
+            415: components["responses"]["ApiError"];
+            422: components["responses"]["ApiError"];
             429: components["responses"]["ApiError"];
             500: components["responses"]["ApiError"];
         };
@@ -12207,12 +12419,21 @@ export interface operations {
                             } | null;
                             /** Format: date-time */
                             created_at?: string;
+                            created_by_membership_id?: string | null;
                             /** @enum {string} */
                             direction?: "received" | "paid";
                             edit_count?: number;
                             expense_category?: string | null;
                             id?: string;
+                            invoice?: {
+                                due_amount?: number;
+                                invoice_number?: string;
+                                invoice_sequence?: number;
+                                /** @enum {string} */
+                                type?: "clinic" | "consultation" | "medical";
+                            } | null;
                             invoice_credit_note_id?: string | null;
+                            invoice_credit_note_number?: number | null;
                             invoice_id?: string | null;
                             is_settled?: boolean;
                             /** @enum {string} */
@@ -12229,6 +12450,10 @@ export interface operations {
                                 created_at?: string;
                                 id?: string;
                             } | null;
+                            medical_purchase_order?: {
+                                purchase_order_number?: number;
+                                supplier_bill_number?: string | null;
+                            } | null;
                             medical_purchase_order_id?: string | null;
                             note?: string | null;
                             /** Format: date-time */
@@ -12237,6 +12462,7 @@ export interface operations {
                             payee_name?: string | null;
                             payment_number?: number;
                             pending_credit_id?: string | null;
+                            pending_credit_number?: number | null;
                             reference?: string | null;
                             reversed_by_payment_id?: string | null;
                             reverses_payment_id?: string | null;
@@ -12245,6 +12471,10 @@ export interface operations {
                                 /** @enum {string} */
                                 mode?: "cash" | "upi" | "card" | "credit";
                             }[];
+                            stock_purchase?: {
+                                bill_number?: string | null;
+                                stock_purchase_number?: number;
+                            } | null;
                             stock_purchase_id?: string | null;
                             /** Format: date-time */
                             updated_at?: string;
@@ -14795,6 +15025,7 @@ export interface operations {
             query?: {
                 after?: string;
                 branch_id?: string;
+                holds?: string;
                 ids?: string;
                 include_ended?: "true" | "false";
                 limit?: number;
@@ -14821,6 +15052,7 @@ export interface operations {
                             ended_at?: string | null;
                             id?: string;
                             is_active?: boolean;
+                            is_owner?: boolean;
                             role_ids?: string[];
                             staff_number?: number;
                             tone?: string;
@@ -15571,6 +15803,7 @@ export interface operations {
                             category?: "consultation" | "treatment" | "package" | "lhr" | "product";
                             /** Format: date-time */
                             created_at?: string;
+                            description?: string | null;
                             duration_minutes?: number;
                             /** @enum {integer} */
                             gst_percent?: 0 | 5 | 12 | 18 | 28;
@@ -15628,6 +15861,7 @@ export interface operations {
                     branch_ids?: string[];
                     /** @enum {string} */
                     category?: "consultation" | "treatment" | "package" | "lhr" | "product";
+                    description?: string | null;
                     duration_minutes?: number;
                     gst_percent?: 0 | 5 | 12 | 18 | 28;
                     is_active?: boolean;
@@ -15661,6 +15895,7 @@ export interface operations {
                             category?: "consultation" | "treatment" | "package" | "lhr" | "product";
                             /** Format: date-time */
                             created_at?: string;
+                            description?: string | null;
                             duration_minutes?: number;
                             /** @enum {integer} */
                             gst_percent?: 0 | 5 | 12 | 18 | 28;
@@ -15724,6 +15959,7 @@ export interface operations {
                             category?: "consultation" | "treatment" | "package" | "lhr" | "product";
                             /** Format: date-time */
                             created_at?: string;
+                            description?: string | null;
                             duration_minutes?: number;
                             /** @enum {integer} */
                             gst_percent?: 0 | 5 | 12 | 18 | 28;
@@ -15806,6 +16042,7 @@ export interface operations {
                     branch_ids?: string[];
                     /** @enum {string} */
                     category?: "consultation" | "treatment" | "package" | "lhr" | "product";
+                    description?: string | null;
                     duration_minutes?: number;
                     /** Format: date-time */
                     expected_updated_at?: string;
@@ -15841,6 +16078,7 @@ export interface operations {
                             category?: "consultation" | "treatment" | "package" | "lhr" | "product";
                             /** Format: date-time */
                             created_at?: string;
+                            description?: string | null;
                             duration_minutes?: number;
                             /** @enum {integer} */
                             gst_percent?: 0 | 5 | 12 | 18 | 28;
@@ -15907,6 +16145,7 @@ export interface operations {
                             category?: "consultation" | "treatment" | "package" | "lhr" | "product";
                             /** Format: date-time */
                             created_at?: string;
+                            description?: string | null;
                             duration_minutes?: number;
                             /** @enum {integer} */
                             gst_percent?: 0 | 5 | 12 | 18 | 28;
@@ -20912,12 +21151,21 @@ export interface operations {
                             } | null;
                             /** Format: date-time */
                             created_at?: string;
+                            created_by_membership_id?: string | null;
                             /** @enum {string} */
                             direction?: "received" | "paid";
                             edit_count?: number;
                             expense_category?: string | null;
                             id?: string;
+                            invoice?: {
+                                due_amount?: number;
+                                invoice_number?: string;
+                                invoice_sequence?: number;
+                                /** @enum {string} */
+                                type?: "clinic" | "consultation" | "medical";
+                            } | null;
                             invoice_credit_note_id?: string | null;
+                            invoice_credit_note_number?: number | null;
                             invoice_id?: string | null;
                             is_settled?: boolean;
                             /** @enum {string} */
@@ -20934,6 +21182,10 @@ export interface operations {
                                 created_at?: string;
                                 id?: string;
                             } | null;
+                            medical_purchase_order?: {
+                                purchase_order_number?: number;
+                                supplier_bill_number?: string | null;
+                            } | null;
                             medical_purchase_order_id?: string | null;
                             note?: string | null;
                             /** Format: date-time */
@@ -20942,6 +21194,7 @@ export interface operations {
                             payee_name?: string | null;
                             payment_number?: number;
                             pending_credit_id?: string | null;
+                            pending_credit_number?: number | null;
                             reference?: string | null;
                             reversed_by_payment_id?: string | null;
                             reverses_payment_id?: string | null;
@@ -20950,6 +21203,10 @@ export interface operations {
                                 /** @enum {string} */
                                 mode?: "cash" | "upi" | "card" | "credit";
                             }[];
+                            stock_purchase?: {
+                                bill_number?: string | null;
+                                stock_purchase_number?: number;
+                            } | null;
                             stock_purchase_id?: string | null;
                             /** Format: date-time */
                             updated_at?: string;
@@ -21028,12 +21285,21 @@ export interface operations {
                             } | null;
                             /** Format: date-time */
                             created_at?: string;
+                            created_by_membership_id?: string | null;
                             /** @enum {string} */
                             direction?: "received" | "paid";
                             edit_count?: number;
                             expense_category?: string | null;
                             id?: string;
+                            invoice?: {
+                                due_amount?: number;
+                                invoice_number?: string;
+                                invoice_sequence?: number;
+                                /** @enum {string} */
+                                type?: "clinic" | "consultation" | "medical";
+                            } | null;
                             invoice_credit_note_id?: string | null;
+                            invoice_credit_note_number?: number | null;
                             invoice_id?: string | null;
                             is_settled?: boolean;
                             /** @enum {string} */
@@ -21050,6 +21316,10 @@ export interface operations {
                                 created_at?: string;
                                 id?: string;
                             } | null;
+                            medical_purchase_order?: {
+                                purchase_order_number?: number;
+                                supplier_bill_number?: string | null;
+                            } | null;
                             medical_purchase_order_id?: string | null;
                             note?: string | null;
                             /** Format: date-time */
@@ -21058,6 +21328,7 @@ export interface operations {
                             payee_name?: string | null;
                             payment_number?: number;
                             pending_credit_id?: string | null;
+                            pending_credit_number?: number | null;
                             reference?: string | null;
                             reversed_by_payment_id?: string | null;
                             reverses_payment_id?: string | null;
@@ -21066,6 +21337,10 @@ export interface operations {
                                 /** @enum {string} */
                                 mode?: "cash" | "upi" | "card" | "credit";
                             }[];
+                            stock_purchase?: {
+                                bill_number?: string | null;
+                                stock_purchase_number?: number;
+                            } | null;
                             stock_purchase_id?: string | null;
                             /** Format: date-time */
                             updated_at?: string;
@@ -21116,12 +21391,21 @@ export interface operations {
                             } | null;
                             /** Format: date-time */
                             created_at?: string;
+                            created_by_membership_id?: string | null;
                             /** @enum {string} */
                             direction?: "received" | "paid";
                             edit_count?: number;
                             expense_category?: string | null;
                             id?: string;
+                            invoice?: {
+                                due_amount?: number;
+                                invoice_number?: string;
+                                invoice_sequence?: number;
+                                /** @enum {string} */
+                                type?: "clinic" | "consultation" | "medical";
+                            } | null;
                             invoice_credit_note_id?: string | null;
+                            invoice_credit_note_number?: number | null;
                             invoice_id?: string | null;
                             is_settled?: boolean;
                             /** @enum {string} */
@@ -21138,6 +21422,10 @@ export interface operations {
                                 created_at?: string;
                                 id?: string;
                             } | null;
+                            medical_purchase_order?: {
+                                purchase_order_number?: number;
+                                supplier_bill_number?: string | null;
+                            } | null;
                             medical_purchase_order_id?: string | null;
                             note?: string | null;
                             /** Format: date-time */
@@ -21146,6 +21434,7 @@ export interface operations {
                             payee_name?: string | null;
                             payment_number?: number;
                             pending_credit_id?: string | null;
+                            pending_credit_number?: number | null;
                             reference?: string | null;
                             reversed_by_payment_id?: string | null;
                             reverses_payment_id?: string | null;
@@ -21154,6 +21443,10 @@ export interface operations {
                                 /** @enum {string} */
                                 mode?: "cash" | "upi" | "card" | "credit";
                             }[];
+                            stock_purchase?: {
+                                bill_number?: string | null;
+                                stock_purchase_number?: number;
+                            } | null;
                             stock_purchase_id?: string | null;
                             /** Format: date-time */
                             updated_at?: string;
@@ -21256,12 +21549,21 @@ export interface operations {
                             } | null;
                             /** Format: date-time */
                             created_at?: string;
+                            created_by_membership_id?: string | null;
                             /** @enum {string} */
                             direction?: "received" | "paid";
                             edit_count?: number;
                             expense_category?: string | null;
                             id?: string;
+                            invoice?: {
+                                due_amount?: number;
+                                invoice_number?: string;
+                                invoice_sequence?: number;
+                                /** @enum {string} */
+                                type?: "clinic" | "consultation" | "medical";
+                            } | null;
                             invoice_credit_note_id?: string | null;
+                            invoice_credit_note_number?: number | null;
                             invoice_id?: string | null;
                             is_settled?: boolean;
                             /** @enum {string} */
@@ -21278,6 +21580,10 @@ export interface operations {
                                 created_at?: string;
                                 id?: string;
                             } | null;
+                            medical_purchase_order?: {
+                                purchase_order_number?: number;
+                                supplier_bill_number?: string | null;
+                            } | null;
                             medical_purchase_order_id?: string | null;
                             note?: string | null;
                             /** Format: date-time */
@@ -21286,6 +21592,7 @@ export interface operations {
                             payee_name?: string | null;
                             payment_number?: number;
                             pending_credit_id?: string | null;
+                            pending_credit_number?: number | null;
                             reference?: string | null;
                             reversed_by_payment_id?: string | null;
                             reverses_payment_id?: string | null;
@@ -21294,6 +21601,10 @@ export interface operations {
                                 /** @enum {string} */
                                 mode?: "cash" | "upi" | "card" | "credit";
                             }[];
+                            stock_purchase?: {
+                                bill_number?: string | null;
+                                stock_purchase_number?: number;
+                            } | null;
                             stock_purchase_id?: string | null;
                             /** Format: date-time */
                             updated_at?: string;
@@ -21399,12 +21710,21 @@ export interface operations {
                             } | null;
                             /** Format: date-time */
                             created_at?: string;
+                            created_by_membership_id?: string | null;
                             /** @enum {string} */
                             direction?: "received" | "paid";
                             edit_count?: number;
                             expense_category?: string | null;
                             id?: string;
+                            invoice?: {
+                                due_amount?: number;
+                                invoice_number?: string;
+                                invoice_sequence?: number;
+                                /** @enum {string} */
+                                type?: "clinic" | "consultation" | "medical";
+                            } | null;
                             invoice_credit_note_id?: string | null;
+                            invoice_credit_note_number?: number | null;
                             invoice_id?: string | null;
                             is_settled?: boolean;
                             /** @enum {string} */
@@ -21421,6 +21741,10 @@ export interface operations {
                                 created_at?: string;
                                 id?: string;
                             } | null;
+                            medical_purchase_order?: {
+                                purchase_order_number?: number;
+                                supplier_bill_number?: string | null;
+                            } | null;
                             medical_purchase_order_id?: string | null;
                             note?: string | null;
                             /** Format: date-time */
@@ -21429,6 +21753,7 @@ export interface operations {
                             payee_name?: string | null;
                             payment_number?: number;
                             pending_credit_id?: string | null;
+                            pending_credit_number?: number | null;
                             reference?: string | null;
                             reversed_by_payment_id?: string | null;
                             reverses_payment_id?: string | null;
@@ -21437,6 +21762,10 @@ export interface operations {
                                 /** @enum {string} */
                                 mode?: "cash" | "upi" | "card" | "credit";
                             }[];
+                            stock_purchase?: {
+                                bill_number?: string | null;
+                                stock_purchase_number?: number;
+                            } | null;
                             stock_purchase_id?: string | null;
                             /** Format: date-time */
                             updated_at?: string;
@@ -21498,12 +21827,21 @@ export interface operations {
                             } | null;
                             /** Format: date-time */
                             created_at?: string;
+                            created_by_membership_id?: string | null;
                             /** @enum {string} */
                             direction?: "received" | "paid";
                             edit_count?: number;
                             expense_category?: string | null;
                             id?: string;
+                            invoice?: {
+                                due_amount?: number;
+                                invoice_number?: string;
+                                invoice_sequence?: number;
+                                /** @enum {string} */
+                                type?: "clinic" | "consultation" | "medical";
+                            } | null;
                             invoice_credit_note_id?: string | null;
+                            invoice_credit_note_number?: number | null;
                             invoice_id?: string | null;
                             is_settled?: boolean;
                             /** @enum {string} */
@@ -21520,6 +21858,10 @@ export interface operations {
                                 created_at?: string;
                                 id?: string;
                             } | null;
+                            medical_purchase_order?: {
+                                purchase_order_number?: number;
+                                supplier_bill_number?: string | null;
+                            } | null;
                             medical_purchase_order_id?: string | null;
                             note?: string | null;
                             /** Format: date-time */
@@ -21528,6 +21870,7 @@ export interface operations {
                             payee_name?: string | null;
                             payment_number?: number;
                             pending_credit_id?: string | null;
+                            pending_credit_number?: number | null;
                             reference?: string | null;
                             reversed_by_payment_id?: string | null;
                             reverses_payment_id?: string | null;
@@ -21536,6 +21879,10 @@ export interface operations {
                                 /** @enum {string} */
                                 mode?: "cash" | "upi" | "card" | "credit";
                             }[];
+                            stock_purchase?: {
+                                bill_number?: string | null;
+                                stock_purchase_number?: number;
+                            } | null;
                             stock_purchase_id?: string | null;
                             /** Format: date-time */
                             updated_at?: string;
@@ -21655,6 +22002,7 @@ export interface operations {
                             } | null;
                             /** Format: date-time */
                             created_at?: string;
+                            created_by_membership_id?: string | null;
                             /** @enum {string} */
                             direction?: "give" | "take";
                             id?: string;
@@ -21738,6 +22086,7 @@ export interface operations {
                             } | null;
                             /** Format: date-time */
                             created_at?: string;
+                            created_by_membership_id?: string | null;
                             /** @enum {string} */
                             direction?: "give" | "take";
                             id?: string;
@@ -21802,6 +22151,7 @@ export interface operations {
                             } | null;
                             /** Format: date-time */
                             created_at?: string;
+                            created_by_membership_id?: string | null;
                             /** @enum {string} */
                             direction?: "give" | "take";
                             id?: string;
@@ -21912,6 +22262,7 @@ export interface operations {
                             } | null;
                             /** Format: date-time */
                             created_at?: string;
+                            created_by_membership_id?: string | null;
                             /** @enum {string} */
                             direction?: "give" | "take";
                             id?: string;
@@ -21979,6 +22330,7 @@ export interface operations {
                             } | null;
                             /** Format: date-time */
                             created_at?: string;
+                            created_by_membership_id?: string | null;
                             /** @enum {string} */
                             direction?: "give" | "take";
                             id?: string;
@@ -22063,6 +22415,7 @@ export interface operations {
                             } | null;
                             /** Format: date-time */
                             created_at?: string;
+                            created_by_membership_id?: string | null;
                             /** @enum {string} */
                             direction?: "give" | "take";
                             id?: string;
@@ -22491,6 +22844,51 @@ export interface operations {
             500: components["responses"]["ApiError"];
         };
     };
+    getAppRoles: {
+        parameters: {
+            query?: {
+                after?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            id?: string;
+                            is_locked?: boolean;
+                            is_system?: boolean;
+                            name?: string;
+                            tone?: string;
+                        }[];
+                        meta?: {
+                            pagination: {
+                                estimated_total?: number;
+                                has_more?: boolean;
+                                next?: string | null;
+                                per_page?: number;
+                            };
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["ApiError"];
+            401: components["responses"]["ApiError"];
+            403: components["responses"]["ApiError"];
+            404: components["responses"]["ApiError"];
+            429: components["responses"]["ApiError"];
+            500: components["responses"]["ApiError"];
+        };
+    };
     getAppStockCounts: {
         parameters: {
             query?: {
@@ -22682,6 +23080,7 @@ export interface operations {
                     "application/json": {
                         data?: {
                             author_membership_id?: string | null;
+                            bill_number?: string | null;
                             /** Format: date-time */
                             created_at?: string;
                             id?: string;
@@ -22692,10 +23091,15 @@ export interface operations {
                             /** @enum {string|null} */
                             revert_reason?: "mistake" | "wrong_item" | "wrong_quantity" | "other" | null;
                             reverted_by_stock_item_movement_id?: string | null;
+                            /** Format: date-time */
+                            reverts_created_at?: string | null;
                             reverts_stock_item_movement_id?: string | null;
+                            /** @enum {string|null} */
+                            reverts_type?: "opening" | "received" | "used" | "damaged" | "returned" | "adjust" | null;
                             stock_count_id?: string | null;
                             stock_item_id?: string;
                             stock_purchase_id?: string | null;
+                            stock_purchase_number?: number | null;
                             /** @enum {string} */
                             type?: "opening" | "received" | "used" | "damaged" | "returned" | "adjust" | "reverted";
                             used_for?: string | null;
@@ -22727,6 +23131,7 @@ export interface operations {
                 category?: string;
                 created_from?: string;
                 created_to?: string;
+                lasts_days_to?: number;
                 limit?: number;
                 order?: "asc" | "desc";
                 q?: string;
@@ -23066,6 +23471,7 @@ export interface operations {
                     "application/json": {
                         data?: {
                             author_membership_id?: string | null;
+                            bill_number?: string | null;
                             /** Format: date-time */
                             created_at?: string;
                             id?: string;
@@ -23076,10 +23482,15 @@ export interface operations {
                             /** @enum {string|null} */
                             revert_reason?: "mistake" | "wrong_item" | "wrong_quantity" | "other" | null;
                             reverted_by_stock_item_movement_id?: string | null;
+                            /** Format: date-time */
+                            reverts_created_at?: string | null;
                             reverts_stock_item_movement_id?: string | null;
+                            /** @enum {string|null} */
+                            reverts_type?: "opening" | "received" | "used" | "damaged" | "returned" | "adjust" | null;
                             stock_count_id?: string | null;
                             stock_item_id?: string;
                             stock_purchase_id?: string | null;
+                            stock_purchase_number?: number | null;
                             /** @enum {string} */
                             type?: "opening" | "received" | "used" | "damaged" | "returned" | "adjust" | "reverted";
                             used_for?: string | null;
@@ -23137,6 +23548,7 @@ export interface operations {
                     "application/json": {
                         data?: {
                             author_membership_id?: string | null;
+                            bill_number?: string | null;
                             /** Format: date-time */
                             created_at?: string;
                             id?: string;
@@ -23147,10 +23559,15 @@ export interface operations {
                             /** @enum {string|null} */
                             revert_reason?: "mistake" | "wrong_item" | "wrong_quantity" | "other" | null;
                             reverted_by_stock_item_movement_id?: string | null;
+                            /** Format: date-time */
+                            reverts_created_at?: string | null;
                             reverts_stock_item_movement_id?: string | null;
+                            /** @enum {string|null} */
+                            reverts_type?: "opening" | "received" | "used" | "damaged" | "returned" | "adjust" | null;
                             stock_count_id?: string | null;
                             stock_item_id?: string;
                             stock_purchase_id?: string | null;
+                            stock_purchase_number?: number | null;
                             /** @enum {string} */
                             type?: "opening" | "received" | "used" | "damaged" | "returned" | "adjust" | "reverted";
                             used_for?: string | null;
@@ -23193,6 +23610,7 @@ export interface operations {
                     "application/json": {
                         data?: {
                             author_membership_id?: string | null;
+                            bill_number?: string | null;
                             /** Format: date-time */
                             created_at?: string;
                             id?: string;
@@ -23203,10 +23621,15 @@ export interface operations {
                             /** @enum {string|null} */
                             revert_reason?: "mistake" | "wrong_item" | "wrong_quantity" | "other" | null;
                             reverted_by_stock_item_movement_id?: string | null;
+                            /** Format: date-time */
+                            reverts_created_at?: string | null;
                             reverts_stock_item_movement_id?: string | null;
+                            /** @enum {string|null} */
+                            reverts_type?: "opening" | "received" | "used" | "damaged" | "returned" | "adjust" | null;
                             stock_count_id?: string | null;
                             stock_item_id?: string;
                             stock_purchase_id?: string | null;
+                            stock_purchase_number?: number | null;
                             /** @enum {string} */
                             type?: "opening" | "received" | "used" | "damaged" | "returned" | "adjust" | "reverted";
                             used_for?: string | null;
@@ -23256,6 +23679,7 @@ export interface operations {
                     "application/json": {
                         data?: {
                             author_membership_id?: string | null;
+                            bill_number?: string | null;
                             /** Format: date-time */
                             created_at?: string;
                             id?: string;
@@ -23266,10 +23690,15 @@ export interface operations {
                             /** @enum {string|null} */
                             revert_reason?: "mistake" | "wrong_item" | "wrong_quantity" | "other" | null;
                             reverted_by_stock_item_movement_id?: string | null;
+                            /** Format: date-time */
+                            reverts_created_at?: string | null;
                             reverts_stock_item_movement_id?: string | null;
+                            /** @enum {string|null} */
+                            reverts_type?: "opening" | "received" | "used" | "damaged" | "returned" | "adjust" | null;
                             stock_count_id?: string | null;
                             stock_item_id?: string;
                             stock_purchase_id?: string | null;
+                            stock_purchase_number?: number | null;
                             /** @enum {string} */
                             type?: "opening" | "received" | "used" | "damaged" | "returned" | "adjust" | "reverted";
                             used_for?: string | null;
@@ -23362,6 +23791,7 @@ export interface operations {
                 category?: string;
                 created_from?: string;
                 created_to?: string;
+                lasts_days_to?: number;
                 limit?: number;
                 order?: "asc" | "desc";
                 q?: string;
@@ -23850,7 +24280,7 @@ export interface operations {
                 limit?: number;
                 order?: "asc" | "desc";
                 q?: string;
-                sort?: "name" | "created_at";
+                sort?: "name" | "created_at" | "payable";
             };
             header?: never;
             path?: never;
@@ -23872,6 +24302,7 @@ export interface operations {
                             name?: string;
                             payable?: number;
                             phone?: string | null;
+                            purchase_count?: number;
                             /** Format: date-time */
                             updated_at?: string;
                         }[];
@@ -23882,6 +24313,7 @@ export interface operations {
                                 next?: string | null;
                                 per_page?: number;
                             };
+                            payable_total?: number;
                             request_id: string;
                         };
                     };
@@ -23929,6 +24361,7 @@ export interface operations {
                             name?: string;
                             payable?: number;
                             phone?: string | null;
+                            purchase_count?: number;
                             /** Format: date-time */
                             updated_at?: string;
                         };
@@ -23975,6 +24408,7 @@ export interface operations {
                             name?: string;
                             payable?: number;
                             phone?: string | null;
+                            purchase_count?: number;
                             /** Format: date-time */
                             updated_at?: string;
                         };
@@ -24058,6 +24492,7 @@ export interface operations {
                             name?: string;
                             payable?: number;
                             phone?: string | null;
+                            purchase_count?: number;
                             /** Format: date-time */
                             updated_at?: string;
                         };
@@ -24107,6 +24542,7 @@ export interface operations {
                             name?: string;
                             payable?: number;
                             phone?: string | null;
+                            purchase_count?: number;
                             /** Format: date-time */
                             updated_at?: string;
                         };
@@ -24732,7 +25168,7 @@ export interface operations {
                             is_automatic?: boolean;
                             is_on?: boolean;
                             /** @enum {string} */
-                            rule_key?: "reply" | "failed_message" | "follow_up" | "claim" | "confirm" | "arrive" | "rebook" | "feedback" | "aftercare" | "call_back" | "next_visit" | "gone_quiet" | "payment_due" | "settle_by";
+                            rule_key?: "reply" | "failed_message" | "follow_up" | "claim" | "confirm" | "arrive" | "rebook" | "feedback" | "aftercare" | "call_back" | "next_visit" | "gone_quiet" | "payment_due" | "settle_by" | "medical_rep_visit";
                             /** Format: date-time */
                             updated_at?: string | null;
                         }[];
@@ -24784,7 +25220,7 @@ export interface operations {
                             is_automatic?: boolean;
                             is_on?: boolean;
                             /** @enum {string} */
-                            rule_key?: "reply" | "failed_message" | "follow_up" | "claim" | "confirm" | "arrive" | "rebook" | "feedback" | "aftercare" | "call_back" | "next_visit" | "gone_quiet" | "payment_due" | "settle_by";
+                            rule_key?: "reply" | "failed_message" | "follow_up" | "claim" | "confirm" | "arrive" | "rebook" | "feedback" | "aftercare" | "call_back" | "next_visit" | "gone_quiet" | "payment_due" | "settle_by" | "medical_rep_visit";
                             /** Format: date-time */
                             updated_at?: string | null;
                         }[];
@@ -24817,7 +25253,7 @@ export interface operations {
                 created_to?: string;
                 due_from?: string;
                 due_to?: string;
-                kind?: "rule" | "follow_up" | "manual";
+                kind?: string;
                 lead_id?: string;
                 limit?: number;
                 order?: "asc" | "desc";
@@ -24863,6 +25299,7 @@ export interface operations {
                             /** @enum {string} */
                             kind?: "rule" | "follow_up" | "manual";
                             lead_id?: string | null;
+                            medical_rep_id?: string | null;
                             next_task_id?: string | null;
                             note?: string | null;
                             /** @enum {string|null} */
@@ -24890,7 +25327,7 @@ export interface operations {
                             resolved_by_membership_id?: string | null;
                             result_text?: string | null;
                             /** @enum {string|null} */
-                            rule_key?: "reply" | "failed_message" | "follow_up" | "claim" | "confirm" | "arrive" | "rebook" | "feedback" | "aftercare" | "call_back" | "next_visit" | "gone_quiet" | "payment_due" | "settle_by" | null;
+                            rule_key?: "reply" | "failed_message" | "follow_up" | "claim" | "confirm" | "arrive" | "rebook" | "feedback" | "aftercare" | "call_back" | "next_visit" | "gone_quiet" | "payment_due" | "settle_by" | "medical_rep_visit" | null;
                             snooze_label?: string | null;
                             /** Format: date-time */
                             snoozed_until?: string | null;
@@ -24982,6 +25419,7 @@ export interface operations {
                             /** @enum {string} */
                             kind?: "rule" | "follow_up" | "manual";
                             lead_id?: string | null;
+                            medical_rep_id?: string | null;
                             next_task_id?: string | null;
                             note?: string | null;
                             /** @enum {string|null} */
@@ -25009,7 +25447,7 @@ export interface operations {
                             resolved_by_membership_id?: string | null;
                             result_text?: string | null;
                             /** @enum {string|null} */
-                            rule_key?: "reply" | "failed_message" | "follow_up" | "claim" | "confirm" | "arrive" | "rebook" | "feedback" | "aftercare" | "call_back" | "next_visit" | "gone_quiet" | "payment_due" | "settle_by" | null;
+                            rule_key?: "reply" | "failed_message" | "follow_up" | "claim" | "confirm" | "arrive" | "rebook" | "feedback" | "aftercare" | "call_back" | "next_visit" | "gone_quiet" | "payment_due" | "settle_by" | "medical_rep_visit" | null;
                             snooze_label?: string | null;
                             /** Format: date-time */
                             snoozed_until?: string | null;
@@ -25075,6 +25513,7 @@ export interface operations {
                             /** @enum {string} */
                             kind?: "rule" | "follow_up" | "manual";
                             lead_id?: string | null;
+                            medical_rep_id?: string | null;
                             next_task_id?: string | null;
                             note?: string | null;
                             /** @enum {string|null} */
@@ -25102,7 +25541,7 @@ export interface operations {
                             resolved_by_membership_id?: string | null;
                             result_text?: string | null;
                             /** @enum {string|null} */
-                            rule_key?: "reply" | "failed_message" | "follow_up" | "claim" | "confirm" | "arrive" | "rebook" | "feedback" | "aftercare" | "call_back" | "next_visit" | "gone_quiet" | "payment_due" | "settle_by" | null;
+                            rule_key?: "reply" | "failed_message" | "follow_up" | "claim" | "confirm" | "arrive" | "rebook" | "feedback" | "aftercare" | "call_back" | "next_visit" | "gone_quiet" | "payment_due" | "settle_by" | "medical_rep_visit" | null;
                             snooze_label?: string | null;
                             /** Format: date-time */
                             snoozed_until?: string | null;
@@ -25209,6 +25648,7 @@ export interface operations {
                             /** @enum {string} */
                             kind?: "rule" | "follow_up" | "manual";
                             lead_id?: string | null;
+                            medical_rep_id?: string | null;
                             next_task_id?: string | null;
                             note?: string | null;
                             /** @enum {string|null} */
@@ -25236,7 +25676,7 @@ export interface operations {
                             resolved_by_membership_id?: string | null;
                             result_text?: string | null;
                             /** @enum {string|null} */
-                            rule_key?: "reply" | "failed_message" | "follow_up" | "claim" | "confirm" | "arrive" | "rebook" | "feedback" | "aftercare" | "call_back" | "next_visit" | "gone_quiet" | "payment_due" | "settle_by" | null;
+                            rule_key?: "reply" | "failed_message" | "follow_up" | "claim" | "confirm" | "arrive" | "rebook" | "feedback" | "aftercare" | "call_back" | "next_visit" | "gone_quiet" | "payment_due" | "settle_by" | "medical_rep_visit" | null;
                             snooze_label?: string | null;
                             /** Format: date-time */
                             snoozed_until?: string | null;
@@ -25313,6 +25753,7 @@ export interface operations {
                             /** @enum {string} */
                             kind?: "rule" | "follow_up" | "manual";
                             lead_id?: string | null;
+                            medical_rep_id?: string | null;
                             next_task_id?: string | null;
                             note?: string | null;
                             /** @enum {string|null} */
@@ -25340,7 +25781,7 @@ export interface operations {
                             resolved_by_membership_id?: string | null;
                             result_text?: string | null;
                             /** @enum {string|null} */
-                            rule_key?: "reply" | "failed_message" | "follow_up" | "claim" | "confirm" | "arrive" | "rebook" | "feedback" | "aftercare" | "call_back" | "next_visit" | "gone_quiet" | "payment_due" | "settle_by" | null;
+                            rule_key?: "reply" | "failed_message" | "follow_up" | "claim" | "confirm" | "arrive" | "rebook" | "feedback" | "aftercare" | "call_back" | "next_visit" | "gone_quiet" | "payment_due" | "settle_by" | "medical_rep_visit" | null;
                             snooze_label?: string | null;
                             /** Format: date-time */
                             snoozed_until?: string | null;
@@ -25427,6 +25868,7 @@ export interface operations {
                             /** @enum {string} */
                             kind?: "rule" | "follow_up" | "manual";
                             lead_id?: string | null;
+                            medical_rep_id?: string | null;
                             next_task_id?: string | null;
                             note?: string | null;
                             /** @enum {string|null} */
@@ -25454,7 +25896,7 @@ export interface operations {
                             resolved_by_membership_id?: string | null;
                             result_text?: string | null;
                             /** @enum {string|null} */
-                            rule_key?: "reply" | "failed_message" | "follow_up" | "claim" | "confirm" | "arrive" | "rebook" | "feedback" | "aftercare" | "call_back" | "next_visit" | "gone_quiet" | "payment_due" | "settle_by" | null;
+                            rule_key?: "reply" | "failed_message" | "follow_up" | "claim" | "confirm" | "arrive" | "rebook" | "feedback" | "aftercare" | "call_back" | "next_visit" | "gone_quiet" | "payment_due" | "settle_by" | "medical_rep_visit" | null;
                             snooze_label?: string | null;
                             /** Format: date-time */
                             snoozed_until?: string | null;
@@ -25523,6 +25965,7 @@ export interface operations {
                             /** @enum {string} */
                             kind?: "rule" | "follow_up" | "manual";
                             lead_id?: string | null;
+                            medical_rep_id?: string | null;
                             next_task_id?: string | null;
                             note?: string | null;
                             /** @enum {string|null} */
@@ -25550,7 +25993,7 @@ export interface operations {
                             resolved_by_membership_id?: string | null;
                             result_text?: string | null;
                             /** @enum {string|null} */
-                            rule_key?: "reply" | "failed_message" | "follow_up" | "claim" | "confirm" | "arrive" | "rebook" | "feedback" | "aftercare" | "call_back" | "next_visit" | "gone_quiet" | "payment_due" | "settle_by" | null;
+                            rule_key?: "reply" | "failed_message" | "follow_up" | "claim" | "confirm" | "arrive" | "rebook" | "feedback" | "aftercare" | "call_back" | "next_visit" | "gone_quiet" | "payment_due" | "settle_by" | "medical_rep_visit" | null;
                             snooze_label?: string | null;
                             /** Format: date-time */
                             snoozed_until?: string | null;
@@ -25627,6 +26070,7 @@ export interface operations {
                             /** @enum {string} */
                             kind?: "rule" | "follow_up" | "manual";
                             lead_id?: string | null;
+                            medical_rep_id?: string | null;
                             next_task_id?: string | null;
                             note?: string | null;
                             /** @enum {string|null} */
@@ -25654,7 +26098,7 @@ export interface operations {
                             resolved_by_membership_id?: string | null;
                             result_text?: string | null;
                             /** @enum {string|null} */
-                            rule_key?: "reply" | "failed_message" | "follow_up" | "claim" | "confirm" | "arrive" | "rebook" | "feedback" | "aftercare" | "call_back" | "next_visit" | "gone_quiet" | "payment_due" | "settle_by" | null;
+                            rule_key?: "reply" | "failed_message" | "follow_up" | "claim" | "confirm" | "arrive" | "rebook" | "feedback" | "aftercare" | "call_back" | "next_visit" | "gone_quiet" | "payment_due" | "settle_by" | "medical_rep_visit" | null;
                             snooze_label?: string | null;
                             /** Format: date-time */
                             snoozed_until?: string | null;
@@ -25694,7 +26138,7 @@ export interface operations {
                 created_to?: string;
                 due_from?: string;
                 due_to?: string;
-                kind?: "rule" | "follow_up" | "manual";
+                kind?: string;
                 lead_id?: string;
                 limit?: number;
                 order?: "asc" | "desc";
@@ -26118,6 +26562,7 @@ export interface operations {
                                 id?: string;
                                 logo_url?: string | null;
                                 name?: string;
+                                owner_user_id?: string | null;
                                 slug?: string;
                                 specialties?: ("skin" | "hair" | "dental" | "gynac" | "physio" | "general")[];
                                 /** @enum {string} */
@@ -26129,8 +26574,15 @@ export interface operations {
                                 updated_at?: string;
                             } | null;
                             global_role?: string | null;
+                            membership_id?: string | null;
                             my_permissions?: string[];
                             my_role_ids?: string[];
+                            my_roles?: {
+                                id: string;
+                                is_system: boolean;
+                                name: string;
+                                tone: string;
+                            }[];
                             user?: {
                                 avatar_url?: string | null;
                                 /** Format: date-time */
@@ -27033,6 +27485,7 @@ export interface operations {
                                 id?: string;
                                 logo_url?: string | null;
                                 name?: string;
+                                owner_user_id?: string | null;
                                 slug?: string;
                                 specialties?: ("skin" | "hair" | "dental" | "gynac" | "physio" | "general")[];
                                 /** @enum {string} */
@@ -27092,6 +27545,7 @@ export interface operations {
                                 id?: string;
                                 logo_url?: string | null;
                                 name?: string;
+                                owner_user_id?: string | null;
                                 slug?: string;
                                 specialties?: ("skin" | "hair" | "dental" | "gynac" | "physio" | "general")[];
                                 /** @enum {string} */
@@ -27337,6 +27791,7 @@ export interface operations {
                             /** Format: date-time */
                             created_at?: string;
                             currency?: string;
+                            description?: string | null;
                             id?: string;
                             is_active?: boolean;
                             name?: string;
@@ -27379,6 +27834,7 @@ export interface operations {
                             /** Format: date-time */
                             created_at?: string;
                             currency?: string;
+                            description?: string | null;
                             id?: string;
                             is_active?: boolean;
                             name?: string;
@@ -28127,6 +28583,7 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: {
+                            description?: string;
                             event?: string;
                         }[];
                         meta?: {
@@ -28545,6 +29002,7 @@ export interface operations {
                             id?: string;
                             logo_url?: string | null;
                             name?: string;
+                            owner_user_id?: string | null;
                             slug?: string;
                             specialties?: ("skin" | "hair" | "dental" | "gynac" | "physio" | "general")[];
                             /** @enum {string} */
@@ -28630,6 +29088,7 @@ export interface operations {
                             id?: string;
                             logo_url?: string | null;
                             name?: string;
+                            owner_user_id?: string | null;
                             slug?: string;
                             specialties?: ("skin" | "hair" | "dental" | "gynac" | "physio" | "general")[];
                             /** @enum {string} */
@@ -29087,6 +29546,7 @@ export interface operations {
                             id?: string;
                             logo_url?: string | null;
                             name?: string;
+                            owner_user_id?: string | null;
                             slug?: string;
                             specialties?: ("skin" | "hair" | "dental" | "gynac" | "physio" | "general")[];
                             /** @enum {string} */
@@ -29182,6 +29642,7 @@ export interface operations {
                                 expires_at?: string;
                                 id?: string;
                             } | null;
+                            is_owner?: boolean;
                             /** Format: date-time */
                             joined_at?: string | null;
                             organization_id?: string;
@@ -29274,10 +29735,12 @@ export interface operations {
                             ended_at?: string | null;
                             id?: string;
                             invitation?: {
+                                debug_invitation_token?: string;
                                 /** Format: date-time */
                                 expires_at?: string;
                                 id?: string;
                             } | null;
+                            is_owner?: boolean;
                             /** Format: date-time */
                             joined_at?: string | null;
                             organization_id?: string;
@@ -29353,6 +29816,7 @@ export interface operations {
                                 expires_at?: string;
                                 id?: string;
                             } | null;
+                            is_owner?: boolean;
                             /** Format: date-time */
                             joined_at?: string | null;
                             organization_id?: string;
@@ -29475,6 +29939,7 @@ export interface operations {
                                 expires_at?: string;
                                 id?: string;
                             } | null;
+                            is_owner?: boolean;
                             /** Format: date-time */
                             joined_at?: string | null;
                             organization_id?: string;
@@ -29578,6 +30043,7 @@ export interface operations {
                             accepted_at?: string | null;
                             /** Format: date-time */
                             created_at?: string;
+                            debug_invitation_token?: string;
                             /** Format: email */
                             email?: string;
                             /** Format: date-time */
@@ -29675,6 +30141,7 @@ export interface operations {
                                 expires_at?: string;
                                 id?: string;
                             } | null;
+                            is_owner?: boolean;
                             /** Format: date-time */
                             joined_at?: string | null;
                             organization_id?: string;
@@ -29987,6 +30454,7 @@ export interface operations {
                         data?: {
                             /** Format: date-time */
                             created_at?: string;
+                            description?: string | null;
                             id?: string;
                             is_locked?: boolean;
                             is_system?: boolean;
@@ -30029,6 +30497,7 @@ export interface operations {
             content: {
                 "application/json": {
                     copy_from_role_id?: string;
+                    description?: string | null;
                     name: string;
                     permission_codes?: string[];
                     /** @enum {string} */
@@ -30047,6 +30516,7 @@ export interface operations {
                         data?: {
                             /** Format: date-time */
                             created_at?: string;
+                            description?: string | null;
                             id?: string;
                             is_locked?: boolean;
                             is_system?: boolean;
@@ -30094,6 +30564,7 @@ export interface operations {
                         data?: {
                             /** Format: date-time */
                             created_at?: string;
+                            description?: string | null;
                             id?: string;
                             is_locked?: boolean;
                             is_system?: boolean;
@@ -30160,6 +30631,7 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    description?: string | null;
                     /** Format: date-time */
                     expected_updated_at?: string;
                     name?: string;
@@ -30179,6 +30651,7 @@ export interface operations {
                         data?: {
                             /** Format: date-time */
                             created_at?: string;
+                            description?: string | null;
                             id?: string;
                             is_locked?: boolean;
                             is_system?: boolean;
@@ -30326,6 +30799,7 @@ export interface operations {
                         data?: {
                             /** Format: date-time */
                             created_at?: string;
+                            description?: string | null;
                             id?: string;
                             is_locked?: boolean;
                             is_system?: boolean;
@@ -30503,6 +30977,7 @@ export interface operations {
                                 expires_at?: string;
                                 id?: string;
                             } | null;
+                            is_owner?: boolean;
                             /** Format: date-time */
                             joined_at?: string | null;
                             organization_id?: string;
@@ -30577,6 +31052,7 @@ export interface operations {
                             id?: string;
                             logo_url?: string | null;
                             name?: string;
+                            owner_user_id?: string | null;
                             slug?: string;
                             specialties?: ("skin" | "hair" | "dental" | "gynac" | "physio" | "general")[];
                             /** @enum {string} */
@@ -30629,6 +31105,7 @@ export interface operations {
                             id?: string;
                             logo_url?: string | null;
                             name?: string;
+                            owner_user_id?: string | null;
                             slug?: string;
                             specialties?: ("skin" | "hair" | "dental" | "gynac" | "physio" | "general")[];
                             /** @enum {string} */
@@ -30673,6 +31150,7 @@ export interface operations {
                             code?: string;
                             /** Format: date-time */
                             created_at?: string;
+                            description?: string | null;
                             name?: string;
                         }[];
                         meta?: {
@@ -31642,6 +32120,7 @@ export interface operations {
                             id?: string;
                             logo_url?: string | null;
                             name?: string;
+                            owner_user_id?: string | null;
                             slug?: string;
                             specialties?: ("skin" | "hair" | "dental" | "gynac" | "physio" | "general")[];
                             /** @enum {string} */
