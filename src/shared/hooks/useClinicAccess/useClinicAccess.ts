@@ -18,6 +18,20 @@ import { useMyStaffProfile } from '@/shared/hooks/useTeam/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
+/**
+ * Whether the member may export a table's rows (the bulk bar's Export): a room on clinozy-be asks
+ * for its own export code (`patient:export`, `lead:export`), as the server would; a View-as
+ * preview, or a room still on fixtures (no code), asks the matrix's `export` ability.
+ */
+export function canExportRows(
+  access: Pick<ClinicAccess, 'isResolved' | 'previewRole' | 'canCode' | 'canAbility'>,
+  code: string | undefined,
+): boolean {
+  if (!access.isResolved) return false;
+  if (code && access.previewRole === null) return access.canCode(code);
+  return access.canAbility('export');
+}
+
 /** The signed-in member's clinic access, narrowed by View-as while it runs. */
 export interface ClinicAccess {
   /**

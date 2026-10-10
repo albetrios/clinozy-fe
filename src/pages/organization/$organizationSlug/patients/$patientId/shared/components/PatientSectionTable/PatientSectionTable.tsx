@@ -6,6 +6,7 @@ import type { ReactTable } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 
 import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import { isBillingSection } from '@/shared/clinic/patient-file-sections.ts';
 import {
   DataTable,
   type DataTableFeatures,
@@ -14,7 +15,7 @@ import {
 import type { DataTableBulkAction } from '@/shared/components/DataTableBulkBar/index.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
 import { RoomTableEmpty } from '@/shared/components/RoomTableEmpty/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { canExportRows, useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { FileIcon } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -62,6 +63,10 @@ function peopleText<TRow extends { id: string }>(
   return typeof value === 'string' ? value : undefined;
 }
 
+/** The code a section's Export asks for: billing records are payments', the rest the patient's. */
+const sectionExportCode = (section: PatientTableSection) =>
+  isBillingSection(section) ? 'payment:export' : 'patient:export';
+
 /**
  * One of the patient file's section tables (KICKOFF §6.6 Section tables;
  * H:4746–4760): the shared table in the section's content — folded columns on
@@ -83,25 +88,27 @@ export function PatientSectionTable<TRow extends { id: string }>({
   const access = useClinicAccess();
   const K = PATIENT_TABLE_KEYS;
   const Icon = PATIENT_FILE_SECTION_ICONS[section];
-  const bulkActions: DataTableBulkAction<TRow>[] =
-    access.isResolved && access.canAbility('export')
-      ? [
-          {
-            id: 'export',
-            label: t(K.export),
-            icon: FileIcon,
-            onSelect: (selected) => {
-              exportTableCsv({
-                table,
-                rows: selected,
-                fileName: `${section}.csv`,
-                cell: (columnId, row) => peopleText(table, columnId, row),
-              });
-              notify.success(t(K.exported, { count: selected.length }));
-            },
+  const bulkActions: DataTableBulkAction<TRow>[] = canExportRows(
+    access,
+    sectionExportCode(section),
+  )
+    ? [
+        {
+          id: 'export',
+          label: t(K.export),
+          icon: FileIcon,
+          onSelect: (selected) => {
+            exportTableCsv({
+              table,
+              rows: selected,
+              fileName: `${section}.csv`,
+              cell: (columnId, row) => peopleText(table, columnId, row),
+            });
+            notify.success(t(K.exported, { count: selected.length }));
           },
-        ]
-      : [];
+        },
+      ]
+    : [];
 
   return (
     <div className="flex min-h-0 flex-1 flex-col pt-3">

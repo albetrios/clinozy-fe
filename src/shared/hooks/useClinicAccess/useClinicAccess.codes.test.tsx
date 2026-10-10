@@ -15,7 +15,7 @@ import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
-import { useClinicAccess } from './useClinicAccess.ts';
+import { canExportRows, useClinicAccess } from './useClinicAccess.ts';
 
 function renderAccess() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -135,5 +135,38 @@ describe('useClinicAccess — a room on the API answers from the member’s code
     rerender();
     await waitFor(() => expect(result.current.previewRole).toBe('doctor'));
     expect(result.current.canCode('lead:export')).toBe(false);
+  });
+});
+
+describe("canExportRows — the bulk bar's Export", () => {
+  const access = (over: Partial<Parameters<typeof canExportRows>[0]> = {}) => ({
+    isResolved: true,
+    previewRole: null,
+    canCode: (code: string) => code === 'patient:export',
+    canAbility: () => true,
+    ...over,
+  });
+
+  it('asks a room on the API for its own export code, not the matrix', () => {
+    expect(canExportRows(access(), 'patient:export')).toBe(true);
+    expect(canExportRows(access(), 'payment:export')).toBe(false);
+    expect(canExportRows(access({ canAbility: () => false }), 'patient:export')).toBe(
+      true,
+    );
+  });
+
+  it('asks the matrix while View-as runs, or for a room still on fixtures', () => {
+    expect(
+      canExportRows(
+        access({ previewRole: 'front_desk', canAbility: () => false }),
+        'patient:export',
+      ),
+    ).toBe(false);
+    expect(canExportRows(access({ previewRole: 'doctor' }), 'payment:export')).toBe(true);
+    expect(canExportRows(access({ canAbility: () => false }), undefined)).toBe(false);
+  });
+
+  it('offers nothing until the access has answered', () => {
+    expect(canExportRows(access({ isResolved: false }), 'patient:export')).toBe(false);
   });
 });

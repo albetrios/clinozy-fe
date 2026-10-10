@@ -17,7 +17,7 @@ Conversion (one) · Created · Follow-up date) · Columns · "New patient", whic
 · Gender · Type · Status · Conversion · Age · Follow-up · Updated (the time), Gender /
 Conversion / Age hidden by default (a device pref); only ID and Follow-up sort; folds on a
 tablet (4 columns at 820, 2 at 1024); selection and the bulk bar from `md` (Export as CSV
-with the `export` ability); row actions Edit · Delete; infinite scroll over cursor pages,
+with `patient:export`; View-as asks the role's `export` ability); row actions Edit · Delete; infinite scroll over cursor pages,
 "All patients loaded". In clinic today, With dues, the Gender filter, the other sorts, the
 Due column and who saved the record go — the API has no read for them (G4, Q22); New
 invoice and Collect come back with Payments on clinozy-be.

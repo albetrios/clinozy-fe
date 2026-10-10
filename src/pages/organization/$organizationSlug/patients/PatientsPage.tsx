@@ -22,7 +22,7 @@ import { PatientDrawer } from '@/shared/components/PatientDrawer/index.ts';
 import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
 import { RoomTableEmpty } from '@/shared/components/RoomTableEmpty/index.ts';
 import { useRoomFilters } from '@/shared/components/RoomToolbar/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { canExportRows, useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
 import { usePatientList } from '@/shared/hooks/usePatients/index.ts';
@@ -163,7 +163,7 @@ export function PatientsPage() {
   };
 
   const bulkActions: DataTableBulkAction<PatientRow>[] =
-    access.isResolved && access.canAbility('export')
+    canExportRows(access, 'patient:export')
       ? [
           {
             id: 'export',

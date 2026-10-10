@@ -16,7 +16,7 @@ import type { DataTableBulkAction } from '@/shared/components/DataTableBulkBar/i
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
 import { EmptyStateAction } from '@/shared/components/EmptyState/index.ts';
 import { RoomTableEmpty } from '@/shared/components/RoomTableEmpty/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { canExportRows, useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import type { CursorListResult } from '@/shared/hooks/useCursorList/index.ts';
 import { FileIcon } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -57,8 +57,13 @@ export interface RoomTableProps<TRow extends { id: string }> {
   /** The 3px status edge's tone. */
   rowTone?: (row: TRow) => Tone | undefined;
   rowActions?: (row: TRow) => readonly DataTableRowAction[];
-  /** The export file ("medicines.csv"); the bulk bar's Export needs the `export` ability. */
+  /**
+   * The export file ("medicines.csv"); the bulk bar's Export needs `exportCode` on a room on
+   * clinozy-be, else the matrix's `export` ability ({@link canExportRows}).
+   */
   exportName: string;
+  /** The clinozy-be export code of a room on the API (`stock_item:export`); none on fixtures. */
+  exportCode?: string;
   /** A cell's own export text (a person cell's name and phone). */
   exportValue?: TableCsvExport<TRow>['cell'];
   /** The room's words for Export and its toast ("3 rows exported as CSV"). */
@@ -97,6 +102,7 @@ export function RoomTable<TRow extends { id: string }>({
   rowTone,
   rowActions,
   exportName,
+  exportCode,
   exportValue,
   exportCopy,
   avatar = false,
@@ -104,7 +110,7 @@ export function RoomTable<TRow extends { id: string }>({
 }: RoomTableProps<TRow>) {
   const access = useClinicAccess();
   const exportAction: DataTableBulkAction<TRow>[] =
-    access.isResolved && access.canAbility('export')
+    canExportRows(access, exportCode)
       ? [
           {
             id: 'export',

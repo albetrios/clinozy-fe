@@ -1,5 +1,5 @@
 import { type ColumnDef, useTable } from '@tanstack/react-table';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
@@ -9,6 +9,8 @@ import {
   dataTableFeatures,
 } from '@/shared/components/DataTable/index.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
 import {
   renderInPatientFile,
@@ -138,6 +140,30 @@ describe('PatientSectionTable (KICKOFF §6.6 Section tables)', () => {
     expect(cell('doctor', VISITS[0] as Visit)).toBe('Dr. Drashti Moradiya');
     expect(cell('when', VISITS[0] as Visit)).toBeUndefined();
     expect(notifyMock.success).toHaveBeenCalledWith('2 rows exported as CSV');
+  });
+
+  it('asks a signed-in member for `patient:export`, whatever their roles allow', async () => {
+    const user = userEvent.setup();
+    renderInPatientFile(<VisitsProbe rows={VISITS} />, { role: 'admin' });
+    act(() => {
+      useUIStore.setState({ previewRole: null });
+      useOrganizationStore
+        .getState()
+        .setPermissions(['organization:read', 'patient:read']);
+    });
+    await user.click(await screen.findByTestId('patient-visits-table-select-all'));
+    expect(
+      screen.queryByTestId('patient-visits-table-bulk-export'),
+    ).not.toBeInTheDocument();
+
+    act(() =>
+      useOrganizationStore
+        .getState()
+        .setPermissions(['organization:read', 'patient:read', 'patient:export']),
+    );
+    expect(
+      await screen.findByTestId('patient-visits-table-bulk-export'),
+    ).toBeInTheDocument();
   });
 
   it('offers no Export to a member without the export ability', async () => {

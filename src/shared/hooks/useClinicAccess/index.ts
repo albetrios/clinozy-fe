@@ -1,4 +1,5 @@
 export {
+  canExportRows,
   type ClinicAccess,
   useClinicAccess,
   useClinicAccessMatrix,
