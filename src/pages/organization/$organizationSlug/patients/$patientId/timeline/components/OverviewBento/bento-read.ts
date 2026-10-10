@@ -11,7 +11,7 @@ export function bentoRead(query: {
   isPending: boolean;
   isError: boolean;
   isSuccess: boolean;
-  refetch: () => unknown;
+  refetch: () => Promise<unknown>;
 }): BentoRead {
   return {
     isPending: query.isPending,

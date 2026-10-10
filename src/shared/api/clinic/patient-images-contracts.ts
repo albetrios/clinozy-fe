@@ -145,7 +145,10 @@ export function toPatientPhoto(row: z.output<typeof patientImageWire>): PatientP
 export function photoName(
   photo: Pick<PatientPhoto, 'caption' | 'displayName' | 'fileName'>,
 ): string {
-  return photo.caption?.trim() || photo.displayName?.trim() || photo.fileName;
+  const named = [photo.caption, photo.displayName]
+    .map((name) => name?.trim())
+    .find(Boolean);
+  return named ?? photo.fileName;
 }
 
 // ── The list ──

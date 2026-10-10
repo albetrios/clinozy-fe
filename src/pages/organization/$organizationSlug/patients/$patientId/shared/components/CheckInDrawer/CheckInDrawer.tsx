@@ -80,7 +80,7 @@ function useEditingCheckIn(
   const [record, setRecord] = useState(checkIn);
   const reload = async () => {
     if (!record) return;
-    const fresh = await queryClient.fetchQuery({
+    const fresh = await queryClient.query({
       queryKey: feedbackQueryKeys.checkIn(organizationId, record.id),
       queryFn: () => fetchCheckIn(record.patientId, record.id),
       staleTime: 0,

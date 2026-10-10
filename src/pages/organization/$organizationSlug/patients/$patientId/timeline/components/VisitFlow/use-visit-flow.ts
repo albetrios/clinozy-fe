@@ -104,7 +104,7 @@ function readOf<Row, T>(
     data: Row[] | undefined;
     isPending: boolean;
     isError: boolean;
-    refetch: () => unknown;
+    refetch: () => Promise<unknown>;
   },
   pick: (rows: readonly Row[]) => T,
 ): VisitFlowRead<T> {

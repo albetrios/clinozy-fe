@@ -134,7 +134,7 @@ function lineOf(
   const { t } = f;
   return {
     id: row.id,
-    name: row.name || offering?.name || t(KEYS.offeringRemoved),
+    name: [row.name, offering?.name].find(Boolean) ?? t(KEYS.offeringRemoved),
     tone: offering ? OFFERING_CATEGORY_TONES[offering.category] : 'stone',
     info: [
       categoryOf(t, offering),

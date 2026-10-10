@@ -186,7 +186,7 @@ function useEditingRecord(
   const [record, setRecord] = useState(patient);
   const reload = async () => {
     if (!record) return;
-    const fresh = await queryClient.fetchQuery({
+    const fresh = await queryClient.query({
       queryKey: patientQueryKeys.detail(organizationId, record.id),
       queryFn: () => fetchPatient(record.id),
       staleTime: 0,

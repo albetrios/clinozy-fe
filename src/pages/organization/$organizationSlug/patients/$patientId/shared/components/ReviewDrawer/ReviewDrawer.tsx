@@ -68,7 +68,7 @@ function useEditingReview(
   const [record, setRecord] = useState(review);
   const reload = async () => {
     if (!record) return;
-    const fresh = await queryClient.fetchQuery({
+    const fresh = await queryClient.query({
       queryKey: feedbackQueryKeys.review(organizationId, record.id),
       queryFn: () => fetchReview(record.patientId, record.id),
       staleTime: 0,
