@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { Contact } from '@/shared/api/clinic/contacts-contracts.ts';
+import { EMPTY_CONTACT_PROFILE } from '@/tests/utils/contact-doubles.ts';
 
 import {
   type ContactEditorValue,
@@ -18,6 +19,7 @@ import {
 
 /** Rhea as `GET /app/contacts/:contact_id` reads her — her primary number second on the wire. */
 const RHEA: Contact = {
+  ...EMPTY_CONTACT_PROFILE,
   id: 'con_rhea00000000000000000',
   contactNumber: 12345,
   firstName: 'Rhea',

@@ -10,6 +10,7 @@ import type {
 } from '@/shared/api/clinic/leads-contracts.ts';
 import { leadHold } from '@/shared/api/clinic/leads-hold.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
+import { EMPTY_CONTACT_PROFILE } from '@/tests/utils/contact-doubles.ts';
 
 /** 10:00 on 3 Oct 2026, clinic time — every Leads test's "now". */
 export const NOW = new Date(clinicInstant('2026-10-03', '10:00'));
@@ -94,6 +95,7 @@ export function leadRecord(overrides: Partial<LeadRecord> = {}): LeadRecord {
 /** The lead's person as `GET /app/contacts/:contact_id` answers. */
 export function contactRecord(overrides: Partial<Contact> = {}): Contact {
   return {
+    ...EMPTY_CONTACT_PROFILE,
     id: 'con_anaya0000000000000000',
     contactNumber: 10234,
     firstName: 'Anaya',

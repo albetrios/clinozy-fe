@@ -17,6 +17,7 @@ import { notify } from '@/shared/notify/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { EMPTY_CONTACT_PROFILE } from '@/tests/utils/contact-doubles.ts';
 
 import {
   useContact,
@@ -39,6 +40,7 @@ vi.mock('@/shared/notify/index.ts', async (importOriginal) => ({
 
 /** Anaya Desai, as `GET /app/contacts/:contact_id` reads her. */
 const ANAYA: Contact = {
+  ...EMPTY_CONTACT_PROFILE,
   id: 'con_anaya0000000000000000',
   contactNumber: 10234,
   firstName: 'Anaya',

@@ -3,6 +3,13 @@ import { z } from 'zod';
 import type { ApiBody, ApiData } from '@/core/http/api.ts';
 import { wireSchema } from '@/core/http/wire-schema.ts';
 
+import {
+  type Gender,
+  genderSchema,
+  type ReferralSource,
+  referralSourceSchema,
+} from './clinic-schema.ts';
+
 /*
  * The person (api-integration §3): one contact holds the name, the numbers, the handles, the
  * channel and the preferences; a lead, a patient file, a booking and a bill point at it with
@@ -77,6 +84,13 @@ const contactFieldsWire = {
   last_received_at: z.string().nullable(),
   is_awaiting_reply: z.boolean(),
   updated_at: z.string(),
+  gender: genderSchema.nullable(),
+  date_of_birth: z.string().nullable(),
+  address: z.string().nullable(),
+  referral_source: referralSourceSchema.nullable(),
+  referred_by_contact_id: z.string().nullable(),
+  referred_by_name: z.string().nullable(),
+  has_marketing_consent: z.boolean(),
 };
 
 /** One contact (`GET /app/contacts/:contact_id`) — with every number. */
@@ -125,8 +139,22 @@ export interface ContactSummary {
   updatedAt: string;
 }
 
+/** What a person's record holds beyond their reach — the patient file's About and Edit patient. */
+export interface ContactProfile {
+  gender: Gender | null;
+  /** `YYYY-MM-DD`. */
+  dateOfBirth: string | null;
+  address: string | null;
+  referralSource: ReferralSource | null;
+  /** The contact who referred them, when it was someone the clinic knows. */
+  referredByContactId: string | null;
+  /** Who referred them, as typed. */
+  referredByName: string | null;
+  hasMarketingConsent: boolean;
+}
+
 /** A person with every number — the contact editor's record. */
-export interface Contact extends ContactSummary {
+export interface Contact extends ContactSummary, ContactProfile {
   phones: ContactPhone[];
 }
 
@@ -160,10 +188,24 @@ export function toContactSummary(row: z.output<typeof contactRowWire>): ContactS
   };
 }
 
+/** A contact row's profile — the fields beyond the name and the reach. */
+export function toContactProfile(row: z.output<typeof contactRowWire>): ContactProfile {
+  return {
+    gender: row.gender,
+    dateOfBirth: row.date_of_birth,
+    address: row.address,
+    referralSource: row.referral_source,
+    referredByContactId: row.referred_by_contact_id,
+    referredByName: row.referred_by_name,
+    hasMarketingConsent: row.has_marketing_consent,
+  };
+}
+
 /** One contact as the rooms read it. */
 export function toContact(row: z.output<typeof contactWire>): Contact {
   return {
     ...toContactSummary(row),
+    ...toContactProfile(row),
     phones: row.phones.map((entry) => ({
       phone: entry.phone,
       isPrimary: entry.is_primary,

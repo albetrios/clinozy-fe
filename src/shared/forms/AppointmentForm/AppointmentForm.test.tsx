@@ -42,6 +42,7 @@ import {
   fixtureActiveBranches,
   signInTestMember,
 } from '@/tests/utils/clinic-shell-doubles.ts';
+import { EMPTY_CONTACT_PROFILE } from '@/tests/utils/contact-doubles.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 const viewport = vi.hoisted(() => ({ tier: 'desktop' as ViewportTier, width: 1440 }));
@@ -327,6 +328,7 @@ const EDIT = IDS.drawer;
 
 /** Riya Mehta as `GET /app/contacts/:contact_id` reads her — a lead, no patient file. */
 const RIYA: Contact = {
+  ...EMPTY_CONTACT_PROFILE,
   ...contactHit(),
   phones: [{ phone: '+919825011241', isPrimary: true, isOnWhatsapp: true }],
 };

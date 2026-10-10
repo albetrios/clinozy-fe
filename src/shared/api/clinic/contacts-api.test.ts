@@ -33,6 +33,13 @@ const contactRow = (patch: Record<string, unknown> = {}) => ({
   last_received_at: '2026-10-02T04:00:00.000Z',
   is_awaiting_reply: true,
   updated_at: '2026-10-02T04:30:00.000Z',
+  gender: 'female',
+  date_of_birth: '1994-03-12',
+  address: null,
+  referral_source: 'instagram',
+  referred_by_contact_id: null,
+  referred_by_name: null,
+  has_marketing_consent: false,
   ...patch,
 });
 
@@ -76,6 +83,13 @@ describe('fetchContact', () => {
       lastReceivedAt: '2026-10-02T04:00:00.000Z',
       isAwaitingReply: true,
       updatedAt: '2026-10-02T04:30:00.000Z',
+      gender: 'female',
+      dateOfBirth: '1994-03-12',
+      address: null,
+      referralSource: 'instagram',
+      referredByContactId: null,
+      referredByName: null,
+      hasMarketingConsent: false,
       phones: [
         { phone: '+919879521034', isPrimary: true, isOnWhatsapp: true },
         { phone: '+919879521035', isPrimary: false, isOnWhatsapp: false },
