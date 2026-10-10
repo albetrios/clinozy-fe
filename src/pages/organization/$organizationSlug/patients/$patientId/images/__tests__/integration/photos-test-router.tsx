@@ -1,7 +1,7 @@
 /**
  * The Photos section as `routeTree.tsx` registers it — the section with its album and filter,
  * the viewer (`$imageId`) and Photo details (`$imageId/edit`) — inside the patient file's
- * context, for a signed-in member holding `codes` (or previewing `role` with View-as). The file
+ * context, for a signed-in member holding `codes` (or a preset `role`'s codes). The file
  * layout itself is not rendered: its reads are other sections' business, and the section only
  * reads the file's context. Every other path lands on a stand-in, so a test can read where a
  * link went.
@@ -24,6 +24,7 @@ import { PATIENT_FILE_SECTIONS } from '@/shared/clinic/patient-file-sections.ts'
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { PRESET_CODES } from '@/tests/utils/clinic-preset-codes.ts';
 import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import { patientFile } from '@/tests/utils/patient-doubles.ts';
 
@@ -52,7 +53,7 @@ export function photosUrl(rest = ''): string {
 interface RenderPhotosOptions {
   /** The member's own codes (no View-as). */
   codes?: readonly OrganizationPermission[];
-  /** Preview a role with View-as instead (the role's matrix and role gates). */
+  /** A member holding this preset's codes instead of `codes`. */
   role?: Role;
   file?: PatientFile;
   photos?: PatientPhotoUploads;
@@ -69,8 +70,9 @@ export function renderPhotos(
   }: RenderPhotosOptions = {},
 ) {
   signInTestMember();
-  useOrganizationStore.getState().setPermissions([...codes]);
-  useUIStore.setState({ previewRole: role ?? null });
+  useOrganizationStore
+    .getState()
+    .setPermissions([...(role ? PRESET_CODES[role] : codes)]);
 
   const root = createRootRoute({ component: () => <Outlet /> });
   const host = createRoute({

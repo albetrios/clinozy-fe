@@ -3,25 +3,30 @@
 Route: `/organization/$organizationSlug/users/roles` — the Users room's second tab (KICKOFF §6.12;
 `S:107`; the spec is the intake's users.md › Roles & access). It is registered beside the Team in the
 route tree rather than under it, because the Team route renders the Team; its folder still nests
-under the room, as the URL does. The URL's `role` is the role on screen — Front desk when absent
-(H:5179).
+under the room, as the URL does. The URL's `role` is the role on screen, by its clinozy-be id
+(`rol_…`) — Front desk when absent (H:5179).
 
-Gated like the room — `membership:read` and the `clinic-users` module, then `requireOrgStatus`.
-Every box and switch is an instant, optimistic write rolled back with the save-error toast
-(Q-U6); changing a role needs "Change roles & access" (`role:manage`, D47), and Admin is never
-narrowed. The clinic rows and the special permissions live on the fixture matrix
-(`REPLACE_WITH_API`); a bound role's Users row and "Change roles & access" are its clinozy-be
-permission codes (D17) — read-only for a role bound to a clinozy-be system role (D47).
+Gated on `role:read` and the `clinic-users` module, then `requireOrgStatus`. A role is its
+clinozy-be permission codes and nothing else: the matrix has one row per resource (Leads,
+Contacts, Contact activity, Appointments, Patients, Prescriptions, Treatments, Reviews,
+Medicines, Stock, Payments, Tasks, Offerings, Users, Roles, Branches) whose View · Create · Edit ·
+Delete boxes are that resource's `read` / `create` / `update` / `delete` codes ("—" where
+clinozy-be has none); **Special permissions** are the eight exports and three reads (lower
+prices, the clinical record, the private album); **Workspace permissions** list every other code
+in the catalogue — settings, integrations, billing, the audit log, uploads — as switch cards
+named by the catalogue. Every box and switch is an instant, optimistic whole-set write
+(`PUT …/roles/:id/permissions`) rolled back with the save-error toast (Q-U6). Changing a role needs
+`role:update`; Owner and Admin are locked; clinozy-be refuses a change while the role holds a code
+the viewer lacks, so the page says so and stays read-only, and a viewer only gives codes they hold.
+A custom role's name and description are boxes under its name (an emptied description saves the
+default, "Custom role"); "Copy from" replaces its codes with another role's. Delete role
+(`role:delete`, with the reason "Not needed") is offered for a custom role nobody holds; a
+system role is never renamed or deleted.
 
 Settings › Roles links here when the Users room is open to the member (D17, L-31f), so what
-Settings' role dialog did lives on the role page too: a custom role's description is a box under
-its name (an emptied box saves the default, "Custom role"), and **Workspace permissions** lists
-every clinozy-be code the matrix doesn't map — settings, integrations, billing, the audit log,
-uploads — as switch cards named by the catalog, for a role clinozy-be backs. The viewer gives only
-what they hold (`useAssignablePermissions`); each switch is a full replace of the role's codes,
-optimistic like a box (`useUpdateRoleCodes`). Delete role is the third relocated capability.
+Settings' role dialog did lives on the role page too.
 
-"Preview as <role>" starts View-as for any role but Admin, a custom role included (by its
+"Preview as <role>" starts View-as for any role but Owner and Admin, a custom role included (by its
 clinozy-be id): `useUIStore.previewRole` narrows `useClinicAccess` everywhere, the shell's pill
 names the role, and a role that can't view Users is taken to its first room by the org layout
 (`useRoomLanding`, Q-U11). Session-only — a reload ends it.
@@ -35,7 +40,7 @@ drawer opened from here (`?from=roles`).
 | File                | Responsibility                                                                           |
 | ------------------- | ---------------------------------------------------------------------------------------- |
 | `roles.route.tsx`   | Route marker — exports `Component` rendering `RolesPage`.                                |
-| `roles.manifest.ts` | Manifest — `kind: 'leaf'`, permission `membership:read`, module `clinic-users`.          |
+| `roles.manifest.ts` | Manifest — `kind: 'leaf'`, permission `role:read`, module `clinic-users`.                |
 | `RolesPage.tsx`     | Reads `role` (`validateRolesSearch`) and renders `RolesAccess`. Owns `users-roles-page`. |
 
 ## Test ids

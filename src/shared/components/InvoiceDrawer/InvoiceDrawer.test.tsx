@@ -85,6 +85,7 @@ import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 import { findMyMembershipId } from '@/shared/tenancy/my-membership.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { holdPreset } from '@/tests/utils/clinic-preset-codes.ts';
 import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import {
   INVOICE_TEST_BRANCHES,
@@ -158,10 +159,9 @@ function setUser() {
   return userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
 }
 
-/** A member previewed as `role` (View-as narrows the clinic access to its matrix). */
+/** The member holding the `role` preset's codes. */
 function asRole(role: Role) {
-  useOrganizationStore.getState().setPermissions(['organization:read']);
-  useUIStore.setState({ previewRole: role });
+  holdPreset(role);
 }
 
 /** The test member signed in to the organization with these clinozy-be codes. */
@@ -1079,8 +1079,8 @@ describe('InvoiceDrawer — Medical sale (§6.7, §6.9)', () => {
     expect(await axeForDialog(drawer)).toHaveNoViolations();
   });
 
-  it('lets a pharmacist — Medical, no Payments — make a New sale, never a clinic invoice', async () => {
-    asRole('pharmacist');
+  it('lets a member with Medical but no Payments make a New sale, never a clinic invoice', async () => {
+    signIn(['organization:read', 'medicine:read', 'medicine:create', 'medicine:update']);
     const sale = renderCreate({}, true);
     const drawer = await panel();
     expect(within(drawer).getByTestId('invoice-drawer-save')).toBeInTheDocument();

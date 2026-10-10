@@ -17,6 +17,7 @@ import { PATIENT_FILE_SECTIONS } from '@/shared/clinic/patient-file-sections.ts'
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { PRESET_CODES } from '@/tests/utils/clinic-preset-codes.ts';
 import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import { patientFile, TEST_PATIENT_ID } from '@/tests/utils/patient-doubles.ts';
 
@@ -36,8 +37,7 @@ export type PrescriptionsMember =
 function signInPrescriptionsMember(member: PrescriptionsMember): void {
   signInTestMember();
   if ('role' in member) {
-    useOrganizationStore.getState().setPermissions(['organization:read']);
-    useUIStore.setState({ previewRole: member.role });
+    useOrganizationStore.getState().setPermissions([...PRESET_CODES[member.role]]);
     return;
   }
   useOrganizationStore.getState().setPermissions(['organization:read', ...member.codes]);

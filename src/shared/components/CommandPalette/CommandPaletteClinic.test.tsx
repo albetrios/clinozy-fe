@@ -11,7 +11,6 @@ import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { OrganizationPermission } from '@/core/rbac/policies.ts';
 import type { PageManifest } from '@/lib/routes/page-manifest.ts';
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import type * as CommandSearchApiModule from '@/shared/api/clinic/command-search-api.ts';
@@ -27,6 +26,7 @@ import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 import type * as MyOrganizationSummariesModule from '@/shared/tenancy/my-organization-summaries.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { fsi, withoutBidiMarks } from '@/tests/utils/bidi-marks.ts';
+import { holdPreset, previewPreset } from '@/tests/utils/clinic-preset-codes.ts';
 
 import { CommandPalette } from './CommandPalette.tsx';
 
@@ -113,37 +113,12 @@ async function renderMenu(path = '/organization/acme/today') {
     </QueryClientProvider>,
   );
   await screen.findByRole('combobox', { name: 'Search' });
-  return { ...utils, router, user };
+  return { ...utils, router, user, client };
 }
 
-/**
- * The codes clinozy-be gives Owner and Admin for the rooms already on it (Leads, Appointments,
- * Patients, Stock, Tasks, Payments; Offerings reads with `organization:read`).
- */
-const LIVE_ROOM_CODES: OrganizationPermission[] = [
-  'lead:read',
-  'lead:create',
-  'appointment:read',
-  'appointment:create',
-  'patient:read',
-  'patient:create',
-  'stock_item:read',
-  'stock_item:create',
-  'task:read',
-  'payment:read',
-  'payment:create',
-];
-
-/** The member: Owner and Admin from their platform codes, any other role by View-as. */
+/** The member holding the `role` preset's codes. */
 function signIn(role: Role) {
-  const permissions: Partial<Record<Role, OrganizationPermission[]>> = {
-    owner: ['organization:read', 'organization:delete', ...LIVE_ROOM_CODES],
-    admin: ['organization:read', 'role:manage', ...LIVE_ROOM_CODES],
-  };
-  useOrganizationStore
-    .getState()
-    .setPermissions(permissions[role] ?? ['organization:read']);
-  useUIStore.getState().setPreviewRole(permissions[role] ? null : role);
+  holdPreset(role);
 }
 
 const search = () => screen.getByRole('combobox', { name: 'Search' });
@@ -184,7 +159,7 @@ const ALL_ACTIONS = [
   'open-tasks',
 ];
 
-/** What each role is offered (access.fixtures.ts; KICKOFF §3.7). */
+/** What each preset is offered by its codes (`PRESET_CODES`; KICKOFF §3.7). */
 const BY_ROLE: Record<
   Role,
   { actions: string[]; goTo: string[]; results: ('patients' | 'leads' | 'invoices')[] }
@@ -201,11 +176,11 @@ const BY_ROLE: Record<
   },
   doctor: {
     actions: ['new-lead', 'new-appointment', 'new-patient', 'open-tasks'],
-    goTo: ['leads', 'appointments', 'patients', 'tasks'],
-    results: ['patients', 'leads'],
+    goTo: ['leads', 'appointments', 'patients', 'payments'],
+    results: ['patients', 'leads', 'invoices'],
   },
   therapist: {
-    actions: ['open-tasks'],
+    actions: ['new-appointment', 'new-patient', 'open-tasks'],
     goTo: ['appointments', 'patients', 'stock', 'tasks'],
     results: ['patients'],
   },
@@ -220,19 +195,19 @@ const BY_ROLE: Record<
     results: ['patients', 'leads', 'invoices'],
   },
   pharmacist: {
-    actions: ['new-patient', 'open-tasks'],
-    goTo: ['patients', 'stock', 'tasks'],
-    results: ['patients'],
+    actions: ['new-receipt', 'open-tasks'],
+    goTo: ['appointments', 'patients', 'stock', 'payments'],
+    results: ['patients', 'invoices'],
   },
   accountant: {
-    actions: ['new-receipt', 'open-tasks'],
-    goTo: ['stock', 'payments', 'tasks'],
-    results: ['invoices'],
+    actions: ['new-receipt'],
+    goTo: ['patients', 'stock', 'payments', 'offerings'],
+    results: ['patients', 'invoices'],
   },
   marketing: {
     actions: ['new-lead', 'open-tasks'],
-    goTo: ['leads', 'tasks'],
-    results: ['leads'],
+    goTo: ['leads', 'patients', 'tasks', 'offerings'],
+    results: ['patients', 'leads'],
   },
 };
 
@@ -263,10 +238,10 @@ describe('the command menu per role (L-28 acceptance)', () => {
   );
 
   it('narrows to the View-as role while a preview runs', async () => {
-    await renderMenu();
+    const { client } = await renderMenu();
     expect(await screen.findByTestId('command-palette-action-new-receipt')).toBeVisible();
 
-    act(() => useUIStore.getState().setPreviewRole('doctor'));
+    act(() => previewPreset(client, 'doctor'));
 
     await waitFor(() =>
       expect(screen.queryByTestId('command-palette-action-new-receipt')).toBeNull(),

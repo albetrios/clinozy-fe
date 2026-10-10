@@ -102,7 +102,7 @@ describe('requirePermission', () => {
       isLoading: false,
     });
     setOrganization({ permissions: ['membership:read'] });
-    await expect(requirePermission('membership:manage')).rejects.toMatchObject({
+    await expect(requirePermission('membership:update')).rejects.toMatchObject({
       to: '/unauthorized',
     });
   });
@@ -113,8 +113,8 @@ describe('requirePermission', () => {
       isAuthenticated: true,
       isLoading: false,
     });
-    setOrganization({ permissions: ['membership:manage'] });
-    await expect(requirePermission('membership:manage')).resolves.toBeUndefined();
+    setOrganization({ permissions: ['membership:update'] });
+    await expect(requirePermission('membership:update')).resolves.toBeUndefined();
   });
 
   // super_admin is a platform-admin role, not an organization capability: clinozy-be grants it
@@ -146,9 +146,9 @@ describe('requirePermission', () => {
       isLoading: false,
     });
     // Store synced to acme, but the route is for globex → deny even with the grant.
-    setOrganization({ permissions: ['membership:manage'], organizationSlug: 'acme' });
+    setOrganization({ permissions: ['membership:update'], organizationSlug: 'acme' });
     await expect(
-      requirePermission('membership:manage', undefined, 'globex'),
+      requirePermission('membership:update', undefined, 'globex'),
     ).rejects.toMatchObject({ to: '/unauthorized' });
   });
 
@@ -158,9 +158,9 @@ describe('requirePermission', () => {
       isAuthenticated: true,
       isLoading: false,
     });
-    setOrganization({ permissions: ['membership:manage'], organizationSlug: 'acme' });
+    setOrganization({ permissions: ['membership:update'], organizationSlug: 'acme' });
     await expect(
-      requirePermission('membership:manage', undefined, 'acme'),
+      requirePermission('membership:update', undefined, 'acme'),
     ).resolves.toBeUndefined();
   });
 });

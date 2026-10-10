@@ -10,7 +10,6 @@ import {
 } from '@/shared/components/DataTable/index.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
 import {
   renderInPatientFile,
@@ -142,11 +141,10 @@ describe('PatientSectionTable (KICKOFF §6.6 Section tables)', () => {
     expect(notifyMock.success).toHaveBeenCalledWith('2 rows exported as CSV');
   });
 
-  it('asks a signed-in member for `patient:export`, whatever their roles allow', async () => {
+  it('exports only for a member holding `patient:export`', async () => {
     const user = userEvent.setup();
     renderInPatientFile(<VisitsProbe rows={VISITS} />, { role: 'admin' });
     act(() => {
-      useUIStore.setState({ previewRole: null });
       useOrganizationStore
         .getState()
         .setPermissions(['organization:read', 'patient:read']);

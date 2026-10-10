@@ -1,12 +1,11 @@
+import { useQueries } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
-import {
-  type ClinicAccessMatrix,
-  resolveClinicAccess,
-} from '@/shared/api/clinic/access-api.ts';
-import type { ClinicRoleKey } from '@/shared/api/clinic/access-contracts.ts';
+import { resolveAccessFromCodes } from '@/shared/api/clinic/access-api.ts';
 import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
+import { getRolePermissions } from '@/shared/api/organization-api.ts';
+import { orgQueryKeys } from '@/shared/api/organization-query-keys.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
 import { formatClinicPhoneDigits } from '@/shared/clinic/clinic-phone-field.ts';
 import {
@@ -18,6 +17,7 @@ import {
   RECORD_DRAWER_KEYS,
   RECORD_DRAWER_NS,
 } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 import type { HoursFormat } from '../../shared/hooks/useHoursFormat/index.ts';
 import { USERS_KEYS, USERS_NS } from '../../users.constants.ts';
@@ -41,18 +41,36 @@ export interface UserDrawerView {
 }
 
 /**
- * "Gets access to" (`users.md:111`): the sections any picked role can View,
- * in the matrix's order — Admin all nine — joined " · "; "Pick a role" when
- * none is picked. Today stays out: every role has it (`S:1012`).
+ * The picked roles' codes, together — each role's read once and kept under its key (an edit's
+ * pre-fill and View-as read the same entry); undefined until every one has answered.
+ */
+function usePickedRoleCodes(roleIds: readonly string[]): string[] | undefined {
+  const organizationId = useOrganizationStore((state) => state.organizationId);
+  return useQueries({
+    queries: roleIds.map((roleId) => ({
+      queryKey: orgQueryKeys.rolePermissions(organizationId, roleId),
+      queryFn: () => getRolePermissions(roleId),
+    })),
+    combine: (results) =>
+      results.every((result) => result.data !== undefined)
+        ? results.flatMap((result) => result.data ?? [])
+        : undefined,
+  });
+}
+
+/**
+ * "Gets access to" (`users.md:111`; research-users §5a): the rooms the picked roles' codes view,
+ * together, in nav order, joined " · "; "Pick a role" when none is picked, nothing while their
+ * codes load. Today stays out: everyone has it.
  */
 function userAccessLine(
-  matrix: ClinicAccessMatrix | undefined,
-  roleKeys: readonly ClinicRoleKey[],
+  codes: readonly string[] | undefined,
+  roleIds: readonly string[],
   t: TFunction,
 ): string {
-  if (roleKeys.length === 0) return t(K.pickRole, { ns: USERS_NS });
-  if (!matrix) return '';
-  return resolveClinicAccess(matrix, roleKeys)
+  if (roleIds.length === 0) return t(K.pickRole, { ns: USERS_NS });
+  if (!codes) return '';
+  return resolveAccessFromCodes(codes)
     .viewableSections.filter((section) => section !== 'today')
     .map((section) => t(CLINIC_KEYS.sections[section].label, { ns: CLINIC_NS }))
     .join(' · ');
@@ -65,24 +83,22 @@ function userAccessLine(
  */
 export function useUserDrawerView({
   values,
-  matrix,
   rolePills,
   branches,
   multiBranch,
   format,
 }: {
   values: UserFormValues;
-  matrix: ClinicAccessMatrix | undefined;
   /** The picked roles as pills, in pick order. */
-  rolePills: (keys: readonly ClinicRoleKey[]) => TeamPill[];
+  rolePills: (roleIds: readonly string[]) => TeamPill[];
   branches: readonly BranchOption[];
   multiBranch: boolean;
   format: HoursFormat;
 }): UserDrawerView {
   const { t } = useTranslation([USERS_NS, CLINIC_NS]);
-  const roles = rolePills(values.roleKeys);
+  const roles = rolePills(values.roleIds);
   const picked = branches.filter((branch) => values.branchIds.includes(branch.id));
-  const access = userAccessLine(matrix, values.roleKeys, t);
+  const access = userAccessLine(usePickedRoleCodes(values.roleIds), values.roleIds, t);
   const hours = format.hours(values.workingDays, values.startsAt, values.endsAt);
   const statusLabel = values.active
     ? t(USERS_KEYS.status.active)
@@ -143,7 +159,7 @@ export function useUserDrawerView({
       },
     ],
     summary: [
-      name || t(K.summaryNew),
+      name || values.email.trim() || t(K.summaryNew),
       roles.map((role) => role.label).join(' + '),
       branchNames.join(', '),
     ]
@@ -155,9 +171,7 @@ export function useUserDrawerView({
         [roles.map((role) => role.label).join(' · '), access, branchNames.join(' · ')],
         notFilled,
       ),
-      missing: missingUserFields(values).map((field) =>
-        field === 'name' ? t(K.fields.name) : t(K.fields.email),
-      ),
+      missing: missingUserFields(values).map(() => t(K.fields.email)),
     },
     hours: {
       peek: hoursPeek,

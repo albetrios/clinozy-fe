@@ -328,14 +328,14 @@ describe('the Tasks room on clinozy-be (KICKOFF §6.10)', () => {
     expect(notifyMock.undo).not.toHaveBeenCalled();
   });
 
-  it('offers no New task without `task:create` — nor during View-as', async () => {
+  it('offers no New task without `task:create` — nor to a Pharmacist', async () => {
     const { unmount } = renderTasksRoutes(TASKS, TasksPage, {
       permissions: ['organization:read', 'task:read', 'task:update'],
     });
     await waitFor(() => expect(rows().length).toBeGreaterThan(0));
     expect(screen.queryByTestId('tasks-new')).not.toBeInTheDocument();
     unmount();
-    renderTasksRoutes(TASKS, TasksPage, { role: 'front_desk' });
+    renderTasksRoutes(TASKS, TasksPage, { role: 'pharmacist' });
     await waitFor(() => expect(rows().length).toBeGreaterThan(0));
     expect(screen.queryByTestId('tasks-new')).not.toBeInTheDocument();
   });

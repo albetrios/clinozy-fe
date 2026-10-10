@@ -4,16 +4,14 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import { PRODUCT_NAME } from '@/lib/product-identity.ts';
-import type * as AccessApiModule from '@/shared/api/clinic/access-api.ts';
-import { resetClinicAccessFixture } from '@/shared/api/clinic/access-api.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import { presetOfRole } from '@/shared/api/clinic/access-contracts.ts';
 import type * as OrganizationApiModule from '@/shared/api/organization-api.ts';
 import type { RoleSummary } from '@/shared/api/organization-contracts.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { PRESET_CODES } from '@/tests/utils/clinic-preset-codes.ts';
 
 import {
   member,
@@ -56,6 +54,7 @@ const api = vi.hoisted(() => ({
   listRoles: vi.fn(),
   listPermissionCatalog: vi.fn(),
   getRolePermissions: vi.fn(),
+  replaceRolePermissions: vi.fn(),
   createRole: vi.fn(),
   updateRole: vi.fn(),
   deleteRole: vi.fn(),
@@ -65,37 +64,42 @@ vi.mock('@/shared/api/organization-api.ts', async (importOriginal) => ({
   ...api,
 }));
 
-// The fixture matrix, with a switch that makes clinozy-be refuse the next write.
-const matrixWrites = vi.hoisted(() => ({ refuse: false }));
-vi.mock('@/shared/api/clinic/access-api.ts', async (importOriginal) => {
-  const actual = await importOriginal<typeof AccessApiModule>();
-  return {
-    ...actual,
-    saveRoleMatrixChange: (change: Parameters<typeof actual.saveRoleMatrixChange>[0]) =>
-      matrixWrites.refuse
-        ? Promise.reject(new Error('offline'))
-        : actual.saveRoleMatrixChange(change),
-  };
-});
-
 /** clinozy-be's permission catalog, as `listPermissionCatalog` maps it. */
 const CATALOG = [
   { code: 'organization:read', name: 'View Organization', category: 'tenancy' },
-  { code: 'membership:read', name: 'View Members', category: 'tenancy' },
+  { code: 'membership:read', name: 'View Members', category: 'users' },
   { code: 'webhook:manage', name: 'Manage Webhooks', category: 'notify' },
-  { code: 'audit-log:read', name: 'View Audit Log', category: 'audit' },
+  { code: 'audit-log:read', name: 'View Audit Logs', category: 'audit' },
 ];
 
+const { admin, doctor, front_desk: frontDesk, counsellor, senior } = PLATFORM_ROLES;
+
 const ROSTER = [
-  member('riya', SELF.email, PLATFORM_ROLES.admin, { userId: SELF.userId }),
-  member('reenal', 'reenal@cresence.skin'),
-  member('foram', 'foram@cresence.skin'),
+  member('riya', SELF.email, [admin, frontDesk], {
+    userId: SELF.userId,
+    name: 'Riya Shah',
+  }),
+  member('reenal', 'reenal@cresence.skin', [doctor], { name: 'Dr. Reenal Chaniyara' }),
+  member('foram', 'foram@cresence.skin', [frontDesk, counsellor], {
+    name: 'Foram Kanpariya',
+  }),
 ];
 
 /** The roles clinozy-be lists — mutable, so a created role is listed on the refetch. */
 let platformRoles: RoleSummary[] = [];
-/** Each role's permission codes as clinozy-be keeps them — a write is read back. */
-let roleCodes = new Map<string, OrganizationPermission[]>();
+/** Each role's codes as clinozy-be keeps them — a write is read back. */
+let roleCodes = new Map<string, string[]>();
+/** Refuse the next codes write, as clinozy-be would. */
+let refuseWrites = false;
+
+/** A role's codes: as written, else the preset's, else the reader's alone. */
+function codesOf(roleId: string): string[] {
+  const written = roleCodes.get(roleId);
+  if (written) return written;
+  const role = platformRoles.find((each) => each.id === roleId);
+  const preset = role ? presetOfRole(role) : null;
+  return preset ? [...PRESET_CODES[preset]] : ['organization:read'];
+}
 
 /** The Roles page as the route renders it: the URL's role on screen. */
 function Roles() {
@@ -107,41 +111,47 @@ function renderRoles(url = '/organization/acme/users/roles', codes = USERS_ADMIN
   return renderUsersRoutes(url, () => null, { codes, Roles });
 }
 
-/** The role page, once it is up. */
+const rolesUrl = (role: RoleSummary) => `/organization/acme/users/roles?role=${role.id}`;
+
+/** The role page, once it and the role's codes are up. */
 async function rolePage() {
   return screen.findByTestId('users-role-page');
 }
 
-function box(section: string, action: string) {
-  return screen.getByTestId(`users-role-matrix-${section}-${action}`);
+function box(row: string, action: string) {
+  return screen.getByTestId(`users-role-matrix-${row}-${action}`);
 }
+
+const without = (...codes: string[]) =>
+  USERS_ADMIN_CODES.filter((code) => !codes.includes(code));
 
 beforeEach(() => {
   viewport.tier = 'desktop';
-  matrixWrites.refuse = false;
-  resetClinicFixtures();
-  resetClinicAccessFixture();
+  refuseWrites = false;
   for (const fn of Object.values(notifyMock)) fn.mockReset();
   for (const fn of Object.values(api)) fn.mockReset();
   platformRoles = Object.values(PLATFORM_ROLES);
+  roleCodes = new Map();
   api.listMembers.mockResolvedValue({ rows: ROSTER, next: null, hasMore: false });
   api.listPermissionCatalog.mockResolvedValue(CATALOG);
   api.listRoles.mockImplementation(() =>
     Promise.resolve({ rows: platformRoles, next: null, hasMore: false }),
   );
-  roleCodes = new Map();
-  api.getRolePermissions.mockImplementation((id: string) =>
-    Promise.resolve(roleCodes.get(id) ?? ['organization:read']),
+  api.getRolePermissions.mockImplementation((id: string) => Promise.resolve(codesOf(id)));
+  api.replaceRolePermissions.mockImplementation((id: string, codes: string[]) => {
+    if (refuseWrites) return Promise.reject(new Error('offline'));
+    roleCodes.set(id, [...codes]);
+    return Promise.resolve(codes);
+  });
+  api.updateRole.mockImplementation(({ input }: { input: { id: string } }) => {
+    const role = platformRoles.find((each) => each.id === input.id);
+    return Promise.resolve({ ...role, ...input });
+  });
+  api.deleteRole.mockImplementation(({ roleId }: { roleId: string }) =>
+    Promise.resolve({ id: roleId }),
   );
-  api.updateRole.mockImplementation(
-    (input: { id: string; name: string; permissions: OrganizationPermission[] }) => {
-      roleCodes.set(input.id, input.permissions);
-      return Promise.resolve({ ...PLATFORM_ROLES.senior, ...input });
-    },
-  );
-  api.deleteRole.mockImplementation((id: string) => Promise.resolve({ id }));
-  api.createRole.mockImplementation((input: { name: string }) => {
-    const created = { ...platformRole('created', input.name, false), name: input.name };
+  api.createRole.mockImplementation(({ input }: { input: { name: string } }) => {
+    const created = platformRole('created', input.name, false);
     platformRoles = [...platformRoles, created];
     return Promise.resolve(created);
   });
@@ -149,31 +159,40 @@ beforeEach(() => {
 afterEach(() => {
   vi.useRealTimers();
   resetUsersRoutes();
-  resetClinicFixtures();
-  resetClinicAccessFixture();
 });
 
 describe('RolesAccess — the role list and page (users.md:42–77)', () => {
-  it('opens on Front desk: its people, the nine matrix rows and the eleven switches', async () => {
+  it('opens on Front desk: its people, a row per resource and its codes', async () => {
     const { container } = renderRoles();
     const page = await rolePage();
     expect(within(page).getByRole('heading', { name: 'Front desk' })).toBeInTheDocument();
-    expect(screen.getByTestId('users-roles-item-front_desk')).toHaveAttribute(
+    expect(screen.getByTestId(`users-roles-item-${frontDesk.id}`)).toHaveAttribute(
       'aria-current',
       'true',
     );
-    // The eight contract roles, then the organisation's custom role (Owner is never listed).
+    // The presets but Owner, then the clinic's own role.
     expect(screen.getAllByTestId(/^users-roles-item-/)).toHaveLength(9);
     const people = within(page).getAllByTestId('users-role-person');
     expect(people.map((pill) => pill.textContent)).toEqual([
       'RSRiya Shah+ Admin',
       'FKForam Kanpariya+ Counsellor',
     ]);
-    expect(within(page).getAllByRole('row')).toHaveLength(10);
-    expect(box('leads', 'view')).toHaveAttribute('aria-checked', 'true');
-    expect(box('leads', 'view')).toHaveAccessibleName('Front desk can view · Leads');
-    expect(box('medical', 'view')).toHaveAttribute('aria-checked', 'false');
-    expect(within(page).getAllByRole('switch')).toHaveLength(11);
+    // The head row and sixteen resources.
+    expect(within(page).getAllByRole('row')).toHaveLength(17);
+    expect(box('lead', 'view')).toHaveAttribute('aria-checked', 'true');
+    expect(box('lead', 'view')).toHaveAccessibleName('Front desk can view · Leads');
+    expect(box('lead', 'view')).toHaveAttribute('title', 'lead:read');
+    expect(box('lead', 'delete')).toHaveAttribute('aria-checked', 'false');
+    expect(box('medicine', 'view')).toHaveAttribute('aria-checked', 'false');
+    expect(box('patient_review', 'create')).toHaveAttribute('aria-checked', 'true');
+    // Every member reads the catalogue: Offerings has no View box.
+    expect(screen.queryByTestId('users-role-matrix-offering-view')).toBeNull();
+    expect(screen.getByTestId('users-role-code-lead:export')).toHaveTextContent(
+      'Export · Leads',
+    );
+    expect(
+      screen.getByTestId('users-role-code-patient:private_album:read'),
+    ).toHaveAttribute('aria-checked', 'false');
     expect(
       within(page).getByText(
         'Changes apply right away to everyone with this role. Someone with two roles gets everything either role allows.',
@@ -182,66 +201,80 @@ describe('RolesAccess — the role list and page (users.md:42–77)', () => {
     expect(await axe(container)).toHaveNoViolations();
   });
 
-  it('writes a box at once and keeps the rules: View off clears the row, the Row pill fills it', async () => {
+  it('writes the whole set at once — View off clears the row, a box brings View, the Row pill fills it', async () => {
     const user = userEvent.setup();
     renderRoles();
     await rolePage();
-    await user.click(box('leads', 'delete'));
-    expect(box('leads', 'delete')).toHaveAttribute('aria-checked', 'true');
-    expect(screen.getByTestId('users-role-matrix-leads-row')).toHaveTextContent('Full');
+    await user.click(box('lead', 'delete'));
+    expect(box('lead', 'delete')).toHaveAttribute('aria-checked', 'true');
+    expect(screen.getByTestId('users-role-matrix-lead-row')).toHaveTextContent('Full');
+    await waitFor(() =>
+      expect(api.replaceRolePermissions).toHaveBeenCalledWith(
+        frontDesk.id,
+        expect.arrayContaining(['lead:delete', ...PRESET_CODES.front_desk]),
+      ),
+    );
 
-    await user.click(box('leads', 'view'));
+    await user.click(box('lead', 'view'));
     for (const action of ['view', 'create', 'edit', 'delete']) {
-      expect(box('leads', action)).toHaveAttribute('aria-checked', 'false');
+      expect(box('lead', action)).toHaveAttribute('aria-checked', 'false');
     }
-    expect(screen.getByTestId('users-role-matrix-leads-row')).toHaveTextContent('None');
+    expect(screen.getByTestId('users-role-matrix-lead-row')).toHaveTextContent('None');
 
-    await user.click(box('medical', 'edit'));
-    expect(box('medical', 'view')).toHaveAttribute('aria-checked', 'true');
-    expect(screen.getByTestId('users-role-matrix-medical-row')).toHaveTextContent('Some');
+    await user.click(box('medicine', 'edit'));
+    expect(box('medicine', 'view')).toHaveAttribute('aria-checked', 'true');
+    expect(screen.getByTestId('users-role-matrix-medicine-row')).toHaveTextContent(
+      'Some',
+    );
 
-    await user.click(screen.getByTestId('users-role-matrix-medical-row'));
-    expect(box('medical', 'delete')).toHaveAttribute('aria-checked', 'true');
+    await user.click(screen.getByTestId('users-role-matrix-medicine-row'));
+    expect(box('medicine', 'delete')).toHaveAttribute('aria-checked', 'true');
     expect(notifyMock.error).not.toHaveBeenCalled();
   });
 
-  it('rolls a refused write back with the save-error toast', async () => {
+  it('puts a refused write back, with the error toast', async () => {
     const user = userEvent.setup();
     renderRoles();
     await rolePage();
-    matrixWrites.refuse = true;
-    await user.click(box('medical', 'view'));
+    refuseWrites = true;
+    await user.click(box('medicine', 'view'));
     await waitFor(() => expect(notifyMock.error).toHaveBeenCalled());
     await waitFor(() =>
-      expect(box('medical', 'view')).toHaveAttribute('aria-checked', 'false'),
+      expect(box('medicine', 'view')).toHaveAttribute('aria-checked', 'false'),
     );
   });
 
-  it('flips a special permission at once', async () => {
+  it('flips a special permission — one code — at once', async () => {
     const user = userEvent.setup();
     renderRoles();
     await rolePage();
-    const floor = screen.getByTestId('users-role-ability-floor');
+    const floor = screen.getByTestId('users-role-code-offering:lower_price:read');
     expect(floor).toHaveAttribute('aria-checked', 'false');
     await user.click(floor);
     expect(floor).toHaveAttribute('aria-checked', 'true');
-    await user.click(screen.getByTestId('users-role-ability-dayclose'));
-    expect(screen.getByTestId('users-role-ability-dayclose')).toHaveAttribute(
-      'aria-checked',
-      'false',
+    await waitFor(() =>
+      expect(api.replaceRolePermissions).toHaveBeenCalledWith(
+        frontDesk.id,
+        expect.arrayContaining(['offering:lower_price:read']),
+      ),
     );
   });
 
-  it('copies another role’s access and says so', async () => {
+  it('copies another role’s codes and says so', async () => {
     const user = userEvent.setup();
     renderRoles();
     await rolePage();
     await user.click(screen.getByTestId('users-role-copy'));
-    await user.click(await screen.findByTestId('users-role-copy-option-pharmacist'));
-    await waitFor(() =>
-      expect(box('medical', 'view')).toHaveAttribute('aria-checked', 'true'),
+    await user.click(
+      await screen.findByTestId(`users-role-copy-option-${PLATFORM_ROLES.pharmacist.id}`),
     );
-    expect(box('leads', 'view')).toHaveAttribute('aria-checked', 'false');
+    await waitFor(() =>
+      expect(box('medicine', 'view')).toHaveAttribute('aria-checked', 'true'),
+    );
+    expect(box('lead', 'view')).toHaveAttribute('aria-checked', 'false');
+    expect(api.replaceRolePermissions).toHaveBeenCalledWith(frontDesk.id, [
+      ...PRESET_CODES.pharmacist,
+    ]);
     expect(notifyMock.success).toHaveBeenCalledWith(
       'Front desk now has the same access as Pharmacist',
     );
@@ -249,227 +282,174 @@ describe('RolesAccess — the role list and page (users.md:42–77)', () => {
 
   it('opens a holder’s drawer with the page kept behind it', async () => {
     const user = userEvent.setup();
-    const { router } = renderRoles('/organization/acme/users/roles?role=doctor');
+    const { router } = renderRoles(rolesUrl(doctor));
     const page = await rolePage();
     expect(within(page).getByRole('heading', { name: 'Doctor' })).toBeInTheDocument();
     await user.click(within(page).getByTestId('users-role-person'));
+    const reenal = ROSTER[1]?.id;
     await waitFor(() =>
       expect(router.state.location.pathname).toBe(
-        '/organization/acme/users/mbr_reenal/edit',
+        `/organization/acme/users/${reenal}/edit`,
       ),
     );
-    expect(router.state.location.search).toEqual({ from: 'roles', role: 'doctor' });
+    expect(router.state.location.search).toEqual({ from: 'roles', role: doctor.id });
   });
 
-  it('previews the app as the role, never as Admin', async () => {
+  it('previews the app as the role — a custom one too — by its id', async () => {
     const user = userEvent.setup();
-    renderRoles('/organization/acme/users/roles?role=counsellor');
-    const page = await rolePage();
-    await user.click(within(page).getByTestId('users-role-preview'));
-    expect(useUIStore.getState().previewRole).toBe('counsellor');
+    const { unmount } = renderRoles(rolesUrl(counsellor));
+    await user.click(within(await rolePage()).getByTestId('users-role-preview'));
+    expect(useUIStore.getState().previewRole).toBe(counsellor.id);
     expect(notifyMock.success).toHaveBeenCalledWith(
       `Previewing ${PRODUCT_NAME} as Counsellor`,
     );
-  });
-
-  it('previews a custom role too — by its clinozy-be id (L-31e)', async () => {
-    const user = userEvent.setup();
-    renderRoles(`/organization/acme/users/roles?role=${PLATFORM_ROLES.senior.id}`);
-    const page = await rolePage();
-    await user.click(within(page).getByTestId('users-role-preview'));
-    expect(useUIStore.getState().previewRole).toBe(PLATFORM_ROLES.senior.id);
-    expect(notifyMock.success).toHaveBeenCalledWith(
-      `Previewing ${PRODUCT_NAME} as Senior desk`,
-    );
+    unmount();
+    useUIStore.setState({ previewRole: null });
+    renderRoles(rolesUrl(senior));
+    await user.click(within(await rolePage()).getByTestId('users-role-preview'));
+    expect(useUIStore.getState().previewRole).toBe(senior.id);
   });
 });
 
-describe('RolesAccess — who may change what (Q-U6, D47)', () => {
+describe('RolesAccess — who may change what (Q-U6)', () => {
   it('locks Admin: every box says why, nothing changes, no preview', async () => {
     const user = userEvent.setup();
-    renderRoles('/organization/acme/users/roles?role=admin');
+    renderRoles(rolesUrl(admin));
     const page = await rolePage();
-    await user.click(box('leads', 'delete'));
+    await user.click(box('lead', 'delete'));
     expect(notifyMock.info).toHaveBeenCalledWith('Admins always have full access');
-    expect(box('leads', 'delete')).toHaveAttribute('aria-checked', 'true');
-    expect(box('leads', 'delete')).toHaveAttribute('aria-disabled', 'true');
+    expect(box('lead', 'delete')).toHaveAttribute('aria-checked', 'true');
+    expect(box('lead', 'delete')).toHaveAttribute('aria-disabled', 'true');
     expect(within(page).getByTestId('users-role-preview')).toBeDisabled();
     expect(within(page).queryByTestId('users-role-copy')).toBeNull();
     expect(
       within(page).getByText('Admins can do everything · this role can’t be narrowed.'),
     ).toBeInTheDocument();
+    expect(api.replaceRolePermissions).not.toHaveBeenCalled();
   });
 
-  it('reads only without "Change roles & access" — boxes, switches and New role', async () => {
+  it('reads only without role:update — boxes, switches — and adds none without role:create', async () => {
     const user = userEvent.setup();
-    renderRoles(
-      '/organization/acme/users/roles',
-      USERS_ADMIN_CODES.filter((code) => code !== 'role:manage'),
-    );
+    renderRoles('/organization/acme/users/roles', without('role:update', 'role:create'));
     const page = await rolePage();
-    await user.click(box('leads', 'delete'));
+    await user.click(box('lead', 'delete'));
     expect(notifyMock.info).toHaveBeenCalledWith('You can’t change roles · ask an admin');
-    expect(box('leads', 'delete')).toHaveAttribute('aria-checked', 'false');
-    await user.click(within(page).getByTestId('users-role-ability-floor'));
-    expect(within(page).getByTestId('users-role-ability-floor')).toHaveAttribute(
-      'aria-checked',
-      'false',
-    );
+    expect(box('lead', 'delete')).toHaveAttribute('aria-checked', 'false');
+    const floor = within(page).getByTestId('users-role-code-offering:lower_price:read');
+    await user.click(floor);
+    expect(floor).toHaveAttribute('aria-checked', 'false');
     expect(within(page).queryByTestId('users-role-copy')).toBeNull();
+    expect(
+      within(page).getByText(
+        'You can see roles here. Changing them needs “Update roles”.',
+      ),
+    ).toBeInTheDocument();
     await user.click(screen.getByTestId('users-roles-new-role'));
     expect(notifyMock.info).toHaveBeenCalledWith('You can’t add roles · ask an admin');
     expect(api.createRole).not.toHaveBeenCalled();
+    expect(api.replaceRolePermissions).not.toHaveBeenCalled();
   });
 
-  it('writes a custom role’s Users row to its clinozy-be codes (D17)', async () => {
+  it('gives only a code the viewer holds — and leaves a role beyond their own access alone', async () => {
     const user = userEvent.setup();
-    renderRoles(`/organization/acme/users/roles?role=${PLATFORM_ROLES.senior.id}`);
+    const { unmount } = renderRoles(rolesUrl(senior), without('medicine:delete'));
     await rolePage();
-    await waitFor(() =>
-      expect(api.getRolePermissions).toHaveBeenCalledWith(PLATFORM_ROLES.senior.id),
-    );
-    await user.click(box('users', 'view'));
-    await waitFor(() =>
-      expect(api.updateRole).toHaveBeenCalledWith({
-        id: PLATFORM_ROLES.senior.id,
-        name: 'Senior desk',
-        description: '',
-        permissions: ['organization:read', 'membership:read', 'role:read'],
-      }),
-    );
-    expect(box('users', 'view')).toHaveAttribute('aria-checked', 'true');
-  });
-
-  it('keeps the Users row of a role bound to a clinozy-be system role read-only', async () => {
-    const user = userEvent.setup();
-    platformRoles = [...platformRoles, platformRole('doctor', 'Doctor', true)];
-    renderRoles('/organization/acme/users/roles?role=doctor');
-    await rolePage();
-    await user.click(box('users', 'view'));
+    expect(box('medicine', 'delete')).toHaveAttribute('aria-disabled', 'true');
+    await user.click(box('medicine', 'delete'));
     expect(notifyMock.info).toHaveBeenCalledWith(
-      `${PRODUCT_NAME} keeps this role’s Users access · it can’t be changed here`,
+      'You can only give access you have yourself',
     );
-    expect(api.updateRole).not.toHaveBeenCalled();
-    expect(box('users', 'view')).toHaveAttribute('aria-disabled', 'true');
-    // Its clinic rows stay the fixture's, and writable.
-    await user.click(box('medical', 'view'));
-    expect(box('medical', 'view')).toHaveAttribute('aria-checked', 'true');
+    expect(api.replaceRolePermissions).not.toHaveBeenCalled();
+    unmount();
+
+    // clinozy-be checks the role's old codes against the editor's too.
+    roleCodes.set(senior.id, ['organization:read', 'medicine:delete']);
+    renderRoles(rolesUrl(senior), without('medicine:delete'));
+    const page = await rolePage();
+    await user.click(box('lead', 'view'));
+    expect(notifyMock.info).toHaveBeenCalledWith(
+      'This role has access you don’t have · ask an admin',
+    );
+    expect(
+      within(page).getByText(
+        'This role has access you don’t have · only someone who has it can change the role.',
+      ),
+    ).toBeInTheDocument();
+    expect(api.replaceRolePermissions).not.toHaveBeenCalled();
   });
 });
 
-describe('RolesAccess — Settings’ role dialog, relocated (D17)', () => {
-  const SENIOR = `/organization/acme/users/roles?role=${PLATFORM_ROLES.senior.id}`;
-
-  it('gives a custom role a workspace permission the viewer holds', async () => {
+describe('RolesAccess — workspace permissions and the description (D17)', () => {
+  it('gives a workspace permission the viewer holds — the codes no box or switch maps', async () => {
     const user = userEvent.setup();
-    renderRoles(SENIOR, [...USERS_ADMIN_CODES, 'webhook:manage']);
+    renderRoles(rolesUrl(senior));
     const page = await rolePage();
     const workspace = await within(page).findByTestId('users-role-workspace');
-    // The catalog's codes the matrix doesn't map — only those the viewer holds.
     expect(
       within(workspace)
         .getAllByRole('switch')
         .map((card) => card.textContent),
-    ).toEqual(['View Organization', 'Manage Webhooks']);
+    ).toEqual(['View Organization', 'Manage Webhooks', 'View Audit Logs']);
     expect(
       within(workspace).getByTestId('users-role-code-organization:read'),
     ).toHaveAttribute('aria-checked', 'true');
     const webhooks = within(workspace).getByTestId('users-role-code-webhook:manage');
-    expect(webhooks).toHaveAttribute('aria-checked', 'false');
     expect(webhooks).toHaveAttribute('title', 'webhook:manage');
-
     await user.click(webhooks);
-    await waitFor(() =>
-      expect(api.updateRole).toHaveBeenCalledWith({
-        id: PLATFORM_ROLES.senior.id,
-        name: 'Senior desk',
-        description: '',
-        permissions: ['organization:read', 'webhook:manage'],
-      }),
-    );
     expect(webhooks).toHaveAttribute('aria-checked', 'true');
-  });
-
-  it('reads the workspace permissions only, without "Change roles & access"', async () => {
-    const user = userEvent.setup();
-    renderRoles(
-      SENIOR,
-      USERS_ADMIN_CODES.filter((code) => code !== 'role:manage'),
+    await waitFor(() =>
+      expect(api.replaceRolePermissions).toHaveBeenCalledWith(senior.id, [
+        'organization:read',
+        'webhook:manage',
+      ]),
     );
-    const card = await screen.findByTestId('users-role-code-organization:read');
-    expect(card).toHaveAttribute('aria-disabled', 'true');
-    await user.click(card);
-    expect(notifyMock.info).toHaveBeenCalledWith('You can’t change roles · ask an admin');
-    expect(api.updateRole).not.toHaveBeenCalled();
-  });
-
-  it('keeps a system-bound role’s workspace permissions the platform’s', async () => {
-    const user = userEvent.setup();
-    platformRoles = [...platformRoles, platformRole('doctor', 'Doctor', true)];
-    renderRoles('/organization/acme/users/roles?role=doctor');
-    const card = await screen.findByTestId('users-role-code-organization:read');
-    await user.click(card);
-    expect(notifyMock.info).toHaveBeenCalledWith(
-      `${PRODUCT_NAME} keeps this role’s workspace permissions · they can’t be changed here`,
-    );
-    expect(api.updateRole).not.toHaveBeenCalled();
-  });
-
-  it('shows no workspace permissions for a role clinozy-be doesn’t back', async () => {
-    renderRoles('/organization/acme/users/roles?role=front_desk');
-    const page = await rolePage();
-    expect(within(page).queryByTestId('users-role-workspace')).toBeNull();
-    expect(within(page).queryByText('Workspace permissions')).toBeNull();
   });
 
   it('describes a custom role in place — an emptied box is the default', async () => {
     const user = userEvent.setup();
-    renderRoles(SENIOR);
+    renderRoles(rolesUrl(senior));
     const page = await rolePage();
     const description = within(page).getByTestId('users-role-description');
-    expect(description).toHaveValue('');
+    expect(description).toHaveValue('Runs the desk on weekends');
     expect(description).toHaveAttribute(
       'placeholder',
       'Custom role · set what it can do below',
     );
+    await user.clear(description);
     await user.type(description, 'Runs the evening desk{Enter}');
     await waitFor(() =>
       expect(api.updateRole).toHaveBeenCalledWith({
-        id: PLATFORM_ROLES.senior.id,
-        name: 'Senior desk',
-        description: 'Runs the evening desk',
-        permissions: ['organization:read'],
+        input: { id: senior.id, description: 'Runs the evening desk' },
+        idempotencyKey: expect.any(String),
       }),
     );
   });
 
   it('shows a custom role’s own description to a viewer who can’t edit it', async () => {
-    platformRoles = platformRoles.map((role) =>
-      role.id === PLATFORM_ROLES.senior.id
-        ? { ...role, description: 'Runs the evening desk' }
-        : role,
-    );
-    renderRoles(
-      SENIOR,
-      USERS_ADMIN_CODES.filter((code) => code !== 'role:manage'),
-    );
+    renderRoles(rolesUrl(senior), without('role:update'));
     const page = await rolePage();
-    expect(await within(page).findByText('Runs the evening desk')).toBeInTheDocument();
+    expect(
+      await within(page).findByText('Runs the desk on weekends'),
+    ).toBeInTheDocument();
     expect(within(page).queryByTestId('users-role-description')).toBeNull();
   });
 });
 
 describe('RolesAccess — new, renamed and deleted roles', () => {
-  it('adds "New role" with no access, selects it and names it in place', async () => {
+  it('adds "New role" in one call, selects it and names it in place', async () => {
     const user = userEvent.setup();
     const { router } = renderRoles();
     await rolePage();
     await user.click(screen.getByTestId('users-roles-new-role'));
     await waitFor(() =>
       expect(api.createRole).toHaveBeenCalledWith({
-        name: 'New role',
-        description: 'Custom role',
-        permissions: ['organization:read'],
+        input: {
+          name: 'New role',
+          description: 'Custom role',
+          permissions: ['organization:read'],
+          tone: 'lime',
+        },
+        idempotencyKey: expect.any(String),
       }),
     );
     const created = platformRole('created', 'New role', false).id;
@@ -479,7 +459,9 @@ describe('RolesAccess — new, renamed and deleted roles', () => {
     );
     const name = await screen.findByTestId('users-role-name');
     expect(name).toHaveValue('New role');
-    expect(box('leads', 'view')).toHaveAttribute('aria-checked', 'false');
+    await waitFor(() =>
+      expect(box('lead', 'view')).toHaveAttribute('aria-checked', 'false'),
+    );
 
     await user.clear(name);
     await user.type(name, 'Senior desk{Enter}');
@@ -491,16 +473,17 @@ describe('RolesAccess — new, renamed and deleted roles', () => {
     await user.clear(name);
     await user.type(name, 'Night desk{Enter}');
     await waitFor(() =>
-      expect(api.updateRole).toHaveBeenCalledWith(
-        expect.objectContaining({ id: created, name: 'Night desk' }),
-      ),
+      expect(api.updateRole).toHaveBeenCalledWith({
+        input: { id: created, name: 'Night desk' },
+        idempotencyKey: expect.any(String),
+      }),
     );
   });
 
-  it('deletes a custom role nobody holds after the Undo window', async () => {
+  it('deletes a custom role nobody holds after the Undo window, as no longer needed', async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
-    renderRoles(`/organization/acme/users/roles?role=${PLATFORM_ROLES.senior.id}`);
+    renderRoles(rolesUrl(senior));
     const page = await rolePage();
     await user.click(within(page).getByTestId('users-role-delete'));
     const dialog = await screen.findByTestId('confirm-dialog');
@@ -508,9 +491,7 @@ describe('RolesAccess — new, renamed and deleted roles', () => {
     expect(await axeForDialog(dialog)).toHaveNoViolations();
     await user.click(within(dialog).getByTestId('confirm-accept'));
     await waitFor(() =>
-      expect(
-        screen.queryByTestId(`users-roles-item-${PLATFORM_ROLES.senior.id}`),
-      ).toBeNull(),
+      expect(screen.queryByTestId(`users-roles-item-${senior.id}`)).toBeNull(),
     );
     expect(api.deleteRole).not.toHaveBeenCalled();
     // The Undo window is the shared 10s, not the deferred default's 5s.
@@ -518,15 +499,19 @@ describe('RolesAccess — new, renamed and deleted roles', () => {
     expect(api.deleteRole).not.toHaveBeenCalled();
     await vi.advanceTimersByTimeAsync(1_000);
     await waitFor(() =>
-      expect(api.deleteRole).toHaveBeenCalledWith(PLATFORM_ROLES.senior.id),
+      expect(api.deleteRole).toHaveBeenCalledWith({
+        roleId: senior.id,
+        reason: 'not_needed',
+      }),
     );
   });
 
-  it('offers no delete for a contract role', async () => {
-    renderRoles('/organization/acme/users/roles?role=marketing');
+  it('offers no delete — nor a rename — for a preset', async () => {
+    renderRoles(rolesUrl(PLATFORM_ROLES.marketing));
     const page = await rolePage();
     expect(within(page).getByRole('heading', { name: 'Marketing' })).toBeInTheDocument();
     expect(within(page).queryByTestId('users-role-delete')).toBeNull();
+    expect(within(page).queryByTestId('users-role-name')).toBeNull();
     expect(
       within(page).getByText(
         'Nobody has this role yet · give it to someone from their user drawer.',
@@ -542,7 +527,7 @@ describe('RolesAccess — on a phone (H:184–187)', () => {
     renderRoles();
     await screen.findByTestId('users-roles-list');
     expect(screen.queryByTestId('users-role-page')).toBeNull();
-    await user.click(screen.getByTestId('users-roles-item-doctor'));
+    await user.click(screen.getByTestId(`users-roles-item-${doctor.id}`));
     const page = await rolePage();
     expect(screen.queryByTestId('users-roles-list')).toBeNull();
     await user.click(within(page).getByTestId('users-roles-back'));

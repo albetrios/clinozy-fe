@@ -29,10 +29,8 @@ const { notifyMock } = vi.hoisted(() => ({
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 vi.mock('@/shared/hooks/useClinicAccess/index.ts', () => ({
   useClinicAccess: () => ({
-    roles: ['front_desk'],
     previewRole: null,
     can: () => true,
-    canAbility: () => true,
     canCode: () => true,
     viewableSections: [],
     isResolved: true,

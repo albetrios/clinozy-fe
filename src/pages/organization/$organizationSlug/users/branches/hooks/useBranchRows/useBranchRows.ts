@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 
+import type { ClinicBranch } from '@/shared/api/clinic/branches-contracts.ts';
 import { branchListKey, fetchBranches } from '@/shared/api/clinic/branches-manage-api.ts';
-import type { Branch } from '@/shared/api/clinic/clinic-schema.ts';
 import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import { useTeam } from '@/shared/hooks/useTeam/index.ts';
@@ -23,37 +23,36 @@ export const BRANCH_DEFAULT_FIELDS = {
   desk: 'defaultDeskId',
   therapist: 'defaultTherapistId',
   pharmacist: 'defaultPharmacistId',
-} as const satisfies Readonly<Record<BranchDefaultRole, keyof Branch>>;
+} as const satisfies Readonly<Record<BranchDefaultRole, keyof ClinicBranch>>;
 
 /** A branch as the Branches table shows it. */
 export interface BranchRow {
-  branch: Branch;
+  branch: ClinicBranch;
   /** The active Team members who work here, in the Team's order. */
   team: TeamMember[];
   /** The default people the Team has, Doctor · Desk · Therapist · Pharmacy. */
   defaults: { role: BranchDefaultRole; member: TeamMember }[];
 }
 
-/** The Team member a staff profile id names, if the Team has one. */
-export function teamMemberByProfileId(
+/** The Team member a membership id names, if the Team has one. */
+export function teamMemberById(
   members: readonly TeamMember[],
-): (profileId: string | null) => TeamMember | undefined {
-  const byProfile = new Map(
-    members.flatMap((member) => (member.profile ? [[member.profile.id, member]] : [])),
-  );
-  return (profileId) => (profileId ? byProfile.get(profileId) : undefined);
+): (membershipId: string | null) => TeamMember | undefined {
+  const byId = new Map(members.map((member) => [member.membershipId, member]));
+  return (membershipId) => (membershipId ? byId.get(membershipId) : undefined);
 }
 
 /** A branch's row: its active people and the default people the Team still has. */
-export function branchRowOf(branch: Branch, members: readonly TeamMember[]): BranchRow {
-  const member = teamMemberByProfileId(members);
+export function branchRowOf(
+  branch: ClinicBranch,
+  members: readonly TeamMember[],
+): BranchRow {
+  const member = teamMemberById(members);
   return {
     branch,
     team: members.filter(
       (candidate) =>
-        candidate.status === 'active' &&
-        candidate.profile !== null &&
-        candidate.branchIds.includes(branch.id),
+        candidate.status === 'active' && candidate.branchIds.includes(branch.id),
     ),
     defaults: BRANCH_DEFAULT_ROLES.flatMap((role) => {
       const person = member(branch[BRANCH_DEFAULT_FIELDS[role]]);
@@ -74,9 +73,9 @@ export interface BranchRowsResult {
 
 /**
  * Users › Branches' data (KICKOFF §6.12 Data): every branch, open and closed —
- * the main branch first, then as opened (fixture, REPLACE_WITH_API) — joined
- * with the Team: who works at each (their profile's branches) and its default
- * people. The list sits under the branches key prefix, so a branch write
+ * the main branch first, then as opened (`GET /app/branches`, `branch:read`) —
+ * joined with the Team: who works at each (each membership's `branch_ids`) and
+ * its default people. The list sits under the branches key prefix, so a branch write
  * refreshes the header picker as well.
  */
 export function useBranchRows(): BranchRowsResult {

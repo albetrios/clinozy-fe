@@ -1,12 +1,10 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { resetClinicAccessFixture } from '@/shared/api/clinic/access-api.ts';
-import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import type * as CsvModule from '@/lib/csv.ts';
+import type * as BranchesApiModule from '@/shared/api/clinic/branches-api.ts';
+import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
 import type * as OrganizationApiModule from '@/shared/api/organization-api.ts';
 
 import {
@@ -18,45 +16,91 @@ import {
 } from './__tests__/integration/users-test-router.tsx';
 import { UsersPage } from './UsersPage.tsx';
 
+// jsdom has no layout: pin the desktop tier, where rows are selectable.
+vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
+  useViewportTier: () => 'desktop',
+  readViewportTier: () => 'desktop',
+}));
+
 const api = vi.hoisted(() => ({
   listMembers: vi.fn(),
   listRoles: vi.fn(),
+  fetchActiveBranches: vi.fn(),
+  downloadCsv: vi.fn(),
 }));
 vi.mock('@/shared/api/organization-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof OrganizationApiModule>()),
   listMembers: api.listMembers,
   listRoles: api.listRoles,
 }));
+vi.mock('@/shared/api/clinic/branches-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof BranchesApiModule>()),
+  fetchActiveBranches: api.fetchActiveBranches,
+}));
+vi.mock('@/lib/csv.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof CsvModule>()),
+  downloadCsv: api.downloadCsv,
+}));
 
 const IN_A_WEEK = new Date(Date.now() + 7 * 86_400_000).toISOString();
 
-/** The roster: you (Riya, an Admin), a doctor, the owner and an invitation. */
-const ROSTER = [
-  member('riya', SELF.email, PLATFORM_ROLES.admin, { userId: SELF.userId }),
-  member('reenal', 'reenal@cresence.skin'),
-  member('owner', 'owner@clinic.com', PLATFORM_ROLES.owner, { name: 'Owen Owner' }),
-  member('new', 'new@clinic.com', PLATFORM_ROLES.member, {
-    status: 'invited',
-    joinedAt: '',
-    invitation: { id: 'inv_new', expiresAt: IN_A_WEEK },
-  }),
-];
+/** An open branch, as the header picker reads it. */
+const branchOption = (id: string, name: string, isMain: boolean): BranchOption => ({
+  id,
+  name,
+  tone: isMain ? 'mint' : 'lav',
+  isMain,
+  opensAt: '10:00',
+  closesAt: '19:00',
+  workingDays: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
+});
+const ADAJAN = branchOption('brn_adajan000000000000000', 'Adajan', true);
+const VESU = branchOption('brn_vesu00000000000000000', 'Vesu', false);
+
+/** The roster: you (Riya — Front desk and Admin), a doctor, the owner and an invitation. */
+const RIYA = member(
+  'riya',
+  SELF.email,
+  [PLATFORM_ROLES.front_desk, PLATFORM_ROLES.admin],
+  {
+    userId: SELF.userId,
+    name: 'Riya Shah',
+    staffNumber: 12,
+    phone: '+919825044120',
+    branchIds: [ADAJAN.id, VESU.id],
+  },
+);
+const REENAL = member('reenal', 'reenal@cresence.skin', PLATFORM_ROLES.doctor, {
+  name: 'Dr. Reenal Chaniyara',
+  staffNumber: 11,
+  branchIds: [VESU.id],
+});
+const OWNER = member('owner', 'owner@clinic.com', PLATFORM_ROLES.owner, {
+  name: 'Owen Owner',
+  staffNumber: 1,
+});
+const INVITED = member('new', 'new@clinic.com', PLATFORM_ROLES.marketing, {
+  status: 'invited',
+  joinedAt: '',
+  staffNumber: 13,
+  invitation: { id: 'inv_new0000000000000000', expiresAt: IN_A_WEEK },
+});
 
 beforeEach(() => {
-  resetClinicFixtures();
-  resetClinicAccessFixture();
-  api.listMembers.mockResolvedValue({ rows: ROSTER, next: null, hasMore: false });
+  for (const fn of Object.values(api)) fn.mockReset();
+  api.listMembers.mockResolvedValue({
+    rows: [RIYA, REENAL, OWNER, INVITED],
+    next: null,
+    hasMore: false,
+  });
   api.listRoles.mockResolvedValue({
     rows: Object.values(PLATFORM_ROLES),
     next: null,
     hasMore: false,
   });
+  api.fetchActiveBranches.mockResolvedValue([ADAJAN, VESU]);
 });
-afterEach(() => {
-  resetUsersRoutes();
-  resetClinicFixtures();
-  resetClinicAccessFixture();
-});
+afterEach(() => resetUsersRoutes());
 
 /** The Team's rows on screen, once loaded. */
 async function rows() {
@@ -73,7 +117,7 @@ const rowOf = async (name: string) => {
 };
 
 describe('UsersPage — the Team', () => {
-  it('renders the room — toolbar, tabs and table — with every member joined to their profile', async () => {
+  it('renders the room — toolbar, tabs and table — every membership with its roles', async () => {
     const { container } = renderUsersRoutes('/organization/acme/users', UsersPage);
     expect(await screen.findByTestId('users-page')).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 1, name: 'Users' })).toBeInTheDocument();
@@ -85,19 +129,20 @@ describe('UsersPage — the Team', () => {
     expect(await rows()).toHaveLength(4);
     const riya = await rowOf('Riya Shah');
     expect(within(riya).getByText('#12')).toBeInTheDocument();
-    expect(within(riya).getByText('Front desk')).toBeInTheDocument();
+    expect(await within(riya).findByText('Front desk')).toBeInTheDocument();
     expect(within(riya).getByText('Admin')).toBeInTheDocument();
+    expect(await within(riya).findByText('Vesu')).toBeInTheDocument();
     expect(await axe(container)).toHaveNoViolations();
   });
 
   it('shows no branch UI with one open branch: no Branches column, no Branches filter', async () => {
-    for (const branch of clinicFixtures.branches.snapshot((row) => !row.isMain)) {
-      await clinicFixtures.branches.update(branch.id, { active: false });
-    }
+    api.fetchActiveBranches.mockResolvedValue([ADAJAN]);
     renderUsersRoutes('/organization/acme/users', UsersPage);
     // Riya works at Adajan and Vesu; with Adajan the only open branch, no chip shows.
     const riya = await rowOf('Riya Shah');
+    await waitFor(() => expect(api.fetchActiveBranches).toHaveBeenCalled());
     expect(within(riya).queryByText('Adajan')).toBeNull();
+    expect(within(riya).queryByText('Vesu')).toBeNull();
     screen.getByTestId('users-team-filters-trigger').click();
     const apply = await screen.findByTestId('users-team-filters-apply');
     const panel = apply.closest('[data-radix-popper-content-wrapper], [role="dialog"]');
@@ -128,8 +173,11 @@ describe('UsersPage — the Team', () => {
     expect(within(doctor).queryByRole('button', { name: 'Leave clinic' })).toBeNull();
   });
 
-  it('filters by the URL’s role and searches in place', async () => {
-    renderUsersRoutes('/organization/acme/users?role=doctor', UsersPage);
+  it('filters by the URL’s role — its id — and searches in place', async () => {
+    renderUsersRoutes(
+      `/organization/acme/users?role=${PLATFORM_ROLES.doctor.id}`,
+      UsersPage,
+    );
     await waitFor(async () => expect(await rows()).toHaveLength(1));
     expect(screen.getByText('Dr. Reenal Chaniyara')).toBeInTheDocument();
   });
@@ -145,29 +193,41 @@ describe('UsersPage — the Team', () => {
     expect(await screen.findByText('No user matches')).toBeInTheDocument();
   });
 
-  it('offers "New user" with invitation:manage and membership:manage, never with one alone (D47)', async () => {
+  it('offers "New user" with membership:create and role:read, never with one alone', async () => {
     const { unmount } = renderUsersRoutes('/organization/acme/users', UsersPage);
     expect(await screen.findByTestId('users-team-new-user')).toBeInTheDocument();
     unmount();
     resetUsersRoutes();
 
     renderUsersRoutes('/organization/acme/users', UsersPage, {
-      codes: ['organization:read', 'membership:read', 'role:read', 'invitation:manage'],
+      codes: ['organization:read', 'membership:read', 'membership:create'],
     });
     await rows();
     expect(screen.queryByTestId('users-team-new-user')).toBeNull();
-    // Without membership:manage no row can be deleted either.
+    // Without membership:delete no row can be deleted either.
     const doctor = await rowOf('Dr. Reenal Chaniyara');
     expect(within(doctor).queryByRole('button', { name: 'Delete' })).toBeNull();
   });
 
-  it('opens the member drawer on a row click', async () => {
+  it('exports the selected rows as CSV to whoever reads the Team', async () => {
+    renderUsersRoutes('/organization/acme/users', UsersPage, {
+      codes: ['organization:read', 'membership:read', 'role:read'],
+    });
+    fireEvent.click(within(await rowOf('Riya Shah')).getByRole('checkbox'));
+    fireEvent.click(screen.getByTestId('users-team-table-bulk-export'));
+    expect(api.downloadCsv).toHaveBeenCalledTimes(1);
+    const [fileName, content] = api.downloadCsv.mock.calls[0] as [string, string];
+    expect(fileName).toBe('users.csv');
+    expect(content).toContain('Riya Shah · +91');
+  });
+
+  it('opens the member drawer — by its membership id — on a row click', async () => {
     const { router } = renderUsersRoutes('/organization/acme/users', UsersPage);
     const doctor = await rowOf('Dr. Reenal Chaniyara');
     within(doctor).getByText('Dr. Reenal Chaniyara').click();
     await waitFor(() =>
       expect(router.state.location.pathname).toBe(
-        '/organization/acme/users/mbr_reenal/edit',
+        `/organization/acme/users/${REENAL.id}/edit`,
       ),
     );
     expect(await screen.findByTestId('user-drawer')).toBeInTheDocument();

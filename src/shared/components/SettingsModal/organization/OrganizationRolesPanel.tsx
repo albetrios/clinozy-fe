@@ -46,13 +46,23 @@ import { OrgListControls } from './OrgListControls.tsx';
 import { useUsersRoomOpen } from './users-room-open.ts';
 import { UsersRoomLink } from './UsersRoomLink.tsx';
 
-/** Per-role actions menu (custom roles only): edit or delete. */
+/** What the caller may do to a custom role — each its own clinozy-be code. */
+interface RoleRowAccess {
+  /** Edit its name, description and codes (`role:update`). */
+  canUpdate: boolean;
+  /** Delete it (`role:delete`). */
+  canDelete: boolean;
+}
+
+/** Per-role actions menu (custom roles only): edit and delete, each by its code. */
 function RoleRowActions({
   role,
+  access,
   onEdit,
   onDelete,
 }: {
   role: RoleSummary;
+  access: RoleRowAccess;
   onEdit: (role: RoleSummary) => void;
   onDelete: (role: RoleSummary) => void;
 }) {
@@ -72,19 +82,23 @@ function RoleRowActions({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem
-          onSelect={() => onEdit(role)}
-          data-testid={`role-edit-${role.id}`}
-        >
-          {t(panels.editAction)}
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          variant="destructive"
-          onSelect={() => onDelete(role)}
-          data-testid={`role-delete-${role.id}`}
-        >
-          {t(panels.deleteAction)}
-        </DropdownMenuItem>
+        {access.canUpdate ? (
+          <DropdownMenuItem
+            onSelect={() => onEdit(role)}
+            data-testid={`role-edit-${role.id}`}
+          >
+            {t(panels.editAction)}
+          </DropdownMenuItem>
+        ) : null}
+        {access.canDelete ? (
+          <DropdownMenuItem
+            variant="destructive"
+            onSelect={() => onDelete(role)}
+            data-testid={`role-delete-${role.id}`}
+          >
+            {t(panels.deleteAction)}
+          </DropdownMenuItem>
+        ) : null}
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -93,12 +107,12 @@ function RoleRowActions({
 /** One role row: name, system badge, member count, and (for custom roles) actions. */
 function RoleListItem({
   role,
-  canManage,
+  access,
   onEdit,
   onDelete,
 }: {
   role: RoleSummary;
-  canManage: boolean;
+  access: RoleRowAccess;
   onEdit: (role: RoleSummary) => void;
   onDelete: (role: RoleSummary) => void;
 }) {
@@ -125,8 +139,8 @@ function RoleListItem({
       <span className="text-muted-foreground text-caption shrink-0 tabular-nums">
         {t(panels.memberCount, { count: role.memberCount })}
       </span>
-      {canManage && !role.isSystem ? (
-        <RoleRowActions role={role} onEdit={onEdit} onDelete={onDelete} />
+      {(access.canUpdate || access.canDelete) && !role.isSystem ? (
+        <RoleRowActions role={role} access={access} onEdit={onEdit} onDelete={onDelete} />
       ) : null}
     </SettingsListRow>
   );
@@ -141,7 +155,7 @@ function RolesResults({
   roles,
   isSearching,
   isStale,
-  canManage,
+  access,
   onEdit,
   onDelete,
 }: {
@@ -149,7 +163,7 @@ function RolesResults({
   isSearching: boolean;
   /** The rows answer a question the user has already changed. */
   isStale: boolean;
-  canManage: boolean;
+  access: RoleRowAccess;
   onEdit: (role: RoleSummary) => void;
   onDelete: (role: RoleSummary) => void;
 }) {
@@ -189,7 +203,7 @@ function RolesResults({
           <RoleListItem
             key={role.id}
             role={role}
-            canManage={canManage}
+            access={access}
             onEdit={onEdit}
             onDelete={onDelete}
           />
@@ -236,7 +250,11 @@ function RolesManager() {
     q: debouncedSearch || undefined,
     ...sortParams,
   });
-  const canManage = useCan({ permission: 'role:manage', teamOrganizationOnly: true });
+  const canCreate = useCan({ permission: 'role:create', teamOrganizationOnly: true });
+  const access: RoleRowAccess = {
+    canUpdate: useCan({ permission: 'role:update' }),
+    canDelete: useCan({ permission: 'role:delete' }),
+  };
   // See the members panel: a `false` before the guard chain answers is "not yet",
   // not "not allowed" (SET-23).
   const accessResolved = useAccessResolved();
@@ -275,14 +293,14 @@ function RolesManager() {
             {t(panels.create)}
           </Button>
         )}
-        {accessResolved && canManage ? <CreateRoleDialog /> : null}
+        {accessResolved && canCreate ? <CreateRoleDialog /> : null}
       </div>
 
       <RolesResults
         roles={roles}
         isSearching={isSearching}
         isStale={isSearchPending}
-        canManage={canManage}
+        access={access}
         onEdit={setToEdit}
         onDelete={setToDelete}
       />
@@ -311,7 +329,9 @@ function RolesManager() {
             toastId: `delete-role-${role.id}`,
             // `mutateAsync`, never `mutate` — see the members panel: `mutate`
             // returns void, so nothing was awaited and nothing could reject.
-            commit: () => deleteRole.mutateAsync(role.id),
+            // Settings asks no reason: a deleted role is "not needed" (research Q-U-D).
+            commit: () =>
+              deleteRole.mutateAsync({ roleId: role.id, reason: 'not_needed' }),
           });
         }}
       />

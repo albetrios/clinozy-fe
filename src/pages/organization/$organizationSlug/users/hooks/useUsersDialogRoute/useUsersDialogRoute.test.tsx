@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
 
 import {
+  PLATFORM_ROLES,
   renderUsersRoutes,
   resetUsersRoutes,
 } from '../../__tests__/integration/users-test-router.tsx';
@@ -14,7 +15,10 @@ const { notifyMock } = vi.hoisted(() => ({
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 
-const REENAL = { membershipId: 'mbr_reenal', name: 'Dr. Reenal Chaniyara' } as TeamMember;
+const REENAL = {
+  membershipId: 'mem_reenal000000000000000',
+  name: 'Dr. Reenal Chaniyara',
+} as TeamMember;
 
 /** The page under test: what the hook says, as text. */
 function probe(team: { members: TeamMember[]; isPending: boolean }, canInvite = true) {
@@ -54,13 +58,13 @@ describe('useUsersDialogRoute (KICKOFF §4, D24)', () => {
 
   it('opens the member on users/$userId/edit — loading until the Team has answered', async () => {
     const { unmount } = renderUsersRoutes(
-      '/organization/acme/users/mbr_reenal/edit',
+      '/organization/acme/users/mem_reenal000000000000000/edit',
       probe({ members: [], isPending: true }),
     );
     expect(await screen.findByRole('status')).toHaveTextContent('edit:loading');
     unmount();
     renderUsersRoutes(
-      '/organization/acme/users/mbr_reenal/edit',
+      '/organization/acme/users/mem_reenal000000000000000/edit',
       probe({ members: [REENAL], isPending: false }),
     );
     expect(await screen.findByRole('status')).toHaveTextContent(
@@ -70,7 +74,7 @@ describe('useUsersDialogRoute (KICKOFF §4, D24)', () => {
 
   it('leaves a dead member link for the Team with "User not found"', async () => {
     const { router } = renderUsersRoutes(
-      '/organization/acme/users/mbr_gone/edit',
+      '/organization/acme/users/mem_gone00000000000000000/edit',
       probe({ members: [REENAL], isPending: false }),
     );
     await waitFor(() =>
@@ -85,18 +89,23 @@ describe('useUsersDialogRoute (KICKOFF §4, D24)', () => {
     function FromRoles() {
       useUsersDialogRoute(
         { members: [REENAL], isPending: false },
-        { canInvite: true, accessResolved: true, from: 'roles', role: 'doctor' },
+        {
+          canInvite: true,
+          accessResolved: true,
+          from: 'roles',
+          role: PLATFORM_ROLES.doctor.id,
+        },
       );
       return null;
     }
     const { router } = renderUsersRoutes(
-      '/organization/acme/users/mbr_gone/edit?from=roles&role=doctor',
+      `/organization/acme/users/mem_gone00000000000000000/edit?from=roles&role=${PLATFORM_ROLES.doctor.id}`,
       FromRoles,
     );
     await waitFor(() =>
       expect(router.state.location.pathname).toBe('/organization/acme/users/roles'),
     );
-    expect(router.state.location.search).toEqual({ role: 'doctor' });
+    expect(router.state.location.search).toEqual({ role: PLATFORM_ROLES.doctor.id });
   });
 
   it('sends a create link back with the permission toast to a member who may not invite', async () => {

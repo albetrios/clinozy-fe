@@ -1,14 +1,14 @@
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type { Branch } from '@/shared/api/clinic/clinic-schema.ts';
+import type { ClinicBranch } from '@/shared/api/clinic/branches-contracts.ts';
 import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
 import { AvatarStack, TonePill } from '@/shared/components/Cells/index.ts';
 
 import { USERS_KEYS, USERS_NS } from '../../../users.constants.ts';
 
 /** The Branch cell: the chip in the branch's tone, and grey "Main" on the main branch. */
-export function BranchNameCell({ branch }: { branch: Branch }) {
+export function BranchNameCell({ branch }: { branch: ClinicBranch }) {
   const { t } = useTranslation(USERS_NS);
   return (
     <span className="flex min-w-0 flex-wrap items-center gap-1">

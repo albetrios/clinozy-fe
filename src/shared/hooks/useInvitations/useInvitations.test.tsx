@@ -83,35 +83,38 @@ describe('useInviteMember', () => {
     const invalidate = vi.spyOn(client, 'invalidateQueries');
     const { result } = renderHook(() => useInviteMember(), { wrapper });
 
-    result.current.mutate({ email: 'new@x.test', roleId: 'rol_1' });
+    result.current.mutate({ email: 'new@x.test', roleIds: ['rol_1'] });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(inviteMember).toHaveBeenCalledWith({ email: 'new@x.test', roleId: 'rol_1' });
+    expect(inviteMember).toHaveBeenCalledWith({
+      invite: { email: 'new@x.test', roleIds: ['rol_1'] },
+      idempotencyKey: expect.any(String),
+    });
     expect(invalidate).toHaveBeenCalledWith({ queryKey: orgQueryKeys.members(ORG) });
     expect(notifySuccess).toHaveBeenCalledTimes(1);
   });
 });
 
 describe('useResendInvitation', () => {
-  it('resends by INVITATION id, refreshes the members list and names the invitee', async () => {
+  it('resends by the MEMBERSHIP id, refreshes the members list and names the invitee', async () => {
     resendInvitation.mockResolvedValue({ email: 'late@x.test', expiresAt: EXPIRES });
     const invalidate = vi.spyOn(client, 'invalidateQueries');
     const { result } = renderHook(() => useResendInvitation(), { wrapper });
 
-    result.current.mutate('inv_aaaaaaaaaaaaaaaaaaaaa');
+    result.current.mutate('mem_invited');
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(resendInvitation).toHaveBeenCalledWith('inv_aaaaaaaaaaaaaaaaaaaaa');
+    expect(resendInvitation).toHaveBeenCalledWith('mem_invited', expect.any(String));
     // The row's expiry moved, so the list must refetch to show it.
     expect(invalidate).toHaveBeenCalledWith({ queryKey: orgQueryKeys.members(ORG) });
     expect(notifySuccess).toHaveBeenCalledWith(expect.stringContaining('late@x.test'));
   });
 
   it("surfaces clinozy-be's refusal as an error toast, never a success", async () => {
-    resendInvitation.mockRejectedValue(new Error('expired'));
+    resendInvitation.mockRejectedValue(new Error('rate limited'));
     const { result } = renderHook(() => useResendInvitation(), { wrapper });
 
-    result.current.mutate('inv_aaaaaaaaaaaaaaaaaaaaa');
+    result.current.mutate('mem_invited');
 
     await waitFor(() => expect(result.current.isError).toBe(true));
     expect(notifyError).toHaveBeenCalledTimes(1);
@@ -120,19 +123,19 @@ describe('useResendInvitation', () => {
 });
 
 describe('useRevokeInvitation', () => {
-  it('drops the row whose INVITATION matches, not a member id, and toasts', async () => {
+  it("drops the invited membership's row and toasts", async () => {
     seedPage([
       { id: 'mem_invited', invitation: { id: 'inv_one', expiresAt: EXPIRES } },
       { id: 'mem_active', invitation: null },
     ]);
-    revokeInvitation.mockResolvedValue({ id: 'inv_one' });
+    revokeInvitation.mockResolvedValue({ id: 'mem_invited' });
     const { result } = renderHook(() => useRevokeInvitation(), { wrapper });
 
-    result.current.mutate('inv_one');
+    result.current.mutate('mem_invited');
 
     await waitFor(() => expect(ids()).toEqual(['mem_active']));
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(revokeInvitation).toHaveBeenCalledWith('inv_one');
+    expect(revokeInvitation).toHaveBeenCalledWith('mem_invited');
     expect(notifySuccess).toHaveBeenCalledTimes(1);
   });
 
@@ -141,7 +144,7 @@ describe('useRevokeInvitation', () => {
     revokeInvitation.mockRejectedValue(new Error('nope'));
     const { result } = renderHook(() => useRevokeInvitation(), { wrapper });
 
-    result.current.mutate('inv_one');
+    result.current.mutate('mem_invited');
 
     await waitFor(() => expect(result.current.isError).toBe(true));
     expect(ids()).toEqual(['mem_invited']);
@@ -149,7 +152,7 @@ describe('useRevokeInvitation', () => {
   });
 
   it('stays silent on success when the caller owns the undo toast', async () => {
-    revokeInvitation.mockResolvedValue({ id: 'inv_one' });
+    revokeInvitation.mockResolvedValue({ id: 'mem_invited' });
     const { result } = renderHook(
       () => useRevokeInvitation({ suppressSuccessToast: true }),
       {
@@ -157,7 +160,7 @@ describe('useRevokeInvitation', () => {
       },
     );
 
-    result.current.mutate('inv_one');
+    result.current.mutate('mem_invited');
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(notifySuccess).not.toHaveBeenCalled();

@@ -1,23 +1,21 @@
-import type {
-  ClinicAction,
-  ClinicRoleKey,
-  ClinicRoleView,
-} from '@/shared/api/clinic/access-contracts.ts';
+import { type ClinicAction, presetOfRole } from '@/shared/api/clinic/access-contracts.ts';
+import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
+import type { RoleSummary } from '@/shared/api/organization-contracts.ts';
 
 import { USERS_KEYS } from '../../../users.constants.ts';
 
-/** The role a page opens on when the URL names none, or one that is gone (H:5179). */
-export const DEFAULT_ROLE: ClinicRoleKey = 'front_desk';
+/** The preset a page opens on when the URL names no role, or one that is gone (H:5179). */
+const DEFAULT_PRESET: Role = 'front_desk';
 
-/** The role on screen: the URL's when it is listed, else Front desk, else the first. */
+/** The role on screen: the URL's (its id) when it is listed, else Front desk, else the first. */
 export function selectedRoleOf(
-  roles: readonly ClinicRoleView[],
-  key: string | undefined,
-): ClinicRoleView | null {
+  roles: readonly RoleSummary[],
+  selected: string | undefined,
+): RoleSummary | null {
   return (
-    roles.find((role) => role.key === key) ??
-    roles.find((role) => role.key === DEFAULT_ROLE) ??
+    roles.find((role) => role.id === selected) ??
+    roles.find((role) => presetOfRole(role) === DEFAULT_PRESET) ??
     roles[0] ??
     null
   );
@@ -28,22 +26,17 @@ export function selectedRoleOf(
  * rest (Owner is never listed, Q-U2).
  */
 export function rolePurposeKey(
-  role: Pick<ClinicRoleView, 'preset'>,
+  role: Pick<RoleSummary, 'name' | 'isSystem'>,
   page = false,
 ): string {
-  if (role.preset && role.preset !== 'owner') {
-    return USERS_KEYS.roles.purposes[role.preset];
-  }
+  const preset = presetOfRole(role);
+  if (preset && preset !== 'owner') return USERS_KEYS.roles.purposes[preset];
   return page ? USERS_KEYS.roles.purposes.customPage : USERS_KEYS.roles.purposes.custom;
 }
 
 /** The members holding a role, in the Team's order. */
-export function roleHolders(
-  role: Pick<ClinicRoleView, 'memberIds'>,
-  team: readonly TeamMember[],
-): TeamMember[] {
-  const held = new Set(role.memberIds);
-  return team.filter((member) => held.has(member.membershipId));
+export function roleHolders(roleId: string, team: readonly TeamMember[]): TeamMember[] {
+  return team.filter((member) => member.roleIds.includes(roleId));
 }
 
 /** The matrix's four actions, each with its box's accessible-name key. */

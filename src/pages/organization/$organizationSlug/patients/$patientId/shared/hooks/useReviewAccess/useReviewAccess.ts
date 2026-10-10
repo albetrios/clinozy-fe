@@ -20,19 +20,13 @@ export interface ReviewAccess {
 }
 
 /**
- * The review gates: the member's own review codes — reviews left `patient:update` for codes of
- * their own (clinozy-be D83 (4)), so Marketing logs the reviews patients give without changing
- * the file — and, while View-as previews a role, that role's clinic matrix for the Patients
- * section (a preview holds no codes), as `usePaymentAccess` does.
+ * The review gates: the review codes in force (a View-as preview's too) — reviews left
+ * `patient:update` for codes of their own (clinozy-be D83 (4)), so Marketing logs the reviews
+ * patients give without changing the file.
  */
 export function useReviewAccess(): ReviewAccess {
   const access = useClinicAccess();
-  const can = (code: string) => {
-    if (!access.isResolved) return false;
-    return access.previewRole === null
-      ? access.canCode(code)
-      : access.can('patients', 'edit');
-  };
+  const can = (code: string) => access.isResolved && access.canCode(code);
   return {
     resolved: access.isResolved,
     log: can(REVIEW_CODES.log),

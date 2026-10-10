@@ -679,8 +679,10 @@ The Team's toolbar and table carry the shared ids with the `tableId` `users-team
 
 The family-shared `RolesAccess` (`pages/organization/$organizationSlug/users/shared/components/RolesAccess/`).
 Its toolbar carries the shared ids with the `tableId` `users-roles` (`users-roles-toolbar`,
-`users-roles-new-role`, `users-roles-fab`). `<section>` is a matrix section (`leads` … `users`),
-`<action>` one of `view`, `create`, `edit`, `delete`, `<ability>` a special permission (`disc` … `perms`).
+`users-roles-new-role`, `users-roles-fab`). `<role>` is a role's clinozy-be id (`rol_…`), `<row>` a
+matrix row — the resource of its codes (`lead`, `contact`, `contact_activity`, `appointment` …
+`membership`, `role`, `branch`) — `<action>` one of `view`, `create`, `edit`, `delete`, and `<code>`
+a clinozy-be permission code.
 
 | Test ID                                             | Element                                                            | Source          |
 | --------------------------------------------------- | ------------------------------------------------------------------ | --------------- |
@@ -691,10 +693,10 @@ Its toolbar carries the shared ids with the `tableId` `users-roles` (`users-role
 | `users-role-preview` / `users-role-delete`          | "Preview as <role>"; "Delete role" (a custom role nobody holds)    | `RolePage`      |
 | `users-role-person`                                 | A "People with this role" pill — the member's drawer over the page | `RolePage`      |
 | `users-role-matrix`                                 | The matrix's bordered, sideways-scrolling box                      | `RoleMatrix`    |
-| `users-role-matrix-<section>`                       | One section row                                                    | `RoleMatrix`    |
-| `users-role-matrix-<section>-<action>`              | One box (`role="checkbox"`, named "Front desk can view · Leads")   | `RoleMatrix`    |
-| `users-role-matrix-<section>-row`                   | The Row pill ("Full" / "Some" / "None")                            | `RoleMatrix`    |
-| `users-role-ability-<ability>`                      | A special permission's switch card (`role="switch"`)               | `RoleAbilities` |
+| `users-role-matrix-<row>`                           | One resource row                                                   | `RoleMatrix`    |
+| `users-role-matrix-<row>-<action>`                  | One box (`role="checkbox"`, named "Front desk can view · Leads")   | `RoleMatrix`    |
+| `users-role-matrix-<row>-row`                       | The Row pill ("Full" / "Some" / "None")                            | `RoleMatrix`    |
+| `users-role-code-<code>` (Special permissions)      | An export's or a read's switch card (`role="switch"`)              | `RoleSpecials`  |
 | `users-role-description`                            | A custom role's description box (Settings' role dialog, relocated) | `RolePage`      |
 | `users-role-workspace` / `users-role-code-<code>`   | Workspace permissions; one clinozy-be code's switch card (L-31f)   | `RoleWorkspace` |
 
@@ -711,12 +713,12 @@ table carry the shared ids with the `tableId` `users-branches` (`users-branches-
 | Test ID                                             | Element                                                                 | Source               |
 | --------------------------------------------------- | ----------------------------------------------------------------------- | -------------------- |
 | `<d>-name` / `<d>-colour` / `<d>-colour-<tone>`     | Step 1's Name and the Colour swatches                                   | `BranchDrawerFields` |
-| `<d>-main` / `<d>-status`                           | The Main branch and Status toggles (`role="switch"`)                    | `BranchDrawerFields` |
+| `<d>-main` / `<d>-status`                           | The Main branch (read-only) and Status toggles (`role="switch"`)        | `BranchDrawerFields` |
 | `<d>-line1` / `<d>-line2` / `<d>-area` / `<d>-city` | The address fields                                                      | `BranchDrawerFields` |
 | `<d>-pin` / `<d>-state`                             | PIN code (digits only) and State                                        | `BranchDrawerFields` |
 | `<d>-phone` / `<d>-email` / `<d>-gstin`             | Step 2's Phone ("+91"), Email and GSTIN (upper-cased)                   | `BranchDrawerFields` |
 | `<d>-days` / `<d>-opens` / `<d>-closes`             | The Days chips and the Opens / Closes time pickers                      | `BranchDrawerFields` |
-| `<d>-team` / `<d>-team-option-<profile id>`         | Step 3's Team picker and one person in it                               | `BranchDrawerFields` |
+| `<d>-team` / `<d>-team-option-<membership id>`      | Step 3's Team picker and one person in it                               | `BranchDrawerFields` |
 | `<d>-default-<role>`                                | A default person's picker (`doctor`, `desk`, `therapist`, `pharmacist`) | `BranchDrawerFields` |
 
 ### Patient file (launch L-42)

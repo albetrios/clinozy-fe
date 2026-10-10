@@ -57,13 +57,10 @@ export interface RoomTableProps<TRow extends { id: string }> {
   /** The 3px status edge's tone. */
   rowTone?: (row: TRow) => Tone | undefined;
   rowActions?: (row: TRow) => readonly DataTableRowAction[];
-  /**
-   * The export file ("medicines.csv"); the bulk bar's Export needs `exportCode` on a room on
-   * clinozy-be, else the matrix's `export` ability ({@link canExportRows}).
-   */
+  /** The export file ("medicines.csv"); the bulk bar's Export needs `exportCode`. */
   exportName: string;
-  /** The clinozy-be export code of a room on the API (`stock_item:export`); none on fixtures. */
-  exportCode?: string;
+  /** The room's clinozy-be export code (`stock_item:export`, `medicine:export`) — {@link canExportRows}. */
+  exportCode: string;
   /** A cell's own export text (a person cell's name and phone). */
   exportValue?: TableCsvExport<TRow>['cell'];
   /** The room's words for Export and its toast ("3 rows exported as CSV"). */
@@ -109,25 +106,24 @@ export function RoomTable<TRow extends { id: string }>({
   bulkActions = [],
 }: RoomTableProps<TRow>) {
   const access = useClinicAccess();
-  const exportAction: DataTableBulkAction<TRow>[] =
-    canExportRows(access, exportCode)
-      ? [
-          {
-            id: 'export',
-            label: exportCopy.label,
-            icon: FileIcon,
-            onSelect: (selected) => {
-              exportTableCsv({
-                table,
-                rows: selected,
-                fileName: exportName,
-                cell: exportValue,
-              });
-              notify.success(exportCopy.done(selected.length));
-            },
+  const exportAction: DataTableBulkAction<TRow>[] = canExportRows(access, exportCode)
+    ? [
+        {
+          id: 'export',
+          label: exportCopy.label,
+          icon: FileIcon,
+          onSelect: (selected) => {
+            exportTableCsv({
+              table,
+              rows: selected,
+              fileName: exportName,
+              cell: exportValue,
+            });
+            notify.success(exportCopy.done(selected.length));
           },
-        ]
-      : [];
+        },
+      ]
+    : [];
 
   return (
     <DataTable

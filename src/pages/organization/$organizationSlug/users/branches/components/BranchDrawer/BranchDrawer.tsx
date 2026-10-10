@@ -21,13 +21,13 @@ import {
 } from '../../../shared/hooks/useRoleDirectory/index.ts';
 import { BRANCH_DRAWER_TEST_ID, USERS_KEYS, USERS_NS } from '../../../users.constants.ts';
 import type { BranchRow } from '../../hooks/useBranchRows/index.ts';
-import type { BranchDeleteTarget } from '../BranchDeleteConfirm/index.ts';
 import { useBranchDrawerView } from './branch-drawer-view.ts';
 import {
   type BranchDrawerStepId,
   branchFormOf,
   type BranchFormValues,
   emptyBranchForm,
+  missingPlaceFields,
 } from './branch-form.ts';
 import {
   BranchContactFields,
@@ -50,8 +50,6 @@ export interface BranchDrawerAccess {
   resolved: boolean;
   /** New: "New branch" is allowed; edit: the branch may be edited. Else view only. */
   canWrite: boolean;
-  /** Delete on an edit — never the main branch. */
-  canDelete: boolean;
 }
 
 interface BranchDrawerBaseProps {
@@ -79,12 +77,6 @@ export interface BranchEditDrawerProps extends BranchDrawerBaseProps {
   /** Undefined while the list is still loading — the drawer shows its skeleton. */
   row: BranchRow | undefined;
   onSaved: () => void;
-  /**
-   * The footer's Delete: the page opens its delete confirm, which outlives
-   * the drawer for the 10s Undo (a confirm inside the drawer was unmounted —
-   * the removal cancelled — when the drawer closed, L-64), and closes it.
-   */
-  onDelete: (target: BranchDeleteTarget) => void;
 }
 
 /** Props of {@link BranchDrawer}. */
@@ -94,10 +86,10 @@ export type BranchDrawerProps = BranchCreateDrawerProps | BranchEditDrawerProps;
 const editedRow = (props: BranchDrawerProps): BranchRow | null =>
   props.mode === 'edit' ? (props.row ?? null) : null;
 
-/** The people who may work at a branch: active Team members with a profile, you first. */
+/** The people who may work at a branch: the active Team, you first. */
 function teamCandidates(members: readonly TeamMember[]): TeamMember[] {
   return members
-    .filter((member) => member.status === 'active' && member.profile !== null)
+    .filter((member) => member.status === 'active')
     .sort((a, b) => Number(b.isSelf) - Number(a.isSelf));
 }
 
@@ -106,15 +98,21 @@ function startingForm(props: BranchDrawerProps, row: BranchRow | null): BranchFo
   if (row) {
     return branchFormOf(
       row.branch,
-      row.team.flatMap((member) => (member.profile ? [member.profile.id] : [])),
+      row.team.map((member) => member.membershipId),
     );
   }
-  const self = props.members.find((member) => member.isSelf && member.profile);
+  const self = props.members.find((member) => member.isSelf);
   return emptyBranchForm({
     branchCount: props.rows.length,
     main: props.rows.find((candidate) => candidate.branch.isMain)?.branch ?? null,
-    selfProfileId: self?.profile?.id ?? null,
+    selfMembershipId: self?.membershipId ?? null,
   });
+}
+
+/** The missing-fields toast: the name first, then the address, then the contact. */
+function missingKey(values: BranchFormValues): string {
+  if (!values.name.trim()) return K.nameMissing;
+  return missingPlaceFields(values).length > 0 ? K.addressMissing : K.contactMissing;
 }
 
 /** What follows a save: its toast, then the caller's hand-off. */
@@ -211,8 +209,6 @@ function drawerChrome(props: BranchDrawerProps, row: BranchRow | null, t: TFunct
     title: create ? t(K.title.create) : t(K.title.edit),
     saveLabel: create ? t(K.save.create) : t(K.save.edit),
     readOnly: !props.access.canWrite,
-    /** Delete on an edit — never the main branch. */
-    canDelete: row !== null && !row.branch.isMain && props.access.canDelete,
   };
 }
 
@@ -235,17 +231,13 @@ function BranchDrawerSession(props: BranchDrawerProps) {
   const { saveState, save } = useBranchSave({
     form,
     branch: row?.branch ?? null,
-    // A new branch has nobody yet: its whole team is added.
+    // A new branch has nobody yet: its whole team is sent with it.
     before: row ? initial.teamIds : [],
     members: props.members,
+    presetOf: directory.preset,
     onStep: setOpenStep,
     onDone: useSaveOutcome(props),
   });
-
-  const remove =
-    props.mode === 'edit' && row && chrome.canDelete
-      ? () => props.onDelete({ branch: row.branch, record: readouts.summary })
-      : undefined;
 
   return (
     <RecordDrawer
@@ -274,15 +266,12 @@ function BranchDrawerSession(props: BranchDrawerProps) {
       }
       openStep={openStep}
       onOpenStepChange={(step) => setOpenStep(step as BranchDrawerStepId)}
-      onMissing={() =>
-        notify.warning(values.name.trim() ? t(K.addressMissing) : t(K.nameMissing))
-      }
+      onMissing={() => notify.warning(t(missingKey(values)))}
       summary={loading ? undefined : readouts.summary}
       readOnly={!loading && readOnly}
       saveLabel={chrome.saveLabel}
       onSave={() => void save()}
       saveState={saveState}
-      onDelete={remove}
       dirty={isDirty}
       testId={BRANCH_DRAWER_TEST_ID}
     >
@@ -299,8 +288,9 @@ function BranchDrawerSession(props: BranchDrawerProps) {
  * — "Branch & address", "Contact & opening hours", "People" — for every role
  * and viewport. New starts not main, Open, Mon–Sat 10:00–19:00 in the next
  * tone, City and State from the main branch, you on its team. Save never
- * disables: an empty Name or Address line 1 opens step 1. Without the right
- * to write it is view only. Every opening starts a fresh form, once the list
+ * disables: an empty required field — Name, the address, Area, City, PIN code,
+ * Phone, Email — opens its step. A branch is closed, never deleted: Status
+ * "Closed". Without the right to write it is view only. Every opening starts a fresh form, once the list
  * and the Team are known.
  */
 export function BranchDrawer(props: BranchDrawerProps) {

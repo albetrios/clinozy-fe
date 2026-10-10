@@ -3,12 +3,11 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
-import { resetClinicAccessFixture } from '@/shared/api/clinic/access-api.ts';
-import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import type * as BranchesApiModule from '@/shared/api/clinic/branches-api.ts';
+import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
 import type * as OrganizationApiModule from '@/shared/api/organization-api.ts';
+import type { MemberInvite } from '@/shared/api/organization-contracts.ts';
+import { HttpError } from '@/shared/errors/HttpError.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 
@@ -50,8 +49,7 @@ const api = vi.hoisted(() => ({
   listMembers: vi.fn(),
   listRoles: vi.fn(),
   inviteMember: vi.fn(),
-  updateMemberRole: vi.fn(),
-  updateMemberStatus: vi.fn(),
+  updateMember: vi.fn(),
   removeMember: vi.fn(),
   resendInvitation: vi.fn(),
   revokeInvitation: vi.fn(),
@@ -62,6 +60,11 @@ vi.mock('@/shared/api/organization-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof OrganizationApiModule>()),
   ...api,
 }));
+const branchesApi = vi.hoisted(() => ({ fetchActiveBranches: vi.fn() }));
+vi.mock('@/shared/api/clinic/branches-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof BranchesApiModule>()),
+  ...branchesApi,
+}));
 // The clinic's name, as me/context reports the active organisation.
 vi.mock('@/shared/hooks/useMeContext/index.ts', () => ({
   useMeContext: () => ({ data: { activeOrganization: { name: 'Cresence Skin' } } }),
@@ -69,57 +72,76 @@ vi.mock('@/shared/hooks/useMeContext/index.ts', () => ({
 
 const IN_A_WEEK = new Date(Date.now() + 7 * 86_400_000).toISOString();
 
-const ROSTER = [
-  member('riya', SELF.email, PLATFORM_ROLES.admin, { userId: SELF.userId }),
-  member('reenal', 'reenal@cresence.skin'),
-  member('new', 'new@clinic.com', PLATFORM_ROLES.member, {
-    status: 'invited',
-    joinedAt: '',
-    invitation: { id: 'inv_new', expiresAt: IN_A_WEEK },
-  }),
-];
+/** The clinic's one open branch: every user is saved on it. */
+const ADAJAN: BranchOption = {
+  id: 'brn_adajan000000000000000',
+  name: 'Adajan',
+  tone: 'mint',
+  isMain: true,
+  opensAt: '10:00',
+  closesAt: '19:00',
+  workingDays: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
+};
+
+const RIYA = member('riya', SELF.email, PLATFORM_ROLES.admin, {
+  userId: SELF.userId,
+  name: 'Riya Shah',
+  staffNumber: 12,
+});
+const REENAL = member('reenal', 'reenal@cresence.skin', PLATFORM_ROLES.doctor, {
+  name: 'Dr. Reenal Chaniyara',
+  staffNumber: 11,
+  branchIds: ['brn_adajan000000000000000'],
+});
+const INVITED = member('new', 'new@clinic.com', PLATFORM_ROLES.marketing, {
+  status: 'invited',
+  joinedAt: '',
+  staffNumber: 13,
+  invitation: { id: 'inv_new0000000000000000', expiresAt: IN_A_WEEK },
+});
+const ROSTER = [RIYA, REENAL, INVITED];
 
 beforeEach(() => {
   viewport.tier = 'desktop';
-  resetClinicFixtures();
-  resetClinicAccessFixture();
-  for (const fn of Object.values(notifyMock)) fn.mockReset();
-  for (const fn of Object.values(api)) fn.mockReset();
+  for (const fn of [
+    ...Object.values(notifyMock),
+    ...Object.values(api),
+    ...Object.values(branchesApi),
+  ]) {
+    fn.mockReset();
+  }
   api.listMembers.mockResolvedValue({ rows: ROSTER, next: null, hasMore: false });
   api.listRoles.mockResolvedValue({
     rows: Object.values(PLATFORM_ROLES),
     next: null,
     hasMore: false,
   });
-  api.inviteMember.mockImplementation(({ email }: { email: string }) =>
+  branchesApi.fetchActiveBranches.mockResolvedValue([ADAJAN]);
+  api.getRolePermissions.mockResolvedValue(['organization:read']);
+  api.inviteMember.mockImplementation(({ invite }: { invite: MemberInvite }) =>
     Promise.resolve(
-      member('ishita', email, PLATFORM_ROLES.member, {
+      member('ishita', invite.email, PLATFORM_ROLES.front_desk, {
         status: 'invited',
         joinedAt: '',
-        invitation: { id: 'inv_ishita', expiresAt: IN_A_WEEK },
+        invitation: { id: 'inv_ishita00000000000000', expiresAt: IN_A_WEEK },
       }),
     ),
   );
-  api.updateMemberStatus.mockImplementation(
-    ({
-      membershipId,
-      status,
-    }: {
-      membershipId: string;
-      status: 'active' | 'suspended';
-    }) => Promise.resolve({ ...ROSTER[1], id: membershipId, status }),
+  api.updateMember.mockImplementation(({ membershipId }: { membershipId: string }) =>
+    Promise.resolve({ ...REENAL, id: membershipId, status: 'suspended' }),
   );
-  api.updateMemberRole.mockResolvedValue(ROSTER[1]);
-  api.removeMember.mockResolvedValue(undefined);
-  api.revokeInvitation.mockResolvedValue(undefined);
-  api.resendInvitation.mockResolvedValue({ email: 'new@clinic.com' });
+  api.removeMember.mockImplementation(({ membershipId }: { membershipId: string }) =>
+    Promise.resolve({ id: membershipId }),
+  );
+  api.revokeInvitation.mockImplementation((membershipId: string) =>
+    Promise.resolve({ id: membershipId }),
+  );
+  api.resendInvitation.mockResolvedValue({ email: INVITED.email, expiresAt: IN_A_WEEK });
   api.leaveOrganization.mockResolvedValue(undefined);
 });
 afterEach(() => {
   vi.useRealTimers();
   resetUsersRoutes();
-  resetClinicFixtures();
-  resetClinicAccessFixture();
 });
 
 /** The user drawer, once its form is up (the access and the Team resolved). */
@@ -128,59 +150,61 @@ async function drawer() {
   return screen.getByTestId('user-drawer');
 }
 
+/** The invitation clinozy-be was sent. */
+function sentInvite(): MemberInvite {
+  expect(api.inviteMember).toHaveBeenCalledTimes(1);
+  const [call] = api.inviteMember.mock.calls[0] as [{ invite: MemberInvite }];
+  return call.invite;
+}
+
 describe('Users › the user drawer (L-31b)', () => {
-  it('invites a new user — least-privilege role while clinozy-be has no Front desk — and saves the profile', async () => {
+  it('invites a new user by email — Front desk, on the one open branch — then "<email> added"', async () => {
     const user = userEvent.setup();
     const { router } = renderUsersRoutes('/organization/acme/users/create', UsersPage);
     const panel = await drawer();
     expect(within(panel).getByText('New user')).toBeInTheDocument();
     expect(await axeForDialog(panel)).toHaveNoViolations();
 
-    await user.type(within(panel).getByTestId('user-drawer-name'), 'Dr. Ishita Rao');
     await user.type(within(panel).getByTestId('user-drawer-email'), 'ishita@clinic.com');
     await user.click(within(panel).getByTestId('user-drawer-save'));
 
     await waitFor(() =>
-      expect(api.inviteMember).toHaveBeenCalledWith({
-        email: 'ishita@clinic.com',
-        roleId: PLATFORM_ROLES.member.id,
-      }),
+      expect(notifyMock.success).toHaveBeenCalledWith('ishita@clinic.com added'),
     );
-    await waitFor(() =>
-      expect(notifyMock.success).toHaveBeenCalledWith('Dr. Ishita Rao added'),
-    );
+    expect(sentInvite()).toMatchObject({
+      email: 'ishita@clinic.com',
+      roleIds: [PLATFORM_ROLES.front_desk.id],
+      branchIds: [ADAJAN.id],
+    });
+    const [call] = api.inviteMember.mock.calls[0] as [{ idempotencyKey?: string }];
+    expect(call.idempotencyKey).toEqual(expect.any(String));
     await waitFor(() =>
       expect(router.state.location.pathname).toBe('/organization/acme/users'),
     );
-    const profile = clinicFixtures.staff.snapshot(
-      (row) => row.email === 'ishita@clinic.com',
-    )[0];
-    expect(profile?.membershipId).toBe('mbr_ishita');
-    expect(profile?.roleKeys).toEqual(['front_desk']);
   });
 
-  it('takes Admin as the membership’s role when Admin is picked', async () => {
+  it('sends every role picked, the first as the main one', async () => {
     const user = userEvent.setup();
     renderUsersRoutes('/organization/acme/users/create', UsersPage);
     const panel = await drawer();
-    await user.type(within(panel).getByTestId('user-drawer-name'), 'Kavya Mehta');
     await user.type(within(panel).getByTestId('user-drawer-email'), 'kavya@clinic.com');
-    await user.click(within(panel).getByTestId('user-drawer-roles-admin'));
-    await user.click(within(panel).getByTestId('user-drawer-save'));
-    await waitFor(() =>
-      expect(api.inviteMember).toHaveBeenCalledWith({
-        email: 'kavya@clinic.com',
-        roleId: PLATFORM_ROLES.admin.id,
-      }),
+    await user.click(
+      within(panel).getByTestId(`user-drawer-roles-${PLATFORM_ROLES.admin.id}`),
     );
+    await user.click(within(panel).getByTestId('user-drawer-save'));
+    await waitFor(() => expect(api.inviteMember).toHaveBeenCalledTimes(1));
+    expect(sentInvite().roleIds).toEqual([
+      PLATFORM_ROLES.front_desk.id,
+      PLATFORM_ROLES.admin.id,
+    ]);
   });
 
-  it('stops on step 1 with "Add name and email" while either is empty', async () => {
+  it('stops on step 1 with "Add their email" while it is empty', async () => {
     const user = userEvent.setup();
     renderUsersRoutes('/organization/acme/users/create', UsersPage);
     const panel = await drawer();
     await user.click(within(panel).getByTestId('user-drawer-save'));
-    expect(notifyMock.warning).toHaveBeenCalledWith('Add name and email');
+    expect(notifyMock.warning).toHaveBeenCalledWith('Add their email');
     expect(api.inviteMember).not.toHaveBeenCalled();
   });
 
@@ -188,7 +212,6 @@ describe('Users › the user drawer (L-31b)', () => {
     const user = userEvent.setup();
     renderUsersRoutes('/organization/acme/users/create', UsersPage);
     const panel = await drawer();
-    await user.type(within(panel).getByTestId('user-drawer-name'), 'Kavya');
     await user.type(within(panel).getByTestId('user-drawer-email'), 'kavya-at-clinic');
     await user.click(within(panel).getByTestId('user-drawer-save'));
     expect(notifyMock.warning).toHaveBeenCalledWith('Enter a valid email address');
@@ -201,9 +224,30 @@ describe('Users › the user drawer (L-31b)', () => {
     expect(api.inviteMember).not.toHaveBeenCalled();
   });
 
-  it('edits a member: Inactive suspends the membership, then "<name> saved"', async () => {
+  it('outlines Email when the person is already in the clinic (409)', async () => {
     const user = userEvent.setup();
-    renderUsersRoutes('/organization/acme/users/mbr_reenal/edit', UsersPage);
+    api.inviteMember.mockRejectedValue(
+      new HttpError('Conflict', 409, '/tenancy/organization/memberships', 'POST', {
+        error: {
+          reason: 'membership_already_exists',
+          detail: 'Already a member',
+        },
+      }),
+    );
+    renderUsersRoutes('/organization/acme/users/create', UsersPage);
+    const panel = await drawer();
+    await user.type(within(panel).getByTestId('user-drawer-email'), REENAL.email);
+    await user.click(within(panel).getByTestId('user-drawer-save'));
+    await waitFor(() => expect(notifyMock.warning).toHaveBeenCalledTimes(1));
+    expect(within(panel).getByTestId('user-drawer-email')).toHaveAttribute(
+      'aria-invalid',
+      'true',
+    );
+  });
+
+  it('edits a member: Inactive suspends the membership, with the read’s updated_at', async () => {
+    const user = userEvent.setup();
+    renderUsersRoutes(`/organization/acme/users/${REENAL.id}/edit`, UsersPage);
     const panel = await drawer();
     expect(within(panel).getByText('Edit user')).toBeInTheDocument();
     expect(within(panel).getByTestId('user-drawer-tag')).toHaveTextContent('#11');
@@ -211,20 +255,18 @@ describe('Users › the user drawer (L-31b)', () => {
     await user.click(within(panel).getByTestId('user-drawer-status'));
     await user.click(within(panel).getByTestId('user-drawer-save'));
     await waitFor(() =>
-      expect(api.updateMemberStatus).toHaveBeenCalledWith({
-        membershipId: 'mbr_reenal',
-        status: 'suspended',
-      }),
-    );
-    await waitFor(() =>
       expect(notifyMock.success).toHaveBeenCalledWith('Dr. Reenal Chaniyara saved'),
     );
-    expect(api.updateMemberRole).not.toHaveBeenCalled();
+    expect(api.updateMember).toHaveBeenCalledWith({
+      membershipId: REENAL.id,
+      change: { status: 'suspended', expectedUpdatedAt: REENAL.updatedAt },
+      idempotencyKey: expect.any(String),
+    });
   });
 
   it('keeps your own status out of reach', async () => {
     const user = userEvent.setup();
-    renderUsersRoutes('/organization/acme/users/mbr_riya/edit', UsersPage);
+    renderUsersRoutes(`/organization/acme/users/${RIYA.id}/edit`, UsersPage);
     const panel = await drawer();
     await user.click(await within(panel).findByTestId('user-drawer-step-hours-trigger'));
     expect(within(panel).getByTestId('user-drawer-status')).toBeDisabled();
@@ -234,20 +276,22 @@ describe('Users › the user drawer (L-31b)', () => {
     );
   });
 
-  it('shows an invited member’s expiry with "Resend invitation"', async () => {
+  it('shows an invited member’s expiry with "Resend invitation", sent by the membership', async () => {
     const user = userEvent.setup();
-    renderUsersRoutes('/organization/acme/users/mbr_new/edit', UsersPage);
+    renderUsersRoutes(`/organization/acme/users/${INVITED.id}/edit`, UsersPage);
     const panel = await drawer();
     await user.click(await within(panel).findByTestId('user-drawer-step-hours-trigger'));
     expect(within(panel).getByTestId('user-drawer-invitation')).toHaveTextContent(
       /^Invitation expires /,
     );
     await user.click(within(panel).getByTestId('user-drawer-resend'));
-    await waitFor(() => expect(api.resendInvitation).toHaveBeenCalledWith('inv_new'));
+    await waitFor(() =>
+      expect(api.resendInvitation).toHaveBeenCalledWith(INVITED.id, expect.any(String)),
+    );
   });
 
-  it('is view only without membership:manage', async () => {
-    renderUsersRoutes('/organization/acme/users/mbr_reenal/edit', UsersPage, {
+  it('is view only without membership:update', async () => {
+    renderUsersRoutes(`/organization/acme/users/${REENAL.id}/edit`, UsersPage, {
       codes: ['organization:read', 'membership:read', 'role:read'],
     });
     const panel = await drawer();
@@ -259,7 +303,7 @@ describe('Users › the user drawer (L-31b)', () => {
 
   it('lands back on the Team with "User not found" for a member id it doesn’t have', async () => {
     const { router } = renderUsersRoutes(
-      '/organization/acme/users/mbr_gone/edit',
+      '/organization/acme/users/mem_gone00000000000000000/edit',
       UsersPage,
     );
     await waitFor(() =>
@@ -274,7 +318,7 @@ describe('Users › the user drawer (L-31b)', () => {
 
   it('sends a create link back with the permission toast to a member who may not invite', async () => {
     const { router } = renderUsersRoutes('/organization/acme/users/create', UsersPage, {
-      codes: ['organization:read', 'membership:read', 'role:read', 'invitation:manage'],
+      codes: ['organization:read', 'membership:read', 'membership:create'],
     });
     await waitFor(() => expect(notifyMock.info).toHaveBeenCalledTimes(1));
     await waitFor(() =>
@@ -287,9 +331,9 @@ describe('Users › the user drawer (L-31b)', () => {
 describe('Users › a member opened from Roles & access (H:5188)', () => {
   it('keeps the role page behind the drawer and returns to it on close', async () => {
     const user = userEvent.setup();
-    api.getRolePermissions.mockResolvedValue(['organization:read']);
+    const role = PLATFORM_ROLES.doctor.id;
     const { router } = renderUsersRoutes(
-      '/organization/acme/users/mbr_reenal/edit?from=roles&role=doctor',
+      `/organization/acme/users/${REENAL.id}/edit?from=roles&role=${role}`,
       UsersPage,
     );
     const panel = await drawer();
@@ -303,7 +347,7 @@ describe('Users › a member opened from Roles & access (H:5188)', () => {
     await waitFor(() =>
       expect(router.state.location.pathname).toBe('/organization/acme/users/roles'),
     );
-    expect(router.state.location.search).toEqual({ role: 'doctor' });
+    expect(router.state.location.search).toEqual({ role });
   });
 });
 
@@ -328,7 +372,7 @@ describe('Users › removing a member (deferred, with Undo)', () => {
     return user;
   }
 
-  it('takes the row away at once and removes the membership only after the 10s Undo window', async () => {
+  it('takes the row away at once and removes the membership — with the reason — only after the 10s Undo window', async () => {
     await confirmDelete('Dr. Reenal Chaniyara');
     await waitFor(() =>
       expect(screen.getAllByTestId('users-team-table-row')).toHaveLength(2),
@@ -339,9 +383,13 @@ describe('Users › removing a member (deferred, with Undo)', () => {
     );
     expect(api.removeMember).not.toHaveBeenCalled();
     await vi.advanceTimersByTimeAsync(10_000);
-    await waitFor(() => expect(api.removeMember).toHaveBeenCalledWith('mbr_reenal'));
-    const profile = clinicFixtures.staff.snapshot((row) => row.seq === 11)[0];
-    expect(profile).toBeUndefined();
+    await waitFor(() =>
+      expect(api.removeMember).toHaveBeenCalledWith({
+        membershipId: REENAL.id,
+        reason: 'not_needed',
+        note: undefined,
+      }),
+    );
   });
 
   it('puts the row back on Undo and never removes the membership', async () => {
@@ -364,7 +412,7 @@ describe('Users › removing a member (deferred, with Undo)', () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     const { router } = renderUsersRoutes(
-      '/organization/acme/users/mbr_reenal/edit',
+      `/organization/acme/users/${REENAL.id}/edit`,
       UsersPage,
     );
     const panel = await drawer();
@@ -381,39 +429,33 @@ describe('Users › removing a member (deferred, with Undo)', () => {
       expect.objectContaining({ action: expect.objectContaining({ label: 'Undo' }) }),
     );
     await vi.advanceTimersByTimeAsync(10_000);
-    await waitFor(() => expect(api.removeMember).toHaveBeenCalledWith('mbr_reenal'));
+    await waitFor(() =>
+      expect(api.removeMember).toHaveBeenCalledWith(
+        expect.objectContaining({ membershipId: REENAL.id }),
+      ),
+    );
     // The drawer closing never takes the delete back ("Action cancelled").
     expect(notifyMock.info).not.toHaveBeenCalled();
   });
 
-  it('cancels an invitation instead of removing a membership', async () => {
+  it('cancels an invitation — by the membership — instead of removing a membership', async () => {
     await confirmDelete('new@clinic.com');
     await vi.advanceTimersByTimeAsync(10_000);
-    await waitFor(() => expect(api.revokeInvitation).toHaveBeenCalledWith('inv_new'));
+    await waitFor(() => expect(api.revokeInvitation).toHaveBeenCalledWith(INVITED.id));
     expect(api.removeMember).not.toHaveBeenCalled();
   });
 
-  /** Codes without one of the member writes, the way a custom role might hold them. */
-  const without = (code: OrganizationPermission) =>
-    USERS_ADMIN_CODES.filter((held) => held !== code);
-
-  it('lets a viewer who may manage invitations only cancel one — as Settings did (D17)', async () => {
-    await confirmDelete('new@clinic.com', without('membership:manage'));
-    // Joined members keep no Delete without membership:manage.
-    const reenal = screen
-      .getAllByTestId('users-team-table-row')
-      .find((row) => within(row).queryByText('Dr. Reenal Chaniyara'));
-    expect(reenal && within(reenal).queryByRole('button', { name: 'Delete' })).toBeNull();
-    await vi.advanceTimersByTimeAsync(10_000);
-    await waitFor(() => expect(api.revokeInvitation).toHaveBeenCalledWith('inv_new'));
-    expect(api.removeMember).not.toHaveBeenCalled();
-  });
-
-  it('removes an invited membership for a viewer who may not manage invitations', async () => {
-    await confirmDelete('new@clinic.com', without('invitation:manage'));
-    await vi.advanceTimersByTimeAsync(10_000);
-    await waitFor(() => expect(api.removeMember).toHaveBeenCalledWith('mbr_new'));
-    expect(api.revokeInvitation).not.toHaveBeenCalled();
+  it('offers Delete on no row without membership:delete', async () => {
+    const codes: OrganizationPermission[] = USERS_ADMIN_CODES.filter(
+      (held) => held !== 'membership:delete',
+    );
+    renderUsersRoutes('/organization/acme/users', UsersPage, { codes });
+    await waitFor(() =>
+      expect(screen.getAllByTestId('users-team-table-row')).toHaveLength(3),
+    );
+    for (const row of screen.getAllByTestId('users-team-table-row')) {
+      expect(within(row).queryByRole('button', { name: 'Delete' })).toBeNull();
+    }
   });
 });
 
@@ -457,7 +499,7 @@ describe('Users › leave the clinic (D17 — Settings’ self-removal)', () => 
 
   it('offers it in Delete’s place on your own drawer', async () => {
     const user = userEvent.setup();
-    renderUsersRoutes('/organization/acme/users/mbr_riya/edit', UsersPage);
+    renderUsersRoutes(`/organization/acme/users/${RIYA.id}/edit`, UsersPage);
     const panel = await drawer();
     await user.click(within(panel).getByTestId('user-drawer-delete'));
     const dialog = await screen.findByTestId('confirm-dialog');
@@ -470,7 +512,7 @@ describe('Users › leave the clinic (D17 — Settings’ self-removal)', () => 
     vi.useFakeTimers({ shouldAdvanceTime: true });
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     const { router } = renderUsersRoutes(
-      '/organization/acme/users/mbr_riya/edit',
+      `/organization/acme/users/${RIYA.id}/edit`,
       UsersPage,
     );
     const panel = await drawer();
@@ -488,13 +530,17 @@ describe('Users › leave the clinic (D17 — Settings’ self-removal)', () => 
   it('never offers it to the owner — clinozy-be makes them transfer ownership first', async () => {
     api.listMembers.mockResolvedValue({
       rows: [
-        member('riya', SELF.email, PLATFORM_ROLES.owner, { userId: SELF.userId }),
-        ...ROSTER.slice(1),
+        member('riya', SELF.email, PLATFORM_ROLES.owner, {
+          userId: SELF.userId,
+          name: 'Riya Shah',
+        }),
+        REENAL,
+        INVITED,
       ],
       next: null,
       hasMore: false,
     });
-    renderUsersRoutes('/organization/acme/users/mbr_riya/edit', UsersPage);
+    renderUsersRoutes(`/organization/acme/users/${RIYA.id}/edit`, UsersPage);
     const panel = await drawer();
     expect(within(panel).queryByTestId('user-drawer-delete')).toBeNull();
     const own = await rowFor('Riya Shah');

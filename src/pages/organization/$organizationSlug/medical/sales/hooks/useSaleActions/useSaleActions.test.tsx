@@ -7,7 +7,7 @@ import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { holdPreset } from '@/tests/utils/clinic-preset-codes.ts';
 
 import { fetchMedicalSale } from '../../../shared/medical-api.ts';
 import { useSaleActions } from './useSaleActions.ts';
@@ -43,10 +43,9 @@ function wrapper({ children }: { children: ReactNode }) {
   return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
 }
 
-/** The hook for a member previewed as `role`, once their access has answered. */
+/** The hook for a member holding the `role` preset's codes, once their access has answered. */
 async function actionsAs(role: Role) {
-  useOrganizationStore.getState().setPermissions(['organization:read']);
-  useUIStore.setState({ previewRole: role });
+  holdPreset(role);
   const view = renderHook(useSaleActions, { wrapper });
   await waitFor(() => expect(view.result.current.canReturn).toBeDefined());
   return view;
@@ -60,7 +59,6 @@ beforeEach(() => {
 });
 afterEach(() => {
   vi.useRealTimers();
-  useUIStore.setState({ previewRole: null });
   useOrganizationStore.getState().clearPermissions();
   resetClinicFixtures();
 });

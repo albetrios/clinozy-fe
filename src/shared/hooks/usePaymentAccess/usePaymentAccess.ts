@@ -34,19 +34,14 @@ const PAYMENT_CODES: Readonly<Record<ClinicAction, string>> = {
 const PAYMENT_EXPORT_CODE = 'payment:export';
 
 /**
- * The Payments gates (research §7): the member's own clinozy-be `payment:*` codes — the room is on
- * the API — and, while View-as previews a role, that role's clinic matrix for the Payments
- * section (a preview holds no codes). One rule for the ledger, its drawers, its row actions and
+ * The Payments gates (research §7): the `payment:*` codes in force — the member's own, or the
+ * previewed role's while View-as runs. One rule for the ledger, its drawers, its row actions and
  * "Pay ₹X" in the rooms that buy.
  */
 export function usePaymentAccess(): PaymentAccess {
   const access = useClinicAccess();
-  const can = (action: ClinicAction) => {
-    if (!access.isResolved) return false;
-    return access.previewRole === null
-      ? access.canCode(PAYMENT_CODES[action])
-      : access.can('payments', action);
-  };
+  const can = (action: ClinicAction) =>
+    access.isResolved && access.canCode(PAYMENT_CODES[action]);
   return {
     resolved: access.isResolved,
     canRead: can('view'),

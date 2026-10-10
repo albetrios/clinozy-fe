@@ -112,7 +112,7 @@ describe('useLeadsList', () => {
 
   it('waits for the viewer’s membership before it reads Mine', async () => {
     renderLeadsRoutes(LEADS, Probe);
-    await waitFor(() => expect(findMyMembershipId).toHaveBeenCalledWith('usr_test'));
+    await waitFor(() => expect(findMyMembershipId).toHaveBeenCalled());
     expect(state().view).toBe('mine');
     expect(state().loading).toBe(true);
     expect(listLeads).not.toHaveBeenCalled();

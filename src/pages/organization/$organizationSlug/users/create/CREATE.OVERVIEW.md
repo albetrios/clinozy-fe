@@ -3,12 +3,13 @@
 Route: `/organization/$organizationSlug/users/create` — a URL-driven dialog over the Team
 (KICKOFF §4, §6.12, D24; `S:105`). The route renders nothing: the Users page reads the URL
 and opens the user drawer over the Team, so a refresh or a shared link reopens it. New user
-sends an invitation — no admin-set password (D17): the membership takes Admin when Admin is
-picked, else the main role's clinozy-be role, else the least-privileged one (Member, then
-Viewer; D47), and the clinic roles, branches, hours and pay go on the staff profile. Gated
-like the room — `membership:read` and the `clinic-users` module, then `requireOrgStatus`;
-"New user" itself needs `invitation:manage` and `membership:manage` (clinozy-be's invite
-route asks for the second, D47) — without them the link lands back on the Team with the
+sends an invitation by email — no admin-set password, and no name: the person sets their own
+(D17). One call (`POST /tenancy/organization/memberships`, one idempotency key per save) carries
+every role picked — the first is the main role — and the clinic details: mobile, colour,
+branches (the one open branch when there is one), days, hours and commission. An email already
+in the clinic (`409 membership_already_exists`) outlines Email. Gated like the room —
+`membership:read` and the `clinic-users` module, then `requireOrgStatus`; "New user" itself needs
+`membership:create` and `role:read` — without them the link lands back on the Team with the
 permission toast. The drawer is the island's `../components/UserDrawer/`, opened by the
 page through `../hooks/useUsersDialogRoute/`.
 

@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
+import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import { moveAppointment } from '@/shared/api/clinic/appointments-api.ts';
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import type { ClinicalNote } from '@/shared/api/clinic/clinical-notes-contracts.ts';
@@ -306,15 +307,18 @@ const HAIR_FALL_KIT: PrescriptionKit = {
 };
 
 /**
- * The flow for a member previewed as `role`, in the file at `timeline?visit=open` — where the
- * Overview mounts it — on `visit`.
+ * The flow for a member holding the `role` preset's codes (or exactly `codes`), in the file
+ * at `timeline?visit=open` — where the Overview mounts it — on `visit`.
  */
 async function openFlow({
   role = 'owner',
+  codes,
   visit = visitOf(),
   viewable = PATIENT_FILE_SECTIONS,
 }: {
   role?: Role;
+  /** Exactly these codes instead of the `role` preset's. */
+  codes?: readonly OrganizationPermission[];
   visit?: VisitRecord;
   viewable?: readonly PatientFileSectionSlug[];
 } = {}) {
@@ -322,6 +326,7 @@ async function openFlow({
   const user = userEvent.setup();
   const view = renderInPatientFile(<VisitFlow visit={visit} />, {
     role,
+    codes,
     file: patientFile(),
     section: 'timeline',
     viewable,
@@ -726,17 +731,26 @@ describe('VisitFlow (KICKOFF §6.6 Visit flow; H:758–768) on clinozy-be', () =
     expect(screen.queryByTestId('visit-flow-collect')).not.toBeInTheDocument();
   });
 
-  it('shows no Invoice or Collect to a member who can’t see Payments', async () => {
-    await openFlow({ role: 'doctor' });
+  it('shows no Invoice or Collect to a member who can’t see Payments — a Therapist', async () => {
+    await openFlow({ role: 'therapist' });
     await screen.findByTestId('visit-flow-step-treatment');
     expect(screen.queryByTestId('visit-flow-step-invoice')).not.toBeInTheDocument();
     expect(screen.queryByTestId('visit-flow-step-collect')).not.toBeInTheDocument();
     expect(listInvoices).not.toHaveBeenCalled();
   });
 
-  it('leaves a therapist the treatment — the checks read-only, no Pause or Complete', async () => {
+  it('leaves a member who only treats the treatment — the checks read-only, no Pause or Complete', async () => {
     world.notes = [checkNote('pcn_consent', 'Consent signed')];
-    await openFlow({ role: 'therapist' });
+    await openFlow({
+      codes: [
+        'organization:read',
+        'patient:read',
+        'patient:clinical_record:read',
+        'patient_treatment:read',
+        'patient_treatment:create',
+        'appointment:read',
+      ],
+    });
     await waitFor(() =>
       expect(screen.getByTestId('visit-flow-check-consent')).toHaveAttribute(
         'aria-checked',

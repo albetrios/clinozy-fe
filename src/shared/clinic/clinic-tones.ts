@@ -23,6 +23,7 @@ import type {
   Section,
   Tone,
 } from '@/shared/api/clinic/clinic-schema.ts';
+import { TONE_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
 import type { LeadRecordSource } from '@/shared/api/clinic/leads-fixture-contracts.ts';
 import type { OfferStatus } from '@/shared/api/clinic/offerings-contracts.ts';
 
@@ -545,4 +546,14 @@ export function toneForLabel(label: string): Tone {
     hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
   }
   return HASHED_TONES[hash % HASHED_TONES.length] ?? 'stone';
+}
+
+/**
+ * A tone clinozy-be served (a member's, a role's): it when the palette has it, else the label's
+ * own hashed tone — a tone a newer backend adds never breaks a row.
+ */
+export function servedTone(tone: string, label: string): Tone {
+  return (TONE_VALUES as readonly string[]).includes(tone)
+    ? (tone as Tone)
+    : toneForLabel(label);
 }

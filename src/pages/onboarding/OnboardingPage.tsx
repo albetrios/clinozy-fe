@@ -327,11 +327,11 @@ function resolveInviteTargetOrganizationId(input: {
 }
 
 /**
- * An assignable (non-Owner) role id for onboarding invites. A freshly created
- * org seeds only the system **Owner** role (clinozy-be), so there is nothing to
- * invite anyone *as*: reuse an existing non-system role if the org already has
- * one, otherwise provision a default "Member" role. Scoped by the active-org
- * token, so the caller must switch to the new org first.
+ * The role onboarding invites go out with: the organization's own (non-preset) role if it has
+ * one, otherwise a default "Member" role created once with the onboarding default codes — the
+ * presets clinozy-be provisions (Owner, Admin, Doctor, …) each carry a clinic job, and the
+ * wizard does not ask which one an invitee does. Scoped by the active-organization token, so the
+ * caller must switch to the new organization first.
  */
 async function resolveInviteRoleId(): Promise<string> {
   const { rows } = await listRoles();
@@ -339,18 +339,20 @@ async function resolveInviteRoleId(): Promise<string> {
   if (existing) return existing.id;
 
   const created = await createRole({
-    name: i18n.t(ONBOARDING_KEYS.defaults.memberRoleName, { ns: ONBOARDING_NS }),
-    description: i18n.t(ONBOARDING_KEYS.defaults.memberRoleDescription, {
-      ns: ONBOARDING_NS,
-    }),
-    permissions: [...ONBOARDING_DEFAULT_MEMBER_PERMISSIONS],
+    input: {
+      name: i18n.t(ONBOARDING_KEYS.defaults.memberRoleName, { ns: ONBOARDING_NS }),
+      description: i18n.t(ONBOARDING_KEYS.defaults.memberRoleDescription, {
+        ns: ONBOARDING_NS,
+      }),
+      permissions: [...ONBOARDING_DEFAULT_MEMBER_PERMISSIONS],
+    },
   });
   return created.id;
 }
 
 /**
- * Send onboarding invites: create an INVITED membership per email
- * (`POST /organization/memberships` with a real `role_id`), all into one
+ * Send onboarding invites: create an invited membership per email
+ * (`POST /tenancy/organization/memberships` with `role_ids`), all into one
  * resolved role. Returns how many failed. Best-effort and non-blocking — a
  * failure (including not being able to provision a role) never strands the
  * wizard; the caller warns on partial failure and the user can resend from
@@ -367,7 +369,7 @@ async function sendOnboardingInvites(emails: string[]): Promise<number> {
   }
 
   const results = await Promise.allSettled(
-    emails.map((email) => inviteMember({ email, roleId })),
+    emails.map((email) => inviteMember({ invite: { email, roleIds: [roleId] } })),
   );
   return results.filter((result) => result.status === 'rejected').length;
 }

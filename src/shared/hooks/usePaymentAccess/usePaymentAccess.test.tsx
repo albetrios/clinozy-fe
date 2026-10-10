@@ -7,6 +7,7 @@ import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { previewPreset } from '@/tests/utils/clinic-preset-codes.ts';
 import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import { usePaymentAccess } from './usePaymentAccess.ts';
@@ -20,7 +21,7 @@ function wrapper({ children }: { children: ReactNode }) {
 function renderAccess(codes: readonly OrganizationPermission[], role?: Role) {
   signInTestMember();
   useOrganizationStore.getState().setPermissions([...codes]);
-  useUIStore.setState({ previewRole: role ?? null });
+  if (role) previewPreset(client, role);
   return renderHook(() => usePaymentAccess(), { wrapper });
 }
 
@@ -81,7 +82,7 @@ describe('usePaymentAccess', () => {
     });
   });
 
-  it('follows the previewed role’s clinic matrix under View-as, which holds no codes', async () => {
+  it('follows the previewed role’s own codes under View-as, not the viewer’s', async () => {
     const { result } = renderAccess(['organization:read'], 'admin');
     await waitFor(() => expect(result.current.resolved).toBe(true));
     expect(result.current).toMatchObject({

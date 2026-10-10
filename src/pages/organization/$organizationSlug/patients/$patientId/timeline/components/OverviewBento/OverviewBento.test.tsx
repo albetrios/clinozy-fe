@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
+import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import type {
   ClinicalNote,
   ClinicalNoteKind,
@@ -318,15 +319,26 @@ function AccessProbe() {
   return access.isResolved ? <span data-testid="access-resolved" /> : null;
 }
 
-/** The bento in Priya's file — a visit booked today — for a member previewed as `role`. */
+/** The bento in Priya's file — a visit booked today — for a member holding the `role` preset's codes (or exactly `codes`). */
+/** A member who reads the whole file and writes nothing in it — no preset is that narrow. */
+const READS_ONLY: OrganizationPermission[] = [
+  'organization:read',
+  'patient:read',
+  'patient:clinical_record:read',
+  'contact_activity:read',
+  'appointment:read',
+];
+
 async function openBento({
   role,
+  codes,
   viewable = PATIENT_FILE_SECTIONS,
   nextVisit = true,
   masked = true,
   toggleMasked,
 }: {
-  role?: 'admin' | 'owner' | 'therapist' | 'doctor';
+  role?: 'admin' | 'owner' | 'doctor';
+  codes?: readonly OrganizationPermission[];
   viewable?: readonly PatientFileSectionSlug[];
   nextVisit?: boolean;
   masked?: boolean;
@@ -340,6 +352,7 @@ async function openBento({
     </>,
     {
       role,
+      codes,
       viewable,
       masked,
       ...(toggleMasked ? { toggleMasked } : {}),
@@ -510,7 +523,7 @@ describe('OverviewBento (KICKOFF §6.6 Overview, H:769–779)', () => {
   });
 
   it('leaves the clinical writes and the composer out for a member who may not', async () => {
-    await openBento({ role: 'therapist' });
+    await openBento({ codes: READS_ONLY });
     await card('clinical');
     expect(screen.queryByTestId('overview-smart-note')).not.toBeInTheDocument();
     expect(screen.queryByTestId('overview-note-input')).not.toBeInTheDocument();

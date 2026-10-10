@@ -6,7 +6,7 @@ import { axe } from 'vitest-axe';
 import { useRoomTable } from '@/shared/hooks/useRoomTable/index.ts';
 import { Package } from '@/shared/icons/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { holdPreset } from '@/tests/utils/clinic-preset-codes.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { RoomTable } from './RoomTable.tsx';
@@ -68,6 +68,7 @@ function Table({ rows, filtered = false }: { rows: Row[]; filtered?: boolean }) 
         { id: 'edit', label: `Edit ${row.name}`, icon: Package, onSelect: vi.fn() },
       ]}
       exportName="vendors.csv"
+      exportCode="stock_item:export"
       exportCopy={{ label: 'Export', done: (count) => `${count} rows exported` }}
     />
   );
@@ -78,11 +79,9 @@ beforeEach(() => {
   onNew.mockReset();
   onRowClick.mockReset();
   notifyMock.success.mockReset();
-  useOrganizationStore.getState().setPermissions(['organization:read']);
-  useUIStore.setState({ previewRole: 'admin' });
+  holdPreset('admin');
 });
 afterEach(() => {
-  useUIStore.setState({ previewRole: null });
   useOrganizationStore.getState().clearPermissions();
 });
 

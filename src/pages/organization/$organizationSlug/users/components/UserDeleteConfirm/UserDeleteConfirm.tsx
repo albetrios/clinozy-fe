@@ -4,11 +4,9 @@ import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
 import type { Member } from '@/shared/api/organization-contracts.ts';
 import { orgQueryKeys } from '@/shared/api/organization-query-keys.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
-import { useCan } from '@/shared/hooks/useCan/index.ts';
 import { useDeferredRowRemoval } from '@/shared/hooks/useDeferredRowRemoval/index.ts';
 import { useRevokeInvitation } from '@/shared/hooks/useInvitations/index.ts';
 import { useRemoveMember } from '@/shared/hooks/useMembers/index.ts';
-import { useRemoveStaffProfile } from '@/shared/hooks/useTeam/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 import { USERS_KEYS, USERS_NS } from '../../users.constants.ts';
@@ -40,12 +38,11 @@ export interface UserDeleteConfirmProps {
  * Delete a user (KICKOFF §6.12 Delete confirm; `users.md:238–252`): the shared
  * reason confirm titled "Delete this user?", the name (or the drawer's
  * summary) in its pill. The row leaves the Team at once and "<name> removed"
- * offers Undo for 10s; only then does the membership go — `useRemoveMember`,
- * or, for an invited member, `useRevokeInvitation` (the invitation cancelled;
- * a viewer who may manage members but not invitations removes the membership,
- * Settings' fallback — D17) — and the staff profile with the reason picked (clinozy-be keeps no reason
- * for a membership, Appendix F). Never the owner's or your own row: the
- * screens offer no Delete there.
+ * offers Undo for 10s; only then does the membership go — `useRemoveMember` with
+ * the reason picked, or, for an invited member, `useRevokeInvitation` (the
+ * invitation cancelled and the invited membership with it). Both are
+ * `membership:delete`'s. Never the owner's or your own row: the screens offer
+ * no Delete there.
  */
 export function UserDeleteConfirm({
   target,
@@ -60,8 +57,6 @@ export function UserDeleteConfirm({
   // The deferred toast owns the messages (SET-7): the writes stay quiet.
   const removeMember = useRemoveMember({ suppressSuccessToast: true });
   const revokeInvitation = useRevokeInvitation({ suppressSuccessToast: true });
-  const removeProfile = useRemoveStaffProfile();
-  const canRevoke = useCan({ permission: 'invitation:manage' });
 
   return (
     <ConfirmDialog
@@ -74,19 +69,20 @@ export function UserDeleteConfirm({
       onConfirm={({ reason, note }) => {
         if (!target) return;
         const { member } = target;
-        const invitation = member.status === 'invited' ? member.invitation : null;
+        const invited = member.status === 'invited';
         scheduleRemoval({
           id: member.membershipId,
           pendingMessage: t(USERS_KEYS.deleteUser.removed, { name: member.name }),
           toastId: `remove-user-${member.membershipId}`,
           delayMs: UNDO_MS,
           commit: async () => {
-            if (invitation && canRevoke)
-              await revokeInvitation.mutateAsync(invitation.id);
-            else await removeMember.mutateAsync(member.membershipId);
-            if (member.profile) {
-              await removeProfile.mutateAsync({ id: member.profile.id, reason, note });
-            }
+            if (invited) await revokeInvitation.mutateAsync(member.membershipId);
+            else
+              await removeMember.mutateAsync({
+                membershipId: member.membershipId,
+                reason,
+                note: note ?? undefined,
+              });
           },
         });
         onDeleted?.();

@@ -43,10 +43,8 @@ vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
 }));
 vi.mock('@/shared/hooks/useClinicAccess/index.ts', () => ({
   useClinicAccess: () => ({
-    roles: ['front_desk'],
     previewRole: null,
     can: () => true,
-    canAbility: () => true,
     canCode: () => true,
     viewableSections: [],
     isResolved: true,

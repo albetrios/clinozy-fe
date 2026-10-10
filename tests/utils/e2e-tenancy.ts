@@ -102,7 +102,7 @@ export async function createTeamInvitation(
   const roleId = await resolveMemberRoleId(api, teamToken);
   const res = await api.post(`${API}/tenancy/organization/memberships`, {
     headers: bearerHeaders(teamToken, true),
-    data: { email: inviteeEmail, role_id: roleId },
+    data: { email: inviteeEmail, role_ids: [roleId] },
   });
   if (res.status() !== 200) {
     if (res.status() === 409) {

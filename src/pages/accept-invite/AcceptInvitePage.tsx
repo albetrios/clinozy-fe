@@ -198,11 +198,12 @@ export function AcceptInvitePage() {
         organization_id: accepted.organizationId,
       });
 
-      let slug = accepted.organizationSlug;
+      // The accept names the organization only; its slug comes from the switch.
+      let slug = '';
       try {
         const ctx = await switchToOrganization(accepted.organizationId);
         await silentRefresh();
-        slug = ctx?.activeOrganization?.slug ?? accepted.organizationSlug;
+        slug = ctx?.activeOrganization?.slug ?? '';
       } catch (switchError) {
         // Joined, but this tab could not be moved into the new org. Report it,
         // say so, and hand off to the index resolver — signing the user out of

@@ -166,7 +166,7 @@ describe('auth/service', () => {
       useAuthStore.getState().setUser(MOCK_USER);
       // Seed an org context with elevated grants, as if a session were active.
       useOrganizationStore.getState().setOrganization('org_prev', 'acme', 'active');
-      useOrganizationStore.setState({ permissions: ['membership:manage'] });
+      useOrganizationStore.setState({ permissions: ['membership:update'] });
 
       forceLogout();
 

@@ -6,11 +6,17 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('@/shared/notify/index.ts', () => ({
   notify: { success: vi.fn(), error: vi.fn(), info: vi.fn(), undo: vi.fn() },
 }));
-/** The member's access: resolved, and whether they read the pharmacy queue. */
-const access = vi.hoisted(() => ({ isResolved: true, readsPrescriptions: false }));
+/** The member's access: resolved, whether they read appointments and the pharmacy queue. */
+const access = vi.hoisted(() => ({
+  isResolved: true,
+  readsAppointments: true,
+  readsPrescriptions: false,
+}));
 vi.mock('@/shared/hooks/useClinicAccess/index.ts', () => ({
   useClinicAccess: () => ({
     isResolved: access.isResolved,
+    can: (section: string, action: string) =>
+      section === 'appointments' && action === 'view' && access.readsAppointments,
     canCode: (code: string) =>
       code === 'patient_prescription:read' && access.readsPrescriptions,
   }),
@@ -47,7 +53,11 @@ beforeEach(() => {
   client = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
-  Object.assign(access, { isResolved: true, readsPrescriptions: false });
+  Object.assign(access, {
+    isResolved: true,
+    readsAppointments: true,
+    readsPrescriptions: false,
+  });
   vi.mocked(fetchTodayFloor).mockResolvedValue([]);
   vi.mocked(fetchTodayEnquiries).mockResolvedValue([]);
 });
@@ -80,6 +90,13 @@ describe('useTodayFloor / useTodayEnquiries (KICKOFF §6.2)', () => {
 
   it('waits for the member’s access, so the floor is read once', () => {
     access.isResolved = false;
+    const { result } = renderHook(() => useTodayFloor(), { wrapper });
+    expect(result.current.fetchStatus).toBe('idle');
+    expect(fetchTodayFloor).not.toHaveBeenCalled();
+  });
+
+  it('never reads the floor without appointment:read — no 403 for an Accountant or Marketing', () => {
+    access.readsAppointments = false;
     const { result } = renderHook(() => useTodayFloor(), { wrapper });
     expect(result.current.fetchStatus).toBe('idle');
     expect(fetchTodayFloor).not.toHaveBeenCalled();

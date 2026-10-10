@@ -27,8 +27,8 @@ const { useAssignablePermissionsMock } = vi.hoisted(() => ({
     rows: [
       { code: 'organization:read', name: 'View Organization', category: 'tenancy' },
       { code: 'membership:read', name: 'View Members', category: 'tenancy' },
-      { code: 'membership:manage', name: 'Manage Members', category: 'tenancy' },
-      { code: 'invitation:manage', name: 'Manage Invitations', category: 'tenancy' },
+      { code: 'membership:update', name: 'Update Members', category: 'tenancy' },
+      { code: 'membership:create', name: 'Create Members', category: 'tenancy' },
       { code: 'webhook:manage', name: 'Manage Webhooks', category: 'notify' },
     ],
     isPending: false,
@@ -79,8 +79,8 @@ describe('CreateRoleDialog', () => {
     await open();
     expect(screen.getByTestId('role-create-name')).toBeInTheDocument();
     expect(screen.getByTestId('role-create-description')).toBeInTheDocument();
-    expect(screen.getByTestId('role-perm-membership:manage')).toBeInTheDocument();
-    expect(screen.getByTestId('role-perm-invitation:manage')).toBeInTheDocument();
+    expect(screen.getByTestId('role-perm-membership:update')).toBeInTheDocument();
+    expect(screen.getByTestId('role-perm-membership:create')).toBeInTheDocument();
   });
 
   it('blocks submit until at least one permission is selected', async () => {
@@ -162,7 +162,7 @@ describe('CreateRoleDialog', () => {
       ),
     );
     // Add a permission and save.
-    await user.click(screen.getByTestId('role-perm-membership:manage'));
+    await user.click(screen.getByTestId('role-perm-membership:update'));
     await user.click(screen.getByTestId('role-create-submit'));
 
     await waitFor(() =>
@@ -170,7 +170,7 @@ describe('CreateRoleDialog', () => {
         expect.objectContaining({
           id: 'rol_x',
           name: 'Member',
-          permissions: expect.arrayContaining(['membership:read', 'membership:manage']),
+          permissions: expect.arrayContaining(['membership:read', 'membership:update']),
         }),
       ),
     );
@@ -208,7 +208,7 @@ describe('CreateRoleDialog', () => {
     const name = await screen.findByTestId('role-create-name');
     await user.clear(name);
     await user.type(name, 'Editor');
-    await user.click(screen.getByTestId('role-perm-invitation:manage'));
+    await user.click(screen.getByTestId('role-perm-membership:create'));
 
     // A refetch lands: same values, brand-new array identity.
     useRolePermissionsMock.mockReturnValue({
@@ -220,7 +220,7 @@ describe('CreateRoleDialog', () => {
     await waitFor(() =>
       expect(screen.getByTestId('role-create-name')).toHaveValue('Editor'),
     );
-    expect(screen.getByTestId('role-perm-invitation:manage')).toBeChecked();
+    expect(screen.getByTestId('role-perm-membership:create')).toBeChecked();
   });
 
   // The catalog is fetched now, so the picker has two states it never had when the list was
@@ -233,7 +233,7 @@ describe('CreateRoleDialog', () => {
     });
     await open();
 
-    expect(screen.queryByTestId('role-perm-membership:manage')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('role-perm-membership:update')).not.toBeInTheDocument();
     expect(screen.getByText(/loading permissions/i)).toBeInTheDocument();
   });
 

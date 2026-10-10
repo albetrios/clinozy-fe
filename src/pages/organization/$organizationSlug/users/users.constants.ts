@@ -111,6 +111,8 @@ export const USERS_KEYS = {
       status: 'drawer.fields.status',
     },
     hints: {
+      /** "set on their own profile" — the Name is the person's, read-only here. */
+      name: 'drawer.hints.name',
       mobile: 'drawer.hints.mobile',
       colour: 'drawer.hints.colour',
       roles: 'drawer.hints.roles',
@@ -230,6 +232,39 @@ export const USERS_KEYS = {
       some: 'roles.matrix.some',
       none: 'roles.matrix.none',
       rowHint: 'roles.matrix.rowHint',
+      /** A "—" box: clinozy-be has no such code for the row. */
+      notApplicable: 'roles.matrix.notApplicable',
+      /** The rows under a section's own row (`MatrixSubRowId`), each named in its own words. */
+      resources: {
+        contact: {
+          label: 'roles.matrix.resources.contact.label',
+          description: 'roles.matrix.resources.contact.description',
+        },
+        contact_activity: {
+          label: 'roles.matrix.resources.contact_activity.label',
+          description: 'roles.matrix.resources.contact_activity.description',
+        },
+        patient_prescription: {
+          label: 'roles.matrix.resources.patient_prescription.label',
+          description: 'roles.matrix.resources.patient_prescription.description',
+        },
+        patient_treatment: {
+          label: 'roles.matrix.resources.patient_treatment.label',
+          description: 'roles.matrix.resources.patient_treatment.description',
+        },
+        patient_review: {
+          label: 'roles.matrix.resources.patient_review.label',
+          description: 'roles.matrix.resources.patient_review.description',
+        },
+        role: {
+          label: 'roles.matrix.resources.role.label',
+          description: 'roles.matrix.resources.role.description',
+        },
+        branch: {
+          label: 'roles.matrix.resources.branch.label',
+          description: 'roles.matrix.resources.branch.description',
+        },
+      },
       /** A box's name: "Front desk can view · Leads". */
       cell: {
         view: 'roles.matrix.cell.view',
@@ -238,56 +273,32 @@ export const USERS_KEYS = {
         delete: 'roles.matrix.cell.delete',
       },
     },
-    abilities: {
-      title: 'roles.abilities.title',
-      disc: {
-        label: 'roles.abilities.disc.label',
-        description: 'roles.abilities.disc.description',
+    /** "Special permissions": the codes no box holds (Q-U-B). */
+    specials: {
+      title: 'roles.specials.title',
+      /** "Export · Leads" — a section's export. */
+      export: {
+        label: 'roles.specials.export.label',
+        description: 'roles.specials.export.description',
       },
       floor: {
-        label: 'roles.abilities.floor.label',
-        description: 'roles.abilities.floor.description',
-      },
-      prices: {
-        label: 'roles.abilities.prices.label',
-        description: 'roles.abilities.prices.description',
-      },
-      dayclose: {
-        label: 'roles.abilities.dayclose.label',
-        description: 'roles.abilities.dayclose.description',
-      },
-      reverse: {
-        label: 'roles.abilities.reverse.label',
-        description: 'roles.abilities.reverse.description',
-      },
-      refund: {
-        label: 'roles.abilities.refund.label',
-        description: 'roles.abilities.refund.description',
-      },
-      void: {
-        label: 'roles.abilities.void.label',
-        description: 'roles.abilities.void.description',
-      },
-      allbr: {
-        label: 'roles.abilities.allbr.label',
-        description: 'roles.abilities.allbr.description',
+        label: 'roles.specials.floor.label',
+        description: 'roles.specials.floor.description',
       },
       clinical: {
-        label: 'roles.abilities.clinical.label',
-        description: 'roles.abilities.clinical.description',
+        label: 'roles.specials.clinical.label',
+        description: 'roles.specials.clinical.description',
       },
-      export: {
-        label: 'roles.abilities.export.label',
-        description: 'roles.abilities.export.description',
-      },
-      perms: {
-        label: 'roles.abilities.perms.label',
-        description: 'roles.abilities.perms.description',
+      privateAlbum: {
+        label: 'roles.specials.privateAlbum.label',
+        description: 'roles.specials.privateAlbum.description',
       },
     },
     notes: {
       admin: 'roles.notes.admin',
       readOnly: 'roles.notes.readOnly',
+      /** The role holds a code the viewer lacks: only someone who has it can change it. */
+      beyond: 'roles.notes.beyond',
       live: 'roles.notes.live',
     },
     locked: {
@@ -297,8 +308,10 @@ export const USERS_KEYS = {
       noPerms: 'roles.locked.noPerms',
       /** "You can’t add roles · ask an admin". */
       noAdd: 'roles.locked.noAdd',
-      /** A role clinozy-be keeps as a system role: its Users row is the platform's (D47). */
-      platform: 'roles.locked.platform',
+      /** The role holds a code the viewer lacks (clinozy-be checks both sets against theirs). */
+      beyond: 'roles.locked.beyond',
+      /** A box or switch whose code the viewer lacks. */
+      notYours: 'roles.locked.notYours',
     },
     /** "Role added · name it and pick what it can do". */
     added: 'roles.added',
@@ -324,8 +337,6 @@ export const USERS_KEYS = {
       /** The viewer can give none of them. */
       none: 'roles.workspace.none',
       loadFailed: 'roles.workspace.loadFailed',
-      /** A role clinozy-be keeps as a system role: its codes are the platform's (D47). */
-      locked: 'roles.workspace.locked',
     },
   },
   /** Branches (`users.md:79–95, 176–198`; H:5196–5222). */
@@ -417,6 +428,8 @@ export const USERS_KEYS = {
       },
       hints: {
         colour: 'branches.drawer.hints.colour',
+        /** "one per clinic · set when it opened" — the Main branch switch is read-only. */
+        main: 'branches.drawer.hints.main',
         phone: 'branches.drawer.hints.phone',
         team: 'branches.drawer.hints.team',
         /** "preselected in forms here" — a default with someone to pick. */
@@ -439,20 +452,18 @@ export const USERS_KEYS = {
       /** "Riya Shah (you)". */
       you: 'branches.drawer.you',
       save: { create: 'branches.drawer.save.create', edit: 'branches.drawer.save.edit' },
-      /** "Name the branch" · "Add the address" · "A branch called Vesu already exists". */
+      /** "Name the branch" · "Add the address …" · "Add the phone and email". */
       nameMissing: 'branches.drawer.nameMissing',
       addressMissing: 'branches.drawer.addressMissing',
+      contactMissing: 'branches.drawer.contactMissing',
+      /** "A branch called Vesu already exists". */
       duplicate: 'branches.drawer.duplicate',
+      pinInvalid: 'branches.drawer.pinInvalid',
       phoneInvalid: 'branches.drawer.phoneInvalid',
       emailInvalid: 'branches.drawer.emailInvalid',
       /** "Vesu branch added" / "Vesu saved". */
       added: 'branches.drawer.added',
       saved: 'branches.drawer.saved',
-    },
-    deleteBranch: {
-      title: 'branches.deleteBranch.title',
-      /** "Vesu removed", with Undo. */
-      removed: 'branches.deleteBranch.removed',
     },
   },
 } as const;

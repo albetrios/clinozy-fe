@@ -23,11 +23,9 @@ export type ClinicModuleKey = (typeof CLINIC_MODULES)[keyof typeof CLINIC_MODULE
  * Rooms that still read fixtures (`REPLACE_WITH_API`). Production keeps them
  * disabled until clinozy-be serves their API (D8); L-60 removes a room from
  * this list as its endpoints land — Leads, Appointments, Patients (D150–D152),
- * Offerings (D153), Clinic stock (D154), Tasks and Today (D155), and Payments
- * + invoices (D156) have. Users is here too: its staff profiles, branches and
- * clinic matrix are fixtures even though members are real.
+ * Offerings (D153), Clinic stock (D154), Tasks and Today (D155), Payments +
+ * invoices (D156) and Users — its Team, Roles & access and Branches — have.
  */
 export const FIXTURE_BACKED_CLINIC_MODULES: readonly ClinicModuleKey[] = [
   CLINIC_MODULES.medical,
-  CLINIC_MODULES.users,
 ];

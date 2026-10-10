@@ -117,20 +117,13 @@ export interface ContactActivityAccess {
 }
 
 /**
- * The member's stream access, from their permission codes. A View-as preview has no codes
- * (`canCode` is false), so it previews by the role as the patient file does: Patients view reads
- * the stream, Patients create adds a note. Both false until the access has answered.
+ * The member's stream access, from the codes in force (a View-as preview's too). Both false
+ * until the access has answered.
  */
 export function useContactActivityAccess(): ContactActivityAccess {
   const access = useClinicAccess();
   return useMemo(() => {
     if (!access.isResolved) return { reads: false, writes: false };
-    if (access.previewRole) {
-      return {
-        reads: access.can('patients', 'view'),
-        writes: access.can('patients', 'create'),
-      };
-    }
     return {
       reads: access.canCode('contact_activity:read'),
       writes: access.canCode('contact_activity:create'),

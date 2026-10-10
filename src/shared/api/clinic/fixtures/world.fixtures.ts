@@ -41,8 +41,8 @@ import type {
   PaymentRecord,
   PendingCreditRecord,
 } from '@/shared/api/clinic/payments-fixture-contracts.ts';
+import type { StaffProfile } from '@/shared/api/clinic/staff-fixture-contracts.ts';
 import type { TaskRecord } from '@/shared/api/clinic/tasks-fixture-contracts.ts';
-import type { StaffProfile } from '@/shared/api/clinic/users-contracts.ts';
 
 import { appointmentSeed } from './appointments.fixtures.ts';
 import { leadMessageSeed, leadSeed } from './leads.fixtures.ts';
@@ -100,7 +100,7 @@ export const clinicFixtures = {
     resource: 'Branch',
     seed: () => branchSeed(),
   }),
-  // A staff profile carries the plan's role keys and membership link (Appendix F) — see users-contracts.ts.
+  // A fixture staff member and the membership it stands for — see staff-fixture-contracts.ts.
   staff: createFixtureCollection<StaffProfile>({
     resource: 'User',
     seed: () => staffSeed(),

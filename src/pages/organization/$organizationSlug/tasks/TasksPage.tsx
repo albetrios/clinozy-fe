@@ -64,16 +64,13 @@ interface TasksAccess {
 }
 
 /**
- * The room's gates (research-tasks §7): the reads take the member's
- * `task:read` — the previewed role's view under View-as, when every code reads
- * false — and every write the member's own clinozy-be code, so a View-as
- * preview reads the room and changes nothing.
+ * The room's gates (research-tasks §7): each its clinozy-be code in force — the member's own, or
+ * the previewed role's while View-as runs.
  */
 function tasksAccessOf(access: ClinicAccess): TasksAccess {
   const code = (permission: string) => access.isResolved && access.canCode(permission);
   return {
-    canView:
-      access.previewRole === null ? code('task:read') : access.can('tasks', 'view'),
+    canView: code('task:read'),
     canCreate: code('task:create'),
     canDelete: code('task:delete'),
     canEditRules: code('organization:update'),

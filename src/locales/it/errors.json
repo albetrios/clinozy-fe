@@ -57,7 +57,18 @@
     "http502": "Il server è temporaneamente non disponibile. Riprova più tardi.",
     "http503": "Il servizio è temporaneamente non disponibile. Riprova più tardi.",
     "reload": "Ricarica",
-    "recordChanged": "Qualcun altro l’ha salvato nel frattempo. Ricarica per vedere le sue modifiche, poi rifai le tue."
+    "recordChanged": "Qualcun altro l’ha salvato nel frattempo. Ricarica per vedere le sue modifiche, poi rifai le tue.",
+    "reasons": {
+      "missingPermission": "Non hai il permesso di farlo. Chiedi al titolare della clinica o a un amministratore.",
+      "ownerMembershipFixed": "Non è possibile modificare i ruoli e lo stato del titolare della clinica. Trasferisci prima la proprietà.",
+      "ownerCannotLeave": "Il titolare della clinica non può uscire. Trasferisci prima la proprietà.",
+      "ownerRoleFixed": "Non è possibile modificare l'accesso del ruolo del titolare della clinica.",
+      "systemRoleFixed": "Un ruolo predefinito non può essere rinominato né eliminato.",
+      "roleLocked": "L'accesso di questo ruolo è fisso e non può essere modificato.",
+      "seatLimitReached": "Il tuo piano non ha posti liberi. Aggiungi un posto in Impostazioni › Fatturazione, poi invita di nuovo.",
+      "membershipAlreadyExists": "Questa persona è già nella clinica.",
+      "disposableEmail": "Usa un indirizzo email permanente: quelli usa e getta non sono accettati."
+    }
   },
   "frontend": {
     "query": {
@@ -105,7 +116,8 @@
         "updateRoleSuccess": "Ruolo del membro aggiornato",
         "removeSuccess": "Membro rimosso",
         "suspendSuccess": "Membro sospeso",
-        "reactivateSuccess": "Membro riattivato"
+        "reactivateSuccess": "Membro riattivato",
+        "updateSuccess": "Membro salvato"
       },
       "roles": {
         "createFailed": "Impossibile creare il ruolo",

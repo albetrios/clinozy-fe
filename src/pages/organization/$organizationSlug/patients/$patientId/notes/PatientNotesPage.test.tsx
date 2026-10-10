@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
+import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import type { ContactActivityEntry } from '@/shared/api/clinic/contact-activities-api.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
@@ -102,14 +103,26 @@ function AccessProbe() {
   return access.isResolved ? <span data-testid="access-resolved" /> : null;
 }
 
-async function openNotes(role: Role = 'admin') {
+/** A member who reads the whole file and writes nothing in it — no preset is that narrow. */
+const READS_ONLY: OrganizationPermission[] = [
+  'organization:read',
+  'patient:read',
+  'patient:clinical_record:read',
+  'contact_activity:read',
+  'appointment:read',
+];
+
+async function openNotes(
+  role: Role = 'admin',
+  codes?: readonly OrganizationPermission[],
+) {
   const user = userEvent.setup();
   const view = renderInPatientFile(
     <>
       <PatientNotesPage />
       <AccessProbe />
     </>,
-    { file: patientFile(), section: 'notes', role },
+    { file: patientFile(), section: 'notes', role, codes },
   );
   await screen.findByTestId('access-resolved');
   return { user, ...view };
@@ -197,7 +210,7 @@ describe('PatientNotesPage (§6 #3)', () => {
   });
 
   it('gives a member who only reads the file the notes alone', async () => {
-    await openNotes('therapist');
+    await openNotes('admin', READS_ONLY);
     expect(await cards()).toHaveLength(2);
     expect(screen.queryByRole('textbox', { name: 'New note' })).not.toBeInTheDocument();
   });

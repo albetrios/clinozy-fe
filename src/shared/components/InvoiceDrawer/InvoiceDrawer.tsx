@@ -25,6 +25,7 @@ import {
   type EditingRecordRead,
   useEditingRecord,
 } from '@/shared/hooks/useEditingRecord/index.ts';
+import { useFixtureStaff } from '@/shared/hooks/useFixtureStaff/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import {
   useDeleteInvoice,
@@ -33,7 +34,6 @@ import {
 } from '@/shared/hooks/useInvoices/index.ts';
 import { usePlan } from '@/shared/hooks/usePlan/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
-import { useStaffProfiles } from '@/shared/hooks/useTeam/index.ts';
 import { useTeamDirectory } from '@/shared/hooks/useTeamDirectory/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -205,7 +205,7 @@ const readInvoiceDetail = (
  * ("Dr. Drashti"), a sale's fixture staff ("Kiran P.").
  */
 function useStaffPills(sale: boolean): ReadonlyMap<string, DrawerPeekPill> {
-  const staff = useStaffProfiles();
+  const staff = useFixtureStaff();
   const team = useTeamDirectory();
   if (sale) {
     return new Map(

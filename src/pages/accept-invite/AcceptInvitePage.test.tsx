@@ -76,12 +76,9 @@ const AFTER_REDIRECT_MS = ACCEPT_INVITE_REDIRECT_MS + 400;
 beforeEach(() => {
   vi.resetAllMocks();
   getAccessTokenMock.mockReturnValue('token');
-  acceptInvitationMock.mockResolvedValue({
-    organizationId: 'org_1',
-    organizationName: 'Acme',
-    organizationSlug: 'acme',
-  });
-  switchToOrganizationMock.mockResolvedValue(undefined);
+  acceptInvitationMock.mockResolvedValue({ organizationId: 'org_1' });
+  // The accept names the organization only; its slug comes from the switch.
+  switchToOrganizationMock.mockResolvedValue({ activeOrganization: { slug: 'acme' } });
   silentRefreshMock.mockResolvedValue(undefined);
   checkIconMock.mockImplementation((props: Record<string, unknown>) => (
     <svg data-testid={props['data-testid'] as string} />
@@ -268,11 +265,7 @@ describe('AcceptInvitePage', () => {
       const retry = await screen.findByTestId('accept-invite-retry');
       expect(acceptInvitationMock).toHaveBeenCalledTimes(1);
 
-      acceptInvitationMock.mockResolvedValue({
-        organizationId: 'org_1',
-        organizationName: 'Acme',
-        organizationSlug: 'acme',
-      });
+      acceptInvitationMock.mockResolvedValue({ organizationId: 'org_1' });
       act(() => {
         retry.dispatchEvent(new MouseEvent('click', { bubbles: true }));
       });
@@ -322,7 +315,7 @@ describe('AcceptInvitePage', () => {
       await waitFor(() => expect(acceptInvitationMock).toHaveBeenCalled());
 
       unmount();
-      settleAccept?.({ organizationId: 'org_1', organizationSlug: 'acme' });
+      settleAccept?.({ organizationId: 'org_1' });
       await waitFor(() => expect(switchToOrganizationMock).toHaveBeenCalled());
       await new Promise((r) => setTimeout(r, 50));
 
@@ -344,7 +337,7 @@ describe('AcceptInvitePage', () => {
       await waitFor(() => expect(acceptInvitationMock).toHaveBeenCalled());
 
       unmount();
-      settleAccept?.({ organizationId: 'org_1', organizationSlug: 'acme' });
+      settleAccept?.({ organizationId: 'org_1' });
 
       // Silence for the user, but not for the logs — the membership exists.
       await waitFor(() => expect(reportErrorMock).toHaveBeenCalled());

@@ -4,11 +4,12 @@ import { api, type ApiData } from '@/core/http/api.ts';
 import { queryClient } from '@/core/http/queryClient.ts';
 import { wireSchema } from '@/core/http/wire-schema.ts';
 import { collectAllPages } from '@/shared/api/fetch-all-pages.ts';
-import { toneForLabel } from '@/shared/clinic/clinic-tones.ts';
+import { servedTone } from '@/shared/clinic/clinic-tones.ts';
 import { personInitials } from '@/shared/components/Cells/PersonAvatar/person-name.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
-import { type Tone, TONE_VALUES } from './clinic-schema.ts';
+import { presetOfRole } from './access-contracts.ts';
+import type { Role, Tone } from './clinic-schema.ts';
 
 /*
  * The team and the names a room's rows point at by id — a booking's doctor
@@ -44,6 +45,18 @@ const teamMemberWire = wireSchema<ApiMemberPick>()(
   }),
 );
 
+type ApiRoleDirectoryRow = NonNullable<ApiData<'/app/roles', 'get'>>[number];
+
+const roleDirectoryWire = wireSchema<ApiRoleDirectoryRow>()(
+  z.object({
+    id: z.string(),
+    name: z.string(),
+    tone: z.string(),
+    is_system: z.boolean(),
+    is_locked: z.boolean(),
+  }),
+);
+
 const branchRoomWire = wireSchema<ApiBranchRoom>()(
   z.object({ id: z.string(), name: z.string() }),
 );
@@ -59,6 +72,47 @@ const directoryQueryKeys = {
   roomNames: (branchId: string) =>
     [...directoryQueryKeys.all, activeOrganizationId(), 'room-names', branchId] as const,
 };
+
+/** The query key of the role directory in one organization. */
+export const roleDirectoryQueryKey = (organizationId: string | null) =>
+  [...directoryQueryKeys.all, organizationId, 'roles'] as const;
+
+/** A role as every member may read it — a pill's name and tone, a preset's key. */
+export interface DirectoryRole {
+  id: string;
+  name: string;
+  /** The role's colour — the palette's, else the name's own hashed tone. */
+  tone: Tone;
+  isSystem: boolean;
+  isLocked: boolean;
+  /** The preset it is (a system role named as one), else null for the clinic's own role. */
+  preset: Role | null;
+}
+
+/**
+ * The organization's roles by name and tone — every page of the role directory
+ * (`GET /app/roles`, any member reads it): the Account menu's role line, a View-as preview's
+ * name, the role pills a member without `role:read` sees.
+ */
+export async function fetchRoleDirectory(): Promise<DirectoryRole[]> {
+  const rows = await collectAllPages(async (after) => {
+    const response = await api.get('/app/roles', {
+      query: { limit: 100, after: after ?? undefined },
+    });
+    return {
+      rows: z.array(roleDirectoryWire).parse(response.data ?? []),
+      next: response.meta?.pagination?.next ?? null,
+    };
+  }, 'role-directory');
+  return rows.map((row) => ({
+    id: row.id,
+    name: row.name,
+    tone: servedTone(row.tone, row.name),
+    isSystem: row.is_system,
+    isLocked: row.is_locked,
+    preset: presetOfRole({ name: row.name, isSystem: row.is_system }),
+  }));
+}
 
 /** The query key of the team in one organization (the hook passes the organization it renders for). */
 export const teamDirectoryQueryKey = (organizationId: string | null) =>
@@ -79,9 +133,6 @@ export interface DirectoryMember {
   branchIds: string[];
 }
 
-const isTone = (value: string): value is Tone =>
-  (TONE_VALUES as readonly string[]).includes(value);
-
 /** A picker row as the rooms read it. */
 function toDirectoryMember(row: z.output<typeof teamMemberWire>): DirectoryMember {
   return {
@@ -89,7 +140,7 @@ function toDirectoryMember(row: z.output<typeof teamMemberWire>): DirectoryMembe
     userId: row.user_id,
     name: row.display_name,
     initials: personInitials(row.display_name),
-    tone: isTone(row.tone) ? row.tone : toneForLabel(row.display_name),
+    tone: servedTone(row.tone, row.display_name),
     roleIds: row.role_ids,
     branchIds: row.branch_ids,
   };

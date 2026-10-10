@@ -667,20 +667,18 @@ describe('OnboardingPage', () => {
     expect(switchToOrganization).toHaveBeenCalledWith('org_new');
     expect(inviteMember).toHaveBeenCalledTimes(2);
     expect(inviteMember).toHaveBeenCalledWith({
-      email: 'a@acme.com',
-      roleId: 'rol_member',
+      invite: { email: 'a@acme.com', roleIds: ['rol_member'] },
     });
     expect(inviteMember).toHaveBeenCalledWith({
-      email: 'b@acme.com',
-      roleId: 'rol_member',
+      invite: { email: 'b@acme.com', roleIds: ['rol_member'] },
     });
     // The org already had an assignable role, so none was provisioned.
     expect(createRole).not.toHaveBeenCalled();
   });
 
-  it('provisions a default Member role when the fresh org seeds only Owner', async () => {
-    // A freshly created org has only the system Owner role — nothing to invite
-    // anyone as — so the finish step provisions a "Member" role first.
+  it('provisions a default Member role when the organization has only presets', async () => {
+    // The presets each carry a clinic job the wizard does not ask about, so the
+    // finish step provisions one "Member" role to invite with.
     const user = userEvent.setup();
     listRoles.mockResolvedValueOnce({
       rows: [{ ...memberRole('rol_owner'), name: 'Owner', isSystem: true }],
@@ -693,9 +691,14 @@ describe('OnboardingPage', () => {
 
     await waitFor(() => expect(navigate).toHaveBeenCalled());
     expect(createRole).toHaveBeenCalledTimes(1);
+    // One call: the codes ride the create (no separate PUT).
+    expect(createRole).toHaveBeenCalledWith({
+      input: expect.objectContaining({
+        permissions: ['organization:read', 'membership:read'],
+      }),
+    });
     expect(inviteMember).toHaveBeenCalledWith({
-      email: 'a@acme.com',
-      roleId: 'rol_provisioned',
+      invite: { email: 'a@acme.com', roleIds: ['rol_provisioned'] },
     });
   });
 
@@ -823,8 +826,7 @@ describe('OnboardingPage', () => {
       // All three go out. This is exactly what silently sent nothing before.
       expect(inviteMember).toHaveBeenCalledTimes(3);
       expect(inviteMember).toHaveBeenCalledWith({
-        email: 'c@acme.com',
-        roleId: 'rol_member',
+        invite: { email: 'c@acme.com', roleIds: ['rol_member'] },
       });
       expect(successSpy).toHaveBeenCalledTimes(1);
       // The toast NAMES how many invitations went out — "your workspace is

@@ -57,7 +57,18 @@
     "http502": "Le serveur est temporairement indisponible. Réessayez plus tard.",
     "http503": "Le service est temporairement indisponible. Réessayez plus tard.",
     "reload": "Recharger",
-    "recordChanged": "Quelqu’un d’autre a enregistré ceci entre-temps. Rechargez pour voir ses modifications, puis refaites les vôtres."
+    "recordChanged": "Quelqu’un d’autre a enregistré ceci entre-temps. Rechargez pour voir ses modifications, puis refaites les vôtres.",
+    "reasons": {
+      "missingPermission": "Vous n'avez pas l'autorisation de faire cela. Demandez au propriétaire de la clinique ou à un administrateur.",
+      "ownerMembershipFixed": "Les rôles et le statut du propriétaire de la clinique ne peuvent pas être modifiés. Transférez d'abord la propriété.",
+      "ownerCannotLeave": "Le propriétaire de la clinique ne peut pas la quitter. Transférez d'abord la propriété.",
+      "ownerRoleFixed": "L'accès du rôle détenu par le propriétaire de la clinique ne peut pas être modifié.",
+      "systemRoleFixed": "Un rôle prédéfini ne peut être ni renommé ni supprimé.",
+      "roleLocked": "L'accès de ce rôle est fixe et ne peut pas être modifié.",
+      "seatLimitReached": "Votre forfait n'a plus de place libre. Ajoutez une place dans Paramètres › Facturation, puis invitez à nouveau.",
+      "membershipAlreadyExists": "Cette personne fait déjà partie de la clinique.",
+      "disposableEmail": "Utilisez une adresse e-mail permanente — les adresses jetables ne sont pas acceptées."
+    }
   },
   "frontend": {
     "query": {
@@ -105,7 +116,8 @@
         "updateRoleSuccess": "Rôle du membre mis à jour",
         "removeSuccess": "Membre retiré",
         "suspendSuccess": "Membre suspendu",
-        "reactivateSuccess": "Membre réactivé"
+        "reactivateSuccess": "Membre réactivé",
+        "updateSuccess": "Membre enregistré"
       },
       "roles": {
         "createFailed": "Impossible de créer le rôle",

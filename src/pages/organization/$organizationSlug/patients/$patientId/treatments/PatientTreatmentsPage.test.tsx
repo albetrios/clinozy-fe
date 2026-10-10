@@ -224,8 +224,8 @@ describe('PatientTreatmentsPage', () => {
     expect(screen.queryByTestId(action('reverse'))).not.toBeInTheDocument();
   });
 
-  it('leaves a role without the treatment gate the check-in only (View-as)', async () => {
-    renderTreatments(url(), { member: { role: 'admin' } });
+  it('leaves a role without the treatment gate the check-in only — the Front desk', async () => {
+    renderTreatments(url(), { member: { role: 'front_desk' } });
     expect(await screen.findByTestId(action('check-in'))).toBeInTheDocument();
     expect(screen.queryByTestId(action('copy'))).not.toBeInTheDocument();
     expect(screen.queryByTestId(action('edit'))).not.toBeInTheDocument();

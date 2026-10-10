@@ -1,8 +1,12 @@
+import { useQueryClient } from '@tanstack/react-query';
 import type { UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import type { Branch } from '@/shared/api/clinic/clinic-schema.ts';
+import { branchQueryKeys } from '@/shared/api/clinic/branches-api.ts';
+import type { ClinicBranch } from '@/shared/api/clinic/branches-contracts.ts';
+import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
+import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -14,6 +18,7 @@ import {
   branchSaveOf,
   isBranchEmailInvalid,
   isBranchPhoneIncomplete,
+  isBranchPinIncomplete,
 } from './branch-form.ts';
 
 const K = USERS_KEYS.branches.drawer;
@@ -46,12 +51,22 @@ const FIELD_STEPS: Readonly<Record<BranchField, BranchDrawerStepId>> = {
 /** The form fields in the drawer's order, for "the first field the server named". */
 const FIELD_ORDER = Object.keys(FIELD_STEPS) as BranchField[];
 
-/** The contract's field names that the form spells differently. */
+/** clinozy-be's field names that the form spells differently. */
 const SERVER_FIELDS: Readonly<Record<string, BranchField>> = {
-  defaultDoctorId: 'defaults',
-  defaultDeskId: 'defaults',
-  defaultTherapistId: 'defaults',
-  defaultPharmacistId: 'defaults',
+  is_main: 'isMain',
+  is_active: 'active',
+  address_line_one: 'addressLine1',
+  address_line_two: 'addressLine2',
+  postal_code: 'pin',
+  gst_number: 'gstNumber',
+  working_days: 'workingDays',
+  opens_at: 'opensAt',
+  closes_at: 'closesAt',
+  membership_ids: 'teamIds',
+  default_doctor_membership_id: 'defaults',
+  default_front_desk_membership_id: 'defaults',
+  default_therapist_membership_id: 'defaults',
+  default_pharmacist_membership_id: 'defaults',
 };
 
 /** What a save ended with: a branch added, or one saved — by its name. */
@@ -62,11 +77,13 @@ export type BranchSaveOutcome =
 export interface UseBranchSaveOptions {
   form: UseFormReturn<BranchFormValues>;
   /** The branch an edit saves; null for a new one. */
-  branch: Branch | null;
-  /** Who worked here when the drawer opened — the Team change is against it. */
+  branch: ClinicBranch | null;
+  /** Who worked here when the drawer opened — the team is written only when it changed. */
   before: readonly string[];
   /** The Team, to keep each default on the team with the role. */
   members: readonly TeamMember[];
+  /** The preset a role is — who may be each default. */
+  presetOf: (roleId: string) => Role | null;
   /** Open a step — the one holding the field a check or the server named. */
   onStep: (stepId: BranchDrawerStepId) => void;
   onDone: (outcome: BranchSaveOutcome) => void;
@@ -74,21 +91,24 @@ export interface UseBranchSaveOptions {
 
 /**
  * The branch drawer's save on the shared drawer save (KICKOFF §6.12 Branch
- * drawer, §6.0 States): checks first — a phone of ten digits, an email that
- * reads as one — then `saveBranch`. "A branch called Vesu already exists"
- * (409) outlines Name; a refused field opens its step; a dropped connection
- * keeps the draft with "Retry save". One toast on success: "Vesu branch
- * added" / "Vesu saved".
+ * drawer, §6.0 States): checks first — a six-digit PIN code, a phone of ten
+ * digits, an email that reads as one — then `saveBranch`. "A branch called Vesu
+ * already exists" (409) outlines Name; someone else's save
+ * first (409 `record_changed`) offers Reload; a refused field opens its step; a
+ * dropped connection keeps the draft with "Retry save". One toast on success:
+ * "Vesu branch added" / "Vesu saved".
  */
 export function useBranchSave({
   form,
   branch,
   before,
   members,
+  presetOf,
   onStep,
   onDone,
 }: UseBranchSaveOptions) {
   const { t } = useTranslation(USERS_NS);
+  const queryClient = useQueryClient();
   const saveBranch = useSaveBranch();
 
   return useDrawerSave<BranchFormValues, BranchSaveOutcome>({
@@ -96,6 +116,9 @@ export function useBranchSave({
     fieldOrder: FIELD_ORDER,
     serverFields: SERVER_FIELDS,
     check: (values) => {
+      if (isBranchPinIncomplete(values.pin)) {
+        return { fields: ['pin'], message: t(K.pinInvalid) };
+      }
       if (isBranchPhoneIncomplete(values.phone)) {
         return { fields: ['phone'], message: t(K.phoneInvalid) };
       }
@@ -104,21 +127,28 @@ export function useBranchSave({
       }
       return null;
     },
-    onConflict: () => {
+    onConflict: (error) => {
+      // clinozy-be names a taken branch name with no reason (the save never sends `is_main`, so
+      // a second main branch can't happen); anything else that conflicts says why.
+      if (apiErrorReason(error)) {
+        notify.warning(mapApiError(error));
+        return;
+      }
       const message = t(K.duplicate, { name: form.getValues('name').trim() });
       form.setError('name', { type: 'server', message });
       onStep('place');
       notify.warning(message);
     },
+    onStale: () => void queryClient.invalidateQueries({ queryKey: branchQueryKeys.all }),
     onField: (field) => onStep(FIELD_STEPS[field as BranchField]),
     write: async () => {
       const values = form.getValues();
-      const team = members.filter(
-        (member) => member.profile && values.teamIds.includes(member.profile.id),
+      const team = members.filter((member) =>
+        values.teamIds.includes(member.membershipId),
       );
       const saved = await saveBranch.mutateAsync({
-        ...(branch ? { id: branch.id } : {}),
-        ...branchSaveOf(values, { team, before }),
+        ...(branch ? { branch, memberIdsBefore: before } : {}),
+        ...branchSaveOf(values, { team, presetOf }),
       });
       return { kind: branch ? 'saved' : 'added', name: saved.name };
     },

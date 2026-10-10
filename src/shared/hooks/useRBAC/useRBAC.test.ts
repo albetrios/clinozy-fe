@@ -34,12 +34,12 @@ describe('useHasPermission', () => {
     expect(renderHook(() => useHasPermission('membership:read')).result.current).toBe(
       true,
     );
-    expect(renderHook(() => useHasPermission('role:manage')).result.current).toBe(false);
+    expect(renderHook(() => useHasPermission('role:update')).result.current).toBe(false);
   });
 
   it('super_admin is still governed by the permission set', () => {
     useAuthStore.setState({ user: { ...USER, role: 'super_admin' } as AuthUser });
-    expect(renderHook(() => useHasPermission('role:manage')).result.current).toBe(false);
+    expect(renderHook(() => useHasPermission('role:update')).result.current).toBe(false);
   });
 });
 
@@ -62,7 +62,7 @@ describe('useRequirePermission', () => {
     useAuthStore.setState({ user: USER });
     useOrganizationStore.getState().setPermissions(['membership:read']);
 
-    renderHook(() => useRequirePermission('role:manage'));
+    renderHook(() => useRequirePermission('role:update'));
     expect(navigateMock).toHaveBeenCalledWith({
       to: AUTH_ROUTES.UNAUTHORIZED,
       replace: true,
@@ -80,7 +80,7 @@ describe('useRequirePermission', () => {
   it('redirects a super_admin that does not hold the permission', () => {
     useAuthStore.setState({ user: { ...USER, role: 'super_admin' } as AuthUser });
 
-    renderHook(() => useRequirePermission('role:manage'));
+    renderHook(() => useRequirePermission('role:update'));
     expect(navigateMock).toHaveBeenCalled();
   });
 
@@ -89,13 +89,13 @@ describe('useRequirePermission', () => {
     useOrganizationStore.getState().setPermissions(['membership:read']);
 
     const { rerender } = renderHook(
-      ({ permission }: { permission: 'membership:read' | 'role:manage' }) =>
+      ({ permission }: { permission: 'membership:read' | 'role:update' }) =>
         useRequirePermission(permission),
       { initialProps: { permission: 'membership:read' as const } },
     );
     expect(navigateMock).not.toHaveBeenCalled();
 
-    rerender({ permission: 'role:manage' });
+    rerender({ permission: 'role:update' });
     expect(navigateMock).toHaveBeenCalledWith({
       to: AUTH_ROUTES.UNAUTHORIZED,
       replace: true,

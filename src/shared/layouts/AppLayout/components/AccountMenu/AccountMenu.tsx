@@ -6,8 +6,6 @@ import { platformConfig } from '@/core/config/env.ts';
 import { cn } from '@/lib/utils.ts';
 import type { Presence } from '@/shared/api/clinic/clinic-schema.ts';
 import { logout } from '@/shared/auth/service.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { ROLE_TONES } from '@/shared/clinic/clinic-tones.ts';
 import { CountBadge } from '@/shared/components/Cells/CountBadge/index.ts';
 import {
   PersonAvatar,
@@ -29,7 +27,7 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu.tsx';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useRoleLabel, useRolesInForce } from '@/shared/hooks/useClinicRoles/index.ts';
 import { useUnreadCount } from '@/shared/hooks/useNotifications/index.ts';
 import { usePresence } from '@/shared/hooks/usePresence/index.ts';
 import {
@@ -140,12 +138,11 @@ function MenuRow({
 /** "<role> · <branch>", or just the role, or nothing for a member without a clinic role. */
 function useRoleLine(): string | null {
   const { t } = useTranslation(LAYOUT_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
-  const { roles } = useClinicAccess();
+  const label = useRoleLabel();
+  const [mainRole] = useRolesInForce();
   const { openBranches } = useBranches();
-  const [mainRole] = roles;
   if (!mainRole) return null;
-  const role = tClinic(CLINIC_KEYS.roles[mainRole]);
+  const role = label(mainRole);
   const branch = openBranches.find((candidate) => candidate.isMain) ?? openBranches[0];
   return branch ? t(keys.identityRole, { role, branch: branch.name }) : role;
 }
@@ -324,15 +321,14 @@ export function AccountMenu({
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
   const { presence } = usePresence();
-  const { roles } = useClinicAccess();
+  const [mainRole] = useRolesInForce();
   const [open, setOpen] = useState(false);
   // The inbox opens as this menu closes; the menu must not hand focus back to
   // the avatar then, or the inbox would read that as a click outside.
   const keepFocusAway = useRef(false);
 
   const name = user?.name ?? user?.email ?? t(LAYOUT_KEYS.app.userFallback);
-  const [mainRole] = roles;
-  const tone = mainRole ? ROLE_TONES[mainRole] : 'stone';
+  const tone = mainRole?.tone ?? 'stone';
   const avatar = (size: 'cell' | 'identity') => (
     <PersonAvatar
       initials={personInitials(name)}

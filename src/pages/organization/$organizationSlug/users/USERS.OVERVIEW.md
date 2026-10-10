@@ -2,17 +2,20 @@
 
 Route: `/organization/$organizationSlug/users` — the Users room (KICKOFF §6.12), the
 single members surface (D17; the spec is the intake's users.md). The bare URL is its first tab, the Team: clinozy-be's memberships
-(every page read up front) joined with the fixture staff profiles (`REPLACE_WITH_API`), searched,
-filtered and sorted in place. Its children are URL-driven dialogs over the Team (D24): New user
+(every page read up front), each carrying the member's clinic details — mobile, colour, branches,
+days, hours and commission — searched, filtered and sorted in place. Its children are URL-driven dialogs over the Team (D24): New user
 (`create/`, an invitation — never an admin-set password) and the member drawer
 (`$userId/edit/`, keyed by membership id) — and the other tabs, Roles & access (`roles/`) and
 Branches (`branches/`), registered beside the Team in the route tree. A member opened from a role page
 (`?from=roles`) keeps Roles & access behind the drawer, and closing it returns to that role.
 
 Gated on `membership:read` and the `clinic-users` module, then `requireOrgStatus`. In-room, the
-Users section follows the member's clinozy-be codes (D17): "New user" needs `invitation:manage`
-and `membership:manage` (clinozy-be's invite asks for the second, D47); edit, status and
-remove need `membership:manage`. View-as narrows it to the previewed role's matrix. Never a
+Users section follows the member's clinozy-be codes (D17): "New user" needs `membership:create`
+and `role:read` (its role picker); edit, status and "Resend invitation" need `membership:update`;
+removing a member and cancelling an invitation need `membership:delete`; Export needs only
+`membership:read`. Each tab shows with its own code — Team `membership:read`, Roles & access
+`role:read`, Branches `branch:read` — and the tab you are on always shows. View-as narrows it all
+to the previewed role's codes. Never a
 Delete on your own row or the owner's: your own row and drawer offer **Leave clinic** instead
 (`components/UserLeaveConfirm/`) — any member but the owner, through clinozy-be's self-service
 `POST /organization/leave`; the row leaves at once, the membership after the 10s Undo, then the
@@ -37,7 +40,7 @@ days and hours (`shared/hooks/useHoursFormat/`).
 | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `users.route.tsx`                 | Route marker — exports `Component` rendering `UsersPage`.                                                                                                                                                         |
 | `users.manifest.ts`               | Manifest — `kind: 'layout'`, children `create`, `$userId`, `roles`, `branches`; `membership:read`, module `clinic-users`, nav `users`.                                                                            |
-| `users.search.ts`                 | `validateUsersSearch` (`q`, `role`, `branch`, `status`, `created`, `sort`), `validateRolesSearch`.                                                                                                                |
+| `users.search.ts`                 | `validateUsersSearch` (`q`, `role` — a role id, `branch`, `status`, `created`, `sort`), `validateRolesSearch` (`role`, a role id).                                                                                |
 | `users.dialog-search.ts`          | `validateUserEditSearch` (`from`) — the member drawer's own param, parsed by the Team; loads with the room.                                                                                                       |
 | `users.constants.ts`              | `USERS_NS` / `USERS_KEYS` (the `users` namespace), `TEAM_TABLE_ID`, `USER_DRAWER_TEST_ID`.                                                                                                                        |
 | `UsersPage.tsx`                   | The Team (or Roles & access, `from=roles`): toolbar, table, row actions, bulk Export, the user drawers and the delete confirm. Owns `users-page`.                                                                 |

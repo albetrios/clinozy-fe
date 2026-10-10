@@ -373,9 +373,11 @@ describe('Treatment drawer (KICKOFF §6.6; S:38–39)', () => {
     );
   });
 
-  it('reads only for a role without the treatment gate (View-as)', async () => {
+  it('reads only for a role without the treatment gate — the Front desk', async () => {
     const user = userEvent.setup();
-    renderTreatments(url(`/${TEST_TREATMENT_ID}/edit`), { member: { role: 'admin' } });
+    renderTreatments(url(`/${TEST_TREATMENT_ID}/edit`), {
+      member: { role: 'front_desk' },
+    });
     const drawer = await screen.findByTestId('treatment-drawer');
     expect(within(drawer).queryByTestId('treatment-drawer-save')).not.toBeInTheDocument();
     expect(within(drawer).getByTestId('treatment-drawer-summary')).toHaveTextContent(

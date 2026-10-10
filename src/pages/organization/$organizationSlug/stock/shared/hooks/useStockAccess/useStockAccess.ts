@@ -20,26 +20,20 @@ export interface StockAccess {
 }
 
 /**
- * The Clinic stock gates (api-integration §5.6 Roles): the stock section's
- * actions — the member's clinozy-be `stock_item:*` codes (the room is on the
- * API), the previewed role's clinic matrix under View-as — and `payment:create`
- * for paying a bill, the member's own code (the previewed role's matrix during
- * View-as). The codes give Therapist and Front desk every keeping control, not
- * the design's "use" alone (Q-S1); Export is the table's (`stock_item:export`).
+ * The Clinic stock gates (api-integration §5.6 Roles): the `stock_item:*` codes in force — the
+ * member's own, or the previewed role's while View-as runs — and `payment:create` for paying a
+ * bill. The codes give Therapist and Front desk every keeping control, not the design's "use"
+ * alone (Q-S1); Export is the table's (`stock_item:export`).
  */
 export function useStockAccess(): StockAccess {
   const access = useClinicAccess();
   const can = (action: ClinicAction) => access.isResolved && access.can('stock', action);
-  const canPay =
-    access.previewRole === null
-      ? access.canCode('payment:create')
-      : access.can('payments', 'create');
   return {
     resolved: access.isResolved,
     canCreate: can('create'),
     canEdit: can('edit'),
     canDelete: can('delete'),
-    canPay: access.isResolved && canPay,
+    canPay: access.isResolved && access.canCode('payment:create'),
   };
 }
 

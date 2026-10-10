@@ -67,10 +67,8 @@ vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 
 vi.mock('@/shared/hooks/useClinicAccess/index.ts', () => ({
   useClinicAccess: () => ({
-    roles: ['admin'],
     previewRole: null,
     can: () => true,
-    canAbility: () => true,
     canCode: () => true,
     viewableSections: [],
     isResolved: true,

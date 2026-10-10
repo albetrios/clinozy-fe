@@ -35,10 +35,8 @@ vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 const access = vi.hoisted(() => ({ codes: new Set<string>() }));
 vi.mock('@/shared/hooks/useClinicAccess/index.ts', () => ({
   useClinicAccess: () => ({
-    roles: ['admin'],
     previewRole: null,
     can: () => true,
-    canAbility: () => true,
     canCode: (code: string) => access.codes.has(code),
     viewableSections: [],
     isResolved: true,

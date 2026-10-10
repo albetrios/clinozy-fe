@@ -4,11 +4,6 @@ import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
-import {
-  fetchClinicAccessMatrix,
-  resetClinicAccessFixture,
-} from '@/shared/api/clinic/access-api.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import type * as OrganizationApiModule from '@/shared/api/organization-api.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
@@ -69,8 +64,6 @@ function setUp(codes: OrganizationPermission[] = USERS_ADMIN_CODES) {
 }
 
 beforeEach(() => {
-  resetClinicFixtures();
-  resetClinicAccessFixture();
   for (const fn of Object.values(notifyMock)) fn.mockReset();
   for (const fn of Object.values(api)) fn.mockReset();
   api.listMembers.mockResolvedValue({
@@ -89,12 +82,10 @@ beforeEach(() => {
 afterEach(() => {
   useOrganizationStore.getState().clearPermissions();
   useAuthStore.getState().clearAuth();
-  resetClinicFixtures();
-  resetClinicAccessFixture();
 });
 
 describe('useNewRole (H:5187)', () => {
-  it('creates the next "New role" with no access, in the next tone, and selects it', async () => {
+  it('creates the next "New role" in one call — no access, the next tone — and selects it', async () => {
     const { hook, onCreated } = setUp();
     await waitFor(() => expect(api.listRoles).toHaveBeenCalled());
     // Wait for the access and the roles to answer before pressing.
@@ -102,23 +93,25 @@ describe('useNewRole (H:5187)', () => {
       await act(() => hook.result.current());
       expect(api.createRole).toHaveBeenCalled();
     });
+    // Two custom roles already (Senior desk, New role): the third tone.
     expect(api.createRole).toHaveBeenCalledWith({
-      name: 'New role 2',
-      description: 'Custom role',
-      permissions: ['organization:read'],
+      input: {
+        name: 'New role 2',
+        description: 'Custom role',
+        permissions: ['organization:read'],
+        tone: 'mint',
+      },
+      idempotencyKey: expect.any(String),
     });
     expect(onCreated).toHaveBeenCalledWith(CREATED.id);
     expect(notifyMock.success).toHaveBeenCalledWith(
       'Role added · name it and pick what it can do',
     );
-    // Two custom roles already (Senior desk, New role): the third tone.
-    const matrix = await fetchClinicAccessMatrix();
-    expect(matrix.customRoleTones[CREATED.id]).toBe('mint');
   });
 
-  it('says why without "Change roles & access" and creates nothing', async () => {
+  it('says why without role:create and creates nothing', async () => {
     const { hook, onCreated } = setUp(
-      USERS_ADMIN_CODES.filter((code) => code !== 'role:manage'),
+      USERS_ADMIN_CODES.filter((code) => code !== 'role:create'),
     );
     await waitFor(async () => {
       await act(() => hook.result.current());

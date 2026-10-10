@@ -1,7 +1,8 @@
 import { seedCommon } from '@/shared/api/clinic/clinic-fixture-seed.ts';
 import type { Presence, Role, Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import { staffInitials, type StaffProfile } from '@/shared/api/clinic/users-contracts.ts';
+import type { StaffProfile } from '@/shared/api/clinic/staff-fixture-contracts.ts';
+import { staffInitials } from '@/shared/api/clinic/users-contracts.ts';
 
 import { type BranchName, branchRef, weekdays } from './organization.fixtures.ts';
 import { must, ref, seedAt, seedMobile } from './refs.fixtures.ts';
@@ -418,7 +419,6 @@ export function staffSeed(today: string = clinicToday()): StaffProfile[] {
       email: row.email,
       phone: row.phone === null ? null : seedMobile(row.phone),
       roles,
-      roleKeys: roles,
       membershipId: null,
       branchIds: row.branches.map(branchRef),
       tone: row.tone,

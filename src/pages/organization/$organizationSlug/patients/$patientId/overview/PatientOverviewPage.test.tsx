@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
+import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import type {
   ClinicalNote,
   ClinicalNoteKind,
@@ -128,14 +129,23 @@ const CARDS = [
   'clinical-card-future-suggestions',
 ];
 
-async function openNotes(role: 'admin' | 'therapist' = 'admin') {
+/** A member who reads the whole file and writes nothing in it — no preset is that narrow. */
+const READS_ONLY: OrganizationPermission[] = [
+  'organization:read',
+  'patient:read',
+  'patient:clinical_record:read',
+  'contact_activity:read',
+  'appointment:read',
+];
+
+async function openNotes(codes?: readonly OrganizationPermission[]) {
   const user = userEvent.setup();
   const view = renderInPatientFile(
     <>
       <PatientOverviewPage />
       <AccessProbe />
     </>,
-    { file: patientFile(), section: 'overview', role },
+    { file: patientFile(), section: 'overview', codes },
   );
   await screen.findAllByTestId('clinical-card-complaints-chip');
   await screen.findByTestId('access-resolved');
@@ -281,7 +291,7 @@ describe('PatientOverviewPage — Clinical notes (KICKOFF §6.6; H:780–826)', 
   });
 
   it('only reads without Patients edit', async () => {
-    await openNotes('therapist');
+    await openNotes(READS_ONLY);
     const card = screen.getByTestId('clinical-card-complaints');
     expect(within(card).queryByRole('textbox')).not.toBeInTheDocument();
     expect(within(card).queryByRole('button')).not.toBeInTheDocument();

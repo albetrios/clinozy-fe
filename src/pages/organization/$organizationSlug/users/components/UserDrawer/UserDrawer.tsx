@@ -12,7 +12,6 @@ import type { QuickFillItem } from '@/shared/components/QuickFillRow/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
-import { useClinicAccessMatrix } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
 import { resetFormInPlace } from '@/shared/hooks/useEditingRecord/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
@@ -22,7 +21,10 @@ import { usePlatformRoles } from '@/shared/hooks/useTeam/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { useHoursFormat } from '../../shared/hooks/useHoursFormat/index.ts';
-import { useRoleDirectory } from '../../shared/hooks/useRoleDirectory/index.ts';
+import {
+  type RoleDirectory,
+  useRoleDirectory,
+} from '../../shared/hooks/useRoleDirectory/index.ts';
 import { USER_DRAWER_TEST_ID, USERS_KEYS, USERS_NS } from '../../users.constants.ts';
 import type { UserDeleteTarget } from '../UserDeleteConfirm/index.ts';
 import { type UserSaveOutcome, useUserSave } from './use-user-save.ts';
@@ -99,21 +101,28 @@ type SessionProps = UserDrawerProps & {
   onAnother: () => void;
 };
 
-/** The Quick fill chips (new only): each sets roles, days, hours and commission — never the colour. */
+/**
+ * The Quick fill chips (new only): each sets the preset's role — the clinic's role of that name,
+ * when it still has one — days, hours and commission; never the colour.
+ */
 function quickFillItems(
   form: UseFormReturn<UserFormValues>,
+  directory: RoleDirectory,
   t: TFunction,
 ): QuickFillItem[] {
   return USER_QUICK_FILLS.map((fill) => ({
     id: fill.id,
     label: t(K.quickFill[fill.id]),
     tone: fill.tone,
-    onSelect: () =>
+    onSelect: () => {
+      const current = form.getValues();
+      const roleId = directory.presetRoleId(fill.role);
       resetFormInPlace(
         form,
-        { ...form.getValues(), ...fill.values },
+        { ...current, ...fill.values, roleIds: roleId ? [roleId] : current.roleIds },
         { keepDefaultValues: true, keepErrors: true },
-      ),
+      );
+    },
   }));
 }
 
@@ -161,8 +170,6 @@ function useSaveOutcome(props: UserDrawerProps, onAnother: () => void) {
 function useDrawerData() {
   const { openBranches, isMultiBranch } = useBranches();
   const { preferences } = usePreferences();
-  const { data: matrix } = useClinicAccessMatrix();
-  const platformRoles = usePlatformRoles();
   const directory = useRoleDirectory();
   const format = useHoursFormat();
   return {
@@ -171,8 +178,6 @@ function useDrawerData() {
     /** With one open branch a user is saved on it (`users.md:95`). */
     singleBranchId: isMultiBranch ? null : (openBranches[0]?.id ?? null),
     defaultBranchId: defaultBranchId(openBranches, preferences.branchFilter),
-    matrix,
-    platformRoles: platformRoles.roles,
     directory,
     format,
   };
@@ -215,7 +220,9 @@ function userDrawerSteps({
       content: (
         <UserProfileFields
           {...shared}
+          showName={member !== null}
           emailLocked={member !== null && member.status !== 'invited'}
+          rolesLocked={member?.isOwner ?? false}
           initials={staffInitials(values.name)}
           roleOptions={data.directory.options}
           access={view.access}
@@ -237,8 +244,7 @@ function userDrawerSteps({
           canResend={access.canResend}
           resending={resend.isPending}
           onResend={() => {
-            const invitation = member?.invitation;
-            if (invitation) resend.mutate(invitation.id);
+            if (member?.invitation) resend.mutate(member.membershipId);
           }}
         />
       ),
@@ -283,7 +289,9 @@ function UserDrawerSession(props: SessionProps) {
   const chrome = drawerChrome(props, member, ready, t);
 
   const form = useForm<UserFormValues>({
-    defaultValues: member ? userFormOf(member) : emptyUserForm(data.defaultBranchId),
+    defaultValues: member
+      ? userFormOf(member)
+      : emptyUserForm(data.defaultBranchId, data.directory.presetRoleId('front_desk')),
   });
   const values = useFormValues(form);
   const { isDirty } = useFormState({ control: form.control });
@@ -291,7 +299,6 @@ function UserDrawerSession(props: SessionProps) {
   const resend = useResendInvitation();
   const view = useUserDrawerView({
     values,
-    matrix: data.matrix,
     rolePills: data.directory.pills,
     branches: data.openBranches,
     multiBranch: data.isMultiBranch,
@@ -300,7 +307,6 @@ function UserDrawerSession(props: SessionProps) {
   const { saveState, save } = useUserSave({
     form,
     member,
-    platformRoles: data.platformRoles,
     singleBranchId: data.singleBranchId,
     onStep: setOpenStep,
     onDone: useSaveOutcome(props, onAnother),
@@ -332,7 +338,7 @@ function UserDrawerSession(props: SessionProps) {
       tag={chrome.tag}
       sub={t(K.sub)}
       badges={readouts.badges}
-      quickFill={chrome.create ? quickFillItems(form, t) : undefined}
+      quickFill={chrome.create ? quickFillItems(form, data.directory, t) : undefined}
       content={CONTENT_PROFILE}
       tone={USERS_TONE}
       steps={steps}
@@ -363,18 +369,20 @@ function UserDrawerSession(props: SessionProps) {
  * shared record drawer: New user — an invitation, never a password (D17) —
  * and Edit user, one form in two steps, "Profile, roles & branches" and
  * "Working hours & pay", for every role and viewport. New starts as Front
- * desk, sky, Mon–Sat 10:00–19:00 on the header's branch, with the Quick fill
- * presets; Edit opens on step 1. Save never disables: an empty Name or Email
- * opens step 1 with "Add name and email". Without the right to write it is
- * view only. Every opening starts a fresh form; "Create & add another"
+ * desk (the clinic's role of that name), sky, Mon–Sat 10:00–19:00 on the
+ * header's branch, with the Quick fill presets; Edit opens on step 1, the name
+ * read-only — the person sets it on their own profile. Save never disables: an
+ * empty Email opens step 1 with "Add their email". Without the right to write it
+ * is view only. Every opening starts a fresh form; "Create & add another"
  * restarts it.
  */
 export function UserDrawer(props: UserDrawerProps) {
   const branches = useBranches();
+  const roles = usePlatformRoles();
   const { session, restart } = useDrawerSession(props.open);
-  // The form starts from what is known: a fresh one once the access, the
-  // branches (a new user's default) or the member (an edit) arrive.
-  const ready = props.access.resolved && !branches.isPending;
+  // The form starts from what is known: a fresh one once the access, the branches and roles (a
+  // new user's defaults) or the member (an edit) arrive.
+  const ready = props.access.resolved && !branches.isPending && !roles.isPending;
   const startsFrom = `${String(ready)}:${props.mode === 'edit' ? (props.member?.membershipId ?? '') : ''}`;
   return (
     <UserDrawerSession

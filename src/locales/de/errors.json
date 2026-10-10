@@ -57,7 +57,18 @@
     "http502": "Der Server ist vorübergehend nicht verfügbar. Bitte später erneut versuchen.",
     "http503": "Der Dienst ist vorübergehend nicht verfügbar. Bitte später erneut versuchen.",
     "reload": "Neu laden",
-    "recordChanged": "Jemand anderes hat das inzwischen gespeichert. Lade neu, um die Änderungen zu sehen, und nimm deine dann erneut vor."
+    "recordChanged": "Jemand anderes hat das inzwischen gespeichert. Lade neu, um die Änderungen zu sehen, und nimm deine dann erneut vor.",
+    "reasons": {
+      "missingPermission": "Dafür hast du keine Berechtigung. Frag die Inhaberin bzw. den Inhaber der Praxis oder eine Admin-Person.",
+      "ownerMembershipFixed": "Rollen und Status der Praxisinhaberin bzw. des Praxisinhabers lassen sich nicht ändern. Übertrage zuerst die Inhaberschaft.",
+      "ownerCannotLeave": "Die Praxisinhaberin bzw. der Praxisinhaber kann die Praxis nicht verlassen. Übertrage zuerst die Inhaberschaft.",
+      "ownerRoleFixed": "Die Zugriffsrechte der Rolle, die die Praxisinhaberin bzw. der Praxisinhaber hat, lassen sich nicht ändern.",
+      "systemRoleFixed": "Eine vordefinierte Rolle lässt sich nicht umbenennen oder löschen.",
+      "roleLocked": "Die Zugriffsrechte dieser Rolle sind festgelegt und lassen sich nicht ändern.",
+      "seatLimitReached": "Dein Tarif hat keinen freien Platz. Füge unter Einstellungen › Abrechnung einen Platz hinzu und lade dann erneut ein.",
+      "membershipAlreadyExists": "Diese Person ist bereits in der Praxis.",
+      "disposableEmail": "Verwende eine dauerhafte E-Mail-Adresse – Wegwerfadressen werden nicht akzeptiert."
+    }
   },
   "frontend": {
     "query": {
@@ -105,7 +116,8 @@
         "updateRoleSuccess": "Mitgliederrolle aktualisiert",
         "removeSuccess": "Mitglied entfernt",
         "suspendSuccess": "Mitglied gesperrt",
-        "reactivateSuccess": "Mitglied reaktiviert"
+        "reactivateSuccess": "Mitglied reaktiviert",
+        "updateSuccess": "Mitglied gespeichert"
       },
       "roles": {
         "createFailed": "Rolle konnte nicht erstellt werden",

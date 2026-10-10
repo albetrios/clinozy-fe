@@ -57,7 +57,18 @@
     "http502": "O servidor está temporariamente indisponível. Tente novamente mais tarde.",
     "http503": "O serviço está temporariamente indisponível. Tente novamente mais tarde.",
     "reload": "Recarregar",
-    "recordChanged": "Outra pessoa salvou isto nesse meio-tempo. Recarregue para ver as alterações dela e depois refaça as suas."
+    "recordChanged": "Outra pessoa salvou isto nesse meio-tempo. Recarregue para ver as alterações dela e depois refaça as suas.",
+    "reasons": {
+      "missingPermission": "Você não tem permissão para fazer isso. Peça ao proprietário da clínica ou a um administrador.",
+      "ownerMembershipFixed": "Não é possível alterar as funções e o status do proprietário da clínica. Transfira a propriedade primeiro.",
+      "ownerCannotLeave": "O proprietário da clínica não pode sair. Transfira a propriedade primeiro.",
+      "ownerRoleFixed": "Não é possível alterar o acesso da função do proprietário da clínica.",
+      "systemRoleFixed": "Uma função predefinida não pode ser renomeada nem excluída.",
+      "roleLocked": "O acesso desta função é fixo e não pode ser alterado.",
+      "seatLimitReached": "Seu plano não tem vagas livres. Adicione uma vaga em Configurações › Faturamento e convide novamente.",
+      "membershipAlreadyExists": "Esta pessoa já está na clínica.",
+      "disposableEmail": "Use um endereço de e-mail permanente — endereços descartáveis não são aceitos."
+    }
   },
   "frontend": {
     "query": {
@@ -105,7 +116,8 @@
         "updateRoleSuccess": "Função do membro atualizada",
         "removeSuccess": "Membro removido",
         "suspendSuccess": "Membro suspenso",
-        "reactivateSuccess": "Membro reativado"
+        "reactivateSuccess": "Membro reativado",
+        "updateSuccess": "Membro salvo"
       },
       "roles": {
         "createFailed": "Não foi possível criar a função",

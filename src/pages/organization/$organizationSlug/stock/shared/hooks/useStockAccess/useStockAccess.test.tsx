@@ -1,13 +1,12 @@
 import { act, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
 import {
   renderStockRoutes,
   resetStockRoutes,
+  type StockTestMember,
 } from '../../../__tests__/integration/stock-test-router.tsx';
 import { useStockAccess, useStockDrawerAccess } from './useStockAccess.ts';
 
@@ -21,12 +20,12 @@ function Probe() {
   ) : null;
 }
 
-/** The member's stock access, previewed as `role`. */
-async function accessAs(role: Role) {
+/** The stock access of `member` — a preset's codes, or their own. */
+async function accessAs(member: StockTestMember) {
   const view = renderStockRoutes(
     '/organization/acme/stock/items',
     { items: Probe },
-    { role },
+    member,
   );
   const flags = JSON.parse((await screen.findByTestId('access')).textContent ?? '{}');
   view.unmount();
@@ -37,7 +36,7 @@ afterEach(() => resetStockRoutes());
 
 describe('useStockAccess', () => {
   it('gives Admin everything: create, edit, delete and pay', async () => {
-    expect(await accessAs('admin')).toEqual({
+    expect(await accessAs({ role: 'admin' })).toEqual({
       resolved: true,
       canCreate: true,
       canEdit: true,
@@ -48,21 +47,31 @@ describe('useStockAccess', () => {
     });
   });
 
-  it('reads each action from the stock section — the previewed role’s grants', async () => {
-    expect(await accessAs('pharmacist')).toMatchObject({
+  it('reads each action from the member’s stock codes', async () => {
+    expect(await accessAs({ role: 'pharmacist' })).toMatchObject({
+      canCreate: true,
+      canEdit: true,
+      canDelete: false,
+      canPay: true,
+    });
+    expect(await accessAs({ role: 'therapist' })).toMatchObject({
       canCreate: true,
       canEdit: true,
       canDelete: false,
       canPay: false,
     });
-    // The design's matrix lets a Therapist create alone; a saved record opens view only.
-    expect(await accessAs('therapist')).toMatchObject({
+    // Create without update: a saved record opens view only.
+    expect(
+      await accessAs({
+        permissions: ['organization:read', 'stock_item:read', 'stock_item:create'],
+      }),
+    ).toMatchObject({
       canCreate: true,
       canEdit: false,
       creating: { readOnly: false },
       editing: { readOnly: true, canDelete: false },
     });
-    expect(await accessAs('accountant')).toMatchObject({
+    expect(await accessAs({ role: 'accountant' })).toMatchObject({
       canCreate: false,
       canEdit: false,
       canDelete: false,
@@ -74,7 +83,6 @@ describe('useStockAccess', () => {
   it('asks a signed-in member for `payment:create` to pay a bill', async () => {
     renderStockRoutes('/organization/acme/stock/items', { items: Probe });
     act(() => {
-      useUIStore.setState({ previewRole: null });
       useOrganizationStore
         .getState()
         .setPermissions(['organization:read', 'stock_item:read', 'payment:create']);

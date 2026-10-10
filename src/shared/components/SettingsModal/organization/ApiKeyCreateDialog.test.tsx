@@ -15,8 +15,8 @@ const { useAssignablePermissionsMock } = vi.hoisted(() => ({
     rows: [
       { code: 'organization:read', name: 'View Organization', category: 'tenancy' },
       { code: 'membership:read', name: 'View Members', category: 'tenancy' },
-      { code: 'membership:manage', name: 'Manage Members', category: 'tenancy' },
-      { code: 'invitation:manage', name: 'Manage Invitations', category: 'tenancy' },
+      { code: 'membership:update', name: 'Update Members', category: 'tenancy' },
+      { code: 'membership:create', name: 'Create Members', category: 'tenancy' },
       { code: 'webhook:manage', name: 'Manage Webhooks', category: 'notify' },
     ],
     isPending: false,

@@ -2,20 +2,12 @@ import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { cn } from '@/lib/utils.ts';
-import {
-  type ClinicRoleKey,
-  isPresetRole,
-} from '@/shared/api/clinic/access-contracts.ts';
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { ROLE_TONES, TONE_CLASSES, toneForLabel } from '@/shared/clinic/clinic-tones.ts';
+import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { EmailVerificationBanner } from '@/shared/components/EmailVerificationBanner/index.ts';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
-import {
-  useClinicAccess,
-  useClinicAccessMatrix,
-} from '@/shared/hooks/useClinicAccess/index.ts';
-import { usePlatformRoles } from '@/shared/hooks/useTeam/index.ts';
+import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useRoleLabel, useRolesInForce } from '@/shared/hooks/useClinicRoles/index.ts';
 import { Eye } from '@/shared/icons/index.ts';
 import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -23,30 +15,14 @@ import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
 const keys = LAYOUT_KEYS.app.sectionBar.viewAs;
 
-/**
- * The previewed role's name and tone: a contract role's clinic name and tone,
- * or a custom role's clinozy-be name and its matrix tone (Users › Roles &
- * access) — the name's hash while the matrix has none (Appendix F).
- */
-function usePreviewRoleBadge(key: ClinicRoleKey | null): { label: string; tone: Tone } {
-  const { t } = useTranslation(CLINIC_NS);
-  // Read only while a custom role is previewed: the shell never lists roles otherwise.
-  const { roles } = usePlatformRoles(key !== null && !isPresetRole(key));
-  const { data: matrix } = useClinicAccessMatrix();
-  if (key === null) return { label: '', tone: 'stone' };
-  if (isPresetRole(key))
-    return { label: t(CLINIC_KEYS.roles[key]), tone: ROLE_TONES[key] };
-  const name = roles.find((role) => role.id === key)?.name ?? '';
-  return { label: name, tone: matrix?.customRoleTones[key] ?? toneForLabel(name) };
-}
-
 /** "Previewing as <role>" with the sections that role can view and "Exit preview" (H:554). */
 function ViewAsPill() {
   const { t } = useTranslation(LAYOUT_NS);
   const { t: tClinic } = useTranslation(CLINIC_NS);
   const setPreviewRole = useUIStore((state) => state.setPreviewRole);
   const { previewRole, viewableSections, isResolved } = useClinicAccess();
-  const role = usePreviewRoleBadge(previewRole);
+  const label = useRoleLabel();
+  const [role] = useRolesInForce();
   if (!previewRole) return null;
   const sections = viewableSections
     .map((section) => tClinic(CLINIC_KEYS.sections[section].label))
@@ -63,11 +39,11 @@ function ViewAsPill() {
         data-slot="pill"
         className={cn(
           'ring-primary-foreground size-2 flex-none rounded-full ring-2',
-          TONE_CLASSES[role.tone].dot,
+          TONE_CLASSES[role?.tone ?? 'stone'].dot,
         )}
       />
       <span className="text-body font-semibold whitespace-nowrap">
-        {t(keys.previewing, { role: role.label })}
+        {t(keys.previewing, { role: role ? label(role) : '' })}
       </span>
       <span className="text-disabled min-w-0 truncate text-xs">
         {isResolved ? sections || t(keys.noSections) : null}

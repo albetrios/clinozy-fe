@@ -257,8 +257,8 @@ is the separate `AppearanceDialog` on the root route.)
   `clinic-users` module is on and their codes view Users (`membership:read` + `role:read`,
   `useUsersRoomOpen`) — `#settings/organization/members` and `…/roles` keep their nav entries
   and hash but render `UsersRoomLink`: what moved and a link to `/users` or `/users/roles`
-  that drops the hash, closing the drawer. Everywhere else (production keeps the room off
-  until its API lands, D8; a Viewer without `role:read`) the panels stay as they were.
+  that drops the hash, closing the drawer. Everywhere else (the module off, or a member
+  without `role:read`) the panels stay as they were.
 
 ## 8. IDs and route params
 

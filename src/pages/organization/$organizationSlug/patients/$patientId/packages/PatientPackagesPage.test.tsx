@@ -35,10 +35,8 @@ const access = vi.hoisted(() => ({ book: true, codes: new Set<string>() }));
 vi.mock('@/shared/hooks/useClinicAccess/index.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   useClinicAccess: () => ({
-    roles: ['admin'],
     previewRole: null,
     can: (section: string) => section !== 'appointments' || access.book,
-    canAbility: () => true,
     canCode: (code: string) => access.codes.has(code),
     viewableSections: [],
     isResolved: true,

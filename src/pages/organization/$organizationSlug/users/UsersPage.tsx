@@ -28,7 +28,6 @@ import {
 } from '@/shared/components/RoomToolbar/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
-import { useCan } from '@/shared/hooks/useCan/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
@@ -87,7 +86,7 @@ function teamFilterFields(
   multiBranch: boolean,
 ): RoomFilterFields {
   return {
-    role: { kind: 'options', values: roles.roles.map((role) => role.key), single: true },
+    role: { kind: 'options', values: roles.roles.map((role) => role.id), single: true },
     ...(multiBranch
       ? { branch: { kind: 'options', values: branches.map((branch) => branch.id) } }
       : {}),
@@ -190,33 +189,35 @@ function TeamEmpty({
   );
 }
 
-/** Who may do what on the Team (D17, D47): clinozy-be's codes, or the previewed role's matrix. */
+/**
+ * Who may do what on the Team (research-users §7): the `membership:*` codes in force — the
+ * member's own, or the previewed role's.
+ */
 function useTeamAccess() {
   const access = useClinicAccess();
-  const canManageMembers = useCan({ permission: 'membership:manage' });
-  const can = (action: 'create' | 'edit' | 'delete') =>
+  const can = (action: 'view' | 'create' | 'edit' | 'delete') =>
     access.isResolved && access.can('users', action);
   return {
     isResolved: access.isResolved,
-    // clinozy-be's invite needs `membership:manage` as well as `invitation:manage` (D47).
-    canInvite: can('create') && (access.previewRole !== null || canManageMembers),
+    // An invite gives roles: the picker needs `role:read` beside `membership:create` (team only).
+    canInvite: can('create') && access.canCode('role:read'),
     canEdit: can('edit'),
     /**
-     * Delete on a row — never your own or the owner's. A joined member's needs
-     * Delete (`membership:manage`); an invited one's is its invitation's cancel,
-     * which Create (`invitation:manage`) may do too, as Settings allowed (D17).
+     * Delete on a row — never your own or the owner's. Removing a joined member and cancelling an
+     * invited one's invitation are both `membership:delete`.
      */
     canDeleteMember: (member: TeamMember) =>
-      !(member.isSelf || member.isOwner) &&
-      (can('delete') || (member.status === 'invited' && can('create'))),
-    canResend: can('create'),
+      !(member.isSelf || member.isOwner) && can('delete'),
+    /** Resend an invitation (`membership:update`) — an expired one too. */
+    canResend: can('edit'),
     /**
      * "Leave clinic" on your own row and drawer — Settings' self-removal,
      * relocated (D17). Self-service, so no code gates it; never the owner, whom
      * clinozy-be makes transfer ownership first.
      */
     canLeave: (member: TeamMember) => member.isSelf && !member.isOwner,
-    canExport: access.isResolved && access.canAbility('export'),
+    // The client's CSV of the loaded rows: whoever reads the Team (no `membership:export`).
+    canExport: can('view'),
   };
 }
 
@@ -224,7 +225,7 @@ function useTeamAccess() {
  * Users › Team (KICKOFF §6.12; `users.md`): the room toolbar — the tabs,
  * search "Name, email, mobile or #ID", Filters (Roles · Branches · Status ·
  * Created), Columns and "New user" (a floating pill on a phone) — over the
- * shared table: clinozy-be's members joined with their staff profiles (D17),
+ * shared table: clinozy-be's memberships (research-users §2),
  * searched, filtered and sorted in place, folded on a tablet, rows with the
  * Roles pills as the key column on a phone. Its dialog routes render nothing:
  * this page reads the URL and opens the user drawer — New user (an

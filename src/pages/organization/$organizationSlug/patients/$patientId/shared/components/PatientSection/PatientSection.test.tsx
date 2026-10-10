@@ -91,10 +91,18 @@ describe('PatientSection', () => {
     );
   });
 
-  it('has no "New …" on the billing sections, whose drawers come back with Payments', async () => {
-    renderInPatientFile(
+  it('offers "New invoice" on Invoices with payment:create, and none without it', async () => {
+    const { unmount } = renderInPatientFile(
       <PatientSection section="invoices" data-testid="patient-section-invoices" />,
       { file, role: 'owner', section: 'invoices' },
+    );
+    expect(await screen.findByTestId('patient-section-primary')).toHaveTextContent(
+      'New invoice',
+    );
+    unmount();
+    renderInPatientFile(
+      <PatientSection section="invoices" data-testid="patient-section-invoices" />,
+      { file, role: 'doctor', section: 'invoices' },
     );
     await screen.findByTestId('patient-section-invoices');
     await waitFor(() =>

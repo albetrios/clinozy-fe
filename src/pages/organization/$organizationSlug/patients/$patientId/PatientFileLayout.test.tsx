@@ -334,7 +334,7 @@ describe('the patient file layout (KICKOFF §6.6)', () => {
     );
   });
 
-  it('shows a Therapist the treatment gate alone in the Add menu', async () => {
+  it('shows a Therapist the treatment gate but no Rx and no billing in the Add menu', async () => {
     const user = userEvent.setup();
     renderPatientFile(at('/visits'), { role: 'therapist' });
     await screen.findByTestId('patient-section-visits');
@@ -343,12 +343,18 @@ describe('the patient file layout (KICKOFF §6.6)', () => {
     expect(
       within(menu)
         .getAllByRole('menuitem')
-        .map((item) => item.textContent),
-    ).toEqual(['Treatment']);
+        .map((item) => item.dataset.testid),
+    ).toEqual(
+      ['treatment', 'photo', 'appointment', 'report', 'note'].map(
+        (id) => `patient-file-add-menu-${id}`,
+      ),
+    );
   });
 
-  it('sends an Accountant to Invoices and shows the billing sections alone (Q-F1)', async () => {
-    const { router } = renderPatientFile(at('/timeline'), { role: 'accountant' });
+  it('sends a member with Payments but no Patients view to Invoices and shows the billing sections alone (Q-F1)', async () => {
+    const { router } = renderPatientFile(at('/timeline'), {
+      codes: ['organization:read', 'payment:read', 'payment:create'],
+    });
     await waitFor(() => expect(router.state.location.pathname).toBe(at('/invoices')));
     await screen.findByTestId('patient-section-invoices');
     await waitFor(() => expect(tabs()).toEqual(['Invoices']));

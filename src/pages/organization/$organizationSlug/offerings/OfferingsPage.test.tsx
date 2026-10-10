@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
@@ -15,6 +15,7 @@ import {
 } from '@/shared/api/clinic/offerings-api.ts';
 import type { OfferingRecord } from '@/shared/api/clinic/offerings-contracts.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+import { previewPreset } from '@/tests/utils/clinic-preset-codes.ts';
 
 import {
   OFFERING_IDS,
@@ -391,10 +392,15 @@ describe('access by permission code (research §7)', () => {
     expect(screen.queryByTestId('offerings-new-button')).not.toBeInTheDocument();
   });
 
-  it('View-as hides every code-gated control', async () => {
-    renderOfferingsRoutes(OFFERINGS_URL, { role: 'admin' });
+  it('View-as shows the previewed role’s controls — Marketing changes nothing', async () => {
+    const { queryClient } = renderOfferingsRoutes(OFFERINGS_URL, { role: 'admin' });
     await waitFor(() => expect(rows()).toHaveLength(6));
-    expect(screen.queryByTestId('offerings-new-button')).not.toBeInTheDocument();
+    expect(await screen.findByTestId('offerings-new-button')).toBeInTheDocument();
+    act(() => previewPreset(queryClient, 'marketing'));
+    await waitFor(() =>
+      expect(screen.queryByTestId('offerings-new-button')).not.toBeInTheDocument(),
+    );
+    expect(screen.queryByTestId('offerings-row-action-edit')).not.toBeInTheDocument();
     expect(screen.queryByTestId('offerings-row-action-delete')).not.toBeInTheDocument();
   });
 });

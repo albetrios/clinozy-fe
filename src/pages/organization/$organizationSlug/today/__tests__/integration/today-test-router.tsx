@@ -15,6 +15,7 @@ import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 import { meContextQueryKey } from '@/shared/tenancy/me-context.ts';
+import { PRESET_CODES, presetMyRoles } from '@/tests/utils/clinic-preset-codes.ts';
 import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import { validateTodaySearch } from '../../today.search.ts';
@@ -36,11 +37,11 @@ export const TODAY_FRONT_DESK_CODES: readonly OrganizationPermission[] = [
   'task:update',
 ];
 
-/** Who the harness signs in: View-as a clinic role (the default), or a member by their codes. */
+/** Who the harness signs in: a member holding a preset's codes (the default), or these codes. */
 export interface TodayTestMember {
-  /** View-as: the clinic access narrows to that role's matrix, and every code reads false. */
+  /** A member who holds this preset — its codes, and its name on me/context (Today's focus). */
   role?: Role;
-  /** The member's clinozy-be codes instead of a preview — the work queue answers from them. */
+  /** The member's clinozy-be codes instead of a preset's — no role on me/context. */
   permissions?: readonly OrganizationPermission[];
   firstName?: string | null;
 }
@@ -48,8 +49,7 @@ export interface TodayTestMember {
 /**
  * Today as `routeTree.tsx` registers it — the page with its search schema —
  * opened at `url` for the test member (`signInTestMember`: organization
- * `org_test`, slug `acme`) previewed as `role` (View-as narrows the clinic
- * access to that role's matrix) or holding `permissions`, greeted as Riya.
+ * `org_test`, slug `acme`) holding `role`'s preset codes or `permissions`, greeted as Riya.
  * Every other path lands on a catch-all, so a test can read where a link went.
  */
 export function renderTodayRoute(
@@ -60,8 +60,7 @@ export function renderTodayRoute(
   signInTestMember();
   useOrganizationStore
     .getState()
-    .setPermissions([...(permissions ?? ['organization:read'])]);
-  useUIStore.setState({ previewRole: permissions ? null : role });
+    .setPermissions([...(permissions ?? PRESET_CODES[role])]);
 
   const root = createRootRoute({ component: () => <Outlet /> });
   const today = createRoute({
@@ -95,7 +94,9 @@ export function renderTodayRoute(
       lastName: 'Shah',
     },
     activeOrganization: null,
+    membershipId: null,
     myPermissions: ['organization:read'],
+    myRoles: permissions ? [] : presetMyRoles(role),
     globalRole: 'user',
     deploymentFlags: {
       personalOrganizationsEnabled: false,

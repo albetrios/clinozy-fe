@@ -23,9 +23,9 @@ export const membersResource: Resource<typeof memberSchema> = {
   permissions: {
     list: 'membership:read',
     show: 'membership:read',
-    create: 'membership:manage',
-    update: 'membership:manage',
-    delete: 'membership:manage',
+    create: 'membership:create',
+    update: 'membership:update',
+    delete: 'membership:delete',
   },
   ui: { label: 'Members', icon: 'Users', showInNav: true },
 };

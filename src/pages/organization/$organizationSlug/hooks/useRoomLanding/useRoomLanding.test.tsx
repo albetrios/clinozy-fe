@@ -14,13 +14,13 @@ import {
   type OrganizationPermission,
   organizationPermissionSchema,
 } from '@/core/types/permissions.ts';
-import { resetClinicAccessFixture } from '@/shared/api/clinic/access-api.ts';
-import type { ClinicRoleKey } from '@/shared/api/clinic/access-contracts.ts';
+import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import type { AuthUser } from '@/shared/auth/types.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { previewPreset } from '@/tests/utils/clinic-preset-codes.ts';
 
 import { useRoomLanding } from './useRoomLanding.ts';
 
@@ -51,7 +51,7 @@ const PAGES = [
 /**
  * The org layout as the route tree mounts it — the guard over an `<Outlet />`
  * — with a page per room (and the non-room suspended page), opened at `path`, for
- * `email` holding `codes`, previewing `previewRole`.
+ * `email` holding `codes`, previewing the `previewRole` preset (its codes already read).
  */
 function renderLayout(
   path: string,
@@ -63,14 +63,15 @@ function renderLayout(
     email?: string;
     /** Null: the permission set hasn't answered yet. */
     codes?: OrganizationPermission[] | null;
-    previewRole?: ClinicRoleKey | null;
+    previewRole?: Role | null;
   } = {},
 ) {
   useOrganizationStore.getState().setOrganization('org_test', 'acme');
   if (codes) useOrganizationStore.getState().setPermissions(codes);
   else useOrganizationStore.getState().clearPermissions();
   useAuthStore.setState({ user: { id: 'usr_me', email, role: 'user' } as AuthUser });
-  useUIStore.setState({ previewRole });
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  if (previewRole) previewPreset(client, previewRole);
 
   const root = createRootRoute({ component: () => <Outlet /> });
   const layout = createRoute({
@@ -92,7 +93,6 @@ function renderLayout(
     routeTree: root.addChildren([layout.addChildren(pages)]),
     history: createMemoryHistory({ initialEntries: [`/organization/acme/${path}`] }),
   });
-  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   render(
     <QueryClientProvider client={client}>
       <RouterProvider router={router} />
@@ -108,7 +108,6 @@ async function expectPage(page: string) {
 beforeEach(() => {
   disabled.modules.clear();
   resetClinicFixtures();
-  resetClinicAccessFixture();
 });
 afterEach(() => {
   useUIStore.setState({ previewRole: null });
@@ -155,9 +154,8 @@ describe('useRoomLanding (Q-U11)', () => {
   });
 
   it('lands "Exit preview" on the first room the member’s own access views', async () => {
-    // Reenal is a Doctor; previewing Pharmacist, she opens Medical. Leads, Appointments and
-    // Patients are on the API and answer from her codes, which hold `patient:read` alone:
-    // Patients is her first room.
+    // Reenal previews the Pharmacist and opens Medical. Back on her own codes — `patient:read`
+    // and no Leads or Appointments code — Patients is her first room.
     const { router } = renderLayout('medical', {
       email: 'reenal@cresence.skin',
       codes: [...MEMBER_CODES, 'patient:read'],

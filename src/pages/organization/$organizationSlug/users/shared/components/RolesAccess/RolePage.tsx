@@ -1,10 +1,9 @@
 import { type KeyboardEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import { cn } from '@/lib/utils.ts';
-import type { ClinicRoleView } from '@/shared/api/clinic/access-contracts.ts';
 import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
+import type { RoleSummary } from '@/shared/api/organization-contracts.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { PersonAvatar } from '@/shared/components/Cells/index.ts';
 import { Picker } from '@/shared/components/Picker/index.ts';
@@ -18,11 +17,18 @@ import {
 import { ChevronDown, ChevronLeft, Eye, Shield } from '@/shared/icons/index.ts';
 
 import { USERS_KEYS, USERS_NS } from '../../../users.constants.ts';
-import { RoleAbilities } from './RoleAbilities.tsx';
 import { RoleMatrix } from './RoleMatrix.tsx';
 import { rolePurposeKey } from './roles-access.ts';
+import { RoleSpecials } from './RoleSpecials.tsx';
 import { RoleWorkspace } from './RoleWorkspace.tsx';
 import type { RoleAccessWrites } from './use-role-access-writes.ts';
+
+/** The page's closing note when its boxes are locked, by why. */
+const LOCK_NOTES = {
+  admin: USERS_KEYS.roles.notes.admin,
+  noPerms: USERS_KEYS.roles.notes.readOnly,
+  beyond: USERS_KEYS.roles.notes.beyond,
+} as const;
 
 /** The 11px uppercase heading every role section opens with (H:1128). */
 function SectionTitle({ children }: { children: string }) {
@@ -35,24 +41,23 @@ function SectionTitle({ children }: { children: string }) {
 
 /** What the page's head row and sections are handed. */
 export interface RolePageProps {
-  role: ClinicRoleView;
+  role: RoleSummary;
   /** The role's name (a preset's clinic name, a custom role's own). */
   label: string;
   /** Every other role, for "Copy access from". */
-  others: readonly { role: ClinicRoleView; label: string }[];
+  others: readonly { role: RoleSummary; label: string }[];
   /** Who holds the role, in the Team's order. */
   holders: readonly TeamMember[];
   /** A holder's other roles, " + "-joined ("Admin"). */
   alsoOf: (member: TeamMember) => string;
-  writes: RoleAccessWrites;
+  /** The role's writes — and its codes, read before the page shows. */
+  writes: RoleAccessWrites & { codes: readonly string[] };
   /** A custom role the viewer may edit: its name and its description are boxes. */
   renamable: boolean;
   onRename: (name: string) => void;
   /** A custom role's own description — its purpose line — or null for the default. */
   description: string | null;
   onDescribe: (description: string) => void;
-  /** The role's clinozy-be codes when the platform backs it: its workspace permissions show. */
-  codes?: readonly OrganizationPermission[];
   /** Shown for a custom role nobody holds (the Settings capability, relocated). */
   onDelete?: () => void;
   onOpenMember: (member: TeamMember) => void;
@@ -123,9 +128,10 @@ function RoleTextBox({
  * One role's page (`users.md:55–77`; H:1123–1144): the head row — a 40px tile
  * in the role's tone, the name and its purpose (a custom role's own
  * description; both boxes when it is editable), "Copy access from" (editable
- * roles) and "Preview as <role>" (never Admin) — then "People with this role",
- * the matrix, the eleven special permissions, the workspace permissions of a
- * role clinozy-be backs (Settings' role dialog, relocated — D17) and the note.
+ * roles) and "Preview as <role>" (never Owner or Admin) — then "People with this role",
+ * the matrix, the special permissions, the workspace permissions (Settings'
+ * role dialog, relocated — D17) and the note — every one of them the role's
+ * clinozy-be codes.
  * On a phone it starts with "Back to roles" and the head row wraps.
  */
 export function RolePage(props: RolePageProps) {
@@ -133,9 +139,7 @@ export function RolePage(props: RolePageProps) {
   const { role, label, writes } = props;
   const tone = TONE_CLASSES[role.tone];
   const editable = writes.lock === null;
-  let note: string = USERS_KEYS.roles.notes.live;
-  if (writes.lock === 'admin') note = USERS_KEYS.roles.notes.admin;
-  else if (writes.lock === 'noPerms') note = USERS_KEYS.roles.notes.readOnly;
+  const note = writes.lock ? LOCK_NOTES[writes.lock] : USERS_KEYS.roles.notes.live;
 
   return (
     <div data-testid="users-role-page" className="flex min-w-0 flex-col">
@@ -213,15 +217,15 @@ export function RolePage(props: RolePageProps) {
               label={t(USERS_KEYS.roles.copyFrom)}
               value={null}
               options={props.others.map((other) => ({
-                key: other.role.key,
+                key: other.role.id,
                 label: other.label,
                 sub: t(rolePurposeKey(other.role)),
                 tone: other.role.tone,
                 leading: { kind: 'dot' },
               }))}
               onChange={(key) => {
-                const source = props.others.find((other) => other.role.key === key);
-                if (source) writes.copyFrom(source.role, source.label, label);
+                const source = props.others.find((other) => other.role.id === key);
+                if (source) void writes.copyFrom(source.role, source.label, label);
               }}
               minWidth={240}
               testId="users-role-copy"
@@ -250,7 +254,7 @@ export function RolePage(props: RolePageProps) {
                 <Button
                   type="button"
                   onClick={props.onPreview}
-                  disabled={role.locked}
+                  disabled={role.isLocked}
                   data-testid="users-role-preview"
                   className="text-body h-9 gap-1.5 rounded-lg ps-3 pe-3.5 font-medium disabled:opacity-50"
                 >
@@ -305,23 +309,21 @@ export function RolePage(props: RolePageProps) {
 
         <section className="flex flex-col gap-2">
           <SectionTitle>{t(USERS_KEYS.roles.matrix.title)}</SectionTitle>
-          <RoleMatrix role={role} label={label} writes={writes} />
+          <RoleMatrix label={label} codes={writes.codes} writes={writes} />
         </section>
 
         <section className="flex flex-col gap-2">
-          <SectionTitle>{t(USERS_KEYS.roles.abilities.title)}</SectionTitle>
-          <RoleAbilities role={role} writes={writes} />
+          <SectionTitle>{t(USERS_KEYS.roles.specials.title)}</SectionTitle>
+          <RoleSpecials tone={role.tone} codes={writes.codes} writes={writes} />
         </section>
 
-        {props.codes ? (
-          <section className="flex flex-col gap-2">
-            <SectionTitle>{t(USERS_KEYS.roles.workspace.title)}</SectionTitle>
-            <span className="text-caption text-muted-foreground text-pretty">
-              {t(USERS_KEYS.roles.workspace.hint)}
-            </span>
-            <RoleWorkspace role={role} codes={props.codes} writes={writes} />
-          </section>
-        ) : null}
+        <section className="flex flex-col gap-2">
+          <SectionTitle>{t(USERS_KEYS.roles.workspace.title)}</SectionTitle>
+          <span className="text-caption text-muted-foreground text-pretty">
+            {t(USERS_KEYS.roles.workspace.hint)}
+          </span>
+          <RoleWorkspace tone={role.tone} codes={writes.codes} writes={writes} />
+        </section>
 
         <span className="text-muted-foreground text-xs leading-normal text-pretty">
           {t(note)}

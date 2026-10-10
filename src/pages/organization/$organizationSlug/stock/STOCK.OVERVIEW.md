@@ -17,7 +17,7 @@ codes (api-integration §5.6 Roles; Q-S1, Q-S2): `stock_item:read` sees the room
 items, purchases and vendors; `stock_item:update` edits them and moves stock — Use, Receive, Adjust,
 Revert, Stock check; `stock_item:delete` deletes (and its Undo restores); `stock_item:export` exports;
 `payment:create` pays at "Paid" on a new purchase. So Therapist and Front desk keep the stock too, and
-Delete and Export stay Owner's and Admin's. View-as previews a role's clinic matrix instead.
+Delete and Export stay Owner's and Admin's. View-as answers with the previewed role's codes instead.
 
 The bare `/stock` redirects to its first tab, `/stock/items` (`S:72`). The tabs are literal child routes
 (D24): `items/`, `purchases/`, `movements/` — the prototype's three — and `vendors/` (Q-K1). The toolbar

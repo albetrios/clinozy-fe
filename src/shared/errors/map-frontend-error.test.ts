@@ -46,6 +46,47 @@ describe('mapFrontendError', () => {
     );
   });
 
+  it.each([
+    [
+      403,
+      'missing_permission',
+      "You don't have permission to do this. Ask the clinic's owner or an admin.",
+    ],
+    [
+      403,
+      'owner_membership_fixed',
+      "The clinic owner's roles and status can't be changed. Transfer ownership first.",
+    ],
+    [
+      403,
+      'owner_cannot_leave',
+      "The clinic owner can't leave. Transfer ownership first.",
+    ],
+    [
+      403,
+      'owner_role_fixed',
+      "The access of the role the clinic owner holds can't be changed.",
+    ],
+    [403, 'system_role_fixed', "A preset role can't be renamed or deleted."],
+    [403, 'role_locked', "This role's access is fixed and can't be changed."],
+    [
+      409,
+      'seat_limit_reached',
+      'Your plan has no free seat. Add a seat in Settings › Billing, then invite again.',
+    ],
+    [409, 'membership_already_exists', 'This person is already in the clinic.'],
+    [
+      400,
+      'disposable_email',
+      "Use a permanent email address — disposable ones aren't accepted.",
+    ],
+  ])('says a %i %s in our own words', (status, reason, message) => {
+    const err = new HttpError(`HTTP ${status}`, status, '/x', 'POST', {
+      error: { reason, detail: "The server's own English" },
+    });
+    expect(mapFrontendError(err)).toBe(message);
+  });
+
   it('maps clinozy-be invalid verification code detail to localized message', () => {
     expect(
       resolveKnownFrontendError(new Error('errors:invalidOrExpiredVerificationCode')),

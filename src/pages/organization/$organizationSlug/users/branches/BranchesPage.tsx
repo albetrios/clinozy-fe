@@ -1,5 +1,5 @@
 import { Outlet, useNavigate, useParams, useSearch } from '@tanstack/react-router';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { downloadCsv, toCsv } from '@/lib/csv.ts';
@@ -20,16 +20,12 @@ import {
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
-import { FileIcon, MapPin, PenLine, Trash } from '@/shared/icons/index.ts';
+import { FileIcon, MapPin, PenLine } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { UsersToolbar } from '../shared/components/UsersToolbar/index.ts';
 import { BRANCHES_TABLE_ID, USERS_KEYS, USERS_NS } from '../users.constants.ts';
 import { validateBranchesSearch } from './branches.search.ts';
-import {
-  BranchDeleteConfirm,
-  type BranchDeleteTarget,
-} from './components/BranchDeleteConfirm/index.ts';
 import { BranchDrawer } from './components/BranchDrawer/index.ts';
 import { useBranchesDialogRoute } from './hooks/useBranchesDialogRoute/index.ts';
 import { useBranchesTable } from './hooks/useBranchesTable/index.ts';
@@ -52,17 +48,20 @@ function csvTextOf(value: unknown): string {
   return typeof value === 'number' || typeof value === 'boolean' ? String(value) : '';
 }
 
-/** Who may do what on Branches: the matrix's Users row (Admin by default, H:3605–3606). */
+/**
+ * Who may do what on Branches — by the `branch:*` codes: create, edit (closing one included —
+ * a branch is never deleted) and export what the tab already shows (clinozy-be has no export
+ * code for branches).
+ */
 function useBranchAccess() {
   const access = useClinicAccess();
-  const can = (action: 'create' | 'edit' | 'delete') =>
-    access.isResolved && access.can('users', action);
+  const holds = (code: 'branch:read' | 'branch:create' | 'branch:update') =>
+    access.isResolved && access.canCode(code);
   return {
     isResolved: access.isResolved,
-    canCreate: can('create'),
-    canEdit: can('edit'),
-    canDelete: can('delete'),
-    canExport: access.isResolved && access.canAbility('export'),
+    canCreate: holds('branch:create'),
+    canEdit: holds('branch:update'),
+    canExport: holds('branch:read'),
   };
 }
 
@@ -114,7 +113,6 @@ export function BranchesPage() {
   const list = useBranchRows();
   useListLoadError(list, BRANCHES_TABLE_ID);
   const filters = useRoomFilters(BRANCH_FILTER_FIELDS);
-  const [deleting, setDeleting] = useState<BranchDeleteTarget | null>(null);
   const { dialog, close } = useBranchesDialogRoute(list, {
     canCreate: access.canCreate,
     accessResolved: access.isResolved,
@@ -136,27 +134,15 @@ export function BranchesPage() {
       search: true,
     });
 
-  const rowActions = (row: BranchRow): DataTableRowAction[] => {
-    const actions: DataTableRowAction[] = [
-      {
-        id: 'edit',
-        label: t(USERS_KEYS.rowActions.edit),
-        icon: PenLine,
-        onSelect: () => openEdit(row),
-      },
-    ];
-    // Never on the main branch (`users.md:88`).
-    if (access.canDelete && !row.branch.isMain) {
-      actions.push({
-        id: 'delete',
-        label: t(USERS_KEYS.rowActions.delete),
-        icon: Trash,
-        destructive: true,
-        onSelect: () => setDeleting({ branch: row.branch }),
-      });
-    }
-    return actions;
-  };
+  // A branch is closed from its drawer (Status), never deleted: Edit is the row's one action.
+  const rowActions = (row: BranchRow): DataTableRowAction[] => [
+    {
+      id: 'edit',
+      label: t(USERS_KEYS.rowActions.edit),
+      icon: PenLine,
+      onSelect: () => openEdit(row),
+    },
+  ];
 
   const bulkActions: DataTableBulkAction<BranchRow>[] = access.canExport
     ? [
@@ -184,8 +170,6 @@ export function BranchesPage() {
         },
       ]
     : [];
-
-  const drawerAccess = { resolved: access.isResolved, canDelete: access.canDelete };
 
   return (
     <section
@@ -231,19 +215,10 @@ export function BranchesPage() {
         }
         className="m-(--room-card-margin) flex-1"
       />
-      {/* The row's and the drawer's confirm both live here, so the removal's
-          10s Undo outlives the drawer it was confirmed from (L-64). */}
-      <BranchDeleteConfirm
-        target={deleting}
-        onClose={() => setDeleting(null)}
-        onDeleted={() => {
-          if (dialog.kind === 'edit') close();
-        }}
-      />
       <BranchDrawer
         mode="create"
         open={dialog.kind === 'create'}
-        access={{ ...drawerAccess, canWrite: access.canCreate, canDelete: false }}
+        access={{ resolved: access.isResolved, canWrite: access.canCreate }}
         rows={list.rows}
         members={list.members}
         ready={!list.isPending}
@@ -254,13 +229,12 @@ export function BranchesPage() {
         mode="edit"
         open={dialog.kind === 'edit'}
         row={dialog.kind === 'edit' ? dialog.row : undefined}
-        access={{ ...drawerAccess, canWrite: access.canEdit }}
+        access={{ resolved: access.isResolved, canWrite: access.canEdit }}
         rows={list.rows}
         members={list.members}
         ready={!list.isPending}
         onClose={close}
         onSaved={close}
-        onDelete={setDeleting}
       />
       <Outlet />
     </section>

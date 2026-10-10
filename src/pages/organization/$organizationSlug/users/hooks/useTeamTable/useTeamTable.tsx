@@ -75,7 +75,7 @@ function useTeamColumns({
   const format = useHoursFormat();
   const branchById = new Map(branches.map((branch) => [branch.id, branch]));
 
-  const rolePills = (member: TeamMember) => roles.pills(member.roleKeys);
+  const rolePills = (member: TeamMember) => roles.pills(member.roleIds);
   const branchPills = (member: TeamMember): TeamPill[] =>
     member.branchIds.flatMap((id) => {
       const branch = branchById.get(id);
@@ -96,19 +96,13 @@ function useTeamColumns({
     };
   };
   const hours = (member: TeamMember) =>
-    member.profile
-      ? format.hours(
-          member.profile.workingDays,
-          member.profile.startsAt,
-          member.profile.endsAt,
-        )
-      : null;
+    format.hours(member.workingDays, member.startsAt, member.endsAt);
+  // Up to two decimals as clinozy-be keeps them (12.5%); none is no commission.
   const commission = (member: TeamMember) =>
-    member.profile?.commissionPct
-      ? t(USERS_KEYS.table.commission, { value: member.profile.commissionPct })
+    member.commissionPercent
+      ? t(USERS_KEYS.table.commission, { value: member.commissionPercent })
       : null;
-  const updated = (member: TeamMember) =>
-    member.profile ? format.updated(member.profile.updatedAt) : null;
+  const updated = (member: TeamMember) => format.updated(member.updatedAt);
 
   const columns: ColumnDef<DataTableFeatures, TeamMember>[] = [
     {
@@ -116,18 +110,11 @@ function useTeamColumns({
       accessorKey: 'seq',
       header: t(USERS_KEYS.columns.seq),
       enableHiding: false,
-      cell: ({ row }) => (
-        <TeamIdCell
-          label={row.original.seq === null ? null : displayId.user(row.original.seq)}
-        />
-      ),
+      cell: ({ row }) => <TeamIdCell label={displayId.user(row.original.seq)} />,
       meta: {
         track: '56px',
         kind: 'id',
-        foldValue: (original) => {
-          const { seq } = rowOf(original);
-          return seq === null ? null : displayId.user(seq);
-        },
+        foldValue: (original) => displayId.user(rowOf(original).seq),
       },
     },
     {
@@ -146,7 +133,7 @@ function useTeamColumns({
     },
     {
       id: 'role',
-      accessorFn: (member) => member.roleKeys.join(','),
+      accessorFn: (member) => member.roleIds.join(','),
       header: t(USERS_KEYS.columns.roles),
       cell: ({ row }) => <TeamRolesCell roles={rolePills(row.original)} />,
       meta: {
@@ -177,7 +164,7 @@ function useTeamColumns({
       : []),
     {
       id: 'hours',
-      accessorFn: (member) => hours(member) ?? '',
+      accessorFn: (member) => hours(member),
       header: t(USERS_KEYS.columns.hours),
       enableSorting: false,
       cell: ({ row }) => <TeamTextCell value={hours(row.original)} />,
@@ -189,7 +176,7 @@ function useTeamColumns({
     },
     {
       id: 'commission',
-      accessorFn: (member) => member.profile?.commissionPct ?? null,
+      accessorFn: (member) => member.commissionPercent,
       header: t(USERS_KEYS.columns.commission),
       cell: ({ row }) => <TeamTextCell value={commission(row.original)} align="end" />,
       meta: {
@@ -212,7 +199,7 @@ function useTeamColumns({
     },
     {
       id: 'updatedAt',
-      accessorFn: (member) => member.profile?.updatedAt ?? '',
+      accessorFn: (member) => member.updatedAt,
       header: t(USERS_KEYS.columns.updated),
       cell: ({ row }) => <TeamTextCell value={updated(row.original)} ink="muted" />,
       meta: {

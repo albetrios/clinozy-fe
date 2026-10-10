@@ -33,7 +33,7 @@ export interface SaleActions {
   canReturn: boolean;
   /**
    * "Void sale": an unpaid sale nothing was paid on or returned from, for
-   * members with Medical Delete and the `void` ability (Q-M2, Q-U8).
+   * members with Medical Delete (`medicine:delete`, Q-M2; the `void` ability retired on codes).
    */
   canVoid: (sale: SaleState) => boolean;
   /** Record the sale's full due as one receipt; `onDone` runs once it is on the ledger. */
@@ -72,8 +72,7 @@ export function useSaleActions(): SaleActions {
       sale.status === 'unpaid' &&
       sale.paid === 0 &&
       sale.returns.length === 0 &&
-      can('delete') &&
-      access.canAbility('void'),
+      can('delete'),
     collecting: collectSale.isPending,
     print: (sale) =>
       void queryClient

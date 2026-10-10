@@ -26,6 +26,7 @@ import { todayQueryKeys } from '@/shared/api/clinic/today-api.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { previewPreset } from '@/tests/utils/clinic-preset-codes.ts';
 import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import {
@@ -169,8 +170,8 @@ describe('usePrescriptionAccess', () => {
     expect(result.current).toMatchObject({ deletes: true, readsBranch: true });
   });
 
-  it('previews a role by its gate during View-as', async () => {
-    useUIStore.setState({ previewRole: 'doctor' });
+  it('previews a role by its own codes during View-as', async () => {
+    previewPreset(client, 'doctor');
     const { result } = renderHook(() => usePrescriptionAccess(), { wrapper });
     await waitFor(() => expect(result.current.resolved).toBe(true));
     expect(result.current).toMatchObject({
@@ -179,7 +180,7 @@ describe('usePrescriptionAccess', () => {
       readsMedicines: true,
       readsBranch: false,
     });
-    act(() => useUIStore.setState({ previewRole: 'front_desk' }));
+    act(() => previewPreset(client, 'front_desk'));
     await waitFor(() => expect(result.current.writes).toBe(false));
     expect(result.current).toMatchObject({ approves: false, deletes: false });
   });

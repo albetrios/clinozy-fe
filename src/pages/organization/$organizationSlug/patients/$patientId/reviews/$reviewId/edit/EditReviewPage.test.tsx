@@ -15,7 +15,7 @@ import { fetchReview } from '@/shared/api/clinic/feedback-api.ts';
 import { PATIENT_FILE_SECTIONS } from '@/shared/clinic/patient-file-sections.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { holdPreset } from '@/tests/utils/clinic-preset-codes.ts';
 import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import { patientFile, TEST_PATIENT_ID } from '@/tests/utils/patient-doubles.ts';
 
@@ -57,8 +57,7 @@ const SAVED = 'rev_saved0000000000000000';
 /** The page at its route under the file, for the test member. */
 function renderPage(url: string) {
   signInTestMember();
-  useOrganizationStore.getState().setPermissions(['organization:read']);
-  useUIStore.setState({ previewRole: 'admin' });
+  holdPreset('admin');
   const root = createRootRoute({ component: () => <Outlet /> });
   const file = createRoute({
     getParentRoute: () => root,
@@ -106,7 +105,6 @@ beforeEach(() => {
   for (const fn of Object.values(notifyMock)) fn.mockReset();
 });
 afterEach(() => {
-  useUIStore.setState({ previewRole: null });
   useOrganizationStore.getState().clearPermissions();
   vi.resetAllMocks();
 });

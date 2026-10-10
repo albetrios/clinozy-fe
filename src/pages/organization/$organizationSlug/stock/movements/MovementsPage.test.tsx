@@ -20,6 +20,7 @@ import { stockItemRow, stockMovementRow } from '@/tests/utils/stock-doubles.ts';
 import {
   renderStockRoutes,
   resetStockRoutes,
+  type StockTestMember,
 } from '../__tests__/integration/stock-test-router.tsx';
 import {
   fetchAllStockItems,
@@ -256,10 +257,18 @@ describe('MovementsPage (clinic-stock.md:57–71)', () => {
     expect(dialog).toHaveTextContent('received of 5 tube Soframycin 30 gm');
   });
 
-  it.each(['therapist', 'accountant'] as const)(
-    'offers no Revert to a %s, who cannot move stock',
-    async (role) => {
-      renderStockRoutes(MOVEMENTS_URL, { movements: MovementsPage }, { role });
+  it.each([
+    { who: 'an Accountant', member: { role: 'accountant' } },
+    {
+      who: 'a member who adds items but updates none',
+      member: {
+        permissions: ['organization:read', 'stock_item:read', 'stock_item:create'],
+      },
+    },
+  ] satisfies { who: string; member: StockTestMember }[])(
+    'offers no Revert to $who, who cannot move stock',
+    async ({ member }) => {
+      renderStockRoutes(MOVEMENTS_URL, { movements: MovementsPage }, member);
       await waitFor(() => expect(rows()).toHaveLength(4));
       expect(screen.queryByTestId('stock-movements-row-action-revert')).toBeNull();
     },

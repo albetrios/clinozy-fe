@@ -46,6 +46,12 @@ export const orgQueryKeys = {
   /** Every role at once (Users › Roles & access) — under the `roles` prefix, so every role write refreshes it. */
   rolesAll: (organizationId: string | null) =>
     [...orgQueryKeys.roles(organizationId), 'all'] as const,
+  /**
+   * One role's permission codes (an edit's pre-fill, View-as) — under the `roles` prefix, so
+   * every role write refreshes it.
+   */
+  rolePermissions: (organizationId: string | null, roleId: string | undefined) =>
+    [...orgQueryKeys.roles(organizationId), 'permissions', roleId] as const,
   apiKeys: (organizationId: string | null) =>
     [...orgQueryKeys.org(organizationId), 'api-keys'] as const,
   apiKeysList: (organizationId: string | null, params: OrgListKeyParams) =>

@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import type { Branch } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
+import { clinicBranch } from '@/tests/utils/branch-doubles.ts';
 
 import {
   branchFormOf,
@@ -10,52 +11,38 @@ import {
   emptyBranchForm,
   isBranchEmailInvalid,
   isBranchPhoneIncomplete,
-  missingBranchFields,
+  isBranchPinIncomplete,
+  missingContactFields,
+  missingPlaceFields,
   newBranchTone,
 } from './branch-form.ts';
 
-const PROFILE_DOCTOR = '00000000-0000-4000-8000-0000000d0c01';
-const PROFILE_DESK = '00000000-0000-4000-8000-0000000de5c1';
+const DOCTOR = 'mem_doctor000000000000000';
+const DESK = 'mem_desk00000000000000000';
+const ROLE_OF: Record<string, Role> = {
+  rol_doctor: 'doctor',
+  rol_desk: 'front_desk',
+  rol_counsellor: 'counsellor',
+};
+const presetOf = (roleId: string) => ROLE_OF[roleId] ?? null;
 
-/** A Team member holding `roleKeys`, on a profile with `profileId`. */
-function person(profileId: string, roleKeys: string[]): TeamMember {
-  return {
-    membershipId: `mbr_${profileId}`,
-    roleKeys,
-    profile: { id: profileId },
-  } as unknown as TeamMember;
+/** A Team member holding these roles. */
+function person(membershipId: string, roleIds: string[]): TeamMember {
+  return { membershipId, roleIds } as unknown as TeamMember;
 }
 
-const VESU = {
-  id: '00000000-0000-4000-8000-00000000b002',
-  name: 'Vesu',
-  tone: 'sky',
-  isMain: false,
-  active: true,
-  addressLine1: 'Shop 12, Rajhans Platinum',
-  addressLine2: null,
-  area: 'Vesu',
-  city: 'Surat',
-  state: 'Gujarat',
-  pin: '395007',
+const VESU = clinicBranch({
   phone: '+917490020098',
-  email: 'vesu@cresence.skin',
-  gstNumber: null,
-  opensAt: '11:00',
-  closesAt: '20:00',
   workingDays: ['tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
-  defaultDoctorId: PROFILE_DOCTOR,
-  defaultDeskId: null,
-  defaultTherapistId: null,
-  defaultPharmacistId: null,
-} as unknown as Branch;
+  defaultDoctorId: DOCTOR,
+});
 
 describe('the branch form', () => {
   it('starts a new branch not main, Open, Mon–Sat 10:00–19:00, in the next tone, with you', () => {
     const form = emptyBranchForm({
       branchCount: 3,
       main: { city: 'Surat', state: 'Gujarat' },
-      selfProfileId: PROFILE_DESK,
+      selfMembershipId: DESK,
     });
     expect(form).toMatchObject({
       tone: 'peach',
@@ -66,15 +53,11 @@ describe('the branch form', () => {
       workingDays: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
       opensAt: '10:00',
       closesAt: '19:00',
-      teamIds: [PROFILE_DESK],
+      teamIds: [DESK],
     });
     expect(
-      emptyBranchForm({ branchCount: 0, main: null, selfProfileId: null }),
-    ).toMatchObject({
-      tone: 'mint',
-      city: '',
-      teamIds: [],
-    });
+      emptyBranchForm({ branchCount: 0, main: null, selfMembershipId: null }),
+    ).toMatchObject({ tone: 'mint', city: '', teamIds: [] });
     expect([0, 1, 2, 3, 4, 5].map(newBranchTone)).toEqual([
       'mint',
       'lav',
@@ -86,40 +69,38 @@ describe('the branch form', () => {
   });
 
   it('reads a branch into the form: the phone’s digits, its defaults by role', () => {
-    const form = branchFormOf(VESU, [PROFILE_DOCTOR]);
-    expect(form).toMatchObject({
+    expect(branchFormOf(VESU, [DOCTOR])).toMatchObject({
       name: 'Vesu',
       phone: '7490020098',
       addressLine2: '',
       gstNumber: '',
-      teamIds: [PROFILE_DOCTOR],
-      defaults: { doctor: PROFILE_DOCTOR, desk: null, therapist: null, pharmacist: null },
+      teamIds: [DOCTOR],
+      defaults: { doctor: DOCTOR, desk: null, therapist: null, pharmacist: null },
     });
   });
 
-  it('names the required fields still empty: Name, then Address line 1', () => {
-    expect(missingBranchFields({ name: ' ', addressLine1: '' })).toEqual([
-      'name',
-      'addressLine1',
-    ]);
-    expect(missingBranchFields({ name: 'Vesu', addressLine1: 'Shop 12' })).toEqual([]);
+  it('names the required fields still empty — step 1’s, then Phone and Email', () => {
+    expect(
+      missingPlaceFields({ name: ' ', addressLine1: '', area: '', city: '', pin: '' }),
+    ).toEqual(['name', 'addressLine1', 'area', 'city', 'pin']);
+    expect(missingPlaceFields(branchFormOf(VESU, []))).toEqual([]);
+    expect(missingContactFields({ phone: '', email: ' ' })).toEqual(['phone', 'email']);
+    expect(missingContactFields(branchFormOf(VESU, []))).toEqual([]);
   });
 
-  it('offers a default only the team’s people with the role — Front desk takes Counsellors', () => {
-    const team = [
-      person(PROFILE_DOCTOR, ['doctor']),
-      person(PROFILE_DESK, ['counsellor']),
-    ];
-    expect(defaultPool('doctor', team).map((member) => member.profile?.id)).toEqual([
-      PROFILE_DOCTOR,
-    ]);
-    expect(defaultPool('desk', team).map((member) => member.profile?.id)).toEqual([
-      PROFILE_DESK,
-    ]);
-    expect(defaultPool('pharmacist', team)).toEqual([]);
+  it('offers a default only the team’s people holding its preset — Front desk takes Counsellors', () => {
+    const team = [person(DOCTOR, ['rol_doctor']), person(DESK, ['rol_counsellor'])];
+    const pool = (role: Parameters<typeof defaultPool>[0]) =>
+      defaultPool(role, team, presetOf).map((member) => member.membershipId);
+    expect(pool('doctor')).toEqual([DOCTOR]);
+    expect(pool('desk')).toEqual([DESK]);
+    expect(pool('pharmacist')).toEqual([]);
   });
 
-  it('checks a filled phone and email, never an empty one', () => {
+  it('checks a filled PIN code, phone and email — an empty one is a missing field', () => {
+    expect(isBranchPinIncomplete('')).toBe(false);
+    expect(isBranchPinIncomplete('3950')).toBe(true);
+    expect(isBranchPinIncomplete('395007')).toBe(false);
     expect(isBranchPhoneIncomplete('')).toBe(false);
     expect(isBranchPhoneIncomplete('98250')).toBe(true);
     expect(isBranchPhoneIncomplete('9825044120')).toBe(false);
@@ -128,22 +109,17 @@ describe('the branch form', () => {
     expect(isBranchEmailInvalid('vesu@clinic.com')).toBe(false);
   });
 
-  it('sends the trimmed fields, a default only while its person is on the team, and the team change', () => {
+  it('sends the trimmed fields, a default only while its person is on the team, and the whole team', () => {
     const values = {
-      ...branchFormOf(VESU, [PROFILE_DOCTOR]),
+      ...branchFormOf(VESU, [DOCTOR]),
       name: ' Vesu ',
       gstNumber: '24aakfc4821m2z5',
-      teamIds: [PROFILE_DESK],
-      defaults: {
-        doctor: PROFILE_DOCTOR,
-        desk: PROFILE_DESK,
-        therapist: null,
-        pharmacist: null,
-      },
+      teamIds: [DESK],
+      defaults: { doctor: DOCTOR, desk: DESK, therapist: null, pharmacist: null },
     };
     const save = branchSaveOf(values, {
-      team: [person(PROFILE_DESK, ['front_desk'])],
-      before: [PROFILE_DOCTOR],
+      team: [person(DESK, ['rol_desk'])],
+      presetOf,
     });
     expect(save.input).toMatchObject({
       name: 'Vesu',
@@ -151,8 +127,9 @@ describe('the branch form', () => {
       addressLine2: null,
       gstNumber: '24AAKFC4821M2Z5',
       defaultDoctorId: null,
-      defaultDeskId: PROFILE_DESK,
+      defaultDeskId: DESK,
     });
-    expect(save.team).toEqual({ add: [PROFILE_DESK], remove: [PROFILE_DOCTOR] });
+    expect(save.input).not.toHaveProperty('isMain');
+    expect(save.memberIds).toEqual([DESK]);
   });
 });

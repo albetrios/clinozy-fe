@@ -53,10 +53,7 @@ export interface PrescriptionAccess {
 }
 
 /**
- * The member's prescription access, from their permission codes. A View-as preview has no codes
- * (`canCode` is false), so it previews by the role gate as the file does: a role that may write
- * a prescription (Doctor, Admin, the Owner) also approves it and reads the medicines — the role
- * presets grant them together — and deletes it only with Patients delete.
+ * The member's prescription access, from the codes in force (a View-as preview's too).
  */
 export function usePrescriptionAccess(): PrescriptionAccess {
   const access = useClinicAccess();
@@ -64,16 +61,6 @@ export function usePrescriptionAccess(): PrescriptionAccess {
     const resolved = access.isResolved;
     const writes = resolved && passesPatientFileGate(access, 'prescriptions');
     const holds = (code: string) => resolved && access.canCode(code);
-    if (access.previewRole) {
-      return {
-        resolved,
-        writes,
-        approves: writes,
-        deletes: writes && access.can('patients', 'delete'),
-        readsMedicines: writes,
-        readsBranch: false,
-      };
-    }
     return {
       resolved,
       writes,

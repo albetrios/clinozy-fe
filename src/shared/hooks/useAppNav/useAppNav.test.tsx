@@ -17,6 +17,7 @@ import { House } from '@/shared/icons/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { previewPreset } from '@/tests/utils/clinic-preset-codes.ts';
 
 import { navCandidates, type NavRoute, useAppNav } from './useAppNav.ts';
 
@@ -121,6 +122,7 @@ function renderNav() {
       <RouterProvider router={router} />
     </QueryClientProvider>,
   );
+  return client;
 }
 
 beforeEach(() => {
@@ -165,9 +167,9 @@ describe('useAppNav', () => {
 
   it('follows a View-as preview', async () => {
     useOrganizationStore.getState().setPermissions(OWNER_CODES);
-    renderNav();
+    const client = renderNav();
     await screen.findByText('today,leads,users');
-    act(() => useUIStore.getState().setPreviewRole('doctor'));
+    act(() => previewPreset(client, 'doctor'));
     expect(await screen.findByText('today,leads')).toBeInTheDocument();
   });
 

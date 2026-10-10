@@ -18,6 +18,7 @@ import { organizationTasks } from '@/lib/routes/tasks-builders.ts';
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { PRESET_CODES } from '@/tests/utils/clinic-preset-codes.ts';
 import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import { validateTaskCreateSearch } from '../../tasks.dialog-search.ts';
@@ -49,11 +50,11 @@ export const TASKS_FRONT_DESK_CODES: readonly OrganizationPermission[] = [
   'appointment:create',
 ];
 
-/** Who the harness signs in: their clinozy-be codes, or View-as a clinic role. */
+/** Who the harness signs in: their clinozy-be codes, or a preset's. */
 export interface TasksTestMember {
   /** The member's codes (the room answers from them); the Admin's by default. */
   permissions?: readonly OrganizationPermission[];
-  /** View-as instead: the reads follow that role's matrix and every code reads false. */
+  /** A member holding this preset's codes instead. */
   role?: Role;
 }
 
@@ -63,7 +64,7 @@ export interface TasksTestMember {
  * nothing — with `Page` as the list's component, opened at `url`, for the test
  * member (`signInTestMember`: organization `org_test`, slug `acme` — every
  * tasks read and key carries the organization) holding `member.permissions`,
- * or previewed as `member.role` (View-as). Every other path lands on a
+ * or holding the preset `member.role`'s codes. Every other path lands on a
  * catch-all, so a test can read where a link went.
  */
 export function renderTasksRoutes(
@@ -72,8 +73,9 @@ export function renderTasksRoutes(
   { permissions = TASKS_ADMIN_CODES, role }: TasksTestMember = {},
 ) {
   signInTestMember();
-  useOrganizationStore.getState().setPermissions([...permissions]);
-  useUIStore.setState({ previewRole: role ?? null });
+  useOrganizationStore
+    .getState()
+    .setPermissions([...(role ? PRESET_CODES[role] : permissions)]);
 
   const root = createRootRoute({ component: () => <Outlet /> });
   const tasks = createRoute({

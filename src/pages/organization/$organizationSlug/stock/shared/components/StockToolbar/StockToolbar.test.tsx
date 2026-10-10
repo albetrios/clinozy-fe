@@ -101,12 +101,14 @@ describe('StockToolbar', () => {
         </>
       ),
     };
-    // The design's Therapist creates without Edit.
-    const therapist = renderStockRoutes(`${ROOM}/items`, items, { role: 'therapist' });
+    // A member who creates without Edit.
+    const creator = renderStockRoutes(`${ROOM}/items`, items, {
+      permissions: ['organization:read', 'stock_item:read', 'stock_item:create'],
+    });
     await screen.findByTestId('access-resolved');
     expect(screen.getByTestId('stock-items-new')).toBeInTheDocument();
     expect(screen.queryByTestId('stock-items-view-action-check')).toBeNull();
-    therapist.unmount();
+    creator.unmount();
 
     renderStockRoutes(`${ROOM}/items`, items, { role: 'accountant' });
     await screen.findByTestId('access-resolved');

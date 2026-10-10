@@ -154,7 +154,7 @@ export function OrganizationGeneralPanel() {
   const organizationId = useOrganizationStore((s) => s.organizationId);
   const organizationSlug = useOrganizationStore((s) => s.organizationSlug);
   // `PATCH /tenancy/organization` (rename) and `PUT`/`DELETE .../logo` all enforce
-  // `organization:update` on clinozy-be — not `membership:manage`, which guards the membership
+  // `organization:update` on clinozy-be — not `membership:update`, which guards the membership
   // routes instead. The two coincide on the seeded Admin role, which is what hid this.
   const canManage = useCan({
     permission: 'organization:update',

@@ -102,7 +102,8 @@
       "colour": "배지에 사용됩니다",
       "roles": "하나 이상 선택 · 권한이 합산됩니다",
       "branches": "근무 지점",
-      "days": "예약은 이 요일만 제공됩니다"
+      "days": "예약은 이 요일만 제공됩니다",
+      "name": "본인이 프로필에서 설정합니다"
     },
     "placeholders": {
       "name": "전체 이름, 예: Dr. Nisha Mavani",
@@ -116,7 +117,7 @@
     "increase": "늘리기",
     "pickRole": "역할 선택",
     "statusOn": "활성 · 로그인 가능",
-    "statusOff": "비활성 · 로그아웃됨",
+    "statusOff": "비활성 · 이 클리닉을 사용할 수 없음",
     "resend": "초대 다시 보내기",
     "quickFill": {
       "doctor": "의사 · 10:00–19:00",
@@ -130,7 +131,7 @@
       "edit": "변경 사항 저장",
       "createAnother": "만들고 하나 더 추가"
     },
-    "missing": "이름과 이메일을 입력하세요",
+    "missing": "이메일을 입력하세요",
     "noRole": "역할을 하나 이상 선택하세요",
     "emailInvalid": "올바른 이메일 주소를 입력하세요",
     "mobileInvalid": "휴대폰 번호는 10자리여야 합니다",
@@ -194,65 +195,51 @@
         "create": "{{role}}: 만들 수 있음 · {{section}}",
         "edit": "{{role}}: 편집할 수 있음 · {{section}}",
         "delete": "{{role}}: 삭제할 수 있음 · {{section}}"
-      }
-    },
-    "abilities": {
-      "title": "특별 권한",
-      "disc": {
-        "label": "제안가보다 낮게 청구",
-        "description": "제안가를 넘어 할인하되 최저가 아래로는 내리지 않습니다"
       },
-      "floor": {
-        "label": "최저가 보기",
-        "description": "서비스와 청구서에 숨겨진 최저가를 표시합니다"
-      },
-      "prices": {
-        "label": "가격 및 할인 변경",
-        "description": "정가·제안가를 편집하고 할인을 만듭니다"
-      },
-      "dayclose": {
-        "label": "하루 마감",
-        "description": "현금을 세고 결제에서 하루를 잠급니다"
-      },
-      "reverse": {
-        "label": "정산된 결제 되돌리기",
-        "description": "마감된 날의 결제를 취소합니다"
-      },
-      "refund": {
-        "label": "환불 및 대변표",
-        "description": "환자에게 돈을 돌려주거나 대변표를 발행합니다"
-      },
-      "void": {
-        "label": "판매 취소 및 청구서 삭제",
-        "description": "약국 판매를 취소하거나 미결제 청구서를 삭제합니다"
-      },
-      "allbr": {
-        "label": "모든 지점 보기",
-        "description": "헤더에서 다른 지점과 전체 지점으로 전환합니다"
-      },
-      "clinical": {
-        "label": "임상 메모 읽기",
-        "description": "주호소, 진단, 처방, 사진을 엽니다"
-      },
-      "export": {
-        "label": "목록 내보내기",
-        "description": "모든 표를 다운로드합니다"
-      },
-      "perms": {
-        "label": "역할 및 권한 변경",
-        "description": "역할, 권한, 지점을 편집합니다"
+      "notApplicable": "이 행에는 해당되지 않습니다",
+      "resources": {
+        "contact": {
+          "label": "연락처",
+          "description": "리드와 환자의 연락처"
+        },
+        "contact_activity": {
+          "label": "메시지 및 메모",
+          "description": "WhatsApp, 통화, 팀 메모"
+        },
+        "patient_prescription": {
+          "label": "처방",
+          "description": "처방 작성 및 승인"
+        },
+        "patient_treatment": {
+          "label": "시술",
+          "description": "세션과 진행 결과"
+        },
+        "patient_review": {
+          "label": "리뷰",
+          "description": "Google 및 영상 리뷰 · 환자와 함께 열람"
+        },
+        "role": {
+          "label": "역할",
+          "description": "역할 및 접근 권한"
+        },
+        "branch": {
+          "label": "지점",
+          "description": "지점과 지점별 근무자"
+        }
       }
     },
     "notes": {
       "admin": "관리자는 모든 것을 할 수 있습니다 · 이 역할은 제한할 수 없습니다.",
-      "readOnly": "여기에서 역할을 볼 수 있습니다. 변경하려면 ‘역할 및 권한 변경’이 필요합니다.",
-      "live": "변경 사항은 이 역할을 가진 모든 사람에게 바로 적용됩니다. 역할이 두 개인 사람은 두 역할 중 하나라도 허용하는 모든 것을 할 수 있습니다."
+      "readOnly": "여기서 역할을 볼 수 있습니다. 변경하려면 “역할 업데이트”가 필요합니다.",
+      "live": "변경 사항은 이 역할을 가진 모든 사람에게 바로 적용됩니다. 역할이 두 개인 사람은 두 역할 중 하나라도 허용하는 모든 것을 할 수 있습니다.",
+      "beyond": "이 역할에는 내게 없는 권한이 있습니다 · 그 권한이 있는 사람만 변경할 수 있습니다."
     },
     "locked": {
       "admin": "관리자는 항상 전체 권한을 가집니다",
       "noPerms": "역할을 변경할 수 없습니다 · 관리자에게 요청하세요",
       "noAdd": "역할을 추가할 수 없습니다 · 관리자에게 요청하세요",
-      "platform": "이 역할의 사용자 권한은 {{productName}}에서 관리합니다 · 여기에서 변경할 수 없습니다"
+      "beyond": "이 역할에는 내게 없는 권한이 있습니다 · 관리자에게 요청하세요",
+      "notYours": "내가 가진 권한만 부여할 수 있습니다"
     },
     "added": "역할을 추가했습니다 · 이름을 정하고 할 수 있는 일을 고르세요",
     "newRoleName": "새 역할",
@@ -268,8 +255,26 @@
       "title": "워크스페이스 권한",
       "hint": "설정, 연동, 결제, 감사 로그 — 위 섹션 밖의 권한입니다. 내가 가진 권한만 줄 수 있습니다.",
       "none": "이 역할에 더 줄 수 있는 권한이 없습니다.",
-      "loadFailed": "워크스페이스 권한을 불러오지 못했습니다.",
-      "locked": "이 역할의 워크스페이스 권한은 {{productName}}에서 관리합니다 · 여기에서 변경할 수 없습니다"
+      "loadFailed": "워크스페이스 권한을 불러오지 못했습니다."
+    },
+    "specials": {
+      "title": "특별 권한",
+      "floor": {
+        "label": "최저가 보기",
+        "description": "서비스와 청구서에 숨겨진 최저가를 표시합니다"
+      },
+      "clinical": {
+        "label": "임상 메모 읽기",
+        "description": "증상, 진단, 메모, 사진, 리포트를 엽니다"
+      },
+      "export": {
+        "label": "내보내기 · {{section}}",
+        "description": "표를 다운로드합니다"
+      },
+      "privateAlbum": {
+        "label": "비공개 앨범 보기",
+        "description": "환자 파일의 비공개 사진을 엽니다"
+      }
     }
   },
   "branches": {
@@ -362,7 +367,8 @@
           "desk": "먼저 팀에 프런트 데스크를 추가하세요",
           "therapist": "먼저 팀에 치료사를 추가하세요",
           "pharmacist": "먼저 팀에 약사를 추가하세요"
-        }
+        },
+        "main": "클리닉당 하나 · 개설 시 지정"
       },
       "toggles": {
         "mainOn": "본점 · 본사",
@@ -377,16 +383,14 @@
         "edit": "지점 저장"
       },
       "nameMissing": "지점 이름을 입력하세요",
-      "addressMissing": "주소를 추가하세요",
+      "addressMissing": "주소, 지역, 도시, PIN 코드를 입력하세요",
       "duplicate": "{{name}} 지점이 이미 있습니다",
       "phoneInvalid": "전화번호는 10자리여야 합니다",
       "emailInvalid": "올바른 이메일 주소를 입력하세요",
       "added": "{{name}} 지점을 추가했습니다",
-      "saved": "{{name}}을(를) 저장했습니다"
-    },
-    "deleteBranch": {
-      "title": "이 지점을 삭제할까요?",
-      "removed": "{{name}}을(를) 삭제했습니다"
+      "saved": "{{name}}을(를) 저장했습니다",
+      "contactMissing": "전화번호와 이메일을 입력하세요",
+      "pinInvalid": "PIN 코드는 6자리여야 합니다"
     }
   }
 }

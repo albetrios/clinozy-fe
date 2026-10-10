@@ -103,7 +103,8 @@
       "colour": "für ihre Abzeichen",
       "roles": "eine oder mehrere wählen · Zugriffe addieren sich",
       "branches": "wo sie arbeiten",
-      "days": "Termine bieten nur diese Tage an"
+      "days": "Termine bieten nur diese Tage an",
+      "name": "legt die Person im eigenen Profil fest"
     },
     "placeholders": {
       "name": "Vollständiger Name, z. B. Dr. Nisha Mavani",
@@ -117,7 +118,7 @@
     "increase": "Erhöhen",
     "pickRole": "Rolle wählen",
     "statusOn": "Aktiv · kann sich anmelden",
-    "statusOff": "Inaktiv · abgemeldet",
+    "statusOff": "Inaktiv · kann diese Praxis nicht nutzen",
     "resend": "Einladung erneut senden",
     "quickFill": {
       "doctor": "Arzt · 10:00–19:00",
@@ -131,7 +132,7 @@
       "edit": "Änderungen speichern",
       "createAnother": "Anlegen & weiteren hinzufügen"
     },
-    "missing": "Name und E-Mail angeben",
+    "missing": "E-Mail-Adresse angeben",
     "noRole": "Mindestens eine Rolle wählen",
     "emailInvalid": "Geben Sie eine gültige E-Mail-Adresse ein",
     "mobileInvalid": "Die Mobilnummer braucht 10 Ziffern",
@@ -195,65 +196,51 @@
         "create": "{{role}} darf erstellen · {{section}}",
         "edit": "{{role}} darf bearbeiten · {{section}}",
         "delete": "{{role}} darf löschen · {{section}}"
-      }
-    },
-    "abilities": {
-      "title": "Sonderrechte",
-      "disc": {
-        "label": "Unter dem Angebotspreis abrechnen",
-        "description": "Rabatt über den Angebotspreis hinaus, nie unter den Mindestpreis"
       },
-      "floor": {
-        "label": "Mindestpreis sehen",
-        "description": "Zeigt den verborgenen Mindestpreis bei Leistungen und Rechnungen"
-      },
-      "prices": {
-        "label": "Preise & Angebote ändern",
-        "description": "Listen- und Angebotspreise bearbeiten und Angebote anlegen"
-      },
-      "dayclose": {
-        "label": "Tag abschließen",
-        "description": "Bargeld zählen und den Tag in Zahlungen sperren"
-      },
-      "reverse": {
-        "label": "Abgeschlossene Zahlungen stornieren",
-        "description": "Geld zurücknehmen, nachdem sein Tag abgeschlossen ist"
-      },
-      "refund": {
-        "label": "Erstattungen & Gutschriften",
-        "description": "Einem Patienten Geld zurückgeben oder eine Gutschrift ausstellen"
-      },
-      "void": {
-        "label": "Verkäufe stornieren & Rechnungen löschen",
-        "description": "Einen Apotheken-Verkauf stornieren oder eine unbezahlte Rechnung löschen"
-      },
-      "allbr": {
-        "label": "Alle Filialen sehen",
-        "description": "Im Kopfbereich zu anderen Filialen und zu Alle Filialen wechseln"
-      },
-      "clinical": {
-        "label": "Klinische Notizen lesen",
-        "description": "Beschwerden, Diagnosen, Rezepte und Fotos öffnen"
-      },
-      "export": {
-        "label": "Listen exportieren",
-        "description": "Jede Tabelle herunterladen"
-      },
-      "perms": {
-        "label": "Rollen & Zugriff ändern",
-        "description": "Rollen, Zugriff und Filialen bearbeiten"
+      "notApplicable": "Gibt es in dieser Zeile nicht",
+      "resources": {
+        "contact": {
+          "label": "Kontakte",
+          "description": "Die Personen hinter Leads und Patienten"
+        },
+        "contact_activity": {
+          "label": "Nachrichten & Notizen",
+          "description": "WhatsApp, Anrufe und Teamnotizen"
+        },
+        "patient_prescription": {
+          "label": "Rezepte",
+          "description": "Rezepte schreiben und freigeben"
+        },
+        "patient_treatment": {
+          "label": "Behandlungen",
+          "description": "Sitzungen und ihr Verlauf"
+        },
+        "patient_review": {
+          "label": "Bewertungen",
+          "description": "Google- und Videobewertungen · mit dem Patienten lesbar"
+        },
+        "role": {
+          "label": "Rollen",
+          "description": "Rollen & Zugriff"
+        },
+        "branch": {
+          "label": "Filialen",
+          "description": "Filialen und wer dort arbeitet"
+        }
       }
     },
     "notes": {
       "admin": "Administratoren dürfen alles · diese Rolle lässt sich nicht einschränken.",
-      "readOnly": "Sie sehen hier die Rollen. Um sie zu ändern, brauchen Sie „Rollen & Zugriff ändern“.",
-      "live": "Änderungen gelten sofort für alle mit dieser Rolle. Wer zwei Rollen hat, bekommt alles, was eine der beiden erlaubt."
+      "readOnly": "Du siehst hier die Rollen. Ändern braucht „Rollen aktualisieren“.",
+      "live": "Änderungen gelten sofort für alle mit dieser Rolle. Wer zwei Rollen hat, bekommt alles, was eine der beiden erlaubt.",
+      "beyond": "Diese Rolle hat Zugriff, den du nicht hast · nur wer ihn hat, kann die Rolle ändern."
     },
     "locked": {
       "admin": "Administratoren haben immer vollen Zugriff",
       "noPerms": "Sie können Rollen nicht ändern · fragen Sie einen Administrator",
       "noAdd": "Sie können keine Rollen hinzufügen · fragen Sie einen Administrator",
-      "platform": "{{productName}} legt den Benutzer-Zugriff dieser Rolle fest · er lässt sich hier nicht ändern"
+      "beyond": "Diese Rolle hat Zugriff, den du nicht hast · frag eine Admin-Person",
+      "notYours": "Du kannst nur Zugriff vergeben, den du selbst hast"
     },
     "added": "Rolle hinzugefügt · geben Sie ihr einen Namen und legen Sie fest, was sie darf",
     "newRoleName": "Neue Rolle",
@@ -269,8 +256,26 @@
       "title": "Arbeitsbereich-Rechte",
       "hint": "Einstellungen, Integrationen, Abrechnung und Audit-Protokoll — über die Bereiche oben hinaus. Sie können nur vergeben, was Sie selbst haben.",
       "none": "Mehr können Sie dieser Rolle nicht geben.",
-      "loadFailed": "Die Arbeitsbereich-Rechte konnten nicht geladen werden.",
-      "locked": "{{productName}} legt die Arbeitsbereich-Rechte dieser Rolle fest · sie lassen sich hier nicht ändern"
+      "loadFailed": "Die Arbeitsbereich-Rechte konnten nicht geladen werden."
+    },
+    "specials": {
+      "title": "Sonderrechte",
+      "floor": {
+        "label": "Mindestpreis sehen",
+        "description": "Zeigt den verborgenen Mindestpreis bei Leistungen und Rechnungen"
+      },
+      "clinical": {
+        "label": "Klinische Notizen lesen",
+        "description": "Öffnet Beschwerden, Diagnose, Notizen, Fotos und Berichte"
+      },
+      "export": {
+        "label": "Exportieren · {{section}}",
+        "description": "Tabelle herunterladen"
+      },
+      "privateAlbum": {
+        "label": "Privates Album sehen",
+        "description": "Öffnet die privaten Fotos in einer Patientenakte"
+      }
     }
   },
   "branches": {
@@ -364,7 +369,8 @@
           "desk": "fügen Sie zuerst jemanden vom Empfang zum Team hinzu",
           "therapist": "fügen Sie zuerst einen Therapeuten zum Team hinzu",
           "pharmacist": "fügen Sie zuerst einen Apotheker zum Team hinzu"
-        }
+        },
+        "main": "eine pro Praxis · bei der Eröffnung festgelegt"
       },
       "toggles": {
         "mainOn": "Haupt · Zentrale",
@@ -379,16 +385,14 @@
         "edit": "Filiale speichern"
       },
       "nameMissing": "Geben Sie der Filiale einen Namen",
-      "addressMissing": "Fügen Sie die Adresse hinzu",
+      "addressMissing": "Adresse, Gebiet, Stadt und PIN angeben",
       "duplicate": "Eine Filiale namens {{name}} gibt es bereits",
       "phoneInvalid": "Die Telefonnummer braucht 10 Ziffern",
       "emailInvalid": "Geben Sie eine gültige E-Mail-Adresse ein",
       "added": "Filiale {{name}} hinzugefügt",
-      "saved": "{{name}} gespeichert"
-    },
-    "deleteBranch": {
-      "title": "Diese Filiale löschen?",
-      "removed": "{{name}} entfernt"
+      "saved": "{{name}} gespeichert",
+      "contactMissing": "Telefon und E-Mail angeben",
+      "pinInvalid": "Die PIN braucht 6 Ziffern"
     }
   }
 }

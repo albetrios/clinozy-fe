@@ -57,7 +57,18 @@
     "http502": "服务器暂时不可用。请稍后重试。",
     "http503": "服务暂时不可用。请稍后重试。",
     "reload": "重新加载",
-    "recordChanged": "其他人在此期间保存了此内容。请重新加载查看其更改，然后重新进行你的更改。"
+    "recordChanged": "其他人在此期间保存了此内容。请重新加载查看其更改，然后重新进行你的更改。",
+    "reasons": {
+      "missingPermission": "你没有执行此操作的权限。请联系诊所所有者或管理员。",
+      "ownerMembershipFixed": "无法更改诊所所有者的角色和状态。请先转让所有权。",
+      "ownerCannotLeave": "诊所所有者无法退出。请先转让所有权。",
+      "ownerRoleFixed": "无法更改诊所所有者所持角色的访问权限。",
+      "systemRoleFixed": "预设角色无法重命名或删除。",
+      "roleLocked": "此角色的访问权限是固定的，无法更改。",
+      "seatLimitReached": "你的方案没有空余席位。请在 设置 › 账单 中添加席位，然后重新邀请。",
+      "membershipAlreadyExists": "此人已在诊所中。",
+      "disposableEmail": "请使用长期有效的邮箱地址——不接受一次性邮箱。"
+    }
   },
   "frontend": {
     "query": {
@@ -105,7 +116,8 @@
         "updateRoleSuccess": "成员角色已更新",
         "removeSuccess": "成员已移除",
         "suspendSuccess": "成员已暂停",
-        "reactivateSuccess": "成员已重新激活"
+        "reactivateSuccess": "成员已重新激活",
+        "updateSuccess": "成员已保存"
       },
       "roles": {
         "createFailed": "无法创建角色",

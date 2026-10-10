@@ -102,7 +102,8 @@
       "colour": "バッジに使われます",
       "roles": "1つ以上選択 · アクセスは合算されます",
       "branches": "勤務する拠点",
-      "days": "予約ではこの曜日だけが選べます"
+      "days": "予約ではこの曜日だけが選べます",
+      "name": "本人がプロフィールで設定します"
     },
     "placeholders": {
       "name": "フルネーム(例: Dr. Nisha Mavani)",
@@ -116,7 +117,7 @@
     "increase": "増やす",
     "pickRole": "ロールを選択",
     "statusOn": "有効 · サインインできます",
-    "statusOff": "無効 · サインアウト済み",
+    "statusOff": "無効 · このクリニックを利用できません",
     "resend": "招待を再送",
     "quickFill": {
       "doctor": "医師 · 10:00–19:00",
@@ -130,7 +131,7 @@
       "edit": "変更を保存",
       "createAnother": "作成して続けて追加"
     },
-    "missing": "名前とメールを入力してください",
+    "missing": "メールアドレスを入力してください",
     "noRole": "ロールを1つ以上選んでください",
     "emailInvalid": "有効なメールアドレスを入力してください",
     "mobileInvalid": "携帯番号は10桁で入力してください",
@@ -194,65 +195,51 @@
         "create": "{{role}} は作成できます · {{section}}",
         "edit": "{{role}} は編集できます · {{section}}",
         "delete": "{{role}} は削除できます · {{section}}"
-      }
-    },
-    "abilities": {
-      "title": "特別な権限",
-      "disc": {
-        "label": "オファー価格より安く請求",
-        "description": "オファー価格を超えて値引きできます。最低価格は下回りません"
       },
-      "floor": {
-        "label": "最低価格を表示",
-        "description": "提供サービスと請求書に隠れた最低価格を表示します"
-      },
-      "prices": {
-        "label": "価格とオファーを変更",
-        "description": "定価・オファー価格を編集し、オファーを作成します"
-      },
-      "dayclose": {
-        "label": "日次締め",
-        "description": "現金を数え、支払いで当日をロックします"
-      },
-      "reverse": {
-        "label": "確定済みの支払いを取り消す",
-        "description": "締めた日の入金を取り消します"
-      },
-      "refund": {
-        "label": "返金とクレジットノート",
-        "description": "患者への返金やクレジットノートの発行"
-      },
-      "void": {
-        "label": "販売の取消と請求書の削除",
-        "description": "薬局の販売を取り消すか、未払いの請求書を削除します"
-      },
-      "allbr": {
-        "label": "すべての拠点を表示",
-        "description": "ヘッダーで他の拠点や「すべての拠点」に切り替えます"
-      },
-      "clinical": {
-        "label": "診療メモを読む",
-        "description": "主訴、診断、処方、写真を開きます"
-      },
-      "export": {
-        "label": "一覧をエクスポート",
-        "description": "どの表もダウンロードできます"
-      },
-      "perms": {
-        "label": "ロールとアクセスを変更",
-        "description": "ロール、アクセス、拠点を編集します"
+      "notApplicable": "この行には該当しません",
+      "resources": {
+        "contact": {
+          "label": "連絡先",
+          "description": "リードと患者の連絡先"
+        },
+        "contact_activity": {
+          "label": "メッセージとメモ",
+          "description": "WhatsApp・通話・チームメモ"
+        },
+        "patient_prescription": {
+          "label": "処方",
+          "description": "処方の作成と承認"
+        },
+        "patient_treatment": {
+          "label": "施術",
+          "description": "セッションと経過"
+        },
+        "patient_review": {
+          "label": "レビュー",
+          "description": "Google・動画レビュー · 患者と一緒に閲覧"
+        },
+        "role": {
+          "label": "ロール",
+          "description": "ロールとアクセス"
+        },
+        "branch": {
+          "label": "拠点",
+          "description": "拠点と各拠点のスタッフ"
+        }
       }
     },
     "notes": {
       "admin": "管理者はすべての操作ができます · このロールは制限できません。",
-      "readOnly": "ここでロールを確認できます。変更するには「ロールとアクセスを変更」が必要です。",
-      "live": "変更はこのロールの全員にすぐ反映されます。2 つのロールを持つ人は、どちらかのロールで許可されたことがすべてできます。"
+      "readOnly": "ここでロールを確認できます。変更には「ロールの更新」が必要です。",
+      "live": "変更はこのロールの全員にすぐ反映されます。2 つのロールを持つ人は、どちらかのロールで許可されたことがすべてできます。",
+      "beyond": "このロールにはあなたにない権限があります · 権限を持つ人だけが変更できます。"
     },
     "locked": {
       "admin": "管理者は常にフルアクセスです",
       "noPerms": "ロールを変更できません · 管理者に依頼してください",
       "noAdd": "ロールを追加できません · 管理者に依頼してください",
-      "platform": "このロールのユーザーへのアクセスは {{productName}} が管理しています · ここでは変更できません"
+      "beyond": "このロールにはあなたにない権限があります · 管理者に依頼してください",
+      "notYours": "自分が持っている権限だけを付与できます"
     },
     "added": "ロールを追加しました · 名前を付けて、できることを選んでください",
     "newRoleName": "新しいロール",
@@ -268,8 +255,26 @@
       "title": "ワークスペースの権限",
       "hint": "設定、連携、請求、監査ログ — 上のセクション以外の権限です。付与できるのは自分が持っている権限だけです。",
       "none": "このロールに付与できる権限は他にありません。",
-      "loadFailed": "ワークスペースの権限を読み込めませんでした。",
-      "locked": "このロールのワークスペースの権限は {{productName}} が管理しています · ここでは変更できません"
+      "loadFailed": "ワークスペースの権限を読み込めませんでした。"
+    },
+    "specials": {
+      "title": "特別な権限",
+      "floor": {
+        "label": "最低価格を表示",
+        "description": "提供サービスと請求書に隠れた最低価格を表示します"
+      },
+      "clinical": {
+        "label": "診療メモを読む",
+        "description": "主訴・診断・メモ・写真・レポートを開けます"
+      },
+      "export": {
+        "label": "エクスポート · {{section}}",
+        "description": "一覧をダウンロード"
+      },
+      "privateAlbum": {
+        "label": "非公開アルバムを見る",
+        "description": "患者ファイルの非公開写真を開けます"
+      }
     }
   },
   "branches": {
@@ -362,7 +367,8 @@
           "desk": "先に受付担当をチームに追加してください",
           "therapist": "先にセラピストをチームに追加してください",
           "pharmacist": "先に薬剤師をチームに追加してください"
-        }
+        },
+        "main": "クリニックに1つ · 開設時に設定"
       },
       "toggles": {
         "mainOn": "本院 · 本部",
@@ -377,16 +383,14 @@
         "edit": "拠点を保存"
       },
       "nameMissing": "拠点に名前を付けてください",
-      "addressMissing": "住所を追加してください",
+      "addressMissing": "住所・地域・市区町村・PINコードを入力してください",
       "duplicate": "{{name}} という拠点はすでにあります",
       "phoneInvalid": "電話番号は 10 桁で入力してください",
       "emailInvalid": "有効なメールアドレスを入力してください",
       "added": "拠点 {{name}} を追加しました",
-      "saved": "{{name}} を保存しました"
-    },
-    "deleteBranch": {
-      "title": "この拠点を削除しますか？",
-      "removed": "{{name}} を削除しました"
+      "saved": "{{name}} を保存しました",
+      "contactMissing": "電話番号とメールを入力してください",
+      "pinInvalid": "PINコードは6桁です"
     }
   }
 }

@@ -158,7 +158,10 @@ describe('MedicineDrawer — Edit medicine', () => {
     );
     const drawer = await screen.findByTestId(D);
     expect(within(drawer).getByTestId(`${D}-tag`)).toHaveTextContent('#456');
-    expect(drawer).toHaveTextContent(`${fsi('AVRI')} · ${fsi('Glycolic acid 6%')}`);
+    // The maker's name arrives with the manufacturer catalogue.
+    await waitFor(() =>
+      expect(drawer).toHaveTextContent(`${fsi('AVRI')} · ${fsi('Glycolic acid 6%')}`),
+    );
     await waitFor(() =>
       expect(within(drawer).getByTestId(`${D}-badges`)).toHaveTextContent(
         `Best ${fsi('₹123')} · ${fsi('Akshar Medicines')}`,

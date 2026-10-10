@@ -10,7 +10,7 @@ import {
   searchSaleCustomers,
 } from '@/shared/api/clinic/invoices-fixture-api.ts';
 import type { SaleCustomerRow } from '@/shared/api/clinic/invoices-fixture-contracts.ts';
-import type { StaffProfile } from '@/shared/api/clinic/users-contracts.ts';
+import type { StaffProfile } from '@/shared/api/clinic/staff-fixture-contracts.ts';
 import { CLINIC_KEYS } from '@/shared/clinic/clinic.constants.ts';
 import { formatClinicPhone, toClinicPhone } from '@/shared/clinic/clinic-phone.ts';
 import { clinicPhoneDigits } from '@/shared/clinic/clinic-phone-field.ts';
@@ -27,11 +27,11 @@ import {
   PatientPicker,
 } from '@/shared/components/PatientPicker/index.ts';
 import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
+import { useFixtureStaff } from '@/shared/hooks/useFixtureStaff/index.ts';
 import {
   useAddMedicalContact,
   useSetMedicalContactPhone,
 } from '@/shared/hooks/useInvoices/index.ts';
-import { useStaffProfiles } from '@/shared/hooks/useTeam/index.ts';
 import { useTeamDirectory } from '@/shared/hooks/useTeamDirectory/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -65,7 +65,7 @@ function useSaleTeamOptions(
   enabled: boolean,
 ): PickerOption<StaffProfile>[] {
   const { t } = useTranslation(INVOICE_DRAWER_NS);
-  const staff = useStaffProfiles();
+  const staff = useFixtureStaff();
   if (!enabled) return [];
   return (staff.data ?? [])
     .filter((person) => person.active || picked.includes(person.id))

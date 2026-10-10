@@ -163,7 +163,7 @@ test.describe('clinozy-be — roles, members & permission catalog', () => {
       (p) => p.code,
     );
     expect(codes).toContain('organization:read');
-    expect(codes).toContain('membership:manage');
+    expect(codes).toContain('membership:update');
   });
 
   test('[+] a team lists roles, memberships and api-keys', async () => {

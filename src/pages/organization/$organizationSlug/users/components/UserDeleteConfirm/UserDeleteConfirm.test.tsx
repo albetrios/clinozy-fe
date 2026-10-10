@@ -26,7 +26,6 @@ vi.mock('@/shared/hooks/useDeferredRowRemoval/index.ts', () => ({
 const writes = vi.hoisted(() => ({
   removeMember: vi.fn(),
   revokeInvitation: vi.fn(),
-  removeProfile: vi.fn(),
 }));
 vi.mock('@/shared/hooks/useMembers/index.ts', () => ({
   useRemoveMember: () => ({ mutateAsync: writes.removeMember }),
@@ -34,32 +33,32 @@ vi.mock('@/shared/hooks/useMembers/index.ts', () => ({
 vi.mock('@/shared/hooks/useInvitations/index.ts', () => ({
   useRevokeInvitation: () => ({ mutateAsync: writes.revokeInvitation }),
 }));
-vi.mock('@/shared/hooks/useTeam/index.ts', () => ({
-  useRemoveStaffProfile: () => ({ mutateAsync: writes.removeProfile }),
-}));
+
+const REENAL = 'mem_reenal000000000000000';
 
 function teamMember(overrides: Partial<TeamMember> = {}): TeamMember {
   return {
-    membershipId: 'mbr_reenal',
+    membershipId: REENAL,
     userId: 'usr_reenal',
     email: 'reenal@cresence.skin',
     status: 'active',
     invitation: null,
-    platformRoleId: 'rol_member',
-    platformRoleName: 'Member',
     joinedAt: '2026-09-01T10:00:00.000Z',
+    createdAt: '2026-09-01T10:00:00.000Z',
+    updatedAt: '2026-09-01T10:00:00.000Z',
     isOwner: false,
     isSelf: false,
     name: 'Dr. Reenal Chaniyara',
     initials: 'RC',
     tone: 'lav',
-    roleKeys: ['doctor'],
+    roleIds: ['rol_doctor000000000000000'],
     seq: 11,
     phone: null,
     branchIds: [],
-    presence: 'away',
-    lastActiveAt: null,
-    profile: { id: 'stf_reenal' } as TeamMember['profile'],
+    workingDays: ['mon'],
+    startsAt: '10:00',
+    endsAt: '19:00',
+    commissionPercent: 0,
     ...overrides,
   };
 }
@@ -72,7 +71,7 @@ beforeEach(() => {
   });
   useOrganizationStore
     .getState()
-    .setPermissions(['membership:read', 'membership:manage', 'invitation:manage']);
+    .setPermissions(['membership:read', 'membership:delete']);
 });
 
 /** An invited member, deleted with a reason: the scheduled removal's commit. */
@@ -83,7 +82,6 @@ async function deleteInvited(user: ReturnType<typeof userEvent.setup>) {
         member: teamMember({
           status: 'invited',
           invitation: { id: 'inv_1', expiresAt: '2026-10-10T00:00:00.000Z' },
-          profile: null,
         }),
       }}
       onClose={vi.fn()}
@@ -113,7 +111,7 @@ describe('UserDeleteConfirm (users.md:238–252)', () => {
     expect(await axeForDialog(dialog)).toHaveNoViolations();
   });
 
-  it('schedules the removal behind a 10s Undo — membership, then the profile with the reason', async () => {
+  it('schedules the removal behind a 10s Undo — the membership, with the reason picked', async () => {
     const user = userEvent.setup();
     const onDeleted = vi.fn();
     renderWithProviders(
@@ -137,34 +135,23 @@ describe('UserDeleteConfirm (users.md:238–252)', () => {
       },
     ];
     expect(input).toMatchObject({
-      id: 'mbr_reenal',
+      id: REENAL,
       pendingMessage: 'Dr. Reenal Chaniyara removed',
       delayMs: 10_000,
     });
     expect(writes.removeMember).not.toHaveBeenCalled();
     await input.commit();
-    expect(writes.removeMember).toHaveBeenCalledWith('mbr_reenal');
-    expect(writes.removeProfile).toHaveBeenCalledWith({
-      id: 'stf_reenal',
+    expect(writes.removeMember).toHaveBeenCalledWith({
+      membershipId: REENAL,
       reason: 'not_needed',
-      note: null,
+      note: undefined,
     });
   });
 
-  it('cancels an invited member’s invitation instead', async () => {
+  it('cancels an invited member’s invitation instead — by the membership', async () => {
     await deleteInvited(userEvent.setup());
-    expect(writes.revokeInvitation).toHaveBeenCalledWith('inv_1');
+    expect(writes.revokeInvitation).toHaveBeenCalledWith(REENAL);
     expect(writes.removeMember).not.toHaveBeenCalled();
-    expect(writes.removeProfile).not.toHaveBeenCalled();
-  });
-
-  it('removes the invited membership for a viewer who may not manage invitations (D17)', async () => {
-    useOrganizationStore
-      .getState()
-      .setPermissions(['membership:read', 'membership:manage']);
-    await deleteInvited(userEvent.setup());
-    expect(writes.removeMember).toHaveBeenCalledWith('mbr_reenal');
-    expect(writes.revokeInvitation).not.toHaveBeenCalled();
   });
 
   it('keeps everyone on "Keep it"', async () => {

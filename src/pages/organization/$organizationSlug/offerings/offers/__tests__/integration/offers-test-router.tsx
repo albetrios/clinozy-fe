@@ -12,6 +12,7 @@ import { render } from '@testing-library/react';
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { PRESET_CODES } from '@/tests/utils/clinic-preset-codes.ts';
 import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import { OFFER_PERMISSIONS } from '../../offers.constants.ts';
@@ -39,8 +40,8 @@ export const COUNSELLOR_CODES: readonly OrganizationPermission[] = [
 export interface OffersRoutesOptions {
   /** The member's offer codes beside `organization:read` (an Owner's by default). */
   codes?: readonly OrganizationPermission[];
-  /** A View-as preview — `canCode` is false for every code then. */
-  previewRole?: 'admin' | 'counsellor';
+  /** A member holding this preset's codes instead of `codes`. */
+  role?: 'admin' | 'counsellor';
 }
 
 /**
@@ -53,11 +54,12 @@ export interface OffersRoutesOptions {
  */
 export function renderOffersRoutes(
   url: string,
-  { codes = OWNER_CODES, previewRole }: OffersRoutesOptions = {},
+  { codes = OWNER_CODES, role }: OffersRoutesOptions = {},
 ) {
   signInTestMember();
-  useOrganizationStore.getState().setPermissions(['organization:read', ...codes]);
-  useUIStore.setState({ previewRole: previewRole ?? null });
+  useOrganizationStore
+    .getState()
+    .setPermissions(role ? [...PRESET_CODES[role]] : ['organization:read', ...codes]);
 
   const root = createRootRoute({ component: () => <Outlet /> });
   const offers = createRoute({

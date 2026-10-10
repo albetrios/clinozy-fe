@@ -59,9 +59,8 @@ import { manifest } from './treatments.manifest.ts';
 const NAME_CHIPS = 4;
 
 /**
- * The member's treatment gates: recording one (`patient_treatment:create` —
- * View-as previews the Doctor, Therapist and Owner gate), changing or
- * reversing one (`patient_treatment:update`, the same gate in a preview), and
+ * The member's treatment gates, from the codes in force (a View-as preview's too): recording one
+ * (`patient_treatment:create`), changing or reversing one (`patient_treatment:update`), and
  * logging a check-in (Patients Edit).
  */
 function treatmentAccessOf(access: ClinicAccess): TreatmentRowAccess {
@@ -70,9 +69,7 @@ function treatmentAccessOf(access: ClinicAccess): TreatmentRowAccess {
   const canCreate = passesPatientFileGate(access, 'treatments');
   return {
     canCreate,
-    canUpdate: access.previewRole
-      ? canCreate
-      : access.canCode('patient_treatment:update'),
+    canUpdate: access.canCode('patient_treatment:update'),
     canCheckIn: access.can('patients', 'edit'),
   };
 }

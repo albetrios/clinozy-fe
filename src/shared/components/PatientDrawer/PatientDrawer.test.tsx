@@ -27,6 +27,7 @@ import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 import { contactHit } from '@/tests/utils/appointment-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { fsi } from '@/tests/utils/bidi-marks.ts';
+import { holdPreset } from '@/tests/utils/clinic-preset-codes.ts';
 import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import { EMPTY_CONTACT_PROFILE } from '@/tests/utils/contact-doubles.ts';
 import { patientRecord } from '@/tests/utils/patient-doubles.ts';
@@ -165,10 +166,9 @@ function setUser() {
   return userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
 }
 
-/** A member previewed as `role` (View-as narrows the clinic access to its matrix). */
+/** The member holding the `role` preset's codes. */
 function asRole(role: Role) {
-  useOrganizationStore.getState().setPermissions(['organization:read']);
-  useUIStore.setState({ previewRole: role });
+  holdPreset(role);
 }
 
 function renderCreate(prefill?: { name?: string; phone?: string; leadId?: string }) {
@@ -804,8 +804,8 @@ describe('PatientDrawer — Edit patient', () => {
     );
   });
 
-  it('is view-only for a role without Edit: Close, no Save, the controls disabled', async () => {
-    asRole('therapist');
+  it('is view-only for a role without Edit — Marketing: Close, no Save, the controls disabled', async () => {
+    asRole('marketing');
     renderEdit();
     const panel = await drawer();
     await waitFor(() =>

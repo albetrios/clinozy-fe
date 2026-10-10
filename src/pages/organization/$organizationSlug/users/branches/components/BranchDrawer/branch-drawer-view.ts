@@ -14,11 +14,13 @@ import {
 
 import type { HoursFormat } from '../../../shared/hooks/useHoursFormat/index.ts';
 import { USERS_KEYS, USERS_NS } from '../../../users.constants.ts';
+import { BRANCH_DEFAULT_ROLES, teamMemberById } from '../../hooks/useBranchRows/index.ts';
 import {
-  BRANCH_DEFAULT_ROLES,
-  teamMemberByProfileId,
-} from '../../hooks/useBranchRows/index.ts';
-import { type BranchFormValues, missingBranchFields } from './branch-form.ts';
+  type BranchFormValues,
+  missingContactFields,
+  missingPlaceFields,
+  type RequiredBranchField,
+} from './branch-form.ts';
 
 const K = USERS_KEYS.branches.drawer;
 
@@ -29,7 +31,7 @@ export interface BranchDrawerView {
   /** "New branch · Surat · 1 person" / "Vesu · Surat · 6 people". */
   summary: string;
   place: { peek: DrawerPeekItem[]; summary: string; missing: string[] };
-  contact: { peek: DrawerPeekItem[]; summary: string };
+  contact: { peek: DrawerPeekItem[]; summary: string; missing: string[] };
   people: { peek: DrawerPeekItem[]; summary: string };
 }
 
@@ -44,7 +46,7 @@ export function useBranchDrawerView({
   format,
 }: {
   values: BranchFormValues;
-  /** The Team, for the people the form names by profile id. */
+  /** The Team, for the people the form names by membership id. */
   members: readonly TeamMember[];
   format: HoursFormat;
 }): BranchDrawerView {
@@ -52,7 +54,16 @@ export function useBranchDrawerView({
   const name = values.name.trim();
   const notFilled = t(RECORD_DRAWER_KEYS.step.notFilled, { ns: RECORD_DRAWER_NS });
   const nobody = t(K.nobody);
-  const memberOf = teamMemberByProfileId(members);
+  const memberOf = teamMemberById(members);
+  const fieldLabel: Readonly<Record<RequiredBranchField, string>> = {
+    name: t(K.fields.name),
+    addressLine1: t(K.fields.line1),
+    area: t(K.fields.area),
+    city: t(K.fields.city),
+    pin: t(K.fields.pin),
+    phone: t(K.fields.phone),
+    email: t(K.fields.email),
+  };
   const team = values.teamIds.flatMap((id) => {
     const member = memberOf(id);
     return member ? [member] : [];
@@ -109,9 +120,7 @@ export function useBranchDrawerView({
         ],
         notFilled,
       ),
-      missing: missingBranchFields(values).map((field) =>
-        field === 'name' ? t(K.fields.name) : t(K.fields.line1),
-      ),
+      missing: missingPlaceFields(values).map((field) => fieldLabel[field]),
     },
     contact: {
       peek: [
@@ -141,6 +150,7 @@ export function useBranchDrawerView({
         ],
         notFilled,
       ),
+      missing: missingContactFields(values).map((field) => fieldLabel[field]),
     },
     people: {
       peek: [

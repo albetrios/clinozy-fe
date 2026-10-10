@@ -7,6 +7,7 @@ import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { previewPreset } from '@/tests/utils/clinic-preset-codes.ts';
 import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import { usePhotoAccess } from './usePhotoAccess.ts';
@@ -20,8 +21,8 @@ function renderAccess({
 }) {
   signInTestMember();
   useOrganizationStore.getState().setPermissions(codes);
-  useUIStore.setState({ previewRole: role });
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  if (role) previewPreset(client, role);
   const wrapper = ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={client}>{children}</QueryClientProvider>
   );
@@ -63,7 +64,7 @@ describe('usePhotoAccess', () => {
     });
   });
 
-  it('previews the Private album by role during View-as (Doctor, Admin, Owner)', async () => {
+  it('previews the Private album by the previewed role’s codes during View-as (Doctor, Admin, Owner)', async () => {
     for (const role of ['doctor', 'admin', 'owner'] as const) {
       const { result } = renderAccess({ role });
       await waitFor(() => expect(result.current.resolved).toBe(true));

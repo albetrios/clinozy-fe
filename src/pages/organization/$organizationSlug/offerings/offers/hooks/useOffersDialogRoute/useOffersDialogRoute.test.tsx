@@ -59,15 +59,12 @@ function renderRoutes(
   url: string,
   {
     codes = ['offering:create', 'offering:update'],
-    previewRole = null,
   }: {
     codes?: OrganizationPermission[];
-    previewRole?: 'admin' | null;
   } = {},
 ) {
   signInTestMember();
   useOrganizationStore.getState().setPermissions(['organization:read', ...codes]);
-  useUIStore.setState({ previewRole });
   const root = createRootRoute({ component: () => <Outlet /> });
   const list = createRoute({
     getParentRoute: () => root,
@@ -174,11 +171,5 @@ describe('useOffersDialogRoute', () => {
       'You do not have permission to perform this action.',
     );
     expect(seen()).toEqual({ kind: 'none' });
-  });
-
-  it('turns a create link away during View-as — no code counts there', async () => {
-    const { router } = renderRoutes(`${OFFERS}/create`, { previewRole: 'admin' });
-    await waitFor(() => expect(router.state.location.pathname).toBe(OFFERS));
-    expect(notifyMock.info).toHaveBeenCalledTimes(1);
   });
 });

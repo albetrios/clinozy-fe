@@ -2,6 +2,7 @@ import { useParams } from '@tanstack/react-router';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import {
   type RoomAction,
   type RoomLinkTab,
@@ -9,6 +10,7 @@ import {
   RoomToolbar,
   type RoomToolbarFilters,
 } from '@/shared/components/RoomToolbar/index.ts';
+import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { type AppIcon, MapPin, Shield, Users } from '@/shared/icons/index.ts';
 
 import { USERS_KEYS, USERS_NS } from '../../../users.constants.ts';
@@ -16,11 +18,31 @@ import { USERS_KEYS, USERS_NS } from '../../../users.constants.ts';
 /** The Users room's tabs, in the design's order (H:1086). */
 export type UsersTab = 'team' | 'roles' | 'branches';
 
-/** Each tab's route and 14px icon. */
-const TABS: readonly { id: UsersTab; to: string; icon: AppIcon }[] = [
-  { id: 'team', to: '/organization/$organizationSlug/users', icon: Users },
-  { id: 'roles', to: '/organization/$organizationSlug/users/roles', icon: Shield },
-  { id: 'branches', to: '/organization/$organizationSlug/users/branches', icon: MapPin },
+/** Each tab's route, 14px icon and the code that opens it. */
+const TABS: readonly {
+  id: UsersTab;
+  to: string;
+  icon: AppIcon;
+  code: OrganizationPermission;
+}[] = [
+  {
+    id: 'team',
+    to: '/organization/$organizationSlug/users',
+    icon: Users,
+    code: 'membership:read',
+  },
+  {
+    id: 'roles',
+    to: '/organization/$organizationSlug/users/roles',
+    icon: Shield,
+    code: 'role:read',
+  },
+  {
+    id: 'branches',
+    to: '/organization/$organizationSlug/users/branches',
+    icon: MapPin,
+    code: 'branch:read',
+  },
 ];
 
 /** Each tab's toolbar id — its test-id prefix and its saved views' key. */
@@ -47,7 +69,8 @@ export interface UsersToolbarProps {
 /**
  * The Users toolbar (KICKOFF §6.12 Toolbar; H:1085–1090; `users.md:17`) on the
  * shared room toolbar, for all three tabs: h1 "Users" · the tabs — links to
- * Team, Roles & access and Branches · the Team's search · Filters (Team and
+ * Team, Roles & access and Branches, each shown with the code that opens it
+ * (`membership:read`, `role:read`, `branch:read`) · the Team's search · Filters (Team and
  * Branches) · Columns (Team) · the tab's "New …" — a floating pill on a phone.
  * The phone rows follow the room toolbar's default: search + Filters, then the
  * tabs; Roles & access has the tabs alone.
@@ -61,7 +84,10 @@ export function UsersToolbar({
 }: UsersToolbarProps) {
   const { t } = useTranslation(USERS_NS);
   const { organizationSlug = '' } = useParams({ strict: false });
-  const tabs: RoomLinkTab[] = TABS.map((entry) => ({
+  const access = useClinicAccess();
+  // The tab on screen stays, so the toolbar never loses where it is.
+  const shown = TABS.filter((entry) => entry.id === tab || access.canCode(entry.code));
+  const tabs: RoomLinkTab[] = shown.map((entry) => ({
     id: entry.id,
     label: t(USERS_KEYS.tabs[entry.id]),
     icon: entry.icon,

@@ -16,7 +16,7 @@ empty copy are not in the source.
 
 `stock_item:create` — "+ New clinic vendor" (toolbar and empty state) · `stock_item:update` — a saved
 vendor opens editable, else view only · `stock_item:delete` — Delete (row and drawer) — the member's own
-codes (`useStockAccess`); under View-as the previewed role's clinic matrix answers instead.
+codes (`useStockAccess`); under View-as the previewed role's codes answer instead.
 
 ## Dialog routes
 

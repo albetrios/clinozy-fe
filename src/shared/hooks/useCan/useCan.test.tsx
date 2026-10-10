@@ -29,7 +29,7 @@ describe('useCan', () => {
     expect(
       renderHook(() => useCan({ permission: 'membership:read' })).result.current,
     ).toBe(true);
-    expect(renderHook(() => useCan({ permission: 'role:manage' })).result.current).toBe(
+    expect(renderHook(() => useCan({ permission: 'role:update' })).result.current).toBe(
       false,
     );
   });
@@ -63,7 +63,7 @@ describe('useVisibleNav', () => {
     const items = [
       { id: 'a' },
       { id: 'b', teamOrganizationOnly: true as const },
-      { id: 'c', permission: 'role:manage' as const },
+      { id: 'c', permission: 'role:update' as const },
     ];
     const visible = renderHook(() => useVisibleNav(items)).result.current;
     expect(visible.map((i) => i.id)).toEqual(['a', 'b']);
@@ -77,7 +77,7 @@ describe('useVisibleNav', () => {
     const NAV = [
       { id: 'a' },
       { id: 'b', teamOrganizationOnly: true as const },
-      { id: 'c', permission: 'role:manage' as const },
+      { id: 'c', permission: 'role:update' as const },
     ];
 
     it('returns the same array reference when nothing it reads has changed', () => {
@@ -103,7 +103,7 @@ describe('useVisibleNav', () => {
       act(() => {
         useOrganizationStore
           .getState()
-          .setPermissions(['membership:read', 'role:manage']);
+          .setPermissions(['membership:read', 'role:update']);
       });
       rerender();
 

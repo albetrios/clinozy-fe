@@ -212,7 +212,7 @@ stored as `other` with its label leading the note.
 | ------------- | ------------------------------------------------------------------------------------------ | -------------------------------- |
 | Roles         | `useUpdateRole`, `useDeleteRole`                                                           | `optimisticInfinite`             |
 | API keys      | `useRenameApiKey`, `useRevokeApiKey`                                                       | `optimisticInfinite`             |
-| Members       | `useUpdateMemberRole`, `useUpdateMemberStatus`, `useRemoveMember`                          | `optimisticInfinite`             |
+| Members       | `useUpdateMember`, `useRemoveMember`                                                       | `optimisticInfinite`             |
 | Invitations   | `useRevokeInvitation` (patches the members list)                                           | `optimisticInfinite`             |
 | Sessions      | `useRevokeSession`                                                                         | `optimistic`                     |
 | Passkeys      | `useRemovePasskey`                                                                         | `optimistic`                     |
@@ -250,13 +250,13 @@ behind the undo toast by their panels (see above), which is why all three take a
 > created as an `INVITED` membership (`POST .../memberships`), so `useInviteMember` (a
 > create — hence non-optimistic) refreshes the members list, and each invited row
 > carries its live invitation (`invitation: { id, expires_at }`). Resend and cancel act
-> on that id: `useResendInvitation` (`POST .../invitations/:id/resend`) and
-> `useRevokeInvitation` (`DELETE .../invitations/:id`, which revokes the invitation
-> **and** removes the invited membership). Cancel no longer goes through
-> `useRemoveMember` — deleting the membership alone left the invitation unrevoked, so
-> the invitee's link answered "not found" instead of "revoked". `useRemoveMember` stays
-> the fallback for a caller holding `membership:manage` but not `invitation:manage`. See
-> the docstrings in
+> on the membership: `useResendInvitation` (`POST .../memberships/:membership_id/invitation/resend`,
+> an expired invitation included) and `useRevokeInvitation`
+> (`DELETE .../memberships/:membership_id/invitation`, which revokes the invitation **and**
+> removes the invited membership). Cancel never goes through `useRemoveMember` — deleting
+> the membership alone would leave the invitation unrevoked, so the invitee's link would
+> answer "not found" instead of "revoked". Resend needs `membership:update`, cancel
+> `membership:delete`. See the docstrings in
 > [`useInvitations.ts`](../../src/shared/hooks/useInvitations/useInvitations.ts).
 >
 > The inventory drifts as hooks are added — the **policy** above is the durable

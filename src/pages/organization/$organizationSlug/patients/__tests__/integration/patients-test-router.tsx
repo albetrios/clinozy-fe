@@ -15,6 +15,7 @@ import { I18nextProvider } from 'react-i18next';
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { PRESET_CODES } from '@/tests/utils/clinic-preset-codes.ts';
 import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import { validatePatientCreateSearch } from '../../patients.dialog-search.ts';
@@ -25,8 +26,7 @@ import { validatePatientsSearch } from '../../patients.search.ts';
  * search schema and its New patient dialog route, which renders nothing — with
  * `Page` as the list's component, opened at `url`, for the test member
  * (`signInTestMember`: organization `org_test`, slug `acme` — every patients read
- * and key carries the organization) previewed as `role` (View-as narrows the
- * clinic access to that role's matrix). Every
+ * and key carries the organization) holding the `role` preset's codes. Every
  * other path lands on a catch-all, so a test can read where a row action went.
  * The guards are `routeTree.test.tsx`'s. `i18n` swaps the suite's instance —
  * which holds every namespace — for one holding only what the route loads.
@@ -37,8 +37,7 @@ export function renderPatientsRoutes(
   { role = 'admin', i18n }: { role?: Role; i18n?: I18n } = {},
 ) {
   signInTestMember();
-  useOrganizationStore.getState().setPermissions(['organization:read']);
-  useUIStore.setState({ previewRole: role });
+  useOrganizationStore.getState().setPermissions([...PRESET_CODES[role]]);
 
   const root = createRootRoute({ component: () => <Outlet /> });
   const patients = createRoute({

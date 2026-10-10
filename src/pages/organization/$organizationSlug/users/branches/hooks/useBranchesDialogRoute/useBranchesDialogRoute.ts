@@ -31,7 +31,7 @@ const EDIT_PATH = /\/users\/branches\/([^/]+)\/edit\/?$/;
  * Which drawer the URL opens over Branches — the dialog routes render nothing,
  * so the page reads them here. A viewer who may not create branches and
  * follows a create link lands back on the list with the permission toast; an
- * id the list doesn't have — a stale link, a deleted branch — leaves with
+ * id the list doesn't have — a stale link — leaves with
  * "Branch not found · it may have been deleted" (`S:115`). `close` returns to
  * Branches with its filter.
  */
@@ -45,8 +45,8 @@ export function useBranchesDialogRoute(
   const { t } = useTranslation([ERRORS_NS, USERS_NS]);
   const edit = EDIT_PATH.exec(pathname);
 
-  // The route this hook is closing itself: a branch just deleted from its
-  // drawer leaves the list before the route does, and is not "not found".
+  // The route this hook is closing itself: the drawer stays shut while the
+  // route catches up, and nothing reads it as "not found" on the way out.
   const [closing, setClosing] = useState<string | null>(null);
   if (closing !== null && closing !== pathname) setClosing(null);
   const close = useCallback(() => {

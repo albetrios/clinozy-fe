@@ -1,33 +1,31 @@
 import { z } from 'zod';
 
-import type { ClinicRoleKey } from '@/shared/api/clinic/access-contracts.ts';
-import type { Tone, Weekday } from '@/shared/api/clinic/clinic-schema.ts';
-import {
-  STAFF_PROFILE_DEFAULTS,
-  type StaffProfileInput,
-  type TeamMember,
-} from '@/shared/api/clinic/users-contracts.ts';
+import type { Role, Tone, Weekday } from '@/shared/api/clinic/clinic-schema.ts';
+import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
+import type { MemberChange, MemberInvite } from '@/shared/api/organization-contracts.ts';
 import { toClinicPhone } from '@/shared/clinic/clinic-phone.ts';
 import { clinicPhoneDigits } from '@/shared/clinic/clinic-phone-field.ts';
 
 /**
- * The user drawer's form (KICKOFF §6.12; `users.md:99–124`): one Name field,
- * the mobile's digits, the sign-in email, the badge colour, the clinic roles
- * in pick order (the first is the main role), the branches, the working
- * week, the commission and the status. No password (D17).
+ * The user drawer's form (KICKOFF §6.12; `users.md:99–124`; research-users §3): the mobile's
+ * digits, the sign-in email, the badge colour, the roles in pick order (the first is the main
+ * role), the branches, the working week, the commission and the status. The name is the person's
+ * own (it follows their profile) — read here, never sent. No password (D17).
  */
 export interface UserFormValues {
+  /** The person's name as clinozy-be shows it — read-only. */
   name: string;
   /** The mobile's digits, at most ten (`DrawerPhoneInput`). */
   phone: string;
   email: string;
   tone: Tone;
-  roleKeys: ClinicRoleKey[];
+  /** Role ids (`rol_…`) in pick order, the main role first — 1 to 10. */
+  roleIds: string[];
   branchIds: string[];
   workingDays: Weekday[];
   startsAt: string;
   endsAt: string;
-  /** A whole percentage; the stepper reads an emptied box as 0. */
+  /** A percentage — whole from the stepper, up to two decimals as clinozy-be keeps it. */
   commissionPct: number;
   /** Active · can sign in (a membership `active`), else `suspended`. */
   active: boolean;
@@ -51,20 +49,21 @@ export const USER_TONES = [
 /** The quick commission chips (`users.md:116`). */
 export const COMMISSION_QUICK = [0, 5, 10, 15] as const;
 
-/** The form's limits (`users.md:105–107`). */
-export const USER_FORM_LIMITS = { name: 60, email: 254 } as const;
+/** The form's limits (`users.md:105–107`; clinozy-be takes 1–10 roles). */
+export const USER_FORM_LIMITS = { email: 254, roles: 10 } as const;
 
 const MON_SAT: readonly Weekday[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 const EVERY_DAY: readonly Weekday[] = [...MON_SAT, 'sun'];
 
-/** One Quick fill preset: it sets the roles, days, hours and commission — never the colour. */
+/**
+ * One Quick fill preset: it sets the preset's role (the clinic's role of that preset — none when
+ * the clinic has no such role), days, hours and commission — never the colour.
+ */
 export interface UserQuickFill {
   id: 'doctor' | 'therapist' | 'front_desk' | 'pharmacist';
   tone: Tone;
-  values: Pick<
-    UserFormValues,
-    'roleKeys' | 'workingDays' | 'startsAt' | 'endsAt' | 'commissionPct'
-  >;
+  role: Role;
+  values: Pick<UserFormValues, 'workingDays' | 'startsAt' | 'endsAt' | 'commissionPct'>;
 }
 
 /**
@@ -76,8 +75,8 @@ export const USER_QUICK_FILLS: readonly UserQuickFill[] = [
   {
     id: 'doctor',
     tone: 'sky',
+    role: 'doctor',
     values: {
-      roleKeys: ['doctor'],
       workingDays: [...MON_SAT],
       startsAt: '10:00',
       endsAt: '19:00',
@@ -87,8 +86,8 @@ export const USER_QUICK_FILLS: readonly UserQuickFill[] = [
   {
     id: 'therapist',
     tone: 'butter',
+    role: 'therapist',
     values: {
-      roleKeys: ['therapist'],
       workingDays: [...MON_SAT],
       startsAt: '10:00',
       endsAt: '19:00',
@@ -98,8 +97,8 @@ export const USER_QUICK_FILLS: readonly UserQuickFill[] = [
   {
     id: 'front_desk',
     tone: 'mint',
+    role: 'front_desk',
     values: {
-      roleKeys: ['front_desk'],
       workingDays: [...MON_SAT],
       startsAt: '09:30',
       endsAt: '19:30',
@@ -109,8 +108,8 @@ export const USER_QUICK_FILLS: readonly UserQuickFill[] = [
   {
     id: 'pharmacist',
     tone: 'blush',
+    role: 'pharmacist',
     values: {
-      roleKeys: ['pharmacist'],
       workingDays: [...EVERY_DAY],
       startsAt: '09:00',
       endsAt: '21:00',
@@ -119,60 +118,60 @@ export const USER_QUICK_FILLS: readonly UserQuickFill[] = [
   },
 ];
 
+/** A new user's working week until someone sets it (`users.md:362`): Mon–Sat 10:00–19:00. */
+const NEW_USER_DEFAULTS = {
+  tone: 'sky',
+  workingDays: MON_SAT,
+  startsAt: '10:00',
+  endsAt: '19:00',
+} as const satisfies Pick<UserFormValues, 'tone' | 'startsAt' | 'endsAt'> & {
+  workingDays: readonly Weekday[];
+};
+
 /**
- * A new user's starting values (`users.md:362`): Front desk, sky, Mon–Sat
- * 10:00–19:00, 0%, Active — on `branchId` (the header's branch, else the
+ * A new user's starting values (`users.md:362`): Front desk — the clinic's role of that preset,
+ * when it has one — sky, Mon–Sat 10:00–19:00, 0%, on `branchId` (the header's branch, else the
  * main one).
  */
-export function emptyUserForm(branchId: string | null): UserFormValues {
+export function emptyUserForm(
+  branchId: string | null,
+  frontDeskRoleId: string | null,
+): UserFormValues {
   return {
     name: '',
     phone: '',
     email: '',
-    tone: STAFF_PROFILE_DEFAULTS.tone,
-    roleKeys: [...STAFF_PROFILE_DEFAULTS.roleKeys],
+    tone: NEW_USER_DEFAULTS.tone,
+    roleIds: frontDeskRoleId ? [frontDeskRoleId] : [],
     branchIds: branchId ? [branchId] : [],
-    workingDays: [...STAFF_PROFILE_DEFAULTS.workingDays],
-    startsAt: STAFF_PROFILE_DEFAULTS.startsAt,
-    endsAt: STAFF_PROFILE_DEFAULTS.endsAt,
-    commissionPct: STAFF_PROFILE_DEFAULTS.commissionPct,
+    workingDays: [...NEW_USER_DEFAULTS.workingDays],
+    startsAt: NEW_USER_DEFAULTS.startsAt,
+    endsAt: NEW_USER_DEFAULTS.endsAt,
+    commissionPct: 0,
     active: true,
   };
 }
 
-/**
- * A member's form: their staff profile's values — the membership's name and
- * email without one (an email-only name stays empty for the person to fill),
- * Owner left out of the roles (clinozy-be decides who owns the organisation).
- */
+/** A member's form: their membership's values as clinozy-be keeps them. */
 export function userFormOf(member: TeamMember): UserFormValues {
-  const { profile } = member;
-  const defaults = emptyUserForm(null);
-  const roleKeys = (profile?.roleKeys ?? member.roleKeys).filter(
-    (key) => key !== 'owner',
-  );
   return {
-    ...defaults,
-    name: member.name === member.email ? '' : member.name,
+    name: member.name,
     phone: member.phone ? clinicPhoneDigits(member.phone) : '',
     email: member.email,
     tone: member.tone,
-    roleKeys: roleKeys.length > 0 ? roleKeys : defaults.roleKeys,
-    branchIds: profile ? [...profile.branchIds] : [...member.branchIds],
-    workingDays: profile ? [...profile.workingDays] : defaults.workingDays,
-    startsAt: profile?.startsAt ?? defaults.startsAt,
-    endsAt: profile?.endsAt ?? defaults.endsAt,
-    commissionPct: profile?.commissionPct ?? defaults.commissionPct,
+    roleIds: [...member.roleIds],
+    branchIds: [...member.branchIds],
+    workingDays: [...member.workingDays],
+    startsAt: member.startsAt,
+    endsAt: member.endsAt,
+    commissionPct: member.commissionPercent,
     active: member.status !== 'suspended',
   };
 }
 
-/** The required fields still empty, in the form's order: Name, then Email. */
-export function missingUserFields(values: UserFormValues): ('name' | 'email')[] {
-  const missing: ('name' | 'email')[] = [];
-  if (!values.name.trim()) missing.push('name');
-  if (!values.email.trim()) missing.push('email');
-  return missing;
+/** The required fields still empty: the Email of a new user. */
+export function missingUserFields(values: UserFormValues): 'email'[] {
+  return values.email.trim() ? [] : ['email'];
 }
 
 const EMAIL = z.email();
@@ -187,28 +186,88 @@ export function isMobileIncomplete(digits: string): boolean {
   return digits.length > 0 && toClinicPhone(digits) === null;
 }
 
-/**
- * The staff profile a save writes (`saveStaffProfile`): the trimmed name and
- * email, the mobile E.164, the commission (0 when emptied) — and, with one
- * open branch, that branch: a user is saved on it (`users.md:95`).
- */
-export function userProfileInput(
+/** The branches a save sends: with one open branch, that branch (`users.md:95`). */
+const branchesOf = (values: UserFormValues, singleBranchId: string | null) =>
+  singleBranchId ? [singleBranchId] : values.branchIds;
+
+/** A new user's invitation (`POST …/memberships`): the email, the roles and their clinic details. */
+export function userInviteOf(
   values: UserFormValues,
-  membershipId: string,
   singleBranchId: string | null,
-): StaffProfileInput {
+): MemberInvite {
   return {
-    membershipId,
-    name: values.name.trim(),
     email: values.email.trim(),
+    roleIds: values.roleIds,
     phone: values.phone ? toClinicPhone(values.phone) : null,
     tone: values.tone,
-    roleKeys: values.roleKeys,
-    branchIds: singleBranchId ? [singleBranchId] : values.branchIds,
+    branchIds: branchesOf(values, singleBranchId),
     workingDays: values.workingDays,
-    startsAt: values.startsAt,
-    endsAt: values.endsAt,
-    commissionPct: values.commissionPct,
-    active: values.active,
+    workStartsAt: values.startsAt,
+    workEndsAt: values.endsAt,
+    commissionPercent: values.commissionPct,
   };
+}
+
+const sameList = (a: readonly string[], b: readonly string[]) =>
+  a.length === b.length && a.every((item, index) => item === b[index]);
+
+const sameSet = (a: readonly string[], b: readonly string[]) =>
+  a.length === b.length && a.every((item) => b.includes(item));
+
+/** The profile an edit changed: the mobile, the colour, the roles (never the owner's) and branches. */
+function profileChange(
+  member: TeamMember,
+  values: UserFormValues,
+  singleBranchId: string | null,
+): MemberChange {
+  const change: MemberChange = {};
+  const phone = values.phone ? toClinicPhone(values.phone) : null;
+  if (phone !== member.phone) change.phone = phone;
+  if (values.tone !== member.tone) change.tone = values.tone;
+  if (!(member.isOwner || sameList(values.roleIds, member.roleIds))) {
+    change.roleIds = values.roleIds;
+  }
+  const branchIds = branchesOf(values, singleBranchId);
+  if (!sameSet(branchIds, member.branchIds)) change.branchIds = branchIds;
+  return change;
+}
+
+/** The week and pay an edit changed: the days, the hours and the commission. */
+function scheduleChange(member: TeamMember, values: UserFormValues): MemberChange {
+  const change: MemberChange = {};
+  if (!sameSet(values.workingDays, member.workingDays)) {
+    change.workingDays = values.workingDays;
+  }
+  if (values.startsAt !== member.startsAt) change.workStartsAt = values.startsAt;
+  if (values.endsAt !== member.endsAt) change.workEndsAt = values.endsAt;
+  if (values.commissionPct !== member.commissionPercent) {
+    change.commissionPercent = values.commissionPct;
+  }
+  return change;
+}
+
+/** The status an edit changed — never an invitation's, the owner's or your own. */
+function statusChange(member: TeamMember, values: UserFormValues): MemberChange {
+  const status = values.active ? 'active' : 'suspended';
+  const changeable = member.status !== 'invited' && !(member.isOwner || member.isSelf);
+  return changeable && status !== member.status ? { status } : {};
+}
+
+/**
+ * What an edit sends (`PATCH …/memberships/:id`): only the fields that changed, with the read's
+ * `updated_at`. The owner's roles and status and your own status are never sent — clinozy-be
+ * refuses them (transfer ownership first). Null when nothing changed.
+ */
+export function userChangeOf(
+  member: TeamMember,
+  values: UserFormValues,
+  singleBranchId: string | null,
+): MemberChange | null {
+  const change: MemberChange = {
+    ...profileChange(member, values, singleBranchId),
+    ...scheduleChange(member, values),
+    ...statusChange(member, values),
+  };
+  if (Object.keys(change).length === 0) return null;
+  return { ...change, expectedUpdatedAt: member.updatedAt };
 }

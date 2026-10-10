@@ -84,7 +84,7 @@ describe('RBACGuard', () => {
     });
     useOrganizationStore.setState({ permissions: ['organization:read'] });
 
-    render(<TestApp permission={'membership:manage' as Permission} />);
+    render(<TestApp permission={'membership:update' as Permission} />);
     expect(await screen.findByTestId('unauthorized-page')).toBeInTheDocument();
   });
 

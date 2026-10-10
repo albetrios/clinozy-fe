@@ -27,13 +27,13 @@ afterEach(() => {
 });
 
 describe('useUsersRoomOpen (D17)', () => {
-  it('is open with the module on and the codes that view Users', () => {
-    hold(['membership:read', 'role:read']);
+  it('is open with the module on and the code that opens its Team (membership:read)', () => {
+    hold(['membership:read']);
     expect(renderHook(() => useUsersRoomOpen()).result.current).toBe(true);
   });
 
-  it('is shut without role:read — a Viewer keeps the Settings panels', () => {
-    hold(['membership:read']);
+  it('is shut without membership:read — the Settings panels stay', () => {
+    hold(['role:read', 'organization:read']);
     expect(renderHook(() => useUsersRoomOpen()).result.current).toBe(false);
   });
 

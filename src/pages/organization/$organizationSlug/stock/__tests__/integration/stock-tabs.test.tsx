@@ -273,7 +273,7 @@ describe('Clinic stock gates — the member’s own codes (api-integration §5.6
     expect(actionsOf('vendors', 'Ibreia')).toEqual(['edit']);
   });
 
-  it('View-as previews the role’s matrix, not the member’s codes', async () => {
+  it('an Accountant reads the stock and changes nothing', async () => {
     await openTab('items', { role: 'accountant' });
     expect(screen.queryByTestId('stock-items-new')).not.toBeInTheDocument();
     expect(actionsOf('items', 'Soframycin')).toEqual(['edit']);

@@ -72,7 +72,7 @@ describe('usePatientsDialogRoute (D24, S:31)', () => {
 
   it('refuses a create link without Create: back to the list, with the permission toast once', async () => {
     const { router } = renderPatientsRoutes(`${PATIENTS}/create`, Probe, {
-      role: 'therapist',
+      role: 'marketing',
     });
     await waitFor(() => expect(router.state.location.pathname).toBe(PATIENTS));
     expect(read()).toEqual({ kind: 'none' });

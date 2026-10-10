@@ -27,7 +27,10 @@ function role(id: string, name: string): RoleSummary {
     description: '',
     permissions: [],
     memberCount: 0,
-    isSystem: name.toLowerCase() === 'owner',
+    isSystem: name === 'Owner',
+    isLocked: false,
+    tone: 'sky',
+    updatedAt: '2026-01-01T00:00:00.000Z',
   };
 }
 
@@ -101,9 +104,9 @@ describe('InviteMemberDialog', () => {
     expect(screen.queryByTestId('invite-member-submit')).not.toBeInTheDocument();
   });
 
-  it('submits the email + selected role_id (the org has real roles)', async () => {
+  it('submits the email + the picked role as role_ids (the org has real roles)', async () => {
     // Regression: the form used to submit a hardcoded role NAME to a
-    // non-existent /invitations endpoint. It must post a real role_id.
+    // non-existent /invitations endpoint. It must post real role ids.
     useRolesMock.mockReturnValue(
       rolesResult([role('rol_owner', 'Owner'), role('rol_mem', 'Member')]),
     );
@@ -112,12 +115,14 @@ describe('InviteMemberDialog', () => {
 
     await screen.findByTestId('invite-member-form');
     await user.type(screen.getByTestId('invite-member-email'), 'new@x.test');
+    await user.click(screen.getByTestId('invite-member-role'));
+    await user.click(await screen.findByRole('option', { name: 'Member' }));
     await user.click(screen.getByTestId('invite-member-submit'));
 
     await waitFor(() =>
       expect(inviteMutate).toHaveBeenCalledWith({
         email: 'new@x.test',
-        roleId: 'rol_mem',
+        roleIds: ['rol_mem'],
       }),
     );
   });
@@ -182,31 +187,21 @@ describe('InviteMemberDialog', () => {
     expect(screen.queryByTestId('invite-member-roles-error')).not.toBeInTheDocument();
   });
 
-  // ── Least-privilege default ───────────────────────────────────────────────
+  // ── No default role ──────────────────────────────────────────────────────
 
-  it('opens on Member, not on whatever the roster sorts first', async () => {
-    // Regression: the field defaulted to `invitableRoles[0]`, and every
-    // organization this app provisions sorts `Admin` first — so the quiet path
-    // through the dialog handed a new teammate admin rights.
+  it('opens on no role, not on whatever the roster sorts first', async () => {
+    // Regression: the field defaulted to `invitableRoles[0]`, and every clinic
+    // this app provisions sorts `Admin` first — so the quiet path through the
+    // dialog handed a new teammate admin rights. The presets each carry a clinic
+    // job, so the inviter picks one.
     useRolesMock.mockReturnValue(
-      rolesResult([
-        role('rol_admin', 'Admin'),
-        role('rol_mem', 'Member'),
-        role('rol_view', 'Viewer'),
-      ]),
+      rolesResult([role('rol_admin', 'Admin'), role('rol_doc', 'Doctor')]),
     );
     await open();
 
-    expect(await screen.findByTestId('invite-member-role')).toHaveTextContent('Member');
-  });
-
-  it('falls back to Viewer when the organization has no Member role', async () => {
-    useRolesMock.mockReturnValue(
-      rolesResult([role('rol_admin', 'Admin'), role('rol_view', 'Viewer')]),
-    );
-    await open();
-
-    expect(await screen.findByTestId('invite-member-role')).toHaveTextContent('Viewer');
+    const trigger = await screen.findByTestId('invite-member-role');
+    expect(trigger).not.toHaveTextContent('Admin');
+    expect(trigger).not.toHaveTextContent('Doctor');
   });
 
   it('preselects nothing — and says so — when only custom roles exist', async () => {

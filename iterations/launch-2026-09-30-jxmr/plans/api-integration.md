@@ -427,6 +427,18 @@ Paths drop `/api/v1`. "Gap Gn" points into §8, "Mn" into §9, "Qn" into §10.
 - **Removed:** §6 #12, #13, #14 (already absent), #15 (relabel).
 - **Gaps:** G5 (presence and last active of other members; stable role keys).
 - **Gate:** `membership:*`, `role:*`, `branch:*`.
+- **Users room (D157, AS-BUILT #105):** built as above with these outcomes — the Team reads every
+  page of the memberships, which carry the clinic details (the staff-profile fixture is gone); New
+  user is one `POST` with every role (main first) and no Name; an edit is one `PATCH` of what
+  changed with `expected_updated_at`; Resend and cancel act on the membership; removal sends the
+  reason. Access is the codes alone — the member's, or under View-as the previewed role's, read by
+  its id — so the preset matrix is gone and View-as previews custom roles too. Roles & access is
+  sixteen resource rows, Special permissions (eight exports, three reads) and Workspace permissions,
+  each change one optimistic whole-set `PUT`; Owner and Admin locked; a role holding a code the
+  caller lacks stays read-only ("beyond your access"). Branches read `include_inactive=true`; New
+  branch posts its team; an edit writes the team (`PUT …/members`) and then the fields; the API's
+  required fields; Main read-only; no delete (Status "Closed"). Each tab by its own read code; the
+  URL's `?role=` is a role id. Users leaves `FIXTURE_BACKED_CLINIC_MODULES`.
 
 ### 5.11 Sign-in and the shell
 

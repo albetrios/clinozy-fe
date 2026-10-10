@@ -104,7 +104,8 @@
       "colour": "utilisée sur ses badges",
       "roles": "un ou plusieurs · les accès s’additionnent",
       "branches": "où il ou elle travaille",
-      "days": "Les rendez-vous ne proposent que ces jours"
+      "days": "Les rendez-vous ne proposent que ces jours",
+      "name": "défini par la personne dans son profil"
     },
     "placeholders": {
       "name": "Nom complet, p. ex. Dr Nisha Mavani",
@@ -118,7 +119,7 @@
     "increase": "Augmenter",
     "pickRole": "Choisir un rôle",
     "statusOn": "Actif · peut se connecter",
-    "statusOff": "Inactif · déconnecté",
+    "statusOff": "Inactif · ne peut pas utiliser cette clinique",
     "resend": "Renvoyer l’invitation",
     "quickFill": {
       "doctor": "Médecin · 10:00–19:00",
@@ -132,7 +133,7 @@
       "edit": "Enregistrer les modifications",
       "createAnother": "Créer et en ajouter un autre"
     },
-    "missing": "Ajoutez un nom et un e-mail",
+    "missing": "Ajoutez son e-mail",
     "noRole": "Choisissez au moins un rôle",
     "emailInvalid": "Saisissez une adresse e-mail valide",
     "mobileInvalid": "Le mobile doit comporter 10 chiffres",
@@ -196,65 +197,51 @@
         "create": "{{role}} peut créer · {{section}}",
         "edit": "{{role}} peut modifier · {{section}}",
         "delete": "{{role}} peut supprimer · {{section}}"
-      }
-    },
-    "abilities": {
-      "title": "Autorisations spéciales",
-      "disc": {
-        "label": "Facturer sous le prix de l’offre",
-        "description": "Remise au-delà du prix de l’offre, jamais sous le prix plancher"
       },
-      "floor": {
-        "label": "Voir le prix plancher",
-        "description": "Affiche le prix plancher masqué sur les prestations et les factures"
-      },
-      "prices": {
-        "label": "Modifier les prix et les offres",
-        "description": "Modifier les prix catalogue et d’offre, et créer des offres"
-      },
-      "dayclose": {
-        "label": "Clôturer la journée",
-        "description": "Compter la caisse et verrouiller la journée dans Paiements"
-      },
-      "reverse": {
-        "label": "Annuler des paiements réglés",
-        "description": "Revenir sur un encaissement après la clôture de sa journée"
-      },
-      "refund": {
-        "label": "Remboursements et avoirs",
-        "description": "Rendre de l’argent à un patient ou émettre un avoir"
-      },
-      "void": {
-        "label": "Annuler des ventes et supprimer des factures",
-        "description": "Annuler une vente en Pharmacie ou supprimer une facture impayée"
-      },
-      "allbr": {
-        "label": "Voir tous les établissements",
-        "description": "Basculer l’en-tête vers d’autres établissements et Tous les établissements"
-      },
-      "clinical": {
-        "label": "Lire les notes cliniques",
-        "description": "Ouvrir les motifs, diagnostics, ordonnances et photos"
-      },
-      "export": {
-        "label": "Exporter les listes",
-        "description": "Télécharger n’importe quel tableau"
-      },
-      "perms": {
-        "label": "Modifier les rôles et l’accès",
-        "description": "Modifier les rôles, l’accès et les établissements"
+      "notApplicable": "Ne s’applique pas à cette ligne",
+      "resources": {
+        "contact": {
+          "label": "Contacts",
+          "description": "Les personnes derrière les prospects et les patients"
+        },
+        "contact_activity": {
+          "label": "Messages et notes",
+          "description": "WhatsApp, appels et notes d’équipe"
+        },
+        "patient_prescription": {
+          "label": "Ordonnances",
+          "description": "Rédiger et valider l’ordonnance"
+        },
+        "patient_treatment": {
+          "label": "Traitements",
+          "description": "Les séances et leur déroulé"
+        },
+        "patient_review": {
+          "label": "Avis",
+          "description": "Avis Google et vidéo · lus avec le patient"
+        },
+        "role": {
+          "label": "Rôles",
+          "description": "Rôles et accès"
+        },
+        "branch": {
+          "label": "Sites",
+          "description": "Les sites et qui y travaille"
+        }
       }
     },
     "notes": {
       "admin": "Les administrateurs peuvent tout faire · ce rôle ne peut pas être restreint.",
-      "readOnly": "Vous pouvez voir les rôles ici. Pour les modifier, il faut « Modifier les rôles et l’accès ».",
-      "live": "Les changements s’appliquent immédiatement à toutes les personnes ayant ce rôle. Une personne avec deux rôles obtient tout ce que l’un ou l’autre permet."
+      "readOnly": "Vous voyez les rôles ici. Les modifier nécessite « Mettre à jour les rôles ».",
+      "live": "Les changements s’appliquent immédiatement à toutes les personnes ayant ce rôle. Une personne avec deux rôles obtient tout ce que l’un ou l’autre permet.",
+      "beyond": "Ce rôle a des accès que vous n’avez pas · seule une personne qui les a peut le modifier."
     },
     "locked": {
       "admin": "Les administrateurs ont toujours un accès complet",
       "noPerms": "Vous ne pouvez pas modifier les rôles · demandez à un administrateur",
       "noAdd": "Vous ne pouvez pas ajouter de rôles · demandez à un administrateur",
-      "platform": "{{productName}} gère l’accès Utilisateurs de ce rôle · il ne peut pas être modifié ici"
+      "beyond": "Ce rôle a des accès que vous n’avez pas · demandez à un administrateur",
+      "notYours": "Vous ne pouvez donner que les accès que vous avez"
     },
     "added": "Rôle ajouté · nommez-le et choisissez ce qu’il peut faire",
     "newRoleName": "Nouveau rôle",
@@ -270,8 +257,26 @@
       "title": "Autorisations de l’espace de travail",
       "hint": "Paramètres, intégrations, facturation et journal d’audit — au-delà des sections ci-dessus. Vous ne pouvez accorder que ce que vous avez vous-même.",
       "none": "Vous n’avez rien d’autre à accorder à ce rôle.",
-      "loadFailed": "Impossible de charger les autorisations de l’espace de travail.",
-      "locked": "{{productName}} gère les autorisations de l’espace de travail de ce rôle · elles ne peuvent pas être modifiées ici"
+      "loadFailed": "Impossible de charger les autorisations de l’espace de travail."
+    },
+    "specials": {
+      "title": "Autorisations spéciales",
+      "floor": {
+        "label": "Voir le prix plancher",
+        "description": "Affiche le prix plancher masqué sur les prestations et les factures"
+      },
+      "clinical": {
+        "label": "Lire les notes cliniques",
+        "description": "Ouvre les plaintes, le diagnostic, les notes, les photos et les rapports"
+      },
+      "export": {
+        "label": "Exporter · {{section}}",
+        "description": "Télécharger son tableau"
+      },
+      "privateAlbum": {
+        "label": "Voir l’album privé",
+        "description": "Ouvre les photos privées du dossier patient"
+      }
     }
   },
   "branches": {
@@ -366,7 +371,8 @@
           "desk": "ajoutez d’abord une personne de l’accueil à l’équipe",
           "therapist": "ajoutez d’abord un thérapeute à l’équipe",
           "pharmacist": "ajoutez d’abord un pharmacien à l’équipe"
-        }
+        },
+        "main": "un par clinique · défini à l’ouverture"
       },
       "toggles": {
         "mainOn": "Principal · siège",
@@ -381,16 +387,14 @@
         "edit": "Enregistrer l’établissement"
       },
       "nameMissing": "Nommez l’établissement",
-      "addressMissing": "Ajoutez l’adresse",
+      "addressMissing": "Ajoutez l’adresse, le quartier, la ville et le code PIN",
       "duplicate": "Un établissement nommé {{name}} existe déjà",
       "phoneInvalid": "Le téléphone doit comporter 10 chiffres",
       "emailInvalid": "Saisissez une adresse e-mail valide",
       "added": "Établissement {{name}} ajouté",
-      "saved": "{{name}} enregistré"
-    },
-    "deleteBranch": {
-      "title": "Supprimer cet établissement ?",
-      "removed": "{{name}} supprimé"
+      "saved": "{{name}} enregistré",
+      "contactMissing": "Ajoutez le téléphone et l’e-mail",
+      "pinInvalid": "Le code PIN doit comporter 6 chiffres"
     }
   }
 }

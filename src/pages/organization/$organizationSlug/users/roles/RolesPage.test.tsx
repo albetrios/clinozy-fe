@@ -2,8 +2,6 @@ import { screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { resetClinicAccessFixture } from '@/shared/api/clinic/access-api.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import type * as OrganizationApiModule from '@/shared/api/organization-api.ts';
 
 import {
@@ -32,8 +30,6 @@ vi.mock('@/shared/api/organization-api.ts', async (importOriginal) => ({
 }));
 
 beforeEach(() => {
-  resetClinicFixtures();
-  resetClinicAccessFixture();
   api.listMembers.mockResolvedValue({
     rows: [member('riya', SELF.email, PLATFORM_ROLES.admin, { userId: SELF.userId })],
     next: null,
@@ -46,14 +42,10 @@ beforeEach(() => {
   });
   api.getRolePermissions.mockResolvedValue(['organization:read']);
 });
-afterEach(() => {
-  resetUsersRoutes();
-  resetClinicFixtures();
-  resetClinicAccessFixture();
-});
+afterEach(() => resetUsersRoutes());
 
 describe('RolesPage (users/roles, S:107)', () => {
-  it('is the Roles & access tab, on Front desk until the URL names a role', async () => {
+  it('is the Roles & access tab, on Front desk until the URL names a role by its id', async () => {
     const { container } = renderUsersRoutes('/organization/acme/users/roles', vi.fn(), {
       Roles: RolesPage,
     });
@@ -74,16 +66,17 @@ describe('RolesPage (users/roles, S:107)', () => {
     expect(await axe(container)).toHaveNoViolations();
   });
 
-  it('opens the role the URL names', async () => {
-    renderUsersRoutes('/organization/acme/users/roles?role=accountant', vi.fn(), {
-      Roles: RolesPage,
-    });
+  it('opens the role the URL names by its id', async () => {
+    renderUsersRoutes(
+      `/organization/acme/users/roles?role=${PLATFORM_ROLES.accountant.id}`,
+      vi.fn(),
+      { Roles: RolesPage },
+    );
     expect(
       await screen.findByRole('heading', { level: 2, name: 'Accountant' }),
     ).toBeInTheDocument();
-    expect(screen.getByTestId('users-roles-item-accountant')).toHaveAttribute(
-      'aria-current',
-      'true',
-    );
+    expect(
+      screen.getByTestId(`users-roles-item-${PLATFORM_ROLES.accountant.id}`),
+    ).toHaveAttribute('aria-current', 'true');
   });
 });

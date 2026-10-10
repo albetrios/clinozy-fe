@@ -49,13 +49,25 @@ const userWire = z.object({
   team_organizations: z.boolean().optional(),
 });
 
+/** One of the caller's roles as me/context names it (any member may read their own). */
+const myRoleWire = z.object({
+  id: z.string(),
+  name: z.string(),
+  tone: z.string(),
+  is_system: z.boolean(),
+});
+
 /** Wire shape of the `GET /auth/me/context` response `data` (snake_case). */
 export const meContextWire = z.object({
   user: userWire,
   active_organization: organizationWire.nullable(),
+  /** The caller's own membership in the active organization; null without one (N10). */
+  membership_id: z.string().nullable().optional(),
   // Permission codes are kept as plain strings — forward-compatible with new
   // codes the FE enum may not yet know (RBAC matches by string membership).
   my_permissions: z.array(z.string()),
+  /** The caller's roles in the active organization, the main role first, each named. */
+  my_roles: z.array(myRoleWire).optional(),
   global_role: z.enum(['super_admin', 'user']).nullable(),
 });
 export type MeContextWire = z.infer<typeof meContextWire>;
@@ -92,10 +104,23 @@ export interface MeUser {
   createdAt: string;
   updatedAt: string;
 }
+/** One of the caller's roles in the active organization. */
+export interface MyRole {
+  id: string;
+  name: string;
+  tone: string;
+  /** A preset the clinic was provisioned with — its name never changes. */
+  isSystem: boolean;
+}
+
 export interface MeContext {
   user: MeUser;
   activeOrganization: OrganizationSummary | null;
+  /** The caller's own membership (`mem_…`) in the active organization; null without one. */
+  membershipId: string | null;
   myPermissions: string[];
+  /** The caller's roles in the active organization, the main role first; `[]` without one. */
+  myRoles: MyRole[];
   globalRole: GlobalRole | null;
   /** Deployment-wide toggles (personal / team orgs enabled for this install). */
   deploymentFlags: DeploymentFlags;
@@ -142,7 +167,14 @@ export function toMeContext(wire: MeContextWire): MeContext {
     activeOrganization: wire.active_organization
       ? toOrganization(wire.active_organization)
       : null,
+    membershipId: wire.membership_id ?? null,
     myPermissions: wire.my_permissions,
+    myRoles: (wire.my_roles ?? []).map((role) => ({
+      id: role.id,
+      name: role.name,
+      tone: role.tone,
+      isSystem: role.is_system,
+    })),
     globalRole: wire.global_role,
     deploymentFlags,
     personalOrganizationId: wire.user.personal_organization_id ?? null,

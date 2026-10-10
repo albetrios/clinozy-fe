@@ -16,7 +16,6 @@ vi.mock('../shared/stock-records-api.ts', async (importOriginal) => ({
   restoreStockItem: vi.fn(),
   logStockMovement: vi.fn(),
 }));
-import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { stockItemRow, TEST_STOCK_ITEM_ID } from '@/tests/utils/stock-doubles.ts';
@@ -24,6 +23,7 @@ import { stockItemRow, TEST_STOCK_ITEM_ID } from '@/tests/utils/stock-doubles.ts
 import {
   renderStockRoutes,
   resetStockRoutes,
+  type StockTestMember,
 } from '../__tests__/integration/stock-test-router.tsx';
 import { useStockDeleteBlockText } from '../shared/components/StockDeleteConfirm/index.ts';
 import { useStockAccess } from '../shared/hooks/useStockAccess/index.ts';
@@ -104,8 +104,11 @@ function ItemsTab() {
 }
 
 /** The Items tab at `url` for `role`, once its rows are listed and the access is known. */
-async function openItems(url = '/organization/acme/stock/items', role: Role = 'admin') {
-  const view = renderStockRoutes(url, { items: ItemsTab }, { role });
+async function openItems(
+  url = '/organization/acme/stock/items',
+  member: StockTestMember = { role: 'admin' },
+) {
+  const view = renderStockRoutes(url, { items: ItemsTab }, member);
   await waitFor(() =>
     expect(screen.getAllByTestId('stock-items-table-row')).toHaveLength(ROWS.length),
   );
@@ -178,7 +181,7 @@ describe('ItemsPage (clinic-stock.md:25–39)', () => {
   });
 
   it('a Pharmacist (create, update) moves stock but deletes nothing', async () => {
-    await openItems(undefined, 'pharmacist');
+    await openItems(undefined, { role: 'pharmacist' });
     const row = rowNamed('Soframycin');
     expect(row.getByTestId('stock-items-row-action-use')).toBeInTheDocument();
     expect(row.getByTestId('stock-items-row-action-adjust')).toBeInTheDocument();
@@ -186,16 +189,18 @@ describe('ItemsPage (clinic-stock.md:25–39)', () => {
   });
 
   it('without update, a row offers Edit alone (read-only) — "+ New item" only with create', async () => {
-    const therapist = await openItems(undefined, 'therapist');
+    const creator = await openItems(undefined, {
+      permissions: ['organization:read', 'stock_item:read', 'stock_item:create'],
+    });
     let row = rowNamed('Soframycin');
     expect(row.queryByTestId('stock-items-row-action-use')).not.toBeInTheDocument();
     expect(row.queryByTestId('stock-items-row-action-receive')).not.toBeInTheDocument();
     expect(row.getByTestId('stock-items-row-action-edit')).toBeInTheDocument();
     expect(screen.getByTestId('stock-items-new')).toBeInTheDocument();
-    therapist.unmount();
+    creator.unmount();
     resetStockRoutes();
 
-    await openItems(undefined, 'accountant');
+    await openItems(undefined, { role: 'accountant' });
     row = rowNamed('Soframycin');
     expect(row.queryByTestId('stock-items-row-action-use')).not.toBeInTheDocument();
     expect(row.getByTestId('stock-items-row-action-edit')).toBeInTheDocument();

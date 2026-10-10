@@ -143,7 +143,7 @@ function PermissionChecklist({
  * "New role" trigger (a fresh org has only the system Owner role, so this is the
  * entry point for the Admin/Member/Viewer roles that make inviting possible). In
  * **edit** mode (`role` given) it is controlled by the parent — no trigger — and
- * saves via `useUpdateRole`. Gated by the caller (render only for `role:manage`).
+ * saves via `useUpdateRole`. Gated by the caller (render only for `role:create`, or `role:update` to edit).
  */
 export function CreateRoleDialog({
   role,

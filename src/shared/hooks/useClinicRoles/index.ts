@@ -1,9 +1,6 @@
 export {
-  type ClinicRoleResult,
   type ClinicRolesResult,
-  type RoleCodesWrite,
-  useClinicRole,
   useClinicRoles,
-  useUpdateRoleCodes,
-  useUpdateRoleMatrix,
+  useRoleLabel,
+  useRolesInForce,
 } from './useClinicRoles.ts';

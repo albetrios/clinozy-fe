@@ -36,13 +36,13 @@ const GUARDS = {
   'members:manage': gateway(
     requireSession,
     requirePermissionGate('membership:read'),
-    requirePermissionGate('membership:manage'),
+    requirePermissionGate('membership:update'),
   ),
   'today-manifest': gatewayFromManifest(todayManifest),
 } as const;
 
 type GuardName = keyof typeof GUARDS;
-type Perm = 'membership:read' | 'membership:manage' | 'organization:read';
+type Perm = 'membership:read' | 'membership:update' | 'organization:read';
 
 interface UserState {
   name: string;
@@ -64,7 +64,7 @@ const STATES: UserState[] = [
   {
     name: 'admin',
     authed: true,
-    perms: ['membership:read', 'membership:manage', 'organization:read'],
+    perms: ['membership:read', 'membership:update', 'organization:read'],
     todayEnabled: true,
   },
   {
@@ -85,7 +85,7 @@ function expectedReachable(state: UserState, guard: GuardName): boolean {
   }
   const canRead = state.perms.includes('membership:read');
   if (guard === 'members:read') return canRead;
-  return canRead && state.perms.includes('membership:manage');
+  return canRead && state.perms.includes('membership:update');
 }
 
 function applyState(state: UserState) {

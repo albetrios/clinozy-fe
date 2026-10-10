@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 
-import { CLINIC_ROLE_CATALOG } from '@/shared/api/clinic/access-contracts.ts';
 import { TEAM_SORT_KEYS as CONTRACT_SORT_KEYS } from '@/shared/api/clinic/users-contracts.ts';
 
 import {
@@ -10,13 +9,15 @@ import {
 } from './users.search.ts';
 
 const ID = '7d3f5a8e-1b2c-4d5e-8f90-123456789abc';
+/** A role's clinozy-be id — a preset's and a custom role's look alike. */
+const ROLE = 'rol_abcdefghij0123456789k';
 
 describe('validateUsersSearch', () => {
   it('keeps every value the Team can read', () => {
     expect(
       validateUsersSearch({
         q: '  #12 ',
-        role: 'front_desk',
+        role: ROLE,
         branch: [ID],
         status: 'active,inactive',
         created: 'last_7',
@@ -24,7 +25,7 @@ describe('validateUsersSearch', () => {
       }),
     ).toEqual({
       q: '#12',
-      role: 'front_desk',
+      role: ROLE,
       branch: [ID],
       status: ['active', 'inactive'],
       created: 'last_7',
@@ -32,15 +33,11 @@ describe('validateUsersSearch', () => {
     });
   });
 
-  it('reads every catalog role and a custom role’s id, never Owner or a stray value', () => {
-    for (const role of CLINIC_ROLE_CATALOG) {
-      expect(validateUsersSearch({ role }).role).toBe(role);
+  it('reads a role by its id — never a preset key or a stray value', () => {
+    expect(validateUsersSearch({ role: ROLE }).role).toBe(ROLE);
+    for (const role of ['front_desk', 'owner', 'rol_short']) {
+      expect(validateUsersSearch({ role }).role).toBeUndefined();
     }
-    expect(validateUsersSearch({ role: 'rol_abcdefghij0123456789k' }).role).toBe(
-      'rol_abcdefghij0123456789k',
-    );
-    expect(validateUsersSearch({ role: 'owner' }).role).toBeUndefined();
-    expect(validateUsersSearch({ role: 'rol_short' }).role).toBeUndefined();
   });
 
   it('drops what the URL can’t hold — never an error', () => {
@@ -72,12 +69,9 @@ describe('validateUsersSearch', () => {
 });
 
 describe('validateRolesSearch', () => {
-  it('keeps a role the page can show and drops anything else', () => {
-    expect(validateRolesSearch({ role: 'counsellor' })).toEqual({ role: 'counsellor' });
-    expect(validateRolesSearch({ role: 'rol_abcdefghij0123456789k' })).toEqual({
-      role: 'rol_abcdefghij0123456789k',
-    });
-    expect(validateRolesSearch({ role: 'owner' })).toEqual({ role: undefined });
+  it('keeps a role the page can show, by its id, and drops anything else', () => {
+    expect(validateRolesSearch({ role: ROLE })).toEqual({ role: ROLE });
+    expect(validateRolesSearch({ role: 'counsellor' })).toEqual({ role: undefined });
     expect(validateRolesSearch({})).toEqual({ role: undefined });
   });
 });

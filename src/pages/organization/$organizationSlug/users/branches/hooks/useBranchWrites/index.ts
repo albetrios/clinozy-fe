@@ -1,5 +1,1 @@
-export {
-  type BranchRemoveVars,
-  useRemoveBranch,
-  useSaveBranch,
-} from './useBranchWrites.ts';
+export { useSaveBranch } from './useBranchWrites.ts';

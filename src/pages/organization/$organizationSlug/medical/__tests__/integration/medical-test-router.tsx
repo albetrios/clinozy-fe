@@ -14,6 +14,7 @@ import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { PRESET_CODES } from '@/tests/utils/clinic-preset-codes.ts';
 
 import { validateMedicalCreateSearch } from '../../medical.dialog-search.ts';
 import {
@@ -43,17 +44,15 @@ export type MedicalTestTab = keyof typeof TAB_DIALOGS;
 /**
  * The Medical family as `routeTree.tsx` registers it — every tab with the
  * room's search schema and its dialog routes, which render nothing — with
- * `pages[tab]` as each tab's component, opened at `url`, for a member
- * previewed as `role` (View-as narrows the clinic access to that role's
- * matrix). Every other path lands on a catch-all.
+ * `pages[tab]` as each tab's component, opened at `url`, for a member holding
+ * the `role` preset's codes. Every other path lands on a catch-all.
  */
 export function renderMedicalRoutes(
   url: string,
   pages: Partial<Record<MedicalTestTab, () => ReactNode>>,
   { role = 'admin' }: { role?: Role } = {},
 ) {
-  useOrganizationStore.getState().setPermissions(['organization:read']);
-  useUIStore.setState({ previewRole: role });
+  useOrganizationStore.getState().setPermissions([...PRESET_CODES[role]]);
 
   const root = createRootRoute({ component: () => <Outlet /> });
   const medical = createRoute({
@@ -107,15 +106,14 @@ const testQueryClient = () =>
 
 /**
  * One Medical drawer (or any part of the room outside a tab's route) for a
- * member previewed as `role`, with the router, query client and tooltips the
+ * member holding the `role` preset's codes, with the router, query client and tooltips the
  * room's shell provides — a drawer's dirty guard reads the router.
  */
 export function renderMedicalDrawer(
   ui: ReactNode,
   { role = 'admin' }: { role?: Role } = {},
 ) {
-  useOrganizationStore.getState().setPermissions(['organization:read']);
-  useUIStore.setState({ previewRole: role });
+  useOrganizationStore.getState().setPermissions([...PRESET_CODES[role]]);
   const queryClient = testQueryClient();
   const root = createRootRoute({
     component: () => <TooltipProvider>{ui}</TooltipProvider>,

@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type { ClinicRoleView } from '@/shared/api/clinic/access-contracts.ts';
 import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
+import type { RoleSummary } from '@/shared/api/organization-contracts.ts';
 import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
 import { PersonAvatar } from '@/shared/components/Cells/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
@@ -15,7 +15,7 @@ const AVATARS = 3;
 
 /** One role in the list, with what it shows. */
 export interface RoleListItem {
-  role: ClinicRoleView;
+  role: RoleSummary;
   label: string;
   holders: readonly TeamMember[];
 }
@@ -34,7 +34,7 @@ export function RoleList({
 }: {
   items: readonly RoleListItem[];
   selected: string | undefined;
-  onSelect: (role: ClinicRoleView) => void;
+  onSelect: (role: RoleSummary) => void;
 }) {
   const { t } = useTranslation(USERS_NS);
   const { formatNumber } = useLocaleFormat();
@@ -48,16 +48,16 @@ export function RoleList({
         {t(USERS_KEYS.roles.label)}
       </span>
       {items.map(({ role, label, holders }) => {
-        const current = role.key === selected;
+        const current = role.id === selected;
         const shown = holders.slice(0, AVATARS);
         const more = holders.length - shown.length;
         return (
           <button
-            key={role.key}
+            key={role.id}
             type="button"
             aria-current={current || undefined}
             onClick={() => onSelect(role)}
-            data-testid={`users-roles-item-${role.key}`}
+            data-testid={`users-roles-item-${role.id}`}
             className={cn(
               'flex items-center gap-2.5 rounded-lg border px-2.5 py-2 text-start transition-colors duration-150',
               current

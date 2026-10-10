@@ -80,7 +80,7 @@ describe('useStaffLookup', () => {
       initials: 'RS',
       tone: 'blush',
     });
-    expect(findMyMembershipId).toHaveBeenCalledWith('usr_test');
+    expect(findMyMembershipId).toHaveBeenCalled();
   });
 
   it('knows nobody for no id, or someone no longer on the team', async () => {

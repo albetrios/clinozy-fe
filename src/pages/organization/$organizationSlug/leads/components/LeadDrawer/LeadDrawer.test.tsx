@@ -62,12 +62,10 @@ vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
 const access = vi.hoisted(() => ({ book: true, tasks: true }));
 vi.mock('@/shared/hooks/useClinicAccess/index.ts', () => ({
   useClinicAccess: () => ({
-    roles: ['admin'],
     previewRole: null,
     can: (section: string) =>
       (section !== 'appointments' || access.book) &&
       (section !== 'tasks' || access.tasks),
-    canAbility: () => true,
     canCode: () => true,
     viewableSections: [],
     isResolved: true,

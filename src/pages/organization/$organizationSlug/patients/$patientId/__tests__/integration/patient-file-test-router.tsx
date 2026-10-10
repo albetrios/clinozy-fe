@@ -11,6 +11,7 @@ import {
 import { render } from '@testing-library/react';
 import type { ReactNode } from 'react';
 
+import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import type { PatientFile } from '@/shared/api/clinic/patient-file-contracts.ts';
 import {
@@ -20,6 +21,7 @@ import {
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { PRESET_CODES } from '@/tests/utils/clinic-preset-codes.ts';
 import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import { EditCheckInPage } from '../../check-ins/$checkInId/edit/EditCheckInPage.tsx';
@@ -66,15 +68,20 @@ export function patientFileUrl(patientId: string, rest = ''): string {
  * The patient file as `routeTree.tsx` registers it — the layout with its
  * search schema, the eleven sections, Edit patient, the index and unknown
  * sections going to the Overview — opened at `url`, for the test member
- * (`signInTestMember`: organization `org_test`, slug `acme`) previewed as
- * `role` (View-as narrows the clinic access to that role's matrix). The
+ * (`signInTestMember`: organization `org_test`, slug `acme`) holding the
+ * `role` preset's codes — or exactly `codes`. The
  * Patients list and every other path land on stand-ins, so a test can read
  * where a link went.
  */
-export function renderPatientFile(url: string, { role = 'admin' }: { role?: Role } = {}) {
+export function renderPatientFile(
+  url: string,
+  {
+    role = 'admin',
+    codes = PRESET_CODES[role],
+  }: { role?: Role; codes?: readonly OrganizationPermission[] } = {},
+) {
   signInTestMember();
-  useOrganizationStore.getState().setPermissions(['organization:read']);
-  useUIStore.setState({ previewRole: role });
+  useOrganizationStore.getState().setPermissions([...codes]);
 
   const root = createRootRoute({ component: () => <Outlet /> });
   const file = createRoute({
@@ -202,6 +209,8 @@ export function renderPatientFile(url: string, { role = 'admin' }: { role?: Role
 /** What {@link renderInPatientFile} puts in the file's context. */
 export interface InPatientFileOptions {
   role?: Role;
+  /** Exactly these codes instead of the `role` preset's. */
+  codes?: readonly OrganizationPermission[];
   /** The file's read (`fetchPatientFile`); undefined while "loading". */
   file?: PatientFile;
   section?: PatientFileSectionSlug | null;
@@ -214,13 +223,14 @@ export interface InPatientFileOptions {
 /**
  * One part of the file — a section, a hook's probe — rendered inside the
  * file's context at `…/patients/<file's patient>/<section>`, for the test
- * member previewed as `role`. Any other URL lands on a stand-in, so a test can read
+ * member holding the `role` preset's codes (or exactly `codes`). Any other URL lands on a stand-in, so a test can read
  * where a link went from `router.state.location`.
  */
 export function renderInPatientFile(
   ui: ReactNode,
   {
     role = 'admin',
+    codes = PRESET_CODES[role],
     file,
     section = 'visits',
     viewable = PATIENT_FILE_SECTIONS,
@@ -230,8 +240,7 @@ export function renderInPatientFile(
   }: InPatientFileOptions = {},
 ) {
   signInTestMember();
-  useOrganizationStore.getState().setPermissions(['organization:read']);
-  useUIStore.setState({ previewRole: role });
+  useOrganizationStore.getState().setPermissions([...codes]);
   const patientId = file?.patient.id ?? 'patient';
 
   const root = createRootRoute({ component: () => <Outlet /> });

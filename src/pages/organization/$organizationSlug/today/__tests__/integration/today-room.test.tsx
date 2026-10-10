@@ -19,6 +19,7 @@ import { notify } from '@/shared/notify/index.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 import type * as MyMembershipModule from '@/shared/tenancy/my-membership.ts';
+import { previewPreset } from '@/tests/utils/clinic-preset-codes.ts';
 
 import { TodayPage } from '../../TodayPage.tsx';
 import {
@@ -51,6 +52,8 @@ vi.mock('@/shared/notify/index.ts', () => ({
 const floor = vi.hoisted(() => {
   const state = {
     failing: false,
+    /** How many times the floor was read. */
+    reads: 0,
     rows: [] as TodayFloorRow[],
     enquiries: [] as TodayEnquiry[],
     /** Apply a move to one row of the floor. */
@@ -63,6 +66,7 @@ const floor = vi.hoisted(() => {
 vi.mock('@/shared/api/clinic/today-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof TodayApiModule>()),
   fetchTodayFloor: async () => {
+    floor.reads += 1;
     if (floor.failing) throw new Error('connection dropped');
     return structuredClone(floor.rows);
   },
@@ -231,11 +235,6 @@ describe('the Today room (KICKOFF §6.2)', () => {
       'pharmacy',
     ],
     [
-      'accountant',
-      ['enquiries', 'arriving', 'waiting', 'with_doctor', 'treatment', 'pharmacy'],
-      'checkout',
-    ],
-    [
       'marketing',
       ['arriving', 'waiting', 'with_doctor', 'treatment', 'checkout', 'pharmacy'],
       'enquiries',
@@ -247,6 +246,24 @@ describe('the Today room (KICKOFF §6.2)', () => {
     await loaded();
     await waitFor(() => expect(dimmedLanes()).toEqual(dimmed));
     expect(panel()).toHaveAttribute('data-lane', lane);
+  });
+
+  it('reads no floor for an Accountant — no appointment:read, so no 403 — and keeps Checkout in focus', async () => {
+    floor.reads = 0;
+    renderTodayRoute(TODAY_PATH, TodayPage, { role: 'accountant' });
+    await loaded();
+    await waitFor(() =>
+      expect(dimmedLanes()).toEqual([
+        'enquiries',
+        'arriving',
+        'waiting',
+        'with_doctor',
+        'treatment',
+        'pharmacy',
+      ]),
+    );
+    expect(floor.reads).toBe(0);
+    expect(LANE_ORDER.map(countOf)).toEqual(['0', '0', '0', '0', '0', '0', '0']);
   });
 
   it('keeps the picked lane in the URL', async () => {
@@ -467,13 +484,16 @@ describe('the Today room (KICKOFF §6.2)', () => {
     expect(listTasks).not.toHaveBeenCalled();
   });
 
-  it('draws the queue read-only in a View-as preview — a preview holds no code', async () => {
-    renderTodayRoute(TODAY_PATH, TodayPage, { role: 'front_desk' });
+  it("answers a View-as preview from the previewed role's codes — an Accountant has no queue", async () => {
+    const { queryClient } = renderTodayRoute(TODAY_PATH, TodayPage, { role: 'owner' });
     await loaded();
     await waitFor(() =>
       expect(screen.getAllByTestId('today-queue-card')).toHaveLength(3),
     );
-    expect(screen.queryByTestId('today-queue-outcome')).not.toBeInTheDocument();
+    act(() => previewPreset(queryClient, 'accountant'));
+    await waitFor(() =>
+      expect(screen.queryByTestId('today-queue-card')).not.toBeInTheDocument(),
+    );
   });
 
   it('toasts a failed read with Retry and keeps what it has', async () => {

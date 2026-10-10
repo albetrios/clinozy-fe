@@ -5,7 +5,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import { fetchInvoiceTotals } from '@/shared/api/clinic/invoices-api.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 import {
   patientFile,
   TEST_CONTACT_ID,
@@ -88,10 +87,9 @@ const itemIds = () =>
     .map((button) => button.textContent)
     .filter(Boolean);
 
-/** End View-as: the member signed in, holding exactly these codes. */
+/** The member signed in, now holding exactly these codes. */
 function signedInWith(codes: OrganizationPermission[]) {
   act(() => {
-    useUIStore.setState({ previewRole: null });
     useOrganizationStore.getState().setPermissions(['organization:read', ...codes]);
   });
 }
@@ -141,13 +139,13 @@ describe('usePatientFileActions', () => {
     );
   });
 
-  it('gives a previewed Admin the Rx but not the treatment (S:35, 38; Owner always passes)', async () => {
+  it('gives an Admin the Rx and the treatment (S:35, 38)', async () => {
     renderInPatientFile(<ActionsProbe />, { file: patientFile() });
     await screen.findByRole('button', { name: 'prescription' });
-    expect(itemIds()).not.toContain('treatment');
+    expect(itemIds()).toContain('treatment');
   });
 
-  it('keeps the Rx and treatment items to their named roles in View-as (S:35, 38)', async () => {
+  it('keeps the Rx and treatment items from a Front desk, who holds neither code (S:35, 38)', async () => {
     renderInPatientFile(<ActionsProbe />, { file: patientFile(), role: 'front_desk' });
     await screen.findByRole('button', { name: 'appointment' });
     expect(itemIds()).toEqual([

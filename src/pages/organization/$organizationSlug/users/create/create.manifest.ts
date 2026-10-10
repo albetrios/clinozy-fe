@@ -5,7 +5,7 @@ import type { PageManifest } from '@/lib/routes/page-manifest.ts';
  * (`/organization/$organizationSlug/users/create`, `S:105`; KICKOFF §4, D24).
  * The route renders nothing: the Team page reads the URL and opens the user
  * drawer, which sends an invitation (D17). Same gates as the room; "New user"
- * itself needs `invitation:manage` and `membership:manage` (D47) — without
+ * itself needs `membership:create` and `role:read` (a role to give) — without
  * them the link lands back on the Team with the permission toast. The test id
  * names that drawer.
  */

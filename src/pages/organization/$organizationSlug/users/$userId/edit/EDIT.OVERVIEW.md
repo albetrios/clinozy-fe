@@ -8,11 +8,12 @@ someone removed — leaves the Team with "User not found · it may have been del
 (`S:115`). The `$userId` folder has no page of its own: the schema has no `/users/$userId`
 route.
 
-Edit writes the membership's role (`useUpdateMemberRole` — Admin when picked, else the main
-role's clinozy-be role, else Member; D47), its status (`useUpdateMemberStatus` — never the
-owner's or your own) and the staff profile. An invited member shows "Invitation expires …"
-with "Resend invitation"; Delete cancels the invitation instead (`useRevokeInvitation`). Gated
-like the room; without `membership:manage` the drawer is view only.
+Edit is one `PATCH` of what changed (`useUpdateMember`, with the read's `updated_at` — someone
+else's save first is a stale save with Reload): the roles, the status — never the owner's roles or
+status, nor your own status — and the clinic details. The name is read-only: it is the person's own.
+An invited member shows "Invitation expires …" with "Resend invitation" (an expired one too, by the
+membership, `membership:update`); Delete cancels the invitation instead (`useRevokeInvitation`,
+`membership:delete`). Gated like the room; without `membership:update` the drawer is view only.
 
 ## Files
 

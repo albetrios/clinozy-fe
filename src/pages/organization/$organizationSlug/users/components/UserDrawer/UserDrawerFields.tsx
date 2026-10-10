@@ -1,7 +1,6 @@
 import { Controller, type UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import type { ClinicRoleKey } from '@/shared/api/clinic/access-contracts.ts';
 import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
 import { type Weekday, WEEKDAY_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
 import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
@@ -48,10 +47,11 @@ interface UserFieldsProps {
 }
 
 /**
- * Step 1, "Profile, roles & branches" (`users.md:105–112`): Profile — Name*,
- * Mobile, Email* (read-only once the invitation is accepted: it is the sign-in
- * id), Colour; Roles & branches — Roles* (pick order: the first is the main
- * role), Gets access to (read-only), Branches (only with two or more open).
+ * Step 1, "Profile, roles & branches" (`users.md:105–112`; research-users §3): Profile — Name
+ * (an edit only, read-only: it follows the person's own profile; a new user names themselves),
+ * Mobile, Email* (read-only once invited: clinozy-be's edit takes no email), Colour; Roles &
+ * branches — Roles* (pick order: the first is the main role; 1–10; the owner's are fixed), Gets
+ * access to (read-only), Branches (only with two or more open).
  */
 export function UserProfileFields({
   form,
@@ -59,15 +59,21 @@ export function UserProfileFields({
   idPrefix,
   testId,
   readOnly,
+  showName,
   emailLocked,
+  rolesLocked,
   initials,
   roleOptions,
   access,
   branches,
   multiBranch,
 }: UserFieldsProps & {
-  /** The email is the sign-in id of a member who has joined. */
+  /** An edit: the person's name, read-only. */
+  showName: boolean;
+  /** The email is the sign-in id of an invited or joined member. */
   emailLocked: boolean;
+  /** The owner's roles — clinozy-be refuses a change (transfer ownership first). */
+  rolesLocked: boolean;
   /** The person's initials, on the picked swatch ("✓" before a name). */
   initials: string;
   /** Every role on offer, in its tone. */
@@ -82,28 +88,27 @@ export function UserProfileFields({
   const name = field('name');
   const mobile = field('phone');
   const email = field('email');
-  const roles = field('roleKeys');
+  const roles = field('roleIds');
 
   return (
     <DrawerStepBody readOnly={readOnly}>
       <DrawerFieldGrid title={t(K.groups.profile)}>
-        <DrawerField
-          span="half"
-          label={t(K.fields.name)}
-          htmlFor={name.id}
-          required
-          error={name.error}
-        >
-          <DrawerInput
-            {...name.control}
-            {...form.register('name')}
-            aria-required="true"
-            maxLength={USER_FORM_LIMITS.name}
-            placeholder={t(K.placeholders.name)}
-            autoComplete="off"
-            data-testid={`${testId}-name`}
-          />
-        </DrawerField>
+        {showName ? (
+          <DrawerField
+            span="half"
+            label={t(K.fields.name)}
+            htmlFor={name.id}
+            hint={t(K.hints.name)}
+          >
+            <DrawerInput
+              {...name.control}
+              {...form.register('name')}
+              readOnly
+              autoComplete="off"
+              data-testid={`${testId}-name`}
+            />
+          </DrawerField>
+        ) : null}
         <DrawerField
           span="half"
           label={t(K.fields.mobile)}
@@ -163,7 +168,7 @@ export function UserProfileFields({
           required
           error={roles.error}
         >
-          <DrawerChips<ClinicRoleKey>
+          <DrawerChips<string>
             multiple
             ordered
             label={t(K.fields.roles)}
@@ -172,10 +177,13 @@ export function UserProfileFields({
               label: role.label,
               tone: role.tone,
             }))}
-            value={values.roleKeys}
-            onChange={(keys) => {
-              form.setValue('roleKeys', keys, { shouldDirty: true });
-              form.clearErrors('roleKeys');
+            value={values.roleIds}
+            disabled={rolesLocked}
+            onChange={(roleIds) => {
+              // clinozy-be takes at most ten roles: an eleventh pick is not taken.
+              if (roleIds.length > USER_FORM_LIMITS.roles) return;
+              form.setValue('roleIds', roleIds, { shouldDirty: true });
+              form.clearErrors('roleIds');
             }}
             testId={`${testId}-roles`}
           />
@@ -206,8 +214,8 @@ export function UserProfileFields({
 
 /**
  * The invited member's Status (`users.md:117`; D17): "Invitation expires 10
- * Oct" / "Invitation expired" read-only, and "Resend invitation" while the
- * link is live — the Settings members copy, relocated.
+ * Oct" / "Invitation expired" read-only, and "Resend invitation" — an expired
+ * link too: clinozy-be sends a fresh one (T11).
  */
 function InvitationStatus({
   invitation,
@@ -239,7 +247,7 @@ function InvitationStatus({
               date: formatDate(invitation.expiresAt, { day: 'numeric', month: 'short' }),
             })}
       </span>
-      {canResend && !expired ? (
+      {canResend ? (
         <Button
           type="button"
           variant="outline"
@@ -260,8 +268,9 @@ function InvitationStatus({
  * Step 2, "Working hours & pay" (`users.md:113–117`): Working hours — Days
  * (Mon–Sun; Appointments only offer these days), From and To (06:00–23:30
  * every 30 minutes; To lists only times after From, §7.3); Pay — Commission
- * (a stepper "% of billed" with 0% · 5% · 10% · 15%) and Status — or, for an
- * invited member, the invitation's expiry and "Resend invitation".
+ * (a stepper "% of billed" with 0% · 5% · 10% · 15%) and Status — for an
+ * invited member the invitation's expiry and "Resend invitation", for a new
+ * user nothing (an invitation is "Invited" until they accept).
  */
 export function UserHoursFields({
   form,
@@ -277,7 +286,7 @@ export function UserHoursFields({
   onResend,
 }: UserFieldsProps & {
   format: HoursFormat;
-  /** The member being edited; null for a new user. */
+  /** The member being edited; null for a new user (no Status: an invitation starts it). */
   member: TeamMember | null;
   /** The owner's or your own status can't be flipped here. */
   statusLocked: boolean;
@@ -385,29 +394,31 @@ export function UserHoursFields({
             )}
           />
         </DrawerField>
-        <DrawerField span="half" label={t(K.fields.status)}>
-          {invitation ? (
-            <InvitationStatus
-              invitation={invitation}
-              canResend={canResend}
-              resending={resending}
-              onResend={onResend}
-              testId={testId}
-            />
-          ) : (
-            <DrawerToggle
-              aria-label={t(K.fields.status)}
-              checked={values.active}
-              onCheckedChange={(active) =>
-                form.setValue('active', active, { shouldDirty: true })
-              }
-              onLabel={t(K.statusOn)}
-              offLabel={t(K.statusOff)}
-              disabled={statusLocked}
-              data-testid={`${testId}-status`}
-            />
-          )}
-        </DrawerField>
+        {member ? (
+          <DrawerField span="half" label={t(K.fields.status)}>
+            {invitation ? (
+              <InvitationStatus
+                invitation={invitation}
+                canResend={canResend}
+                resending={resending}
+                onResend={onResend}
+                testId={testId}
+              />
+            ) : (
+              <DrawerToggle
+                aria-label={t(K.fields.status)}
+                checked={values.active}
+                onCheckedChange={(active) =>
+                  form.setValue('active', active, { shouldDirty: true })
+                }
+                onLabel={t(K.statusOn)}
+                offLabel={t(K.statusOff)}
+                disabled={statusLocked}
+                data-testid={`${testId}-status`}
+              />
+            )}
+          </DrawerField>
+        ) : null}
       </DrawerFieldGrid>
     </DrawerStepBody>
   );

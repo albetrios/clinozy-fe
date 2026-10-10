@@ -20,14 +20,18 @@ export interface TodayFloorView {
 
 /**
  * The floor as the room shows it (KICKOFF §6.2 Route and data, States): the
- * day's bookings and — for a member who sees Leads — the open enquiries, in
+ * day's bookings — for a member who reads appointments — and the open enquiries — for a member
+ * who reads leads — in
  * the header's branches (the D32 preference, read once it has loaded), polled
  * every 60s; their lanes and the pulse. A failed read toasts "Couldn’t load this list · connection dropped.
  * Showing the last copy." with Retry, once, and the last copy stays.
  */
 export function useTodayFloorView(): TodayFloorView {
   const { preferences, isPending: preferencesPending } = usePreferences();
-  const readsEnquiries = useClinicAccess().can('leads', 'view');
+  const access = useClinicAccess();
+  // Each lane is read only with its code: the floor `appointment:read`, the enquiries `lead:read`.
+  const readsFloor = access.isResolved && access.can('appointments', 'view');
+  const readsEnquiries = access.can('leads', 'view');
   const params = { branchIds: preferences.branchFilter };
   const options = { enabled: !preferencesPending, notifyOnError: false };
   const floor = useTodayFloor(params, options);
@@ -36,6 +40,7 @@ export function useTodayFloorView(): TodayFloorView {
     enabled: options.enabled && readsEnquiries,
   });
   const enquiriesPending = readsEnquiries && enquiries.isPending;
+  const floorPending = !access.isResolved || (readsFloor && floor.isPending);
   const { refetch: refetchFloor } = floor;
   const { refetch: refetchEnquiries } = enquiries;
   const retry = useCallback(() => {
@@ -44,10 +49,10 @@ export function useTodayFloorView(): TodayFloorView {
   }, [refetchFloor, refetchEnquiries]);
   const rows = useListLoadError(
     {
-      isError: floor.isError || (readsEnquiries && enquiries.isError),
+      isError: (readsFloor && floor.isError) || (readsEnquiries && enquiries.isError),
       refetch: retry,
       rows: floor.data,
-      isPending: floor.isPending,
+      isPending: floorPending,
     },
     'today-floor',
   );
@@ -56,6 +61,6 @@ export function useTodayFloorView(): TodayFloorView {
   return {
     lanes,
     pulse: todayPulse(lanes),
-    loading: floor.isPending || enquiriesPending,
+    loading: floorPending || enquiriesPending,
   };
 }

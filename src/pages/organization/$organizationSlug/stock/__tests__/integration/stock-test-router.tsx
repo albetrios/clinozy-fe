@@ -15,6 +15,7 @@ import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { PRESET_CODES } from '@/tests/utils/clinic-preset-codes.ts';
 import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
@@ -49,22 +50,20 @@ const STOCK_ADMIN_CODES: readonly OrganizationPermission[] = [
   'payment:read',
 ];
 
-/** Who the harness signs in: their clinozy-be codes, or View-as a clinic role. */
+/** Who the harness signs in: their clinozy-be codes, or a preset's. */
 export interface StockTestMember {
   /** The member's codes (the room answers from them); the Admin's by default. */
   permissions?: readonly OrganizationPermission[];
-  /**
-   * View-as instead: the clinic access narrows to that role's matrix and every
-   * code reads false (`canCode`).
-   */
+  /** A member holding this preset's codes instead. */
   role?: Role;
 }
 
 /** Sign the test member in as `member` says. */
 function signInStockMember({ permissions = STOCK_ADMIN_CODES, role }: StockTestMember) {
   signInTestMember();
-  useOrganizationStore.getState().setPermissions([...permissions]);
-  useUIStore.setState({ previewRole: role ?? null });
+  useOrganizationStore
+    .getState()
+    .setPermissions([...(role ? PRESET_CODES[role] : permissions)]);
 }
 
 /** A query client for one test: no retries, nothing cached between tests. */
@@ -79,7 +78,7 @@ const testQueryClient = () =>
  * `pages[tab]` as each tab's component, opened at `url`, for the test member
  * (`signInTestMember`: organization `org_test`, slug `acme` — every stock read
  * and key carries the organization) holding `member.permissions` (the Admin's
- * codes by default), or previewed as `member.role` (View-as). Every other path
+ * codes by default), or the `member.role` preset's codes. Every other path
  * lands on a catch-all.
  */
 export function renderStockRoutes(

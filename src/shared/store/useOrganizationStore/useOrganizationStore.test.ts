@@ -24,7 +24,7 @@ describe('useOrganizationStore', () => {
   it('clearOrganization wipes every field (no org/permission bleed to the next sign-in)', () => {
     const store = useOrganizationStore.getState();
     // Populate the full active-org context the way a signed-in session would.
-    store.setActiveOrganization(TEAM, ['organization:read', 'membership:manage']);
+    store.setActiveOrganization(TEAM, ['organization:read', 'membership:update']);
     store.setDeploymentContext(
       { personalOrganizations: false, teamOrganizations: true },
       'org_personal000000000x',

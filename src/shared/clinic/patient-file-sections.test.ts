@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  PATIENT_FILE_SECTION_VALUES,
-  type Role,
-} from '@/shared/api/clinic/clinic-schema.ts';
+import { PATIENT_FILE_SECTION_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
 
 import {
   isBillingSection,
@@ -20,14 +17,9 @@ const holding =
   (code: string) =>
     codes.includes(code);
 
-/** The access a View-as preview of `role` runs with — no codes, the role alone. */
-function previewing(role: Role) {
-  return { roles: [role], previewRole: role, canCode: () => false };
-}
-
-/** The access a signed-in member runs with — their roles and codes, no preview. */
-function member(codes: string[], roles: Role[] = ['front_desk']) {
-  return { roles, previewRole: null, canCode: holding(...codes) };
+/** The access in force holding exactly these codes. */
+function member(...codes: string[]) {
+  return { canCode: holding(...codes) };
 }
 
 describe('the patient file sections (D26)', () => {
@@ -128,51 +120,25 @@ describe('viewablePatientFileSections (Q-F1)', () => {
 });
 
 describe('passesPatientFileGate (S:35–40, A-F15)', () => {
-  it('passes a signed-in member by their own code, whatever their roles', () => {
+  it("passes by the gate's own code — the member's, or a previewed role's", () => {
     expect(
-      passesPatientFileGate(member(['patient_prescription:create']), 'prescriptions'),
+      passesPatientFileGate(member('patient_prescription:create'), 'prescriptions'),
     ).toBe(true);
+    expect(passesPatientFileGate(member('patient_treatment:create'), 'treatments')).toBe(
+      true,
+    );
     expect(
-      passesPatientFileGate(member(['patient_treatment:create']), 'treatments'),
-    ).toBe(true);
-    expect(
-      passesPatientFileGate(member(['patient:private_album:read']), 'privateAlbum'),
+      passesPatientFileGate(member('patient:private_album:read'), 'privateAlbum'),
     ).toBe(true);
   });
 
-  it('turns a signed-in member away without the code, even as a Doctor or the Owner', () => {
-    expect(passesPatientFileGate(member([], ['doctor']), 'prescriptions')).toBe(false);
-    expect(passesPatientFileGate(member([], ['owner']), 'treatments')).toBe(false);
+  it('turns away without the code, whatever else is held', () => {
+    expect(passesPatientFileGate(member(), 'prescriptions')).toBe(false);
     expect(
-      passesPatientFileGate(member(['patient_prescription:create']), 'treatments'),
+      passesPatientFileGate(member('patient_prescription:create'), 'treatments'),
     ).toBe(false);
-  });
-
-  it('lets a previewed Doctor or Admin write prescriptions, not a Front desk', () => {
-    expect(passesPatientFileGate(previewing('doctor'), 'prescriptions')).toBe(true);
-    expect(passesPatientFileGate(previewing('admin'), 'prescriptions')).toBe(true);
-    expect(passesPatientFileGate(previewing('front_desk'), 'prescriptions')).toBe(false);
-  });
-
-  it('lets a previewed Therapist write treatments but not open the Private album', () => {
-    expect(passesPatientFileGate(previewing('therapist'), 'treatments')).toBe(true);
-    expect(passesPatientFileGate(previewing('therapist'), 'privateAlbum')).toBe(false);
-    expect(passesPatientFileGate(previewing('admin'), 'treatments')).toBe(false);
-  });
-
-  it('always passes a previewed Owner, and passes any one role of several', () => {
-    expect(passesPatientFileGate(previewing('owner'), 'treatments')).toBe(true);
     expect(
-      passesPatientFileGate(
-        { roles: ['counsellor', 'doctor'], previewRole: 'doctor', canCode: () => false },
-        'privateAlbum',
-      ),
-    ).toBe(true);
-    expect(
-      passesPatientFileGate(
-        { roles: [], previewRole: 'custom_role', canCode: () => true },
-        'prescriptions',
-      ),
+      passesPatientFileGate(member('patient:clinical_record:read'), 'privateAlbum'),
     ).toBe(false);
   });
 });

@@ -135,7 +135,7 @@ describe('useStockDialogRoute (KICKOFF §6.8 Routes)', () => {
     const create = renderStockRoutes(
       `${ITEMS}/create`,
       { items: Probe },
-      { role: 'therapist' },
+      { permissions: ['organization:read', 'stock_item:read', 'stock_item:create'] },
     );
     expect(await screen.findByTestId('dialog')).toHaveTextContent('create');
     expect(notifyMock.info).not.toHaveBeenCalled();
@@ -144,7 +144,7 @@ describe('useStockDialogRoute (KICKOFF §6.8 Routes)', () => {
     const check = renderStockRoutes(
       `${ITEMS}/check`,
       { items: Probe },
-      { role: 'therapist' },
+      { permissions: ['organization:read', 'stock_item:read', 'stock_item:create'] },
     );
     await waitFor(() => expect(check.router.state.location.pathname).toBe(ITEMS));
     expect(notifyMock.info).toHaveBeenCalledTimes(1);

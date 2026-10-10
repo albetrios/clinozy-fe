@@ -57,7 +57,18 @@
     "http502": "The server is temporarily unavailable. Please try again later.",
     "http503": "The service is temporarily unavailable. Please try again later.",
     "reload": "Reload",
-    "recordChanged": "Someone else saved this meanwhile. Reload to see their changes, then make yours again."
+    "recordChanged": "Someone else saved this meanwhile. Reload to see their changes, then make yours again.",
+    "reasons": {
+      "missingPermission": "You don't have permission to do this. Ask the clinic's owner or an admin.",
+      "ownerMembershipFixed": "The clinic owner's roles and status can't be changed. Transfer ownership first.",
+      "ownerCannotLeave": "The clinic owner can't leave. Transfer ownership first.",
+      "ownerRoleFixed": "The access of the role the clinic owner holds can't be changed.",
+      "systemRoleFixed": "A preset role can't be renamed or deleted.",
+      "roleLocked": "This role's access is fixed and can't be changed.",
+      "seatLimitReached": "Your plan has no free seat. Add a seat in Settings › Billing, then invite again.",
+      "membershipAlreadyExists": "This person is already in the clinic.",
+      "disposableEmail": "Use a permanent email address — disposable ones aren't accepted."
+    }
   },
   "frontend": {
     "query": {
@@ -105,7 +116,8 @@
         "updateRoleSuccess": "Member role updated",
         "removeSuccess": "Member removed",
         "suspendSuccess": "Member suspended",
-        "reactivateSuccess": "Member reactivated"
+        "reactivateSuccess": "Member reactivated",
+        "updateSuccess": "Member saved"
       },
       "roles": {
         "createFailed": "Could not create role",

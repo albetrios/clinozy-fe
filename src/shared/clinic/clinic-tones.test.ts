@@ -22,6 +22,7 @@ import {
   PATIENT_TYPE_TONES,
   ROLE_TONES,
   SECTION_TONES,
+  servedTone,
   TONE_CLASSES,
   toneForLabel,
 } from './clinic-tones.ts';
@@ -151,5 +152,13 @@ describe('list-row states', () => {
       expect(TONE_CLASSES[tone].edge).toBe(`border-s-tone-${tone}-foreground`);
       expect(TONE_CLASSES[tone].edgeDot).toBe(`border-s-tone-${tone}-dot`);
     }
+  });
+});
+
+describe('servedTone', () => {
+  it('keeps a tone the palette has, and hashes the label for one it lacks', () => {
+    expect(servedTone('plum', 'Marketing')).toBe('plum');
+    expect(servedTone('teal', 'Marketing')).toBe(toneForLabel('Marketing'));
+    expect(servedTone('', 'Ada')).toBe(toneForLabel('Ada'));
   });
 });

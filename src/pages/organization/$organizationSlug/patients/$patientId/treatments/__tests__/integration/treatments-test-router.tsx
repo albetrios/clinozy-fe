@@ -17,6 +17,7 @@ import { PATIENT_FILE_SECTIONS } from '@/shared/clinic/patient-file-sections.ts'
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { PRESET_CODES } from '@/tests/utils/clinic-preset-codes.ts';
 import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import { patientFile } from '@/tests/utils/patient-doubles.ts';
 
@@ -28,16 +29,15 @@ export function treatmentsUrl(file: PatientFile, rest = ''): string {
   return `/organization/acme/patients/${file.patient.id}/treatments${rest}`;
 }
 
-/** Who the test member is: a View-as preview of a role, or their own permission codes. */
+/** Who the test member is: a member holding a preset's codes, or these permission codes. */
 export type TreatmentsMember =
   { role: Role } | { permissions: readonly OrganizationPermission[] };
 
-/** Sign the test member in: a View-as preview of a role, or their own codes. */
+/** Sign the test member in: a preset's codes, or their own. */
 function signIn(member: TreatmentsMember) {
   signInTestMember();
-  const codes = 'permissions' in member ? member.permissions : [];
+  const codes = 'permissions' in member ? member.permissions : PRESET_CODES[member.role];
   useOrganizationStore.getState().setPermissions(['organization:read', ...codes]);
-  useUIStore.setState({ previewRole: 'role' in member ? member.role : null });
 }
 
 /**
@@ -93,7 +93,7 @@ function renderAt(url: string, file: PatientFile, ui: ReactNode) {
 
 /**
  * The Treatments section as `routeTree.tsx` registers it, opened at `url` for the test member
- * (`signInTestMember`: organization `org_test`, slug `acme`) — previewed as a role (View-as),
+ * (`signInTestMember`: organization `org_test`, slug `acme`) — holding a preset's codes,
  * or signed in with the codes given.
  */
 export function renderTreatments(

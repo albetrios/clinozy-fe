@@ -6,8 +6,7 @@
  * unknown role, a bad date — is dropped, never an error; defaults stay out of
  * the URL (`/users` is the whole Team, newest #ID first).
  *
- * Dependency-free on purpose: `routeTree.tsx` is the entry chunk. The role
- * keys are declared here, not imported (the test pins them to the catalog).
+ * Dependency-free on purpose: `routeTree.tsx` is the entry chunk.
  */
 import {
   listIn,
@@ -45,12 +44,8 @@ export type TeamSortColumn = (typeof TEAM_SORT_KEYS)[number];
 /** A column sort in the URL: `name:asc`, `seq:desc` (the shared table's form). */
 export type TeamSort = `${TeamSortColumn}:${'asc' | 'desc'}`;
 
-/**
- * A clinic role in the URL: one of the catalog's preset keys, or a custom
- * role's clinozy-be id (`rol_` + 21).
- */
-const ROLE_KEY =
-  /^(?:admin|doctor|therapist|front_desk|counsellor|pharmacist|accountant|marketing|rol_[a-z0-9]{21})$/;
+/** A clinic role in the URL: its clinozy-be id (`rol_` + 21), a preset's as any other's. */
+const ROLE_ID = /^rol_[a-z0-9]{21}$/;
 
 /** Validated `?…` search params for `/users` and its dialog routes. */
 export interface UsersSearch {
@@ -73,7 +68,7 @@ export interface UsersSearch {
 export function validateUsersSearch(search: Record<string, unknown>): UsersSearch {
   return {
     q: queryOf(search.q, 80),
-    role: matchOf(ROLE_KEY, search.role),
+    role: matchOf(ROLE_ID, search.role),
     branch: listOf(search.branch, (entry) => RECORD_ID.test(entry)),
     status: listIn(TEAM_STATUS_VALUES, search.status),
     created: readCreatedFilter(search.created),
@@ -83,11 +78,11 @@ export function validateUsersSearch(search: Record<string, unknown>): UsersSearc
 
 /** Validated `?…` search params for `/users/roles`. */
 export interface RolesSearch {
-  /** The role on screen — Front desk when absent (H:5179). */
+  /** The role on screen, by its id — Front desk when absent (H:5179). */
   role?: string;
 }
 
 /** Parse `/users/roles` search params: the selected role, when it is one. */
 export function validateRolesSearch(search: Record<string, unknown>): RolesSearch {
-  return { role: matchOf(ROLE_KEY, search.role) };
+  return { role: matchOf(ROLE_ID, search.role) };
 }

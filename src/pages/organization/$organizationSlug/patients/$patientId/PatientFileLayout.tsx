@@ -104,7 +104,7 @@ function useViewableSections() {
         ? viewablePatientFileSections({
             patients: access.can('patients', 'view'),
             billing: access.can('payments', 'view'),
-            canCode: access.previewRole ? undefined : access.canCode,
+            canCode: access.canCode,
           })
         : [],
       access,

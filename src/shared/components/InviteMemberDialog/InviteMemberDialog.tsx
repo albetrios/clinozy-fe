@@ -1,11 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { type ReactNode, useEffect, useId, useRef, useState } from 'react';
+import { type ReactNode, useId, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
 import { translateFormMessage } from '@/lib/i18n/translate-form-message.ts';
-import { isInvitableRole, leastPrivilegeRoleId } from '@/shared/api/clinic/users-api.ts';
+import { isInvitableRole } from '@/shared/api/organization-contracts.ts';
 import { DrawerField, DrawerInput } from '@/shared/components/DrawerField/index.ts';
 import { Picker } from '@/shared/components/Picker/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
@@ -33,10 +33,10 @@ const INVITE_FORM_PROFILE = { fieldCount: 2 } as const;
 /**
  * Drawer + form for inviting a new member to the active organization — a child
  * drawer stacked on Settings › Members (L-65), whose Back returns there. Roles
- * come from the org's real role set (`role_id` is required by clinozy-be's
- * add-member endpoint), so a freshly-created org — which only has the system
- * Owner role — shows a "create a role first" hint instead of an unusable form.
- * Gated by the caller (render only when the user holds `invitation:manage`).
+ * come from the organization's real role set (clinozy-be's invite requires
+ * `role_ids`), every role but the owner's; an organization without one shows a
+ * "create a role first" hint instead of an unusable form. Gated by the caller
+ * (render only when the user holds `membership:create` and `role:read`).
  */
 export function InviteMemberDialog() {
   const { t } = useTranslation(SETTINGS_NS);
@@ -49,7 +49,6 @@ export function InviteMemberDialog() {
   const roles = useRoles();
   const invitableRoles = (roles.rows ?? []).filter(isInvitableRole);
   const hasRoles = invitableRoles.length > 0;
-  const defaultRoleId = leastPrivilegeRoleId(invitableRoles);
 
   const form = useForm<InviteInput>({
     resolver: zodResolver(inviteSchema),
@@ -59,25 +58,13 @@ export function InviteMemberDialog() {
     register,
     handleSubmit,
     control,
-    getValues,
-    setValue,
     formState: { errors, isSubmitting },
   } = form;
   const { ref: registerEmailRef, ...emailField } = register('email');
 
-  // Preselect the least-privileged well-known role once the list loads. Only
-  // while the field is UNTOUCHED: this effect re-runs whenever that id changes,
-  // and a refetch that reorders the list used to overwrite a role the user had
-  // already picked, mid-session (SET-11). When the organization has no Member
-  // and no Viewer the field stays empty on purpose — see leastPrivilegeRoleId.
-  useEffect(() => {
-    if (!defaultRoleId || getValues('roleId')) return;
-    setValue('roleId', defaultRoleId);
-  }, [defaultRoleId, getValues, setValue]);
-
   const onSubmit = async (data: InviteInput) => {
-    await invite.mutateAsync(data);
-    resetFormInPlace(form, { email: '', roleId: defaultRoleId ?? '' });
+    await invite.mutateAsync({ email: data.email, roleIds: [data.roleId] });
+    resetFormInPlace(form, { email: '', roleId: '' });
     setOpen(false);
   };
 

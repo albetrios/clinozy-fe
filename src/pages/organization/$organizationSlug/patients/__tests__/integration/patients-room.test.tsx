@@ -318,7 +318,7 @@ describe('the Patients room (KICKOFF §6.5)', () => {
     const { router } = renderPatientsRoutes(
       `${PATIENTS}/create?view=recall`,
       PatientsPage,
-      { role: 'therapist' },
+      { role: 'marketing' },
     );
     await waitFor(() => expect(router.state.location.pathname).toBe(PATIENTS));
     expect(router.state.location.search).toEqual({ view: 'recall' });
@@ -430,8 +430,8 @@ describe('the Patients room (KICKOFF §6.5)', () => {
 });
 
 describe('access (§6.5 Access, D9)', () => {
-  it('a Therapist views only: no New patient, no row actions', async () => {
-    renderPatientsRoutes(PATIENTS, PatientsPage, { role: 'therapist' });
+  it('Marketing views only: no New patient, no row actions', async () => {
+    renderPatientsRoutes(PATIENTS, PatientsPage, { role: 'marketing' });
     await waitFor(() => expect(rows()).toHaveLength(4));
     expect(screen.queryByTestId('patients-new')).not.toBeInTheDocument();
     expect(screen.queryByTestId('patients-row-action-edit')).not.toBeInTheDocument();

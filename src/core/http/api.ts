@@ -60,14 +60,17 @@ type BodyOption<O> = O extends { requestBody: unknown }
     ? { body?: never }
     : { body?: BodyOf<O> };
 
-/** What a call takes besides its path: path parameters, query, body and the per-action key. */
+/**
+ * What a call takes besides its path: path parameters, query, body, the per-action key, and
+ * `skip401` for a call whose 401 is an answer rather than an expired token (an invitation's accept).
+ */
 export type ApiInit<P extends ApiPath, M extends HttpMethod> = RequiredWhenPresent<
   'params',
   PathParametersOf<Operation<P, M>>
 > &
   RequiredWhenPresent<'query', QueryOf<Operation<P, M>>> &
   BodyOption<Operation<P, M>> &
-  Pick<RequestOptions, 'idempotencyKey'>;
+  Pick<RequestOptions, 'idempotencyKey' | 'skip401'>;
 
 /** The init is optional when nothing in it is required (a list with no required filter). */
 type InitArguments<Init> = Partial<Init> extends Init ? [init?: Init] : [init: Init];
@@ -133,12 +136,18 @@ interface LooseInit {
   query?: Readonly<Record<string, QueryValue>>;
   body?: unknown;
   idempotencyKey?: string;
+  skip401?: boolean;
   reason?: string;
   note?: string;
 }
 
-const optionsOf = (init: LooseInit): RequestOptions | undefined =>
-  init.idempotencyKey ? { idempotencyKey: init.idempotencyKey } : undefined;
+function optionsOf(init: LooseInit): RequestOptions | undefined {
+  if (!(init.idempotencyKey || init.skip401)) return undefined;
+  return {
+    ...(init.idempotencyKey ? { idempotencyKey: init.idempotencyKey } : {}),
+    ...(init.skip401 ? { skip401: true } : {}),
+  };
+}
 
 /**
  * clinozy-be's API, typed from its OpenAPI document (`openapi-types.d.ts`). Each method takes a

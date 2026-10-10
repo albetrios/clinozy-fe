@@ -1,10 +1,7 @@
 import { z } from 'zod';
 
-import type {
-  BranchInput,
-  BranchTeamChange,
-} from '@/shared/api/clinic/branches-contracts.ts';
-import type { Branch, Tone, Weekday } from '@/shared/api/clinic/clinic-schema.ts';
+import type { BranchSave, ClinicBranch } from '@/shared/api/clinic/branches-contracts.ts';
+import type { Role, Tone, Weekday } from '@/shared/api/clinic/clinic-schema.ts';
 import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
 import { toClinicPhone } from '@/shared/clinic/clinic-phone.ts';
 import { clinicPhoneDigits } from '@/shared/clinic/clinic-phone-field.ts';
@@ -18,11 +15,12 @@ import {
 /**
  * The branch drawer's form (KICKOFF §6.12 Branch drawer; `users.md:179–198`):
  * the branch, its address, contact and opening hours, and its people — the
- * Team (staff profile ids) and the four default people.
+ * Team (membership ids) and the four default people.
  */
 export interface BranchFormValues {
   name: string;
   tone: Tone;
+  /** Read-only: the clinic's main branch is set when it is provisioned. */
   isMain: boolean;
   active: boolean;
   addressLine1: string;
@@ -38,7 +36,7 @@ export interface BranchFormValues {
   workingDays: Weekday[];
   opensAt: string;
   closesAt: string;
-  /** Who works here — staff profile ids. */
+  /** Who works here — membership ids. */
   teamIds: string[];
   defaults: Record<BranchDefaultRole, string | null>;
 }
@@ -85,11 +83,11 @@ const NO_DEFAULTS: Record<BranchDefaultRole, null> = {
 export function emptyBranchForm({
   branchCount,
   main,
-  selfProfileId,
+  selfMembershipId,
 }: {
   branchCount: number;
-  main: Pick<Branch, 'city' | 'state'> | null;
-  selfProfileId: string | null;
+  main: Pick<ClinicBranch, 'city' | 'state'> | null;
+  selfMembershipId: string | null;
 }): BranchFormValues {
   return {
     name: '',
@@ -108,14 +106,14 @@ export function emptyBranchForm({
     workingDays: [...MON_SAT],
     opensAt: '10:00',
     closesAt: '19:00',
-    teamIds: selfProfileId ? [selfProfileId] : [],
+    teamIds: selfMembershipId ? [selfMembershipId] : [],
     defaults: { ...NO_DEFAULTS },
   };
 }
 
 /** A branch's form: its values, its team the people working there now. */
 export function branchFormOf(
-  branch: Branch,
+  branch: ClinicBranch,
   teamIds: readonly string[],
 ): BranchFormValues {
   return {
@@ -142,77 +140,99 @@ export function branchFormOf(
   };
 }
 
-/** The required fields still empty, in the form's order: Name, then Address line 1. */
-export function missingBranchFields(
-  values: Pick<BranchFormValues, 'name' | 'addressLine1'>,
-): ('name' | 'addressLine1')[] {
-  const missing: ('name' | 'addressLine1')[] = [];
+/** A field the branch can't be saved without (clinozy-be's create requires each). */
+export type RequiredBranchField =
+  'name' | 'addressLine1' | 'area' | 'city' | 'pin' | 'phone' | 'email';
+
+/** Step 1's required fields still empty, in the form's order: Name, the address, Area, City, PIN. */
+export function missingPlaceFields(
+  values: Pick<BranchFormValues, 'name' | 'addressLine1' | 'area' | 'city' | 'pin'>,
+): RequiredBranchField[] {
+  const missing: RequiredBranchField[] = [];
   if (!values.name.trim()) missing.push('name');
   if (!values.addressLine1.trim()) missing.push('addressLine1');
+  if (!values.area.trim()) missing.push('area');
+  if (!values.city.trim()) missing.push('city');
+  if (!values.pin) missing.push('pin');
   return missing;
 }
 
-/** Which roles may be each default (`users.md:194–197`): Front desk takes Counsellors too. */
-const DEFAULT_ROLE_KEYS: Readonly<Record<BranchDefaultRole, readonly string[]>> = {
+/** Step 2's required fields still empty: Phone, then Email. */
+export function missingContactFields(
+  values: Pick<BranchFormValues, 'phone' | 'email'>,
+): RequiredBranchField[] {
+  const missing: RequiredBranchField[] = [];
+  if (!values.phone) missing.push('phone');
+  if (!values.email.trim()) missing.push('email');
+  return missing;
+}
+
+/** Which presets may be each default (`users.md:194–197`): Front desk takes Counsellors too. */
+const DEFAULT_PRESETS: Readonly<Record<BranchDefaultRole, readonly Role[]>> = {
   doctor: ['doctor'],
   desk: ['front_desk', 'counsellor'],
   therapist: ['therapist'],
   pharmacist: ['pharmacist'],
 };
 
-/** The people a default may be: the team's members holding the role. */
+/** The people a default may be: the team's members holding one of the role's presets. */
 export function defaultPool(
   role: BranchDefaultRole,
   team: readonly TeamMember[],
+  presetOf: (roleId: string) => Role | null,
 ): TeamMember[] {
   return team.filter((member) =>
-    member.roleKeys.some((key) => DEFAULT_ROLE_KEYS[role].includes(key)),
+    member.roleIds.some((roleId) => {
+      const preset = presetOf(roleId);
+      return preset !== null && DEFAULT_PRESETS[role].includes(preset);
+    }),
   );
 }
 
 const EMAIL = z.email();
 
-/** Whether a filled email reads as one (an empty one is fine). */
+/** Whether a filled email reads as one (an empty one is a missing field). */
 export function isBranchEmailInvalid(value: string): boolean {
   const email = value.trim();
   return email.length > 0 && !EMAIL.safeParse(email).success;
 }
 
-/** A filled phone that is not ten digits (an empty one is fine). */
+/** A filled phone that is not ten digits (an empty one is a missing field). */
 export function isBranchPhoneIncomplete(digits: string): boolean {
   return digits.length > 0 && toClinicPhone(digits) === null;
 }
 
+/** A filled PIN code that is not six digits. */
+export function isBranchPinIncomplete(pin: string): boolean {
+  return pin.length > 0 && !/^\d{6}$/.test(pin);
+}
+
 /**
- * What a save sends (`saveBranch`): the trimmed fields, the phone E.164 (or
- * `''`), the GSTIN upper-cased, a default only while that person is still on
- * the team with the role — and the Team change against who worked here.
+ * What a save sends (`saveBranch`): the trimmed fields, the phone E.164, the GSTIN upper-cased,
+ * a default only while that person is on the team with the role — and the team, the whole set.
  */
 export function branchSaveOf(
   values: BranchFormValues,
   {
     team,
-    before,
+    presetOf,
   }: {
     /** The picked team's members, to keep the defaults honest. */
     team: readonly TeamMember[];
-    /** Who worked here when the drawer opened (none for a new branch). */
-    before: readonly string[];
+    presetOf: (roleId: string) => Role | null;
   },
-): { input: BranchInput; team: BranchTeamChange } {
+): Pick<BranchSave, 'input' | 'memberIds'> {
   const defaultOf = (role: BranchDefaultRole) => {
     const id = values.defaults[role];
-    return id && defaultPool(role, team).some((member) => member.profile?.id === id)
+    return id &&
+      defaultPool(role, team, presetOf).some((member) => member.membershipId === id)
       ? id
       : null;
   };
-  const picked = new Set(values.teamIds);
-  const was = new Set(before);
   return {
     input: {
       name: values.name.trim(),
       tone: values.tone,
-      isMain: values.isMain,
       active: values.active,
       addressLine1: values.addressLine1.trim(),
       addressLine2: values.addressLine2.trim() || null,
@@ -220,7 +240,7 @@ export function branchSaveOf(
       city: values.city.trim(),
       state: values.state.trim(),
       pin: values.pin,
-      phone: (values.phone && toClinicPhone(values.phone)) || '',
+      phone: toClinicPhone(values.phone) ?? '',
       email: values.email.trim(),
       gstNumber: values.gstNumber.trim().toUpperCase() || null,
       workingDays: values.workingDays,
@@ -231,9 +251,6 @@ export function branchSaveOf(
       defaultTherapistId: defaultOf('therapist'),
       defaultPharmacistId: defaultOf('pharmacist'),
     },
-    team: {
-      add: values.teamIds.filter((id) => !was.has(id)),
-      remove: before.filter((id) => !picked.has(id)),
-    },
+    memberIds: [...values.teamIds],
   };
 }

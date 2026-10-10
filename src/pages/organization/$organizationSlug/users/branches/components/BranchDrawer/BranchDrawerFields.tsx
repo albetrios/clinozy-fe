@@ -101,8 +101,9 @@ function TextField({
 
 /**
  * Step 1, "Branch & address" (`users.md:179–186`): Branch — Name* (half,
- * alone), Colour, Main branch, Status; Address — Address line 1*, line 2,
- * Area, City, PIN code (digits only, never masked), State.
+ * alone), Colour, Main branch (read-only: one per clinic, set when it opened),
+ * Status (Closed is how a branch goes — there is no delete); Address — Address
+ * line 1*, line 2, Area*, City*, PIN code* (digits only, never masked), State.
  */
 export function BranchPlaceFields({
   form,
@@ -139,11 +140,12 @@ export function BranchPlaceFields({
             testId={`${testId}-colour`}
           />
         </DrawerField>
-        <DrawerField span="half" label={t(K.fields.main)}>
+        <DrawerField span="half" label={t(K.fields.main)} hint={t(K.hints.main)}>
           <DrawerToggle
             aria-label={t(K.fields.main)}
             checked={values.isMain}
-            onCheckedChange={(on) => form.setValue('isMain', on, { shouldDirty: true })}
+            disabled
+            onCheckedChange={() => undefined}
             onLabel={t(K.toggles.mainOn)}
             offLabel={t(K.toggles.mainOff)}
             data-testid={`${testId}-main`}
@@ -189,8 +191,9 @@ export function BranchPlaceFields({
           name="area"
           label={t(K.fields.area)}
           placeholder={t(K.placeholders.area)}
-          maxLength={BRANCH_LIMITS.address}
+          maxLength={BRANCH_LIMITS.place}
           span="half"
+          required
           testId={`${testId}-area`}
         />
         <TextField
@@ -199,11 +202,18 @@ export function BranchPlaceFields({
           name="city"
           label={t(K.fields.city)}
           placeholder={t(K.placeholders.city)}
-          maxLength={BRANCH_LIMITS.address}
+          maxLength={BRANCH_LIMITS.place}
           span="half"
+          required
           testId={`${testId}-city`}
         />
-        <DrawerField span="third" label={t(K.fields.pin)} htmlFor={pin.id}>
+        <DrawerField
+          span="third"
+          label={t(K.fields.pin)}
+          htmlFor={pin.id}
+          required
+          error={pin.error}
+        >
           <Controller
             control={form.control}
             name="pin"
@@ -218,6 +228,7 @@ export function BranchPlaceFields({
                 }
                 onBlur={control.onBlur}
                 inputMode="numeric"
+                aria-required="true"
                 maxLength={BRANCH_LIMITS.pin}
                 placeholder={t(K.placeholders.pin)}
                 autoComplete="off"
@@ -242,8 +253,8 @@ export function BranchPlaceFields({
 }
 
 /**
- * Step 2, "Contact & opening hours" (`users.md:187–192`): Contact — Phone
- * ("+91", 10 digits), Email, GSTIN (upper-cased); Opening hours — Days,
+ * Step 2, "Contact & opening hours" (`users.md:187–192`): Contact — Phone*
+ * ("+91", 10 digits), Email*, GSTIN (upper-cased); Opening hours — Days,
  * Opens, Closes (06:00–23:30 every 30 minutes; Closes lists only times after
  * Opens, `S:174`).
  */
@@ -270,6 +281,7 @@ export function BranchContactFields({
           label={t(K.fields.phone)}
           htmlFor={phone.id}
           hint={t(K.hints.phone)}
+          required
           error={phone.error}
         >
           <Controller
@@ -281,6 +293,7 @@ export function BranchContactFields({
                 value={control.value}
                 onChange={control.onChange}
                 onBlur={control.onBlur}
+                aria-required="true"
                 data-testid={`${testId}-phone`}
               />
             )}
@@ -294,6 +307,7 @@ export function BranchContactFields({
           placeholder={t(K.placeholders.email)}
           maxLength={BRANCH_LIMITS.email}
           span="half"
+          required
           testId={`${testId}-email`}
         />
         <DrawerField
@@ -403,10 +417,10 @@ function personOption(
   you: (name: string) => string,
 ): PickerOption {
   return {
-    key: member.profile?.id ?? member.membershipId,
+    key: member.membershipId,
     label: member.isSelf ? you(member.name) : member.name,
     sub: directory
-      .pills(member.roleKeys)
+      .pills(member.roleIds)
       .map((pill) => pill.label)
       .join(' + '),
     tone: member.tone,
@@ -430,15 +444,13 @@ export function BranchPeopleFields({
   people,
   directory,
 }: BranchFieldsProps & {
-  /** The people who may work here: active Team members with a staff profile, you first. */
+  /** The people who may work here: the active Team, you first. */
   people: readonly TeamMember[];
   directory: RoleDirectory;
 }) {
   const { t } = useTranslation(USERS_NS);
   const you = (name: string) => t(K.you, { name });
-  const team = people.filter(
-    (member) => member.profile && values.teamIds.includes(member.profile.id),
-  );
+  const team = people.filter((member) => values.teamIds.includes(member.membershipId));
   const nobody: PickerOption = {
     key: NOBODY,
     label: t(K.nobody),
@@ -472,7 +484,7 @@ export function BranchPeopleFields({
           />
         </DrawerField>
         {BRANCH_DEFAULT_ROLES.map((role) => {
-          const pool = defaultPool(role, team);
+          const pool = defaultPool(role, team, directory.preset);
           const id = `${idPrefix}-default-${role}`;
           const hint =
             pool.length > 0 ? t(K.hints.preselected) : t(K.hints.addFirst[role]);
@@ -491,7 +503,7 @@ export function BranchPeopleFields({
             );
           }
           const picked = values.defaults[role];
-          const value = pool.some((member) => member.profile?.id === picked)
+          const value = pool.some((member) => member.membershipId === picked)
             ? picked
             : NOBODY;
           return (

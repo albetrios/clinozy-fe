@@ -3,8 +3,6 @@ import { renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { resetClinicAccessFixture } from '@/shared/api/clinic/access-api.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
 import type * as OrganizationApiModule from '@/shared/api/organization-api.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
@@ -30,8 +28,6 @@ const wrapper = ({ children }: { children: ReactNode }) => (
 );
 
 beforeEach(() => {
-  resetClinicFixtures();
-  resetClinicAccessFixture();
   useOrganizationStore.getState().setOrganization('org_test', 'acme');
   useOrganizationStore.getState().setPermissions(USERS_ADMIN_CODES);
   useAuthStore
@@ -50,31 +46,47 @@ afterEach(() => {
 });
 
 describe('useRoleDirectory', () => {
-  it('lists the catalog’s presets, then the custom roles, each named and toned', async () => {
+  it('lists every role but Owner in creation order, each named and toned by its id', async () => {
     const { result } = renderHook(() => useRoleDirectory(), { wrapper });
     await waitFor(() => expect(result.current.isPending).toBe(false));
-    expect(result.current.options.map((role) => role.id)).toEqual([
-      'admin',
-      'doctor',
-      'therapist',
-      'front_desk',
-      'counsellor',
-      'pharmacist',
-      'accountant',
-      'marketing',
-      PLATFORM_ROLES.senior.id,
-    ]);
-    expect(result.current.label('front_desk')).toBe('Front desk');
-    expect(result.current.tone('front_desk')).toBe('mint');
+    const { owner, ...listed } = PLATFORM_ROLES;
+    expect(result.current.roles.map((role) => role.id)).toEqual(
+      Object.values(listed).map((role) => role.id),
+    );
+    expect(result.current.options[0]).toEqual({
+      id: PLATFORM_ROLES.admin.id,
+      label: 'Admin',
+      tone: 'plum',
+    });
+    expect(result.current.label(PLATFORM_ROLES.front_desk.id)).toBe('Front desk');
     expect(result.current.label(PLATFORM_ROLES.senior.id)).toBe('Senior desk');
+    expect(result.current.tone(PLATFORM_ROLES.senior.id)).toBe('lime');
+    expect(result.current.preset(PLATFORM_ROLES.doctor.id)).toBe('doctor');
+    expect(result.current.preset(PLATFORM_ROLES.senior.id)).toBeNull();
+    // Owner is no pill to give, yet still named on the owner's own row.
+    expect(result.current.label(owner.id)).toBe('Owner');
   });
 
-  it('names Owner — the org owner’s row — though Owner is not listed', async () => {
+  it('finds the clinic’s role for a preset — a Quick fill’s, the default Front desk', async () => {
     const { result } = renderHook(() => useRoleDirectory(), { wrapper });
     await waitFor(() => expect(result.current.isPending).toBe(false));
-    expect(result.current.pills(['owner', 'doctor'])).toEqual([
-      { id: 'owner', label: 'Owner', tone: 'slate' },
-      { id: 'doctor', label: 'Doctor', tone: 'sky' },
+    expect(result.current.presetRoleId('front_desk')).toBe(PLATFORM_ROLES.front_desk.id);
+    expect(
+      result.current.pills([PLATFORM_ROLES.doctor.id, PLATFORM_ROLES.senior.id]),
+    ).toEqual([
+      { id: PLATFORM_ROLES.doctor.id, label: 'Doctor', tone: 'sky' },
+      { id: PLATFORM_ROLES.senior.id, label: 'Senior desk', tone: 'lime' },
     ]);
+  });
+
+  it('has no preset role a clinic no longer keeps', async () => {
+    api.listRoles.mockResolvedValue({
+      rows: [PLATFORM_ROLES.admin],
+      next: null,
+      hasMore: false,
+    });
+    const { result } = renderHook(() => useRoleDirectory(), { wrapper });
+    await waitFor(() => expect(result.current.isPending).toBe(false));
+    expect(result.current.presetRoleId('front_desk')).toBeNull();
   });
 });

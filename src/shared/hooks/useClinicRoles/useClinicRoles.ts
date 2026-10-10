@@ -1,165 +1,108 @@
 import { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
-import type { OrganizationPermission } from '@/core/types/permissions.ts';
+import { presetOfRole } from '@/shared/api/clinic/access-contracts.ts';
+import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
 import {
-  applyRoleMatrixChange,
-  type ClinicAccessMatrix,
-  clinicAccessQueryKeys,
-  type RoleMatrixChange,
-  saveRoleMatrixChange,
-} from '@/shared/api/clinic/access-api.ts';
-import type {
-  ClinicRoleKey,
-  ClinicRoleView,
-  PlatformRoleRef,
-} from '@/shared/api/clinic/access-contracts.ts';
-import { joinClinicRoles, withPlatformAccess } from '@/shared/api/clinic/users-api.ts';
-import * as orgApi from '@/shared/api/organization-api.ts';
-import type { RoleSummary } from '@/shared/api/organization-contracts.ts';
-import { orgQueryKeys } from '@/shared/api/organization-query-keys.ts';
-import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
-import { useClinicAccessMatrix } from '@/shared/hooks/useClinicAccess/index.ts';
-import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
-import { rolePermissionsKey, useRolePermissions } from '@/shared/hooks/useRoles/index.ts';
-import { usePlatformRoles, useTeam } from '@/shared/hooks/useTeam/index.ts';
+  type DirectoryRole,
+  fetchRoleDirectory,
+  roleDirectoryQueryKey,
+} from '@/shared/api/clinic/directory-api.ts';
+import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+import { servedTone, toneForLabel } from '@/shared/clinic/clinic-tones.ts';
+import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
+import { useMeContext } from '@/shared/hooks/useMeContext/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
-/** The roles and the state of their reads. */
+/** How long the role directory is reused before it is read again. */
+const ROLE_DIRECTORY_STALE_MS = 5 * 60_000;
+
+const NO_ROLES: DirectoryRole[] = [];
+
+/** The organization's roles, and how each is named and toned. */
 export interface ClinicRolesResult {
-  /** The contract's roles (Owner aside), then the custom roles — each ⨝ its matrix and holders. */
-  roles: ClinicRoleView[];
-  /** True until the matrix, the Team and (with `role:read`) the roles have answered. */
-  isPending: boolean;
-  isError: boolean;
-  error: Error | null;
-  refetch: () => void;
-}
-
-/**
- * Users › Roles & access (KICKOFF §6.12 Data): clinozy-be's roles — all pages —
- * joined with the fixture clinic matrix and abilities (REPLACE_WITH_API), each
- * role's tone and the Team members holding it. The roles sit under the `roles`
- * key prefix, so `useCreateRole`, `useUpdateRole` and `useDeleteRole` refresh
- * them.
- */
-export function useClinicRoles(): ClinicRolesResult {
-  const platformRoles = usePlatformRoles();
-  const matrix = useClinicAccessMatrix();
-  const team = useTeam();
-
-  const roles = useMemo(
-    () =>
-      matrix.data
-        ? joinClinicRoles({
-            platformRoles: platformRoles.roles,
-            matrix: matrix.data,
-            team: team.members,
-          })
-        : [],
-    [matrix.data, platformRoles.roles, team.members],
-  );
-
-  const { refetch: refetchRoles } = platformRoles;
-  const { refetch: refetchMatrix } = matrix;
-  const { refetch: refetchTeam } = team;
-  const refetch = useCallback(() => {
-    refetchRoles();
-    void refetchMatrix();
-    refetchTeam();
-  }, [refetchRoles, refetchMatrix, refetchTeam]);
-
-  return {
-    roles,
-    isPending: matrix.isPending || team.isPending || platformRoles.isPending,
-    isError: matrix.isError || platformRoles.isError || team.isError,
-    error: matrix.error ?? platformRoles.error ?? team.error ?? null,
-    refetch,
-  };
-}
-
-/** One role, its Users row and "Change roles & access" read from clinozy-be. */
-export interface ClinicRoleResult {
-  /** Null while loading, or when no role has the key. */
-  role: ClinicRoleView | null;
-  /** True until the role and — for a role clinozy-be backs — its permission codes have answered. */
+  /** Every role, in the directory's order (the presets as provisioned, then the clinic's own). */
+  roles: DirectoryRole[];
+  byId: ReadonlyMap<string, DirectoryRole>;
+  /** A role's name — a preset's in the clinic's own words, the clinic's own role by its name. */
+  label: (role: Pick<DirectoryRole, 'name' | 'preset'>) => string;
+  /** A role's name by its id; `''` for a role the directory does not know. */
+  labelOf: (roleId: string) => string;
+  /** A role's tone by its id — the name's hash for a role the directory does not know. */
+  toneOf: (roleId: string) => Tone;
   isPending: boolean;
 }
 
-/**
- * One role page's data: the role from {@link useClinicRoles} with its Users row
- * and "Change roles & access" read from its clinozy-be permission codes when
- * the platform backs it (D17; `GET /roles/:id/permissions`, `role:read`).
- */
-export function useClinicRole(key: ClinicRoleKey | undefined): ClinicRoleResult {
-  const { roles, isPending } = useClinicRoles();
-  const view = roles.find((role) => role.key === key) ?? null;
-  const platformId = view?.platformBacked ? view.platformRole?.id : undefined;
-  const codes = useRolePermissions(platformId);
-  const codesPending = platformId !== undefined && codes.isPending;
-  return useMemo(
-    () => ({
-      role:
-        view && codes.data && platformId ? withPlatformAccess(view, codes.data) : view,
-      isPending: isPending || codesPending,
-    }),
-    [view, codes.data, platformId, isPending, codesPending],
+/** A role's name — a preset's in the clinic's own words, the clinic's own role by its name. */
+export function useRoleLabel(): (role: Pick<DirectoryRole, 'name' | 'preset'>) => string {
+  const { t } = useTranslation(CLINIC_NS);
+  return useCallback(
+    (role) => (role.preset ? t(CLINIC_KEYS.roles[role.preset]) : role.name),
+    [t],
   );
 }
 
 /**
- * Change the fixture matrix — a box, a Row pill, the switches, "Copy access
- * from", a custom role's rows (Q-U6: instant): optimistic, so the box flips at
- * once and every resolver (`useClinicAccess`, the nav) follows; a refused or
- * failed save rolls back with the save-error toast. The Users row and "Change
- * roles & access" of a role clinozy-be backs are its permission codes instead
- * — `platformCodesWithUsersAccess` through `useUpdateRole` (D17).
+ * The organization's roles as every member may read them (`GET /app/roles`, research-users B3):
+ * a View-as preview's name and tone, the role pills of a member without `role:read`. Read once
+ * per organization (while `enabled`) and reused for a few minutes.
  */
-export function useUpdateRoleMatrix(
-  options: CrudMutationOptions<ClinicAccessMatrix, RoleMatrixChange> = {},
-) {
-  return useAppMutation<ClinicAccessMatrix, RoleMatrixChange, ClinicAccessMatrix>({
-    mutationFn: saveRoleMatrixChange,
-    invalidateKeys: [clinicAccessQueryKeys.all],
-    optimistic: {
-      queryKey: clinicAccessQueryKeys.matrix(),
-      update: (previous, change) =>
-        previous ? applyRoleMatrixChange(previous, change) : previous,
-    },
-    // Boxes are clicked in runs; one error toast replaces the last.
-    toastId: 'role-matrix',
-    ...options,
-  });
-}
-
-/** What a code write sends: the clinozy-be role and its whole new permission set. */
-export interface RoleCodesWrite {
-  role: PlatformRoleRef;
-  codes: OrganizationPermission[];
-}
-
-/**
- * Write a clinozy-be role's permission codes — its Users row and "Change roles
- * & access" on the matrix (D17) — as a full replace through the roles API.
- * Optimistic like every matrix box (Q-U6): the role's codes change at once, so
- * the page (`useClinicRole`) reads the new row; a refused or failed write rolls
- * back with the save-error toast. One hook per role page (`roleId`).
- */
-export function useUpdateRoleCodes(roleId: string | undefined) {
+export function useClinicRoles(enabled = true): ClinicRolesResult {
+  const label = useRoleLabel();
   const organizationId = useOrganizationStore((state) => state.organizationId);
-  return useAppMutation<RoleSummary, RoleCodesWrite, OrganizationPermission[]>({
-    mutationFn: ({ role, codes }) =>
-      orgApi.updateRole({
-        id: role.id,
-        name: role.name,
-        description: role.description,
-        permissions: codes,
-      }),
-    invalidateKeys: [orgQueryKeys.roles(organizationId)],
-    optimistic: {
-      queryKey: rolePermissionsKey(organizationId, roleId),
-      update: (_previous, { codes }) => codes,
-    },
-    // Boxes are clicked in runs; one error toast replaces the last.
-    toastId: 'role-matrix',
+  const query = useAppQuery({
+    queryKey: roleDirectoryQueryKey(organizationId),
+    queryFn: fetchRoleDirectory,
+    enabled: enabled && organizationId !== null,
+    staleTime: ROLE_DIRECTORY_STALE_MS,
+    // Its readers degrade to a role's raw name or no line at all.
+    notifyOnError: false,
   });
+  const roles = query.data ?? NO_ROLES;
+  const byId = useMemo(() => new Map(roles.map((role) => [role.id, role])), [roles]);
+  const labelOf = useCallback(
+    (roleId: string) => {
+      const role = byId.get(roleId);
+      return role ? label(role) : '';
+    },
+    [byId, label],
+  );
+  const toneOf = useCallback(
+    (roleId: string) => byId.get(roleId)?.tone ?? toneForLabel(roleId),
+    [byId],
+  );
+  return useMemo(
+    () => ({ roles, byId, label, labelOf, toneOf, isPending: query.isPending }),
+    [roles, byId, label, labelOf, toneOf, query.isPending],
+  );
+}
+
+/**
+ * The roles in force, the main role first: the signed-in member's own (`my_roles` on me/context —
+ * no extra read), or — while View-as runs — the previewed role alone (from the directory, read
+ * then). Empty until known. What the Account menu's role line and avatar tone, the View-as pill
+ * and Today's focus read.
+ */
+export function useRolesInForce(): DirectoryRole[] {
+  const previewRole = useUIStore((state) => state.previewRole);
+  const me = useMeContext({ notifyOnError: false });
+  // The directory is read only while a preview needs its role's name.
+  const { byId } = useClinicRoles(previewRole !== null);
+  const myRoles = me.data?.myRoles;
+  return useMemo(() => {
+    if (previewRole !== null) {
+      const role = byId.get(previewRole);
+      return role ? [role] : [];
+    }
+    return (myRoles ?? []).map((role) => ({
+      id: role.id,
+      name: role.name,
+      tone: servedTone(role.tone, role.name),
+      isSystem: role.isSystem,
+      // me/context does not say; the directory does once read.
+      isLocked: byId.get(role.id)?.isLocked ?? false,
+      preset: presetOfRole(role),
+    }));
+  }, [previewRole, byId, myRoles]);
 }

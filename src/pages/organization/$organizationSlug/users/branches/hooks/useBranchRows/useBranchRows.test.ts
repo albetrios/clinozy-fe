@@ -1,43 +1,33 @@
 import { describe, expect, it } from 'vitest';
 
-import type { Branch } from '@/shared/api/clinic/clinic-schema.ts';
 import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
+import { clinicBranch, TEST_BRANCH_ID } from '@/tests/utils/branch-doubles.ts';
 
-import { branchRowOf, teamMemberByProfileId } from './useBranchRows.ts';
+import { branchRowOf, teamMemberById } from './useBranchRows.ts';
 
-const BRANCH = 'b-adajan';
-
-function teamMember(
-  key: string,
-  overrides: Partial<TeamMember> & { profileId?: string | null } = {},
-): TeamMember {
-  const { profileId = `p-${key}`, ...rest } = overrides;
+function teamMember(key: string, overrides: Partial<TeamMember> = {}): TeamMember {
   return {
-    membershipId: `mbr_${key}`,
+    membershipId: `mem_${key}`,
     name: key,
     status: 'active',
-    branchIds: [BRANCH],
-    profile: profileId ? { id: profileId } : null,
-    ...rest,
+    branchIds: [TEST_BRANCH_ID],
+    ...overrides,
   } as unknown as TeamMember;
 }
 
-const branch = {
-  id: BRANCH,
-  defaultDoctorId: 'p-nisha',
-  defaultDeskId: 'p-gone',
-  defaultTherapistId: null,
-  defaultPharmacistId: 'p-farah',
-} as unknown as Branch;
+const branch = clinicBranch({
+  defaultDoctorId: 'mem_nisha',
+  defaultDeskId: 'mem_gone',
+  defaultPharmacistId: 'mem_farah',
+});
 
 describe('branchRowOf', () => {
-  it('counts the active people with a profile who work there', () => {
+  it('counts the active people who work there', () => {
     const row = branchRowOf(branch, [
       teamMember('riya'),
       teamMember('samya', { status: 'suspended' }),
       teamMember('new', { status: 'invited' }),
-      teamMember('vesu-only', { branchIds: ['b-vesu'] }),
-      teamMember('no-profile', { profileId: null }),
+      teamMember('elsewhere', { branchIds: ['brn_other'] }),
     ]);
     expect(row.team.map((member) => member.name)).toEqual(['riya']);
   });
@@ -50,10 +40,10 @@ describe('branchRowOf', () => {
     ]);
   });
 
-  it('finds a Team member by staff profile id', () => {
-    const find = teamMemberByProfileId([teamMember('riya')]);
-    expect(find('p-riya')?.name).toBe('riya');
-    expect(find('p-gone')).toBeUndefined();
+  it('finds a Team member by membership id', () => {
+    const find = teamMemberById([teamMember('riya')]);
+    expect(find('mem_riya')?.name).toBe('riya');
+    expect(find('mem_gone')).toBeUndefined();
     expect(find(null)).toBeUndefined();
   });
 });

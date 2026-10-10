@@ -1,4 +1,3 @@
-import type { ClinicAction } from '@/shared/api/clinic/access-contracts.ts';
 import type { InvoiceRecord } from '@/shared/api/clinic/invoices-contracts.ts';
 import {
   type ClinicAccess,
@@ -8,39 +7,25 @@ import {
 /*
  * Who may do what with an invoice (research-payments §7): the money codes clinozy-be checks —
  * `payment:read` to see it, `payment:create` to bill (with "Paid now"), `payment:update` to
- * change it, `payment:delete` to delete it and bring it back — the member's own codes, or the
- * previewed role's clinic matrix while View-as runs. A Medical sale is Medical's create (the
- * parked room's fixture matrix: Admin, Pharmacist).
+ * change it, `payment:delete` to delete it and bring it back — the codes in force (the member's
+ * own, or the previewed role's while View-as runs). A Medical sale is Medical's create.
  */
-
-/** The money codes the invoice drawer asks about, and the section action View-as reads instead. */
-const PAYMENT_ACTIONS = {
-  'payment:read': 'view',
-  'payment:create': 'create',
-  'payment:update': 'edit',
-  'payment:delete': 'delete',
-} as const satisfies Record<string, ClinicAction>;
 
 /** A money code the invoice drawer asks about. */
-export type PaymentCode = keyof typeof PAYMENT_ACTIONS;
+export type PaymentCode =
+  'payment:read' | 'payment:create' | 'payment:update' | 'payment:delete';
 
-/**
- * Whether the member holds a money code — false until access resolves ("not known yet"); during
- * View-as, the previewed role's Payments action.
- */
+/** Whether the codes in force hold a money code — false until access resolves ("not known yet"). */
 export function canPayment(
-  access: Pick<ClinicAccess, 'isResolved' | 'previewRole' | 'canCode' | 'can'>,
+  access: Pick<ClinicAccess, 'isResolved' | 'canCode'>,
   code: PaymentCode,
 ): boolean {
-  if (!access.isResolved) return false;
-  return access.previewRole === null
-    ? access.canCode(code)
-    : access.can('payments', PAYMENT_ACTIONS[code]);
+  return access.isResolved && access.canCode(code);
 }
 
 /** What the drawer allows on this opening. */
 export interface InvoiceDrawerAccess {
-  /** The access answered: before, nothing is asked of the server for the member (no preview). */
+  /** The access answered: before, nothing is asked of the server for the member. */
   resolved: boolean;
   /** View only: the member may not write this — or the invoice can no longer change. */
   readOnly: boolean;
@@ -77,15 +62,15 @@ export function useInvoiceAccess(
   let mayWrite = canPayment(access, editing ? 'payment:update' : 'payment:create');
   if (newSale) mayWrite = access.isResolved && access.can('medical', 'create');
   const readOnly = locked !== null || (access.isResolved && !mayWrite);
-  const live = access.isResolved && access.previewRole === null;
+  const holds = (code: string) => access.isResolved && access.canCode(code);
   return {
     resolved: access.isResolved,
     readOnly,
     locked,
     canDelete:
       editing !== null && locked === null && canPayment(access, 'payment:delete'),
-    floorVisible: live && access.canCode('offering:lower_price:read'),
-    addOffering: live && access.canCode('offering:create'),
+    floorVisible: holds('offering:lower_price:read'),
+    addOffering: holds('offering:create'),
     addMedicine: access.isResolved && access.can('medical', 'create'),
   };
 }

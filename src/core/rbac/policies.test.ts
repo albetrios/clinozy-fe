@@ -29,7 +29,7 @@ describe('hasPermission', () => {
 
   it('denies when the permission is not in the set', () => {
     expect(
-      hasPermission(ctx({ permissions: ['membership:read'] }), 'membership:manage'),
+      hasPermission(ctx({ permissions: ['membership:read'] }), 'membership:update'),
     ).toBe(false);
   });
 
@@ -59,9 +59,9 @@ describe('hasPermission', () => {
 describe('hasAllPermissions', () => {
   it('returns true when all permissions are granted', () => {
     expect(
-      hasAllPermissions(ctx({ permissions: ['role:read', 'role:manage'] }), [
+      hasAllPermissions(ctx({ permissions: ['role:read', 'role:update'] }), [
         'role:read',
-        'role:manage',
+        'role:update',
       ]),
     ).toBe(true);
   });
@@ -70,7 +70,7 @@ describe('hasAllPermissions', () => {
     expect(
       hasAllPermissions(ctx({ permissions: ['role:read'] }), [
         'role:read',
-        'role:manage',
+        'role:update',
       ]),
     ).toBe(false);
   });

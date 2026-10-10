@@ -8,6 +8,7 @@ import type { InvoiceRxPreset } from '@/shared/api/clinic/invoices-fixture-contr
 import type { OfferingRecord } from '@/shared/api/clinic/offerings-contracts.ts';
 import { patientName } from '@/shared/api/clinic/patients-fixture-contracts.ts';
 import { useFixturePatient } from '@/shared/hooks/useFixturePatients/index.ts';
+import { useFixtureMyStaff } from '@/shared/hooks/useFixtureStaff/index.ts';
 import {
   useInvoicePresets,
   usePrescriptionPreset,
@@ -17,7 +18,6 @@ import { useMyMembershipId } from '@/shared/hooks/useMyMembership/index.ts';
 import { useOffers } from '@/shared/hooks/useOffers/index.ts';
 import { usePatient } from '@/shared/hooks/usePatients/index.ts';
 import { useStackedDrawer } from '@/shared/hooks/useStackedDrawer/index.ts';
-import { useMyStaffProfile } from '@/shared/hooks/useTeam/index.ts';
 import { useVisitTreatmentsToBill } from '@/shared/hooks/useTreatments/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -177,7 +177,7 @@ export function useTeamPrefill({
   const presets = useInvoicePresets(sale ? null : patientId);
   const salePresets = useSalePresets(sale ? patientId : null);
   const myMembershipId = useMyMembershipId();
-  const myStaff = useMyStaffProfile();
+  const myStaff = useFixtureMyStaff();
   const touchedRef = useRef(ownTeam);
   const recent = (sale ? salePresets.data : presets.data)?.recentTeamIds ?? [];
   const me = sale ? myStaff.data?.id : myMembershipId;

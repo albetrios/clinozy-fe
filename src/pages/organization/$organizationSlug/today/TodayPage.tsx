@@ -13,6 +13,7 @@ import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.
 import { type TaskTarget, taskTargetNavigation } from '@/shared/clinic/task-targets.ts';
 import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
+import { useRolesInForce } from '@/shared/hooks/useClinicRoles/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
 import { useMeContext } from '@/shared/hooks/useMeContext/index.ts';
 import { useMyMembershipId } from '@/shared/hooks/useMyMembership/index.ts';
@@ -124,7 +125,11 @@ export function TodayPage() {
   const followOn = useFollowOn(organizationSlug, setBooking);
   const queue = useTodayWorkQueue(scope, followOn);
 
-  const focus = useMemo(() => todayFocus(access.roles), [access.roles]);
+  const rolesInForce = useRolesInForce();
+  const focus = useMemo(
+    () => todayFocus(rolesInForce.flatMap((role) => (role.preset ? [role.preset] : []))),
+    [rolesInForce],
+  );
   const lane: TodayLane = search.lane ?? defaultTodayLane(floor.lanes, focus);
   const loading = floor.loading || (queue.shown && queue.loading);
 

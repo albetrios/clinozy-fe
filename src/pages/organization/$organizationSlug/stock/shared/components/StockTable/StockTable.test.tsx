@@ -5,7 +5,7 @@ import { axe } from 'vitest-axe';
 
 import { useRoomTable } from '@/shared/hooks/useRoomTable/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { holdPreset } from '@/tests/utils/clinic-preset-codes.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { StockTable } from './StockTable.tsx';
@@ -61,11 +61,9 @@ function Table({ rows }: { rows: Row[] }) {
 beforeEach(() => {
   csv.downloadCsv.mockReset();
   notifyMock.success.mockReset();
-  useOrganizationStore.getState().setPermissions(['organization:read']);
-  useUIStore.setState({ previewRole: 'admin' });
+  holdPreset('admin');
 });
 afterEach(() => {
-  useUIStore.setState({ previewRole: null });
   useOrganizationStore.getState().clearPermissions();
 });
 
@@ -93,11 +91,10 @@ describe('StockTable', () => {
     expect(notifyMock.success).toHaveBeenCalledWith('1 row exported as CSV');
   });
 
-  it('asks a signed-in member for `stock_item:export`, whatever their roles allow', async () => {
+  it('exports only for a member holding `stock_item:export`', async () => {
     const user = userEvent.setup();
     renderWithProviders(<Table rows={[{ id: 'a', name: 'Gauze swabs' }]} />);
     act(() => {
-      useUIStore.setState({ previewRole: null });
       useOrganizationStore
         .getState()
         .setPermissions(['organization:read', 'stock_item:read']);

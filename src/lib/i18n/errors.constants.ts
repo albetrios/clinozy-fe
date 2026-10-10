@@ -74,6 +74,18 @@ export const ERRORS_KEYS = {
      * names a user id and an ISO time.
      */
     recordChanged: 'api.recordChanged',
+    /** clinozy-be's `error.reason` codes said in our own words (D83 #170 and the tenancy guards). */
+    reasons: {
+      missingPermission: 'api.reasons.missingPermission',
+      ownerMembershipFixed: 'api.reasons.ownerMembershipFixed',
+      ownerCannotLeave: 'api.reasons.ownerCannotLeave',
+      ownerRoleFixed: 'api.reasons.ownerRoleFixed',
+      systemRoleFixed: 'api.reasons.systemRoleFixed',
+      roleLocked: 'api.reasons.roleLocked',
+      seatLimitReached: 'api.reasons.seatLimitReached',
+      membershipAlreadyExists: 'api.reasons.membershipAlreadyExists',
+      disposableEmail: 'api.reasons.disposableEmail',
+    },
   },
   frontend: {
     query: {
@@ -120,6 +132,7 @@ export const ERRORS_KEYS = {
         removeFailed: 'frontend.hooks.members.removeFailed',
         updateFailed: 'frontend.hooks.members.updateFailed',
         updateRoleSuccess: 'frontend.hooks.members.updateRoleSuccess',
+        updateSuccess: 'frontend.hooks.members.updateSuccess',
         removeSuccess: 'frontend.hooks.members.removeSuccess',
         suspendSuccess: 'frontend.hooks.members.suspendSuccess',
         reactivateSuccess: 'frontend.hooks.members.reactivateSuccess',

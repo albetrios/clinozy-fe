@@ -1,11 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { ClinicRoleKey } from '@/shared/api/clinic/access-contracts.ts';
-import type { Section } from '@/shared/api/clinic/clinic-schema.ts';
-import type { AuthUser } from '@/shared/auth/types.ts';
-import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
+vi.mock('@/shared/api/organization-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  getRolePermissions: vi.fn(),
+}));
+import { queryClient } from '@/core/http/queryClient.ts';
+import type { Role, Section } from '@/shared/api/clinic/clinic-schema.ts';
+import { getRolePermissions } from '@/shared/api/organization-api.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { holdPreset, PRESET_CODES } from '@/tests/utils/clinic-preset-codes.ts';
 
 import { clinicHomeRoute, clinicHomeSection } from './clinic-home.ts';
 
@@ -15,83 +19,82 @@ vi.mock('@/core/security/gates/require-module.ts', () => ({
 }));
 
 const everyRoomOpen = () => true;
+const holding =
+  (...codes: readonly string[]) =>
+  (code: string) =>
+    codes.includes(code);
 
-describe('clinicHomeSection (D25)', () => {
-  it.each<[ClinicRoleKey[], Section]>([
-    [['pharmacist'], 'medical'],
-    [['accountant'], 'payments'],
-    [['marketing'], 'leads'],
-    [['doctor'], 'today'],
-    [['front_desk'], 'today'],
-    [['owner'], 'today'],
-    [[], 'today'],
-    [['accountant', 'pharmacist'], 'payments'],
-    [['rol_abcdefghijklmnopqrstu', 'pharmacist'], 'today'],
-  ])('%j → %s', (roles, home) => {
-    expect(clinicHomeSection(roles, everyRoomOpen)).toBe(home);
+describe('clinicHomeSection (D25, re-derived on codes)', () => {
+  it.each<[Role, Section]>([
+    ['owner', 'today'],
+    ['admin', 'today'],
+    ['doctor', 'today'],
+    ['therapist', 'today'],
+    ['front_desk', 'today'],
+    ['counsellor', 'today'],
+    // Reads appointments since D83, books none, sells medicines: still the pharmacy.
+    ['pharmacist', 'medical'],
+    ['accountant', 'payments'],
+    ['marketing', 'leads'],
+  ])('a %s’s codes land on %s', (role, home) => {
+    expect(clinicHomeSection(holding(...PRESET_CODES[role]), everyRoomOpen)).toBe(home);
   });
 
-  it('falls back to the first open room in nav order', () => {
-    expect(
-      clinicHomeSection(
-        ['marketing'],
-        (section) => section !== 'leads' && section !== 'today',
-      ),
-    ).toBe('appointments');
+  it('lands an edited or custom role by what it holds', () => {
+    expect(clinicHomeSection(holding('payment:read', 'lead:read'), everyRoomOpen)).toBe(
+      'payments',
+    );
+    expect(clinicHomeSection(holding('appointment:read'), everyRoomOpen)).toBe('today');
+  });
+
+  it('skips a home whose room is shut, then falls back to the first open room in nav order', () => {
+    const isOpen = (section: Section) => section !== 'medical' && section !== 'today';
+    expect(clinicHomeSection(holding('medicine:create', 'payment:read'), isOpen)).toBe(
+      'payments',
+    );
+    expect(clinicHomeSection(holding('medicine:create'), isOpen)).toBe('leads');
   });
 
   it('is null when no room is open', () => {
-    expect(clinicHomeSection(['doctor'], () => false)).toBeNull();
+    expect(clinicHomeSection(holding(...PRESET_CODES.doctor), () => false)).toBeNull();
   });
 });
 
 describe('clinicHomeRoute', () => {
   beforeEach(() => {
+    vi.resetAllMocks();
+    queryClient.clear();
     disabled.modules = new Set();
+    useOrganizationStore.getState().setOrganization('org_test', 'acme');
     useUIStore.getState().setPreviewRole(null);
-    useAuthStore.setState({ user: null });
   });
 
-  it('sends a member home by their staff profile’s main role (L-31)', async () => {
-    useAuthStore.setState({
-      user: { id: 'usr_farah', email: 'farah@cresence.skin', role: 'user' } as AuthUser,
-    });
-    useOrganizationStore.getState().setPermissions(['organization:read']);
-    expect((await clinicHomeRoute('acme'))?.to).toBe(
-      '/organization/$organizationSlug/medical',
-    );
-  });
-
-  it('sends the org owner to Today', async () => {
-    useOrganizationStore
-      .getState()
-      .setPermissions(['organization:read', 'organization:delete']);
+  it('sends a member home by their own codes', async () => {
+    holdPreset('accountant');
     expect(await clinicHomeRoute('acme')).toEqual({
-      to: '/organization/$organizationSlug/today',
+      to: '/organization/$organizationSlug/payments',
       params: { organizationSlug: 'acme' },
     });
   });
 
-  it('skips a room on clinozy-be the member holds no codes for', async () => {
-    // Today off: the owner's fallback walks the nav order, and Leads and Appointments answer
-    // from the codes (the room would turn them away otherwise), not from the full-access matrix.
+  it('opens only rooms the member’s codes view', async () => {
     disabled.modules = new Set(['clinic-today']);
     useOrganizationStore
       .getState()
-      .setPermissions(['organization:read', 'organization:delete', 'appointment:read']);
+      .setPermissions(['organization:read', 'appointment:read']);
     expect((await clinicHomeRoute('acme'))?.to).toBe(
       '/organization/$organizationSlug/appointments',
     );
   });
 
-  it('follows a View-as preview', async () => {
-    useOrganizationStore
-      .getState()
-      .setPermissions(['organization:read', 'organization:delete']);
-    useUIStore.getState().setPreviewRole('accountant');
+  it('follows a View-as preview by the previewed role’s codes', async () => {
+    holdPreset('owner');
+    vi.mocked(getRolePermissions).mockResolvedValue([...PRESET_CODES.marketing]);
+    useUIStore.getState().setPreviewRole('rol_marketing');
     expect((await clinicHomeRoute('acme'))?.to).toBe(
-      '/organization/$organizationSlug/payments',
+      '/organization/$organizationSlug/leads',
     );
+    expect(getRolePermissions).toHaveBeenCalledWith('rol_marketing');
   });
 
   it('is null when the deployment enables no clinic room', async () => {
@@ -107,9 +110,7 @@ describe('clinicHomeRoute', () => {
       'clinic-offerings',
       'clinic-users',
     ]);
-    useOrganizationStore
-      .getState()
-      .setPermissions(['organization:read', 'organization:delete']);
+    holdPreset('owner');
     expect(await clinicHomeRoute('acme')).toBeNull();
   });
 });

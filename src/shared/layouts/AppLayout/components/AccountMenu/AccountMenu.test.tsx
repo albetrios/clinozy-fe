@@ -10,6 +10,7 @@ import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { presetMyRoles } from '@/tests/utils/clinic-preset-codes.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { AccountMenu } from './AccountMenu.tsx';
@@ -20,6 +21,8 @@ const { logoutMock, disabledModules, platformOverrides } = vi.hoisted(() => ({
   platformOverrides: { themeLock: false },
 }));
 vi.mock('@/shared/auth/service.ts', () => ({ logout: logoutMock }));
+const { meContextMock } = vi.hoisted(() => ({ meContextMock: vi.fn() }));
+vi.mock('@/shared/hooks/useMeContext/index.ts', () => ({ useMeContext: meContextMock }));
 vi.mock('@/core/config/env.ts', async (importOriginal) => {
   const actual = await importOriginal<{ platformConfig: Record<string, unknown> }>();
   return {
@@ -61,6 +64,8 @@ beforeEach(() => {
   useOrganizationStore
     .getState()
     .setPermissions(['organization:read', 'organization:delete']);
+  // The role line reads the member's own roles off me/context.
+  meContextMock.mockReturnValue({ data: { myRoles: presetMyRoles('owner') } });
   useThemeStore.getState().setTheme('light');
 });
 
@@ -81,6 +86,29 @@ describe('AccountMenu', () => {
     expect(identity).toHaveTextContent('Riya Shah');
     expect(identity).toHaveTextContent('riya@acme.test');
     expect(identity).toHaveTextContent(/owner/i);
+  });
+
+  it('names a custom main role by its own name, and shows no role line without one', async () => {
+    meContextMock.mockReturnValue({
+      data: {
+        myRoles: [{ id: 'rol_x', name: 'Floor manager', tone: 'lime', isSystem: false }],
+      },
+    });
+    const { unmount } = renderWithProviders(
+      <AccountMenu onOpenNotifications={vi.fn()} />,
+    );
+    let { menu } = await openMenu();
+    expect(within(menu).getByTestId('account-menu-identity')).toHaveTextContent(
+      'Floor manager',
+    );
+    unmount();
+
+    meContextMock.mockReturnValue({ data: { myRoles: [] } });
+    renderWithProviders(<AccountMenu onOpenNotifications={vi.fn()} />);
+    ({ menu } = await openMenu());
+    expect(within(menu).getByTestId('account-menu-identity')).not.toHaveTextContent(
+      /owner|floor manager/i,
+    );
   });
 
   it('switches the appearance from its radio pills', async () => {

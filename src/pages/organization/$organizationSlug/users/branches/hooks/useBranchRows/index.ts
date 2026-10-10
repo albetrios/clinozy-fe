@@ -5,6 +5,6 @@ export {
   type BranchRow,
   branchRowOf,
   type BranchRowsResult,
-  teamMemberByProfileId,
+  teamMemberById,
   useBranchRows,
 } from './useBranchRows.ts';

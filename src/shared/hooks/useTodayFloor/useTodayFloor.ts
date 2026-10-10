@@ -49,8 +49,13 @@ export function useTodayFloor(
     queryKey: [...todayQueryKeys.floor(organizationId, params), { readsPrescriptions }],
     queryFn: () => fetchTodayFloor(params, { readsPrescriptions }),
     refetchInterval: TODAY_REFETCH_MS,
-    // Once the member's codes are known — the read depends on them, so it is not made twice.
-    enabled: (options.enabled ?? true) && access.isResolved,
+    // Once the member's codes are known — the read depends on them, so it is not made twice —
+    // and only with `appointment:read`: a member without it (Accountant, Marketing) gets no
+    // floor rather than a 403 on every visit (research-users §7 ⚠).
+    enabled:
+      (options.enabled ?? true) &&
+      access.isResolved &&
+      access.can('appointments', 'view'),
     notifyOnError: options.notifyOnError ?? true,
   });
 }

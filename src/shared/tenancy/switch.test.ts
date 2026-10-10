@@ -79,7 +79,7 @@ const BASE_CTX: MeContext = {
     createdAt: TS,
     updatedAt: TS,
   },
-  myPermissions: ['membership:manage'],
+  myPermissions: ['membership:update'],
   globalRole: null,
   deploymentFlags: { personalOrganizations: true, teamOrganizations: true },
   personalOrganizationId: PERSONAL_ID,
@@ -174,7 +174,7 @@ describe('tenancy/switch', () => {
           type: 'TEAM',
           slug: 'acme',
         },
-        my_permissions: ['membership:manage'],
+        my_permissions: ['membership:update'],
         global_role: 'super_admin',
       },
     });

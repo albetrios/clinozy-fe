@@ -1,7 +1,7 @@
 import { screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { Branch } from '@/shared/api/clinic/clinic-schema.ts';
+import { clinicBranch } from '@/tests/utils/branch-doubles.ts';
 
 import {
   renderUsersRoutes,
@@ -16,7 +16,7 @@ const { notifyMock } = vi.hoisted(() => ({
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 
 const VESU: BranchRow = {
-  branch: { id: 'b-vesu', name: 'Vesu' } as Branch,
+  branch: clinicBranch(),
   team: [],
   defaults: [],
 };
@@ -61,13 +61,13 @@ describe('useBranchesDialogRoute (KICKOFF §4, D24)', () => {
 
   it('opens a branch on its edit route — loading until the list has answered', async () => {
     const { unmount } = renderAt(
-      '/organization/acme/users/branches/b-vesu/edit',
+      '/organization/acme/users/branches/brn_vesu00000000000000000/edit',
       probe({ rows: [], isPending: true }),
     );
     expect(await screen.findByRole('status')).toHaveTextContent('edit:loading');
     unmount();
     renderAt(
-      '/organization/acme/users/branches/b-vesu/edit',
+      '/organization/acme/users/branches/brn_vesu00000000000000000/edit',
       probe({ rows: [VESU], isPending: false }),
     );
     expect(await screen.findByRole('status')).toHaveTextContent('edit:Vesu');
@@ -75,7 +75,7 @@ describe('useBranchesDialogRoute (KICKOFF §4, D24)', () => {
 
   it('leaves a dead branch link with "Branch not found", keeping the filter', async () => {
     const { router } = renderAt(
-      '/organization/acme/users/branches/b-gone/edit?created=today',
+      '/organization/acme/users/branches/brn_gone0000000000000000/edit?created=today',
       probe({ rows: [VESU], isPending: false }),
     );
     await waitFor(() =>

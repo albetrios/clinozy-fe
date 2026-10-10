@@ -2,15 +2,17 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { resetClinicAccessFixture } from '@/shared/api/clinic/access-api.ts';
-import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import type * as BranchesApiModule from '@/shared/api/clinic/branches-api.ts';
+import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
+import type { BranchSave, ClinicBranch } from '@/shared/api/clinic/branches-contracts.ts';
+import type * as BranchesManageApiModule from '@/shared/api/clinic/branches-manage-api.ts';
 import type * as OrganizationApiModule from '@/shared/api/organization-api.ts';
+import type { Member } from '@/shared/api/organization-contracts.ts';
+import { HttpError } from '@/shared/errors/HttpError.ts';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { clinicBranch } from '@/tests/utils/branch-doubles.ts';
 
 import {
   member,
@@ -44,33 +46,111 @@ vi.mock('@/shared/notify/notify.ts', () => ({
   UNDO_TOAST_DURATION_MS: 10_000,
 }));
 
-const api = vi.hoisted(() => ({ listMembers: vi.fn(), listRoles: vi.fn() }));
+const api = vi.hoisted(() => ({
+  listMembers: vi.fn(),
+  listRoles: vi.fn(),
+  fetchBranches: vi.fn(),
+  saveBranch: vi.fn(),
+  fetchActiveBranches: vi.fn(),
+}));
 vi.mock('@/shared/api/organization-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof OrganizationApiModule>()),
-  ...api,
+  listMembers: api.listMembers,
+  listRoles: api.listRoles,
+}));
+vi.mock('@/shared/api/clinic/branches-manage-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof BranchesManageApiModule>()),
+  fetchBranches: api.fetchBranches,
+  saveBranch: api.saveBranch,
+}));
+vi.mock('@/shared/api/clinic/branches-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof BranchesApiModule>()),
+  fetchActiveBranches: api.fetchActiveBranches,
 }));
 
-const ROSTER = [
-  member('riya', SELF.email, PLATFORM_ROLES.admin, { userId: SELF.userId }),
-  member('reenal', 'reenal@cresence.skin'),
-  member('nisha', 'nisha@cresence.skin', PLATFORM_ROLES.admin),
-];
+const ADAJAN = clinicBranch({
+  id: 'brn_adajan000000000000000',
+  name: 'Adajan',
+  tone: 'mint',
+  isMain: true,
+  area: 'Adajan',
+  createdAt: '2026-09-01T05:00:00.000Z',
+});
+const VESU = clinicBranch({ createdAt: '2026-09-02T05:00:00.000Z' });
+const VARACHHA = clinicBranch({
+  id: 'brn_varachha0000000000000',
+  name: 'Varachha',
+  tone: 'blush',
+  area: 'Varachha',
+  createdAt: '2026-09-03T05:00:00.000Z',
+});
+
+/** What clinozy-be holds for the run: the three branches and the roster. */
+const server = { branches: [] as ClinicBranch[], roster: [] as Member[] };
+
+const RIYA = member('riya', SELF.email, PLATFORM_ROLES.admin, {
+  userId: SELF.userId,
+  branchIds: [ADAJAN.id, VESU.id],
+});
+const REENAL = member('reenal', 'reenal@cresence.skin', PLATFORM_ROLES.doctor, {
+  branchIds: [VESU.id],
+});
+
+/** clinozy-be's save: a taken name is a reasonless 409; the team moves with the branch. */
+function serverSave({ save }: { save: BranchSave }): ClinicBranch {
+  const name = save.input.name.toLowerCase();
+  const taken = server.branches.some(
+    (row) => row.name.toLowerCase() === name && row.id !== save.branch?.id,
+  );
+  if (taken) throw new HttpError('Conflict', 409, '/app/branches', 'POST', {});
+  const before = server.branches.find((row) => row.id === save.branch?.id);
+  const saved: ClinicBranch = {
+    ...(before ?? clinicBranch({ id: `brn_${name.padEnd(21, '0')}`, isMain: false })),
+    ...save.input,
+    createdAt: before?.createdAt ?? '2026-10-10T05:00:00.000Z',
+  };
+  server.branches = before
+    ? server.branches.map((row) => (row.id === saved.id ? saved : row))
+    : [...server.branches, saved];
+  server.roster = server.roster.map((person) => {
+    const others = person.branchIds.filter((id) => id !== saved.id);
+    return {
+      ...person,
+      branchIds: save.memberIds.includes(person.id) ? [...others, saved.id] : others,
+    };
+  });
+  return saved;
+}
+
+/** `GET /app/branches/my` for an admin: every open branch, main first. */
+const openBranches = (): BranchOption[] =>
+  server.branches
+    .filter((row) => row.active)
+    .map(({ id, name, tone, isMain, opensAt, closesAt, workingDays }) => ({
+      id,
+      name,
+      tone,
+      isMain,
+      opensAt,
+      closesAt,
+      workingDays,
+    }));
 
 /** The open-branch state the header picker reads, beside the page. */
 function Page() {
-  const { isMultiBranch, openBranches } = useBranches();
+  const { isMultiBranch, openBranches: open } = useBranches();
   return (
     <>
       <output data-testid="probe">
-        {String(isMultiBranch)}:{openBranches.length}
+        {String(isMultiBranch)}:{open.length}
       </output>
       <BranchesPage />
     </>
   );
 }
 
-function renderBranches(url: string) {
-  return renderUsersRoutes(url, () => null, { Branches: Page });
+function renderBranches(url: string, codes?: Parameters<typeof renderUsersRoutes>[2]) {
+  return renderUsersRoutes(url, () => null, { Branches: Page, ...codes });
 }
 
 /** The drawer, once its form is up (the list, the Team and the access resolved). */
@@ -79,35 +159,53 @@ async function drawer() {
   return screen.getByTestId('branch-drawer');
 }
 
-function branchNamed(name: string) {
-  const branch = clinicFixtures.branches.snapshot((row) => row.name === name)[0];
-  if (!branch) throw new Error(`no branch ${name}`);
-  return branch;
+/** The one save clinozy-be was sent. */
+function sentSave(): BranchSave {
+  expect(api.saveBranch).toHaveBeenCalledTimes(1);
+  const [call] = api.saveBranch.mock.calls[0] as [{ save: BranchSave }];
+  return call.save;
 }
 
-function profileOf(email: string) {
-  const profile = clinicFixtures.staff.snapshot((row) => row.email === email)[0];
-  if (!profile) throw new Error(`no profile ${email}`);
-  return profile;
+/** Fill a new branch's required fields — PIN code, phone and email included. */
+async function fillRequired(
+  user: ReturnType<typeof userEvent.setup>,
+  panel: HTMLElement,
+  name: string,
+) {
+  await user.type(within(panel).getByTestId('branch-drawer-name'), name);
+  await user.type(
+    within(panel).getByTestId('branch-drawer-line1'),
+    '4th floor, Piplod Plaza',
+  );
+  await user.type(within(panel).getByTestId('branch-drawer-area'), 'Piplod');
+  await user.type(within(panel).getByTestId('branch-drawer-pin'), '395007');
+  await user.click(within(panel).getByTestId('branch-drawer-step-contact-trigger'));
+  await user.type(await within(panel).findByTestId('branch-drawer-phone'), '9825044120');
+  await user.type(within(panel).getByTestId('branch-drawer-email'), 'piplod@clinic.com');
 }
 
 beforeEach(() => {
   viewport.tier = 'desktop';
-  resetClinicFixtures();
-  resetClinicAccessFixture();
-  for (const fn of Object.values(notifyMock)) fn.mockReset();
-  api.listMembers.mockResolvedValue({ rows: ROSTER, next: null, hasMore: false });
+  server.branches = [ADAJAN, VESU, VARACHHA];
+  server.roster = [RIYA, REENAL];
+  for (const fn of [...Object.values(notifyMock), ...Object.values(api)]) fn.mockReset();
+  api.listMembers.mockImplementation(async () => ({
+    rows: server.roster,
+    next: null,
+    hasMore: false,
+  }));
   api.listRoles.mockResolvedValue({
     rows: Object.values(PLATFORM_ROLES),
     next: null,
     hasMore: false,
   });
+  api.fetchBranches.mockImplementation(async () => [...server.branches]);
+  api.fetchActiveBranches.mockImplementation(async () => openBranches());
+  api.saveBranch.mockImplementation(async (input: { save: BranchSave }) =>
+    serverSave(input),
+  );
 });
-afterEach(() => {
-  resetUsersRoutes();
-  resetClinicFixtures();
-  resetClinicAccessFixture();
-});
+afterEach(() => resetUsersRoutes());
 
 describe('the branch drawer — New branch (users.md:176–198)', () => {
   it('starts not main, Open, Mon–Sat 10:00–19:00, the main branch’s City and State, you on its team', async () => {
@@ -117,10 +215,13 @@ describe('the branch drawer — New branch (users.md:176–198)', () => {
     expect(within(panel).getByTestId('branch-drawer-name')).toHaveValue('');
     expect(within(panel).getByTestId('branch-drawer-city')).toHaveValue('Surat');
     expect(within(panel).getByTestId('branch-drawer-state')).toHaveValue('Gujarat');
+    // Main is set when the clinic opens, never from here.
     expect(within(panel).getByTestId('branch-drawer-main')).toHaveAttribute(
       'aria-checked',
       'false',
     );
+    expect(within(panel).getByTestId('branch-drawer-main')).toBeDisabled();
+    expect(within(panel).getByText('one per clinic · set when it opened')).toBeVisible();
     expect(within(panel).getByTestId('branch-drawer-status')).toHaveAttribute(
       'aria-checked',
       'true',
@@ -134,7 +235,7 @@ describe('the branch drawer — New branch (users.md:176–198)', () => {
     expect(await axeForDialog(panel)).toHaveNoViolations();
   });
 
-  it('opens step 1 for the name, then for the address, before anything is sent', async () => {
+  it('asks for the name, then the address, then the contact — before anything is sent', async () => {
     const user = userEvent.setup();
     renderBranches('/organization/acme/users/branches/create');
     const panel = await drawer();
@@ -142,45 +243,54 @@ describe('the branch drawer — New branch (users.md:176–198)', () => {
     expect(notifyMock.warning).toHaveBeenCalledWith('Name the branch');
     await user.type(within(panel).getByTestId('branch-drawer-name'), 'Piplod');
     await user.click(within(panel).getByTestId('branch-drawer-save'));
-    expect(notifyMock.warning).toHaveBeenLastCalledWith('Add the address');
-    expect(clinicFixtures.branches.snapshot()).toHaveLength(3);
+    expect(notifyMock.warning).toHaveBeenLastCalledWith(
+      'Add the address, area, city and PIN code',
+    );
+    await user.type(within(panel).getByTestId('branch-drawer-line1'), 'Shop 1');
+    await user.type(within(panel).getByTestId('branch-drawer-area'), 'Piplod');
+    await user.type(within(panel).getByTestId('branch-drawer-pin'), '395007');
+    await user.click(within(panel).getByTestId('branch-drawer-save'));
+    expect(notifyMock.warning).toHaveBeenLastCalledWith('Add the phone and email');
+    expect(api.saveBranch).not.toHaveBeenCalled();
   });
 
-  it('adds the branch with its team and says so; the list stays', async () => {
+  it('adds the branch with its team in one save and says so; the list stays', async () => {
     const user = userEvent.setup();
     const { router } = renderBranches('/organization/acme/users/branches/create');
     const panel = await drawer();
-    await user.type(within(panel).getByTestId('branch-drawer-name'), 'Piplod');
-    await user.type(
-      within(panel).getByTestId('branch-drawer-line1'),
-      '4th floor, Piplod Plaza',
-    );
+    await fillRequired(user, panel, 'Piplod');
     await user.click(within(panel).getByTestId('branch-drawer-save'));
     await waitFor(() =>
       expect(notifyMock.success).toHaveBeenCalledWith('Piplod branch added'),
     );
+    const save = sentSave();
+    expect(save.branch).toBeUndefined();
+    expect(save.input).toMatchObject({
+      name: 'Piplod',
+      tone: 'peach',
+      active: true,
+      addressLine1: '4th floor, Piplod Plaza',
+      area: 'Piplod',
+      city: 'Surat',
+      state: 'Gujarat',
+      pin: '395007',
+      phone: '+919825044120',
+      email: 'piplod@clinic.com',
+    });
+    expect(save.memberIds).toEqual([RIYA.id]);
     await waitFor(() =>
       expect(router.state.location.pathname).toBe('/organization/acme/users/branches'),
     );
-    const piplod = branchNamed('Piplod');
-    expect(piplod).toMatchObject({
-      city: 'Surat',
-      isMain: false,
-      active: true,
-      phone: '',
-    });
-    expect(profileOf(SELF.email).branchIds).toContain(piplod.id);
     await waitFor(() =>
       expect(screen.getAllByTestId('users-branches-table-row')).toHaveLength(4),
     );
   });
 
-  it('refuses a name another branch has, outlining Name', async () => {
+  it('refuses a name another branch has (409), outlining Name', async () => {
     const user = userEvent.setup();
     renderBranches('/organization/acme/users/branches/create');
     const panel = await drawer();
-    await user.type(within(panel).getByTestId('branch-drawer-name'), 'vesu');
-    await user.type(within(panel).getByTestId('branch-drawer-line1'), 'Shop 1');
+    await fillRequired(user, panel, 'vesu');
     await user.click(within(panel).getByTestId('branch-drawer-save'));
     // The Name box capitalises the first letter as it is typed.
     await waitFor(() =>
@@ -192,42 +302,56 @@ describe('the branch drawer — New branch (users.md:176–198)', () => {
       'aria-invalid',
       'true',
     );
+    expect(server.branches).toHaveLength(3);
   });
 
-  it('checks a filled phone has ten digits and a filled email reads as one', async () => {
+  it('checks a PIN code of six digits, a phone of ten and an email that reads as one', async () => {
     const user = userEvent.setup();
     renderBranches('/organization/acme/users/branches/create');
     const panel = await drawer();
-    await user.type(within(panel).getByTestId('branch-drawer-name'), 'Piplod');
-    await user.type(within(panel).getByTestId('branch-drawer-line1'), 'Shop 1');
-    await user.click(within(panel).getByTestId('branch-drawer-step-contact-trigger'));
-    await user.type(await within(panel).findByTestId('branch-drawer-phone'), '98250');
+    await fillRequired(user, panel, 'Piplod');
+    await user.click(within(panel).getByTestId('branch-drawer-step-place-trigger'));
+    const pin = await within(panel).findByTestId('branch-drawer-pin');
+    await user.clear(pin);
+    await user.type(pin, '3950');
     await user.click(within(panel).getByTestId('branch-drawer-save'));
-    expect(notifyMock.warning).toHaveBeenCalledWith('Phone needs 10 digits');
+    expect(notifyMock.warning).toHaveBeenLastCalledWith('PIN code needs 6 digits');
+    await user.type(within(panel).getByTestId('branch-drawer-pin'), '07');
+    await user.click(within(panel).getByTestId('branch-drawer-step-contact-trigger'));
+    const phone = await within(panel).findByTestId('branch-drawer-phone');
+    await user.clear(phone);
+    await user.type(phone, '98250');
+    await user.click(within(panel).getByTestId('branch-drawer-save'));
+    expect(notifyMock.warning).toHaveBeenLastCalledWith('Phone needs 10 digits');
     await user.type(within(panel).getByTestId('branch-drawer-phone'), '44120');
-    await user.type(within(panel).getByTestId('branch-drawer-email'), 'not-an-email');
+    const email = within(panel).getByTestId('branch-drawer-email');
+    await user.clear(email);
+    await user.type(email, 'not-an-email');
     await user.click(within(panel).getByTestId('branch-drawer-save'));
     expect(notifyMock.warning).toHaveBeenLastCalledWith('Enter a valid email address');
+    expect(api.saveBranch).not.toHaveBeenCalled();
   });
 });
 
 describe('the branch drawer — Edit branch', () => {
-  it('saves a branch as main, clearing main on the old one', async () => {
+  it('saves the fields with the read’s updated_at, and the team only when it changed', async () => {
     const user = userEvent.setup();
-    const vesu = branchNamed('Vesu');
-    renderBranches(`/organization/acme/users/branches/${vesu.id}/edit`);
+    renderBranches(`/organization/acme/users/branches/${VESU.id}/edit`);
     const panel = await drawer();
     expect(within(panel).getByTestId('branch-drawer-name')).toHaveValue('Vesu');
-    await user.click(within(panel).getByTestId('branch-drawer-main'));
+    expect(within(panel).getByTestId('branch-drawer-main')).toBeDisabled();
+    await user.type(within(panel).getByTestId('branch-drawer-line2'), 'Near the park');
     await user.click(within(panel).getByTestId('branch-drawer-save'));
     await waitFor(() => expect(notifyMock.success).toHaveBeenCalledWith('Vesu saved'));
-    expect(branchNamed('Vesu').isMain).toBe(true);
-    expect(branchNamed('Adajan').isMain).toBe(false);
+    const save = sentSave();
+    expect(save.branch).toMatchObject({ id: VESU.id, updatedAt: VESU.updatedAt });
+    expect(save.input).toMatchObject({ addressLine2: 'Near the park' });
+    expect(save.memberIds).toEqual(save.memberIdsBefore);
   });
 
   it('closing all but one branch turns the branch UI off app-wide', async () => {
     const user = userEvent.setup();
-    renderBranches(`/organization/acme/users/branches/${branchNamed('Vesu').id}/edit`);
+    renderBranches(`/organization/acme/users/branches/${VESU.id}/edit`);
     await waitFor(() => expect(screen.getByTestId('probe')).toHaveTextContent('true:3'));
     let panel = await drawer();
     await user.click(within(panel).getByTestId('branch-drawer-status'));
@@ -244,73 +368,61 @@ describe('the branch drawer — Edit branch', () => {
     await user.click(within(panel).getByTestId('branch-drawer-save'));
     await waitFor(() => expect(screen.getByTestId('probe')).toHaveTextContent('false:1'));
     // The Branches tab itself still lists the closed ones.
+    await waitFor(() => expect(screen.getAllByText('Closed')).toHaveLength(2));
     expect(screen.getAllByTestId('users-branches-table-row')).toHaveLength(3);
-    expect(screen.getAllByText('Closed')).toHaveLength(2);
   });
 
-  it('moves people on and off the branch with the Team field', async () => {
+  it('moves people on and off the branch with the Team field — the whole set', async () => {
     const user = userEvent.setup();
-    const varachha = branchNamed('Varachha');
-    renderBranches(`/organization/acme/users/branches/${varachha.id}/edit`);
+    renderBranches(`/organization/acme/users/branches/${VARACHHA.id}/edit`);
     const panel = await drawer();
     await user.click(within(panel).getByTestId('branch-drawer-step-people-trigger'));
     await user.click(await within(panel).findByTestId('branch-drawer-team'));
-    await user.click(
-      await screen.findByTestId(
-        `branch-drawer-team-option-${profileOf('reenal@cresence.skin').id}`,
-      ),
-    );
+    await user.click(await screen.findByTestId(`branch-drawer-team-option-${REENAL.id}`));
     await user.keyboard('{Escape}');
     await user.click(within(panel).getByTestId('branch-drawer-save'));
     await waitFor(() =>
       expect(notifyMock.success).toHaveBeenCalledWith('Varachha saved'),
     );
-    expect(profileOf('reenal@cresence.skin').branchIds).toContain(varachha.id);
+    const save = sentSave();
+    expect(save.memberIdsBefore).toEqual([]);
+    expect(save.memberIds).toEqual([REENAL.id]);
+    expect(server.roster.find((person) => person.id === REENAL.id)?.branchIds).toContain(
+      VARACHHA.id,
+    );
   });
 
-  it('offers Delete on a branch but never on the main one', async () => {
-    renderBranches(`/organization/acme/users/branches/${branchNamed('Adajan').id}/edit`);
+  it('never offers Delete — a branch is closed, not deleted', async () => {
+    renderBranches(`/organization/acme/users/branches/${VESU.id}/edit`);
     const panel = await drawer();
     expect(within(panel).queryByTestId('branch-drawer-delete')).toBeNull();
   });
 
-  it('deletes a branch from its drawer: one confirm, it closes, the branch goes after the window', async () => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
-    const vesu = branchNamed('Vesu');
-    const { router } = renderBranches(
-      `/organization/acme/users/branches/${vesu.id}/edit`,
+  it('says why another conflict refused the save, leaving Name alone', async () => {
+    const user = userEvent.setup();
+    api.saveBranch.mockRejectedValue(
+      new HttpError('Conflict', 409, `/app/branches/${VESU.id}`, 'PATCH', {
+        error: { reason: 'branch_main_exists', detail: 'A main branch exists' },
+      }),
     );
+    renderBranches(`/organization/acme/users/branches/${VESU.id}/edit`);
     const panel = await drawer();
-    await user.click(within(panel).getByTestId('branch-drawer-delete'));
-    const dialog = await screen.findByTestId('confirm-dialog');
-    await user.click(within(dialog).getByTestId('confirm-reason-not-needed'));
-    await user.click(within(dialog).getByTestId('confirm-accept'));
-    await waitFor(() =>
-      expect(router.state.location.pathname).toBe('/organization/acme/users/branches'),
+    await user.type(within(panel).getByTestId('branch-drawer-line2'), 'Near the park');
+    await user.click(within(panel).getByTestId('branch-drawer-save'));
+    await waitFor(() => expect(notifyMock.warning).toHaveBeenCalledTimes(1));
+    expect(notifyMock.warning).not.toHaveBeenCalledWith(
+      'A branch called Vesu already exists',
     );
-    expect(notifyMock.success).toHaveBeenCalledWith(
-      'Vesu removed',
-      expect.objectContaining({ action: expect.objectContaining({ label: 'Undo' }) }),
+    expect(within(panel).getByTestId('branch-drawer-name')).not.toHaveAttribute(
+      'aria-invalid',
+      'true',
     );
-    await vi.advanceTimersByTimeAsync(10_000);
-    await waitFor(() =>
-      expect(clinicFixtures.branches.snapshot((row) => row.id === vesu.id)).toHaveLength(
-        0,
-      ),
-    );
-    // Neither "Branch not found" nor "Action cancelled" on the way out.
-    expect(notifyMock.info).not.toHaveBeenCalled();
-    vi.useRealTimers();
   });
 
-  it('is view only without the Users row’s Edit', async () => {
-    resetUsersRoutes();
-    renderUsersRoutes(
-      `/organization/acme/users/branches/${branchNamed('Vesu').id}/edit`,
-      () => null,
-      { Branches: Page, codes: ['organization:read', 'membership:read', 'role:read'] },
-    );
+  it('is view only without branch:update', async () => {
+    renderBranches(`/organization/acme/users/branches/${VESU.id}/edit`, {
+      codes: ['organization:read', 'membership:read', 'role:read', 'branch:read'],
+    });
     const panel = await drawer();
     expect(within(panel).getByTestId('branch-drawer-name')).toBeDisabled();
     expect(within(panel).queryByTestId('branch-drawer-save')).toBeNull();

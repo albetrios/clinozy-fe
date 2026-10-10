@@ -50,8 +50,8 @@ import {
   paymentRecordSchema,
   pendingCreditRecordSchema,
 } from '@/shared/api/clinic/payments-fixture-contracts.ts';
+import { staffProfileSchema } from '@/shared/api/clinic/staff-fixture-contracts.ts';
 import { taskRecordSchema } from '@/shared/api/clinic/tasks-fixture-contracts.ts';
-import { staffProfileSchema } from '@/shared/api/clinic/users-contracts.ts';
 
 /** The fixture's packages: the contract's, and one added before its invoice (`invoiceId` null). */
 const patientPackageRecordSchema = patientPackageSchema.extend({
@@ -70,7 +70,7 @@ type CollectionKey = keyof typeof clinicFixtures;
 
 const SCHEMAS = {
   branches: branchSchema,
-  // A staff profile carries the plan's role keys and membership link (Appendix F).
+  // A fixture staff profile: a user with its membership link (Medical sales, fixture leads).
   staff: staffProfileSchema,
   patients: patientRecordSchema,
   // Leads carry the plan's hold, unread and custom-interest fields (Appendix F).

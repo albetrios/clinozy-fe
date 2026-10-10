@@ -1,28 +1,34 @@
 import { z } from 'zod';
 
 import { API_BASE_PATH } from '@/core/config/constants.ts';
+import { api, type ApiData } from '@/core/http/api.ts';
 import { apiClient } from '@/core/http/fetch-client.ts';
+import { wireSchema } from '@/core/http/wire-schema.ts';
 import type { OrganizationPermission } from '@/core/rbac/policies.ts';
 import { organizationPermissionSchema } from '@/core/types/permissions.ts';
-import { isoDateString, publicId } from '@/core/types/wire.ts';
+import { isoDateString } from '@/core/types/wire.ts';
 import { parseListTolerant } from '@/lib/parse-list-tolerant.ts';
+import {
+  type DeleteReason,
+  type Tone,
+  weekdaySchema,
+} from '@/shared/api/clinic/clinic-schema.ts';
 import type {
   ApiKey,
   ApiKeyWithSecret,
   Member,
+  MemberChange,
+  MemberInvite,
   MembershipStatus,
-  OrgRole,
   RoleSummary,
 } from '@/shared/api/organization-contracts.ts';
-import { AppError } from '@/shared/errors/AppError.ts';
-import { FRONTEND_ERROR_CODES } from '@/shared/errors/frontend-error-codes.ts';
+import { servedTone } from '@/shared/clinic/clinic-tones.ts';
 import { fetchMeContext } from '@/shared/tenancy/me-context.ts';
 
 import { fetchListPage, type ListPage, type ListPageParams } from './fetch-list-page.ts';
 
 /** Active-org scoped tenancy base (active org comes from the token, not the URL). */
 const ORG_API = `${API_BASE_PATH}/tenancy/organization`;
-const INVITATIONS_API = `${API_BASE_PATH}/tenancy/invitations`;
 /** Sibling of ORG_API, not a child: the permission catalog is platform-wide, not org-scoped. */
 const PERMISSIONS_API = `${API_BASE_PATH}/tenancy/permissions`;
 
@@ -54,144 +60,213 @@ export async function getMyPermissions(): Promise<OrganizationPermission[]> {
   return toOrganizationPermissions(ctx.myPermissions);
 }
 
-export interface AcceptedInvitation {
-  organizationId: string;
-  organizationName: string;
-  organizationSlug: string;
-}
+// ── Invitations (the invitee's side) ──
 
-const acceptedInvitationWire = z.object({
-  organization_id: publicId('org'),
-  organization_name: z.string().optional(),
-  organization_slug: z.string().nullable().optional(),
-});
+type ApiAcceptedInvitation = NonNullable<
+  ApiData<'/tenancy/membership-invitations/{membership_invitation_id}/accept', 'post'>
+>;
 
+const acceptedInvitationWire = wireSchema<ApiAcceptedInvitation>()(
+  z.object({ organization_id: z.string() }),
+);
+
+/**
+ * Accept an invitation with the token from its link (`POST
+ * /tenancy/membership-invitations/:id/accept`). The answer names the organization only — the
+ * caller reads its slug from the switch that follows.
+ *
+ * @remarks
+ * A 401 here is clinozy-be refusing the link for this account, not an expired session, so the
+ * refresh-and-replay is skipped.
+ *
+ * @returns The joined organization's id.
+ */
 export async function acceptInvitation(
   invitationId: string,
   token: string,
-): Promise<AcceptedInvitation> {
-  const res = await apiClient.post<unknown>(
-    `${INVITATIONS_API}/${encodeURIComponent(invitationId)}/accept`,
-    { token },
-    { skip401: true },
+): Promise<{ organizationId: string }> {
+  const response = await api.post(
+    '/tenancy/membership-invitations/{membership_invitation_id}/accept',
+    {
+      params: { membership_invitation_id: invitationId },
+      body: { token },
+      skip401: true,
+    },
   );
-  const wire = acceptedInvitationWire.parse(res.data);
-  return {
-    organizationId: wire.organization_id,
-    organizationName: wire.organization_name ?? '',
-    organizationSlug: wire.organization_slug ?? '',
-  };
+  return { organizationId: acceptedInvitationWire.parse(response.data).organization_id };
 }
 
 // ── Members ──
 
-const membershipUserWire = z.object({
-  id: publicId('usr'),
-  email: z.string(),
-  first_name: z.string().nullable(),
-  last_name: z.string().nullable(),
-  avatar_url: z.string().nullable(),
-});
-const membershipWire = z.object({
-  id: z.string(),
-  user_id: publicId('usr'),
-  role_id: publicId('rol'),
-  status: z.enum(['ACTIVE', 'INVITED', 'SUSPENDED']),
-  joined_at: isoDateString.nullable(),
-  last_active_at: isoDateString.nullable().optional(),
-  user: membershipUserWire,
-  role: z.object({ id: publicId('rol'), name: z.string() }),
-  // The live pending invitation, present only on INVITED rows. Optional so a
-  // response from before clinozy-be sent it still parses.
-  invitation: z
-    .object({ id: publicId('inv'), expires_at: isoDateString })
-    .nullable()
-    .optional(),
-});
-type MembershipWire = z.infer<typeof membershipWire>;
+type ApiMembership = NonNullable<
+  ApiData<'/tenancy/organization/memberships/{membership_id}', 'get'>
+>;
 
-function toMembershipStatus(status: MembershipWire['status']): MembershipStatus {
-  if (status === 'ACTIVE') return 'active';
-  if (status === 'SUSPENDED') return 'suspended';
-  return 'invited';
-}
+const membershipWire = wireSchema<ApiMembership>()(
+  z.object({
+    id: z.string(),
+    user_id: z.string(),
+    status: z.enum(['invited', 'active', 'suspended']),
+    is_owner: z.boolean(),
+    joined_at: z.string().nullable(),
+    created_at: z.string(),
+    updated_at: z.string(),
+    display_name: z.string(),
+    user: z.object({ email: z.string(), avatar_url: z.string().nullable() }),
+    invitation: z.object({ id: z.string(), expires_at: z.string() }).nullable(),
+    staff_number: z.number(),
+    phone: z.string().nullable(),
+    tone: z.string(),
+    role_ids: z.array(z.string()),
+    branch_ids: z.array(z.string()),
+    working_days: z.array(weekdaySchema),
+    work_starts_at: z.string(),
+    work_ends_at: z.string(),
+    commission_percent: z.number(),
+  }),
+);
+type MembershipWire = z.output<typeof membershipWire>;
 
-function toOrgRole(name: string): OrgRole {
-  const n = name.toLowerCase();
-  if (n === 'owner' || n === 'admin' || n === 'viewer') return n;
-  return 'member';
-}
-
-function toMember(w: MembershipWire): Member {
-  const fullName = [w.user.first_name, w.user.last_name].filter(Boolean).join(' ');
+/** A membership as the app reads it. */
+function toMember(wire: MembershipWire): Member {
   return {
-    id: w.id,
-    userId: w.user_id,
-    name: fullName.length > 0 ? fullName : w.user.email,
-    email: w.user.email,
-    role: toOrgRole(w.role.name),
-    roleId: w.role.id,
-    roleName: w.role.name,
-    status: toMembershipStatus(w.status),
-    avatarUrl: w.user.avatar_url ?? undefined,
-    joinedAt: w.joined_at ?? '',
-    lastActiveAt: w.last_active_at ?? undefined,
-    invitation: w.invitation
-      ? { id: w.invitation.id, expiresAt: w.invitation.expires_at }
+    id: wire.id,
+    userId: wire.user_id,
+    name: wire.display_name,
+    email: wire.user.email,
+    status: wire.status,
+    roleIds: wire.role_ids,
+    roleId: wire.role_ids[0] ?? '',
+    isOwner: wire.is_owner,
+    joinedAt: wire.joined_at ?? '',
+    avatarUrl: wire.user.avatar_url ?? undefined,
+    invitation: wire.invitation
+      ? { id: wire.invitation.id, expiresAt: wire.invitation.expires_at }
       : null,
+    staffNumber: wire.staff_number,
+    phone: wire.phone,
+    tone: servedTone(wire.tone, wire.display_name),
+    branchIds: wire.branch_ids,
+    workingDays: wire.working_days,
+    workStartsAt: wire.work_starts_at,
+    workEndsAt: wire.work_ends_at,
+    commissionPercent: wire.commission_percent,
+    createdAt: wire.created_at,
+    updatedAt: wire.updated_at,
   };
 }
 
+/** The members list's server-side filters beside search, sort and the cursor. */
+export interface MemberListParams extends ListPageParams {
+  status?: MembershipStatus;
+  roleId?: string;
+  branchId?: string;
+}
+
 /**
- * One page of the active organization's members. Windowed server-side (search
- * `q` + keyset cursor) so a large org never ships its whole roster to the
- * browser; callers accumulate pages via `useInfiniteQuery`.
+ * One page of the active organization's members (`GET /tenancy/organization/memberships`,
+ * `membership:read`): search `q`, sort by name or joining, the status / role / branch filters and
+ * the keyset cursor. Callers accumulate pages (`useCursorList`) or read them all
+ * (`fetchAllMembers`).
  */
 export async function listMembers(
-  params: ListPageParams = {},
+  params: MemberListParams = {},
 ): Promise<ListPage<Member>> {
-  const page = await fetchListPage(
-    `${ORG_API}/memberships`,
-    membershipWire,
-    'memberships',
-    params,
-  );
-  return { ...page, rows: page.rows.map(toMember) };
+  const response = await api.get('/tenancy/organization/memberships', {
+    query: {
+      limit: params.limit,
+      after: params.after,
+      q: params.q === '' ? undefined : params.q,
+      sort: listSortOf(params.sort),
+      order: params.order,
+      status: params.status,
+      role_id: params.roleId,
+      branch_id: params.branchId,
+    },
+  });
+  const pagination = response.meta?.pagination;
+  return {
+    rows: z
+      .array(membershipWire)
+      .parse(response.data ?? [])
+      .map(toMember),
+    next: pagination?.next ?? null,
+    hasMore: pagination?.has_more ?? false,
+  };
 }
 
-export async function updateMemberRole(input: {
+/** The sorts the member and role lists take — anything else falls back to the server's default. */
+function listSortOf(sort: string | undefined): 'name' | 'created_at' | undefined {
+  return sort === 'name' || sort === 'created_at' ? sort : undefined;
+}
+
+/**
+ * Change a member (`PATCH /tenancy/organization/memberships/:id`, `membership:update`): any of
+ * status, roles, phone, tone, branches, working days, hours and commission. With
+ * `expectedUpdatedAt`, clinozy-be answers `409 record_changed` when the row moved since it was
+ * read. clinozy-be refuses the owner's roles and status (transfer ownership first) and the
+ * caller's own status.
+ */
+export async function updateMember({
+  membershipId,
+  change,
+  idempotencyKey,
+}: {
   membershipId: string;
-  role: OrgRole;
-  roleId?: string;
+  change: MemberChange;
+  idempotencyKey?: string;
 }): Promise<Member> {
-  if (!input.roleId) {
-    throw new AppError(
-      FRONTEND_ERROR_CODES.MEMBER_ROLE_REQUIRED,
-      400,
-      FRONTEND_ERROR_CODES.MEMBER_ROLE_REQUIRED,
-    );
-  }
-  const res = await apiClient.patch<unknown>(
-    `${ORG_API}/memberships/${input.membershipId}`,
-    { role_id: input.roleId },
-  );
-  return toMember(membershipWire.parse(res.data));
+  const response = await api.patch('/tenancy/organization/memberships/{membership_id}', {
+    params: { membership_id: membershipId },
+    body: {
+      status: change.status === 'invited' ? undefined : change.status,
+      role_ids: change.roleIds,
+      phone: change.phone,
+      tone: change.tone,
+      branch_ids: change.branchIds,
+      working_days: change.workingDays,
+      work_starts_at: change.workStartsAt,
+      work_ends_at: change.workEndsAt,
+      commission_percent: change.commissionPercent,
+      expected_updated_at: change.expectedUpdatedAt,
+    },
+    idempotencyKey,
+  });
+  return toMember(membershipWire.parse(response.data));
 }
 
-export async function updateMemberStatus(input: {
+/**
+ * Remove a member (`DELETE /tenancy/organization/memberships/:id?reason=`, `membership:delete`).
+ * Their preferences, saved views, API keys, lead holds, open tasks and branch defaults go with
+ * the membership; a restore brings back the membership alone. Never the owner, never yourself.
+ */
+export async function removeMember({
+  membershipId,
+  reason,
+  note,
+}: {
   membershipId: string;
-  status: MembershipStatus;
-}): Promise<Member> {
-  const res = await apiClient.patch<unknown>(
-    `${ORG_API}/memberships/${input.membershipId}`,
-    { status: input.status.toUpperCase() },
-  );
-  return toMember(membershipWire.parse(res.data));
-}
-
-export async function removeMember(membershipId: string): Promise<{ id: string }> {
-  await apiClient.delete<unknown>(`${ORG_API}/memberships/${membershipId}`);
+  reason: DeleteReason;
+  note?: string;
+}): Promise<{ id: string }> {
+  await api.delete('/tenancy/organization/memberships/{membership_id}', {
+    params: { membership_id: membershipId },
+    reason,
+    note,
+  });
   return { id: membershipId };
+}
+
+/** Bring a removed member back (`POST …/memberships/:id/restore`, `membership:delete`). */
+export async function restoreMember(
+  membershipId: string,
+  idempotencyKey: string,
+): Promise<Member> {
+  const response = await api.post(
+    '/tenancy/organization/memberships/{membership_id}/restore',
+    { params: { membership_id: membershipId }, idempotencyKey },
+  );
+  return toMember(membershipWire.parse(response.data));
 }
 
 /**
@@ -204,203 +279,317 @@ export async function leaveOrganization(): Promise<void> {
 }
 
 /**
- * Invite a member by email (clinozy-be REQ-1). There is no separate "invitation"
- * resource: `POST /organization/memberships` provisions/resolves the user and
- * creates an **INVITED** membership with the given role, emailing an invite
- * token. The invitee then appears in the members list as `invited` until they
- * accept. Requires `membership:manage`.
+ * Invite a member by email (`POST /tenancy/organization/memberships`, `membership:create`,
+ * team organizations only): clinozy-be creates an **invited** membership with the roles and any
+ * clinic details given, and emails the invitee a link. The row joins the members list as
+ * `invited` — its name is the email until they set one. clinozy-be refuses a role carrying a code
+ * the inviter lacks (403), a full plan (`409 seat_limit_reached`), an existing member
+ * (`409 membership_already_exists`) and a disposable address (`400 disposable_email`).
  */
-export async function inviteMember(input: {
-  email: string;
-  roleId: string;
+export async function inviteMember({
+  invite,
+  idempotencyKey,
+}: {
+  invite: MemberInvite;
+  idempotencyKey?: string;
 }): Promise<Member> {
-  const res = await apiClient.post<unknown>(`${ORG_API}/memberships`, {
-    email: input.email,
-    role_id: input.roleId,
+  const response = await api.post('/tenancy/organization/memberships', {
+    body: {
+      email: invite.email,
+      role_ids: invite.roleIds,
+      expires_in_days: invite.expiresInDays,
+      phone: invite.phone,
+      tone: invite.tone,
+      branch_ids: invite.branchIds,
+      working_days: invite.workingDays,
+      work_starts_at: invite.workStartsAt,
+      work_ends_at: invite.workEndsAt,
+      commission_percent: invite.commissionPercent,
+    },
+    idempotencyKey,
   });
-  return toMember(membershipWire.parse(res.data));
+  return toMember(membershipWire.parse(response.data));
 }
 
-// Invitations are created as INVITED memberships (see `inviteMember` above), and
-// each INVITED row carries its live invitation (`Member.invitation`). There is
-// no list or create route under /organization/invitations — only resend and
-// revoke, keyed by that invitation's id. Accepting (`acceptInvitation`) is the
-// invitee's side and lives above.
+// ── Invitations (the organization's side) ──
+//
+// An invitation belongs to its invited membership: resend and cancel act on the membership id.
 
-const resentInvitationWire = z.object({
-  invitation: z.object({
-    id: publicId('inv'),
-    email: z.string(),
-    expires_at: isoDateString,
-  }),
-});
+type ApiResentInvitation = NonNullable<
+  ApiData<'/tenancy/organization/memberships/{membership_id}/invitation/resend', 'post'>
+>;
+
+const resentInvitationWire = wireSchema<ApiResentInvitation>()(
+  z.object({ email: z.string(), expires_at: z.string() }),
+);
 
 /**
- * Send a pending invitation again.
- *
- * @remarks
- * The invitee gets a fresh link and clinozy-be's default expiry (7 days). clinozy-be
- * refuses once the invitation has expired, been accepted or been revoked, and
- * rate-limits the route strictly. Requires `invitation:manage`.
+ * Send an invited member's link again (`POST …/memberships/:id/invitation/resend`,
+ * `membership:update`): a fresh link and clinozy-be's default expiry (7 days) — an expired
+ * invitation too. clinozy-be rate-limits the route strictly.
  */
 export async function resendInvitation(
-  invitationId: string,
+  membershipId: string,
+  idempotencyKey?: string,
 ): Promise<{ email: string; expiresAt: string }> {
-  const res = await apiClient.post<unknown>(
-    `${ORG_API}/invitations/${encodeURIComponent(invitationId)}/resend`,
-    {},
+  const response = await api.post(
+    '/tenancy/organization/memberships/{membership_id}/invitation/resend',
+    { params: { membership_id: membershipId }, body: {}, idempotencyKey },
   );
-  const { invitation } = resentInvitationWire.parse(res.data);
+  const invitation = resentInvitationWire.parse(response.data);
   return { email: invitation.email, expiresAt: invitation.expires_at };
 }
 
 /**
- * Revoke a pending invitation.
- *
- * @remarks
- * clinozy-be revokes it and removes the invited membership in one step, so the row
- * leaves the members list. Removing the membership alone left the invitation
- * unrevoked: the invitee's link then failed with "not found" instead of saying
- * the invitation was revoked. Requires `invitation:manage`.
+ * Cancel an invited member's invitation (`DELETE …/memberships/:id/invitation`,
+ * `membership:delete`): clinozy-be revokes the link and ends the invited membership in one step,
+ * so the row leaves the members list and the invitee's link says it was revoked.
  */
-export async function revokeInvitation(invitationId: string): Promise<{ id: string }> {
-  await apiClient.delete<unknown>(
-    `${ORG_API}/invitations/${encodeURIComponent(invitationId)}`,
-  );
-  return { id: invitationId };
+export async function revokeInvitation(membershipId: string): Promise<{ id: string }> {
+  await api.delete('/tenancy/organization/memberships/{membership_id}/invitation', {
+    params: { membership_id: membershipId },
+  });
+  return { id: membershipId };
 }
 
 // ── Roles ──
 
-const roleWire = z.object({
-  id: publicId('rol'),
-  name: z.string(),
-  description: z.string().nullable().optional(),
-  is_system: z.boolean(),
-  permissions: z.array(z.string()).optional(),
-  member_count: z.number().int().nonnegative().optional(),
-});
-type RoleWire = z.infer<typeof roleWire>;
+type ApiRole = NonNullable<ApiData<'/tenancy/organization/roles/{role_id}', 'get'>>;
 
-function toRoleSummary(w: RoleWire): RoleSummary {
+const roleWire = wireSchema<ApiRole>()(
+  z.object({
+    id: z.string(),
+    name: z.string(),
+    description: z.string().nullable(),
+    is_system: z.boolean(),
+    is_locked: z.boolean(),
+    tone: z.string(),
+    member_count: z.number(),
+    updated_at: z.string(),
+  }),
+);
+
+/** A role as the app reads it. The list carries no codes — `getRolePermissions` reads them. */
+function toRoleSummary(
+  wire: z.output<typeof roleWire>,
+  permissions: OrganizationPermission[] = [],
+): RoleSummary {
   return {
-    id: w.id,
-    name: w.name,
-    description: w.description ?? '',
-    // Drop codes this build does not model rather than widening the type — an unknown code
-    // cannot be rendered in the picker or round-tripped through a save.
-    permissions: toOrganizationPermissions(w.permissions ?? []),
-    memberCount: w.member_count ?? 0,
-    isSystem: w.is_system,
+    id: wire.id,
+    name: wire.name,
+    description: wire.description ?? '',
+    permissions,
+    memberCount: wire.member_count,
+    isSystem: wire.is_system,
+    isLocked: wire.is_locked,
+    tone: servedTone(wire.tone, wire.name),
+    updatedAt: wire.updated_at,
   };
 }
 
-/** One page of the active organization's roles (windowed: search `q` + keyset cursor). */
+/**
+ * One page of the active organization's roles (`GET /tenancy/organization/roles`, `role:read`):
+ * search `q`, sort by name or creation (creation is the presets' own order), the keyset cursor.
+ */
 export async function listRoles(
   params: ListPageParams = {},
 ): Promise<ListPage<RoleSummary>> {
-  const page = await fetchListPage(`${ORG_API}/roles`, roleWire, 'roles', params);
-  return { ...page, rows: page.rows.map(toRoleSummary) };
+  const response = await api.get('/tenancy/organization/roles', {
+    query: {
+      limit: params.limit,
+      after: params.after,
+      q: params.q === '' ? undefined : params.q,
+      sort: listSortOf(params.sort),
+      order: params.order,
+    },
+  });
+  const pagination = response.meta?.pagination;
+  return {
+    rows: z
+      .array(roleWire)
+      .parse(response.data ?? [])
+      .map((row) => toRoleSummary(row)),
+    next: pagination?.next ?? null,
+    hasMore: pagination?.has_more ?? false,
+  };
 }
 
-/**
- * Create a custom role. clinozy-be splits this into two calls: `POST /roles`
- * accepts only `{ name, description }` (a `.strict()` body — sending
- * `permissions` 400s), and the permission set is applied via
- * `PUT /roles/:id/permissions` with `permission_codes`. We chain them and
- * return the role with the permissions we just assigned.
- */
-export async function createRole(input: {
+/** A new custom role's name, description, tone, codes and the role whose codes it starts from. */
+export interface RoleCreateInput {
   name: string;
   description: string;
   permissions: string[];
+  tone?: Tone;
+  /** Adds that role's codes to `permissions` (Users › New role's "Copy access from"). */
+  copyFromRoleId?: string;
+}
+
+/**
+ * Create a custom role in one call (`POST /tenancy/organization/roles`, `role:create`, team
+ * organizations only): name, description, tone and its codes — `permission_codes`, plus a source
+ * role's with `copy_from_role_id`. clinozy-be refuses a code the caller does not hold (403) and a
+ * name already taken (409). The stored set is read back: it is what the cache should believe.
+ */
+export async function createRole({
+  input,
+  idempotencyKey,
+}: {
+  input: RoleCreateInput;
+  idempotencyKey?: string;
 }): Promise<RoleSummary> {
-  const created = await apiClient.post<unknown>(`${ORG_API}/roles`, {
-    name: input.name,
-    description: input.description,
-  });
-  const role = toRoleSummary(roleWire.parse(created.data));
-
-  if (input.permissions.length === 0) return role;
-
-  // The two calls are not atomic, and the second one genuinely fails: clinozy-be refuses any
-  // code the caller does not personally hold. Left alone that surfaced an error while a
-  // zero-permission role stayed behind — a role the user never asked for and did not know
-  // existed. Roll the creation back so a failed write leaves nothing behind, and report the
-  // original failure rather than the cleanup's.
-  try {
-    await apiClient.put<unknown>(`${ORG_API}/roles/${role.id}/permissions`, {
+  const response = await api.post('/tenancy/organization/roles', {
+    body: {
+      name: input.name,
+      description: input.description === '' ? null : input.description,
       permission_codes: input.permissions,
-    });
-  } catch (error) {
-    await deleteRole(role.id).catch(() => undefined);
-    throw error;
-  }
-  // Read the stored set back rather than echoing the request: the response is what the
-  // cache and the UI should believe.
-  return { ...role, permissions: await getRolePermissions(role.id) };
+      tone: input.tone,
+      copy_from_role_id: input.copyFromRoleId,
+    },
+    idempotencyKey,
+  });
+  const role = roleWire.parse(response.data);
+  return toRoleSummary(role, await getRolePermissions(role.id));
 }
 
-/**
- * Update a custom role. Same two-step contract as {@link createRole}: `PATCH
- * /roles/:id` takes only `{ name, description }` (its `.strict()` body 400s on
- * `permissions`), and the permission set is replaced via `PUT
- * /roles/:id/permissions` with `permission_codes`.
- */
-export async function updateRole(input: {
+/** A role's edit: what changes on the role itself, and its whole new code set when that changes. */
+export interface RoleUpdateInput {
   id: string;
-  name: string;
-  description: string;
-  permissions: string[];
-}): Promise<RoleSummary> {
-  const res = await apiClient.patch<unknown>(`${ORG_API}/roles/${input.id}`, {
-    name: input.name,
-    description: input.description,
-  });
-  const role = toRoleSummary(roleWire.parse(res.data));
-
-  // `PUT .../permissions` is a full replace and can be refused independently of the PATCH
-  // above, so an edit can half-apply: renamed, but not re-permissioned. Nothing can be rolled
-  // back here (the previous name is already gone), so surface the failure and let the caller
-  // invalidate — the mutation hooks do — rather than reporting a success that is half true.
-  await apiClient.put<unknown>(`${ORG_API}/roles/${input.id}/permissions`, {
-    permission_codes: input.permissions,
-  });
-  return { ...role, permissions: await getRolePermissions(input.id) };
+  /** Custom roles only — a preset keeps its name. */
+  name?: string;
+  description?: string;
+  tone?: Tone;
+  /** The whole new set (a full replace), or omitted to leave the codes as they are. */
+  permissions?: string[];
+  /** The edited role's `updatedAt` — `409 record_changed` when it moved since. */
+  expectedUpdatedAt?: string;
 }
 
 /**
- * Delete a custom role.
+ * Edit a role: name, description and tone (`PATCH …/roles/:id`, `role:update`), then — when given
+ * — its whole code set (`PUT …/roles/:id/permissions`, a full replace).
  *
  * @remarks
- * clinozy-be refuses this for a seeded (`is_system`) role, so the caller should offer it
- * only for roles the organization created. The route answers 204 with no body; the id
- * is echoed back so callers can evict it from the roles cache.
- *
- * @param roleId - Public id of the role to delete.
- * @returns The deleted role's id.
+ * The two writes are separate on clinozy-be, so an edit can half-apply: renamed, but not
+ * re-permissioned (a code the caller lacks, a locked role). Nothing can be rolled back (the old
+ * name is gone), so the failure surfaces and the mutation hooks refresh the roles either way.
  */
-export async function deleteRole(roleId: string): Promise<{ id: string }> {
-  await apiClient.delete<unknown>(`${ORG_API}/roles/${roleId}`);
+export async function updateRole({
+  input,
+  idempotencyKey,
+}: {
+  input: RoleUpdateInput;
+  idempotencyKey?: string;
+}): Promise<RoleSummary> {
+  const hasRoleChange =
+    input.name !== undefined ||
+    input.description !== undefined ||
+    input.tone !== undefined;
+  const role = hasRoleChange
+    ? roleWire.parse(
+        (
+          await api.patch('/tenancy/organization/roles/{role_id}', {
+            params: { role_id: input.id },
+            body: {
+              name: input.name,
+              description: input.description,
+              tone: input.tone,
+              expected_updated_at: input.expectedUpdatedAt,
+            },
+            idempotencyKey,
+          })
+        ).data,
+      )
+    : null;
+  if (input.permissions !== undefined) {
+    await replaceRolePermissions(input.id, input.permissions);
+  }
+  const permissions = await getRolePermissions(input.id);
+  if (role) return toRoleSummary(role, permissions);
+  const read = await api.get('/tenancy/organization/roles/{role_id}', {
+    params: { role_id: input.id },
+  });
+  return toRoleSummary(roleWire.parse(read.data), permissions);
+}
+
+/**
+ * Replace a role's codes with this set (`PUT …/roles/:id/permissions`, `role:update`). clinozy-be
+ * refuses a code the caller lacks, a locked role's and the owner's role's.
+ */
+export async function replaceRolePermissions(
+  roleId: string,
+  permissions: readonly string[],
+): Promise<OrganizationPermission[]> {
+  const response = await api.put('/tenancy/organization/roles/{role_id}/permissions', {
+    params: { role_id: roleId },
+    body: { permission_codes: [...permissions] },
+  });
+  return codesOf(response.data);
+}
+
+/**
+ * Delete a custom role (`DELETE …/roles/:id?reason=`, `role:delete`). clinozy-be refuses a preset
+ * (`is_system`), so the caller offers it only for the organization's own roles.
+ */
+export async function deleteRole({
+  roleId,
+  reason,
+  note,
+}: {
+  roleId: string;
+  reason: DeleteReason;
+  note?: string;
+}): Promise<{ id: string }> {
+  await api.delete('/tenancy/organization/roles/{role_id}', {
+    params: { role_id: roleId },
+    reason,
+    note,
+  });
   return { id: roleId };
 }
 
-const rolePermissionWire = z.object({ permission_code: z.string() });
+/** Bring a deleted role back (`POST …/roles/:id/restore`, `role:delete`). */
+export async function restoreRole(
+  roleId: string,
+  idempotencyKey: string,
+): Promise<RoleSummary> {
+  const response = await api.post('/tenancy/organization/roles/{role_id}/restore', {
+    params: { role_id: roleId },
+    idempotencyKey,
+  });
+  const role = roleWire.parse(response.data);
+  return toRoleSummary(role, await getRolePermissions(role.id));
+}
+
+type ApiRolePermission = NonNullable<
+  ApiData<'/tenancy/organization/roles/{role_id}/permissions', 'get'>
+>[number];
+
+const rolePermissionWire = wireSchema<ApiRolePermission>()(
+  z.object({ permission_code: z.string() }),
+);
+
+/** The known codes in a role-permissions answer. */
+function codesOf(data: unknown): OrganizationPermission[] {
+  return toOrganizationPermissions(
+    z
+      .array(rolePermissionWire)
+      .parse(data ?? [])
+      .map((row) => row.permission_code),
+  );
+}
 
 /**
- * The permission codes granted to one role. The roles LIST omits permissions
- * (only `GET /roles/:id/permissions` returns them), so editing a role must read
- * them here to pre-fill — otherwise a save would wipe the role's real grants.
+ * The permission codes granted to one role (`GET …/roles/:id/permissions`, `role:read` — the
+ * whole set, one answer). The roles list carries none, so an edit reads them here first —
+ * otherwise a save would replace the role's real codes with an empty set.
  */
 export async function getRolePermissions(
   roleId: string,
 ): Promise<OrganizationPermission[]> {
-  const res = await apiClient.get<unknown>(`${ORG_API}/roles/${roleId}/permissions`);
-  return toOrganizationPermissions(
-    parseListTolerant(rolePermissionWire, res.data, 'role permissions').map(
-      (row) => row.permission_code,
-    ),
-  );
+  const response = await api.get('/tenancy/organization/roles/{role_id}/permissions', {
+    params: { role_id: roleId },
+  });
+  return codesOf(response.data);
 }
 
 const permissionCatalogWire = z.object({

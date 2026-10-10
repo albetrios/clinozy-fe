@@ -2,8 +2,8 @@ import { z } from 'zod';
 
 /**
  * Organization-scoped permission codes, mirroring clinozy-be's permission catalog
- * (`GET /tenancy/permissions`, by category — 82 codes at the clinic launch API): the
- * platform's and the clinic's per-resource codes (`lead:read`, `payment:create`,
+ * (`GET /tenancy/permissions`, by category — 85 codes at the clinic launch API, all of them
+ * an Owner's): the platform's and the clinic's per-resource codes (`lead:read`, `payment:create`,
  * `offering:lower_price:read`, `patient:clinical_record:read`, …).
  *
  * These are granted to a user by their membership/role **within a specific
@@ -105,12 +105,6 @@ export const organizationPermissionSchema = z.enum([
   'organization:update',
   // upload
   'upload:manage',
-  // Not on clinozy-be any more — the Settings › Members / Roles panels and the Users room still
-  // gate on them, so they never pass against the built API (api-integration §1.3). The Users room
-  // step (L-60) moves those gates to the `membership:*` / `role:*` codes and removes these three.
-  'invitation:manage',
-  'membership:manage',
-  'role:manage',
   // users
   'branch:create',
   'branch:delete',

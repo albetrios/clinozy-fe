@@ -103,7 +103,8 @@
       "colour": "used on their badges",
       "roles": "pick one or more · access adds up",
       "branches": "where they work",
-      "days": "Appointments only offer these days"
+      "days": "Appointments only offer these days",
+      "name": "set on their own profile"
     },
     "placeholders": {
       "name": "Full name, e.g. Dr. Nisha Mavani",
@@ -117,7 +118,7 @@
     "increase": "Increase",
     "pickRole": "Pick a role",
     "statusOn": "Active · can sign in",
-    "statusOff": "Inactive · signed out",
+    "statusOff": "Inactive · can't use this clinic",
     "resend": "Resend invitation",
     "quickFill": {
       "doctor": "Doctor · 10:00–19:00",
@@ -131,7 +132,7 @@
       "edit": "Save changes",
       "createAnother": "Create & add another"
     },
-    "missing": "Add name and email",
+    "missing": "Add their email",
     "noRole": "Pick at least one role",
     "emailInvalid": "Enter a valid email address",
     "mobileInvalid": "Mobile needs 10 digits",
@@ -195,65 +196,51 @@
         "create": "{{role}} can create · {{section}}",
         "edit": "{{role}} can edit · {{section}}",
         "delete": "{{role}} can delete · {{section}}"
-      }
-    },
-    "abilities": {
-      "title": "Special permissions",
-      "disc": {
-        "label": "Bill below the offer price",
-        "description": "Discount past the offer price, never below the lowest price"
       },
-      "floor": {
-        "label": "See the lowest price",
-        "description": "Shows the hidden floor price on offerings and invoices"
-      },
-      "prices": {
-        "label": "Change prices & offers",
-        "description": "Edit list / offer prices and create offers"
-      },
-      "dayclose": {
-        "label": "Close the day",
-        "description": "Count cash and lock the day in Payments"
-      },
-      "reverse": {
-        "label": "Reverse settled payments",
-        "description": "Undo money after its day is closed"
-      },
-      "refund": {
-        "label": "Give refunds & credit notes",
-        "description": "Return money to a patient or issue a credit note"
-      },
-      "void": {
-        "label": "Void sales & delete invoices",
-        "description": "Cancel a Medical sale or delete an unpaid invoice"
-      },
-      "allbr": {
-        "label": "See every branch",
-        "description": "Switch the header to other branches and All branches"
-      },
-      "clinical": {
-        "label": "Read clinical notes",
-        "description": "Open complaints, diagnosis, prescriptions and photos"
-      },
-      "export": {
-        "label": "Export lists",
-        "description": "Download any table"
-      },
-      "perms": {
-        "label": "Change roles & access",
-        "description": "Edit roles, access and branches"
+      "notApplicable": "Not part of this row",
+      "resources": {
+        "contact": {
+          "label": "Contacts",
+          "description": "The people behind leads and patients"
+        },
+        "contact_activity": {
+          "label": "Messages & notes",
+          "description": "WhatsApp, calls and team notes"
+        },
+        "patient_prescription": {
+          "label": "Prescriptions",
+          "description": "Writing and approving the Rx"
+        },
+        "patient_treatment": {
+          "label": "Treatments",
+          "description": "Sessions and how they went"
+        },
+        "patient_review": {
+          "label": "Reviews",
+          "description": "Google and video reviews · read with the patient"
+        },
+        "role": {
+          "label": "Roles",
+          "description": "Roles & access"
+        },
+        "branch": {
+          "label": "Branches",
+          "description": "Branches and who works at each"
+        }
       }
     },
     "notes": {
       "admin": "Admins can do everything · this role can’t be narrowed.",
-      "readOnly": "You can see roles here. Changing them needs “Change roles & access”.",
-      "live": "Changes apply right away to everyone with this role. Someone with two roles gets everything either role allows."
+      "readOnly": "You can see roles here. Changing them needs “Update roles”.",
+      "live": "Changes apply right away to everyone with this role. Someone with two roles gets everything either role allows.",
+      "beyond": "This role has access you don’t have · only someone who has it can change the role."
     },
     "locked": {
       "admin": "Admins always have full access",
       "noPerms": "You can’t change roles · ask an admin",
       "noAdd": "You can’t add roles · ask an admin",
-      "platform": "{{productName}} keeps this role’s Users access · it can’t be changed here"
+      "beyond": "This role has access you don’t have · ask an admin",
+      "notYours": "You can only give access you have yourself"
     },
     "added": "Role added · name it and pick what it can do",
     "newRoleName": "New role",
@@ -269,8 +256,26 @@
       "title": "Workspace permissions",
       "hint": "Settings, integrations, billing and the audit log — beyond the sections above. You can only give what you have yourself.",
       "none": "There’s nothing else you can give this role.",
-      "loadFailed": "Couldn’t load the workspace permissions.",
-      "locked": "{{productName}} keeps this role’s workspace permissions · they can’t be changed here"
+      "loadFailed": "Couldn’t load the workspace permissions."
+    },
+    "specials": {
+      "title": "Special permissions",
+      "floor": {
+        "label": "See the lowest price",
+        "description": "Shows the hidden floor price on offerings and invoices"
+      },
+      "clinical": {
+        "label": "Read clinical notes",
+        "description": "Open complaints, diagnosis, notes, photos and reports"
+      },
+      "export": {
+        "label": "Export · {{section}}",
+        "description": "Download its table"
+      },
+      "privateAlbum": {
+        "label": "See the private album",
+        "description": "Opens the private photos in a patient file"
+      }
     }
   },
   "branches": {
@@ -364,7 +369,8 @@
           "desk": "add a front desk to the team first",
           "therapist": "add a therapist to the team first",
           "pharmacist": "add a pharmacist to the team first"
-        }
+        },
+        "main": "one per clinic · set when it opened"
       },
       "toggles": {
         "mainOn": "Main · head office",
@@ -379,16 +385,14 @@
         "edit": "Save branch"
       },
       "nameMissing": "Name the branch",
-      "addressMissing": "Add the address",
+      "addressMissing": "Add the address, area, city and PIN code",
       "duplicate": "A branch called {{name}} already exists",
       "phoneInvalid": "Phone needs 10 digits",
       "emailInvalid": "Enter a valid email address",
       "added": "{{name}} branch added",
-      "saved": "{{name}} saved"
-    },
-    "deleteBranch": {
-      "title": "Delete this branch?",
-      "removed": "{{name}} removed"
+      "saved": "{{name}} saved",
+      "contactMissing": "Add the phone and email",
+      "pinInvalid": "PIN code needs 6 digits"
     }
   }
 }

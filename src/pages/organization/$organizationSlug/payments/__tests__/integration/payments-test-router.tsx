@@ -14,6 +14,7 @@ import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { PRESET_CODES } from '@/tests/utils/clinic-preset-codes.ts';
 import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import {
@@ -43,7 +44,7 @@ export const PAYMENTS_OWNER_CODES: readonly OrganizationPermission[] = [
 
 /** Who the harness signs in, and the pages it mounts. */
 export interface PaymentsRoutesOptions {
-  /** View-as this clinic role (the matrix, no codes) — Admin by default, unless `permissions` is given. */
+  /** A member holding this preset's codes — Admin's by default, unless `permissions` is given. */
   role?: Role;
   /** The member's own clinozy-be codes instead of View-as — how the room on the API answers. */
   permissions?: readonly OrganizationPermission[];
@@ -59,9 +60,8 @@ export interface PaymentsRoutesOptions {
  * its own (Add pending, Edit pending), each rendering nothing — opened at
  * `url`, for the test member (`signInTestMember`: organization `org_test`, slug
  * `acme` — every money read and key carries the organization) holding
- * `permissions`, or previewed as `role` (View-as narrows the clinic access to
- * that role's matrix). `ledger` and `pending` stand in for the two pages (a
- * hook's probe). Every other path lands on a catch-all.
+ * `permissions`, or the `role` preset's codes. `ledger` and `pending` stand in
+ * for the two pages (a hook's probe). Every other path lands on a catch-all.
  */
 export function renderPaymentsRoutes(
   url: string,
@@ -75,8 +75,9 @@ export function renderPaymentsRoutes(
   signInTestMember();
   useOrganizationStore
     .getState()
-    .setPermissions([...(permissions ?? ['organization:read'])]);
-  useUIStore.setState({ previewRole: permissions && !role ? null : (role ?? 'admin') });
+    .setPermissions([
+      ...(permissions && !role ? permissions : PRESET_CODES[role ?? 'admin']),
+    ]);
 
   const root = createRootRoute({ component: () => <Outlet /> });
   const payments = createRoute({

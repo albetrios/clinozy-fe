@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2198 src files · ~1072 tests in src/ · 48 E2E specs · 26 shadcn UI primitives
+Stats: ~2200 src files · ~1071 tests in src/ · 48 E2E specs · 26 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -1395,7 +1395,6 @@ clinozy-fe/
 │   │   │   │   │   └── [1 test file]
 │   │   │   │   ├── access-api.ts
 │   │   │   │   ├── access-contracts.ts
-│   │   │   │   ├── access.fixtures.ts
 │   │   │   │   ├── appointment-status.ts
 │   │   │   │   ├── appointment-views.ts
 │   │   │   │   ├── appointments-api.ts
@@ -1473,6 +1472,8 @@ clinozy-fe/
 │   │   │   │   ├── prescriptions-api.ts
 │   │   │   │   ├── prescriptions-contracts.ts
 │   │   │   │   ├── presence-api.ts
+│   │   │   │   ├── staff-fixture-api.ts
+│   │   │   │   ├── staff-fixture-contracts.ts
 │   │   │   │   ├── stock-room-query-key.ts
 │   │   │   │   ├── task-views.ts
 │   │   │   │   ├── tasks-api.ts
@@ -2353,7 +2354,7 @@ clinozy-fe/
 │   │   │   ├── useClinicAccess/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useClinicAccess.ts
-│   │   │   │   └── [2 test files]
+│   │   │   │   └── [1 test file]
 │   │   │   ├── useClinicalNotes/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useClinicalNotes.ts
@@ -2466,6 +2467,10 @@ clinozy-fe/
 │   │   │   ├── useFixturePatients/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useFixturePatients.ts
+│   │   │   │   └── [1 test file]
+│   │   │   ├── useFixtureStaff/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useFixtureStaff.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── useFormValues/
 │   │   │   │   ├── index.ts
@@ -2911,6 +2916,8 @@ clinozy-fe/
 │   │   ├── auth-api-paths.ts
 │   │   ├── axe-for-dialog.ts
 │   │   ├── bidi-marks.ts
+│   │   ├── branch-doubles.ts
+│   │   ├── clinic-preset-codes.ts
 │   │   ├── clinic-shell-doubles.ts
 │   │   ├── contact-doubles.ts
 │   │   ├── e2e-api-retry.ts

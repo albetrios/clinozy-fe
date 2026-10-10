@@ -31,21 +31,18 @@ vi.mock('@/shared/notify/index.ts', () => ({
   notify: { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() },
 }));
 
-/** The access in force: a signed-in member's codes, or a View-as preview's section actions. */
+/** The access in force: the codes of the member, or of the role a View-as preview shows. */
 const access = vi.hoisted(() => ({
   isResolved: true,
   previewRole: null as string | null,
   codes: new Set<string>(),
-  sections: new Set<string>(),
 }));
 vi.mock('@/shared/hooks/useClinicAccess/index.ts', () => ({
   useClinicAccess: () => ({
-    roles: [],
     previewRole: access.previewRole,
     isResolved: access.isResolved,
-    can: (section: string, action: string) => access.sections.has(`${section}:${action}`),
-    canAbility: () => false,
-    canCode: (code: string) => !access.previewRole && access.codes.has(code),
+    can: () => false,
+    canCode: (code: string) => access.codes.has(code),
     viewableSections: [],
   }),
 }));
@@ -91,7 +88,6 @@ beforeEach(() => {
   access.isResolved = true;
   access.previewRole = null;
   access.codes = new Set();
-  access.sections = new Set();
 });
 afterEach(() => useOrganizationStore.getState().clearOrganization());
 
@@ -265,10 +261,9 @@ describe('useContactActivityAccess', () => {
     expect(result.current).toEqual({ reads: true, writes: true });
   });
 
-  it('previews a role by its Patients view and create — a preview has no codes', () => {
-    access.previewRole = 'therapist';
-    access.codes = new Set(['contact_activity:read', 'contact_activity:create']);
-    access.sections = new Set(['patients:view']);
+  it('previews a role by that role’s own codes', () => {
+    access.previewRole = 'rol_therapist';
+    access.codes = new Set(['contact_activity:read']);
     const { result } = renderHook(() => useContactActivityAccess());
     expect(result.current).toEqual({ reads: true, writes: false });
   });

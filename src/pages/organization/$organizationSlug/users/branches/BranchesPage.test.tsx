@@ -1,16 +1,15 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { resetClinicAccessFixture } from '@/shared/api/clinic/access-api.ts';
-import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import type { OrganizationPermission } from '@/core/types/permissions.ts';
+import type * as CsvModule from '@/lib/csv.ts';
+import type * as BranchesManageApiModule from '@/shared/api/clinic/branches-manage-api.ts';
 import type * as OrganizationApiModule from '@/shared/api/organization-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { fsi } from '@/tests/utils/bidi-marks.ts';
+import { clinicBranch } from '@/tests/utils/branch-doubles.ts';
 
 import {
   member,
@@ -39,24 +38,69 @@ const { notifyMock } = vi.hoisted(() => ({
     dismiss: vi.fn(),
   },
 }));
-// The module itself, not the barrel: the deferred commit imports it directly.
 vi.mock('@/shared/notify/notify.ts', () => ({
   notify: notifyMock,
   TOAST_DURATION_MS: { default: 5_200, error: 9_000 },
   UNDO_TOAST_DURATION_MS: 10_000,
 }));
 
-const api = vi.hoisted(() => ({ listMembers: vi.fn(), listRoles: vi.fn() }));
+const api = vi.hoisted(() => ({
+  listMembers: vi.fn(),
+  listRoles: vi.fn(),
+  fetchBranches: vi.fn(),
+  downloadCsv: vi.fn(),
+}));
 vi.mock('@/shared/api/organization-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof OrganizationApiModule>()),
-  ...api,
+  listMembers: api.listMembers,
+  listRoles: api.listRoles,
+}));
+vi.mock('@/shared/api/clinic/branches-manage-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof BranchesManageApiModule>()),
+  fetchBranches: api.fetchBranches,
+}));
+vi.mock('@/lib/csv.ts', async (importOriginal) => ({
+  ...(await importOriginal<typeof CsvModule>()),
+  downloadCsv: api.downloadCsv,
 }));
 
-const ROSTER = [
-  member('riya', SELF.email, PLATFORM_ROLES.admin, { userId: SELF.userId }),
-  member('reenal', 'reenal@cresence.skin'),
-  member('nisha', 'nisha@cresence.skin', PLATFORM_ROLES.admin),
-];
+const NISHA = member('nisha', 'nisha@cresence.skin', PLATFORM_ROLES.doctor, {
+  name: 'Dr. Nisha Mavani',
+  branchIds: ['brn_adajan000000000000000'],
+});
+const RIYA = member('riya', SELF.email, PLATFORM_ROLES.admin, {
+  userId: SELF.userId,
+  name: 'Riya Shah',
+  branchIds: ['brn_adajan000000000000000'],
+});
+
+const ADAJAN = clinicBranch({
+  id: 'brn_adajan000000000000000',
+  name: 'Adajan',
+  tone: 'mint',
+  isMain: true,
+  addressLine1: '3rd floor, Shree Hari Complex',
+  addressLine2: 'Near Star Bazaar, Adajan Gam Road',
+  area: 'Adajan',
+  pin: '395009',
+  phone: '+917490020099',
+  email: 'adajan@clinic.com',
+  closesAt: '20:00',
+  defaultDoctorId: NISHA.id,
+  createdAt: '2026-09-01T05:00:00.000Z',
+});
+const VESU = clinicBranch({
+  workingDays: ['tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
+  opensAt: '11:00',
+  closesAt: '20:00',
+});
+const VARACHHA = clinicBranch({
+  id: 'brn_varachha0000000000000',
+  name: 'Varachha',
+  tone: 'blush',
+  active: false,
+  createdAt: '2026-09-03T05:00:00.000Z',
+});
 
 /** The list's rows, once they are in. */
 async function rows() {
@@ -68,29 +112,23 @@ async function rows() {
 
 function renderBranches(
   url = '/organization/acme/users/branches',
-  codes = USERS_ADMIN_CODES,
+  codes: OrganizationPermission[] = USERS_ADMIN_CODES,
 ) {
   return renderUsersRoutes(url, () => null, { codes, Branches: BranchesPage });
 }
 
 beforeEach(() => {
   viewport.tier = 'desktop';
-  resetClinicFixtures();
-  resetClinicAccessFixture();
-  for (const fn of Object.values(notifyMock)) fn.mockReset();
-  api.listMembers.mockResolvedValue({ rows: ROSTER, next: null, hasMore: false });
+  for (const fn of [...Object.values(notifyMock), ...Object.values(api)]) fn.mockReset();
+  api.listMembers.mockResolvedValue({ rows: [RIYA, NISHA], next: null, hasMore: false });
   api.listRoles.mockResolvedValue({
     rows: Object.values(PLATFORM_ROLES),
     next: null,
     hasMore: false,
   });
+  api.fetchBranches.mockResolvedValue([ADAJAN, VESU, VARACHHA]);
 });
-afterEach(() => {
-  vi.useRealTimers();
-  resetUsersRoutes();
-  resetClinicFixtures();
-  resetClinicAccessFixture();
-});
+afterEach(() => resetUsersRoutes());
 
 describe('Users › Branches (users.md:79–95)', () => {
   it('lists every branch, the main one first with "Main", each with its address, contact and hours', async () => {
@@ -104,29 +142,28 @@ describe('Users › Branches (users.md:79–95)', () => {
       within(adajan).getByText('Near Star Bazaar, Adajan Gam Road, Adajan, Surat 395009'),
     ).toBeInTheDocument();
     expect(within(adajan).getByText('+91 74900 20099')).toBeInTheDocument();
+    expect(within(adajan).getByText('adajan@clinic.com')).toBeInTheDocument();
     expect(within(adajan).getByText('Mon–Sat · 10:00–20:00')).toBeInTheDocument();
     expect(within(adajan).getByText('Open')).toBeInTheDocument();
     expect(within(vesu).getByText('Tue–Sun · 11:00–20:00')).toBeInTheDocument();
-    // The Team who work there and the default people the Team has.
+    // The Team who work there (each membership's branches) and the default people it has.
     expect(within(adajan).getByText('Riya S.')).toBeInTheDocument();
     // The member's name isolated beside the role.
     expect(
       within(adajan).getByText(`Doctor · ${fsi('Dr. Nisha Mavani')}`),
     ).toBeInTheDocument();
+    expect(within(vesu).getByText('Not set')).toBeInTheDocument();
     expect(screen.getByText('All branches loaded')).toBeInTheDocument();
     expect(await axe(container)).toHaveNoViolations();
   });
 
-  it('lists a closed branch as "Closed" and never offers Delete on the main branch', async () => {
-    const vesu = clinicFixtures.branches.snapshot((branch) => branch.name === 'Vesu')[0];
-    if (!vesu) throw new Error('Vesu');
-    await clinicFixtures.branches.update(vesu.id, { active: false });
+  it('lists a closed branch as "Closed", and offers Edit — never Delete — on every row', async () => {
     renderBranches();
-    const [adajan, vesuRow] = await rows();
-    if (!(adajan && vesuRow)) throw new Error('two rows');
-    expect(within(vesuRow).getByText('Closed')).toBeInTheDocument();
-    expect(within(adajan).queryByRole('button', { name: 'Delete' })).toBeNull();
-    expect(within(vesuRow).getByRole('button', { name: 'Delete' })).toBeInTheDocument();
+    const all = await rows();
+    expect(within(all[2] as HTMLElement).getByText('Closed')).toBeInTheDocument();
+    for (const row of all) {
+      expect(within(row).queryByRole('button', { name: 'Delete' })).toBeNull();
+    }
   });
 
   it('opens a branch’s drawer from its row, and New branch from the toolbar', async () => {
@@ -136,11 +173,10 @@ describe('Users › Branches (users.md:79–95)', () => {
     if (!adajan) throw new Error('a row');
     await user.click(adajan);
     await waitFor(() =>
-      expect(router.state.location.pathname).toMatch(
-        /^\/organization\/acme\/users\/branches\/[^/]+\/edit$/,
+      expect(router.state.location.pathname).toBe(
+        `/organization/acme/users/branches/${ADAJAN.id}/edit`,
       ),
     );
-    expect(await screen.findByTestId('branch-drawer')).toBeInTheDocument();
     expect(await screen.findByTestId('branch-drawer-name')).toHaveValue('Adajan');
     await user.click(screen.getByTestId('branch-drawer-close'));
     await waitFor(() =>
@@ -160,46 +196,38 @@ describe('Users › Branches (users.md:79–95)', () => {
     expect(screen.queryAllByTestId('users-branches-table-row')).toHaveLength(0);
   });
 
-  it('removes a branch only after the 10s Undo window', async () => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+  it('exports the selected rows as CSV with branch:read', async () => {
     renderBranches();
-    const [, vesu] = await rows();
-    if (!vesu) throw new Error('Vesu');
-    await user.click(within(vesu).getByRole('button', { name: 'Delete' }));
-    const dialog = await screen.findByTestId('confirm-dialog');
-    expect(within(dialog).getByText('Delete this branch?')).toBeInTheDocument();
-    expect(within(dialog).getByTestId('confirm-record')).toHaveTextContent('Vesu');
-    await user.click(within(dialog).getByTestId('confirm-reason-not-needed'));
-    await user.click(within(dialog).getByTestId('confirm-accept'));
-    await waitFor(() =>
-      expect(screen.getAllByTestId('users-branches-table-row')).toHaveLength(2),
-    );
-    expect(notifyMock.success).toHaveBeenCalledWith(
-      'Vesu removed',
-      expect.objectContaining({ action: expect.objectContaining({ label: 'Undo' }) }),
-    );
-    expect(clinicFixtures.branches.snapshot()).toHaveLength(3);
-    await vi.advanceTimersByTimeAsync(10_000);
-    await waitFor(() => expect(clinicFixtures.branches.snapshot()).toHaveLength(2));
+    const [adajan, vesu] = await rows();
+    if (!(adajan && vesu)) throw new Error('two rows');
+    fireEvent.click(within(adajan).getByRole('checkbox'));
+    fireEvent.click(within(vesu).getByRole('checkbox'));
+    fireEvent.click(screen.getByTestId('users-branches-table-bulk-export'));
+    expect(api.downloadCsv).toHaveBeenCalledTimes(1);
+    const [fileName, content] = api.downloadCsv.mock.calls[0] as [string, string];
+    expect(fileName).toBe('branches.csv');
+    expect(content.split('\n')).toHaveLength(3);
+    expect(notifyMock.success).toHaveBeenCalledTimes(1);
   });
 
-  it('offers no "New branch" and no Delete without the Users row’s rights', async () => {
+  it('offers no "New branch" and no Export without their codes', async () => {
     renderBranches('/organization/acme/users/branches', [
       'organization:read',
       'membership:read',
       'role:read',
     ]);
-    const [, vesu] = await rows();
-    if (!vesu) throw new Error('Vesu');
+    const [adajan] = await rows();
+    if (!adajan) throw new Error('a row');
     expect(screen.queryByTestId('users-branches-new-branch')).toBeNull();
-    expect(within(vesu).queryByRole('button', { name: 'Delete' })).toBeNull();
+    fireEvent.click(within(adajan).getByRole('checkbox'));
+    expect(screen.queryByTestId('users-branches-table-bulk-export')).toBeNull();
   });
 
   it('sends a create link back with the permission toast to a viewer who may not create', async () => {
     const { router } = renderBranches('/organization/acme/users/branches/create', [
       'organization:read',
       'membership:read',
+      'branch:read',
     ]);
     await waitFor(() =>
       expect(router.state.location.pathname).toBe('/organization/acme/users/branches'),
@@ -209,7 +237,7 @@ describe('Users › Branches (users.md:79–95)', () => {
 
   it('leaves a dead branch link with "Branch not found"', async () => {
     const { router } = renderBranches(
-      '/organization/acme/users/branches/00000000-0000-4000-8000-000000000000/edit',
+      '/organization/acme/users/branches/brn_gone0000000000000000/edit',
     );
     await waitFor(() =>
       expect(router.state.location.pathname).toBe('/organization/acme/users/branches'),
@@ -217,6 +245,13 @@ describe('Users › Branches (users.md:79–95)', () => {
     expect(notifyMock.info).toHaveBeenCalledWith(
       'Branch not found · it may have been deleted',
     );
+  });
+
+  it('keeps the list and says so when its read fails', async () => {
+    api.fetchBranches.mockRejectedValue(new Error('down'));
+    renderBranches();
+    await waitFor(() => expect(notifyMock.error).toHaveBeenCalledTimes(1));
+    expect(screen.queryAllByTestId('users-branches-table-row')).toHaveLength(0);
   });
 
   it('puts the chip first and the address block, with the rest, at the end on a phone', async () => {

@@ -12,7 +12,7 @@ describe('clinic module keys (D8)', () => {
     for (const key of keys) expect(key).toMatch(/^clinic-[a-z]+$/);
   });
 
-  it('takes Leads, Appointments, Patients, Offerings, Stock, Tasks, Today and Payments off the fixtures — they are on the API', () => {
+  it('takes every room but Medical off the fixtures — they are on the API', () => {
     expect(FIXTURE_BACKED_CLINIC_MODULES).not.toContain(CLINIC_MODULES.leads);
     expect(FIXTURE_BACKED_CLINIC_MODULES).not.toContain(CLINIC_MODULES.appointments);
     expect(FIXTURE_BACKED_CLINIC_MODULES).not.toContain(CLINIC_MODULES.patients);
@@ -21,10 +21,8 @@ describe('clinic module keys (D8)', () => {
     expect(FIXTURE_BACKED_CLINIC_MODULES).not.toContain(CLINIC_MODULES.tasks);
     expect(FIXTURE_BACKED_CLINIC_MODULES).not.toContain(CLINIC_MODULES.today);
     expect(FIXTURE_BACKED_CLINIC_MODULES).not.toContain(CLINIC_MODULES.payments);
-    expect(FIXTURE_BACKED_CLINIC_MODULES).toEqual([
-      CLINIC_MODULES.medical,
-      CLINIC_MODULES.users,
-    ]);
+    expect(FIXTURE_BACKED_CLINIC_MODULES).not.toContain(CLINIC_MODULES.users);
+    expect(FIXTURE_BACKED_CLINIC_MODULES).toEqual([CLINIC_MODULES.medical]);
   });
 
   it('production disables every fixture-backed room until its API lands', () => {
@@ -40,6 +38,7 @@ describe('clinic module keys (D8)', () => {
     expect(disabled.has(CLINIC_MODULES.tasks)).toBe(false);
     expect(disabled.has(CLINIC_MODULES.today)).toBe(false);
     expect(disabled.has(CLINIC_MODULES.payments)).toBe(false);
+    expect(disabled.has(CLINIC_MODULES.users)).toBe(false);
   });
 
   it('local and development keep the rooms on', () => {

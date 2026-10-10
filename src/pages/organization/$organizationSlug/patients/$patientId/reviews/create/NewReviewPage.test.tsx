@@ -13,7 +13,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { PATIENT_FILE_SECTIONS } from '@/shared/clinic/patient-file-sections.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { holdPreset } from '@/tests/utils/clinic-preset-codes.ts';
 import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import { patientFile, TEST_PATIENT_ID } from '@/tests/utils/patient-doubles.ts';
 
@@ -47,11 +47,10 @@ vi.mock('../../patient-id.sections.ts', async () => {
 
 const FILE = `/organization/acme/patients/${TEST_PATIENT_ID}`;
 
-/** The page at its route under the file, for the test member previewed as `role`. */
+/** The page at its route under the file, for the test member holding the `role` preset's codes. */
 function renderPage(url: string, role: Role = 'admin') {
   signInTestMember();
-  useOrganizationStore.getState().setPermissions(['organization:read']);
-  useUIStore.setState({ previewRole: role });
+  holdPreset(role);
   const root = createRootRoute({ component: () => <Outlet /> });
   const file = createRoute({
     getParentRoute: () => root,
@@ -99,7 +98,6 @@ beforeEach(() => {
   for (const fn of Object.values(notifyMock)) fn.mockReset();
 });
 afterEach(() => {
-  useUIStore.setState({ previewRole: null });
   useOrganizationStore.getState().clearPermissions();
 });
 
@@ -125,8 +123,8 @@ describe('NewReviewPage (S:46)', () => {
     expect(screen.getByTestId('patient-section-overview')).toBeInTheDocument();
   });
 
-  it('turns a member who cannot edit patients back (S:46)', async () => {
-    const { router } = renderPage(`${FILE}/reviews/create?from=visits`, 'therapist');
+  it('turns a member who cannot log reviews back — a Pharmacist (S:46)', async () => {
+    const { router } = renderPage(`${FILE}/reviews/create?from=visits`, 'pharmacist');
     await waitFor(() => expect(router.state.location.pathname).toBe(`${FILE}/visits`));
     expect(notifyMock.info).toHaveBeenCalledWith(
       'You do not have permission to perform this action.',

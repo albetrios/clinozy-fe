@@ -40,6 +40,15 @@ const CODE_TO_AUTH_KEY: Record<string, string> = {
  */
 const REASON_TO_ERRORS_KEY: Record<string, string> = {
   record_changed: ERRORS_KEYS.api.recordChanged,
+  missing_permission: ERRORS_KEYS.api.reasons.missingPermission,
+  owner_membership_fixed: ERRORS_KEYS.api.reasons.ownerMembershipFixed,
+  owner_cannot_leave: ERRORS_KEYS.api.reasons.ownerCannotLeave,
+  owner_role_fixed: ERRORS_KEYS.api.reasons.ownerRoleFixed,
+  system_role_fixed: ERRORS_KEYS.api.reasons.systemRoleFixed,
+  role_locked: ERRORS_KEYS.api.reasons.roleLocked,
+  seat_limit_reached: ERRORS_KEYS.api.reasons.seatLimitReached,
+  membership_already_exists: ERRORS_KEYS.api.reasons.membershipAlreadyExists,
+  disposable_email: ERRORS_KEYS.api.reasons.disposableEmail,
 };
 
 function translateKey(key: string): string {

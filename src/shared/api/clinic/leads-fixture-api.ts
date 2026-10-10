@@ -16,8 +16,8 @@ import {
   type LeadRecord,
 } from './leads-fixture-contracts.ts';
 import { isLeadClosed } from './leads-fixture-hold.ts';
-import { fetchMyStaffProfile } from './users-api.ts';
-import type { StaffProfile } from './users-contracts.ts';
+import { fetchFixtureMyStaff } from './staff-fixture-api.ts';
+import type { StaffProfile } from './staff-fixture-contracts.ts';
 
 /*
  * The fixture world's leads, for the rooms still on fixtures (D149): the appointment form's
@@ -58,14 +58,14 @@ export async function fetchFixtureLead(id: string): Promise<LeadRecord> {
  * The signed-in member as the Leads room reads them — whose leads "Mine" and
  * "Unreplied" list, who claims, releases and assigns (REPLACE_WITH_API: the
  * server knows the member from the token). Their staff profile by sign-in
- * email (`fetchMyStaffProfile`); else the fixture server's own member, so the
+ * email (`fetchFixtureMyStaff`); else the fixture server's own member, so the
  * room and the fixture server — which sends, claims and moves leads as that
  * member — agree on "me". Null only when the clinic has neither.
  */
 export async function fetchFixtureLeadViewer(
   email: string | null,
 ): Promise<StaffProfile | null> {
-  const mine = await fetchMyStaffProfile(email);
+  const mine = await fetchFixtureMyStaff(email);
   if (mine) return mine;
   const [{ clinicFixtures }, { FIXTURE_VIEWER_ID }] = await Promise.all([
     fixtureWorld(),

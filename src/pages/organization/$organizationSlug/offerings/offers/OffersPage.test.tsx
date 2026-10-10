@@ -344,16 +344,6 @@ describe('access by the member’s codes (research §7)', () => {
       expect(within(probe).queryByTestId(`offers-row-action-${action}`)).toBeNull();
     }
   });
-
-  it('hides every code-gated control during View-as', async () => {
-    const user = userEvent.setup();
-    await openList({ previewRole: 'admin' });
-    await openViewOnly(user, 'P0 Probe offer');
-    expect(screen.queryByTestId('offers-new-button')).not.toBeInTheDocument();
-    expect(
-      within(rowOf('P0 Probe offer')).queryByTestId('offers-row-action-delete'),
-    ).toBeNull();
-  });
 });
 
 describe('the read’s states (KICKOFF §6.11 States)', () => {

@@ -4,32 +4,18 @@ import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
-import { branchRef } from '@/shared/api/clinic/fixtures/organization.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import { STAFF_PROFILE_DEFAULTS } from '@/shared/api/clinic/users-contracts.ts';
 import type { Member, RoleSummary } from '@/shared/api/organization-contracts.ts';
-import { orgQueryKeys } from '@/shared/api/organization-query-keys.ts';
 import type { AuthUser } from '@/shared/auth/types.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
-import {
-  useMyStaffProfile,
-  usePlatformRoles,
-  useRemoveStaffProfile,
-  useSaveStaffProfile,
-  useStaffProfiles,
-  useTeam,
-} from './useTeam.ts';
+import { usePlatformRoles, useTeam } from './useTeam.ts';
 
 const { listMembers, listRoles } = vi.hoisted(() => ({
   listMembers: vi.fn(),
   listRoles: vi.fn(),
 }));
 vi.mock('@/shared/api/organization-api.ts', () => ({ listMembers, listRoles }));
-vi.mock('@/shared/notify/index.ts', () => ({
-  notify: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
-}));
 
 const ORG = 'org_aaaaaaaaaaaaaaaaaaaaa';
 const ADMIN: RoleSummary = {
@@ -39,34 +25,40 @@ const ADMIN: RoleSummary = {
   permissions: [],
   memberCount: 1,
   isSystem: true,
+  isLocked: true,
+  tone: 'plum',
+  updatedAt: '2026-09-01T10:00:00.000Z',
 };
-const OWNER: RoleSummary = { ...ADMIN, id: 'rol_owneraaaaaaaaaaaaaaaa', name: 'Owner' };
 
-function member(key: string, email: string, overrides: Partial<Member> = {}): Member {
+function member(
+  key: string,
+  staffNumber: number,
+  overrides: Partial<Member> = {},
+): Member {
   return {
-    id: `mbr_${key}`,
+    id: `mem_${key.padEnd(21, '0')}`,
     userId: `usr_${key}`,
-    name: email,
-    email,
-    role: 'admin',
-    roleId: ADMIN.id,
-    roleName: 'Admin',
+    name: `${key} name`,
+    email: `${key}@clinic.com`,
     status: 'active',
+    roleIds: [ADMIN.id],
+    roleId: ADMIN.id,
+    isOwner: false,
     joinedAt: '2026-09-01T10:00:00.000Z',
     invitation: null,
+    staffNumber,
+    phone: null,
+    tone: 'sky',
+    branchIds: [],
+    workingDays: ['mon'],
+    workStartsAt: '10:00',
+    workEndsAt: '19:00',
+    commissionPercent: 0,
+    createdAt: '2026-09-01T10:00:00.000Z',
+    updatedAt: '2026-09-01T10:00:00.000Z',
     ...overrides,
   };
 }
-
-const ROSTER = [
-  member('me', 'me@clinic.com', {
-    name: 'Kavya Mehta',
-    role: 'owner',
-    roleId: OWNER.id,
-    roleName: 'Owner',
-  }),
-  member('riya', 'riya@cresence.skin'),
-];
 
 /** One page holding `rows`. */
 const page = <T,>(rows: T[]) => ({ rows, next: null, hasMore: false });
@@ -88,184 +80,66 @@ beforeEach(() => {
   client = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
-  resetClinicFixtures();
-  listMembers.mockReset().mockResolvedValue(page(ROSTER));
-  listRoles.mockReset().mockResolvedValue(page([OWNER, ADMIN]));
-  signIn(['organization:read', 'membership:read', 'role:read', 'membership:manage']);
+  listMembers.mockReset();
+  listRoles.mockReset();
 });
 afterEach(() => {
   client.clear();
-  resetClinicFixtures();
   useAuthStore.setState({ user: null });
   useOrganizationStore.getState().clearOrganization();
 });
 
 describe('useTeam', () => {
-  it('joins the whole roster with the staff profiles, newest #ID first', async () => {
+  it('reads the whole roster with membership:read — the newest #ID first, you marked', async () => {
+    signIn(['organization:read', 'membership:read']);
+    listMembers.mockResolvedValue(
+      page([member('riya', 3), member('me', 12, { isOwner: true })]),
+    );
     const { result } = renderHook(() => useTeam(), { wrapper });
-    expect(result.current.isPending).toBe(true);
-    await waitFor(() => expect(result.current.isPending).toBe(false));
-    expect(result.current.members.map((row) => [row.name, row.seq])).toEqual([
-      ['Riya Shah', 12],
-      ['Kavya Mehta', null],
+    await waitFor(() => expect(result.current.members).toHaveLength(2));
+    expect(
+      result.current.members.map((row) => [row.seq, row.isSelf, row.isOwner]),
+    ).toEqual([
+      [12, true, true],
+      [3, false, false],
     ]);
-    expect(result.current.members[1]).toMatchObject({
-      isSelf: true,
-      isOwner: true,
-      roleKeys: ['owner'],
-    });
-    expect(listMembers).toHaveBeenCalledWith({ limit: 100 });
+    expect(result.current.isPending).toBe(false);
   });
 
-  it('reads no roster without membership:read', async () => {
+  it('reads nothing — and is never pending — without membership:read', () => {
     signIn(['organization:read']);
     const { result } = renderHook(() => useTeam(), { wrapper });
-    await waitFor(() => expect(listRoles).not.toHaveBeenCalled());
-    expect(result.current.isPending).toBe(true);
+    expect(result.current).toMatchObject({ members: [], isPending: false });
     expect(listMembers).not.toHaveBeenCalled();
   });
 
-  it('renders without the roles when the viewer can’t read them', async () => {
+  it('reports a failed read in place, and Retry reads again', async () => {
     signIn(['organization:read', 'membership:read']);
-    const { result } = renderHook(() => useTeam(), { wrapper });
-    await waitFor(() => expect(result.current.isPending).toBe(false));
-    expect(listRoles).not.toHaveBeenCalled();
-    expect(result.current.members).toHaveLength(2);
-  });
-
-  it('reports a roster failure in place, and reads again on Retry', async () => {
-    listMembers.mockRejectedValueOnce(new Error('connection dropped'));
+    listMembers.mockRejectedValueOnce(new Error('down'));
     const { result } = renderHook(() => useTeam(), { wrapper });
     await waitFor(() => expect(result.current.isError).toBe(true));
-    expect(result.current.error?.message).toBe('connection dropped');
+    listMembers.mockResolvedValue(page([member('me', 1)]));
     act(() => result.current.refetch());
-    await waitFor(() => expect(result.current.members).toHaveLength(2));
-    expect(result.current.isError).toBe(false);
-  });
-
-  it('refreshes when any member write invalidates the members prefix', async () => {
-    const { result } = renderHook(() => useTeam(), { wrapper });
-    await waitFor(() => expect(result.current.isPending).toBe(false));
-    listMembers.mockResolvedValue(page([...ROSTER, member('new', 'new@clinic.com')]));
-    await act(() => client.invalidateQueries({ queryKey: orgQueryKeys.members(ORG) }));
-    await waitFor(() => expect(result.current.members).toHaveLength(3));
-  });
-});
-
-describe('the staff profile writes', () => {
-  it('saves an invited member’s profile, which the Team then shows under its name', async () => {
-    listMembers.mockResolvedValue(
-      page([
-        ...ROSTER,
-        member('ishita', 'ishita@clinic.com', {
-          role: 'member',
-          roleId: 'rol_memberaaaaaaaaaaaaaaa',
-          roleName: 'Member',
-          status: 'invited',
-          joinedAt: '',
-          invitation: { id: 'inv_one', expiresAt: '2026-10-10T04:30:00.000Z' },
-        }),
-      ]),
-    );
-    const { result } = renderHook(
-      () => ({ team: useTeam(), save: useSaveStaffProfile() }),
-      { wrapper },
-    );
-    await waitFor(() => expect(result.current.team.isPending).toBe(false));
-    const ishita = () =>
-      result.current.team.members.find((row) => row.membershipId === 'mbr_ishita');
-    expect(ishita()?.name).toBe('ishita@clinic.com');
-
-    await act(() =>
-      result.current.save.mutateAsync({
-        ...STAFF_PROFILE_DEFAULTS,
-        roleKeys: ['doctor'],
-        branchIds: [branchRef('Adajan')],
-        membershipId: 'mbr_ishita',
-        name: 'Dr. Ishita Rao',
-        email: 'ishita@clinic.com',
-      }),
-    );
-    await waitFor(() =>
-      expect(ishita()).toMatchObject({
-        name: 'Dr. Ishita Rao',
-        seq: 19,
-        status: 'invited',
-        roleKeys: ['doctor'],
-      }),
-    );
-    expect(result.current.team.members[0]?.membershipId).toBe('mbr_ishita');
-  });
-
-  it('removes a profile, and the member’s row falls back to the membership', async () => {
-    const { result } = renderHook(
-      () => ({ team: useTeam(), remove: useRemoveStaffProfile() }),
-      { wrapper },
-    );
-    await waitFor(() => expect(result.current.team.isPending).toBe(false));
-    const riya = result.current.team.members[0]?.profile;
-    if (!riya) throw new Error('Riya has a profile');
-    await act(() =>
-      result.current.remove.mutateAsync({
-        id: riya.id,
-        reason: 'no_longer_needed',
-        note: null,
-      }),
-    );
-    await waitFor(() =>
-      expect(result.current.team.members.map((row) => row.profile)).toEqual([null, null]),
-    );
+    await waitFor(() => expect(result.current.members).toHaveLength(1));
   });
 });
 
 describe('usePlatformRoles', () => {
-  it('reads every clinozy-be role for a viewer with role:read', async () => {
+  it('reads every role with role:read', async () => {
+    signIn(['organization:read', 'role:read']);
+    listRoles.mockResolvedValue(page([ADMIN]));
     const { result } = renderHook(() => usePlatformRoles(), { wrapper });
-    await waitFor(() => expect(result.current.isPending).toBe(false));
-    expect(result.current.roles).toEqual([OWNER, ADMIN]);
+    await waitFor(() => expect(result.current.roles).toEqual([ADMIN]));
   });
 
-  it('reads nothing, and is never pending, without role:read', async () => {
-    signIn(['organization:read', 'membership:read']);
-    const { result } = renderHook(() => usePlatformRoles(), { wrapper });
-    expect(result.current.isPending).toBe(false);
-    expect(result.current.roles).toEqual([]);
+  it('reads nothing without role:read, or when not enabled', () => {
+    signIn(['organization:read']);
+    const { result, unmount } = renderHook(() => usePlatformRoles(), { wrapper });
+    expect(result.current).toMatchObject({ roles: [], isPending: false });
+    unmount();
+    signIn(['organization:read', 'role:read']);
+    const off = renderHook(() => usePlatformRoles(false), { wrapper });
+    expect(off.result.current).toMatchObject({ roles: [], isPending: false });
     expect(listRoles).not.toHaveBeenCalled();
-  });
-
-  it('reports a failure in place and reads again on Retry', async () => {
-    listRoles.mockRejectedValueOnce(new Error('connection dropped'));
-    const { result } = renderHook(() => usePlatformRoles(), { wrapper });
-    await waitFor(() => expect(result.current.isError).toBe(true));
-    act(() => result.current.refetch());
-    await waitFor(() => expect(result.current.roles).toHaveLength(2));
-  });
-});
-
-describe('useMyStaffProfile', () => {
-  it('reads the signed-in member’s profile by their sign-in email', async () => {
-    useAuthStore.setState({
-      user: { id: 'usr_riya', email: 'riya@cresence.skin', role: 'user' } as AuthUser,
-    });
-    const { result } = renderHook(() => useMyStaffProfile(), { wrapper });
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data?.seq).toBe(12);
-  });
-
-  it('is null for a member without one', async () => {
-    const { result } = renderHook(() => useMyStaffProfile(), { wrapper });
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data).toBeNull();
-  });
-});
-
-describe('useStaffProfiles', () => {
-  it('reads every live staff profile into the one cache entry the Team joins', async () => {
-    const { result } = renderHook(() => useStaffProfiles(), { wrapper });
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data?.some((profile) => profile.seq === 12)).toBe(true);
-    expect(client.getQueryData(['clinic', 'staff', 'profiles'])).toBe(
-      result.current.data,
-    );
   });
 });

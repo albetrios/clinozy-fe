@@ -13,6 +13,7 @@ import type { OrganizationPermission } from '@/core/rbac/policies.ts';
 import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { PRESET_CODES } from '@/tests/utils/clinic-preset-codes.ts';
 import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import { validateOfferingCreateSearch } from '../../offerings.dialog-search.ts';
@@ -41,8 +42,7 @@ export const OFFERINGS_ADMIN_CODES: readonly OrganizationPermission[] = [
  * at `url` for the test member (`signInTestMember`:
  * organization `org_test`, slug `acme` — every offerings read and key carries
  * the organization) holding `permissions` (their clinozy-be codes; the Admin's
- * by default). `role` runs View-as instead: the clinic access narrows to that
- * role's matrix and every code reads false. Every other path (the Offers tab
+ * by default), or a preset `role`'s codes. Every other path (the Offers tab
  * included — its suites have their own harness, `offers-test-router.tsx`) lands
  * on a catch-all.
  */
@@ -54,8 +54,9 @@ export function renderOfferingsRoutes(
   }: { permissions?: readonly OrganizationPermission[]; role?: Role } = {},
 ) {
   signInTestMember();
-  useOrganizationStore.getState().setPermissions([...permissions]);
-  useUIStore.setState({ previewRole: role ?? null });
+  useOrganizationStore
+    .getState()
+    .setPermissions([...(role ? PRESET_CODES[role] : permissions)]);
 
   const root = createRootRoute({ component: () => <Outlet /> });
   const offerings = createRoute({

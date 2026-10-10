@@ -10,18 +10,21 @@ import {
   MEDICAL_TABLE_IDS,
 } from '../../../medical.constants.ts';
 
+/** The Medical room's export code (`medicine:export`, research-users §7). */
+const MEDICAL_EXPORT_CODE = 'medicine:export';
+
 /** Props of {@link MedicalTable}: the shared room table's, named by the tab. */
 export interface MedicalTableProps<TRow extends { id: string }> extends Omit<
   RoomTableProps<TRow>,
-  'tableId' | 'label' | 'tone' | 'icon' | 'emptyHint' | 'exportCopy'
+  'tableId' | 'label' | 'tone' | 'icon' | 'emptyHint' | 'exportCopy' | 'exportCode'
 > {
   tab: MedicalTab;
 }
 
 /**
  * A Medical tab's table (KICKOFF §6.7 Tables) — the shared room table in the
- * room's blush, its `Pill` empty tile, the tab's table id and name, and the
- * room's words for the hint and Export.
+ * room's blush, its `Pill` empty tile, the tab's table id and name, the
+ * room's words for the hint and Export, and Export behind `medicine:export`.
  */
 export function MedicalTable<TRow extends { id: string }>({
   tab,
@@ -36,6 +39,7 @@ export function MedicalTable<TRow extends { id: string }>({
       tone="blush"
       icon={<Pill />}
       emptyHint={t(MEDICAL_KEYS.empty.hint)}
+      exportCode={MEDICAL_EXPORT_CODE}
       exportCopy={{
         label: t(MEDICAL_KEYS.bulk.export),
         done: (count) => t(MEDICAL_KEYS.bulk.exported, { count }),
