@@ -69,7 +69,7 @@ export async function clinicHomeRoute(organizationSlug: string) {
   const { previewRole } = useUIStore.getState();
   const codes: readonly string[] = previewRole
     ? await queryClient
-        .fetchQuery({
+        .query({
           queryKey: orgQueryKeys.rolePermissions(organizationId, previewRole),
           queryFn: () => getRolePermissions(previewRole),
         })

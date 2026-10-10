@@ -106,7 +106,7 @@ export function useRoleAccessWrites(role: RoleSummary | null): RoleAccessWrites 
       if (!(role && codes) || refused()) return;
       let next: string[];
       try {
-        next = await queryClient.fetchQuery({
+        next = await queryClient.query({
           queryKey: orgQueryKeys.rolePermissions(organizationId, source.id),
           queryFn: () => getRolePermissions(source.id),
         });
