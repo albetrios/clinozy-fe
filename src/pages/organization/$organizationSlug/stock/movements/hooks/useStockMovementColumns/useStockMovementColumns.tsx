@@ -100,7 +100,7 @@ function movementNote(
   if (row.reverts) return text.revertNote(row.reverts, row.note);
   const remark = text.remark(row);
   const { purchase } = row;
-  if (purchase === null || purchase.seq === null) return remark;
+  if (purchase?.seq == null) return remark;
   return (
     <>
       <button

@@ -104,9 +104,14 @@ export function useUpdateOffer(
   });
 }
 
-/** An offer as a pause or resume leaves it before the answer: paused at once, a resume's status still to come. */
-function toggled(offer: OfferRecord, isActive: boolean): OfferRecord {
-  return isActive ? { ...offer, isActive } : { ...offer, isActive, status: 'paused' };
+/** An offer as a pause leaves it before the answer: paused at once (an inactive offer is paused, O10). */
+function pausedNow(offer: OfferRecord): OfferRecord {
+  return { ...offer, isActive: false, status: 'paused' };
+}
+
+/** An offer as a resume leaves it before the answer: active, its status still to come. */
+function resumedNow(offer: OfferRecord): OfferRecord {
+  return { ...offer, isActive: true };
 }
 
 /** What a row's Pause / Resume sends. */
@@ -135,8 +140,10 @@ export function useSetOfferActive(
     invalidateKeys: [offerQueryKeys.all],
     optimistic: {
       queryKey: listKey,
-      update: (previous, { id, isActive }) =>
-        previous?.map((offer) => (offer.id === id ? toggled(offer, isActive) : offer)),
+      update: (previous, { id, isActive }) => {
+        const settle = isActive ? resumedNow : pausedNow;
+        return previous?.map((offer) => (offer.id === id ? settle(offer) : offer));
+      },
     },
     successMessage: (offer) =>
       offerToast(

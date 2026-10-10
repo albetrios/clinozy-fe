@@ -48,7 +48,7 @@ const TABLE_ID = STOCK_TABLE_IDS.vendors;
 function useVendorCount({ q }: StockVendorListParams): string | undefined {
   const { t, formatRupees } = useStockWords();
   const summary = useStockSummary('vendors', { q }).data;
-  if (summary === undefined || summary.total === null || summary.due === null) {
+  if (summary?.total == null || summary.due == null) {
     return undefined;
   }
   return t(STOCK_KEYS.vendors.count, {
