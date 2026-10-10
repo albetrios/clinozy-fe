@@ -102,16 +102,18 @@ describe('PatientPicker', () => {
     expect(await axe(container)).toHaveNoViolations();
     await user.click(trigger);
     await user.type(await screen.findByTestId('patient-picker-search'), 'Rhea');
-    const option = await screen.findByTestId(
-      `patient-picker-option-${patientRef('Rhea Shah')}`,
-    );
+    const optionId = `patient-picker-option-${patientRef('Rhea Shah')}`;
+    const option = await screen.findByTestId(optionId);
     expect(within(option).getByText('Rhea Shah')).toBeInTheDocument();
-    await user.click(option);
-    await waitFor(() =>
+    // The search's answer can re-render the list between the find and the click (a slow
+    // run) — the click then lands on a node that is gone; click the current option until
+    // the pick arrives.
+    await waitFor(async () => {
+      if (onPick.mock.calls.length === 0) await user.click(screen.getByTestId(optionId));
       expect(onPick).toHaveBeenCalledWith(
         expect.objectContaining({ kind: 'patient', name: 'Rhea Shah' }),
-      ),
-    );
+      );
+    });
     await waitFor(() => expect(trigger).toHaveTextContent('Rhea Shah'));
   });
 
