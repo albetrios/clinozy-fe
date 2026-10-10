@@ -12423,7 +12423,8 @@ export interface operations {
                             /** @enum {string} */
                             direction?: "received" | "paid";
                             edit_count?: number;
-                            expense_category?: string | null;
+                            /** @enum {string|null} */
+                            expense_category?: "medicines" | "consumables" | "salary" | "rent" | "marketing" | "utilities" | "maintenance" | "misc" | null;
                             id?: string;
                             invoice?: {
                                 due_amount?: number;
@@ -12441,9 +12442,61 @@ export interface operations {
                             last_edit?: {
                                 author_membership_id?: string | null;
                                 changes?: {
-                                    [key: string]: {
-                                        from?: unknown;
-                                        to?: unknown;
+                                    attachment_keys?: {
+                                        from: string[];
+                                        to: string[];
+                                    };
+                                    contact_id?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    expense_category?: {
+                                        /** @enum {string|null} */
+                                        from: "medicines" | "consumables" | "salary" | "rent" | "marketing" | "utilities" | "maintenance" | "misc" | null;
+                                        /** @enum {string|null} */
+                                        to: "medicines" | "consumables" | "salary" | "rent" | "marketing" | "utilities" | "maintenance" | "misc" | null;
+                                    };
+                                    invoice_id?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    medical_purchase_order_id?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    note?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    paid_at?: {
+                                        /** Format: date-time */
+                                        from: string;
+                                        /** Format: date-time */
+                                        to: string;
+                                    };
+                                    payee_name?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    reference?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    splits?: {
+                                        from: {
+                                            amount: number;
+                                            /** @enum {string} */
+                                            mode: "cash" | "upi" | "card" | "credit";
+                                        }[];
+                                        to: {
+                                            amount: number;
+                                            /** @enum {string} */
+                                            mode: "cash" | "upi" | "card" | "credit";
+                                        }[];
+                                    };
+                                    stock_purchase_id?: {
+                                        from: string | null;
+                                        to: string | null;
                                     };
                                 };
                                 /** Format: date-time */
@@ -15060,7 +15113,6 @@ export interface operations {
                         }[];
                         meta?: {
                             pagination: {
-                                estimated_total?: number;
                                 has_more?: boolean;
                                 next?: string | null;
                                 per_page?: number;
@@ -21155,7 +21207,8 @@ export interface operations {
                             /** @enum {string} */
                             direction?: "received" | "paid";
                             edit_count?: number;
-                            expense_category?: string | null;
+                            /** @enum {string|null} */
+                            expense_category?: "medicines" | "consumables" | "salary" | "rent" | "marketing" | "utilities" | "maintenance" | "misc" | null;
                             id?: string;
                             invoice?: {
                                 due_amount?: number;
@@ -21173,9 +21226,61 @@ export interface operations {
                             last_edit?: {
                                 author_membership_id?: string | null;
                                 changes?: {
-                                    [key: string]: {
-                                        from?: unknown;
-                                        to?: unknown;
+                                    attachment_keys?: {
+                                        from: string[];
+                                        to: string[];
+                                    };
+                                    contact_id?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    expense_category?: {
+                                        /** @enum {string|null} */
+                                        from: "medicines" | "consumables" | "salary" | "rent" | "marketing" | "utilities" | "maintenance" | "misc" | null;
+                                        /** @enum {string|null} */
+                                        to: "medicines" | "consumables" | "salary" | "rent" | "marketing" | "utilities" | "maintenance" | "misc" | null;
+                                    };
+                                    invoice_id?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    medical_purchase_order_id?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    note?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    paid_at?: {
+                                        /** Format: date-time */
+                                        from: string;
+                                        /** Format: date-time */
+                                        to: string;
+                                    };
+                                    payee_name?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    reference?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    splits?: {
+                                        from: {
+                                            amount: number;
+                                            /** @enum {string} */
+                                            mode: "cash" | "upi" | "card" | "credit";
+                                        }[];
+                                        to: {
+                                            amount: number;
+                                            /** @enum {string} */
+                                            mode: "cash" | "upi" | "card" | "credit";
+                                        }[];
+                                    };
+                                    stock_purchase_id?: {
+                                        from: string | null;
+                                        to: string | null;
                                     };
                                 };
                                 /** Format: date-time */
@@ -21289,7 +21394,8 @@ export interface operations {
                             /** @enum {string} */
                             direction?: "received" | "paid";
                             edit_count?: number;
-                            expense_category?: string | null;
+                            /** @enum {string|null} */
+                            expense_category?: "medicines" | "consumables" | "salary" | "rent" | "marketing" | "utilities" | "maintenance" | "misc" | null;
                             id?: string;
                             invoice?: {
                                 due_amount?: number;
@@ -21307,9 +21413,61 @@ export interface operations {
                             last_edit?: {
                                 author_membership_id?: string | null;
                                 changes?: {
-                                    [key: string]: {
-                                        from?: unknown;
-                                        to?: unknown;
+                                    attachment_keys?: {
+                                        from: string[];
+                                        to: string[];
+                                    };
+                                    contact_id?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    expense_category?: {
+                                        /** @enum {string|null} */
+                                        from: "medicines" | "consumables" | "salary" | "rent" | "marketing" | "utilities" | "maintenance" | "misc" | null;
+                                        /** @enum {string|null} */
+                                        to: "medicines" | "consumables" | "salary" | "rent" | "marketing" | "utilities" | "maintenance" | "misc" | null;
+                                    };
+                                    invoice_id?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    medical_purchase_order_id?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    note?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    paid_at?: {
+                                        /** Format: date-time */
+                                        from: string;
+                                        /** Format: date-time */
+                                        to: string;
+                                    };
+                                    payee_name?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    reference?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    splits?: {
+                                        from: {
+                                            amount: number;
+                                            /** @enum {string} */
+                                            mode: "cash" | "upi" | "card" | "credit";
+                                        }[];
+                                        to: {
+                                            amount: number;
+                                            /** @enum {string} */
+                                            mode: "cash" | "upi" | "card" | "credit";
+                                        }[];
+                                    };
+                                    stock_purchase_id?: {
+                                        from: string | null;
+                                        to: string | null;
                                     };
                                 };
                                 /** Format: date-time */
@@ -21395,7 +21553,8 @@ export interface operations {
                             /** @enum {string} */
                             direction?: "received" | "paid";
                             edit_count?: number;
-                            expense_category?: string | null;
+                            /** @enum {string|null} */
+                            expense_category?: "medicines" | "consumables" | "salary" | "rent" | "marketing" | "utilities" | "maintenance" | "misc" | null;
                             id?: string;
                             invoice?: {
                                 due_amount?: number;
@@ -21413,9 +21572,61 @@ export interface operations {
                             last_edit?: {
                                 author_membership_id?: string | null;
                                 changes?: {
-                                    [key: string]: {
-                                        from?: unknown;
-                                        to?: unknown;
+                                    attachment_keys?: {
+                                        from: string[];
+                                        to: string[];
+                                    };
+                                    contact_id?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    expense_category?: {
+                                        /** @enum {string|null} */
+                                        from: "medicines" | "consumables" | "salary" | "rent" | "marketing" | "utilities" | "maintenance" | "misc" | null;
+                                        /** @enum {string|null} */
+                                        to: "medicines" | "consumables" | "salary" | "rent" | "marketing" | "utilities" | "maintenance" | "misc" | null;
+                                    };
+                                    invoice_id?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    medical_purchase_order_id?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    note?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    paid_at?: {
+                                        /** Format: date-time */
+                                        from: string;
+                                        /** Format: date-time */
+                                        to: string;
+                                    };
+                                    payee_name?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    reference?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    splits?: {
+                                        from: {
+                                            amount: number;
+                                            /** @enum {string} */
+                                            mode: "cash" | "upi" | "card" | "credit";
+                                        }[];
+                                        to: {
+                                            amount: number;
+                                            /** @enum {string} */
+                                            mode: "cash" | "upi" | "card" | "credit";
+                                        }[];
+                                    };
+                                    stock_purchase_id?: {
+                                        from: string | null;
+                                        to: string | null;
                                     };
                                 };
                                 /** Format: date-time */
@@ -21553,7 +21764,8 @@ export interface operations {
                             /** @enum {string} */
                             direction?: "received" | "paid";
                             edit_count?: number;
-                            expense_category?: string | null;
+                            /** @enum {string|null} */
+                            expense_category?: "medicines" | "consumables" | "salary" | "rent" | "marketing" | "utilities" | "maintenance" | "misc" | null;
                             id?: string;
                             invoice?: {
                                 due_amount?: number;
@@ -21571,9 +21783,61 @@ export interface operations {
                             last_edit?: {
                                 author_membership_id?: string | null;
                                 changes?: {
-                                    [key: string]: {
-                                        from?: unknown;
-                                        to?: unknown;
+                                    attachment_keys?: {
+                                        from: string[];
+                                        to: string[];
+                                    };
+                                    contact_id?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    expense_category?: {
+                                        /** @enum {string|null} */
+                                        from: "medicines" | "consumables" | "salary" | "rent" | "marketing" | "utilities" | "maintenance" | "misc" | null;
+                                        /** @enum {string|null} */
+                                        to: "medicines" | "consumables" | "salary" | "rent" | "marketing" | "utilities" | "maintenance" | "misc" | null;
+                                    };
+                                    invoice_id?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    medical_purchase_order_id?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    note?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    paid_at?: {
+                                        /** Format: date-time */
+                                        from: string;
+                                        /** Format: date-time */
+                                        to: string;
+                                    };
+                                    payee_name?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    reference?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    splits?: {
+                                        from: {
+                                            amount: number;
+                                            /** @enum {string} */
+                                            mode: "cash" | "upi" | "card" | "credit";
+                                        }[];
+                                        to: {
+                                            amount: number;
+                                            /** @enum {string} */
+                                            mode: "cash" | "upi" | "card" | "credit";
+                                        }[];
+                                    };
+                                    stock_purchase_id?: {
+                                        from: string | null;
+                                        to: string | null;
                                     };
                                 };
                                 /** Format: date-time */
@@ -21650,9 +21914,61 @@ export interface operations {
                         data?: {
                             author_membership_id?: string | null;
                             changes?: {
-                                [key: string]: {
-                                    from?: unknown;
-                                    to?: unknown;
+                                attachment_keys?: {
+                                    from: string[];
+                                    to: string[];
+                                };
+                                contact_id?: {
+                                    from: string | null;
+                                    to: string | null;
+                                };
+                                expense_category?: {
+                                    /** @enum {string|null} */
+                                    from: "medicines" | "consumables" | "salary" | "rent" | "marketing" | "utilities" | "maintenance" | "misc" | null;
+                                    /** @enum {string|null} */
+                                    to: "medicines" | "consumables" | "salary" | "rent" | "marketing" | "utilities" | "maintenance" | "misc" | null;
+                                };
+                                invoice_id?: {
+                                    from: string | null;
+                                    to: string | null;
+                                };
+                                medical_purchase_order_id?: {
+                                    from: string | null;
+                                    to: string | null;
+                                };
+                                note?: {
+                                    from: string | null;
+                                    to: string | null;
+                                };
+                                paid_at?: {
+                                    /** Format: date-time */
+                                    from: string;
+                                    /** Format: date-time */
+                                    to: string;
+                                };
+                                payee_name?: {
+                                    from: string | null;
+                                    to: string | null;
+                                };
+                                reference?: {
+                                    from: string | null;
+                                    to: string | null;
+                                };
+                                splits?: {
+                                    from: {
+                                        amount: number;
+                                        /** @enum {string} */
+                                        mode: "cash" | "upi" | "card" | "credit";
+                                    }[];
+                                    to: {
+                                        amount: number;
+                                        /** @enum {string} */
+                                        mode: "cash" | "upi" | "card" | "credit";
+                                    }[];
+                                };
+                                stock_purchase_id?: {
+                                    from: string | null;
+                                    to: string | null;
                                 };
                             };
                             /** Format: date-time */
@@ -21661,7 +21977,6 @@ export interface operations {
                         }[];
                         meta?: {
                             pagination: {
-                                estimated_total?: number;
                                 has_more?: boolean;
                                 next?: string | null;
                                 per_page?: number;
@@ -21714,7 +22029,8 @@ export interface operations {
                             /** @enum {string} */
                             direction?: "received" | "paid";
                             edit_count?: number;
-                            expense_category?: string | null;
+                            /** @enum {string|null} */
+                            expense_category?: "medicines" | "consumables" | "salary" | "rent" | "marketing" | "utilities" | "maintenance" | "misc" | null;
                             id?: string;
                             invoice?: {
                                 due_amount?: number;
@@ -21732,9 +22048,61 @@ export interface operations {
                             last_edit?: {
                                 author_membership_id?: string | null;
                                 changes?: {
-                                    [key: string]: {
-                                        from?: unknown;
-                                        to?: unknown;
+                                    attachment_keys?: {
+                                        from: string[];
+                                        to: string[];
+                                    };
+                                    contact_id?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    expense_category?: {
+                                        /** @enum {string|null} */
+                                        from: "medicines" | "consumables" | "salary" | "rent" | "marketing" | "utilities" | "maintenance" | "misc" | null;
+                                        /** @enum {string|null} */
+                                        to: "medicines" | "consumables" | "salary" | "rent" | "marketing" | "utilities" | "maintenance" | "misc" | null;
+                                    };
+                                    invoice_id?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    medical_purchase_order_id?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    note?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    paid_at?: {
+                                        /** Format: date-time */
+                                        from: string;
+                                        /** Format: date-time */
+                                        to: string;
+                                    };
+                                    payee_name?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    reference?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    splits?: {
+                                        from: {
+                                            amount: number;
+                                            /** @enum {string} */
+                                            mode: "cash" | "upi" | "card" | "credit";
+                                        }[];
+                                        to: {
+                                            amount: number;
+                                            /** @enum {string} */
+                                            mode: "cash" | "upi" | "card" | "credit";
+                                        }[];
+                                    };
+                                    stock_purchase_id?: {
+                                        from: string | null;
+                                        to: string | null;
                                     };
                                 };
                                 /** Format: date-time */
@@ -21831,7 +22199,8 @@ export interface operations {
                             /** @enum {string} */
                             direction?: "received" | "paid";
                             edit_count?: number;
-                            expense_category?: string | null;
+                            /** @enum {string|null} */
+                            expense_category?: "medicines" | "consumables" | "salary" | "rent" | "marketing" | "utilities" | "maintenance" | "misc" | null;
                             id?: string;
                             invoice?: {
                                 due_amount?: number;
@@ -21849,9 +22218,61 @@ export interface operations {
                             last_edit?: {
                                 author_membership_id?: string | null;
                                 changes?: {
-                                    [key: string]: {
-                                        from?: unknown;
-                                        to?: unknown;
+                                    attachment_keys?: {
+                                        from: string[];
+                                        to: string[];
+                                    };
+                                    contact_id?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    expense_category?: {
+                                        /** @enum {string|null} */
+                                        from: "medicines" | "consumables" | "salary" | "rent" | "marketing" | "utilities" | "maintenance" | "misc" | null;
+                                        /** @enum {string|null} */
+                                        to: "medicines" | "consumables" | "salary" | "rent" | "marketing" | "utilities" | "maintenance" | "misc" | null;
+                                    };
+                                    invoice_id?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    medical_purchase_order_id?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    note?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    paid_at?: {
+                                        /** Format: date-time */
+                                        from: string;
+                                        /** Format: date-time */
+                                        to: string;
+                                    };
+                                    payee_name?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    reference?: {
+                                        from: string | null;
+                                        to: string | null;
+                                    };
+                                    splits?: {
+                                        from: {
+                                            amount: number;
+                                            /** @enum {string} */
+                                            mode: "cash" | "upi" | "card" | "credit";
+                                        }[];
+                                        to: {
+                                            amount: number;
+                                            /** @enum {string} */
+                                            mode: "cash" | "upi" | "card" | "credit";
+                                        }[];
+                                    };
+                                    stock_purchase_id?: {
+                                        from: string | null;
+                                        to: string | null;
                                     };
                                 };
                                 /** Format: date-time */
@@ -22871,7 +23292,6 @@ export interface operations {
                         }[];
                         meta?: {
                             pagination: {
-                                estimated_total?: number;
                                 has_more?: boolean;
                                 next?: string | null;
                                 per_page?: number;
@@ -29156,7 +29576,6 @@ export interface operations {
                         }[];
                         meta?: {
                             pagination: {
-                                estimated_total?: number;
                                 has_more?: boolean;
                                 next?: string | null;
                                 per_page?: number;
@@ -30466,7 +30885,6 @@ export interface operations {
                         }[];
                         meta?: {
                             pagination: {
-                                estimated_total?: number;
                                 has_more?: boolean;
                                 next?: string | null;
                                 per_page?: number;
@@ -32133,7 +32551,6 @@ export interface operations {
                         }[];
                         meta?: {
                             pagination: {
-                                estimated_total?: number;
                                 has_more?: boolean;
                                 next?: string | null;
                                 per_page?: number;
