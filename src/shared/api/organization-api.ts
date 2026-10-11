@@ -8,11 +8,8 @@ import type { OrganizationPermission } from '@/core/rbac/policies.ts';
 import { organizationPermissionSchema } from '@/core/types/permissions.ts';
 import { isoDateString } from '@/core/types/wire.ts';
 import { parseListTolerant } from '@/lib/parse-list-tolerant.ts';
-import {
-  type DeleteReason,
-  type Tone,
-  weekdaySchema,
-} from '@/shared/api/app/app-schema.ts';
+import type { DeleteReason, Tone } from '@/shared/api/app/app-schema.ts';
+import { WEEK } from '@/shared/api/app/app-week.ts';
 import type {
   ApiKey,
   ApiKeyWithSecret,
@@ -22,7 +19,7 @@ import type {
   MembershipStatus,
   RoleSummary,
 } from '@/shared/api/organization-contracts.ts';
-import { servedTone } from '@/shared/app/app-tones.ts';
+import { servedTone } from '@/shared/app/app-tone-label.ts';
 import { fetchMeContext } from '@/shared/tenancy/me-context.ts';
 
 import { fetchListPage, type ListPage, type ListPageParams } from './fetch-list-page.ts';
@@ -120,7 +117,7 @@ const membershipWire = wireSchema<ApiMembership>()(
     tone: z.string(),
     role_ids: z.array(z.string()),
     branch_ids: z.array(z.string()),
-    working_days: z.array(weekdaySchema),
+    working_days: z.array(z.enum(WEEK)),
     work_starts_at: z.string(),
     work_ends_at: z.string(),
     commission_percent: z.number(),

@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { api } from '@/core/http/api.ts';
 import { queryClient } from '@/core/http/queryClient.ts';
 import { collectAllPages } from '@/shared/api/fetch-all-pages.ts';
-import { toneForLabel } from '@/shared/app/app-tones.ts';
+import { toneForLabel } from '@/shared/app/app-tone-label.ts';
 import { personInitials } from '@/shared/components/Cells/PersonAvatar/person-name.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 

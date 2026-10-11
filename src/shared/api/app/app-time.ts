@@ -1,6 +1,7 @@
 import { zonedClockParts } from '@/lib/i18n/format.ts';
 
 import type { Weekday } from './app-schema.ts';
+import { WEEK } from './app-week.ts';
 
 /**
  * The clinic clock. Calendar dates (`YYYY-MM-DD`) and clock times (`HH:mm`) in
@@ -144,9 +145,6 @@ export function appInstant(date: string, time: string, timeZone = APP_TIME_ZONE)
   const offset = offsetMinutes(new Date(naive), timeZone);
   return new Date(naive - offset * 60_000).toISOString();
 }
-
-/** The week in the contract's order, Monday first (`S:` `weekday`). */
-const WEEK: readonly Weekday[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
 /**
  * How a working week reads (`usRange`, H:3608): "Every day" for all seven, a

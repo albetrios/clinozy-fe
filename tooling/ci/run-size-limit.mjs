@@ -32,7 +32,7 @@ if (jsPaths.length === 0) {
 }
 
 // Budgets are a RATCHET (same philosophy as coverage thresholds): pinned just
-// above the measured first-paint size (JS ~237 kB gz, CSS ~36 kB gz) so any
+// above the measured first-paint size (JS ~243 kB gz, CSS ~36 kB gz) so any
 // regression trips CI immediately — lower as the bundle shrinks, never raise
 // to absorb growth.
 //
@@ -260,8 +260,34 @@ const config = [
      * and the shortcuts drawer stay off it (`appearance-dialog.constants.test.ts`
      * pins the drawer's modules out of the entry). Not attributed per item;
      * ~0.4 kB of headroom.
+     *
+     * 237 → 243.4 kB (same exemption, D48): measured 242.9 kB after the
+     * clinozy-be integration rows (236.8 kB at L-65), both ends built the same
+     * way (no env file, as CI) and attributed through the hidden source maps —
+     * +12.4 kB raw:
+     * - The typed API layer and its errors (L-60, F1–F13, ~6.1 kB raw):
+     *   `core/http/api.ts`, `wire-schema.ts`, the fetch client's idempotency
+     *   key, `map-frontend-error.ts` and its error keys, `queryClient.ts`, and
+     *   the parts of react-query the rooms now call (`queryClient.query`, the
+     *   mutation cache) — 5.104.0 at both ends, so no dependency bump.
+     * - Members, roles and access on permission codes (D83, ~2.7 kB raw):
+     *   `organization-api.ts` reads the membership and role wire shapes,
+     *   `core/types/permissions.ts` the code list.
+     * - Invitations at sign-in (D84, ~1.5 kB raw): `my-invitations.ts` and the
+     *   resolver's and me-context's branch for them.
+     * - The analytics consent per account (D85, ~1.3 kB raw): `capture.ts`,
+     *   the consent store and Sentry's replay gate.
+     * - Session and boot (~1.1 kB raw): the auth shell's keys, the refresh
+     *   service, `useAppSplashActive`; the deployment's module flags (D165,
+     *   ~0.3 kB). Offsets: the theme store left first paint (−0.9 kB raw).
+     * Trimmed first (−6.3 kB): `organization-api.ts` imported `servedTone`
+     * from `app-tones.ts` — the tone class table and, through it, the
+     * generated `app-schema.ts`, pages of zod — and read `weekdaySchema` from
+     * that schema too. Both are declared beside it now (`app-tone-label.ts`,
+     * `app-week.ts`), each pinned to the contract's enum by its test. ~0.5 kB
+     * of headroom.
      */
-    limit: '237 kB',
+    limit: '243.4 kB',
     gzip: true,
   },
   ...(cssPaths.length

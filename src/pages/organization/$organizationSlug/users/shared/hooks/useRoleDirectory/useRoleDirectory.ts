@@ -3,7 +3,7 @@ import { useCallback, useMemo } from 'react';
 import { presetOfRole } from '@/shared/api/app/access-contracts.ts';
 import type { Role, Tone } from '@/shared/api/app/app-schema.ts';
 import { isOwnerRole, type RoleSummary } from '@/shared/api/organization-contracts.ts';
-import { toneForLabel } from '@/shared/app/app-tones.ts';
+import { toneForLabel } from '@/shared/app/app-tone-label.ts';
 import { useRoleLabel } from '@/shared/hooks/useAppRoles/index.ts';
 import { usePlatformRoles } from '@/shared/hooks/useTeam/index.ts';
 

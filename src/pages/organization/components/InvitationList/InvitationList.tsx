@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next';
 
 import { queryClient } from '@/core/http/queryClient.ts';
 import { cn } from '@/lib/utils.ts';
-import { TONE_CLASSES, toneForLabel } from '@/shared/app/app-tones.ts';
+import { toneForLabel } from '@/shared/app/app-tone-label.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { AUTH_KEYS, AUTH_NS } from '@/shared/auth/auth-shell.constants.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
 import { Spinner } from '@/shared/components/Spinner/index.ts';

@@ -8,7 +8,7 @@ vi.mock('@/shared/tenancy/my-organization-summaries.ts', () => ({
   ensureMyOrganizationSummaries: vi.fn(),
 }));
 import { api } from '@/core/http/api.ts';
-import { toneForLabel } from '@/shared/app/app-tones.ts';
+import { toneForLabel } from '@/shared/app/app-tone-label.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import type { OrganizationSummary } from '@/shared/tenancy/me-context.ts';
 import { ensureMyOrganizationSummaries } from '@/shared/tenancy/my-organization-summaries.ts';

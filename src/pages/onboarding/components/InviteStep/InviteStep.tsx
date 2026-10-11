@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
-import { toneForLabel } from '@/shared/app/app-tones.ts';
+import { toneForLabel } from '@/shared/app/app-tone-label.ts';
 import {
   PersonAvatar,
   personInitials,

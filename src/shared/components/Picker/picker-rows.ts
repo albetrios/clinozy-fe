@@ -1,5 +1,5 @@
 import type { Tone } from '@/shared/api/app/app-schema.ts';
-import { toneForLabel } from '@/shared/app/app-tones.ts';
+import { toneForLabel } from '@/shared/app/app-tone-label.ts';
 
 import type { PickerFilter, PickerOption } from './picker.types.ts';
 

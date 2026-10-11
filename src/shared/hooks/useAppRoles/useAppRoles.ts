@@ -9,7 +9,7 @@ import {
   roleDirectoryQueryKey,
 } from '@/shared/api/app/directory-api.ts';
 import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
-import { servedTone, toneForLabel } from '@/shared/app/app-tones.ts';
+import { servedTone, toneForLabel } from '@/shared/app/app-tone-label.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import { useMeContext } from '@/shared/hooks/useMeContext/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';

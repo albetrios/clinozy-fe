@@ -4,7 +4,7 @@ import { api, type ApiData } from '@/core/http/api.ts';
 import { queryClient } from '@/core/http/queryClient.ts';
 import { wireSchema } from '@/core/http/wire-schema.ts';
 import { collectAllPages } from '@/shared/api/fetch-all-pages.ts';
-import { servedTone } from '@/shared/app/app-tones.ts';
+import { servedTone } from '@/shared/app/app-tone-label.ts';
 import { personInitials } from '@/shared/components/Cells/PersonAvatar/person-name.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 

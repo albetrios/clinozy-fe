@@ -18,7 +18,7 @@ import {
 } from '@/shared/api/app/app-list-filters.ts';
 import type { Tone } from '@/shared/api/app/app-schema.ts';
 import { appToday } from '@/shared/api/app/app-time.ts';
-import { toneForLabel } from '@/shared/app/app-tones.ts';
+import { toneForLabel } from '@/shared/app/app-tone-label.ts';
 import {
   CountBadge,
   PersonAvatar,

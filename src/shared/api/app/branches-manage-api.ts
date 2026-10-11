@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { api, type ApiData } from '@/core/http/api.ts';
 import { wireSchema } from '@/core/http/wire-schema.ts';
-import { servedTone } from '@/shared/app/app-tones.ts';
+import { servedTone } from '@/shared/app/app-tone-label.ts';
 
 import { clockTimeSchema, weekdaySchema } from './app-schema.ts';
 import { branchQueryKeys } from './branches-api.ts';

@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { api, type ApiData } from '@/core/http/api.ts';
 import { wireSchema } from '@/core/http/wire-schema.ts';
 import { collectAllPages } from '@/shared/api/fetch-all-pages.ts';
-import { toneForLabel } from '@/shared/app/app-tones.ts';
+import { toneForLabel } from '@/shared/app/app-tone-label.ts';
 import { personInitials } from '@/shared/components/Cells/PersonAvatar/person-name.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { ensureMyOrganizationSummaries } from '@/shared/tenancy/my-organization-summaries.ts';

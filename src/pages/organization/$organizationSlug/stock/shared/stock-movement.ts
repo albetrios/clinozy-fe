@@ -1,6 +1,6 @@
 import { numberFromText } from '@/lib/number-text.ts';
 import type { Tone } from '@/shared/api/app/app-schema.ts';
-import { toneForLabel } from '@/shared/app/app-tones.ts';
+import { toneForLabel } from '@/shared/app/app-tone-label.ts';
 
 import type { StockItemRecord } from './stock-contracts.ts';
 import type { StockMovementInputType } from './stock-records-contracts.ts';

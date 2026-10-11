@@ -1,7 +1,7 @@
 import type { ComponentProps, ReactNode } from 'react';
 
 import { cn } from '@/lib/utils.ts';
-import { toneForLabel } from '@/shared/app/app-tones.ts';
+import { toneForLabel } from '@/shared/app/app-tone-label.ts';
 import { PersonAvatar } from '@/shared/components/Cells/PersonAvatar/index.ts';
 import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import { PICKER_TRIGGER_SIZE_CLASSES } from '@/shared/components/Picker/picker.constants.ts';

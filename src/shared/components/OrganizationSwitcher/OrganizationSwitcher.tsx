@@ -282,7 +282,7 @@ function OrganizationSubmenu({
             data-testid="organization-switcher-invitation-count"
           />
         ) : null}
-        <span className="text-muted-foreground text-caption ml-auto max-w-28 min-w-0 truncate">
+        <span className="text-muted-foreground text-caption ms-auto max-w-28 min-w-0 truncate">
           {activeName}
         </span>
       </DropdownMenuSubTrigger>

@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next';
 
 import { organizationHome } from '@/lib/routes/index.ts';
 import { cn } from '@/lib/utils.ts';
-import { TONE_CLASSES, toneForLabel } from '@/shared/app/app-tones.ts';
+import { toneForLabel } from '@/shared/app/app-tone-label.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { AUTH_KEYS, AUTH_NS } from '@/shared/auth/auth-shell.constants.ts';
 import { CreateOrganizationDialog } from '@/shared/components/CreateOrganizationDialog/index.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
