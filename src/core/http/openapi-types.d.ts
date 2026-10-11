@@ -28444,6 +28444,7 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: {
+                            billing_cycles?: ("monthly" | "yearly")[];
                             /** Format: date-time */
                             created_at?: string;
                             currency?: string;
@@ -28452,7 +28453,7 @@ export interface operations {
                             is_active?: boolean;
                             name?: string;
                             price_monthly?: string;
-                            price_yearly?: string;
+                            price_yearly?: string | null;
                             /** Format: date-time */
                             updated_at?: string;
                         }[];
@@ -28487,6 +28488,7 @@ export interface operations {
                 content: {
                     "application/json": {
                         data?: {
+                            billing_cycles?: ("monthly" | "yearly")[];
                             /** Format: date-time */
                             created_at?: string;
                             currency?: string;
@@ -28495,7 +28497,7 @@ export interface operations {
                             is_active?: boolean;
                             name?: string;
                             price_monthly?: string;
-                            price_yearly?: string;
+                            price_yearly?: string | null;
                             /** Format: date-time */
                             updated_at?: string;
                         };
@@ -29312,7 +29314,7 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    events: string[];
+                    events: ("organization.created" | "organization.updated" | "membership.created" | "membership.updated" | "membership.deleted" | "subscription.created" | "subscription.updated" | "subscription.cancelled")[];
                     /** @default true */
                     is_enabled?: boolean;
                     secret?: string;
@@ -29445,7 +29447,7 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    events?: string[];
+                    events?: ("organization.created" | "organization.updated" | "membership.created" | "membership.updated" | "membership.deleted" | "subscription.created" | "subscription.updated" | "subscription.cancelled")[];
                     is_enabled?: boolean;
                     secret?: string;
                     /** Format: uri */

@@ -75,6 +75,19 @@ describe('billing-api', () => {
     });
   });
 
+  it('keeps a monthly-only plan, its yearly price null', async () => {
+    getMock.mockResolvedValue({
+      data: [{ ...PLAN_WIRE, price_yearly: null, billing_cycles: ['monthly'] }],
+    });
+    const plans = await listBillingPlans();
+    expect(plans).toHaveLength(1);
+    expect(plans[0]).toMatchObject({
+      id: PLN_PRO,
+      priceMonthly: 9900,
+      priceYearly: null,
+    });
+  });
+
   it('drops a malformed plan instead of blanking the whole catalog (tolerant)', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     getMock.mockResolvedValue({ data: [PLAN_WIRE, { id: 'pln_broken' }] });

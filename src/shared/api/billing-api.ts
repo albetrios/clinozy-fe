@@ -61,7 +61,7 @@ function toBillingPlan(w: z.infer<typeof billingPlanWireSchema>): BillingPlan {
     name: w.name,
     description: w.description,
     priceMonthly: parseMoneyToCents(w.price_monthly),
-    priceYearly: parseMoneyToCents(w.price_yearly),
+    priceYearly: w.price_yearly === null ? null : parseMoneyToCents(w.price_yearly),
     currency: w.currency.toLowerCase(),
     isActive: w.is_active,
     seatLimit: w.limits.seats,

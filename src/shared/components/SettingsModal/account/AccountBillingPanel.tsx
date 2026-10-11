@@ -51,8 +51,10 @@ function planPriceLabel(
   formatCurrency: (cents: number, currency: string) => string,
   t: TFunction,
 ) {
-  const yearly = billingCycle === 'yearly';
-  const cents = yearly ? plan.priceYearly : plan.priceMonthly;
+  // A plan without annual billing keeps its monthly price in the yearly view.
+  const yearlyCents = billingCycle === 'yearly' ? plan.priceYearly : null;
+  const yearly = yearlyCents !== null;
+  const cents = yearlyCents ?? plan.priceMonthly;
   // A free plan still gets formatted in the viewer's locale — a hardcoded "$0"
   // was both untranslated and wrong for every non-USD workspace.
   const price = formatCurrency(cents, plan.currency);
