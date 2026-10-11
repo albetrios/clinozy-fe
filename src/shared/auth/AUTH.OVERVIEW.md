@@ -38,9 +38,17 @@ The current-session state itself (the `user` + `isAuthenticated`) lives in `src/
   (falls back to in-tab dedupe where Web Locks is unavailable).
 - Why it matters: the backend rotates refresh sessions with reuse-detection — two parallel
   refreshes look like token theft and kill the whole session. Never add a second caller.
-- A failed refresh means the session is gone: callers run `forceLogout()`, which clears
-  local auth state, broadcasts logout to every tab via `auth-channel.ts`, and hard-redirects
-  to `/login`.
+- A refresh the server **refused** (401/403) means the session is gone: callers run
+  `forceLogout()`, which clears local auth state, broadcasts logout to every tab via
+  `auth-channel.ts`, and hard-redirects to `/login`.
+- A refresh that got **no usable answer** — offline, timed out (`HTTP.REFRESH_TIMEOUT`, 5 s),
+  throttled (429) or a server fault (5xx) — says nothing about the session. It is retried
+  **once** after 600 ms, inside clinozy-be's 10-second grace for the just-superseded refresh
+  secret (a lost answer may already have rotated the cookie); a second retry could land outside
+  that grace and read as a replay, which revokes every session of the user. If the retry is
+  unanswered too, `isRefreshUnanswered()` is true and the 401 handler fails the request as
+  unreachable (status 0) **without** signing anyone out; at boot the visitor lands on `/login`,
+  whose own silent refresh tries again.
 
 ## Ending a session: `logout()` vs `forceLogout()`
 

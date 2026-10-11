@@ -32,7 +32,8 @@
     "more": "+{{more}}",
     "count_one": "{{count}} Person",
     "count_other": "{{count}} Personen",
-    "empty": "Gerade ist niemand hier."
+    "empty": "Gerade ist niemand hier.",
+    "none": "Der Praxisbetrieb und die Anfragen gehören nicht zu Ihrer Rolle."
   },
   "actions": {
     "book": "Buchen",

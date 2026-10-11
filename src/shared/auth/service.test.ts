@@ -114,6 +114,7 @@ describe('auth/service', () => {
   let handleCrossTabLogout: AuthServiceModule['handleCrossTabLogout'];
   let logout: AuthServiceModule['logout'];
   let refreshAccessToken: AuthServiceModule['refreshAccessToken'];
+  let isRefreshUnanswered: AuthServiceModule['isRefreshUnanswered'];
   let establishSession: AuthServiceModule['establishSession'];
   let startAuthBootstrap: AuthServiceModule['startAuthBootstrap'];
 
@@ -124,6 +125,7 @@ describe('auth/service', () => {
     handleCrossTabLogout = mod.handleCrossTabLogout;
     logout = mod.logout;
     refreshAccessToken = mod.refreshAccessToken;
+    isRefreshUnanswered = mod.isRefreshUnanswered;
     establishSession = mod.establishSession;
     startAuthBootstrap = mod.startAuthBootstrap;
   });
@@ -221,7 +223,8 @@ describe('auth/service', () => {
     });
 
     it('rejects if refresh endpoint fails', async () => {
-      (fetchMock as Mock).mockRejectedValueOnce(new Error('401'));
+      // Unanswered twice (the try and its one retry), so the refresh gives up.
+      (fetchMock as Mock).mockRejectedValue(new Error('401'));
 
       await expect(silentRefresh()).rejects.toThrow('401');
       expect(getAccessToken()).toBeNull();
@@ -267,6 +270,42 @@ describe('auth/service', () => {
 
       expect(fetchMock).toHaveBeenCalledTimes(2);
       expect(getAccessToken()).toBe(VALID_TOKEN);
+    });
+
+    it('a refresh with no usable answer (5xx, 429, offline) is retried once and can succeed', async () => {
+      (fetchMock as Mock)
+        .mockResolvedValueOnce(mockFetchResponse({ message: 'busy' }, 503))
+        .mockResolvedValueOnce(
+          mockFetchResponse({ data: { access_token: VALID_TOKEN } }),
+        );
+
+      await refreshAccessToken();
+
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      expect(getAccessToken()).toBe(VALID_TOKEN);
+    });
+
+    it('retries an unanswered refresh ONCE only — a second try could fall outside the reuse grace', async () => {
+      (fetchMock as Mock)
+        .mockRejectedValueOnce(new TypeError('Failed to fetch'))
+        .mockResolvedValueOnce(mockFetchResponse({ message: 'slow down' }, 429));
+
+      const error = await refreshAccessToken().catch((caught: unknown) => caught);
+
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      // It says nothing about the session, so nothing signs out on it.
+      expect(isRefreshUnanswered(error)).toBe(true);
+    });
+
+    it('a refresh the server refused is not retried and is no "unanswered" one', async () => {
+      (fetchMock as Mock).mockResolvedValueOnce(
+        mockFetchResponse({ message: 'session revoked' }, 401),
+      );
+
+      const error = await refreshAccessToken().catch((caught: unknown) => caught);
+
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      expect(isRefreshUnanswered(error)).toBe(false);
     });
 
     it('serializes through the cross-tab Web Lock when navigator.locks exists', async () => {

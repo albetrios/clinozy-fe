@@ -31,7 +31,8 @@
     },
     "more": "+{{more}}",
     "count_other": "{{count}} 人",
-    "empty": "目前这里没有人。"
+    "empty": "目前这里没有人。",
+    "none": "诊所现场和咨询不在您的角色范围内。"
   },
   "actions": {
     "book": "预约",

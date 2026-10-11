@@ -33,7 +33,8 @@
     "count_one": "{{count}} persona",
     "count_many": "{{count}} persone",
     "count_other": "{{count}} persone",
-    "empty": "Nessuno qui al momento."
+    "empty": "Nessuno qui al momento.",
+    "none": "La sala della clinica e le richieste non fanno parte del tuo ruolo."
   },
   "actions": {
     "book": "Prenota",

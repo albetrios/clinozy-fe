@@ -13,9 +13,14 @@ import { HttpError, isUnauthorized } from '@/shared/errors/HttpError.ts';
 // shared/auth/service.test.ts — here we only assert fetch-client DELEGATES.
 vi.mock('@/shared/auth/service.ts', () => ({
   forceLogout: vi.fn(),
+  isRefreshUnanswered: vi.fn(),
   refreshAccessToken: vi.fn(),
 }));
-import { forceLogout, refreshAccessToken } from '@/shared/auth/service.ts';
+import {
+  forceLogout,
+  isRefreshUnanswered,
+  refreshAccessToken,
+} from '@/shared/auth/service.ts';
 
 import { apiClient } from './fetch-client.ts';
 
@@ -282,6 +287,20 @@ describe('fetch-client', () => {
       // The refresh error surfaces to the caller after the local logout.
       await expect(apiClient.get('/protected')).rejects.toThrow('session revoked');
       expect(forceLogout).toHaveBeenCalledTimes(1);
+    });
+
+    it('a refresh that got no answer keeps the session and fails the request as unreachable', async () => {
+      vi.mocked(refreshAccessToken).mockRejectedValueOnce(
+        new Error('Refresh failed (503)'),
+      );
+      vi.mocked(isRefreshUnanswered).mockReturnValueOnce(true);
+      fetchMock.mockResolvedValueOnce(unauthorized()); // original request
+
+      const error = await apiClient.get('/protected').catch((caught: unknown) => caught);
+      expect(error).toBeInstanceOf(HttpError);
+      expect((error as HttpError).status).toBe(0);
+      // A slow or failing network says nothing about the session: nobody is signed out.
+      expect(forceLogout).not.toHaveBeenCalled();
     });
   });
 

@@ -1,7 +1,11 @@
 import { API_ENDPOINTS, HTTP } from '@/core/config/constants.ts';
 import { platformConfig } from '@/core/config/env.ts';
 import i18n from '@/lib/i18n/i18n.ts';
-import { forceLogout, refreshAccessToken } from '@/shared/auth/service.ts';
+import {
+  forceLogout,
+  isRefreshUnanswered,
+  refreshAccessToken,
+} from '@/shared/auth/service.ts';
 import { getAccessToken } from '@/shared/auth/token.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 
@@ -246,14 +250,28 @@ function buildRequestUrl(path: string): string {
  * (the only code path allowed to call /auth/refresh — see
  * `refreshAccessToken`'s remarks on rotation + reuse-detection), then replay
  * the original request. Concurrent 401s all await the same in-flight refresh.
- * A failed refresh means the session is gone: clear local auth and bail.
+ * A refresh the server refused means the session is gone: clear local auth and
+ * bail. One that got no answer (offline, timed out, throttled, a server fault —
+ * already retried once inside `refreshAccessToken`) says nothing about the
+ * session: keep it, and fail this request as unreachable (status 0), so a slow
+ * network never signs anyone out.
  */
 async function doRefreshAndReplay<T>(
   replay: () => Promise<HttpResponse<T>>,
+  request: { url: string; method: string },
 ): Promise<HttpResponse<T>> {
   try {
     await refreshAccessToken();
   } catch (refreshError) {
+    if (isRefreshUnanswered(refreshError)) {
+      throw new HttpError(
+        (refreshError as Error).message,
+        0,
+        request.url,
+        request.method,
+        undefined,
+      );
+    }
     forceLogout();
     throw refreshError;
   }
@@ -372,7 +390,7 @@ async function request<T>(
         forceLogout();
         throw await parseErrorResponse(response, url, method);
       }
-      return doRefreshAndReplay(() => run(0, true));
+      return doRefreshAndReplay(() => run(0, true), { url, method });
     }
 
     if (!response.ok) {

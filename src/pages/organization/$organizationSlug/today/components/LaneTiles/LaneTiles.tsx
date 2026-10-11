@@ -23,6 +23,8 @@ export interface LaneTilesProps {
   selected: TodayLane;
   /** The member's focus — lanes outside it recede ({@link DIMMED_TILE_INK}). */
   focus: ReadonlySet<TodayLane>;
+  /** The lanes this member can read, in their fixed order (`readableTodayLanes`, D163). */
+  visible?: readonly TodayLane[];
   /** The clinic day, for wording each hint's time. */
   today: string;
   onSelect: (lane: TodayLane) => void;
@@ -61,7 +63,14 @@ const DIMMED_TILE_INK = {
  * focus recede ({@link DIMMED_TILE_INK}); hover inks the border at once (no
  * transition).
  */
-export function LaneTiles({ lanes, selected, focus, today, onSelect }: LaneTilesProps) {
+export function LaneTiles({
+  lanes,
+  selected,
+  focus,
+  visible = TODAY_LANES,
+  today,
+  onSelect,
+}: LaneTilesProps) {
   const { t } = useTranslation(TODAY_NS);
   const { formatNumber } = useLocaleFormat();
   const clock = useClinicClock();
@@ -78,7 +87,7 @@ export function LaneTiles({ lanes, selected, focus, today, onSelect }: LaneTiles
         data-testid={TODAY_TEST_IDS.lanes}
         className="-mx-3 flex snap-x snap-mandatory scroll-px-3 [scrollbar-width:none] gap-2 overflow-x-auto px-3 pb-0.5 md:mx-0 md:grid md:grid-cols-[repeat(auto-fill,minmax(106px,1fr))] md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-[repeat(auto-fill,minmax(114px,1fr))] [&::-webkit-scrollbar]:hidden"
       >
-        {TODAY_LANES.map((lane) => {
+        {visible.map((lane) => {
           const cards = lanes[lane];
           const { tone } = TODAY_LANE_META[lane];
           const paint = TONE_CLASSES[tone];

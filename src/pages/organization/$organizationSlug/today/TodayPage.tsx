@@ -33,7 +33,12 @@ import { useFloorActions } from './hooks/useFloorActions/index.ts';
 import { useTodayFloorView } from './hooks/useTodayFloorView/index.ts';
 import { useWorkQueue, type WorkQueueScope } from './hooks/useWorkQueue/index.ts';
 import { TODAY_KEYS, TODAY_NS, TODAY_TEST_IDS } from './today.constants.ts';
-import { defaultTodayLane, todayFocus } from './today.lanes.ts';
+import {
+  defaultTodayLane,
+  readableTodayLanes,
+  todayFocus,
+  type TodayLanes,
+} from './today.lanes.ts';
 import { validateTodaySearch } from './today.search.ts';
 
 /**
@@ -100,6 +105,47 @@ function useTodayWorkQueue(
 }
 
 /**
+ * The lanes this member can read (F3, D163) and the one the panel shows: the URL's lane when it is
+ * one of them, else the default. Until the member's codes are known, every lane.
+ */
+function useTodayLanes(
+  lanes: TodayLanes,
+  focus: ReadonlySet<TodayLane>,
+  picked: TodayLane | undefined,
+) {
+  const access = useClinicAccess();
+  const leads = !access.isResolved || access.can('leads', 'view');
+  const appointments = !access.isResolved || access.can('appointments', 'view');
+  const visibleLanes = useMemo(
+    () => readableTodayLanes({ leads, appointments }),
+    [leads, appointments],
+  );
+  const lane =
+    picked && visibleLanes.includes(picked)
+      ? picked
+      : defaultTodayLane(lanes, focus, visibleLanes);
+  return { visibleLanes, lane };
+}
+
+/**
+ * The greeting's two buttons, each only for a member who may act on it: New booking opens New lead
+ * (`lead:create`); Walk-in opens the command menu to book someone (`appointment:create`, F4).
+ */
+function useGreetingActions(organizationSlug: string) {
+  const navigate = useNavigate();
+  const access = useClinicAccess();
+  const newBooking =
+    access.isResolved && access.can('leads', 'create')
+      ? () => void navigate(clinicCommandNavigation('newLead', { organizationSlug }))
+      : undefined;
+  const walkIn =
+    access.isResolved && access.can('appointments', 'create')
+      ? () => useUIStore.getState().setCommandPaletteOpen(true)
+      : undefined;
+  return { newBooking, walkIn };
+}
+
+/**
  * Today (KICKOFF §6.2; `today.md`): the clinic floor now. The greeting row —
  * the greeting is the title — over the seven lane tiles and the selected
  * lane's cards, with the work queue beside them (under them on a phone). The
@@ -110,13 +156,11 @@ function useTodayWorkQueue(
  */
 export function TodayPage() {
   const { t } = useTranslation(TODAY_NS);
-  const navigate = useNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
   const search = validateTodaySearch(useSearch({ strict: false }));
   const { patchSearch } = useDataTableUrlState(true);
   const now = useNow();
   const today = clinicToday(now);
-  const access = useClinicAccess();
   const me = useMeContext();
   const floor = useTodayFloorView();
   const actions = useFloorActions(organizationSlug);
@@ -130,13 +174,10 @@ export function TodayPage() {
     () => todayFocus(rolesInForce.flatMap((role) => (role.preset ? [role.preset] : []))),
     [rolesInForce],
   );
-  const lane: TodayLane = search.lane ?? defaultTodayLane(floor.lanes, focus);
+  const { visibleLanes, lane } = useTodayLanes(floor.lanes, focus, search.lane);
   const loading = floor.loading || (queue.shown && queue.loading);
 
-  const newBooking =
-    access.isResolved && access.can('leads', 'create')
-      ? () => void navigate(clinicCommandNavigation('newLead', { organizationSlug }))
-      : undefined;
+  const { newBooking, walkIn } = useGreetingActions(organizationSlug);
 
   return (
     <section
@@ -161,24 +202,36 @@ export function TodayPage() {
             now={now}
             counts={floor.pulse}
             onNewBooking={newBooking}
-            onWalkIn={() => useUIStore.getState().setCommandPaletteOpen(true)}
+            onWalkIn={walkIn}
           />
-          <LaneTiles
-            lanes={floor.lanes}
-            selected={lane}
-            focus={focus}
-            today={today}
-            onSelect={(next) => patchSearch({ lane: next })}
-          />
-          <LanePanel
-            lane={lane}
-            cards={floor.lanes[lane]}
-            loading={floor.loading}
-            now={now}
-            today={today}
-            actionOf={actions.actionOf}
-            onOpen={actions.open}
-          />
+          {visibleLanes.length > 0 ? (
+            <>
+              <LaneTiles
+                lanes={floor.lanes}
+                selected={lane}
+                focus={focus}
+                visible={visibleLanes}
+                today={today}
+                onSelect={(next) => patchSearch({ lane: next })}
+              />
+              <LanePanel
+                lane={lane}
+                cards={floor.lanes[lane]}
+                loading={floor.loading}
+                now={now}
+                today={today}
+                actionOf={actions.actionOf}
+                onOpen={actions.open}
+              />
+            </>
+          ) : (
+            <p
+              data-testid={TODAY_TEST_IDS.noLanes}
+              className="text-body text-muted-foreground-strong"
+            >
+              {t(TODAY_KEYS.lanes.none)}
+            </p>
+          )}
         </div>
         {queue.shown ? (
           <WorkQueue

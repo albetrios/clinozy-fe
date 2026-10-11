@@ -8,21 +8,24 @@ Gated like every clinic room: membership (`organization:read`) and the `clinic-t
 (on in production since Today and Tasks left `FIXTURE_BACKED_CLINIC_MODULES`, D155), then
 `requireOrgStatus`; every role sees Today. In-room actions follow `useClinicAccess`
 (KICKOFF §3.7): "New booking" needs Leads Create, "Book" Leads View, "Check in" and "Send in"
-Appointments Edit, "Open session" Patients View and the treatments gate (Doctor, Therapist),
+Appointments Edit, "Walk-in" Appointments Create, "Open session" Patients View and the treatments gate (Doctor, Therapist),
 "Checkout" Patients View and `payment:create`, "Dispense" Medical Create — each is hidden
 without it. With doctor has no action (L-64): the consult is the patient's own page. The work
-queue needs `task:read` (the Accountant holds no task code: Today is the floor alone for
-them) and its outcomes their own codes (`task:update` and each outcome's record
-codes — `visibleTaskOutcomes`); a View-as preview reads it and runs none.
+queue needs `task:read` (the Accountant holds no task code) and its outcomes their own codes (`task:update` and each outcome's record
+codes — `visibleTaskOutcomes`); a View-as preview reads it and runs none. The lanes follow
+codes too (D163, `readableTodayLanes`): Enquiries needs `lead:read`, the six floor lanes
+`appointment:read`; a lane the member cannot read has no tile and reads nothing (Marketing sees
+Enquiries alone), and a member with neither (the Accountant) gets one line —
+`today-no-lanes` — in place of the tiles and the panel.
 
 The screen: the greeting is its h1 — no other title ("Good morning, <first name>" on the
 clinic-local clock, `greetingFor`; "there" without a name) — then the pulse ("<n> in clinic ·
 <n> waiting · <n> arriving · <day>, <time>"), "New booking" (→ `/leads/create`) and "Walk-in"
-(→ ⌘K). Seven lane tiles (a grid from `md`, a snap strip of 128px tiles below it) over the
+(→ ⌘K). Up to seven lane tiles (a grid from `md`, a snap strip of 128px tiles below it) over the
 selected lane's panel of visit cards; lanes outside the member's role focus recede — the fill
 at 60%, the text a step lighter at AA contrast (`todayFocus`: the union of their clinic roles,
 the View-as role while previewing; Owner and Admin dim nothing). The default lane is the first in focus with people, else the first with
-people, else Enquiries; a picked lane lives in the URL for the session (`?lane=`). The work
+people, else the first lane shown; a picked lane lives in the URL for the session (`?lane=`). The work
 queue (`?queue=everyone`; Mine by default — the member's tasks and the unowned ones in their
 roles' queues, the server's `scope=mine`) is the Tasks room's one task model: its open tasks by
 due time and the ones closed today, the type's pill and the outcomes the member can run, the
@@ -98,5 +101,5 @@ the last copy." with Retry and keeps the last copy; the first load wears the in-
 (`data-lane`), `today-card` (`data-card-id`), `today-card-open`, `today-card-action`
 (`data-action`), `today-empty`, `today-queue`, `today-queue-scope-<mine|everyone>`,
 `today-queue-card` (`data-task-id`, `data-closed`), `today-queue-outcome` (`data-outcome`),
-`today-queue-empty`, `today-booking-error` — listed in `docs/reference/e2e-testids-inventory.md`
+`today-queue-empty`, `today-booking-error`, `today-no-lanes` — listed in `docs/reference/e2e-testids-inventory.md`
 › Today.

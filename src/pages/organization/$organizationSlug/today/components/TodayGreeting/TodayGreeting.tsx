@@ -19,8 +19,8 @@ export interface TodayGreetingProps {
   counts: { inClinic: number; waiting: number; arriving: number };
   /** "New booking" — absent without Leads Create (§3.7). */
   onNewBooking?: () => void;
-  /** "Walk-in" — the command menu. */
-  onWalkIn: () => void;
+  /** "Walk-in" — the command menu; absent without Appointments Create (F4, D163). */
+  onWalkIn?: () => void;
 }
 
 /** The two outline buttons (`today.md:18`): 32px, 13px, `rounded-lg`, transparent, hover `accent`. */
@@ -88,16 +88,18 @@ export function TodayGreeting({
           {t(TODAY_KEYS.newBooking)}
         </Button>
       ) : null}
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        data-testid={TODAY_TEST_IDS.walkIn}
-        onClick={onWalkIn}
-        className={cn(BUTTON, 'font-normal shadow-none')}
-      >
-        {t(TODAY_KEYS.walkIn)}
-      </Button>
+      {onWalkIn ? (
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          data-testid={TODAY_TEST_IDS.walkIn}
+          onClick={onWalkIn}
+          className={cn(BUTTON, 'font-normal shadow-none')}
+        >
+          {t(TODAY_KEYS.walkIn)}
+        </Button>
+      ) : null}
     </div>
   );
 }

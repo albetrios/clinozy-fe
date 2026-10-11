@@ -33,7 +33,8 @@
     "count_one": "{{count}} pessoa",
     "count_many": "{{count}} pessoas",
     "count_other": "{{count}} pessoas",
-    "empty": "Ninguém aqui agora."
+    "empty": "Ninguém aqui agora.",
+    "none": "O atendimento da clínica e as consultas não fazem parte da sua função."
   },
   "actions": {
     "book": "Agendar",

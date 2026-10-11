@@ -136,7 +136,10 @@ Paths drop `/api/v1`. "Gap Gn" points into §8, "Mn" into §9, "Qn" into §10.
 - **Gaps:** the card flags — first visit, pack, dues, "₹n to pay", allergies, Rx approved (G1); the
   role focus keyed on the fixed nine roles (G5).
 - **Gate:** the room `appointment:read`; moves `appointment:update`; the queue `task:read` /
-  `task:update`.
+  `task:update`. **Lanes by code (D163, AS-BUILT #110):** Enquiries shows with `lead:read`, the six
+  floor lanes with `appointment:read` — a lane the member cannot read has no tile and reads nothing,
+  and a member with neither (the Accountant) sees one line instead of the lanes; Walk-in shows with
+  `appointment:create`.
 - **Work queue (D155, AS-BUILT #102):** the Tasks room's model (§5.8) — `tab=open` and `tab=done`
   (today's closes by default, no `resolved_from`) in the scope and the header's branches
   (`branch_id`), every page; "<n> open" is `tab=open&scope=everyone&limit=1`'s `estimated_total` in

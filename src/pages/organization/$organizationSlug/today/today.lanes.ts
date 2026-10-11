@@ -211,17 +211,34 @@ export function groupTodayLanes(
 }
 
 /**
+ * The lanes a member can read (F3, D163): Enquiries are leads (`lead:read`); every other lane is
+ * a booking on the floor (`appointment:read`). A lane the member cannot read is left out rather
+ * than shown at 0, which would read as an empty clinic.
+ */
+export function readableTodayLanes(reads: {
+  leads: boolean;
+  appointments: boolean;
+}): readonly TodayLane[] {
+  return TODAY_LANES.filter((lane) =>
+    lane === 'enquiries' ? reads.leads : reads.appointments,
+  );
+}
+
+/**
  * The lane the panel shows when the member picked none (`today.md:35`): the
  * first lane in their focus that has people, else the first lane with people,
- * else Enquiries.
+ * else the first lane — Enquiries for anyone who reads leads. Only the lanes the
+ * member can read (`visible`, {@link readableTodayLanes}) are candidates.
  */
 export function defaultTodayLane(
   lanes: TodayLanes,
   focus: ReadonlySet<TodayLane>,
+  visible: readonly TodayLane[] = TODAY_LANES,
 ): TodayLane {
   return (
-    TODAY_LANES.find((lane) => focus.has(lane) && lanes[lane].length > 0) ??
-    TODAY_LANES.find((lane) => lanes[lane].length > 0) ??
+    visible.find((lane) => focus.has(lane) && lanes[lane].length > 0) ??
+    visible.find((lane) => lanes[lane].length > 0) ??
+    visible[0] ??
     'enquiries'
   );
 }

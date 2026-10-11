@@ -17,6 +17,7 @@ import {
   isLaneInFocus,
   laneFaces,
   laneHint,
+  readableTodayLanes,
   TODAY_ROLE_FOCUS,
   todayFocus,
   type TodayLanes,
@@ -134,6 +135,30 @@ describe('defaultTodayLane (today.md:35)', () => {
       'checkout',
     );
     expect(defaultTodayLane(lanesWith({}), todayFocus(['doctor']))).toBe('enquiries');
+  });
+
+  it('picks among the lanes the member can read only (F3, D163)', () => {
+    const floorOnly = readableTodayLanes({ leads: false, appointments: true });
+    expect(
+      defaultTodayLane(
+        lanesWith({ enquiries: 3 }),
+        todayFocus(['front_desk']),
+        floorOnly,
+      ),
+    ).toBe('arriving');
+  });
+});
+
+describe('readableTodayLanes (F3, D163)', () => {
+  it('keeps Enquiries for a lead reader and the floor for an appointment reader', () => {
+    expect(readableTodayLanes({ leads: true, appointments: true })).toEqual(TODAY_LANES);
+    expect(readableTodayLanes({ leads: true, appointments: false })).toEqual([
+      'enquiries',
+    ]);
+    expect(readableTodayLanes({ leads: false, appointments: true })).toEqual(
+      TODAY_LANES.filter((lane) => lane !== 'enquiries'),
+    );
+    expect(readableTodayLanes({ leads: false, appointments: false })).toEqual([]);
   });
 });
 

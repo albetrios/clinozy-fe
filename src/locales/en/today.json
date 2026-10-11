@@ -32,7 +32,8 @@
     "more": "+{{more}}",
     "count_one": "{{count}} person",
     "count_other": "{{count}} people",
-    "empty": "No one here right now."
+    "empty": "No one here right now.",
+    "none": "The clinic floor and enquiries are not part of your role."
   },
   "actions": {
     "book": "Book",

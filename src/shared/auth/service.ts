@@ -226,8 +226,8 @@ export async function refreshAccessToken(): Promise<void> {
 async function runExclusiveRefresh(generation: number): Promise<void> {
   const refresh = async () => {
     if (generation !== authGeneration) return;
-    const token = await fetchRefreshToken();
-    if (generation !== authGeneration) return;
+    const token = await fetchRefreshTokenRetryingOnce(generation);
+    if (token === null || generation !== authGeneration) return;
     setAccessToken(token);
     scheduleTokenRefresh();
   };
@@ -244,28 +244,80 @@ async function runExclusiveRefresh(generation: number): Promise<void> {
  */
 class RefreshRejectedError extends Error {}
 
-async function fetchRefreshToken(): Promise<string> {
-  const response = await authFetch(`${authBase()}${API_ENDPOINTS.AUTH.REFRESH}`, {
-    method: 'POST',
-    timeout: HTTP.REFRESH_TIMEOUT,
-  });
+/**
+ * The refresh got no usable answer: no response at all (offline, timed out), a throttle (429) or a
+ * server fault (5xx). Unlike {@link RefreshRejectedError} it says nothing about the session, which
+ * may be perfectly alive — so it never signs anyone out by itself.
+ */
+class RefreshUnansweredError extends Error {}
 
-  const data = (await response.json()) as unknown;
-  if (!response.ok) {
-    const envelope = data as { message?: string; error?: { detail?: string } };
-    const message =
-      envelope?.error?.detail ??
-      envelope?.message ??
-      `Refresh failed (${response.status})`;
-    throw new RefreshRejectedError(message);
+/** True when a refresh failed without the server saying anything about the session. */
+export function isRefreshUnanswered(error: unknown): boolean {
+  return error instanceof RefreshUnansweredError;
+}
+
+/** The pause before the one retry of an unanswered refresh. */
+const REFRESH_RETRY_DELAY_MS = 600;
+
+/**
+ * One refresh, retried ONCE when it got no usable answer. Once only: a request that timed out may
+ * already have rotated the refresh cookie on the server without the new one reaching the browser,
+ * and clinozy-be accepts the superseded secret for 10 seconds only (`REFRESH_TOKEN_REUSE_GRACE_MS`)
+ * — the retry lands well inside that (`HTTP.REFRESH_TIMEOUT` + this delay), where a second retry
+ * could land outside it and read as a replay, which revokes every session of the user.
+ *
+ * @returns the new access token, or `null` when a newer sign-in or sign-out superseded the wait.
+ */
+async function fetchRefreshTokenRetryingOnce(generation: number): Promise<string | null> {
+  try {
+    return await fetchRefreshToken();
+  } catch (error) {
+    if (!(error instanceof RefreshUnansweredError)) throw error;
+    await new Promise((resolve) => setTimeout(resolve, REFRESH_RETRY_DELAY_MS));
+    if (generation !== authGeneration) return null;
+    return fetchRefreshToken();
   }
+}
 
+/** POST /auth/refresh; no response at all (offline, timed out) is an unanswered refresh. */
+async function postRefresh(): Promise<Response> {
+  try {
+    return await authFetch(`${authBase()}${API_ENDPOINTS.AUTH.REFRESH}`, {
+      method: 'POST',
+      timeout: HTTP.REFRESH_TIMEOUT,
+    });
+  } catch (error) {
+    throw new RefreshUnansweredError(
+      error instanceof Error ? error.message : 'Refresh got no answer',
+    );
+  }
+}
+
+/** The refusal's own words from the error envelope, else a status line. */
+function refusalMessage(data: unknown, status: number): string {
+  const envelope = data as { message?: string; error?: { detail?: string } } | null;
+  return envelope?.error?.detail ?? envelope?.message ?? `Refresh failed (${status})`;
+}
+
+/** The access token in a refresh answer (enveloped or bare, snake or camel case). */
+function accessTokenOf(data: unknown): string | undefined {
   const payload =
     data && typeof data === 'object' && 'data' in data
       ? (data as { data: unknown }).data
       : data;
   const raw = payload as { access_token?: string; accessToken?: string } | null;
-  const token = raw?.access_token ?? raw?.accessToken;
+  return raw?.access_token ?? raw?.accessToken;
+}
+
+async function fetchRefreshToken(): Promise<string> {
+  const response = await postRefresh();
+  if (response.status === 429 || response.status >= 500) {
+    throw new RefreshUnansweredError(`Refresh failed (${response.status})`);
+  }
+  const data = (await response.json()) as unknown;
+  if (!response.ok) throw new RefreshRejectedError(refusalMessage(data, response.status));
+
+  const token = accessTokenOf(data);
   if (typeof token !== 'string' || token.length === 0) {
     throw new Error(`Refresh failed (${response.status})`);
   }

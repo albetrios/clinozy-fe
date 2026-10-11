@@ -56,6 +56,8 @@ export const TODAY_KEYS = {
     },
     /** "+2" after four faces. */
     more: 'lanes.more',
+    /** In place of the tiles when the member can read no lane (F3, D163). */
+    none: 'lanes.none',
     /** "1 person" · "<n> people" (plural). */
     count: 'lanes.count',
     empty: 'lanes.empty',
@@ -115,6 +117,8 @@ export const TODAY_TEST_IDS = {
   newBooking: 'today-new-booking',
   walkIn: 'today-walk-in',
   lanes: 'today-lanes',
+  /** The note in place of the tiles when the member can read no lane (F3, D163). */
+  noLanes: 'today-no-lanes',
   lane: (lane: TodayLane) => `today-lane-${lane.replace('_', '-')}`,
   panel: 'today-panel',
   card: 'today-card',

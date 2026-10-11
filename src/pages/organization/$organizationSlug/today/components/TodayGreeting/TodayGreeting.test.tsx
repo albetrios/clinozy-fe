@@ -64,7 +64,7 @@ describe('TodayGreeting (KICKOFF §6.2 Greeting row)', () => {
     );
   });
 
-  it('offers "New booking" with Leads Create and "Walk-in" always', async () => {
+  it('offers "New booking" with Leads Create and "Walk-in" with Appointments Create', async () => {
     const user = userEvent.setup();
     const onNewBooking = vi.fn();
     const onWalkIn = vi.fn();
@@ -81,5 +81,11 @@ describe('TodayGreeting (KICKOFF §6.2 Greeting row)', () => {
     await screen.findByTestId('today-greeting');
     expect(screen.queryByTestId('today-new-booking')).not.toBeInTheDocument();
     expect(screen.getByTestId('today-walk-in')).toBeInTheDocument();
+  });
+
+  it('hides "Walk-in" without Appointments Create (F4, D163)', async () => {
+    renderGreeting({ onWalkIn: undefined });
+    await screen.findByTestId('today-greeting');
+    expect(screen.queryByTestId('today-walk-in')).not.toBeInTheDocument();
   });
 });

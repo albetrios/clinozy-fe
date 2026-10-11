@@ -154,8 +154,13 @@ const tileOf = (lane: TodayLane) =>
   screen.getByTestId(`today-lane-${lane.replace('_', '-')}`);
 const countOf = (lane: TodayLane) =>
   tileOf(lane).querySelector('.text-stat')?.textContent ?? '';
+/** The dimmed tiles among those the role can read — a lane it cannot read has no tile (D163). */
 const dimmedLanes = () =>
-  LANE_ORDER.filter((lane) => tileOf(lane).dataset.dimmed === 'true');
+  LANE_ORDER.filter(
+    (lane) =>
+      screen.queryByTestId(`today-lane-${lane.replace('_', '-')}`)?.dataset.dimmed ===
+      'true',
+  );
 const panel = () => screen.getByTestId('today-panel');
 const cardNamed = (name: string) => {
   const card = within(panel())
@@ -219,9 +224,10 @@ describe('the Today room (KICKOFF §6.2)', () => {
   it.each<[Role, TodayLane[], TodayLane]>([
     ['front_desk', ['with_doctor', 'treatment', 'pharmacy'], 'enquiries'],
     ['doctor', ['enquiries', 'arriving', 'treatment', 'checkout', 'pharmacy'], 'waiting'],
+    // No lead:read — Enquiries has no tile to dim.
     [
       'therapist',
-      ['enquiries', 'arriving', 'waiting', 'with_doctor', 'checkout', 'pharmacy'],
+      ['arriving', 'waiting', 'with_doctor', 'checkout', 'pharmacy'],
       'treatment',
     ],
     [
@@ -231,14 +237,11 @@ describe('the Today room (KICKOFF §6.2)', () => {
     ],
     [
       'pharmacist',
-      ['enquiries', 'arriving', 'waiting', 'with_doctor', 'treatment', 'checkout'],
+      ['arriving', 'waiting', 'with_doctor', 'treatment', 'checkout'],
       'pharmacy',
     ],
-    [
-      'marketing',
-      ['arriving', 'waiting', 'with_doctor', 'treatment', 'checkout', 'pharmacy'],
-      'enquiries',
-    ],
+    // Enquiries alone: no appointment:read, so no floor tiles at all.
+    ['marketing', [], 'enquiries'],
     ['owner', [], 'enquiries'],
     ['admin', [], 'enquiries'],
   ])('focuses a %s: dims %j and opens %s', async (role, dimmed, lane) => {
@@ -248,22 +251,35 @@ describe('the Today room (KICKOFF §6.2)', () => {
     expect(panel()).toHaveAttribute('data-lane', lane);
   });
 
-  it('reads no floor for an Accountant — no appointment:read, so no 403 — and keeps Checkout in focus', async () => {
+  it('shows an Accountant no lanes — no appointment:read nor lead:read — and reads no floor (F3, D163)', async () => {
     floor.reads = 0;
     renderTodayRoute(TODAY_PATH, TodayPage, { role: 'accountant' });
     await loaded();
-    await waitFor(() =>
-      expect(dimmedLanes()).toEqual([
-        'enquiries',
-        'arriving',
-        'waiting',
-        'with_doctor',
-        'treatment',
-        'pharmacy',
-      ]),
+    expect(await screen.findByTestId('today-no-lanes')).toHaveTextContent(
+      'The clinic floor and enquiries are not part of your role.',
     );
+    expect(screen.queryByTestId('today-lanes')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('today-panel')).not.toBeInTheDocument();
+    // Walk-in books a visit: not for a role that cannot (F4).
+    expect(screen.queryByTestId('today-walk-in')).not.toBeInTheDocument();
     expect(floor.reads).toBe(0);
-    expect(LANE_ORDER.map(countOf)).toEqual(['0', '0', '0', '0', '0', '0', '0']);
+  });
+
+  it('shows Marketing the Enquiries lane alone — leads, but no floor (F3, D163)', async () => {
+    floor.reads = 0;
+    renderTodayRoute(TODAY_PATH, TodayPage, { role: 'marketing' });
+    await loaded();
+    const lanes = await screen.findByTestId('today-lanes');
+    await waitFor(() =>
+      expect(
+        within(lanes)
+          .getAllByRole('button')
+          .map((tile) => tile.dataset.testid),
+      ).toEqual(['today-lane-enquiries']),
+    );
+    expect(screen.getByTestId('today-panel')).toHaveAttribute('data-lane', 'enquiries');
+    expect(screen.queryByTestId('today-walk-in')).not.toBeInTheDocument();
+    expect(floor.reads).toBe(0);
   });
 
   it('keeps the picked lane in the URL', async () => {
