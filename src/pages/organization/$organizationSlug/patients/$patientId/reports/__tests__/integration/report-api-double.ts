@@ -7,6 +7,7 @@
 import type { DeleteReason } from '@/shared/api/clinic/clinic-schema.ts';
 import type {
   PatientReport,
+  PatientReportFile,
   PatientReportInput,
   PatientReportList,
 } from '@/shared/api/clinic/patient-reports-contracts.ts';
@@ -15,15 +16,29 @@ import { HttpError } from '@/shared/errors/HttpError.ts';
 /** The patient the reports belong to (the shared `patientFile()` double's). */
 const PATIENT_ID = 'pat_priya0000000000000000';
 
-/** One report as the API answers it — "CBC + Thyroid profile", Lab, 20 Sep, one PDF. */
+/** One of a report's files as the API answers it: its upload's name and a signed link (D86). */
+export function reportFileDouble(fileKey: string): PatientReportFile {
+  return {
+    fileKey,
+    fileName: fileKey.split('/').pop() ?? fileKey,
+    fileUrl: `https://uploads.test/${fileKey}?X-Amz-Expires=900`,
+  };
+}
+
+/**
+ * One report as the API answers it — "CBC + Thyroid profile", Lab, 20 Sep, one PDF; its `files`
+ * follow its `fileKeys` unless given.
+ */
 export function reportDouble(overrides: Partial<PatientReport> = {}): PatientReport {
+  const fileKeys = overrides.fileKeys ?? ['organization-files/org_test/cbc.pdf'];
   return {
     id: 'prep_cbc00000000000000000',
     patientId: PATIENT_ID,
     type: 'lab',
     name: 'CBC + Thyroid profile',
     date: '2026-09-20',
-    fileKeys: ['organization-files/org_test/cbc.pdf'],
+    fileKeys,
+    files: fileKeys.map(reportFileDouble),
     notes: null,
     createdAt: '2026-09-20T06:00:00.000Z',
     updatedAt: '2026-09-20T06:00:00.000Z',
@@ -129,7 +144,11 @@ export async function attachPatientReportFile({
 }): Promise<PatientReport> {
   const row = live(patientId, reportId);
   if (!row.report.fileKeys.includes(fileKey)) {
-    row.report = { ...row.report, fileKeys: [...row.report.fileKeys, fileKey] };
+    row.report = {
+      ...row.report,
+      fileKeys: [...row.report.fileKeys, fileKey],
+      files: [...row.report.files, reportFileDouble(fileKey)],
+    };
   }
   return { ...row.report };
 }

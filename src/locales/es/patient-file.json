@@ -217,8 +217,16 @@
       "previousHint": "Anterior (←)",
       "next": "Foto siguiente",
       "nextHint": "Siguiente (→)",
+      "zoom": "Zoom",
+      "zoomOut": "Alejar",
+      "zoomOutHint": "Alejar (−)",
+      "zoomIn": "Acercar",
+      "zoomInHint": "Acercar (+)",
+      "zoomReset": "Ajustar a la pantalla (0)",
       "hints": {
         "browse": "← → navegar",
+        "zoom": "Desplaza o + − para hacer zoom",
+        "pan": "Arrastra para mover · doble clic para restablecer",
         "close": "Esc cierra"
       },
       "missing": "Vista previa no disponible",
@@ -597,7 +605,10 @@
     "view": {
       "sub": "{{name}} · {{date}}",
       "notes": "Notas",
-      "noNotes": "Este informe no tiene notas"
+      "noNotes": "Este informe no tiene notas",
+      "download": "Descargar",
+      "downloading": "Descargando {{name}}",
+      "fileGone": "Ya no está disponible"
     }
   },
   "package": {

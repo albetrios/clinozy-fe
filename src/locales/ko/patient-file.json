@@ -201,8 +201,16 @@
       "previousHint": "이전 (←)",
       "next": "다음 사진",
       "nextHint": "다음 (→)",
+      "zoom": "확대/축소",
+      "zoomOut": "축소",
+      "zoomOutHint": "축소 (−)",
+      "zoomIn": "확대",
+      "zoomInHint": "확대 (+)",
+      "zoomReset": "화면에 맞추기 (0)",
       "hints": {
         "browse": "← → 넘기기",
+        "zoom": "스크롤 또는 + − 로 확대/축소",
+        "pan": "끌어서 이동 · 두 번 클릭해 초기화",
         "close": "Esc 닫기"
       },
       "missing": "미리 보기를 사용할 수 없음",
@@ -573,7 +581,10 @@
     "view": {
       "sub": "{{name}} · {{date}}",
       "notes": "메모",
-      "noNotes": "이 결과에 메모가 없습니다"
+      "noNotes": "이 결과에 메모가 없습니다",
+      "download": "다운로드",
+      "downloading": "{{name}} 다운로드 중",
+      "fileGone": "더 이상 사용할 수 없음"
     }
   },
   "package": {

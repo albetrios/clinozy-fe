@@ -161,6 +161,17 @@ not fail) on a deploy environment that leaves it unset. Steps:
    the server exactly. A super_admin needing access inside an organization gets
    it the normal way: a membership with a role.
 
+6. **`connect-src` and `img-src` allow `https://*.amazonaws.com`.** Uploads go from the
+   browser straight to S3 (a presigned POST or PUT — clinozy-be never sees the bytes), and
+   stored files come back from it: a patient photo's `file_url`, a report file, the signed
+   avatar and organization logo. The bucket and region differ per deployment, so the allowance
+   is AWS's host suffix rather than one bucket. Without it every upload was refused by
+   `connect-src` and every stored image by `img-src` (found in the D86 live check). The
+   residual risk is a script that already runs here sending data to some other AWS-hosted
+   endpoint — `script-src 'self'` is what keeps such a script out; no script, frame or
+   default source is widened. A report file opens in its own tab, outside this policy. Narrow
+   it to the bucket's host if one deployment's storage ever needs it.
+
 ## Backend's half (confirm, don't implement here)
 
 - The refresh cookie must be `SameSite=Lax` (or stricter) and the backend must

@@ -5,6 +5,7 @@ import type { operations } from '@/core/http/openapi-types.d.ts';
 import { wireSchema } from '@/core/http/wire-schema.ts';
 
 import { civilDateSchema } from './clinic-schema.ts';
+import { stableFileUrl } from './file-links.ts';
 
 /*
  * A patient's photos on clinozy-be (`/app/patients/:patient_id/images`, api-integration §5.4):
@@ -12,8 +13,9 @@ import { civilDateSchema } from './clinic-schema.ts';
  * caption, visit (`appointment_id`, whose `service_label` the server joins) and treatment
  * session, taken on a civil day. A list page carries `meta.album_counts` — the live photos of
  * each album, the Private album only for a member who holds `patient:private_album:read`.
- * B1 (Q4): nothing turns a `file_key` into a URL, so a photo is shown by its name, never its
- * pixels.
+ * Each read carries `file_url` (clinozy-be D86): a link that shows the photo, valid 15 minutes
+ * and made fresh on every read — so the file reads the list again rather than keep a link — and
+ * null when the stored upload is gone (the photo then shows by its name).
  */
 
 /** The albums, in tab order (`album`). */
@@ -70,10 +72,12 @@ export interface PatientPhoto {
   patientTreatmentId: string | null;
   album: PatientPhotoAlbum;
   stage: PatientPhotoStage | null;
-  /** The stored object's key — B1: there is no URL for it. */
+  /** The stored object's key. */
   fileKey: string;
   /** The uploaded file's name, as the upload recorded it. */
   fileName: string;
+  /** A link that shows it, valid 15 minutes from the read (D86); null when its upload is gone. */
+  fileUrl: string | null;
   /** The name it was filed under (≤60). */
   displayName: string | null;
   caption: string | null;
@@ -107,6 +111,7 @@ export const patientImageWire = wireSchema<ApiPatientImage>()(
     stage: z.enum(PATIENT_PHOTO_STAGES).nullable(),
     file_key: z.string(),
     file_name: z.string(),
+    file_url: z.string().nullable(),
     display_name: z.string().nullable(),
     caption: z.string().nullable(),
     body_part: z.enum(PATIENT_PHOTO_BODY_PARTS).nullable(),
@@ -131,6 +136,7 @@ export function toPatientPhoto(row: z.output<typeof patientImageWire>): PatientP
     stage: row.stage,
     fileKey: row.file_key,
     fileName: row.file_name,
+    fileUrl: stableFileUrl(row.file_key, row.file_url),
     displayName: row.display_name,
     caption: row.caption,
     bodyPart: row.body_part,

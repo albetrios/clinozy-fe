@@ -8,6 +8,7 @@ import { fsi, withoutBidiMarks } from '@/tests/utils/bidi-marks.ts';
 
 import {
   reportDouble,
+  reportFileDouble,
   seedReports,
 } from '../../__tests__/integration/report-api-double.ts';
 import {
@@ -83,10 +84,60 @@ describe('Report view (KICKOFF §6.6; S:43)', () => {
     expect(await axeForDialog(baseElement)).toHaveNoViolations();
   });
 
-  it('offers no download — no stored file can be read back (B1)', async () => {
-    const { drawer } = await openView();
-    expect(within(drawer).queryByTestId('report-view-save')).not.toBeInTheDocument();
-    expect(drawer).not.toHaveTextContent('Download');
+  it('lists each file by its name, opening it in a new tab (D86)', async () => {
+    const { user, drawer } = await openView();
+    await user.click(within(drawer).getByTestId('report-view-step-details-trigger'));
+    const links = within(drawer).getAllByTestId('report-view-file-link');
+    expect(links.map((link) => link.textContent)).toEqual(['cbc.pdf', 'p2.PNG']);
+    expect(links[0]).toHaveAttribute('href', CBC.files[0]?.fileUrl);
+    expect(links[0]).toHaveAttribute('target', '_blank');
+    expect(links[0]).toHaveAttribute('rel', 'noopener noreferrer');
+  });
+
+  it('downloads its one file in a new tab, saying so', async () => {
+    const one = reportDouble();
+    seedReports([one]);
+    const open = vi.spyOn(window, 'open').mockReturnValue(null);
+    const { user, drawer } = await openView(one.id);
+    await user.click(within(drawer).getByTestId('report-view-download'));
+    expect(open).toHaveBeenCalledWith(
+      one.files[0]?.fileUrl,
+      '_blank',
+      'noopener,noreferrer',
+    );
+    expect(notifyMock.success).toHaveBeenCalledWith('Downloading CBC + Thyroid profile');
+    open.mockRestore();
+  });
+
+  it('with several files, Download opens the step that lists them', async () => {
+    const open = vi.spyOn(window, 'open').mockReturnValue(null);
+    const { user, drawer } = await openView();
+    await user.click(within(drawer).getByTestId('report-view-download'));
+    expect(open).not.toHaveBeenCalled();
+    expect(await within(drawer).findAllByTestId('report-view-file-link')).toHaveLength(2);
+    open.mockRestore();
+  });
+
+  it('marks a file whose upload is gone, and offers no Download without a file to open', async () => {
+    seedReports([
+      reportDouble({
+        fileKeys: ['organization-files/org_test/cbc.pdf'],
+        files: [
+          {
+            ...reportFileDouble('organization-files/org_test/cbc.pdf'),
+            fileName: null,
+            fileUrl: null,
+          },
+        ],
+      }),
+    ]);
+    const { user, drawer } = await openView();
+    expect(within(drawer).queryByTestId('report-view-download')).not.toBeInTheDocument();
+    await user.click(within(drawer).getByTestId('report-view-step-details-trigger'));
+    expect(within(drawer).getByTestId('report-view-files')).toHaveTextContent(
+      'No longer available',
+    );
+    expect(within(drawer).queryByTestId('report-view-file-link')).not.toBeInTheDocument();
   });
 
   it('shows the notes and a report with no file yet', async () => {

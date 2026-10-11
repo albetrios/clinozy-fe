@@ -209,8 +209,16 @@
       "previousHint": "Previous (←)",
       "next": "Next photo",
       "nextHint": "Next (→)",
+      "zoom": "Zoom",
+      "zoomOut": "Zoom out",
+      "zoomOutHint": "Zoom out (−)",
+      "zoomIn": "Zoom in",
+      "zoomInHint": "Zoom in (+)",
+      "zoomReset": "Fit to screen (0)",
       "hints": {
         "browse": "← → browse",
+        "zoom": "Scroll or + − zoom",
+        "pan": "Drag to move · double-click to reset",
         "close": "Esc close"
       },
       "missing": "Preview not available",
@@ -585,7 +593,10 @@
     "view": {
       "sub": "{{name}} · {{date}}",
       "notes": "Notes",
-      "noNotes": "No notes on this report"
+      "noNotes": "No notes on this report",
+      "download": "Download",
+      "downloading": "Downloading {{name}}",
+      "fileGone": "No longer available"
     }
   },
   "package": {

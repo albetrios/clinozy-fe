@@ -23,10 +23,12 @@ step past the photos read reads the next page first; the ends wrap once every pa
 and × close back to Photos; a click outside does not. Delete runs the reason confirm and the
 viewer leaves once it lands.
 
-**B1 (Q4):** nothing turns a `file_key` into a URL, so the stage shows the image glyph
-(`../../shared/components/PhotoThumb/`), the file's name and "Preview not available" — the photo
-is known by its names and dates only. With no pixels there is nothing to zoom, pan, pinch or
-swipe: no zoom group, no `+ − 0` keys and no hints for them.
+**The photo (clinozy-be D86):** the stage shows the photo from its `file_url` — a 15-minute link
+made on every read (`../../shared/components/PhotoThumb/`, `object-contain`) — and zooms 100–600%:
+the bar's zoom group (− · the level, which resets · +), the wheel (×1.12 a notch), a double-click
+(100% ↔ 200%), a pinch, the `+ − 0` keys; a drag pans once zoomed and a swipe browses on touch
+(`hooks/usePhotoZoom/`), with the hints for them. A photo whose upload is gone — or whose link
+fails to load — shows the image glyph, its file's name and "Preview not available".
 
 ## Files
 

@@ -58,6 +58,18 @@ const STRIPE_ORIGINS = [
  */
 const POSTHOG_ASSETS_ORIGIN = 'https://us-assets.i.posthog.com';
 
+/**
+ * Where clinozy-be's stored files live: `<bucket>.s3[.<region>].amazonaws.com`. The browser sends
+ * every upload's bytes there itself — the presigned POST or PUT (`connect-src`; the API never
+ * sees them) — and reads them back from there — `file_url` on a patient photo or report file
+ * (clinozy-be D86), the signed avatar and organization logo (`img-src`). The bucket and region
+ * differ per deployment, so the allowance is AWS's host suffix (CSP3: `*.` matches any number of
+ * labels), in those two directives only; a report file opens in its own tab, outside this
+ * document's policy. Kept in lock step with the meta CSP in index.html. An S3-compatible store on
+ * another host (`S3_ENDPOINT`) needs its origin here too.
+ */
+const STORED_FILE_ORIGIN = 'https://*.amazonaws.com';
+
 const CONNECT_SRC_THIRD_PARTY = [
   'https://*.ingest.sentry.io',
   'https://*.sentry.io',
@@ -68,6 +80,7 @@ const CONNECT_SRC_THIRD_PARTY = [
   // `lib/password-breach.ts`.
   'https://api.pwnedpasswords.com',
   ...STRIPE_ORIGINS,
+  STORED_FILE_ORIGIN,
 ] as const;
 
 /**
@@ -99,7 +112,7 @@ export function buildContentSecurityPolicy(
     `script-src 'self' ${TURNSTILE_ORIGIN} ${STRIPE_ORIGINS[0]} ${POSTHOG_ASSETS_ORIGIN}`,
     "style-src 'self' 'unsafe-inline'",
     `connect-src ${connectSrc.join(' ')}`,
-    "img-src 'self' data: blob:",
+    `img-src 'self' data: blob: ${STORED_FILE_ORIGIN}`,
     "font-src 'self'",
     // Cloudflare Turnstile runs its challenge in a Web Worker created from a `blob:` URL.
     // With `worker-src 'self'` the browser blocks that worker and the challenge cannot

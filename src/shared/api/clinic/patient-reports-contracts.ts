@@ -4,12 +4,14 @@ import type { ApiBody, ApiData } from '@/core/http/api.ts';
 import { wireSchema } from '@/core/http/wire-schema.ts';
 
 import { civilDateSchema, type ReportType, reportTypeSchema } from './clinic-schema.ts';
+import { stableFileUrl } from './file-links.ts';
 
 /*
  * A patient's reports on clinozy-be (`/app/patients/:patient_id/reports`, api-integration
  * §5.4): a named, typed, dated record with an optional note and up to ten stored files
- * (`file_keys`). It does not say who added it (G4), and B1 (Q4): a `file_key` has no URL, so
- * nothing downloads.
+ * (`file_keys`). It does not say who added it (G4). Each read gives every file its upload's
+ * name and a link that opens it (`files`, clinozy-be D86) — valid 15 minutes and made fresh on
+ * every read, both null when the upload is gone.
  */
 
 /** The API's limits on a report (its 400s name the field past them). */
@@ -29,12 +31,23 @@ export interface PatientReport {
   name: string;
   /** The report's own civil day, `YYYY-MM-DD`. */
   date: string;
-  /** The stored files' keys, in the order they were attached — B1: none can be read back. */
+  /** The stored files' keys, in the order they were attached. */
   fileKeys: string[];
+  /** The same files with their names and links (D86), in the same order. */
+  files: PatientReportFile[];
   notes: string | null;
   createdAt: string;
   /** The read's stamp — a change sends it back as `expected_updated_at`. */
   updatedAt: string;
+}
+
+/** One of a report's files: its key, the name it was uploaded under and a link that opens it. */
+export interface PatientReportFile {
+  fileKey: string;
+  /** Null when the upload is gone. */
+  fileName: string | null;
+  /** Valid 15 minutes from the read (D86); null when the upload is gone. */
+  fileUrl: string | null;
 }
 
 // ── The wire ──
@@ -55,6 +68,13 @@ export const patientReportWire = wireSchema<ApiPatientReport>()(
     name: z.string(),
     report_date: civilDateSchema,
     file_keys: z.array(z.string()),
+    files: z.array(
+      z.object({
+        file_key: z.string(),
+        file_name: z.string().nullable(),
+        file_url: z.string().nullable(),
+      }),
+    ),
     notes: z.string().nullable(),
     created_at: z.string(),
     updated_at: z.string(),
@@ -73,6 +93,11 @@ export function toPatientReport(row: z.output<typeof patientReportWire>): Patien
     name: row.name,
     date: row.report_date,
     fileKeys: row.file_keys,
+    files: row.files.map((file) => ({
+      fileKey: file.file_key,
+      fileName: file.file_name,
+      fileUrl: stableFileUrl(file.file_key, file.file_url),
+    })),
     notes: row.notes,
     createdAt: row.created_at,
     updatedAt: row.updated_at,

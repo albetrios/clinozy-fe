@@ -46,6 +46,12 @@ export const REPORT_KEYS = {
     sub: 'report.view.sub',
     notes: 'report.view.notes',
     noNotes: 'report.view.noNotes',
+    /** The footer's primary (D86). */
+    download: 'report.view.download',
+    /** "Downloading CBC + Thyroid profile". */
+    downloading: 'report.view.downloading',
+    /** A file whose upload is gone. */
+    fileGone: 'report.view.fileGone',
   },
 } as const;
 

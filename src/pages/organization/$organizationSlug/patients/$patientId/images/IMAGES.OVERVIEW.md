@@ -27,9 +27,11 @@ Registered in `src/app/routes/routeTree.tsx` through the file's one lazy module
   were checked in or completed — the only ones the API files a photo under.
 - **Writes:** `POST …/images` per uploaded JPG / PNG, `PATCH …/images/:id` with
   `expected_updated_at`, `DELETE …?reason=&note=`, `POST …/restore` (the toast's Undo).
-- **B1 (Q4):** nothing turns a `file_key` into a URL, so a tile shows the image glyph
-  (`../shared/components/PhotoThumb/`), the photo's name and day, its body part and stage — never
-  its pixels.
+- **The photo (clinozy-be D86):** each tile shows the photo from its `file_url`
+  (`../shared/components/PhotoThumb/`) under its body part and stage, its name and day fading in on
+  hover; a link lives 15 minutes, so the list reads again every 5 and on the tab's return, keeping
+  a link while it has life left (`@/shared/api/clinic/file-links.ts`). A photo whose upload is gone
+  shows the image glyph with its name and day always on.
 
 ## The section (L-44)
 

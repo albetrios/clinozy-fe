@@ -132,6 +132,7 @@ describe('Upload report (KICKOFF §6.6; S:42)', () => {
       type: 'scan',
       notes: 'No findings',
       fileKeys: [],
+      files: [],
     });
     expect(enqueueMock).toHaveBeenCalledWith([pdf], expect.any(Object));
   });

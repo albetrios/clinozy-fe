@@ -251,7 +251,14 @@ class RefreshRejectedError extends Error {}
  */
 class RefreshUnansweredError extends Error {}
 
-/** True when a refresh failed without the server saying anything about the session. */
+/**
+ * True when a refresh failed without the server saying anything about the session.
+ *
+ * @remarks
+ * The 401 handler in `core/http/fetch-client.ts` asks this before signing anyone out: such a
+ * failure — already retried once inside clinozy-be's refresh grace — fails the request as
+ * unreachable and keeps the session; only a refused refresh ends it.
+ */
 export function isRefreshUnanswered(error: unknown): boolean {
   return error instanceof RefreshUnansweredError;
 }

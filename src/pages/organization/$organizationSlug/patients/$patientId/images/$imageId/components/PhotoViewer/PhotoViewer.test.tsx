@@ -25,7 +25,7 @@ function renderViewer(props: Partial<PhotoViewerProps> = {}) {
 }
 
 describe('PhotoViewer', () => {
-  it('shows the photo’s name, its line and place, and its file in the image’s place (B1)', async () => {
+  it('shows the photo from its link with its name, line and place, the zoom group and hints (D86)', async () => {
     const { baseElement } = renderViewer({ onEdit: vi.fn(), onDelete: vi.fn() });
     const viewer = screen.getByTestId('patient-photo-viewer');
     expect(viewer).toHaveAttribute('data-surface', 'light-pinned');
@@ -33,19 +33,58 @@ describe('PhotoViewer', () => {
     expect(viewer).toHaveTextContent('Face · 24 Sep · General');
     expect(viewer).toHaveTextContent('2 of 6');
     const stage = screen.getByTestId('patient-photo-viewer-stage');
-    expect(within(stage).getByText('IMG_5100.png')).toBeInTheDocument();
-    expect(stage.querySelector('img')).toBeNull();
+    const image = stage.querySelector('img');
+    expect(image).toHaveAttribute('src', PHOTO.fileUrl);
+    expect(image).toHaveClass('object-contain');
+    expect(screen.getByRole('group', { name: 'Zoom' })).toHaveTextContent('100%');
     expect(viewer).toHaveTextContent('← → browse');
+    expect(viewer).toHaveTextContent('Scroll or + − zoom');
+    expect(viewer).toHaveTextContent('Drag to move · double-click to reset');
     expect(viewer).toHaveTextContent('Esc close');
     expect(viewer).toHaveFocus();
     expect(await axeForDialog(baseElement)).toHaveNoViolations();
   });
 
-  it('has no zoom — nothing on screen to zoom into', () => {
+  it('shows the file’s name in the image’s place when its link is gone', () => {
+    renderViewer({ photo: { ...PHOTO, fileUrl: null } });
+    const stage = screen.getByTestId('patient-photo-viewer-stage');
+    expect(within(stage).getByText('IMG_5100.png')).toBeInTheDocument();
+    expect(stage).toHaveTextContent('Preview not available');
+    expect(stage.querySelector('img')).toBeNull();
+  });
+
+  it('zooms on the wheel, a double-click and the keys, and swaps the cursor once zoomed', () => {
     renderViewer();
-    expect(screen.queryByRole('group', { name: 'Zoom' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Zoom in' })).not.toBeInTheDocument();
-    expect(screen.getByTestId('patient-photo-viewer')).not.toHaveTextContent('zoom');
+    const viewer = screen.getByTestId('patient-photo-viewer');
+    const stage = screen.getByTestId('patient-photo-viewer-stage');
+    const zoom = screen.getByTestId('patient-photo-viewer-zoom-reset');
+    expect(stage).toHaveClass('cursor-zoom-in');
+    fireEvent.wheel(stage, { deltaY: -100 });
+    expect(zoom).toHaveTextContent('112%');
+    fireEvent.doubleClick(stage);
+    expect(zoom).toHaveTextContent('100%');
+    fireEvent.doubleClick(stage);
+    expect(zoom).toHaveTextContent('200%');
+    expect(stage).toHaveClass('cursor-grab');
+    fireEvent.keyDown(viewer, { key: '0' });
+    expect(zoom).toHaveTextContent('100%');
+    fireEvent.keyDown(viewer, { key: '+' });
+    expect(zoom).toHaveTextContent('125%');
+    fireEvent.keyDown(viewer, { key: '-' });
+    expect(zoom).toHaveTextContent('100%');
+  });
+
+  it('zooms with the group’s buttons, and its level resets', async () => {
+    const user = userEvent.setup();
+    renderViewer();
+    const zoom = screen.getByTestId('patient-photo-viewer-zoom-reset');
+    await user.click(screen.getByRole('button', { name: 'Zoom in' }));
+    expect(zoom).toHaveTextContent('125%');
+    await user.click(screen.getByRole('button', { name: 'Zoom out' }));
+    expect(zoom).toHaveTextContent('100%');
+    await user.click(screen.getByRole('button', { name: 'Zoom in' }));
+    await user.click(zoom);
+    expect(zoom).toHaveTextContent('100%');
   });
 
   it('steps with ‹ › and ← →, and closes with × and Esc', async () => {

@@ -76,9 +76,11 @@ function TileBar({
       data-imgbar=""
       data-surface="light-pinned"
       className={cn(
-        // Always shown: with no image to uncover (B1), the name and day are the tile (H:414
-        // fades it in on hover where hover exists).
         'from-overlay/78 via-overlay/35 text-canvas pointer-events-none absolute inset-x-0 bottom-0 flex items-center gap-1.5 bg-linear-to-t via-70% to-transparent',
+        // Over the photo it fades in on hover where hover exists, always shown on touch
+        // (H:414); with no image to uncover (its upload is gone) the name and day are the tile.
+        photo.fileUrl &&
+          'transition-opacity duration-150 group-focus-within/tile:opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover/tile:opacity-100',
         look.bar,
       )}
     >
@@ -131,10 +133,10 @@ function TileBar({
  * The Photos grid (H:829; `patient-file.md:62–65`): a group per day — "24 Sep"
  * or "Today" (13/600) with its visit's service (12px) — over
  * `repeat(auto-fill, minmax(<tile>, 1fr))` at the size picked. A tile is a
- * square on a muted fill (10px corners): the image glyph in the photo's place
- * (B1: no file can be read back), the body-part and stage pills at the top
- * start, and the caption bar — the name over the day — on a dark scrim. A tile
- * opens the viewer. The design's "3 photos · …" per day goes: a day can run
+ * square on a muted fill (10px corners): the photo from its `file_url`
+ * (clinozy-be D86; the image glyph when its upload is gone), the body-part and
+ * stage pills at the top start, and the caption bar — the name over the day —
+ * on a dark scrim, fading in on hover over a photo. A tile opens the viewer. The design's "3 photos · …" per day goes: a day can run
  * across pages, and the API counts by album only.
  */
 export function PhotoGrid({
@@ -183,7 +185,7 @@ export function PhotoGrid({
                       aria-label={t(K.tile.open, { name: photoName(photo) })}
                       className="absolute inset-0 size-full"
                     >
-                      <PhotoThumb />
+                      <PhotoThumb src={photo.fileUrl} />
                     </button>
                     {pills ? (
                       <span className="pointer-events-none absolute start-1.5 end-1.5 top-1.5 flex flex-wrap gap-1">

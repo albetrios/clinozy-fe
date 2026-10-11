@@ -56,8 +56,12 @@ describe('PhotoGrid', () => {
     expect(first).toHaveTextContent('IMG_5100');
     expect(first).toHaveTextContent('day 24');
     expect(screen.getByRole('button', { name: 'Open Left cheek' })).toBeInTheDocument();
-    // B1: the glyph stands in for the image.
-    expect(container.querySelector('img')).toBeNull();
+    // Each tile shows its photo from its link (D86).
+    expect(
+      within(first as HTMLElement)
+        .getByRole('button', { name: /^Open / })
+        .querySelector('img'),
+    ).toHaveAttribute('src', expect.stringContaining('X-Amz-Expires=900'));
     expect(await axe(container)).toHaveNoViolations();
   });
 

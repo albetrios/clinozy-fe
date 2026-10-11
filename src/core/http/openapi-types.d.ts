@@ -18428,6 +18428,8 @@ export interface operations {
                             display_name?: string | null;
                             file_key?: string;
                             file_name?: string;
+                            /** Format: uri */
+                            file_url?: string | null;
                             id?: string;
                             patient_id?: string;
                             patient_treatment_id?: string | null;
@@ -18514,6 +18516,8 @@ export interface operations {
                             display_name?: string | null;
                             file_key?: string;
                             file_name?: string;
+                            /** Format: uri */
+                            file_url?: string | null;
                             id?: string;
                             patient_id?: string;
                             patient_treatment_id?: string | null;
@@ -18573,6 +18577,8 @@ export interface operations {
                             display_name?: string | null;
                             file_key?: string;
                             file_name?: string;
+                            /** Format: uri */
+                            file_url?: string | null;
                             id?: string;
                             patient_id?: string;
                             patient_treatment_id?: string | null;
@@ -18683,6 +18689,8 @@ export interface operations {
                             display_name?: string | null;
                             file_key?: string;
                             file_name?: string;
+                            /** Format: uri */
+                            file_url?: string | null;
                             id?: string;
                             patient_id?: string;
                             patient_treatment_id?: string | null;
@@ -18745,6 +18753,8 @@ export interface operations {
                             display_name?: string | null;
                             file_key?: string;
                             file_name?: string;
+                            /** Format: uri */
+                            file_url?: string | null;
                             id?: string;
                             patient_id?: string;
                             patient_treatment_id?: string | null;
@@ -19968,6 +19978,12 @@ export interface operations {
                             /** Format: date-time */
                             created_at?: string;
                             file_keys?: string[];
+                            files?: {
+                                file_key?: string;
+                                file_name?: string | null;
+                                /** Format: uri */
+                                file_url?: string | null;
+                            }[];
                             id?: string;
                             name?: string;
                             notes?: string | null;
@@ -20035,6 +20051,12 @@ export interface operations {
                             /** Format: date-time */
                             created_at?: string;
                             file_keys?: string[];
+                            files?: {
+                                file_key?: string;
+                                file_name?: string | null;
+                                /** Format: uri */
+                                file_url?: string | null;
+                            }[];
                             id?: string;
                             name?: string;
                             notes?: string | null;
@@ -20086,6 +20108,12 @@ export interface operations {
                             /** Format: date-time */
                             created_at?: string;
                             file_keys?: string[];
+                            files?: {
+                                file_key?: string;
+                                file_name?: string | null;
+                                /** Format: uri */
+                                file_url?: string | null;
+                            }[];
                             id?: string;
                             name?: string;
                             notes?: string | null;
@@ -20183,6 +20211,12 @@ export interface operations {
                             /** Format: date-time */
                             created_at?: string;
                             file_keys?: string[];
+                            files?: {
+                                file_key?: string;
+                                file_name?: string | null;
+                                /** Format: uri */
+                                file_url?: string | null;
+                            }[];
                             id?: string;
                             name?: string;
                             notes?: string | null;
@@ -20237,6 +20271,12 @@ export interface operations {
                             /** Format: date-time */
                             created_at?: string;
                             file_keys?: string[];
+                            files?: {
+                                file_key?: string;
+                                file_name?: string | null;
+                                /** Format: uri */
+                                file_url?: string | null;
+                            }[];
                             id?: string;
                             name?: string;
                             notes?: string | null;

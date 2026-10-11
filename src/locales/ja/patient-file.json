@@ -201,8 +201,16 @@
       "previousHint": "前へ (←)",
       "next": "次の写真",
       "nextHint": "次へ (→)",
+      "zoom": "ズーム",
+      "zoomOut": "縮小",
+      "zoomOutHint": "縮小 (−)",
+      "zoomIn": "拡大",
+      "zoomInHint": "拡大 (+)",
+      "zoomReset": "画面に合わせる (0)",
       "hints": {
         "browse": "← → 切り替え",
+        "zoom": "スクロールまたは + − でズーム",
+        "pan": "ドラッグで移動 · ダブルクリックでリセット",
         "close": "Esc で閉じる"
       },
       "missing": "プレビューは利用できません",
@@ -573,7 +581,10 @@
     "view": {
       "sub": "{{name}} · {{date}}",
       "notes": "メモ",
-      "noNotes": "この報告にメモはありません"
+      "noNotes": "この報告にメモはありません",
+      "download": "ダウンロード",
+      "downloading": "{{name}} をダウンロードしています",
+      "fileGone": "利用できなくなりました"
     }
   },
   "package": {

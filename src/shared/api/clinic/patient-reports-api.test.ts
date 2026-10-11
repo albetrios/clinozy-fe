@@ -21,19 +21,30 @@ const REPORT_ID = 'prep_gwlzqinmx87mwn2d1owyi';
 const CBC = 'organization-files/org_1kugs30wim2jh5k4zw2yk/groupd-cbc-report.pdf';
 const LIPID = 'organization-files/org_1kugs30wim2jh5k4zw2yk/groupd-lipid-panel.pdf';
 
-/** A report as the local stack answered it (`POST …/reports`, 10 Oct 2026). */
-const reportRow = (patch: Record<string, unknown> = {}) => ({
-  id: REPORT_ID,
-  patient_id: PATIENT_ID,
-  type: 'lab',
-  name: 'CBC',
-  report_date: '2026-10-05',
-  file_keys: [CBC],
-  notes: 'Fasting sample',
-  created_at: '2026-10-10T01:44:20.862Z',
-  updated_at: '2026-10-10T01:44:20.862Z',
-  ...patch,
+/** One of a report's files as clinozy-be answers it (D86): the upload's name, a signed link. */
+const fileRow = (fileKey: string) => ({
+  file_key: fileKey,
+  file_name: fileKey.split('/').pop() ?? fileKey,
+  file_url: `https://clinozy-uploads.s3.amazonaws.com/${fileKey}?X-Amz-Expires=900`,
 });
+
+/** A report as the local stack answered it (`POST …/reports`, 10 Oct 2026); `files` follow its keys. */
+const reportRow = (patch: Record<string, unknown> = {}) => {
+  const fileKeys = (patch.file_keys as string[] | undefined) ?? [CBC];
+  return {
+    id: REPORT_ID,
+    patient_id: PATIENT_ID,
+    type: 'lab',
+    name: 'CBC',
+    report_date: '2026-10-05',
+    file_keys: fileKeys,
+    files: fileKeys.map(fileRow),
+    notes: 'Fasting sample',
+    created_at: '2026-10-10T01:44:20.862Z',
+    updated_at: '2026-10-10T01:44:20.862Z',
+    ...patch,
+  };
+};
 
 const listPage = (rows: unknown[], pagination: Record<string, unknown> = {}) => ({
   data: rows,
@@ -79,11 +90,22 @@ describe('listPatientReports', () => {
         name: 'CBC',
         date: '2026-10-05',
         fileKeys: [CBC],
+        files: [
+          {
+            fileKey: CBC,
+            fileName: 'groupd-cbc-report.pdf',
+            fileUrl: `https://clinozy-uploads.s3.amazonaws.com/${CBC}?X-Amz-Expires=900`,
+          },
+        ],
         notes: 'Fasting sample',
         createdAt: '2026-10-10T01:44:20.862Z',
         updatedAt: '2026-10-10T01:44:20.862Z',
       },
-      expect.objectContaining({ id: 'prep_spkf93tnu56pu178oxno1', fileKeys: [] }),
+      expect.objectContaining({
+        id: 'prep_spkf93tnu56pu178oxno1',
+        fileKeys: [],
+        files: [],
+      }),
     ]);
   });
 

@@ -17,8 +17,12 @@ view (anyone who reads the file).
 - **Writes** (all `patient:update`): `POST …/reports` (Upload report), then a `PATCH` of
   `file_keys` per confirmed file; `DELETE …?reason=&note=` and `POST …/restore` (the toast's
   Undo).
+- **Files (clinozy-be D86):** each read gives every file its upload's name and a 15-minute
+  `file_url`; Report view lists them as links that open each in a new tab, and its "Download"
+  opens a single file ("Downloading CBC + Thyroid profile") or, for several, the step that lists
+  them. The reads come again every 5 minutes and on the tab's return.
 - **Gone:** "Uploaded by" and Report view's "Added by" — the API does not say who added a report
-  (G4); "Download" — no URL for a `file_key` (B1, Q4).
+  (G4).
 
 Gated by the file layout (membership, the `clinic-patients` module, the org status, the
 section's `patient:clinical_record:read`); in-room access is `useClinicAccess` (`patient:update`

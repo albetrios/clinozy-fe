@@ -32,6 +32,8 @@ export function photoDouble(overrides: Partial<PatientPhoto> = {}): PatientPhoto
     stage: null,
     fileKey: 'organization-files/org_test/img-5100.png',
     fileName: 'IMG_5100.png',
+    fileUrl:
+      'https://uploads.test/organization-files/org_test/img-5100.png?X-Amz-Expires=900',
     displayName: 'IMG_5100',
     caption: null,
     bodyPart: null,

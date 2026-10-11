@@ -233,8 +233,8 @@ function PhotosBody({
  * more" reads the next); a tile opens the viewer, Edit opens Photo details,
  * Delete the reason confirm. Files dropped on the section or picked with
  * "Upload images" go to the album on screen. Every write is `patient:update`;
- * the Private album is `patient:private_album:read`. B1: a tile shows the
- * photo's name and day over the image glyph, never its pixels.
+ * the Private album is `patient:private_album:read`. Each tile shows the photo
+ * from its `file_url` (D86).
  */
 export function PatientImagesPage() {
   const { t } = useTranslation(PATIENT_PHOTOS_NS);

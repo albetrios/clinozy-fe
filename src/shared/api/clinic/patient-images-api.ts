@@ -24,7 +24,8 @@ import { patientQueryKeys } from './patients-api.ts';
  * A patient's photos on clinozy-be (`/app/patients/:patient_id/images`, api-integration §5.4):
  * a page of the list for its filters, with the server's total and album counts; one photo; an
  * attach of an uploaded file; a change carrying the read's `updated_at`; delete with its reason
- * and restore. Every write carries the action's key. B1: no call reads a file back.
+ * and restore. Every write carries the action's key. Each photo carries its 15-minute `file_url`
+ * (D86).
  */
 
 /**

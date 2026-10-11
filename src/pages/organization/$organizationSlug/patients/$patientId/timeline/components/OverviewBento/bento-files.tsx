@@ -47,8 +47,8 @@ interface NewCardLinks extends CardLinks {
 
 /**
  * Photos (two columns wide; H:772, H:4992): "Upload"; the newest eight
- * (`GET …/images`, one page) — each its glyph and name (B1: no file reads
- * back) with its album's pill, opening Photos on that album; the server's
+ * (`GET …/images`, one page) — each the photo from its `file_url` (D86), named
+ * for the reader, with its album's pill, opening Photos on that album; the server's
  * count; "No photos yet · upload the first". ("Compare" is not built — its
  * mode never rendered, H:4766.)
  */
@@ -96,7 +96,7 @@ export function PhotosBentoCard({
               data-testid={`${testId}-thumb`}
               className="bg-muted hover:border-muted-foreground relative aspect-square overflow-hidden rounded-lg border transition-colors"
             >
-              <PhotoThumb />
+              <PhotoThumb src={photo.fileUrl} />
               <span
                 data-slot="pill"
                 className="bg-card/90 text-tiny text-muted-foreground-strong absolute start-1 bottom-1 flex h-4.5 items-center rounded-full px-1.5 font-medium"

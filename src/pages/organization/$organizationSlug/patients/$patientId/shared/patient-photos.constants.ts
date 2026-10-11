@@ -106,11 +106,19 @@ export const PATIENT_PHOTOS_KEYS = {
     previousHint: 'photos.viewer.previousHint',
     next: 'photos.viewer.next',
     nextHint: 'photos.viewer.nextHint',
+    zoom: 'photos.viewer.zoom',
+    zoomOut: 'photos.viewer.zoomOut',
+    zoomOutHint: 'photos.viewer.zoomOutHint',
+    zoomIn: 'photos.viewer.zoomIn',
+    zoomInHint: 'photos.viewer.zoomInHint',
+    zoomReset: 'photos.viewer.zoomReset',
     hints: {
       browse: 'photos.viewer.hints.browse',
+      zoom: 'photos.viewer.hints.zoom',
+      pan: 'photos.viewer.hints.pan',
       close: 'photos.viewer.hints.close',
     },
-    /** "Preview not available" — B1: the stage shows the file's name, never its pixels. */
+    /** "Preview not available" — the stage shows the file's name when its link is gone or fails (D86). */
     missing: 'photos.viewer.missing',
     /** "Photo" — the record in "Photo not found · it may have been deleted". */
     notFoundRecord: 'photos.viewer.notFoundRecord',

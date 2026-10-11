@@ -56,6 +56,7 @@ const CONSENT = reportDouble({
   name: 'Chemical peel consent',
   date: '2026-09-28',
   fileKeys: [],
+  files: [],
 });
 const CBC = reportDouble();
 const rows = () => screen.findAllByTestId('patient-reports-table-row');

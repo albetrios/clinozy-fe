@@ -38,6 +38,7 @@ const REPORT: PatientReport = {
   name: 'CBC',
   date: '2026-10-05',
   fileKeys: [],
+  files: [],
   notes: null,
   createdAt: '2026-10-05T06:00:00.000Z',
   updatedAt: '2026-10-05T06:00:00.000Z',

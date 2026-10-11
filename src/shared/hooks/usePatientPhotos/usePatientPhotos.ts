@@ -8,6 +8,7 @@ import {
 import { useCallback, useMemo, useRef } from 'react';
 
 import type { DeleteReason } from '@/shared/api/clinic/clinic-schema.ts';
+import { FILE_LINK_QUERY_OPTIONS } from '@/shared/api/clinic/file-links.ts';
 import {
   deletePatientPhoto,
   fetchPatientPhoto,
@@ -79,6 +80,8 @@ export function usePatientPhotos(
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) => (last.hasMore ? (last.next ?? undefined) : undefined),
     placeholderData: keepPreviousData,
+    // Each photo's `file_url` lapses 15 minutes after the read (D86): read again before then
+    ...FILE_LINK_QUERY_OPTIONS,
     // The screen renders this failure itself (see above).
     meta: { notifyOnError: false },
     enabled: enabled && organizationId !== null && patientId !== '',
@@ -152,6 +155,7 @@ export function usePatientPhoto(patientId: string, imageId: string) {
     queryKey: patientImageQueryKeys.detail(organizationId, patientId, imageId),
     queryFn: () => fetchPatientPhoto({ patientId, imageId }),
     placeholderData: () => cachedPhoto(queryClient, organizationId, patientId, imageId),
+    ...FILE_LINK_QUERY_OPTIONS,
     enabled: organizationId !== null && patientId !== '' && imageId !== '',
     // The screen renders this failure itself (see above).
     notifyOnError: false,

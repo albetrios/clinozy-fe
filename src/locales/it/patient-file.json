@@ -217,8 +217,16 @@
       "previousHint": "Precedente (←)",
       "next": "Foto successiva",
       "nextHint": "Successiva (→)",
+      "zoom": "Zoom",
+      "zoomOut": "Riduci",
+      "zoomOutHint": "Riduci (−)",
+      "zoomIn": "Ingrandisci",
+      "zoomInHint": "Ingrandisci (+)",
+      "zoomReset": "Adatta allo schermo (0)",
       "hints": {
         "browse": "← → sfoglia",
+        "zoom": "Scorri o + − per lo zoom",
+        "pan": "Trascina per spostare · doppio clic per ripristinare",
         "close": "Esc chiude"
       },
       "missing": "Anteprima non disponibile",
@@ -597,7 +605,10 @@
     "view": {
       "sub": "{{name}} · {{date}}",
       "notes": "Note",
-      "noNotes": "Nessuna nota su questo referto"
+      "noNotes": "Nessuna nota su questo referto",
+      "download": "Scarica",
+      "downloading": "Download di {{name}} in corso",
+      "fileGone": "Non più disponibile"
     }
   },
   "package": {

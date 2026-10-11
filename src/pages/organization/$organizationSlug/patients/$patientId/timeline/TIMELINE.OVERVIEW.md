@@ -20,7 +20,7 @@ padding inside; row dense), Clinical, Photos and Team notes two columns wide —
   `../shared/hooks/useClinicalLists/`). Visits: "Reschedule" the next visit (its tile — the
   file's read, its service, no length) or "Book", the person's last three completed bookings
   (`usePersonAppointments`). Photos: "Upload", the newest eight (one page of `…/images`), each
-  its glyph and name (B1: no file reads back), opening Photos on their album. Packages: each
+  the photo itself (`file_url`, D86) named for the reader, opening Photos on their album. Packages: each
   package's sessions as segments and its state as the server keeps it — "All sessions done",
   "Expired", "Valid till …" / "No expiry"; no "Next · 8 Oct", "Session 2 overdue" (the API
   dates no package's next session — G4) or "Use session" (§6 #20). Prescriptions: the latest

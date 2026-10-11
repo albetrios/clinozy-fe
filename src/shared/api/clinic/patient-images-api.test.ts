@@ -21,6 +21,10 @@ const PATIENT_ID = 'pat_rhuanxgy2umhsl3av5xjr';
 const IMAGE_ID = 'pimg_groupdphototwo00000aa';
 const VISIT_ID = 'appt_co7tgiahg3uze2okuj98w';
 
+/** The photo's link as clinozy-be signs it (D86) — its query trimmed. */
+const SIGNED_LINK =
+  'https://clinozy-uploads.s3.amazonaws.com/organization-files/org_1kugs30wim2jh5k4zw2yk/groupd-img-5101.png?X-Amz-Expires=900&X-Amz-Signature=a1';
+
 /** A photo as the local stack answered it (`GET …/images`, 10 Oct 2026). */
 const imageRow = (patch: Record<string, unknown> = {}) => ({
   id: IMAGE_ID,
@@ -31,6 +35,7 @@ const imageRow = (patch: Record<string, unknown> = {}) => ({
   stage: 'before',
   file_key: 'organization-files/org_1kugs30wim2jh5k4zw2yk/groupd-img-5101.png',
   file_name: 'IMG_5101.png',
+  file_url: SIGNED_LINK,
   display_name: null,
   caption: 'Upper lip, session one',
   body_part: 'upper_lip',
@@ -106,6 +111,7 @@ describe('listPatientPhotos', () => {
           stage: 'before',
           fileKey: 'organization-files/org_1kugs30wim2jh5k4zw2yk/groupd-img-5101.png',
           fileName: 'IMG_5101.png',
+          fileUrl: SIGNED_LINK,
           displayName: null,
           caption: 'Upper lip, session one',
           bodyPart: 'upper_lip',

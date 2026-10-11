@@ -217,8 +217,16 @@
       "previousHint": "Précédente (←)",
       "next": "Photo suivante",
       "nextHint": "Suivante (→)",
+      "zoom": "Zoom",
+      "zoomOut": "Dézoomer",
+      "zoomOutHint": "Dézoomer (−)",
+      "zoomIn": "Zoomer",
+      "zoomInHint": "Zoomer (+)",
+      "zoomReset": "Ajuster à l’écran (0)",
       "hints": {
         "browse": "← → parcourir",
+        "zoom": "Défiler ou + − pour zoomer",
+        "pan": "Glisser pour déplacer · double-clic pour réinitialiser",
         "close": "Échap pour fermer"
       },
       "missing": "Aperçu indisponible",
@@ -597,7 +605,10 @@
     "view": {
       "sub": "{{name}} · {{date}}",
       "notes": "Notes",
-      "noNotes": "Aucune note sur ce compte rendu"
+      "noNotes": "Aucune note sur ce compte rendu",
+      "download": "Télécharger",
+      "downloading": "Téléchargement de {{name}}",
+      "fileGone": "N’est plus disponible"
     }
   },
   "package": {

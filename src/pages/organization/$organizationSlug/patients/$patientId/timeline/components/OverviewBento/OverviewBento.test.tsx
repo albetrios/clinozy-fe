@@ -276,6 +276,7 @@ const PHOTO: PatientPhoto = {
   stage: 'before',
   fileKey: 'organization-files/org_test/one.png',
   fileName: 'one.png',
+  fileUrl: 'https://uploads.test/organization-files/org_test/one.png?X-Amz-Expires=900',
   displayName: 'Face before',
   caption: null,
   bodyPart: null,
@@ -292,6 +293,7 @@ const REPORT: PatientReport = {
   name: 'CBC',
   date: '2026-09-20',
   fileKeys: [],
+  files: [],
   notes: null,
   createdAt: '2026-09-20T05:00:00.000Z',
   updatedAt: '2026-09-20T05:00:00.000Z',
@@ -478,12 +480,12 @@ describe('OverviewBento (KICKOFF §6.6 Overview, H:769–779)', () => {
     // "Use a session" goes — a recorded treatment spends one (§6 #20).
     expect(within(packages).queryByText('Use session')).not.toBeInTheDocument();
 
-    // B1: the glyph and the name, no image; the server's count.
+    // Each thumb shows its photo from its link (D86), named for the reader; the server's count.
     const photos = await card('photos');
     const [thumb] = await within(photos).findAllByTestId('overview-card-photos-thumb');
     expect(thumb).toHaveAccessibleName('Face before');
     expect(within(photos).getByText('9')).toBeInTheDocument();
-    expect(photos.querySelector('img')).toBeNull();
+    expect(thumb?.querySelector('img')).toHaveAttribute('src', PHOTO.fileUrl);
     expect(listPatientPhotos).toHaveBeenCalledWith(
       TEST_PATIENT_ID,
       { limit: 8 },

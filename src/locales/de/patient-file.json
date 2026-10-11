@@ -209,8 +209,16 @@
       "previousHint": "Zurück (←)",
       "next": "Nächstes Foto",
       "nextHint": "Weiter (→)",
+      "zoom": "Zoom",
+      "zoomOut": "Verkleinern",
+      "zoomOutHint": "Verkleinern (−)",
+      "zoomIn": "Vergrößern",
+      "zoomInHint": "Vergrößern (+)",
+      "zoomReset": "An Bildschirm anpassen (0)",
       "hints": {
         "browse": "← → blättern",
+        "zoom": "Scrollen oder + − zum Zoomen",
+        "pan": "Ziehen zum Verschieben · Doppelklick zum Zurücksetzen",
         "close": "Esc schließt"
       },
       "missing": "Vorschau nicht verfügbar",
@@ -585,7 +593,10 @@
     "view": {
       "sub": "{{name}} · {{date}}",
       "notes": "Notizen",
-      "noNotes": "Keine Notizen zu diesem Befund"
+      "noNotes": "Keine Notizen zu diesem Befund",
+      "download": "Herunterladen",
+      "downloading": "{{name}} wird heruntergeladen",
+      "fileGone": "Nicht mehr verfügbar"
     }
   },
   "package": {

@@ -1,4 +1,5 @@
 import type { DeleteReason } from '@/shared/api/clinic/clinic-schema.ts';
+import { FILE_LINK_QUERY_OPTIONS } from '@/shared/api/clinic/file-links.ts';
 import {
   createPatientReport,
   deletePatientReport,
@@ -39,6 +40,8 @@ export function usePatientReports(
   return useAppQuery({
     queryKey: patientReportQueryKeys.list(organizationId, patientId, limit ?? null),
     queryFn: () => listPatientReports(patientId, limit === undefined ? {} : { limit }),
+    // Each file's `file_url` lapses 15 minutes after the read (D86): read again before then
+    ...FILE_LINK_QUERY_OPTIONS,
     enabled: enabled && organizationId !== null && patientId !== '',
   });
 }

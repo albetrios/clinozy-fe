@@ -86,9 +86,10 @@ describe('the photo viewer (KICKOFF §6.6; S:40)', () => {
     await waitFor(() => expect(viewer).toHaveTextContent('1 of 14'));
     expect(viewer).toHaveTextContent('Chest');
     expect(viewer).toHaveTextContent('General');
+    // The photo itself, from its link (D86).
     expect(
-      within(screen.getByTestId('patient-photo-viewer-stage')).getByText('IMG_6000.png'),
-    ).toBeInTheDocument();
+      screen.getByTestId('patient-photo-viewer-stage').querySelector('img'),
+    ).toHaveAttribute('src', expect.stringContaining('X-Amz-Expires=900'));
     expect(screen.getByTestId('patient-section-images')).toBeInTheDocument();
     expect(await axeForDialog(baseElement)).toHaveNoViolations();
   });
