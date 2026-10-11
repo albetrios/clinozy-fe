@@ -25,8 +25,27 @@ interface Box {
   height: number;
 }
 
+/**
+ * Where the element comes to rest. The card moves: it slides in, and its
+ * `duration-300` also times every transition, so when the tab bar mounts its
+ * `bottom` glides from 12px to clear of the bar over 300ms. A box read mid-move
+ * overlapped the bar — the flake. Wait out every running animation and
+ * transition (a new one can start as an old one ends), then measure.
+ */
 async function boxOf(page: Page, testId: string): Promise<Box> {
-  const box = await byTestId(page, testId).boundingBox();
+  const element = byTestId(page, testId);
+  await element.evaluate(async (node) => {
+    for (
+      let running = node.getAnimations();
+      running.length > 0;
+      running = node.getAnimations()
+    ) {
+      await Promise.all(
+        running.map((animation) => animation.finished.catch(() => undefined)),
+      );
+    }
+  });
+  const box = await element.boundingBox();
   if (!box) throw new Error(`${testId} has no layout box`);
   return box;
 }
