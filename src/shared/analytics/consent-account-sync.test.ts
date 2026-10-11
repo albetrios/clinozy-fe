@@ -90,6 +90,24 @@ describe('consent account sync (D161)', () => {
     await expect(reconcileConsentWithAccount()).resolves.toBeUndefined();
   });
 
+  it('saves an answer stamped in the same millisecond as the one before it', async () => {
+    vi.useFakeTimers({ now: Date.parse('2026-10-10T12:00:00.000Z'), toFake: ['Date'] });
+    try {
+      useAuthStore.setState({ user: USER });
+      stop = startConsentAccountSync();
+      useConsentStore.getState().setAnalyticsConsent('granted');
+      useConsentStore.getState().setAnalyticsConsent('denied');
+      expect(apiMock.patch).toHaveBeenLastCalledWith('/users/me/settings', {
+        body: {
+          analytics_consent: 'denied',
+          analytics_consent_version: CONSENT_POLICY_VERSION,
+        },
+      });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('saves a new answer while signed in, but not the account answer it applied', async () => {
     useAuthStore.setState({ user: USER });
     apiMock.get.mockResolvedValue(accountAnswer('granted', new Date().toISOString()));

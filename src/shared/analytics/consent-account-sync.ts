@@ -124,7 +124,13 @@ export function startConsentAccountSync(): () => void {
   });
 
   const stopConsent = useConsentStore.subscribe((state, previous) => {
-    if (applyingElsewhereAnswer || state.decidedAt === previous.decidedAt) return;
+    if (applyingElsewhereAnswer) return;
+    // A new answer changes the decision or its time; two stamped in the same millisecond still
+    // differ by decision, so the time alone cannot tell them apart.
+    const unchanged =
+      state.analyticsConsent === previous.analyticsConsent &&
+      state.decidedAt === previous.decidedAt;
+    if (unchanged) return;
     if (state.analyticsConsent === null || useAuthStore.getState().user === null) return;
     void saveAccountConsent(state.analyticsConsent).catch(() => undefined);
   });
