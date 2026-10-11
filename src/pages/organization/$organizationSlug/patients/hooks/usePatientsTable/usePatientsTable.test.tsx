@@ -1,7 +1,7 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { PatientRow } from '@/shared/api/clinic/patients-contracts.ts';
+import type { PatientRow } from '@/shared/api/app/patients-contracts.ts';
 import { useDevicePrefsStore } from '@/shared/store/useDevicePrefsStore/index.ts';
 import { patientRow } from '@/tests/utils/patient-doubles.ts';
 

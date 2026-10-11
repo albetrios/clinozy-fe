@@ -1,12 +1,9 @@
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { CreditRow } from '@/shared/api/clinic/credits-contracts.ts';
-import {
-  CREDIT_DIRECTION_TONES,
-  CREDIT_STATUS_TONES,
-} from '@/shared/clinic/clinic-tones.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { CreditRow } from '@/shared/api/app/credits-contracts.ts';
+import { CREDIT_DIRECTION_TONES, CREDIT_STATUS_TONES } from '@/shared/app/app-tones.ts';
 import { IdPill, PersonChip, TonePill } from '@/shared/components/Cells/index.ts';
 import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 

@@ -16,10 +16,10 @@
     "src/pages/**/*.route.tsx",
     "src/pages/**/*.manifest.ts",
     // The clinic data contract, GENERATED from the launch's schema-routes.md
-    // ('pnpm clinic:schema'; byte-identical in clinozy-be): its exports are the
+    // ('pnpm app:schema'; byte-identical in clinozy-be): its exports are the
     // contract's surface — every entity, enum and server set — whether or not
     // a screen reads one yet, and a hand edit would only be regenerated away.
-    "src/shared/api/clinic/clinic-schema.ts",
+    "src/shared/api/app/app-schema.ts",
     // clinozy-be's API as types, GENERATED from its OpenAPI document ('pnpm api:types'):
     // every route, operation and shape is the API's surface whether or not a screen calls
     // it yet, and a hand edit would only be regenerated away.

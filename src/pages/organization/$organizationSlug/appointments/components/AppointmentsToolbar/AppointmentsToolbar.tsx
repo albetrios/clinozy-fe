@@ -1,12 +1,12 @@
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
+import { appToday, localDateOf } from '@/shared/api/app/app-time.ts';
 import {
   type AppointmentCalendarView,
   appointmentViewRange,
-} from '@/shared/api/clinic/appointment-views.ts';
-import type { AppointmentView } from '@/shared/api/clinic/appointments-contracts.ts';
-import { clinicToday, localDateOf } from '@/shared/api/clinic/clinic-time.ts';
+} from '@/shared/api/app/appointment-views.ts';
+import type { AppointmentView } from '@/shared/api/app/appointments-contracts.ts';
 import { RoomToolbar, RoomViewTabs } from '@/shared/components/RoomToolbar/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
@@ -45,7 +45,7 @@ function PeriodControls({ view }: { view: AppointmentCalendarView }) {
   const navigation = useAppointmentsNavigation();
   const keys = APPOINTMENTS_KEYS.toolbar;
   const { anchor } = navigation;
-  const current = isCurrentPeriod(view, anchor, clinicToday());
+  const current = isCurrentPeriod(view, anchor, appToday());
   const day = (date: string, options: Intl.DateTimeFormatOptions) =>
     formatDate(localDateOf(date), options, { civilDay: true });
   let label = day(anchor, { month: 'long', year: 'numeric' });

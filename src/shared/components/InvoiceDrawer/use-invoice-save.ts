@@ -5,8 +5,8 @@ import { useTranslation } from 'react-i18next';
 import type {
   InvoiceRecord,
   InvoiceSaveResult,
-} from '@/shared/api/clinic/invoices-contracts.ts';
-import type { InvoiceSaveResult as SaleSaveResult } from '@/shared/api/clinic/invoices-fixture-contracts.ts';
+} from '@/shared/api/app/invoices-contracts.ts';
+import type { InvoiceSaveResult as SaleSaveResult } from '@/shared/api/app/invoices-fixture-contracts.ts';
 import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
 import type { HttpError } from '@/shared/errors/HttpError.ts';
 import {

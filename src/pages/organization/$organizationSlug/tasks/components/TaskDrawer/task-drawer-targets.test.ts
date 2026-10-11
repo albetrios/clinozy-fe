@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import type { TaskRow } from '@/shared/api/clinic/tasks-contracts.ts';
+import type { TaskRow } from '@/shared/api/app/tasks-contracts.ts';
 import { taskPerson } from '@/tests/utils/task-doubles.ts';
 
 import { taskSourceTarget } from './task-drawer-targets.ts';

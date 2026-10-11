@@ -13,7 +13,7 @@ export const manifest = {
   title: 'Edit invoice',
   testId: 'invoice-drawer',
   permission: 'organization:read',
-  module: 'clinic-payments',
+  module: 'app-payments',
   kind: 'leaf',
   children: [],
 } as const satisfies PageManifest;

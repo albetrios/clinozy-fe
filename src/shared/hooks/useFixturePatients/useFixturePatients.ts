@@ -1,7 +1,7 @@
 import {
   fetchPatient,
   fixturePatientQueryKeys,
-} from '@/shared/api/clinic/patients-fixture-api.ts';
+} from '@/shared/api/app/patients-fixture-api.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 
 /*

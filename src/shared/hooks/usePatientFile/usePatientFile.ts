@@ -1,7 +1,7 @@
 import {
   fetchPatientFile,
   patientFileQueryKeys,
-} from '@/shared/api/clinic/patient-file-api.ts';
+} from '@/shared/api/app/patient-file-api.ts';
 import { isNotFound } from '@/shared/errors/HttpError.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';

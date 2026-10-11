@@ -1,5 +1,5 @@
-import { passesPatientFileGate } from '@/shared/clinic/patient-file-sections.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { passesPatientFileGate } from '@/shared/app/patient-file-sections.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 
 import { PHOTO_ALBUMS, type PhotoAlbum } from '../../../images.search.ts';
 
@@ -25,7 +25,7 @@ export interface PhotoAccess {
  * decides whether the file offers the section (`viewablePatientFileSections`).
  */
 export function usePhotoAccess(): PhotoAccess {
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const resolved = access.isResolved;
   const privateAlbum = resolved && passesPatientFileGate(access, 'privateAlbum');
   return {

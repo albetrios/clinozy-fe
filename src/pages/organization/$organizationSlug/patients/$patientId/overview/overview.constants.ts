@@ -1,6 +1,6 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 import { kebabCase } from '@/lib/kebab-case.ts';
-import type { FeedbackActionKind } from '@/shared/api/clinic/clinic-schema.ts';
+import type { FeedbackActionKind } from '@/shared/api/app/app-schema.ts';
 
 import type { ClinicalField } from '../shared/patient-clinical.ts';
 

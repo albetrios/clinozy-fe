@@ -2,10 +2,10 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type * as AppointmentsApiModule from '@/shared/api/clinic/appointments-api.ts';
-import { fetchPersonAppointments } from '@/shared/api/clinic/appointments-api.ts';
-import type * as ImagesApiModule from '@/shared/api/clinic/patient-images-api.ts';
-import { updatePatientPhoto } from '@/shared/api/clinic/patient-images-api.ts';
+import type * as AppointmentsApiModule from '@/shared/api/app/appointments-api.ts';
+import { fetchPersonAppointments } from '@/shared/api/app/appointments-api.ts';
+import type * as ImagesApiModule from '@/shared/api/app/patient-images-api.ts';
+import { updatePatientPhoto } from '@/shared/api/app/patient-images-api.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { appointmentRow } from '@/tests/utils/appointment-doubles.ts';
@@ -25,7 +25,7 @@ import {
   resetPhotos,
 } from '../../__tests__/integration/photos-test-router.tsx';
 
-vi.mock('@/shared/api/clinic/patient-images-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/patient-images-api.ts', async (importOriginal) => {
   const double = await import('../../__tests__/integration/photo-api-double.ts');
   return {
     ...(await importOriginal<typeof ImagesApiModule>()),
@@ -34,7 +34,7 @@ vi.mock('@/shared/api/clinic/patient-images-api.ts', async (importOriginal) => {
     updatePatientPhoto: vi.fn(double.updatePatientPhoto),
   };
 });
-vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/appointments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof AppointmentsApiModule>()),
   fetchPersonAppointments: vi.fn(),
 }));

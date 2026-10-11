@@ -2,9 +2,9 @@ import { type KeyboardEvent, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type { InvoiceType } from '@/shared/api/clinic/clinic-schema.ts';
-import { CLINIC_KEYS } from '@/shared/clinic/clinic.constants.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import type { InvoiceType } from '@/shared/api/app/app-schema.ts';
+import { APP_KEYS } from '@/shared/app/app.constants.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 
 import {
   INVOICE_DRAWER_KEYS,
@@ -87,7 +87,7 @@ export function InvoiceTypeSwitch({ value, onChange, disabled }: InvoiceTypeSwit
                 TONE_CLASSES[INVOICE_TYPE_TONES[type]].fill,
               )}
             />
-            {t(CLINIC_KEYS.invoiceTypes[type])}
+            {t(APP_KEYS.invoiceTypes[type])}
           </button>
         );
       })}

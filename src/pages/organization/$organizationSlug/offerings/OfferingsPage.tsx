@@ -7,8 +7,8 @@ import {
   organizationOfferingCreate,
   organizationOfferingEdit,
 } from '@/lib/routes/offerings-builders.ts';
-import type { OfferRecord } from '@/shared/api/clinic/offerings-contracts.ts';
-import { OFFERING_CATEGORY_TONES } from '@/shared/clinic/clinic-tones.ts';
+import type { OfferRecord } from '@/shared/api/app/offerings-contracts.ts';
+import { OFFERING_CATEGORY_TONES } from '@/shared/app/app-tones.ts';
 import { DataTable, exportTableCsv } from '@/shared/components/DataTable/index.ts';
 import type { DataTableBulkAction } from '@/shared/components/DataTableBulkBar/index.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
@@ -21,10 +21,10 @@ import {
   useRoomFilters,
 } from '@/shared/components/RoomToolbar/index.ts';
 import {
+  type AppAccess,
   canExportRows,
-  type ClinicAccess,
-  useClinicAccess,
-} from '@/shared/hooks/useClinicAccess/index.ts';
+  useAppAccess,
+} from '@/shared/hooks/useAppAccess/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
 import { FileIcon, PenLine, Tag, Trash } from '@/shared/icons/index.ts';
@@ -239,7 +239,7 @@ function offeringRowActions({
   onEdit,
   onDelete,
 }: {
-  access: Pick<ClinicAccess, 'canCode'>;
+  access: Pick<AppAccess, 'canCode'>;
   labels: { edit: string; delete: string };
   onEdit: () => void;
   onDelete: () => void;
@@ -281,7 +281,7 @@ export function OfferingsPage() {
   const navigate = useNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
   const { patchSearch } = useDataTableUrlState(true);
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const catalogue = useOfferingsCatalogue();
   // A failed read with rows on screen keeps them and toasts Retry; with none
   // read yet the table shows the error in place instead (`TableEmpty`).

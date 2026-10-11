@@ -3,12 +3,12 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { fetchContactThread } from '@/shared/api/clinic/contact-activities-api.ts';
+import { fetchContactThread } from '@/shared/api/app/contact-activities-api.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { resetOutboxes } from '@/shared/hooks/useThread/index.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { patientFile, TEST_CONTACT_ID } from '@/tests/utils/patient-doubles.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
@@ -20,7 +20,7 @@ vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
   readViewportTier: () => viewport.tier,
 }));
 // The person's stream is clinozy-be's (`/app/contacts/:contact_id/activities`).
-vi.mock('@/shared/api/clinic/contact-activities-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/contact-activities-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchContactThread: vi.fn(),
   fetchContactMessagingStatus: vi.fn(async () => ({ whatsappDown: false })),
@@ -33,7 +33,7 @@ vi.mock('@/shared/api/clinic/contact-activities-api.ts', async (importOriginal) 
   })),
 }));
 // The chat names offerings from the one catalogue: none here.
-vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/offerings-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchAllOfferings: vi.fn(async () => []),
 }));

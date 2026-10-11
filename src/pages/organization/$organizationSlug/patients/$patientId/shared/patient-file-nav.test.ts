@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   PATIENT_FILE_SECTIONS,
   viewablePatientFileSections,
-} from '@/shared/clinic/patient-file-sections.ts';
+} from '@/shared/app/patient-file-sections.ts';
 import { TEST_PATIENT_ID } from '@/tests/utils/patient-doubles.ts';
 
 import {

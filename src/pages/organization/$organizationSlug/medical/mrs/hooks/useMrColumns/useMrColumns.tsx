@@ -1,9 +1,9 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
+import { formatAppPhone } from '@/shared/app/app-phone.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { PersonChip, TonePill } from '@/shared/components/Cells/index.ts';
 import type { DataTableFeatures } from '@/shared/components/DataTable/index.ts';
 
@@ -33,7 +33,7 @@ export function mrInitials(name: string): string {
 export function useMrColumns(): ColumnDef<DataTableFeatures, MrRow>[] {
   const { t } = useTranslation(MEDICAL_NS);
   const dates = useMedicalDates();
-  const today = clinicToday();
+  const today = appToday();
   const keys = MEDICAL_KEYS.mrs;
   const noValue = t(MEDICAL_KEYS.table.noValue);
 
@@ -49,7 +49,7 @@ export function useMrColumns(): ColumnDef<DataTableFeatures, MrRow>[] {
           initials={mrInitials(row.original.name)}
           sub={
             row.original.phone
-              ? formatClinicPhone(row.original.phone)
+              ? formatAppPhone(row.original.phone)
               : t(MEDICAL_KEYS.table.addPhone)
           }
           tone="mint"

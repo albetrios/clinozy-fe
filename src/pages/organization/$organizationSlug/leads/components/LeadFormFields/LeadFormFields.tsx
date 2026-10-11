@@ -7,14 +7,14 @@ import type {
   LeadSource,
   LeadStatus,
   Tone,
-} from '@/shared/api/clinic/clinic-schema.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+} from '@/shared/api/app/app-schema.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import {
   LEAD_INTEREST_TONES,
   LEAD_SOURCE_TONES,
   LEAD_STATUS_TONES,
   TONE_CLASSES,
-} from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/app/app-tones.ts';
 import { DrawerChips } from '@/shared/components/DrawerField/index.ts';
 import { Check } from '@/shared/icons/index.ts';
 
@@ -116,14 +116,14 @@ export function LeadSourceField({
   onChange: (source: LeadSource) => void;
 }) {
   const { t } = useTranslation(LEADS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   return (
     <LeadField label={t(LEADS_KEYS.drawer.source)}>
       <DrawerChips
         label={t(LEADS_KEYS.drawer.source)}
         options={LEAD_SOURCE_ORDER.map((source) => ({
           value: source,
-          label: tClinic(CLINIC_KEYS.leads.sources[source]),
+          label: tApp(APP_KEYS.leads.sources[source]),
           tone: LEAD_SOURCE_TONES[source],
           icon: LEAD_SOURCE_ICONS[source],
         }))}
@@ -149,7 +149,7 @@ export function LeadInterestsField({
   onChange: (value: LeadInterest[]) => void;
 }) {
   const { t } = useTranslation(LEADS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   return (
     <LeadField label={t(LEADS_KEYS.drawer.interests)}>
       <DrawerChips
@@ -157,7 +157,7 @@ export function LeadInterestsField({
         label={t(LEADS_KEYS.drawer.interests)}
         options={LEAD_INTEREST_CHIPS.map((interest) => ({
           value: interest,
-          label: tClinic(CLINIC_KEYS.leads.interests[interest]),
+          label: tApp(APP_KEYS.leads.interests[interest]),
           tone: LEAD_INTEREST_TONES[interest],
         }))}
         value={[...value]}
@@ -226,10 +226,10 @@ export function LeadProgressField({
   onChange: (status: LeadStatus) => void;
 }) {
   const { t } = useTranslation(LEADS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const at = (MAIN_STATUSES as readonly LeadStatus[]).indexOf(status);
   const visited = status === 'clinic_visited';
-  const label = (value: LeadStatus) => tClinic(CLINIC_KEYS.leads.statuses[value]);
+  const label = (value: LeadStatus) => tApp(APP_KEYS.leads.statuses[value]);
   return (
     <section
       aria-label={t(LEADS_KEYS.drawer.progressAria)}

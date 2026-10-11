@@ -1,10 +1,10 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 
 /**
- * Person-card copy lives in `clinic`: any room's person can open one, and it
+ * Person-card copy lives in `app`: any room's person can open one, and it
  * loads with the org shell — off the entry bundle.
  */
-export const PERSON_CARD_NS = I18N_NAMESPACES.clinic;
+export const PERSON_CARD_NS = I18N_NAMESPACES.app;
 
 /** Key paths for the contact and team cards (verbatim from `_patterns.md:209–229`). */
 export const PERSON_CARD_KEYS = {

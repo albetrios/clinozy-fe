@@ -3,8 +3,8 @@ import { type KeyboardEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { LedgerRow } from '@/shared/api/app/payments-contracts.ts';
 import { TonePill } from '@/shared/components/Cells/index.ts';
 import {
   TABLE_KEYS,

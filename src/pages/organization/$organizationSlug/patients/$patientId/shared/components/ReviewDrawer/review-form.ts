@@ -1,8 +1,5 @@
-import type { ReviewSource } from '@/shared/api/clinic/clinic-schema.ts';
-import type {
-  PatientReview,
-  ReviewFields,
-} from '@/shared/api/clinic/feedback-contracts.ts';
+import type { ReviewSource } from '@/shared/api/app/app-schema.ts';
+import type { PatientReview, ReviewFields } from '@/shared/api/app/feedback-contracts.ts';
 import type { PickedFile } from '@/shared/components/DrawerField/index.ts';
 
 import { REVIEW_FILE_TYPES } from './review.constants.ts';

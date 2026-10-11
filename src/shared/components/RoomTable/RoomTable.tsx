@@ -5,7 +5,7 @@
 import type { ReactTable } from '@tanstack/react-table';
 import type { ReactNode } from 'react';
 
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
 import {
   DataTable,
   type DataTableFeatures,
@@ -16,7 +16,7 @@ import type { DataTableBulkAction } from '@/shared/components/DataTableBulkBar/i
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
 import { EmptyStateAction } from '@/shared/components/EmptyState/index.ts';
 import { RoomTableEmpty } from '@/shared/components/RoomTableEmpty/index.ts';
-import { canExportRows, useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { canExportRows, useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import type { CursorListResult } from '@/shared/hooks/useCursorList/index.ts';
 import { FileIcon } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -105,7 +105,7 @@ export function RoomTable<TRow extends { id: string }>({
   avatar = false,
   bulkActions = [],
 }: RoomTableProps<TRow>) {
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const exportAction: DataTableBulkAction<TRow>[] = canExportRows(access, exportCode)
     ? [
         {

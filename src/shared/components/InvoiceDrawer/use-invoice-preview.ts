@@ -5,7 +5,7 @@ import {
   type InvoiceInput,
   type InvoicePreview,
   type InvoiceRecord,
-} from '@/shared/api/clinic/invoices-contracts.ts';
+} from '@/shared/api/app/invoices-contracts.ts';
 import { mapApiError } from '@/shared/errors/errorHandler.ts';
 import { isHttpError } from '@/shared/errors/HttpError.ts';
 import { useDebouncedValue } from '@/shared/hooks/useDebouncedValue/index.ts';

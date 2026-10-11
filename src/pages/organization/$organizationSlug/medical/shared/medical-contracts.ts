@@ -1,4 +1,4 @@
-import type { CreatedFilter } from '@/shared/api/clinic/clinic-list-filters.ts';
+import type { CreatedFilter } from '@/shared/api/app/app-list-filters.ts';
 import type {
   Branch,
   Manufacturer,
@@ -8,14 +8,14 @@ import type {
   Organization,
   PoStage,
   Supplier,
-} from '@/shared/api/clinic/clinic-schema.ts';
-import type { MedicineMaker } from '@/shared/api/clinic/medicines-contracts.ts';
+} from '@/shared/api/app/app-schema.ts';
+import type { MedicineMaker } from '@/shared/api/app/medicines-contracts.ts';
 
 /*
  * The Medical family's read shapes (KICKOFF §6.7 Data): each list row is the
  * contract record (`S:741–858`) plus what the server derives for the list —
  * a backend request (Appendix F), served by the fixture server until then
- * (REPLACE_WITH_API). Medicines live in `@/shared/api/clinic/` (the Invoice
+ * (REPLACE_WITH_API). Medicines live in `@/shared/api/app/` (the Invoice
  * and Rx drawers read them); sales, purchase orders, suppliers,
  * manufacturers and MRs live here.
  */

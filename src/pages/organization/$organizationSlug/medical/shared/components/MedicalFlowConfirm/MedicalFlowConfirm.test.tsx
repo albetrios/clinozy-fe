@@ -2,11 +2,11 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
+import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
 import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+  appFixtures,
+  resetAppFixtures,
+} from '@/shared/api/app/fixtures/world.fixtures.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 
 import {
@@ -41,11 +41,11 @@ const setup = () =>
 
 beforeEach(() => {
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 afterEach(() => {
   resetMedicalRoutes();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 
 /** Open the confirm on `target` and confirm with `reason`; resolve once its write is done. */
@@ -80,7 +80,7 @@ function pressUndo(message: string) {
 
 /** A medicine's batch quantity, by the medicine's number and the batch. */
 async function batchQty(medicineSeq: number, batchNo: string) {
-  const medicine = await clinicFixtures.medicines.get(ref.medicine(medicineSeq));
+  const medicine = await appFixtures.medicines.get(ref.medicine(medicineSeq));
   return medicine.batches.find((batch) => batch.batchNo === batchNo)?.qty;
 }
 
@@ -93,7 +93,7 @@ describe('MedicalFlowConfirm (medical.md:357–368)', () => {
       'Ordered by mistake',
       'Cancel order',
     );
-    expect(await clinicFixtures.purchaseOrders.get(id)).toMatchObject({
+    expect(await appFixtures.purchaseOrders.get(id)).toMatchObject({
       stage: 'cancelled',
       cancelReason: 'mistake',
     });
@@ -101,7 +101,7 @@ describe('MedicalFlowConfirm (medical.md:357–368)', () => {
     expect(notifyMock.success).not.toHaveBeenCalled();
     pressUndo('PO #430 cancelled');
     await waitFor(async () =>
-      expect(await clinicFixtures.purchaseOrders.get(id)).toMatchObject({
+      expect(await appFixtures.purchaseOrders.get(id)).toMatchObject({
         stage: 'ordered',
         cancelReason: null,
       }),
@@ -117,16 +117,16 @@ describe('MedicalFlowConfirm (medical.md:357–368)', () => {
       'Billed by mistake',
       'Void sale',
     );
-    expect((await clinicFixtures.medicalSales.get(id)).voidedAt).not.toBeNull();
+    expect((await appFixtures.medicalSales.get(id)).voidedAt).not.toBeNull();
     expect(await batchQty(453, 'ADE25510')).toBeGreaterThan(before ?? 0);
     expect(notifyMock.success).not.toHaveBeenCalled();
     pressUndo('Sale #978 voided');
     await waitFor(async () =>
-      expect((await clinicFixtures.medicalSales.get(id)).voidedAt).toBeNull(),
+      expect((await appFixtures.medicalSales.get(id)).voidedAt).toBeNull(),
     );
     expect(await batchQty(453, 'ADE25510')).toBe(before);
     expect(
-      clinicFixtures.invoices.snapshot((invoice) => invoice.id === ref.invoice(788)),
+      appFixtures.invoices.snapshot((invoice) => invoice.id === ref.invoice(788)),
     ).toHaveLength(1);
   });
 

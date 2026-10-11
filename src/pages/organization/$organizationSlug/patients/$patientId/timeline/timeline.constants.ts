@@ -1,5 +1,5 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
 
 /** The Overview reads the patient file's namespace. */
 export const TIMELINE_NS = I18N_NAMESPACES.patientFile;

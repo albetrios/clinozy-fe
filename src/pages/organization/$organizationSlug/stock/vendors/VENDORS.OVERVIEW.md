@@ -38,7 +38,7 @@ again. It shows for `payment:create` and `payment:read` (Q-S3).
 | File                           | Responsibility                                                                                            |
 | ------------------------------ | --------------------------------------------------------------------------------------------------------- |
 | `vendors.route.tsx`            | Route marker — exports `Component` rendering `VendorsPage`.                                               |
-| `vendors.manifest.ts`          | Manifest — `kind: 'layout'` over its dialog routes, module `clinic-stock`.                                |
+| `vendors.manifest.ts`          | Manifest — `kind: 'layout'` over its dialog routes, module `app-stock`.                                   |
 | `vendors.params.ts`            | The list read from the URL (search; sort `name` · `payable`) and its filter key.                          |
 | `VendorsPage.tsx`              | The tab: the Clinic stock toolbar, the table, the footer, its row actions and states; hosts the `Outlet`. |
 | `hooks/useStockVendorColumns/` | The columns: tracks, folds (the meta line and the phone key), sort ids, rupees.                           |

@@ -2,15 +2,15 @@ import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type * as AppointmentsApiModule from '@/shared/api/clinic/appointments-api.ts';
+import type * as AppointmentsApiModule from '@/shared/api/app/appointments-api.ts';
 import {
   fetchAppointmentRange,
   listAppointments,
-} from '@/shared/api/clinic/appointments-api.ts';
-import type * as DirectoryApiModule from '@/shared/api/clinic/directory-api.ts';
+} from '@/shared/api/app/appointments-api.ts';
+import type * as DirectoryApiModule from '@/shared/api/app/directory-api.ts';
 import type * as AppointmentFormModule from '@/shared/forms/AppointmentForm/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { APPOINTMENT_NOW } from '@/tests/utils/appointment-doubles.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import {
   type AppointmentsWorld,
@@ -21,7 +21,7 @@ import {
 } from './__tests__/integration/appointments-test-data.ts';
 import {
   APPOINTMENTS_PAGE,
-  grantClinicAccess,
+  grantAppAccess,
   renderAppointmentsRoutes,
 } from './__tests__/integration/appointments-test-router.tsx';
 import { AppointmentsPage } from './AppointmentsPage.tsx';
@@ -55,7 +55,7 @@ vi.mock('@/shared/forms/AppointmentForm/index.ts', async (importOriginal) => {
 });
 
 const world = vi.hoisted(() => ({}) as AppointmentsWorld);
-vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/appointments-api.ts', async (importOriginal) => {
   const { appointmentsApiDouble } =
     await import('./__tests__/integration/appointments-test-data.ts');
   return {
@@ -63,7 +63,7 @@ vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => {
     ...appointmentsApiDouble(world),
   };
 });
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => {
   const { directoryApiDouble } =
     await import('./__tests__/integration/appointments-test-data.ts');
   return {
@@ -78,7 +78,7 @@ beforeEach(() => {
   vi.resetAllMocks();
   Object.assign(world, seededAppointmentsWorld());
   signInTestMember();
-  grantClinicAccess('owner');
+  grantAppAccess('owner');
 });
 afterEach(() => vi.useRealTimers());
 

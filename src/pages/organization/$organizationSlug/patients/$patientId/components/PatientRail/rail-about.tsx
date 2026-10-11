@@ -1,13 +1,9 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import {
-  civilYearsBetween,
-  clinicToday,
-  localDateOf,
-} from '@/shared/api/clinic/clinic-time.ts';
-import type { PatientFile } from '@/shared/api/clinic/patient-file-contracts.ts';
-import { CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+import { appToday, civilYearsBetween, localDateOf } from '@/shared/api/app/app-time.ts';
+import type { PatientFile } from '@/shared/api/app/patient-file-contracts.ts';
+import { APP_NS } from '@/shared/app/app.constants.ts';
 import {
   ConsentChips,
   PERSON_CARD_KEYS,
@@ -57,9 +53,9 @@ function useGenderAge(file: PatientFile, today: string): string | null {
  * The date, the language and the address read in their own direction.
  */
 export function RailAbout({ file }: { file: PatientFile }) {
-  const { t } = useTranslation([PATIENT_RAIL_NS, CLINIC_NS]);
+  const { t } = useTranslation([PATIENT_RAIL_NS, APP_NS]);
   const { formatDate } = useLocaleFormat();
-  const today = clinicToday();
+  const today = appToday();
   const genderAge = useGenderAge(file, today);
   const { dateOfBirth, address, consents } = file.patient;
   const birthday = birthdayInDays(dateOfBirth, today);
@@ -98,7 +94,7 @@ export function RailAbout({ file }: { file: PatientFile }) {
         {file.language ? (
           <AboutRow icon={<MessageSquare />}>
             <span dir="auto">
-              {t(CONTACT_EDITOR_KEYS.preferences[file.language], { ns: CLINIC_NS })}
+              {t(CONTACT_EDITOR_KEYS.preferences[file.language], { ns: APP_NS })}
             </span>
           </AboutRow>
         ) : null}

@@ -1,4 +1,4 @@
-import type { DeleteReason } from '@/shared/api/clinic/clinic-schema.ts';
+import type { DeleteReason } from '@/shared/api/app/app-schema.ts';
 
 import { REASON_CONFIRM_KEYS } from './reason-confirm.constants.ts';
 

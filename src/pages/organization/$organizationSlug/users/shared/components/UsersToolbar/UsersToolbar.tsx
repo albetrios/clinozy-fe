@@ -10,7 +10,7 @@ import {
   RoomToolbar,
   type RoomToolbarFilters,
 } from '@/shared/components/RoomToolbar/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { type AppIcon, MapPin, Shield, Users } from '@/shared/icons/index.ts';
 
 import { USERS_KEYS, USERS_NS } from '../../../users.constants.ts';
@@ -84,7 +84,7 @@ export function UsersToolbar({
 }: UsersToolbarProps) {
   const { t } = useTranslation(USERS_NS);
   const { organizationSlug = '' } = useParams({ strict: false });
-  const access = useClinicAccess();
+  const access = useAppAccess();
   // The tab on screen stays, so the toolbar never loses where it is.
   const shown = TABS.filter((entry) => entry.id === tab || access.canCode(entry.code));
   const tabs: RoomLinkTab[] = shown.map((entry) => ({

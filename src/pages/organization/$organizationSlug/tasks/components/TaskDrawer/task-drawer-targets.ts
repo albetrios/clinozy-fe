@@ -1,5 +1,5 @@
-import type { TaskLinkKind, TaskRow } from '@/shared/api/clinic/tasks-contracts.ts';
-import type { TaskTarget } from '@/shared/clinic/task-targets.ts';
+import type { TaskLinkKind, TaskRow } from '@/shared/api/app/tasks-contracts.ts';
+import type { TaskTarget } from '@/shared/app/task-targets.ts';
 
 /** The source button's kind: the record it opens. */
 type TaskSourceKind =
@@ -75,7 +75,7 @@ const LINKED: Readonly<
  * file ("Open patient", its Timeline). None for a credit or a medical rep, for
  * a record on a file the person does not have, or for a chat-only contact.
  * The read code each needs comes with it; the follow-on screens and every
- * target's navigation are shared with Today (`@/shared/clinic/task-targets.ts`).
+ * target's navigation are shared with Today (`@/shared/app/task-targets.ts`).
  */
 export function taskSourceTarget({ link, person }: TaskSourceRow): TaskSource | null {
   const patientId = person?.patientId ?? null;

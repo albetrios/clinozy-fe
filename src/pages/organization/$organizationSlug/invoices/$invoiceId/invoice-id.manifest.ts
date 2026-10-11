@@ -12,7 +12,7 @@ export const manifest = {
   title: 'Invoice',
   testId: 'invoice-preview',
   permission: 'organization:read',
-  module: 'clinic-payments',
+  module: 'app-payments',
   kind: 'layout',
   children: ['edit'],
 } as const satisfies PageManifest;

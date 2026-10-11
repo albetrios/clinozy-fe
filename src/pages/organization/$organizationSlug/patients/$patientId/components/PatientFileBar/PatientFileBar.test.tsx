@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { PATIENT_FILE_SECTIONS } from '@/shared/clinic/patient-file-sections.ts';
+import { PATIENT_FILE_SECTIONS } from '@/shared/app/patient-file-sections.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { Camera } from '@/shared/icons/index.ts';
 import { patientFile } from '@/tests/utils/patient-doubles.ts';

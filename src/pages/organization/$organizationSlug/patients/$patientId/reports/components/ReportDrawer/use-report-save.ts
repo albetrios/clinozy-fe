@@ -5,8 +5,8 @@ import { useTranslation } from 'react-i18next';
 import {
   attachPatientReportFile,
   patientReportQueryKeys,
-} from '@/shared/api/clinic/patient-reports-api.ts';
-import type { PatientReport } from '@/shared/api/clinic/patient-reports-contracts.ts';
+} from '@/shared/api/app/patient-reports-api.ts';
+import type { PatientReport } from '@/shared/api/app/patient-reports-contracts.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useCreatePatientReport } from '@/shared/hooks/usePatientReports/index.ts';
 import { useUploadQueue } from '@/shared/hooks/useUploadQueue/index.ts';

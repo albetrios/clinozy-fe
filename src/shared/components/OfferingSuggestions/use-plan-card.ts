@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next';
 
 import { paiseOfRupees, rupeesOfPaise } from '@/lib/number-text.ts';
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
-import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
-import type { PatientPurchaseRow } from '@/shared/api/clinic/patient-packages-contracts.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
+import type { LeadRecord } from '@/shared/api/app/leads-contracts.ts';
+import type { PatientPurchaseRow } from '@/shared/api/app/patient-packages-contracts.ts';
 import {
   billedPrice,
   type PlanActivityRow,
@@ -12,12 +12,12 @@ import {
   type PlanOffering,
   type PlanSuggestionRow,
   type SuggestionChange,
-} from '@/shared/api/clinic/plan-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { OFFERING_CATEGORY_TONES } from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/api/app/plan-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { OFFERING_CATEGORY_TONES } from '@/shared/app/app-tones.ts';
 import type { PickerOption } from '@/shared/components/Picker/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 import { useLead } from '@/shared/hooks/useLeads/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { usePatientPurchases } from '@/shared/hooks/usePatientPackages/index.ts';
@@ -110,9 +110,7 @@ const categoryOf = (
   t: Translate,
   offering: Pick<PlanOffering, 'category'> | undefined,
 ) =>
-  offering
-    ? t(CLINIC_KEYS.offerings.categories[offering.category], { ns: CLINIC_NS })
-    : '';
+  offering ? t(APP_KEYS.offerings.categories[offering.category], { ns: APP_NS }) : '';
 
 /** One unit's list and lowest price, as the details tooltip reads them (the lowest only when served). */
 function pricesText(f: Formatters, offering: PlanOffering | undefined): string[] {
@@ -221,7 +219,7 @@ function activityOf(line: PlanActivityRow, f: Formatters): SuggestionActivityLin
     id: line.id,
     at: f.instant(line.at),
     channel: {
-      label: f.t(CLINIC_KEYS.channels[line.channel], { ns: CLINIC_NS }),
+      label: f.t(APP_KEYS.channels[line.channel], { ns: APP_NS }),
       tone: CHANNEL_TONES[line.channel],
     },
     direction: line.direction === 'received' ? 'got' : 'sent',
@@ -299,7 +297,7 @@ function activityPropsOf({
     summary: lead
       ? [
           f.t(KEYS.activityLead, { id: `#${lead.leadNumber}` }),
-          f.t(CLINIC_KEYS.leads.statuses[lead.status], { ns: CLINIC_NS }),
+          f.t(APP_KEYS.leads.statuses[lead.status], { ns: APP_NS }),
         ].join(' · ')
       : undefined,
     lines: lines.map((line) => activityOf(line, f)),
@@ -325,10 +323,10 @@ const holdsOffering = (row: PlanSuggestionRow) =>
  * Undo (`…/restore`).
  */
 export function usePlanCard(host: PlanCardHost): PlanCard {
-  const { t } = useTranslation([OFFERING_SUGGESTIONS_NS, CLINIC_NS]);
+  const { t } = useTranslation([OFFERING_SUGGESTIONS_NS, APP_NS]);
   const money = usePaiseFormat();
-  const clock = useClinicClock();
-  const access = useClinicAccess();
+  const clock = useAppClock();
+  const access = useAppAccess();
   const team = useTeamDirectory();
   // No patient yet: nothing to read.
   const patientId = host.patientId || null;

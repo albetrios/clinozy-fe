@@ -6,7 +6,7 @@ import type { PageManifest } from '@/lib/routes/page-manifest.ts';
  * D24). The route renders nothing: the page reads the URL and opens the
  * appointment form, prefilled from `?date=&time=&doctor=&who=&copyOf=` (the
  * date and doctor are the page's own params). Same gates as the room; in-room
- * Create is `useClinicAccess`. The test id names that drawer.
+ * Create is `useAppAccess`. The test id names that drawer.
  */
 export const manifest = {
   segment: 'create',
@@ -14,7 +14,7 @@ export const manifest = {
   title: 'New appointment',
   testId: 'new-appointment-drawer',
   permission: 'organization:read',
-  module: 'clinic-appointments',
+  module: 'app-appointments',
   kind: 'leaf',
   children: [],
 } as const satisfies PageManifest;

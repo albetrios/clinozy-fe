@@ -1,11 +1,11 @@
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import { fetchContact } from '@/shared/api/clinic/contacts-api.ts';
-import type { ContactSummary } from '@/shared/api/clinic/contacts-contracts.ts';
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
-import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import { fetchContact } from '@/shared/api/app/contacts-api.ts';
+import type { ContactSummary } from '@/shared/api/app/contacts-contracts.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
+import type { LeadRecord } from '@/shared/api/app/leads-contracts.ts';
 import type { DrawerSaveState } from '@/shared/components/DrawerFooter/index.ts';
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import type { ContactCardData } from '@/shared/components/PersonCard/index.ts';

@@ -2,14 +2,14 @@ import { z } from 'zod';
 
 import { api } from '@/core/http/api.ts';
 import { queryClient } from '@/core/http/queryClient.ts';
-import { createdRangeOf } from '@/shared/api/clinic/clinic-filter-ranges.ts';
-import type { CreatedFilter } from '@/shared/api/clinic/clinic-list-filters.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import { createdRangeOf } from '@/shared/api/app/app-filter-ranges.ts';
+import type { CreatedFilter } from '@/shared/api/app/app-list-filters.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
 import {
   fetchTeamDirectory,
   teamDirectoryQueryKey,
-} from '@/shared/api/clinic/directory-api.ts';
-import { STOCK_ROOM_QUERY_KEY } from '@/shared/api/clinic/stock-room-query-key.ts';
+} from '@/shared/api/app/directory-api.ts';
+import { STOCK_ROOM_QUERY_KEY } from '@/shared/api/app/stock-room-query-key.ts';
 import { collectAllPages } from '@/shared/api/fetch-all-pages.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
@@ -52,7 +52,7 @@ import {
  * row. Every key carries the organization.
  */
 
-/** TanStack Query keys for Clinic stock — all under `['clinic', 'stock']`, each carrying the organization. */
+/** TanStack Query keys for Clinic stock — all under `['app', 'stock']`, each carrying the organization. */
 export const stockQueryKeys = {
   all: STOCK_ROOM_QUERY_KEY,
   /** Every Items read — a delete patches and refreshes them all. */
@@ -227,7 +227,7 @@ const ITEM_SORTS = {
 /** The Items read's query for the URL's params, on the clinic's `today` — by name by default. */
 export function stockItemListQuery(
   params: StockItemListParams,
-  today: string = clinicToday(),
+  today: string = appToday(),
 ) {
   return {
     limit: PAGE_SIZE,
@@ -295,7 +295,7 @@ function purchaseFilterQuery(
 /** The Purchases read's query for the URL's params, on the clinic's `today`. */
 export function stockPurchaseListQuery(
   params: StockPurchaseListParams,
-  today: string = clinicToday(),
+  today: string = appToday(),
 ) {
   return {
     limit: PAGE_SIZE,
@@ -367,7 +367,7 @@ export async function fetchOldestOpenStockPurchase(
 /** The Movements read's query for the URL's params, on the clinic's `today` — newest first. */
 export function stockMovementListQuery(
   params: StockMovementListParams,
-  today: string = clinicToday(),
+  today: string = appToday(),
 ) {
   return {
     limit: PAGE_SIZE,
@@ -530,7 +530,7 @@ const SUMMARY_READERS: {
 export function stockListSummary<T extends StockSummaryTab>(
   tab: T,
   params: StockSummaryParams[T],
-  today: string = clinicToday(),
+  today: string = appToday(),
 ): Promise<StockListSummary> {
   const read: (
     params: StockSummaryParams[T],

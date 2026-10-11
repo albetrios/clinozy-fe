@@ -1,14 +1,11 @@
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { PaymentMode, Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import type {
-  LedgerRow,
-  PaymentEditSide,
-} from '@/shared/api/clinic/payments-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { PAYMENT_KIND_TONES } from '@/shared/clinic/clinic-tones.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { PaymentMode, Tone } from '@/shared/api/app/app-schema.ts';
+import type { LedgerRow, PaymentEditSide } from '@/shared/api/app/payments-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { PAYMENT_KIND_TONES } from '@/shared/app/app-tones.ts';
 
 import { LEDGER_KEYS, LEDGER_NS } from './ledger-cells.constants.ts';
 
@@ -17,7 +14,7 @@ import { LEDGER_KEYS, LEDGER_NS } from './ledger-cells.constants.ts';
  * pure wording, and the hook that words the sub line for the viewer, so the
  * cells, the meta line, the phone rows, Day close's review and the CSV export
  * all word an entry the same way. When reads by the rooms' one time rule
- * (`useClinicClock`).
+ * (`useAppClock`).
  */
 
 const SUB = LEDGER_KEYS.ledger.sub;
@@ -45,11 +42,8 @@ export function ledgerModes(row: Pick<LedgerRow, 'splits'>): PaymentMode[] {
 }
 
 /** "Cash + UPI" — the modes as the Mode pill joins them (`payments.md:29`). */
-export function ledgerModesLabel(
-  modes: readonly PaymentMode[],
-  tClinic: TFunction,
-): string {
-  return modes.map((mode) => tClinic(CLINIC_KEYS.paymentModes[mode])).join(' + ');
+export function ledgerModesLabel(modes: readonly PaymentMode[], tApp: TFunction): string {
+  return modes.map((mode) => tApp(APP_KEYS.paymentModes[mode])).join(' + ');
 }
 
 /** A receipt's part: its invoice — "Sale · Invoice #785" for a medical one. */
@@ -88,10 +82,10 @@ function billPart(bill: NonNullable<LedgerRow['bill']>, t: TFunction): string {
 }
 
 /** Money out: a supplier bill's "Medical PO #431 · bill 1631", else the expense's category. */
-function paidOutParts(row: LedgerRow, t: TFunction, tClinic: TFunction): string[] {
+function paidOutParts(row: LedgerRow, t: TFunction, tApp: TFunction): string[] {
   if (row.bill) return [billPart(row.bill, t)];
   if (!row.expenseCategory) return [];
-  return [tClinic(CLINIC_KEYS.expenseCategories[row.expenseCategory])];
+  return [tApp(APP_KEYS.expenseCategories[row.expenseCategory])];
 }
 
 /** A reversal's part: what the entry it undid named — its invoice or its supplier bill. */
@@ -104,13 +98,13 @@ function reversalParts(row: LedgerRow, t: TFunction): string[] {
 function kindParts(
   row: LedgerRow,
   t: TFunction,
-  tClinic: TFunction,
+  tApp: TFunction,
   creditNote: (seq: number) => string,
 ): string[] {
   if (row.kind === 'refund') return refundParts(row, t, creditNote);
   if (row.kind === 'money_back') return [t(SUB.moneyBack)];
   if (row.kind === 'reversal') return reversalParts(row, t);
-  return paidOutParts(row, t, tClinic);
+  return paidOutParts(row, t, tApp);
 }
 
 /**
@@ -124,11 +118,11 @@ function kindParts(
 export function ledgerSubLine(
   row: LedgerRow,
   t: TFunction,
-  tClinic: TFunction,
+  tApp: TFunction,
   creditNote: (seq: number) => string,
 ): string {
   const receipt = row.kind === 'receipt';
-  const parts = receipt ? receiptParts(row, t) : kindParts(row, t, tClinic, creditNote);
+  const parts = receipt ? receiptParts(row, t) : kindParts(row, t, tApp, creditNote);
   if (row.pendingCreditSeq !== null) {
     parts.push(t(SUB.fromCredit, { ref: displayId.pendingCredit(row.pendingCreditSeq) }));
   }
@@ -187,18 +181,18 @@ export function ledgerEntryReversible(
 export function editSideLabel(
   side: PaymentEditSide,
   t: TFunction,
-  tClinic: TFunction,
+  tApp: TFunction,
   formatRupees: (rupees: number) => string,
 ): string {
   return t(LEDGER_KEYS.ledger.editSide, {
     amount: formatRupees(side.amount),
-    modes: ledgerModesLabel(side.modes, tClinic),
+    modes: ledgerModesLabel(side.modes, tApp),
   });
 }
 
 /** The From / to sub line, worded for the viewer. */
 export function useLedgerSubLine(): (row: LedgerRow) => string {
   const { t } = useTranslation(LEDGER_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
-  return (row) => ledgerSubLine(row, t, tClinic, displayId.creditNote);
+  const { t: tApp } = useTranslation(APP_NS);
+  return (row) => ledgerSubLine(row, t, tApp, displayId.creditNote);
 }

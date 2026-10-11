@@ -1,11 +1,11 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 
 /**
- * The print preview's chrome copy lives in `clinic`: the patient file's
+ * The print preview's chrome copy lives in `app`: the patient file's
  * prescriptions and the shared invoice routes open it, both inside the org
  * shell.
  */
-export const PRINT_PREVIEW_NS = I18N_NAMESPACES.clinic;
+export const PRINT_PREVIEW_NS = I18N_NAMESPACES.app;
 
 /** Key paths for the print preview's chrome (`patient-file.md:301–315`; verbatim). */
 export const PRINT_PREVIEW_KEYS = {

@@ -1,12 +1,12 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 
 /**
- * The reason confirm's copy lives in `clinic`: it confirms a clinic record's
- * delete, cancel or void, always inside the org shell, which loads `clinic` —
+ * The reason confirm's copy lives in `app`: it confirms a clinic record's
+ * delete, cancel or void, always inside the org shell, which loads `app` —
  * so none of it rides the entry bundle. A caller's own option `labelKey`
  * resolves in this namespace too.
  */
-export const REASON_CONFIRM_NS = I18N_NAMESPACES.clinic;
+export const REASON_CONFIRM_NS = I18N_NAMESPACES.app;
 
 /**
  * Key paths of the reason confirm's kinds, reasons, hints and placeholders —

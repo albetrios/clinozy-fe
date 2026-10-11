@@ -6,7 +6,7 @@ import {
   phoneDigitsOf,
   phoneIsInvalid,
   storedPhoneOf,
-} from '@/shared/clinic/clinic-phone-field.ts';
+} from '@/shared/app/app-phone-field.ts';
 import {
   PATIENT_DRAWER_KEYS,
   PATIENT_DRAWER_NS,

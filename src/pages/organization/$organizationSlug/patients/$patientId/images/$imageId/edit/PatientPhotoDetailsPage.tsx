@@ -12,7 +12,7 @@ import {
   type PatientPhotoChange,
   type PatientPhotoStage,
   photoName,
-} from '@/shared/api/clinic/patient-images-contracts.ts';
+} from '@/shared/api/app/patient-images-contracts.ts';
 import {
   type DrawerChipOption,
   DrawerChips,
@@ -23,7 +23,7 @@ import {
 } from '@/shared/components/DrawerField/index.ts';
 import { DatePicker } from '@/shared/components/Picker/DatePicker/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import {
@@ -107,7 +107,7 @@ function changeOf(photo: PatientPhoto, form: PhotoForm): PatientPhotoChange {
 function usePhotoChips(photo: PatientPhoto, visits: readonly PhotoVisit[]) {
   const { t } = useTranslation(PATIENT_PHOTOS_NS);
   const access = usePhotoAccess();
-  const { day: dayLabel } = useClinicClock();
+  const { day: dayLabel } = useAppClock();
   const albums: DrawerChipOption<PhotoAlbum>[] = access.albums.map((album) => ({
     value: album,
     label: t(K.albums[album]),

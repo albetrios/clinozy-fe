@@ -3,8 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
-import type * as BranchesApiModule from '@/shared/api/clinic/branches-api.ts';
-import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
+import type * as BranchesApiModule from '@/shared/api/app/branches-api.ts';
+import type { BranchOption } from '@/shared/api/app/branches-api.ts';
 import type * as OrganizationApiModule from '@/shared/api/organization-api.ts';
 import type { MemberInvite } from '@/shared/api/organization-contracts.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
@@ -61,7 +61,7 @@ vi.mock('@/shared/api/organization-api.ts', async (importOriginal) => ({
   ...api,
 }));
 const branchesApi = vi.hoisted(() => ({ fetchActiveBranches: vi.fn() }));
-vi.mock('@/shared/api/clinic/branches-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/branches-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof BranchesApiModule>()),
   ...branchesApi,
 }));

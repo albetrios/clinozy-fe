@@ -1,18 +1,18 @@
 import type { QueryKey } from '@tanstack/react-query';
 
-import type { DeleteReason } from '@/shared/api/clinic/clinic-schema.ts';
-import { commandSearchQueryKeys } from '@/shared/api/clinic/command-search-api.ts';
-import { contactActivityQueryKeys } from '@/shared/api/clinic/contact-activities-api.ts';
-import { creditQueryKeys } from '@/shared/api/clinic/credits-api.ts';
-import { dayCloseQueryKeys } from '@/shared/api/clinic/day-close-api.ts';
+import type { DeleteReason } from '@/shared/api/app/app-schema.ts';
+import { commandSearchQueryKeys } from '@/shared/api/app/command-search-api.ts';
+import { contactActivityQueryKeys } from '@/shared/api/app/contact-activities-api.ts';
+import { creditQueryKeys } from '@/shared/api/app/credits-api.ts';
+import { dayCloseQueryKeys } from '@/shared/api/app/day-close-api.ts';
 import {
   fetchAllInvoices,
   invoiceQueryKeys,
   listOpenInvoices,
-} from '@/shared/api/clinic/invoices-api.ts';
-import type { InvoiceRecord } from '@/shared/api/clinic/invoices-contracts.ts';
-import { MEDICAL_ROOM_QUERY_KEY } from '@/shared/api/clinic/medicines-api.ts';
-import { patientQueryKeys } from '@/shared/api/clinic/patients-api.ts';
+} from '@/shared/api/app/invoices-api.ts';
+import type { InvoiceRecord } from '@/shared/api/app/invoices-contracts.ts';
+import { MEDICAL_ROOM_QUERY_KEY } from '@/shared/api/app/medicines-api.ts';
+import { patientQueryKeys } from '@/shared/api/app/patients-api.ts';
 import {
   deletePayment,
   fetchLedgerCount,
@@ -27,19 +27,19 @@ import {
   restorePayment,
   reversePayment,
   updatePayment,
-} from '@/shared/api/clinic/payments-api.ts';
+} from '@/shared/api/app/payments-api.ts';
 import type {
   LedgerListParams,
   LedgerRow,
   PayExpenseInput,
   PaymentPatch,
   ReceivePaymentInput,
-} from '@/shared/api/clinic/payments-contracts.ts';
-import { STOCK_ROOM_QUERY_KEY } from '@/shared/api/clinic/stock-room-query-key.ts';
-import { VISIT_WRITE_KEYS } from '@/shared/api/clinic/visits-api.ts';
+} from '@/shared/api/app/payments-contracts.ts';
+import { STOCK_ROOM_QUERY_KEY } from '@/shared/api/app/stock-room-query-key.ts';
+import { VISIT_WRITE_KEYS } from '@/shared/api/app/visits-api.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
 import { useCursorList } from '@/shared/hooks/useCursorList/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
@@ -184,7 +184,7 @@ export function usePatientPayments(patientId: string) {
  */
 export function useOpenSupplierBills(enabled = true) {
   const organizationId = useOrganizationId();
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const readable = {
     stock: access.canCode('stock_item:read'),
     medical: access.canCode('medicine:read'),

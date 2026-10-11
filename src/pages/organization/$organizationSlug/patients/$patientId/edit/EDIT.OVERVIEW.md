@@ -10,16 +10,16 @@ patient drawer in its edit mode over it
 drawer's Delete ("Delete this record?", 10s Undo) goes back to the Patients list. `from` is
 parsed by `validatePatientFileDialogSearch` in `../patient-id.dialog-search.ts` and checked by the hook.
 
-Gated by the file layout (membership, the `clinic-patients` module, the org status); without
+Gated by the file layout (membership, the `app-patients` module, the org status); without
 Patients edit the drawer opens read-only ("View only · your role can’t change this").
 
 ## Files
 
-| File                  | Responsibility                                                                                             |
-| --------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `edit.route.tsx`      | Route marker — exports `Component` rendering `PatientEditPage`.                                            |
-| `edit.manifest.ts`    | Manifest — `kind: 'leaf'`, permission `organization:read`, module `clinic-patients`, title "Edit patient". |
-| `PatientEditPage.tsx` | The section behind, and the patient drawer over it.                                                        |
+| File                  | Responsibility                                                                                          |
+| --------------------- | ------------------------------------------------------------------------------------------------------- |
+| `edit.route.tsx`      | Route marker — exports `Component` rendering `PatientEditPage`.                                         |
+| `edit.manifest.ts`    | Manifest — `kind: 'leaf'`, permission `organization:read`, module `app-patients`, title "Edit patient". |
+| `PatientEditPage.tsx` | The section behind, and the patient drawer over it.                                                     |
 
 ## Test ids
 

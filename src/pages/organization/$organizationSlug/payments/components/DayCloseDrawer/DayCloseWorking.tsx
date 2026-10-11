@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type { DayCloseView } from '@/shared/api/clinic/day-close-contracts.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import type { DayCloseView } from '@/shared/api/app/day-close-contracts.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { shortPersonName, TonePill } from '@/shared/components/Cells/index.ts';
 import {
   DrawerField,
@@ -13,7 +13,7 @@ import {
   RECORD_DRAWER_KEYS,
   RECORD_DRAWER_NS,
 } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 import { Check } from '@/shared/icons/index.ts';
 
@@ -77,7 +77,7 @@ export interface DayCloseWorkingProps {
 function OpeningCell({ view }: { view: DayCloseWorkingProps['view'] }) {
   const { t } = useTranslation(PAYMENTS_NS);
   const formatRupees = useRupeeFormat();
-  const { time: timeOf } = useClinicClock();
+  const { time: timeOf } = useAppClock();
   return (
     <StripCell label={t(K.opening)} testId={`${T}-opening`}>
       <StripFigure>{formatRupees(view.opening.cash)}</StripFigure>

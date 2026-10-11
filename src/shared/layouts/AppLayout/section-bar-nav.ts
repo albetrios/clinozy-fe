@@ -1,17 +1,17 @@
 import { useRouterState } from '@tanstack/react-router';
 import { useCallback, useMemo } from 'react';
 
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import { CLINIC_KEYS } from '@/shared/clinic/clinic.constants.ts';
-import { clinicSectionForPath } from '@/shared/clinic/clinic-sections.ts';
-import { SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
+import { APP_KEYS } from '@/shared/app/app.constants.ts';
+import { appSectionForPath } from '@/shared/app/app-sections.ts';
+import { SECTION_TONES } from '@/shared/app/app-tones.ts';
 import type { AppNavEntry } from '@/shared/hooks/useAppNav/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
 
 /** A nav entry as the section bar draws it: its tone and its description key. */
 export interface SectionBarEntry extends AppNavEntry {
   tone: Tone;
-  /** The `clinic` key of the room's one-line description. */
+  /** The `app` key of the room's one-line description. */
   descriptionKey: string;
 }
 
@@ -33,7 +33,7 @@ function toSectionBarEntry(entry: AppNavEntry): SectionBarEntry {
   return {
     ...entry,
     tone: SECTION_TONES[entry.section],
-    descriptionKey: CLINIC_KEYS.sections[entry.section].description,
+    descriptionKey: APP_KEYS.sections[entry.section].description,
   };
 }
 
@@ -53,7 +53,7 @@ export function useSectionBarNav(navItems: readonly AppNavEntry[]): SectionBarNa
     const pinned = pins.flatMap((section) =>
       entries.filter((entry) => entry.section === section),
     );
-    const currentSection = clinicSectionForPath(pathname);
+    const currentSection = appSectionForPath(pathname);
     const current = entries.find((entry) => entry.section === currentSection) ?? null;
     return {
       entries,

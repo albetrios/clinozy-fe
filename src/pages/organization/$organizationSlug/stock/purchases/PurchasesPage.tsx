@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
-import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
+import { formatAppPhone } from '@/shared/app/app-phone.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import {
@@ -63,7 +63,7 @@ const vendorChoice = (
   id: vendor.id,
   name: vendor.name,
   tone: 'sky',
-  role: vendor.phone ? formatClinicPhone(vendor.phone) : '',
+  role: vendor.phone ? formatAppPhone(vendor.phone) : '',
 });
 
 /**

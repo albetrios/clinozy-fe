@@ -51,7 +51,7 @@ exist to them until you write it down. Err on the side of over-specifying.
 
 **Return these markdown files and nothing else** — no prose before or after
 them, no other files, no subfolders. Every screen gets a **Slug**: lowercase
-kebab-case, no digits (`patient-file`, `clinic-stock`). The files, in this order:
+kebab-case, no digits (`patient-file`, `app-stock`). The files, in this order:
 
 ```text
 shell.md          ← header, sidebar, nav — the frame around every screen (PART 1)

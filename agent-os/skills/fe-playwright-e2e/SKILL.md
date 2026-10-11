@@ -66,7 +66,7 @@ test('logs in', async ({ page }) => {
 **The clinic shell:** the section bar has no sidebar, bell or header theme toggle — the Account
 menu (`openAccountMenu`, `openNotificationCenter`, `chooseThemeMode` in `e2e-hybrid.ts`) holds
 them, and "Switch clinic" (`openOrganizationSwitcher`). A room spec starts from
-`openNewClinic(page)` (`tests/utils/e2e-clinic.ts`): a new owner of a new clinic on their role home,
+`openNewClinic(page)` (`tests/utils/e2e-app.ts`): a new owner of a new clinic on their role home,
 signed in through `page.request` so a cold `page.goto` (a deep link) restores the session.
 
 ## When to use which
@@ -81,9 +81,9 @@ signed in through `page.request` so a cold `page.goto` (a deep link) restores th
 | ---------------------------------- | ------------------------------------------------------------------ |
 | `auth.e2e.test.ts`                 | Unified login, OAuth, guards, email OTP                            |
 | `home.e2e.test.ts`                 | Landing on Today in the clinic shell                               |
-| `clinic-rooms.e2e.test.ts`         | Launch smoke: every room, desktop + phone                          |
-| `clinic-roles.e2e.test.ts`         | Role QA: four presets' rooms, homes and controls by code (View-as) |
-| `clinic-dialog-routes.e2e.test.ts` | Dialog-route deep links (`S:115`)                                  |
+| `app-rooms.e2e.test.ts`         | Launch smoke: every room, desktop + phone                          |
+| `app-roles.e2e.test.ts`         | Role QA: four presets' rooms, homes and controls by code (View-as) |
+| `app-dialog-routes.e2e.test.ts` | Dialog-route deep links (`S:115`)                                  |
 | `settings.e2e.test.ts`             | Hash modal `#settings/...`                                         |
 | `navigation.e2e.test.ts`           | 404, auth guards                                                   |
 | `organization.e2e.test.ts`         | Picker at `/organization`                                          |

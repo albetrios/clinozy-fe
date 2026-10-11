@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next';
 
 import { isolateText } from '@/lib/bidi-isolate.ts';
 import { cn } from '@/lib/utils.ts';
-import type { MedicalPurchaseOrder } from '@/shared/api/clinic/clinic-schema.ts';
-import { SECTION_TONES, TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import type { MedicalPurchaseOrder } from '@/shared/api/app/app-schema.ts';
+import { SECTION_TONES, TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { DrawerFieldGrid } from '@/shared/components/DrawerField/index.ts';
 import {
   type DrawerBadge,

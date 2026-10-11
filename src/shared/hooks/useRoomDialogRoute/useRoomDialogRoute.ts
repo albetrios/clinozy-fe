@@ -4,9 +4,9 @@ import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
-import type { ClinicAction } from '@/shared/api/clinic/access-contracts.ts';
-import type { Section } from '@/shared/api/clinic/clinic-schema.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import type { AppAction } from '@/shared/api/app/access-contracts.ts';
+import type { Section } from '@/shared/api/app/app-schema.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useDialogRouteLocation } from '@/shared/hooks/useCrossRoomDialog/index.ts';
 import { useDialogRouteRecord } from '@/shared/hooks/useDialogRouteRecord/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -41,7 +41,7 @@ export interface UseRoomDialogRouteOptions<T, TPrefill> {
   /** The clinic section whose access a create route needs. */
   section: Section;
   /** What a create — or a tab action — route needs in that section, all of them (Create by default). */
-  createActions?: readonly ClinicAction[];
+  createActions?: readonly AppAction[];
   /** The tab's own action routes, by their last segment (`check`), gated like a create. */
   tabActions?: readonly string[];
   /** Back to the tab's list, keeping its search, filters and sort. */
@@ -57,7 +57,7 @@ export interface UseRoomDialogRouteOptions<T, TPrefill> {
 }
 
 /** Create unless a room says otherwise. */
-const CREATE: readonly ClinicAction[] = ['create'];
+const CREATE: readonly AppAction[] = ['create'];
 
 /** No tab action routes unless a room has some. */
 const NO_ACTIONS: readonly string[] = [];
@@ -140,7 +140,7 @@ export function useRoomDialogRoute<T, TPrefill>({
     search: routeSearch,
   });
   const close = crossRoom ? crossRoom.close : closeToList;
-  const access = useClinicAccess();
+  const access = useAppAccess();
 
   const id = params[param];
   const drawer = useDialogRouteRecord({

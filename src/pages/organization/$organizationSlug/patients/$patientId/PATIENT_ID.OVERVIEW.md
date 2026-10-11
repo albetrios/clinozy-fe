@@ -4,9 +4,9 @@ Route: `/organization/$organizationSlug/patients/$patientId` — one patient's f
 §6.6; `iterations/launch-2026-09-30-jxmr/intake-files/patient-file.md`). The bare URL and any unknown segment go to `timeline/`, the
 Overview (`S:33`), keeping the search (the `activity` a Patients row or ⌘K sends).
 
-Gated like the Patients room: membership (`organization:read`) and the `clinic-patients`
+Gated like the Patients room: membership (`organization:read`) and the `app-patients`
 module, then `requireOrgStatus`, in `src/app/routes/routeTree.tsx`; in-room access is
-`useClinicAccess` — the member's own codes (D152): Patients view, and each section's read
+`useAppAccess` — the member's own codes (D152): Patients view, and each section's read
 code beside it — `patient:clinical_record:read` (Clinical notes, Photos, Reports),
 `patient_prescription:read`, `patient_treatment:read` (`viewablePatientFileSections`); the
 file's write gates are `patient_prescription:create`, `patient_treatment:create` and
@@ -64,9 +64,9 @@ General" once the last of a batch is filed.
 The data is the shared patients domain on clinozy-be: the file's read is the patient
 (`GET /app/patients/:patient_id`) with their person (`GET /app/contacts/:contact_id`), the
 person's next booking (`…/preview`) and the newest check-in and review —
-`@/shared/api/clinic/patient-file-api.ts` and `@/shared/hooks/usePatientFile/`. The team
+`@/shared/api/app/patient-file-api.ts` and `@/shared/hooks/usePatientFile/`. The team
 (`GET /app/memberships`) is who a record names and who the staff pickers offer. The sections' slugs and role gates are
-`@/shared/clinic/patient-file-sections.ts`; the links are
+`@/shared/app/patient-file-sections.ts`; the links are
 `@/lib/routes/patient-file-builders.ts` (kept off the entry chunk's route barrel).
 
 ## Children
@@ -90,7 +90,7 @@ one loader for the whole file.
 | File                                     | Responsibility                                                                                                                                                                                                        |
 | ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `patient-id.route.tsx`                   | Route marker — exports `Component` rendering `PatientFileLayout`.                                                                                                                                                     |
-| `patient-id.manifest.ts`                 | Manifest — `kind: 'layout'` over the eleven sections, `edit`, `check-ins` and `reviews`, permission `organization:read`, module `clinic-patients`.                                                                    |
+| `patient-id.manifest.ts`                 | Manifest — `kind: 'layout'` over the eleven sections, `edit`, `check-ins` and `reviews`, permission `organization:read`, module `app-patients`.                                                                       |
 | `patient-id.search.ts`                   | URL schema: the file's `activity` and `visit` (the flow) — entry chunk.                                                                                                                                               |
 | `patient-id.dialog-search.ts`            | The file's dialog routes' params: a file-level drawer's `from`, the feedback drawers' visit, treatment and source, New prescription's medicines — parsed where they are read; loads with the file.                    |
 | `patient-id.sections.ts`                 | The lazy route components of the layout, every section and the file-level drawers, behind one dynamic import.                                                                                                         |

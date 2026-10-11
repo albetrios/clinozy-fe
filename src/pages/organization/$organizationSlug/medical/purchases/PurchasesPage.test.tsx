@@ -3,8 +3,8 @@ import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
+import { resetAppFixtures } from '@/shared/api/app/fixtures/world.fixtures.ts';
 
 import {
   renderMedicalRoutes,
@@ -17,10 +17,10 @@ const PAY = '/organization/acme/payments/pay';
 const setup = () =>
   userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
 
-beforeEach(() => resetClinicFixtures());
+beforeEach(() => resetAppFixtures());
 afterEach(() => {
   resetMedicalRoutes();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 
 /** The Purchases tab at `url`. */

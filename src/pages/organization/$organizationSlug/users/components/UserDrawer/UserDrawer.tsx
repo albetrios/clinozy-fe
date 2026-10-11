@@ -3,10 +3,10 @@ import { useId, useState } from 'react';
 import { useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
-import { staffInitials } from '@/shared/api/clinic/users-contracts.ts';
-import { defaultBranchId } from '@/shared/clinic/clinic-branch.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { TeamMember } from '@/shared/api/app/users-contracts.ts';
+import { staffInitials } from '@/shared/api/app/users-contracts.ts';
+import { defaultBranchId } from '@/shared/app/app-branch.ts';
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import type { QuickFillItem } from '@/shared/components/QuickFillRow/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';

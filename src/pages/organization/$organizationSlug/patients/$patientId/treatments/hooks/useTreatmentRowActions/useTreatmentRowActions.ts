@@ -8,7 +8,7 @@ import {
 import {
   TREATMENT_LIMITS,
   type TreatmentRecord,
-} from '@/shared/api/clinic/treatments-contracts.ts';
+} from '@/shared/api/app/treatments-contracts.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
 import { useCreateTreatment } from '@/shared/hooks/useTreatments/index.ts';
 import { Copy, MessageSquare, PenLine, XCircle } from '@/shared/icons/index.ts';

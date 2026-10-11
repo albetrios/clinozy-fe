@@ -1,22 +1,22 @@
 import type { QueryKey } from '@tanstack/react-query';
 
-import type { DeleteReason } from '@/shared/api/clinic/clinic-schema.ts';
-import { commandSearchQueryKeys } from '@/shared/api/clinic/command-search-api.ts';
-import { MEDICAL_ROOM_QUERY_KEY } from '@/shared/api/clinic/medicines-api.ts';
-import { fixturePatientQueryKeys } from '@/shared/api/clinic/patients-fixture-api.ts';
-import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
+import type { DeleteReason } from '@/shared/api/app/app-schema.ts';
+import { commandSearchQueryKeys } from '@/shared/api/app/command-search-api.ts';
+import { MEDICAL_ROOM_QUERY_KEY } from '@/shared/api/app/medicines-api.ts';
+import { fixturePatientQueryKeys } from '@/shared/api/app/patients-fixture-api.ts';
+import type { LedgerRow } from '@/shared/api/app/payments-contracts.ts';
 import {
   deleteFixturePayment,
   fixtureLedgerQueryKeys,
   listFixtureLedger,
   listFixtureOpenSupplierBills,
   restoreFixturePayment,
-} from '@/shared/api/clinic/payments-fixture-api.ts';
+} from '@/shared/api/app/payments-fixture-api.ts';
 import type {
   FixtureLedgerListParams,
   PaymentRecord,
-} from '@/shared/api/clinic/payments-fixture-contracts.ts';
-import { STOCK_ROOM_QUERY_KEY } from '@/shared/api/clinic/stock-room-query-key.ts';
+} from '@/shared/api/app/payments-fixture-contracts.ts';
+import { STOCK_ROOM_QUERY_KEY } from '@/shared/api/app/stock-room-query-key.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';

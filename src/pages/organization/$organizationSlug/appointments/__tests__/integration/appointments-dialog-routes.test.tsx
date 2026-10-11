@@ -1,18 +1,18 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type * as AppointmentsApiModule from '@/shared/api/clinic/appointments-api.ts';
+import type * as AppointmentsApiModule from '@/shared/api/app/appointments-api.ts';
 import {
   appointmentQueryKeys,
   fetchAppointment,
   fetchAppointmentRange,
-} from '@/shared/api/clinic/appointments-api.ts';
-import type * as DirectoryApiModule from '@/shared/api/clinic/directory-api.ts';
+} from '@/shared/api/app/appointments-api.ts';
+import type * as DirectoryApiModule from '@/shared/api/app/directory-api.ts';
 import type * as AppointmentFormModule from '@/shared/forms/AppointmentForm/index.ts';
 import { notify } from '@/shared/notify/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { APPOINTMENT_NOW, contactHit } from '@/tests/utils/appointment-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import { AppointmentsPage } from '../../AppointmentsPage.tsx';
 import {
@@ -24,10 +24,7 @@ import {
   STAND_IN_BOOKED_DATE,
   standInForm,
 } from './appointments-test-data.ts';
-import {
-  grantClinicAccess,
-  renderAppointmentsRoutes,
-} from './appointments-test-router.tsx';
+import { grantAppAccess, renderAppointmentsRoutes } from './appointments-test-router.tsx';
 
 vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
   useViewportTier: () => 'desktop',
@@ -56,14 +53,14 @@ vi.mock('@/shared/forms/AppointmentForm/index.ts', async (importOriginal) => {
 });
 
 const world = vi.hoisted(() => ({}) as AppointmentsWorld);
-vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/appointments-api.ts', async (importOriginal) => {
   const { appointmentsApiDouble } = await import('./appointments-test-data.ts');
   return {
     ...(await importOriginal<typeof AppointmentsApiModule>()),
     ...appointmentsApiDouble(world),
   };
 });
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => {
   const { directoryApiDouble } = await import('./appointments-test-data.ts');
   return {
     ...(await importOriginal<typeof DirectoryApiModule>()),
@@ -85,7 +82,7 @@ beforeEach(() => {
   vi.resetAllMocks();
   Object.assign(world, seededAppointmentsWorld());
   signInTestMember();
-  grantClinicAccess('owner');
+  grantAppAccess('owner');
 });
 afterEach(() => vi.useRealTimers());
 

@@ -3,15 +3,15 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type * as DirectoryApiModule from '@/shared/api/clinic/directory-api.ts';
-import type { DirectoryRole } from '@/shared/api/clinic/directory-api.ts';
+import type * as DirectoryApiModule from '@/shared/api/app/directory-api.ts';
+import type { DirectoryRole } from '@/shared/api/app/directory-api.ts';
 import type * as OrganizationApiModule from '@/shared/api/organization-api.ts';
 import type { AuthUser } from '@/shared/auth/types.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
-import { holdPreset, PRESET_CODES } from '@/tests/utils/clinic-preset-codes.ts';
+import { holdPreset, PRESET_CODES } from '@/tests/utils/app-preset-codes.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { NoticeStack } from './NoticeStack.tsx';
@@ -30,7 +30,7 @@ vi.mock('@/shared/api/organization-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof OrganizationApiModule>()),
   getRolePermissions: api.getRolePermissions,
 }));
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof DirectoryApiModule>()),
   fetchRoleDirectory: api.fetchRoleDirectory,
 }));

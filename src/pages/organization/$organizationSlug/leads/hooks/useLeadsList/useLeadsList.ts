@@ -1,12 +1,12 @@
 import { useSearch } from '@tanstack/react-router';
 import type { SortingState } from '@tanstack/react-table';
 
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
 import type {
   LeadListParams,
   LeadRecord,
   LeadView,
-} from '@/shared/api/clinic/leads-contracts.ts';
+} from '@/shared/api/app/leads-contracts.ts';
 import type { CursorListResult } from '@/shared/hooks/useCursorList/index.ts';
 import {
   sortingFromSearch,

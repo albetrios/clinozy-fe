@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import type { RxTiming } from '@/shared/api/clinic/clinic-schema.ts';
+import type { RxTiming } from '@/shared/api/app/app-schema.ts';
 
 import { RX_KEYS, RX_NS } from '../../prescriptions.constants.ts';
 import {

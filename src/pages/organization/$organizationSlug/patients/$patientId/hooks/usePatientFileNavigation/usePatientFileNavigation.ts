@@ -9,15 +9,15 @@ import { organizationPatients } from '@/lib/routes/patients-builders.ts';
 import type {
   PatientFile,
   PatientNextVisit,
-} from '@/shared/api/clinic/patient-file-contracts.ts';
-import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
+} from '@/shared/api/app/patient-file-contracts.ts';
+import { appCommandNavigation } from '@/shared/app/app-command-targets.ts';
 import {
   PATIENT_FILE_DEFAULT_SECTION,
   type PatientFileSectionSlug,
-} from '@/shared/clinic/patient-file-sections.ts';
+} from '@/shared/app/patient-file-sections.ts';
 import type { ChatHistoryTarget } from '@/shared/components/ChatColumn/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
-import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
+import { useAppNavigate } from '@/shared/hooks/useAppNavigate/index.ts';
 import { usePaymentAccess } from '@/shared/hooks/usePaymentAccess/index.ts';
 import { useOpenVisit, useStartVisit } from '@/shared/hooks/useVisits/index.ts';
 
@@ -79,11 +79,11 @@ export interface PatientFileNavigation {
  * A-P1). Each is left out when access says no.
  */
 export function usePatientFileNavigation(): PatientFileNavigation {
-  const navigate = useClinicNavigate();
+  const navigate = useAppNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
   const search: { visit?: 'open' } = useSearch({ strict: false });
   const { patientId, file, section, viewable } = usePatientFileContext();
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const money = usePaymentAccess();
   const actions = usePatientFileActions();
   const openVisit = useOpenVisit(patientId).data ?? null;
@@ -106,7 +106,7 @@ export function usePatientFileNavigation(): PatientFileNavigation {
     void navigate(organizationPatientSection(organizationSlug, patientId, target));
   const book = () =>
     void navigate(
-      clinicCommandNavigation('newAppointment', {
+      appCommandNavigation('newAppointment', {
         organizationSlug,
         referrer,
         // The booking is the person's (`who=` a contact id).
@@ -115,7 +115,7 @@ export function usePatientFileNavigation(): PatientFileNavigation {
     );
   const collect = () =>
     void navigate(
-      clinicCommandNavigation('newReceipt', {
+      appCommandNavigation('newReceipt', {
         organizationSlug,
         referrer,
         search: { patient: patientId },

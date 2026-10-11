@@ -1,8 +1,8 @@
 import type { ColumnDef } from '@tanstack/react-table';
 
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import { formatAppPhone } from '@/shared/app/app-phone.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import {
   IdPill,
   MoneyCell,
@@ -141,7 +141,7 @@ export function useStockItemColumns(): ColumnDef<DataTableFeatures, StockItemRow
         return (
           <PersonChip
             name={vendor.name}
-            sub={vendor.phone ? formatClinicPhone(vendor.phone) : undefined}
+            sub={vendor.phone ? formatAppPhone(vendor.phone) : undefined}
             tone="sky"
           />
         );

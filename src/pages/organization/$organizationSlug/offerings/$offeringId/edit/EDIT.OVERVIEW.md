@@ -6,7 +6,7 @@ page reads the URL and opens the offering's drawer over the list, so a refresh o
 link reopens it. A row click and a row's Edit come here. The `$offeringId` segment has no
 page of its own — its folder holds only this island. `$offeringId` is the offering's public
 id (`off_…`); the page reads it with `GET /app/offerings/:offering_id`. Gated like the room —
-membership (`organization:read`) and the `clinic-offerings` module, then `requireOrgStatus`.
+membership (`organization:read`) and the `app-offerings` module, then `requireOrgStatus`.
 The route stays reachable for a viewer: without `offering:update` the drawer is view only
 ("View only · your role can’t change this"), and without `offering:delete` it has no Delete.
 An id that names no offering (a stale link, a deleted offering — the API's 404 — or no public
@@ -18,11 +18,11 @@ the list's own params.
 
 ## Files
 
-| File                   | Responsibility                                                                                               |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `edit.route.tsx`       | Route marker — exports `Component` rendering `EditOfferingPage`.                                             |
-| `edit.manifest.ts`     | Manifest — `kind: 'leaf'`, permission `organization:read`, module `clinic-offerings`, title "Edit offering". |
-| `EditOfferingPage.tsx` | Renders nothing — the dialog route's own UI. The drawer mounts on the Offerings page.                        |
+| File                   | Responsibility                                                                                            |
+| ---------------------- | --------------------------------------------------------------------------------------------------------- |
+| `edit.route.tsx`       | Route marker — exports `Component` rendering `EditOfferingPage`.                                          |
+| `edit.manifest.ts`     | Manifest — `kind: 'leaf'`, permission `organization:read`, module `app-offerings`, title "Edit offering". |
+| `EditOfferingPage.tsx` | Renders nothing — the dialog route's own UI. The drawer mounts on the Offerings page.                     |
 
 ## Test ids
 

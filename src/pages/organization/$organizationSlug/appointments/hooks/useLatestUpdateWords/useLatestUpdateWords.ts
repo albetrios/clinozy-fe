@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { isolateValues } from '@/lib/bidi-isolate.ts';
-import { clinicClockTime, clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import { appClockTime, appToday } from '@/shared/api/app/app-time.ts';
 import { useAppointmentSlotLabel } from '@/shared/hooks/useAppointments/index.ts';
 
 import { APPOINTMENTS_KEYS, APPOINTMENTS_NS } from '../../appointments.constants.ts';
@@ -47,7 +47,7 @@ export function useLatestUpdateWords(): LatestUpdateWords {
         const instant = new Date(update.from);
         return t(
           KEYS.latestHints.moved,
-          isolateValues(slotLabel(clinicToday(instant), clinicClockTime(instant))),
+          isolateValues(slotLabel(appToday(instant), appClockTime(instant))),
         );
       }
       return t(KEYS.latestHints[update.kind]);

@@ -48,7 +48,7 @@ interface UserState {
   name: string;
   authed: boolean;
   perms: Perm[];
-  /** Whether the deployment switches the Today room's module (`clinic-today`) on. */
+  /** Whether the deployment switches the Today room's module (`app-today`) on. */
   todayEnabled: boolean;
 }
 
@@ -89,7 +89,7 @@ function expectedReachable(state: UserState, guard: GuardName): boolean {
 }
 
 function applyState(state: UserState) {
-  disabledModulesRef.value = state.todayEnabled ? new Set() : new Set(['clinic-today']);
+  disabledModulesRef.value = state.todayEnabled ? new Set() : new Set(['app-today']);
   if (state.authed) {
     useAuthStore.setState({
       user: { id: 'u', email: 'a@b.test', role: 'user' },

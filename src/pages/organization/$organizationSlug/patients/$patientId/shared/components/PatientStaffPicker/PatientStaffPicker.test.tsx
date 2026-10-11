@@ -5,15 +5,15 @@ import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { fetchTeamDirectory } from '@/shared/api/clinic/directory-api.ts';
+import { fetchTeamDirectory } from '@/shared/api/app/directory-api.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { findMyMembershipId } from '@/shared/tenancy/my-membership.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import {
   DOCTOR_ARJUN,
   DOCTOR_NISHA,
   teamDoctor,
 } from '@/tests/utils/appointment-doubles.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import { PatientStaffPicker } from './PatientStaffPicker.tsx';
 import { useDefaultStaff } from './use-default-staff.ts';
@@ -23,7 +23,7 @@ vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
   useViewportTier: () => 'desktop',
 }));
 // The team (`GET /app/memberships`) and the signed-in member's own membership.
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchTeamDirectory: vi.fn(),
 }));

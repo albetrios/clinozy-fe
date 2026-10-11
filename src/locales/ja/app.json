@@ -1,0 +1,1370 @@
+{
+  "sections": {
+    "today": {
+      "label": "今日",
+      "description": "現在のクリニック：来院、待機中、診察中、会計"
+    },
+    "leads": {
+      "label": "リード",
+      "description": "問い合わせとその会話（患者になるまで）"
+    },
+    "appointments": {
+      "label": "予約",
+      "description": "医師・部屋・機器ごとの予約"
+    },
+    "patients": {
+      "label": "患者",
+      "description": "登録済みの患者（処方・施術・写真付き）"
+    },
+    "medical": {
+      "label": "薬局",
+      "description": "薬局：販売中の薬、仕入先、MR、仕入れ、販売"
+    },
+    "stock": {
+      "label": "クリニック在庫",
+      "description": "施術で使うクリニックの消耗品と機器 · 販売用ではありません"
+    },
+    "payments": {
+      "label": "支払い",
+      "description": "入金、請求書、未払い"
+    },
+    "tasks": {
+      "label": "タスク",
+      "description": "担当者と期限付きのフォローアップ、フィードバック電話、リマインダー"
+    },
+    "offerings": {
+      "label": "提供サービス",
+      "description": "クリニックの販売内容：サービス、パッケージ、オファー、価格"
+    },
+    "users": {
+      "label": "ユーザー",
+      "description": "チーム、ロールとアクセス、支店"
+    }
+  },
+  "tones": {
+    "butter": "バター",
+    "lav": "ラベンダー",
+    "sky": "スカイ",
+    "sage": "セージ",
+    "blush": "ブラッシュ",
+    "mint": "ミント",
+    "peach": "ピーチ",
+    "plum": "プラム",
+    "lime": "ライム",
+    "slate": "スレート",
+    "stone": "ストーン"
+  },
+  "roles": {
+    "admin": "管理者",
+    "doctor": "医師",
+    "therapist": "セラピスト",
+    "front_desk": "受付",
+    "counsellor": "カウンセラー",
+    "pharmacist": "薬剤師",
+    "accountant": "会計担当",
+    "marketing": "マーケティング",
+    "owner": "オーナー"
+  },
+  "leads": {
+    "statuses": {
+      "new": "新規",
+      "contacted": "連絡済み",
+      "follow_up": "フォローアップ",
+      "clinic_visited": "来院済み",
+      "no_response": "応答なし",
+      "not_interested": "関心なし",
+      "invalid": "無効",
+      "lost": "失注"
+    },
+    "retargeted": "再アプローチ",
+    "sources": {
+      "instagram": "Instagram",
+      "google": "Google",
+      "whatsapp": "WhatsApp",
+      "facebook": "Facebook",
+      "walk_in": "飛び込み",
+      "referral": "紹介",
+      "retarget": "再アプローチ",
+      "phone_call": "電話"
+    },
+    "interests": {
+      "others": "その他",
+      "clinical": "クリニカル",
+      "peel": "ピーリング",
+      "lhr": "LHR",
+      "hydrafacial": "Hydrafacial",
+      "prp": "PRP"
+    }
+  },
+  "appointments": {
+    "statuses": {
+      "scheduled": "予定",
+      "confirmed": "確認済み",
+      "checked_in": "受付済み",
+      "completed": "完了",
+      "cancelled": "キャンセル済み",
+      "no_show": "来院なし"
+    },
+    "moves": {
+      "reschedule": "別の時間に移動",
+      "cancelled": "キャンセル"
+    },
+    "moveHints": {
+      "scheduled": "枠を確保 · WhatsAppで確認依頼を送信済み",
+      "confirmed": "承諾済み · WhatsAppで「はい」と返信があると自動で設定されます",
+      "checked_in": "来院しました · 当日のみ",
+      "completed": "受診完了 · 通常は受診画面から設定されます",
+      "reschedule": "新しい枠へ移動 · 同じ予約のまま、元の枠は履歴に残ります",
+      "cancelled": "枠を空け、リマインダーを停止します",
+      "no_show": "開始時刻を過ぎてからのみ"
+    },
+    "guards": {
+      "final": "最終ステータスです。新しい予約を作るには「再予約」を使ってください。",
+      "visitDay": "{{day}}のみ",
+      "beforeStart": "{{day}} {{time}}以降に利用可能",
+      "needsPatient": "先に患者記録を作成してください · 完了には患者が必要です"
+    },
+    "nextActions": {
+      "check_in": "受付",
+      "confirm": "確認",
+      "complete": "完了にする",
+      "rebook": "再予約"
+    },
+    "tiles": {
+      "booked": "予約済み",
+      "said_yes": "承諾済み",
+      "visit_day": "来院日に利用可能",
+      "after_check_in": "受付後"
+    },
+    "hints": {
+      "scheduled": "枠を確保 · WhatsAppで確認を依頼し、「はい」の返信で確定します",
+      "confirmed": "電話で確認済み · リマインダーを送信します",
+      "checked_in": "患者は来院中 · 医師の待ち行列に通知済み · 終わったら完了にしてください",
+      "completed": "受診完了 · 明日フィードバックのタスクが送られます",
+      "needs_patient": "この受診を完了するには患者記録を作成してください",
+      "cancelled": "戻すには復元してください · その間、枠は他の人が使えます",
+      "closed": "この予約は終了しています · {{status}}"
+    },
+    "cancelReasons": {
+      "patient_asked": "患者の希望",
+      "unreachable": "患者に連絡がつかない",
+      "doctor_unavailable": "医師の都合がつかない",
+      "resource_unavailable": "機器または部屋が使えない",
+      "rescheduling_later": "後日再調整",
+      "booked_by_mistake": "誤って予約",
+      "other": "その他"
+    },
+    "cancelSides": {
+      "patient": "患者",
+      "clinic": "クリニック"
+    },
+    "cancelConfirm": {
+      "title": "この予約をキャンセルしますか？",
+      "record": "{{name}} · {{service}}",
+      "effect": "枠が空き、リマインダーが停止します。時間が過ぎるまでは元に戻せます。",
+      "action": "キャンセル"
+    },
+    "formCancelReasons": {
+      "patient_cancelled": "患者がキャンセル",
+      "rescheduling_later": "後日再調整",
+      "doctor_unavailable": "医師の都合がつかない",
+      "booked_by_mistake": "誤って予約",
+      "other": "その他"
+    },
+    "toasts": {
+      "booked": "{{id}} を予約しました · {{day}} {{time}} · WhatsAppで確認依頼を送信しました",
+      "bookedQueued": "{{id}} を予約しました · {{day}} {{time}} · リマインダーを予約しました",
+      "bookedOnly": "{{id}} を予約しました · {{day}} {{time}}",
+      "moved": "{{id}} を {{day}} {{time}} に移動しました · 確認依頼を送信しました",
+      "movedOnly": "{{id}} を {{day}} {{time}} に移動しました",
+      "updated": "{{id}} を更新しました",
+      "statusChanged": "{{name}} → {{status}}",
+      "statusConfirmed": "{{name}} → {{status}} · リマインダーを予約しました",
+      "statusCancelled": "{{name}} → {{status}} · {{reason}} · 枠を解放し、リマインダーを停止しました",
+      "cancelled": "予約 {{id}} をキャンセルしました",
+      "restored": "予約を復元しました · リマインダーを再送します"
+    }
+  },
+  "offerings": {
+    "categories": {
+      "consultation": "診察",
+      "treatment": "施術",
+      "package": "パッケージ",
+      "lhr": "LHR",
+      "product": "商品"
+    },
+    "offerKinds": {
+      "percent": "%割引",
+      "amount": "₹割引",
+      "fixed": "固定価格",
+      "extra": "追加セッション"
+    },
+    "offerStates": {
+      "live": "実施中",
+      "scheduled": "予定",
+      "paused": "一時停止",
+      "ended": "終了"
+    },
+    "toasts": {
+      "offeringCreated": "サービス {{id}} を作成しました",
+      "offeringSaved": "サービス {{id}} を保存しました",
+      "offeringRemoved": "サービス {{id}} を削除しました",
+      "offerCreated": "{{name}} を作成しました · 自動で適用されます",
+      "offerSaved": "{{name}} を保存しました",
+      "offerRemoved": "{{name}} を削除しました",
+      "offerPaused": "{{name}} を一時停止しました",
+      "offerResumed": "{{name}} を再開しました"
+    },
+    "specialties": {
+      "skin": "皮膚",
+      "hair": "毛髪",
+      "dental": "歯科",
+      "gynac": "婦人科",
+      "physio": "理学療法",
+      "general": "一般"
+    }
+  },
+  "patients": {
+    "types": {
+      "aesthetic": "美容",
+      "clinical": "一般診療",
+      "lhr": "LHR",
+      "dental": "歯科",
+      "physio": "理学療法",
+      "gynac": "婦人科"
+    },
+    "statuses": {
+      "new": "新規",
+      "regular": "通常",
+      "vip": "VIP",
+      "inactive": "休眠"
+    },
+    "conversions": {
+      "converted": "T-成約",
+      "not_converted": "T-未成約"
+    },
+    "referralSources": {
+      "patient": "患者",
+      "doctor": "医師",
+      "instagram": "Instagram",
+      "google": "Google",
+      "walk_in": "飛び込み",
+      "other": "その他"
+    }
+  },
+  "visits": {
+    "record": "来院"
+  },
+  "patientDelete": {
+    "title": "この患者を削除しますか？",
+    "titleRecord": "このレコードを削除しますか？",
+    "removed": "{{name}} を削除しました"
+  },
+  "patientDrawer": {
+    "title": {
+      "create": "新規患者",
+      "edit": "患者を編集"
+    },
+    "sub": {
+      "full": "連絡先も作成・更新されます",
+      "quick": "来院を完了する前にクリニックが必要とする情報"
+    },
+    "quickFill": {
+      "walkIn": "本日の飛び込み",
+      "referred": "患者からの紹介",
+      "instagram": "Instagram から",
+      "lhr": "LHR 患者"
+    },
+    "steps": {
+      "contact": "連絡先・個人情報",
+      "clinic": "クリニック・紹介・フォローアップ"
+    },
+    "groups": {
+      "contact": "連絡先",
+      "personal": "個人情報",
+      "clinic": "クリニック",
+      "referral": "紹介・フォローアップ"
+    },
+    "fields": {
+      "firstName": "名",
+      "lastName": "姓",
+      "mobile": "携帯番号",
+      "mobileHint": "メイン · WhatsApp",
+      "phone2": "サブの携帯番号",
+      "phone2Hint": "10桁",
+      "address": "住所",
+      "addressPlaceholder": "地域、市区町村",
+      "homeBranch": "所属院",
+      "gender": "性別",
+      "birthDate": "生年月日",
+      "age": "{{age}}歳",
+      "types": "患者の種別",
+      "typesHint": "複数選択可",
+      "status": "ステータス",
+      "conversion": "コンバージョン",
+      "referredBy": "紹介者",
+      "referredByPlaceholder": "氏名",
+      "referrerType": "紹介元の種類",
+      "followUp": "フォローアップ",
+      "followUpDate": "フォローアップ日",
+      "followUpTime": "フォローアップ時刻",
+      "notes": "メモ",
+      "notesPlaceholder": "チームに共有すべきこと",
+      "consent": "同意",
+      "consentHint": "署名済みの内容",
+      "photos": "初回の写真",
+      "photosHint": "ビフォー写真 · 本日の来院に保存",
+      "photosDrop": "写真を撮影またはドロップ",
+      "photosLimit": "JPG または PNG · 1枚あたり {{limit}} まで",
+      "photosRemove": "{{name}} を削除"
+    },
+    "followUpQuick": {
+      "tomorrow": "明日 {{time}}",
+      "week": "1週間後",
+      "twentyDays": "20日後",
+      "month": "1か月後"
+    },
+    "save": {
+      "create": "患者を作成",
+      "edit": "変更を保存",
+      "createAnother": "作成して続けて追加"
+    },
+    "missing": "氏名と携帯番号を入力してください",
+    "mobileInvalid": "10桁の携帯番号を入力してください",
+    "created": "患者 {{id}} を作成しました",
+    "openFile": "ファイルを開く",
+    "saved": "{{name}} を保存しました",
+    "registered": "{{name}} を患者 {{id}} として登録しました",
+    "registeredPhotos_other": "{{name}} を患者 {{id}} として登録しました · 写真 {{count}} 枚を保存",
+    "duplicate": "{{name}} と同じ携帯番号 · {{id}}",
+    "useExisting": "既存の患者を使う",
+    "summaryEmpty": "新規患者",
+    "knownPerson": "{{name}} はすでに連絡先にいます · この方のカルテとして作成します"
+  },
+  "recordDrawer": {
+    "cancel": "キャンセル",
+    "back": "戻る",
+    "close": "閉じる",
+    "save": "保存",
+    "saving": "保存中…",
+    "retrySave": "保存を再試行",
+    "saveAndAdd": "保存して続けて追加",
+    "delete": "削除",
+    "notSaved": "未保存 · 変更は保持されています",
+    "saveFailed": "保存できませんでした · 接続が切れました。入力した内容はすべて残っています。",
+    "readOnly": "閲覧のみ · あなたのロールでは変更できません",
+    "quickFill": "クイック入力",
+    "step": {
+      "next": "次へ: {{step}} →",
+      "edit": "編集",
+      "open": "開く",
+      "missing": "未入力: {{fields, list(type: unit)}}",
+      "notFilled": "未入力"
+    },
+    "peek": {
+      "empty": "空欄",
+      "added_other": "{{count}} 件追加",
+      "noneYet": "まだありません"
+    },
+    "stepper": {
+      "decrease": "減らす",
+      "increase": "増やす"
+    },
+    "colours": {
+      "butter": "バター",
+      "lav": "ラベンダー",
+      "sky": "スカイ",
+      "sage": "セージ",
+      "blush": "ブラッシュ",
+      "mint": "ミント",
+      "peach": "ピーチ",
+      "plum": "プラム",
+      "lime": "ライム",
+      "slate": "スレート",
+      "stone": "ストーン"
+    },
+    "currency": "₹"
+  },
+  "personCard": {
+    "contactLabel": "連絡先",
+    "openPatientFile": "患者ファイルを開く",
+    "since": "{{date}}から",
+    "leadSince": "{{date}}からリード",
+    "kind": {
+      "patient": "患者",
+      "lead": "リード",
+      "contact": "連絡先"
+    },
+    "editContact": "連絡先を編集",
+    "changeContact": "連絡先を変更",
+    "changeContactHint": "別の連絡先を選ぶ",
+    "reach": "連絡手段",
+    "team": "チーム",
+    "about": "概要",
+    "reachSub": {
+      "whatsappPrimary": "WhatsApp · メイン",
+      "whatsappAlternate": "WhatsApp · サブ",
+      "phonePrimary": "電話 · メイン",
+      "phoneAlternate": "電話 · サブ",
+      "instagram": "Instagram"
+    },
+    "whatsApp": "WhatsApp",
+    "call": "電話する",
+    "openInstagram": "Instagramを開く",
+    "copy": "コピー",
+    "copied": "{{value}}をコピーしました",
+    "noReach": "電話番号やハンドルはまだ保存されていません",
+    "claim": "未対応 · 引き受ける",
+    "claimHint": "この人のリードが未対応です · 引き受けてください",
+    "gender": {
+      "female": "女性",
+      "male": "男性",
+      "other": "その他"
+    },
+    "genderAge": "{{gender}} · {{age}}歳",
+    "age": "{{age}}歳",
+    "cameVia": "{{source}}経由",
+    "owedToThem": "返金予定 {{amount}}",
+    "owedByThem": "クリニックへの未払い {{amount}}",
+    "reviews_other": "レビュー{{count}}件 · 最新は{{source}}で{{rating}}★ · {{date}}",
+    "consent": {
+      "data": "データ",
+      "photos": "写真",
+      "marketing": "マーケティング",
+      "hint": "同意 · {{label}}",
+      "given": "{{label}}: 同意済み",
+      "missing": "{{label}}: 同意なし"
+    },
+    "newLead": "+ リード",
+    "newLeadHint": "この連絡先の新しい問い合わせ",
+    "newAppointment": "+ 予約",
+    "newAppointmentHint": "この連絡先の予約を入れる",
+    "newPatient": "+ 患者",
+    "newPatientHint": "この連絡先の患者記録を作成",
+    "online": "オンライン",
+    "offline": "オフライン",
+    "memberKind": {
+      "assigned": "担当",
+      "sentThis": "送信者",
+      "treating": "施術中",
+      "involved": "関与"
+    },
+    "assignToYourself": "自分に割り当てる",
+    "works": "勤務 {{from}} – {{to}}",
+    "updated": "{{time}}に更新",
+    "fetching": "最新情報を取得中…"
+  },
+  "reasonConfirm": {
+    "keep": "残す",
+    "reason": "理由",
+    "note": "メモ",
+    "notePlaceholder": "メモを追加（任意）",
+    "noteRequired": "チームに理由を伝えてください（必須）",
+    "hintPickReason": "続けるには理由を選んでください",
+    "hintAddNote": "「その他」には短いメモを追加してください",
+    "kinds": {
+      "delete": {
+        "action": "削除",
+        "effect": "一覧と選択肢から消えます。直後に表示される通知から元に戻せます。"
+      },
+      "cancel": {
+        "action": "注文をキャンセル",
+        "effect": "注文はここで止まります。在庫と仕入先への支払いは変わりません。"
+      },
+      "void": {
+        "action": "販売を取り消す",
+        "effect": "販売は取り消され、請求書もキャンセルされます。在庫は戻ります。"
+      }
+    },
+    "reasons": {
+      "mistake": "誤って作成",
+      "duplicate": "重複",
+      "notNeeded": "不要になった",
+      "other": "その他",
+      "orderedByMistake": "誤って発注",
+      "supplierCantDeliver": "仕入先が納品できない",
+      "priceChanged": "価格が変わった",
+      "billedByMistake": "誤って請求",
+      "wrongItems": "商品の誤り",
+      "customerChangedMind": "お客様の気が変わった"
+    }
+  },
+  "itemsField": {
+    "addRow": "行を追加",
+    "removeRow": "行を削除",
+    "remove": "削除",
+    "decrease": "減らす",
+    "increase": "増やす",
+    "note": "メモ",
+    "notePlaceholder": "備考",
+    "moneyPlaceholder": "₹ 0"
+  },
+  "roomToolbar": {
+    "more": "その他",
+    "moreSections": "その他のセクション",
+    "searchTitle": "検索 · / キー",
+    "moreCreate": "その他の作成操作"
+  },
+  "filters": {
+    "title": "フィルター",
+    "appliedCount": "{{count}} 件適用中",
+    "clearAll": "すべてクリア",
+    "clearAllFilters": "すべてのフィルターをクリア",
+    "apply": "フィルターを適用",
+    "saveView": "ビューとして保存",
+    "savedView": "ビューとして保存済み",
+    "viewSaved": "ビュー「{{name}}」を保存しました",
+    "any": "すべて",
+    "from": "開始",
+    "to": "終了",
+    "created": {
+      "label": "作成日",
+      "today": "今日",
+      "yesterday": "昨日",
+      "lastSevenDays": "過去 7 日間",
+      "lastThirtyDays": "過去 30 日間",
+      "thisMonth": "今月",
+      "range": "期間を指定"
+    },
+    "followUp": {
+      "label": "フォローアップ日",
+      "overdue": "期限切れ",
+      "today": "今日",
+      "tomorrow": "明日",
+      "nextSevenDays": "今後 7 日間",
+      "notSet": "未設定",
+      "range": "期間を指定"
+    }
+  },
+  "commandMenu": {
+    "results": "結果",
+    "groups": {
+      "actions": "アクション",
+      "goTo": "移動",
+      "people": "人物"
+    },
+    "actions": {
+      "newLead": "新規リード",
+      "newAppointment": "新規予約",
+      "newPatient": "新規患者",
+      "newReceipt": "新規入金",
+      "openTasks": "タスクを開く"
+    },
+    "screen": "画面",
+    "move": "移動",
+    "open": "開く",
+    "hint": "人物を検索するには3文字以上または4桁以上を入力してください",
+    "empty": "一致するものがありません。名前、電話番号、または C 番号でお試しください。",
+    "personSub": "{{id}} · •••• {{lastDigits}}"
+  },
+  "lists": {
+    "loadError": "このリストを読み込めませんでした · 接続が切れました。最後のコピーを表示しています。",
+    "retry": "再試行"
+  },
+  "clock": {
+    "todayTime": "今日 {{time}}",
+    "dayTime": "{{day}} {{time}}"
+  },
+  "channels": {
+    "whatsapp": "WhatsApp",
+    "call": "電話",
+    "sms": "SMS",
+    "instagram": "Instagram",
+    "email": "メール",
+    "note": "メモ"
+  },
+  "checkInFeels": {
+    "much_better": "とても良い",
+    "better": "良い",
+    "same": "変わらない",
+    "worse": "悪い"
+  },
+  "reviewSources": {
+    "google": "Google",
+    "video": "動画",
+    "instagram": "Instagram",
+    "internal_form": "フィードバックフォーム",
+    "whatsapp": "WhatsApp"
+  },
+  "paymentModes": {
+    "cash": "現金",
+    "upi": "UPI",
+    "card": "カード",
+    "credit": "クレジット残高"
+  },
+  "invoiceTypes": {
+    "clinic": "クリニック",
+    "medical": "薬局",
+    "consultation": "診察"
+  },
+  "invoiceStatuses": {
+    "paid": "支払い済み",
+    "partial": "一部支払い",
+    "unpaid": "未払い"
+  },
+  "taskOutcomes": {
+    "log_check_in": "経過を記録",
+    "doing_well": "経過良好",
+    "no_answer": "応答なし",
+    "happy": "満足",
+    "done": "完了"
+  },
+  "chatColumn": {
+    "thread": "メッセージ",
+    "separator": " · ",
+    "created": {
+      "lead": "リード作成 · {{time}} · {{source}} 経由",
+      "patientThread": "患者 · チャットのみ · リードなし",
+      "contactThread": "連絡先 · チャットのみ · リードなし"
+    },
+    "history": {
+      "appointment": "予約 #{{seq}}",
+      "reminder": "リマインダー送信済み",
+      "prescription": "処方 #{{seq}}",
+      "session": "{{session}} 回目",
+      "invoice": "{{type}}請求書 #{{seq}}",
+      "due": "{{amount}} 未払い",
+      "paid": "支払済み",
+      "received": "{{amount}} 受領",
+      "refund": "{{amount}} 返金",
+      "invoiceRef": "#{{seq}}",
+      "checkIn": "経過確認",
+      "score": "{{score}}/10",
+      "after": "{{context}} 後",
+      "review": "{{source}} のレビュー",
+      "rating": "{{rating}}★",
+      "task": "タスク · {{title}} → {{result}}",
+      "masked": "₹ ••••"
+    },
+    "delivery": {
+      "sending": "送信中…",
+      "sent": "送信済み",
+      "delivered": "配信済み",
+      "read": "既読",
+      "queued": "送信待ち",
+      "notSent": "未送信",
+      "retry": "再試行"
+    },
+    "sender": {
+      "call": "{{name}} · 電話",
+      "note": "{{name}} · メモ"
+    },
+    "empty": {
+      "title": "まだ会話がありません",
+      "visit": "{{first}} さんの {{service}} は {{when}} {{time}} です · WhatsApp をひと言送ると枠を確保できます",
+      "pastVisits": "{{first}} さんとの WhatsApp・電話・メモはすべてここに表示されます",
+      "noVisits": "WhatsApp で始めましょう · 返信はここに届きます",
+      "today": "今日",
+      "tomorrow": "明日",
+      "onDate": "{{date}}"
+    },
+    "starters": {
+      "onTheWay": "向かっていますか？",
+      "directions": "道順を送る",
+      "newTime": "別の時間を提案",
+      "confirm": "来院を確認",
+      "prep": "事前の注意事項",
+      "howItWent": "様子を尋ねる",
+      "nextSession": "次回の予約",
+      "offer": "キャンペーンを案内",
+      "hello": "あいさつする",
+      "consultation": "診察を提案"
+    },
+    "sendVia": "送信方法",
+    "modes": {
+      "whatsapp": "WhatsApp",
+      "instagram": "Instagram",
+      "call": "通話記録",
+      "note": "メモ"
+    },
+    "noInstagram": "この連絡先に Instagram はありません",
+    "message": "メッセージ",
+    "placeholder": {
+      "message": "{{channel}} で {{first}} さんにメッセージ",
+      "messageNoName": "{{channel}} でリードにメッセージ",
+      "note": "チーム用メモ（{{first}} さんには送信されません）",
+      "noteNoName": "チーム用メモ（リードには送信されません）",
+      "call": "通話の内容は？"
+    },
+    "send": {
+      "whatsapp": "WhatsApp を送信",
+      "instagram": "Instagram を送信",
+      "call": "通話を記録",
+      "note": "メモを追加"
+    },
+    "replyHint": "{{first}} さんの最後の連絡はここ",
+    "mismatch": "{{first}} さんは {{channel}} で連絡 · 切り替え",
+    "outage": "WhatsApp 障害中 · 返信は送信待ちになります",
+    "prefersNoCalls": "電話は希望しない · メッセージで",
+    "prefersAfterSix": "18時以降の連絡を希望",
+    "suggest": "提案",
+    "suggestions": "提案",
+    "suggestHint": "提案とテンプレート · または / を入力",
+    "book": "予約する",
+    "bookHint": "予約する · 理由はメッセージから",
+    "suggestedFor": "{{first}} さんへの提案",
+    "closeSuggestions": "提案を閉じる",
+    "templatesLabel": "テンプレート · 入力欄に / を入力して検索",
+    "noTemplate": "「{{query}}」に一致するテンプレートはありません",
+    "fillIn": "入力",
+    "chips": {
+      "price": "料金を伝える",
+      "priceHint": "料金について質問あり",
+      "slots": "2 枠を提案",
+      "slotsHint": "日時について質問あり",
+      "location": "場所を送る",
+      "explain": "{{term}} を説明",
+      "greet": "あいさつ",
+      "followUp": "フォローアップ"
+    },
+    "templates": {
+      "greeting": "あいさつ",
+      "price": "料金",
+      "slots": "空き枠",
+      "location": "所在地",
+      "reminder": "リマインダー",
+      "aftercare": "アフターケア",
+      "followUp": "フォローアップ",
+      "review": "レビュー"
+    },
+    "content": {
+      "starters": {
+        "onTheWay": "{{first}} さん、こんにちは。{{time}} の {{service}} の準備ができています。こちらに向かっていますか？",
+        "directionsToday": "{{first}} さん、こんにちは。クリニックの場所はこちらです：{{maps}}。{{time}} にお待ちしています！",
+        "newTime": "{{first}} さん、こんにちは。本日 {{time}} のご都合が悪ければ、ご希望の時間を返信してください。変更いたします。",
+        "confirm": "{{first}} さん、こんにちは。{{when}} {{time}} の {{service}} のリマインダーです。確認のため「はい」と返信してください。",
+        "prep": "{{first}} さん、こんにちは。{{when}} の {{service}} の前に：メイクはせずにお越しいただき、24時間は日光を避けてください。{{time}} にお待ちしています！",
+        "directionsLater": "{{first}} さん、こんにちは。クリニックの場所はこちらです：{{maps}}。{{when}} {{time}} にお待ちしています。",
+        "howItWent": "{{first}} さん、こんにちは。前回の来院後、お肌の調子はいかがですか？医師へのご質問はありますか？",
+        "nextSession": "{{first}} さん、こんにちは。次回の予約をお取りしましょうか？ご都合の良い日を返信してください。",
+        "offer": "{{first}} さん、こんにちは。今月はいつもの施術がお得になるキャンペーンがあります。詳細をお送りしましょうか？",
+        "hello": "{{first}} さん、こんにちは。{{clinic}} の {{me}} です。何でもお気軽にご相談ください。",
+        "consultation": "{{first}} さん、こんにちは。今週、医師の診察が可能です。診察のご予約をお取りしましょうか？",
+        "directions": "{{first}} さん、こんにちは。クリニックの場所はこちらです：{{maps}}。"
+      },
+      "templates": {
+        "greeting": "{{first}} さん、こんにちは。{{clinic}} の {{me}} です 😊 本日はどのようなご用件でしょうか？",
+        "price": "{{offering}} は {{price}} です。医師の診察が含まれます。ご予約をお取りしましょうか？",
+        "priceSessions": "{{offering}} は {{sessions}} 回で {{price}} です。医師の診察が含まれます。ご予約をお取りしましょうか？",
+        "slots": "{{interest}} は {{slots}} に空きがあります。どちらがよろしいですか？",
+        "location": "所在地は {{address}} です · Google マップ：{{maps}}。すぐ前に駐車場があります。",
+        "reminder": "{{first}} さん、こんにちは。{{dayTime}} のご来院のリマインダーです。確認のため「はい」と返信いただくか、ご希望の時間をお知らせください。",
+        "aftercare": "{{first}} さん、こんにちは。今日のお肌の調子はいかがですか？保湿と日焼け止めを心がけ、48時間はスクラブを避けてください。",
+        "followUp": "{{first}} さん、こんにちは。{{interest}} の件でご連絡しました。今週の枠をお取りしておきましょうか？",
+        "review": "{{first}} さん、ご来院ありがとうございました！気に入っていただけたら、Google のレビューを書いていただけると大変助かります：{{reviewLink}}"
+      },
+      "explain": "良いご質問です！{{offering}} はこれに効果的で、多くの方が {{results}} で効果を実感されています。診察で医師が確認し、プランを立てます。",
+      "sessions": "{{n}} 回",
+      "fewWeeks": "数週間",
+      "slotPair": "{{first}} または {{second}}",
+      "slot": "{{day}} {{time}}",
+      "dayTime": "{{day}} {{time}}",
+      "dayTimeFallback": "明日の午前11時",
+      "today": "今日",
+      "tomorrow": "明日",
+      "onDate": "{{date}}",
+      "there": "お客様",
+      "yourTreatment": "ご希望の施術",
+      "interests": {
+        "clinical": "皮膚科治療",
+        "peel": "ピーリング",
+        "lhr": "レーザー脱毛",
+        "hydrafacial": "ハイドラフェイシャル",
+        "prp": "PRP"
+      },
+      "fill": {
+        "address": "住所",
+        "maps": "地図リンク",
+        "dayTime": "日時",
+        "reviewLink": "レビューリンク"
+      }
+    }
+  },
+  "offeringSuggestions": {
+    "title": "サービスの提案",
+    "suggested_other": "提案 {{count}} 件",
+    "planned_other": "予定 {{count}} 件",
+    "accepted_other": "承諾 {{count}} 件",
+    "pastPurchases_other": "過去の購入 {{count}} 件",
+    "ideas_other": "アイデア {{count}} 件",
+    "nothingSuggested": "まだ提案はありません",
+    "noSuggestions": "まだ提案はありません",
+    "pricesHidden": "価格は非表示",
+    "masked": "₹ ••••",
+    "pricesHiddenHint": "価格は非表示 · 目のアイコンで表示",
+    "showPrices": "価格を表示",
+    "hidePrices": "価格を非表示",
+    "columns": {
+      "suggested": "提案",
+      "qty": "数量",
+      "price": "価格",
+      "status": "ステータス"
+    },
+    "less": "減らす",
+    "more": "増やす",
+    "quantity": "数量",
+    "finalPrice": "最終価格",
+    "belowFloor": "最低価格を下回っています",
+    "tooMuchDiscount": "割引が大きすぎます · 管理者に確認してください",
+    "details": "サービスの詳細",
+    "statuses": {
+      "planned": "予定",
+      "accepted": "承諾",
+      "next_time": "次回",
+      "declined": "辞退"
+    },
+    "statusHints": {
+      "planned": "提案済み · まだ未定",
+      "accepted": "同意済み · 実施時に請求",
+      "next_time": "関心あり · 次回の来院で話す",
+      "declined": "関心なし · 記録として保持"
+    },
+    "statusLabel": "ステータス · {{status}}",
+    "invoiced": "請求済み",
+    "invoicedOf": "請求済み · {{total}} 件中 {{done}} 件",
+    "remove": "削除",
+    "empty": "{{first}} さんへの提案はまだありません。",
+    "whyIdea": "このアイデアの理由",
+    "idea": "アイデア",
+    "add": "+ 追加",
+    "addNamed": "{{name}} を追加",
+    "addHint": "提案に追加",
+    "addOffering": "サービスを追加",
+    "purchasesTitle": "{{first}} さんの最近の購入",
+    "purchaseColumns": {
+      "date": "日付",
+      "bought": "購入品",
+      "sessions": "回数"
+    },
+    "sessionsUsed": "{{total}} 回中 {{used}} 回使用",
+    "activityTitle": "連絡先のアクティビティ",
+    "openChat": "チャットを開く",
+    "activityColumns": {
+      "when": "日時",
+      "channel": "チャネル",
+      "message": "メッセージ",
+      "status": "ステータス"
+    },
+    "sent": "送信",
+    "got": "受信",
+    "removeConfirm": {
+      "title": "この記録を削除しますか？",
+      "record": "提案から {{name}}",
+      "effect": "{{first}} さんのサービス提案から外れます。提案した記録を残すには「辞退」を使ってください。",
+      "reasons": {
+        "addedByMistake": "誤って追加",
+        "duplicate": "重複",
+        "planChanged": "計画が変わった",
+        "other": "その他"
+      }
+    },
+    "searchOfferings": "提供サービスを検索",
+    "single": "単発",
+    "minPrice": "最低 {{price}}",
+    "added": "{{name}} を {{first}} さんの提案に追加しました",
+    "removed": "{{name}} を提案から外しました",
+    "offeringRemoved": "サービスを削除しました",
+    "info": {
+      "sessions_other": "{{count}} 回",
+      "visits_other": "来院 {{count}} 回",
+      "list": "定価 {{price}}",
+      "lowest": "最低 {{price}}"
+    },
+    "ideaReasons": {
+      "history": "履歴からの提案"
+    },
+    "delivery": {
+      "queued": "送信待ち",
+      "sent": "送信済み",
+      "delivered": "配信済み",
+      "read": "既読",
+      "failed": "未配信",
+      "received": "受信"
+    },
+    "activityLead": "リード {{id}}",
+    "purchasesCount_other": "{{count}} 件"
+  },
+  "contactEditor": {
+    "title": "連絡先を編集",
+    "sub": "一度保存 · すべてのリード、患者、チャットで使用",
+    "newContact": "新しい連絡先",
+    "steps": {
+      "identity": "本人情報と連絡手段",
+      "preferences": "連絡の希望"
+    },
+    "idHelp": "1 つの連絡先 · リード、患者、チャットで共有",
+    "idTooltip": "連絡先 ID · クリックしてコピー",
+    "idAria": "連絡先 ID {{id}} をコピー",
+    "idCopied": "連絡先 ID {{id}} をコピーしました",
+    "firstName": "名",
+    "firstNamePlaceholder": "名",
+    "lastName": "姓",
+    "lastNamePlaceholder": "姓（任意）",
+    "mobiles": "携帯番号",
+    "mobileAria": "携帯番号 {{n}}",
+    "primary": "メイン",
+    "primaryTitle": "メイン番号 · 電話と照合に使用",
+    "setPrimary": "メインにする",
+    "setPrimaryTitle": "この番号をメインにする",
+    "primaryChanged": "{{number}} をメイン番号にしました",
+    "whatsAppOn": "WhatsApp あり · クリックでオフ",
+    "whatsAppOff": "WhatsApp なし · クリックでオン",
+    "removeNumber": "番号を削除",
+    "addNumber": "+ 番号を追加",
+    "addInstagram": "+ Instagram",
+    "handlePlaceholder": "@ユーザー名",
+    "handleAria": "Instagram {{n}}",
+    "removeHandle": "ユーザー名を削除",
+    "removeHandleTitle": "このユーザー名を削除",
+    "handleRemoved": "{{handle}} を削除しました",
+    "addHandle": "+ ユーザー名を追加",
+    "defaultChannel": "既定のチャネル",
+    "defaultChannelHint": "· 最後に使ったチャネルに切り替わります",
+    "custom": "+ カスタム",
+    "customPlaceholder": "希望を入力",
+    "customAria": "カスタムの希望",
+    "done": "完了",
+    "updated": "連絡先を更新しました · すべてに反映されます",
+    "preferences": {
+      "noCalls": "電話不可",
+      "sundaysOnly": "日曜日のみ",
+      "weekdaysOnly": "平日のみ",
+      "afterSix": "午後 6 時以降",
+      "mornings": "午前中",
+      "evenings": "夕方",
+      "weekendsOnly": "週末のみ",
+      "gujarati": "グジャラート語",
+      "hindi": "ヒンディー語",
+      "english": "英語",
+      "femaleDoctor": "女性医師",
+      "textFirst": "電話の前にメッセージ"
+    }
+  },
+  "offeringQuickCreate": {
+    "title": "新しいサービス",
+    "sub": "請求するサービス・施術・パッケージ",
+    "steps": {
+      "offering": "サービス",
+      "details": "詳細",
+      "payment": "支払い"
+    },
+    "fields": {
+      "name": "名称",
+      "namePlaceholder": "例：全顔レーザー脱毛",
+      "duration": "所要時間",
+      "minutesUnit": "分",
+      "minutes": "{{minutes}}分",
+      "category": "カテゴリ",
+      "price": "料金"
+    },
+    "save": "サービスを追加",
+    "toasts": {
+      "name": "名称を入力してください",
+      "price": "料金を入力してください",
+      "added": "サービス「{{name}}」を追加しました"
+    }
+  },
+  "appointmentForm": {
+    "title": {
+      "loading": "予約",
+      "create": "新規予約",
+      "edit": "予約 {{id}}",
+      "reschedule": "{{id}} を日時変更"
+    },
+    "sub": "空いている枠のみ表示 · 過去の時刻はロックされています",
+    "who": {
+      "search": "患者またはリードを名前・電話・IDで検索",
+      "searchLabel": "人を検索",
+      "useContact": "連絡先を使う",
+      "patient": "患者",
+      "createContact": "+ 連絡先「{{query}}」を作成",
+      "newContact": "新しい連絡先 · 予約には携帯番号を追加",
+      "mobile": "携帯番号",
+      "name": "名前",
+      "mobileLabel": "携帯",
+      "save": "保存",
+      "addName": "名前を入力してください",
+      "mobileDigits": "携帯番号は10桁必要です"
+    },
+    "links": {
+      "connected": "関連リード",
+      "chip": "{{id}} · {{status}}",
+      "chipHint": "リード {{id}} · {{source}} · 担当 {{owner}}",
+      "movesAtCheckIn": "· 受付時に「来院済み」へ移動"
+    },
+    "status": {
+      "section": "来院ステータス",
+      "group": "ステータス",
+      "copy": "コピー",
+      "copyHint": "コピー · 同じサービス・医師・理由・メモ",
+      "cancelVisit": "来院をキャンセル",
+      "cancelHint": "この予約をキャンセル",
+      "cancelledReason": "{{reason}} · 枠を解放 · リマインダー停止",
+      "cancelledNoReason": "枠を解放 · リマインダー停止",
+      "restore": "元に戻す",
+      "rescheduledConfirm": "日時変更済み · 変更前 {{day}} {{time}} · 再確認が必要 · 保存すると新しいリマインダーを送信",
+      "rescheduled": "日時変更済み · 変更前 {{day}} {{time}} · 保存すると新しいリマインダーを送信",
+      "planReady_other": "プラン準備済み · サービス {{count}} 件",
+      "planVisit_other": "この来院で {{count}} 件予定",
+      "planEarlier_other": "以前の来院から {{count}} 件"
+    },
+    "details": {
+      "title": "予約",
+      "notFilled": "未入力",
+      "open": "開く",
+      "type": "種類",
+      "typeGroup": "予約の種類",
+      "types": {
+        "consultation": "診察",
+        "follow_up": "経過観察",
+        "treatment": "施術",
+        "package_session": "パッケージ施術",
+        "other": "その他"
+      },
+      "typeHints": {
+        "consultation": "初診または医師による診察",
+        "follow_up": "施術や処方後の短い確認",
+        "treatment": "単発の施術、来院時に請求",
+        "package_session": "支払い済みパッケージから1回分を使用",
+        "other": "上記以外のもの"
+      },
+      "typeLines": {
+        "consultation": "会計時に診察料が請求書に追加されます",
+        "follow_up": "通常は無料 · 追加がなければ請求書なし",
+        "other": "内容を下のメモに記入してください"
+      },
+      "treatment": "施術",
+      "pickTreatment": "施術を選択",
+      "searchTreatments": "施術を検索",
+      "common": "よく使う",
+      "fromOfferings": "提供サービスから",
+      "doctor": "医師",
+      "pickDoctor": "医師を選択",
+      "searchDoctors": "医師・セラピストを検索",
+      "length": "所要時間",
+      "minutes": "{{minutes}} 分",
+      "minutesHint": "{{minutes}} 分",
+      "reason": "理由",
+      "reasonPlaceholder": "希望内容 · 例：頬のシミ",
+      "notes": "メモ",
+      "notesPlaceholder": "医師や受付が知っておくべきこと"
+    },
+    "slot": {
+      "title": "日時",
+      "nextWeek": "来週",
+      "calendar": "カレンダー",
+      "previousMonth": "前の月",
+      "nextMonth": "次の月",
+      "step": "枠の間隔",
+      "stepOption": "{{minutes}} 分",
+      "time": "時刻",
+      "pickDate": "日付を選ぶと時刻が表示されます",
+      "none": "この日は予約できる時間がありません · 別の日付を選んでください",
+      "closed": {
+        "past": "この日は過ぎています · 別の日付を選んでください",
+        "branchInactive": "この院は予約を受け付けていません",
+        "closedDay": "この日は休診日です · 別の日付を選んでください",
+        "holiday": "{{label}}のため休診 · 別の日付を選んでください",
+        "doctorOff": "この日は医師が休みです · 別の日付か医師を選んでください"
+      },
+      "am": "午前",
+      "pm": "午後",
+      "hour": "{{period}}{{hour}}時",
+      "free": "{{time}} · 空き",
+      "locked": "ロック中",
+      "lockedSummary": "{{day}} · {{time}} · 受付後はロック",
+      "lockedToast": "患者の受付後は日時がロックされます"
+    },
+    "footer": {
+      "pickTime": "時刻を選択",
+      "book": "{{day}} {{time}} で予約",
+      "move": "{{day}} {{time}} に変更",
+      "saveChanges": "変更を保存",
+      "minutes": "{{minutes}} 分"
+    },
+    "validation": {
+      "who": "予約の対象者を選んでください",
+      "slot": "日付と時刻を選んでください",
+      "passed": "その時刻は過ぎています · 今後の枠を選んでください",
+      "taken": "ちょうど埋まりました · 別の枠を選んでください",
+      "doctor": "医師を選んでください",
+      "branch": "予約できる営業中の院がありません"
+    },
+    "copied": "コピーしました · 日付と時刻を選んでください"
+  },
+  "expenseCategories": {
+    "medicines": "医薬品",
+    "consumables": "消耗品",
+    "salary": "給与",
+    "rent": "家賃",
+    "marketing": "マーケティング",
+    "utilities": "光熱費",
+    "maintenance": "メンテナンス",
+    "misc": "その他"
+  },
+  "patientPicker": {
+    "label": "患者",
+    "placeholder": "患者を検索",
+    "hint": "選べるのは患者のみ",
+    "due": "未払い {{amount}}",
+    "nothingDue": "未払いなし"
+  },
+  "splitRows": {
+    "mode": "方法",
+    "amount": "金額"
+  },
+  "settleCredit": {
+    "title": {
+      "give": "返金する",
+      "take": "回収した"
+    },
+    "sub": {
+      "give": "{{name}} へ · {{reason}} · 支払いに出金を追加します",
+      "take": "{{name}} から · {{reason}} · 支払いに入金を追加します"
+    },
+    "section": {
+      "give": "返金の方法",
+      "take": "受け取った方法"
+    },
+    "rows": {
+      "give": "返金方法",
+      "take": "受取方法"
+    },
+    "add": "別の方法を追加",
+    "total": "合計 {{total}} · {{owed}} 中",
+    "save": {
+      "give": "{{amount}} を返金",
+      "take": "{{amount}} を記録"
+    },
+    "enterAmount": "金額を入力してください",
+    "moreThanOwed": "未精算の {{amount}} を超えています",
+    "done": {
+      "give": "{{name}} に {{amount}} を返金 · {{entry}}",
+      "take": "{{name}} から {{amount}} を回収 · {{entry}}"
+    },
+    "branch": "店舗",
+    "date": "日付",
+    "dayClosed": "この店舗ではその日は日締め済みです · 締めていない日を選んでください",
+    "moreThanPaid": "請求書の支払済み額を超えています",
+    "closed": "{{ref}} は精算済みです",
+    "entry": {
+      "give": "出金を追加しました",
+      "take": "入金を追加しました"
+    }
+  },
+  "quickLine": {
+    "label": "クイック追加",
+    "enter": "↵ 追加",
+    "matches": "候補",
+    "suggested": "おすすめ · クリックで追加",
+    "typed": "リストにありません · 入力どおりに追加",
+    "noMatch": "一致するものがありません。綴りを確認するか、文字数を減らしてください。",
+    "keys": "↑↓ 選択 · ↵ 追加 · Esc クリア",
+    "browse": "一覧から選ぶ",
+    "browseAll": "すべて表示",
+    "groups": "グループ",
+    "closeBrowse": "一覧を閉じる",
+    "added_other": "{{count}}件追加済み",
+    "tapToAdd": "タイルをタップして追加",
+    "showing": "{{total}}件中{{shown}}件を表示 · 入力して絞り込み",
+    "done": "完了",
+    "emptyGroup": "このグループに一致するものはありません。",
+    "addOne": "1つ追加",
+    "removeOne": "1つ減らす",
+    "addNew": "新規追加",
+    "tags": {
+      "qty": "×{{count}}",
+      "free": "無償 +{{count}}",
+      "rate": "@ {{amount}}",
+      "discount": "{{percent}}% オフ"
+    }
+  },
+  "invoiceDrawer": {
+    "title": {
+      "create": "新しい請求書",
+      "edit": "請求書を編集",
+      "createSale": "新しい販売",
+      "editSale": "販売を編集"
+    },
+    "sub": {
+      "create": "種類を選んでから項目を追加",
+      "edit": "変更は請求書に記録されます",
+      "sale": "医薬品の請求書 · 在庫は期限の近いものから減ります"
+    },
+    "type": "種類",
+    "steps": {
+      "party": "患者とチーム",
+      "items": "項目",
+      "medicines": "医薬品",
+      "payment": "支払い"
+    },
+    "fields": {
+      "branch": "店舗",
+      "newPatient": "新しい患者",
+      "customer": "顧客",
+      "customerHint": "患者または任意の連絡先 · 新しい名前は薬局の連絡先として保存されます",
+      "customerPlaceholder": "患者・リード・薬局の連絡先を検索",
+      "addContact": "連絡先を追加",
+      "mobile": "携帯番号",
+      "mobileHint": "連絡先に保存されます",
+      "mobilePlaceholder": "98765 43210",
+      "team": "チーム",
+      "prescribedBy": "処方者",
+      "teamPlaceholder": "チームを選択",
+      "teamHint": "医師・セラピスト・カウンセラー",
+      "teamFrom": "{{name}} さんのチームから",
+      "overallDiscount": "全体割引",
+      "quickFill": "クイック入力",
+      "paidNow": "今回の支払い",
+      "remark": "備考",
+      "remarkPlaceholder": "印刷した請求書に表示されます",
+      "paid": "これまでの支払い"
+    },
+    "customerGroups": {
+      "patient": "患者",
+      "lead": "リード",
+      "contact": "薬局の連絡先"
+    },
+    "customerSub": {
+      "noMobile": "携帯番号はまだありません"
+    },
+    "items": {
+      "quickLine": "サービス・数量・割引を入力 · 例: lhr face 1 10%",
+      "quickLineMedical": "医薬品と数量を入力 · 例: sun 2",
+      "hint": "2 = 数量 · 10% = 割引 · @500 = 単価",
+      "oftenBilled": "よく請求する項目",
+      "browse": {
+        "all": "すべて",
+        "oral": "内服",
+        "topical": "外用"
+      },
+      "columns": {
+        "offering": "サービス",
+        "medicine": "医薬品",
+        "qty": "数量",
+        "rate": "単価",
+        "discount": "割引 %",
+        "gst": "GST",
+        "final": "最終"
+      },
+      "pickItem": "項目を選択",
+      "selectOffering": "サービスを選択…",
+      "selectMedicine": "医薬品を選択…",
+      "newOffering": "新しいサービス",
+      "addItem": "項目を追加",
+      "addMedicine": "医薬品を追加",
+      "total": "合計",
+      "sessions_other": "{{count}} 回",
+      "inStock": "在庫 {{count}}",
+      "outOfStock": "在庫切れ",
+      "belowFloor": "{{name}} の最低価格 {{amount}} を下回っています",
+      "newMedicineName": "新しい医薬品名",
+      "medicineAdded": "{{name}} を追加しました · 希望小売価格は後で在庫で設定",
+      "hintInvoice": "2 = 数量 · 10% = 割引",
+      "belowLowest": "{{name}} の最低価格を下回っています",
+      "offerApplied": "適用中のオファー：{{offer}}"
+    },
+    "payment": {
+      "full": "全額 · {{mode}} で {{amount}}",
+      "split": "現金 + UPI に分割",
+      "nothing": "今は支払わない",
+      "mode": "方法",
+      "amount": "金額",
+      "addMode": "別の方法を追加",
+      "paidTotal": "支払済み {{paid}} · 未払い {{due}}"
+    },
+    "totals": {
+      "label": "合計",
+      "subtotal": "小計",
+      "discountGst": "割引 + GST",
+      "discountGstValue": "{{discount}} · +{{gst}}",
+      "bill": "請求額",
+      "dueAfter": "この後の未払い",
+      "preview": "保存される内容で計算した金額",
+      "pending": "金額を計算中…",
+      "refused": "計算できません · 印の付いた行を修正してください",
+      "failed": "この請求書の金額を計算できませんでした",
+      "retry": "再試行"
+    },
+    "badges": {
+      "bill": "請求額 {{amount}}",
+      "sessions_other": "{{count}} 回分",
+      "draft": "下書き",
+      "due": "未払い {{amount}}",
+      "paid": "支払済み"
+    },
+    "presets": {
+      "print": "請求書を印刷",
+      "plan": "プラン · {{name}}",
+      "planQty": "プラン · {{name}} ×{{count}}",
+      "package": "パッケージ · {{name}}",
+      "repeat": "#{{seq}} を繰り返す",
+      "consultation": "新規診察 · {{amount}}",
+      "rx": "処方箋 #{{seq}} から"
+    },
+    "save": {
+      "clinic": "クリニックの請求書を作成",
+      "medical": "医薬品の請求書を作成",
+      "consultation": "診察の請求書を作成",
+      "edit": "変更を保存"
+    },
+    "summary": "{{type}} · {{name}} · {{items}}",
+    "summaryItems_other": "{{count}} 項目",
+    "noPatient": "患者なし",
+    "errors": {
+      "pickPatient": "患者を選んでください",
+      "pickCustomer": "顧客を選んでください",
+      "addItem": "項目を1つ以上追加してください",
+      "paidAboveBill": "支払額 {{paid}} が請求額 {{bill}} を超えています",
+      "stock": "{{name}} の在庫は {{count}} のみです",
+      "belowFloor": "{{name}} が最低価格 {{amount}} を下回っています · 最終価格を上げてください",
+      "belowLowest": "{{name}} が最低価格を下回っています · 最終価格を上げてください"
+    },
+    "toasts": {
+      "created": {
+        "clinic": "クリニックの請求書 #{{seq}} を作成しました",
+        "medical": "医薬品の請求書 #{{seq}} を作成しました",
+        "consultation": "診察の請求書 #{{seq}} を作成しました"
+      },
+      "copied": "請求書 #{{seq}} としてコピーしました",
+      "createdPlan_other": "{{created}} · 提案 {{count}} 件を請求済みにしました",
+      "saved": "請求書 #{{seq}} を保存しました",
+      "savedPlan": "請求書 #{{seq}} を保存しました · 提案を更新しました",
+      "promo": "{{offering}} に {{offer}} を適用しました",
+      "contactSaved": "{{name}} を薬局の連絡先として保存しました · 下に携帯番号を追加",
+      "rxUnmatched": "{{name}} は医薬品リストにありません · クイック追加から追加してください",
+      "deleted": "請求書 #{{seq}} を削除しました"
+    },
+    "deleteTitle": "この請求書を削除しますか?",
+    "previewTitle": {
+      "clinic": "請求書 #{{seq}}",
+      "medical": "医薬品の請求書 #{{seq}}",
+      "consultation": "診察の請求書 #{{seq}}"
+    },
+    "record": "請求書",
+    "refusals": {
+      "moreThanDue": "今回の支払いが請求額を超えています",
+      "dayClosed": "その日は締め済みです · 支払いを追加できません",
+      "settled": "この請求書は確定済みです · 支払いの一つが締め済みの日にあります",
+      "belowPaid": "請求額を支払済みの金額より下げることはできません",
+      "offeringInUse": "このパッケージのセッションは使用済みです · 行を残してください",
+      "treatmentBilled": "この請求書の施術が別の請求書で請求済みです · 削除して保存し直してください",
+      "ofSale": "この請求書は医薬品販売のものです · 医薬品から変更してください",
+      "paid": "この請求書には支払いまたはクレジットノートがあります · 削除できません",
+      "inUseDelete": "このパッケージのセッションは使用済みです · 請求書は削除できません"
+    },
+    "notices": {
+      "settled": "確定済み · この請求書の支払いが締め済みの日にあるため変更できません",
+      "sale": "医薬品販売の請求書 · 医薬品から変更してください"
+    }
+  },
+  "printPreview": {
+    "title": "印刷プレビュー · {{title}}",
+    "close": "閉じる",
+    "print": "印刷 / PDF保存"
+  },
+  "appHomeEmpty": {
+    "title": "まだ何も有効になっていません",
+    "description": "クリニックのセクションは、有効になり次第ここに表示されます。"
+  }
+}

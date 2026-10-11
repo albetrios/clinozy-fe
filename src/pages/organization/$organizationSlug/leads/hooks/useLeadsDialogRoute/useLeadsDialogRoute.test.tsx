@@ -1,10 +1,10 @@
 import { screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type * as LeadsApiModule from '@/shared/api/clinic/leads-api.ts';
-import { fetchLead } from '@/shared/api/clinic/leads-api.ts';
+import type * as LeadsApiModule from '@/shared/api/app/leads-api.ts';
+import { fetchLead } from '@/shared/api/app/leads-api.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 
 import {
   leadRecord,
@@ -17,7 +17,7 @@ import { type LeadsDialogRoute, useLeadsDialogRoute } from './useLeadsDialogRout
 const { notifyMock } = vi.hoisted(() => ({ notifyMock: { info: vi.fn() } }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 const world = vi.hoisted(() => ({}) as LeadsWorld);
-vi.mock('@/shared/api/clinic/leads-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/leads-api.ts', async (importOriginal) => {
   const { leadsApiDouble } =
     await import('../../__tests__/integration/leads-test-data.ts');
   return { ...(await importOriginal<typeof LeadsApiModule>()), ...leadsApiDouble(world) };

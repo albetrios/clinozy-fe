@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
-import { fetchInvoiceTotals } from '@/shared/api/clinic/invoices-api.ts';
+import { fetchInvoiceTotals } from '@/shared/api/app/invoices-api.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import {
   patientFile,
@@ -29,7 +29,7 @@ const { notifyMock } = vi.hoisted(() => ({
   },
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
-vi.mock('@/shared/api/clinic/invoices-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/invoices-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchInvoiceTotals: vi.fn(),
 }));

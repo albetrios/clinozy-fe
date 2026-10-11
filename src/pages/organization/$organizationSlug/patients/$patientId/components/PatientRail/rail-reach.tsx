@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { PatientFile } from '@/shared/api/clinic/patient-file-contracts.ts';
-import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
+import type { PatientFile } from '@/shared/api/app/patient-file-contracts.ts';
+import { formatAppPhone } from '@/shared/app/app-phone.ts';
 import {
   type ContactReach,
   reachLinks,
@@ -129,7 +129,7 @@ export function RailReach({ file }: { file: PatientFile }) {
           }
           const key = `${reach.channel}-${reach.phone}`;
           const visible = shown.has(key);
-          const full = formatClinicPhone(reach.phone);
+          const full = formatAppPhone(reach.phone);
           return (
             <ReachRow
               key={key}

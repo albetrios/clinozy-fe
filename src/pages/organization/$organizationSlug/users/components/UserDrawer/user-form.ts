@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
-import type { Role, Tone, Weekday } from '@/shared/api/clinic/clinic-schema.ts';
-import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
+import type { Role, Tone, Weekday } from '@/shared/api/app/app-schema.ts';
+import type { TeamMember } from '@/shared/api/app/users-contracts.ts';
 import type { MemberChange, MemberInvite } from '@/shared/api/organization-contracts.ts';
-import { toClinicPhone } from '@/shared/clinic/clinic-phone.ts';
-import { clinicPhoneDigits } from '@/shared/clinic/clinic-phone-field.ts';
+import { toAppPhone } from '@/shared/app/app-phone.ts';
+import { appPhoneDigits } from '@/shared/app/app-phone-field.ts';
 
 /**
  * The user drawer's form (KICKOFF §6.12; `users.md:99–124`; research-users §3): the mobile's
@@ -156,7 +156,7 @@ export function emptyUserForm(
 export function userFormOf(member: TeamMember): UserFormValues {
   return {
     name: member.name,
-    phone: member.phone ? clinicPhoneDigits(member.phone) : '',
+    phone: member.phone ? appPhoneDigits(member.phone) : '',
     email: member.email,
     tone: member.tone,
     roleIds: [...member.roleIds],
@@ -183,7 +183,7 @@ export function isUserEmail(value: string): boolean {
 
 /** A filled mobile that is not ten digits (an empty one is fine). */
 export function isMobileIncomplete(digits: string): boolean {
-  return digits.length > 0 && toClinicPhone(digits) === null;
+  return digits.length > 0 && toAppPhone(digits) === null;
 }
 
 /** The branches a save sends: with one open branch, that branch (`users.md:95`). */
@@ -198,7 +198,7 @@ export function userInviteOf(
   return {
     email: values.email.trim(),
     roleIds: values.roleIds,
-    phone: values.phone ? toClinicPhone(values.phone) : null,
+    phone: values.phone ? toAppPhone(values.phone) : null,
     tone: values.tone,
     branchIds: branchesOf(values, singleBranchId),
     workingDays: values.workingDays,
@@ -221,7 +221,7 @@ function profileChange(
   singleBranchId: string | null,
 ): MemberChange {
   const change: MemberChange = {};
-  const phone = values.phone ? toClinicPhone(values.phone) : null;
+  const phone = values.phone ? toAppPhone(values.phone) : null;
   if (phone !== member.phone) change.phone = phone;
   if (values.tone !== member.tone) change.tone = values.tone;
   if (!(member.isOwner || sameList(values.roleIds, member.roleIds))) {

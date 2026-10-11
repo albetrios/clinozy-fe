@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { fetchPayment, updatePayment } from '@/shared/api/clinic/payments-api.ts';
-import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
+import { fetchPayment, updatePayment } from '@/shared/api/app/payments-api.ts';
+import type { LedgerRow } from '@/shared/api/app/payments-contracts.ts';
 import { ledgerRow, TEST_PAYMENT_ID } from '@/tests/utils/payments-doubles.ts';
 
 import { attachPaymentFile } from './send-attachments.ts';
 
-vi.mock('@/shared/api/clinic/payments-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/payments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchPayment: vi.fn(),
   updatePayment: vi.fn(),

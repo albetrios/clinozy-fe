@@ -1,12 +1,12 @@
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { ROLE_TONES } from '@/shared/clinic/clinic-tones.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { ROLE_TONES } from '@/shared/app/app-tones.ts';
 import { shortPersonName } from '@/shared/components/Cells/index.ts';
 import type { PickerOption } from '@/shared/components/Picker/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useLead } from '@/shared/hooks/useLeads/index.ts';
 import { Users } from '@/shared/icons/index.ts';
 
@@ -39,8 +39,8 @@ export interface NewTaskOwner {
  */
 export function useNewTaskOwner(person: NewTaskPerson | null): NewTaskOwner {
   const { t } = useTranslation(TASKS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
-  const access = useClinicAccess();
+  const { t: tApp } = useTranslation(APP_NS);
+  const access = useAppAccess();
   const assignees = useTaskAssignees();
   const canReadLeads = access.isResolved && access.canCode('lead:read');
   // `?lead=` read the lead with the person; a picked person's open lead is read here.
@@ -52,7 +52,7 @@ export function useNewTaskOwner(person: NewTaskPerson | null): NewTaskOwner {
     const team = t(TASKS_KEYS.drawer.assignGroups.team);
     const queues = TASK_QUEUE_ROLES.map((role): PickerOption<DirectoryMember | null> => ({
       key: taskAssigneeKeyOf({ role }),
-      label: tClinic(CLINIC_KEYS.roles[role]),
+      label: tApp(APP_KEYS.roles[role]),
       group: t(TASKS_KEYS.drawer.assignGroups.queues),
       tone: ROLE_TONES[role],
       leading: { kind: 'icon', icon: Users },
@@ -62,7 +62,7 @@ export function useNewTaskOwner(person: NewTaskPerson | null): NewTaskOwner {
       ...assignees.options.map((option) => ({ ...option, group: team })),
       ...queues,
     ];
-  }, [assignees.options, t, tClinic]);
+  }, [assignees.options, t, tApp]);
 
   const workerIds = useMemo(
     () => new Set(assignees.options.map((option) => option.key)),
@@ -77,11 +77,11 @@ export function useNewTaskOwner(person: NewTaskPerson | null): NewTaskOwner {
     (key: string | null) => {
       if (key === null) return '';
       const assignee = taskAssigneeOfKey(key);
-      if ('role' in assignee) return tClinic(CLINIC_KEYS.roles[assignee.role]);
+      if ('role' in assignee) return tApp(APP_KEYS.roles[assignee.role]);
       const member = assignees.byId.get(assignee.membershipId);
       return member ? shortPersonName(member.name) : '';
     },
-    [assignees.byId, tClinic],
+    [assignees.byId, tApp],
   );
 
   return {

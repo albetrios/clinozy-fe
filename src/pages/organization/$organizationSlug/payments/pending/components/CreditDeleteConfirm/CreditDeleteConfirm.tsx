@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { CreditRow } from '@/shared/api/clinic/credits-contracts.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { CreditRow } from '@/shared/api/app/credits-contracts.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
 import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
 import { useDeleteCredit, useRestoreCredit } from '@/shared/hooks/useCredits/index.ts';

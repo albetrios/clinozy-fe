@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 
 import { kebabCase } from '@/lib/kebab-case.ts';
 import { cn } from '@/lib/utils.ts';
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import { TREATMENT_LIMITS } from '@/shared/api/clinic/treatments-contracts.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
+import { TREATMENT_LIMITS } from '@/shared/api/app/treatments-contracts.ts';
 import {
   DrawerChips,
   DrawerField,

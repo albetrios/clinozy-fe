@@ -1,8 +1,8 @@
-import type { CheckinFeel, CheckinFollowed } from '@/shared/api/clinic/clinic-schema.ts';
+import type { CheckinFeel, CheckinFollowed } from '@/shared/api/app/app-schema.ts';
 import type {
   CheckInFields,
   PatientCheckIn,
-} from '@/shared/api/clinic/feedback-contracts.ts';
+} from '@/shared/api/app/feedback-contracts.ts';
 
 /** The check-in drawer's fields (`patient-file.md:171–179`). */
 export interface CheckInFormValues {

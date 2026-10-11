@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { InvoiceRecord } from '@/shared/api/clinic/invoices-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { INVOICE_STATUS_TONES } from '@/shared/clinic/clinic-tones.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { InvoiceRecord } from '@/shared/api/app/invoices-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { INVOICE_STATUS_TONES } from '@/shared/app/app-tones.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { useInvoiceList, useInvoiceTotals } from '@/shared/hooks/useInvoices/index.ts';
 import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
@@ -135,7 +135,7 @@ function BillingRows({
   onInvoice: (invoice: InvoiceRecord) => void;
   testId: string;
 }) {
-  const { t } = useTranslation([TIMELINE_NS, CLINIC_NS]);
+  const { t } = useTranslation([TIMELINE_NS, APP_NS]);
   const day = useTableDay();
   return (
     <div className="flex flex-col">
@@ -143,12 +143,12 @@ function BillingRows({
         <BentoRow
           key={invoice.id}
           title={t(K.invoice, {
-            type: t(CLINIC_KEYS.invoiceTypes[invoice.type], { ns: CLINIC_NS }),
+            type: t(APP_KEYS.invoiceTypes[invoice.type], { ns: APP_NS }),
             number: displayId.invoiceNumber(invoice.seq),
           })}
           sub={t(K.sub, { date: day(invoice.date, true), amount: money(invoice.total) })}
           tag={{
-            label: t(CLINIC_KEYS.invoiceStatuses[invoice.status], { ns: CLINIC_NS }),
+            label: t(APP_KEYS.invoiceStatuses[invoice.status], { ns: APP_NS }),
             tone: INVOICE_STATUS_TONES[invoice.status],
           }}
           onClick={() => onInvoice(invoice)}

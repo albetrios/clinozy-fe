@@ -3,10 +3,10 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import * as preferencesApi from '@/shared/api/clinic/preferences-api.ts';
+import * as preferencesApi from '@/shared/api/app/preferences-api.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 
 import { usePreferences } from './usePreferences.ts';
 
@@ -69,7 +69,7 @@ describe('usePreferences', () => {
     const { result } = renderHook(() => usePreferences(), { wrapper });
     expect(result.current.isPending).toBe(false);
     act(() => result.current.update({ pinnedSections: ['today'] }));
-    expect(result.current.preferences).toEqual(preferencesApi.DEFAULT_CLINIC_PREFERENCES);
+    expect(result.current.preferences).toEqual(preferencesApi.DEFAULT_APP_PREFERENCES);
     expect(fetch).not.toHaveBeenCalled();
     expect(save).not.toHaveBeenCalled();
   });

@@ -4,10 +4,10 @@ import { type ReactNode, useId, useState } from 'react';
 import { useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import { fetchOffering, offeringQueryKeys } from '@/shared/api/clinic/offerings-api.ts';
-import type { OfferingRecord } from '@/shared/api/clinic/offerings-contracts.ts';
-import { SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import { fetchOffering, offeringQueryKeys } from '@/shared/api/app/offerings-api.ts';
+import type { OfferingRecord } from '@/shared/api/app/offerings-contracts.ts';
+import { SECTION_TONES } from '@/shared/app/app-tones.ts';
 import { DrawerStepBody } from '@/shared/components/DrawerField/index.ts';
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import type { QuickFillItem } from '@/shared/components/QuickFillRow/index.ts';
@@ -16,7 +16,7 @@ import {
   RecordDrawerPending,
 } from '@/shared/components/RecordDrawer/index.ts';
 import { mapApiError } from '@/shared/errors/errorHandler.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
 import { resetFormInPlace } from '@/shared/hooks/useEditingRecord/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
@@ -131,7 +131,7 @@ function quickFillItems(
  * them (gap 6). View-as hides it too (`canCode` is false while it runs).
  */
 function useDrawerAccess(editing: boolean) {
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const readOnly =
     access.isResolved && !access.can('offerings', editing ? 'edit' : 'create');
   return {

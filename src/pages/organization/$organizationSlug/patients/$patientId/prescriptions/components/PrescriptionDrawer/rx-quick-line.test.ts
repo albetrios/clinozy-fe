@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import type { RxCatalogMedicine } from '@/shared/api/clinic/prescriptions-contracts.ts';
+import type { RxCatalogMedicine } from '@/shared/api/app/prescriptions-contracts.ts';
 import {
   nameNumbers,
   QUICK_LINE_MATCH_LIMIT,

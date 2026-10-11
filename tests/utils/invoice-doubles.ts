@@ -6,17 +6,17 @@
  * Mehta's consultation invoice #5 (`payments-doubles.ts`) and the server's preview of a bill.
  * Ids are public ids; money is rupees. Override what a test is about.
  */
-import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
+import type { BranchOption } from '@/shared/api/app/branches-api.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
 import type {
   InvoiceDetail,
   InvoicePreview,
   InvoiceRecord,
-} from '@/shared/api/clinic/invoices-contracts.ts';
+} from '@/shared/api/app/invoices-contracts.ts';
 import type {
   OfferingRecord,
   OfferRecord,
-} from '@/shared/api/clinic/offerings-contracts.ts';
+} from '@/shared/api/app/offerings-contracts.ts';
 
 import { offeringRecord, offerRecord } from './offering-doubles.ts';
 import {

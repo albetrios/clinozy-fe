@@ -1,23 +1,19 @@
 import type { TFunction } from 'i18next';
 
 import { isolateText, isolateValues } from '@/lib/bidi-isolate.ts';
-import type { Channel, LeadInterest, Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import {
-  addCivilDays,
-  civilDayOffset,
-  clinicInstant,
-} from '@/shared/api/clinic/clinic-time.ts';
+import type { Channel, LeadInterest, Tone } from '@/shared/api/app/app-schema.ts';
+import { addCivilDays, appInstant, civilDayOffset } from '@/shared/api/app/app-time.ts';
 import type {
   Contact,
   ContactPreferenceTag,
-} from '@/shared/api/clinic/contacts-contracts.ts';
-import type { LeadRecord } from '@/shared/api/clinic/leads-fixture-contracts.ts';
+} from '@/shared/api/app/contacts-contracts.ts';
+import type { LeadRecord } from '@/shared/api/app/leads-fixture-contracts.ts';
 import type {
   ChatMessage,
   ChatSlot,
   ComposerMode,
   ContactHistoryEntry,
-} from '@/shared/api/clinic/messages-contracts.ts';
+} from '@/shared/api/app/messages-contracts.ts';
 import {
   type AppIcon,
   Bell,
@@ -388,7 +384,7 @@ export interface ChatSender {
  * literals (§7.3).
  */
 export interface MessageContext {
-  /** Translates `clinic` keys in the patient-message language (Q-X2). */
+  /** Translates `app` keys in the patient-message language (Q-X2). */
   tm: TFunction;
   clock: ChatClock;
   /** Their first name ("there" with none). */
@@ -525,7 +521,7 @@ function slotPhrase(slot: ChatSlot, ctx: MessageContext): string {
   else day = ctx.clock.date(slot.date);
   return ctx.tm(content.slot, {
     day,
-    time: ctx.clock.shortTime(clinicInstant(slot.date, slot.time)),
+    time: ctx.clock.shortTime(appInstant(slot.date, slot.time)),
   });
 }
 

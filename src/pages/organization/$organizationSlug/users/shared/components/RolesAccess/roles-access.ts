@@ -1,6 +1,6 @@
-import { type ClinicAction, presetOfRole } from '@/shared/api/clinic/access-contracts.ts';
-import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
-import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
+import { type AppAction, presetOfRole } from '@/shared/api/app/access-contracts.ts';
+import type { Role } from '@/shared/api/app/app-schema.ts';
+import type { TeamMember } from '@/shared/api/app/users-contracts.ts';
 import type { RoleSummary } from '@/shared/api/organization-contracts.ts';
 
 import { USERS_KEYS } from '../../../users.constants.ts';
@@ -40,7 +40,7 @@ export function roleHolders(roleId: string, team: readonly TeamMember[]): TeamMe
 }
 
 /** The matrix's four actions, each with its box's accessible-name key. */
-export const MATRIX_CELL_KEYS: Readonly<Record<ClinicAction, string>> = {
+export const MATRIX_CELL_KEYS: Readonly<Record<AppAction, string>> = {
   view: USERS_KEYS.roles.matrix.cell.view,
   create: USERS_KEYS.roles.matrix.cell.create,
   edit: USERS_KEYS.roles.matrix.cell.edit,
@@ -48,7 +48,7 @@ export const MATRIX_CELL_KEYS: Readonly<Record<ClinicAction, string>> = {
 };
 
 /** The matrix head's action labels. */
-export const MATRIX_HEAD_KEYS: Readonly<Record<ClinicAction, string>> = {
+export const MATRIX_HEAD_KEYS: Readonly<Record<AppAction, string>> = {
   view: USERS_KEYS.roles.matrix.view,
   create: USERS_KEYS.roles.matrix.create,
   edit: USERS_KEYS.roles.matrix.edit,

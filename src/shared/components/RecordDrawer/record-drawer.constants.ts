@@ -1,10 +1,10 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 
 /**
- * The record drawer's chrome copy lives in `clinic`: every room's drawer shares
+ * The record drawer's chrome copy lives in `app`: every room's drawer shares
  * it, and it loads with the org shell — off the entry bundle.
  */
-export const RECORD_DRAWER_NS = I18N_NAMESPACES.clinic;
+export const RECORD_DRAWER_NS = I18N_NAMESPACES.app;
 
 /**
  * Key paths for the record drawer and its parts (footer, steps, Quick fill).

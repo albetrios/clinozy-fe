@@ -2,12 +2,12 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
+import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
 import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import { fetchMedicine } from '@/shared/api/clinic/medicines-api.ts';
+  appFixtures,
+  resetAppFixtures,
+} from '@/shared/api/app/fixtures/world.fixtures.ts';
+import { fetchMedicine } from '@/shared/api/app/medicines-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { fsi, withoutBidiMarks } from '@/tests/utils/bidi-marks.ts';
@@ -46,11 +46,11 @@ const setup = () =>
 
 beforeEach(() => {
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 afterEach(() => {
   resetMedicalRoutes();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 
 describe('ExpiringReturnDrawer (medical.md:297–309)', () => {
@@ -87,7 +87,7 @@ describe('ExpiringReturnDrawer (medical.md:297–309)', () => {
     expect(notifyMock.success).toHaveBeenCalledWith(
       '3 returned · ₹369 credit from Akshar Medicines',
     );
-    const saved = await clinicFixtures.medicines.get(ref.medicine(456));
+    const saved = await appFixtures.medicines.get(ref.medicine(456));
     expect(saved.batches[0]?.qty).toBe(0);
     const [credit] = await fetchSupplierAccount(ref.supplier(52));
     expect(credit).toMatchObject({ kind: 'credit', batchNo: '026-312', amount: 36_900 });

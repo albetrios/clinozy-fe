@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { InvoiceType, OfferingCategory } from '@/shared/api/clinic/clinic-schema.ts';
-import type { OfferingRecord } from '@/shared/api/clinic/offerings-contracts.ts';
-import { CLINIC_KEYS } from '@/shared/clinic/clinic.constants.ts';
+import type { InvoiceType, OfferingCategory } from '@/shared/api/app/app-schema.ts';
+import type { OfferingRecord } from '@/shared/api/app/offerings-contracts.ts';
+import { APP_KEYS } from '@/shared/app/app.constants.ts';
 import type { PickerOption } from '@/shared/components/Picker/index.ts';
 import { useMedicineCatalogue } from '@/shared/hooks/useMedicines/index.ts';
 import { useOfferings } from '@/shared/hooks/useOfferings/index.ts';
@@ -74,9 +74,7 @@ export function useInvoiceCatalog(
       };
     }
     const parts = [
-      item.detail
-        ? t(CLINIC_KEYS.offerings.categories[item.group as OfferingCategory])
-        : '',
+      item.detail ? t(APP_KEYS.offerings.categories[item.group as OfferingCategory]) : '',
       item.sessions > 1 ? t(K.sessions, { count: item.sessions }) : '',
       item.promo ?? '',
     ];

@@ -1,4 +1,4 @@
-import type { Gender, Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Gender, Tone } from '@/shared/api/app/app-schema.ts';
 
 /** What the card reads (D32 — there is no Contact entity): a Patient, a Lead or a MedicalContact. */
 export type ContactKind = 'patient' | 'lead' | 'contact';

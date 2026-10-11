@@ -2,7 +2,7 @@ import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 import type {
   PatientPhotoBodyPart,
   PatientPhotoStage,
-} from '@/shared/api/clinic/patient-images-contracts.ts';
+} from '@/shared/api/app/patient-images-contracts.ts';
 
 /** The patient's photos read the patient file's namespace. */
 export const PATIENT_PHOTOS_NS = I18N_NAMESPACES.patientFile;

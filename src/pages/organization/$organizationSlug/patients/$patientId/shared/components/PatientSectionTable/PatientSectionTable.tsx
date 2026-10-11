@@ -5,8 +5,8 @@
 import type { ReactTable } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import { isBillingSection } from '@/shared/clinic/patient-file-sections.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
+import { isBillingSection } from '@/shared/app/patient-file-sections.ts';
 import {
   DataTable,
   type DataTableFeatures,
@@ -15,7 +15,7 @@ import {
 import type { DataTableBulkAction } from '@/shared/components/DataTableBulkBar/index.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
 import { RoomTableEmpty } from '@/shared/components/RoomTableEmpty/index.ts';
-import { canExportRows, useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { canExportRows, useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { FileIcon } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -93,7 +93,7 @@ export function PatientSectionTable<TRow extends { id: string }>({
   paging,
 }: PatientSectionTableProps<TRow>) {
   const { t } = useTranslation(PATIENT_TABLE_NS);
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const K = PATIENT_TABLE_KEYS;
   const Icon = PATIENT_FILE_SECTION_ICONS[section];
   const bulkActions: DataTableBulkAction<TRow>[] = canExportRows(

@@ -3,8 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import * as branchesApi from '@/shared/api/clinic/branches-api.ts';
-import type * as OfferingsApiModule from '@/shared/api/clinic/offerings-api.ts';
+import * as branchesApi from '@/shared/api/app/branches-api.ts';
+import type * as OfferingsApiModule from '@/shared/api/app/offerings-api.ts';
 import {
   deleteOffering,
   fetchAllOfferings,
@@ -12,10 +12,10 @@ import {
   fetchOffering,
   offeringQueryKeys,
   restoreOffering,
-} from '@/shared/api/clinic/offerings-api.ts';
-import type { OfferingRecord } from '@/shared/api/clinic/offerings-contracts.ts';
+} from '@/shared/api/app/offerings-api.ts';
+import type { OfferingRecord } from '@/shared/api/app/offerings-contracts.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
-import { previewPreset } from '@/tests/utils/clinic-preset-codes.ts';
+import { previewPreset } from '@/tests/utils/app-preset-codes.ts';
 
 import {
   OFFERING_IDS,
@@ -57,7 +57,7 @@ vi.mock('@/lib/csv.ts', async (importOriginal) => ({
 }));
 
 const world = vi.hoisted(() => ({}) as OfferingsTabWorld);
-vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/offerings-api.ts', async (importOriginal) => {
   const { offeringsApiDouble } =
     await import('./__tests__/integration/offerings-tab-test-data.ts');
   return {

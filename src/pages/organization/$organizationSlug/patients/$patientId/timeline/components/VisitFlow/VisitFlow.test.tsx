@@ -4,32 +4,32 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
-import { moveAppointment } from '@/shared/api/clinic/appointments-api.ts';
-import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
-import type { ClinicalNote } from '@/shared/api/clinic/clinical-notes-contracts.ts';
-import { listInvoices } from '@/shared/api/clinic/invoices-api.ts';
-import type { InvoiceRecord } from '@/shared/api/clinic/invoices-contracts.ts';
-import type { PatientPackageRow } from '@/shared/api/clinic/patient-packages-contracts.ts';
+import type { Role } from '@/shared/api/app/app-schema.ts';
+import { moveAppointment } from '@/shared/api/app/appointments-api.ts';
+import type { ClinicalNote } from '@/shared/api/app/clinical-notes-contracts.ts';
+import { listInvoices } from '@/shared/api/app/invoices-api.ts';
+import type { InvoiceRecord } from '@/shared/api/app/invoices-contracts.ts';
+import type { PatientPackageRow } from '@/shared/api/app/patient-packages-contracts.ts';
 import {
   approvePrescription,
   createPrescription,
-} from '@/shared/api/clinic/prescriptions-api.ts';
+} from '@/shared/api/app/prescriptions-api.ts';
 import type {
   PrescriptionKit,
   PrescriptionRecord,
-} from '@/shared/api/clinic/prescriptions-contracts.ts';
-import { moveFloorStage } from '@/shared/api/clinic/today-api.ts';
-import { createTreatment } from '@/shared/api/clinic/treatments-api.ts';
-import type { TreatmentRecord } from '@/shared/api/clinic/treatments-contracts.ts';
+} from '@/shared/api/app/prescriptions-contracts.ts';
+import { moveFloorStage } from '@/shared/api/app/today-api.ts';
+import { createTreatment } from '@/shared/api/app/treatments-api.ts';
+import type { TreatmentRecord } from '@/shared/api/app/treatments-contracts.ts';
 import {
   fetchVisitCheckNotes,
   recordVisitCheck,
   removeVisitCheck,
   setVisitPaused,
-} from '@/shared/api/clinic/visits-api.ts';
-import type { VisitRecord } from '@/shared/api/clinic/visits-contracts.ts';
-import type { PatientFileSectionSlug } from '@/shared/clinic/patient-file-sections.ts';
-import { PATIENT_FILE_SECTIONS } from '@/shared/clinic/patient-file-sections.ts';
+} from '@/shared/api/app/visits-api.ts';
+import type { VisitRecord } from '@/shared/api/app/visits-contracts.ts';
+import type { PatientFileSectionSlug } from '@/shared/app/patient-file-sections.ts';
+import { PATIENT_FILE_SECTIONS } from '@/shared/app/patient-file-sections.ts';
 import {
   APPOINTMENT_NOW,
   APPOINTMENT_TODAY,
@@ -77,7 +77,7 @@ const world = vi.hoisted(() => ({
   invoices: [] as InvoiceRecord[],
   failNotes: false,
 }));
-vi.mock('@/shared/api/clinic/invoices-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/invoices-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listInvoices: vi.fn(async () => ({
     rows: world.invoices,
@@ -86,7 +86,7 @@ vi.mock('@/shared/api/clinic/invoices-api.ts', async (importOriginal) => ({
     totals: null,
   })),
 }));
-vi.mock('@/shared/api/clinic/visits-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/visits-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchOpenVisit: vi.fn(async () => world.visit),
   fetchVisitCheckNotes: vi.fn(async () => {
@@ -118,14 +118,14 @@ vi.mock('@/shared/api/clinic/visits-api.ts', async (importOriginal) => ({
   }),
   setVisitPaused: vi.fn(async () => world.visit),
 }));
-vi.mock('@/shared/api/clinic/patient-file-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/patient-file-api.ts', async (importOriginal) => {
   const { patientFile: file } = await import('@/tests/utils/patient-doubles.ts');
   return {
     ...(await importOriginal<object>()),
     fetchPatientFile: vi.fn(async () => file()),
   };
 });
-vi.mock('@/shared/api/clinic/prescriptions-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/prescriptions-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listPatientPrescriptions: vi.fn(async () => world.prescriptions),
   listPrescriptionKits: vi.fn(async () => world.kits),
@@ -165,7 +165,7 @@ vi.mock('@/shared/api/clinic/prescriptions-api.ts', async (importOriginal) => ({
     return { ...record, status: 'approved' };
   }),
 }));
-vi.mock('@/shared/api/clinic/treatments-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/treatments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listPatientTreatments: vi.fn(async () => world.treatments),
   createTreatment: vi.fn(
@@ -190,11 +190,11 @@ vi.mock('@/shared/api/clinic/treatments-api.ts', async (importOriginal) => ({
     },
   ),
 }));
-vi.mock('@/shared/api/clinic/patient-packages-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/patient-packages-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listPatientPackages: vi.fn(async () => world.packages),
 }));
-vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/appointments-api.ts', async (importOriginal) => {
   const { appointmentRow: row } = await import('@/tests/utils/appointment-doubles.ts');
   return {
     ...(await importOriginal<object>()),
@@ -204,11 +204,11 @@ vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => {
     }),
   };
 });
-vi.mock('@/shared/api/clinic/today-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/today-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   moveFloorStage: vi.fn(async () => undefined),
 }));
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => {
   const { DOCTOR_NISHA: nisha, DOCTOR_ARJUN: arjun } =
     await import('@/tests/utils/appointment-doubles.ts');
   return {

@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { AvatarStack, TextCell, TonePill } from '@/shared/components/Cells/index.ts';
 import {
   REASON_CONFIRM_KEYS,

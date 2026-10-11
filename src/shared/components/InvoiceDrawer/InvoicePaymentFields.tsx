@@ -1,9 +1,9 @@
 import { Controller, type UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { INVOICE_REMARK_MAX } from '@/shared/api/clinic/invoices-contracts.ts';
-import { CLINIC_KEYS } from '@/shared/clinic/clinic.constants.ts';
-import { PAYMENT_MODE_TONES } from '@/shared/clinic/clinic-tones.ts';
+import { INVOICE_REMARK_MAX } from '@/shared/api/app/invoices-contracts.ts';
+import { APP_KEYS } from '@/shared/app/app.constants.ts';
+import { PAYMENT_MODE_TONES } from '@/shared/app/app-tones.ts';
 import {
   DrawerField,
   DrawerFieldGrid,
@@ -56,7 +56,7 @@ function useModeOptions(): PickerOption[] {
   const { t } = useTranslation(INVOICE_DRAWER_NS);
   return PAID_NOW_MODES.map((mode) => ({
     key: mode,
-    label: t(CLINIC_KEYS.paymentModes[mode]),
+    label: t(APP_KEYS.paymentModes[mode]),
     tone: PAYMENT_MODE_TONES[mode],
   }));
 }
@@ -197,7 +197,7 @@ function usePaidNowPresets({
       value: 'full',
       label: t(K.payment.full, {
         amount: formatPaise(left),
-        mode: t(CLINIC_KEYS.paymentModes[firstMode]),
+        mode: t(APP_KEYS.paymentModes[firstMode]),
       }),
     },
     { value: 'split', label: t(K.payment.split) },

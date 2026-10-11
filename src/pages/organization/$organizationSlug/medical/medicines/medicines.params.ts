@@ -4,7 +4,7 @@
  * with the tab.
  */
 import { sortParamsOf } from '@/lib/routes/search-params.ts';
-import type { MedicineListParams } from '@/shared/api/clinic/medicines-contracts.ts';
+import type { MedicineListParams } from '@/shared/api/app/medicines-contracts.ts';
 
 import type { MedicalSearch } from '../medical.search.ts';
 

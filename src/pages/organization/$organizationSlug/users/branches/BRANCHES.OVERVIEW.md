@@ -13,7 +13,7 @@ Created; no search, no sort, no Columns button. The table folds on a tablet into
 on a phone the chip leads and the address block carries Contact · Opening hours · Status · Default
 people (`DataTable`'s `phoneKeyFirst`).
 
-Gated on `branch:read` and the `clinic-users` module, then `requireOrgStatus`; "New branch" needs
+Gated on `branch:read` and the `app-users` module, then `requireOrgStatus`; "New branch" needs
 `branch:create`, editing `branch:update`, and Export only `branch:read`. A branch is never deleted
 — clinozy-be has no delete — it is closed from its drawer (Status "Closed"), so Edit is the row's
 one action. Main is read-only: one per clinic, set when it opened. A branch write refreshes every
@@ -25,7 +25,7 @@ open branch the clinic shows no branch UI, while this tab still lists the closed
 | File                            | Responsibility                                                                                                           |
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
 | `branches.route.tsx`            | Route marker — exports `Component` rendering `BranchesPage`.                                                             |
-| `branches.manifest.ts`          | Manifest — `kind: 'layout'`, children `create`, `$branchId`; `branch:read`, module `clinic-users`.                       |
+| `branches.manifest.ts`          | Manifest — `kind: 'layout'`, children `create`, `$branchId`; `branch:read`, module `app-users`.                          |
 | `branches.search.ts`            | `validateBranchesSearch` — `created` (entry chunk: no zod).                                                              |
 | `BranchesPage.tsx`              | The list: toolbar, table, the Edit row action, bulk Export and the branch drawers. Owns `users-branches-page`.           |
 | `components/BranchCells/`       | The cells — the chip with "Main", two-line Address / Contact / Default people, hours, the Team's avatars, Open / Closed. |

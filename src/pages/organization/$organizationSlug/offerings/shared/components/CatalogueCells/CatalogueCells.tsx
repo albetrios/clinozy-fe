@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
-import { ALL_BRANCHES } from '@/shared/api/clinic/clinic-list-filters.ts';
+import { ALL_BRANCHES } from '@/shared/api/app/app-list-filters.ts';
+import type { BranchOption } from '@/shared/api/app/branches-api.ts';
 import { TonePill } from '@/shared/components/Cells/index.ts';
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 
 import { CATALOGUE_CELLS_KEYS, CATALOGUE_CELLS_NS } from './catalogue-cells.constants.ts';
 
@@ -126,7 +126,7 @@ export function BranchChips({
  * Hidden by default (Columns brings it).
  */
 export function UpdatedCell({ updatedAt }: { updatedAt: string }) {
-  const clock = useClinicClock();
+  const clock = useAppClock();
   return (
     <span className="text-caption text-muted-foreground min-w-0 truncate tabular-nums">
       {clock.moment(updatedAt)}

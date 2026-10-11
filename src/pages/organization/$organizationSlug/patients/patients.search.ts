@@ -17,16 +17,13 @@ import {
   type FollowUpFilter,
   readCreatedFilter,
   readFollowUpFilter,
-} from '@/shared/api/clinic/clinic-list-filters.ts';
+} from '@/shared/api/app/app-list-filters.ts';
 import type {
   PatientConversion,
   PatientStatus,
   PatientType,
-} from '@/shared/api/clinic/clinic-schema.ts';
-import type {
-  PatientSortKey,
-  PatientView,
-} from '@/shared/api/clinic/patients-contracts.ts';
+} from '@/shared/api/app/app-schema.ts';
+import type { PatientSortKey, PatientView } from '@/shared/api/app/patients-contracts.ts';
 
 /**
  * The list's views, in the tab order (`patients.md:203–207`) — less In clinic today and With

@@ -7,8 +7,8 @@ import {
   type ContactChannel,
   type ContactFields,
   type ContactPreferenceTag,
-} from '@/shared/api/clinic/contacts-contracts.ts';
-import { toClinicPhone } from '@/shared/clinic/clinic-phone.ts';
+} from '@/shared/api/app/contacts-contracts.ts';
+import { toAppPhone } from '@/shared/app/app-phone.ts';
 
 /** One number as the editor holds it: its digits as typed, and whether they are on WhatsApp on it. */
 export interface ContactEditorPhone {
@@ -148,7 +148,7 @@ export function withCustomPreference(
 
 /** The primary number as the API stores it — `null` until it is a 10-digit mobile. */
 export function primaryPhoneOf(value: ContactEditorValue): string | null {
-  return toClinicPhone(value.phones[0]?.digits ?? '');
+  return toAppPhone(value.phones[0]?.digits ?? '');
 }
 
 /** The numbers and handles beyond the primary — the contact card's " · +N more". */
@@ -164,7 +164,7 @@ export function extraReachCount(value: ContactEditorValue): number {
  */
 export function contactFieldsOf(value: ContactEditorValue): ContactFields {
   const phones = value.phones.flatMap((entry) => {
-    const phone = toClinicPhone(entry.digits);
+    const phone = toAppPhone(entry.digits);
     return phone ? [{ phone, isOnWhatsapp: entry.whatsapp }] : [];
   });
   const lastName = value.lastName.trim();

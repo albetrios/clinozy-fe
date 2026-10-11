@@ -8,7 +8,7 @@ import { orgQueryKeys } from '@/shared/api/organization-query-keys.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useDeferredRowRemoval } from '@/shared/hooks/useDeferredRowRemoval/index.ts';
 import { useDeleteRole, useUpdateRole } from '@/shared/hooks/useRoles/index.ts';
 import { useTeam } from '@/shared/hooks/useTeam/index.ts';
@@ -108,7 +108,7 @@ function useRoleAdmin(role: RoleSummary | null, directory: RoleDirectory) {
 function useRolesScreen(selected: string | undefined) {
   const directory = useRoleDirectory();
   const team = useTeam();
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const role = selectedRoleOf(directory.roles, selected);
   const admin = useRoleAdmin(role, directory);
   const writes = useRoleAccessWrites(role);

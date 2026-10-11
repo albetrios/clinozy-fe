@@ -133,17 +133,15 @@ async function hotUpdate(plugin: Plugin, file: string, loaded: readonly string[]
 
 describe('dev server: a locale edit reaches the page without a restart', () => {
   it('names the namespace a file feeds — the build’s locale or its English fallback', () => {
-    expect(localeNamespaceOf('/repo/src/locales/en/clinic.json', 'en')).toBe('clinic');
+    expect(localeNamespaceOf('/repo/src/locales/en/app.json', 'en')).toBe('app');
     expect(localeNamespaceOf('/repo/src/locales/es/patients.json', 'es')).toBe(
       'patients',
     );
     expect(localeNamespaceOf('/repo/src/locales/en/patients.json', 'es')).toBe(
       'patients',
     );
-    expect(localeNamespaceOf('C:\\repo\\src\\locales\\en\\clinic.json', 'en')).toBe(
-      'clinic',
-    );
-    expect(localeNamespaceOf('/repo/src/locales/de/clinic.json', 'en')).toBeUndefined();
+    expect(localeNamespaceOf('C:\\repo\\src\\locales\\en\\app.json', 'en')).toBe('app');
+    expect(localeNamespaceOf('/repo/src/locales/de/app.json', 'en')).toBeUndefined();
     expect(localeNamespaceOf('/repo/src/locales/en/unknown.json', 'en')).toBeUndefined();
     expect(localeNamespaceOf('/repo/src/pages/patients.json', 'en')).toBeUndefined();
   });
@@ -152,35 +150,35 @@ describe('dev server: a locale edit reaches the page without a restart', () => {
     const plugin = i18nBuild({ modeFlag: 'single', localeFlag: 'en-US' });
     const { result, environment } = await hotUpdate(
       plugin,
-      resolve('src/locales/en/clinic.json'),
-      [NAMESPACE_ID('clinic'), NAMESPACE_ID('patients'), RESOURCE_ID],
+      resolve('src/locales/en/app.json'),
+      [NAMESPACE_ID('app'), NAMESPACE_ID('patients'), RESOURCE_ID],
     );
     expect(result).toEqual([]);
     expect(
       environment.moduleGraph.invalidateModule.mock.calls.map(([module]) => module),
-    ).toEqual([{ id: NAMESPACE_ID('clinic') }, { id: RESOURCE_ID }]);
+    ).toEqual([{ id: NAMESPACE_ID('app') }, { id: RESOURCE_ID }]);
     expect(environment.hot.send).toHaveBeenCalledWith({ type: 'full-reload' });
   });
 
   it('leaves every other edit to Vite', async () => {
     const single = i18nBuild({ modeFlag: 'single', localeFlag: 'en-US' });
-    const loaded = [NAMESPACE_ID('clinic'), RESOURCE_ID];
+    const loaded = [NAMESPACE_ID('app'), RESOURCE_ID];
     for (const file of [
       resolve('src/pages/organization/$organizationSlug/patients/PatientsPage.tsx'),
-      resolve('src/locales/de/clinic.json'),
+      resolve('src/locales/de/app.json'),
     ]) {
       const { result, environment } = await hotUpdate(single, file, loaded);
       expect(result).toBeUndefined();
       expect(environment.hot.send).not.toHaveBeenCalled();
     }
     // Nothing built from the file yet: nothing to drop, no reload.
-    const unloaded = await hotUpdate(single, resolve('src/locales/en/clinic.json'), []);
+    const unloaded = await hotUpdate(single, resolve('src/locales/en/app.json'), []);
     expect(unloaded.result).toBeUndefined();
     expect(unloaded.environment.hot.send).not.toHaveBeenCalled();
     // Multi mode imports the JSON itself, which Vite already tracks.
     const multi = await hotUpdate(
       i18nBuild({ modeFlag: 'multi' }),
-      resolve('src/locales/en/clinic.json'),
+      resolve('src/locales/en/app.json'),
       loaded,
     );
     expect(multi.result).toBeUndefined();

@@ -2,7 +2,7 @@ import { useId, useState } from 'react';
 import { useForm, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
+import { SECTION_TONES } from '@/shared/app/app-tones.ts';
 import {
   DrawerFieldGrid,
   DrawerStepBody,

@@ -1,14 +1,14 @@
-import { createdFilterMatches } from '@/shared/api/clinic/clinic-filter-match.ts';
-import type { CreatedFilter } from '@/shared/api/clinic/clinic-list-filters.ts';
-import { offeringMatchesSearch } from '@/shared/api/clinic/offerings-api.ts';
+import { createdFilterMatches } from '@/shared/api/app/app-filter-match.ts';
+import type { CreatedFilter } from '@/shared/api/app/app-list-filters.ts';
+import { offeringMatchesSearch } from '@/shared/api/app/offerings-api.ts';
 import type {
   OfferingRecord,
   OfferRecord,
-} from '@/shared/api/clinic/offerings-contracts.ts';
+} from '@/shared/api/app/offerings-contracts.ts';
 import {
   type EffectivePrice,
   effectivePrice,
-} from '@/shared/api/clinic/offerings-pricing.ts';
+} from '@/shared/api/app/offerings-pricing.ts';
 import type {
   RoomFilterField,
   RoomFilterFields,

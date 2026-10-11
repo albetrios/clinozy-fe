@@ -1,8 +1,8 @@
 import type { FieldPath, PathValue, UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
-import { TASK_TITLE_MAX, TASK_WHY_MAX } from '@/shared/api/clinic/tasks-contracts.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
+import { TASK_TITLE_MAX, TASK_WHY_MAX } from '@/shared/api/app/tasks-contracts.ts';
 import {
   DrawerChips,
   DrawerField,

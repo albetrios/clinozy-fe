@@ -11,12 +11,12 @@ import { render } from '@testing-library/react';
 import type { ReactNode } from 'react';
 
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
-import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Role } from '@/shared/api/app/app-schema.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 import { meContextQueryKey } from '@/shared/tenancy/me-context.ts';
-import { PRESET_CODES, presetMyRoles } from '@/tests/utils/clinic-preset-codes.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { PRESET_CODES, presetMyRoles } from '@/tests/utils/app-preset-codes.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 
 import { validateTodaySearch } from '../../today.search.ts';
 

@@ -1,16 +1,16 @@
 import {
-  clinicHttpError,
+  appHttpError,
   definedFields,
   refuseUnknownIds,
-  validateClinicInput,
-} from '@/shared/api/clinic/clinic-fixture-store.ts';
+  validateAppInput,
+} from '@/shared/api/app/app-fixture-store.ts';
 import type {
   DeleteReason,
   Manufacturer,
   MedicalRep,
   MRVisit,
   Supplier,
-} from '@/shared/api/clinic/clinic-schema.ts';
+} from '@/shared/api/app/app-schema.ts';
 
 import {
   MANUFACTURER_TONES,
@@ -33,15 +33,15 @@ import {
  * the toast's Undo (D32).
  */
 
-const fixtureWorld = () => import('@/shared/api/clinic/fixtures/world.fixtures.ts');
+const fixtureWorld = () => import('@/shared/api/app/fixtures/world.fixtures.ts');
 
-type FixtureWorld = Awaited<ReturnType<typeof fixtureWorld>>['clinicFixtures'];
+type FixtureWorld = Awaited<ReturnType<typeof fixtureWorld>>['appFixtures'];
 
 /** A 422 on the name — the quick creates' one check. */
 function requireName(name: string): string {
   const trimmed = name.trim();
   if (!trimmed) {
-    throw clinicHttpError(422, 'validation', PARTNER_NAME_MESSAGE, {
+    throw appHttpError(422, 'validation', PARTNER_NAME_MESSAGE, {
       name: [PARTNER_NAME_MESSAGE],
     });
   }
@@ -62,10 +62,10 @@ function refuseUnknownMakers(world: FixtureWorld, ids: readonly string[]) {
 
 /** Create a supplier from its drawer (`S:1675`; REPLACE_WITH_API). */
 export async function createSupplier(input: SupplierInput): Promise<Supplier> {
-  const { clinicFixtures } = await fixtureWorld();
-  const fields = validateClinicInput(supplierInputSchema, input);
-  refuseUnknownMakers(clinicFixtures, fields.manufacturerIds);
-  return clinicFixtures.suppliers.create({ ...fields, isQuick: false });
+  const { appFixtures } = await fixtureWorld();
+  const fields = validateAppInput(supplierInputSchema, input);
+  refuseUnknownMakers(appFixtures, fields.manufacturerIds);
+  return appFixtures.suppliers.create({ ...fields, isQuick: false });
 }
 
 /** Save a supplier (`S:1675`; REPLACE_WITH_API): a full save drops the quick flag. */
@@ -73,14 +73,14 @@ export async function updateSupplier(
   id: string,
   patch: Partial<SupplierInput>,
 ): Promise<Supplier> {
-  const { clinicFixtures } = await fixtureWorld();
-  const saved = await clinicFixtures.suppliers.get(id);
-  const fields = validateClinicInput(supplierInputSchema, {
+  const { appFixtures } = await fixtureWorld();
+  const saved = await appFixtures.suppliers.get(id);
+  const fields = validateAppInput(supplierInputSchema, {
     ...saved,
     ...definedFields(patch),
   });
-  refuseUnknownMakers(clinicFixtures, fields.manufacturerIds);
-  return clinicFixtures.suppliers.update(id, { ...fields, isQuick: false });
+  refuseUnknownMakers(appFixtures, fields.manufacturerIds);
+  return appFixtures.suppliers.update(id, { ...fields, isQuick: false });
 }
 
 /**
@@ -91,9 +91,9 @@ export async function quickCreateSupplier(
   name: string,
   manufacturerIds: readonly string[] = [],
 ): Promise<Supplier> {
-  const { clinicFixtures } = await fixtureWorld();
-  refuseUnknownMakers(clinicFixtures, manufacturerIds);
-  return clinicFixtures.suppliers.create({
+  const { appFixtures } = await fixtureWorld();
+  refuseUnknownMakers(appFixtures, manufacturerIds);
+  return appFixtures.suppliers.create({
     name: requireName(name),
     phone: null,
     gstNumber: null,
@@ -112,21 +112,21 @@ export async function deleteSupplier(
   reason: DeleteReason,
   note: string | null,
 ): Promise<Supplier> {
-  const { clinicFixtures } = await fixtureWorld();
-  const open = clinicFixtures.purchaseOrders.snapshot(
+  const { appFixtures } = await fixtureWorld();
+  const open = appFixtures.purchaseOrders.snapshot(
     (order) =>
       order.supplierId === id && order.stage !== 'paid' && order.stage !== 'cancelled',
   );
   if (open.length > 0) {
-    throw clinicHttpError(409, 'conflict', 'Settle this supplier’s orders first');
+    throw appHttpError(409, 'conflict', 'Settle this supplier’s orders first');
   }
-  return clinicFixtures.suppliers.remove(id, reason, note);
+  return appFixtures.suppliers.remove(id, reason, note);
 }
 
 /** Restore a deleted supplier — the Undo of its toast (D32). */
 export async function restoreSupplier(id: string): Promise<Supplier> {
-  const { clinicFixtures } = await fixtureWorld();
-  return clinicFixtures.suppliers.restore(id);
+  const { appFixtures } = await fixtureWorld();
+  return appFixtures.suppliers.restore(id);
 }
 
 // ── Manufacturers ──
@@ -178,14 +178,14 @@ function refuseUnknownLinks(
 export async function createManufacturer(
   input: ManufacturerInput,
 ): Promise<Manufacturer> {
-  const { clinicFixtures } = await fixtureWorld();
-  const { supplierIds, mrIds, ...fields } = validateClinicInput(
+  const { appFixtures } = await fixtureWorld();
+  const { supplierIds, mrIds, ...fields } = validateAppInput(
     manufacturerInputSchema,
     input,
   );
-  refuseUnknownLinks(clinicFixtures, { supplierIds, mrIds });
-  const maker = await clinicFixtures.manufacturers.create({ ...fields, isQuick: false });
-  await linkManufacturer(clinicFixtures, maker.id, supplierIds, mrIds);
+  refuseUnknownLinks(appFixtures, { supplierIds, mrIds });
+  const maker = await appFixtures.manufacturers.create({ ...fields, isQuick: false });
+  await linkManufacturer(appFixtures, maker.id, supplierIds, mrIds);
   return maker;
 }
 
@@ -194,18 +194,18 @@ export async function updateManufacturer(
   id: string,
   input: ManufacturerInput,
 ): Promise<Manufacturer> {
-  const { clinicFixtures } = await fixtureWorld();
-  await clinicFixtures.manufacturers.get(id);
-  const { supplierIds, mrIds, ...fields } = validateClinicInput(
+  const { appFixtures } = await fixtureWorld();
+  await appFixtures.manufacturers.get(id);
+  const { supplierIds, mrIds, ...fields } = validateAppInput(
     manufacturerInputSchema,
     input,
   );
-  refuseUnknownLinks(clinicFixtures, { supplierIds, mrIds });
-  const maker = await clinicFixtures.manufacturers.update(id, {
+  refuseUnknownLinks(appFixtures, { supplierIds, mrIds });
+  const maker = await appFixtures.manufacturers.update(id, {
     ...fields,
     isQuick: false,
   });
-  await linkManufacturer(clinicFixtures, id, supplierIds, mrIds);
+  await linkManufacturer(appFixtures, id, supplierIds, mrIds);
   return maker;
 }
 
@@ -214,9 +214,9 @@ export async function updateManufacturer(
  * the next of the six colours.
  */
 export async function quickCreateManufacturer(name: string): Promise<Manufacturer> {
-  const { clinicFixtures } = await fixtureWorld();
-  const count = clinicFixtures.manufacturers.snapshot().length;
-  return clinicFixtures.manufacturers.create({
+  const { appFixtures } = await fixtureWorld();
+  const count = appFixtures.manufacturers.snapshot().length;
+  return appFixtures.manufacturers.create({
     name: requireName(name).toUpperCase(),
     tone: MANUFACTURER_TONES[count % MANUFACTURER_TONES.length] ?? 'lav',
     isQuick: true,
@@ -232,28 +232,28 @@ export async function deleteManufacturer(
   reason: DeleteReason,
   note: string | null,
 ): Promise<Manufacturer> {
-  const { clinicFixtures } = await fixtureWorld();
-  const used = clinicFixtures.medicines.snapshot((row) => row.manufacturerId === id);
+  const { appFixtures } = await fixtureWorld();
+  const used = appFixtures.medicines.snapshot((row) => row.manufacturerId === id);
   if (used.length > 0) {
-    throw clinicHttpError(409, 'conflict', 'Medicines still name this manufacturer');
+    throw appHttpError(409, 'conflict', 'Medicines still name this manufacturer');
   }
-  return clinicFixtures.manufacturers.remove(id, reason, note);
+  return appFixtures.manufacturers.remove(id, reason, note);
 }
 
 /** Restore a deleted manufacturer — the Undo of its toast (D32). */
 export async function restoreManufacturer(id: string): Promise<Manufacturer> {
-  const { clinicFixtures } = await fixtureWorld();
-  return clinicFixtures.manufacturers.restore(id);
+  const { appFixtures } = await fixtureWorld();
+  return appFixtures.manufacturers.restore(id);
 }
 
 // ── MRs ──
 
 /** Create an MR from their drawer (`S:1675`; REPLACE_WITH_API). */
 export async function createMedicalRep(input: MedicalRepInput): Promise<MedicalRep> {
-  const { clinicFixtures } = await fixtureWorld();
-  const fields = validateClinicInput(medicalRepInputSchema, input);
-  refuseUnknownMakers(clinicFixtures, fields.manufacturerIds);
-  return clinicFixtures.medicalReps.create(fields);
+  const { appFixtures } = await fixtureWorld();
+  const fields = validateAppInput(medicalRepInputSchema, input);
+  refuseUnknownMakers(appFixtures, fields.manufacturerIds);
+  return appFixtures.medicalReps.create(fields);
 }
 
 /** Save an MR (`S:1675`; REPLACE_WITH_API). */
@@ -261,20 +261,20 @@ export async function updateMedicalRep(
   id: string,
   patch: Partial<MedicalRepInput>,
 ): Promise<MedicalRep> {
-  const { clinicFixtures } = await fixtureWorld();
-  const saved = await clinicFixtures.medicalReps.get(id);
-  const fields = validateClinicInput(medicalRepInputSchema, {
+  const { appFixtures } = await fixtureWorld();
+  const saved = await appFixtures.medicalReps.get(id);
+  const fields = validateAppInput(medicalRepInputSchema, {
     ...saved,
     ...definedFields(patch),
   });
-  refuseUnknownMakers(clinicFixtures, fields.manufacturerIds);
-  return clinicFixtures.medicalReps.update(id, fields);
+  refuseUnknownMakers(appFixtures, fields.manufacturerIds);
+  return appFixtures.medicalReps.update(id, fields);
 }
 
 /** "Add MR “Ravi”" (`medical.md:317`; REPLACE_WITH_API): the typed name, nothing else yet. */
 export async function quickCreateMedicalRep(name: string): Promise<MedicalRep> {
-  const { clinicFixtures } = await fixtureWorld();
-  return clinicFixtures.medicalReps.create({
+  const { appFixtures } = await fixtureWorld();
+  return appFixtures.medicalReps.create({
     name: requireName(name),
     phone: null,
     nextVisitOn: null,
@@ -288,14 +288,14 @@ export async function deleteMedicalRep(
   reason: DeleteReason,
   note: string | null,
 ): Promise<MedicalRep> {
-  const { clinicFixtures } = await fixtureWorld();
-  return clinicFixtures.medicalReps.remove(id, reason, note);
+  const { appFixtures } = await fixtureWorld();
+  return appFixtures.medicalReps.remove(id, reason, note);
 }
 
 /** Restore a deleted MR — the Undo of their toast (D32). */
 export async function restoreMedicalRep(id: string): Promise<MedicalRep> {
-  const { clinicFixtures } = await fixtureWorld();
-  return clinicFixtures.medicalReps.restore(id);
+  const { appFixtures } = await fixtureWorld();
+  return appFixtures.medicalReps.restore(id);
 }
 
 /**
@@ -304,10 +304,10 @@ export async function restoreMedicalRep(id: string): Promise<MedicalRep> {
  * becomes theirs (`medical.md:251`).
  */
 export async function logMrVisit(input: MrVisitInput): Promise<MRVisit> {
-  const { clinicFixtures } = await fixtureWorld();
-  const { nextVisitOn, ...visit } = validateClinicInput(mrVisitInputSchema, input);
-  await clinicFixtures.medicalReps.get(visit.mrId);
-  const logged = await clinicFixtures.mrVisits.create(visit);
-  await clinicFixtures.medicalReps.update(visit.mrId, { nextVisitOn });
+  const { appFixtures } = await fixtureWorld();
+  const { nextVisitOn, ...visit } = validateAppInput(mrVisitInputSchema, input);
+  await appFixtures.medicalReps.get(visit.mrId);
+  const logged = await appFixtures.mrVisits.create(visit);
+  await appFixtures.medicalReps.update(visit.mrId, { nextVisitOn });
   return logged;
 }

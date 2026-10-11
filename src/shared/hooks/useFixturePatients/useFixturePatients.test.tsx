@@ -3,15 +3,15 @@ import { renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/shared/api/clinic/patients-fixture-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/patients-fixture-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchPatient: vi.fn(),
 }));
 import {
   fetchPatient,
   fixturePatientQueryKeys,
-} from '@/shared/api/clinic/patients-fixture-api.ts';
-import type { PatientRow } from '@/shared/api/clinic/patients-fixture-contracts.ts';
+} from '@/shared/api/app/patients-fixture-api.ts';
+import type { PatientRow } from '@/shared/api/app/patients-fixture-contracts.ts';
 
 import { useFixturePatient } from './useFixturePatients.ts';
 
@@ -52,7 +52,7 @@ describe('the fixture patient the fixture rooms still read', () => {
       id: 'patient-raam',
     });
     expect(fixturePatientQueryKeys.detail('patient-raam').slice(0, 2)).toEqual([
-      'clinic',
+      'app',
       'fixture-patients',
     ]);
   });

@@ -1,4 +1,4 @@
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
 import { shortPersonName } from '@/shared/components/Cells/index.ts';
 import { useTeamDirectory } from '@/shared/hooks/useTeamDirectory/index.ts';
 

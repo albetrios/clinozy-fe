@@ -50,7 +50,7 @@ const shellLoads = vi.hoisted(() => ({
   emptyHome: vi.fn(),
   login: vi.fn(),
 }));
-const clinicHomeRoute = vi.hoisted(() => vi.fn());
+const appHomeRoute = vi.hoisted(() => vi.fn());
 const notifyInfo = vi.hoisted(() => vi.fn());
 vi.mock('@/shared/layouts/AuthLayout/index.ts', () => {
   shellLoads.auth();
@@ -71,14 +71,11 @@ vi.mock('@/pages/organization/$organizationSlug/organization-slug.route.tsx', ()
   shellLoads.organization();
   return { Component: () => null };
 });
-vi.mock(
-  '@/pages/organization/$organizationSlug/components/ClinicHomeEmpty/index.ts',
-  () => {
-    shellLoads.emptyHome();
-    return { ClinicHomeEmpty: () => null };
-  },
-);
-vi.mock('@/shared/clinic/clinic-home.ts', () => ({ clinicHomeRoute }));
+vi.mock('@/pages/organization/$organizationSlug/components/AppHomeEmpty/index.ts', () => {
+  shellLoads.emptyHome();
+  return { AppHomeEmpty: () => null };
+});
+vi.mock('@/shared/app/app-home.ts', () => ({ appHomeRoute }));
 vi.mock('@/shared/notify/index.ts', async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
   notify: { info: notifyInfo },
@@ -94,7 +91,7 @@ vi.mock('@/pages/organization/$organizationSlug/invoices/invoices.route.tsx', ()
 
 vi.mock('@/core/security/gateway.ts', () => ({ gatewayFromManifest }));
 const { visitRedirectMock } = vi.hoisted(() => ({ visitRedirectMock: vi.fn() }));
-vi.mock('@/shared/clinic/visit-redirect.ts', () => ({
+vi.mock('@/shared/app/visit-redirect.ts', () => ({
   visitRedirect: visitRedirectMock,
 }));
 vi.mock('@/core/security/gate-context.ts', () => ({
@@ -473,21 +470,21 @@ describe('the org home replaces the dashboard as every landing (L-63)', () => {
   };
 
   beforeEach(() => {
-    clinicHomeRoute.mockReset();
+    appHomeRoute.mockReset();
     notifyInfo.mockClear();
     vi.mocked(requireOrgStatus).mockReset();
   });
 
   it('sends the member on to their role home', async () => {
-    clinicHomeRoute.mockResolvedValue(leads);
+    appHomeRoute.mockResolvedValue(leads);
     const thrown = await thrownBy(() => beforeLoadOf(HOME)(args));
     expect(isRedirect(thrown)).toBe(true);
     expect(thrown).toMatchObject({ options: leads });
-    expect(clinicHomeRoute).toHaveBeenCalledWith('acme');
+    expect(appHomeRoute).toHaveBeenCalledWith('acme');
   });
 
   it('renders the empty home in place when no room is open — no redirect, so no loop', async () => {
-    clinicHomeRoute.mockResolvedValue(null);
+    appHomeRoute.mockResolvedValue(null);
     expect(await thrownBy(() => beforeLoadOf(HOME)(args))).toBeUndefined();
     expect(requireOrgStatus).toHaveBeenCalledOnce();
 
@@ -510,24 +507,24 @@ describe('the org home replaces the dashboard as every landing (L-63)', () => {
       throw suspended;
     });
     expect(await thrownBy(() => beforeLoadOf(HOME)(args))).toBe(suspended);
-    expect(clinicHomeRoute).not.toHaveBeenCalled();
+    expect(appHomeRoute).not.toHaveBeenCalled();
   });
 
   it('resolves nothing on a hover preload', async () => {
     await beforeLoadOf(HOME)({ ...args, preload: true });
-    expect(clinicHomeRoute).not.toHaveBeenCalled();
+    expect(appHomeRoute).not.toHaveBeenCalled();
     expect(requireOrgStatus).not.toHaveBeenCalled();
   });
 
   it('an unknown in-org path says so and lands on the role home', async () => {
-    clinicHomeRoute.mockResolvedValue(leads);
+    appHomeRoute.mockResolvedValue(leads);
     const thrown = await thrownBy(() => beforeLoadOf(UNKNOWN)(args));
     expect(notifyInfo).toHaveBeenCalledOnce();
     expect(thrown).toMatchObject({ options: leads });
   });
 
   it('with no room open, an unknown in-org path lands on the empty home', async () => {
-    clinicHomeRoute.mockResolvedValue(null);
+    appHomeRoute.mockResolvedValue(null);
     const thrown = await thrownBy(() => beforeLoadOf(UNKNOWN)(args));
     expect(thrown).toMatchObject({
       options: {

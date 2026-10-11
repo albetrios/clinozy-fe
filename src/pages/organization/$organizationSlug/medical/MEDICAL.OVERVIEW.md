@@ -4,9 +4,9 @@ Route: `/organization/$organizationSlug/medical`. The in-house medicine store: m
 batches and expiry, sales to patients and Medical contacts, purchase orders, suppliers,
 manufacturers, MRs and the Medical slice of the payments ledger (KICKOFF §6.7; the intake’s Medical spec).
 
-Gated like every clinic room: membership (`organization:read`) and the `clinic-medical`
+Gated like every clinic room: membership (`organization:read`) and the `app-medical`
 module, then `requireOrgStatus`; in-room View / Create / Edit / Delete come from
-`useClinicAccess` (KICKOFF §3.7) — without Create the split "New" and the tabs' "New …" hide,
+`useAppAccess` (KICKOFF §3.7) — without Create the split "New" and the tabs' "New …" hide,
 without Edit the row actions that change a record go.
 
 ## The room (L-50)
@@ -25,8 +25,8 @@ renders the family's Medical toolbar and its table:
   rows on a phone, selection and the bulk bar from `md` (Export as CSV), infinite scroll over
   cursor pages, the footer count and the end line, and the blush empty state with the tab's
   "New …".
-- **Data**: medicines are the shared `@/shared/api/clinic/medicines-api.ts` (the Invoice and Rx
-  drawers read them) with their stock rules in `@/shared/api/clinic/medicine-stock.ts`; the
+- **Data**: medicines are the shared `@/shared/api/app/medicines-api.ts` (the Invoice and Rx
+  drawers read them) with their stock rules in `@/shared/api/app/medicine-stock.ts`; the
   rest is the family's `shared/medical-api.ts` over the fixture world (`REPLACE_WITH_API`).
 
 ## The drawers (L-50b)
@@ -84,7 +84,7 @@ all tabs, on the entry chunk); each tab's list read is its own `<tab>.params.ts`
 | File                       | Responsibility                                                                                                                                                                              |
 | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `medical.route.tsx`        | Route marker — exports `Component` rendering `MedicalLayout`.                                                                                                                               |
-| `medical.manifest.ts`      | Manifest — `kind: 'layout'` over the seven tabs, module `clinic-medical`, nav section `medical`.                                                                                            |
+| `medical.manifest.ts`      | Manifest — `kind: 'layout'` over the seven tabs, module `app-medical`, nav section `medical`.                                                                                               |
 | `medical.constants.ts`     | `MEDICAL_NS` / `MEDICAL_KEYS` (the `medical` namespace) and the tabs' table ids.                                                                                                            |
 | `medical.search.ts`        | The tabs' URL reader (`validateMedicalSearch`).                                                                                                                                             |
 | `medical.dialog-search.ts` | The create drawers' prefills — parsed by `useMedicalDialogRoute`; loads with the room.                                                                                                      |

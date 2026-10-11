@@ -8,18 +8,15 @@ import type {
   TaskScope,
   TaskTab,
   TaskType,
-} from '@/shared/api/clinic/tasks-contracts.ts';
+} from '@/shared/api/app/tasks-contracts.ts';
 import {
-  type ClinicCommandNavigation,
-  clinicCommandNavigation,
-} from '@/shared/clinic/clinic-command-targets.ts';
-import { type TaskTarget, taskTargetNavigation } from '@/shared/clinic/task-targets.ts';
+  type AppCommandNavigation,
+  appCommandNavigation,
+} from '@/shared/app/app-command-targets.ts';
+import { type TaskTarget, taskTargetNavigation } from '@/shared/app/task-targets.ts';
 import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
-import {
-  type ClinicAccess,
-  useClinicAccess,
-} from '@/shared/hooks/useClinicAccess/index.ts';
-import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
+import { type AppAccess, useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
+import { useAppNavigate } from '@/shared/hooks/useAppNavigate/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
 import { useNow } from '@/shared/hooks/useNow/index.ts';
@@ -67,7 +64,7 @@ interface TasksAccess {
  * The room's gates (research-tasks §7): each its clinozy-be code in force — the member's own, or
  * the previewed role's while View-as runs.
  */
-function tasksAccessOf(access: ClinicAccess): TasksAccess {
+function tasksAccessOf(access: AppAccess): TasksAccess {
   const code = (permission: string) => access.isResolved && access.canCode(permission);
   return {
     canView: code('task:read'),
@@ -180,12 +177,12 @@ function useNewTask(organizationSlug: string, close: () => void, gates: TasksAcc
  * nobody.
  */
 function useTaskContactActions(organizationSlug: string) {
-  const navigate = useClinicNavigate();
-  const access = useClinicAccess();
+  const navigate = useAppNavigate();
+  const access = useAppAccess();
   const tier = useViewportTier();
   const can = (section: 'leads' | 'appointments') =>
     access.isResolved && access.can(section, 'create');
-  const go = (navigation: ClinicCommandNavigation) => void navigate(navigation);
+  const go = (navigation: AppCommandNavigation) => void navigate(navigation);
   return (row: TaskRow): ContactCardActions => {
     const { person } = row;
     if (!person) return {};
@@ -194,7 +191,7 @@ function useTaskContactActions(organizationSlug: string) {
       onOpenPatientFile: patientId
         ? () =>
             go(
-              clinicCommandNavigation('patient', {
+              appCommandNavigation('patient', {
                 organizationSlug,
                 recordId: patientId,
                 // Activity open on tablet and desktop, closed on a phone (§6.6).
@@ -205,7 +202,7 @@ function useTaskContactActions(organizationSlug: string) {
       onNewLead: can('leads')
         ? () =>
             go({
-              ...clinicCommandNavigation('newLead', { organizationSlug }),
+              ...appCommandNavigation('newLead', { organizationSlug }),
               search: {
                 name: person.name,
                 ...(person.phone ? { phone: person.phone } : {}),
@@ -215,7 +212,7 @@ function useTaskContactActions(organizationSlug: string) {
       onNewAppointment: can('appointments')
         ? () =>
             go(
-              clinicCommandNavigation('newAppointment', {
+              appCommandNavigation('newAppointment', {
                 organizationSlug,
                 referrer: 'tasks',
                 // The booking is the person's (`who=` a contact id).
@@ -233,7 +230,7 @@ function useTaskContactActions(organizationSlug: string) {
  * next for <first>?" over the list.
  */
 function useTaskDrawer(organizationSlug: string, close: () => void) {
-  const navigate = useClinicNavigate();
+  const navigate = useAppNavigate();
   const assignees = useTaskAssignees();
   const [whatsNext, setWhatsNext] = useState<WhatsNextFor | null>(null);
   const openTarget = (target: TaskTarget) =>
@@ -267,7 +264,7 @@ export function TasksPage() {
   const { organizationSlug = '' } = useParams({ strict: false });
   const search = validateTasksSearch(useSearch({ strict: false }));
   const { patchSearch } = useDataTableUrlState(true);
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const gates = tasksAccessOf(access);
   const { t } = useTranslation(TASKS_NS);
   const now = useNow();

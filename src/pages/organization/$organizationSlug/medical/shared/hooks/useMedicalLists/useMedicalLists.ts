@@ -1,4 +1,4 @@
-import type { CursorPage } from '@/shared/api/clinic/clinic-fixture-store.ts';
+import type { CursorPage } from '@/shared/api/app/app-fixture-store.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import { useCursorList } from '@/shared/hooks/useCursorList/index.ts';
 

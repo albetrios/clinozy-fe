@@ -1,6 +1,6 @@
 import type { TFunction } from 'i18next';
 
-import type { CheckinFollowed, Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { CheckinFollowed, Tone } from '@/shared/api/app/app-schema.ts';
 
 /*
  * The feedback words and tones the file's parts share — the rail, the

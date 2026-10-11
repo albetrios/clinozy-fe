@@ -8,10 +8,10 @@ import {
   cancelReasonToContract,
   isAppointmentSlotLocked,
   restoreGuard,
-} from '@/shared/api/clinic/appointment-status.ts';
-import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
-import { contactQueryKeys, fetchContact } from '@/shared/api/clinic/contacts-api.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+} from '@/shared/api/app/appointment-status.ts';
+import type { AppointmentRow } from '@/shared/api/app/appointments-contracts.ts';
+import { contactQueryKeys, fetchContact } from '@/shared/api/app/contacts-api.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
 import {
   CONTACT_EDITOR_KEYS,
@@ -53,7 +53,7 @@ import { type WhoEdit, WhoSection } from './WhoSection.tsx';
 
 const K = APPOINTMENT_FORM_KEYS;
 const IDS = APPOINTMENT_FORM_TEST_IDS;
-const APPT = CLINIC_KEYS.appointments;
+const APPT = APP_KEYS.appointments;
 
 /** The form's open and collapsed parts, and the stacked dialogs it raises. */
 export interface AppointmentFormUi {
@@ -155,7 +155,7 @@ export function StatusBlock({
   ui: AppointmentFormUi;
   onCopy?: () => void;
 }) {
-  const { t } = useTranslation([APPOINTMENT_FORM_NS, CLINIC_NS]);
+  const { t } = useTranslation([APPOINTMENT_FORM_NS, APP_NS]);
   const slotLabel = useAppointmentSlotLabel();
   const restore = useReinstateAppointment();
   const { draft, canEdit } = state;
@@ -175,9 +175,7 @@ export function StatusBlock({
         state.change({ kind: 'status', status });
         if (isAppointmentSlotLocked(status)) ui.setDetailsOpen(false);
       }}
-      onNeedsPatient={() =>
-        notify.warning(t(APPT.guards.needsPatient, { ns: CLINIC_NS }))
-      }
+      onNeedsPatient={() => notify.warning(t(APPT.guards.needsPatient, { ns: APP_NS }))}
       cancelReason={cancelReasonText(t, row)}
       onRestore={canRestore ? () => restore.mutate(row) : undefined}
       restoring={restore.isPending}
@@ -274,7 +272,7 @@ export function CancelVisitConfirm({
   open: boolean;
   onClose: () => void;
 }) {
-  const { t } = useTranslation(CLINIC_NS);
+  const { t } = useTranslation(APP_NS);
   const cancel = useCancelAppointment();
   return (
     <ConfirmDialog

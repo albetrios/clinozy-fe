@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { TaskType } from '@/shared/api/clinic/tasks-contracts.ts';
+import type { TaskType } from '@/shared/api/app/tasks-contracts.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 

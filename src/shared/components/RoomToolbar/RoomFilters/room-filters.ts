@@ -3,7 +3,7 @@ import {
   readCreatedFilter,
   readFollowUpFilter,
   toDateRange,
-} from '@/shared/api/clinic/clinic-list-filters.ts';
+} from '@/shared/api/app/app-list-filters.ts';
 
 /**
  * The Filters popover's model of a room's filters (KICKOFF §3.5): which URL

@@ -2,7 +2,7 @@ import { act, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type { VisitRecord } from '@/shared/api/clinic/visits-contracts.ts';
+import type { VisitRecord } from '@/shared/api/app/visits-contracts.ts';
 import { patientFile, TEST_PATIENT_ID } from '@/tests/utils/patient-doubles.ts';
 
 import {

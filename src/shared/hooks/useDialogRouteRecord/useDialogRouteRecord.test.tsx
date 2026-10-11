@@ -3,7 +3,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { clinicHttpError } from '@/shared/api/clinic/clinic-fixture-store.ts';
+import { appHttpError } from '@/shared/api/app/app-fixture-store.ts';
 
 import { useDialogRouteRecord } from './useDialogRouteRecord.ts';
 
@@ -19,11 +19,11 @@ const attempts = { down: 0 };
 async function fetchRecord(id: string) {
   if (id === 'down') {
     attempts.down += 1;
-    if (attempts.down <= 3) throw clinicHttpError(503, 'unavailable', 'Try again');
+    if (attempts.down <= 3) throw appHttpError(503, 'unavailable', 'Try again');
     return { id, name: 'Back' };
   }
   const record = RECORDS[id];
-  if (!record) throw clinicHttpError(404, 'not_found', 'Lead not found');
+  if (!record) throw appHttpError(404, 'not_found', 'Lead not found');
   return record;
 }
 

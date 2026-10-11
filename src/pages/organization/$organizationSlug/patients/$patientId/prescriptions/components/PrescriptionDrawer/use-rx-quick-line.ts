@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import type {
   RxCatalog,
   RxCatalogMedicine,
-} from '@/shared/api/clinic/prescriptions-contracts.ts';
+} from '@/shared/api/app/prescriptions-contracts.ts';
 import {
   nameNumbers,
   type QuickLineItem,

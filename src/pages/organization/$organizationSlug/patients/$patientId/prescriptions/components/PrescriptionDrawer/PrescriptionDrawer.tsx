@@ -4,20 +4,20 @@ import { useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { isolateValues } from '@/lib/bidi-isolate.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import { localDateOf } from '@/shared/api/clinic/clinic-time.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
+import { localDateOf } from '@/shared/api/app/app-time.ts';
 import {
   fetchPrescription,
   prescriptionQueryKeys,
-} from '@/shared/api/clinic/prescriptions-api.ts';
+} from '@/shared/api/app/prescriptions-api.ts';
 import type {
   PrescriptionKit,
   PrescriptionRecord,
   PrescriptionStatus,
   RxCatalog,
-} from '@/shared/api/clinic/prescriptions-contracts.ts';
-import { visitFlowReferrer } from '@/shared/clinic/clinic-referrer.ts';
+} from '@/shared/api/app/prescriptions-contracts.ts';
+import { visitFlowReferrer } from '@/shared/app/app-referrer.ts';
 import {
   type DrawerStep,
   drawerStepSummary,

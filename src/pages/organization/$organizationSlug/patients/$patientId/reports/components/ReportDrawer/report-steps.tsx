@@ -2,8 +2,8 @@ import { useId } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { REPORT_TYPE_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
-import { REPORT_LIMITS } from '@/shared/api/clinic/patient-reports-contracts.ts';
+import { REPORT_TYPE_VALUES } from '@/shared/api/app/app-schema.ts';
+import { REPORT_LIMITS } from '@/shared/api/app/patient-reports-contracts.ts';
 import { UPLOAD_MAX_BYTES } from '@/shared/api/uploads-api.ts';
 import {
   DrawerChips,

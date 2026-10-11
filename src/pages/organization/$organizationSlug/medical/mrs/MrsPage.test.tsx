@@ -2,7 +2,7 @@ import { screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import { resetAppFixtures } from '@/shared/api/app/fixtures/world.fixtures.ts';
 
 import {
   renderMedicalRoutes,
@@ -10,10 +10,10 @@ import {
 } from '../__tests__/integration/medical-test-router.tsx';
 import { MrsPage } from './MrsPage.tsx';
 
-beforeEach(() => resetClinicFixtures());
+beforeEach(() => resetAppFixtures());
 afterEach(() => {
   resetMedicalRoutes();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 
 describe('MrsPage', () => {

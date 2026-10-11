@@ -6,7 +6,7 @@
  * by hand. The dialog-route reader's stand-in is `useTasksDialogRouteStub`
  * (`tasks-test-router.tsx`).
  */
-import type { TaskRecord } from '@/shared/api/clinic/tasks-contracts.ts';
+import type { TaskRecord } from '@/shared/api/app/tasks-contracts.ts';
 
 import { CREATED_TASK } from './tasks-test-data.ts';
 

@@ -1,17 +1,17 @@
 import { type ReactNode, useMemo } from 'react';
 
+import { appToday } from '@/shared/api/app/app-time.ts';
 import {
   type AppointmentMove,
   NEXT_ACTION_MOVES,
   nextAction,
-} from '@/shared/api/clinic/appointment-status.ts';
-import type { AppointmentMoveRoute } from '@/shared/api/clinic/appointments-contracts.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+} from '@/shared/api/app/appointment-status.ts';
+import type { AppointmentMoveRoute } from '@/shared/api/app/appointments-contracts.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import {
   useCancelAppointment,
   useMoveAppointment,
 } from '@/shared/hooks/useAppointments/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 
 import { useAppointmentsNavigation } from '../../hooks/useAppointmentsNavigation/index.ts';
 import {
@@ -39,7 +39,7 @@ const MOVE_ROUTES: Readonly<
  * with its note there (L-64) — and its toast's Undo reinstates the booking.
  */
 export function AppointmentActionsProvider({ children }: { children: ReactNode }) {
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const { openAppointment, openCreate } = useAppointmentsNavigation();
   const { mutate: moveWrite } = useMoveAppointment();
   const { mutate: cancelWrite } = useCancelAppointment({ announce: 'status' });
@@ -64,7 +64,7 @@ export function AppointmentActionsProvider({ children }: { children: ReactNode }
         cancelWrite({ appointment, cancel: { reason, note: text } });
       },
       runNext: (appointment) => {
-        const step = nextAction(appointment, clinicToday());
+        const step = nextAction(appointment, appToday());
         if (step === 'rebook') {
           openCreate({ copyOf: appointment.id });
           return;

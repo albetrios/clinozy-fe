@@ -38,7 +38,7 @@ describe('useUsersRoomOpen (D17)', () => {
   });
 
   it('is shut where the deployment turns the room off (production until its API lands, D8)', () => {
-    disabled.modules.add('clinic-users');
+    disabled.modules.add('app-users');
     hold(['membership:read', 'role:read']);
     expect(renderHook(() => useUsersRoomOpen()).result.current).toBe(false);
   });

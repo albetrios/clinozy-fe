@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import type {
   RxCatalog,
   RxCatalogMedicine,
-} from '@/shared/api/clinic/prescriptions-contracts.ts';
+} from '@/shared/api/app/prescriptions-contracts.ts';
 import type { PickerOption } from '@/shared/components/Picker/index.ts';
 import { QuickLine } from '@/shared/components/QuickLine/index.ts';
 import {

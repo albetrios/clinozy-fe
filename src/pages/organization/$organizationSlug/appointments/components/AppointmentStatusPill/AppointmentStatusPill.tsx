@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
 
-import type { AppointmentStatus } from '@/shared/api/clinic/clinic-schema.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { APPOINTMENT_STATUS_TONES } from '@/shared/clinic/clinic-tones.ts';
+import type { AppointmentStatus } from '@/shared/api/app/app-schema.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { APPOINTMENT_STATUS_TONES } from '@/shared/app/app-tones.ts';
 import { TonePill } from '@/shared/components/Cells/index.ts';
 
 /** Props for {@link AppointmentStatusPill}. */
@@ -23,7 +23,7 @@ export function AppointmentStatusPill({
   size = 'md',
   className,
 }: AppointmentStatusPillProps) {
-  const { t } = useTranslation(CLINIC_NS);
+  const { t } = useTranslation(APP_NS);
   return (
     <TonePill
       tone={APPOINTMENT_STATUS_TONES[status]}
@@ -31,7 +31,7 @@ export function AppointmentStatusPill({
       size={size}
       className={className}
     >
-      {t(CLINIC_KEYS.appointments.statuses[status])}
+      {t(APP_KEYS.appointments.statuses[status])}
     </TonePill>
   );
 }

@@ -1,7 +1,7 @@
 import type { QueryKey } from '@tanstack/react-query';
 import type { ReactElement, ReactNode } from 'react';
 
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
 import type { ListPage } from '@/shared/api/fetch-list-page.ts';
 import type { AppIcon } from '@/shared/icons/index.ts';
 

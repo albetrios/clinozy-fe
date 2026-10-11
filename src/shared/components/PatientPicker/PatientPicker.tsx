@@ -4,7 +4,7 @@ import {
   patientPickerQueryKeys,
   type PatientPickRow,
   searchPatientPicker,
-} from '@/shared/api/clinic/patient-search-api.ts';
+} from '@/shared/api/app/patient-search-api.ts';
 import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
 import { useInvoiceTotals } from '@/shared/hooks/useInvoices/index.ts';
 import { usePatient } from '@/shared/hooks/usePatients/index.ts';

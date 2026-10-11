@@ -1,7 +1,7 @@
 /**
  * The Offerings tab's test catalogue, as clinozy-be would answer it — rupees, public ids, the
  * server's order (offerings newest first; offers live → scheduled → paused → ended) — and the
- * api doubles its suites mock `@/shared/api/clinic/offerings-api.ts` and the member's branches
+ * api doubles its suites mock `@/shared/api/app/offerings-api.ts` and the member's branches
  * with. Built on the room's shared doubles (`@/tests/utils/offering-doubles.ts`).
  *
  * What the rows come to with no single branch picked:
@@ -16,11 +16,11 @@
  */
 import { vi } from 'vitest';
 
-import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
+import type { BranchOption } from '@/shared/api/app/branches-api.ts';
 import type {
   OfferingRecord,
   OfferRecord,
-} from '@/shared/api/clinic/offerings-contracts.ts';
+} from '@/shared/api/app/offerings-contracts.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import {
   offeringRecord,
@@ -219,7 +219,7 @@ export function seededOfferingsTabWorld(): OfferingsTabWorld {
 }
 
 /**
- * The reads and writes of `@/shared/api/clinic/offerings-api.ts` the tab calls, over an
+ * The reads and writes of `@/shared/api/app/offerings-api.ts` the tab calls, over an
  * {@link OfferingsTabWorld}: a later read shows a write; an unknown id is a 404.
  */
 export function offeringsApiDouble(world: OfferingsTabWorld) {

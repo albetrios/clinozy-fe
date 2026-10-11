@@ -4,9 +4,9 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { isolateText } from '@/lib/bidi-isolate.ts';
-import { purchaseLineAmount } from '@/shared/api/clinic/clinic-money.ts';
-import type { PurchaseItem } from '@/shared/api/clinic/clinic-schema.ts';
-import { SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
+import { purchaseLineAmount } from '@/shared/api/app/app-money.ts';
+import type { PurchaseItem } from '@/shared/api/app/app-schema.ts';
+import { SECTION_TONES } from '@/shared/app/app-tones.ts';
 import {
   DrawerField,
   DrawerFieldGrid,

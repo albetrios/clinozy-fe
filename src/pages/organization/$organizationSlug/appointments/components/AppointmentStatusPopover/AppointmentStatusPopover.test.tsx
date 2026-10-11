@@ -3,14 +3,12 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type * as AppointmentsApiModule from '@/shared/api/clinic/appointments-api.ts';
-import {
-  cancelAppointment,
-  moveAppointment,
-} from '@/shared/api/clinic/appointments-api.ts';
-import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import type * as AppointmentsApiModule from '@/shared/api/app/appointments-api.ts';
+import { cancelAppointment, moveAppointment } from '@/shared/api/app/appointments-api.ts';
+import type { AppointmentRow } from '@/shared/api/app/appointments-contracts.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { notify } from '@/shared/notify/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import {
   APPOINTMENT_NOW,
   APPOINTMENT_TODAY,
@@ -18,7 +16,6 @@ import {
   appointmentRow,
 } from '@/tests/utils/appointment-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import {
   type AppointmentsWorld,
@@ -26,7 +23,7 @@ import {
 } from '../../__tests__/integration/appointments-test-data.ts';
 import {
   APPOINTMENTS_PAGE,
-  grantClinicAccess,
+  grantAppAccess,
   renderInAppointments,
 } from '../../__tests__/integration/appointments-test-router.tsx';
 import {
@@ -41,7 +38,7 @@ vi.mock('@/shared/notify/index.ts', () => ({
 }));
 
 const world = vi.hoisted(() => ({}) as AppointmentsWorld);
-vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/appointments-api.ts', async (importOriginal) => {
   const { appointmentsApiDouble } =
     await import('../../__tests__/integration/appointments-test-data.ts');
   return {
@@ -60,7 +57,7 @@ const base = appointmentRow();
 function Harness({ appointment }: { appointment: AppointmentRow }) {
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<AppointmentStatusView>('moves');
-  const access = useClinicAccess();
+  const access = useAppAccess();
   if (!access.isResolved) return null;
   return (
     <AppointmentStatusPopover
@@ -97,7 +94,7 @@ beforeEach(() => {
   vi.resetAllMocks();
   Object.assign(world, seededAppointmentsWorld());
   signInTestMember();
-  grantClinicAccess('owner');
+  grantAppAccess('owner');
 });
 afterEach(() => vi.useRealTimers());
 

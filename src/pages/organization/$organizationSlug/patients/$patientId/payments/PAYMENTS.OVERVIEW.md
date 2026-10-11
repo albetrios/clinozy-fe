@@ -9,7 +9,7 @@ Reads: the ledger's entries for her person — `GET /app/payments?patient_id=` (
 
 A row opens nothing. Its actions are the ledger's (`useLedgerRowActions`), by the entry's public id: on an open day Edit (`payment:update`; a receipt — a refund's and a reversal's money is fixed) opens the entry's drawer over the file (`/payments/$paymentId/edit?from=…`, the `paymentEdit` cross-room drawer, A-P1) and Delete (`payment:delete`, `PaymentDeleteConfirm`, Undo); on a closed day Reverse (`payment:delete`, `PaymentReverseConfirm`; `409 already_reversed` / `day_open` / `day_closed` in the ledger's words), never on a reversal or an entry already reversed; a pending credit's entry offers nothing. The section's chunk loads the Payments room's copy with it.
 
-Gated by the file layout (membership, the `clinic-patients` module, the org status); in-room
+Gated by the file layout (membership, the `app-patients` module, the org status); in-room
 access is the member's `payment:*` codes (`usePaymentAccess`). Registered in `src/app/routes/routeTree.tsx` through the file's
 one lazy module (`../patient-id.sections.ts`).
 
@@ -18,7 +18,7 @@ one lazy module (`../patient-id.sections.ts`).
 | File                             | Responsibility                                                                                                  |
 | -------------------------------- | --------------------------------------------------------------------------------------------------------------- |
 | `payments.route.tsx`             | Route marker — exports `Component` rendering `PatientPaymentsPage`.                                             |
-| `payments.manifest.ts`           | Manifest — `kind: 'leaf'`, permission `organization:read`, module `clinic-patients`, title "Payments".          |
+| `payments.manifest.ts`           | Manifest — `kind: 'leaf'`, permission `organization:read`, module `app-patients`, title "Payments".             |
 | `PatientPaymentsPage.tsx`        | The section: its Columns chooser, the table of her entries, Retry, the ledger's row actions and their confirms. |
 | `hooks/usePatientPaymentsTable/` | The columns (760px): When the primary, Amount the phone key (rupees), the recorder's pill folding to nothing.   |
 

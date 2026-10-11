@@ -11,13 +11,13 @@ import { render } from '@testing-library/react';
 import type { ReactNode } from 'react';
 
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
-import { PRESET_ROLE_NAMES } from '@/shared/api/clinic/access-contracts.ts';
-import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
+import { PRESET_ROLE_NAMES } from '@/shared/api/app/access-contracts.ts';
+import type { Role } from '@/shared/api/app/app-schema.ts';
 import type { Member, RoleSummary } from '@/shared/api/organization-contracts.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
-import { PRESET_CODES, previewPreset } from '@/tests/utils/clinic-preset-codes.ts';
+import { PRESET_CODES, previewPreset } from '@/tests/utils/app-preset-codes.ts';
 
 import { validateBranchesSearch } from '../../branches/branches.search.ts';
 import { validateUserEditSearch } from '../../users.dialog-search.ts';

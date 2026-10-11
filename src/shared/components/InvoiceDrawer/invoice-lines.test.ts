@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   medicineForm,
   type MedicineRecord,
-} from '@/shared/api/clinic/medicines-contracts.ts';
+} from '@/shared/api/app/medicines-contracts.ts';
 import {
   INVOICE_TEST_OFFERINGS,
   INVOICE_TEST_OFFERS,

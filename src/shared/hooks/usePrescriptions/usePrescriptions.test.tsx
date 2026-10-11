@@ -4,8 +4,8 @@ import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { OrganizationPermission } from '@/core/rbac/policies.ts';
-import type { PrescriptionItem } from '@/shared/api/clinic/clinic-schema.ts';
-import type * as PrescriptionsApiModule from '@/shared/api/clinic/prescriptions-api.ts';
+import type { PrescriptionItem } from '@/shared/api/app/app-schema.ts';
+import type * as PrescriptionsApiModule from '@/shared/api/app/prescriptions-api.ts';
 import {
   approvePrescription,
   createPrescription,
@@ -17,17 +17,17 @@ import {
   prescriptionQueryKeys,
   restorePrescription,
   updatePrescription,
-} from '@/shared/api/clinic/prescriptions-api.ts';
+} from '@/shared/api/app/prescriptions-api.ts';
 import type {
   PrescriptionFields,
   PrescriptionRecord,
-} from '@/shared/api/clinic/prescriptions-contracts.ts';
-import { todayQueryKeys } from '@/shared/api/clinic/today-api.ts';
+} from '@/shared/api/app/prescriptions-contracts.ts';
+import { todayQueryKeys } from '@/shared/api/app/today-api.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
-import { previewPreset } from '@/tests/utils/clinic-preset-codes.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { previewPreset } from '@/tests/utils/app-preset-codes.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 
 import {
   useCreatePrescription,
@@ -42,7 +42,7 @@ import {
   useUpdatePrescription,
 } from './usePrescriptions.ts';
 
-vi.mock('@/shared/api/clinic/prescriptions-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/prescriptions-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof PrescriptionsApiModule>()),
   listPatientPrescriptions: vi.fn(),
   createPrescription: vi.fn(),

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { ApiData } from '@/core/http/api.ts';
-import { STOCK_CATEGORY_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
+import { STOCK_CATEGORY_VALUES } from '@/shared/api/app/app-schema.ts';
 
 import {
   STOCK_CATEGORIES,

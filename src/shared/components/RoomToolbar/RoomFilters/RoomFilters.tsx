@@ -15,10 +15,10 @@ import {
   FOLLOW_UP_PRESETS,
   type FollowUpPreset,
   toDateRange,
-} from '@/shared/api/clinic/clinic-list-filters.ts';
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import { toneForLabel } from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/api/app/app-list-filters.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
+import { toneForLabel } from '@/shared/app/app-tones.ts';
 import {
   CountBadge,
   PersonAvatar,
@@ -198,7 +198,7 @@ function FilterSection({
 }
 
 /**
- * Each date section's chips in order — its presets (`clinic-list-filters.ts`)
+ * Each date section's chips in order — its presets (`app-list-filters.ts`)
  * — and their tones, then "Custom range" (H:3859); "Any" is stone.
  */
 const DATE_CHIPS = {
@@ -357,7 +357,7 @@ export function RoomDateFilter({
               return;
             }
             // A range starts on today at each end it does not have yet.
-            const today = clinicToday();
+            const today = appToday();
             set(toDateRange(ends?.from ?? today, ends?.to ?? today));
           }}
           trailing={rangeEnds}

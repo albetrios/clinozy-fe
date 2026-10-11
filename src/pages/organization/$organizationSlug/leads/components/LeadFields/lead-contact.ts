@@ -1,7 +1,7 @@
-import type { LeadSource } from '@/shared/api/clinic/clinic-schema.ts';
-import type { Contact } from '@/shared/api/clinic/contacts-contracts.ts';
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
-import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
+import type { LeadSource } from '@/shared/api/app/app-schema.ts';
+import type { Contact } from '@/shared/api/app/contacts-contracts.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
+import type { LeadRecord } from '@/shared/api/app/leads-contracts.ts';
 import type {
   ContactCardData,
   ContactReach,

@@ -1,4 +1,4 @@
-import { ALL_BRANCHES } from '@/shared/api/clinic/clinic-list-filters.ts';
+import { ALL_BRANCHES } from '@/shared/api/app/app-list-filters.ts';
 import type { RoomFilterField } from '@/shared/components/RoomToolbar/index.ts';
 
 /*

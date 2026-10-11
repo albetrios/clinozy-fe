@@ -3,7 +3,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/shared/api/clinic/invoices-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/invoices-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchInvoice: vi.fn(),
   listInvoices: vi.fn(),
@@ -16,7 +16,7 @@ vi.mock('@/shared/api/clinic/invoices-api.ts', async (importOriginal) => ({
   deleteInvoice: vi.fn(),
   restoreInvoice: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/invoices-fixture-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/invoices-fixture-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   createSale: vi.fn(),
   fetchPrescriptionPreset: vi.fn(),
@@ -24,7 +24,7 @@ vi.mock('@/shared/api/clinic/invoices-fixture-api.ts', async (importOriginal) =>
 vi.mock('@/shared/notify/index.ts', () => ({
   notify: { success: vi.fn(), error: vi.fn(), info: vi.fn(), undo: vi.fn() },
 }));
-import { appointmentQueryKeys } from '@/shared/api/clinic/appointments-api.ts';
+import { appointmentQueryKeys } from '@/shared/api/app/appointments-api.ts';
 import {
   createInvoice,
   deleteInvoice,
@@ -37,21 +37,21 @@ import {
   previewInvoiceChange,
   restoreInvoice,
   updateInvoice,
-} from '@/shared/api/clinic/invoices-api.ts';
+} from '@/shared/api/app/invoices-api.ts';
 import type {
   InvoiceDetail,
   InvoiceInput,
   InvoicePreview,
-} from '@/shared/api/clinic/invoices-contracts.ts';
+} from '@/shared/api/app/invoices-contracts.ts';
 import {
   createSale,
   fetchPrescriptionPreset,
   fixtureInvoiceQueryKeys,
-} from '@/shared/api/clinic/invoices-fixture-api.ts';
-import { paymentQueryKeys } from '@/shared/api/clinic/payments-api.ts';
-import { fixtureLedgerQueryKeys } from '@/shared/api/clinic/payments-fixture-api.ts';
+} from '@/shared/api/app/invoices-fixture-api.ts';
+import { paymentQueryKeys } from '@/shared/api/app/payments-api.ts';
+import { fixtureLedgerQueryKeys } from '@/shared/api/app/payments-fixture-api.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import {
   invoiceRecord,
   TEST_INVOICE_ID,

@@ -2,8 +2,8 @@
 
 Route: `/organization/$organizationSlug/appointments`. Bookings by doctor, room and machine (KICKOFF §6.4).
 
-Gated like every clinic room: membership (`organization:read`) and the `clinic-appointments`
-module, then `requireOrgStatus`; in-room View / Create / Edit come from `useClinicAccess`
+Gated like every clinic room: membership (`organization:read`) and the `app-appointments`
+module, then `requireOrgStatus`; in-room View / Create / Edit come from `useAppAccess`
 (KICKOFF §3.7): "New appointment" and slot clicks hide without Create, status moves and saves
 need Edit, Therapists read only (Q-A16).
 
@@ -29,8 +29,8 @@ follow-up on bookings and sorts by date and start (api-integration §5.3, G3). T
 `who` is a contact id and `copyOf` a booking id (public ids). The page, `create/` and
 `$appointmentId/` share one search string, so a booking from an empty Day slot keeps the same day
 behind it. The data — reads, writes, the status machine — lives in the shared clinic layer on
-clinozy-be (`@/shared/hooks/useAppointments/`, `@/shared/api/clinic/appointments-api.ts`,
-`@/shared/api/clinic/appointment-status.ts`); every read is within the header's branches.
+clinozy-be (`@/shared/hooks/useAppointments/`, `@/shared/api/app/appointments-api.ts`,
+`@/shared/api/app/appointment-status.ts`); every read is within the header's branches.
 
 The views (L-36b): the toolbar on the shared `RoomToolbar` — the view tabs, on a calendar the
 period controls (`period`), the search, the room's own Filters popover (`filtersSlot`: a month
@@ -62,7 +62,7 @@ split overlapping bookings into lanes, show the card on hover and open the drawe
 | File                                                        | Responsibility                                                                                                                                                                                             |
 | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `appointments.route.tsx`                                    | Route marker — exports `Component` rendering `AppointmentsPage`.                                                                                                                                           |
-| `appointments.manifest.ts`                                  | Manifest — `kind: 'layout'`, children `create` and `$appointmentId`; permission `organization:read`, module `clinic-appointments`, nav section.                                                            |
+| `appointments.manifest.ts`                                  | Manifest — `kind: 'layout'`, children `create` and `$appointmentId`; permission `organization:read`, module `app-appointments`, nav section.                                                               |
 | `appointments.constants.ts`                                 | `APPOINTMENTS_NS` / `APPOINTMENTS_KEYS` (the `appointments` namespace) and `APPOINTMENTS_TEST_IDS`.                                                                                                        |
 | `appointments.search.ts`                                    | `validateSearch` for the page (shared readers, no zod — the route tree is the entry chunk).                                                                                                                |
 | `appointments.dialog-search.ts`                             | Both dialog routes' params (the booking prefill, the drawer's `mode`) — the routes keep the raw values, `useAppointmentsDialogRoute` parses them; loads with the room.                                     |
@@ -90,7 +90,7 @@ split overlapping bookings into lanes, show the card on hover and open the drawe
 | `components/AppointmentsWeek/`                              | The Week: day headers (load bar, double-booking dot, open the day) over seven columns; 1,102px wide at least.                                                                                              |
 | `components/AppointmentsMonth/`                             | The Month board: cells with fitted chips and "+<n> more" → `MonthDayPopover`; a cell opens its day.                                                                                                        |
 | `create/`, `$appointmentId/`                                | The dialog routes (four files each; their pages render nothing).                                                                                                                                           |
-| `__tests__/integration/appointments-test-router.tsx`        | The family's routes for tests — the page, both dialog routes, a room to close back to; `grantClinicAccess`, `renderAppointmentsRoutes`.                                                                    |
+| `__tests__/integration/appointments-test-router.tsx`        | The family's routes for tests — the page, both dialog routes, a room to close back to; `grantAppAccess`, `renderAppointmentsRoutes`.                                                                       |
 | `__tests__/integration/appointments-test-data.ts`           | A `vi.hoisted` world of bookings and the doubles of the appointments API and the team directory the room's suites mock with (cursor pages, ranges, day counts, writes, a hold that keeps a write pending). |
 | `__tests__/integration/appointment-form-stand-in.tsx`       | A stand-in for the shared `AppointmentForm` showing its props, with Save, Close, Copy and Open — the room's suites test the room, the form's own suites the form.                                          |
 | `__tests__/integration/appointments-dialog-routes.test.tsx` | Deep links, the not-found toast, the prefill kept in the URL, axe behind a dialog route.                                                                                                                   |

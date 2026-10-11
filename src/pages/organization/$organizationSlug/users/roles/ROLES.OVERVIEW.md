@@ -6,7 +6,7 @@ route tree rather than under it, because the Team route renders the Team; its fo
 under the room, as the URL does. The URL's `role` is the role on screen, by its clinozy-be id
 (`rol_…`) — Front desk when absent (H:5179).
 
-Gated on `role:read` and the `clinic-users` module, then `requireOrgStatus`. A role is its
+Gated on `role:read` and the `app-users` module, then `requireOrgStatus`. A role is its
 clinozy-be permission codes and nothing else: the matrix has one row per resource (Leads,
 Contacts, Contact activity, Appointments, Patients, Prescriptions, Treatments, Reviews,
 Medicines, Stock, Payments, Tasks, Offerings, Users, Roles, Branches) whose View · Create · Edit ·
@@ -27,7 +27,7 @@ Settings › Roles links here when the Users room is open to the member (D17, L-
 Settings' role dialog did lives on the role page too.
 
 "Preview as <role>" starts View-as for any role but Owner and Admin, a custom role included (by its
-clinozy-be id): `useUIStore.previewRole` narrows `useClinicAccess` everywhere, the shell's pill
+clinozy-be id): `useUIStore.previewRole` narrows `useAppAccess` everywhere, the shell's pill
 names the role, and a role that can't view Users is taken to its first room by the org layout
 (`useRoomLanding`, Q-U11). Session-only — a reload ends it.
 
@@ -40,7 +40,7 @@ drawer opened from here (`?from=roles`).
 | File                | Responsibility                                                                           |
 | ------------------- | ---------------------------------------------------------------------------------------- |
 | `roles.route.tsx`   | Route marker — exports `Component` rendering `RolesPage`.                                |
-| `roles.manifest.ts` | Manifest — `kind: 'leaf'`, permission `role:read`, module `clinic-users`.                |
+| `roles.manifest.ts` | Manifest — `kind: 'leaf'`, permission `role:read`, module `app-users`.                   |
 | `RolesPage.tsx`     | Reads `role` (`validateRolesSearch`) and renders `RolesAccess`. Owns `users-roles-page`. |
 
 ## Test ids

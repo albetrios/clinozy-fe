@@ -4,8 +4,8 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import i18n from '@/lib/i18n/i18n.ts';
-import { fetchPayment } from '@/shared/api/clinic/payments-api.ts';
-import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
+import { fetchPayment } from '@/shared/api/app/payments-api.ts';
+import type { LedgerRow } from '@/shared/api/app/payments-contracts.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import {
   type CrossRoomDialog,
@@ -29,7 +29,7 @@ const { notifyMock } = vi.hoisted(() => ({
   notifyMock: { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() },
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
-vi.mock('@/shared/api/clinic/payments-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/payments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchPayment: vi.fn(),
 }));

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
+import { formatAppPhone } from '@/shared/app/app-phone.ts';
 import { personInitials } from '@/shared/components/Cells/index.ts';
 import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
 
@@ -63,7 +63,7 @@ export function StockVendorPicker({
   >(catalogue, added).map((vendor) => ({
     key: vendor.id,
     label: vendor.name,
-    sub: vendor.phone ? formatClinicPhone(vendor.phone) : undefined,
+    sub: vendor.phone ? formatAppPhone(vendor.phone) : undefined,
     tone: 'sky',
     leading: { kind: 'avatar', initials: personInitials(vendor.name) },
   }));

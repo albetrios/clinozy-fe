@@ -3,13 +3,13 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type * as OfferingsApiModule from '@/shared/api/clinic/offerings-api.ts';
+import type * as OfferingsApiModule from '@/shared/api/app/offerings-api.ts';
 import {
   deleteOffer,
   fetchAllOffers,
   restoreOffer,
   setOfferActive,
-} from '@/shared/api/clinic/offerings-api.ts';
+} from '@/shared/api/app/offerings-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 import { offerRecord } from '@/tests/utils/offering-doubles.ts';
@@ -56,7 +56,7 @@ vi.mock('@/lib/csv.ts', async (importOriginal) => ({
 }));
 
 const world = vi.hoisted(() => ({}) as OffersWorld);
-vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/offerings-api.ts', async (importOriginal) => {
   const { offersApiDouble } = await import('./__tests__/integration/offers-test-data.ts');
   return {
     ...(await importOriginal<typeof OfferingsApiModule>()),
@@ -238,7 +238,7 @@ describe('Pause and Resume (H:5483) — `is_active` alone', () => {
     await waitFor(() =>
       expect(notifyMock.success).toHaveBeenCalledWith(
         'P0 Probe offer paused',
-        expect.objectContaining({ id: 'clinic-offer-paused' }),
+        expect.objectContaining({ id: 'app-offer-paused' }),
       ),
     );
     expect(
@@ -260,7 +260,7 @@ describe('Pause and Resume (H:5483) — `is_active` alone', () => {
     );
     expect(notifyMock.success).toHaveBeenCalledWith(
       'Research Diwali glow running again',
-      expect.objectContaining({ id: 'clinic-offer-paused' }),
+      expect.objectContaining({ id: 'app-offer-paused' }),
     );
   });
 

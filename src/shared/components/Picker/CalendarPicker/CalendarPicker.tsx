@@ -3,11 +3,7 @@ import type { Matcher } from 'react-day-picker';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import {
-  civilDateOf,
-  clinicToday,
-  localDateOf,
-} from '@/shared/api/clinic/clinic-time.ts';
+import { appToday, civilDateOf, localDateOf } from '@/shared/api/app/app-time.ts';
 import { LocalizedCalendar } from '@/shared/components/LocalizedCalendar/index.ts';
 import { PICKER_KEYS, PICKER_NS } from '@/shared/components/Picker/picker.constants.ts';
 import type { PickerSize } from '@/shared/components/Picker/picker.types.ts';
@@ -83,8 +79,8 @@ export function CalendarPicker({
   const { t } = useTranslation(PICKER_NS);
   const { formatDate } = useLocaleFormat();
   const [open, setOpen] = useState(false);
-  const [clinicDay] = useState(() => clinicToday());
-  const today = localDateOf(todayProp ?? clinicDay);
+  const [appDay] = useState(() => appToday());
+  const today = localDateOf(todayProp ?? appDay);
   const selected = value ? localDateOf(value) : undefined;
   const name = label ?? t(PICKER_KEYS.date.label);
   const shown = selected

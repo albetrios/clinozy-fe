@@ -2,8 +2,8 @@ import { renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { Branch } from '@/shared/api/clinic/clinic-schema.ts';
-import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
+import type { Branch } from '@/shared/api/app/app-schema.ts';
+import type { TeamMember } from '@/shared/api/app/users-contracts.ts';
 
 import type { RoleDirectory } from '../../shared/hooks/useRoleDirectory/index.ts';
 import { useTeamTable } from './useTeamTable.tsx';

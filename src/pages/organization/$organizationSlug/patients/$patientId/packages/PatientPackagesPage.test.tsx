@@ -3,9 +3,9 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type * as OfferingsApiModule from '@/shared/api/clinic/offerings-api.ts';
-import type * as PackagesApiModule from '@/shared/api/clinic/patient-packages-api.ts';
-import type { PatientPackageRow } from '@/shared/api/clinic/patient-packages-contracts.ts';
+import type * as OfferingsApiModule from '@/shared/api/app/offerings-api.ts';
+import type * as PackagesApiModule from '@/shared/api/app/patient-packages-api.ts';
+import type { PatientPackageRow } from '@/shared/api/app/patient-packages-contracts.ts';
 import { offeringRecord } from '@/tests/utils/offering-doubles.ts';
 import {
   patientFile,
@@ -32,9 +32,9 @@ vi.mock('@/shared/notify/index.ts', () => ({
 
 /** What the member may do: book (`appointment:create`), edit a package (`payment:update`). */
 const access = vi.hoisted(() => ({ book: true, codes: new Set<string>() }));
-vi.mock('@/shared/hooks/useClinicAccess/index.ts', async (importOriginal) => ({
+vi.mock('@/shared/hooks/useAppAccess/index.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
-  useClinicAccess: () => ({
+  useAppAccess: () => ({
     previewRole: null,
     can: (section: string) => section !== 'appointments' || access.book,
     canCode: (code: string) => access.codes.has(code),
@@ -43,18 +43,18 @@ vi.mock('@/shared/hooks/useClinicAccess/index.ts', async (importOriginal) => ({
   }),
 }));
 
-vi.mock('@/shared/api/clinic/patient-packages-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/patient-packages-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof PackagesApiModule>()),
   listPatientPackages: vi.fn(),
   updatePatientPackage: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/offerings-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof OfferingsApiModule>()),
   fetchAllOfferings: vi.fn(),
 }));
 
-import { fetchAllOfferings } from '@/shared/api/clinic/offerings-api.ts';
-import { listPatientPackages } from '@/shared/api/clinic/patient-packages-api.ts';
+import { fetchAllOfferings } from '@/shared/api/app/offerings-api.ts';
+import { listPatientPackages } from '@/shared/api/app/patient-packages-api.ts';
 
 import { PatientPackagesPage } from './PatientPackagesPage.tsx';
 

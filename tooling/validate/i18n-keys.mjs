@@ -76,7 +76,7 @@ function collectKeyLiterals(fileText) {
 }
 
 // `I18N_NAMESPACES.<property>` → the namespace's file name. They differ for
-// hyphenated namespaces (`clinicStock: 'clinic-stock'`), so read the real value.
+// hyphenated namespaces (`appStock: 'app-stock'`), so read the real value.
 const NAMESPACE_FILES = Object.fromEntries(
   [
     ...readFileSync(join(SRC, 'lib/i18n/namespaces.ts'), 'utf8').matchAll(

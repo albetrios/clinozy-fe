@@ -1,10 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
-import {
-  nextCustomRoleName,
-  nextCustomRoleTone,
-} from '@/shared/api/clinic/access-api.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { nextCustomRoleName, nextCustomRoleTone } from '@/shared/api/app/access-api.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useCreateRole } from '@/shared/hooks/useRoles/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -21,7 +18,7 @@ import { useRoleDirectory } from '../useRoleDirectory/index.ts';
  */
 export function useNewRole(onCreated: (roleId: string) => void) {
   const { t } = useTranslation(USERS_NS);
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const directory = useRoleDirectory();
   const create = useCreateRole({ suppressSuccessToast: true });
 

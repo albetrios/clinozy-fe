@@ -2,17 +2,11 @@ import { useTranslation } from 'react-i18next';
 
 import { isolateText } from '@/lib/bidi-isolate.ts';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import { clinicToday, localDateOf } from '@/shared/api/clinic/clinic-time.ts';
-import {
-  patientName,
-  type PatientRecord,
-} from '@/shared/api/clinic/patients-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import {
-  PATIENT_STATUS_TONES,
-  PATIENT_TYPE_TONES,
-} from '@/shared/clinic/clinic-tones.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import { appToday, localDateOf } from '@/shared/api/app/app-time.ts';
+import { patientName, type PatientRecord } from '@/shared/api/app/patients-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { PATIENT_STATUS_TONES, PATIENT_TYPE_TONES } from '@/shared/app/app-tones.ts';
 import {
   PersonAvatar,
   personInitials,
@@ -37,8 +31,8 @@ const K = PATIENT_RAIL_KEYS;
 function useTenureLine(patient: PatientRecord): { line: string; since: string } {
   const { t } = useTranslation(PATIENT_RAIL_NS);
   const { formatDate } = useLocaleFormat();
-  const today = clinicToday();
-  const joined = clinicToday(new Date(patient.createdAt));
+  const today = appToday();
+  const joined = appToday(new Date(patient.createdAt));
   const tenure = patientTenure(joined, today);
   let line = t(K.joinedToday);
   if (tenure.kind === 'days') line = t(K.daysAsPatient, { count: tenure.count });
@@ -69,7 +63,7 @@ export function RailIdentity({
   /** "Edit contact" — hidden without Patients edit. */
   onEditContact?: () => void;
 }) {
-  const { t } = useTranslation([PATIENT_RAIL_NS, CLINIC_NS, ERRORS_NS]);
+  const { t } = useTranslation([PATIENT_RAIL_NS, APP_NS, ERRORS_NS]);
   const name = patientName(patient);
   const id = displayId.patient(patient.seq);
   const { line, since } = useTenureLine(patient);
@@ -117,11 +111,11 @@ export function RailIdentity({
         <div className="mt-1 flex flex-wrap gap-1.5">
           {patient.types.map((type) => (
             <TonePill key={type} tone={PATIENT_TYPE_TONES[type]} size="sm">
-              {t(CLINIC_KEYS.patients.types[type], { ns: CLINIC_NS })}
+              {t(APP_KEYS.patients.types[type], { ns: APP_NS })}
             </TonePill>
           ))}
           <TonePill tone={PATIENT_STATUS_TONES[patient.status]} size="sm">
-            {t(CLINIC_KEYS.patients.statuses[patient.status], { ns: CLINIC_NS })}
+            {t(APP_KEYS.patients.statuses[patient.status], { ns: APP_NS })}
           </TonePill>
         </div>
       </div>

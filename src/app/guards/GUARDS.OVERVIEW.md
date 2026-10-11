@@ -24,7 +24,7 @@ helper for ad-hoc loaders; routes with a manifest should use step 5 instead.
 Every room runs `gatewayFromManifest(manifest)` then `requireOrgStatus` in
 `routeTree.tsx` (`roomLeafGate`). The org home (`…/$organizationSlug`, the index) runs
 `requireOrgStatus`, then redirects to the member's role home — or, when no clinic room
-is open to them, renders `ClinicHomeEmpty` in place instead of redirecting, so it can
+is open to them, renders `AppHomeEmpty` in place instead of redirecting, so it can
 never loop.
 
 ## The retired `/dashboard`

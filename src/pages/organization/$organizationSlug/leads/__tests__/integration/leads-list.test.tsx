@@ -3,16 +3,16 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type * as ContactActivitiesApiModule from '@/shared/api/clinic/contact-activities-api.ts';
-import type * as ContactsApiModule from '@/shared/api/clinic/contacts-api.ts';
-import type * as DirectoryApiModule from '@/shared/api/clinic/directory-api.ts';
-import type * as LeadsApiModule from '@/shared/api/clinic/leads-api.ts';
-import { claimLead, leadListQuery, listLeads } from '@/shared/api/clinic/leads-api.ts';
-import type { LeadListParams } from '@/shared/api/clinic/leads-contracts.ts';
+import type * as ContactActivitiesApiModule from '@/shared/api/app/contact-activities-api.ts';
+import type * as ContactsApiModule from '@/shared/api/app/contacts-api.ts';
+import type * as DirectoryApiModule from '@/shared/api/app/directory-api.ts';
+import type * as LeadsApiModule from '@/shared/api/app/leads-api.ts';
+import { claimLead, leadListQuery, listLeads } from '@/shared/api/app/leads-api.ts';
+import type { LeadListParams } from '@/shared/api/app/leads-contracts.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import type * as MyMembershipModule from '@/shared/tenancy/my-membership.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 
 import { LeadsPage } from '../../LeadsPage.tsx';
 import {
@@ -41,8 +41,8 @@ vi.mock('@/shared/notify/index.ts', () => ({
 vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
   useViewportTier: () => 'desktop',
 }));
-vi.mock('@/shared/hooks/useClinicAccess/index.ts', () => ({
-  useClinicAccess: () => ({
+vi.mock('@/shared/hooks/useAppAccess/index.ts', () => ({
+  useAppAccess: () => ({
     previewRole: null,
     can: () => true,
     canCode: () => true,
@@ -53,25 +53,25 @@ vi.mock('@/shared/hooks/useClinicAccess/index.ts', () => ({
 
 const world = vi.hoisted(() => ({}) as LeadsWorld);
 const people = vi.hoisted(() => ({}) as ContactsWorld);
-vi.mock('@/shared/api/clinic/leads-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/leads-api.ts', async (importOriginal) => {
   const { leadsApiDouble } = await import('./leads-test-data.ts');
   return { ...(await importOriginal<typeof LeadsApiModule>()), ...leadsApiDouble(world) };
 });
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => {
   const { directoryApiDouble } = await import('./leads-test-data.ts');
   return {
     ...(await importOriginal<typeof DirectoryApiModule>()),
     ...directoryApiDouble(),
   };
 });
-vi.mock('@/shared/api/clinic/contacts-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/contacts-api.ts', async (importOriginal) => {
   const { contactsApiDouble } = await import('./leads-test-data.ts');
   return {
     ...(await importOriginal<typeof ContactsApiModule>()),
     ...contactsApiDouble(people),
   };
 });
-vi.mock('@/shared/api/clinic/contact-activities-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/contact-activities-api.ts', async (importOriginal) => {
   const { contactActivitiesApiDouble } = await import('./leads-test-data.ts');
   return {
     ...(await importOriginal<typeof ContactActivitiesApiModule>()),

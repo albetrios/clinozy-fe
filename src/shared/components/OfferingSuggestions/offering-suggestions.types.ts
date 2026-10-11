@@ -1,4 +1,4 @@
-import type { SuggestionStatus, Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { SuggestionStatus, Tone } from '@/shared/api/app/app-schema.ts';
 
 /**
  * One plan row as the card shows it (`…/offering-suggestions`, named and priced from the

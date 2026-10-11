@@ -9,12 +9,12 @@ the record's visit, treatment, context and day. An id that names no check-in goe
 "Check-in not found · it may have been deleted" (`useDialogRouteRecord`).
 
 Data: clinozy-be — the record is `GET /app/patients/{patient_id}/check-ins/{patient_check_in_id}`
-(`fetchCheckIn`, `@/shared/api/clinic/feedback-api.ts`; `patient:read`), the save a `PATCH`
+(`fetchCheckIn`, `@/shared/api/app/feedback-api.ts`; `patient:read`), the save a `PATCH`
 with `expected_updated_at` (`patient:update`): a `409 record_changed` offers Reload. Its next
 offerings show by name and do not change here — the plan changes in the plan (TR10).
 
-Gated by the file layout (membership, the `clinic-patients` module, the org status); in-room
-Patients edit is `useClinicAccess` — anyone without it who follows the link lands back on the
+Gated by the file layout (membership, the `app-patients` module, the org status); in-room
+Patients edit is `useAppAccess` — anyone without it who follows the link lands back on the
 section with the permission toast.
 Registered in `src/app/routes/routeTree.tsx` as a file-level drawer route, through the
 file's one lazy module (`../../../patient-id.sections.ts`).

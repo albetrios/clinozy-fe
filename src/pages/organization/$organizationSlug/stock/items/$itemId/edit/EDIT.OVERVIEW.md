@@ -4,7 +4,7 @@ Route: `/organization/$organizationSlug/stock/items/$itemId/edit` — a URL-driv
 D24): Edit item (`S:75`) — a row's click; the row's "Use" is a popover with no URL. The route renders nothing: the Items page reads the URL and opens the
 drawer over the list, so a refresh or a shared link reopens it; an unknown id leaves the list
 in place with "<Record> not found" (`S:115`). Gated like the room — membership
-(`organization:read`) and the `clinic-stock` module, then `requireOrgStatus`; without
+(`organization:read`) and the `app-stock` module, then `requireOrgStatus`; without
 `stock_item:update` the item opens read-only.
 
 On clinozy-be the record is `GET /app/stock-items/:id`; the save patches only what changed with the
@@ -15,11 +15,11 @@ record_changed`) toasts with "Reload", which reads the item again and starts the
 
 ## Files
 
-| File                    | Responsibility                                                                                       |
-| ----------------------- | ---------------------------------------------------------------------------------------------------- |
-| `edit.route.tsx`        | Route marker — exports `Component` rendering `EditStockItemPage`.                                    |
-| `edit.manifest.ts`      | Manifest — `kind: 'leaf'`, permission `organization:read`, module `clinic-stock`, title "Edit item". |
-| `EditStockItemPage.tsx` | Renders nothing — the drawer mounts on the Items page.                                               |
+| File                    | Responsibility                                                                                    |
+| ----------------------- | ------------------------------------------------------------------------------------------------- |
+| `edit.route.tsx`        | Route marker — exports `Component` rendering `EditStockItemPage`.                                 |
+| `edit.manifest.ts`      | Manifest — `kind: 'leaf'`, permission `organization:read`, module `app-stock`, title "Edit item". |
+| `EditStockItemPage.tsx` | Renders nothing — the drawer mounts on the Items page.                                            |
 
 ## Test ids
 

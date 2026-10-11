@@ -1,10 +1,10 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 
 /**
- * The patient delete confirm's copy lives in `clinic`: the Patients rows, the
+ * The patient delete confirm's copy lives in `app`: the Patients rows, the
  * patient drawer and the patient file's Edit drawer all raise it.
  */
-export const PATIENT_DELETE_NS = I18N_NAMESPACES.clinic;
+export const PATIENT_DELETE_NS = I18N_NAMESPACES.app;
 
 /** Key paths of the confirm's own copy (`patients.md:160–165`); its chrome is the reason confirm's. */
 export const PATIENT_DELETE_KEYS = {

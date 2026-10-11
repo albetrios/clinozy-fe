@@ -3,14 +3,14 @@ import { useId, useState } from 'react';
 import { Controller, useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import type { Supplier } from '@/shared/api/clinic/clinic-schema.ts';
-import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
+import type { Supplier } from '@/shared/api/app/app-schema.ts';
+import { formatAppPhone } from '@/shared/app/app-phone.ts';
 import {
   phoneDigitsOf,
   phoneIsInvalid,
   storedPhoneOf,
-} from '@/shared/clinic/clinic-phone-field.ts';
-import { SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/app/app-phone-field.ts';
+import { SECTION_TONES } from '@/shared/app/app-tones.ts';
 import {
   DrawerField,
   DrawerFieldGrid,
@@ -314,7 +314,7 @@ function useSteps(
   const notFilled = tDrawer(RECORD_DRAWER_KEYS.step.notFilled);
   const name = values.name.trim();
   const phone = storedPhoneOf(values.phone);
-  const phoneText = phone ? formatClinicPhone(phone) : '';
+  const phoneText = phone ? formatAppPhone(phone) : '';
   const gst = values.gstNumber.trim();
   const makers = makerPills(body.pickers, values.manufacturerIds);
   const steps: DrawerStep[] = [

@@ -2,12 +2,12 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
+import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
 import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import type { MedicineRecord } from '@/shared/api/clinic/medicines-contracts.ts';
+  appFixtures,
+  resetAppFixtures,
+} from '@/shared/api/app/fixtures/world.fixtures.ts';
+import type { MedicineRecord } from '@/shared/api/app/medicines-contracts.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { fsi } from '@/tests/utils/bidi-marks.ts';
@@ -43,16 +43,16 @@ const D = 'medicine-drawer';
 const setup = () =>
   userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
 const glycolac = () =>
-  clinicFixtures.medicines.get(ref.medicine(456)) as Promise<MedicineRecord>;
+  appFixtures.medicines.get(ref.medicine(456)) as Promise<MedicineRecord>;
 
 beforeEach(() => {
   viewport.tier = 'desktop';
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 afterEach(() => {
   resetMedicalRoutes();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 
 describe('MedicineDrawer — New medicine (medical.md:170–188)', () => {
@@ -80,10 +80,10 @@ describe('MedicineDrawer — New medicine (medical.md:170–188)', () => {
       'Order 10 to fill up to 10. Shows under Stock › Low stock.',
     );
 
-    const before = clinicFixtures.medicines.snapshot().length;
+    const before = appFixtures.medicines.snapshot().length;
     await user.click(within(drawer).getByTestId(`${D}-save`));
     expect(notifyMock.warning).toHaveBeenCalledWith('Enter the MRP');
-    expect(clinicFixtures.medicines.snapshot()).toHaveLength(before);
+    expect(appFixtures.medicines.snapshot()).toHaveLength(before);
     expect(onClose).not.toHaveBeenCalled();
     expect(await axeForDialog(drawer)).toHaveNoViolations();
   });
@@ -117,7 +117,7 @@ describe('MedicineDrawer — New medicine (medical.md:170–188)', () => {
     await user.click(within(drawer).getByTestId(`${D}-save`));
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(notifyMock.success).toHaveBeenCalledWith('Added Azel cream');
-    const added = clinicFixtures.medicines.snapshot((row) => row.name === 'Azel cream');
+    const added = appFixtures.medicines.snapshot((row) => row.name === 'Azel cream');
     expect(added).toHaveLength(1);
     expect(added[0]).toMatchObject({ mrp: 65_000, gstPct: 18, prescriptionOnly: true });
   });

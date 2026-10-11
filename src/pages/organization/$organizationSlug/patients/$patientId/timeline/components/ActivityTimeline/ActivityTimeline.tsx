@@ -11,13 +11,10 @@ import {
   organizationTreatmentEdit,
 } from '@/lib/routes/patient-file-builders.ts';
 import { cn } from '@/lib/utils.ts';
-import {
-  type CivilDayReading,
-  civilDayReading,
-} from '@/shared/api/clinic/clinic-time.ts';
-import type { ContactActivityEntry } from '@/shared/api/clinic/contact-activities-api.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
-import type { PatientFileSectionSlug } from '@/shared/clinic/patient-file-sections.ts';
+import { type CivilDayReading, civilDayReading } from '@/shared/api/app/app-time.ts';
+import type { ContactActivityEntry } from '@/shared/api/app/contact-activities-api.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
+import type { PatientFileSectionSlug } from '@/shared/app/patient-file-sections.ts';
 import { PersonAvatar, shortPersonName } from '@/shared/components/Cells/index.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
@@ -27,8 +24,8 @@ import {
 } from '@/shared/components/RoomToolbar/RoomTabs/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
-import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
+import { useAppNavigate } from '@/shared/hooks/useAppNavigate/index.ts';
 import {
   useContactActivities,
   useContactActivityAccess,
@@ -74,7 +71,7 @@ const NAMED_DAYS = new Set<CivilDayReading>([
  * ("24 Sep").
  */
 function useDayHeading(): (day: string) => { main: string; sub: string | null } {
-  const clock = useClinicClock();
+  const clock = useAppClock();
   return (day) => ({
     main: clock.day(day),
     sub: NAMED_DAYS.has(civilDayReading(clock.today, day)) ? clock.date(day) : null,
@@ -87,7 +84,7 @@ function useDayHeading(): (day: string) => { main: string; sub: string | null } 
  * who may open it; a note opens Team notes; a task's event or one with no record opens nothing.
  */
 function useEntryOpen(): (entry: ContactActivityEntry) => (() => void) | null {
-  const navigate = useClinicNavigate();
+  const navigate = useAppNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
   const { patientId, viewable } = usePatientFileContext();
   const record = (section: PatientFileSectionSlug, go: () => Promise<void>) =>
@@ -264,7 +261,7 @@ export function ActivityTimeline() {
   const titleId = useId();
   const listId = useId();
   const heading = useDayHeading();
-  const clock = useClinicClock();
+  const clock = useAppClock();
   const open = useEntryOpen();
   const staff = useStaffLookup();
   const { file, viewable, masked } = usePatientFileContext();

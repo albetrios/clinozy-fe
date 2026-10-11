@@ -2,14 +2,14 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
-import { addTask } from '@/shared/api/clinic/tasks-api.ts';
-import type { TaskRow } from '@/shared/api/clinic/tasks-contracts.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
+import { addTask } from '@/shared/api/app/tasks-api.ts';
+import type { TaskRow } from '@/shared/api/app/tasks-contracts.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import type * as NotifyModule from '@/shared/notify/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { fsi } from '@/tests/utils/bidi-marks.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 import {
   taskRecord,
@@ -28,7 +28,7 @@ vi.mock('@/shared/notify/index.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof NotifyModule>()),
   notify: notifyMock,
 }));
-vi.mock('@/shared/api/clinic/tasks-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/tasks-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   addTask: vi.fn(),
 }));

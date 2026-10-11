@@ -4,7 +4,7 @@ import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { Progress } from '@/shared/components/ui/progress.tsx';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';

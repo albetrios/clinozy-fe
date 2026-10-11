@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import type { PatientPackageRow } from '@/shared/api/clinic/patient-packages-contracts.ts';
-import type { TreatmentRecord } from '@/shared/api/clinic/treatments-contracts.ts';
+import type { PatientPackageRow } from '@/shared/api/app/patient-packages-contracts.ts';
+import type { TreatmentRecord } from '@/shared/api/app/treatments-contracts.ts';
 import { invoiceRecord } from '@/tests/utils/payments-doubles.ts';
 
 import {

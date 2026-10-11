@@ -3,21 +3,21 @@ import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event'
 import { useState } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/offerings-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   createOffering: vi.fn(),
 }));
 
-import { createOffering } from '@/shared/api/clinic/offerings-api.ts';
-import type { OfferingRecord } from '@/shared/api/clinic/offerings-contracts.ts';
+import { createOffering } from '@/shared/api/app/offerings-api.ts';
+import type { OfferingRecord } from '@/shared/api/app/offerings-contracts.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { useStackedDrawer } from '@/shared/hooks/useStackedDrawer/index.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import { offeringRecord } from '@/tests/utils/offering-doubles.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 

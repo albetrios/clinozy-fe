@@ -4,9 +4,9 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import { patientRef } from '@/shared/api/app/fixtures/patients.fixtures.ts';
+import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
+import { resetAppFixtures } from '@/shared/api/app/fixtures/world.fixtures.ts';
 import { CrossRoomDialogContext } from '@/shared/hooks/useCrossRoomDialog/index.ts';
 
 import {
@@ -65,12 +65,12 @@ function SalesTab() {
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'], shouldAdvanceTime: true });
   vi.setSystemTime(NOW);
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 afterEach(() => {
   vi.useRealTimers();
   resetMedicalRoutes();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 
 describe('SaleDrawers', () => {

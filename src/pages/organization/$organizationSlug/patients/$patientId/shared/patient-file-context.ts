@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react';
 
-import type { PatientFile } from '@/shared/api/clinic/patient-file-contracts.ts';
-import type { PatientFileSectionSlug } from '@/shared/clinic/patient-file-sections.ts';
+import type { PatientFile } from '@/shared/api/app/patient-file-contracts.ts';
+import type { PatientFileSectionSlug } from '@/shared/app/patient-file-sections.ts';
 
 import type { PatientPhotoUploads } from './hooks/usePatientPhotoUpload/index.ts';
 

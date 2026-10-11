@@ -2,20 +2,20 @@ import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
-import { isTaskOverdue } from '@/shared/api/clinic/task-views.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
+import { isTaskOverdue } from '@/shared/api/app/task-views.ts';
 import {
   TASK_TYPES,
   type TaskOutcomePlan,
   type TaskRow,
-} from '@/shared/api/clinic/tasks-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/api/app/tasks-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import {
   TASK_QUEUE_KEYS,
   TASK_RULE_KEYS,
   TASK_RULES_NS,
-} from '@/shared/clinic/task-rules.constants.ts';
+} from '@/shared/app/task-rules.constants.ts';
 import { personFirstName, shortPersonName } from '@/shared/components/Cells/index.ts';
 import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
@@ -105,11 +105,11 @@ const QUEUE_CARD_INK = {
 function useOwnerName(team: WorkQueueTeam): (row: TaskRow) => string {
   const { t } = useTranslation(TODAY_NS);
   const { t: tTasks } = useTranslation(TASK_RULES_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   return (row) => {
     if (!row.ownerId) {
       return row.ownerRole
-        ? tClinic(CLINIC_KEYS.roles[row.ownerRole])
+        ? tApp(APP_KEYS.roles[row.ownerRole])
         : tTasks(TASK_QUEUE_KEYS.anyone);
     }
     const owner = team.byId.get(row.ownerId);

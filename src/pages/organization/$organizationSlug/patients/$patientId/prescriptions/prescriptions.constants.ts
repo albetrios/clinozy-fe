@@ -1,6 +1,6 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import type { PrescriptionStatus } from '@/shared/api/clinic/prescriptions-contracts.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
+import type { PrescriptionStatus } from '@/shared/api/app/prescriptions-contracts.ts';
 
 /** The prescription drawer and its print preview read the patient file's namespace. */
 export const RX_NS = I18N_NAMESPACES.patientFile;

@@ -29,7 +29,7 @@ export interface AppointmentCreateSearch {
   /**
    * The room it was opened from, kept behind the drawer (KICKOFF §4, A-P1) —
    * as given: read it only through `safeReferrer`, whose allow-list
-   * (`clinic-referrer.ts`) decides, so anything off the list is the page.
+   * (`app-referrer.ts`) decides, so anything off the list is the page.
    */
   from?: string;
 }

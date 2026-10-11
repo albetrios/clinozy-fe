@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { organizationPatientSection } from '@/lib/routes/patient-file-builders.ts';
-import type { VisitRecord } from '@/shared/api/clinic/visits-contracts.ts';
+import type { VisitRecord } from '@/shared/api/app/visits-contracts.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { useOpenVisit } from '@/shared/hooks/useVisits/index.ts';
 

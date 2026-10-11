@@ -2,15 +2,15 @@ import { useId, useState } from 'react';
 import { Controller, useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import type { MedicalRep } from '@/shared/api/clinic/clinic-schema.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
+import type { MedicalRep } from '@/shared/api/app/app-schema.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
+import { formatAppPhone } from '@/shared/app/app-phone.ts';
 import {
   phoneDigitsOf,
   phoneIsInvalid,
   storedPhoneOf,
-} from '@/shared/clinic/clinic-phone-field.ts';
-import { SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/app/app-phone-field.ts';
+import { SECTION_TONES } from '@/shared/app/app-tones.ts';
 import {
   DrawerField,
   DrawerFieldGrid,
@@ -143,7 +143,7 @@ interface BodyProps {
 /** MR: Name* · Phone · Next visit (`medical.md:228–230`). */
 function MrFields({ form, idPrefix, testId }: BodyProps) {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
-  const [today] = useState(() => clinicToday());
+  const [today] = useState(() => appToday());
   const field = useDrawerFieldIds(form, idPrefix);
   const name = field('name');
   const phone = field('phone');
@@ -287,7 +287,7 @@ function useSteps(
   const notFilled = tDrawer(RECORD_DRAWER_KEYS.step.notFilled);
   const name = values.name.trim();
   const phone = storedPhoneOf(values.phone);
-  const phoneText = phone ? formatClinicPhone(phone) : '';
+  const phoneText = phone ? formatAppPhone(phone) : '';
   const next = values.nextVisitOn ? dates.day(values.nextVisitOn) : '';
   const byId = new Map(body.pickers.manufacturers.map((option) => [option.key, option]));
   const makers = values.manufacturerIds.flatMap((id) => {

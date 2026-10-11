@@ -13,7 +13,7 @@ export const manifest = {
   title: 'Stock check',
   testId: 'stock-check-drawer',
   permission: 'organization:read',
-  module: 'clinic-stock',
+  module: 'app-stock',
   kind: 'leaf',
   children: [],
 } as const satisfies PageManifest;

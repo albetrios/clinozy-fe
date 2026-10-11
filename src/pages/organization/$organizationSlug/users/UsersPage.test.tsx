@@ -3,8 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import type * as CsvModule from '@/lib/csv.ts';
-import type * as BranchesApiModule from '@/shared/api/clinic/branches-api.ts';
-import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
+import type * as BranchesApiModule from '@/shared/api/app/branches-api.ts';
+import type { BranchOption } from '@/shared/api/app/branches-api.ts';
 import type * as OrganizationApiModule from '@/shared/api/organization-api.ts';
 
 import {
@@ -33,7 +33,7 @@ vi.mock('@/shared/api/organization-api.ts', async (importOriginal) => ({
   listMembers: api.listMembers,
   listRoles: api.listRoles,
 }));
-vi.mock('@/shared/api/clinic/branches-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/branches-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof BranchesApiModule>()),
   fetchActiveBranches: api.fetchActiveBranches,
 }));

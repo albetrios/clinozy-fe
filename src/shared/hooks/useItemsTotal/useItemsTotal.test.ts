@@ -2,8 +2,8 @@ import { act, renderHook } from '@testing-library/react';
 import { useForm } from 'react-hook-form';
 import { describe, expect, it } from 'vitest';
 
-import { invoiceLineAmounts } from '@/shared/api/clinic/clinic-money.ts';
-import type { InvoiceItem } from '@/shared/api/clinic/clinic-schema.ts';
+import { invoiceLineAmounts } from '@/shared/api/app/app-money.ts';
+import type { InvoiceItem } from '@/shared/api/app/app-schema.ts';
 
 import { useItemsTotal } from './useItemsTotal.ts';
 

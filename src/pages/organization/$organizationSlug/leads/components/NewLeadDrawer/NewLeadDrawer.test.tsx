@@ -2,15 +2,15 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import * as ContactsApiModule from '@/shared/api/clinic/contacts-api.ts';
-import type { ContactSummary } from '@/shared/api/clinic/contacts-contracts.ts';
-import * as LeadsApiModule from '@/shared/api/clinic/leads-api.ts';
+import * as ContactsApiModule from '@/shared/api/app/contacts-api.ts';
+import type { ContactSummary } from '@/shared/api/app/contacts-contracts.ts';
+import * as LeadsApiModule from '@/shared/api/app/leads-api.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { notify } from '@/shared/notify/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { withoutBidiMarks } from '@/tests/utils/bidi-marks.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import {
@@ -35,12 +35,12 @@ vi.mock('@/shared/notify/index.ts', () => ({
   TOAST_DURATION_MS: { default: 5_200, error: 9_000 },
 }));
 
-vi.mock('@/shared/api/clinic/contacts-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/contacts-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof ContactsApiModule>()),
   searchContacts: vi.fn(),
   fetchContact: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/leads-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/leads-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof LeadsApiModule>()),
   createLead: vi.fn(),
 }));

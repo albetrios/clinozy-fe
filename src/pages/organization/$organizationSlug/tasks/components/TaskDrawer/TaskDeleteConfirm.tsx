@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import type { TaskRow } from '@/shared/api/clinic/tasks-contracts.ts';
+import type { TaskRow } from '@/shared/api/app/tasks-contracts.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
 import { useDeleteTask, useRestoreTask } from '@/shared/hooks/useTasks/index.ts';
 

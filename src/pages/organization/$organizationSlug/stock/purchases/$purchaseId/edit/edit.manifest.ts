@@ -13,7 +13,7 @@ export const manifest = {
   title: 'Edit purchase',
   testId: 'stock-purchase-drawer',
   permission: 'organization:read',
-  module: 'clinic-stock',
+  module: 'app-stock',
   kind: 'leaf',
   children: [],
 } as const satisfies PageManifest;

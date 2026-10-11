@@ -16,7 +16,7 @@ export const manifest = {
   title: 'Appointment',
   testId: 'appointment-drawer',
   permission: 'organization:read',
-  module: 'clinic-appointments',
+  module: 'app-appointments',
   kind: 'leaf',
   children: [],
 } as const satisfies PageManifest;

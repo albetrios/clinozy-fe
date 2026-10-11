@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { TEAM_SORT_KEYS as CONTRACT_SORT_KEYS } from '@/shared/api/clinic/users-contracts.ts';
+import { TEAM_SORT_KEYS as CONTRACT_SORT_KEYS } from '@/shared/api/app/users-contracts.ts';
 
 import {
   TEAM_SORT_KEYS,

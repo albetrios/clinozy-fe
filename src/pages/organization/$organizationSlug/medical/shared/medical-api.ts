@@ -1,31 +1,28 @@
+import { appDateOf, createdFilterMatches } from '@/shared/api/app/app-filter-match.ts';
 import {
-  clinicDateOf,
-  createdFilterMatches,
-} from '@/shared/api/clinic/clinic-filter-match.ts';
-import {
-  clinicHttpError,
+  appHttpError,
   compareText,
   type CursorPage,
   cursorPageOf,
   directedCompare,
   searchMatches,
-} from '@/shared/api/clinic/clinic-fixture-store.ts';
+} from '@/shared/api/app/app-fixture-store.ts';
 import {
   invoiceBalance,
   invoiceLineAmounts,
   purchaseOrderDue,
   purchaseOrderTotal,
-} from '@/shared/api/clinic/clinic-money.ts';
+} from '@/shared/api/app/app-money.ts';
 import type {
   Invoice,
   MedicalPurchaseOrder,
   MedicalSale,
-} from '@/shared/api/clinic/clinic-schema.ts';
-import { civilDayOffset, clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import { cheapestRate } from '@/shared/api/clinic/medicine-stock.ts';
-import { MEDICAL_ROOM_QUERY_KEY } from '@/shared/api/clinic/medicines-api.ts';
-import type { MedicineMaker } from '@/shared/api/clinic/medicines-contracts.ts';
-import { patientName } from '@/shared/api/clinic/patients-fixture-contracts.ts';
+} from '@/shared/api/app/app-schema.ts';
+import { appToday, civilDayOffset } from '@/shared/api/app/app-time.ts';
+import { cheapestRate } from '@/shared/api/app/medicine-stock.ts';
+import { MEDICAL_ROOM_QUERY_KEY } from '@/shared/api/app/medicines-api.ts';
+import type { MedicineMaker } from '@/shared/api/app/medicines-contracts.ts';
+import { patientName } from '@/shared/api/app/patients-fixture-contracts.ts';
 
 import {
   type ManufacturerListParams,
@@ -56,7 +53,7 @@ import { type SupplierCredit, supplierCreditStore } from './medical-supplier-cre
  * the shared `medicines-api.ts`.
  */
 
-/** TanStack Query keys for the Medical family — all under `['clinic', 'medical']`. */
+/** TanStack Query keys for the Medical family — all under `['app', 'medical']`. */
 export const medicalQueryKeys = {
   all: MEDICAL_ROOM_QUERY_KEY,
   sales: (params: SaleListParams) => [...medicalQueryKeys.all, 'sales', params] as const,
@@ -88,14 +85,14 @@ export const medicalQueryKeys = {
     [...medicalQueryKeys.all, 'catalogue', kind] as const,
 };
 
-const fixtureWorld = () => import('@/shared/api/clinic/fixtures/world.fixtures.ts');
+const fixtureWorld = () => import('@/shared/api/app/fixtures/world.fixtures.ts');
 
-type FixtureWorld = Awaited<ReturnType<typeof fixtureWorld>>['clinicFixtures'];
+type FixtureWorld = Awaited<ReturnType<typeof fixtureWorld>>['appFixtures'];
 
 /** The credits suppliers gave for returned expiring stock (fixture state beside the world). */
 async function supplierCredits(): Promise<readonly SupplierCredit[]> {
-  const { onClinicFixturesReset } = await fixtureWorld();
-  return supplierCreditStore(onClinicFixturesReset).list();
+  const { onAppFixturesReset } = await fixtureWorld();
+  return supplierCreditStore(onAppFixturesReset).list();
 }
 
 /** Whether `createdAt` passes the Created filter (none set passes). */
@@ -216,9 +213,9 @@ const SALE_ORDER = {
 
 /** The sales a list read matches, in its order. */
 async function salesFor(params: SaleListParams): Promise<SaleRow[]> {
-  const { clinicFixtures } = await fixtureWorld();
-  const today = clinicToday();
-  const rows = saleRows(clinicFixtures).filter(
+  const { appFixtures } = await fixtureWorld();
+  const today = appToday();
+  const rows = saleRows(appFixtures).filter(
     (row) =>
       searchMatches(params.q, [row.customer?.name ?? '', `#${row.seq}`]) &&
       (params.status !== 'unpaid' || row.status === 'unpaid') &&
@@ -276,13 +273,13 @@ export async function listSaleReminders(
 
 /** One sale as its row — a 404 when it is unknown, deleted or voided. */
 export async function fetchMedicalSale(id: string): Promise<SaleRow> {
-  const { clinicFixtures } = await fixtureWorld();
-  const sale = await clinicFixtures.medicalSales.get(id);
-  if (sale.voidedAt) throw clinicHttpError(404, 'not_found', 'Sale not found');
+  const { appFixtures } = await fixtureWorld();
+  const sale = await appFixtures.medicalSales.get(id);
+  if (sale.voidedAt) throw appHttpError(404, 'not_found', 'Sale not found');
   const invoices = new Map(
-    clinicFixtures.invoices.snapshot().map((invoice) => [invoice.id, invoice]),
+    appFixtures.invoices.snapshot().map((invoice) => [invoice.id, invoice]),
   );
-  return toSaleRow(sale, clinicFixtures, invoices);
+  return toSaleRow(sale, appFixtures, invoices);
 }
 
 // ── Purchase orders ──
@@ -327,9 +324,9 @@ const PURCHASE_ORDER_ORDER = {
 async function purchaseOrdersFor(
   params: PurchaseOrderListParams,
 ): Promise<PurchaseOrderRow[]> {
-  const { clinicFixtures } = await fixtureWorld();
-  const today = clinicToday();
-  const rows = purchaseOrderRows(clinicFixtures).filter(
+  const { appFixtures } = await fixtureWorld();
+  const today = appToday();
+  const rows = purchaseOrderRows(appFixtures).filter(
     (row) =>
       searchMatches(params.q, [
         `#${row.seq}`,
@@ -358,13 +355,13 @@ export async function listPurchaseOrders(
 
 /** One purchase order as its row — a 404 when it is unknown or deleted. */
 export async function fetchPurchaseOrder(id: string): Promise<PurchaseOrderRow> {
-  const { clinicFixtures } = await fixtureWorld();
-  const order = await clinicFixtures.purchaseOrders.get(id);
+  const { appFixtures } = await fixtureWorld();
+  const order = await appFixtures.purchaseOrders.get(id);
   const suppliers = new Map(
-    clinicFixtures.suppliers.snapshot().map((row) => [row.id, row.name]),
+    appFixtures.suppliers.snapshot().map((row) => [row.id, row.name]),
   );
   const medicines = new Map(
-    clinicFixtures.medicines.snapshot().map((row) => [row.id, row.name]),
+    appFixtures.medicines.snapshot().map((row) => [row.id, row.name]),
   );
   return toPurchaseOrderRow(order, suppliers, medicines);
 }
@@ -375,12 +372,12 @@ export async function fetchPurchaseOrder(id: string): Promise<PurchaseOrderRow> 
  * clinic with its main branch's phone and GSTIN, as an order names no branch.
  */
 export async function fetchPurchaseOrderSheet(id: string): Promise<PurchaseOrderSheet> {
-  const { clinicFixtures, clinicOrganization } = await fixtureWorld();
+  const { appFixtures, clinicOrganization } = await fixtureWorld();
   const order = await fetchPurchaseOrder(id);
-  const supplier = await clinicFixtures.suppliers.get(order.supplierId, {
+  const supplier = await appFixtures.suppliers.get(order.supplierId, {
     includeDeleted: true,
   });
-  const branches = clinicFixtures.branches.snapshot();
+  const branches = appFixtures.branches.snapshot();
   const branch = branches.find((row) => row.isMain) ?? branches[0];
   const organization = clinicOrganization();
   return {
@@ -411,7 +408,7 @@ function supplierRows(
   world: FixtureWorld,
   credits: readonly SupplierCredit[],
 ): SupplierRow[] {
-  const today = clinicToday();
+  const today = appToday();
   const makers = makersOf(world);
   const orders = purchaseOrderRows(world);
   return world.suppliers.snapshot().map((supplier) => {
@@ -446,9 +443,9 @@ const SUPPLIER_ORDER = {
 
 /** The suppliers a list read matches, in its order (name, A to Z, by default). */
 async function suppliersFor(params: SupplierListParams): Promise<SupplierRow[]> {
-  const { clinicFixtures } = await fixtureWorld();
-  const today = clinicToday();
-  return supplierRows(clinicFixtures, await supplierCredits())
+  const { appFixtures } = await fixtureWorld();
+  const today = appToday();
+  return supplierRows(appFixtures, await supplierCredits())
     .filter(
       (row) =>
         searchMatches(params.q, [row.name]) &&
@@ -474,11 +471,11 @@ export function fetchAllSuppliers(params: SupplierListParams = {}) {
 
 /** One supplier as its row — a 404 when it is unknown or deleted. */
 export async function fetchSupplier(id: string): Promise<SupplierRow> {
-  const { clinicFixtures } = await fixtureWorld();
-  const [row] = supplierRows(clinicFixtures, await supplierCredits()).filter(
+  const { appFixtures } = await fixtureWorld();
+  const [row] = supplierRows(appFixtures, await supplierCredits()).filter(
     (supplier) => supplier.id === id,
   );
-  if (!row) throw clinicHttpError(404, 'not_found', 'Supplier not found');
+  if (!row) throw appHttpError(404, 'not_found', 'Supplier not found');
   return row;
 }
 
@@ -488,8 +485,8 @@ export async function fetchSupplier(id: string): Promise<SupplierRow> {
  * ("Credit · 026-312"), latest first (REPLACE_WITH_API).
  */
 export async function fetchSupplierAccount(id: string): Promise<SupplierAccountRow[]> {
-  const { clinicFixtures } = await fixtureWorld();
-  const orders: SupplierAccountRow[] = purchaseOrderRows(clinicFixtures)
+  const { appFixtures } = await fixtureWorld();
+  const orders: SupplierAccountRow[] = purchaseOrderRows(appFixtures)
     .filter((order) => order.supplierId === id)
     .map((order) => ({
       kind: 'order' as const,
@@ -507,7 +504,7 @@ export async function fetchSupplierAccount(id: string): Promise<SupplierAccountR
       kind: 'credit' as const,
       id: credit.id,
       batchNo: credit.batchNo,
-      date: clinicDateOf(credit.at),
+      date: appDateOf(credit.at),
       amount: credit.amount,
     }));
   return [...credits, ...orders].sort((a, b) => compareText(b.date, a.date));
@@ -536,9 +533,9 @@ function manufacturerRows(world: FixtureWorld): ManufacturerRow[] {
 async function manufacturersFor(
   params: ManufacturerListParams,
 ): Promise<ManufacturerRow[]> {
-  const { clinicFixtures } = await fixtureWorld();
-  const today = clinicToday();
-  return manufacturerRows(clinicFixtures)
+  const { appFixtures } = await fixtureWorld();
+  const today = appToday();
+  return manufacturerRows(appFixtures)
     .filter(
       (row) =>
         searchMatches(params.q, [row.name]) &&
@@ -565,9 +562,9 @@ export function fetchAllManufacturers(params: ManufacturerListParams = {}) {
 
 /** One manufacturer as its row — a 404 when it is unknown or deleted. */
 export async function fetchManufacturer(id: string): Promise<ManufacturerRow> {
-  const { clinicFixtures } = await fixtureWorld();
-  const [row] = manufacturerRows(clinicFixtures).filter((maker) => maker.id === id);
-  if (!row) throw clinicHttpError(404, 'not_found', 'Manufacturer not found');
+  const { appFixtures } = await fixtureWorld();
+  const [row] = manufacturerRows(appFixtures).filter((maker) => maker.id === id);
+  if (!row) throw appHttpError(404, 'not_found', 'Manufacturer not found');
   return row;
 }
 
@@ -592,9 +589,9 @@ function mrRows(world: FixtureWorld): MrRow[] {
 
 /** The MRs a list read matches, by name. */
 async function mrsFor(params: MrListParams): Promise<MrRow[]> {
-  const { clinicFixtures } = await fixtureWorld();
-  const today = clinicToday();
-  return mrRows(clinicFixtures)
+  const { appFixtures } = await fixtureWorld();
+  const today = appToday();
+  return mrRows(appFixtures)
     .filter(
       (row) =>
         searchMatches(params.q, [row.name]) &&
@@ -618,9 +615,9 @@ export function fetchAllMedicalReps(params: MrListParams = {}) {
 
 /** One MR as their row — a 404 when they are unknown or deleted. */
 export async function fetchMedicalRep(id: string): Promise<MrRow> {
-  const { clinicFixtures } = await fixtureWorld();
-  const [row] = mrRows(clinicFixtures).filter((rep) => rep.id === id);
-  if (!row) throw clinicHttpError(404, 'not_found', 'MR not found');
+  const { appFixtures } = await fixtureWorld();
+  const [row] = mrRows(appFixtures).filter((rep) => rep.id === id);
+  if (!row) throw appHttpError(404, 'not_found', 'MR not found');
   return row;
 }
 

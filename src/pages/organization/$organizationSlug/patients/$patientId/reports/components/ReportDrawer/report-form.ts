@@ -1,5 +1,5 @@
-import type { ReportType } from '@/shared/api/clinic/clinic-schema.ts';
-import type { PatientReportInput } from '@/shared/api/clinic/patient-reports-contracts.ts';
+import type { ReportType } from '@/shared/api/app/app-schema.ts';
+import type { PatientReportInput } from '@/shared/api/app/patient-reports-contracts.ts';
 import type { PickedFile } from '@/shared/components/DrawerField/index.ts';
 
 import { REPORT_FILE_TYPES } from '../../reports.constants.ts';

@@ -6,13 +6,10 @@ import {
   organizationCheckInCreate,
   organizationReviewCreate,
 } from '@/lib/routes/patient-file-builders.ts';
-import {
-  REVIEW_SOURCE_VALUES,
-  type ReviewSource,
-} from '@/shared/api/clinic/clinic-schema.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { REVIEW_SOURCE_TONES } from '@/shared/clinic/clinic-tones.ts';
-import type { PatientFileSectionSlug } from '@/shared/clinic/patient-file-sections.ts';
+import { REVIEW_SOURCE_VALUES, type ReviewSource } from '@/shared/api/app/app-schema.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { REVIEW_SOURCE_TONES } from '@/shared/app/app-tones.ts';
+import type { PatientFileSectionSlug } from '@/shared/app/patient-file-sections.ts';
 import {
   DrawerChips,
   DrawerField,
@@ -73,7 +70,7 @@ export function LogFeedbackPicker({
   access,
   onClose,
 }: LogFeedbackPickerProps) {
-  const { t } = useTranslation([CLINICAL_NS, CLINIC_NS]);
+  const { t } = useTranslation([CLINICAL_NS, APP_NS]);
   const { organizationSlug = '' } = useParams({ strict: false });
   const navigate = useNavigate();
   const { formatDate } = useLocaleFormat();
@@ -169,7 +166,7 @@ export function LogFeedbackPicker({
                 label={t(K.groups.review)}
                 options={REVIEW_SOURCE_VALUES.map((source) => ({
                   value: source,
-                  label: t(CLINIC_KEYS.reviewSources[source], { ns: CLINIC_NS }),
+                  label: t(APP_KEYS.reviewSources[source], { ns: APP_NS }),
                   tone: REVIEW_SOURCE_TONES[source],
                   hint: t(SOURCE_HINTS[source]),
                 }))}

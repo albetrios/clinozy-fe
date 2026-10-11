@@ -5,21 +5,21 @@ import type {
   PatientType,
   ReferralSource,
   Tone,
-} from '@/shared/api/clinic/clinic-schema.ts';
+} from '@/shared/api/app/app-schema.ts';
 import {
   addCivilDays,
   addCivilMonths,
-  clinicClockTime,
-  clinicInstant,
-  clinicToday,
-} from '@/shared/api/clinic/clinic-time.ts';
+  appClockTime,
+  appInstant,
+  appToday,
+} from '@/shared/api/app/app-time.ts';
 import type {
   PatientConsent,
   PatientFields,
   PatientRecord,
-} from '@/shared/api/clinic/patients-contracts.ts';
-import { toClinicPhone } from '@/shared/clinic/clinic-phone.ts';
-import { clinicPhoneDigits } from '@/shared/clinic/clinic-phone-field.ts';
+} from '@/shared/api/app/patients-contracts.ts';
+import { toAppPhone } from '@/shared/app/app-phone.ts';
+import { appPhoneDigits } from '@/shared/app/app-phone-field.ts';
 
 /**
  * The patient drawer's form (`patients.md:44–58`; KICKOFF §6.5): text as
@@ -99,7 +99,7 @@ export function emptyPatientForm(prefill: PatientDrawerPrefill = {}): PatientFor
   return {
     firstName,
     lastName,
-    phone: prefill.phone ? clinicPhoneDigits(prefill.phone) : '',
+    phone: prefill.phone ? appPhoneDigits(prefill.phone) : '',
     phone2: '',
     address: '',
     homeBranchId: null,
@@ -123,8 +123,8 @@ export function patientFormOf(patient: PatientRecord): PatientFormValues {
   return {
     firstName: patient.firstName,
     lastName: patient.lastName ?? '',
-    phone: clinicPhoneDigits(patient.phone),
-    phone2: patient.phone2 ? clinicPhoneDigits(patient.phone2) : '',
+    phone: appPhoneDigits(patient.phone),
+    phone2: patient.phone2 ? appPhoneDigits(patient.phone2) : '',
     address: patient.address ?? '',
     homeBranchId: patient.homeBranchId,
     gender: patient.gender,
@@ -134,8 +134,8 @@ export function patientFormOf(patient: PatientRecord): PatientFormValues {
     conversion: patient.conversion,
     referredByName: patient.referredByName ?? '',
     referralSource: patient.referralSource,
-    followUpDate: followUp ? clinicToday(followUp) : null,
-    followUpTime: followUp ? clinicClockTime(followUp) : null,
+    followUpDate: followUp ? appToday(followUp) : null,
+    followUpTime: followUp ? appClockTime(followUp) : null,
     notes: patient.notes ?? '',
     consents: [...patient.consents],
   };
@@ -144,7 +144,7 @@ export function patientFormOf(patient: PatientRecord): PatientFormValues {
 const textOrNull = (value: string) => value.trim() || null;
 
 /** A mobile field's digits as the contract stores them; the server answers a bad one with a 422. */
-const storedPhone = (digits: string) => toClinicPhone(digits) ?? digits;
+const storedPhone = (digits: string) => toAppPhone(digits) ?? digits;
 
 /**
  * The fields a form saves (`POST /app/patients`, or the edit's two writes): text trimmed
@@ -171,7 +171,7 @@ export function patientInputOf(
     referredByName: textOrNull(values.referredByName),
     referralSource: values.referralSource,
     followUpAt: values.followUpDate
-      ? clinicInstant(values.followUpDate, values.followUpTime ?? FOLLOW_UP_HOUR)
+      ? appInstant(values.followUpDate, values.followUpTime ?? FOLLOW_UP_HOUR)
       : null,
     notes: textOrNull(values.notes),
     consents: values.consents,
@@ -193,7 +193,7 @@ export function invalidPatientPhones(
   values: Pick<PatientFormValues, 'phone' | 'phone2'>,
 ): ('phone' | 'phone2')[] {
   return (['phone', 'phone2'] as const).filter(
-    (field) => values[field] !== '' && toClinicPhone(values[field]) === null,
+    (field) => values[field] !== '' && toAppPhone(values[field]) === null,
   );
 }
 

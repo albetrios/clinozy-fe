@@ -3,8 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { fetchPersonAppointments } from '@/shared/api/clinic/appointments-api.ts';
-import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
+import { fetchPersonAppointments } from '@/shared/api/app/appointments-api.ts';
+import type { AppointmentRow } from '@/shared/api/app/appointments-contracts.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { APPOINTMENT_NOW, appointmentRow } from '@/tests/utils/appointment-doubles.ts';
 import {
@@ -26,7 +26,7 @@ vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
   readViewportTier: () => viewport.tier,
 }));
 // The person's bookings (`GET /app/appointments?contact_id=`).
-vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/appointments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchPersonAppointments: vi.fn(),
 }));

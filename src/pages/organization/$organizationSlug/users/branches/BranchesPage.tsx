@@ -7,8 +7,8 @@ import {
   organizationUsersBranchCreate,
   organizationUsersBranchEdit,
 } from '@/lib/routes/users-builders.ts';
-import { createdFilterMatches } from '@/shared/api/clinic/clinic-filter-match.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import { createdFilterMatches } from '@/shared/api/app/app-filter-match.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
 import { DataTable } from '@/shared/components/DataTable/index.ts';
 import type { DataTableBulkAction } from '@/shared/components/DataTableBulkBar/index.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
@@ -18,7 +18,7 @@ import {
   useRoomFilters,
 } from '@/shared/components/RoomToolbar/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
 import { FileIcon, MapPin, PenLine } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -54,7 +54,7 @@ function csvTextOf(value: unknown): string {
  * code for branches).
  */
 function useBranchAccess() {
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const holds = (code: 'branch:read' | 'branch:create' | 'branch:update') =>
     access.isResolved && access.canCode(code);
   return {
@@ -121,7 +121,7 @@ export function BranchesPage() {
   const { created } = search;
   const rows = useMemo(() => {
     if (!created) return list.rows;
-    const today = clinicToday();
+    const today = appToday();
     return list.rows.filter((row) =>
       createdFilterMatches(row.branch.createdAt, created, today),
     );

@@ -1,13 +1,13 @@
 import { renderHook } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
+import { resetAppFixtures } from '@/shared/api/app/fixtures/world.fixtures.ts';
 
 import { fetchSupplier } from '../../../shared/medical-api.ts';
 import { useSupplierColumns } from './useSupplierColumns.tsx';
 
-afterEach(() => resetClinicFixtures());
+afterEach(() => resetAppFixtures());
 
 describe('useSupplierColumns', () => {
   it('lays out the Suppliers columns', () => {

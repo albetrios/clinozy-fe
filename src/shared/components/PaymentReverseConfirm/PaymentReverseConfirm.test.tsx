@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import i18n from '@/lib/i18n/i18n.ts';
-import { reversePayment } from '@/shared/api/clinic/payments-api.ts';
+import { reversePayment } from '@/shared/api/app/payments-api.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
@@ -22,7 +22,7 @@ const { notifyMock } = vi.hoisted(() => ({
   notifyMock: { success: vi.fn(), error: vi.fn(), info: vi.fn(), undo: vi.fn() },
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
-vi.mock('@/shared/api/clinic/payments-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/payments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   reversePayment: vi.fn(),
 }));

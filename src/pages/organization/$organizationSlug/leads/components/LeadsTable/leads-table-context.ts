@@ -1,8 +1,8 @@
 import { createContext, useContext } from 'react';
 
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
-import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
-import type { LeadHold } from '@/shared/api/clinic/leads-hold.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
+import type { LeadRecord } from '@/shared/api/app/leads-contracts.ts';
+import type { LeadHold } from '@/shared/api/app/leads-hold.ts';
 import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
 
 /** What the Leads rows read beyond the lead: the team, "me", the hold, the actions. */

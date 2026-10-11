@@ -2,33 +2,33 @@ import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
-import { findContactByPhone } from '@/shared/api/clinic/contacts-api.ts';
+import type { Role } from '@/shared/api/app/app-schema.ts';
+import { findContactByPhone } from '@/shared/api/app/contacts-api.ts';
 import type {
   ContactProfile,
   ContactSummary,
-} from '@/shared/api/clinic/contacts-contracts.ts';
-import { fetchLead } from '@/shared/api/clinic/leads-api.ts';
-import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
-import { attachPatientImage } from '@/shared/api/clinic/patient-images-api.ts';
+} from '@/shared/api/app/contacts-contracts.ts';
+import { fetchLead } from '@/shared/api/app/leads-api.ts';
+import type { LeadRecord } from '@/shared/api/app/leads-contracts.ts';
+import { attachPatientImage } from '@/shared/api/app/patient-images-api.ts';
 import {
   createPatient,
   fetchPatient,
   updatePatient,
-} from '@/shared/api/clinic/patients-api.ts';
+} from '@/shared/api/app/patients-api.ts';
 import type {
   PatientFields,
   PatientRecord,
-} from '@/shared/api/clinic/patients-contracts.ts';
+} from '@/shared/api/app/patients-contracts.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { holdPreset } from '@/tests/utils/app-preset-codes.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { contactHit } from '@/tests/utils/appointment-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { fsi } from '@/tests/utils/bidi-marks.ts';
-import { holdPreset } from '@/tests/utils/clinic-preset-codes.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import { EMPTY_CONTACT_PROFILE } from '@/tests/utils/contact-doubles.ts';
 import { patientRecord } from '@/tests/utils/patient-doubles.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
@@ -55,21 +55,21 @@ vi.mock('@/shared/hooks/useUploadQueue/index.ts', () => ({
   useUploadQueue: () => ({ enqueue: enqueueMock }),
 }));
 
-vi.mock('@/shared/api/clinic/patients-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/patients-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchPatient: vi.fn(),
   createPatient: vi.fn(),
   updatePatient: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/contacts-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/contacts-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   findContactByPhone: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/leads-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/leads-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchLead: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/patient-images-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/patient-images-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   attachPatientImage: vi.fn(),
 }));

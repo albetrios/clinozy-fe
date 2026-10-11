@@ -4,20 +4,20 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import type * as RequireModule from '@/core/security/gates/require-module.ts';
-import type * as PresenceApiModule from '@/shared/api/clinic/presence-api.ts';
+import type * as PresenceApiModule from '@/shared/api/app/presence-api.ts';
 import type { AuthUser } from '@/shared/auth/types.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
-import { presetMyRoles } from '@/tests/utils/clinic-preset-codes.ts';
+import { presetMyRoles } from '@/tests/utils/app-preset-codes.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { AccountMenu } from './AccountMenu.tsx';
 
 /** clinozy-be's copy of my presence (`GET /users/me`, `PUT /users/me/presence`). */
 const presenceServer = vi.hoisted(() => ({ presence: 'online' }));
-vi.mock('@/shared/api/clinic/presence-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/presence-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof PresenceApiModule>()),
   fetchMyPresence: async () => presenceServer.presence,
   saveMyPresence: async (next: string) => {

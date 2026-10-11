@@ -21,19 +21,19 @@ save toasts with "Reload". Gone from the design: "Use a session" (a recorded tre
 §6 #20), "Add package" and its drawer (no package before its invoice, G4), "Next: <date>" per
 package (G4).
 
-Gated by the file layout (membership, the `clinic-patients` module, the org status); in-room
-access is `useClinicAccess`. Registered in `src/app/routes/routeTree.tsx` through the file's
+Gated by the file layout (membership, the `app-patients` module, the org status); in-room
+access is `useAppAccess`. Registered in `src/app/routes/routeTree.tsx` through the file's
 one lazy module (`../patient-id.sections.ts`).
 
 ## Files
 
-| File                            | Responsibility                                                                                         |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `packages.route.tsx`            | Route marker — exports `Component` rendering `PatientPackagesPage`.                                    |
-| `packages.manifest.ts`          | Manifest — `kind: 'leaf'`, permission `organization:read`, module `clinic-patients`, title "Packages". |
-| `packages.constants.ts`         | The cards' and Edit package's copy keys and test ids.                                                  |
-| `PatientPackagesPage.tsx`       | The section: its cards and their states, and Edit package while it is open.                            |
-| `components/EditPackageDrawer/` | Edit package (560): "Valid till" and "Sessions" over the package's name; "Package saved".              |
+| File                            | Responsibility                                                                                      |
+| ------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `packages.route.tsx`            | Route marker — exports `Component` rendering `PatientPackagesPage`.                                 |
+| `packages.manifest.ts`          | Manifest — `kind: 'leaf'`, permission `organization:read`, module `app-patients`, title "Packages". |
+| `packages.constants.ts`         | The cards' and Edit package's copy keys and test ids.                                               |
+| `PatientPackagesPage.tsx`       | The section: its cards and their states, and Edit package while it is open.                         |
+| `components/EditPackageDrawer/` | Edit package (560): "Valid till" and "Sessions" over the package's name; "Package saved".           |
 
 ## Test ids
 

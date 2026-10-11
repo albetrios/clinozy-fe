@@ -3,16 +3,16 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type * as ActivitiesApiModule from '@/shared/api/clinic/contact-activities-api.ts';
+import type * as ActivitiesApiModule from '@/shared/api/app/contact-activities-api.ts';
 import {
   type ContactActivityEntry,
   type ContactActivityPage,
   listContactActivities,
   sendContactActivity,
-} from '@/shared/api/clinic/contact-activities-api.ts';
-import type { ChatMessage } from '@/shared/api/clinic/messages-contracts.ts';
+} from '@/shared/api/app/contact-activities-api.ts';
+import type { ChatMessage } from '@/shared/api/app/messages-contracts.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { TEST_CONTACT_ID } from '@/tests/utils/patient-doubles.ts';
 
 import {
@@ -22,7 +22,7 @@ import {
   useContactActivityAccess,
 } from './useContactActivities.ts';
 
-vi.mock('@/shared/api/clinic/contact-activities-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/contact-activities-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof ActivitiesApiModule>()),
   listContactActivities: vi.fn(),
   sendContactActivity: vi.fn(),
@@ -37,8 +37,8 @@ const access = vi.hoisted(() => ({
   previewRole: null as string | null,
   codes: new Set<string>(),
 }));
-vi.mock('@/shared/hooks/useClinicAccess/index.ts', () => ({
-  useClinicAccess: () => ({
+vi.mock('@/shared/hooks/useAppAccess/index.ts', () => ({
+  useAppAccess: () => ({
     previewRole: access.previewRole,
     isResolved: access.isResolved,
     can: () => false,
@@ -227,7 +227,7 @@ describe('useAddContactNote (§6 #3)', () => {
     });
 
     await act(async () => answer?.(sent));
-    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['clinic', 'messages'] });
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['app', 'messages'] });
     await waitFor(() =>
       expect(result.current.list.entries.map((entry) => entry.id)).toEqual([
         'msg_new',

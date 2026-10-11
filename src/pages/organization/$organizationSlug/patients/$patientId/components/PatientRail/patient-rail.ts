@@ -1,4 +1,4 @@
-import { addCivilMonths, civilDayOffset } from '@/shared/api/clinic/clinic-time.ts';
+import { addCivilMonths, civilDayOffset } from '@/shared/api/app/app-time.ts';
 
 /**
  * How long someone has been a patient (H:4971): joined today, whole days

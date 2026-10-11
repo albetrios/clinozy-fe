@@ -6,11 +6,11 @@ import {
   deleteClinicalNote,
   listClinicalNotes,
   restoreClinicalNote,
-} from '@/shared/api/clinic/clinical-notes-api.ts';
+} from '@/shared/api/app/clinical-notes-api.ts';
 import type {
   ClinicalNote,
   ClinicalNoteKind,
-} from '@/shared/api/clinic/clinical-notes-contracts.ts';
+} from '@/shared/api/app/clinical-notes-contracts.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
@@ -89,7 +89,7 @@ export function useCreateClinicalNote(
     mutationFn: (vars, action) => createClinicalNote({ ...vars, ...action }),
     // The person's activity: the server writes a `system` entry for a new note
     // (`messageQueryKeys`, named here so the hook does not load the messages module).
-    invalidateKeys: [['clinic', 'messages']],
+    invalidateKeys: [['app', 'messages']],
     ...options,
     onSuccess: async (note, vars) => {
       updateNotes(vars.patientId, (notes) => withNote(notes, note));

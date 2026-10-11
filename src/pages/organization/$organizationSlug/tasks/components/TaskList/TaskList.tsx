@@ -7,12 +7,12 @@ import {
   groupTasks,
   TASK_GROUP_TONES,
   type TaskGroup,
-} from '@/shared/api/clinic/task-views.ts';
+} from '@/shared/api/app/task-views.ts';
 import type {
   TaskRow as TaskRowRecord,
   TaskTab,
-} from '@/shared/api/clinic/tasks-contracts.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/api/app/tasks-contracts.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { EmptyState, EmptyStateAction } from '@/shared/components/EmptyState/index.ts';
 import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';

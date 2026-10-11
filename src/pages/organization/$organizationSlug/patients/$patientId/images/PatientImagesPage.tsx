@@ -8,11 +8,11 @@ import {
   organizationPatientPhotoEdit,
 } from '@/lib/routes/patient-file-builders.ts';
 import { cn } from '@/lib/utils.ts';
-import type { PatientPhoto } from '@/shared/api/clinic/patient-images-contracts.ts';
+import type { PatientPhoto } from '@/shared/api/app/patient-images-contracts.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
 import {
   type PatientPhotoList,
@@ -188,7 +188,7 @@ function PhotosBody({
 }) {
   const { t } = useTranslation(PATIENT_PHOTOS_NS);
   const size = useDevicePrefsStore((state) => state.photoSize);
-  const { day: dayLabel } = useClinicClock();
+  const { day: dayLabel } = useAppClock();
   const links = usePhotoLinks();
   if (read.isPending) return <PhotosSkeleton />;
   if (read.photos.length === 0) {
@@ -254,7 +254,7 @@ export function PatientImagesPage() {
   const visits = usePhotoVisits();
   const size = useDevicePrefsStore((state) => state.photoSize);
   const setSize = useDevicePrefsStore((state) => state.setPhotoSize);
-  const { day: dayLabel } = useClinicClock();
+  const { day: dayLabel } = useAppClock();
   const links = usePhotoLinks();
   const [deleting, setDeleting] = useState<PatientPhoto | null>(null);
 

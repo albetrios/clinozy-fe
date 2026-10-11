@@ -2,12 +2,12 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type * as PatientsApiModule from '@/shared/api/clinic/patients-api.ts';
-import { deletePatient, restorePatient } from '@/shared/api/clinic/patients-api.ts';
+import type * as PatientsApiModule from '@/shared/api/app/patients-api.ts';
+import { deletePatient, restorePatient } from '@/shared/api/app/patients-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import { patientRecord, TEST_PATIENT_ID } from '@/tests/utils/patient-doubles.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
@@ -26,7 +26,7 @@ vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 
 /** Whether Dharti's file is live on the server double — a delete takes it, a restore brings it back. */
 const server = vi.hoisted(() => ({ live: true }));
-vi.mock('@/shared/api/clinic/patients-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/patients-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof PatientsApiModule>()),
   deletePatient: vi.fn(async () => {
     server.live = false;

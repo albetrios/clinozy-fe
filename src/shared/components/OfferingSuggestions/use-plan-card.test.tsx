@@ -3,21 +3,21 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type * as DirectoryApiModule from '@/shared/api/clinic/directory-api.ts';
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
-import type * as LeadsApiModule from '@/shared/api/clinic/leads-api.ts';
-import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
-import type * as OfferingsApiModule from '@/shared/api/clinic/offerings-api.ts';
-import type * as PackagesApiModule from '@/shared/api/clinic/patient-packages-api.ts';
-import type { PatientPurchaseRow } from '@/shared/api/clinic/patient-packages-contracts.ts';
-import type * as PlanApiModule from '@/shared/api/clinic/plan-api.ts';
+import type * as DirectoryApiModule from '@/shared/api/app/directory-api.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
+import type * as LeadsApiModule from '@/shared/api/app/leads-api.ts';
+import type { LeadRecord } from '@/shared/api/app/leads-contracts.ts';
+import type * as OfferingsApiModule from '@/shared/api/app/offerings-api.ts';
+import type * as PackagesApiModule from '@/shared/api/app/patient-packages-api.ts';
+import type { PatientPurchaseRow } from '@/shared/api/app/patient-packages-contracts.ts';
+import type * as PlanApiModule from '@/shared/api/app/plan-api.ts';
 import type {
   PlanActivityRow,
   PlanIdeaRow,
   PlanOffering,
   PlanSuggestionRow,
-} from '@/shared/api/clinic/plan-contracts.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+} from '@/shared/api/app/plan-contracts.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { offeringRecord } from '@/tests/utils/offering-doubles.ts';
 
 const { notifyMock } = vi.hoisted(() => ({
@@ -33,8 +33,8 @@ vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 
 /** The member's permission codes the card asks about. */
 const access = vi.hoisted(() => ({ codes: new Set<string>() }));
-vi.mock('@/shared/hooks/useClinicAccess/index.ts', () => ({
-  useClinicAccess: () => ({
+vi.mock('@/shared/hooks/useAppAccess/index.ts', () => ({
+  useAppAccess: () => ({
     previewRole: null,
     can: () => true,
     canCode: (code: string) => access.codes.has(code),
@@ -43,7 +43,7 @@ vi.mock('@/shared/hooks/useClinicAccess/index.ts', () => ({
   }),
 }));
 
-vi.mock('@/shared/api/clinic/plan-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/plan-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof PlanApiModule>()),
   fetchPlan: vi.fn(),
   fetchPlanIdeas: vi.fn(),
@@ -53,27 +53,27 @@ vi.mock('@/shared/api/clinic/plan-api.ts', async (importOriginal) => ({
   deletePlanSuggestion: vi.fn(),
   restorePlanSuggestion: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/offerings-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof OfferingsApiModule>()),
   fetchAllOfferings: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/patient-packages-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/patient-packages-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof PackagesApiModule>()),
   listPatientPurchases: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof DirectoryApiModule>()),
   fetchTeamDirectory: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/leads-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/leads-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof LeadsApiModule>()),
   fetchLead: vi.fn(),
 }));
 
-import { fetchTeamDirectory } from '@/shared/api/clinic/directory-api.ts';
-import { fetchLead } from '@/shared/api/clinic/leads-api.ts';
-import { fetchAllOfferings } from '@/shared/api/clinic/offerings-api.ts';
-import { listPatientPurchases } from '@/shared/api/clinic/patient-packages-api.ts';
+import { fetchTeamDirectory } from '@/shared/api/app/directory-api.ts';
+import { fetchLead } from '@/shared/api/app/leads-api.ts';
+import { fetchAllOfferings } from '@/shared/api/app/offerings-api.ts';
+import { listPatientPurchases } from '@/shared/api/app/patient-packages-api.ts';
 import {
   createPlanSuggestion,
   deletePlanSuggestion,
@@ -82,7 +82,7 @@ import {
   fetchPlanIdeas,
   restorePlanSuggestion,
   updatePlanSuggestion,
-} from '@/shared/api/clinic/plan-api.ts';
+} from '@/shared/api/app/plan-api.ts';
 
 import { type PlanCardHost, usePlanCard } from './use-plan-card.ts';
 

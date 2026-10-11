@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { ChatPerson } from '@/shared/api/clinic/messages-contracts.ts';
-import { basePrice } from '@/shared/api/clinic/offerings-pricing.ts';
+import type { ChatPerson } from '@/shared/api/app/messages-contracts.ts';
+import { basePrice } from '@/shared/api/app/offerings-pricing.ts';
 import type { AuthUser } from '@/shared/auth/types.ts';
 import { shortPersonName } from '@/shared/components/Cells/PersonAvatar/index.ts';
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 import { useMessageTranslator } from '@/shared/hooks/useMessageTranslator/index.ts';
 import { useOfferings } from '@/shared/hooks/useOfferings/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
@@ -30,7 +30,7 @@ import type { ChatClock, ChatFormat } from './chat-history.ts';
 export function useChatFormat(maskMoney: boolean): ChatFormat {
   const { t } = useTranslation(CHAT_COLUMN_NS);
   const money = usePaiseFormat();
-  const clock = useClinicClock();
+  const clock = useAppClock();
   return useMemo(() => ({ t, money, clock, maskMoney }), [t, money, clock, maskMoney]);
 }
 

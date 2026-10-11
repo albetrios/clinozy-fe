@@ -1,17 +1,17 @@
 import { cn } from '@/lib/utils.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
 import {
   purchaseLineAmount,
   purchaseOrderDue,
   purchaseOrderTotal,
-} from '@/shared/api/clinic/clinic-money.ts';
+} from '@/shared/api/app/app-money.ts';
 import type {
   Branch,
   MedicalPurchaseOrder,
   Organization,
   PurchaseItem,
   Supplier,
-} from '@/shared/api/clinic/clinic-schema.ts';
+} from '@/shared/api/app/app-schema.ts';
 import {
   usePrintFormat,
   usePrintTranslation,

@@ -1,8 +1,8 @@
 import type { ComponentProps, ReactNode } from 'react';
 
 import { cn } from '@/lib/utils.ts';
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 
 /** A pill's paint: a tone, `neutral` (`bg-muted`) or `inverse` (the dark ink pill). */
 export type PillTone = Tone | 'neutral' | 'inverse';

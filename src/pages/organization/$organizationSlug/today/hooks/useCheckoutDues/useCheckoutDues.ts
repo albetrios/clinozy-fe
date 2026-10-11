@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
 
-import { fetchAllInvoices, invoiceQueryKeys } from '@/shared/api/clinic/invoices-api.ts';
+import { fetchAllInvoices, invoiceQueryKeys } from '@/shared/api/app/invoices-api.ts';
 import type {
   InvoiceListParams,
   InvoiceRecord,
-} from '@/shared/api/clinic/invoices-contracts.ts';
-import { TODAY_REFETCH_MS } from '@/shared/api/clinic/today-contracts.ts';
+} from '@/shared/api/app/invoices-contracts.ts';
+import { TODAY_REFETCH_MS } from '@/shared/api/app/today-contracts.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import { usePaymentAccess } from '@/shared/hooks/usePaymentAccess/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';

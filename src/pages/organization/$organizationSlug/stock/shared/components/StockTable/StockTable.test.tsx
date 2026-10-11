@@ -5,7 +5,7 @@ import { axe } from 'vitest-axe';
 
 import { useRoomTable } from '@/shared/hooks/useRoomTable/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { holdPreset } from '@/tests/utils/clinic-preset-codes.ts';
+import { holdPreset } from '@/tests/utils/app-preset-codes.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { StockTable } from './StockTable.tsx';

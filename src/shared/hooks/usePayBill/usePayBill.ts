@@ -5,7 +5,7 @@ import { organizationPaymentPay } from '@/lib/routes/payments-builders.ts';
 import {
   supplierBillKey,
   type SupplierBillRef,
-} from '@/shared/api/clinic/payments-contracts.ts';
+} from '@/shared/api/app/payments-contracts.ts';
 import { usePaymentAccess } from '@/shared/hooks/usePaymentAccess/index.ts';
 
 /** What {@link usePayBill} hands a room: whether "Pay ₹X" shows, and what it opens. */

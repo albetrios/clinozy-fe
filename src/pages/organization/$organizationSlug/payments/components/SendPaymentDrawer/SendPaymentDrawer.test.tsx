@@ -9,13 +9,13 @@ import {
   listOpenSupplierBills,
   payExpense,
   updatePayment,
-} from '@/shared/api/clinic/payments-api.ts';
-import type { OpenSupplierBill } from '@/shared/api/clinic/payments-contracts.ts';
+} from '@/shared/api/app/payments-api.ts';
+import type { OpenSupplierBill } from '@/shared/api/app/payments-contracts.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import { ledgerRow } from '@/tests/utils/payments-doubles.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
@@ -38,7 +38,7 @@ const { notifyMock } = vi.hoisted(() => ({
   },
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
-vi.mock('@/shared/api/clinic/payments-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/payments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listOpenSupplierBills: vi.fn(),
   payExpense: vi.fn(),

@@ -3,8 +3,8 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type * as AppointmentsApiModule from '@/shared/api/clinic/appointments-api.ts';
-import type * as FeedbackApiModule from '@/shared/api/clinic/feedback-api.ts';
+import type * as AppointmentsApiModule from '@/shared/api/app/appointments-api.ts';
+import type * as FeedbackApiModule from '@/shared/api/app/feedback-api.ts';
 import {
   createCheckIn,
   deleteFeedback,
@@ -12,17 +12,17 @@ import {
   logFeedbackAction,
   restoreFeedback,
   updateCheckIn,
-} from '@/shared/api/clinic/feedback-api.ts';
+} from '@/shared/api/app/feedback-api.ts';
 import type {
   FeedbackItem,
   PatientCheckIn,
-} from '@/shared/api/clinic/feedback-contracts.ts';
-import { patientFileQueryKeys } from '@/shared/api/clinic/patient-file-api.ts';
-import type * as TreatmentsApiModule from '@/shared/api/clinic/treatments-api.ts';
-import { treatmentQueryKeys } from '@/shared/api/clinic/treatments-api.ts';
+} from '@/shared/api/app/feedback-contracts.ts';
+import { patientFileQueryKeys } from '@/shared/api/app/patient-file-api.ts';
+import type * as TreatmentsApiModule from '@/shared/api/app/treatments-api.ts';
+import { treatmentQueryKeys } from '@/shared/api/app/treatments-api.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { appointmentRow } from '@/tests/utils/appointment-doubles.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import { TEST_PATIENT_ID } from '@/tests/utils/patient-doubles.ts';
 
 import {
@@ -63,7 +63,7 @@ function checkIn(overrides: Partial<PatientCheckIn> = {}): PatientCheckIn {
 /** The server's records — every write shows in the next read. */
 const store = vi.hoisted(() => ({ items: [] as FeedbackItem[] }));
 
-vi.mock('@/shared/api/clinic/feedback-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/feedback-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof FeedbackApiModule>()),
   listPatientFeedback: vi.fn(async () => [...store.items]),
   fetchPreviousCheckIn: vi.fn(async () => null),
@@ -73,11 +73,11 @@ vi.mock('@/shared/api/clinic/feedback-api.ts', async (importOriginal) => ({
   restoreFeedback: vi.fn(),
   logFeedbackAction: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/treatments-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/treatments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof TreatmentsApiModule>()),
   fetchTreatment: vi.fn(async () => ({ id: 'trt_lhr', name: 'LHR Full Face' })),
 }));
-vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/appointments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof AppointmentsApiModule>()),
   fetchAppointment: vi.fn(async () =>
     appointmentRow({ id: 'appt_visit', serviceLabel: 'Hydrafacial' }),

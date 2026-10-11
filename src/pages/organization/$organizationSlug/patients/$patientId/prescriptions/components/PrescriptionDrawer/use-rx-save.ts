@@ -1,7 +1,7 @@
 import type { FieldPath, UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import type { PrescriptionRecord } from '@/shared/api/clinic/prescriptions-contracts.ts';
+import type { PrescriptionRecord } from '@/shared/api/app/prescriptions-contracts.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import {
   useCreatePrescription,

@@ -3,11 +3,11 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import type { Role } from '@/shared/api/app/app-schema.ts';
+import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
+import { resetAppFixtures } from '@/shared/api/app/fixtures/world.fixtures.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { holdPreset } from '@/tests/utils/clinic-preset-codes.ts';
+import { holdPreset } from '@/tests/utils/app-preset-codes.ts';
 
 import { fetchMedicalSale } from '../../../shared/medical-api.ts';
 import { useSaleActions } from './useSaleActions.ts';
@@ -55,12 +55,12 @@ beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] });
   vi.setSystemTime(NOW);
   for (const fn of [...Object.values(notifyMock), printMock]) fn.mockReset();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 afterEach(() => {
   vi.useRealTimers();
   useOrganizationStore.getState().clearPermissions();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 
 describe('useSaleActions (medical.md:29, 338)', () => {

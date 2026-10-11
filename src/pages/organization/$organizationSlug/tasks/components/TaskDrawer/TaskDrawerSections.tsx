@@ -2,19 +2,19 @@ import { type ReactNode, useId } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import { isTaskOverdue } from '@/shared/api/clinic/task-views.ts';
+import { isTaskOverdue } from '@/shared/api/app/task-views.ts';
 import {
   TASK_TYPES,
   type TaskDetail,
   type TaskOutcomePlan,
   type TaskRow,
   visibleTaskOutcomes,
-} from '@/shared/api/clinic/tasks-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
-import { TASK_RULE_ICONS } from '@/shared/clinic/task-rule-icons.ts';
-import { TASK_RULE_KEYS, TASK_RULES_NS } from '@/shared/clinic/task-rules.constants.ts';
-import type { TaskTarget } from '@/shared/clinic/task-targets.ts';
+} from '@/shared/api/app/tasks-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
+import { TASK_RULE_ICONS } from '@/shared/app/task-rule-icons.ts';
+import { TASK_RULE_KEYS, TASK_RULES_NS } from '@/shared/app/task-rules.constants.ts';
+import type { TaskTarget } from '@/shared/app/task-targets.ts';
 import {
   PersonAvatar,
   personInitials,
@@ -84,7 +84,7 @@ export function TaskRuleTile({ detail }: { detail: TaskDetail }) {
  */
 function useTaskOwner(row: TaskRow, assignees: TaskAssignees) {
   const { t } = useTranslation(TASKS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const member = row.ownerId ? assignees.byId.get(row.ownerId) : undefined;
   if (member) {
     const short = shortPersonName(member.name);
@@ -96,8 +96,7 @@ function useTaskOwner(row: TaskRow, assignees: TaskAssignees) {
           : short,
     };
   }
-  if (row.ownerRole)
-    return { member: null, name: tClinic(CLINIC_KEYS.roles[row.ownerRole]) };
+  if (row.ownerRole) return { member: null, name: tApp(APP_KEYS.roles[row.ownerRole]) };
   return { member: null, name: row.ownerId ? '' : t(TASKS_KEYS.row.anyone) };
 }
 

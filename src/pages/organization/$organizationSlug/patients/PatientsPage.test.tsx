@@ -2,8 +2,8 @@ import { screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type * as PatientsApiModule from '@/shared/api/clinic/patients-api.ts';
-import { listPatients } from '@/shared/api/clinic/patients-api.ts';
+import type * as PatientsApiModule from '@/shared/api/app/patients-api.ts';
+import { listPatients } from '@/shared/api/app/patients-api.ts';
 
 import {
   NOW,
@@ -17,7 +17,7 @@ import {
 import { PatientsPage } from './PatientsPage.tsx';
 
 const world = vi.hoisted(() => ({}) as PatientsWorld);
-vi.mock('@/shared/api/clinic/patients-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/patients-api.ts', async (importOriginal) => {
   const { patientsApiDouble } =
     await import('./__tests__/integration/patients-test-data.ts');
   return {

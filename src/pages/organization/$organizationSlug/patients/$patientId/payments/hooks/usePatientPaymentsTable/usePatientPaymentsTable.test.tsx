@@ -3,7 +3,7 @@ import { renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
+import type { LedgerRow } from '@/shared/api/app/payments-contracts.ts';
 import { useDevicePrefsStore } from '@/shared/store/useDevicePrefsStore/index.ts';
 import { ledgerRow } from '@/tests/utils/payments-doubles.ts';
 

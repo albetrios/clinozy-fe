@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import type {
   ClinicalNote,
   ClinicalNoteKind,
-} from '@/shared/api/clinic/clinical-notes-contracts.ts';
+} from '@/shared/api/app/clinical-notes-contracts.ts';
 
 import {
   CLINICAL_LISTS,

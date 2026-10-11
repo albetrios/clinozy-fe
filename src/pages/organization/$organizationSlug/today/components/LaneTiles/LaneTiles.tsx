@@ -1,9 +1,9 @@
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import { TODAY_LANES, type TodayLane } from '@/shared/api/clinic/today-contracts.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import { TODAY_LANES, type TodayLane } from '@/shared/api/app/today-contracts.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
 import { TODAY_KEYS, TODAY_NS, TODAY_TEST_IDS } from '../../today.constants.ts';
@@ -56,7 +56,7 @@ const DIMMED_TILE_INK = {
  * From `lg` the tracks start at 114px, so the widest 12-hour hint ("oldest
  * 12:40 PM", 86px) stays on one line wherever the row lands: at 1280 seven
  * 125px tiles (106 made eight 108px tracks there — 81px for the hint), at
- * 1440 eight 128px tracks. The time itself never breaks (`useClinicClock`
+ * 1440 eight 128px tracks. The time itself never breaks (`useAppClock`
  * keeps it one token). Below `md` one snap strip of 128px tiles that bleeds to
  * the screen edges. Each tile: the label in the lane's ink, the
  * count, up to four faces then "+N", and the hint. Lanes outside the member's
@@ -73,7 +73,7 @@ export function LaneTiles({
 }: LaneTilesProps) {
   const { t } = useTranslation(TODAY_NS);
   const { formatNumber } = useLocaleFormat();
-  const clock = useClinicClock();
+  const clock = useAppClock();
 
   return (
     // The group is a fieldset around the strip, not the strip itself: a

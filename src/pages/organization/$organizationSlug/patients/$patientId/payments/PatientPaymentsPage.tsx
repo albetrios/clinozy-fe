@@ -8,8 +8,8 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
-import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
-import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
+import type { LedgerRow } from '@/shared/api/app/payments-contracts.ts';
+import { appCommandNavigation } from '@/shared/app/app-command-targets.ts';
 import { DataTableColumnChooser } from '@/shared/components/DataTableColumnChooser/index.ts';
 import {
   PaymentDeleteConfirm,
@@ -17,7 +17,7 @@ import {
 } from '@/shared/components/PaymentDeleteConfirm/index.ts';
 import { PaymentReverseConfirm } from '@/shared/components/PaymentReverseConfirm/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
-import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
+import { useAppNavigate } from '@/shared/hooks/useAppNavigate/index.ts';
 import { useLedgerRowActions } from '@/shared/hooks/useLedgerRowActions/index.ts';
 import { usePatientPayments } from '@/shared/hooks/usePayments/index.ts';
 
@@ -46,7 +46,7 @@ import { manifest } from './payments.manifest.ts';
  */
 export function PatientPaymentsPage() {
   const { t } = useTranslation([PATIENT_TABLE_NS, ERRORS_NS]);
-  const navigate = useClinicNavigate();
+  const navigate = useAppNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
   const { patientId } = usePatientFileContext();
   const payments = usePatientPayments(patientId);
@@ -57,7 +57,7 @@ export function PatientPaymentsPage() {
   const rowActions = useLedgerRowActions({
     onEdit: (row) =>
       void navigate(
-        clinicCommandNavigation('paymentEdit', {
+        appCommandNavigation('paymentEdit', {
           organizationSlug,
           recordId: row.id,
           referrer: `patients/${patientId}/payments`,

@@ -71,7 +71,7 @@ test.describe('Navigation', () => {
   }) => {
     // Inside an organization the shell's guard runs first, so a guest never reaches the
     // 404 — and a member never does either: an unknown in-org path goes to their role
-    // home with "Page not found" (S:115, `clinic-dialog-routes.e2e.test.ts`).
+    // home with "Page not found" (S:115, `app-dialog-routes.e2e.test.ts`).
     await page.goto('/organization/acme/does/not/exist');
     await expect(page).toHaveURL(/\/login\?redirect=/, { timeout: 10000 });
     const redirect = new URL(page.url()).searchParams.get('redirect') ?? '';

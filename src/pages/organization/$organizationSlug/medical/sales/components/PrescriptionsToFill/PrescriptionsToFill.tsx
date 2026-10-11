@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
 import { Picker } from '@/shared/components/Picker/index.ts';
 import { RoomViewAction } from '@/shared/components/RoomToolbar/index.ts';
 import { Pill } from '@/shared/icons/index.ts';

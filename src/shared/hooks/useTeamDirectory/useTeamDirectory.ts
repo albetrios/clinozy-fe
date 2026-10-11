@@ -4,7 +4,7 @@ import {
   type DirectoryMember,
   fetchTeamDirectory,
   teamDirectoryQueryKey,
-} from '@/shared/api/clinic/directory-api.ts';
+} from '@/shared/api/app/directory-api.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 

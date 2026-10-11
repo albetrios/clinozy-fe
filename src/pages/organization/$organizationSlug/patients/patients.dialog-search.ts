@@ -7,7 +7,7 @@
  * parses it, and this module loads with the room.
  */
 import { PUBLIC_ID, textOf } from '@/lib/routes/search-params.ts';
-import { toClinicPhone } from '@/shared/clinic/clinic-phone.ts';
+import { toAppPhone } from '@/shared/app/app-phone.ts';
 
 /** The New patient prefill (`S:31`; ⌘K "New patient", the contact card's "+ Patient"). */
 export interface PatientCreateSearch {
@@ -32,7 +32,7 @@ export function validatePatientCreateSearch(
   const fromLead = textOf(search.fromLead);
   return {
     name: name && name.length <= 120 ? name : undefined,
-    phone: (phone && toClinicPhone(phone)) || undefined,
+    phone: (phone && toAppPhone(phone)) || undefined,
     fromLead:
       PUBLIC_ID.test(fromLead) && fromLead.startsWith('lead_') ? fromLead : undefined,
   };

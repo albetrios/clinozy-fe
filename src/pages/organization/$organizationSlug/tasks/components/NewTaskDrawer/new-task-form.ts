@@ -1,5 +1,5 @@
-import { addCivilDays, clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
-import type { TaskFields, TaskPriority } from '@/shared/api/clinic/tasks-contracts.ts';
+import { addCivilDays, appInstant } from '@/shared/api/app/app-time.ts';
+import type { TaskFields, TaskPriority } from '@/shared/api/app/tasks-contracts.ts';
 
 import { taskAssigneeOfKey } from '../../hooks/useTaskAssignees/index.ts';
 import type { NewTaskPerson } from './new-task-person.ts';
@@ -122,7 +122,7 @@ export function newTaskFieldsOf(
   return {
     title,
     why: notes || null,
-    dueAt: clinicInstant(form.dueDate, form.dueTime),
+    dueAt: appInstant(form.dueDate, form.dueTime),
     assignee: taskAssigneeOfKey(owner),
     priority: form.priority,
     contactId: person?.contactId ?? null,

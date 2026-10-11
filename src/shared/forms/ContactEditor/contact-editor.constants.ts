@@ -3,12 +3,12 @@ import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 import type { ContactPreferencePreset } from './contact-editor-value.ts';
 
 /**
- * The contact editor's copy (`leads.md:439–443`) lives in the shared `clinic`
+ * The contact editor's copy (`leads.md:439–443`) lives in the shared `app`
  * namespace: a contact card in any room opens it. The channel names and the
  * band's "+ Lead" · "+ Appointment" · "+ Patient" are the clinic's own
- * (`CLINIC_KEYS.channels`, `PERSON_CARD_KEYS`).
+ * (`APP_KEYS.channels`, `PERSON_CARD_KEYS`).
  */
-export const CONTACT_EDITOR_NS = I18N_NAMESPACES.clinic;
+export const CONTACT_EDITOR_NS = I18N_NAMESPACES.app;
 
 /** The contact editor's keys, verbatim from the design. */
 export const CONTACT_EDITOR_KEYS = {

@@ -3,9 +3,9 @@ import { useTranslation } from 'react-i18next';
 
 import { isolateValues } from '@/lib/bidi-isolate.ts';
 import { cn } from '@/lib/utils.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { ContactSummary } from '@/shared/api/clinic/contacts-contracts.ts';
-import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { ContactSummary } from '@/shared/api/app/contacts-contracts.ts';
+import { formatAppPhone } from '@/shared/app/app-phone.ts';
 import { PersonAvatar, personInitials } from '@/shared/components/Cells/index.ts';
 import {
   CONTACT_EDITOR_KEYS,
@@ -46,7 +46,7 @@ function useHitLine() {
   return (hit: ContactSummary) => {
     const values = isolateValues({
       id: displayId.contact(hit.contactNumber),
-      phone: formatClinicPhone(hit.primaryPhone),
+      phone: formatAppPhone(hit.primaryPhone),
     });
     if (hit.openLeadId) return t(K.hits.openLead, values);
     return t(hit.patientId ? K.hits.patient : K.hits.contact, values);

@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+import { expectRoomReady } from '@/tests/utils/e2e-app.ts';
 import { registerNewUserAndGoToToday } from '@/tests/utils/e2e-auth.ts';
-import { expectRoomReady } from '@/tests/utils/e2e-clinic.ts';
 import {
   byTestId,
   expectAppHeaderReady,

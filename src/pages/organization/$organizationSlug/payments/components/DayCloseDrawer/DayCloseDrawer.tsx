@@ -2,14 +2,14 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import { dayCloseQueryKeys } from '@/shared/api/clinic/day-close-api.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
+import { dayCloseQueryKeys } from '@/shared/api/app/day-close-api.ts';
 import type {
   CloseDayInput,
   DayCloseView,
-} from '@/shared/api/clinic/day-close-contracts.ts';
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
-import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
+} from '@/shared/api/app/day-close-contracts.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
+import type { LedgerRow } from '@/shared/api/app/payments-contracts.ts';
 import { shortPersonName } from '@/shared/components/Cells/index.ts';
 import { ledgerEntryLock } from '@/shared/components/LedgerCells/index.ts';
 import { PanelSkeleton } from '@/shared/components/PanelSkeleton/index.ts';
@@ -23,8 +23,8 @@ import { RetryError } from '@/shared/components/RetryError/index.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
 import { mapValidationErrors } from '@/shared/errors/map-validation-errors.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { useLedgerRowActions } from '@/shared/hooks/useLedgerRowActions/index.ts';
 import { useMyMembershipId } from '@/shared/hooks/useMyMembership/index.ts';
 import { usePaymentAccess } from '@/shared/hooks/usePaymentAccess/index.ts';
@@ -176,7 +176,7 @@ function useDayWrites({
 }) {
   const { t } = useTranslation(PAYMENTS_NS);
   const formatRupees = useRupeeFormat();
-  const { time: timeOf } = useClinicClock();
+  const { time: timeOf } = useAppClock();
   const queryClient = useQueryClient();
   const accept = useAcceptOpeningCash({ notifyOnError: false });
   const close = useCloseDay({ notifyOnError: false });
@@ -446,7 +446,7 @@ export function DayCloseDrawer({
   onClose,
 }: DayCloseDrawerProps) {
   const { t } = useTranslation(PAYMENTS_NS);
-  const [today] = useState(() => clinicToday());
+  const [today] = useState(() => appToday());
   const date = search.date && search.date <= today ? search.date : today;
   const branchId = useDayCloseBranch(search.branch);
   const query = useDayClose(branchId, date);

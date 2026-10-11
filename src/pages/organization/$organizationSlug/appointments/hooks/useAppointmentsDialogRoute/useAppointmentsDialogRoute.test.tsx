@@ -1,22 +1,22 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type * as AppointmentsApiModule from '@/shared/api/clinic/appointments-api.ts';
+import type * as AppointmentsApiModule from '@/shared/api/app/appointments-api.ts';
 import {
   appointmentQueryKeys,
   fetchAppointment,
-} from '@/shared/api/clinic/appointments-api.ts';
+} from '@/shared/api/app/appointments-api.ts';
 import {
   type CrossRoomDialog,
   CrossRoomDialogContext,
 } from '@/shared/hooks/useCrossRoomDialog/index.ts';
 import { notify } from '@/shared/notify/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import {
   APPOINTMENT_NOW,
   contactHit,
   DOCTOR_NISHA,
 } from '@/tests/utils/appointment-doubles.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import {
   type AppointmentsWorld,
@@ -26,7 +26,7 @@ import {
   seededAppointmentsWorld,
 } from '../../__tests__/integration/appointments-test-data.ts';
 import {
-  grantClinicAccess,
+  grantAppAccess,
   renderAppointmentsRoutes,
 } from '../../__tests__/integration/appointments-test-router.tsx';
 import {
@@ -39,7 +39,7 @@ vi.mock('@/shared/notify/index.ts', () => ({
 }));
 
 const world = vi.hoisted(() => ({}) as AppointmentsWorld);
-vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/appointments-api.ts', async (importOriginal) => {
   const { appointmentsApiDouble } =
     await import('../../__tests__/integration/appointments-test-data.ts');
   return {
@@ -91,7 +91,7 @@ beforeEach(() => {
   vi.resetAllMocks();
   Object.assign(world, seededAppointmentsWorld());
   signInTestMember();
-  grantClinicAccess('owner');
+  grantAppAccess('owner');
 });
 afterEach(() => vi.useRealTimers());
 
@@ -223,7 +223,7 @@ describe('useAppointmentsDialogRoute', () => {
   });
 
   it('reads the drawer read-only without Edit, and refuses a create link without Create', async () => {
-    grantClinicAccess('none');
+    grantAppAccess('none');
     const drawer = renderAppointmentsRoutes(`${PAGE}/${RIYA}`, Probe);
     await waitFor(() => expect(seen()).toMatchObject({ seq: 2861, readOnly: true }));
     drawer.unmount();
@@ -288,7 +288,7 @@ describe('useAppointmentsDialogRoute over another room (A-P1)', () => {
 
     vi.mocked(notify.info).mockClear();
     close.mockReset();
-    grantClinicAccess('none');
+    grantAppAccess('none');
     renderAppointmentsRoutes(TODAY, Probe, {
       Today: overToday(drawer('create', { from: 'today' }, close)),
     });

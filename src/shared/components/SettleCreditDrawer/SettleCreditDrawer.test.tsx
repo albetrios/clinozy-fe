@@ -3,15 +3,15 @@ import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import i18n from '@/lib/i18n/i18n.ts';
-import { settleCredit } from '@/shared/api/clinic/credits-api.ts';
-import type { CreditRow } from '@/shared/api/clinic/credits-contracts.ts';
-import { branchRef } from '@/shared/api/clinic/fixtures/organization.fixtures.ts';
+import { settleCredit } from '@/shared/api/app/credits-api.ts';
+import type { CreditRow } from '@/shared/api/app/credits-contracts.ts';
+import { branchRef } from '@/shared/api/app/fixtures/organization.fixtures.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { fsi } from '@/tests/utils/bidi-marks.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import { creditRow, TEST_CREDIT_ID } from '@/tests/utils/payments-doubles.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
@@ -34,7 +34,7 @@ const { notifyMock } = vi.hoisted(() => ({
   },
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
-vi.mock('@/shared/api/clinic/credits-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/credits-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   settleCredit: vi.fn(),
 }));
@@ -66,7 +66,7 @@ const SUPPLIER_CREDIT = creditRow({
 
 const part = (id: string) => screen.getByTestId(`${D}-${id}`);
 const words = (key: string, options: Record<string, unknown> = {}) =>
-  i18n.t(key, { ns: 'clinic', ...options });
+  i18n.t(key, { ns: 'app', ...options });
 
 /** A refusal as clinozy-be answers it. */
 const conflict = (reason: string) =>

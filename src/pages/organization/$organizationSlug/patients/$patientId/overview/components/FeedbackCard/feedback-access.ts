@@ -1,4 +1,4 @@
-import type { FeedbackItem } from '@/shared/api/clinic/feedback-contracts.ts';
+import type { FeedbackItem } from '@/shared/api/app/feedback-contracts.ts';
 
 /**
  * What the member may do with a patient's feedback. Check-ins are part of the file

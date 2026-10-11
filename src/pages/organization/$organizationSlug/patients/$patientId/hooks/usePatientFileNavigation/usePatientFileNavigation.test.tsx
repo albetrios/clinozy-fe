@@ -3,8 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
-import type { PatientNextVisit } from '@/shared/api/clinic/patient-file-contracts.ts';
-import { viewablePatientFileSections } from '@/shared/clinic/patient-file-sections.ts';
+import type { PatientNextVisit } from '@/shared/api/app/patient-file-contracts.ts';
+import { viewablePatientFileSections } from '@/shared/app/patient-file-sections.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 import {
@@ -39,7 +39,7 @@ vi.mock('@/shared/hooks/useVisits/index.ts', async (importOriginal) => ({
 }));
 
 // What she owes, for the Add menu's Payment — its own reads are `useInvoices`' to test.
-vi.mock('@/shared/api/clinic/invoices-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/invoices-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchInvoiceTotals: vi.fn(async () => ({ due: 100, paid: 0, count: 1 })),
 }));

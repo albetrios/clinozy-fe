@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { type Role, ROLE_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
-import type { TaskAssignee } from '@/shared/api/clinic/tasks-contracts.ts';
+import { type Role, ROLE_VALUES } from '@/shared/api/app/app-schema.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
+import type { TaskAssignee } from '@/shared/api/app/tasks-contracts.ts';
 import type { PickerOption } from '@/shared/components/Picker/index.ts';
 import { useMyMembershipId } from '@/shared/hooks/useMyMembership/index.ts';
 import { useTaskWorkerIds } from '@/shared/hooks/useTasks/index.ts';

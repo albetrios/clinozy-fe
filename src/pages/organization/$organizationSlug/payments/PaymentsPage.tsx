@@ -10,12 +10,12 @@ import {
   organizationPaymentPay,
   organizationPaymentReceive,
 } from '@/lib/routes/payments-builders.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import { LEDGER_FILTER_VALUES } from '@/shared/api/clinic/ledger-filter-values.ts';
-import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { PAYMENT_KIND_TONES, PAYMENT_MODE_TONES } from '@/shared/clinic/clinic-tones.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
+import { LEDGER_FILTER_VALUES } from '@/shared/api/app/ledger-filter-values.ts';
+import type { LedgerRow } from '@/shared/api/app/payments-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { PAYMENT_KIND_TONES, PAYMENT_MODE_TONES } from '@/shared/app/app-tones.ts';
 import { DataTable } from '@/shared/components/DataTable/index.ts';
 import type { DataTableBulkAction } from '@/shared/components/DataTableBulkBar/index.ts';
 import { EmptyState, EmptyStateAction } from '@/shared/components/EmptyState/index.ts';
@@ -118,7 +118,7 @@ function LedgerEmpty({
 /** The Filters popover's sections (`payments.md:39`): Show (All by default), What, Mode. */
 function useLedgerFilterCopy(): Readonly<Record<string, RoomFilterCopy>> {
   const { t } = useTranslation(PAYMENTS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   return {
     direction: {
       label: t(PAYMENTS_KEYS.filters.show),
@@ -143,7 +143,7 @@ function useLedgerFilterCopy(): Readonly<Record<string, RoomFilterCopy>> {
         LEDGER_FILTER_VALUES.mode.map((mode) => [
           mode,
           {
-            label: tClinic(CLINIC_KEYS.paymentModes[mode]),
+            label: tApp(APP_KEYS.paymentModes[mode]),
             tone: PAYMENT_MODE_TONES[mode],
           },
         ]),
@@ -160,7 +160,7 @@ function useLedgerFilterCopy(): Readonly<Record<string, RoomFilterCopy>> {
  */
 function useLedgerCsv() {
   const { t } = useTranslation(PAYMENTS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const { formatDate } = useLocaleFormat();
   const subLine = useLedgerSubLine();
   const headers = [
@@ -177,11 +177,9 @@ function useLedgerCsv() {
     t(ledgerWhat(row).labelKey),
     formatDate(row.paidAt),
     [row.partyName, subLine(row)].filter(Boolean).join(' · '),
-    [
-      ...new Set(
-        row.splits.map((split) => tClinic(CLINIC_KEYS.paymentModes[split.mode])),
-      ),
-    ].join(' + '),
+    [...new Set(row.splits.map((split) => tApp(APP_KEYS.paymentModes[split.mode])))].join(
+      ' + ',
+    ),
     (row.direction === 'received' ? 1 : -1) * row.amount,
     row.by?.name ?? '',
   ];
@@ -252,7 +250,7 @@ export function PaymentsPage() {
   const { dialog, close } = usePaymentsDialogRoute();
 
   const reviewDay =
-    dialog.kind === 'dayClose' ? (dialog.search.date ?? clinicToday()) : undefined;
+    dialog.kind === 'dayClose' ? (dialog.search.date ?? appToday()) : undefined;
   const params = ledgerListParamsOf(search, {
     branchIds: preferences.branchFilter,
     day: reviewDay,

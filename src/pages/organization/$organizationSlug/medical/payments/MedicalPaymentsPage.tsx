@@ -3,11 +3,11 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { organizationPaymentEdit } from '@/lib/routes/payments-builders.ts';
-import { LEDGER_FILTER_VALUES } from '@/shared/api/clinic/ledger-filter-values.ts';
-import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
-import type { FixtureLedgerListParams } from '@/shared/api/clinic/payments-fixture-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { PAYMENT_KIND_TONES, PAYMENT_MODE_TONES } from '@/shared/clinic/clinic-tones.ts';
+import { LEDGER_FILTER_VALUES } from '@/shared/api/app/ledger-filter-values.ts';
+import type { LedgerRow } from '@/shared/api/app/payments-contracts.ts';
+import type { FixtureLedgerListParams } from '@/shared/api/app/payments-fixture-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { PAYMENT_KIND_TONES, PAYMENT_MODE_TONES } from '@/shared/app/app-tones.ts';
 import {
   LEDGER_KEYS,
   LEDGER_NS,
@@ -22,7 +22,7 @@ import {
   type RoomFilterFields,
   useRoomFilters,
 } from '@/shared/components/RoomToolbar/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useFixtureLedgerList } from '@/shared/hooks/useFixtureLedger/index.ts';
 import { useLedgerRowActions } from '@/shared/hooks/useLedgerRowActions/index.ts';
 import { ledgerRowTone, useLedgerTable } from '@/shared/hooks/useLedgerTable/index.ts';
@@ -54,7 +54,7 @@ const MEDICAL_LEDGER_FILTER_FIELDS = {
 /** The Filters' What and Mode sections, in the ledger's words and tones. */
 function useFilterCopy(): Readonly<Record<string, RoomFilterCopy>> {
   const { t } = useTranslation(LEDGER_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   return {
     kind: {
       label: t(LEDGER_KEYS.columns.what),
@@ -71,7 +71,7 @@ function useFilterCopy(): Readonly<Record<string, RoomFilterCopy>> {
         LEDGER_FILTER_VALUES.mode.map((mode) => [
           mode,
           {
-            label: tClinic(CLINIC_KEYS.paymentModes[mode]),
+            label: tApp(APP_KEYS.paymentModes[mode]),
             tone: PAYMENT_MODE_TONES[mode],
           },
         ]),
@@ -112,7 +112,7 @@ export function MedicalPaymentsPage() {
   const { organizationSlug = '' } = useParams({ strict: false });
   const search = validateMedicalPaymentsSearch(useSearch({ strict: false }));
   const { preferences } = usePreferences();
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const nav = useMedicalNav();
   const filters = useRoomFilters(MEDICAL_LEDGER_FILTER_FIELDS);
   const filterCopy = useFilterCopy();

@@ -7,7 +7,7 @@ import type {
   NotificationChannel,
   NotificationPreference,
 } from '@/shared/api/notification-contracts.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { PanelSkeleton } from '@/shared/components/PanelSkeleton/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import { SettingsCard } from '@/shared/components/SettingsCard/index.ts';

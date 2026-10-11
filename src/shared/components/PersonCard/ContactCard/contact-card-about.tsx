@@ -13,7 +13,7 @@ import {
   PERSON_CARD_NS,
 } from '@/shared/components/PersonCard/person-card.constants.ts';
 import { CardGroup } from '@/shared/components/PersonCard/person-card-parts.tsx';
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import {
@@ -67,7 +67,7 @@ interface AboutLine<Text = string | null | undefined> {
 function useAboutRows(about: ContactAbout): AboutLine<string>[] {
   const { t } = useTranslation(PERSON_CARD_NS);
   const { formatNumber } = useLocaleFormat();
-  const clock = useClinicClock();
+  const clock = useAppClock();
   const formatPaise = usePaiseFormat();
   const age = typeof about.age === 'number' ? formatNumber(about.age) : null;
   const reviews: ContactReviews | null =

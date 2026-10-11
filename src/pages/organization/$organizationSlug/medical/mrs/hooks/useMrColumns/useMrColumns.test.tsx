@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { addCivilDays, clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import { addCivilDays, appToday } from '@/shared/api/app/app-time.ts';
 
 import type { MrRow } from '../../../shared/medical-contracts.ts';
 import { mrInitials, useMrColumns } from './useMrColumns.tsx';
@@ -34,10 +34,10 @@ describe('useMrColumns', () => {
     const { result } = renderHook(() => useMrColumns());
     const fold = (row: MrRow) =>
       result.current.find((column) => column.id === 'nextVisit')?.meta?.foldValue?.(row);
-    expect(fold(rep(addCivilDays(clinicToday(), -1)))).toMatchObject({
+    expect(fold(rep(addCivilDays(appToday(), -1)))).toMatchObject({
       dotClassName: 'bg-tone-blush-foreground text-background',
     });
-    expect(fold(rep(addCivilDays(clinicToday(), 3)))).toMatchObject({
+    expect(fold(rep(addCivilDays(appToday(), 3)))).toMatchObject({
       dotClassName: 'bg-tone-sky-foreground text-background',
     });
     expect(fold(rep(null))).toBeNull();

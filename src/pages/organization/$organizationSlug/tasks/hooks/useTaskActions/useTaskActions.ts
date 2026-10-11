@@ -2,7 +2,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { taskQueryKeys } from '@/shared/api/clinic/tasks-api.ts';
+import { taskQueryKeys } from '@/shared/api/app/tasks-api.ts';
 import {
   findTaskOutcome,
   type TaskAssignee,
@@ -11,13 +11,13 @@ import {
   type TaskRecord,
   type TaskRow,
   type TaskSnoozeOption,
-} from '@/shared/api/clinic/tasks-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { TASK_RULE_KEYS, TASK_RULES_NS } from '@/shared/clinic/task-rules.constants.ts';
-import { taskFollowOnTarget, type TaskTarget } from '@/shared/clinic/task-targets.ts';
+} from '@/shared/api/app/tasks-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { TASK_RULE_KEYS, TASK_RULES_NS } from '@/shared/app/task-rules.constants.ts';
+import { taskFollowOnTarget, type TaskTarget } from '@/shared/app/task-targets.ts';
 import { shortPersonName } from '@/shared/components/Cells/index.ts';
 import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import {
   useReassignTask,
   useSnoozeTask,
@@ -117,9 +117,9 @@ export function useTaskActions({
 }: TaskActionsOptions): TaskActions {
   const { t } = useTranslation(TASKS_NS);
   const { t: tRules } = useTranslation(TASK_RULES_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const queryClient = useQueryClient();
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const outcomeWrite = useTaskOutcome({ notifyOnError: false });
   const snoozeWrite = useSnoozeTask({ notifyOnError: false });
   const reassignWrite = useReassignTask({ notifyOnError: false });
@@ -162,7 +162,7 @@ export function useTaskActions({
 
   /** Who a task goes to, in words: the member's short name, else the role's queue. */
   const assigneeName = (assignee: TaskAssignee) => {
-    if ('role' in assignee) return tClinic(CLINIC_KEYS.roles[assignee.role]);
+    if ('role' in assignee) return tApp(APP_KEYS.roles[assignee.role]);
     const member = assignees.byId.get(assignee.membershipId);
     return member ? shortPersonName(member.name) : '';
   };

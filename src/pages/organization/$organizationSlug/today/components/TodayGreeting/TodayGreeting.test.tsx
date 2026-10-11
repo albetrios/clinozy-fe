@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
+import { appInstant } from '@/shared/api/app/app-time.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
@@ -15,7 +15,7 @@ function renderGreeting(props: Partial<TodayGreetingProps> = {}) {
   return renderWithProviders(
     <TodayGreeting
       firstName="Riya"
-      now={new Date(clinicInstant('2026-10-03', '10:42'))}
+      now={new Date(appInstant('2026-10-03', '10:42'))}
       counts={COUNTS}
       onNewBooking={vi.fn()}
       onWalkIn={vi.fn()}
@@ -39,7 +39,7 @@ describe('TodayGreeting (KICKOFF §6.2 Greeting row)', () => {
   ])(
     'greets on the clinic-local clock at %s — no 09:00–19:59 clamp',
     async (time, text) => {
-      renderGreeting({ now: new Date(clinicInstant('2026-10-03', time)) });
+      renderGreeting({ now: new Date(appInstant('2026-10-03', time)) });
       expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent(text);
     },
   );

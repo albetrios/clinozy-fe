@@ -2,14 +2,14 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import i18n from '@/lib/i18n/i18n.ts';
-import { clinicalNoteQueryKeys } from '@/shared/api/clinic/clinical-notes-api.ts';
-import type { ClinicalNote } from '@/shared/api/clinic/clinical-notes-contracts.ts';
-import { contactQueryKeys } from '@/shared/api/clinic/contacts-api.ts';
-import { leadQueryKeys } from '@/shared/api/clinic/leads-api.ts';
+import { clinicalNoteQueryKeys } from '@/shared/api/app/clinical-notes-api.ts';
+import type { ClinicalNote } from '@/shared/api/app/clinical-notes-contracts.ts';
+import { contactQueryKeys } from '@/shared/api/app/contacts-api.ts';
+import { leadQueryKeys } from '@/shared/api/app/leads-api.ts';
 import {
   fetchPatientFile,
   patientFileQueryKeys,
-} from '@/shared/api/clinic/patient-file-api.ts';
+} from '@/shared/api/app/patient-file-api.ts';
 import {
   fetchOpenVisit,
   fetchVisitCheckNotes,
@@ -20,16 +20,16 @@ import {
   VISIT_WRITE_KEYS,
   type VisitCheckTarget,
   visitQueryKeys,
-} from '@/shared/api/clinic/visits-api.ts';
+} from '@/shared/api/app/visits-api.ts';
 import {
   VISIT_CHECK_NOTE_TEXTS,
   type VisitCheck,
   type VisitRecord,
-} from '@/shared/api/clinic/visits-contracts.ts';
+} from '@/shared/api/app/visits-contracts.ts';
 import { AppError } from '@/shared/errors/AppError.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useMyMembershipId } from '@/shared/hooks/useMyMembership/index.ts';
 import { usePatientFile } from '@/shared/hooks/usePatientFile/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
@@ -54,7 +54,7 @@ const useOrganizationId = () => useOrganizationStore((state) => state.organizati
  */
 export function useOpenVisit(patientId: string) {
   const organizationId = useOrganizationId();
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const file = usePatientFile(patientId === '' ? undefined : patientId);
   const contactId = file.data?.patient.contactId ?? '';
   // A member who can't read the bookings (`appointment:read`) sees no open visit — asked nothing.

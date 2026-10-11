@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 
 import {

@@ -2,11 +2,11 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
+import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
 import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+  appFixtures,
+  resetAppFixtures,
+} from '@/shared/api/app/fixtures/world.fixtures.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 
@@ -44,11 +44,11 @@ const setup = () =>
 
 beforeEach(() => {
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 afterEach(() => {
   resetMedicalRoutes();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 
 describe('PurchaseOrderDrawer (medical.md:254–267)', () => {
@@ -90,7 +90,7 @@ describe('PurchaseOrderDrawer (medical.md:254–267)', () => {
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(notifyMock.success).toHaveBeenCalledWith('Purchase order saved');
     expect(
-      clinicFixtures.purchaseOrders.snapshot(
+      appFixtures.purchaseOrders.snapshot(
         (order) => order.stage === 'ordered' && order.supplierId === ref.supplier(52),
       ),
     ).toHaveLength(1);
@@ -162,7 +162,7 @@ describe('PurchaseOrderDrawer (medical.md:254–267)', () => {
     await waitFor(() =>
       expect(within(drawer).getAllByTestId(`${D}-lines-row`)).toHaveLength(3),
     );
-    const [quick] = clinicFixtures.medicines.snapshot(
+    const [quick] = appFixtures.medicines.snapshot(
       (medicine) => medicine.name === 'Azel cream',
     );
     expect(quick).toMatchObject({ isQuick: true, mrp: 0 });

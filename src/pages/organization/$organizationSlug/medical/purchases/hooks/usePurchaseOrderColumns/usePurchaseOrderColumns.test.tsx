@@ -1,13 +1,13 @@
 import { renderHook } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
+import { resetAppFixtures } from '@/shared/api/app/fixtures/world.fixtures.ts';
 
 import { fetchPurchaseOrder } from '../../../shared/medical-api.ts';
 import { usePurchaseOrderColumns } from './usePurchaseOrderColumns.tsx';
 
-afterEach(() => resetClinicFixtures());
+afterEach(() => resetAppFixtures());
 
 describe('usePurchaseOrderColumns', () => {
   it('lays out the Purchases columns, the Total the phone key and the PO first in the meta', () => {

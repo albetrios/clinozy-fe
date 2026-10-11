@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 
 import { cn } from '@/lib/utils.ts';
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 
 /** Props of {@link TextCell}. */
 export interface TextCellProps {

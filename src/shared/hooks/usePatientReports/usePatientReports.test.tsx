@@ -3,16 +3,16 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type * as ReportsApiModule from '@/shared/api/clinic/patient-reports-api.ts';
+import type * as ReportsApiModule from '@/shared/api/app/patient-reports-api.ts';
 import {
   createPatientReport,
   deletePatientReport,
   listPatientReports,
   restorePatientReport,
-} from '@/shared/api/clinic/patient-reports-api.ts';
-import type { PatientReport } from '@/shared/api/clinic/patient-reports-contracts.ts';
+} from '@/shared/api/app/patient-reports-api.ts';
+import type { PatientReport } from '@/shared/api/app/patient-reports-contracts.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 
 import {
   useCreatePatientReport,
@@ -21,7 +21,7 @@ import {
   useRestorePatientReport,
 } from './usePatientReports.ts';
 
-vi.mock('@/shared/api/clinic/patient-reports-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/patient-reports-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof ReportsApiModule>()),
   listPatientReports: vi.fn(),
   createPatientReport: vi.fn(),
@@ -126,7 +126,7 @@ describe('the report writes', () => {
       idempotencyKey: expect.any(String),
     });
     expect(invalidate).toHaveBeenCalledWith(
-      expect.objectContaining({ queryKey: ['clinic', 'patients', 'reports'] }),
+      expect.objectContaining({ queryKey: ['app', 'patients', 'reports'] }),
     );
   });
 });

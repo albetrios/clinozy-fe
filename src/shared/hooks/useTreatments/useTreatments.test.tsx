@@ -3,20 +3,20 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type * as TreatmentsApiModule from '@/shared/api/clinic/treatments-api.ts';
+import type * as TreatmentsApiModule from '@/shared/api/app/treatments-api.ts';
 import {
   createTreatment,
   listPatientTreatments,
   listTreatmentCheckIns,
   reverseTreatment,
   updateTreatment,
-} from '@/shared/api/clinic/treatments-api.ts';
+} from '@/shared/api/app/treatments-api.ts';
 import type {
   TreatmentFields,
   TreatmentRecord,
-} from '@/shared/api/clinic/treatments-contracts.ts';
+} from '@/shared/api/app/treatments-contracts.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 
 import {
   useCreateTreatment,
@@ -26,7 +26,7 @@ import {
   useUpdateTreatment,
 } from './useTreatments.ts';
 
-vi.mock('@/shared/api/clinic/treatments-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/treatments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof TreatmentsApiModule>()),
   listPatientTreatments: vi.fn(),
   listTreatmentCheckIns: vi.fn(),

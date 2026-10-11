@@ -5,7 +5,7 @@
 
 import { useTranslation } from 'react-i18next';
 
-import { APPOINTMENT_STATUS_TONES } from '@/shared/clinic/clinic-tones.ts';
+import { APPOINTMENT_STATUS_TONES } from '@/shared/app/app-tones.ts';
 import { DataTableColumnChooser } from '@/shared/components/DataTableColumnChooser/index.ts';
 import { usePersonAppointments } from '@/shared/hooks/useAppointments/index.ts';
 

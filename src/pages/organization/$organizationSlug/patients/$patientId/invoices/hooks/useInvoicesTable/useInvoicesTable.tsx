@@ -2,14 +2,14 @@ import { type ColumnDef, useTable } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { InvoiceRecord } from '@/shared/api/clinic/invoices-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { InvoiceRecord } from '@/shared/api/app/invoices-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import {
   INVOICE_STATUS_TONES,
   INVOICE_TYPE_TONES,
   TONE_CLASSES,
-} from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/app/app-tones.ts';
 import { IdPill, MoneyCell, TonePill } from '@/shared/components/Cells/index.ts';
 import {
   type DataTableFeatures,
@@ -43,14 +43,13 @@ const rowOf = (original: unknown) => original as InvoiceRecord;
  */
 function useInvoicesColumns(): ColumnDef<DataTableFeatures, InvoiceRecord>[] {
   const { t } = useTranslation(PATIENT_TABLE_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const day = useTableDay();
   const staff = useStaffLookup();
   const formatRupees = useRupeeFormat();
-  const type = (invoice: InvoiceRecord) =>
-    tClinic(CLINIC_KEYS.invoiceTypes[invoice.type]);
+  const type = (invoice: InvoiceRecord) => tApp(APP_KEYS.invoiceTypes[invoice.type]);
   const status = (invoice: InvoiceRecord) =>
-    tClinic(CLINIC_KEYS.invoiceStatuses[invoice.status]);
+    tApp(APP_KEYS.invoiceStatuses[invoice.status]);
   const items = (invoice: InvoiceRecord) =>
     invoice.items.map((line) => line.name).join(', ');
   const team = (invoice: InvoiceRecord) =>

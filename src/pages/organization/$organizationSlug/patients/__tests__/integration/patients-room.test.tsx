@@ -3,15 +3,15 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type * as ContactsApiModule from '@/shared/api/clinic/contacts-api.ts';
-import type * as PatientsApiModule from '@/shared/api/clinic/patients-api.ts';
+import type * as ContactsApiModule from '@/shared/api/app/contacts-api.ts';
+import type * as PatientsApiModule from '@/shared/api/app/patients-api.ts';
 import {
   createPatient,
   deletePatient,
   listPatients,
   restorePatient,
-} from '@/shared/api/clinic/patients-api.ts';
-import type { PatientListParams } from '@/shared/api/clinic/patients-contracts.ts';
+} from '@/shared/api/app/patients-api.ts';
+import type { PatientListParams } from '@/shared/api/app/patients-contracts.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { shownLocation } from '@/tests/utils/shown-location.ts';
 
@@ -52,14 +52,14 @@ vi.mock('@/lib/csv.ts', async (importOriginal) => ({
 }));
 
 const world = vi.hoisted(() => ({}) as PatientsWorld);
-vi.mock('@/shared/api/clinic/patients-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/patients-api.ts', async (importOriginal) => {
   const { patientsApiDouble } = await import('./patients-test-data.ts');
   return {
     ...(await importOriginal<typeof PatientsApiModule>()),
     ...patientsApiDouble(world),
   };
 });
-vi.mock('@/shared/api/clinic/contacts-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/contacts-api.ts', async (importOriginal) => {
   const { contactsApiDouble } = await import('./patients-test-data.ts');
   return {
     ...(await importOriginal<typeof ContactsApiModule>()),

@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils.ts';
 import {
   type PatientPhoto,
   photoName,
-} from '@/shared/api/clinic/patient-images-contracts.ts';
+} from '@/shared/api/app/patient-images-contracts.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import {
   ChevronLeft,

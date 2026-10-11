@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils.ts';
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { PersonAvatar } from '@/shared/components/Cells/PersonAvatar/index.ts';
 import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import { keepFocus } from '@/shared/components/Picker/picker-dom.ts';

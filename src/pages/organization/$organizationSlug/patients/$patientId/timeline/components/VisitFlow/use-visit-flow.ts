@@ -5,26 +5,26 @@ import {
   organizationPrescriptionCreate,
   organizationTreatmentCreate,
 } from '@/lib/routes/patient-file-builders.ts';
-import { clinicToday, localDateOf } from '@/shared/api/clinic/clinic-time.ts';
-import type { InvoiceRecord } from '@/shared/api/clinic/invoices-contracts.ts';
-import type { PatientPackageRow } from '@/shared/api/clinic/patient-packages-contracts.ts';
+import { appToday, localDateOf } from '@/shared/api/app/app-time.ts';
+import type { InvoiceRecord } from '@/shared/api/app/invoices-contracts.ts';
+import type { PatientPackageRow } from '@/shared/api/app/patient-packages-contracts.ts';
 import type {
   PrescriptionKit,
   PrescriptionRecord,
-} from '@/shared/api/clinic/prescriptions-contracts.ts';
-import type { TreatmentRecord } from '@/shared/api/clinic/treatments-contracts.ts';
+} from '@/shared/api/app/prescriptions-contracts.ts';
+import type { TreatmentRecord } from '@/shared/api/app/treatments-contracts.ts';
 import {
   type VisitCheck,
   type VisitChecks,
   visitChecksOf,
   type VisitRecord,
-} from '@/shared/api/clinic/visits-contracts.ts';
-import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
-import { visitFlowReferrer } from '@/shared/clinic/clinic-referrer.ts';
-import { passesPatientFileGate } from '@/shared/clinic/patient-file-sections.ts';
+} from '@/shared/api/app/visits-contracts.ts';
+import { appCommandNavigation } from '@/shared/app/app-command-targets.ts';
+import { visitFlowReferrer } from '@/shared/app/app-referrer.ts';
+import { passesPatientFileGate } from '@/shared/app/patient-file-sections.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
+import { useAppNavigate } from '@/shared/hooks/useAppNavigate/index.ts';
 import { useMoveAppointment } from '@/shared/hooks/useAppointments/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
-import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
 import { useInvoiceList } from '@/shared/hooks/useInvoices/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { usePatientPackages } from '@/shared/hooks/usePatientPackages/index.ts';
@@ -140,7 +140,7 @@ function readOf<Row, T>(
 /** What the member may read and write of the visit's records. */
 function useFlowAccess() {
   const { viewable } = usePatientFileContext();
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const rx = usePrescriptionAccess();
   const money = usePaymentAccess();
   const resolved = access.isResolved;
@@ -322,7 +322,7 @@ function useRecordActions({
   'prescribeKit' | 'writeRx' | 'repeatTreatment' | 'newTreatment'
 > {
   const { t } = useTranslation(VISIT_FLOW_NS);
-  const navigate = useClinicNavigate();
+  const navigate = useAppNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
   const { patientId } = usePatientFileContext();
   const createRx = useCreatePrescription();
@@ -355,7 +355,7 @@ function useRecordActions({
         approve: can.rx.approves,
         fields: {
           doctorId,
-          date: clinicToday(),
+          date: appToday(),
           items: kit.items,
           advice: null,
           labReport: null,
@@ -413,7 +413,7 @@ function useMoneyActions({
   flow,
 }: FlowBase): Pick<VisitFlowActions, 'createInvoice' | 'customInvoice' | 'collect'> {
   const { t } = useTranslation(VISIT_FLOW_NS);
-  const navigate = useClinicNavigate();
+  const navigate = useAppNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
   const { patientId } = usePatientFileContext();
   const bill = records.bill?.data;
@@ -421,7 +421,7 @@ function useMoneyActions({
   const referrer = visitFlowReferrer(patientId, flow.fromToday);
   const newInvoice = (search: Record<string, string>) =>
     void navigate(
-      clinicCommandNavigation('newInvoice', {
+      appCommandNavigation('newInvoice', {
         organizationSlug,
         referrer,
         search: { type: 'clinic', patient: patientId, ...search },
@@ -434,7 +434,7 @@ function useMoneyActions({
         invoice.due > 0
           ? () =>
               void navigate(
-                clinicCommandNavigation('newReceipt', {
+                appCommandNavigation('newReceipt', {
                   organizationSlug,
                   referrer,
                   search: { patient: patientId, invoice: invoice.id },

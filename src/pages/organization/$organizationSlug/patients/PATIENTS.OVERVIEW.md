@@ -2,9 +2,9 @@
 
 Route: `/organization/$organizationSlug/patients`. Registered patients, with prescriptions, sessions and photos (KICKOFF §6.5).
 
-Gated like every clinic room: membership (`organization:read`) and the `clinic-patients`
+Gated like every clinic room: membership (`organization:read`) and the `app-patients`
 module, then `requireOrgStatus`; in-room View / Create / Edit / Delete come from
-`useClinicAccess` — the member's own codes `patient:read|create|update|delete` (Patients is
+`useAppAccess` — the member's own codes `patient:read|create|update|delete` (Patients is
 on clinozy-be, D152): without Create the "New patient" button and the phone pill hide,
 without Edit the row Edit goes, without Delete the row Delete goes.
 
@@ -44,10 +44,10 @@ drawer is Edit patient on the file's edit route (`$patientId/edit/`) — one sav
 writes: the person (`PATCH /app/contacts/:contact_id`) and the file
 (`PATCH /app/patients/:patient_id`).
 
-The data is the shared patients domain on clinozy-be: `@/shared/api/clinic/patients-api.ts`
+The data is the shared patients domain on clinozy-be: `@/shared/api/app/patients-api.ts`
 (`/app/patients`, each list page joined with its people through `GET /app/contacts?ids=`),
 its contracts beside it, and the hooks in `@/shared/hooks/usePatients/`. The rooms still on
-fixtures (Payments, Medical, Tasks) read `@/shared/api/clinic/patients-fixture-api.ts` through
+fixtures (Payments, Medical, Tasks) read `@/shared/api/app/patients-fixture-api.ts` through
 `@/shared/hooks/useFixturePatients/`. The delete confirm (a reason, Undo = restore) is
 `@/shared/components/PatientDeleteConfirm/`.
 
@@ -56,7 +56,7 @@ fixtures (Payments, Medical, Tasks) read `@/shared/api/clinic/patients-fixture-a
 | File                            | Responsibility                                                                                                                                                                                                                           |
 | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `patients.route.tsx`            | Route marker — exports `Component` rendering `PatientsPage`.                                                                                                                                                                             |
-| `patients.manifest.ts`          | Manifest — `kind: 'layout'` over `create`, permission `organization:read`, module `clinic-patients`, nav section `patients`.                                                                                                             |
+| `patients.manifest.ts`          | Manifest — `kind: 'layout'` over `create`, permission `organization:read`, module `app-patients`, nav section `patients`.                                                                                                                |
 | `patients.search.ts`            | URL schemas (`validateSearch`): the list's `view`, `q`, `types`, one `status`, one `conversion`, `created`, `followUp`, `sort`. Rides the entry chunk; the list read doesn't.                                                            |
 | `patients.dialog-search.ts`     | New patient's prefill (`name`, `phone`, `fromLead` — a lead's public id) — its route keeps the raw values, `usePatientsDialogRoute` parses them; loads with the room.                                                                    |
 | `patients.params.ts`            | The list read from the URL — `patientListParamsOf` (defaults applied, the sort split) — off the entry chunk.                                                                                                                             |

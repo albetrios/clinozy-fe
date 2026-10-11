@@ -1,7 +1,7 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 
 /** The Clinic stock room's i18n namespace. */
-export const STOCK_NS = I18N_NAMESPACES.clinicStock;
+export const STOCK_NS = I18N_NAMESPACES.appStock;
 
 /**
  * The Clinic stock room's copy, verbatim from `clinic-stock.md` › Copy (KICKOFF

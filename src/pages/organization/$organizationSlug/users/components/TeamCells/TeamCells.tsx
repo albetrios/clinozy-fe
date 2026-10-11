@@ -1,9 +1,9 @@
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
+import type { TeamMember } from '@/shared/api/app/users-contracts.ts';
 import { isInvitationExpired } from '@/shared/api/organization-contracts.ts';
-import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
+import { formatAppPhone } from '@/shared/app/app-phone.ts';
 import { IdPill, PersonChip, TonePill } from '@/shared/components/Cells/index.ts';
 import {
   Tooltip,
@@ -32,7 +32,7 @@ export function TeamUserCell({ member }: { member: TeamMember }) {
       name={member.name}
       initials={member.initials}
       tone={member.tone}
-      sub={member.phone ? formatClinicPhone(member.phone) : undefined}
+      sub={member.phone ? formatAppPhone(member.phone) : undefined}
     />
   );
 }

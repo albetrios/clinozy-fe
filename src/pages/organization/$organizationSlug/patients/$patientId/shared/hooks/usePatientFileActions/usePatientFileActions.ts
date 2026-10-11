@@ -8,16 +8,16 @@ import {
   organizationReportCreate,
   organizationTreatmentCreate,
 } from '@/lib/routes/patient-file-builders.ts';
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import type { PatientNextVisit } from '@/shared/api/clinic/patient-file-contracts.ts';
-import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
-import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
+import type { PatientNextVisit } from '@/shared/api/app/patient-file-contracts.ts';
+import { patientName } from '@/shared/api/app/patients-contracts.ts';
+import { appCommandNavigation } from '@/shared/app/app-command-targets.ts';
 import {
   passesPatientFileGate,
   type PatientFileSectionSlug,
-} from '@/shared/clinic/patient-file-sections.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
-import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
+} from '@/shared/app/patient-file-sections.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
+import { useAppNavigate } from '@/shared/hooks/useAppNavigate/index.ts';
 import { useInvoiceTotals } from '@/shared/hooks/useInvoices/index.ts';
 import { usePaymentAccess } from '@/shared/hooks/usePaymentAccess/index.ts';
 import {
@@ -119,10 +119,10 @@ export interface PatientFileActions {
  */
 export function usePatientFileActions(): PatientFileActions {
   const { t } = useTranslation(PATIENT_FILE_ACTIONS_NS);
-  const navigate = useClinicNavigate();
+  const navigate = useAppNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
   const { patientId, file, section, photos } = usePatientFileContext();
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const money = usePaymentAccess();
   // What she owes, for Payment's "Nothing due" — read only by a member who records and reads money.
   const totals = useInvoiceTotals(
@@ -137,7 +137,7 @@ export function usePatientFileActions(): PatientFileActions {
 
   const openSection = (target: PatientFileSectionSlug) => () =>
     void navigate(organizationPatientSection(organizationSlug, patientId, target));
-  const go = (navigation: ReturnType<typeof clinicCommandNavigation>) =>
+  const go = (navigation: ReturnType<typeof appCommandNavigation>) =>
     void navigate(navigation);
 
   const actions: Record<PatientAddItemId, { allowed: boolean; run: () => void }> = {
@@ -154,7 +154,7 @@ export function usePatientFileActions(): PatientFileActions {
       allowed: money.canCreate,
       run: () =>
         go(
-          clinicCommandNavigation('newInvoice', {
+          appCommandNavigation('newInvoice', {
             organizationSlug,
             referrer,
             search: { type: 'clinic', patient: patientId },
@@ -173,7 +173,7 @@ export function usePatientFileActions(): PatientFileActions {
           return;
         }
         go(
-          clinicCommandNavigation('newReceipt', {
+          appCommandNavigation('newReceipt', {
             organizationSlug,
             referrer,
             search: { patient: patientId },
@@ -193,7 +193,7 @@ export function usePatientFileActions(): PatientFileActions {
       allowed: can('appointments', 'create'),
       run: () =>
         go(
-          clinicCommandNavigation('newAppointment', {
+          appCommandNavigation('newAppointment', {
             organizationSlug,
             referrer,
             // The booking is the person's (`who=` a contact id).

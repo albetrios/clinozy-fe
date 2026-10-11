@@ -4,13 +4,13 @@ import { useTranslation } from 'react-i18next';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { revealInScroller } from '@/lib/reveal-in-scroller.ts';
 import { cn } from '@/lib/utils.ts';
-import type { FeedbackActionKind } from '@/shared/api/clinic/clinic-schema.ts';
+import type { FeedbackActionKind } from '@/shared/api/app/app-schema.ts';
 import {
   FEEDBACK_PAGE_SIZE,
   type FeedbackItem,
   type FeedbackType,
-} from '@/shared/api/clinic/feedback-contracts.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/api/app/feedback-contracts.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { usePersonAppointments } from '@/shared/hooks/useAppointments/index.ts';

@@ -5,13 +5,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import { PRODUCT_NAME } from '@/lib/product-identity.ts';
-import { presetOfRole } from '@/shared/api/clinic/access-contracts.ts';
+import { presetOfRole } from '@/shared/api/app/access-contracts.ts';
 import type * as OrganizationApiModule from '@/shared/api/organization-api.ts';
 import type { RoleSummary } from '@/shared/api/organization-contracts.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { PRESET_CODES } from '@/tests/utils/app-preset-codes.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
-import { PRESET_CODES } from '@/tests/utils/clinic-preset-codes.ts';
 
 import {
   member,

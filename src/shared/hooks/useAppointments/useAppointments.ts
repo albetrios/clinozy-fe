@@ -2,6 +2,9 @@ import { keepPreviousData } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
 import i18n from '@/lib/i18n/i18n.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { AppointmentStatus } from '@/shared/api/app/app-schema.ts';
+import { appToday, civilDayOffset } from '@/shared/api/app/app-time.ts';
 import {
   appointmentQueryKeys,
   cancelAppointment,
@@ -15,7 +18,7 @@ import {
   listAppointments,
   moveAppointment,
   updateAppointment,
-} from '@/shared/api/clinic/appointments-api.ts';
+} from '@/shared/api/app/appointments-api.ts';
 import {
   type AppointmentCancel,
   type AppointmentCreateInput,
@@ -26,14 +29,11 @@ import {
   type AppointmentRow,
   type AppointmentSlotParams,
   bookableTreatmentsOf,
-} from '@/shared/api/clinic/appointments-contracts.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { AppointmentStatus } from '@/shared/api/clinic/clinic-schema.ts';
-import { civilDayOffset, clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import { contactQueryKeys } from '@/shared/api/clinic/contacts-api.ts';
-import { leadQueryKeys } from '@/shared/api/clinic/leads-api.ts';
-import { messageQueryKeys } from '@/shared/api/clinic/messages-api.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+} from '@/shared/api/app/appointments-contracts.ts';
+import { contactQueryKeys } from '@/shared/api/app/contacts-api.ts';
+import { leadQueryKeys } from '@/shared/api/app/leads-api.ts';
+import { messageQueryKeys } from '@/shared/api/app/messages-api.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import { PICKER_KEYS, PICKER_NS } from '@/shared/components/Picker/picker.constants.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
@@ -59,7 +59,7 @@ import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.
  * offered where the API has a way back — a check-in (`undo-check-in`) and a cancel (`reinstate`).
  */
 
-const KEYS = CLINIC_KEYS.appointments;
+const KEYS = APP_KEYS.appointments;
 
 /** What every appointment write may have changed. */
 const APPOINTMENT_WRITE_KEYS = [
@@ -67,7 +67,7 @@ const APPOINTMENT_WRITE_KEYS = [
   leadQueryKeys.all,
   contactQueryKeys.all,
   messageQueryKeys.all,
-  ['clinic', 'patients'],
+  ['app', 'patients'],
 ];
 
 /**
@@ -90,11 +90,11 @@ function withTaskRulesRefresh<TData, TVars>(
 }
 
 /** A phrase in the clinic vocabulary (the namespace loads with the org shell). */
-function clinicText(key: string, values: Record<string, string> = {}): string {
-  return i18n.t(key, { ns: CLINIC_NS, ...values });
+function appText(key: string, values: Record<string, string> = {}): string {
+  return i18n.t(key, { ns: APP_NS, ...values });
 }
 
-const statusLabel = (status: AppointmentStatus) => clinicText(KEYS.statuses[status]);
+const statusLabel = (status: AppointmentStatus) => appText(KEYS.statuses[status]);
 
 /** The active organization — every key carries it. */
 const useOrganizationId = () => useOrganizationStore((state) => state.organizationId);
@@ -123,7 +123,7 @@ export function useAppointmentSlotLabel(): (
       const [year = 1970, month = 1, day = 1] = date.split('-').map(Number);
       const [hours = 0, minutes = 0] = time.split(':').map(Number);
       const slot = new Date(year, month - 1, day, hours, minutes);
-      const offset = civilDayOffset(clinicToday(), date);
+      const offset = civilDayOffset(appToday(), date);
       let dayLabel = formatDate(
         slot,
         { weekday: 'short', day: 'numeric', month: 'short' },
@@ -309,11 +309,11 @@ export function useBookableTreatments() {
 /** "Booked #2870 · <day> <time>", with what the server sent the person. */
 function bookedToast(row: AppointmentRow, slot: { day: string; time: string }): string {
   const values = { id: displayId.appointment(row.seq), ...slot };
-  if (row.reminder === 'confirm_requested') return clinicText(KEYS.toasts.booked, values);
+  if (row.reminder === 'confirm_requested') return appText(KEYS.toasts.booked, values);
   if (row.reminder === 'reminder_queued') {
-    return clinicText(KEYS.toasts.bookedQueued, values);
+    return appText(KEYS.toasts.bookedQueued, values);
   }
-  return clinicText(KEYS.toasts.bookedOnly, values);
+  return appText(KEYS.toasts.bookedOnly, values);
 }
 
 /** Who a new booking is for, and its fields. */
@@ -388,11 +388,11 @@ export function useUpdateAppointment(
     invalidateKeys: APPOINTMENT_WRITE_KEYS,
     successMessage: (row, vars) => {
       const id = displayId.appointment(row.seq);
-      if (!movedBy(vars, row)) return clinicText(KEYS.toasts.updated, { id });
+      if (!movedBy(vars, row)) return appText(KEYS.toasts.updated, { id });
       const values = { id, ...slotLabel(row.date, row.startTime) };
       return row.reminder === 'confirm_requested'
-        ? clinicText(KEYS.toasts.moved, values)
-        : clinicText(KEYS.toasts.movedOnly, values);
+        ? appText(KEYS.toasts.moved, values)
+        : appText(KEYS.toasts.movedOnly, values);
     },
     ...withTaskRulesRefresh(options, refreshTasks),
   });
@@ -417,7 +417,7 @@ export interface AppointmentMoveVars {
 /** "<name> → <status>", and " · reminder queued" when the server queued one. */
 function statusToast(row: AppointmentRow): string {
   const values = { name: row.person.name, status: statusLabel(row.status) };
-  return clinicText(
+  return appText(
     row.status === 'confirmed' && row.reminder === 'reminder_queued'
       ? KEYS.toasts.statusConfirmed
       : KEYS.toasts.statusChanged,
@@ -511,12 +511,12 @@ export function useCancelAppointment({
     ...withUndoToast(withTaskRulesRefresh(options, refreshTasks), (row) => {
       const message =
         announce === 'status'
-          ? clinicText(KEYS.toasts.statusCancelled, {
+          ? appText(KEYS.toasts.statusCancelled, {
               name: row.person.name,
               status: statusLabel(row.status),
-              reason: clinicText(KEYS.cancelReasons[row.cancelReason ?? 'other']),
+              reason: appText(KEYS.cancelReasons[row.cancelReason ?? 'other']),
             })
-          : clinicText(KEYS.toasts.cancelled, { id: displayId.appointment(row.seq) });
+          : appText(KEYS.toasts.cancelled, { id: displayId.appointment(row.seq) });
       notify.undo(message, { onUndo: () => reinstate.mutate(row) });
     }),
   });
@@ -531,7 +531,7 @@ export function useReinstateAppointment(
     mutationFn: (row, action) =>
       moveAppointment({ appointmentId: row.id, route: 'reinstate', ...action }),
     invalidateKeys: APPOINTMENT_WRITE_KEYS,
-    successMessage: () => clinicText(KEYS.toasts.restored),
+    successMessage: () => appText(KEYS.toasts.restored),
     ...withTaskRulesRefresh(options, refreshTasks),
   });
 }

@@ -3,20 +3,20 @@ import { act, cleanup, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type * as ContactsApiModule from '@/shared/api/clinic/contacts-api.ts';
+import type * as ContactsApiModule from '@/shared/api/app/contacts-api.ts';
 import {
   createContact,
   fetchContact,
   searchContacts,
   updateContact,
-} from '@/shared/api/clinic/contacts-api.ts';
-import type { Contact, ContactFields } from '@/shared/api/clinic/contacts-contracts.ts';
-import { leadQueryKeys } from '@/shared/api/clinic/leads-api.ts';
+} from '@/shared/api/app/contacts-api.ts';
+import type { Contact, ContactFields } from '@/shared/api/app/contacts-contracts.ts';
+import { leadQueryKeys } from '@/shared/api/app/leads-api.ts';
 import type * as NotifyModule from '@/shared/notify/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { EMPTY_CONTACT_PROFILE } from '@/tests/utils/contact-doubles.ts';
 
 import {
@@ -26,7 +26,7 @@ import {
   useUpdateContact,
 } from './useContacts.ts';
 
-vi.mock('@/shared/api/clinic/contacts-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/contacts-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof ContactsApiModule>()),
   fetchContact: vi.fn(),
   searchContacts: vi.fn(),

@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   CREDIT_DIRECTION_VALUES,
   CREDIT_STATUS_VALUES,
-} from '@/shared/api/clinic/clinic-schema.ts';
+} from '@/shared/api/app/app-schema.ts';
 
 import { PENDING_FILTER_VALUES, validatePendingSearch } from './pending.search.ts';
 

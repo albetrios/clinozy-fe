@@ -8,18 +8,18 @@ sends an invitation by email — no admin-set password, and no name: the person 
 every role picked — the first is the main role — and the clinic details: mobile, colour,
 branches (the one open branch when there is one), days, hours and commission. An email already
 in the clinic (`409 membership_already_exists`) outlines Email. Gated like the room —
-`membership:read` and the `clinic-users` module, then `requireOrgStatus`; "New user" itself needs
+`membership:read` and the `app-users` module, then `requireOrgStatus`; "New user" itself needs
 `membership:create` and `role:read` — without them the link lands back on the Team with the
 permission toast. The drawer is the island's `../components/UserDrawer/`, opened by the
 page through `../hooks/useUsersDialogRoute/`.
 
 ## Files
 
-| File                 | Responsibility                                                                                    |
-| -------------------- | ------------------------------------------------------------------------------------------------- |
-| `create.route.tsx`   | Route marker — exports `Component` rendering `NewUserPage`.                                       |
-| `create.manifest.ts` | Manifest — `kind: 'leaf'`, permission `membership:read`, module `clinic-users`, title "New user". |
-| `NewUserPage.tsx`    | Renders nothing — the dialog route's own UI. The drawer mounts on the Users page.                 |
+| File                 | Responsibility                                                                                 |
+| -------------------- | ---------------------------------------------------------------------------------------------- |
+| `create.route.tsx`   | Route marker — exports `Component` rendering `NewUserPage`.                                    |
+| `create.manifest.ts` | Manifest — `kind: 'leaf'`, permission `membership:read`, module `app-users`, title "New user". |
+| `NewUserPage.tsx`    | Renders nothing — the dialog route's own UI. The drawer mounts on the Users page.              |
 
 ## Test ids
 

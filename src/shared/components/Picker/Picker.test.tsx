@@ -7,9 +7,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   fetchMyPreferences,
   saveMyPreferences,
-} from '@/shared/api/clinic/preferences-api.ts';
+} from '@/shared/api/app/preferences-api.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import { Picker } from './Picker.tsx';
 import type { PickerOption, PickerSingleProps } from './picker.types.ts';

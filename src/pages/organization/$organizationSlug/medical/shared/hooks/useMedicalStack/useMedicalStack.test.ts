@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { Manufacturer } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Manufacturer } from '@/shared/api/app/app-schema.ts';
 
 import { useMedicalStack } from './useMedicalStack.ts';
 

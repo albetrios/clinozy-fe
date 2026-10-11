@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import type { DayCloseView } from '@/shared/api/clinic/day-close-contracts.ts';
-import type { LedgerPerson } from '@/shared/api/clinic/payments-contracts.ts';
+import type { DayCloseView } from '@/shared/api/app/day-close-contracts.ts';
+import type { LedgerPerson } from '@/shared/api/app/payments-contracts.ts';
 
 import {
   countDifference,

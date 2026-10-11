@@ -5,9 +5,9 @@ import { useTranslation } from 'react-i18next';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { PUBLIC_ID } from '@/lib/routes/search-params.ts';
 import { organizationTasks } from '@/lib/routes/tasks-builders.ts';
-import { fetchTask, taskQueryKeys } from '@/shared/api/clinic/tasks-api.ts';
-import type { TaskDetail } from '@/shared/api/clinic/tasks-contracts.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { fetchTask, taskQueryKeys } from '@/shared/api/app/tasks-api.ts';
+import type { TaskDetail } from '@/shared/api/app/tasks-contracts.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useDialogRouteRecord } from '@/shared/hooks/useDialogRouteRecord/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
@@ -66,7 +66,7 @@ export function useTasksDialogRoute(): TasksDialogRouteState {
   const navigate = useNavigate();
   const { t } = useTranslation(TASKS_NS);
   const { t: tErrors } = useTranslation(ERRORS_NS);
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const organizationId = useOrganizationStore((state) => state.organizationId);
 
   const close = useCallback(() => {

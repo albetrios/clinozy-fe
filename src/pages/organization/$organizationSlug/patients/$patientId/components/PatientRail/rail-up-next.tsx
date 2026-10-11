@@ -2,12 +2,12 @@ import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import { localDateOf } from '@/shared/api/clinic/clinic-time.ts';
+import { localDateOf } from '@/shared/api/app/app-time.ts';
 import type {
   PatientFile,
   PatientNextVisit,
-} from '@/shared/api/clinic/patient-file-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+} from '@/shared/api/app/patient-file-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { useInvoiceTotals } from '@/shared/hooks/useInvoices/index.ts';
@@ -214,12 +214,12 @@ export function RailUpNext({
   /** The money card's mask — absent for a member who does not see billing. */
   money?: RailMoney;
 }) {
-  const { t } = useTranslation([PATIENT_RAIL_NS, CLINIC_NS]);
+  const { t } = useTranslation([PATIENT_RAIL_NS, APP_NS]);
   const { feedback } = file;
   const worse = feedback.feel === 'worse';
   const feedbackValue = (() => {
     if (feedback.feel) {
-      const feel = t(CLINIC_KEYS.checkInFeels[feedback.feel], { ns: CLINIC_NS });
+      const feel = t(APP_KEYS.checkInFeels[feedback.feel], { ns: APP_NS });
       return feedback.score === null
         ? feel
         : t(K.feedbackScore, { feel, score: feedback.score });
@@ -227,7 +227,7 @@ export function RailUpNext({
     if (feedback.review) {
       return t(K.feedbackReview, {
         rating: feedback.review.rating ?? 0,
-        source: t(CLINIC_KEYS.reviewSources[feedback.review.source], { ns: CLINIC_NS }),
+        source: t(APP_KEYS.reviewSources[feedback.review.source], { ns: APP_NS }),
       });
     }
     return t(K.noFeedback);

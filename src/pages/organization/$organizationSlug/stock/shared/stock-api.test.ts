@@ -3,16 +3,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('@/core/http/api.ts', () => ({
   api: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
 }));
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchTeamDirectory: vi.fn(),
 }));
 import { api } from '@/core/http/api.ts';
 import { queryClient } from '@/core/http/queryClient.ts';
-import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
-import { fetchTeamDirectory } from '@/shared/api/clinic/directory-api.ts';
+import { appInstant } from '@/shared/api/app/app-time.ts';
+import { fetchTeamDirectory } from '@/shared/api/app/directory-api.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import {
   stockItemWire,
   stockMovementWire,
@@ -81,7 +81,7 @@ beforeEach(() => {
   queryClient.clear();
   signInTestMember();
   vi.useFakeTimers({ toFake: ['Date'] });
-  vi.setSystemTime(new Date(clinicInstant(TODAY, '10:00')));
+  vi.setSystemTime(new Date(appInstant(TODAY, '10:00')));
 });
 afterEach(() => {
   vi.useRealTimers();
@@ -135,8 +135,8 @@ describe('the list queries', () => {
       q: undefined,
       payment_status: 'unpaid,partial',
       stock_vendor_id: TEST_STOCK_VENDOR_ID,
-      created_from: clinicInstant(TODAY, '00:00'),
-      created_to: clinicInstant('2026-10-11', '00:00'),
+      created_from: appInstant(TODAY, '00:00'),
+      created_to: appInstant('2026-10-11', '00:00'),
       sort: undefined,
       order: undefined,
     });

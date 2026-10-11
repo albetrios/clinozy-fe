@@ -5,11 +5,11 @@
  * the calendars' (`appointments.calendar.ts`). One doctor, and no follow-up
  * filter: the API takes one doctor and has no follow-up on bookings (G3).
  */
+import type { CreatedFilter } from '@/shared/api/app/app-list-filters.ts';
 import type {
   AppointmentStatusFilter,
   AppointmentView,
-} from '@/shared/api/clinic/appointments-contracts.ts';
-import type { CreatedFilter } from '@/shared/api/clinic/clinic-list-filters.ts';
+} from '@/shared/api/app/appointments-contracts.ts';
 
 import type { AppointmentsSearch } from '../../appointments.search.ts';
 

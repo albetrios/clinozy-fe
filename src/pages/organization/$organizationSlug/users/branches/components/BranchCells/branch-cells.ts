@@ -1,21 +1,21 @@
 import type { TFunction } from 'i18next';
 
 import { isolateText } from '@/lib/bidi-isolate.ts';
-import type { ClinicBranch } from '@/shared/api/clinic/branches-contracts.ts';
-import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
+import type { AppBranch } from '@/shared/api/app/branches-contracts.ts';
+import { formatAppPhone } from '@/shared/app/app-phone.ts';
 
 import { USERS_KEYS } from '../../../users.constants.ts';
 import type { BranchRow } from '../../hooks/useBranchRows/index.ts';
 
 /** The Address cell's sub-line: line 2, area, city and PIN ("VIP Road, Vesu, Surat 395007"). */
-export function branchAddressLine(branch: ClinicBranch): string {
+export function branchAddressLine(branch: AppBranch): string {
   const city = [branch.city, branch.pin].filter(Boolean).join(' ');
   return [branch.addressLine2, branch.area, city].filter(Boolean).join(', ');
 }
 
 /** The Contact cell's value: "+91 74900 20099", or "—" with no phone. */
-export function branchPhone(branch: ClinicBranch): string {
-  return branch.phone ? formatClinicPhone(branch.phone) : '—';
+export function branchPhone(branch: AppBranch): string {
+  return branch.phone ? formatAppPhone(branch.phone) : '—';
 }
 
 /**

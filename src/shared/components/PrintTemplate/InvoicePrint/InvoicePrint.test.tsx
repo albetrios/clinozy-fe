@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type { InvoiceRecord } from '@/shared/api/clinic/invoices-contracts.ts';
+import type { InvoiceRecord } from '@/shared/api/app/invoices-contracts.ts';
 import { PRINT_TEMPLATE_TEST_IDS } from '@/shared/components/PrintTemplate/print-template.constants.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 import { invoiceDetail, TEST_PEEL_ID } from '@/tests/utils/invoice-doubles.ts';

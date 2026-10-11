@@ -1,11 +1,11 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 
 /**
- * The items field's chrome copy lives in `clinic` (the namespace `CLINIC_NS`
+ * The items field's chrome copy lives in `app` (the namespace `APP_NS`
  * names), which loads with the org shell where every drawer renders — not in
  * the entry bundle's `common`.
  */
-export const ITEMS_FIELD_NS = I18N_NAMESPACES.clinic;
+export const ITEMS_FIELD_NS = I18N_NAMESPACES.app;
 
 /** Key paths for the items field's own copy (every value verbatim from the design). */
 export const ITEMS_FIELD_KEYS = {

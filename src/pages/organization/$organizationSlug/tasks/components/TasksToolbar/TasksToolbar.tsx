@@ -1,10 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import type {
-  TaskScope,
-  TaskTab,
-  TaskType,
-} from '@/shared/api/clinic/tasks-contracts.ts';
+import type { TaskScope, TaskTab, TaskType } from '@/shared/api/app/tasks-contracts.ts';
 import { RoomToolbar, RoomViewTabs } from '@/shared/components/RoomToolbar/index.ts';
 
 import {

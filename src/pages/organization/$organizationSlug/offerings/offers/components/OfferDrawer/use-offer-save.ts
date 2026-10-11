@@ -3,11 +3,11 @@ import { useState } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { fetchOffer, offerQueryKeys } from '@/shared/api/clinic/offerings-api.ts';
+import { fetchOffer, offerQueryKeys } from '@/shared/api/app/offerings-api.ts';
 import {
   isOfferCodeInUse,
   type OfferRecord,
-} from '@/shared/api/clinic/offerings-contracts.ts';
+} from '@/shared/api/app/offerings-contracts.ts';
 import { mapApiError } from '@/shared/errors/errorHandler.ts';
 import { HttpError, isHttpError } from '@/shared/errors/HttpError.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';

@@ -1,5 +1,5 @@
-import type { PatientNextVisit } from '@/shared/api/clinic/patient-file-contracts.ts';
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import type { PatientNextVisit } from '@/shared/api/app/patient-file-contracts.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 
 /**
  * The next visit's start beside its date tile — the rail's Up next and the
@@ -10,6 +10,6 @@ import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 export function useVisitWhen(): (
   visit: Pick<PatientNextVisit, 'date' | 'startTime'>,
 ) => string {
-  const clock = useClinicClock();
+  const clock = useAppClock();
   return (visit) => clock.wallTime(visit.date, visit.startTime);
 }

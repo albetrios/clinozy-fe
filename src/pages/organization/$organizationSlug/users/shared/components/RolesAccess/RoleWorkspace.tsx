@@ -1,11 +1,11 @@
 import { useTranslation } from 'react-i18next';
 
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { useAssignablePermissions } from '@/shared/hooks/useAssignablePermissions/index.ts';
 
 import { USERS_KEYS, USERS_NS } from '../../../users.constants.ts';
-import { CLINIC_PERMISSION_CODES } from './roles-matrix.ts';
+import { APP_PERMISSION_CODES } from './roles-matrix.ts';
 import { RoleSwitchCard } from './RoleSwitchCard.tsx';
 import type { RoleAccessWrites } from './use-role-access-writes.ts';
 
@@ -37,9 +37,7 @@ export function RoleWorkspace({
       </span>
     );
   }
-  const rows = assignable.rows.filter(
-    (entry) => !CLINIC_PERMISSION_CODES.has(entry.code),
-  );
+  const rows = assignable.rows.filter((entry) => !APP_PERMISSION_CODES.has(entry.code));
   if (rows.length === 0) {
     return <EmptyState variant="inline" title={t(USERS_KEYS.roles.workspace.none)} />;
   }

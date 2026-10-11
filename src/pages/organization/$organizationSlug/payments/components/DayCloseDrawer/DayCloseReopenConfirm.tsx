@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
-import { dayCloseQueryKeys } from '@/shared/api/clinic/day-close-api.ts';
+import { dayCloseQueryKeys } from '@/shared/api/app/day-close-api.ts';
 import {
   ConfirmDialog,
   type ConfirmReasonChoice,

@@ -4,23 +4,20 @@ import { useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { isolateJoin } from '@/lib/bidi-isolate.ts';
-import type { PatientPackageRow } from '@/shared/api/clinic/patient-packages-contracts.ts';
-import {
-  fetchTreatment,
-  treatmentQueryKeys,
-} from '@/shared/api/clinic/treatments-api.ts';
+import type { PatientPackageRow } from '@/shared/api/app/patient-packages-contracts.ts';
+import { fetchTreatment, treatmentQueryKeys } from '@/shared/api/app/treatments-api.ts';
 import type {
   TreatmentCheckIn,
   TreatmentRecord,
   TreatmentTemplate,
-} from '@/shared/api/clinic/treatments-contracts.ts';
+} from '@/shared/api/app/treatments-contracts.ts';
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import type { QuickFillItem } from '@/shared/components/QuickFillRow/index.ts';
 import {
   type DrawerBadge,
   RecordDrawer,
 } from '@/shared/components/RecordDrawer/index.ts';
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 import {
   resetFormInPlace,
   useEditingRecord,
@@ -164,7 +161,7 @@ const readTreatment = (treatment: TreatmentRecord, organizationId: string | null
 /** "Reversed 10 Oct · Recorded by mistake" — under the header of a reversed session. */
 function ReversedBand({ treatment }: { treatment: TreatmentRecord }) {
   const { t } = useTranslation(TREATMENT_NS);
-  const clock = useClinicClock();
+  const clock = useAppClock();
   const date = treatment.reversedAt ? clock.date(clock.dayOf(treatment.reversedAt)) : '';
   return (
     <p

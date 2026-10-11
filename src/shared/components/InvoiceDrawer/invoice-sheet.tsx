@@ -1,6 +1,6 @@
 import type { ReactElement } from 'react';
 
-import type { InvoiceDetail } from '@/shared/api/clinic/invoices-contracts.ts';
+import type { InvoiceDetail } from '@/shared/api/app/invoices-contracts.ts';
 import { InvoicePrint, printDocument } from '@/shared/components/PrintTemplate/index.ts';
 
 /**

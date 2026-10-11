@@ -1,9 +1,9 @@
 import { Controller, type UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
-import { type Weekday, WEEKDAY_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
-import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
+import { type Weekday, WEEKDAY_VALUES } from '@/shared/api/app/app-schema.ts';
+import type { BranchOption } from '@/shared/api/app/branches-api.ts';
+import type { TeamMember } from '@/shared/api/app/users-contracts.ts';
 import { isInvitationExpired } from '@/shared/api/organization-contracts.ts';
 import {
   DrawerChips,

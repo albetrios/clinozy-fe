@@ -15,7 +15,7 @@ export const manifest = {
   title: 'Lead',
   testId: 'lead-drawer',
   permission: 'organization:read',
-  module: 'clinic-leads',
+  module: 'app-leads',
   kind: 'leaf',
   children: [],
 } as const satisfies PageManifest;

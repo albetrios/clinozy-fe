@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type { PaymentMode } from '@/shared/api/clinic/clinic-schema.ts';
-import type { DayCloseView } from '@/shared/api/clinic/day-close-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { PAYMENT_MODE_TONES } from '@/shared/clinic/clinic-tones.ts';
+import type { PaymentMode } from '@/shared/api/app/app-schema.ts';
+import type { DayCloseView } from '@/shared/api/app/day-close-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { PAYMENT_MODE_TONES } from '@/shared/app/app-tones.ts';
 import {
   PersonAvatar,
   shortPersonName,
@@ -70,7 +70,7 @@ export function DayCloseNetByMode({
   className?: string;
 }) {
   const { t } = useTranslation(PAYMENTS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const formatRupees = useRupeeFormat();
   const modes = [
     ...STRIP_MODES,
@@ -90,7 +90,7 @@ export function DayCloseNetByMode({
             data-testid={`${testId}-mode-${mode}`}
             className="tabular-nums"
           >
-            {tClinic(CLINIC_KEYS.paymentModes[mode])}
+            {tApp(APP_KEYS.paymentModes[mode])}
             <span className="ms-1 font-semibold">
               {formatRupees(view.netByMode[mode])}
             </span>

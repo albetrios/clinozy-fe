@@ -3,15 +3,15 @@ import { renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type * as DirectoryApiModule from '@/shared/api/clinic/directory-api.ts';
-import type { TreatmentRecord } from '@/shared/api/clinic/treatments-contracts.ts';
+import type * as DirectoryApiModule from '@/shared/api/app/directory-api.ts';
+import type { TreatmentRecord } from '@/shared/api/app/treatments-contracts.ts';
 import { useDevicePrefsStore } from '@/shared/store/useDevicePrefsStore/index.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 
 import { TEAM, treatmentRecord } from '../../__tests__/integration/treatment-doubles.ts';
 import { useTreatmentsTable } from './useTreatmentsTable.tsx';
 
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof DirectoryApiModule>()),
   fetchTeamDirectory: vi.fn(async () => TEAM),
 }));

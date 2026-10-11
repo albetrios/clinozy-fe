@@ -4,11 +4,11 @@ import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import i18n from '@/lib/i18n/i18n.ts';
-import { settleCredit } from '@/shared/api/clinic/credits-api.ts';
-import { listOpenInvoices } from '@/shared/api/clinic/invoices-api.ts';
+import { settleCredit } from '@/shared/api/app/credits-api.ts';
+import { listOpenInvoices } from '@/shared/api/app/invoices-api.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import {
   creditRow,
   invoiceRecord,
@@ -30,11 +30,11 @@ const { notifyMock } = vi.hoisted(() => ({
   },
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
-vi.mock('@/shared/api/clinic/credits-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/credits-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   settleCredit: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/invoices-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/invoices-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listOpenInvoices: vi.fn(),
 }));

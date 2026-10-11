@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 
-import type { TodayEnquiry } from '@/shared/api/clinic/today-contracts.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import type { TodayEnquiry } from '@/shared/api/app/today-contracts.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
 import { useTodayEnquiries, useTodayFloor } from '@/shared/hooks/useTodayFloor/index.ts';
@@ -28,7 +28,7 @@ export interface TodayFloorView {
  */
 export function useTodayFloorView(): TodayFloorView {
   const { preferences, isPending: preferencesPending } = usePreferences();
-  const access = useClinicAccess();
+  const access = useAppAccess();
   // Each lane is read only with its code: the floor `appointment:read`, the enquiries `lead:read`.
   const readsFloor = access.isResolved && access.can('appointments', 'view');
   const readsEnquiries = access.can('leads', 'view');

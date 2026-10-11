@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
-import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
+import type { LeadRecord } from '@/shared/api/app/leads-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
 import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
 import {
@@ -21,8 +21,8 @@ import {
   contactFieldsOf,
   contactValueOf,
 } from '@/shared/forms/ContactEditor/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 import { useContact, useUpdateContact } from '@/shared/hooks/useContacts/index.ts';
 import {
   useDeleteLead,
@@ -67,7 +67,7 @@ export interface LeadDetailsBodyProps {
  */
 export function LeadTitleChips({ lead }: { lead: LeadRecord }) {
   const { t } = useTranslation(LEADS_NS);
-  const clock = useClinicClock();
+  const clock = useAppClock();
   const seq = String(lead.leadNumber);
   const copyId = async () => {
     try {
@@ -141,7 +141,7 @@ function LeadPerson({
   actions: ContactCardActions;
 }) {
   const { t } = useTranslation(LEADS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const { t: tEditor } = useTranslation(CONTACT_EDITOR_NS);
   const [editing, setEditing] = useState(false);
   const contact = useContact(lead.contactId).data;
@@ -163,7 +163,7 @@ function LeadPerson({
         card={leadContactCardData(
           lead,
           team,
-          { source: (source) => tClinic(CLINIC_KEYS.leads.sources[source]) },
+          { source: (source) => tApp(APP_KEYS.leads.sources[source]) },
           contact,
         )}
         name={lead.name}
@@ -206,8 +206,8 @@ interface LeadFact {
  */
 function LeadInfoCard({ lead }: { lead: LeadRecord }) {
   const { t } = useTranslation(LEADS_NS);
-  const clock = useClinicClock();
-  const access = useClinicAccess();
+  const clock = useAppClock();
+  const access = useAppAccess();
   const readsTasks = access.isResolved && access.can('tasks', 'view');
   const openTasks = useOpenLeadTasks(lead.id, { enabled: readsTasks });
   const facts: LeadFact[] = [

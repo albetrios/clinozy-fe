@@ -2,8 +2,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import type { FieldPath, UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { attachReviewFile, feedbackQueryKeys } from '@/shared/api/clinic/feedback-api.ts';
-import type { PatientReview } from '@/shared/api/clinic/feedback-contracts.ts';
+import { attachReviewFile, feedbackQueryKeys } from '@/shared/api/app/feedback-api.ts';
+import type { PatientReview } from '@/shared/api/app/feedback-contracts.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useCreateReview, useUpdateReview } from '@/shared/hooks/useFeedback/index.ts';
 import { useUploadQueue } from '@/shared/hooks/useUploadQueue/index.ts';

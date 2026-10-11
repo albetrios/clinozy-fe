@@ -10,7 +10,7 @@
 import type {
   AppointmentListParams,
   AppointmentRangeParams,
-} from '@/shared/api/clinic/appointments-contracts.ts';
+} from '@/shared/api/app/appointments-contracts.ts';
 
 import {
   APPOINTMENTS_SEARCH_DEFAULTS,

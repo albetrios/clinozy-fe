@@ -13,7 +13,7 @@ export const manifest = {
   title: 'Photo details',
   testId: 'patient-photo-details',
   permission: 'organization:read',
-  module: 'clinic-patients',
+  module: 'app-patients',
   kind: 'leaf',
   children: [],
 } as const satisfies PageManifest;

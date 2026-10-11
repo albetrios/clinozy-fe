@@ -1,11 +1,11 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
-import type { TaskGroupId } from '@/shared/api/clinic/task-views.ts';
+import type { TaskGroupId } from '@/shared/api/app/task-views.ts';
 import type {
   TaskLinkKind,
   TaskPriority,
   TaskTab,
-} from '@/shared/api/clinic/tasks-contracts.ts';
-import { TASK_QUEUE_KEYS } from '@/shared/clinic/task-rules.constants.ts';
+} from '@/shared/api/app/tasks-contracts.ts';
+import { TASK_QUEUE_KEYS } from '@/shared/app/task-rules.constants.ts';
 
 /** The Tasks room's i18n namespace. */
 export const TASKS_NS = I18N_NAMESPACES.tasks;
@@ -14,7 +14,7 @@ export const TASKS_NS = I18N_NAMESPACES.tasks;
  * The Tasks room's keys, verbatim from `tasks.md` › Copy (KICKOFF §6.10). The
  * rule catalogue's copy — labels, descriptions, automations, how-to steps,
  * outcomes, the Snooze options — shares the namespace through
- * `TASK_RULE_KEYS` (`src/shared/clinic/task-rules.constants.ts`). Copy naming
+ * `TASK_RULE_KEYS` (`src/shared/app/task-rules.constants.ts`). Copy naming
  * the product reads `{{productName}}`.
  */
 export const TASKS_KEYS = {

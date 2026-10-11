@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
 import { stockPurchaseRow } from '@/tests/utils/stock-doubles.ts';
 
 import type { StockItemRow } from '../../stock-contracts.ts';
@@ -40,7 +40,7 @@ describe('the purchase form (clinic-stock.md:142–157)', () => {
     expect(newPurchaseForm()).toEqual({
       vendorId: null,
       billNo: '',
-      date: clinicToday(),
+      date: appToday(),
       lines: [],
       bill: '',
       paid: '',
@@ -81,7 +81,7 @@ describe('the purchase form (clinic-stock.md:142–157)', () => {
     expect(input).toEqual({
       vendorId: 'svnd_ankur0000000000000000',
       billNo: 'AP-3001',
-      date: clinicToday(),
+      date: appToday(),
       lines: [
         { itemId: 'gauze', qtyMilli: 10_000, rate: 250 },
         { itemId: 'gloves', qtyMilli: 2000, rate: 0 },

@@ -6,14 +6,14 @@ import {
   type TaskPerson,
   taskReassignCodes,
   type TaskRow,
-} from '@/shared/api/clinic/tasks-contracts.ts';
-import { TASK_RULE_KEYS, TASK_RULES_NS } from '@/shared/clinic/task-rules.constants.ts';
-import type { TaskTarget } from '@/shared/clinic/task-targets.ts';
+} from '@/shared/api/app/tasks-contracts.ts';
+import { TASK_RULE_KEYS, TASK_RULES_NS } from '@/shared/app/task-rules.constants.ts';
+import type { TaskTarget } from '@/shared/app/task-targets.ts';
 import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useRefreshTasksAfterRules } from '@/shared/hooks/useTasks/index.ts';
 import { useDevicePrefsStore } from '@/shared/store/useDevicePrefsStore/index.ts';
 
@@ -111,7 +111,7 @@ interface TaskDrawerGates {
 
 /** The drawer's gates for a task, from the member's codes (all false under View-as). */
 function useTaskDrawerGates(row: TaskRow | undefined): TaskDrawerGates {
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const canCode: TaskCanCode = (code) => access.isResolved && access.canCode(code);
   return {
     canCode,

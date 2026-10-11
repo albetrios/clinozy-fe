@@ -3,18 +3,18 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { resolveAccessFromCodes } from '@/shared/api/clinic/access-api.ts';
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
+import { resolveAccessFromCodes } from '@/shared/api/app/access-api.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
 import {
   reassignTask,
   recordTaskOutcome,
   snoozeTask,
-} from '@/shared/api/clinic/tasks-api.ts';
-import type { TaskDetail, TaskRow } from '@/shared/api/clinic/tasks-contracts.ts';
+} from '@/shared/api/app/tasks-api.ts';
+import type { TaskDetail, TaskRow } from '@/shared/api/app/tasks-contracts.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
-import type { ClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import type { AppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import type * as NotifyModule from '@/shared/notify/index.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import {
   taskPerson,
   taskRecord,
@@ -37,7 +37,7 @@ vi.mock('@/shared/notify/index.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof NotifyModule>()),
   notify: notifyMock,
 }));
-vi.mock('@/shared/api/clinic/tasks-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/tasks-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   recordTaskOutcome: vi.fn(),
   snoozeTask: vi.fn(),
@@ -46,9 +46,9 @@ vi.mock('@/shared/api/clinic/tasks-api.ts', async (importOriginal) => ({
 
 /** The member's clinozy-be codes. */
 const member = vi.hoisted(() => ({ codes: [] as string[] }));
-vi.mock('@/shared/hooks/useClinicAccess/index.ts', async (importOriginal) => ({
+vi.mock('@/shared/hooks/useAppAccess/index.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
-  useClinicAccess: (): ClinicAccess => ({
+  useAppAccess: (): AppAccess => ({
     roles: [],
     previewRole: null,
     isResolved: true,

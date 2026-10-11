@@ -1,6 +1,6 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
-import type { TodayLane } from '@/shared/api/clinic/today-contracts.ts';
-import type { GreetingPart } from '@/shared/clinic/clinic-greeting.ts';
+import type { TodayLane } from '@/shared/api/app/today-contracts.ts';
+import type { GreetingPart } from '@/shared/app/app-greeting.ts';
 
 /** The Today room's i18n namespace. */
 export const TODAY_NS = I18N_NAMESPACES.today;

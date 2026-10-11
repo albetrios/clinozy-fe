@@ -18,15 +18,15 @@
  * rules (Week → Day on a phone) live in the island's hooks, off the first paint.
  */
 import { matchOf, oneOf, PUBLIC_ID, queryOf } from '@/lib/routes/search-params.ts';
-import type {
-  AppointmentStatusFilter,
-  AppointmentView,
-} from '@/shared/api/clinic/appointments-contracts.ts';
 import {
   CALENDAR_DATE,
   type CreatedFilter,
   readCreatedFilter,
-} from '@/shared/api/clinic/clinic-list-filters.ts';
+} from '@/shared/api/app/app-list-filters.ts';
+import type {
+  AppointmentStatusFilter,
+  AppointmentView,
+} from '@/shared/api/app/appointments-contracts.ts';
 
 const VIEWS = [
   'agenda',

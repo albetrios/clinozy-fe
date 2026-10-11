@@ -1,4 +1,4 @@
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 
 /**
  * The tables' date words, on the clinic clock: a moment by the rooms' one time
@@ -8,7 +8,7 @@ import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
  * the year added when it is another year's).
  */
 export function useMedicalDates() {
-  const clock = useClinicClock();
+  const clock = useAppClock();
   return {
     clock,
     when: (instant: string) => clock.moment(instant),

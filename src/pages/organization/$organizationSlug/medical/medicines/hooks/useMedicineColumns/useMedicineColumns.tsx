@@ -2,16 +2,16 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
 import {
   expiryTone,
   listMarginTone,
   MEDICINE_STOCK_TONES,
   medicineStockLevel,
   stockFillPercent,
-} from '@/shared/api/clinic/medicine-stock.ts';
-import type { MedicineRow } from '@/shared/api/clinic/medicines-contracts.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/api/app/medicine-stock.ts';
+import type { MedicineRow } from '@/shared/api/app/medicines-contracts.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import {
   IdPill,
   MoneyCell,

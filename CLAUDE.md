@@ -302,6 +302,9 @@ src/shared/
 ├── layouts/<Name>/                  # AuthLayout, AppLayout, PublicLayout
 ├── api/                             # cross-page API helpers (auth, organization, billing, mfa,
 │                                    #   passkeys, sessions, webhooks, notifications) — plain modules
+│   └── app/                         # the clinic rooms' contracts + fetchers (clinozy-be /api/v1/app/*)
+├── app/                             # the clinic rooms' shared layer (sections, tones, keys) — not src/app/;
+│                                    #   `app` is the rooms' code name everywhere (fe-file-structure.mdc)
 ├── auth/                            # auth runtime (token, refresh-timer, idle-timeout, service, captcha)
 ├── tenancy/                         # URL-driven org context, membership, resolver, deployment-mode
 ├── icons/                           # icon registry (import from @/shared/icons, never lucide-react)

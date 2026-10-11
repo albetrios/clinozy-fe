@@ -2,15 +2,15 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { presetOfRole } from '@/shared/api/clinic/access-contracts.ts';
-import { teamMemberOf } from '@/shared/api/clinic/users-api.ts';
-import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
+import { presetOfRole } from '@/shared/api/app/access-contracts.ts';
+import { teamMemberOf } from '@/shared/api/app/users-api.ts';
+import type { TeamMember } from '@/shared/api/app/users-contracts.ts';
 import type * as OrganizationApiModule from '@/shared/api/organization-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { PRESET_CODES } from '@/tests/utils/app-preset-codes.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
-import { PRESET_CODES } from '@/tests/utils/clinic-preset-codes.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import {

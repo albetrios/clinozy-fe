@@ -3,7 +3,7 @@ import type {
   MeasureUnit,
   StockCategory,
   StockUnit,
-} from '@/shared/api/clinic/clinic-schema.ts';
+} from '@/shared/api/app/app-schema.ts';
 
 import type { StockItemRow } from '../../stock-contracts.ts';
 import type { StockItemInput } from '../../stock-records-contracts.ts';

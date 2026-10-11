@@ -1,5 +1,5 @@
-import { LEAD_STATUS_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
-import { LEAD_HOLD_FILTER_VALUES } from '@/shared/api/clinic/leads-contracts.ts';
+import { LEAD_STATUS_VALUES } from '@/shared/api/app/app-schema.ts';
+import { LEAD_HOLD_FILTER_VALUES } from '@/shared/api/app/leads-contracts.ts';
 import type { RoomFilterFields } from '@/shared/components/RoomToolbar/index.ts';
 
 import { LEAD_SOURCE_ORDER } from '../LeadFields/index.ts';

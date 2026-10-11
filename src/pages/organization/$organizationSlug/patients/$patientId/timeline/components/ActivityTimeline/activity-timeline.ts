@@ -1,9 +1,9 @@
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
 import type {
   ContactActivityEntry,
   ContactActivityFilter,
   ContactActivityLinkKind,
-} from '@/shared/api/clinic/contact-activities-api.ts';
+} from '@/shared/api/app/contact-activities-api.ts';
 import {
   type AppIcon,
   Calendar,

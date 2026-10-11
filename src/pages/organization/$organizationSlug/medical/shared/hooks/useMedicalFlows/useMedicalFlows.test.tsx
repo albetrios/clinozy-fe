@@ -3,12 +3,12 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
+import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
 import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import { fixtureLedgerQueryKeys } from '@/shared/api/clinic/payments-fixture-api.ts';
+  appFixtures,
+  resetAppFixtures,
+} from '@/shared/api/app/fixtures/world.fixtures.ts';
+import { fixtureLedgerQueryKeys } from '@/shared/api/app/payments-fixture-api.ts';
 
 import { medicalQueryKeys } from '../../medical-api.ts';
 import {
@@ -67,14 +67,14 @@ function invalidated(spy: ReturnType<typeof vi.spyOn>): unknown[] {
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] });
   vi.setSystemTime(NOW);
-  resetClinicFixtures();
+  resetAppFixtures();
   client = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
 });
 afterEach(() => {
   vi.useRealTimers();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 
 describe('the purchase-order writes', () => {
@@ -104,7 +104,7 @@ describe('the purchase-order writes', () => {
         },
       });
     });
-    expect((await clinicFixtures.purchaseOrders.get(created)).supplierBillNo).toBe('T-1');
+    expect((await appFixtures.purchaseOrders.get(created)).supplierBillNo).toBe('T-1');
 
     spy.mockClear();
     await act(async () => {
@@ -122,7 +122,7 @@ describe('the purchase-order writes', () => {
         note: null,
       });
     });
-    expect((await clinicFixtures.purchaseOrders.get(ref.purchaseOrder(430))).stage).toBe(
+    expect((await appFixtures.purchaseOrders.get(ref.purchaseOrder(430))).stage).toBe(
       'cancelled',
     );
   });
@@ -160,7 +160,7 @@ describe('the sale writes', () => {
       });
     });
     expect(
-      (await clinicFixtures.medicalSales.get(ref.medicalSale(978))).voidedAt,
+      (await appFixtures.medicalSales.get(ref.medicalSale(978))).voidedAt,
     ).not.toBeNull();
   });
 });

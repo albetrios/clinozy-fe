@@ -1,23 +1,23 @@
 import type { TFunction } from 'i18next';
 
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
 import type {
   CheckinFollowed,
   FeedbackActionKind,
   Tone,
-} from '@/shared/api/clinic/clinic-schema.ts';
+} from '@/shared/api/app/app-schema.ts';
 import type {
   FeedbackItem,
   FeedbackType,
   PatientCheckIn,
   PatientReview,
-} from '@/shared/api/clinic/feedback-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+} from '@/shared/api/app/feedback-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import {
   CHECKIN_FEEL_TONES,
   CHECKIN_FOLLOWED_TONES,
   REVIEW_SOURCE_TONES,
-} from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/app/app-tones.ts';
 import {
   type AppIcon,
   Calendar,
@@ -76,7 +76,7 @@ export function feedbackTypesOf(items: readonly FeedbackItem[]): FeedbackType[] 
 /** A type chip's label: "All", "Consultation", "Treatment feedback", "Google" … */
 export function feedbackTypeLabel(type: FeedbackType, t: TFunction): string {
   if (type === 'all' || type === 'visit' || type === 'treatment') return t(K.types[type]);
-  return t(CLINIC_KEYS.reviewSources[type], { ns: CLINIC_NS });
+  return t(APP_KEYS.reviewSources[type], { ns: APP_NS });
 }
 
 /**
@@ -176,7 +176,7 @@ function checkInCardView(checkIn: PatientCheckIn, t: TFunction): FeedbackCardVie
     typeLabel: feedbackTypeLabel(type, t),
     sub: checkIn.context,
     head: {
-      text: t(CLINIC_KEYS.checkInFeels[checkIn.feel], { ns: CLINIC_NS }),
+      text: t(APP_KEYS.checkInFeels[checkIn.feel], { ns: APP_NS }),
       tone: CHECKIN_FEEL_TONES[checkIn.feel],
       stars: false,
     },

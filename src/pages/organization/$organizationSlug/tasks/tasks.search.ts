@@ -11,11 +11,7 @@
  * each list to the contract's.
  */
 import { listOf, oneOf, queryOf } from '@/lib/routes/search-params.ts';
-import type {
-  TaskScope,
-  TaskTab,
-  TaskType,
-} from '@/shared/api/clinic/tasks-contracts.ts';
+import type { TaskScope, TaskTab, TaskType } from '@/shared/api/app/tasks-contracts.ts';
 
 /** The views, "To do · Snoozed · Done" — To do is the API's `open` (route map §2 #21). */
 export const TASK_VIEWS = [

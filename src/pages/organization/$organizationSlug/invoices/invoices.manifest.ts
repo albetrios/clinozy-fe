@@ -6,7 +6,7 @@ import type { PageManifest } from '@/lib/routes/page-manifest.ts';
  * dialogs over a referrer — the Payments ledger stands behind them, the
  * default (§4), and `from` takes the drawer back to the room that opened it.
  * Gated like the Payments room (the money domain): membership and the
- * `clinic-payments` module; in-room access is `useClinicAccess`. Its children
+ * `app-payments` module; in-room access is `useAppAccess`. Its children
  * are New invoice (`create`) and an invoice's preview (`$invoiceId`) with its
  * edit.
  */
@@ -16,7 +16,7 @@ export const manifest = {
   title: 'Invoices',
   testId: 'invoice-drawer',
   permission: 'organization:read',
-  module: 'clinic-payments',
+  module: 'app-payments',
   kind: 'layout',
   children: ['create', '$invoiceId'],
 } as const satisfies PageManifest;

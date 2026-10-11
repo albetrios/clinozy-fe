@@ -4,15 +4,15 @@ import { useTranslation } from 'react-i18next';
 import {
   CREDIT_DIRECTION_VALUES,
   type CreditDirection,
-} from '@/shared/api/clinic/clinic-schema.ts';
-import { creditQueryKeys, searchCreditParties } from '@/shared/api/clinic/credits-api.ts';
+} from '@/shared/api/app/app-schema.ts';
+import { creditQueryKeys, searchCreditParties } from '@/shared/api/app/credits-api.ts';
 import {
   CREDIT_NOTE_MAX,
   type CreditPartyRow,
-} from '@/shared/api/clinic/credits-contracts.ts';
-import type { InvoiceRecord } from '@/shared/api/clinic/invoices-contracts.ts';
-import { CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { CREDIT_DIRECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/api/app/credits-contracts.ts';
+import type { InvoiceRecord } from '@/shared/api/app/invoices-contracts.ts';
+import { APP_NS } from '@/shared/app/app.constants.ts';
+import { CREDIT_DIRECTION_TONES } from '@/shared/app/app-tones.ts';
 import {
   DrawerChips,
   DrawerField,
@@ -77,7 +77,7 @@ export function CreditWayFields({
   onParty: (party: CreditParty | null) => void;
 }) {
   const { t } = useTranslation(PAYMENTS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const organizationId = useOrganizationStore((state) => state.organizationId);
   const field = useDrawerFieldIds(form, idPrefix);
   const who = field('party');
@@ -157,7 +157,7 @@ export function CreditWayFields({
               value={control.value}
               onValueChange={control.onChange}
               onBlur={control.onBlur}
-              prefix={tClinic(RECORD_DRAWER_KEYS.currency)}
+              prefix={tApp(RECORD_DRAWER_KEYS.currency)}
               maxLength={MONEY_LENGTH}
               readOnly={readOnly}
               data-testid={`${testId}-amount`}

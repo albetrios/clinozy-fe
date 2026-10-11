@@ -1,5 +1,5 @@
 import { AvatarStack } from '@/shared/components/Cells/index.ts';
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 
 import type { StaffChip } from '../../hooks/useStaffLookup/index.ts';
 
@@ -22,7 +22,7 @@ export function StaffCell({ person }: { person: StaffChip | null }) {
  * the rooms' one time rule — the Patients room's Updated cell.
  */
 export function UpdatedCell({ person, at }: { person: StaffChip | null; at: string }) {
-  const clock = useClinicClock();
+  const clock = useAppClock();
   return (
     <span className="flex min-w-0 items-center gap-2">
       {person ? (

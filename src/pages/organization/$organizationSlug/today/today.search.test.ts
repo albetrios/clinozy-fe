@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { TODAY_LANES } from '@/shared/api/clinic/today-contracts.ts';
+import { TODAY_LANES } from '@/shared/api/app/today-contracts.ts';
 
 import {
   TODAY_LANE_VALUES,

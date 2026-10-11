@@ -3,12 +3,12 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import i18n from '@/lib/i18n/i18n.ts';
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
+import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
 import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import { deletePayment } from '@/shared/api/clinic/payments-api.ts';
+  appFixtures,
+  resetAppFixtures,
+} from '@/shared/api/app/fixtures/world.fixtures.ts';
+import { deletePayment } from '@/shared/api/app/payments-api.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
@@ -29,7 +29,7 @@ const { notifyMock } = vi.hoisted(() => ({
   notifyMock: { success: vi.fn(), error: vi.fn(), info: vi.fn(), undo: vi.fn() },
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
-vi.mock('@/shared/api/clinic/payments-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/payments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   deletePayment: vi.fn(),
 }));
@@ -66,18 +66,18 @@ const conflict = (reason: string, detail: string) =>
   });
 
 const isLive = (id: string) =>
-  clinicFixtures.payments.snapshot((payment) => payment.id === id).length === 1;
+  appFixtures.payments.snapshot((payment) => payment.id === id).length === 1;
 
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'], shouldAdvanceTime: true });
   vi.setSystemTime(NOW);
   viewport.tier = 'desktop';
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 afterEach(() => {
   vi.useRealTimers();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 
 describe('PaymentDeleteConfirm (payments.md:34)', () => {
@@ -115,7 +115,7 @@ describe('PaymentDeleteConfirm (payments.md:34)', () => {
     expect(onClose).toHaveBeenCalled();
     expect(isLive(ref.payment(5512))).toBe(false);
     // A reason the schema lacks travels as "other", its label in the note (D32).
-    const removed = await clinicFixtures.payments.get(ref.payment(5512), {
+    const removed = await appFixtures.payments.get(ref.payment(5512), {
       includeDeleted: true,
     });
     expect(removed).toMatchObject({ deleteReason: 'other', deleteNote: 'Wrong amount' });

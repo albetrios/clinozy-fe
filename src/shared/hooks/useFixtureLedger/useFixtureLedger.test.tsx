@@ -3,13 +3,13 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
+import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
 import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import { paymentQueryKeys } from '@/shared/api/clinic/payments-api.ts';
-import { fixtureLedgerQueryKeys } from '@/shared/api/clinic/payments-fixture-api.ts';
+  appFixtures,
+  resetAppFixtures,
+} from '@/shared/api/app/fixtures/world.fixtures.ts';
+import { paymentQueryKeys } from '@/shared/api/app/payments-api.ts';
+import { fixtureLedgerQueryKeys } from '@/shared/api/app/payments-fixture-api.ts';
 
 import {
   FIXTURE_MONEY_WRITE_KEYS,
@@ -34,7 +34,7 @@ function wrapper({ children }: { children: ReactNode }) {
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] });
   vi.setSystemTime(NOW);
-  resetClinicFixtures();
+  resetAppFixtures();
   client = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
@@ -42,7 +42,7 @@ beforeEach(() => {
 afterEach(() => {
   vi.useRealTimers();
   client.clear();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 
 describe('FIXTURE_MONEY_WRITE_KEYS', () => {
@@ -79,9 +79,9 @@ describe('the fixture ledger hooks (Medical)', () => {
     await act(() =>
       result.current.remove.mutateAsync({ id, reason: 'duplicate', note: null }),
     );
-    expect(clinicFixtures.payments.snapshot((row) => row.id === id)).toEqual([]);
+    expect(appFixtures.payments.snapshot((row) => row.id === id)).toEqual([]);
 
     await act(() => result.current.restore.mutateAsync(id));
-    expect(clinicFixtures.payments.snapshot((row) => row.id === id)).toHaveLength(1);
+    expect(appFixtures.payments.snapshot((row) => row.id === id)).toHaveLength(1);
   });
 });

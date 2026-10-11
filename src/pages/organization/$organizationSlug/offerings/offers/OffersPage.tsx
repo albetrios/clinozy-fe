@@ -6,7 +6,7 @@ import {
   organizationOfferCreate,
   organizationOfferEdit,
 } from '@/lib/routes/offerings-builders.ts';
-import { OFFER_STATE_TONES } from '@/shared/clinic/clinic-tones.ts';
+import { OFFER_STATE_TONES } from '@/shared/app/app-tones.ts';
 import { DataTable, exportTableCsv } from '@/shared/components/DataTable/index.ts';
 import type { DataTableBulkAction } from '@/shared/components/DataTableBulkBar/index.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
@@ -19,10 +19,10 @@ import {
 } from '@/shared/components/RoomToolbar/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import {
+  type AppAccess,
   canExportRows,
-  type ClinicAccess,
-  useClinicAccess,
-} from '@/shared/hooks/useClinicAccess/index.ts';
+  useAppAccess,
+} from '@/shared/hooks/useAppAccess/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
 import { useSetOfferActive } from '@/shared/hooks/useOffers/index.ts';
 import { FileIcon, Pause, PenLine, Play, Sparkles, Trash } from '@/shared/icons/index.ts';
@@ -174,7 +174,7 @@ function useOfferingNames(
 }
 
 /** What the member's codes let them do on the tab (research §7; View-as: nothing). */
-function offerRights(access: ClinicAccess) {
+function offerRights(access: AppAccess) {
   return {
     create: access.canCode(OFFER_PERMISSIONS.create),
     update: access.canCode(OFFER_PERMISSIONS.update),
@@ -258,7 +258,7 @@ export function OffersPage() {
   const { t } = useTranslation(OFFERS_NS);
   const navigate = useNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
-  const rights = offerRights(useClinicAccess());
+  const rights = offerRights(useAppAccess());
   const catalogue = useOfferingsCatalogue();
   const loading = catalogue.isPending && catalogue.offers.length === 0;
   const failed = catalogue.isError && catalogue.offers.length === 0;

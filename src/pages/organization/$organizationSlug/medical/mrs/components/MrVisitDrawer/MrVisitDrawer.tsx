@@ -2,13 +2,9 @@ import { useId, useState } from 'react';
 import { Controller, useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import type { MRVisit } from '@/shared/api/clinic/clinic-schema.ts';
-import {
-  addCivilDays,
-  addCivilMonths,
-  clinicToday,
-} from '@/shared/api/clinic/clinic-time.ts';
-import { SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
+import type { MRVisit } from '@/shared/api/app/app-schema.ts';
+import { addCivilDays, addCivilMonths, appToday } from '@/shared/api/app/app-time.ts';
+import { SECTION_TONES } from '@/shared/app/app-tones.ts';
 import {
   DrawerField,
   DrawerFieldGrid,
@@ -260,7 +256,7 @@ function VisitSession({
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
   const dates = useMedicalDates();
   const idPrefix = `mr-visit-${useId().replace(/:/g, '')}`;
-  const [today] = useState(() => clinicToday());
+  const [today] = useState(() => appToday());
   const form = useForm<VisitFormValues>({
     defaultValues: {
       date: today,

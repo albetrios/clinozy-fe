@@ -1,7 +1,7 @@
 import { screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { clinicBranch } from '@/tests/utils/branch-doubles.ts';
+import { appBranch } from '@/tests/utils/branch-doubles.ts';
 
 import {
   renderUsersRoutes,
@@ -16,7 +16,7 @@ const { notifyMock } = vi.hoisted(() => ({
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 
 const VESU: BranchRow = {
-  branch: clinicBranch(),
+  branch: appBranch(),
   team: [],
   defaults: [],
 };

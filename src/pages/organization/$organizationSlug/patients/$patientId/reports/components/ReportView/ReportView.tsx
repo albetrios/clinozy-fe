@@ -2,11 +2,11 @@ import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { isolateValues } from '@/lib/bidi-isolate.ts';
-import { localDateOf } from '@/shared/api/clinic/clinic-time.ts';
+import { localDateOf } from '@/shared/api/app/app-time.ts';
 import type {
   PatientReport,
   PatientReportFile,
-} from '@/shared/api/clinic/patient-reports-contracts.ts';
+} from '@/shared/api/app/patient-reports-contracts.ts';
 import {
   DrawerField,
   DrawerFieldGrid,

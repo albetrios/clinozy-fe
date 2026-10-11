@@ -1,13 +1,13 @@
 import type { I18nLocale } from '@/lib/i18n/locales.ts';
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
-import type { InvoiceStatus } from '@/shared/api/clinic/clinic-money.ts';
+import type { InvoiceStatus } from '@/shared/api/app/app-money.ts';
 import type {
   BodyPart,
   OfferingSpecialty,
   PoStage,
   RxMeal,
   RxTiming,
-} from '@/shared/api/clinic/clinic-schema.ts';
+} from '@/shared/api/app/app-schema.ts';
 
 /**
  * Print template copy has its own namespace, `print`: loaded on demand by

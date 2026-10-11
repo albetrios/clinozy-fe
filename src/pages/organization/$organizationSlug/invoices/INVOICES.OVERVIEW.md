@@ -10,7 +10,7 @@ stands behind it — `src/app/routes/routeTree.tsx` renders `PaymentsPage` besid
 host, the §4 default — and closing goes to `from`, else the ledger.
 
 Gated like the Payments room, the money domain: membership (`organization:read`) and the
-`clinic-payments` module, then `requireOrgStatus`; in-room View / Create / Edit / Delete are the
+`app-payments` module, then `requireOrgStatus`; in-room View / Create / Edit / Delete are the
 member's `payment:read` / `payment:create` / `payment:update` / `payment:delete` codes
 (`canPayment` from the drawer's barrel — View as falls back to the fixture matrix). A member
 without `payment:create` who follows a create link lands on the ledger with the permission toast;
@@ -38,13 +38,13 @@ Each child renders nothing — the host (`InvoicesLayout.tsx`) reads the URL thr
 
 The drawer itself is shared — `@/shared/components/InvoiceDrawer/` — because the Medical room
 opens it as New sale and the patient file, Today and ⌘K open it too. A clinic or consultation
-invoice is clinozy-be's (`@/shared/api/clinic/invoices-api.ts`, `@/shared/hooks/useInvoices/`):
+invoice is clinozy-be's (`@/shared/api/app/invoices-api.ts`, `@/shared/hooks/useInvoices/`):
 the server prices every line — the best live offer at the branch and date, never under the
 lowest price (#159) — and the drawer shows its preview (`POST /app/invoices/preview`, an edit's
 `POST /app/invoices/{invoice_id}/preview`) as the member types, never its own sums. The save is
 `POST /app/invoices` with "Paid now" as one receipt, or `PATCH /app/invoices/{invoice_id}` with
 what changed and the read's `updated_at`. Medical's New sale stays on the fixture world
-(`@/shared/api/clinic/invoices-fixture-api.ts`, its sums in `@/shared/api/clinic/clinic-money.ts`;
+(`@/shared/api/app/invoices-fixture-api.ts`, its sums in `@/shared/api/app/app-money.ts`;
 D153 seam).
 
 ## Files

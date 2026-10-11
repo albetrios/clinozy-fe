@@ -2,9 +2,9 @@ import { useQueryClient } from '@tanstack/react-query';
 import type { FieldPath, UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { patientPackageQueryKeys } from '@/shared/api/clinic/patient-packages-api.ts';
-import { treatmentQueryKeys } from '@/shared/api/clinic/treatments-api.ts';
-import type { TreatmentRecord } from '@/shared/api/clinic/treatments-contracts.ts';
+import { patientPackageQueryKeys } from '@/shared/api/app/patient-packages-api.ts';
+import { treatmentQueryKeys } from '@/shared/api/app/treatments-api.ts';
+import type { TreatmentRecord } from '@/shared/api/app/treatments-contracts.ts';
 import { mapApiError } from '@/shared/errors/errorHandler.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import {

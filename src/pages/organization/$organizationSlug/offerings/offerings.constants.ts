@@ -6,7 +6,7 @@ export const OFFERINGS_NS = I18N_NAMESPACES.offerings;
 /**
  * The Offerings tab's copy, verbatim from `offerings.md` › Copy (KICKOFF
  * §6.11). The categories, offer kinds and states are the shared clinic
- * vocabulary (`CLINIC_KEYS.offerings`); the toolbar's and the cells both tabs
+ * vocabulary (`APP_KEYS.offerings`); the toolbar's and the cells both tabs
  * share sit with their units in `shared/`.
  */
 export const OFFERINGS_KEYS = {

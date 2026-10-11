@@ -1,6 +1,6 @@
 import type { ColumnDef } from '@tanstack/react-table';
 
-import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
+import { formatAppPhone } from '@/shared/app/app-phone.ts';
 import { MoneyCell, PersonChip } from '@/shared/components/Cells/index.ts';
 import type { DataTableFeatures } from '@/shared/components/DataTable/index.ts';
 
@@ -39,7 +39,7 @@ export function useStockVendorColumns(): ColumnDef<DataTableFeatures, StockVendo
           name={row.original.name}
           sub={
             row.original.phone
-              ? formatClinicPhone(row.original.phone)
+              ? formatAppPhone(row.original.phone)
               : t(STOCK_KEYS.table.addPhone)
           }
           tone="sky"

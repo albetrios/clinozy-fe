@@ -1,5 +1,5 @@
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import type { MedicineMaker } from '@/shared/api/clinic/medicines-contracts.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
+import type { MedicineMaker } from '@/shared/api/app/medicines-contracts.ts';
 import { TonePill } from '@/shared/components/Cells/index.ts';
 
 /** The manufacturers as pills in their own tones (`medical.md:45, 77`). */

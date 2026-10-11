@@ -92,14 +92,14 @@ The clinic shell has no sidebar, bell or header theme toggle: the Account menu (
 | `openNotificationCenter(page)` | Account menu › Notifications → `notification-popover`                      |
 | `chooseThemeMode(page, mode)`  | Account menu › Appearance pills (`account-menu-theme-<mode>`), then closes |
 
-### `e2e-clinic.ts` — the clinic rooms
+### `e2e-app.ts` — the clinic rooms
 
 | Helper                                | Purpose                                                                                                                      |
 | ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | `openNewClinic(page)`                 | A new owner of a new clinic (team org) via `page.request`, standing on their role home (Today); skips when team orgs are off |
 | `openRoomFromShell(page, room, tier)` | Open a room as a member does: pinned tab (header / phone tab bar) or All sections (popover / "More" sheet)                   |
 | `expectRoomReady(page, room)`         | The room's URL, page root and its `h1` (a11y guard)                                                                          |
-| `CLINIC_ROOMS` · `CLINIC_VIEWPORTS`   | The ten rooms in nav order · desktop 1440×900 and phone 375×812                                                              |
+| `APP_ROOMS` · `APP_VIEWPORTS`         | The ten rooms in nav order · desktop 1440×900 and phone 375×812                                                              |
 | `hideDevtools(page)`                  | Hide the React Query devtools (`VITE_DEVTOOLS`) — their toggle covers the phone tab bar's "More"                             |
 
 ### `e2e-tenancy.ts`

@@ -14,7 +14,7 @@ export const manifest = {
   title: 'New branch',
   testId: 'branch-drawer',
   permission: 'branch:read',
-  module: 'clinic-users',
+  module: 'app-users',
   kind: 'leaf',
   children: [],
 } as const satisfies PageManifest;

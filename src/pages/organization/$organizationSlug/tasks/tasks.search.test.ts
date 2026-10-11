@@ -5,7 +5,7 @@ import {
   TASK_SCOPES,
   TASK_TABS,
   TASK_TYPE_VALUES,
-} from '@/shared/api/clinic/tasks-contracts.ts';
+} from '@/shared/api/app/tasks-contracts.ts';
 
 import {
   TASK_SCOPE_VALUES,

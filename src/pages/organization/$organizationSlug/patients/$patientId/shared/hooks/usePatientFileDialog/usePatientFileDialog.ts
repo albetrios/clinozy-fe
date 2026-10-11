@@ -7,7 +7,7 @@ import { organizationPatientSection } from '@/lib/routes/patient-file-builders.t
 import {
   isPatientFileSection,
   type PatientFileSectionSlug,
-} from '@/shared/clinic/patient-file-sections.ts';
+} from '@/shared/app/patient-file-sections.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { validatePatientFileDialogSearch } from '../../../patient-id.dialog-search.ts';

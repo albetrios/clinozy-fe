@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { REVIEW_SOURCE_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
+import { REVIEW_SOURCE_VALUES } from '@/shared/api/app/app-schema.ts';
 
 import {
   PATIENT_REVIEW_SOURCES,

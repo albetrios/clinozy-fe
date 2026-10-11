@@ -3,12 +3,12 @@ import { createInstance, type i18n as I18n } from 'i18next';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
-import enClinic from '@/locales/en/clinic.json';
+import enApp from '@/locales/en/app.json';
 import enCommon from '@/locales/en/common.json';
 import enErrors from '@/locales/en/errors.json';
 import enLayout from '@/locales/en/layout.json';
 import enPatients from '@/locales/en/patients.json';
-import type * as PatientsApiModule from '@/shared/api/clinic/patients-api.ts';
+import type * as PatientsApiModule from '@/shared/api/app/patients-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useDevicePrefsStore } from '@/shared/store/useDevicePrefsStore/index.ts';
 
@@ -32,7 +32,7 @@ vi.mock('@/shared/notify/index.ts', () => ({
 }));
 
 const world = vi.hoisted(() => ({}) as PatientsWorld);
-vi.mock('@/shared/api/clinic/patients-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/patients-api.ts', async (importOriginal) => {
   const { patientsApiDouble } = await import('./patients-test-data.ts');
   return {
     ...(await importOriginal<typeof PatientsApiModule>()),
@@ -45,7 +45,7 @@ const PATIENTS = '/organization/acme/patients';
 /**
  * What the Patients route has loaded in the app, and nothing else: the boot
  * bundle's namespaces (`common`, `errors`, `layout`), the org shell's
- * (`clinic` — `routeTree.tsx` › `OrganizationShell`) and the room's own
+ * (`app` — `routeTree.tsx` › `OrganizationShell`) and the room's own
  * (`patients` — › `PatientsPage`). The suite's shared instance holds every
  * namespace, so a label read through a namespace the route never loads, or
  * through the wrong one, passes there and shows its key path in the app.
@@ -54,13 +54,13 @@ const ROUTE_RESOURCES = {
   [I18N_NAMESPACES.common]: enCommon,
   [I18N_NAMESPACES.errors]: enErrors,
   [I18N_NAMESPACES.layout]: enLayout,
-  [I18N_NAMESPACES.clinic]: enClinic,
+  [I18N_NAMESPACES.app]: enApp,
   [I18N_NAMESPACES.patients]: enPatients,
 };
 
 /** A key path of those namespaces showing as text, e.g. `patients.types.lhr`. */
 const RAW_KEY = new RegExp(
-  `\\b(${[...Object.keys(enClinic), ...Object.keys(enPatients)].join('|')})\\.[A-Za-z]`,
+  `\\b(${[...Object.keys(enApp), ...Object.keys(enPatients)].join('|')})\\.[A-Za-z]`,
 );
 
 let routeI18n: I18n;
@@ -101,11 +101,11 @@ describe('the Patients room with only its route’s namespaces loaded', () => {
     const dharti = screen
       .getAllByTestId('patients-table-row')
       .find((row) => row.textContent?.includes('Dharti Galani'));
-    // Type and Status (`clinic` › patients), Gender (`clinic` › personCard).
+    // Type and Status (`app` › patients), Gender (`app` › personCard).
     expect(dharti).toHaveTextContent('Aesthetic');
     expect(dharti).toHaveTextContent('Regular');
     expect(dharti).toHaveTextContent('Female');
-    // Conversion (`clinic` › patients) and Age (`patients` › table).
+    // Conversion (`app` › patients) and Age (`patients` › table).
     expect(dharti).toHaveTextContent('T-Not converted');
     expect(dharti).toHaveTextContent('30 yrs');
     expect(screen.getByRole('columnheader', { name: /Conversion/ })).toBeInTheDocument();
@@ -115,7 +115,7 @@ describe('the Patients room with only its route’s namespaces loaded', () => {
   it('opens the New patient drawer with every label in place', async () => {
     renderPatientsRoutes(`${PATIENTS}/create`, PatientsPage, { i18n: routeI18n });
     const drawer = await screen.findByTestId('patient-drawer');
-    // The drawer's copy is `clinic` (it is shared — quick-add stacks it on other rooms).
+    // The drawer's copy is `app` (it is shared — quick-add stacks it on other rooms).
     expect(drawer).toHaveTextContent('New patient');
     expect(drawer).toHaveTextContent('Contact & personal');
     expect(drawer).toHaveTextContent('primary · WhatsApp');

@@ -2,16 +2,13 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { AppointmentMove } from '@/shared/api/clinic/appointment-status.ts';
-import type * as AppointmentsApiModule from '@/shared/api/clinic/appointments-api.ts';
-import {
-  cancelAppointment,
-  moveAppointment,
-} from '@/shared/api/clinic/appointments-api.ts';
-import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
+import type { AppointmentMove } from '@/shared/api/app/appointment-status.ts';
+import type * as AppointmentsApiModule from '@/shared/api/app/appointments-api.ts';
+import { cancelAppointment, moveAppointment } from '@/shared/api/app/appointments-api.ts';
+import type { AppointmentRow } from '@/shared/api/app/appointments-contracts.ts';
 import { notify } from '@/shared/notify/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { APPOINTMENT_NOW } from '@/tests/utils/appointment-doubles.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import {
   type AppointmentsWorld,
@@ -23,7 +20,7 @@ import {
 } from '../../__tests__/integration/appointments-test-data.ts';
 import {
   APPOINTMENTS_PAGE,
-  grantClinicAccess,
+  grantAppAccess,
   renderInAppointments,
 } from '../../__tests__/integration/appointments-test-router.tsx';
 import { useAppointmentActions } from './appointment-actions-context.ts';
@@ -35,7 +32,7 @@ vi.mock('@/shared/notify/index.ts', () => ({
 }));
 
 const world = vi.hoisted(() => ({}) as AppointmentsWorld);
-vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/appointments-api.ts', async (importOriginal) => {
   const { appointmentsApiDouble } =
     await import('../../__tests__/integration/appointments-test-data.ts');
   return {
@@ -99,7 +96,7 @@ beforeEach(() => {
   vi.resetAllMocks();
   Object.assign(world, seededAppointmentsWorld());
   signInTestMember();
-  grantClinicAccess('owner');
+  grantAppAccess('owner');
 });
 afterEach(() => vi.useRealTimers());
 
@@ -261,7 +258,7 @@ describe('AppointmentActionsProvider', () => {
   });
 
   it('reads no Edit and no Create for a member who only reads', async () => {
-    grantClinicAccess('none');
+    grantAppAccess('none');
     renderInAppointments(<Probe appointment={RIYA_BOOKING} />);
     await waitFor(() =>
       expect(screen.getByTestId('access')).toHaveTextContent('false·false'),

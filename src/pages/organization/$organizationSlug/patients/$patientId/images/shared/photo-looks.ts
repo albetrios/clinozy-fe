@@ -1,8 +1,8 @@
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
 import type {
   PatientPhotoBodyPart,
   PatientPhotoStage,
-} from '@/shared/api/clinic/patient-images-contracts.ts';
+} from '@/shared/api/app/patient-images-contracts.ts';
 import { type AppIcon, ImageIcon, Lock, Sparkles } from '@/shared/icons/index.ts';
 import type { PhotoSize } from '@/shared/store/useDevicePrefsStore/index.ts';
 

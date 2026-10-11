@@ -7,8 +7,8 @@
  * flags have no field in the API (api-integration §8 G1). Pure; the room words
  * them.
  */
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import { clinicClockTime } from '@/shared/api/clinic/clinic-time.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
+import { appClockTime } from '@/shared/api/app/app-time.ts';
 
 import type { TodayCard } from './today.lanes.ts';
 
@@ -95,7 +95,7 @@ function bookingFlags(
         ? [
             {
               id: 'rxApproved' as const,
-              time: clinicClockTime(new Date(row.prescription.approvedAt)),
+              time: appClockTime(new Date(row.prescription.approvedAt)),
             },
           ]
         : [];

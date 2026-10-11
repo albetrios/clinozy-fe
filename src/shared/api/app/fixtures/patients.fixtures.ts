@@ -1,0 +1,725 @@
+import {
+  PROTOTYPE_SEED_DAY,
+  seedCommon,
+  seedInstant,
+} from '@/shared/api/app/app-fixture-seed.ts';
+import type {
+  PatientConversion,
+  PatientStatus,
+  PatientType,
+} from '@/shared/api/app/app-schema.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
+import type {
+  PatientConsent,
+  PatientRecord,
+} from '@/shared/api/app/patients-fixture-contracts.ts';
+
+import { branchRef, MAIN_BRANCH } from './organization.fixtures.ts';
+import { must, readSeedLabel, ref, seedAt, seedMobile } from './refs.fixtures.ts';
+import { type StaffKey, staffRef } from './staff.fixtures.ts';
+
+const TYPES: Record<string, PatientType> = {
+  Aesthetic: 'aesthetic',
+  Clinical: 'clinical',
+  LHR: 'lhr',
+};
+const STATUSES: Record<string, PatientStatus> = {
+  New: 'new',
+  Regular: 'regular',
+  VIP: 'vip',
+  Inactive: 'inactive',
+};
+/** `PT_CONV`; the one blank (#3503) takes the contract default. */
+const CONVERSIONS: Record<string, PatientConversion> = {
+  'T-Converted': 'converted',
+  'T-Not converted': 'not_converted',
+  '': 'not_converted',
+};
+const GENDERS = { F: 'female', M: 'male' } as const;
+
+interface PatientRow {
+  seq: number;
+  first: string;
+  last: string;
+  phone: string;
+  /** A second number another seed gives the same person. */
+  phoneTwo?: string;
+  gender: 'F' | 'M' | '';
+  dob: string;
+  address: string;
+  types: readonly string[];
+  status: string;
+  conversion: string;
+  /** Follow-up label and its kind (`fu` / `fuK`); a "today" kind keeps the label's time on today. */
+  followUp: string;
+  followUpKind: 'today' | 'past' | 'future' | 'none';
+  since: string;
+  updated: string;
+  by: StaffKey;
+  doctor: StaffKey | null;
+  lead?: number;
+  consent?: boolean;
+}
+
+/**
+ * `PT_SEED` (H:3649–3664), verbatim but for `since` (first evidence of the
+ * patient in any seed), `doctor` (whoever the Rx, sessions, invoices or visits
+ * name, else the doctor who last updated the row) and the origin `lead`.
+ * Rhea and Dharti's consent is `CINFO` (H:3369); Kiran Desai's second number
+ * is her contact number (`CONTACTS` H:3368, shared with Anaya Desai).
+ */
+const REGISTERED: readonly PatientRow[] = [
+  {
+    seq: 3508,
+    first: 'Dharti',
+    last: 'Galani',
+    phone: '82006 03212',
+    gender: 'F',
+    dob: '1995-10-27',
+    address: 'Umra, Velanja',
+    types: ['Aesthetic'],
+    status: 'Regular',
+    conversion: 'T-Not converted',
+    followUp: 'Sep 24 · 14:50',
+    followUpKind: 'today',
+    since: 'Sep 24 · 14:40',
+    updated: 'Sep 24 · 15:39',
+    by: 'RS',
+    doctor: 'DD',
+    lead: 2352,
+    consent: true,
+  },
+  {
+    seq: 3507,
+    first: 'Raam',
+    last: 'Shah',
+    phone: '81548 30361',
+    gender: 'M',
+    dob: '2005-10-31',
+    address: 'Vesu, Surat',
+    types: ['Clinical'],
+    status: 'Regular',
+    conversion: 'T-Not converted',
+    followUp: 'Sep 23 · 16:30',
+    followUpKind: 'past',
+    since: 'Sep 23 · 16:20',
+    updated: 'Sep 23 · 17:41',
+    by: 'DD',
+    doctor: 'DD',
+  },
+  {
+    seq: 3506,
+    first: 'Yesha',
+    last: 'Kheni',
+    phone: '94266 35162',
+    gender: 'F',
+    dob: '2004-04-17',
+    address: 'Adajan, Surat',
+    types: ['Aesthetic'],
+    status: 'Regular',
+    conversion: 'T-Converted',
+    followUp: 'Sep 23 · 15:02',
+    followUpKind: 'past',
+    since: 'Sep 23 · 14:55',
+    updated: 'Sep 23 · 17:42',
+    by: 'DD',
+    doctor: 'DD',
+  },
+  {
+    seq: 3505,
+    first: 'Priyanka',
+    last: 'Gajera',
+    phone: '96245 10114',
+    gender: 'F',
+    dob: '1995-03-16',
+    address: 'Katargam, Surat',
+    types: ['Aesthetic'],
+    status: 'Regular',
+    conversion: 'T-Not converted',
+    followUp: 'Sep 23 · 12:50',
+    followUpKind: 'past',
+    since: 'Sep 23 · 12:45',
+    updated: 'Sep 23 · 13:24',
+    by: 'DD',
+    doctor: 'DD',
+  },
+  {
+    seq: 3504,
+    first: 'Aayush',
+    last: 'Thakkar',
+    phone: '88495 98690',
+    gender: 'M',
+    dob: '2004-07-09',
+    address: 'Pal, Surat',
+    types: ['Aesthetic'],
+    status: 'Regular',
+    conversion: 'T-Not converted',
+    followUp: 'Sep 22 · 11:07',
+    followUpKind: 'past',
+    since: 'Sep 22 · 11:00',
+    updated: 'Sep 22 · 15:53',
+    by: 'RS',
+    doctor: null,
+  },
+  {
+    seq: 3503,
+    first: 'Shila',
+    last: 'Rathod',
+    phone: '73834 29920',
+    gender: 'F',
+    dob: '2000-03-13',
+    address: 'Varachha, Surat',
+    types: ['Clinical'],
+    status: 'New',
+    conversion: '',
+    followUp: 'Sep 21 · 11:22',
+    followUpKind: 'past',
+    since: 'Sep 21 · 11:15',
+    updated: 'Sep 21 · 12:15',
+    by: 'DD',
+    doctor: 'DD',
+  },
+  {
+    seq: 3502,
+    first: 'Drashtik',
+    last: 'Baldha',
+    phone: '38288 52399',
+    gender: 'M',
+    dob: '',
+    address: 'Mota Varachha',
+    types: ['Aesthetic'],
+    status: 'Regular',
+    conversion: 'T-Not converted',
+    followUp: 'Sep 19 · 11:41',
+    followUpKind: 'past',
+    since: 'Sep 19 · 11:35',
+    updated: 'Sep 19 · 13:05',
+    by: 'DD',
+    doctor: 'DD',
+  },
+  {
+    seq: 3501,
+    first: 'Nisha',
+    last: 'Chudasma',
+    phone: '81289 39579',
+    gender: 'F',
+    dob: '1989-07-06',
+    address: 'Althan, Surat',
+    types: ['LHR'],
+    status: 'Regular',
+    conversion: 'T-Not converted',
+    followUp: 'Oct 02 · 19:01',
+    followUpKind: 'future',
+    since: 'Sep 19 · 10:30',
+    updated: 'Sep 19 · 10:30',
+    by: 'RS',
+    doctor: null,
+  },
+  {
+    seq: 3500,
+    first: 'Kajal',
+    last: 'Bhani',
+    phone: '72019 29027',
+    gender: 'F',
+    dob: '1994-10-22',
+    address: 'Piplod, Surat',
+    types: ['LHR'],
+    status: 'VIP',
+    conversion: 'T-Not converted',
+    followUp: 'Oct 06 · 18:51',
+    followUpKind: 'future',
+    since: 'Sep 19 · 18:36',
+    updated: 'Sep 19 · 18:36',
+    by: 'RS',
+    doctor: null,
+  },
+  {
+    seq: 3499,
+    first: 'Arpita',
+    last: 'Kachhadiya',
+    phone: '63592 00770',
+    gender: 'F',
+    dob: '1998-07-17',
+    address: '329 Shyamnagar Soc, Kamrej',
+    types: ['Aesthetic'],
+    status: 'Regular',
+    conversion: 'T-Not converted',
+    followUp: 'Sep 17 · 11:21',
+    followUpKind: 'past',
+    since: 'Sep 17 · 11:15',
+    updated: 'Sep 25 · 11:41',
+    by: 'DR',
+    doctor: 'DD',
+  },
+  {
+    seq: 3473,
+    first: 'Varun',
+    last: 'Bhimani',
+    phone: '90336 49912',
+    gender: 'M',
+    dob: '1993-03-02',
+    address: 'Nikol, Ahmedabad (Virdi)',
+    types: ['Aesthetic'],
+    status: 'Regular',
+    conversion: 'T-Converted',
+    followUp: 'Oct 08 · 17:48',
+    followUpKind: 'future',
+    since: 'Aug 18 · 17:40',
+    updated: 'Aug 18 · 17:48',
+    by: 'DN',
+    doctor: 'DD',
+  },
+  {
+    seq: 3460,
+    first: 'Rhea',
+    last: 'Shah',
+    phone: '98250 11241',
+    gender: 'F',
+    dob: '1996-01-12',
+    address: 'Adajan, Surat',
+    types: ['LHR', 'Aesthetic'],
+    status: 'VIP',
+    conversion: 'T-Converted',
+    followUp: 'Oct 01 · 10:40',
+    followUpKind: 'today',
+    since: 'Jun 28 · 12:00',
+    updated: 'Today · 10:40',
+    by: 'RS',
+    doctor: 'DN',
+    lead: 2210,
+    consent: true,
+  },
+  {
+    seq: 3441,
+    first: 'Kiran',
+    last: 'Desai',
+    phone: '98791 22840',
+    phoneTwo: '98795 21034',
+    gender: 'F',
+    dob: '1990-05-02',
+    address: 'Vesu, Surat',
+    types: ['Aesthetic'],
+    status: 'Regular',
+    conversion: 'T-Converted',
+    followUp: 'Oct 03 · 12:00',
+    followUpKind: 'future',
+    since: 'Sep 02 · 12:00',
+    updated: 'Sep 02 · 12:10',
+    by: 'NK',
+    doctor: 'DD',
+  },
+  {
+    seq: 3430,
+    first: 'Rohan',
+    last: 'Pillai',
+    phone: '99099 45210',
+    gender: 'M',
+    dob: '1988-11-19',
+    address: 'City Light, Surat',
+    types: ['Clinical'],
+    status: 'Regular',
+    conversion: 'T-Converted',
+    followUp: 'Sep 20 · 11:00',
+    followUpKind: 'past',
+    since: 'Sep 01 · 11:10',
+    updated: 'Sep 01 · 11:20',
+    by: 'NK',
+    doctor: 'DN',
+  },
+  {
+    seq: 3412,
+    first: 'Tanvi',
+    last: 'Shah',
+    phone: '97122 55014',
+    gender: 'F',
+    dob: '1999-02-08',
+    address: 'Ghod Dod Road',
+    types: ['Aesthetic'],
+    status: 'Inactive',
+    conversion: 'T-Not converted',
+    followUp: '',
+    followUpKind: 'none',
+    since: 'Jun 04 · 10:00',
+    updated: 'Jun 06 · 13:10',
+    by: 'AS',
+    doctor: 'DR',
+  },
+];
+
+/**
+ * People the other seeds treat as patients who are not in `PT_SEED`. `seq` is
+ * the number of their "PT-0…" code where they have one (`PATIENTS` H:3316,
+ * `LAPSED` H:3349 — a code another patient already owns is dropped), else the
+ * next number after #3508. Services they booked give `types`; what no seed
+ * says (gender, birth date, address) stays empty.
+ */
+const ALSO_PATIENTS: readonly PatientRow[] = [
+  // `PATIENTS` (H:3316): the four not in PT_SEED. Phones from AP_INIT / THREADS.
+  {
+    seq: 377,
+    first: 'Dhruv',
+    last: 'Patel',
+    phone: '99251 40317',
+    gender: '',
+    dob: '',
+    address: '',
+    types: ['LHR'],
+    status: 'Regular',
+    conversion: 'T-Converted',
+    followUp: '11 Oct',
+    followUpKind: 'future',
+    since: 'Aug 28 · 17:00',
+    updated: 'Aug 28 · 17:00',
+    by: 'RS',
+    doctor: 'DD',
+  },
+  {
+    seq: 520,
+    first: 'Sana',
+    last: 'Kapoor',
+    phone: '90000 00520',
+    gender: '',
+    dob: '',
+    address: '',
+    types: ['Clinical'],
+    status: 'New',
+    conversion: 'T-Not converted',
+    followUp: '',
+    followUpKind: 'none',
+    since: 'Sep 25 · 10:00',
+    updated: 'Sep 25 · 10:00',
+    by: 'RS',
+    doctor: 'DN',
+  },
+  {
+    seq: 551,
+    first: 'Neha',
+    last: 'Gupta',
+    phone: '97140 88213',
+    gender: '',
+    dob: '',
+    address: '',
+    types: ['LHR'],
+    status: 'Regular',
+    conversion: 'T-Converted',
+    followUp: '29 Sep · 16:00',
+    followUpKind: 'future',
+    since: 'Aug 15 · 10:00',
+    updated: 'Aug 15 · 10:00',
+    by: 'RS',
+    doctor: null,
+  },
+  {
+    // LAPSED lists her too (as PT-0377, Dhruv's code) with a second number.
+    seq: 390,
+    first: 'Pooja',
+    last: 'Nair',
+    phone: '98240 11562',
+    phoneTwo: '98240 55120',
+    gender: '',
+    dob: '',
+    address: '',
+    types: ['Aesthetic'],
+    status: 'Regular',
+    conversion: 'T-Converted',
+    followUp: '10 Oct',
+    followUpKind: 'future',
+    since: 'Jun 12 · 10:00',
+    updated: 'Jun 12 · 10:00',
+    by: 'RS',
+    doctor: 'DD',
+  },
+  // `LAPSED` (H:3349): the re-target candidates, lapsed patients by definition.
+  {
+    seq: 291,
+    first: 'Kavya',
+    last: 'Joshi',
+    phone: '97250 33418',
+    gender: '',
+    dob: '',
+    address: '',
+    types: ['LHR'],
+    status: 'Regular',
+    conversion: 'T-Converted',
+    followUp: '',
+    followUpKind: 'none',
+    since: 'May 02 · 10:00',
+    updated: 'May 02 · 10:00',
+    by: 'NK',
+    doctor: null,
+  },
+  {
+    seq: 198,
+    first: 'Nirali',
+    last: 'Mehta',
+    phone: '99090 41276',
+    gender: '',
+    dob: '',
+    address: '',
+    types: ['Clinical'],
+    status: 'Regular',
+    conversion: 'T-Not converted',
+    followUp: '',
+    followUpKind: 'none',
+    since: 'Apr 18 · 10:00',
+    updated: 'Apr 18 · 10:00',
+    by: 'NK',
+    doctor: null,
+  },
+  {
+    seq: 352,
+    first: 'Sameer',
+    last: 'Khan',
+    phone: '98980 12007',
+    gender: '',
+    dob: '',
+    address: '',
+    types: ['Aesthetic'],
+    status: 'Regular',
+    conversion: 'T-Converted',
+    followUp: '',
+    followUpKind: 'none',
+    since: 'Jun 20 · 10:00',
+    updated: 'Jun 20 · 10:00',
+    by: 'RS',
+    doctor: null,
+  },
+  {
+    seq: 240,
+    first: 'Hetal',
+    last: 'Parmar',
+    phone: '90990 55811',
+    gender: '',
+    dob: '',
+    address: '',
+    types: ['Aesthetic'],
+    status: 'Regular',
+    conversion: 'T-Converted',
+    followUp: '',
+    followUpKind: 'none',
+    since: 'Mar 05 · 10:00',
+    updated: 'Mar 05 · 10:00',
+    by: 'RS',
+    doctor: null,
+  },
+  {
+    // "Booked 2 Oct" (LAPSED.skip) — kept as his follow-up.
+    seq: 319,
+    first: 'Jignesh',
+    last: 'Rana',
+    phone: '93270 66054',
+    gender: '',
+    dob: '',
+    address: '',
+    types: ['LHR'],
+    status: 'Regular',
+    conversion: 'T-Converted',
+    followUp: 'Oct 02 · 11:00',
+    followUpKind: 'future',
+    since: 'Jun 01 · 10:00',
+    updated: 'Jun 01 · 10:00',
+    by: 'RS',
+    doctor: null,
+  },
+  // Lead #2355 converted on 24 Sep; its "#3504" is Aayush Thakkar's number.
+  {
+    seq: 3509,
+    first: 'Raghuvirsinh',
+    last: 'Vaghela',
+    phone: '96624 15101',
+    gender: '',
+    dob: '',
+    address: '',
+    types: ['LHR'],
+    status: 'New',
+    conversion: 'T-Not converted',
+    followUp: '',
+    followUpKind: 'none',
+    since: 'Sep 24 · 15:44',
+    updated: 'Sep 24 · 15:44',
+    by: 'RS',
+    doctor: null,
+    lead: 2355,
+  },
+  // Today's floor (`CARDS` H:3447): checked in, completed, reviewed or on a package.
+  {
+    seq: 3510,
+    first: 'Meera',
+    last: 'Joshi',
+    phone: '98240 55123',
+    gender: '',
+    dob: '',
+    address: '',
+    types: ['Aesthetic'],
+    status: 'New',
+    conversion: 'T-Converted',
+    followUp: '',
+    followUpKind: 'none',
+    since: 'Sep 23 · 10:00',
+    updated: 'Sep 23 · 10:00',
+    by: 'RS',
+    doctor: 'DR',
+  },
+  {
+    seq: 3511,
+    first: 'Priti',
+    last: 'Soni',
+    phone: '90990 11223',
+    gender: '',
+    dob: '',
+    address: '',
+    types: ['LHR'],
+    status: 'Regular',
+    conversion: 'T-Converted',
+    followUp: '',
+    followUpKind: 'none',
+    since: 'Aug 01 · 10:00',
+    updated: 'Aug 01 · 10:00',
+    by: 'RS',
+    doctor: 'DR',
+  },
+  {
+    seq: 3512,
+    first: 'Nikhil',
+    last: 'Rao',
+    phone: '90000 03512',
+    gender: '',
+    dob: '',
+    address: '',
+    types: ['Clinical'],
+    status: 'Regular',
+    conversion: 'T-Not converted',
+    followUp: '',
+    followUpKind: 'none',
+    since: 'Sep 10 · 10:00',
+    updated: 'Sep 10 · 10:00',
+    by: 'RS',
+    doctor: 'KS',
+  },
+  {
+    seq: 3513,
+    first: 'Ishita',
+    last: 'Vora',
+    phone: '90000 03513',
+    gender: '',
+    dob: '',
+    address: '',
+    types: ['Aesthetic'],
+    status: 'New',
+    conversion: 'T-Converted',
+    followUp: '',
+    followUpKind: 'none',
+    since: 'Sep 20 · 10:00',
+    updated: 'Sep 20 · 10:00',
+    by: 'RS',
+    doctor: 'DN',
+  },
+  {
+    seq: 3514,
+    first: 'Harsh',
+    last: 'Trivedi',
+    phone: '90000 03514',
+    gender: '',
+    dob: '',
+    address: '',
+    types: ['Clinical'],
+    status: 'New',
+    conversion: 'T-Not converted',
+    followUp: '',
+    followUpKind: 'none',
+    since: 'Sep 24 · 10:00',
+    updated: 'Sep 24 · 10:00',
+    by: 'RS',
+    doctor: 'DN',
+  },
+];
+
+const ROSTER: readonly PatientRow[] = [...REGISTERED, ...ALSO_PATIENTS];
+
+/** Dharti's clinical bento (`PT_OV` H:3686), one item per line. */
+const CLINICAL_NOTES: Record<
+  number,
+  Pick<
+    PatientRecord,
+    'complaints' | 'diagnosis' | 'treatmentSuggestions' | 'futureSuggestions'
+  >
+> = {
+  3508: {
+    complaints: 'Tanning on face\nUneven skin tone',
+    diagnosis: 'Post-inflammatory hyperpigmentation',
+    treatmentSuggestions: 'Chemical peel × 4\nLHR full face',
+    futureSuggestions: 'Hydrafacial after 4 weeks',
+  },
+};
+
+const nameOf = (row: PatientRow) => `${row.first} ${row.last}`;
+
+/** The patient id of a person the seeds name, or undefined when they are not a patient. */
+export function findPatientRef(name: string): string | undefined {
+  const row = ROSTER.find((candidate) => nameOf(candidate) === name);
+  return row ? ref.patient(row.seq) : undefined;
+}
+
+/** The patient id of a person the seeds name as a patient. */
+export const patientRef = (name: string): string =>
+  must(findPatientRef(name), `patient ${name}`);
+
+function followUpAt(row: PatientRow, today: string): string | null {
+  if (row.followUpKind === 'none') return null;
+  if (row.followUpKind === 'today') {
+    const time = readSeedLabel(row.followUp).time ?? '11:00';
+    return seedInstant(PROTOTYPE_SEED_DAY, time, today);
+  }
+  return seedAt(row.followUp, '11:00', today);
+}
+
+/**
+ * A signed consent in the seeds reads "Data ✓ · Photos ✓ · Marketing ✗"
+ * (`CINFO`, H:3369) — the plan's three chips (Appendix F); the contract's
+ * `consentGiven` follows the Data chip.
+ */
+const SIGNED_CONSENTS: readonly PatientConsent[] = ['data', 'photos'];
+
+/**
+ * The one patient roster: `PT_SEED` and `PATIENTS` merged, plus everyone else
+ * treated as a patient — with the plan's fields (Appendix F): the row's "by" is
+ * who last saved it.
+ */
+export function patientSeed(today: string = appToday()): PatientRecord[] {
+  return ROSTER.map((row) => ({
+    ...seedCommon(
+      seedAt(row.since, '10:00', today),
+      staffRef(row.by),
+      seedAt(row.updated, '10:00', today),
+    ),
+    updatedById: staffRef(row.by),
+    id: ref.patient(row.seq),
+    seq: row.seq,
+    firstName: row.first,
+    lastName: row.last,
+    phone: seedMobile(row.phone),
+    phone2: row.phoneTwo ? seedMobile(row.phoneTwo) : null,
+    email: null,
+    gender: row.gender ? GENDERS[row.gender] : null,
+    dateOfBirth: row.dob || null,
+    address: row.address || null,
+    homeBranchId: branchRef(MAIN_BRANCH),
+    types: row.types.map((label) => must(TYPES[label], `patient type ${label}`)),
+    status: must(STATUSES[row.status], `patient status ${row.status}`),
+    conversion: must(CONVERSIONS[row.conversion], `conversion ${row.conversion}`),
+    referralSource: null,
+    referredByName: null,
+    referredByPatientId: null,
+    consentGiven: row.consent ?? false,
+    consents: row.consent ? [...SIGNED_CONSENTS] : [],
+    doctorId: row.doctor ? staffRef(row.doctor) : null,
+    followUpAt: followUpAt(row, today),
+    notes: null,
+    complaints: null,
+    diagnosis: null,
+    treatmentSuggestions: null,
+    futureSuggestions: null,
+    ...CLINICAL_NOTES[row.seq],
+    leadId: row.lead === undefined ? null : ref.lead(row.lead),
+  }));
+}

@@ -9,13 +9,13 @@ import {
   fetchCredit,
   searchCreditParties,
   updateCredit,
-} from '@/shared/api/clinic/credits-api.ts';
-import { fetchAllInvoices } from '@/shared/api/clinic/invoices-api.ts';
+} from '@/shared/api/app/credits-api.ts';
+import { fetchAllInvoices } from '@/shared/api/app/invoices-api.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import {
   creditRow,
   invoiceRecord,
@@ -45,14 +45,14 @@ const { notifyMock } = vi.hoisted(() => ({
   },
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
-vi.mock('@/shared/api/clinic/credits-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/credits-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   searchCreditParties: vi.fn(),
   createCredit: vi.fn(),
   updateCredit: vi.fn(),
   fetchCredit: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/invoices-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/invoices-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchAllInvoices: vi.fn(),
 }));

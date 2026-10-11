@@ -1,14 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  LEAD_SOURCE_VALUES,
-  LEAD_STATUS_VALUES,
-} from '@/shared/api/clinic/clinic-schema.ts';
+import { LEAD_SOURCE_VALUES, LEAD_STATUS_VALUES } from '@/shared/api/app/app-schema.ts';
 import {
   LEAD_HOLD_FILTER_VALUES,
   LEAD_SORT_KEYS,
   LEAD_VIEW_VALUES,
-} from '@/shared/api/clinic/leads-contracts.ts';
+} from '@/shared/api/app/leads-contracts.ts';
 
 import { LEADS_SEARCH_DEFAULTS, validateLeadsSearch } from './leads.search.ts';
 

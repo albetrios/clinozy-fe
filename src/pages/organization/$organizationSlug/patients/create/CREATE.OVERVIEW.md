@@ -8,7 +8,7 @@ card's "+ Patient") — parsed by `validatePatientCreateSearch` in the parent's
 `../patients.dialog-search.ts` (an invalid mobile is dropped; a valid one arrives E.164;
 `fromLead` must be a lead's public id, `lead_…` — the patient is filed on its person), and `name` / `phone` are scrubbed from telemetry
 (`SENSITIVE_QUERY_PARAMS`). Gated like the room — membership (`organization:read`) and the
-`clinic-patients` module, then `requireOrgStatus`; in-room Create is `useClinicAccess` —
+`app-patients` module, then `requireOrgStatus`; in-room Create is `useAppAccess` —
 without it the list sends the link back with the permission toast. The drawer is the shared
 `PatientDrawer` (`@/shared/components/PatientDrawer/`), opened by the page through the
 parent's `../hooks/usePatientsDialogRoute/`; saving or closing it returns to the list with
@@ -16,11 +16,11 @@ the list's own params, the prefill dropped.
 
 ## Files
 
-| File                 | Responsibility                                                                                            |
-| -------------------- | --------------------------------------------------------------------------------------------------------- |
-| `create.route.tsx`   | Route marker — exports `Component` rendering `NewPatientPage`.                                            |
-| `create.manifest.ts` | Manifest — `kind: 'leaf'`, permission `organization:read`, module `clinic-patients`, title "New patient". |
-| `NewPatientPage.tsx` | Renders nothing — the dialog route's own UI. The drawer mounts on the Patients page.                      |
+| File                 | Responsibility                                                                                         |
+| -------------------- | ------------------------------------------------------------------------------------------------------ |
+| `create.route.tsx`   | Route marker — exports `Component` rendering `NewPatientPage`.                                         |
+| `create.manifest.ts` | Manifest — `kind: 'leaf'`, permission `organization:read`, module `app-patients`, title "New patient". |
+| `NewPatientPage.tsx` | Renders nothing — the dialog route's own UI. The drawer mounts on the Patients page.                   |
 
 ## Test ids
 

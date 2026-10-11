@@ -101,13 +101,13 @@ describe('the form’s words', () => {
       ),
     ).toBe('Moved city');
     expect(cancelReasonText(t, appointmentRow({ cancelReason: 'other' }))).toBe(
-      'appointments.cancelReasons.other{"ns":"clinic"}',
+      'appointments.cancelReasons.other{"ns":"app"}',
     );
     expect(cancelReasonText(t, appointmentRow({ cancelReason: 'patient_asked' }))).toBe(
-      'appointments.cancelReasons.patient_asked{"ns":"clinic"}',
+      'appointments.cancelReasons.patient_asked{"ns":"app"}',
     );
     expect(
       cancelReasonText(t, appointmentRow({ cancelReason: 'resource_unavailable' })),
-    ).toBe('appointments.cancelReasons.resource_unavailable{"ns":"clinic"}');
+    ).toBe('appointments.cancelReasons.resource_unavailable{"ns":"app"}');
   });
 });

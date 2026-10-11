@@ -2,13 +2,13 @@ import { render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type { MedicalPurchaseOrder } from '@/shared/api/clinic/clinic-schema.ts';
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
+import type { MedicalPurchaseOrder } from '@/shared/api/app/app-schema.ts';
+import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
 import {
-  clinicFixtures,
+  appFixtures,
   clinicOrganization,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+  resetAppFixtures,
+} from '@/shared/api/app/fixtures/world.fixtures.ts';
 import { PRINT_TEMPLATE_TEST_IDS } from '@/shared/components/PrintTemplate/print-template.constants.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 
@@ -22,14 +22,14 @@ function propsFor(
   seq: number,
   overrides: Partial<MedicalPurchaseOrder> = {},
 ): PurchaseOrderPrintProps {
-  const found = clinicFixtures.purchaseOrders.snapshot((row) => row.seq === seq)[0];
+  const found = appFixtures.purchaseOrders.snapshot((row) => row.seq === seq)[0];
   if (!found) throw new Error(`purchase order #${seq}`);
   const order = { ...found, ...overrides };
-  const medicines = clinicFixtures.medicines.snapshot();
-  const supplier = clinicFixtures.suppliers.snapshot(
+  const medicines = appFixtures.medicines.snapshot();
+  const supplier = appFixtures.suppliers.snapshot(
     (row) => row.id === order.supplierId,
   )[0];
-  const branch = clinicFixtures.branches.snapshot((row) => row.isMain)[0];
+  const branch = appFixtures.branches.snapshot((row) => row.isMain)[0];
   if (!(supplier && branch)) throw new Error(`the supplier and branch of #${seq}`);
   return {
     order,
@@ -62,13 +62,13 @@ describe('PurchaseOrderPrint (Q-M7)', () => {
     // On the prototype's own day, so every seed carries the prototype's dates.
     vi.useFakeTimers({ toFake: ['Date'] });
     vi.setSystemTime(new Date('2026-09-27T06:30:00Z'));
-    resetClinicFixtures();
+    resetAppFixtures();
     useLocaleStore.setState({ formatLocale: 'en-IN', currencyCode: 'INR' });
   });
 
   afterEach(() => {
     vi.useRealTimers();
-    resetClinicFixtures();
+    resetAppFixtures();
     useLocaleStore.setState({
       formatLocale: 'en-US',
       currencyCode: 'USD',

@@ -2,9 +2,9 @@ import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { cn } from '@/lib/utils.ts';
-import type { PrescriptionKit } from '@/shared/api/clinic/prescriptions-contracts.ts';
-import { VISIT_CHECKS, type VisitChecks } from '@/shared/api/clinic/visits-contracts.ts';
-import { TONE_CLASSES, toneForLabel } from '@/shared/clinic/clinic-tones.ts';
+import type { PrescriptionKit } from '@/shared/api/app/prescriptions-contracts.ts';
+import { VISIT_CHECKS, type VisitChecks } from '@/shared/api/app/visits-contracts.ts';
+import { TONE_CLASSES, toneForLabel } from '@/shared/app/app-tones.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 
 import type { VisitFlowActions, VisitFlowRecords } from './use-visit-flow.ts';

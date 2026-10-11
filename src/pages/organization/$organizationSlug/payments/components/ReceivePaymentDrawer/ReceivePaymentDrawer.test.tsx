@@ -4,22 +4,19 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import i18n from '@/lib/i18n/i18n.ts';
-import {
-  fetchInvoiceTotals,
-  listOpenInvoices,
-} from '@/shared/api/clinic/invoices-api.ts';
-import { searchPatientPicker } from '@/shared/api/clinic/patient-search-api.ts';
-import { fetchPatient } from '@/shared/api/clinic/patients-api.ts';
+import { fetchInvoiceTotals, listOpenInvoices } from '@/shared/api/app/invoices-api.ts';
+import { searchPatientPicker } from '@/shared/api/app/patient-search-api.ts';
+import { fetchPatient } from '@/shared/api/app/patients-api.ts';
 import {
   fetchPayment,
   receivePayment,
   updatePayment,
-} from '@/shared/api/clinic/payments-api.ts';
+} from '@/shared/api/app/payments-api.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import { patientRecord } from '@/tests/utils/patient-doubles.ts';
 import {
   invoiceRecord,
@@ -49,22 +46,22 @@ const { notifyMock } = vi.hoisted(() => ({
   },
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
-vi.mock('@/shared/api/clinic/payments-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/payments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   receivePayment: vi.fn(),
   updatePayment: vi.fn(),
   fetchPayment: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/invoices-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/invoices-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listOpenInvoices: vi.fn(),
   fetchInvoiceTotals: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/patients-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/patients-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchPatient: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/patient-search-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/patient-search-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   searchPatientPicker: vi.fn(),
 }));

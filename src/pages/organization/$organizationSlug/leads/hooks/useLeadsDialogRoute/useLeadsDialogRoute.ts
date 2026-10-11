@@ -3,8 +3,8 @@ import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { organizationLeads } from '@/lib/routes/leads-builders.ts';
-import { fetchLead, leadQueryKeys } from '@/shared/api/clinic/leads-api.ts';
-import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
+import { fetchLead, leadQueryKeys } from '@/shared/api/app/leads-api.ts';
+import type { LeadRecord } from '@/shared/api/app/leads-contracts.ts';
 import { useDialogRouteRecord } from '@/shared/hooks/useDialogRouteRecord/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 

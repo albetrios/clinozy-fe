@@ -10,7 +10,7 @@ export const manifest = {
   title: 'Clinic stock',
   testId: 'stock-purchases-page',
   permission: 'organization:read',
-  module: 'clinic-stock',
+  module: 'app-stock',
   kind: 'layout',
   children: ['create', '$purchaseId/edit'],
 } as const satisfies PageManifest;

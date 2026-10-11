@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import type { OpenSupplierBill } from '@/shared/api/clinic/payments-contracts.ts';
+import type { OpenSupplierBill } from '@/shared/api/app/payments-contracts.ts';
 import { ledgerRow, TEST_MONEY_BRANCH_ID } from '@/tests/utils/payments-doubles.ts';
 
 import {

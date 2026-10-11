@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
+import type { LedgerRow } from '@/shared/api/app/payments-contracts.ts';
 import { CrossRoomDialogContext } from '@/shared/hooks/useCrossRoomDialog/index.ts';
 import { TEST_MONEY_PATIENT_ID } from '@/tests/utils/payments-doubles.ts';
 

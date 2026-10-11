@@ -14,7 +14,7 @@ export const manifest = {
   title: 'Photo',
   testId: 'patient-photo-viewer',
   permission: 'organization:read',
-  module: 'clinic-patients',
+  module: 'app-patients',
   kind: 'layout',
   children: ['edit'],
 } as const satisfies PageManifest;

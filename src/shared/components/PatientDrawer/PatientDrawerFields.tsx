@@ -2,7 +2,6 @@ import type { ReactNode } from 'react';
 import { Controller, type UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
 import {
   GENDER_VALUES,
   PATIENT_CONVERSION_VALUES,
@@ -10,19 +9,20 @@ import {
   PATIENT_TYPE_VALUES,
   REFERRAL_SOURCE_VALUES,
   type Tone,
-} from '@/shared/api/clinic/clinic-schema.ts';
-import { civilYearsBetween } from '@/shared/api/clinic/clinic-time.ts';
+} from '@/shared/api/app/app-schema.ts';
+import { civilYearsBetween } from '@/shared/api/app/app-time.ts';
+import type { BranchOption } from '@/shared/api/app/branches-api.ts';
 import {
   PATIENT_CONSENT_VALUES,
   type PatientConsent,
-} from '@/shared/api/clinic/patients-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+} from '@/shared/api/app/patients-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import {
   GENDER_TONES,
   PATIENT_CONVERSION_TONES,
   PATIENT_STATUS_TONES,
   PATIENT_TYPE_TONES,
-} from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/app/app-tones.ts';
 import {
   DrawerChips,
   DrawerField,
@@ -359,7 +359,7 @@ export function PatientClinicFields({
   onPhotosChange: (files: PickedFile[]) => void;
 }) {
   const { t } = useTranslation(PATIENT_DRAWER_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const { t: tCard } = useTranslation(PERSON_CARD_NS);
   const field = useDrawerFieldIds(form, idPrefix);
   const referred = field('referredByName');
@@ -379,7 +379,7 @@ export function PatientClinicFields({
                 label={t(K.types)}
                 options={PATIENT_TYPE_VALUES.map((type) => ({
                   value: type,
-                  label: tClinic(CLINIC_KEYS.patients.types[type]),
+                  label: tApp(APP_KEYS.patients.types[type]),
                   tone: PATIENT_TYPE_TONES[type],
                 }))}
                 value={control.value}
@@ -398,7 +398,7 @@ export function PatientClinicFields({
                 label={t(K.status)}
                 options={PATIENT_STATUS_VALUES.map((status) => ({
                   value: status,
-                  label: tClinic(CLINIC_KEYS.patients.statuses[status]),
+                  label: tApp(APP_KEYS.patients.statuses[status]),
                   tone: PATIENT_STATUS_TONES[status],
                 }))}
                 value={control.value}
@@ -420,7 +420,7 @@ export function PatientClinicFields({
                 label={t(K.conversion)}
                 options={PATIENT_CONVERSION_VALUES.map((conversion) => ({
                   value: conversion,
-                  label: tClinic(CLINIC_KEYS.patients.conversions[conversion]),
+                  label: tApp(APP_KEYS.patients.conversions[conversion]),
                   tone: PATIENT_CONVERSION_TONES[conversion],
                 }))}
                 value={control.value}
@@ -453,7 +453,7 @@ export function PatientClinicFields({
                 label={t(K.referrerType)}
                 options={REFERRAL_SOURCE_VALUES.map((source) => ({
                   value: source,
-                  label: tClinic(CLINIC_KEYS.patients.referralSources[source]),
+                  label: tApp(APP_KEYS.patients.referralSources[source]),
                 }))}
                 value={control.value}
                 onChange={control.onChange}

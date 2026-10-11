@@ -3,9 +3,9 @@ import { keepPreviousData } from '@tanstack/react-query';
 import {
   commandSearchQueryKeys,
   isCommandSearchQuery,
-  searchClinicCommands,
-} from '@/shared/api/clinic/command-search-api.ts';
-import type { CommandSearchResult } from '@/shared/api/clinic/command-search-contracts.ts';
+  searchAppCommands,
+} from '@/shared/api/app/command-search-api.ts';
+import type { CommandSearchResult } from '@/shared/api/app/command-search-contracts.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import { useDebouncedSearch } from '@/shared/hooks/useDebouncedValue/index.ts';
 
@@ -54,7 +54,7 @@ export function useCommandSearch(
     queryKey: commandSearchQueryKeys.search(debounced.toLowerCase()),
     queryFn: async () => ({
       query: debounced,
-      result: await searchClinicCommands(debounced),
+      result: await searchAppCommands(debounced),
     }),
     enabled: enabled && isCommandSearchQuery(debounced),
     placeholderData: keepPreviousData,

@@ -1,15 +1,15 @@
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
+import type { AppointmentStatus, Tone } from '@/shared/api/app/app-schema.ts';
 import {
   type AppointmentTile,
   type AppointmentTileStatus,
   formStatusHint,
   formTiles,
-} from '@/shared/api/clinic/appointment-status.ts';
-import type { AppointmentStatus, Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { TONE_CLASSES, type ToneClasses } from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/api/app/appointment-status.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { TONE_CLASSES, type ToneClasses } from '@/shared/app/app-tones.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Tooltip,
@@ -26,7 +26,7 @@ import {
 
 const K = APPOINTMENT_FORM_KEYS.status;
 const IDS = APPOINTMENT_FORM_TEST_IDS;
-const APPT = CLINIC_KEYS.appointments;
+const APPT = APP_KEYS.appointments;
 
 /**
  * The form's tile tones (H:4136, H:6038): Scheduled stone, Confirmed sky,
@@ -108,7 +108,7 @@ function StatusTile({
   onPick: (status: AppointmentStatus) => void;
   onNeedsPatient: () => void;
 }) {
-  const { t } = useTranslation(CLINIC_NS);
+  const { t } = useTranslation(APP_NS);
   const tone = TONE_CLASSES[APPOINTMENT_TILE_TONES[tile.status]];
   const blocked = tile.reason === 'needs_patient';
   const live = !inert && (tile.pickable || blocked);
@@ -163,7 +163,7 @@ function useStatusHint(
   draft: AppointmentStatus,
   isPatient: boolean,
 ) {
-  const { t } = useTranslation(CLINIC_NS);
+  const { t } = useTranslation(APP_NS);
   const hint = formStatusHint({ saved, draft, isPatient });
   if (hint === 'closed') {
     return t(APPT.hints.closed, { status: t(APPT.statuses.no_show) });
@@ -181,7 +181,7 @@ function CancelledBanner({
   onRestore?: () => void;
   restoring: boolean;
 }) {
-  const { t } = useTranslation([APPOINTMENT_FORM_NS, CLINIC_NS]);
+  const { t } = useTranslation([APPOINTMENT_FORM_NS, APP_NS]);
   return (
     <div
       data-testid={IDS.cancelled}
@@ -189,7 +189,7 @@ function CancelledBanner({
     >
       <span className="flex min-w-0 flex-1 flex-col gap-0.5 leading-[1.3]">
         <span className="text-detail text-destructive font-semibold">
-          {t(APPT.statuses.cancelled, { ns: CLINIC_NS })}
+          {t(APPT.statuses.cancelled, { ns: APP_NS })}
         </span>
         <span className="text-muted-foreground-strong text-xs">
           {reason ? t(K.cancelledReason, { reason }) : t(K.cancelledNoReason)}
@@ -275,7 +275,7 @@ export function VisitStatusSection({
   onCopy,
   onCancelVisit,
 }: VisitStatusSectionProps) {
-  const { t } = useTranslation([APPOINTMENT_FORM_NS, CLINIC_NS]);
+  const { t } = useTranslation([APPOINTMENT_FORM_NS, APP_NS]);
   const tiles = formTiles({ saved, draft, date, today, isPatient, canEdit });
   const cancelled = saved === 'cancelled';
   const inert = cancelled || saved === 'no_show' || !canEdit;
@@ -320,7 +320,7 @@ export function VisitStatusSection({
       <div className="flex flex-wrap items-center justify-end gap-2">
         {onCopy ? (
           <VisitAction
-            label={rebook ? t(APPT.nextActions.rebook, { ns: CLINIC_NS }) : t(K.copy)}
+            label={rebook ? t(APPT.nextActions.rebook, { ns: APP_NS }) : t(K.copy)}
             hint={t(K.copyHint)}
             icon={Copy}
             onClick={onCopy}

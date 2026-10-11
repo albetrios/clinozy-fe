@@ -3,11 +3,11 @@ import { renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type * as AppointmentsApiModule from '@/shared/api/clinic/appointments-api.ts';
-import { fetchPersonAppointments } from '@/shared/api/clinic/appointments-api.ts';
-import { PATIENT_FILE_SECTIONS } from '@/shared/clinic/patient-file-sections.ts';
+import type * as AppointmentsApiModule from '@/shared/api/app/appointments-api.ts';
+import { fetchPersonAppointments } from '@/shared/api/app/appointments-api.ts';
+import { PATIENT_FILE_SECTIONS } from '@/shared/app/patient-file-sections.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { appointmentRow } from '@/tests/utils/appointment-doubles.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import {
   patientFile,
   TEST_CONTACT_ID,
@@ -17,7 +17,7 @@ import {
 import { PatientFileContext } from '../../../../shared/patient-file-context.ts';
 import { usePhotoVisits } from './usePhotoVisits.ts';
 
-vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/appointments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof AppointmentsApiModule>()),
   fetchPersonAppointments: vi.fn(),
 }));

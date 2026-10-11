@@ -1,8 +1,8 @@
-import type { PatientRecord } from '@/shared/api/clinic/patients-contracts.ts';
+import type { PatientRecord } from '@/shared/api/app/patients-contracts.ts';
 import type {
   PrescriptionRecord,
   RxSheetClinic,
-} from '@/shared/api/clinic/prescriptions-contracts.ts';
+} from '@/shared/api/app/prescriptions-contracts.ts';
 import {
   PrescriptionPrint,
   printDocument,

@@ -1,5 +1,5 @@
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import type { PatientPackageRow } from '@/shared/api/clinic/patient-packages-contracts.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
+import type { PatientPackageRow } from '@/shared/api/app/patient-packages-contracts.ts';
 import {
   TREATMENT_LIMITS,
   type TreatmentAftercareCall,
@@ -7,7 +7,7 @@ import {
   type TreatmentFields,
   type TreatmentRecord,
   type TreatmentTemplate,
-} from '@/shared/api/clinic/treatments-contracts.ts';
+} from '@/shared/api/app/treatments-contracts.ts';
 
 /*
  * The Treatment drawer's form (KICKOFF §6.6; `patient-file.md:123–141,

@@ -1,7 +1,7 @@
 import { keepPreviousData, type QueryKey } from '@tanstack/react-query';
 
-import { appointmentQueryKeys } from '@/shared/api/clinic/appointments-api.ts';
-import type { DeleteReason } from '@/shared/api/clinic/clinic-schema.ts';
+import type { DeleteReason } from '@/shared/api/app/app-schema.ts';
+import { appointmentQueryKeys } from '@/shared/api/app/appointments-api.ts';
 import {
   createInvoice,
   deleteInvoice,
@@ -14,14 +14,14 @@ import {
   previewInvoiceChange,
   restoreInvoice,
   updateInvoice,
-} from '@/shared/api/clinic/invoices-api.ts';
+} from '@/shared/api/app/invoices-api.ts';
 import type {
   InvoiceInput,
   InvoiceListParams,
   InvoicePreview,
   InvoiceRecord,
   InvoiceSaveResult,
-} from '@/shared/api/clinic/invoices-contracts.ts';
+} from '@/shared/api/app/invoices-contracts.ts';
 import {
   addMedicalContact,
   createSale,
@@ -30,14 +30,14 @@ import {
   fetchSalePresets,
   fixtureInvoiceQueryKeys,
   setMedicalContactPhone,
-} from '@/shared/api/clinic/invoices-fixture-api.ts';
+} from '@/shared/api/app/invoices-fixture-api.ts';
 import type {
   InvoiceInput as SaleInput,
   InvoiceSaveResult as SaleSaveResult,
   OftenBilledKind,
   SaleContact,
-} from '@/shared/api/clinic/invoices-fixture-contracts.ts';
-import { taskQueryKeys } from '@/shared/api/clinic/tasks-api.ts';
+} from '@/shared/api/app/invoices-fixture-contracts.ts';
+import { taskQueryKeys } from '@/shared/api/app/tasks-api.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';

@@ -12,17 +12,17 @@ import {
   organizationLeadCreate,
   organizationLeads,
 } from '@/lib/routes/leads-builders.ts';
-import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
-import { leadHold } from '@/shared/api/clinic/leads-hold.ts';
-import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
-import { referrerFromPath } from '@/shared/clinic/clinic-referrer.ts';
+import type { LeadRecord } from '@/shared/api/app/leads-contracts.ts';
+import { leadHold } from '@/shared/api/app/leads-hold.ts';
+import { appCommandNavigation } from '@/shared/app/app-command-targets.ts';
+import { referrerFromPath } from '@/shared/app/app-referrer.ts';
 import { shortPersonName } from '@/shared/components/Cells/index.ts';
 import { EmptyState, EmptyStateAction } from '@/shared/components/EmptyState/index.ts';
 import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
-import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
+import { useAppNavigate } from '@/shared/hooks/useAppNavigate/index.ts';
 import {
   LEAD_TOASTS_KEYS,
   useAssignLead,
@@ -64,16 +64,16 @@ function withoutPrefill({
  * backend: a check-in opens the file (§4 #5, #7).
  */
 function personNavigation(
-  navigate: ReturnType<typeof useClinicNavigate>,
+  navigate: ReturnType<typeof useAppNavigate>,
   organizationSlug: string,
   pathname: string,
 ) {
   return {
     patient: (recordId: string) =>
-      void navigate(clinicCommandNavigation('patient', { organizationSlug, recordId })),
+      void navigate(appCommandNavigation('patient', { organizationSlug, recordId })),
     newAppointment: (who: string) =>
       void navigate(
-        clinicCommandNavigation('newAppointment', {
+        appCommandNavigation('newAppointment', {
           organizationSlug,
           referrer: referrerFromPath(pathname),
           search: { who },
@@ -166,8 +166,8 @@ export function LeadsPage() {
   const state = useLeadsList();
   // The phone's pane — Chat first, kept between leads (KICKOFF §6.3).
   const [pane, setPane] = useState<LeadDrawerPane>('chat');
-  const access = useClinicAccess();
-  const navigate = useClinicNavigate();
+  const access = useAppAccess();
+  const navigate = useAppNavigate();
   const { organizationSlug = '', leadId } = useParams({ strict: false });
   const pathname = useLocation({ select: (location) => location.pathname });
   const claim = useClaimLead();

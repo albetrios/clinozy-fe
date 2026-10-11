@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { organizationPatients } from '@/lib/routes/patients-builders.ts';
 import type { PatientDrawerPrefill } from '@/shared/components/PatientDrawer/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { validatePatientCreateSearch } from '../../patients.dialog-search.ts';
@@ -38,7 +38,7 @@ export function usePatientsDialogRoute(): PatientsDialogRouteState {
   const search: Record<string, unknown> = useSearch({ strict: false });
   const navigate = useNavigate();
   const { t } = useTranslation(ERRORS_NS);
-  const access = useClinicAccess();
+  const access = useAppAccess();
 
   const close = useCallback(() => {
     void navigate({

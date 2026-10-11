@@ -2,10 +2,10 @@ import { useQueryClient } from '@tanstack/react-query';
 import type { UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { branchQueryKeys } from '@/shared/api/clinic/branches-api.ts';
-import type { ClinicBranch } from '@/shared/api/clinic/branches-contracts.ts';
-import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
-import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
+import type { Role } from '@/shared/api/app/app-schema.ts';
+import { branchQueryKeys } from '@/shared/api/app/branches-api.ts';
+import type { AppBranch } from '@/shared/api/app/branches-contracts.ts';
+import type { TeamMember } from '@/shared/api/app/users-contracts.ts';
 import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -77,7 +77,7 @@ export type BranchSaveOutcome =
 export interface UseBranchSaveOptions {
   form: UseFormReturn<BranchFormValues>;
   /** The branch an edit saves; null for a new one. */
-  branch: ClinicBranch | null;
+  branch: AppBranch | null;
   /** Who worked here when the drawer opened — the team is written only when it changed. */
   before: readonly string[];
   /** The Team, to keep each default on the team with the role. */

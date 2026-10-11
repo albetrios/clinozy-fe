@@ -5,7 +5,7 @@ import type { PageManifest } from '@/lib/routes/page-manifest.ts';
  * (`/organization/$organizationSlug/offerings/create`, `S:99`; KICKOFF §4,
  * D24). The route renders nothing: the Offerings page reads the URL and opens
  * the New offering drawer, prefilled from `?name=`. Same gates as the room;
- * in-room Create is `useClinicAccess`. The test id names that drawer.
+ * in-room Create is `useAppAccess`. The test id names that drawer.
  */
 export const manifest = {
   segment: 'create',
@@ -13,7 +13,7 @@ export const manifest = {
   title: 'New offering',
   testId: 'offering-drawer',
   permission: 'organization:read',
-  module: 'clinic-offerings',
+  module: 'app-offerings',
   kind: 'leaf',
   children: [],
 } as const satisfies PageManifest;

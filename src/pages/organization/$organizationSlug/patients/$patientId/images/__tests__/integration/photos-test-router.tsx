@@ -18,14 +18,14 @@ import {
 import { render } from '@testing-library/react';
 
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
-import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
-import type { PatientFile } from '@/shared/api/clinic/patient-file-contracts.ts';
-import { PATIENT_FILE_SECTIONS } from '@/shared/clinic/patient-file-sections.ts';
+import type { Role } from '@/shared/api/app/app-schema.ts';
+import type { PatientFile } from '@/shared/api/app/patient-file-contracts.ts';
+import { PATIENT_FILE_SECTIONS } from '@/shared/app/patient-file-sections.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
-import { PRESET_CODES } from '@/tests/utils/clinic-preset-codes.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { PRESET_CODES } from '@/tests/utils/app-preset-codes.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { patientFile } from '@/tests/utils/patient-doubles.ts';
 
 import type { PatientPhotoUploads } from '../../../shared/hooks/usePatientPhotoUpload/index.ts';

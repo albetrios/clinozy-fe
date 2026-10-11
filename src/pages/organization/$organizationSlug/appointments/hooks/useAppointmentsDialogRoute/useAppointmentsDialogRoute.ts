@@ -7,10 +7,10 @@ import { organizationAppointments } from '@/lib/routes/appointments-builders.ts'
 import {
   appointmentQueryKeys,
   fetchAppointment,
-} from '@/shared/api/clinic/appointments-api.ts';
-import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
-import { safeReferrer } from '@/shared/clinic/clinic-referrer.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+} from '@/shared/api/app/appointments-api.ts';
+import type { AppointmentRow } from '@/shared/api/app/appointments-contracts.ts';
+import { safeReferrer } from '@/shared/app/app-referrer.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useDialogRouteLocation } from '@/shared/hooks/useCrossRoomDialog/index.ts';
 import { useDialogRouteRecord } from '@/shared/hooks/useDialogRouteRecord/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -86,7 +86,7 @@ export function useAppointmentsDialogRoute(): AppointmentsDialogRouteState {
   const { organizationSlug = '', appointmentId } = params;
   const navigate = useNavigate();
   const { t } = useTranslation([APPOINTMENTS_NS, ERRORS_NS]);
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const organizationId = useOrganizationStore((state) => state.organizationId);
 
   const backToPage = useCallback(

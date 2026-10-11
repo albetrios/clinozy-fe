@@ -2,12 +2,12 @@ import { useQueries } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
-import { resolveAccessFromCodes } from '@/shared/api/clinic/access-api.ts';
-import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
+import { resolveAccessFromCodes } from '@/shared/api/app/access-api.ts';
+import type { BranchOption } from '@/shared/api/app/branches-api.ts';
 import { getRolePermissions } from '@/shared/api/organization-api.ts';
 import { orgQueryKeys } from '@/shared/api/organization-query-keys.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { formatClinicPhoneDigits } from '@/shared/clinic/clinic-phone-field.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { formatAppPhoneDigits } from '@/shared/app/app-phone-field.ts';
 import {
   type DrawerPeekItem,
   drawerStepSummary,
@@ -72,7 +72,7 @@ function userAccessLine(
   if (!codes) return '';
   return resolveAccessFromCodes(codes)
     .viewableSections.filter((section) => section !== 'today')
-    .map((section) => t(CLINIC_KEYS.sections[section].label, { ns: CLINIC_NS }))
+    .map((section) => t(APP_KEYS.sections[section].label, { ns: APP_NS }))
     .join(' · ');
 }
 
@@ -95,7 +95,7 @@ export function useUserDrawerView({
   multiBranch: boolean;
   format: HoursFormat;
 }): UserDrawerView {
-  const { t } = useTranslation([USERS_NS, CLINIC_NS]);
+  const { t } = useTranslation([USERS_NS, APP_NS]);
   const roles = rolePills(values.roleIds);
   const picked = branches.filter((branch) => values.branchIds.includes(branch.id));
   const access = userAccessLine(usePickedRoleCodes(values.roleIds), values.roleIds, t);
@@ -112,7 +112,7 @@ export function useUserDrawerView({
     {
       kind: 'value',
       label: t(K.fields.mobile),
-      value: values.phone ? formatClinicPhoneDigits(values.phone) : undefined,
+      value: values.phone ? formatAppPhoneDigits(values.phone) : undefined,
     },
     { kind: 'value', label: t(K.fields.email), value: values.email.trim() },
     {

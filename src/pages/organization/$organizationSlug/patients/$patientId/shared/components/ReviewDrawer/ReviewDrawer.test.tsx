@@ -2,13 +2,13 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type * as FeedbackApiModule from '@/shared/api/clinic/feedback-api.ts';
+import type * as FeedbackApiModule from '@/shared/api/app/feedback-api.ts';
 import {
   attachReviewFile,
   createReview,
   updateReview,
-} from '@/shared/api/clinic/feedback-api.ts';
-import type { PatientReview } from '@/shared/api/clinic/feedback-contracts.ts';
+} from '@/shared/api/app/feedback-api.ts';
+import type { PatientReview } from '@/shared/api/app/feedback-contracts.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { fsi } from '@/tests/utils/bidi-marks.ts';
@@ -35,7 +35,7 @@ vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 vi.mock('@/shared/hooks/useUploadQueue/index.ts', () => ({
   useUploadQueue: () => ({ enqueue: enqueueMock }),
 }));
-vi.mock('@/shared/api/clinic/feedback-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/feedback-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof FeedbackApiModule>()),
   createReview: vi.fn(),
   updateReview: vi.fn(),

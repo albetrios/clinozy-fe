@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'react';
 
-import type { ComposerMode } from '@/shared/api/clinic/messages-contracts.ts';
+import type { ComposerMode } from '@/shared/api/app/messages-contracts.ts';
 
 /**
  * A message this client has sent but the server has not accepted: "Sending…"

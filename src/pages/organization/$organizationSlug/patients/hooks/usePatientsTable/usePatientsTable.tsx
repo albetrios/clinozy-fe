@@ -1,18 +1,18 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import { patientName, type PatientRow } from '@/shared/api/clinic/patients-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
+import { patientName, type PatientRow } from '@/shared/api/app/patients-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import {
   GENDER_TONES,
   PATIENT_CONVERSION_TONES,
   PATIENT_STATUS_TONES,
   PATIENT_TYPE_TONES,
   TONE_CLASSES,
-} from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/app/app-tones.ts';
 import type {
   DataTableFeatures,
   DataTableFoldValue,
@@ -22,7 +22,7 @@ import {
   PERSON_CARD_KEYS,
   PERSON_CARD_NS,
 } from '@/shared/components/PersonCard/person-card.constants.ts';
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 import { useRoomTable } from '@/shared/hooks/useRoomTable/index.ts';
 
 import {
@@ -70,21 +70,21 @@ function usePatientColumns(
   contactActions: (patient: PatientRow) => ContactCardActions,
 ): ColumnDef<DataTableFeatures, PatientRow>[] {
   const { t } = useTranslation(PATIENTS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const { t: tCard } = useTranslation(PERSON_CARD_NS);
-  const clock = useClinicClock();
-  const today = clinicToday();
+  const clock = useAppClock();
+  const today = appToday();
 
   const types = (patient: PatientRow) =>
     patient.types.map((type) => ({
       id: type,
-      label: tClinic(CLINIC_KEYS.patients.types[type]),
+      label: tApp(APP_KEYS.patients.types[type]),
       tone: PATIENT_TYPE_TONES[type],
     }));
   const status = (patient: PatientRow) => [
     {
       id: patient.status,
-      label: tClinic(CLINIC_KEYS.patients.statuses[patient.status]),
+      label: tApp(APP_KEYS.patients.statuses[patient.status]),
       tone: PATIENT_STATUS_TONES[patient.status],
     },
   ];
@@ -103,7 +103,7 @@ function usePatientColumns(
       ? [
           {
             id: patient.conversion,
-            label: tClinic(CLINIC_KEYS.patients.conversions[patient.conversion]),
+            label: tApp(APP_KEYS.patients.conversions[patient.conversion]),
             tone: PATIENT_CONVERSION_TONES[patient.conversion],
           },
         ]

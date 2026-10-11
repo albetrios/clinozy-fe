@@ -2,7 +2,7 @@ import type { CSSProperties, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { TonePill } from '@/shared/components/Cells/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 

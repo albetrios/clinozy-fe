@@ -3,8 +3,8 @@ import { type ReactNode, useId, useMemo, useState } from 'react';
 import { useForm, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import type { OfferRecord } from '@/shared/api/clinic/offerings-contracts.ts';
-import { SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
+import type { OfferRecord } from '@/shared/api/app/offerings-contracts.ts';
+import { SECTION_TONES } from '@/shared/app/app-tones.ts';
 import { DrawerStepBody } from '@/shared/components/DrawerField/index.ts';
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import {
@@ -12,7 +12,7 @@ import {
   RecordDrawerPending,
 } from '@/shared/components/RecordDrawer/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -112,7 +112,7 @@ const FIELD_STEPS: Readonly<Record<keyof OfferFormValues, OfferStepId>> = {
  * view only; Delete with `offering:delete`. During View-as nothing is.
  */
 function useDrawerAccess(editing: boolean) {
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const canWrite = access.canCode(
     editing ? OFFER_PERMISSIONS.update : OFFER_PERMISSIONS.create,
   );

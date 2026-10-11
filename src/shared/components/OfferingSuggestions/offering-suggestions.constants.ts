@@ -1,8 +1,8 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
-import type { SuggestionStatus, Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { SuggestionStatus, Tone } from '@/shared/api/app/app-schema.ts';
 
-/** The card renders inside the org shell, so its copy lives in `clinic`. */
-export const OFFERING_SUGGESTIONS_NS = I18N_NAMESPACES.clinic;
+/** The card renders inside the org shell, so its copy lives in `app`. */
+export const OFFERING_SUGGESTIONS_NS = I18N_NAMESPACES.app;
 
 const STATUS_KEYS = (prefix: string): Readonly<Record<SuggestionStatus, string>> => ({
   planned: `${prefix}.planned`,

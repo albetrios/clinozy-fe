@@ -3,10 +3,10 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type * as PackagesApiModule from '@/shared/api/clinic/patient-packages-api.ts';
-import type { PatientPackageRow } from '@/shared/api/clinic/patient-packages-contracts.ts';
+import type * as PackagesApiModule from '@/shared/api/app/patient-packages-api.ts';
+import type { PatientPackageRow } from '@/shared/api/app/patient-packages-contracts.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 
 vi.mock('@/shared/notify/index.ts', () => ({
   notify: { success: vi.fn(), error: vi.fn(), info: vi.fn(), undo: vi.fn() },
@@ -14,7 +14,7 @@ vi.mock('@/shared/notify/index.ts', () => ({
 
 /** The patient's packages on the "server": a PATCH changes the row and its `updated_at`. */
 const server = vi.hoisted(() => ({ rows: [] as PatientPackageRow[] }));
-vi.mock('@/shared/api/clinic/patient-packages-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/patient-packages-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof PackagesApiModule>()),
   listPatientPackages: vi.fn(async () => structuredClone(server.rows)),
   listPatientPurchases: vi.fn(async () =>
@@ -39,7 +39,7 @@ import {
   listPatientPackages,
   listPatientPurchases,
   updatePatientPackage,
-} from '@/shared/api/clinic/patient-packages-api.ts';
+} from '@/shared/api/app/patient-packages-api.ts';
 
 import {
   usePatientPackages,

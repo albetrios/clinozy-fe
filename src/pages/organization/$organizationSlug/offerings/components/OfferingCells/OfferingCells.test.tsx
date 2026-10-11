@@ -2,8 +2,8 @@ import { render, renderHook, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type { OfferRecord } from '@/shared/api/clinic/offerings-contracts.ts';
-import type { EffectivePrice } from '@/shared/api/clinic/offerings-pricing.ts';
+import type { OfferRecord } from '@/shared/api/app/offerings-contracts.ts';
+import type { EffectivePrice } from '@/shared/api/app/offerings-pricing.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 import { offerRecord } from '@/tests/utils/offering-doubles.ts';
 

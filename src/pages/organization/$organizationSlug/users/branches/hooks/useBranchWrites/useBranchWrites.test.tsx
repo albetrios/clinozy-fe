@@ -3,16 +3,16 @@ import { act, renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { branchQueryKeys } from '@/shared/api/clinic/branches-api.ts';
-import type * as BranchesManageApiModule from '@/shared/api/clinic/branches-manage-api.ts';
-import { saveBranch } from '@/shared/api/clinic/branches-manage-api.ts';
+import { branchQueryKeys } from '@/shared/api/app/branches-api.ts';
+import type * as BranchesManageApiModule from '@/shared/api/app/branches-manage-api.ts';
+import { saveBranch } from '@/shared/api/app/branches-manage-api.ts';
 import { orgQueryKeys } from '@/shared/api/organization-query-keys.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { clinicBranch } from '@/tests/utils/branch-doubles.ts';
+import { appBranch } from '@/tests/utils/branch-doubles.ts';
 
 import { useSaveBranch } from './useBranchWrites.ts';
 
-vi.mock('@/shared/api/clinic/branches-manage-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/branches-manage-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof BranchesManageApiModule>()),
   saveBranch: vi.fn(),
 }));
@@ -20,7 +20,7 @@ vi.mock('@/shared/api/clinic/branches-manage-api.ts', async (importOriginal) => 
 describe('useSaveBranch', () => {
   it('saves once per press — its own idempotency key — and refreshes every branch read and the Team', async () => {
     useOrganizationStore.getState().setOrganization('org_test', 'acme');
-    vi.mocked(saveBranch).mockResolvedValue(clinicBranch());
+    vi.mocked(saveBranch).mockResolvedValue(appBranch());
     const queryClient = new QueryClient({
       defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
     });
@@ -30,7 +30,7 @@ describe('useSaveBranch', () => {
     );
     const { result } = renderHook(() => useSaveBranch(), { wrapper });
     const save = {
-      branch: clinicBranch(),
+      branch: appBranch(),
       input: { name: 'Vesu' } as never,
       memberIds: [],
     };

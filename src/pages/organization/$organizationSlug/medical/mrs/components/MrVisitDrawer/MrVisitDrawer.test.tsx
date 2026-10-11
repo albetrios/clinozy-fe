@@ -2,16 +2,12 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { addCivilDays, addCivilMonths, appToday } from '@/shared/api/app/app-time.ts';
+import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
 import {
-  addCivilDays,
-  addCivilMonths,
-  clinicToday,
-} from '@/shared/api/clinic/clinic-time.ts';
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+  appFixtures,
+  resetAppFixtures,
+} from '@/shared/api/app/fixtures/world.fixtures.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 
@@ -49,11 +45,11 @@ const setup = () =>
 
 beforeEach(() => {
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 afterEach(() => {
   resetMedicalRoutes();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 
 describe('MrVisitDrawer (medical.md:239–252)', () => {
@@ -85,11 +81,11 @@ describe('MrVisitDrawer (medical.md:239–252)', () => {
     expect(notifyMock.success).toHaveBeenCalledWith(
       expect.stringMatching(/^Visit logged · reminder set for /),
     );
-    const today = clinicToday();
-    expect((await clinicFixtures.medicalReps.get(mr.id)).nextVisitOn).toBe(
+    const today = appToday();
+    expect((await appFixtures.medicalReps.get(mr.id)).nextVisitOn).toBe(
       addCivilMonths(today, 1),
     );
-    const visits = clinicFixtures.mrVisits.snapshot(
+    const visits = appFixtures.mrVisits.snapshot(
       (visit) => visit.mrId === mr.id && visit.date === today,
     );
     expect(visits.at(-1)).toMatchObject({ samples: '4 tubes Azelan', notes: null });

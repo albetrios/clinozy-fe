@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import type { TreatmentRecord } from '@/shared/api/clinic/treatments-contracts.ts';
+import type { TreatmentRecord } from '@/shared/api/app/treatments-contracts.ts';
 import {
   INVOICE_TEST_OFFERINGS,
   INVOICE_TEST_OFFERS,

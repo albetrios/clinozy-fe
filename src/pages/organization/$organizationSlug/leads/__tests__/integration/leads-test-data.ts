@@ -1,19 +1,19 @@
 import { vi } from 'vitest';
 
-import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
-import type { Contact, ContactFields } from '@/shared/api/clinic/contacts-contracts.ts';
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
+import { appInstant } from '@/shared/api/app/app-time.ts';
+import type { Contact, ContactFields } from '@/shared/api/app/contacts-contracts.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
 import type {
   LeadFields,
   LeadListParams,
   LeadRecord,
-} from '@/shared/api/clinic/leads-contracts.ts';
-import { leadHold } from '@/shared/api/clinic/leads-hold.ts';
+} from '@/shared/api/app/leads-contracts.ts';
+import { leadHold } from '@/shared/api/app/leads-hold.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { EMPTY_CONTACT_PROFILE } from '@/tests/utils/contact-doubles.ts';
 
 /** 10:00 on 3 Oct 2026, clinic time — every Leads test's "now". */
-export const NOW = new Date(clinicInstant('2026-10-03', '10:00'));
+export const NOW = new Date(appInstant('2026-10-03', '10:00'));
 
 /** An instant `days` before {@link NOW}. */
 export const daysAgo = (days: number) =>
@@ -215,7 +215,7 @@ function sorted(rows: LeadRecord[], params: LeadListParams): LeadRecord[] {
 }
 
 /**
- * `@/shared/api/clinic/leads-api.ts` over a {@link LeadsWorld} — every read answers from it and
+ * `@/shared/api/app/leads-api.ts` over a {@link LeadsWorld} — every read answers from it and
  * every write changes it, so a later read shows the write. An unknown id is a 404.
  */
 export function leadsApiDouble(world: LeadsWorld) {
@@ -284,7 +284,7 @@ export function leadsApiDouble(world: LeadsWorld) {
   };
 }
 
-/** `@/shared/api/clinic/directory-api.ts`'s team reads over {@link TEAM}. */
+/** `@/shared/api/app/directory-api.ts`'s team reads over {@link TEAM}. */
 export function directoryApiDouble() {
   return {
     fetchTeamDirectory: vi.fn(async () => structuredClone([...TEAM])),
@@ -305,7 +305,7 @@ export interface ContactsWorld {
   contacts: Contact[];
 }
 
-/** `@/shared/api/clinic/contacts-api.ts` over a {@link ContactsWorld}: a save changes the person. */
+/** `@/shared/api/app/contacts-api.ts` over a {@link ContactsWorld}: a save changes the person. */
 export function contactsApiDouble(world: ContactsWorld) {
   const find = (contactId: string) => {
     const contact = world.contacts.find((entry) => entry.id === contactId);
@@ -352,7 +352,7 @@ export function contactsApiDouble(world: ContactsWorld) {
   };
 }
 
-/** `@/shared/api/clinic/contact-activities-api.ts` — the lead drawer's chat: a quiet stream. */
+/** `@/shared/api/app/contact-activities-api.ts` — the lead drawer's chat: a quiet stream. */
 export function contactActivitiesApiDouble() {
   return {
     fetchContactThread: vi.fn(async (_contactId: string) => ({

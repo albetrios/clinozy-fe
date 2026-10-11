@@ -1,10 +1,10 @@
 import { useCallback, useMemo } from 'react';
 
-import { presetOfRole } from '@/shared/api/clinic/access-contracts.ts';
-import type { Role, Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import { presetOfRole } from '@/shared/api/app/access-contracts.ts';
+import type { Role, Tone } from '@/shared/api/app/app-schema.ts';
 import { isOwnerRole, type RoleSummary } from '@/shared/api/organization-contracts.ts';
-import { toneForLabel } from '@/shared/clinic/clinic-tones.ts';
-import { useRoleLabel } from '@/shared/hooks/useClinicRoles/index.ts';
+import { toneForLabel } from '@/shared/app/app-tones.ts';
+import { useRoleLabel } from '@/shared/hooks/useAppRoles/index.ts';
 import { usePlatformRoles } from '@/shared/hooks/useTeam/index.ts';
 
 /** A role as a pill: its id, its name and its tone. */

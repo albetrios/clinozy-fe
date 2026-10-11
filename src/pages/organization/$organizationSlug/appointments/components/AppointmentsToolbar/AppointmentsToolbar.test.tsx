@@ -3,14 +3,14 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type { AppointmentView } from '@/shared/api/clinic/appointments-contracts.ts';
+import type { AppointmentView } from '@/shared/api/app/appointments-contracts.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { APPOINTMENT_NOW } from '@/tests/utils/appointment-doubles.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import {
   APPOINTMENTS_PAGE,
-  grantClinicAccess,
+  grantAppAccess,
   renderInAppointments,
 } from '../../__tests__/integration/appointments-test-router.tsx';
 import { AppointmentsToolbar } from './AppointmentsToolbar.tsx';
@@ -35,7 +35,7 @@ beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] });
   vi.setSystemTime(APPOINTMENT_NOW);
   signInTestMember();
-  grantClinicAccess('owner');
+  grantAppAccess('owner');
 });
 afterEach(() => vi.useRealTimers());
 
@@ -154,7 +154,7 @@ describe('AppointmentsToolbar (KICKOFF §6.4 Toolbar)', () => {
     expect(router.state.location.search).toEqual({ status: 'all' });
     unmount();
 
-    grantClinicAccess('none');
+    grantAppAccess('none');
     renderToolbar('agenda');
     await screen.findByRole('tablist', { name: 'View' });
     expect(screen.queryByTestId('appointments-new-appointment')).toBeNull();

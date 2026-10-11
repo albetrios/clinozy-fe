@@ -5,8 +5,8 @@ import { describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import { PRODUCT_NAME } from '@/lib/product-identity.ts';
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
-import type { TaskRow as TaskRowRecord } from '@/shared/api/clinic/tasks-contracts.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
+import type { TaskRow as TaskRowRecord } from '@/shared/api/app/tasks-contracts.ts';
 import { fsi } from '@/tests/utils/bidi-marks.ts';
 import { taskPerson, taskRow, TEST_TASK_MEMBER_ID } from '@/tests/utils/task-doubles.ts';
 

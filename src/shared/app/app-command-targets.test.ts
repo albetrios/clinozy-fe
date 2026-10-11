@@ -1,0 +1,137 @@
+import { describe, expect, it } from 'vitest';
+
+import { APP_COMMAND_TARGETS, appCommandNavigation } from './app-command-targets.ts';
+import { APP_SECTION_ROUTES } from './app-home.ts';
+
+const ORG = '/organization/$organizationSlug';
+const PATIENT = '0b6d2f0e-5c7a-4c1e-9b2a-3d4e5f6a7b8c';
+
+describe('APP_COMMAND_TARGETS (KICKOFF §6.0, D24)', () => {
+  it('opens each create action on its form route and Open tasks on the room', () => {
+    expect(APP_COMMAND_TARGETS).toMatchObject({
+      newLead: `${ORG}/leads/create`,
+      newAppointment: `${ORG}/appointments/create`,
+      newPatient: `${ORG}/patients/create`,
+      newReceipt: `${ORG}/payments/receive`,
+      openTasks: APP_SECTION_ROUTES.tasks,
+    });
+  });
+
+  it('opens each record on its own route (D19 / D26; §7.3)', () => {
+    expect(APP_COMMAND_TARGETS).toMatchObject({
+      patient: `${ORG}/patients/$patientId`,
+      lead: `${ORG}/leads/$leadId`,
+      invoice: `${ORG}/invoices/$invoiceId`,
+      invoiceEdit: `${ORG}/invoices/$invoiceId/edit`,
+      paymentEdit: `${ORG}/payments/$paymentId/edit`,
+    });
+  });
+
+  it('opens a ledger entry’s drawer over the patient file’s Payments (A-P1)', () => {
+    expect(
+      appCommandNavigation('paymentEdit', {
+        organizationSlug: 'acme',
+        recordId: 'pay_5vstwdmuz5fnklr2jy6aa',
+        referrer: 'patients/pat_9e6j52vjb8uhvz44ebe94/payments',
+      }),
+    ).toEqual({
+      to: `${ORG}/payments/$paymentId/edit`,
+      params: { organizationSlug: 'acme', paymentId: 'pay_5vstwdmuz5fnklr2jy6aa' },
+      search: { from: 'patients/pat_9e6j52vjb8uhvz44ebe94/payments' },
+    });
+  });
+
+  it('takes Today’s Dispense and Save & sell to the sale drawer (§6.2)', () => {
+    expect(
+      appCommandNavigation('newSale', {
+        organizationSlug: 'acme',
+        referrer: 'today',
+        search: { prescription: PATIENT },
+      }),
+    ).toEqual({
+      to: `${ORG}/medical/sales/create`,
+      params: { organizationSlug: 'acme' },
+      search: { prescription: PATIENT, from: 'today' },
+    });
+    // The Rx drawer's "Save & sell" (L-45) keeps the prescriptions section behind it.
+    expect(
+      appCommandNavigation('newSale', {
+        organizationSlug: 'acme',
+        referrer: `patients/${PATIENT}/prescriptions`,
+        search: { prescription: 'rx-1' },
+      }).search,
+    ).toEqual({ prescription: 'rx-1', from: `patients/${PATIENT}/prescriptions` });
+  });
+
+  it('takes the Patients row actions to the other rooms’ drawers (§6.5)', () => {
+    expect(APP_COMMAND_TARGETS).toMatchObject({
+      newInvoice: `${ORG}/invoices/create`,
+      patientEdit: `${ORG}/patients/$patientId/edit`,
+    });
+    expect(
+      appCommandNavigation('patientEdit', {
+        organizationSlug: 'acme',
+        recordId: PATIENT,
+        referrer: 'patients',
+      }),
+    ).toEqual({
+      to: `${ORG}/patients/$patientId/edit`,
+      params: { organizationSlug: 'acme', patientId: PATIENT },
+    });
+    expect(
+      appCommandNavigation('newInvoice', {
+        organizationSlug: 'acme',
+        referrer: 'patients',
+        search: { type: 'clinic', patient: PATIENT },
+      }).search,
+    ).toEqual({ type: 'clinic', patient: PATIENT, from: 'patients' });
+  });
+});
+
+describe('appCommandNavigation', () => {
+  it('names the record by its route param', () => {
+    expect(
+      appCommandNavigation('patient', {
+        organizationSlug: 'acme',
+        recordId: PATIENT,
+        search: { activity: 'open' },
+      }),
+    ).toEqual({
+      to: `${ORG}/patients/$patientId`,
+      params: { organizationSlug: 'acme', patientId: PATIENT },
+      search: { activity: 'open' },
+    });
+    expect(
+      appCommandNavigation('lead', { organizationSlug: 'acme', recordId: 'l-1' }).params,
+    ).toEqual({ organizationSlug: 'acme', leadId: 'l-1' });
+  });
+
+  it('keeps the page it opens from behind the drawers that take `from`', () => {
+    for (const target of [
+      'newAppointment',
+      'newReceipt',
+      'paymentEdit',
+      'newInvoice',
+      'invoice',
+      'invoiceEdit',
+      'newSale',
+    ] as const) {
+      expect(
+        appCommandNavigation(target, {
+          organizationSlug: 'acme',
+          recordId: 'i-1',
+          referrer: 'today',
+        }).search,
+      ).toEqual({ from: 'today' });
+    }
+  });
+
+  it('leaves `from` out where the target opens over its own room, or there is none', () => {
+    expect(
+      appCommandNavigation('newLead', { organizationSlug: 'acme', referrer: 'today' }),
+    ).toEqual({ to: `${ORG}/leads/create`, params: { organizationSlug: 'acme' } });
+    expect(
+      appCommandNavigation('newReceipt', { organizationSlug: 'acme', referrer: null }),
+    ).toEqual({ to: `${ORG}/payments/receive`, params: { organizationSlug: 'acme' } });
+  });
+});

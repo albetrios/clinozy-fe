@@ -1,4 +1,6 @@
-import { isAppointmentSlotLocked } from '@/shared/api/clinic/appointment-status.ts';
+import type { AppointmentStatus, AppointmentType } from '@/shared/api/app/app-schema.ts';
+import { clockMinutes } from '@/shared/api/app/app-time.ts';
+import { isAppointmentSlotLocked } from '@/shared/api/app/appointment-status.ts';
 import {
   APPOINTMENT_LENGTHS,
   APPOINTMENT_TYPE_MINUTES,
@@ -9,14 +11,9 @@ import {
   type AppointmentPerson,
   type AppointmentRow,
   type AppointmentSlot,
-} from '@/shared/api/clinic/appointments-contracts.ts';
-import type {
-  AppointmentStatus,
-  AppointmentType,
-} from '@/shared/api/clinic/clinic-schema.ts';
-import { clockMinutes } from '@/shared/api/clinic/clinic-time.ts';
-import type { ContactSummary } from '@/shared/api/clinic/contacts-contracts.ts';
-import { toClinicPhone } from '@/shared/clinic/clinic-phone.ts';
+} from '@/shared/api/app/appointments-contracts.ts';
+import type { ContactSummary } from '@/shared/api/app/contacts-contracts.ts';
+import { toAppPhone } from '@/shared/app/app-phone.ts';
 
 /*
  * The appointment form's model (KICKOFF §6.4 Appointment form; H:5976–6051):
@@ -603,7 +600,7 @@ export function hourLabel(hour: number): { number: number; period: 'am' | 'pm' }
 
 /** A new contact's mobile as the contract stores it, or `null` when it is not ten digits. */
 export function newContactPhone(draft: AppointmentDraft): string | null {
-  return draft.newPhone.length === 10 ? toClinicPhone(draft.newPhone) : null;
+  return draft.newPhone.length === 10 ? toAppPhone(draft.newPhone) : null;
 }
 
 /** The fields a booking shares between New and Edit. */

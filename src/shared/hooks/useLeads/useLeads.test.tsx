@@ -3,7 +3,7 @@ import { act, cleanup, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type * as LeadsApiModule from '@/shared/api/clinic/leads-api.ts';
+import type * as LeadsApiModule from '@/shared/api/app/leads-api.ts';
 import {
   claimLead,
   countOpenLeadTasks,
@@ -16,13 +16,13 @@ import {
   releaseLead,
   restoreLead,
   updateLead,
-} from '@/shared/api/clinic/leads-api.ts';
-import type { LeadFields, LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
+} from '@/shared/api/app/leads-api.ts';
+import type { LeadFields, LeadRecord } from '@/shared/api/app/leads-contracts.ts';
 import type * as NotifyModule from '@/shared/notify/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 
 import {
   useAssignLead,
@@ -39,7 +39,7 @@ import {
   useUpdateLead,
 } from './useLeads.ts';
 
-vi.mock('@/shared/api/clinic/leads-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/leads-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof LeadsApiModule>()),
   listLeads: vi.fn(),
   fetchLead: vi.fn(),

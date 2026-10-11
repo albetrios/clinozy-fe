@@ -7,7 +7,7 @@ import {
   rupeesOfPaise,
   textFromNumber,
 } from '@/lib/number-text.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
 
 import type { StockItemRow, StockPurchaseRecord } from '../../stock-contracts.ts';
 import type {
@@ -130,7 +130,7 @@ export function newPurchaseForm(
   return {
     vendorId: null,
     billNo: '',
-    date: clinicToday(),
+    date: appToday(),
     lines,
     bill: '',
     paid: '',

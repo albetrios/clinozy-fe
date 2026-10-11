@@ -13,8 +13,8 @@ import {
 } from '@/lib/app-splash.ts';
 import { zonedClockParts } from '@/lib/i18n/format.ts';
 import { cn } from '@/lib/utils.ts';
-import { CLINIC_TIME_ZONE } from '@/shared/api/clinic/clinic-time.ts';
-import { greetingFor } from '@/shared/clinic/clinic-greeting.ts';
+import { APP_TIME_ZONE } from '@/shared/api/app/app-time.ts';
+import { greetingFor } from '@/shared/app/app-greeting.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { useOnlineStatus } from '@/shared/hooks/useOnlineStatus/index.ts';
@@ -110,7 +110,7 @@ function SplashBlock({
   }, [timing.at]);
   // The clinic-local calendar, read once: a greeting must not flip mid-splash.
   const [weekday] = useState(() => {
-    const clinic = zonedClockParts(new Date(), CLINIC_TIME_ZONE);
+    const clinic = zonedClockParts(new Date(), APP_TIME_ZONE);
     return formatDate(
       new Date(clinic.year, clinic.month - 1, clinic.day),
       { weekday: 'long' },
@@ -207,10 +207,10 @@ export function AppSplashSlot({ offlineAtMount, greets }: AppSplashSlotProps) {
     [awaitingSession],
   );
 
-  const [clinicHour] = useState(() => zonedClockParts(new Date(), CLINIC_TIME_ZONE).hour);
+  const [appHour] = useState(() => zonedClockParts(new Date(), APP_TIME_ZONE).hour);
   const greeting =
     greets && firstName
-      ? t(SPLASH_KEYS.greeting[greetingFor(clinicHour)], { name: firstName })
+      ? t(SPLASH_KEYS.greeting[greetingFor(appHour)], { name: firstName })
       : null;
 
   if (!(host && (offline || greeting))) return null;

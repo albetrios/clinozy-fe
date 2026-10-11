@@ -1,10 +1,7 @@
-import type { DeleteReason } from '@/shared/api/clinic/clinic-schema.ts';
-import { commandSearchQueryKeys } from '@/shared/api/clinic/command-search-api.ts';
-import {
-  contactQueryKeys,
-  findContactByPhone,
-} from '@/shared/api/clinic/contacts-api.ts';
-import { leadQueryKeys } from '@/shared/api/clinic/leads-api.ts';
+import type { DeleteReason } from '@/shared/api/app/app-schema.ts';
+import { commandSearchQueryKeys } from '@/shared/api/app/command-search-api.ts';
+import { contactQueryKeys, findContactByPhone } from '@/shared/api/app/contacts-api.ts';
+import { leadQueryKeys } from '@/shared/api/app/leads-api.ts';
 import {
   createPatient,
   deletePatient,
@@ -13,14 +10,14 @@ import {
   patientQueryKeys,
   restorePatient,
   updatePatient,
-} from '@/shared/api/clinic/patients-api.ts';
+} from '@/shared/api/app/patients-api.ts';
 import type {
   PatientFields,
   PatientListParams,
   PatientPersonInput,
   PatientRecord,
   PatientRow,
-} from '@/shared/api/clinic/patients-contracts.ts';
+} from '@/shared/api/app/patients-contracts.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';

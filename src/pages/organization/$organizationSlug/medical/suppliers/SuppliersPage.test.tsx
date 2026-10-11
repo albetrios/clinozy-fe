@@ -3,8 +3,8 @@ import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
+import { resetAppFixtures } from '@/shared/api/app/fixtures/world.fixtures.ts';
 
 import {
   renderMedicalRoutes,
@@ -12,10 +12,10 @@ import {
 } from '../__tests__/integration/medical-test-router.tsx';
 import { SuppliersPage } from './SuppliersPage.tsx';
 
-beforeEach(() => resetClinicFixtures());
+beforeEach(() => resetAppFixtures());
 afterEach(() => {
   resetMedicalRoutes();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 
 describe('SuppliersPage', () => {

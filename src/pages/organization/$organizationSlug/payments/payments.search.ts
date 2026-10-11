@@ -13,10 +13,10 @@ import { listIn, oneOf, queryOf } from '@/lib/routes/search-params.ts';
 import {
   type CreatedFilter,
   readCreatedFilter,
-} from '@/shared/api/clinic/clinic-list-filters.ts';
-import type { PaymentDirection, PaymentMode } from '@/shared/api/clinic/clinic-schema.ts';
-import { LEDGER_FILTER_VALUES } from '@/shared/api/clinic/ledger-filter-values.ts';
-import type { LedgerKindFilter } from '@/shared/api/clinic/payments-contracts.ts';
+} from '@/shared/api/app/app-list-filters.ts';
+import type { PaymentDirection, PaymentMode } from '@/shared/api/app/app-schema.ts';
+import { LEDGER_FILTER_VALUES } from '@/shared/api/app/ledger-filter-values.ts';
+import type { LedgerKindFilter } from '@/shared/api/app/payments-contracts.ts';
 
 /** Validated `?…` search params for `/payments` and its dialog routes. */
 export interface PaymentsSearch {

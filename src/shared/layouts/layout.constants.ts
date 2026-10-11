@@ -80,7 +80,7 @@ export const LAYOUT_KEYS = {
       submitting: 'app.orgCreate.submitting',
       /**
        * The drawer's own "Cancel": it also opens over the organization picker,
-       * outside the org shell, where the drawers' shared `clinic` copy is not loaded.
+       * outside the org shell, where the drawers' shared `app` copy is not loaded.
        */
       cancel: 'app.orgCreate.cancel',
     },

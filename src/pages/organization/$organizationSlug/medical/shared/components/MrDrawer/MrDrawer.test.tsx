@@ -2,11 +2,11 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
+import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
 import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+  appFixtures,
+  resetAppFixtures,
+} from '@/shared/api/app/fixtures/world.fixtures.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 
@@ -44,11 +44,11 @@ const setup = () =>
 
 beforeEach(() => {
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 afterEach(() => {
   resetMedicalRoutes();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 
 describe('MrDrawer (medical.md:224–237)', () => {
@@ -69,7 +69,7 @@ describe('MrDrawer (medical.md:224–237)', () => {
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(notifyMock.success).toHaveBeenCalledWith('MR saved');
     expect(
-      clinicFixtures.medicalReps.snapshot((rep) => rep.name === 'Ravi')[0],
+      appFixtures.medicalReps.snapshot((rep) => rep.name === 'Ravi')[0],
     ).toMatchObject({ phone: '+919876543210', nextVisitOn: null });
   });
 
@@ -89,7 +89,7 @@ describe('MrDrawer (medical.md:224–237)', () => {
     await user.paste('Alvio Pharma · Rakesh S');
     await user.click(within(drawer).getByTestId(`${D}-save`));
     await waitFor(() => expect(onClose).toHaveBeenCalled());
-    expect((await clinicFixtures.medicalReps.get(mr.id)).name).toBe(
+    expect((await appFixtures.medicalReps.get(mr.id)).name).toBe(
       'Alvio Pharma · Rakesh S',
     );
   });

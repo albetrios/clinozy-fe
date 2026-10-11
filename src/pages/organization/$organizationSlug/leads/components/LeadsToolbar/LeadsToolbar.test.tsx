@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type { LeadView } from '@/shared/api/clinic/leads-contracts.ts';
+import type { LeadView } from '@/shared/api/app/leads-contracts.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 

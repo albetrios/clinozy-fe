@@ -8,15 +8,9 @@ import {
   organizationPendingCreate,
   organizationPendingEdit,
 } from '@/lib/routes/payments-builders.ts';
-import type { CreditDirection } from '@/shared/api/clinic/clinic-schema.ts';
-import type {
-  CreditListParams,
-  CreditRow,
-} from '@/shared/api/clinic/credits-contracts.ts';
-import {
-  CREDIT_DIRECTION_TONES,
-  CREDIT_STATUS_TONES,
-} from '@/shared/clinic/clinic-tones.ts';
+import type { CreditDirection } from '@/shared/api/app/app-schema.ts';
+import type { CreditListParams, CreditRow } from '@/shared/api/app/credits-contracts.ts';
+import { CREDIT_DIRECTION_TONES, CREDIT_STATUS_TONES } from '@/shared/app/app-tones.ts';
 import { DataTable } from '@/shared/components/DataTable/index.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
 import { EmptyState, EmptyStateAction } from '@/shared/components/EmptyState/index.ts';

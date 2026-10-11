@@ -1,25 +1,25 @@
 import { vi } from 'vitest';
 
-import { clinicDateOf } from '@/shared/api/clinic/clinic-filter-match.ts';
-import { clinicInstant, clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import { appDateOf } from '@/shared/api/app/app-filter-match.ts';
+import { appInstant, appToday } from '@/shared/api/app/app-time.ts';
 import type {
   ContactProfile,
   ContactSummary,
-} from '@/shared/api/clinic/contacts-contracts.ts';
+} from '@/shared/api/app/contacts-contracts.ts';
 import type {
   PatientFields,
   PatientListParams,
   PatientPersonInput,
   PatientRecord,
   PatientRow,
-} from '@/shared/api/clinic/patients-contracts.ts';
+} from '@/shared/api/app/patients-contracts.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { contactHit } from '@/tests/utils/appointment-doubles.ts';
 import { EMPTY_CONTACT_PROFILE } from '@/tests/utils/contact-doubles.ts';
 import { patientRecord } from '@/tests/utils/patient-doubles.ts';
 
 /** 10:00 on 3 Oct 2026, clinic time — every Patients room test's "now". */
-export const NOW = new Date(clinicInstant('2026-10-03', '10:00'));
+export const NOW = new Date(appInstant('2026-10-03', '10:00'));
 
 /** Dharti Galani, #3508 — Regular, Aesthetic, a follow-up at 2:50 pm today. */
 export const DHARTI = patientRecord({
@@ -35,10 +35,10 @@ export const DHARTI = patientRecord({
   dateOfBirth: '1995-10-27',
   status: 'regular',
   types: ['aesthetic'],
-  followUpAt: clinicInstant('2026-10-03', '14:50'),
+  followUpAt: appInstant('2026-10-03', '14:50'),
   consents: ['data', 'photos'],
   createdAt: '2026-09-24T09:10:00.000Z',
-  updatedAt: clinicInstant('2026-10-03', '09:00'),
+  updatedAt: appInstant('2026-10-03', '09:00'),
 });
 
 /** Raam Shah, #3441 — New, Clinical, no follow-up. */
@@ -72,7 +72,7 @@ const KIRAN = patientRecord({
   status: 'inactive',
   types: ['lhr'],
   conversion: 'converted',
-  followUpAt: clinicInstant('2026-09-28', '11:00'),
+  followUpAt: appInstant('2026-09-28', '11:00'),
   createdAt: '2026-08-01T06:00:00.000Z',
   updatedAt: '2026-09-28T06:00:00.000Z',
 });
@@ -89,7 +89,7 @@ const MEERA = patientRecord({
   phones: [{ phone: '+919099911223', isPrimary: true, isOnWhatsapp: true }],
   status: 'vip',
   types: ['dental'],
-  followUpAt: clinicInstant('2026-10-09', '12:00'),
+  followUpAt: appInstant('2026-10-09', '12:00'),
   createdAt: '2026-01-05T06:00:00.000Z',
   updatedAt: '2026-09-01T06:00:00.000Z',
 });
@@ -151,9 +151,7 @@ function recordWith(base: PatientRecord, fields: PatientFields): PatientRecord {
 /** Whether a patient is in the list's view: everyone, follow-up due (today or before), Recall. */
 function inView(patient: PatientRecord, params: PatientListParams): boolean {
   if (params.view === 'follow') {
-    return (
-      patient.followUpAt !== null && clinicDateOf(patient.followUpAt) <= clinicToday()
-    );
+    return patient.followUpAt !== null && appDateOf(patient.followUpAt) <= appToday();
   }
   if (params.view === 'recall') return patient.status === 'inactive';
   return true;
@@ -196,7 +194,7 @@ function rowOf({ phone2: _phone2, phones: _phones, ...row }: PatientRecord): Pat
 }
 
 /**
- * `@/shared/api/clinic/patients-api.ts` over a {@link PatientsWorld} — every read answers from
+ * `@/shared/api/app/patients-api.ts` over a {@link PatientsWorld} — every read answers from
  * it and every write changes it, so a later read shows the write. An unknown id is a 404.
  */
 export function patientsApiDouble(world: PatientsWorld) {
@@ -289,7 +287,7 @@ export function patientsApiDouble(world: PatientsWorld) {
 }
 
 /**
- * `@/shared/api/clinic/contacts-api.ts`'s duplicate-number check over a {@link PatientsWorld}:
+ * `@/shared/api/app/contacts-api.ts`'s duplicate-number check over a {@link PatientsWorld}:
  * the person on a number is the patient's, with their file.
  */
 export function contactsApiDouble(world: PatientsWorld) {

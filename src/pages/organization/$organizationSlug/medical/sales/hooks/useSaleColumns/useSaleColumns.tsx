@@ -1,7 +1,7 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import {
   IdPill,
   MoneyCell,

@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import i18n from '@/lib/i18n/i18n.ts';
-import type { ComposerMode } from '@/shared/api/clinic/messages-contracts.ts';
+import type { ComposerMode } from '@/shared/api/app/messages-contracts.ts';
 import {
   CHAT_COLUMN_NS,
   CHAT_COLUMN_TEST_IDS as ids,

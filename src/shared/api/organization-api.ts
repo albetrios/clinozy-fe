@@ -12,7 +12,7 @@ import {
   type DeleteReason,
   type Tone,
   weekdaySchema,
-} from '@/shared/api/clinic/clinic-schema.ts';
+} from '@/shared/api/app/app-schema.ts';
 import type {
   ApiKey,
   ApiKeyWithSecret,
@@ -22,7 +22,7 @@ import type {
   MembershipStatus,
   RoleSummary,
 } from '@/shared/api/organization-contracts.ts';
-import { servedTone } from '@/shared/clinic/clinic-tones.ts';
+import { servedTone } from '@/shared/app/app-tones.ts';
 import { fetchMeContext } from '@/shared/tenancy/me-context.ts';
 
 import { fetchListPage, type ListPage, type ListPageParams } from './fetch-list-page.ts';

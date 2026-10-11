@@ -2,8 +2,8 @@ import { useNavigate, useParams } from '@tanstack/react-router';
 import { useCallback, useLayoutEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { isCommandSearchQuery } from '@/shared/api/clinic/command-search-api.ts';
-import type { ClinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
+import { isCommandSearchQuery } from '@/shared/api/app/command-search-api.ts';
+import type { AppCommandNavigation } from '@/shared/app/app-command-targets.ts';
 import { PICKER_KEYS, PICKER_NS } from '@/shared/components/Picker/picker.constants.ts';
 import {
   Command,
@@ -12,7 +12,7 @@ import {
   CommandList,
 } from '@/shared/components/ui/command.tsx';
 import { useAppNav } from '@/shared/hooks/useAppNav/index.ts';
-import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
+import { useAppNavigate } from '@/shared/hooks/useAppNavigate/index.ts';
 import { useDeploymentFlags } from '@/shared/hooks/useDeploymentFlags/index.ts';
 import { useMeContext } from '@/shared/hooks/useMeContext/index.ts';
 import { Search } from '@/shared/icons/index.ts';
@@ -20,10 +20,10 @@ import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
 import {
-  type ClinicCommandGroups,
-  NO_CLINIC_COMMANDS,
-  useClinicCommandGroups,
-} from './clinic-command-groups.ts';
+  type AppCommandGroups,
+  NO_APP_COMMANDS,
+  useAppCommandGroups,
+} from './app-command-groups.ts';
 import { COMMAND_MENU_KEYS, COMMAND_MENU_NS } from './command-palette.constants.ts';
 import {
   COMMAND_SEARCH_CLASS,
@@ -77,7 +77,7 @@ export function CommandPaletteContent() {
 /** Close the palette, then run a command — or navigate. */
 function usePaletteCommands() {
   const setOpen = useUIStore((s) => s.setCommandPaletteOpen);
-  const navigate = useClinicNavigate();
+  const navigate = useAppNavigate();
   const runCommand = useCallback(
     (command: () => void) => {
       setOpen(false);
@@ -86,7 +86,7 @@ function usePaletteCommands() {
     [setOpen],
   );
   const go = useCallback(
-    (navigation: ClinicCommandNavigation) => runCommand(() => navigate(navigation)),
+    (navigation: AppCommandNavigation) => runCommand(() => navigate(navigation)),
     [navigate, runCommand],
   );
   return { runCommand, go };
@@ -98,17 +98,17 @@ function OrganizationCommandMenu({ organizationSlug }: { organizationSlug: strin
   // member's clinic access and any View-as preview.
   const { entries } = useAppNav();
   const { go } = usePaletteCommands();
-  const clinic = useClinicCommandGroups({
+  const appCommands = useAppCommandGroups({
     query,
     organizationSlug,
     navEntries: entries,
     go,
   });
-  return <CommandMenu organizationSlug={organizationSlug} clinic={clinic} />;
+  return <CommandMenu organizationSlug={organizationSlug} appCommands={appCommands} />;
 }
 
 function PersonalCommandMenu() {
-  return <CommandMenu organizationSlug="" clinic={NO_CLINIC_COMMANDS} />;
+  return <CommandMenu organizationSlug="" appCommands={NO_APP_COMMANDS} />;
 }
 
 /**
@@ -120,10 +120,10 @@ function PersonalCommandMenu() {
  */
 function CommandMenu({
   organizationSlug,
-  clinic,
+  appCommands,
 }: {
   organizationSlug: string;
-  clinic: ClinicCommandGroups;
+  appCommands: AppCommandGroups;
 }) {
   const { t } = useTranslation(LAYOUT_NS);
   const { t: tMenu } = useTranslation(COMMAND_MENU_NS);
@@ -135,7 +135,7 @@ function CommandMenu({
   const { runCommand } = usePaletteCommands();
   const inOrganization = organizationSlug !== '';
   const platform = usePlatformCommandGroups({ query, runCommand });
-  const selection = useCommandSelection(query, clinic.groups[0]?.rows[0]?.value);
+  const selection = useCommandSelection(query, appCommands.groups[0]?.rows[0]?.value);
   const closePalette = useCallback(() => {
     setOpen(false);
   }, [setOpen]);
@@ -144,15 +144,15 @@ function CommandMenu({
   const typed = query.trim();
   // The design's empty query shows Actions alone (H:4600); the platform rows
   // join once typing — or at once, when the clinic has nothing to offer.
-  const showPlatform = typed !== '' || clinic.groups.length === 0;
+  const showPlatform = typed !== '' || appCommands.groups.length === 0;
   // The clinic's empty line names what it searches, and waits for the search
   // to answer — "No matches" never flashes ahead of the rows.
   let empty: string | null = t(cp.empty);
-  if (clinic.searchable) {
-    empty = typed && !clinic.isSearching ? tMenu(COMMAND_MENU_KEYS.empty) : null;
+  if (appCommands.searchable) {
+    empty = typed && !appCommands.isSearching ? tMenu(COMMAND_MENU_KEYS.empty) : null;
   }
   const hint =
-    clinic.searchable && !isCommandSearchQuery(typed)
+    appCommands.searchable && !isCommandSearchQuery(typed)
       ? tMenu(COMMAND_MENU_KEYS.hint)
       : null;
 
@@ -171,7 +171,7 @@ function CommandMenu({
       }}
       className="flex min-h-0 flex-1 flex-col rounded-none bg-transparent"
     >
-      <CommandPaletteInput searching={clinic.isSearching} />
+      <CommandPaletteInput searching={appCommands.isSearching} />
 
       <CommandList
         label={inOrganization ? tMenu(COMMAND_MENU_KEYS.results) : undefined}
@@ -184,7 +184,7 @@ function CommandMenu({
           </CommandEmpty>
         ) : null}
 
-        {clinic.groups.map((group) => (
+        {appCommands.groups.map((group) => (
           <CommandPaletteGroup key={group.id} group={group} />
         ))}
 

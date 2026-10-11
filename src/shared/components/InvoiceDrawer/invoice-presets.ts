@@ -3,10 +3,10 @@ import type { UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { rupeesOfPaise } from '@/lib/number-text.ts';
-import type { InvoicePresets } from '@/shared/api/clinic/invoices-contracts.ts';
-import type { InvoiceRxPreset } from '@/shared/api/clinic/invoices-fixture-contracts.ts';
-import type { PlanSuggestionRow } from '@/shared/api/clinic/plan-contracts.ts';
-import type { TreatmentRecord } from '@/shared/api/clinic/treatments-contracts.ts';
+import type { InvoicePresets } from '@/shared/api/app/invoices-contracts.ts';
+import type { InvoiceRxPreset } from '@/shared/api/app/invoices-fixture-contracts.ts';
+import type { PlanSuggestionRow } from '@/shared/api/app/plan-contracts.ts';
+import type { TreatmentRecord } from '@/shared/api/app/treatments-contracts.ts';
 import type { QuickFillItem } from '@/shared/components/QuickFillRow/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { notify } from '@/shared/notify/index.ts';

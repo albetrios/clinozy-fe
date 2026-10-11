@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
+import { appInstant } from '@/shared/api/app/app-time.ts';
 import {
   taskRecord,
   TEST_TASK_CONTACT_ID,
@@ -15,7 +15,7 @@ import {
   whatsNextMissing,
 } from './whats-next-form.ts';
 
-const NOW = new Date(clinicInstant('2026-10-03', '10:00'));
+const NOW = new Date(appInstant('2026-10-03', '10:00'));
 const ME = 'mem_yls33gz5jj66ful8q4ads';
 const context = {
   closed: taskRecord(),
@@ -59,7 +59,7 @@ describe('the What’s next form (H:4054)', () => {
     expect(whatsNextFieldsOf(form, context)).toEqual({
       title: 'Call again · Anaya',
       why: 'Planned after: Reply to Anaya · Booked a visit',
-      dueAt: clinicInstant('2026-10-04', '11:00'),
+      dueAt: appInstant('2026-10-04', '11:00'),
       assignee: { membershipId: ME },
       priority: 'normal',
       contactId: TEST_TASK_CONTACT_ID,

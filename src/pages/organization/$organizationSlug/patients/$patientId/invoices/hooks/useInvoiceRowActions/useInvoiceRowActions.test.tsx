@@ -2,10 +2,10 @@ import { act, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
-import type * as InvoicesApiModule from '@/shared/api/clinic/invoices-api.ts';
-import { fetchInvoice } from '@/shared/api/clinic/invoices-api.ts';
-import type { InvoiceRecord } from '@/shared/api/clinic/invoices-contracts.ts';
-import { CROSS_ROOM_PARAM } from '@/shared/clinic/clinic-referrer.ts';
+import type * as InvoicesApiModule from '@/shared/api/app/invoices-api.ts';
+import { fetchInvoice } from '@/shared/api/app/invoices-api.ts';
+import type { InvoiceRecord } from '@/shared/api/app/invoices-contracts.ts';
+import { CROSS_ROOM_PARAM } from '@/shared/app/app-referrer.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { usePaymentAccess } from '@/shared/hooks/usePaymentAccess/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
@@ -36,7 +36,7 @@ vi.mock('@/shared/components/PrintTemplate/print-document.ts', () => ({
   printDocument: printMock,
   PRINTING_ATTRIBUTE: 'data-printing',
 }));
-vi.mock('@/shared/api/clinic/invoices-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/invoices-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof InvoicesApiModule>()),
   fetchInvoice: vi.fn(),
 }));

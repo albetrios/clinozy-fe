@@ -1,17 +1,17 @@
 import type { TFunction } from 'i18next';
 
 import { isolateJoin } from '@/lib/bidi-isolate.ts';
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
 import type {
   ChatMessage,
   ChatThread,
   ChatWhen,
   ContactHistoryEntry,
-} from '@/shared/api/clinic/messages-contracts.ts';
-import { CLINIC_KEYS } from '@/shared/clinic/clinic.constants.ts';
-import { APPOINTMENT_STATUS_TONES } from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/api/app/messages-contracts.ts';
+import { APP_KEYS } from '@/shared/app/app.constants.ts';
+import { APPOINTMENT_STATUS_TONES } from '@/shared/app/app-tones.ts';
 import { shortPersonName } from '@/shared/components/Cells/PersonAvatar/index.ts';
-import type { ClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import type { AppClock } from '@/shared/hooks/useAppClock/index.ts';
 import type { OutboxMessage } from '@/shared/hooks/useThread/index.ts';
 import {
   type AppIcon,
@@ -49,12 +49,12 @@ export interface HistoryChip {
   target: ChatHistoryTarget | null;
 }
 
-/** How a chat reads dates — the clinic clock (`useClinicClock`). */
-export type ChatClock = ClinicClock;
+/** How a chat reads dates — the clinic clock (`useAppClock`). */
+export type ChatClock = AppClock;
 
-/** What the thread's strings need: the `clinic` translator, money and time. */
+/** What the thread's strings need: the `app` translator, money and time. */
 export interface ChatFormat {
-  /** Translates `clinic` keys in the screen's language. */
+  /** Translates `app` keys in the screen's language. */
   t: TFunction;
   /** Paise as clinic money ("₹4,800"). */
   money: (paise: number) => string;
@@ -65,7 +65,7 @@ export interface ChatFormat {
 
 /**
  * A history chip's or the divider's time by the rooms' one rule
- * (`ClinicClock.moment`; `_patterns.md:193`): "Today 4:00 pm", "Yesterday
+ * (`AppClock.moment`; `_patterns.md:193`): "Today 4:00 pm", "Yesterday
  * 9:10 am", "Fri 4:00 pm", "24 Sep 4:00 pm"; ahead "Tomorrow 11:00 am", "9 Oct
  * 4:00 pm" — and the day alone for a record the contract dates without a
  * clock time ("Today", "24 Sep"). A message keeps today's bare time.
@@ -102,7 +102,7 @@ const HISTORY_PARTS: {
   appointment: (entry, { t }) => [
     t(keys.history.appointment, { seq: entry.seq }),
     entry.service,
-    t(CLINIC_KEYS.appointments.statuses[entry.status]),
+    t(APP_KEYS.appointments.statuses[entry.status]),
     nameOf(entry.doctorName),
   ],
   reminder: (entry, { t, clock }) => [
@@ -122,7 +122,7 @@ const HISTORY_PARTS: {
   ],
   invoice: (entry, format) => [
     format.t(keys.history.invoice, {
-      type: format.t(CLINIC_KEYS.invoiceTypes[entry.type]),
+      type: format.t(APP_KEYS.invoiceTypes[entry.type]),
       seq: entry.seq,
     }),
     moneyOf(format, entry.bill),
@@ -134,25 +134,25 @@ const HISTORY_PARTS: {
     format.t(entry.refund ? keys.history.refund : keys.history.received, {
       amount: moneyOf(format, entry.amount),
     }),
-    entry.modes.map((mode) => format.t(CLINIC_KEYS.paymentModes[mode])).join(' + '),
+    entry.modes.map((mode) => format.t(APP_KEYS.paymentModes[mode])).join(' + '),
     entry.invoiceSeq !== null &&
       format.t(keys.history.invoiceRef, { seq: entry.invoiceSeq }),
   ],
   checkIn: (entry, { t }) => [
     t(keys.history.checkIn),
-    t(CLINIC_KEYS.checkInFeels[entry.feel]),
+    t(APP_KEYS.checkInFeels[entry.feel]),
     entry.score !== null && t(keys.history.score, { score: entry.score }),
     entry.context !== null && t(keys.history.after, { context: entry.context }),
   ],
   review: (entry, { t }) => [
-    t(keys.history.review, { source: t(CLINIC_KEYS.reviewSources[entry.source]) }),
+    t(keys.history.review, { source: t(APP_KEYS.reviewSources[entry.source]) }),
     entry.rating !== null && t(keys.history.rating, { rating: entry.rating }),
   ],
   task: (entry, { t }) => [
     t(keys.history.task, {
       title: entry.title,
       // The server's result ("Booked a visit"), else the contract outcome's label.
-      result: entry.result ?? t(CLINIC_KEYS.taskOutcomes[entry.outcome]),
+      result: entry.result ?? t(APP_KEYS.taskOutcomes[entry.outcome]),
     }),
   ],
 };
@@ -189,7 +189,7 @@ export function threadDivider(
   if (thread && thread.kind !== 'contact_thread') {
     return t(keys.created.lead, {
       time: clock.moment(thread.createdAt),
-      source: thread.source ? t(CLINIC_KEYS.leads.sources[thread.source]) : '—',
+      source: thread.source ? t(APP_KEYS.leads.sources[thread.source]) : '—',
     });
   }
   return t(

@@ -1,7 +1,7 @@
 import type { FieldValues } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import type { MedicineRow } from '@/shared/api/clinic/medicines-contracts.ts';
+import type { MedicineRow } from '@/shared/api/app/medicines-contracts.ts';
 import type { PickerOption } from '@/shared/components/Picker/index.ts';
 import {
   type ItemsCellBinding,

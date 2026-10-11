@@ -3,7 +3,7 @@ import { renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
+import type { AppointmentRow } from '@/shared/api/app/appointments-contracts.ts';
 import { useDevicePrefsStore } from '@/shared/store/useDevicePrefsStore/index.ts';
 import { APPOINTMENT_NOW, appointmentRow } from '@/tests/utils/appointment-doubles.ts';
 import { TEST_CONTACT_ID, TEST_PATIENT_ID } from '@/tests/utils/patient-doubles.ts';

@@ -2,8 +2,8 @@ import { type FieldValues, useController } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type { RxTiming } from '@/shared/api/clinic/clinic-schema.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import type { RxTiming } from '@/shared/api/app/app-schema.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
 import type { ItemsCellBinding } from '@/shared/forms/ItemsField/index.ts';
 import { ChevronDown } from '@/shared/icons/index.ts';

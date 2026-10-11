@@ -14,7 +14,7 @@ export const manifest = {
   title: 'New invoice',
   testId: 'invoice-drawer',
   permission: 'organization:read',
-  module: 'clinic-payments',
+  module: 'app-payments',
   kind: 'leaf',
   children: [],
 } as const satisfies PageManifest;

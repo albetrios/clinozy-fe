@@ -1,0 +1,1408 @@
+{
+  "sections": {
+    "today": {
+      "label": "Hoje",
+      "description": "A clínica agora: chegadas, em espera, com o médico, saída"
+    },
+    "leads": {
+      "label": "Leads",
+      "description": "Contatos e suas conversas, até se tornarem pacientes"
+    },
+    "appointments": {
+      "label": "Consultas",
+      "description": "Agendamentos por médico, sala e equipamento"
+    },
+    "patients": {
+      "label": "Pacientes",
+      "description": "Pacientes cadastrados, com receitas, sessões e fotos"
+    },
+    "medical": {
+      "label": "Farmácia",
+      "description": "A farmácia: medicamentos à venda, fornecedores, representantes, compras, vendas"
+    },
+    "stock": {
+      "label": "Estoque da clínica",
+      "description": "Insumos e equipamentos da clínica usados nos procedimentos · não são vendidos"
+    },
+    "payments": {
+      "label": "Pagamentos",
+      "description": "Recebimentos, faturas e valores em aberto"
+    },
+    "tasks": {
+      "label": "Tarefas",
+      "description": "Acompanhamentos, ligações de feedback e lembretes, com responsável e prazo"
+    },
+    "offerings": {
+      "label": "Serviços",
+      "description": "O que a clínica vende: serviços, pacotes, ofertas e preços"
+    },
+    "users": {
+      "label": "Usuários",
+      "description": "Equipe, funções e acesso, unidades"
+    }
+  },
+  "tones": {
+    "butter": "Manteiga",
+    "lav": "Lavanda",
+    "sky": "Céu",
+    "sage": "Sálvia",
+    "blush": "Rosado",
+    "mint": "Menta",
+    "peach": "Pêssego",
+    "plum": "Ameixa",
+    "lime": "Lima",
+    "slate": "Ardósia",
+    "stone": "Pedra"
+  },
+  "roles": {
+    "admin": "Administrador",
+    "doctor": "Médico",
+    "therapist": "Terapeuta",
+    "front_desk": "Recepção",
+    "counsellor": "Consultor",
+    "pharmacist": "Farmacêutico",
+    "accountant": "Contador",
+    "marketing": "Marketing",
+    "owner": "Proprietário"
+  },
+  "leads": {
+    "statuses": {
+      "new": "Novo",
+      "contacted": "Contatado",
+      "follow_up": "Acompanhamento",
+      "clinic_visited": "Visitou a clínica",
+      "no_response": "Sem resposta",
+      "not_interested": "Sem interesse",
+      "invalid": "Inválido",
+      "lost": "Perdido"
+    },
+    "retargeted": "Reativado",
+    "sources": {
+      "instagram": "Instagram",
+      "google": "Google",
+      "whatsapp": "WhatsApp",
+      "facebook": "Facebook",
+      "walk_in": "Sem agendamento",
+      "referral": "Indicação",
+      "retarget": "Reativação",
+      "phone_call": "Ligação telefônica"
+    },
+    "interests": {
+      "others": "Outros",
+      "clinical": "Clínico",
+      "peel": "Peeling",
+      "lhr": "LHR",
+      "hydrafacial": "Hydrafacial",
+      "prp": "PRP"
+    }
+  },
+  "appointments": {
+    "statuses": {
+      "scheduled": "Agendada",
+      "confirmed": "Confirmada",
+      "checked_in": "Chegou",
+      "completed": "Concluída",
+      "cancelled": "Cancelada",
+      "no_show": "Não compareceu"
+    },
+    "moves": {
+      "reschedule": "Mover para outro horário",
+      "cancelled": "Cancelar"
+    },
+    "moveHints": {
+      "scheduled": "Horário reservado · pedido de confirmação enviado no WhatsApp",
+      "confirmed": "Disseram sim · uma resposta «Sim» no WhatsApp marca isto automaticamente",
+      "checked_in": "Chegaram · só no dia",
+      "completed": "Visita feita · normalmente marcada pela visita",
+      "reschedule": "Mover para um novo horário · mesma consulta, o horário antigo fica no histórico",
+      "cancelled": "Libera o horário e para os lembretes",
+      "no_show": "Só depois do horário de início"
+    },
+    "guards": {
+      "final": "Status final. Use Remarcar para criar uma nova consulta.",
+      "visitDay": "Só {{day}}",
+      "beforeStart": "Disponível após {{time}} · {{day}}",
+      "needsPatient": "Crie primeiro a ficha do paciente · Concluída exige um paciente"
+    },
+    "nextActions": {
+      "check_in": "Fazer check-in",
+      "confirm": "Confirmar",
+      "complete": "Concluir",
+      "rebook": "Remarcar"
+    },
+    "tiles": {
+      "booked": "Reservada",
+      "said_yes": "Disseram sim",
+      "visit_day": "Disponível no dia da consulta",
+      "after_check_in": "Após o check-in"
+    },
+    "hints": {
+      "scheduled": "Horário reservado · o WhatsApp pede confirmação, uma resposta «Sim» confirma",
+      "confirmed": "Já confirmada por ligação · o lembrete é enviado",
+      "checked_in": "O paciente está na clínica · fila do médico avisada · marque Concluída ao terminar",
+      "completed": "Visita feita · amanhã sai uma tarefa de feedback",
+      "needs_patient": "Crie a ficha do paciente para concluir esta visita",
+      "cancelled": "Restaure para recuperá-la · enquanto isso o horário fica livre para outros",
+      "closed": "Esta consulta está encerrada · {{status}}"
+    },
+    "cancelReasons": {
+      "patient_asked": "O paciente pediu",
+      "unreachable": "Não foi possível contatar o paciente",
+      "doctor_unavailable": "Médico indisponível",
+      "resource_unavailable": "Máquina ou sala indisponível",
+      "rescheduling_later": "Vai remarcar depois",
+      "booked_by_mistake": "Agendada por engano",
+      "other": "Outro"
+    },
+    "cancelSides": {
+      "patient": "PACIENTE",
+      "clinic": "CLÍNICA"
+    },
+    "cancelConfirm": {
+      "title": "Cancelar esta consulta?",
+      "record": "{{name}} · {{service}}",
+      "effect": "O horário é liberado e os lembretes param. Você pode restaurá-la até o horário passar.",
+      "action": "Cancelar"
+    },
+    "formCancelReasons": {
+      "patient_cancelled": "O paciente cancelou",
+      "rescheduling_later": "Vai remarcar depois",
+      "doctor_unavailable": "Médico indisponível",
+      "booked_by_mistake": "Agendada por engano",
+      "other": "Outro"
+    },
+    "toasts": {
+      "booked": "Agendada {{id}} · {{day}} {{time}} · pedido de confirmação enviado no WhatsApp",
+      "bookedQueued": "Agendada {{id}} · {{day}} {{time}} · lembrete na fila",
+      "bookedOnly": "Agendada {{id}} · {{day}} {{time}}",
+      "moved": "{{id}} movida para {{day}} {{time}} · pedido de confirmação enviado",
+      "movedOnly": "{{id}} movida para {{day}} {{time}}",
+      "updated": "{{id}} atualizada",
+      "statusChanged": "{{name}} → {{status}}",
+      "statusConfirmed": "{{name}} → {{status}} · lembrete na fila",
+      "statusCancelled": "{{name}} → {{status}} · {{reason}} · horário liberado, lembretes parados",
+      "cancelled": "Consulta {{id}} cancelada",
+      "restored": "Consulta restaurada · o lembrete é enviado novamente"
+    }
+  },
+  "offerings": {
+    "categories": {
+      "consultation": "Consulta",
+      "treatment": "Tratamento",
+      "package": "Pacote",
+      "lhr": "LHR",
+      "product": "Produto"
+    },
+    "offerKinds": {
+      "percent": "% de desconto",
+      "amount": "₹ de desconto",
+      "fixed": "Preço fixo",
+      "extra": "Sessões extras"
+    },
+    "offerStates": {
+      "live": "Ativa",
+      "scheduled": "Agendada",
+      "paused": "Pausada",
+      "ended": "Encerrada"
+    },
+    "toasts": {
+      "offeringCreated": "Serviço {{id}} criado",
+      "offeringSaved": "Serviço {{id}} salvo",
+      "offeringRemoved": "Serviço {{id}} removido",
+      "offerCreated": "{{name}} criada · aplica-se automaticamente",
+      "offerSaved": "{{name}} salva",
+      "offerRemoved": "{{name}} removida",
+      "offerPaused": "{{name}} pausada",
+      "offerResumed": "{{name}} ativa novamente"
+    },
+    "specialties": {
+      "skin": "Pele",
+      "hair": "Cabelo",
+      "dental": "Odontologia",
+      "gynac": "Ginecologia",
+      "physio": "Fisioterapia",
+      "general": "Geral"
+    }
+  },
+  "patients": {
+    "types": {
+      "aesthetic": "Estética",
+      "clinical": "Clínica",
+      "lhr": "LHR",
+      "dental": "Odontologia",
+      "physio": "Fisio",
+      "gynac": "Ginecologia"
+    },
+    "statuses": {
+      "new": "Novo",
+      "regular": "Regular",
+      "vip": "VIP",
+      "inactive": "Inativo"
+    },
+    "conversions": {
+      "converted": "T-Convertido",
+      "not_converted": "T-Não convertido"
+    },
+    "referralSources": {
+      "patient": "Paciente",
+      "doctor": "Médico",
+      "instagram": "Instagram",
+      "google": "Google",
+      "walk_in": "Sem agendamento",
+      "other": "Outro"
+    }
+  },
+  "visits": {
+    "record": "Visita"
+  },
+  "patientDelete": {
+    "title": "Excluir este paciente?",
+    "titleRecord": "Excluir este registro?",
+    "removed": "{{name}} removido"
+  },
+  "patientDrawer": {
+    "title": {
+      "create": "Novo paciente",
+      "edit": "Editar paciente"
+    },
+    "sub": {
+      "full": "Também cria ou atualiza o contato",
+      "quick": "O que a clínica precisa antes de concluir uma visita"
+    },
+    "quickFill": {
+      "walkIn": "Sem agendamento hoje",
+      "referred": "Indicado por paciente",
+      "instagram": "Pelo Instagram",
+      "lhr": "Paciente LHR"
+    },
+    "steps": {
+      "contact": "Contato e dados pessoais",
+      "clinic": "Clínica, indicação e retorno"
+    },
+    "groups": {
+      "contact": "Contato",
+      "personal": "Dados pessoais",
+      "clinic": "Clínica",
+      "referral": "Indicação e retorno"
+    },
+    "fields": {
+      "firstName": "Nome",
+      "lastName": "Sobrenome",
+      "mobile": "Celular",
+      "mobileHint": "principal · WhatsApp",
+      "phone2": "Celular secundário",
+      "phone2Hint": "10 dígitos",
+      "address": "Endereço",
+      "addressPlaceholder": "Bairro, cidade",
+      "homeBranch": "Unidade de origem",
+      "gender": "Gênero",
+      "birthDate": "Data de nascimento",
+      "age": "Idade {{age}}",
+      "types": "Tipo de paciente",
+      "typesHint": "escolha quantos quiser",
+      "status": "Status",
+      "conversion": "Conversão",
+      "referredBy": "Indicado por",
+      "referredByPlaceholder": "Nome",
+      "referrerType": "Tipo de indicação",
+      "followUp": "Retorno",
+      "followUpDate": "Data do retorno",
+      "followUpTime": "Hora do retorno",
+      "notes": "Observações",
+      "notesPlaceholder": "O que a equipe deve saber",
+      "consent": "Consentimento",
+      "consentHint": "o que foi assinado",
+      "photos": "Primeiras fotos",
+      "photosHint": "fotos de antes · arquivadas na visita de hoje",
+      "photosDrop": "Tire ou arraste fotos",
+      "photosLimit": "JPG ou PNG · até {{limit}} cada",
+      "photosRemove": "Remover {{name}}"
+    },
+    "followUpQuick": {
+      "tomorrow": "Amanhã {{time}}",
+      "week": "Em 1 semana",
+      "twentyDays": "20 dias",
+      "month": "1 mês"
+    },
+    "save": {
+      "create": "Criar paciente",
+      "edit": "Salvar alterações",
+      "createAnother": "Criar e adicionar outro"
+    },
+    "missing": "Adicione nome e celular",
+    "mobileInvalid": "Digite um celular de 10 dígitos",
+    "created": "Paciente {{id}} criado",
+    "openFile": "Abrir ficha",
+    "saved": "Alterações de {{name}} salvas",
+    "registered": "Ficha de paciente {{id}} criada para {{name}}",
+    "registeredPhotos_one": "Ficha de paciente {{id}} criada para {{name}} · {{count}} foto arquivada",
+    "registeredPhotos_many": "Ficha de paciente {{id}} criada para {{name}} · {{count}} fotos arquivadas",
+    "registeredPhotos_other": "Ficha de paciente {{id}} criada para {{name}} · {{count}} fotos arquivadas",
+    "duplicate": "Mesmo celular de {{name}} · {{id}}",
+    "useExisting": "Usar o existente",
+    "summaryEmpty": "Novo paciente",
+    "knownPerson": "{{name}} já está nos seus contatos · a ficha abre no nome dessa pessoa"
+  },
+  "recordDrawer": {
+    "cancel": "Cancelar",
+    "back": "Voltar",
+    "close": "Fechar",
+    "save": "Salvar",
+    "saving": "Salvando…",
+    "retrySave": "Tentar salvar de novo",
+    "saveAndAdd": "Salvar e adicionar outro",
+    "delete": "Excluir",
+    "notSaved": "Não salvo · suas alterações foram mantidas",
+    "saveFailed": "Não foi possível salvar · conexão perdida. Tudo o que você digitou continua aqui.",
+    "readOnly": "Somente visualização · sua função não pode alterar isto",
+    "quickFill": "Preenchimento rápido",
+    "step": {
+      "next": "Próximo: {{step}} →",
+      "edit": "Editar",
+      "open": "Abrir",
+      "missing": "Faltando: {{fields, list(type: unit)}}",
+      "notFilled": "Ainda não preenchido"
+    },
+    "peek": {
+      "empty": "Vazio",
+      "added_one": "{{count}} adicionado",
+      "added_many": "{{count}} adicionados",
+      "added_other": "{{count}} adicionados",
+      "noneYet": "Nenhum ainda"
+    },
+    "stepper": {
+      "decrease": "Diminuir",
+      "increase": "Aumentar"
+    },
+    "colours": {
+      "butter": "Manteiga",
+      "lav": "Lavanda",
+      "sky": "Azul-céu",
+      "sage": "Sálvia",
+      "blush": "Rosa-claro",
+      "mint": "Menta",
+      "peach": "Pêssego",
+      "plum": "Ameixa",
+      "lime": "Lima",
+      "slate": "Ardósia",
+      "stone": "Pedra"
+    },
+    "currency": "₹"
+  },
+  "personCard": {
+    "contactLabel": "Contato",
+    "openPatientFile": "Abrir ficha do paciente",
+    "since": "Desde {{date}}",
+    "leadSince": "Lead desde {{date}}",
+    "kind": {
+      "patient": "Paciente",
+      "lead": "Lead",
+      "contact": "Contato"
+    },
+    "editContact": "Editar contato",
+    "changeContact": "Trocar contato",
+    "changeContactHint": "Escolher outro contato",
+    "reach": "Contatos",
+    "team": "Equipe",
+    "about": "Sobre",
+    "reachSub": {
+      "whatsappPrimary": "WhatsApp · principal",
+      "whatsappAlternate": "WhatsApp · alternativo",
+      "phonePrimary": "Telefone · principal",
+      "phoneAlternate": "Telefone · alternativo",
+      "instagram": "Instagram"
+    },
+    "whatsApp": "WhatsApp",
+    "call": "Ligar",
+    "openInstagram": "Abrir Instagram",
+    "copy": "Copiar",
+    "copied": "{{value}} copiado",
+    "noReach": "Nenhum telefone ou perfil salvo ainda",
+    "claim": "Aberto · Assumir",
+    "claimHint": "Há um lead aberto com esta pessoa · assuma-o",
+    "gender": {
+      "female": "Feminino",
+      "male": "Masculino",
+      "other": "Outro"
+    },
+    "genderAge": "{{gender}} · {{age}} anos",
+    "age": "{{age}} anos",
+    "cameVia": "Veio por {{source}}",
+    "owedToThem": "{{amount}} a devolver",
+    "owedByThem": "{{amount}} devidos à clínica",
+    "reviews_one": "{{count}} avaliação · última {{rating}}★ no {{source}} · {{date}}",
+    "reviews_many": "{{count}} de avaliações · última {{rating}}★ no {{source}} · {{date}}",
+    "reviews_other": "{{count}} avaliações · última {{rating}}★ no {{source}} · {{date}}",
+    "consent": {
+      "data": "Dados",
+      "photos": "Fotos",
+      "marketing": "Marketing",
+      "hint": "Consentimento · {{label}}",
+      "given": "{{label}}: consentimento dado",
+      "missing": "{{label}}: sem consentimento"
+    },
+    "newLead": "+ Lead",
+    "newLeadHint": "Nova solicitação para este contato",
+    "newAppointment": "+ Consulta",
+    "newAppointmentHint": "Agendar para este contato",
+    "newPatient": "+ Paciente",
+    "newPatientHint": "Criar uma ficha de paciente para este contato",
+    "online": "Online agora",
+    "offline": "Offline",
+    "memberKind": {
+      "assigned": "Atribuído",
+      "sentThis": "Enviou isto",
+      "treating": "Em tratamento",
+      "involved": "Envolvido"
+    },
+    "assignToYourself": "Atribuir a mim",
+    "works": "Trabalha {{from}} – {{to}}",
+    "updated": "Atualizado às {{time}}",
+    "fetching": "Buscando o mais recente…"
+  },
+  "reasonConfirm": {
+    "keep": "Manter",
+    "reason": "Motivo",
+    "note": "Nota",
+    "notePlaceholder": "Adicione uma nota (opcional)",
+    "noteRequired": "Diga à equipe o porquê (obrigatório)",
+    "hintPickReason": "Escolha um motivo para continuar",
+    "hintAddNote": "Adicione uma nota curta para “Outro”",
+    "kinds": {
+      "delete": {
+        "action": "Excluir",
+        "effect": "Some das listas e dos seletores. Você pode desfazer pelo aviso logo em seguida."
+      },
+      "cancel": {
+        "action": "Cancelar pedido",
+        "effect": "O pedido para aqui. Estoque e contas a pagar ao fornecedor não mudam."
+      },
+      "void": {
+        "action": "Anular venda",
+        "effect": "A venda é anulada e a fatura, cancelada. O estoque volta."
+      }
+    },
+    "reasons": {
+      "mistake": "Criado por engano",
+      "duplicate": "Duplicado",
+      "notNeeded": "Não é mais necessário",
+      "other": "Outro",
+      "orderedByMistake": "Pedido por engano",
+      "supplierCantDeliver": "O fornecedor não consegue entregar",
+      "priceChanged": "O preço mudou",
+      "billedByMistake": "Cobrado por engano",
+      "wrongItems": "Itens errados",
+      "customerChangedMind": "O cliente mudou de ideia"
+    }
+  },
+  "itemsField": {
+    "addRow": "Adicionar linha",
+    "removeRow": "Remover linha",
+    "remove": "Remover",
+    "decrease": "Diminuir",
+    "increase": "Aumentar",
+    "note": "Nota",
+    "notePlaceholder": "Observações",
+    "moneyPlaceholder": "₹ 0"
+  },
+  "roomToolbar": {
+    "more": "Mais",
+    "moreSections": "Mais seções",
+    "searchTitle": "Pesquisar · pressione /",
+    "moreCreate": "Mais ações de criação"
+  },
+  "filters": {
+    "title": "Filtros",
+    "appliedCount": "{{count}} aplicados",
+    "clearAll": "Limpar tudo",
+    "clearAllFilters": "Limpar todos os filtros",
+    "apply": "Aplicar filtro",
+    "saveView": "Salvar como visualização",
+    "savedView": "Salva como visualização",
+    "viewSaved": "Visualização “{{name}}” salva",
+    "any": "Qualquer",
+    "from": "De",
+    "to": "Até",
+    "created": {
+      "label": "Criado",
+      "today": "Hoje",
+      "yesterday": "Ontem",
+      "lastSevenDays": "Últimos 7 dias",
+      "lastThirtyDays": "Últimos 30 dias",
+      "thisMonth": "Este mês",
+      "range": "Período personalizado"
+    },
+    "followUp": {
+      "label": "Data de retorno",
+      "overdue": "Atrasado",
+      "today": "Hoje",
+      "tomorrow": "Amanhã",
+      "nextSevenDays": "Próximos 7 dias",
+      "notSet": "Não definida",
+      "range": "Período personalizado"
+    }
+  },
+  "commandMenu": {
+    "results": "Resultados",
+    "groups": {
+      "actions": "Ações",
+      "goTo": "Ir para",
+      "people": "Pessoas"
+    },
+    "actions": {
+      "newLead": "Novo lead",
+      "newAppointment": "Nova consulta",
+      "newPatient": "Novo paciente",
+      "newReceipt": "Novo recebimento",
+      "openTasks": "Abrir tarefas"
+    },
+    "screen": "Tela",
+    "move": "mover",
+    "open": "abrir",
+    "hint": "Digite 3+ letras ou 4+ dígitos para pesquisar pessoas",
+    "empty": "Nenhum resultado. Tente um nome, telefone ou número C.",
+    "personSub": "{{id}} · •••• {{lastDigits}}"
+  },
+  "lists": {
+    "loadError": "Não foi possível carregar esta lista · conexão perdida. Mostrando a última cópia.",
+    "retry": "Tentar novamente"
+  },
+  "clock": {
+    "todayTime": "Hoje {{time}}",
+    "dayTime": "{{day}} {{time}}"
+  },
+  "channels": {
+    "whatsapp": "WhatsApp",
+    "call": "Ligação",
+    "sms": "SMS",
+    "instagram": "Instagram",
+    "email": "E-mail",
+    "note": "Nota"
+  },
+  "checkInFeels": {
+    "much_better": "Muito melhor",
+    "better": "Melhor",
+    "same": "Igual",
+    "worse": "Pior"
+  },
+  "reviewSources": {
+    "google": "Google",
+    "video": "Vídeo",
+    "instagram": "Instagram",
+    "internal_form": "Formulário de feedback",
+    "whatsapp": "WhatsApp"
+  },
+  "paymentModes": {
+    "cash": "Dinheiro",
+    "upi": "UPI",
+    "card": "Cartão",
+    "credit": "Crédito"
+  },
+  "invoiceTypes": {
+    "clinic": "Clínica",
+    "medical": "Médica",
+    "consultation": "Consulta"
+  },
+  "invoiceStatuses": {
+    "paid": "Paga",
+    "partial": "Paga em parte",
+    "unpaid": "Em aberto"
+  },
+  "taskOutcomes": {
+    "log_check_in": "Registrar acompanhamento",
+    "doing_well": "Está bem",
+    "no_answer": "Sem resposta",
+    "happy": "Satisfeito",
+    "done": "Concluído"
+  },
+  "chatColumn": {
+    "thread": "Mensagens",
+    "separator": " · ",
+    "created": {
+      "lead": "Lead criado · {{time}} · via {{source}}",
+      "patientThread": "Paciente · só chat · sem lead",
+      "contactThread": "Contato · só chat · sem lead"
+    },
+    "history": {
+      "appointment": "Consulta #{{seq}}",
+      "reminder": "Lembrete enviado",
+      "prescription": "Receita #{{seq}}",
+      "session": "sessão {{session}}",
+      "invoice": "Fatura ({{type}}) #{{seq}}",
+      "due": "{{amount}} em aberto",
+      "paid": "Paga",
+      "received": "{{amount}} recebido",
+      "refund": "Reembolso de {{amount}}",
+      "invoiceRef": "#{{seq}}",
+      "checkIn": "Acompanhamento",
+      "score": "{{score}}/10",
+      "after": "após {{context}}",
+      "review": "Avaliação no {{source}}",
+      "rating": "{{rating}}★",
+      "task": "Tarefa · {{title}} → {{result}}",
+      "masked": "₹ ••••"
+    },
+    "delivery": {
+      "sending": "Enviando…",
+      "sent": "Enviada",
+      "delivered": "Entregue",
+      "read": "Lida",
+      "queued": "Na fila",
+      "notSent": "Não enviada",
+      "retry": "Tentar de novo"
+    },
+    "sender": {
+      "call": "{{name}} · ligação",
+      "note": "{{name}} · nota"
+    },
+    "empty": {
+      "title": "Ainda não há conversa",
+      "visit": "O {{service}} de {{first}} é {{when}} às {{time}} · um WhatsApp rápido garante o horário",
+      "pastVisits": "Cada WhatsApp, ligação e nota com {{first}} aparece aqui",
+      "noVisits": "Comece com um WhatsApp · as respostas chegam aqui",
+      "today": "hoje",
+      "tomorrow": "amanhã",
+      "onDate": "em {{date}}"
+    },
+    "starters": {
+      "onTheWay": "Já está a caminho?",
+      "directions": "Enviar localização",
+      "newTime": "Oferecer outro horário",
+      "confirm": "Confirmar a visita",
+      "prep": "Instruções de preparo",
+      "howItWent": "Perguntar como foi",
+      "nextSession": "Agendar a próxima sessão",
+      "offer": "Compartilhar uma oferta",
+      "hello": "Dizer olá",
+      "consultation": "Oferecer uma consulta"
+    },
+    "sendVia": "Enviar por",
+    "modes": {
+      "whatsapp": "WhatsApp",
+      "instagram": "Instagram",
+      "call": "Registro de ligação",
+      "note": "Nota"
+    },
+    "noInstagram": "Este contato não tem Instagram",
+    "message": "Mensagem",
+    "placeholder": {
+      "message": "Mensagem para {{first}} no {{channel}}",
+      "messageNoName": "Mensagem para o lead no {{channel}}",
+      "note": "Nota para a equipe, não enviada para {{first}}",
+      "noteNoName": "Nota para a equipe, não enviada para o lead",
+      "call": "O que aconteceu na ligação?"
+    },
+    "send": {
+      "whatsapp": "Enviar WhatsApp",
+      "instagram": "Enviar Instagram",
+      "call": "Registrar ligação",
+      "note": "Adicionar nota"
+    },
+    "replyHint": "{{first}} escreveu aqui por último",
+    "mismatch": "{{first}} escreveu no {{channel}} · Trocar",
+    "outage": "WhatsApp fora do ar · as respostas ficarão na fila",
+    "prefersNoCalls": "Prefere não receber ligações · envie mensagem",
+    "prefersAfterSix": "Prefere contato depois das 18h",
+    "suggest": "Sugerir",
+    "suggestions": "Sugestões",
+    "suggestHint": "Sugestões e modelos · ou digite /",
+    "book": "Agendar uma consulta",
+    "bookHint": "Agendar uma consulta · motivo tirado da mensagem",
+    "suggestedFor": "Sugestões para {{first}}",
+    "closeSuggestions": "Fechar sugestões",
+    "templatesLabel": "Modelos · digite / na caixa para buscar",
+    "noTemplate": "Nenhum modelo corresponde a “{{query}}”",
+    "fillIn": "Preencher",
+    "chips": {
+      "price": "Informar preço",
+      "priceHint": "Perguntou o preço",
+      "slots": "Oferecer 2 horários",
+      "slotsHint": "Perguntou o horário",
+      "location": "Enviar localização",
+      "explain": "Explicar {{term}}",
+      "greet": "Cumprimentar",
+      "followUp": "Fazer follow-up"
+    },
+    "templates": {
+      "greeting": "Saudação",
+      "price": "Preço",
+      "slots": "Horários livres",
+      "location": "Localização",
+      "reminder": "Lembrete",
+      "aftercare": "Cuidados pós-tratamento",
+      "followUp": "Follow-up",
+      "review": "Avaliação"
+    },
+    "content": {
+      "starters": {
+        "onTheWay": "Olá, {{first}}! Estamos prontos para o seu {{service}} às {{time}}. Já está a caminho?",
+        "directionsToday": "Olá, {{first}}! Aqui está a localização da clínica: {{maps}}. Até às {{time}}!",
+        "newTime": "Olá, {{first}}! Se {{time}} não der certo hoje, responda com um horário melhor e nós remarcamos.",
+        "confirm": "Olá, {{first}}! Lembrete do seu {{service}} {{when}} às {{time}}. Responda Sim para confirmar.",
+        "prep": "Olá, {{first}}! Antes do seu {{service}} {{when}}: venha sem maquiagem e evite o sol por 24 horas. Até às {{time}}!",
+        "directionsLater": "Olá, {{first}}! Aqui está a localização da clínica: {{maps}}. Nos vemos {{when}} às {{time}}.",
+        "howItWent": "Olá, {{first}}! Como está a pele depois da última visita? Alguma dúvida para o médico?",
+        "nextSession": "Olá, {{first}}! Vamos agendar a sua próxima sessão? Responda com um dia que seja bom para você.",
+        "offer": "Olá, {{first}}! Este mês temos uma oferta no seu tratamento de sempre. Quer os detalhes?",
+        "hello": "Olá, {{first}}! Aqui é {{me}}, da {{clinic}}. Fico à disposição para o que precisar.",
+        "consultation": "Olá, {{first}}! Nosso médico pode atender você esta semana. Agendo uma consulta?",
+        "directions": "Olá, {{first}}! Aqui está a localização da clínica: {{maps}}."
+      },
+      "templates": {
+        "greeting": "Olá, {{first}}! Aqui é {{me}}, da {{clinic}} 😊 Como posso ajudar hoje?",
+        "price": "{{offering}} custa {{price}}. Inclui uma consulta com o médico. Posso agendar para você?",
+        "priceSessions": "{{offering}} custa {{price}} por {{sessions}} sessões. Inclui uma consulta com o médico. Posso agendar para você?",
+        "slots": "Temos {{slots}} livres para {{interest}}. Qual fica melhor?",
+        "location": "Estamos em {{address}} · Google Maps: {{maps}}. Há estacionamento bem em frente.",
+        "reminder": "Olá, {{first}}! Lembrete da sua visita {{dayTime}}. Responda Sim para confirmar ou nos diga um horário melhor.",
+        "aftercare": "Olá, {{first}}! Como está a pele hoje? Mantenha-a hidratada, use protetor solar e evite esfoliantes por 48 horas.",
+        "followUp": "Olá, {{first}}! Passando para falar sobre {{interest}}. Quer que eu reserve um horário para você esta semana?",
+        "review": "Obrigado pela visita, {{first}}! Se gostou, uma avaliação rápida no Google nos ajuda muito: {{reviewLink}}"
+      },
+      "explain": "Ótima pergunta! {{offering}} funciona bem para isso — a maioria vê resultados em {{results}}. O médico vai avaliar e planejar tudo na sua consulta.",
+      "sessions": "{{n}} sessões",
+      "fewWeeks": "algumas semanas",
+      "slotPair": "{{first}} ou {{second}}",
+      "slot": "{{day}} às {{time}}",
+      "dayTime": "{{day}} às {{time}}",
+      "dayTimeFallback": "amanhã às 11h",
+      "today": "hoje",
+      "tomorrow": "amanhã",
+      "onDate": "em {{date}}",
+      "there": "tudo bem",
+      "yourTreatment": "o seu tratamento",
+      "interests": {
+        "clinical": "Tratamento clínico",
+        "peel": "Peeling",
+        "lhr": "LHR",
+        "hydrafacial": "Hydrafacial",
+        "prp": "PRP"
+      },
+      "fill": {
+        "address": "endereço",
+        "maps": "link do Maps",
+        "dayTime": "dia e hora",
+        "reviewLink": "link de avaliação"
+      }
+    }
+  },
+  "offeringSuggestions": {
+    "title": "Sugestões de serviços",
+    "suggested_one": "{{count}} sugerido",
+    "suggested_many": "{{count}} sugeridos",
+    "suggested_other": "{{count}} sugeridos",
+    "planned_one": "{{count}} planejado",
+    "planned_many": "{{count}} planejados",
+    "planned_other": "{{count}} planejados",
+    "accepted_one": "{{count}} aceito",
+    "accepted_many": "{{count}} aceitos",
+    "accepted_other": "{{count}} aceitos",
+    "pastPurchases_one": "{{count}} compra anterior",
+    "pastPurchases_many": "{{count}} compras anteriores",
+    "pastPurchases_other": "{{count}} compras anteriores",
+    "ideas_one": "{{count}} ideia",
+    "ideas_many": "{{count}} ideias",
+    "ideas_other": "{{count}} ideias",
+    "nothingSuggested": "Nada sugerido ainda",
+    "noSuggestions": "Nenhuma sugestão ainda",
+    "pricesHidden": "Preços ocultos",
+    "masked": "₹ ••••",
+    "pricesHiddenHint": "Preços ocultos · use o olho para mostrar",
+    "showPrices": "Mostrar preços",
+    "hidePrices": "Ocultar preços",
+    "columns": {
+      "suggested": "Sugerido",
+      "qty": "Qtd.",
+      "price": "Preço",
+      "status": "Status"
+    },
+    "less": "Menos",
+    "more": "Mais",
+    "quantity": "Quantidade",
+    "finalPrice": "Preço final",
+    "belowFloor": "Abaixo do preço mínimo",
+    "tooMuchDiscount": "Desconto demais · peça a um administrador",
+    "details": "Detalhes do serviço",
+    "statuses": {
+      "planned": "Planejado",
+      "accepted": "Aceito",
+      "next_time": "Próxima vez",
+      "declined": "Recusado"
+    },
+    "statusHints": {
+      "planned": "Sugerido · ainda não decidido",
+      "accepted": "Concordaram · faturar quando acontecer",
+      "next_time": "Interessados · retomar na próxima visita",
+      "declined": "Sem interesse · mantido como registro"
+    },
+    "statusLabel": "Status · {{status}}",
+    "invoiced": "Faturado",
+    "invoicedOf": "Faturado · {{done}} de {{total}}",
+    "remove": "Remover",
+    "empty": "Nada sugerido para {{first}} ainda.",
+    "whyIdea": "Por que esta ideia",
+    "idea": "Ideia",
+    "add": "+ Adicionar",
+    "addNamed": "Adicionar {{name}}",
+    "addHint": "Adicionar às sugestões",
+    "addOffering": "Adicionar serviço",
+    "purchasesTitle": "Últimas compras de {{first}}",
+    "purchaseColumns": {
+      "date": "Data",
+      "bought": "Comprado",
+      "sessions": "Sessões"
+    },
+    "sessionsUsed": "{{used}} de {{total}} usadas",
+    "activityTitle": "Atividade do contato",
+    "openChat": "Abrir chat",
+    "activityColumns": {
+      "when": "Quando",
+      "channel": "Canal",
+      "message": "Mensagem",
+      "status": "Status"
+    },
+    "sent": "Enviada",
+    "got": "Recebida",
+    "removeConfirm": {
+      "title": "Remover este registro?",
+      "record": "{{name}} das sugestões",
+      "effect": "Ele sai das sugestões de serviços de {{first}}. Use “Recusado” para manter o registro de que foi oferecido.",
+      "reasons": {
+        "addedByMistake": "Adicionado por engano",
+        "duplicate": "Duplicado",
+        "planChanged": "O plano mudou",
+        "other": "Outro"
+      }
+    },
+    "searchOfferings": "Buscar serviços",
+    "single": "Avulso",
+    "minPrice": "mín. {{price}}",
+    "added": "{{name}} adicionado às sugestões de {{first}}",
+    "removed": "{{name}} removido das sugestões",
+    "offeringRemoved": "Serviço removido",
+    "info": {
+      "sessions_one": "{{count}} sessão",
+      "sessions_many": "{{count}} sessões",
+      "sessions_other": "{{count}} sessões",
+      "visits_one": "{{count}} visita",
+      "visits_many": "{{count}} visitas",
+      "visits_other": "{{count}} visitas",
+      "list": "Tabela {{price}}",
+      "lowest": "mínimo {{price}}"
+    },
+    "ideaReasons": {
+      "history": "Ideia do histórico"
+    },
+    "delivery": {
+      "queued": "Na fila",
+      "sent": "Enviada",
+      "delivered": "Entregue",
+      "read": "Lida",
+      "failed": "Não entregue",
+      "received": "Recebida"
+    },
+    "activityLead": "Lead {{id}}",
+    "purchasesCount_one": "{{count}} linha",
+    "purchasesCount_many": "{{count}} linhas",
+    "purchasesCount_other": "{{count}} linhas"
+  },
+  "contactEditor": {
+    "title": "Editar contato",
+    "sub": "Salvo uma vez · usado em cada lead, paciente e chat",
+    "newContact": "Novo contato",
+    "steps": {
+      "identity": "Identidade e contato",
+      "preferences": "Preferências de contato"
+    },
+    "idHelp": "Um contato · compartilhado por leads, pacientes e chats",
+    "idTooltip": "ID do contato · clique para copiar",
+    "idAria": "Copiar ID do contato {{id}}",
+    "idCopied": "ID do contato {{id}} copiado",
+    "firstName": "Nome",
+    "firstNamePlaceholder": "Primeiro nome",
+    "lastName": "Sobrenome",
+    "lastNamePlaceholder": "Sobrenome (opcional)",
+    "mobiles": "Números de celular",
+    "mobileAria": "Celular {{n}}",
+    "primary": "Principal",
+    "primaryTitle": "Número principal · usado em ligações e correspondência",
+    "setPrimary": "Tornar principal",
+    "setPrimaryTitle": "Tornar este o número principal",
+    "primaryChanged": "{{number}} agora é o número principal",
+    "whatsAppOn": "No WhatsApp · clique para desativar",
+    "whatsAppOff": "Não está no WhatsApp · clique para ativar",
+    "removeNumber": "Remover número",
+    "addNumber": "+ Adicionar número",
+    "addInstagram": "+ Instagram",
+    "handlePlaceholder": "@usuario",
+    "handleAria": "Instagram {{n}}",
+    "removeHandle": "Remover usuário",
+    "removeHandleTitle": "Remover este usuário",
+    "handleRemoved": "{{handle}} removido",
+    "addHandle": "+ Adicionar usuário",
+    "defaultChannel": "Canal padrão",
+    "defaultChannelHint": "· muda para o último canal usado",
+    "custom": "+ Personalizada",
+    "customPlaceholder": "Digite uma preferência",
+    "customAria": "Preferência personalizada",
+    "done": "Concluído",
+    "updated": "Contato atualizado · vale em todo lugar",
+    "preferences": {
+      "noCalls": "Sem ligações",
+      "sundaysOnly": "Só aos domingos",
+      "weekdaysOnly": "Só em dias úteis",
+      "afterSix": "Depois das 18h",
+      "mornings": "Manhãs",
+      "evenings": "Noites",
+      "weekendsOnly": "Só nos fins de semana",
+      "gujarati": "Guzerate",
+      "hindi": "Hindi",
+      "english": "Inglês",
+      "femaleDoctor": "Médica",
+      "textFirst": "Mensagem antes de ligar"
+    }
+  },
+  "offeringQuickCreate": {
+    "title": "Novo serviço",
+    "sub": "Serviço, tratamento ou pacote que você cobra",
+    "steps": {
+      "offering": "Serviço",
+      "details": "Detalhes",
+      "payment": "Pagamento"
+    },
+    "fields": {
+      "name": "Nome",
+      "namePlaceholder": "ex.: Laser rosto inteiro",
+      "duration": "Duração",
+      "minutesUnit": "min",
+      "minutes": "{{minutes}} min",
+      "category": "Categoria",
+      "price": "Preço"
+    },
+    "save": "Adicionar serviço",
+    "toasts": {
+      "name": "Adicione um nome",
+      "price": "Informe o preço",
+      "added": "Serviço {{name}} adicionado"
+    }
+  },
+  "appointmentForm": {
+    "title": {
+      "loading": "Consulta",
+      "create": "Nova consulta",
+      "edit": "Consulta {{id}}",
+      "reschedule": "Remarcar {{id}}"
+    },
+    "sub": "Só horários livres são oferecidos · horários passados ficam bloqueados",
+    "who": {
+      "search": "Busque paciente ou lead por nome, telefone, ID",
+      "searchLabel": "Buscar pessoa",
+      "useContact": "Usar contato",
+      "patient": "Paciente",
+      "createContact": "+ Criar contato “{{query}}”",
+      "newContact": "Novo contato · adicione o celular para agendar",
+      "mobile": "Número de celular",
+      "name": "Nome",
+      "mobileLabel": "Celular",
+      "save": "Salvar",
+      "addName": "Adicione um nome",
+      "mobileDigits": "O celular precisa de 10 dígitos"
+    },
+    "links": {
+      "connected": "Lead vinculado",
+      "chip": "{{id}} · {{status}}",
+      "chipHint": "Lead {{id}} · {{source}} · responsável {{owner}}",
+      "movesAtCheckIn": "· passa para “Visitou a clínica” no check-in"
+    },
+    "status": {
+      "section": "Status da visita",
+      "group": "Status",
+      "copy": "Copiar",
+      "copyHint": "Copiar · mesmo serviço, médico, motivo e observações",
+      "cancelVisit": "Cancelar visita",
+      "cancelHint": "Cancelar esta consulta",
+      "cancelledReason": "{{reason}} · horário liberado · lembretes interrompidos",
+      "cancelledNoReason": "Horário liberado · lembretes interrompidos",
+      "restore": "Restaurar",
+      "rescheduledConfirm": "Remarcada · era {{day}} {{time}} · precisa ser confirmada de novo · um novo lembrete sai ao salvar",
+      "rescheduled": "Remarcada · era {{day}} {{time}} · um novo lembrete sai ao salvar",
+      "planReady_one": "Plano pronto · {{count}} serviço",
+      "planReady_many": "Plano pronto · {{count}} serviços",
+      "planReady_other": "Plano pronto · {{count}} serviços",
+      "planVisit_one": "{{count}} planejado para esta visita",
+      "planVisit_many": "{{count}} planejados para esta visita",
+      "planVisit_other": "{{count}} planejados para esta visita",
+      "planEarlier_one": "{{count}} de visitas anteriores",
+      "planEarlier_many": "{{count}} de visitas anteriores",
+      "planEarlier_other": "{{count}} de visitas anteriores"
+    },
+    "details": {
+      "title": "Consulta",
+      "notFilled": "Ainda não preenchido",
+      "open": "Abrir",
+      "type": "Tipo",
+      "typeGroup": "Tipo de consulta",
+      "types": {
+        "consultation": "Consulta",
+        "follow_up": "Retorno",
+        "treatment": "Tratamento",
+        "package_session": "Sessão do pacote",
+        "other": "Outro"
+      },
+      "typeHints": {
+        "consultation": "Primeira visita ou avaliação médica",
+        "follow_up": "Revisão curta após um tratamento ou receita",
+        "treatment": "Uma sessão avulsa, cobrada na visita",
+        "package_session": "Usa uma sessão de um pacote pago",
+        "other": "Qualquer coisa que não seja uma das anteriores"
+      },
+      "typeLines": {
+        "consultation": "O valor da consulta entra na fatura no fechamento",
+        "follow_up": "Normalmente gratuito · sem fatura, a menos que algo seja adicionado",
+        "other": "Diga o que é nas observações abaixo"
+      },
+      "treatment": "Tratamento",
+      "pickTreatment": "Escolha um tratamento",
+      "searchTreatments": "Buscar tratamentos",
+      "common": "Comuns",
+      "fromOfferings": "Dos serviços",
+      "doctor": "Médico",
+      "pickDoctor": "Escolha um médico",
+      "searchDoctors": "Buscar médicos e terapeutas",
+      "length": "Duração",
+      "minutes": "{{minutes}} min",
+      "minutesHint": "{{minutes}} minutos",
+      "reason": "Motivo",
+      "reasonPlaceholder": "O que a pessoa pediu · ex.: manchas nas bochechas",
+      "notes": "Observações",
+      "notesPlaceholder": "O que o médico ou a recepção precisam saber"
+    },
+    "slot": {
+      "title": "Data e hora",
+      "nextWeek": "Próxima semana",
+      "calendar": "Calendário",
+      "previousMonth": "Mês anterior",
+      "nextMonth": "Próximo mês",
+      "step": "Intervalo",
+      "stepOption": "{{minutes}} min",
+      "time": "Horário",
+      "pickDate": "Escolha uma data para ver os horários",
+      "none": "Não há horários para agendar neste dia · escolha outra data",
+      "closed": {
+        "past": "Este dia já passou · escolha outra data",
+        "branchInactive": "Esta unidade não aceita agendamentos",
+        "closedDay": "A clínica fecha neste dia · escolha outra data",
+        "holiday": "Fechado por {{label}} · escolha outra data",
+        "doctorOff": "O médico não atende neste dia · escolha outra data ou outro médico"
+      },
+      "am": "AM",
+      "pm": "PM",
+      "hour": "{{hour}} {{period}}",
+      "free": "{{time}} · livre",
+      "locked": "Bloqueado",
+      "lockedSummary": "{{day}} · {{time}} · bloqueado após o check-in",
+      "lockedToast": "Data e hora ficam bloqueadas após o check-in do paciente"
+    },
+    "footer": {
+      "pickTime": "Escolha um horário",
+      "book": "Agendar {{day}}, {{time}}",
+      "move": "Mover para {{day}}, {{time}}",
+      "saveChanges": "Salvar alterações",
+      "minutes": "{{minutes}} min"
+    },
+    "validation": {
+      "who": "Escolha para quem é a consulta",
+      "slot": "Escolha data e hora",
+      "passed": "Esse horário já passou · escolha um horário futuro",
+      "taken": "Acabou de ser ocupado · escolha outro horário",
+      "doctor": "Escolha um médico",
+      "branch": "Nenhuma unidade aberta para agendar"
+    },
+    "copied": "Copiada · escolha data e hora"
+  },
+  "expenseCategories": {
+    "medicines": "Medicamentos",
+    "consumables": "Materiais de consumo",
+    "salary": "Salários",
+    "rent": "Aluguel",
+    "marketing": "Marketing",
+    "utilities": "Contas de consumo",
+    "maintenance": "Manutenção",
+    "misc": "Diversos"
+  },
+  "patientPicker": {
+    "label": "Paciente",
+    "placeholder": "Buscar pacientes",
+    "hint": "só é possível escolher pacientes",
+    "due": "{{amount}} em aberto",
+    "nothingDue": "Nada em aberto"
+  },
+  "splitRows": {
+    "mode": "Forma",
+    "amount": "Valor"
+  },
+  "settleCredit": {
+    "title": {
+      "give": "Devolver",
+      "take": "Recebido de volta"
+    },
+    "sub": {
+      "give": "Para {{name}} · {{reason}} · adiciona uma saída em Pagamentos",
+      "take": "De {{name}} · {{reason}} · adiciona uma entrada em Pagamentos"
+    },
+    "section": {
+      "give": "Como é devolvido",
+      "take": "Como entrou"
+    },
+    "rows": {
+      "give": "Devolvido via",
+      "take": "Recebido como"
+    },
+    "add": "Adicionar outra forma",
+    "total": "Total {{total}} · de {{owed}}",
+    "save": {
+      "give": "Devolver {{amount}}",
+      "take": "Registrar {{amount}}"
+    },
+    "enterAmount": "Informe o valor",
+    "moreThanOwed": "Mais do que os {{amount}} devidos",
+    "done": {
+      "give": "{{amount}} devolvidos a {{name}} · {{entry}}",
+      "take": "{{amount}} recebidos de volta de {{name}} · {{entry}}"
+    },
+    "branch": "Unidade",
+    "date": "Data",
+    "dayClosed": "Esse dia está fechado nesta unidade · escolha um dia aberto",
+    "moreThanPaid": "Mais do que foi pago na fatura",
+    "closed": "{{ref}} já está quitado",
+    "entry": {
+      "give": "saída adicionada",
+      "take": "entrada adicionada"
+    }
+  },
+  "quickLine": {
+    "label": "Adicionar rápido",
+    "enter": "↵ adicionar",
+    "matches": "Resultados",
+    "suggested": "Sugestões · clique para adicionar",
+    "typed": "Fora da lista · adicionar como digitado",
+    "noMatch": "Nenhum resultado. Confira a grafia ou digite menos letras.",
+    "keys": "↑↓ escolher · ↵ adicionar · Esc limpar",
+    "browse": "Explorar",
+    "browseAll": "Explorar tudo",
+    "groups": "Grupo",
+    "closeBrowse": "Fechar explorar",
+    "added_one": "{{count}} adicionado",
+    "added_many": "{{count}} adicionados",
+    "added_other": "{{count}} adicionados",
+    "tapToAdd": "Toque em um bloco para adicionar",
+    "showing": "Mostrando {{shown}} de {{total}} · digite para filtrar",
+    "done": "Concluir",
+    "emptyGroup": "Nada neste grupo corresponde.",
+    "addOne": "Adicionar um",
+    "removeOne": "Remover um",
+    "addNew": "Adicionar novo",
+    "tags": {
+      "qty": "×{{count}}",
+      "free": "+{{count}} de bônus",
+      "rate": "@ {{amount}}",
+      "discount": "{{percent}}% de desconto"
+    }
+  },
+  "invoiceDrawer": {
+    "title": {
+      "create": "Nova fatura",
+      "edit": "Editar fatura",
+      "createSale": "Nova venda",
+      "editSale": "Editar venda"
+    },
+    "sub": {
+      "create": "Escolha o tipo e adicione os itens",
+      "edit": "As mudanças ficam registradas na fatura",
+      "sale": "Fatura médica · o estoque baixa pela validade mais próxima"
+    },
+    "type": "Tipo",
+    "steps": {
+      "party": "Paciente e equipe",
+      "items": "Itens",
+      "medicines": "Medicamentos",
+      "payment": "Pagamento"
+    },
+    "fields": {
+      "branch": "Unidade",
+      "newPatient": "Novo paciente",
+      "customer": "Cliente",
+      "customerHint": "paciente ou qualquer contato · nomes novos são salvos como contato médico",
+      "customerPlaceholder": "Buscar pacientes, leads ou contatos médicos",
+      "addContact": "Adicionar contato",
+      "mobile": "Celular",
+      "mobileHint": "salvo no contato",
+      "mobilePlaceholder": "98765 43210",
+      "team": "Equipe",
+      "prescribedBy": "Prescrito por",
+      "teamPlaceholder": "Escolha a equipe",
+      "teamHint": "médico, terapeuta, consultor",
+      "teamFrom": "da equipe de {{name}}",
+      "overallDiscount": "Desconto geral",
+      "quickFill": "Preenchimento rápido",
+      "paidNow": "Pago agora",
+      "remark": "Observação",
+      "remarkPlaceholder": "Aparece na fatura impressa",
+      "paid": "Pago até agora"
+    },
+    "customerGroups": {
+      "patient": "Pacientes",
+      "lead": "Leads",
+      "contact": "Contatos médicos"
+    },
+    "customerSub": {
+      "noMobile": "Ainda sem celular"
+    },
+    "items": {
+      "quickLine": "Digite serviço, quantidade, desconto · ex.: lhr face 1 10%",
+      "quickLineMedical": "Digite medicamento e quantidade · ex.: sun 2",
+      "hint": "2 = quantidade · 10% = desconto · @500 = preço",
+      "oftenBilled": "Faturados com frequência",
+      "browse": {
+        "all": "Todos",
+        "oral": "Oral",
+        "topical": "Tópico"
+      },
+      "columns": {
+        "offering": "Serviço",
+        "medicine": "Medicamento",
+        "qty": "Qtd.",
+        "rate": "Preço",
+        "discount": "Desc. %",
+        "gst": "GST",
+        "final": "Final"
+      },
+      "pickItem": "Escolha o item",
+      "selectOffering": "Selecione o serviço…",
+      "selectMedicine": "Selecione o medicamento…",
+      "newOffering": "Novo serviço",
+      "addItem": "Adicionar item",
+      "addMedicine": "Adicionar medicamento",
+      "total": "Total",
+      "sessions_one": "{{count}} sessão",
+      "sessions_many": "{{count}} sessões",
+      "sessions_other": "{{count}} sessões",
+      "inStock": "{{count}} em estoque",
+      "outOfStock": "Sem estoque",
+      "belowFloor": "Abaixo do preço mínimo de {{amount}} para {{name}}",
+      "newMedicineName": "Nome do novo medicamento",
+      "medicineAdded": "{{name}} adicionado · defina o PMC depois em Estoque",
+      "hintInvoice": "2 = quantidade · 10% = desconto",
+      "belowLowest": "Abaixo do preço mínimo de {{name}}",
+      "offerApplied": "Oferta aplicada: {{offer}}"
+    },
+    "payment": {
+      "full": "Integral · {{amount}} em {{mode}}",
+      "split": "Dividir dinheiro + UPI",
+      "nothing": "Nada agora",
+      "mode": "Forma",
+      "amount": "Valor",
+      "addMode": "Adicionar outra forma",
+      "paidTotal": "Pago {{paid}} · em aberto {{due}}"
+    },
+    "totals": {
+      "label": "Totais",
+      "subtotal": "Subtotal",
+      "discountGst": "Desconto + GST",
+      "discountGstValue": "{{discount}} · +{{gst}}",
+      "bill": "Total",
+      "dueAfter": "Em aberto depois",
+      "preview": "Preços como serão salvos",
+      "pending": "Calculando preços…",
+      "refused": "Sem preço · corrija a linha marcada",
+      "failed": "Não foi possível calcular esta fatura",
+      "retry": "Tentar novamente"
+    },
+    "badges": {
+      "bill": "Total {{amount}}",
+      "sessions_one": "Cobre {{count}} sessão",
+      "sessions_many": "Cobre {{count}} sessões",
+      "sessions_other": "Cobre {{count}} sessões",
+      "draft": "Rascunho",
+      "due": "{{amount}} em aberto",
+      "paid": "Totalmente paga"
+    },
+    "presets": {
+      "print": "Imprimir fatura",
+      "plan": "Plano · {{name}}",
+      "planQty": "Plano · {{name}} ×{{count}}",
+      "package": "Pacote · {{name}}",
+      "repeat": "Repetir #{{seq}}",
+      "consultation": "Nova consulta · {{amount}}",
+      "rx": "Da receita #{{seq}}"
+    },
+    "save": {
+      "clinic": "Criar fatura da clínica",
+      "medical": "Criar fatura médica",
+      "consultation": "Criar fatura de consulta",
+      "edit": "Salvar alterações"
+    },
+    "summary": "{{type}} · {{name}} · {{items}}",
+    "summaryItems_one": "{{count}} item",
+    "summaryItems_many": "{{count}} itens",
+    "summaryItems_other": "{{count}} itens",
+    "noPatient": "Sem paciente",
+    "errors": {
+      "pickPatient": "Escolha um paciente",
+      "pickCustomer": "Escolha um cliente",
+      "addItem": "Adicione pelo menos um item",
+      "paidAboveBill": "O pago ({{paid}}) é maior que a fatura de {{bill}}",
+      "stock": "Só há {{count}} de {{name}} em estoque",
+      "belowFloor": "{{name}} está abaixo do preço mínimo de {{amount}} · aumente o preço final",
+      "belowLowest": "{{name}} está abaixo do preço mínimo · aumente o preço final"
+    },
+    "toasts": {
+      "created": {
+        "clinic": "Fatura da clínica #{{seq}} criada",
+        "medical": "Fatura médica #{{seq}} criada",
+        "consultation": "Fatura de consulta #{{seq}} criada"
+      },
+      "copied": "Copiada como fatura #{{seq}}",
+      "createdPlan_one": "{{created}} · {{count}} sugestão marcada como faturada",
+      "createdPlan_many": "{{created}} · {{count}} sugestões marcadas como faturadas",
+      "createdPlan_other": "{{created}} · {{count}} sugestões marcadas como faturadas",
+      "saved": "Fatura #{{seq}} salva",
+      "savedPlan": "Fatura #{{seq}} salva · sugestões atualizadas",
+      "promo": "{{offer}} aplicado a {{offering}}",
+      "contactSaved": "{{name}} salvo como contato médico · adicione um celular abaixo",
+      "rxUnmatched": "{{name}} não está na lista de medicamentos · adicione pela adição rápida",
+      "deleted": "Fatura #{{seq}} excluída"
+    },
+    "deleteTitle": "Excluir esta fatura?",
+    "previewTitle": {
+      "clinic": "Fatura #{{seq}}",
+      "medical": "Fatura médica #{{seq}}",
+      "consultation": "Fatura de consulta #{{seq}}"
+    },
+    "record": "Fatura",
+    "refusals": {
+      "moreThanDue": "O pago agora é maior que a conta",
+      "dayClosed": "Esse dia está fechado · não é possível adicionar pagamentos",
+      "settled": "Esta fatura está liquidada · um pagamento dela cai num dia fechado",
+      "belowPaid": "A conta não pode ficar abaixo do que já foi pago",
+      "offeringInUse": "Uma sessão deste pacote já foi usada · mantenha a linha",
+      "treatmentBilled": "Um tratamento desta fatura foi faturado nesse meio-tempo · remova-o e salve de novo",
+      "ofSale": "Esta fatura pertence a uma venda do Medical · altere-a no Medical",
+      "paid": "Esta fatura tem pagamentos ou uma nota de crédito · não pode ser excluída",
+      "inUseDelete": "Uma sessão deste pacote já foi usada · a fatura não pode ser excluída"
+    },
+    "notices": {
+      "settled": "Liquidada · um pagamento desta fatura cai num dia fechado, então não pode mudar",
+      "sale": "Fatura de uma venda do Medical · altere-a no Medical"
+    }
+  },
+  "printPreview": {
+    "title": "Pré-visualização · {{title}}",
+    "close": "Fechar",
+    "print": "Imprimir / Salvar PDF"
+  },
+  "appHomeEmpty": {
+    "title": "Nada foi ativado aqui ainda",
+    "description": "As seções da sua clínica aparecerão aqui assim que forem ativadas para você."
+  }
+}

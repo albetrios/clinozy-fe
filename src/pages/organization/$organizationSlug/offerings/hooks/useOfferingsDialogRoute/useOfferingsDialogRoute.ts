@@ -5,9 +5,9 @@ import { useTranslation } from 'react-i18next';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { organizationOfferings } from '@/lib/routes/offerings-builders.ts';
 import { PUBLIC_ID } from '@/lib/routes/search-params.ts';
-import { fetchOffering, offeringQueryKeys } from '@/shared/api/clinic/offerings-api.ts';
-import type { OfferingRecord } from '@/shared/api/clinic/offerings-contracts.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { fetchOffering, offeringQueryKeys } from '@/shared/api/app/offerings-api.ts';
+import type { OfferingRecord } from '@/shared/api/app/offerings-contracts.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useDialogRouteRecord } from '@/shared/hooks/useDialogRouteRecord/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
@@ -55,7 +55,7 @@ export function useOfferingsDialogRoute(): OfferingsDialogRouteState {
   const navigate = useNavigate();
   const { t } = useTranslation(ERRORS_NS);
   const { t: tRoom } = useTranslation(OFFERINGS_NS);
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const organizationId = useOrganizationStore((state) => state.organizationId);
 
   const close = useCallback(() => {

@@ -12,15 +12,15 @@ import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { organizationPatientSection } from '@/lib/routes/patient-file-builders.ts';
 import { organizationPatients } from '@/lib/routes/patients-builders.ts';
 import { cn } from '@/lib/utils.ts';
-import type { PatientFile } from '@/shared/api/clinic/patient-file-contracts.ts';
+import type { PatientFile } from '@/shared/api/app/patient-file-contracts.ts';
 import {
   type PatientFileSectionSlug,
   viewablePatientFileSections,
-} from '@/shared/clinic/patient-file-sections.ts';
+} from '@/shared/app/patient-file-sections.ts';
 import { SkeletonBar, SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { isNotFound } from '@/shared/errors/HttpError.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
 import { usePatientFile } from '@/shared/hooks/usePatientFile/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
@@ -96,7 +96,7 @@ function useFileLoadFailure(
 
 /** The sections the member may open (Q-F1), and whether access has answered. */
 function useViewableSections() {
-  const access = useClinicAccess();
+  const access = useAppAccess();
   return useMemo(
     () => ({
       resolved: access.isResolved,

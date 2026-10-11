@@ -10,9 +10,9 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useEffect } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
-import { CROSS_ROOM_PARAM } from '@/shared/clinic/clinic-referrer.ts';
-import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
+import { appCommandNavigation } from '@/shared/app/app-command-targets.ts';
+import { CROSS_ROOM_PARAM } from '@/shared/app/app-referrer.ts';
+import { useAppNavigate } from '@/shared/hooks/useAppNavigate/index.ts';
 import { useCrossRoomDialog } from '@/shared/hooks/useCrossRoomDialog/index.ts';
 
 import { CrossRoomDialogs } from './CrossRoomDialogs.tsx';
@@ -68,12 +68,12 @@ vi.mock(
 
 const TODAY = '/organization/acme/today';
 const APPOINTMENT = 'appt_riya00000000000000000';
-const NEW_INVOICE = clinicCommandNavigation('newInvoice', {
+const NEW_INVOICE = appCommandNavigation('newInvoice', {
   organizationSlug: 'acme',
   referrer: 'today',
   search: { type: 'clinic' },
 });
-const NEW_APPOINTMENT = clinicCommandNavigation('newAppointment', {
+const NEW_APPOINTMENT = appCommandNavigation('newAppointment', {
   organizationSlug: 'acme',
   referrer: 'today',
 });
@@ -93,7 +93,7 @@ function renderShell(
 ) {
   const mounted = vi.fn();
   function Today() {
-    const navigate = useClinicNavigate();
+    const navigate = useAppNavigate();
     useEffect(() => mounted(), []);
     return (
       <>

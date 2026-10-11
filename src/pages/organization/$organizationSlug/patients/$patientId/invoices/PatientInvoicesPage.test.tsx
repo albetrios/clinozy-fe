@@ -4,14 +4,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
-import type * as InvoicesApiModule from '@/shared/api/clinic/invoices-api.ts';
+import type * as InvoicesApiModule from '@/shared/api/app/invoices-api.ts';
 import {
   deleteInvoice,
   fetchInvoiceTotals,
   listInvoices,
   restoreInvoice,
-} from '@/shared/api/clinic/invoices-api.ts';
-import type { InvoiceRecord } from '@/shared/api/clinic/invoices-contracts.ts';
+} from '@/shared/api/app/invoices-api.ts';
+import type { InvoiceRecord } from '@/shared/api/app/invoices-contracts.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
@@ -44,7 +44,7 @@ vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
   readViewportTier: () => viewport.tier,
 }));
 
-vi.mock('@/shared/api/clinic/invoices-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/invoices-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof InvoicesApiModule>()),
   listInvoices: vi.fn(),
   fetchInvoiceTotals: vi.fn(),

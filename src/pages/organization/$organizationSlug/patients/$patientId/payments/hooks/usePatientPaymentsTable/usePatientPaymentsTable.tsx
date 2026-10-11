@@ -2,16 +2,16 @@ import { type ColumnDef, useTable } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { PAYMENT_MODE_TONES, TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { LedgerRow } from '@/shared/api/app/payments-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { PAYMENT_MODE_TONES, TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { IdPill, TonePill } from '@/shared/components/Cells/index.ts';
 import {
   type DataTableFeatures,
   dataTableFeatures,
 } from '@/shared/components/DataTable/index.ts';
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 import { useHiddenColumns } from '@/shared/hooks/useHiddenColumns/index.ts';
 import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 
@@ -36,14 +36,14 @@ const rowOf = (original: unknown) => original as LedgerRow;
  */
 function usePatientPaymentsColumns(): ColumnDef<DataTableFeatures, LedgerRow>[] {
   const { t } = useTranslation(PATIENT_TABLE_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
-  const clock = useClinicClock();
+  const { t: tApp } = useTranslation(APP_NS);
+  const clock = useAppClock();
   const formatRupees = useRupeeFormat();
   // "Cash + UPI" — each split's mode once, as the ledger's Mode pill joins them.
   const modes = (row: LedgerRow) => [...new Set(row.splits.map((split) => split.mode))];
   const modeLabel = (row: LedgerRow) =>
     modes(row)
-      .map((mode) => tClinic(CLINIC_KEYS.paymentModes[mode]))
+      .map((mode) => tApp(APP_KEYS.paymentModes[mode]))
       .join(' + ');
   const modeTone = (row: LedgerRow) => {
     const [first] = modes(row);

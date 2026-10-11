@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
-import type { DeleteReason } from '@/shared/api/clinic/clinic-schema.ts';
+import type { DeleteReason } from '@/shared/api/app/app-schema.ts';
 import {
   approvePrescription,
   createPrescription,
@@ -13,18 +13,18 @@ import {
   prescriptionQueryKeys,
   restorePrescription,
   updatePrescription,
-} from '@/shared/api/clinic/prescriptions-api.ts';
+} from '@/shared/api/app/prescriptions-api.ts';
 import {
   type PrescriptionFields,
   type PrescriptionRecord,
   type RxCatalog,
   rxCatalogOf,
-} from '@/shared/api/clinic/prescriptions-contracts.ts';
-import { todayQueryKeys } from '@/shared/api/clinic/today-api.ts';
-import { passesPatientFileGate } from '@/shared/clinic/patient-file-sections.ts';
+} from '@/shared/api/app/prescriptions-contracts.ts';
+import { todayQueryKeys } from '@/shared/api/app/today-api.ts';
+import { passesPatientFileGate } from '@/shared/app/patient-file-sections.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
@@ -56,7 +56,7 @@ export interface PrescriptionAccess {
  * The member's prescription access, from the codes in force (a View-as preview's too).
  */
 export function usePrescriptionAccess(): PrescriptionAccess {
-  const access = useClinicAccess();
+  const access = useAppAccess();
   return useMemo(() => {
     const resolved = access.isResolved;
     const writes = resolved && passesPatientFileGate(access, 'prescriptions');
@@ -199,7 +199,7 @@ const rxWriteKeys = (organizationId: string | null) => [
   todayQueryKeys.floors(),
   // The person's activity: the server writes a `system` entry for a new Rx (`messageQueryKeys`,
   // named here so the hook does not load the messages module).
-  ['clinic', 'messages'],
+  ['app', 'messages'],
 ];
 
 /**

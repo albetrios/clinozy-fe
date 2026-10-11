@@ -2,12 +2,12 @@ import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { cn } from '@/lib/utils.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { EmailVerificationBanner } from '@/shared/components/EmailVerificationBanner/index.ts';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
-import { useRoleLabel, useRolesInForce } from '@/shared/hooks/useClinicRoles/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
+import { useRoleLabel, useRolesInForce } from '@/shared/hooks/useAppRoles/index.ts';
 import { Eye } from '@/shared/icons/index.ts';
 import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -18,14 +18,14 @@ const keys = LAYOUT_KEYS.app.sectionBar.viewAs;
 /** "Previewing as <role>" with the sections that role can view and "Exit preview" (H:554). */
 function ViewAsPill() {
   const { t } = useTranslation(LAYOUT_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const setPreviewRole = useUIStore((state) => state.setPreviewRole);
-  const { previewRole, viewableSections, isResolved } = useClinicAccess();
+  const { previewRole, viewableSections, isResolved } = useAppAccess();
   const label = useRoleLabel();
   const [role] = useRolesInForce();
   if (!previewRole) return null;
   const sections = viewableSections
-    .map((section) => tClinic(CLINIC_KEYS.sections[section].label))
+    .map((section) => tApp(APP_KEYS.sections[section].label))
     .join(' · ');
   return (
     <output

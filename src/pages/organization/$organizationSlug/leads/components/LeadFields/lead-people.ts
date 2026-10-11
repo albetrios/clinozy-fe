@@ -1,4 +1,4 @@
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
 import type { AvatarStackPerson } from '@/shared/components/Cells/index.ts';
 import type { TeamCardData } from '@/shared/components/PersonCard/index.ts';
 

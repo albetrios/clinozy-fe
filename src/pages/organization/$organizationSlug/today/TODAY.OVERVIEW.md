@@ -4,9 +4,9 @@ Route: `/organization/$organizationSlug/today`. The clinic floor now — who is 
 arriving, waiting, with the doctor, in treatment, at checkout and at the pharmacy — with the
 desk's work queue beside it (KICKOFF §6.2; L-48).
 
-Gated like every clinic room: membership (`organization:read`) and the `clinic-today` module
-(on in production since Today and Tasks left `FIXTURE_BACKED_CLINIC_MODULES`, D155), then
-`requireOrgStatus`; every role sees Today. In-room actions follow `useClinicAccess`
+Gated like every clinic room: membership (`organization:read`) and the `app-today` module
+(on in production since Today and Tasks left `FIXTURE_BACKED_APP_MODULES`, D155), then
+`requireOrgStatus`; every role sees Today. In-room actions follow `useAppAccess`
 (KICKOFF §3.7): "New booking" needs Leads Create, "Book" Leads View, "Check in" and "Send in"
 Appointments Edit, "Walk-in" Appointments Create, "Open session" Patients View and the treatments gate (Doctor, Therapist),
 "Checkout" Patients View and `payment:create`, "Dispense" Medical Create — each is hidden
@@ -41,7 +41,7 @@ again. A booking follow-on stacks the shared appointment form over Today
 check-in or review on the patient file, the person's file or lead) navigates. "What’s next"
 chains only in the Tasks room.
 
-Data — clinozy-be (`src/shared/api/clinic/today-api.ts`, api-integration §5.1, D149): every
+Data — clinozy-be (`src/shared/api/app/today-api.ts`, api-integration §5.1, D149): every
 page of the day's scheduled, confirmed and checked-in bookings (`GET /app/appointments`, the
 header's branches from the member's preferences, D32), the doctors' and rooms' names (one
 read per set, cached) and — for a member holding `patient_prescription:read` — the pharmacy
@@ -75,7 +75,7 @@ the last copy." with Retry and keeps the last copy; the first load wears the in-
 | File                        | Responsibility                                                                                                                                                                                                                                                                                              |
 | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `today.route.tsx`           | Route marker — exports `Component` rendering `TodayPage`.                                                                                                                                                                                                                                                   |
-| `today.manifest.ts`         | Manifest — `kind: 'leaf'`, permission `organization:read`, module `clinic-today`, nav section `today`.                                                                                                                                                                                                      |
+| `today.manifest.ts`         | Manifest — `kind: 'leaf'`, permission `organization:read`, module `app-today`, nav section `today`.                                                                                                                                                                                                         |
 | `today.search.ts`           | URL schema (`validateSearch`): `lane` (one of the seven), `queue` (`mine`, `everyone`) — entry-resident, so built on `src/lib/routes/search-params.ts` only.                                                                                                                                                |
 | `today.constants.ts`        | `TODAY_NS` / `TODAY_KEYS` (the `today` namespace; the work queue's rule copy is the `tasks` namespace's), `TODAY_TEST_IDS`.                                                                                                                                                                                 |
 | `today.lanes.ts`            | Pure: the lanes' tones and actions, the tile paint, `groupTodayLanes`, `todayFocus` / `isLaneInFocus`, `defaultTodayLane`, `laneHint`, `laneFaces`, `todayPulse`.                                                                                                                                           |

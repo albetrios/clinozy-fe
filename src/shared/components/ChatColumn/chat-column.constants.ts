@@ -1,13 +1,13 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 
 /**
- * Chat column copy lives in the `clinic` namespace (KICKOFF §3.8: "the chat
- * column goes in `clinic`") — it loads with the org shell, where the column
+ * Chat column copy lives in the `app` namespace (KICKOFF §3.8: "the chat
+ * column goes in `app`") — it loads with the org shell, where the column
  * always renders, and stays out of the entry bundle.
  */
-export const CHAT_COLUMN_NS = I18N_NAMESPACES.clinic;
+export const CHAT_COLUMN_NS = I18N_NAMESPACES.app;
 
-/** Key paths in `clinic` (every value verbatim from `_patterns.md:143–193` and `leads.md`). */
+/** Key paths in `app` (every value verbatim from `_patterns.md:143–193` and `leads.md`). */
 export const CHAT_COLUMN_KEYS = {
   thread: 'chatColumn.thread',
   separator: 'chatColumn.separator',

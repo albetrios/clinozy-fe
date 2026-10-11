@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import { clinicClockTime, clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import { greetingFor } from '@/shared/clinic/clinic-greeting.ts';
+import { appClockTime, appToday } from '@/shared/api/app/app-time.ts';
+import { greetingFor } from '@/shared/app/app-greeting.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { clinicWallClock, useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import { appWallClock, useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
 import { TODAY_KEYS, TODAY_NS, TODAY_TEST_IDS } from '../../today.constants.ts';
@@ -44,13 +44,13 @@ export function TodayGreeting({
 }: TodayGreetingProps) {
   const { t } = useTranslation(TODAY_NS);
   const { formatDate, formatNumber } = useLocaleFormat();
-  const clock = useClinicClock();
-  const today = clinicToday(now);
-  const time = clinicClockTime(now);
+  const clock = useAppClock();
+  const today = appToday(now);
+  const time = appClockTime(now);
   const part = greetingFor(Number(time.slice(0, 2)));
   const name = firstName?.trim() || t(TODAY_KEYS.greeting.nobody); // NOSONAR(S6606): a blank name greets nobody
   const day = formatDate(
-    clinicWallClock(today, '00:00'),
+    appWallClock(today, '00:00'),
     { weekday: 'short', day: 'numeric', month: 'short' },
     { wallClock: true },
   );

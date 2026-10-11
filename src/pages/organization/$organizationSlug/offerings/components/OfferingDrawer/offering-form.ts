@@ -5,14 +5,14 @@ import {
   rupeesOfPaise,
   textFromNumber,
 } from '@/lib/number-text.ts';
-import type { OfferingCategory, Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { OfferingCategory, Tone } from '@/shared/api/app/app-schema.ts';
 import {
   GST_PERCENT_VALUES,
   type GstPercent,
   OFFERING_DEFAULTS,
   type OfferingFields,
   type OfferingRecord,
-} from '@/shared/api/clinic/offerings-contracts.ts';
+} from '@/shared/api/app/offerings-contracts.ts';
 
 /**
  * The Offering drawer's form (`offerings.md:59–80`; KICKOFF §6.11): text as

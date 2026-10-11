@@ -10,9 +10,9 @@ import {
   type TaskRuleSettingChange,
   type TaskRuleSettings,
   type TaskType,
-} from '@/shared/api/clinic/tasks-contracts.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
-import { TASK_RULE_KEYS, TASK_RULES_NS } from '@/shared/clinic/task-rules.constants.ts';
+} from '@/shared/api/app/tasks-contracts.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
+import { TASK_RULE_KEYS, TASK_RULES_NS } from '@/shared/app/task-rules.constants.ts';
 import { PickerSheet } from '@/shared/components/Picker/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';

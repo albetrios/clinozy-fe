@@ -1,22 +1,22 @@
 import {
   appointmentQueryKeys,
   moveAppointment,
-} from '@/shared/api/clinic/appointments-api.ts';
-import { leadQueryKeys } from '@/shared/api/clinic/leads-api.ts';
+} from '@/shared/api/app/appointments-api.ts';
+import { leadQueryKeys } from '@/shared/api/app/leads-api.ts';
 import {
   fetchTodayEnquiries,
   fetchTodayFloor,
   moveFloorStage,
   todayQueryKeys,
-} from '@/shared/api/clinic/today-api.ts';
+} from '@/shared/api/app/today-api.ts';
 import {
   type FloorStage,
   TODAY_REFETCH_MS,
   type TodayFloorParamsInput,
-} from '@/shared/api/clinic/today-contracts.ts';
+} from '@/shared/api/app/today-contracts.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useRefreshTasksAfterRules } from '@/shared/hooks/useTasks/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
@@ -43,7 +43,7 @@ export function useTodayFloor(
   options: TodayQueryOptions = {},
 ) {
   const organizationId = useOrganizationStore((state) => state.organizationId);
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const readsPrescriptions = access.canCode('patient_prescription:read');
   return useAppQuery({
     queryKey: [...todayQueryKeys.floor(organizationId, params), { readsPrescriptions }],

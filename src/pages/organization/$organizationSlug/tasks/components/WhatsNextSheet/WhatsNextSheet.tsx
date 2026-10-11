@@ -8,8 +8,8 @@ import {
   TASK_WHY_MAX,
   type TaskRecord,
   type TaskRow,
-} from '@/shared/api/clinic/tasks-contracts.ts';
-import { TASK_RULE_KEYS, TASK_RULES_NS } from '@/shared/clinic/task-rules.constants.ts';
+} from '@/shared/api/app/tasks-contracts.ts';
+import { TASK_RULE_KEYS, TASK_RULES_NS } from '@/shared/app/task-rules.constants.ts';
 import {
   DrawerChips,
   DrawerField,

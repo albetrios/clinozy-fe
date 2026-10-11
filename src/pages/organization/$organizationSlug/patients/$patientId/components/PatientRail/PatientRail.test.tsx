@@ -3,10 +3,10 @@ import userEvent from '@testing-library/user-event';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { fetchInvoiceTotals } from '@/shared/api/clinic/invoices-api.ts';
-import type { PatientRecord } from '@/shared/api/clinic/patients-contracts.ts';
+import { fetchInvoiceTotals } from '@/shared/api/app/invoices-api.ts';
+import type { PatientRecord } from '@/shared/api/app/patients-contracts.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import {
   patientFile,
   patientRecord,
@@ -20,7 +20,7 @@ const { notifyMock } = vi.hoisted(() => ({
   notifyMock: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
-vi.mock('@/shared/api/clinic/invoices-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/invoices-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchInvoiceTotals: vi.fn(),
 }));

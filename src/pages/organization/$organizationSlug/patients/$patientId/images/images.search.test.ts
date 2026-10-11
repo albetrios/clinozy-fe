@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   NO_PHOTO_VISIT,
   PATIENT_PHOTO_ALBUMS,
-} from '@/shared/api/clinic/patient-images-contracts.ts';
+} from '@/shared/api/app/patient-images-contracts.ts';
 
 import { NO_VISIT, PHOTO_ALBUMS, validatePatientImagesSearch } from './images.search.ts';
 

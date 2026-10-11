@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import type { PrescriptionItem } from '@/shared/api/clinic/clinic-schema.ts';
-import type { PrescriptionRecord } from '@/shared/api/clinic/prescriptions-contracts.ts';
+import type { PrescriptionItem } from '@/shared/api/app/app-schema.ts';
+import type { PrescriptionRecord } from '@/shared/api/app/prescriptions-contracts.ts';
 
 import { prescriptionRecord } from '../../__tests__/integration/prescription-doubles.ts';
 import {

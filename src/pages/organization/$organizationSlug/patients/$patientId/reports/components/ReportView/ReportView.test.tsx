@@ -2,7 +2,7 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type * as ReportsApiModule from '@/shared/api/clinic/patient-reports-api.ts';
+import type * as ReportsApiModule from '@/shared/api/app/patient-reports-api.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { fsi, withoutBidiMarks } from '@/tests/utils/bidi-marks.ts';
 
@@ -17,7 +17,7 @@ import {
   resetReports,
 } from '../../__tests__/integration/reports-test-router.tsx';
 
-vi.mock('@/shared/api/clinic/patient-reports-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/patient-reports-api.ts', async (importOriginal) => {
   const double = await import('../../__tests__/integration/report-api-double.ts');
   return {
     ...(await importOriginal<typeof ReportsApiModule>()),

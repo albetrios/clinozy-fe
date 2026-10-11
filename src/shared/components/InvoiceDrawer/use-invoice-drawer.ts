@@ -2,11 +2,11 @@ import { useEffect, useRef } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import type { InvoiceType } from '@/shared/api/clinic/clinic-schema.ts';
-import type { InvoicePresets } from '@/shared/api/clinic/invoices-contracts.ts';
-import type { InvoiceRxPreset } from '@/shared/api/clinic/invoices-fixture-contracts.ts';
-import type { OfferingRecord } from '@/shared/api/clinic/offerings-contracts.ts';
-import { patientName } from '@/shared/api/clinic/patients-fixture-contracts.ts';
+import type { InvoiceType } from '@/shared/api/app/app-schema.ts';
+import type { InvoicePresets } from '@/shared/api/app/invoices-contracts.ts';
+import type { InvoiceRxPreset } from '@/shared/api/app/invoices-fixture-contracts.ts';
+import type { OfferingRecord } from '@/shared/api/app/offerings-contracts.ts';
+import { patientName } from '@/shared/api/app/patients-fixture-contracts.ts';
 import { useFixturePatient } from '@/shared/hooks/useFixturePatients/index.ts';
 import { useFixtureMyStaff } from '@/shared/hooks/useFixtureStaff/index.ts';
 import {

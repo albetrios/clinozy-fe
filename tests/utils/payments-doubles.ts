@@ -5,9 +5,9 @@
  * cash and UPI, her credit CR-1, a closed day at Vesu) and the rooms' rows they map to. Ids are
  * public ids (`<prefix>_<21 [a-z0-9]>`); money is rupees. Override what a test is about.
  */
-import type { CreditRow } from '@/shared/api/clinic/credits-contracts.ts';
-import type { InvoiceRecord } from '@/shared/api/clinic/invoices-contracts.ts';
-import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
+import type { CreditRow } from '@/shared/api/app/credits-contracts.ts';
+import type { InvoiceRecord } from '@/shared/api/app/invoices-contracts.ts';
+import type { LedgerRow } from '@/shared/api/app/payments-contracts.ts';
 
 /** Kavya Mehta's contact. */
 export const TEST_MONEY_CONTACT_ID = 'con_ebj92x3oamfu4qjwim3wq';

@@ -2,8 +2,8 @@ import { screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type * as DirectoryApiModule from '@/shared/api/clinic/directory-api.ts';
-import type * as TasksApiModule from '@/shared/api/clinic/tasks-api.ts';
+import type * as DirectoryApiModule from '@/shared/api/app/directory-api.ts';
+import type * as TasksApiModule from '@/shared/api/app/tasks-api.ts';
 import type * as MyMembershipModule from '@/shared/tenancy/my-membership.ts';
 
 import {
@@ -23,14 +23,14 @@ vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
 }));
 
 const world = vi.hoisted(() => ({}) as TasksWorld);
-vi.mock('@/shared/api/clinic/tasks-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/tasks-api.ts', async (importOriginal) => {
   const { tasksApiDouble } = await import('./__tests__/integration/tasks-test-data.ts');
   return {
     ...(await importOriginal<typeof TasksApiModule>()),
     ...tasksApiDouble(world),
   };
 });
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => {
   const { directoryApiDouble } =
     await import('./__tests__/integration/tasks-test-data.ts');
   return {

@@ -5,7 +5,7 @@
  * back. A test mocks the module with {@link rxServerApi} and seeds {@link rxWorld}:
  *
  * ```ts
- * vi.mock('@/shared/api/clinic/prescriptions-api.ts', async (importOriginal) => ({
+ * vi.mock('@/shared/api/app/prescriptions-api.ts', async (importOriginal) => ({
  *   ...(await importOriginal<object>()),
  *   ...(await import('<this file>')).rxServerApi,
  * }));
@@ -13,14 +13,14 @@
  */
 import { vi } from 'vitest';
 
-import type { PrescriptionItem } from '@/shared/api/clinic/clinic-schema.ts';
-import type * as PrescriptionsApi from '@/shared/api/clinic/prescriptions-api.ts';
+import type { PrescriptionItem } from '@/shared/api/app/app-schema.ts';
+import type * as PrescriptionsApi from '@/shared/api/app/prescriptions-api.ts';
 import type {
   PrescriptionKit,
   PrescriptionRecord,
   RxSheetClinic,
   RxStoreMedicine,
-} from '@/shared/api/clinic/prescriptions-contracts.ts';
+} from '@/shared/api/app/prescriptions-contracts.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { DOCTOR_NISHA } from '@/tests/utils/appointment-doubles.ts';
 import { TEST_PATIENT_ID } from '@/tests/utils/patient-doubles.ts';

@@ -4,10 +4,10 @@ import {
   paiseOfRupees,
   rupeesOfPaise,
 } from '@/lib/number-text.ts';
-import type { Branch, Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import type { DayCloseView } from '@/shared/api/clinic/day-close-contracts.ts';
-import type { LedgerPerson } from '@/shared/api/clinic/payments-contracts.ts';
-import { defaultBranchId } from '@/shared/clinic/clinic-branch.ts';
+import type { Branch, Tone } from '@/shared/api/app/app-schema.ts';
+import type { DayCloseView } from '@/shared/api/app/day-close-contracts.ts';
+import type { LedgerPerson } from '@/shared/api/app/payments-contracts.ts';
+import { defaultBranchId } from '@/shared/app/app-branch.ts';
 
 /*
  * What Day close says about a day (KICKOFF §6.9 Day close; H:5083–5125) — pure, so the bar, the

@@ -3,7 +3,7 @@ import type { PageManifest } from '@/lib/routes/page-manifest.ts';
 /**
  * Appointments room island manifest (`/organization/$organizationSlug/appointments`) —
  * Bookings by doctor, room and machine (KICKOFF §6.4). The route gates on membership and the clinic module
- * (D8, D9); in-room access is `useClinicAccess`. In the primary nav as the
+ * (D8, D9); in-room access is `useAppAccess`. In the primary nav as the
  * `appointments` section. Its children are URL-driven dialogs over the page —
  * New appointment (`create`) and the appointment drawer (`$appointmentId`);
  * `$appointmentId/edit` redirects to the drawer from `routeTree.tsx` (D24,
@@ -15,7 +15,7 @@ export const manifest = {
   title: 'Appointments',
   testId: 'appointments-page',
   permission: 'organization:read',
-  module: 'clinic-appointments',
+  module: 'app-appointments',
   nav: { id: 'appointments', section: 'appointments' },
   kind: 'layout',
   children: ['create', '$appointmentId'],

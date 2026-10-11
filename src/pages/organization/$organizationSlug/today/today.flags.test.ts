@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import type { TodayFloorRow } from '@/shared/api/clinic/today-contracts.ts';
+import type { TodayFloorRow } from '@/shared/api/app/today-contracts.ts';
 
 import { enquiry, floorRow, publicId } from './__tests__/integration/today-fixtures.ts';
 import { TODAY_FLAG_TONES, todayCardFlags } from './today.flags.ts';

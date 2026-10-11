@@ -3,8 +3,8 @@ import { useId, useState } from 'react';
 import { Controller, useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import type { Manufacturer, Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import { SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
+import type { Manufacturer, Tone } from '@/shared/api/app/app-schema.ts';
+import { SECTION_TONES } from '@/shared/app/app-tones.ts';
 import {
   DrawerField,
   DrawerFieldGrid,

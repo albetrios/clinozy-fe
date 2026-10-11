@@ -1,15 +1,15 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type * as ContactActivitiesApiModule from '@/shared/api/clinic/contact-activities-api.ts';
-import type * as ContactsApiModule from '@/shared/api/clinic/contacts-api.ts';
-import type * as DirectoryApiModule from '@/shared/api/clinic/directory-api.ts';
-import type * as LeadsApiModule from '@/shared/api/clinic/leads-api.ts';
-import { fetchLead, leadQueryKeys } from '@/shared/api/clinic/leads-api.ts';
+import type * as ContactActivitiesApiModule from '@/shared/api/app/contact-activities-api.ts';
+import type * as ContactsApiModule from '@/shared/api/app/contacts-api.ts';
+import type * as DirectoryApiModule from '@/shared/api/app/directory-api.ts';
+import type * as LeadsApiModule from '@/shared/api/app/leads-api.ts';
+import { fetchLead, leadQueryKeys } from '@/shared/api/app/leads-api.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import type * as MyMembershipModule from '@/shared/tenancy/my-membership.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import { LeadsPage } from '../../LeadsPage.tsx';
 import {
@@ -27,8 +27,8 @@ const { notifyMock } = vi.hoisted(() => ({
   notifyMock: { info: vi.fn(), success: vi.fn(), warning: vi.fn(), error: vi.fn() },
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
-vi.mock('@/shared/hooks/useClinicAccess/index.ts', () => ({
-  useClinicAccess: () => ({
+vi.mock('@/shared/hooks/useAppAccess/index.ts', () => ({
+  useAppAccess: () => ({
     previewRole: null,
     can: () => true,
     canCode: () => true,
@@ -39,25 +39,25 @@ vi.mock('@/shared/hooks/useClinicAccess/index.ts', () => ({
 
 const world = vi.hoisted(() => ({}) as LeadsWorld);
 const people = vi.hoisted(() => ({}) as ContactsWorld);
-vi.mock('@/shared/api/clinic/leads-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/leads-api.ts', async (importOriginal) => {
   const { leadsApiDouble } = await import('./leads-test-data.ts');
   return { ...(await importOriginal<typeof LeadsApiModule>()), ...leadsApiDouble(world) };
 });
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => {
   const { directoryApiDouble } = await import('./leads-test-data.ts');
   return {
     ...(await importOriginal<typeof DirectoryApiModule>()),
     ...directoryApiDouble(),
   };
 });
-vi.mock('@/shared/api/clinic/contacts-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/contacts-api.ts', async (importOriginal) => {
   const { contactsApiDouble } = await import('./leads-test-data.ts');
   return {
     ...(await importOriginal<typeof ContactsApiModule>()),
     ...contactsApiDouble(people),
   };
 });
-vi.mock('@/shared/api/clinic/contact-activities-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/contact-activities-api.ts', async (importOriginal) => {
   const { contactActivitiesApiDouble } = await import('./leads-test-data.ts');
   return {
     ...(await importOriginal<typeof ContactActivitiesApiModule>()),

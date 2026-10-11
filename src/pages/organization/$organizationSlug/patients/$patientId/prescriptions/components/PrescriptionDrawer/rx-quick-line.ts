@@ -1,6 +1,6 @@
-import type { BodyPart, RxMeal, RxTiming } from '@/shared/api/clinic/clinic-schema.ts';
-import type { MedicineForm } from '@/shared/api/clinic/medicines-contracts.ts';
-import type { RxCatalogMedicine } from '@/shared/api/clinic/prescriptions-contracts.ts';
+import type { BodyPart, RxMeal, RxTiming } from '@/shared/api/app/app-schema.ts';
+import type { MedicineForm } from '@/shared/api/app/medicines-contracts.ts';
+import type { RxCatalogMedicine } from '@/shared/api/app/prescriptions-contracts.ts';
 import {
   quickLineBrowseMatches,
   quickLineMatches,

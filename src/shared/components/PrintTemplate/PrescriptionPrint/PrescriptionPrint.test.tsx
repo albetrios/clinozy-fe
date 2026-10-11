@@ -2,15 +2,12 @@ import { render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type {
-  Prescription,
-  PrescriptionItem,
-} from '@/shared/api/clinic/clinic-schema.ts';
+import type { Prescription, PrescriptionItem } from '@/shared/api/app/app-schema.ts';
 import {
-  clinicFixtures,
+  appFixtures,
   clinicOrganization,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+  resetAppFixtures,
+} from '@/shared/api/app/fixtures/world.fixtures.ts';
 import { PRINT_TEMPLATE_TEST_IDS } from '@/shared/components/PrintTemplate/print-template.constants.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 
@@ -21,19 +18,19 @@ function propsFor(
   seq: number,
   overrides: Partial<Prescription> = {},
 ): PrescriptionPrintProps {
-  const found = clinicFixtures.prescriptions.snapshot((row) => row.seq === seq)[0];
+  const found = appFixtures.prescriptions.snapshot((row) => row.seq === seq)[0];
   if (!found) throw new Error(`Rx #${seq}`);
   const prescription = { ...found, ...overrides };
-  const patient = clinicFixtures.patients.snapshot(
+  const patient = appFixtures.patients.snapshot(
     (row) => row.id === prescription.patientId,
   )[0];
-  const branch = clinicFixtures.branches.snapshot((row) => row.isMain)[0];
+  const branch = appFixtures.branches.snapshot((row) => row.isMain)[0];
   if (!(patient && branch)) throw new Error(`records of Rx #${seq}`);
   return {
     prescription,
     patient,
     doctor:
-      clinicFixtures.staff.snapshot((row) => row.id === prescription.doctorId)[0] ?? null,
+      appFixtures.staff.snapshot((row) => row.id === prescription.doctorId)[0] ?? null,
     organization: clinicOrganization(),
     branch,
   };
@@ -70,13 +67,13 @@ describe('PrescriptionPrint', () => {
     // On the prototype's own day, so every seed carries the prototype's dates.
     vi.useFakeTimers({ toFake: ['Date'] });
     vi.setSystemTime(new Date('2026-09-27T06:30:00Z'));
-    resetClinicFixtures();
+    resetAppFixtures();
     useLocaleStore.setState({ formatLocale: 'en-IN' });
   });
 
   afterEach(() => {
     vi.useRealTimers();
-    resetClinicFixtures();
+    resetAppFixtures();
     useLocaleStore.setState({ formatLocale: 'en-US' });
   });
 

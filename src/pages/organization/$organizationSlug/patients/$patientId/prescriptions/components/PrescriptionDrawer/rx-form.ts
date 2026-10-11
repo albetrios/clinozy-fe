@@ -4,12 +4,12 @@ import type {
   RxMeal,
   RxTiming,
   Tone,
-} from '@/shared/api/clinic/clinic-schema.ts';
+} from '@/shared/api/app/app-schema.ts';
 import type {
   PrescriptionFields,
   PrescriptionRecord,
   RxCatalogMedicine,
-} from '@/shared/api/clinic/prescriptions-contracts.ts';
+} from '@/shared/api/app/prescriptions-contracts.ts';
 import {
   quickLineCount,
   withQuickLineRow,

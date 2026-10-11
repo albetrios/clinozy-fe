@@ -1,17 +1,17 @@
 import { vi } from 'vitest';
 
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
-import type { TaskOutcomeInput, TaskPage } from '@/shared/api/clinic/tasks-api.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
+import type { TaskOutcomeInput, TaskPage } from '@/shared/api/app/tasks-api.ts';
 import type {
   TaskListQueryInput,
   TaskRecord,
   TaskRow,
-} from '@/shared/api/clinic/tasks-contracts.ts';
+} from '@/shared/api/app/tasks-contracts.ts';
 import type {
   FloorStage,
   TodayEnquiry,
   TodayFloorRow,
-} from '@/shared/api/clinic/today-contracts.ts';
+} from '@/shared/api/app/today-contracts.ts';
 import { ASHA, RIYA, taskRowFixture } from '@/tests/utils/task-row-fixture.ts';
 
 /** A public id for the tests' rows: `<prefix>_` and `n` padded to the API's 21 characters. */

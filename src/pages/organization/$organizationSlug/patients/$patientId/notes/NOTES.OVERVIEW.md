@@ -16,18 +16,18 @@ Team notes card too. There is no delete and so no Undo — the API has no route 
 preview reads by the role's Patients view and adds by its Patients create. The author is the entry's
 member (`author_membership_id`, `../shared/hooks/useStaffLookup/`).
 
-Gated by the file layout (membership, the `clinic-patients` module, the org status); in-room
-access is `useClinicAccess`. Registered in `src/app/routes/routeTree.tsx` through the file's
+Gated by the file layout (membership, the `app-patients` module, the org status); in-room
+access is `useAppAccess`. Registered in `src/app/routes/routeTree.tsx` through the file's
 one lazy module (`../patient-id.sections.ts`).
 
 ## Files
 
-| File                   | Responsibility                                                                                           |
-| ---------------------- | -------------------------------------------------------------------------------------------------------- |
-| `notes.route.tsx`      | Route marker — exports `Component` rendering `PatientNotesPage`.                                         |
-| `notes.manifest.ts`    | Manifest — `kind: 'leaf'`, permission `organization:read`, module `clinic-patients`, title "Team notes". |
-| `PatientNotesPage.tsx` | The section: the composer, the note cards and "Load more", on the person's stream.                       |
-| `notes.constants.ts`   | The section's copy keys and test ids.                                                                    |
+| File                   | Responsibility                                                                                        |
+| ---------------------- | ----------------------------------------------------------------------------------------------------- |
+| `notes.route.tsx`      | Route marker — exports `Component` rendering `PatientNotesPage`.                                      |
+| `notes.manifest.ts`    | Manifest — `kind: 'leaf'`, permission `organization:read`, module `app-patients`, title "Team notes". |
+| `PatientNotesPage.tsx` | The section: the composer, the note cards and "Load more", on the person's stream.                    |
+| `notes.constants.ts`   | The section's copy keys and test ids.                                                                 |
 
 ## Test ids
 

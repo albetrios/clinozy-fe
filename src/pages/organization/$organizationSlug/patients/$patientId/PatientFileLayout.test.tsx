@@ -4,11 +4,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
-import { fetchPersonAppointments } from '@/shared/api/clinic/appointments-api.ts';
-import { fetchContactThread } from '@/shared/api/clinic/contact-activities-api.ts';
-import { fetchTeamDirectory } from '@/shared/api/clinic/directory-api.ts';
-import { fetchPatientFile } from '@/shared/api/clinic/patient-file-api.ts';
-import type { PatientFile } from '@/shared/api/clinic/patient-file-contracts.ts';
+import { fetchPersonAppointments } from '@/shared/api/app/appointments-api.ts';
+import { fetchContactThread } from '@/shared/api/app/contact-activities-api.ts';
+import { fetchTeamDirectory } from '@/shared/api/app/directory-api.ts';
+import { fetchPatientFile } from '@/shared/api/app/patient-file-api.ts';
+import type { PatientFile } from '@/shared/api/app/patient-file-contracts.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
@@ -45,26 +45,26 @@ vi.mock('@/shared/notify/index.ts', async (importOriginal) => ({
 }));
 
 // The file's read, and what its bar, rail, Activity and Visits read beside it.
-vi.mock('@/shared/api/clinic/patient-file-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/patient-file-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchPatientFile: vi.fn(),
 }));
 // What she owes, over all her invoices — nothing (the rail's "All paid", Payment's "Nothing due").
-vi.mock('@/shared/api/clinic/invoices-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/invoices-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchInvoiceTotals: vi.fn(async () => ({ due: 0, paid: 0, count: 0 })),
   listInvoices: vi.fn(async () => ({ rows: [], next: null, total: 0, totals: null })),
 }));
-vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/appointments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchPersonAppointments: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchTeamDirectory: vi.fn(),
 }));
 // The Activity chat names offerings from the one catalogue: none here.
-vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/offerings-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchAllOfferings: vi.fn(async () => []),
 }));
@@ -72,7 +72,7 @@ vi.mock('@/shared/tenancy/my-membership.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   findMyMembershipId: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/contact-activities-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/contact-activities-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchContactThread: vi.fn(),
   fetchContactMessagingStatus: vi.fn(async () => ({ whatsappDown: false })),

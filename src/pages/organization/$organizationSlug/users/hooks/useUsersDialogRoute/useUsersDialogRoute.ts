@@ -7,7 +7,7 @@ import {
   organizationUsers,
   organizationUsersRoles,
 } from '@/lib/routes/users-builders.ts';
-import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
+import type { TeamMember } from '@/shared/api/app/users-contracts.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { USERS_KEYS, USERS_NS } from '../../users.constants.ts';

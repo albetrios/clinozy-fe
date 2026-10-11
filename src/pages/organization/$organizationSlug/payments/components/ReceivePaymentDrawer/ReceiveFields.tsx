@@ -2,9 +2,9 @@ import type { TFunction } from 'i18next';
 import { Controller, type UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { Branch, InvoiceType } from '@/shared/api/clinic/clinic-schema.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { Branch, InvoiceType } from '@/shared/api/app/app-schema.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import {
   DrawerChips,
   DrawerField,
@@ -81,7 +81,7 @@ function InertChip({ label, testId }: { label: string; testId: string }) {
 /** The open invoices' read failed: the field says so, with Retry in place. */
 function RetryChip({ onRetry, testId }: { onRetry: () => void; testId: string }) {
   const { t } = useTranslation(PAYMENTS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   return (
     <span className="flex flex-wrap items-center gap-2" data-testid={testId}>
       <span className="text-caption text-destructive">{t(K.invoicesFailed)}</span>
@@ -91,7 +91,7 @@ function RetryChip({ onRetry, testId }: { onRetry: () => void; testId: string })
         data-testid={`${testId}-retry`}
         className="text-caption text-foreground font-medium underline underline-offset-2"
       >
-        {tClinic(CLINIC_KEYS.lists.retry)}
+        {tApp(APP_KEYS.lists.retry)}
       </button>
     </span>
   );
@@ -117,7 +117,7 @@ function InvoiceChips({
   testId: string;
 }) {
   const { t } = useTranslation(PAYMENTS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const formatPaise = usePaiseFormat();
   if (invoices.kind === 'waiting') {
     return <InertChip label={t(K.pickPatientFirst)} testId={testId} />;
@@ -139,7 +139,7 @@ function InvoiceChips({
           due: formatPaise(invoice.due),
         }),
         tone: invoice.id === picked ? ('peach' as const) : undefined,
-        hint: tClinic(CLINIC_KEYS.invoiceTypes[invoice.type]),
+        hint: tApp(APP_KEYS.invoiceTypes[invoice.type]),
       }))}
       value={picked}
       clearable

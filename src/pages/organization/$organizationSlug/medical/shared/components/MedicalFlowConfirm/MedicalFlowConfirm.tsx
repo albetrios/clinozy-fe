@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
 
 import {

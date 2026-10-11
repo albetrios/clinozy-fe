@@ -1,12 +1,9 @@
 import { useTranslation } from 'react-i18next';
 
-import type { OfferKind } from '@/shared/api/clinic/clinic-schema.ts';
-import { localDateOf } from '@/shared/api/clinic/clinic-time.ts';
-import type {
-  OfferRecord,
-  OfferStatus,
-} from '@/shared/api/clinic/offerings-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+import type { OfferKind } from '@/shared/api/app/app-schema.ts';
+import { localDateOf } from '@/shared/api/app/app-time.ts';
+import type { OfferRecord, OfferStatus } from '@/shared/api/app/offerings-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 
@@ -33,7 +30,7 @@ export interface OfferLabels {
  */
 export function useOfferLabels(): OfferLabels {
   const { t } = useTranslation(OFFER_LABELS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const formatRupees = useRupeeFormat();
   const { formatDate } = useLocaleFormat();
   return {
@@ -49,8 +46,8 @@ export function useOfferLabels(): OfferLabels {
           return t(OFFER_LABELS_KEYS.extraSessions, { count: value });
       }
     },
-    kind: (kind) => tClinic(CLINIC_KEYS.offerings.offerKinds[kind]),
-    state: (status) => tClinic(CLINIC_KEYS.offerings.offerStates[status]),
+    kind: (kind) => tApp(APP_KEYS.offerings.offerKinds[kind]),
+    state: (status) => tApp(APP_KEYS.offerings.offerStates[status]),
     date: (day) =>
       formatDate(
         localDateOf(day),

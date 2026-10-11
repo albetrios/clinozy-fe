@@ -120,7 +120,7 @@ import {
   validateUsersSearch,
 } from '@/pages/organization/$organizationSlug/users/users.search.ts';
 import { manifest as organizationPickerManifest } from '@/pages/organization/organization.manifest.ts';
-import type { PatientFileSectionSlug } from '@/shared/clinic/patient-file-sections.ts';
+import type { PatientFileSectionSlug } from '@/shared/app/patient-file-sections.ts';
 import { AppearanceDialogLazy } from '@/shared/components/AppearanceDialog/index.ts';
 import { AppSplashSlotLazy } from '@/shared/components/AppSplashSlot/index.ts';
 import { ConsentBannerLazy } from '@/shared/components/ConsentBanner/index.ts';
@@ -264,10 +264,10 @@ const OrganizationPickerPage = lazyRouteComponent(
   'Component',
 );
 // The org shell's nav, View-as pill and ⌘K name the clinic sections, so the
-// `clinic` vocabulary loads with the shell rather than with each room. Its
+// `app` vocabulary loads with the shell rather than with each room. Its
 // module adds, over any room, the drawer another room opened (A-P1).
 const OrganizationShell = lazyRouteComponent(
-  localizedRoute([I18N_NAMESPACES.clinic], () => import('./OrganizationShell.tsx')),
+  localizedRoute([I18N_NAMESPACES.app], () => import('./OrganizationShell.tsx')),
   'Component',
 );
 const SuspendedPage = lazyRouteComponent(
@@ -302,7 +302,7 @@ function warmRoomRoutes(): void {
 }
 
 // The org home's state when no clinic room is open to the member, in a room's place.
-const ClinicHomeEmpty = roomRoute('ClinicHomeEmpty');
+const AppHomeEmpty = roomRoute('AppHomeEmpty');
 const TodayPage = roomRoute('TodayPage');
 const LeadsPage = roomRoute('LeadsPage');
 const AppointmentsPage = roomRoute('AppointmentsPage');
@@ -702,7 +702,7 @@ const organizationSuspendedRoute = createRoute({
 // home (D25, S:115) — Today for most roles; `/medical` and `/stock` open on
 // their first tab. With no room open to the member — every clinic module off
 // (D8: production until each room's API lands) or an access that views none —
-// the home renders `ClinicHomeEmpty` in a room's place: it never redirects
+// the home renders `AppHomeEmpty` in a room's place: it never redirects
 // then, so nothing can loop.
 const organizationIndexRoute = createRoute({
   getParentRoute: () => organizationShellRoute,
@@ -712,11 +712,11 @@ const organizationIndexRoute = createRoute({
     // A suspended organization goes to its blocked state, never to the empty
     // state below — the gate every room runs, run here for the home's own page.
     requireOrgStatus({ params });
-    const { clinicHomeRoute } = await import('@/shared/clinic/clinic-home.ts');
-    const home = await clinicHomeRoute(params.organizationSlug);
+    const { appHomeRoute } = await import('@/shared/app/app-home.ts');
+    const home = await appHomeRoute(params.organizationSlug);
     if (home) throw redirect(home);
   },
-  component: ClinicHomeEmpty,
+  component: AppHomeEmpty,
   errorComponent: RouteErrorBoundary,
 });
 
@@ -725,13 +725,13 @@ const organizationNotFoundRoute = createRoute({
   path: '$',
   beforeLoad: async ({ params, preload }) => {
     if (preload) return;
-    const [{ clinicHomeRoute }, { notify }] = await Promise.all([
-      import('@/shared/clinic/clinic-home.ts'),
+    const [{ appHomeRoute }, { notify }] = await Promise.all([
+      import('@/shared/app/app-home.ts'),
       import('@/shared/notify/index.ts'),
     ]);
     notify.info(i18n.t(ERRORS_KEYS.route.pageNotFound, { ns: ERRORS_NS }));
     throw redirect(
-      (await clinicHomeRoute(params.organizationSlug)) ??
+      (await appHomeRoute(params.organizationSlug)) ??
         organizationHome(params.organizationSlug),
     );
   },
@@ -849,7 +849,7 @@ const organizationPatientCreateRoute = createRoute({
 
 // The patient file (KICKOFF §4, §6.6): a layout of its own beside the list,
 // gated like the room; its sections and dialog routes inherit the gate, and
-// in-room access is `useClinicAccess` (D9).
+// in-room access is `useAppAccess` (D9).
 const organizationPatientFileRoute = createRoute({
   getParentRoute: () => organizationShellRoute,
   path: 'patients/$patientId',
@@ -1163,7 +1163,7 @@ const organizationVisitRedirectRoute = createRoute({
   path: 'visits/$visitId',
   beforeLoad: async ({ params, preload }) => {
     if (preload) return;
-    const { visitRedirect } = await import('@/shared/clinic/visit-redirect.ts');
+    const { visitRedirect } = await import('@/shared/app/visit-redirect.ts');
     throw redirect(await visitRedirect(params.organizationSlug, params.visitId));
   },
   component: () => null,

@@ -1,4 +1,4 @@
-import type { StockCategory, Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { StockCategory, Tone } from '@/shared/api/app/app-schema.ts';
 
 import type { STOCK_MOVEMENT_KINDS, STOCK_PURCHASE_STATUSES } from '../stock.search.ts';
 

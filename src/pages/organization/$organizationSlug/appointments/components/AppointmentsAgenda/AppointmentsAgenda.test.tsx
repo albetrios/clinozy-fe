@@ -3,26 +3,26 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type * as AppointmentsApiModule from '@/shared/api/clinic/appointments-api.ts';
+import type * as AppointmentsApiModule from '@/shared/api/app/appointments-api.ts';
 import {
   cancelAppointment,
   fetchAppointmentDayCounts,
   listAppointments,
   moveAppointment,
-} from '@/shared/api/clinic/appointments-api.ts';
-import type { AppointmentListParams } from '@/shared/api/clinic/appointments-contracts.ts';
-import type * as DirectoryApiModule from '@/shared/api/clinic/directory-api.ts';
-import { saveMyPreferences } from '@/shared/api/clinic/preferences-api.ts';
+} from '@/shared/api/app/appointments-api.ts';
+import type { AppointmentListParams } from '@/shared/api/app/appointments-contracts.ts';
+import type * as DirectoryApiModule from '@/shared/api/app/directory-api.ts';
+import { saveMyPreferences } from '@/shared/api/app/preferences-api.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { notify } from '@/shared/notify/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import {
   APPOINTMENT_NOW,
   dayCount,
   DOCTOR_NISHA,
   TEST_BRANCH_ID,
 } from '@/tests/utils/appointment-doubles.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import {
   type AppointmentsWorld,
@@ -33,7 +33,7 @@ import {
   seededAppointmentsWorld,
 } from '../../__tests__/integration/appointments-test-data.ts';
 import {
-  grantClinicAccess,
+  grantAppAccess,
   renderAppointmentsRoutes,
 } from '../../__tests__/integration/appointments-test-router.tsx';
 import { AppointmentActionsProvider } from '../AppointmentActions/index.ts';
@@ -59,7 +59,7 @@ vi.mock('@/shared/notify/index.ts', () => ({
 }));
 
 const world = vi.hoisted(() => ({}) as AppointmentsWorld);
-vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/appointments-api.ts', async (importOriginal) => {
   const { appointmentsApiDouble } =
     await import('../../__tests__/integration/appointments-test-data.ts');
   return {
@@ -67,7 +67,7 @@ vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => {
     ...appointmentsApiDouble(world),
   };
 });
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => {
   const { directoryApiDouble } =
     await import('../../__tests__/integration/appointments-test-data.ts');
   return {
@@ -142,7 +142,7 @@ beforeEach(() => {
   vi.resetAllMocks();
   Object.assign(world, seededAppointmentsWorld());
   signInTestMember();
-  grantClinicAccess('owner');
+  grantAppAccess('owner');
 });
 afterEach(() => {
   vi.useRealTimers();
@@ -504,7 +504,7 @@ describe('AppointmentsAgenda — Change status', () => {
   });
 
   it('shows the status alone without Edit, and no "book one" without Create', async () => {
-    grantClinicAccess('none');
+    grantAppAccess('none');
     const list = renderAppointmentsRoutes(PAGE, Agenda);
     await rows();
     expect(screen.queryByTestId('appointments-status-button')).toBeNull();

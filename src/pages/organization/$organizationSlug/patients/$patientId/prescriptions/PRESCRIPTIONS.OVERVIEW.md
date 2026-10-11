@@ -14,8 +14,8 @@ takes `?medicines=` — the names the Overview's smart note recognised, each a l
 - `GET /app/patients/:patient_id/prescriptions` (every page, `sort=prescription_date`, newest
   first), `GET …/:patient_prescription_id`, `POST`, `PATCH` (a draft, with `expected_updated_at`),
   `POST …/approve`, `DELETE` (a draft, with the confirm's reason) and `POST …/restore` (Undo) —
-  `src/shared/api/clinic/prescriptions-api.ts`, its shapes in
-  `src/shared/api/clinic/prescriptions-contracts.ts`, the hooks in
+  `src/shared/api/app/prescriptions-api.ts`, its shapes in
+  `src/shared/api/app/prescriptions-contracts.ts`, the hooks in
   `src/shared/hooks/usePrescriptions/`.
 - **Draft until approved (Q19).** A member holding `patient_prescription:update` saves with
   "Save & approve" (the write, then `…/approve`); anyone else who writes (`…:create`) saves a
@@ -31,7 +31,7 @@ takes `?medicines=` — the names the Overview's smart note recognised, each a l
   and the patient's home branch's phone and GSTIN from `GET /app/branches/:branch_id`
   (`branch:read` only). No server PDF, no share (§6 #26).
 
-Gated by the file layout (membership, the `clinic-patients` module, the org status, the section's
+Gated by the file layout (membership, the `app-patients` module, the org status, the section's
 `patient_prescription:read`); in-room access is `usePrescriptionAccess`. Registered in
 `src/app/routes/routeTree.tsx` through the file's one lazy module (`../patient-id.sections.ts`).
 
@@ -40,7 +40,7 @@ Gated by the file layout (membership, the `clinic-patients` module, the org stat
 | File                                                     | Responsibility                                                                                                                                                                                                                                                                                                                                                                                                 |
 | -------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `prescriptions.route.tsx`                                | Route marker — exports `Component` rendering `PatientPrescriptionsPage`.                                                                                                                                                                                                                                                                                                                                       |
-| `prescriptions.manifest.ts`                              | Manifest — `kind: 'layout'` (children `create`, `$prescriptionId`), permission `organization:read`, module `clinic-patients`, title "Prescriptions".                                                                                                                                                                                                                                                           |
+| `prescriptions.manifest.ts`                              | Manifest — `kind: 'layout'` (children `create`, `$prescriptionId`), permission `organization:read`, module `app-patients`, title "Prescriptions".                                                                                                                                                                                                                                                              |
 | `prescriptions.constants.ts`                             | The drawer's and preview's copy keys, the status and kit tones, and root test ids.                                                                                                                                                                                                                                                                                                                             |
 | `PatientPrescriptionsPage.tsx`                           | The section, and the dialog its URL names: the drawer once the history, the medicines, the kits and the default doctor are read; the preview once the sheet's clinic is.                                                                                                                                                                                                                                       |
 | `hooks/usePrescriptionsTable/`                           | The columns (1100px): Date the primary, Medicines the phone key, Status a pill; Notes and Updated hidden; the people fold to nothing.                                                                                                                                                                                                                                                                          |

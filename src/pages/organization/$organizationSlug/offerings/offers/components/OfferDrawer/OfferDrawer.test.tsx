@@ -2,14 +2,14 @@ import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type * as OfferingsApiModule from '@/shared/api/clinic/offerings-api.ts';
+import type * as OfferingsApiModule from '@/shared/api/app/offerings-api.ts';
 import {
   createOffer,
   deleteOffer,
   fetchOffer,
   updateOffer,
-} from '@/shared/api/clinic/offerings-api.ts';
-import type { OfferRecord } from '@/shared/api/clinic/offerings-contracts.ts';
+} from '@/shared/api/app/offerings-api.ts';
+import type { OfferRecord } from '@/shared/api/app/offerings-contracts.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
@@ -56,7 +56,7 @@ vi.mock('@/shared/notify/index.ts', () => ({
 }));
 
 const world = vi.hoisted(() => ({}) as OffersWorld);
-vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/offerings-api.ts', async (importOriginal) => {
   const { offersApiDouble } =
     await import('../../__tests__/integration/offers-test-data.ts');
   return {

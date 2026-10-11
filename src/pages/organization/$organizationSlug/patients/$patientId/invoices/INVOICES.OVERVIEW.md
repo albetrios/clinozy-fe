@@ -9,7 +9,7 @@ Reads: `GET /app/invoices?patient_id=` (`useInvoiceList`, newest first, 50 a pag
 
 A row opens Edit invoice on the shared Invoice drawer (L-40) by its public id — the preview for a member without `payment:update`, for a Medical sale's invoice and for a settled one (`is_settled`) — keeping the file behind it (`from`, A-P1). Its actions, each on its code (`usePaymentAccess`): Print and Preview; Copy invoice (`payment:create`, never a sale's: New invoice prefilled from it, today, nothing paid; "Copied as #788" on save; L-64); Record payment (`payment:create`, while the server says it owes: Receive payment for this invoice over the file); Edit (`payment:update`) and Delete (`payment:delete`, "Delete this invoice?" with its reason and Undo; `409 invoice_paid` / `offering_in_use` in the drawer's words), neither on a sale's invoice nor a settled one.
 
-Gated by the file layout (membership, the `clinic-patients` module, the org status); in-room
+Gated by the file layout (membership, the `app-patients` module, the org status); in-room
 access is the member's `payment:*` codes (`usePaymentAccess`; a View-as preview reads the role's Payments matrix). Registered in `src/app/routes/routeTree.tsx` through the file's
 one lazy module (`../patient-id.sections.ts`).
 
@@ -18,7 +18,7 @@ one lazy module (`../patient-id.sections.ts`).
 | File                          | Responsibility                                                                                                       |
 | ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | `invoices.route.tsx`          | Route marker — exports `Component` rendering `PatientInvoicesPage`.                                                  |
-| `invoices.manifest.ts`        | Manifest — `kind: 'leaf'`, permission `organization:read`, module `clinic-patients`, title "Invoices".               |
+| `invoices.manifest.ts`        | Manifest — `kind: 'leaf'`, permission `organization:read`, module `app-patients`, title "Invoices".                  |
 | `PatientInvoicesPage.tsx`     | The section: its Columns chooser, the paged table, the server's count line, Retry, and "Delete this invoice?".       |
 | `hooks/useInvoicesTable/`     | The columns (1120px): Items the primary, Bill the phone key, Paid / due over "₹4,800 due" or "Nothing due" (rupees). |
 | `hooks/useInvoiceRowActions/` | A row's actions and what a row opens, on the ⌘K invoice targets with `from`, each gated by its `payment:*` code.     |

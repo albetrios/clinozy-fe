@@ -1,11 +1,11 @@
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
 import {
   TASK_FOLLOW_UP_SPANS,
   type TaskFields,
   type TaskFollowUpWhen,
   type TaskRecord,
   taskTimeAfter,
-} from '@/shared/api/clinic/tasks-contracts.ts';
+} from '@/shared/api/app/tasks-contracts.ts';
 
 /** "What’s next" Next step chips (H:4054), in order. */
 export const WHATS_NEXT_STEPS = [

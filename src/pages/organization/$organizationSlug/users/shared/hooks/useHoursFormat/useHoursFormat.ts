@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
 
-import type { Weekday } from '@/shared/api/clinic/clinic-schema.ts';
-import { localDateOf, workingDaysPattern } from '@/shared/api/clinic/clinic-time.ts';
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import type { Weekday } from '@/shared/api/app/app-schema.ts';
+import { localDateOf, workingDaysPattern } from '@/shared/api/app/app-time.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
 import { USERS_KEYS, USERS_NS } from '../../../users.constants.ts';
@@ -42,7 +42,7 @@ export interface HoursFormat {
 export function useHoursFormat(): HoursFormat {
   const { t } = useTranslation(USERS_NS);
   const { formatDate } = useLocaleFormat();
-  const clock = useClinicClock();
+  const clock = useAppClock();
 
   const weekday = (day: Weekday) => {
     const date = localDateOf(MONDAY);

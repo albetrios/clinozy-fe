@@ -3,7 +3,7 @@ import type { ClassNames } from 'react-day-picker';
 
 import { weekdayHeaders } from '@/lib/i18n/weekday-headers.ts';
 import { cn } from '@/lib/utils.ts';
-import { civilDateOf } from '@/shared/api/clinic/clinic-time.ts';
+import { civilDateOf } from '@/shared/api/app/app-time.ts';
 import { Calendar } from '@/shared/components/ui/calendar.tsx';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 

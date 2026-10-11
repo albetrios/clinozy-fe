@@ -3,8 +3,8 @@ import { useState } from 'react';
 import { useForm, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { feedbackQueryKeys, fetchCheckIn } from '@/shared/api/clinic/feedback-api.ts';
-import type { PatientCheckIn } from '@/shared/api/clinic/feedback-contracts.ts';
+import { feedbackQueryKeys, fetchCheckIn } from '@/shared/api/app/feedback-api.ts';
+import type { PatientCheckIn } from '@/shared/api/app/feedback-contracts.ts';
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { useEditingRecord } from '@/shared/hooks/useEditingRecord/index.ts';

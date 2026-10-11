@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import type { TreatmentRecord } from '@/shared/api/clinic/treatments-contracts.ts';
+import type { TreatmentRecord } from '@/shared/api/app/treatments-contracts.ts';
 import {
   ConfirmDialog,
   type ConfirmReasonChoice,

@@ -4,7 +4,7 @@ import {
   type OrganizationPermission,
   organizationPermissionSchema,
 } from '@/core/types/permissions.ts';
-import type { Tone, Weekday } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Tone, Weekday } from '@/shared/api/app/app-schema.ts';
 
 /**
  * Organization domain types and runtime form schemas.

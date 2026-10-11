@@ -147,9 +147,9 @@ Comma-separated **product module keys** (e.g. `billing,members`). Disabled modul
 - Nav/settings entries should hide via `isPlatformModuleEnabled()`
 
 **A production deploy must switch off every fixture-backed clinic room** —
-`FIXTURE_BACKED_CLINIC_MODULES` in `src/core/config/clinic-modules.ts`, today `clinic-medical`
+`FIXTURE_BACKED_APP_MODULES` in `src/core/config/app-modules.ts`, today `app-medical`
 (launch D8). It is a GitHub Environment **variable** (`deployVariables` in
-`tooling/setup/setup.config.json`): put `VITE_DISABLED_MODULES=clinic-medical` (plus anything else
+`tooling/setup/setup.config.json`): put `VITE_DISABLED_MODULES=app-medical` (plus anything else
 to hide) in `.env.production` and run `pnpm github:sync`; the deploy and preview builds write it
 into the build's env file. `pnpm validate:client-env` refuses a production deploy whose value
 leaves a fixture-backed room on — without it the build would ship every room, fixtures included.

@@ -5,23 +5,23 @@ and prices (KICKOFF §6.11; the offerings spec). The bare URL is the **Offerings
 its literal child route, a page of its own (D24) — see `offers/OFFERS.OVERVIEW.md`. The room's tabs are
 links between the two, not state.
 
-Gated like every clinic room: membership (`organization:read`) and the `clinic-offerings` module, then
+Gated like every clinic room: membership (`organization:read`) and the `app-offerings` module, then
 `requireOrgStatus`. In the room every control asks for the member's own clinozy-be code
-(`useClinicAccess().canCode`, research §7): New offering `offering:create`, a row's Edit
+(`useAppAccess().canCode`, research §7): New offering `offering:create`, a row's Edit
 `offering:update`, Delete (and its Undo) `offering:delete`, bulk Export `offering:export`
 (`canExportRows`), the Lowest price `offering:lower_price:read`. Owner and Admin hold them all;
 a Counsellor creates and edits; a Doctor, Pharmacist or Accountant exports. A row click opens the drawer
 for everyone — view only without `offering:update`. During View-as every code reads false, so every
 code-gated control hides.
 
-The room is on clinozy-be (D153; `clinic-offerings` is out of `FIXTURE_BACKED_CLINIC_MODULES`). Both
+The room is on clinozy-be (D153; `app-offerings` is out of `FIXTURE_BACKED_APP_MODULES`). Both
 tabs read `GET /app/offerings` and `GET /app/offers` (`useOfferings` / `useOffers`): the catalogue is
 small, so every cursor page is read up front and kept in the server's order (offerings newest first;
 offers live → scheduled → paused → ended), then searched, filtered and sorted in place (KICKOFF §6.11
 Lists). It is the clinic's one catalogue: the appointment form's "From offerings", a check-in's offerings
 and the plan card select their own shape from the same cache entry (`useOfferings({ select })`), so this
 room's writes refresh them too. Money is rupees as the API sends them (`useRupeeFormat`). Each row is priced for the
-header's branch with `effectivePrice` (`src/shared/api/clinic/offerings-pricing.ts`, Q-O2, D40) — only
+header's branch with `effectivePrice` (`src/shared/api/app/offerings-pricing.ts`, Q-O2, D40) — only
 the offers the server calls `live` count, and a floor the member cannot see (`min_price` null) clamps
 nothing. A product's Duration reads "—". The Filters sections are built from the values the rows show — a
 column gets one with 2–10 values, fewer than the rows (`offerings.md:187`) — then Created. A first read
@@ -45,7 +45,7 @@ onto the list with the write's toast (D28); reopening the same record returns to
 | File                                        | Responsibility                                                                                                                                                                                                                                                                                                                  |
 | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `offerings.route.tsx`                       | Route marker — exports `Component` rendering `OfferingsPage`.                                                                                                                                                                                                                                                                   |
-| `offerings.manifest.ts`                     | Manifest — `kind: 'layout'`, children `create`, `$offeringId`, `offers`; permission `organization:read`, module `clinic-offerings`, nav.                                                                                                                                                                                        |
+| `offerings.manifest.ts`                     | Manifest — `kind: 'layout'`, children `create`, `$offeringId`, `offers`; permission `organization:read`, module `app-offerings`, nav.                                                                                                                                                                                           |
 | `offerings.search.ts`                       | `validateOfferingsSearch` (`q`, `category`, `offer`, `branch`, `status`, `created`, `sort`; `specialty` left raw, Q-O6), on the same shared readers as Offers. In the entry chunk: no zod.                                                                                                                                      |
 | `offerings.dialog-search.ts`                | New offering's `?name=` — parsed by `useOfferingsDialogRoute`; loads with the room.                                                                                                                                                                                                                                             |
 | `offerings.constants.ts`                    | `OFFERINGS_NS` / `OFFERINGS_KEYS` (the Offerings tab's copy), `OFFERINGS_TABLE_ID`.                                                                                                                                                                                                                                             |

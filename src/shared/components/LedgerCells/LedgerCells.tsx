@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import { editSidesOf, type LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
-import { CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { PAYMENT_MODE_TONES } from '@/shared/clinic/clinic-tones.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import { editSidesOf, type LedgerRow } from '@/shared/api/app/payments-contracts.ts';
+import { APP_NS } from '@/shared/app/app.constants.ts';
+import { PAYMENT_MODE_TONES } from '@/shared/app/app-tones.ts';
 import {
   AvatarStack,
   IdPill,
@@ -12,7 +12,7 @@ import {
   TonePill,
   type TonePillProps,
 } from '@/shared/components/Cells/index.ts';
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 
 import { LEDGER_KEYS, LEDGER_NS } from './ledger-cells.constants.ts';
@@ -62,9 +62,9 @@ export function LedgerWhenCell({
   row: Pick<LedgerRow, 'paidAt' | 'editCount' | 'lastEdit'>;
 }) {
   const { t } = useTranslation(LEDGER_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const formatRupees = useRupeeFormat();
-  const clock = useClinicClock();
+  const clock = useAppClock();
   const last = row.lastEdit ? editSidesOf(row.lastEdit) : null;
   return (
     <span className="flex min-w-0 flex-col">
@@ -75,8 +75,8 @@ export function LedgerWhenCell({
         <span className="text-caption text-tone-butter-foreground truncate tabular-nums">
           {t(LEDGER_KEYS.ledger.edited, {
             count: row.editCount,
-            from: editSideLabel(last.from, t, tClinic, formatRupees),
-            to: editSideLabel(last.to, t, tClinic, formatRupees),
+            from: editSideLabel(last.from, t, tApp, formatRupees),
+            to: editSideLabel(last.to, t, tApp, formatRupees),
           })}
         </span>
       ) : null}
@@ -115,13 +115,13 @@ export function LedgerModeCell({
   row: Pick<LedgerRow, 'splits'>;
   size?: TonePillProps['size'];
 }) {
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const modes = ledgerModes(row);
   const first = modes[0];
   if (!first) return null;
   return (
     <TonePill tone={PAYMENT_MODE_TONES[first]} size={size}>
-      {ledgerModesLabel(modes, tClinic)}
+      {ledgerModesLabel(modes, tApp)}
     </TonePill>
   );
 }

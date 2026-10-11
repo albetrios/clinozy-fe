@@ -6,7 +6,7 @@ import {
   PACKAGE_SESSIONS_MAX,
   type PatientPackageChange,
   type PatientPackageRow,
-} from '@/shared/api/clinic/patient-packages-contracts.ts';
+} from '@/shared/api/app/patient-packages-contracts.ts';
 import {
   DrawerField,
   DrawerFieldGrid,

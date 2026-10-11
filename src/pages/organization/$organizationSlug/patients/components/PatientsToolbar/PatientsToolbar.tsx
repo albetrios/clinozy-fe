@@ -6,14 +6,14 @@
 import type { ReactTable } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import type { PatientRow, PatientView } from '@/shared/api/clinic/patients-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
+import type { PatientRow, PatientView } from '@/shared/api/app/patients-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import {
   PATIENT_CONVERSION_TONES,
   PATIENT_STATUS_TONES,
   PATIENT_TYPE_TONES,
-} from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/app/app-tones.ts';
 import type { DataTableFeatures } from '@/shared/components/DataTable/index.ts';
 import { DataTableColumnChooser } from '@/shared/components/DataTableColumnChooser/index.ts';
 import {
@@ -53,7 +53,7 @@ export interface PatientsToolbarProps {
 /** The Filters popover's sections (`patients.md:133`): Type · Status · Conversion, each value in its badge's tone. */
 function useFilterCopy(): Readonly<Record<string, RoomFilterCopy>> {
   const { t } = useTranslation(PATIENTS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const labelled = <T extends string>(
     values: readonly T[],
     labelOf: (value: T) => string,
@@ -67,7 +67,7 @@ function useFilterCopy(): Readonly<Record<string, RoomFilterCopy>> {
       label: t(PATIENTS_KEYS.columns.types),
       options: labelled(
         PATIENT_FILTER_VALUES.types,
-        (type) => tClinic(CLINIC_KEYS.patients.types[type]),
+        (type) => tApp(APP_KEYS.patients.types[type]),
         PATIENT_TYPE_TONES,
       ),
     },
@@ -75,7 +75,7 @@ function useFilterCopy(): Readonly<Record<string, RoomFilterCopy>> {
       label: t(PATIENTS_KEYS.columns.status),
       options: labelled(
         PATIENT_FILTER_VALUES.status,
-        (status) => tClinic(CLINIC_KEYS.patients.statuses[status]),
+        (status) => tApp(APP_KEYS.patients.statuses[status]),
         PATIENT_STATUS_TONES,
       ),
     },
@@ -83,7 +83,7 @@ function useFilterCopy(): Readonly<Record<string, RoomFilterCopy>> {
       label: t(PATIENTS_KEYS.columns.conversion),
       options: labelled(
         PATIENT_FILTER_VALUES.conversion,
-        (conversion) => tClinic(CLINIC_KEYS.patients.conversions[conversion]),
+        (conversion) => tApp(APP_KEYS.patients.conversions[conversion]),
         PATIENT_CONVERSION_TONES,
       ),
     },

@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
 
-import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
-import { ALL_BRANCHES } from '@/shared/api/clinic/clinic-list-filters.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { ALL_BRANCHES } from '@/shared/api/app/app-list-filters.ts';
+import type { BranchOption } from '@/shared/api/app/branches-api.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import type { DataTableFoldValue } from '@/shared/components/DataTable/index.ts';
 import type { RoomFilterCopy } from '@/shared/components/RoomToolbar/index.ts';
 

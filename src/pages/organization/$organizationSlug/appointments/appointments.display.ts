@@ -4,14 +4,14 @@
  * "Latest update" pill. Pure — every view (Agenda, the card, the calendar
  * blocks) reads these, and the tests pin them. The service tone and the
  * contact card are shared with the appointment form
- * (`@/shared/clinic/appointment-display.ts`).
+ * (`@/shared/app/appointment-display.ts`).
  */
+import type { Tone } from '@/shared/api/app/app-schema.ts';
+import { civilDayOffset } from '@/shared/api/app/app-time.ts';
 import type {
   AppointmentPersonKind,
   AppointmentRow,
-} from '@/shared/api/clinic/appointments-contracts.ts';
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import { civilDayOffset } from '@/shared/api/clinic/clinic-time.ts';
+} from '@/shared/api/app/appointments-contracts.ts';
 
 // ── Tones ──
 

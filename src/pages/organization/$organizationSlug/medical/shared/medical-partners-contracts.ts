@@ -6,7 +6,7 @@ import {
   type PoStage,
   type Tone,
   toneSchema,
-} from '@/shared/api/clinic/clinic-schema.ts';
+} from '@/shared/api/app/app-schema.ts';
 
 /*
  * What a client sends for the Medical store's partners — suppliers,

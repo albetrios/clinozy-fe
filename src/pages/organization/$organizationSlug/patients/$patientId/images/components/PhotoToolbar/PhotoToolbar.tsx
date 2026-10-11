@@ -2,8 +2,8 @@ import { type KeyboardEvent, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type { PatientPhotoAlbumCounts } from '@/shared/api/clinic/patient-images-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+import type { PatientPhotoAlbumCounts } from '@/shared/api/app/patient-images-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
 import { RoomViewTabs } from '@/shared/components/RoomToolbar/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
@@ -63,7 +63,7 @@ function useVisitOptions(
   visits: readonly PhotoVisit[],
   dayLabel: (date: string) => string,
 ): PickerOption[] {
-  const { t } = useTranslation([PATIENT_PHOTOS_NS, CLINIC_NS]);
+  const { t } = useTranslation([PATIENT_PHOTOS_NS, APP_NS]);
   return visits.map((visit) => ({
     key: visit.appointmentId,
     label: t(K.visitFilter.visit, {
@@ -72,7 +72,7 @@ function useVisitOptions(
     }),
     sub: t(K.visitFilter.visitSub, {
       seq: visit.seq,
-      status: t(CLINIC_KEYS.appointments.statuses[visit.status], { ns: CLINIC_NS }),
+      status: t(APP_KEYS.appointments.statuses[visit.status], { ns: APP_NS }),
     }),
     tone: 'sky' as const,
   }));

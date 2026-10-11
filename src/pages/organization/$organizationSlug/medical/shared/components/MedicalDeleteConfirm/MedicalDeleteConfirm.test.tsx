@@ -2,11 +2,11 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
+import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
 import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+  appFixtures,
+  resetAppFixtures,
+} from '@/shared/api/app/fixtures/world.fixtures.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 
 import {
@@ -44,11 +44,11 @@ const setup = () =>
 
 beforeEach(() => {
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 afterEach(() => {
   resetMedicalRoutes();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 
 /** Confirm `target` with its first reason; resolve once the confirm has closed. */
@@ -75,7 +75,7 @@ describe('MedicalDeleteConfirm (medical.md:357–368)', () => {
       { kind: 'medicine', id, name: 'Glycolac Cream' },
       'Delete this medicine?',
     );
-    expect(clinicFixtures.medicines.snapshot((row) => row.id === id)).toHaveLength(0);
+    expect(appFixtures.medicines.snapshot((row) => row.id === id)).toHaveLength(0);
     expect(notifyMock.undo).toHaveBeenCalledWith(
       'Glycolac Cream deleted',
       expect.objectContaining({ onUndo: expect.any(Function) }),
@@ -83,7 +83,7 @@ describe('MedicalDeleteConfirm (medical.md:357–368)', () => {
     const [, options] = notifyMock.undo.mock.calls[0] as [string, { onUndo: () => void }];
     options.onUndo();
     await waitFor(() =>
-      expect(clinicFixtures.medicines.snapshot((row) => row.id === id)).toHaveLength(1),
+      expect(appFixtures.medicines.snapshot((row) => row.id === id)).toHaveLength(1),
     );
   });
 
@@ -93,12 +93,12 @@ describe('MedicalDeleteConfirm (medical.md:357–368)', () => {
       'Delete this MR?',
     );
     expect(
-      clinicFixtures.medicalReps.snapshot((rep) => rep.id === ref.medicalRep(3)),
+      appFixtures.medicalReps.snapshot((rep) => rep.id === ref.medicalRep(3)),
     ).toHaveLength(0);
   });
 
   it('deletes a manufacturer no medicine names', async () => {
-    const maker = await clinicFixtures.manufacturers.create({
+    const maker = await appFixtures.manufacturers.create({
       name: 'ZEN',
       tone: 'lav',
       isQuick: true,
@@ -107,9 +107,9 @@ describe('MedicalDeleteConfirm (medical.md:357–368)', () => {
       { kind: 'manufacturer', id: maker.id, name: 'ZEN', record: 'ZEN · 0 suppliers' },
       'Delete this manufacturer?',
     );
-    expect(
-      clinicFixtures.manufacturers.snapshot((row) => row.id === maker.id),
-    ).toHaveLength(0);
+    expect(appFixtures.manufacturers.snapshot((row) => row.id === maker.id)).toHaveLength(
+      0,
+    );
   });
 
   it('deletes a supplier with nothing to settle', async () => {
@@ -118,7 +118,7 @@ describe('MedicalDeleteConfirm (medical.md:357–368)', () => {
       'Delete this supplier?',
     );
     expect(
-      clinicFixtures.suppliers.snapshot((row) => row.id === ref.supplier(52)),
+      appFixtures.suppliers.snapshot((row) => row.id === ref.supplier(52)),
     ).toHaveLength(0);
   });
 });

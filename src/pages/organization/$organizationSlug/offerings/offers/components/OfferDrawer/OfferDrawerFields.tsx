@@ -1,19 +1,16 @@
 import { Controller, type UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
-import { ALL_BRANCHES } from '@/shared/api/clinic/clinic-list-filters.ts';
+import { ALL_BRANCHES } from '@/shared/api/app/app-list-filters.ts';
 import {
   OFFER_KIND_VALUES,
   OFFERING_CATEGORY_VALUES,
-} from '@/shared/api/clinic/clinic-schema.ts';
-import type { OfferingRecord } from '@/shared/api/clinic/offerings-contracts.ts';
-import { basePrice } from '@/shared/api/clinic/offerings-pricing.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import {
-  OFFER_KIND_TONES,
-  OFFERING_CATEGORY_TONES,
-} from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/api/app/app-schema.ts';
+import type { BranchOption } from '@/shared/api/app/branches-api.ts';
+import type { OfferingRecord } from '@/shared/api/app/offerings-contracts.ts';
+import { basePrice } from '@/shared/api/app/offerings-pricing.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { OFFER_KIND_TONES, OFFERING_CATEGORY_TONES } from '@/shared/app/app-tones.ts';
 import {
   DrawerChips,
   DrawerField,
@@ -139,7 +136,7 @@ function OfferValueField({
 export function OfferMainFields(props: OfferFieldsProps) {
   const { form, idPrefix, testId } = props;
   const { t } = useTranslation(OFFER_DRAWER_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const field = useDrawerFieldIds(form, idPrefix);
   const name = field('name');
   const code = field('code');
@@ -196,7 +193,7 @@ export function OfferMainFields(props: OfferFieldsProps) {
               label={t(F.type)}
               options={OFFER_KIND_VALUES.map((kind) => ({
                 value: kind,
-                label: tClinic(CLINIC_KEYS.offerings.offerKinds[kind]),
+                label: tApp(APP_KEYS.offerings.offerKinds[kind]),
                 tone: OFFER_KIND_TONES[kind],
               }))}
               value={control.value}
@@ -245,7 +242,7 @@ function useOfferingOptions(
   offerings: readonly OfferingRecord[],
   picked: readonly string[],
 ): PickerOption<OfferingRecord>[] {
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const formatRupees = useRupeeFormat();
   const rank = (offering: OfferingRecord) =>
     OFFERING_CATEGORY_VALUES.indexOf(offering.category);
@@ -253,7 +250,7 @@ function useOfferingOptions(
     .filter((offering) => offering.isActive || picked.includes(offering.id))
     .sort((a, b) => rank(a) - rank(b))
     .map((offering) => {
-      const category = tClinic(CLINIC_KEYS.offerings.categories[offering.category]);
+      const category = tApp(APP_KEYS.offerings.categories[offering.category]);
       return {
         key: offering.id,
         label: offering.name,

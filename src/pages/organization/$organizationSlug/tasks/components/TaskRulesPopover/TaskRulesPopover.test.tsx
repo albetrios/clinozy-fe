@@ -7,7 +7,7 @@ import {
   TASK_RULE_KEY_VALUES,
   type TaskRuleKey,
   type TaskRuleSettings,
-} from '@/shared/api/clinic/tasks-contracts.ts';
+} from '@/shared/api/app/tasks-contracts.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 

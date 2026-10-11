@@ -2,11 +2,11 @@ import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type { DayCloseView } from '@/shared/api/clinic/day-close-contracts.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import type { DayCloseView } from '@/shared/api/app/day-close-contracts.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { PersonAvatar, shortPersonName } from '@/shared/components/Cells/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 import { CheckCircle } from '@/shared/icons/index.ts';
 
@@ -50,7 +50,7 @@ function differenceSub(view: DayCloseView, t: TFunction): string {
 /** "Closed by Riya S. · 01:42", or the worker's "Closed at 00:00 · auto-closed …". */
 function useClosedSub(view: DayCloseView): string {
   const { t } = useTranslation(PAYMENTS_NS);
-  const { time: timeOf } = useClinicClock();
+  const { time: timeOf } = useAppClock();
   const time = view.closedAt ? timeOf(view.closedAt) : '—';
   if (view.autoClosed) return t(K.autoClosed, { time });
   const name = view.closedBy ? shortPersonName(view.closedBy.name) : t(K.someone);
@@ -107,7 +107,7 @@ function LogAvatar({ row }: { row: DayLogRow }) {
  */
 function DayLog({ view }: { view: DayCloseView }) {
   const { t } = useTranslation(PAYMENTS_NS);
-  const { time: timeOf } = useClinicClock();
+  const { time: timeOf } = useAppClock();
   const textOf = useLogText(view);
   const rows = dayLog(view);
   if (rows.length === 0) return null;

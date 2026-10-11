@@ -3,8 +3,8 @@ import type { UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { paiseOfRupees } from '@/lib/number-text.ts';
-import { discountForFinal, lineFinal } from '@/shared/api/clinic/clinic-money.ts';
-import type { InvoiceRecord } from '@/shared/api/clinic/invoices-contracts.ts';
+import { discountForFinal, lineFinal } from '@/shared/api/app/app-money.ts';
+import type { InvoiceRecord } from '@/shared/api/app/invoices-contracts.ts';
 import { useOffers } from '@/shared/hooks/useOffers/index.ts';
 import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 import { notify } from '@/shared/notify/index.ts';

@@ -3,15 +3,13 @@ import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type * as AppointmentsApiModule from '@/shared/api/clinic/appointments-api.ts';
-import {
-  cancelAppointment,
-  moveAppointment,
-} from '@/shared/api/clinic/appointments-api.ts';
-import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
-import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { appInstant } from '@/shared/api/app/app-time.ts';
+import type * as AppointmentsApiModule from '@/shared/api/app/appointments-api.ts';
+import { cancelAppointment, moveAppointment } from '@/shared/api/app/appointments-api.ts';
+import type { AppointmentRow } from '@/shared/api/app/appointments-contracts.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { notify } from '@/shared/notify/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import {
   APPOINTMENT_NOW,
   APPOINTMENT_TODAY,
@@ -20,7 +18,6 @@ import {
 } from '@/tests/utils/appointment-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { fsi, withoutBidiMarks } from '@/tests/utils/bidi-marks.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import {
   type AppointmentsWorld,
@@ -28,7 +25,7 @@ import {
 } from '../../__tests__/integration/appointments-test-data.ts';
 import {
   APPOINTMENTS_PAGE,
-  grantClinicAccess,
+  grantAppAccess,
   renderInAppointments,
 } from '../../__tests__/integration/appointments-test-router.tsx';
 import { AppointmentCardContent, AppointmentQuickView } from './AppointmentCard.tsx';
@@ -40,7 +37,7 @@ vi.mock('@/shared/notify/index.ts', () => ({
 }));
 
 const world = vi.hoisted(() => ({}) as AppointmentsWorld);
-vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/appointments-api.ts', async (importOriginal) => {
   const { appointmentsApiDouble } =
     await import('../../__tests__/integration/appointments-test-data.ts');
   return {
@@ -54,7 +51,7 @@ const booking = (overrides: Partial<AppointmentRow> = {}) => appointmentRow(over
 
 /** The card once the member's access is known — the guards read it. */
 function WhenResolved({ children }: { children: ReactNode }) {
-  const access = useClinicAccess();
+  const access = useAppAccess();
   return access.isResolved ? children : null;
 }
 
@@ -80,7 +77,7 @@ beforeEach(() => {
   vi.resetAllMocks();
   Object.assign(world, seededAppointmentsWorld());
   signInTestMember();
-  grantClinicAccess('owner');
+  grantAppAccess('owner');
 });
 afterEach(() => vi.useRealTimers());
 
@@ -98,7 +95,7 @@ describe('AppointmentCardContent (appointments.md:149–163)', () => {
 
   it('says where a moved booking came from, and "No update yet" without an event', async () => {
     const moved = renderCard(
-      booking({ moveCount: 1, rescheduledFrom: clinicInstant('2026-10-02', '16:30') }),
+      booking({ moveCount: 1, rescheduledFrom: appInstant('2026-10-02', '16:30') }),
     );
     expect(withoutBidiMarks((await screen.findByTestId('card')).textContent)).toMatch(
       /Moved from .+ 4:30\sPM/,
@@ -230,7 +227,7 @@ describe('AppointmentCardContent (appointments.md:149–163)', () => {
   });
 
   it('keeps the moves away from a member without Edit', async () => {
-    grantClinicAccess('none');
+    grantAppAccess('none');
     renderCard(booking());
     await screen.findByTestId('appointment-card-open');
     expect(screen.queryByTestId('appointment-card-move-reschedule')).toBeNull();

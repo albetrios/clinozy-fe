@@ -3,14 +3,14 @@ import { useTranslation } from 'react-i18next';
 
 import { isolateText } from '@/lib/bidi-isolate.ts';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
-import type { ContactActivityEntry } from '@/shared/api/clinic/contact-activities-api.ts';
+import type { ContactActivityEntry } from '@/shared/api/app/contact-activities-api.ts';
 import { PersonAvatar, shortPersonName } from '@/shared/components/Cells/index.ts';
 import { DrawerTextarea } from '@/shared/components/DrawerField/index.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 import {
   CONTACT_NOTE_MAX,
   CONTACT_NOTES_FILTER,
@@ -77,7 +77,7 @@ function NoteCard({
   author: StaffChip | null;
 }) {
   const { t } = useTranslation(NOTES_NS);
-  const clock = useClinicClock();
+  const clock = useAppClock();
   return (
     <div
       data-slot="card"

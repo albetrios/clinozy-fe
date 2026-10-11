@@ -3,19 +3,19 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type * as AppointmentsApiModule from '@/shared/api/clinic/appointments-api.ts';
-import type * as ContactActivitiesApiModule from '@/shared/api/clinic/contact-activities-api.ts';
-import { fetchContactThread } from '@/shared/api/clinic/contact-activities-api.ts';
-import type * as ContactsApiModule from '@/shared/api/clinic/contacts-api.ts';
-import { fetchContact, updateContact } from '@/shared/api/clinic/contacts-api.ts';
-import type * as DirectoryApiModule from '@/shared/api/clinic/directory-api.ts';
-import type * as LeadsApiModule from '@/shared/api/clinic/leads-api.ts';
+import type * as AppointmentsApiModule from '@/shared/api/app/appointments-api.ts';
+import type * as ContactActivitiesApiModule from '@/shared/api/app/contact-activities-api.ts';
+import { fetchContactThread } from '@/shared/api/app/contact-activities-api.ts';
+import type * as ContactsApiModule from '@/shared/api/app/contacts-api.ts';
+import { fetchContact, updateContact } from '@/shared/api/app/contacts-api.ts';
+import type * as DirectoryApiModule from '@/shared/api/app/directory-api.ts';
+import type * as LeadsApiModule from '@/shared/api/app/leads-api.ts';
 import {
   countOpenLeadTasks,
   deleteLead,
   restoreLead,
   updateLead,
-} from '@/shared/api/clinic/leads-api.ts';
+} from '@/shared/api/app/leads-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import type * as NotifyModule from '@/shared/notify/index.ts';
 import {
@@ -25,7 +25,7 @@ import {
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import type * as MyMembershipModule from '@/shared/tenancy/my-membership.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 
 import {
   contactRecord,
@@ -60,8 +60,8 @@ vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
  * ability is granted.
  */
 const access = vi.hoisted(() => ({ book: true, tasks: true }));
-vi.mock('@/shared/hooks/useClinicAccess/index.ts', () => ({
-  useClinicAccess: () => ({
+vi.mock('@/shared/hooks/useAppAccess/index.ts', () => ({
+  useAppAccess: () => ({
     previewRole: null,
     can: (section: string) =>
       (section !== 'appointments' || access.book) &&
@@ -74,12 +74,12 @@ vi.mock('@/shared/hooks/useClinicAccess/index.ts', () => ({
 
 const world = vi.hoisted(() => ({}) as LeadsWorld);
 const people = vi.hoisted(() => ({}) as ContactsWorld);
-vi.mock('@/shared/api/clinic/leads-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/leads-api.ts', async (importOriginal) => {
   const { leadsApiDouble } =
     await import('../../__tests__/integration/leads-test-data.ts');
   return { ...(await importOriginal<typeof LeadsApiModule>()), ...leadsApiDouble(world) };
 });
-vi.mock('@/shared/api/clinic/contacts-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/contacts-api.ts', async (importOriginal) => {
   const { contactsApiDouble } =
     await import('../../__tests__/integration/leads-test-data.ts');
   return {
@@ -87,7 +87,7 @@ vi.mock('@/shared/api/clinic/contacts-api.ts', async (importOriginal) => {
     ...contactsApiDouble(people),
   };
 });
-vi.mock('@/shared/api/clinic/contact-activities-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/contact-activities-api.ts', async (importOriginal) => {
   const { contactActivitiesApiDouble } =
     await import('../../__tests__/integration/leads-test-data.ts');
   return {
@@ -95,7 +95,7 @@ vi.mock('@/shared/api/clinic/contact-activities-api.ts', async (importOriginal) 
     ...contactActivitiesApiDouble(),
   };
 });
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => {
   const { directoryApiDouble } =
     await import('../../__tests__/integration/leads-test-data.ts');
   return {
@@ -104,7 +104,7 @@ vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => {
   };
 });
 // The stacked appointment form's reads: the day's free starts, no treatments.
-vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/appointments-api.ts', async (importOriginal) => {
   const { slotDay } = await import('@/tests/utils/appointment-doubles.ts');
   return {
     ...(await importOriginal<typeof AppointmentsApiModule>()),
@@ -114,7 +114,7 @@ vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => {
   };
 });
 // The one offerings catalogue — the booking step's "From offerings": empty here.
-vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/offerings-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchAllOfferings: vi.fn(async () => []),
 }));

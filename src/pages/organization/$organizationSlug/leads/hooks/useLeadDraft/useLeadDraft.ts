@@ -4,8 +4,8 @@ import type {
   LeadInterest,
   LeadSource,
   LeadStatus,
-} from '@/shared/api/clinic/clinic-schema.ts';
-import type { LeadFields, LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
+} from '@/shared/api/app/app-schema.ts';
+import type { LeadFields, LeadRecord } from '@/shared/api/app/leads-contracts.ts';
 import type { DrawerSaveState } from '@/shared/components/DrawerFooter/index.ts';
 import { useUpdateLead } from '@/shared/hooks/useLeads/index.ts';
 

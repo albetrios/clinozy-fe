@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import type { PatientPackageRow } from '@/shared/api/clinic/patient-packages-contracts.ts';
+import type { PatientPackageRow } from '@/shared/api/app/patient-packages-contracts.ts';
 
 import {
   patientPackage,

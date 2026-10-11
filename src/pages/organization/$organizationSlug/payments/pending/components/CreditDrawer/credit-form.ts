@@ -5,14 +5,14 @@ import {
   rupeesOfPaise,
   textFromNumber,
 } from '@/lib/number-text.ts';
-import type { CreditDirection, Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { CreditDirection, Tone } from '@/shared/api/app/app-schema.ts';
 import {
   CREDIT_REASON_VALUES,
   type CreditInput,
   type CreditPartyRow,
   type CreditReasonKey,
   type CreditRow,
-} from '@/shared/api/clinic/credits-contracts.ts';
+} from '@/shared/api/app/credits-contracts.ts';
 
 /*
  * Add pending / Edit pending's form (`payments.md:152–168`; H:4022–4034) —

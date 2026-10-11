@@ -11,7 +11,7 @@ import { SPLASH_TEST_IDS } from './app-splash.constants.ts';
 import { AppSplashSlot } from './AppSplashSlot.tsx';
 
 /** 09:00 in Asia/Kolkata on Saturday 3 October 2026 — the clinic's clock. */
-const CLINIC_MORNING = new Date('2026-10-03T03:30:00Z');
+const APP_MORNING = new Date('2026-10-03T03:30:00Z');
 
 function meContext(firstName: string | null, email = 'riya@cresence.test'): MeContext {
   return {
@@ -70,7 +70,7 @@ describe('AppSplashSlot', () => {
   let slot: HTMLElement;
 
   beforeEach(() => {
-    vi.useFakeTimers({ now: CLINIC_MORNING });
+    vi.useFakeTimers({ now: APP_MORNING });
     setOnline(true);
     slot = mountSplash();
   });

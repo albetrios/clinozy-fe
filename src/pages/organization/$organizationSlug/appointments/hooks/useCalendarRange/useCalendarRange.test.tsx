@@ -1,18 +1,18 @@
 import { screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type * as AppointmentsApiModule from '@/shared/api/clinic/appointments-api.ts';
-import { fetchAppointmentRange } from '@/shared/api/clinic/appointments-api.ts';
-import type * as DirectoryApiModule from '@/shared/api/clinic/directory-api.ts';
-import { saveMyPreferences } from '@/shared/api/clinic/preferences-api.ts';
+import type * as AppointmentsApiModule from '@/shared/api/app/appointments-api.ts';
+import { fetchAppointmentRange } from '@/shared/api/app/appointments-api.ts';
+import type * as DirectoryApiModule from '@/shared/api/app/directory-api.ts';
+import { saveMyPreferences } from '@/shared/api/app/preferences-api.ts';
 import { notify } from '@/shared/notify/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import {
   APPOINTMENT_NOW,
   DOCTOR_ARJUN,
   DOCTOR_NISHA,
   TEST_BRANCH_ID,
 } from '@/tests/utils/appointment-doubles.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import {
   type AppointmentsWorld,
@@ -30,7 +30,7 @@ vi.mock('@/shared/notify/index.ts', () => ({
 }));
 
 const world = vi.hoisted(() => ({}) as AppointmentsWorld);
-vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/appointments-api.ts', async (importOriginal) => {
   const { appointmentsApiDouble } =
     await import('../../__tests__/integration/appointments-test-data.ts');
   return {
@@ -38,7 +38,7 @@ vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => {
     ...appointmentsApiDouble(world),
   };
 });
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => {
   const { directoryApiDouble } =
     await import('../../__tests__/integration/appointments-test-data.ts');
   return {

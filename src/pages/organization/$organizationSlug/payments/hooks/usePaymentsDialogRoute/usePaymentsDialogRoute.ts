@@ -5,9 +5,9 @@ import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { organizationPayments } from '@/lib/routes/payments-builders.ts';
-import { fetchPayment, paymentQueryKeys } from '@/shared/api/clinic/payments-api.ts';
-import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
-import { safeReferrer } from '@/shared/clinic/clinic-referrer.ts';
+import { fetchPayment, paymentQueryKeys } from '@/shared/api/app/payments-api.ts';
+import type { LedgerRow } from '@/shared/api/app/payments-contracts.ts';
+import { safeReferrer } from '@/shared/app/app-referrer.ts';
 import {
   ledgerEntryEditable,
   ledgerEntryFixed,

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
+import type { TeamMember } from '@/shared/api/app/users-contracts.ts';
 import type { Member } from '@/shared/api/organization-contracts.ts';
 import { orgQueryKeys } from '@/shared/api/organization-query-keys.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';

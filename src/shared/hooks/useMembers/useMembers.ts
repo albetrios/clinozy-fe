@@ -1,6 +1,6 @@
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import i18n from '@/lib/i18n/i18n.ts';
-import type { DeleteReason } from '@/shared/api/clinic/clinic-schema.ts';
+import type { DeleteReason } from '@/shared/api/app/app-schema.ts';
 import * as orgApi from '@/shared/api/organization-api.ts';
 import type { Member, MemberChange } from '@/shared/api/organization-contracts.ts';
 import {

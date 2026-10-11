@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import {
   type PatientPhoto,
   photoName,
-} from '@/shared/api/clinic/patient-images-contracts.ts';
+} from '@/shared/api/app/patient-images-contracts.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
 import {
   useDeletePatientPhoto,

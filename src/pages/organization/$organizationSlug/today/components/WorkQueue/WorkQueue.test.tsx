@@ -8,7 +8,7 @@ import {
   TASK_TYPES,
   type TaskOutcomePlan,
   type TaskRow,
-} from '@/shared/api/clinic/tasks-contracts.ts';
+} from '@/shared/api/app/tasks-contracts.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 import { ASHA, RIYA, taskRowFixture } from '@/tests/utils/task-row-fixture.ts';

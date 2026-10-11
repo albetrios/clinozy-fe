@@ -34,7 +34,7 @@ zero) — closes the confirm, says why and refreshes the list.
 | File                             | Responsibility                                                                                 |
 | -------------------------------- | ---------------------------------------------------------------------------------------------- |
 | `movements.route.tsx`            | Route marker — exports `Component` rendering `MovementsPage`.                                  |
-| `movements.manifest.ts`          | Manifest — `kind: 'leaf'`, module `clinic-stock`.                                              |
+| `movements.manifest.ts`          | Manifest — `kind: 'leaf'`, module `app-stock`.                                                 |
 | `movements.params.ts`            | The list read from the URL (`type`, `item`, `created`) and its filter key; no search, no sort. |
 | `MovementsPage.tsx`              | The tab: the toolbar and its Filters (Item, Type, Created), the table, its states and Revert.  |
 | `hooks/useStockMovementColumns/` | The columns: tracks, folds (the meta line and the phone key), the note and the purchase link.  |

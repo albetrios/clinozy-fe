@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  PO_STAGE_VALUES,
-  STOCK_CATEGORY_VALUES,
-} from '@/shared/api/clinic/clinic-schema.ts';
+import { PO_STAGE_VALUES, STOCK_CATEGORY_VALUES } from '@/shared/api/app/app-schema.ts';
 
 import {
   MEDICINE_EXPIRY_FILTERS,

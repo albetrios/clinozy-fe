@@ -2,13 +2,13 @@
 
 Route: `/organization/$organizationSlug/payments/day-close` (`S:91`) — a URL-driven dialog over the Payments ledger (KICKOFF §4, D24).
 The route renders nothing: the Payments ledger reads the URL and opens the Day close drawer (`../components/DayCloseDrawer/`, L-41) over itself — the ledger behind it listing only the reviewed day. `?date=YYYY-MM-DD` (default today; a later day reads as today) and `?branch=` (a branch's public id; else the header's one branch, the member's own from the team directory, the main one — Q-G6) — parsed by `validateDayCloseSearch` in the parent's `../payments.dialog-search.ts`. Picking another day keeps it in the URL.
-Gated like the room — membership (`organization:read`) and the `clinic-payments` module, then
+Gated like the room — membership (`organization:read`) and the `app-payments` module, then
 `requireOrgStatus`; in-room access is the member's `payment:*` codes (`usePaymentAccess`).
 
 ## On clinozy-be (L-60)
 
 The drawer reads and writes `/app/day-closes` through `useDayClose` (`../hooks/useDayClose/`,
-over `@/shared/api/clinic/day-close-api.ts`). Every figure is the server's, in rupees:
+over `@/shared/api/app/day-close-api.ts`). Every figure is the server's, in rupees:
 
 | Step                    | Route                                                                                                                                    | Code             |
 | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |

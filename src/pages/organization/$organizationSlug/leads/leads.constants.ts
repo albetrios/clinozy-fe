@@ -7,7 +7,7 @@ export const LEADS_NS = I18N_NAMESPACES.leads;
  * The Leads room's keys, verbatim from `leads.md` › Copy and KICKOFF §6.3. The
  * toasts the shared leads hooks raise sit in the same namespace, declared
  * beside them (`useLeads/leads-toasts.constants.ts`); the statuses, sources and
- * interests are the shared `clinic` vocabulary (`CLINIC_KEYS.leads`).
+ * interests are the shared `app` vocabulary (`APP_KEYS.leads`).
  */
 export const LEADS_KEYS = {
   manifest: { title: 'manifest.title' },

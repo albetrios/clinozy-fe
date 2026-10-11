@@ -3,12 +3,9 @@ import { useTranslation } from 'react-i18next';
 
 import { weekdayHeaders } from '@/lib/i18n/weekday-headers.ts';
 import { cn } from '@/lib/utils.ts';
-import {
-  appointmentViewRange,
-  monthCells,
-} from '@/shared/api/clinic/appointment-views.ts';
-import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
-import { addCivilDays, localDateOf } from '@/shared/api/clinic/clinic-time.ts';
+import { addCivilDays, localDateOf } from '@/shared/api/app/app-time.ts';
+import { appointmentViewRange, monthCells } from '@/shared/api/app/appointment-views.ts';
+import type { AppointmentRow } from '@/shared/api/app/appointments-contracts.ts';
 import { useElementWidth } from '@/shared/hooks/useElementWidth/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 

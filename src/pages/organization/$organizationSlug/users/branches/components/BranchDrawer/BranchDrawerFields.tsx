@@ -1,9 +1,9 @@
 import { Controller, type UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { BRANCH_LIMITS } from '@/shared/api/clinic/branches-contracts.ts';
-import { type Weekday, WEEKDAY_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
-import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
+import { type Weekday, WEEKDAY_VALUES } from '@/shared/api/app/app-schema.ts';
+import { BRANCH_LIMITS } from '@/shared/api/app/branches-contracts.ts';
+import type { TeamMember } from '@/shared/api/app/users-contracts.ts';
 import {
   DrawerChips,
   DrawerField,

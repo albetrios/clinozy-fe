@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
+import { formatAppPhone } from '@/shared/app/app-phone.ts';
 import { PersonAvatar, personInitials } from '@/shared/components/Cells/index.ts';
 import {
   ContactCard,
@@ -60,7 +60,7 @@ export function LeadContactStrip({
               {name}
             </span>
             <span className="text-foreground-soft text-caption tabular-nums">
-              {phone ? <span dir="ltr">{formatClinicPhone(phone)}</span> : null}
+              {phone ? <span dir="ltr">{formatAppPhone(phone)}</span> : null}
               {more}
             </span>
           </span>

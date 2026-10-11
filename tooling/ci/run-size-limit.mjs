@@ -113,7 +113,7 @@ const config = [
      * boundary built and attributed through the hidden source maps:
      * - L-32, the Patients room (+1.88 kB). The entry +1.08: the room's URL
      *   readers (`patients.search.ts` — view, filters, sort and the New
-     *   patient prefill, whose mobile check brings `toClinicPhone` along), the
+     *   patient prefill, whose mobile check brings `toAppPhone` along), the
      *   `create` route block and manifest, two builders and the route's
      *   preload list. The shared `icons` chunk +0.79: the WhatsApp and
      *   Instagram marks and five Lucide glyphs this room draws first — the
@@ -142,7 +142,7 @@ const config = [
      *   row in the entry's English copy), L-30e nothing.
      * Trimmed first: once the Offers schema imported the Offerings one, the
      * bundler split the shared URL readers (`search-params.ts`,
-     * `clinic-list-filters.ts`) into two more first-paint chunks; reading them
+     * `app-list-filters.ts`) into two more first-paint chunks; reading them
      * from the shared modules keeps them in the entry (−0.35 kB).
      *
      * 245.5 → 253.1 kB (same exemption, D48): measured 252.65 kB after the
@@ -206,7 +206,7 @@ const config = [
      *   `from`, the `payments` copy on that tab's loader, and the Medical and
      *   Clinic stock routes' preload lists naming the chunks the flows share
      *   (the ledger units, the Invoice drawer, `usePayBill`); the ledger's
-     *   filter values moved to `shared/api/clinic/` at no cost.
+     *   filter values moved to `shared/api/app/` at no cost.
      * Trimmed first: nothing — the new readers are dependency-free, and the
      * drawer, its money module and the print preview load with their routes.
      *
@@ -229,7 +229,7 @@ const config = [
      * - The room builders (−1.08 kB): `builders.ts` keeps the organization-
      *   level four the entry calls; each room's are imported by path.
      * - The dialog routes' search schemas (−0.96 kB): they moved to each
-     *   room's `<room>.dialog-search.ts`, with `toClinicPhone` and the Visit
+     *   room's `<room>.dialog-search.ts`, with `toAppPhone` and the Visit
      *   sheet's tab reader; the routes keep their search, typed for links, and
      *   the rooms parse it.
      * `pnpm build:check` (`check-entry-routes.mjs`) now fails on a dialog

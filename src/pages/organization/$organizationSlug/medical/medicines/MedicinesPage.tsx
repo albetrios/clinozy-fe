@@ -5,9 +5,9 @@ import { useTranslation } from 'react-i18next';
 import {
   MEDICINE_STOCK_TONES,
   medicineStockLevel,
-} from '@/shared/api/clinic/medicine-stock.ts';
-import { fetchMedicine, medicineQueryKeys } from '@/shared/api/clinic/medicines-api.ts';
-import type { MedicineRow } from '@/shared/api/clinic/medicines-contracts.ts';
+} from '@/shared/api/app/medicine-stock.ts';
+import { fetchMedicine, medicineQueryKeys } from '@/shared/api/app/medicines-api.ts';
+import type { MedicineRow } from '@/shared/api/app/medicines-contracts.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
 import {
   automaticSection,
@@ -15,7 +15,7 @@ import {
   RoomViewAction,
   useRoomFilters,
 } from '@/shared/components/RoomToolbar/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
 import {
   useMedicineList,
@@ -138,7 +138,7 @@ export function MedicinesPage() {
   const search = validateMedicalSearch(useSearch({ strict: false }));
   const params = medicineParamsOf(search);
   const { patchSearch } = useDataTableUrlState(true);
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const nav = useMedicalNav();
   const { fields, copy } = useMedicineFilters();
   const filters = useRoomFilters(fields);

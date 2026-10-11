@@ -3,7 +3,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/shared/api/clinic/day-close-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/day-close-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchDayClose: vi.fn(),
   acceptOpeningCash: vi.fn(),
@@ -19,14 +19,14 @@ import {
   dayCloseQueryKeys,
   fetchDayClose,
   reopenDay,
-} from '@/shared/api/clinic/day-close-api.ts';
+} from '@/shared/api/app/day-close-api.ts';
 import type {
   DayCloseRecord,
   DayCloseView,
-} from '@/shared/api/clinic/day-close-contracts.ts';
-import { paymentQueryKeys } from '@/shared/api/clinic/payments-api.ts';
+} from '@/shared/api/app/day-close-contracts.ts';
+import { paymentQueryKeys } from '@/shared/api/app/payments-api.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import {
   TEST_DAY_CLOSE_ID,
   TEST_MONEY_BRANCH_ID,

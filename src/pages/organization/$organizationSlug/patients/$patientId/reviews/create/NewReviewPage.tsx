@@ -1,8 +1,8 @@
 import { useSearch } from '@tanstack/react-router';
 import { useState } from 'react';
 
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
+import { patientName } from '@/shared/api/app/patients-contracts.ts';
 
 import { validatePatientFeedbackSearch } from '../../patient-id.dialog-search.ts';
 import { PATIENT_FILE_SECTION_PAGES } from '../../patient-id.sections.ts';
@@ -26,7 +26,7 @@ export function NewReviewPage() {
   const reviews = useReviewAccess();
   const canEdit = reviews.resolved ? reviews.log : undefined;
   const { behind, back } = usePatientFileDialog({ canOpen: canEdit });
-  const [today] = useState(() => clinicToday());
+  const [today] = useState(() => appToday());
   const Section = PATIENT_FILE_SECTION_PAGES[behind];
 
   return (

@@ -6,15 +6,15 @@
  */
 import { vi } from 'vitest';
 
-import type { AppointmentTreatment } from '@/shared/api/clinic/appointments-contracts.ts';
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
-import type { PatientPackageRow } from '@/shared/api/clinic/patient-packages-contracts.ts';
+import type { AppointmentTreatment } from '@/shared/api/app/appointments-contracts.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
+import type { PatientPackageRow } from '@/shared/api/app/patient-packages-contracts.ts';
 import type {
   TreatmentCheckIn,
   TreatmentCreateInput,
   TreatmentFields,
   TreatmentRecord,
-} from '@/shared/api/clinic/treatments-contracts.ts';
+} from '@/shared/api/app/treatments-contracts.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { TEST_PATIENT_ID } from '@/tests/utils/patient-doubles.ts';
 

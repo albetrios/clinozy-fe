@@ -3,12 +3,12 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import i18n from '@/lib/i18n/i18n.ts';
-import { deleteCredit, restoreCredit } from '@/shared/api/clinic/credits-api.ts';
+import { deleteCredit, restoreCredit } from '@/shared/api/app/credits-api.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import { creditRow, TEST_CREDIT_ID } from '@/tests/utils/payments-doubles.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
@@ -24,7 +24,7 @@ const { notifyMock } = vi.hoisted(() => ({
   notifyMock: { success: vi.fn(), error: vi.fn(), info: vi.fn(), undo: vi.fn() },
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
-vi.mock('@/shared/api/clinic/credits-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/credits-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   deleteCredit: vi.fn(),
   restoreCredit: vi.fn(),

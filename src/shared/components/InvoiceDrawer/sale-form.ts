@@ -4,8 +4,8 @@ import {
   type InvoiceTotals,
   invoiceTotals,
   overallDiscountFromPercent,
-} from '@/shared/api/clinic/clinic-money.ts';
-import type { InvoiceInput as SaleInput } from '@/shared/api/clinic/invoices-fixture-contracts.ts';
+} from '@/shared/api/app/app-money.ts';
+import type { InvoiceInput as SaleInput } from '@/shared/api/app/invoices-fixture-contracts.ts';
 
 import {
   type InvoiceFormValues,

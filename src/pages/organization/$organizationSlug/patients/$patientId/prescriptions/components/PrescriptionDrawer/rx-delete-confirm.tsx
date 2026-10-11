@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { PrescriptionRecord } from '@/shared/api/clinic/prescriptions-contracts.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { PrescriptionRecord } from '@/shared/api/app/prescriptions-contracts.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
 import {
   useDeletePrescription,

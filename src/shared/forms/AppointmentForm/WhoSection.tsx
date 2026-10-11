@@ -2,12 +2,12 @@ import { type KeyboardEvent, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type { AppointmentStatus, Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import { appointmentContactCard } from '@/shared/clinic/appointment-display.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
-import { clinicPhoneDigits } from '@/shared/clinic/clinic-phone-field.ts';
-import { LEAD_STATUS_TONES, TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import type { AppointmentStatus, Tone } from '@/shared/api/app/app-schema.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { formatAppPhone } from '@/shared/app/app-phone.ts';
+import { appPhoneDigits } from '@/shared/app/app-phone-field.ts';
+import { LEAD_STATUS_TONES, TONE_CLASSES } from '@/shared/app/app-tones.ts';
+import { appointmentContactCard } from '@/shared/app/appointment-display.ts';
 import { PersonAvatar, personInitials } from '@/shared/components/Cells/index.ts';
 import {
   DrawerField,
@@ -87,13 +87,13 @@ function WhoSearch({
   onPick: (who: WhoDraft) => void;
   disabled: boolean;
 }) {
-  const { t } = useTranslation([APPOINTMENT_FORM_NS, CLINIC_NS]);
+  const { t } = useTranslation([APPOINTMENT_FORM_NS, APP_NS]);
   const [query, setQuery] = useState('');
   const search = useContactSearch(query);
   const typed = query.trim();
   const hits = search.hits.map((contact) => ({
     who: whoOfContact(contact),
-    sub: contact.patientId ? t(K.patient) : formatClinicPhone(contact.primaryPhone),
+    sub: contact.patientId ? t(K.patient) : formatAppPhone(contact.primaryPhone),
   }));
   const pick = (who: WhoDraft) => {
     onPick(who);
@@ -192,7 +192,7 @@ function WhoEditor({
   const { t } = useTranslation(APPOINTMENT_FORM_NS);
   const id = useId();
   const [name, setName] = useState(who.name);
-  const [phone, setPhone] = useState(who.phone ? clinicPhoneDigits(who.phone) : '');
+  const [phone, setPhone] = useState(who.phone ? appPhoneDigits(who.phone) : '');
   const [saving, setSaving] = useState(false);
   const save = async () => {
     if (!name.trim()) {
@@ -266,14 +266,14 @@ function ConnectedLead({
   status: AppointmentStatus;
   onOpenLead: (leadId: string) => void;
 }) {
-  const { t } = useTranslation([APPOINTMENT_FORM_NS, CLINIC_NS]);
+  const { t } = useTranslation([APPOINTMENT_FORM_NS, APP_NS]);
   const lead = useLead(leadId).data;
   const team = useTeamDirectory();
   if (!lead) return null;
   const id = `#${lead.leadNumber}`;
   const tone: Tone = LEAD_STATUS_TONES[lead.status];
   const source = lead.source
-    ? t(CLINIC_KEYS.leads.sources[lead.source], { ns: CLINIC_NS })
+    ? t(APP_KEYS.leads.sources[lead.source], { ns: APP_NS })
     : '—';
   const owner = (lead.ownerId && team.byId.get(lead.ownerId)?.name) || '—';
   return (
@@ -298,7 +298,7 @@ function ConnectedLead({
             />
             {t(L.chip, {
               id,
-              status: t(CLINIC_KEYS.leads.statuses[lead.status], { ns: CLINIC_NS }),
+              status: t(APP_KEYS.leads.statuses[lead.status], { ns: APP_NS }),
             })}
           </button>
         </TooltipTrigger>
@@ -312,7 +312,7 @@ function ConnectedLead({
 /** The person's line under their name: a new contact's note, else the mobile. */
 function whoSubline(who: WhoDraft, newContact: string): string {
   if (who.kind === 'new') return newContact;
-  return who.phone ? formatClinicPhone(who.phone) : '';
+  return who.phone ? formatAppPhone(who.phone) : '';
 }
 
 /**

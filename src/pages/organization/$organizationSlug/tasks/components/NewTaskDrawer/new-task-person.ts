@@ -1,8 +1,8 @@
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { ContactSummary } from '@/shared/api/clinic/contacts-contracts.ts';
-import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
+import type { ContactSummary } from '@/shared/api/app/contacts-contracts.ts';
+import type { LeadRecord } from '@/shared/api/app/leads-contracts.ts';
 import type { ContactCardData } from '@/shared/components/PersonCard/index.ts';
 
 import { TASKS_KEYS, TASKS_NS } from '../../tasks.constants.ts';

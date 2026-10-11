@@ -23,11 +23,11 @@ import { localizedRoute } from './localized-route.ts';
 /** Every clinic room's page or tab component, by the name `roomRoute(name)` mounts it under. */
 export const ROOM_ROUTES = {
   // The org home when no room is open to the member (L-63). Its words are
-  // `clinic`'s, which load with the org shell.
-  ClinicHomeEmpty: lazyRouteComponent(
+  // `app`'s, which load with the org shell.
+  AppHomeEmpty: lazyRouteComponent(
     () =>
-      import('@/pages/organization/$organizationSlug/components/ClinicHomeEmpty/index.ts'),
-    'ClinicHomeEmpty',
+      import('@/pages/organization/$organizationSlug/components/AppHomeEmpty/index.ts'),
+    'AppHomeEmpty',
   ),
   // Today's work queue reads the Tasks rule copy (one task model, Q-T3): `tasks` loads with it.
   TodayPage: lazyRouteComponent(
@@ -185,21 +185,21 @@ export const ROOM_ROUTES = {
   ),
   StockLayout: lazyRouteComponent(
     localizedRoute(
-      [I18N_NAMESPACES.clinicStock],
+      [I18N_NAMESPACES.appStock],
       () => import('@/pages/organization/$organizationSlug/stock/stock.route.tsx'),
     ),
     'Component',
   ),
   StockItemsPage: lazyRouteComponent(
     localizedRoute(
-      [I18N_NAMESPACES.clinicStock],
+      [I18N_NAMESPACES.appStock],
       () => import('@/pages/organization/$organizationSlug/stock/items/items.route.tsx'),
     ),
     'Component',
   ),
   StockPurchasesPage: lazyRouteComponent(
     localizedRoute(
-      [I18N_NAMESPACES.clinicStock],
+      [I18N_NAMESPACES.appStock],
       () =>
         import('@/pages/organization/$organizationSlug/stock/purchases/purchases.route.tsx'),
     ),
@@ -207,7 +207,7 @@ export const ROOM_ROUTES = {
   ),
   StockMovementsPage: lazyRouteComponent(
     localizedRoute(
-      [I18N_NAMESPACES.clinicStock],
+      [I18N_NAMESPACES.appStock],
       () =>
         import('@/pages/organization/$organizationSlug/stock/movements/movements.route.tsx'),
     ),
@@ -215,7 +215,7 @@ export const ROOM_ROUTES = {
   ),
   StockVendorsPage: lazyRouteComponent(
     localizedRoute(
-      [I18N_NAMESPACES.clinicStock],
+      [I18N_NAMESPACES.appStock],
       () =>
         import('@/pages/organization/$organizationSlug/stock/vendors/vendors.route.tsx'),
     ),

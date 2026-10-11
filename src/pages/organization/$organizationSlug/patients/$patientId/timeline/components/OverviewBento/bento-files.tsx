@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { PatientPhotoAlbum } from '@/shared/api/clinic/patient-images-contracts.ts';
-import { photoName } from '@/shared/api/clinic/patient-images-contracts.ts';
+import type { PatientPhotoAlbum } from '@/shared/api/app/patient-images-contracts.ts';
+import { photoName } from '@/shared/api/app/patient-images-contracts.ts';
 import { PersonAvatar, shortPersonName } from '@/shared/components/Cells/index.ts';
 import { DrawerInput } from '@/shared/components/DrawerField/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 import {
   CONTACT_NOTE_MAX,
   CONTACT_NOTES_FILTER,
@@ -180,7 +180,7 @@ export function NotesBentoCard({ onOpen, canPost }: CardLinks & { canPost: boole
   const notes = useContactActivities(contactId, CONTACT_NOTES_FILTER, { limit: LISTED });
   const add = useAddContactNote(contactId);
   const staff = useStaffLookup();
-  const clock = useClinicClock();
+  const clock = useAppClock();
   const [body, setBody] = useState('');
   const rows = notes.entries.slice(0, LISTED);
   const title = t(TIMELINE_KEYS.cards.notes);

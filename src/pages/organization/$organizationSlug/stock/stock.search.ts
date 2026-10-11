@@ -22,7 +22,7 @@ import {
 import {
   type CreatedFilter,
   readCreatedFilter,
-} from '@/shared/api/clinic/clinic-list-filters.ts';
+} from '@/shared/api/app/app-list-filters.ts';
 
 /** Items' Stock filter beyond All (`clinic-stock.md:39`). */
 export const STOCK_LEVEL_FILTERS = ['low'] as const;

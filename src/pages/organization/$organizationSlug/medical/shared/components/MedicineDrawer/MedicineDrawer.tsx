@@ -4,9 +4,9 @@ import { Controller, useForm, type UseFormReturn, useFormState } from 'react-hoo
 import { useTranslation } from 'react-i18next';
 
 import { isolateText, isolateValues } from '@/lib/bidi-isolate.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { MedicineRecord } from '@/shared/api/clinic/medicines-contracts.ts';
-import { SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { MedicineRecord } from '@/shared/api/app/medicines-contracts.ts';
+import { SECTION_TONES } from '@/shared/app/app-tones.ts';
 import {
   DrawerChips,
   DrawerField,

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 

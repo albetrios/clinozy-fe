@@ -14,11 +14,11 @@ with Reload). A unique name; Main is read-only. There is no Delete: a branch is 
 
 ## Files
 
-| File                 | Responsibility                                                                                   |
-| -------------------- | ------------------------------------------------------------------------------------------------ |
-| `edit.route.tsx`     | Route marker — exports `Component` rendering `EditBranchPage`.                                   |
-| `edit.manifest.ts`   | Manifest — `kind: 'leaf'`, permission `branch:read`, module `clinic-users`, title "Edit branch". |
-| `EditBranchPage.tsx` | Renders nothing — the dialog route's own UI. The drawer mounts on the Branches page.             |
+| File                 | Responsibility                                                                                |
+| -------------------- | --------------------------------------------------------------------------------------------- |
+| `edit.route.tsx`     | Route marker — exports `Component` rendering `EditBranchPage`.                                |
+| `edit.manifest.ts`   | Manifest — `kind: 'leaf'`, permission `branch:read`, module `app-users`, title "Edit branch". |
+| `EditBranchPage.tsx` | Renders nothing — the dialog route's own UI. The drawer mounts on the Branches page.          |
 
 ## Test ids
 

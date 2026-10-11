@@ -13,9 +13,9 @@ vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
 }));
 
 import {
-  clinicHttpError,
+  appHttpError,
   createFixtureCollection,
-} from '@/shared/api/clinic/clinic-fixture-store.ts';
+} from '@/shared/api/app/app-fixture-store.ts';
 import { AppToaster, notify } from '@/shared/notify/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 
@@ -287,7 +287,7 @@ describe('ConfirmDialog — reason variant', () => {
   it('shows the server’s note error at the field and stays open (422)', async () => {
     const user = userEvent.setup();
     const onConfirm = vi.fn().mockRejectedValue(
-      clinicHttpError(422, 'validation', 'Add a short note for "Other"', {
+      appHttpError(422, 'validation', 'Add a short note for "Other"', {
         note: ['Keep the note under 280 characters'],
       }),
     );
@@ -313,7 +313,7 @@ describe('ConfirmDialog — reason variant', () => {
     const user = userEvent.setup();
     const onConfirm = vi
       .fn()
-      .mockRejectedValue(clinicHttpError(409, 'conflict', 'Changed meanwhile'));
+      .mockRejectedValue(appHttpError(409, 'conflict', 'Changed meanwhile'));
     const { onOpenChange } = renderReason({ onConfirm });
 
     await user.click(screen.getByTestId(confirmReasonTestId('mistake')));

@@ -7,7 +7,7 @@ import {
   PATIENT_FILE_SECTIONS,
   type PatientFileSectionSlug,
   viewablePatientFileSections,
-} from '@/shared/clinic/patient-file-sections.ts';
+} from '@/shared/app/patient-file-sections.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 

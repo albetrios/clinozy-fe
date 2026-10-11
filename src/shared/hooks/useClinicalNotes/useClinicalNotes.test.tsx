@@ -3,7 +3,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/shared/api/clinic/clinical-notes-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/clinical-notes-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listClinicalNotes: vi.fn(),
   createClinicalNote: vi.fn(),
@@ -19,11 +19,11 @@ import {
   deleteClinicalNote,
   listClinicalNotes,
   restoreClinicalNote,
-} from '@/shared/api/clinic/clinical-notes-api.ts';
-import type { ClinicalNote } from '@/shared/api/clinic/clinical-notes-contracts.ts';
+} from '@/shared/api/app/clinical-notes-api.ts';
+import type { ClinicalNote } from '@/shared/api/app/clinical-notes-contracts.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { TEST_PATIENT_ID } from '@/tests/utils/patient-doubles.ts';
 
 import {

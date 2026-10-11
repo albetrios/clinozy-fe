@@ -1,11 +1,11 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 
 /**
- * The patient drawer's copy lives in `clinic`, not the room's `patients`: the
+ * The patient drawer's copy lives in `app`, not the room's `patients`: the
  * drawer is shared — the Patients room opens it, and the invoice and
  * appointment pickers stack it as quick-add (KICKOFF §6.5, Q-P2).
  */
-export const PATIENT_DRAWER_NS = I18N_NAMESPACES.clinic;
+export const PATIENT_DRAWER_NS = I18N_NAMESPACES.app;
 
 /** Key paths for the patient drawer (`patients.md` › Copy, verbatim). */
 export const PATIENT_DRAWER_KEYS = {

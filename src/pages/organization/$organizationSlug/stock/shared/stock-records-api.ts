@@ -1,5 +1,5 @@
 import { api } from '@/core/http/api.ts';
-import type { DeleteReason } from '@/shared/api/clinic/clinic-schema.ts';
+import type { DeleteReason } from '@/shared/api/app/app-schema.ts';
 
 import {
   type StockCountResult,

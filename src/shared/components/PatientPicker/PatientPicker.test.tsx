@@ -4,29 +4,29 @@ import { useState } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-vi.mock('@/shared/api/clinic/patient-search-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/patient-search-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   searchPatientPicker: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/patients-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/patients-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchPatient: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/invoices-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/invoices-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchInvoiceTotals: vi.fn(),
 }));
 import i18n from '@/lib/i18n/i18n.ts';
-import { fetchInvoiceTotals } from '@/shared/api/clinic/invoices-api.ts';
+import { fetchInvoiceTotals } from '@/shared/api/app/invoices-api.ts';
 import {
   type PatientPickRow,
   searchPatientPicker,
-} from '@/shared/api/clinic/patient-search-api.ts';
-import { fetchPatient } from '@/shared/api/clinic/patients-api.ts';
+} from '@/shared/api/app/patient-search-api.ts';
+import { fetchPatient } from '@/shared/api/app/patients-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { fsi } from '@/tests/utils/bidi-marks.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import { patientRecord, TEST_PATIENT_ID } from '@/tests/utils/patient-doubles.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 

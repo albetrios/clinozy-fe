@@ -5,7 +5,7 @@ import {
   rupeesOfPaise,
   textFromNumber,
 } from '@/lib/number-text.ts';
-import type { ExpenseCategory, Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { ExpenseCategory, Tone } from '@/shared/api/app/app-schema.ts';
 import {
   EXPENSE_MODE_VALUES,
   type LedgerRow,
@@ -14,7 +14,7 @@ import {
   type PaymentPatch,
   supplierBillKey,
   type SupplierBillRef,
-} from '@/shared/api/clinic/payments-contracts.ts';
+} from '@/shared/api/app/payments-contracts.ts';
 
 /*
  * Send payment's form (`payments.md:112–130`; H:5126–5134) — pure, so the

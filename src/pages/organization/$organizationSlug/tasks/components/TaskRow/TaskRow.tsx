@@ -3,17 +3,17 @@ import { useTranslation } from 'react-i18next';
 
 import { isolateValues } from '@/lib/bidi-isolate.ts';
 import { cn } from '@/lib/utils.ts';
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
-import { isTaskOverdue } from '@/shared/api/clinic/task-views.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
+import { isTaskOverdue } from '@/shared/api/app/task-views.ts';
 import {
   TASK_TYPES,
   type TaskLinkKind,
   type TaskRow as TaskRowRecord,
-} from '@/shared/api/clinic/tasks-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
-import { TASK_RULE_ICONS } from '@/shared/clinic/task-rule-icons.ts';
+} from '@/shared/api/app/tasks-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
+import { TASK_RULE_ICONS } from '@/shared/app/task-rule-icons.ts';
 import {
   PersonAvatar,
   personFirstName,
@@ -109,14 +109,14 @@ export interface TaskRowProps {
  * member has left the team.
  */
 function usePreviousOwner(row: TaskRowRecord, team: TaskRowTeam): string | null {
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const [last] = row.ownerChanges;
   if (!last) return null;
   if (last.fromId) {
     const member = team.byId.get(last.fromId);
     return member ? personFirstName(member.name) : null;
   }
-  return last.fromRole ? tClinic(CLINIC_KEYS.roles[last.fromRole]) : null;
+  return last.fromRole ? tApp(APP_KEYS.roles[last.fromRole]) : null;
 }
 
 /** A pill's words: the name alone, or "<name> · was <first>" with both names isolated. */
@@ -140,11 +140,11 @@ function OwnerWords({ name, previous }: { name: string; previous: string | null 
  */
 function OwnerCell({ row, team }: { row: TaskRowRecord; team: TaskRowTeam }) {
   const { t } = useTranslation(TASKS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const previous = usePreviousOwner(row, team);
   if (!row.ownerId) {
     const queue = row.ownerRole
-      ? tClinic(CLINIC_KEYS.roles[row.ownerRole])
+      ? tApp(APP_KEYS.roles[row.ownerRole])
       : t(TASKS_KEYS.row.anyone);
     return (
       <span

@@ -1,6 +1,6 @@
 import type { UseFormReturn } from 'react-hook-form';
 
-import type { TaskFields, TaskRecord } from '@/shared/api/clinic/tasks-contracts.ts';
+import type { TaskFields, TaskRecord } from '@/shared/api/app/tasks-contracts.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useCreateTask } from '@/shared/hooks/useTasks/index.ts';
 

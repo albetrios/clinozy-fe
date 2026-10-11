@@ -4,7 +4,7 @@ Route: `/organization/$organizationSlug/payments`. One ledger of the money in an
 pending credits and the daily cash close (KICKOFF §6.9). The bare URL is the ledger itself
 (D24, `S:84`).
 
-Gated like every clinic room: membership (`organization:read`) and the `clinic-payments`
+Gated like every clinic room: membership (`organization:read`) and the `app-payments`
 module, then `requireOrgStatus`. In the room the ledger, Receive, Send, an entry's edit and Reverse
 answer from the member's own clinozy-be codes (`@/shared/hooks/usePaymentAccess/`; under View-as the
 previewed role's matrix): `payment:read` sees the ledger and Day close; without `payment:create`,
@@ -121,18 +121,18 @@ opens the entry's drawer over Day close. Accept and Close day need `payment:upda
 `payment:delete`; the drawer opens with `payment:read`. Its own overview:
 `day-close/DAY_CLOSE.OVERVIEW.md`.
 
-The data is the shared money domain on clinozy-be: `@/shared/api/clinic/payments-api.ts`,
-`@/shared/api/clinic/invoices-api.ts`, `@/shared/api/clinic/credits-api.ts` and
-`@/shared/api/clinic/day-close-api.ts`, their contracts beside them, and the hooks in
+The data is the shared money domain on clinozy-be: `@/shared/api/app/payments-api.ts`,
+`@/shared/api/app/invoices-api.ts`, `@/shared/api/app/credits-api.ts` and
+`@/shared/api/app/day-close-api.ts`, their contracts beside them, and the hooks in
 `@/shared/hooks/usePayments/` and `@/shared/hooks/useCredits/`. Medical › Payments stays on the
-fixture copies (`@/shared/api/clinic/payments-fixture-api.ts`, `@/shared/hooks/useFixtureLedger/`).
+fixture copies (`@/shared/api/app/payments-fixture-api.ts`, `@/shared/hooks/useFixtureLedger/`).
 
 ## Files
 
 | File                                                 | Responsibility                                                                                                                                                                                                                                                                        |
 | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `payments.route.tsx`                                 | Route marker — exports `Component` rendering `PaymentsPage`.                                                                                                                                                                                                                          |
-| `payments.manifest.ts`                               | Manifest — `kind: 'layout'` over `receive`, `pay`, `$paymentId/edit`, `day-close` and `pending`; permission `organization:read`, module `clinic-payments`, nav section `payments`.                                                                                                    |
+| `payments.manifest.ts`                               | Manifest — `kind: 'layout'` over `receive`, `pay`, `$paymentId/edit`, `day-close` and `pending`; permission `organization:read`, module `app-payments`, nav section `payments`.                                                                                                       |
 | `payments.search.ts`                                 | URL schemas (`validateSearch`): the ledger's `direction`, `kind`, `mode`, `created`, `q`. Rides the entry chunk; the list read doesn't.                                                                                                                                               |
 | `payments.dialog-search.ts`                          | Receive's, Pay's and Day close's params — their routes keep the raw values, `usePaymentsDialogRoute` parses them; loads with the room.                                                                                                                                                |
 | `payments.params.ts`                                 | The ledger read from the URL — `ledgerListParamsOf` (the header's branches, Day close's day) — off the entry chunk.                                                                                                                                                                   |
@@ -157,7 +157,7 @@ limited to Medical (L-50c): the cells and their words (`src/shared/components/Le
 (`src/shared/components/PaymentReverseConfirm/`), the table (`src/shared/hooks/useLedgerTable/`,
 under its table id), the row actions (`src/shared/hooks/useLedgerRowActions/`) and the gates
 (`src/shared/hooks/usePaymentAccess/`). The Filters' values are `LEDGER_FILTER_VALUES`
-(`src/shared/api/clinic/ledger-filter-values.ts`).
+(`src/shared/api/app/ledger-filter-values.ts`).
 
 ## Test ids
 

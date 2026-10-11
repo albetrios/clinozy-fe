@@ -1,10 +1,10 @@
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import { clinicDateOf } from '@/shared/api/clinic/clinic-filter-match.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import type { CreditRow } from '@/shared/api/clinic/credits-contracts.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import { appDateOf } from '@/shared/api/app/app-filter-match.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
+import type { CreditRow } from '@/shared/api/app/credits-contracts.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 
@@ -80,7 +80,7 @@ export function creditStateLabel(
   t: TFunction,
 ): string {
   const label = t(K.states[credit.status]);
-  if (credit.settledAt && clinicDateOf(credit.settledAt) === clinicToday()) {
+  if (credit.settledAt && appDateOf(credit.settledAt) === appToday()) {
     return t(K.settledToday, { state: label });
   }
   return label;

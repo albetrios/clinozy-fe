@@ -1,5 +1,5 @@
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import { addCivilDays, civilDayOffset } from '@/shared/api/clinic/clinic-time.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
+import { addCivilDays, civilDayOffset } from '@/shared/api/app/app-time.ts';
 import type { PickerOption } from '@/shared/components/Picker/picker.types.ts';
 
 /** Days before today the date list reaches by default (H:4453). */

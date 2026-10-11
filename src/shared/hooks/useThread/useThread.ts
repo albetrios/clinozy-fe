@@ -7,9 +7,9 @@ import {
   fetchContactThread,
   resendContactActivity,
   sendContactActivity,
-} from '@/shared/api/clinic/contact-activities-api.ts';
-import { ensureContactThread } from '@/shared/api/clinic/contact-threads-api.ts';
-import { contactQueryKeys } from '@/shared/api/clinic/contacts-api.ts';
+} from '@/shared/api/app/contact-activities-api.ts';
+import { ensureContactThread } from '@/shared/api/app/contact-threads-api.ts';
+import { contactQueryKeys } from '@/shared/api/app/contacts-api.ts';
 import {
   chatThreadOf,
   fetchContactHistory,
@@ -20,7 +20,7 @@ import {
   messageQueryKeys,
   resendMessage,
   sendMessage,
-} from '@/shared/api/clinic/messages-api.ts';
+} from '@/shared/api/app/messages-api.ts';
 import {
   type ChatMessage,
   type ChatPerson,
@@ -28,7 +28,7 @@ import {
   type ChatThread,
   type ChatThreadRead,
   type ComposerMode,
-} from '@/shared/api/clinic/messages-contracts.ts';
+} from '@/shared/api/app/messages-contracts.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 

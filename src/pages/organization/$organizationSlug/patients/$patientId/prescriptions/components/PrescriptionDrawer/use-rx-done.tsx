@@ -1,10 +1,10 @@
 import { useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { PrescriptionRecord } from '@/shared/api/clinic/prescriptions-contracts.ts';
-import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
-import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { PrescriptionRecord } from '@/shared/api/app/prescriptions-contracts.ts';
+import { appCommandNavigation } from '@/shared/app/app-command-targets.ts';
+import { useAppNavigate } from '@/shared/hooks/useAppNavigate/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { RX_KEYS, RX_NS } from '../../prescriptions.constants.ts';
@@ -65,7 +65,7 @@ export function useRxDone({
   onClose: () => void;
 }) {
   const { t } = useTranslation(RX_NS);
-  const navigate = useClinicNavigate();
+  const navigate = useAppNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
   return (saved: PrescriptionRecord, sell: boolean) => {
     const number = displayId.prescription(saved.seq);
@@ -81,7 +81,7 @@ export function useRxDone({
       return;
     }
     void navigate(
-      clinicCommandNavigation('newSale', {
+      appCommandNavigation('newSale', {
         organizationSlug,
         referrer: sellFrom,
         search: { prescription: saved.id },

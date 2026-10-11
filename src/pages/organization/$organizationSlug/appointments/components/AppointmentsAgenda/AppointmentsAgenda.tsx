@@ -8,17 +8,17 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { organizationLeadCreate } from '@/lib/routes/leads-builders.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
 import {
   agendaCountsWindow,
   groupAppointmentsByDay,
-} from '@/shared/api/clinic/appointment-views.ts';
+} from '@/shared/api/app/appointment-views.ts';
 import type {
   AppointmentDayCount,
   AppointmentPerson,
   AppointmentRow,
-} from '@/shared/api/clinic/appointments-contracts.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import { APPOINTMENT_STATUS_TONES } from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/api/app/appointments-contracts.ts';
+import { APPOINTMENT_STATUS_TONES } from '@/shared/app/app-tones.ts';
 import {
   DataTable,
   dataTableFeatures,
@@ -26,12 +26,12 @@ import {
 } from '@/shared/components/DataTable/index.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import {
   useAppointmentDayCounts,
   useAppointmentList,
   useAppointmentSlotLabel,
 } from '@/shared/hooks/useAppointments/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
 import { useTeamDirectory } from '@/shared/hooks/useTeamDirectory/index.ts';
@@ -124,7 +124,7 @@ export function AppointmentsAgenda() {
   const tier = useViewportTier();
   const navigation = useAppointmentsNavigation();
   const actions = useAppointmentActions();
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const navigate = useNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
   const slotLabel = useAppointmentSlotLabel();
@@ -153,7 +153,7 @@ export function AppointmentsAgenda() {
       group.counts,
     ]),
   );
-  const today = clinicToday();
+  const today = appToday();
 
   const { openCreate } = navigation;
   const { canEdit, canCreate } = actions;

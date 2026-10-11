@@ -3,13 +3,13 @@ import { type ReactNode, useId, useState } from 'react';
 import { useForm, type UseFormReturn, useFormState, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { CreditDirection } from '@/shared/api/clinic/clinic-schema.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import { creditQueryKeys, fetchCredit } from '@/shared/api/clinic/credits-api.ts';
-import type { CreditRow } from '@/shared/api/clinic/credits-contracts.ts';
-import type { InvoiceRecord } from '@/shared/api/clinic/invoices-contracts.ts';
-import { CREDIT_DIRECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { CreditDirection } from '@/shared/api/app/app-schema.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
+import { creditQueryKeys, fetchCredit } from '@/shared/api/app/credits-api.ts';
+import type { CreditRow } from '@/shared/api/app/credits-contracts.ts';
+import type { InvoiceRecord } from '@/shared/api/app/invoices-contracts.ts';
+import { CREDIT_DIRECTION_TONES } from '@/shared/app/app-tones.ts';
 import { DrawerStepBody } from '@/shared/components/DrawerField/index.ts';
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
@@ -310,7 +310,7 @@ function CreditSession({
 }) {
   const { t } = useTranslation(PAYMENTS_NS);
   const idPrefix = `credit-${useId().replace(/:/g, '')}`;
-  const [today] = useState(() => clinicToday());
+  const [today] = useState(() => appToday());
   const [locked, setLocked] = useState(false);
   const { readOnly, canDelete } = useDrawerAccess(props, locked);
 

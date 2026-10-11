@@ -18,7 +18,7 @@ The default assignee is the person's open lead's owner (`GET /app/leads/:lead_id
 member. Type and "Remind 15 min before" are gone (no such fields, route map §4 #22). A
 refusal outlines the field the server named and opens its step.
 
-Gated like the room — membership (`organization:read`) and the `clinic-tasks` module, then
+Gated like the room — membership (`organization:read`) and the `app-tasks` module, then
 `requireOrgStatus`; in-room Create is the member's `task:create` code — without it the list
 offers no New task, the link goes back with the permission toast, and the drawer writes
 nothing. The drawer is the parent's `../components/NewTaskDrawer/`, opened by the page through
@@ -28,11 +28,11 @@ with Undo for a member with `task:delete` (`DELETE /app/tasks/:task_id?reason=mi
 
 ## Files
 
-| File                 | Responsibility                                                                                      |
-| -------------------- | --------------------------------------------------------------------------------------------------- |
-| `create.route.tsx`   | Route marker — exports `Component` rendering `NewTaskPage`.                                         |
-| `create.manifest.ts` | Manifest — `kind: 'leaf'`, permission `organization:read`, module `clinic-tasks`, title "New task". |
-| `NewTaskPage.tsx`    | Renders nothing — the dialog route's own UI. The drawer mounts on the Tasks page.                   |
+| File                 | Responsibility                                                                                   |
+| -------------------- | ------------------------------------------------------------------------------------------------ |
+| `create.route.tsx`   | Route marker — exports `Component` rendering `NewTaskPage`.                                      |
+| `create.manifest.ts` | Manifest — `kind: 'leaf'`, permission `organization:read`, module `app-tasks`, title "New task". |
+| `NewTaskPage.tsx`    | Renders nothing — the dialog route's own UI. The drawer mounts on the Tasks page.                |
 
 ## Test ids
 

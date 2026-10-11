@@ -12,14 +12,14 @@ import { MONEY_SCALE, numberFromText } from '@/lib/number-text.ts';
 import {
   OFFERING_CATEGORY_VALUES,
   type OfferingCategory,
-} from '@/shared/api/clinic/clinic-schema.ts';
+} from '@/shared/api/app/app-schema.ts';
 import {
   isOfferingNameTaken,
   OFFERING_DEFAULTS,
   type OfferingRecord,
-} from '@/shared/api/clinic/offerings-contracts.ts';
-import { CLINIC_KEYS } from '@/shared/clinic/clinic.constants.ts';
-import { OFFERING_CATEGORY_TONES, SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/api/app/offerings-contracts.ts';
+import { APP_KEYS } from '@/shared/app/app.constants.ts';
+import { OFFERING_CATEGORY_TONES, SECTION_TONES } from '@/shared/app/app-tones.ts';
 import {
   DrawerChips,
   DrawerField,
@@ -166,7 +166,7 @@ function useStepBodies(
                 label={t(F.category)}
                 options={OFFERING_CATEGORY_VALUES.map((category) => ({
                   value: category,
-                  label: t(CLINIC_KEYS.offerings.categories[category]),
+                  label: t(APP_KEYS.offerings.categories[category]),
                   tone: OFFERING_CATEGORY_TONES[category],
                 }))}
                 value={control.value}
@@ -220,7 +220,7 @@ function useStepHeads(values: QuickOfferingValues) {
   const notFilled = t(RECORD_DRAWER_KEYS.step.notFilled);
   const name = values.name.trim();
   const minutes = t(F.minutes, { minutes: values.durationMin });
-  const category = t(CLINIC_KEYS.offerings.categories[values.category]);
+  const category = t(APP_KEYS.offerings.categories[values.category]);
   const paise = numberFromText(values.price, MONEY_SCALE);
   const price = paise > 0 ? formatPaise(paise) : undefined;
   return {

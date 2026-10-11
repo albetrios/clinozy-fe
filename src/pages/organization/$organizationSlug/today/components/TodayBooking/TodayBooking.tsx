@@ -2,11 +2,11 @@ import { Suspense, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { onceAsync, useRetryableLazy } from '@/lib/lazy-module.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import type { AppointmentFormPrefill } from '@/shared/forms/AppointmentForm/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useAppointment } from '@/shared/hooks/useAppointments/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 
 /** What Today opens the shared booking form for: a new booking, or a move of one. */
 export type TodayBookingRequest =
@@ -36,8 +36,8 @@ export interface TodayBookingProps {
  * opens without a wait.
  */
 export function TodayBooking({ request, onClose }: TodayBookingProps) {
-  const { t } = useTranslation(CLINIC_NS);
-  const access = useClinicAccess();
+  const { t } = useTranslation(APP_NS);
+  const access = useAppAccess();
   const { Component: AppointmentForm, retry } = useRetryableLazy(loadAppointmentForm);
   const moving = request?.mode === 'reschedule' ? request.appointmentId : undefined;
   const booking = useAppointment(moving);
@@ -50,7 +50,7 @@ export function TodayBooking({ request, onClose }: TodayBookingProps) {
   if (!request) return null;
   return (
     <SectionErrorBoundary
-      title={t(CLINIC_KEYS.sections.appointments.label)}
+      title={t(APP_KEYS.sections.appointments.label)}
       onReset={retry}
       testId="today-booking-error"
       variant="inline"

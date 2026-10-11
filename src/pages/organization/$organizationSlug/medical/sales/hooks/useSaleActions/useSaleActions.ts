@@ -4,10 +4,10 @@ import { useTranslation } from 'react-i18next';
 import {
   fetchSaleInvoice,
   fixtureInvoiceQueryKeys,
-} from '@/shared/api/clinic/invoices-fixture-api.ts';
+} from '@/shared/api/app/invoices-fixture-api.ts';
 import { printInvoice } from '@/shared/components/InvoiceDrawer/index.ts';
 import { notifyError } from '@/shared/errors/errorHandler.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useFixtureDeletePayment } from '@/shared/hooks/useFixtureLedger/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -60,7 +60,7 @@ export function useSaleActions(): SaleActions {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
   const queryClient = useQueryClient();
   const formatPaise = usePaiseFormat();
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const collectSale = useCollectSale();
   const removeReceipt = useFixtureDeletePayment();
   const can = (action: 'edit' | 'delete') =>

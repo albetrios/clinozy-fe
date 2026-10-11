@@ -5,11 +5,11 @@ import {
   organizationPrescription,
   organizationPrescriptionEdit,
 } from '@/lib/routes/patient-file-builders.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import type { PrescriptionRecord } from '@/shared/api/clinic/prescriptions-contracts.ts';
-import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
+import type { PrescriptionRecord } from '@/shared/api/app/prescriptions-contracts.ts';
+import { appCommandNavigation } from '@/shared/app/app-command-targets.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
-import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
+import { useAppNavigate } from '@/shared/hooks/useAppNavigate/index.ts';
 import { useCreatePrescription } from '@/shared/hooks/usePrescriptions/index.ts';
 import { Copy, Eye, PenLine, Printer, Receipt, Trash } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -44,7 +44,7 @@ export function usePrescriptionRowActions({
   onDelete: (prescription: PrescriptionRecord) => void;
 }): (prescription: PrescriptionRecord) => DataTableRowAction[] {
   const { t } = useTranslation(PATIENT_TABLE_NS);
-  const navigate = useClinicNavigate();
+  const navigate = useAppNavigate();
   const { organizationSlug = '', patientId = '' } = useParams({ strict: false });
   const create = useCreatePrescription();
   const print = useRxPrint();
@@ -56,7 +56,7 @@ export function usePrescriptionRowActions({
         patientId: prescription.patientId,
         fields: {
           doctorId: prescription.doctorId,
-          date: clinicToday(),
+          date: appToday(),
           items: prescription.items,
           advice: prescription.advice,
           labReport: prescription.labReport,
@@ -100,7 +100,7 @@ export function usePrescriptionRowActions({
         icon: Receipt,
         onSelect: () =>
           void navigate(
-            clinicCommandNavigation('newSale', {
+            appCommandNavigation('newSale', {
               organizationSlug,
               referrer: `patients/${patientId}/prescriptions`,
               search: { prescription: prescription.id },

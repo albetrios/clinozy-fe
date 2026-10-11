@@ -8,7 +8,7 @@
 import type {
   OfferingRecord,
   OfferRecord,
-} from '@/shared/api/clinic/offerings-contracts.ts';
+} from '@/shared/api/app/offerings-contracts.ts';
 
 /** Research Peel's offering id. */
 export const TEST_OFFERING_ID = 'off_xh6ravxjcszcpta6taym0';

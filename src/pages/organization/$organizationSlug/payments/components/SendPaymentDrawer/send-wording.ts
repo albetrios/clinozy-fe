@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import type { OpenSupplierBill } from '@/shared/api/clinic/payments-contracts.ts';
+import type { OpenSupplierBill } from '@/shared/api/app/payments-contracts.ts';
 
 import { PAYMENTS_KEYS, PAYMENTS_NS } from '../../payments.constants.ts';
 

@@ -2,17 +2,17 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type * as AppointmentsApiModule from '@/shared/api/clinic/appointments-api.ts';
-import type * as FeedbackApiModule from '@/shared/api/clinic/feedback-api.ts';
+import type * as AppointmentsApiModule from '@/shared/api/app/appointments-api.ts';
+import type * as FeedbackApiModule from '@/shared/api/app/feedback-api.ts';
 import {
   createCheckIn,
   fetchCheckIn,
   updateCheckIn,
-} from '@/shared/api/clinic/feedback-api.ts';
-import type { PatientCheckIn } from '@/shared/api/clinic/feedback-contracts.ts';
-import type * as OfferingsApiModule from '@/shared/api/clinic/offerings-api.ts';
-import type { OfferingRecord } from '@/shared/api/clinic/offerings-contracts.ts';
-import type * as TreatmentsApiModule from '@/shared/api/clinic/treatments-api.ts';
+} from '@/shared/api/app/feedback-api.ts';
+import type { PatientCheckIn } from '@/shared/api/app/feedback-contracts.ts';
+import type * as OfferingsApiModule from '@/shared/api/app/offerings-api.ts';
+import type { OfferingRecord } from '@/shared/api/app/offerings-contracts.ts';
+import type * as TreatmentsApiModule from '@/shared/api/app/treatments-api.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { appointmentRow } from '@/tests/utils/appointment-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
@@ -82,22 +82,22 @@ const offering = (overrides: Partial<OfferingRecord>): OfferingRecord =>
     ...overrides,
   });
 
-vi.mock('@/shared/api/clinic/feedback-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/feedback-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof FeedbackApiModule>()),
   fetchPreviousCheckIn: vi.fn(),
   fetchCheckIn: vi.fn(),
   createCheckIn: vi.fn(),
   updateCheckIn: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/offerings-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof OfferingsApiModule>()),
   fetchAllOfferings: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/treatments-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/treatments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof TreatmentsApiModule>()),
   fetchTreatment: vi.fn(async () => ({ id: LHR, name: 'LHR Full Face' })),
 }));
-vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/appointments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof AppointmentsApiModule>()),
   fetchAppointment: vi.fn(async () =>
     appointmentRow({ id: VISIT, serviceLabel: 'Peel' }),
@@ -126,9 +126,9 @@ async function open(props: Partial<CheckInDrawerProps> = {}) {
 
 beforeEach(async () => {
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  const api = await import('@/shared/api/clinic/feedback-api.ts');
+  const api = await import('@/shared/api/app/feedback-api.ts');
   vi.mocked(api.fetchPreviousCheckIn).mockResolvedValue(checkIn());
-  const catalogue = await import('@/shared/api/clinic/offerings-api.ts');
+  const catalogue = await import('@/shared/api/app/offerings-api.ts');
   vi.mocked(catalogue.fetchAllOfferings).mockResolvedValue([
     offering({}),
     offering({ id: 'off_old', name: 'Old peel', isActive: false }),

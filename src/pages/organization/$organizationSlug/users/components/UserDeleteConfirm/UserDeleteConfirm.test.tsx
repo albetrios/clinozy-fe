@@ -2,7 +2,7 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
+import type { TeamMember } from '@/shared/api/app/users-contracts.ts';
 import type { AuthUser } from '@/shared/auth/types.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';

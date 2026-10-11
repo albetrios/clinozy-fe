@@ -3,7 +3,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/offerings-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchAllOfferings: vi.fn(),
   fetchOffering: vi.fn(),
@@ -24,14 +24,14 @@ import {
   offerQueryKeys,
   restoreOffering,
   updateOffering,
-} from '@/shared/api/clinic/offerings-api.ts';
+} from '@/shared/api/app/offerings-api.ts';
 import {
   OFFERING_DEFAULTS,
   type OfferingFields,
-} from '@/shared/api/clinic/offerings-contracts.ts';
+} from '@/shared/api/app/offerings-contracts.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { offeringRecord, TEST_OFFERING_ID } from '@/tests/utils/offering-doubles.ts';
 
 import {

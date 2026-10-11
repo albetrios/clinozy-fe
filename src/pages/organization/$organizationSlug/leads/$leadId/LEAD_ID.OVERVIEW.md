@@ -9,7 +9,7 @@ the list in place, without a drawer, and toasts "Lead not found · it may have b
 deleted" (`S:115`). A save sends the read's `updated_at` (`409 record_changed` when someone
 saved it meanwhile). `/leads/$leadId/edit` is a redirect to this route,
 registered in `app/routes/routeTree.tsx` with no island (`S:25`). Gated like the room —
-membership (`organization:read`) and the `clinic-leads` module, then
+membership (`organization:read`) and the `app-leads` module, then
 `requireOrgStatus`. The drawer is `pages/organization/$organizationSlug/leads/components/LeadDrawer/` (L-34b), mounted by the Leads
 page over the list. The person's contact card offers "Edit contact" (`contact:update`): the
 shared `ContactEditor` (L-35) over the drawer on the person read from
@@ -19,11 +19,11 @@ everywhere"). The chat beside it is the person's stream.
 
 ## Files
 
-| File                  | Responsibility                                                                                  |
-| --------------------- | ----------------------------------------------------------------------------------------------- |
-| `lead-id.route.tsx`   | Route marker — exports `Component` rendering `LeadPage`.                                        |
-| `lead-id.manifest.ts` | Manifest — `kind: 'leaf'`, permission `organization:read`, module `clinic-leads`, title "Lead". |
-| `LeadPage.tsx`        | Renders nothing — the dialog route's own UI. The drawer mounts on the Leads page.               |
+| File                  | Responsibility                                                                               |
+| --------------------- | -------------------------------------------------------------------------------------------- |
+| `lead-id.route.tsx`   | Route marker — exports `Component` rendering `LeadPage`.                                     |
+| `lead-id.manifest.ts` | Manifest — `kind: 'leaf'`, permission `organization:read`, module `app-leads`, title "Lead". |
+| `LeadPage.tsx`        | Renders nothing — the dialog route's own UI. The drawer mounts on the Leads page.            |
 
 ## Test ids
 

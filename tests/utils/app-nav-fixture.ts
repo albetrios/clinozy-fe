@@ -13,7 +13,7 @@ export const TODAY_ONLY_NAV: AppNav = {
       to: '/organization/$organizationSlug/today',
       section: 'today',
       icon: House,
-      labelNs: 'clinic',
+      labelNs: 'app',
       labelKey: 'sections.today.label',
       permission: 'organization:read',
     },

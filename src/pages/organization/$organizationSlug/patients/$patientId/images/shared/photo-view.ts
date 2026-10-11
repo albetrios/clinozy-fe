@@ -1,9 +1,9 @@
-import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
-import type { AppointmentStatus } from '@/shared/api/clinic/clinic-schema.ts';
+import type { AppointmentStatus } from '@/shared/api/app/app-schema.ts';
+import type { AppointmentRow } from '@/shared/api/app/appointments-contracts.ts';
 import type {
   PatientPhoto,
   PatientPhotoListParams,
-} from '@/shared/api/clinic/patient-images-contracts.ts';
+} from '@/shared/api/app/patient-images-contracts.ts';
 
 import { NO_VISIT, type PhotoAlbum } from '../images.search.ts';
 

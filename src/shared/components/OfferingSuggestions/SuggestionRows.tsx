@@ -5,8 +5,8 @@ import { cn } from '@/lib/utils.ts';
 import {
   SUGGESTION_STATUS_VALUES,
   type SuggestionStatus,
-} from '@/shared/api/clinic/clinic-schema.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/api/app/app-schema.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { PersonAvatar } from '@/shared/components/Cells/index.ts';
 import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
 import { RECORD_DRAWER_KEYS } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';

@@ -23,10 +23,10 @@ const loadSettingsSurface = onceAsync(async () => {
   const [, , , module] = await Promise.all([
     ensureNamespace(locale, I18N_NAMESPACES.auth),
     ensureNamespace(locale, I18N_NAMESPACES.settings),
-    // The drawer chrome its child drawers read ("Back", "Saving…") is `clinic`
+    // The drawer chrome its child drawers read ("Back", "Saving…") is `app`
     // copy, which otherwise loads only with the org shell — and Settings also
     // opens over the organization picker.
-    ensureNamespace(locale, I18N_NAMESPACES.clinic),
+    ensureNamespace(locale, I18N_NAMESPACES.app),
     import('./SettingsModal.tsx'),
   ]);
   return { default: module.SettingsModal };

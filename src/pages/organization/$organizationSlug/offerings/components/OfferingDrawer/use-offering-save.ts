@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import {
   isOfferingNameTaken,
   type OfferingRecord,
-} from '@/shared/api/clinic/offerings-contracts.ts';
+} from '@/shared/api/app/offerings-contracts.ts';
 import { mapApiError } from '@/shared/errors/errorHandler.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import {

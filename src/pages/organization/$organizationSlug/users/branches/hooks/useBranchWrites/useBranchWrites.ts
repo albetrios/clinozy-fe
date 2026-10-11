@@ -1,6 +1,6 @@
-import { branchQueryKeys } from '@/shared/api/clinic/branches-api.ts';
-import type { BranchSave, ClinicBranch } from '@/shared/api/clinic/branches-contracts.ts';
-import { saveBranch } from '@/shared/api/clinic/branches-manage-api.ts';
+import { branchQueryKeys } from '@/shared/api/app/branches-api.ts';
+import type { AppBranch, BranchSave } from '@/shared/api/app/branches-contracts.ts';
+import { saveBranch } from '@/shared/api/app/branches-manage-api.ts';
 import { orgQueryKeys } from '@/shared/api/organization-query-keys.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
@@ -13,7 +13,7 @@ import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.
  */
 export function useSaveBranch() {
   const organizationId = useOrganizationStore((state) => state.organizationId);
-  return useAppMutation<ClinicBranch, BranchSave>({
+  return useAppMutation<AppBranch, BranchSave>({
     mutationFn: (save, action) =>
       saveBranch({ save, idempotencyKey: action.idempotencyKey }),
     invalidateKeys: [branchQueryKeys.all, orgQueryKeys.members(organizationId)],

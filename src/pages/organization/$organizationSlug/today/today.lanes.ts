@@ -3,15 +3,15 @@
  * lanes and their cards, the role focus, the default lane, each tile's faces
  * and hint, and the pulse. Pure, so each rule is tested apart from React.
  */
-import type { Role, Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import { clinicClockTime } from '@/shared/api/clinic/clinic-time.ts';
+import type { Role, Tone } from '@/shared/api/app/app-schema.ts';
+import { appClockTime } from '@/shared/api/app/app-time.ts';
 import {
   TODAY_LANES,
   type TodayEnquiry,
   type TodayFloorRow,
   type TodayLane,
   todayLaneOf,
-} from '@/shared/api/clinic/today-contracts.ts';
+} from '@/shared/api/app/today-contracts.ts';
 import { personInitials } from '@/shared/components/Cells/index.ts';
 
 import type { TodayCardAction } from './today.constants.ts';
@@ -191,7 +191,7 @@ export function groupTodayLanes(
       id: enquiry.id,
       lane: 'enquiries',
       name: enquiry.name,
-      time: clinicClockTime(new Date(enquiry.lastActivityAt)),
+      time: appClockTime(new Date(enquiry.lastActivityAt)),
       enquiry,
     });
   }

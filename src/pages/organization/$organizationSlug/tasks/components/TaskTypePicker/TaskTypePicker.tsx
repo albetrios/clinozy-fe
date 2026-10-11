@@ -5,8 +5,8 @@ import {
   TASK_TYPE_VALUES,
   TASK_TYPES,
   type TaskType,
-} from '@/shared/api/clinic/tasks-contracts.ts';
-import { TASK_RULE_KEYS, TASK_RULES_NS } from '@/shared/clinic/task-rules.constants.ts';
+} from '@/shared/api/app/tasks-contracts.ts';
+import { TASK_RULE_KEYS, TASK_RULES_NS } from '@/shared/app/task-rules.constants.ts';
 import {
   Picker,
   PICKER_KEYS,

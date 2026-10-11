@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   APPOINTMENT_STATUS_FILTERS,
   APPOINTMENT_VIEWS,
-} from '@/shared/api/clinic/appointments-contracts.ts';
+} from '@/shared/api/app/appointments-contracts.ts';
 import { DOCTOR_ARJUN, DOCTOR_NISHA } from '@/tests/utils/appointment-doubles.ts';
 
 import {

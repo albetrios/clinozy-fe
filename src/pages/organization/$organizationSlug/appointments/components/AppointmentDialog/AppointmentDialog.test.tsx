@@ -2,16 +2,16 @@ import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type * as AppointmentsApiModule from '@/shared/api/clinic/appointments-api.ts';
-import { CROSS_ROOM_PARAM } from '@/shared/clinic/clinic-referrer.ts';
+import type * as AppointmentsApiModule from '@/shared/api/app/appointments-api.ts';
+import { CROSS_ROOM_PARAM } from '@/shared/app/app-referrer.ts';
 import type * as AppointmentFormModule from '@/shared/forms/AppointmentForm/index.ts';
 import { CrossRoomDialogContext } from '@/shared/hooks/useCrossRoomDialog/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import {
   APPOINTMENT_NOW,
   contactHit,
   DOCTOR_NISHA,
 } from '@/tests/utils/appointment-doubles.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import {
   type AppointmentsWorld,
@@ -24,7 +24,7 @@ import {
 } from '../../__tests__/integration/appointments-test-data.ts';
 import {
   APPOINTMENTS_PAGE,
-  grantClinicAccess,
+  grantAppAccess,
   renderAppointmentsRoutes,
 } from '../../__tests__/integration/appointments-test-router.tsx';
 import { AppointmentDialog } from './AppointmentDialog.tsx';
@@ -44,7 +44,7 @@ vi.mock('@/shared/forms/AppointmentForm/index.ts', async (importOriginal) => {
 });
 
 const world = vi.hoisted(() => ({}) as AppointmentsWorld);
-vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/appointments-api.ts', async (importOriginal) => {
   const { appointmentsApiDouble } =
     await import('../../__tests__/integration/appointments-test-data.ts');
   return {
@@ -62,7 +62,7 @@ beforeEach(() => {
   vi.resetAllMocks();
   Object.assign(world, seededAppointmentsWorld());
   signInTestMember();
-  grantClinicAccess('owner');
+  grantAppAccess('owner');
 });
 afterEach(() => vi.useRealTimers());
 
@@ -154,7 +154,7 @@ describe('AppointmentDialog', () => {
   });
 
   it('opens the drawer read-only for a member without Edit', async () => {
-    grantClinicAccess('none');
+    grantAppAccess('none');
     renderAppointmentsRoutes(
       `${APPOINTMENTS_PAGE}/${RIYA_BOOKING.id}`,
       AppointmentDialog,

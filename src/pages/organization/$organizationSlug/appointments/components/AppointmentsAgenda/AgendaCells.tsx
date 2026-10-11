@@ -8,13 +8,10 @@ import { cn } from '@/lib/utils.ts';
 import type {
   AppointmentRow,
   AppointmentStaff,
-} from '@/shared/api/clinic/appointments-contracts.ts';
-import {
-  appointmentContactCard,
-  serviceTone,
-} from '@/shared/clinic/appointment-display.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
+} from '@/shared/api/app/appointments-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { formatAppPhone } from '@/shared/app/app-phone.ts';
+import { appointmentContactCard, serviceTone } from '@/shared/app/appointment-display.ts';
 import {
   PersonAvatar,
   PersonChip,
@@ -92,7 +89,7 @@ export function ContactCell({ row }: AgendaCell) {
     >
       <PersonChip
         name={person.name}
-        sub={person.phone ? formatClinicPhone(person.phone) : undefined}
+        sub={person.phone ? formatAppPhone(person.phone) : undefined}
         tone={PERSON_TONES[person.kind]}
         patient={person.kind === 'patient'}
       />
@@ -194,13 +191,13 @@ export function QuickViewCell({ row }: AgendaCell) {
 
 /** The 32px Status button: the status pill and a chevron that turns while the popover is open (H:2045). */
 export function StatusCell({ row }: AgendaCell) {
-  const { t } = useTranslation([APPOINTMENTS_NS, CLINIC_NS]);
+  const { t } = useTranslation([APPOINTMENTS_NS, APP_NS]);
   const { canEdit, statusTarget, setStatusTarget } = useAgendaCells();
   const appointment = row.original;
   if (!canEdit) return <AppointmentStatusPill status={appointment.status} />;
   const open = statusTarget?.id === appointment.id;
-  const statusLabel = t(CLINIC_KEYS.appointments.statuses[appointment.status], {
-    ns: CLINIC_NS,
+  const statusLabel = t(APP_KEYS.appointments.statuses[appointment.status], {
+    ns: APP_NS,
   });
   return (
     <span className="flex max-w-full min-w-0" data-row-click="ignore">

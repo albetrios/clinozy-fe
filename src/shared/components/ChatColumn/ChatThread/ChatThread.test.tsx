@@ -4,8 +4,8 @@ import { describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import i18n from '@/lib/i18n/i18n.ts';
-import type { LeadMessage } from '@/shared/api/clinic/clinic-schema.ts';
-import type { ChatAuthor } from '@/shared/api/clinic/messages-contracts.ts';
+import type { LeadMessage } from '@/shared/api/app/app-schema.ts';
+import type { ChatAuthor } from '@/shared/api/app/messages-contracts.ts';
 import {
   CHAT_COLUMN_NS,
   CHAT_COLUMN_TEST_IDS as ids,
@@ -16,16 +16,16 @@ import type {
   ThreadEntry,
 } from '@/shared/components/ChatColumn/chat-history.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
-import { clinicClockOf } from '@/shared/hooks/useClinicClock/index.ts';
+import { appClockOf } from '@/shared/hooks/useAppClock/index.ts';
 import { Calendar } from '@/shared/icons/index.ts';
 import { fsi } from '@/tests/utils/bidi-marks.ts';
 
 import { ChatThread, type ChatThreadProps } from './ChatThread.tsx';
 
-const clock: ChatClock = clinicClockOf(
+const clock: ChatClock = appClockOf(
   {
     today: '2026-10-03',
-    clinicToday: '2026-10-03',
+    appToday: '2026-10-03',
     dayOf: (instant) => instant.slice(0, 10),
     time: () => '10:28 am',
     shortTime: () => '10 am',

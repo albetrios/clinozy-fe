@@ -2,7 +2,7 @@ import type { QueryKey } from '@tanstack/react-query';
 import { useLocation } from '@tanstack/react-router';
 
 import type { StockTab } from '@/lib/routes/stock-builders.ts';
-import type { ClinicAction } from '@/shared/api/clinic/access-contracts.ts';
+import type { AppAction } from '@/shared/api/app/access-contracts.ts';
 import {
   type RoomDialogRouteState,
   useRoomDialogRoute,
@@ -30,8 +30,8 @@ export interface UseStockDialogRouteOptions<T> {
 }
 
 /** A create needs Create; Stock check moves stock, so it needs Edit (`stock_item:update`). */
-const CREATE: readonly ClinicAction[] = ['create'];
-const CHECK: readonly ClinicAction[] = ['edit'];
+const CREATE: readonly AppAction[] = ['create'];
+const CHECK: readonly AppAction[] = ['edit'];
 
 /**
  * Which drawer a Clinic stock tab's URL opens (KICKOFF §6.8 Routes) — the

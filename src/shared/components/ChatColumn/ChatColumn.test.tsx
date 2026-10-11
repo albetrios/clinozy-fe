@@ -5,16 +5,16 @@ import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import * as contactActivitiesApi from '@/shared/api/clinic/contact-activities-api.ts';
-import { setFixtureWhatsAppOutage } from '@/shared/api/clinic/fixtures/messages.fixtures.ts';
-import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
+import * as contactActivitiesApi from '@/shared/api/app/contact-activities-api.ts';
+import { setFixtureWhatsAppOutage } from '@/shared/api/app/fixtures/messages.fixtures.ts';
+import { patientRef } from '@/shared/api/app/fixtures/patients.fixtures.ts';
+import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
 import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import * as messagesApi from '@/shared/api/clinic/messages-api.ts';
-import type { ChatPerson } from '@/shared/api/clinic/messages-contracts.ts';
+  appFixtures,
+  resetAppFixtures,
+} from '@/shared/api/app/fixtures/world.fixtures.ts';
+import * as messagesApi from '@/shared/api/app/messages-api.ts';
+import type { ChatPerson } from '@/shared/api/app/messages-contracts.ts';
 import { resetOutboxes } from '@/shared/hooks/useThread/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
@@ -27,12 +27,12 @@ import type { ChatContact } from './chat-composer.ts';
 import { clearDrafts } from './chat-drafts.ts';
 import { ChatColumn, type ChatColumnProps } from './ChatColumn.tsx';
 
-vi.mock('@/shared/api/clinic/messages-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/messages-api.ts', async (importOriginal) => {
   const actual = await importOriginal<typeof messagesApi>();
   return { ...actual, sendMessage: vi.fn(actual.sendMessage) };
 });
 // A contact's stream is clinozy-be's (`/app/contacts/:contact_id/activities`).
-vi.mock('@/shared/api/clinic/contact-activities-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/contact-activities-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof contactActivitiesApi>()),
   fetchContactThread: vi.fn(),
   fetchContactMessagingStatus: vi.fn(async () => ({ whatsappDown: false })),
@@ -112,7 +112,7 @@ beforeEach(() => {
   vi.mocked(useViewportTier).mockReturnValue('desktop');
   // The clinic's regional format: "30 Sep", "4:00 pm" (the design's).
   useLocaleStore.getState().setFormatLocale('en-IN');
-  resetClinicFixtures();
+  resetAppFixtures();
   resetOutboxes();
   clearDrafts();
 });
@@ -124,7 +124,7 @@ afterEach(() => {
   useAuthStore.setState({ user: null });
   useLocaleStore.getState().setFormatLocale('en-US');
   client.clear();
-  resetClinicFixtures();
+  resetAppFixtures();
   resetOutboxes();
   clearDrafts();
 });
@@ -439,7 +439,7 @@ describe('sending', () => {
     );
     await user.click(retry);
     await waitFor(() => expect(screen.queryByTestId(ids.retry)).not.toBeInTheDocument());
-    const message = clinicFixtures.leadMessages.snapshot(
+    const message = appFixtures.leadMessages.snapshot(
       (row) => row.body === 'Yes. A counsellor will call you by 11:00 with details.',
     )[0];
     expect(message?.deliveryStatus).toBe('sent');

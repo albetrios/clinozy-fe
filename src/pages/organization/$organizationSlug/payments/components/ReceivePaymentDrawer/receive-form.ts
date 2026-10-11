@@ -1,12 +1,12 @@
 import { paiseOfRupees, rupeesOfPaise } from '@/lib/number-text.ts';
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import type { InvoiceRecord } from '@/shared/api/clinic/invoices-contracts.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
+import type { InvoiceRecord } from '@/shared/api/app/invoices-contracts.ts';
 import type {
   LedgerRow,
   PaymentPatch,
   ReceivePaymentInput,
-} from '@/shared/api/clinic/payments-contracts.ts';
-import { PAYMENT_MODE_TONES } from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/api/app/payments-contracts.ts';
+import { PAYMENT_MODE_TONES } from '@/shared/app/app-tones.ts';
 import {
   FIRST_SPLIT_MODE,
   isSplitMode,

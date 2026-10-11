@@ -74,7 +74,7 @@ await gatewayFromManifest(manifest)(toGateContext(location, params));
 | L5 permission | `manifest.permission`                        | `/unauthorized` or `notFound` per `onDeny` |
 | L6b module    | `manifest.module` vs `VITE_DISABLED_MODULES` | `notFound()` (404)                         |
 
-Module keys must match `docs/reference/frontend-platform.md` catalog (`billing`, `members`, …).
+Module keys must match `docs/reference/frontend-platform.md` catalog — the Settings keys (`billing`, `members`, `integrations`) and the clinic rooms' `app-<room>` keys (`APP_MODULES` in `src/core/config/app-modules.ts`, e.g. `app-medical`).
 
 ---
 

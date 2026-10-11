@@ -261,7 +261,7 @@ is the separate `AppearanceDialog` on the root route.)
   (they are table-heavy admin surfaces — expect it). When promoted, keep a
   `#settings/organization/members` → path redirect shim so old links survive.
 - **Members and Roles live in the Users room (D17).** Where the room is open to the member — the
-  `clinic-users` module is on and their codes view Users (`membership:read` + `role:read`,
+  `app-users` module is on and their codes view Users (`membership:read` + `role:read`,
   `useUsersRoomOpen`) — `#settings/organization/members` and `…/roles` keep their nav entries
   and hash but render `UsersRoomLink`: what moved and a link to `/users` or `/users/roles`
   that drops the hash, closing the drawer. Everywhere else (the module off, or a member
@@ -296,11 +296,11 @@ live in their own module, imported by path, and load with the code that navigate
 
 **Clinic route plumbing (L-12a).** The org index (`/organization/<slug>`) and any
 unknown path under it redirect to the member's **role home** (D25,
-`shared/clinic/clinic-home.ts`: Pharmacist Medical, Accountant Payments,
+`shared/app/app-home.ts`: Pharmacist Medical, Accountant Payments,
 Marketing Leads, everyone else Today; the first open room when that one is
 closed) — the unknown path with a "Page not found" toast (S:115). When no clinic
 room is open to the member (every module off, D8, or no View), the org index
-renders `ClinicHomeEmpty` in a room's place instead of redirecting — "Nothing is
+renders `AppHomeEmpty` in a room's place instead of redirecting — "Nothing is
 switched on here yet" — and the unknown path lands there (L-63). An unknown organization slug keeps the platform's
 404 (identical for an unknown and a non-member slug, so existence never leaks).
 A URL-driven dialog route renders nothing of its own, so `routeTree.tsx` — the entry
@@ -318,7 +318,7 @@ opening render already has it — a tab's own action route (Stock check's
 `items/check`), or a record route; a create or an action the member's access does
 not allow goes back to the list with the permission toast. A drawer opened
 from another room keeps that room behind it through a `from` search param that
-must match the allow-list in `shared/clinic/clinic-referrer.ts`; anything else
+must match the allow-list in `shared/app/app-referrer.ts`; anything else
 falls back to the drawer's own parent.
 
 **The primary nav is manifest-driven.** A route the nav lists carries its manifest as

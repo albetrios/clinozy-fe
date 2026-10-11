@@ -1,9 +1,9 @@
 import { waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type * as TreatmentsApiModule from '@/shared/api/clinic/treatments-api.ts';
-import { createTreatment } from '@/shared/api/clinic/treatments-api.ts';
-import type { TreatmentRecord } from '@/shared/api/clinic/treatments-contracts.ts';
+import type * as TreatmentsApiModule from '@/shared/api/app/treatments-api.ts';
+import { createTreatment } from '@/shared/api/app/treatments-api.ts';
+import type { TreatmentRecord } from '@/shared/api/app/treatments-contracts.ts';
 import { patientFile } from '@/tests/utils/patient-doubles.ts';
 
 import {
@@ -34,7 +34,7 @@ const { notifyMock } = vi.hoisted(() => ({
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 
 const world = vi.hoisted(() => ({}) as TreatmentsWorld);
-vi.mock('@/shared/api/clinic/treatments-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/treatments-api.ts', async (importOriginal) => {
   const { treatmentsApiDouble } =
     await import('../../__tests__/integration/treatment-doubles.ts');
   return {

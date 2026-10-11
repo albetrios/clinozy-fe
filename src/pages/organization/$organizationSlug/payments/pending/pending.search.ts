@@ -9,8 +9,8 @@ import { listIn, queryOf } from '@/lib/routes/search-params.ts';
 import {
   type CreatedFilter,
   readCreatedFilter,
-} from '@/shared/api/clinic/clinic-list-filters.ts';
-import type { CreditDirection, CreditStatus } from '@/shared/api/clinic/clinic-schema.ts';
+} from '@/shared/api/app/app-list-filters.ts';
+import type { CreditDirection, CreditStatus } from '@/shared/api/app/app-schema.ts';
 
 /** Each Pending filter's values, in the chip order (`payments.md:45`). */
 export const PENDING_FILTER_VALUES = {

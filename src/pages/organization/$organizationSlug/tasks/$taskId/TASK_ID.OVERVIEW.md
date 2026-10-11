@@ -12,7 +12,7 @@ An id that is no task's public id (`task_` + 21; a link from the fixture days) i
 and an unknown one (a 404) leaves the list in place without a drawer, toasting "Task not
 found · it may have been deleted" (`S:115`); any other failed read keeps the drawer open with
 the error and Retry in place. Gated like the room — membership (`organization:read`) and the
-`clinic-tasks` module, then `requireOrgStatus`; every action inside by the member's clinozy-be
+`app-tasks` module, then `requireOrgStatus`; every action inside by the member's clinozy-be
 codes (all false under View-as: a preview reads the drawer and changes nothing).
 
 The drawer (L-47c) is the parent's `../components/TaskDrawer/`, on the record drawer: from `md`
@@ -39,11 +39,11 @@ task's person and record.
 
 ## Files
 
-| File                  | Responsibility                                                                                  |
-| --------------------- | ----------------------------------------------------------------------------------------------- |
-| `task-id.route.tsx`   | Route marker — exports `Component` rendering `TaskPage`.                                        |
-| `task-id.manifest.ts` | Manifest — `kind: 'leaf'`, permission `organization:read`, module `clinic-tasks`, title "Task". |
-| `TaskPage.tsx`        | Renders nothing — the dialog route's own UI. The drawer mounts on the Tasks page.               |
+| File                  | Responsibility                                                                               |
+| --------------------- | -------------------------------------------------------------------------------------------- |
+| `task-id.route.tsx`   | Route marker — exports `Component` rendering `TaskPage`.                                     |
+| `task-id.manifest.ts` | Manifest — `kind: 'leaf'`, permission `organization:read`, module `app-tasks`, title "Task". |
+| `TaskPage.tsx`        | Renders nothing — the dialog route's own UI. The drawer mounts on the Tasks page.            |
 
 ## Test ids
 

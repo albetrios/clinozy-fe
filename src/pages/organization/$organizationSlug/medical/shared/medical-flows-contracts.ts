@@ -4,7 +4,7 @@ import {
   civilDateSchema,
   expiryMonthSchema,
   paiseSchema,
-} from '@/shared/api/clinic/clinic-schema.ts';
+} from '@/shared/api/app/app-schema.ts';
 
 /*
  * What the Medical flows send and answer (KICKOFF §6.7; `medical.md:254–309`,

@@ -1,10 +1,10 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 
 /**
- * Give back / Got it back live in `clinic`: Payments › Pending opens the
+ * Give back / Got it back live in `app`: Payments › Pending opens the
  * drawer, and so does the patient file's "₹500 to return" (KICKOFF §6.9).
  */
-export const SETTLE_CREDIT_NS = I18N_NAMESPACES.clinic;
+export const SETTLE_CREDIT_NS = I18N_NAMESPACES.app;
 
 /** Key paths for the drawer (`payments.md:170–180, 254–266`; verbatim), by the credit's way. */
 export const SETTLE_CREDIT_KEYS = {

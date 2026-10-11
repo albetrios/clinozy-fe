@@ -12,7 +12,7 @@ const today: SectionBarEntry = {
   to: '/organization/$organizationSlug/today',
   section: 'today',
   icon: House,
-  labelNs: 'clinic',
+  labelNs: 'app',
   labelKey: 'sections.today.label',
   tone: 'butter',
   descriptionKey: 'sections.today.description',

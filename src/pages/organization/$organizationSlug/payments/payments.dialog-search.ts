@@ -8,7 +8,7 @@
  * and this module loads with the room.
  */
 import { matchOf, PUBLIC_ID, textOf } from '@/lib/routes/search-params.ts';
-import { CALENDAR_DATE } from '@/shared/api/clinic/clinic-list-filters.ts';
+import { CALENDAR_DATE } from '@/shared/api/app/app-list-filters.ts';
 
 /**
  * `/payments/receive` (`S:85`): the patient and the invoice to prefill, and the

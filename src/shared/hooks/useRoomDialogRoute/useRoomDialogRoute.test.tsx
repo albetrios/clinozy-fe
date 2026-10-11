@@ -11,7 +11,7 @@ import {
 import { render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { clinicHttpError } from '@/shared/api/clinic/clinic-fixture-store.ts';
+import { appHttpError } from '@/shared/api/app/app-fixture-store.ts';
 import {
   type CrossRoomDialog,
   CrossRoomDialogContext,
@@ -30,8 +30,8 @@ const access = vi.hoisted(() => ({
   isResolved: true,
   granted: new Set<string>(['view', 'create', 'edit']),
 }));
-vi.mock('@/shared/hooks/useClinicAccess/index.ts', () => ({
-  useClinicAccess: () => ({
+vi.mock('@/shared/hooks/useAppAccess/index.ts', () => ({
+  useAppAccess: () => ({
     isResolved: access.isResolved,
     can: (_section: string, action: string) => access.granted.has(action),
   }),
@@ -41,7 +41,7 @@ const RECORDS: Record<string, { name: string }> = { r1: { name: 'Alpha' } };
 
 async function fetchRecord(id: string) {
   const record = RECORDS[id];
-  if (!record) throw clinicHttpError(404, 'not_found', 'Record not found');
+  if (!record) throw appHttpError(404, 'not_found', 'Record not found');
   return record;
 }
 

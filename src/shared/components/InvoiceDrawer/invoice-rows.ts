@@ -1,4 +1,4 @@
-import { INVOICE_QTY_MAX } from '@/shared/api/clinic/invoices-contracts.ts';
+import { INVOICE_QTY_MAX } from '@/shared/api/app/invoices-contracts.ts';
 import {
   type QuickLineTermValues,
   withQuickLineRow,

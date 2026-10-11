@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useDevicePrefsStore } from '@/shared/store/useDevicePrefsStore/index.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 
 import {
   prescriptionLine,
@@ -12,7 +12,7 @@ import {
 } from '../../__tests__/integration/prescription-doubles.ts';
 import { usePrescriptionsTable } from './usePrescriptionsTable.tsx';
 
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => {
   const { DOCTOR_NISHA } = await import('@/tests/utils/appointment-doubles.ts');
   return {
     ...(await importOriginal<object>()),

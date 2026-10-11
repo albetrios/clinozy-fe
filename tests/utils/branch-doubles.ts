@@ -3,7 +3,7 @@
  * branch the room reads. Ids are public ids (`<prefix>_<21 [a-z0-9]>`). Override what a test is
  * about; the rest stays Vesu — open, not main, Mon–Sat 10:00–19:00, nobody by default.
  */
-import type { ClinicBranch } from '@/shared/api/clinic/branches-contracts.ts';
+import type { AppBranch } from '@/shared/api/app/branches-contracts.ts';
 
 /** Vesu's branch id. */
 export const TEST_BRANCH_ID = 'brn_vesu00000000000000000';
@@ -39,7 +39,7 @@ export const branchWireRow = (patch: Record<string, unknown> = {}) => ({
 });
 
 /** Vesu as the room reads it. */
-export const clinicBranch = (patch: Partial<ClinicBranch> = {}): ClinicBranch => ({
+export const appBranch = (patch: Partial<AppBranch> = {}): AppBranch => ({
   id: TEST_BRANCH_ID,
   name: 'Vesu',
   tone: 'lav',

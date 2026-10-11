@@ -1,4 +1,4 @@
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
 import type { NotificationCategory } from '@/shared/api/notification-contracts.ts';
 import { type AppIcon, Bell, ShieldCheck, UserPlus, Zap } from '@/shared/icons/index.ts';
 

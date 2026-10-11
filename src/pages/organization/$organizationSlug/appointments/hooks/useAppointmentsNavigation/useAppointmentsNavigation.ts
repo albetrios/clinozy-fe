@@ -5,16 +5,12 @@ import {
   organizationAppointment,
   organizationAppointmentCreate,
 } from '@/lib/routes/appointments-builders.ts';
+import { addCivilDays, addCivilMonths, appToday } from '@/shared/api/app/app-time.ts';
 import {
   type AppointmentCalendarView,
   appointmentViewRange,
-} from '@/shared/api/clinic/appointment-views.ts';
-import type { AppointmentView } from '@/shared/api/clinic/appointments-contracts.ts';
-import {
-  addCivilDays,
-  addCivilMonths,
-  clinicToday,
-} from '@/shared/api/clinic/clinic-time.ts';
+} from '@/shared/api/app/appointment-views.ts';
+import type { AppointmentView } from '@/shared/api/app/appointments-contracts.ts';
 
 import {
   type AppointmentsSearch,
@@ -90,7 +86,7 @@ export function useAppointmentsNavigation(): AppointmentsNavigation {
   const raw: Record<string, unknown> = useSearch({ strict: false });
   const navigate = useNavigate();
   const search = useMemo(() => validateAppointmentsSearch(raw), [raw]);
-  const anchor = search.date ?? clinicToday();
+  const anchor = search.date ?? appToday();
 
   const patch = useCallback(
     (next: Partial<AppointmentsSearch>) => {

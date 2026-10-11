@@ -3,17 +3,14 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import {
-  type TaskRow,
-  visibleTaskOutcomes,
-} from '@/shared/api/clinic/tasks-contracts.ts';
-import type { TodayLane } from '@/shared/api/clinic/today-contracts.ts';
-import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
-import { type TaskTarget, taskTargetNavigation } from '@/shared/clinic/task-targets.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
-import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
-import { useRolesInForce } from '@/shared/hooks/useClinicRoles/index.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
+import { type TaskRow, visibleTaskOutcomes } from '@/shared/api/app/tasks-contracts.ts';
+import type { TodayLane } from '@/shared/api/app/today-contracts.ts';
+import { appCommandNavigation } from '@/shared/app/app-command-targets.ts';
+import { type TaskTarget, taskTargetNavigation } from '@/shared/app/task-targets.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
+import { useAppNavigate } from '@/shared/hooks/useAppNavigate/index.ts';
+import { useRolesInForce } from '@/shared/hooks/useAppRoles/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
 import { useMeContext } from '@/shared/hooks/useMeContext/index.ts';
 import { useMyMembershipId } from '@/shared/hooks/useMyMembership/index.ts';
@@ -51,8 +48,8 @@ function useFollowOn(
   organizationSlug: string,
   book: (request: TodayBookingRequest) => void,
 ) {
-  const navigate = useClinicNavigate();
-  const access = useClinicAccess();
+  const navigate = useAppNavigate();
+  const access = useAppAccess();
   return (target: TaskTarget) => {
     if (target.kind === 'newAppointment') {
       if (!access.can('appointments', 'create')) return;
@@ -85,7 +82,7 @@ function useTodayWorkQueue(
   scope: WorkQueueScope,
   onFollowOn: (target: TaskTarget) => void,
 ) {
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const reads = access.isResolved && access.can('tasks', 'view');
   const queue = useWorkQueue({ scope, enabled: reads, onFollowOn });
   const { byId } = useTeamDirectory();
@@ -113,7 +110,7 @@ function useTodayLanes(
   focus: ReadonlySet<TodayLane>,
   picked: TodayLane | undefined,
 ) {
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const leads = !access.isResolved || access.can('leads', 'view');
   const appointments = !access.isResolved || access.can('appointments', 'view');
   const visibleLanes = useMemo(
@@ -133,10 +130,10 @@ function useTodayLanes(
  */
 function useGreetingActions(organizationSlug: string) {
   const navigate = useNavigate();
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const newBooking =
     access.isResolved && access.can('leads', 'create')
-      ? () => void navigate(clinicCommandNavigation('newLead', { organizationSlug }))
+      ? () => void navigate(appCommandNavigation('newLead', { organizationSlug }))
       : undefined;
   const walkIn =
     access.isResolved && access.can('appointments', 'create')
@@ -160,7 +157,7 @@ export function TodayPage() {
   const search = validateTodaySearch(useSearch({ strict: false }));
   const { patchSearch } = useDataTableUrlState(true);
   const now = useNow();
-  const today = clinicToday(now);
+  const today = appToday(now);
   const me = useMeContext();
   const floor = useTodayFloorView();
   const actions = useFloorActions(organizationSlug);

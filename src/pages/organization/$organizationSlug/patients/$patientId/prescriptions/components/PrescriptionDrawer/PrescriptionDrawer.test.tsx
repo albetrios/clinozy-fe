@@ -49,11 +49,11 @@ vi.mock('@/shared/components/PrintTemplate/print-document.ts', () => ({
   PRINTING_ATTRIBUTE: 'data-printing',
 }));
 
-vi.mock('@/shared/api/clinic/prescriptions-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/prescriptions-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   ...(await import('../../__tests__/integration/prescription-doubles.ts')).rxServerApi,
 }));
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => {
   const { DOCTOR_ARJUN, DOCTOR_NISHA: NISHA } =
     await import('@/tests/utils/appointment-doubles.ts');
   return {

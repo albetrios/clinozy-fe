@@ -3,8 +3,8 @@ import { useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { numberFromText } from '@/lib/number-text.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import { SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import { SECTION_TONES } from '@/shared/app/app-tones.ts';
 import {
   DrawerFieldGrid,
   DrawerStepBody,

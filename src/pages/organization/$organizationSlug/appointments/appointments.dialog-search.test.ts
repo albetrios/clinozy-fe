@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { safeReferrer } from '@/shared/clinic/clinic-referrer.ts';
+import { safeReferrer } from '@/shared/app/app-referrer.ts';
 import { appointmentRow, contactHit } from '@/tests/utils/appointment-doubles.ts';
 
 import {

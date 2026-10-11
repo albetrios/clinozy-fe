@@ -8,17 +8,17 @@ lav · blush · peach · plum, with City and State copied from the main branch a
 team. Name, the address, Area, City, a six-digit PIN code, Phone and Email are required, as
 clinozy-be requires them; the branch and its team go in one `POST /app/branches`, and a name
 another branch has (409) outlines Name. Gated like Branches — `branch:read` and the
-`clinic-users` module, then `requireOrgStatus`; "New branch" itself needs `branch:create` —
+`app-users` module, then `requireOrgStatus`; "New branch" itself needs `branch:create` —
 without it the link lands back on the list with the permission toast. The drawer is the family's
 `../components/BranchDrawer/`, opened by the page through `../hooks/useBranchesDialogRoute/`.
 
 ## Files
 
-| File                 | Responsibility                                                                                  |
-| -------------------- | ----------------------------------------------------------------------------------------------- |
-| `create.route.tsx`   | Route marker — exports `Component` rendering `NewBranchPage`.                                   |
-| `create.manifest.ts` | Manifest — `kind: 'leaf'`, permission `branch:read`, module `clinic-users`, title "New branch". |
-| `NewBranchPage.tsx`  | Renders nothing — the dialog route's own UI. The drawer mounts on the Branches page.            |
+| File                 | Responsibility                                                                               |
+| -------------------- | -------------------------------------------------------------------------------------------- |
+| `create.route.tsx`   | Route marker — exports `Component` rendering `NewBranchPage`.                                |
+| `create.manifest.ts` | Manifest — `kind: 'leaf'`, permission `branch:read`, module `app-users`, title "New branch". |
+| `NewBranchPage.tsx`  | Renders nothing — the dialog route's own UI. The drawer mounts on the Branches page.         |
 
 ## Test ids
 

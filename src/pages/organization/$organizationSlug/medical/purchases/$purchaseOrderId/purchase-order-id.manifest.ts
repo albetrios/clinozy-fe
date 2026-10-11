@@ -13,7 +13,7 @@ export const manifest = {
   title: 'Purchase order',
   testId: 'purchase-order-view-drawer',
   permission: 'organization:read',
-  module: 'clinic-medical',
+  module: 'app-medical',
   kind: 'layout',
   children: ['edit', 'receive'],
 } as const satisfies PageManifest;

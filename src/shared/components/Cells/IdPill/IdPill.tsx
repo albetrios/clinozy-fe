@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils.ts';
 /**
  * A record's display id ("#3508", "PAY-5512") as the design's 22px `bg-muted`
  * pill: 11.5px/500, tabular figures, `rounded-md` (H:684). Format the id with
- * `displayId` from `@/shared/api/clinic/clinic-display-id.ts`.
+ * `displayId` from `@/shared/api/app/app-display-id.ts`.
  */
 export function IdPill({ className, ...props }: ComponentProps<'span'>) {
   return (

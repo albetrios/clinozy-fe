@@ -16,7 +16,7 @@ Edit and Delete; a closed day's answers "PAY-5501 · Day closed".
 | File                      | Responsibility                                                      |
 | ------------------------- | ------------------------------------------------------------------- |
 | `payments.route.tsx`      | Route marker — exports `Component` rendering `MedicalPaymentsPage`. |
-| `payments.manifest.ts`    | Manifest — `kind: 'leaf'`, module `clinic-medical`.                 |
+| `payments.manifest.ts`    | Manifest — `kind: 'leaf'`, module `app-medical`.                    |
 | `MedicalPaymentsPage.tsx` | The tab: the Medical toolbar over the ledger limited to Medical.    |
 
 ## Test ids

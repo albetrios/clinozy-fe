@@ -1,8 +1,4 @@
-import {
-  clinicClockTime,
-  clinicToday,
-  clockMinutes,
-} from '@/shared/api/clinic/clinic-time.ts';
+import { appClockTime, appToday, clockMinutes } from '@/shared/api/app/app-time.ts';
 import { useNow } from '@/shared/hooks/useNow/index.ts';
 
 /** The clinic's clock as the calendars read it. */
@@ -21,5 +17,5 @@ export interface CalendarClock {
  */
 export function useCalendarClock(): CalendarClock {
   const now = useNow();
-  return { today: clinicToday(now), minutes: clockMinutes(clinicClockTime(now)) };
+  return { today: appToday(now), minutes: clockMinutes(appClockTime(now)) };
 }

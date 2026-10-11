@@ -3,10 +3,11 @@ import { act, renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { appointmentQueryKeys } from '@/shared/api/clinic/appointments-api.ts';
-import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
-import type { Contact } from '@/shared/api/clinic/contacts-contracts.ts';
+import { appointmentQueryKeys } from '@/shared/api/app/appointments-api.ts';
+import type { AppointmentRow } from '@/shared/api/app/appointments-contracts.ts';
+import type { Contact } from '@/shared/api/app/contacts-contracts.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import {
   APPOINTMENT_NOW,
   APPOINTMENT_TODAY,
@@ -16,7 +17,6 @@ import {
   DOCTOR_NISHA,
   TEST_BRANCH_ID,
 } from '@/tests/utils/appointment-doubles.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 const { notifyMock, appointmentsApi, contactsApi } = vi.hoisted(() => ({
   notifyMock: {
@@ -35,11 +35,11 @@ const { notifyMock, appointmentsApi, contactsApi } = vi.hoisted(() => ({
   contactsApi: { createContact: vi.fn() },
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
-vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/appointments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   ...appointmentsApi,
 }));
-vi.mock('@/shared/api/clinic/contacts-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/contacts-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   ...contactsApi,
 }));

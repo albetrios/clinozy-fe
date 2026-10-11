@@ -4,7 +4,7 @@
  * imports that module for `validateSearch`, so anything else exported from it
  * ships on the first paint; this module loads with the room.
  */
-import type { LedgerListParams } from '@/shared/api/clinic/payments-contracts.ts';
+import type { LedgerListParams } from '@/shared/api/app/payments-contracts.ts';
 
 import type { PaymentsSearch } from './payments.search.ts';
 

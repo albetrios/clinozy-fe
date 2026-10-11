@@ -13,7 +13,7 @@ export const manifest = {
   title: 'Prescription',
   testId: 'rx-print-preview',
   permission: 'organization:read',
-  module: 'clinic-patients',
+  module: 'app-patients',
   kind: 'layout',
   children: ['edit'],
 } as const satisfies PageManifest;

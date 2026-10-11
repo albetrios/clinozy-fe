@@ -3,15 +3,15 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type * as DirectoryApiModule from '@/shared/api/clinic/directory-api.ts';
+import type * as DirectoryApiModule from '@/shared/api/app/directory-api.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { DOCTOR_ARJUN, DOCTOR_NISHA } from '@/tests/utils/appointment-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import { renderInAppointments } from '../../__tests__/integration/appointments-test-router.tsx';
 import { DoctorPicker } from './DoctorPicker.tsx';
 
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => {
   const { directoryApiDouble } =
     await import('../../__tests__/integration/appointments-test-data.ts');
   return {

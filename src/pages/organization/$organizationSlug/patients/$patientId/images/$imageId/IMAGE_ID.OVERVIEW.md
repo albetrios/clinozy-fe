@@ -4,7 +4,7 @@ Route: `/organization/$organizationSlug/patients/$patientId/images/$imageId` (`S
 §6.6 Photo viewer) — a full-screen dialog over the Photos section, keeping its
 `?album=&appointment=`.
 
-Gated by the file layout (membership, the `clinic-patients` module, the org status); the photo's
+Gated by the file layout (membership, the `app-patients` module, the org status); the photo's
 read (`GET /app/patients/:patient_id/images/:patient_image_id`, standing in with a cached page's
 copy while it runs) answers 404 for a deleted or unknown photo and for one in the Private album
 without `patient:private_album:read` — "Photo not found · it may have been deleted" — and the

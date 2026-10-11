@@ -2,17 +2,17 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type * as BranchesApiModule from '@/shared/api/clinic/branches-api.ts';
-import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
-import type { BranchSave, ClinicBranch } from '@/shared/api/clinic/branches-contracts.ts';
-import type * as BranchesManageApiModule from '@/shared/api/clinic/branches-manage-api.ts';
+import type * as BranchesApiModule from '@/shared/api/app/branches-api.ts';
+import type { BranchOption } from '@/shared/api/app/branches-api.ts';
+import type { AppBranch, BranchSave } from '@/shared/api/app/branches-contracts.ts';
+import type * as BranchesManageApiModule from '@/shared/api/app/branches-manage-api.ts';
 import type * as OrganizationApiModule from '@/shared/api/organization-api.ts';
 import type { Member } from '@/shared/api/organization-contracts.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
-import { clinicBranch } from '@/tests/utils/branch-doubles.ts';
+import { appBranch } from '@/tests/utils/branch-doubles.ts';
 
 import {
   member,
@@ -58,17 +58,17 @@ vi.mock('@/shared/api/organization-api.ts', async (importOriginal) => ({
   listMembers: api.listMembers,
   listRoles: api.listRoles,
 }));
-vi.mock('@/shared/api/clinic/branches-manage-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/branches-manage-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof BranchesManageApiModule>()),
   fetchBranches: api.fetchBranches,
   saveBranch: api.saveBranch,
 }));
-vi.mock('@/shared/api/clinic/branches-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/branches-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof BranchesApiModule>()),
   fetchActiveBranches: api.fetchActiveBranches,
 }));
 
-const ADAJAN = clinicBranch({
+const ADAJAN = appBranch({
   id: 'brn_adajan000000000000000',
   name: 'Adajan',
   tone: 'mint',
@@ -76,8 +76,8 @@ const ADAJAN = clinicBranch({
   area: 'Adajan',
   createdAt: '2026-09-01T05:00:00.000Z',
 });
-const VESU = clinicBranch({ createdAt: '2026-09-02T05:00:00.000Z' });
-const VARACHHA = clinicBranch({
+const VESU = appBranch({ createdAt: '2026-09-02T05:00:00.000Z' });
+const VARACHHA = appBranch({
   id: 'brn_varachha0000000000000',
   name: 'Varachha',
   tone: 'blush',
@@ -86,7 +86,7 @@ const VARACHHA = clinicBranch({
 });
 
 /** What clinozy-be holds for the run: the three branches and the roster. */
-const server = { branches: [] as ClinicBranch[], roster: [] as Member[] };
+const server = { branches: [] as AppBranch[], roster: [] as Member[] };
 
 const RIYA = member('riya', SELF.email, PLATFORM_ROLES.admin, {
   userId: SELF.userId,
@@ -97,15 +97,15 @@ const REENAL = member('reenal', 'reenal@cresence.skin', PLATFORM_ROLES.doctor, {
 });
 
 /** clinozy-be's save: a taken name is a reasonless 409; the team moves with the branch. */
-function serverSave({ save }: { save: BranchSave }): ClinicBranch {
+function serverSave({ save }: { save: BranchSave }): AppBranch {
   const name = save.input.name.toLowerCase();
   const taken = server.branches.some(
     (row) => row.name.toLowerCase() === name && row.id !== save.branch?.id,
   );
   if (taken) throw new HttpError('Conflict', 409, '/app/branches', 'POST', {});
   const before = server.branches.find((row) => row.id === save.branch?.id);
-  const saved: ClinicBranch = {
-    ...(before ?? clinicBranch({ id: `brn_${name.padEnd(21, '0')}`, isMain: false })),
+  const saved: AppBranch = {
+    ...(before ?? appBranch({ id: `brn_${name.padEnd(21, '0')}`, isMain: false })),
     ...save.input,
     createdAt: before?.createdAt ?? '2026-10-10T05:00:00.000Z',
   };

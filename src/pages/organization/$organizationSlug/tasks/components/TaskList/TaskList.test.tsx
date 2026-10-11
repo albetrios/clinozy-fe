@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type { TaskRow } from '@/shared/api/clinic/tasks-contracts.ts';
+import type { TaskRow } from '@/shared/api/app/tasks-contracts.ts';
 import { taskRow } from '@/tests/utils/task-doubles.ts';
 
 import type { TaskRowTeam } from '../TaskRow/index.ts';

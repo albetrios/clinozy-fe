@@ -2,7 +2,7 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { fetchTask } from '@/shared/api/clinic/tasks-api.ts';
+import { fetchTask } from '@/shared/api/app/tasks-api.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { taskRow, TEST_TASK_ID } from '@/tests/utils/task-doubles.ts';
 
@@ -17,7 +17,7 @@ const { notifyMock } = vi.hoisted(() => ({
   notifyMock: { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() },
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
-vi.mock('@/shared/api/clinic/tasks-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/tasks-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchTask: vi.fn(),
 }));

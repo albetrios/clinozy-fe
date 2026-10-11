@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils.ts';
-import type { PatientFile } from '@/shared/api/clinic/patient-file-contracts.ts';
-import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
+import type { PatientFile } from '@/shared/api/app/patient-file-contracts.ts';
+import { patientName } from '@/shared/api/app/patients-contracts.ts';
 import {
   ChatColumn,
   type ChatHistoryTarget,

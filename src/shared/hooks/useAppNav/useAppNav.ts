@@ -3,19 +3,16 @@ import { useMemo } from 'react';
 
 import { isModuleEnabled } from '@/core/security/gates/require-module.ts';
 import type { PageManifest } from '@/lib/routes/page-manifest.ts';
-import type { Section } from '@/shared/api/clinic/clinic-schema.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { CLINIC_SECTION_ICONS } from '@/shared/clinic/clinic-section-icons.ts';
-import {
-  CLINIC_SECTION_ORDER,
-  isClinicSection,
-} from '@/shared/clinic/clinic-sections.ts';
+import type { Section } from '@/shared/api/app/app-schema.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { APP_SECTION_ICONS } from '@/shared/app/app-section-icons.ts';
+import { APP_SECTION_ORDER, isAppSection } from '@/shared/app/app-sections.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import {
   type AccessCheck,
   useAccessResolved,
   useVisibleNav,
 } from '@/shared/hooks/useCan/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import type { AppIcon } from '@/shared/icons/index.ts';
 
 /** One primary-nav destination — a clinic room, built from its route's manifest. */
@@ -41,7 +38,7 @@ const ORGANIZATION_PREFIX = '/organization/$organizationSlug/';
 
 function toEntry({ fullPath, manifest }: NavRoute): AppNavEntry[] {
   const nav = manifest.nav;
-  if (!(nav && isClinicSection(nav.section))) return [];
+  if (!(nav && isAppSection(nav.section))) return [];
   const section = nav.section;
   return [
     {
@@ -49,9 +46,9 @@ function toEntry({ fullPath, manifest }: NavRoute): AppNavEntry[] {
       id: nav.id,
       to: fullPath,
       section,
-      icon: CLINIC_SECTION_ICONS[section],
-      labelNs: CLINIC_NS,
-      labelKey: CLINIC_KEYS.sections[section].label,
+      icon: APP_SECTION_ICONS[section],
+      labelNs: APP_NS,
+      labelKey: APP_KEYS.sections[section].label,
     },
   ];
 }
@@ -75,7 +72,7 @@ export function navCandidates(
     .flatMap(toEntry)
     .sort(
       (a, b) =>
-        CLINIC_SECTION_ORDER.indexOf(a.section) - CLINIC_SECTION_ORDER.indexOf(b.section),
+        APP_SECTION_ORDER.indexOf(a.section) - APP_SECTION_ORDER.indexOf(b.section),
     );
 }
 
@@ -94,7 +91,7 @@ const PENDING: AppNav = { entries: [], isResolved: false };
 /**
  * The primary nav, built from the route manifests (L-12): the candidates,
  * filtered by each manifest's platform permission (`useVisibleNav`) and by View
- * in `useClinicAccess` — so it follows a View-as preview too. The org shell's
+ * in `useAppAccess` — so it follows a View-as preview too. The org shell's
  * nav and the ⌘K "Go to" group read this.
  */
 export function useAppNav(): AppNav {
@@ -108,7 +105,7 @@ export function useAppNav(): AppNav {
   }, [router]);
   const permissionsResolved = useAccessResolved();
   const permitted = useVisibleNav(candidates);
-  const access = useClinicAccess();
+  const access = useAppAccess();
 
   return useMemo(() => {
     if (!permissionsResolved) return PENDING;

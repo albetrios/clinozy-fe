@@ -2,13 +2,13 @@ import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { fetchPersonAppointments } from '@/shared/api/clinic/appointments-api.ts';
-import { findContactByPhone } from '@/shared/api/clinic/contacts-api.ts';
+import { fetchPersonAppointments } from '@/shared/api/app/appointments-api.ts';
+import { findContactByPhone } from '@/shared/api/app/contacts-api.ts';
 import {
   deletePatient,
   fetchPatient,
   updatePatient,
-} from '@/shared/api/clinic/patients-api.ts';
+} from '@/shared/api/app/patients-api.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import {
   patientFile,
@@ -37,23 +37,23 @@ vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 vi.mock('@/shared/hooks/useUploadQueue/index.ts', () => ({
   useUploadQueue: () => ({ enqueue: vi.fn() }),
 }));
-vi.mock('@/shared/api/clinic/patients-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/patients-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchPatient: vi.fn(),
   updatePatient: vi.fn(),
   deletePatient: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/contacts-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/contacts-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   findContactByPhone: vi.fn(),
 }));
 // The Visits section behind the drawer reads the person's bookings.
-vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/appointments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchPersonAppointments: vi.fn(),
 }));
 // The Activity chat behind the drawer names offerings from the one catalogue: none here.
-vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/offerings-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchAllOfferings: vi.fn(async () => []),
 }));

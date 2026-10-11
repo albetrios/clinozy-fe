@@ -3,12 +3,12 @@ import {
   listPatientPurchases,
   patientPackageQueryKeys,
   updatePatientPackage,
-} from '@/shared/api/clinic/patient-packages-api.ts';
+} from '@/shared/api/app/patient-packages-api.ts';
 import type {
   PatientPackageChange,
   PatientPackageRow,
-} from '@/shared/api/clinic/patient-packages-contracts.ts';
-import { planQueryKeys } from '@/shared/api/clinic/plan-api.ts';
+} from '@/shared/api/app/patient-packages-contracts.ts';
+import { planQueryKeys } from '@/shared/api/app/plan-api.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';

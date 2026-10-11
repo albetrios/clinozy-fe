@@ -10,8 +10,8 @@ import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import type {
   InvoiceRecord,
   InvoiceTotals,
-} from '@/shared/api/clinic/invoices-contracts.ts';
-import { INVOICE_STATUS_TONES } from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/api/app/invoices-contracts.ts';
+import { INVOICE_STATUS_TONES } from '@/shared/app/app-tones.ts';
 import { DataTableColumnChooser } from '@/shared/components/DataTableColumnChooser/index.ts';
 import {
   INVOICE_DRAWER_KEYS,

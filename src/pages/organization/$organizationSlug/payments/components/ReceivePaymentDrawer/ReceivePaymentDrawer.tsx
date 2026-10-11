@@ -5,14 +5,14 @@ import { useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { paiseOfRupees } from '@/lib/number-text.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import { invoiceQueryKeys, listOpenInvoices } from '@/shared/api/clinic/invoices-api.ts';
-import type { InvoiceRecord } from '@/shared/api/clinic/invoices-contracts.ts';
-import { fetchPayment, paymentQueryKeys } from '@/shared/api/clinic/payments-api.ts';
-import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { defaultBranchId } from '@/shared/clinic/clinic-branch.ts';
-import { SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import { invoiceQueryKeys, listOpenInvoices } from '@/shared/api/app/invoices-api.ts';
+import type { InvoiceRecord } from '@/shared/api/app/invoices-contracts.ts';
+import { fetchPayment, paymentQueryKeys } from '@/shared/api/app/payments-api.ts';
+import type { LedgerRow } from '@/shared/api/app/payments-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { defaultBranchId } from '@/shared/app/app-branch.ts';
+import { SECTION_TONES } from '@/shared/app/app-tones.ts';
 import type { PatientPick } from '@/shared/components/PatientPicker/index.ts';
 import type { QuickFillItem } from '@/shared/components/QuickFillRow/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
@@ -334,7 +334,7 @@ function ReceiveSession({
   start: SessionStart;
 }) {
   const { t } = useTranslation(PAYMENTS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const formatPaise = usePaiseFormat();
   const { openBranches } = useBranches();
   const idPrefix = `receive-${useId().replace(/:/g, '')}`;
@@ -366,9 +366,7 @@ function ReceiveSession({
   const { pickPatient, pickInvoice } = usePicks(form);
 
   const modes = splitsModes(values.splits);
-  const modesLabel = modes
-    .map((mode) => tClinic(CLINIC_KEYS.paymentModes[mode]))
-    .join(' + ');
+  const modesLabel = modes.map((mode) => tApp(APP_KEYS.paymentModes[mode])).join(' + ');
   const amount = formatPaise(splitsTotal(values.splits));
   const quickFill =
     due !== null && !record ? quickFillItems(form, due, t, formatPaise) : undefined;

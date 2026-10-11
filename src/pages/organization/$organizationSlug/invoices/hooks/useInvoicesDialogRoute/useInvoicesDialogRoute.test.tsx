@@ -2,13 +2,13 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/shared/api/clinic/invoices-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/invoices-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchInvoice: vi.fn(),
 }));
 
-import { fetchInvoice, invoiceQueryKeys } from '@/shared/api/clinic/invoices-api.ts';
-import { CROSS_ROOM_PARAM } from '@/shared/clinic/clinic-referrer.ts';
+import { fetchInvoice, invoiceQueryKeys } from '@/shared/api/app/invoices-api.ts';
+import { CROSS_ROOM_PARAM } from '@/shared/app/app-referrer.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import {
   type CrossRoomDialog,

@@ -1,6 +1,6 @@
 import i18n from '@/lib/i18n/i18n.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { DeleteReason } from '@/shared/api/clinic/clinic-schema.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { DeleteReason } from '@/shared/api/app/app-schema.ts';
 import {
   createOffering,
   deleteOffering,
@@ -10,12 +10,12 @@ import {
   offerQueryKeys,
   restoreOffering,
   updateOffering,
-} from '@/shared/api/clinic/offerings-api.ts';
+} from '@/shared/api/app/offerings-api.ts';
 import type {
   OfferingFields,
   OfferingRecord,
-} from '@/shared/api/clinic/offerings-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+} from '@/shared/api/app/offerings-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
@@ -36,7 +36,7 @@ const useCanSetLowestPrice = () =>
 
 /** "Offering #275 created" and its kin — the offering's display id in the clinic vocabulary. */
 function offeringToast(key: string, offering: OfferingRecord): string {
-  return i18n.t(key, { ns: CLINIC_NS, id: displayId.offering(offering.offeringNumber) });
+  return i18n.t(key, { ns: APP_NS, id: displayId.offering(offering.offeringNumber) });
 }
 
 /** How a catalogue read reports its own failure, and what a room makes of the catalogue. */
@@ -115,7 +115,7 @@ export function useCreateOffering(
       createOffering({ fields, canSetLowestPrice, ...action }),
     invalidateKeys: [offeringQueryKeys.all],
     successMessage: (offering) =>
-      offeringToast(CLINIC_KEYS.offerings.toasts.offeringCreated, offering),
+      offeringToast(APP_KEYS.offerings.toasts.offeringCreated, offering),
     ...options,
   });
 }
@@ -139,7 +139,7 @@ export function useUpdateOffering(
       updateOffering({ record, fields, canSetLowestPrice, ...action }),
     invalidateKeys: [offeringQueryKeys.all],
     successMessage: (offering) =>
-      offeringToast(CLINIC_KEYS.offerings.toasts.offeringSaved, offering),
+      offeringToast(APP_KEYS.offerings.toasts.offeringSaved, offering),
     ...options,
   });
 }
@@ -156,7 +156,7 @@ export interface OfferingDeleteVars {
  * back if the write fails. The catalogue and the offers refresh (the offers stop naming it,
  * OFFERINGS-M4) — not the offering's own read, which would answer 404 while its drawer closes.
  * No toast of its own: the Reason confirm's `reason.undo` shows "Offering #272 removed"
- * (`CLINIC_KEYS.offerings.toasts.offeringRemoved`) with Undo, which runs
+ * (`APP_KEYS.offerings.toasts.offeringRemoved`) with Undo, which runs
  * {@link useRestoreOffering}.
  */
 export function useDeleteOffering(

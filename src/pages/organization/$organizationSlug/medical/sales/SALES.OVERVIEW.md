@@ -19,7 +19,7 @@ list (D24).
 | File                              | Responsibility                                                                                          |
 | --------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | `sales.route.tsx`                 | Route marker — exports `Component` rendering `SalesPage`.                                               |
-| `sales.manifest.ts`               | Manifest — `kind: 'layout'` over its dialog routes, module `clinic-medical`.                            |
+| `sales.manifest.ts`               | Manifest — `kind: 'layout'` over its dialog routes, module `app-medical`.                               |
 | `sales.params.ts`                 | The list read from the URL (defaults applied, the tab's own sort keys) and its filter key.              |
 | `SalesPage.tsx`                   | The tab: the Medical toolbar, the table, its row actions and states; hosts the dialog routes' `Outlet`. |
 | `hooks/useSaleColumns/`           | The columns: tracks, folds (the meta line and the phone key), sort ids, the recommended set.            |

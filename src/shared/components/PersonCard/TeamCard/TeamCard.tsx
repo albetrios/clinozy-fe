@@ -5,8 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { isolateJoin, isolateText, isolateValues } from '@/lib/bidi-isolate.ts';
 import { dateFormatOptions } from '@/lib/i18n/intl-config.ts';
 import { cn } from '@/lib/utils.ts';
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
+import { formatAppPhone } from '@/shared/app/app-phone.ts';
 import {
   PersonAvatar,
   personInitials,
@@ -73,7 +73,7 @@ function teamReach(data: TeamCardData, t: TFunction): ReachLine<string>[] {
     {
       key: 'phone',
       icon: <Phone />,
-      text: data.phone ? formatClinicPhone(data.phone) : null,
+      text: data.phone ? formatAppPhone(data.phone) : null,
       ltr: true,
     },
     { key: 'email', icon: <Mail />, text: data.email, ltr: true },

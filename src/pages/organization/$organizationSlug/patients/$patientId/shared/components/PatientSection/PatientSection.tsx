@@ -3,7 +3,7 @@ import { type ReactNode, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type { PatientFileSectionSlug } from '@/shared/clinic/patient-file-sections.ts';
+import type { PatientFileSectionSlug } from '@/shared/app/patient-file-sections.ts';
 import { ChevronDown } from '@/shared/icons/index.ts';
 
 import { usePatientFileActions } from '../../hooks/usePatientFileActions/index.ts';

@@ -9,12 +9,12 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type * as PackagesApiModule from '@/shared/api/clinic/patient-packages-api.ts';
-import type { PatientPackageRow } from '@/shared/api/clinic/patient-packages-contracts.ts';
+import type * as PackagesApiModule from '@/shared/api/app/patient-packages-api.ts';
+import type { PatientPackageRow } from '@/shared/api/app/patient-packages-contracts.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { HttpError } from '@/shared/errors/HttpError.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import { TEST_PATIENT_ID } from '@/tests/utils/patient-doubles.ts';
 
 const { notifyMock } = vi.hoisted(() => ({
@@ -31,12 +31,12 @@ vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
   useViewportTier: () => 'desktop',
 }));
-vi.mock('@/shared/api/clinic/patient-packages-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/patient-packages-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof PackagesApiModule>()),
   updatePatientPackage: vi.fn(),
 }));
 
-import { updatePatientPackage } from '@/shared/api/clinic/patient-packages-api.ts';
+import { updatePatientPackage } from '@/shared/api/app/patient-packages-api.ts';
 
 import { EditPackageDrawer } from './EditPackageDrawer.tsx';
 

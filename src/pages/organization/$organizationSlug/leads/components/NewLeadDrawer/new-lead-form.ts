@@ -2,10 +2,10 @@ import type {
   LeadInterest,
   LeadSource,
   LeadStatus,
-} from '@/shared/api/clinic/clinic-schema.ts';
-import type { ContactSummary } from '@/shared/api/clinic/contacts-contracts.ts';
-import type { LeadPersonInput } from '@/shared/api/clinic/leads-api.ts';
-import type { LeadFields } from '@/shared/api/clinic/leads-contracts.ts';
+} from '@/shared/api/app/app-schema.ts';
+import type { ContactSummary } from '@/shared/api/app/contacts-contracts.ts';
+import type { LeadPersonInput } from '@/shared/api/app/leads-api.ts';
+import type { LeadFields } from '@/shared/api/app/leads-contracts.ts';
 import {
   type ContactEditorValue,
   contactFieldsOf,

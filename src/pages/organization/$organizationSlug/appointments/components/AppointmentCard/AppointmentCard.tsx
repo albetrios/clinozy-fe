@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { isolateValues } from '@/lib/bidi-isolate.ts';
 import { focusSurfaceOnOpen } from '@/lib/focus-surface.ts';
 import { cn } from '@/lib/utils.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
 import {
   allowedNext,
   APPOINTMENT_TILE_STATUSES,
@@ -12,14 +14,12 @@ import {
   NEXT_ACTION_MOVES,
   nextAction,
   transitionGuard,
-} from '@/shared/api/clinic/appointment-status.ts';
-import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import { serviceTone } from '@/shared/clinic/appointment-display.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
-import { APPOINTMENT_STATUS_TONES, TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/api/app/appointment-status.ts';
+import type { AppointmentRow } from '@/shared/api/app/appointments-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { formatAppPhone } from '@/shared/app/app-phone.ts';
+import { APPOINTMENT_STATUS_TONES, TONE_CLASSES } from '@/shared/app/app-tones.ts';
+import { serviceTone } from '@/shared/app/appointment-display.ts';
 import {
   PersonAvatar,
   personInitials,
@@ -59,7 +59,7 @@ const TRACKER_TEXT = 'text-[length:calc(var(--text-xs)*19/24)]';
 
 /** The four steps of the tracker, each in its status tone: done ✓ on the tint, current solid, upcoming grey (H:6117). */
 function StatusTracker({ appointment }: { appointment: AppointmentRow }) {
-  const { t } = useTranslation([APPOINTMENTS_NS, CLINIC_NS]);
+  const { t } = useTranslation([APPOINTMENTS_NS, APP_NS]);
   const closed = appointment.status === 'cancelled' || appointment.status === 'no_show';
   const position = closed
     ? -1
@@ -73,7 +73,7 @@ function StatusTracker({ appointment }: { appointment: AppointmentRow }) {
         const done = index < position;
         const current = index === position;
         const last = index === APPOINTMENT_TILE_STATUSES.length - 1;
-        const label = t(CLINIC_KEYS.appointments.statuses[status], { ns: CLINIC_NS });
+        const label = t(APP_KEYS.appointments.statuses[status], { ns: APP_NS });
         let disc = 'bg-muted text-muted-foreground';
         if (current) disc = cn(tone.ink, 'bg-current');
         else if (done) disc = tone.surface;
@@ -125,7 +125,7 @@ function StatusTracker({ appointment }: { appointment: AppointmentRow }) {
 function cardMoveLabelKey(move: AppointmentMove): string {
   if (move === 'reschedule') return APPOINTMENTS_KEYS.card.reschedule;
   if (move === 'cancelled') return APPOINTMENTS_KEYS.card.cancel;
-  return CLINIC_KEYS.appointments.statuses[move];
+  return APP_KEYS.appointments.statuses[move];
 }
 
 /** Props for {@link AppointmentCardContent}. */
@@ -151,13 +151,13 @@ export function AppointmentCardContent({
   close,
   onCancel,
 }: AppointmentCardContentProps) {
-  const { t } = useTranslation([APPOINTMENTS_NS, CLINIC_NS]);
+  const { t } = useTranslation([APPOINTMENTS_NS, APP_NS]);
   const actions = useAppointmentActions();
   const slotLabel = useAppointmentSlotLabel();
   const words = useLatestUpdateWords();
   const { person, doctor, status } = appointment;
   const slot = slotLabel(appointment.date, appointment.startTime);
-  const today = clinicToday();
+  const today = appToday();
   const step = nextAction(appointment, today);
   const stepMove = step ? NEXT_ACTION_MOVES[step] : null;
   const subject = {
@@ -211,7 +211,7 @@ export function AppointmentCardContent({
               dir="ltr"
               className="text-caption text-muted-foreground [text-align:match-parent] leading-[1.3] tabular-nums"
             >
-              {formatClinicPhone(person.phone)}
+              {formatAppPhone(person.phone)}
             </span>
           ) : null}
         </span>
@@ -247,9 +247,9 @@ export function AppointmentCardContent({
       </div>
       {closed ? (
         <span className="text-caption text-muted-foreground">
-          {t(CLINIC_KEYS.appointments.hints.closed, {
-            ns: CLINIC_NS,
-            status: t(CLINIC_KEYS.appointments.statuses[status], { ns: CLINIC_NS }),
+          {t(APP_KEYS.appointments.hints.closed, {
+            ns: APP_NS,
+            status: t(APP_KEYS.appointments.statuses[status], { ns: APP_NS }),
           })}
         </span>
       ) : null}
@@ -262,7 +262,7 @@ export function AppointmentCardContent({
             guard={stepGuard}
             onClick={run(() => actions.runNext(appointment))}
           >
-            {t(CLINIC_KEYS.appointments.nextActions[step], { ns: CLINIC_NS })}
+            {t(APP_KEYS.appointments.nextActions[step], { ns: APP_NS })}
           </CardButton>
         ) : null}
         <CardButton
@@ -288,7 +288,7 @@ export function AppointmentCardContent({
                 ns:
                   move === 'reschedule' || move === 'cancelled'
                     ? APPOINTMENTS_NS
-                    : CLINIC_NS,
+                    : APP_NS,
               })}
             </CardButton>
           ))}

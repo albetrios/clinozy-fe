@@ -12,9 +12,9 @@ import {
   contactActivityQueryKeys,
   listContactActivities,
   sendContactActivity,
-} from '@/shared/api/clinic/contact-activities-api.ts';
+} from '@/shared/api/app/contact-activities-api.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 /** The active organization — every key carries it. */
@@ -24,10 +24,10 @@ const useOrganizationId = () => useOrganizationStore((state) => state.organizati
 export const CONTACT_NOTES_FILTER: ContactActivityFilter = { type: ['note'] };
 
 /**
- * What a note write refreshes: the person's thread and every stream read (`['clinic',
+ * What a note write refreshes: the person's thread and every stream read (`['app',
  * 'messages']` — the Activity column shows the note too).
  */
-const NOTE_WRITE_KEYS = [['clinic', 'messages']];
+const NOTE_WRITE_KEYS = [['app', 'messages']];
 
 /** {@link useContactActivities}: the pages read so far, the server's total, the paging. */
 export interface ContactActivityList {
@@ -121,7 +121,7 @@ export interface ContactActivityAccess {
  * until the access has answered.
  */
 export function useContactActivityAccess(): ContactActivityAccess {
-  const access = useClinicAccess();
+  const access = useAppAccess();
   return useMemo(() => {
     if (!access.isResolved) return { reads: false, writes: false };
     return {

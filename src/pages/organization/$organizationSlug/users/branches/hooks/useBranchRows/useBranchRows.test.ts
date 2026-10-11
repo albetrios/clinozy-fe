@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
-import { clinicBranch, TEST_BRANCH_ID } from '@/tests/utils/branch-doubles.ts';
+import type { TeamMember } from '@/shared/api/app/users-contracts.ts';
+import { appBranch, TEST_BRANCH_ID } from '@/tests/utils/branch-doubles.ts';
 
 import { branchRowOf, teamMemberById } from './useBranchRows.ts';
 
@@ -15,7 +15,7 @@ function teamMember(key: string, overrides: Partial<TeamMember> = {}): TeamMembe
   } as unknown as TeamMember;
 }
 
-const branch = clinicBranch({
+const branch = appBranch({
   defaultDoctorId: 'mem_nisha',
   defaultDeskId: 'mem_gone',
   defaultPharmacistId: 'mem_farah',

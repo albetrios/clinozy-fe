@@ -3,13 +3,13 @@ import { type KeyboardEvent, type RefObject, useId, useMemo, useState } from 're
 import { isolateText } from '@/lib/bidi-isolate.ts';
 import { occurrenceKeys } from '@/lib/occurrence-keys.ts';
 import { cn } from '@/lib/utils.ts';
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
 import {
   type ComposerMode,
   MESSAGE_MAX_LENGTH,
-} from '@/shared/api/clinic/messages-contracts.ts';
-import { CLINIC_KEYS } from '@/shared/clinic/clinic.constants.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/api/app/messages-contracts.ts';
+import { APP_KEYS } from '@/shared/app/app.constants.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import {
   CHAT_COLUMN_KEYS,
   CHAT_COLUMN_TEST_IDS,
@@ -134,7 +134,7 @@ function placeholderFor(mode: ComposerMode, first: string, t: Translate): string
   if (mode === 'note') {
     return first ? t(keys.placeholder.note, { first }) : t(keys.placeholder.noteNoName);
   }
-  const channel = t(CLINIC_KEYS.channels[mode]);
+  const channel = t(APP_KEYS.channels[mode]);
   return first
     ? t(keys.placeholder.message, { first, channel })
     : t(keys.placeholder.messageNoName, { channel });
@@ -230,7 +230,7 @@ function ComposerNotes({
         >
           {t(keys.mismatch, {
             first: isolateText(first),
-            channel: t(CLINIC_KEYS.channels[hint.channel]),
+            channel: t(APP_KEYS.channels[hint.channel]),
           })}
         </button>
       ) : null}

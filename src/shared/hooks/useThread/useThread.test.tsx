@@ -3,26 +3,26 @@ import { act, cleanup, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type * as ContactActivitiesApiModule from '@/shared/api/clinic/contact-activities-api.ts';
+import type * as ContactActivitiesApiModule from '@/shared/api/app/contact-activities-api.ts';
 import {
   fetchContactMessagingStatus,
   fetchContactTemplateValues,
   fetchContactThread,
   resendContactActivity,
   sendContactActivity,
-} from '@/shared/api/clinic/contact-activities-api.ts';
-import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
+} from '@/shared/api/app/contact-activities-api.ts';
+import { patientRef } from '@/shared/api/app/fixtures/patients.fixtures.ts';
+import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
 import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import * as messagesApi from '@/shared/api/clinic/messages-api.ts';
+  appFixtures,
+  resetAppFixtures,
+} from '@/shared/api/app/fixtures/world.fixtures.ts';
+import * as messagesApi from '@/shared/api/app/messages-api.ts';
 import {
   type ChatMessage,
   type ChatPerson,
   chatPersonKey,
-} from '@/shared/api/clinic/messages-contracts.ts';
+} from '@/shared/api/app/messages-contracts.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { resetOutboxes } from './thread-outbox.ts';
@@ -37,11 +37,11 @@ import {
   useThreadOutbox,
 } from './useThread.ts';
 
-vi.mock('@/shared/api/clinic/messages-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/messages-api.ts', async (importOriginal) => {
   const actual = await importOriginal<typeof messagesApi>();
   return { ...actual, sendMessage: vi.fn(actual.sendMessage) };
 });
-vi.mock('@/shared/api/clinic/contact-activities-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/contact-activities-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof ContactActivitiesApiModule>()),
   fetchContactThread: vi.fn(),
   sendContactActivity: vi.fn(),
@@ -115,7 +115,7 @@ beforeEach(() => {
   vi.setSystemTime(new Date('2026-10-03T09:30:00Z'));
   client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   vi.mocked(notify.error).mockClear();
-  resetClinicFixtures();
+  resetAppFixtures();
   resetOutboxes();
   stream = [streamEntry('act_first')];
   vi.mocked(fetchContactThread).mockImplementation(async () => ({
@@ -161,7 +161,7 @@ afterEach(() => {
   vi.mocked(fetchContactMessagingStatus).mockReset();
   vi.mocked(fetchContactTemplateValues).mockReset();
   client.clear();
-  resetClinicFixtures();
+  resetAppFixtures();
   resetOutboxes();
 });
 
@@ -275,7 +275,7 @@ describe('sending', () => {
     expect(result.current.thread.data?.messages.map((message) => message.body)).toEqual([
       'Hello Kiran',
     ]);
-    const threads = clinicFixtures.leads.snapshot((lead) => lead.name === 'Kiran Desai');
+    const threads = appFixtures.leads.snapshot((lead) => lead.name === 'Kiran Desai');
     expect(threads).toHaveLength(1);
   });
 

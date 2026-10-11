@@ -5,7 +5,7 @@ import type { PageManifest } from '@/lib/routes/page-manifest.ts';
  * (`/organization/$organizationSlug/patients/$patientId/edit`, `S:34`; KICKOFF
  * §6.6, D24): the shared patient drawer over the section it opened from
  * (`?from=`, AMBER A-F1; Clinical notes by default). Gated by the file layout;
- * in-room Edit is `useClinicAccess` — without it the drawer is read-only. The
+ * in-room Edit is `useAppAccess` — without it the drawer is read-only. The
  * test id names that drawer.
  */
 export const manifest = {
@@ -14,7 +14,7 @@ export const manifest = {
   title: 'Edit patient',
   testId: 'patient-drawer',
   permission: 'organization:read',
-  module: 'clinic-patients',
+  module: 'app-patients',
   kind: 'leaf',
   children: [],
 } as const satisfies PageManifest;

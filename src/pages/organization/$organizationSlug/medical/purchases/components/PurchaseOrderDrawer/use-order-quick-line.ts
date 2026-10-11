@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import type {
   MedicineRecord,
   MedicineRow,
-} from '@/shared/api/clinic/medicines-contracts.ts';
+} from '@/shared/api/app/medicines-contracts.ts';
 import type { PickerOption } from '@/shared/components/Picker/index.ts';
 import {
   nameNumbers,

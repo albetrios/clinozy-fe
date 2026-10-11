@@ -1,4 +1,4 @@
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
 import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
 import { useTeamDirectory } from '@/shared/hooks/useTeamDirectory/index.ts';
 

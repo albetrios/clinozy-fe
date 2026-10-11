@@ -3,12 +3,12 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import * as branchesApi from '@/shared/api/clinic/branches-api.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import { fetchMyPreferences } from '@/shared/api/clinic/preferences-api.ts';
+import * as branchesApi from '@/shared/api/app/branches-api.ts';
+import { resetAppFixtures } from '@/shared/api/app/fixtures/world.fixtures.ts';
+import { fetchMyPreferences } from '@/shared/api/app/preferences-api.ts';
 import { pickerTestIds } from '@/shared/components/Picker/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { BranchPicker } from './BranchPicker.tsx';
@@ -22,7 +22,7 @@ vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 
 beforeEach(() => {
   signInTestMember();
-  resetClinicFixtures();
+  resetAppFixtures();
   notifyMock.success.mockReset();
   notifyMock.info.mockReset();
   vi.restoreAllMocks();

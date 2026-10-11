@@ -7,18 +7,18 @@ import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import type {
   ClinicalNote,
   ClinicalNoteKind,
-} from '@/shared/api/clinic/clinical-notes-contracts.ts';
-import type { ContactActivityEntry } from '@/shared/api/clinic/contact-activities-api.ts';
-import type { PatientPhoto } from '@/shared/api/clinic/patient-images-contracts.ts';
-import type { PatientPackageRow } from '@/shared/api/clinic/patient-packages-contracts.ts';
-import type { PatientReport } from '@/shared/api/clinic/patient-reports-contracts.ts';
-import type { PrescriptionRecord } from '@/shared/api/clinic/prescriptions-contracts.ts';
-import type { TreatmentRecord } from '@/shared/api/clinic/treatments-contracts.ts';
+} from '@/shared/api/app/clinical-notes-contracts.ts';
+import type { ContactActivityEntry } from '@/shared/api/app/contact-activities-api.ts';
+import type { PatientPhoto } from '@/shared/api/app/patient-images-contracts.ts';
+import type { PatientPackageRow } from '@/shared/api/app/patient-packages-contracts.ts';
+import type { PatientReport } from '@/shared/api/app/patient-reports-contracts.ts';
+import type { PrescriptionRecord } from '@/shared/api/app/prescriptions-contracts.ts';
+import type { TreatmentRecord } from '@/shared/api/app/treatments-contracts.ts';
 import {
   PATIENT_FILE_SECTIONS,
   type PatientFileSectionSlug,
-} from '@/shared/clinic/patient-file-sections.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+} from '@/shared/app/patient-file-sections.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 import {
   APPOINTMENT_TODAY,
@@ -67,7 +67,7 @@ const server = vi.hoisted(() => ({
   failPackages: false,
 }));
 
-vi.mock('@/shared/api/clinic/clinical-notes-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/clinical-notes-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listClinicalNotes: vi.fn(async () => structuredClone(server.clinical)),
   createClinicalNote: vi.fn(
@@ -79,7 +79,7 @@ vi.mock('@/shared/api/clinic/clinical-notes-api.ts', async (importOriginal) => (
     },
   ),
 }));
-vi.mock('@/shared/api/clinic/contact-activities-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/contact-activities-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listContactActivities: vi.fn(async () => ({
     rows: structuredClone(server.notes),
@@ -92,40 +92,40 @@ vi.mock('@/shared/api/clinic/contact-activities-api.ts', async (importOriginal) 
     return { id: 'msg_posted' };
   }),
 }));
-vi.mock('@/shared/api/clinic/prescriptions-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/prescriptions-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listPatientPrescriptions: vi.fn(),
   listRxMedicines: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/treatments-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/treatments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listPatientTreatments: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/patient-packages-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/patient-packages-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listPatientPackages: vi.fn(async () => {
     if (server.failPackages) throw new Error('offline');
     return [LHR, PEEL];
   }),
 }));
-vi.mock('@/shared/api/clinic/patient-images-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/patient-images-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listPatientPhotos: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/patient-reports-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/patient-reports-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listPatientReports: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/appointments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchPersonAppointments: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/invoices-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/invoices-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listInvoices: vi.fn(),
   fetchInvoiceTotals: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchTeamDirectory: vi.fn(async () => [DOCTOR_NISHA]),
 }));
@@ -134,24 +134,24 @@ vi.mock('@/shared/tenancy/my-membership.ts', async (importOriginal) => ({
   findMyMembershipId: vi.fn(async () => DOCTOR_NISHA.id),
 }));
 
-import { fetchPersonAppointments } from '@/shared/api/clinic/appointments-api.ts';
+import { fetchPersonAppointments } from '@/shared/api/app/appointments-api.ts';
 import {
   createClinicalNote,
   listClinicalNotes,
-} from '@/shared/api/clinic/clinical-notes-api.ts';
+} from '@/shared/api/app/clinical-notes-api.ts';
 import {
   listContactActivities,
   sendContactActivity,
-} from '@/shared/api/clinic/contact-activities-api.ts';
-import { fetchInvoiceTotals, listInvoices } from '@/shared/api/clinic/invoices-api.ts';
-import { listPatientPhotos } from '@/shared/api/clinic/patient-images-api.ts';
-import { listPatientPackages } from '@/shared/api/clinic/patient-packages-api.ts';
-import { listPatientReports } from '@/shared/api/clinic/patient-reports-api.ts';
+} from '@/shared/api/app/contact-activities-api.ts';
+import { fetchInvoiceTotals, listInvoices } from '@/shared/api/app/invoices-api.ts';
+import { listPatientPhotos } from '@/shared/api/app/patient-images-api.ts';
+import { listPatientPackages } from '@/shared/api/app/patient-packages-api.ts';
+import { listPatientReports } from '@/shared/api/app/patient-reports-api.ts';
 import {
   listPatientPrescriptions,
   listRxMedicines,
-} from '@/shared/api/clinic/prescriptions-api.ts';
-import { listPatientTreatments } from '@/shared/api/clinic/treatments-api.ts';
+} from '@/shared/api/app/prescriptions-api.ts';
+import { listPatientTreatments } from '@/shared/api/app/treatments-api.ts';
 
 const FILE = patientFileUrl(TEST_PATIENT_ID);
 
@@ -317,7 +317,7 @@ const INVOICES = [
 
 /** Says when the member's access is known — before then every gate reads "not allowed". */
 function AccessProbe() {
-  const access = useClinicAccess();
+  const access = useAppAccess();
   return access.isResolved ? <span data-testid="access-resolved" /> : null;
 }
 

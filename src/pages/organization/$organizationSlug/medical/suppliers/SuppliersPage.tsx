@@ -8,7 +8,7 @@ import {
   roomFiltersOf,
   useRoomFilters,
 } from '@/shared/components/RoomToolbar/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { usePayBill } from '@/shared/hooks/usePayBill/index.ts';
@@ -57,7 +57,7 @@ export function SuppliersPage() {
   const search = validateMedicalSearch(useSearch({ strict: false }));
   const params = supplierParamsOf(search);
   const { patchSearch } = useDataTableUrlState(true);
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const nav = useMedicalNav();
   const formatPaise = usePaiseFormat();
   const makers = useManufacturerCatalogue().data ?? [];

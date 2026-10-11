@@ -1,12 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
-import type { Presence } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Presence } from '@/shared/api/app/app-schema.ts';
 import {
   fetchMyPresence,
   presenceQueryKeys,
   saveMyPresence,
-} from '@/shared/api/clinic/presence-api.ts';
+} from '@/shared/api/app/presence-api.ts';
 import { reportError } from '@/shared/errors/errorHandler.ts';
 
 /** The member's presence and an optimistic setter. */

@@ -1,7 +1,7 @@
 import type { UIEvent } from 'react';
 import { useCallback, useMemo, useRef, useState } from 'react';
 
-import { recentPicksFor, withRecentPick } from '@/shared/api/clinic/preferences-api.ts';
+import { recentPicksFor, withRecentPick } from '@/shared/api/app/preferences-api.ts';
 import type { ListPage } from '@/shared/api/fetch-list-page.ts';
 import { useCursorList } from '@/shared/hooks/useCursorList/index.ts';
 import { useDebouncedSearch } from '@/shared/hooks/useDebouncedValue/index.ts';

@@ -14,7 +14,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   supplierBillKey,
   supplierBillRefOf,
-} from '@/shared/api/clinic/payments-contracts.ts';
+} from '@/shared/api/app/payments-contracts.ts';
 
 import { usePayBill } from './usePayBill.ts';
 

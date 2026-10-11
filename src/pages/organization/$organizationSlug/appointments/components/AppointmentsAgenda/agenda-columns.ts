@@ -1,7 +1,7 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import type { TFunction } from 'i18next';
 
-import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
+import type { AppointmentRow } from '@/shared/api/app/appointments-contracts.ts';
 import type { DataTableFeatures } from '@/shared/components/DataTable/index.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 

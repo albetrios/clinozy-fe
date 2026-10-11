@@ -5,11 +5,11 @@ import {
   organizationPatientSection,
   organizationTreatmentEdit,
 } from '@/lib/routes/patient-file-builders.ts';
-import type { InvoiceRecord } from '@/shared/api/clinic/invoices-contracts.ts';
-import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
-import type { PatientFileSectionSlug } from '@/shared/clinic/patient-file-sections.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
-import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
+import type { InvoiceRecord } from '@/shared/api/app/invoices-contracts.ts';
+import { appCommandNavigation } from '@/shared/app/app-command-targets.ts';
+import type { PatientFileSectionSlug } from '@/shared/app/patient-file-sections.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
+import { useAppNavigate } from '@/shared/hooks/useAppNavigate/index.ts';
 import { useContactActivityAccess } from '@/shared/hooks/useContactActivities/index.ts';
 import { usePaymentAccess } from '@/shared/hooks/usePaymentAccess/index.ts';
 
@@ -51,10 +51,10 @@ import { useSmartNote } from './use-smart-note.ts';
  */
 export function OverviewBento() {
   const { t } = useTranslation(TIMELINE_NS);
-  const navigate = useClinicNavigate();
+  const navigate = useAppNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
   const { patientId, file, viewable } = usePatientFileContext();
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const money = usePaymentAccess();
   const stream = useContactActivityAccess();
   const { items, reschedule } = usePatientFileActions();
@@ -77,7 +77,7 @@ export function OverviewBento() {
   const openInvoice = (invoice: InvoiceRecord) => {
     const editable = money.canEdit && invoice.type !== 'medical' && !invoice.isSettled;
     void navigate(
-      clinicCommandNavigation(editable ? 'invoiceEdit' : 'invoice', {
+      appCommandNavigation(editable ? 'invoiceEdit' : 'invoice', {
         organizationSlug,
         recordId: invoice.id,
         referrer: `patients/${patientId}/timeline`,

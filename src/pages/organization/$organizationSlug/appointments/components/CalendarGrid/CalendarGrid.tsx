@@ -2,8 +2,8 @@ import type { CSSProperties, MouseEvent, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type { AppointmentCalendarView } from '@/shared/api/clinic/appointment-views.ts';
-import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
+import type { AppointmentCalendarView } from '@/shared/api/app/appointment-views.ts';
+import type { AppointmentRow } from '@/shared/api/app/appointments-contracts.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
 import {

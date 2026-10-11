@@ -1,10 +1,10 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 
 /**
- * The patient field lives in `clinic`: Receive payment and the Invoice drawer
+ * The patient field lives in `app`: Receive payment and the Invoice drawer
  * both carry it, wherever they open (KICKOFF §6.9).
  */
-export const PATIENT_PICKER_NS = I18N_NAMESPACES.clinic;
+export const PATIENT_PICKER_NS = I18N_NAMESPACES.app;
 
 /** Key paths for the patient field (`payments.md:101`; verbatim). */
 export const PATIENT_PICKER_KEYS = {

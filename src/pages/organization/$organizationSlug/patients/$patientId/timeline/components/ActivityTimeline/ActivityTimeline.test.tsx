@@ -3,16 +3,12 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import {
-  addCivilDays,
-  clinicInstant,
-  clinicToday,
-} from '@/shared/api/clinic/clinic-time.ts';
+import { addCivilDays, appInstant, appToday } from '@/shared/api/app/app-time.ts';
 import type {
   ContactActivityEntry,
   ContactActivityFilter,
-} from '@/shared/api/clinic/contact-activities-api.ts';
-import { PATIENT_FILE_SECTIONS } from '@/shared/clinic/patient-file-sections.ts';
+} from '@/shared/api/app/contact-activities-api.ts';
+import { PATIENT_FILE_SECTIONS } from '@/shared/app/patient-file-sections.ts';
 import { DOCTOR_NISHA } from '@/tests/utils/appointment-doubles.ts';
 import {
   patientFile,
@@ -33,7 +29,7 @@ const server = vi.hoisted(() => ({
   fail: false,
   pageSize: 20,
 }));
-vi.mock('@/shared/api/clinic/contact-activities-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/contact-activities-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listContactActivities: vi.fn(
     async ({
@@ -62,7 +58,7 @@ vi.mock('@/shared/api/clinic/contact-activities-api.ts', async (importOriginal) 
     },
   ),
 }));
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchTeamDirectory: vi.fn(async () => [DOCTOR_NISHA]),
 }));
@@ -71,9 +67,9 @@ vi.mock('@/shared/tenancy/my-membership.ts', async (importOriginal) => ({
   findMyMembershipId: vi.fn(async () => DOCTOR_NISHA.id),
 }));
 
-import { listContactActivities } from '@/shared/api/clinic/contact-activities-api.ts';
+import { listContactActivities } from '@/shared/api/app/contact-activities-api.ts';
 
-const today = clinicToday();
+const today = appToday();
 
 /** An entry `days` from today at `time`. */
 function entry(
@@ -87,7 +83,7 @@ function entry(
     type: 'system',
     group: 'clinical',
     body: id,
-    occurredAt: clinicInstant(addCivilDays(today, days), time),
+    occurredAt: appInstant(addCivilDays(today, days), time),
     authorId: null,
     link: null,
     ...more,

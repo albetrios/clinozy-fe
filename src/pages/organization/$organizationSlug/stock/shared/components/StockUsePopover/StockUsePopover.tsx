@@ -2,7 +2,7 @@ import { type RefObject, useId, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { DrawerChips, DrawerNumberInput } from '@/shared/components/DrawerField/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {

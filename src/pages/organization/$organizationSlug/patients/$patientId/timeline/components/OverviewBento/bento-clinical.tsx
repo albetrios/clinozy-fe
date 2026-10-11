@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { cn } from '@/lib/utils.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { TonePill } from '@/shared/components/Cells/index.ts';
 import { DrawerInput } from '@/shared/components/DrawerField/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';

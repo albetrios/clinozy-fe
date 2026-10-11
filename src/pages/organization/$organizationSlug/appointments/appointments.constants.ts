@@ -13,7 +13,7 @@ const PERIODS = (prefix: string) => ({
 /**
  * The Appointments room's keys (`appointments.md` › Copy, verbatim). The
  * status machine's words, the cancel reasons and the toasts are the clinic
- * vocabulary (`CLINIC_KEYS.appointments`) — Today, the patient file and the
+ * vocabulary (`APP_KEYS.appointments`) — Today, the patient file and the
  * appointment form speak them too.
  */
 export const APPOINTMENTS_KEYS = {

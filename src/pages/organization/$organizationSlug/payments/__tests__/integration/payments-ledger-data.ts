@@ -5,10 +5,7 @@
  * reversal PAY-9 of a closed day's expense, and that expense PAY-305 itself — and `listLedger` /
  * `fetchLedgerCount` over them, which a suite swaps in with `vi.mock`.
  */
-import type {
-  LedgerListParams,
-  LedgerRow,
-} from '@/shared/api/clinic/payments-contracts.ts';
+import type { LedgerListParams, LedgerRow } from '@/shared/api/app/payments-contracts.ts';
 import { ledgerRow } from '@/tests/utils/payments-doubles.ts';
 
 /** 10:30 on 10 Oct, clinic time — the entries were recorded this morning. */

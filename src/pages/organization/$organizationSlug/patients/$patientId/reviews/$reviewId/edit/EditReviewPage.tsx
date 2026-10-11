@@ -2,9 +2,9 @@ import { useParams } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import { feedbackQueryKeys, fetchReview } from '@/shared/api/clinic/feedback-api.ts';
-import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
+import { feedbackQueryKeys, fetchReview } from '@/shared/api/app/feedback-api.ts';
+import { patientName } from '@/shared/api/app/patients-contracts.ts';
 import { useDialogRouteRecord } from '@/shared/hooks/useDialogRouteRecord/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
@@ -41,7 +41,7 @@ export function EditReviewPage() {
     recordLabel: t(REVIEW_KEYS.record),
     onMissing: back,
   });
-  const [today] = useState(() => clinicToday());
+  const [today] = useState(() => appToday());
   const Section = PATIENT_FILE_SECTION_PAGES[behind];
 
   return (

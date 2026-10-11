@@ -1,4 +1,4 @@
-import { FIXTURE_BACKED_CLINIC_MODULES } from './clinic-modules.ts';
+import { FIXTURE_BACKED_APP_MODULES } from './app-modules.ts';
 import {
   assertAuthPlatformInvariants,
   branchEnvironmentMap,
@@ -108,7 +108,7 @@ describe('envProfiles required keys', () => {
     );
     expect(rule?.level).toBe('error');
     expect(rule?.when?.(() => undefined)).toBe(true);
-    const fixtureRooms = FIXTURE_BACKED_CLINIC_MODULES.join(',');
+    const fixtureRooms = FIXTURE_BACKED_APP_MODULES.join(',');
     expect(rule?.satisfiedBy?.(fixtureRooms)).toBe(true);
     expect(rule?.satisfiedBy?.(` billing , ${fixtureRooms} `)).toBe(true);
     expect(rule?.satisfiedBy?.('billing')).toBe(false);

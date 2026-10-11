@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
 import { PersonAvatar, shortPersonName } from '@/shared/components/Cells/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {

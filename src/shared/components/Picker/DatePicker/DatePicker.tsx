@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { clinicToday, localDateOf } from '@/shared/api/clinic/clinic-time.ts';
+import { appToday, localDateOf } from '@/shared/api/app/app-time.ts';
 import { PICKER_KEYS, PICKER_NS } from '@/shared/components/Picker/picker.constants.ts';
 import { Picker } from '@/shared/components/Picker/Picker.tsx';
 import type {
@@ -82,8 +82,8 @@ export function DatePicker({
 }: DatePickerProps) {
   const { t } = useTranslation(PICKER_NS);
   const { formatDate } = useLocaleFormat();
-  const [clinicDay] = useState(() => clinicToday());
-  const today = todayProp ?? clinicDay;
+  const [appDay] = useState(() => appToday());
+  const today = todayProp ?? appDay;
 
   const format = useMemo<DateOptionFormat>(
     () => ({

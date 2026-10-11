@@ -1,5 +1,5 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
-import { LEDGER_FILTER_VALUES } from '@/shared/api/clinic/ledger-filter-values.ts';
+import { LEDGER_FILTER_VALUES } from '@/shared/api/app/ledger-filter-values.ts';
 import { LEDGER_KEYS } from '@/shared/components/LedgerCells/ledger-cells.constants.ts';
 import type { RoomFilterFields } from '@/shared/components/RoomToolbar/index.ts';
 
@@ -9,7 +9,7 @@ export const PAYMENTS_NS = I18N_NAMESPACES.payments;
 /**
  * The Payments room's copy, verbatim from `payments.md` › Copy (KICKOFF §6.9).
  * The payment modes, invoice types and expense categories are the shared clinic
- * vocabulary (`CLINIC_KEYS`); the ledger's own words are the shared
+ * vocabulary (`APP_KEYS`); the ledger's own words are the shared
  * `LEDGER_KEYS`, which Medical › Payments reads too.
  */
 export const PAYMENTS_KEYS = {

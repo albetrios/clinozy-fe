@@ -3,7 +3,7 @@ import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event'
 import { isValidElement } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/shared/api/clinic/invoices-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/invoices-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchInvoice: vi.fn(),
   fetchInvoicePresets: vi.fn(),
@@ -12,20 +12,20 @@ vi.mock('@/shared/api/clinic/invoices-api.ts', async (importOriginal) => ({
   previewInvoiceChange: vi.fn(),
   updateInvoice: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/offerings-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchAllOfferings: vi.fn(),
   fetchAllOffers: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/plan-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/plan-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchPlan: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchTeamDirectory: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/patients-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/patients-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchPatient: vi.fn(),
 }));
@@ -34,8 +34,8 @@ vi.mock('@/shared/tenancy/my-membership.ts', async (importOriginal) => ({
   findMyMembershipId: vi.fn(),
 }));
 
-import * as branchesApi from '@/shared/api/clinic/branches-api.ts';
-import { fetchTeamDirectory } from '@/shared/api/clinic/directory-api.ts';
+import * as branchesApi from '@/shared/api/app/branches-api.ts';
+import { fetchTeamDirectory } from '@/shared/api/app/directory-api.ts';
 import {
   fetchInvoice,
   fetchInvoicePresets,
@@ -43,11 +43,11 @@ import {
   previewInvoice,
   previewInvoiceChange,
   updateInvoice,
-} from '@/shared/api/clinic/invoices-api.ts';
-import type { InvoiceDetail } from '@/shared/api/clinic/invoices-contracts.ts';
-import { fetchAllOfferings, fetchAllOffers } from '@/shared/api/clinic/offerings-api.ts';
-import { fetchPatient } from '@/shared/api/clinic/patients-api.ts';
-import { fetchPlan } from '@/shared/api/clinic/plan-api.ts';
+} from '@/shared/api/app/invoices-api.ts';
+import type { InvoiceDetail } from '@/shared/api/app/invoices-contracts.ts';
+import { fetchAllOfferings, fetchAllOffers } from '@/shared/api/app/offerings-api.ts';
+import { fetchPatient } from '@/shared/api/app/patients-api.ts';
+import { fetchPlan } from '@/shared/api/app/plan-api.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { findMyMembershipId } from '@/shared/tenancy/my-membership.ts';

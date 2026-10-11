@@ -9,7 +9,7 @@ import {
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
+import type { LeadRecord } from '@/shared/api/app/leads-contracts.ts';
 import {
   type DataTableFeatures,
   dataTableFeatures,

@@ -4,13 +4,13 @@ import {
   dayCloseQueryKeys,
   fetchDayClose,
   reopenDay,
-} from '@/shared/api/clinic/day-close-api.ts';
+} from '@/shared/api/app/day-close-api.ts';
 import type {
   AcceptOpeningInput,
   CloseDayInput,
   DayCloseRecord,
   ReopenDayInput,
-} from '@/shared/api/clinic/day-close-contracts.ts';
+} from '@/shared/api/app/day-close-contracts.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';

@@ -24,9 +24,9 @@ vi.mock('../../stock-records-api.ts', () => ({
 vi.mock('@/shared/notify/index.ts', () => ({
   notify: { success: vi.fn(), error: vi.fn(), info: vi.fn(), undo: vi.fn() },
 }));
-import { paymentQueryKeys } from '@/shared/api/clinic/payments-api.ts';
+import { paymentQueryKeys } from '@/shared/api/app/payments-api.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import {
   stockItemRow,
   stockMovementRow,

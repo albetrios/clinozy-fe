@@ -13,7 +13,7 @@ import type { ReactNode } from 'react';
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 
 import { validatePendingSearch } from '../../pending.search.ts';
 import { PendingPage } from '../../PendingPage.tsx';

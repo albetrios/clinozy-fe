@@ -4,11 +4,11 @@ import { useState } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
+import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
 import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+  appFixtures,
+  resetAppFixtures,
+} from '@/shared/api/app/fixtures/world.fixtures.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 
 import {
@@ -97,11 +97,11 @@ function Multiple({ kind }: { kind: MedicalPartnerKind }) {
 
 beforeEach(() => {
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 afterEach(() => {
   resetMedicalRoutes();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 
 describe('MedicalPartnerPicker (medical.md:311–325)', () => {
@@ -128,7 +128,7 @@ describe('MedicalPartnerPicker (medical.md:311–325)', () => {
     await waitFor(() =>
       expect(notifyMock.success).toHaveBeenCalledWith('Manufacturer ACME added'),
     );
-    const [acme] = clinicFixtures.manufacturers.snapshot((row) => row.name === 'ACME');
+    const [acme] = appFixtures.manufacturers.snapshot((row) => row.name === 'ACME');
     expect(acme?.isQuick).toBe(true);
     await waitFor(() =>
       expect(screen.getByTestId('picked')).toHaveTextContent(acme?.id ?? '—'),
@@ -150,7 +150,7 @@ describe('MedicalPartnerPicker (medical.md:311–325)', () => {
         'Supplier Om Pharma added · add phone and GST later',
       ),
     );
-    const [om] = clinicFixtures.suppliers.snapshot((row) => row.name === 'Om Pharma');
+    const [om] = appFixtures.suppliers.snapshot((row) => row.name === 'Om Pharma');
     expect(om?.manufacturerIds).toEqual([ref.manufacturer(6)]);
   });
 
@@ -166,7 +166,7 @@ describe('MedicalPartnerPicker (medical.md:311–325)', () => {
     );
     const [request] = openChild.mock.calls[0] ?? [];
     if (request?.kind !== 'mr') throw new Error('expected an MR request');
-    const rep = await clinicFixtures.medicalReps.create({
+    const rep = await appFixtures.medicalReps.create({
       name: 'Ravi',
       phone: null,
       nextVisitOn: null,
@@ -186,7 +186,7 @@ describe('MedicalPartnerPicker (medical.md:311–325)', () => {
     await user.type(screen.getByRole('combobox'), 'Ravi');
     await user.click(await screen.findByRole('option', { name: /Add MR “Ravi”/ }));
     await waitFor(() => expect(notifyMock.success).toHaveBeenCalledWith('MR Ravi added'));
-    const [ravi] = clinicFixtures.medicalReps.snapshot((rep) => rep.name === 'Ravi');
+    const [ravi] = appFixtures.medicalReps.snapshot((rep) => rep.name === 'Ravi');
     await waitFor(() =>
       expect(screen.getByTestId('picked')).toHaveTextContent(
         `${ref.medicalRep(1)},${ravi?.id ?? '—'}`,

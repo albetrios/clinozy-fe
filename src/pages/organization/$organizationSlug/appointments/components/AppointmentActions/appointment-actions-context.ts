@@ -3,11 +3,11 @@ import { createContext, useContext } from 'react';
 import type {
   AppointmentGuardOptions,
   AppointmentMove,
-} from '@/shared/api/clinic/appointment-status.ts';
+} from '@/shared/api/app/appointment-status.ts';
 import type {
   AppointmentCancelReason,
   AppointmentRow,
-} from '@/shared/api/clinic/appointments-contracts.ts';
+} from '@/shared/api/app/appointments-contracts.ts';
 
 /** What every booking surface of the room can do to a booking (the popover, the card, the blocks). */
 export interface AppointmentActionsValue {

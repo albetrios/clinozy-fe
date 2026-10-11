@@ -8,17 +8,17 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { organizationReport } from '@/lib/routes/patient-file-builders.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
 import {
   fetchPatientReport,
   patientReportQueryKeys,
-} from '@/shared/api/clinic/patient-reports-api.ts';
-import type { PatientReport } from '@/shared/api/clinic/patient-reports-contracts.ts';
-import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
+} from '@/shared/api/app/patient-reports-api.ts';
+import type { PatientReport } from '@/shared/api/app/patient-reports-contracts.ts';
+import { patientName } from '@/shared/api/app/patients-contracts.ts';
 import { DataTableColumnChooser } from '@/shared/components/DataTableColumnChooser/index.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { usePatientReports } from '@/shared/hooks/usePatientReports/index.ts';
 import { FileIcon, Trash } from '@/shared/icons/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
@@ -134,8 +134,8 @@ export function PatientReportsPage() {
   const { reportId } = useParams({ strict: false });
   const { patientId, file } = usePatientFileContext();
   const organizationId = useOrganizationStore((state) => state.organizationId);
-  const access = useClinicAccess();
-  const [today] = useState(() => clinicToday());
+  const access = useAppAccess();
+  const [today] = useState(() => appToday());
   const canWrite = access.isResolved && access.can('patients', 'edit');
   const route = usePatientRecordRoute<PatientReport>({
     section: 'reports',

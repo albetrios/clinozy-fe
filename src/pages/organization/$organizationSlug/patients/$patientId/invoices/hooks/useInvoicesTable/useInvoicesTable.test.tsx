@@ -3,7 +3,7 @@ import { renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import type { InvoiceRecord } from '@/shared/api/clinic/invoices-contracts.ts';
+import type { InvoiceRecord } from '@/shared/api/app/invoices-contracts.ts';
 import { useDevicePrefsStore } from '@/shared/store/useDevicePrefsStore/index.ts';
 import { invoiceRecord } from '@/tests/utils/payments-doubles.ts';
 

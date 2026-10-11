@@ -3,8 +3,8 @@ import { renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type * as CommandSearchApiModule from '@/shared/api/clinic/command-search-api.ts';
-import type { CommandSearchPerson } from '@/shared/api/clinic/command-search-contracts.ts';
+import type * as CommandSearchApiModule from '@/shared/api/app/command-search-api.ts';
+import type { CommandSearchPerson } from '@/shared/api/app/command-search-contracts.ts';
 
 import { useCommandSearch } from './useCommandSearch.ts';
 
@@ -31,11 +31,11 @@ const PEOPLE = [
 const { searchSpy } = vi.hoisted(() => ({ searchSpy: vi.fn<(query: string) => void>() }));
 
 // `GET /app/contacts?q=` as a name match; the minimum is the real module's.
-vi.mock('@/shared/api/clinic/command-search-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/command-search-api.ts', async (importOriginal) => {
   const actual = await importOriginal<typeof CommandSearchApiModule>();
   return {
     ...actual,
-    searchClinicCommands: async (query: string) => {
+    searchAppCommands: async (query: string) => {
       searchSpy(query);
       const q = query.trim().toLowerCase();
       return {

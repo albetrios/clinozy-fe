@@ -43,7 +43,7 @@ really on the shelf.
 | File                         | Responsibility                                                                                             |
 | ---------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | `items.route.tsx`            | Route marker — exports `Component` rendering `ItemsPage`.                                                  |
-| `items.manifest.ts`          | Manifest — `kind: 'layout'` over its dialog routes, module `clinic-stock`.                                 |
+| `items.manifest.ts`          | Manifest — `kind: 'layout'` over its dialog routes, module `app-stock`.                                    |
 | `items.params.ts`            | The list read from the URL (the tab's own sort keys, a Lasts tier's day bound) and its filter key.         |
 | `ItemsPage.tsx`              | The tab: the toolbar, the table, its row actions and states; the drawers, popover and confirm.             |
 | `hooks/useStockItemColumns/` | The columns: tracks, folds (the meta line and the phone key), sort ids, the hidden Supplier and Last rate. |

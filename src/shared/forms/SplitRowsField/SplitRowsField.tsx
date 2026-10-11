@@ -1,8 +1,8 @@
 import type { Control, FieldArray, FieldArrayPath, FieldValues } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { PAYMENT_MODE_TONES } from '@/shared/clinic/clinic-tones.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { PAYMENT_MODE_TONES } from '@/shared/app/app-tones.ts';
 import type { PickerOption } from '@/shared/components/Picker/index.ts';
 import {
   type ItemsColumn,
@@ -63,10 +63,10 @@ export interface SplitRowsFieldProps<TForm extends SplitRowsForm> {
 
 /** Cash, UPI, Card — each on its tone's dot. */
 function useModeOptions(): PickerOption[] {
-  const { t } = useTranslation(CLINIC_NS);
+  const { t } = useTranslation(APP_NS);
   return SPLIT_MODES.map((mode) => ({
     key: mode,
-    label: t(CLINIC_KEYS.paymentModes[mode]),
+    label: t(APP_KEYS.paymentModes[mode]),
     tone: PAYMENT_MODE_TONES[mode],
   }));
 }

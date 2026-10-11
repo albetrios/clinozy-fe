@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
+import type { LedgerRow } from '@/shared/api/app/payments-contracts.ts';
 import { dataTableFeatures } from '@/shared/components/DataTable/index.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { ArrowDownLeft, ArrowUpRight } from '@/shared/icons/index.ts';

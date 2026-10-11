@@ -14,13 +14,13 @@ import {
   type OrganizationPermission,
   organizationPermissionSchema,
 } from '@/core/types/permissions.ts';
-import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import type { Role } from '@/shared/api/app/app-schema.ts';
+import { resetAppFixtures } from '@/shared/api/app/fixtures/world.fixtures.ts';
 import type { AuthUser } from '@/shared/auth/types.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
-import { previewPreset } from '@/tests/utils/clinic-preset-codes.ts';
+import { previewPreset } from '@/tests/utils/app-preset-codes.ts';
 
 import { useRoomLanding } from './useRoomLanding.ts';
 
@@ -107,7 +107,7 @@ async function expectPage(page: string) {
 
 beforeEach(() => {
   disabled.modules.clear();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 afterEach(() => {
   useUIStore.setState({ previewRole: null });
@@ -180,7 +180,7 @@ describe('useRoomLanding (Q-U11)', () => {
   });
 
   it('never lands on a room the deployment turns off', async () => {
-    disabled.modules.add('clinic-leads');
+    disabled.modules.add('app-leads');
     renderLayout('users', { previewRole: 'doctor' });
     await expectPage('appointments');
   });

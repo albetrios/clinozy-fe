@@ -1,9 +1,9 @@
 import { type ColumnDef, useTable } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { PrescriptionRecord } from '@/shared/api/clinic/prescriptions-contracts.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { PrescriptionRecord } from '@/shared/api/app/prescriptions-contracts.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { IdPill, TonePill } from '@/shared/components/Cells/index.ts';
 import {
   type DataTableFeatures,

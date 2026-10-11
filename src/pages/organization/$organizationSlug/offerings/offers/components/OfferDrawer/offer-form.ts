@@ -5,12 +5,12 @@ import {
   rupeesOfPaise,
   textFromNumber,
 } from '@/lib/number-text.ts';
-import type { OfferKind, Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { OfferKind, Tone } from '@/shared/api/app/app-schema.ts';
 import {
   OFFER_DEFAULTS,
   type OfferFields,
   type OfferRecord,
-} from '@/shared/api/clinic/offerings-contracts.ts';
+} from '@/shared/api/app/offerings-contracts.ts';
 
 /**
  * The Offer drawer's form (`offerings.md:91–112`; KICKOFF §6.11): text as

@@ -1,9 +1,9 @@
 import { type KeyboardEvent, type PointerEvent, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
-import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
+import type { LeadRecord } from '@/shared/api/app/leads-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import {
   ChatColumn,
   chatContactOfContact,
@@ -152,7 +152,7 @@ export function LeadDrawer({
   onPaneChange,
 }: LeadDrawerProps) {
   const { t } = useTranslation(LEADS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const phone = useViewportTier() === 'phone';
   const chatWidth = useDevicePrefsStore((state) => state.leadChatWidth);
   const viewport = useViewportWidth();
@@ -192,7 +192,7 @@ export function LeadDrawer({
           data: leadContactCardData(
             lead,
             team,
-            { source: (source) => tClinic(CLINIC_KEYS.leads.sources[source]) },
+            { source: (source) => tApp(APP_KEYS.leads.sources[source]) },
             contact,
           ),
         }}

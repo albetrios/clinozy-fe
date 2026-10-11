@@ -1,7 +1,7 @@
 import type { FieldPath, UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import type { PatientCheckIn } from '@/shared/api/clinic/feedback-contracts.ts';
+import type { PatientCheckIn } from '@/shared/api/app/feedback-contracts.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useCreateCheckIn, useUpdateCheckIn } from '@/shared/hooks/useFeedback/index.ts';
 

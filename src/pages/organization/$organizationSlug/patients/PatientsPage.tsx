@@ -3,14 +3,14 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { organizationPatientCreate } from '@/lib/routes/patients-builders.ts';
-import type { PatientRow, PatientView } from '@/shared/api/clinic/patients-contracts.ts';
-import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
+import type { PatientRow, PatientView } from '@/shared/api/app/patients-contracts.ts';
+import { patientName } from '@/shared/api/app/patients-contracts.ts';
 import {
-  type ClinicCommandNavigation,
-  clinicCommandNavigation,
-} from '@/shared/clinic/clinic-command-targets.ts';
-import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
-import { PATIENT_STATUS_TONES } from '@/shared/clinic/clinic-tones.ts';
+  type AppCommandNavigation,
+  appCommandNavigation,
+} from '@/shared/app/app-command-targets.ts';
+import { formatAppPhone } from '@/shared/app/app-phone.ts';
+import { PATIENT_STATUS_TONES } from '@/shared/app/app-tones.ts';
 import { DataTable, exportTableCsv } from '@/shared/components/DataTable/index.ts';
 import type { DataTableBulkAction } from '@/shared/components/DataTableBulkBar/index.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
@@ -22,8 +22,8 @@ import { PatientDrawer } from '@/shared/components/PatientDrawer/index.ts';
 import type { ContactCardActions } from '@/shared/components/PersonCard/index.ts';
 import { RoomTableEmpty } from '@/shared/components/RoomTableEmpty/index.ts';
 import { useRoomFilters } from '@/shared/components/RoomToolbar/index.ts';
-import { canExportRows, useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
-import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
+import { canExportRows, useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
+import { useAppNavigate } from '@/shared/hooks/useAppNavigate/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
 import { usePatientList } from '@/shared/hooks/usePatients/index.ts';
 import { usePaymentAccess } from '@/shared/hooks/usePaymentAccess/index.ts';
@@ -74,12 +74,12 @@ function filterKeyOf(params: ReturnType<typeof patientListParamsOf>): string {
  */
 export function PatientsPage() {
   const { t } = useTranslation(PATIENTS_NS);
-  const navigate = useClinicNavigate();
+  const navigate = useAppNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
   const search = validatePatientsSearch(useSearch({ strict: false }));
   const params = patientListParamsOf(search);
   const { patchSearch } = useDataTableUrlState(true);
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const money = usePaymentAccess();
   const tier = useViewportTier();
   const filters = useRoomFilters(PATIENT_FILTER_FIELDS);
@@ -89,12 +89,12 @@ export function PatientsPage() {
   const list = usePatientList(params);
   const { rows, loading } = useRoomList(list, PATIENTS_TABLE_ID, filterKeyOf(params));
 
-  const go = (navigation: ClinicCommandNavigation) => void navigate(navigation);
+  const go = (navigation: AppCommandNavigation) => void navigate(navigation);
   const can = (action: 'create' | 'edit' | 'delete') =>
     access.isResolved && access.can('patients', action);
   const openFile = (patient: PatientRow) =>
     go(
-      clinicCommandNavigation('patient', {
+      appCommandNavigation('patient', {
         organizationSlug,
         recordId: patient.id,
         // Activity open on tablet and desktop, closed on a phone (H:4687, §6.6).
@@ -102,9 +102,7 @@ export function PatientsPage() {
       }),
     );
   const editPatient = (patient: PatientRow) =>
-    go(
-      clinicCommandNavigation('patientEdit', { organizationSlug, recordId: patient.id }),
-    );
+    go(appCommandNavigation('patientEdit', { organizationSlug, recordId: patient.id }));
   const openCreate = () =>
     void navigate({ ...organizationPatientCreate(organizationSlug), search: true });
 
@@ -115,7 +113,7 @@ export function PatientsPage() {
       access.isResolved && access.can('leads', 'create')
         ? () =>
             go({
-              ...clinicCommandNavigation('newLead', { organizationSlug }),
+              ...appCommandNavigation('newLead', { organizationSlug }),
               search: { name: patientName(patient), phone: patient.phone },
             })
         : undefined,
@@ -123,7 +121,7 @@ export function PatientsPage() {
       access.isResolved && access.can('appointments', 'create')
         ? () =>
             go(
-              clinicCommandNavigation('newAppointment', {
+              appCommandNavigation('newAppointment', {
                 organizationSlug,
                 referrer: 'patients',
                 // The booking is the person's (`who=` a contact id).
@@ -151,7 +149,7 @@ export function PatientsPage() {
         icon: Receipt,
         onSelect: () =>
           go(
-            clinicCommandNavigation('newInvoice', {
+            appCommandNavigation('newInvoice', {
               organizationSlug,
               referrer: 'patients',
               search: { type: 'clinic', patient: patient.id },
@@ -195,7 +193,7 @@ export function PatientsPage() {
               fileName: EXPORT_FILE_NAME,
               cell: (columnId, patient) =>
                 columnId === 'name'
-                  ? `${patientName(patient)} · ${formatClinicPhone(patient.phone)}`
+                  ? `${patientName(patient)} · ${formatAppPhone(patient.phone)}`
                   : undefined,
             });
             notify.success(t(PATIENTS_KEYS.bulk.exported, { count: selected.length }));

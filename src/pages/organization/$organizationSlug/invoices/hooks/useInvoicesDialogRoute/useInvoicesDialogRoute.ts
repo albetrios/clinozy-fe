@@ -9,16 +9,16 @@ import {
 } from '@/lib/routes/invoice-builders.ts';
 import { organizationPayments } from '@/lib/routes/payments-builders.ts';
 import { PUBLIC_ID } from '@/lib/routes/search-params.ts';
-import { fetchInvoice, invoiceQueryKeys } from '@/shared/api/clinic/invoices-api.ts';
-import type { InvoiceDetail } from '@/shared/api/clinic/invoices-contracts.ts';
-import { safeReferrer } from '@/shared/clinic/clinic-referrer.ts';
+import { fetchInvoice, invoiceQueryKeys } from '@/shared/api/app/invoices-api.ts';
+import type { InvoiceDetail } from '@/shared/api/app/invoices-contracts.ts';
+import { safeReferrer } from '@/shared/app/app-referrer.ts';
 import {
   canPayment,
   INVOICE_DRAWER_KEYS,
   INVOICE_DRAWER_NS,
 } from '@/shared/components/InvoiceDrawer/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
-import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
+import { useAppNavigate } from '@/shared/hooks/useAppNavigate/index.ts';
 import { useDialogRouteLocation } from '@/shared/hooks/useCrossRoomDialog/index.ts';
 import { useDialogRouteRecord } from '@/shared/hooks/useDialogRouteRecord/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -94,9 +94,9 @@ export function useInvoicesDialogRoute(): InvoicesDialogRouteState {
     search: routeSearch,
   });
   const { organizationSlug = '', invoiceId } = params;
-  const navigate = useClinicNavigate();
+  const navigate = useAppNavigate();
   const { t } = useTranslation([INVOICE_DRAWER_NS, ERRORS_NS]);
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const organizationId = useOrganizationStore((state) => state.organizationId);
   const detailKey = useCallback(
     (id: string) => invoiceQueryKeys.detail(organizationId, id),
@@ -121,7 +121,7 @@ export function useInvoicesDialogRoute(): InvoicesDialogRouteState {
   }, [crossRoom, from, navigate, organizationSlug]);
 
   // Moving between the preview and the edit keeps the room to go back to —
-  // and, over that room's page, the page (`useClinicNavigate`).
+  // and, over that room's page, the page (`useAppNavigate`).
   const openEdit = useCallback(
     (id: string) => {
       void navigate({

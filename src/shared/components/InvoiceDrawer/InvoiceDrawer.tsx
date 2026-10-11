@@ -2,14 +2,14 @@ import { useId, useState } from 'react';
 import { useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import type { InvoiceType } from '@/shared/api/clinic/clinic-schema.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import { fetchInvoice, invoiceQueryKeys } from '@/shared/api/clinic/invoices-api.ts';
+import type { InvoiceType } from '@/shared/api/app/app-schema.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
+import { fetchInvoice, invoiceQueryKeys } from '@/shared/api/app/invoices-api.ts';
 import type {
   InvoiceDetail,
   InvoiceRecord,
-} from '@/shared/api/clinic/invoices-contracts.ts';
-import { defaultBranchId } from '@/shared/clinic/clinic-branch.ts';
+} from '@/shared/api/app/invoices-contracts.ts';
+import { defaultBranchId } from '@/shared/app/app-branch.ts';
 import { personFullName, shortPersonName } from '@/shared/components/Cells/index.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
 import type {
@@ -351,7 +351,7 @@ function printPreset(detail: InvoiceDetail | null): (() => void) | null {
 function useSessionForm(props: InvoiceDrawerProps) {
   const { openBranches } = useBranches();
   const { preferences } = usePreferences();
-  const [today] = useState(() => clinicToday());
+  const [today] = useState(() => appToday());
   const input = sessionInput(props);
   const branchId = defaultBranchId(openBranches, preferences.branchFilter);
   const form = useForm<InvoiceFormValues>({

@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next';
 
-import type { LeadInterest, LeadSource } from '@/shared/api/clinic/clinic-schema.ts';
-import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { clinicLeadStatusKey } from '@/shared/clinic/clinic-lead-status.ts';
-import { LEAD_SOURCE_TONES, LEAD_STATUS_TONES } from '@/shared/clinic/clinic-tones.ts';
+import type { LeadInterest, LeadSource } from '@/shared/api/app/app-schema.ts';
+import type { LeadRecord } from '@/shared/api/app/leads-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { appLeadStatusKey } from '@/shared/app/app-lead-status.ts';
+import { LEAD_SOURCE_TONES, LEAD_STATUS_TONES } from '@/shared/app/app-tones.ts';
 import { TonePill } from '@/shared/components/Cells/index.ts';
 import {
   Tooltip,
@@ -20,20 +20,20 @@ import { LEAD_SOURCE_ICONS, leadInterestViews } from './lead-display.ts';
  * re-target lead still New (D22).
  */
 export function LeadStatusPill({ lead }: { lead: Pick<LeadRecord, 'status' | 'kind'> }) {
-  const { t } = useTranslation(CLINIC_NS);
-  const key = clinicLeadStatusKey(lead);
+  const { t } = useTranslation(APP_NS);
+  const key = appLeadStatusKey(lead);
   if (!key) return null;
   return <TonePill tone={LEAD_STATUS_TONES[lead.status]}>{t(key)}</TonePill>;
 }
 
 /** A lead's source as a 24px pill: its 13px icon and name, in its tone (H:3348). */
 export function LeadSourcePill({ source }: { source: LeadSource | null }) {
-  const { t } = useTranslation(CLINIC_NS);
+  const { t } = useTranslation(APP_NS);
   if (!source) return null;
   const Icon = LEAD_SOURCE_ICONS[source];
   return (
     <TonePill tone={LEAD_SOURCE_TONES[source]} icon={<Icon className="size-3.25" />}>
-      {t(CLINIC_KEYS.leads.sources[source])}
+      {t(APP_KEYS.leads.sources[source])}
     </TonePill>
   );
 }
@@ -43,10 +43,10 @@ export function LeadSourcePill({ source }: { source: LeadSource | null }) {
  * and a neutral "+N" pill whose tooltip lists them all.
  */
 export function LeadInterestPills({ interests }: { interests: readonly LeadInterest[] }) {
-  const { t } = useTranslation(CLINIC_NS);
+  const { t } = useTranslation(APP_NS);
   const { t: tLeads } = useTranslation(LEADS_NS);
   const views = leadInterestViews(interests, (interest) =>
-    t(CLINIC_KEYS.leads.interests[interest]),
+    t(APP_KEYS.leads.interests[interest]),
   );
   const [first] = views;
   if (!first) return null;

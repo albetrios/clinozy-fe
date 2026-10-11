@@ -1,9 +1,9 @@
 import { Trans, useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type { AppointmentDayCount } from '@/shared/api/clinic/appointments-contracts.ts';
-import { localDateOf } from '@/shared/api/clinic/clinic-time.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { localDateOf } from '@/shared/api/app/app-time.ts';
+import type { AppointmentDayCount } from '@/shared/api/app/appointments-contracts.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
 import {

@@ -5,20 +5,20 @@ import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { cn } from '@/lib/utils.ts';
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
 import type {
   PatientPackageRow,
   PatientPackageStatus,
-} from '@/shared/api/clinic/patient-packages-contracts.ts';
-import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/api/app/patient-packages-contracts.ts';
+import { appCommandNavigation } from '@/shared/app/app-command-targets.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { TonePill } from '@/shared/components/Cells/index.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { Skeleton } from '@/shared/components/ui/skeleton.tsx';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
-import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
+import { useAppNavigate } from '@/shared/hooks/useAppNavigate/index.ts';
 import { usePatientPackages } from '@/shared/hooks/usePatientPackages/index.ts';
 import { usePlanOfferings } from '@/shared/hooks/usePlan/index.ts';
 
@@ -160,10 +160,10 @@ function PackageSkeletons() {
  */
 export function PatientPackagesPage() {
   const { t } = useTranslation([PACKAGE_NS, ERRORS_NS]);
-  const navigate = useClinicNavigate();
+  const navigate = useAppNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
   const { patientId, file } = usePatientFileContext();
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const packages = usePatientPackages(patientId);
   // The offerings' tones for the name pills — the plan card's catalogue read, shared.
   const offerings = usePlanOfferings();
@@ -178,7 +178,7 @@ export function PatientPackagesPage() {
 
   const book = () =>
     void navigate(
-      clinicCommandNavigation('newAppointment', {
+      appCommandNavigation('newAppointment', {
         organizationSlug,
         referrer: `patients/${patientId}/packages`,
         // The booking is the person's (`who=` a contact id).

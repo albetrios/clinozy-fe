@@ -1,9 +1,5 @@
-import type {
-  LeadInterest,
-  LeadSource,
-  Tone,
-} from '@/shared/api/clinic/clinic-schema.ts';
-import { LEAD_INTEREST_TONES } from '@/shared/clinic/clinic-tones.ts';
+import type { LeadInterest, LeadSource, Tone } from '@/shared/api/app/app-schema.ts';
+import { LEAD_INTEREST_TONES } from '@/shared/app/app-tones.ts';
 import {
   type AppIcon,
   House,

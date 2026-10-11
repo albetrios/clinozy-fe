@@ -6,8 +6,8 @@ It renders in the file layout's content column through the family's section fram
 (`../shared/components/PatientSection/`). Search (`images.search.ts`): `album` (`private` ·
 `lhr`; General when absent) and `appointment` (a visit id, or `none`; every photo when absent).
 
-Gated by the file layout (membership, the `clinic-patients` module, the org status, the
-section's `patient:clinical_record:read`); in-room access is `useClinicAccess` through
+Gated by the file layout (membership, the `app-patients` module, the org status, the
+section's `patient:clinical_record:read`); in-room access is `useAppAccess` through
 `shared/hooks/usePhotoAccess/`: the Private album by `patient:private_album:read`
 (`passesPatientFileGate(access, 'privateAlbum')`; View-as previews it for Doctor, Admin and
 Owner) — a member without it following `?album=private` gets the permission toast and General —
@@ -30,7 +30,7 @@ Registered in `src/app/routes/routeTree.tsx` through the file's one lazy module
 - **The photo (clinozy-be D86):** each tile shows the photo from its `file_url`
   (`../shared/components/PhotoThumb/`) under its body part and stage, its name and day fading in on
   hover; a link lives 15 minutes, so the list reads again every 5 and on the tab's return, keeping
-  a link while it has life left (`@/shared/api/clinic/file-links.ts`). A photo whose upload is gone
+  a link while it has life left (`@/shared/api/app/file-links.ts`). A photo whose upload is gone
   shows the image glyph with its name and day always on.
 
 ## The section (L-44)
@@ -42,7 +42,7 @@ Registered in `src/app/routes/routeTree.tsx` through the file's one lazy module
   (`useDevicePrefsStore.photoSize`). The design's per-visit photo count goes: the API counts by
   album only (G4).
 - **Grid** (`components/PhotoGrid/`): a group per day, named by the rooms' one time rule
-  (`useClinicClock().day`: "Today", "Yesterday", "Mon", "24 Sep") with its visit's service, square
+  (`useAppClock().day`: "Today", "Yesterday", "Mon", "24 Sep") with its visit's service, square
   tiles at 110 / 160 / 230px with the body-part and stage pills and the caption bar (always shown;
   Edit and Delete at M and L). The design's "3 photos · …" per day goes (a day can run across
   pages). A tile opens the viewer (`$imageId/`), Edit opens Photo details (`$imageId/edit/`),

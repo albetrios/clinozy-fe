@@ -2,11 +2,11 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
+import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
 import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+  appFixtures,
+  resetAppFixtures,
+} from '@/shared/api/app/fixtures/world.fixtures.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 
@@ -44,11 +44,11 @@ const setup = () =>
 
 beforeEach(() => {
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 afterEach(() => {
   resetMedicalRoutes();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 
 describe('ManufacturerDrawer (medical.md:208–222)', () => {
@@ -78,7 +78,7 @@ describe('ManufacturerDrawer (medical.md:208–222)', () => {
       'Manufacturer saved · connections updated',
     );
     expect(
-      clinicFixtures.manufacturers.snapshot((maker) => maker.name === 'ACME')[0],
+      appFixtures.manufacturers.snapshot((maker) => maker.name === 'ACME')[0],
     ).toMatchObject({ tone: 'sky', isQuick: false });
   });
 
@@ -106,7 +106,7 @@ describe('ManufacturerDrawer (medical.md:208–222)', () => {
     await user.click(within(drawer).getByTestId(`${D}-save`));
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
-    const kr = await clinicFixtures.suppliers.get(ref.supplier(61));
+    const kr = await appFixtures.suppliers.get(ref.supplier(61));
     expect(kr.manufacturerIds).toContain(ref.manufacturer(6));
   });
 

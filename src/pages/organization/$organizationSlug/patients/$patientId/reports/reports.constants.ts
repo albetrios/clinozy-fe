@@ -1,5 +1,5 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
-import type { ReportType, Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { ReportType, Tone } from '@/shared/api/app/app-schema.ts';
 
 /** Upload report and Report view read the patient file's namespace. */
 export const REPORT_NS = I18N_NAMESPACES.patientFile;

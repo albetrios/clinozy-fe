@@ -9,7 +9,7 @@
 import {
   type CreatedFilter,
   readCreatedFilter,
-} from '@/shared/api/clinic/clinic-list-filters.ts';
+} from '@/shared/api/app/app-list-filters.ts';
 
 /** Validated `?…` search params for `/users/branches` and its dialog routes. */
 export interface BranchesSearch {

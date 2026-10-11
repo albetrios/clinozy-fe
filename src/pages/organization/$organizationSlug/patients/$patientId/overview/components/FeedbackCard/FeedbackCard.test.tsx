@@ -3,20 +3,20 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type * as AppointmentsApiModule from '@/shared/api/clinic/appointments-api.ts';
-import type * as DirectoryApiModule from '@/shared/api/clinic/directory-api.ts';
-import type * as FeedbackApiModule from '@/shared/api/clinic/feedback-api.ts';
+import type * as AppointmentsApiModule from '@/shared/api/app/appointments-api.ts';
+import type * as DirectoryApiModule from '@/shared/api/app/directory-api.ts';
+import type * as FeedbackApiModule from '@/shared/api/app/feedback-api.ts';
 import {
   deleteFeedback,
   listPatientFeedback,
   logFeedbackAction,
   restoreFeedback,
-} from '@/shared/api/clinic/feedback-api.ts';
+} from '@/shared/api/app/feedback-api.ts';
 import type {
   FeedbackItem,
   PatientCheckIn,
   PatientReview,
-} from '@/shared/api/clinic/feedback-contracts.ts';
+} from '@/shared/api/app/feedback-contracts.ts';
 import {
   CONFIRM_TEST_IDS,
   confirmReasonTestId,
@@ -117,7 +117,7 @@ const store = vi.hoisted(() => ({
   removed: [] as FeedbackItem[],
 }));
 
-vi.mock('@/shared/api/clinic/feedback-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/feedback-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof FeedbackApiModule>()),
   listPatientFeedback: vi.fn(async () => [...store.items]),
   deleteFeedback: vi.fn(async ({ id }: { id: string }) => {
@@ -147,13 +147,13 @@ vi.mock('@/shared/api/clinic/feedback-api.ts', async (importOriginal) => ({
     );
   }),
 }));
-vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/appointments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof AppointmentsApiModule>()),
   fetchPersonAppointments: vi.fn(async () => [
     appointmentRow({ id: VISIT, seq: 2790, serviceLabel: 'Hydrafacial' }),
   ]),
 }));
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof DirectoryApiModule>()),
   fetchTeamDirectory: vi.fn(async () => [DOCTOR_NISHA]),
 }));

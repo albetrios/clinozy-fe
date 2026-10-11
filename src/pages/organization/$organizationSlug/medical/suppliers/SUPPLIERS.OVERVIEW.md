@@ -19,7 +19,7 @@ list (D24): the Supplier drawer (`../shared/components/SupplierDrawer/`) — 560
 | File                        | Responsibility                                                                                          |
 | --------------------------- | ------------------------------------------------------------------------------------------------------- |
 | `suppliers.route.tsx`       | Route marker — exports `Component` rendering `SuppliersPage`.                                           |
-| `suppliers.manifest.ts`     | Manifest — `kind: 'layout'` over its dialog routes, module `clinic-medical`.                            |
+| `suppliers.manifest.ts`     | Manifest — `kind: 'layout'` over its dialog routes, module `app-medical`.                               |
 | `suppliers.params.ts`       | The list read from the URL (defaults applied, the tab's own sort keys) and its filter key.              |
 | `SuppliersPage.tsx`         | The tab: the Medical toolbar, the table, its row actions and states; hosts the dialog routes' `Outlet`. |
 | `hooks/useSupplierColumns/` | The columns: tracks, folds (the meta line and the phone key), sort ids, the recommended set.            |

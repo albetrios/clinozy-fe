@@ -7,7 +7,7 @@ import {
   type RoomFilterFields,
   useRoomFilters,
 } from '@/shared/components/RoomToolbar/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { useRoomList } from '@/shared/hooks/useRoomList/index.ts';
@@ -80,7 +80,7 @@ export function SalesPage() {
   const search = validateMedicalSearch(useSearch({ strict: false }));
   const params = saleParamsOf(search);
   const { patchSearch } = useDataTableUrlState(true);
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const nav = useMedicalNav();
   const filters = useRoomFilters(SALE_FILTER_FIELDS);
   const actions = useSaleActions();

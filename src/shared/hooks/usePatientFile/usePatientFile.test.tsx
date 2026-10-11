@@ -3,14 +3,14 @@ import { renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/shared/api/clinic/patient-file-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/patient-file-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchPatientFile: vi.fn(),
 }));
-import { fetchPatientFile } from '@/shared/api/clinic/patient-file-api.ts';
+import { fetchPatientFile } from '@/shared/api/app/patient-file-api.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { patientFile, TEST_PATIENT_ID } from '@/tests/utils/patient-doubles.ts';
 
 import { usePatientFile } from './usePatientFile.ts';

@@ -5,7 +5,7 @@
  */
 import { z } from 'zod';
 
-import { FIXTURE_BACKED_CLINIC_MODULES } from './clinic-modules.ts';
+import { FIXTURE_BACKED_APP_MODULES } from './app-modules.ts';
 import {
   enabledOAuthProviders,
   hasAnyAuthSurface,
@@ -139,7 +139,7 @@ export const envFieldDescriptions: Readonly<Record<string, string>> = {
   VITE_CSP_REPORT_URI:
     'CSP violation report collector URI (e.g. a Sentry CSP ingest URL); empty = violations reach each visitor console only. Warned on in both deploy environments.',
   VITE_DISABLED_MODULES:
-    'Comma-separated module keys to disable (e.g. billing,members); routes 404 via the module gate. Clinic rooms are clinic-today … clinic-users; production disables the fixture-backed ones until their API lands.',
+    'Comma-separated module keys to disable (e.g. billing,members); routes 404 via the module gate. Clinic rooms are app-today … app-users; production disables the fixture-backed ones until their API lands.',
   VITE_PERSONAL_ORGANIZATIONS:
     'Tri-state override for personal-org deployment mode (true/false/unset).',
   VITE_TEAM_ORGANIZATIONS:
@@ -403,12 +403,12 @@ const CSP_REPORT_URI_RULE: RequiredKeyRule = {
  */
 const FIXTURE_ROOMS_OFF_RULE: RequiredKeyRule = {
   key: 'VITE_DISABLED_MODULES',
-  when: () => FIXTURE_BACKED_CLINIC_MODULES.length > 0,
+  when: () => FIXTURE_BACKED_APP_MODULES.length > 0,
   satisfiedBy: (value) => {
     const off = resolveDisabledModules(value);
-    return FIXTURE_BACKED_CLINIC_MODULES.every((module) => off.has(module));
+    return FIXTURE_BACKED_APP_MODULES.every((module) => off.has(module));
   },
-  condition: `naming every fixture-backed clinic room (${FIXTURE_BACKED_CLINIC_MODULES.join(', ')}) until its API lands — D8`,
+  condition: `naming every fixture-backed clinic room (${FIXTURE_BACKED_APP_MODULES.join(', ')}) until its API lands — D8`,
   level: 'error',
 };
 

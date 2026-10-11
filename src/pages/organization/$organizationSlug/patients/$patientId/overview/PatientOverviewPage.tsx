@@ -8,14 +8,14 @@ import {
   organizationCheckInEdit,
   organizationReviewEdit,
 } from '@/lib/routes/patient-file-builders.ts';
-import type { FeedbackItem } from '@/shared/api/clinic/feedback-contracts.ts';
-import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
+import type { FeedbackItem } from '@/shared/api/app/feedback-contracts.ts';
+import { patientName } from '@/shared/api/app/patients-contracts.ts';
 import {
   OfferingSuggestions,
   usePlanCard,
 } from '@/shared/components/OfferingSuggestions/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { PatientSection } from '../shared/components/PatientSection/index.ts';
@@ -63,7 +63,7 @@ export function PatientOverviewPage() {
   const { organizationSlug = '' } = useParams({ strict: false });
   const navigate = useNavigate();
   const { patientId, file } = usePatientFileContext();
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const canEdit = access.isResolved && access.can('patients', 'edit');
   // Reviews have their own codes (clinozy-be D83 (4)) — Marketing logs them, the file stays shut.
   const reviews = useReviewAccess();

@@ -1,12 +1,12 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
-import type { ClinicAction } from '@/shared/api/clinic/access-contracts.ts';
+import type { AppAction } from '@/shared/api/app/access-contracts.ts';
 import { getRolePermissions } from '@/shared/api/organization-api.ts';
 import type { RoleSummary } from '@/shared/api/organization-contracts.ts';
 import { orgQueryKeys } from '@/shared/api/organization-query-keys.ts';
 import { notifyError } from '@/shared/errors/errorHandler.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import {
   useReplaceRolePermissions,
   useRolePermissions,
@@ -40,7 +40,7 @@ export interface RoleAccessWrites {
   retryCodes: () => void;
   /** Whether the viewer may give a code: they hold it themselves. */
   canGive: (code: string) => boolean;
-  toggleBox: (row: MatrixRow, action: ClinicAction) => void;
+  toggleBox: (row: MatrixRow, action: AppAction) => void;
   toggleRow: (row: MatrixRow) => void;
   /** A special or a workspace permission — one code — on or off. */
   toggleCode: (code: string) => void;
@@ -58,7 +58,7 @@ export function useRoleAccessWrites(role: RoleSummary | null): RoleAccessWrites 
   const { t } = useTranslation(USERS_NS);
   const queryClient = useQueryClient();
   const organizationId = useOrganizationStore((state) => state.organizationId);
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const codesQuery = useRolePermissions(role?.id);
   const codes: readonly string[] | undefined = codesQuery.data;
   const replace = useReplaceRolePermissions(role?.id);

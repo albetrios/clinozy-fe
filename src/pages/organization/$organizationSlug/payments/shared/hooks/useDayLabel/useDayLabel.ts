@@ -1,11 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import {
-  addCivilDays,
-  clinicToday,
-  localDateOf,
-} from '@/shared/api/clinic/clinic-time.ts';
+import { addCivilDays, appToday, localDateOf } from '@/shared/api/app/app-time.ts';
 import { PICKER_KEYS, PICKER_NS } from '@/shared/components/Picker/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
@@ -22,7 +18,7 @@ export function useDayLabel({
 }: { yesterday?: boolean; relative?: boolean } = {}): (day: string) => string {
   const { t } = useTranslation(PICKER_NS);
   const { formatDate } = useLocaleFormat();
-  const [today] = useState(() => clinicToday());
+  const [today] = useState(() => appToday());
   return (day) => {
     if (relative && day === today) return t(PICKER_KEYS.date.today);
     if (relative && yesterday && day === addCivilDays(today, -1)) {

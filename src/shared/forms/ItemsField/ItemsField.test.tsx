@@ -13,9 +13,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 import { z } from 'zod';
 
-import { clinicHttpError } from '@/shared/api/clinic/clinic-fixture-store.ts';
-import { invoiceLineAmounts } from '@/shared/api/clinic/clinic-money.ts';
-import type { InvoiceItem, PrescriptionItem } from '@/shared/api/clinic/clinic-schema.ts';
+import { appHttpError } from '@/shared/api/app/app-fixture-store.ts';
+import { invoiceLineAmounts } from '@/shared/api/app/app-money.ts';
+import type { InvoiceItem, PrescriptionItem } from '@/shared/api/app/app-schema.ts';
 import { MoneyCell } from '@/shared/components/Cells/index.ts';
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import type { PickerOption } from '@/shared/components/Picker/index.ts';
@@ -367,7 +367,7 @@ describe('ItemsField — validation at the cell (fe-http-forms-errors)', () => {
     const formRef: { current: UseFormReturn<LinesForm> | null } = { current: null };
     renderWithClient(<LinesHarness initial={[GLOVES, GAUZE]} formRef={formRef} />);
 
-    const error = clinicHttpError(422, 'validation', 'Enter the rate', {
+    const error = appHttpError(422, 'validation', 'Enter the rate', {
       'lines.1.rate': ['Enter the rate'],
     });
     act(() => {

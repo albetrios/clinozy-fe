@@ -1,8 +1,8 @@
 import {
   type AppointmentCalendarView,
   appointmentViewRange,
-} from '@/shared/api/clinic/appointment-views.ts';
-import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
+} from '@/shared/api/app/appointment-views.ts';
+import type { AppointmentRow } from '@/shared/api/app/appointments-contracts.ts';
 import { useAppointmentRange } from '@/shared/hooks/useAppointments/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';

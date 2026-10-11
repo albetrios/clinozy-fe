@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 
 import { occurrenceKeys } from '@/lib/occurrence-keys.ts';
 import { cn } from '@/lib/utils.ts';
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import {
   RECORD_DRAWER_KEYS,
   RECORD_DRAWER_NS,

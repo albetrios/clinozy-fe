@@ -28,8 +28,8 @@ describe('isolateText — one data token in its own direction', () => {
 describe('isolateValues — the tokens of a translated sentence', () => {
   it('isolates string values and leaves numbers and i18next options alone', () => {
     expect(
-      isolateValues({ name: 'Riya Shah', count: 2, ns: 'clinic', context: 'male' }),
-    ).toEqual({ name: `${FSI}Riya Shah${PDI}`, count: 2, ns: 'clinic', context: 'male' });
+      isolateValues({ name: 'Riya Shah', count: 2, ns: 'app', context: 'male' }),
+    ).toEqual({ name: `${FSI}Riya Shah${PDI}`, count: 2, ns: 'app', context: 'male' });
   });
 
   it('isolates each token, not the sentence around it', () => {

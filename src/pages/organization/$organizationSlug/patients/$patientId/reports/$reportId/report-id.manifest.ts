@@ -14,7 +14,7 @@ export const manifest = {
   title: 'Report',
   testId: 'report-view',
   permission: 'organization:read',
-  module: 'clinic-patients',
+  module: 'app-patients',
   kind: 'leaf',
   children: [],
 } as const satisfies PageManifest;

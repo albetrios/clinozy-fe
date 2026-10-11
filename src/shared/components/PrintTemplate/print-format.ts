@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { localDateOf } from '@/shared/api/clinic/clinic-time.ts';
+import { localDateOf } from '@/shared/api/app/app-time.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
 import { PRINT_LANGUAGE, PRINT_TEMPLATE_NS } from './print-template.constants.ts';

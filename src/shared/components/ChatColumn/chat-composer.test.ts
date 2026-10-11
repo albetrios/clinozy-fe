@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import i18n from '@/lib/i18n/i18n.ts';
-import type { LeadMessage } from '@/shared/api/clinic/clinic-schema.ts';
-import { clinicClockTime, clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import type { Contact } from '@/shared/api/clinic/contacts-contracts.ts';
-import type { ContactHistoryEntry } from '@/shared/api/clinic/messages-contracts.ts';
+import type { LeadMessage } from '@/shared/api/app/app-schema.ts';
+import { appClockTime, appToday } from '@/shared/api/app/app-time.ts';
+import type { Contact } from '@/shared/api/app/contacts-contracts.ts';
+import type { ContactHistoryEntry } from '@/shared/api/app/messages-contracts.ts';
 import { fsi } from '@/tests/utils/bidi-marks.ts';
 
 import { CHAT_COLUMN_NS } from './chat-column.constants.ts';
@@ -59,17 +59,13 @@ const MONTHS = [
 /** The clinic clock on 3 Oct 2026, writing times as the design does. */
 const clock: ChatClock = {
   today: '2026-10-03',
-  dayOf: (instant) => clinicToday(new Date(instant)),
+  dayOf: (instant) => appToday(new Date(instant)),
   time: (instant) => {
-    const [hour = 0, minute = 0] = clinicClockTime(new Date(instant))
-      .split(':')
-      .map(Number);
+    const [hour = 0, minute = 0] = appClockTime(new Date(instant)).split(':').map(Number);
     return `${hour % 12 || 12}:${String(minute).padStart(2, '0')} ${hour < 12 ? 'am' : 'pm'}`;
   },
   shortTime: (instant) => {
-    const [hour = 0, minute = 0] = clinicClockTime(new Date(instant))
-      .split(':')
-      .map(Number);
+    const [hour = 0, minute = 0] = appClockTime(new Date(instant)).split(':').map(Number);
     const minutes = minute ? `:${String(minute).padStart(2, '0')}` : '';
     return `${hour % 12 || 12}${minutes} ${hour < 12 ? 'am' : 'pm'}`;
   },
@@ -463,7 +459,7 @@ describe('suggestions (_patterns.md:179–182)', () => {
 });
 
 describe('fill-ins (H:5749–5750)', () => {
-  // Built per test: the `clinic` copy loads in the suite's beforeAll, after collection.
+  // Built per test: the `app` copy loads in the suite's beforeAll, after collection.
   let ctx: MessageContext;
   let values: Record<string, string>;
   beforeEach(() => {

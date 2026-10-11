@@ -9,9 +9,9 @@ On clinozy-be (D154): every read and write goes to `/app/stock-items`, `/app/sto
 in `shared/` — ids are public ids (`sitm_` · `smov_` · `spur_` · `svnd_` · `scnt_`), money is the API's
 rupees, quantities its decimals (×1000 inside the room). The level, the runway, what is due and owed are
 the server's; the room joins vendor and item names and the authors from one cached catalogue read each,
-never one read per row. The room is out of `FIXTURE_BACKED_CLINIC_MODULES`, so production serves it.
+never one read per row. The room is out of `FIXTURE_BACKED_APP_MODULES`, so production serves it.
 
-Gated like every clinic room: membership (`organization:read`) and the `clinic-stock` module, then
+Gated like every clinic room: membership (`organization:read`) and the `app-stock` module, then
 `requireOrgStatus` on every tab and dialog route. In-room access is `useStockAccess` over the member's own
 codes (api-integration §5.6 Roles; Q-S1, Q-S2): `stock_item:read` sees the room; `stock_item:create` adds
 items, purchases and vendors; `stock_item:update` edits them and moves stock — Use, Receive, Adjust,
@@ -36,8 +36,8 @@ unpaid purchase or a vendor owed nothing (`409 item_has_stock` · `purchase_paid
 | File                                     | Responsibility                                                                                                                                                                                                                                         |
 | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `stock.route.tsx`                        | Route marker — exports `Component` rendering `StockLayout`.                                                                                                                                                                                            |
-| `stock.manifest.ts`                      | Manifest — `kind: 'layout'`, children `items`, `purchases`, `movements`, `vendors`; module `clinic-stock`, nav section `stock`.                                                                                                                        |
-| `stock.constants.ts`                     | `STOCK_NS` / `STOCK_KEYS` (the `clinic-stock` namespace) and `STOCK_TABLE_IDS`.                                                                                                                                                                        |
+| `stock.manifest.ts`                      | Manifest — `kind: 'layout'`, children `items`, `purchases`, `movements`, `vendors`; module `app-stock`, nav section `stock`.                                                                                                                           |
+| `stock.constants.ts`                     | `STOCK_NS` / `STOCK_KEYS` (the `app-stock` namespace) and `STOCK_TABLE_IDS`.                                                                                                                                                                           |
 | `stock.search.ts`                        | Every tab's URL params (search, filters, sort) — the entry chunk's dependency-free reader.                                                                                                                                                             |
 | `stock.dialog-search.ts`                 | The create drawers' prefills — parsed by `useStockDialogRoute`; loads with the room.                                                                                                                                                                   |
 | `StockLayout.tsx`                        | Layout over the tab routes (`<Outlet />`).                                                                                                                                                                                                             |

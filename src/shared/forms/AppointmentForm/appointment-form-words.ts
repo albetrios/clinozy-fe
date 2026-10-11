@@ -1,10 +1,10 @@
 import { isolateJoin, isolateValues } from '@/lib/bidi-isolate.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
 import type {
   AppointmentRow,
   AppointmentStaff,
-} from '@/shared/api/clinic/appointments-contracts.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+} from '@/shared/api/app/appointments-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 
 import { APPOINTMENT_FORM_KEYS } from './appointment-form.constants.ts';
 import type {
@@ -99,5 +99,5 @@ export function cancelReasonText(
 ): string | null {
   if (!row?.cancelReason) return null;
   if (row.cancelReason === 'other' && row.cancelNote) return row.cancelNote;
-  return t(CLINIC_KEYS.appointments.cancelReasons[row.cancelReason], { ns: CLINIC_NS });
+  return t(APP_KEYS.appointments.cancelReasons[row.cancelReason], { ns: APP_NS });
 }

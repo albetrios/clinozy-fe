@@ -33,8 +33,8 @@ collapsed at first and brought into view as they open (`@/lib/reveal-in-scroller
   routes (`../check-ins/`, `../reviews/`), which show this section behind them.
 
 Patients edit (`patient:update`) writes the notes and logs feedback; without it the cards read.
-Gated by the file layout (membership, the `clinic-patients` module, the org status, and
-`patient:clinical_record:read` — the notes' read code); in-room access is `useClinicAccess`.
+Gated by the file layout (membership, the `app-patients` module, the org status, and
+`patient:clinical_record:read` — the notes' read code); in-room access is `useAppAccess`.
 Registered in `src/app/routes/routeTree.tsx` through the file's one lazy module
 (`../patient-id.sections.ts`).
 
@@ -43,7 +43,7 @@ Registered in `src/app/routes/routeTree.tsx` through the file's one lazy module
 | File                            | Responsibility                                                                                    |
 | ------------------------------- | ------------------------------------------------------------------------------------------------- |
 | `overview.route.tsx`            | Route marker — exports `Component` rendering `PatientOverviewPage`.                               |
-| `overview.manifest.ts`          | Manifest — `kind: 'leaf'`, permission `organization:read`, module `clinic-patients`.              |
+| `overview.manifest.ts`          | Manifest — `kind: 'leaf'`, permission `organization:read`, module `app-patients`.                 |
 | `overview.constants.ts`         | The cards' tones and copy keys (`CLINICAL_KEYS`, `FEEDBACK_KEYS`, `LOG_FEEDBACK_KEYS`), test ids. |
 | `PatientOverviewPage.tsx`       | The section: the grid, a chip's removal and Undo, the plan card, Feedback, the picker.            |
 | `components/ClinicalChipCard/`  | One chip card: dot, title, "1 new", chips with ×, the dashed input; bars while loading.           |
@@ -52,7 +52,7 @@ Registered in `src/app/routes/routeTree.tsx` through the file's one lazy module
 
 The chip cards read and write the notes through `../shared/hooks/useClinicalLists/` — the
 family's, since the Overview's Clinical card and smart note write them too (L-46) — on the
-shared `@/shared/hooks/useClinicalNotes/` (`@/shared/api/clinic/clinical-notes-api.ts`).
+shared `@/shared/hooks/useClinicalNotes/` (`@/shared/api/app/clinical-notes-api.ts`).
 
 ## Test ids
 

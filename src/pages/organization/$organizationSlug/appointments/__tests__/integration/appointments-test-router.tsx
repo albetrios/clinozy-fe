@@ -24,11 +24,11 @@ import { AppointmentActionsProvider } from '../../components/AppointmentActions/
 export const APPOINTMENTS_PAGE = '/organization/acme/appointments';
 
 /**
- * The test member's codes on clinozy-be — `useClinicAccess` reads the Appointments room's from
+ * The test member's codes on clinozy-be — `useAppAccess` reads the Appointments room's from
  * them: every booking action (read, create, update, delete, and a lead from the contact card),
  * or read only (no Edit, no Create).
  */
-export function grantClinicAccess(level: 'owner' | 'none' = 'owner') {
+export function grantAppAccess(level: 'owner' | 'none' = 'owner') {
   useOrganizationStore.setState({
     permissions: (level === 'owner'
       ? [

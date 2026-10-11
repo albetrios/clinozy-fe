@@ -4,18 +4,18 @@ import { isolateJoin, isolateText } from '@/lib/bidi-isolate.ts';
 import {
   type CheckinFeel,
   OFFERING_CATEGORY_VALUES,
-} from '@/shared/api/clinic/clinic-schema.ts';
-import { localDateOf } from '@/shared/api/clinic/clinic-time.ts';
+} from '@/shared/api/app/app-schema.ts';
+import { localDateOf } from '@/shared/api/app/app-time.ts';
 import type {
   CheckInContext,
   CheckInOffering,
-} from '@/shared/api/clinic/feedback-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+} from '@/shared/api/app/feedback-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import {
   CHECKIN_FEEL_TONES,
   CHECKIN_FOLLOWED_TONES,
   OFFERING_CATEGORY_TONES,
-} from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/app/app-tones.ts';
 import {
   type DrawerPeekItem,
   drawerStepSummary,
@@ -62,7 +62,7 @@ export function useCheckInHead({
   aftercare: boolean;
   context: CheckInContext;
 }): CheckInHead {
-  const { t } = useTranslation([CHECK_IN_NS, CLINIC_NS]);
+  const { t } = useTranslation([CHECK_IN_NS, APP_NS]);
   const { formatDate } = useLocaleFormat();
   const { previous } = context;
   const last = previous
@@ -74,7 +74,7 @@ export function useCheckInHead({
             { civilDay: true },
           ),
         ),
-        feel: t(CLINIC_KEYS.checkInFeels[previous.feel], { ns: CLINIC_NS }),
+        feel: t(APP_KEYS.checkInFeels[previous.feel], { ns: APP_NS }),
       })
     : '';
   const service = context.treatmentName ?? context.visitService;
@@ -93,7 +93,7 @@ export function useCheckInOfferingOptions(
   offerings: readonly CheckInOffering[],
   picked: readonly string[],
 ): PickerOption<CheckInOffering>[] {
-  const { t } = useTranslation([CHECK_IN_NS, CLINIC_NS]);
+  const { t } = useTranslation([CHECK_IN_NS, APP_NS]);
   const paise = usePaiseFormat();
   const money = (rupees: number) => paise(Math.round(rupees * 100));
   const rank = (offering: CheckInOffering) =>
@@ -111,7 +111,7 @@ export function useCheckInOfferingOptions(
               count: offering.sessions,
             })
           : money(offering.price),
-      group: t(CLINIC_KEYS.offerings.categories[offering.category], { ns: CLINIC_NS }),
+      group: t(APP_KEYS.offerings.categories[offering.category], { ns: APP_NS }),
       groupTone: OFFERING_CATEGORY_TONES[offering.category],
       tone: offering.tone,
       keywords: offering.searchTerms,
@@ -129,11 +129,10 @@ export function useCheckInStepsView(
   values: CheckInFormValues,
   named: readonly PickerOption<CheckInOffering>[],
 ): Record<CheckInStepId, CheckInStepView> {
-  const { t } = useTranslation([CHECK_IN_NS, CLINIC_NS]);
+  const { t } = useTranslation([CHECK_IN_NS, APP_NS]);
   const { t: tDrawer } = useTranslation(RECORD_DRAWER_NS);
   const notFilled = tDrawer(RECORD_DRAWER_KEYS.step.notFilled);
-  const feelOf = (feel: CheckinFeel) =>
-    t(CLINIC_KEYS.checkInFeels[feel], { ns: CLINIC_NS });
+  const feelOf = (feel: CheckinFeel) => t(APP_KEYS.checkInFeels[feel], { ns: APP_NS });
   const feel = values.feel ? feelOf(values.feel) : '';
   const score = values.score > 0 ? String(values.score) : '';
   const now = values.currentState.trim();

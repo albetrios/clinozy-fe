@@ -1,9 +1,6 @@
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import {
-  medicineStockLevel,
-  reorderQuantity,
-} from '@/shared/api/clinic/medicine-stock.ts';
-import type { MedicineRow } from '@/shared/api/clinic/medicines-contracts.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
+import { medicineStockLevel, reorderQuantity } from '@/shared/api/app/medicine-stock.ts';
+import type { MedicineRow } from '@/shared/api/app/medicines-contracts.ts';
 
 import type { PurchaseOrderRow } from '../../../shared/medical-contracts.ts';
 import type { PurchaseOrderInput } from '../../../shared/medical-flows-contracts.ts';
@@ -129,7 +126,7 @@ export function newOrderForm(
   supplierId: string | null,
   lines: OrderLineValues[] = [],
 ): PurchaseOrderFormValues {
-  return { supplierId, billNo: '', date: clinicToday(), lines };
+  return { supplierId, billNo: '', date: appToday(), lines };
 }
 
 /** A saved order's form. */

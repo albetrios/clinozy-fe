@@ -9,8 +9,8 @@ import {
   type CreatedFilter,
   readBranchFilter,
   readCreatedFilter,
-} from '@/shared/api/clinic/clinic-list-filters.ts';
-import type { OfferStatus } from '@/shared/api/clinic/offerings-contracts.ts';
+} from '@/shared/api/app/app-list-filters.ts';
+import type { OfferStatus } from '@/shared/api/app/offerings-contracts.ts';
 
 /** The offer statuses, in the tab's order (`S:101`; the test pins them). */
 export const OFFER_STATE_FILTER = [

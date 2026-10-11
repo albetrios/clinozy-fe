@@ -1,6 +1,6 @@
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import i18n from '@/lib/i18n/i18n.ts';
-import type { DeleteReason } from '@/shared/api/clinic/clinic-schema.ts';
+import type { DeleteReason } from '@/shared/api/app/app-schema.ts';
 import type { RoleCreateInput, RoleUpdateInput } from '@/shared/api/organization-api.ts';
 import * as orgApi from '@/shared/api/organization-api.ts';
 import type { RoleSummary } from '@/shared/api/organization-contracts.ts';

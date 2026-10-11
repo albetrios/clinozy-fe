@@ -1,14 +1,14 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
-import type { AppointmentType } from '@/shared/api/clinic/clinic-schema.ts';
+import type { AppointmentType } from '@/shared/api/app/app-schema.ts';
 
 /**
- * The appointment form's copy lives in `clinic`, not the room's
+ * The appointment form's copy lives in `app`, not the room's
  * `appointments`: the form is shared — the Appointments room opens it, and the
  * lead drawer and the task drawer stack it (KICKOFF §6.4). The status
  * machine's words, the cancel confirm and the booking toasts are the clinic
- * vocabulary's (`CLINIC_KEYS.appointments`).
+ * vocabulary's (`APP_KEYS.appointments`).
  */
-export const APPOINTMENT_FORM_NS = I18N_NAMESPACES.clinic;
+export const APPOINTMENT_FORM_NS = I18N_NAMESPACES.app;
 
 const TYPE_KEYS = (prefix: string): Readonly<Record<AppointmentType, string>> => ({
   consultation: `${prefix}.consultation`,

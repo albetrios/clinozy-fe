@@ -19,7 +19,7 @@ import {
 import {
   type CreatedFilter,
   readCreatedFilter,
-} from '@/shared/api/clinic/clinic-list-filters.ts';
+} from '@/shared/api/app/app-list-filters.ts';
 
 /** The Team's Status filter values (`users.md:204`). */
 export const TEAM_STATUS_VALUES = ['active', 'inactive'] as const;

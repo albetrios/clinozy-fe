@@ -3,16 +3,16 @@ import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import type { TreatmentRecord } from '@/shared/api/clinic/treatments-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { CHECKIN_FEEL_TONES, TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
+import type { TreatmentRecord } from '@/shared/api/app/treatments-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { CHECKIN_FEEL_TONES, TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { TonePill } from '@/shared/components/Cells/index.ts';
 import {
   type DataTableFeatures,
   dataTableFeatures,
 } from '@/shared/components/DataTable/index.ts';
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 import { useHiddenColumns } from '@/shared/hooks/useHiddenColumns/index.ts';
 
 import {
@@ -73,7 +73,7 @@ function treatmentFeedback(
   if (checkIn) {
     return {
       label: t(keys.treatments.feedbackScore, {
-        feel: t(CLINIC_KEYS.checkInFeels[checkIn.feel], { ns: CLINIC_NS }),
+        feel: t(APP_KEYS.checkInFeels[checkIn.feel], { ns: APP_NS }),
         score: checkIn.score,
       }),
       tone: CHECKIN_FEEL_TONES[checkIn.feel],
@@ -132,7 +132,7 @@ function useTreatmentParts() {
 function useTreatmentsColumns(): ColumnDef<DataTableFeatures, TreatmentRecord>[] {
   const { t } = useTranslation(PATIENT_TABLE_NS);
   const day = useTableDay();
-  const clock = useClinicClock();
+  const clock = useAppClock();
   const staff = useStaffLookup();
   const parts = useTreatmentParts();
   const team = (treatment: TreatmentRecord) =>

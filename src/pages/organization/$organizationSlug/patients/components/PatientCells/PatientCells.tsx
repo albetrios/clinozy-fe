@@ -1,18 +1,18 @@
 import { useTranslation } from 'react-i18next';
 
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import { localDateOf } from '@/shared/api/clinic/clinic-time.ts';
-import { patientName, type PatientRow } from '@/shared/api/clinic/patients-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
+import { localDateOf } from '@/shared/api/app/app-time.ts';
+import { patientName, type PatientRow } from '@/shared/api/app/patients-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { formatAppPhone } from '@/shared/app/app-phone.ts';
 import { IdPill, PersonChip, TonePill } from '@/shared/components/Cells/index.ts';
 import {
   ContactCard,
   type ContactCardActions,
   type ContactCardData,
 } from '@/shared/components/PersonCard/index.ts';
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
 import { PATIENTS_KEYS, PATIENTS_NS } from '../../patients.constants.ts';
@@ -48,20 +48,20 @@ export function PatientBadges({
  * primary number only, and no dues — the API answers neither for a list (G4).
  */
 function useContactCardData(patient: PatientRow, today: string): ContactCardData {
-  const { t } = useTranslation(CLINIC_NS);
+  const { t } = useTranslation(APP_NS);
   return {
     kind: 'patient',
     name: patientName(patient),
     displayId: displayId.patient(patient.seq),
     since: patient.createdAt,
-    tags: patient.types.map((type) => t(CLINIC_KEYS.patients.types[type])),
+    tags: patient.types.map((type) => t(APP_KEYS.patients.types[type])),
     reach: [{ channel: 'whatsapp', phone: patient.phone }],
     about: {
       gender: patient.gender,
       age: patientAge(patient.dateOfBirth, today),
       area: patient.address,
       source: patient.referralSource
-        ? t(CLINIC_KEYS.patients.referralSources[patient.referralSource])
+        ? t(APP_KEYS.patients.referralSources[patient.referralSource])
         : null,
       consent: {
         data: patient.consents.includes('data'),
@@ -91,7 +91,7 @@ export function PatientNameCell({
     <ContactCard data={data} {...actions}>
       <PersonChip
         name={data.name}
-        sub={formatClinicPhone(patient.phone)}
+        sub={formatAppPhone(patient.phone)}
         tone="sage"
         patient
       />
@@ -141,7 +141,7 @@ export function PatientFollowUpCell({
   followUpAt: string | null;
   today: string;
 }) {
-  const clock = useClinicClock();
+  const clock = useAppClock();
   if (!followUpAt) return null;
   return (
     <TonePill tone={FOLLOW_UP_TONES[followUpWhen(followUpAt, today)]}>
@@ -152,7 +152,7 @@ export function PatientFollowUpCell({
 
 /** The Updated cell: when the file was last saved, by the rooms' one time rule ("3:39 pm", "Yesterday 3:39 pm", "24 Sep"). */
 export function PatientUpdatedCell({ patient }: { patient: PatientRow }) {
-  const clock = useClinicClock();
+  const clock = useAppClock();
   return (
     <span className="text-body text-muted-foreground min-w-0 truncate tabular-nums">
       {clock.moment(patient.updatedAt)}

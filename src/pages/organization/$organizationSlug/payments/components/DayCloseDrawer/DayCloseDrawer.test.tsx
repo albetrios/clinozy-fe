@@ -3,30 +3,30 @@ import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
-import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
+import type { BranchOption } from '@/shared/api/app/branches-api.ts';
 import {
   acceptOpeningCash,
   closeDay,
   fetchDayClose,
   reopenDay,
-} from '@/shared/api/clinic/day-close-api.ts';
+} from '@/shared/api/app/day-close-api.ts';
 import {
   type DayCloseRecord,
   type DayCloseView,
   dayCloseWire,
   toDayCloseRecord,
-} from '@/shared/api/clinic/day-close-contracts.ts';
-import { fetchTeamDirectory } from '@/shared/api/clinic/directory-api.ts';
-import type { LedgerPerson } from '@/shared/api/clinic/payments-contracts.ts';
+} from '@/shared/api/app/day-close-contracts.ts';
+import { fetchTeamDirectory } from '@/shared/api/app/directory-api.ts';
+import type { LedgerPerson } from '@/shared/api/app/payments-contracts.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
-import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import {
   fixtureActiveBranches,
   signInTestMember,
-} from '@/tests/utils/clinic-shell-doubles.ts';
+} from '@/tests/utils/app-shell-doubles.ts';
+import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import {
   dayCloseWire as dayCloseWireDouble,
   ledgerRow,
@@ -55,14 +55,14 @@ const { notifyMock } = vi.hoisted(() => ({
   },
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
-vi.mock('@/shared/api/clinic/day-close-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/day-close-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchDayClose: vi.fn(),
   acceptOpeningCash: vi.fn(),
   closeDay: vi.fn(),
   reopenDay: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchTeamDirectory: vi.fn(),
 }));

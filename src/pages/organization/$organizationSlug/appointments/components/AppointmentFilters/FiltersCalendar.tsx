@@ -2,14 +2,14 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type { AppointmentDayCount } from '@/shared/api/clinic/appointments-contracts.ts';
 import {
   addCivilDays,
+  appToday,
   civilDateOf,
   civilMonthStart,
-  clinicToday,
   localDateOf,
-} from '@/shared/api/clinic/clinic-time.ts';
+} from '@/shared/api/app/app-time.ts';
+import type { AppointmentDayCount } from '@/shared/api/app/appointments-contracts.ts';
 import {
   type CalendarDayDots,
   LocalizedCalendar,
@@ -61,7 +61,7 @@ export interface FiltersCalendarProps {
  */
 export function FiltersCalendar({ value, onChange, branchIds }: FiltersCalendarProps) {
   const { t } = useTranslation(APPOINTMENTS_NS);
-  const today = clinicToday();
+  const today = appToday();
   const [month, setMonth] = useState(() => civilMonthStart(value ?? today));
   const counts = useAppointmentDayCounts(
     {

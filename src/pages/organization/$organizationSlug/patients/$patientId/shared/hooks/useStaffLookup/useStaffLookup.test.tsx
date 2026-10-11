@@ -3,20 +3,20 @@ import { renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { fetchTeamDirectory } from '@/shared/api/clinic/directory-api.ts';
+import { fetchTeamDirectory } from '@/shared/api/app/directory-api.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { findMyMembershipId } from '@/shared/tenancy/my-membership.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import {
   DOCTOR_ARJUN,
   DOCTOR_NISHA,
   teamDoctor,
 } from '@/tests/utils/appointment-doubles.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import { useStaffLookup } from './useStaffLookup.ts';
 
 // The team (`GET /app/memberships`) and the signed-in member's own membership.
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchTeamDirectory: vi.fn(),
 }));

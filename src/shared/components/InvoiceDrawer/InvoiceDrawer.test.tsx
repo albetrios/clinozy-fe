@@ -2,7 +2,7 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/shared/api/clinic/invoices-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/invoices-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   previewInvoice: vi.fn(),
   previewInvoiceChange: vi.fn(),
@@ -14,25 +14,25 @@ vi.mock('@/shared/api/clinic/invoices-api.ts', async (importOriginal) => ({
   fetchInvoicePresets: vi.fn(),
   fetchInvoiceTotals: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/offerings-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchAllOfferings: vi.fn(),
   fetchAllOffers: vi.fn(),
   createOffering: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/plan-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/plan-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchPlan: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchTeamDirectory: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/patients-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/patients-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchPatient: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/patient-search-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/patient-search-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   searchPatientPicker: vi.fn(),
 }));
@@ -40,20 +40,20 @@ vi.mock('@/shared/tenancy/my-membership.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   findMyMembershipId: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/treatments-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/treatments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listVisitTreatmentsToBill: vi.fn(),
 }));
 
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
-import * as branchesApi from '@/shared/api/clinic/branches-api.ts';
-import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
-import { fetchTeamDirectory } from '@/shared/api/clinic/directory-api.ts';
-import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
+import type { Role } from '@/shared/api/app/app-schema.ts';
+import * as branchesApi from '@/shared/api/app/branches-api.ts';
+import { fetchTeamDirectory } from '@/shared/api/app/directory-api.ts';
+import { patientRef } from '@/shared/api/app/fixtures/patients.fixtures.ts';
 import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+  appFixtures,
+  resetAppFixtures,
+} from '@/shared/api/app/fixtures/world.fixtures.ts';
 import {
   createInvoice,
   deleteInvoice,
@@ -64,29 +64,29 @@ import {
   previewInvoiceChange,
   restoreInvoice,
   updateInvoice,
-} from '@/shared/api/clinic/invoices-api.ts';
+} from '@/shared/api/app/invoices-api.ts';
 import type {
   InvoiceDetail,
   InvoiceInput,
   InvoicePreview,
-} from '@/shared/api/clinic/invoices-contracts.ts';
+} from '@/shared/api/app/invoices-contracts.ts';
 import {
   createOffering,
   fetchAllOfferings,
   fetchAllOffers,
-} from '@/shared/api/clinic/offerings-api.ts';
-import { fetchPatient } from '@/shared/api/clinic/patients-api.ts';
-import { fetchPlan } from '@/shared/api/clinic/plan-api.ts';
-import { listVisitTreatmentsToBill } from '@/shared/api/clinic/treatments-api.ts';
-import type { TreatmentRecord } from '@/shared/api/clinic/treatments-contracts.ts';
+} from '@/shared/api/app/offerings-api.ts';
+import { fetchPatient } from '@/shared/api/app/patients-api.ts';
+import { fetchPlan } from '@/shared/api/app/plan-api.ts';
+import { listVisitTreatmentsToBill } from '@/shared/api/app/treatments-api.ts';
+import type { TreatmentRecord } from '@/shared/api/app/treatments-contracts.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 import { findMyMembershipId } from '@/shared/tenancy/my-membership.ts';
+import { holdPreset } from '@/tests/utils/app-preset-codes.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
-import { holdPreset } from '@/tests/utils/clinic-preset-codes.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import {
   INVOICE_TEST_BRANCHES,
   INVOICE_TEST_OFFERINGS,
@@ -287,7 +287,7 @@ beforeEach(() => {
   viewport.tier = 'desktop';
   for (const fn of Object.values(notifyMock)) fn.mockReset();
   printMock.mockReset();
-  resetClinicFixtures();
+  resetAppFixtures();
   vi.spyOn(branchesApi, 'fetchActiveBranches').mockResolvedValue(INVOICE_TEST_BRANCHES);
   vi.mocked(fetchAllOfferings).mockResolvedValue(INVOICE_TEST_OFFERINGS);
   vi.mocked(fetchAllOffers).mockResolvedValue(INVOICE_TEST_OFFERS);
@@ -347,7 +347,7 @@ beforeEach(() => {
 afterEach(() => {
   vi.useRealTimers();
   vi.restoreAllMocks();
-  resetClinicFixtures();
+  resetAppFixtures();
   useUIStore.setState({ previewRole: null });
   useOrganizationStore.getState().clearOrganization();
 });
@@ -1105,7 +1105,7 @@ describe('InvoiceDrawer — Medical sale (§6.7, §6.9)', () => {
       ),
     );
     expect(
-      clinicFixtures.medicines.snapshot((medicine) => medicine.name === 'Azel Cream')[0],
+      appFixtures.medicines.snapshot((medicine) => medicine.name === 'Azel Cream')[0],
     ).toMatchObject({ isQuick: true, mrp: 0 });
     await waitFor(() =>
       expect(screen.getByTestId('invoice-drawer-items-row')).toHaveTextContent(
@@ -1124,7 +1124,7 @@ describe('InvoiceDrawer — Medical sale (§6.7, §6.9)', () => {
       expect(screen.getAllByTestId('invoice-drawer-items-row')).toHaveLength(2),
     );
     expect(
-      clinicFixtures.medicines.snapshot((medicine) => medicine.name === 'Derma gel'),
+      appFixtures.medicines.snapshot((medicine) => medicine.name === 'Derma gel'),
     ).toHaveLength(1);
   });
 

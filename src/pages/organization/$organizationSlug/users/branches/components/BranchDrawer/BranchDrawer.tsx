@@ -3,7 +3,7 @@ import { useId, useState } from 'react';
 import { useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
+import type { TeamMember } from '@/shared/api/app/users-contracts.ts';
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';

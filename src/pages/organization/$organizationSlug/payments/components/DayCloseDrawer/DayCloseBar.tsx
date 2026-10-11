@@ -6,8 +6,8 @@ import { cn } from '@/lib/utils.ts';
 import type {
   DayCloseHistoryItem,
   DayCloseView,
-} from '@/shared/api/clinic/day-close-contracts.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/api/app/day-close-contracts.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import {
   PersonAvatar,
   shortPersonName,

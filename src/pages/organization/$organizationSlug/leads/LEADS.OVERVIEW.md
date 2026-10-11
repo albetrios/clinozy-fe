@@ -2,10 +2,10 @@
 
 Route: `/organization/$organizationSlug/leads`. Enquiries and their conversations, until they become patients (KICKOFF §6.3).
 
-Gated like every clinic room: membership (`organization:read`) and the `clinic-leads`
+Gated like every clinic room: membership (`organization:read`) and the `app-leads`
 module, then `requireOrgStatus`; in-room View / Create / Edit / Delete come from
-`useClinicAccess` (KICKOFF §3.7) — `lead:read` / `create` / `update` / `delete` once the room
-leaves `FIXTURE_BACKED_CLINIC_MODULES`; the person's "Edit contact" needs `contact:update`.
+`useAppAccess` (KICKOFF §3.7) — `lead:read` / `create` / `update` / `delete` once the room
+leaves `FIXTURE_BACKED_APP_MODULES`; the person's "Edit contact" needs `contact:update`.
 
 The room reads clinozy-be (L-60, D150): `GET /app/leads` and its writes, the person
 (`/app/contacts`), their stream (`/app/contacts/:contact_id/activities`) and the team
@@ -55,18 +55,18 @@ route renders nothing — this page reads the URL and opens the drawer over the 
 - `/leads/$leadId/edit` redirects to `/leads/$leadId` with the same search — a
   `app/routes/routeTree.tsx` route with no island (`S:25`).
 
-The data is the shared leads domain on clinozy-be: `@/shared/api/clinic/leads-api.ts`, its
-contracts and the hold (`@/shared/api/clinic/leads-hold.ts`, from `held_until`) beside it, the hooks in
-`@/shared/hooks/useLeads/`; the person in `@/shared/api/clinic/contacts-api.ts` / `@/shared/hooks/useContacts/`;
-the chat's stream in `@/shared/api/clinic/contact-activities-api.ts`; the team in `useTeamDirectory`. The lead
-record itself lives in `@/shared/api/clinic/leads-fixture-contracts.ts`, beside the fixtures that store it.
+The data is the shared leads domain on clinozy-be: `@/shared/api/app/leads-api.ts`, its
+contracts and the hold (`@/shared/api/app/leads-hold.ts`, from `held_until`) beside it, the hooks in
+`@/shared/hooks/useLeads/`; the person in `@/shared/api/app/contacts-api.ts` / `@/shared/hooks/useContacts/`;
+the chat's stream in `@/shared/api/app/contact-activities-api.ts`; the team in `useTeamDirectory`. The lead
+record itself lives in `@/shared/api/app/leads-fixture-contracts.ts`, beside the fixtures that store it.
 
 ## Files
 
 | File                         | Responsibility                                                                                                                                                                                                                                                                                                                                                                                                          |
 | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `leads.route.tsx`            | Route marker — exports `Component` rendering `LeadsPage`.                                                                                                                                                                                                                                                                                                                                                               |
-| `leads.manifest.ts`          | Manifest — `kind: 'layout'` over `create` and `$leadId`, permission `organization:read`, module `clinic-leads`, nav section `leads`.                                                                                                                                                                                                                                                                                    |
+| `leads.manifest.ts`          | Manifest — `kind: 'layout'` over `create` and `$leadId`, permission `organization:read`, module `app-leads`, nav section `leads`.                                                                                                                                                                                                                                                                                       |
 | `leads.search.ts`            | URL schemas (`validateSearch`): the list's `view`, `q`, `status`, `source`, `hold`, `member`, `created`, `followUp`, `sort`.                                                                                                                                                                                                                                                                                            |
 | `leads.dialog-search.ts`     | New lead's prefill — its route keeps the raw values, `useLeadsDialogRoute` parses them; loads with the room.                                                                                                                                                                                                                                                                                                            |
 | `leads.constants.ts`         | `LEADS_NS` / `LEADS_KEYS` (the `leads` namespace).                                                                                                                                                                                                                                                                                                                                                                      |

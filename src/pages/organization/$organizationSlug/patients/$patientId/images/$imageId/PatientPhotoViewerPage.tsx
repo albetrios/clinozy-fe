@@ -7,8 +7,8 @@ import {
   organizationPatientPhotoEdit,
   organizationPatientSection,
 } from '@/lib/routes/patient-file-builders.ts';
-import type { PatientPhoto } from '@/shared/api/clinic/patient-images-contracts.ts';
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import type { PatientPhoto } from '@/shared/api/app/patient-images-contracts.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 import {
   usePatientPhoto,
   usePatientPhotos,
@@ -31,7 +31,7 @@ const K = PATIENT_PHOTOS_KEYS;
 /** "Face · Before · 24 Sep · General" — the viewer's line under the name (H:4785 `lb.meta`). */
 function usePhotoMeta(): (photo: PatientPhoto) => string {
   const { t } = useTranslation(PATIENT_PHOTOS_NS);
-  const { day: dayLabel } = useClinicClock();
+  const { day: dayLabel } = useAppClock();
   return (photo) =>
     [
       photo.bodyPart ? t(K.bodyParts[photo.bodyPart]) : null,

@@ -3,7 +3,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import { resetAppFixtures } from '@/shared/api/app/fixtures/world.fixtures.ts';
 import type { AuthUser } from '@/shared/auth/types.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 
@@ -21,7 +21,7 @@ function signIn(email: string | null) {
 }
 
 beforeEach(() => {
-  resetClinicFixtures();
+  resetAppFixtures();
   client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
 });
 afterEach(() => {

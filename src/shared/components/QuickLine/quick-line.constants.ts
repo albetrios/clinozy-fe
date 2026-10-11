@@ -1,10 +1,10 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 
 /**
- * The quick line's own copy lives in `clinic` (the namespace `CLINIC_NS`
+ * The quick line's own copy lives in `app` (the namespace `APP_NS`
  * names), which loads with the org shell where every drawer renders.
  */
-export const QUICK_LINE_NS = I18N_NAMESPACES.clinic;
+export const QUICK_LINE_NS = I18N_NAMESPACES.app;
 
 /** Key paths for the quick line's chrome (every value verbatim from the design, H:911–935). */
 export const QUICK_LINE_KEYS = {

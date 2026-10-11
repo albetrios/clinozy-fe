@@ -1,8 +1,5 @@
-import type { InvoiceRecord } from '@/shared/api/clinic/invoices-contracts.ts';
-import {
-  type ClinicAccess,
-  useClinicAccess,
-} from '@/shared/hooks/useClinicAccess/index.ts';
+import type { InvoiceRecord } from '@/shared/api/app/invoices-contracts.ts';
+import { type AppAccess, useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 
 /*
  * Who may do what with an invoice (research-payments §7): the money codes clinozy-be checks —
@@ -17,7 +14,7 @@ export type PaymentCode =
 
 /** Whether the codes in force hold a money code — false until access resolves ("not known yet"). */
 export function canPayment(
-  access: Pick<ClinicAccess, 'isResolved' | 'canCode'>,
+  access: Pick<AppAccess, 'isResolved' | 'canCode'>,
   code: PaymentCode,
 ): boolean {
   return access.isResolved && access.canCode(code);
@@ -57,7 +54,7 @@ export function useInvoiceAccess(
   editing: InvoiceRecord | null,
   newSale: boolean,
 ): InvoiceDrawerAccess {
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const locked = lockOf(editing);
   let mayWrite = canPayment(access, editing ? 'payment:update' : 'payment:create');
   if (newSale) mayWrite = access.isResolved && access.can('medical', 'create');

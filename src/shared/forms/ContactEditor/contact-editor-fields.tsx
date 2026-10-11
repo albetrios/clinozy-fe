@@ -4,14 +4,14 @@ import { useTranslation } from 'react-i18next';
 import { isolateText } from '@/lib/bidi-isolate.ts';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { cn } from '@/lib/utils.ts';
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
 import {
   CONTACT_CHANNELS,
   type ContactChannel,
-} from '@/shared/api/clinic/contacts-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { formatClinicPhone, toClinicPhone } from '@/shared/clinic/clinic-phone.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/api/app/contacts-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { formatAppPhone, toAppPhone } from '@/shared/app/app-phone.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import {
   DrawerChips,
   DrawerField,
@@ -134,7 +134,7 @@ function PhoneRow({
   testId,
 }: ContactStepProps & { index: number }) {
   const { t } = useTranslation(CONTACT_EDITOR_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const row = value.phones[index];
   if (!row) return null;
   const primary = index === 0;
@@ -144,9 +144,9 @@ function PhoneRow({
   const makePrimary = () => {
     if (primary) return;
     setPhones(withPrimaryPhone(value.phones, index));
-    const stored = toClinicPhone(row.digits);
+    const stored = toAppPhone(row.digits);
     notify.success(
-      t(K.primaryChanged, { number: stored ? formatClinicPhone(stored) : row.digits }),
+      t(K.primaryChanged, { number: stored ? formatAppPhone(stored) : row.digits }),
     );
   };
   return (
@@ -217,7 +217,7 @@ function PhoneRow({
             {row.whatsapp ? '✓' : null}
           </span>
           <WhatsAppMark aria-hidden="true" className="size-3" />
-          {tClinic(CLINIC_KEYS.channels.whatsapp)}
+          {tApp(APP_KEYS.channels.whatsapp)}
         </button>
         {value.phones.length > 1 ? (
           <Button
@@ -241,7 +241,7 @@ function PhoneRow({
 /** The Instagram rows (H:1976–1978): "@handle" ≤ 30, "×" on each, "+ Add handle". */
 function HandleRows({ value, onChange, testId }: ContactStepProps) {
   const { t } = useTranslation(CONTACT_EDITOR_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const labelId = useId();
   const setHandles = (instagram: string[]) => onChange({ ...value, instagram });
   const remove = (index: number) => {
@@ -252,7 +252,7 @@ function HandleRows({ value, onChange, testId }: ContactStepProps) {
   return (
     <fieldset aria-labelledby={labelId} className="flex min-w-0 flex-col gap-1.5">
       <span id={labelId} className="text-muted-foreground-strong text-xs font-medium">
-        {tClinic(CLINIC_KEYS.channels.instagram)}
+        {tApp(APP_KEYS.channels.instagram)}
       </span>
       {ordinalsOf(value.instagram).map((n) => {
         const index = n - 1;
@@ -325,7 +325,7 @@ export function ContactIdentityFields({
   testId,
 }: ContactStepProps & { recordId: string | null; linked?: ContactLinkedNotice }) {
   const { t } = useTranslation(CONTACT_EDITOR_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const { t: tErrors } = useTranslation(ERRORS_NS);
   const nameId = useId();
   const lastNameId = useId();
@@ -429,7 +429,7 @@ export function ContactIdentityFields({
             label={t(K.defaultChannel)}
             options={CONTACT_CHANNELS.map((channel) => ({
               value: channel,
-              label: tClinic(CLINIC_KEYS.channels[channel]),
+              label: tApp(APP_KEYS.channels[channel]),
               tone: CHANNELS[channel].tone,
               icon: CHANNELS[channel].icon,
             }))}

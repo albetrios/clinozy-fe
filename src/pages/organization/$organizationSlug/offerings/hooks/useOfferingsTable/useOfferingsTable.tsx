@@ -8,14 +8,14 @@ import {
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import { OFFERING_CATEGORY_TONES, TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import { OFFERING_CATEGORY_TONES, TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { IdPill } from '@/shared/components/Cells/index.ts';
 import {
   type DataTableFeatures,
   dataTableFeatures,
 } from '@/shared/components/DataTable/index.ts';
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 import {
   sortingFromSearch,
   sortingToSearch,
@@ -68,7 +68,7 @@ function useOfferingColumns(
   const { t } = useTranslation(OFFERINGS_NS);
   const text = useOfferingText();
   const branchFold = useBranchFold();
-  const clock = useClinicClock();
+  const clock = useAppClock();
 
   return [
     {

@@ -113,6 +113,23 @@ surfaces. Manifest `module` keys must match this catalog:
 | `members`      | Members resource registry reference; settings members panel |
 | `integrations` | Settings integrations panel (planned)                       |
 
+The clinic rooms carry one key each (`APP_MODULES`, `src/core/config/app-modules.ts`).
+The `app-` prefix is the rooms' code name — the word clinozy-be uses for the same
+records (`/api/v1/app/…`, schema `app`); the screens still say "clinic".
+
+| Key                | Room (its routes and nav entry)                            |
+| ------------------ | ---------------------------------------------------------- |
+| `app-today`        | Today                                                      |
+| `app-leads`        | Leads                                                      |
+| `app-appointments` | Appointments                                               |
+| `app-patients`     | Patients and the patient file                              |
+| `app-medical`      | Medical — still on fixtures, so production must disable it |
+| `app-stock`        | Clinic stock                                               |
+| `app-payments`     | Payments and invoices                                      |
+| `app-tasks`        | Tasks                                                      |
+| `app-offerings`    | Offerings                                                  |
+| `app-users`        | Users (Team, Roles & access, Branches)                     |
+
 UI should hide nav/settings entries via `isModuleEnabled()` when a module is
 off — routes still 404 via the gateway if linked directly.
 

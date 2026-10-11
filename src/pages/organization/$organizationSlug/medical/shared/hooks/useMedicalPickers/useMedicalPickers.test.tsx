@@ -3,8 +3,8 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
+import { resetAppFixtures } from '@/shared/api/app/fixtures/world.fixtures.ts';
 
 import { useMedicalPickers } from './useMedicalPickers.ts';
 
@@ -32,9 +32,9 @@ function wrapper({ children }: { children: ReactNode }) {
 
 beforeEach(() => {
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
-afterEach(() => resetClinicFixtures());
+afterEach(() => resetAppFixtures());
 
 describe('useMedicalPickers (medical.md:175, 182, 311–325)', () => {
   it('offers the makers as tone pills with their medicine counts', async () => {

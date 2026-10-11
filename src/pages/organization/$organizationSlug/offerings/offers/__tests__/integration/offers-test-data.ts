@@ -1,14 +1,14 @@
 import { vi } from 'vitest';
 
-import { branchRef } from '@/shared/api/clinic/fixtures/organization.fixtures.ts';
-import type * as OfferingsApiModule from '@/shared/api/clinic/offerings-api.ts';
+import { branchRef } from '@/shared/api/app/fixtures/organization.fixtures.ts';
+import type * as OfferingsApiModule from '@/shared/api/app/offerings-api.ts';
 import {
   offerChangeOf,
   offerCreateBodyOf,
   type OfferFields,
   type OfferingRecord,
   type OfferRecord,
-} from '@/shared/api/clinic/offerings-contracts.ts';
+} from '@/shared/api/app/offerings-contracts.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { offeringRecord, offerRecord } from '@/tests/utils/offering-doubles.ts';
 

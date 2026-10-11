@@ -1,10 +1,10 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 
 /**
- * The stacked "New offering" lives in `clinic`, not the room's `offerings`:
+ * The stacked "New offering" lives in `app`, not the room's `offerings`:
  * the Invoice drawer opens it, wherever that drawer is (KICKOFF §6.11, L-40).
  */
-export const OFFERING_QUICK_CREATE_NS = I18N_NAMESPACES.clinic;
+export const OFFERING_QUICK_CREATE_NS = I18N_NAMESPACES.app;
 
 /** Key paths for the stacked "New offering" (`offerings.md` › Forms, Popups; verbatim). */
 export const OFFERING_QUICK_CREATE_KEYS = {

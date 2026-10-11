@@ -1,4 +1,4 @@
-import { clockMinutes, clockOfMinutes } from '@/shared/api/clinic/clinic-time.ts';
+import { clockMinutes, clockOfMinutes } from '@/shared/api/app/app-time.ts';
 
 /** The first tile the time picker offers (`users.md:114`). */
 export const TIME_PICKER_FROM = '06:00';

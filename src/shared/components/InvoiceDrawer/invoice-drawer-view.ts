@@ -1,9 +1,9 @@
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import { CLINIC_KEYS } from '@/shared/clinic/clinic.constants.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
+import { APP_KEYS } from '@/shared/app/app.constants.ts';
 import {
   type DrawerPeekItem,
   type DrawerPeekPill,
@@ -80,7 +80,7 @@ function badgesOf(
   const badges: DrawerBadge[] = [
     {
       id: 'type',
-      label: t(CLINIC_KEYS.invoiceTypes[values.type]),
+      label: t(APP_KEYS.invoiceTypes[values.type]),
       tone: INVOICE_TYPE_TONES[values.type],
     },
     {
@@ -97,7 +97,7 @@ function badgesOf(
     });
   }
   const modes = paidNowSplits(values.paidNow).map((split) =>
-    t(CLINIC_KEYS.paymentModes[split.mode]),
+    t(APP_KEYS.paymentModes[split.mode]),
   );
   if (modes.length > 1)
     badges.push({ id: 'modes', label: modes.join(' + '), tone: 'sky' });
@@ -129,7 +129,7 @@ function paymentPeek(
     });
     return [{ kind: 'value', label: t(K.fields.paid), value: paid }];
   }
-  const modes = input.values.paidNow.map((row) => t(CLINIC_KEYS.paymentModes[row.mode]));
+  const modes = input.values.paidNow.map((row) => t(APP_KEYS.paymentModes[row.mode]));
   return [
     { kind: 'value', label: t(K.fields.quickFill) },
     { kind: 'items', label: t(K.payment.mode), names: modes },
@@ -158,7 +158,7 @@ function stepsOf(
     ? `${percentOf(values.overallDiscountPct)}%`
     : formatPaise(overallDiscountPaise(values));
   const paid = paidNowSplits(values.paidNow).map(
-    (split) => `${t(CLINIC_KEYS.paymentModes[split.mode])} ${formatPaise(split.amount)}`,
+    (split) => `${t(APP_KEYS.paymentModes[split.mode])} ${formatPaise(split.amount)}`,
   );
   const remark = values.remark.trim() || undefined;
   return {
@@ -236,7 +236,7 @@ export function useInvoiceDrawerView(input: InvoiceDrawerViewInput): InvoiceDraw
   const formatPaise = usePaiseFormat();
   const { values } = input;
   const lines = namedLines(values.items);
-  const typeLabel = t(CLINIC_KEYS.invoiceTypes[values.type]);
+  const typeLabel = t(APP_KEYS.invoiceTypes[values.type]);
   return {
     ...headerOf(input, t),
     tag: input.seq === null ? undefined : displayId.invoiceNumber(input.seq),

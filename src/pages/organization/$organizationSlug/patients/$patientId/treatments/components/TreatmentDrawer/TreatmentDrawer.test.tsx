@@ -2,12 +2,12 @@ import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type * as DirectoryApiModule from '@/shared/api/clinic/directory-api.ts';
-import type * as OfferingsApiModule from '@/shared/api/clinic/offerings-api.ts';
-import type * as PatientPackagesApiModule from '@/shared/api/clinic/patient-packages-api.ts';
-import { listPatientPackages } from '@/shared/api/clinic/patient-packages-api.ts';
-import type * as TreatmentsApiModule from '@/shared/api/clinic/treatments-api.ts';
-import { createTreatment, updateTreatment } from '@/shared/api/clinic/treatments-api.ts';
+import type * as DirectoryApiModule from '@/shared/api/app/directory-api.ts';
+import type * as OfferingsApiModule from '@/shared/api/app/offerings-api.ts';
+import type * as PatientPackagesApiModule from '@/shared/api/app/patient-packages-api.ts';
+import { listPatientPackages } from '@/shared/api/app/patient-packages-api.ts';
+import type * as TreatmentsApiModule from '@/shared/api/app/treatments-api.ts';
+import { createTreatment, updateTreatment } from '@/shared/api/app/treatments-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { withoutBidiMarks } from '@/tests/utils/bidi-marks.ts';
@@ -50,7 +50,7 @@ const { notifyMock } = vi.hoisted(() => ({
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 
 const world = vi.hoisted(() => ({}) as TreatmentsWorld);
-vi.mock('@/shared/api/clinic/treatments-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/treatments-api.ts', async (importOriginal) => {
   const { treatmentsApiDouble } =
     await import('../../__tests__/integration/treatment-doubles.ts');
   return {
@@ -58,7 +58,7 @@ vi.mock('@/shared/api/clinic/treatments-api.ts', async (importOriginal) => {
     ...treatmentsApiDouble(world),
   };
 });
-vi.mock('@/shared/api/clinic/patient-packages-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/patient-packages-api.ts', async (importOriginal) => {
   const { packagesApiDouble } =
     await import('../../__tests__/integration/treatment-doubles.ts');
   return {
@@ -66,13 +66,13 @@ vi.mock('@/shared/api/clinic/patient-packages-api.ts', async (importOriginal) =>
     ...packagesApiDouble(world),
   };
 });
-vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/offerings-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof OfferingsApiModule>()),
   fetchAllOfferings: vi.fn(async () =>
     BOOKABLE_TREATMENTS.map((treatment) => offeringRecord(treatment)),
   ),
 }));
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof DirectoryApiModule>()),
   fetchTeamDirectory: vi.fn(async () => TEAM),
 }));

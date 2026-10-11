@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
 import type { Notification } from '@/shared/api/notification-contracts.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
@@ -17,7 +17,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/shared/components/ui/popover.tsx';
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 import {
   useMarkAllNotificationsRead,
   useMarkNotificationRead,
@@ -83,7 +83,7 @@ function NotificationRow({
   item: Notification;
   onClick: (item: Notification) => void;
 }) {
-  const clock = useClinicClock();
+  const clock = useAppClock();
   const look = NOTIFICATION_CATEGORY_LOOK[item.category];
   return (
     <li>

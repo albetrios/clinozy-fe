@@ -1,9 +1,6 @@
 import { paiseOfRupees, rupeesOfPaise } from '@/lib/number-text.ts';
-import type {
-  CreditRow,
-  CreditSettlement,
-} from '@/shared/api/clinic/credits-contracts.ts';
-import { paidAtOn } from '@/shared/api/clinic/payments-contracts.ts';
+import type { CreditRow, CreditSettlement } from '@/shared/api/app/credits-contracts.ts';
+import { paidAtOn } from '@/shared/api/app/payments-contracts.ts';
 import {
   FIRST_SPLIT_MODE,
   paidSplits,

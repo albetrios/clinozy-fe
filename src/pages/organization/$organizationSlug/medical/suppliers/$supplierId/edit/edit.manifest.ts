@@ -13,7 +13,7 @@ export const manifest = {
   title: 'Edit supplier',
   testId: 'supplier-drawer',
   permission: 'organization:read',
-  module: 'clinic-medical',
+  module: 'app-medical',
   kind: 'leaf',
   children: [],
 } as const satisfies PageManifest;

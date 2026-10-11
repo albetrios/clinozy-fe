@@ -1,4 +1,4 @@
-import type { PoStage, Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { PoStage, Tone } from '@/shared/api/app/app-schema.ts';
 
 /** A purchase order's stage pill and row edge (`medical.md:61`). */
 export const PURCHASE_STAGE_TONES: Readonly<Record<PoStage, Tone>> = {

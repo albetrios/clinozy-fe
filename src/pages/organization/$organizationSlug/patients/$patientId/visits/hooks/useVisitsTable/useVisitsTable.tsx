@@ -1,11 +1,11 @@
 import { type ColumnDef, useTable } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 
-import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import { serviceTone } from '@/shared/clinic/appointment-display.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { APPOINTMENT_STATUS_TONES, TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { AppointmentRow } from '@/shared/api/app/appointments-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { APPOINTMENT_STATUS_TONES, TONE_CLASSES } from '@/shared/app/app-tones.ts';
+import { serviceTone } from '@/shared/app/appointment-display.ts';
 import { IdPill, TonePill } from '@/shared/components/Cells/index.ts';
 import {
   type DataTableFeatures,
@@ -31,14 +31,14 @@ const rowOf = (original: unknown) => original as AppointmentRow;
  * it; the doctor's chip folds to nothing (H:4115).
  */
 function useVisitsColumns(): ColumnDef<DataTableFeatures, AppointmentRow>[] {
-  const { t } = useTranslation([PATIENT_TABLE_NS, CLINIC_NS]);
+  const { t } = useTranslation([PATIENT_TABLE_NS, APP_NS]);
   const slot = useAppointmentSlotLabel();
   const when = (row: AppointmentRow) => {
     const label = slot(row.date, row.startTime);
     return `${label.day} · ${label.time}`;
   };
   const status = (row: AppointmentRow) =>
-    t(CLINIC_KEYS.appointments.statuses[row.status], { ns: CLINIC_NS });
+    t(APP_KEYS.appointments.statuses[row.status], { ns: APP_NS });
   return [
     {
       id: 'id',

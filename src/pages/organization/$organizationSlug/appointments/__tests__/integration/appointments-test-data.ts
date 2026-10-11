@@ -1,5 +1,7 @@
 import { vi } from 'vitest';
 
+import type { AppointmentStatus } from '@/shared/api/app/app-schema.ts';
+import { appInstant, appToday } from '@/shared/api/app/app-time.ts';
 import {
   type AppointmentCancel,
   type AppointmentCreateInput,
@@ -12,10 +14,8 @@ import {
   type AppointmentRow,
   type AppointmentSlotParams,
   statusesForFilter,
-} from '@/shared/api/clinic/appointments-contracts.ts';
-import type { AppointmentStatus } from '@/shared/api/clinic/clinic-schema.ts';
-import { clinicInstant, clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
+} from '@/shared/api/app/appointments-contracts.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import {
   APPOINTMENT_TODAY,
@@ -97,7 +97,7 @@ export const MEERA_BOOKING = personBooking('meera', 2863, 'Meera Iyer', {
   serviceLabel: 'HydraFacial',
   type: 'treatment',
   status: 'checked_in',
-  checkedInAt: clinicInstant(APPOINTMENT_TODAY, '08:35'),
+  checkedInAt: appInstant(APPOINTMENT_TODAY, '08:35'),
 });
 
 /** Dev Shah (#2864) — a contact, Scheduled with Dr. Arjun tomorrow at 12:00, moved twice. */
@@ -107,7 +107,7 @@ export const DEV_BOOKING = personBooking('dev', 2864, 'Dev Shah', {
   startTime: '12:00',
   endTime: '12:20',
   moveCount: 2,
-  rescheduledFrom: clinicInstant('2026-10-02', '16:30'),
+  rescheduledFrom: appInstant('2026-10-02', '16:30'),
 });
 
 /** Tara Kapoor (#2865) — a lead, Cancelled with Dr. Nisha today at 13:00. */
@@ -199,7 +199,7 @@ const MOVED_TO: Readonly<Record<AppointmentMoveRoute, AppointmentStatus>> = {
 };
 
 /**
- * `@/shared/api/clinic/appointments-api.ts` over an {@link AppointmentsWorld} — every read
+ * `@/shared/api/app/appointments-api.ts` over an {@link AppointmentsWorld} — every read
  * answers from it and every write changes it, so a later read shows the write. An unknown id is
  * a 404.
  */
@@ -229,7 +229,7 @@ export function appointmentsApiDouble(world: AppointmentsWorld) {
   const nextSeq = () => Math.max(...world.rows.map((row) => row.seq)) + 1;
   return {
     listAppointments: vi.fn(async (params: AppointmentListParams, after?: string) => {
-      const from = params.date ?? clinicToday();
+      const from = params.date ?? appToday();
       const rows = bySlot(
         world.rows.filter(
           (row) =>
@@ -358,7 +358,7 @@ export function appointmentsApiDouble(world: AppointmentsWorld) {
   };
 }
 
-/** `@/shared/api/clinic/directory-api.ts`'s team reads over {@link TEAM}. */
+/** `@/shared/api/app/directory-api.ts`'s team reads over {@link TEAM}. */
 export function directoryApiDouble() {
   return {
     fetchTeamDirectory: vi.fn(async () => structuredClone([...TEAM])),

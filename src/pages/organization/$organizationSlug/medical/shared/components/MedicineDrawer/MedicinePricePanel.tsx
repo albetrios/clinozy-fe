@@ -7,8 +7,8 @@ import {
   drawerMarginTone,
   marginPercent,
   mrpSplit,
-} from '@/shared/api/clinic/medicine-stock.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/api/app/medicine-stock.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import {
   DrawerField,
   DrawerNumberInput,

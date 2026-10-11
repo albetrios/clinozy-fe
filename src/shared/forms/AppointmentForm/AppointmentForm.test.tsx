@@ -9,23 +9,27 @@ import {
   fetchAppointmentSlots,
   moveAppointment,
   updateAppointment,
-} from '@/shared/api/clinic/appointments-api.ts';
+} from '@/shared/api/app/appointments-api.ts';
 import type {
   AppointmentRow,
   AppointmentSlotDay,
-} from '@/shared/api/clinic/appointments-contracts.ts';
+} from '@/shared/api/app/appointments-contracts.ts';
 import {
   createContact,
   fetchContact,
   updateContact,
-} from '@/shared/api/clinic/contacts-api.ts';
-import type { Contact } from '@/shared/api/clinic/contacts-contracts.ts';
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
-import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
+} from '@/shared/api/app/contacts-api.ts';
+import type { Contact } from '@/shared/api/app/contacts-contracts.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
+import type { LeadRecord } from '@/shared/api/app/leads-contracts.ts';
 import { CONFIRM_TEST_IDS } from '@/shared/components/ConfirmDialog/index.ts';
 import { useAppointment } from '@/shared/hooks/useAppointments/index.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import {
+  fixtureActiveBranches,
+  signInTestMember,
+} from '@/tests/utils/app-shell-doubles.ts';
 import {
   APPOINTMENT_NOW,
   APPOINTMENT_TODAY,
@@ -38,10 +42,6 @@ import {
 } from '@/tests/utils/appointment-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { fsi } from '@/tests/utils/bidi-marks.ts';
-import {
-  fixtureActiveBranches,
-  signInTestMember,
-} from '@/tests/utils/clinic-shell-doubles.ts';
 import { EMPTY_CONTACT_PROFILE } from '@/tests/utils/contact-doubles.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
@@ -65,8 +65,8 @@ const { notifyMock } = vi.hoisted(() => ({
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 
-vi.mock('@/shared/hooks/useClinicAccess/index.ts', () => ({
-  useClinicAccess: () => ({
+vi.mock('@/shared/hooks/useAppAccess/index.ts', () => ({
+  useAppAccess: () => ({
     previewRole: null,
     can: () => true,
     canCode: () => true,
@@ -90,7 +90,7 @@ const world = vi.hoisted(() => ({
 /** A new booking's id — #2870. */
 const BOOKED_ID = 'appt_new000000000000000000';
 
-vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/appointments-api.ts', async (importOriginal) => {
   const { appointmentRow: row, slotDay: day } =
     await import('@/tests/utils/appointment-doubles.ts');
   const { HttpError } = await import('@/shared/errors/HttpError.ts');
@@ -206,7 +206,7 @@ vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => {
   };
 });
 
-vi.mock('@/shared/api/clinic/contacts-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/contacts-api.ts', async (importOriginal) => {
   const { HttpError } = await import('@/shared/errors/HttpError.ts');
   const find = (id: string) => {
     const found = world.contacts.find((entry) => entry.id === id);
@@ -274,7 +274,7 @@ vi.mock('@/shared/api/clinic/contacts-api.ts', async (importOriginal) => {
   };
 });
 
-vi.mock('@/shared/api/clinic/leads-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/leads-api.ts', async (importOriginal) => {
   const { HttpError } = await import('@/shared/errors/HttpError.ts');
   return {
     ...(await importOriginal<object>()),
@@ -287,7 +287,7 @@ vi.mock('@/shared/api/clinic/leads-api.ts', async (importOriginal) => {
   };
 });
 
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchTeamDirectory: vi.fn(async () => structuredClone(world.team)),
   fetchMemberNames: vi.fn(
@@ -301,13 +301,13 @@ vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => ({
 }));
 
 // The one offerings catalogue — "From offerings" and the chat's offering names: empty here.
-vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/offerings-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchAllOfferings: vi.fn(async () => []),
 }));
 
 // The person's chat beside an Edit: a quiet stream.
-vi.mock('@/shared/api/clinic/contact-activities-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/contact-activities-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchContactThread: vi.fn(async () => ({ thread: null, messages: [], authors: {} })),
   sendContactActivity: vi.fn(),

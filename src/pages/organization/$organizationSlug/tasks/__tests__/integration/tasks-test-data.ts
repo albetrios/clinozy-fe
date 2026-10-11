@@ -12,8 +12,8 @@
 import { vi } from 'vitest';
 
 import { PRODUCT_NAME } from '@/lib/product-identity.ts';
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
-import type { TaskPage } from '@/shared/api/clinic/tasks-api.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
+import type { TaskPage } from '@/shared/api/app/tasks-api.ts';
 import {
   normalizeTaskListQuery,
   TASK_RULE_KEY_VALUES,
@@ -23,7 +23,7 @@ import {
   type TaskRuleKey,
   type TaskRuleSettingChange,
   type TaskRuleSettings,
-} from '@/shared/api/clinic/tasks-contracts.ts';
+} from '@/shared/api/app/tasks-contracts.ts';
 import {
   taskPerson,
   taskRecord,

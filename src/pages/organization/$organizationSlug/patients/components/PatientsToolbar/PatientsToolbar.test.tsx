@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type { PatientRow } from '@/shared/api/clinic/patients-contracts.ts';
+import type { PatientRow } from '@/shared/api/app/patients-contracts.ts';
 import { dataTableFeatures } from '@/shared/components/DataTable/index.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 

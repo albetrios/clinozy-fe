@@ -2,8 +2,8 @@
  * How the Tasks room names people and records (KICKOFF §6.10): pure, shared by
  * the rows, New task, the task drawer and "What’s next".
  */
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { TaskPerson, TaskRow } from '@/shared/api/clinic/tasks-contracts.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { TaskPerson, TaskRow } from '@/shared/api/app/tasks-contracts.ts';
 import type { ContactCardData } from '@/shared/components/PersonCard/index.ts';
 
 /** What a task's person is to the clinic: a patient, a lead, or a chat-only contact. */

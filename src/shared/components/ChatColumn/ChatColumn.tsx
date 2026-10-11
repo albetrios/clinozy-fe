@@ -6,8 +6,8 @@ import {
   chatPersonKey,
   type ChatThread as ChatThreadRecord,
   type ChatThreadRead,
-} from '@/shared/api/clinic/messages-contracts.ts';
-import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
+} from '@/shared/api/app/messages-contracts.ts';
+import { formatAppPhone } from '@/shared/app/app-phone.ts';
 import {
   PersonAvatar,
   personInitials,
@@ -122,7 +122,7 @@ function ChatHeader({
             dir="ltr"
             className="text-caption text-muted-foreground truncate [text-align:match-parent] tabular-nums"
           >
-            {formatClinicPhone(contact.phone)}
+            {formatAppPhone(contact.phone)}
           </span>
         ) : null}
       </span>

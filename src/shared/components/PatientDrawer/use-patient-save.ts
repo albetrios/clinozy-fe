@@ -1,12 +1,12 @@
 import type { FieldPath, UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { attachPatientImage } from '@/shared/api/clinic/patient-images-api.ts';
+import { attachPatientImage } from '@/shared/api/app/patient-images-api.ts';
 import type {
   PatientFields,
   PatientPersonInput,
   PatientRecord,
-} from '@/shared/api/clinic/patients-contracts.ts';
+} from '@/shared/api/app/patients-contracts.ts';
 import { mapApiError } from '@/shared/errors/errorHandler.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useCreatePatient, useUpdatePatient } from '@/shared/hooks/usePatients/index.ts';

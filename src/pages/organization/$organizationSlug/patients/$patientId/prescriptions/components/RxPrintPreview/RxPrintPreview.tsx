@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
 import { PrintPreview } from '@/shared/components/PrintPreview/index.ts';
 
 import { RX_KEYS, RX_NS, RX_TEST_IDS } from '../../prescriptions.constants.ts';

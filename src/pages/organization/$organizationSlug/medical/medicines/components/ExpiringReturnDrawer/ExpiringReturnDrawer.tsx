@@ -2,9 +2,9 @@ import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { isolateValues } from '@/lib/bidi-isolate.ts';
-import { expiryTone } from '@/shared/api/clinic/medicine-stock.ts';
-import type { MedicineRow } from '@/shared/api/clinic/medicines-contracts.ts';
-import { SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
+import { expiryTone } from '@/shared/api/app/medicine-stock.ts';
+import type { MedicineRow } from '@/shared/api/app/medicines-contracts.ts';
+import { SECTION_TONES } from '@/shared/app/app-tones.ts';
 import {
   DrawerField,
   DrawerFieldGrid,

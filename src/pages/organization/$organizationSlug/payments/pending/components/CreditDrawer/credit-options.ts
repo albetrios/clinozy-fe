@@ -1,10 +1,10 @@
 import type { TFunction } from 'i18next';
 
 import { isolateText } from '@/lib/bidi-isolate.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { CreditPartyRow } from '@/shared/api/clinic/credits-contracts.ts';
-import type { InvoiceRecord } from '@/shared/api/clinic/invoices-contracts.ts';
-import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { CreditPartyRow } from '@/shared/api/app/credits-contracts.ts';
+import type { InvoiceRecord } from '@/shared/api/app/invoices-contracts.ts';
+import { formatAppPhone } from '@/shared/app/app-phone.ts';
 import { personInitials } from '@/shared/components/Cells/index.ts';
 import type { PickerOption } from '@/shared/components/Picker/index.ts';
 
@@ -22,7 +22,7 @@ function partySub(row: CreditPartyRow, t: TFunction): string {
     return t(K.parties.patient, { id: isolateText(displayId.patient(row.seq)) });
   if (row.kind === 'contact') {
     return row.phone
-      ? t(K.parties.contactPhone, { phone: isolateText(formatClinicPhone(row.phone)) })
+      ? t(K.parties.contactPhone, { phone: isolateText(formatAppPhone(row.phone)) })
       : t(K.parties.contact);
   }
   return t(row.kind === 'vendor' ? K.parties.vendor : K.parties.supplier);

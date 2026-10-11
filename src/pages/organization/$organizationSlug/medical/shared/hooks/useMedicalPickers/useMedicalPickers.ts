@@ -6,8 +6,8 @@ import type {
   MedicalRep,
   Supplier,
   Tone,
-} from '@/shared/api/clinic/clinic-schema.ts';
-import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
+} from '@/shared/api/app/app-schema.ts';
+import { formatAppPhone } from '@/shared/app/app-phone.ts';
 import type { PickerOption } from '@/shared/components/Picker/index.ts';
 
 import {
@@ -115,7 +115,7 @@ export function useMedicalPickers(): MedicalPickers {
     setAdded((current) => ({ ...current, [key]: [...current[key], partner] }));
 
   const phoneLine = (phone: string | null) =>
-    phone ? formatClinicPhone(phone) : t(K.pickers.noPhone);
+    phone ? formatAppPhone(phone) : t(K.pickers.noPhone);
   const partnerOption = (row: PartnerEntry, group?: string): PickerOption => ({
     key: row.id,
     label: row.name,

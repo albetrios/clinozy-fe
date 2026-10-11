@@ -6,13 +6,13 @@ import { axe } from 'vitest-axe';
 import {
   branchRef,
   MAIN_BRANCH,
-} from '@/shared/api/clinic/fixtures/organization.fixtures.ts';
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+} from '@/shared/api/app/fixtures/organization.fixtures.ts';
+import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
+import { resetAppFixtures } from '@/shared/api/app/fixtures/world.fixtures.ts';
 import {
   listFixtureLedger,
   payFixtureExpense,
-} from '@/shared/api/clinic/payments-fixture-api.ts';
+} from '@/shared/api/app/payments-fixture-api.ts';
 
 import {
   renderMedicalRoutes,
@@ -46,12 +46,12 @@ beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] });
   vi.setSystemTime(NOW);
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 afterEach(() => {
   vi.useRealTimers();
   resetMedicalRoutes();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 
 describe('MedicalPaymentsPage', () => {

@@ -17,7 +17,7 @@ import { House } from '@/shared/icons/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
-import { previewPreset } from '@/tests/utils/clinic-preset-codes.ts';
+import { previewPreset } from '@/tests/utils/app-preset-codes.ts';
 
 import { navCandidates, type NavRoute, useAppNav } from './useAppNav.ts';
 
@@ -46,7 +46,7 @@ function manifest(
 
 const room = (section: string): NavRoute => ({
   fullPath: `${ORG}/${section}`,
-  manifest: manifest(section, { id: section, section }, `clinic-${section}`),
+  manifest: manifest(section, { id: section, section }, `app-${section}`),
 });
 const enabled = () => true;
 const ids = (entries: { id: string }[]) => entries.map((entry) => entry.id);
@@ -60,7 +60,7 @@ describe('navCandidates', () => {
       to: `${ORG}/today`,
       section: 'today',
       icon: House,
-      labelNs: 'clinic',
+      labelNs: 'app',
       labelKey: 'sections.today.label',
       permission: 'organization:read',
     });
@@ -68,7 +68,7 @@ describe('navCandidates', () => {
 
   it('lists nothing when the deployment enables no clinic room (D8)', () => {
     const routes = [room('today'), room('leads')];
-    expect(navCandidates(routes, (key) => !key.startsWith('clinic-'))).toEqual([]);
+    expect(navCandidates(routes, (key) => !key.startsWith('app-'))).toEqual([]);
   });
 
   it('lists only the rooms under the organization shell', () => {
@@ -86,9 +86,7 @@ describe('navCandidates', () => {
       },
       { fullPath: `${ORG}/inbox`, manifest: manifest('inbox', undefined) },
     ];
-    expect(ids(navCandidates(routes, (key) => key !== 'clinic-leads'))).toEqual([
-      'today',
-    ]);
+    expect(ids(navCandidates(routes, (key) => key !== 'app-leads'))).toEqual(['today']);
   });
 });
 

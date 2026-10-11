@@ -1,14 +1,11 @@
 import { useLocation, useNavigate, useParams } from '@tanstack/react-router';
 import { useEffect } from 'react';
 
-import { CLINIC_MODULES } from '@/core/config/clinic-modules.ts';
+import { APP_MODULES } from '@/core/config/app-modules.ts';
 import { isModuleEnabled } from '@/core/security/gates/require-module.ts';
-import { CLINIC_SECTION_ROUTES } from '@/shared/clinic/clinic-home.ts';
-import {
-  clinicSectionForPath,
-  clinicSectionLanding,
-} from '@/shared/clinic/clinic-sections.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { APP_SECTION_ROUTES } from '@/shared/app/app-home.ts';
+import { appSectionForPath, appSectionLanding } from '@/shared/app/app-sections.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 
 /**
  * Off a room the access in force can't view (KICKOFF §6.12 View-as; Q-U11):
@@ -21,23 +18,23 @@ import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
  * and the hash (an open Settings modal) rides along.
  */
 export function useRoomLanding(): void {
-  const { isResolved, viewableSections } = useClinicAccess();
+  const { isResolved, viewableSections } = useAppAccess();
   const pathname = useLocation({ select: (location) => location.pathname });
   const { organizationSlug = '' } = useParams({ strict: false });
   const navigate = useNavigate();
-  const section = clinicSectionForPath(pathname);
+  const section = appSectionForPath(pathname);
   const landing =
     isResolved && section !== null && !viewableSections.includes(section)
-      ? clinicSectionLanding(
+      ? appSectionLanding(
           section,
-          viewableSections.filter((open) => isModuleEnabled(CLINIC_MODULES[open])),
+          viewableSections.filter((open) => isModuleEnabled(APP_MODULES[open])),
         )
       : null;
 
   useEffect(() => {
     if (!(landing && organizationSlug)) return;
     void navigate({
-      to: CLINIC_SECTION_ROUTES[landing],
+      to: APP_SECTION_ROUTES[landing],
       params: { organizationSlug },
       // The Settings modal is the hash's: it stays open over the new room.
       hash: true,

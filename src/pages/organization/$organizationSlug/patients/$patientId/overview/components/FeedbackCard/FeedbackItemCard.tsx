@@ -2,10 +2,10 @@ import { useTranslation } from 'react-i18next';
 
 import { isolateText } from '@/lib/bidi-isolate.ts';
 import { cn } from '@/lib/utils.ts';
-import type { FeedbackActionKind } from '@/shared/api/clinic/clinic-schema.ts';
-import { localDateOf } from '@/shared/api/clinic/clinic-time.ts';
-import type { FeedbackItem } from '@/shared/api/clinic/feedback-contracts.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import type { FeedbackActionKind } from '@/shared/api/app/app-schema.ts';
+import { localDateOf } from '@/shared/api/app/app-time.ts';
+import type { FeedbackItem } from '@/shared/api/app/feedback-contracts.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
   DropdownMenu,

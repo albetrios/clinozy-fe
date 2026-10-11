@@ -2,14 +2,14 @@ import { act, waitFor } from '@testing-library/react';
 import { useEffect } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type * as DirectoryApiModule from '@/shared/api/clinic/directory-api.ts';
-import { fetchTeamDirectory } from '@/shared/api/clinic/directory-api.ts';
-import type * as LeadsApiModule from '@/shared/api/clinic/leads-api.ts';
-import { listLeads } from '@/shared/api/clinic/leads-api.ts';
+import type * as DirectoryApiModule from '@/shared/api/app/directory-api.ts';
+import { fetchTeamDirectory } from '@/shared/api/app/directory-api.ts';
+import type * as LeadsApiModule from '@/shared/api/app/leads-api.ts';
+import { listLeads } from '@/shared/api/app/leads-api.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import type * as MyMembershipModule from '@/shared/tenancy/my-membership.ts';
 import { findMyMembershipId } from '@/shared/tenancy/my-membership.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 
 import {
   KABIR,
@@ -26,12 +26,12 @@ const world = vi.hoisted(() => ({}) as LeadsWorld);
 const membership = vi.hoisted(() => ({
   answer: null as ((id: string | null) => void) | null,
 }));
-vi.mock('@/shared/api/clinic/leads-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/leads-api.ts', async (importOriginal) => {
   const { leadsApiDouble } =
     await import('../../__tests__/integration/leads-test-data.ts');
   return { ...(await importOriginal<typeof LeadsApiModule>()), ...leadsApiDouble(world) };
 });
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => {
   const { directoryApiDouble } =
     await import('../../__tests__/integration/leads-test-data.ts');
   return {

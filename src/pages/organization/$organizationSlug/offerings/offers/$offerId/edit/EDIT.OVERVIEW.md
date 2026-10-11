@@ -5,7 +5,7 @@ the Offers tab (KICKOFF §4, D24; `S:103`). The route renders nothing: the Offer
 URL and opens the offer's drawer over the list, so a refresh or a shared link reopens it. A row
 click and a row's Edit come here. The `$offerId` segment has no page of its own — its folder holds
 only this island. Gated like the room — membership (`organization:read`) and the
-`clinic-offerings` module, then `requireOrgStatus`. The route stays reachable for a viewer: without
+`app-offerings` module, then `requireOrgStatus`. The route stays reachable for a viewer: without
 `offering:update` the drawer is view only, and without `offering:delete` it has no Delete. The offer is
 the list's copy, or — for a deep link the list does not hold yet — its own read
 (`GET /app/offers/:offer_id`), with Retry in the drawer when that read fails. An id that names no offer
@@ -16,11 +16,11 @@ changed with the read's `updated_at` (`PATCH /app/offers/:offer_id`). The drawer
 
 ## Files
 
-| File                | Responsibility                                                                                            |
-| ------------------- | --------------------------------------------------------------------------------------------------------- |
-| `edit.route.tsx`    | Route marker — exports `Component` rendering `EditOfferPage`.                                             |
-| `edit.manifest.ts`  | Manifest — `kind: 'leaf'`, permission `organization:read`, module `clinic-offerings`, title "Edit offer". |
-| `EditOfferPage.tsx` | Renders nothing — the dialog route's own UI. The drawer mounts on the Offers page.                        |
+| File                | Responsibility                                                                                         |
+| ------------------- | ------------------------------------------------------------------------------------------------------ |
+| `edit.route.tsx`    | Route marker — exports `Component` rendering `EditOfferPage`.                                          |
+| `edit.manifest.ts`  | Manifest — `kind: 'leaf'`, permission `organization:read`, module `app-offerings`, title "Edit offer". |
+| `EditOfferPage.tsx` | Renders nothing — the dialog route's own UI. The drawer mounts on the Offers page.                     |
 
 ## Test ids
 

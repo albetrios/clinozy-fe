@@ -1,10 +1,10 @@
 import { MONEY_SCALE, numberFromText, textFromNumber } from '@/lib/number-text.ts';
-import type { SupplierRate } from '@/shared/api/clinic/clinic-schema.ts';
-import { cheapestRate } from '@/shared/api/clinic/medicine-stock.ts';
+import type { SupplierRate } from '@/shared/api/app/app-schema.ts';
+import { cheapestRate } from '@/shared/api/app/medicine-stock.ts';
 import type {
   MedicineInput,
   MedicineRecord,
-} from '@/shared/api/clinic/medicines-contracts.ts';
+} from '@/shared/api/app/medicines-contracts.ts';
 
 /*
  * The Medicine drawer's form (`medical.md:170–188`; KICKOFF §6.7): text as

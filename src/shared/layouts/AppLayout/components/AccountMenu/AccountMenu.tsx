@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { platformConfig } from '@/core/config/env.ts';
 import { cn } from '@/lib/utils.ts';
-import type { Presence } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Presence } from '@/shared/api/app/app-schema.ts';
 import { logout } from '@/shared/auth/service.ts';
 import { CountBadge } from '@/shared/components/Cells/CountBadge/index.ts';
 import {
@@ -26,8 +26,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu.tsx';
+import { useRoleLabel, useRolesInForce } from '@/shared/hooks/useAppRoles/index.ts';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
-import { useRoleLabel, useRolesInForce } from '@/shared/hooks/useClinicRoles/index.ts';
 import { useUnreadCount } from '@/shared/hooks/useNotifications/index.ts';
 import { usePresence } from '@/shared/hooks/usePresence/index.ts';
 import {

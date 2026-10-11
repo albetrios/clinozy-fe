@@ -3,10 +3,10 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { organizationLead } from '@/lib/routes/leads-builders.ts';
-import { isAppointmentSlotLocked } from '@/shared/api/clinic/appointment-status.ts';
-import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
-import { civilMonthStart } from '@/shared/api/clinic/clinic-time.ts';
-import { CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+import { civilMonthStart } from '@/shared/api/app/app-time.ts';
+import { isAppointmentSlotLocked } from '@/shared/api/app/appointment-status.ts';
+import type { AppointmentRow } from '@/shared/api/app/appointments-contracts.ts';
+import { APP_NS } from '@/shared/app/app.constants.ts';
 import {
   ChatColumn,
   type ChatHistoryTarget,
@@ -178,7 +178,7 @@ function useChatAside(
 
 /** The footer's words: the summary and the primary's label. */
 function useFooterWords(state: AppointmentFormState) {
-  const { t } = useTranslation([APPOINTMENT_FORM_NS, CLINIC_NS]);
+  const { t } = useTranslation([APPOINTMENT_FORM_NS, APP_NS]);
   const slotLabel = useAppointmentSlotLabel();
   const { draft } = state;
   const doctor = state.staff.find((member) => member.id === draft.doctorId);
@@ -241,7 +241,7 @@ function FormBody({
 
 /** One opening of the form: its draft, its checks and its writes. */
 function AppointmentFormSession(props: SessionProps) {
-  const { t } = useTranslation([APPOINTMENT_FORM_NS, CLINIC_NS]);
+  const { t } = useTranslation([APPOINTMENT_FORM_NS, APP_NS]);
   const state = useAppointmentFormState(props);
   const { ui, asking, closeCancel } = useFormUi(state);
   useCopiedToast(state);

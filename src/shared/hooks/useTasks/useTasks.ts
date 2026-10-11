@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
-import type { DeleteReason } from '@/shared/api/clinic/clinic-schema.ts';
+import type { DeleteReason } from '@/shared/api/app/app-schema.ts';
 import {
   addTask,
   countOpenTasks,
@@ -18,7 +18,7 @@ import {
   TASK_SIDE_EFFECT_KEYS,
   type TaskOutcomeInput,
   taskQueryKeys,
-} from '@/shared/api/clinic/tasks-api.ts';
+} from '@/shared/api/app/tasks-api.ts';
 import {
   findTaskOutcome,
   normalizeTaskListQuery,
@@ -32,10 +32,10 @@ import {
   TASKS_REFETCH_MS,
   type TaskSnoozeOption,
   taskSnoozeUntil,
-} from '@/shared/api/clinic/tasks-contracts.ts';
+} from '@/shared/api/app/tasks-contracts.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
 import {
   type CursorListResult,
@@ -116,7 +116,7 @@ export function useTask(
   options: TaskQueryOptions = {},
 ) {
   const organizationId = useOrganizationId();
-  const access = useClinicAccess();
+  const access = useAppAccess();
   return useAppQuery({
     queryKey: taskQueryKeys.detail(organizationId, taskId ?? ''),
     queryFn: () => fetchTask(taskId ?? '', access.canCode),

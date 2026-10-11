@@ -4,11 +4,11 @@ import {
   PATIENT_CONVERSION_VALUES,
   PATIENT_STATUS_VALUES,
   PATIENT_TYPE_VALUES,
-} from '@/shared/api/clinic/clinic-schema.ts';
+} from '@/shared/api/app/app-schema.ts';
 import {
   PATIENT_SORT_KEYS,
   PATIENT_VIEW_VALUES,
-} from '@/shared/api/clinic/patients-contracts.ts';
+} from '@/shared/api/app/patients-contracts.ts';
 import { roomFilterValues } from '@/shared/components/RoomToolbar/RoomFilters/room-filters.ts';
 
 import { PATIENT_FILTER_FIELDS } from './patients.constants.ts';

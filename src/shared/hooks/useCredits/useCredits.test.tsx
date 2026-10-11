@@ -3,7 +3,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/shared/api/clinic/credits-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/credits-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listPendingCredits: vi.fn(),
   fetchCredit: vi.fn(),
@@ -25,11 +25,11 @@ import {
   restoreCredit,
   settleCredit,
   updateCredit,
-} from '@/shared/api/clinic/credits-api.ts';
-import type { CreditInput } from '@/shared/api/clinic/credits-contracts.ts';
-import { invoiceQueryKeys } from '@/shared/api/clinic/invoices-api.ts';
+} from '@/shared/api/app/credits-api.ts';
+import type { CreditInput } from '@/shared/api/app/credits-contracts.ts';
+import { invoiceQueryKeys } from '@/shared/api/app/invoices-api.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import {
   creditRow,
   TEST_CREDIT_ID,

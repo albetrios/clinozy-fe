@@ -15,22 +15,22 @@ import { axe } from 'vitest-axe';
 
 import { organizationPermissionSchema } from '@/core/types/permissions.ts';
 import type { PageManifest } from '@/lib/routes/page-manifest.ts';
-import type * as DirectoryApiModule from '@/shared/api/clinic/directory-api.ts';
-import type { DirectoryRole } from '@/shared/api/clinic/directory-api.ts';
-import type * as PresenceApiModule from '@/shared/api/clinic/presence-api.ts';
+import type * as DirectoryApiModule from '@/shared/api/app/directory-api.ts';
+import type { DirectoryRole } from '@/shared/api/app/directory-api.ts';
+import type * as PresenceApiModule from '@/shared/api/app/presence-api.ts';
 import type { AuthUser } from '@/shared/auth/types.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { useAppNav } from '@/shared/hooks/useAppNav/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
-import { presetRoleId, previewPreset } from '@/tests/utils/clinic-preset-codes.ts';
+import { presetRoleId, previewPreset } from '@/tests/utils/app-preset-codes.ts';
 
 import { SectionBarShell } from './AppLayoutSectionBar.tsx';
 
 /** clinozy-be's copy of my presence (`GET /users/me`, `PUT /users/me/presence`). */
 const presenceServer = vi.hoisted(() => ({ presence: 'online' }));
-vi.mock('@/shared/api/clinic/presence-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/presence-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof PresenceApiModule>()),
   fetchMyPresence: async () => presenceServer.presence,
   saveMyPresence: async (next: string) => {
@@ -50,7 +50,7 @@ vi.mock('@/shared/hooks/useMeContext/index.ts', () => ({
   useMeContext: () => ({ data: undefined }),
 }));
 // The role directory View-as names the previewed role from (`GET /app/roles`).
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof DirectoryApiModule>()),
   fetchRoleDirectory: async (): Promise<DirectoryRole[]> => [
     {

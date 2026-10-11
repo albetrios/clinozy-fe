@@ -7,9 +7,9 @@ import {
   stageAfterRecord,
   type VisitRecord,
   type VisitRecordKind,
-} from '@/shared/api/clinic/visits-contracts.ts';
-import { CLINIC_SECTION_ROUTES } from '@/shared/clinic/clinic-home.ts';
-import { VISIT_REFERRER } from '@/shared/clinic/clinic-referrer.ts';
+} from '@/shared/api/app/visits-contracts.ts';
+import { APP_SECTION_ROUTES } from '@/shared/app/app-home.ts';
+import { VISIT_REFERRER } from '@/shared/app/app-referrer.ts';
 import { usePatientPackages } from '@/shared/hooks/usePatientPackages/index.ts';
 import { useTodayMoves } from '@/shared/hooks/useTodayFloor/index.ts';
 import { usePatientTreatments } from '@/shared/hooks/useTreatments/index.ts';
@@ -116,7 +116,7 @@ export function useVisitFlowReturn(): VisitFlowReturn {
 
   const leaveFlow = useCallback(() => {
     if (fromToday) {
-      void navigate({ to: CLINIC_SECTION_ROUTES.today, params: { organizationSlug } });
+      void navigate({ to: APP_SECTION_ROUTES.today, params: { organizationSlug } });
       return;
     }
     void navigate({

@@ -9,7 +9,7 @@ export const PATIENTS_NS = I18N_NAMESPACES.patients;
 /**
  * The Patients room's copy, verbatim from `patients.md` › Copy (KICKOFF §6.5).
  * The patient enums' labels are the shared clinic vocabulary
- * (`CLINIC_KEYS.patients`); the patient drawer's copy sits beside it.
+ * (`APP_KEYS.patients`); the patient drawer's copy sits beside it.
  */
 export const PATIENTS_KEYS = {
   manifest: { title: 'manifest.title' },

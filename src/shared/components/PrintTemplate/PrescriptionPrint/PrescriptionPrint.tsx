@@ -1,7 +1,7 @@
 import type { TFunction } from 'i18next';
 
 import { cn } from '@/lib/utils.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
 import type {
   Branch,
   Organization,
@@ -9,8 +9,8 @@ import type {
   Prescription,
   PrescriptionItem,
   User,
-} from '@/shared/api/clinic/clinic-schema.ts';
-import { civilYearsBetween } from '@/shared/api/clinic/clinic-time.ts';
+} from '@/shared/api/app/app-schema.ts';
+import { civilYearsBetween } from '@/shared/api/app/app-time.ts';
 import {
   usePrintFormat,
   usePrintTranslation,

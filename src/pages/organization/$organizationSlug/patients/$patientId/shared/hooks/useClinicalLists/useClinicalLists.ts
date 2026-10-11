@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import type { PatientRecord } from '@/shared/api/clinic/patients-contracts.ts';
+import type { PatientRecord } from '@/shared/api/app/patients-contracts.ts';
 import {
   useClinicalNotes,
   useCreateClinicalNote,

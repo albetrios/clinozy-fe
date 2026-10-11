@@ -7,8 +7,8 @@ reopens it. `?name=&phone=` prefill the drawer (⌘K "New lead", the contact car
 "+ Lead") — parsed by `validateLeadCreateSearch` in the parent's `../leads.dialog-search.ts`
 (an invalid mobile is dropped; a valid one arrives E.164), and scrubbed from
 telemetry (`SENSITIVE_QUERY_PARAMS`). Gated like the room — membership
-(`organization:read`) and the `clinic-leads` module, then `requireOrgStatus`; in-room
-Create is `useClinicAccess`. The drawer is `NewLeadDrawer`
+(`organization:read`) and the `app-leads` module, then `requireOrgStatus`; in-room
+Create is `useAppAccess`. The drawer is `NewLeadDrawer`
 (`../components/NewLeadDrawer/`, L-35): a 640px record drawer — Contact (the person search
 `GET /app/contacts?q=`, Quick start, "New contact" → the shared `ContactEditor`) and Lead details,
 locked until there is a person; with a prefill or a picked person, the person's strip with "Change"
@@ -20,11 +20,11 @@ the prefill.
 
 ## Files
 
-| File                 | Responsibility                                                                                      |
-| -------------------- | --------------------------------------------------------------------------------------------------- |
-| `create.route.tsx`   | Route marker — exports `Component` rendering `NewLeadPage`.                                         |
-| `create.manifest.ts` | Manifest — `kind: 'leaf'`, permission `organization:read`, module `clinic-leads`, title "New lead". |
-| `NewLeadPage.tsx`    | Renders nothing — the dialog route's own UI. The drawer mounts on the Leads page.                   |
+| File                 | Responsibility                                                                                   |
+| -------------------- | ------------------------------------------------------------------------------------------------ |
+| `create.route.tsx`   | Route marker — exports `Component` rendering `NewLeadPage`.                                      |
+| `create.manifest.ts` | Manifest — `kind: 'leaf'`, permission `organization:read`, module `app-leads`, title "New lead". |
+| `NewLeadPage.tsx`    | Renders nothing — the dialog route's own UI. The drawer mounts on the Leads page.                |
 
 ## Test ids
 

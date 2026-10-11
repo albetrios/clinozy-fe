@@ -5,9 +5,9 @@ import { useTranslation } from 'react-i18next';
 import { isolateText } from '@/lib/bidi-isolate.ts';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { cn } from '@/lib/utils.ts';
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
+import { formatAppPhone } from '@/shared/app/app-phone.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import {
   type ContactReach,
   ICON_ACTION,
@@ -49,13 +49,13 @@ function describeReach(
   }
   if (reach.channel === 'phone') {
     return {
-      value: formatClinicPhone(reach.phone),
+      value: formatAppPhone(reach.phone),
       sub: t(primary ? keys.reachSub.phonePrimary : keys.reachSub.phoneAlternate),
       links,
     };
   }
   return {
-    value: formatClinicPhone(reach.phone),
+    value: formatAppPhone(reach.phone),
     sub: t(primary ? keys.reachSub.whatsappPrimary : keys.reachSub.whatsappAlternate),
     links,
   };

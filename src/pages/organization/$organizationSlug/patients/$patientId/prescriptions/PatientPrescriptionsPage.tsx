@@ -8,16 +8,16 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { organizationPrescriptionEdit } from '@/lib/routes/patient-file-builders.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
+import { patientName } from '@/shared/api/app/patients-contracts.ts';
 import {
   fetchPrescription,
   prescriptionQueryKeys,
-} from '@/shared/api/clinic/prescriptions-api.ts';
-import type { PrescriptionRecord } from '@/shared/api/clinic/prescriptions-contracts.ts';
+} from '@/shared/api/app/prescriptions-api.ts';
+import type { PrescriptionRecord } from '@/shared/api/app/prescriptions-contracts.ts';
 import { DataTableColumnChooser } from '@/shared/components/DataTableColumnChooser/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import {
   usePatientPrescriptions,
   usePrescriptionAccess,
@@ -81,7 +81,7 @@ function RxDrawerHost({
   const { patientId, file } = usePatientFileContext();
   // New prescription's route keeps the raw values (typed only); parsed here.
   const search = validatePatientRxCreateSearch(useSearch({ strict: false }));
-  const [today] = useState(() => clinicToday());
+  const [today] = useState(() => appToday());
   const history = usePatientPrescriptions(patientId);
   const catalog = useRxCatalog(patientId);
   // A member's kits list for a member who writes (`patient_prescription:create`).
@@ -200,13 +200,13 @@ export function PatientPrescriptionsPage() {
   const { prescriptionId } = useParams({ strict: false });
   const { patientId } = usePatientFileContext();
   const organizationId = useOrganizationStore((state) => state.organizationId);
-  const clinic = useClinicAccess();
+  const appAccess = useAppAccess();
   const rx = usePrescriptionAccess();
   const access: PrescriptionDrawerAccess = {
     writes: rx.writes,
     approves: rx.approves,
     deletes: rx.deletes,
-    sells: clinic.isResolved && clinic.can('medical', 'create'),
+    sells: appAccess.isResolved && appAccess.can('medical', 'create'),
   };
   const route = usePatientRecordRoute<PrescriptionRecord>({
     section: 'prescriptions',

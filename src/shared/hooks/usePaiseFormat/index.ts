@@ -1,1 +1,1 @@
-export { CLINIC_CURRENCY, usePaiseFormat } from './usePaiseFormat.ts';
+export { APP_CURRENCY, usePaiseFormat } from './usePaiseFormat.ts';

@@ -3,23 +3,23 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
-import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
-import * as ContactsApiModule from '@/shared/api/clinic/contacts-api.ts';
-import type { Contact, ContactSummary } from '@/shared/api/clinic/contacts-contracts.ts';
-import type * as DirectoryApiModule from '@/shared/api/clinic/directory-api.ts';
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
-import * as LeadsApiModule from '@/shared/api/clinic/leads-api.ts';
-import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
-import * as TasksApiModule from '@/shared/api/clinic/tasks-api.ts';
-import type { TaskFields } from '@/shared/api/clinic/tasks-contracts.ts';
+import { appInstant } from '@/shared/api/app/app-time.ts';
+import * as ContactsApiModule from '@/shared/api/app/contacts-api.ts';
+import type { Contact, ContactSummary } from '@/shared/api/app/contacts-contracts.ts';
+import type * as DirectoryApiModule from '@/shared/api/app/directory-api.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
+import * as LeadsApiModule from '@/shared/api/app/leads-api.ts';
+import type { LeadRecord } from '@/shared/api/app/leads-contracts.ts';
+import * as TasksApiModule from '@/shared/api/app/tasks-api.ts';
+import type { TaskFields } from '@/shared/api/app/tasks-contracts.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import type * as MyMembershipModule from '@/shared/tenancy/my-membership.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { fsi } from '@/tests/utils/bidi-marks.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 import { taskRecord } from '@/tests/utils/task-doubles.ts';
 
@@ -37,23 +37,23 @@ vi.mock('@/shared/notify/index.ts', () => ({
   },
   TOAST_DURATION_MS: { default: 5_200, error: 9_000 },
 }));
-vi.mock('@/shared/api/clinic/contacts-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/contacts-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof ContactsApiModule>()),
   searchContacts: vi.fn(),
   fetchContact: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/leads-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/leads-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof LeadsApiModule>()),
   fetchLead: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/tasks-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/tasks-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof TasksApiModule>()),
   addTask: vi.fn(),
   fetchTaskWorkerIds: vi.fn(),
 }));
 
 const team = vi.hoisted(() => ({ members: [] as DirectoryMember[] }));
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof DirectoryApiModule>()),
   fetchTeamDirectory: async () => structuredClone(team.members),
 }));
@@ -297,7 +297,7 @@ describe('NewTaskDrawer on clinozy-be (KICKOFF §6.10 New task, Q-T4)', () => {
     expect(sentFields()).toEqual({
       title: 'Share the laser price',
       why: 'Asked twice',
-      dueAt: clinicInstant('2026-10-13', '11:00'),
+      dueAt: appInstant('2026-10-13', '11:00'),
       assignee: { membershipId: RIYA.id },
       priority: 'high',
       contactId: KAVYA.id,

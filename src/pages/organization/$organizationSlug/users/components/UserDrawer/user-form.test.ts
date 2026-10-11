@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
+import type { TeamMember } from '@/shared/api/app/users-contracts.ts';
 
 import {
   emptyUserForm,

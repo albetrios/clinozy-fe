@@ -2,13 +2,13 @@ import { useId } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { localDateOf } from '@/shared/api/clinic/clinic-time.ts';
-import type { PatientPackageRow } from '@/shared/api/clinic/patient-packages-contracts.ts';
+import { localDateOf } from '@/shared/api/app/app-time.ts';
+import type { PatientPackageRow } from '@/shared/api/app/patient-packages-contracts.ts';
 import {
   TREATMENT_LIMITS,
   type TreatmentCheckIn,
-} from '@/shared/api/clinic/treatments-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+} from '@/shared/api/app/treatments-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import {
   DrawerChips,
   DrawerField,
@@ -274,7 +274,7 @@ export function TreatmentAftercareFields({
   checkIns: readonly TreatmentCheckIn[] | undefined;
   readOnly: boolean;
 }) {
-  const { t } = useTranslation([TREATMENT_NS, CLINIC_NS]);
+  const { t } = useTranslation([TREATMENT_NS, APP_NS]);
   const { formatDate } = useLocaleFormat();
   const ids = useId();
   const feedback = checkIns?.length
@@ -286,7 +286,7 @@ export function TreatmentAftercareFields({
               { day: 'numeric', month: 'short' },
               { civilDay: true },
             ),
-            feel: t(CLINIC_KEYS.checkInFeels[checkIn.feel], { ns: CLINIC_NS }),
+            feel: t(APP_KEYS.checkInFeels[checkIn.feel], { ns: APP_NS }),
             score: checkIn.score,
           }),
         )

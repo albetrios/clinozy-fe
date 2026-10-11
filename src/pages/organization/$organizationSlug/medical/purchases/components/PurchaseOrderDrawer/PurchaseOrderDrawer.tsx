@@ -2,8 +2,8 @@ import { useId, useState } from 'react';
 import { useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import type { MedicalPurchaseOrder } from '@/shared/api/clinic/clinic-schema.ts';
-import { SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
+import type { MedicalPurchaseOrder } from '@/shared/api/app/app-schema.ts';
+import { SECTION_TONES } from '@/shared/app/app-tones.ts';
 import { DrawerStepBody } from '@/shared/components/DrawerField/index.ts';
 import {
   type DrawerStep,

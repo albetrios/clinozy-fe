@@ -1,14 +1,14 @@
 import { type ColumnDef, useTable } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
-import { CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { LedgerRow } from '@/shared/api/app/payments-contracts.ts';
+import { APP_NS } from '@/shared/app/app.constants.ts';
 import {
   PAYMENT_KIND_TONES,
   PAYMENT_MODE_TONES,
   TONE_CLASSES,
-} from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/app/app-tones.ts';
 import {
   type DataTableFeatures,
   dataTableFeatures,
@@ -27,7 +27,7 @@ import {
   LedgerWhatCell,
   LedgerWhenCell,
 } from '@/shared/components/LedgerCells/index.ts';
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 import { useHiddenColumns } from '@/shared/hooks/useHiddenColumns/index.ts';
 import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
@@ -45,9 +45,9 @@ const rowOf = (original: unknown) => original as LedgerRow;
  */
 function useLedgerColumns(): ColumnDef<DataTableFeatures, LedgerRow>[] {
   const { t } = useTranslation(LEDGER_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const formatRupees = useRupeeFormat();
-  const clock = useClinicClock();
+  const clock = useAppClock();
   const phone = useViewportTier() === 'phone';
 
   return [
@@ -119,7 +119,7 @@ function useLedgerColumns(): ColumnDef<DataTableFeatures, LedgerRow>[] {
           const first = modes[0];
           if (!first) return null;
           return {
-            value: ledgerModesLabel(modes, tClinic),
+            value: ledgerModesLabel(modes, tApp),
             dotClassName: TONE_CLASSES[PAYMENT_MODE_TONES[first]].fill,
           };
         },

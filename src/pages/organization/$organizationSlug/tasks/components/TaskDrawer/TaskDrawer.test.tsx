@@ -4,17 +4,17 @@ import { type ComponentProps, useEffect, useState } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { PRODUCT_NAME } from '@/lib/product-identity.ts';
-import { resolveAccessFromCodes } from '@/shared/api/clinic/access-api.ts';
-import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
-import { deleteTask, restoreTask } from '@/shared/api/clinic/tasks-api.ts';
-import type { TaskDetail, TaskRow } from '@/shared/api/clinic/tasks-contracts.ts';
-import type { ClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { resolveAccessFromCodes } from '@/shared/api/app/access-api.ts';
+import type { LeadRecord } from '@/shared/api/app/leads-contracts.ts';
+import { deleteTask, restoreTask } from '@/shared/api/app/tasks-api.ts';
+import type { TaskDetail, TaskRow } from '@/shared/api/app/tasks-contracts.ts';
+import type { AppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useContact } from '@/shared/hooks/useContacts/index.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import type * as NotifyModule from '@/shared/notify/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { appointmentRow, DOCTOR_NISHA } from '@/tests/utils/appointment-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 import {
   taskPerson,
@@ -48,7 +48,7 @@ vi.mock('@/shared/notify/index.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof NotifyModule>()),
   notify: notifyMock,
 }));
-vi.mock('@/shared/api/clinic/tasks-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/tasks-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   deleteTask: vi.fn(),
   restoreTask: vi.fn(),
@@ -56,9 +56,9 @@ vi.mock('@/shared/api/clinic/tasks-api.ts', async (importOriginal) => ({
 
 /** The member's clinozy-be codes. */
 const member = vi.hoisted(() => ({ codes: [] as string[] }));
-vi.mock('@/shared/hooks/useClinicAccess/index.ts', async (importOriginal) => ({
+vi.mock('@/shared/hooks/useAppAccess/index.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
-  useClinicAccess: (): ClinicAccess => ({
+  useAppAccess: (): AppAccess => ({
     roles: [],
     previewRole: null,
     isResolved: true,

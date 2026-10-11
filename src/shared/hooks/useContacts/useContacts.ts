@@ -7,13 +7,13 @@ import {
   isContactSearchable,
   searchContacts,
   updateContact,
-} from '@/shared/api/clinic/contacts-api.ts';
+} from '@/shared/api/app/contacts-api.ts';
 import type {
   Contact,
   ContactFields,
   ContactSummary,
-} from '@/shared/api/clinic/contacts-contracts.ts';
-import { leadQueryKeys } from '@/shared/api/clinic/leads-api.ts';
+} from '@/shared/api/app/contacts-contracts.ts';
+import { leadQueryKeys } from '@/shared/api/app/leads-api.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';

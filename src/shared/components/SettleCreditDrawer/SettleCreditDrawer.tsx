@@ -10,14 +10,14 @@ import {
 import { useTranslation } from 'react-i18next';
 
 import { isolateValues } from '@/lib/bidi-isolate.ts';
-import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
+import type { BranchOption } from '@/shared/api/app/branches-api.ts';
 import type {
   CreditRow,
   CreditSettleResult,
-} from '@/shared/api/clinic/credits-contracts.ts';
-import { defaultBranchId } from '@/shared/clinic/clinic-branch.ts';
+} from '@/shared/api/app/credits-contracts.ts';
+import { defaultBranchId } from '@/shared/app/app-branch.ts';
 import {
   DrawerChips,
   DrawerField,
@@ -343,7 +343,7 @@ export function SettleCreditDrawer({
   const start = settleStart({
     owed: owedInPaise(target),
     branchId: defaultBranchId(openBranches, preferences.branchFilter),
-    today: clinicToday(),
+    today: appToday(),
   });
   return (
     <SettleSession

@@ -1,11 +1,11 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
+import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
 import {
-  clinicFixtures,
+  appFixtures,
   clinicOrganization,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+  resetAppFixtures,
+} from '@/shared/api/app/fixtures/world.fixtures.ts';
 
 import {
   fetchMedicalSale,
@@ -21,7 +21,7 @@ import {
   medicalListSummary,
 } from './medical-api.ts';
 
-afterEach(() => resetClinicFixtures());
+afterEach(() => resetAppFixtures());
 
 describe('payment reminders (`medical.md:17`, Q-M6)', () => {
   it('lists each customer the unpaid sales name, with their due and sales', async () => {
@@ -40,15 +40,14 @@ describe('payment reminders (`medical.md:17`, Q-M6)', () => {
 
   it('sums a customer’s unpaid sales, oldest first', async () => {
     // Rhea's #983 becomes Dharti's, its payment undone.
-    const dharti = (await clinicFixtures.medicalSales.get(ref.medicalSale(978)))
-      .patientId;
-    const sale = await clinicFixtures.medicalSales.update(ref.medicalSale(983), {
+    const dharti = (await appFixtures.medicalSales.get(ref.medicalSale(978))).patientId;
+    const sale = await appFixtures.medicalSales.update(ref.medicalSale(983), {
       patientId: dharti,
     });
-    for (const payment of clinicFixtures.payments.snapshot(
+    for (const payment of appFixtures.payments.snapshot(
       (row) => row.invoiceId === sale.invoiceId,
     )) {
-      await clinicFixtures.payments.remove(payment.id, 'mistake', null);
+      await appFixtures.payments.remove(payment.id, 'mistake', null);
     }
     const { bill } = await fetchMedicalSale(sale.id);
     const { customers } = await listSaleReminders();
@@ -63,13 +62,13 @@ describe('the purchase order sheet (Q-M7)', () => {
     expect(sheet.order).toMatchObject({ seq: 428, supplierName: 'Akshar Medicines' });
     expect(sheet.supplier.name).toBe('Akshar Medicines');
     expect(sheet.organization).toMatchObject({ name: clinicOrganization().name });
-    const [main] = clinicFixtures.branches.snapshot((row) => row.isMain);
+    const [main] = appFixtures.branches.snapshot((row) => row.isMain);
     expect(sheet.branch).toEqual({
       phone: main?.phone,
       gstNumber: main?.gstNumber ?? null,
     });
     // A supplier removed since still prints on its order.
-    await clinicFixtures.suppliers.remove(ref.supplier(52), 'mistake', null);
+    await appFixtures.suppliers.remove(ref.supplier(52), 'mistake', null);
     expect((await fetchPurchaseOrderSheet(ref.purchaseOrder(428))).supplier.name).toBe(
       'Akshar Medicines',
     );

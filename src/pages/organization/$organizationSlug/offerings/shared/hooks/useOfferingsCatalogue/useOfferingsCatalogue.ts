@@ -1,12 +1,12 @@
 import { useCallback } from 'react';
 
-import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
+import type { BranchOption } from '@/shared/api/app/branches-api.ts';
 import type {
   OfferingRecord,
   OfferRecord,
-} from '@/shared/api/clinic/offerings-contracts.ts';
-import { pricingBranch } from '@/shared/api/clinic/offerings-pricing.ts';
+} from '@/shared/api/app/offerings-contracts.ts';
+import { pricingBranch } from '@/shared/api/app/offerings-pricing.ts';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
 import { useOfferings } from '@/shared/hooks/useOfferings/index.ts';
 import { useOffers } from '@/shared/hooks/useOffers/index.ts';
@@ -63,7 +63,7 @@ export function useOfferingsCatalogue(): OfferingsCatalogue {
     branches: openBranches,
     isMultiBranch,
     pricingBranchId: pricingBranch(preferences.branchFilter),
-    today: clinicToday(),
+    today: appToday(),
     isPending: offerings.isPending || offers.isPending,
     isError: offerings.isError || offers.isError,
     refetch,

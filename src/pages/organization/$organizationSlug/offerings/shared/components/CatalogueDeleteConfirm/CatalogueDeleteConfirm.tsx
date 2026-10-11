@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
 import {
   useDeleteOffering,
@@ -62,7 +62,7 @@ export function CatalogueDeleteConfirm({
   onDeleted,
 }: CatalogueDeleteConfirmProps) {
   const { t } = useTranslation(CATALOGUE_DELETE_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const removeOffering = useDeleteOffering();
   const restoreOffering = useRestoreOffering();
   const removeOffer = useDeleteOffer();
@@ -70,10 +70,10 @@ export function CatalogueDeleteConfirm({
 
   const removed = (record: CatalogueDeleteTarget) =>
     record.kind === 'offering'
-      ? tClinic(CLINIC_KEYS.offerings.toasts.offeringRemoved, {
+      ? tApp(APP_KEYS.offerings.toasts.offeringRemoved, {
           id: displayId.offering(record.offeringNumber),
         })
-      : tClinic(CLINIC_KEYS.offerings.toasts.offerRemoved, { name: record.name });
+      : tApp(APP_KEYS.offerings.toasts.offerRemoved, { name: record.name });
 
   return (
     <ConfirmDialog

@@ -1,7 +1,7 @@
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useEffect } from 'react';
 
-import type { AppointmentView } from '@/shared/api/clinic/appointments-contracts.ts';
+import type { AppointmentView } from '@/shared/api/app/appointments-contracts.ts';
 import {
   useViewportTier,
   type ViewportTier,

@@ -1,15 +1,15 @@
 import { useTranslation } from 'react-i18next';
 
-import type { TodayFloorRow, TodayLane } from '@/shared/api/clinic/today-contracts.ts';
+import type { TodayFloorRow, TodayLane } from '@/shared/api/app/today-contracts.ts';
 import {
-  type ClinicCommandNavigation,
-  clinicCommandNavigation,
-} from '@/shared/clinic/clinic-command-targets.ts';
-import { passesPatientFileGate } from '@/shared/clinic/patient-file-sections.ts';
-import { taskTargetNavigation } from '@/shared/clinic/task-targets.ts';
-import { patientVisitTarget } from '@/shared/clinic/visit-redirect.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
-import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
+  type AppCommandNavigation,
+  appCommandNavigation,
+} from '@/shared/app/app-command-targets.ts';
+import { passesPatientFileGate } from '@/shared/app/patient-file-sections.ts';
+import { taskTargetNavigation } from '@/shared/app/task-targets.ts';
+import { patientVisitTarget } from '@/shared/app/visit-redirect.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
+import { useAppNavigate } from '@/shared/hooks/useAppNavigate/index.ts';
 import { usePaymentAccess } from '@/shared/hooks/usePaymentAccess/index.ts';
 import { useTodayMoves } from '@/shared/hooks/useTodayFloor/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -49,11 +49,11 @@ export interface FloorActions {
  */
 export function useFloorActions(organizationSlug: string): FloorActions {
   const { t } = useTranslation(TODAY_NS);
-  const navigate = useClinicNavigate();
-  const access = useClinicAccess();
+  const navigate = useAppNavigate();
+  const access = useAppAccess();
   const money = usePaymentAccess();
   const moves = useTodayMoves();
-  const go = (navigation: ClinicCommandNavigation) => void navigate(navigation);
+  const go = (navigation: AppCommandNavigation) => void navigate(navigation);
   const canEditBookings = access.can('appointments', 'edit');
 
   const checkIn = async (card: TodayCard) => {
@@ -85,7 +85,7 @@ export function useFloorActions(organizationSlug: string): FloorActions {
     if (!(prescription && access.can('medical', 'create'))) return null;
     return () =>
       go(
-        clinicCommandNavigation('newSale', {
+        appCommandNavigation('newSale', {
           organizationSlug,
           referrer: REFERRER,
           search: { prescription },

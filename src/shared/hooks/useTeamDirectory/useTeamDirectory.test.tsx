@@ -3,14 +3,14 @@ import { renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchTeamDirectory: vi.fn(),
 }));
 import {
   type DirectoryMember,
   fetchTeamDirectory,
-} from '@/shared/api/clinic/directory-api.ts';
+} from '@/shared/api/app/directory-api.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 import { useTeamDirectory } from './useTeamDirectory.ts';

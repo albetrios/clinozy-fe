@@ -1,7 +1,7 @@
 import { render, renderHook, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { addCivilDays, clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import { addCivilDays, appToday } from '@/shared/api/app/app-time.ts';
 
 import { useMedicalDates } from './medical-dates.ts';
 import { MakerPills, NamePills } from './MedicalCells.tsx';
@@ -34,8 +34,8 @@ describe('MedicalCells', () => {
     expect(result.current.when(new Date().toISOString())).toMatch(
       /^Today \u2068\d{1,2}:\d{2}/,
     );
-    expect(result.current.visit(clinicToday())).toBe('Today');
-    expect(result.current.visit(addCivilDays(clinicToday(), -1))).toBe('Yesterday');
-    expect(result.current.day(clinicToday())).toMatch(/\d/);
+    expect(result.current.visit(appToday())).toBe('Today');
+    expect(result.current.visit(addCivilDays(appToday(), -1))).toBe('Yesterday');
+    expect(result.current.day(appToday())).toMatch(/\d/);
   });
 });

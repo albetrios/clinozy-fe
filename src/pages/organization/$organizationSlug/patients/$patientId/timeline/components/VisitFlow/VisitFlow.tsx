@@ -5,8 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
 import { cn } from '@/lib/utils.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { VisitRecord } from '@/shared/api/clinic/visits-contracts.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { VisitRecord } from '@/shared/api/app/visits-contracts.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 

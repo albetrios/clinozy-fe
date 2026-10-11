@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
-import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
-import { clinicBranch } from '@/tests/utils/branch-doubles.ts';
+import type { Role } from '@/shared/api/app/app-schema.ts';
+import type { TeamMember } from '@/shared/api/app/users-contracts.ts';
+import { appBranch } from '@/tests/utils/branch-doubles.ts';
 
 import {
   branchFormOf,
@@ -31,7 +31,7 @@ function person(membershipId: string, roleIds: string[]): TeamMember {
   return { membershipId, roleIds } as unknown as TeamMember;
 }
 
-const VESU = clinicBranch({
+const VESU = appBranch({
   phone: '+917490020098',
   workingDays: ['tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
   defaultDoctorId: DOCTOR,

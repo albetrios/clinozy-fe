@@ -2,7 +2,7 @@ import { render, renderHook, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type { Branch } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Branch } from '@/shared/api/app/app-schema.ts';
 
 import { BranchChips, CellText, UpdatedCell } from './CatalogueCells.tsx';
 import { useBranchFilterCopy, useBranchFold } from './use-branch-copy.ts';

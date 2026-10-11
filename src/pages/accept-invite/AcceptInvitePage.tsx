@@ -3,7 +3,7 @@ import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 
 import { organizationHome } from '@/lib/routes/index.ts';
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
 import { getAccessToken } from '@/shared/auth/token.ts';
 import { EmptyState, EmptyStateAction } from '@/shared/components/EmptyState/index.ts';
 import { PublicCard } from '@/shared/components/PublicFrame/index.ts';

@@ -2,11 +2,11 @@ import { act, waitFor } from '@testing-library/react';
 import { useEffect } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { moveAppointment } from '@/shared/api/clinic/appointments-api.ts';
-import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
-import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import { moveFloorStage } from '@/shared/api/clinic/today-api.ts';
+import type { Role } from '@/shared/api/app/app-schema.ts';
+import { appInstant } from '@/shared/api/app/app-time.ts';
+import { moveAppointment } from '@/shared/api/app/appointments-api.ts';
+import { resetAppFixtures } from '@/shared/api/app/fixtures/world.fixtures.ts';
+import { moveFloorStage } from '@/shared/api/app/today-api.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import {
@@ -26,11 +26,11 @@ import { type FloorActions, useFloorActions } from './useFloorActions.ts';
 vi.mock('@/shared/notify/index.ts', () => ({
   notify: { success: vi.fn(), error: vi.fn(), info: vi.fn(), undo: vi.fn() },
 }));
-vi.mock('@/shared/api/clinic/today-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/today-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   moveFloorStage: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/appointments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   moveAppointment: vi.fn(),
 }));
@@ -86,14 +86,14 @@ function cardIn(lane: keyof typeof LANES): TodayCard {
 
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] });
-  vi.setSystemTime(new Date(clinicInstant('2026-10-03', '10:42')));
+  vi.setSystemTime(new Date(appInstant('2026-10-03', '10:42')));
   vi.resetAllMocks();
   probe.actions = null;
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 afterEach(() => {
   resetTodayRoute();
-  resetClinicFixtures();
+  resetAppFixtures();
   vi.useRealTimers();
 });
 

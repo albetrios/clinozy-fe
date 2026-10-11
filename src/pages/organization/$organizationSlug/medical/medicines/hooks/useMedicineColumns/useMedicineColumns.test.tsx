@@ -1,13 +1,13 @@
 import { renderHook } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import { fetchMedicine } from '@/shared/api/clinic/medicines-api.ts';
+import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
+import { resetAppFixtures } from '@/shared/api/app/fixtures/world.fixtures.ts';
+import { fetchMedicine } from '@/shared/api/app/medicines-api.ts';
 
 import { useMedicineColumns } from './useMedicineColumns.tsx';
 
-afterEach(() => resetClinicFixtures());
+afterEach(() => resetAppFixtures());
 
 describe('useMedicineColumns', () => {
   it('lays out the Medicines columns, Best rate hidden, the ids the URL sorts by', () => {

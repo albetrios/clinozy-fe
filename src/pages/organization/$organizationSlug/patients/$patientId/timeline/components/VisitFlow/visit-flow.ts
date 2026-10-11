@@ -1,10 +1,10 @@
-import type { InvoiceRecord } from '@/shared/api/clinic/invoices-contracts.ts';
-import type { PatientPackageRow } from '@/shared/api/clinic/patient-packages-contracts.ts';
+import type { InvoiceRecord } from '@/shared/api/app/invoices-contracts.ts';
+import type { PatientPackageRow } from '@/shared/api/app/patient-packages-contracts.ts';
 import {
   TREATMENT_LIMITS,
   type TreatmentCreateInput,
   type TreatmentRecord,
-} from '@/shared/api/clinic/treatments-contracts.ts';
+} from '@/shared/api/app/treatments-contracts.ts';
 
 import { VISIT_FLOW_STEPS, type VisitFlowStep } from './visit-flow.constants.ts';
 

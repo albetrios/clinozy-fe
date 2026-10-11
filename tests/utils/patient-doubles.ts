@@ -4,11 +4,8 @@
  * Ids are public ids (`<prefix>_<21 [a-z0-9]>`). Override what a test is about; the rest stays
  * a plausible new patient — Priya Shah, #3508, Aesthetic, at the main branch.
  */
-import type { PatientFile } from '@/shared/api/clinic/patient-file-contracts.ts';
-import type {
-  PatientRecord,
-  PatientRow,
-} from '@/shared/api/clinic/patients-contracts.ts';
+import type { PatientFile } from '@/shared/api/app/patient-file-contracts.ts';
+import type { PatientRecord, PatientRow } from '@/shared/api/app/patients-contracts.ts';
 
 import { TEST_BRANCH_ID } from './appointment-doubles.ts';
 

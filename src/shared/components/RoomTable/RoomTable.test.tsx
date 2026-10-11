@@ -6,7 +6,7 @@ import { axe } from 'vitest-axe';
 import { useRoomTable } from '@/shared/hooks/useRoomTable/index.ts';
 import { Package } from '@/shared/icons/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { holdPreset } from '@/tests/utils/clinic-preset-codes.ts';
+import { holdPreset } from '@/tests/utils/app-preset-codes.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { RoomTable } from './RoomTable.tsx';

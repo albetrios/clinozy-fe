@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
-import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
-import { formatClinicPhoneDigits } from '@/shared/clinic/clinic-phone-field.ts';
+import type { TeamMember } from '@/shared/api/app/users-contracts.ts';
+import { formatAppPhoneDigits } from '@/shared/app/app-phone-field.ts';
 import {
   type DrawerPeekItem,
   drawerStepSummary,
@@ -70,7 +70,7 @@ export function useBranchDrawerView({
   });
   const mainLabel = values.isMain ? t(K.toggles.mainOn) : t(K.toggles.mainOff);
   const statusLabel = values.active ? t(K.toggles.openOn) : t(K.toggles.openOff);
-  const phone = values.phone ? formatClinicPhoneDigits(values.phone) : undefined;
+  const phone = values.phone ? formatAppPhoneDigits(values.phone) : undefined;
   const defaultName = (role: (typeof BRANCH_DEFAULT_ROLES)[number]) =>
     memberOf(values.defaults[role])?.name;
 

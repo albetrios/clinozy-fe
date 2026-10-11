@@ -2,10 +2,10 @@ import { type ReactNode, useLayoutEffect, useRef } from 'react';
 
 import { isolateText } from '@/lib/bidi-isolate.ts';
 import { cn } from '@/lib/utils.ts';
-import type { Channel } from '@/shared/api/clinic/clinic-schema.ts';
-import type { ChatAuthor } from '@/shared/api/clinic/messages-contracts.ts';
-import { CLINIC_KEYS } from '@/shared/clinic/clinic.constants.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import type { Channel } from '@/shared/api/app/app-schema.ts';
+import type { ChatAuthor } from '@/shared/api/app/messages-contracts.ts';
+import { APP_KEYS } from '@/shared/app/app.constants.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { shortPersonName } from '@/shared/components/Cells/PersonAvatar/index.ts';
 import {
   CHAT_COLUMN_KEYS,
@@ -254,7 +254,7 @@ function MessageBubble({ data, format }: { data: BubbleData; format: ChatFormat 
   const ours = data.kind !== 'in';
   const glyph = data.kind === 'note' ? undefined : GLYPHS[data.channel];
   const Glyph = glyph?.icon;
-  const channelName = format.t(CLINIC_KEYS.channels[data.channel]);
+  const channelName = format.t(APP_KEYS.channels[data.channel]);
   return (
     <div
       data-testid={ids.bubble}
@@ -332,7 +332,7 @@ function Sender({
         name: author.name,
         initials: author.initials,
         tone: author.tone,
-        role: author.roles.map((role) => format.t(CLINIC_KEYS.roles[role])).join(' · '),
+        role: author.roles.map((role) => format.t(APP_KEYS.roles[role])).join(' · '),
         online: author.online,
         phone: author.phone,
         email: author.email,

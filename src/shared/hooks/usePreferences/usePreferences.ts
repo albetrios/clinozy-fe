@@ -2,21 +2,21 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
 import {
-  type ClinicPreferences,
-  DEFAULT_CLINIC_PREFERENCES,
+  type AppPreferences,
+  DEFAULT_APP_PREFERENCES,
   fetchMyPreferences,
   preferencesQueryKeys,
   saveMyPreferences,
-} from '@/shared/api/clinic/preferences-api.ts';
+} from '@/shared/api/app/preferences-api.ts';
 import { reportError } from '@/shared/errors/errorHandler.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 /** The user's clinic preferences, and a silent optimistic `update`. */
 export interface UsePreferencesResult {
-  preferences: ClinicPreferences;
+  preferences: AppPreferences;
   isPending: boolean;
-  update: (patch: Partial<ClinicPreferences>) => void;
+  update: (patch: Partial<AppPreferences>) => void;
 }
 
 /**
@@ -44,18 +44,18 @@ export function usePreferences(): UsePreferencesResult {
   const mutation = useMutation({
     mutationFn: saveMyPreferences,
     retry: 3,
-    onMutate: async (patch: Partial<ClinicPreferences>) => {
+    onMutate: async (patch: Partial<AppPreferences>) => {
       await queryClient.cancelQueries({ queryKey });
-      const previous = queryClient.getQueryData<ClinicPreferences>(queryKey);
-      queryClient.setQueryData<ClinicPreferences>(queryKey, {
-        ...(previous ?? DEFAULT_CLINIC_PREFERENCES),
+      const previous = queryClient.getQueryData<AppPreferences>(queryKey);
+      queryClient.setQueryData<AppPreferences>(queryKey, {
+        ...(previous ?? DEFAULT_APP_PREFERENCES),
         ...patch,
       });
       return { previous };
     },
     onError: (error, _patch, context) => {
       queryClient.setQueryData(queryKey, context?.previous);
-      reportError(error, { scope: 'clinic-preferences' });
+      reportError(error, { scope: 'app-preferences' });
     },
     onSuccess: (saved) => {
       queryClient.setQueryData(queryKey, saved);
@@ -64,14 +64,14 @@ export function usePreferences(): UsePreferencesResult {
 
   const { mutate } = mutation;
   const update = useCallback(
-    (patch: Partial<ClinicPreferences>) => {
+    (patch: Partial<AppPreferences>) => {
       if (active) mutate(patch);
     },
     [active, mutate],
   );
 
   return {
-    preferences: query.data ?? DEFAULT_CLINIC_PREFERENCES,
+    preferences: query.data ?? DEFAULT_APP_PREFERENCES,
     isPending: active && query.isPending,
     update,
   };

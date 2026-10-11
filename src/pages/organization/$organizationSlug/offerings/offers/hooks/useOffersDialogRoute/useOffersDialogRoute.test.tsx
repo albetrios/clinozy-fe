@@ -11,12 +11,12 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
-import type * as OfferingsApiModule from '@/shared/api/clinic/offerings-api.ts';
-import { fetchOffer } from '@/shared/api/clinic/offerings-api.ts';
+import type * as OfferingsApiModule from '@/shared/api/app/offerings-api.ts';
+import { fetchOffer } from '@/shared/api/app/offerings-api.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { offerRecord, TEST_OFFER_ID } from '@/tests/utils/offering-doubles.ts';
 
 import { validateOffersSearch } from '../../offers.search.ts';
@@ -25,7 +25,7 @@ import { type OffersDialogRoute, useOffersDialogRoute } from './useOffersDialogR
 const { notifyMock } = vi.hoisted(() => ({ notifyMock: { info: vi.fn() } }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 
-vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/offerings-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof OfferingsApiModule>()),
   fetchOffer: vi.fn(),
 }));

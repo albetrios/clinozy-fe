@@ -12,8 +12,8 @@ const access = vi.hoisted(() => ({
   readsAppointments: true,
   readsPrescriptions: false,
 }));
-vi.mock('@/shared/hooks/useClinicAccess/index.ts', () => ({
-  useClinicAccess: () => ({
+vi.mock('@/shared/hooks/useAppAccess/index.ts', () => ({
+  useAppAccess: () => ({
     isResolved: access.isResolved,
     can: (section: string, action: string) =>
       section === 'appointments' && action === 'view' && access.readsAppointments,
@@ -21,25 +21,25 @@ vi.mock('@/shared/hooks/useClinicAccess/index.ts', () => ({
       code === 'patient_prescription:read' && access.readsPrescriptions,
   }),
 }));
-vi.mock('@/shared/api/clinic/today-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/today-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchTodayFloor: vi.fn(),
   fetchTodayEnquiries: vi.fn(),
   moveFloorStage: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/appointments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   moveAppointment: vi.fn(),
 }));
 
-import { moveAppointment } from '@/shared/api/clinic/appointments-api.ts';
+import { moveAppointment } from '@/shared/api/app/appointments-api.ts';
 import {
   fetchTodayEnquiries,
   fetchTodayFloor,
   moveFloorStage,
   todayQueryKeys,
-} from '@/shared/api/clinic/today-api.ts';
-import { TODAY_REFETCH_MS } from '@/shared/api/clinic/today-contracts.ts';
+} from '@/shared/api/app/today-api.ts';
+import { TODAY_REFETCH_MS } from '@/shared/api/app/today-contracts.ts';
 
 import { useTodayEnquiries, useTodayFloor, useTodayMoves } from './useTodayFloor.ts';
 
@@ -143,7 +143,7 @@ describe('useTodayMoves', () => {
       idempotencyKey: expect.any(String),
     });
     expect(refresh).toHaveBeenCalledWith(
-      expect.objectContaining({ queryKey: ['clinic', 'appointments'] }),
+      expect.objectContaining({ queryKey: ['app', 'appointments'] }),
     );
   });
 

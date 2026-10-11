@@ -4,8 +4,8 @@ import type { ReactNode } from 'react';
 
 import { localeDirection } from '@/lib/i18n/locales.ts';
 import { cn } from '@/lib/utils.ts';
-import type { Branch, Organization } from '@/shared/api/clinic/clinic-schema.ts';
-import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
+import type { Branch, Organization } from '@/shared/api/app/app-schema.ts';
+import { formatAppPhone } from '@/shared/app/app-phone.ts';
 
 import { usePrintTranslation } from './print-format.ts';
 import {
@@ -166,7 +166,7 @@ export function PrintFooter({
     >
       <p className={style.thanks}>{t(thanksKey, { clinic: organization.name })}</p>
       <p className="text-muted-foreground leading-[3.9mm]">
-        {t(PRINT_TEMPLATE_KEYS.contact, { phone: formatClinicPhone(branch.phone) })}
+        {t(PRINT_TEMPLATE_KEYS.contact, { phone: formatAppPhone(branch.phone) })}
       </p>
       {branch.gstNumber ? (
         <p className="text-muted-foreground leading-[3.9mm]">

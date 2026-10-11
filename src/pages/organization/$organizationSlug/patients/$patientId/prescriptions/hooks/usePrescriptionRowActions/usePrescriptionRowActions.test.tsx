@@ -1,8 +1,8 @@
 import { waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import type { PrescriptionRecord } from '@/shared/api/clinic/prescriptions-contracts.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
+import type { PrescriptionRecord } from '@/shared/api/app/prescriptions-contracts.ts';
 import { shownLocation } from '@/tests/utils/shown-location.ts';
 
 import {
@@ -35,11 +35,11 @@ vi.mock('@/shared/components/PrintTemplate/print-document.ts', () => ({
   printDocument: printMock,
   PRINTING_ATTRIBUTE: 'data-printing',
 }));
-vi.mock('@/shared/api/clinic/prescriptions-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/prescriptions-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   ...(await import('../../__tests__/integration/prescription-doubles.ts')).rxServerApi,
 }));
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => {
   const { DOCTOR_NISHA } = await import('@/tests/utils/appointment-doubles.ts');
   return {
     ...(await importOriginal<object>()),
@@ -140,7 +140,7 @@ describe('usePrescriptionRowActions (H:4753; Q19)', () => {
       patientId: APPROVED.patientId,
       fields: {
         doctorId: APPROVED.doctorId,
-        date: clinicToday(),
+        date: appToday(),
         items: APPROVED.items,
         advice: APPROVED.advice,
       },

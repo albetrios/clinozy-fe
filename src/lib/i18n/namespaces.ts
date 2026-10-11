@@ -12,12 +12,12 @@ export const I18N_NAMESPACES = {
   patients: 'patients',
   patientFile: 'patient-file',
   medical: 'medical',
-  clinicStock: 'clinic-stock',
+  appStock: 'app-stock',
   payments: 'payments',
   tasks: 'tasks',
   offerings: 'offerings',
   users: 'users',
-  clinic: 'clinic',
+  app: 'app',
   print: 'print',
 } as const;
 

@@ -6,8 +6,8 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
-import { LEAD_STATUS_TONES } from '@/shared/clinic/clinic-tones.ts';
+import type { LeadRecord } from '@/shared/api/app/leads-contracts.ts';
+import { LEAD_STATUS_TONES } from '@/shared/app/app-tones.ts';
 import { DataTable } from '@/shared/components/DataTable/index.ts';
 
 import { LEADS_KEYS, LEADS_NS, LEADS_TABLE_ID } from '../../leads.constants.ts';

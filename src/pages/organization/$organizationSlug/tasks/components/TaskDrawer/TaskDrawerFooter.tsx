@@ -1,15 +1,15 @@
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
 import {
   TASK_SNOOZE_OPTIONS,
   type TaskAssignee,
   type TaskRow,
   type TaskSnoozeOption,
-} from '@/shared/api/clinic/tasks-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { TASK_RULE_KEYS, TASK_RULES_NS } from '@/shared/clinic/task-rules.constants.ts';
+} from '@/shared/api/app/tasks-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { TASK_RULE_KEYS, TASK_RULES_NS } from '@/shared/app/task-rules.constants.ts';
 import { shortPersonName } from '@/shared/components/Cells/index.ts';
 import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
@@ -55,13 +55,13 @@ function Chevron({ open }: { open: boolean }) {
  */
 function usePreviousOwners(row: TaskRow, assignees: TaskAssignees): string[] {
   const { t } = useTranslation(TASKS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   return [...row.ownerChanges].reverse().flatMap((change) => {
     if (change.fromId) {
       const member = assignees.byId.get(change.fromId);
       return member ? [shortPersonName(member.name)] : [];
     }
-    if (change.fromRole) return [tClinic(CLINIC_KEYS.roles[change.fromRole])];
+    if (change.fromRole) return [tApp(APP_KEYS.roles[change.fromRole])];
     return [t(TASKS_KEYS.row.anyone)];
   });
 }
@@ -71,14 +71,14 @@ function useAssigneeOptions(
   assignees: TaskAssignees,
 ): PickerOption<DirectoryMember | null>[] {
   const { t } = useTranslation(TASKS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const team = t(K.assignGroups.team);
   const queues = t(K.assignGroups.queues);
   return [
     ...assignees.options.map((option) => ({ ...option, group: team })),
     ...TASK_QUEUE_ROLES.map((role): PickerOption<DirectoryMember | null> => ({
       key: taskAssigneeKeyOf({ role }),
-      label: tClinic(CLINIC_KEYS.roles[role]),
+      label: tApp(APP_KEYS.roles[role]),
       group: queues,
       leading: { kind: 'none' },
       data: null,
@@ -89,10 +89,10 @@ function useAssigneeOptions(
 /** The Assigned trigger's words: the member, the queue, or "Anyone". */
 function useOwnerWords(row: TaskRow, assignees: TaskAssignees): string {
   const { t } = useTranslation(TASKS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const member = row.ownerId ? assignees.byId.get(row.ownerId) : undefined;
   if (member) return shortPersonName(member.name);
-  if (row.ownerRole) return tClinic(CLINIC_KEYS.roles[row.ownerRole]);
+  if (row.ownerRole) return tApp(APP_KEYS.roles[row.ownerRole]);
   return row.ownerId ? '' : t(TASKS_KEYS.row.anyone);
 }
 

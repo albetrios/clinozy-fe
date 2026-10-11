@@ -19,7 +19,7 @@ import {
   RoomToolbar,
   type RoomToolbarFilters,
 } from '@/shared/components/RoomToolbar/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import {
   type AppIcon,
@@ -118,7 +118,7 @@ export function MedicalToolbar<TRow extends RowData>({
 }: MedicalToolbarProps<TRow>) {
   const { t } = useTranslation(MEDICAL_NS);
   const phone = useViewportTier() === 'phone';
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const nav = useMedicalNav();
   const tableId = MEDICAL_TABLE_IDS[tab];
   const canCreate = access.isResolved && access.can('medical', 'create');

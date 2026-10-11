@@ -4,22 +4,22 @@ import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { PRODUCT_NAME } from '@/lib/product-identity.ts';
-import type * as TasksApiModule from '@/shared/api/clinic/tasks-api.ts';
+import type * as TasksApiModule from '@/shared/api/app/tasks-api.ts';
 import {
   countOpenTasks,
   listTasks,
   recordTaskOutcome,
   type TaskPage,
-} from '@/shared/api/clinic/tasks-api.ts';
+} from '@/shared/api/app/tasks-api.ts';
 import type {
   TaskListQueryInput,
   TaskRecord,
   TaskRow,
-} from '@/shared/api/clinic/tasks-contracts.ts';
+} from '@/shared/api/app/tasks-contracts.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { PRITI_VISIT_ID, taskRowFixture } from '@/tests/utils/task-row-fixture.ts';
 
 import {
@@ -33,7 +33,7 @@ vi.mock('@/shared/notify/index.ts', () => ({
   TOAST_DURATION_MS: { default: 5_200, error: 9_000 },
 }));
 
-vi.mock('@/shared/api/clinic/tasks-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/tasks-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof TasksApiModule>()),
   listTasks: vi.fn(),
   countOpenTasks: vi.fn(),

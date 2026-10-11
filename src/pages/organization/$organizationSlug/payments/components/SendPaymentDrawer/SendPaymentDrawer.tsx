@@ -4,22 +4,22 @@ import { type ReactNode, useId, useState } from 'react';
 import { useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import { fetchPayment, paymentQueryKeys } from '@/shared/api/clinic/payments-api.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
+import { fetchPayment, paymentQueryKeys } from '@/shared/api/app/payments-api.ts';
 import {
   ledgerDayOf,
   type LedgerRow,
   type OpenSupplierBill,
   supplierBillKey,
-} from '@/shared/api/clinic/payments-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { defaultBranchId } from '@/shared/clinic/clinic-branch.ts';
+} from '@/shared/api/app/payments-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { defaultBranchId } from '@/shared/app/app-branch.ts';
 import {
   EXPENSE_CATEGORY_TONES,
   PAYMENT_MODE_TONES,
   SECTION_TONES,
-} from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/app/app-tones.ts';
 import {
   DrawerStepBody,
   type PickedFile,
@@ -140,12 +140,12 @@ function useDrawerAccess(props: SendPaymentDrawerProps) {
 function quickFillItems(
   form: UseFormReturn<SendFormValues>,
   t: TFunction,
-  tClinic: TFunction,
+  tApp: TFunction,
 ): QuickFillItem[] {
   return SEND_QUICK_FILLS.map((fill) => {
     const label =
       fill.id === 'consumables'
-        ? tClinic(CLINIC_KEYS.expenseCategories.consumables)
+        ? tApp(APP_KEYS.expenseCategories.consumables)
         : t(K.presets[fill.id]);
     return {
       id: fill.id,
@@ -171,14 +171,14 @@ function quickFillItems(
 /** The Expense step's peek: the bill it pays, or the category — then Paid to and the note. */
 function useExpensePeek(values: SendFormValues): DrawerStep['peek'] {
   const { t } = useTranslation(PAYMENTS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const billLabel = useBillLabel();
   const head = values.bill
     ? { kind: 'value' as const, label: t(K.bill), value: billLabel(values.bill) }
     : {
         kind: 'value' as const,
         label: t(K.category),
-        value: tClinic(CLINIC_KEYS.expenseCategories[values.category]),
+        value: tApp(APP_KEYS.expenseCategories[values.category]),
         tone: EXPENSE_CATEGORY_TONES[values.category],
       };
   return [
@@ -199,7 +199,7 @@ function useSteps({
   bodies: Record<SendStepId, ReactNode>;
 }): DrawerStep[] {
   const { t } = useTranslation(PAYMENTS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const formatPaise = usePaiseFormat();
   const billLabel = useBillLabel();
   const expensePeek = useExpensePeek(values);
@@ -207,7 +207,7 @@ function useSteps({
   const missing = sendMissing(values);
   const amount = sendAmount(values);
   const billSummary = values.bill ? billLabel(values.bill) : t(K.otherSpend);
-  const notFilled = t(RECORD_DRAWER_KEYS.step.notFilled, { ns: CLINIC_NS });
+  const notFilled = t(RECORD_DRAWER_KEYS.step.notFilled, { ns: APP_NS });
   const steps: DrawerStep[] = [];
   if (bills.bills || bills.retry) {
     steps.push({
@@ -241,7 +241,7 @@ function useSteps({
         {
           kind: 'value',
           label: t(K.mode),
-          value: tClinic(CLINIC_KEYS.paymentModes[values.mode]),
+          value: tApp(APP_KEYS.paymentModes[values.mode]),
           tone: PAYMENT_MODE_TONES[values.mode],
         },
       ],
@@ -381,13 +381,13 @@ function useSendSave({
 
 /** The header's badges and the footer's summary, as the form stands. */
 function useChrome(values: SendFormValues) {
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const formatPaise = usePaiseFormat();
   const billLabel = useBillLabel();
   const amount = sendAmount(values);
   const what = values.bill
     ? billLabel(values.bill)
-    : tClinic(CLINIC_KEYS.expenseCategories[values.category]);
+    : tApp(APP_KEYS.expenseCategories[values.category]);
   const badges: DrawerBadge[] = [
     {
       id: 'category',
@@ -397,7 +397,7 @@ function useChrome(values: SendFormValues) {
   ];
   if (amount > 0)
     badges.push({ id: 'amount', label: `− ${formatPaise(amount)}`, tone: 'blush' });
-  badges.push({ id: 'mode', label: tClinic(CLINIC_KEYS.paymentModes[values.mode]) });
+  badges.push({ id: 'mode', label: tApp(APP_KEYS.paymentModes[values.mode]) });
   const payee = values.payeeName.trim();
   // A bill's label already names its supplier, the payee it fills.
   const shownPayee = values.bill?.supplierName === payee ? '' : payee;
@@ -494,9 +494,9 @@ function SendSession({
   onAnother: () => void;
 }) {
   const { t } = useTranslation(PAYMENTS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const idPrefix = `send-${useId().replace(/:/g, '')}`;
-  const [today] = useState(() => clinicToday());
+  const [today] = useState(() => appToday());
   const { readOnly: noWrite, canDelete } = useDrawerAccess(props);
   const [dayClosed, setDayClosed] = useState(false);
   const readOnly = noWrite || dayClosed;
@@ -555,7 +555,7 @@ function SendSession({
         tag={labels.tag}
         sub={t(K.sub)}
         badges={chrome.badges}
-        quickFill={record ? undefined : quickFillItems(form, t, tClinic)}
+        quickFill={record ? undefined : quickFillItems(form, t, tApp)}
         content={CONTENT_PROFILE}
         tone={SECTION_TONES.payments}
         steps={steps}
@@ -604,7 +604,7 @@ export function SendPaymentDrawer(props: SendPaymentDrawerProps) {
   const { session, restart, fresh } = useDrawerSession(props.open);
   const { openBranches, isPending } = useBranches();
   const { preferences } = usePreferences();
-  const [today] = useState(() => clinicToday());
+  const [today] = useState(() => appToday());
   const creating = props.mode === 'create';
   const open = useOpenSupplierBills(creating);
   if (isPending || (creating && !open.isFetched)) return null;

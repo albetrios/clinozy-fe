@@ -2,17 +2,17 @@ import { fireEvent, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
+import type { AppointmentRow } from '@/shared/api/app/appointments-contracts.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import {
   APPOINTMENT_NOW,
   APPOINTMENT_TODAY,
   appointmentRow,
 } from '@/tests/utils/appointment-doubles.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 import { publicId } from '../../__tests__/integration/appointments-test-data.ts';
 import {
-  grantClinicAccess,
+  grantAppAccess,
   renderInAppointments,
 } from '../../__tests__/integration/appointments-test-router.tsx';
 import { CalendarCard, DayColumn, HourRail } from './CalendarGrid.tsx';
@@ -41,7 +41,7 @@ beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] });
   vi.setSystemTime(APPOINTMENT_NOW);
   signInTestMember();
-  grantClinicAccess('owner');
+  grantAppAccess('owner');
 });
 afterEach(() => vi.useRealTimers());
 

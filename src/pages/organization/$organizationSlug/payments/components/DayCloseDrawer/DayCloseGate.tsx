@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type { DayOpening } from '@/shared/api/clinic/day-close-contracts.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import type { DayOpening } from '@/shared/api/app/day-close-contracts.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { DrawerNumberInput } from '@/shared/components/DrawerField/index.ts';
 import {
   RECORD_DRAWER_KEYS,

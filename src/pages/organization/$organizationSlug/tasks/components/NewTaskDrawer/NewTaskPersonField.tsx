@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next';
 
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import { contactQueryKeys, searchContacts } from '@/shared/api/clinic/contacts-api.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
+import { contactQueryKeys, searchContacts } from '@/shared/api/app/contacts-api.ts';
 import type { ListPage } from '@/shared/api/fetch-list-page.ts';
-import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
+import { formatAppPhone } from '@/shared/app/app-phone.ts';
 import { personInitials } from '@/shared/components/Cells/index.ts';
 import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
@@ -59,7 +59,7 @@ export function NewTaskPersonField({
     sub: [
       person.kind === 'contact' ? null : kindLabel(person),
       contactNumber === undefined ? null : displayId.contact(contactNumber),
-      person.phone ? formatClinicPhone(person.phone) : null,
+      person.phone ? formatAppPhone(person.phone) : null,
     ]
       .filter(Boolean)
       .join(' · '),

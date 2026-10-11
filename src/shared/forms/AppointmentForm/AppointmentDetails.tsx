@@ -1,17 +1,14 @@
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
+import { APPOINTMENT_TYPE_VALUES, type Tone } from '@/shared/api/app/app-schema.ts';
 import {
   APPOINTMENT_LENGTHS,
   type AppointmentStaff,
   type AppointmentTreatment,
-} from '@/shared/api/clinic/appointments-contracts.ts';
-import { APPOINTMENT_TYPE_VALUES, type Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import {
-  APPOINTMENT_TYPE_TONES,
-  serviceTone,
-} from '@/shared/clinic/appointment-display.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+} from '@/shared/api/app/appointments-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { APPOINTMENT_TYPE_TONES, serviceTone } from '@/shared/app/appointment-display.ts';
 import { PersonAvatar } from '@/shared/components/Cells/index.ts';
 import {
   DrawerChips,
@@ -114,7 +111,7 @@ function TreatmentField({
   treatments,
   disabled,
 }: Pick<AppointmentDetailsProps, 'draft' | 'onChange' | 'treatments' | 'disabled'>) {
-  const { t } = useTranslation([APPOINTMENT_FORM_NS, CLINIC_NS]);
+  const { t } = useTranslation([APPOINTMENT_FORM_NS, APP_NS]);
   const minutes = (count: number) => t(K.minutes, { minutes: count });
   const common: PickerOption[] = COMMON_TREATMENTS.map((treatment) => ({
     key: commonKey(treatment.label),
@@ -132,7 +129,7 @@ function TreatmentField({
     .map((treatment) => ({
       key: treatment.id,
       label: treatment.name,
-      sub: t(CLINIC_KEYS.offerings.specialties[treatment.specialty], { ns: CLINIC_NS }),
+      sub: t(APP_KEYS.offerings.specialties[treatment.specialty], { ns: APP_NS }),
       meta: minutes(treatment.durationMin || 30),
       group: t(K.fromOfferings),
       tone: treatment.tone,
@@ -178,7 +175,7 @@ function DoctorField({
   staff,
   disabled,
 }: Pick<AppointmentDetailsProps, 'draft' | 'onChange' | 'staff' | 'disabled'>) {
-  const { t } = useTranslation([APPOINTMENT_FORM_NS, CLINIC_NS, PICKER_NS]);
+  const { t } = useTranslation([APPOINTMENT_FORM_NS, APP_NS, PICKER_NS]);
   const options: PickerOption<AppointmentStaff>[] = staff.map((person) => ({
     key: person.id,
     label: person.name,

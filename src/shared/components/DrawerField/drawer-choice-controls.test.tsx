@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
 
 import { DrawerInfo, DrawerSwatches, DrawerToggle } from './drawer-choice-controls.tsx';
 

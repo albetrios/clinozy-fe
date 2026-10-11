@@ -14,7 +14,7 @@ vi.mock('../../stock-api.ts', async (importOriginal) => ({
   stockListSummary: vi.fn(),
 }));
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import {
   stockItemRow,
   stockMovementRow,

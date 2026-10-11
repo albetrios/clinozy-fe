@@ -3,17 +3,17 @@ import type { UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { isolateJoin } from '@/lib/bidi-isolate.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { Branch, Role } from '@/shared/api/clinic/clinic-schema.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { Branch, Role } from '@/shared/api/app/app-schema.ts';
 import {
   fixtureInvoiceQueryKeys,
   searchSaleCustomers,
-} from '@/shared/api/clinic/invoices-fixture-api.ts';
-import type { SaleCustomerRow } from '@/shared/api/clinic/invoices-fixture-contracts.ts';
-import type { StaffProfile } from '@/shared/api/clinic/staff-fixture-contracts.ts';
-import { CLINIC_KEYS } from '@/shared/clinic/clinic.constants.ts';
-import { formatClinicPhone, toClinicPhone } from '@/shared/clinic/clinic-phone.ts';
-import { clinicPhoneDigits } from '@/shared/clinic/clinic-phone-field.ts';
+} from '@/shared/api/app/invoices-fixture-api.ts';
+import type { SaleCustomerRow } from '@/shared/api/app/invoices-fixture-contracts.ts';
+import type { StaffProfile } from '@/shared/api/app/staff-fixture-contracts.ts';
+import { APP_KEYS } from '@/shared/app/app.constants.ts';
+import { formatAppPhone, toAppPhone } from '@/shared/app/app-phone.ts';
+import { appPhoneDigits } from '@/shared/app/app-phone-field.ts';
 import { personFullName, personInitials } from '@/shared/components/Cells/index.ts';
 import {
   DrawerChips,
@@ -76,7 +76,7 @@ function useSaleTeamOptions(
     .map((person) => ({
       key: person.id,
       label: personFullName(person),
-      sub: person.roles[0] ? t(CLINIC_KEYS.roles[person.roles[0]]) : undefined,
+      sub: person.roles[0] ? t(APP_KEYS.roles[person.roles[0]]) : undefined,
       tone: person.tone,
       leading: { kind: 'avatar', initials: person.initials },
       keywords: [person.initials],
@@ -107,7 +107,7 @@ function customerOption(
   row: SaleCustomerRow,
   t: (key: string) => string,
 ): PickerOption<SaleCustomerRow> {
-  const phone = row.phone ? formatClinicPhone(row.phone) : t(K.customerSub.noMobile);
+  const phone = row.phone ? formatAppPhone(row.phone) : t(K.customerSub.noMobile);
   let sub = isolateJoin([phone]);
   if (row.kind === 'patient') sub = isolateJoin([displayId.patient(row.seq), phone]);
   else if (row.kind === 'lead') sub = isolateJoin([displayId.lead(row.seq), phone]);
@@ -410,7 +410,7 @@ function ContactMobileField({
   const { t } = useTranslation(INVOICE_DRAWER_NS);
   const save = useSetMedicalContactPhone({ notifyOnError: true });
   const [digits, setDigits] = useState(() =>
-    party.phone ? clinicPhoneDigits(party.phone) : '',
+    party.phone ? appPhoneDigits(party.phone) : '',
   );
   const id = `${party.id}-mobile`;
   return (
@@ -423,7 +423,7 @@ function ContactMobileField({
         readOnly={disabled}
         data-testid={INVOICE_DRAWER_TEST_IDS.mobile}
         onBlur={() => {
-          const phone = toClinicPhone(digits);
+          const phone = toAppPhone(digits);
           if (!phone || phone === party.phone) return;
           void save
             .mutateAsync({ id: party.id, phone })

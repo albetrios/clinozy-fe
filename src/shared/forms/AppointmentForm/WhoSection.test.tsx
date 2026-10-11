@@ -5,14 +5,14 @@ import type { ReactElement } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
+import type { LeadRecord } from '@/shared/api/app/leads-contracts.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import {
   contactHit,
   DOCTOR_NISHA,
   TEST_BRANCH_ID,
 } from '@/tests/utils/appointment-doubles.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 
 const { notifyMock, searchContactsMock, fetchLeadMock } = vi.hoisted(() => ({
   notifyMock: { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() },
@@ -20,15 +20,15 @@ const { notifyMock, searchContactsMock, fetchLeadMock } = vi.hoisted(() => ({
   fetchLeadMock: vi.fn(),
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
-vi.mock('@/shared/api/clinic/contacts-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/contacts-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   searchContacts: searchContactsMock,
 }));
-vi.mock('@/shared/api/clinic/leads-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/leads-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchLead: fetchLeadMock,
 }));
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchTeamDirectory: vi.fn(async () => [DOCTOR_NISHA]),
 }));

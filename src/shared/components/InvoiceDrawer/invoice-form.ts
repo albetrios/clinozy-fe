@@ -1,16 +1,16 @@
 import { MONEY_SCALE, numberFromText, rupeesOfPaise } from '@/lib/number-text.ts';
-import type { InvoiceType } from '@/shared/api/clinic/clinic-schema.ts';
+import type { InvoiceType } from '@/shared/api/app/app-schema.ts';
 import type {
   ClinicInvoiceType,
   InvoiceDetail,
   InvoiceInput,
   InvoiceLineInput,
   InvoiceRecord,
-} from '@/shared/api/clinic/invoices-contracts.ts';
+} from '@/shared/api/app/invoices-contracts.ts';
 import {
   EXPENSE_MODE_VALUES,
   type MoneySplit,
-} from '@/shared/api/clinic/payments-contracts.ts';
+} from '@/shared/api/app/payments-contracts.ts';
 
 /*
  * The Invoice drawer's form (KICKOFF §6.9): what each field holds, what a new or an existing

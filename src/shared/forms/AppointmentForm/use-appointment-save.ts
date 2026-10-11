@@ -3,9 +3,9 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
-import { appointmentQueryKeys } from '@/shared/api/clinic/appointments-api.ts';
-import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
-import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
+import { appInstant } from '@/shared/api/app/app-time.ts';
+import { appointmentQueryKeys } from '@/shared/api/app/appointments-api.ts';
+import type { AppointmentRow } from '@/shared/api/app/appointments-contracts.ts';
 import type { DrawerSaveState } from '@/shared/components/DrawerFooter/index.ts';
 import {
   RECORD_DRAWER_KEYS,
@@ -71,7 +71,7 @@ export function saveProblem(
   if (!(draft.date && draft.time)) return 'slot';
   if (!draft.doctorId) return 'doctor';
   const checksSlot = mode !== 'edit' || slotMoved(draft, saved);
-  if (checksSlot && Date.parse(clinicInstant(draft.date, draft.time)) <= now.getTime()) {
+  if (checksSlot && Date.parse(appInstant(draft.date, draft.time)) <= now.getTime()) {
     return 'passed';
   }
   return null;

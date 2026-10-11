@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import { CLINIC_ACTIONS } from '@/shared/api/clinic/access-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { CLINIC_SECTION_ICONS } from '@/shared/clinic/clinic-section-icons.ts';
-import { SECTION_TONES, TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { APP_ACTIONS } from '@/shared/api/app/access-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { APP_SECTION_ICONS } from '@/shared/app/app-section-icons.ts';
+import { SECTION_TONES, TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { Check } from '@/shared/icons/index.ts';
 
 import { USERS_KEYS, USERS_NS } from '../../../users.constants.ts';
@@ -34,14 +34,14 @@ const ROW_KEYS = {
 /** A row's name and line: a section's own row in the room's words, a row under it in its own. */
 function useRowWords() {
   const { t } = useTranslation(USERS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   return (row: MatrixRow) => {
     if (row.sub) {
       const keys = USERS_KEYS.roles.matrix.resources[row.id];
       return { label: t(keys.label), description: t(keys.description) };
     }
-    const keys = CLINIC_KEYS.sections[row.section];
-    return { label: tClinic(keys.label), description: tClinic(keys.description) };
+    const keys = APP_KEYS.sections[row.section];
+    return { label: tApp(keys.label), description: tApp(keys.description) };
   };
 }
 
@@ -62,7 +62,7 @@ function MatrixRowView({
   const words = useRowWords()(row);
   const state = rowState(row, held);
   const tone = TONE_CLASSES[SECTION_TONES[row.section]];
-  const Icon = CLINIC_SECTION_ICONS[row.section];
+  const Icon = APP_SECTION_ICONS[row.section];
   const locked = writes.lock !== null;
   return (
     <div // NOSONAR(S6819): grid ARIA table, see the note above MATRIX_GRID
@@ -100,7 +100,7 @@ function MatrixRowView({
           </span>
         </span>
       </span>
-      {CLINIC_ACTIONS.map((action) => {
+      {APP_ACTIONS.map((action) => {
         const code = row.codes[action];
         if (!code) {
           return (
@@ -227,7 +227,7 @@ export function RoleMatrix({
           >
             {t(USERS_KEYS.roles.matrix.section)}
           </span>
-          {CLINIC_ACTIONS.map((action) => (
+          {APP_ACTIONS.map((action) => (
             <span // NOSONAR(S6819): grid ARIA table, see the note above MATRIX_GRID
               key={action}
               role="columnheader"

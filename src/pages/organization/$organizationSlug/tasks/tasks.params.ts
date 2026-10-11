@@ -5,7 +5,7 @@
  * exported from it that the room uses ships on the first paint; this module
  * loads with the room.
  */
-import type { TaskListQuery } from '@/shared/api/clinic/tasks-contracts.ts';
+import type { TaskListQuery } from '@/shared/api/app/tasks-contracts.ts';
 
 import { TASKS_SEARCH_DEFAULTS, type TasksSearch } from './tasks.search.ts';
 

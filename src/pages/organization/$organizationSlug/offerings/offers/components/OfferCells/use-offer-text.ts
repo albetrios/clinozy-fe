@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
-import { civilDayOffset } from '@/shared/api/clinic/clinic-time.ts';
-import type { OfferRecord } from '@/shared/api/clinic/offerings-contracts.ts';
+import { civilDayOffset } from '@/shared/api/app/app-time.ts';
+import type { OfferRecord } from '@/shared/api/app/offerings-contracts.ts';
 
 import { useOfferLabels } from '../../../shared/hooks/useOfferLabels/index.ts';
 import { OFFERS_KEYS, OFFERS_NS } from '../../offers.constants.ts';

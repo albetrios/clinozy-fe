@@ -2,10 +2,10 @@ import { useParams } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import { feedbackQueryKeys, fetchCheckIn } from '@/shared/api/clinic/feedback-api.ts';
-import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
+import { feedbackQueryKeys, fetchCheckIn } from '@/shared/api/app/feedback-api.ts';
+import { patientName } from '@/shared/api/app/patients-contracts.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useDialogRouteRecord } from '@/shared/hooks/useDialogRouteRecord/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
@@ -30,7 +30,7 @@ export function EditCheckInPage() {
   const { t } = useTranslation(CHECK_IN_NS);
   const { checkInId } = useParams({ strict: false });
   const { patientId, file } = usePatientFileContext();
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const canEdit = access.isResolved ? access.can('patients', 'edit') : undefined;
   const { behind, back } = usePatientFileDialog({ canOpen: canEdit });
   const organizationId = useOrganizationStore((state) => state.organizationId);
@@ -41,7 +41,7 @@ export function EditCheckInPage() {
     recordLabel: t(CHECK_IN_KEYS.record),
     onMissing: back,
   });
-  const [today] = useState(() => clinicToday());
+  const [today] = useState(() => appToday());
   const Section = PATIENT_FILE_SECTION_PAGES[behind];
 
   return (

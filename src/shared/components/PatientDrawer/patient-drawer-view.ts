@@ -2,17 +2,17 @@ import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
 import { isolateJoin } from '@/lib/bidi-isolate.ts';
-import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
-import { civilYearsBetween, localDateOf } from '@/shared/api/clinic/clinic-time.ts';
-import { CLINIC_KEYS } from '@/shared/clinic/clinic.constants.ts';
-import { formatClinicPhone, toClinicPhone } from '@/shared/clinic/clinic-phone.ts';
-import { formatClinicPhoneDigits } from '@/shared/clinic/clinic-phone-field.ts';
+import { civilYearsBetween, localDateOf } from '@/shared/api/app/app-time.ts';
+import type { BranchOption } from '@/shared/api/app/branches-api.ts';
+import { APP_KEYS } from '@/shared/app/app.constants.ts';
+import { formatAppPhone, toAppPhone } from '@/shared/app/app-phone.ts';
+import { formatAppPhoneDigits } from '@/shared/app/app-phone-field.ts';
 import {
   GENDER_TONES,
   PATIENT_CONVERSION_TONES,
   PATIENT_STATUS_TONES,
   PATIENT_TYPE_TONES,
-} from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/app/app-tones.ts';
 import {
   type DrawerPeekItem,
   drawerStepSummary,
@@ -78,8 +78,8 @@ function patientFormLabels(
   const { gender, dateOfBirth, conversion, referralSource } = values;
   return {
     name: patientFormName(values),
-    types: values.types.map((type) => t(CLINIC_KEYS.patients.types[type])),
-    status: t(CLINIC_KEYS.patients.statuses[values.status]),
+    types: values.types.map((type) => t(APP_KEYS.patients.types[type])),
+    status: t(APP_KEYS.patients.statuses[values.status]),
     gender: gender ? t(PERSON_CARD_KEYS.gender[gender]) : undefined,
     birth: dateOfBirth
       ? formatDate(
@@ -88,9 +88,9 @@ function patientFormLabels(
           { civilDay: true },
         )
       : undefined,
-    conversion: conversion ? t(CLINIC_KEYS.patients.conversions[conversion]) : undefined,
+    conversion: conversion ? t(APP_KEYS.patients.conversions[conversion]) : undefined,
     referrer: referralSource
-      ? t(CLINIC_KEYS.patients.referralSources[referralSource])
+      ? t(APP_KEYS.patients.referralSources[referralSource])
       : undefined,
     followUp: formatFollowUp(values, formatDate),
     consents: values.consents.map((consent) => t(PERSON_CARD_KEYS.consent[consent])),
@@ -104,7 +104,7 @@ function contactPeekOf(
   branch: { shown: boolean; picked: BranchOption | undefined },
   t: TFunction,
 ): DrawerPeekItem[] {
-  const digits = (value: string) => (value ? formatClinicPhoneDigits(value) : undefined);
+  const digits = (value: string) => (value ? formatAppPhoneDigits(value) : undefined);
   return [
     { kind: 'value', label: t(K.fields.firstName), value: values.firstName.trim() },
     { kind: 'value', label: t(K.fields.lastName), value: values.lastName.trim() },
@@ -206,7 +206,7 @@ export function usePatientDrawerView({
   const { t } = useTranslation(PATIENT_DRAWER_NS);
   const { formatDate } = useLocaleFormat();
   const labels = patientFormLabels(values, today, t, formatDate);
-  const storedPhone = toClinicPhone(values.phone);
+  const storedPhone = toAppPhone(values.phone);
   const notFilled = t(RECORD_DRAWER_KEYS.step.notFilled);
 
   const contactPeek = contactPeekOf(
@@ -226,7 +226,7 @@ export function usePatientDrawerView({
     summary: isolateJoin([
       labels.name || t(K.summaryEmpty),
       labels.types.join(', '),
-      storedPhone ? formatClinicPhone(storedPhone) : '',
+      storedPhone ? formatAppPhone(storedPhone) : '',
     ]),
     badges: drawerBadges(values, labels, t),
     contact: {

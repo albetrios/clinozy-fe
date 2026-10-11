@@ -3,23 +3,23 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
-import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
-import type * as DirectoryApiModule from '@/shared/api/clinic/directory-api.ts';
-import type * as TasksApiModule from '@/shared/api/clinic/tasks-api.ts';
-import { listTasks, recordTaskOutcome } from '@/shared/api/clinic/tasks-api.ts';
-import type * as TodayApiModule from '@/shared/api/clinic/today-api.ts';
+import type { Role } from '@/shared/api/app/app-schema.ts';
+import { appInstant } from '@/shared/api/app/app-time.ts';
+import type * as DirectoryApiModule from '@/shared/api/app/directory-api.ts';
+import type * as TasksApiModule from '@/shared/api/app/tasks-api.ts';
+import { listTasks, recordTaskOutcome } from '@/shared/api/app/tasks-api.ts';
+import type * as TodayApiModule from '@/shared/api/app/today-api.ts';
 import type {
   TodayEnquiry,
   TodayFloorRow,
   TodayLane,
-} from '@/shared/api/clinic/today-contracts.ts';
-import { CROSS_ROOM_PARAM } from '@/shared/clinic/clinic-referrer.ts';
+} from '@/shared/api/app/today-contracts.ts';
+import { CROSS_ROOM_PARAM } from '@/shared/app/app-referrer.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 import type * as MyMembershipModule from '@/shared/tenancy/my-membership.ts';
-import { previewPreset } from '@/tests/utils/clinic-preset-codes.ts';
+import { previewPreset } from '@/tests/utils/app-preset-codes.ts';
 
 import { TodayPage } from '../../TodayPage.tsx';
 import {
@@ -63,7 +63,7 @@ const floor = vi.hoisted(() => {
   };
   return state;
 });
-vi.mock('@/shared/api/clinic/today-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/today-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof TodayApiModule>()),
   fetchTodayFloor: async () => {
     floor.reads += 1;
@@ -85,7 +85,7 @@ vi.mock('@/shared/api/clinic/today-api.ts', async (importOriginal) => ({
   },
 }));
 /** Today checks in, and undoes it, through the booking's own move routes. */
-vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/appointments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   moveAppointment: async ({
     appointmentId,
@@ -106,14 +106,14 @@ vi.mock('@/shared/api/clinic/appointments-api.ts', async (importOriginal) => ({
 
 /** The work queue's server (`tasks-api.ts`), the team and the member's membership. */
 const queue = vi.hoisted(() => ({ tasks: [] }) as QueueWorld);
-vi.mock('@/shared/api/clinic/tasks-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/tasks-api.ts', async (importOriginal) => {
   const { queueApiDouble } = await import('./today-fixtures.ts');
   return {
     ...(await importOriginal<typeof TasksApiModule>()),
     ...queueApiDouble(queue),
   };
 });
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => {
   const { QUEUE_TEAM } = await import('./today-fixtures.ts');
   return {
     ...(await importOriginal<typeof DirectoryApiModule>()),
@@ -186,7 +186,7 @@ const initialHourCycle = useLocaleStore.getState().hourCycle;
 beforeEach(() => {
   // The floor is the seed day's: pin the clinic clock to 10:42 on it (H:3410).
   vi.useFakeTimers({ toFake: ['Date'] });
-  vi.setSystemTime(new Date(clinicInstant('2026-10-03', '10:42')));
+  vi.setSystemTime(new Date(appInstant('2026-10-03', '10:42')));
   useLocaleStore.setState({ hourCycle: 'h23' });
   Object.assign(floor, seededFloor(), { failing: false });
   Object.assign(queue, seededQueue());

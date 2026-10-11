@@ -1,4 +1,4 @@
-import type { LeadListParams, LeadSortKey } from '@/shared/api/clinic/leads-contracts.ts';
+import type { LeadListParams, LeadSortKey } from '@/shared/api/app/leads-contracts.ts';
 
 import { LEADS_SEARCH_DEFAULTS, type LeadsSearch } from '../../leads.search.ts';
 

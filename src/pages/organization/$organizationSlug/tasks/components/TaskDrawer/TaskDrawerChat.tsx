@@ -1,5 +1,5 @@
-import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
-import type { TaskPerson } from '@/shared/api/clinic/tasks-contracts.ts';
+import type { LeadRecord } from '@/shared/api/app/leads-contracts.ts';
+import type { TaskPerson } from '@/shared/api/app/tasks-contracts.ts';
 import {
   ChatColumn,
   chatContactOfContact,

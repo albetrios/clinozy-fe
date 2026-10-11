@@ -1,5 +1,5 @@
-import type { ClinicAction } from '@/shared/api/clinic/access-contracts.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import type { AppAction } from '@/shared/api/app/access-contracts.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 
 /** What the member may do in Clinic stock — every flag `false` until access resolves. */
 export interface StockAccess {
@@ -26,8 +26,8 @@ export interface StockAccess {
  * alone (Q-S1); Export is the table's (`stock_item:export`).
  */
 export function useStockAccess(): StockAccess {
-  const access = useClinicAccess();
-  const can = (action: ClinicAction) => access.isResolved && access.can('stock', action);
+  const access = useAppAccess();
+  const can = (action: AppAction) => access.isResolved && access.can('stock', action);
   return {
     resolved: access.isResolved,
     canCreate: can('create'),

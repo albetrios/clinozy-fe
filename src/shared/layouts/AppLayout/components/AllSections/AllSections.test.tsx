@@ -21,7 +21,7 @@ const room = (
   to: `/organization/$organizationSlug/${id}`,
   section: id,
   icon,
-  labelNs: 'clinic',
+  labelNs: 'app',
   labelKey: `sections.${id}.label`,
   tone,
   descriptionKey: `sections.${id}.description`,

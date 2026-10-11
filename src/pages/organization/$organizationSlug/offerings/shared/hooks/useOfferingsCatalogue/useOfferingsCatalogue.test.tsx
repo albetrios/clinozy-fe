@@ -3,16 +3,16 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/offerings-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchAllOfferings: vi.fn(),
   fetchAllOffers: vi.fn(),
 }));
-import { branchRef } from '@/shared/api/clinic/fixtures/organization.fixtures.ts';
-import { fetchAllOfferings, fetchAllOffers } from '@/shared/api/clinic/offerings-api.ts';
-import * as preferencesApi from '@/shared/api/clinic/preferences-api.ts';
+import { branchRef } from '@/shared/api/app/fixtures/organization.fixtures.ts';
+import { fetchAllOfferings, fetchAllOffers } from '@/shared/api/app/offerings-api.ts';
+import * as preferencesApi from '@/shared/api/app/preferences-api.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { offeringRecord, offerRecord } from '@/tests/utils/offering-doubles.ts';
 
 import { useOfferingsCatalogue } from './useOfferingsCatalogue.ts';
@@ -67,7 +67,7 @@ describe('useOfferingsCatalogue', () => {
   it('names the pricing branch the header picks alone', async () => {
     const vesu = branchRef('Vesu');
     const spy = vi.spyOn(preferencesApi, 'fetchMyPreferences').mockResolvedValue({
-      ...preferencesApi.DEFAULT_CLINIC_PREFERENCES,
+      ...preferencesApi.DEFAULT_APP_PREFERENCES,
       branchFilter: [vesu],
     });
     const { result } = renderHook(() => useOfferingsCatalogue(), { wrapper });

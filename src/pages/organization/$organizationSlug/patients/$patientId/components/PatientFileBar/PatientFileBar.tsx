@@ -2,12 +2,12 @@ import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { PatientFile } from '@/shared/api/clinic/patient-file-contracts.ts';
-import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
-import type { PatientFilePin } from '@/shared/api/clinic/preferences-api.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
-import type { PatientFileSectionSlug } from '@/shared/clinic/patient-file-sections.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { PatientFile } from '@/shared/api/app/patient-file-contracts.ts';
+import { patientName } from '@/shared/api/app/patients-contracts.ts';
+import type { PatientFilePin } from '@/shared/api/app/preferences-api.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
+import type { PatientFileSectionSlug } from '@/shared/app/patient-file-sections.ts';
 import {
   PersonAvatar,
   personInitials,

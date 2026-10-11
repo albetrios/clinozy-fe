@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import type { ContactActivityEntry } from '@/shared/api/clinic/contact-activities-api.ts';
+import type { ContactActivityEntry } from '@/shared/api/app/contact-activities-api.ts';
 import { Camera, ClipboardList, MessageSquare, Pill } from '@/shared/icons/index.ts';
 
 import {

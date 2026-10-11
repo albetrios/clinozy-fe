@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import { PATIENT_PHOTO_CONTENT_TYPES } from '@/shared/api/clinic/patient-images-contracts.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import { PATIENT_PHOTO_CONTENT_TYPES } from '@/shared/api/app/patient-images-contracts.ts';
 import { UPLOAD_MAX_BYTES } from '@/shared/api/uploads-api.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import {
   DrawerFilesField,
   type PickedFile,

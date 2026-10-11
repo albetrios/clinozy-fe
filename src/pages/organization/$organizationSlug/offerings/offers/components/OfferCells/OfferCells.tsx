@@ -1,8 +1,5 @@
-import type {
-  OfferRecord,
-  OfferStatus,
-} from '@/shared/api/clinic/offerings-contracts.ts';
-import { OFFER_STATE_TONES } from '@/shared/clinic/clinic-tones.ts';
+import type { OfferRecord, OfferStatus } from '@/shared/api/app/offerings-contracts.ts';
+import { OFFER_STATE_TONES } from '@/shared/app/app-tones.ts';
 import { TonePill } from '@/shared/components/Cells/index.ts';
 
 import { CellText } from '../../../shared/components/CatalogueCells/index.ts';

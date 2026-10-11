@@ -1,17 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import i18n from '@/lib/i18n/i18n.ts';
-import type { LeadMessage } from '@/shared/api/clinic/clinic-schema.ts';
-import {
-  clinicClockTime,
-  clinicToday,
-  localDateOf,
-} from '@/shared/api/clinic/clinic-time.ts';
-import { patientRef } from '@/shared/api/clinic/fixtures/patients.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import { fetchContactHistory } from '@/shared/api/clinic/messages-api.ts';
-import type { ContactHistoryEntry } from '@/shared/api/clinic/messages-contracts.ts';
-import { clinicClockOf } from '@/shared/hooks/useClinicClock/index.ts';
+import type { LeadMessage } from '@/shared/api/app/app-schema.ts';
+import { appClockTime, appToday, localDateOf } from '@/shared/api/app/app-time.ts';
+import { patientRef } from '@/shared/api/app/fixtures/patients.fixtures.ts';
+import { resetAppFixtures } from '@/shared/api/app/fixtures/world.fixtures.ts';
+import { fetchContactHistory } from '@/shared/api/app/messages-api.ts';
+import type { ContactHistoryEntry } from '@/shared/api/app/messages-contracts.ts';
+import { appClockOf } from '@/shared/hooks/useAppClock/index.ts';
 import {
   Calendar,
   CheckCircle,
@@ -65,20 +61,20 @@ const weekdayOf = (date: string) => WEEKDAYS[localDateOf(date).getDay()] ?? '';
  * The clinic's clock on Saturday 3 Oct 2026 — the rooms' one time rule over
  * parts that format as the design writes them (12-hour, lowercase).
  */
-const clock: ChatClock = clinicClockOf(
+const clock: ChatClock = appClockOf(
   {
     today: '2026-10-03',
-    clinicToday: '2026-10-03',
-    dayOf: (instant) => clinicToday(new Date(instant)),
+    appToday: '2026-10-03',
+    dayOf: (instant) => appToday(new Date(instant)),
     time: (instant) => {
-      const [hour = 0, minute = 0] = clinicClockTime(new Date(instant))
+      const [hour = 0, minute = 0] = appClockTime(new Date(instant))
         .split(':')
         .map(Number);
       const meridiem = hour < 12 ? 'am' : 'pm';
       return `${hour % 12 || 12}:${String(minute).padStart(2, '0')} ${meridiem}`;
     },
     shortTime: (instant) => {
-      const [hour = 0, minute = 0] = clinicClockTime(new Date(instant))
+      const [hour = 0, minute = 0] = appClockTime(new Date(instant))
         .split(':')
         .map(Number);
       const meridiem = hour < 12 ? 'am' : 'pm';
@@ -382,11 +378,11 @@ describe('a patient’s history, end to end', () => {
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ['Date'] });
     vi.setSystemTime(new Date('2026-10-03T09:30:00Z'));
-    resetClinicFixtures();
+    resetAppFixtures();
   });
   afterEach(() => {
     vi.useRealTimers();
-    resetClinicFixtures();
+    resetAppFixtures();
   });
 
   it('reads Dharti Galani’s records as the design’s chips, oldest first', async () => {

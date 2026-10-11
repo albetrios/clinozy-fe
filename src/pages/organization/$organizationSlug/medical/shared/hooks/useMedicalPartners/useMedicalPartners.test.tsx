@@ -3,11 +3,11 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
+import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
 import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+  appFixtures,
+  resetAppFixtures,
+} from '@/shared/api/app/fixtures/world.fixtures.ts';
 import { isHttpError } from '@/shared/errors/HttpError.ts';
 
 import {
@@ -82,8 +82,8 @@ async function refusal(write: () => Promise<unknown>): Promise<number | undefine
   return undefined;
 }
 
-beforeEach(() => resetClinicFixtures());
-afterEach(() => resetClinicFixtures());
+beforeEach(() => resetAppFixtures());
+afterEach(() => resetAppFixtures());
 
 describe('useMedicalPartners — suppliers (S:1675)', () => {
   it('creates, saves, quick-adds and deletes a supplier, and undoes the delete', async () => {
@@ -120,11 +120,11 @@ describe('useMedicalPartners — suppliers (S:1675)', () => {
         note: null,
       });
     });
-    expect(clinicFixtures.suppliers.snapshot((row) => row.id === id)).toHaveLength(0);
+    expect(appFixtures.suppliers.snapshot((row) => row.id === id)).toHaveLength(0);
     await act(async () => {
       await result.current.restoreSupplier.mutateAsync(id);
     });
-    expect(clinicFixtures.suppliers.snapshot((row) => row.id === id)).toHaveLength(1);
+    expect(appFixtures.suppliers.snapshot((row) => row.id === id)).toHaveLength(1);
   });
 
   it('refuses a name left empty, an unknown maker, and deleting a supplier with an order to settle', async () => {
@@ -180,11 +180,11 @@ describe('useMedicalPartners — manufacturers', () => {
       id = maker.id;
       expect(maker.name).toBe('ACME');
     });
+    expect((await appFixtures.suppliers.get(ref.supplier(61))).manufacturerIds).toContain(
+      id,
+    );
     expect(
-      (await clinicFixtures.suppliers.get(ref.supplier(61))).manufacturerIds,
-    ).toContain(id);
-    expect(
-      (await clinicFixtures.medicalReps.get(ref.medicalRep(1))).manufacturerIds,
+      (await appFixtures.medicalReps.get(ref.medicalRep(1))).manufacturerIds,
     ).toContain(id);
 
     await act(async () => {
@@ -194,13 +194,13 @@ describe('useMedicalPartners — manufacturers', () => {
       });
     });
     expect(
-      (await clinicFixtures.suppliers.get(ref.supplier(61))).manufacturerIds,
+      (await appFixtures.suppliers.get(ref.supplier(61))).manufacturerIds,
     ).not.toContain(id);
+    expect((await appFixtures.suppliers.get(ref.supplier(52))).manufacturerIds).toContain(
+      id,
+    );
     expect(
-      (await clinicFixtures.suppliers.get(ref.supplier(52))).manufacturerIds,
-    ).toContain(id);
-    expect(
-      (await clinicFixtures.medicalReps.get(ref.medicalRep(1))).manufacturerIds,
+      (await appFixtures.medicalReps.get(ref.medicalRep(1))).manufacturerIds,
     ).not.toContain(id);
   });
 
@@ -266,7 +266,7 @@ describe('useMedicalPartners — MRs and visits (S:1676)', () => {
       });
       expect(visit).toMatchObject({ mrId: ref.medicalRep(2), samples: '4 tubes Azelan' });
     });
-    expect((await clinicFixtures.medicalReps.get(ref.medicalRep(2))).nextVisitOn).toBe(
+    expect((await appFixtures.medicalReps.get(ref.medicalRep(2))).nextVisitOn).toBe(
       '2026-10-18',
     );
   });

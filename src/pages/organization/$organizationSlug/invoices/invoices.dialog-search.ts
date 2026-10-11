@@ -8,7 +8,7 @@
  * loads with the room.
  */
 import { matchOf, oneOf, PUBLIC_ID, textOf } from '@/lib/routes/search-params.ts';
-import type { InvoiceType } from '@/shared/api/clinic/clinic-schema.ts';
+import type { InvoiceType } from '@/shared/api/app/app-schema.ts';
 
 import type { InvoiceSearch } from './invoices.search.ts';
 

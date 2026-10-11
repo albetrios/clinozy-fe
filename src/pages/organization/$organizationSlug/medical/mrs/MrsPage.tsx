@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
 import { roomFiltersOf, useRoomFilters } from '@/shared/components/RoomToolbar/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
 import { useRoomList } from '@/shared/hooks/useRoomList/index.ts';
 import { useRoomTable } from '@/shared/hooks/useRoomTable/index.ts';
@@ -48,7 +48,7 @@ export function MrsPage() {
   const search = validateMedicalSearch(useSearch({ strict: false }));
   const params = mrParamsOf(search);
   const { patchSearch } = useDataTableUrlState(true);
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const nav = useMedicalNav();
   const filters = useRoomFilters(MR_FILTER_FIELDS);
   const stack = useMedicalStack();

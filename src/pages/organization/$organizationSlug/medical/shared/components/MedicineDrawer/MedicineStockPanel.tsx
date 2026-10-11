@@ -7,8 +7,8 @@ import {
   MEDICINE_STOCK_HEALTH_TONES,
   medicineStockHealth,
   reorderQuantity,
-} from '@/shared/api/clinic/medicine-stock.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/api/app/medicine-stock.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { DrawerStepper } from '@/shared/components/DrawerField/index.ts';
 import { Label } from '@/shared/components/ui/label.tsx';
 

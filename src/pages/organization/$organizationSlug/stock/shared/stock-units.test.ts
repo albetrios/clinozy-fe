@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { STOCK_CATEGORY_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
+import { STOCK_CATEGORY_VALUES } from '@/shared/api/app/app-schema.ts';
 
 import { STOCK_MOVEMENT_KINDS, STOCK_PURCHASE_STATUSES } from '../stock.search.ts';
 import {

@@ -5,7 +5,7 @@ import { axe } from 'vitest-axe';
 
 import i18n from '@/lib/i18n/i18n.ts';
 import { ensureNamespace } from '@/lib/i18n/load-namespace.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+import { resetAppFixtures } from '@/shared/api/app/fixtures/world.fixtures.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 
@@ -85,11 +85,11 @@ beforeEach(() => {
     clinicName: 'Cresence Skin',
     customers: [WALK_IN, DHARTI],
   };
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 afterEach(async () => {
   resetMedicalRoutes();
-  resetClinicFixtures();
+  resetAppFixtures();
   await i18n.changeLanguage('en');
 });
 

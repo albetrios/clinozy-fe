@@ -3,26 +3,26 @@ import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
-import { resolveAccessFromCodes } from '@/shared/api/clinic/access-api.ts';
-import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
+import { resolveAccessFromCodes } from '@/shared/api/app/access-api.ts';
+import type { BranchOption } from '@/shared/api/app/branches-api.ts';
 import {
   createOffering,
   deleteOffering,
   fetchOffering,
   updateOffering,
-} from '@/shared/api/clinic/offerings-api.ts';
+} from '@/shared/api/app/offerings-api.ts';
 import {
   offeringChangeOf,
   type OfferingFields,
   type OfferingRecord,
-} from '@/shared/api/clinic/offerings-contracts.ts';
+} from '@/shared/api/app/offerings-contracts.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
-import type { ClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import type { AppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { withoutBidiMarks } from '@/tests/utils/bidi-marks.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import {
   offeringRecord,
   offerRecord,
@@ -52,7 +52,7 @@ vi.mock('@/shared/notify/index.ts', () => ({
   TOAST_DURATION_MS: { default: 5200, error: 9000, undo: 10_000 },
 }));
 
-vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/offerings-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   createOffering: vi.fn(),
   updateOffering: vi.fn(),
@@ -63,9 +63,9 @@ vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => ({
 
 /** The member's clinozy-be codes — the room answers from them once it is on the API. */
 const member = vi.hoisted(() => ({ codes: [] as string[] }));
-vi.mock('@/shared/hooks/useClinicAccess/index.ts', async (importOriginal) => ({
+vi.mock('@/shared/hooks/useAppAccess/index.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
-  useClinicAccess: (): ClinicAccess => ({
+  useAppAccess: (): AppAccess => ({
     roles: [],
     previewRole: null,
     isResolved: true,

@@ -5,7 +5,7 @@ import { focusSurfaceOnOpen } from '@/lib/focus-surface.ts';
 import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
 import { closeControlClassName } from '@/lib/icon-surface.ts';
 import { cn } from '@/lib/utils.ts';
-import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
+import type { AppointmentRow } from '@/shared/api/app/appointments-contracts.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
   Popover,

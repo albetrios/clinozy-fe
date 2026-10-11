@@ -15,11 +15,11 @@ import { type ReactNode, useCallback } from 'react';
 
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import { organizationTasks } from '@/lib/routes/tasks-builders.ts';
-import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Role } from '@/shared/api/app/app-schema.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
-import { PRESET_CODES } from '@/tests/utils/clinic-preset-codes.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { PRESET_CODES } from '@/tests/utils/app-preset-codes.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 
 import { validateTaskCreateSearch } from '../../tasks.dialog-search.ts';
 import { validateTasksSearch } from '../../tasks.search.ts';

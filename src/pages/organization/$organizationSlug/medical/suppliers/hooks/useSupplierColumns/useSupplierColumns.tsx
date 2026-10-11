@@ -1,8 +1,8 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 
-import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { formatAppPhone } from '@/shared/app/app-phone.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { MoneyCell, PersonChip, TonePill } from '@/shared/components/Cells/index.ts';
 import type { DataTableFeatures } from '@/shared/components/DataTable/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
@@ -42,7 +42,7 @@ export function useSupplierColumns(): ColumnDef<DataTableFeatures, SupplierRow>[
           name={row.original.name}
           sub={
             row.original.phone
-              ? formatClinicPhone(row.original.phone)
+              ? formatAppPhone(row.original.phone)
               : t(MEDICAL_KEYS.table.addPhone)
           }
           tone="sky"

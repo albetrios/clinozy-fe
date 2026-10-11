@@ -10,11 +10,11 @@ import {
 import { render } from '@testing-library/react';
 
 import type { OrganizationPermission } from '@/core/rbac/policies.ts';
-import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Role } from '@/shared/api/app/app-schema.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
-import { PRESET_CODES } from '@/tests/utils/clinic-preset-codes.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { PRESET_CODES } from '@/tests/utils/app-preset-codes.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 
 import { validateOfferingCreateSearch } from '../../offerings.dialog-search.ts';
 import { validateOfferingsSearch } from '../../offerings.search.ts';

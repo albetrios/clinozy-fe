@@ -17,11 +17,11 @@ membership, `membership:update`); Delete cancels the invitation instead (`useRev
 
 ## Files
 
-| File               | Responsibility                                                                                     |
-| ------------------ | -------------------------------------------------------------------------------------------------- |
-| `edit.route.tsx`   | Route marker — exports `Component` rendering `EditUserPage`.                                       |
-| `edit.manifest.ts` | Manifest — `kind: 'leaf'`, permission `membership:read`, module `clinic-users`, title "Edit user". |
-| `EditUserPage.tsx` | Renders nothing — the dialog route's own UI. The drawer mounts on the Users page.                  |
+| File               | Responsibility                                                                                  |
+| ------------------ | ----------------------------------------------------------------------------------------------- |
+| `edit.route.tsx`   | Route marker — exports `Component` rendering `EditUserPage`.                                    |
+| `edit.manifest.ts` | Manifest — `kind: 'leaf'`, permission `membership:read`, module `app-users`, title "Edit user". |
+| `EditUserPage.tsx` | Renders nothing — the dialog route's own UI. The drawer mounts on the Users page.               |
 
 ## Test ids
 

@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 
 import { USERS_KEYS, USERS_NS } from '../../../users.constants.ts';
 import { SPECIAL_PERMISSIONS, type SpecialPermission } from './roles-matrix.ts';
@@ -26,12 +26,12 @@ export function RoleSpecials({
   writes: RoleAccessWrites;
 }) {
   const { t } = useTranslation(USERS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const words = (special: SpecialPermission) => {
     const keys = USERS_KEYS.roles.specials[special.kind];
     return {
       label: t(keys.label, {
-        section: tClinic(CLINIC_KEYS.sections[special.section].label),
+        section: tApp(APP_KEYS.sections[special.section].label),
       }),
       description: t(keys.description),
     };

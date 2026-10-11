@@ -1,13 +1,13 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
-import type { InvoiceType, Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { InvoiceType, Tone } from '@/shared/api/app/app-schema.ts';
 
 /**
- * The Invoice drawer's copy lives in `clinic`, not the room's `payments`: the
+ * The Invoice drawer's copy lives in `app`, not the room's `payments`: the
  * drawer is shared — the `invoices/` routes open it over Payments, the patient
- * file and Medical's New sale (KICKOFF §6.9) — and `clinic` loads with the org
+ * file and Medical's New sale (KICKOFF §6.9) — and `app` loads with the org
  * shell wherever it renders.
  */
-export const INVOICE_DRAWER_NS = I18N_NAMESPACES.clinic;
+export const INVOICE_DRAWER_NS = I18N_NAMESPACES.app;
 
 /** Key paths for the Invoice drawer and the preview (`payments.md` › Copy, verbatim). */
 export const INVOICE_DRAWER_KEYS = {

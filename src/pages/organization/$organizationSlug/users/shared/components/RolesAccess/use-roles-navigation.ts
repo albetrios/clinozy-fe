@@ -6,7 +6,7 @@ import {
   organizationUserEdit,
   organizationUsersRoles,
 } from '@/lib/routes/users-builders.ts';
-import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
+import type { TeamMember } from '@/shared/api/app/users-contracts.ts';
 import type { RoleSummary } from '@/shared/api/organization-contracts.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';

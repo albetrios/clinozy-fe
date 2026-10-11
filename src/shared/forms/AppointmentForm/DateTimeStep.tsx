@@ -2,18 +2,18 @@ import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
 import {
-  APPOINTMENT_SLOT_STEPS,
-  type AppointmentClosedReason,
-  type AppointmentSlotDay,
-  type AppointmentSlotStep,
-} from '@/shared/api/clinic/appointments-contracts.ts';
-import {
   addCivilDays,
   civilDateOf,
   civilMonthStart,
   localDateOf,
-} from '@/shared/api/clinic/clinic-time.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/api/app/app-time.ts';
+import {
+  APPOINTMENT_SLOT_STEPS,
+  type AppointmentClosedReason,
+  type AppointmentSlotDay,
+  type AppointmentSlotStep,
+} from '@/shared/api/app/appointments-contracts.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import {
   DrawerQuickChips,
   type DrawerQuickOption,

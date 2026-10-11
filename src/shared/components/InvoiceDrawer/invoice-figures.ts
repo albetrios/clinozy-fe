@@ -1,5 +1,5 @@
 import { paiseOfRupees } from '@/lib/number-text.ts';
-import type { InvoicePreview } from '@/shared/api/clinic/invoices-contracts.ts';
+import type { InvoicePreview } from '@/shared/api/app/invoices-contracts.ts';
 
 import type { SaleDraftFigures } from './sale-form.ts';
 

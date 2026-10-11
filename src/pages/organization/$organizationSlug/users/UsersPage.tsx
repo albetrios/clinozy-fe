@@ -7,15 +7,15 @@ import {
   organizationUserCreate,
   organizationUserEdit,
 } from '@/lib/routes/users-builders.ts';
-import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
+import type { BranchOption } from '@/shared/api/app/branches-api.ts';
 import {
   compareTeamMembers,
   teamMemberMatchesFilters,
   teamMemberMatchesSearch,
-} from '@/shared/api/clinic/users-api.ts';
-import type { TeamMember, TeamSortKey } from '@/shared/api/clinic/users-contracts.ts';
-import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
+} from '@/shared/api/app/users-api.ts';
+import type { TeamMember, TeamSortKey } from '@/shared/api/app/users-contracts.ts';
+import { formatAppPhone } from '@/shared/app/app-phone.ts';
 import { DataTable } from '@/shared/components/DataTable/index.ts';
 import type { DataTableBulkAction } from '@/shared/components/DataTableBulkBar/index.ts';
 import { DataTableColumnChooser } from '@/shared/components/DataTableColumnChooser/index.ts';
@@ -27,8 +27,8 @@ import {
   useRoomFilters,
 } from '@/shared/components/RoomToolbar/index.ts';
 import { SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
 import { useTeam } from '@/shared/hooks/useTeam/index.ts';
@@ -132,7 +132,7 @@ function useTeamRows(
   roles: RoleDirectory,
 ): TeamMember[] {
   return useMemo(() => {
-    const today = clinicToday();
+    const today = appToday();
     const filtered = members.filter(
       (member) =>
         teamMemberMatchesSearch(member, search.q ?? '') &&
@@ -194,7 +194,7 @@ function TeamEmpty({
  * member's own, or the previewed role's.
  */
 function useTeamAccess() {
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const can = (action: 'view' | 'create' | 'edit' | 'delete') =>
     access.isResolved && access.can('users', action);
   return {
@@ -324,7 +324,7 @@ export function UsersPage() {
               columns.map((column) => {
                 if (column.id === 'name') {
                   return member.phone
-                    ? `${member.name} · ${formatClinicPhone(member.phone)}`
+                    ? `${member.name} · ${formatAppPhone(member.phone)}`
                     : member.name;
                 }
                 if (column.id === 'email') return member.email;

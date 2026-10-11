@@ -5,7 +5,7 @@ import { axe } from 'vitest-axe';
 
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import i18n from '@/lib/i18n/i18n.ts';
-import type * as PaymentsApiModule from '@/shared/api/clinic/payments-api.ts';
+import type * as PaymentsApiModule from '@/shared/api/app/payments-api.ts';
 import {
   deletePayment,
   fetchLedgerCount,
@@ -13,8 +13,8 @@ import {
   listLedger,
   listOpenSupplierBills,
   reversePayment,
-} from '@/shared/api/clinic/payments-api.ts';
-import type { LedgerListParams } from '@/shared/api/clinic/payments-contracts.ts';
+} from '@/shared/api/app/payments-api.ts';
+import type { LedgerListParams } from '@/shared/api/app/payments-contracts.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { fsi } from '@/tests/utils/bidi-marks.ts';
@@ -59,7 +59,7 @@ vi.mock('@/lib/csv.ts', async (importOriginal) => ({
   downloadCsv: csv.downloadCsv,
 }));
 
-vi.mock('@/shared/api/clinic/payments-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/payments-api.ts', async (importOriginal) => {
   const { ledgerApiDouble } = await import('./payments-ledger-data.ts');
   const double = ledgerApiDouble();
   return {

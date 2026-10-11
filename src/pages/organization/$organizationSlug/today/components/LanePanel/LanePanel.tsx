@@ -2,12 +2,12 @@ import { useEffect, useId, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type { TodayLane } from '@/shared/api/clinic/today-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import type { TodayLane } from '@/shared/api/app/today-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 
@@ -42,15 +42,15 @@ export interface LanePanelProps {
 /** A flag in words. */
 function useFlagWords(today: string): (flag: TodayFlag) => string {
   const { t } = useTranslation(TODAY_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const { formatNumber } = useLocaleFormat();
   const formatRupees = useRupeeFormat();
-  const clock = useClinicClock();
+  const clock = useAppClock();
   const K = TODAY_KEYS.flags;
   return (flag) => {
     switch (flag.id) {
       case 'channel':
-        return tClinic(CLINIC_KEYS.channels[flag.channel]);
+        return tApp(APP_KEYS.channels[flag.channel]);
       case 'waiting':
         return t(K.waiting, { minutes: formatNumber(flag.minutes) });
       case 'inRoom':
@@ -87,7 +87,7 @@ function VisitCard({
   onOpen: (card: TodayCard) => void;
 }) {
   const { t } = useTranslation(TODAY_NS);
-  const clock = useClinicClock();
+  const clock = useAppClock();
   const flagWords = useFlagWords(today);
   const service = useCardServiceLine();
   const meta = TODAY_LANE_META[card.lane];

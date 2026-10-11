@@ -6,7 +6,7 @@ export const USERS_NS = I18N_NAMESPACES.users;
 /**
  * The Users room's copy, verbatim from `users.md` › Copy (KICKOFF §6.12). The
  * section names and descriptions, the role names and the reason confirm's
- * chrome are the shared clinic vocabulary (`CLINIC_KEYS`).
+ * chrome are the shared clinic vocabulary (`APP_KEYS`).
  */
 export const USERS_KEYS = {
   manifest: { title: 'manifest.title' },

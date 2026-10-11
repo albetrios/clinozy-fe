@@ -9,7 +9,7 @@ days, hours and commission — searched, filtered and sorted in place. Its child
 Branches (`branches/`), registered beside the Team in the route tree. A member opened from a role page
 (`?from=roles`) keeps Roles & access behind the drawer, and closing it returns to that role.
 
-Gated on `membership:read` and the `clinic-users` module, then `requireOrgStatus`. In-room, the
+Gated on `membership:read` and the `app-users` module, then `requireOrgStatus`. In-room, the
 Users section follows the member's clinozy-be codes (D17): "New user" needs `membership:create`
 and `role:read` (its role picker); edit, status and "Resend invitation" need `membership:update`;
 removing a member and cancelling an invitation need `membership:delete`; Export needs only
@@ -39,7 +39,7 @@ days and hours (`shared/hooks/useHoursFormat/`).
 | File                              | Responsibility                                                                                                                                                                                                    |
 | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `users.route.tsx`                 | Route marker — exports `Component` rendering `UsersPage`.                                                                                                                                                         |
-| `users.manifest.ts`               | Manifest — `kind: 'layout'`, children `create`, `$userId`, `roles`, `branches`; `membership:read`, module `clinic-users`, nav `users`.                                                                            |
+| `users.manifest.ts`               | Manifest — `kind: 'layout'`, children `create`, `$userId`, `roles`, `branches`; `membership:read`, module `app-users`, nav `users`.                                                                               |
 | `users.search.ts`                 | `validateUsersSearch` (`q`, `role` — a role id, `branch`, `status`, `created`, `sort`), `validateRolesSearch` (`role`, a role id).                                                                                |
 | `users.dialog-search.ts`          | `validateUserEditSearch` (`from`) — the member drawer's own param, parsed by the Team; loads with the room.                                                                                                       |
 | `users.constants.ts`              | `USERS_NS` / `USERS_KEYS` (the `users` namespace), `TEAM_TABLE_ID`, `USER_DRAWER_TEST_ID`.                                                                                                                        |

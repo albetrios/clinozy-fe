@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
+import { appInstant } from '@/shared/api/app/app-time.ts';
 import { TEST_BRANCH_ID } from '@/tests/utils/appointment-doubles.ts';
 import { patientRecord } from '@/tests/utils/patient-doubles.ts';
 
@@ -68,7 +68,7 @@ describe('the patient form', () => {
       status: 'regular',
       conversion: 'converted',
       referralSource: 'instagram',
-      followUpAt: clinicInstant('2026-10-05', '14:50'),
+      followUpAt: appInstant('2026-10-05', '14:50'),
       notes: 'Prefers mornings',
       consents: ['data', 'marketing'],
     });
@@ -126,7 +126,7 @@ describe('the patient form', () => {
       referredByName: null,
       referralSource: null,
       // Only the day picked: 11:00, the quick chips' hour.
-      followUpAt: clinicInstant('2026-10-05', '11:00'),
+      followUpAt: appInstant('2026-10-05', '11:00'),
       notes: 'Allergic to latex',
       consents: ['data', 'photos'],
     });

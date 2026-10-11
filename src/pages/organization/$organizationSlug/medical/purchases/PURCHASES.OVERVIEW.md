@@ -19,7 +19,7 @@ list (D24).
 | File                              | Responsibility                                                                                                        |
 | --------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
 | `purchases.route.tsx`             | Route marker — exports `Component` rendering `PurchasesPage`.                                                         |
-| `purchases.manifest.ts`           | Manifest — `kind: 'layout'` over its dialog routes, module `clinic-medical`.                                          |
+| `purchases.manifest.ts`           | Manifest — `kind: 'layout'` over its dialog routes, module `app-medical`.                                             |
 | `purchases.params.ts`             | The list read from the URL (defaults applied, the tab's own sort keys) and its filter key.                            |
 | `PurchasesPage.tsx`               | The tab: the Medical toolbar, the table, its row actions and states; hosts the dialog routes' `Outlet`.               |
 | `hooks/usePurchaseOrderColumns/`  | The columns: tracks, folds (the meta line and the phone key), sort ids, the recommended set.                          |

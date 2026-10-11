@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import i18n from '@/lib/i18n/i18n.ts';
-import { fetchCredit } from '@/shared/api/clinic/credits-api.ts';
+import { fetchCredit } from '@/shared/api/app/credits-api.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { creditRow, TEST_CREDIT_ID } from '@/tests/utils/payments-doubles.ts';
 
@@ -19,7 +19,7 @@ const { notifyMock } = vi.hoisted(() => ({
   notifyMock: { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() },
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
-vi.mock('@/shared/api/clinic/credits-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/credits-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchCredit: vi.fn(),
 }));

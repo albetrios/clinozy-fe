@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import type { Contact } from '@/shared/api/clinic/contacts-contracts.ts';
+import type { Contact } from '@/shared/api/app/contacts-contracts.ts';
 import { EMPTY_CONTACT_PROFILE } from '@/tests/utils/contact-doubles.ts';
 
 import {

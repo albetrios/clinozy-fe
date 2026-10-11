@@ -3,8 +3,8 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { ClinicalNote } from '@/shared/api/clinic/clinical-notes-contracts.ts';
-import { fetchPatientFile } from '@/shared/api/clinic/patient-file-api.ts';
+import type { ClinicalNote } from '@/shared/api/app/clinical-notes-contracts.ts';
+import { fetchPatientFile } from '@/shared/api/app/patient-file-api.ts';
 import {
   fetchOpenVisit,
   fetchVisitCheckNotes,
@@ -12,18 +12,18 @@ import {
   removeVisitCheck,
   setVisitPaused,
   startVisit,
-} from '@/shared/api/clinic/visits-api.ts';
-import type { VisitRecord } from '@/shared/api/clinic/visits-contracts.ts';
+} from '@/shared/api/app/visits-api.ts';
+import type { VisitRecord } from '@/shared/api/app/visits-contracts.ts';
 import { useMyMembershipId } from '@/shared/hooks/useMyMembership/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import {
   appointmentRow,
   DOCTOR_ARJUN,
   DOCTOR_NISHA,
   TEST_BRANCH_ID,
 } from '@/tests/utils/appointment-doubles.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import {
   patientFile,
   patientRecord,
@@ -42,11 +42,11 @@ import {
 vi.mock('@/shared/notify/index.ts', () => ({
   notify: { success: vi.fn(), error: vi.fn(), info: vi.fn(), undo: vi.fn() },
 }));
-vi.mock('@/shared/api/clinic/patient-file-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/patient-file-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchPatientFile: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/visits-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/visits-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchOpenVisit: vi.fn(),
   fetchVisitCheckNotes: vi.fn(),

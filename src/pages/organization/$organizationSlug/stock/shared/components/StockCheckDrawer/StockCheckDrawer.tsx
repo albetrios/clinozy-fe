@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { numberFromText, sanitizeNumberText } from '@/lib/number-text.ts';
 import { cn } from '@/lib/utils.ts';
-import { SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
+import { SECTION_TONES } from '@/shared/app/app-tones.ts';
 import { type PillTone, TonePill } from '@/shared/components/Cells/index.ts';
 import { DrawerChips } from '@/shared/components/DrawerField/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';

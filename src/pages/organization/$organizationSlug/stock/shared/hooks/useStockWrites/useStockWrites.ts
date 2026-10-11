@@ -1,6 +1,6 @@
 import type { QueryKey } from '@tanstack/react-query';
 
-import { paymentQueryKeys } from '@/shared/api/clinic/payments-api.ts';
+import { paymentQueryKeys } from '@/shared/api/app/payments-api.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';

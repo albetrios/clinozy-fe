@@ -4,11 +4,11 @@ import { useTranslation } from 'react-i18next';
 
 import { isolateText } from '@/lib/bidi-isolate.ts';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import type { TaskRecord } from '@/shared/api/clinic/tasks-contracts.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
+import type { TaskRecord } from '@/shared/api/app/tasks-contracts.ts';
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useContact } from '@/shared/hooks/useContacts/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
 import { useLead } from '@/shared/hooks/useLeads/index.ts';
@@ -73,7 +73,7 @@ export interface NewTaskDrawerProps {
  * read, or a record gone, leaves "For" empty.
  */
 function usePrefilledPerson(prefill: TaskCreateSearch): NewTaskPerson | null {
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const canReadLeads = access.isResolved && access.canCode('lead:read');
   const lead = useLead(canReadLeads ? prefill.lead : undefined);
   const contact = useContact(prefill.lead ? undefined : prefill.contact);
@@ -168,13 +168,13 @@ export function NewTaskDrawer({ prefill, onClose, onCreated }: NewTaskDrawerProp
   const { t } = useTranslation(TASKS_NS);
   const { t: tErrors } = useTranslation(ERRORS_NS);
   const [openedAt] = useState(() => new Date());
-  const today = clinicToday(openedAt);
+  const today = appToday(openedAt);
   const idPrefix = `new-task-${useId().replace(/:/g, '')}`;
   const form = useForm<NewTaskForm>({ defaultValues: newTaskForm(today) });
   const values = useFormValues(form);
   const { isDirty } = useFormState({ control: form.control });
   const [openStep, setOpenStep] = useState<string>('what');
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const prefilled = usePrefilledPerson(prefill);
   const kindLabel = usePersonKindLabel();
 

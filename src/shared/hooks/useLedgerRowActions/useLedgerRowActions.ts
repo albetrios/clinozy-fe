@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
+import type { LedgerRow } from '@/shared/api/app/payments-contracts.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
 import {
   LEDGER_KEYS,

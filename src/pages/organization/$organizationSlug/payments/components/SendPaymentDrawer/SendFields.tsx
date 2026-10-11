@@ -1,17 +1,14 @@
 import { Controller, type UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { EXPENSE_CATEGORY_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
+import { EXPENSE_CATEGORY_VALUES } from '@/shared/api/app/app-schema.ts';
 import {
   EXPENSE_MODE_VALUES,
   type OpenSupplierBill,
   supplierBillKey,
-} from '@/shared/api/clinic/payments-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import {
-  EXPENSE_CATEGORY_TONES,
-  PAYMENT_MODE_TONES,
-} from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/api/app/payments-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { EXPENSE_CATEGORY_TONES, PAYMENT_MODE_TONES } from '@/shared/app/app-tones.ts';
 import {
   DrawerChips,
   DrawerField,
@@ -86,7 +83,7 @@ function useBillOptions(bills: readonly OpenSupplierBill[]): PickerOption[] {
 /** The open bills' read failed: the step says so, with Retry in place. */
 function BillsFailed({ onRetry, testId }: { onRetry: () => void; testId: string }) {
   const { t } = useTranslation(PAYMENTS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   return (
     <DrawerFieldGrid>
       <DrawerField label={t(K.bill)}>
@@ -98,7 +95,7 @@ function BillsFailed({ onRetry, testId }: { onRetry: () => void; testId: string 
             data-testid={`${testId}-retry`}
             className="text-caption text-foreground font-medium underline underline-offset-2"
           >
-            {tClinic(CLINIC_KEYS.lists.retry)}
+            {tApp(APP_KEYS.lists.retry)}
           </button>
         </span>
       </DrawerField>
@@ -194,7 +191,7 @@ function CategoryField({
   readOnly,
 }: Pick<SendFieldsProps, 'form' | 'testId' | 'readOnly'>) {
   const { t } = useTranslation(PAYMENTS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   return (
     <DrawerField label={t(K.category)}>
       <Controller
@@ -205,7 +202,7 @@ function CategoryField({
             label={t(K.category)}
             options={EXPENSE_CATEGORY_VALUES.map((category) => ({
               value: category,
-              label: tClinic(CLINIC_KEYS.expenseCategories[category]),
+              label: tApp(APP_KEYS.expenseCategories[category]),
               tone: EXPENSE_CATEGORY_TONES[category],
             }))}
             value={control.value}
@@ -322,7 +319,7 @@ export function SendPaymentFields({
   onFiles: (files: PickedFile[]) => void;
 }) {
   const { t } = useTranslation(PAYMENTS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const formatPaise = usePaiseFormat();
   const field = useDrawerFieldIds(form, idPrefix);
   const amount = field('amount');
@@ -348,7 +345,7 @@ export function SendPaymentFields({
                 value={control.value}
                 onValueChange={control.onChange}
                 onBlur={control.onBlur}
-                prefix={tClinic(RECORD_DRAWER_KEYS.currency)}
+                prefix={tApp(RECORD_DRAWER_KEYS.currency)}
                 placeholder="0"
                 maxLength={LIMITS.money}
                 readOnly={readOnly}
@@ -399,7 +396,7 @@ export function SendPaymentFields({
               label={t(K.mode)}
               options={EXPENSE_MODE_VALUES.map((mode) => ({
                 value: mode,
-                label: tClinic(CLINIC_KEYS.paymentModes[mode]),
+                label: tApp(APP_KEYS.paymentModes[mode]),
                 tone: PAYMENT_MODE_TONES[mode],
               }))}
               value={control.value}

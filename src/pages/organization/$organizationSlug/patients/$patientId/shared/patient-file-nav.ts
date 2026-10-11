@@ -1,9 +1,9 @@
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import type { PatientFilePin } from '@/shared/api/clinic/preferences-api.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
+import type { PatientFilePin } from '@/shared/api/app/preferences-api.ts';
 import {
   isPatientFileSection,
   type PatientFileSectionSlug,
-} from '@/shared/clinic/patient-file-sections.ts';
+} from '@/shared/app/patient-file-sections.ts';
 import {
   type AppIcon,
   Calendar,

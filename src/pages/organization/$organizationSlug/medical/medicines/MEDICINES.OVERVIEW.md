@@ -19,7 +19,7 @@ list (D24): the Medicine drawer (`../shared/components/MedicineDrawer/`), New wi
 | File                               | Responsibility                                                                                          |
 | ---------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | `medicines.route.tsx`              | Route marker — exports `Component` rendering `MedicinesPage`.                                           |
-| `medicines.manifest.ts`            | Manifest — `kind: 'layout'` over its dialog routes, module `clinic-medical`.                            |
+| `medicines.manifest.ts`            | Manifest — `kind: 'layout'` over its dialog routes, module `app-medical`.                               |
 | `medicines.params.ts`              | The list read from the URL (defaults applied, the tab's own sort keys) and its filter key.              |
 | `MedicinesPage.tsx`                | The tab: the Medical toolbar, the table, its row actions and states; hosts the dialog routes' `Outlet`. |
 | `hooks/useMedicineColumns/`        | The columns: tracks, folds (the meta line and the phone key), sort ids, the recommended set.            |

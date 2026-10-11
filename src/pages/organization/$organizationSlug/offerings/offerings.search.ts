@@ -21,8 +21,8 @@ import {
   type CreatedFilter,
   readBranchFilter,
   readCreatedFilter,
-} from '@/shared/api/clinic/clinic-list-filters.ts';
-import type { OfferingCategory } from '@/shared/api/clinic/clinic-schema.ts';
+} from '@/shared/api/app/app-list-filters.ts';
+import type { OfferingCategory } from '@/shared/api/app/app-schema.ts';
 
 /** The categories, in the Filters chips' order (`S:1330`). */
 export const OFFERING_CATEGORY_FILTER = [

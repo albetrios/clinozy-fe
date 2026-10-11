@@ -1,16 +1,16 @@
-import type { DeleteReason } from '@/shared/api/clinic/clinic-schema.ts';
-import { FILE_LINK_QUERY_OPTIONS } from '@/shared/api/clinic/file-links.ts';
+import type { DeleteReason } from '@/shared/api/app/app-schema.ts';
+import { FILE_LINK_QUERY_OPTIONS } from '@/shared/api/app/file-links.ts';
 import {
   createPatientReport,
   deletePatientReport,
   listPatientReports,
   patientReportQueryKeys,
   restorePatientReport,
-} from '@/shared/api/clinic/patient-reports-api.ts';
+} from '@/shared/api/app/patient-reports-api.ts';
 import type {
   PatientReport,
   PatientReportInput,
-} from '@/shared/api/clinic/patient-reports-contracts.ts';
+} from '@/shared/api/app/patient-reports-contracts.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
@@ -24,7 +24,7 @@ const useOrganizationId = () => useOrganizationStore((state) => state.organizati
  * and the person's activity (the server's `system` entry; `messageQueryKeys`, named here so the
  * hook does not load the messages module).
  */
-const REPORT_WRITE_KEYS = [patientReportQueryKeys.all, ['clinic', 'messages']];
+const REPORT_WRITE_KEYS = [patientReportQueryKeys.all, ['app', 'messages']];
 
 /**
  * A patient's reports, newest first, with the server's total (`{ reports, total }`): every page

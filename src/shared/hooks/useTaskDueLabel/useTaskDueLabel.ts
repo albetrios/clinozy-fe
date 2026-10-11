@@ -1,16 +1,16 @@
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { clinicClockTime, clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import { appClockTime, appToday } from '@/shared/api/app/app-time.ts';
 import {
   type TaskDueAt,
   taskDueAt,
   type TaskDueLabel,
   taskDueLabel,
-} from '@/shared/api/clinic/task-views.ts';
-import type { TaskRow } from '@/shared/api/clinic/tasks-contracts.ts';
-import { TASK_DUE_KEYS, TASK_RULES_NS } from '@/shared/clinic/task-rules.constants.ts';
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+} from '@/shared/api/app/task-views.ts';
+import type { TaskRow } from '@/shared/api/app/tasks-contracts.ts';
+import { TASK_DUE_KEYS, TASK_RULES_NS } from '@/shared/app/task-rules.constants.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 
 /** What a due label reads of a task. */
 export type TaskDueLabelInput = Pick<
@@ -37,7 +37,7 @@ export function useTaskDayTimeWords(): (
   time: string,
   now: Date,
 ) => TaskDayTimeWords {
-  const clock = useClinicClock();
+  const clock = useAppClock();
   return useCallback(
     (date: string, time: string, now: Date) => ({
       day: clock.wallDay(date, now),
@@ -49,7 +49,7 @@ export function useTaskDayTimeWords(): (
 
 /** A due day and time by the rooms' one time rule: "11:30 am" today, "Tomorrow 3:30 pm", "7 Oct 3:30 pm". */
 function useDueAtWords(sameDay = false): (label: TaskDueAt, now: Date) => string {
-  const clock = useClinicClock();
+  const clock = useAppClock();
   return useCallback(
     (label: TaskDueAt, now: Date) =>
       clock.wallMoment(label.date, label.time, { now, sameDay }),
@@ -84,7 +84,7 @@ export function useTaskDueLabel({ sameDay = false }: { sameDay?: boolean } = {})
   now: Date,
 ) => string {
   const { t } = useTranslation(TASK_RULES_NS);
-  const clock = useClinicClock();
+  const clock = useAppClock();
   const atWords = useDueAtWords(sameDay);
 
   const words = useCallback(
@@ -108,7 +108,7 @@ export function useTaskDueLabel({ sameDay = false }: { sameDay?: boolean } = {})
           }
           const at = new Date(label.at);
           return t(TASK_DUE_KEYS.done, {
-            time: clock.wallMoment(clinicToday(at), clinicClockTime(at), {
+            time: clock.wallMoment(appToday(at), appClockTime(at), {
               now,
               sameDay,
             }),

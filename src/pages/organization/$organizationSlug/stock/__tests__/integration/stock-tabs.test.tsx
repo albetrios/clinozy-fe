@@ -18,7 +18,7 @@ vi.mock('../../shared/stock-api.ts', async (importOriginal) => ({
   fetchStockVendor: vi.fn(),
 }));
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
-import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Role } from '@/shared/api/app/app-schema.ts';
 
 import { ItemsPage } from '../../items/ItemsPage.tsx';
 import { MovementsPage } from '../../movements/MovementsPage.tsx';

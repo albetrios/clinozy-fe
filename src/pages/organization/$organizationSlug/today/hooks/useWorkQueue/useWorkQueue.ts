@@ -3,19 +3,19 @@ import type { TFunction } from 'i18next';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { taskQueryKeys } from '@/shared/api/clinic/tasks-api.ts';
+import { taskQueryKeys } from '@/shared/api/app/tasks-api.ts';
 import {
   findTaskOutcome,
   type TaskOutcomePlan,
   type TaskRecord,
   type TaskRow,
-} from '@/shared/api/clinic/tasks-contracts.ts';
+} from '@/shared/api/app/tasks-contracts.ts';
 import {
   TASK_QUEUE_KEYS,
   TASK_RULE_KEYS,
   TASK_RULES_NS,
-} from '@/shared/clinic/task-rules.constants.ts';
-import { taskFollowOnTarget, type TaskTarget } from '@/shared/clinic/task-targets.ts';
+} from '@/shared/app/task-rules.constants.ts';
+import { taskFollowOnTarget, type TaskTarget } from '@/shared/app/task-targets.ts';
 import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
 import type { CursorListResult } from '@/shared/hooks/useCursorList/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';

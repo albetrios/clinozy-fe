@@ -6,13 +6,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type {
   ClinicalNote,
   ClinicalNoteKind,
-} from '@/shared/api/clinic/clinical-notes-contracts.ts';
+} from '@/shared/api/app/clinical-notes-contracts.ts';
 import {
   PATIENT_FILE_SECTIONS,
   type PatientFileSectionSlug,
-} from '@/shared/clinic/patient-file-sections.ts';
+} from '@/shared/app/patient-file-sections.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { patientRecord, TEST_PATIENT_ID } from '@/tests/utils/patient-doubles.ts';
 
 import { PatientFileContext } from '../../patient-file-context.ts';
@@ -25,7 +25,7 @@ const server = vi.hoisted(() => ({
   next: 0,
 }));
 
-vi.mock('@/shared/api/clinic/clinical-notes-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/clinical-notes-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   // Oldest first, as the API answers.
   listClinicalNotes: vi.fn(async () =>
@@ -58,7 +58,7 @@ import {
   createClinicalNote,
   deleteClinicalNote,
   listClinicalNotes,
-} from '@/shared/api/clinic/clinical-notes-api.ts';
+} from '@/shared/api/app/clinical-notes-api.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 /** A note of Priya's. */

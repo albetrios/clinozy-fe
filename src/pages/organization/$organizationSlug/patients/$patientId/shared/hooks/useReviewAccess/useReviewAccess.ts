@@ -1,4 +1,4 @@
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 
 /** The review codes (clinozy-be D83 (4)) — their own, so Marketing logs reviews. */
 const REVIEW_CODES = {
@@ -25,7 +25,7 @@ export interface ReviewAccess {
  * patients give without changing the file.
  */
 export function useReviewAccess(): ReviewAccess {
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const can = (code: string) => access.isResolved && access.canCode(code);
   return {
     resolved: access.isResolved,

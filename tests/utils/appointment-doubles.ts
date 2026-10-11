@@ -5,17 +5,17 @@
  * and a day's free slots. Ids are public ids (`<prefix>_<21 [a-z0-9]>`). Override what a test
  * is about; the rest stays a plausible Scheduled consultation tomorrow at 10:30.
  */
+import { appInstant } from '@/shared/api/app/app-time.ts';
 import type {
   AppointmentDayCount,
   AppointmentRow,
   AppointmentSlotDay,
   AppointmentStaff,
-} from '@/shared/api/clinic/appointments-contracts.ts';
-import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
-import type { ContactSummary } from '@/shared/api/clinic/contacts-contracts.ts';
+} from '@/shared/api/app/appointments-contracts.ts';
+import type { ContactSummary } from '@/shared/api/app/contacts-contracts.ts';
 
 /** 09:00 on Sat 3 Oct 2026, clinic time — the appointment tests' "now". */
-export const APPOINTMENT_NOW = new Date(clinicInstant('2026-10-03', '09:00'));
+export const APPOINTMENT_NOW = new Date(appInstant('2026-10-03', '09:00'));
 
 /** The clinic day {@link APPOINTMENT_NOW} falls on. */
 export const APPOINTMENT_TODAY = '2026-10-03';

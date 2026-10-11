@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import { shortPersonName } from '@/shared/components/Cells/index.ts';
 
 import { TODAY_KEYS, TODAY_NS } from '../../today.constants.ts';
@@ -15,12 +15,12 @@ import type { TodayCard } from '../../today.lanes.ts';
  */
 export function useCardServiceLine(): (card: TodayCard) => string | null {
   const { t } = useTranslation(TODAY_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const K = TODAY_KEYS.card;
   return (card) => {
     if (card.kind === 'enquiry') {
       const interest = card.enquiry.interests.find((value) => value !== 'others');
-      return interest ? tClinic(CLINIC_KEYS.leads.interests[interest]) : null;
+      return interest ? tApp(APP_KEYS.leads.interests[interest]) : null;
     }
     const { row } = card;
     if (card.lane === 'pharmacy' && row.prescription) {

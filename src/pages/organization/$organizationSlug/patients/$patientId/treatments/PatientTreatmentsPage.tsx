@@ -9,21 +9,15 @@ import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { organizationTreatmentEdit } from '@/lib/routes/patient-file-builders.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import { patientName } from '@/shared/api/clinic/patients-contracts.ts';
-import {
-  fetchTreatment,
-  treatmentQueryKeys,
-} from '@/shared/api/clinic/treatments-api.ts';
-import type { TreatmentRecord } from '@/shared/api/clinic/treatments-contracts.ts';
-import { passesPatientFileGate } from '@/shared/clinic/patient-file-sections.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
+import { patientName } from '@/shared/api/app/patients-contracts.ts';
+import { fetchTreatment, treatmentQueryKeys } from '@/shared/api/app/treatments-api.ts';
+import type { TreatmentRecord } from '@/shared/api/app/treatments-contracts.ts';
+import { passesPatientFileGate } from '@/shared/app/patient-file-sections.ts';
 import { DataTableColumnChooser } from '@/shared/components/DataTableColumnChooser/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
+import { type AppAccess, useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useBookableTreatments } from '@/shared/hooks/useAppointments/index.ts';
-import {
-  type ClinicAccess,
-  useClinicAccess,
-} from '@/shared/hooks/useClinicAccess/index.ts';
 import { usePatientPackages } from '@/shared/hooks/usePatientPackages/index.ts';
 import { usePatientTreatments } from '@/shared/hooks/useTreatments/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
@@ -63,7 +57,7 @@ const NAME_CHIPS = 4;
  * (`patient_treatment:create`), changing or reversing one (`patient_treatment:update`), and
  * logging a check-in (Patients Edit).
  */
-function treatmentAccessOf(access: ClinicAccess): TreatmentRowAccess {
+function treatmentAccessOf(access: AppAccess): TreatmentRowAccess {
   if (!access.isResolved)
     return { canCreate: false, canUpdate: false, canCheckIn: false };
   const canCreate = passesPatientFileGate(access, 'treatments');
@@ -121,7 +115,7 @@ function TreatmentCheckIn({
   onClose: () => void;
 }) {
   const { patientId, file } = usePatientFileContext();
-  const [today] = useState(() => clinicToday());
+  const [today] = useState(() => appToday());
   if (!file) return null;
   return (
     <CheckInDrawer
@@ -280,22 +274,22 @@ export function PatientTreatmentsPage() {
   const { treatmentId } = useParams({ strict: false });
   const { patientId } = usePatientFileContext();
   const organizationId = useOrganizationStore((state) => state.organizationId);
-  const clinicAccess = useClinicAccess();
-  const access = treatmentAccessOf(clinicAccess);
+  const appAccess = useAppAccess();
+  const access = treatmentAccessOf(appAccess);
   const route = usePatientRecordRoute<TreatmentRecord>({
     section: 'treatments',
     id: treatmentId,
     queryKey: (id) => treatmentQueryKeys.detail(organizationId, patientId, id),
     fetchRecord: (id) => fetchTreatment(patientId, id),
     recordLabel: t(TREATMENT_KEYS.record),
-    canCreate: clinicAccess.isResolved ? access.canCreate : undefined,
+    canCreate: appAccess.isResolved ? access.canCreate : undefined,
   });
   const editing = route.mode === 'edit' ? route.record : undefined;
 
   return (
     <>
       <TreatmentsTable {...access} />
-      {clinicAccess.isResolved && (route.mode === 'create' || editing) ? (
+      {appAccess.isResolved && (route.mode === 'create' || editing) ? (
         <TreatmentDrawerHost
           key={editing?.id ?? 'new'}
           treatment={editing ?? null}

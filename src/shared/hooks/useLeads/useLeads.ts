@@ -1,7 +1,7 @@
 import i18n from '@/lib/i18n/i18n.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { DeleteReason } from '@/shared/api/clinic/clinic-schema.ts';
-import { contactQueryKeys } from '@/shared/api/clinic/contacts-api.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { DeleteReason } from '@/shared/api/app/app-schema.ts';
+import { contactQueryKeys } from '@/shared/api/app/contacts-api.ts';
 import {
   claimLead,
   countOpenLeadTasks,
@@ -15,15 +15,15 @@ import {
   releaseLead,
   restoreLead,
   updateLead,
-} from '@/shared/api/clinic/leads-api.ts';
+} from '@/shared/api/app/leads-api.ts';
 import type {
   LeadFields,
   LeadListParams,
   LeadRecord,
-} from '@/shared/api/clinic/leads-contracts.ts';
-import { messageQueryKeys } from '@/shared/api/clinic/messages-api.ts';
-import { taskQueryKeys } from '@/shared/api/clinic/tasks-api.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+} from '@/shared/api/app/leads-contracts.ts';
+import { messageQueryKeys } from '@/shared/api/app/messages-api.ts';
+import { taskQueryKeys } from '@/shared/api/app/tasks-api.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
@@ -154,7 +154,7 @@ export function useUpdateLead(
     invalidateKeys: LEAD_WRITE_KEYS,
     successMessage: (saved, { lead }) => {
       if (saved.status === lead.status) return leadToast(LEAD_TOASTS_KEYS.saved);
-      const status = i18n.t(CLINIC_KEYS.leads.statuses[saved.status], { ns: CLINIC_NS });
+      const status = i18n.t(APP_KEYS.leads.statuses[saved.status], { ns: APP_NS });
       return leadToast(LEAD_TOASTS_KEYS.statusChanged, { name: saved.name, status });
     },
     ...options,

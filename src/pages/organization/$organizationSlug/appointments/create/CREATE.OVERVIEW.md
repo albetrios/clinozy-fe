@@ -12,7 +12,7 @@ booking, the old one stays), the plan's `source` (`chat` or `task`: step 1 colla
 `from` (the room it was opened from — allow-listed, the drawer closes back to it).
 `validateAppointmentCreateSearch` in the parent's `../appointments.dialog-search.ts` parses them.
 
-Gated like the room (membership, the `clinic-appointments` module, `requireOrgStatus`); a
+Gated like the room (membership, the `app-appointments` module, `requireOrgStatus`); a
 member without Create who follows a link here lands back on the page with the permission
 toast.
 

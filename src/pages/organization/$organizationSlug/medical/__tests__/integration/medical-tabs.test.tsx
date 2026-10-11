@@ -3,11 +3,11 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
+import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
 import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+  appFixtures,
+  resetAppFixtures,
+} from '@/shared/api/app/fixtures/world.fixtures.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 
 import { ManufacturersPage } from '../../manufacturers/ManufacturersPage.tsx';
@@ -68,11 +68,11 @@ beforeEach(() => {
   viewport.tier = 'desktop';
   for (const fn of Object.values(notifyMock)) fn.mockReset();
   csv.downloadCsv.mockReset();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 afterEach(() => {
   resetMedicalRoutes();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 
 describe('Medical › Sales (KICKOFF §6.7)', () => {
@@ -152,7 +152,7 @@ describe('Medical › Medicines', () => {
         screen.getByTestId('medical-medicines-view-action-discount'),
       ).toHaveAccessibleName('Remove near-expiry discount'),
     );
-    const discounted = clinicFixtures.medicines.snapshot(
+    const discounted = appFixtures.medicines.snapshot(
       (medicine) => medicine.nearExpiryDiscountPct === 20,
     );
     expect(discounted.length).toBeGreaterThan(0);

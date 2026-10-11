@@ -23,13 +23,13 @@ import {
   type FollowUpFilter,
   readCreatedFilter,
   readFollowUpFilter,
-} from '@/shared/api/clinic/clinic-list-filters.ts';
-import type { LeadSource, LeadStatus } from '@/shared/api/clinic/clinic-schema.ts';
+} from '@/shared/api/app/app-list-filters.ts';
+import type { LeadSource, LeadStatus } from '@/shared/api/app/app-schema.ts';
 import type {
   LeadHoldFilter,
   LeadSortKey,
   LeadView,
-} from '@/shared/api/clinic/leads-contracts.ts';
+} from '@/shared/api/app/leads-contracts.ts';
 
 const VIEWS = ['mine', 'unreplied', 'all'] as const satisfies readonly LeadView[];
 const STATUSES = [

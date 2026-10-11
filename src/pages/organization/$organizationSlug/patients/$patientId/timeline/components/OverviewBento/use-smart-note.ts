@@ -4,9 +4,9 @@ import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { organizationPrescriptionCreate } from '@/lib/routes/patient-file-builders.ts';
-import { passesPatientFileGate } from '@/shared/clinic/patient-file-sections.ts';
+import { passesPatientFileGate } from '@/shared/app/patient-file-sections.ts';
 import { reportError } from '@/shared/errors/errorHandler.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useRxCatalog } from '@/shared/hooks/usePrescriptions/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
@@ -46,7 +46,7 @@ export function useSmartNote(lists: ClinicalLists): SmartNote {
   const navigate = useNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
   const { patientId } = usePatientFileContext();
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const locale = useLocaleStore((state) => state.locale);
   const writesRx = access.isResolved && passesPatientFileGate(access, 'prescriptions');
   const catalog = useRxCatalog(writesRx ? patientId : '');

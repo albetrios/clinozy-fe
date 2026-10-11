@@ -5,11 +5,11 @@ import { axe } from 'vitest-axe';
 
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import type * as CsvModule from '@/lib/csv.ts';
-import type * as BranchesManageApiModule from '@/shared/api/clinic/branches-manage-api.ts';
+import type * as BranchesManageApiModule from '@/shared/api/app/branches-manage-api.ts';
 import type * as OrganizationApiModule from '@/shared/api/organization-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { fsi } from '@/tests/utils/bidi-marks.ts';
-import { clinicBranch } from '@/tests/utils/branch-doubles.ts';
+import { appBranch } from '@/tests/utils/branch-doubles.ts';
 
 import {
   member,
@@ -55,7 +55,7 @@ vi.mock('@/shared/api/organization-api.ts', async (importOriginal) => ({
   listMembers: api.listMembers,
   listRoles: api.listRoles,
 }));
-vi.mock('@/shared/api/clinic/branches-manage-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/branches-manage-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof BranchesManageApiModule>()),
   fetchBranches: api.fetchBranches,
 }));
@@ -74,7 +74,7 @@ const RIYA = member('riya', SELF.email, PLATFORM_ROLES.admin, {
   branchIds: ['brn_adajan000000000000000'],
 });
 
-const ADAJAN = clinicBranch({
+const ADAJAN = appBranch({
   id: 'brn_adajan000000000000000',
   name: 'Adajan',
   tone: 'mint',
@@ -89,12 +89,12 @@ const ADAJAN = clinicBranch({
   defaultDoctorId: NISHA.id,
   createdAt: '2026-09-01T05:00:00.000Z',
 });
-const VESU = clinicBranch({
+const VESU = appBranch({
   workingDays: ['tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
   opensAt: '11:00',
   closesAt: '20:00',
 });
-const VARACHHA = clinicBranch({
+const VARACHHA = appBranch({
   id: 'brn_varachha0000000000000',
   name: 'Varachha',
   tone: 'blush',

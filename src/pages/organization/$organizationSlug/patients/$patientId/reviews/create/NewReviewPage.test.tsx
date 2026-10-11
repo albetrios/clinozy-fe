@@ -10,11 +10,11 @@ import {
 import { render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
-import { PATIENT_FILE_SECTIONS } from '@/shared/clinic/patient-file-sections.ts';
+import type { Role } from '@/shared/api/app/app-schema.ts';
+import { PATIENT_FILE_SECTIONS } from '@/shared/app/patient-file-sections.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { holdPreset } from '@/tests/utils/clinic-preset-codes.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { holdPreset } from '@/tests/utils/app-preset-codes.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { patientFile, TEST_PATIENT_ID } from '@/tests/utils/patient-doubles.ts';
 
 import { PatientFileContext } from '../../shared/patient-file-context.ts';

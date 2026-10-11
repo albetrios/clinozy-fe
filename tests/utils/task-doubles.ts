@@ -8,7 +8,7 @@ import type {
   TaskPerson,
   TaskRecord,
   TaskRow,
-} from '@/shared/api/clinic/tasks-contracts.ts';
+} from '@/shared/api/app/tasks-contracts.ts';
 
 /** The rule task's id on the local stack ("Reply to Anaya"). */
 export const TEST_TASK_ID = 'task_h7etxlhnxwzy1e2dxrins';

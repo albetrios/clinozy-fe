@@ -2,8 +2,8 @@ import { type KeyboardEvent, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type { TreatmentTemplate } from '@/shared/api/clinic/clinic-schema.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import type { TreatmentTemplate } from '@/shared/api/app/app-schema.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 
 import { TREATMENT_KEYS, TREATMENT_NS } from '../../treatments.constants.ts';
 import { TREATMENT_TEMPLATES } from './treatment-form.ts';

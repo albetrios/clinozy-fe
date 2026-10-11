@@ -4,8 +4,8 @@
  * for the patient Priti Soni, owned by Riya — the card the queue suites draw. The Tasks room's
  * rows are `tests/utils/task-doubles.ts`; this one is built on them.
  */
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
-import type { TaskRow } from '@/shared/api/clinic/tasks-contracts.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
+import type { TaskRow } from '@/shared/api/app/tasks-contracts.ts';
 
 import { taskPerson, taskRow } from './task-doubles.ts';
 

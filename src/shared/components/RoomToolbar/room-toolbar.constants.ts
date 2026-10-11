@@ -1,15 +1,12 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
-import type {
-  CreatedPreset,
-  FollowUpPreset,
-} from '@/shared/api/clinic/clinic-list-filters.ts';
+import type { CreatedPreset, FollowUpPreset } from '@/shared/api/app/app-list-filters.ts';
 
 /**
- * The room toolbar's copy lives in `clinic` (`CLINIC_NS`): that namespace
+ * The room toolbar's copy lives in `app` (`APP_NS`): that namespace
  * loads with the organization shell, and every room renders inside it — so
  * the chrome stays off the entry bundle (English `common` ships in it).
  */
-export const ROOM_TOOLBAR_NS = I18N_NAMESPACES.clinic;
+export const ROOM_TOOLBAR_NS = I18N_NAMESPACES.app;
 
 /** Toolbar chrome (KICKOFF §3.5 List toolbar). */
 export const ROOM_TOOLBAR_KEYS = {
@@ -36,7 +33,7 @@ export const ROOM_FILTERS_KEYS = {
 
 /**
  * Each date section's label, its preset chips keyed by the URL's preset value
- * (`clinic-list-filters.ts`), and its "Custom range" chip.
+ * (`app-list-filters.ts`), and its "Custom range" chip.
  */
 export const DATE_FILTER_KEYS = {
   created: {

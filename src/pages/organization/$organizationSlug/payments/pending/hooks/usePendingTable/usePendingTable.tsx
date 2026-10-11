@@ -1,14 +1,14 @@
 import { type ColumnDef, useTable } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import type { CreditRow } from '@/shared/api/clinic/credits-contracts.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
+import type { CreditRow } from '@/shared/api/app/credits-contracts.ts';
 import {
   CREDIT_DIRECTION_TONES,
   CREDIT_STATUS_TONES,
   TONE_CLASSES,
-} from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/app/app-tones.ts';
 import {
   type DataTableFeatures,
   dataTableFeatures,

@@ -1,9 +1,9 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import { paymentQueryKeys } from '@/shared/api/clinic/payments-api.ts';
-import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import { paymentQueryKeys } from '@/shared/api/app/payments-api.ts';
+import type { LedgerRow } from '@/shared/api/app/payments-contracts.ts';
 import {
   ConfirmDialog,
   type ConfirmReasonOption,

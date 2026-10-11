@@ -1,11 +1,11 @@
 import { type APIRequestContext, expect, type Page, test } from '@playwright/test';
 
+import { openNewClinic } from '@/tests/utils/e2e-app.ts';
 import {
   completeOnboardingWizard,
   loginViaEmailCodeUI,
   openOrganizationSwitcher,
 } from '@/tests/utils/e2e-auth.ts';
-import { openNewClinic } from '@/tests/utils/e2e-clinic.ts';
 import { byTestId, clickTestId } from '@/tests/utils/e2e-hybrid.ts';
 import {
   createSessionViaEmailCode,

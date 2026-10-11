@@ -1,7 +1,8 @@
 import { useState } from 'react';
 
 import { PUBLIC_ID } from '@/lib/routes/search-params.ts';
-import { isAppointmentSlotLocked } from '@/shared/api/clinic/appointment-status.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
+import { isAppointmentSlotLocked } from '@/shared/api/app/appointment-status.ts';
 import type {
   AppointmentRow,
   AppointmentSlotDay,
@@ -9,16 +10,15 @@ import type {
   AppointmentSlotStep,
   AppointmentStaff,
   AppointmentTreatment,
-} from '@/shared/api/clinic/appointments-contracts.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import { defaultBranchId } from '@/shared/clinic/clinic-branch.ts';
+} from '@/shared/api/app/appointments-contracts.ts';
+import { defaultBranchId } from '@/shared/app/app-branch.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import {
   useAppointment,
   useAppointmentSlots,
   useBookableTreatments,
 } from '@/shared/hooks/useAppointments/index.ts';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useContact } from '@/shared/hooks/useContacts/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
 import { useTeamDirectory } from '@/shared/hooks/useTeamDirectory/index.ts';
@@ -279,8 +279,8 @@ function startNewDraft({
 export function useAppointmentFormState(
   input: AppointmentFormInput,
 ): AppointmentFormState {
-  const [today] = useState(() => clinicToday());
-  const access = useClinicAccess();
+  const [today] = useState(() => appToday());
+  const access = useAppAccess();
   const prefill = input.prefill ?? NO_PREFILL;
   const row = input.mode === 'create' ? undefined : input.appointment;
   const mode = effectiveMode(input.mode, row);

@@ -2,7 +2,7 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
+import type { TeamMember } from '@/shared/api/app/users-contracts.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 

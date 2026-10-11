@@ -4,9 +4,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
-import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
-import type { ContactActivityEntry } from '@/shared/api/clinic/contact-activities-api.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import type { Role } from '@/shared/api/app/app-schema.ts';
+import type { ContactActivityEntry } from '@/shared/api/app/contact-activities-api.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { DOCTOR_ARJUN, DOCTOR_NISHA } from '@/tests/utils/appointment-doubles.ts';
 import { fsi } from '@/tests/utils/bidi-marks.ts';
 import { patientFile, TEST_CONTACT_ID } from '@/tests/utils/patient-doubles.ts';
@@ -36,7 +36,7 @@ const server = vi.hoisted(() => ({
   failRead: false,
   refuseNext: false,
 }));
-vi.mock('@/shared/api/clinic/contact-activities-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/contact-activities-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listContactActivities: vi.fn(async ({ after }: { after?: string }) => {
     if (server.failRead) throw new Error('offline');
@@ -60,7 +60,7 @@ vi.mock('@/shared/api/clinic/contact-activities-api.ts', async (importOriginal) 
     return { id: 'msg_new' };
   }),
 }));
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchTeamDirectory: vi.fn(async () => [DOCTOR_NISHA, DOCTOR_ARJUN]),
 }));
@@ -72,7 +72,7 @@ vi.mock('@/shared/tenancy/my-membership.ts', async (importOriginal) => ({
 import {
   listContactActivities,
   sendContactActivity,
-} from '@/shared/api/clinic/contact-activities-api.ts';
+} from '@/shared/api/app/contact-activities-api.ts';
 
 /** A team note of Priya's person. */
 function note(
@@ -99,7 +99,7 @@ const OLDEST = note(
 
 /** Says when the member's access is known — before then every gate reads "not allowed". */
 function AccessProbe() {
-  const access = useClinicAccess();
+  const access = useAppAccess();
   return access.isResolved ? <span data-testid="access-resolved" /> : null;
 }
 

@@ -5,8 +5,8 @@
  * the now line and the slot an empty-column press books. Pure — the views
  * read them and the tests pin them.
  */
-import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
-import { clockMinutes, clockOfMinutes } from '@/shared/api/clinic/clinic-time.ts';
+import { clockMinutes, clockOfMinutes } from '@/shared/api/app/app-time.ts';
+import type { AppointmentRow } from '@/shared/api/app/appointments-contracts.ts';
 
 // ── The hour rail ──
 

@@ -2,10 +2,10 @@ import { type UseFormReturn, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type { OfferingCategory } from '@/shared/api/clinic/clinic-schema.ts';
-import { INVOICE_QTY_MAX } from '@/shared/api/clinic/invoices-contracts.ts';
-import { CLINIC_KEYS } from '@/shared/clinic/clinic.constants.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import type { OfferingCategory } from '@/shared/api/app/app-schema.ts';
+import { INVOICE_QTY_MAX } from '@/shared/api/app/invoices-contracts.ts';
+import { APP_KEYS } from '@/shared/app/app.constants.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { MoneyCell } from '@/shared/components/Cells/index.ts';
 import type { PickerOption } from '@/shared/components/Picker/index.ts';
 import {
@@ -118,7 +118,7 @@ function useBrowseGroups(
   const present = [...new Set(catalog.items.map((item) => item.group))];
   const groupLabel = (group: string) => {
     if (medical) return t(group === 'topical' ? K.browse.topical : K.browse.oral);
-    return t(CLINIC_KEYS.offerings.categories[group as OfferingCategory]);
+    return t(APP_KEYS.offerings.categories[group as OfferingCategory]);
   };
   const order = medical ? ['oral', 'topical'] : present;
   return [

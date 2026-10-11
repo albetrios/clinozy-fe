@@ -1,8 +1,8 @@
 import { type ColumnDef, useTable } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 
-import type { PatientReport } from '@/shared/api/clinic/patient-reports-contracts.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import type { PatientReport } from '@/shared/api/app/patient-reports-contracts.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { TonePill } from '@/shared/components/Cells/index.ts';
 import {
   type DataTableFeatures,

@@ -1,4 +1,4 @@
-import type { DeleteReason } from '@/shared/api/clinic/clinic-schema.ts';
+import type { DeleteReason } from '@/shared/api/app/app-schema.ts';
 import {
   createCredit,
   creditQueryKeys,
@@ -8,15 +8,15 @@ import {
   restoreCredit,
   settleCredit,
   updateCredit,
-} from '@/shared/api/clinic/credits-api.ts';
+} from '@/shared/api/app/credits-api.ts';
 import type {
   CreditInput,
   CreditListParams,
   CreditRow,
   CreditSettlement,
   CreditSettleResult,
-} from '@/shared/api/clinic/credits-contracts.ts';
-import { taskQueryKeys } from '@/shared/api/clinic/tasks-api.ts';
+} from '@/shared/api/app/credits-contracts.ts';
+import { taskQueryKeys } from '@/shared/api/app/tasks-api.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';

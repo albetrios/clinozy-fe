@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
 import { stockMovementRow } from '@/tests/utils/stock-doubles.ts';
 
 import { STOCK_KEYS } from '../../../stock.constants.ts';
@@ -88,9 +88,9 @@ describe('useStockWords', () => {
     // The movements show days alone: today by name too, no time.
     expect(w.when(new Date().toISOString())).toBe('Today');
     expect(w.when(new Date(Date.now() - 86_400_000).toISOString())).toBe('Yesterday');
-    expect(w.day(clinicToday())).toBe('Today');
+    expect(w.day(appToday())).toBe('Today');
     // The viewer's locale orders it ("Sep 22, 2026" in en-US); the year is always there.
     expect(w.billDate('2026-09-22')).toMatch(/^(?=.*22)(?=.*Sep)(?=.*2026)/);
-    expect(w.billDate(clinicToday())).toContain(clinicToday().slice(0, 4));
+    expect(w.billDate(appToday())).toContain(appToday().slice(0, 4));
   });
 });

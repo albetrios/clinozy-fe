@@ -1,5 +1,5 @@
-import { fetchPayment, updatePayment } from '@/shared/api/clinic/payments-api.ts';
-import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
+import { fetchPayment, updatePayment } from '@/shared/api/app/payments-api.ts';
+import type { LedgerRow } from '@/shared/api/app/payments-contracts.ts';
 
 /** Each entry's attach in flight — an entry's photos are filed one after another. */
 const attaching = new Map<string, Promise<unknown>>();

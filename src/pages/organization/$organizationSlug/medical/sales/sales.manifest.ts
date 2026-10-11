@@ -10,7 +10,7 @@ export const manifest = {
   title: 'Medical',
   testId: 'medical-sales-page',
   permission: 'organization:read',
-  module: 'clinic-medical',
+  module: 'app-medical',
   kind: 'layout',
   children: ['create', '$saleId'],
 } as const satisfies PageManifest;

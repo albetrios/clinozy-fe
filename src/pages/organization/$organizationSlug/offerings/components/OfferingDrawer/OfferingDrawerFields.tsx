@@ -1,12 +1,12 @@
 import { Controller, type UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
-import { ALL_BRANCHES } from '@/shared/api/clinic/clinic-list-filters.ts';
-import { OFFERING_CATEGORY_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
-import { GST_PERCENT_VALUES } from '@/shared/api/clinic/offerings-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { OFFERING_CATEGORY_TONES } from '@/shared/clinic/clinic-tones.ts';
+import { ALL_BRANCHES } from '@/shared/api/app/app-list-filters.ts';
+import { OFFERING_CATEGORY_VALUES } from '@/shared/api/app/app-schema.ts';
+import type { BranchOption } from '@/shared/api/app/branches-api.ts';
+import { GST_PERCENT_VALUES } from '@/shared/api/app/offerings-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { OFFERING_CATEGORY_TONES } from '@/shared/app/app-tones.ts';
 import {
   DrawerChips,
   DrawerField,
@@ -80,7 +80,7 @@ export function OfferingIdentityFields({
   branches: readonly BranchOption[];
 }) {
   const { t } = useTranslation(OFFERING_DRAWER_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const field = useDrawerFieldIds(form, idPrefix);
   const name = field('name');
   const branchField = field('branchIds');
@@ -119,7 +119,7 @@ export function OfferingIdentityFields({
               label={t(F.category)}
               options={OFFERING_CATEGORY_VALUES.map((category) => ({
                 value: category,
-                label: tClinic(CLINIC_KEYS.offerings.categories[category]),
+                label: tApp(APP_KEYS.offerings.categories[category]),
                 tone: OFFERING_CATEGORY_TONES[category],
               }))}
               value={control.value}

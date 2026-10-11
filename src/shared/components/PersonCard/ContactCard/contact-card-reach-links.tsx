@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import { instagramHref, telHref, whatsAppHref } from '@/shared/clinic/clinic-phone.ts';
+import { instagramHref, telHref, whatsAppHref } from '@/shared/app/app-phone.ts';
 import type { ContactReach } from '@/shared/components/PersonCard/ContactCard/contact-card.types.ts';
 import { InstagramMark, Phone, WhatsAppMark } from '@/shared/icons/index.ts';
 

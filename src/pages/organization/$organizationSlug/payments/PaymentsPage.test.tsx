@@ -3,8 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type * as PaymentsApiModule from '@/shared/api/clinic/payments-api.ts';
-import { listLedger } from '@/shared/api/clinic/payments-api.ts';
+import type * as PaymentsApiModule from '@/shared/api/app/payments-api.ts';
+import { listLedger } from '@/shared/api/app/payments-api.ts';
 
 import {
   LEDGER_NOW,
@@ -17,7 +17,7 @@ import {
   resetPaymentsRoutes,
 } from './__tests__/integration/payments-test-router.tsx';
 
-vi.mock('@/shared/api/clinic/payments-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/payments-api.ts', async (importOriginal) => {
   const { ledgerApiDouble } =
     await import('./__tests__/integration/payments-ledger-data.ts');
   const double = ledgerApiDouble();

@@ -1,20 +1,16 @@
 import { paiseOfRupees } from '@/lib/number-text.ts';
-import type {
-  InvoiceType,
-  OfferingCategory,
-  Tone,
-} from '@/shared/api/clinic/clinic-schema.ts';
-import { medicineStock } from '@/shared/api/clinic/medicine-stock.ts';
+import type { InvoiceType, OfferingCategory, Tone } from '@/shared/api/app/app-schema.ts';
+import { medicineStock } from '@/shared/api/app/medicine-stock.ts';
 import {
   type MedicineForm,
   medicineForm,
   type MedicineRecord,
-} from '@/shared/api/clinic/medicines-contracts.ts';
+} from '@/shared/api/app/medicines-contracts.ts';
 import type {
   OfferingRecord,
   OfferRecord,
-} from '@/shared/api/clinic/offerings-contracts.ts';
-import { effectivePrice } from '@/shared/api/clinic/offerings-pricing.ts';
+} from '@/shared/api/app/offerings-contracts.ts';
+import { effectivePrice } from '@/shared/api/app/offerings-pricing.ts';
 import type { QuickLineSearchable } from '@/shared/components/QuickLine/index.ts';
 
 import type { InvoiceLineForm } from './invoice-form.ts';

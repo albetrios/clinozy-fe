@@ -7,9 +7,9 @@ import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import type {
   ClinicalNote,
   ClinicalNoteKind,
-} from '@/shared/api/clinic/clinical-notes-contracts.ts';
-import type { FeedbackItem } from '@/shared/api/clinic/feedback-contracts.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+} from '@/shared/api/app/clinical-notes-contracts.ts';
+import type { FeedbackItem } from '@/shared/api/app/feedback-contracts.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { patientFile, TEST_PATIENT_ID } from '@/tests/utils/patient-doubles.ts';
 
 import {
@@ -27,7 +27,7 @@ const server = vi.hoisted(() => ({
   next: 0,
 }));
 
-vi.mock('@/shared/api/clinic/clinical-notes-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/clinical-notes-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listClinicalNotes: vi.fn(async () => structuredClone(server.notes)),
   createClinicalNote: vi.fn(
@@ -99,7 +99,7 @@ import {
   createClinicalNote,
   deleteClinicalNote,
   listClinicalNotes,
-} from '@/shared/api/clinic/clinical-notes-api.ts';
+} from '@/shared/api/app/clinical-notes-api.ts';
 import { usePlanCard } from '@/shared/components/OfferingSuggestions/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -118,7 +118,7 @@ function note(id: string, kind: ClinicalNoteKind, text: string): ClinicalNote {
 
 /** Says when the member's access is known — before then every gate reads "not allowed". */
 function AccessProbe() {
-  const access = useClinicAccess();
+  const access = useAppAccess();
   return access.isResolved ? <span data-testid="access-resolved" /> : null;
 }
 

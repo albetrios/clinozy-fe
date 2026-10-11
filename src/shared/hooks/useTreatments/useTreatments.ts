@@ -1,5 +1,5 @@
-import { patientQueryKeys } from '@/shared/api/clinic/patients-api.ts';
-import { taskQueryKeys } from '@/shared/api/clinic/tasks-api.ts';
+import { patientQueryKeys } from '@/shared/api/app/patients-api.ts';
+import { taskQueryKeys } from '@/shared/api/app/tasks-api.ts';
 import {
   createTreatment,
   listPatientTreatments,
@@ -8,13 +8,13 @@ import {
   reverseTreatment,
   treatmentQueryKeys,
   updateTreatment,
-} from '@/shared/api/clinic/treatments-api.ts';
+} from '@/shared/api/app/treatments-api.ts';
 import type {
   TreatmentCreateInput,
   TreatmentFields,
   TreatmentRecord,
-} from '@/shared/api/clinic/treatments-contracts.ts';
-import { VISIT_WRITE_KEYS } from '@/shared/api/clinic/visits-api.ts';
+} from '@/shared/api/app/treatments-contracts.ts';
+import { VISIT_WRITE_KEYS } from '@/shared/api/app/visits-api.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
@@ -32,7 +32,7 @@ const TREATMENT_WRITE_KEYS = [
   patientQueryKeys.all,
   // The person's thread (`messageQueryKeys`), named here so the hook does not load the
   // messages module — it still reads the fixture world.
-  ['clinic', 'messages'],
+  ['app', 'messages'],
   taskQueryKeys.all,
 ];
 

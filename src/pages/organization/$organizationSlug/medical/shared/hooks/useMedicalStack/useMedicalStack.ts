@@ -1,9 +1,5 @@
-import type {
-  Manufacturer,
-  MedicalRep,
-  Supplier,
-} from '@/shared/api/clinic/clinic-schema.ts';
-import type { MedicineRecord } from '@/shared/api/clinic/medicines-contracts.ts';
+import type { Manufacturer, MedicalRep, Supplier } from '@/shared/api/app/app-schema.ts';
+import type { MedicineRecord } from '@/shared/api/app/medicines-contracts.ts';
 import {
   type StackedRequests,
   useStackedRequest,

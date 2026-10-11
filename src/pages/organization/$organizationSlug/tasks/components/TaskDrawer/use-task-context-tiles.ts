@@ -1,13 +1,13 @@
 import { useTranslation } from 'react-i18next';
 
-import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
-import { clinicClockTime, clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
-import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
-import type { TaskDetail } from '@/shared/api/clinic/tasks-contracts.ts';
-import type { TreatmentRecord } from '@/shared/api/clinic/treatments-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
+import { appClockTime, appToday } from '@/shared/api/app/app-time.ts';
+import type { AppointmentRow } from '@/shared/api/app/appointments-contracts.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
+import type { LeadRecord } from '@/shared/api/app/leads-contracts.ts';
+import type { TaskDetail } from '@/shared/api/app/tasks-contracts.ts';
+import type { TreatmentRecord } from '@/shared/api/app/treatments-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { formatAppPhone } from '@/shared/app/app-phone.ts';
 import { shortPersonName } from '@/shared/components/Cells/index.ts';
 import { useTaskDayTimeWords } from '@/shared/hooks/useTaskDueLabel/index.ts';
 
@@ -51,7 +51,7 @@ export function useTaskContextTiles(
   staffName: TaskStaffName,
 ): TaskContextTile[] {
   const { t } = useTranslation(TASKS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const dayTime = useTaskDayTimeWords();
   const tiles: TaskContextTile[] = [];
   const add = (key: TaskContextTileKey, value: string | null | undefined) => {
@@ -73,12 +73,12 @@ export function useTaskContextTiles(
     );
     add('service', appointment.serviceLabel);
     add('doctor', staffName(appointment.doctorId));
-    add('status', tClinic(CLINIC_KEYS.appointments.statuses[appointment.status]));
+    add('status', tApp(APP_KEYS.appointments.statuses[appointment.status]));
   };
   const treatment = (record: TreatmentRecord) => {
     const done = new Date(record.performedAt);
     add('treatment', record.name);
-    add('doneOn', dayTime(clinicToday(done), clinicClockTime(done), now).day);
+    add('doneOn', dayTime(appToday(done), appClockTime(done), now).day);
     add(
       'session',
       t(TASKS_KEYS.drawer.tileValues.session, { number: record.sessionNumber }),
@@ -86,19 +86,16 @@ export function useTaskContextTiles(
     add('therapist', staffName(record.therapistId ?? record.doctorId));
   };
   const lead = (record: LeadRecord) => {
-    add('status', tClinic(CLINIC_KEYS.leads.statuses[record.status]));
-    add(
-      'source',
-      record.source ? tClinic(CLINIC_KEYS.leads.sources[record.source]) : null,
-    );
+    add('status', tApp(APP_KEYS.leads.statuses[record.status]));
+    add('source', record.source ? tApp(APP_KEYS.leads.sources[record.source]) : null);
     add(
       'interestedIn',
       record.interests
-        .map((interest) => tClinic(CLINIC_KEYS.leads.interests[interest]))
+        .map((interest) => tApp(APP_KEYS.leads.interests[interest]))
         .join(', '),
     );
     add('owner', staffName(record.ownerId));
-    add('mobile', record.phone ? formatClinicPhone(record.phone) : null);
+    add('mobile', record.phone ? formatAppPhone(record.phone) : null);
   };
 
   const { source } = detail;

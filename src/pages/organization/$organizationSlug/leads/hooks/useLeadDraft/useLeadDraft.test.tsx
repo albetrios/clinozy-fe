@@ -3,8 +3,8 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import * as LeadsApiModule from '@/shared/api/clinic/leads-api.ts';
-import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
+import * as LeadsApiModule from '@/shared/api/app/leads-api.ts';
+import type { LeadRecord } from '@/shared/api/app/leads-contracts.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { leadRecord } from '../../__tests__/integration/leads-test-data.ts';
@@ -22,7 +22,7 @@ vi.mock('@/shared/notify/index.ts', () => ({
   TOAST_DURATION_MS: { default: 5_200, error: 9_000 },
 }));
 
-vi.mock('@/shared/api/clinic/leads-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/leads-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof LeadsApiModule>()),
   updateLead: vi.fn(),
 }));

@@ -3,8 +3,8 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { Presence } from '@/shared/api/clinic/clinic-schema.ts';
-import type * as PresenceApiModule from '@/shared/api/clinic/presence-api.ts';
+import type { Presence } from '@/shared/api/app/app-schema.ts';
+import type * as PresenceApiModule from '@/shared/api/app/presence-api.ts';
 
 import { usePresence } from './usePresence.ts';
 
@@ -14,7 +14,7 @@ const server = vi.hoisted(() => ({
   fetchMyPresence: vi.fn(),
   saveMyPresence: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/presence-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/presence-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof PresenceApiModule>()),
   fetchMyPresence: server.fetchMyPresence,
   saveMyPresence: server.saveMyPresence,

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
+import { appInstant } from '@/shared/api/app/app-time.ts';
 
 import {
   defaultAssigneeKey,
@@ -110,7 +110,7 @@ describe('newTaskFieldsOf (POST /app/tasks)', () => {
     expect(fields).toEqual({
       title: 'Share the laser price',
       why: 'Asked on Instagram',
-      dueAt: clinicInstant('2026-10-11', '11:00'),
+      dueAt: appInstant('2026-10-11', '11:00'),
       assignee: { membershipId: RIYA },
       priority: 'high',
       contactId: ANAYA.contactId,

@@ -1,7 +1,7 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 
 /** The Clinic stock drawers' i18n namespace — the room's own. */
-export const STOCK_DRAWERS_NS = I18N_NAMESPACES.clinicStock;
+export const STOCK_DRAWERS_NS = I18N_NAMESPACES.appStock;
 
 /**
  * The Clinic stock drawers', popover's and confirms' copy, verbatim from

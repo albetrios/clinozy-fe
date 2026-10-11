@@ -3,11 +3,11 @@ import { useTranslation } from 'react-i18next';
 
 import { dateFormatOptions } from '@/lib/i18n/intl-config.ts';
 import { cn } from '@/lib/utils.ts';
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
-import type { LeadRecord } from '@/shared/api/clinic/leads-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
+import type { LeadRecord } from '@/shared/api/app/leads-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { formatAppPhone } from '@/shared/app/app-phone.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import {
   AvatarStack,
   type AvatarStackPerson,
@@ -19,7 +19,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip.tsx';
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
 import { LEADS_KEYS, LEADS_NS, LEADS_TEST_IDS } from '../../leads.constants.ts';
@@ -38,16 +38,16 @@ const firstWord = (name: string) => name.trim().split(/\s+/)[0] ?? '';
  */
 export function LeadPersonCell({ lead }: { lead: LeadRecord }) {
   const { team, contactActions } = useLeadsTableContext();
-  const { t } = useTranslation(CLINIC_NS);
+  const { t } = useTranslation(APP_NS);
   const isPatient = lead.patientId !== null;
   const data = leadContactCardData(lead, team, {
-    source: (source) => t(CLINIC_KEYS.leads.sources[source]),
+    source: (source) => t(APP_KEYS.leads.sources[source]),
   });
   return (
     <ContactCard data={data} {...contactActions(lead)}>
       <PersonChip
         name={lead.name}
-        sub={lead.phone ? formatClinicPhone(lead.phone) : ''}
+        sub={lead.phone ? formatAppPhone(lead.phone) : ''}
         tone={isPatient ? 'sage' : 'lav'}
         patient={isPatient}
         emphasis={lead.isAwaitingReply}
@@ -155,7 +155,7 @@ export function LeadTeamCell({ lead }: { lead: LeadRecord }) {
   const { t } = useTranslation(LEADS_NS);
   const { team, teamUpdatedAt, viewerId, holdOf, canClaim, onClaim, onTakeOver } =
     useLeadsTableContext();
-  const clock = useClinicClock();
+  const clock = useAppClock();
   const owner = lead.ownerId ? team.get(lead.ownerId) : undefined;
   const hold = holdOf(lead);
   const mine = viewerId !== null && lead.ownerId === viewerId;
@@ -230,7 +230,7 @@ export function LeadTeamCell({ lead }: { lead: LeadRecord }) {
  * IST". Nothing before their first activity.
  */
 export function LeadUpdatedCell({ lead, now }: { lead: LeadRecord; now: Date }) {
-  const clock = useClinicClock();
+  const clock = useAppClock();
   const { formatDate, prefs } = useLocaleFormat();
   const at = lead.lastActivityAt;
   if (!at) return null;

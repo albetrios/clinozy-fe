@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { Rocket } from '@/shared/icons/index.ts';
 
 import { ONBOARDING_KEYS, ONBOARDING_NS } from '../../onboarding.constants.ts';

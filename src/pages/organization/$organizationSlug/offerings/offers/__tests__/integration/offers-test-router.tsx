@@ -12,8 +12,8 @@ import { render } from '@testing-library/react';
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
-import { PRESET_CODES } from '@/tests/utils/clinic-preset-codes.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { PRESET_CODES } from '@/tests/utils/app-preset-codes.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 
 import { OFFER_PERMISSIONS } from '../../offers.constants.ts';
 import { validateOffersSearch } from '../../offers.search.ts';

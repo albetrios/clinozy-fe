@@ -1,16 +1,16 @@
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
-import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
+import type { BranchOption } from '@/shared/api/app/branches-api.ts';
 import type {
   OfferingRecord,
   OfferRecord,
-} from '@/shared/api/clinic/offerings-contracts.ts';
+} from '@/shared/api/app/offerings-contracts.ts';
 import {
   type EffectivePrice,
   effectivePrice,
-} from '@/shared/api/clinic/offerings-pricing.ts';
-import { OFFERING_CATEGORY_TONES } from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/api/app/offerings-pricing.ts';
+import { OFFERING_CATEGORY_TONES } from '@/shared/app/app-tones.ts';
 import {
   type DrawerPeekItem,
   drawerStepSummary,
@@ -114,11 +114,11 @@ function offersNotEnded(
 /** The words the view puts together, from the room's and the clinic's copy. */
 function useViewWords() {
   const { t } = useTranslation(OFFERING_DRAWER_NS);
-  const { t: tClinic } = useTranslation(RECORD_DRAWER_NS);
+  const { t: tApp } = useTranslation(RECORD_DRAWER_NS);
   const text = useOfferingText();
   const labels = useOfferLabels();
   const formatRupees = useRupeeFormat();
-  return { t, tClinic, text, labels, formatRupees };
+  return { t, tApp, text, labels, formatRupees };
 }
 
 type ViewWords = ReturnType<typeof useViewWords>;
@@ -149,7 +149,7 @@ function mainStepOf(
   billedToday: string | null,
   words: ViewWords,
 ): OfferingStepView {
-  const { t, tClinic, text, formatRupees } = words;
+  const { t, tApp, text, formatRupees } = words;
   const price = rupeesOfText(values.price);
   const offerPrice = rupeesOfText(values.offerPrice);
   const category = text.category(values.category);
@@ -173,7 +173,7 @@ function mainStepOf(
     {
       kind: 'value',
       label: t(F.colour),
-      value: tClinic(RECORD_DRAWER_KEYS.colours[values.tone]),
+      value: tApp(RECORD_DRAWER_KEYS.colours[values.tone]),
       tone: values.tone,
     },
     ...(branchesShown
@@ -213,7 +213,7 @@ function mainStepOf(
         gst,
         billedToday,
       ],
-      tClinic(RECORD_DRAWER_KEYS.step.notFilled),
+      tApp(RECORD_DRAWER_KEYS.step.notFilled),
     ),
     missing: missingOfferingFields(values).map((field) =>
       field === 'name' ? t(F.name) : t(F.price),
@@ -262,7 +262,7 @@ function stepOf(
     peek: parts.flatMap((part) => part.peek),
     summary: drawerStepSummary(
       parts.flatMap((part) => part.values),
-      words.tClinic(RECORD_DRAWER_KEYS.step.notFilled),
+      words.tApp(RECORD_DRAWER_KEYS.step.notFilled),
     ),
     missing: [],
   };

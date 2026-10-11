@@ -3,18 +3,18 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   branchRef,
   MAIN_BRANCH,
-} from '@/shared/api/clinic/fixtures/organization.fixtures.ts';
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { staffRef } from '@/shared/api/clinic/fixtures/staff.fixtures.ts';
+} from '@/shared/api/app/fixtures/organization.fixtures.ts';
+import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
+import { staffRef } from '@/shared/api/app/fixtures/staff.fixtures.ts';
 import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+  appFixtures,
+  resetAppFixtures,
+} from '@/shared/api/app/fixtures/world.fixtures.ts';
 import {
   listFixtureLedger,
   listFixtureOpenSupplierBills,
   payFixtureExpense,
-} from '@/shared/api/clinic/payments-fixture-api.ts';
+} from '@/shared/api/app/payments-fixture-api.ts';
 import { isHttpError } from '@/shared/errors/HttpError.ts';
 
 import {
@@ -57,7 +57,7 @@ async function failureOf(call: Promise<unknown>) {
 
 /** A medicine's batch by number. */
 async function batchOf(medicineSeq: number, batchNo: string) {
-  const medicine = await clinicFixtures.medicines.get(ref.medicine(medicineSeq));
+  const medicine = await appFixtures.medicines.get(ref.medicine(medicineSeq));
   return medicine.batches.find((batch) => batch.batchNo === batchNo);
 }
 
@@ -69,11 +69,11 @@ async function medicalLedger() {
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] });
   vi.setSystemTime(NOW);
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 afterEach(() => {
   vi.useRealTimers();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 
 describe('purchase orders (createPO · updatePO · cancelPO, S:1670–1673)', () => {
@@ -326,7 +326,7 @@ describe('every money action reaches the ledger (Q-M1)', () => {
   it('refuses to collect a settled sale, or on a closed day', async () => {
     const settled = await failureOf(collectSale(ref.medicalSale(983)));
     expect(settled).toMatchObject({ status: 409, detail: 'Nothing is due on this sale' });
-    await clinicFixtures.dayCloses.create({
+    await appFixtures.dayCloses.create({
       branchId: MAIN,
       date: '2026-10-03',
       openingCash: 200_000,
@@ -463,7 +463,7 @@ describe('void a sale (voidSale, S:1668; Q-M2)', () => {
     expect((await batchOf(453, 'ADE25510'))?.qty).toBe(8);
     expect((await batchOf(456, '026-312'))?.qty).toBe(5);
     expect(
-      clinicFixtures.invoices.snapshot((invoice) => invoice.id === ref.invoice(788)),
+      appFixtures.invoices.snapshot((invoice) => invoice.id === ref.invoice(788)),
     ).toHaveLength(0);
     const seqs = (await listMedicalSales()).items.map((row) => row.seq);
     expect(seqs).not.toContain(978);
@@ -491,7 +491,7 @@ describe('void a sale (voidSale, S:1668; Q-M2)', () => {
     expect((await batchOf(453, 'ADE25510'))?.qty).toBe(7);
     expect((await batchOf(456, '026-312'))?.qty).toBe(3);
     expect(
-      clinicFixtures.invoices.snapshot((invoice) => invoice.id === ref.invoice(788)),
+      appFixtures.invoices.snapshot((invoice) => invoice.id === ref.invoice(788)),
     ).toHaveLength(1);
     const seqs = (await listMedicalSales()).items.map((row) => row.seq);
     expect(seqs).toContain(978);
@@ -545,7 +545,7 @@ describe('return expiring stock (Appendix F)', () => {
       supplierId: SHREE_RAMDEV,
       qty: 1,
     });
-    resetClinicFixtures();
+    resetAppFixtures();
     expect((await fetchSupplier(SHREE_RAMDEV)).payable).toBe(298_000);
   });
 });
@@ -559,7 +559,7 @@ describe('prescriptions to fill (listPrescriptionsToFill, S:1658)', () => {
     const dates = list.map((rx) => rx.date);
     expect([...dates].sort().reverse()).toEqual(dates);
 
-    await clinicFixtures.medicalSales.update(ref.medicalSale(983), {
+    await appFixtures.medicalSales.update(ref.medicalSale(983), {
       prescriptionId: ref.prescription(501),
     });
     const after = await listPrescriptionsToFill();

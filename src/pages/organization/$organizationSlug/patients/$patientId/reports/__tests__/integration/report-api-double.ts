@@ -4,13 +4,13 @@
  * attach, delete and restore. A suite swaps it in with `vi.mock` and seeds it with
  * {@link seedReports}; it never imports a component, so the mock factory can load it.
  */
-import type { DeleteReason } from '@/shared/api/clinic/clinic-schema.ts';
+import type { DeleteReason } from '@/shared/api/app/app-schema.ts';
 import type {
   PatientReport,
   PatientReportFile,
   PatientReportInput,
   PatientReportList,
-} from '@/shared/api/clinic/patient-reports-contracts.ts';
+} from '@/shared/api/app/patient-reports-contracts.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 
 /** The patient the reports belong to (the shared `patientFile()` double's). */

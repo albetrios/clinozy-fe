@@ -5,15 +5,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   listPatientPackages,
   patientPackageQueryKeys,
-} from '@/shared/api/clinic/patient-packages-api.ts';
-import type { PatientPackageRow } from '@/shared/api/clinic/patient-packages-contracts.ts';
-import { moveFloorStage } from '@/shared/api/clinic/today-api.ts';
+} from '@/shared/api/app/patient-packages-api.ts';
+import type { PatientPackageRow } from '@/shared/api/app/patient-packages-contracts.ts';
+import { moveFloorStage } from '@/shared/api/app/today-api.ts';
 import {
   listPatientTreatments,
   treatmentQueryKeys,
-} from '@/shared/api/clinic/treatments-api.ts';
-import type { TreatmentRecord } from '@/shared/api/clinic/treatments-contracts.ts';
-import type { VisitRecord } from '@/shared/api/clinic/visits-contracts.ts';
+} from '@/shared/api/app/treatments-api.ts';
+import type { TreatmentRecord } from '@/shared/api/app/treatments-contracts.ts';
+import type { VisitRecord } from '@/shared/api/app/visits-contracts.ts';
 import { appointmentRow } from '@/tests/utils/appointment-doubles.ts';
 import {
   patientFile,
@@ -48,15 +48,15 @@ vi.mock('@/shared/hooks/useVisits/index.ts', async (importOriginal) => {
       }),
   };
 });
-vi.mock('@/shared/api/clinic/today-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/today-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   moveFloorStage: vi.fn(async () => undefined),
 }));
-vi.mock('@/shared/api/clinic/patient-packages-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/patient-packages-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listPatientPackages: vi.fn(async () => []),
 }));
-vi.mock('@/shared/api/clinic/treatments-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/treatments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listPatientTreatments: vi.fn(async () => []),
 }));

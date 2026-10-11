@@ -24,8 +24,8 @@ view (anyone who reads the file).
 - **Gone:** "Uploaded by" and Report view's "Added by" — the API does not say who added a report
   (G4).
 
-Gated by the file layout (membership, the `clinic-patients` module, the org status, the
-section's `patient:clinical_record:read`); in-room access is `useClinicAccess` (`patient:update`
+Gated by the file layout (membership, the `app-patients` module, the org status, the
+section's `patient:clinical_record:read`); in-room access is `useAppAccess` (`patient:update`
 for every write). Registered in `src/app/routes/routeTree.tsx` through the file's one lazy
 module (`../patient-id.sections.ts`).
 
@@ -34,7 +34,7 @@ module (`../patient-id.sections.ts`).
 | File                              | Responsibility                                                                                                                                                                                       |
 | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `reports.route.tsx`               | Route marker — exports `Component` rendering `PatientReportsPage`.                                                                                                                                   |
-| `reports.manifest.ts`             | Manifest — `kind: 'layout'` (children `create`, `$reportId`), permission `organization:read`, module `clinic-patients`, title "Reports".                                                             |
+| `reports.manifest.ts`             | Manifest — `kind: 'layout'` (children `create`, `$reportId`), permission `organization:read`, module `app-patients`, title "Reports".                                                                |
 | `reports.constants.ts`            | The drawers' copy keys, each type's tone, the File's types and the root test ids.                                                                                                                    |
 | `PatientReportsPage.tsx`          | The section, and the dialog its URL names.                                                                                                                                                           |
 | `report-file.ts`                  | A report's file formats ("PDF, JPG"), read off its `file_keys` by the view and the table.                                                                                                            |

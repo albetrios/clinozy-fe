@@ -4,9 +4,9 @@ import {
   organizationAppointment,
   organizationAppointmentCreate,
 } from '@/lib/routes/appointments-builders.ts';
-import { safeReferrer } from '@/shared/clinic/clinic-referrer.ts';
+import { safeReferrer } from '@/shared/app/app-referrer.ts';
 import { AppointmentForm } from '@/shared/forms/AppointmentForm/index.ts';
-import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
+import { useAppNavigate } from '@/shared/hooks/useAppNavigate/index.ts';
 import { useCrossRoomDialog } from '@/shared/hooks/useCrossRoomDialog/index.ts';
 
 import { useAppointmentsDialogRoute } from '../../hooks/useAppointmentsDialogRoute/index.ts';
@@ -25,7 +25,7 @@ export function AppointmentDialog() {
   const { dialog, close } = useAppointmentsDialogRoute();
   const navigation = useAppointmentsNavigation();
   const crossRoom = useCrossRoomDialog();
-  const go = useClinicNavigate();
+  const go = useAppNavigate();
   const { organizationSlug = '' } = useParams({ strict: false });
   const from = crossRoom ? safeReferrer(crossRoom.search.from, '') : '';
   const openCreate = (copyOf: string) =>

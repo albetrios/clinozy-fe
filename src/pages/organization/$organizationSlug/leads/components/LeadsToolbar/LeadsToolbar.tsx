@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next';
 
-import { LEAD_STATUS_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
-import type { DirectoryMember } from '@/shared/api/clinic/directory-api.ts';
-import type { LeadView } from '@/shared/api/clinic/leads-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { LEAD_SOURCE_TONES, LEAD_STATUS_TONES } from '@/shared/clinic/clinic-tones.ts';
+import { LEAD_STATUS_VALUES } from '@/shared/api/app/app-schema.ts';
+import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
+import type { LeadView } from '@/shared/api/app/leads-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { LEAD_SOURCE_TONES, LEAD_STATUS_TONES } from '@/shared/app/app-tones.ts';
 import { DataTableColumnChooser } from '@/shared/components/DataTableColumnChooser/index.ts';
 import {
   type RoomFilterCopy,
@@ -47,7 +47,7 @@ function useFilterCopy(
   members: readonly DirectoryMember[],
 ): Record<string, RoomFilterCopy> {
   const { t } = useTranslation(LEADS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const keys = LEADS_KEYS.filters;
   return {
     status: {
@@ -56,7 +56,7 @@ function useFilterCopy(
         LEAD_STATUS_VALUES.map((status) => [
           status,
           {
-            label: tClinic(CLINIC_KEYS.leads.statuses[status]),
+            label: tApp(APP_KEYS.leads.statuses[status]),
             tone: LEAD_STATUS_TONES[status],
           },
         ]),
@@ -69,7 +69,7 @@ function useFilterCopy(
         LEAD_SOURCE_ORDER.map((source) => [
           source,
           {
-            label: tClinic(CLINIC_KEYS.leads.sources[source]),
+            label: tApp(APP_KEYS.leads.sources[source]),
             tone: LEAD_SOURCE_TONES[source],
             icon: LEAD_SOURCE_ICONS[source],
           },

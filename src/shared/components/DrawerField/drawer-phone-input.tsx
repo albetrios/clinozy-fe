@@ -2,10 +2,10 @@ import type { ComponentProps } from 'react';
 
 import { cn } from '@/lib/utils.ts';
 import {
-  CLINIC_PHONE_PREFIX,
-  clinicPhoneDigits,
-  formatClinicPhoneDigits,
-} from '@/shared/clinic/clinic-phone-field.ts';
+  APP_PHONE_PREFIX,
+  appPhoneDigits,
+  formatAppPhoneDigits,
+} from '@/shared/app/app-phone-field.ts';
 
 /** Props for {@link DrawerPhoneInput}. */
 export interface DrawerPhoneInputProps extends Omit<
@@ -46,7 +46,7 @@ export function DrawerPhoneInput({
         aria-hidden="true"
         className="bg-muted text-body text-muted-foreground-strong flex shrink-0 items-center border-e px-2.5"
       >
-        {CLINIC_PHONE_PREFIX}
+        {APP_PHONE_PREFIX}
       </span>
       <input
         {...props}
@@ -56,8 +56,8 @@ export function DrawerPhoneInput({
         // No `maxLength`: the browser would cut a pasted "+91 98765-43210"
         // before the country code could be dropped; the digits cap at ten.
         placeholder={placeholder}
-        value={formatClinicPhoneDigits(value)}
-        onChange={(event) => onChange(clinicPhoneDigits(event.currentTarget.value))}
+        value={formatAppPhoneDigits(value)}
+        onChange={(event) => onChange(appPhoneDigits(event.currentTarget.value))}
         className="text-field md:text-field placeholder:text-muted-foreground min-w-0 flex-1 bg-transparent px-2.5 tabular-nums outline-none disabled:cursor-not-allowed"
       />
     </div>

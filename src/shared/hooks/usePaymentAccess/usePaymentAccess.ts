@@ -1,5 +1,5 @@
-import type { ClinicAction } from '@/shared/api/clinic/access-contracts.ts';
-import { canExportRows, useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
+import type { AppAction } from '@/shared/api/app/access-contracts.ts';
+import { canExportRows, useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 
 /** What the member may do with the ledger's money — every flag `false` until access resolves. */
 export interface PaymentAccess {
@@ -23,7 +23,7 @@ export interface PaymentAccess {
 }
 
 /** Each gate's clinozy-be code (api-integration §5.8; the OpenAPI `x-permission`). */
-const PAYMENT_CODES: Readonly<Record<ClinicAction, string>> = {
+const PAYMENT_CODES: Readonly<Record<AppAction, string>> = {
   view: 'payment:read',
   create: 'payment:create',
   edit: 'payment:update',
@@ -39,8 +39,8 @@ const PAYMENT_EXPORT_CODE = 'payment:export';
  * "Pay ₹X" in the rooms that buy.
  */
 export function usePaymentAccess(): PaymentAccess {
-  const access = useClinicAccess();
-  const can = (action: ClinicAction) =>
+  const access = useAppAccess();
+  const can = (action: AppAction) =>
     access.isResolved && access.canCode(PAYMENT_CODES[action]);
   return {
     resolved: access.isResolved,

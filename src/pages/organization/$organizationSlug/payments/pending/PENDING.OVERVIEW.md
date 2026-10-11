@@ -7,7 +7,7 @@ still has to give back or take — pending credits — as the Payments room's se
 A page of its own: a child folder of the Payments island on disk, registered as a **sibling** of
 the ledger in `app/routes/routeTree.tsx` (`path: 'payments/pending'` under the org shell),
 so the ledger never renders under it. Gated like the room — membership
-(`organization:read`) and the `clinic-payments` module, then `requireOrgStatus`; in-room
+(`organization:read`) and the `app-payments` module, then `requireOrgStatus`; in-room
 access is the member's own `payment:*` codes (`usePaymentAccess`; a View-as preview reads
 the previewed role's matrix).
 
@@ -91,7 +91,7 @@ amount, branch_id, splits, paid_at?}`. A part leaves the rest open ("₹X adjust
 | File                              | Responsibility                                                                                                                                                                                                                              |
 | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `pending.route.tsx`               | Route marker — exports `Component` rendering `PendingPage`.                                                                                                                                                                                 |
-| `pending.manifest.ts`             | Manifest — `kind: 'layout'` over `create` and `$creditId/edit`, permission `organization:read`, module `clinic-payments`.                                                                                                                   |
+| `pending.manifest.ts`             | Manifest — `kind: 'layout'` over `create` and `$creditId/edit`, permission `organization:read`, module `app-payments`.                                                                                                                      |
 | `pending.search.ts`               | URL schema (`validateSearch`): `direction`, `status`, `created`, `q`. Rides the entry chunk.                                                                                                                                                |
 | `pending.constants.ts`            | The Filters fields (page-only, kept off the entry). The copy is the room's (`PAYMENTS_KEYS`).                                                                                                                                               |
 | `PendingPage.tsx`                 | The Pending tab — toolbar, table, states (loading, empty, error in place), the row actions by code, the delete confirm and the settle drawer; reads the dialog routes and hosts their `Outlet`. Owns `data-testid="payments-pending-page"`. |

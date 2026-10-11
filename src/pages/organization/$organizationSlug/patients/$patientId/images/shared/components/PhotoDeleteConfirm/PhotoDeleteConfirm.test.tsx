@@ -2,10 +2,10 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type * as ImagesApiModule from '@/shared/api/clinic/patient-images-api.ts';
+import type * as ImagesApiModule from '@/shared/api/app/patient-images-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import {
@@ -15,7 +15,7 @@ import {
 } from '../../../__tests__/integration/photo-api-double.ts';
 import { PhotoDeleteConfirm } from './PhotoDeleteConfirm.tsx';
 
-vi.mock('@/shared/api/clinic/patient-images-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/patient-images-api.ts', async (importOriginal) => {
   const double = await import('../../../__tests__/integration/photo-api-double.ts');
   return {
     ...(await importOriginal<typeof ImagesApiModule>()),

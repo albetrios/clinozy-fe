@@ -3,11 +3,11 @@ import { useForm, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { isolateText } from '@/lib/bidi-isolate.ts';
-import type { ReviewSource } from '@/shared/api/clinic/clinic-schema.ts';
-import { feedbackQueryKeys, fetchReview } from '@/shared/api/clinic/feedback-api.ts';
-import type { PatientReview } from '@/shared/api/clinic/feedback-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { REVIEW_SOURCE_TONES } from '@/shared/clinic/clinic-tones.ts';
+import type { ReviewSource } from '@/shared/api/app/app-schema.ts';
+import { feedbackQueryKeys, fetchReview } from '@/shared/api/app/feedback-api.ts';
+import type { PatientReview } from '@/shared/api/app/feedback-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { REVIEW_SOURCE_TONES } from '@/shared/app/app-tones.ts';
 import {
   type DrawerStep,
   drawerStepSummary,
@@ -79,7 +79,7 @@ export function ReviewDrawer({
   today,
   onClose,
 }: ReviewDrawerProps) {
-  const { t } = useTranslation([REVIEW_NS, CLINIC_NS]);
+  const { t } = useTranslation([REVIEW_NS, APP_NS]);
   const { t: tDrawer } = useTranslation(RECORD_DRAWER_NS);
   const form = useForm<ReviewFormValues>({
     defaultValues: review ? reviewFormOf(review) : newReviewForm(source ?? undefined),
@@ -94,7 +94,7 @@ export function ReviewDrawer({
   const { isDirty } = useFormState({ control: form.control });
   const [step, setStep] = useState<string>('review');
   const sourceLabel = (value: ReviewSource) =>
-    t(CLINIC_KEYS.reviewSources[value], { ns: CLINIC_NS });
+    t(APP_KEYS.reviewSources[value], { ns: APP_NS });
 
   const { saveState, save } = useReviewSave({
     form,

@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 
 import { weekdayHeaders } from '@/lib/i18n/weekday-headers.ts';
 import { cn } from '@/lib/utils.ts';
-import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
-import { addCivilDays, localDateOf } from '@/shared/api/clinic/clinic-time.ts';
+import { addCivilDays, localDateOf } from '@/shared/api/app/app-time.ts';
+import type { AppointmentRow } from '@/shared/api/app/appointments-contracts.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
 import { type LoadTone, RAIL_HEIGHT, weekLoad } from '../../appointments.calendar.ts';

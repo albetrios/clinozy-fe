@@ -2,16 +2,16 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
-import { fetchInvoice, invoiceQueryKeys } from '@/shared/api/clinic/invoices-api.ts';
-import type { InvoiceRecord } from '@/shared/api/clinic/invoices-contracts.ts';
+import { fetchInvoice, invoiceQueryKeys } from '@/shared/api/app/invoices-api.ts';
+import type { InvoiceRecord } from '@/shared/api/app/invoices-contracts.ts';
 import {
-  clinicCommandNavigation,
-  type ClinicCommandTarget,
-} from '@/shared/clinic/clinic-command-targets.ts';
+  appCommandNavigation,
+  type AppCommandTarget,
+} from '@/shared/app/app-command-targets.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
 import { printInvoice } from '@/shared/components/InvoiceDrawer/index.ts';
 import { notifyError } from '@/shared/errors/errorHandler.ts';
-import { useClinicNavigate } from '@/shared/hooks/useClinicNavigate/index.ts';
+import { useAppNavigate } from '@/shared/hooks/useAppNavigate/index.ts';
 import { usePaymentAccess } from '@/shared/hooks/usePaymentAccess/index.ts';
 import { Copy, Eye, PenLine, Printer, Trash, Wallet } from '@/shared/icons/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
@@ -40,7 +40,7 @@ const changeable = (invoice: InvoiceRecord) =>
 /**
  * An Invoices row's actions (KICKOFF §6.6 Section tables; H:4748), on the
  * shared Invoice drawer (L-40), each opening over the file's Invoices, which
- * stays behind it (`from`, §4, A-P1 — `useClinicNavigate`), by the invoice's
+ * stays behind it (`from`, §4, A-P1 — `useAppNavigate`), by the invoice's
  * public id: "Print" (the A4 sheet straight to the printer), "Preview",
  * "Copy invoice" (a new invoice prefilled from this one — its lines and
  * discount, today's date, nothing paid; `payment:create`, never a sale's),
@@ -55,16 +55,16 @@ export function useInvoiceRowActions({
   onDelete: (invoice: InvoiceRecord) => void;
 }): InvoiceRowActions {
   const { t } = useTranslation(PATIENT_TABLE_NS);
-  const navigate = useClinicNavigate();
+  const navigate = useAppNavigate();
   const queryClient = useQueryClient();
   const access = usePaymentAccess();
   const organizationId = useOrganizationStore((state) => state.organizationId);
   const { organizationSlug = '', patientId = '' } = useParams({ strict: false });
   const referrer = `patients/${patientId}/invoices`;
 
-  const go = (target: ClinicCommandTarget, invoice: InvoiceRecord) =>
+  const go = (target: AppCommandTarget, invoice: InvoiceRecord) =>
     void navigate(
-      clinicCommandNavigation(target, {
+      appCommandNavigation(target, {
         organizationSlug,
         recordId: invoice.id,
         referrer,
@@ -84,7 +84,7 @@ export function useInvoiceRowActions({
   };
   const copy = (invoice: InvoiceRecord) =>
     void navigate(
-      clinicCommandNavigation('newInvoice', {
+      appCommandNavigation('newInvoice', {
         organizationSlug,
         referrer,
         search: { type: invoice.type, patient: patientId, copyOf: invoice.id },
@@ -92,7 +92,7 @@ export function useInvoiceRowActions({
     );
   const pay = (invoice: InvoiceRecord) =>
     void navigate(
-      clinicCommandNavigation('newReceipt', {
+      appCommandNavigation('newReceipt', {
         organizationSlug,
         referrer,
         search: { patient: patientId, invoice: invoice.id },

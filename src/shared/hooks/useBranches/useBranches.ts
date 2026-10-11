@@ -4,7 +4,7 @@ import {
   type BranchOption,
   branchQueryKeys,
   fetchActiveBranches,
-} from '@/shared/api/clinic/branches-api.ts';
+} from '@/shared/api/app/branches-api.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 /** The clinic's open branches (main first), whether there are several, and whether they have loaded. */

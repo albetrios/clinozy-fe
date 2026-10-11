@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import type { MedicineRecord } from '@/shared/api/clinic/medicines-contracts.ts';
+import type { MedicineRecord } from '@/shared/api/app/medicines-contracts.ts';
 
 import {
   bestFormRate,

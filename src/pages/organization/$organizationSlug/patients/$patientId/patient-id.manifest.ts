@@ -9,10 +9,10 @@ import type { PageManifest } from '@/lib/routes/page-manifest.ts';
  * check-in and review drawers (`check-ins`, `reviews`, `S:44–47`), each over
  * the section it opened from. Its index — and any unknown section — goes
  * to `timeline`, the Overview (D19; the schema says `overview`, `S:32`).
- * Gated like the Patients room (membership, the `clinic-patients` module, the
+ * Gated like the Patients room (membership, the `app-patients` module, the
  * org status); its children inherit the gate, and in-room access — the billing
  * sections' `billing.view`, the role-named Rx, treatment and Private album
- * gates — is `useClinicAccess` (D9, Q-F1). Not in the nav: the room is
+ * gates — is `useAppAccess` (D9, Q-F1). Not in the nav: the room is
  * Patients.
  */
 export const manifest = {
@@ -21,7 +21,7 @@ export const manifest = {
   title: 'Patient file',
   testId: 'patient-file-layout',
   permission: 'organization:read',
-  module: 'clinic-patients',
+  module: 'app-patients',
   kind: 'layout',
   children: [
     'timeline',

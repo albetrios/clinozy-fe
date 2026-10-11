@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 
 import i18n from '@/lib/i18n/i18n.ts';
-import type { DeleteReason } from '@/shared/api/clinic/clinic-schema.ts';
+import type { DeleteReason } from '@/shared/api/app/app-schema.ts';
 import {
   createOffer,
   deleteOffer,
@@ -11,12 +11,9 @@ import {
   restoreOffer,
   setOfferActive,
   updateOffer,
-} from '@/shared/api/clinic/offerings-api.ts';
-import type {
-  OfferFields,
-  OfferRecord,
-} from '@/shared/api/clinic/offerings-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+} from '@/shared/api/app/offerings-api.ts';
+import type { OfferFields, OfferRecord } from '@/shared/api/app/offerings-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
@@ -28,7 +25,7 @@ const useOrganizationId = () => useOrganizationStore((state) => state.organizati
 
 /** "Navratri glow saved" and its kin — the offer's name in the clinic vocabulary. */
 function offerToast(key: string, offer: OfferRecord): string {
-  return i18n.t(key, { ns: CLINIC_NS, name: offer.name });
+  return i18n.t(key, { ns: APP_NS, name: offer.name });
 }
 
 // ── Reads ──
@@ -75,8 +72,7 @@ export function useCreateOffer(
   return useAppMutation<OfferRecord, OfferCreateVars>({
     mutationFn: ({ fields }, action) => createOffer({ fields, ...action }),
     invalidateKeys: [offerQueryKeys.all],
-    successMessage: (offer) =>
-      offerToast(CLINIC_KEYS.offerings.toasts.offerCreated, offer),
+    successMessage: (offer) => offerToast(APP_KEYS.offerings.toasts.offerCreated, offer),
     ...options,
   });
 }
@@ -99,7 +95,7 @@ export function useUpdateOffer(
     mutationFn: ({ record, fields }, action) =>
       updateOffer({ record, fields, ...action }),
     invalidateKeys: [offerQueryKeys.all],
-    successMessage: (offer) => offerToast(CLINIC_KEYS.offerings.toasts.offerSaved, offer),
+    successMessage: (offer) => offerToast(APP_KEYS.offerings.toasts.offerSaved, offer),
     ...options,
   });
 }
@@ -148,11 +144,11 @@ export function useSetOfferActive(
     successMessage: (offer) =>
       offerToast(
         offer.isActive
-          ? CLINIC_KEYS.offerings.toasts.offerResumed
-          : CLINIC_KEYS.offerings.toasts.offerPaused,
+          ? APP_KEYS.offerings.toasts.offerResumed
+          : APP_KEYS.offerings.toasts.offerPaused,
         offer,
       ),
-    toastId: 'clinic-offer-paused',
+    toastId: 'app-offer-paused',
     ...rest,
     onSuccess: async (offer, vars) => {
       queryClient.setQueryData<OfferRecord[]>(listKey, (previous) =>
@@ -174,7 +170,7 @@ export interface OfferDeleteVars {
  * Delete an offer (`S:1546`) — optimistic: the row leaves at once and comes back if the write
  * fails. The list refreshes — not the offer's own read, which would answer 404 while its
  * drawer closes. No toast of its own: the Reason confirm's `reason.undo` shows "Navratri glow
- * removed" (`CLINIC_KEYS.offerings.toasts.offerRemoved`) with Undo, which runs
+ * removed" (`APP_KEYS.offerings.toasts.offerRemoved`) with Undo, which runs
  * {@link useRestoreOffer}.
  */
 export function useDeleteOffer(options: CrudMutationOptions<void, OfferDeleteVars> = {}) {

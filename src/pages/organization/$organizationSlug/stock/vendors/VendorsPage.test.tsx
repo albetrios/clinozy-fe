@@ -15,7 +15,7 @@ vi.mock('../shared/stock-records-api.ts', async (importOriginal) => ({
   deleteStockVendor: vi.fn(),
   restoreStockVendor: vi.fn(),
 }));
-import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Role } from '@/shared/api/app/app-schema.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { stockPurchaseRow, stockVendorRow } from '@/tests/utils/stock-doubles.ts';
 

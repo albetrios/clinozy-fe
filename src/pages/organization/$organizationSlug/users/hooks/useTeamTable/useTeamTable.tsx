@@ -8,10 +8,10 @@ import {
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { BranchOption } from '@/shared/api/app/branches-api.ts';
+import type { TeamMember } from '@/shared/api/app/users-contracts.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import {
   type DataTableFeatures,
   dataTableFeatures,

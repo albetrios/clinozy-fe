@@ -6,7 +6,7 @@ import { platformConfig } from '@/core/config/env.ts';
 import { PageTransition } from '@/lib/animations/PageTransition.tsx';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { cn } from '@/lib/utils.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { preloadCommandPalette } from '@/shared/components/CommandPalette/index.ts';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import type { AppNavEntry } from '@/shared/hooks/useAppNav/index.ts';

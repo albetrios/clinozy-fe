@@ -15,7 +15,7 @@ export const manifest = {
   title: 'Task',
   testId: 'task-drawer',
   permission: 'organization:read',
-  module: 'clinic-tasks',
+  module: 'app-tasks',
   kind: 'leaf',
   children: [],
 } as const satisfies PageManifest;

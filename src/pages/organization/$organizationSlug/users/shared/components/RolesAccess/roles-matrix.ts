@@ -1,6 +1,6 @@
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
-import type { ClinicAction } from '@/shared/api/clinic/access-contracts.ts';
-import type { Section } from '@/shared/api/clinic/clinic-schema.ts';
+import type { AppAction } from '@/shared/api/app/access-contracts.ts';
+import type { Section } from '@/shared/api/app/app-schema.ts';
 
 /*
  * Roles & access on clinozy-be's permission codes (Q-U-B): a role IS its codes, so every box,
@@ -46,7 +46,7 @@ interface MatrixRowBase {
   /** The clinic section it belongs to: the row's tile and tone. */
   section: Exclude<Section, 'today'>;
   /** Each box's code; null where clinozy-be has none ("—": a review is read with its patient). */
-  codes: Readonly<Record<ClinicAction, OrganizationPermission | null>>;
+  codes: Readonly<Record<AppAction, OrganizationPermission | null>>;
 }
 
 /** One row of "What it can see and do": a section's own row, or one under it (`sub`). */
@@ -57,9 +57,9 @@ export type MatrixRow =
 /** `resource:read|create|update|delete`, with the actions clinozy-be lacks left out. */
 function crud(
   resource: string,
-  missing: readonly ClinicAction[] = [],
-): Record<ClinicAction, OrganizationPermission | null> {
-  const code = (action: ClinicAction, verb: string) =>
+  missing: readonly AppAction[] = [],
+): Record<AppAction, OrganizationPermission | null> {
+  const code = (action: AppAction, verb: string) =>
     missing.includes(action) ? null : (`${resource}:${verb}` as OrganizationPermission);
   return {
     view: code('view', 'read'),
@@ -134,7 +134,7 @@ export const SPECIAL_PERMISSIONS: readonly SpecialPermission[] = [
 ];
 
 /** The codes a box or a special switch holds — every other code is a workspace permission. */
-export const CLINIC_PERMISSION_CODES: ReadonlySet<string> = new Set([
+export const APP_PERMISSION_CODES: ReadonlySet<string> = new Set([
   ...MATRIX_ROWS.flatMap((row) =>
     Object.values(row.codes).filter((code) => code !== null),
   ),
@@ -166,7 +166,7 @@ export function rowState(
 export function withBoxToggled(
   codes: readonly string[],
   row: MatrixRow,
-  action: ClinicAction,
+  action: AppAction,
 ): string[] {
   const code = row.codes[action];
   if (!code) return [...codes];

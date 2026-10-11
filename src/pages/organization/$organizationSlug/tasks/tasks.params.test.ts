@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { taskListQuery } from '@/shared/api/clinic/tasks-api.ts';
+import { taskListQuery } from '@/shared/api/app/tasks-api.ts';
 
 import { taskListQueryOf } from './tasks.params.ts';
 

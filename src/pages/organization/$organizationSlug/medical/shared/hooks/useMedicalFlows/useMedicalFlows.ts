@@ -4,9 +4,9 @@ import type {
   DeleteReason,
   MedicalPurchaseOrder,
   MedicalSale,
-} from '@/shared/api/clinic/clinic-schema.ts';
-import { fixtureLedgerQueryKeys } from '@/shared/api/clinic/payments-fixture-api.ts';
-import type { PaymentRecord } from '@/shared/api/clinic/payments-fixture-contracts.ts';
+} from '@/shared/api/app/app-schema.ts';
+import { fixtureLedgerQueryKeys } from '@/shared/api/app/payments-fixture-api.ts';
+import type { PaymentRecord } from '@/shared/api/app/payments-fixture-contracts.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';

@@ -3,10 +3,10 @@ import { Controller, type UseFormReturn, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { MONEY_SCALE, textFromNumber } from '@/lib/number-text.ts';
-import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { PAYMENT_MODE_TONES } from '@/shared/clinic/clinic-tones.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
+import type { BranchOption } from '@/shared/api/app/branches-api.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { PAYMENT_MODE_TONES } from '@/shared/app/app-tones.ts';
 import { MoneyCell } from '@/shared/components/Cells/index.ts';
 import {
   DrawerChips,
@@ -143,7 +143,7 @@ export function BillFields({
               label={t(K.date)}
               value={control.value}
               onChange={control.onChange}
-              max={clinicToday()}
+              max={appToday()}
               invalid={Boolean(date.error)}
               aria-describedby={date.control['aria-describedby']}
               disabled={readOnly}
@@ -274,7 +274,7 @@ function usePaidNowFields({
   payment,
 }: PurchaseFieldsProps): ReactElement[] {
   const { t } = useTranslation(STOCK_DRAWERS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   const { t: tDrawer } = useTranslation(RECORD_DRAWER_NS);
   const field = useDrawerFieldIds(form, idPrefix);
   const values = useWatch({ control: form.control });
@@ -330,7 +330,7 @@ function usePaidNowFields({
         label={t(K.mode)}
         options={PURCHASE_PAYMENT_MODES.map((mode) => ({
           value: mode,
-          label: tClinic(CLINIC_KEYS.paymentModes[mode]),
+          label: tApp(APP_KEYS.paymentModes[mode]),
           tone: PAYMENT_MODE_TONES[mode],
         }))}
         value={values.paidMode ?? 'cash'}

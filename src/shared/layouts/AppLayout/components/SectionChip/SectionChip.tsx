@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import type { SectionBarEntry } from '@/shared/layouts/AppLayout/section-bar-nav.ts';
 import { LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
 

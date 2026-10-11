@@ -15,7 +15,7 @@ export const manifest = {
   title: 'New user',
   testId: 'user-drawer',
   permission: 'membership:read',
-  module: 'clinic-users',
+  module: 'app-users',
   kind: 'leaf',
   children: [],
 } as const satisfies PageManifest;

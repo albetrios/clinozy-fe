@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { OFFER_STATUS_VALUES } from '@/shared/api/clinic/offerings-contracts.ts';
+import { OFFER_STATUS_VALUES } from '@/shared/api/app/offerings-contracts.ts';
 
 import { OFFER_STATE_FILTER, validateOffersSearch } from './offers.search.ts';
 

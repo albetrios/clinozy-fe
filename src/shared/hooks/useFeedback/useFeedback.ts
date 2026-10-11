@@ -1,9 +1,6 @@
 import type { QueryKey } from '@tanstack/react-query';
 
-import type {
-  DeleteReason,
-  FeedbackActionKind,
-} from '@/shared/api/clinic/clinic-schema.ts';
+import type { DeleteReason, FeedbackActionKind } from '@/shared/api/app/app-schema.ts';
 import {
   createCheckIn,
   createReview,
@@ -15,7 +12,7 @@ import {
   restoreFeedback,
   updateCheckIn,
   updateReview,
-} from '@/shared/api/clinic/feedback-api.ts';
+} from '@/shared/api/app/feedback-api.ts';
 import {
   type CheckInContext,
   type CheckInCreateInput,
@@ -26,14 +23,11 @@ import {
   type PatientReview,
   type ReviewCreateInput,
   type ReviewFields,
-} from '@/shared/api/clinic/feedback-contracts.ts';
-import { patientFileQueryKeys } from '@/shared/api/clinic/patient-file-api.ts';
-import { planQueryKeys } from '@/shared/api/clinic/plan-api.ts';
-import { taskQueryKeys } from '@/shared/api/clinic/tasks-api.ts';
-import {
-  fetchTreatment,
-  treatmentQueryKeys,
-} from '@/shared/api/clinic/treatments-api.ts';
+} from '@/shared/api/app/feedback-contracts.ts';
+import { patientFileQueryKeys } from '@/shared/api/app/patient-file-api.ts';
+import { planQueryKeys } from '@/shared/api/app/plan-api.ts';
+import { taskQueryKeys } from '@/shared/api/app/tasks-api.ts';
+import { fetchTreatment, treatmentQueryKeys } from '@/shared/api/app/treatments-api.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppointment } from '@/shared/hooks/useAppointments/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
@@ -60,7 +54,7 @@ const FEEDBACK_WRITE_KEYS: QueryKey[] = [
  * A new one also writes a `system` entry to the person's thread (`messageQueryKeys`, named
  * here so the hook does not load the messages module — it still reads the fixture world).
  */
-const FEEDBACK_CREATE_KEYS: QueryKey[] = [...FEEDBACK_WRITE_KEYS, ['clinic', 'messages']];
+const FEEDBACK_CREATE_KEYS: QueryKey[] = [...FEEDBACK_WRITE_KEYS, ['app', 'messages']];
 
 /** A new check-in's next offerings land in the plan (TR10) — the suggestions refresh too. */
 const CHECK_IN_CREATE_KEYS: QueryKey[] = [...FEEDBACK_CREATE_KEYS, planQueryKeys.all];

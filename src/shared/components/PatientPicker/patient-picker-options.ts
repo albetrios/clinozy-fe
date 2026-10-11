@@ -1,10 +1,10 @@
 import type { TFunction } from 'i18next';
 
 import { isolateJoin } from '@/lib/bidi-isolate.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { PatientPickRow } from '@/shared/api/clinic/patient-search-api.ts';
-import type { PatientRow } from '@/shared/api/clinic/patients-contracts.ts';
-import { formatClinicPhone } from '@/shared/clinic/clinic-phone.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { PatientPickRow } from '@/shared/api/app/patient-search-api.ts';
+import type { PatientRow } from '@/shared/api/app/patients-contracts.ts';
+import { formatAppPhone } from '@/shared/app/app-phone.ts';
 import { personInitials } from '@/shared/components/Cells/index.ts';
 import type { PickerOption } from '@/shared/components/Picker/index.ts';
 
@@ -42,7 +42,7 @@ export function patientPickOption(
     sub: isolateJoin([
       duePart(row.due, t, formatRupees),
       displayId.patient(row.seq),
-      row.phone ? formatClinicPhone(row.phone) : '',
+      row.phone ? formatAppPhone(row.phone) : '',
     ]),
     leading: { kind: 'avatar', initials: personInitials(row.name), patient: true },
     data: row,

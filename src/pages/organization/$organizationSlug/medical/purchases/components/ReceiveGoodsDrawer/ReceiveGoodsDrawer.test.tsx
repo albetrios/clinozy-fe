@@ -2,11 +2,11 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
+import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
 import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+  appFixtures,
+  resetAppFixtures,
+} from '@/shared/api/app/fixtures/world.fixtures.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { fsi } from '@/tests/utils/bidi-marks.ts';
@@ -54,11 +54,11 @@ const setup = () =>
 beforeEach(() => {
   viewport.tier = 'desktop';
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 afterEach(() => {
   resetMedicalRoutes();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 
 /** An ordered line of #430 — Epriva Tab, 10 + 2 free at ₹212. */
@@ -214,7 +214,7 @@ describe('ReceiveGoodsDrawer (medical.md:269–279)', () => {
     expect(notifyMock.success).toHaveBeenCalledWith(
       'Goods received · stock and free quantity added',
     );
-    const saved = await clinicFixtures.purchaseOrders.get(ref.purchaseOrder(430));
+    const saved = await appFixtures.purchaseOrders.get(ref.purchaseOrder(430));
     expect(saved.stage).toBe('received');
     expect(saved.items.map((item) => [item.received, item.batchNo])).toEqual([
       [true, 'NEW-430'],
@@ -289,7 +289,7 @@ describe('ReceiveGoodsDrawer (medical.md:269–279)', () => {
 
     await user.click(within(drawer).getByTestId(`${D}-save`));
     await waitFor(() => expect(onClose).toHaveBeenCalled());
-    const saved = await clinicFixtures.purchaseOrders.get(ref.purchaseOrder(430));
+    const saved = await appFixtures.purchaseOrders.get(ref.purchaseOrder(430));
     expect(saved.stage).toBe('received');
     expect(saved.items[2]).toEqual({
       medicineId: ref.medicine(450),
@@ -300,7 +300,7 @@ describe('ReceiveGoodsDrawer (medical.md:269–279)', () => {
       expiry: '06/28',
       received: true,
     });
-    const azelan = await clinicFixtures.medicines.get(ref.medicine(450));
+    const azelan = await appFixtures.medicines.get(ref.medicine(450));
     expect(azelan.batches.find((batch) => batch.batchNo === 'AZ900')?.qty).toBe(2);
   });
 
@@ -341,7 +341,7 @@ describe('ReceiveGoodsDrawer (medical.md:269–279)', () => {
     ).toBeNull();
     await user.click(within(drawer).getByTestId(`${D}-save`));
     await waitFor(() => expect(onClose).toHaveBeenCalled());
-    const saved = await clinicFixtures.purchaseOrders.get(ref.purchaseOrder(430));
+    const saved = await appFixtures.purchaseOrders.get(ref.purchaseOrder(430));
     expect(saved.items).toHaveLength(2);
   });
 

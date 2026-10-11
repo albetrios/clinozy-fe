@@ -1,11 +1,7 @@
 import { useCallback, useMemo } from 'react';
 
-import {
-  fetchAllMembers,
-  fetchAllRoles,
-  joinTeam,
-} from '@/shared/api/clinic/users-api.ts';
-import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
+import { fetchAllMembers, fetchAllRoles, joinTeam } from '@/shared/api/app/users-api.ts';
+import type { TeamMember } from '@/shared/api/app/users-contracts.ts';
 import type { RoleSummary } from '@/shared/api/organization-contracts.ts';
 import { orgQueryKeys } from '@/shared/api/organization-query-keys.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
@@ -75,7 +71,7 @@ export interface PlatformRolesResult {
  * `roles` key prefix, so every role write refreshes it — for a viewer holding `role:read`;
  * nothing (and never pending) for anyone else. Roles & access, the Team's role pills and the
  * member drawer's role picker read it; anyone may read the role directory instead
- * (`useClinicRoles`).
+ * (`useAppRoles`).
  */
 export function usePlatformRoles(enabled = true): PlatformRolesResult {
   const organizationId = useOrganizationStore((state) => state.organizationId);

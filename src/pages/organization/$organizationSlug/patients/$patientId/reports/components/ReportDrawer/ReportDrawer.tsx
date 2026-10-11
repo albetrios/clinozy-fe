@@ -3,7 +3,7 @@ import { useForm, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { isolateText } from '@/lib/bidi-isolate.ts';
-import { localDateOf } from '@/shared/api/clinic/clinic-time.ts';
+import { localDateOf } from '@/shared/api/app/app-time.ts';
 import {
   type DrawerStep,
   drawerStepSummary,

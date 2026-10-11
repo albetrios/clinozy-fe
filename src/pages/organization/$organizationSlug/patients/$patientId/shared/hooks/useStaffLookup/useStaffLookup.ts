@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
 import { useMyMembershipId } from '@/shared/hooks/useMyMembership/index.ts';
 import { useTeamDirectory } from '@/shared/hooks/useTeamDirectory/index.ts';
 

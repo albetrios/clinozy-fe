@@ -5,13 +5,13 @@ import { axe } from 'vitest-axe';
 
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import i18n from '@/lib/i18n/i18n.ts';
-import type * as PaymentsApiModule from '@/shared/api/clinic/payments-api.ts';
+import type * as PaymentsApiModule from '@/shared/api/app/payments-api.ts';
 import {
   deletePayment,
   listPatientPayments,
   reversePayment,
-} from '@/shared/api/clinic/payments-api.ts';
-import { CROSS_ROOM_PARAM } from '@/shared/clinic/clinic-referrer.ts';
+} from '@/shared/api/app/payments-api.ts';
+import { CROSS_ROOM_PARAM } from '@/shared/app/app-referrer.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
@@ -47,7 +47,7 @@ vi.mock('@/shared/hooks/useViewportTier/index.ts', () => ({
   readViewportTier: () => viewport.tier,
 }));
 
-vi.mock('@/shared/api/clinic/payments-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/payments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof PaymentsApiModule>()),
   listPatientPayments: vi.fn(),
   deletePayment: vi.fn(),

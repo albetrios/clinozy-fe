@@ -4,24 +4,24 @@ import { useId, useState } from 'react';
 import { useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import { fetchPatient, patientQueryKeys } from '@/shared/api/clinic/patients-api.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
+import { fetchPatient, patientQueryKeys } from '@/shared/api/app/patients-api.ts';
 import {
   patientName,
   type PatientPersonInput,
   type PatientRecord,
-} from '@/shared/api/clinic/patients-contracts.ts';
-import { defaultBranchId } from '@/shared/clinic/clinic-branch.ts';
-import { clinicCommandNavigation } from '@/shared/clinic/clinic-command-targets.ts';
-import { toClinicPhone } from '@/shared/clinic/clinic-phone.ts';
+} from '@/shared/api/app/patients-contracts.ts';
+import { defaultBranchId } from '@/shared/app/app-branch.ts';
+import { appCommandNavigation } from '@/shared/app/app-command-targets.ts';
+import { toAppPhone } from '@/shared/app/app-phone.ts';
 import type { PickedFile } from '@/shared/components/DrawerField/index.ts';
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import { PatientDeleteConfirm } from '@/shared/components/PatientDeleteConfirm/index.ts';
 import type { QuickFillItem } from '@/shared/components/QuickFillRow/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
+import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
-import { useClinicAccess } from '@/shared/hooks/useClinicAccess/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
 import {
   resetFormInPlace,
@@ -142,7 +142,7 @@ function useDuplicateMobile(phone: string, editingId: string | null) {
   const [checked, setChecked] = useState<string | null>(null);
   const lookup = usePersonByPhone(checked);
   const person =
-    checked !== null && toClinicPhone(phone) === checked ? (lookup.data ?? null) : null;
+    checked !== null && toAppPhone(phone) === checked ? (lookup.data ?? null) : null;
   const patientId = person?.patientId ?? null;
   const other = patientId !== null && patientId !== editingId;
   return {
@@ -152,7 +152,7 @@ function useDuplicateMobile(phone: string, editingId: string | null) {
         : null,
     known: person && patientId === null && editingId === null ? person : null,
     check: (digits: string) => {
-      const phone = toClinicPhone(digits);
+      const phone = toAppPhone(digits);
       // The same number again (the server refused it as taken): ask once more.
       if (phone !== null && phone === checked) void lookup.refetch();
       else setChecked(phone);
@@ -218,7 +218,7 @@ function drawerChrome(props: PatientDrawerProps, t: TFunction) {
 
 /** View-only without the mode's write; Delete with the delete ability on an edit. */
 function useDrawerAccess(editing: boolean) {
-  const access = useClinicAccess();
+  const access = useAppAccess();
   const readOnly =
     access.isResolved && !access.can('patients', editing ? 'edit' : 'create');
   return {
@@ -263,7 +263,7 @@ function useSaveOutcome(props: PatientDrawerProps, onAnother: () => void) {
 
   const openFile = (patientId: string) => {
     void navigate(
-      clinicCommandNavigation('patient', { organizationSlug, recordId: patientId }),
+      appCommandNavigation('patient', { organizationSlug, recordId: patientId }),
     );
   };
 
@@ -342,7 +342,7 @@ function PatientDrawerSession(props: SessionProps) {
   const { openBranches } = useBranches();
   const { preferences } = usePreferences();
   const idPrefix = `patient-${useId().replace(/:/g, '')}`;
-  const [today] = useState(() => clinicToday());
+  const [today] = useState(() => appToday());
   const editing = props.mode === 'edit' ? props.patient : null;
   const prefill = sessionPrefill(props, fresh);
   const chrome = drawerChrome(props, t);

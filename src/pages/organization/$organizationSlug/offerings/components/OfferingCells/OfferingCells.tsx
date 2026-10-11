@@ -1,8 +1,8 @@
 import { cn } from '@/lib/utils.ts';
-import type { OfferingCategory } from '@/shared/api/clinic/clinic-schema.ts';
-import type { OfferRecord } from '@/shared/api/clinic/offerings-contracts.ts';
-import type { EffectivePrice } from '@/shared/api/clinic/offerings-pricing.ts';
-import { OFFERING_CATEGORY_TONES } from '@/shared/clinic/clinic-tones.ts';
+import type { OfferingCategory } from '@/shared/api/app/app-schema.ts';
+import type { OfferRecord } from '@/shared/api/app/offerings-contracts.ts';
+import type { EffectivePrice } from '@/shared/api/app/offerings-pricing.ts';
+import { OFFERING_CATEGORY_TONES } from '@/shared/app/app-tones.ts';
 import { TonePill } from '@/shared/components/Cells/index.ts';
 
 import type { OfferingRow } from '../../offerings.rows.ts';

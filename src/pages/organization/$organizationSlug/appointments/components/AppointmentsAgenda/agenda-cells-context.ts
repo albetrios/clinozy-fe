@@ -3,7 +3,7 @@ import { createContext, useContext } from 'react';
 import type {
   AppointmentPerson,
   AppointmentRow,
-} from '@/shared/api/clinic/appointments-contracts.ts';
+} from '@/shared/api/app/appointments-contracts.ts';
 
 import type { AppointmentStatusView } from '../AppointmentStatusPopover/index.ts';
 

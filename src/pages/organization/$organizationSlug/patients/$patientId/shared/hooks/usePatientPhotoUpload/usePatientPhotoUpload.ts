@@ -5,11 +5,11 @@ import { useTranslation } from 'react-i18next';
 import {
   attachPatientImage,
   patientImageQueryKeys,
-} from '@/shared/api/clinic/patient-images-api.ts';
+} from '@/shared/api/app/patient-images-api.ts';
 import {
   PATIENT_PHOTO_CONTENT_TYPES,
   type PatientPhotoAlbum,
-} from '@/shared/api/clinic/patient-images-contracts.ts';
+} from '@/shared/api/app/patient-images-contracts.ts';
 import { useUploadQueue } from '@/shared/hooks/useUploadQueue/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 

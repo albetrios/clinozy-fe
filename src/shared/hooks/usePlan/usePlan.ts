@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 
-import type { DeleteReason } from '@/shared/api/clinic/clinic-schema.ts';
+import type { DeleteReason } from '@/shared/api/app/app-schema.ts';
 import {
   createPlanSuggestion,
   deletePlanSuggestion,
@@ -11,13 +11,13 @@ import {
   planQueryKeys,
   restorePlanSuggestion,
   updatePlanSuggestion,
-} from '@/shared/api/clinic/plan-api.ts';
+} from '@/shared/api/app/plan-api.ts';
 import {
   type PatientPlan,
   planOfferingsOf,
   type PlanSuggestionRow,
   type SuggestionChange,
-} from '@/shared/api/clinic/plan-contracts.ts';
+} from '@/shared/api/app/plan-contracts.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';

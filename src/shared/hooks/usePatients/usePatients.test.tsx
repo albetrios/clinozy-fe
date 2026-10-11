@@ -3,7 +3,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/shared/api/clinic/patients-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/patients-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listPatients: vi.fn(),
   fetchPatient: vi.fn(),
@@ -12,14 +12,14 @@ vi.mock('@/shared/api/clinic/patients-api.ts', async (importOriginal) => ({
   deletePatient: vi.fn(),
   restorePatient: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/contacts-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/contacts-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   findContactByPhone: vi.fn(),
 }));
 vi.mock('@/shared/notify/index.ts', () => ({
   notify: { success: vi.fn(), error: vi.fn(), info: vi.fn(), undo: vi.fn() },
 }));
-import { findContactByPhone } from '@/shared/api/clinic/contacts-api.ts';
+import { findContactByPhone } from '@/shared/api/app/contacts-api.ts';
 import {
   createPatient,
   deletePatient,
@@ -28,11 +28,11 @@ import {
   patientQueryKeys,
   restorePatient,
   updatePatient,
-} from '@/shared/api/clinic/patients-api.ts';
-import type { PatientFields } from '@/shared/api/clinic/patients-contracts.ts';
+} from '@/shared/api/app/patients-api.ts';
+import type { PatientFields } from '@/shared/api/app/patients-contracts.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { contactHit } from '@/tests/utils/appointment-doubles.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
 import { EMPTY_CONTACT_PROFILE } from '@/tests/utils/contact-doubles.ts';
 import {
   patientRecord,

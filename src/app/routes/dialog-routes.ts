@@ -117,7 +117,7 @@ import { manifest as branchCreateManifest } from '@/pages/organization/$organiza
 import { Component as BranchCreateRoute } from '@/pages/organization/$organizationSlug/users/branches/create/create.route.tsx';
 import { manifest as userCreateManifest } from '@/pages/organization/$organizationSlug/users/create/create.manifest.ts';
 import { Component as UserCreateRoute } from '@/pages/organization/$organizationSlug/users/create/create.route.tsx';
-import { crossRoomNavigation } from '@/shared/clinic/clinic-referrer.ts';
+import { crossRoomNavigation } from '@/shared/app/app-referrer.ts';
 
 /** A dialog route's lazily loaded half: the manifest its gate and title read, and its component. */
 export interface DialogRoute {
@@ -207,7 +207,7 @@ export const DIALOG_ROUTES = {
 /**
  * A drawer another room owns, entered on its own route with a `from` naming
  * an allowed room other than its own (KICKOFF §4, A-P1) — a shared link, a
- * stale tab, a link that skipped `useClinicNavigate` — goes to that room
+ * stale tab, a link that skipped `useAppNavigate` — goes to that room
  * instead: the room's page with the drawer named in its search, masked as the
  * drawer's own route, so the room stands behind the drawer, its guards run,
  * and the URL bar still shows the link. `dialogRoute(name)` in

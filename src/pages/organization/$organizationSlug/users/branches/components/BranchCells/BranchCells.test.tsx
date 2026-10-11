@@ -3,8 +3,8 @@ import type { TFunction } from 'i18next';
 import { describe, expect, it } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type { Branch } from '@/shared/api/clinic/clinic-schema.ts';
-import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
+import type { Branch } from '@/shared/api/app/app-schema.ts';
+import type { TeamMember } from '@/shared/api/app/users-contracts.ts';
 import { fsi } from '@/tests/utils/bidi-marks.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 

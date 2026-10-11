@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { describe, expect, it } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type { AppointmentTreatment } from '@/shared/api/clinic/appointments-contracts.ts';
+import type { AppointmentTreatment } from '@/shared/api/app/appointments-contracts.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 import { DOCTOR_ARJUN, DOCTOR_NISHA } from '@/tests/utils/appointment-doubles.ts';
 

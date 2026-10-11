@@ -3,11 +3,11 @@ import { useTranslation } from 'react-i18next';
 
 import { isolateText, isolateValues } from '@/lib/bidi-isolate.ts';
 import { cn } from '@/lib/utils.ts';
-import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
-import type { AppointmentStatus } from '@/shared/api/clinic/clinic-schema.ts';
-import { serviceTone } from '@/shared/clinic/appointment-display.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { APPOINTMENT_STATUS_TONES, TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import type { AppointmentStatus } from '@/shared/api/app/app-schema.ts';
+import type { AppointmentRow } from '@/shared/api/app/appointments-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { APPOINTMENT_STATUS_TONES, TONE_CLASSES } from '@/shared/app/app-tones.ts';
+import { serviceTone } from '@/shared/app/appointment-display.ts';
 import {
   PersonAvatar,
   personInitials,
@@ -106,13 +106,13 @@ export function CalendarBlock({
   geometry,
   clash = false,
 }: CalendarBlockProps) {
-  const { t } = useTranslation([APPOINTMENTS_NS, CLINIC_NS]);
+  const { t } = useTranslation([APPOINTMENTS_NS, APP_NS]);
   const actions = useAppointmentActions();
   const slotLabel = useAppointmentSlotLabel();
   const { person, doctor } = appointment;
   const time = slotLabel(appointment.date, appointment.startTime).time;
-  const statusLabel = t(CLINIC_KEYS.appointments.statuses[appointment.status], {
-    ns: CLINIC_NS,
+  const statusLabel = t(APP_KEYS.appointments.statuses[appointment.status], {
+    ns: APP_NS,
   });
   const doctorName = doctor?.name ?? '';
   // The tooltip's name, time, service and doctor are isolated tokens.

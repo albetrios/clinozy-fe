@@ -3,11 +3,11 @@ import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
+import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
 import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+  appFixtures,
+  resetAppFixtures,
+} from '@/shared/api/app/fixtures/world.fixtures.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 
 import {
@@ -26,10 +26,10 @@ const TRIGGER = 'medical-sales-view-action-prescriptions';
 const setup = () =>
   userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
 
-beforeEach(() => resetClinicFixtures());
+beforeEach(() => resetAppFixtures());
 afterEach(() => {
   resetMedicalRoutes();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 
 describe('PrescriptionsToFill (medical.md:417–431)', () => {
@@ -54,8 +54,8 @@ describe('PrescriptionsToFill (medical.md:417–431)', () => {
   });
 
   it('hides while every prescription is filled', async () => {
-    for (const rx of clinicFixtures.prescriptions.snapshot()) {
-      await clinicFixtures.prescriptions.update(rx.id, { items: [] });
+    for (const rx of appFixtures.prescriptions.snapshot()) {
+      await appFixtures.prescriptions.update(rx.id, { items: [] });
     }
     renderMedicalDrawer(<PrescriptionsToFill onPick={vi.fn()} />);
     await waitFor(() => expect(screen.queryByTestId(TRIGGER)).not.toBeInTheDocument());

@@ -4,15 +4,15 @@ Route: `/organization/$organizationSlug/stock/vendors/$vendorId/edit` — a URL-
 D24): Edit clinic vendor (`S:83`) — a row's click. The route renders nothing: the Vendors page reads the URL and opens the
 drawer over the list, so a refresh or a shared link reopens it; an unknown id leaves the list
 in place with "<Record> not found" (`S:115`). Gated like the room — membership
-(`organization:read`) and the `clinic-stock` module, then `requireOrgStatus`.
+(`organization:read`) and the `app-stock` module, then `requireOrgStatus`.
 
 ## Files
 
-| File                      | Responsibility                                                                                                |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `edit.route.tsx`          | Route marker — exports `Component` rendering `EditStockVendorPage`.                                           |
-| `edit.manifest.ts`        | Manifest — `kind: 'leaf'`, permission `organization:read`, module `clinic-stock`, title "Edit clinic vendor". |
-| `EditStockVendorPage.tsx` | Renders nothing — the drawer mounts on the Vendors page.                                                      |
+| File                      | Responsibility                                                                                             |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `edit.route.tsx`          | Route marker — exports `Component` rendering `EditStockVendorPage`.                                        |
+| `edit.manifest.ts`        | Manifest — `kind: 'leaf'`, permission `organization:read`, module `app-stock`, title "Edit clinic vendor". |
+| `EditStockVendorPage.tsx` | Renders nothing — the drawer mounts on the Vendors page.                                                   |
 
 ## Test ids
 

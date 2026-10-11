@@ -4,9 +4,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import i18n from '@/lib/i18n/i18n.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
-import { CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import type { LedgerRow } from '@/shared/api/app/payments-contracts.ts';
+import { APP_NS } from '@/shared/app/app.constants.ts';
 import { fsi } from '@/tests/utils/bidi-marks.ts';
 import { ledgerRow } from '@/tests/utils/payments-doubles.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
@@ -37,7 +37,7 @@ import {
 const NOW = new Date('2026-10-10T05:00:00Z');
 
 const t = i18n.getFixedT('en', LEDGER_NS);
-const tClinic = i18n.getFixedT('en', CLINIC_NS);
+const tApp = i18n.getFixedT('en', APP_NS);
 const rupees = (amount: number) => `₹${amount.toLocaleString('en-IN')}`;
 
 /** A translator that answers each key with its options — for the words not in the locales yet. */
@@ -106,11 +106,11 @@ describe('the ledger’s wording (payments.md:29)', () => {
       ],
     });
     expect(modes).toEqual(['cash', 'upi']);
-    expect(ledgerModesLabel(modes, tClinic)).toBe('Cash + UPI');
+    expect(ledgerModesLabel(modes, tApp)).toBe('Cash + UPI');
   });
 
   it('words the From / to sub line for every kind', () => {
-    const sub = (row: LedgerRow) => ledgerSubLine(row, t, tClinic, displayId.creditNote);
+    const sub = (row: LedgerRow) => ledgerSubLine(row, t, tApp, displayId.creditNote);
     // A receipt names its invoice, its note kept off the line; a sale's says so.
     expect(sub(ledgerRow())).toBe('Invoice #5');
     expect(
@@ -177,8 +177,7 @@ describe('the ledger’s wording (payments.md:29)', () => {
   });
 
   it('words a bill without its number, a reversal and an entry a reversal undid', () => {
-    const sub = (row: LedgerRow) =>
-      ledgerSubLine(row, keyT, tClinic, displayId.creditNote);
+    const sub = (row: LedgerRow) => ledgerSubLine(row, keyT, tApp, displayId.creditNote);
     expect(
       sub({
         ...tea,
@@ -244,7 +243,7 @@ describe('the ledger’s wording (payments.md:29)', () => {
   });
 
   it('words one side of a logged edit: "₹600 UPI"', () => {
-    expect(editSideLabel({ amount: 600, modes: ['upi'] }, t, tClinic, rupees)).toBe(
+    expect(editSideLabel({ amount: 600, modes: ['upi'] }, t, tApp, rupees)).toBe(
       '₹600 UPI',
     );
   });

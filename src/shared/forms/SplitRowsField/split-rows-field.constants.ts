@@ -1,11 +1,11 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 
 /**
- * The Mode · Amount rows live in `clinic`: Receive payment and the give-back
+ * The Mode · Amount rows live in `app`: Receive payment and the give-back
  * drawer carry them, and the give-back drawer opens from the patient file too
  * (KICKOFF §6.9).
  */
-export const SPLIT_ROWS_NS = I18N_NAMESPACES.clinic;
+export const SPLIT_ROWS_NS = I18N_NAMESPACES.app;
 
 /** Key paths for the rows' headers (`payments.md:103, 174`; verbatim). */
 export const SPLIT_ROWS_KEYS = {

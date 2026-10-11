@@ -1,10 +1,10 @@
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
-import type { BranchOption } from '@/shared/api/clinic/branches-api.ts';
-import type { OfferingRecord } from '@/shared/api/clinic/offerings-contracts.ts';
-import { offerPreview } from '@/shared/api/clinic/offerings-pricing.ts';
-import { OFFER_KIND_TONES } from '@/shared/clinic/clinic-tones.ts';
+import type { BranchOption } from '@/shared/api/app/branches-api.ts';
+import type { OfferingRecord } from '@/shared/api/app/offerings-contracts.ts';
+import { offerPreview } from '@/shared/api/app/offerings-pricing.ts';
+import { OFFER_KIND_TONES } from '@/shared/app/app-tones.ts';
 import {
   type DrawerPeekItem,
   drawerStepSummary,
@@ -73,10 +73,10 @@ export interface OfferDrawerViewInput {
 /** The words the view puts together, from the room's and the clinic's copy. */
 function useViewWords() {
   const { t } = useTranslation(OFFER_DRAWER_NS);
-  const { t: tClinic } = useTranslation(RECORD_DRAWER_NS);
+  const { t: tApp } = useTranslation(RECORD_DRAWER_NS);
   const labels = useOfferLabels();
   const formatRupees = useRupeeFormat();
-  return { t, tClinic, labels, formatRupees };
+  return { t, tApp, labels, formatRupees };
 }
 
 type ViewWords = ReturnType<typeof useViewWords>;
@@ -94,7 +94,7 @@ function valueText(values: OfferFormValues, words: ViewWords): string | undefine
 
 /** Step 1, "Offer": Name · Code · Type · the value · Colour. */
 function offerStepOf(values: OfferFormValues, words: ViewWords): OfferStepView {
-  const { t, tClinic, labels } = words;
+  const { t, tApp, labels } = words;
   const kind = labels.kind(values.kind);
   const value = valueText(values, words);
   return {
@@ -112,14 +112,14 @@ function offerStepOf(values: OfferFormValues, words: ViewWords): OfferStepView {
       {
         kind: 'value',
         label: t(F.colour),
-        value: tClinic(RECORD_DRAWER_KEYS.colours[values.tone]),
+        value: tApp(RECORD_DRAWER_KEYS.colours[values.tone]),
         tone: values.tone,
       },
     ],
     // The head names values, never the colour (H:3840).
     summary: drawerStepSummary(
       [values.name.trim(), values.code, kind, value],
-      tClinic(RECORD_DRAWER_KEYS.step.notFilled),
+      tApp(RECORD_DRAWER_KEYS.step.notFilled),
     ),
     missing: missingOfferFields(values).includes('name') ? [t(F.name)] : [],
   };
@@ -131,7 +131,7 @@ function whereStepOf(
   input: Pick<OfferDrawerViewInput, 'offerings' | 'branches'>,
   words: ViewWords,
 ): OfferStepView {
-  const { t, tClinic, labels } = words;
+  const { t, tApp, labels } = words;
   const picked = values.offeringIds.flatMap(
     (id) => input.offerings.find((offering) => offering.id === id) ?? [],
   );
@@ -176,7 +176,7 @@ function whereStepOf(
         starts,
         ends,
       ],
-      tClinic(RECORD_DRAWER_KEYS.step.notFilled),
+      tApp(RECORD_DRAWER_KEYS.step.notFilled),
     ),
     missing: missingOfferFields(values).includes('offeringIds') ? [t(F.offerings)] : [],
   };
@@ -184,7 +184,7 @@ function whereStepOf(
 
 /** Step 3, "Notes": Note · Status. */
 function notesStepOf(values: OfferFormValues, words: ViewWords): OfferStepView {
-  const { t, tClinic } = words;
+  const { t, tApp } = words;
   const note = values.note.trim();
   const status = t(values.live ? F.live : F.paused);
   return {
@@ -193,10 +193,7 @@ function notesStepOf(values: OfferFormValues, words: ViewWords): OfferStepView {
       { kind: 'value', label: t(F.note), value: note },
       { kind: 'value', label: t(F.status), value: status },
     ],
-    summary: drawerStepSummary(
-      [note, status],
-      tClinic(RECORD_DRAWER_KEYS.step.notFilled),
-    ),
+    summary: drawerStepSummary([note, status], tApp(RECORD_DRAWER_KEYS.step.notFilled)),
     missing: [],
   };
 }

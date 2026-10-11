@@ -3,9 +3,9 @@ import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+  appFixtures,
+  resetAppFixtures,
+} from '@/shared/api/app/fixtures/world.fixtures.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 
 import {
@@ -67,11 +67,11 @@ async function stackManufacturer(user: ReturnType<typeof setup>, query: string) 
 
 beforeEach(() => {
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 afterEach(() => {
   resetMedicalRoutes();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 
 describe('MedicalStackHost (medical.md:343–355)', () => {
@@ -107,9 +107,9 @@ describe('MedicalStackHost (medical.md:343–355)', () => {
     await waitFor(() =>
       expect(screen.queryByTestId('manufacturer-drawer-stacked')).not.toBeInTheDocument(),
     );
-    expect(
-      clinicFixtures.manufacturers.snapshot((row) => row.name === 'ZEN'),
-    ).toHaveLength(1);
+    expect(appFixtures.manufacturers.snapshot((row) => row.name === 'ZEN')).toHaveLength(
+      1,
+    );
     await waitFor(() =>
       expect(
         within(parent).getByTestId('medicine-drawer-manufacturer'),

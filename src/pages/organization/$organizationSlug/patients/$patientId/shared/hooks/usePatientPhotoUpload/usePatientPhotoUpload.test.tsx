@@ -3,12 +3,12 @@ import { act, fireEvent, render, renderHook, waitFor } from '@testing-library/re
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type * as ImagesApiModule from '@/shared/api/clinic/patient-images-api.ts';
-import { attachPatientImage } from '@/shared/api/clinic/patient-images-api.ts';
+import type * as ImagesApiModule from '@/shared/api/app/patient-images-api.ts';
+import { attachPatientImage } from '@/shared/api/app/patient-images-api.ts';
 
 import { usePatientPhotoUpload } from './usePatientPhotoUpload.ts';
 
-vi.mock('@/shared/api/clinic/patient-images-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/patient-images-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof ImagesApiModule>()),
   attachPatientImage: vi.fn(async () => ({})),
 }));
@@ -87,7 +87,7 @@ describe('usePatientPhotoUpload', () => {
       album: 'lhr',
     });
     expect(invalidate).toHaveBeenCalledWith({
-      queryKey: ['clinic', 'patients', 'images'],
+      queryKey: ['app', 'patients', 'images'],
     });
   });
 

@@ -3,8 +3,8 @@ import { Controller, useForm, type UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { isolateText } from '@/lib/bidi-isolate.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { PAYMENT_MODE_TONES, SECTION_TONES } from '@/shared/clinic/clinic-tones.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { PAYMENT_MODE_TONES, SECTION_TONES } from '@/shared/app/app-tones.ts';
 import {
   DrawerChips,
   DrawerField,
@@ -148,7 +148,7 @@ function LinesStep(props: BodyProps) {
 /** REASON & REFUND: Reason (default Unused) · Refund by (default Cash) (`medical.md:289–290`). */
 function ReasonStep({ form, readOnly, testId }: BodyProps) {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
-  const { t: tClinic } = useTranslation(CLINIC_NS);
+  const { t: tApp } = useTranslation(APP_NS);
   return (
     <DrawerStepBody readOnly={readOnly}>
       <DrawerFieldGrid>
@@ -183,7 +183,7 @@ function ReasonStep({ form, readOnly, testId }: BodyProps) {
                 label={t(K.refundBy)}
                 options={REFUND_MODES.map((mode) => ({
                   value: mode,
-                  label: tClinic(CLINIC_KEYS.paymentModes[mode]),
+                  label: tApp(APP_KEYS.paymentModes[mode]),
                   tone: PAYMENT_MODE_TONES[mode],
                 }))}
                 value={field.value}

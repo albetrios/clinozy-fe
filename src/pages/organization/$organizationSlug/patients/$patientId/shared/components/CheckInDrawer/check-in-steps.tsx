@@ -5,17 +5,14 @@ import { useTranslation } from 'react-i18next';
 import {
   CHECKIN_FEEL_VALUES,
   CHECKIN_FOLLOWED_VALUES,
-} from '@/shared/api/clinic/clinic-schema.ts';
+} from '@/shared/api/app/app-schema.ts';
 import {
   type CheckInOffering,
   FEEDBACK_LIMITS,
   type PatientCheckIn,
-} from '@/shared/api/clinic/feedback-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import {
-  CHECKIN_FEEL_TONES,
-  CHECKIN_FOLLOWED_TONES,
-} from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/api/app/feedback-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { CHECKIN_FEEL_TONES, CHECKIN_FOLLOWED_TONES } from '@/shared/app/app-tones.ts';
 import {
   DrawerChips,
   DrawerField,
@@ -55,7 +52,7 @@ interface CheckInStepFieldsProps {
  * placeholder the last check-in's words when there are some.
  */
 export function CheckInNowFields({ form, values, previous }: CheckInStepFieldsProps) {
-  const { t } = useTranslation([CHECK_IN_NS, CLINIC_NS]);
+  const { t } = useTranslation([CHECK_IN_NS, APP_NS]);
   const field = useDrawerFieldIds(form, useId());
   const words = field('currentState');
   const lastWords = previous?.currentState?.trim();
@@ -68,7 +65,7 @@ export function CheckInNowFields({ form, values, previous }: CheckInStepFieldsPr
             label={t(K.feel)}
             options={CHECKIN_FEEL_VALUES.map((feel) => ({
               value: feel,
-              label: t(CLINIC_KEYS.checkInFeels[feel], { ns: CLINIC_NS }),
+              label: t(APP_KEYS.checkInFeels[feel], { ns: APP_NS }),
               tone: CHECKIN_FEEL_TONES[feel],
             }))}
             value={values.feel}

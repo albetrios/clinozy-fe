@@ -380,8 +380,8 @@ clinozy-fe/
 │   ├── core/
 │   │   ├── config/
 │   │   │   ├── app-manifest.ts
+│   │   │   ├── app-modules.ts
 │   │   │   ├── auth-methods.ts
-│   │   │   ├── clinic-modules.ts
 │   │   │   ├── constants.ts
 │   │   │   ├── env-resolvers.ts
 │   │   │   ├── env-schema.ts
@@ -513,10 +513,10 @@ clinozy-fe/
 │   │   └── [26 test files]
 │   ├── locales/
 │   │   ├── ar/
+│   │   │   ├── app-stock.json
+│   │   │   ├── app.json
 │   │   │   ├── appointments.json
 │   │   │   ├── auth.json
-│   │   │   ├── clinic-stock.json
-│   │   │   ├── clinic.json
 │   │   │   ├── common.json
 │   │   │   ├── errors.json
 │   │   │   ├── layout.json
@@ -533,10 +533,10 @@ clinozy-fe/
 │   │   │   ├── today.json
 │   │   │   └── users.json
 │   │   ├── de/
+│   │   │   ├── app-stock.json
+│   │   │   ├── app.json
 │   │   │   ├── appointments.json
 │   │   │   ├── auth.json
-│   │   │   ├── clinic-stock.json
-│   │   │   ├── clinic.json
 │   │   │   ├── common.json
 │   │   │   ├── errors.json
 │   │   │   ├── layout.json
@@ -553,10 +553,10 @@ clinozy-fe/
 │   │   │   ├── today.json
 │   │   │   └── users.json
 │   │   ├── en/
+│   │   │   ├── app-stock.json
+│   │   │   ├── app.json
 │   │   │   ├── appointments.json
 │   │   │   ├── auth.json
-│   │   │   ├── clinic-stock.json
-│   │   │   ├── clinic.json
 │   │   │   ├── common.json
 │   │   │   ├── errors.json
 │   │   │   ├── layout.json
@@ -573,10 +573,10 @@ clinozy-fe/
 │   │   │   ├── today.json
 │   │   │   └── users.json
 │   │   ├── es/
+│   │   │   ├── app-stock.json
+│   │   │   ├── app.json
 │   │   │   ├── appointments.json
 │   │   │   ├── auth.json
-│   │   │   ├── clinic-stock.json
-│   │   │   ├── clinic.json
 │   │   │   ├── common.json
 │   │   │   ├── errors.json
 │   │   │   ├── layout.json
@@ -593,10 +593,10 @@ clinozy-fe/
 │   │   │   ├── today.json
 │   │   │   └── users.json
 │   │   ├── fr/
+│   │   │   ├── app-stock.json
+│   │   │   ├── app.json
 │   │   │   ├── appointments.json
 │   │   │   ├── auth.json
-│   │   │   ├── clinic-stock.json
-│   │   │   ├── clinic.json
 │   │   │   ├── common.json
 │   │   │   ├── errors.json
 │   │   │   ├── layout.json
@@ -613,10 +613,10 @@ clinozy-fe/
 │   │   │   ├── today.json
 │   │   │   └── users.json
 │   │   ├── hi/
+│   │   │   ├── app-stock.json
+│   │   │   ├── app.json
 │   │   │   ├── appointments.json
 │   │   │   ├── auth.json
-│   │   │   ├── clinic-stock.json
-│   │   │   ├── clinic.json
 │   │   │   ├── common.json
 │   │   │   ├── errors.json
 │   │   │   ├── layout.json
@@ -633,10 +633,10 @@ clinozy-fe/
 │   │   │   ├── today.json
 │   │   │   └── users.json
 │   │   ├── it/
+│   │   │   ├── app-stock.json
+│   │   │   ├── app.json
 │   │   │   ├── appointments.json
 │   │   │   ├── auth.json
-│   │   │   ├── clinic-stock.json
-│   │   │   ├── clinic.json
 │   │   │   ├── common.json
 │   │   │   ├── errors.json
 │   │   │   ├── layout.json
@@ -653,10 +653,10 @@ clinozy-fe/
 │   │   │   ├── today.json
 │   │   │   └── users.json
 │   │   ├── ja/
+│   │   │   ├── app-stock.json
+│   │   │   ├── app.json
 │   │   │   ├── appointments.json
 │   │   │   ├── auth.json
-│   │   │   ├── clinic-stock.json
-│   │   │   ├── clinic.json
 │   │   │   ├── common.json
 │   │   │   ├── errors.json
 │   │   │   ├── layout.json
@@ -673,10 +673,10 @@ clinozy-fe/
 │   │   │   ├── today.json
 │   │   │   └── users.json
 │   │   ├── ko/
+│   │   │   ├── app-stock.json
+│   │   │   ├── app.json
 │   │   │   ├── appointments.json
 │   │   │   ├── auth.json
-│   │   │   ├── clinic-stock.json
-│   │   │   ├── clinic.json
 │   │   │   ├── common.json
 │   │   │   ├── errors.json
 │   │   │   ├── layout.json
@@ -693,10 +693,10 @@ clinozy-fe/
 │   │   │   ├── today.json
 │   │   │   └── users.json
 │   │   ├── pt/
+│   │   │   ├── app-stock.json
+│   │   │   ├── app.json
 │   │   │   ├── appointments.json
 │   │   │   ├── auth.json
-│   │   │   ├── clinic-stock.json
-│   │   │   ├── clinic.json
 │   │   │   ├── common.json
 │   │   │   ├── errors.json
 │   │   │   ├── layout.json
@@ -713,10 +713,10 @@ clinozy-fe/
 │   │   │   ├── today.json
 │   │   │   └── users.json
 │   │   └── zh/
+│   │       ├── app-stock.json
+│   │       ├── app.json
 │   │       ├── appointments.json
 │   │       ├── auth.json
-│   │       ├── clinic-stock.json
-│   │       ├── clinic.json
 │   │       ├── common.json
 │   │       ├── errors.json
 │   │       ├── layout.json
@@ -863,9 +863,9 @@ clinozy-fe/
 │   │       │   │   ├── AppointmentsPage.tsx
 │   │       │   │   └── [6 test files]
 │   │       │   ├── components/
-│   │       │   │   └── ClinicHomeEmpty/
-│   │       │   │       ├── clinic-home-empty.constants.ts
-│   │       │   │       ├── ClinicHomeEmpty.tsx
+│   │       │   │   └── AppHomeEmpty/
+│   │       │   │       ├── app-home-empty.constants.ts
+│   │       │   │       ├── AppHomeEmpty.tsx
 │   │       │   │       ├── index.ts
 │   │       │   │       └── [1 test file]
 │   │       │   ├── hooks/
@@ -1380,7 +1380,7 @@ clinozy-fe/
 │   │   │   ├── consent-account-sync.ts
 │   │   │   └── [3 test files]
 │   │   ├── api/
-│   │   │   ├── clinic/
+│   │   │   ├── app/
 │   │   │   │   ├── fixtures/
 │   │   │   │   │   ├── appointments.fixtures.ts
 │   │   │   │   │   ├── contact-threads.fixtures.ts
@@ -1401,6 +1401,15 @@ clinozy-fe/
 │   │   │   │   │   └── [1 test file]
 │   │   │   │   ├── access-api.ts
 │   │   │   │   ├── access-contracts.ts
+│   │   │   │   ├── app-display-id.ts
+│   │   │   │   ├── app-filter-match.ts
+│   │   │   │   ├── app-filter-ranges.ts
+│   │   │   │   ├── app-fixture-seed.ts
+│   │   │   │   ├── app-fixture-store.ts
+│   │   │   │   ├── app-list-filters.ts
+│   │   │   │   ├── app-money.ts
+│   │   │   │   ├── app-schema.ts
+│   │   │   │   ├── app-time.ts
 │   │   │   │   ├── appointment-status.ts
 │   │   │   │   ├── appointment-views.ts
 │   │   │   │   ├── appointments-api.ts
@@ -1409,15 +1418,6 @@ clinozy-fe/
 │   │   │   │   ├── branches-api.ts
 │   │   │   │   ├── branches-contracts.ts
 │   │   │   │   ├── branches-manage-api.ts
-│   │   │   │   ├── clinic-display-id.ts
-│   │   │   │   ├── clinic-filter-match.ts
-│   │   │   │   ├── clinic-filter-ranges.ts
-│   │   │   │   ├── clinic-fixture-seed.ts
-│   │   │   │   ├── clinic-fixture-store.ts
-│   │   │   │   ├── clinic-list-filters.ts
-│   │   │   │   ├── clinic-money.ts
-│   │   │   │   ├── clinic-schema.ts
-│   │   │   │   ├── clinic-time.ts
 │   │   │   │   ├── clinical-notes-api.ts
 │   │   │   │   ├── clinical-notes-contracts.ts
 │   │   │   │   ├── command-search-api.ts
@@ -1519,6 +1519,27 @@ clinozy-fe/
 │   │   │   ├── webhook-contracts.ts
 │   │   │   ├── webhooks-api.ts
 │   │   │   └── [18 test files]
+│   │   ├── app/
+│   │   │   ├── app-branch.ts
+│   │   │   ├── app-command-targets.ts
+│   │   │   ├── app-greeting.ts
+│   │   │   ├── app-home.ts
+│   │   │   ├── app-lead-status.ts
+│   │   │   ├── app-phone-field.ts
+│   │   │   ├── app-phone.ts
+│   │   │   ├── app-referrer.ts
+│   │   │   ├── app-section-icons.ts
+│   │   │   ├── app-sections.ts
+│   │   │   ├── app-tones.ts
+│   │   │   ├── app.constants.ts
+│   │   │   ├── APP.OVERVIEW.md
+│   │   │   ├── appointment-display.ts
+│   │   │   ├── patient-file-sections.ts
+│   │   │   ├── task-rule-icons.ts
+│   │   │   ├── task-rules.constants.ts
+│   │   │   ├── task-targets.ts
+│   │   │   ├── visit-redirect.ts
+│   │   │   └── [16 test files]
 │   │   ├── auth/
 │   │   │   ├── captcha/
 │   │   │   │   ├── useCaptchaIntent/
@@ -1556,27 +1577,6 @@ clinozy-fe/
 │   │   │   ├── load-stripe.ts
 │   │   │   ├── stripe-config.ts
 │   │   │   └── [1 test file]
-│   │   ├── clinic/
-│   │   │   ├── appointment-display.ts
-│   │   │   ├── clinic-branch.ts
-│   │   │   ├── clinic-command-targets.ts
-│   │   │   ├── clinic-greeting.ts
-│   │   │   ├── clinic-home.ts
-│   │   │   ├── clinic-lead-status.ts
-│   │   │   ├── clinic-phone-field.ts
-│   │   │   ├── clinic-phone.ts
-│   │   │   ├── clinic-referrer.ts
-│   │   │   ├── clinic-section-icons.ts
-│   │   │   ├── clinic-sections.ts
-│   │   │   ├── clinic-tones.ts
-│   │   │   ├── clinic.constants.ts
-│   │   │   ├── CLINIC.OVERVIEW.md
-│   │   │   ├── patient-file-sections.ts
-│   │   │   ├── task-rule-icons.ts
-│   │   │   ├── task-rules.constants.ts
-│   │   │   ├── task-targets.ts
-│   │   │   ├── visit-redirect.ts
-│   │   │   └── [16 test files]
 │   │   ├── components/
 │   │   │   ├── AppearanceDialog/
 │   │   │   │   ├── appearance-dialog-loader.ts
@@ -1661,7 +1661,7 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   └── [4 test files]
 │   │   │   ├── CommandPalette/
-│   │   │   │   ├── clinic-command-groups.ts
+│   │   │   │   ├── app-command-groups.ts
 │   │   │   │   ├── command-palette-context.ts
 │   │   │   │   ├── command-palette-model.ts
 │   │   │   │   ├── command-palette.constants.ts
@@ -2312,6 +2312,14 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useApiKeys.ts
 │   │   │   │   └── [1 test file]
+│   │   │   ├── useAppAccess/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useAppAccess.ts
+│   │   │   │   └── [1 test file]
+│   │   │   ├── useAppClock/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useAppClock.ts
+│   │   │   │   └── [1 test file]
 │   │   │   ├── useAppMutation/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useAppMutation.ts
@@ -2320,6 +2328,10 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useAppNav.ts
 │   │   │   │   └── [1 test file]
+│   │   │   ├── useAppNavigate/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useAppNavigate.ts
+│   │   │   │   └── [1 test file]
 │   │   │   ├── useAppointments/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useAppointments.ts
@@ -2327,6 +2339,10 @@ clinozy-fe/
 │   │   │   ├── useAppQuery/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useAppQuery.ts
+│   │   │   │   └── [1 test file]
+│   │   │   ├── useAppRoles/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── useAppRoles.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── useAppSplashActive/
 │   │   │   │   ├── index.ts
@@ -2360,25 +2376,9 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useCanHover.ts
 │   │   │   │   └── [1 test file]
-│   │   │   ├── useClinicAccess/
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── useClinicAccess.ts
-│   │   │   │   └── [1 test file]
 │   │   │   ├── useClinicalNotes/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useClinicalNotes.ts
-│   │   │   │   └── [1 test file]
-│   │   │   ├── useClinicClock/
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── useClinicClock.ts
-│   │   │   │   └── [1 test file]
-│   │   │   ├── useClinicNavigate/
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── useClinicNavigate.ts
-│   │   │   │   └── [1 test file]
-│   │   │   ├── useClinicRoles/
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── useClinicRoles.ts
 │   │   │   │   └── [1 test file]
 │   │   │   ├── useCommandSearch/
 │   │   │   │   ├── index.ts
@@ -2927,18 +2927,18 @@ clinozy-fe/
 │   │   └── [8 test files]
 │   ├── utils/
 │   │   ├── app-nav-fixture.ts
+│   │   ├── app-preset-codes.ts
+│   │   ├── app-shell-doubles.ts
 │   │   ├── appointment-doubles.ts
 │   │   ├── auth-api-paths.ts
 │   │   ├── axe-for-dialog.ts
 │   │   ├── bidi-marks.ts
 │   │   ├── branch-doubles.ts
-│   │   ├── clinic-preset-codes.ts
-│   │   ├── clinic-shell-doubles.ts
 │   │   ├── contact-doubles.ts
 │   │   ├── e2e-api-retry.ts
+│   │   ├── e2e-app.ts
 │   │   ├── e2e-auth.ts
 │   │   ├── e2e-captcha.ts
-│   │   ├── e2e-clinic.ts
 │   │   ├── e2e-deployment-mode.ts
 │   │   ├── e2e-faker.ts
 │   │   ├── e2e-hybrid.ts
@@ -2981,7 +2981,7 @@ clinozy-fe/
 │   │   └── [5 test files]
 │   ├── codegen/
 │   │   ├── api-types.mjs
-│   │   ├── clinic-schema.mjs
+│   │   ├── app-schema.mjs
 │   │   └── [1 test file]
 │   ├── dev/
 │   │   ├── chrome-devtools-mcp.mjs

@@ -2,8 +2,8 @@
 
 Route: `/organization/$organizationSlug/tasks`. Follow-ups, feedback calls, reminders, with an owner and due time (KICKOFF §6.10).
 
-Gated like every clinic room: membership (`organization:read`) and the `clinic-tasks`
-module (on in production since the room left `FIXTURE_BACKED_CLINIC_MODULES`, D155), then
+Gated like every clinic room: membership (`organization:read`) and the `app-tasks`
+module (on in production since the room left `FIXTURE_BACKED_APP_MODULES`, D155), then
 `requireOrgStatus`. In the room the member's clinozy-be codes decide
 (research-tasks §7): the reads `task:read` (the Accountant holds none — the list reads
 nothing and To do stays empty; Pharmacist and Marketing read and work tasks but create none,
@@ -52,12 +52,12 @@ deletes it (`DELETE /app/tasks/:task_id?reason=mistake`); the API has no other w
 Data (L-47, one model with Today's work queue, Q-T3 — Today reads the same hooks and outcome
 plans, D155): the catalogue (`TASK_TYPES`, keyed by the
 API's rule keys and "Follow-ups you set"), the shapes, the list query and the write bodies in
-`src/shared/api/clinic/tasks-contracts.ts`; the groups and due labels as pure functions in
-`src/shared/api/clinic/task-views.ts`; the calls in `src/shared/api/clinic/tasks-api.ts`; the
+`src/shared/api/app/tasks-contracts.ts`; the groups and due labels as pure functions in
+`src/shared/api/app/task-views.ts`; the calls in `src/shared/api/app/tasks-api.ts`; the
 hooks in `src/shared/hooks/useTasks/` (list and drawer polled every 60s, outcomes, snooze,
 reassign, create, delete and restore, the rule settings); the due labels worded by
 `src/shared/hooks/useTaskDueLabel/`; the rule copy, the follow-on targets and the icons in
-`src/shared/clinic/`.
+`src/shared/app/`.
 
 ## Dialog routes
 
@@ -75,7 +75,7 @@ link reopens them:
 | File                           | Responsibility                                                                                                                                                                                                                                                                                                                                                                                                                |
 | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `tasks.route.tsx`              | Route marker — exports `Component` rendering `TasksPage`.                                                                                                                                                                                                                                                                                                                                                                     |
-| `tasks.manifest.ts`            | Manifest — `kind: 'layout'` over `create` and `$taskId`, permission `organization:read`, module `clinic-tasks`, nav section `tasks`.                                                                                                                                                                                                                                                                                          |
+| `tasks.manifest.ts`            | Manifest — `kind: 'layout'` over `create` and `$taskId`, permission `organization:read`, module `app-tasks`, nav section `tasks`.                                                                                                                                                                                                                                                                                             |
 | `tasks.search.ts`              | URL schema (`validateSearch`): `tab` (`open` · `snoozed` · `done`), `q`, `type` (the API's rule keys and `by_hand`), `scope` — declared for the entry chunk, pinned to the contract.                                                                                                                                                                                                                                          |
 | `tasks.dialog-search.ts`       | New task's `lead` / `contact` — parsed by `useTasksDialogRoute`; loads with the room.                                                                                                                                                                                                                                                                                                                                         |
 | `tasks.params.ts`              | The list read from the URL and the header's branches — `taskListQueryOf` (defaults applied) — off the entry chunk.                                                                                                                                                                                                                                                                                                            |

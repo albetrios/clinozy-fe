@@ -21,8 +21,8 @@ import {
 import {
   readCreatedFilter,
   readFollowUpFilter,
-} from '@/shared/api/clinic/clinic-list-filters.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+} from '@/shared/api/app/app-list-filters.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
 import {
   LEAD_CHAT_WIDTH,
   useDevicePrefsStore,
@@ -235,7 +235,7 @@ describe('RoomFilters — pending → Apply → URL (the acceptance)', () => {
   });
 
   it('"Custom range" adds From / To pickers starting today, applied as from..to', async () => {
-    const today = clinicToday();
+    const today = appToday();
     const { router, user } = renderFilters();
     const panel = await openFilters(user);
     const created = within(panel).getByRole('group', { name: 'Created' });

@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { ROLE_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
+import { ROLE_VALUES } from '@/shared/api/app/app-schema.ts';
 import {
   type FloorStage,
   TODAY_LANES,
   type TodayLane,
-} from '@/shared/api/clinic/today-contracts.ts';
+} from '@/shared/api/app/today-contracts.ts';
 
 import { enquiry, floorRow, publicId } from './__tests__/integration/today-fixtures.ts';
 

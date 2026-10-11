@@ -1,10 +1,10 @@
 import {
-  clinicHttpError,
+  appHttpError,
   compareText,
   refuseUnknownIds,
-  validateClinicInput,
-} from '@/shared/api/clinic/clinic-fixture-store.ts';
-import { invoiceBalance, invoiceLineAmounts } from '@/shared/api/clinic/clinic-money.ts';
+  validateAppInput,
+} from '@/shared/api/app/app-fixture-store.ts';
+import { invoiceBalance, invoiceLineAmounts } from '@/shared/api/app/app-money.ts';
 import type {
   DeleteReason,
   Invoice,
@@ -12,12 +12,12 @@ import type {
   MedicalSale,
   MedicineBatch,
   PaymentMode,
-} from '@/shared/api/clinic/clinic-schema.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
-import { assertDayOpen } from '@/shared/api/clinic/day-close-fixture-api.ts';
-import { patientName } from '@/shared/api/clinic/patients-fixture-contracts.ts';
-import { newLedgerEntry } from '@/shared/api/clinic/payments-fixture-api.ts';
-import type { PaymentRecord } from '@/shared/api/clinic/payments-fixture-contracts.ts';
+} from '@/shared/api/app/app-schema.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
+import { assertDayOpen } from '@/shared/api/app/day-close-fixture-api.ts';
+import { patientName } from '@/shared/api/app/patients-fixture-contracts.ts';
+import { newLedgerEntry } from '@/shared/api/app/payments-fixture-api.ts';
+import type { PaymentRecord } from '@/shared/api/app/payments-fixture-contracts.ts';
 
 import {
   type ExpiringReturnInput,
@@ -46,25 +46,25 @@ import { supplierCreditStore } from './medical-supplier-credits.ts';
  * (Q-M1): Collect writes a receipt, a refund a credit note and its entry.
  */
 
-const fixtureWorld = () => import('@/shared/api/clinic/fixtures/world.fixtures.ts');
+const fixtureWorld = () => import('@/shared/api/app/fixtures/world.fixtures.ts');
 
-type FixtureWorld = Awaited<ReturnType<typeof fixtureWorld>>['clinicFixtures'];
+type FixtureWorld = Awaited<ReturnType<typeof fixtureWorld>>['appFixtures'];
 
 /** A 422 the drawers show on a field. */
 function refuse(field: string, message: string): never {
-  throw clinicHttpError(422, 'validation', message, { [field]: [message] });
+  throw appHttpError(422, 'validation', message, { [field]: [message] });
 }
 
 /** A 409: the record is no longer in a state the write applies to. */
 function conflict(message: string): never {
-  throw clinicHttpError(409, 'conflict', message);
+  throw appHttpError(409, 'conflict', message);
 }
 
 // ── Purchase orders ──
 
 /** The order's fields, checked: a known supplier, medicines the store stocks. */
 function orderFields(world: FixtureWorld, input: PurchaseOrderInput) {
-  const fields = validateClinicInput(purchaseOrderInputSchema, input);
+  const fields = validateAppInput(purchaseOrderInputSchema, input);
   refuseUnknownIds(
     'supplierId',
     [fields.supplierId],
@@ -97,9 +97,9 @@ function orderFields(world: FixtureWorld, input: PurchaseOrderInput) {
 export async function createPurchaseOrder(
   input: PurchaseOrderInput,
 ): Promise<MedicalPurchaseOrder> {
-  const { clinicFixtures } = await fixtureWorld();
-  return clinicFixtures.purchaseOrders.create({
-    ...orderFields(clinicFixtures, input),
+  const { appFixtures } = await fixtureWorld();
+  return appFixtures.purchaseOrders.create({
+    ...orderFields(appFixtures, input),
     stage: 'ordered',
     paid: 0,
     cancelReason: null,
@@ -118,9 +118,9 @@ export async function updatePurchaseOrder(
   id: string,
   input: PurchaseOrderInput,
 ): Promise<MedicalPurchaseOrder> {
-  const { clinicFixtures } = await fixtureWorld();
-  await orderedOrder(clinicFixtures, id);
-  return clinicFixtures.purchaseOrders.update(id, orderFields(clinicFixtures, input));
+  const { appFixtures } = await fixtureWorld();
+  await orderedOrder(appFixtures, id);
+  return appFixtures.purchaseOrders.update(id, orderFields(appFixtures, input));
 }
 
 /**
@@ -132,9 +132,9 @@ export async function cancelPurchaseOrder(
   id: string,
   reason: DeleteReason,
 ): Promise<MedicalPurchaseOrder> {
-  const { clinicFixtures } = await fixtureWorld();
-  await orderedOrder(clinicFixtures, id);
-  return clinicFixtures.purchaseOrders.update(id, {
+  const { appFixtures } = await fixtureWorld();
+  await orderedOrder(appFixtures, id);
+  return appFixtures.purchaseOrders.update(id, {
     stage: 'cancelled',
     cancelReason: reason,
   });
@@ -146,10 +146,10 @@ export async function cancelPurchaseOrder(
  * order is Ordered again, the stage it was cancelled from, its reason gone.
  */
 export async function restorePurchaseOrder(id: string): Promise<MedicalPurchaseOrder> {
-  const { clinicFixtures } = await fixtureWorld();
-  const order = await clinicFixtures.purchaseOrders.get(id);
+  const { appFixtures } = await fixtureWorld();
+  const order = await appFixtures.purchaseOrders.get(id);
   if (order.stage !== 'cancelled') conflict('This order is not cancelled');
-  return clinicFixtures.purchaseOrders.update(id, {
+  return appFixtures.purchaseOrders.update(id, {
     stage: 'ordered',
     cancelReason: null,
   });
@@ -179,9 +179,9 @@ export async function receivePurchaseOrder(
   id: string,
   input: ReceiveInput,
 ): Promise<MedicalPurchaseOrder> {
-  const { clinicFixtures } = await fixtureWorld();
-  const order = await orderedOrder(clinicFixtures, id);
-  const { lines, extras } = validateClinicInput(receiveInputSchema, input);
+  const { appFixtures } = await fixtureWorld();
+  const order = await orderedOrder(appFixtures, id);
+  const { lines, extras } = validateAppInput(receiveInputSchema, input);
   if (lines.length !== order.items.length) refuse('lines', 'Tick what arrived');
   lines.forEach((line, index) => {
     if (line.arrived && !line.expiry) refuse(`lines.${index}.expiry`, EXPIRY_MESSAGE);
@@ -189,7 +189,7 @@ export async function receivePurchaseOrder(
   refuseUnknownIds(
     'extras',
     extras.map((extra) => extra.medicineId),
-    clinicFixtures.medicines.snapshot(),
+    appFixtures.medicines.snapshot(),
     'Pick medicines the store stocks',
   );
   extras.forEach((extra, index) => {
@@ -219,8 +219,8 @@ export async function receivePurchaseOrder(
   ];
   for (const item of items) {
     if (!(item.received && item.batchNo && item.expiry)) continue;
-    const medicine = await clinicFixtures.medicines.get(item.medicineId);
-    await clinicFixtures.medicines.update(medicine.id, {
+    const medicine = await appFixtures.medicines.get(item.medicineId);
+    await appFixtures.medicines.update(medicine.id, {
       batches: withStock(medicine.batches, {
         batchNo: item.batchNo,
         expiry: item.expiry,
@@ -229,7 +229,7 @@ export async function receivePurchaseOrder(
       }),
     });
   }
-  return clinicFixtures.purchaseOrders.update(id, { items, stage: 'received' });
+  return appFixtures.purchaseOrders.update(id, { items, stage: 'received' });
 }
 
 // ── Sales ──
@@ -263,11 +263,11 @@ export async function collectSale(
   saleId: string,
   mode: PaymentMode = 'upi',
 ): Promise<PaymentRecord> {
-  const { clinicFixtures } = await fixtureWorld();
-  const { invoice, due, party } = await saleState(clinicFixtures, saleId);
+  const { appFixtures } = await fixtureWorld();
+  const { invoice, due, party } = await saleState(appFixtures, saleId);
   if (due === 0) conflict('Nothing is due on this sale');
-  await assertDayOpen(invoice.branchId, clinicToday());
-  return clinicFixtures.payments.create(
+  await assertDayOpen(invoice.branchId, appToday());
+  return appFixtures.payments.create(
     newLedgerEntry({
       direction: 'received',
       kind: 'receipt',
@@ -335,9 +335,9 @@ export async function returnSale(
   saleId: string,
   input: SaleReturnInput,
 ): Promise<SaleReturnResult> {
-  const { clinicFixtures } = await fixtureWorld();
-  const fields = validateClinicInput(saleReturnInputSchema, input);
-  const state = await saleState(clinicFixtures, saleId);
+  const { appFixtures } = await fixtureWorld();
+  const fields = validateAppInput(saleReturnInputSchema, input);
+  const state = await saleState(appFixtures, saleId);
   const sold = new Map(soldLines(state.invoice).map((line) => [line.key, line]));
   const back = fields.lines.filter((line) => line.qty > 0);
   if (back.length === 0) refuse('lines', RETURN_NOTHING_MESSAGE);
@@ -352,8 +352,8 @@ export async function returnSale(
   });
 
   const restocked = !WRITTEN_OFF_REASONS.has(fields.reason);
-  if (restocked) await restock(clinicFixtures, back);
-  await clinicFixtures.medicalSales.update(saleId, {
+  if (restocked) await restock(appFixtures, back);
+  await appFixtures.medicalSales.update(saleId, {
     returns: [
       ...state.sale.returns,
       { items: back, amount, reason: fields.reason, at: new Date().toISOString() },
@@ -364,13 +364,13 @@ export async function returnSale(
   const owed = state.bill - state.returned - amount;
   const refunded = Math.min(amount, Math.max(0, state.paid - owed));
   if (refunded > 0) {
-    await assertDayOpen(state.invoice.branchId, clinicToday());
-    const note = await clinicFixtures.creditNotes.create({
+    await assertDayOpen(state.invoice.branchId, appToday());
+    const note = await appFixtures.creditNotes.create({
       invoiceId: state.invoice.id,
       amount: refunded,
       reason: fields.reason,
     });
-    await clinicFixtures.payments.create(
+    await appFixtures.payments.create(
       newLedgerEntry({
         direction: 'paid',
         kind: 'refund',
@@ -396,14 +396,14 @@ export async function voidSale(
   reason: DeleteReason,
   note: string | null,
 ): Promise<MedicalSale> {
-  const { clinicFixtures } = await fixtureWorld();
-  const state = await saleState(clinicFixtures, saleId);
+  const { appFixtures } = await fixtureWorld();
+  const state = await saleState(appFixtures, saleId);
   if (state.paid > 0 || state.sale.returns.length > 0) {
     conflict('Only a sale with nothing paid or returned is voided');
   }
-  await restock(clinicFixtures, soldLines(state.invoice));
-  await clinicFixtures.invoices.remove(state.invoice.id, reason, note);
-  return clinicFixtures.medicalSales.update(saleId, {
+  await restock(appFixtures, soldLines(state.invoice));
+  await appFixtures.invoices.remove(state.invoice.id, reason, note);
+  return appFixtures.medicalSales.update(saleId, {
     voidedAt: new Date().toISOString(),
   });
 }
@@ -415,15 +415,15 @@ export async function voidSale(
  * the list as it was.
  */
 export async function restoreSale(saleId: string): Promise<MedicalSale> {
-  const { clinicFixtures } = await fixtureWorld();
-  const sale = await clinicFixtures.medicalSales.get(saleId);
+  const { appFixtures } = await fixtureWorld();
+  const sale = await appFixtures.medicalSales.get(saleId);
   if (!sale.voidedAt) conflict('This sale is not void');
-  const invoice = await clinicFixtures.invoices.restore(sale.invoiceId);
+  const invoice = await appFixtures.invoices.restore(sale.invoiceId);
   await restock(
-    clinicFixtures,
+    appFixtures,
     soldLines(invoice).map((line) => ({ ...line, qty: -line.qty })),
   );
-  return clinicFixtures.medicalSales.update(saleId, { voidedAt: null });
+  return appFixtures.medicalSales.update(saleId, { voidedAt: null });
 }
 
 // ── Stock back to a supplier ──
@@ -437,20 +437,20 @@ export async function restoreSale(saleId: string): Promise<MedicalSale> {
 export async function returnExpiringStock(
   input: ExpiringReturnInput,
 ): Promise<ExpiringReturnResult> {
-  const { clinicFixtures, onClinicFixturesReset } = await fixtureWorld();
-  const fields = validateClinicInput(expiringReturnInputSchema, input);
-  const medicine = await clinicFixtures.medicines.get(fields.medicineId);
-  const supplier = await clinicFixtures.suppliers.get(fields.supplierId);
+  const { appFixtures, onAppFixturesReset } = await fixtureWorld();
+  const fields = validateAppInput(expiringReturnInputSchema, input);
+  const medicine = await appFixtures.medicines.get(fields.medicineId);
+  const supplier = await appFixtures.suppliers.get(fields.supplierId);
   const batch = medicine.batches.find((row) => row.batchNo === fields.batchNo);
   if (!batch || batch.qty === 0) conflict('Nothing left in this batch');
   const qty = Math.min(fields.qty, batch.qty);
-  await clinicFixtures.medicines.update(medicine.id, {
+  await appFixtures.medicines.update(medicine.id, {
     batches: medicine.batches.map((row) =>
       row.batchNo === batch.batchNo ? { ...row, qty: row.qty - qty } : row,
     ),
   });
   const credit = qty * batch.purchaseRate;
-  supplierCreditStore(onClinicFixturesReset).add({
+  supplierCreditStore(onAppFixturesReset).add({
     supplierId: supplier.id,
     medicineId: medicine.id,
     batchNo: batch.batchNo,
@@ -470,16 +470,16 @@ const TO_FILL_LIMIT = 20;
  * `S:1658`): each with medicines, newest first, at most 20.
  */
 export async function listPrescriptionsToFill(): Promise<PrescriptionToFill[]> {
-  const { clinicFixtures } = await fixtureWorld();
+  const { appFixtures } = await fixtureWorld();
   const filled = new Set(
-    clinicFixtures.medicalSales
+    appFixtures.medicalSales
       .snapshot((sale) => sale.voidedAt === null && sale.prescriptionId !== null)
       .map((sale) => sale.prescriptionId),
   );
   const patients = new Map(
-    clinicFixtures.patients.snapshot().map((patient) => [patient.id, patient]),
+    appFixtures.patients.snapshot().map((patient) => [patient.id, patient]),
   );
-  return clinicFixtures.prescriptions
+  return appFixtures.prescriptions
     .snapshot((rx) => rx.items.length > 0 && !filled.has(rx.id))
     .sort((a, b) => compareText(b.date, a.date) || b.seq - a.seq)
     .slice(0, TO_FILL_LIMIT)

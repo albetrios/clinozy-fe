@@ -3,15 +3,15 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import type * as DirectoryApiModule from '@/shared/api/clinic/directory-api.ts';
-import { saveMyPreferences } from '@/shared/api/clinic/preferences-api.ts';
-import type * as TasksApiModule from '@/shared/api/clinic/tasks-api.ts';
+import type * as DirectoryApiModule from '@/shared/api/app/directory-api.ts';
+import { saveMyPreferences } from '@/shared/api/app/preferences-api.ts';
+import type * as TasksApiModule from '@/shared/api/app/tasks-api.ts';
 import {
   deleteTask,
   listTasks,
   saveTaskRuleSettings,
-} from '@/shared/api/clinic/tasks-api.ts';
-import type { TaskListQueryInput } from '@/shared/api/clinic/tasks-contracts.ts';
+} from '@/shared/api/app/tasks-api.ts';
+import type { TaskListQueryInput } from '@/shared/api/app/tasks-contracts.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import type * as MyMembershipModule from '@/shared/tenancy/my-membership.ts';
 import { TEST_TASK_ID } from '@/tests/utils/task-doubles.ts';
@@ -52,14 +52,14 @@ vi.mock('@/shared/notify/index.ts', () => ({
 }));
 
 const world = vi.hoisted(() => ({}) as TasksWorld);
-vi.mock('@/shared/api/clinic/tasks-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/tasks-api.ts', async (importOriginal) => {
   const { tasksApiDouble } = await import('./tasks-test-data.ts');
   return {
     ...(await importOriginal<typeof TasksApiModule>()),
     ...tasksApiDouble(world),
   };
 });
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => {
   const { directoryApiDouble } = await import('./tasks-test-data.ts');
   return {
     ...(await importOriginal<typeof DirectoryApiModule>()),
@@ -233,7 +233,7 @@ describe('the Tasks room on clinozy-be (KICKOFF §6.10)', () => {
   });
 
   it('reads the header’s branches (D32) — the tasks under none kept', async () => {
-    // The preferences are the suite's in-memory double (`clinic-shell-doubles.ts`).
+    // The preferences are the suite's in-memory double (`app-shell-doubles.ts`).
     await saveMyPreferences({ branchFilter: [ADAJAN] });
     renderTasksRoutes(TASKS, TasksPage);
     await waitFor(() => expect(titles()).toContain('Confirm Priti’s visit'));

@@ -2,11 +2,11 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
+import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
 import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+  appFixtures,
+  resetAppFixtures,
+} from '@/shared/api/app/fixtures/world.fixtures.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 
 import { ManufacturersPage } from '../../manufacturers/ManufacturersPage.tsx';
@@ -66,11 +66,11 @@ const rowOf = async (tab: string, text: string) => {
 beforeEach(() => {
   viewport.tier = 'desktop';
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 afterEach(() => {
   resetMedicalRoutes();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 
 describe('Medical drawers over their tabs (KICKOFF §6.7, D24)', () => {
@@ -121,7 +121,7 @@ describe('Medical drawers over their tabs (KICKOFF §6.7, D24)', () => {
     );
     expect(notifyMock.undo).toHaveBeenCalledWith('Epriva Tab deleted', expect.anything());
     expect(
-      clinicFixtures.medicines.snapshot((m) => m.id === ref.medicine(455)),
+      appFixtures.medicines.snapshot((m) => m.id === ref.medicine(455)),
     ).toHaveLength(0);
   });
 
@@ -137,7 +137,7 @@ describe('Medical drawers over their tabs (KICKOFF §6.7, D24)', () => {
 
   it('offers Delete only on a manufacturer no medicine names, and opens Edit from a row', async () => {
     const user = setup();
-    await clinicFixtures.manufacturers.create({
+    await appFixtures.manufacturers.create({
       name: 'ZEN',
       tone: 'lav',
       isQuick: true,

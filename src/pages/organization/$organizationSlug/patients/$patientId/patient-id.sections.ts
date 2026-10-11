@@ -2,7 +2,7 @@ import { lazyRouteComponent } from '@tanstack/react-router';
 
 import { ensureNamespace } from '@/lib/i18n/load-namespace.ts';
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
-import type { PatientFileSectionSlug } from '@/shared/clinic/patient-file-sections.ts';
+import type { PatientFileSectionSlug } from '@/shared/app/patient-file-sections.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 
 import { Component as PrescriptionEdit } from './prescriptions/$prescriptionId/edit/edit.route.tsx';

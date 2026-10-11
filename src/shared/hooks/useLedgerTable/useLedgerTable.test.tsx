@@ -1,9 +1,9 @@
 import { renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import type { LedgerRow } from '@/shared/api/clinic/payments-contracts.ts';
-import { listFixtureLedger } from '@/shared/api/clinic/payments-fixture-api.ts';
+import { resetAppFixtures } from '@/shared/api/app/fixtures/world.fixtures.ts';
+import type { LedgerRow } from '@/shared/api/app/payments-contracts.ts';
+import { listFixtureLedger } from '@/shared/api/app/payments-fixture-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { useDevicePrefsStore } from '@/shared/store/useDevicePrefsStore/index.ts';
 
@@ -24,13 +24,13 @@ beforeEach(async () => {
   vi.useFakeTimers({ toFake: ['Date'] });
   vi.setSystemTime(NOW);
   viewport.tier = 'desktop';
-  resetClinicFixtures();
+  resetAppFixtures();
   useDevicePrefsStore.setState({ hiddenColumns: {} });
   rows = [...(await listFixtureLedger({})).items];
 });
 afterEach(() => {
   vi.useRealTimers();
-  resetClinicFixtures();
+  resetAppFixtures();
 });
 
 describe('useLedgerTable (payments.md:29–30)', () => {

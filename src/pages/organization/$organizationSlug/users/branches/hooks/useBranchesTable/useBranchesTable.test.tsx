@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import type { Branch } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Branch } from '@/shared/api/app/app-schema.ts';
 
 import type { BranchRow } from '../useBranchRows/index.ts';
 import { useBranchesTable } from './useBranchesTable.tsx';

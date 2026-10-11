@@ -7,7 +7,7 @@
  * and this module loads with the room.
  */
 import { textOf } from '@/lib/routes/search-params.ts';
-import { toClinicPhone } from '@/shared/clinic/clinic-phone.ts';
+import { toAppPhone } from '@/shared/app/app-phone.ts';
 
 /** The New lead prefill (`S:23`; ⌘K "New lead", contact card "+ Lead"). */
 export interface LeadCreateSearch {
@@ -29,6 +29,6 @@ export function validateLeadCreateSearch(
   const phone = textOf(search.phone);
   return {
     name: name && name.length <= 120 ? name : undefined,
-    phone: (phone && toClinicPhone(phone)) || undefined,
+    phone: (phone && toAppPhone(phone)) || undefined,
   };
 }

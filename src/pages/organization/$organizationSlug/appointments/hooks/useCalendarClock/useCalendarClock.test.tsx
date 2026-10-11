@@ -1,13 +1,13 @@
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
+import { appInstant } from '@/shared/api/app/app-time.ts';
 
 import { useCalendarClock } from './useCalendarClock.ts';
 
 beforeEach(() => {
   vi.useFakeTimers();
-  vi.setSystemTime(new Date(clinicInstant('2026-10-03', '10:30')));
+  vi.setSystemTime(new Date(appInstant('2026-10-03', '10:30')));
 });
 afterEach(() => vi.useRealTimers());
 
@@ -18,7 +18,7 @@ describe('useCalendarClock', () => {
   });
 
   it('moves on every minute, across midnight too', () => {
-    vi.setSystemTime(new Date(clinicInstant('2026-10-03', '23:59')));
+    vi.setSystemTime(new Date(appInstant('2026-10-03', '23:59')));
     const { result } = renderHook(() => useCalendarClock());
     act(() => vi.advanceTimersByTime(60_000));
     expect(result.current).toEqual({ today: '2026-10-04', minutes: 0 });

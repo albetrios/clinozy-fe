@@ -1,4 +1,4 @@
-import type { DeleteReason } from '@/shared/api/clinic/clinic-schema.ts';
+import type { DeleteReason } from '@/shared/api/app/app-schema.ts';
 import {
   createMedicine,
   deleteMedicine,
@@ -11,14 +11,14 @@ import {
   restoreMedicine,
   setNearExpiryDiscount,
   updateMedicine,
-} from '@/shared/api/clinic/medicines-api.ts';
+} from '@/shared/api/app/medicines-api.ts';
 import type {
   MedicineInput,
   MedicineListParams,
   MedicineRecord,
   MedicineRow,
   QuickMedicineInput,
-} from '@/shared/api/clinic/medicines-contracts.ts';
+} from '@/shared/api/app/medicines-contracts.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';

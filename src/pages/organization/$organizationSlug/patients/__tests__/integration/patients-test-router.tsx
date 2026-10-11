@@ -12,11 +12,11 @@ import type { i18n as I18n } from 'i18next';
 import type { ReactNode } from 'react';
 import { I18nextProvider } from 'react-i18next';
 
-import type { Role } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Role } from '@/shared/api/app/app-schema.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
-import { PRESET_CODES } from '@/tests/utils/clinic-preset-codes.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { PRESET_CODES } from '@/tests/utils/app-preset-codes.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 
 import { validatePatientCreateSearch } from '../../patients.dialog-search.ts';
 import { validatePatientsSearch } from '../../patients.search.ts';

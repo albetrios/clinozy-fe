@@ -10,7 +10,7 @@ interface UIStore {
   appearanceOpen: boolean;
   /**
    * View-as (Users › Roles & access): the role (`rol_…`) whose permission codes the clinic
-   * screens preview in place of the member's own (`useClinicAccess`). Session-only — never
+   * screens preview in place of the member's own (`useAppAccess`). Session-only — never
    * persisted.
    */
   previewRole: string | null;

@@ -1,8 +1,8 @@
 import { useCallback, useMemo } from 'react';
 
-import type { ClinicBranch } from '@/shared/api/clinic/branches-contracts.ts';
-import { branchListKey, fetchBranches } from '@/shared/api/clinic/branches-manage-api.ts';
-import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
+import type { AppBranch } from '@/shared/api/app/branches-contracts.ts';
+import { branchListKey, fetchBranches } from '@/shared/api/app/branches-manage-api.ts';
+import type { TeamMember } from '@/shared/api/app/users-contracts.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import { useTeam } from '@/shared/hooks/useTeam/index.ts';
 
@@ -23,11 +23,11 @@ export const BRANCH_DEFAULT_FIELDS = {
   desk: 'defaultDeskId',
   therapist: 'defaultTherapistId',
   pharmacist: 'defaultPharmacistId',
-} as const satisfies Readonly<Record<BranchDefaultRole, keyof ClinicBranch>>;
+} as const satisfies Readonly<Record<BranchDefaultRole, keyof AppBranch>>;
 
 /** A branch as the Branches table shows it. */
 export interface BranchRow {
-  branch: ClinicBranch;
+  branch: AppBranch;
   /** The active Team members who work here, in the Team's order. */
   team: TeamMember[];
   /** The default people the Team has, Doctor · Desk · Therapist · Pharmacy. */
@@ -44,7 +44,7 @@ export function teamMemberById(
 
 /** A branch's row: its active people and the default people the Team still has. */
 export function branchRowOf(
-  branch: ClinicBranch,
+  branch: AppBranch,
   members: readonly TeamMember[],
 ): BranchRow {
   const member = teamMemberById(members);

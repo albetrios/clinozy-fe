@@ -1,5 +1,5 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
-import type { VisitCheck } from '@/shared/api/clinic/visits-contracts.ts';
+import type { VisitCheck } from '@/shared/api/app/visits-contracts.ts';
 
 /** The visit flow reads the patient file's namespace. */
 export const VISIT_FLOW_NS = I18N_NAMESPACES.patientFile;

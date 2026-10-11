@@ -2,11 +2,11 @@ import { useId } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { REVIEW_SOURCE_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
-import { FEEDBACK_LIMITS } from '@/shared/api/clinic/feedback-contracts.ts';
+import { REVIEW_SOURCE_VALUES } from '@/shared/api/app/app-schema.ts';
+import { FEEDBACK_LIMITS } from '@/shared/api/app/feedback-contracts.ts';
 import { UPLOAD_MAX_BYTES } from '@/shared/api/uploads-api.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { REVIEW_SOURCE_TONES } from '@/shared/clinic/clinic-tones.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { REVIEW_SOURCE_TONES } from '@/shared/app/app-tones.ts';
 import {
   DrawerChips,
   DrawerField,
@@ -48,7 +48,7 @@ interface ReviewStepFieldsProps {
  * sage — and the Rating, five stars down to one.
  */
 export function ReviewWhereFields({ form, values }: ReviewStepFieldsProps) {
-  const { t } = useTranslation([REVIEW_NS, CLINIC_NS]);
+  const { t } = useTranslation([REVIEW_NS, APP_NS]);
   const field = useDrawerFieldIds(form, useId());
   return (
     <DrawerStepBody readOnly={false}>
@@ -58,7 +58,7 @@ export function ReviewWhereFields({ form, values }: ReviewStepFieldsProps) {
             label={t(K.where)}
             options={REVIEW_SOURCE_VALUES.map((source) => ({
               value: source,
-              label: t(CLINIC_KEYS.reviewSources[source], { ns: CLINIC_NS }),
+              label: t(APP_KEYS.reviewSources[source], { ns: APP_NS }),
               tone: REVIEW_SOURCE_TONES[source],
             }))}
             value={values.source}

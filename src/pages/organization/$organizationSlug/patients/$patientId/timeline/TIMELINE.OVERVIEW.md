@@ -91,8 +91,8 @@ padding inside; row dense), Clinical, Photos and Team notes two columns wide —
   who reads its records, each action only for one who may take it. Without an open visit the
   param is dropped and the Overview stays — a link never starts a visit.
 
-Gated by the file layout (membership, the `clinic-patients` module, the org status); in-room
-access is `useClinicAccess`. Registered in `src/app/routes/routeTree.tsx` through the file's
+Gated by the file layout (membership, the `app-patients` module, the org status); in-room
+access is `useAppAccess`. Registered in `src/app/routes/routeTree.tsx` through the file's
 one lazy module (`../patient-id.sections.ts`).
 
 ## Files
@@ -100,7 +100,7 @@ one lazy module (`../patient-id.sections.ts`).
 | File                                               | Responsibility                                                                                                                                                                                                                              |
 | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `timeline.route.tsx`                               | Route marker — exports `Component` rendering `PatientTimelinePage`.                                                                                                                                                                         |
-| `timeline.manifest.ts`                             | Manifest — `kind: 'leaf'`, permission `organization:read`, module `clinic-patients`, title "Overview".                                                                                                                                      |
+| `timeline.manifest.ts`                             | Manifest — `kind: 'leaf'`, permission `organization:read`, module `app-patients`, title "Overview".                                                                                                                                         |
 | `timeline.constants.ts`                            | `TIMELINE_KEYS` (the file's own words reused where they are the same), the cards and tones, test ids.                                                                                                                                       |
 | `PatientTimelinePage.tsx`                          | The section: no header, the bento, then the activity timeline — or the visit flow on `?visit=open`.                                                                                                                                         |
 | `components/OverviewBento/OverviewBento.tsx`       | The grid and what each card opens, adds and does.                                                                                                                                                                                           |

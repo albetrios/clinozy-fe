@@ -4,9 +4,9 @@ import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import {
-  clinicFixtures,
-  resetClinicFixtures,
-} from '@/shared/api/clinic/fixtures/world.fixtures.ts';
+  appFixtures,
+  resetAppFixtures,
+} from '@/shared/api/app/fixtures/world.fixtures.ts';
 
 import { useBranches } from './useBranches.ts';
 
@@ -18,8 +18,8 @@ function renderBranches() {
   return renderHook(() => useBranches(), { wrapper });
 }
 
-beforeEach(() => resetClinicFixtures());
-afterEach(() => resetClinicFixtures());
+beforeEach(() => resetAppFixtures());
+afterEach(() => resetAppFixtures());
 
 describe('useBranches', () => {
   it('loads the open branches, the main one first', async () => {
@@ -38,8 +38,8 @@ describe('useBranches', () => {
   });
 
   it('is single-branch once the other branches close — a closed branch never counts', async () => {
-    for (const branch of clinicFixtures.branches.snapshot((row) => !row.isMain)) {
-      await clinicFixtures.branches.update(branch.id, { active: false });
+    for (const branch of appFixtures.branches.snapshot((row) => !row.isMain)) {
+      await appFixtures.branches.update(branch.id, { active: false });
     }
     const { result } = renderBranches();
     await waitFor(() => expect(result.current.isPending).toBe(false));

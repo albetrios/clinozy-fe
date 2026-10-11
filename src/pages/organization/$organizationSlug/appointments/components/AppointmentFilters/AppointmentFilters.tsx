@@ -8,11 +8,11 @@ import {
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type { AppointmentView } from '@/shared/api/clinic/appointments-contracts.ts';
-import { readCreatedFilter } from '@/shared/api/clinic/clinic-list-filters.ts';
-import { APPOINTMENT_STATUS_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { APPOINTMENT_STATUS_TONES } from '@/shared/clinic/clinic-tones.ts';
+import { readCreatedFilter } from '@/shared/api/app/app-list-filters.ts';
+import { APPOINTMENT_STATUS_VALUES } from '@/shared/api/app/app-schema.ts';
+import type { AppointmentView } from '@/shared/api/app/appointments-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { APPOINTMENT_STATUS_TONES } from '@/shared/app/app-tones.ts';
 import { DrawerChips } from '@/shared/components/DrawerField/drawer-chip-controls.tsx';
 import { PickerSheet } from '@/shared/components/Picker/index.ts';
 import {
@@ -105,7 +105,7 @@ export interface AppointmentFiltersProps {
  * "Clear all" and the × apply at once; Esc or a tap outside drops them (D33).
  */
 export function AppointmentFilters({ view, className }: AppointmentFiltersProps) {
-  const { t } = useTranslation([APPOINTMENTS_NS, ROOM_TOOLBAR_NS, CLINIC_NS]);
+  const { t } = useTranslation([APPOINTMENTS_NS, ROOM_TOOLBAR_NS, APP_NS]);
   const navigation = useAppointmentsNavigation();
   const { preferences } = usePreferences();
   const ids = roomToolbarTestIds('appointments');
@@ -136,7 +136,7 @@ export function AppointmentFilters({ view, className }: AppointmentFiltersProps)
   const statusLabel = (value: (typeof STATUS_CHIPS)[number]) => {
     if (value === 'all') return t(keys.all);
     if (value === 'active') return t(keys.active);
-    return t(CLINIC_KEYS.appointments.statuses[value], { ns: CLINIC_NS });
+    return t(APP_KEYS.appointments.statuses[value], { ns: APP_NS });
   };
 
   return (

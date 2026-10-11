@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { LEAD_SOURCE_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
+import { LEAD_SOURCE_VALUES } from '@/shared/api/app/app-schema.ts';
 import { TooltipProvider } from '@/shared/components/ui/tooltip.tsx';
 
 import {

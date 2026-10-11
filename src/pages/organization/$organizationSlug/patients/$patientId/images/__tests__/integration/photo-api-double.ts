@@ -12,7 +12,7 @@ import {
   type PatientPhotoChange,
   type PatientPhotoListParams,
   type PatientPhotoPage,
-} from '@/shared/api/clinic/patient-images-contracts.ts';
+} from '@/shared/api/app/patient-images-contracts.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 
 /** The patient the photos belong to (the shared `patientFile()` double's). */

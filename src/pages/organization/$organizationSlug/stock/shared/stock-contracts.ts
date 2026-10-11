@@ -4,7 +4,7 @@ import type { ApiData } from '@/core/http/api.ts';
 import type { operations } from '@/core/http/openapi-types.d.ts';
 import { wireSchema } from '@/core/http/wire-schema.ts';
 import type { SortDirection } from '@/lib/routes/search-params.ts';
-import type { CreatedFilter } from '@/shared/api/clinic/clinic-list-filters.ts';
+import type { CreatedFilter } from '@/shared/api/app/app-list-filters.ts';
 import {
   MEASURE_UNIT_VALUES,
   type MeasureUnit,
@@ -13,7 +13,7 @@ import {
   type StockCategory,
   type StockUnit,
   type Tone,
-} from '@/shared/api/clinic/clinic-schema.ts';
+} from '@/shared/api/app/app-schema.ts';
 
 import { STOCK_MOVEMENT_KINDS, STOCK_PURCHASE_STATUSES } from '../stock.search.ts';
 import {

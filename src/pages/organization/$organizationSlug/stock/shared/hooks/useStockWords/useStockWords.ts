@@ -5,9 +5,9 @@ import type {
   StockCategory,
   StockUnit,
   Tone,
-} from '@/shared/api/clinic/clinic-schema.ts';
-import { localDateOf } from '@/shared/api/clinic/clinic-time.ts';
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
+} from '@/shared/api/app/app-schema.ts';
+import { localDateOf } from '@/shared/api/app/app-time.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 
@@ -48,7 +48,7 @@ export function useStockWords() {
   const { t } = useTranslation(STOCK_NS);
   const { formatNumber, formatDate } = useLocaleFormat();
   const formatRupees = useRupeeFormat();
-  const clock = useClinicClock();
+  const clock = useAppClock();
   const figure = (value: number) => formatNumber(value, { maximumFractionDigits: 2 });
   const unit = (value: StockUnit) => t(STOCK_KEYS.units[value]);
   const measure = (value: MeasureUnit) => t(STOCK_KEYS.measures[value]);

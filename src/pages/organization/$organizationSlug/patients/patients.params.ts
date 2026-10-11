@@ -7,7 +7,7 @@
 import type {
   PatientListParams,
   PatientSortKey,
-} from '@/shared/api/clinic/patients-contracts.ts';
+} from '@/shared/api/app/patients-contracts.ts';
 
 import { PATIENTS_SEARCH_DEFAULTS, type PatientsSearch } from './patients.search.ts';
 

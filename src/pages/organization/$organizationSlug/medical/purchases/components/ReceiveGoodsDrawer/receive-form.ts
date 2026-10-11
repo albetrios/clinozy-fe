@@ -1,5 +1,5 @@
-import { purchaseOrderTotal } from '@/shared/api/clinic/clinic-money.ts';
-import { expiryMonthSchema } from '@/shared/api/clinic/clinic-schema.ts';
+import { purchaseOrderTotal } from '@/shared/api/app/app-money.ts';
+import { expiryMonthSchema } from '@/shared/api/app/app-schema.ts';
 
 import type { PurchaseOrderRow } from '../../../shared/medical-contracts.ts';
 import type { ReceiveInput } from '../../../shared/medical-flows-contracts.ts';

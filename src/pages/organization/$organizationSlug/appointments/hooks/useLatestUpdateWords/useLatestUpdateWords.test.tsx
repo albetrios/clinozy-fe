@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { clinicInstant } from '@/shared/api/clinic/clinic-time.ts';
+import { appInstant } from '@/shared/api/app/app-time.ts';
 import { APPOINTMENT_NOW } from '@/tests/utils/appointment-doubles.ts';
 
 import { useLatestUpdateWords } from './useLatestUpdateWords.ts';
@@ -45,7 +45,7 @@ describe('useLatestUpdateWords (appointments.md:359–360)', () => {
         kind: 'moved',
         tone: 'butter',
         times: 1,
-        from: clinicInstant('2026-10-02', '16:30'),
+        from: appInstant('2026-10-02', '16:30'),
       }),
       // The old slot's day and time are isolated tokens in the sentence.
     ).toMatch(/^Moved from \u2068.+\u2069 \u20684:30\sPM\u2069$/);

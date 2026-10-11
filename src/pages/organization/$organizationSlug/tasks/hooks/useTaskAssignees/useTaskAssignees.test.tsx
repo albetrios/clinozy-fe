@@ -3,11 +3,11 @@ import { renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/shared/api/clinic/directory-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/directory-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchTeamDirectory: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/tasks-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/tasks-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchTaskWorkerIds: vi.fn(),
 }));
@@ -18,11 +18,11 @@ vi.mock('@/shared/tenancy/my-membership.ts', async (importOriginal) => ({
 import {
   type DirectoryMember,
   fetchTeamDirectory,
-} from '@/shared/api/clinic/directory-api.ts';
-import { fetchTaskWorkerIds } from '@/shared/api/clinic/tasks-api.ts';
+} from '@/shared/api/app/directory-api.ts';
+import { fetchTaskWorkerIds } from '@/shared/api/app/tasks-api.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { findMyMembershipId } from '@/shared/tenancy/my-membership.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 
 import {
   taskAssigneeKeyOf,

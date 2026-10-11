@@ -2,8 +2,8 @@ import { type KeyboardEvent, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
-import { TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { CountBadge } from '@/shared/components/Cells/CountBadge/index.ts';
 import { DrawerInput } from '@/shared/components/DrawerField/index.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';

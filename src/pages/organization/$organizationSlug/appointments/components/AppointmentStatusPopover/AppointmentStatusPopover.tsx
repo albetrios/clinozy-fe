@@ -10,17 +10,17 @@ import { Trans, useTranslation } from 'react-i18next';
 
 import { focusSurfaceOnOpen } from '@/lib/focus-surface.ts';
 import { cn } from '@/lib/utils.ts';
+import type { CancelReason } from '@/shared/api/app/app-schema.ts';
 import {
   type AppointmentGuard,
   type AppointmentMove,
   appointmentMoveOptions,
   CANCEL_REASON_GROUPS,
   isFinalAppointmentStatus,
-} from '@/shared/api/clinic/appointment-status.ts';
-import type { AppointmentRow } from '@/shared/api/clinic/appointments-contracts.ts';
-import type { CancelReason } from '@/shared/api/clinic/clinic-schema.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { APPOINTMENT_STATUS_TONES, TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+} from '@/shared/api/app/appointment-status.ts';
+import type { AppointmentRow } from '@/shared/api/app/appointments-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { APPOINTMENT_STATUS_TONES, TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { REASON_CONFIRM_KEYS } from '@/shared/components/ConfirmDialog/reason-confirm.constants.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
@@ -71,9 +71,9 @@ function moveDot(move: AppointmentMove): string {
 
 /** A move's label: the status's, "Move to another time", "Cancel". */
 function moveLabelKey(move: AppointmentMove): string {
-  if (move === 'reschedule') return CLINIC_KEYS.appointments.moves.reschedule;
-  if (move === 'cancelled') return CLINIC_KEYS.appointments.moves.cancelled;
-  return CLINIC_KEYS.appointments.statuses[move];
+  if (move === 'reschedule') return APP_KEYS.appointments.moves.reschedule;
+  if (move === 'cancelled') return APP_KEYS.appointments.moves.cancelled;
+  return APP_KEYS.appointments.statuses[move];
 }
 
 /** One option row: 8px dot, the label at 500 and its line — the reason, or why it is off. */
@@ -88,7 +88,7 @@ function MoveOption({
   why: string;
   onPick: () => void;
 }) {
-  const { t } = useTranslation(CLINIC_NS);
+  const { t } = useTranslation(APP_NS);
   const off = !guard.allowed;
   return (
     <button
@@ -135,7 +135,7 @@ function CancelView({
   onBack: () => void;
   onCancel: (reason: CancelReason, note: string | null) => void;
 }) {
-  const { t } = useTranslation([APPOINTMENTS_NS, CLINIC_NS]);
+  const { t } = useTranslation([APPOINTMENTS_NS, APP_NS]);
   const [note, setNote] = useState<string | null>(null);
   const noteRef = useRef<HTMLTextAreaElement>(null);
   const formId = useId();
@@ -178,14 +178,14 @@ function CancelView({
       {CANCEL_REASON_GROUPS.map(({ side, reasons }) => (
         <fieldset
           key={side}
-          aria-label={t(CLINIC_KEYS.appointments.cancelSides[side], { ns: CLINIC_NS })}
+          aria-label={t(APP_KEYS.appointments.cancelSides[side], { ns: APP_NS })}
           className="m-0 flex min-w-0 flex-col gap-0.5 border-0 p-0"
         >
           <span
             aria-hidden="true"
             className="text-micro text-muted-foreground px-2 pt-1.5 pb-0.5 font-semibold tracking-[0.05em] uppercase"
           >
-            {t(CLINIC_KEYS.appointments.cancelSides[side], { ns: CLINIC_NS })}
+            {t(APP_KEYS.appointments.cancelSides[side], { ns: APP_NS })}
           </span>
           {reasons.map((reason) => {
             const other = reason === 'other';
@@ -202,7 +202,7 @@ function CancelView({
                   other && noting && 'bg-muted font-medium',
                 )}
               >
-                {t(CLINIC_KEYS.appointments.cancelReasons[reason], { ns: CLINIC_NS })}
+                {t(APP_KEYS.appointments.cancelReasons[reason], { ns: APP_NS })}
               </button>
             );
           })}
@@ -233,9 +233,9 @@ function CancelView({
               event.preventDefault();
               submit();
             }}
-            aria-label={t(REASON_CONFIRM_KEYS.note, { ns: CLINIC_NS })}
+            aria-label={t(REASON_CONFIRM_KEYS.note, { ns: APP_NS })}
             aria-required
-            placeholder={t(REASON_CONFIRM_KEYS.noteRequired, { ns: CLINIC_NS })}
+            placeholder={t(REASON_CONFIRM_KEYS.noteRequired, { ns: APP_NS })}
             data-testid={APPOINTMENTS_TEST_IDS.cancelNote}
             className="md:text-body field-sizing-fixed min-h-0 resize-none rounded-lg px-2.5 py-2"
           />
@@ -245,7 +245,7 @@ function CancelView({
               aria-live="polite"
               className="text-muted-foreground min-w-0 flex-1 text-xs"
             >
-              {ready ? '' : t(REASON_CONFIRM_KEYS.hintAddNote, { ns: CLINIC_NS })}
+              {ready ? '' : t(REASON_CONFIRM_KEYS.hintAddNote, { ns: APP_NS })}
             </span>
             <Button
               type="submit"
@@ -259,7 +259,7 @@ function CancelView({
                   'bg-muted text-disabled hover:bg-muted hover:text-disabled cursor-not-allowed',
               )}
             >
-              {t(CLINIC_KEYS.appointments.cancelConfirm.action, { ns: CLINIC_NS })}
+              {t(APP_KEYS.appointments.cancelConfirm.action, { ns: APP_NS })}
             </Button>
           </div>
         </form>
@@ -288,7 +288,7 @@ export function AppointmentStatusPopover({
   children,
   anchorRef,
 }: AppointmentStatusPopoverProps) {
-  const { t } = useTranslation([APPOINTMENTS_NS, CLINIC_NS]);
+  const { t } = useTranslation([APPOINTMENTS_NS, APP_NS]);
   const actions = useAppointmentActions();
   const slotLabel = useAppointmentSlotLabel();
   const status = appointment.status;
@@ -321,20 +321,20 @@ export function AppointmentStatusPopover({
   };
 
   const whyFor = (move: AppointmentMove, guard: AppointmentGuard): string => {
-    const keys = CLINIC_KEYS.appointments;
+    const keys = APP_KEYS.appointments;
     if (guard.allowed) {
-      return t(keys.moveHints[move], { ns: CLINIC_NS });
+      return t(keys.moveHints[move], { ns: APP_NS });
     }
     if (guard.reason === 'visit_day') {
-      return t(keys.guards.visitDay, { ns: CLINIC_NS, day: slot.day });
+      return t(keys.guards.visitDay, { ns: APP_NS, day: slot.day });
     }
     if (guard.reason === 'before_start') {
-      return t(keys.guards.beforeStart, { ns: CLINIC_NS, ...slot });
+      return t(keys.guards.beforeStart, { ns: APP_NS, ...slot });
     }
     if (guard.reason === 'needs_patient') {
-      return t(keys.guards.needsPatient, { ns: CLINIC_NS });
+      return t(keys.guards.needsPatient, { ns: APP_NS });
     }
-    return t(keys.guards.final, { ns: CLINIC_NS });
+    return t(keys.guards.final, { ns: APP_NS });
   };
 
   const pick = (move: AppointmentMove) => {
@@ -346,11 +346,11 @@ export function AppointmentStatusPopover({
     actions.move(appointment, move);
   };
 
-  const statusLabel = t(CLINIC_KEYS.appointments.statuses[status], { ns: CLINIC_NS });
+  const statusLabel = t(APP_KEYS.appointments.statuses[status], { ns: APP_NS });
   const reasonLabel =
     status === 'cancelled' && appointment.cancelReason
-      ? t(CLINIC_KEYS.appointments.cancelReasons[appointment.cancelReason], {
-          ns: CLINIC_NS,
+      ? t(APP_KEYS.appointments.cancelReasons[appointment.cancelReason], {
+          ns: APP_NS,
         })
       : null;
   return (
@@ -408,7 +408,7 @@ export function AppointmentStatusPopover({
           : null}
         {view === 'moves' && isFinalAppointmentStatus(status) ? (
           <span className="text-muted-foreground p-2 text-xs">
-            {t(CLINIC_KEYS.appointments.guards.final, { ns: CLINIC_NS })}
+            {t(APP_KEYS.appointments.guards.final, { ns: APP_NS })}
           </span>
         ) : null}
       </PopoverContent>

@@ -1,8 +1,8 @@
-import type { Tone } from '@/shared/api/clinic/clinic-schema.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
 import type {
   ClinicalNote,
   ClinicalNoteKind,
-} from '@/shared/api/clinic/clinical-notes-contracts.ts';
+} from '@/shared/api/app/clinical-notes-contracts.ts';
 
 /*
  * The four clinical lists as chips — Complaints, Diagnosis, Treatment and Future suggestions —

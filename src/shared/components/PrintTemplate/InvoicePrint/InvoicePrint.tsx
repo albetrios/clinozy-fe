@@ -1,12 +1,12 @@
 import { paiseOfRupees } from '@/lib/number-text.ts';
 import { cn } from '@/lib/utils.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
 import type {
   InvoiceLine,
   InvoiceParty,
   InvoiceRecord,
   InvoiceSheet,
-} from '@/shared/api/clinic/invoices-contracts.ts';
+} from '@/shared/api/app/invoices-contracts.ts';
 import {
   usePrintFormat,
   usePrintTranslation,

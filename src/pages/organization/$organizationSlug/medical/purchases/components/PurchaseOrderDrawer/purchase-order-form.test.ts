@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { ref } from '@/shared/api/clinic/fixtures/refs.fixtures.ts';
-import { resetClinicFixtures } from '@/shared/api/clinic/fixtures/world.fixtures.ts';
-import { fetchAllMedicines } from '@/shared/api/clinic/medicines-api.ts';
+import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
+import { resetAppFixtures } from '@/shared/api/app/fixtures/world.fixtures.ts';
+import { fetchAllMedicines } from '@/shared/api/app/medicines-api.ts';
 
 import { fetchPurchaseOrder } from '../../../shared/medical-api.ts';
 import {
@@ -19,7 +19,7 @@ import {
   supplierRateOf,
 } from './purchase-order-form.ts';
 
-afterEach(() => resetClinicFixtures());
+afterEach(() => resetAppFixtures());
 
 describe('the purchase order’s form (medical.md:254–267)', () => {
   it('totals qty × rate — free units cost nothing — over the picked lines', () => {

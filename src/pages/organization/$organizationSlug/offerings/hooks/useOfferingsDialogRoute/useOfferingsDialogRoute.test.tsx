@@ -11,11 +11,11 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { OrganizationPermission } from '@/core/rbac/policies.ts';
-import type * as OfferingsApiModule from '@/shared/api/clinic/offerings-api.ts';
-import { fetchOffering } from '@/shared/api/clinic/offerings-api.ts';
+import type * as OfferingsApiModule from '@/shared/api/app/offerings-api.ts';
+import { fetchOffering } from '@/shared/api/app/offerings-api.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 
 import {
   OFFERING_IDS,
@@ -33,7 +33,7 @@ const { notifyMock } = vi.hoisted(() => ({ notifyMock: { info: vi.fn() } }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 
 const world = vi.hoisted(() => ({}) as OfferingsTabWorld);
-vi.mock('@/shared/api/clinic/offerings-api.ts', async (importOriginal) => {
+vi.mock('@/shared/api/app/offerings-api.ts', async (importOriginal) => {
   const { offeringsApiDouble } =
     await import('../../__tests__/integration/offerings-tab-test-data.ts');
   return {

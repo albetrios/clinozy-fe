@@ -4,8 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import i18n from '@/lib/i18n/i18n.ts';
-import { fetchCredit, listPendingCredits } from '@/shared/api/clinic/credits-api.ts';
-import type { CreditRow } from '@/shared/api/clinic/credits-contracts.ts';
+import { fetchCredit, listPendingCredits } from '@/shared/api/app/credits-api.ts';
+import type { CreditRow } from '@/shared/api/app/credits-contracts.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { creditRow, TEST_CREDIT_ID } from '@/tests/utils/payments-doubles.ts';
@@ -35,7 +35,7 @@ vi.mock('@/shared/notify/index.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   notify: notifyMock,
 }));
-vi.mock('@/shared/api/clinic/credits-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/credits-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listPendingCredits: vi.fn(),
   fetchCredit: vi.fn(),

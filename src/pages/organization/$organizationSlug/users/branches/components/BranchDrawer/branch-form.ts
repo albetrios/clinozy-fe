@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
-import type { BranchSave, ClinicBranch } from '@/shared/api/clinic/branches-contracts.ts';
-import type { Role, Tone, Weekday } from '@/shared/api/clinic/clinic-schema.ts';
-import type { TeamMember } from '@/shared/api/clinic/users-contracts.ts';
-import { toClinicPhone } from '@/shared/clinic/clinic-phone.ts';
-import { clinicPhoneDigits } from '@/shared/clinic/clinic-phone-field.ts';
+import type { Role, Tone, Weekday } from '@/shared/api/app/app-schema.ts';
+import type { AppBranch, BranchSave } from '@/shared/api/app/branches-contracts.ts';
+import type { TeamMember } from '@/shared/api/app/users-contracts.ts';
+import { toAppPhone } from '@/shared/app/app-phone.ts';
+import { appPhoneDigits } from '@/shared/app/app-phone-field.ts';
 
 import {
   BRANCH_DEFAULT_FIELDS,
@@ -86,7 +86,7 @@ export function emptyBranchForm({
   selfMembershipId,
 }: {
   branchCount: number;
-  main: Pick<ClinicBranch, 'city' | 'state'> | null;
+  main: Pick<AppBranch, 'city' | 'state'> | null;
   selfMembershipId: string | null;
 }): BranchFormValues {
   return {
@@ -113,7 +113,7 @@ export function emptyBranchForm({
 
 /** A branch's form: its values, its team the people working there now. */
 export function branchFormOf(
-  branch: ClinicBranch,
+  branch: AppBranch,
   teamIds: readonly string[],
 ): BranchFormValues {
   return {
@@ -127,7 +127,7 @@ export function branchFormOf(
     city: branch.city,
     pin: branch.pin,
     state: branch.state,
-    phone: branch.phone ? clinicPhoneDigits(branch.phone) : '',
+    phone: branch.phone ? appPhoneDigits(branch.phone) : '',
     email: branch.email,
     gstNumber: branch.gstNumber ?? '',
     workingDays: [...branch.workingDays],
@@ -199,7 +199,7 @@ export function isBranchEmailInvalid(value: string): boolean {
 
 /** A filled phone that is not ten digits (an empty one is a missing field). */
 export function isBranchPhoneIncomplete(digits: string): boolean {
-  return digits.length > 0 && toClinicPhone(digits) === null;
+  return digits.length > 0 && toAppPhone(digits) === null;
 }
 
 /** A filled PIN code that is not six digits. */
@@ -240,7 +240,7 @@ export function branchSaveOf(
       city: values.city.trim(),
       state: values.state.trim(),
       pin: values.pin,
-      phone: toClinicPhone(values.phone) ?? '',
+      phone: toAppPhone(values.phone) ?? '',
       email: values.email.trim(),
       gstNumber: values.gstNumber.trim().toUpperCase() || null,
       workingDays: values.workingDays,

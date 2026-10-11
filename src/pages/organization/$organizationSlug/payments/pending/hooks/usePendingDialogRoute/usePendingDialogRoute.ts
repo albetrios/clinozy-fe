@@ -4,9 +4,9 @@ import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { organizationPaymentsPending } from '@/lib/routes/payments-builders.ts';
-import type { CreditDirection } from '@/shared/api/clinic/clinic-schema.ts';
-import { creditQueryKeys, fetchCredit } from '@/shared/api/clinic/credits-api.ts';
-import type { CreditRow } from '@/shared/api/clinic/credits-contracts.ts';
+import type { CreditDirection } from '@/shared/api/app/app-schema.ts';
+import { creditQueryKeys, fetchCredit } from '@/shared/api/app/credits-api.ts';
+import type { CreditRow } from '@/shared/api/app/credits-contracts.ts';
 import { useDialogRouteRecord } from '@/shared/hooks/useDialogRouteRecord/index.ts';
 import { usePaymentAccess } from '@/shared/hooks/usePaymentAccess/index.ts';
 import { notify } from '@/shared/notify/index.ts';

@@ -3,7 +3,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/shared/api/clinic/payments-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/payments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listLedger: vi.fn(),
   fetchPayment: vi.fn(),
@@ -17,14 +17,14 @@ vi.mock('@/shared/api/clinic/payments-api.ts', async (importOriginal) => ({
   restorePayment: vi.fn(),
   reversePayment: vi.fn(),
 }));
-vi.mock('@/shared/api/clinic/invoices-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/invoices-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listOpenInvoices: vi.fn(),
   fetchAllInvoices: vi.fn(),
 }));
 const access = vi.hoisted(() => ({ codes: new Set<string>(), isResolved: true }));
-vi.mock('@/shared/hooks/useClinicAccess/index.ts', () => ({
-  useClinicAccess: () => ({
+vi.mock('@/shared/hooks/useAppAccess/index.ts', () => ({
+  useAppAccess: () => ({
     isResolved: access.isResolved,
     canCode: (code: string) => access.codes.has(code),
   }),
@@ -32,13 +32,13 @@ vi.mock('@/shared/hooks/useClinicAccess/index.ts', () => ({
 vi.mock('@/shared/notify/index.ts', () => ({
   notify: { success: vi.fn(), error: vi.fn(), info: vi.fn(), undo: vi.fn() },
 }));
-import { creditQueryKeys } from '@/shared/api/clinic/credits-api.ts';
+import { creditQueryKeys } from '@/shared/api/app/credits-api.ts';
 import {
   fetchAllInvoices,
   invoiceQueryKeys,
   listOpenInvoices,
-} from '@/shared/api/clinic/invoices-api.ts';
-import { patientQueryKeys } from '@/shared/api/clinic/patients-api.ts';
+} from '@/shared/api/app/invoices-api.ts';
+import { patientQueryKeys } from '@/shared/api/app/patients-api.ts';
 import {
   deletePayment,
   fetchPayment,
@@ -52,10 +52,10 @@ import {
   restorePayment,
   reversePayment,
   updatePayment,
-} from '@/shared/api/clinic/payments-api.ts';
-import type { ReceivePaymentInput } from '@/shared/api/clinic/payments-contracts.ts';
+} from '@/shared/api/app/payments-api.ts';
+import type { ReceivePaymentInput } from '@/shared/api/app/payments-contracts.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { signInTestMember } from '@/tests/utils/clinic-shell-doubles.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import {
   invoiceRecord,
   ledgerRow,

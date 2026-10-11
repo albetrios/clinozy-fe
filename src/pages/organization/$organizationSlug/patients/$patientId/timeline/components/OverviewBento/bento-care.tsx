@@ -1,18 +1,18 @@
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
-import { displayId } from '@/shared/api/clinic/clinic-display-id.ts';
-import { localDateOf } from '@/shared/api/clinic/clinic-time.ts';
-import type { PatientNextVisit } from '@/shared/api/clinic/patient-file-contracts.ts';
-import type { PatientPackageRow } from '@/shared/api/clinic/patient-packages-contracts.ts';
-import { CLINIC_KEYS, CLINIC_NS } from '@/shared/clinic/clinic.constants.ts';
-import { APPOINTMENT_STATUS_TONES, TONE_CLASSES } from '@/shared/clinic/clinic-tones.ts';
+import { displayId } from '@/shared/api/app/app-display-id.ts';
+import { localDateOf } from '@/shared/api/app/app-time.ts';
+import type { PatientNextVisit } from '@/shared/api/app/patient-file-contracts.ts';
+import type { PatientPackageRow } from '@/shared/api/app/patient-packages-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { APPOINTMENT_STATUS_TONES, TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { TonePill } from '@/shared/components/Cells/index.ts';
+import { useAppClock } from '@/shared/hooks/useAppClock/index.ts';
 import {
   useAppointmentSlotLabel,
   usePersonAppointments,
 } from '@/shared/hooks/useAppointments/index.ts';
-import { useClinicClock } from '@/shared/hooks/useClinicClock/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { usePatientPackages } from '@/shared/hooks/usePatientPackages/index.ts';
 import { usePatientPrescriptions } from '@/shared/hooks/usePrescriptions/index.ts';
@@ -92,7 +92,7 @@ export function VisitsBentoCard({
   onBook: (() => void) | null;
   onReschedule: ((visit: PatientNextVisit) => void) | null;
 }) {
-  const { t } = useTranslation([TIMELINE_NS, CLINIC_NS]);
+  const { t } = useTranslation([TIMELINE_NS, APP_NS]);
   const { file } = usePatientFileContext();
   const visits = usePersonAppointments(file?.patient.contactId);
   const slot = useAppointmentSlotLabel();
@@ -135,8 +135,8 @@ export function VisitsBentoCard({
                 title={row.serviceLabel}
                 sub={`${when.day} · ${when.time}`}
                 tag={{
-                  label: t(CLINIC_KEYS.appointments.statuses[row.status], {
-                    ns: CLINIC_NS,
+                  label: t(APP_KEYS.appointments.statuses[row.status], {
+                    ns: APP_NS,
                   }),
                   tone: APPOINTMENT_STATUS_TONES[row.status],
                 }}
@@ -310,7 +310,7 @@ export function TreatmentsBentoCard({
 }: NewCardLinks & { onEdit: (treatmentId: string) => void }) {
   const { t } = useTranslation(TIMELINE_NS);
   const { patientId } = usePatientFileContext();
-  const clock = useClinicClock();
+  const clock = useAppClock();
   // The card shows its own failure (BentoReadState).
   const treatments = usePatientTreatments(patientId, { notifyOnError: false });
   const rows = (treatments.data ?? []).filter((row) => row.status === 'done');

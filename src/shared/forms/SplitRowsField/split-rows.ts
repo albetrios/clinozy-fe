@@ -1,4 +1,4 @@
-import type { PaymentMode } from '@/shared/api/clinic/clinic-schema.ts';
+import type { PaymentMode } from '@/shared/api/app/app-schema.ts';
 
 /*
  * The Mode · Amount rows of money that changes hands (H:5071): a receipt's, a

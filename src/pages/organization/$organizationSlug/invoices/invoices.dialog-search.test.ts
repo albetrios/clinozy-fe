@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { INVOICE_TYPE_VALUES } from '@/shared/api/clinic/clinic-schema.ts';
+import { INVOICE_TYPE_VALUES } from '@/shared/api/app/app-schema.ts';
 
 import {
   INVOICE_TYPE_PARAMS,

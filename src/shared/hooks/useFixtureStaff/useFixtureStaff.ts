@@ -2,7 +2,7 @@ import {
   fetchFixtureMyStaff,
   fetchFixtureStaff,
   fixtureStaffQueryKeys,
-} from '@/shared/api/clinic/staff-fixture-api.ts';
+} from '@/shared/api/app/staff-fixture-api.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 

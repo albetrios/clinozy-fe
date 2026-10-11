@@ -17,8 +17,8 @@ vi.mock('../../stock-records-api.ts', async (importOriginal) => ({
   quickCreateStockItem: vi.fn(),
 }));
 import i18n from '@/lib/i18n/i18n.ts';
-import * as branchesApi from '@/shared/api/clinic/branches-api.ts';
-import { clinicToday } from '@/shared/api/clinic/clinic-time.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
+import * as branchesApi from '@/shared/api/app/branches-api.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
@@ -239,7 +239,7 @@ describe('StockPurchaseDrawer (clinic-stock.md:142–157, 247–259)', () => {
       input: {
         vendorId: TEST_STOCK_VENDOR_ID,
         billNo: null,
-        date: clinicToday(),
+        date: appToday(),
         lines: [
           { itemId: GAUZE, qtyMilli: 6000, rate: 250 },
           { itemId: D_TAN, qtyMilli: 6000, rate: 80.5 },
