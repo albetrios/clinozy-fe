@@ -40,7 +40,7 @@ build-time or local-only, never synced to a GitHub Environment.
 | `VITE_DEBUG_LOGGING` | variable | `false` | `true` | `false` | "true" emits [Module] diagnostic console logs (on locally and in the development deploy, off in production). |
 | `VITE_DEV_API_URL` | build·local | — | — | — | Dev server only: Vite proxy target for /api. |
 | `VITE_DEVTOOLS` | variable | `false` | `true` | `false` | "true" mounts React Query Devtools + the localhost debug panel. |
-| `VITE_DISABLED_MODULES` | build·local | — | — | `clinic-medical` | Comma-separated module keys to disable (e.g. billing,members); routes 404 via the module gate. Clinic rooms are clinic-today … clinic-users; production disables the fixture-backed ones until their API lands. |
+| `VITE_DISABLED_MODULES` | variable | — | — | — | Comma-separated module keys to disable (e.g. billing,members); routes 404 via the module gate. Clinic rooms are clinic-today … clinic-users; production disables the fixture-backed ones until their API lands. |
 | `VITE_E2E_HOOKS` | variable | `false` | `false` | `false` | "true" installs Playwright E2E hooks on globalThis (navigateInApp, establishSession). |
 | `VITE_LAYOUT_WIDTH` | build·local | — | — | — | App layout width: contained (default), full, or reading. |
 | `VITE_PERSONAL_ORGANIZATIONS` | variable | — | — | — | Tri-state override for personal-org deployment mode (true/false/unset). |
@@ -85,6 +85,7 @@ above are scaffold values, which may differ. Preview with `pnpm github:sync <env
 - `VITE_CAPTCHA_DISABLED`
 - `VITE_DEBUG_LOGGING`
 - `VITE_DEVTOOLS`
+- `VITE_DISABLED_MODULES`
 - `VITE_E2E_HOOKS`
 - `VITE_PERSONAL_ORGANIZATIONS`
 - `VITE_SENTRY_PROFILES_SAMPLE_RATE`

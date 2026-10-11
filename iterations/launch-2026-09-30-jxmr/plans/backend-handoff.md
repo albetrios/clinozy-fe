@@ -24,9 +24,10 @@ that trace yet.
    `REPLACE_WITH_API` markers and the room's fixtures go in the same change, and `pnpm contracts:drift`
    (part of `pnpm sync:check:local`) proves every new path exists in clinozy-be.
 3. The room leaves `FIXTURE_BACKED_CLINIC_MODULES` in `src/core/config/clinic-modules.ts`, which takes
-   it out of production's default `VITE_DISABLED_MODULES` (`src/core/config/env-schema.ts`;
-   `pnpm env:catalog` regenerates the catalog). Deploys read their env from GitHub Environments, so
-   the production environment's `VITE_DISABLED_MODULES` drops the room too.
+   it out of what a production deploy must switch off (`FIXTURE_ROOMS_OFF_RULE` in
+   `src/core/config/env-schema.ts`; `pnpm env:catalog` regenerates the catalog). Deploys read their
+   env from GitHub Environments, so the production environment's `VITE_DISABLED_MODULES` drops the
+   room too (`.env.production`, then `pnpm github:sync` — D165).
 4. The room's row below takes the commit in both columns.
 
 ## Rooms

@@ -145,7 +145,8 @@ function requiredIssues(environment: AppEnvironment): {
   const get = (key: string): string | undefined => runtimeGet(key) ?? fileVals[key];
   for (const rule of envProfiles[environment].required) {
     const applies = rule.when ? rule.when(get) : true;
-    if (!applies || get(rule.key)) continue;
+    const value = get(rule.key);
+    if (!applies || (value && (rule.satisfiedBy?.(value) ?? true))) continue;
     const detail = rule.condition ? ` (${rule.condition})` : '';
     const message = `${rule.key} is required for ${environment}${detail}`;
     (rule.level === 'warn' || !onCi ? warnings : errors).push(message);

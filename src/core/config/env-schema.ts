@@ -10,6 +10,7 @@ import {
   enabledOAuthProviders,
   hasAnyAuthSurface,
   resolveBooleanFlag,
+  resolveDisabledModules,
   resolveOAuthProviderFlags,
 } from './env-resolvers.ts';
 
@@ -309,6 +310,8 @@ interface RequiredKeyRule {
   readonly condition?: string;
   /** `error` fails the gate; `warn` only reports. Defaults to `error`. */
   readonly level?: 'error' | 'warn';
+  /** Set is not enough: the value must also pass this. Omit = any non-empty value. */
+  readonly satisfiedBy?: (value: string) => boolean;
 }
 
 /** A key that must NOT reach an environment (optionally only when value matches). */
@@ -390,6 +393,23 @@ const CSP_REPORT_URI_RULE: RequiredKeyRule = {
   key: 'VITE_CSP_REPORT_URI',
   condition: 'deploy that collects CSP + Trusted-Types violations',
   level: 'warn',
+};
+
+/**
+ * Production keeps every fixture-backed clinic room switched off until its API lands (D8): a
+ * production deploy must name each in `VITE_DISABLED_MODULES`. The profile's default says the
+ * same, but defaults are not applied at runtime — a build without the key would ship the
+ * fixture rooms to real clinics, so the deploy is refused instead.
+ */
+const FIXTURE_ROOMS_OFF_RULE: RequiredKeyRule = {
+  key: 'VITE_DISABLED_MODULES',
+  when: () => FIXTURE_BACKED_CLINIC_MODULES.length > 0,
+  satisfiedBy: (value) => {
+    const off = resolveDisabledModules(value);
+    return FIXTURE_BACKED_CLINIC_MODULES.every((module) => off.has(module));
+  },
+  condition: `naming every fixture-backed clinic room (${FIXTURE_BACKED_CLINIC_MODULES.join(', ')}) until its API lands — D8`,
+  level: 'error',
 };
 
 const devLikeContract: Omit<EnvProfile, 'defaults'> = {
@@ -490,6 +510,7 @@ export const envProfiles: Readonly<Record<AppEnvironment, EnvProfile>> = {
         level: 'warn',
       },
       CSP_REPORT_URI_RULE,
+      FIXTURE_ROOMS_OFF_RULE,
     ],
     forbidden: [
       ...SONAR_LOCAL_ONLY,
@@ -507,15 +528,16 @@ export const envProfiles: Readonly<Record<AppEnvironment, EnvProfile>> = {
       VITE_E2E_HOOKS: ['false'],
       VITE_VERSION_CHECK: ['true'],
     },
-    // Production-safe defaults (each ∈ allowed above): diagnostics off, polling on,
-    // and the fixture-backed clinic rooms switched off until their API lands (D8).
+    // Production-safe defaults (each ∈ allowed above): diagnostics off, polling on. The
+    // fixture-backed rooms are NOT a default: `github:sync` prunes a variable equal to its
+    // default (assuming the runtime falls back to it), and the runtime never applies this one —
+    // the deploy would ship every room. `FIXTURE_ROOMS_OFF_RULE` refuses that deploy instead (D8).
     defaults: {
       VITE_APP_ENV: 'production',
       VITE_DEBUG_LOGGING: 'false',
       VITE_DEVTOOLS: 'false',
       VITE_E2E_HOOKS: 'false',
       VITE_VERSION_CHECK: 'true',
-      VITE_DISABLED_MODULES: FIXTURE_BACKED_CLINIC_MODULES.join(','),
     },
   },
 };

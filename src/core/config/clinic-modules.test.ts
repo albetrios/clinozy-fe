@@ -25,20 +25,16 @@ describe('clinic module keys (D8)', () => {
     expect(FIXTURE_BACKED_CLINIC_MODULES).toEqual([CLINIC_MODULES.medical]);
   });
 
-  it('production disables every fixture-backed room until its API lands', () => {
-    const disabled = resolveDisabledModules(
-      envProfiles.production.defaults?.VITE_DISABLED_MODULES,
+  it('a production deploy must switch off exactly the fixture-backed rooms to pass (D8)', () => {
+    const rule = envProfiles.production.required.find(
+      (candidate) => candidate.key === 'VITE_DISABLED_MODULES',
     );
-    for (const key of FIXTURE_BACKED_CLINIC_MODULES) expect(disabled.has(key)).toBe(true);
-    expect(disabled.has(CLINIC_MODULES.leads)).toBe(false);
-    expect(disabled.has(CLINIC_MODULES.appointments)).toBe(false);
-    expect(disabled.has(CLINIC_MODULES.patients)).toBe(false);
-    expect(disabled.has(CLINIC_MODULES.offerings)).toBe(false);
-    expect(disabled.has(CLINIC_MODULES.stock)).toBe(false);
-    expect(disabled.has(CLINIC_MODULES.tasks)).toBe(false);
-    expect(disabled.has(CLINIC_MODULES.today)).toBe(false);
-    expect(disabled.has(CLINIC_MODULES.payments)).toBe(false);
-    expect(disabled.has(CLINIC_MODULES.users)).toBe(false);
+    expect(rule?.satisfiedBy?.(FIXTURE_BACKED_CLINIC_MODULES.join(','))).toBe(true);
+    // Every live room may stay on: naming only the fixture-backed ones is enough.
+    const live = Object.values(CLINIC_MODULES).filter(
+      (key) => !FIXTURE_BACKED_CLINIC_MODULES.includes(key),
+    );
+    expect(rule?.satisfiedBy?.(live.join(','))).toBe(false);
   });
 
   it('local and development keep the rooms on', () => {

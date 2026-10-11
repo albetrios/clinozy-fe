@@ -102,6 +102,36 @@ describe('deploy env sync policy', () => {
     }
   });
 
+  it('deployed and preview builds receive the switched-off modules', () => {
+    // Production switches the fixture-backed clinic rooms off through this key (D8); the
+    // schema's per-environment default is not applied at runtime, so a build without it
+    // would ship every room — the client-env gate refuses that deploy instead.
+    const config = JSON.parse(
+      readFileSync(join(process.cwd(), 'tooling/setup/setup.config.json'), 'utf8'),
+    ) as { environments: { name: string; deployVariables: string[] }[] };
+    for (const [name, source, validateStep] of [
+      [
+        'reusable-netlify-deploy.yml',
+        reusable,
+        String.raw`Validate client env \(VITE_\*\)`,
+      ],
+      ['preview.yml', preview, String.raw`Validate client env \(development profile\)`],
+    ] as const) {
+      expect(materializeList(source), `${name} must materialize it`).toContain(
+        'VITE_DISABLED_MODULES',
+      );
+      expect(stepEnvKeys(source, validateStep), `${name} must validate it`).toContain(
+        'VITE_DISABLED_MODULES',
+      );
+    }
+    for (const environment of config.environments) {
+      expect(
+        environment.deployVariables,
+        `${environment.name} must sync VITE_DISABLED_MODULES as a variable`,
+      ).toContain('VITE_DISABLED_MODULES');
+    }
+  });
+
   it('every materialized key is supplied by the build step env block', () => {
     for (const [source, stepName] of [
       [reusable, 'Build'],
