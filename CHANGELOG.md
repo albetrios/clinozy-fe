@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.11.0](https://github.com/albetrios/clinozy-fe/compare/v1.10.0...v1.11.0) (2026-10-03)
+
+
+### Added
+
+* **setup:** setup:local fills external credentials into .env.local ([#39](https://github.com/albetrios/clinozy-fe/issues/39)) ([b9fbd0a](https://github.com/albetrios/clinozy-fe/commit/b9fbd0ad835d0e42995e7210a856aac3cef8de3b))
+
+
+### Fixed
+
+* **agent-os:** re-inject the resume card after compaction via SessionStart `compact` ([#36](https://github.com/albetrios/clinozy-fe/issues/36)) ([557d510](https://github.com/albetrios/clinozy-fe/commit/557d510cdbe3de0878856a4474b6c568d4e72eaa))
+* **mcp:** semgrep runs the CLI's built-in MCP; sonarqube gets its token from .env.local ([#38](https://github.com/albetrios/clinozy-fe/issues/38)) ([104512f](https://github.com/albetrios/clinozy-fe/commit/104512fe28859835601a263222c735df02aabc3a))
+* **setup:** setup:local names the credentials it checked and warns on unsourced ones ([#40](https://github.com/albetrios/clinozy-fe/issues/40)) ([5ac0d43](https://github.com/albetrios/clinozy-fe/commit/5ac0d439b95efc3d20e889b1d09220a72e2cfa61))
+
 ## [1.10.0](https://github.com/albetrios/clinozy-fe/compare/v1.9.3...v1.10.0) (2026-10-03)
 
 
