@@ -95,7 +95,10 @@ function followRecordingConsent(Sentry: SentryModule, recordingAtInit: boolean):
       Sentry.addIntegration(sessionReplayIntegration(Sentry));
       replayAdded = true;
     }
-    if (!granted) void Sentry.getReplay()?.stop();
+    if (!granted)
+      Sentry.getReplay()
+        ?.stop()
+        .catch(() => undefined);
   });
 }
 
