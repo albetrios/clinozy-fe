@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2203 src files · ~1073 tests in src/ · 50 E2E specs · 26 shadcn UI primitives
+Stats: ~2203 src files · ~1073 tests in src/ · 58 E2E specs · 26 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -2898,13 +2898,21 @@ clinozy-fe/
 │   │   │   └── e2e-init.json
 │   │   ├── visual.e2e.test.ts-snapshots/
 │   │   │   ├── 404-dark-chromium-darwin.png
+│   │   │   ├── 404-dark-chromium-linux.png
 │   │   │   ├── 404-light-chromium-darwin.png
+│   │   │   ├── 404-light-chromium-linux.png
 │   │   │   ├── accept-invite-error-light-chromium-darwin.png
+│   │   │   ├── accept-invite-error-light-chromium-linux.png
 │   │   │   ├── login-dark-chromium-darwin.png
+│   │   │   ├── login-dark-chromium-linux.png
 │   │   │   ├── login-dark-glass-hairline-chromium-darwin.png
+│   │   │   ├── login-dark-glass-hairline-chromium-linux.png
 │   │   │   ├── login-light-chromium-darwin.png
+│   │   │   ├── login-light-chromium-linux.png
 │   │   │   ├── login-theme-extremes-chromium-darwin.png
-│   │   │   └── today-chromium-darwin.png
+│   │   │   ├── login-theme-extremes-chromium-linux.png
+│   │   │   ├── today-chromium-darwin.png
+│   │   │   └── today-chromium-linux.png
 │   │   ├── global-setup.ts
 │   │   └── [40 test files]
 │   ├── factories/

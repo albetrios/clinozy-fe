@@ -4,6 +4,7 @@ import {
   AUTH_EMAIL_CODE_LOGIN_PATH,
   AUTH_EMAIL_CODE_SEND_PATH,
 } from '@/tests/utils/auth-api-paths.ts';
+import { probeLiveDeployment } from '@/tests/utils/e2e-deployment-mode.ts';
 import { e2eTeamOrgProfile } from '@/tests/utils/e2e-faker.ts';
 import {
   createSessionViaEmailCode,
@@ -29,6 +30,15 @@ test.afterAll(async () => {
 test.describe('clinozy-be server — auth & tenancy contracts', () => {
   test.describe.configure({ mode: 'serial' });
 
+  /** Whether a new account gets a personal workspace here — a team-only deployment gives none. */
+  let personalWorkspaces = true;
+
+  test.beforeAll(async () => {
+    const { accessToken } = await createSessionViaEmailCode(api);
+    personalWorkspaces = (await probeLiveDeployment(api, accessToken)).flags
+      .personalOrganizations;
+  });
+
   test('[+] email send-code returns uniform 200 + request_id', async () => {
     const email = uniqueE2eEmail();
     const res = await api.post(AUTH_EMAIL_CODE_SEND_PATH, {
@@ -48,6 +58,7 @@ test.describe('clinozy-be server — auth & tenancy contracts', () => {
   });
 
   test('[+] me/context exposes the auto-created PERSONAL org (status ACTIVE)', async () => {
+    test.skip(!personalWorkspaces, 'personal workspaces are off on this deployment');
     const { accessToken } = await createSessionViaEmailCode(api);
     const ctx = await api.get('/api/v1/auth/me/context', {
       headers: { Authorization: `Bearer ${accessToken}` },
@@ -60,8 +71,24 @@ test.describe('clinozy-be server — auth & tenancy contracts', () => {
     expect(Array.isArray(data.my_permissions)).toBe(true);
   });
 
+  test('[+] me/context has no workspace until a clinic is made (team-only)', async () => {
+    test.skip(
+      personalWorkspaces,
+      'this deployment gives a new account a personal workspace',
+    );
+    const { accessToken } = await createSessionViaEmailCode(api);
+    const ctx = await api.get('/api/v1/auth/me/context', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    expect(ctx.status()).toBe(200);
+    const { data } = await ctx.json();
+    expect(data.active_organization).toBeNull();
+    expect(data.user.personal_organization_id ?? null).toBeNull();
+  });
+
   // The workspace list lives at /users/me/organizations (me/context carries none).
   test('[+] list my organizations includes the personal org', async () => {
+    test.skip(!personalWorkspaces, 'personal workspaces are off on this deployment');
     const { accessToken } = await createSessionViaEmailCode(api);
     const list = await api.get('/api/v1/users/me/organizations', {
       headers: { Authorization: `Bearer ${accessToken}` },
@@ -72,6 +99,7 @@ test.describe('clinozy-be server — auth & tenancy contracts', () => {
   });
 
   test('[+] switch-to-personal re-mints an access token', async () => {
+    test.skip(!personalWorkspaces, 'personal workspaces are off on this deployment');
     const { accessToken } = await createSessionViaEmailCode(api);
     const sw = await api.post('/api/v1/auth/switch-to-personal', {
       headers: { Authorization: `Bearer ${accessToken}` },

@@ -11,6 +11,7 @@ import {
   registerNewUserAndGoToToday,
   selectOrganizationInSwitcher,
 } from '@/tests/utils/e2e-auth.ts';
+import { probeLiveDeployment } from '@/tests/utils/e2e-deployment-mode.ts';
 import { e2eTeamOrgProfile } from '@/tests/utils/e2e-faker.ts';
 import { byTestId, gotoApp } from '@/tests/utils/e2e-hybrid.ts';
 import {
@@ -52,9 +53,15 @@ test.describe('Auth workflow (API)', () => {
       headers: bearerHeaders(accessToken),
     });
     expect(ctx.status()).toBe(200);
+    // A personal workspace where the deployment has them; none until a clinic in team-only.
     const activeOrg = (await ctx.json()).data.active_organization;
-    expect(activeOrg.type).toBe('PERSONAL');
-    expect(activeOrg.status).toBe('ACTIVE');
+    const { flags } = await probeLiveDeployment(api, accessToken);
+    if (flags.personalOrganizations) {
+      expect(activeOrg.type).toBe('PERSONAL');
+      expect(activeOrg.status).toBe('ACTIVE');
+    } else {
+      expect(activeOrg).toBeNull();
+    }
 
     const logout = await api.post(`${API}/auth/logout`, {
       headers: bearerHeaders(accessToken),
@@ -100,21 +107,25 @@ test.describe('Tenancy workflow (API)', () => {
     expect(bySlug.status()).toBe(200);
   });
 
-  test('personal org cannot create memberships (422 guard)', async () => {
+  test('a session outside any clinic cannot create memberships (422 personal · 403 none)', async () => {
     const { accessToken } = await createSessionViaEmailCode(api);
+    const { flags } = await probeLiveDeployment(api, accessToken);
     const res = await api.post(`${API}/tenancy/organization/memberships`, {
       headers: bearerHeaders(accessToken, true),
-      data: { email: uniqueE2eEmail('invite'), role_id: 'rol_zzzzzzzzzzzzzzzzzzzzz' },
+      data: { email: uniqueE2eEmail('invite'), role_ids: ['rol_zzzzzzzzzzzzzzzzzzzzz'] },
     });
-    expect(res.status()).toBe(422);
+    expect(res.status()).toBe(flags.personalOrganizations ? 422 : 403);
   });
 });
 
 test.describe('Invitations workflow (API)', () => {
   test('accept invite without auth returns 401 (not 500)', async () => {
-    const res = await api.post(`${API}/tenancy/invitations/inv_expired/accept`, {
-      data: {},
-    });
+    const res = await api.post(
+      `${API}/tenancy/membership-invitations/inv_expired/accept`,
+      {
+        data: {},
+      },
+    );
     expect(res.status()).toBe(401);
     expect((await res.json()).error).toBeTruthy();
   });
@@ -122,7 +133,7 @@ test.describe('Invitations workflow (API)', () => {
   test('authenticated accept of an unknown invitation fails cleanly (4xx, not 500)', async () => {
     const { accessToken } = await createSessionViaEmailCode(api);
     const res = await api.post(
-      `${API}/tenancy/invitations/inv_${'z'.repeat(21)}/accept`,
+      `${API}/tenancy/membership-invitations/inv_${'z'.repeat(21)}/accept`,
       {
         headers: bearerHeaders(accessToken),
         data: {},
@@ -135,10 +146,13 @@ test.describe('Invitations workflow (API)', () => {
 
   test('authenticated accept of a malformed invitation id fails cleanly (4xx, not 500)', async () => {
     const { accessToken } = await createSessionViaEmailCode(api);
-    const res = await api.post(`${API}/tenancy/invitations/not-a-valid-id/accept`, {
-      headers: bearerHeaders(accessToken),
-      data: {},
-    });
+    const res = await api.post(
+      `${API}/tenancy/membership-invitations/not-a-valid-id/accept`,
+      {
+        headers: bearerHeaders(accessToken),
+        data: {},
+      },
+    );
     expect(res.status()).toBeGreaterThanOrEqual(400);
     expect(res.status()).toBeLessThan(500);
   });

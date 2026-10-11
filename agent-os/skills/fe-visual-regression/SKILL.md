@@ -14,8 +14,11 @@ extreme values are pinned as pixels.
 
 ## Ground rules
 
-- **Local-only lane.** Baselines are platform-pinned (`*-chromium-darwin.png`);
-  the suite needs clinozy-be on `:3000` (Playwright `global-setup` enforces it — env
+- **Local-only lane.** Baselines are platform-pinned: `*-chromium-darwin.png` for macOS,
+  `*-chromium-linux.png` for a Linux machine or cloud container. Make a Linux set from a
+  checkout whose `node_modules` is a real folder — a git worktree's symlinked one makes Vite
+  refuse the font files (`/@fs/` 403), and the shots fall back to system fonts. The suite
+  needs clinozy-be on `:3000` (Playwright `global-setup` enforces it — env
   steps in `agent-os/skills/fe-playwright-e2e/SKILL.md`). CI never runs it; do not
   wire it into a workflow without a Docker-pinned runner and a fresh baseline set.
 - **Determinism is non-negotiable.** Every test inherits

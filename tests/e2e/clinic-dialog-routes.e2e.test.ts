@@ -22,8 +22,14 @@ import { verifyDatabaseConnection } from '@/tests/utils/e2e-session.ts';
  * the clinic goes to the member's role home with "Page not found".
  */
 
-/** Matches no record in the fixture world, and is shaped like every clinic id. */
-const UNKNOWN_ID = '00000000-0000-4000-8000-00000000dead';
+/**
+ * A public id no record has: the entity's prefix and 21 characters (`lead_zzz…`), shaped like
+ * every id the API issues, so the room reads it and the API answers 404.
+ */
+const unknownId = (prefix: string): string => `${prefix}_${'z'.repeat(21)}`;
+
+/** Matches no sale in the fixture world (Medical still runs on fixtures, parked). */
+const UNKNOWN_FIXTURE_ID = '00000000-0000-4000-8000-00000000dead';
 
 /** A cold load of a path inside the clinic — the session comes back from the refresh cookie. */
 async function coldLoad(page: Page, slug: string, path: string): Promise<void> {
@@ -63,10 +69,8 @@ const CREATE_ROUTES = [
 
 /**
  * Record routes: opened from the room's list, then reloaded — the id in the URL
- * alone brings the drawer back over its room. Records with stable fixture ids
- * only: the fixture world re-derives the Tasks rules' tasks on every load with
- * new ids, so a refreshed rule task says "Task not found" until the Tasks API
- * lands (L-60) — the unknown-id case below covers its route.
+ * alone brings the drawer back over its room. The clinic is seeded through the
+ * API (`seedClinic`), so each room has a real row; Medical's sale is a fixture's.
  */
 const RECORD_ROUTES: readonly {
   room: ClinicRoom;
@@ -102,20 +106,42 @@ const RECORD_ROUTES: readonly {
 
 /** Unknown ids: the parent page, the toast naming the record, and the parent's URL. */
 const UNKNOWN_RECORD_ROUTES = [
-  { path: `leads/${UNKNOWN_ID}`, room: 'leads', record: /^Lead not found/ },
   {
-    path: `appointments/${UNKNOWN_ID}`,
+    id: unknownId('lead'),
+    path: `leads/${unknownId('lead')}`,
+    room: 'leads',
+    record: /^Lead not found/,
+  },
+  {
+    id: unknownId('appt'),
+    path: `appointments/${unknownId('appt')}`,
     room: 'appointments',
     record: /^Appointment not found/,
   },
-  { path: `tasks/${UNKNOWN_ID}`, room: 'tasks', record: /^Task not found/ },
   {
-    path: `offerings/${UNKNOWN_ID}/edit`,
+    id: unknownId('task'),
+    path: `tasks/${unknownId('task')}`,
+    room: 'tasks',
+    record: /^Task not found/,
+  },
+  {
+    id: unknownId('off'),
+    path: `offerings/${unknownId('off')}/edit`,
     room: 'offerings',
     record: /^Offering not found/,
   },
-  { path: `medical/sales/${UNKNOWN_ID}`, room: 'medical', record: /^Sale not found/ },
-] as const satisfies readonly { path: string; room: ClinicRoom; record: RegExp }[];
+  {
+    id: UNKNOWN_FIXTURE_ID,
+    path: `medical/sales/${UNKNOWN_FIXTURE_ID}`,
+    room: 'medical',
+    record: /^Sale not found/,
+  },
+] as const satisfies readonly {
+  id: string;
+  path: string;
+  room: ClinicRoom;
+  record: RegExp;
+}[];
 
 test.beforeEach(async () => {
   test.skip(
@@ -143,7 +169,7 @@ test.describe('Clinic dialog routes — deep links', () => {
 
   test('a record route reopens its drawer after a reload', async ({ page }) => {
     test.setTimeout(180_000);
-    await openNewClinic(page);
+    await openNewClinic(page, { seed: true });
     for (const route of RECORD_ROUTES) {
       await test.step(route.room, async () => {
         await openRoomFromShell(page, route.room, 'desktop');
@@ -177,7 +203,7 @@ test.describe('Clinic dialog routes — deep links', () => {
         await coldLoad(page, slug, route.path);
         await expectToast(page, route.record);
         await expectRoomReady(page, route.room);
-        await expect(page).not.toHaveURL(new RegExp(UNKNOWN_ID));
+        await expect(page).not.toHaveURL(new RegExp(route.id));
         await expect(page.getByRole('dialog')).toHaveCount(0);
       });
     }

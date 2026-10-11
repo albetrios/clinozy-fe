@@ -113,7 +113,6 @@ test.describe('Organization lifecycle — rename, role change, removal', () => {
       // Invite through the Users room's "New user" — the members surface (D17).
       await navigateInApp(page, `/organization/${slug}/users/create`);
       await expect(page.getByTestId('user-drawer')).toBeVisible({ timeout: 10_000 });
-      await byTestId(page, 'user-drawer-name').fill('Lifecycle Invitee');
       await byTestId(page, 'user-drawer-email').fill(inviteeEmail);
       const invite = page.waitForResponse(
         (response) =>
@@ -134,7 +133,7 @@ test.describe('Organization lifecycle — rename, role change, removal', () => {
       }
       const row = page
         .getByTestId('users-team-table-row')
-        .filter({ hasText: 'Lifecycle Invitee' });
+        .filter({ hasText: inviteeEmail });
       await expect(row).toHaveCount(1, { timeout: 15_000 });
 
       // Accept via API as the invitee — both the invitation id and the raw
@@ -144,7 +143,7 @@ test.describe('Organization lifecycle — rename, role change, removal', () => {
       inviteeApi = await playwright.request.newContext({ baseURL: HOST });
       const invitee = await createSessionViaEmailCode(inviteeApi, inviteeEmail);
       const accept = await inviteeApi.post(
-        `${API}/tenancy/invitations/${invitationId}/accept`,
+        `${API}/tenancy/membership-invitations/${invitationId}/accept`,
         {
           headers: { Authorization: `Bearer ${invitee.accessToken}` },
           data: { token: invitationToken },
@@ -158,7 +157,11 @@ test.describe('Organization lifecycle — rename, role change, removal', () => {
       await navigateInApp(page, `/organization/${slug}/users`);
       await row.click();
       await expect(page.getByTestId('user-drawer')).toBeVisible({ timeout: 10_000 });
-      await byTestId(page, 'user-drawer-roles-admin').click();
+      await page
+        .locator('[data-testid^="user-drawer-roles-"]')
+        .filter({ hasText: /^Admin$/ })
+        .first()
+        .click();
       await byTestId(page, 'user-drawer-save').click();
       await expect(row).toContainText(/admin/i, { timeout: 15_000 });
 

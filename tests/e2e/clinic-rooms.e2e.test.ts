@@ -19,9 +19,9 @@ import { verifyDatabaseConnection } from '@/tests/utils/e2e-session.ts';
  * phone viewport, opened from the shell the way a member opens it and walked
  * through one happy path — on a brand-new clinic whose owner lands on Today.
  *
- * The rooms run on the fixture world until their APIs land (D6, D8 — local
- * and development turn the clinic modules on), so the rows are the
- * prototype's seeds and every new clinic sees the same ones.
+ * The rooms read the live clinozy-be, so each new clinic is seeded through the API before its
+ * owner walks in (`seedClinic`: a branch open all week, an offering, a patient, a lead, a task
+ * and a booking later today). Medical alone still runs on the fixture world (parked).
  */
 
 /**
@@ -171,7 +171,11 @@ for (const tier of Object.keys(CLINIC_VIEWPORTS) as ClinicTier[]) {
 
     for (const room of CLINIC_ROOMS) {
       test(`${room} opens from the shell and its happy path works`, async ({ page }) => {
-        await openNewClinic(page);
+        const { seed } = await openNewClinic(page, { seed: true });
+        test.skip(
+          room === 'today' && !seed?.appointmentId,
+          'no bookable slot is left today in the clinic’s time zone',
+        );
         // Today is where an owner lands (D25); every other room opens from the shell.
         if (room !== 'today') await openRoomFromShell(page, room, tier);
         await HAPPY_PATHS[room](page);

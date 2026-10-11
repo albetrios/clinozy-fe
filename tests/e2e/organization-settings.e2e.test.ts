@@ -115,7 +115,6 @@ test.describe('Organization settings', () => {
     // Inviting moved from Settings to the Users room's "New user" (D17).
     await navigateInApp(page, `/organization/${ctx?.slug}/users/create`);
     await expect(page.getByTestId('user-drawer')).toBeVisible({ timeout: 15000 });
-    await byTestId(page, 'user-drawer-name').fill('Invite Retained');
 
     const recipient = uniqueE2eEmail('invite-retained');
     const emailField = byTestId(page, 'user-drawer-email');

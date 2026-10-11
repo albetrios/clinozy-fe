@@ -1,10 +1,16 @@
-import { expect, type Locator, type Page, test } from '@playwright/test';
+import {
+  type APIRequestContext,
+  expect,
+  type Locator,
+  type Page,
+  test,
+} from '@playwright/test';
 
 import { establishSessionInPage, navigateInApp } from '@/tests/utils/e2e-auth.ts';
 import { probeLiveDeployment } from '@/tests/utils/e2e-deployment-mode.ts';
 import { byTestId, expectLoginFormReady, gotoApp } from '@/tests/utils/e2e-hybrid.ts';
 import { createSessionViaEmailCode } from '@/tests/utils/e2e-session.ts';
-import { createTeamOrganization } from '@/tests/utils/e2e-tenancy.ts';
+import { bearerHeaders, createTeamOrganization } from '@/tests/utils/e2e-tenancy.ts';
 
 /** The clinic rooms (KICKOFF §4) by their nav id, in nav order. */
 export const CLINIC_ROOMS = [
@@ -90,6 +96,173 @@ export async function hideDevtools(page: Page): Promise<void> {
   });
 }
 
+const API = '/api/v1';
+
+/** Every weekday: the seeded clinic and its owner work all week, so a booking fits any day. */
+const EVERY_DAY = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
+
+/** The records a room's happy path opens in a new clinic, made by its owner through the API. */
+export interface ClinicSeed {
+  branchId: string;
+  offeringId: string;
+  patientId: string;
+  leadId: string;
+  taskId: string;
+  /** A booking later today, in the arriving lane; `null` when no slot is left today. */
+  appointmentId: string | null;
+}
+
+/** A `data` answer, or a thrown error naming the call. */
+async function seedData<T>(
+  response: Awaited<ReturnType<APIRequestContext['post']>>,
+  call: string,
+): Promise<T> {
+  if (!response.ok()) {
+    throw new Error(`seed ${call} failed: ${response.status()} ${await response.text()}`);
+  }
+  return ((await response.json()) as { data: T }).data;
+}
+
+/** A mobile number no other seeded person in the clinic has (`contact_phone_exists`). */
+function seedPhone(): string {
+  return `+9198${String(Math.floor(Math.random() * 1e8)).padStart(8, '0')}`;
+}
+
+/** Today in `timeZone`, as the API's `appointment_date` (`YYYY-MM-DD`). */
+function todayIn(timeZone: string): string {
+  return new Intl.DateTimeFormat('en-CA', { timeZone }).format(new Date());
+}
+
+/**
+ * Fills a brand-new clinic with one of everything the rooms list — a branch open all week, an
+ * offering, a patient, a lead, a task for the owner and a booking later today — so every room's
+ * happy path meets a real row on the live clinozy-be. The owner works every day and every hour, so
+ * the booking does not depend on the weekday the suite runs on.
+ */
+export async function seedClinic(
+  api: APIRequestContext,
+  token: string,
+): Promise<ClinicSeed> {
+  const write = (path: string, data: unknown, method: 'post' | 'patch' = 'post') =>
+    api[method](`${API}${path}`, { headers: bearerHeaders(token, true), data });
+  const read = (path: string) =>
+    api.get(`${API}${path}`, { headers: bearerHeaders(token) });
+
+  const context = await seedData<{ membership_id: string }>(
+    await read('/auth/me/context'),
+    'context',
+  );
+  const ownerId = context.membership_id;
+  await seedData(
+    await write(
+      `/tenancy/organization/memberships/${ownerId}`,
+      { working_days: EVERY_DAY, work_starts_at: '00:00', work_ends_at: '23:59' },
+      'patch',
+    ),
+    'owner hours',
+  );
+  const organization = await seedData<{ timezone: string }>(
+    await read('/tenancy/organization'),
+    'organization',
+  );
+  const branch = await seedData<{ id: string }>(
+    await write('/app/branches', {
+      name: 'Main',
+      address_line_one: '12, Ocean Arcade',
+      area: 'Vesu',
+      city: 'Surat',
+      postal_code: '395007',
+      phone: seedPhone(),
+      email: 'main@example.com',
+      opens_at: '00:00',
+      closes_at: '23:59',
+      working_days: EVERY_DAY,
+    }),
+    'branch',
+  );
+  const offering = await seedData<{ id: string }>(
+    await write('/app/offerings', {
+      name: 'Skin consultation',
+      category: 'consultation',
+      specialty: 'skin',
+      tone: 'sky',
+      price: 500,
+      duration_minutes: 15,
+      gst_percent: 18,
+      is_gst_inclusive: true,
+      branch_ids: [branch.id],
+    }),
+    'offering',
+  );
+  const patient = await seedData<{ id: string; contact_id: string }>(
+    await write('/app/patients', {
+      home_branch_id: branch.id,
+      contact: {
+        first_name: 'Asha',
+        last_name: 'Patel',
+        phones: [{ phone: seedPhone(), is_primary: true }],
+      },
+    }),
+    'patient',
+  );
+  const lead = await seedData<{ id: string }>(
+    await write('/app/leads', {
+      contact: {
+        first_name: 'Neha',
+        last_name: 'Shah',
+        phones: [{ phone: seedPhone(), is_primary: true }],
+      },
+      source: 'instagram',
+      branch_id: branch.id,
+      owner_membership_id: ownerId,
+    }),
+    'lead',
+  );
+  const task = await seedData<{ id: string }>(
+    await write('/app/tasks', {
+      title: 'Call Asha about her consultation',
+      due_at: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+      owner_membership_id: ownerId,
+      contact_id: patient.contact_id,
+    }),
+    'task',
+  );
+
+  const date = todayIn(organization.timezone);
+  const slots = await seedData<{ slots: { start_time: string }[] }>(
+    await read(
+      `/app/appointments/slots?branch_id=${branch.id}&appointment_date=${date}` +
+        `&duration_minutes=15&doctor_membership_id=${ownerId}`,
+    ),
+    'slots',
+  );
+  const start = slots.slots[0]?.start_time;
+  const appointment = start
+    ? await seedData<{ id: string }>(
+        await write('/app/appointments', {
+          contact_id: patient.contact_id,
+          branch_id: branch.id,
+          doctor_membership_id: ownerId,
+          appointment_date: date,
+          start_time: start,
+          type: 'consultation',
+          offering_id: offering.id,
+          duration_minutes: 15,
+        }),
+        'appointment',
+      )
+    : null;
+
+  return {
+    branchId: branch.id,
+    offeringId: offering.id,
+    patientId: patient.id,
+    leadId: lead.id,
+    taskId: task.id,
+    appointmentId: appointment?.id ?? null,
+  };
+}
+
 /**
  * A brand-new user who owns a brand-new clinic (a team organization), signed in
  * and standing in it on their role home — Today for an owner (D25).
@@ -100,12 +273,13 @@ export async function hideDevtools(page: Page): Promise<void> {
  * already scoped to the clinic, so the guards meet a provisioned owner. Skips
  * when the live clinozy-be has team organizations turned off — there is no
  * clinic to open then. `email` signs in a given address instead of a fresh one —
- * someone a spec has already invited elsewhere, say.
+ * someone a spec has already invited elsewhere, say. `seed` fills the clinic
+ * (`seedClinic`) before the owner walks in, so the rooms have rows to open.
  */
 export async function openNewClinic(
   page: Page,
-  options: { email?: string } = {},
-): Promise<{ slug: string; email: string }> {
+  options: { email?: string; seed?: boolean } = {},
+): Promise<{ slug: string; email: string; seed: ClinicSeed | null }> {
   await hideDevtools(page);
   await gotoApp(page, '/login');
   await expectLoginFormReady(page);
@@ -126,11 +300,13 @@ export async function openNewClinic(
   const slug = org?.slug ?? '';
   expect(slug, `the clinic was not created (${createStatus})`).not.toBe('');
 
+  const seed = options.seed ? await seedClinic(page.request, teamToken) : null;
+
   await establishSessionInPage(page, teamToken);
 
   await navigateInApp(page, `/organization/${slug}`);
   await expectRoomReady(page, 'today');
-  return { slug, email };
+  return { slug, email, seed };
 }
 
 /**

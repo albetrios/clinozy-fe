@@ -93,7 +93,13 @@ test.describe('Accessibility', () => {
     const slug = /^\/organization\/([^/]+)\//.exec(new URL(page.url()).pathname)?.[1];
     expect(slug, 'landed outside a clinic').toBeTruthy();
 
-    await navigateInApp(page, `/organization/${slug}/users/roles?role=doctor`);
+    // The URL's `?role=` is a role id (D157): pick the Doctor preset from the list by its name.
+    await navigateInApp(page, `/organization/${slug}/users/roles`);
+    await page
+      .locator('[data-testid^="users-roles-item-"]')
+      .filter({ hasText: /^Doctor/ })
+      .first()
+      .click();
     await expectHybridVisible(page, 'users-role-preview', {
       role: 'button',
       name: /^preview as doctor$/i,
