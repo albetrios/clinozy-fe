@@ -1,5 +1,6 @@
 import { HoverCard as HoverCardPrimitive } from 'radix-ui';
 import type * as React from 'react';
+import { useRef } from 'react';
 
 import { cn } from '@/lib/utils.ts';
 
@@ -7,10 +8,39 @@ function HoverCard({ ...props }: React.ComponentProps<typeof HoverCardPrimitive.
   return <HoverCardPrimitive.Root data-slot="hover-card" {...props} />;
 }
 
+/**
+ * The trigger, opening on hover and on keyboard focus — but not again on the focus a click gives
+ * it. Radix schedules the open on pointer enter AND on focus, and keeps only the second timer's
+ * id: the first outlives a pointer leave (the card opens after the pointer has gone) and an
+ * unmount (in a test, a timer that fires after its window is torn down). The pointer already
+ * asked for the card; a focus that follows a press on the trigger is not asked twice.
+ */
 function HoverCardTrigger({
+  onPointerDown,
+  onFocus,
+  onBlur,
   ...props
 }: React.ComponentProps<typeof HoverCardPrimitive.Trigger>) {
-  return <HoverCardPrimitive.Trigger data-slot="hover-card-trigger" {...props} />;
+  const pressed = useRef(false);
+  return (
+    <HoverCardPrimitive.Trigger
+      data-slot="hover-card-trigger"
+      onPointerDown={(event) => {
+        pressed.current = true;
+        onPointerDown?.(event);
+      }}
+      onFocus={(event) => {
+        onFocus?.(event);
+        if (pressed.current) event.preventDefault();
+        pressed.current = false;
+      }}
+      onBlur={(event) => {
+        pressed.current = false;
+        onBlur?.(event);
+      }}
+      {...props}
+    />
+  );
 }
 
 function HoverCardContent({
