@@ -5,12 +5,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const {
   getActiveSubscription,
+  listBillingPlans,
   createSubscription,
   changeSubscriptionPlan,
   cancelSubscription,
   resumeSubscription,
 } = vi.hoisted(() => ({
   getActiveSubscription: vi.fn(),
+  listBillingPlans: vi.fn(),
   createSubscription: vi.fn(),
   changeSubscriptionPlan: vi.fn(),
   cancelSubscription: vi.fn(),
@@ -18,6 +20,7 @@ const {
 }));
 vi.mock('@/shared/api/billing-api.ts', () => ({
   getActiveSubscription,
+  listBillingPlans,
   createSubscription,
   changeSubscriptionPlan,
   cancelSubscription,
@@ -35,6 +38,7 @@ import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 import {
+  useBillingPlans,
   useCancelSubscription,
   useResumeSubscription,
   useSelectBillingPlan,
@@ -82,6 +86,21 @@ describe('useSubscription', () => {
 
     await waitFor(() => expect(result.current.fetchStatus).toBe('idle'));
     expect(getActiveSubscription).not.toHaveBeenCalled();
+  });
+});
+
+describe('useBillingPlans', () => {
+  // The catalog needs no permission: a personal workspace reads it too.
+  it('loads the plan catalog without subscription:read', async () => {
+    useOrganizationStore.setState({ permissions: [] });
+    const plans = [{ id: 'pln_free', name: 'Free' }];
+    listBillingPlans.mockResolvedValue(plans);
+
+    const { result } = renderHook(() => useBillingPlans(), { wrapper });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data).toEqual(plans);
+    expect(listBillingPlans).toHaveBeenCalledOnce();
   });
 });
 
