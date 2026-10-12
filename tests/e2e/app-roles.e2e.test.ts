@@ -21,7 +21,9 @@ import { bearerHeaders, createTeamOrganization } from '@/tests/utils/e2e-tenancy
 /**
  * Role QA (L-60, D157): a member sees the clinic their permission codes allow — no more, no less.
  * The spec opens its own clinic on the live clinozy-be (never a shared one) with one branch and one
- * patient, and walks it as a Front desk, a Doctor, an Accountant and a Marketing member: their home,
+ * patient, and walks it as each preset View-as can preview — Front desk, Doctor, Therapist,
+ * Counsellor, Pharmacist, Accountant and Marketing (Admin is the locked role and offers no preview;
+ * the Owner is the session itself): their home,
  * the rooms that open and the ones that send them away, the create and money controls, and the
  * patient file's clinical sections. The codes are clinozy-be's presets (after D83), read by the
  * role's id; the client keeps no role matrix.
@@ -100,6 +102,60 @@ const ROLES: readonly RoleExpectation[] = [
     ],
     // Reads the bills, takes no money.
     hides: [['payments', 'payments-receive']],
+    readsPrescriptions: true,
+  },
+  {
+    role: 'Therapist',
+    home: 'today',
+    opens: ['appointments', 'patients', 'stock', 'tasks', 'offerings'],
+    sendsAway: ['leads', 'medical', 'payments', 'users'],
+    landsOn: 'appointments',
+    shows: [
+      ['appointments', 'appointments-new-appointment'],
+      ['patients', 'patients-new'],
+    ],
+    // Today's New booking starts from an enquiry (`lead:create`), which a therapist does not hold.
+    hides: [['today', 'today-new-booking']],
+    readsPrescriptions: true,
+  },
+  {
+    role: 'Counsellor',
+    home: 'today',
+    opens: ['leads', 'appointments', 'patients', 'payments', 'tasks', 'offerings'],
+    sendsAway: ['medical', 'stock', 'users'],
+    landsOn: 'leads',
+    shows: [
+      ['today', 'today-new-booking'],
+      ['leads', 'leads-new-lead'],
+      ['patients', 'patients-new'],
+      // Fixes the bills it makes (D83 (4)).
+      ['payments', 'payments-receive'],
+    ],
+    hides: [],
+    readsPrescriptions: true,
+  },
+  {
+    role: 'Pharmacist',
+    home: 'medical',
+    opens: [
+      'today',
+      'appointments',
+      'patients',
+      'medical',
+      'stock',
+      'payments',
+      'tasks',
+      'offerings',
+    ],
+    sendsAway: ['leads', 'users'],
+    landsOn: 'appointments',
+    // Sells and collects (payment:create); reads the patients and the day's visits only.
+    shows: [['payments', 'payments-receive']],
+    hides: [
+      ['today', 'today-new-booking'],
+      ['appointments', 'appointments-new-appointment'],
+      ['patients', 'patients-new'],
+    ],
     readsPrescriptions: true,
   },
   {
