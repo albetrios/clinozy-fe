@@ -401,8 +401,17 @@ import { User } from './contracts';
 - Use `apiClient` from `@/core/http/fetch-client.ts` for all API calls.
 - Exception: the auth service uses raw `fetch` (`authFetch`) to avoid interceptor recursion.
 - The fetch client is the reactive auth layer: Bearer attach, single-flight 401 refresh
-  (concurrent 401s share ONE refresh) + one replay — a second 401 after a fresh token
-  means the session is dead → `forceLogout()`. Writes auto-carry an `X-Idempotency-Key`
+  (concurrent 401s share ONE refresh) + replay. clinozy-be keeps ONE live access token per
+  session — every refresh, workspace switch or other tab's refresh retires the one before it —
+  so a 401 for a token replaced while the request was in flight is replayed with the current
+  token, no new refresh; a refresh that waited for the lock while a newer token arrived does
+  not rotate again. Only a refused refresh, or a token still rejected after two refreshes,
+  means the session is dead → `forceLogout()`. The session's one token names the organization
+  it was last switched to, so a refresh answering for **another** organization than this tab's
+  `me/context` (another tab switched) switches the tab back before any request carries it —
+  never another clinic's records under this tab's screen. A switch waits for a refresh in
+  flight. A boot that got no answer (refresh or `me/context` offline, 429, 5xx) is asked again
+  by the next guard, not settled as signed out. Writes auto-carry an `X-Idempotency-Key`
   (minted once per logical request, reused across retries/replay). Organization context:
   the **app URL** drives the active org — guards sync it via `/auth/switch-to-organization`,
   which re-mints the access token with a signed `org` claim. API requests carry **no**

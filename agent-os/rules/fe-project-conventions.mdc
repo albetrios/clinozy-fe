@@ -87,7 +87,7 @@ pages/<page>/
 
 - Use `apiClient` from `@/core/http/fetch-client.ts` (a hand-rolled `fetch` client) for all API calls (never raw fetch except auth)
 - Exception: auth service uses raw `fetch` to avoid interceptor recursion
-- The fetch client handles 401 refresh + replay (single-flight refresh + one replay) — never handle 401 in components
+- The fetch client handles 401 refresh + replay (single-flight refresh; a token replaced in flight is replayed, not refreshed) — never handle 401 in components
 - TanStack Query's retry skips 401s (handled by the fetch client)
 
 ## Styling

@@ -318,6 +318,29 @@ async function parseJsonBody<T>(
   return { data: parsed as T };
 }
 
+/**
+ * How many times one request may be replayed because the token it carried was replaced while it
+ * was in flight (a refresh, a workspace switch, another tab) — bounded, so a token that keeps
+ * rotating can never loop.
+ */
+const MAX_ROTATION_REPLAYS = 3;
+
+/**
+ * How many refreshes one request may ask for. The second covers a replay retired by a rotation
+ * elsewhere (another tab) while this tab's token stayed the same; a token rejected after that is a
+ * dead session.
+ */
+const MAX_REFRESHES_PER_REQUEST = 2;
+
+/** Where one request stands: its retry attempt, refreshes asked for, and rotation replays. */
+interface AttemptState {
+  readonly attempt: number;
+  readonly refreshes: number;
+  readonly rotationReplays: number;
+}
+
+const FIRST_ATTEMPT: AttemptState = { attempt: 0, refreshes: 0, rotationReplays: 0 };
+
 /** Write methods carry an auto-generated X-Idempotency-Key (server de-dupes). */
 const WRITE_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
@@ -359,52 +382,86 @@ async function request<T>(
   /** A dropped connection: retried on the shared budget, or surfaced as a status-0 HttpError. */
   async function retryOrThrowNetworkError(
     err: unknown,
-    attempt: number,
-    hasRefreshed: boolean,
+    state: AttemptState,
   ): Promise<HttpResponse<T>> {
     const message = (err as Error)?.message;
     const errorKind = classifyFetchError(err);
-    const delay = nextRetryDelay({ method, attempt, status: null, errorKind });
+    const delay = nextRetryDelay({
+      method,
+      attempt: state.attempt,
+      status: null,
+      errorKind,
+    });
     if (delay === null) {
       throw new HttpError(message ?? 'Network error', 0, url, method, undefined);
     }
     await new Promise((r) => setTimeout(r, delay));
-    logRetry(attempt, url, `: ${message ?? ''}`);
-    return run(attempt + 1, hasRefreshed);
+    logRetry(state.attempt, url, `: ${message ?? ''}`);
+    return run({ ...state, attempt: state.attempt + 1 });
+  }
+
+  /**
+   * A 401 is about the token the request carried. clinozy-be keeps one live access token per
+   * session, so every refresh, workspace switch or other tab's refresh retires the token before it
+   * — and a request can be rejected for a token replaced while it was in flight. Then it is replayed
+   * with the current token and nothing rotates again (another rotation would retire tokens other
+   * requests are carrying). Otherwise the token is refreshed and the request replayed, at most
+   * {@link MAX_REFRESHES_PER_REQUEST} times: only a token still rejected after that, or a refresh
+   * the server refuses, is a dead session.
+   */
+  async function handleUnauthorized(
+    response: Response,
+    sentToken: string | null,
+    state: AttemptState,
+  ): Promise<HttpResponse<T>> {
+    const currentToken = getAccessToken();
+    if (
+      currentToken !== null &&
+      currentToken !== sentToken &&
+      state.rotationReplays < MAX_ROTATION_REPLAYS
+    ) {
+      return run({ ...state, attempt: 0, rotationReplays: state.rotationReplays + 1 });
+    }
+    if (state.refreshes >= MAX_REFRESHES_PER_REQUEST) {
+      // A token refreshed and replayed twice is still rejected: the session is
+      // genuinely dead (revoked / logout-all / expiry). Never refresh-loop — clear
+      // local auth and surface the error.
+      forceLogout();
+      throw await parseErrorResponse(response, url, method);
+    }
+    return doRefreshAndReplay(
+      () => run({ ...state, attempt: 0, refreshes: state.refreshes + 1 }),
+      { url, method },
+    );
   }
 
   // Single attempt budget shared by connection-error AND bad-status retries.
-  const run = async (attempt = 0, hasRefreshed = false): Promise<HttpResponse<T>> => {
+  const run = async (state: AttemptState = FIRST_ATTEMPT): Promise<HttpResponse<T>> => {
+    // `buildHeaders` reads the same token synchronously when `fetchOnce` starts.
+    const sentToken = getAccessToken();
     let response: Response;
     try {
       response = await fetchOnce();
     } catch (err) {
-      return retryOrThrowNetworkError(err, attempt, hasRefreshed);
+      return retryOrThrowNetworkError(err, state);
     }
 
     if (response.status === 401 && !options?.skip401 && !isRefreshUrl) {
-      if (hasRefreshed) {
-        // The replay carried a freshly-minted token and was still rejected:
-        // the session is genuinely dead (revoked / logout-all / expiry).
-        // Never refresh-loop — clear local auth and surface the error.
-        forceLogout();
-        throw await parseErrorResponse(response, url, method);
-      }
-      return doRefreshAndReplay(() => run(0, true), { url, method });
+      return handleUnauthorized(response, sentToken, state);
     }
 
     if (!response.ok) {
       const delay = nextRetryDelay({
         method,
-        attempt,
+        attempt: state.attempt,
         status: response.status,
         errorKind: null,
         response,
       });
       if (delay !== null) {
         await new Promise((r) => setTimeout(r, delay));
-        logRetry(attempt, url, ` (${response.status})`);
-        return run(attempt + 1, hasRefreshed);
+        logRetry(state.attempt, url, ` (${response.status})`);
+        return run({ ...state, attempt: state.attempt + 1 });
       }
       throw await parseErrorResponse(response, url, method);
     }

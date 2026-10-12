@@ -26,9 +26,13 @@ export function e2eDisplayName(): string {
   return faker.person.fullName();
 }
 
-/** Organization / workspace name for onboarding or create-org dialogs. */
+/**
+ * Organization / workspace name for onboarding or create-org dialogs. The onboarding derives the
+ * clinic's slug from it, and slugs are unique across clinozy-be, so a bare company name repeated by
+ * an earlier run answers `409 organization_slug_exists` — the suffix keeps every run's name new.
+ */
 export function e2eOrganizationName(): string {
-  return faker.company.name();
+  return `${faker.company.name()} ${faker.string.alphanumeric(6).toUpperCase()}`;
 }
 
 /** URL-safe team org slug with optional label prefix. */

@@ -17,11 +17,17 @@ import {
   hasSessionHint,
   markSessionStart,
 } from '@/shared/auth/session-lifetime.ts';
-import { clearAccessToken, getAccessToken, setAccessToken } from '@/shared/auth/token.ts';
+import {
+  clearAccessToken,
+  getAccessToken,
+  organizationClaimOf,
+  setAccessToken,
+} from '@/shared/auth/token.ts';
+import { isHttpError } from '@/shared/errors/HttpError.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOnboardingStore } from '@/shared/store/useOnboardingStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import type { MeContext } from '@/shared/tenancy/me-context.ts';
+import { type MeContext, meContextQueryKey } from '@/shared/tenancy/me-context.ts';
 import {
   hydrateSessionContext,
   invalidateSessionContext,
@@ -185,8 +191,12 @@ export function startAuthBootstrap(): Promise<void> {
        */
       if (!hasSessionHint()) throw new Error('No session hint');
       await silentRefresh();
-    } catch {
+    } catch (error) {
       if (generation !== authGeneration) return;
+      // No usable answer says nothing about the session, which the refresh cookie may still hold:
+      // the next guard to wait on the bootstrap — the login page's — asks again instead of
+      // settling for this attempt.
+      if (saidNothingAboutSession(error)) authBootstrapPromise = null;
       const { isAuthenticated } = useAuthStore.getState();
       if (!(isAuthenticated || getAccessToken())) {
         if (platformConfig.debugLogging) {
@@ -203,6 +213,18 @@ export function startAuthBootstrap(): Promise<void> {
   return authBootstrapPromise;
 }
 
+/**
+ * True when a boot attempt failed without the server saying anything about the session: an
+ * unanswered refresh, or `me/context` unreachable (status 0), throttled (429) or failing (5xx).
+ */
+function saidNothingAboutSession(error: unknown): boolean {
+  if (isRefreshUnanswered(error)) return true;
+  return (
+    isHttpError(error) &&
+    (error.status === 0 || error.status === 429 || error.status >= 500)
+  );
+}
+
 export async function awaitAuthBootstrap(): Promise<void> {
   await startAuthBootstrap();
 }
@@ -212,7 +234,7 @@ const authBase = () => `${platformConfig.apiBaseUrl}${API_BASE_PATH}`;
 export async function refreshAccessToken(): Promise<void> {
   if (tokenRefreshPromise) return tokenRefreshPromise;
   const generation = authGeneration;
-  const pending = runExclusiveRefresh(generation)
+  const pending = runExclusiveRefresh({ generation, tokenWhenAsked: getAccessToken() })
     .catch((error: unknown) => {
       if (generation === authGeneration) throw error;
     })
@@ -223,10 +245,42 @@ export async function refreshAccessToken(): Promise<void> {
   return pending;
 }
 
-async function runExclusiveRefresh(generation: number): Promise<void> {
+/**
+ * Resolves once the refresh in flight, if any, has settled — whatever its outcome.
+ *
+ * @remarks
+ * clinozy-be keeps one live access token per session, and a refresh and a workspace switch each
+ * retire the token before them. A switch sent while a refresh is in flight can be answered first;
+ * the refresh's answer would then put its own token back, minted for the workspace being left.
+ * `shared/tenancy/switch.ts` waits on this before it sends the switch. A failed refresh is the
+ * switch's own request to report, so the outcome is swallowed here.
+ */
+export async function settleInFlightRefresh(): Promise<void> {
+  const pending = tokenRefreshPromise;
+  if (!pending) return;
+  await pending.catch(() => undefined);
+}
+
+/**
+ * The refresh itself, behind the cross-tab Web Lock. clinozy-be keeps one live access token per
+ * session and a refresh retires the one before it, so a refresh that waited for the lock while a
+ * newer token arrived (a workspace switch, a sign-in) does not rotate again: that would retire the
+ * token the app now carries and the requests in flight with it.
+ */
+async function runExclusiveRefresh({
+  generation,
+  tokenWhenAsked,
+}: {
+  generation: number;
+  tokenWhenAsked: string | null;
+}): Promise<void> {
   const refresh = async () => {
     if (generation !== authGeneration) return;
-    const token = await fetchRefreshTokenRetryingOnce(generation);
+    const currentToken = getAccessToken();
+    if (currentToken !== null && currentToken !== tokenWhenAsked) return;
+    const refreshed = await fetchRefreshTokenRetryingOnce(generation);
+    if (refreshed === null || generation !== authGeneration) return;
+    const token = await onThisTabsOrganization({ token: refreshed, generation });
     if (token === null || generation !== authGeneration) return;
     setAccessToken(token);
     scheduleTokenRefresh();
@@ -235,6 +289,64 @@ async function runExclusiveRefresh(generation: number): Promise<void> {
     return navigator.locks.request(`${PRODUCT_NAMESPACE}-auth:refresh`, refresh);
   }
   return refresh();
+}
+
+/**
+ * The refreshed token, on the organization this tab shows.
+ *
+ * @remarks
+ * clinozy-be keeps one live access token per session, scoped to the organization the session was
+ * last switched to. Another tab's switch — or a switch of this tab whose answer never arrived —
+ * makes the refresh answer with a token for that other organization. Carried here, it would read
+ * and write the other organization's records under this tab's screen, so the tab switches back
+ * first, inside the refresh lock, before any request carries it. A switch the server refuses
+ * (membership ended, a security policy) hands the tab to the `/` resolver; one with no usable
+ * answer fails the request as unreachable. Either way the other organization's token is dropped.
+ */
+async function onThisTabsOrganization({
+  token,
+  generation,
+}: {
+  token: string;
+  generation: number;
+}): Promise<string | null> {
+  // The organization this tab works in: the one its `me/context` names, which only that read and a
+  // completed switch write. The org store is not it — before `me/context` it holds the URL's
+  // placeholder (a slug, the localhost fallback), never an organization the server knows.
+  const active =
+    queryClient.getQueryData<MeContext>(meContextQueryKey)?.activeOrganization;
+  const claim = organizationClaimOf(token);
+  // A token naming no organization reaches no organization's records; only another one is a risk.
+  if (!active || claim === null || claim === active.id) return token;
+  const personal = active.type === 'PERSONAL';
+  let response: Response;
+  try {
+    response = await authFetch(
+      `${authBase()}${personal ? '/auth/switch-to-personal' : '/auth/switch-to-organization'}`,
+      {
+        method: 'POST',
+        timeout: HTTP.REFRESH_TIMEOUT,
+        headers: { Authorization: `Bearer ${token}` },
+        body: JSON.stringify(personal ? {} : { organization_id: active.id }),
+      },
+    );
+  } catch (error) {
+    throw new RefreshUnansweredError(
+      error instanceof Error ? error.message : 'Workspace switch got no answer',
+    );
+  }
+  if (generation !== authGeneration) return null;
+  if (response.status === 429 || response.status >= 500) {
+    throw new RefreshUnansweredError(`Workspace switch failed (${response.status})`);
+  }
+  if (!response.ok) {
+    window.location.href = '/';
+    throw new RefreshUnansweredError(`Workspace switch refused (${response.status})`);
+  }
+  const switched = accessTokenOf(await response.json().catch(() => null));
+  if (!switched)
+    throw new RefreshUnansweredError('Workspace switch answered without a token');
+  return switched;
 }
 
 /**

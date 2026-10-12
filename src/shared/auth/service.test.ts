@@ -23,15 +23,17 @@ function deferred<T>() {
 // Mock global fetch
 let fetchMock: ReturnType<typeof vi.fn>;
 
-const { fetchMeContextMock, setQueryDataMock } = vi.hoisted(() => ({
+const { fetchMeContextMock, setQueryDataMock, getQueryDataMock } = vi.hoisted(() => ({
   fetchMeContextMock: vi.fn(),
   setQueryDataMock: vi.fn(),
+  getQueryDataMock: vi.fn(),
 }));
 
 vi.mock('@/core/http/queryClient.ts', () => ({
   queryClient: {
     clear: vi.fn(),
     setQueryData: setQueryDataMock,
+    getQueryData: getQueryDataMock,
     removeQueries: vi.fn(),
     // Session hydration also starts the organization list (a cache-first read).
     query: vi.fn(() => Promise.resolve([])),
@@ -135,6 +137,7 @@ describe('auth/service', () => {
     fetchMock = vi.fn();
     vi.stubGlobal('fetch', fetchMock);
     clearAccessToken();
+    useOrganizationStore.getState().clearOrganization();
     useAuthStore.setState({
       user: null,
       isAuthenticated: false,
@@ -245,6 +248,122 @@ describe('auth/service', () => {
   });
 
   describe('refreshAccessToken (the ONE single-flight)', () => {
+    /*
+     * One live token per session, scoped to the organization the session was last switched to.
+     * With this tab on clinic A and another tab switched to clinic B, the refresh answers with a
+     * B token — carried here it would read and write clinic B's records under clinic A's screen.
+     */
+    describe('a refreshed token for another organization than this tab shows', () => {
+      const TOKEN_FOR_B = makeJwt({ sub: 'user1', org: 'org_b', exp: 9999999999 });
+      const TOKEN_FOR_A = makeJwt({ sub: 'user1', org: 'org_a', exp: 9999999999 });
+
+      /** This tab's `me/context`, on organization A. */
+      function tabOnOrganization(type: 'TEAM' | 'PERSONAL') {
+        getQueryDataMock.mockReturnValue({
+          ...SAMPLE_CTX,
+          activeOrganization: { ...SAMPLE_CTX.activeOrganization, id: 'org_a', type },
+        });
+      }
+
+      beforeEach(() => {
+        tabOnOrganization('TEAM');
+      });
+
+      it('takes no action before this tab has read its context (the store holds a URL placeholder)', async () => {
+        getQueryDataMock.mockReturnValue(undefined);
+        useOrganizationStore.setState({
+          organizationId: 'default',
+          organizationType: 'TEAM',
+        });
+        (fetchMock as Mock).mockResolvedValueOnce(
+          mockFetchResponse({ data: { access_token: TOKEN_FOR_B } }),
+        );
+
+        await refreshAccessToken();
+
+        expect(fetchMock).toHaveBeenCalledOnce();
+        expect(getAccessToken()).toBe(TOKEN_FOR_B);
+      });
+
+      it('switches this tab back to its own organization before the token is used', async () => {
+        (fetchMock as Mock)
+          .mockResolvedValueOnce(
+            mockFetchResponse({ data: { access_token: TOKEN_FOR_B } }),
+          )
+          .mockResolvedValueOnce(
+            mockFetchResponse({ data: { access_token: TOKEN_FOR_A } }),
+          );
+
+        await refreshAccessToken();
+
+        expect(fetchMock).toHaveBeenCalledTimes(2);
+        const [switchUrl, switchInit] = fetchMock.mock.calls[1] as [string, RequestInit];
+        expect(switchUrl).toContain('/auth/switch-to-organization');
+        expect(JSON.parse(String(switchInit.body))).toEqual({ organization_id: 'org_a' });
+        expect((switchInit.headers as Record<string, string>).Authorization).toBe(
+          `Bearer ${TOKEN_FOR_B}`,
+        );
+        expect(getAccessToken()).toBe(TOKEN_FOR_A);
+      });
+
+      it('keeps a refreshed token that already names this tab organization', async () => {
+        (fetchMock as Mock).mockResolvedValueOnce(
+          mockFetchResponse({ data: { access_token: TOKEN_FOR_A } }),
+        );
+
+        await refreshAccessToken();
+
+        expect(fetchMock).toHaveBeenCalledOnce();
+        expect(getAccessToken()).toBe(TOKEN_FOR_A);
+      });
+
+      it('switches a personal workspace tab back through switch-to-personal', async () => {
+        tabOnOrganization('PERSONAL');
+        (fetchMock as Mock)
+          .mockResolvedValueOnce(
+            mockFetchResponse({ data: { access_token: TOKEN_FOR_B } }),
+          )
+          .mockResolvedValueOnce(
+            mockFetchResponse({ data: { access_token: TOKEN_FOR_A } }),
+          );
+
+        await refreshAccessToken();
+
+        expect(String(fetchMock.mock.calls[1]?.[0])).toContain(
+          '/auth/switch-to-personal',
+        );
+        expect(getAccessToken()).toBe(TOKEN_FOR_A);
+      });
+
+      it('never keeps the other organization token when the switch back gets no answer', async () => {
+        (fetchMock as Mock)
+          .mockResolvedValueOnce(
+            mockFetchResponse({ data: { access_token: TOKEN_FOR_B } }),
+          )
+          .mockResolvedValueOnce(mockFetchResponse({ message: 'busy' }, 503));
+
+        const error = await refreshAccessToken().catch((caught: unknown) => caught);
+
+        expect(isRefreshUnanswered(error)).toBe(true);
+        expect(getAccessToken()).not.toBe(TOKEN_FOR_B);
+      });
+
+      it('hands the tab to the resolver when the switch back is refused', async () => {
+        (fetchMock as Mock)
+          .mockResolvedValueOnce(
+            mockFetchResponse({ data: { access_token: TOKEN_FOR_B } }),
+          )
+          .mockResolvedValueOnce(mockFetchResponse({ message: 'not a member' }, 403));
+
+        const error = await refreshAccessToken().catch((caught: unknown) => caught);
+
+        // Not a sign-out: the session is fine, this tab's organization is not the caller's any more.
+        expect(isRefreshUnanswered(error)).toBe(true);
+        expect(window.location.href).toBe('/');
+        expect(getAccessToken()).not.toBe(TOKEN_FOR_B);
+      });
+    });
+
     it('concurrent calls share ONE /auth/refresh request', async () => {
       (fetchMock as Mock).mockResolvedValueOnce(
         mockFetchResponse({ data: { access_token: VALID_TOKEN } }),
@@ -325,6 +444,70 @@ describe('auth/service', () => {
 
         expect(lockRequest).toHaveBeenCalledTimes(1);
         expect(lockRequest.mock.calls[0]?.[0]).toBe(`${PRODUCT_NAMESPACE}-auth:refresh`);
+        expect(getAccessToken()).toBe(VALID_TOKEN);
+      } finally {
+        delete (navigator as { locks?: unknown }).locks;
+      }
+    });
+
+    // clinozy-be keeps one live access token per session: a refresh retires the token before it.
+    // A refresh asked for before a newer token arrived (a workspace switch, a sign-in) must not
+    // rotate again once it gets the lock — it would retire the token the app now carries.
+    it('skips the rotation when a newer token arrived while it waited for the lock', async () => {
+      let openLock!: () => void;
+      const lockOpen = new Promise<void>((resolve) => {
+        openLock = resolve;
+      });
+      const lockRequest = vi.fn(
+        async (_name: string, cb: () => Promise<unknown>): Promise<unknown> => {
+          await lockOpen;
+          return cb();
+        },
+      );
+      Object.defineProperty(navigator, 'locks', {
+        configurable: true,
+        value: { request: lockRequest },
+      });
+      const olderToken = makeJwt({ sub: 'older', exp: 9999999999 });
+      const switchedToken = makeJwt({ sub: 'switched', exp: 9999999999 });
+      try {
+        setAccessToken(olderToken);
+        const refreshing = refreshAccessToken();
+        setAccessToken(switchedToken); // e.g. a workspace switch landed meanwhile
+        openLock();
+        await refreshing;
+
+        expect(fetchMock).not.toHaveBeenCalled();
+        expect(getAccessToken()).toBe(switchedToken);
+      } finally {
+        delete (navigator as { locks?: unknown }).locks;
+      }
+    });
+
+    it('still rotates when the token is unchanged after waiting for the lock', async () => {
+      let openLock!: () => void;
+      const lockOpen = new Promise<void>((resolve) => {
+        openLock = resolve;
+      });
+      Object.defineProperty(navigator, 'locks', {
+        configurable: true,
+        value: {
+          request: async (_name: string, cb: () => Promise<unknown>) => {
+            await lockOpen;
+            return cb();
+          },
+        },
+      });
+      try {
+        setAccessToken(makeJwt({ sub: 'expiring', exp: 9999999999 }));
+        (fetchMock as Mock).mockResolvedValueOnce(
+          mockFetchResponse({ data: { access_token: VALID_TOKEN } }),
+        );
+        const refreshing = refreshAccessToken();
+        openLock();
+        await refreshing;
+
+        expect(fetchMock).toHaveBeenCalledTimes(1);
         expect(getAccessToken()).toBe(VALID_TOKEN);
       } finally {
         delete (navigator as { locks?: unknown }).locks;
@@ -680,6 +863,73 @@ describe('auth/service', () => {
       next.resolve(NEXT_CTX);
       await login;
       expect(useAuthStore.getState().user?.id).toBe('next-user');
+      expect(fetchMock).toHaveBeenCalledOnce();
+    });
+  });
+  /*
+   * A cold boot whose refresh got no usable answer (503, offline, throttled) says nothing about
+   * the session — the refresh cookie may be perfectly alive. The login page's guard waits on the
+   * same bootstrap, so a settled failure there used to leave the visitor on the sign-in form with
+   * nothing asking again until they reloaded.
+   */
+  describe('startAuthBootstrap after a boot with no usable answer', () => {
+    async function freshService() {
+      vi.resetModules();
+      const service = await import('./service.ts');
+      const { useAuthStore: store } =
+        await import('@/shared/store/useAuthStore/index.ts');
+      localStorage.setItem(`${PRODUCT_NAMESPACE}:session-started-at`, String(Date.now()));
+      return { service, store };
+    }
+
+    it('asks again on the next wait when the refresh went unanswered', async () => {
+      const { service, store } = await freshService();
+      fetchMock
+        .mockResolvedValueOnce(mockFetchResponse({}, 503))
+        .mockResolvedValueOnce(mockFetchResponse({}, 503))
+        .mockResolvedValue(mockFetchResponse({ data: { access_token: VALID_TOKEN } }));
+      fetchMeContextMock.mockResolvedValue(SAMPLE_CTX);
+
+      const first = service.startAuthBootstrap();
+      await first;
+      expect(store.getState().isAuthenticated).toBe(false);
+
+      const second = service.startAuthBootstrap();
+      expect(second).not.toBe(first);
+      await second;
+      expect(store.getState().isAuthenticated).toBe(true);
+    });
+
+    it('asks again when me/context failed after the refresh', async () => {
+      const { service, store } = await freshService();
+      // A fresh Response per call: a body can be read once.
+      fetchMock.mockImplementation(() =>
+        Promise.resolve(mockFetchResponse({ data: { access_token: VALID_TOKEN } })),
+      );
+      const { HttpError } = await import('@/shared/errors/HttpError.ts');
+      fetchMeContextMock
+        .mockRejectedValueOnce(
+          new HttpError('Service unavailable', 503, '/auth/me/context', 'GET'),
+        )
+        .mockResolvedValue(SAMPLE_CTX);
+
+      await service.startAuthBootstrap();
+      expect(store.getState().isAuthenticated).toBe(false);
+
+      await service.startAuthBootstrap();
+      expect(store.getState().isAuthenticated).toBe(true);
+    });
+
+    it('settles for a refused refresh — the session is gone', async () => {
+      const { service } = await freshService();
+      fetchMock.mockResolvedValue(
+        mockFetchResponse({ error: { detail: 'Session expired' } }, 401),
+      );
+
+      const first = service.startAuthBootstrap();
+      await first;
+
+      expect(service.startAuthBootstrap()).toBe(first);
       expect(fetchMock).toHaveBeenCalledOnce();
     });
   });

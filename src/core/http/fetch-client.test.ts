@@ -250,15 +250,105 @@ describe('fetch-client', () => {
       expect(forceLogout).not.toHaveBeenCalled();
     });
 
-    it('replay that 401s AGAIN means a dead session: forceLogout, no refresh loop', async () => {
+    it('a token still rejected after two refreshes means a dead session: forceLogout, no refresh loop', async () => {
       fetchMock
         .mockResolvedValueOnce(unauthorized()) // original request
-        .mockResolvedValueOnce(unauthorized()); // replay STILL 401
+        .mockResolvedValueOnce(unauthorized()) // first replay STILL 401
+        .mockResolvedValueOnce(unauthorized()); // second replay STILL 401
 
       await expect(apiClient.get('/protected')).rejects.toBeInstanceOf(HttpError);
-      // never refreshes twice for one request
-      expect(refreshAccessToken).toHaveBeenCalledTimes(1);
+      // Bounded: two refreshes for one request, never a loop.
+      expect(refreshAccessToken).toHaveBeenCalledTimes(2);
+      expect(fetchMock).toHaveBeenCalledTimes(3);
       expect(forceLogout).toHaveBeenCalledTimes(1);
+    });
+
+    /** A JWT-shaped access token told apart by its subject. */
+    const tokenNamed = (name: string): string => makeJwt({ sub: name, exp: 9999999999 });
+
+    /** The bearer token one fetch call carried. */
+    const bearerOf = (call: unknown[]): string | null =>
+      ((call[1] as RequestInit).headers as Headers).get('Authorization');
+
+    // clinozy-be keeps ONE live access token per session: every refresh and every workspace
+    // switch retires the token before it. A 401 is therefore about the token a request carried,
+    // and that token may have been replaced while the request was in flight.
+    it('a 401 for a token replaced mid-flight replays with the current token, without a refresh', async () => {
+      setAccessToken(tokenNamed('token-first'));
+      fetchMock
+        .mockImplementationOnce(() => {
+          setAccessToken(tokenNamed('token-switched')); // a workspace switch landed meanwhile
+          return Promise.resolve(unauthorized());
+        })
+        .mockResolvedValueOnce(ok());
+
+      const { data } = await apiClient.get<{ ok: boolean }>('/protected');
+
+      expect(data).toEqual({ ok: true });
+      expect(refreshAccessToken).not.toHaveBeenCalled();
+      expect(bearerOf(fetchMock.mock.calls[1] as unknown[])).toBe(
+        `Bearer ${tokenNamed('token-switched')}`,
+      );
+      expect(forceLogout).not.toHaveBeenCalled();
+    });
+
+    it('a replay retired by another rotation replays again instead of signing out', async () => {
+      setAccessToken(tokenNamed('token-first'));
+      vi.mocked(refreshAccessToken).mockImplementationOnce(async () => {
+        setAccessToken(tokenNamed('token-refreshed'));
+      });
+      fetchMock
+        .mockResolvedValueOnce(unauthorized()) // original request
+        .mockImplementationOnce(() => {
+          setAccessToken(tokenNamed('token-switched')); // a switch retired the refreshed token
+          return Promise.resolve(unauthorized());
+        })
+        .mockResolvedValueOnce(ok());
+
+      const { data } = await apiClient.get<{ ok: boolean }>('/protected');
+
+      expect(data).toEqual({ ok: true });
+      expect(refreshAccessToken).toHaveBeenCalledTimes(1);
+      expect(bearerOf(fetchMock.mock.calls[2] as unknown[])).toBe(
+        `Bearer ${tokenNamed('token-switched')}`,
+      );
+      expect(forceLogout).not.toHaveBeenCalled();
+    });
+
+    it('a replay rejected with its token unchanged refreshes once more before giving up', async () => {
+      setAccessToken(tokenNamed('token-first'));
+      vi.mocked(refreshAccessToken)
+        .mockImplementationOnce(async () => setAccessToken(tokenNamed('token-refreshed')))
+        .mockImplementationOnce(async () =>
+          setAccessToken(tokenNamed('token-refreshed-again')),
+        );
+      fetchMock
+        .mockResolvedValueOnce(unauthorized()) // original request
+        .mockResolvedValueOnce(unauthorized()) // retired by another tab's refresh
+        .mockResolvedValueOnce(ok());
+
+      const { data } = await apiClient.get<{ ok: boolean }>('/protected');
+
+      expect(data).toEqual({ ok: true });
+      expect(refreshAccessToken).toHaveBeenCalledTimes(2);
+      expect(bearerOf(fetchMock.mock.calls[2] as unknown[])).toBe(
+        `Bearer ${tokenNamed('token-refreshed-again')}`,
+      );
+      expect(forceLogout).not.toHaveBeenCalled();
+    });
+
+    it('a token that keeps rotating under a request is replayed a bounded number of times', async () => {
+      let rotation = 0;
+      setAccessToken(tokenNamed('token-0'));
+      fetchMock.mockImplementation(() => {
+        rotation += 1;
+        setAccessToken(tokenNamed(`token-${rotation}`));
+        return Promise.resolve(unauthorized());
+      });
+
+      await expect(apiClient.get('/protected')).rejects.toBeInstanceOf(HttpError);
+      // Never an endless loop, whatever keeps rotating the token.
+      expect(fetchMock.mock.calls.length).toBeLessThanOrEqual(8);
     });
 
     it('every concurrent 401 awaits the shared single-flight (no direct refresh fetch)', async () => {
