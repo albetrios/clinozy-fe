@@ -280,8 +280,28 @@ const config = [
      * that schema too. Both are declared beside it now (`app-tone-label.ts`,
      * `app-week.ts`), each pinned to the contract's enum by its test. ~0.5 kB
      * of headroom.
+     *
+     * 243.4 → 243.8 kB (same exemption, D48): measured 243.41 kB, from 242.90
+     * kB at 182910e7, each end built the same way (no env file, as CI) and
+     * the first-paint chunks compared:
+     * - One live token per session (3b7d1e2c, +0.42 kB, all in the chunk that
+     *   carries `queryClient.ts`): the fetch client's rotation replay and its
+     *   wait on a switch in flight, the refresh service's check that the
+     *   answer names this tab's organization (switching the tab back when it
+     *   does not), and `token.ts`'s claim reader. The auth runtime is first
+     *   paint by definition — every request goes through it.
+     * - A taken workspace URL says so (383091da, +0.03 kB): its error key in
+     *   `errors.constants.ts` and the English `errors` copy.
+     * - The reuse audit (67614ea2, +0.06 kB): `notifyError` takes the full
+     *   notify options and `notifyQueryError` its own message, duration and
+     *   retry label; `pageOf` (one cursor-page reader for 45 fetchers) sits
+     *   beside `toPaginated`; `publicIdPattern` splits out of `publicId`; and
+     *   the organization store's `useOrganizationId` selector.
+     * Trimmed first: nothing — each is a shared helper the rooms now call
+     * instead of their own copies, or the auth runtime itself. ~0.4 kB of
+     * headroom.
      */
-    limit: '243.4 kB',
+    limit: '243.8 kB',
     gzip: true,
   },
   ...(cssPaths.length
