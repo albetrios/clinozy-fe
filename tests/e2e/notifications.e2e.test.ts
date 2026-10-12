@@ -1,17 +1,77 @@
 import { expect, test } from '@playwright/test';
 
-import { registerNewUserAndGoToToday } from '@/tests/utils/e2e-auth.ts';
+import {
+  loginViaEmailCodeUI,
+  registerNewUserAndGoToToday,
+} from '@/tests/utils/e2e-auth.ts';
 import { openAccountMenu, openNotificationCenter } from '@/tests/utils/e2e-hybrid.ts';
-import { verifyDatabaseConnection } from '@/tests/utils/e2e-session.ts';
+import {
+  createSessionViaEmailCode,
+  uniqueE2eEmail,
+  verifyDatabaseConnection,
+} from '@/tests/utils/e2e-session.ts';
+import { bearerHeaders, createTeamInvitation } from '@/tests/utils/e2e-tenancy.ts';
+
+const API = '/api/v1';
 
 /**
- * Seeded-inbox assertions still require clinozy-be test fixtures
- * (`GET /me/notifications`) — that suite stays skipped below. The empty-inbox
- * and navigation behavior needs no fixtures, so it runs against a fresh account.
+ * A real notification, made the way clinozy-be makes one (D84): a clinic's owner invites
+ * someone, they decline, and the owner is told. Inviting needs a free seat, and a local
+ * clinic's Free plan holds one — so where the local billing seed has no room the invite is
+ * answered `409 seat_limit_reached` and the test skips, as the other invite journeys do. The
+ * empty inbox needs nothing, so it runs on a fresh account below.
  */
-test.describe.skip('Notifications (seeded)', () => {
-  test('shows seeded notifications', () => {
-    /* Pending clinozy-be test fixtures (GET /me/notifications). */
+test.describe('Notifications (from a declined invitation)', () => {
+  test('the owner sees the decline in the notification center, counted', async ({
+    page,
+    playwright,
+  }) => {
+    test.skip(
+      !(await verifyDatabaseConnection()),
+      'DATABASE_URL must reach clinozy-be Postgres (mail_outbox)',
+    );
+    const api = await playwright.request.newContext({ baseURL: 'http://localhost:3000' });
+    try {
+      const owner = await createSessionViaEmailCode(api);
+      const inviteeEmail = uniqueE2eEmail('declines');
+      let invitationId: string;
+      try {
+        ({ invitationId } = await createTeamInvitation(
+          api,
+          owner.accessToken,
+          inviteeEmail,
+        ));
+      } catch (error) {
+        if (error instanceof Error && error.message === 'SEAT_LIMIT_REACHED') {
+          test.skip(true, 'team org seat limit reached in local billing seed');
+        }
+        throw error;
+      }
+      const invitee = await createSessionViaEmailCode(api, inviteeEmail);
+      const declined = await api.post(
+        `${API}/tenancy/membership-invitations/${invitationId}/decline`,
+        { headers: bearerHeaders(invitee.accessToken, true) },
+      );
+      expect(declined.status()).toBe(200);
+
+      await loginViaEmailCodeUI(page, owner.email);
+      await expect(page.getByTestId('today-page')).toBeVisible({ timeout: 20_000 });
+      // One unread item: the Account menu's Notifications row carries its count.
+      await openAccountMenu(page);
+      await expect(page.getByTestId('account-menu-notifications')).toHaveText(/1/, {
+        timeout: 15_000,
+      });
+      await page.keyboard.press('Escape');
+      await expect(page.getByTestId('account-menu')).toHaveCount(0);
+
+      await openNotificationCenter(page);
+      const list = page.getByTestId('notifications-list');
+      await expect(list).toBeVisible({ timeout: 15_000 });
+      await expect(list.getByRole('button')).toHaveCount(1);
+      await expect(list.getByRole('button').first()).toContainText(/declined/i);
+    } finally {
+      await api.dispose();
+    }
   });
 });
 

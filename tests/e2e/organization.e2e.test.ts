@@ -8,18 +8,16 @@ import {
 import { byTestId, gotoApp, navigateAuthenticated } from '@/tests/utils/e2e-hybrid.ts';
 
 /**
- * The header switcher with "Create organization" belongs to the preview shells
- * (sidebar, top nav, rail). The clinic shell — the section bar, the default — keeps
- * the switcher in the Account menu as "Switch clinic", which lists workspaces and
- * creates none, so the create-dialog specs skip there.
+ * Opens "Create organization" where a member finds it: the organization picker
+ * (`/organization`). The clinic shell's Switch clinic lists workspaces and creates
+ * none (D44), so the picker is the one way into the create dialog.
  */
-const NO_HEADER_SWITCHER =
-  'the section-bar shell has no header switcher (Switch clinic lives in the Account menu and creates nothing)';
-
-/** The header switcher of a preview shell, when this shell has one. */
-async function headerSwitcher(page: Page) {
-  const trigger = byTestId(page, 'organization-switcher-trigger');
-  return (await trigger.isVisible()) ? trigger : null;
+async function openCreateFromPicker(page: Page): Promise<void> {
+  await registerNewUserAndGoToToday(page);
+  await navigateAuthenticated(page, '/organization');
+  await expect(page.getByTestId('organization-page')).toBeVisible({ timeout: 10000 });
+  await byTestId(page, 'organization-picker-create').click();
+  await expect(page.getByTestId('create-organization-dialog-form')).toBeVisible();
 }
 
 test.describe('Organization picker', () => {
@@ -56,18 +54,7 @@ test.describe('Organization picker', () => {
   });
 
   test('the create-organization action opens the create dialog', async ({ page }) => {
-    await registerNewUserAndGoToToday(page);
-    const trigger = await headerSwitcher(page);
-    test.skip(trigger === null, NO_HEADER_SWITCHER);
-    await trigger?.click();
-    const createItem = page.getByTestId('organization-switcher-create');
-    test.skip(
-      !(await createItem.isVisible()),
-      'team creation disabled in this deployment mode',
-    );
-
-    await createItem.click();
-    await expect(page.getByTestId('create-organization-dialog-form')).toBeVisible();
+    await openCreateFromPicker(page);
     await expect(page.getByTestId('create-organization-dialog-name')).toBeVisible();
     await expect(
       page.getByRole('heading', { name: /create organization/i }),
@@ -85,17 +72,7 @@ test.describe('Organization picker', () => {
   test('an invalid Workspace URL is explained, not silently refused', async ({
     page,
   }) => {
-    await registerNewUserAndGoToToday(page);
-    const trigger = await headerSwitcher(page);
-    test.skip(trigger === null, NO_HEADER_SWITCHER);
-    await trigger?.click();
-    const createItem = page.getByTestId('organization-switcher-create');
-    test.skip(
-      !(await createItem.isVisible()),
-      'team creation disabled in this deployment mode',
-    );
-    await createItem.click();
-    await expect(page.getByTestId('create-organization-dialog-form')).toBeVisible();
+    await openCreateFromPicker(page);
 
     await byTestId(page, 'create-organization-dialog-name').fill('QA Org');
     await byTestId(page, 'create-organization-dialog-slug').fill('QA Org 4877!');

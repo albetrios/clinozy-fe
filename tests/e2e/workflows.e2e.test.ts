@@ -13,7 +13,7 @@ import {
 } from '@/tests/utils/e2e-auth.ts';
 import { probeLiveDeployment } from '@/tests/utils/e2e-deployment-mode.ts';
 import { e2eTeamOrgProfile } from '@/tests/utils/e2e-faker.ts';
-import { byTestId, gotoApp } from '@/tests/utils/e2e-hybrid.ts';
+import { byTestId, gotoApp, navigateAuthenticated } from '@/tests/utils/e2e-hybrid.ts';
 import {
   createSessionViaEmailCode,
   e2eAuthHeaders,
@@ -193,18 +193,19 @@ test.describe('Auth workflow (UI)', () => {
 });
 
 test.describe('Org switch workflow (UI)', () => {
-  test('create team via switcher then switch back to personal', async ({ page }) => {
+  // Through the UI end to end: a second clinic made in the picker's create dialog (the API
+  // helpers make every other spec's clinics), then Switch clinic back into the first. A
+  // personal workspace is not a destination any more (D44): personal workspaces are off.
+  test('create a second clinic from the picker, then switch back to the first', async ({
+    page,
+  }) => {
     await registerNewUserAndGoToToday(page);
-    // Only the preview shells' header switcher creates; the clinic shell's Switch
-    // clinic (Account menu) lists workspaces — `org-switching.e2e.test.ts` drives it.
-    const switcher = byTestId(page, 'organization-switcher-trigger');
-    test.skip(
-      !(await switcher.isVisible()),
-      'the section-bar shell has no header switcher (Switch clinic lives in the Account menu and creates nothing)',
-    );
+    const first = /^\/organization\/([^/]+)\//.exec(new URL(page.url()).pathname)?.[1];
+    expect(first, 'landed outside a clinic').toBeTruthy();
 
-    await switcher.click();
-    await page.getByTestId('organization-switcher-create').click();
+    await navigateAuthenticated(page, '/organization');
+    await expect(page.getByTestId('organization-page')).toBeVisible({ timeout: 10000 });
+    await byTestId(page, 'organization-picker-create').click();
     const { name, slug } = e2eTeamOrgProfile({ label: 'wf' });
     await page.getByTestId('create-organization-dialog-name').fill(name);
     await page.getByTestId('create-organization-dialog-slug').fill(slug);
@@ -213,18 +214,13 @@ test.describe('Org switch workflow (UI)', () => {
     await expect(page).toHaveURL(new RegExp(`/organization/${slug}/today`), {
       timeout: 15000,
     });
+    await expect(page.getByTestId('today-page')).toBeVisible({ timeout: 15000 });
 
-    await byTestId(page, 'organization-switcher-trigger').click();
-    const personal = page.getByTestId('organization-switcher-option-personal');
-    test.skip(!(await personal.isVisible()), 'personal org disabled');
-    await page.keyboard.press('Escape');
-    // Radix closes the menu with an exit animation. A trigger click that lands
-    // mid-close is swallowed (the same trap `theme.e2e` documents), so wait for
-    // the menu to be fully gone before the helper opens it again.
-    await expect(personal).toBeHidden();
-    await selectOrganizationInSwitcher(page, 'personal');
-    // A personal workspace has no clinic (D44): it lands on the picker.
-    await expect(page).toHaveURL(/\/organization(?:[?#]|$)/, { timeout: 15000 });
+    await selectOrganizationInSwitcher(page, first ?? '');
+    await expect(page).toHaveURL(new RegExp(`/organization/${first}/today`), {
+      timeout: 15000,
+    });
+    await expect(page.getByTestId('today-page')).toBeVisible({ timeout: 15000 });
   });
 });
 

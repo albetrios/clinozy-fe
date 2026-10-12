@@ -7,6 +7,15 @@ import { describe, expect, it, vi } from 'vitest';
 import { i18nBuild, localeNamespaceOf } from '../../plugins/i18n-build.ts';
 import { I18N_NAMESPACES } from '../../src/lib/i18n/namespaces.ts';
 
+/**
+ * The throwaway servers' own cache. Left at Vite's default (`node_modules/.vite`), their
+ * optimizer met a config unlike the dev server's and rewrote `node_modules/.vite/deps` — so
+ * every `pnpm test` pulled the pre-bundled deps out from under a running `pnpm dev`, and each
+ * lazy chunk importing one (the Security panel's `qrcode`, the theme's `culori`) died on a
+ * `504 (Outdated Optimize Dep)` until that server restarted.
+ */
+const POLICY_CACHE_DIR = resolve('node_modules/.vite/i18n-build-policy');
+
 const RESOURCE_ID = '\0virtual:clinozy-fe-i18n-resources';
 const NAMESPACE_ID = (namespace: string) =>
   `\0virtual:clinozy-fe-i18n-namespace/${namespace}`;
@@ -20,6 +29,7 @@ describe('production i18n resource boundaries', () => {
     const server = await createServer({
       configFile: false,
       envFile: false,
+      cacheDir: POLICY_CACHE_DIR,
       plugins: [i18nBuild({ modeFlag: 'single', localeFlag })],
       server: { middlewareMode: true, watch: null },
     });
@@ -87,6 +97,7 @@ describe('production i18n resource boundaries', () => {
     const server = await createServer({
       configFile: false,
       envFile: false,
+      cacheDir: POLICY_CACHE_DIR,
       plugins: [i18nBuild({ modeFlag: 'multi' })],
       server: { middlewareMode: true, watch: null },
     });

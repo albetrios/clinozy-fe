@@ -217,10 +217,13 @@ _fresh_ code still loops (the backend has a per-email issue window) — it just 
 answer it already has.
 
 **The dev server is part of the test.** "Failed to fetch dynamically imported module"
-behind a `504 (Outdated Optimize Dep)` is Vite re-optimizing mid-session because a
-lazy-only dependency was missing from `optimizeDeps.include` (`vite.config.ts`); every lazy
-chunk that pulls a pre-bundled dep then dies until the server restarts. Add the dependency
-there and restart with `--force`. The watcher also reloads pages when `coverage/` is
+behind a `504 (Outdated Optimize Dep)` means the dev server's pre-bundled deps changed
+mid-session; every lazy chunk that pulls one then dies until the server restarts with
+`--force`. Two causes so far: a lazy-only dependency missing from `optimizeDeps.include`
+(`vite.config.ts`) — add it there; and anything else writing `node_modules/.vite/deps` — a
+`createServer()` in a test left on Vite's default `cacheDir` rewrote it on every `pnpm test`
+(`tests/ci/i18n-build.policy.test.ts` now gives its servers their own `cacheDir`; a new
+test that starts Vite does the same). The watcher also reloads pages when `coverage/` is
 rewritten — do not run a coverage pass while a browser suite is using the same server.
 
 **Prove it bites.** Put the old behaviour back for one run and watch the spec fail.
