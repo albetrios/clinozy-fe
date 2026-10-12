@@ -110,8 +110,8 @@
       "cancelled": "Annuler"
     },
     "moveHints": {
-      "scheduled": "Créneau réservé · demande de confirmation envoyée sur WhatsApp",
-      "confirmed": "Ils ont dit oui · une réponse « Oui » sur WhatsApp le définit automatiquement",
+      "scheduled": "Créneau réservé · demande de confirmation en file d’attente",
+      "confirmed": "Ils ont dit oui",
       "checked_in": "Ils sont arrivés · uniquement le jour même",
       "completed": "Visite effectuée · généralement défini depuis la visite",
       "reschedule": "Déplacer vers un nouveau créneau · même rendez-vous, l’ancien créneau reste dans l’historique",
@@ -137,7 +137,7 @@
       "after_check_in": "Après l’arrivée"
     },
     "hints": {
-      "scheduled": "Créneau réservé · WhatsApp leur demande de confirmer, un « Oui » le confirme",
+      "scheduled": "Créneau réservé · la demande de confirmation attend dans la file jusqu’à ce que la messagerie soit connectée",
       "confirmed": "Déjà confirmé par téléphone · le rappel est envoyé",
       "checked_in": "Le patient est à la clinique · file du médecin prévenue · marquez Terminé une fois fini",
       "completed": "Visite effectuée · une tâche de retour part demain",
@@ -172,10 +172,10 @@
       "other": "Autre"
     },
     "toasts": {
-      "booked": "{{id}} réservé · {{day}} {{time}} · demande de confirmation envoyée sur WhatsApp",
+      "booked": "{{id}} réservé · {{day}} {{time}} · demande de confirmation en file d’attente",
       "bookedQueued": "{{id}} réservé · {{day}} {{time}} · rappel programmé",
       "bookedOnly": "{{id}} réservé · {{day}} {{time}}",
-      "moved": "{{id}} déplacé à {{day}} {{time}} · demande de confirmation envoyée",
+      "moved": "{{id}} déplacé à {{day}} {{time}} · demande de confirmation en file d’attente",
       "movedOnly": "{{id}} déplacé à {{day}} {{time}}",
       "updated": "{{id}} mis à jour",
       "statusChanged": "{{name}} → {{status}}",

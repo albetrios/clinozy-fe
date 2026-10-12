@@ -228,12 +228,17 @@ function usePicks(form: UseFormReturn<ReceiveFormValues>) {
       return;
     }
     form.clearErrors('patientId');
+    const rowsAtPick = JSON.stringify(form.getValues('splits'));
     const open = await readOpenInvoices(queryClient, organizationId, patient.id);
     const next = withPatient(form.getValues(), patient, open);
     form.setValue('patientId', next.patientId, dirty);
     form.setValue('contactId', next.contactId, dirty);
     form.setValue('invoiceId', next.invoiceId, dirty);
-    form.setValue('splits', next.splits, dirty);
+    // The due fills the rows — unless an amount was typed while the invoices were read: a late
+    // answer never wipes what the member entered.
+    if (JSON.stringify(form.getValues('splits')) === rowsAtPick) {
+      form.setValue('splits', next.splits, dirty);
+    }
   };
   const pickInvoice = (invoice: ReceiveInvoiceChoice | null) => {
     form.setValue('invoiceId', invoice?.id ?? null, dirty);

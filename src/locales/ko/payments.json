@@ -170,7 +170,7 @@
   "receive": {
     "title": "수납하기",
     "titleEdit": "수납 수정",
-    "sub": "영수증은 WhatsApp으로 환자에게 전송됩니다",
+    "sub": "영수증은 환자에게 보낼 WhatsApp 대기열에 들어갑니다",
     "subEdit": "마감 전까지 수정 가능 · 모든 변경이 기록됩니다",
     "section": "결제하는 사람",
     "branch": "지점",
@@ -343,7 +343,7 @@
     "previousTitle": "{{day}} 확인",
     "closeDay": "하루 마감",
     "countFirst": "먼저 현금을 세세요",
-    "closed": "하루 마감 완료 · 요약을 WhatsApp으로 관리자에게 보냈습니다",
+    "closed": "하루 마감 완료",
     "reopened": "하루 다시 열림",
     "gate": {
       "title": "시작 현금 · {{day}}",

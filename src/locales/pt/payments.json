@@ -178,7 +178,7 @@
   "receive": {
     "title": "Receber pagamento",
     "titleEdit": "Editar recebimento",
-    "sub": "O recibo vai para o paciente pelo WhatsApp",
+    "sub": "O recibo fica na fila para o paciente no WhatsApp",
     "subEdit": "Aberto até o fechamento do dia · cada mudança é registrada",
     "section": "Quem está pagando",
     "branch": "Unidade",
@@ -363,7 +363,7 @@
     "previousTitle": "Revisar {{day}}",
     "closeDay": "Fechar o dia",
     "countFirst": "Conte o dinheiro primeiro",
-    "closed": "Dia fechado · resumo enviado ao admin pelo WhatsApp",
+    "closed": "Dia fechado",
     "reopened": "Dia reaberto",
     "gate": {
       "title": "Caixa inicial · {{day}}",

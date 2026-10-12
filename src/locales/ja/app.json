@@ -110,8 +110,8 @@
       "cancelled": "キャンセル"
     },
     "moveHints": {
-      "scheduled": "枠を確保 · WhatsAppで確認依頼を送信済み",
-      "confirmed": "承諾済み · WhatsAppで「はい」と返信があると自動で設定されます",
+      "scheduled": "枠を確保 · 確認依頼は送信待ちです",
+      "confirmed": "承諾済み",
       "checked_in": "来院しました · 当日のみ",
       "completed": "受診完了 · 通常は受診画面から設定されます",
       "reschedule": "新しい枠へ移動 · 同じ予約のまま、元の枠は履歴に残ります",
@@ -137,7 +137,7 @@
       "after_check_in": "受付後"
     },
     "hints": {
-      "scheduled": "枠を確保 · WhatsAppで確認を依頼し、「はい」の返信で確定します",
+      "scheduled": "枠を確保 · メッセージ連携が接続されるまで確認依頼は送信待ちです",
       "confirmed": "電話で確認済み · リマインダーを送信します",
       "checked_in": "患者は来院中 · 医師の待ち行列に通知済み · 終わったら完了にしてください",
       "completed": "受診完了 · 明日フィードバックのタスクが送られます",
@@ -172,10 +172,10 @@
       "other": "その他"
     },
     "toasts": {
-      "booked": "{{id}} を予約しました · {{day}} {{time}} · WhatsAppで確認依頼を送信しました",
+      "booked": "{{id}} を予約しました · {{day}} {{time}} · 確認依頼は送信待ちです",
       "bookedQueued": "{{id}} を予約しました · {{day}} {{time}} · リマインダーを予約しました",
       "bookedOnly": "{{id}} を予約しました · {{day}} {{time}}",
-      "moved": "{{id}} を {{day}} {{time}} に移動しました · 確認依頼を送信しました",
+      "moved": "{{id}} を {{day}} {{time}} に移動しました · 確認依頼は送信待ちです",
       "movedOnly": "{{id}} を {{day}} {{time}} に移動しました",
       "updated": "{{id}} を更新しました",
       "statusChanged": "{{name}} → {{status}}",

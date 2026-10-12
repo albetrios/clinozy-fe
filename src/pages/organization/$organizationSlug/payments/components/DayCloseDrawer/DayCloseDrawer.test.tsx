@@ -413,9 +413,7 @@ describe('Day close — the working day (payments.md:73–80; Q-G5)', () => {
       }),
     );
     await waitFor(() =>
-      expect(notifyMock.success).toHaveBeenLastCalledWith(
-        'Day closed · summary sent to admin on WhatsApp',
-      ),
+      expect(notifyMock.success).toHaveBeenLastCalledWith('Day closed'),
     );
     // The count is spent: a day reopened later starts a new one.
     expect(part('strip-count-input')).toHaveValue('');

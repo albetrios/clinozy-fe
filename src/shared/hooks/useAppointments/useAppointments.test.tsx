@@ -509,7 +509,7 @@ describe('useCreateAppointment', () => {
   });
 
   it.each([
-    ['confirm_requested', ' · confirm request sent on WhatsApp'],
+    ['confirm_requested', ' · confirm request queued'],
     ['reminder_queued', ' · reminder queued'],
     ['not_sent', ''],
     ['failed', ''],
@@ -602,7 +602,7 @@ describe('useUpdateAppointment', () => {
     await act(() =>
       result.current.mutateAsync({ appointment: RIYA, fields: { date: '2026-10-13' } }),
     );
-    expect(lastSuccess()).toMatch(/^#2861 moved to Tue.* · confirm request sent$/);
+    expect(lastSuccess()).toMatch(/^#2861 moved to Tue.* · confirm request queued$/);
   });
 
   it('says why a stale save was refused', async () => {

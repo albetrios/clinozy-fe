@@ -174,7 +174,7 @@
   "receive": {
     "title": "Zahlung einnehmen",
     "titleEdit": "Einnahme bearbeiten",
-    "sub": "Der Beleg geht per WhatsApp an den Patienten",
+    "sub": "Der Beleg wird für den Patienten per WhatsApp in die Warteschlange gestellt",
     "subEdit": "Offen bis zum Tagesabschluss · jede Änderung wird protokolliert",
     "section": "Wer zahlt",
     "branch": "Filiale",
@@ -353,7 +353,7 @@
     "previousTitle": "{{day}} prüfen",
     "closeDay": "Tag abschließen",
     "countFirst": "Zählen Sie zuerst das Bargeld",
-    "closed": "Tag abgeschlossen · Zusammenfassung per WhatsApp an den Admin gesendet",
+    "closed": "Tag abgeschlossen",
     "reopened": "Tag wieder geöffnet",
     "gate": {
       "title": "Anfangsbestand · {{day}}",

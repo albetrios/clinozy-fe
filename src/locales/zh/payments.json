@@ -170,7 +170,7 @@
   "receive": {
     "title": "收款",
     "titleEdit": "编辑收款",
-    "sub": "收据会通过 WhatsApp 发给患者",
+    "sub": "收据将排队通过 WhatsApp 发给患者",
     "subEdit": "结账前可修改 · 每次更改都会记录",
     "section": "付款人",
     "branch": "分店",
@@ -343,7 +343,7 @@
     "previousTitle": "查看 {{day}}",
     "closeDay": "结算当天",
     "countFirst": "请先清点现金",
-    "closed": "当天已结算 · 摘要已通过 WhatsApp 发给管理员",
+    "closed": "当天已结算",
     "reopened": "当天已重新打开",
     "gate": {
       "title": "期初现金 · {{day}}",

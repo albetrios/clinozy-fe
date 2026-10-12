@@ -110,8 +110,8 @@
       "cancelled": "Stornieren"
     },
     "moveHints": {
-      "scheduled": "Zeitfenster reserviert · Bestätigungsanfrage per WhatsApp gesendet",
-      "confirmed": "Zugesagt · eine Ja-Antwort auf WhatsApp setzt dies automatisch",
+      "scheduled": "Zeitfenster reserviert · Bestätigungsanfrage in der Warteschlange",
+      "confirmed": "Zugesagt",
       "checked_in": "Angekommen · nur am Termintag",
       "completed": "Besuch erledigt · meist aus dem Besuch heraus gesetzt",
       "reschedule": "Auf ein neues Zeitfenster verschieben · derselbe Termin, das alte bleibt im Verlauf",
@@ -137,7 +137,7 @@
       "after_check_in": "Nach dem Check-in"
     },
     "hints": {
-      "scheduled": "Zeitfenster reserviert · WhatsApp bittet um Bestätigung, eine Ja-Antwort bestätigt ihn",
+      "scheduled": "Zeitfenster reserviert · die Bestätigungsanfrage wartet in der Warteschlange, bis Messaging verbunden ist",
       "confirmed": "Bereits telefonisch bestätigt · Erinnerung wird gesendet",
       "checked_in": "Patient ist in der Klinik · Wartezimmer des Arztes informiert · nach dem Besuch als Abgeschlossen markieren",
       "completed": "Besuch erledigt · morgen wird eine Feedback-Aufgabe erstellt",
@@ -172,10 +172,10 @@
       "other": "Sonstiges"
     },
     "toasts": {
-      "booked": "{{id}} gebucht · {{day}} {{time}} · Bestätigungsanfrage per WhatsApp gesendet",
+      "booked": "{{id}} gebucht · {{day}} {{time}} · Bestätigungsanfrage in der Warteschlange",
       "bookedQueued": "{{id}} gebucht · {{day}} {{time}} · Erinnerung eingeplant",
       "bookedOnly": "{{id}} gebucht · {{day}} {{time}}",
-      "moved": "{{id}} verschoben auf {{day}} {{time}} · Bestätigungsanfrage gesendet",
+      "moved": "{{id}} verschoben auf {{day}} {{time}} · Bestätigungsanfrage in der Warteschlange",
       "movedOnly": "{{id}} verschoben auf {{day}} {{time}}",
       "updated": "{{id}} aktualisiert",
       "statusChanged": "{{name}} → {{status}}",

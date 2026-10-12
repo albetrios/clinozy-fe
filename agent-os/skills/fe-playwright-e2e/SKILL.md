@@ -82,6 +82,7 @@ signed in through `page.request` so a cold `page.goto` (a deep link) restores th
 | `auth.e2e.test.ts`                 | Unified login, OAuth, guards, email OTP                            |
 | `home.e2e.test.ts`                 | Landing on Today in the clinic shell                               |
 | `app-rooms.e2e.test.ts`         | Launch smoke: every room, desktop + phone                          |
+| `app-writes.e2e.test.ts`        | Write flows: each room saves through its drawer, and a reload still lists it |
 | `app-roles.e2e.test.ts`         | Role QA: four presets' rooms, homes and controls by code (View-as) |
 | `app-dialog-routes.e2e.test.ts` | Dialog-route deep links (`S:115`)                                  |
 | `settings.e2e.test.ts`             | Hash modal `#settings/...`                                         |

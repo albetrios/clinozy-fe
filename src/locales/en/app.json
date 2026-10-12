@@ -110,8 +110,8 @@
       "cancelled": "Cancel"
     },
     "moveHints": {
-      "scheduled": "Slot held · confirm request sent on WhatsApp",
-      "confirmed": "They said yes · a Yes reply on WhatsApp sets this automatically",
+      "scheduled": "Slot held · confirm request queued",
+      "confirmed": "They said yes",
       "checked_in": "They have arrived · only on the day",
       "completed": "Visit done · usually set from the visit",
       "reschedule": "Move to a new slot · same appointment, old slot kept in history",
@@ -137,7 +137,7 @@
       "after_check_in": "After check-in"
     },
     "hints": {
-      "scheduled": "Slot held · WhatsApp asks them to confirm, a Yes reply confirms it",
+      "scheduled": "Slot held · the confirm request waits in the queue until messaging is connected",
       "confirmed": "Already confirmed on a call · reminder goes out",
       "checked_in": "Patient is at the clinic · doctor queue notified · mark Completed when done",
       "completed": "Visit done · a feedback task goes out tomorrow",
@@ -172,10 +172,10 @@
       "other": "Other"
     },
     "toasts": {
-      "booked": "Booked {{id}} · {{day}} {{time}} · confirm request sent on WhatsApp",
+      "booked": "Booked {{id}} · {{day}} {{time}} · confirm request queued",
       "bookedQueued": "Booked {{id}} · {{day}} {{time}} · reminder queued",
       "bookedOnly": "Booked {{id}} · {{day}} {{time}}",
-      "moved": "{{id}} moved to {{day}} {{time}} · confirm request sent",
+      "moved": "{{id}} moved to {{day}} {{time}} · confirm request queued",
       "movedOnly": "{{id}} moved to {{day}} {{time}}",
       "updated": "{{id}} updated",
       "statusChanged": "{{name}} → {{status}}",

@@ -110,8 +110,8 @@
       "cancelled": "Annulla"
     },
     "moveHints": {
-      "scheduled": "Orario riservato · richiesta di conferma inviata su WhatsApp",
-      "confirmed": "Hanno detto sì · una risposta «Sì» su WhatsApp lo imposta automaticamente",
+      "scheduled": "Orario riservato · richiesta di conferma in coda",
+      "confirmed": "Hanno detto sì",
       "checked_in": "Sono arrivati · solo nel giorno della visita",
       "completed": "Visita fatta · di solito impostato dalla visita",
       "reschedule": "Sposta a un nuovo orario · stesso appuntamento, il vecchio orario resta nello storico",
@@ -137,7 +137,7 @@
       "after_check_in": "Dopo l’arrivo"
     },
     "hints": {
-      "scheduled": "Orario riservato · WhatsApp chiede di confermare, una risposta «Sì» lo conferma",
+      "scheduled": "Orario riservato · la richiesta di conferma resta in coda finché la messaggistica non è collegata",
       "confirmed": "Già confermato al telefono · il promemoria viene inviato",
       "checked_in": "Il paziente è in clinica · coda del medico avvisata · segna Completato quando hai finito",
       "completed": "Visita fatta · domani parte un’attività di feedback",
@@ -172,10 +172,10 @@
       "other": "Altro"
     },
     "toasts": {
-      "booked": "Prenotato {{id}} · {{day}} {{time}} · richiesta di conferma inviata su WhatsApp",
+      "booked": "Prenotato {{id}} · {{day}} {{time}} · richiesta di conferma in coda",
       "bookedQueued": "Prenotato {{id}} · {{day}} {{time}} · promemoria in coda",
       "bookedOnly": "Prenotato {{id}} · {{day}} {{time}}",
-      "moved": "{{id}} spostato a {{day}} {{time}} · richiesta di conferma inviata",
+      "moved": "{{id}} spostato a {{day}} {{time}} · richiesta di conferma in coda",
       "movedOnly": "{{id}} spostato a {{day}} {{time}}",
       "updated": "{{id}} aggiornato",
       "statusChanged": "{{name}} → {{status}}",

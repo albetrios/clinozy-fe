@@ -329,7 +329,7 @@ export const PAYMENTS_KEYS = {
     previousNone: 'dayClose.previousNone',
     closeDay: 'dayClose.closeDay',
     countFirst: 'dayClose.countFirst',
-    /** "Day closed · summary sent to admin on WhatsApp". */
+    /** "Day closed". */
     closed: 'dayClose.closed',
     reopened: 'dayClose.reopened',
     /** clinozy-be's `409`s, in the room's words — each re-reads the day. */

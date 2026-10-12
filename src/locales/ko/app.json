@@ -110,8 +110,8 @@
       "cancelled": "취소"
     },
     "moveHints": {
-      "scheduled": "시간 확보됨 · WhatsApp으로 확인 요청을 보냈습니다",
-      "confirmed": "응답함 · WhatsApp에서 ‘예’라고 답하면 자동으로 설정됩니다",
+      "scheduled": "시간 확보됨 · 확인 요청이 대기열에 있습니다",
+      "confirmed": "응답함",
       "checked_in": "도착했습니다 · 당일에만",
       "completed": "진료 완료 · 보통 진료 화면에서 설정됩니다",
       "reschedule": "새 시간으로 이동 · 같은 예약이며, 이전 시간은 기록에 남습니다",
@@ -137,7 +137,7 @@
       "after_check_in": "체크인 후"
     },
     "hints": {
-      "scheduled": "시간 확보됨 · WhatsApp으로 확인을 요청하며, ‘예’ 응답으로 확정됩니다",
+      "scheduled": "시간 확보됨 · 메시징이 연결될 때까지 확인 요청이 대기열에서 기다립니다",
       "confirmed": "전화로 이미 확정 · 알림이 발송됩니다",
       "checked_in": "환자가 클리닉에 있습니다 · 의사 대기열에 알림 · 끝나면 완료로 표시하세요",
       "completed": "진료 완료 · 내일 피드백 작업이 발송됩니다",
@@ -172,10 +172,10 @@
       "other": "기타"
     },
     "toasts": {
-      "booked": "{{id}} 예약됨 · {{day}} {{time}} · WhatsApp으로 확인 요청을 보냈습니다",
+      "booked": "{{id}} 예약됨 · {{day}} {{time}} · 확인 요청이 대기열에 있습니다",
       "bookedQueued": "{{id}} 예약됨 · {{day}} {{time}} · 알림 예약됨",
       "bookedOnly": "{{id}} 예약됨 · {{day}} {{time}}",
-      "moved": "{{id}} 이동됨 · {{day}} {{time}} · 확인 요청을 보냈습니다",
+      "moved": "{{id}} 이동됨 · {{day}} {{time}} · 확인 요청이 대기열에 있습니다",
       "movedOnly": "{{id}} 이동됨 · {{day}} {{time}}",
       "updated": "{{id}} 업데이트됨",
       "statusChanged": "{{name}} → {{status}}",

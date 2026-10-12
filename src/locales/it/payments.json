@@ -178,7 +178,7 @@
   "receive": {
     "title": "Incassa pagamento",
     "titleEdit": "Modifica incasso",
-    "sub": "La ricevuta va al paziente su WhatsApp",
+    "sub": "La ricevuta è in coda per il paziente su WhatsApp",
     "subEdit": "Aperto fino alla chiusura · ogni modifica è registrata",
     "section": "Chi paga",
     "branch": "Sede",
@@ -363,7 +363,7 @@
     "previousTitle": "Controlla {{day}}",
     "closeDay": "Chiudi la giornata",
     "countFirst": "Prima conta i contanti",
-    "closed": "Giornata chiusa · riepilogo inviato all’admin su WhatsApp",
+    "closed": "Giornata chiusa",
     "reopened": "Giornata riaperta",
     "gate": {
       "title": "Fondo cassa iniziale · {{day}}",

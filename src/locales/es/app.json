@@ -110,8 +110,8 @@
       "cancelled": "Cancelar"
     },
     "moveHints": {
-      "scheduled": "Hueco reservado · solicitud de confirmación enviada por WhatsApp",
-      "confirmed": "Dijeron que sí · una respuesta «Sí» en WhatsApp lo marca automáticamente",
+      "scheduled": "Hueco reservado · solicitud de confirmación en cola",
+      "confirmed": "Dijeron que sí",
       "checked_in": "Han llegado · solo el día de la cita",
       "completed": "Visita hecha · normalmente se marca desde la visita",
       "reschedule": "Mover a un nuevo hueco · misma cita, el hueco anterior queda en el historial",
@@ -137,7 +137,7 @@
       "after_check_in": "Después de la llegada"
     },
     "hints": {
-      "scheduled": "Hueco reservado · WhatsApp les pide confirmar, una respuesta «Sí» la confirma",
+      "scheduled": "Hueco reservado · la solicitud de confirmación espera en cola hasta que se conecte la mensajería",
       "confirmed": "Ya confirmada por llamada · se envía el recordatorio",
       "checked_in": "El paciente está en la clínica · cola del médico avisada · marca Completada al terminar",
       "completed": "Visita hecha · mañana sale una tarea de opinión",
@@ -172,10 +172,10 @@
       "other": "Otro"
     },
     "toasts": {
-      "booked": "Reservada {{id}} · {{day}} {{time}} · solicitud de confirmación enviada por WhatsApp",
+      "booked": "Reservada {{id}} · {{day}} {{time}} · solicitud de confirmación en cola",
       "bookedQueued": "Reservada {{id}} · {{day}} {{time}} · recordatorio programado",
       "bookedOnly": "Reservada {{id}} · {{day}} {{time}}",
-      "moved": "{{id}} movida a {{day}} {{time}} · solicitud de confirmación enviada",
+      "moved": "{{id}} movida a {{day}} {{time}} · solicitud de confirmación en cola",
       "movedOnly": "{{id}} movida a {{day}} {{time}}",
       "updated": "{{id}} actualizada",
       "statusChanged": "{{name}} → {{status}}",

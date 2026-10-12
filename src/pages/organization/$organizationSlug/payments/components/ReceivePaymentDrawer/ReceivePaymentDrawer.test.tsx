@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -235,6 +235,28 @@ describe('ReceivePaymentDrawer — new (payments.md:95–110)', () => {
     expect(part('splits-total')).toHaveTextContent('Total ₹1,250.50 · due ₹1,250.50');
     await user.click(part('splits-add'));
     expect(screen.getAllByTestId(`${D}-splits-row`)).toHaveLength(2);
+  });
+
+  it('keeps an amount typed while the patient’s invoices are still being read', async () => {
+    const user = setUser();
+    let answer: ((invoices: typeof OPEN) => void) | undefined;
+    vi.mocked(listOpenInvoices).mockReturnValueOnce(
+      new Promise((resolve) => {
+        answer = resolve;
+      }),
+    );
+    renderWithProviders(
+      <ReceivePaymentDrawer open mode="create" prefill={{}} onClose={vi.fn()} />,
+    );
+    await user.click(await screen.findByTestId(`${D}-patient`));
+    await user.type(await screen.findByTestId(`${D}-patient-search`), 'Kavya');
+    await user.click(await screen.findByTestId(`${D}-patient-option-${KAVYA.id}`));
+    const amount = part('splits-amount');
+    await user.clear(amount);
+    await user.type(amount, '500');
+    await act(async () => answer?.([]));
+    expect(part('splits-amount')).toHaveValue('500');
+    expect(part('splits-total')).toHaveTextContent('₹500');
   });
 
   it('records an advance when the invoice is cleared — against no invoice, with no due', async () => {

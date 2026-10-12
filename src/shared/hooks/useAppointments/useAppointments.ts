@@ -366,7 +366,7 @@ const movedBy = ({ appointment }: AppointmentUpdateVars, row: AppointmentRow) =>
 
 /**
  * Save an edit — not optimistic, refused when someone saved the booking meanwhile
- * (`409 record_changed`): "#2861 moved to <day> <time> · confirm request sent" when the slot
+ * (`409 record_changed`): "#2861 moved to <day> <time> · confirm request queued" when the slot
  * moved, else "#2861 updated".
  */
 export function useUpdateAppointment(

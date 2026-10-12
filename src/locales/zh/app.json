@@ -110,8 +110,8 @@
       "cancelled": "取消"
     },
     "moveHints": {
-      "scheduled": "时段已预留 · 已通过 WhatsApp 发送确认请求",
-      "confirmed": "对方已同意 · 在 WhatsApp 回复“是”会自动设置",
+      "scheduled": "时段已预留 · 确认请求已排队",
+      "confirmed": "对方已同意",
       "checked_in": "已到达 · 仅限当天",
       "completed": "就诊完成 · 通常在就诊中设置",
       "reschedule": "改到新时段 · 同一预约，旧时段保留在历史中",
@@ -137,7 +137,7 @@
       "after_check_in": "签到后"
     },
     "hints": {
-      "scheduled": "时段已预留 · WhatsApp 会请对方确认，回复“是”即确认",
+      "scheduled": "时段已预留 · 确认请求将排队等待，直到接通消息服务",
       "confirmed": "已电话确认 · 会发送提醒",
       "checked_in": "患者已在诊所 · 已通知医生排队 · 完成后标记为已完成",
       "completed": "就诊完成 · 明天会发出反馈任务",
@@ -172,10 +172,10 @@
       "other": "其他"
     },
     "toasts": {
-      "booked": "已预约 {{id}} · {{day}} {{time}} · 已通过 WhatsApp 发送确认请求",
+      "booked": "已预约 {{id}} · {{day}} {{time}} · 确认请求已排队",
       "bookedQueued": "已预约 {{id}} · {{day}} {{time}} · 提醒已排队",
       "bookedOnly": "已预约 {{id}} · {{day}} {{time}}",
-      "moved": "{{id}} 已改到 {{day}} {{time}} · 已发送确认请求",
+      "moved": "{{id}} 已改到 {{day}} {{time}} · 确认请求已排队",
       "movedOnly": "{{id}} 已改到 {{day}} {{time}}",
       "updated": "{{id}} 已更新",
       "statusChanged": "{{name}} → {{status}}",

@@ -178,7 +178,7 @@
   "receive": {
     "title": "Encaisser un paiement",
     "titleEdit": "Modifier l’encaissement",
-    "sub": "Le reçu part au patient par WhatsApp",
+    "sub": "Le reçu est mis en file d’attente pour le patient sur WhatsApp",
     "subEdit": "Modifiable jusqu’à la clôture · chaque modification est tracée",
     "section": "Qui paie",
     "branch": "Site",
@@ -363,7 +363,7 @@
     "previousTitle": "Vérifier le {{day}}",
     "closeDay": "Clôturer la journée",
     "countFirst": "Comptez d’abord les espèces",
-    "closed": "Journée clôturée · résumé envoyé à l’admin sur WhatsApp",
+    "closed": "Journée clôturée",
     "reopened": "Journée rouverte",
     "gate": {
       "title": "Fonds de caisse · {{day}}",

@@ -110,8 +110,8 @@
       "cancelled": "Cancelar"
     },
     "moveHints": {
-      "scheduled": "Horário reservado · pedido de confirmação enviado no WhatsApp",
-      "confirmed": "Disseram sim · uma resposta «Sim» no WhatsApp marca isto automaticamente",
+      "scheduled": "Horário reservado · pedido de confirmação na fila",
+      "confirmed": "Disseram sim",
       "checked_in": "Chegaram · só no dia",
       "completed": "Visita feita · normalmente marcada pela visita",
       "reschedule": "Mover para um novo horário · mesma consulta, o horário antigo fica no histórico",
@@ -137,7 +137,7 @@
       "after_check_in": "Após o check-in"
     },
     "hints": {
-      "scheduled": "Horário reservado · o WhatsApp pede confirmação, uma resposta «Sim» confirma",
+      "scheduled": "Horário reservado · o pedido de confirmação aguarda na fila até a mensagem estar ligada",
       "confirmed": "Já confirmada por ligação · o lembrete é enviado",
       "checked_in": "O paciente está na clínica · fila do médico avisada · marque Concluída ao terminar",
       "completed": "Visita feita · amanhã sai uma tarefa de feedback",
@@ -172,10 +172,10 @@
       "other": "Outro"
     },
     "toasts": {
-      "booked": "Agendada {{id}} · {{day}} {{time}} · pedido de confirmação enviado no WhatsApp",
+      "booked": "Agendada {{id}} · {{day}} {{time}} · pedido de confirmação na fila",
       "bookedQueued": "Agendada {{id}} · {{day}} {{time}} · lembrete na fila",
       "bookedOnly": "Agendada {{id}} · {{day}} {{time}}",
-      "moved": "{{id}} movida para {{day}} {{time}} · pedido de confirmação enviado",
+      "moved": "{{id}} movida para {{day}} {{time}} · pedido de confirmação na fila",
       "movedOnly": "{{id}} movida para {{day}} {{time}}",
       "updated": "{{id}} atualizada",
       "statusChanged": "{{name}} → {{status}}",

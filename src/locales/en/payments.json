@@ -174,7 +174,7 @@
   "receive": {
     "title": "Receive payment",
     "titleEdit": "Edit payment in",
-    "sub": "Receipt goes to the patient on WhatsApp",
+    "sub": "The receipt is queued for the patient on WhatsApp",
     "subEdit": "Open until the day is closed · every change is logged",
     "section": "Who is paying",
     "branch": "Branch",
@@ -353,7 +353,7 @@
     "previousTitle": "Review {{day}}",
     "closeDay": "Close day",
     "countFirst": "Count the cash first",
-    "closed": "Day closed · summary sent to admin on WhatsApp",
+    "closed": "Day closed",
     "reopened": "Day reopened",
     "gate": {
       "title": "Opening cash · {{day}}",

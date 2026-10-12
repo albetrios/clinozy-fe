@@ -651,7 +651,7 @@ describe('AppointmentForm — New (KICKOFF §6.4)', () => {
       appointment: { id: BOOKED_ID, date: '2026-10-05', startTime: '10:30' },
     });
     expect(notifyMock.success).toHaveBeenCalledWith(
-      expect.stringMatching(/^Booked #2870 · .* · confirm request sent on WhatsApp$/),
+      expect.stringMatching(/^Booked #2870 · .* · confirm request queued$/),
     );
   });
 

@@ -178,7 +178,7 @@
   "receive": {
     "title": "Cobrar pago",
     "titleEdit": "Editar cobro",
-    "sub": "El recibo se envía al paciente por WhatsApp",
+    "sub": "El recibo queda en cola para el paciente por WhatsApp",
     "subEdit": "Abierto hasta cerrar el día · cada cambio queda registrado",
     "section": "Quién paga",
     "branch": "Sucursal",
@@ -363,7 +363,7 @@
     "previousTitle": "Revisar {{day}}",
     "closeDay": "Cerrar el día",
     "countFirst": "Cuenta primero el efectivo",
-    "closed": "Día cerrado · resumen enviado al admin por WhatsApp",
+    "closed": "Día cerrado",
     "reopened": "Día reabierto",
     "gate": {
       "title": "Efectivo inicial · {{day}}",

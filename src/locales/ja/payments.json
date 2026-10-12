@@ -170,7 +170,7 @@
   "receive": {
     "title": "入金を受け取る",
     "titleEdit": "入金を編集",
-    "sub": "領収書は WhatsApp で患者に送られます",
+    "sub": "領収書は患者へのWhatsApp送信待ちになります",
     "subEdit": "日締めまで編集可 · 変更はすべて記録されます",
     "section": "支払う人",
     "branch": "店舗",
@@ -343,7 +343,7 @@
     "previousTitle": "{{day}} を確認",
     "closeDay": "日次を締める",
     "countFirst": "先に現金を数えてください",
-    "closed": "日次を締めました · 概要を WhatsApp で管理者に送信しました",
+    "closed": "日次を締めました",
     "reopened": "日次を再開しました",
     "gate": {
       "title": "開始時の現金 · {{day}}",
