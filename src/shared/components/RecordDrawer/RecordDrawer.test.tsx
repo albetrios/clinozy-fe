@@ -276,6 +276,8 @@ describe('RecordDrawer — shell', () => {
     );
     const save = await screen.findByTestId('pt-save');
     expect(save).toHaveAttribute('data-incomplete', 'true');
+    expect(save).toHaveAttribute('aria-disabled', 'true');
+    expect(save).toBeEnabled();
     expect(save).toHaveClass('opacity-50', 'md:h-8');
     await u.click(save);
     expect(onSave).toHaveBeenCalledOnce();

@@ -127,6 +127,9 @@ function PrimaryAction({
       form={saveFormId}
       disabled={saving || saveDisabled}
       aria-busy={saving || undefined}
+      // Incomplete: dimmed and announced as not yet available, still clickable — the screen
+      // names what is missing (an inactive control, so WCAG 1.4.3 does not apply to its ink).
+      aria-disabled={saveIncomplete || undefined}
       data-incomplete={saveIncomplete || undefined}
       onClick={saveFormId ? undefined : onSave}
       data-testid={saveTestId ?? `${testId}-save`}

@@ -277,6 +277,25 @@ export async function openNotificationCenter(page: Page): Promise<void> {
   await expect(page.getByTestId('notification-popover')).toBeVisible();
 }
 
+/** `<html>`'s class in dark mode — assert it before a dark shot or scan. */
+export const DARK_HTML_CLASS = /(?:^|\s)dark(?:\s|$)/;
+
+/**
+ * Dark mode the way a member has it: the saved preference (`useThemeStore`'s
+ * `theme-preference`), seeded before the app boots, so `theme-init.js` paints
+ * dark from the first frame and the store rehydrates to dark. Adding `.dark`
+ * after the load raced that rehydrate, which put the saved mode — light, the
+ * default — back: the "dark" 404 was shot light whenever it lost (flaky).
+ */
+export async function seedDarkMode(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      'theme-preference',
+      JSON.stringify({ state: { theme: 'dark' }, version: 8 }),
+    );
+  });
+}
+
 /**
  * Picks Light, Dark or System from the Account menu's Appearance pills, then
  * closes the menu (a pill keeps it open) and waits for it to be gone.

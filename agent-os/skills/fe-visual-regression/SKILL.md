@@ -59,6 +59,14 @@ each cell must earn its maintenance cost:
    after `gotoApp`.
 3. **Axis interactions** only when an audit found a real bug in a combination
    (e.g. `dark + separation:hairline + menu:glass`) — pin the fixed combination.
+4. **The clinic rooms** are one test per pass — light at desktop, light at the phone's
+   width, dark at desktop — that opens a new clinic (`openNewClinic(page, { name })`, a fixed
+   name) under a fixed clock and shoots every room of `APP_ROOMS` in turn as a soft
+   assertion (`room-<room>-<desktop|phone|dark>.png`). Empty rooms, on purpose: a seeded row
+   carries server times no browser clock can hold still. Mask what is per run — the
+   avatar, Today's greeting, the owner's row in Users. A new room joins `APP_ROOMS` and is
+   shot by all three passes; record its PNGs on each platform you keep baselines for
+   (`pnpm test:visual:update` on macOS writes the `-darwin` set).
 
 Do **not** snapshot every axis × every route (matrix explosion), transient states
 (toasts, spinners), or pages whose content is nondeterministic without fixtures.

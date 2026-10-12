@@ -220,8 +220,9 @@ function ComposerNotes({
 }) {
   return (
     <>
+      {/* The notes sit on the composer's channel tint: the strong muted ink keeps them AA. */}
       {hint?.kind === 'here' ? (
-        <span className="text-caption text-muted-foreground min-w-0 flex-1 truncate">
+        <span className="text-caption text-muted-foreground-strong min-w-0 flex-1 truncate">
           {t(keys.replyHint, { first: isolateText(first) })}
         </span>
       ) : null}
@@ -245,7 +246,7 @@ function ComposerNotes({
         </span>
       ) : null}
       {notConnected ? (
-        <span className="text-caption text-muted-foreground min-w-0 truncate">
+        <span className="text-caption text-muted-foreground-strong min-w-0 truncate">
           {t(keys.notConnected)}
         </span>
       ) : null}

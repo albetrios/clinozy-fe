@@ -102,7 +102,8 @@ export function AgendaDayHeader({
         </span>
         <span className="flex flex-col">
           <span className="text-body leading-[1.25] font-semibold">{title}</span>
-          <span className="text-caption text-muted-foreground leading-[1.25]">
+          {/* The strong muted ink: the plain one falls under AA on the tinted band. */}
+          <span className="text-caption text-muted-foreground-strong leading-[1.25]">
             {subLine}
           </span>
         </span>

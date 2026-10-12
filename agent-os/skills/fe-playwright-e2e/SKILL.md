@@ -92,8 +92,8 @@ signed in through `page.request` so a cold `page.goto` (a deep link) restores th
 | `org-switching.e2e.test.ts`        | Account menu › Switch clinic                                       |
 | `invitations.e2e.test.ts` | Invitations at sign-in: picker, accept, decline, Invited row (D84) |
 | `responsive.e2e.test.ts`           | 320px overflow                                                     |
-| `accessibility.e2e.test.ts`        | Axe WCAG gate                                                      |
-| `visual.e2e.test.ts`               | Screenshots (reduced motion)                                       |
+| `accessibility.e2e.test.ts`        | Axe WCAG gate: every room + its main drawer, light and dark        |
+| `visual.e2e.test.ts`               | Screenshots (reduced motion): every room, desktop/phone/dark       |
 
 ## Workflow (new spec)
 

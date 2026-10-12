@@ -1,7 +1,19 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import {
+  APP_ROOMS,
+  APP_VIEWPORTS,
+  expectRoomLoaded,
+  openNewClinic,
+  openRoomFromShell,
+} from '@/tests/utils/e2e-app.ts';
 import { navigateInApp, registerNewUserAndGoToToday } from '@/tests/utils/e2e-auth.ts';
-import { expectAuthScreenReady, gotoApp } from '@/tests/utils/e2e-hybrid.ts';
+import {
+  DARK_HTML_CLASS,
+  expectAuthScreenReady,
+  gotoApp,
+  seedDarkMode,
+} from '@/tests/utils/e2e-hybrid.ts';
 import { verifyDatabaseConnection } from '@/tests/utils/e2e-session.ts';
 
 /**
@@ -29,25 +41,6 @@ async function settled(page: Page): Promise<void> {
   await page.addStyleTag({ content: HIDE_TRANSIENT });
 }
 
-/** `<html>` in dark mode — asserted before a dark shot is taken. */
-const DARK = /(?:^|\s)dark(?:\s|$)/;
-
-/**
- * Dark mode the way a member has it: the saved preference (`useThemeStore`'s
- * `theme-preference`), seeded before the app boots, so `theme-init.js` paints
- * dark from the first frame and the store rehydrates to dark. Adding `.dark`
- * after the load raced that rehydrate, which put the saved mode — light, the
- * default — back: the "dark" 404 was shot light whenever it lost (flaky).
- */
-async function seedDarkMode(page: Page): Promise<void> {
-  await page.addInitScript(() => {
-    localStorage.setItem(
-      'theme-preference',
-      JSON.stringify({ state: { theme: 'dark' }, version: 8 }),
-    );
-  });
-}
-
 test.beforeEach(async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
 });
@@ -69,7 +62,7 @@ test.describe('Visual Regression', () => {
     await gotoApp(page, '/login');
     await expectAuthScreenReady(page);
     await settled(page);
-    await expect(page.locator('html')).toHaveClass(DARK);
+    await expect(page.locator('html')).toHaveClass(DARK_HTML_CLASS);
     await expect(page).toHaveScreenshot('login-dark.png', {
       fullPage: true,
       maxDiffPixelRatio: 0.02,
@@ -103,7 +96,7 @@ test.describe('Visual Regression', () => {
     });
     await expectAuthScreenReady(page);
     await settled(page);
-    await expect(page.locator('html')).toHaveClass(DARK);
+    await expect(page.locator('html')).toHaveClass(DARK_HTML_CLASS);
     await expect(page).toHaveScreenshot('login-dark-glass-hairline.png', {
       fullPage: true,
       maxDiffPixelRatio: 0.02,
@@ -151,7 +144,7 @@ test.describe('Visual Regression', () => {
     await gotoApp(page, '/definitely-not-a-route');
     await expect(page.getByTestId('not-found-page')).toBeVisible({ timeout: 10000 });
     await settled(page);
-    await expect(page.locator('html')).toHaveClass(DARK);
+    await expect(page.locator('html')).toHaveClass(DARK_HTML_CLASS);
     await expect(page).toHaveScreenshot('404-dark.png', {
       fullPage: true,
       maxDiffPixelRatio: 0.02,
@@ -178,4 +171,61 @@ test.describe('Visual Regression', () => {
       animations: 'disabled',
     });
   });
+});
+
+// Every room of a new clinic — light at desktop and at the phone's width, dark at desktop:
+// the shell, the toolbars, the filters and each room's empty state. Empty, because a seeded
+// row carries live times (booked "later today", created "2 min ago") that no fixed clock can
+// hold still. One clinic per pass, every room in turn; each shot is soft, so one moved room
+// still reports every other.
+const ROOM_PASSES = [
+  { tier: 'desktop', scheme: 'light' },
+  { tier: 'phone', scheme: 'light' },
+  { tier: 'desktop', scheme: 'dark' },
+] as const;
+
+test.describe('Visual Regression — clinic rooms', () => {
+  for (const { tier, scheme } of ROOM_PASSES) {
+    const variant = scheme === 'dark' ? 'dark' : tier;
+    test(`every room of a new clinic (${tier}, ${scheme})`, async ({ page }) => {
+      test.skip(
+        !(await verifyDatabaseConnection()),
+        'DATABASE_URL must reach clinozy-be Postgres (auth.mail_outbox)',
+      );
+      test.setTimeout(180_000);
+      await page.setViewportSize(APP_VIEWPORTS[tier]);
+      await page.clock.setFixedTime(FIXED_NOW);
+      if (scheme === 'dark') await seedDarkMode(page);
+      // One clinic name every run: the header shows it.
+      await openNewClinic(page, { name: 'Riya Skin Clinic' });
+      await settled(page);
+      if (scheme === 'dark')
+        await expect(page.locator('html')).toHaveClass(DARK_HTML_CLASS);
+
+      for (const room of APP_ROOMS) {
+        if (room !== 'today') await openRoomFromShell(page, room, tier);
+        await expectRoomLoaded(page, room);
+        if (room === 'today') {
+          await expect(page.getByTestId('today-page')).not.toHaveAttribute('aria-busy', {
+            timeout: 15_000,
+          });
+        }
+        await expect.soft(page).toHaveScreenshot(`room-${room}-${variant}.png`, {
+          fullPage: true,
+          maxDiffPixelRatio: 0.03,
+          animations: 'disabled',
+          // A new owner every run: their avatar, their name in Today's greeting, and their
+          // row (name and email) in the team list.
+          mask: [
+            page.getByTestId('user-menu-trigger'),
+            page.getByRole('heading', {
+              level: 1,
+              name: /^Good (morning|afternoon|evening)/,
+            }),
+            page.getByTestId('users-team-table-row'),
+          ],
+        });
+      }
+    });
+  }
 });

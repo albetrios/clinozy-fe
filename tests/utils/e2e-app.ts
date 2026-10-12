@@ -268,11 +268,12 @@ export async function seedClinic(
  * when the live clinozy-be has team organizations turned off — there is no
  * clinic to open then. `email` signs in a given address instead of a fresh one —
  * someone a spec has already invited elsewhere, say. `seed` fills the clinic
- * (`seedClinic`) before the owner walks in, so the rooms have rows to open.
+ * (`seedClinic`) before the owner walks in, so the rooms have rows to open. `name` names the
+ * clinic (a random one otherwise) — a screenshot needs the same name every run.
  */
 export async function openNewClinic(
   page: Page,
-  options: { email?: string; seed?: boolean } = {},
+  options: { email?: string; seed?: boolean; name?: string } = {},
 ): Promise<{ slug: string; email: string; seed: ClinicSeed | null }> {
   await hideDevtools(page);
   await gotoApp(page, '/login');
@@ -290,6 +291,7 @@ export async function openNewClinic(
   const { createStatus, org, teamToken } = await createTeamOrganization(
     page.request,
     accessToken,
+    { name: options.name },
   );
   const slug = org?.slug ?? '';
   expect(slug, `the clinic was not created (${createStatus})`).not.toBe('');
@@ -314,6 +316,14 @@ export async function expectRoomReady(page: Page, room: AppRoom): Promise<void> 
   });
   await expect(page.getByTestId(testId)).toBeVisible({ timeout: 15_000 });
   await expect(page.getByRole('heading', { level: 1, name: heading })).toBeVisible();
+}
+
+/** The room has loaded its rows: no skeleton left in it. */
+export async function expectRoomLoaded(page: Page, room: AppRoom): Promise<void> {
+  const root = page.getByTestId(APP_ROOM_PAGES[room].testId);
+  await expect(root.locator('[data-slot="skeleton"]')).toHaveCount(0, {
+    timeout: 15_000,
+  });
 }
 
 /** A record drawer is open and exposed as a dialog (the a11y guard). */

@@ -107,7 +107,8 @@ function ValueTile({
     return (
       <div className={cn(TILE_CLASS, 'border-dashed')}>
         <span className={TILE_LABEL_CLASS}>{label}</span>
-        <span className="text-detail text-disabled">
+        {/* Muted, not disabled: "Empty" is read, not an inactive control (WCAG 1.4.3). */}
+        <span className="text-detail text-muted-foreground">
           {t(RECORD_DRAWER_KEYS.peek.empty)}
         </span>
       </div>
