@@ -283,26 +283,35 @@ async function serveShellWhileOffline(
       else await route.abort('internetdisconnected');
       return;
     }
-    const response = await route.fetch();
-    // The backend (`/api/…`) is never part of the shell; source modules under
-    // `/src/…/api/` are.
-    if (
-      request.method() === 'GET' &&
-      !new URL(request.url()).pathname.startsWith('/api/')
-    ) {
-      // The body is stored decoded: its encoding and length no longer apply.
-      const headers = Object.fromEntries(
-        Object.entries(response.headers()).filter(
-          ([name]) => name !== 'content-encoding' && name !== 'content-length',
-        ),
-      );
-      shell.set(request.url(), {
-        status: response.status(),
-        headers,
-        body: await response.body(),
-      });
+    try {
+      const response = await route.fetch();
+      // The backend (`/api/…`) is never part of the shell; source modules under
+      // `/src/…/api/` are.
+      if (
+        request.method() === 'GET' &&
+        !new URL(request.url()).pathname.startsWith('/api/')
+      ) {
+        // The body is stored decoded: its encoding and length no longer apply.
+        const headers = Object.fromEntries(
+          Object.entries(response.headers()).filter(
+            ([name]) => name !== 'content-encoding' && name !== 'content-length',
+          ),
+        );
+        shell.set(request.url(), {
+          status: response.status(),
+          headers,
+          body: await response.body(),
+        });
+      }
+      await route.fulfill({ response });
+    } catch (error) {
+      // A navigation abandons the requests the page it left still had in flight
+      // (a lazy chunk, a warm-up prefetch), and Playwright disposes their
+      // responses: nothing waits for them, so there is nothing to answer. A
+      // module the shell then lacks still fails the offline boot visibly below.
+      if (error instanceof Error && error.message.includes('has been disposed')) return;
+      throw error;
     }
-    await route.fulfill({ response });
   });
   return async (value) => {
     offline = value;
