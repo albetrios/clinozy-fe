@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { api } from '@/core/http/api.ts';
+import { pageOf } from '@/core/http/pagination.ts';
 import { queryClient } from '@/core/http/queryClient.ts';
 import { collectAllPages } from '@/shared/api/fetch-all-pages.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
@@ -35,7 +36,7 @@ import {
   toInvoiceSheetBranch,
 } from './invoices-contracts.ts';
 import { listPatientPackages, patientPackageQueryKeys } from './patient-packages-api.ts';
-import { estimatedTotalOf, listInvoicePayments, nextCursorOf } from './payments-api.ts';
+import { listInvoicePayments } from './payments-api.ts';
 
 /*
  * Invoices on clinozy-be (`/app/invoices`, api-integration §5.8): a person's invoices (a page
@@ -135,8 +136,7 @@ export async function listInvoices(
   });
   return {
     rows: recordsOf(response.data),
-    next: nextCursorOf(response.meta),
-    total: estimatedTotalOf(response.meta),
+    ...pageOf(response.meta?.pagination),
     totals: totalsOf(response.meta),
   };
 }
@@ -153,7 +153,10 @@ export async function fetchAllInvoices(
         after: after ?? undefined,
       },
     });
-    return { rows: recordsOf(response.data), next: nextCursorOf(response.meta) };
+    return {
+      rows: recordsOf(response.data),
+      next: pageOf(response.meta?.pagination).next,
+    };
   }, 'invoices');
 }
 
@@ -178,7 +181,7 @@ export async function fetchInvoiceTotals(
     query: { ...invoiceFilterQuery(params), limit: 1 },
   });
   const totals = totalsOf(response.meta);
-  const count = estimatedTotalOf(response.meta);
+  const count = pageOf(response.meta?.pagination).total;
   return totals && count !== null ? { ...totals, count } : totals;
 }
 

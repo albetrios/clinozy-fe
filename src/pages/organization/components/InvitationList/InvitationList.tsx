@@ -10,7 +10,7 @@ import { AUTH_KEYS, AUTH_NS } from '@/shared/auth/auth-shell.constants.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
 import { Spinner } from '@/shared/components/Spinner/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { mapApiError, reportError } from '@/shared/errors/errorHandler.ts';
+import { notifyError, reportError } from '@/shared/errors/errorHandler.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { Building } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -53,7 +53,7 @@ function useInvitationResponse() {
       await navigate({ to: '/', replace: true });
     } catch (error) {
       reportError(error, { scope: 'organization-picker.invitation-accept' });
-      notify.error(mapApiError(error));
+      notifyError(error);
       // An invitation that turned out expired or revoked leaves the list.
       void invalidateMyInvitations();
     } finally {
@@ -66,7 +66,7 @@ function useInvitationResponse() {
     try {
       await declineInvitation(invitation.id);
     } catch (error) {
-      notify.error(mapApiError(error));
+      notifyError(error);
       throw error;
     }
     notify.success(t(AUTH_KEYS.organizationPicker.declined));

@@ -18,16 +18,13 @@ import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
 import { useDebouncedSearch } from '@/shared/hooks/useDebouncedValue/index.ts';
-import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { useOrganizationId } from '@/shared/store/useOrganizationStore/index.ts';
 
 /*
  * The person on clinozy-be (`/app/contacts`): one contact with every number, the person search
  * New lead and the pickers read, a new person before their booking, and the contact editor's
  * save.
  */
-
-/** The active organization — every key carries it. */
-const useOrganizationId = () => useOrganizationStore((state) => state.organizationId);
 
 /** One contact with every number; idle without an id. */
 export function useContact(contactId: string | undefined) {

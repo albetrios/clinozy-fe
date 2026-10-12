@@ -16,7 +16,7 @@ import {
   organizationPurchaseOrderReceive,
   organizationSupplierEdit,
 } from '@/lib/routes/medical-builders.ts';
-import { safeReferrer } from '@/shared/app/app-referrer.ts';
+import { referrerHref, safeReferrer } from '@/shared/app/app-referrer.ts';
 
 import type { MedicalCreateSearch } from '../../../medical.dialog-search.ts';
 import { validateMedicalSearch } from '../../../medical.search.ts';
@@ -62,7 +62,7 @@ export function useMedicalNav() {
           close(tab);
           return;
         }
-        void navigate({ href: `/organization/${slug}/${room}`, replace: true });
+        void navigate({ href: referrerHref(slug, room), replace: true });
       },
       /** Another tab, fresh. */
       tab: (tab: MedicalTab) => void navigate(organizationMedicalTab(slug, tab)),

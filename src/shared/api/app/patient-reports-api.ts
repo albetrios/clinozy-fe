@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { api } from '@/core/http/api.ts';
+import { pageOf } from '@/core/http/pagination.ts';
 import { collectAllPages } from '@/shared/api/fetch-all-pages.ts';
 
 import type { DeleteReason } from './app-schema.ts';
@@ -61,8 +62,7 @@ async function readReportPage(patientId: string, limit: number, after?: string) 
       .array(patientReportRowWire)
       .parse(response.data ?? [])
       .map(toPatientReport),
-    next: pagination?.has_more ? (pagination.next ?? null) : null,
-    total: pagination?.estimated_total ?? null,
+    ...pageOf(pagination),
   };
 }
 

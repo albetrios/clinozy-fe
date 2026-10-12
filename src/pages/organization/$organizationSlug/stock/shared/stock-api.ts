@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { api } from '@/core/http/api.ts';
+import { pageOf } from '@/core/http/pagination.ts';
 import { queryClient } from '@/core/http/queryClient.ts';
 import { createdRangeOf } from '@/shared/api/app/app-filter-ranges.ts';
 import type { CreatedFilter } from '@/shared/api/app/app-list-filters.ts';
@@ -117,17 +118,6 @@ const CATALOGUE_PAGE_SIZE = 100;
 /** The organization the cached lists belong to. */
 const activeOrganizationId = () => useOrganizationStore.getState().organizationId;
 
-/** A list page's cursor: the next one while there is more. */
-function nextOf(
-  meta: { pagination?: { has_more?: boolean; next?: string | null } } | undefined,
-) {
-  return meta?.pagination?.has_more ? (meta.pagination.next ?? null) : null;
-}
-
-/** The API's estimated count of the whole list — on its first page; null when left out. */
-const pageTotal = (meta: { pagination?: { estimated_total?: number } } | undefined) =>
-  meta?.pagination?.estimated_total ?? null;
-
 /** The Created filter as the API's range, on the clinic's `today`. */
 function createdQuery(created: CreatedFilter | undefined, today: string) {
   const range = created ? createdRangeOf(created, today) : {};
@@ -161,7 +151,7 @@ export async function fetchAllStockVendors(): Promise<StockVendorRow[]> {
         .array(stockVendorRowWire)
         .parse(response.data ?? [])
         .map(toStockVendorRow),
-      next: nextOf(response.meta),
+      next: pageOf(response.meta?.pagination).next,
     };
   }, 'stock-vendors');
 }
@@ -207,7 +197,7 @@ export async function fetchAllStockItems(): Promise<StockItemRow[]> {
         .array(stockItemRowWire)
         .parse(response.data ?? [])
         .map(toStockItemRecord),
-      next: nextOf(response.meta),
+      next: pageOf(response.meta?.pagination).next,
     };
   }, 'stock-items');
   return withVendors(items);
@@ -256,8 +246,7 @@ export async function listStockItems(
     .map(toStockItemRecord);
   return {
     rows: await withVendors(items),
-    next: nextOf(response.meta),
-    total: pageTotal(response.meta),
+    ...pageOf(response.meta?.pagination),
   };
 }
 
@@ -327,8 +316,7 @@ export async function listStockPurchases(
     purchases.length > 0 ? await vendorRefs() : new Map<string, StockVendorRef>();
   return {
     rows: purchases.map((purchase) => purchaseRowOf(purchase, vendors)),
-    next: nextOf(response.meta),
-    total: pageTotal(response.meta),
+    ...pageOf(response.meta?.pagination),
   };
 }
 
@@ -402,7 +390,7 @@ export async function listStockMovements(
   });
   const movements = z.array(stockMovementRowWire).parse(response.data ?? []);
   if (movements.length === 0) {
-    return { rows: [], next: nextOf(response.meta), total: pageTotal(response.meta) };
+    return { rows: [], ...pageOf(response.meta?.pagination) };
   }
   const [items, staff] = await Promise.all([
     queryClient.query({
@@ -421,8 +409,7 @@ export async function listStockMovements(
           : null,
       }),
     ),
-    next: nextOf(response.meta),
-    total: pageTotal(response.meta),
+    ...pageOf(response.meta?.pagination),
   };
 }
 
@@ -447,8 +434,7 @@ export async function listStockVendors(
       .array(stockVendorRowWire)
       .parse(response.data ?? [])
       .map(toStockVendorRow),
-    next: nextOf(response.meta),
-    total: pageTotal(response.meta),
+    ...pageOf(response.meta?.pagination),
   };
 }
 
@@ -482,7 +468,7 @@ async function purchaseSummary(
   });
   const meta = stockPurchaseListMetaWire.safeParse(response.meta);
   return {
-    total: pageTotal(response.meta),
+    total: pageOf(response.meta?.pagination).total,
     due: meta.success ? meta.data.due_total : null,
   };
 }
@@ -494,7 +480,7 @@ async function vendorSummary(params: StockVendorListParams): Promise<StockListSu
   });
   const meta = stockVendorListMetaWire.safeParse(response.meta);
   return {
-    total: pageTotal(response.meta),
+    total: pageOf(response.meta?.pagination).total,
     due: meta.success ? meta.data.payable_total : null,
   };
 }
@@ -507,7 +493,7 @@ async function movementSummary(
   const response = await api.get('/app/stock-item-movements', {
     query: { ...stockMovementListQuery(params, today), limit: 1 },
   });
-  return { total: pageTotal(response.meta), due: null };
+  return { total: pageOf(response.meta?.pagination).total, due: null };
 }
 
 /** Each tab's footer read. */

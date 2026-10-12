@@ -7,7 +7,7 @@ import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { organizationPayments } from '@/lib/routes/payments-builders.ts';
 import { fetchPayment, paymentQueryKeys } from '@/shared/api/app/payments-api.ts';
 import type { LedgerRow } from '@/shared/api/app/payments-contracts.ts';
-import { safeReferrer } from '@/shared/app/app-referrer.ts';
+import { referrerHref, safeReferrer } from '@/shared/app/app-referrer.ts';
 import {
   ledgerEntryEditable,
   ledgerEntryFixed,
@@ -183,7 +183,7 @@ export function usePaymentsDialogRoute(): PaymentsDialogRouteState {
     : '';
   const close = useCallback(() => {
     if (from && !crossRoom) {
-      void navigate({ href: `/organization/${organizationSlug}/${from}` });
+      void navigate({ href: referrerHref(organizationSlug, from) });
       return;
     }
     backToLedger();

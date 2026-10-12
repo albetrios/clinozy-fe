@@ -5,13 +5,12 @@ import { useTranslation } from 'react-i18next';
 import { patientPackageQueryKeys } from '@/shared/api/app/patient-packages-api.ts';
 import { treatmentQueryKeys } from '@/shared/api/app/treatments-api.ts';
 import type { TreatmentRecord } from '@/shared/api/app/treatments-contracts.ts';
-import { mapApiError } from '@/shared/errors/errorHandler.ts';
+import { notifyError } from '@/shared/errors/errorHandler.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import {
   useCreateTreatment,
   useUpdateTreatment,
 } from '@/shared/hooks/useTreatments/index.ts';
-import { notify } from '@/shared/notify/index.ts';
 
 import { TREATMENT_KEYS, TREATMENT_NS } from '../../treatments.constants.ts';
 import { treatmentFieldsOf, type TreatmentFormValues } from './treatment-form.ts';
@@ -90,7 +89,7 @@ export function useTreatmentSave({
     // `offering_expired`), or the session was reversed meanwhile: the server's
     // words, and the packages and sessions read again.
     onConflict: (error) => {
-      notify.error(mapApiError(error), { id: 'treatment-save-failed' });
+      notifyError(error, { id: 'treatment-save-failed' });
       void queryClient.invalidateQueries({ queryKey: patientPackageQueryKeys.all });
       void queryClient.invalidateQueries({ queryKey: treatmentQueryKeys.all });
     },

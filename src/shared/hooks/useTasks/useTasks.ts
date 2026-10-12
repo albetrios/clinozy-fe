@@ -41,7 +41,7 @@ import {
   type CursorListResult,
   useCursorList,
 } from '@/shared/hooks/useCursorList/index.ts';
-import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { useOrganizationId } from '@/shared/store/useOrganizationStore/index.ts';
 
 /*
  * Tasks' server state on clinozy-be (KICKOFF §6.10, one model with Today's queue, Q-T3): the list
@@ -49,9 +49,6 @@ import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.
  * may have changed — and once more after the server's rules have run on it (D81 T7). Writes toast
  * only their errors — the rooms toast success themselves.
  */
-
-/** The active organization — every key carries it. */
-const useOrganizationId = () => useOrganizationStore((state) => state.organizationId);
 
 /** What every task write may have changed. */
 const TASK_WRITE_KEYS = [taskQueryKeys.all, ...TASK_SIDE_EFFECT_KEYS];

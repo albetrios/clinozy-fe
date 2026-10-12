@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { api } from '@/core/http/api.ts';
+import { pageOf } from '@/core/http/pagination.ts';
 import { collectAllPages } from '@/shared/api/fetch-all-pages.ts';
 
 import type { DeleteReason } from './app-schema.ts';
@@ -63,8 +64,6 @@ export const prescriptionQueryKeys = {
 const PAGE_SIZE = 100;
 
 /** The next page's cursor, or null on the last. */
-const nextOf = (pagination: { next?: string | null; has_more?: boolean } | undefined) =>
-  pagination?.has_more ? (pagination.next ?? null) : null;
 
 /** A patient's prescriptions, newest first: the prescription's day, then the server's order. */
 export async function listPatientPrescriptions(
@@ -85,7 +84,7 @@ export async function listPatientPrescriptions(
         .array(prescriptionRowWire)
         .parse(response.data ?? [])
         .map(toPrescriptionRecord),
-      next: nextOf(response.meta?.pagination),
+      next: pageOf(response.meta?.pagination).next,
     };
   }, 'patient-prescriptions');
 }
@@ -232,7 +231,7 @@ export async function listPrescriptionKits(): Promise<PrescriptionKit[]> {
         .array(prescriptionKitWire)
         .parse(response.data ?? [])
         .map(toPrescriptionKit),
-      next: nextOf(response.meta?.pagination),
+      next: pageOf(response.meta?.pagination).next,
     };
   }, 'prescription-kits');
 }
@@ -251,7 +250,7 @@ export async function listRxMedicines(): Promise<RxStoreMedicine[]> {
         .array(rxMedicineWire)
         .parse(response.data ?? [])
         .map(toRxStoreMedicine),
-      next: nextOf(response.meta?.pagination),
+      next: pageOf(response.meta?.pagination).next,
     };
   }, 'rx-medicines');
 }

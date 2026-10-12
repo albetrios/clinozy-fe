@@ -31,21 +31,20 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
+import { firstPaintAssets } from './first-paint.mjs';
+
 const root = process.env.ENTRY_ROUTES_ROOT ?? process.cwd();
 const fail = (message) => {
   console.error(`\nbuild:check FAILED — ${message}`);
   process.exit(1);
 };
 
-const indexHtml = join(root, 'dist/index.html');
-if (!existsSync(indexHtml)) fail('no dist/index.html. Run `pnpm build` first.');
-const html = readFileSync(indexHtml, 'utf8');
-const firstPaint = [
-  ...html.matchAll(/<script type="module"[^>]*\ssrc="\/(assets\/[^"]+\.js)"/g),
-  ...html.matchAll(/rel="modulepreload"[^>]*\shref="\/(assets\/[^"]+\.js)"/g),
-].map((match) => match[1]);
+if (!existsSync(join(root, 'dist/index.html'))) {
+  fail('no dist/index.html. Run `pnpm build` first.');
+}
+const firstPaint = firstPaintAssets(root);
 if (firstPaint.length === 0) fail('no entry script in dist/index.html.');
-const shipped = [...new Set(firstPaint)].map((file) => ({
+const shipped = firstPaint.map((file) => ({
   file,
   code: readFileSync(join(root, 'dist', file), 'utf8'),
 }));

@@ -3,7 +3,7 @@ import type { QueryKey } from '@tanstack/react-query';
 import { paymentQueryKeys } from '@/shared/api/app/payments-api.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
-import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { useOrganizationId } from '@/shared/store/useOrganizationStore/index.ts';
 
 import { stockListReadKeys, stockQueryKeys } from '../../stock-api.ts';
 import type {
@@ -67,9 +67,6 @@ export type StockDeleteVars = StockDeleteRequest;
 /** What every stock write refreshes; bills add Send payment's open bills. */
 const ROOM_KEYS: readonly QueryKey[] = [stockQueryKeys.all];
 const BILL_KEYS: readonly QueryKey[] = [stockQueryKeys.all, paymentQueryKeys.openBills()];
-
-/** The active organization — a delete patches its lists. */
-const useOrganizationId = () => useOrganizationStore((state) => state.organizationId);
 
 // ── Vendors ──
 

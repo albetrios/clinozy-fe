@@ -95,6 +95,15 @@ export function referrerFromPath(pathname: string): string | null {
   return page && isAllowedReferrer(page) ? page : null;
 }
 
+/**
+ * The href of an organization's page from its org-relative path — a `from` that
+ * {@link safeReferrer} let through, or a page path a drawer leaves to
+ * (`patients/pat_…/timeline`): the receiver's side of {@link referrerFromPath}.
+ */
+export function referrerHref(organizationSlug: string, from: string): string {
+  return `/organization/${organizationSlug}/${from}`;
+}
+
 /** The search key a referring page's URL names the drawer open over it under (A-P1). */
 export const CROSS_ROOM_PARAM = 'dialog';
 
@@ -284,7 +293,7 @@ export function crossRoomDialogOf(
   const query = at < 0 ? '' : value.slice(at);
   const drawer = crossRoomRouteOf(path);
   if (!drawer) return null;
-  const pathname = `/organization/${organizationSlug}/${path}`;
+  const pathname = referrerHref(organizationSlug, path);
   return {
     route: drawer.route,
     pathname,

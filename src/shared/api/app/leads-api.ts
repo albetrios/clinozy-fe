@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { api } from '@/core/http/api.ts';
+import { pageOf } from '@/core/http/pagination.ts';
 
 import { createdRangeOf, followUpRangeOf } from './app-filter-ranges.ts';
 import type { DeleteReason } from './app-schema.ts';
@@ -97,8 +98,7 @@ export async function listLeads(
       .array(leadRowWire)
       .parse(response.data ?? [])
       .map(toLeadRecord),
-    next: pagination?.has_more ? (pagination.next ?? null) : null,
-    total: pagination?.estimated_total ?? null,
+    ...pageOf(pagination),
   };
 }
 

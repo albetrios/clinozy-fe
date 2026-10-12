@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { copyText } from '@/lib/sensitive-clipboard.ts';
 import { cn } from '@/lib/utils.ts';
 import { displayId } from '@/shared/api/app/app-display-id.ts';
 import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
@@ -70,12 +71,8 @@ export function LeadTitleChips({ lead }: { lead: LeadRecord }) {
   const clock = useAppClock();
   const seq = String(lead.leadNumber);
   const copyId = async () => {
-    try {
-      await navigator.clipboard.writeText(`#${seq}`);
-      notify.success(t(LEADS_KEYS.drawer.idCopied, { seq }));
-    } catch {
-      // A blocked clipboard copies nothing; the ID stays on screen to read.
-    }
+    // A blocked clipboard copies nothing; the ID stays on screen to read.
+    if (await copyText(`#${seq}`)) notify.success(t(LEADS_KEYS.drawer.idCopied, { seq }));
   };
   return (
     <>

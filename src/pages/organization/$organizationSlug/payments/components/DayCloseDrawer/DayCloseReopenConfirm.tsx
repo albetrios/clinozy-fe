@@ -8,7 +8,7 @@ import {
   type ConfirmReasonOption,
 } from '@/shared/components/ConfirmDialog/index.ts';
 import { REASON_CONFIRM_KEYS } from '@/shared/components/ConfirmDialog/reason-confirm.constants.ts';
-import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
+import { apiErrorReason, notifyError } from '@/shared/errors/errorHandler.ts';
 import { isHttpError } from '@/shared/errors/HttpError.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -81,7 +81,7 @@ export function DayCloseReopenConfirm({ target, onClose }: DayCloseReopenConfirm
       return;
     }
     // The confirm shows a 400 on the reason at its field.
-    if (!(isHttpError(error) && error.status === 400)) notify.error(mapApiError(error));
+    if (!(isHttpError(error) && error.status === 400)) notifyError(error);
   };
 
   return (

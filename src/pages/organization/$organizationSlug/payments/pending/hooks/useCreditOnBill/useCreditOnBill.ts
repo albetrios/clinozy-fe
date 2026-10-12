@@ -7,7 +7,11 @@ import { displayId } from '@/shared/api/app/app-display-id.ts';
 import type { CreditRow } from '@/shared/api/app/credits-contracts.ts';
 import { invoiceQueryKeys, listOpenInvoices } from '@/shared/api/app/invoices-api.ts';
 import type { InvoiceRecord } from '@/shared/api/app/invoices-contracts.ts';
-import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
+import {
+  apiErrorReason,
+  mapApiError,
+  notifyError,
+} from '@/shared/errors/errorHandler.ts';
 import { useSettleCredit } from '@/shared/hooks/useCredits/index.ts';
 import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -87,7 +91,7 @@ export function useCreditOnBill(): (credit: CreditRow) => Promise<void> {
     try {
       [invoice] = await openInvoicesOf(credit.patientId ?? '');
     } catch (error) {
-      notify.error(mapApiError(error));
+      notifyError(error);
       return;
     }
     if (!invoice) {

@@ -19,10 +19,10 @@ import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
-import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-
-/** The active organization — every key carries it. */
-const useOrganizationId = () => useOrganizationStore((state) => state.organizationId);
+import {
+  useOrganizationId,
+  useOrganizationStore,
+} from '@/shared/store/useOrganizationStore/index.ts';
 
 /**
  * Whether the member may set an offering's lowest price — their own `offering:lower_price:read`.

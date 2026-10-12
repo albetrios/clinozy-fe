@@ -8,22 +8,16 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
+import { firstPaintAssets } from './first-paint.mjs';
+
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const html = readFileSync(path.join(root, 'dist/index.html'), 'utf8');
 
-const entry = html.match(
-  /<script type="module" crossorigin src="(\/assets\/index-[^"]+\.js)"><\/script>/,
-)?.[1];
-const preloads = [
-  ...html.matchAll(/rel="modulepreload" crossorigin href="(\/assets\/[^"]+\.js)"/g),
-].map((m) => m[1]);
 const css = html.match(
   /<link rel="stylesheet" crossorigin href="(\/assets\/index-[^"]+\.css)">/,
 )?.[1];
 
-const jsPaths = [...new Set([entry, ...preloads].filter(Boolean))].map((p) =>
-  `dist${p}`.replace(/^\//, ''),
-);
+const jsPaths = firstPaintAssets(root).map((file) => `dist/${file}`);
 const cssPaths = css ? [`dist${css}`.replace(/^\//, '')] : [];
 
 if (jsPaths.length === 0) {

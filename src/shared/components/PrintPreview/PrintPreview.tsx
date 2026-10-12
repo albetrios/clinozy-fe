@@ -1,4 +1,3 @@
-import { useQuery } from '@tanstack/react-query';
 import type { CSSProperties, ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -17,6 +16,7 @@ import {
 } from '@/shared/components/RecordDrawer/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { Sheet, SheetContent, SheetTitle } from '@/shared/components/ui/sheet.tsx';
+import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import { useElementWidth } from '@/shared/hooks/useElementWidth/index.ts';
 import { Printer } from '@/shared/icons/index.ts';
 
@@ -27,13 +27,15 @@ import { PRINT_PREVIEW_KEYS, PRINT_PREVIEW_NS } from './print-preview.constants.
  * loaded before the sheet shows, as `printDocument` loads it before printing.
  */
 function usePrintCopy(): boolean {
-  return useQuery({
+  return useAppQuery({
     queryKey: ['i18n', PRINT_LANGUAGE, PRINT_TEMPLATE_NS],
     queryFn: async () => {
       await ensureNamespace(PRINT_LANGUAGE, PRINT_TEMPLATE_NS);
       return true;
     },
     staleTime: Number.POSITIVE_INFINITY,
+    // A copy that does not load keeps the sheet out; it is no failure of the user's to toast.
+    notifyOnError: false,
   }).isSuccess;
 }
 

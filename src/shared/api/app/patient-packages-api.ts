@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { api } from '@/core/http/api.ts';
+import { pageOf } from '@/core/http/pagination.ts';
 import { collectAllPages } from '@/shared/api/fetch-all-pages.ts';
 
 import {
@@ -56,9 +57,7 @@ export async function listPatientPackages(
         .array(patientOfferingWire)
         .parse(response.data ?? [])
         .map(toPatientPackageRow),
-      next: response.meta?.pagination?.has_more
-        ? (response.meta.pagination.next ?? null)
-        : null,
+      next: pageOf(response.meta?.pagination).next,
     };
   }, 'patient-packages');
 }

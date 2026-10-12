@@ -23,6 +23,8 @@ export type MeContextWire = {
     personal_organization_id?: string | null;
   };
   active_organization: { type: 'PERSONAL' | 'TEAM'; id: string } | null;
+  /** The caller's membership in the active organization (`mem_…`); `null` without one. */
+  membership_id: string | null;
 };
 
 /** One workspace of `GET /users/me/organizations`. */

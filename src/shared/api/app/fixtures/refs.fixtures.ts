@@ -1,5 +1,4 @@
 import {
-  civilDaysBetween,
   fixtureUuid,
   parseSeedDisplayDate,
   PROTOTYPE_SEED_DAY,
@@ -7,7 +6,7 @@ import {
   seedInstant,
   seedPhone,
 } from '@/shared/api/app/app-fixture-seed.ts';
-import { addCivilDays, appToday } from '@/shared/api/app/app-time.ts';
+import { addCivilDays, appToday, civilDayOffset } from '@/shared/api/app/app-time.ts';
 
 /**
  * Shared plumbing of the clinic fixture world (REPLACE_WITH_API): the stable id
@@ -138,7 +137,7 @@ export function seedExpiry(expiry: string, today: string = appToday()): string {
   const [month = '01', year = '00'] = expiry.split('/');
   const shifted = addCivilDays(
     `20${year}-${month}-15`,
-    civilDaysBetween(PROTOTYPE_SEED_DAY, today),
+    civilDayOffset(PROTOTYPE_SEED_DAY, today),
   );
   return `${shifted.slice(5, 7)}/${shifted.slice(2, 4)}`;
 }

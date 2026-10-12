@@ -8283,7 +8283,6 @@ export interface operations {
                             patient_review_id?: string | null;
                             patient_treatment_id?: string | null;
                             payment_id?: string | null;
-                            provider_message_id?: string | null;
                             /** Format: date-time */
                             read_at?: string | null;
                             reply_to_contact_activity_id?: string | null;
@@ -9111,7 +9110,6 @@ export interface operations {
                             patient_review_id?: string | null;
                             patient_treatment_id?: string | null;
                             payment_id?: string | null;
-                            provider_message_id?: string | null;
                             /** Format: date-time */
                             read_at?: string | null;
                             reply_to_contact_activity_id?: string | null;
@@ -9192,7 +9190,6 @@ export interface operations {
                             patient_review_id?: string | null;
                             patient_treatment_id?: string | null;
                             payment_id?: string | null;
-                            provider_message_id?: string | null;
                             /** Format: date-time */
                             read_at?: string | null;
                             reply_to_contact_activity_id?: string | null;
@@ -9270,7 +9267,6 @@ export interface operations {
                             patient_review_id?: string | null;
                             patient_treatment_id?: string | null;
                             payment_id?: string | null;
-                            provider_message_id?: string | null;
                             /** Format: date-time */
                             read_at?: string | null;
                             reply_to_contact_activity_id?: string | null;
@@ -9370,7 +9366,6 @@ export interface operations {
                             patient_review_id?: string | null;
                             patient_treatment_id?: string | null;
                             payment_id?: string | null;
-                            provider_message_id?: string | null;
                             /** Format: date-time */
                             read_at?: string | null;
                             reply_to_contact_activity_id?: string | null;
@@ -9472,7 +9467,6 @@ export interface operations {
                             patient_review_id?: string | null;
                             patient_treatment_id?: string | null;
                             payment_id?: string | null;
-                            provider_message_id?: string | null;
                             /** Format: date-time */
                             read_at?: string | null;
                             reply_to_contact_activity_id?: string | null;
@@ -9576,7 +9570,6 @@ export interface operations {
                             patient_review_id?: string | null;
                             patient_treatment_id?: string | null;
                             payment_id?: string | null;
-                            provider_message_id?: string | null;
                             /** Format: date-time */
                             read_at?: string | null;
                             reply_to_contact_activity_id?: string | null;

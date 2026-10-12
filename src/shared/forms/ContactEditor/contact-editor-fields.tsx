@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { isolateText } from '@/lib/bidi-isolate.ts';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
+import { copyText } from '@/lib/sensitive-clipboard.ts';
 import { cn } from '@/lib/utils.ts';
 import type { Tone } from '@/shared/api/app/app-schema.ts';
 import {
@@ -92,11 +93,9 @@ function ContactIdRow({ recordId, testId }: { recordId: string | null; testId: s
   const { t } = useTranslation(CONTACT_EDITOR_NS);
   const copy = async () => {
     if (!recordId) return;
-    try {
-      await navigator.clipboard.writeText(recordId);
+    // A blocked clipboard copies nothing; the id stays on screen to read.
+    if (await copyText(recordId)) {
       notify.success(t(K.idCopied, { id: isolateText(recordId, 'ltr') }));
-    } catch {
-      // A blocked clipboard copies nothing; the id stays on screen to read.
     }
   };
   return (

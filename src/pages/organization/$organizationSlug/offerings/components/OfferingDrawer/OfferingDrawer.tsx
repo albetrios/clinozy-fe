@@ -15,7 +15,7 @@ import {
   RecordDrawer,
   RecordDrawerPending,
 } from '@/shared/components/RecordDrawer/index.ts';
-import { mapApiError } from '@/shared/errors/errorHandler.ts';
+import { notifyError } from '@/shared/errors/errorHandler.ts';
 import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
 import { resetFormInPlace } from '@/shared/hooks/useEditingRecord/index.ts';
@@ -172,7 +172,7 @@ function useOfferingForm(
         queryKey: offeringQueryKeys.list(organizationId),
       });
     } catch (error) {
-      notify.error(mapApiError(error));
+      notifyError(error);
     }
   };
   return {

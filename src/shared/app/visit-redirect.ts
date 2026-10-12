@@ -2,7 +2,7 @@ import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import i18n from '@/lib/i18n/i18n.ts';
 import { organizationPatientSection } from '@/lib/routes/patient-file-builders.ts';
 import { fetchAppointment } from '@/shared/api/app/appointments-api.ts';
-import { isHttpError } from '@/shared/errors/HttpError.ts';
+import { isHttpError, isNotFound } from '@/shared/errors/HttpError.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { APP_KEYS, APP_NS } from './app.constants.ts';
@@ -44,7 +44,7 @@ async function patientOfVisit(appointmentId: string): Promise<string | null> {
   try {
     return (await fetchAppointment(appointmentId)).patientId;
   } catch (error) {
-    if (isHttpError(error) && (error.status === 404 || error.status === 400)) return null;
+    if (isNotFound(error) || (isHttpError(error) && error.status === 400)) return null;
     throw error;
   }
 }

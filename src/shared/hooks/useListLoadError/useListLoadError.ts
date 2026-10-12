@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 
 import i18n from '@/lib/i18n/i18n.ts';
 import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
-import { notify, TOAST_DURATION_MS } from '@/shared/notify/index.ts';
+import { notifyQueryError } from '@/shared/errors/errorHandler.ts';
+import { TOAST_DURATION_MS } from '@/shared/notify/index.ts';
 
 /** What the toast reads of a list query — and, to keep the last copy, its rows. */
 interface ListLoadState<T> {
@@ -44,13 +45,12 @@ export function useListLoadError<T>(
     }
     if (shown.current) return;
     shown.current = true;
-    notify.error(i18n.t(APP_KEYS.lists.loadError, { ns: APP_NS }), {
+    notifyQueryError(null, {
       id: `list-error:${listId}`,
+      onRetry: refetch,
+      message: i18n.t(APP_KEYS.lists.loadError, { ns: APP_NS }),
       duration: TOAST_DURATION_MS.error,
-      action: {
-        label: i18n.t(APP_KEYS.lists.retry, { ns: APP_NS }),
-        onClick: refetch,
-      },
+      retryLabel: i18n.t(APP_KEYS.lists.retry, { ns: APP_NS }),
     });
   }, [isError, refetch, listId]);
 

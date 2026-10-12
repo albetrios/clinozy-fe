@@ -2978,10 +2978,11 @@ clinozy-fe/
 │   │   ├── contract-drift-allowlist.json
 │   │   ├── coverage-summary.mjs
 │   │   ├── doc-staleness-allowlist.json
+│   │   ├── first-paint.mjs
 │   │   ├── lint-changed-markdown.sh
 │   │   ├── run-size-limit.mjs
 │   │   ├── strip-sourcemaps.mjs
-│   │   └── [5 test files]
+│   │   └── [6 test files]
 │   ├── codegen/
 │   │   ├── api-types.mjs
 │   │   ├── app-schema.mjs

@@ -7,6 +7,7 @@ import { civilMonthStart } from '@/shared/api/app/app-time.ts';
 import { isAppointmentSlotLocked } from '@/shared/api/app/appointment-status.ts';
 import type { AppointmentRow } from '@/shared/api/app/appointments-contracts.ts';
 import { APP_NS } from '@/shared/app/app.constants.ts';
+import { referrerHref } from '@/shared/app/app-referrer.ts';
 import {
   ChatColumn,
   type ChatHistoryTarget,
@@ -127,7 +128,7 @@ function useFormExits(onClose: () => void): AppointmentFormExits {
     },
     openPatientFile: (path) => {
       onClose();
-      void navigate({ href: `/organization/${organizationSlug}/patients/${path}` });
+      void navigate({ href: referrerHref(organizationSlug, `patients/${path}`) });
     },
   };
 }

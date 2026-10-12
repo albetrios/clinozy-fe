@@ -22,10 +22,7 @@ import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
 import { useCursorList } from '@/shared/hooks/useCursorList/index.ts';
 import { MONEY_WRITE_KEYS } from '@/shared/hooks/usePayments/index.ts';
-import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-
-/** The active organization — every key carries it. */
-const useOrganizationId = () => useOrganizationStore((state) => state.organizationId);
+import { useOrganizationId } from '@/shared/store/useOrganizationStore/index.ts';
 
 /** What a credit write refreshes: every money read, and the tasks (a Settle by day opens one). */
 const CREDIT_WRITE_KEYS = [...MONEY_WRITE_KEYS, taskQueryKeys.all];

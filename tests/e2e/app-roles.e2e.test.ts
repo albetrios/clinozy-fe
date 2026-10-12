@@ -11,6 +11,7 @@ import {
   type AppRoom,
   expectRoomReady,
   hideDevtools,
+  seedData,
 } from '@/tests/utils/e2e-app.ts';
 import { establishSessionInPage, navigateInApp } from '@/tests/utils/e2e-auth.ts';
 import { probeLiveDeployment } from '@/tests/utils/e2e-deployment-mode.ts';
@@ -194,20 +195,9 @@ interface Clinic {
   roleIds: Map<string, string>;
 }
 
-/** A `data` answer, or a thrown error naming the call. */
-async function dataOf<T>(
-  response: Awaited<ReturnType<APIRequestContext['post']>>,
-  call: string,
-): Promise<T> {
-  if (!response.ok()) {
-    throw new Error(`${call} failed: ${response.status()} ${await response.text()}`);
-  }
-  return ((await response.json()) as { data: T }).data;
-}
-
 /** The clinic's main branch and one patient in it, made by the owner. */
 async function seedPatient(api: APIRequestContext, ownerToken: string): Promise<string> {
-  const branch = await dataOf<{ id: string }>(
+  const branch = await seedData<{ id: string }>(
     await api.post(`${API}/app/branches`, {
       headers: bearerHeaders(ownerToken, true),
       data: {
@@ -222,7 +212,7 @@ async function seedPatient(api: APIRequestContext, ownerToken: string): Promise<
     }),
     'branch',
   );
-  const patient = await dataOf<{ id: string }>(
+  const patient = await seedData<{ id: string }>(
     await api.post(`${API}/app/patients`, {
       headers: bearerHeaders(ownerToken, true),
       data: {
@@ -247,7 +237,7 @@ async function openClinic(api: APIRequestContext): Promise<Clinic | null> {
   if (!flags.teamOrganizations) return null;
   const { org, teamToken } = await createTeamOrganization(api, accessToken);
   if (!org?.slug) throw new Error('the clinic was not created');
-  const roles = await dataOf<{ id: string; name: string }[]>(
+  const roles = await seedData<{ id: string; name: string }[]>(
     await api.get(`${API}/tenancy/organization/roles`, {
       headers: bearerHeaders(teamToken),
     }),

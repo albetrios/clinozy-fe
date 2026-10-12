@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  civilDaysBetween,
   fixtureUuid,
   parseSeedDisplayDate,
   PROTOTYPE_SEED_DAY,
@@ -17,7 +16,6 @@ describe('seed helpers', () => {
     expect(seedDate(PROTOTYPE_SEED_DAY, '2026-10-03')).toBe('2026-10-03');
     expect(seedDate('2026-09-24', '2026-10-03')).toBe('2026-09-30');
     expect(seedDate('2026-10-08', '2026-10-03')).toBe('2026-10-14');
-    expect(civilDaysBetween('2026-09-27', '2026-10-01')).toBe(4);
   });
 
   it('turns a seed date and clinic time into the UTC instant', () => {

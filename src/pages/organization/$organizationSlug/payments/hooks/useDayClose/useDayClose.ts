@@ -15,10 +15,7 @@ import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
 import { MONEY_WRITE_KEYS } from '@/shared/hooks/usePayments/index.ts';
-import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-
-/** The active organization — every key carries it. */
-const useOrganizationId = () => useOrganizationStore((state) => state.organizationId);
+import { useOrganizationId } from '@/shared/store/useOrganizationStore/index.ts';
 
 /** One branch-day as Day close draws it; idle until the branch is known. */
 export function useDayClose(branchId: string | null, date: string) {

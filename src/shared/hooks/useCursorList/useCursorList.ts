@@ -6,12 +6,21 @@ import type { ListPage } from '@/shared/api/fetch-list-page.ts';
 /**
  * Normalized result of a cursor-paginated list: the accumulated rows plus a
  * flat control surface. Hides `useInfiniteQuery`'s `data.pages` shape from
- * consumers so panels (and their tests) stay declarative.
+ * consumers so panels (and their tests) stay declarative. `TPage` is the page
+ * as the fetcher returns it — a page that carries more than its rows (a total,
+ * per-album counts) exposes those through {@link CursorListResult.firstPage}.
  */
-export interface CursorListResult<T> {
+export interface CursorListResult<T, TPage extends ListPage<T> = ListPage<T>> {
   /** All rows fetched so far, flattened across pages. */
   rows: T[];
+  /**
+   * The first page as the fetcher returned it — where a list's own counts ride
+   * (`total`, `albumCounts`); `undefined` until it answers.
+   */
+  firstPage: TPage | undefined;
   isPending: boolean;
+  /** The read has answered and its last fetch did not fail (`status === 'success'`). */
+  isSuccess: boolean;
   isError: boolean;
   /** Any fetch in flight (initial load, refetch, or next page). */
   isFetching: boolean;
@@ -47,16 +56,22 @@ export interface CursorListResult<T> {
  * A failed fetch **toasts by default** (`meta.notifyOnError`); a list that
  * renders its own inline error surface opts out with `notifyOnError: false`
  * rather than failing silently by accident (X-3).
+ *
+ * The fetcher may return a page wider than {@link ListPage} (`TPage`); the
+ * first one comes back as `firstPage`, so a list reads its server counts
+ * without re-deriving the pages.
  */
-export function useCursorList<T>(args: {
+export function useCursorList<T, TPage extends ListPage<T> = ListPage<T>>(args: {
   queryKey: QueryKey;
-  queryFn: (after: string | undefined) => Promise<ListPage<T>>;
+  queryFn: (after: string | undefined) => Promise<TPage & ListPage<T>>;
   enabled?: boolean;
   /** Toast the mapped error on failure (default: true). */
   notifyOnError?: boolean;
   /** Poll every loaded page this often, in ms, while the tab is visible (default: no polling). */
   refetchInterval?: number;
-}): CursorListResult<T> {
+  /** Read every loaded page again when the window regains focus (default: TanStack's own). */
+  refetchOnWindowFocus?: boolean;
+}): CursorListResult<T, TPage> {
   const query = useInfiniteQuery({
     queryKey: args.queryKey,
     queryFn: ({ pageParam }) => args.queryFn(pageParam),
@@ -67,6 +82,9 @@ export function useCursorList<T>(args: {
     ...(args.enabled !== undefined ? { enabled: args.enabled } : {}),
     ...(args.refetchInterval !== undefined
       ? { refetchInterval: args.refetchInterval }
+      : {}),
+    ...(args.refetchOnWindowFocus !== undefined
+      ? { refetchOnWindowFocus: args.refetchOnWindowFocus }
       : {}),
   });
 
@@ -98,7 +116,9 @@ export function useCursorList<T>(args: {
 
   return {
     rows,
+    firstPage: data?.pages[0],
     isPending: query.isPending,
+    isSuccess: query.isSuccess,
     isError: query.isError,
     isFetching: query.isFetching,
     isRefreshing: query.isPlaceholderData,

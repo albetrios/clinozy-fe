@@ -22,7 +22,7 @@ import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
 import { useOfferings } from '@/shared/hooks/useOfferings/index.ts';
-import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { useOrganizationId } from '@/shared/store/useOrganizationStore/index.ts';
 
 /*
  * A patient's plan on clinozy-be (api-integration §5.4) — the Offering suggestions card in the
@@ -34,9 +34,6 @@ import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.
 
 /** What a plan write may have changed: every patient's rows, total and ideas. */
 const PLAN_WRITE_KEYS = [planQueryKeys.all];
-
-/** The organization a read is keyed by; reads wait for one. */
-const useOrganizationId = () => useOrganizationStore((state) => state.organizationId);
 
 /** A patient's plan rows and the server's total; idle without a patient or an organization. */
 export function usePlan(patientId: string | null) {

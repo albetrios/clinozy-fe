@@ -30,7 +30,7 @@ import {
 import { StripePaymentForm } from '@/shared/components/StripePaymentForm/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
-import { mapApiError } from '@/shared/errors/errorHandler.ts';
+import { notifyError } from '@/shared/errors/errorHandler.ts';
 import { useBillingPaymentMethods } from '@/shared/hooks/useBillingPaymentMethods/index.ts';
 import { CreditCard } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -143,7 +143,7 @@ export function BillingPaymentMethods({
     } catch (error) {
       // Was a bare try/finally: the button simply re-enabled, so a failed setup
       // looked exactly like a click that did nothing (SET-17).
-      notify.error(mapApiError(error), { id: ADD_METHOD_TOAST });
+      notifyError(error, { id: ADD_METHOD_TOAST });
     } finally {
       isAddingRef.current = false;
       if (isMountedRef.current) setIsAdding(false);

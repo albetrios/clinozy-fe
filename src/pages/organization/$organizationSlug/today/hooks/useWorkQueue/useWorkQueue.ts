@@ -16,7 +16,7 @@ import {
   TASK_RULES_NS,
 } from '@/shared/app/task-rules.constants.ts';
 import { taskFollowOnTarget, type TaskTarget } from '@/shared/app/task-targets.ts';
-import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
+import { apiErrorReason, notifyError } from '@/shared/errors/errorHandler.ts';
 import type { CursorListResult } from '@/shared/hooks/useCursorList/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
@@ -217,7 +217,7 @@ export function useWorkQueue({
       notify.info(tRules(TASK_QUEUE_KEYS.alreadyClosed));
       return;
     }
-    notify.error(mapApiError(error));
+    notifyError(error);
   };
 
   /** The outcome's write: the card waits, then shows its result and toasts — or opens again. */

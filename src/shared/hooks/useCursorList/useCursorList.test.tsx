@@ -41,6 +41,39 @@ describe('useCursorList', () => {
     expect(queryFn).toHaveBeenCalledWith(undefined);
   });
 
+  it('hands back the first page as fetched, wider than a ListPage, and isSuccess', async () => {
+    type CountedPage = ListPage<Row> & { total: number | null };
+    const queryFn = vi
+      .fn<(after: string | undefined) => Promise<CountedPage>>()
+      .mockResolvedValueOnce({
+        rows: [{ id: 'a' }],
+        next: 'cur_1',
+        hasMore: true,
+        total: 2,
+      })
+      .mockResolvedValueOnce({
+        rows: [{ id: 'b' }],
+        next: null,
+        hasMore: false,
+        total: 9,
+      });
+
+    const { result } = renderHook(
+      () => useCursorList({ queryKey: ['list', 'counted'], queryFn }),
+      { wrapper },
+    );
+
+    expect(result.current.firstPage).toBeUndefined();
+    expect(result.current.isSuccess).toBe(false);
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.firstPage?.total).toBe(2);
+
+    act(() => result.current.fetchNextPage());
+    await waitFor(() => expect(result.current.rows).toHaveLength(2));
+    // The counts stay the first page's: a later page does not replace them.
+    expect(result.current.firstPage?.total).toBe(2);
+  });
+
   it('keeps one rows array per fetched result, not one per render', async () => {
     const queryFn = vi
       .fn<(after: string | undefined) => Promise<ListPage<Row>>>()

@@ -8,7 +8,11 @@ import {
   RECORD_DRAWER_KEYS,
   RECORD_DRAWER_NS,
 } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
-import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
+import {
+  apiErrorReason,
+  mapApiError,
+  notifyError,
+} from '@/shared/errors/errorHandler.ts';
 import { type HttpError, isHttpError } from '@/shared/errors/HttpError.ts';
 import { mapValidationErrors } from '@/shared/errors/map-validation-errors.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -80,7 +84,7 @@ export function useDrawerSave<TValues extends FieldValues, TOutcome>({
     if (apiErrorReason(error) === 'record_changed') {
       // Someone else saved first: our own words (the server's detail names a user id and a
       // time — `mapApiError` maps the reason), and a way to load what they saved.
-      notify.error(mapApiError(error), {
+      notifyError(error, {
         id: toastId,
         ...(onStale && {
           action: {

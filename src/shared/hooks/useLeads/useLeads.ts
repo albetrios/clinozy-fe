@@ -29,7 +29,7 @@ import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
 import { useCursorList } from '@/shared/hooks/useCursorList/index.ts';
 import { useListLoadError } from '@/shared/hooks/useListLoadError/index.ts';
-import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { useOrganizationId } from '@/shared/store/useOrganizationStore/index.ts';
 
 import { LEAD_TOASTS_KEYS, LEAD_TOASTS_NS } from './leads-toasts.constants.ts';
 
@@ -37,9 +37,6 @@ import { LEAD_TOASTS_KEYS, LEAD_TOASTS_NS } from './leads-toasts.constants.ts';
 function leadToast(key: string, values: Record<string, string> = {}): string {
   return i18n.t(key, { ns: LEAD_TOASTS_NS, ...values });
 }
-
-/** The active organization — every key carries it. */
-const useOrganizationId = () => useOrganizationStore((state) => state.organizationId);
 
 /** What a lead write changes: the leads, their tasks (a follow-up), the person's activity. */
 const LEAD_WRITE_KEYS = [leadQueryKeys.all, taskQueryKeys.all, messageQueryKeys.all];

@@ -12,13 +12,13 @@
  * (env validation at boot), query (QueryProvider). Everything else is a
  * regression.
  */
-import { readFileSync } from 'node:fs';
+import { firstPaintAssets } from './first-paint.mjs';
 
 const FORBIDDEN_CHUNKS = ['sentry', 'posthog', 'cmdk', 'rhf'];
 
-const html = readFileSync('dist/index.html', 'utf8');
-const referenced = [...html.matchAll(/assets\/([a-zA-Z][\w]*)-[\w-]+\.js/g)].map(
-  (match) => match[1],
+/** Each first-paint file's chunk name: `assets/sentry-a1b2.js` → `sentry`. */
+const referenced = firstPaintAssets(process.cwd()).flatMap(
+  (file) => /^assets\/([a-zA-Z]\w*)-[\w-]+\.js$/.exec(file)?.[1] ?? [],
 );
 
 const offenders = FORBIDDEN_CHUNKS.filter((name) => referenced.includes(name));

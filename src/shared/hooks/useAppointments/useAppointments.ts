@@ -49,7 +49,7 @@ import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { useOfferings } from '@/shared/hooks/useOfferings/index.ts';
 import { useRefreshTasksAfterRules } from '@/shared/hooks/useTasks/index.ts';
 import { notify } from '@/shared/notify/index.ts';
-import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { useOrganizationId } from '@/shared/store/useOrganizationStore/index.ts';
 
 /**
  * Appointments' server state on clinozy-be (KICKOFF §6.4; api-integration §5.3): the Agenda in
@@ -95,9 +95,6 @@ function appText(key: string, values: Record<string, string> = {}): string {
 }
 
 const statusLabel = (status: AppointmentStatus) => appText(KEYS.statuses[status]);
-
-/** The active organization — every key carries it. */
-const useOrganizationId = () => useOrganizationStore((state) => state.organizationId);
 
 /** Options for the reads. */
 export interface AppointmentQueryOptions {

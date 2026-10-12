@@ -52,20 +52,41 @@ export function formFieldOf(serverField: string): string {
     .join('.');
 }
 
+/** One entry of clinozy-be's validation list (`error.errors[]`), as the wire names its field. */
+export interface ValidationEntry {
+  /** The field as sent — `body.items/0/rate`, `min_price`; {@link formFieldOf} names it for a form. */
+  field: string;
+  message: string;
+}
+
+/** Whether a listed value is a validation entry: an object with a string field and message. */
+function isValidationEntry(entry: unknown): entry is ValidationEntry {
+  if (!entry || typeof entry !== 'object') return false;
+  const { field, message } = entry as { field?: unknown; message?: unknown };
+  return typeof field === 'string' && typeof message === 'string';
+}
+
 /**
- * clinozy-be's validation answer — `400 { error: { type: 'validation_error', errors: [{ field,
- * message }] } }` — as form fields and their messages (first message per field kept).
+ * clinozy-be's validation list — `error.errors[]` of `400 { error: { type: 'validation_error',
+ * errors: [{ field, message }] } }` — as sent: the entries themselves (fields not renamed),
+ * anything that is not a `{ field, message }` pair skipped; empty when the body has no list.
+ * For a screen that reads or rewords the server's entries; a form takes them through
+ * {@link mapValidationErrors}.
+ */
+export function readValidationEntries(data: unknown): ValidationEntry[] {
+  if (!data || typeof data !== 'object') return [];
+  const list = (data as { error?: { errors?: unknown } }).error?.errors;
+  return Array.isArray(list) ? list.filter(isValidationEntry) : [];
+}
+
+/**
+ * clinozy-be's validation answer ({@link readValidationEntries}) as form fields and their
+ * messages (first message per field kept).
  */
 function readValidationList(data: unknown): Record<string, string[]> | null {
-  if (!data || typeof data !== 'object') return null;
-  const list = (data as { error?: { errors?: unknown } }).error?.errors;
-  if (!Array.isArray(list)) return null;
   const out = Object.create(null) as Record<string, string[]>;
-  for (const entry of list) {
-    if (!entry || typeof entry !== 'object') continue;
-    const { field, message } = entry as { field?: unknown; message?: unknown };
-    if (typeof field !== 'string' || typeof message !== 'string' || field === '')
-      continue;
+  for (const { field, message } of readValidationEntries(data)) {
+    if (field === '') continue;
     const name = formFieldOf(field);
     if (name === '') continue;
     out[name] = [...(out[name] ?? []), message];

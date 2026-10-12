@@ -7,7 +7,7 @@ import type {
   InvoiceSaveResult,
 } from '@/shared/api/app/invoices-contracts.ts';
 import type { InvoiceSaveResult as SaleSaveResult } from '@/shared/api/app/invoices-fixture-contracts.ts';
-import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
+import { apiErrorReason, notifyError } from '@/shared/errors/errorHandler.ts';
 import type { HttpError } from '@/shared/errors/HttpError.ts';
 import {
   type DrawerSaveProblem,
@@ -259,7 +259,7 @@ export function useInvoiceSave({
   const onConflict = (error: HttpError) => {
     const conflict = CONFLICTS.get(apiErrorReason(error) ?? '');
     if (!conflict) {
-      notify.error(mapApiError(error));
+      notifyError(error);
       return;
     }
     const message = t(conflict.key);

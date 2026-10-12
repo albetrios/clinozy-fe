@@ -1,11 +1,8 @@
 import {
   type InfiniteData,
-  keepPreviousData,
   type QueryClient,
-  useInfiniteQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import { useCallback, useMemo, useRef } from 'react';
 
 import type { DeleteReason } from '@/shared/api/app/app-schema.ts';
 import { FILE_LINK_QUERY_OPTIONS } from '@/shared/api/app/file-links.ts';
@@ -27,10 +24,8 @@ import type {
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
-import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-
-/** The active organization — every key carries it. */
-const useOrganizationId = () => useOrganizationStore((state) => state.organizationId);
+import { useCursorList } from '@/shared/hooks/useCursorList/index.ts';
+import { useOrganizationId } from '@/shared/store/useOrganizationStore/index.ts';
 
 /**
  * What a photo write refreshes: every photo read (the section, the viewer, the Overview's card)
@@ -74,52 +69,20 @@ export function usePatientPhotos(
   { enabled = true }: { enabled?: boolean } = {},
 ): PatientPhotoList {
   const organizationId = useOrganizationId();
-  const query = useInfiniteQuery({
+  const { rows, firstPage, ...list } = useCursorList({
     queryKey: patientImageQueryKeys.list(organizationId, patientId, params),
-    queryFn: ({ pageParam }) => listPatientPhotos(patientId, params, pageParam),
-    initialPageParam: undefined as string | undefined,
-    getNextPageParam: (last) => (last.hasMore ? (last.next ?? undefined) : undefined),
-    placeholderData: keepPreviousData,
+    queryFn: (after) => listPatientPhotos(patientId, params, after),
     // Each photo's `file_url` lapses 15 minutes after the read (D86): read again before then
     ...FILE_LINK_QUERY_OPTIONS,
     // The screen renders this failure itself (see above).
-    meta: { notifyOnError: false },
+    notifyOnError: false,
     enabled: enabled && organizationId !== null && patientId !== '',
   });
-
-  const { fetchNextPage } = query;
-  const inFlight = useRef(false);
-  const loadMore = useCallback(() => {
-    if (inFlight.current) return;
-    inFlight.current = true;
-    fetchNextPage()
-      .catch(() => {
-        // The query's own isError says so.
-      })
-      .finally(() => {
-        inFlight.current = false;
-      });
-  }, [fetchNextPage]);
-
-  const { data } = query;
-  const photos = useMemo(() => data?.pages.flatMap((page) => page.rows) ?? [], [data]);
-  const first = data?.pages[0];
   return {
-    photos,
-    total: first?.total ?? null,
-    albumCounts: first?.albumCounts ?? null,
-    isPending: query.isPending,
-    isSuccess: query.isSuccess,
-    isError: query.isError,
-    isRefreshing: query.isPlaceholderData,
-    hasNextPage: query.hasNextPage,
-    isFetchingNextPage: query.isFetchingNextPage,
-    fetchNextPage: loadMore,
-    refetch: () => {
-      query.refetch().catch(() => {
-        // The query's own isError says so.
-      });
-    },
+    ...list,
+    photos: rows,
+    total: firstPage?.total ?? null,
+    albumCounts: firstPage?.albumCounts ?? null,
   };
 }
 

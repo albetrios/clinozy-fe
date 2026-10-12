@@ -21,7 +21,7 @@ import {
   RECORD_DRAWER_KEYS,
   RECORD_DRAWER_NS,
 } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
-import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
+import { apiErrorReason, notifyError } from '@/shared/errors/errorHandler.ts';
 import type { HttpError } from '@/shared/errors/HttpError.ts';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
 import {
@@ -318,7 +318,7 @@ function usePaidConflict(
   return (error: HttpError) => {
     const key = PAID_REFUSALS.get(apiErrorReason(error) ?? '');
     if (!key) {
-      notify.error(mapApiError(error));
+      notifyError(error);
       return;
     }
     const message = t(key);

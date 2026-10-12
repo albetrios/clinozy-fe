@@ -18,10 +18,7 @@ import { VISIT_WRITE_KEYS } from '@/shared/api/app/visits-api.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
-import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-
-/** The active organization — every key carries it. */
-const useOrganizationId = () => useOrganizationStore((state) => state.organizationId);
+import { useOrganizationId } from '@/shared/store/useOrganizationStore/index.ts';
 
 /**
  * What a treatment write refreshes: every patient read (the sessions, the packages whose sessions

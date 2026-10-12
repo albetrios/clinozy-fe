@@ -1,17 +1,15 @@
 import { apiErrorReason } from '@/shared/errors/errorHandler.ts';
 import { HttpError, isHttpError } from '@/shared/errors/HttpError.ts';
+import {
+  readValidationEntries,
+  type ValidationEntry,
+} from '@/shared/errors/map-validation-errors.ts';
 
 /** The refusal reason of a field the member's codes may not set (D81). */
 const FIELD_PERMISSION_REQUIRED = 'field_permission_required';
 
 /** The lowest price's field on the wire — the one field an offering guards. */
 const LOWEST_PRICE_FIELD = 'min_price';
-
-/** A validation entry as clinozy-be lists it (`errors[]`). */
-interface FieldRefusal {
-  field: string;
-  message: string;
-}
 
 /** What {@link offeringRefusalOnForm} needs beside the refusal. */
 export interface OfferingRefusalContext {
@@ -28,33 +26,16 @@ export interface OfferingRefusalContext {
   };
 }
 
-/** Whether a listed entry is a validation entry: a field and its message. */
-function isFieldRefusal(entry: unknown): entry is FieldRefusal {
-  return (
-    typeof entry === 'object' &&
-    entry !== null &&
-    'field' in entry &&
-    typeof entry.field === 'string' &&
-    'message' in entry &&
-    typeof entry.message === 'string'
-  );
-}
-
 /** The validation entries of a 400, as listed; none for anything else. */
-function fieldRefusalsOf(error: HttpError): FieldRefusal[] {
-  if (error.status !== 400) return [];
-  const list: unknown = (
-    error.data as { error?: { errors?: unknown } } | null | undefined
-  )?.error?.errors;
-  return Array.isArray(list) ? list.filter(isFieldRefusal) : [];
-}
+const fieldRefusalsOf = (error: HttpError): ValidationEntry[] =>
+  error.status === 400 ? readValidationEntries(error.data) : [];
 
 /** Whether a validation entry names the lowest price (`min_price` or `body.min_price`). */
-const namesLowestPrice = ({ field }: FieldRefusal) =>
+const namesLowestPrice = ({ field }: ValidationEntry) =>
   field === LOWEST_PRICE_FIELD || field.endsWith(`.${LOWEST_PRICE_FIELD}`);
 
 /** The same refusal as a 400 naming `fields` — the shape the drawer's save puts on its fields. */
-function asFieldRefusal(error: HttpError, fields: FieldRefusal[]): HttpError {
+function asFieldRefusal(error: HttpError, fields: ValidationEntry[]): HttpError {
   const envelope = (error.data as { error?: object } | null | undefined)?.error ?? {};
   return new HttpError(error.message, 400, error.url, error.method, {
     error: { ...envelope, type: 'validation_error', errors: fields },

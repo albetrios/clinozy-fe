@@ -13,7 +13,7 @@ import { CREDIT_DIRECTION_TONES } from '@/shared/app/app-tones.ts';
 import { DrawerStepBody } from '@/shared/components/DrawerField/index.ts';
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
-import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
+import { apiErrorReason, notifyError } from '@/shared/errors/errorHandler.ts';
 import type { HttpError } from '@/shared/errors/HttpError.ts';
 import { useCreateCredit, useUpdateCredit } from '@/shared/hooks/useCredits/index.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
@@ -253,7 +253,7 @@ function useCreditSave({
       );
       return;
     }
-    notify.error(mapApiError(error));
+    notifyError(error);
   };
   return useDrawerSave<CreditFormValues, CreditRow>({
     form,

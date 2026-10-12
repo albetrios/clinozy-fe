@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { api } from '@/core/http/api.ts';
+import { pageOf } from '@/core/http/pagination.ts';
 import { queryClient } from '@/core/http/queryClient.ts';
 import { collectAllPages } from '@/shared/api/fetch-all-pages.ts';
 import { toneForLabel } from '@/shared/app/app-tone-label.ts';
@@ -160,8 +161,7 @@ export async function listAppointments(
     .map(toAppointmentRecord);
   return {
     rows: await withDoctors(records),
-    next: pagination?.has_more ? (pagination.next ?? null) : null,
-    total: pagination?.estimated_total ?? null,
+    ...pageOf(pagination),
   };
 }
 
@@ -184,9 +184,7 @@ export async function fetchPersonAppointments(
         .array(appointmentRowWire)
         .parse(response.data ?? [])
         .map(toAppointmentRecord),
-      next: response.meta?.pagination?.has_more
-        ? (response.meta.pagination.next ?? null)
-        : null,
+      next: pageOf(response.meta?.pagination).next,
     };
   }, 'appointments-person');
   return withDoctors(records);
@@ -211,9 +209,7 @@ export async function fetchAppointmentRange(
         .array(appointmentRowWire)
         .parse(response.data ?? [])
         .map(toAppointmentRecord),
-      next: response.meta?.pagination?.has_more
-        ? (response.meta.pagination.next ?? null)
-        : null,
+      next: pageOf(response.meta?.pagination).next,
     };
   }, 'appointments-range');
   return withDoctors(records);

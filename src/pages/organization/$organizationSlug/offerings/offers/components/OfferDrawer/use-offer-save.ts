@@ -10,6 +10,7 @@ import {
 } from '@/shared/api/app/offerings-contracts.ts';
 import { mapApiError } from '@/shared/errors/errorHandler.ts';
 import { HttpError, isHttpError } from '@/shared/errors/HttpError.ts';
+import { readValidationEntries } from '@/shared/errors/map-validation-errors.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { resetFormInPlace } from '@/shared/hooks/useEditingRecord/index.ts';
 import { useCreateOffer, useUpdateOffer } from '@/shared/hooks/useOffers/index.ts';
@@ -45,15 +46,8 @@ const SERVER_FIELDS = { isActive: 'live' } as const;
 /** An offering's public id inside a server message ("off_… is not an active offering"). */
 const OFFERING_ID_IN_TEXT = /\boff_[a-z0-9]{21}\b/;
 
-/** A clinozy-be validation entry. */
-interface ValidationEntry {
-  field?: unknown;
-  message?: unknown;
-}
-
 /** Whether a validation entry is about the offer's offerings (`offering_ids`, any request part). */
-const isOfferingsField = (field: unknown) =>
-  typeof field === 'string' && /(?:^|\.)offering_ids(?:\/|$)/.test(field);
+const isOfferingsField = (field: string) => /(?:^|\.)offering_ids(?:\/|$)/.test(field);
 
 /**
  * A refusal with each "off_… is not an active offering" (O12; OFFERINGS-M5 names the id) worded
@@ -65,12 +59,9 @@ function withOfferingNames(
   inactive: (offeringId: string) => string | null,
 ): unknown {
   if (!isHttpError(error) || error.status !== 400) return error;
-  const data = error.data as { error?: { errors?: unknown } } | undefined;
-  const entries = data?.error?.errors;
-  if (!Array.isArray(entries)) return error;
   let changed = false;
-  const worded = entries.map((entry: ValidationEntry) => {
-    if (!isOfferingsField(entry.field) || typeof entry.message !== 'string') return entry;
+  const worded = readValidationEntries(error.data).map((entry) => {
+    if (!isOfferingsField(entry.field)) return entry;
     const offeringId = OFFERING_ID_IN_TEXT.exec(entry.message)?.[0];
     const message = offeringId ? inactive(offeringId) : null;
     if (message === null) return entry;
@@ -78,6 +69,7 @@ function withOfferingNames(
     return { ...entry, message };
   });
   if (!changed) return error;
+  const data = error.data as { error?: object } | undefined;
   return new HttpError(error.message, error.status, error.url, error.method, {
     ...data,
     error: { ...data?.error, errors: worded },

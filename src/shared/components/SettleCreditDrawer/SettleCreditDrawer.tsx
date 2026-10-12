@@ -26,7 +26,7 @@ import {
 } from '@/shared/components/DrawerField/index.ts';
 import { DatePicker } from '@/shared/components/Picker/DatePicker/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
-import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
+import { apiErrorReason, notifyError } from '@/shared/errors/errorHandler.ts';
 import type { HttpError } from '@/shared/errors/HttpError.ts';
 import { SplitRowsField, splitsTotal } from '@/shared/forms/SplitRowsField/index.ts';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
@@ -107,7 +107,7 @@ function useSettleConflict(
       notify.info(t(K.closed, { ref: displayId.pendingCredit(credit.seq) }));
       onClose();
     } else {
-      notify.error(mapApiError(error));
+      notifyError(error);
     }
   };
 }

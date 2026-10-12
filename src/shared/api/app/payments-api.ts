@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { api } from '@/core/http/api.ts';
+import { pageOf } from '@/core/http/pagination.ts';
 import { queryClient } from '@/core/http/queryClient.ts';
 import { collectAllPages } from '@/shared/api/fetch-all-pages.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
@@ -91,18 +92,6 @@ const JOIN_STALE_MS = 5 * 60_000;
 
 /** The organization the cached joins belong to. */
 const activeOrganizationId = () => useOrganizationStore.getState().organizationId;
-
-/** A list page's cursor: the next one while there is more. */
-export function nextCursorOf(
-  meta: { pagination?: { has_more?: boolean; next?: string | null } } | undefined,
-): string | null {
-  return meta?.pagination?.has_more ? (meta.pagination.next ?? null) : null;
-}
-
-/** The API's estimated count of the whole list — on its first page; null when left out. */
-export const estimatedTotalOf = (
-  meta: { pagination?: { estimated_total?: number } } | undefined,
-) => meta?.pagination?.estimated_total ?? null;
 
 /** A list filter as the API takes it — comma-joined, none when empty. */
 const listOf = (values: readonly string[] | undefined) =>
@@ -203,8 +192,7 @@ export async function listLedger(
     .map(toPaymentRecord);
   return {
     rows: await ledgerRowsOf(records),
-    next: nextCursorOf(response.meta),
-    total: estimatedTotalOf(response.meta),
+    ...pageOf(response.meta?.pagination),
   };
 }
 
@@ -216,7 +204,7 @@ export async function fetchLedgerCount(params: LedgerListParams): Promise<number
   const response = await api.get('/app/payments', {
     query: { ...ledgerListQuery(params), limit: 1 },
   });
-  return estimatedTotalOf(response.meta);
+  return pageOf(response.meta?.pagination).total;
 }
 
 /** One entry with its author — a 404 when it is unknown or deleted. */
@@ -239,7 +227,7 @@ export async function listPaymentEdits(paymentId: string): Promise<PaymentEdit[]
         .array(paymentEditWire)
         .parse(response.data ?? [])
         .map(toPaymentEdit),
-      next: nextCursorOf(response.meta),
+      next: pageOf(response.meta?.pagination).next,
     };
   }, 'payment-edits');
 }
@@ -261,7 +249,7 @@ async function fetchAllPayments(filter: {
         .array(paymentRowWire)
         .parse(response.data ?? [])
         .map(toPaymentRecord),
-      next: nextCursorOf(response.meta),
+      next: pageOf(response.meta?.pagination).next,
     };
   }, 'payments');
   return ledgerRowsOf(records);
@@ -299,7 +287,7 @@ async function stockVendorNames(): Promise<ReadonlyMap<string, string>> {
         });
         return {
           rows: z.array(stockVendorNameWire).parse(response.data ?? []),
-          next: nextCursorOf(response.meta),
+          next: pageOf(response.meta?.pagination).next,
         };
       }, 'stock-vendor-names'),
     staleTime: JOIN_STALE_MS,
@@ -321,7 +309,7 @@ async function openStockBills(today: string): Promise<OpenSupplierBill[]> {
     });
     return {
       rows: z.array(openStockBillWire).parse(response.data ?? []),
-      next: nextCursorOf(response.meta),
+      next: pageOf(response.meta?.pagination).next,
     };
   }, 'open-stock-bills');
   if (purchases.length === 0) return [];
@@ -353,7 +341,7 @@ async function openMedicalBills(today: string): Promise<OpenSupplierBill[]> {
     });
     return {
       rows: z.array(openMedicalBillWire).parse(response.data ?? []),
-      next: nextCursorOf(response.meta),
+      next: pageOf(response.meta?.pagination).next,
     };
   }, 'open-medical-bills');
   return orders.map((order) => ({

@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
-import { mapApiError } from '@/shared/errors/errorHandler.ts';
+import { notifyError } from '@/shared/errors/errorHandler.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
 import { usePayBill } from '@/shared/hooks/usePayBill/index.ts';
 import { useRoomList } from '@/shared/hooks/useRoomList/index.ts';
@@ -84,7 +84,7 @@ function useVendorPay() {
         notify.info(t(STOCK_KEYS.vendors.paidUp, { name: vendor.name }));
         refresh(vendor.id);
       })
-      .catch((error: unknown) => notify.error(mapApiError(error)));
+      .catch((error: unknown) => notifyError(error));
   };
   return { canPay, payOldest };
 }

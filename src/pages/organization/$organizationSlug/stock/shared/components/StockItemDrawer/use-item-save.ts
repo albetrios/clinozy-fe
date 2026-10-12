@@ -1,7 +1,7 @@
 import type { UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
+import { apiErrorReason, notifyError } from '@/shared/errors/errorHandler.ts';
 import type { HttpError } from '@/shared/errors/HttpError.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -45,7 +45,7 @@ export function useItemConflict(
   const { t } = useTranslation(STOCK_DRAWERS_NS);
   return (error: HttpError) => {
     if (apiErrorReason(error) !== 'record_already_exists') {
-      notify.error(mapApiError(error));
+      notifyError(error);
       return;
     }
     const message = t(STOCK_DRAWER_KEYS.item.nameTaken);

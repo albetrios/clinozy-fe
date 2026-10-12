@@ -13,14 +13,22 @@ import { PUBLIC_ID } from '@/lib/routes/search-params.ts';
 
 const PUBLIC_ID_SUFFIX_LEN = 21;
 
-/** Zod schema for a specific prefixed public id, e.g. `publicId('org')`. */
-export function publicId(prefix: string) {
-  // Both interpolations are internal constants — `prefix` is an entity key from this module's
+/**
+ * The whole-string pattern of one prefix's public id — `publicIdPattern('rol')` matches
+ * `rol_` and its 21 lowercase alphanumerics, nothing more. For a URL param or a guard that
+ * takes a `RegExp`; a wire schema uses {@link publicId}.
+ */
+export function publicIdPattern(prefix: string): RegExp {
+  // Both interpolations are internal constants — `prefix` is an entity key from this codebase's
   // own call sites and the length is the literal above. Nothing user-supplied reaches the
   // pattern, so there is no injection surface here.
   // eslint-disable-next-line security/detect-non-literal-regexp -- prefix is an internal entity key, not input
-  const re = new RegExp(`^${prefix}_[a-z0-9]{${PUBLIC_ID_SUFFIX_LEN}}$`);
-  return z.string().regex(re, `invalid ${prefix} id`);
+  return new RegExp(`^${prefix}_[a-z0-9]{${PUBLIC_ID_SUFFIX_LEN}}$`);
+}
+
+/** Zod schema for a specific prefixed public id, e.g. `publicId('org')`. */
+export function publicId(prefix: string) {
+  return z.string().regex(publicIdPattern(prefix), `invalid ${prefix} id`);
 }
 
 /** Generic public-id guard accepting any valid 2–5 char prefix. */

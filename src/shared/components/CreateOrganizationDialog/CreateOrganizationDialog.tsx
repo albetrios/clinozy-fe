@@ -10,7 +10,7 @@ import i18n from '@/lib/i18n/i18n.ts';
 import { organizationHome } from '@/lib/routes/index.ts';
 import { DrawerField, DrawerInput } from '@/shared/components/DrawerField/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
-import { mapApiError } from '@/shared/errors/errorHandler.ts';
+import { notifyError } from '@/shared/errors/errorHandler.ts';
 import { resetFormInPlace } from '@/shared/hooks/useEditingRecord/index.ts';
 import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
 import { notify } from '@/shared/notify/index.ts';
@@ -89,7 +89,7 @@ export function CreateOrganizationDialog({
         // ONLY the create is a form-level failure — a taken slug, a rejected
         // name. Surface what actually went wrong instead of a generic "check
         // the form", and keep the user here so they can correct it.
-        notify.error(mapApiError(error));
+        notifyError(error);
         return;
       }
 

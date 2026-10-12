@@ -1,9 +1,5 @@
-import {
-  type InfiniteData,
-  keepPreviousData,
-  useInfiniteQuery,
-} from '@tanstack/react-query';
-import { useCallback, useMemo, useRef } from 'react';
+import type { InfiniteData } from '@tanstack/react-query';
+import { useMemo } from 'react';
 
 import {
   type ContactActivityEntry,
@@ -15,10 +11,8 @@ import {
 } from '@/shared/api/app/contact-activities-api.ts';
 import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
-import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-
-/** The active organization — every key carries it. */
-const useOrganizationId = () => useOrganizationStore((state) => state.organizationId);
+import { useCursorList } from '@/shared/hooks/useCursorList/index.ts';
+import { useOrganizationId } from '@/shared/store/useOrganizationStore/index.ts';
 
 /** A person's team notes: the `note` entries of their stream (§6 #3). */
 export const CONTACT_NOTES_FILTER: ContactActivityFilter = { type: ['note'] };
@@ -62,50 +56,15 @@ export function useContactActivities(
 ): ContactActivityList {
   const organizationId = useOrganizationId();
   const contact = contactId ?? '';
-  const query = useInfiniteQuery({
+  const { rows, firstPage, ...list } = useCursorList({
     queryKey: contactActivityQueryKeys.list(organizationId, contact, filter, limit),
-    queryFn: ({ pageParam }) =>
-      listContactActivities({ contactId: contact, filter, limit, after: pageParam }),
-    initialPageParam: undefined as string | undefined,
-    getNextPageParam: (last) => (last.hasMore ? (last.next ?? undefined) : undefined),
-    placeholderData: keepPreviousData,
+    queryFn: (after) =>
+      listContactActivities({ contactId: contact, filter, limit, after }),
     // The screen renders this failure itself (see above).
-    meta: { notifyOnError: false },
+    notifyOnError: false,
     enabled: enabled && organizationId !== null && contact !== '',
   });
-
-  const { fetchNextPage } = query;
-  const inFlight = useRef(false);
-  const loadMore = useCallback(() => {
-    if (inFlight.current) return;
-    inFlight.current = true;
-    fetchNextPage()
-      .catch(() => {
-        // The query's own isError says so.
-      })
-      .finally(() => {
-        inFlight.current = false;
-      });
-  }, [fetchNextPage]);
-
-  const { data } = query;
-  const entries = useMemo(() => data?.pages.flatMap((page) => page.rows) ?? [], [data]);
-  return {
-    entries,
-    total: data?.pages[0]?.total ?? null,
-    isPending: query.isPending,
-    isSuccess: query.isSuccess,
-    isError: query.isError,
-    isRefreshing: query.isPlaceholderData,
-    hasNextPage: query.hasNextPage,
-    isFetchingNextPage: query.isFetchingNextPage,
-    fetchNextPage: loadMore,
-    refetch: () => {
-      query.refetch().catch(() => {
-        // The query's own isError says so.
-      });
-    },
-  };
+  return { ...list, entries: rows, total: firstPage?.total ?? null };
 }
 
 /** What the member may do with a person's stream. */

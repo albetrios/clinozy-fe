@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { api } from '@/core/http/api.ts';
+import { pageOf } from '@/core/http/pagination.ts';
 import { collectAllPages } from '@/shared/api/fetch-all-pages.ts';
 
 import type { DeleteReason } from './app-schema.ts';
@@ -57,11 +58,6 @@ const PAGE_SIZE = 100;
 /** How many lines "Contact activity" lists (H:2823). */
 const ACTIVITY_LINES = 5;
 
-/** The cursor of the page after this one, `null` on the last. */
-const nextCursor = (meta?: {
-  pagination?: { has_more: boolean; next: string | null };
-}) => (meta?.pagination?.has_more ? meta.pagination.next : null);
-
 /** The plan list's own `meta` field — the planned and accepted rows' total. */
 const planMetaWire = z.object({ plan_total: z.number().optional() });
 
@@ -84,7 +80,7 @@ export async function fetchPlan(patientId: string): Promise<PatientPlan> {
         .array(planSuggestionWire)
         .parse(response.data ?? [])
         .map(toPlanSuggestionRow),
-      next: nextCursor(response.meta),
+      next: pageOf(response.meta?.pagination).next,
     };
   }, 'offering-suggestions');
   return { suggestions, planTotal };

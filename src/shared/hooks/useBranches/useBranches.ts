@@ -1,10 +1,9 @@
-import { useQuery } from '@tanstack/react-query';
-
 import {
   type BranchOption,
   branchQueryKeys,
   fetchActiveBranches,
 } from '@/shared/api/app/branches-api.ts';
+import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 /** The clinic's open branches (main first), whether there are several, and whether they have loaded. */
@@ -26,10 +25,12 @@ export interface UseBranchesResult {
  */
 export function useBranches(): UseBranchesResult {
   const organizationId = useOrganizationStore((state) => state.organizationId);
-  const query = useQuery({
+  const query = useAppQuery({
     queryKey: branchQueryKeys.active(organizationId),
     queryFn: fetchActiveBranches,
     staleTime: 5 * 60_000,
+    // No toast, as before: until the branches answer, the clinic shows no branch UI.
+    notifyOnError: false,
   });
   const openBranches = query.data ?? [];
   return {

@@ -45,10 +45,7 @@ import { useCursorList } from '@/shared/hooks/useCursorList/index.ts';
 import { FIXTURE_MONEY_WRITE_KEYS } from '@/shared/hooks/useFixtureLedger/index.ts';
 import { MEDICINE_WRITE_KEYS } from '@/shared/hooks/useMedicines/index.ts';
 import { MONEY_WRITE_KEYS } from '@/shared/hooks/usePayments/index.ts';
-import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-
-/** The active organization — every key carries it. */
-const useOrganizationId = () => useOrganizationStore((state) => state.organizationId);
+import { useOrganizationId } from '@/shared/store/useOrganizationStore/index.ts';
 
 /**
  * What an invoice write refreshes (KICKOFF §6.9 Save): every money read (the ledger, credits,

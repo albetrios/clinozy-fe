@@ -1,9 +1,10 @@
-import { type QueryKey, useQuery } from '@tanstack/react-query';
+import type { QueryKey } from '@tanstack/react-query';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { isNotFound } from '@/shared/errors/HttpError.ts';
+import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 /** What a URL-driven drawer needs to know about its record. */
@@ -55,11 +56,14 @@ export function useDialogRouteRecord<T>({
   const { t } = useTranslation(ERRORS_NS);
   const malformed = id !== undefined && !isWellFormed(id);
   const readId = malformed ? undefined : id;
-  const query = useQuery({
+  const query = useAppQuery({
     queryKey: readId === undefined ? ['dialog-route', 'none'] : queryKey(readId),
     queryFn: () => fetchRecord(readId as string),
     enabled: readId !== undefined,
     retry: (failures, error) => !isNotFound(error) && failures < 2,
+    // The drawer says it in place: a missing record closes with its own notice, another failure
+    // is the hook's `isError`.
+    notifyOnError: false,
   });
   const missing = malformed || (id !== undefined && isNotFound(query.error));
   const reportedFor = useRef<string | null>(null);

@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { api } from '@/core/http/api.ts';
+import { pageOf } from '@/core/http/pagination.ts';
 import { queryClient } from '@/core/http/queryClient.ts';
 import { collectAllPages } from '@/shared/api/fetch-all-pages.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
@@ -64,11 +65,6 @@ const SPECIALTIES_STALE_MS = 5 * 60_000;
 
 const activeOrganizationId = () => useOrganizationStore.getState().organizationId;
 
-/** A page's next cursor, `null` on the last. */
-const nextCursor = (
-  meta: { pagination?: { has_more?: boolean; next?: string | null } } | undefined,
-) => (meta?.pagination?.has_more ? (meta.pagination.next ?? null) : null);
-
 // ── Search (the rooms', in place) ──
 
 /** Whether an offering matches a search: its name, its search terms or "#274" (H:5454). */
@@ -116,7 +112,7 @@ export async function fetchAllOfferings(): Promise<OfferingRecord[]> {
     });
     return {
       rows: z.array(offeringRowWire).parse(response.data ?? []),
-      next: nextCursor(response.meta),
+      next: pageOf(response.meta?.pagination).next,
     };
   }, 'offerings');
   return rows.map(toOfferingRecord);
@@ -236,7 +232,7 @@ export async function fetchAllOffers(): Promise<OfferRecord[]> {
     });
     return {
       rows: z.array(offerRowWire).parse(response.data ?? []),
-      next: nextCursor(response.meta),
+      next: pageOf(response.meta?.pagination).next,
     };
   }, 'offers');
   return rows.map(toOfferRecord);

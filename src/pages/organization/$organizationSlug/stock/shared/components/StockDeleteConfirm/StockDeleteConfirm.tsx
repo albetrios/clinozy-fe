@@ -2,7 +2,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
-import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
+import { apiErrorReason, notifyError } from '@/shared/errors/errorHandler.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import {
@@ -123,7 +123,7 @@ export function StockDeleteConfirm({
             void queryClient.invalidateQueries({ queryKey: stockQueryKeys.all });
             onClose();
           } else {
-            notify.error(mapApiError(error));
+            notifyError(error);
           }
           throw error;
         }

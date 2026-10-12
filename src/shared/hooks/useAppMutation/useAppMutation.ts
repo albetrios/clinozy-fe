@@ -7,7 +7,7 @@ import {
 import { useCallback, useMemo, useRef } from 'react';
 
 import { isStepUpRequiredError } from '@/shared/api/step-up-api.ts';
-import { mapApiError } from '@/shared/errors/errorHandler.ts';
+import { notifyError } from '@/shared/errors/errorHandler.ts';
 import { notify, type NotifyOptions } from '@/shared/notify/index.ts';
 
 /**
@@ -332,7 +332,7 @@ export function useAppMutation<
       // Step-up-required is a flow signal, not a user-facing failure — the
       // caller opens the StepUpDialog and retries, so a toast would be noise.
       if (options.notifyOnError !== false && !isStepUpRequiredError(error)) {
-        notify.error(mapApiError(error), ...toastArgs(options.toastId));
+        notifyError(error, ...toastArgs(options.toastId));
       }
     },
   });

@@ -6,8 +6,13 @@ import {
   test,
 } from '@playwright/test';
 
+import { API_BASE_PATH } from '@/core/config/constants.ts';
+import { appToday } from '@/shared/api/app/app-time.ts';
 import { establishSessionInPage, navigateInApp } from '@/tests/utils/e2e-auth.ts';
-import { probeLiveDeployment } from '@/tests/utils/e2e-deployment-mode.ts';
+import {
+  fetchMeContextWire,
+  probeLiveDeployment,
+} from '@/tests/utils/e2e-deployment-mode.ts';
 import { byTestId, expectLoginFormReady, gotoApp } from '@/tests/utils/e2e-hybrid.ts';
 import { createSessionViaEmailCode } from '@/tests/utils/e2e-session.ts';
 import { bearerHeaders, createTeamOrganization } from '@/tests/utils/e2e-tenancy.ts';
@@ -96,8 +101,6 @@ export async function hideDevtools(page: Page): Promise<void> {
   });
 }
 
-const API = '/api/v1';
-
 /** Every weekday: the seeded clinic and its owner work all week, so a booking fits any day. */
 const EVERY_DAY = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
 
@@ -113,7 +116,7 @@ export interface ClinicSeed {
 }
 
 /** A `data` answer, or a thrown error naming the call. */
-async function seedData<T>(
+export async function seedData<T>(
   response: Awaited<ReturnType<APIRequestContext['post']>>,
   call: string,
 ): Promise<T> {
@@ -128,11 +131,6 @@ function seedPhone(): string {
   return `+9198${String(Math.floor(Math.random() * 1e8)).padStart(8, '0')}`;
 }
 
-/** Today in `timeZone`, as the API's `appointment_date` (`YYYY-MM-DD`). */
-function todayIn(timeZone: string): string {
-  return new Intl.DateTimeFormat('en-CA', { timeZone }).format(new Date());
-}
-
 /**
  * Fills a brand-new clinic with one of everything the rooms list — a branch open all week, an
  * offering, a patient, a lead, a task for the owner and a booking later today — so every room's
@@ -144,15 +142,11 @@ export async function seedClinic(
   token: string,
 ): Promise<ClinicSeed> {
   const write = (path: string, data: unknown, method: 'post' | 'patch' = 'post') =>
-    api[method](`${API}${path}`, { headers: bearerHeaders(token, true), data });
+    api[method](`${API_BASE_PATH}${path}`, { headers: bearerHeaders(token, true), data });
   const read = (path: string) =>
-    api.get(`${API}${path}`, { headers: bearerHeaders(token) });
+    api.get(`${API_BASE_PATH}${path}`, { headers: bearerHeaders(token) });
 
-  const context = await seedData<{ membership_id: string }>(
-    await read('/auth/me/context'),
-    'context',
-  );
-  const ownerId = context.membership_id;
+  const ownerId = (await fetchMeContextWire(api, token)).membership_id;
   await seedData(
     await write(
       `/tenancy/organization/memberships/${ownerId}`,
@@ -228,7 +222,7 @@ export async function seedClinic(
     'task',
   );
 
-  const date = todayIn(organization.timezone);
+  const date = appToday(new Date(), organization.timezone);
   const slots = await seedData<{ slots: { start_time: string }[] }>(
     await read(
       `/app/appointments/slots?branch_id=${branch.id}&appointment_date=${date}` +

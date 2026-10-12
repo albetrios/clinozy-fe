@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { api } from '@/core/http/api.ts';
+import { pageOf } from '@/core/http/pagination.ts';
 import { collectAllPages } from '@/shared/api/fetch-all-pages.ts';
 
 import { patientQueryKeys } from './patients-api.ts';
@@ -67,8 +68,6 @@ export const treatmentQueryKeys = {
 const PAGE_SIZE = 100;
 
 /** A cursor page's next cursor, or null on the last. */
-const nextOf = (pagination?: { has_more?: boolean; next?: string | null }) =>
-  pagination?.has_more ? (pagination.next ?? null) : null;
 
 /** Every session of a patient, newest first — the reversed ones too (every page). */
 export async function listPatientTreatments(
@@ -89,7 +88,7 @@ export async function listPatientTreatments(
         .array(treatmentWire)
         .parse(response.data ?? [])
         .map(toTreatmentRecord),
-      next: nextOf(response.meta?.pagination),
+      next: pageOf(response.meta?.pagination).next,
     };
   }, 'patient-treatments');
 }
@@ -120,7 +119,7 @@ export async function listVisitTreatmentsToBill(
         .array(treatmentWire)
         .parse(response.data ?? [])
         .map(toTreatmentRecord),
-      next: nextOf(response.meta?.pagination),
+      next: pageOf(response.meta?.pagination).next,
     };
   }, 'visit-treatments-to-bill');
 }
@@ -158,7 +157,7 @@ export async function listTreatmentCheckIns(
         .array(treatmentCheckInWire)
         .parse(response.data ?? [])
         .map(toTreatmentCheckIn),
-      next: nextOf(response.meta?.pagination),
+      next: pageOf(response.meta?.pagination).next,
     };
   }, 'treatment-check-ins');
 }

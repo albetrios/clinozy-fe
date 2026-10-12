@@ -7,11 +7,10 @@ import type {
   PatientPersonInput,
   PatientRecord,
 } from '@/shared/api/app/patients-contracts.ts';
-import { mapApiError } from '@/shared/errors/errorHandler.ts';
+import { notifyError } from '@/shared/errors/errorHandler.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useCreatePatient, useUpdatePatient } from '@/shared/hooks/usePatients/index.ts';
 import { useUploadQueue } from '@/shared/hooks/useUploadQueue/index.ts';
-import { notify } from '@/shared/notify/index.ts';
 
 import { PATIENT_DRAWER_KEYS, PATIENT_DRAWER_NS } from './patient-drawer.constants.ts';
 import { invalidPatientPhones, type PatientFormValues } from './patient-form.ts';
@@ -131,7 +130,7 @@ export function usePatientSave({
     onConflict: (error) => {
       onStep('contact');
       onConflict();
-      notify.error(mapApiError(error));
+      notifyError(error);
     },
     onStale,
     onField: (field: FieldPath<PatientFormValues>) =>

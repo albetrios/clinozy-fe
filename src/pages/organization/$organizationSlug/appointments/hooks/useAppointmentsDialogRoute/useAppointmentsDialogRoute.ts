@@ -9,7 +9,7 @@ import {
   fetchAppointment,
 } from '@/shared/api/app/appointments-api.ts';
 import type { AppointmentRow } from '@/shared/api/app/appointments-contracts.ts';
-import { safeReferrer } from '@/shared/app/app-referrer.ts';
+import { referrerHref, safeReferrer } from '@/shared/app/app-referrer.ts';
 import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useDialogRouteLocation } from '@/shared/hooks/useCrossRoomDialog/index.ts';
 import { useDialogRouteRecord } from '@/shared/hooks/useDialogRouteRecord/index.ts';
@@ -141,7 +141,7 @@ export function useAppointmentsDialogRoute(): AppointmentsDialogRouteState {
   const close = useCallback(
     (options?: { date?: string }) => {
       if (from && !crossRoom) {
-        void navigate({ href: `/organization/${organizationSlug}/${from}` });
+        void navigate({ href: referrerHref(organizationSlug, from) });
         return;
       }
       backToPage(options?.date);

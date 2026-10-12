@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { displayId } from '@/shared/api/app/app-display-id.ts';
 import type { CreditRow } from '@/shared/api/app/credits-contracts.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
-import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
+import { apiErrorReason, notifyError } from '@/shared/errors/errorHandler.ts';
 import { useDeleteCredit, useRestoreCredit } from '@/shared/hooks/useCredits/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -68,7 +68,7 @@ export function CreditDeleteConfirm({
             );
             onClose();
           } else {
-            notify.error(mapApiError(error));
+            notifyError(error);
           }
           throw error;
         }

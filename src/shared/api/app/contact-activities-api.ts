@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { api, type ApiData } from '@/core/http/api.ts';
+import { pageOf } from '@/core/http/pagination.ts';
 import { wireSchema } from '@/core/http/wire-schema.ts';
 import { collectAllPages } from '@/shared/api/fetch-all-pages.ts';
 import { toneForLabel } from '@/shared/app/app-tone-label.ts';
@@ -230,9 +231,8 @@ export async function listContactActivities({
       .array(activityEntryWire)
       .parse(response.data ?? [])
       .map(toActivityEntry),
-    next: pagination?.has_more ? (pagination.next ?? null) : null,
+    ...pageOf(pagination),
     hasMore: pagination?.has_more === true && Boolean(pagination.next),
-    total: pagination?.estimated_total ?? null,
   };
 }
 

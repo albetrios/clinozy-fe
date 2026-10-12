@@ -4,7 +4,11 @@ import { describe, expect, it, vi } from 'vitest';
 import { ValidationError } from '@/shared/errors/AppError.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 
-import { formFieldOf, mapValidationErrors } from './map-validation-errors.ts';
+import {
+  formFieldOf,
+  mapValidationErrors,
+  readValidationEntries,
+} from './map-validation-errors.ts';
 
 describe('mapValidationErrors', () => {
   it('maps ValidationError fieldErrors onto RHF setError', () => {
@@ -123,5 +127,25 @@ describe('formFieldOf', () => {
     expect(formFieldOf('querystring.date_to')).toBe('dateTo');
     expect(formFieldOf('params.lead_id')).toBe('leadId');
     expect(formFieldOf('q')).toBe('q');
+  });
+});
+
+describe('readValidationEntries', () => {
+  it('lists the entries as sent, fields not renamed, skipping what is not a field and message', () => {
+    const entry = { field: 'body.items/2', message: 'Below the lowest price', code: 'x' };
+    const data = {
+      error: {
+        errors: [entry, { field: 'q' }, null, 'oops', { field: '', message: 'y' }],
+      },
+    };
+
+    expect(readValidationEntries(data)).toEqual([entry, { field: '', message: 'y' }]);
+    expect(readValidationEntries(data)[0]).toBe(entry);
+  });
+
+  it('is empty for a body with no list', () => {
+    expect(readValidationEntries(undefined)).toEqual([]);
+    expect(readValidationEntries({ error: { reason: 'conflict' } })).toEqual([]);
+    expect(readValidationEntries({ error: { errors: 'nope' } })).toEqual([]);
   });
 });

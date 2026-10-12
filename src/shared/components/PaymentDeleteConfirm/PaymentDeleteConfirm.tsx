@@ -10,7 +10,7 @@ import {
 } from '@/shared/components/ConfirmDialog/index.ts';
 import { REASON_CONFIRM_KEYS } from '@/shared/components/ConfirmDialog/reason-confirm.constants.ts';
 import { LEDGER_KEYS, LEDGER_NS } from '@/shared/components/LedgerCells/index.ts';
-import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
+import { apiErrorReason, notifyError } from '@/shared/errors/errorHandler.ts';
 import {
   useFixtureDeletePayment,
   useFixtureRestorePayment,
@@ -103,7 +103,7 @@ export function PaymentDeleteConfirm({
     const block = apiErrorReason(error);
     const blockKey = block === undefined ? undefined : DELETE_BLOCK_KEYS[block];
     if (blockKey === undefined) {
-      notify.error(mapApiError(error));
+      notifyError(error);
       return;
     }
     notify.error(t(blockKey, { ref }));

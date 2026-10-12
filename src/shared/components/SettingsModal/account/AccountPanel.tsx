@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import i18n from '@/lib/i18n/i18n.ts';
 import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
+import { copyText } from '@/lib/sensitive-clipboard.ts';
 import { authApi } from '@/shared/api/auth-api.ts';
 import { forceLogout } from '@/shared/auth/service.ts';
 import { getAccessToken } from '@/shared/auth/token.ts';
@@ -58,10 +59,9 @@ export function AccountPanel() {
   const role = user?.role ?? 'user';
 
   const copyId = async () => {
-    try {
-      await navigator.clipboard.writeText(userId);
+    if (await copyText(userId)) {
       notify.success(i18n.t(ERRORS_KEYS.frontend.account.copySuccess, { ns: ERRORS_NS }));
-    } catch {
+    } else {
       notify.error(i18n.t(ERRORS_KEYS.frontend.account.copyFailed, { ns: ERRORS_NS }));
     }
   };

@@ -22,10 +22,7 @@ import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
 import { useCursorList } from '@/shared/hooks/useCursorList/index.ts';
-import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-
-/** The active organization — every key carries it. */
-const useOrganizationId = () => useOrganizationStore((state) => state.organizationId);
+import { useOrganizationId } from '@/shared/store/useOrganizationStore/index.ts';
 
 /**
  * What a patient write refreshes: every patient read, the people (a name or a number is the

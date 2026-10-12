@@ -2,8 +2,7 @@ import { type QueryKey, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import type { FieldValues, UseFormReturn } from 'react-hook-form';
 
-import { mapApiError } from '@/shared/errors/errorHandler.ts';
-import { notify } from '@/shared/notify/index.ts';
+import { notifyError } from '@/shared/errors/errorHandler.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 import { resetFormInPlace } from './reset-form-in-place.ts';
@@ -50,7 +49,7 @@ export function useEditingRecord<TRecord, TValues extends FieldValues>({
       setRecord(fresh);
       resetFormInPlace(form, formOf(fresh));
     } catch (error) {
-      notify.error(mapApiError(error));
+      notifyError(error);
     }
   };
   return { record, reload };

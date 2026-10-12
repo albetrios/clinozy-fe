@@ -33,10 +33,7 @@ import { useAppointment } from '@/shared/hooks/useAppointments/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
 import { useOfferings } from '@/shared/hooks/useOfferings/index.ts';
-import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-
-/** The active organization — every key carries it. */
-const useOrganizationId = () => useOrganizationStore((state) => state.organizationId);
+import { useOrganizationId } from '@/shared/store/useOrganizationStore/index.ts';
 
 /**
  * What a feedback write refreshes: the cards, the file's rail (its latest feedback and counts),

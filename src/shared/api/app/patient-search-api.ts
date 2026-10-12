@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
 import { api } from '@/core/http/api.ts';
+import { pageOf } from '@/core/http/pagination.ts';
 
 import { isContactSearchable } from './contacts-api.ts';
 import { contactNameOf, contactRowWire } from './contacts-contracts.ts';
-import { nextCursorOf } from './payments-api.ts';
 
 /*
  * The patient field's search (Receive payment, the Invoice drawer — KICKOFF §6.9) on clinozy-be:
@@ -75,5 +75,5 @@ export async function searchPatientPicker(
           ]
         : [],
     );
-  return { items, nextCursor: nextCursorOf(response.meta) };
+  return { items, nextCursor: pageOf(response.meta?.pagination).next };
 }

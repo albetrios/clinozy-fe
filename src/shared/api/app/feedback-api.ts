@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { api } from '@/core/http/api.ts';
+import { pageOf } from '@/core/http/pagination.ts';
 import { collectAllPages } from '@/shared/api/fetch-all-pages.ts';
 
 import type { DeleteReason, FeedbackActionKind } from './app-schema.ts';
@@ -53,13 +54,6 @@ const PAGE_SIZE = 100;
 /** How many of the newest check-ins the drawer looks through for the one before (same-day ones). */
 const PREVIOUS_LOOKBACK = 10;
 
-/** The next page's cursor, or null on the last. */
-function nextCursor(
-  pagination: { has_more?: boolean; next?: string | null } | undefined,
-) {
-  return pagination?.has_more ? (pagination.next ?? null) : null;
-}
-
 /** Newest first: the day, then when it was logged (both ISO, so text order is time order). */
 function newestFirst(
   a: { date: string; createdAt: string },
@@ -93,7 +87,7 @@ async function listCheckIns(patientId: string): Promise<PatientCheckIn[]> {
         .array(checkInRowWire)
         .parse(response.data ?? [])
         .map(toPatientCheckIn),
-      next: nextCursor(response.meta?.pagination),
+      next: pageOf(response.meta?.pagination).next,
     };
   }, 'patient-check-ins');
 }
@@ -115,7 +109,7 @@ async function listReviews(patientId: string): Promise<PatientReview[]> {
         .array(reviewRowWire)
         .parse(response.data ?? [])
         .map(toPatientReview),
-      next: nextCursor(response.meta?.pagination),
+      next: pageOf(response.meta?.pagination).next,
     };
   }, 'patient-reviews');
 }

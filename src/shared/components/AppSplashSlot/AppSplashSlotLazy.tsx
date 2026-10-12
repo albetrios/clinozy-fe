@@ -1,17 +1,13 @@
 import { useRouterState } from '@tanstack/react-router';
-import { lazy, Suspense, useEffect, useLayoutEffect, useState } from 'react';
+import { lazy, Suspense, useLayoutEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import {
-  holdAppSplash,
-  isAppSplashActive,
-  labelAppSplash,
-  onAppSplashDismissed,
-} from '@/lib/app-splash.ts';
+import { holdAppSplash, labelAppSplash } from '@/lib/app-splash.ts';
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 import { onceAsync } from '@/lib/lazy-module.ts';
 import { parseOrganizationSlugParam } from '@/lib/routes/params.ts';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
+import { useAppSplashActive } from '@/shared/hooks/useAppSplashActive/index.ts';
 import { readOnline, useOnlineStatus } from '@/shared/hooks/useOnlineStatus/index.ts';
 
 /*
@@ -67,7 +63,7 @@ function isOrganizationLayoutPath(pathname: string): boolean {
  */
 export function AppSplashSlotLazy() {
   const { t } = useTranslation(SPLASH_LABEL.ns);
-  const [active, setActive] = useState(isAppSplashActive);
+  const active = useAppSplashActive();
   // "Offline at mount" (`splash.md:45`) — this is the app's mount.
   const [offlineAtMount] = useState(() => !readOnline());
   const online = useOnlineStatus();
@@ -78,11 +74,6 @@ export function AppSplashSlotLazy() {
   useLayoutEffect(() => {
     if (active) labelAppSplash(t(SPLASH_LABEL.key));
   }, [active, t]);
-
-  useEffect(() => {
-    if (!active) return;
-    return onAppSplashDismissed(() => setActive(false));
-  }, [active]);
 
   if (!(active && (greets || offlineAtMount || !online))) return null;
 

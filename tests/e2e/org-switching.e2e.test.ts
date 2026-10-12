@@ -1,5 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import { organizationClaimOf } from '@/shared/auth/token.ts';
 import {
   createTeamOrgAndOpenToday,
   navigateInApp,
@@ -15,19 +16,6 @@ import { verifyDatabaseConnection } from '@/tests/utils/e2e-session.ts';
  * Team ↔ team is the clinic case; personal ↔ team runs only where the deployment
  * still has personal workspaces.
  */
-
-/** The `org` claim of a bearer token — read, never verified (the server does that). */
-function organizationClaim(authorization: string): string | null {
-  const payload = authorization.replace(/^Bearer\s+/i, '').split('.')[1] ?? '';
-  try {
-    const decoded = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')) as {
-      org?: unknown;
-    };
-    return typeof decoded.org === 'string' ? decoded.org : null;
-  } catch {
-    return null;
-  }
-}
 
 /** Waits for a switcher option to show — the submenu animates in. */
 async function optionShown(page: Page, slug: string): Promise<boolean> {
@@ -96,7 +84,9 @@ test.describe('Organization switching (Account menu › Switch clinic)', () => {
     page.on('request', (request) => {
       const authorization = request.headers().authorization;
       if (!authorization || !request.url().includes('/api/v1/app/')) return;
-      claims.push(organizationClaim(authorization) ?? 'none');
+      claims.push(
+        organizationClaimOf(authorization.replace(/^Bearer\s+/i, '')) ?? 'none',
+      );
     });
     const switchBack = page.waitForRequest(
       (request) =>

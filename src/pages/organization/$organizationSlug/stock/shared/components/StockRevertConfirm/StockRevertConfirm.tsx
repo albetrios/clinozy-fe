@@ -6,7 +6,7 @@ import {
   type ConfirmReasonOption,
 } from '@/shared/components/ConfirmDialog/index.ts';
 import { REASON_CONFIRM_KEYS } from '@/shared/components/ConfirmDialog/reason-confirm.constants.ts';
-import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
+import { apiErrorReason, notifyError } from '@/shared/errors/errorHandler.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { useStockWords } from '../../hooks/useStockWords/index.ts';
@@ -73,7 +73,7 @@ export function StockRevertConfirm({ movement, onClose }: StockRevertConfirmProp
     const block = apiErrorReason(error);
     const blockKey = block === undefined ? undefined : REVERT_BLOCK_KEYS[block];
     if (blockKey === undefined) {
-      notify.error(mapApiError(error));
+      notifyError(error);
       return;
     }
     notify.error(t(blockKey));

@@ -11,7 +11,7 @@ import {
   PATIENT_DRAWER_KEYS,
   PATIENT_DRAWER_NS,
 } from '@/shared/components/PatientDrawer/patient-drawer.constants.ts';
-import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
+import { apiErrorReason, notifyError } from '@/shared/errors/errorHandler.ts';
 import type { HttpError } from '@/shared/errors/HttpError.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import {
@@ -117,7 +117,7 @@ export function useVendorSave({ form, vendor, stacked, onDone }: UseVendorSaveOp
 
   const onConflict = (error: HttpError) => {
     if (apiErrorReason(error) !== 'record_already_exists') {
-      notify.error(mapApiError(error), { id: TOAST_ID });
+      notifyError(error, { id: TOAST_ID });
       return;
     }
     const message = t(K.nameTaken);

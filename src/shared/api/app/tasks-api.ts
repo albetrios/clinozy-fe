@@ -1,10 +1,11 @@
 import { z } from 'zod';
 
 import { api, type ApiData } from '@/core/http/api.ts';
+import { pageOf } from '@/core/http/pagination.ts';
 import { wireSchema } from '@/core/http/wire-schema.ts';
 import { collectAllPages } from '@/shared/api/fetch-all-pages.ts';
 import { apiErrorReason } from '@/shared/errors/errorHandler.ts';
-import { isHttpError } from '@/shared/errors/HttpError.ts';
+import { isHttpError, isNotFound } from '@/shared/errors/HttpError.ts';
 
 import type { DeleteReason } from './app-schema.ts';
 import { addCivilDays, appInstant, appToday } from './app-time.ts';
@@ -138,8 +139,7 @@ export async function listTasks(
   const pagination = response.meta?.pagination;
   return {
     rows: tasks.map((task) => toTaskRow(task, people)),
-    next: pagination?.has_more ? (pagination.next ?? null) : null,
-    total: pagination?.estimated_total ?? null,
+    ...pageOf(pagination),
   };
 }
 
@@ -161,7 +161,7 @@ export async function countOpenTasks(branchIds: readonly string[] = []): Promise
 
 /** Whether a read was refused or found nothing — what a drawer leaves out instead of failing. */
 const isUnreadable = (error: unknown) =>
-  isHttpError(error) && (error.status === 403 || error.status === 404);
+  isNotFound(error) || (isHttpError(error) && error.status === 403);
 
 /** A read the drawer can do without — `undefined` when the member may not read it or it is gone. */
 async function optional<T>(read: () => Promise<T>): Promise<T | undefined> {

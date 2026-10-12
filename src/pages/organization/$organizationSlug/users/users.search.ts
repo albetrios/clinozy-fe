@@ -8,6 +8,7 @@
  *
  * Dependency-free on purpose: `routeTree.tsx` is the entry chunk.
  */
+import { publicIdPattern } from '@/core/types/wire.ts';
 import {
   listIn,
   listOf,
@@ -45,7 +46,7 @@ export type TeamSortColumn = (typeof TEAM_SORT_KEYS)[number];
 export type TeamSort = `${TeamSortColumn}:${'asc' | 'desc'}`;
 
 /** A clinic role in the URL: its clinozy-be id (`rol_` + 21), a preset's as any other's. */
-const ROLE_ID = /^rol_[a-z0-9]{21}$/;
+const ROLE_ID = publicIdPattern('rol');
 
 /** Validated `?…` search params for `/users` and its dialog routes. */
 export interface UsersSearch {

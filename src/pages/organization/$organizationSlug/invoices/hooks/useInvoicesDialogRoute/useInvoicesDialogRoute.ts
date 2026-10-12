@@ -11,7 +11,7 @@ import { organizationPayments } from '@/lib/routes/payments-builders.ts';
 import { PUBLIC_ID } from '@/lib/routes/search-params.ts';
 import { fetchInvoice, invoiceQueryKeys } from '@/shared/api/app/invoices-api.ts';
 import type { InvoiceDetail } from '@/shared/api/app/invoices-contracts.ts';
-import { safeReferrer } from '@/shared/app/app-referrer.ts';
+import { referrerHref, safeReferrer } from '@/shared/app/app-referrer.ts';
 import {
   canPayment,
   INVOICE_DRAWER_KEYS,
@@ -110,7 +110,7 @@ export function useInvoicesDialogRoute(): InvoicesDialogRouteState {
       return;
     }
     if (from) {
-      void navigate({ href: `/organization/${organizationSlug}/${from}`, replace: true });
+      void navigate({ href: referrerHref(organizationSlug, from), replace: true });
       return;
     }
     void navigate({

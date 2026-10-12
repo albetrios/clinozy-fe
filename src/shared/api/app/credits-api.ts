@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { api } from '@/core/http/api.ts';
+import { pageOf } from '@/core/http/pagination.ts';
 import { isHttpError } from '@/shared/errors/HttpError.ts';
 
 import { createdRangeOf } from './app-filter-ranges.ts';
@@ -26,12 +27,7 @@ import {
   toCreditRow,
   toPendingCreditRecord,
 } from './credits-contracts.ts';
-import {
-  estimatedTotalOf,
-  fetchPayment,
-  nextCursorOf,
-  withAuthors,
-} from './payments-api.ts';
+import { fetchPayment, withAuthors } from './payments-api.ts';
 import { stockVendorNameWire } from './payments-contracts.ts';
 
 /*
@@ -125,8 +121,7 @@ export async function listPendingCredits(
     .map(toPendingCreditRecord);
   return {
     rows: await creditRowsOf(records),
-    next: nextCursorOf(response.meta),
-    total: estimatedTotalOf(response.meta),
+    ...pageOf(response.meta?.pagination),
   };
 }
 
@@ -209,7 +204,7 @@ async function peopleFound(q: string | undefined, cursor: string | null) {
           }
         : { kind: 'contact', contactId: row.id, name, phone: row.primary_phone };
     });
-  return { rows, next: nextCursorOf(response.meta) };
+  return { rows, next: pageOf(response.meta?.pagination).next };
 }
 
 /**

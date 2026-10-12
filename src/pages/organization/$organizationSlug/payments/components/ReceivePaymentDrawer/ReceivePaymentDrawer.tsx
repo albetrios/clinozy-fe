@@ -16,7 +16,7 @@ import { SECTION_TONES } from '@/shared/app/app-tones.ts';
 import type { PatientPick } from '@/shared/components/PatientPicker/index.ts';
 import type { QuickFillItem } from '@/shared/components/QuickFillRow/index.ts';
 import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
-import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
+import { apiErrorReason, notifyError } from '@/shared/errors/errorHandler.ts';
 import type { HttpError } from '@/shared/errors/HttpError.ts';
 import { splitsModes, splitsTotal } from '@/shared/forms/SplitRowsField/index.ts';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
@@ -266,7 +266,7 @@ function useConflict(form: UseFormReturn<ReceiveFormValues>, onDayClosed: () => 
       notify.error(t(K.moreThanDue));
       return;
     }
-    notify.error(mapApiError(error));
+    notifyError(error);
   };
 }
 

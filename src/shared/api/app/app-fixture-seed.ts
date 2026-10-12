@@ -1,6 +1,6 @@
 import { FIXTURE_ACTOR_ID, FIXTURE_ORGANIZATION_ID } from './app-fixture-store.ts';
 import type { AppCommon } from './app-schema.ts';
-import { addCivilDays, appInstant, appToday } from './app-time.ts';
+import { addCivilDays, appInstant, appToday, civilDayOffset } from './app-time.ts';
 
 /**
  * Helpers that turn the prototype's seed data into contract records.
@@ -28,18 +28,9 @@ const MONTHS = [
   'dec',
 ];
 
-/** Whole days from one calendar date to another. */
-export function civilDaysBetween(from: string, to: string): number {
-  const utc = (date: string) => {
-    const [y, m, d] = date.split('-').map(Number);
-    return Date.UTC(y ?? 1970, (m ?? 1) - 1, d ?? 1);
-  };
-  return Math.round((utc(to) - utc(from)) / 86_400_000);
-}
-
 /** A prototype seed date moved so the seed day lands on today. */
 export function seedDate(prototypeDate: string, today: string = appToday()): string {
-  return addCivilDays(today, civilDaysBetween(PROTOTYPE_SEED_DAY, prototypeDate));
+  return addCivilDays(today, civilDayOffset(PROTOTYPE_SEED_DAY, prototypeDate));
 }
 
 /** The UTC instant of a prototype seed date and clinic-local `HH:mm`, shifted to today. */

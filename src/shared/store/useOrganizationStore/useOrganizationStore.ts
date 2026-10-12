@@ -102,3 +102,10 @@ export const useOrganizationStore = create<OrganizationStore>((set) => ({
       personalOrganizationId: null,
     }),
 }));
+
+/**
+ * The active organization's id — what every organization-scoped query key carries,
+ * so a cached read never answers for another clinic; `null` outside one.
+ */
+export const useOrganizationId = (): string | null =>
+  useOrganizationStore((state) => state.organizationId);

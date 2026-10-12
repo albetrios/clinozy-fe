@@ -32,7 +32,7 @@ import {
   RecordDrawer,
 } from '@/shared/components/RecordDrawer/index.ts';
 import { RECORD_DRAWER_KEYS } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
-import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
+import { apiErrorReason, notifyError } from '@/shared/errors/errorHandler.ts';
 import type { HttpError } from '@/shared/errors/HttpError.ts';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
@@ -292,7 +292,7 @@ function useConflict(
       notify.error(t(K.moreThanDue));
       return;
     }
-    notify.error(mapApiError(error));
+    notifyError(error);
   };
 }
 

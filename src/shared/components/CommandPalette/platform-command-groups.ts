@@ -9,7 +9,7 @@ import {
 } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { settingsHash } from '@/shared/components/SettingsModal/settings-hash-grammar.ts';
 import type { SettingsScope } from '@/shared/components/SettingsModal/settings-sections.ts';
-import { mapApiError, reportError } from '@/shared/errors/errorHandler.ts';
+import { notifyError, reportError } from '@/shared/errors/errorHandler.ts';
 import { useMeContext } from '@/shared/hooks/useMeContext/index.ts';
 import { useVisibleSettingsSections } from '@/shared/hooks/useSettingsNav/index.ts';
 import {
@@ -23,7 +23,6 @@ import {
   Sun,
 } from '@/shared/icons/index.ts';
 import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
-import { notify } from '@/shared/notify/index.ts';
 import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
@@ -211,7 +210,7 @@ export function usePlatformCommandGroups({
                 // nothing else moved, and the user was still signed in
                 // with nothing said and nothing reported (SHELL-12).
                 reportError(error, { scope: 'command-palette-logout' });
-                notify.error(mapApiError(error), { id: PALETTE_LOGOUT_TOAST_ID });
+                notifyError(error, { id: PALETTE_LOGOUT_TOAST_ID });
               });
             }),
         },

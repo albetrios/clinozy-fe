@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { isolateText } from '@/lib/bidi-isolate.ts';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
+import { copyText } from '@/lib/sensitive-clipboard.ts';
 import { cn } from '@/lib/utils.ts';
 import type { Tone } from '@/shared/api/app/app-schema.ts';
 import { formatAppPhone } from '@/shared/app/app-phone.ts';
@@ -105,12 +106,8 @@ export function ReachRow({
   const copyLabel = copy.label ?? t(PERSON_CARD_KEYS.copy);
 
   const copyValue = async () => {
-    try {
-      await navigator.clipboard.writeText(copy.text);
-      notify.success(copy.message);
-    } catch {
-      notify.error(t(ERRORS_KEYS.frontend.account.copyFailed, { ns: ERRORS_NS }));
-    }
+    if (await copyText(copy.text)) notify.success(copy.message);
+    else notify.error(t(ERRORS_KEYS.frontend.account.copyFailed, { ns: ERRORS_NS }));
   };
 
   return (

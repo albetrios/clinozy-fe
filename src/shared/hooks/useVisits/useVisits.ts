@@ -32,7 +32,7 @@ import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import { useMyMembershipId } from '@/shared/hooks/useMyMembership/index.ts';
 import { usePatientFile } from '@/shared/hooks/usePatientFile/index.ts';
-import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { useOrganizationId } from '@/shared/store/useOrganizationStore/index.ts';
 
 /**
  * The visit's server state on clinozy-be (api-integration §5.1, §5.4): the patient's open visit
@@ -41,9 +41,6 @@ import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.
  * complete are the appointments' and Today's own writes (`useMoveAppointment`, `useTodayMoves`).
  * Writes toast only their errors; the screens toast success in their own words.
  */
-
-/** The active organization — every key carries it. */
-const useOrganizationId = () => useOrganizationStore((state) => state.organizationId);
 
 // ── Reads ──
 

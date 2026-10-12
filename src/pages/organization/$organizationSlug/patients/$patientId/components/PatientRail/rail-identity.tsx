@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 
 import { isolateText } from '@/lib/bidi-isolate.ts';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
+import { copyText } from '@/lib/sensitive-clipboard.ts';
 import { displayId } from '@/shared/api/app/app-display-id.ts';
 import { appToday, localDateOf } from '@/shared/api/app/app-time.ts';
 import { patientName, type PatientRecord } from '@/shared/api/app/patients-contracts.ts';
@@ -69,12 +70,8 @@ export function RailIdentity({
   const { line, since } = useTenureLine(patient);
 
   const copyId = async () => {
-    try {
-      await navigator.clipboard.writeText(id);
-      notify.success(t(K.idCopied));
-    } catch {
-      notify.error(t(ERRORS_KEYS.frontend.account.copyFailed, { ns: ERRORS_NS }));
-    }
+    if (await copyText(id)) notify.success(t(K.idCopied));
+    else notify.error(t(ERRORS_KEYS.frontend.account.copyFailed, { ns: ERRORS_NS }));
   };
 
   return (

@@ -3,7 +3,9 @@ import { z } from 'zod';
 import type { ApiBody, ApiData } from '@/core/http/api.ts';
 import type { operations } from '@/core/http/openapi-types.d.ts';
 import { wireSchema } from '@/core/http/wire-schema.ts';
+import { apiErrorReason } from '@/shared/errors/errorHandler.ts';
 import { isHttpError } from '@/shared/errors/HttpError.ts';
+import { readValidationEntries } from '@/shared/errors/map-validation-errors.ts';
 
 import {
   civilDateSchema,
@@ -646,11 +648,9 @@ const LINE_FIELD = /(?:^|\.)items\/(\d+)$/;
  */
 export function belowLowestPriceLines(error: unknown): number[] {
   if (!isHttpError(error) || error.status !== 400) return [];
-  const body = error.data as
-    { error?: { reason?: unknown; errors?: { field?: unknown }[] } } | undefined;
-  if (body?.error?.reason !== BELOW_LOWEST_PRICE) return [];
-  return (body.error.errors ?? []).flatMap((entry) => {
-    const match = typeof entry.field === 'string' ? LINE_FIELD.exec(entry.field) : null;
+  if (apiErrorReason(error) !== BELOW_LOWEST_PRICE) return [];
+  return readValidationEntries(error.data).flatMap(({ field }) => {
+    const match = LINE_FIELD.exec(field);
     return match?.[1] === undefined ? [] : [Number(match[1])];
   });
 }

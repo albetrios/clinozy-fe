@@ -7,6 +7,7 @@
  * (`dialogSearch` in `routeTree.tsx`); the page that opens the drawer parses it,
  * and this module loads with the room.
  */
+import { publicIdPattern } from '@/core/types/wire.ts';
 import { matchOf, PUBLIC_ID, textOf } from '@/lib/routes/search-params.ts';
 import { CALENDAR_DATE } from '@/shared/api/app/app-list-filters.ts';
 
@@ -37,7 +38,7 @@ export function validatePaymentReceiveSearch(
  * A supplier bill in the URL: its purchase's public id — `mpo_…` (a Medical PO) or `spur_…` (a
  * Clinic stock purchase); the prefix names the kind (`supplierBillRefOf`).
  */
-const BILL_PARAM = /^(?:mpo|spur)_[a-z0-9]{21}$/;
+const BILL_PARAMS = [publicIdPattern('mpo'), publicIdPattern('spur')] as const;
 
 /** `/payments/pay` (`S:86`): the supplier bill Medical or Clinic stock's "Pay ₹X" opens it on. */
 export interface PaymentPaySearch {
@@ -48,7 +49,9 @@ export interface PaymentPaySearch {
 export function validatePaymentPaySearch(
   search: Record<string, unknown>,
 ): PaymentPaySearch {
-  return { bill: matchOf(BILL_PARAM, search.bill) };
+  return {
+    bill: BILL_PARAMS.map((pattern) => matchOf(pattern, search.bill)).find(Boolean),
+  };
 }
 
 /** `/payments/day-close` (`S:91`): the day (default today) and the branch. */

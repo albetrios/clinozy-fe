@@ -65,7 +65,8 @@ Cross-room clinic UI vocabulary for the launch's ten rooms (iteration
   `useRoomLanding` applies it on every access change, View-as and its Exit too.
 - `app-referrer.ts` — the `from` allow-list a shared drawer route keeps its
   referring page with: `safeReferrer` on the drawer's side, `referrerFromPath`
-  on the sender's (the page a drawer opens over, when it is an allowed one);
+  on the sender's (the page a drawer opens over, when it is an allowed one),
+  `referrerHref` the href of an org-relative path (where a drawer goes back to);
   `visitFlowReferrer` — the patient's visit flow, the one referrer with a query
   (`timeline?visit=open[&from=today]`, `VISIT_REFERRER`). It also holds the
   cross-room drawers (A-P1): `CROSS_ROOM_ROUTES` (the Invoice drawer, Receive

@@ -1,6 +1,6 @@
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import { useCursorList } from '@/shared/hooks/useCursorList/index.ts';
-import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { useOrganizationId } from '@/shared/store/useOrganizationStore/index.ts';
 
 import {
   fetchAllStockItems,
@@ -32,9 +32,6 @@ import type {
  * params load the previous rows stay; a failed read raises no toast here: the
  * tab keeps the last copy and offers Retry (KICKOFF §6.0).
  */
-
-/** The active organization — every key carries it. */
-const useOrganizationId = () => useOrganizationStore((state) => state.organizationId);
 
 /** A page as the shared list hook reads it. */
 const asListPage = <T>(page: StockPage<T>) => ({

@@ -3,9 +3,8 @@ import { useRef, useState } from 'react';
 
 import { organizationHome, organizationPicker } from '@/lib/routes/index.ts';
 import { CommandGroup } from '@/shared/components/ui/command.tsx';
-import { mapApiError, reportError } from '@/shared/errors/errorHandler.ts';
+import { notifyError, reportError } from '@/shared/errors/errorHandler.ts';
 import { Building, Check, User } from '@/shared/icons/index.ts';
-import { notify } from '@/shared/notify/index.ts';
 import type { OrganizationSummary } from '@/shared/tenancy/me-context.ts';
 import { useMyOrganizationSummaries } from '@/shared/tenancy/my-organization-summaries.ts';
 import { switchToPersonal } from '@/shared/tenancy/switch.ts';
@@ -107,7 +106,7 @@ export function CommandPaletteOrgGroup({
         organizationId: org.id,
         organizationType: org.type,
       });
-      notify.error(mapApiError(error), { id: PALETTE_SWITCH_TOAST_ID });
+      notifyError(error, { id: PALETTE_SWITCH_TOAST_ID });
     });
   };
 

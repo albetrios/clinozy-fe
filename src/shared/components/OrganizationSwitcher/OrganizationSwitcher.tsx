@@ -19,12 +19,11 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu.tsx';
-import { mapApiError, reportError } from '@/shared/errors/errorHandler.ts';
+import { notifyError, reportError } from '@/shared/errors/errorHandler.ts';
 import { useDeploymentFlags } from '@/shared/hooks/useDeploymentFlags/index.ts';
 import { useMeContext } from '@/shared/hooks/useMeContext/index.ts';
 import { Check, ChevronsUpDown, Plus } from '@/shared/icons/index.ts';
 import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
-import { notify } from '@/shared/notify/index.ts';
 import { useWorkspaceSwitchStore } from '@/shared/store/useWorkspaceSwitchStore/index.ts';
 import {
   resolveDeploymentMode,
@@ -394,7 +393,7 @@ function useOrganizationSwitch({
           organizationId: org.id,
           organizationType: org.type,
         });
-        notify.error(mapApiError(error), { id: ORG_SWITCH_TOAST_ID });
+        notifyError(error, { id: ORG_SWITCH_TOAST_ID });
       })
       .finally(() => {
         endSwitch();
