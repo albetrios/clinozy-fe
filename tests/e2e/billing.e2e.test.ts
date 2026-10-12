@@ -248,6 +248,11 @@ test.describe('Billing & subscription', () => {
       timeout: 15000,
     });
 
+    // The card frames the list before Stripe's answer arrives: decide on the table itself, once
+    // the invoices have loaded — not on the card, which is up while they are still loading.
+    await expect(page.getByTestId('billing-invoices-table')).toBeVisible({
+      timeout: 15000,
+    });
     const viewLink = page.getByTestId('billing-invoice-view').first();
     test.skip(
       !(await viewLink.isVisible()),
