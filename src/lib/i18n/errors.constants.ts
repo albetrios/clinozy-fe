@@ -84,6 +84,7 @@ export const ERRORS_KEYS = {
       roleLocked: 'api.reasons.roleLocked',
       seatLimitReached: 'api.reasons.seatLimitReached',
       membershipAlreadyExists: 'api.reasons.membershipAlreadyExists',
+      organizationSlugExists: 'api.reasons.organizationSlugExists',
       disposableEmail: 'api.reasons.disposableEmail',
     },
   },

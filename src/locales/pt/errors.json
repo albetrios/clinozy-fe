@@ -67,6 +67,7 @@
       "roleLocked": "O acesso desta função é fixo e não pode ser alterado.",
       "seatLimitReached": "Seu plano não tem vagas livres. Adicione uma vaga em Configurações › Faturamento e convide novamente.",
       "membershipAlreadyExists": "Esta pessoa já está na clínica.",
+      "organizationSlugExists": "Essa URL do espaço já está em uso. Escolha outra.",
       "disposableEmail": "Use um endereço de e-mail permanente — endereços descartáveis não são aceitos."
     }
   },

@@ -67,6 +67,7 @@
       "roleLocked": "Die Zugriffsrechte dieser Rolle sind festgelegt und lassen sich nicht ändern.",
       "seatLimitReached": "Dein Tarif hat keinen freien Platz. Füge unter Einstellungen › Abrechnung einen Platz hinzu und lade dann erneut ein.",
       "membershipAlreadyExists": "Diese Person ist bereits in der Praxis.",
+      "organizationSlugExists": "Diese Arbeitsbereichs-URL ist bereits vergeben. Wähle eine andere.",
       "disposableEmail": "Verwende eine dauerhafte E-Mail-Adresse – Wegwerfadressen werden nicht akzeptiert."
     }
   },

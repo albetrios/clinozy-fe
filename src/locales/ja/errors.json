@@ -67,6 +67,7 @@
       "roleLocked": "このロールのアクセス権は固定されており、変更できません。",
       "seatLimitReached": "プランに空きシートがありません。設定 › 請求でシートを追加してから、もう一度招待してください。",
       "membershipAlreadyExists": "この人はすでにクリニックのメンバーです。",
+      "organizationSlugExists": "このワークスペース URL はすでに使われています。別の URL を選んでください。",
       "disposableEmail": "恒久的なメールアドレスを使ってください。使い捨てのアドレスは使用できません。"
     }
   },

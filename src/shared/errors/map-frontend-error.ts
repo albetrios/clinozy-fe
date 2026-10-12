@@ -48,6 +48,7 @@ const REASON_TO_ERRORS_KEY: Record<string, string> = {
   role_locked: ERRORS_KEYS.api.reasons.roleLocked,
   seat_limit_reached: ERRORS_KEYS.api.reasons.seatLimitReached,
   membership_already_exists: ERRORS_KEYS.api.reasons.membershipAlreadyExists,
+  organization_slug_exists: ERRORS_KEYS.api.reasons.organizationSlugExists,
   disposable_email: ERRORS_KEYS.api.reasons.disposableEmail,
 };
 

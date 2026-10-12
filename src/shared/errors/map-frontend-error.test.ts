@@ -76,6 +76,11 @@ describe('mapFrontendError', () => {
     ],
     [409, 'membership_already_exists', 'This person is already in the clinic.'],
     [
+      409,
+      'organization_slug_exists',
+      'That workspace URL is already taken. Choose another one.',
+    ],
+    [
       400,
       'disposable_email',
       "Use a permanent email address — disposable ones aren't accepted.",

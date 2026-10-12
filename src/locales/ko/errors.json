@@ -67,6 +67,7 @@
       "roleLocked": "이 역할의 접근 권한은 고정되어 있어 변경할 수 없습니다.",
       "seatLimitReached": "요금제에 남은 좌석이 없습니다. 설정 › 결제에서 좌석을 추가한 뒤 다시 초대하세요.",
       "membershipAlreadyExists": "이 사람은 이미 클리닉에 있습니다.",
+      "organizationSlugExists": "이 워크스페이스 URL은 이미 사용 중입니다. 다른 URL을 선택하세요.",
       "disposableEmail": "영구적인 이메일 주소를 사용하세요. 일회용 주소는 허용되지 않습니다."
     }
   },

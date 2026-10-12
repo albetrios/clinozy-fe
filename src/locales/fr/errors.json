@@ -67,6 +67,7 @@
       "roleLocked": "L'accès de ce rôle est fixe et ne peut pas être modifié.",
       "seatLimitReached": "Votre forfait n'a plus de place libre. Ajoutez une place dans Paramètres › Facturation, puis invitez à nouveau.",
       "membershipAlreadyExists": "Cette personne fait déjà partie de la clinique.",
+      "organizationSlugExists": "Cette URL de l'espace est déjà prise. Choisissez-en une autre.",
       "disposableEmail": "Utilisez une adresse e-mail permanente — les adresses jetables ne sont pas acceptées."
     }
   },
