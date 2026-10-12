@@ -26,8 +26,12 @@ const API = 'http://localhost:3000/api/v1';
 
 type TeamContext = { slug: string; subscribed: boolean; planCount: number };
 
+/** Why a subscription spec skips: no paid plan carries a Stripe sandbox price. */
+const NO_PAID_SUBSCRIPTION =
+  'no paid plan with a Stripe sandbox price — run `pnpm db:seed:stripe-catalog` in clinozy-be';
+
 /**
- * Create a team org via the API, optionally seed a free-plan subscription, then
+ * Create a team org via the API, optionally subscribe it to the cheapest paid plan, then
  * hydrate the browser with the team-scoped token and land on its home (Today).
  * Returns `null` when the environment can't provision one (seat seed / Stripe).
  * `planCount` reflects the seeded plan catalog so plan-dependent specs can skip
@@ -57,12 +61,17 @@ async function setUpTeamBilling(
 
     let subscribed = false;
     if (opts.withSubscription) {
-      // A free plan activates without a payment method — the reliable seed path.
-      const freePlan = plans.find((p) => Number(p.price_monthly) === 0) ?? plans[0];
-      if (freePlan) {
+      // Free is the tier an organization with no subscription is on: clinozy-be refuses a
+      // subscription to it (it has no provider price). The cheapest paid plan — priced in the
+      // Stripe sandbox by clinozy-be's `pnpm db:seed:stripe-catalog` — is subscribed to, and
+      // waits for its first payment.
+      const paidPlan = plans
+        .filter((p) => Number(p.price_monthly) > 0)
+        .sort((a, b) => Number(a.price_monthly) - Number(b.price_monthly))[0];
+      if (paidPlan) {
         const sub = await api.post(`${API}/billing/subscriptions`, {
           headers: bearerHeaders(teamToken, true),
-          data: { plan_id: freePlan.id, billing_cycle: 'monthly' },
+          data: { plan_id: paidPlan.id, billing_cycle: 'monthly' },
         });
         subscribed = sub.ok();
       }
@@ -137,16 +146,13 @@ test.describe('Billing & subscription', () => {
     await expect(page.getByText(/\/\s*mo/).first()).toBeVisible();
   });
 
-  test('an active subscription surfaces summary, invoices, payment methods, and cancellation', async ({
+  test('a subscription surfaces summary, invoices, payment methods, and cancellation', async ({
     page,
     playwright,
   }) => {
     const ctx = await setUpTeamBilling(page, playwright, { withSubscription: true });
     test.skip(ctx === null, 'team org could not be provisioned in this environment');
-    test.skip(
-      !ctx?.subscribed,
-      'no free plan seeded / subscription create unavailable in this environment',
-    );
+    test.skip(!ctx?.subscribed, NO_PAID_SUBSCRIPTION);
 
     await openSettingsHash(page, 'account', 'billing');
 
@@ -180,7 +186,7 @@ test.describe('Billing & subscription', () => {
   }) => {
     const ctx = await setUpTeamBilling(page, playwright, { withSubscription: true });
     test.skip(ctx === null, 'team org could not be provisioned in this environment');
-    test.skip(!ctx?.subscribed, 'subscription create unavailable in this environment');
+    test.skip(!ctx?.subscribed, NO_PAID_SUBSCRIPTION);
 
     await openSettingsHash(page, 'account', 'billing');
     await expect(page.getByTestId('billing-cancellation-card')).toBeVisible({
@@ -190,7 +196,9 @@ test.describe('Billing & subscription', () => {
     const cancelButton = page.getByTestId('billing-cancel');
     test.skip(
       !(await cancelButton.isEnabled()),
-      'subscription not in a cancellable state',
+      // The subscription waits for its first payment; only Stripe's webhook marks it paid, so
+      // locally it needs `stripe listen --forward-to localhost:3000/api/v1/billing/webhook`.
+      'subscription not cancellable yet: its first payment is unconfirmed (forward Stripe webhooks with `stripe listen`)',
     );
 
     await cancelButton.click();
@@ -209,7 +217,7 @@ test.describe('Billing & subscription', () => {
   }) => {
     const ctx = await setUpTeamBilling(page, playwright, { withSubscription: true });
     test.skip(ctx === null, 'team org could not be provisioned in this environment');
-    test.skip(!ctx?.subscribed, 'subscription create unavailable in this environment');
+    test.skip(!ctx?.subscribed, NO_PAID_SUBSCRIPTION);
 
     await openSettingsHash(page, 'account', 'billing');
     const summary = page.getByTestId('billing-summary');
@@ -233,7 +241,7 @@ test.describe('Billing & subscription', () => {
   }) => {
     const ctx = await setUpTeamBilling(page, playwright, { withSubscription: true });
     test.skip(ctx === null, 'team org could not be provisioned in this environment');
-    test.skip(!ctx?.subscribed, 'subscription create unavailable in this environment');
+    test.skip(!ctx?.subscribed, NO_PAID_SUBSCRIPTION);
 
     await openSettingsHash(page, 'account', 'billing');
     await expect(page.getByTestId('billing-invoices-card')).toBeVisible({
