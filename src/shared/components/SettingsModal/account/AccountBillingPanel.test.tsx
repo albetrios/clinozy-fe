@@ -270,8 +270,7 @@ describe('AccountBillingPanel', () => {
     expect(screen.getByTestId('plan-pln_pro')).toHaveTextContent('Switch to Pro');
   });
 
-  it('draws the current plan with the ink edge and the cycle on a segmented track', async () => {
-    const user = userEvent.setup();
+  it('draws the current plan with the ink edge', () => {
     useSubscriptionMock.mockReturnValue({
       data: SUB,
       isPending: false,
@@ -283,6 +282,19 @@ describe('AccountBillingPanel', () => {
 
     const current = screen.getByText('Current plan').closest('[data-current]');
     expect(current).toHaveClass('border-foreground', 'ring-1');
+  });
+
+  it('offers the cycle on a segmented track before there is a subscription', async () => {
+    const user = userEvent.setup();
+    useSubscriptionMock.mockReturnValue({
+      data: null,
+      isPending: false,
+      isLoading: false,
+      isError: false,
+    });
+    setCanManage(true);
+    renderPanel();
+
     // Monthly · Yearly states which cycle is in force, and moves with a press.
     expect(screen.getByTestId('billing-cycle-monthly')).toHaveAttribute(
       'aria-pressed',
@@ -297,6 +309,52 @@ describe('AccountBillingPanel', () => {
       'aria-pressed',
       'false',
     );
+    expect(screen.getByTestId('plan-options')).toHaveTextContent('/ yr');
+  });
+
+  /*
+   * clinozy-be's change-plan takes `plan_id` alone (400 on `billing_cycle`): a
+   * subscription keeps the cycle it was created on. A Monthly · Yearly switch
+   * next to "Switch to Pro" therefore priced a cycle the switch would not use —
+   * the card read "/ yr" and the subscription stayed monthly.
+   */
+  describe('with a subscription, its own cycle decides', () => {
+    const YEARLY_SUB = { ...SUB, billingCycle: 'yearly' as const };
+
+    it('hides the cycle switch and prices every card on the subscription cycle', () => {
+      useSubscriptionMock.mockReturnValue({
+        data: YEARLY_SUB,
+        isPending: false,
+        isLoading: false,
+        isError: false,
+      });
+      setCanManage(true);
+      renderPanel();
+
+      expect(screen.queryByTestId('billing-cycle-toggle')).not.toBeInTheDocument();
+      expect(screen.getByText('Billed yearly')).toBeInTheDocument();
+      expect(screen.getByTestId('plan-options')).toHaveTextContent('/ yr');
+      expect(screen.getByTestId('plan-options')).not.toHaveTextContent('/ mo');
+    });
+
+    it('switches plan on the subscription cycle', async () => {
+      useSubscriptionMock.mockReturnValue({
+        data: YEARLY_SUB,
+        isPending: false,
+        isLoading: false,
+        isError: false,
+      });
+      setCanManage(true);
+      selectPlanMutateAsync.mockResolvedValue({ ...YEARLY_SUB, planId: 'pln_pro' });
+      const user = userEvent.setup();
+      renderPanel();
+
+      await user.click(screen.getByTestId('plan-pln_pro'));
+      expect(selectPlanMutateAsync).toHaveBeenCalledWith({
+        planId: 'pln_pro',
+        billingCycle: 'yearly',
+      });
+    });
   });
 
   it('switches plan when allowed', async () => {

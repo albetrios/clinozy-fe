@@ -245,9 +245,10 @@ function BillingContent({ sub, plans }: BillingContentProps) {
     teamOrganizationOnly: true,
   });
   const selectPlan = useSelectBillingPlan();
-  const [billingCycle, setBillingCycle] = useState<BillingCycle>(
-    sub?.billingCycle ?? 'monthly',
-  );
+  const [chosenCycle, setChosenCycle] = useState<BillingCycle>('monthly');
+  // clinozy-be's change-plan takes the plan alone: a subscription keeps the cycle it was created
+  // on. So the cycle is chosen only before there is one, and every card is priced on it after.
+  const billingCycle = sub ? sub.billingCycle : chosenCycle;
   const [paymentClientSecret, setPaymentClientSecret] = useState<string | null>(null);
   /**
    * Which plan button the user actually pressed. `selectPlan.isPending` is one
@@ -403,8 +404,8 @@ function BillingContent({ sub, plans }: BillingContentProps) {
         title={t(BILLING_KEYS.changePlanTitle)}
         description={t(BILLING_KEYS.changePlanDescription)}
         action={
-          canManage ? (
-            <BillingCycleSwitch value={billingCycle} onChange={setBillingCycle} />
+          canManage && !sub ? (
+            <BillingCycleSwitch value={chosenCycle} onChange={setChosenCycle} />
           ) : undefined
         }
       >

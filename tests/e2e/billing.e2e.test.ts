@@ -155,6 +155,9 @@ test.describe('Billing & subscription', () => {
     await expect(page.getByTestId('billing-invoices-card')).toBeVisible();
     await expect(page.getByTestId('billing-payment-methods-card')).toBeVisible();
     await expect(page.getByTestId('billing-cancellation-card')).toBeVisible();
+    // A subscription keeps its own cycle (change-plan takes the plan alone), so the
+    // Monthly · Yearly switch is offered only before there is one.
+    await expect(page.getByTestId('billing-cycle-toggle')).toHaveCount(0);
   });
 
   test('a personal account cannot manage billing (team-gated)', async ({ page }) => {
