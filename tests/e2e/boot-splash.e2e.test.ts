@@ -159,7 +159,7 @@ interface SplashFrames {
   framesAt: number | null;
   /** When the exit began (`.app-splash-exiting`). */
   exitAt: number | null;
-  /** The wordmark's opacity two frames after first paint. */
+  /** The wordmark's opacity two frames after its animation started (first paint). */
   wordmarkOpacityAtStart: string | null;
   /** The greeting line, if the slot rendered one. */
   greeting: string | null;
@@ -195,9 +195,30 @@ const TRACE_FRAMES = `
     if (bar) trace.barTransform = getComputedStyle(bar).transform;
     if (ticker) trace.tickerTransform = getComputedStyle(ticker).transform;
   };
+  // Two frames after the wordmark's animation has started — not after
+  // DOMContentLoaded: on the dev server DOMContentLoaded waits for every static
+  // module, which under load lands after the wordmark's own 1250ms beat. Waiting
+  // for the animation to start (rather than sampling as it is parsed) lets reduced
+  // motion's 1ms frame land first.
+  let startSampled = false;
+  const sampleStart = (splash) => {
+    const parsed = byId(splash, 'app-splash-wordmark');
+    if (startSampled || !parsed) return;
+    startSampled = true;
+    const animations = typeof parsed.getAnimations === 'function' ? parsed.getAnimations() : [];
+    Promise.all(animations.map((animation) => animation.ready)).catch(() => {}).then(() => {
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        const current = document.getElementById('app-splash');
+        const wordmark = current && byId(current, 'app-splash-wordmark');
+        if (wordmark) trace.wordmarkOpacityAtStart = getComputedStyle(wordmark).opacity;
+        if (current) trace.framesAt = framesStart(current) ?? trace.framesAt;
+      }));
+    });
+  };
   const check = () => {
     const splash = document.getElementById('app-splash');
     if (!splash) return;
+    sampleStart(splash);
     trace.framesAt = framesStart(splash) ?? trace.framesAt;
     if (trace.exitAt === null && splash.classList.contains('app-splash-exiting')) {
       trace.exitAt = performance.now();
@@ -213,14 +234,6 @@ const TRACE_FRAMES = `
   };
   new MutationObserver(check).observe(document, {
     childList: true, subtree: true, attributes: true, attributeFilter: ['class'],
-  });
-  document.addEventListener('DOMContentLoaded', () => {
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      const splash = document.getElementById('app-splash');
-      const wordmark = splash && byId(splash, 'app-splash-wordmark');
-      if (wordmark) trace.wordmarkOpacityAtStart = getComputedStyle(wordmark).opacity;
-      if (splash) trace.framesAt = framesStart(splash) ?? trace.framesAt;
-    }));
   });
 })();
 `;
@@ -314,7 +327,10 @@ test.describe('Splash — frames, slot, offline hold, reduced motion', () => {
     page,
   }) => {
     await page.addInitScript(TRACE_FRAMES);
-    await page.goto('/login');
+    // Look for the splash from the first byte, not from `load`: the splash is in
+    // the HTML and leaves on its own clock, and on a busy dev server `load` (every
+    // static module and font) can land after it has already gone.
+    await page.goto('/login', { waitUntil: 'commit' });
 
     await expect(
       page.getByRole('status', { name: `Loading ${PRODUCT_NAME}` }),
