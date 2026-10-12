@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 
 import {
   loginViaEmailCodeUI,
+  navigateInApp,
   registerNewUserAndGoToToday,
 } from '@/tests/utils/e2e-auth.ts';
 import { openAccountMenu, openNotificationCenter } from '@/tests/utils/e2e-hybrid.ts';
@@ -35,8 +36,9 @@ test.describe('Notifications (from a declined invitation)', () => {
       const owner = await createSessionViaEmailCode(api);
       const inviteeEmail = uniqueE2eEmail('declines');
       let invitationId: string;
+      let orgSlug: string;
       try {
-        ({ invitationId } = await createTeamInvitation(
+        ({ invitationId, orgSlug } = await createTeamInvitation(
           api,
           owner.accessToken,
           inviteeEmail,
@@ -55,6 +57,9 @@ test.describe('Notifications (from a declined invitation)', () => {
       expect(declined.status()).toBe(200);
 
       await loginViaEmailCodeUI(page, owner.email);
+      // Into the clinic by its address: where personal workspaces are on, a fresh sign-in
+      // starts outside it, on the picker.
+      await navigateInApp(page, `/organization/${orgSlug}`);
       await expect(page.getByTestId('today-page')).toBeVisible({ timeout: 20_000 });
       // One unread item: the Account menu's Notifications row carries its count.
       await openAccountMenu(page);

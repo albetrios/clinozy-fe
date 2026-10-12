@@ -13,6 +13,7 @@ import {
   uniqueE2eEmail,
   verifyDatabaseConnection,
 } from '@/tests/utils/e2e-session.ts';
+import { bearerHeaders } from '@/tests/utils/e2e-tenancy.ts';
 
 const HOST = 'http://localhost:3000';
 const API = `${HOST}/api/v1`;
@@ -145,16 +146,21 @@ test.describe('Organization lifecycle — rename, role change, removal', () => {
       const accept = await inviteeApi.post(
         `${API}/tenancy/membership-invitations/${invitationId}/accept`,
         {
-          headers: { Authorization: `Bearer ${invitee.accessToken}` },
+          // An accept is a write that requires its idempotency key (the `I` column of
+          // docs/routes.txt); without one clinozy-be answers 422.
+          headers: bearerHeaders(invitee.accessToken, true),
           data: { token: invitationToken },
         },
       );
       expect(accept.ok(), `accept failed: ${accept.status()}`).toBe(true);
 
-      // Owner promotes the member to Admin from their drawer. Navigate away and
-      // back — a remount refetches the roster, with no cold boot to wait out.
-      await navigateInApp(page, `/organization/${slug}/users/roles`);
-      await navigateInApp(page, `/organization/${slug}/users`);
+      // Owner promotes the member to Admin from their drawer — on the roster read after the
+      // accept. A remount alone keeps the cached roster while it is fresh, and a drawer opened
+      // on the invitee's row saves with its old `updated_at`: clinozy-be refuses that as
+      // `record_changed` (the stale-save guard), so the page loads the roster again.
+      await page.reload();
+      await expect(row).toHaveCount(1, { timeout: 15_000 });
+      await expect(row).not.toContainText(/invited/i, { timeout: 15_000 });
       await row.click();
       await expect(page.getByTestId('user-drawer')).toBeVisible({ timeout: 10_000 });
       await page
