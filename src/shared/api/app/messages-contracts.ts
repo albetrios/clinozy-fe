@@ -157,6 +157,12 @@ export type ChatThreadRead = z.infer<typeof chatThreadReadSchema>;
 export const messagingStatusSchema = z.object({
   /** WhatsApp is down: WhatsApp replies queue, and the composer says so. */
   whatsappDown: z.boolean(),
+  /**
+   * A messaging service delivers this thread's messages. False for a contact's stream on
+   * clinozy-be: delivery is a separate service, not built yet (backend D87), so every message waits
+   * `queued` in the outbox — the thread labels it "Queued", the composer says why.
+   */
+  isConnected: z.boolean(),
 });
 /** The channels' status. */
 export type MessagingStatus = z.infer<typeof messagingStatusSchema>;

@@ -698,6 +698,7 @@
     "replyHint": "{{first}} hat zuletzt hier geschrieben",
     "mismatch": "{{first}} hat über {{channel}} geschrieben · Wechseln",
     "outage": "WhatsApp gestört · Antworten werden eingereiht",
+    "notConnected": "Nachrichten warten in der Warteschlange · sie gehen raus, sobald Messaging verbunden ist",
     "prefersNoCalls": "Keine Anrufe gewünscht · lieber schreiben",
     "prefersAfterSix": "Kontakt erst nach 18 Uhr gewünscht",
     "suggest": "Vorschläge",

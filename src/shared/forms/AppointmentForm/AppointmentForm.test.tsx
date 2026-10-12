@@ -312,7 +312,10 @@ vi.mock('@/shared/api/app/contact-activities-api.ts', async (importOriginal) => 
   fetchContactThread: vi.fn(async () => ({ thread: null, messages: [], authors: {} })),
   sendContactActivity: vi.fn(),
   resendContactActivity: vi.fn(),
-  fetchContactMessagingStatus: vi.fn(async () => ({ whatsappDown: false })),
+  fetchContactMessagingStatus: vi.fn(async () => ({
+    whatsappDown: false,
+    isConnected: false,
+  })),
   fetchContactTemplateValues: vi.fn(async () => ({
     clinicName: 'Cresence',
     address: '',

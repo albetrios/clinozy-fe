@@ -698,6 +698,7 @@
     "replyHint": "{{first}} last wrote here",
     "mismatch": "{{first}} wrote on {{channel}} · Switch",
     "outage": "WhatsApp down · replies will queue",
+    "notConnected": "Messages wait in the queue · they go out once messaging is connected",
     "prefersNoCalls": "Prefers no calls · message instead",
     "prefersAfterSix": "Prefers contact after 6 pm",
     "suggest": "Suggest",

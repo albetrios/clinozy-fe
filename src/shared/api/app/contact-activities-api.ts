@@ -24,7 +24,8 @@ import type {
  * §3.3): their WhatsApp and Instagram messages, the calls and notes the team logged and the
  * server's own entries, oldest first — the chat column's thread for a contact. Sending writes
  * one entry (`send-message`, `log-call`, `add-note`); a failed message is queued again
- * (`resend`); `messaging-status` says whether messages go out. The design's SMS and e-mail are
+ * (`resend`). Every message waits `queued` in clinozy-be's outbox until a messaging service
+ * delivers it — none is connected yet (backend D87). The design's SMS and e-mail are
  * not channels (route map §4 #8). The patient file reads the same stream a page at a time,
  * newest first, filtered by `type` and `group` — its Overview timeline and its Team notes
  * (§6 #2, #3: there is no separate patient timeline and no patient note).
@@ -143,17 +144,6 @@ const activityWire = wireSchema<ApiActivity>()(
     task_id: z.string().nullable(),
   }),
 );
-
-/**
- * `messaging-status` as its route describes it — the OpenAPI document gives its 200 no body
- * (api-integration §9), so there is no generated type to check this against.
- */
-const messagingStatusWire = z.object({
-  is_delivery_enabled: z.boolean(),
-  is_provider_down: z.boolean(),
-  whatsapp: z.object({ is_connected: z.boolean(), queued_count: z.number() }),
-  instagram: z.object({ is_connected: z.boolean(), queued_count: z.number() }),
-});
 
 /** Each entry type as the chat column's channel. */
 const CHANNEL_OF: Readonly<Record<(typeof ACTIVITY_TYPES)[number], Channel>> = {
@@ -348,15 +338,11 @@ export async function resendContactActivity({
 }
 
 /**
- * Whether WhatsApp replies will wait in the queue: Meta is failing, or this deployment sends
- * nothing at all (`messaging-status`) — the composer's "WhatsApp down · replies will queue".
+ * A contact's stream has no messaging service yet: clinozy-be stores a sent message `queued` in
+ * its outbox, and delivering it is a separate service, not built (backend D87). Nothing to ask.
  */
 export async function fetchContactMessagingStatus(): Promise<MessagingStatus> {
-  const response: { data?: unknown } = await api.get(
-    '/app/contact-activities/messaging-status',
-  );
-  const status = messagingStatusWire.parse(response.data);
-  return { whatsappDown: status.is_provider_down || !status.is_delivery_enabled };
+  return { whatsappDown: false, isConnected: false };
 }
 
 /**

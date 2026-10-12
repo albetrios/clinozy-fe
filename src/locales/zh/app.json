@@ -695,6 +695,7 @@
     "replyHint": "{{first}} 最近在这里留言",
     "mismatch": "{{first}} 通过 {{channel}} 联系 · 切换",
     "outage": "WhatsApp 故障 · 回复将排队发送",
+    "notConnected": "消息在队列中等待 · 消息服务接通后发送",
     "prefersNoCalls": "不希望接电话 · 请发消息",
     "prefersAfterSix": "希望下午 6 点后联系",
     "suggest": "建议",

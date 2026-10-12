@@ -78,7 +78,7 @@ const DELIVERED: ReadonlySet<ComposerMode> = new Set(['whatsapp', 'instagram']);
  */
 export async function fetchMessagingStatus(): Promise<MessagingStatus> {
   const { fixtureWhatsAppDown } = await messageFixtures();
-  return { whatsappDown: fixtureWhatsAppDown() };
+  return { whatsappDown: fixtureWhatsAppDown(), isConnected: true };
 }
 
 // ── Threads ──

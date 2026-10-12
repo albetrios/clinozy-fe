@@ -141,7 +141,10 @@ beforeEach(() => {
     if (!queued) throw new Error(`no activity ${activityId}`);
     return queued;
   });
-  vi.mocked(fetchContactMessagingStatus).mockResolvedValue({ whatsappDown: true });
+  vi.mocked(fetchContactMessagingStatus).mockResolvedValue({
+    whatsappDown: false,
+    isConnected: false,
+  });
   vi.mocked(fetchContactTemplateValues).mockResolvedValue({
     clinicName: 'Cresence Skin Clinic',
     address: '',
@@ -180,7 +183,10 @@ describe('the reads', () => {
     await waitFor(() => expect(result.current.history.isSuccess).toBe(true));
     expect(result.current.thread.data?.messages).toHaveLength(3);
     expect(result.current.history.data?.at(-1)).toMatchObject({ kind: 'appointment' });
-    expect(result.current.status.data).toEqual({ whatsappDown: false });
+    expect(result.current.status.data).toEqual({
+      whatsappDown: false,
+      isConnected: true,
+    });
     expect(result.current.values.data?.clinicName).toBe('Cresence Skin');
     expect(fetchContactThread).not.toHaveBeenCalled();
     expect(fetchContactMessagingStatus).not.toHaveBeenCalled();
@@ -206,7 +212,10 @@ describe('the reads', () => {
       messages: [streamEntry('act_first')],
       authors: {},
     });
-    expect(result.current.status.data).toEqual({ whatsappDown: true });
+    expect(result.current.status.data).toEqual({
+      whatsappDown: false,
+      isConnected: false,
+    });
     expect(result.current.values.data?.clinicName).toBe('Cresence Skin Clinic');
     expect(result.current.history.fetchStatus).toBe('idle');
   });

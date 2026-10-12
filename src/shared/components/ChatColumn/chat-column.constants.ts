@@ -94,6 +94,7 @@ export const CHAT_COLUMN_KEYS = {
   replyHint: 'chatColumn.replyHint',
   mismatch: 'chatColumn.mismatch',
   outage: 'chatColumn.outage',
+  notConnected: 'chatColumn.notConnected',
   prefersNoCalls: 'chatColumn.prefersNoCalls',
   prefersAfterSix: 'chatColumn.prefersAfterSix',
   suggest: 'chatColumn.suggest',

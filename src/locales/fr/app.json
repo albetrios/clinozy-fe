@@ -701,6 +701,7 @@
     "replyHint": "{{first}} a écrit ici en dernier",
     "mismatch": "{{first}} a écrit sur {{channel}} · Changer",
     "outage": "WhatsApp en panne · les réponses seront mises en attente",
+    "notConnected": "Les messages attendent dans la file · ils partiront une fois la messagerie connectée",
     "prefersNoCalls": "Préfère ne pas être appelé · écrivez plutôt",
     "prefersAfterSix": "Préfère être contacté après 18 h",
     "suggest": "Suggérer",

@@ -62,17 +62,6 @@ const organization = (id: string, name: string): OrganizationSummary => ({
   updatedAt: '2026-01-01T00:00:00.000Z',
 });
 
-/** The messaging status as clinozy-be answers it. */
-const messagingStatus = (patch: Record<string, unknown> = {}) => ({
-  data: {
-    is_delivery_enabled: true,
-    is_provider_down: false,
-    whatsapp: { is_connected: true, queued_count: 0 },
-    instagram: { is_connected: true, queued_count: 0 },
-    ...patch,
-  },
-});
-
 beforeEach(() => {
   vi.resetAllMocks();
   vi.mocked(fetchMemberNames).mockResolvedValue(
@@ -372,24 +361,12 @@ describe('resendContactActivity', () => {
 });
 
 describe('fetchContactMessagingStatus', () => {
-  it('reads WhatsApp as up while messages go out', async () => {
-    vi.mocked(api.get).mockResolvedValueOnce(messagingStatus() as never);
-    expect(await fetchContactMessagingStatus()).toEqual({ whatsappDown: false });
-    expect(api.get).toHaveBeenCalledWith('/app/contact-activities/messaging-status');
-  });
-
-  it('reads WhatsApp as down when the provider is failing', async () => {
-    vi.mocked(api.get).mockResolvedValueOnce(
-      messagingStatus({ is_provider_down: true }) as never,
-    );
-    expect(await fetchContactMessagingStatus()).toEqual({ whatsappDown: true });
-  });
-
-  it('reads WhatsApp as down when this deployment sends nothing', async () => {
-    vi.mocked(api.get).mockResolvedValueOnce(
-      messagingStatus({ is_delivery_enabled: false }) as never,
-    );
-    expect(await fetchContactMessagingStatus()).toEqual({ whatsappDown: true });
+  it('reads a stream as not connected — the outbox waits for the messaging service — without a request', async () => {
+    expect(await fetchContactMessagingStatus()).toEqual({
+      whatsappDown: false,
+      isConnected: false,
+    });
+    expect(api.get).not.toHaveBeenCalled();
   });
 });
 

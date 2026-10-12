@@ -197,11 +197,15 @@ function ModeTabs({
   );
 }
 
-/** The notes after the tabs: the reply hint or the mismatch chip, the outage line, the preference warning. */
+/**
+ * The notes after the tabs: the reply hint or the mismatch chip, the outage or not-connected line,
+ * the preference warning.
+ */
 function ComposerNotes({
   hint,
   first,
   outage,
+  notConnected,
   warning,
   onSwitch,
   t,
@@ -209,6 +213,7 @@ function ComposerNotes({
   hint: ReplyHint;
   first: string;
   outage: boolean;
+  notConnected: boolean;
   warning: 'noCalls' | 'afterSix' | null;
   onSwitch: (mode: ComposerMode) => void;
   t: Translate;
@@ -237,6 +242,11 @@ function ComposerNotes({
       {outage ? (
         <span className="text-caption text-tone-blush-foreground min-w-0 truncate">
           {t(keys.outage)}
+        </span>
+      ) : null}
+      {notConnected ? (
+        <span className="text-caption text-muted-foreground min-w-0 truncate">
+          {t(keys.notConnected)}
         </span>
       ) : null}
       {warning ? (
@@ -494,6 +504,8 @@ export interface ChatComposerProps {
   first: string;
   hint: ReplyHint;
   outage: boolean;
+  /** No messaging service delivers this thread: what is sent waits in the outbox. */
+  notConnected?: boolean;
   warning: 'noCalls' | 'afterSix' | null;
   /** "Suggested for <First>": the smart chips and the eight templates. */
   suggestions: readonly ComposerSuggestion[];
@@ -525,6 +537,7 @@ export function ChatComposer({
   first,
   hint,
   outage,
+  notConnected = false,
   warning,
   suggestions,
   templates,
@@ -576,6 +589,7 @@ export function ChatComposer({
           hint={hint}
           first={first}
           outage={outage}
+          notConnected={notConnected}
           warning={warning}
           onSwitch={onModeChange}
           t={t}

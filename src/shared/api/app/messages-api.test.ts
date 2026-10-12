@@ -275,7 +275,10 @@ describe('sending (sendMessage, S:1595)', () => {
 
   it('keeps WhatsApp replies queued while WhatsApp is down', async () => {
     setFixtureWhatsAppOutage(true);
-    expect(await fetchMessagingStatus()).toEqual({ whatsappDown: true });
+    expect(await fetchMessagingStatus()).toEqual({
+      whatsappDown: true,
+      isConnected: true,
+    });
     await sendMessage({ leadId: KABIR, channel: 'whatsapp', body: 'Are you free?' });
     await sendMessage({ leadId: KABIR, channel: 'instagram', body: 'Or here?' });
     const read = await fetchThread({ kind: 'lead', leadId: KABIR });
@@ -285,7 +288,10 @@ describe('sending (sendMessage, S:1595)', () => {
     ]);
 
     resetAppFixtures();
-    expect(await fetchMessagingStatus()).toEqual({ whatsappDown: false });
+    expect(await fetchMessagingStatus()).toEqual({
+      whatsappDown: false,
+      isConnected: true,
+    });
   });
 
   it('names the signed-in member — the fixture’s viewer — as the sender', async () => {

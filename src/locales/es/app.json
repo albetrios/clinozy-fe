@@ -701,6 +701,7 @@
     "replyHint": "{{first}} escribió aquí por última vez",
     "mismatch": "{{first}} escribió por {{channel}} · Cambiar",
     "outage": "WhatsApp caído · las respuestas quedarán en cola",
+    "notConnected": "Los mensajes esperan en la cola · se enviarán cuando la mensajería esté conectada",
     "prefersNoCalls": "Prefiere no recibir llamadas · mejor escribir",
     "prefersAfterSix": "Prefiere contacto después de las 18:00",
     "suggest": "Sugerir",

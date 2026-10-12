@@ -548,23 +548,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/app/contact-activities/messaging-status": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Messaging status */
-        get: operations["getAppContactActivitiesMessagingStatus"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/app/contact-message-templates": {
         parameters: {
             query?: never;
@@ -1652,24 +1635,6 @@ export interface paths {
         head?: never;
         /** Update my saved view */
         patch: operations["patchAppMembershipsMeSavedViewsBymembership_saved_view_id"];
-        trace?: never;
-    };
-    "/api/v1/app/messaging-webhook": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Messaging webhook handshake */
-        get: operations["getAppMessagingWebhook"];
-        put?: never;
-        /** Messaging webhook callback */
-        post: operations["postAppMessagingWebhook"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
         trace?: never;
     };
     "/api/v1/app/offering-groups": {
@@ -8342,29 +8307,6 @@ export interface operations {
             413: components["responses"]["ApiError"];
             415: components["responses"]["ApiError"];
             422: components["responses"]["ApiError"];
-            429: components["responses"]["ApiError"];
-            500: components["responses"]["ApiError"];
-        };
-    };
-    getAppContactActivitiesMessagingStatus: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            400: components["responses"]["ApiError"];
-            401: components["responses"]["ApiError"];
-            403: components["responses"]["ApiError"];
-            404: components["responses"]["ApiError"];
             429: components["responses"]["ApiError"];
             500: components["responses"]["ApiError"];
         };
@@ -15598,62 +15540,6 @@ export interface operations {
                         };
                     };
                 };
-            };
-            400: components["responses"]["ApiError"];
-            401: components["responses"]["ApiError"];
-            403: components["responses"]["ApiError"];
-            404: components["responses"]["ApiError"];
-            409: components["responses"]["ApiError"];
-            413: components["responses"]["ApiError"];
-            415: components["responses"]["ApiError"];
-            422: components["responses"]["ApiError"];
-            429: components["responses"]["ApiError"];
-            500: components["responses"]["ApiError"];
-        };
-    };
-    getAppMessagingWebhook: {
-        parameters: {
-            query: {
-                "hub.challenge": string;
-                "hub.mode": string;
-                "hub.verify_token": string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            400: components["responses"]["ApiError"];
-            401: components["responses"]["ApiError"];
-            403: components["responses"]["ApiError"];
-            404: components["responses"]["ApiError"];
-            429: components["responses"]["ApiError"];
-            500: components["responses"]["ApiError"];
-        };
-    };
-    postAppMessagingWebhook: {
-        parameters: {
-            query?: never;
-            header: {
-                "Stripe-Signature": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
             400: components["responses"]["ApiError"];
             401: components["responses"]["ApiError"];
@@ -31605,7 +31491,6 @@ export interface operations {
                     /** @enum {string} */
                     default_locale?: "en" | "es";
                     deleted_record_purge_days?: number;
-                    instagram_account_id?: string | null;
                     is_email_notifications_enabled?: boolean;
                     lead_hold_days?: number;
                     reminder_hour?: number;
@@ -31613,7 +31498,6 @@ export interface operations {
                     security_policy?: {
                         [key: string]: string | number | boolean | (null);
                     };
-                    whatsapp_phone_number_id?: string | null;
                 };
             };
         };

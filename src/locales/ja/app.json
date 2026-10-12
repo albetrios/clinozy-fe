@@ -695,6 +695,7 @@
     "replyHint": "{{first}} さんの最後の連絡はここ",
     "mismatch": "{{first}} さんは {{channel}} で連絡 · 切り替え",
     "outage": "WhatsApp 障害中 · 返信は送信待ちになります",
+    "notConnected": "メッセージは送信待ちです · メッセージ連携が接続されると送信されます",
     "prefersNoCalls": "電話は希望しない · メッセージで",
     "prefersAfterSix": "18時以降の連絡を希望",
     "suggest": "提案",

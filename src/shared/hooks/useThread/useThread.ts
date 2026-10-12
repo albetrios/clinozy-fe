@@ -72,8 +72,9 @@ export function useContactHistory(person: ChatPerson) {
 }
 
 /**
- * Whether WhatsApp is down (Q-L10) — clinozy-be's `messaging-status` for a contact, the
- * fixture's switch otherwise; fresh for a minute, then read again on the next mount or focus.
+ * Whether WhatsApp is down (Q-L10) and whether a messaging service delivers the thread — for a
+ * contact, not yet (backend D87: no request, every message waits `queued`); the fixture's switch
+ * otherwise. Fresh for a minute, then read again on the next mount or focus.
  */
 export function useMessagingStatus(person: ChatPerson) {
   const live = person.kind === 'contact';

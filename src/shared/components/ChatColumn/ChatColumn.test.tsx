@@ -35,7 +35,10 @@ vi.mock('@/shared/api/app/messages-api.ts', async (importOriginal) => {
 vi.mock('@/shared/api/app/contact-activities-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof contactActivitiesApi>()),
   fetchContactThread: vi.fn(),
-  fetchContactMessagingStatus: vi.fn(async () => ({ whatsappDown: false })),
+  fetchContactMessagingStatus: vi.fn(async () => ({
+    whatsappDown: false,
+    isConnected: false,
+  })),
   fetchContactTemplateValues: vi.fn(async () => ({
     clinicName: 'Cresence Skin',
     address: '',
@@ -276,6 +279,38 @@ describe('the conversation', () => {
       'aria-selected',
       'true',
     );
+  });
+
+  it('holds a contact’s queued messages "Queued", and says they wait for messaging to be connected', async () => {
+    vi.mocked(contactActivitiesApi.fetchContactThread).mockResolvedValue({
+      thread: null,
+      messages: [
+        {
+          id: 'msg_anaya0000000000000003',
+          channel: 'instagram',
+          direction: 'sent',
+          body: 'See you at 11:30',
+          deliveryStatus: 'queued',
+          isSystem: false,
+          authorId: null,
+          taskId: null,
+          sentAt: '2026-10-03T05:30:00.000Z',
+        },
+      ],
+      authors: {},
+    });
+    renderChat({
+      person: { kind: 'contact', contactId: 'con_anaya0000000000000000' },
+      contact: { ...ANAYA_CONTACT, instagram: '@anaya.d' },
+    });
+
+    expect(
+      await screen.findByText(
+        'Messages wait in the queue · they go out once messaging is connected',
+      ),
+    ).toBeVisible();
+    expect(bubbles()[0]).toHaveTextContent('Queued');
+    expect(screen.queryByText('WhatsApp down · replies will queue')).toBeNull();
   });
 
   it('shows the skeleton while the thread loads', () => {

@@ -367,6 +367,8 @@ export interface ChatThreadProps {
   /** Their first name — who wrote their messages. */
   contactFirst: string;
   whatsappDown: boolean;
+  /** A messaging service delivers this thread; false holds every queued message as "Queued". */
+  isMessagingConnected?: boolean;
   format: ChatFormat;
   /** Resend a stored message its provider could not deliver. */
   onResend: (messageId: string) => void;
@@ -396,6 +398,7 @@ export function ChatThread({
   authors,
   contactFirst,
   whatsappDown,
+  isMessagingConnected = true,
   format,
   onResend,
   resendingId,
@@ -466,7 +469,7 @@ export function ChatThread({
       delivery:
         resendingId === message.id
           ? { kind: 'sending' }
-          : deliveryView(message, whatsappDown),
+          : deliveryView(message, whatsappDown, isMessagingConnected),
       onRetry: () => onResend(message.id),
     };
   };

@@ -254,6 +254,21 @@ describe('delivery labels (D22)', () => {
     ).toEqual({ kind: 'sending' });
   });
 
+  it('reads every queued message "Queued" while no messaging service is connected', () => {
+    for (const channel of ['whatsapp', 'instagram'] as const) {
+      expect(
+        deliveryView(sent({ channel, deliveryStatus: 'queued' }), false, false),
+      ).toEqual({
+        kind: 'status',
+        status: 'queued',
+      });
+    }
+    expect(deliveryView(sent({ deliveryStatus: 'read' }), false, false)).toEqual({
+      kind: 'status',
+      status: 'read',
+    });
+  });
+
   it('labels the provider’s states and a failure', () => {
     expect(deliveryView(sent({ deliveryStatus: 'read' }), false)).toEqual({
       kind: 'status',

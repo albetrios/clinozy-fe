@@ -75,7 +75,10 @@ vi.mock('@/shared/tenancy/my-membership.ts', async (importOriginal) => ({
 vi.mock('@/shared/api/app/contact-activities-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   fetchContactThread: vi.fn(),
-  fetchContactMessagingStatus: vi.fn(async () => ({ whatsappDown: false })),
+  fetchContactMessagingStatus: vi.fn(async () => ({
+    whatsappDown: false,
+    isConnected: false,
+  })),
   fetchContactTemplateValues: vi.fn(async () => ({
     clinicName: 'Cresence Skin',
     address: '',

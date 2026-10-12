@@ -6,6 +6,7 @@ import {
   chatPersonKey,
   type ChatThread as ChatThreadRecord,
   type ChatThreadRead,
+  type MessagingStatus,
 } from '@/shared/api/app/messages-contracts.ts';
 import { formatAppPhone } from '@/shared/app/app-phone.ts';
 import {
@@ -152,6 +153,14 @@ function ChatHeader({
 /** What the conversation below the header reads — the header owns the contact card, the column its class. */
 type ChatConversationProps = Omit<ChatColumnProps, 'contactCard' | 'className'>;
 
+/** WhatsApp's outage, and whether a messaging service delivers the thread — both unknown read as fine. */
+function messagingFlags(status: MessagingStatus | undefined) {
+  return {
+    whatsappDown: status?.whatsappDown ?? false,
+    isMessagingConnected: status?.isConnected ?? true,
+  };
+}
+
 /** The thread and composer once the thread has loaded — remounted per person. */
 function ChatLoaded({
   person,
@@ -169,7 +178,9 @@ function ChatLoaded({
   const format = useChatFormat(maskMoney);
   const { t, clock } = format;
   const history = useContactHistory(person).data;
-  const whatsappDown = useMessagingStatus(person).data?.whatsappDown ?? false;
+  const { whatsappDown, isMessagingConnected } = messagingFlags(
+    useMessagingStatus(person).data,
+  );
   const outbox = useThreadOutbox(person);
   const { send, retry } = useSendMessage(person, contact, { onSent });
   const resend = useResendMessage(person);
@@ -224,6 +235,7 @@ function ChatLoaded({
         authors={read.authors}
         contactFirst={first}
         whatsappDown={whatsappDown}
+        isMessagingConnected={isMessagingConnected}
         format={format}
         onResend={(messageId) => resend.mutate(messageId)}
         resendingId={resend.isPending ? (resend.variables ?? null) : null}
@@ -247,6 +259,7 @@ function ChatLoaded({
         first={first}
         hint={replyHint(lastFrom, mode)}
         outage={whatsappDown}
+        notConnected={!isMessagingConnected}
         warning={preferenceWarning(mode, contact.preferences)}
         suggestions={composerSuggestions(lastFrom, ctx, t)}
         templates={composerTemplates(ctx, t)}

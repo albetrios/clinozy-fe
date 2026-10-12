@@ -262,19 +262,21 @@ export type DeliveryView =
 
 /**
  * A sent message's delivery as the design labels it (D22): `queued` reads
- * "Sending…" — or "Queued" for WhatsApp while WhatsApp is down — `failed`
- * reads "Not sent" with a Retry; theirs, notes and call logs say nothing.
+ * "Sending…" — or "Queued" for WhatsApp while WhatsApp is down, and for every
+ * channel while no messaging service is connected — `failed` reads "Not sent"
+ * with a Retry; theirs, notes and call logs say nothing.
  */
 export function deliveryView(
   message: Pick<ChatMessage, 'channel' | 'direction' | 'deliveryStatus' | 'isSystem'>,
   whatsappDown: boolean,
+  isConnected = true,
 ): DeliveryView {
   if (message.isSystem || bubbleKind(message) !== 'out') return { kind: 'none' };
   switch (message.deliveryStatus) {
     case 'failed':
       return { kind: 'failed' };
     case 'queued':
-      return whatsappDown && message.channel === 'whatsapp'
+      return !isConnected || (whatsappDown && message.channel === 'whatsapp')
         ? { kind: 'status', status: 'queued' }
         : { kind: 'sending' };
     default:
