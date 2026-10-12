@@ -2938,6 +2938,7 @@ clinozy-fe/
 │   │   ├── branch-doubles.ts
 │   │   ├── contact-doubles.ts
 │   │   ├── e2e-api-retry.ts
+│   │   ├── e2e-app-config.ts
 │   │   ├── e2e-app.ts
 │   │   ├── e2e-auth.ts
 │   │   ├── e2e-captcha.ts

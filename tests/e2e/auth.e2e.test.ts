@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 
 import { API_ENDPOINTS } from '@/core/config/constants.ts';
 import { PRODUCT_NAMESPACE } from '@/lib/product-identity.ts';
+import { readAppSignInMethods } from '@/tests/utils/e2e-app-config.ts';
 import { registerNewUserAndGoToToday } from '@/tests/utils/e2e-auth.ts';
 import { uniqueE2eEmail } from '@/tests/utils/e2e-faker.ts';
 import {
@@ -19,7 +20,9 @@ test.describe('Authentication', () => {
     await gotoApp(page, '/login');
     await expectAuthScreenReady(page);
     await expect(page.getByTestId('auth-email-panel')).toBeVisible();
-    await expect(page.getByTestId('auth-continue-google')).toBeVisible();
+    // Google sits beside the email panel exactly when this deployment offers it.
+    const { google } = await readAppSignInMethods(page);
+    await expect(page.getByTestId('auth-continue-google')).toHaveCount(google ? 1 : 0);
   });
 
   test('invalid verification code calls the API and surfaces an error', async ({
@@ -67,18 +70,27 @@ test.describe('Authentication', () => {
   /**
    * GitHub OAuth is not provisioned for this deployment, so `AuthForm` filters its
    * button out even where `VITE_AUTH_OAUTH_GITHUB` is on (the icon, test id and
-   * `/callback` stay wired). Google is the one provider offered. When GitHub's
-   * credentials exist and the filter goes, this spec is the one to flip.
+   * `/callback` stay wired). Google is the one provider offered — where
+   * `VITE_AUTH_OAUTH_GOOGLE` turns it on; off, its button is absent too. When
+   * GitHub's credentials exist and the filter goes, this spec is the one to flip.
    */
-  test('offers Continue with Google, and not GitHub until its OAuth is provisioned', async ({
+  test('offers Continue with Google where it is on, and not GitHub until its OAuth is provisioned', async ({
     page,
   }) => {
     await gotoApp(page, '/login');
     await expectAuthScreenReady(page);
-    await expect(page.getByTestId('auth-continue-google')).toBeVisible();
-    await expect(
-      page.getByRole('button', { name: /continue with google/i }),
-    ).toBeVisible();
+    const { google } = await readAppSignInMethods(page);
+    if (google) {
+      await expect(page.getByTestId('auth-continue-google')).toBeVisible();
+      await expect(
+        page.getByRole('button', { name: /continue with google/i }),
+      ).toBeVisible();
+    } else {
+      await expect(page.getByTestId('auth-continue-google')).toHaveCount(0);
+      await expect(
+        page.getByRole('button', { name: /continue with google/i }),
+      ).toHaveCount(0);
+    }
     await expect(page.getByTestId('auth-continue-github')).toHaveCount(0);
     await expect(page.getByRole('button', { name: /continue with github/i })).toHaveCount(
       0,
