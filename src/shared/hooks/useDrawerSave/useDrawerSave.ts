@@ -105,9 +105,16 @@ export function useDrawerSave<TValues extends FieldValues, TOutcome>({
       form.setError(field, option);
       named.push(field);
     });
-    const first = fieldOrder.find((field) => named.includes(field));
+    // A nested name belongs to its field (`parameters.fluence` to `parameters`): that field's
+    // step opens, and the toast says what the server said about the nested one.
+    const within = (name: string, field: string) =>
+      name === field || name.startsWith(`${field}.`);
+    const first = fieldOrder.find((field) => named.some((name) => within(name, field)));
     if (first) onField(first);
-    const message = first ? form.getFieldState(first).error?.message : undefined;
+    const firstNamed = first ? named.find((name) => within(name, first)) : undefined;
+    const message = firstNamed
+      ? form.getFieldState(firstNamed as FieldPath<TValues>).error?.message
+      : undefined;
     notify.error(message ?? mapApiError(error));
   };
 

@@ -51,22 +51,20 @@ const FIELD_STEPS: Readonly<Record<BranchField, BranchDrawerStepId>> = {
 /** The form fields in the drawer's order, for "the first field the server named". */
 const FIELD_ORDER = Object.keys(FIELD_STEPS) as BranchField[];
 
-/** clinozy-be's field names that the form spells differently. */
+/**
+ * clinozy-be's field names that the form spells differently, as the error mapper hands them
+ * (`body.postal_code` → `postalCode`); a name the form shares needs no entry.
+ */
 const SERVER_FIELDS: Readonly<Record<string, BranchField>> = {
-  is_main: 'isMain',
-  is_active: 'active',
-  address_line_one: 'addressLine1',
-  address_line_two: 'addressLine2',
-  postal_code: 'pin',
-  gst_number: 'gstNumber',
-  working_days: 'workingDays',
-  opens_at: 'opensAt',
-  closes_at: 'closesAt',
-  membership_ids: 'teamIds',
-  default_doctor_membership_id: 'defaults',
-  default_front_desk_membership_id: 'defaults',
-  default_therapist_membership_id: 'defaults',
-  default_pharmacist_membership_id: 'defaults',
+  isActive: 'active',
+  addressLineOne: 'addressLine1',
+  addressLineTwo: 'addressLine2',
+  postalCode: 'pin',
+  membershipIds: 'teamIds',
+  defaultDoctorMembershipId: 'defaults',
+  defaultFrontDeskMembershipId: 'defaults',
+  defaultTherapistMembershipId: 'defaults',
+  defaultPharmacistMembershipId: 'defaults',
 };
 
 /** What a save ended with: a branch added, or one saved — by its name. */

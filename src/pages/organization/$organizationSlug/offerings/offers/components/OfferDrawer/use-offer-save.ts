@@ -66,7 +66,9 @@ function withOfferingNames(
     const message = offeringId ? inactive(offeringId) : null;
     if (message === null) return entry;
     changed = true;
-    return { ...entry, message };
+    // The picker is one control for the whole list: an entry's place (`offering_ids/1`) is
+    // dropped, so the refusal outlines the picker and opens its step.
+    return { ...entry, field: entry.field.replace(/\/\d+$/, ''), message };
   });
   if (!changed) return error;
   const data = error.data as { error?: object } | undefined;

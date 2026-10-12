@@ -38,17 +38,14 @@ const FIELD_STEPS: Readonly<Record<keyof UserFormValues, UserDrawerStepId>> = {
 /** The form fields in the drawer's order, for "the first field the server named". */
 const FIELD_ORDER = Object.keys(FIELD_STEPS) as (keyof UserFormValues)[];
 
-/** clinozy-be's field names that the form spells differently. */
+/**
+ * clinozy-be's field names that the form spells differently, as the error mapper hands them
+ * (`body.work_starts_at` → `workStartsAt`); a name the form shares needs no entry.
+ */
 const SERVER_FIELDS: Readonly<Record<string, keyof UserFormValues>> = {
-  email: 'email',
-  phone: 'phone',
-  tone: 'tone',
-  role_ids: 'roleIds',
-  branch_ids: 'branchIds',
-  working_days: 'workingDays',
-  work_starts_at: 'startsAt',
-  work_ends_at: 'endsAt',
-  commission_percent: 'commissionPct',
+  workStartsAt: 'startsAt',
+  workEndsAt: 'endsAt',
+  commissionPercent: 'commissionPct',
   status: 'active',
 };
 

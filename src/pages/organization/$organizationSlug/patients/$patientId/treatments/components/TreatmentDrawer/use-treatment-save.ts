@@ -94,11 +94,7 @@ export function useTreatmentSave({
       void queryClient.invalidateQueries({ queryKey: treatmentQueryKeys.all });
     },
     onField: (field) =>
-      onStep(
-        FIELD_STEPS.find(
-          ([name]) => field === name || field.startsWith(`${name}.`),
-        )?.[1] ?? 'details',
-      ),
+      onStep(FIELD_STEPS.find(([name]) => name === field)?.[1] ?? 'details'),
     write: async () => {
       const values = form.getValues();
       const fields = treatmentFieldsOf(values, t(TREATMENT_KEYS.record));

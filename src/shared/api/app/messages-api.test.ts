@@ -415,3 +415,68 @@ describe('query keys', () => {
     expect(chatPersonKey({ kind: 'patient', patientId: KIRAN })).toBe(`patient:${KIRAN}`);
   });
 });
+
+describe('the fixture reader’s edges', () => {
+  it('reads nothing of the fixture world for a contact — clinozy-be’s stream holds it', async () => {
+    const contact = { kind: 'contact', contactId: 'con_anaya0000000000000000' } as const;
+    expect(await fetchThread(contact)).toEqual({
+      thread: null,
+      messages: [],
+      authors: {},
+    });
+    expect(await fetchContactHistory(contact)).toEqual([]);
+  });
+
+  it('reads a check-in scored 0 as unscored, and a blank context as none', async () => {
+    const lead = { kind: 'lead', leadId: ref.lead(2352) } as const;
+    const before = await fetchContactHistory(lead);
+    const checkIn = before.find((entry) => entry.kind === 'checkIn');
+    expect(checkIn).toBeDefined();
+    await appFixtures.checkIns.update(checkIn?.id ?? '', { score: 0, context: '' });
+
+    const after = await fetchContactHistory(lead);
+    expect(after.find((entry) => entry.id === checkIn?.id)).toMatchObject({
+      kind: 'checkIn',
+      score: null,
+      context: null,
+    });
+  });
+
+  it('sorts a record entered on another day at 09:00 of its own day', async () => {
+    const lead = { kind: 'lead', leadId: ref.lead(2352) } as const;
+    const rx = (await fetchContactHistory(lead)).find(
+      (entry) => entry.kind === 'prescription',
+    );
+    expect(rx).toBeDefined();
+    // Dated back to a day before it was written up.
+    await appFixtures.prescriptions.update(rx?.id ?? '', { date: '2026-09-20' });
+
+    const moved = (await fetchContactHistory(lead)).find((entry) => entry.id === rx?.id);
+    expect(moved).toMatchObject({ when: { kind: 'day', date: '2026-09-20' } });
+    expect(moved?.sortAt).toBe('2026-09-20T03:30:00.000Z');
+  });
+
+  it('fills a thread whose branch is gone from the main branch', async () => {
+    await appFixtures.leads.update(ANAYA, { branchId: 'brn_gone' });
+    const values = await fetchTemplateValues({ kind: 'lead', leadId: ANAYA });
+    const main = appFixtures.branches.snapshot().find((branch) => branch.isMain);
+    expect(values.address).toContain(main?.city ?? '');
+    expect(values.clinicName).toBe('Cresence Skin');
+  });
+
+  it('offers no slot today once the day’s last candidate time has passed', async () => {
+    // 22:30 in the clinic: every time today is gone.
+    vi.setSystemTime(new Date('2026-10-03T17:00:00Z'));
+    const { freeSlots } = await fetchTemplateValues({ kind: 'lead', leadId: ANAYA });
+    expect(freeSlots.map((slot) => slot.date)).not.toContain('2026-10-03');
+    expect(freeSlots).toHaveLength(2);
+  });
+
+  it('keeps the involved people as they are when one of them replies again', async () => {
+    const before = await appFixtures.leads.get(KABIR);
+    await sendMessage({ leadId: KABIR, channel: 'note', body: 'Called twice' });
+    const after = await appFixtures.leads.get(KABIR);
+    expect(after.involvedIds).toEqual(before.involvedIds);
+    expect(after.involvedIds.filter((id) => id === FIXTURE_VIEWER_ID)).toHaveLength(1);
+  });
+});

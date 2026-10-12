@@ -414,3 +414,56 @@ describe('resending a stored failed message', () => {
     );
   });
 });
+
+describe('the edges of a send', () => {
+  it('sends again only a message that is "Not sent" — one still sending, or unknown, is left alone', async () => {
+    let finish: ((message: ChatMessage) => void) | undefined;
+    vi.mocked(messagesApi.sendMessage).mockImplementationOnce(
+      () =>
+        new Promise<ChatMessage>((resolve) => {
+          finish = resolve;
+        }) as never,
+    );
+    const { result } = renderChat(ANAYA);
+    await waitFor(() => expect(result.current.thread.isSuccess).toBe(true));
+
+    act(() => result.current.chat.send('whatsapp', 'On my way'));
+    const clientId = result.current.outbox[0]?.clientId ?? '';
+    expect(result.current.outbox[0]?.state).toBe('sending');
+    await waitFor(() => expect(messagesApi.sendMessage).toHaveBeenCalledOnce());
+
+    act(() => result.current.chat.retry(clientId));
+    act(() => result.current.chat.retry('no-such-message'));
+    await act(async () => Promise.resolve());
+    expect(messagesApi.sendMessage).toHaveBeenCalledOnce();
+    expect(result.current.outbox[0]?.state).toBe('sending');
+
+    finish?.(streamEntry('msg_on_my_way', { direction: 'sent', body: 'On my way' }));
+    await waitFor(() => expect(result.current.outbox).toEqual([]));
+  });
+
+  it('sends a patient’s message on the thread already read — no second lookup', async () => {
+    const { result } = renderChat(KIRAN);
+    await waitFor(() => expect(result.current.thread.data?.thread).toBeNull());
+    act(() => result.current.chat.send('whatsapp', 'Hello Kiran'));
+    await waitFor(() =>
+      expect(result.current.thread.data?.thread?.kind).toBe('contact_thread'),
+    );
+    const leadsBefore = appFixtures.leads.snapshot((lead) => lead.name === 'Kiran Desai');
+
+    act(() => result.current.chat.send('whatsapp', 'See you at 11'));
+    await waitFor(() =>
+      expect(result.current.thread.data?.messages.map((message) => message.body)).toEqual(
+        ['Hello Kiran', 'See you at 11'],
+      ),
+    );
+    const leadsAfter = appFixtures.leads.snapshot((lead) => lead.name === 'Kiran Desai');
+    expect(leadsAfter).toHaveLength(1);
+    expect(leadsAfter[0]?.id).toBe(leadsBefore[0]?.id);
+    const [, second] = vi.mocked(messagesApi.sendMessage).mock.calls;
+    expect(second?.[0]).toMatchObject({
+      leadId: leadsBefore[0]?.id,
+      body: 'See you at 11',
+    });
+  });
+});
