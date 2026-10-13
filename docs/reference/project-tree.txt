@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2214 src files · ~1122 tests in src/ · 89 E2E specs · 27 shadcn UI primitives
+Stats: ~2219 src files · ~1126 tests in src/ · 89 E2E specs · 27 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -287,6 +287,14 @@ clinozy-fe/
 │   │   └── README.md
 │   └── README.md
 ├── iterations/
+│   ├── change-shell-polish-and-sign-in-2026-10-13-ojjp/
+│   │   ├── intake-files/
+│   │   │   └── BRIEF.md
+│   │   ├── plans/
+│   │   │   └── decisions.md
+│   │   ├── AS-BUILT.md
+│   │   ├── KICKOFF.md
+│   │   └── README.md
 │   ├── launch-2026-09-30-jxmr/
 │   │   ├── intake-files/
 │   │   │   ├── _index.md
@@ -446,7 +454,7 @@ clinozy-fe/
 │   │   │   ├── PageTransition.tsx
 │   │   │   ├── prefers-reduced-motion.ts
 │   │   │   ├── useReplayedAnimation.ts
-│   │   │   └── [2 test files]
+│   │   │   └── [3 test files]
 │   │   ├── billing/
 │   │   │   ├── stripe-return.ts
 │   │   │   └── [1 test file]
@@ -2223,6 +2231,10 @@ clinozy-fe/
 │   │   │   │   ├── upload-tray.constants.ts
 │   │   │   │   ├── UploadTray.tsx
 │   │   │   │   └── [2 test files]
+│   │   │   ├── WeightStableLabel/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── WeightStableLabel.tsx
+│   │   │   │   └── [1 test file]
 │   │   │   ├── WidgetErrorBoundary/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── WidgetErrorBoundary.tsx
@@ -2803,6 +2815,12 @@ clinozy-fe/
 │   │   │   │   ├── section-bar-shortcuts.ts
 │   │   │   │   └── [6 test files]
 │   │   │   ├── AuthLayout/
+│   │   │   │   ├── components/
+│   │   │   │   │   └── AuthShowcase/
+│   │   │   │   │       ├── auth-showcase.constants.ts
+│   │   │   │   │       ├── AuthShowcase.tsx
+│   │   │   │   │       ├── index.ts
+│   │   │   │   │       └── [1 test file]
 │   │   │   │   ├── AuthLayout.shared.tsx
 │   │   │   │   ├── AuthLayout.tsx
 │   │   │   │   ├── index.ts
@@ -2891,7 +2909,7 @@ clinozy-fe/
 │   │       ├── layout-width.ts
 │   │       ├── org-brand.ts
 │   │       ├── presets.ts
-│   │       └── [7 test files]
+│   │       └── [8 test files]
 │   ├── App.tsx
 │   ├── index.css
 │   ├── main.tsx

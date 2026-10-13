@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils.ts';
 import { displayId } from '@/shared/api/app/app-display-id.ts';
 import type { ContactSummary } from '@/shared/api/app/contacts-contracts.ts';
 import { formatAppPhone } from '@/shared/app/app-phone.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { PersonAvatar, personInitials } from '@/shared/components/Cells/index.ts';
 import {
   CONTACT_EDITOR_KEYS,
@@ -117,7 +118,9 @@ export function NewLeadContactStep({
               data-slot="pill"
               className={cn(
                 'inline-flex h-7 items-center gap-1.5 rounded-full border px-2.5 text-xs font-medium whitespace-nowrap',
-                on ? 'bg-muted border-foreground' : 'bg-card hover:bg-muted',
+                on
+                  ? cn('bg-muted border-transparent', TONE_CLASSES.stone.selected)
+                  : 'bg-card hover:bg-muted',
               )}
             >
               <preset.icon

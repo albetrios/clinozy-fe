@@ -10,23 +10,26 @@ Convention: `page.getByTestId('…')` in `tests/e2e/`.
 
 ## Auth (`AuthLayout` + unified form)
 
-| Test ID                                                                      | Element                                                  | File                                              |
-| ---------------------------------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------- |
-| `auth-layout`                                                                | Auth shell                                               | `shared/layouts/AuthLayout/AuthLayout.tsx`        |
-| `auth-form-container`                                                        | Form column                                              | `shared/layouts/AuthLayout/AuthLayout.shared.tsx` |
-| `login-page`                                                                 | Unified auth page root                                   | `pages/login/LoginPage.tsx`                       |
-| `auth-form`                                                                  | Unified auth root                                        | `shared/forms/AuthForm/AuthForm.tsx`              |
-| `auth-continue-google` / `auth-continue-github`                              | OAuth                                                    | AuthForm                                          |
-| `auth-continue-passkey`                                                      | Passkey                                                  | AuthForm                                          |
-| `auth-email-panel`                                                           | Email OTP panel                                          | `AuthEmailPanel.tsx`                              |
-| `auth-email` / `auth-email-submit` / `auth-email-code` / `auth-email-verify` | Email OTP flow                                           | AuthEmailPanel                                    |
-| `auth-email-resend` / `auth-email-resend-countdown` / `auth-email-change`    | Resend link, timer, change email                         | AuthEmailPanel                                    |
-| `mfa-form` / `mfa-code` / `mfa-submit`                                       | MFA                                                      | `MfaForm.tsx`                                     |
-| `public-frame-controls`                                                      | Signed-out canvas header: the controls (language, theme) | `shared/components/PublicFrame/`                  |
+| Test ID                                                                      | Element                                                  | File                                                 |
+| ---------------------------------------------------------------------------- | -------------------------------------------------------- | ---------------------------------------------------- |
+| `auth-layout`                                                                | Auth shell                                               | `shared/layouts/AuthLayout/AuthLayout.tsx`           |
+| `auth-form-container`                                                        | Form column                                              | `shared/layouts/AuthLayout/AuthLayout.shared.tsx`    |
+| `login-page`                                                                 | Unified auth page root                                   | `pages/login/LoginPage.tsx`                          |
+| `auth-form`                                                                  | Unified auth root                                        | `shared/forms/AuthForm/AuthForm.tsx`                 |
+| `auth-continue-google` / `auth-continue-github`                              | OAuth                                                    | AuthForm                                             |
+| `auth-continue-passkey`                                                      | Passkey                                                  | AuthForm                                             |
+| `auth-email-panel`                                                           | Email OTP panel                                          | `AuthEmailPanel.tsx`                                 |
+| `auth-email` / `auth-email-submit` / `auth-email-code` / `auth-email-verify` | Email OTP flow                                           | AuthEmailPanel                                       |
+| `auth-email-resend` / `auth-email-resend-countdown` / `auth-email-change`    | Resend link, timer, change email                         | AuthEmailPanel                                       |
+| `mfa-form` / `mfa-code` / `mfa-submit`                                       | MFA                                                      | `MfaForm.tsx`                                        |
+| `public-frame-controls`                                                      | Signed-out canvas header: the controls (language, theme) | `shared/components/PublicFrame/`                     |
+| `auth-showcase-hero` / `auth-showcase` / `auth-showcase-privacy`             | Sign-in showcase: hero, board, privacy line              | `shared/layouts/AuthLayout/components/AuthShowcase/` |
+| `auth-showcase-journey` / `auth-showcase-moments` / `auth-showcase-values`   | Showcase board: journey, moments, reasons                | AuthShowcase                                         |
 
 The auth shell (`AuthLayout.tsx`) is the signed-out canvas (`PublicFrame`): it keeps
-`auth-layout` and `auth-form-container`, and its logo is `brand-logo`. `PublicLayout`, the
-organization picker and the 404 draw the same frame.
+`auth-layout` and `auth-form-container`, and its logo is `brand-logo`; the card sits beside
+the sign-in showcase (`auth-showcase*`). `PublicLayout`, the organization picker and the 404
+draw the same frame without the showcase.
 
 **Hybrid helpers:** `tests/utils/e2e-hybrid.ts` — `expectAuthScreenReady`, `expectLoginFormReady`, `fillTestId`, `clickTestId`, label constants.
 

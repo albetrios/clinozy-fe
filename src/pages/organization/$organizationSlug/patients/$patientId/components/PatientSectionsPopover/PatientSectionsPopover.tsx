@@ -26,14 +26,14 @@ import {
 
 const K = PATIENT_SECTIONS_POPOVER_KEYS;
 
-/** A tile's hover border in its tone's ink (H:4940 `style-hover`), as full literals. */
-const HOVER_INK: Readonly<Partial<Record<Tone, string>>> = {
-  sage: 'hover:border-tone-sage-foreground',
-  blush: 'hover:border-tone-blush-foreground',
-  sky: 'hover:border-tone-sky-foreground',
-  lav: 'hover:border-tone-lav-foreground',
-  mint: 'hover:border-tone-mint-foreground',
-  peach: 'hover:border-tone-peach-foreground',
+/** A tile's hover border in its tone's edge colour (H:4940 `style-hover` drew the ink), as full literals. */
+const HOVER_EDGE: Readonly<Partial<Record<Tone, string>>> = {
+  sage: 'hover:border-tone-sage-edge',
+  blush: 'hover:border-tone-blush-edge',
+  sky: 'hover:border-tone-sky-edge',
+  lav: 'hover:border-tone-lav-edge',
+  mint: 'hover:border-tone-mint-edge',
+  peach: 'hover:border-tone-peach-edge',
 };
 
 /** Props of {@link PatientSectionsPopover}. */
@@ -81,7 +81,7 @@ function SectionTile({
         data-testid={`${PATIENT_SECTIONS_TEST_ID}-tile-${section}`}
         className={cn(
           'flex min-w-0 flex-1 flex-col items-start gap-2 rounded-lg border p-2.5 text-start transition-colors',
-          HOVER_INK[tone],
+          HOVER_EDGE[tone],
           current &&
             cn(TONE_CLASSES[tone].bg, TONE_CLASSES[tone].ring, 'border-transparent'),
           !current && 'bg-card',

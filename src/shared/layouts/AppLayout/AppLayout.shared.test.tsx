@@ -106,3 +106,21 @@ describe('AppMain — scroll restore across a remount', () => {
     });
   });
 });
+
+describe('AppMain — the room frame while the page rises', () => {
+  const FRAME_CLIP = 'has-[>[data-replaying]]:overflow-y-clip';
+
+  it('clips a flush room’s frame vertically only while the rise plays', async () => {
+    const view = renderWithProviders(<AppMain flush />);
+    const main = await view.findByTestId('main-content');
+    const frame = main.firstElementChild;
+    expect(frame).toHaveClass(FRAME_CLIP);
+    // The page itself is the frame's direct child — what `>` in the variant needs.
+    expect(frame?.firstElementChild).toHaveAttribute('data-route');
+  });
+
+  it('leaves a padded page alone: its padding already absorbs the 6px rise', async () => {
+    const { main } = await mountMain();
+    expect(main.firstElementChild).not.toHaveClass(FRAME_CLIP);
+  });
+});
