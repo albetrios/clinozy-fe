@@ -4,6 +4,7 @@ import {
   contactQueryKeys,
   createContact,
   fetchContact,
+  fetchRecentContacts,
   isContactSearchable,
   searchContacts,
   updateContact,
@@ -45,11 +46,16 @@ export interface ContactSearch {
   hits: readonly ContactSummary[];
   /** The query as typed has its answer and it is empty: "No existing match". */
   noMatch: boolean;
+  /**
+   * The query is a search and its answer is not in yet — the debounce is still catching up or
+   * the read is in flight (the picker's spinner and progress line).
+   */
+  searching: boolean;
 }
 
 /**
  * The person search (`GET /app/contacts?q=`): debounced 250ms, from 3 letters or 4 digits; the
- * previous answer stays up while the next one loads.
+ * previous answer stays up while the next one loads, and `searching` says one is on its way.
  */
 export function useContactSearch(query: string): ContactSearch {
   const organizationId = useOrganizationId();
@@ -64,7 +70,35 @@ export function useContactSearch(query: string): ContactSearch {
   const live = isContactSearchable(typed);
   const hits = live ? (search.data ?? []) : [];
   const settled = live && !isPending && debounced === typed && !search.isPlaceholderData;
-  return { hits, noMatch: settled && search.isSuccess && hits.length === 0 };
+  return {
+    hits,
+    noMatch: settled && search.isSuccess && hits.length === 0,
+    searching: live && (!settled || search.isFetching),
+  };
+}
+
+/** The people a picker shows before anything is typed. */
+export interface RecentContacts {
+  people: readonly ContactSummary[];
+  /** The first read is in flight (its shimmer rows). */
+  loading: boolean;
+}
+
+/**
+ * "Recent" (`GET /app/contacts?sort=last_activity_at`, change-contact-quick-pick D7): the five
+ * people the clinic was last in touch with — idle while `enabled` is off, quiet on failure (the
+ * search still works, so no toast), fresh for 30s.
+ */
+export function useRecentContacts(enabled: boolean): RecentContacts {
+  const organizationId = useOrganizationId();
+  const recent = useAppQuery({
+    queryKey: contactQueryKeys.recent(organizationId),
+    queryFn: fetchRecentContacts,
+    enabled,
+    staleTime: 30_000,
+    notifyOnError: false,
+  });
+  return { people: recent.data ?? [], loading: enabled && recent.isPending };
 }
 
 /** What a contact save sends: the contact as read and its edited fields. */

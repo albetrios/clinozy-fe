@@ -29,10 +29,15 @@ export const contactQueryKeys = {
     [...contactQueryKeys.all, organizationId, 'one', contactId] as const,
   search: (organizationId: string | null, query: string) =>
     [...contactQueryKeys.all, organizationId, 'search', query] as const,
+  recent: (organizationId: string | null) =>
+    [...contactQueryKeys.all, organizationId, 'recent'] as const,
 };
 
 /** The most a search answers with. */
 const SEARCH_LIMIT = 8;
+
+/** The most people "Recent" shows before anything is typed (change-contact-quick-pick D7). */
+const RECENT_CONTACTS_LIMIT = 5;
 
 /** One contact with every number (`GET /app/contacts/:contact_id`). */
 export async function fetchContact(contactId: string): Promise<Contact> {
@@ -45,6 +50,8 @@ export async function fetchContact(contactId: string): Promise<Contact> {
 async function listContacts(query: {
   q?: string;
   limit: number;
+  sort?: 'last_activity_at';
+  order?: 'desc';
 }): Promise<ContactSummary[]> {
   const response = await api.get('/app/contacts', { query });
   return z
@@ -119,6 +126,19 @@ export async function searchContacts(typed: string): Promise<ContactSummary[]> {
   const q = typed.trim();
   if (!isContactSearchable(q)) return [];
   return listContacts({ q, limit: SEARCH_LIMIT });
+}
+
+/**
+ * The people the clinic was last in touch with (`GET /app/contacts?sort=last_activity_at`) —
+ * newest activity first, anyone without activity last; a picker's "Recent" before anything is
+ * typed.
+ */
+export async function fetchRecentContacts(): Promise<ContactSummary[]> {
+  return listContacts({
+    sort: 'last_activity_at',
+    order: 'desc',
+    limit: RECENT_CONTACTS_LIMIT,
+  });
 }
 
 /**

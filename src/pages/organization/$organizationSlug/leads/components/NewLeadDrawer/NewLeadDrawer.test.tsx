@@ -39,13 +39,14 @@ vi.mock('@/shared/api/app/contacts-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof ContactsApiModule>()),
   searchContacts: vi.fn(),
   fetchContact: vi.fn(),
+  fetchRecentContacts: vi.fn(),
 }));
 vi.mock('@/shared/api/app/leads-api.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof LeadsApiModule>()),
   createLead: vi.fn(),
 }));
 
-const { fetchContact, searchContacts } = ContactsApiModule;
+const { fetchContact, fetchRecentContacts, searchContacts } = ContactsApiModule;
 const { createLead } = LeadsApiModule;
 
 /** A person as the search answers: the contact row, no other numbers. */
@@ -98,6 +99,8 @@ beforeEach(() => {
   for (const fn of Object.values(callbacks)) fn.mockReset();
   vi.mocked(searchContacts).mockReset();
   vi.mocked(fetchContact).mockReset();
+  vi.mocked(fetchRecentContacts).mockReset();
+  vi.mocked(fetchRecentContacts).mockResolvedValue([]);
   vi.mocked(searchContacts).mockImplementation(async (typed) =>
     [WITH_OPEN_LEAD, PATIENT, CONTACT].filter((person) =>
       person.name.toLowerCase().includes(typed.trim().toLowerCase()),
@@ -138,7 +141,7 @@ describe('NewLeadDrawer (KICKOFF §6.3)', () => {
     expect(drawer).toHaveAccessibleDescription('Name and mobile are enough to start');
     await waitFor(() =>
       expect(
-        screen.getByRole('textbox', { name: 'Search existing patient or contact' }),
+        screen.getByRole('combobox', { name: 'Search existing patient or contact' }),
       ).toHaveFocus(),
     );
     expect(step('contact')).toHaveAttribute('data-state', 'open');
@@ -294,6 +297,7 @@ describe('NewLeadDrawer (KICKOFF §6.3)', () => {
     const { user } = await openNewLead();
 
     await user.click(screen.getByTestId('new-lead-new-contact'));
+    await user.click(screen.getByTestId('new-lead-contact-quick-add-more'));
     const editor = await screen.findByTestId('contact-editor');
     await user.type(within(editor).getByTestId('contact-editor-first-name'), 'Meera');
     await user.type(within(editor).getByTestId('contact-editor-last-name'), 'Joshi');
@@ -326,6 +330,91 @@ describe('NewLeadDrawer (KICKOFF §6.3)', () => {
       }),
       idempotencyKey: expect.any(String),
     });
+  });
+
+  it('offers the Recent people before anything is typed, and picks one by ↵', async () => {
+    vi.mocked(fetchRecentContacts).mockResolvedValue([CONTACT, PATIENT]);
+    const { user } = await openNewLead();
+
+    const recent = await screen.findByTestId('new-lead-contact-recent');
+    expect(within(recent).getByText('Recent')).toBeInTheDocument();
+    expect(within(recent).getByTestId('new-lead-hit-10412')).toHaveTextContent(
+      'Use contact',
+    );
+    await waitFor(() => expect(screen.getByTestId('new-lead-search')).toHaveFocus());
+    await user.keyboard('{Enter}');
+
+    expect(notify.success).toHaveBeenCalledWith('Using existing contact Anjali Shah');
+    expect(step('details')).toHaveAttribute('data-state', 'open');
+  });
+
+  it('moves through the hits with ↓ and picks with ↵, as a click would', async () => {
+    vi.mocked(searchContacts).mockResolvedValue([WITH_OPEN_LEAD, PATIENT, CONTACT]);
+    const { user } = await openNewLead();
+    await searchFor(user, 'ani');
+    await screen.findByTestId('new-lead-hit-10871');
+    await user.keyboard('{ArrowDown}{Enter}');
+
+    expect(notify.success).toHaveBeenCalledWith(
+      'Existing patient C-10871 · new lead will be linked',
+    );
+    expect(screen.getByRole('button', { name: 'Re-target' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+  });
+
+  it('adds a person nobody matched in the quick add: ↵, the mobile, ↵ — then creates', async () => {
+    const { user } = await openNewLead();
+    await searchFor(user, 'Meera Joshi');
+    await screen.findByTestId('new-lead-no-match');
+    await user.keyboard('{Enter}');
+
+    expect(screen.getByTestId('new-lead-contact-quick-add-name')).toHaveValue(
+      'Meera Joshi',
+    );
+    await waitFor(() =>
+      expect(screen.getByTestId('new-lead-contact-quick-add-mobile')).toHaveFocus(),
+    );
+    await user.keyboard('{Enter}');
+    expect(notify.warning).toHaveBeenLastCalledWith('Add a 10-digit mobile');
+
+    await user.keyboard('9898012345{Enter}');
+    expect(screen.queryByTestId('new-lead-drawer-step-contact')).toBeNull();
+    expect(screen.getByText('Meera Joshi')).toBeInTheDocument();
+    expect(screen.getByText('+91 98980 12345')).toBeInTheDocument();
+    expect(step('details')).toHaveAttribute('data-state', 'open');
+
+    await user.click(save());
+    await waitFor(() => expect(callbacks.onCreated).toHaveBeenCalled());
+    expect(vi.mocked(createLead).mock.lastCall?.[0].person).toEqual({
+      contact: {
+        firstName: 'Meera',
+        lastName: 'Joshi',
+        phones: [{ phone: '+919898012345', isOnWhatsapp: true }],
+        instagramHandles: [],
+        defaultChannel: 'whatsapp',
+        preferenceTags: [],
+      },
+    });
+  });
+
+  it('"More details" opens the contact editor on the quick add’s values; cancelling commits nothing', async () => {
+    const { user } = await openNewLead();
+    await searchFor(user, 'Meera 9898012345');
+    await user.click(await screen.findByTestId('new-lead-new-contact'));
+    await user.click(screen.getByTestId('new-lead-contact-quick-add-more'));
+
+    const editor = await screen.findByTestId('contact-editor');
+    expect(within(editor).getByTestId('contact-editor-first-name')).toHaveValue('Meera');
+    expect(within(editor).getByTestId('contact-editor-mobile-1')).toHaveValue(
+      '98980 12345',
+    );
+    await user.click(within(editor).getByTestId('contact-editor-dismiss'));
+    await waitFor(() => expect(screen.queryByTestId('contact-editor')).toBeNull());
+
+    expect(step('contact')).toHaveAttribute('data-state', 'open');
+    expect(screen.queryByText('Meera')).toBeNull();
   });
 
   it('starts from the prefill with the person known', async () => {

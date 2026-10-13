@@ -885,6 +885,29 @@
     "activityLead": "潜在客户 {{id}}",
     "purchasesCount_other": "{{count}} 行"
   },
+  "contactPick": {
+    "recent": "最近",
+    "keepTyping": "请继续输入 — 3 个字母或 4 位数字",
+    "searching": "正在搜索…",
+    "found_other": "找到 {{count}} 人",
+    "noMatch": "没有匹配项",
+    "addNamed": "将“{{name}}”添加为新联系人",
+    "addPhone": "将 {{phone}} 添加为新联系人",
+    "addNamedPhone": "将“{{name}}”· {{phone}} 添加为新联系人",
+    "enterKey": "↵",
+    "clearSearch": "清除搜索",
+    "quickAdd": {
+      "name": "姓名",
+      "namePlaceholder": "姓名",
+      "mobile": "手机号",
+      "add": "添加联系人",
+      "more": "更多详情",
+      "back": "返回搜索",
+      "addName": "请填写姓名",
+      "needMobile": "请填写 10 位手机号",
+      "mobileDigits": "手机号需要 10 位数字"
+    }
+  },
   "contactEditor": {
     "title": "编辑联系人",
     "sub": "保存一次 · 用于每条线索、每位患者和每段聊天",
@@ -978,7 +1001,6 @@
       "searchLabel": "搜索人员",
       "useContact": "使用联系人",
       "patient": "患者",
-      "createContact": "+ 新建联系人“{{query}}”",
       "newContact": "新联系人 · 预约需补充手机号",
       "mobile": "手机号码",
       "name": "姓名",

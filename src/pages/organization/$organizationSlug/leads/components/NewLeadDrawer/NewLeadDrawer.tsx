@@ -6,6 +6,7 @@ import { fetchContact } from '@/shared/api/app/contacts-api.ts';
 import type { ContactSummary } from '@/shared/api/app/contacts-contracts.ts';
 import type { DirectoryMember } from '@/shared/api/app/directory-api.ts';
 import type { LeadRecord } from '@/shared/api/app/leads-contracts.ts';
+import type { QuickAddDraft } from '@/shared/components/ContactQuickPick/index.ts';
 import type { DrawerSaveState } from '@/shared/components/DrawerFooter/index.ts';
 import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import type { ContactCardData } from '@/shared/components/PersonCard/index.ts';
@@ -14,12 +15,13 @@ import { Button } from '@/shared/components/ui/button.tsx';
 import { apiErrorReason, mapApiError } from '@/shared/errors/errorHandler.ts';
 import {
   ContactEditor,
+  type ContactEditorValue,
   contactFieldsOf,
   contactValueName,
+  emptyContactValue,
   extraReachCount,
   primaryPhoneOf,
 } from '@/shared/forms/ContactEditor/index.ts';
-import { useContactSearch } from '@/shared/hooks/useContacts/index.ts';
 import { useCreateLead } from '@/shared/hooks/useLeads/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -151,6 +153,11 @@ function useCreate(
   return { save, saveState };
 }
 
+/** The quick add's values as the contact editor holds them: the name split, the mobile +91. */
+function contactValueOfDraft({ name, phone }: QuickAddDraft): ContactEditorValue {
+  return emptyContactValue(name, phone ? `+91${phone}` : null);
+}
+
 /** What the form's parts change: the form, through its setter. */
 type FormSetter = (next: (current: NewLeadForm) => NewLeadForm) => void;
 
@@ -253,9 +260,10 @@ function NewLeadPerson({
 /**
  * New lead (KICKOFF §6.3; `leads.md:75–90, 138–150, 246–262`, H:1883–1961) on
  * the shared record drawer, 640px, "New lead" over "Name and mobile are enough
- * to start". Without a contact: step 1 Contact — the search, Quick start and
- * "New contact" — and step 2 Lead details, locked ("After contact"; a tap toasts
- * "Pick or add the contact first"). With one — picked, typed in the contact
+ * to start". Without a contact: step 1 Contact — the shared contact picker
+ * (Recent, the search, Quick start, the quick add — change-contact-quick-pick) —
+ * and step 2 Lead details, locked ("After contact"; a tap toasts "Pick or add
+ * the contact first"). With one — picked, quick-added, typed in the contact
  * editor, or prefilled — the person's strip with "Change", and Lead details
  * as step 1: Source, Interested in, Assigned & involved (the signed-in member
  * first; anyone can be assigned). "Create lead" checks for a name and a
@@ -274,10 +282,10 @@ export function NewLeadDrawer({
 }: NewLeadDrawerProps) {
   const { t } = useTranslation(LEADS_NS);
   const [form, setForm] = useState(() => newLeadForm(prefill, viewerId));
-  const [query, setQuery] = useState('');
-  const [editing, setEditing] = useState(false);
+  // The value the contact editor opens on: the person typed so far ("Edit" on the strip), or
+  // the quick add's values ("More details") — committed to the form only by the editor's Done.
+  const [editorValue, setEditorValue] = useState<ContactEditorValue | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
-  const search = useContactSearch(query);
   const { save, saveState } = useCreate(onCreated, onOpenLead);
   const contactSet = hasNewLeadContact(form);
   // The membership may load after the drawer opens: until someone is assigned, it is them.
@@ -285,7 +293,6 @@ export function NewLeadDrawer({
 
   const pick = (hit: ContactSummary) => {
     setForm((current) => withPickedContact(current, hit));
-    setQuery('');
     notify.success(
       hit.patientId
         ? t(K.toasts.existingPatient, { id: displayId.contact(hit.contactNumber) })
@@ -304,11 +311,7 @@ export function NewLeadDrawer({
     title: t(K.contact),
     content: (
       <NewLeadContactStep
-        query={query}
-        onQueryChange={setQuery}
         searchRef={searchRef}
-        hits={search.hits}
-        noMatch={search.noMatch}
         pressed={(preset) => presetPressed(form, preset)}
         onPreset={(preset: NewLeadPreset) => {
           setForm((current) => ({ ...current, source: preset.source }));
@@ -316,7 +319,14 @@ export function NewLeadDrawer({
         }}
         onPick={pick}
         onOpenLead={onOpenLead}
-        onNewContact={() => setEditing(true)}
+        onQuickAdd={(draft) =>
+          setForm((current) => ({
+            ...current,
+            picked: null,
+            contact: contactValueOfDraft(draft),
+          }))
+        }
+        onMoreDetails={(draft) => setEditorValue(contactValueOfDraft(draft))}
       />
     ),
   };
@@ -353,19 +363,19 @@ export function NewLeadDrawer({
         {contactSet ? (
           <NewLeadPerson
             form={form}
-            onEdit={() => setEditing(true)}
+            onEdit={() => setEditorValue(form.contact)}
             onChange={() => setForm((current) => withoutContact(current))}
           />
         ) : null}
       </RecordDrawer>
       <ContactEditor
-        open={editing}
-        value={form.contact}
+        open={editorValue !== null}
+        value={editorValue ?? form.contact}
         onDone={(value) => {
-          setForm((current) => ({ ...current, contact: value }));
-          setEditing(false);
+          setForm((current) => ({ ...current, picked: null, contact: value }));
+          setEditorValue(null);
         }}
-        onClose={() => setEditing(false)}
+        onClose={() => setEditorValue(null)}
       />
     </>
   );

@@ -1,0 +1,45 @@
+/* The skeleton sheen (`SkeletonBar` `shimmer`, change-contact-quick-pick
+   D10–D11): a soft band, half the bar wide, swept along the bar in the reading
+   direction (reversed on a right-to-left page), each row 90ms after the one
+   above (`data-sweep`, cycled by three) so the rows sweep as one wave.
+
+   Loaded with the skeleton bars' own chunk, not on every first paint: the
+   initial stylesheet is a ratchet (`pnpm size`), and only a wait someone is
+   watching — a search, a picker — shimmers.
+
+   The colour comes from the theme's tokens: the page colour over the bar's
+   muted-strong fill in light; a faint lift of the text colour in dark. The
+   band is drawn in longhands, so the bar's own `bg-muted-strong` stays. Plain
+   CSS outside a layer, so the sweep replaces the skeleton primitive's
+   `animate-pulse` utility. It fills both ways: the band waits off the bar
+   through its delay, and leaves it when the reduced-motion rule
+   (`src/index.css`, end) cuts the pass short — the bars then stand still. */
+.skeleton-sheen {
+  --skeleton-sheen: color-mix(in oklab, var(--color-background) 70%, transparent);
+  background-image: linear-gradient(90deg, #0000, var(--skeleton-sheen), #0000);
+  background-size: 50%;
+  background-repeat: no-repeat;
+  animation: skeleton-sweep 1.4s ease-in-out infinite both;
+}
+.dark .skeleton-sheen {
+  --skeleton-sheen: color-mix(in oklab, var(--color-foreground) 8%, transparent);
+}
+.skeleton-sheen[data-sweep='1'] {
+  animation-delay: 90ms;
+}
+.skeleton-sheen[data-sweep='2'] {
+  animation-delay: 180ms;
+}
+[dir='rtl'] .skeleton-sheen {
+  animation-direction: reverse;
+}
+
+/* -100% parks the 50%-wide band just before the bar's start, 200% just past its end. */
+@keyframes skeleton-sweep {
+  from {
+    background-position: -100% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}

@@ -896,6 +896,30 @@
     "purchasesCount_one": "{{count}} Position",
     "purchasesCount_other": "{{count}} Positionen"
   },
+  "contactPick": {
+    "recent": "Zuletzt",
+    "keepTyping": "Weiter tippen — 3 Buchstaben oder 4 Ziffern",
+    "searching": "Suche läuft…",
+    "found_one": "{{count}} Person gefunden",
+    "found_other": "{{count}} Personen gefunden",
+    "noMatch": "Kein vorhandener Treffer",
+    "addNamed": "„{{name}}“ als neuen Kontakt anlegen",
+    "addPhone": "{{phone}} als neuen Kontakt anlegen",
+    "addNamedPhone": "„{{name}}“ · {{phone}} als neuen Kontakt anlegen",
+    "enterKey": "↵",
+    "clearSearch": "Suche leeren",
+    "quickAdd": {
+      "name": "Name",
+      "namePlaceholder": "Vor- und Nachname",
+      "mobile": "Mobilnummer",
+      "add": "Kontakt anlegen",
+      "more": "Weitere Angaben",
+      "back": "Zurück zur Suche",
+      "addName": "Geben Sie einen Namen ein",
+      "needMobile": "Geben Sie eine 10-stellige Mobilnummer ein",
+      "mobileDigits": "Die Mobilnummer braucht 10 Ziffern"
+    }
+  },
   "contactEditor": {
     "title": "Kontakt bearbeiten",
     "sub": "Einmal gespeichert · für jeden Lead, Patienten und Chat verwendet",
@@ -989,7 +1013,6 @@
       "searchLabel": "Person suchen",
       "useContact": "Kontakt verwenden",
       "patient": "Patient",
-      "createContact": "+ Kontakt „{{query}}“ anlegen",
       "newContact": "Neuer Kontakt · Mobilnummer zum Buchen ergänzen",
       "mobile": "Mobilnummer",
       "name": "Name",

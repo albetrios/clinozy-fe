@@ -907,6 +907,31 @@
     "purchasesCount_many": "{{count}} líneas",
     "purchasesCount_other": "{{count}} líneas"
   },
+  "contactPick": {
+    "recent": "Recientes",
+    "keepTyping": "Sigue escribiendo — 3 letras o 4 dígitos",
+    "searching": "Buscando…",
+    "found_one": "{{count}} persona encontrada",
+    "found_many": "{{count}} personas encontradas",
+    "found_other": "{{count}} personas encontradas",
+    "noMatch": "Ninguna coincidencia",
+    "addNamed": "Añadir «{{name}}» como contacto nuevo",
+    "addPhone": "Añadir {{phone}} como contacto nuevo",
+    "addNamedPhone": "Añadir «{{name}}» · {{phone}} como contacto nuevo",
+    "enterKey": "↵",
+    "clearSearch": "Borrar búsqueda",
+    "quickAdd": {
+      "name": "Nombre",
+      "namePlaceholder": "Nombre y apellido",
+      "mobile": "Móvil",
+      "add": "Añadir contacto",
+      "more": "Más datos",
+      "back": "Volver a la búsqueda",
+      "addName": "Añade un nombre",
+      "needMobile": "Añade un móvil de 10 dígitos",
+      "mobileDigits": "El móvil necesita 10 dígitos"
+    }
+  },
   "contactEditor": {
     "title": "Editar contacto",
     "sub": "Se guarda una vez · se usa en cada lead, paciente y chat",
@@ -1000,7 +1025,6 @@
       "searchLabel": "Buscar persona",
       "useContact": "Usar contacto",
       "patient": "Paciente",
-      "createContact": "+ Crear contacto «{{query}}»",
       "newContact": "Contacto nuevo · añade el móvil para reservar",
       "mobile": "Número de móvil",
       "name": "Nombre",

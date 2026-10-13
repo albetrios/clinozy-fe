@@ -173,7 +173,6 @@
       "recreate": "Volver a crear lead",
       "useContact": "Usar contacto"
     },
-    "noMatch": "Ninguna coincidencia",
     "more_one": " · +{{count}} más",
     "more_many": " · +{{count}} más",
     "more_other": " · +{{count}} más",

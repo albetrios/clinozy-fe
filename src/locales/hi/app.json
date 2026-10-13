@@ -896,6 +896,30 @@
     "purchasesCount_one": "{{count}} लाइन",
     "purchasesCount_other": "{{count}} लाइन"
   },
+  "contactPick": {
+    "recent": "हाल के",
+    "keepTyping": "लिखते रहें — 3 अक्षर या 4 अंक",
+    "searching": "खोज रहे हैं…",
+    "found_one": "{{count}} व्यक्ति मिला",
+    "found_other": "{{count}} लोग मिले",
+    "noMatch": "कोई मौजूदा मेल नहीं",
+    "addNamed": "“{{name}}” को नए संपर्क के रूप में जोड़ें",
+    "addPhone": "{{phone}} को नए संपर्क के रूप में जोड़ें",
+    "addNamedPhone": "“{{name}}” · {{phone}} को नए संपर्क के रूप में जोड़ें",
+    "enterKey": "↵",
+    "clearSearch": "खोज साफ़ करें",
+    "quickAdd": {
+      "name": "नाम",
+      "namePlaceholder": "पहला और अंतिम नाम",
+      "mobile": "मोबाइल",
+      "add": "संपर्क जोड़ें",
+      "more": "और विवरण",
+      "back": "खोज पर वापस जाएँ",
+      "addName": "नाम जोड़ें",
+      "needMobile": "10 अंकों का मोबाइल नंबर जोड़ें",
+      "mobileDigits": "मोबाइल में 10 अंक होने चाहिए"
+    }
+  },
   "contactEditor": {
     "title": "संपर्क संपादित करें",
     "sub": "एक बार सेव · हर लीड, मरीज़ और चैट में इस्तेमाल",
@@ -989,7 +1013,6 @@
       "searchLabel": "व्यक्ति खोजें",
       "useContact": "संपर्क चुनें",
       "patient": "मरीज़",
-      "createContact": "+ संपर्क “{{query}}” बनाएँ",
       "newContact": "नया संपर्क · बुक करने के लिए मोबाइल जोड़ें",
       "mobile": "मोबाइल नंबर",
       "name": "नाम",

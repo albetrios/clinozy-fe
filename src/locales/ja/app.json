@@ -885,6 +885,29 @@
     "activityLead": "リード {{id}}",
     "purchasesCount_other": "{{count}} 件"
   },
+  "contactPick": {
+    "recent": "最近",
+    "keepTyping": "続けて入力してください — 3 文字または 4 桁",
+    "searching": "検索中…",
+    "found_other": "{{count}} 人見つかりました",
+    "noMatch": "一致する人はいません",
+    "addNamed": "「{{name}}」を新しい連絡先として追加",
+    "addPhone": "{{phone}} を新しい連絡先として追加",
+    "addNamedPhone": "「{{name}}」· {{phone}} を新しい連絡先として追加",
+    "enterKey": "↵",
+    "clearSearch": "検索をクリア",
+    "quickAdd": {
+      "name": "名前",
+      "namePlaceholder": "姓と名",
+      "mobile": "携帯",
+      "add": "連絡先を追加",
+      "more": "詳細を入力",
+      "back": "検索に戻る",
+      "addName": "名前を入力してください",
+      "needMobile": "10 桁の携帯番号を入力してください",
+      "mobileDigits": "携帯番号は10桁必要です"
+    }
+  },
   "contactEditor": {
     "title": "連絡先を編集",
     "sub": "一度保存 · すべてのリード、患者、チャットで使用",
@@ -978,7 +1001,6 @@
       "searchLabel": "人を検索",
       "useContact": "連絡先を使う",
       "patient": "患者",
-      "createContact": "+ 連絡先「{{query}}」を作成",
       "newContact": "新しい連絡先 · 予約には携帯番号を追加",
       "mobile": "携帯番号",
       "name": "名前",
