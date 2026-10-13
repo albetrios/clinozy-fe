@@ -9,19 +9,21 @@ import {
 import { Trans, useTranslation } from 'react-i18next';
 
 import { platformConfig } from '@/core/config/env.ts';
+import { i18n } from '@/lib/i18n/index.ts';
 import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
 import { cn } from '@/lib/utils.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import {
   ACCEPT_ALL_CONSENT_PREFERENCES,
-  type ConsentPreferences,
   isGlobalPrivacyControlOn,
   REJECT_ALL_CONSENT_PREFERENCES,
   selectConsentCardOpen,
   useConsentStore,
 } from '@/shared/store/useConsentStore/index.ts';
 
+import { CONSENT_KEYS, CONSENT_NS } from './consent-banner.constants.ts';
 import { ConsentCategoryRow } from './ConsentCategoryRow/index.ts';
+import { saveConsentPreferences } from './save-consent-preferences.ts';
 
 /**
  * The card's rendered height, published on `<html>` for as long as it is up.
@@ -39,17 +41,6 @@ const CARD_HEIGHT_VAR = '--consent-card-height';
 const BUTTON_CLASS = 'h-auto min-h-9 min-w-0 px-2 whitespace-normal sm:px-3.5';
 
 type ConsentCardView = 'summary' | 'customize';
-
-/** Store the answer, then act on it off the critical path (analytics, the account's receipt). */
-function answer(
-  save: (preferences: ConsentPreferences) => void,
-  preferences: ConsentPreferences,
-): void {
-  save(preferences);
-  import('@/shared/analytics/record-consent-decision.ts')
-    .then((m) => m.recordConsentDecision(preferences, 'consent_banner'))
-    .catch(() => undefined);
-}
 
 /**
  * The cookie card, on claude.com's cookie banner (D1–D15): "Cookie settings", one paragraph and
@@ -69,11 +60,12 @@ function answer(
  *   (claude.com's), 24px in; below `sm` a full-width inset sheet that rides above the tab bar
  *   through `--floating-bottom-offset` (see `index.css`). Logical `start-*`, so it mirrors under RTL.
  *
- * The answer goes to {@link useConsentStore} (this browser's cookie); PostHog and Sentry's
- * recording react to the store. `ConsentBannerLazy` decides when it is mounted.
+ * The answer is saved by `saveConsentPreferences` (this browser's cookie and {@link useConsentStore});
+ * PostHog and Sentry's recording react to the store. `ConsentBannerLazy` decides when it is mounted.
  */
 export function ConsentBanner() {
-  const { t } = useTranslation(LOCALE_NS);
+  const { t } = useTranslation(CONSENT_NS);
+  const { t: tCommon } = useTranslation(LOCALE_NS);
   const titleId = useId();
   const descriptionId = useId();
   const cardRef = useRef<HTMLDialogElement>(null);
@@ -81,7 +73,6 @@ export function ConsentBanner() {
   const saveRef = useRef<HTMLButtonElement>(null);
   const open = useConsentStore(selectConsentCardOpen);
   const preferences = useConsentStore((s) => s.preferences);
-  const savePreferences = useConsentStore((s) => s.savePreferences);
   const globalPrivacyControl = isGlobalPrivacyControlOn();
   const [view, setView] = useState<ConsentCardView>('summary');
   const [analytics, setAnalytics] = useState(
@@ -113,10 +104,15 @@ export function ConsentBanner() {
     (globalPrivacyControl ? saveRef.current : analyticsSwitchRef.current)?.focus();
   }, [view, globalPrivacyControl]);
 
-  const acceptAll = () => answer(savePreferences, ACCEPT_ALL_CONSENT_PREFERENCES);
-  const rejectAll = () => answer(savePreferences, REJECT_ALL_CONSENT_PREFERENCES);
+  const acceptAll = () =>
+    saveConsentPreferences(ACCEPT_ALL_CONSENT_PREFERENCES, 'consent_banner');
+  const rejectAll = () =>
+    saveConsentPreferences(REJECT_ALL_CONSENT_PREFERENCES, 'consent_banner');
   const saveCustomized = () =>
-    answer(savePreferences, { analytics: !globalPrivacyControl && analytics });
+    saveConsentPreferences(
+      { analytics: !globalPrivacyControl && analytics },
+      'consent_banner',
+    );
 
   const onKeyDown = (event: KeyboardEvent<HTMLDialogElement>) => {
     if (event.key !== 'Escape') return;
@@ -149,21 +145,29 @@ export function ConsentBanner() {
       )}
     >
       <h2 id={titleId} className="text-lg leading-6 font-semibold">
-        {t(LOCALE_KEYS.consentTitle)}
+        {tCommon(LOCALE_KEYS.consentTitle)}
       </h2>
       <p
         id={descriptionId}
         className="text-muted-foreground mt-4 text-sm leading-relaxed"
       >
         {view === 'summary'
-          ? t(LOCALE_KEYS.consentDescription)
-          : t(LOCALE_KEYS.consentCustomizeDescription)}
+          ? t(CONSENT_KEYS.description)
+          : t(CONSENT_KEYS.customizeDescription)}
         {view === 'summary' && platformConfig.privacyPolicyUrl ? (
           <>
             {' '}
+            {/*
+              The app's own instance, handed over rather than found through context: it keeps
+              this lazy chunk reaching `@/lib/i18n` beside the `i18next` core `Trans` imports,
+              so the bundler leaves that core inside the first-paint i18n chunk instead of
+              splitting it into a chunk of its own (+0.2 kB gzipped on every first paint,
+              `pnpm size`).
+            */}
             <Trans
-              ns={LOCALE_NS}
-              i18nKey={LOCALE_KEYS.consentPolicy}
+              i18n={i18n}
+              ns={CONSENT_NS}
+              i18nKey={CONSENT_KEYS.policy}
               components={{
                 // Trans replaces the link's text with the translation's <1>…</1>;
                 // the address stands in only if a translation drops the tag.
@@ -188,7 +192,7 @@ export function ConsentBanner() {
           className="text-muted-foreground mt-2 text-xs leading-[1.45]"
           data-testid="consent-gpc-note"
         >
-          {t(LOCALE_KEYS.consentGpcNote)}
+          {t(CONSENT_KEYS.gpcNote)}
         </p>
       ) : null}
 
@@ -200,8 +204,8 @@ export function ConsentBanner() {
             onClick={() => setView('customize')}
             data-testid="consent-customize"
           >
-            <span className="sm:hidden">{t(LOCALE_KEYS.consentCustomizeShort)}</span>
-            <span className="max-sm:hidden">{t(LOCALE_KEYS.consentCustomize)}</span>
+            <span className="sm:hidden">{t(CONSENT_KEYS.customizeShort)}</span>
+            <span className="max-sm:hidden">{t(CONSENT_KEYS.customize)}</span>
           </Button>
           <Button
             variant="outline"
@@ -209,8 +213,8 @@ export function ConsentBanner() {
             onClick={rejectAll}
             data-testid="consent-reject"
           >
-            <span className="sm:hidden">{t(LOCALE_KEYS.consentRejectShort)}</span>
-            <span className="max-sm:hidden">{t(LOCALE_KEYS.consentRejectAll)}</span>
+            <span className="sm:hidden">{t(CONSENT_KEYS.rejectShort)}</span>
+            <span className="max-sm:hidden">{t(CONSENT_KEYS.rejectAll)}</span>
           </Button>
           <Button
             className={BUTTON_CLASS}
@@ -218,8 +222,8 @@ export function ConsentBanner() {
             disabled={globalPrivacyControl}
             data-testid="consent-accept"
           >
-            <span className="sm:hidden">{t(LOCALE_KEYS.consentAcceptShort)}</span>
-            <span className="max-sm:hidden">{t(LOCALE_KEYS.consentAcceptAll)}</span>
+            <span className="sm:hidden">{t(CONSENT_KEYS.acceptShort)}</span>
+            <span className="max-sm:hidden">{t(CONSENT_KEYS.acceptAll)}</span>
           </Button>
         </div>
       ) : (
@@ -227,17 +231,17 @@ export function ConsentBanner() {
           <div className="mt-4 flex flex-col gap-2">
             <ConsentCategoryRow
               testId="consent-option-necessary"
-              title={t(LOCALE_KEYS.consentNecessaryTitle)}
-              description={t(LOCALE_KEYS.consentNecessaryDescription)}
-              status={t(LOCALE_KEYS.consentRequired)}
+              title={t(CONSENT_KEYS.necessaryTitle)}
+              description={t(CONSENT_KEYS.necessaryDescription)}
+              status={t(CONSENT_KEYS.required)}
               checked
               disabled
             />
             <ConsentCategoryRow
               testId="consent-option-analytics"
-              title={t(LOCALE_KEYS.consentAnalyticsTitle)}
-              description={t(LOCALE_KEYS.consentAnalyticsDescription)}
-              status={t(analytics ? LOCALE_KEYS.consentOn : LOCALE_KEYS.consentOff)}
+              title={t(CONSENT_KEYS.analyticsTitle)}
+              description={t(CONSENT_KEYS.analyticsDescription)}
+              status={t(analytics ? CONSENT_KEYS.on : CONSENT_KEYS.off)}
               checked={analytics}
               disabled={globalPrivacyControl}
               onCheckedChange={setAnalytics}
@@ -250,7 +254,7 @@ export function ConsentBanner() {
             onClick={saveCustomized}
             data-testid="consent-save"
           >
-            {t(LOCALE_KEYS.consentSave)}
+            {t(CONSENT_KEYS.save)}
           </Button>
         </>
       )}

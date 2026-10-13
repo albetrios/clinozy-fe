@@ -70,8 +70,12 @@ capture settings are part of the threat model — verified:
   PostHog's `ph_*` identifiers. "Privacy choices" on the signed-out frame and Settings ›
   Account › Privacy change it. `index.html` does not preconnect to PostHog, so nothing reaches
   it before a grant.
-  ([`shared/store/useConsentStore/useConsentStore.ts`](../../src/shared/store/useConsentStore/useConsentStore.ts),
-  [`shared/analytics/record-consent-decision.ts`](../../src/shared/analytics/record-consent-decision.ts))
+  ([`shared/store/useConsentStore/useConsentStore.ts`](../../src/shared/store/useConsentStore/useConsentStore.ts)
+  reads it on every first paint;
+  [`shared/components/ConsentBanner/save-consent-preferences.ts`](../../src/shared/components/ConsentBanner/save-consent-preferences.ts)
+  writes it, from the card and Settings only;
+  [`shared/analytics/record-consent-decision.ts`](../../src/shared/analytics/record-consent-decision.ts)
+  sends the event and the receipt)
 - **Service worker** — precaches only static build assets + fonts; **no runtime
   caching of `/api`** or auth responses, so a shared device cannot serve one
   user's data to another from the SW cache. ([`src/sw.ts`](../../src/sw.ts))

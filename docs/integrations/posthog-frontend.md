@@ -189,7 +189,7 @@ Never import `posthog-js` directly in feature code — use `captureAnalyticsEven
 | `app/analytics/posthog.ts`                    | SDK init + logout reset               |
 | `shared/analytics/record-consent-decision.ts` | Consent event + the account's receipt |
 | `main.tsx`                                    | Idle bootstrap with router            |
-| `shared/components/ConsentBanner/`            | Consent gate                          |
+| `shared/components/ConsentBanner/`            | Consent gate; saves the answer        |
 
 ---
 

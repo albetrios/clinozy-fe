@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { PRODUCT_NAMESPACE } from '@/lib/product-identity.ts';
 import {
-  readConsentCookieForTests,
+  answerConsentForTests,
   resetConsentForTests,
   setGlobalPrivacyControlForTests,
   writeConsentCookieForTests,
@@ -37,18 +37,14 @@ describe('useConsentStore', () => {
     expect(hasAnalyticsConsent()).toBe(false);
   });
 
-  it('Accept all keeps the answer in the cookie, with the policy version and the time', () => {
-    useConsentStore.getState().savePreferences(ACCEPT_ALL_CONSENT_PREFERENCES);
-    const stored = readConsentCookieForTests();
-    expect(stored).toMatchObject({ analytics: true, version: CONSENT_POLICY_VERSION });
-    expect(Date.now() - Date.parse(String(stored?.decidedAt))).toBeLessThan(5000);
+  it('a standing Accept all allows analytics and stops asking', () => {
+    answerConsentForTests(ACCEPT_ALL_CONSENT_PREFERENCES);
     expect(hasAnalyticsConsent()).toBe(true);
     expect(selectShouldAsk(useConsentStore.getState())).toBe(false);
   });
 
-  it('Reject all keeps analytics off and stops asking', () => {
-    useConsentStore.getState().savePreferences(REJECT_ALL_CONSENT_PREFERENCES);
-    expect(readConsentCookieForTests()).toMatchObject({ analytics: false });
+  it('a standing Reject all keeps analytics off and stops asking', () => {
+    answerConsentForTests(REJECT_ALL_CONSENT_PREFERENCES);
     expect(hasAnalyticsConsent()).toBe(false);
     expect(selectShouldAsk(useConsentStore.getState())).toBe(false);
   });
@@ -91,20 +87,18 @@ describe('useConsentStore', () => {
   });
 
   it('Global Privacy Control turns analytics off and answers for the card', () => {
-    useConsentStore.getState().savePreferences(ACCEPT_ALL_CONSENT_PREFERENCES);
+    answerConsentForTests(ACCEPT_ALL_CONSENT_PREFERENCES);
     setGlobalPrivacyControlForTests(true);
     expect(hasAnalyticsConsent()).toBe(false);
     resetConsentForTests();
     expect(selectShouldAsk(useConsentStore.getState())).toBe(false);
   });
 
-  it('Privacy choices reopens the card over a standing answer; saving closes it', () => {
-    useConsentStore.getState().savePreferences(REJECT_ALL_CONSENT_PREFERENCES);
+  it('Privacy choices reopens the card over a standing answer', () => {
+    answerConsentForTests(REJECT_ALL_CONSENT_PREFERENCES);
     expect(selectConsentCardOpen(useConsentStore.getState())).toBe(false);
     useConsentStore.getState().openPreferences();
     expect(selectConsentCardOpen(useConsentStore.getState())).toBe(true);
-    useConsentStore.getState().savePreferences(ACCEPT_ALL_CONSENT_PREFERENCES);
-    expect(selectConsentCardOpen(useConsentStore.getState())).toBe(false);
   });
 
   it('startConsentFollow drops the launch answer and re-reads the cookie when the tab is shown', () => {

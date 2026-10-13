@@ -91,19 +91,6 @@ function readStandingAnswer(): StandingAnswer | null {
   }
 }
 
-function writeConsentCookie(stored: StoredConsent): void {
-  const attributes = [
-    `${CONSENT_COOKIE_NAME}=${encodeURIComponent(JSON.stringify(stored))}`,
-    `Max-Age=${CONSENT_COOKIE_MAX_AGE_SECONDS}`,
-    'Path=/',
-    'SameSite=Lax',
-  ];
-  // `Secure` wherever the page is https; a plain-http dev server would have the cookie refused.
-  if (globalThis.location?.protocol === 'https:') attributes.push('Secure');
-  // biome-ignore lint/suspicious/noDocumentCookie: the Cookie Store API is async and missing from some supported browsers; the card's answer must be readable on the next line.
-  document.cookie = attributes.join('; ');
-}
-
 /**
  * True while the browser sends Global Privacy Control: every optional category is off, the card
  * never asks on its own, and Analytics cannot be switched on (D6).
@@ -123,8 +110,6 @@ interface ConsentState {
   decidedAt: string | null;
   /** The card was reopened from Privacy choices, whatever the answer. */
   preferencesOpen: boolean;
-  /** Store an answer in this browser's cookie and close the card. */
-  savePreferences: (preferences: ConsentPreferences) => void;
   /** Reopen the card (Privacy choices). */
   openPreferences: () => void;
   /** Take the cookie's answer again — another tab may have changed it. */
@@ -150,6 +135,10 @@ function stateFromCookie(): Pick<ConsentState, 'preferences' | 'decidedAt'> {
  *   year, `SameSite=Lax`, `Secure` on https) holds it. Signing out never forgets it and signing in
  *   never replaces it; an answer given while signed in is also sent to the account as a receipt
  *   (`shared/analytics/record-consent-decision.ts`), never read back.
+ * - **Read here, written by the card.** This store only reads the cookie: it is on every first
+ *   paint, and only the card and Settings answer — through
+ *   `shared/components/ConsentBanner/save-consent-preferences.ts`, which writes the cookie and
+ *   sets this store.
  * - **Asked again** when the cookie expires, is unreadable, or answers another
  *   {@link CONSENT_POLICY_VERSION}.
  * - **Global Privacy Control** overrides the answer: {@link hasAnalyticsConsent} is false while
@@ -158,19 +147,6 @@ function stateFromCookie(): Pick<ConsentState, 'preferences' | 'decidedAt'> {
 export const useConsentStore = create<ConsentState>()((set) => ({
   ...stateFromCookie(),
   preferencesOpen: false,
-  savePreferences: (preferences) => {
-    const decidedAt = new Date().toISOString();
-    writeConsentCookie({
-      analytics: preferences.analytics,
-      version: CONSENT_POLICY_VERSION,
-      decidedAt,
-    });
-    set({
-      preferences: { analytics: preferences.analytics },
-      decidedAt,
-      preferencesOpen: false,
-    });
-  },
   openPreferences: () => set({ preferencesOpen: true }),
   reloadFromCookie: () => set(stateFromCookie()),
 }));

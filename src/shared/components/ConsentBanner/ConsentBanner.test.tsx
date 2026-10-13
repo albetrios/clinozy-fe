@@ -10,6 +10,7 @@ import {
   useConsentStore,
 } from '@/shared/store/useConsentStore/index.ts';
 import {
+  answerConsentForTests,
   readConsentCookieForTests,
   resetConsentForTests,
   setGlobalPrivacyControlForTests,
@@ -193,7 +194,7 @@ describe('ConsentBanner', () => {
 
     it('starts from the current answer when reopened', async () => {
       const user = userEvent.setup();
-      useConsentStore.getState().savePreferences(ACCEPT_ALL_CONSENT_PREFERENCES);
+      answerConsentForTests(ACCEPT_ALL_CONSENT_PREFERENCES);
       useConsentStore.getState().openPreferences();
       render(<ConsentBanner />);
       await user.click(screen.getByTestId('consent-customize'));
@@ -338,7 +339,7 @@ describe('ConsentBanner', () => {
     });
 
     it('renders and reserves nothing while an answer stands and nobody reopened it', () => {
-      useConsentStore.getState().savePreferences(ACCEPT_ALL_CONSENT_PREFERENCES);
+      answerConsentForTests(ACCEPT_ALL_CONSENT_PREFERENCES);
       render(<ConsentBanner />);
       expect(screen.queryByTestId('consent-banner')).not.toBeInTheDocument();
       expect(published()).toBe('');

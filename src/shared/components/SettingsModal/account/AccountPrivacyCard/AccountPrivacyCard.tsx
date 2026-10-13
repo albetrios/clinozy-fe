@@ -1,8 +1,12 @@
 import { useTranslation } from 'react-i18next';
 
 import { platformConfig } from '@/core/config/env.ts';
-import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
+import {
+  CONSENT_KEYS,
+  CONSENT_NS,
+} from '@/shared/components/ConsentBanner/consent-banner.constants.ts';
 import { ConsentCategoryRow } from '@/shared/components/ConsentBanner/ConsentCategoryRow/index.ts';
+import { saveConsentPreferences } from '@/shared/components/ConsentBanner/save-consent-preferences.ts';
 import { SettingsCard } from '@/shared/components/SettingsCard/index.ts';
 import {
   SETTINGS_KEYS,
@@ -24,22 +28,16 @@ import {
  */
 export function AccountPrivacyCard() {
   const { t } = useTranslation(SETTINGS_NS);
-  const { t: tCommon } = useTranslation(LOCALE_NS);
+  const { t: tConsent } = useTranslation(CONSENT_NS);
   const keys = SETTINGS_KEYS.panels.account;
   const { formatDate } = useLocaleFormat();
   const analytics = useConsentStore(selectAnalyticsAllowed);
   const answered = useConsentStore((s) => s.preferences !== null);
   const decidedAt = useConsentStore((s) => s.decidedAt);
-  const savePreferences = useConsentStore((s) => s.savePreferences);
   const globalPrivacyControl = isGlobalPrivacyControlOn();
 
-  const onCheckedChange = (checked: boolean) => {
-    const preferences = { analytics: checked };
-    savePreferences(preferences);
-    import('@/shared/analytics/record-consent-decision.ts')
-      .then((m) => m.recordConsentDecision(preferences, 'settings'))
-      .catch(() => undefined);
-  };
+  const onCheckedChange = (checked: boolean) =>
+    saveConsentPreferences({ analytics: checked }, 'settings');
 
   const status =
     answered && decidedAt
@@ -55,17 +53,17 @@ export function AccountPrivacyCard() {
       <div className="flex flex-col gap-2">
         <ConsentCategoryRow
           testId="account-privacy-necessary"
-          title={tCommon(LOCALE_KEYS.consentNecessaryTitle)}
-          description={tCommon(LOCALE_KEYS.consentNecessaryDescription)}
-          status={tCommon(LOCALE_KEYS.consentRequired)}
+          title={tConsent(CONSENT_KEYS.necessaryTitle)}
+          description={tConsent(CONSENT_KEYS.necessaryDescription)}
+          status={tConsent(CONSENT_KEYS.required)}
           checked
           disabled
         />
         <ConsentCategoryRow
           testId="account-privacy-analytics"
-          title={tCommon(LOCALE_KEYS.consentAnalyticsTitle)}
-          description={tCommon(LOCALE_KEYS.consentAnalyticsDescription)}
-          status={tCommon(analytics ? LOCALE_KEYS.consentOn : LOCALE_KEYS.consentOff)}
+          title={tConsent(CONSENT_KEYS.analyticsTitle)}
+          description={tConsent(CONSENT_KEYS.analyticsDescription)}
+          status={tConsent(analytics ? CONSENT_KEYS.on : CONSENT_KEYS.off)}
           checked={analytics}
           disabled={globalPrivacyControl}
           onCheckedChange={onCheckedChange}
@@ -84,7 +82,7 @@ export function AccountPrivacyCard() {
           className="text-muted-foreground text-xs leading-[1.45]"
           data-testid="consent-gpc-note"
         >
-          {tCommon(LOCALE_KEYS.consentGpcNote)}
+          {tConsent(CONSENT_KEYS.gpcNote)}
         </p>
       ) : null}
       {platformConfig.privacyPolicyUrl ? (

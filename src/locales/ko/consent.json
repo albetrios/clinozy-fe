@@ -1,0 +1,24 @@
+{
+  "banner": {
+    "description": "당사는 서비스를 제공하고 개선하기 위해 쿠키를 사용하며, 동의하시면 {{productName}} 사용 방식을 분석하는 데에도 사용합니다.",
+    "policy": "개인정보 처리방침은 <1>여기</1>에서 확인하실 수 있습니다.",
+    "customizeDescription": "쿠키는 {{productName}}을(를) 사용하는 다른 사람과 회원님을 구별하고, 로그인 상태를 안전하게 유지하며, 허용하시면 기능이 어떻게 사용되는지 파악해 개선하는 데 도움이 됩니다. 일부 유형의 쿠키는 허용하지 않도록 선택할 수 있습니다.",
+    "customize": "쿠키 설정 사용자 지정",
+    "customizeShort": "사용자 지정",
+    "rejectAll": "모든 쿠키 거부",
+    "rejectShort": "거부",
+    "acceptAll": "모든 쿠키 허용",
+    "acceptShort": "허용",
+    "save": "환경설정 저장"
+  },
+  "preferences": {
+    "necessaryTitle": "필수",
+    "necessaryDescription": "보안과 기본 기능을 제공합니다.",
+    "analyticsTitle": "분석",
+    "analyticsDescription": "기능이 어떻게 사용되는지 보여 주는 제품 분석과 세션 기록을 사용합니다.",
+    "required": "필수",
+    "on": "켜짐",
+    "off": "꺼짐",
+    "gpcNote": "브라우저가 Global Privacy Control 신호를 보내고 있어 분석이 꺼진 상태로 유지됩니다."
+  }
+}

@@ -9,10 +9,12 @@ import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import {
   ACCEPT_ALL_CONSENT_PREFERENCES,
   REJECT_ALL_CONSENT_PREFERENCES,
-  useConsentStore,
 } from '@/shared/store/useConsentStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
-import { resetConsentForTests } from '@/tests/utils/consent-cookie.ts';
+import {
+  answerConsentForTests,
+  resetConsentForTests,
+} from '@/tests/utils/consent-cookie.ts';
 
 import { initSentry } from './sentry.ts';
 
@@ -68,7 +70,7 @@ describe('initSentry', () => {
 
   it('initializes with the full integration set when a DSN is configured', async () => {
     config.sentryDsn = 'https://key@sentry.example/1';
-    useConsentStore.getState().savePreferences(ACCEPT_ALL_CONSENT_PREFERENCES);
+    answerConsentForTests(ACCEPT_ALL_CONSENT_PREFERENCES);
     await initSentry(ROUTER);
 
     expect(Sentry.init).toHaveBeenCalledTimes(1);
@@ -119,13 +121,13 @@ describe('initSentry', () => {
     >);
     await initSentry(ROUTER);
 
-    useConsentStore.getState().savePreferences(ACCEPT_ALL_CONSENT_PREFERENCES);
+    answerConsentForTests(ACCEPT_ALL_CONSENT_PREFERENCES);
     expect(Sentry.addIntegration).toHaveBeenCalledWith({ name: 'replay' });
 
-    useConsentStore.getState().savePreferences(REJECT_ALL_CONSENT_PREFERENCES);
+    answerConsentForTests(REJECT_ALL_CONSENT_PREFERENCES);
     expect(stop).toHaveBeenCalledTimes(1);
     // Granted again in the same page: not re-added (the SDK allows one replay integration).
-    useConsentStore.getState().savePreferences(ACCEPT_ALL_CONSENT_PREFERENCES);
+    answerConsentForTests(ACCEPT_ALL_CONSENT_PREFERENCES);
     expect(Sentry.addIntegration).toHaveBeenCalledTimes(1);
   });
 

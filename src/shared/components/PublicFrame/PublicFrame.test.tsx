@@ -9,7 +9,10 @@ import {
   selectConsentCardOpen,
   useConsentStore,
 } from '@/shared/store/useConsentStore/index.ts';
-import { resetConsentForTests } from '@/tests/utils/consent-cookie.ts';
+import {
+  answerConsentForTests,
+  resetConsentForTests,
+} from '@/tests/utils/consent-cookie.ts';
 
 import { PublicCard, PublicCardHeader, PublicFrame } from './PublicFrame.tsx';
 
@@ -50,7 +53,7 @@ describe('PublicFrame', () => {
 
   it('reopens the cookie card from "Privacy choices" in its footer (claude.com)', async () => {
     resetConsentForTests();
-    useConsentStore.getState().savePreferences(REJECT_ALL_CONSENT_PREFERENCES);
+    answerConsentForTests(REJECT_ALL_CONSENT_PREFERENCES);
     const user = userEvent.setup();
     render(
       <PublicFrame>

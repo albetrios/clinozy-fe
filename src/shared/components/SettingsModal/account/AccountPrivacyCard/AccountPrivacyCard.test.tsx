@@ -9,6 +9,7 @@ import {
   useConsentStore,
 } from '@/shared/store/useConsentStore/index.ts';
 import {
+  answerConsentForTests,
   readConsentCookieForTests,
   resetConsentForTests,
   setGlobalPrivacyControlForTests,
@@ -66,7 +67,7 @@ describe('AccountPrivacyCard — this browser’s cookie settings', () => {
   });
 
   it('turning it off withdraws as easily as it was given', async () => {
-    useConsentStore.getState().savePreferences(ACCEPT_ALL_CONSENT_PREFERENCES);
+    answerConsentForTests(ACCEPT_ALL_CONSENT_PREFERENCES);
     const user = userEvent.setup();
     render(<AccountPrivacyCard />);
 
@@ -81,7 +82,7 @@ describe('AccountPrivacyCard — this browser’s cookie settings', () => {
 
   it('locks Analytics off under Global Privacy Control and says why', () => {
     setGlobalPrivacyControlForTests(true);
-    useConsentStore.getState().savePreferences(ACCEPT_ALL_CONSENT_PREFERENCES);
+    answerConsentForTests(ACCEPT_ALL_CONSENT_PREFERENCES);
     render(<AccountPrivacyCard />);
     const toggle = screen.getByRole('switch', { name: 'Analytics' });
     expect(toggle).not.toBeChecked();

@@ -7,6 +7,7 @@ import {
   useConsentStore,
 } from '@/shared/store/useConsentStore/index.ts';
 import {
+  answerConsentForTests,
   resetConsentForTests,
   setGlobalPrivacyControlForTests,
 } from '@/tests/utils/consent-cookie.ts';
@@ -49,7 +50,7 @@ describe('ConsentBannerLazy', () => {
     (_, preferences) => {
       // The returning visitor is the common case, and the reason this is lazy:
       // they never see the card, so they should never download it.
-      useConsentStore.getState().savePreferences(preferences);
+      answerConsentForTests(preferences);
 
       const { container } = render(<ConsentBannerLazy />);
 
@@ -64,7 +65,7 @@ describe('ConsentBannerLazy', () => {
   });
 
   it('comes back when Privacy choices reopens it over a standing answer', async () => {
-    useConsentStore.getState().savePreferences(REJECT_ALL_CONSENT_PREFERENCES);
+    answerConsentForTests(REJECT_ALL_CONSENT_PREFERENCES);
     render(<ConsentBannerLazy />);
     expect(screen.queryByTestId('consent-banner')).not.toBeInTheDocument();
 
