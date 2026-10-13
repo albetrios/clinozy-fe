@@ -122,6 +122,20 @@ describe('list-row states', () => {
     }
   });
 
+  it('outlines a picked badge in its tone’s edge colour and halo, never its ink', () => {
+    for (const tone of TONE_VALUES) {
+      const { ring, selected, selectedHover } = TONE_CLASSES[tone];
+      expect(ring).toBe(`ring-1 ring-tone-${tone}-edge`);
+      expect(selected).toBe(
+        `inset-ring-[1.5px] inset-ring-tone-${tone}-edge ring-3 ring-tone-${tone}-dot/22`,
+      );
+      expect(selectedHover).toBe(`hover:inset-ring hover:inset-ring-tone-${tone}-edge`);
+      for (const value of [ring, selected, selectedHover]) {
+        expect(value).not.toContain('-foreground');
+      }
+    }
+  });
+
   it('draws a row’s inline-start status edge in the tone’s ink (preset.md:192), or its dot', () => {
     for (const tone of TONE_VALUES) {
       expect(TONE_CLASSES[tone].edge).toBe(`border-s-tone-${tone}-foreground`);
