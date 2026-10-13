@@ -326,6 +326,48 @@
   --animate-fade: fade-in 150ms ease both;
   --animate-spinner: spinner 700ms linear infinite;
   --animate-sheet-up: sheet-up 260ms cubic-bezier(0.32, 0.72, 0, 1) both;
+  /* The sign-in showcase (AuthShowcase): a wave that lights each journey stop
+     in turn (8.4s, each stop 600ms after the last), the moments' 4px drift, and
+     a live dot's breathing halo. Each element also carries
+     `motion-reduce:animate-none`, so reduced motion shows every stop lit. */
+  --animate-journey-wave: journey-wave 8400ms ease-in-out infinite both;
+  --animate-drift: drift 6000ms ease-in-out infinite alternate both;
+  --animate-pulse-dot: pulse-dot 2400ms ease-in-out infinite;
+
+  @keyframes journey-wave {
+    0%,
+    85%,
+    100% {
+      opacity: 0.4;
+      transform: none;
+    }
+    8% {
+      opacity: 1;
+      transform: translateY(-2px);
+    }
+    14%,
+    70% {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes drift {
+    from {
+      transform: none;
+    }
+    to {
+      transform: translateY(-4px);
+    }
+  }
+  @keyframes pulse-dot {
+    0%,
+    100% {
+      box-shadow: 0 0 0 3px color-mix(in oklab, currentColor 18%, transparent);
+    }
+    50% {
+      box-shadow: 0 0 0 5px color-mix(in oklab, currentColor 32%, transparent);
+    }
+  }
 
   @keyframes dropdown-in {
     from {
