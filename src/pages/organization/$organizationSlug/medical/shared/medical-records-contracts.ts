@@ -30,9 +30,13 @@ export const MANUFACTURER_TONES: readonly Tone[] = [
   'mint',
 ];
 
+/** Two ids in a stable order (public ids are lowercase ASCII). */
+const compareIds = (a: string, b: string) => Number(a > b) - Number(a < b);
+
 /** A list as a change compares it: the same ids, in any order. */
 const sameIds = (a: readonly string[], b: readonly string[]) =>
-  a.length === b.length && [...a].sort().join(',') === [...b].sort().join(',');
+  a.length === b.length &&
+  [...a].sort(compareIds).join(',') === [...b].sort(compareIds).join(',');
 
 /** Text as the API takes it — none when blank. */
 const textOrNull = (text: string | null) => (text?.trim() ? text.trim() : null);

@@ -91,7 +91,7 @@ export function useMrColumns(): ColumnDef<DataTableFeatures, MrRow>[] {
         const next = row.original.nextVisitOn;
         if (!next) return null;
         return (
-          <TonePill tone={nextVisitTone(row.original.visitOverdue)}>
+          <TonePill tone={nextVisitTone(row.original)}>
             <span className="whitespace-nowrap tabular-nums">{dates.visit(next)}</span>
           </TonePill>
         );
@@ -104,7 +104,7 @@ export function useMrColumns(): ColumnDef<DataTableFeatures, MrRow>[] {
           if (!mr.nextVisitOn) return null;
           return {
             value: dates.visit(mr.nextVisitOn),
-            dotClassName: TONE_CLASSES[nextVisitTone(mr.visitOverdue)].fill,
+            dotClassName: TONE_CLASSES[nextVisitTone(mr)].fill,
           };
         },
       },

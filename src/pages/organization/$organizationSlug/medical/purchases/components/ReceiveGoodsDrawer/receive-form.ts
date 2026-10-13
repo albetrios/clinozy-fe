@@ -142,8 +142,12 @@ export function receiveTotal(
 }
 
 /** A line's medicine as the checks name it: its name, or a typed one's. */
-export const receiveLineName = (line: Pick<ReceiveLineValues, 'name' | 'medicineId'>) =>
-  line.name || typedMedicineName(line.medicineId) || undefined;
+export function receiveLineName(
+  line: Pick<ReceiveLineValues, 'name' | 'medicineId'>,
+): string | undefined {
+  if (line.name) return line.name;
+  return typedMedicineName(line.medicineId) ?? undefined;
+}
 
 /**
  * The contract's fields: every ordered line by its id — an empty batch is the

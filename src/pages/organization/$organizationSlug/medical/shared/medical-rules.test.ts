@@ -70,7 +70,7 @@ describe('the family’s rules', () => {
     });
     expect(SALE_STATUS_TONES).toEqual({ paid: 'sage', unpaid: 'blush' });
     expect([3, 7, 30].map(supplierAgeingTone)).toEqual(['sage', 'butter', 'blush']);
-    expect(nextVisitTone(true)).toBe('blush');
-    expect(nextVisitTone(false)).toBe('sky');
+    expect(nextVisitTone({ visitOverdue: true })).toBe('blush');
+    expect(nextVisitTone({ visitOverdue: false })).toBe('sky');
   });
 });
