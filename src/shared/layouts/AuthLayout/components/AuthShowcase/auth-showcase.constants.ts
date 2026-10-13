@@ -1,3 +1,4 @@
+import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 import type { Tone } from '@/shared/api/app/app-schema.ts';
 import {
   type AppIcon,
@@ -15,6 +16,13 @@ import {
   Users,
   Wallet,
 } from '@/shared/icons/index.ts';
+
+/**
+ * The showcase's namespace — `auth` — read from the registry: importing
+ * `AUTH_NS` would pull the first-paint auth constants into this lazy chunk's
+ * graph and re-split them.
+ */
+export const AUTH_SHOWCASE_NS = I18N_NAMESPACES.auth;
 
 /**
  * The showcase's keys in the `auth` namespace (`showcase.*`). Kept here, not in

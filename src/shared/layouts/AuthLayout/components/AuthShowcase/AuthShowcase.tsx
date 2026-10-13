@@ -1,7 +1,6 @@
 import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 import { cn } from '@/lib/utils.ts';
 import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 // The unit, not the Cells barrel: the barrel would make this lazy chunk an
@@ -11,6 +10,7 @@ import { Lock } from '@/shared/icons/index.ts';
 
 import {
   AUTH_SHOWCASE_KEYS,
+  AUTH_SHOWCASE_NS,
   AUTH_SHOWCASE_TEST_IDS,
   JOURNEY_STOPS,
   SHOWCASE_MOMENTS,
@@ -19,9 +19,6 @@ import {
 } from './auth-showcase.constants.ts';
 
 const K = AUTH_SHOWCASE_KEYS;
-/** The `auth` namespace, read from the registry: importing `AUTH_NS` would pull
- * the first-paint auth constants into this lazy chunk's graph and re-split them. */
-const AUTH_NS = I18N_NAMESPACES.auth;
 
 /** The live dot: the sage dot with a breathing halo (still under reduced motion). */
 function LiveDot() {
@@ -40,7 +37,7 @@ function LiveDot() {
  * from `lg`. Its heading is an `h2`: the card's heading stays the page's `h1`.
  */
 export function AuthShowcaseHero({ className }: { className?: string }) {
-  const { t } = useTranslation(AUTH_NS);
+  const { t } = useTranslation(AUTH_SHOWCASE_NS);
   const headingId = useId();
   return (
     <section
@@ -73,7 +70,7 @@ export function AuthShowcaseHero({ className }: { className?: string }) {
 
 /** One patient's journey: seven tone-coded stops a wave lights in turn. */
 function Journey() {
-  const { t } = useTranslation(AUTH_NS);
+  const { t } = useTranslation(AUTH_SHOWCASE_NS);
   return (
     <div
       data-slot="surface"
@@ -115,7 +112,7 @@ function Journey() {
 
 /** Three anonymous moments from a clinic day, drifting out of step. */
 function Moments() {
-  const { t } = useTranslation(AUTH_NS);
+  const { t } = useTranslation(AUTH_SHOWCASE_NS);
   return (
     <ul
       aria-label={t(K.moments.label)}
@@ -157,7 +154,7 @@ function Moments() {
 
 /** Why clinics choose Clinozy — three value lines, each in a room's tone. */
 function Values() {
-  const { t } = useTranslation(AUTH_NS);
+  const { t } = useTranslation(AUTH_SHOWCASE_NS);
   return (
     <ul
       aria-label={t(K.values.label)}
@@ -194,7 +191,7 @@ function Values() {
  * sits on the start column's panel ({@link AuthShowcaseCanvas}) and drops its own.
  */
 export function AuthShowcaseBoard({ className }: { className?: string }) {
-  const { t } = useTranslation(AUTH_NS);
+  const { t } = useTranslation(AUTH_SHOWCASE_NS);
   return (
     <section
       aria-label={t(K.regionLabel)}
@@ -230,7 +227,7 @@ export function AuthShowcaseCanvas({ className }: { className?: string }) {
 
 /** The privacy line under the card: each clinic sees only its own records. */
 export function AuthShowcasePrivacy({ className }: { className?: string }) {
-  const { t } = useTranslation(AUTH_NS);
+  const { t } = useTranslation(AUTH_SHOWCASE_NS);
   return (
     <p
       data-testid={AUTH_SHOWCASE_TEST_IDS.privacy}
