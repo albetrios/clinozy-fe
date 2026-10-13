@@ -17,11 +17,26 @@
  * Wired as `pnpm deps:audit` / `pnpm deps:audit:prod` (pr-ci Security audit
  * lane). Network or registry errors FAIL the run — a silent pass on a broken
  * audit would be a hole, not a gate.
+ *
+ * Accepted advisories. An advisory with NO fixed version published is listed in
+ * `auditConfig.ignoreGhsas` in `pnpm-workspace.yaml` — the list `pnpm audit`
+ * itself honours, and the only one this script reads (clinozy-be keeps the same
+ * rule). Each entry carries a comment naming `Package:`, `Path:`, `No fix:` and
+ * `Remove when:`; an entry without them, or with a malformed id, fails the run.
+ * An accepted advisory is still REPORTED ("accepted (no fix published)") but does
+ * not fail. The acceptance expires on its own: the newest published version of
+ * the package is put back to the bulk endpoint, and once the advisory no longer
+ * applies to it (or the advisory names `patched_versions`) a fix exists and the
+ * run FAILS until the entry is removed and the package overridden or bumped. A
+ * full-tree run also fails on an entry no locked package reports any more.
+ * Every other advisory at or above the threshold fails exactly as before.
  */
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
-const BULK_ENDPOINT = 'https://registry.npmjs.org/-/npm/v1/security/advisories/bulk';
+const REGISTRY = 'https://registry.npmjs.org';
+const BULK_ENDPOINT = `${REGISTRY}/-/npm/v1/security/advisories/bulk`;
 const SEVERITY_RANK = new Map([
   ['low', 0],
   ['moderate', 1],
@@ -29,18 +44,184 @@ const SEVERITY_RANK = new Map([
   ['critical', 3],
 ]);
 
-const args = process.argv.slice(2);
-const prodOnly = args.includes('--prod');
-const levelFlag = args.includes('--level')
-  ? (args[args.indexOf('--level') + 1] ?? 'high')
-  : 'high';
-if (!SEVERITY_RANK.has(levelFlag)) {
-  console.error(
-    `[bulk-audit] unknown --level "${levelFlag}" (low|moderate|high|critical)`,
-  );
-  process.exit(1);
+/** GitHub advisory ids: `GHSA-` and three groups of four from GitHub's own alphabet. */
+const GHSA_ID_PATTERN = /^GHSA(?:-[23456789cfghjmpqrvwx]{4}){3}$/;
+
+/** The labelled comment lines every `auditConfig.ignoreGhsas` entry must carry above it. */
+export const ACCEPTED_COMMENT_LABELS = ['Package:', 'Path:', 'No fix:', 'Remove when:'];
+
+/** The bulk endpoint answers `patched_versions` (when it does at all) with this for "none". */
+const NO_PATCHED_VERSIONS = '<0.0.0';
+
+/**
+ * Reads `auditConfig.ignoreGhsas` from `pnpm-workspace.yaml` text, with the comment
+ * block directly above each entry. Line-based like the lockfile parser below: only
+ * this one shape is needed, and the comments — which a YAML parser drops — are the
+ * point. Returns the entries and every policy problem found (empty when clean).
+ */
+export function readAcceptedAdvisories(workspaceText) {
+  /** @type {Array<{ghsa: string, packageName: string | undefined, comment: string[]}>} */
+  const entries = [];
+  /** @type {string[]} */
+  const problems = [];
+  const lines = workspaceText.split('\n').map((line) => line.replace(/\r$/, ''));
+  const start = lines.findIndex((line) => /^auditConfig:\s*$/.test(line));
+  if (start === -1) return { entries, problems };
+
+  let inList = false;
+  /** @type {string[]} */
+  let comment = [];
+  for (const line of lines.slice(start + 1)) {
+    // The next top-level key (or a column-0 comment before one) ends auditConfig.
+    if (/^\S/.test(line)) break;
+    const key = /^ {2}(\w+):\s*(.*)$/.exec(line);
+    if (key) {
+      inList = key[1] === 'ignoreGhsas' && key[2] === '';
+      if (key[1] === 'ignoreGhsas' && key[2] !== '') {
+        problems.push(
+          'auditConfig.ignoreGhsas must be a block list: one `- GHSA-…` line per advisory, under its own comment.',
+        );
+      }
+      comment = [];
+      continue;
+    }
+    if (!inList) continue;
+    const commentLine = /^\s+#\s?(.*)$/.exec(line);
+    if (commentLine) {
+      comment.push((commentLine[1] ?? '').trim());
+      continue;
+    }
+    // A blank line detaches a comment from the entry below it.
+    if (line.trim() === '') {
+      comment = [];
+      continue;
+    }
+    const item = /^\s+-\s+(.*)$/.exec(line);
+    if (!item) {
+      problems.push(`auditConfig.ignoreGhsas: unexpected line "${line.trim()}".`);
+      continue;
+    }
+    const ghsa = (item[1] ?? '')
+      .replace(/\s+#.*$/, '')
+      .trim()
+      .replace(/^(['"])(.*)\1$/, '$2');
+    const packageLine = comment.find((text) => text.startsWith('Package:'));
+    const packageName =
+      packageLine?.slice('Package:'.length).trim().split(/\s/)[0] || undefined;
+    if (!GHSA_ID_PATTERN.test(ghsa)) {
+      problems.push(
+        `auditConfig.ignoreGhsas: "${ghsa}" is not a GHSA id (GHSA-xxxx-xxxx-xxxx).`,
+      );
+    } else if (entries.some((entry) => entry.ghsa === ghsa)) {
+      problems.push(`auditConfig.ignoreGhsas: ${ghsa} is listed twice.`);
+    } else if (comment.length === 0) {
+      problems.push(
+        `auditConfig.ignoreGhsas: ${ghsa} has no comment above it — name its ${ACCEPTED_COMMENT_LABELS.join(' ')}`,
+      );
+    } else {
+      const missing = ACCEPTED_COMMENT_LABELS.filter(
+        (label) =>
+          !comment.some((text) => text.startsWith(label) && text.length > label.length),
+      );
+      if (missing.length > 0) {
+        problems.push(
+          `auditConfig.ignoreGhsas: the comment above ${ghsa} is missing ${missing.join(' ')}`,
+        );
+      }
+    }
+    entries.push({ ghsa, packageName, comment });
+    comment = [];
+  }
+  return { entries, problems };
 }
-const threshold = SEVERITY_RANK.get(levelFlag);
+
+/** The GHSA id of a bulk-endpoint advisory (its `url` ends with it). */
+function ghsaOf(advisory) {
+  return (
+    advisory.github_advisory_id ??
+    /\/(GHSA(?:-[a-z0-9]{4}){3})$/i.exec(advisory.url ?? '')?.[1]
+  );
+}
+
+/** One report line per advisory, as this script has always printed them. */
+function reportLine(name, advisory, audited) {
+  const versions = [...(audited.get(name) ?? [])].join(', ');
+  return `${advisory.severity.toUpperCase().padEnd(8)} ${name} (locked: ${versions}; vulnerable: ${advisory.vulnerable_versions}) — ${advisory.title} ${advisory.url}`;
+}
+
+/**
+ * Pure verdict over one audit run — no network, so the tests feed it fixtures.
+ *
+ * `advisories` is the bulk endpoint's answer for the locked versions; `newest` maps
+ * each package with an accepted advisory to its newest published version and the
+ * GHSA ids the endpoint still reports for THAT version. An accepted advisory missing
+ * from that set no longer applies to the newest release: a fix is published.
+ */
+export function judgeAudit({ advisories, audited, level, accepted, newest, prodOnly }) {
+  const threshold = SEVERITY_RANK.get(level);
+  if (threshold === undefined) throw new Error(`unknown level "${level}"`);
+  const acceptedById = new Map(accepted.map((entry) => [entry.ghsa, entry]));
+  const seen = new Set();
+  const verdict = {
+    /** @type {string[]} */ failing: [],
+    /** @type {string[]} */ accepted: [],
+    /** @type {string[]} */ belowThreshold: [],
+    /** @type {string[]} */ acceptanceProblems: [],
+  };
+
+  for (const [name, entries] of Object.entries(advisories)) {
+    for (const advisory of entries) {
+      const line = reportLine(name, advisory, audited);
+      const ghsa = ghsaOf(advisory);
+      const entry = ghsa === undefined ? undefined : acceptedById.get(ghsa);
+      if (entry !== undefined) {
+        seen.add(entry.ghsa);
+        const release = newest.get(name);
+        const patched = advisory.patched_versions;
+        const fix =
+          typeof patched === 'string' && patched !== '' && patched !== NO_PATCHED_VERSIONS
+            ? patched
+            : release !== undefined && !release.ghsas.has(entry.ghsa)
+              ? release.version
+              : undefined;
+        if (fix !== undefined) {
+          verdict.acceptanceProblems.push(
+            `${entry.ghsa} now has a fix (${fix}) — remove it from auditConfig.ignoreGhsas and override/bump instead.`,
+          );
+        } else if (release === undefined) {
+          verdict.acceptanceProblems.push(
+            `${entry.ghsa}: the newest ${name} release was not checked, so "no fix published" is unproven.`,
+          );
+        } else if (entry.packageName !== name) {
+          verdict.acceptanceProblems.push(
+            `${entry.ghsa} is reported for ${name}, but its comment names Package: ${entry.packageName ?? '(none)'} — correct the comment.`,
+          );
+        } else {
+          verdict.accepted.push(
+            `accepted (no fix published; newest ${name} is ${release.version}) ${line}`,
+          );
+        }
+        continue;
+      }
+      const rank = SEVERITY_RANK.get(advisory.severity) ?? SEVERITY_RANK.get('critical');
+      if (rank >= threshold) verdict.failing.push(line);
+      else verdict.belowThreshold.push(line);
+    }
+  }
+
+  // A prod-only run audits part of the tree, so a dev-only acceptance is simply out of
+  // its view there; the full tree is where an entry nothing reports is truly stale.
+  if (!prodOnly) {
+    for (const entry of accepted) {
+      if (!seen.has(entry.ghsa)) {
+        verdict.acceptanceProblems.push(
+          `${entry.ghsa} is in auditConfig.ignoreGhsas, but no locked package reports it any more — remove the entry.`,
+        );
+      }
+    }
+  }
+  return verdict;
+}
 
 /** Splits `name@version` at the LAST `@` (scoped names start with one). */
 function splitNameVersion(key) {
@@ -177,55 +358,142 @@ function prodReachable(prodRoots, snapshotDeps) {
   return reached;
 }
 
-const lockText = readFileSync(resolve(process.cwd(), 'pnpm-lock.yaml'), 'utf8');
-const { allPackages, snapshotDeps, prodRoots } = parseLockfile(lockText);
-const audited = prodOnly ? prodReachable(prodRoots, snapshotDeps) : allPackages;
-
-if (audited.size === 0) {
-  console.error('[bulk-audit] parsed 0 packages from pnpm-lock.yaml — parser drift?');
-  process.exit(1);
+/** Asks the bulk endpoint which advisories apply to `{ name: [versions] }`; throws on any non-2xx. */
+async function fetchAdvisories(payload) {
+  const response = await fetch(BULK_ENDPOINT, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) throw new Error(`registry responded ${response.status}`);
+  return response.json();
 }
 
-const payload = Object.fromEntries(
-  [...audited.entries()].map(([name, versions]) => [name, [...versions]]),
-);
-
-const response = await fetch(BULK_ENDPOINT, {
-  method: 'POST',
-  headers: { 'content-type': 'application/json' },
-  body: JSON.stringify(payload),
-});
-if (!response.ok) {
-  console.error(`[bulk-audit] registry responded ${response.status} — failing loud.`);
-  process.exit(1);
-}
-/** @type {Record<string, Array<{id: number, title: string, severity: string, url: string, vulnerable_versions: string}>>} */
-const advisories = await response.json();
-
-let failures = 0;
-let reported = 0;
-for (const [name, entries] of Object.entries(advisories)) {
-  for (const advisory of entries) {
-    reported += 1;
-    const rank = SEVERITY_RANK.get(advisory.severity) ?? SEVERITY_RANK.get('critical');
-    const versions = [...(audited.get(name) ?? [])].join(', ');
-    const line = `${advisory.severity.toUpperCase().padEnd(8)} ${name} (locked: ${versions}; vulnerable: ${advisory.vulnerable_versions}) — ${advisory.title} ${advisory.url}`;
-    if (rank >= threshold) {
-      failures += 1;
-      console.error(`  ${line}`);
-    } else {
-      console.info(`  (below threshold) ${line}`);
-    }
-  }
+/** The `latest` dist-tag of a package, from its abbreviated packument. */
+async function fetchNewestVersion(name) {
+  const path = encodeURIComponent(name).replace(/^%40/, '@');
+  const response = await fetch(`${REGISTRY}/${path}`, {
+    headers: { accept: 'application/vnd.npm.install-v1+json' },
+  });
+  if (!response.ok) throw new Error(`registry responded ${response.status} for ${name}`);
+  const packument = await response.json();
+  const latest = packument?.['dist-tags']?.latest;
+  if (typeof latest !== 'string')
+    throw new Error(`no latest version published for ${name}`);
+  return latest;
 }
 
-const scope = prodOnly ? 'prod-reachable' : 'all';
-if (failures > 0) {
-  console.error(
-    `[bulk-audit] ${failures} advisory(ies) at ${levelFlag}+ across ${audited.size} ${scope} packages — fix or pin (overrides in pnpm-workspace.yaml).`,
+/**
+ * For every package carrying an accepted advisory: its newest published version and
+ * the GHSA ids the bulk endpoint reports for that version — the same range matching
+ * the audit itself relies on, so no semver logic is reimplemented here.
+ */
+async function checkNewestReleases(advisories, accepted) {
+  const acceptedIds = new Set(accepted.map((entry) => entry.ghsa));
+  const names = Object.entries(advisories)
+    .filter(([, entries]) =>
+      entries.some((advisory) => acceptedIds.has(ghsaOf(advisory))),
+    )
+    .map(([name]) => name);
+  /** @type {Map<string, {version: string, ghsas: Set<string>}>} */
+  const newest = new Map();
+  if (names.length === 0) return newest;
+  const versions = new Map(
+    await Promise.all(names.map(async (name) => [name, await fetchNewestVersion(name)])),
   );
-  process.exit(1);
+  const answer = await fetchAdvisories(
+    Object.fromEntries([...versions].map(([name, version]) => [name, [version]])),
+  );
+  for (const [name, version] of versions) {
+    newest.set(name, {
+      version,
+      ghsas: new Set((answer[name] ?? []).map((advisory) => ghsaOf(advisory))),
+    });
+  }
+  return newest;
 }
-console.info(
-  `[bulk-audit] OK — ${audited.size} ${scope} packages, ${reported} advisory(ies) reported, none at ${levelFlag}+.`,
-);
+
+async function main() {
+  const args = process.argv.slice(2);
+  const prodOnly = args.includes('--prod');
+  const level = args.includes('--level')
+    ? (args[args.indexOf('--level') + 1] ?? 'high')
+    : 'high';
+  if (!SEVERITY_RANK.has(level)) {
+    console.error(`[bulk-audit] unknown --level "${level}" (low|moderate|high|critical)`);
+    process.exit(1);
+  }
+
+  const { entries: accepted, problems } = readAcceptedAdvisories(
+    readFileSync(resolve(process.cwd(), 'pnpm-workspace.yaml'), 'utf8'),
+  );
+  if (problems.length > 0) {
+    for (const problem of problems) console.error(`  ${problem}`);
+    console.error(
+      `[bulk-audit] auditConfig.ignoreGhsas in pnpm-workspace.yaml breaks the accepted-advisory policy (${problems.length} problem(s)).`,
+    );
+    process.exit(1);
+  }
+
+  const lockText = readFileSync(resolve(process.cwd(), 'pnpm-lock.yaml'), 'utf8');
+  const { allPackages, snapshotDeps, prodRoots } = parseLockfile(lockText);
+  const audited = prodOnly ? prodReachable(prodRoots, snapshotDeps) : allPackages;
+
+  if (audited.size === 0) {
+    console.error('[bulk-audit] parsed 0 packages from pnpm-lock.yaml — parser drift?');
+    process.exit(1);
+  }
+
+  const payload = Object.fromEntries(
+    [...audited.entries()].map(([name, versions]) => [name, [...versions]]),
+  );
+
+  let advisories;
+  let newest;
+  try {
+    /** @type {Record<string, Array<{id: number, title: string, severity: string, url: string, vulnerable_versions: string}>>} */
+    advisories = await fetchAdvisories(payload);
+    newest = await checkNewestReleases(advisories, accepted);
+  } catch (error) {
+    console.error(
+      `[bulk-audit] ${error instanceof Error ? error.message : String(error)} — failing loud.`,
+    );
+    process.exit(1);
+  }
+
+  const verdict = judgeAudit({ advisories, audited, level, accepted, newest, prodOnly });
+  for (const line of verdict.failing) console.error(`  ${line}`);
+  for (const line of verdict.belowThreshold) console.info(`  (below threshold) ${line}`);
+  for (const line of verdict.accepted) console.info(`  ${line}`);
+  for (const problem of verdict.acceptanceProblems) console.error(`  ${problem}`);
+
+  const scope = prodOnly ? 'prod-reachable' : 'all';
+  const reported = Object.values(advisories).reduce(
+    (sum, entries) => sum + entries.length,
+    0,
+  );
+  if (verdict.failing.length > 0) {
+    console.error(
+      `[bulk-audit] ${verdict.failing.length} advisory(ies) at ${level}+ across ${audited.size} ${scope} packages — fix or pin (overrides in pnpm-workspace.yaml).`,
+    );
+  }
+  if (verdict.acceptanceProblems.length > 0) {
+    console.error(
+      `[bulk-audit] auditConfig.ignoreGhsas in pnpm-workspace.yaml is out of date (${verdict.acceptanceProblems.length} entry problem(s)) — an accepted advisory must have no fix published.`,
+    );
+  }
+  if (verdict.failing.length > 0 || verdict.acceptanceProblems.length > 0)
+    process.exit(1);
+  const acceptedNote =
+    verdict.accepted.length > 0
+      ? `, ${verdict.accepted.length} accepted (no fix published, auditConfig.ignoreGhsas)`
+      : '';
+  const none = verdict.accepted.length > 0 ? 'none other' : 'none';
+  console.info(
+    `[bulk-audit] OK — ${audited.size} ${scope} packages, ${reported} advisory(ies) reported${acceptedNote}, ${none} at ${level}+.`,
+  );
+}
+
+if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
+  await main();
+}
