@@ -10,7 +10,6 @@ import type * as TreatmentsApiModule from '@/shared/api/app/treatments-api.ts';
 import { createTreatment, updateTreatment } from '@/shared/api/app/treatments-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
-import { withoutBidiMarks } from '@/tests/utils/bidi-marks.ts';
 import { offeringRecord } from '@/tests/utils/offering-doubles.ts';
 import { patientFile } from '@/tests/utils/patient-doubles.ts';
 
@@ -152,11 +151,10 @@ describe('Treatment drawer (KICKOFF §6.6; S:38–39)', () => {
     expect(within(drawer).getByTestId('treatment-drawer-name')).toHaveValue(
       'LHR Full Face',
     );
-    expect(
-      withoutBidiMarks(
-        within(drawer).getByTestId('treatment-drawer-step-session').textContent,
-      ),
-    ).toMatch(/LHR Full Face · 2 · /);
+    expect(within(drawer).getByTestId('treatment-drawer-step-session')).toHaveAttribute(
+      'data-status',
+      'open',
+    );
     const fill = within(drawer).getByTestId('treatment-drawer-quick-fill');
     expect(
       within(fill).getByRole('button', { name: /Next session of LHR Full Face/ }),

@@ -165,7 +165,9 @@ describe('OfferDrawer — New offer (POST /app/offers)', () => {
     expect(within(stepOf('offer')).getByText('Offer')).toBeVisible();
     expect(within(stepOf('where')).getByText('Where it applies')).toBeVisible();
     expect(within(stepOf('notes')).getByText('Notes')).toBeVisible();
-    expect(stepOf('where')).toHaveTextContent('Missing: Offerings');
+    // Not reached yet: not flagged until it is opened or a save is tried.
+    expect(stepOf('where')).toHaveAttribute('data-status', 'later');
+    expect(stepOf('where')).not.toHaveTextContent('Missing: Offerings');
     expect(part('summary')).toHaveTextContent('New offer · 10% off');
     expect(part('save')).toHaveTextContent('Create offer');
     expect(screen.queryByTestId(`${D}-save-and-add`)).not.toBeInTheDocument();

@@ -10,7 +10,6 @@ const STEPS: DrawerStep[] = [
   {
     id: 'contact',
     title: 'Contact & personal',
-    summary: 'Priya · Shah',
     peek: [
       { kind: 'value', label: 'First name', value: 'Priya' },
       { kind: 'value', label: 'Mobile' },
@@ -35,6 +34,9 @@ const STEPS: DrawerStep[] = [
           { label: 'Acne' },
         ],
       },
+      { kind: 'value', label: 'Status' },
+      { kind: 'value', label: 'Patient type' },
+      { kind: 'value', label: 'Referred by' },
     ],
     content: <p>clinic body</p>,
   },
@@ -58,7 +60,13 @@ const STEPS: DrawerStep[] = [
   },
 ];
 
-function Steps({ initial = 'contact' }: { initial?: string }) {
+function Steps({
+  initial = 'contact',
+  revealMissing,
+}: {
+  initial?: string;
+  revealMissing?: boolean;
+}) {
   const [value, setValue] = useState(initial);
   return (
     <DrawerSteps
@@ -66,6 +74,7 @@ function Steps({ initial = 'contact' }: { initial?: string }) {
       value={value}
       onValueChange={setValue}
       tone="sky"
+      revealMissing={revealMissing}
       testId="pt"
     />
   );
@@ -73,43 +82,98 @@ function Steps({ initial = 'contact' }: { initial?: string }) {
 
 const card = (id: string) => screen.getByTestId(`pt-step-${id}`);
 const trigger = (id: string) => screen.getByTestId(`pt-step-${id}-trigger`);
+const chevron = (id: string) => trigger(id).querySelector('[data-slot="step-chevron"]');
 
 describe('DrawerSteps', () => {
-  it('opens the first step: its body, its summary line and "Next: <step> →"', () => {
+  it('opens the first step: its body and "Next: <step> →", no sub line, no hint', () => {
     render(<Steps />);
 
     expect(card('contact')).toHaveAttribute('data-status', 'open');
     expect(card('contact')).toHaveAttribute('data-state', 'open');
     expect(screen.getByLabelText('First name')).toBeInTheDocument();
-    expect(within(trigger('contact')).getByText('Priya · Shah')).toBeInTheDocument();
     expect(screen.getByTestId('pt-step-contact-next')).toHaveTextContent(
       'Next: Clinic, referral & follow-up →',
     );
-    // An open card shows no peek and no hint.
+    // An open card shows no peek, no sub line and no hint — its fields are right there.
     expect(screen.queryByTestId('pt-step-contact-peek')).not.toBeInTheDocument();
     expect(within(trigger('contact')).queryByText('Open')).not.toBeInTheDocument();
+    expect(within(trigger('contact')).queryByText('Priya')).not.toBeInTheDocument();
+    // Its chevron points up: it folds away.
+    expect(chevron('contact')).toHaveClass('rotate-180');
   });
 
-  it('marks a later step with a missing required field with "!" and names the fields', () => {
+  it('never flags a step the user has not reached: a grey number and "Open"', () => {
     render(<Steps />);
+
+    expect(card('clinic')).toHaveAttribute('data-status', 'later');
+    expect(within(trigger('clinic')).getByText('2')).toBeInTheDocument();
+    expect(within(trigger('clinic')).queryByText('!')).not.toBeInTheDocument();
+    expect(within(trigger('clinic')).queryByText(/^Missing:/)).not.toBeInTheDocument();
+    expect(within(trigger('clinic')).getByText('Open')).toBeInTheDocument();
+    expect(chevron('clinic')).not.toHaveClass('rotate-180');
+  });
+
+  it('flags a reached step with an empty required field: "!", "Missing: …" in red, "Edit"', async () => {
+    const user = userEvent.setup();
+    render(<Steps />);
+
+    await user.click(screen.getByTestId('pt-step-contact-next'));
+    await user.click(trigger('clinic'));
 
     expect(card('clinic')).toHaveAttribute('data-status', 'missing');
     expect(within(trigger('clinic')).getByText('!')).toBeInTheDocument();
-    expect(
-      within(trigger('clinic')).getByText('Missing: Status, Patient type'),
-    ).toBeInTheDocument();
-    expect(within(trigger('clinic')).getByText('Open')).toBeInTheDocument();
+    const line = within(trigger('clinic')).getByText('Missing: Status, Patient type');
+    expect(line).toHaveClass('text-destructive');
+    expect(within(trigger('clinic')).getByText('Edit')).toBeInTheDocument();
+    // The missing fields are named once — not again in "Not filled".
+    const peek = screen.getByTestId('pt-step-clinic-peek');
+    expect(within(peek).getByText('Not filled: Referred by')).toBeInTheDocument();
   });
 
-  it('numbers the later steps and offers to open them', () => {
+  it('flags every step with an empty required field once a save was tried', () => {
+    render(<Steps revealMissing />);
+
+    expect(card('clinic')).toHaveAttribute('data-status', 'missing');
+    expect(card('notes')).toHaveAttribute('data-status', 'later');
+  });
+
+  it('reads a step that holds something as done before it is reached — a saved record, a default', () => {
     render(<Steps />);
 
-    expect(card('items')).toHaveAttribute('data-status', 'later');
-    expect(within(trigger('items')).getByText('3')).toBeInTheDocument();
-    expect(within(trigger('items')).getByText('Open')).toBeInTheDocument();
+    expect(card('items')).toHaveAttribute('data-status', 'done');
+    expect(within(trigger('items')).getByText('Edit')).toBeInTheDocument();
+    // Nothing in it and never opened: later.
+    expect(card('notes')).toHaveAttribute('data-status', 'later');
   });
 
-  it('peeks a multi-select as four pills then "+N"', () => {
+  it('summarises a collapsed step as label / value pairs and one "Not filled" line', async () => {
+    const user = userEvent.setup();
+    render(<Steps />);
+
+    await user.click(trigger('items'));
+
+    const peek = screen.getByTestId('pt-step-contact-peek');
+    expect(within(peek).getByText('First name')).toBeInTheDocument();
+    expect(within(peek).getByText('Priya')).toBeInTheDocument();
+    expect(within(peek).getByText('New')).toHaveAttribute('data-slot', 'pill');
+    // No dashed tile per empty field: they fold into one muted line.
+    expect(within(peek).queryByText('Empty')).not.toBeInTheDocument();
+    expect(within(peek).getByText('Not filled: Mobile')).toBeInTheDocument();
+    expect(peek.querySelector('.border-dashed')).toBeNull();
+    // No sub line under the head while the summary says it all.
+    expect(
+      within(trigger('contact')).queryByText(/Not filled yet/),
+    ).not.toBeInTheDocument();
+  });
+
+  it('reads "Not filled yet" on a step that holds nothing, with no summary under it', () => {
+    render(<Steps />);
+
+    expect(within(trigger('notes')).getByText('Not filled yet')).toBeInTheDocument();
+    expect(screen.queryByTestId('pt-step-notes-peek')).not.toBeInTheDocument();
+  });
+
+  it('shows a multi-select as four pills then "+N"', () => {
     render(<Steps />);
 
     const peek = screen.getByTestId('pt-step-clinic-peek');
@@ -121,7 +185,7 @@ describe('DrawerSteps', () => {
     expect(within(peek).getByText('+2')).toBeInTheDocument();
   });
 
-  it('peeks an items table as "<N> added", six names then "+N" — or "None yet"', () => {
+  it('shows an items table as "<N> added", six names then "+N"', () => {
     render(<Steps />);
 
     const items = screen.getByTestId('pt-step-items-peek');
@@ -129,9 +193,30 @@ describe('DrawerSteps', () => {
     expect(within(items).getByText('F')).toBeInTheDocument();
     expect(within(items).queryByText('G')).not.toBeInTheDocument();
     expect(within(items).getByText('+2')).toBeInTheDocument();
+  });
 
-    const notes = screen.getByTestId('pt-step-notes-peek');
-    expect(within(notes).getByText('Photos · None yet')).toBeInTheDocument();
+  it('shows six filled pairs, then "+N more"', () => {
+    const many: DrawerStep[] = [
+      { id: 'open', title: 'Open', content: <p>open body</p> },
+      {
+        id: 'many',
+        title: 'Many',
+        peek: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'].map((label) => ({
+          kind: 'value' as const,
+          label,
+          value: `${label} value`,
+        })),
+        content: null,
+      },
+    ];
+    render(
+      <DrawerSteps steps={many} value="open" onValueChange={() => {}} testId="pt" />,
+    );
+
+    const peek = screen.getByTestId('pt-step-many-peek');
+    expect(within(peek).getByText('F value')).toBeInTheDocument();
+    expect(within(peek).queryByText('G value')).not.toBeInTheDocument();
+    expect(within(peek).getByText('+2 more')).toBeInTheDocument();
   });
 
   it('keeps every pill when values repeat — two rows of one offering, two members of one name', () => {
@@ -189,53 +274,71 @@ describe('DrawerSteps', () => {
     expect(within(trigger('clinic')).queryByText(/^Missing:/)).not.toBeInTheDocument();
   });
 
-  it('shows a collapsed step’s peek, with "Empty" on a dashed tile for a blank field', async () => {
-    const user = userEvent.setup();
+  it('lets a closed card be opened anywhere — its head stretches over the summary — and lifts on hover', () => {
     render(<Steps />);
 
-    await user.click(trigger('items'));
-
-    const peek = screen.getByTestId('pt-step-contact-peek');
-    expect(within(peek).getByText('Priya')).toBeInTheDocument();
-    expect(within(peek).getByText('Empty').parentElement).toHaveClass('border-dashed');
-    expect(within(peek).getByText('New')).toHaveAttribute('data-slot', 'pill');
-    // With a peek, the summary line gives way to it.
-    expect(
-      within(trigger('contact')).queryByText('Priya · Shah'),
-    ).not.toBeInTheDocument();
-  });
-
-  it('lets a closed card be opened anywhere — its head stretches over the peek', () => {
-    render(<Steps />);
-
-    expect(card('items')).toHaveClass('relative');
+    expect(card('items')).toHaveClass(
+      'relative',
+      'data-[state=closed]:hover:border-border-strong',
+    );
     expect(trigger('items')).toHaveClass(
       'data-[state=closed]:after:absolute',
       'data-[state=closed]:after:inset-0',
     );
   });
 
-  it('collapses the open step and keeps the steps already passed done', async () => {
+  it('collapses the open step: a reached step reads done, an untouched one stays later', async () => {
     const user = userEvent.setup();
-    render(<Steps initial="items" />);
+    render(<Steps />);
 
-    await user.click(trigger('items'));
+    await user.click(trigger('contact'));
 
-    expect(card('items')).toHaveAttribute('data-state', 'closed');
-    expect(card('items')).toHaveAttribute('data-status', 'done');
+    expect(card('contact')).toHaveAttribute('data-state', 'closed');
     expect(card('contact')).toHaveAttribute('data-status', 'done');
     expect(card('notes')).toHaveAttribute('data-status', 'later');
   });
 
-  it('fills the open step’s circle with the section tone’s ink', () => {
-    render(<Steps />);
+  it('fills the open step’s circle with the section tone’s ink, even when it is complete', () => {
+    render(
+      <DrawerSteps
+        steps={[{ ...STEPS[0]!, complete: true }, STEPS[1]!]}
+        value="contact"
+        onValueChange={() => {}}
+        tone="sky"
+        testId="pt"
+      />,
+    );
 
     const circle = trigger('contact').querySelector('[data-slot="pill"]');
     expect(circle).toHaveClass('bg-tone-sky-foreground', 'text-background');
     expect(circle).toHaveTextContent('1');
   });
 
-  it('keeps a locked step shut: its hint, a grey number, the attempt instead of opening', async () => {
+  it('reads a collapsed `complete` step without a peek as done', () => {
+    render(
+      <DrawerSteps
+        steps={[
+          { id: 'open', title: 'Open', content: <p>a</p> },
+          {
+            id: 'view',
+            title: 'Report',
+            complete: true,
+            summary: 'Lab · 2 files',
+            content: null,
+          },
+        ]}
+        value="open"
+        onValueChange={() => {}}
+        testId="rv"
+      />,
+    );
+
+    const view = screen.getByTestId('rv-step-view-trigger');
+    expect(screen.getByTestId('rv-step-view')).toHaveAttribute('data-status', 'done');
+    expect(view).toHaveTextContent('Lab · 2 files');
+  });
+
+  it('keeps a locked step shut: its hint, a grey lock, no chevron, the attempt instead of opening', async () => {
     const user = userEvent.setup();
     const attempts: string[] = [];
     const steps: DrawerStep[] = [
@@ -254,6 +357,7 @@ describe('DrawerSteps', () => {
         value="contact"
         onValueChange={() => {}}
         tone="lav"
+        collapsible={false}
         testId="nl"
       />,
     );
@@ -262,10 +366,18 @@ describe('DrawerSteps', () => {
     expect(locked).toHaveAttribute('aria-disabled', 'true');
     expect(locked).toHaveTextContent('After contact');
     expect(locked).toHaveTextContent('Source, interest and who handles it');
+    expect(locked).toHaveTextContent('Step 2 of 2 · Locked');
     expect(locked.querySelector('[data-slot="pill"]')).toHaveClass(
       'bg-border',
       'text-disabled',
     );
+    expect(locked.querySelector('[data-slot="step-chevron"]')).toBeNull();
+    // The open step that cannot fold away shows no chevron either.
+    expect(
+      screen
+        .getByTestId('nl-step-contact-trigger')
+        .querySelector('[data-slot="step-chevron"]'),
+    ).toBeNull();
     // The open step before it offers no "Next" into a locked one.
     expect(screen.queryByTestId('nl-step-contact-next')).toBeNull();
 
@@ -274,29 +386,12 @@ describe('DrawerSteps', () => {
     expect(screen.getByTestId('nl-step-details')).toHaveAttribute('data-state', 'closed');
   });
 
-  it('turns a filled-in step’s circle green, open or not', () => {
-    render(
-      <DrawerSteps
-        steps={[
-          {
-            id: 'identity',
-            title: 'Identity & reach',
-            complete: true,
-            content: <p>a</p>,
-          },
-          { id: 'preferences', title: 'Contact preferences', content: <p>b</p> },
-        ]}
-        value="identity"
-        onValueChange={() => {}}
-        tone="stone"
-        testId="ce"
-      />,
-    );
-    const circle = (id: string) =>
-      screen.getByTestId(`ce-step-${id}-trigger`).querySelector('[data-slot="pill"]');
-    expect(circle('identity')).toHaveClass('bg-success');
-    expect(circle('identity')).toHaveTextContent('1');
-    expect(circle('preferences')).not.toHaveClass('bg-success');
+  it('reads out each step’s place and state, which the circle shows in colour', () => {
+    render(<Steps />);
+
+    expect(trigger('contact')).toHaveTextContent('Step 1 of 4 · In progress');
+    expect(trigger('clinic')).toHaveTextContent('Step 2 of 4 · Not started');
+    expect(trigger('items')).toHaveTextContent('Step 3 of 4 · Complete');
   });
 
   it('has no accessibility violations', async () => {

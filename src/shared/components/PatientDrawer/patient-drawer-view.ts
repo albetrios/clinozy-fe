@@ -13,13 +13,9 @@ import {
   PATIENT_STATUS_TONES,
   PATIENT_TYPE_TONES,
 } from '@/shared/app/app-tones.ts';
-import {
-  type DrawerPeekItem,
-  drawerStepSummary,
-} from '@/shared/components/DrawerSteps/index.ts';
+import type { DrawerPeekItem } from '@/shared/components/DrawerSteps/index.ts';
 import { PERSON_CARD_KEYS } from '@/shared/components/PersonCard/person-card.constants.ts';
 import type { DrawerBadge } from '@/shared/components/RecordDrawer/index.ts';
-import { RECORD_DRAWER_KEYS } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
 import { PATIENT_DRAWER_KEYS, PATIENT_DRAWER_NS } from './patient-drawer.constants.ts';
@@ -55,8 +51,8 @@ export interface PatientDrawerView {
   summary: string;
   /** Each type, the status, and "28 yrs". */
   badges: DrawerBadge[];
-  contact: { peek: DrawerPeekItem[]; summary: string; missing: string[] };
-  clinic: { peek: DrawerPeekItem[]; summary: string };
+  contact: { peek: DrawerPeekItem[]; missing: string[] };
+  clinic: { peek: DrawerPeekItem[] };
 }
 
 function formatFollowUp(values: PatientFormValues, formatDate: FormatDate) {
@@ -190,7 +186,7 @@ function drawerBadges(
 /**
  * What the drawer shows of its form outside the fields (`patients.md:91–103`,
  * H:3832–3852): the badge strip, the footer summary, and each step's peek
- * grid, head summary ("Not filled yet" before anything is) and missing fields.
+ * grid and missing fields.
  */
 export function usePatientDrawerView({
   values,
@@ -207,18 +203,6 @@ export function usePatientDrawerView({
   const { formatDate } = useLocaleFormat();
   const labels = patientFormLabels(values, today, t, formatDate);
   const storedPhone = toAppPhone(values.phone);
-  const notFilled = t(RECORD_DRAWER_KEYS.step.notFilled);
-
-  const contactPeek = contactPeekOf(
-    values,
-    labels,
-    {
-      shown: branches.length > 1,
-      picked: branches.find((branch) => branch.id === homeBranchId),
-    },
-    t,
-  );
-  const clinicPeek = clinicPeekOf(values, labels, t);
 
   return {
     labels,
@@ -230,30 +214,19 @@ export function usePatientDrawerView({
     ]),
     badges: drawerBadges(values, labels, t),
     contact: {
-      peek: contactPeek,
-      summary: drawerStepSummary(
-        contactPeek.map((item) => (item.kind === 'value' ? item.value : undefined)),
-        notFilled,
+      peek: contactPeekOf(
+        values,
+        labels,
+        {
+          shown: branches.length > 1,
+          picked: branches.find((branch) => branch.id === homeBranchId),
+        },
+        t,
       ),
       missing: missingPatientFields(values).map((field) =>
         field === 'firstName' ? t(K.fields.firstName) : t(K.fields.mobile),
       ),
     },
-    clinic: {
-      peek: clinicPeek,
-      summary: drawerStepSummary(
-        [
-          labels.types.join(', '),
-          labels.status,
-          labels.conversion,
-          values.referredByName.trim(),
-          labels.referrer,
-          labels.followUp,
-          values.notes.trim(),
-          labels.consents.join(', '),
-        ],
-        notFilled,
-      ),
-    },
+    clinic: { peek: clinicPeekOf(values, labels, t) },
   };
 }

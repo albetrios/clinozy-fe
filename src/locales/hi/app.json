@@ -360,13 +360,22 @@
       "edit": "संपादित करें",
       "open": "खोलें",
       "missing": "बाकी: {{fields, list(type: unit)}}",
-      "notFilled": "अभी भरा नहीं गया"
+      "notFilled": "अभी भरा नहीं गया",
+      "position": "चरण {{number}} / {{total}}",
+      "state": {
+        "open": "जारी है",
+        "done": "पूरा",
+        "missing": "ध्यान देना ज़रूरी",
+        "later": "शुरू नहीं हुआ",
+        "locked": "लॉक"
+      }
     },
     "peek": {
-      "empty": "खाली",
       "added_one": "{{count}} जोड़ा गया",
       "added_other": "{{count}} जोड़े गए",
-      "noneYet": "अभी कोई नहीं"
+      "more_one": "+{{count}} और",
+      "more_other": "+{{count}} और",
+      "notFilled": "नहीं भरा: {{fields, list(type: unit)}}"
     },
     "stepper": {
       "decrease": "घटाएँ",
@@ -1025,8 +1034,6 @@
     },
     "details": {
       "title": "अपॉइंटमेंट",
-      "notFilled": "अभी भरा नहीं",
-      "open": "खोलें",
       "type": "प्रकार",
       "typeGroup": "अपॉइंटमेंट का प्रकार",
       "types": {
@@ -1072,6 +1079,7 @@
       "nextMonth": "अगला महीना",
       "step": "स्लॉट अंतराल",
       "stepOption": "{{minutes}} मिनट",
+      "date": "तारीख",
       "time": "समय",
       "pickDate": "समय देखने के लिए तारीख़ चुनें",
       "none": "इस दिन बुक करने के लिए कोई समय नहीं · दूसरी तारीख़ चुनें",

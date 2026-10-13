@@ -361,14 +361,24 @@
       "edit": "Modifica",
       "open": "Apri",
       "missing": "Mancano: {{fields, list(type: unit)}}",
-      "notFilled": "Non ancora compilato"
+      "notFilled": "Non ancora compilato",
+      "position": "Passo {{number}} di {{total}}",
+      "state": {
+        "open": "In corso",
+        "done": "Completato",
+        "missing": "Richiede attenzione",
+        "later": "Non iniziato",
+        "locked": "Bloccato"
+      }
     },
     "peek": {
-      "empty": "Vuoto",
       "added_one": "{{count}} aggiunto",
       "added_many": "{{count}} aggiunti",
       "added_other": "{{count}} aggiunti",
-      "noneYet": "Nessuno per ora"
+      "more_one": "+{{count}} altro",
+      "more_many": "+{{count}} altri",
+      "more_other": "+{{count}} altri",
+      "notFilled": "Non compilato: {{fields, list(type: unit)}}"
     },
     "stepper": {
       "decrease": "Diminuisci",
@@ -1039,8 +1049,6 @@
     },
     "details": {
       "title": "Appuntamento",
-      "notFilled": "Non ancora compilato",
-      "open": "Apri",
       "type": "Tipo",
       "typeGroup": "Tipo di appuntamento",
       "types": {
@@ -1086,6 +1094,7 @@
       "nextMonth": "Mese successivo",
       "step": "Intervallo",
       "stepOption": "{{minutes}} min",
+      "date": "Data",
       "time": "Ora",
       "pickDate": "Scegli una data per vedere gli orari",
       "none": "Nessun orario prenotabile in questo giorno · scegli un’altra data",

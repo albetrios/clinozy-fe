@@ -16,15 +16,8 @@ import {
   CHECKIN_FOLLOWED_TONES,
   OFFERING_CATEGORY_TONES,
 } from '@/shared/app/app-tones.ts';
-import {
-  type DrawerPeekItem,
-  drawerStepSummary,
-} from '@/shared/components/DrawerSteps/index.ts';
+import type { DrawerPeekItem } from '@/shared/components/DrawerSteps/index.ts';
 import type { PickerOption } from '@/shared/components/Picker/index.ts';
-import {
-  RECORD_DRAWER_KEYS,
-  RECORD_DRAWER_NS,
-} from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 
@@ -35,9 +28,8 @@ import type { CheckInStepId } from './use-check-in-save.ts';
 
 const K = CHECK_IN_KEYS;
 
-/** A step head's words: its sub line and its collapsed peek. */
+/** A step head's words: its collapsed peek. */
 export interface CheckInStepView {
-  summary: string;
   peek: DrawerPeekItem[];
 }
 
@@ -120,9 +112,8 @@ export function useCheckInOfferingOptions(
 }
 
 /**
- * Each step head's sub line — its first filled values (H:3840 `stepSum`) —
- * and its collapsed peek: the feel and the score in their tones, the words;
- * how far the advice was followed and the details; the plan and the
+ * Each step head's collapsed peek: the feel and the score in their tones, the
+ * words; how far the advice was followed and the details; the plan and the
  * offerings it names.
  */
 export function useCheckInStepsView(
@@ -130,8 +121,6 @@ export function useCheckInStepsView(
   named: readonly PickerOption<CheckInOffering>[],
 ): Record<CheckInStepId, CheckInStepView> {
   const { t } = useTranslation([CHECK_IN_NS, APP_NS]);
-  const { t: tDrawer } = useTranslation(RECORD_DRAWER_NS);
-  const notFilled = tDrawer(RECORD_DRAWER_KEYS.step.notFilled);
   const feelOf = (feel: CheckinFeel) => t(APP_KEYS.checkInFeels[feel], { ns: APP_NS });
   const feel = values.feel ? feelOf(values.feel) : '';
   const score = values.score > 0 ? String(values.score) : '';
@@ -141,7 +130,6 @@ export function useCheckInStepsView(
   const plan = values.nextPlan.trim();
   return {
     now: {
-      summary: drawerStepSummary([feel, score, now], notFilled),
       peek: [
         {
           kind: 'value',
@@ -159,7 +147,6 @@ export function useCheckInStepsView(
       ],
     },
     followed: {
-      summary: drawerStepSummary([followed, details], notFilled),
       peek: [
         {
           kind: 'value',
@@ -171,10 +158,6 @@ export function useCheckInStepsView(
       ],
     },
     next: {
-      summary: drawerStepSummary(
-        [plan, named.map((option) => option.label).join(', ')],
-        notFilled,
-      ),
       peek: [
         { kind: 'value', label: t(K.plan), value: plan || undefined },
         {

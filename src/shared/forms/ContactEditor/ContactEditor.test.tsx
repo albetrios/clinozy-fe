@@ -116,7 +116,8 @@ describe('ContactEditor', () => {
     expect(within(band).getByText('Priya Mehta')).toBeInTheDocument();
     expect(within(band).getByText('Contact')).toBeInTheDocument();
     expect(within(band).getByText('PM')).toBeInTheDocument();
-    // "Identity & reach" turns green once there is a first name.
+    // "Identity & reach" reads done once there is a first name and it is folded away.
+    await user.click(screen.getByTestId('contact-editor-step-preferences-trigger'));
     expect(circle()).toHaveClass('bg-success');
   });
 
@@ -201,10 +202,10 @@ describe('ContactEditor', () => {
       'aria-pressed',
       'false',
     );
-    // Collapsed, Identity & reach names the contact.
-    expect(screen.getByTestId('contact-editor-step-identity')).toHaveTextContent(
-      'Rhea Shah',
-    );
+    // Collapsed, Identity & reach shows the contact's name.
+    const identity = screen.getByTestId('contact-editor-step-identity-peek');
+    expect(within(identity).getByText('Rhea')).toBeInTheDocument();
+    expect(within(identity).getByText('Shah')).toBeInTheDocument();
 
     await user.click(within(group).getByRole('button', { name: 'Hindi' }));
     await user.click(within(group).getByRole('button', { name: 'No calls' }));

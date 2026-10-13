@@ -359,12 +359,20 @@
       "edit": "編集",
       "open": "開く",
       "missing": "未入力: {{fields, list(type: unit)}}",
-      "notFilled": "未入力"
+      "notFilled": "未入力",
+      "position": "ステップ {{number}}/{{total}}",
+      "state": {
+        "open": "入力中",
+        "done": "完了",
+        "missing": "要確認",
+        "later": "未着手",
+        "locked": "ロック中"
+      }
     },
     "peek": {
-      "empty": "空欄",
       "added_other": "{{count}} 件追加",
-      "noneYet": "まだありません"
+      "more_other": "ほか {{count}} 件",
+      "notFilled": "未入力: {{fields, list(type: unit)}}"
     },
     "stepper": {
       "decrease": "減らす",
@@ -1011,8 +1019,6 @@
     },
     "details": {
       "title": "予約",
-      "notFilled": "未入力",
-      "open": "開く",
       "type": "種類",
       "typeGroup": "予約の種類",
       "types": {
@@ -1058,6 +1064,7 @@
       "nextMonth": "次の月",
       "step": "枠の間隔",
       "stepOption": "{{minutes}} 分",
+      "date": "日付",
       "time": "時刻",
       "pickDate": "日付を選ぶと時刻が表示されます",
       "none": "この日は予約できる時間がありません · 別の日付を選んでください",

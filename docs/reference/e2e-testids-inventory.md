@@ -585,7 +585,7 @@ Below, `<d>` is that root id.
 | `<d>-body`                                             | Scrolling body                                                                                                                 | RecordDrawer                           |
 | `<d>-quick-fill` / `<d>-quick-fill-<id>`               | "Quick fill" row and one preset chip                                                                                           | `shared/components/QuickFillRow/`      |
 | `<d>-steps` / `<d>-step-<id>`                          | Step accordion and one card (`data-status`: open · done · missing · later)                                                     | `shared/components/DrawerSteps/`       |
-| `<d>-step-<id>-trigger` / `-peek` / `-next`            | Card head, collapsed peek, the "Next: … →" button                                                                              | DrawerSteps                            |
+| `<d>-step-<id>-trigger` / `-peek` / `-next`            | Card head, collapsed summary (label / value pairs, "Not filled: …"), the "Next: … →" button                                    | DrawerSteps                            |
 | `<d>-footer` / `<d>-summary`                           | Footer and its summary                                                                                                         | `shared/components/DrawerFooter/`      |
 | `<d>-start`                                            | The footer's start controls (`footerStart` — the task drawer's Snooze, Assigned)                                               | DrawerFooter                           |
 | `<d>-main` / `<d>-aside`                               | The form and the column at the inline end (`aside`); on a phone the column's pane                                              | RecordDrawer                           |
@@ -1029,24 +1029,24 @@ booking) or `appointment-drawer` (Edit, Reschedule), with the drawer's derived i
 `-main`, `-aside`). The type, length and status chips carry `<id>-<value>`; the treatment, package
 and doctor pickers the shared picker ids; Cancel visit and Delete photo the shared reason confirm.
 
-| Test ID                                                                                | Element                                                                                   | Source                      |
-| -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | --------------------------- |
-| `appointment-form`                                                                     | The form's sections (a size container — under 520px the fields stack)                     | `AppointmentForm.tsx`       |
-| `appointment-form-who-search` · `-who-hit` · `-who-create`                             | Person search · one hit · "+ Create contact “<query>”"                                    | `WhoSection.tsx`            |
-| `appointment-form-who-card` · `-who-mobile`                                            | The person's card · a new contact's "+91" mobile                                          | `WhoSection.tsx`            |
-| `appointment-form-who-edit` · `-who-edit-name` · `-who-edit-mobile` · `-who-edit-save` | The inline Name · Mobile editor ("Edit" on the contact card) and its Save                 | `WhoSection.tsx`            |
-| `appointment-form-connected-lead`                                                      | The person's open lead as a "Connected lead" chip                                         | `WhoSection.tsx`            |
-| `appointment-form-status` · `-status-<status>` · `-status-hint`                        | Visit status (Edit): the section · one tile (`data-step`) · the hint line                 | `VisitStatusSection.tsx`    |
-| `appointment-form-cancelled` · `-restore` · `-rescheduled`                             | Cancelled banner · its Restore · the "Rescheduled · was …" note                           | `VisitStatusSection.tsx`    |
-| `appointment-form-copy` · `-rebook` · `-cancel-visit`                                  | Copy (Rebook for a No-show) · Cancel visit                                                | `VisitStatusSection.tsx`    |
-| `appointment-form-details` · `-details-toggle`                                         | Step 1 Appointment (`data-open`) · its head                                               | `AppointmentFormBlocks.tsx` |
-| `appointment-form-type` · `-treatment`                                                 | Type chips · treatment picker                                                             | `AppointmentDetails.tsx`    |
-| `appointment-form-doctor` · `-length` · `-reason` · `-notes`                           | Doctor picker · length chips · Reason · Notes                                             | `AppointmentDetails.tsx`    |
-| `appointment-form-slot` · `-slot-toggle`                                               | Step 2 Date & time (`data-open`; locked after check-in) · its head                        | `AppointmentFormBlocks.tsx` |
-| `appointment-form-quick-<today\|tomorrow\|next-week>`                                  | Quick dates (`aria-pressed`)                                                              | `DateTimeStep.tsx`          |
-| `appointment-form-calendar` · `-calendar-day` · `-calendar-previous` · `-next`         | Month grid · one day button (`data-day`; its gridcell `aria-selected`) · the month arrows | `DateTimeStep.tsx`          |
-| `appointment-form-slot-step` · `-slot-hour` · `-slot-time` · `-slot-hint`              | "30 min" · "15 min" · one hour row · one free start (`data-time`) · the line in its place | `DateTimeStep.tsx`          |
-| `appointment-form-chat`                                                                | The chat column (Edit, `md` and up)                                                       | `AppointmentForm.tsx`       |
+| Test ID                                                                                | Element                                                                                                | Source                      |
+| -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | --------------------------- |
+| `appointment-form`                                                                     | The form's sections (a size container — under 520px the fields stack)                                  | `AppointmentForm.tsx`       |
+| `appointment-form-who-search` · `-who-hit` · `-who-create`                             | Person search · one hit · "+ Create contact “<query>”"                                                 | `WhoSection.tsx`            |
+| `appointment-form-who-card` · `-who-mobile`                                            | The person's card · a new contact's "+91" mobile                                                       | `WhoSection.tsx`            |
+| `appointment-form-who-edit` · `-who-edit-name` · `-who-edit-mobile` · `-who-edit-save` | The inline Name · Mobile editor ("Edit" on the contact card) and its Save                              | `WhoSection.tsx`            |
+| `appointment-form-connected-lead`                                                      | The person's open lead as a "Connected lead" chip                                                      | `WhoSection.tsx`            |
+| `appointment-form-status` · `-status-<status>` · `-status-hint`                        | Visit status (Edit): the section · one tile (`data-step`) · the hint line                              | `VisitStatusSection.tsx`    |
+| `appointment-form-cancelled` · `-restore` · `-rescheduled`                             | Cancelled banner · its Restore · the "Rescheduled · was …" note                                        | `VisitStatusSection.tsx`    |
+| `appointment-form-copy` · `-rebook` · `-cancel-visit`                                  | Copy (Rebook for a No-show) · Cancel visit                                                             | `VisitStatusSection.tsx`    |
+| `appointment-form-details` · `-details-toggle` · `-details-next` · `-details-peek`     | Step 1 Appointment (`data-open`, `data-status`) · its head · "Next: Date & time →" · collapsed summary | `AppointmentFormBlocks.tsx` |
+| `appointment-form-type` · `-treatment`                                                 | Type chips · treatment picker                                                                          | `AppointmentDetails.tsx`    |
+| `appointment-form-doctor` · `-length` · `-reason` · `-notes`                           | Doctor picker · length chips · Reason · Notes                                                          | `AppointmentDetails.tsx`    |
+| `appointment-form-slot` · `-slot-toggle` · `-slot-peek`                                | Step 2 Date & time (`data-open`, `data-status`; locked after check-in) · its head · collapsed summary  | `AppointmentFormBlocks.tsx` |
+| `appointment-form-quick-<today\|tomorrow\|next-week>`                                  | Quick dates (`aria-pressed`)                                                                           | `DateTimeStep.tsx`          |
+| `appointment-form-calendar` · `-calendar-day` · `-calendar-previous` · `-next`         | Month grid · one day button (`data-day`; its gridcell `aria-selected`) · the month arrows              | `DateTimeStep.tsx`          |
+| `appointment-form-slot-step` · `-slot-hour` · `-slot-time` · `-slot-hint`              | "30 min" · "15 min" · one hour row · one free start (`data-time`) · the line in its place              | `DateTimeStep.tsx`          |
+| `appointment-form-chat`                                                                | The chat column (Edit, `md` and up)                                                                    | `AppointmentForm.tsx`       |
 
 ---
 

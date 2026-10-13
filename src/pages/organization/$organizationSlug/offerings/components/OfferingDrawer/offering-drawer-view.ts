@@ -11,10 +11,7 @@ import {
   effectivePrice,
 } from '@/shared/api/app/offerings-pricing.ts';
 import { OFFERING_CATEGORY_TONES } from '@/shared/app/app-tones.ts';
-import {
-  type DrawerPeekItem,
-  drawerStepSummary,
-} from '@/shared/components/DrawerSteps/index.ts';
+import type { DrawerPeekItem } from '@/shared/components/DrawerSteps/index.ts';
 import type { DrawerBadge } from '@/shared/components/RecordDrawer/index.ts';
 import {
   RECORD_DRAWER_KEYS,
@@ -53,18 +50,11 @@ export interface OfferOnThis {
  */
 export type OfferingStepId = 'offering' | 'time' | 'details';
 
-/** A step card's head: what it peeks while closed, its sub line, and its gaps. */
+/** A step card's head: what it peeks while closed, and its gaps. */
 interface OfferingStepView {
   id: OfferingStepId;
   peek: DrawerPeekItem[];
-  summary: string;
   missing: string[];
-}
-
-/** A group of fields' share of a step head: its peek tiles and the values its sub line names. */
-interface StepPart {
-  peek: DrawerPeekItem[];
-  values: (string | null | undefined)[];
 }
 
 /** What the drawer shows of its form beyond the fields: header, footer and step heads. */
@@ -146,7 +136,6 @@ function validityText(days: number, words: ViewWords): string {
 function mainStepOf(
   values: OfferingFormValues,
   branches: readonly BranchOption[],
-  billedToday: string | null,
   words: ViewWords,
 ): OfferingStepView {
   const { t, tApp, text, formatRupees } = words;
@@ -198,23 +187,6 @@ function mainStepOf(
   return {
     id: 'offering',
     peek,
-    // The head names values, never the colour (H:3840).
-    summary: drawerStepSummary(
-      [
-        values.name.trim(),
-        category,
-        branchesShown
-          ? picked.map((branch) => branch.name).join(', ') || allBranches
-          : undefined,
-        money(price),
-        money(offerPrice),
-        String(values.sessions),
-        gstRate,
-        gst,
-        billedToday,
-      ],
-      tApp(RECORD_DRAWER_KEYS.step.notFilled),
-    ),
     missing: missingOfferingFields(values).map((field) =>
       field === 'name' ? t(F.name) : t(F.price),
     ),
@@ -222,50 +194,34 @@ function mainStepOf(
 }
 
 /** TIME & VALIDITY: Duration · Validity (read-only boxes never peek, H:3834). */
-function timePartOf(values: OfferingFormValues, words: ViewWords): StepPart {
+function timePeekOf(values: OfferingFormValues, words: ViewWords): DrawerPeekItem[] {
   const { t } = words;
-  const duration = t(OFFERINGS_KEYS.cells.minutes, { minutes: values.durationMinutes });
-  const validity = validityText(values.validityDays, words);
-  return {
-    peek: [
-      { kind: 'value', label: t(F.duration), value: duration },
-      { kind: 'value', label: t(F.validity), value: validity },
-    ],
-    values: [duration, validity],
-  };
+  return [
+    {
+      kind: 'value',
+      label: t(F.duration),
+      value: t(OFFERINGS_KEYS.cells.minutes, { minutes: values.durationMinutes }),
+    },
+    {
+      kind: 'value',
+      label: t(F.validity),
+      value: validityText(values.validityDays, words),
+    },
+  ];
 }
 
 /** DETAILS: Search terms · Description · Status. */
-function detailsPartOf(values: OfferingFormValues, words: ViewWords): StepPart {
+function detailsPeekOf(values: OfferingFormValues, words: ViewWords): DrawerPeekItem[] {
   const { t } = words;
-  const status = t(values.isActive ? F.active : F.inactive);
-  const terms = values.searchTerms.trim();
-  const description = values.description.trim();
-  return {
-    peek: [
-      { kind: 'value', label: t(F.searchTerms), value: terms },
-      { kind: 'value', label: t(F.description), value: description },
-      { kind: 'value', label: t(F.status), value: status },
-    ],
-    values: [terms, description, status],
-  };
-}
-
-/** A step made of groups: their peeks and values in order; no required field among them. */
-function stepOf(
-  id: OfferingStepId,
-  parts: readonly StepPart[],
-  words: ViewWords,
-): OfferingStepView {
-  return {
-    id,
-    peek: parts.flatMap((part) => part.peek),
-    summary: drawerStepSummary(
-      parts.flatMap((part) => part.values),
-      words.tApp(RECORD_DRAWER_KEYS.step.notFilled),
-    ),
-    missing: [],
-  };
+  return [
+    { kind: 'value', label: t(F.searchTerms), value: values.searchTerms.trim() },
+    { kind: 'value', label: t(F.description), value: values.description.trim() },
+    {
+      kind: 'value',
+      label: t(F.status),
+      value: t(values.isActive ? F.active : F.inactive),
+    },
+  ];
 }
 
 /** The steps after the first: one for time and details, or two around the offers on this. */
@@ -274,12 +230,17 @@ function laterStepsOf(
   offersOnThis: readonly OfferOnThis[],
   words: ViewWords,
 ): OfferingStepView[] {
-  const time = timePartOf(values, words);
-  const details = detailsPartOf(values, words);
-  if (offersOnThis.length === 0) return [stepOf('time', [time, details], words)];
-  // The offers' boxes are read-only: they name values but never peek.
-  const offers: StepPart = { peek: [], values: offersOnThis.map((entry) => entry.text) };
-  return [stepOf('time', [offers, time], words), stepOf('details', [details], words)];
+  const time = timePeekOf(values, words);
+  const details = detailsPeekOf(values, words);
+  // No required field among them.
+  if (offersOnThis.length === 0) {
+    return [{ id: 'time', peek: [...time, ...details], missing: [] }];
+  }
+  // The offers' boxes are read-only: they never peek.
+  return [
+    { id: 'time', peek: time, missing: [] },
+    { id: 'details', peek: details, missing: [] },
+  ];
 }
 
 /**
@@ -287,7 +248,7 @@ function laterStepsOf(
  * (`offerings.md:131–143, 237–244`; H:5485–5528): the draft priced for the
  * header's branch — "Billed today", the badge strip and the footer summary —
  * the offers that have not ended (three steps while there is one), and each
- * step's peek, head line ("Not filled yet" before anything is) and gaps.
+ * step's peek and gaps.
  */
 export function useOfferingDrawerView({
   values,
@@ -345,7 +306,7 @@ export function useOfferingDrawerView({
       .filter(Boolean)
       .join(' · '),
     steps: [
-      mainStepOf(values, branches, billedToday, words),
+      mainStepOf(values, branches, words),
       ...laterStepsOf(values, offersOnThis, words),
     ],
   };
