@@ -126,7 +126,7 @@ export function ConsentBanner() {
   if (!open) return null;
 
   return (
-    <dialog // NOSONAR(S6847): the dialog's own Escape key (WAI-ARIA dialog), bubbling from its focused control; a document listener would also fire for Escape elsewhere
+    <dialog // NOSONAR(S6847): Escape declines from any control inside, the WAI-ARIA dialog pattern — a non-modal <dialog open> fires no cancel event
       ref={cardRef}
       open
       aria-labelledby={titleId}

@@ -5,11 +5,14 @@ import { OAUTH_PROVIDER_SLUG_PATTERN } from '@/lib/routes/params.ts';
 import { ANALYTICS_EVENTS } from '@/shared/analytics/analytics.constants.ts';
 import { captureAnalyticsEvent } from '@/shared/analytics/capture.ts';
 import { authApi, MfaRequiredError } from '@/shared/api/auth-api.ts';
+import { AUTH_KEYS } from '@/shared/auth/auth-shell.constants.ts';
 import { skipAutoGoogleSignIn } from '@/shared/auth/auto-google-sign-in.ts';
 import { stashMfaHandoff } from '@/shared/auth/mfa-handoff.ts';
 import { popReturnTo } from '@/shared/auth/redirect-safety.ts';
 import { establishSession, silentRefresh } from '@/shared/auth/service.ts';
+import { hasSessionHint } from '@/shared/auth/session-lifetime.ts';
 import { FullPageSpinner } from '@/shared/components/FullPageSpinner/index.ts';
+import { UnauthorizedError } from '@/shared/errors/AppError.ts';
 import { mapFrontendError } from '@/shared/errors/map-frontend-error.ts';
 import { notify } from '@/shared/notify/index.ts';
 
@@ -53,6 +56,26 @@ function readCallbackParams(rawProvider: unknown): {
 }
 
 /**
+ * The no-code fallback: restore a session this browser may still hold.
+ *
+ * With no session hint the browser has never signed in, or has signed out, so
+ * there is nothing on the server to restore — the refresh could only answer 401,
+ * which the browser logs as a console error on every direct visit and every
+ * provider denial. It fails the way that 401 would, without the round trip: the
+ * call `startAuthBootstrap` makes. The hint never authorizes — when it is present
+ * the refresh still decides.
+ *
+ * @throws {UnauthorizedError} with no session hint; whatever `silentRefresh()`
+ *   throws otherwise.
+ */
+async function restoreExistingSession(): Promise<void> {
+  if (!hasSessionHint()) {
+    throw new UnauthorizedError(AUTH_KEYS.auth.errors.oauthFailed);
+  }
+  await silentRefresh();
+}
+
+/**
  * Provider-specific OAuth landing page (`/callback/$provider`, e.g.
  * `/callback/google`). Each provider registers its own URL, so the path itself
  * names the provider that is returning — the route guard has already validated
@@ -60,7 +83,8 @@ function readCallbackParams(rawProvider: unknown): {
  * consumes the CSRF state, exchanges the code, and sets the refresh-session
  * cookie on that XHR response. Without `code`+`state` (direct visit, provider
  * denial) it falls back to `silentRefresh()` so an already-signed-in visitor
- * still lands in the app.
+ * still lands in the app — when this browser has signed in at all (the session
+ * hint); otherwise it goes straight back to `/login` without asking the server.
  */
 export function CallbackPage() {
   const navigate = useNavigate();
@@ -138,7 +162,7 @@ export function CallbackPage() {
       }
 
       try {
-        await silentRefresh();
+        await restoreExistingSession();
       } catch (error) {
         failToLogin(error);
         return;
