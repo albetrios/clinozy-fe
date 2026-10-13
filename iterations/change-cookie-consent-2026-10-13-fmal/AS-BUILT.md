@@ -26,7 +26,12 @@ What was actually built, ledger row by ledger row, against the approved plan in
 
 - **Planned, not built** (deferred, user OK): none.
 - **Built, not planned:** `tests/utils/consent-cookie.ts` (shared test helpers); the e2e now also
-  asserts the account receipt end to end.
+  asserts the account receipt end to end; `src/core/http/openapi-types.d.ts` regenerated (`a491c2a`
+  — only its header: clinozy-be's OpenAPI moved to 9.0.0 on `main` before this iteration, so
+  `api:types:check` failed at pre-push).
+- **Not run here:** the pre-push SonarQube gate (`pnpm sonar:scan`) — this session has no Docker
+  daemon; every other pre-push step passed (Biome, type-check, build, `build:check`, docs lint, the
+  full Vitest suite 1160 files / 9218 tests, `contracts:drift`, `api:types:check`).
 - **Follow-ups for the next iteration:**
   - The initial-JS size budget is already over on `main` in this environment (+12.88 kB); look at
     it separately (`pnpm size`).
