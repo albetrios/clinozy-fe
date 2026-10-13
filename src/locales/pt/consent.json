@@ -1,0 +1,24 @@
+{
+  "banner": {
+    "description": "Usamos cookies para fornecer e melhorar nossos serviços e, se você concordar, para analisar como o {{productName}} é usado.",
+    "policy": "Você pode ler nossa Política de Privacidade <1>aqui</1>.",
+    "customizeDescription": "Os cookies nos permitem distinguir você de outras pessoas que usam o {{productName}}, manter seu login ativo e seguro e, se você permitir, mostrar como os recursos são usados para que possamos melhorá-los. Você pode optar por não permitir alguns tipos de cookies.",
+    "customize": "Personalizar configurações de cookies",
+    "customizeShort": "Personalizar",
+    "rejectAll": "Rejeitar todos os cookies",
+    "rejectShort": "Rejeitar",
+    "acceptAll": "Aceitar todos os cookies",
+    "acceptShort": "Aceitar",
+    "save": "Salvar preferências"
+  },
+  "preferences": {
+    "necessaryTitle": "Necessários",
+    "necessaryDescription": "Permitem a segurança e as funções básicas.",
+    "analyticsTitle": "Análise",
+    "analyticsDescription": "Permitem a análise do produto e as gravações de sessão que mostram como os recursos são usados.",
+    "required": "Obrigatório",
+    "on": "Ativado",
+    "off": "Desativado",
+    "gpcNote": "Seu navegador envia o Global Privacy Control, então a análise permanece desativada."
+  }
+}

@@ -229,11 +229,8 @@
       "deleteBody": "Exclua permanentemente sua conta e todos os dados associados.",
       "deleteAction": "Excluir conta",
       "privacyTitle": "Privacidade",
-      "privacyDescription": "A sua escolha sobre a análise do produto e as gravações de sessão, guardada na sua conta.",
-      "analyticsLabel": "Análise do produto e gravações de sessão",
-      "analyticsHint": "Análise do PostHog e gravações de sessão do Sentry. Os relatórios de erros funcionam de qualquer forma.",
-      "consentGrantedOn": "Permitido em {{date}}",
-      "consentDeniedOn": "Recusado em {{date}}",
+      "privacyDescription": "Configurações de cookies deste navegador. As alterações valem na hora.",
+      "consentSavedOn": "Salvo em {{date}}",
       "consentUnanswered": "Ainda sem resposta",
       "privacyPolicyLink": "Política de Privacidade"
     },

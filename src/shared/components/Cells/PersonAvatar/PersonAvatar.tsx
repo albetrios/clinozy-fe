@@ -150,8 +150,9 @@ export interface PersonAvatarProps {
    */
   src?: string | null;
   /**
-   * A picked person: a 1.5px ring in the tone's ink, 2px off the disc (the
-   * Leads Team filter and the people popover's assignee, H:1714, H:1786).
+   * A picked person: a 1.5px ring in the tone's edge colour, 2px off the disc
+   * (the Leads Team filter and the people popover's assignee, H:1714, H:1786;
+   * the design's ink became the edge in change-shell-polish-and-sign-in, D7).
    */
   selected?: boolean;
   className?: string;

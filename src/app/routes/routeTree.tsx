@@ -20,6 +20,7 @@ import {
   resolveActiveOrg,
 } from '@/app/guards/org-gates.ts';
 import { requireOnboardingWorkspace } from '@/app/guards/route-guards.ts';
+import { CriticalUpdateNoticeLazy } from '@/app/version/CriticalUpdateNoticeLazy.tsx';
 import { redirectIfAuthenticated, requireAuth } from '@/core/rbac/guards.ts';
 import { toGateContext } from '@/core/security/gate-context.ts';
 import { gatewayFromManifest } from '@/core/security/gateway.ts';
@@ -484,6 +485,9 @@ const rootRoute = createRootRoute({
       </SectionErrorBoundary>
       {/* Dedicated Language & region dialog — mirrors Appearance, opened via useUIStore. */}
       <OfflineIndicator />
+      {/* "Update required" — a critical update counting down (core/version/check.ts).
+          At the root so the sign-in screens get it too. Lazy: almost no load shows it. */}
+      <CriticalUpdateNoticeLazy />
       {/* aria-live announcer: reads the new document.title on navigation. */}
       <RouteAnnouncer />
       {/* Cookie-consent gate for analytics (PostHog). Lazy: only an undecided

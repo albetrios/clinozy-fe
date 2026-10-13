@@ -332,10 +332,14 @@ jobs:
       # matters was never reported at all.
       - name: Production dependency audit
         run: pnpm deps:audit:prod
-      # The full tree (incl. devDependencies) is reported but non-blocking, because
-      # a dev-only advisory with no published fix would otherwise wedge every PR
-      # with no honest way out: `bulk-audit.mjs` has no waiver list by design, and
-      # the alternative is dropping the offending tool.
+      # The full tree (incl. devDependencies) is reported but non-blocking here.
+      # An advisory with a published fix is fixed (an `overrides` entry in
+      # pnpm-workspace.yaml, or a bump). One with NO fixed version is accepted in
+      # `auditConfig.ignoreGhsas` there — one entry per GHSA, with its Package:,
+      # Path:, No fix: and Remove when: comment — the same rule as clinozy-be.
+      # `bulk-audit.mjs` reads that list (the one `pnpm audit` honours): it still
+      # reports each accepted advisory, and fails once a fix is published for it,
+      # so an acceptance cannot outlive its reason.
       #
       # Live examples: braces <=3.0.3 (stack-exhaustion DoS on nested patterns) and
       # node-forge <=1.4.0 (lax PKCS#1 v1.5 signature verification) — in both cases
@@ -347,12 +351,15 @@ jobs:
       # moving it to `pnpm dlx` would unpin a deploy-critical tool to silence a
       # dev-only finding, which is the worse trade.
       #
-      # The full accepted-risk list (path + rationale per advisory) lives in
-      # docs/reference/dependency-upgrades.md — keep the two in sync.
+      # The accepted-risk table (path + rationale per advisory) lives in
+      # docs/reference/dependency-upgrades.md and lists the same GHSA ids
+      # (tests/ci/audit-accepted-advisories.policy.test.ts keeps them equal).
       #
-      # Coverage is not lost: failures stay visible in this log, and
-      # scheduled-deps-audit.yml re-runs the full tree weekly. Make this blocking
-      # again once the dev-only backlog is empty.
+      # Still advisory on a PR: a dev-only advisory published this week, or an
+      # acceptance whose fix just shipped, says nothing about the PR in hand and
+      # should not wedge it. Coverage is not lost: failures stay visible in this
+      # log, and scheduled-deps-audit.yml re-runs the full tree weekly as a
+      # blocking job.
       - name: Dependency audit (all deps, advisory)
         continue-on-error: true
         run: pnpm deps:audit

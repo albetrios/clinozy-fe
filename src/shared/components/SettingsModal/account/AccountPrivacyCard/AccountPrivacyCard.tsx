@@ -1,49 +1,48 @@
-import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { platformConfig } from '@/core/config/env.ts';
+import {
+  CONSENT_KEYS,
+  CONSENT_NS,
+} from '@/shared/components/ConsentBanner/consent-banner.constants.ts';
+import { ConsentCategoryRow } from '@/shared/components/ConsentBanner/ConsentCategoryRow/index.ts';
+import { saveConsentPreferences } from '@/shared/components/ConsentBanner/save-consent-preferences.ts';
 import { SettingsCard } from '@/shared/components/SettingsCard/index.ts';
 import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
-import { Switch } from '@/shared/components/ui/switch.tsx';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import {
-  selectCurrentConsent,
+  isGlobalPrivacyControlOn,
+  selectAnalyticsAllowed,
   useConsentStore,
 } from '@/shared/store/useConsentStore/index.ts';
 
 /**
- * Settings › Account › Privacy: the person's analytics consent — on or off, when it was given,
- * and the policy (D161). Withdrawing is as easy as giving: one switch, saved to the account like
- * the card's answer (`shared/analytics/consent-account-sync.ts`). Off stops PostHog and Sentry's
- * session recording at once; error reports run either way.
+ * Settings › Account › Privacy: this browser's cookie settings, as the consent card's Customize
+ * view draws them — Necessary (Required) and Analytics (a switch that saves at once), when the
+ * answer was saved, and the policy. The signed-in counterpart of the signed-out frame's "Privacy
+ * choices" (D12). Off stops PostHog and Sentry's session recording at once; error reports run
+ * either way. Under Global Privacy Control the switch is locked off and says why (D6).
  */
 export function AccountPrivacyCard() {
   const { t } = useTranslation(SETTINGS_NS);
+  const { t: tConsent } = useTranslation(CONSENT_NS);
   const keys = SETTINGS_KEYS.panels.account;
   const { formatDate } = useLocaleFormat();
-  const switchId = useId();
-  const hintId = useId();
-  const decision = useConsentStore(selectCurrentConsent);
+  const analytics = useConsentStore(selectAnalyticsAllowed);
+  const answered = useConsentStore((s) => s.preferences !== null);
   const decidedAt = useConsentStore((s) => s.decidedAt);
-  const setConsent = useConsentStore((s) => s.setAnalyticsConsent);
+  const globalPrivacyControl = isGlobalPrivacyControlOn();
 
-  const onCheckedChange = (checked: boolean) => {
-    const next = checked ? 'granted' : 'denied';
-    setConsent(next);
-    import('@/shared/analytics/capture-consent-decision.ts')
-      .then((m) => m.captureAnalyticsConsentDecision(next, 'settings'))
-      .catch(() => undefined);
-  };
+  const onCheckedChange = (checked: boolean) =>
+    saveConsentPreferences({ analytics: checked }, 'settings');
 
-  let status = t(keys.consentUnanswered);
-  if (decision !== null && decidedAt) {
-    status = t(decision === 'granted' ? keys.consentGrantedOn : keys.consentDeniedOn, {
-      date: formatDate(decidedAt),
-    });
-  }
+  const status =
+    answered && decidedAt
+      ? t(keys.consentSavedOn, { date: formatDate(decidedAt) })
+      : t(keys.consentUnanswered);
 
   return (
     <SettingsCard
@@ -51,29 +50,41 @@ export function AccountPrivacyCard() {
       description={t(keys.privacyDescription)}
       data-testid="account-privacy"
     >
-      <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0 space-y-0.5">
-          <label htmlFor={switchId} className="text-body font-medium">
-            {t(keys.analyticsLabel)}
-          </label>
-          <p id={hintId} className="text-muted-foreground text-xs leading-[1.45]">
-            {t(keys.analyticsHint)}
-          </p>
-          <p
-            className="text-muted-foreground text-xs leading-[1.45]"
-            data-testid="account-privacy-status"
-          >
-            {status}
-          </p>
-        </div>
-        <Switch
-          id={switchId}
-          checked={decision === 'granted'}
+      <div className="flex flex-col gap-2">
+        <ConsentCategoryRow
+          testId="account-privacy-necessary"
+          title={tConsent(CONSENT_KEYS.necessaryTitle)}
+          description={tConsent(CONSENT_KEYS.necessaryDescription)}
+          status={tConsent(CONSENT_KEYS.required)}
+          checked
+          disabled
+        />
+        <ConsentCategoryRow
+          testId="account-privacy-analytics"
+          title={tConsent(CONSENT_KEYS.analyticsTitle)}
+          description={tConsent(CONSENT_KEYS.analyticsDescription)}
+          status={tConsent(analytics ? CONSENT_KEYS.on : CONSENT_KEYS.off)}
+          checked={analytics}
+          disabled={globalPrivacyControl}
           onCheckedChange={onCheckedChange}
-          aria-describedby={hintId}
-          data-testid="account-privacy-analytics"
+          footer={
+            <span
+              className="text-muted-foreground block text-xs leading-[1.45]"
+              data-testid="account-privacy-status"
+            >
+              {status}
+            </span>
+          }
         />
       </div>
+      {globalPrivacyControl ? (
+        <p
+          className="text-muted-foreground text-xs leading-[1.45]"
+          data-testid="consent-gpc-note"
+        >
+          {tConsent(CONSENT_KEYS.gpcNote)}
+        </p>
+      ) : null}
       {platformConfig.privacyPolicyUrl ? (
         <a
           href={platformConfig.privacyPolicyUrl}

@@ -12,20 +12,28 @@
  *     • immediately when the tab is hidden (the reload is invisible),
  *     • otherwise once the user has gone idle (no input for IDLE_AFTER_MS) or
  *       returns to the tab.
+ * - A **critical** update — version.json names a `minimumVersion` this bundle's
+ *   release is below (`minimum-version.constants.ts`) — does not wait for a safe
+ *   moment: on screen it counts down CRITICAL_UPDATE_GRACE_MS from a notice that
+ *   cannot be snoozed, then reloads even over a focused field (unsaved drawers,
+ *   Settings and onboarding still get the browser's own leave prompt); on the
+ *   boot splash or in a hidden tab it reloads at once.
  *
  * Users get fresh code after a release without a jarring mid-task reload.
  */
 
 import { platformConfig } from '@/core/config/env.ts';
 import { isAppSplashActive } from '@/lib/app-splash.ts';
+import { compareReleaseVersions } from '@/lib/app-version.ts';
 import { isEditableElementFocused } from '@/lib/editable-focus.ts';
-import { readInjectedAppBuildId } from '@/lib/i18n/build-env.ts';
+import { readInjectedAppBuildId, readInjectedAppVersion } from '@/lib/i18n/build-env.ts';
 
 import {
   alreadyReloadedFor as hasReloadedFor,
   markReloadedFor as recordReloadFor,
 } from './reload-marker.ts';
 import {
+  CRITICAL_UPDATE_GRACE_MS,
   VERSION_CHECK_INITIAL_DELAY_MS,
   VERSION_CHECK_RELOADED_FOR_KEY,
 } from './version-check.constants.ts';
@@ -54,7 +62,17 @@ function getVersionUrl(): string {
   return `${base}/version.json`;
 }
 
-type VersionPayload = { buildId: string; builtAt: string };
+/**
+ * The deployed version.json. `version` and `minimumVersion` come from the
+ * version-json build plugin and are read as untrusted: either may be absent
+ * (a local build, no critical release) or malformed.
+ */
+type VersionPayload = {
+  buildId: string;
+  builtAt: string;
+  version?: unknown;
+  minimumVersion?: unknown;
+};
 
 interface VersionCheckUpdateContext {
   buildId: string;
@@ -64,6 +82,15 @@ interface VersionCheckUpdateContext {
   snooze: () => void;
 }
 
+/** What {@link VersionCheckOptions.onCriticalUpdate} gets: the deadline and the way out. */
+export interface CriticalUpdateContext {
+  buildId: string;
+  /** When the tab reloads on its own (epoch ms) — the notice counts down to it. */
+  reloadAt: number;
+  /** Reload now (marks the loop guard and stops the countdown). */
+  reloadNow: () => void;
+}
+
 export interface VersionCheckOptions {
   /**
    * Called once per newly detected buildId while the tab is visible enough to
@@ -71,6 +98,12 @@ export interface VersionCheckOptions {
    * still runs when a reload is pending.
    */
   onUpdateAvailable?: (ctx: VersionCheckUpdateContext) => void;
+  /**
+   * Called once when a critical update starts counting down on screen — instead
+   * of `onUpdateAvailable`. Render a notice that cannot be dismissed; the reload
+   * at `reloadAt` is the checker's own and happens whatever the notice does.
+   */
+  onCriticalUpdate?: (ctx: CriticalUpdateContext) => void;
 }
 
 function getCurrentBuildId(): string | undefined {
@@ -97,6 +130,25 @@ function shouldReload(
 ): boolean {
   if (!(latest && current)) return false;
   return latest.buildId !== current;
+}
+
+/**
+ * Whether the advertised deploy is critical FOR THIS TAB: version.json names a
+ * `minimumVersion`, this bundle's release version is below it, and the advertised
+ * build itself meets it. Anything unknown — no version baked into this bundle (a
+ * local build), a missing or malformed field, a floor the new build does not
+ * meet — is not critical: the ordinary update path still applies, and a guess
+ * never forces a reload.
+ */
+function isCriticalUpdate(latest: VersionPayload): boolean {
+  const own = readInjectedAppVersion();
+  const { version, minimumVersion } = latest;
+  if (!own || typeof version !== 'string' || typeof minimumVersion !== 'string') {
+    return false;
+  }
+  const ownOrder = compareReleaseVersions(own, minimumVersion);
+  const latestOrder = compareReleaseVersions(version, minimumVersion);
+  return ownOrder !== null && ownOrder < 0 && latestOrder !== null && latestOrder >= 0;
 }
 
 /**
@@ -259,6 +311,11 @@ export function startVersionCheck(
   let pendingBuildId: string | null = null;
   let toastShownForBuildId: string | null = null;
   let lastActivityAt = Date.now();
+  // A critical update's countdown: once started its deadline stands — a later
+  // poll never restarts or extends it.
+  let criticalBuildId: string | null = null;
+  let criticalTimer: ReturnType<typeof setTimeout> | null = null;
+  let stopWaitingForOnline: (() => void) | null = null;
 
   const markActivity = () => {
     lastActivityAt = Date.now();
@@ -285,6 +342,7 @@ export function startVersionCheck(
     pendingBuildId = null;
     toastShownForBuildId = null;
     stopSafetyWatch();
+    stopCriticalCountdown();
     if (platformConfig.debugLogging) {
       console.info('[VersionCheck] Applying deferred reload for', buildId);
     }
@@ -307,7 +365,52 @@ export function startVersionCheck(
     }
   }
 
+  function stopCriticalCountdown(): void {
+    if (criticalTimer) {
+      clearTimeout(criticalTimer);
+      criticalTimer = null;
+    }
+    stopWaitingForOnline?.();
+    stopWaitingForOnline = null;
+  }
+
+  // The deadline passed. Reloading offline would only re-serve the cached old
+  // shell, so an offline tab waits for the network and reloads the moment it is back.
+  function reloadOnceOnline(buildId: string): void {
+    criticalTimer = null;
+    if (navigator.onLine === false) {
+      const onOnline = () => applyReload(buildId);
+      window.addEventListener('online', onOnline, { once: true });
+      stopWaitingForOnline = () => window.removeEventListener('online', onOnline);
+      return;
+    }
+    applyReload(buildId);
+  }
+
+  function startCriticalCountdown(buildId: string): void {
+    if (criticalBuildId) return;
+    criticalBuildId = buildId;
+    // Nothing on screen to lose (boot splash, hidden tab): take it now.
+    if (isAppSplashActive() || document.visibilityState === 'hidden') {
+      applyReload(buildId);
+      return;
+    }
+    const reloadAt = Date.now() + CRITICAL_UPDATE_GRACE_MS;
+    criticalTimer = setTimeout(() => reloadOnceOnline(buildId), CRITICAL_UPDATE_GRACE_MS);
+    if (platformConfig.debugLogging) {
+      console.info('[VersionCheck] Critical update detected; reloading at', reloadAt);
+    }
+    options?.onCriticalUpdate?.({
+      buildId,
+      reloadAt,
+      reloadNow: () => applyReload(buildId),
+    });
+    // A safe moment before the deadline (idle, the tab hidden) reloads sooner.
+    startSafetyWatch();
+  }
+
   async function checkForUpdate(): Promise<void> {
+    if (criticalBuildId) return; // a critical countdown is running; its deadline stands
     const latest = await fetchVersion();
     if (!(latest && shouldReload(latest, currentBuildId))) return;
 
@@ -328,6 +431,13 @@ export function startVersionCheck(
     // Pre-warm: fetch + install the new build's SW in the background now, so
     // the eventual reload handoff (SKIP_WAITING → controllerchange) is instant.
     requestServiceWorkerUpdate();
+
+    // Critical: a countdown instead of the toast — never snoozed, never deferred
+    // past its deadline by a focused field.
+    if (isCriticalUpdate(latest)) {
+      startCriticalCountdown(latest.buildId);
+      return;
+    }
 
     if (isVersionUpdateSnoozed(latest.buildId)) {
       toastShownForBuildId = null;
@@ -391,6 +501,7 @@ export function startVersionCheck(
     clearTimeout(initialCheck);
     stopPoll();
     stopSafetyWatch();
+    stopCriticalCountdown();
     document.removeEventListener('visibilitychange', onVisibility);
     for (const evt of ACTIVITY_EVENTS) {
       window.removeEventListener(evt, markActivity);

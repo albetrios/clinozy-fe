@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { useConsentStore } from '@/shared/store/useConsentStore/index.ts';
+import { resetConsentForTests } from '@/tests/utils/consent-cookie.ts';
 
 import { ConsentBannerLazy } from './ConsentBannerLazy.tsx';
 
@@ -18,7 +18,7 @@ vi.mock('@/core/config/env.ts', () => ({ platformConfig: env }));
 // imported component's lazy card never mounted again, and they timed out.
 describe('ConsentBannerLazy — while the chunk is in flight', () => {
   beforeEach(() => {
-    useConsentStore.getState().resetAnalyticsConsent();
+    resetConsentForTests();
   });
 
   it('reserves no space while the chunk is in flight', async () => {

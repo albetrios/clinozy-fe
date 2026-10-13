@@ -225,11 +225,8 @@
       "deleteBody": "永久删除您的账户及所有关联数据。",
       "deleteAction": "删除账户",
       "privacyTitle": "隐私",
-      "privacyDescription": "您对产品分析和会话录制的选择，保存在您的账户中。",
-      "analyticsLabel": "产品分析和会话录制",
-      "analyticsHint": "PostHog 分析和 Sentry 会话录制。错误报告始终运行。",
-      "consentGrantedOn": "于 {{date}} 允许",
-      "consentDeniedOn": "于 {{date}} 拒绝",
+      "privacyDescription": "此浏览器的 Cookie 设置。更改会立即生效。",
+      "consentSavedOn": "保存于 {{date}}",
       "consentUnanswered": "尚未回答",
       "privacyPolicyLink": "隐私政策"
     },

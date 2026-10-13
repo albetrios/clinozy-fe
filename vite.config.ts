@@ -74,7 +74,9 @@ export default defineConfig(({ command, mode }) => {
         modeFlag: env.BUILD_I18N_MODE,
         localeFlag: env.BUILD_I18N_LOCALE,
       }),
-      versionJson(buildId),
+      // The release version rides along so version.json can carry the critical-update
+      // floor (src/core/version/minimum-version.constants.ts).
+      versionJson(buildId, { version: env.VITE_APP_VERSION }),
       // Substitutes {{PRODUCT_*}} in index.html; runs `pre` so the CSP pass below
       // sees final markup. Keeps branding out of the rebrand surface entirely.
       productIdentityHtml(),
@@ -202,7 +204,14 @@ export default defineConfig(({ command, mode }) => {
           manualChunks(id) {
             if (id.includes('node_modules/@sentry')) return 'sentry';
             if (id.includes('node_modules/posthog-js')) return 'posthog';
-            if (id.includes('node_modules/zod')) return 'zod';
+            // src/lib/zod-jitless.ts rides in the zod chunk so it runs before any
+            // chunk builds a schema — see that module.
+            if (
+              id.includes('node_modules/zod') ||
+              id.endsWith('/src/lib/zod-jitless.ts')
+            ) {
+              return 'zod';
+            }
             if (id.includes('node_modules/react-hook-form')) return 'rhf';
             if (
               id.includes('node_modules/react/') ||

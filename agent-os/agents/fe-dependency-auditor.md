@@ -20,7 +20,7 @@ You are read-only. You produce a report and fix plan; you never edit `package.js
 2. For each vulnerability: identify severity, package, affected version range, and whether it is reachable in the client bundle vs dev-only.
 3. Check for non-breaking updates (`pnpm outdated`), and confirm `pnpm-lock.yaml` is in sync (`pnpm run validate:lockfile`) — a desynced lockfile is a blocking finding.
 4. For any **new** dependency in the diff, note its license and its bundle-size impact (does it land in the first-paint preload path? cross-check `pnpm size` budgets and `agent-os/skills/fe-platform-hygiene/SKILL.md` heavy-import rules).
-5. Classify each finding by severity: **blocking** (high/critical vuln, lockfile desync, license incompatibility) / **warn** (moderate vuln, stale major, large new dep) / **nit** (low vuln, minor staleness). Recommend an action: **Patch now** / **Update minor** / **Requires major** / **Accept risk** (with rationale).
+5. Classify each finding by severity: **blocking** (high/critical vuln, lockfile desync, license incompatibility) / **warn** (moderate vuln, stale major, large new dep) / **nit** (low vuln, minor staleness). Recommend an action: **Patch now** / **Update minor** / **Requires major** / **Accept risk** (with rationale — only when no fixed version is published: `auditConfig.ignoreGhsas` in `pnpm-workspace.yaml`, per `fe-dependency-management`; the audit lists those as `accepted (no fix published …)` and fails once a fix ships).
 
 ## Output format
 

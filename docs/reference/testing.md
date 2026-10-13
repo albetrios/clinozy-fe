@@ -114,7 +114,7 @@ loosens local Docker.
 | `invitations.e2e.test.ts`                     | Invitations for the person signing in (D84): invited into no clinic → the picker lists the invitation, Accept in the app → profile-only onboarding → the clinic; Decline (confirmed) → onboarding, and the inviter's in-app notice; already in a clinic → the avatar's count and Switch clinic's Invited row → the picker. Skips where the local Free plan has no seat to invite with (`seat_limit_reached`)                         |
 | `session-timeout.e2e.test.ts`                 | Idle sign-out under a **virtual clock** (`page.clock`): the warning's Sign out (real `mouse.down()`…`up()`, and the keyboard), the 90 s deadline, and Stay signed in — each sign-out proven to stay signed out after a fresh load                                                                                                                                                                                                    |
 | `boot-splash.e2e.test.ts`                     | Cold load is one continuous screen: the splash fades **exactly once** and the page is **never blank** behind it (`/auth/refresh` held open 1.5 s so the invariant bites on localhost)                                                                                                                                                                                                                                                |
-| `consent-card.e2e.test.ts`                    | Cookie-consent card placement: bottom-start corner, RTL mirror, inset sheet on phones, rides above the mobile tab bar, decision remembered (runs with an _undecided_ storage state)                                                                                                                                                                                                                                                  |
+| `consent-card.e2e.test.ts`                    | The cookie card (claude.com's model): Customize · Reject all · Accept all, the Customize categories, Escape rejects, "Privacy choices" reopens it, Global Privacy Control never asked, an old-policy answer asked again, **signing out keeps the answer**; placement — bottom-start corner, ≤ 456px, RTL mirror, one-row buttons on phones, rides above the mobile tab bar (runs with an _undecided_ storage state)                  |
 | `app-rooms.e2e.test.ts`                       | Launch smoke (L-55): each of the ten clinic rooms on a new clinic, at desktop (1440) and phone (375) — opened from the shell (pinned tab, or All sections / the tab bar's More) and one happy path each (Check in on Today; a record or a New drawer and its dialog-route URL elsewhere; the patient file from Patients)                                                                                                             |
 | `app-writes.e2e.test.ts`                      | Write flows (#78): on a new clinic, each room's create drawer (offerings, stock, tasks, patients, leads, Receive, New appointment) and Today's check-in save on clinozy-be, the room lists the record, and a full reload still does — desktop only; Users' save is `org-lifecycle.e2e.test.ts`, Medical is parked                                                                                                                    |
 | `app-roles.e2e.test.ts`                       | Role QA (L-60, D157): a new clinic with one branch and one patient, walked as Front desk, Doctor, Accountant and Marketing through the owner's View-as — each role's home, the rooms that open and the ones that send it to its first viewable room, the New / Receive controls by code, and the patient file's Prescriptions section (`patient_prescription:read`, else Timeline). View-as because a local Free plan holds one seat |
@@ -159,6 +159,52 @@ Helpers: `tests/utils/e2e-auth.ts`, `tests/utils/axe-for-dialog.ts`.
 | `pnpm coverage:patch`                     | Changed-lines ≥ 90% (PR CI)                            |
 
 Contract drift (scheduled CI): `pnpm contracts:drift` vs `clinozy-be/docs/routes.txt`.
+
+## Mutation testing (Stryker, weekly)
+
+Stryker mutates the pure runtime logic and checks that its tests notice. CI:
+`.github/workflows/mutation-test.yml`, Mondays 05:00 UTC and `workflow_dispatch` — a report, never a
+merge gate. Config: `stryker.config.json`, pinned on the PR gate by
+`tests/ci/mutation-config.policy.test.ts`.
+
+| Setting            | Value                                                                                                                               |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `mutate`           | rbac, `env.ts`, the data provider, the app guards, `shared/auth`, `shared/tenancy`, `lib/routes`, `csv.ts`, `utils.ts` (`.ts` only) |
+| `testFiles`        | the `*.test.*` files of those folders + `tests/security/` — a module's own tests must kill its mutants                              |
+| `thresholds.break` | 70 — the run fails below a 70% score; never lowered                                                                                 |
+| `testRunner`       | `vitest-shim` (`tooling/stryker/vitest-runner-shim.mjs`) — the upstream runner plus its two missing Vitest 5 fixes                  |
+| `ignorePatterns`   | agent tooling (`.claude`, `.cursor`, `.mcp.json`, `agent-os`), docs, design intakes, build output                                   |
+
+Why each of those exists:
+
+- **`.mcp.json` ignored.** It is a tracked symlink to a gitignored file, so it dangles on a fresh
+  checkout and Stryker's sandbox copy failed with `ENOENT`. The policy test fails on any dangling
+  symlink left out of `ignorePatterns`.
+- **`testFiles`.** Without it the initial run takes every suite Vitest's `related` mode links to a
+  mutated file — `cn` (`lib/utils.ts`) and the auth/tenancy runtime are imported by nearly every
+  component — and Stryker's Vitest runner runs them on **one** thread, so it outgrew its 15-minute
+  limit. Scoped, it is 71 test files.
+- **The runner shim.** On Vitest 5 the runner's per-test filter matches nothing
+  ([stryker-js#6210](https://github.com/stryker-mutator/stryker-js/issues/6210)), so every covered
+  mutant ran zero tests and survived; and with `testFiles` a static mutant was activated after its
+  module had loaded ([#6144](https://github.com/stryker-mutator/stryker-js/issues/6144)). Delete the
+  shim once a runner release fixes both.
+
+Measured on `ubuntu-latest` (2026-10-13): 58 files, 1,894 mutants (1,602 scored, the rest are the
+excluded string/regex/template mutators), initial run ≈ 3 minutes, whole run 26 m 38 s, score
+**76.09%**. The 48 static mutants are about half of that time, because each reloads and reruns its
+module's tests. The job limit is 60 minutes and the initial-run limit 15.
+
+Run it locally — Stryker is installed ad hoc, as in CI, and never lands in the lockfile:
+
+```bash
+pnpm add -D @stryker-mutator/core@10.0.0 @stryker-mutator/vitest-runner@10.0.0
+pnpm exec stryker run                                                   # the whole lane
+pnpm exec stryker run --mutate src/lib/csv.ts --testFiles 'src/lib/csv*.test.ts'  # one module
+git checkout -- package.json pnpm-lock.yaml && pnpm install --frozen-lockfile
+```
+
+The report is `reports/mutation/mutation-report.html` (the CI run uploads it as `stryker-report`).
 
 ## Cross-browser smoke (production build)
 

@@ -496,6 +496,35 @@ describe('RoomViewTabs — the other tab rows (card, plain, fill, automatic)', (
     );
   });
 
+  it('keeps each label at its bold width where the selected tab is bolder (card, plain)', () => {
+    const tabs = [
+      { id: 'visits', label: 'Visits' },
+      { id: 'notes', label: 'Notes' },
+    ];
+    const reserves = (look: 'track' | 'card' | 'plain') => {
+      const { container, unmount } = render(
+        <RoomViewTabs
+          look={look}
+          label="Views"
+          value="visits"
+          onValueChange={vi.fn()}
+          testIdPrefix={look}
+          tabs={tabs}
+        />,
+      );
+      const found = Array.from(
+        container.querySelectorAll('[data-slot="weight-reserve"]'),
+        (node) => node.getAttribute('data-label'),
+      );
+      unmount();
+      return found;
+    };
+    expect(reserves('card')).toEqual(['Visits', 'Notes']);
+    expect(reserves('plain')).toEqual(['Visits', 'Notes']);
+    // The track draws every tab at one weight: nothing to reserve.
+    expect(reserves('track')).toEqual([]);
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(<Modes />);
     expect(await axe(container)).toHaveNoViolations();

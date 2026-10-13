@@ -225,11 +225,8 @@
       "deleteBody": "アカウントと関連するすべてのデータを完全に削除します。",
       "deleteAction": "アカウントを削除",
       "privacyTitle": "プライバシー",
-      "privacyDescription": "製品分析とセッション記録に関するあなたの選択（アカウントに保存されます）。",
-      "analyticsLabel": "製品分析とセッション記録",
-      "analyticsHint": "PostHog の分析と Sentry のセッション記録。エラーレポートはどちらの場合も送信されます。",
-      "consentGrantedOn": "{{date}} に許可",
-      "consentDeniedOn": "{{date}} に拒否",
+      "privacyDescription": "このブラウザのCookie設定です。変更はすぐに反映されます。",
+      "consentSavedOn": "{{date}} に保存",
       "consentUnanswered": "未回答",
       "privacyPolicyLink": "プライバシーポリシー"
     },

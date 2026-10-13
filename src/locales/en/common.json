@@ -5,7 +5,6 @@
     "loadingNamed": "Loading {{name}}…",
     "loadingPage": "Loading page",
     "toggleTheme": "Toggle theme",
-    "cookieConsent": "Cookie consent",
     "rowsPerPage": "Rows per page",
     "goFirstPage": "Go to first page",
     "goPreviousPage": "Go to previous page",
@@ -113,7 +112,14 @@
   "versionUpdate": {
     "title": "Update available",
     "description": "A new version of the app is ready.",
-    "refresh": "Refresh now"
+    "refresh": "Refresh now",
+    "required": {
+      "title": "Update required",
+      "countdown": "Reloading in {{time}}",
+      "saveFirst": "Save your work, then update",
+      "announcement": "{{productName}} needs an important update and reloads in {{time}}. Save your work now.",
+      "updateNow": "Update now"
+    }
   },
   "cells": {
     "patient": "Patient",
@@ -181,11 +187,8 @@
     }
   },
   "consent": {
-    "description": "With your OK, we use PostHog analytics and Sentry session recordings to improve {{productName}}. Everything else, error reports included, works without them. Closing this means no.",
-    "privacyPolicy": "Privacy Policy",
-    "accept": "Accept",
-    "decline": "Decline",
-    "closeAndDecline": "Close (counts as declining)"
+    "title": "Cookie settings",
+    "privacyChoices": "Privacy choices"
   },
   "confirm": {
     "accept": "Confirm",

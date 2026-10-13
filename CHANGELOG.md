@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.13.0](https://github.com/albetrios/clinozy-fe/compare/v1.12.0...v1.13.0) (2026-10-13)
+
+
+### Added
+
+* **consent:** claude.com-style cookie card, kept per browser across sign-out ([#57](https://github.com/albetrios/clinozy-fe/issues/57)) ([d53c1ea](https://github.com/albetrios/clinozy-fe/commit/d53c1ea8460bea22032f0e56bcef7a0faf9405cb))
+* **pwa:** critical updates, and the precached shell when a navigation fails ([#52](https://github.com/albetrios/clinozy-fe/issues/52)) ([14d57f7](https://github.com/albetrios/clinozy-fe/commit/14d57f77e4186488e8a1b92c6044de65996a0418))
+* sign-in showcase, steady room switches and soft picked badges ([#58](https://github.com/albetrios/clinozy-fe/issues/58)) ([9e0cc61](https://github.com/albetrios/clinozy-fe/commit/9e0cc6158c1cf129ac6ec0f2317d0e99d8987552))
+
+
+### Fixed
+
+* **i18n:** polish the sign-in showcase translations in ten locales ([#60](https://github.com/albetrios/clinozy-fe/issues/60)) ([d5485c1](https://github.com/albetrios/clinozy-fe/commit/d5485c1f166ef32703e37e0f7056a527db5a1e27))
+
+
+### Documentation
+
+* regenerate the project tree after [#52](https://github.com/albetrios/clinozy-fe/issues/52) and [#54](https://github.com/albetrios/clinozy-fe/issues/54) landed together ([#56](https://github.com/albetrios/clinozy-fe/issues/56)) ([10dfdde](https://github.com/albetrios/clinozy-fe/commit/10dfdde9883d6caf27282b4e9b428e50ddf33125))
+
 ## [1.12.0](https://github.com/albetrios/clinozy-fe/compare/v1.11.0...v1.12.0) (2026-10-13)
 
 

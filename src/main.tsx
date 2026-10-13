@@ -1,4 +1,5 @@
 import './index.css';
+import '@/lib/zod-jitless.ts';
 import '@/lib/i18n/i18n.ts';
 
 import { StrictMode } from 'react';
@@ -10,6 +11,7 @@ import {
   preloadSignedInShell,
   router,
 } from '@/app/routes/routeTree.tsx';
+import { showCriticalUpdate } from '@/app/version/show-critical-update.ts';
 import { showUpdateAvailableToast } from '@/app/version/show-update-available-toast.ts';
 import { platformConfig } from '@/core/config/env.ts';
 import { bootstrapResources } from '@/core/resources/index.ts';
@@ -37,8 +39,9 @@ import {
 } from '@/shared/auth/service.ts';
 import { hasSessionHint } from '@/shared/auth/session-lifetime.ts';
 import {
-  currentAnalyticsConsent,
   hasAnalyticsConsent,
+  selectAnalyticsAllowed,
+  startConsentFollow,
   useConsentStore,
 } from '@/shared/store/useConsentStore/index.ts';
 import { resolveOrganizationFromSubdomain } from '@/shared/tenancy/tenancy-service.ts';
@@ -51,7 +54,7 @@ import App from './App.tsx';
  * for returning users, or the moment they Accept the ConsentBanner). Sentry's
  * error reports are NOT here — they run under legitimate interest (no tracking
  * cookies); its session recording and profiling follow the same consent from
- * `app/observability/sentry.ts` (D161).
+ * `app/observability/sentry.ts`.
  */
 let analyticsStarted = false;
 function startAnalytics(): void {
@@ -70,11 +73,11 @@ function startAnalytics(): void {
  * analytics only with consent. Keeps auth funnels off the critical path.
  */
 function initObservabilityWhenIdle(): void {
-  // Follow the standing decision, from whichever source it changes — the card, Settings, the
-  // account's answer at sign-in, another tab, a session's end (D161).
+  // Follow this browser's answer, from whichever source it changes — the card, Privacy choices,
+  // Settings, another tab. Signing in or out never changes it.
   useConsentStore.subscribe((state, previous) => {
-    const granted = currentAnalyticsConsent(state) === 'granted';
-    const wasGranted = currentAnalyticsConsent(previous) === 'granted';
+    const granted = selectAnalyticsAllowed(state);
+    const wasGranted = selectAnalyticsAllowed(previous);
     if (granted && !wasGranted) {
       startAnalytics();
       resumeAnalyticsOnConsentGranted();
@@ -168,21 +171,20 @@ preloadBootRoutes({ likelySignedIn: hasSessionHint() });
 // Initialize observability/analytics after splash dismiss + idle (auth funnels stay lean).
 initObservabilityWhenIdle();
 
-// The analytics consent follows the person: settled at sign-in, saved to the account, forgotten
-// when the session ends (D161). Lazy — the sign-in screen's first paint does not wait for it; a
-// session restored before it loads is settled when it starts.
-import('@/shared/analytics/consent-account-sync.ts')
-  .then((m) => m.startConsentAccountSync())
-  .catch(() => undefined);
+// The cookie answer is this browser's (claude.com's model): no sign-in or sign-out touches it.
+// Follow another tab's answer when this one is shown again, and drop the launch's stored answer.
+startConsentFollow();
 
 // Recover from a lazy chunk that a newer deploy has already renamed away: one
 // reload onto the current build per buildId, never over a field being typed in.
 startStaleChunkRecovery();
 
-// Start version check — notify + deferred reload when a new deployment ships (prod only)
+// Start version check — notify + deferred reload when a new deployment ships (prod only);
+// a critical one counts down from the "Update required" notice instead.
 startVersionCheck({
   onUpdateAvailable: ({ buildId, reloadNow, snooze }) =>
     showUpdateAvailableToast({ buildId, reloadNow, snooze }),
+  onCriticalUpdate: showCriticalUpdate,
 });
 
 // Cross-tab logout: when any tab's session dies (admin-suspend, logout-all,

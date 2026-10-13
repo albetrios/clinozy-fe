@@ -96,7 +96,14 @@
   "versionUpdate": {
     "title": "업데이트 사용 가능",
     "description": "앱의 새 버전이 준비되었습니다.",
-    "refresh": "지금 새로 고침"
+    "refresh": "지금 새로 고침",
+    "required": {
+      "title": "업데이트 필요",
+      "countdown": "{{time}} 후 새로 고침",
+      "saveFirst": "작업을 저장한 뒤 업데이트하세요",
+      "announcement": "{{productName}}에 중요한 업데이트가 있어 {{time}} 후 새로 고침됩니다. 지금 작업을 저장하세요.",
+      "updateNow": "지금 업데이트"
+    }
   },
   "cells": {
     "patient": "환자",
@@ -116,7 +123,6 @@
     "loadingNamed": "{{name}} 불러오는 중…",
     "loadingPage": "페이지 로딩 중",
     "toggleTheme": "테마 전환",
-    "cookieConsent": "쿠키 동의",
     "rowsPerPage": "페이지당 행 수",
     "goFirstPage": "첫 페이지로",
     "goPreviousPage": "이전 페이지로",
@@ -180,11 +186,8 @@
     }
   },
   "consent": {
-    "description": "동의하시면 {{productName}} 개선을 위해 PostHog 분석과 Sentry 세션 기록을 사용합니다. 오류 보고를 포함한 나머지 기능은 이것 없이도 작동합니다. 닫으면 거부로 처리됩니다.",
-    "privacyPolicy": "개인정보 처리방침",
-    "accept": "동의",
-    "decline": "거부",
-    "closeAndDecline": "닫기(거부로 처리됨)"
+    "title": "쿠키 설정",
+    "privacyChoices": "개인정보 선택"
   },
   "confirm": {
     "accept": "확인",

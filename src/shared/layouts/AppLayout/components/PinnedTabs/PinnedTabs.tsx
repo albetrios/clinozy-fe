@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils.ts';
 import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { Picker } from '@/shared/components/Picker/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
+import { WeightStableLabel } from '@/shared/components/WeightStableLabel/index.ts';
 import { ChevronDown } from '@/shared/icons/index.ts';
 import type {
   SectionBarEntry,
@@ -64,7 +65,8 @@ function PinnedTab({
       )}
     >
       <entry.icon className="size-4" aria-hidden />
-      {label}
+      {/* Its 600 width whatever its weight: switching tabs moves no other tab. */}
+      <WeightStableLabel label={label} />
     </Link>
   );
 }

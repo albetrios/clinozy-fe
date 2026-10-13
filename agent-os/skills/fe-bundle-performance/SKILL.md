@@ -14,6 +14,15 @@ this skill fixes. Use it when a size budget is exceeded or a chunk regresses.
 `pnpm size:check` emits JSON for before/after comparison. Never measure on the
 dev server — see `docs/reference/local-production-perf.md`.
 
+`pnpm size` sees the first-paint path only. What each signed-out route actually
+downloads is `pnpm perf:routes` (`tooling/perf/public-route-budgets.json`, run
+weekly by `lighthouse.yml`). Re-pin it with `pnpm perf:routes --update` on a
+CI-equivalent build — no `.env.local`, no ambient `VITE_*` (see Verify): an env
+that names a Sentry DSN loads Sentry's ~144 kB chunk after idle, which CI never
+does, and the totals once sat ~155 kB loose for exactly that reason. `--update`
+re-pins every key; keep the old value wherever it would rise (budgets only come
+down) and itemise each change in `tests/performance/README.md` → Re-pins.
+
 ## The main levers
 
 1. **Dynamic-import heavy / deferred modules.** `@sentry/react`, `posthog-js`,

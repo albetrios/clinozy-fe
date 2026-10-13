@@ -96,7 +96,14 @@
   "versionUpdate": {
     "title": "Update verfügbar",
     "description": "Eine neue Version der App ist bereit.",
-    "refresh": "Jetzt aktualisieren"
+    "refresh": "Jetzt aktualisieren",
+    "required": {
+      "title": "Update erforderlich",
+      "countdown": "Neuladen in {{time}}",
+      "saveFirst": "Arbeit speichern, dann aktualisieren",
+      "announcement": "{{productName}} braucht ein wichtiges Update und lädt in {{time}} neu. Jetzt die Arbeit speichern.",
+      "updateNow": "Jetzt aktualisieren"
+    }
   },
   "cells": {
     "patient": "Patient",
@@ -116,7 +123,6 @@
     "loadingNamed": "{{name}} wird geladen…",
     "loadingPage": "Seite wird geladen",
     "toggleTheme": "Design umschalten",
-    "cookieConsent": "Cookie-Einwilligung",
     "rowsPerPage": "Zeilen pro Seite",
     "goFirstPage": "Zur ersten Seite",
     "goPreviousPage": "Zur vorherigen Seite",
@@ -181,11 +187,8 @@
     }
   },
   "consent": {
-    "description": "Mit Ihrer Zustimmung nutzen wir PostHog-Analysen und Sentry-Sitzungsaufzeichnungen, um {{productName}} zu verbessern. Alles andere, auch Fehlerberichte, funktioniert ohne sie. Schließen bedeutet Nein.",
-    "privacyPolicy": "Datenschutzerklärung",
-    "accept": "Akzeptieren",
-    "decline": "Ablehnen",
-    "closeAndDecline": "Schließen (gilt als Ablehnung)"
+    "title": "Cookie-Einstellungen",
+    "privacyChoices": "Datenschutzoptionen"
   },
   "confirm": {
     "accept": "Bestätigen",

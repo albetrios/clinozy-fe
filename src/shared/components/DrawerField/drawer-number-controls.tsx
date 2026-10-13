@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { clampNumber, sanitizeNumberText } from '@/lib/number-text.ts';
 import { cn } from '@/lib/utils.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import {
   RECORD_DRAWER_KEYS,
   RECORD_DRAWER_NS,
@@ -112,8 +113,9 @@ export interface DrawerQuickOption<T extends string | number = number> {
 /**
  * The quick picks under a field (H:1602) — a stepper's figures, the
  * follow-up's presets, the booking's "Today · Tomorrow · Next week": 24px
- * outline pills, 12px/500, the one matching the value on `muted` — its edge
- * in the text ink too where the screen marks it (`pickedEdge`, H:6005).
+ * outline pills, 12px/500, the one matching the value on `muted` — with
+ * stone's picked edge and halo too where the screen marks it (`pickedEdge`,
+ * H:6005; the ink edge became stone's in change-shell-polish-and-sign-in, D7).
  */
 export function DrawerQuickChips<T extends string | number>({
   label,
@@ -131,7 +133,7 @@ export function DrawerQuickChips<T extends string | number>({
   value: T | null;
   onChange: (value: T) => void;
   disabled?: boolean;
-  /** The picked chip's edge in the text ink (the appointment form's quick dates). */
+  /** Edge the picked chip (stone's edge and halo — the appointment form's quick dates). */
   pickedEdge?: boolean;
   /** Base test id; each chip is `<testId>-<value>`. */
   testId?: string;
@@ -153,7 +155,7 @@ export function DrawerQuickChips<T extends string | number>({
           className={cn(
             'text-foreground hover:bg-muted h-6 rounded-full border px-2.5 text-xs font-medium whitespace-nowrap tabular-nums transition-colors disabled:pointer-events-none disabled:opacity-50',
             option.value === value
-              ? cn('bg-muted', pickedEdge && 'border-foreground')
+              ? cn('bg-muted', pickedEdge && TONE_CLASSES.stone.selected)
               : 'bg-background',
           )}
         >
