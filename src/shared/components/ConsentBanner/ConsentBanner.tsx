@@ -126,7 +126,7 @@ export function ConsentBanner() {
   if (!open) return null;
 
   return (
-    <dialog
+    <dialog // NOSONAR(S6847): Escape on the open, non-modal card rejects consent (the dialog pattern's close key) — a document listener would also catch Escape meant for other surfaces
       ref={cardRef}
       open
       aria-labelledby={titleId}
