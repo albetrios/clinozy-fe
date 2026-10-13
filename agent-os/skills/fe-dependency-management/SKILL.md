@@ -33,6 +33,15 @@ before-commit guard blocks it locally via `pnpm run validate:lockfile`.
    dynamic import and defer to `agent-os/skills/fe-bundle-performance/SKILL.md`.
 5. **Remove:** `pnpm remove <pkg>` + `pnpm install`; run `pnpm knip` to catch
    now-dead code/exports the removal orphaned.
+6. **A bump that moves `radix-ui`, `vaul` or `cmdk`** (Dependabot's npm-non-major
+   group included) needs `pnpm dedupe` before it can merge. An incremental lockfile
+   update leaves `vaul` / `cmdk` on older copies of the Radix dialog stack; each copy
+   tracks `<body>` `pointer-events` on its own, so a menu-opened vaul sheet leaves the
+   page unclickable on phones. `pnpm dedupe` only drops duplicates. Commit the
+   lockfile (on a Dependabot PR, as a normal commit on its branch);
+   `tests/ci/lockfile-single-radix.policy.test.ts` fails until every `@radix-ui/*`
+   package resolves to one version. Detail: `docs/reference/dependency-upgrades.md`
+   → One copy of Radix.
 
 ## Verify
 
@@ -51,6 +60,8 @@ existing security floors, coverage thresholds, and bundle budgets intact; report
 any remaining blocker rather than treating the pin as completion.
 
 - `pnpm run validate:lockfile` — lockfile in sync with `package.json`.
+- `pnpm exec vitest run --project ci-policy tests/ci/lockfile-single-radix.policy.test.ts`
+  — one copy of each Radix package (fix with `pnpm dedupe`).
 - `pnpm deps:audit` — no unaccepted high/critical vulnerabilities.
 - `pnpm knip` — no dead code left by a removal.
 

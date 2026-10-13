@@ -25,6 +25,10 @@ The approval is the manual gate — `main` requires 0 approvals (solo-maintained
 
 **Prefer merging Dependabot PRs** over ad-hoc bumps, then run `pnpm validate` on the branch.
 
+A group PR that moves `radix-ui`, `vaul` or `cmdk` usually needs `pnpm dedupe` pushed to its
+branch before its unit lane can pass: Dependabot's lockfile leaves older copies of the Radix
+dialog stack behind, and a ci-policy guard fails on them (see [One copy of Radix](#one-copy-of-radix)).
+
 ## Node.js (runtime)
 
 - **`package.json` → `engines.node`:** `>=24.15` — **Active LTS** only (currently the **24.x** line). Do not target odd/current non-LTS releases for CI or deploy defaults.
@@ -53,29 +57,53 @@ Revisit these when Dependabot or direct dependency upgrades remove the need.
 
 ## Test DOM compatibility
 
-Keep `jsdom` pinned exactly to `30.0.1` until a replacement passes the ordinary
-interaction suites below and `pnpm test:ci`. During PR #290 verification on
-2026-09-20, `30.1.0` failed 14 tests across these suites; changing only jsdom to
-`30.0.1` passed all 27 tests and the full 2,336-test coverage run. The failures
-depend on repeated menu interactions: a test can pass alone and fail after a
-preceding menu opens and unmounts. This is a measured compatibility constraint,
-not a confirmed diagnosis of an upstream defect.
+`jsdom` stays pinned to an exact version in `package.json` (`30.1.2` today), so it moves
+only through a reviewed bump. The old hold at `30.0.1` is over: the tree has since moved
+to `30.1.1` and now `30.1.2` with the full suite green.
+
+That hold recorded a symptom from PR #290 (2026-09-20) that was never diagnosed:
+`30.1.0` failed 14 menu-interaction tests, and a test could pass alone yet fail after a
+preceding menu opened and unmounted. The same shape came back on Dependabot's
+npm-non-major PRs #47 and #50, and there the cause was the lockfile, not the DOM: two
+copies of the Radix dialog stack (below). With `jsdom` 30.1.2 on both sides,
+`pnpm dedupe` alone turned every failure green. PR #290's failure most likely had the
+same cause.
+
+## One copy of Radix
+
+`radix-ui` (every shadcn primitive), `vaul` (the phone sheets, `ConfirmDialog` among
+them) and `cmdk` (the pickers and the command menu) all build on
+`@radix-ui/react-dialog` and the modules under it: `react-dismissable-layer`,
+`react-focus-scope`, `react-focus-guards`, `react-portal`, `react-presence`, and the
+scroll-lock and `aria-hidden` helpers. Those modules keep **module-level** state (the
+stack of open layers, the `<body>` `pointer-events` value saved when a modal layer opens,
+the focus-scope stack) and React contexts. Two versions in the lockfile means two copies
+of that state, each blind to the other.
+
+An incremental lockfile update, which is what Dependabot writes, never re-resolves a
+sub-dependency whose range is still satisfied. When the npm-non-major group moved
+`radix-ui` 1.6.7 → 1.8.0 (onto `react-dialog` 1.3.0 and `react-dismissable-layer` 1.2.0),
+`vaul` stayed on 1.1.23 / 1.1.19 and `cmdk` on 1.1.15 / 1.1.11. When a Radix menu opens
+the vaul confirm sheet at phone width, closing the sheet restores the menu's saved
+`pointer-events: none` and **the page stops taking clicks**. That is a real phone bug,
+and on #50 it failed 19 tests in three suites:
 
 ```bash
-pnpm exec vitest run --project unit src/shared/components/OrganizationSwitcher/OrganizationSwitcher.test.tsx src/shared/components/SettingsModal/organization/OrganizationMembersPanel.test.tsx src/shared/components/DataTable/DataTable.test.tsx src/shared/components/DateTimePrefsCard/DateTimePrefsCard.test.tsx
-pnpm test:ci
+pnpm exec vitest run --project unit \
+  src/shared/components/SettingsModal/organization/OrganizationRolesPanel.test.tsx \
+  src/shared/components/SettingsModal/organization/OrganizationMembersPanel.test.tsx \
+  'src/pages/organization/$organizationSlug/tasks/components/NewTaskDrawer/NewTaskDrawer.test.tsx'
 ```
 
-PR #290 ran the shared `MembersTable` suite; that component was removed as dead code.
-Its menus now live in `OrganizationMembersPanel` (row actions) and the `DataTable` kit
-suite (column sort), so those two stand in for it. They were not re-run against
-`30.1.0`.
-
-Before removing the pin, run these commands on the actual regenerated lockfile,
-without a module-resolution hook or test-only dependency substitution. Preserve
-the user-event interactions and assertions; do not hide the regression with
-mocks, skipped tests, or lower coverage thresholds. Commit the manifest and
-lockfile together and re-run the normal push hooks.
+- **Fix:** `pnpm dedupe`, then commit `pnpm-lock.yaml`. It moves every copy onto the
+  newest version each range accepts (`vaul` takes `^1.1.1`, `cmdk` `^1.1.6`), adds no
+  package version and only drops duplicates. On a Dependabot PR, push it to the PR's
+  branch as a normal commit.
+- **Guard:** `tests/ci/lockfile-single-radix.policy.test.ts` (ci-policy project, run by
+  `pnpm test:ci`) fails when any `@radix-ui/*` package or dialog-stack helper resolves to
+  more than one version. Its message names each duplicate and its versions and says to
+  run `pnpm dedupe`. If a duplicate survives the dedupe, `pnpm why <package>` names the
+  dependency pinning an incompatible range.
 
 ## Pins and known constraints
 
@@ -140,6 +168,22 @@ design**: its full-tree step is blocking, because a scheduled run blocks no merg
 run is how a finding stays visible.
 
 ## Upgrade decisions log
+
+### npm-non-major group with radix-ui 1.8 — `pnpm dedupe` and a duplicate-copy guard (2026-10-13) — ADOPTED
+
+- **What:** Dependabot's npm-non-major group (#50, 26 updates, after #47 closed): patch and
+  minor bumps across TanStack, i18next, `radix-ui` 1.6.7 → 1.8.0, `react-hook-form`, `zod`,
+  Playwright 1.64, Vite 8.3.4, `jsdom` 30.1.2 and the dev tooling.
+- **Broke:** the unit lane. The lockfile Dependabot wrote kept `vaul` and `cmdk` on older
+  copies of the Radix dialog stack, and a menu-opened vaul sheet left `<body>` unclickable
+  (see [One copy of Radix](#one-copy-of-radix)).
+- **Fixed:** `pnpm dedupe`, which removed 81 duplicate versions (31 of them `@radix-ui`
+  copies) and added none.
+- **Guarded** by `tests/ci/lockfile-single-radix.policy.test.ts`. Against the lockfile
+  Dependabot wrote it fails, listing 17 duplicated packages; against the deduped one it
+  passes.
+- **Bundle:** first-paint JS 243.75 kB before the dedupe and 243.73 kB after, under the
+  243.8 kB limit, which is unchanged.
 
 ### Advisory floors — seroval, source-map-js, MCP SDK (2026-10-13) — ADOPTED
 
