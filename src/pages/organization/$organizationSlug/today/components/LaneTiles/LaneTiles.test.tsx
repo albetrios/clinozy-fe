@@ -68,6 +68,29 @@ describe('LaneTiles (KICKOFF §6.2 Lane tiles)', () => {
     expect(await axe(container)).toHaveNoViolations();
   });
 
+  it('edges the pressed tile in its lane’s own hue with a halo, never its ink', async () => {
+    renderWithProviders(
+      <LaneTiles
+        lanes={LANES}
+        selected="waiting"
+        focus={todayFocus(['owner'])}
+        today="2026-10-03"
+        onSelect={vi.fn()}
+      />,
+    );
+    const group = await screen.findByRole('group', { name: 'Lanes' });
+    const waiting = within(group).getByRole('button', { pressed: true });
+    expect(waiting).toHaveClass(
+      'border-tone-butter-edge',
+      'ring-3',
+      'ring-tone-butter-dot/22',
+    );
+    expect(waiting).not.toHaveClass('border-tone-butter-foreground');
+    const arriving = within(group).getAllByRole('button', { pressed: false })[1];
+    expect(arriving).toHaveClass('hover:border-tone-sky-edge');
+    expect(arriving).not.toHaveClass('ring-3');
+  });
+
   it('counts, shows four faces then "+N", and hints the earliest time', async () => {
     renderWithProviders(
       <LaneTiles

@@ -164,7 +164,7 @@ describe('DrawerQuickChips', () => {
     expect(onChange).toHaveBeenCalledWith(90);
   });
 
-  it('edges the picked chip in the text ink where the screen asks (the quick dates)', () => {
+  it('edges the picked chip in stone’s edge and halo where the screen asks (the quick dates)', () => {
     render(
       <DrawerQuickChips
         label="Date & time"
@@ -180,9 +180,11 @@ describe('DrawerQuickChips', () => {
     );
     expect(screen.getByTestId('quick-today')).toHaveClass(
       'bg-muted',
-      'border-foreground',
+      'inset-ring-tone-stone-edge',
     );
     expect(screen.getByTestId('quick-today')).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByTestId('quick-tomorrow')).not.toHaveClass('border-foreground');
+    expect(screen.getByTestId('quick-tomorrow')).not.toHaveClass(
+      'inset-ring-tone-stone-edge',
+    );
   });
 });

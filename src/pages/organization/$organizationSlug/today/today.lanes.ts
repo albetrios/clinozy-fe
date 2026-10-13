@@ -46,8 +46,10 @@ export const TODAY_LANE_META: Readonly<Record<TodayLane, TodayLaneMeta>> = {
 
 /**
  * A tile's own paint beyond the tone's (`TONE_CLASSES`), as full literals so
- * Tailwind sees each: the pressed border in the lane's ink, hover inking the
- * border at once (no transition, `today.md:35`), and a face's ring in the
+ * Tailwind sees each: the pressed tile's border in the lane's edge colour
+ * with a soft halo in its dot (not the design's ink — change-shell-polish-and-
+ * sign-in, D7), hover edging the border at once (no transition, `today.md:35`),
+ * and a face's ring in the
  * lane's fill. Out of the member's focus the fill, its border and the faces'
  * ring take the design's 60% (`dimFill`, `dimBorder`, `dimFace`) — the
  * surface only; the text recedes on AA-safe steps instead (`LaneTiles`).
@@ -56,7 +58,7 @@ export const LANE_TILE_TONES: Readonly<
   Record<
     TodayLaneTone,
     {
-      ink: string;
+      pressed: string;
       hover: string;
       face: string;
       dimFill: string;
@@ -66,48 +68,48 @@ export const LANE_TILE_TONES: Readonly<
   >
 > = {
   lav: {
-    ink: 'border-tone-lav-foreground',
-    hover: 'hover:border-tone-lav-foreground',
+    pressed: 'border-tone-lav-edge ring-3 ring-tone-lav-dot/22',
+    hover: 'hover:border-tone-lav-edge',
     face: 'border-tone-lav',
     dimFill: 'bg-tone-lav/60',
     dimBorder: 'border-tone-lav-border/60',
     dimFace: 'border-tone-lav/60',
   },
   sky: {
-    ink: 'border-tone-sky-foreground',
-    hover: 'hover:border-tone-sky-foreground',
+    pressed: 'border-tone-sky-edge ring-3 ring-tone-sky-dot/22',
+    hover: 'hover:border-tone-sky-edge',
     face: 'border-tone-sky',
     dimFill: 'bg-tone-sky/60',
     dimBorder: 'border-tone-sky-border/60',
     dimFace: 'border-tone-sky/60',
   },
   butter: {
-    ink: 'border-tone-butter-foreground',
-    hover: 'hover:border-tone-butter-foreground',
+    pressed: 'border-tone-butter-edge ring-3 ring-tone-butter-dot/22',
+    hover: 'hover:border-tone-butter-edge',
     face: 'border-tone-butter',
     dimFill: 'bg-tone-butter/60',
     dimBorder: 'border-tone-butter-border/60',
     dimFace: 'border-tone-butter/60',
   },
   blush: {
-    ink: 'border-tone-blush-foreground',
-    hover: 'hover:border-tone-blush-foreground',
+    pressed: 'border-tone-blush-edge ring-3 ring-tone-blush-dot/22',
+    hover: 'hover:border-tone-blush-edge',
     face: 'border-tone-blush',
     dimFill: 'bg-tone-blush/60',
     dimBorder: 'border-tone-blush-border/60',
     dimFace: 'border-tone-blush/60',
   },
   sage: {
-    ink: 'border-tone-sage-foreground',
-    hover: 'hover:border-tone-sage-foreground',
+    pressed: 'border-tone-sage-edge ring-3 ring-tone-sage-dot/22',
+    hover: 'hover:border-tone-sage-edge',
     face: 'border-tone-sage',
     dimFill: 'bg-tone-sage/60',
     dimBorder: 'border-tone-sage-border/60',
     dimFace: 'border-tone-sage/60',
   },
   mint: {
-    ink: 'border-tone-mint-foreground',
-    hover: 'hover:border-tone-mint-foreground',
+    pressed: 'border-tone-mint-edge ring-3 ring-tone-mint-dot/22',
+    hover: 'hover:border-tone-mint-edge',
     face: 'border-tone-mint',
     dimFill: 'bg-tone-mint/60',
     dimBorder: 'border-tone-mint-border/60',

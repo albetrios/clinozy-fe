@@ -285,12 +285,7 @@ function HourRow({
                 'text-caption h-6.5 min-w-0 rounded-md border px-1 font-medium whitespace-nowrap tabular-nums transition-shadow',
                 on
                   ? cn(tone.fill, 'border-transparent')
-                  : cn(
-                      'bg-card',
-                      tone.ink,
-                      tone.border,
-                      'hover:ring-1 hover:ring-current',
-                    ),
+                  : cn('bg-card', tone.ink, tone.border, tone.selectedHover),
               )}
             >
               :{slot.time.slice(3)}

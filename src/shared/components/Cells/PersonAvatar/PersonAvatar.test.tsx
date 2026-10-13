@@ -110,17 +110,13 @@ describe('PersonAvatar', () => {
     }
   });
 
-  it('rings a picked person in the tone ink, 2px off the disc', () => {
+  it('rings a picked person in the tone’s edge colour (never its ink), 2px off the disc', () => {
     const { container } = render(
       <PersonAvatar initials="NK" tone="sage" size="list" selected />,
     );
     const disc = container.querySelector('[data-slot="avatar"]');
-    expect(disc).toHaveClass(
-      'ring-[1.5px]',
-      'ring-offset-2',
-      'ring-tone-sage-foreground',
-    );
-    expect(disc).not.toHaveClass('ring-1');
+    expect(disc).toHaveClass('ring-[1.5px]', 'ring-offset-2', 'ring-tone-sage-edge');
+    expect(disc).not.toHaveClass('ring-1', 'ring-tone-sage-foreground');
   });
 
   it('paints an offline dot in border-strong', () => {

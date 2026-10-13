@@ -257,7 +257,7 @@ function ReasonDescription({
 }
 
 const CHIP_CLASS =
-  'text-detail inline-flex h-7 items-center px-3 font-medium whitespace-nowrap transition-shadow hover:ring-1 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:ring-[1.5px]';
+  'text-detail inline-flex h-7 items-center px-3 font-medium whitespace-nowrap transition-shadow hover:inset-ring disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:inset-ring-[1.5px] data-[state=checked]:ring-3';
 
 /** A field's message from the server (a 422), announced as it appears. */
 function FieldError({
