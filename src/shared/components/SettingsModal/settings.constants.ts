@@ -466,3 +466,67 @@ export const SETTINGS_SECTION_LABEL_KEYS = {
   billing: SETTINGS_KEYS.nav.billing,
   integrations: SETTINGS_KEYS.nav.integrations,
 } as const;
+
+/** The two keys of a settings section's head row: its title and its sub line. */
+interface SettingsSectionHeadingKeys {
+  title: string;
+  description: string;
+}
+
+/**
+ * Each settings section's head row — the title and sub line its panel draws, and the
+ * stand-in the drawer draws while that panel's code loads (`SettingsSectionHeader`).
+ *
+ * @remarks
+ * One map for both, so the header shown first is the header that stays: the stand-in
+ * used to name a section by its nav label and leave out the sub line, and the panel
+ * then grew the header by a line (and on General changed its title) a beat after the
+ * drawer opened. The title is the panel's heading, not the nav label — the two differ
+ * on General ("Organization · General"). Integrations swaps its sub line for
+ * `descriptionApiKeysOnly` when the caller cannot see webhooks.
+ */
+export const SETTINGS_SECTION_HEADING_KEYS = {
+  profile: {
+    title: SETTINGS_KEYS.panels.profile.title,
+    description: SETTINGS_KEYS.panels.profile.description,
+  },
+  account: {
+    title: SETTINGS_KEYS.panels.account.title,
+    description: SETTINGS_KEYS.panels.account.description,
+  },
+  security: {
+    title: SETTINGS_KEYS.security.heading,
+    description: SETTINGS_KEYS.security.description,
+  },
+  notifications: {
+    title: SETTINGS_KEYS.panels.notifications.title,
+    description: SETTINGS_KEYS.panels.notifications.description,
+  },
+  sessions: {
+    title: SETTINGS_KEYS.panels.sessions.title,
+    description: SETTINGS_KEYS.panels.sessions.description,
+  },
+  general: {
+    title: SETTINGS_KEYS.panels.general.title,
+    description: SETTINGS_KEYS.panels.general.description,
+  },
+  members: {
+    title: SETTINGS_KEYS.panels.members.title,
+    description: SETTINGS_KEYS.panels.members.description,
+  },
+  roles: {
+    title: SETTINGS_KEYS.panels.roles.title,
+    description: SETTINGS_KEYS.panels.roles.description,
+  },
+  billing: {
+    title: SETTINGS_KEYS.panels.billing.title,
+    description: SETTINGS_KEYS.panels.billing.description,
+  },
+  integrations: {
+    title: SETTINGS_KEYS.panels.integrations.title,
+    description: SETTINGS_KEYS.panels.integrations.description,
+  },
+} as const satisfies Record<
+  keyof typeof SETTINGS_SECTION_LABEL_KEYS,
+  SettingsSectionHeadingKeys
+>;

@@ -16,7 +16,7 @@ import {
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { useRegisterSettingsDirty } from '@/shared/components/SettingsModal/settings-dirty.tsx';
-import { SectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
+import { SettingsSectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { useCan } from '@/shared/hooks/useCan/index.ts';
 import {
@@ -168,10 +168,7 @@ export function OrganizationGeneralPanel() {
 
   return (
     <div className="flex flex-col gap-4" data-testid="settings-section-org-general">
-      <SectionHeader
-        title={t(SETTINGS_KEYS.panels.general.title)}
-        description={t(SETTINGS_KEYS.panels.general.description)}
-      />
+      <SettingsSectionHeader section="general" />
       <QueryBoundary
         query={orgsQuery}
         errorMessage={t(SETTINGS_KEYS.panels.general.loadFailed)}
