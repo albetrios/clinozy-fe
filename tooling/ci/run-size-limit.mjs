@@ -473,8 +473,17 @@ const config = [
            * handle's slot, and the Appearance studio's controls — Tailwind emits
            * a file's classes whether or not anything mounts it. ~0.4 kB of
            * headroom.
+           *
+           * 35.9 → 35.7 kB, lowered: measured 35.25 kB, from 35.89 kB on main
+           * (aeee944f) — the cookie card (#57) and the sign-in showcase (#58)
+           * had used the headroom above. The retired base-colour picker's tint
+           * blocks (`[data-base='stone' | 'slate' | 'olive' | 'zinc' | 'warm']`,
+           * light and dark: ten blocks, −0.64 kB) left `index.css`; nothing has
+           * set `data-base` since the theme studio went (L-65), so no screen
+           * changes. `pnpm perf:routes`' `cssKb` (35.4, measured 34.8) keeps its
+           * pin — it only ever comes down. ~0.45 kB of headroom.
            */
-          limit: '35.9 kB',
+          limit: '35.7 kB',
           gzip: true,
         },
       ]
