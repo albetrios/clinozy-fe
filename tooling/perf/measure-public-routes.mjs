@@ -490,7 +490,8 @@ async function main() {
       for (const row of breach.top) log(`      ${String(row.kb).padStart(7)} kB  ${row.file}`);
     }
     log('\n  Budgets are a RATCHET: lower them as routes shrink, never raise to');
-    log('  absorb growth. Re-pin deliberately with `pnpm perf:routes --update`.');
+    log('  absorb growth. Re-pin deliberately with `pnpm perf:routes --update`,');
+    log('  and itemise the raise in tests/performance/README.md → Re-pins.');
     process.exit(1);
   }
 
