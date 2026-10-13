@@ -303,6 +303,14 @@ clinozy-fe/
 │   │   ├── AS-BUILT.md
 │   │   ├── KICKOFF.md
 │   │   └── README.md
+│   ├── fix-sign-out-straight-to-login-2026-10-13-jjlp/
+│   │   ├── intake-files/
+│   │   │   └── BRIEF.md
+│   │   ├── plans/
+│   │   │   └── decisions.md
+│   │   ├── AS-BUILT.md
+│   │   ├── KICKOFF.md
+│   │   └── README.md
 │   ├── launch-2026-09-30-jxmr/
 │   │   ├── intake-files/
 │   │   │   ├── _index.md
