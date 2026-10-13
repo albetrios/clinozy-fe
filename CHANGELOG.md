@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.12.0](https://github.com/albetrios/clinozy-fe/compare/v1.11.0...v1.12.0) (2026-10-13)
+
+
+### Added
+
+* **app:** clinic launch — every room on clinozy-be ([#44](https://github.com/albetrios/clinozy-fe/issues/44)) ([7f150a6](https://github.com/albetrios/clinozy-fe/commit/7f150a66e1fdbe098f026993dbf5be3fb1482eac))
+
+
+### Fixed
+
+* **deps:** floor seroval, source-map-js and the MCP SDK past their advisories ([#49](https://github.com/albetrios/clinozy-fe/issues/49)) ([c04b36e](https://github.com/albetrios/clinozy-fe/commit/c04b36e15e579a8380190a6ccc88e949999dceeb))
+
 ## [1.11.0](https://github.com/albetrios/clinozy-fe/compare/v1.10.0...v1.11.0) (2026-10-03)
 
 
