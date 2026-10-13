@@ -314,6 +314,7 @@ clinozy-fe/
 │   │   │   └── users.md
 │   │   ├── plans/
 │   │   │   └── decisions.md
+│   │   ├── KICKOFF.md
 │   │   └── README.md
 │   ├── launch-2026-09-30-jxmr/
 │   │   ├── intake-files/
