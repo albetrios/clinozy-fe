@@ -27,6 +27,17 @@ export const ANALYTICS_EVENTS = {
   commandPaletteOpened: 'command_palette_opened',
   appearanceDialogOpened: 'appearance_dialog_opened',
 
+  /** Clinic setup (feat-clinic-setup KICKOFF §6.8) — never with patient data. */
+  setupStarted: 'setup_started',
+  setupStepCompleted: 'setup_step_completed',
+  setupLive: 'setup_live',
+  setupDeferred: 'setup_deferred',
+  setupGuideItem: 'setup_guide_item',
+  setupGuideHidden: 'setup_guide_hidden',
+  firstAppointmentBooked: 'first_appointment_booked',
+  /** "How did you hear about us?" — asked on "You're live" since /onboarding was shortened. */
+  setupHeardAbout: 'setup_heard_about',
+
   /** Deploy / version */
   deploymentUpdateAvailable: 'deployment_update_available',
   deploymentUpdateRefreshClicked: 'deployment_update_refresh_clicked',

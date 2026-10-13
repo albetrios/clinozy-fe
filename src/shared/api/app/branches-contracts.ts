@@ -86,8 +86,11 @@ export interface BranchSave {
   /** The edited branch; none for a new one. */
   branch?: Pick<AppBranch, 'id' | 'updatedAt'>;
   input: BranchInput;
-  /** Everyone who works at the branch after the save (membership ids). */
-  memberIds: readonly string[];
+  /**
+   * Everyone who works at the branch after the save (membership ids). Left out, the team is not
+   * written: a new branch gets its creator (clinozy-be D13), an edit keeps the team it has.
+   */
+  memberIds?: readonly string[];
   /** An edit's team as it was: the members are written only when they changed. */
   memberIdsBefore?: readonly string[];
 }

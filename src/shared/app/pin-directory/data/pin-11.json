@@ -1,0 +1,842 @@
+{
+  "110001": [
+    "New Delhi",
+    "Delhi",
+    [
+      "Baroda House",
+      "Bengali Market",
+      "Bhagat Singh Market",
+      "Connaught Place",
+      "Election Commission",
+      "Janpath",
+      "Krishi Bhawan",
+      "Lady Harding Medical College",
+      "New Delhi",
+      "North Avenue",
+      "Parliament House",
+      "Patiala House",
+      "Pragati Maidan",
+      "Rail Bhawan",
+      "Sansad Marg",
+      "Sansadiya Soudh",
+      "Secretariat North",
+      "Shastri Bhawan",
+      "South Avenue",
+      "Supreme Court"
+    ]
+  ],
+  "110002": [
+    "Central",
+    "Delhi",
+    [
+      "Agcr",
+      "Ajmeri Gate Extn",
+      "Civic Centre",
+      "Darya Ganj",
+      "Gandhi Smarak Nidhi",
+      "Indraprastha",
+      "IPEstate",
+      "Minto Road"
+    ]
+  ],
+  "110003": [
+    "South East",
+    "Delhi",
+    [
+      "Aliganj",
+      "C G O Complex",
+      "Delhi High Court",
+      "Golf Links",
+      "Kasturba Nagar",
+      "Lodi Road",
+      "Pandara Road",
+      "Pragati Vihar",
+      "Safdarjung Air Port"
+    ]
+  ],
+  "110004": ["New Delhi", "Delhi", ["Rashtrapati Bhawan"]],
+  "110005": [
+    "Central",
+    "Delhi",
+    [
+      "Anand Parbat",
+      "Anand Parbat Indl Area",
+      "Bank Street",
+      "Desh Bandhu Gupta Road",
+      "Guru Gobind Singh Marg",
+      "Karol Bagh",
+      "Master Prithvi Nath Marg",
+      "Sat Nagar"
+    ]
+  ],
+  "110006": [
+    "Central",
+    "Delhi",
+    [
+      "Baratooti",
+      "Chandni Chowk",
+      "Chawri Bazar",
+      "Dareeba",
+      "Delhi",
+      "Delhi Sadar Bazar",
+      "Hauz Qazi",
+      "Jama Masjid"
+    ]
+  ],
+  "110007": [
+    "North",
+    "Delhi",
+    [
+      "Delhi University",
+      "Gulabi Bagh",
+      "Jawahar Nagar",
+      "Kamla Nagar",
+      "Malka Ganj",
+      "Padam Nagar",
+      "Rana Pratap Bagh",
+      "Rcao",
+      "Roop Nagar",
+      "Roshan Ara Road",
+      "Shakti Nagar"
+    ]
+  ],
+  "110008": [
+    "West",
+    "Delhi",
+    [
+      "Dada Ghosh Bhawan",
+      "Patel Nagar",
+      "Patel Nagar East",
+      "Patel Nagar South",
+      "Patel Nagar West"
+    ]
+  ],
+  "110009": [
+    "North",
+    "Delhi",
+    [
+      "DrMukerjee Nagar",
+      "G T B Nagar Extension",
+      "GTB Nagar",
+      "Gujranwala Colony",
+      "HSSangh",
+      "Model Town II",
+      "Model Town III",
+      "Nirankari Colony"
+    ]
+  ],
+  "110010": [
+    "New Delhi",
+    "Delhi",
+    [
+      "505 A B Workshop",
+      "A F Palam",
+      "Aps Colony",
+      "Cod",
+      "CVD",
+      "Delhi Cantt",
+      "Dhaula Kuan",
+      "Kirby Place",
+      "Pinto Park",
+      "R R Hospital",
+      "Signal Enclave",
+      "Station Road",
+      "Subroto Park"
+    ]
+  ],
+  "110011": ["New Delhi", "Delhi", ["Nirman Bhawan", "Udyog Bhawan"]],
+  "110012": ["West", "Delhi", ["Iari", "Inderpuri", "National Physical Laboratory"]],
+  "110013": ["South", "Delhi", ["Dargah Sharif", "Hazrat Nizamuddin"]],
+  "110014": [
+    "South",
+    "Delhi",
+    ["Hari Nagar Ashram", "Jeevan Nagar", "Jungpura", "Pratap Market"]
+  ],
+  "110015": [
+    "West",
+    "Delhi",
+    [
+      "Esi",
+      "Karam Pura",
+      "L. M. Nagar Indl. Area",
+      "Mansarover Garden",
+      "Moti Nagar",
+      "Ramesh Nagar",
+      "Zakhira"
+    ]
+  ],
+  "110016": [
+    "South",
+    "Delhi",
+    [
+      "Green Park Market",
+      "Hauz Khas",
+      "Hauz Khas Market",
+      "IT Hauz Khas",
+      "NIE Campus",
+      "Technology Bhawan"
+    ]
+  ],
+  "110017": [
+    "South",
+    "Delhi",
+    [
+      "Distt Court Complex Saket",
+      "Malviya Nagar",
+      "MMTCSTC Colony",
+      "Panchsheel Enclave",
+      "Pushp Vihar",
+      "Saket",
+      "Sarvodya Enclave",
+      "South Malviya Nagar"
+    ]
+  ],
+  "110018": [
+    "West",
+    "Delhi",
+    [
+      "Ashok Nagar",
+      "Chand Nagar",
+      "Chaukhandi",
+      "Fateh Nagar",
+      "Khyala Phase I",
+      "Khyala Phase II",
+      "M.B.S. Nagar",
+      "Mahabir Nagar",
+      "Tilak Nagar",
+      "Tilak Nagar East",
+      "Vikas Puri",
+      "Vishnu Garden"
+    ]
+  ],
+  "110019": [
+    "South East",
+    "Delhi",
+    ["Alaknanda", "Chittranjan Park", "Kalkaji", "Nehru Place"]
+  ],
+  "110020": [
+    "South East",
+    "Delhi",
+    [
+      "C R R I",
+      "F F C Okhla",
+      "Okhla Industrial Area Phasei",
+      "Okhla Industrial Estate",
+      "Tehkhand"
+    ]
+  ],
+  "110021": [
+    "New Delhi",
+    "Delhi",
+    [
+      "Anand Niketan",
+      "Chanakya Puri",
+      "Malcha Marg",
+      "Moti Bagh",
+      "Nanak Pura",
+      "South Delhi Campus"
+    ]
+  ],
+  "110022": [
+    "New Delhi",
+    "Delhi",
+    [
+      "R K Puram Sect1",
+      "R K Puram Sect12",
+      "R K Puram Sect3",
+      "R K Puram Sect4",
+      "R K Puram Sect5",
+      "R K Puram Sect7",
+      "R K Puram Sect8",
+      "R K Puram Sector 6 Postal SB"
+    ]
+  ],
+  "110023": [
+    "New Delhi",
+    "Delhi",
+    [
+      "Kidwai Nagar East",
+      "Kidwai Nagar West",
+      "Laxmi Bai Nagar",
+      "Netaji Nagar",
+      "Sarojini Nagar"
+    ]
+  ],
+  "110024": [
+    "South East",
+    "Delhi",
+    ["Amar Colony", "Defence Colony", "Krishna Market", "Lajpat Nagar South Delhi"]
+  ],
+  "110025": [
+    "South East",
+    "Delhi",
+    [
+      "Abul Fazal EnclaveI",
+      "Jamia Nagar",
+      "New Friends Colony",
+      "Sukhdev Vihar",
+      "Zakir Nagar"
+    ]
+  ],
+  "110026": [
+    "West",
+    "Delhi",
+    ["Ashoka Park Extn.", "Punjabi Bagh", "Punjabi Bagh Sec III", "Shivaji Park"]
+  ],
+  "110027": [
+    "West",
+    "Delhi",
+    [
+      "Janta Market",
+      "Rajouri Garden J 6",
+      "Rajouri Market",
+      "Subhash Nagar",
+      "Subhash Nagar West",
+      "Tagore Garden"
+    ]
+  ],
+  "110028": ["New Delhi", "Delhi", ["Naraina Industrial Estate", "Naraina Village"]],
+  "110029": ["South", "Delhi", ["Ansari Nagar", "Nauroji Nagar", "Safdarjung Enclave"]],
+  "110030": [
+    "South",
+    "Delhi",
+    [
+      "Gadaipur",
+      "Ghitorni",
+      "Lado Sarai",
+      "Mehrauli",
+      "Paryavaran Complex",
+      "Sultanpur",
+      "T B Hospital"
+    ]
+  ],
+  "110031": [
+    "Shahdara",
+    "Delhi",
+    [
+      "Gandhi Nagar",
+      "Gandhi Nagar Bazar",
+      "Geeta Colony",
+      "Kailash Nagar",
+      "Raghubar Pura",
+      "Rajgarh Colony",
+      "Shastri Nagar"
+    ]
+  ],
+  "110032": [
+    "Shahdara",
+    "Delhi",
+    [
+      "Babarpur",
+      "Balbir Nagar",
+      "Bhola Nath Nagar",
+      "Distt Court KKD",
+      "Goverdhan Bihari Colony",
+      "Loni Road",
+      "Man Sarovar Park",
+      "Rohtash Nagar",
+      "Shahdara",
+      "Shahdara Mandi",
+      "Shivaji Park",
+      "Telewara",
+      "Vishwas Nagar"
+    ]
+  ],
+  "110033": [
+    "North",
+    "Delhi",
+    [
+      "Adrash Nagar",
+      "Bhalaswa",
+      "Jahangir Puri A Block",
+      "Jahangir Puri D Block",
+      "Jahangir Puri H Block",
+      "NSMandi"
+    ]
+  ],
+  "110034": [
+    "North West",
+    "Delhi",
+    [
+      "Anandvas Shakurpur",
+      "Maurya Enclave",
+      "Rani Bagh",
+      "Saraswati Vihar",
+      "Shakur Pur I Block",
+      "Shakurbasti Rs",
+      "Sri Nagar Colony"
+    ]
+  ],
+  "110035": [
+    "North West",
+    "Delhi",
+    [
+      "C4 Keshav Puram",
+      "Ganeshpura",
+      "Inderlok",
+      "Keshavpuram",
+      "Power House",
+      "Rampura",
+      "Sarai Rohilla"
+    ]
+  ],
+  "110036": [
+    "North",
+    "Delhi",
+    [
+      "Alipur",
+      "Bakhtawar Pur",
+      "Bakoli",
+      "Hiranki",
+      "Kadipur",
+      "Khampur",
+      "Mukhmelpur",
+      "Nangal Poona",
+      "Palla"
+    ]
+  ],
+  "110037": [
+    "New Delhi",
+    "Delhi",
+    ["Gurgaon Road", "IGI Airport", "Mahipalpur", "Nangal Dewat", "Palam Airport"]
+  ],
+  "110038": ["New Delhi", "Delhi", ["A F Rajokari", "Rajokari"]],
+  "110039": [
+    "North",
+    "Delhi",
+    [
+      "Auchandi",
+      "Barwala",
+      "Bawana",
+      "Ghoga",
+      "Hareveli",
+      "Jat Khore",
+      "Katewara",
+      "Mungeshpur",
+      "Nangal Thakran",
+      "Pooth Khurd",
+      "Qutabagarh"
+    ]
+  ],
+  "110040": [
+    "North West",
+    "Delhi",
+    [
+      "Bankner",
+      "Bhorgarh",
+      "Kanya Gurukul",
+      "Lampur",
+      "Narela",
+      "Narela Town",
+      "Singhu",
+      "Tikri Khurd"
+    ]
+  ],
+  "110041": [
+    "West",
+    "Delhi",
+    [
+      "Bakkarwala",
+      "Hirankudna",
+      "Kunwar Singh Nagar",
+      "Mundka",
+      "Nangloi",
+      "Nangloi II",
+      "Nangloi III",
+      "Neelwal",
+      "Nilothi",
+      "Ranhola",
+      "Tikri Kalan"
+    ]
+  ],
+  "110042": [
+    "North",
+    "Delhi",
+    [
+      "Badli",
+      "Delhi Engg College",
+      "Mukundpur Village",
+      "Pehlad Pur",
+      "Samai Pur",
+      "Shahbad Dairy",
+      "Siraspur"
+    ]
+  ],
+  "110043": [
+    "South West",
+    "Delhi",
+    [
+      "Arjun Park",
+      "Baprola",
+      "Daulatpur",
+      "Dichaun Kalan",
+      "Dindarpur",
+      "Durga Park",
+      "Gopal Nagar",
+      "Jhatikara",
+      "Kair",
+      "Khaira",
+      "Mitraon",
+      "Najafgarh",
+      "Pandwala Kalan",
+      "Papravat",
+      "Rewla Khanpur",
+      "Shyam Vihar",
+      "Surehra",
+      "Tilangpur Kotla"
+    ]
+  ],
+  "110044": [
+    "South",
+    "Delhi",
+    [
+      "Badarpur",
+      "BTPS",
+      "Jaitpur",
+      "Lal Kuan",
+      "Meethapur",
+      "Molarband",
+      "Pul Pahladpur",
+      "Tugalkabad Railway Colony",
+      "Village Tugalkabad"
+    ]
+  ],
+  "110045": [
+    "South West",
+    "Delhi",
+    ["Dabri", "Indira Park", "Mahavir Enclave", "Nasirpur", "Palam Village"]
+  ],
+  "110046": ["New Delhi", "Delhi", ["Nangal Raya", "Sagarpur"]],
+  "110047": ["South", "Delhi", ["Arjungarh", "Aya Nagar", "Jaunapur", "Mandi"]],
+  "110048": ["South East", "Delhi", ["Greater Kailash", "Kailash Colony", "Masjid Moth"]],
+  "110049": [
+    "South East",
+    "Delhi",
+    [
+      "Andrewsganj",
+      "Gautam Nagar",
+      "Gulmohar Park",
+      "New Delhi South ExtII",
+      "Sadiq Nagar",
+      "Sahpurjat"
+    ]
+  ],
+  "110051": [
+    "Shahdara",
+    "Delhi",
+    ["Azad Nagar", "Govind Pura", "Krishna Nagar", "Ram Nagar"]
+  ],
+  "110052": [
+    "North",
+    "Delhi",
+    ["Ashok Vihar", "Nimri", "Satyawati Nagar", "Shastri Nagar", "Wazir Pur III"]
+  ],
+  "110053": [
+    "North East",
+    "Delhi",
+    [
+      "Bhajan Pura",
+      "Brahampuri",
+      "Garhi Mandu",
+      "Jafrabad",
+      "Jagjit Nagar",
+      "Maujpur",
+      "New Usmanpur",
+      "Seelampur",
+      "Yamuna Vihar"
+    ]
+  ],
+  "110054": [
+    "Central",
+    "Delhi",
+    ["Aruna Nagar", "Civil Lines", "District Courts", "Patrachar Vidyalay", "Timarpur"]
+  ],
+  "110055": [
+    "Central",
+    "Delhi",
+    ["AKMarket", "Multani Dhanda", "Pahar Ganj", "Swami Ram Tirth Nagar"]
+  ],
+  "110056": ["North West", "Delhi", ["Shakur Basti Depot"]],
+  "110057": ["New Delhi", "Delhi", ["Vasant Vihar1", "Vasant Vihar2"]],
+  "110058": [
+    "West",
+    "Delhi",
+    ["D.E.S.U. Colony", "Jail Road", "Janakpuri A 3", "Janakpuri B 1", "Janakpuri C 4"]
+  ],
+  "110059": [
+    "West",
+    "Delhi",
+    [
+      "D. K. Mohan Garden",
+      "Hastal Village",
+      "Jeevan Park",
+      "K5 Extn. Mohan Garden",
+      "Matiala",
+      "Sanjay Enclave",
+      "Uttam Nagar"
+    ]
+  ],
+  "110060": ["Central", "Delhi", ["Rajender Nagar"]],
+  "110061": ["South West", "Delhi", ["Bijwasan", "Shahbad Mohammadpur"]],
+  "110062": [
+    "South",
+    "Delhi",
+    [
+      "Dakshinpuri PhaseI",
+      "Dakshinpuri PhaseII",
+      "Dakshinpuri PhaseIII",
+      "Dr Ambedkar Nagar",
+      "Hamdard Nagar",
+      "Pushpa Bhawan"
+    ]
+  ],
+  "110063": [
+    "West",
+    "Delhi",
+    [
+      "Jawala Heri",
+      "Madipur Slum Quarter",
+      "Madipur Village",
+      "Paschim Vihar",
+      "Paschim Vihar B Block"
+    ]
+  ],
+  "110064": [
+    "West",
+    "Delhi",
+    [
+      "Hari Nagar",
+      "Hari Nagar BE Block",
+      "Hari Nagar Dadb Block",
+      "Maya Puri",
+      "Mayapuri Shopping Centre"
+    ]
+  ],
+  "110065": [
+    "South East",
+    "Delhi",
+    [
+      "East Of Kailash",
+      "East Of Kailash PhaseI",
+      "Nehru Nagar",
+      "Sant Nagar",
+      "Sriniwaspuri"
+    ]
+  ],
+  "110066": ["New Delhi", "Delhi", ["R K Puram Main", "R K Puram West"]],
+  "110067": ["New Delhi", "Delhi", ["Jnu", "JNU New Campus", "Munirka"]],
+  "110068": ["South", "Delhi", ["Ignou", "Maidan Garhi"]],
+  "110069": ["New Delhi", "Delhi", ["Union Public Service Commission"]],
+  "110070": ["New Delhi", "Delhi", ["Masood Pur", "Vasant Kunj", "Vasant Kunj PktA"]],
+  "110071": [
+    "South West",
+    "Delhi",
+    ["Badusarai", "Chhawla", "Kangan Heri", "Qutub Vihar"]
+  ],
+  "110072": ["South West", "Delhi", ["CRPF Jharoda Kalan", "Jharoda Kalan"]],
+  "110073": [
+    "South West",
+    "Delhi",
+    [
+      "Dhansa",
+      "Galib Pur",
+      "Ghuman Hera",
+      "Issapur",
+      "Jafarpur",
+      "Khera Dabur",
+      "Malik Pur",
+      "Mundela Kalan",
+      "Quazipur",
+      "Raota",
+      "Ujwa"
+    ]
+  ],
+  "110074": [
+    "South",
+    "Delhi",
+    [
+      "Bhati Village",
+      "Chandanhoola",
+      "Chattarpur",
+      "CSKM School",
+      "Dera",
+      "Fatehpur Beri",
+      "Sanjay Colony Bhati Mines",
+      "Satbari"
+    ]
+  ],
+  "110075": [
+    "South West",
+    "Delhi",
+    ["Amberhai", "District Court Complex Dwarka", "Dwarka Sec-6"]
+  ],
+  "110076": ["South", "Delhi", ["Ali", "Madanpur Khadar", "Sarita Vihar"]],
+  "110077": [
+    "South West",
+    "Delhi",
+    ["Bagdola", "Barthal", "Dhulsiras", "Palam Extn (Harijan Basti)", "Raj Nagar II"]
+  ],
+  "110078": ["South West", "Delhi", ["GGSIP University", "Kakrola", "N.S.I.T. Dwarka"]],
+  "110080": [
+    "South",
+    "Delhi",
+    [
+      "Air Force Station Tugalkabad",
+      "BSF Camp Tigri",
+      "Deoli",
+      "Khanpur",
+      "Sangam Vihar",
+      "Talimabad"
+    ]
+  ],
+  "110081": [
+    "North West",
+    "Delhi",
+    [
+      "Chand Pur",
+      "Gheora",
+      "H S School",
+      "Jaunti",
+      "Kanjhawla",
+      "Karala",
+      "Lad Pur",
+      "Majra Dabas",
+      "Mubarak Pur Dabas",
+      "Nizampur",
+      "Punjab Khor",
+      "Rani Khera"
+    ]
+  ],
+  "110082": [
+    "North",
+    "Delhi",
+    ["Holambi Kalan", "Khera Kalan", "Khera Khurd", "Naya Bans"]
+  ],
+  "110083": [
+    "North West",
+    "Delhi",
+    [
+      "Mangolpuri A Block",
+      "Mangolpuri I Block",
+      "Mangolpuri N Block",
+      "Mangolpuri S Block"
+    ]
+  ],
+  "110084": [
+    "Central",
+    "Delhi",
+    [
+      "Burari",
+      "Jagatpur",
+      "Jharoda Majraa",
+      "Nathupura Village",
+      "NEW Nathupura",
+      "Sant Nagar",
+      "Wazirabad Village"
+    ]
+  ],
+  "110085": [
+    "North West",
+    "Delhi",
+    [
+      "Avantika",
+      "Prashant Vihar",
+      "Rithala",
+      "Rohini Courts",
+      "Rohini Sec11",
+      "Rohini Sector 16",
+      "Rohini Sector 5",
+      "Rohini Sector7"
+    ]
+  ],
+  "110086": [
+    "North West",
+    "Delhi",
+    [
+      "Begumpur",
+      "Budh Vihar",
+      "Kirari Suleman Nagar",
+      "Pooth Kalan",
+      "Pooth Kalan Resettlement",
+      "Prem Nagar",
+      "Sultanpuri B Block",
+      "Sultanpuri C Block",
+      "Sultanpuri F Block"
+    ]
+  ],
+  "110087": ["West", "Delhi", ["Jwala Puri", "Peeragarhi", "Sunder Vihar"]],
+  "110088": ["North", "Delhi", ["Haiderpur", "Shalamar", "Shalimar Bagh"]],
+  "110089": ["North West", "Delhi", ["Rohini Sector 15", "Rohini Sector 15 Extension"]],
+  "110090": [
+    "North East",
+    "Delhi",
+    [
+      "Badarpur Khadar",
+      "Karawal Nagar",
+      "Khajoori Khas",
+      "Sabhapur",
+      "Shaheed Bhagat Singh Colony",
+      "Shriram Colony Rajeev Nagar",
+      "Sonia Vihar"
+    ]
+  ],
+  "110091": [
+    "East",
+    "Delhi",
+    [
+      "Chilla",
+      "Himmatpuri",
+      "Kalyanpuri",
+      "Kalyanvas",
+      "Mayur Vihar PhI",
+      "Patparganj",
+      "Trilok Puri"
+    ]
+  ],
+  "110092": [
+    "East",
+    "Delhi",
+    [
+      "Anand Vihar",
+      "IP Extension",
+      "Laxmi Nagar",
+      "Laxmi Nagar Extension",
+      "Mandawali Fazalpur",
+      "Nirman Vihar",
+      "Shakarpur",
+      "Surajmal Vihar",
+      "Yozna Vihar"
+    ]
+  ],
+  "110093": [
+    "North East",
+    "Delhi",
+    [
+      "Harsh Vihar",
+      "Housing Complex Loni Road",
+      "Mandoli Saboli",
+      "Nand Nagri A",
+      "Nand Nagri C",
+      "Sunder Nagari"
+    ]
+  ],
+  "110094": ["North East", "Delhi", ["Dayalpur", "Gokal Puri", "Johripur"]],
+  "110095": [
+    "Shahdara",
+    "Delhi",
+    [
+      "Dilshad Garden",
+      "GTB Hospital",
+      "Jhilmil",
+      "Jhilmil Tahirpur",
+      "New Seemapuri",
+      "Old Seemapuri",
+      "Vishwakarma Nagar",
+      "Vivek Vihar"
+    ]
+  ],
+  "110096": ["East", "Delhi", ["Ghazipur", "Mayur Vihar PhIII", "Vasundhra Enclave"]],
+  "110097": ["South West", "Delhi", ["Kapashera"]],
+  "110099": ["North West", "Delhi", ["Rohini Sector 23"]],
+  "110110": ["North West", "Delhi", []]
+}

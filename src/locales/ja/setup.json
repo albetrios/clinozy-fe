@@ -1,0 +1,172 @@
+{
+  "drawer": {
+    "title": "{{clinic}}を設定",
+    "sub": "約1分 · ステップ {{step}}/{{total}}",
+    "progressLabel": "設定の進捗",
+    "stepAnnounce": "ステップ {{step}}/{{total}}",
+    "exploreFirst": "先に見てみる",
+    "next": "次へ：{{step}}",
+    "goLive": "利用を開始",
+    "goingLive": "開始しています…",
+    "saving": "保存しています…",
+    "notSaved": "未保存 · 変更は保持されています",
+    "lockedHint": "「{{step}}」の後",
+    "lockedToast": "先に「{{step}}」を完了してください",
+    "saveFailed": "このステップを保存できませんでした。回答は保持されています。もう一度お試しください。",
+    "loadFailed": "クリニックの初期設定を読み込めませんでした。"
+  },
+  "steps": {
+    "clinicType": {
+      "title": "どのようなクリニックですか？",
+      "why": "サービスと請求の基本になります。",
+      "label": "診療科",
+      "hint": "1つ以上選択",
+      "required": "診療科を1つ以上選択してください。"
+    },
+    "location": {
+      "title": "クリニックはどこにありますか？",
+      "why": "予約と請求には所在地が必要です。",
+      "pin": "郵便番号",
+      "pinHint": "エリア、市区町村、州・県を自動入力します",
+      "pinUnknown": "この郵便番号は見つかりません。エリア、市区町村、州・県を入力してください。",
+      "areaPick": "エリアを選択",
+      "area": "エリア",
+      "city": "市区町村",
+      "state": "州・県",
+      "address": "住所",
+      "phone": "電話",
+      "email": "メール",
+      "branchName": "拠点名",
+      "hours": "営業 {{days}} · {{opens}}–{{closes}}",
+      "change": "変更",
+      "done": "完了",
+      "days": "営業日",
+      "opens": "開店",
+      "closes": "閉店",
+      "closesAfterOpens": "閉店時刻は開店時刻より後にしてください。",
+      "requiredField": "{{field}}は必須です。",
+      "pinInvalid": "6桁の郵便番号を入力してください。",
+      "emailInvalid": "有効なメールアドレスを入力してください。",
+      "phoneInvalid": "有効な電話番号を入力してください。",
+      "mainExists": "クリニックにはすでに本院があります。設定ではそちらを使います。"
+    },
+    "you": {
+      "title": "ご自身も患者を診ますか？",
+      "why": "初日からあなたの予約を受け付けられるようにするためです。",
+      "label": "ご自身も患者を診ますか？",
+      "doctor": "はい、医師として",
+      "therapist": "はい、セラピストとして",
+      "no": "いいえ",
+      "noHint": "次に医師を招待できます。",
+      "required": "1つ選択してください。"
+    }
+  },
+  "peek": {
+    "specialties": "診療科",
+    "branch": "拠点",
+    "hours": "営業時間",
+    "seesPatients": "本人の診察"
+  },
+  "checks": {
+    "clinic_type": "クリニックの種類",
+    "main_branch": "所在地",
+    "services": "サービス1件"
+  },
+  "goLiveRefused": "まだ利用を開始できません。不足しているもの：{{missing}}。",
+  "live": {
+    "title": "利用を開始しました",
+    "sub": "{{clinic}}で予約と請求ができるようになりました。",
+    "setUp": "設定した内容：",
+    "branch": "拠点：{{branch}}",
+    "consultation": "{{name}} {{price}}",
+    "youAsDoctor": "あなた（医師）",
+    "youAsTherapist": "あなた（セラピスト）",
+    "book": "最初の予約を入れる",
+    "done": "完了",
+    "heardAbout": {
+      "label": "どこで知りましたか？",
+      "options": {
+        "search": "検索",
+        "socialMedia": "ソーシャルメディア",
+        "friendOrColleague": "友人や同僚",
+        "blogOrArticle": "ブログや記事",
+        "other": "その他"
+      },
+      "thanks": "ありがとうございます。参考にさせていただきます。"
+    }
+  },
+  "guide": {
+    "title": "{{clinic}}の設定を仕上げる",
+    "count": "{{total}} 件中 {{done}} 件完了",
+    "consultationAdded": "診察を追加しました",
+    "items": {
+      "treatments": {
+        "title": "施術を追加",
+        "sub": "スターターリストから選択",
+        "action": "追加"
+      },
+      "inviteTeam": {
+        "title": "チームを招待",
+        "sub": "医師、受付",
+        "action": "招待"
+      },
+      "inviteDoctor": {
+        "title": "医師を招待",
+        "sub": "まだ誰も予約を受けられません",
+        "action": "招待"
+      },
+      "firstAppointment": {
+        "title": "最初の予約を入れる",
+        "action": "予約"
+      }
+    },
+    "skip": "スキップ",
+    "undoSkip": "スキップを取り消す",
+    "skipped": "スキップ済み",
+    "done": "完了",
+    "hide": "このガイドを非表示",
+    "hidden": "ガイドを非表示にしました。クリニックの設定から再表示できます。",
+    "ready": {
+      "title": "クリニックの準備ができました",
+      "sub": "そのほかの項目（営業時間、部屋、リマインダー）はすべてクリニックの設定にあります。",
+      "settings": "クリニックの設定"
+    }
+  },
+  "starter": {
+    "title": "施術を追加",
+    "sub": "提供している施術にチェックを入れ、追加前に名前・時間（分）・料金・GSTを編集してください。",
+    "back": "ガイドに戻る",
+    "name": "名前",
+    "minutes": "分",
+    "price": "料金",
+    "gst": "GST",
+    "rowLabel": "{{name}}を追加",
+    "exists": "追加済み",
+    "add_other": "{{count}} 件の施術を追加",
+    "adding": "追加しています…",
+    "added_other": "{{count}} 件の施術を追加しました",
+    "addOwn": "独自に追加",
+    "nothingTicked": "施術を1つ以上チェックしてください。",
+    "consultationNamed": "{{specialty}}診察",
+    "names": {
+      "consultation": "診察",
+      "chemicalPeel": "ケミカルピーリング",
+      "hydrafacial": "Hydrafacial",
+      "laserHairRemovalFullFace": "LHR 全顔（1回）",
+      "acneScarTreatment": "ニキビ跡治療",
+      "prpSession": "PRP（1回）",
+      "prpPack": "PRP パック",
+      "scalpTreatment": "頭皮トリートメント",
+      "scalingPolishing": "スケーリング＆ポリッシング",
+      "toothFilling": "虫歯の詰め物",
+      "rootCanal": "根管治療",
+      "teethWhitening": "ホワイトニング",
+      "papSmear": "子宮頸部細胞診",
+      "pelvicUltrasound": "骨盤超音波検査",
+      "physioSession": "理学療法（1回）",
+      "physioPack": "理学療法パック",
+      "followUpVisit": "再診",
+      "dressing": "創傷処置"
+    }
+  }
+}

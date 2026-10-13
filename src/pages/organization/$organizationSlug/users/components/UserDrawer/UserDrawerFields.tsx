@@ -20,9 +20,9 @@ import {
 } from '@/shared/components/DrawerField/index.ts';
 import { nextTimeSlot, TimePicker } from '@/shared/components/Picker/TimePicker/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
+import type { HoursFormat } from '@/shared/hooks/useHoursFormat/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 
-import type { HoursFormat } from '../../shared/hooks/useHoursFormat/index.ts';
 import { USERS_KEYS, USERS_NS } from '../../users.constants.ts';
 import type { TeamPill } from '../TeamCells/index.ts';
 import {

@@ -344,6 +344,11 @@ const PANEL_LOADERS = {
       default: m.OrganizationGeneralPanel,
     })),
   ),
+  clinic: onceAsync(() =>
+    import('./organization/OrganizationClinicPanel.tsx').then((m) => ({
+      default: m.OrganizationClinicPanel,
+    })),
+  ),
   members: onceAsync(() =>
     import('./organization/OrganizationMembersPanel.tsx').then((m) => ({
       default: m.OrganizationMembersPanel,

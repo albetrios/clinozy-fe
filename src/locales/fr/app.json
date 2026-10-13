@@ -554,14 +554,16 @@
       "newAppointment": "Nouveau rendez-vous",
       "newPatient": "Nouveau patient",
       "newReceipt": "Nouvel encaissement",
-      "openTasks": "Ouvrir les tâches"
+      "openTasks": "Ouvrir les tâches",
+      "finishSetup": "Terminer la configuration"
     },
     "screen": "Écran",
     "move": "naviguer",
     "open": "ouvrir",
     "hint": "Saisissez 3+ lettres ou 4+ chiffres pour rechercher des personnes",
     "empty": "Aucun résultat. Essayez un nom, un téléphone ou un numéro C.",
-    "personSub": "{{id}} · •••• {{lastDigits}}"
+    "personSub": "{{id}} · •••• {{lastDigits}}",
+    "setupSub": "{{done}} sur {{total}}"
   },
   "lists": {
     "loadError": "Impossible de charger cette liste · connexion interrompue. Affichage de la dernière copie.",

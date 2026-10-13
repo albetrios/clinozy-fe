@@ -11,8 +11,8 @@ import {
   RECORD_DRAWER_KEYS,
   RECORD_DRAWER_NS,
 } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
+import type { HoursFormat } from '@/shared/hooks/useHoursFormat/index.ts';
 
-import type { HoursFormat } from '../../../shared/hooks/useHoursFormat/index.ts';
 import { USERS_KEYS, USERS_NS } from '../../../users.constants.ts';
 import { BRANCH_DEFAULT_ROLES, teamMemberById } from '../../hooks/useBranchRows/index.ts';
 import {

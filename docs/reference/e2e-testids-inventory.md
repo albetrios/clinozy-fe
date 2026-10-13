@@ -384,9 +384,11 @@ See grep in `src/` or sections above for: `onboarding-*`, `accept-invite-*`, `or
 | `widget-error`                 | A section's contained throw — the dashed card (`WidgetErrorBoundary/`)     |
 | `offline-indicator`            | The offline notice pill (root-mounted)                                     |
 
-Onboarding's question chips are `onboarding-team-size-<value>`, `onboarding-use-case-<value>` and
-`onboarding-referral-<value>` — `<value>` is the option key's last segment in kebab case
-(`two-to-ten`, `internal-tools`, `friend-or-colleague`); each group keeps its own id.
+The clinic setup drawer's controls are `setup-drawer-*` (the steps: `setup-drawer-step-<step>`,
+`setup-specialty-<value>`, `setup-location-<field>`, `setup-you-<answer>`), `setup-live-*`,
+`setup-guide-*` (`setup-guide-item-<item>`, `-action`, `-skip`, `setup-guide-hide`) and
+`setup-starter-*`; the shell's entries are `user-menu-setup-ring`, `account-menu-finish-setup`,
+`account-menu-clinic-settings`, `command-palette-action-finish-setup` and `setup-member-notice`.
 
 ---
 
@@ -718,22 +720,28 @@ a clinozy-be permission code.
 
 New branch and Edit branch are one `BranchDrawer`
 (`pages/organization/$organizationSlug/users/branches/components/BranchDrawer/`); `<d>` is
-`branch-drawer`. Its steps are `place`, `contact` and `people`. A chip group's chips are
+`branch-drawer`. Its steps are `place`, `contact` and `people`, and on an edit `places` (clinic-setup T2). A chip group's chips are
 `<group>-<value>` (`branch-drawer-days-sun`, `branch-drawer-colour-mint`). The list's toolbar and
 table carry the shared ids with the `tableId` `users-branches` (`users-branches-toolbar`,
 `users-branches-filters-trigger`, `users-branches-new-branch`, `users-branches-fab`,
 `users-branches-table-row`).
 
-| Test ID                                             | Element                                                                 | Source               |
-| --------------------------------------------------- | ----------------------------------------------------------------------- | -------------------- |
-| `<d>-name` / `<d>-colour` / `<d>-colour-<tone>`     | Step 1's Name and the Colour swatches                                   | `BranchDrawerFields` |
-| `<d>-main` / `<d>-status`                           | The Main branch (read-only) and Status toggles (`role="switch"`)        | `BranchDrawerFields` |
-| `<d>-line1` / `<d>-line2` / `<d>-area` / `<d>-city` | The address fields                                                      | `BranchDrawerFields` |
-| `<d>-pin` / `<d>-state`                             | PIN code (digits only) and State                                        | `BranchDrawerFields` |
-| `<d>-phone` / `<d>-email` / `<d>-gstin`             | Step 2's Phone ("+91"), Email and GSTIN (upper-cased)                   | `BranchDrawerFields` |
-| `<d>-days` / `<d>-opens` / `<d>-closes`             | The Days chips and the Opens / Closes time pickers                      | `BranchDrawerFields` |
-| `<d>-team` / `<d>-team-option-<membership id>`      | Step 3's Team picker and one person in it                               | `BranchDrawerFields` |
-| `<d>-default-<role>`                                | A default person's picker (`doctor`, `desk`, `therapist`, `pharmacist`) | `BranchDrawerFields` |
+| Test ID                                                                                                | Element                                                                                                           | Source                                       |
+| ------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| `<d>-name` / `<d>-colour` / `<d>-colour-<tone>`                                                        | Step 1's Name and the Colour swatches                                                                             | `BranchDrawerFields`                         |
+| `<d>-main` / `<d>-status`                                                                              | The Main branch (read-only) and Status toggles (`role="switch"`)                                                  | `BranchDrawerFields`                         |
+| `<d>-line1` / `<d>-line2` / `<d>-area` / `<d>-city`                                                    | The address fields                                                                                                | `BranchDrawerFields`                         |
+| `<d>-pin` / `<d>-state`                                                                                | PIN code (digits only) and State                                                                                  | `BranchDrawerFields`                         |
+| `<d>-phone` / `<d>-email` / `<d>-gstin`                                                                | Step 2's Phone ("+91"), Email and GSTIN (upper-cased)                                                             | `BranchDrawerFields`                         |
+| `<d>-days` / `<d>-opens` / `<d>-closes`                                                                | The Days chips and the Opens / Closes time pickers                                                                | `BranchDrawerFields`                         |
+| `<d>-team` / `<d>-team-option-<membership id>`                                                         | Step 3's Team picker and one person in it                                                                         | `BranchDrawerFields`                         |
+| `<d>-default-<role>`                                                                                   | A default person's picker (`doctor`, `desk`, `therapist`, `pharmacist`)                                           | `BranchDrawerFields`                         |
+| `<d>-step-places` (`-trigger`, `-peek`) / `<d>-places`                                                 | "Places & days" (edit only) and its body                                                                          | `BranchPlacesFields`                         |
+| `<d>-<l>` / `<d>-<l>-row` / `<d>-<l>-empty`                                                            | A list (`<l>` = `rooms` · `machines` · `holidays`), one row (`data-place-id` / `data-holiday-id`), its empty line | `branch-place-rows`, `branch-holiday-rows`   |
+| `<d>-rooms-active` / `<d>-machines-active`                                                             | A row's In use switch (`role="switch"`, named "<name> in use")                                                    | `branch-place-rows`                          |
+| `<d>-<l>-row-action-rename` / `-remove`                                                                | Rename (`branch:update`) / Remove (`branch:delete`, reason confirm)                                               | `branch-place-rows`, `branch-holiday-rows`   |
+| `<d>-<l>-rename` (`-name`, `-submit`, `-cancel`, `-error`)                                             | The inline rename row                                                                                             | `branch-places-parts`                        |
+| `<d>-<l>-add` (`-name`, `-submit`, `-error`; holidays: `-date`, `-date-option-<YYYY-MM-DD>`, `-label`) | The add row (`branch:create`)                                                                                     | `branch-places-parts`, `branch-holiday-rows` |
 
 ### Patient file (launch L-42)
 

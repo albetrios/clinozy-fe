@@ -106,12 +106,27 @@ Every custom event includes **shared context** from `getAnalyticsContext()`:
 
 ### Product surfaces
 
-| Event                      | When                  | Extra properties                                                    |
-| -------------------------- | --------------------- | ------------------------------------------------------------------- |
-| `onboarding_completed`     | Finish wizard         | `team_size`, `primary_use_case`, `referral_source`, `invited_count` |
-| `settings_section_viewed`  | Settings hash changes | `scope`, `section`                                                  |
-| `command_palette_opened`   | Cmd+K / palette open  | —                                                                   |
-| `appearance_dialog_opened` | Appearance panel      | —                                                                   |
+| Event                      | When                  | Extra properties   |
+| -------------------------- | --------------------- | ------------------ |
+| `onboarding_completed`     | Finish wizard         | —                  |
+| `settings_section_viewed`  | Settings hash changes | `scope`, `section` |
+| `command_palette_opened`   | Cmd+K / palette open  | —                  |
+| `appearance_dialog_opened` | Appearance panel      | —                  |
+
+### Clinic setup (feat-clinic-setup KICKOFF §6.8)
+
+Never with patient data — only steps, items, outcomes and a duration.
+
+| Event                      | When                                                     | Extra properties                                                                         |
+| -------------------------- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `setup_started`            | The setup drawer opens by itself for the first time      | —                                                                                        |
+| `setup_step_completed`     | A step saves                                             | `step`: `clinic_type` \| `location` \| `you`                                             |
+| `setup_live`               | "Go live" lands                                          | —                                                                                        |
+| `setup_deferred`           | The drawer is closed before going live ("Explore first") | `step`                                                                                   |
+| `setup_guide_item`         | A guide item is done from the guide, or skipped          | `item`, `outcome`: `done` \| `skipped`                                                   |
+| `setup_guide_hidden`       | "Hide this guide"                                        | —                                                                                        |
+| `first_appointment_booked` | The first appointment booked from setup                  | `minutes_since_clinic_created`                                                           |
+| `setup_heard_about`        | "How did you hear about us?" answered on "You're live"   | `source`: `search` \| `socialMedia` \| `friendOrColleague` \| `blogOrArticle` \| `other` |
 
 ### Deploy / version
 
@@ -147,7 +162,7 @@ Suggested insights for analyzing the data above:
 
 1. **Auth funnel** — `auth_email_code_sent` → `auth_email_code_verified` → `session_started`
 2. **OAuth split** — `auth_oauth_started` by `provider` vs `auth_oauth_completed`
-3. **Activation** — `onboarding_completed` breakdown by `primary_use_case`, `team_size`
+3. **Activation** — `setup_started` → `setup_step_completed` → `setup_live` → `first_appointment_booked`; acquisition by `setup_heard_about` `source`
 4. **Engagement** — DAU/WAU from `session_started`, stickiness from `$pageview`
 5. **Settings usage** — `settings_section_viewed` by `scope` + `section`
 6. **Org switching** — `organization_switched` by `target_type`

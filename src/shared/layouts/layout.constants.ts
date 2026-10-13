@@ -18,6 +18,14 @@ export const LAYOUT_KEYS = {
     userFallback: 'app.userFallback',
     settings: 'app.settings',
     logOut: 'app.logOut',
+    /** The clinic setup's shell entries (feat-clinic-setup KICKOFF §3). */
+    setup: {
+      finishSetup: 'app.setup.finishSetup',
+      clinicSettings: 'app.setup.clinicSettings',
+      ringLabel: 'app.setup.ringLabel',
+      memberNotice: 'app.setup.memberNotice',
+      drawerName: 'app.setup.drawerName',
+    },
     sectionBar: {
       nav: 'app.sectionBar.nav',
       allSections: 'app.sectionBar.allSections',

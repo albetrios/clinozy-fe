@@ -18,39 +18,36 @@ import { DoneStep } from './DoneStep.tsx';
 const TEAM_ONLY_STEPS: readonly OnboardingStep[] = [
   'welcome',
   'profile',
-  'questions',
   'workspace',
-  'invite',
   'done',
 ];
-const HYBRID_NO_TEAM_STEPS: readonly OnboardingStep[] = [
-  'welcome',
-  'profile',
-  'questions',
-  'done',
-];
+const HYBRID_NO_TEAM_STEPS: readonly OnboardingStep[] = ['welcome', 'profile', 'done'];
 
 describe('DoneStep', () => {
   beforeEach(() => {
     useOnboardingStore.getState().reset();
   });
 
-  it('summarizes the collected onboarding data (team-only flow)', () => {
-    useOnboardingStore.getState().patch({ organizationName: 'Acme Inc.' });
+  it('summarizes the name and the clinic name, and nothing else (team-only flow)', () => {
+    useOnboardingStore
+      .getState()
+      .patch({ firstName: 'Ada', lastName: 'Lovelace', organizationName: 'Acme Inc.' });
     render(<DoneStep steps={TEAM_ONLY_STEPS} />);
+    expect(screen.getByText('Ada Lovelace')).toBeInTheDocument();
     expect(screen.getByText('Acme Inc.')).toBeInTheDocument();
-    expect(screen.getByText(/pending/i)).toBeInTheDocument(); // invite step runs
+    // No invitations are collected here any more — inviting is the setup guide's.
+    expect(screen.getAllByRole('term')).toHaveLength(2);
+    expect(screen.queryByText(/invit|pending/i)).not.toBeInTheDocument();
   });
 
-  it('hides the organization and invite rows when the flow never collected them (hybrid, no team)', () => {
+  it('hides the organization row when the flow never collected it (hybrid, no team)', () => {
     // personal-and-team with no team membership: steps are
-    // welcome/profile/questions/done — no workspace step, no invite step.
+    // welcome/profile/done — no workspace step.
     useOnboardingStore.getState().patch({ firstName: 'Ada', lastName: 'Lovelace' });
     render(<DoneStep steps={HYBRID_NO_TEAM_STEPS} />);
     expect(screen.getByText('Ada Lovelace')).toBeInTheDocument();
     // No dangling "Organization: —" for a value this flow never asked for.
     expect(screen.queryByText('—')).not.toBeInTheDocument();
-    expect(screen.queryByText(/pending/i)).not.toBeInTheDocument();
   });
 
   it('hides the organization row in personal-only mode too', () => {
@@ -65,7 +62,7 @@ describe('DoneStep', () => {
     // rows — no hidden second derivation to disagree with the page.
     useOnboardingStore
       .getState()
-      .patch({ firstName: 'Ada', organizationName: 'Acme Inc.', invites: ['a@b.test'] });
+      .patch({ firstName: 'Ada', organizationName: 'Acme Inc.' });
 
     const { unmount } = render(<DoneStep steps={HYBRID_NO_TEAM_STEPS} />);
     expect(screen.queryByText('Acme Inc.')).not.toBeInTheDocument();
@@ -100,7 +97,7 @@ describe('DoneStep', () => {
   });
 
   it('has no accessibility violations', async () => {
-    useOnboardingStore.getState().patch({ firstName: 'Ada', invites: ['a@b.test'] });
+    useOnboardingStore.getState().patch({ firstName: 'Ada' });
     const { container } = render(<DoneStep steps={TEAM_ONLY_STEPS} />);
     expect(await axe(container)).toHaveNoViolations();
   });

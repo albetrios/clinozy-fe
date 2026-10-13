@@ -142,7 +142,7 @@ Mirror key paths from `ONBOARDING_KEYS`. Use i18next plural suffixes (`_one`, `_
 
 ## Reference implementation
 
-**Pilot:** `pages/onboarding/` — `onboarding.constants.ts`, `QuestionsStep.constants.ts`, `src/locales/en/onboarding.json`.
+**Pilot:** `pages/onboarding/` — `onboarding.constants.ts`, `src/locales/en/onboarding.json`.
 
 **Infrastructure:** `src/lib/i18n/`, `src/app/providers/I18nProvider.tsx`.
 

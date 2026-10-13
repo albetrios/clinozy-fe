@@ -73,6 +73,13 @@ const directoryQueryKeys = {
     [...directoryQueryKeys.all, activeOrganizationId(), 'room-names', branchId] as const,
 };
 
+/**
+ * The query key of one branch's room names — the Places & days room writes refresh it, so a room
+ * added or renamed reads right in the appointment form and Today at once (feat-clinic-setup T2).
+ */
+export const roomNamesQueryKey = (branchId: string) =>
+  directoryQueryKeys.roomNames(branchId);
+
 /** The query key of the role directory in one organization. */
 export const roleDirectoryQueryKey = (organizationId: string | null) =>
   [...directoryQueryKeys.all, organizationId, 'roles'] as const;

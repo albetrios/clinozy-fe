@@ -112,7 +112,6 @@ describe('deployment-mode — personal-and-team', () => {
     expect(deriveOnboardingSteps(BOTH, organizations)).toEqual([
       'welcome',
       'profile',
-      'questions',
       'done',
     ]);
     expect(shouldCreateOrganizationOnFinish(BOTH, organizations)).toBe(false);

@@ -218,7 +218,7 @@ drawers whose Back returns to Settings. The unit keeps its name (`SettingsModal`
 
 ```text
 #settings/account/{profile|account|security|notifications|sessions|billing|integrations}
-#settings/organization/{general|members|roles}
+#settings/organization/{general|clinic|members|roles}
 ```
 
 (Source of truth: `settings-sections.ts`. Billing and Integrations are **account** sections.
@@ -266,6 +266,40 @@ is the separate `AppearanceDialog` on the root route.)
   and hash but render `UsersRoomLink`: what moved and a link to `/users` or `/users/roles`
   that drops the hash, closing the drawer. Everywhere else (the module off, or a member
   without `role:read`) the panels stay as they were.
+
+- **Clinic (feat-clinic-setup §6.6)** — `#settings/organization/clinic`, TEAM only,
+  `organization:read` to view and `organization:update` to save (read-only otherwise). The
+  clinic's specialties and timezone (`PATCH /tenancy/organization`) and its booking-reminder
+  hour, lead hold and retarget days, each with its default (`PATCH
+/tenancy/organization/settings`). It links to Users › Branches for hours, holidays, rooms,
+  machines, GST and review links, and to General for the logo. "Show the setup guide again"
+  appears while the guide is hidden. No cash-drawer float (D17).
+
+### 7.1 The clinic setup drawer — a second hash surface
+
+The clinic setup (feat-clinic-setup KICKOFF §4, D11) is a drawer on the same model as Settings:
+`#setup[/<step>]` rides on any room of an organization, so a refresh, a shared link or another
+default room reopens the same step, and Back leaves the room as it was.
+
+```text
+#setup                → the first unanswered step, or the guide once the clinic is live
+#setup/clinic-type    → step 1 · #setup/location → step 2 · #setup/you → step 3
+#setup/live           → "You're live" (after "Go live") · #setup/guide → the three-item guide
+```
+
+- **Grammar** — `shared/components/SetupDrawer/setup-hash-grammar.ts`, pure strings with no
+  runtime imports (the account menu, ⌘K and the create-action guard need only it), like
+  `settings-hash-grammar.ts`.
+- **Mount** — `SetupDrawerLazy` in the organization island (`OrganizationLayout`), not on the
+  root route: the entry chunk is untouched and a personal workspace or the picker never loads it.
+- **Self-gating** — route guards never see the hash. The drawer opens only for a manager
+  (`organization:update`) of a team organization, never in a View-as preview; for anyone else
+  the hash is cleared once access is resolved.
+- **Canonical** — a step not yet unlocked (the steps unlock in order, D14) or a place that does
+  not fit the setup's state is rewritten with `replace`, never a new history entry.
+- **Opens by itself** once per clinic, after the boot splash, while the clinic is neither live
+  nor deferred and nothing else is open; closing it ("Explore first") stores the deferral on the
+  server, so it never opens by itself again (D5).
 
 ## 8. IDs and route params
 

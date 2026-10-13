@@ -18,8 +18,8 @@ import {
 } from '@/shared/components/DrawerField/index.ts';
 import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
 import { nextTimeSlot, TimePicker } from '@/shared/components/Picker/TimePicker/index.ts';
+import type { HoursFormat } from '@/shared/hooks/useHoursFormat/index.ts';
 
-import type { HoursFormat } from '../../../shared/hooks/useHoursFormat/index.ts';
 import type { RoleDirectory } from '../../../shared/hooks/useRoleDirectory/index.ts';
 import { USERS_KEYS, USERS_NS } from '../../../users.constants.ts';
 import {

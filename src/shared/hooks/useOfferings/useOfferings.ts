@@ -1,6 +1,6 @@
 import i18n from '@/lib/i18n/i18n.ts';
 import { displayId } from '@/shared/api/app/app-display-id.ts';
-import type { DeleteReason } from '@/shared/api/app/app-schema.ts';
+import type { DeleteReason, OfferingSpecialty } from '@/shared/api/app/app-schema.ts';
 import {
   createOffering,
   deleteOffering,
@@ -99,6 +99,8 @@ export function useOffering(id: string | undefined) {
 /** What a create sends: the drawer's fields. */
 export interface OfferingCreateVars {
   fields: OfferingFields;
+  /** The offering's specialty when not the clinic's first — a setup starter row's (D18). */
+  specialty?: OfferingSpecialty;
 }
 
 /**
@@ -111,8 +113,8 @@ export function useCreateOffering(
 ) {
   const canSetLowestPrice = useCanSetLowestPrice();
   return useAppMutation<OfferingRecord, OfferingCreateVars>({
-    mutationFn: ({ fields }, action) =>
-      createOffering({ fields, canSetLowestPrice, ...action }),
+    mutationFn: ({ fields, specialty }, action) =>
+      createOffering({ fields, canSetLowestPrice, specialty, ...action }),
     invalidateKeys: [offeringQueryKeys.all],
     successMessage: (offering) =>
       offeringToast(APP_KEYS.offerings.toasts.offeringCreated, offering),

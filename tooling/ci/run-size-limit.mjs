@@ -35,6 +35,21 @@ if (jsPaths.length === 0) {
 // ever set to false). Re-adding it without that plugin fails the run outright
 // with "Config option running needs @size-limit/time plugin".
 const config = [
+  // The PIN directory (feat-clinic-setup G6): one lazy chunk per PIN prefix, loaded only when a
+  // six-digit PIN is typed — never on first paint. Measured 30.45 kB (pin-50, the largest) and
+  // 845.94 kB for all 71 parts.
+  {
+    name: 'PIN directory: largest part (pin-50)',
+    path: ['dist/assets/pin-50-*.js'],
+    limit: '31 kB',
+    gzip: true,
+  },
+  {
+    name: 'PIN directory: all parts',
+    path: ['dist/assets/pin-[0-9][0-9]-*.js'],
+    limit: '850 kB',
+    gzip: true,
+  },
   {
     name: 'Initial JS (entry + vendor)',
     path: jsPaths,
@@ -320,8 +335,28 @@ const config = [
      * copy through the shared i18n instance — importing react-i18next from the
      * lazy chunk had split `useTranslation` into a first-paint chunk of its own
      * (−0.37 kB). ~0.4 kB of headroom.
+     *
+     * 245.0 → 245.5 kB: a declared exemption, itemised — the clinic setup
+     * (iterations/feat-clinic-setup-2026-10-13-sltd, AS-BUILT row 14; for the
+     * owner's review before the pull request). Measured 245.26 kB, from 244.78 kB
+     * on its base, both ends built the same way (no env file, as CI) and the
+     * first-paint chunks compared:
+     * - The onboarding store's version-1 migration (+0.13 kB, `queryClient`):
+     *   the wizard lost two steps, and a half-finished onboarding must resume on
+     *   the right one. The store is read at boot.
+     * - The `setup` namespace's loader and the shell's setup keys
+     *   (`layout` › `app.setup.*`, Settings › Clinic) (+0.12 kB, `i18n`).
+     * - The setup's eight event names in the analytics catalog (+0.11 kB,
+     *   `capture`) — the catalog is the one source of event names.
+     * - The route preload lists naming the setup's shared chunks
+     *   (`setup-hash-grammar`, `useOnboardingSetup`) (+0.10 kB, entry): the
+     *   account menu, ⌘K and the create-action guard read the setup.
+     * Trimmed first: "Finish setup" draws the registry's `ClipboardList` instead
+     * of adding `ListChecks` to the entry-preloaded icon chunk (−0.08 kB); the
+     * drawer, the guide, the starter list and the PIN directory load on demand.
+     * ~0.24 kB of headroom.
      */
-    limit: '245.0 kB',
+    limit: '245.5 kB',
     gzip: true,
   },
   ...(cssPaths.length

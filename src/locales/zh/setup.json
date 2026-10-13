@@ -1,0 +1,172 @@
+{
+  "drawer": {
+    "title": "设置{{clinic}}",
+    "sub": "约一分钟 · 第 {{step}}/{{total}} 步",
+    "progressLabel": "设置进度",
+    "stepAnnounce": "第 {{step}} 步，共 {{total}} 步",
+    "exploreFirst": "先看看",
+    "next": "下一步：{{step}}",
+    "goLive": "正式上线",
+    "goingLive": "正在上线…",
+    "saving": "正在保存…",
+    "notSaved": "未保存 · 您的更改已保留",
+    "lockedHint": "完成“{{step}}”后",
+    "lockedToast": "请先完成“{{step}}”",
+    "saveFailed": "无法保存此步骤。您的回答已保留——请重试。",
+    "loadFailed": "无法加载诊所的初始设置。"
+  },
+  "steps": {
+    "clinicType": {
+      "title": "这是什么类型的诊所？",
+      "why": "您的服务和账单都以此为基础。",
+      "label": "专科",
+      "hint": "可选一个或多个",
+      "required": "请至少选择一个专科。"
+    },
+    "location": {
+      "title": "您的诊所在哪里？",
+      "why": "预约和账单都需要一个地点。",
+      "pin": "邮政编码",
+      "pinHint": "自动填写区域、城市和邦/省",
+      "pinUnknown": "无法识别此邮政编码——请输入区域、城市和邦/省。",
+      "areaPick": "选择您的区域",
+      "area": "区域",
+      "city": "城市",
+      "state": "邦/省",
+      "address": "地址",
+      "phone": "电话",
+      "email": "邮箱",
+      "branchName": "分院名称",
+      "hours": "营业 {{days}} · {{opens}}–{{closes}}",
+      "change": "更改",
+      "done": "完成",
+      "days": "营业日",
+      "opens": "开门",
+      "closes": "关门",
+      "closesAfterOpens": "关门时间必须晚于开门时间。",
+      "requiredField": "请填写{{field}}。",
+      "pinInvalid": "请输入 6 位邮政编码。",
+      "emailInvalid": "请输入有效的邮箱。",
+      "phoneInvalid": "请输入有效的电话号码。",
+      "mainExists": "您的诊所已有总院——设置将直接使用它。"
+    },
+    "you": {
+      "title": "您本人也接诊吗？",
+      "why": "这样从第一天起，患者就能预约您。",
+      "label": "您本人也接诊吗？",
+      "doctor": "是，作为医生",
+      "therapist": "是，作为治疗师",
+      "no": "否",
+      "noHint": "接下来可以邀请您的医生。",
+      "required": "请选择一项。"
+    }
+  },
+  "peek": {
+    "specialties": "专科",
+    "branch": "分院",
+    "hours": "营业时间",
+    "seesPatients": "本人接诊"
+  },
+  "checks": {
+    "clinic_type": "诊所类型",
+    "main_branch": "诊所地点",
+    "services": "一项服务"
+  },
+  "goLiveRefused": "暂时无法上线——还缺少：{{missing}}。",
+  "live": {
+    "title": "已正式上线",
+    "sub": "{{clinic}}现在可以预约和开票了。",
+    "setUp": "我们已为您设置：",
+    "branch": "{{branch}}分院",
+    "consultation": "{{name}} {{price}}",
+    "youAsDoctor": "您本人（医生）",
+    "youAsTherapist": "您本人（治疗师）",
+    "book": "创建第一个预约",
+    "done": "完成",
+    "heardAbout": {
+      "label": "您是如何了解到我们的？",
+      "options": {
+        "search": "搜索",
+        "socialMedia": "社交媒体",
+        "friendOrColleague": "朋友或同事",
+        "blogOrArticle": "博客或文章",
+        "other": "其他"
+      },
+      "thanks": "谢谢——这对我们很有帮助。"
+    }
+  },
+  "guide": {
+    "title": "完成{{clinic}}的设置",
+    "count": "已完成 {{done}}/{{total}}",
+    "consultationAdded": "已添加问诊",
+    "items": {
+      "treatments": {
+        "title": "添加您的治疗项目",
+        "sub": "从初始列表中选择",
+        "action": "添加"
+      },
+      "inviteTeam": {
+        "title": "邀请您的团队",
+        "sub": "医生、前台",
+        "action": "邀请"
+      },
+      "inviteDoctor": {
+        "title": "邀请您的医生",
+        "sub": "目前还无人可预约",
+        "action": "邀请"
+      },
+      "firstAppointment": {
+        "title": "创建第一个预约",
+        "action": "预约"
+      }
+    },
+    "skip": "跳过",
+    "undoSkip": "撤销跳过",
+    "skipped": "已跳过",
+    "done": "已完成",
+    "hide": "隐藏此指南",
+    "hidden": "指南已隐藏——可在诊所设置中重新打开。",
+    "ready": {
+      "title": "您的诊所已准备就绪",
+      "sub": "其他一切——营业时间、诊室、提醒——都在诊所设置中。",
+      "settings": "诊所设置"
+    }
+  },
+  "starter": {
+    "title": "添加您的治疗项目",
+    "sub": "勾选您提供的项目；添加前可编辑名称、分钟数、价格和 GST。",
+    "back": "返回指南",
+    "name": "名称",
+    "minutes": "分钟",
+    "price": "价格",
+    "gst": "GST",
+    "rowLabel": "添加{{name}}",
+    "exists": "已添加",
+    "add_other": "添加 {{count}} 个治疗项目",
+    "adding": "正在添加…",
+    "added_other": "已添加 {{count}} 个治疗项目",
+    "addOwn": "自行添加",
+    "nothingTicked": "请至少勾选一个治疗项目。",
+    "consultationNamed": "{{specialty}}问诊",
+    "names": {
+      "consultation": "问诊",
+      "chemicalPeel": "化学换肤",
+      "hydrafacial": "Hydrafacial",
+      "laserHairRemovalFullFace": "LHR 全脸（单次）",
+      "acneScarTreatment": "痤疮疤痕治疗",
+      "prpSession": "PRP 治疗（单次）",
+      "prpPack": "PRP 疗程包",
+      "scalpTreatment": "头皮护理",
+      "scalingPolishing": "洁牙抛光",
+      "toothFilling": "补牙",
+      "rootCanal": "根管治疗",
+      "teethWhitening": "牙齿美白",
+      "papSmear": "宫颈涂片",
+      "pelvicUltrasound": "盆腔超声",
+      "physioSession": "理疗（单次）",
+      "physioPack": "理疗疗程包",
+      "followUpVisit": "复诊",
+      "dressing": "换药"
+    }
+  }
+}

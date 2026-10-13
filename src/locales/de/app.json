@@ -551,14 +551,16 @@
       "newAppointment": "Neuer Termin",
       "newPatient": "Neuer Patient",
       "newReceipt": "Neuer Zahlungseingang",
-      "openTasks": "Aufgaben öffnen"
+      "openTasks": "Aufgaben öffnen",
+      "finishSetup": "Einrichtung abschließen"
     },
     "screen": "Seite",
     "move": "navigieren",
     "open": "öffnen",
     "hint": "Geben Sie 3+ Buchstaben oder 4+ Ziffern ein, um Personen zu suchen",
     "empty": "Keine Treffer. Versuchen Sie einen Namen, eine Telefonnummer oder eine C-Nummer.",
-    "personSub": "{{id}} · •••• {{lastDigits}}"
+    "personSub": "{{id}} · •••• {{lastDigits}}",
+    "setupSub": "{{done}} von {{total}}"
   },
   "lists": {
     "loadError": "Diese Liste konnte nicht geladen werden · Verbindung unterbrochen. Die letzte Version wird angezeigt.",

@@ -26,9 +26,10 @@ const CIRCLE_CLASS: Record<StepState, string> = {
 };
 
 /**
- * Numbered progress across the top of the onboarding card: the step circles,
- * joined by hairlines that share the card's width — green behind a done step —
- * so five steps fit a phone without spilling out of the card.
+ * Numbered progress across the top of the onboarding card: the step circles —
+ * four at most (Welcome → Your name → Clinic name → Done) — joined by hairlines
+ * that share the card's width, green behind a done step, so they fit a phone
+ * without spilling out of the card.
  */
 export function StepIndicator({
   current,

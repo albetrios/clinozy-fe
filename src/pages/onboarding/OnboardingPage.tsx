@@ -9,7 +9,6 @@ import i18n from '@/lib/i18n/i18n.ts';
 import { ANALYTICS_EVENTS } from '@/shared/analytics/analytics.constants.ts';
 import { captureAnalyticsEvent } from '@/shared/analytics/capture.ts';
 import { authApi } from '@/shared/api/auth-api.ts';
-import { createRole, inviteMember, listRoles } from '@/shared/api/organization-api.ts';
 import { isSafeRedirectPath } from '@/shared/auth/redirect-safety.ts';
 import { getAccessToken } from '@/shared/auth/token.ts';
 import { PublicCard, PublicCardHeader } from '@/shared/components/PublicFrame/index.ts';
@@ -42,15 +41,12 @@ import { hydrateSessionContext } from '@/shared/tenancy/session-context.ts';
 import { switchToOrganization, switchToPersonal } from '@/shared/tenancy/switch.ts';
 
 import { DoneStep } from './components/DoneStep/index.ts';
-import { InviteStep } from './components/InviteStep/index.ts';
 import { ProfileStep } from './components/ProfileStep/index.ts';
-import { QuestionsStep } from './components/QuestionsStep/index.ts';
 import { StepIndicator } from './components/StepIndicator/index.ts';
 import { WelcomeStep } from './components/WelcomeStep/index.ts';
 import { WorkspaceStep } from './components/WorkspaceStep/index.ts';
 import { useOnboardingStepMotion } from './hooks/useOnboardingStepMotion/index.ts';
 import {
-  ONBOARDING_DEFAULT_MEMBER_PERMISSIONS,
   ONBOARDING_KEYS,
   ONBOARDING_NS,
   ONBOARDING_TEST_IDS,
@@ -106,12 +102,8 @@ function getStepMetaKeys(step: OnboardingStep): {
   switch (step) {
     case 'profile':
       return ONBOARDING_KEYS.steps.profile;
-    case 'questions':
-      return ONBOARDING_KEYS.steps.questions;
     case 'workspace':
       return ONBOARDING_KEYS.steps.workspace;
-    case 'invite':
-      return ONBOARDING_KEYS.steps.invite;
     case 'done':
       return ONBOARDING_KEYS.steps.done;
     default:
@@ -120,18 +112,14 @@ function getStepMetaKeys(step: OnboardingStep): {
 }
 
 /**
- * Persist the collected profile + fire a segmentation event. Best-effort by
+ * Persist the collected name + fire the completion event. Best-effort by
  * contract — every failure is swallowed so it can never strand the user on
- * the onboarding screen. The survey answers are analytics only (not PII we
- * store server-side); first + last name update the user's profile.
+ * the onboarding screen. First + last name update the user's profile; the
+ * event carries nothing the user typed.
  */
 async function persistOnboardingResult(input: {
   firstName: string;
   lastName: string;
-  teamSize: string;
-  primaryUseCase: string;
-  referralSource: string;
-  invitedCount: number;
 }): Promise<void> {
   const firstName = input.firstName.trim();
   const lastName = input.lastName.trim();
@@ -168,12 +156,7 @@ async function persistOnboardingResult(input: {
     }
   }
 
-  captureAnalyticsEvent(ANALYTICS_EVENTS.onboardingCompleted, {
-    team_size: input.teamSize || undefined,
-    primary_use_case: input.primaryUseCase || undefined,
-    referral_source: input.referralSource || undefined,
-    invited_count: input.invitedCount,
-  });
+  captureAnalyticsEvent(ANALYTICS_EVENTS.onboardingCompleted);
 }
 
 async function resolveOrganizationForFinish(input: {
@@ -249,15 +232,11 @@ function isOnboardingDirty(input: {
   firstName: string;
   lastName: string;
   organizationName: string;
-  inviteCount: number;
 }): boolean {
   if (input.completed) return false;
   if (input.stepIndex > 0) return true;
   return Boolean(
-    input.firstName.trim() ||
-    input.lastName.trim() ||
-    input.organizationName.trim() ||
-    input.inviteCount > 0,
+    input.firstName.trim() || input.lastName.trim() || input.organizationName.trim(),
   );
 }
 
@@ -299,79 +278,6 @@ async function activateWorkspaceAfterOnboardingFinish(input: {
     return switchToPersonal();
   }
   return undefined;
-}
-
-/**
- * The organization onboarding invites must be created in: the workspace that was
- * just ACTIVATED, not the one the wizard created.
- *
- * Invites are scoped by the active-org token, but the send used to be gated on
- * the *created* org id. In `personal-and-team` mode with an existing team the
- * wizard creates nothing (`shouldCreateOrganizationOnFinish` -> false) while
- * `deriveOnboardingSteps` still shows the invite step, so that id was null:
- * every invite was dropped and the success toast still told the user their
- * workspace was ready. Reading the activated org makes the two agree.
- *
- * Only a TEAM org can hold invited members, so an activation that landed on a
- * personal workspace (several teams -> no unambiguous destination) is NOT an
- * invite target; the caller reports that through the partial-failure warning
- * rather than a success toast that lies.
- */
-function resolveInviteTargetOrganizationId(input: {
-  activeOrganization: MeContext['activeOrganization'] | undefined;
-  createdOrganizationId: string | null;
-}): string | null {
-  const active = input.activeOrganization;
-  if (active?.type === 'TEAM') return active.id;
-  return input.createdOrganizationId;
-}
-
-/**
- * The role onboarding invites go out with: the organization's own (non-preset) role if it has
- * one, otherwise a default "Member" role created once with the onboarding default codes — the
- * presets clinozy-be provisions (Owner, Admin, Doctor, …) each carry a clinic job, and the
- * wizard does not ask which one an invitee does. Scoped by the active-organization token, so the
- * caller must switch to the new organization first.
- */
-async function resolveInviteRoleId(): Promise<string> {
-  const { rows } = await listRoles();
-  const existing = rows.find((role) => !role.isSystem);
-  if (existing) return existing.id;
-
-  const created = await createRole({
-    input: {
-      name: i18n.t(ONBOARDING_KEYS.defaults.memberRoleName, { ns: ONBOARDING_NS }),
-      description: i18n.t(ONBOARDING_KEYS.defaults.memberRoleDescription, {
-        ns: ONBOARDING_NS,
-      }),
-      permissions: [...ONBOARDING_DEFAULT_MEMBER_PERMISSIONS],
-    },
-  });
-  return created.id;
-}
-
-/**
- * Send onboarding invites: create an invited membership per email
- * (`POST /tenancy/organization/memberships` with `role_ids`), all into one
- * resolved role. Returns how many failed. Best-effort and non-blocking — a
- * failure (including not being able to provision a role) never strands the
- * wizard; the caller warns on partial failure and the user can resend from
- * Members. Must run AFTER the token has switched to the new org.
- */
-async function sendOnboardingInvites(emails: string[]): Promise<number> {
-  if (emails.length === 0) return 0;
-
-  let roleId: string;
-  try {
-    roleId = await resolveInviteRoleId();
-  } catch {
-    return emails.length;
-  }
-
-  const results = await Promise.allSettled(
-    emails.map((email) => inviteMember({ invite: { email, roleIds: [roleId] } })),
-  );
-  return results.filter((result) => result.status === 'rejected').length;
 }
 
 /**
@@ -440,7 +346,7 @@ const ONBOARDING_PATHNAME = '/onboarding';
  * to: an effect re-runs only when its deps CHANGE, and while the post-finish
  * navigation is merely in flight the pathname never leaves `/onboarding`. A
  * second click inside that window therefore still finds the latch armed and
- * still only replays — no duplicate invitations. The latch is dropped only after
+ * still only replays — no duplicate writes. The latch is dropped only after
  * the router has been somewhere else and come back, which is exactly the bounce.
  */
 function useReleaseFinishLatchOnReturn(latchRef: RefObject<MeContext | null>): void {
@@ -461,7 +367,7 @@ function useReleaseFinishLatchOnReturn(latchRef: RefObject<MeContext | null>): v
  */
 /**
  * Back + Continue/Finish row. `Finish` is the wizard's checkout — it creates the
- * organization, stamps the profile and sends the invites — so `submitting` keeps
+ * organization, stamps the profile and marks the account onboarded — so `submitting` keeps
  * it visibly disabled while `finish()` holds the synchronous single-flight guard
  * that actually stops a duplicate write.
  */
@@ -539,12 +445,8 @@ function renderStep(
   switch (step) {
     case 'profile':
       return <ProfileStep />;
-    case 'questions':
-      return <QuestionsStep />;
     case 'workspace':
       return <WorkspaceStep />;
-    case 'invite':
-      return <InviteStep />;
     case 'done':
       return <DoneStep steps={steps} />;
     default:
@@ -628,36 +530,6 @@ function useForgetStaleCreatedOrganization({
       cancelled = true;
     };
   }, [createdOrganizationId, setCreatedOrganizationId, setCreatedOrganizationSlug]);
-}
-
-/**
- * The finish toast: a warning naming the invitations that could not be sent,
- * otherwise a success that names how many went out.
- */
-function announceOnboardingFinish({
-  failed,
-  invitesSent,
-}: {
-  failed: number;
-  invitesSent: number;
-}): void {
-  if (failed > 0) {
-    notify.warning(
-      i18n.t(ONBOARDING_KEYS.toast.invitePartialFailure, {
-        ns: ONBOARDING_NS,
-        count: failed,
-      }),
-    );
-  } else {
-    notify.success(
-      invitesSent > 0
-        ? i18n.t(ONBOARDING_KEYS.toast.finishSuccessWithInvites, {
-            ns: ONBOARDING_NS,
-            count: invitesSent,
-          })
-        : i18n.t(ONBOARDING_KEYS.toast.finishSuccess, { ns: ONBOARDING_NS }),
-    );
-  }
 }
 
 /**
@@ -752,11 +624,13 @@ function OnboardingCard({
 }
 
 /**
- * Multi-step, resumable onboarding wizard. Progress is persisted in
- * {@link useOnboardingStore}; the final step creates the organization, sends any
- * invitations, and navigates to the new organization's home (the
- * `$organizationSlug` guard syncs context, persists, and loads permissions).
- * Step UIs live in `components/` (folder-per-unit).
+ * Multi-step, resumable onboarding wizard: Welcome → Your name → Clinic name →
+ * Done. Progress is persisted in {@link useOnboardingStore}; the final step
+ * creates the organization, marks the account onboarded and navigates to the
+ * new organization's home (the `$organizationSlug` guard syncs context,
+ * persists, and loads permissions). No invitation is sent from here — inviting
+ * is the setup guide's (clinic-setup D4). Step UIs live in `components/`
+ * (folder-per-unit).
  */
 export function OnboardingPage() {
   const { t } = useTranslation(ONBOARDING_NS);
@@ -781,7 +655,6 @@ export function OnboardingPage() {
     lastName,
     organizationName,
     organizationSlug,
-    inviteCount,
     complete,
     setCreatedOrganizationId,
     setCreatedOrganizationSlug,
@@ -796,7 +669,6 @@ export function OnboardingPage() {
       lastName: s.data.lastName,
       organizationName: s.data.organizationName,
       organizationSlug: s.data.organizationSlug,
-      inviteCount: s.data.invites.length,
       complete: s.complete,
       setCreatedOrganizationId: s.setCreatedOrganizationId,
       setCreatedOrganizationSlug: s.setCreatedOrganizationSlug,
@@ -861,9 +733,8 @@ export function OnboardingPage() {
    * interactive for that whole stretch, so a second "Enter workspace" click
    * re-ran the ENTIRE finish. Org creation is idempotent (cached append +
    * existence check), but the profile PATCH, `completeOnboarding`, the org
-   * switch, the analytics event and every invitation went out a SECOND time —
-   * duplicate invitations, or a spurious "N invites couldn't be sent" warning
-   * landing on top of the success toast the user had just read.
+   * switch and the analytics event went out a SECOND time, with a second
+   * success toast on top of the one the user had just read.
    *
    * A ref rather than the store's persisted `completed` flag: `completed`
    * outlives the page in localStorage, so gating on it would permanently
@@ -899,7 +770,6 @@ export function OnboardingPage() {
     firstName,
     lastName,
     organizationName,
-    inviteCount,
   });
   const { guardDialog } = useUnsavedChangesGuard({
     when: dirty && !submitting,
@@ -943,7 +813,7 @@ export function OnboardingPage() {
     // `submitting` only disables the button after React re-renders, so the
     // control stays live for the frame after the first click: a double-click or
     // a bouncing touch target fires this handler twice and the second run
-    // creates a second organization and re-sends every invite. This ref flips
+    // creates a second organization and re-runs every write. This ref flips
     // synchronously, so the duplicate gesture is dropped before any request
     // goes out; `disabled={submitting}` remains the visible affordance.
     if (finishingRef.current) return;
@@ -996,10 +866,6 @@ export function OnboardingPage() {
       await persistOnboardingResult({
         firstName: data.firstName,
         lastName: data.lastName,
-        teamSize: data.teamSize,
-        primaryUseCase: data.primaryUseCase,
-        referralSource: data.referralSource,
-        invitedCount: data.invites.length,
       });
 
       // Stamp onboarding complete on the backend BEFORE re-reading me/context, so
@@ -1032,31 +898,8 @@ export function OnboardingPage() {
         organizations: await fetchMyOrganizationSummaries(),
       });
 
-      // Invites go out AFTER activation: they are scoped by the active-org token
-      // (switched above), and a just-created org needs an assignable role first.
-      // The target is therefore the org that was ACTIVATED, not the one the
-      // wizard created — see resolveInviteTargetOrganizationId.
-      const inviteEmails = effectiveSteps.includes('invite') ? data.invites : [];
-      const inviteOrganizationId = resolveInviteTargetOrganizationId({
-        activeOrganization: activatedContext?.activeOrganization,
-        createdOrganizationId: organizationId,
-      });
-      // No team workspace to invite into: nothing can be sent, so count every
-      // address as failed and let the partial-failure warning below say so. A
-      // success toast here would tell the user their teammates were invited
-      // when not one request was made.
-      const failed = inviteOrganizationId
-        ? await sendOnboardingInvites(inviteEmails)
-        : inviteEmails.length;
-
-      // How many invitations actually went out. The toast names it: "your
-      // workspace is ready" alone left the user with no confirmation that the
-      // teammates they typed were invited at all — the one thing they most
-      // wanted to know at that moment.
-      const invitesSent = inviteEmails.length - failed;
-
       complete();
-      announceOnboardingFinish({ failed, invitesSent });
+      notify.success(i18n.t(ONBOARDING_KEYS.toast.finishSuccess, { ns: ONBOARDING_NS }));
       // Armed BEFORE control passes to the router: every write above has
       // landed, so from this point a repeat click must navigate, not re-submit.
       finishedContextRef.current = activatedContext ?? refreshedContext;

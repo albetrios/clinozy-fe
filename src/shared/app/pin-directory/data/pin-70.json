@@ -1,0 +1,639 @@
+{
+  "700001": [
+    "Kolkata",
+    "West Bengal",
+    [
+      "Council House Street",
+      "Customs House",
+      "Khengrapatti",
+      "Kolkatta",
+      "Lalbazar",
+      "New Secretariat Building",
+      "R N Mukherjee Road",
+      "Radhabazar",
+      "Reserve Bank Building",
+      "Telephone Bhawan",
+      "Treasury Building",
+      "West Bengal Assembly",
+      "Writers Building"
+    ]
+  ],
+  "700002": [
+    "Kolkata",
+    "West Bengal",
+    [
+      "Cossipore",
+      "Cossipore Gun Factory",
+      "Indian Research",
+      "Kolkata Armed Police",
+      "Paikpara",
+      "Postal Stores Depot",
+      "Satchasipara",
+      "Tala"
+    ]
+  ],
+  "700003": [
+    "Kolkata",
+    "West Bengal",
+    ["Amrita Bazar Patrika", "Baghbazar", "Girish Avenue"]
+  ],
+  "700004": [
+    "Kolkata",
+    "West Bengal",
+    ["RGKar Medical College", "Shyambazar Mail", "Ultadanga"]
+  ],
+  "700005": ["Kolkata", "West Bengal", ["Ahiritola", "Hatkhola"]],
+  "700006": [
+    "Kolkata",
+    "West Bengal",
+    [
+      "Beadon Street",
+      "Bidhan Sarani",
+      "Jorasanko",
+      "Manicktala",
+      "Pathuriaghata",
+      "Sahitya Parisad",
+      "Simla"
+    ]
+  ],
+  "700007": [
+    "Kolkata",
+    "West Bengal",
+    [
+      "Archana",
+      "Barabazar H O",
+      "College Square",
+      "Kalakar Street",
+      "Strand Road",
+      "Vaishya Sabha"
+    ]
+  ],
+  "700008": ["Kolkata", "West Bengal", ["Barisha"]],
+  "700009": ["Kolkata", "West Bengal", ["Parsibagan", "Raja Ram Mohan Sarani"]],
+  "700010": ["Kolkata", "West Bengal", ["Beleghata", "Joramandir", "Subhash Sarabor"]],
+  "700011": ["Kolkata", "West Bengal", ["Narkeldanga"]],
+  "700012": ["Kolkata", "West Bengal", ["Bowbazar", "Sankaritola", "Yogayog Bhawan"]],
+  "700013": ["Kolkata", "West Bengal", ["Dharmatala"]],
+  "700014": [
+    "Kolkata",
+    "West Bengal",
+    ["Asylum Lane", "Bamboovila", "Intally", "Linton Street", "Taltala"]
+  ],
+  "700015": ["Kolkata", "West Bengal", ["Sales Tax Building", "Seal Lane", "Tangra"]],
+  "700016": ["Kolkata", "West Bengal", ["Elliot Road", "Madrassa", "Park Street"]],
+  "700017": [
+    "Kolkata",
+    "West Bengal",
+    ["Circus Avenue", "Jhowtala", "Park Circus", "Shakespeare Sarani"]
+  ],
+  "700018": ["Kolkata", "West Bengal", ["Bartala", "Rabindra Nagar"]],
+  "700019": [
+    "Kolkata",
+    "West Bengal",
+    [
+      "Ballygunge",
+      "Ballygunge RS",
+      "Ballygunge Sc College",
+      "Garcha Road",
+      "Gariahat Market",
+      "Golpark"
+    ]
+  ],
+  "700020": [
+    "Kolkata",
+    "West Bengal",
+    ["AJCBose Road", "Gokhel Road", "KMHospital", "LRSarani"]
+  ],
+  "700021": ["Kolkata", "West Bengal", ["Fort William"]],
+  "700022": ["Kolkata", "West Bengal", ["Bakery Road", "Hastings"]],
+  "700023": [
+    "Kolkata",
+    "West Bengal",
+    ["Khiddirpore", "Mansatala", "Raja J.N.Market", "Watgunge"]
+  ],
+  "700024": ["Kolkata", "West Bengal", ["Garden Reach", "KCMills", "PGReach", "TGRoad"]],
+  "700025": [
+    "Kolkata",
+    "West Bengal",
+    ["Bhawanipore", "Lansdowne Market", "Ramkrishna Park"]
+  ],
+  "700026": [
+    "Kolkata",
+    "West Bengal",
+    [
+      "Kalighat",
+      "Kalimandir",
+      "Keoratala",
+      "RKSeva Pratisthan",
+      "Sahanagar",
+      "Southern Market"
+    ]
+  ],
+  "700027": [
+    "Kolkata",
+    "West Bengal",
+    [
+      "Alipore",
+      "Alipore Bodyguard Line",
+      "Alipore Civil Court",
+      "Alipore Dist Board",
+      "Chetla",
+      "Mominpur",
+      "Natioinal Library"
+    ]
+  ],
+  "700028": [
+    "24 Paraganas North",
+    "West Bengal",
+    [
+      "Dumdum",
+      "Jugipara Satganchi",
+      "Kamalapur",
+      "Kumarpara",
+      "Nagerbazar",
+      "Ordnance Factory",
+      "Rajabagan"
+    ]
+  ],
+  "700029": [
+    "Kolkata",
+    "West Bengal",
+    ["Dover Lane", "Lake Market", "Rash Behari Avenue", "Sarat Bose Road"]
+  ],
+  "700030": [
+    "24 Paraganas North",
+    "West Bengal",
+    ["Ghugudanga", "Purba Sinthee", "Sethbagan"]
+  ],
+  "700031": ["Kolkata", "West Bengal", ["Dhakuria", "KPRoy Lane"]],
+  "700032": [
+    "Kolkata",
+    "West Bengal",
+    ["Bijoygarh", "Jadavpur University", "Pgh Shah Road"]
+  ],
+  "700033": ["Kolkata", "West Bengal", ["Indrani Park", "TCRoad", "Tollygunge"]],
+  "700034": [
+    "Kolkata",
+    "West Bengal",
+    [
+      "Behala",
+      "Behala Municipal Market",
+      "Brahma Samaj Road",
+      "Jayshree Park",
+      "Panchanantala",
+      "Senhati"
+    ]
+  ],
+  "700035": ["24 Paraganas North", "West Bengal", ["Alambazar", "Deshbandhu Road"]],
+  "700036": [
+    "24 Paraganas North",
+    "West Bengal",
+    ["Baranagar", "Bengal Immunity", "Kuthighat Road"]
+  ],
+  "700037": [
+    "Kolkata",
+    "West Bengal",
+    ["Belgachia", "Belgachia Road", "Northern Avenue"]
+  ],
+  "700038": ["Kolkata", "West Bengal", ["Sahapur"]],
+  "700039": [
+    "Kolkata",
+    "West Bengal",
+    ["Bediadanga", "Picnic Garden", "Tiljala", "Tiljala Bazar", "Topsia"]
+  ],
+  "700040": ["Kolkata", "West Bengal", ["Netaji Nagar", "Regent Park", "Russa"]],
+  "700041": ["Kolkata", "West Bengal", ["Paschim Putiari", "Sirity"]],
+  "700042": ["Kolkata", "West Bengal", ["Bosepukur Road", "Kasba"]],
+  "700043": ["Kolkata", "West Bengal", ["Sonai", "South Eastern Railway"]],
+  "700044": ["Kolkata", "West Bengal", ["Badartala", "Rajabagan Dock Yard"]],
+  "700045": ["Kolkata", "West Bengal", ["Lake Gardens"]],
+  "700046": [
+    "Kolkata",
+    "West Bengal",
+    ["Abinash Chaowdhury Lane", "Gobinda Khatick Road"]
+  ],
+  "700047": [
+    "Kolkata",
+    "West Bengal",
+    ["Ganguly Bagan", "Garia BT", "Naktala", "Raipur Jorabagan Road"]
+  ],
+  "700048": [
+    "24 Paraganas North",
+    "West Bengal",
+    ["Patipukur", "Sadhana Ausudhalaya Road", "Sreebhumi"]
+  ],
+  "700049": ["24 Paraganas North", "West Bengal", ["Nimta", "Udaipur"]],
+  "700050": ["Kolkata", "West Bengal", ["Sinthee", "South Sinhee"]],
+  "700051": ["24 Paraganas North", "West Bengal", ["Birati", "Sultanpur"]],
+  "700052": ["24 Paraganas North", "West Bengal", ["Kendriya Vihar", "Kolkata Airport"]],
+  "700053": [
+    "Kolkata",
+    "West Bengal",
+    ["Kalabagan", "Kolkata Mint", "New Alipore", "NRAvenue"]
+  ],
+  "700054": [
+    "Kolkata",
+    "West Bengal",
+    [
+      "Bengal Chemical",
+      "Cmda Abasan",
+      "Kankurgachi",
+      "Phulbagan",
+      "Ram Krishna Samadhi Road"
+    ]
+  ],
+  "700055": [
+    "24 Paraganas North",
+    "West Bengal",
+    ["Bangur Avenue", "Dum Dum Park", "Shyam Nagar Dum Dum"]
+  ],
+  "700056": [
+    "24 Paraganas North",
+    "West Bengal",
+    [
+      "Belgharia",
+      "Belgharia Mohini Mills",
+      "Rani Park",
+      "Rathtala",
+      "South Belgharia",
+      "Texmaco"
+    ]
+  ],
+  "700057": ["24 Paraganas North", "West Bengal", ["Ariadaha", "Nowdapara"]],
+  "700058": ["24 Paraganas North", "West Bengal", ["Elias Road", "Kamarhati"]],
+  "700059": [
+    "24 Paraganas North",
+    "West Bengal",
+    ["Arjunpur", "Baguiati Super Market", "Desh Bandhu Nagar", "Raghunathpur"]
+  ],
+  "700060": ["Kolkata", "West Bengal", ["Mahendra Banerjee Road", "Parnasree Pally"]],
+  "700061": [
+    "Kolkata",
+    "West Bengal",
+    ["Dakshin Behala", "Jairampur", "Kasthadanga", "Sakuntala Park", "Sarsoona"]
+  ],
+  "700062": ["Kolkata", "West Bengal", ["West Bengal Governors Camp"]],
+  "700063": ["Kolkata", "West Bengal", ["Kalagachia", "Paschim Barisha", "Thakurpukur"]],
+  "700064": [
+    "24 Paraganas North",
+    "West Bengal",
+    ["Bidhan Nagar", "Bidhan Nagar AE Market", "Bidhannagr CC Block", "Labony Estate"]
+  ],
+  "700065": [
+    "24 Paraganas North",
+    "West Bengal",
+    ["Durganagar", "Health Institute", "Rabindra Nagar", "Subhas Nagar"]
+  ],
+  "700066": ["Kolkata", "West Bengal", ["Bidhangarh"]],
+  "700067": ["Kolkata", "West Bengal", ["Lily Biscuit", "Ultadanga Main Road"]],
+  "700068": ["Kolkata", "West Bengal", ["Jodhpur Park"]],
+  "700069": ["Kolkata", "West Bengal", ["Esplanade", "Income Tax Building"]],
+  "700070": ["24 Paraganas South", "West Bengal", ["Bansdroni", "Kalibari Temple"]],
+  "700071": [
+    "Kolkata",
+    "West Bengal",
+    ["Little Russel Street", "Middleton Row", "Russel Street"]
+  ],
+  "700072": [
+    "Kolkata",
+    "West Bengal",
+    ["Hindustan Building", "Princep Street", "Sooterkin Street"]
+  ],
+  "700073": [
+    "Kolkata",
+    "West Bengal",
+    [
+      "Chittaranjan Avenue",
+      "Colootala",
+      "Kolkata University",
+      "Pollock Street",
+      "Tiretta Bazar"
+    ]
+  ],
+  "700074": [
+    "24 Paraganas North",
+    "West Bengal",
+    ["Dumdum Road", "Jawpore", "Motijheel"]
+  ],
+  "700075": [
+    "Kolkata",
+    "West Bengal",
+    ["Garfa", "Santoshpur", "Santoshpur Avenue", "Viveknagar"]
+  ],
+  "700076": ["24 Paraganas North", "West Bengal", ["Dakshineswar"]],
+  "700077": ["24 Paraganas North", "West Bengal", ["Bediapara"]],
+  "700078": ["Kolkata", "West Bengal", ["Haltu", "Jadavgarh", "Purbachal Main Road"]],
+  "700079": ["24 Paraganas North", "West Bengal", ["Italghacha"]],
+  "700080": ["24 Paraganas North", "West Bengal", ["Jessore Road", "Mall Road"]],
+  "700081": ["24 Paraganas North", "West Bengal", ["Rajbari Colony"]],
+  "700082": ["Kolkata", "West Bengal", ["Haridevpur", "KPBazar"]],
+  "700083": [
+    "24 Paraganas North",
+    "West Bengal",
+    ["Basudebpur", "D P Nagar", "East Belghoria", "Nandan Nagar"]
+  ],
+  "700084": [
+    "24 Paraganas South",
+    "West Bengal",
+    ["Garia", "Garia Garden", "Kamda Hari"]
+  ],
+  "700085": ["Kolkata", "West Bengal", ["KG Bose Sarani"]],
+  "700086": ["Kolkata", "West Bengal", ["Baghajatin"]],
+  "700087": ["Kolkata", "West Bengal", ["New Market"]],
+  "700088": [
+    "Kolkata",
+    "West Bengal",
+    ["Brace Bridge", "Taratala Road", "Telecom Factory"]
+  ],
+  "700089": [
+    "24 Paraganas North",
+    "West Bengal",
+    ["Kalindi Housing Estate", "Lake Town"]
+  ],
+  "700090": ["24 Paraganas North", "West Bengal", ["Netaji Colony", "Noapara"]],
+  "700091": [
+    "24 Paraganas North",
+    "West Bengal",
+    ["Bidhan Nagar CK Market", "Nabadiganta IT", "Sech Bhawan"]
+  ],
+  "700092": ["Kolkata", "West Bengal", ["Regent Estate"]],
+  "700093": ["24 Paraganas South", "West Bengal", ["Purba Putiary"]],
+  "700094": [
+    "Kolkata",
+    "West Bengal",
+    ["Baishnab Ghata Patuli Township", "Panchasayar", "Sammilani Mahavidyalaya"]
+  ],
+  "700095": ["Kolkata", "West Bengal", ["Golf Green"]],
+  "700096": ["24 Paraganas South", "West Bengal", ["Brahmapur"]],
+  "700097": ["24 Paraganas North", "West Bengal", ["Purbachal"]],
+  "700099": ["Kolkata", "West Bengal", ["Kalikapur", "Mukundapur"]],
+  "700100": ["Kolkata", "West Bengal", ["Vip Nagar"]],
+  "700101": ["24 Paraganas North", "West Bengal", ["Prafulla Kanan"]],
+  "700102": ["24 Paraganas North", "West Bengal", ["Krishnapur"]],
+  "700103": [
+    "24 Paraganas South",
+    "West Bengal",
+    ["Bonhooghly", "Narendrapur", "Nepalganj"]
+  ],
+  "700104": [
+    "24 Paraganas South",
+    "West Bengal",
+    [
+      "Amgachia",
+      "IIM Joka",
+      "Joka",
+      "Nahazari",
+      "Pailanhat",
+      "Ramchandrapur Chak Thakurani",
+      "Rasapunja"
+    ]
+  ],
+  "700105": ["Kolkata", "West Bengal", ["Chowbaga", "Dhapa", "Nowbhanga"]],
+  "700106": ["24 Paraganas North", "West Bengal", ["Bidhan Nagar IB Market"]],
+  "700107": ["Kolkata", "West Bengal", ["Ekt", "Madurdaha"]],
+  "700108": ["24 Paraganas North", "West Bengal", ["Ashokegarh", "Bonhooghly", "Isi"]],
+  "700109": ["24 Paraganas North", "West Bengal", ["Agarpara"]],
+  "700110": [
+    "24 Paraganas North",
+    "West Bengal",
+    [
+      "Bijoypur",
+      "Chandpur Leningarh",
+      "Jugberia",
+      "Ramchandra Pur",
+      "Sodepur",
+      "Sodepur GHE",
+      "Tirtha Bharati"
+    ]
+  ],
+  "700111": ["24 Paraganas North", "West Bengal", ["Ghola", "Ghola Bazar"]],
+  "700112": [
+    "24 Paraganas North",
+    "West Bengal",
+    ["Kalyannagar Cooperative Colony", "Pansila"]
+  ],
+  "700113": [
+    "24 Paraganas North",
+    "West Bengal",
+    ["Karnamadhabpur", "Natagarh", "Panchanantala"]
+  ],
+  "700114": ["24 Paraganas North", "West Bengal", ["Bangodaya", "Panihati"]],
+  "700115": ["24 Paraganas North", "West Bengal", ["Sukchar"]],
+  "700116": ["24 Paraganas North", "West Bengal", ["BDSopan"]],
+  "700117": [
+    "24 Paraganas North",
+    "West Bengal",
+    ["Jeliapara", "Khardah", "Surya Sen Nagar"]
+  ],
+  "700118": ["24 Paraganas North", "West Bengal", ["Rahara"]],
+  "700119": [
+    "24 Paraganas North",
+    "West Bengal",
+    ["Bandipur", "Bishalakshi Ghat", "Bramhasthan", "Patulia", "Titagarh"]
+  ],
+  "700120": [
+    "24 Paraganas North",
+    "West Bengal",
+    [
+      "Barrackpore",
+      "Barrackpore Bazar",
+      "Barrackpore GovtHousing",
+      "Ghosh Para Road",
+      "Monirampore",
+      "Nayapally",
+      "Orderly Bazar",
+      "Vivekananda Math"
+    ]
+  ],
+  "700121": [
+    "24 Paraganas North",
+    "West Bengal",
+    ["Beraberia", "Nilganj Bazaar", "Sewli Telinipara", "Suryapur"]
+  ],
+  "700122": [
+    "24 Paraganas North",
+    "West Bengal",
+    ["Anandapuri", "Jaffarpur", "Nonachandanpukur"]
+  ],
+  "700123": [
+    "24 Paraganas North",
+    "West Bengal",
+    ["Barrackpore RS", "Panpara", "Talpukur"]
+  ],
+  "700124": [
+    "24 Paraganas North",
+    "West Bengal",
+    ["Barasat", "Barasat Bazar", "Sethpukur"]
+  ],
+  "700125": [
+    "24 Paraganas North",
+    "West Bengal",
+    [
+      "Kadambagachi",
+      "Kamdevpur",
+      "Kazipara",
+      "Khilkapur",
+      "Mirhati",
+      "Noapara",
+      "Noapara Madhavpur"
+    ]
+  ],
+  "700126": [
+    "24 Paraganas North",
+    "West Bengal",
+    ["Bodai", "Jagannathpur", "Malikapur", "Nabapally"]
+  ],
+  "700127": ["24 Paraganas North", "West Bengal", ["Hridaypur"]],
+  "700128": [
+    "24 Paraganas North",
+    "West Bengal",
+    ["Badu", "Bhagyamantapur", "Kirtipur", "Madanpur Krishnapur", "Mudiahat"]
+  ],
+  "700129": [
+    "24 Paraganas North",
+    "West Bengal",
+    ["East Udayrajpur", "Madhyamgram", "Udayrajpur"]
+  ],
+  "700130": [
+    "24 Paraganas North",
+    "West Bengal",
+    ["Korachandigarh", "Madhyamgram Bazar", "Taldharia Kapasia"]
+  ],
+  "700131": [
+    "24 Paraganas North",
+    "West Bengal",
+    ["Aharampur", "Kodalia Agapur", "Newbarrackpur", "Sajirhat"]
+  ],
+  "700132": ["24 Paraganas North", "West Bengal", ["Ganganagar", "Ganti"]],
+  "700133": ["24 Paraganas North", "West Bengal", ["Michealnagar"]],
+  "700134": ["24 Paraganas North", "West Bengal", ["Nilachal"]],
+  "700135": [
+    "24 Paraganas North",
+    "West Bengal",
+    [
+      "Akandakeshari",
+      "Bagu",
+      "Chandpur",
+      "Hatisala",
+      "Kadampukur",
+      "Kamduni",
+      "Kashinathpur",
+      "Lauhati",
+      "Machibhanga",
+      "Matiagachha",
+      "Paikan",
+      "Pakka Polarhat",
+      "Patharghata",
+      "Pithapukuria",
+      "Polarhat",
+      "Rajarhat",
+      "Rajarhat Bishnupur",
+      "Rajarhat Deara",
+      "Rohanda",
+      "Satbhaya",
+      "Shyamnagar",
+      "Sikharpur",
+      "Sonepur",
+      "Uttar Kashipur"
+    ]
+  ],
+  "700136": ["24 Paraganas North", "West Bengal", ["Narayanpur", "Rajarhat Gopalpur"]],
+  "700137": [
+    "24 Paraganas South",
+    "West Bengal",
+    [
+      "Bawali",
+      "Bawali Chandipur",
+      "Budge Budge",
+      "Budge Budge Natun Bazar",
+      "Buinta",
+      "Ghanashyambati",
+      "Hentalkhali",
+      "Sarengabad",
+      "Shyampur",
+      "Uttar Raipur"
+    ]
+  ],
+  "700138": [
+    "24 Paraganas South",
+    "West Bengal",
+    ["Achhipur", "Benjanharia", "Pujali", "Purba Nischintapur"]
+  ],
+  "700139": [
+    "24 Paraganas South",
+    "West Bengal",
+    ["Daulatpur", "Memanpur Chandannagar", "Vivekananda Pally"]
+  ],
+  "700140": [
+    "24 Paraganas South",
+    "West Bengal",
+    [
+      "Akra Krishnanagar",
+      "Bangla",
+      "Batanagar",
+      "Chatakalikapur",
+      "Jagannathnagar",
+      "Khagramuri",
+      "Nungi",
+      "Par Bangla",
+      "Paschim Rameswarpur"
+    ]
+  ],
+  "700141": [
+    "24 Paraganas South",
+    "West Bengal",
+    [
+      "Ashuti",
+      "Boga Noapara",
+      "Chakjot Shibrampur",
+      "Gonipur",
+      "Jalkhura",
+      "Maheshtala Gobindapur",
+      "Mahestala",
+      "Raipur",
+      "Vivekanandapur"
+    ]
+  ],
+  "700142": ["24 Paraganas South", "West Bengal", ["Santosh Pur Maheshtalaso"]],
+  "700143": ["24 Paraganas South", "West Bengal", ["Sarkarpool"]],
+  "700144": ["24 Paraganas South", "West Bengal", ["Baruipur"]],
+  "700145": [
+    "24 Paraganas South",
+    "West Bengal",
+    ["Bamangachi", "Dakshin Gobindapur", "Gangrai", "Malancha Mahinagar", "Mallickpore"]
+  ],
+  "700146": ["24 Paraganas South", "West Bengal", ["Kodalia"]],
+  "700147": ["24 Paraganas South", "West Bengal", ["Subhas Gram"]],
+  "700148": ["24 Paraganas South", "West Bengal", ["Harinavi"]],
+  "700149": ["24 Paraganas South", "West Bengal", ["Chowhati", "Rajpur", "Rajpur Bazar"]],
+  "700150": [
+    "24 Paraganas South",
+    "West Bengal",
+    [
+      "Hadia",
+      "Kamrabad",
+      "Khayada",
+      "Nayabad",
+      "Ramkrishna Pally",
+      "Sonarpur",
+      "Uchhepota"
+    ]
+  ],
+  "700151": ["24 Paraganas South", "West Bengal", ["Dakshin Jagatdal", "Dingelpota"]],
+  "700152": ["24 Paraganas South", "West Bengal", ["Dhalua", "Panchpota"]],
+  "700153": ["24 Paraganas South", "West Bengal", ["Laskar Pur"]],
+  "700154": ["24 Paraganas South", "West Bengal", ["Boral", "Rania"]],
+  "700155": ["24 Paraganas North", "West Bengal", ["Abdalpur"]],
+  "700156": [
+    "24 Paraganas North",
+    "West Bengal",
+    ["Chakpanchuria", "Hatgacha", "Mahishbathan", "New Town"]
+  ],
+  "700157": ["24 Paraganas North", "West Bengal", ["Ghuni", "Hatiara"]],
+  "700158": ["24 Paraganas North", "West Bengal", ["Bisharpara"]],
+  "700159": ["24 Paraganas North", "West Bengal", ["Aswini Nagar", "Jyangra"]],
+  "700160": ["24 Paraganas North", "West Bengal", ["New Town Action Area III"]],
+  "700161": ["24 Paraganas North", "West Bengal", ["New Town Action Area II"]],
+  "700162": ["24 Paraganas North", "West Bengal", ["Gouranganagar"]],
+  "700163": ["24 Paraganas North", "West Bengal", ["New Town Action Area I"]]
+}

@@ -1,0 +1,4294 @@
+{
+  "380001": [
+    "Ahmadabad",
+    "Gujarat",
+    [
+      "Ahmedabad",
+      "Dariapur",
+      "District Court",
+      "Gandhi Road",
+      "Gheekanta Road",
+      "Jamalpur",
+      "Khadia",
+      "Khanpur",
+      "Lal Darwaja",
+      "Manek Chowk",
+      "Municipal Corporation",
+      "Raikhad",
+      "Raipur"
+    ]
+  ],
+  "380002": ["Ahmadabad", "Gujarat", ["N C Market", "Railwaypura", "Revdibazar"]],
+  "380003": ["Ahmadabad", "Gujarat", ["Delivery Hub Ahmedabad"]],
+  "380004": [
+    "Ahmadabad",
+    "Gujarat",
+    [
+      "Cantonment",
+      "Delhi Gate",
+      "Dudheshwar Tavdipura",
+      "Foreign Post Office Ahmedabad",
+      "Girdharnagar",
+      "Madhupura Market",
+      "Shahibag",
+      "Shahpur"
+    ]
+  ],
+  "380005": ["Ahmadabad", "Gujarat", ["Kabir Chowk", "Motera", "O N G C", "Sabarmati"]],
+  "380006": ["Ahmadabad", "Gujarat", ["Ellisbridge"]],
+  "380007": [
+    "Ahmadabad",
+    "Gujarat",
+    ["Anandnagar", "Narayannagar", "Paldi", "Sarkhej Road", "Shardanagar"]
+  ],
+  "380008": [
+    "Ahmadabad",
+    "Gujarat",
+    [
+      "Daxini Society",
+      "Jawahar Chowk",
+      "Khokhara Mehmadabad",
+      "L G Hospital",
+      "Maninagar",
+      "S A Mills",
+      "Vasisthnagar"
+    ]
+  ],
+  "380009": [
+    "Ahmadabad",
+    "Gujarat",
+    ["B D Cell Ahmedabad City", "Darpan Society", "Gujarat University", "Navrangpura"]
+  ],
+  "380013": [
+    "Ahmadabad",
+    "Gujarat",
+    ["Naranpura Vistar", "Nava Vadaj", "Shastrinagar", "Stadium Marg", "Vadaj"]
+  ],
+  "380014": ["Ahmadabad", "Gujarat", ["Navjivan"]],
+  "380015": [
+    "Ahmadabad",
+    "Gujarat",
+    ["Azad Society", "I I M", "Jodhpur Char Rasta", "Manekbag", "Polytechnic", "S A C"]
+  ],
+  "380016": [
+    "Ahmadabad",
+    "Gujarat",
+    ["Asarwa Chakla", "Civil Hospital", "Meghaningar", "Public Office"]
+  ],
+  "380018": ["Ahmadabad", "Gujarat", ["Saraspur"]],
+  "380019": ["Ahmadabad", "Gujarat", ["D Cabin", "Railway Colony"]],
+  "380021": ["Ahmadabad", "Gujarat", ["Gomtipur", "Rajpur Gomtipur"]],
+  "380022": [
+    "Ahmadabad",
+    "Gujarat",
+    ["Behrampura", "Calico Mills", "Gita Mandir Road", "M D Marg"]
+  ],
+  "380023": ["Ahmadabad", "Gujarat", ["Rakhial Udyog Vistar", "Sukhrampura"]],
+  "380024": ["Ahmadabad", "Gujarat", ["Asarwa Ext South", "Bapunagar", "I E Bapunagar"]],
+  "380026": ["Ahmadabad", "Gujarat", ["Amraiwadi", "Ctm Char Rasta"]],
+  "380027": ["Ahmadabad", "Gujarat", ["Gandhi Ashram"]],
+  "380028": ["Ahmadabad", "Gujarat", ["Bhairavnath Road", "Shah Alam Roza"]],
+  "380049": ["Ahmadabad", "Gujarat", ["Nikol"]],
+  "380050": ["Ahmadabad", "Gujarat", ["Ghodasar"]],
+  "380051": ["Ahmadabad", "Gujarat", ["Jivraj Park"]],
+  "380052": ["Ahmadabad", "Gujarat", ["Memnagar"]],
+  "380054": ["Ahmadabad", "Gujarat", ["Bodakdev", "Thaltej Road"]],
+  "380055": ["Ahmadabad", "Gujarat", ["Juhapura"]],
+  "380058": ["Ahmadabad", "Gujarat", ["Ambli", "Bopal", "Ghuma", "Shela"]],
+  "380059": ["Ahmadabad", "Gujarat", ["Shilaj", "Thaltej"]],
+  "380060": ["Ahmadabad", "Gujarat", ["Gujrat High Court", "Lapkaman", "Ognaj", "Sola"]],
+  "380061": ["Ahmadabad", "Gujarat", ["Ghatlodia"]],
+  "380063": ["Ahmadabad", "Gujarat", ["Sola H B C"]],
+  "382006": ["Gandhinagar", "Gujarat", ["Gandhinagar Sector 6"]],
+  "382007": [
+    "Gandhinagar",
+    "Gujarat",
+    ["Gandhinagar Sector 7", "Gandhinagar Sector 8", "Gandhinagar Sector 9", "Indroda"]
+  ],
+  "382010": [
+    "Gandhinagar",
+    "Gujarat",
+    ["Gandhinagar Gujarat", "New Sachivalaya Complex", "Simandhar City", "Vidhansabha"]
+  ],
+  "382016": [
+    "Gandhinagar",
+    "Gujarat",
+    ["Gandhinagar Sector 16", "Gandhinagar Sector 17", "Vavol"]
+  ],
+  "382021": [
+    "Gandhinagar",
+    "Gujarat",
+    ["Gandhinagar Sector 19", "Gandhinagar Sector 21", "Gandhinagar Sector 22"]
+  ],
+  "382024": [
+    "Gandhinagar",
+    "Gujarat",
+    ["Gandhinagar Sector 23", "Gandhinagar Sector 24"]
+  ],
+  "382028": ["Gandhinagar", "Gujarat", ["Gandhinagar Sector 28", "Kolavada"]],
+  "382030": [
+    "Gandhinagar",
+    "Gujarat",
+    ["Gandhinagar Sector 29", "Gandhinagar Sector 30"]
+  ],
+  "382041": ["Gandhinagar", "Gujarat", ["Thermal Power Station"]],
+  "382042": ["Gandhinagar", "Gujarat", ["Alampur", "CRPF Campus G Nagar", "Lekawada"]],
+  "382045": ["Gandhinagar", "Gujarat", ["BSF Gandhinagar"]],
+  "382110": [
+    "Ahmadabad",
+    "Gujarat",
+    [
+      "Charel",
+      "Daduka",
+      "Fangadi",
+      "Goraj",
+      "Jamp",
+      "Kaneti",
+      "Kundal",
+      "Kunvar",
+      "Makhiav",
+      "Mankol",
+      "Moti Kishol",
+      "Pimpan",
+      "Rethal",
+      "Sanand",
+      "Upardal",
+      "Vekaria",
+      "Vinchhiya"
+    ]
+  ],
+  "382115": [
+    "Ahmadabad",
+    "Gujarat",
+    ["Andej", "Chekhla", "Garodia", "Godhavi", "Khanderaopura", "Nedharad", "Rancharada"]
+  ],
+  "382120": [
+    "Ahmadabad",
+    "Gujarat",
+    [
+      "Abasana",
+      "Charol",
+      "Dabhsar",
+      "Dadhana",
+      "Dekawada",
+      "Detroj",
+      "Gamanpura",
+      "Gunjala",
+      "Jalisana",
+      "Kukvav",
+      "Marusana",
+      "Nadishala",
+      "Odhav",
+      "Rudatal",
+      "Sadatpura",
+      "Sangpura",
+      "Sinaj",
+      "Ughroj",
+      "Vinchhan",
+      "Vithlpura",
+      "Zanzarva"
+    ]
+  ],
+  "382122": ["Gandhinagar", "Gujarat", ["Dantali"]],
+  "382130": [
+    "Ahmadabad",
+    "Gujarat",
+    [
+      "Dalod",
+      "Dhedasana",
+      "Endla",
+      "Kadvasan",
+      "Kunpur",
+      "Malanpur",
+      "Mandal",
+      "Nana Ubhada",
+      "Navagam",
+      "Nayakpur",
+      "Rakhiana",
+      "Ribadi",
+      "Sher",
+      "Sitapur",
+      "Solgam",
+      "Vaghada",
+      "Vanpardi",
+      "Varmor",
+      "Vinzuvada"
+    ]
+  ],
+  "382140": [
+    "Ahmadabad",
+    "Gujarat",
+    [
+      "Ashoknagar",
+      "Bhadana",
+      "Bhankoda",
+      "Chhaniar",
+      "Devpura",
+      "Ghatisana",
+      "Kanz",
+      "Kointia",
+      "Panar",
+      "Pandharpura",
+      "Rampura",
+      "Shivpura",
+      "Sihor",
+      "Ukardi"
+    ]
+  ],
+  "382145": [
+    "Ahmadabad",
+    "Gujarat",
+    [
+      "Balsasan",
+      "Bamroli",
+      "Bhoyani",
+      "Chuval Dangarva",
+      "Katosan Road",
+      "Madrisana",
+      "Moti Rantai",
+      "Sobhasan",
+      "Sunvala",
+      "Telavi"
+    ]
+  ],
+  "382150": [
+    "Ahmadabad",
+    "Gujarat",
+    [
+      "Asalgam",
+      "Bhojwa",
+      "Bordibazar Viramgam",
+      "Chandranagar",
+      "Daslana",
+      "Dhakdi",
+      "Dumana",
+      "Ghoda",
+      "Goraiya",
+      "Hansalpur",
+      "Hirapura",
+      "Jakwada",
+      "Jalampur",
+      "Joshipura",
+      "Junapadhar",
+      "Kamijala",
+      "Kankravadi",
+      "Karakthal",
+      "Khudad",
+      "Kokta",
+      "Kumarkhan",
+      "Manipur",
+      "Melaj",
+      "Ogan",
+      "Rahemalpur",
+      "Rangpur",
+      "Sachana",
+      "Sarsavadi",
+      "Shahpur",
+      "Thori Mubarak",
+      "Thori Thumbha",
+      "Thuleta",
+      "Trent",
+      "Ukhlod",
+      "Vadgas",
+      "Vani",
+      "Vansva",
+      "Vanthal",
+      "Viramgam",
+      "Zezra"
+    ]
+  ],
+  "382170": [
+    "Ahmadabad",
+    "Gujarat",
+    [
+      "Bakrana",
+      "Bol",
+      "Chandrasan",
+      "Chharodi",
+      "Dodar",
+      "Iawa Vasna",
+      "Jholapur",
+      "Kalana",
+      "Khoda",
+      "Khorajnanoda",
+      "Siawada",
+      "Vasna Iawa",
+      "Virochannagar"
+    ]
+  ],
+  "382210": [
+    "Ahmadabad",
+    "Gujarat",
+    [
+      "Bakrol",
+      "Bhat",
+      "Fatewadi",
+      "Kasindra",
+      "Kolat",
+      "Navapura",
+      "Sanathal",
+      "Sarkhej",
+      "Telav",
+      "Vishalpur"
+    ]
+  ],
+  "382213": [
+    "Ahmadabad",
+    "Gujarat",
+    ["Changodar", "Devtimoti", "Matoda", "Moraiya", "Vasna Chacharvadi"]
+  ],
+  "382220": [
+    "Ahmadabad",
+    "Gujarat",
+    [
+      "Adroda",
+      "Bavla",
+      "Bavla Market Yard",
+      "Bhayla",
+      "Chhabasar",
+      "Chiada",
+      "Daran",
+      "Dehgamda",
+      "Dhanwada",
+      "Juval",
+      "Juval Rupavati",
+      "Kerala",
+      "Kocharia",
+      "Modasar",
+      "Nani Devti",
+      "Nanodara",
+      "Rajoda",
+      "Ranesar",
+      "Rasam",
+      "Rupal",
+      "Salajada",
+      "Sankod",
+      "Sari"
+    ]
+  ],
+  "382225": [
+    "Ahmadabad",
+    "Gujarat",
+    [
+      "Ambaliara",
+      "Ambareli",
+      "Dadusar",
+      "Dholka",
+      "Jalalpur Vajifa",
+      "Kelia Vasna",
+      "Nesda",
+      "Rampur",
+      "Ranoda",
+      "Sahij",
+      "Sarandi",
+      "Sathal",
+      "Sherpura",
+      "Siawada",
+      "Sindharej",
+      "Transad",
+      "Valdhera",
+      "Vautha"
+    ]
+  ],
+  "382230": [
+    "Ahmadabad",
+    "Gujarat",
+    [
+      "Arnej",
+      "Bagodara",
+      "Bholad",
+      "Bhurkhi",
+      "Dhingada",
+      "Durgi",
+      "Gundi Sarvodaya Ashram",
+      "Jakhada",
+      "Jawaraj",
+      "Lothal Bhurkhi RS",
+      "Mithapur",
+      "Moti Boru",
+      "Nani Boru",
+      "Rohika",
+      "Sargwala",
+      "Shiyal",
+      "Utelia",
+      "Vejalka"
+    ]
+  ],
+  "382240": [
+    "Ahmadabad",
+    "Gujarat",
+    [
+      "Baldana",
+      "Bamsara",
+      "Deo Dholera",
+      "Dholi",
+      "Gangad",
+      "Kalyangadh",
+      "Kesardi",
+      "Koth",
+      "Rupgadh"
+    ]
+  ],
+  "382245": [
+    "Botad",
+    "Gujarat",
+    [
+      "Alampur",
+      "Aniali K",
+      "Bodia",
+      "Devaliya",
+      "Dharpipla",
+      "Galsana",
+      "Keria",
+      "Khokarnesh",
+      "Kundli",
+      "Nani Vavdi",
+      "Rajpura",
+      "Ranpur",
+      "Umrela",
+      "Vagad"
+    ]
+  ],
+  "382250": [
+    "Ahmadabad",
+    "Gujarat",
+    [
+      "Akru",
+      "Chokdi",
+      "Jeska",
+      "Parabadi",
+      "Polarpur",
+      "Shahpur",
+      "Tagadi",
+      "Unchadi",
+      "Zinzar"
+    ]
+  ],
+  "382255": [
+    "Botad",
+    "Gujarat",
+    [
+      "Alau",
+      "Bagad",
+      "Chandarva",
+      "Godhavata",
+      "Gunda",
+      "Jalila",
+      "Khas",
+      "Moti Vavdi",
+      "Refda",
+      "Sunderiana"
+    ]
+  ],
+  "382260": [
+    "Ahmadabad",
+    "Gujarat",
+    ["Badarkha", "Chaloda", "Chandisar", "Kavitha", "Saroda"]
+  ],
+  "382265": [
+    "Ahmadabad",
+    "Gujarat",
+    ["Ganol", "Ingoli", "Kauka", "Pisawada", "Simej", "Varna", "Vataman", "Virdi"]
+  ],
+  "382305": [
+    "Gandhinagar",
+    "Gujarat",
+    [
+      "Amrajinamuvada",
+      "Anguthala",
+      "Bardolikoti",
+      "Dehgam",
+      "Harkhji Na Muvada",
+      "Harsoli",
+      "Jalia No Math",
+      "Jawaharmarket Dehgam",
+      "Kadodara",
+      "Karoli",
+      "Lavad",
+      "Mota Jalundra",
+      "Nandol",
+      "Salki",
+      "Sanoda",
+      "Vadvasa",
+      "Vasna Rathod"
+    ]
+  ],
+  "382308": [
+    "Gandhinagar",
+    "Gujarat",
+    [
+      "Bahiyal",
+      "Baria",
+      "Chiskari",
+      "Devkaran Na Muvada",
+      "Ghamij",
+      "Hathijan",
+      "Hilol",
+      "Isanpurdodia",
+      "Kanipur",
+      "Motipura",
+      "Palundra",
+      "Siawada",
+      "Vasna Sogthi"
+    ]
+  ],
+  "382315": [
+    "Gandhinagar",
+    "Gujarat",
+    [
+      "Antoli",
+      "Dharisana",
+      "Jindva",
+      "Kadjodara",
+      "Khanpur",
+      "Lihoda",
+      "Masang Moti",
+      "Navanagar",
+      "Patna Kuva",
+      "Piplaj",
+      "Rakhial",
+      "Rakhial RS",
+      "Sahebji Na Muvada",
+      "Sametri",
+      "Sampa",
+      "Suja Na Muvada",
+      "Udan"
+    ]
+  ],
+  "382320": [
+    "Gandhinagar",
+    "Gujarat",
+    ["Dolarana Vasna", "Jakhora", "Madhavgadh", "Sadra"]
+  ],
+  "382321": [
+    "Gandhinagar",
+    "Gujarat",
+    [
+      "Chandrala",
+      "Chekhala Pagi",
+      "Chhala",
+      "Giyod",
+      "Halisa",
+      "Nana Jalundra",
+      "Vasnachaudhary"
+    ]
+  ],
+  "382330": [
+    "Ahmadabad",
+    "Gujarat",
+    [
+      "Bilasia",
+      "Limbadia",
+      "Medra",
+      "Nana Chiloda",
+      "Naroda",
+      "Naroda I E",
+      "Naroda S A",
+      "Pardhol",
+      "Vehlal"
+    ]
+  ],
+  "382340": ["Ahmadabad", "Gujarat", ["Kubernagar", "Kubernagar B A", "Noblenagar"]],
+  "382345": [
+    "Ahmadabad",
+    "Gujarat",
+    ["Krishnanagar", "N C Mills", "Naroda Road", "Saijpur Bogha"]
+  ],
+  "382350": ["Ahmadabad", "Gujarat", ["Khodiyarnagar", "T B Nagar"]],
+  "382355": [
+    "Gandhinagar",
+    "Gujarat",
+    [
+      "Basan",
+      "Chiloda",
+      "Dabhoda",
+      "Dashela",
+      "Dhanap",
+      "Galudan",
+      "Gift City",
+      "Isanpurmota",
+      "Lavarpur",
+      "Magodi",
+      "Palaj",
+      "Prantiya",
+      "Shahpur",
+      "Shiholi Moti",
+      "Vadodara",
+      "Valad"
+    ]
+  ],
+  "382405": [
+    "Ahmadabad",
+    "Gujarat",
+    ["Gyaspur", "Lambha", "Narol", "Saijpur", "Shahwadi"]
+  ],
+  "382415": ["Ahmadabad", "Gujarat", ["Odhav", "Odhav Industrial Estate"]],
+  "382418": ["Ahmadabad", "Gujarat", ["Vastral"]],
+  "382421": [
+    "Gandhinagar",
+    "Gujarat",
+    ["Adalaj", "Ambapur", "Khodiyar", "Kudasan", "Por", "Sargasan", "Zundal"]
+  ],
+  "382422": [
+    "Gandhinagar",
+    "Gujarat",
+    ["Bhoyan Rathod", "Pundrasan", "Tintoda", "Uvarsad"]
+  ],
+  "382423": ["Gandhinagar", "Gujarat", ["Jamiyatpura", "Kasturinagar", "Shertha"]],
+  "382424": ["Ahmadabad", "Gujarat", ["Chandkheda", "Chandkheda Society Area", "Sughad"]],
+  "382425": [
+    "Ahmadabad",
+    "Gujarat",
+    [
+      "Bareja",
+      "Girmatha",
+      "Mahijada",
+      "Miroli",
+      "Muktipur",
+      "Paldi Kankaj",
+      "Pirana",
+      "Timba",
+      "Vasai"
+    ]
+  ],
+  "382426": [
+    "Gandhinagar",
+    "Gujarat",
+    ["Kasturba Vidyalaya", "Koba", "Randesan", "Raysan"]
+  ],
+  "382427": ["Ahmadabad", "Gujarat", ["Aslali", "Jetalpur", "Ode"]],
+  "382428": ["Ahmadabad", "Gujarat", ["Bhat"]],
+  "382430": [
+    "Ahmadabad",
+    "Gujarat",
+    [
+      "Bakrol",
+      "Bhuvaldi",
+      "Kanbha",
+      "Kathwada",
+      "Kathwada GIDC",
+      "Kathwada Maize Product",
+      "Kubadthal",
+      "Kujad",
+      "Pasunj",
+      "Zanu"
+    ]
+  ],
+  "382433": [
+    "Ahmadabad",
+    "Gujarat",
+    [
+      "Bhavda",
+      "Chamla",
+      "Chandial",
+      "Chaulaj",
+      "Kaniyel",
+      "Kuha",
+      "Ranodra",
+      "Undrel",
+      "Vadod"
+    ]
+  ],
+  "382435": [
+    "Ahmadabad",
+    "Gujarat",
+    ["Dhamatvan", "Gamdi", "Geratpur", "Harniav", "Hirapur", "Nandej"]
+  ],
+  "382443": ["Ahmadabad", "Gujarat", ["Isanpur"]],
+  "382445": [
+    "Ahmadabad",
+    "Gujarat",
+    ["Hathijan", "Vatva", "Vatva Industrial Estate", "Vinzol", "Vivekanandnagar"]
+  ],
+  "382449": ["Ahmadabad", "Gujarat", ["Gatrad", "Jantanagar", "Ramol", "Vanch"]],
+  "382450": [
+    "Ahmadabad",
+    "Gujarat",
+    [
+      "Barwala Ghelasha",
+      "Charanki",
+      "Khambhada",
+      "Khamidana",
+      "Kundal",
+      "Navda",
+      "Rampura",
+      "Rojid",
+      "Salangpur Hanuman",
+      "Vadhela",
+      "Valhia"
+    ]
+  ],
+  "382455": [
+    "Ahmadabad",
+    "Gujarat",
+    [
+      "Bavaliary",
+      "Bhangadh",
+      "Dholera",
+      "Hebatpur",
+      "Khun",
+      "Mingalpur",
+      "Panchhi",
+      "Sandhida"
+    ]
+  ],
+  "382460": [
+    "Ahmadabad",
+    "Gujarat",
+    [
+      "Adval",
+      "Aniali Bhimji",
+      "Bajarda",
+      "Chhasiana",
+      "Dhandhuka",
+      "Gunjar",
+      "Jaliya",
+      "Khadol",
+      "Kharad",
+      "Khasta",
+      "Kothadia",
+      "Mota Tradia",
+      "Padana",
+      "Rayka",
+      "Rojka",
+      "Salasar",
+      "Vasna",
+      "Zanzarka"
+    ]
+  ],
+  "382463": [
+    "Ahmadabad",
+    "Gujarat",
+    [
+      "Ambli",
+      "Bhadiad",
+      "Gogla",
+      "Gorasu",
+      "Kadipur",
+      "Otaria",
+      "Otaria Sarvodaya Ashram",
+      "Sangasar",
+      "Sodhi",
+      "Valinda"
+    ]
+  ],
+  "382465": [
+    "Ahmadabad",
+    "Gujarat",
+    [
+      "Buranpur",
+      "Dhanala",
+      "Fatepur",
+      "Fedra",
+      "Gamph",
+      "Kamiala",
+      "Kasindra",
+      "Loliya",
+      "Panchham",
+      "Pipli",
+      "Shela"
+    ]
+  ],
+  "382470": ["Ahmadabad", "Gujarat", ["Digvijaynagar", "Jagatpur", "Kali", "Tragad"]],
+  "382475": ["Ahmadabad", "Gujarat", ["Sardarnagar"]],
+  "382480": ["Ahmadabad", "Gujarat", ["Ranip"]],
+  "382481": ["Ahmadabad", "Gujarat", ["Chandlodia", "Dr Baou", "Gota", "Nirnaynagar"]],
+  "382610": ["Gandhinagar", "Gujarat", ["Pethapur", "Pindarda", "Piplaj"]],
+  "382620": ["Gandhinagar", "Gujarat", ["Randheja"]],
+  "382630": ["Gandhinagar", "Gujarat", ["Rupal"]],
+  "382640": ["Gandhinagar", "Gujarat", ["Adrajmoti", "Sardhav"]],
+  "382650": [
+    "Gandhinagar",
+    "Gujarat",
+    ["Aluva", "Amrapur Gram Bharti", "Limbodra", "Mubarakpura", "Unava Balva", "Vasan"]
+  ],
+  "382721": [
+    "Gandhinagar",
+    "Gujarat",
+    ["Balva", "Kalol", "Kalol Gandhi Road", "Kalol Society Area"]
+  ],
+  "382722": [
+    "Gandhinagar",
+    "Gujarat",
+    ["Bhadaj", "Jethlaj", "Khatraj I E", "Santej", "Vadsar", "Vadsar Air Force"]
+  ],
+  "382725": [
+    "Gandhinagar",
+    "Gujarat",
+    [
+      "Bhoyan Moti",
+      "Borisana",
+      "Hajipur",
+      "Jaspur",
+      "Kalol Industrial Estate",
+      "Palsana",
+      "Piyaj",
+      "Ramnagar",
+      "Saij",
+      "Serisa"
+    ]
+  ],
+  "382729": ["Gandhinagar", "Gujarat", ["Chhatral"]],
+  "382735": [
+    "Gandhinagar",
+    "Gujarat",
+    [
+      "Amja",
+      "Golthara",
+      "Jamla",
+      "Khoraj",
+      "Kotha",
+      "Nardipur",
+      "Paliyed Veda",
+      "Soja",
+      "Veda Paliyed"
+    ]
+  ],
+  "382740": [
+    "Gandhinagar",
+    "Gujarat",
+    ["Dhamasana", "Dingucha", "Isand", "Mokhasan", "Pansar"]
+  ],
+  "382810": [
+    "Gandhinagar",
+    "Gujarat",
+    [
+      "Ajol",
+      "Bilodra",
+      "Chadasana",
+      "Charada",
+      "Delvada",
+      "Padusma",
+      "Samau",
+      "Solaiya",
+      "Vihar"
+    ]
+  ],
+  "382835": [
+    "Gandhinagar",
+    "Gujarat",
+    ["Lakroda", "Lodra", "Rangpur", "Ridrol", "Varsoda"]
+  ],
+  "382845": [
+    "Gandhinagar",
+    "Gujarat",
+    [
+      "Ambod",
+      "Badpura",
+      "Bapupura",
+      "Boru",
+      "Dholakuva",
+      "Fatepura",
+      "Indrapura",
+      "Itadar",
+      "Kharana",
+      "Manekpura",
+      "Mansa",
+      "Mansa Bazar",
+      "Parbatpura",
+      "Parsa",
+      "Pratapnagar",
+      "Vagosana"
+    ]
+  ],
+  "382855": [
+    "Gandhinagar",
+    "Gujarat",
+    ["Anodia", "Khadat", "Mahudi", "Pundhara", "Veda"]
+  ],
+  "383001": [
+    "Sabar Kantha",
+    "Gujarat",
+    [
+      "Agiol",
+      "Bavsar",
+      "Berna",
+      "Chandarni",
+      "Gadhoda",
+      "Hadiol",
+      "Hajipura",
+      "Hapa",
+      "Himatnagar",
+      "Jambudi",
+      "Kankrol",
+      "Katwad",
+      "Khed",
+      "Nava",
+      "Navalpur",
+      "Parabada",
+      "Pural",
+      "Sahebapura",
+      "Savgadh",
+      "Tajpuri",
+      "Viravada",
+      "Vishwamangalam"
+    ]
+  ],
+  "383002": ["Sabar Kantha", "Gujarat", ["Himatnagar Station Road", "Zahirabad"]],
+  "383006": ["Sabar Kantha", "Gujarat", ["Boria"]],
+  "383010": [
+    "Sabar Kantha",
+    "Gujarat",
+    [
+      "Gadha",
+      "Himatpur",
+      "Jamla",
+      "Kaniol",
+      "Kapoda",
+      "Likhi",
+      "Lolasan",
+      "Rajpur",
+      "Vaktapur",
+      "Virpur"
+    ]
+  ],
+  "383030": [
+    "Sabar Kantha",
+    "Gujarat",
+    [
+      "Adapur",
+      "Dhundhar",
+      "Gambhoi",
+      "Hathrol",
+      "Karanpur",
+      "Manorpur",
+      "Pedhmala",
+      "Rupal",
+      "Sadha",
+      "Shravana",
+      "Vavdi"
+    ]
+  ],
+  "383110": [
+    "Sabar Kantha",
+    "Gujarat",
+    [
+      "Aroda",
+      "Bhadresar",
+      "Chadasana",
+      "Daramali",
+      "Dungri",
+      "Jadar",
+      "Kotda Nana",
+      "Mangadh",
+      "Rudardi",
+      "Sachodar"
+    ]
+  ],
+  "383120": [
+    "Sabar Kantha",
+    "Gujarat",
+    ["Dalpur", "Hajipur", "Moyad", "Piludra", "Salal", "Sampad"]
+  ],
+  "383205": [
+    "Sabar Kantha",
+    "Gujarat",
+    [
+      "Balisana",
+      "Bobha",
+      "Dalani Muvadi",
+      "Ghadkan",
+      "Jenpur",
+      "Kamalpur",
+      "Karol",
+      "Majra",
+      "Oran",
+      "Pallachar",
+      "Poglu",
+      "Prantij",
+      "Sitwada",
+      "Tajpur",
+      "Unchha",
+      "Vadrad",
+      "Vadvasa",
+      "Vaghpur"
+    ]
+  ],
+  "383210": [
+    "Sabar Kantha",
+    "Gujarat",
+    [
+      "Ambawada",
+      "Fatepur Mota",
+      "Mahadevpura",
+      "Mauchha",
+      "Nananpur",
+      "Nikoda",
+      "Rampur A",
+      "Sonasan",
+      "Takhatgadh",
+      "Vaghrota",
+      "Zinzva"
+    ]
+  ],
+  "383215": [
+    "Sabar Kantha",
+    "Gujarat",
+    [
+      "Amrapur",
+      "Boria Bechraji",
+      "Doltabad",
+      "Ghadi",
+      "Gora Anjana",
+      "Jorajini Muvadi",
+      "Kherol",
+      "Mahiyal",
+      "Mudhasana",
+      "Poyda",
+      "Salatpur",
+      "Semalia",
+      "Talod",
+      "Talod M Y",
+      "Ujedia",
+      "Valiampura"
+    ]
+  ],
+  "383220": [
+    "Sabar Kantha",
+    "Gujarat",
+    ["Dedhrota", "Derol", "Ilol", "Kadoli", "Kanai", "Kanda", "Khedavada", "Navanagar"]
+  ],
+  "383225": [
+    "Sabar Kantha",
+    "Gujarat",
+    ["Arsodia", "Davad", "Eklara", "Kabso", "Pethapur", "Prempur", "Singa"]
+  ],
+  "383230": [
+    "Sabar Kantha",
+    "Gujarat",
+    [
+      "Bolundra S",
+      "Budheli",
+      "Chhapi",
+      "Deshotar",
+      "Falasan",
+      "Finchod",
+      "Kesharpura",
+      "Maniyor",
+      "Masal",
+      "Oda",
+      "Umedgadh",
+      "Virpur"
+    ]
+  ],
+  "383235": [
+    "Sabar Kantha",
+    "Gujarat",
+    [
+      "Asai",
+      "Babsar",
+      "Bhandval",
+      "Dantroli",
+      "Dhamadi Gadu",
+      "Dobhada",
+      "Gadu",
+      "Hatharva",
+      "Hathoj",
+      "Kesharganj",
+      "Kuba Dharol",
+      "Mahor",
+      "Medh",
+      "Nadri",
+      "Raheda",
+      "Therasana",
+      "Vadali",
+      "Vadoth",
+      "Vasan"
+    ]
+  ],
+  "383240": [
+    "Sabar Kantha",
+    "Gujarat",
+    [
+      "Ada Hathrol",
+      "Bamna",
+      "Bankhor",
+      "Himmatpur",
+      "Hunj",
+      "Mankdi",
+      "Meditimba",
+      "Punasan"
+    ]
+  ],
+  "383245": [
+    "Arvalli",
+    "Gujarat",
+    [
+      "Bhatera",
+      "Bhetali",
+      "Bhiloda",
+      "Bhiloda Bazar",
+      "Bhutavad",
+      "Chiboda",
+      "Chunakhan",
+      "Dholvani",
+      "Jeshingpur",
+      "Khalvad",
+      "Lilchha",
+      "Mau Bhavnath",
+      "Mehru",
+      "Nandoj",
+      "Narsoli",
+      "Nava Bhavnath",
+      "Raipur",
+      "Vankaner",
+      "Vejpur"
+    ]
+  ],
+  "383246": [
+    "Arvalli",
+    "Gujarat",
+    [
+      "Ambabar",
+      "Bhanmer",
+      "Budheli",
+      "Budhrasan",
+      "Chamthan",
+      "Chitrodi",
+      "Chorimala",
+      "Dhansor",
+      "Itavadi",
+      "Jayla",
+      "Jinjudi",
+      "Kanadar",
+      "Kundol Pal",
+      "Masota",
+      "Raisingpur",
+      "Rampuri",
+      "Takatuka",
+      "Torda",
+      "Ubsal",
+      "Virpur"
+    ]
+  ],
+  "383250": [
+    "Arvalli",
+    "Gujarat",
+    [
+      "Adhera",
+      "Bamanvad",
+      "Bolundra",
+      "Kheradi",
+      "Khiloda",
+      "Kudol",
+      "Kushki",
+      "Moti Bebar",
+      "Nandisan",
+      "Sunokh",
+      "Tintoi",
+      "Vandhiyol",
+      "Vanzar"
+    ]
+  ],
+  "383251": [
+    "Arvalli",
+    "Gujarat",
+    [
+      "Ansol",
+      "Dahegamda",
+      "Gali Semro",
+      "Intva",
+      "Isari",
+      "Kagda Mahuda",
+      "Lusadia",
+      "Mota Kantharia",
+      "NavagamIsri",
+      "Panibar",
+      "Rellawada",
+      "Vaghpur"
+    ]
+  ],
+  "383255": [
+    "Sabar Kantha",
+    "Gujarat",
+    [
+      "Bahediya",
+      "Chikhla",
+      "Delwada",
+      "Dharoi",
+      "Didhiya",
+      "Gota",
+      "Khedbrahma",
+      "Khedva",
+      "Navi Metral",
+      "Nichi Dhanal",
+      "Padardi",
+      "Padhara",
+      "Paroya",
+      "Sitol",
+      "Valaran",
+      "Vartol",
+      "Vasana",
+      "Zanzva Panai"
+    ]
+  ],
+  "383260": [
+    "Arvalli",
+    "Gujarat",
+    ["Akrund", "Borditimba", "Chandrej", "Rampura Kampa", "Vatrakgadh"]
+  ],
+  "383270": [
+    "Sabar Kantha",
+    "Gujarat",
+    [
+      "Agiya",
+      "Ambaigadha",
+      "Bandiyana Talav",
+      "Dan Mahudi",
+      "Demti",
+      "Dotad",
+      "Gadhada Shamlaji",
+      "Gundel",
+      "Kheroj",
+      "Lambadiya",
+      "Matoda",
+      "Mota Baval",
+      "Nada",
+      "Nana Sembalia",
+      "Nava Mota",
+      "Panch Mahuda",
+      "Patadiya",
+      "Radhiwad",
+      "Ratanpur",
+      "Tembada",
+      "Unchi Dhanal"
+    ]
+  ],
+  "383275": [
+    "Sabar Kantha",
+    "Gujarat",
+    [
+      "Damavas",
+      "Galodiya",
+      "Kalol Kampa",
+      "Khergadh",
+      "Laxmipura Sabarkantha",
+      "Tandaliya",
+      "Vaghela Derol"
+    ]
+  ],
+  "383276": [
+    "Sabar Kantha",
+    "Gujarat",
+    [
+      "Adpodra",
+      "Khambhisar",
+      "Mathasulia",
+      "Medhasan",
+      "Raigadh",
+      "Rajendranagar",
+      "Rakhiyal",
+      "Vagdi"
+    ]
+  ],
+  "383305": [
+    "Sabar Kantha",
+    "Gujarat",
+    [
+      "Aniod",
+      "Antroli",
+      "Badodara",
+      "Dadarda",
+      "Harsol",
+      "Kabodara",
+      "Lavari",
+      "Madhavgadh",
+      "Modhuka",
+      "Mohanpur",
+      "Mota Chekhla",
+      "Motesari",
+      "Nana Chekhla",
+      "Nava",
+      "Padusan",
+      "Ranasan",
+      "Tajpur Camp",
+      "Varvada"
+    ]
+  ],
+  "383307": [
+    "Arvalli",
+    "Gujarat",
+    [
+      "Ambasar",
+      "Khilodia",
+      "Lalinomath",
+      "Punsari",
+      "Rajpur",
+      "Ranipura",
+      "Sagpur",
+      "Vadagam"
+    ]
+  ],
+  "383310": [
+    "Arvalli",
+    "Gujarat",
+    [
+      "Amodara",
+      "Bhensawada",
+      "Bilwania",
+      "Butal",
+      "Dhamania",
+      "Dhansura",
+      "Dolpur",
+      "Hirapur",
+      "Jasvantpura Kampa",
+      "Khadoda",
+      "Khadol",
+      "Kidi",
+      "Kolvada",
+      "Naranpura Kampa",
+      "Navi Shinol",
+      "Shantipura",
+      "Shinol",
+      "Sika",
+      "Ujleshvar"
+    ]
+  ],
+  "383315": [
+    "Arvalli",
+    "Gujarat",
+    [
+      "Amlai",
+      "Badodara",
+      "Bherunda",
+      "Dugarvada",
+      "Gajan",
+      "Ganeshpur",
+      "Jhalodar",
+      "Kau",
+      "Kolikhad",
+      "Madapur Kampa",
+      "Mahadevpura Kampa",
+      "Mevda",
+      "Modasa",
+      "Modasa Bazar",
+      "Muloj",
+      "Nathavas",
+      "Pahadpur",
+      "Ramana",
+      "Rinchvad",
+      "Sakariya",
+      "Sayra",
+      "Shinavad",
+      "Vaniad Kokapur"
+    ]
+  ],
+  "383316": [
+    "Arvalli",
+    "Gujarat",
+    [
+      "Bayal Dhankhrol",
+      "Bhachediya",
+      "Bhavanpura Kampa",
+      "Gadha",
+      "Itadi",
+      "Limbhoi",
+      "Moti Chinchano",
+      "Ramos"
+    ]
+  ],
+  "383317": ["Arvalli", "Gujarat", ["Dadhalia", "Mahadevgram", "Moti Isrol", "Varthu"]],
+  "383320": ["Arvalli", "Gujarat", ["Davli", "Gadhada", "Sardoi", "Shampur"]],
+  "383325": [
+    "Arvalli",
+    "Gujarat",
+    [
+      "Alwa",
+      "Ambagam",
+      "Ambaliara",
+      "Amiapura",
+      "Bayad",
+      "Bhukhel",
+      "Bhundasan",
+      "Bibinivav",
+      "Choila",
+      "Dabha",
+      "Dakhneshwar",
+      "Ganeshpura",
+      "Jitpur",
+      "Limb",
+      "Pipodara",
+      "Radodara",
+      "Ramos",
+      "Ranechi",
+      "Tenpur",
+      "Untarda",
+      "Vantda Bayad",
+      "Vasnirel"
+    ]
+  ],
+  "383330": [
+    "Arvalli",
+    "Gujarat",
+    [
+      "Amodara",
+      "Boral",
+      "Chhabhou",
+      "Demai",
+      "Deroli",
+      "Desaipura",
+      "Lank",
+      "Madhavgadh",
+      "Rampura Kampa"
+    ]
+  ],
+  "383335": [
+    "Arvalli",
+    "Gujarat",
+    [
+      "Badarpura",
+      "Barnoli",
+      "Bhempoda",
+      "Gabat",
+      "Gotapur",
+      "Khalikpur",
+      "Magodi",
+      "Sarsoli",
+      "Tunadar",
+      "Ubharan",
+      "Vankaneda"
+    ]
+  ],
+  "383340": [
+    "Arvalli",
+    "Gujarat",
+    ["Bordi", "Hathipura", "Indran", "Jalampur", "Odha", "Sathamba", "Savela", "Talod"]
+  ],
+  "383345": [
+    "Arvalli",
+    "Gujarat",
+    [
+      "Ambalia",
+      "Aniyor",
+      "Aniyor Kampa",
+      "Faredi",
+      "Helodar",
+      "Kaswada",
+      "Mahiyapur",
+      "Malpur",
+      "Mangalpur",
+      "Nanawada",
+      "Piprana",
+      "Rambhoda",
+      "Satarda",
+      "Vavdi"
+    ]
+  ],
+  "383350": [
+    "Arvalli",
+    "Gujarat",
+    [
+      "Banthiwada",
+      "Behdaj",
+      "Belyo",
+      "Bhemapur",
+      "Iploda",
+      "Jamgadh",
+      "Kadvadi",
+      "Kaliya Kuva",
+      "Kasana",
+      "Kolundra",
+      "Kunol",
+      "Lalpur",
+      "Limbodara",
+      "Meghraj",
+      "Moti Mori",
+      "Moti Moydi",
+      "Panchal",
+      "Patelna Dhundha",
+      "Ramgadhi",
+      "Rayawada",
+      "Relyo",
+      "Shangal",
+      "Sisodara A",
+      "Undava",
+      "Vaghpur",
+      "Valuna",
+      "Vaniawada",
+      "Vasna",
+      "Zarda"
+    ]
+  ],
+  "383355": [
+    "Arvalli",
+    "Gujarat",
+    [
+      "Devnimori",
+      "Dhambolia",
+      "Dhandhasan",
+      "Dodisara",
+      "Jab Chitaria",
+      "Karchha",
+      "Kherancha",
+      "Napda",
+      "Ode",
+      "Palla",
+      "Panch Mahudi",
+      "Sarvoday Kendra",
+      "Shamlaji"
+    ]
+  ],
+  "383410": [
+    "Sabar Kantha",
+    "Gujarat",
+    [
+      "Ankala",
+      "Badoli",
+      "Bhanpur",
+      "Diyoli",
+      "Ganthiol",
+      "Goral",
+      "Kukadia",
+      "Lalpur",
+      "Sherpur"
+    ]
+  ],
+  "383421": [
+    "Sabar Kantha",
+    "Gujarat",
+    ["BolundraR", "Chitroda", "Dharapur", "Mota Kotda", "Poshina", "Sabli"]
+  ],
+  "383422": [
+    "Sabar Kantha",
+    "Gujarat",
+    [
+      "Ajavas",
+      "Ambamahuda",
+      "Chandrana",
+      "Dantral",
+      "Delwada",
+      "Ganer",
+      "Ganva",
+      "Kalikankar",
+      "Kotda",
+      "Kukdi",
+      "Petachhapra",
+      "Pipliya",
+      "Poshina",
+      "Salera",
+      "Sembalia Poshina",
+      "Tadhivedi",
+      "Vinchhi"
+    ]
+  ],
+  "383430": [
+    "Sabar Kantha",
+    "Gujarat",
+    [
+      "Barvav",
+      "Bhavangadh",
+      "Gambhirpura",
+      "Idar",
+      "Idar Town",
+      "Laloda",
+      "Lei",
+      "Limbhoi",
+      "Mathasur",
+      "Netramali",
+      "Panol",
+      "Pratappura",
+      "Ratanpur",
+      "Sabalwad",
+      "Sapawada",
+      "Surpur",
+      "Umedpura"
+    ]
+  ],
+  "383434": [
+    "Sabar Kantha",
+    "Gujarat",
+    [
+      "Badol",
+      "Chandap",
+      "Gajipur",
+      "Golwada",
+      "Gulabpura",
+      "Kamalpur",
+      "Kava",
+      "Rampur Fudeda",
+      "Ravol",
+      "Verabar"
+    ]
+  ],
+  "383440": [
+    "Sabar Kantha",
+    "Gujarat",
+    [
+      "Bhutiya",
+      "Choriwad",
+      "Chulla",
+      "Juna Chamu",
+      "Kadiadra",
+      "Kalvan",
+      "Kathvavdi",
+      "Pratapgadh Kampa"
+    ]
+  ],
+  "383450": [
+    "Arvalli",
+    "Gujarat",
+    [
+      "Jumsar",
+      "Kanpur",
+      "Kishangadh",
+      "Malasa",
+      "Mesan",
+      "Mudeti",
+      "Munai",
+      "Nankhi",
+      "Nava Revas",
+      "Siyasan",
+      "Sunsar",
+      "Vagheswari",
+      "Vasai"
+    ]
+  ],
+  "383460": [
+    "Sabar Kantha",
+    "Gujarat",
+    [
+      "Abhapur",
+      "Androkha",
+      "Atarsumba",
+      "Bhankhara",
+      "Chandvasa",
+      "Kelava",
+      "Nalseri",
+      "Navagam Dhanela",
+      "Padela",
+      "Parosada",
+      "Rajpur",
+      "Saroli",
+      "Sarsav",
+      "Ukhala Dungri",
+      "Vandhol",
+      "Vasai",
+      "Vijaynagar"
+    ]
+  ],
+  "383462": [
+    "Sabar Kantha",
+    "Gujarat",
+    [
+      "Baleta",
+      "Biladia",
+      "Chitariya",
+      "Chithoda",
+      "Dadhvav",
+      "Dantod",
+      "Gadi",
+      "Jaleti",
+      "Kodiawada",
+      "Limda",
+      "Pal",
+      "Vankda"
+    ]
+  ],
+  "384001": [
+    "Mahesana",
+    "Gujarat",
+    [
+      "Basana",
+      "Dela",
+      "Dhamanva",
+      "Gadha",
+      "Gorad",
+      "Kansarakui",
+      "Kherva",
+      "Lakhvad",
+      "Mahesana",
+      "Mahesana Bazar",
+      "Mahesana JSM",
+      "Meghaliasana",
+      "Mitha",
+      "Nagalpur",
+      "Piludra",
+      "Sametra",
+      "Savala",
+      "Sobhasan",
+      "Tareti",
+      "Udalpur",
+      "Vadosan",
+      "Virta"
+    ]
+  ],
+  "384002": ["Mahesana", "Gujarat", ["Mahesana I E", "Mahesana Railway Colony"]],
+  "384003": ["Mahesana", "Gujarat", ["Mahesana Ongc Colony"]],
+  "384005": [
+    "Mahesana",
+    "Gujarat",
+    ["Aloda", "Chhathiarda", "Nugar", "Palodar", "Panchot"]
+  ],
+  "384012": ["Mahesana", "Gujarat", ["Ganpat Vidyanagar"]],
+  "384110": ["Patan", "Gujarat", ["Balisana", "Der", "Kani"]],
+  "384120": [
+    "Mahesana",
+    "Gujarat",
+    [
+      "Bamosana",
+      "Bhandu",
+      "Bokarwada",
+      "Butta Paldi",
+      "Davada",
+      "Jetalvasana",
+      "Moti Dau"
+    ]
+  ],
+  "384130": [
+    "Mahesana",
+    "Gujarat",
+    ["Bhunav", "Kahoda", "Lunva", "Machhava", "Mahervada", "Mandali"]
+  ],
+  "384135": ["Mahesana", "Gujarat", ["Brahmanwada", "Varvada", "Vishol"]],
+  "384140": ["Mahesana", "Gujarat", ["Jagnathpura", "Kamli"]],
+  "384151": [
+    "Patan",
+    "Gujarat",
+    [
+      "Bilia",
+      "Chandravati",
+      "Dethli",
+      "Gangalasan",
+      "Ganvada",
+      "Khali",
+      "Kholvada",
+      "Meloj",
+      "Mudana",
+      "Nagvasana",
+      "Nandotri",
+      "Nedra",
+      "Samoda",
+      "Sedrana",
+      "Sidhpur",
+      "Sidhpur Jafri Baug",
+      "Sidhpur Jam Chakla",
+      "Sidhpur Market Yard",
+      "Tavadia",
+      "Umru",
+      "Vadhana",
+      "Vanasan",
+      "Varsila"
+    ]
+  ],
+  "384160": ["Mahesana", "Gujarat", ["Unava"]],
+  "384170": [
+    "Mahesana",
+    "Gujarat",
+    [
+      "Aithor",
+      "Amudh",
+      "Bhankhar",
+      "Dabhi",
+      "Dasaj",
+      "Hajipur",
+      "Karli",
+      "Maktupur",
+      "Ranchhodpura",
+      "Sihi",
+      "Sunok",
+      "Tundav",
+      "Unjha",
+      "Unjha Kotkuva",
+      "Unjha Umiya Mataji",
+      "Upera",
+      "Vanagala"
+    ]
+  ],
+  "384220": [
+    "Patan",
+    "Gujarat",
+    [
+      "Brahmanwada",
+      "Chanasma",
+      "Dhanodharda",
+      "Dharmoda",
+      "Jakhana",
+      "Jitoda",
+      "Khari Ghariayal",
+      "Khorsam",
+      "Mithi Vavdi",
+      "Ruppur",
+      "Sevala"
+    ]
+  ],
+  "384221": [
+    "Patan",
+    "Gujarat",
+    ["Chhamichha", "Maniyari", "Mithi Gariyal", "Takodi", "Vadavali"]
+  ],
+  "384225": [
+    "Patan",
+    "Gujarat",
+    ["Chaveli", "Danodarda", "Dhinoj", "Keshni", "Pimpal", "Sunsar", "Zilia"]
+  ],
+  "384229": ["Patan", "Gujarat", ["Lanva", "Mitha Dharva", "Palasar", "Pindharpura"]],
+  "384230": ["Patan", "Gujarat", ["Delmal", "Itoda", "Kamboi", "Sodhav", "Tambolia"]],
+  "384240": [
+    "Patan",
+    "Gujarat",
+    [
+      "Aritha",
+      "Bilia",
+      "Boratwada",
+      "Dhadhana",
+      "Ekalva",
+      "Harij",
+      "Jamanpur",
+      "Jasomav",
+      "Jasvantpura",
+      "Juna Manka",
+      "Kathi",
+      "Katra",
+      "Khakhal",
+      "Kukrana",
+      "Kumbhana",
+      "Matrota",
+      "Nana",
+      "Nava Manka",
+      "Piplana",
+      "Ravad",
+      "Ravindra",
+      "Roda",
+      "Sarval",
+      "Tarora",
+      "Vaghel",
+      "Vagosan",
+      "Vansa",
+      "Vejawada"
+    ]
+  ],
+  "384241": [
+    "Patan",
+    "Gujarat",
+    [
+      "Chandur Moti",
+      "Jesda",
+      "Khijdiyari",
+      "Kunvar",
+      "Kunvarad",
+      "Lolada",
+      "Loteshwar",
+      "Memna",
+      "Mujpur",
+      "Ranod",
+      "Sipur",
+      "Taranagar",
+      "Tuvad"
+    ]
+  ],
+  "384245": [
+    "Patan",
+    "Gujarat",
+    [
+      "Adgam",
+      "Amrapuara",
+      "Anvarpura",
+      "Baspa",
+      "Bhadrada",
+      "Chandur Nani",
+      "Dadar",
+      "Daudpur",
+      "Dudkha",
+      "Gajdinpura",
+      "Gujarwada",
+      "Kanij",
+      "Mandvi",
+      "Mota Joravarpura",
+      "Nayka",
+      "Rafu",
+      "Ranavada",
+      "Sami",
+      "Samsherpura",
+      "Varana",
+      "Ved",
+      "Zilvana"
+    ]
+  ],
+  "384246": [
+    "Patan",
+    "Gujarat",
+    ["Bolera", "Dantisana", "Dhanora", "Padla", "Panchasar", "Sankheshwar"]
+  ],
+  "384255": [
+    "Patan",
+    "Gujarat",
+    [
+      "Adiya",
+      "Chandrumana",
+      "Khanpur Rajkuva",
+      "Khari Vavdi",
+      "Kungher",
+      "Kureja",
+      "Sankra"
+    ]
+  ],
+  "384260": ["Mahesana", "Gujarat", ["Kanthravi", "Manund", "Pali"]],
+  "384265": [
+    "Patan",
+    "Gujarat",
+    [
+      "Aghar",
+      "Ajimana",
+      "Anawada",
+      "Dasawada",
+      "Dhanawada",
+      "Dharnoj",
+      "Dharpur",
+      "Dunawada",
+      "Hansapur",
+      "Kalyana",
+      "Kamliwada",
+      "Kansa",
+      "Katra Samal",
+      "Kotavad",
+      "Kunwara",
+      "Mesar",
+      "Nayta",
+      "Odhva",
+      "Pachakvada",
+      "Patan",
+      "Patan City",
+      "Patan H N G University",
+      "Patan Rajkawada",
+      "Patan Siddhraj Road",
+      "Patan Three Gate",
+      "Rajpur",
+      "Rampura",
+      "Runi",
+      "Sagodiya",
+      "Sujnipur",
+      "Vadli",
+      "Vamaiya"
+    ]
+  ],
+  "384272": [
+    "Patan",
+    "Gujarat",
+    ["Bepadar", "Goliwada", "Sampra", "Sariyad", "Undra", "Veloda"]
+  ],
+  "384275": [
+    "Patan",
+    "Gujarat",
+    [
+      "Borsan",
+      "Ganget",
+      "Islampura",
+      "Matpur",
+      "Norta",
+      "Ranuj",
+      "Ruvavi",
+      "Samoda",
+      "Sander",
+      "Sankhari",
+      "Vasai"
+    ]
+  ],
+  "384285": [
+    "Patan",
+    "Gujarat",
+    [
+      "Abluva",
+      "Bhatsan",
+      "Bhilvan",
+      "Charup",
+      "Dharusan",
+      "Endla",
+      "Jangral",
+      "Khareda",
+      "Khodana",
+      "Kimbuva",
+      "Koita",
+      "Laxmipura",
+      "Morpa",
+      "Muna",
+      "Raviyana",
+      "Vadu",
+      "Vahana",
+      "Vayad",
+      "Wagdod"
+    ]
+  ],
+  "384290": [
+    "Patan",
+    "Gujarat",
+    ["Dindrol", "Kakoshi", "Methan", "Metrana", "Mudvada", "Sahesa"]
+  ],
+  "384305": [
+    "Mahesana",
+    "Gujarat",
+    ["Dadhial", "Kada", "Kharvada", "Lacjjadi", "Magroda"]
+  ],
+  "384310": ["Mahesana", "Gujarat", ["Khandosan", "Pudgam", "Tarabh", "Valam"]],
+  "384315": [
+    "Mahesana",
+    "Gujarat",
+    [
+      "Bhalak",
+      "Denap",
+      "Gothva",
+      "Gunja",
+      "Jaska",
+      "Kamana",
+      "Kansa",
+      "Kuvasana",
+      "Laxmipura",
+      "Paladi",
+      "Rajgadh",
+      "Ralisana",
+      "Rangakui",
+      "Saduthala",
+      "Visnagar",
+      "Visnagar Market Yard",
+      "Visnagar Station Road"
+    ]
+  ],
+  "384320": ["Mahesana", "Gujarat", ["Umta"]],
+  "384325": [
+    "Mahesana",
+    "Gujarat",
+    [
+      "Balad",
+      "Chada",
+      "Chansol",
+      "Chotia",
+      "Dabhad",
+      "Dabhoda",
+      "Dalisana",
+      "Davol",
+      "Keshimpa",
+      "Kheralu",
+      "Mahiyal",
+      "Mandropur",
+      "Moti Hirvani",
+      "Nanivada",
+      "Rasulpur",
+      "Sagthala",
+      "Varetha",
+      "Vithoda"
+    ]
+  ],
+  "384330": [
+    "Mahesana",
+    "Gujarat",
+    [
+      "Anand Bhankhri",
+      "Ankaliyara",
+      "Bedasma Mumanvas",
+      "Bhalusana",
+      "Bhatvas",
+      "Bhimpura",
+      "Gothada",
+      "Himmatpura",
+      "Kothasana",
+      "Mothibhalu",
+      "Sartanpur",
+      "Satlasana",
+      "Tarangaji Temple",
+      "Timba"
+    ]
+  ],
+  "384335": [
+    "Mahesana",
+    "Gujarat",
+    [
+      "Ambavada",
+      "Gorisana",
+      "Karsanpura",
+      "Madhasana",
+      "Sipor",
+      "Sobhasan",
+      "Unad",
+      "Undhai",
+      "Vaghawadi",
+      "Valasana"
+    ]
+  ],
+  "384340": ["Mahesana", "Gujarat", ["Sardarpur", "Sudasana", "Umari", "Vasai"]],
+  "384345": ["Mahesana", "Gujarat", ["Sundhia"]],
+  "384355": [
+    "Mahesana",
+    "Gujarat",
+    [
+      "Badarpur",
+      "Bamanva",
+      "Chhabalia",
+      "Gundrasan",
+      "Kahipur",
+      "Karbatia",
+      "Khatoda",
+      "Malekpur Vad",
+      "Molipur",
+      "Sabalpur",
+      "Sultanpur",
+      "Undani",
+      "Vadnagar"
+    ]
+  ],
+  "384360": ["Mahesana", "Gujarat", ["Dharoi DSC", "Hadol", "Khodamali"]],
+  "384410": [
+    "Mahesana",
+    "Gujarat",
+    ["Asjol", "Balol", "Deloli", "Maguna", "Nadasa", "Palaj", "Rantej"]
+  ],
+  "384412": [
+    "Mahesana",
+    "Gujarat",
+    ["Gambhu", "Kanoda", "Modhera", "Motap", "Ranela", "Vijapurda"]
+  ],
+  "384415": [
+    "Mahesana",
+    "Gujarat",
+    [
+      "Ambala",
+      "Becharaji",
+      "Chadasana",
+      "Dedana",
+      "Delvada Khant",
+      "Dethali",
+      "Dodiwada",
+      "Kalri",
+      "Khambhei",
+      "Sampawada",
+      "Shankhalpur",
+      "Surpura",
+      "Venpura"
+    ]
+  ],
+  "384421": [
+    "Mahesana",
+    "Gujarat",
+    ["Bhesana", "Diwanpura", "Jakasana", "Jhotana", "Khadalpur", "Manknaj", "Mudarda"]
+  ],
+  "384430": ["Mahesana", "Gujarat", ["Katosan", "Martoli", "Santhal", "Virsoda"]],
+  "384435": ["Mahesana", "Gujarat", ["Ambasan", "Boriavi", "Linch"]],
+  "384440": [
+    "Mahesana",
+    "Gujarat",
+    [
+      "Adundra",
+      "Balasar",
+      "Budasan",
+      "Deusana",
+      "Indrad",
+      "Jasalpur",
+      "Kadi",
+      "Kadi Mkt Yard",
+      "Karannagar",
+      "Kaswa",
+      "Kundal",
+      "Lunasan",
+      "Nagrasan",
+      "Nani Kadi",
+      "Rajpur",
+      "Rangpurda",
+      "Sadra",
+      "Sarsav",
+      "Sujatpura",
+      "Suraj",
+      "Untva",
+      "Vidaj",
+      "Visatpur"
+    ]
+  ],
+  "384441": [
+    "Mahesana",
+    "Gujarat",
+    ["Adrajmerdabo", "Borisana Kadi", "Fuletra", "Manipur", "Thol", "Thol I E", "Vamaj"]
+  ],
+  "384445": [
+    "Mahesana",
+    "Gujarat",
+    [
+      "Agol",
+      "Bavlu",
+      "Daran",
+      "Dharampur",
+      "Jeshangpura",
+      "Kalyanpura",
+      "Kanzari",
+      "Khavad",
+      "Kolad",
+      "Lhor",
+      "Medha",
+      "Vadharoda",
+      "Vekra"
+    ]
+  ],
+  "384450": [
+    "Mahesana",
+    "Gujarat",
+    [
+      "Bhatasan",
+      "Dangarwa",
+      "Ganeshpura",
+      "Ghumasan",
+      "Jhulasan",
+      "Juni Sedhavi",
+      "Kaiyal",
+      "Karjisan",
+      "Mathasul",
+      "Nandasan",
+      "Vadasma",
+      "Vadu"
+    ]
+  ],
+  "384455": [
+    "Mahesana",
+    "Gujarat",
+    [
+      "Ambaliasan",
+      "Baliyasan",
+      "Bhasaria",
+      "Chaluva",
+      "Dhanali",
+      "Dholasan",
+      "Jornang",
+      "Tundali"
+    ]
+  ],
+  "384460": [
+    "Mahesana",
+    "Gujarat",
+    ["Akhaj", "Devrasan", "Jagudan", "Mevad", "Mulsan", "Punasan", "Sanganpur"]
+  ],
+  "384465": ["Mahesana", "Gujarat", ["Charadu", "Langhnaj", "Meu", "Saldi"]],
+  "384470": ["Mahesana", "Gujarat", ["Gozaria"]],
+  "384515": ["Mahesana", "Gujarat", ["Gavada", "Malosan"]],
+  "384520": ["Mahesana", "Gujarat", ["Gerita Kolavda RS", "Pamol", "Tatosan"]],
+  "384530": [
+    "Mahesana",
+    "Gujarat",
+    ["Dagavadia", "Devda", "Kelisana", "Kukarwada", "Sokhda", "Vadasan"]
+  ],
+  "384540": ["Mahesana", "Gujarat", ["Kharod", "Ladol", "Mandali"]],
+  "384550": ["Mahesana", "Gujarat", ["Khanusa", "Pilvai"]],
+  "384560": [
+    "Mahesana",
+    "Gujarat",
+    ["Fudeda", "Jantral", "Madhi", "Sardarpur", "Sundarpur"]
+  ],
+  "384565": ["Mahesana", "Gujarat", ["Dabhala", "Padharia", "Titodan", "Vasai Dabhala"]],
+  "384570": [
+    "Mahesana",
+    "Gujarat",
+    [
+      "Aglod",
+      "Bhavsor",
+      "Bilia",
+      "Devpura",
+      "Falu",
+      "Ghantu Dhanpura",
+      "Hirpura",
+      "Jepur",
+      "Kot",
+      "Navasangpur",
+      "Pedhamali",
+      "Rampur Kot",
+      "Ranasan",
+      "Ransipur",
+      "Vijapur",
+      "Vijapur Bazar"
+    ]
+  ],
+  "385001": [
+    "Banas Kantha",
+    "Gujarat",
+    [
+      "Bhagal J",
+      "Bhagal P",
+      "Chadotar",
+      "Dhandha",
+      "Dhanpura",
+      "Gathaman",
+      "Hasanpur",
+      "Hathidra",
+      "Hoda",
+      "Jagana",
+      "Jalotra",
+      "Karjoda",
+      "Lalawada",
+      "Lunva",
+      "Malan",
+      "Malana",
+      "Moria P",
+      "Palanpur",
+      "Palanpur Delhigate",
+      "Palanpur Ganjbazar",
+      "Palanpur Kamalpura",
+      "Palanpur Kirtistambh",
+      "Ratanpur Lokniketan",
+      "Sadarpur",
+      "Sagrosana",
+      "Sangra",
+      "Vadhana",
+      "Vagda",
+      "Vasan",
+      "Virampur"
+    ]
+  ],
+  "385010": [
+    "Banas Kantha",
+    "Gujarat",
+    ["Antroli", "Bhatamalmoti", "Bhutedi", "Chitrasani", "Ranavas", "Saghankshetra"]
+  ],
+  "385110": [
+    "Banas Kantha",
+    "Gujarat",
+    [
+      "Ambaji",
+      "Bamnoj",
+      "Dhagadia",
+      "Hadad",
+      "Jamru",
+      "Jodhsar",
+      "Koteshwar",
+      "Panchha",
+      "Ranpur",
+      "Sanali",
+      "Sembalpani"
+    ]
+  ],
+  "385120": [
+    "Banas Kantha",
+    "Gujarat",
+    [
+      "Bhakhari",
+      "Dalpura",
+      "Danta Bhavangadh",
+      "Dhanali",
+      "Gangva",
+      "Gorad",
+      "Jaswant Gadh",
+      "Jitpur",
+      "Kukadi",
+      "Kundel",
+      "Kuvarshi",
+      "Mankadi",
+      "Moria N",
+      "Motasada",
+      "Mumanvas",
+      "Navovas",
+      "Pethapur",
+      "Punjpur",
+      "Rangpur",
+      "Sandhosi",
+      "Vasi",
+      "Vijlasan"
+    ]
+  ],
+  "385130": ["Banas Kantha", "Gujarat", ["Dabhela", "Kidotar", "Shri Amirgadh"]],
+  "385135": [
+    "Banas Kantha",
+    "Gujarat",
+    ["Balundra", "Dholia", "Iqbalgadh", "Jethi", "Kapasia", "Manpuria", "Sarotra"]
+  ],
+  "385210": [
+    "Banas Kantha",
+    "Gujarat",
+    [
+      "Bavalchudi",
+      "Chhapi",
+      "Edrana",
+      "Mahi",
+      "Majadar",
+      "Malosana",
+      "Manpura",
+      "Pasvadal",
+      "Pirojpura",
+      "Teniwada",
+      "Timbachudi"
+    ]
+  ],
+  "385310": [
+    "Banas Kantha",
+    "Gujarat",
+    [
+      "Bhanjana",
+      "Bhatib",
+      "Dhakha",
+      "Dhanera",
+      "Dharnodhar",
+      "Dugdol",
+      "Duva",
+      "Ghana",
+      "Ghodasar",
+      "Jadi",
+      "Jadia",
+      "Jadiali",
+      "Jiwana",
+      "Kherola",
+      "Kuvarla",
+      "Lavara",
+      "Malotra",
+      "Morthal",
+      "Nandla",
+      "Nani",
+      "Nenava",
+      "Pechhadal",
+      "Rah",
+      "Ramsan",
+      "Raviya",
+      "Samarvada",
+      "Saral",
+      "Sia",
+      "Thavar",
+      "Valer",
+      "Vinchhivadi",
+      "Zenal"
+    ]
+  ],
+  "385320": [
+    "Banas Kantha",
+    "Gujarat",
+    [
+      "Balodhan",
+      "Barvala",
+      "Bhabhar",
+      "Chatra",
+      "Chembuva",
+      "Dhrechana",
+      "Eta",
+      "Garambadi",
+      "Jasanwada",
+      "Katav",
+      "Kuvala",
+      "Madhpura",
+      "Mitha",
+      "Morvada",
+      "Radka",
+      "Runi",
+      "Ruvel",
+      "Sanesada",
+      "Soneth",
+      "Suthar Nesdi",
+      "Tanvad",
+      "Tervada",
+      "Uchosan",
+      "Ujanwada",
+      "Undai",
+      "Vajapur Juna",
+      "Varasada"
+    ]
+  ],
+  "385330": [
+    "Banas Kantha",
+    "Gujarat",
+    [
+      "Bhesana",
+      "Chalva",
+      "Chibhada",
+      "Deodar",
+      "Dhanakwada",
+      "Duchakwada",
+      "Forna",
+      "Golvi",
+      "Jada",
+      "Jalodha",
+      "Jasali",
+      "Kotarwada",
+      "Lavana",
+      "Ludra",
+      "Nokha",
+      "Paldi",
+      "Raiya",
+      "Rantila",
+      "Ravel",
+      "Soni",
+      "Surana",
+      "Vakha",
+      "Vatamjuna"
+    ]
+  ],
+  "385340": [
+    "Patan",
+    "Gujarat",
+    [
+      "Allahabad",
+      "Arjansar",
+      "Bandhvad",
+      "Bhilot",
+      "Chalvada",
+      "D RS",
+      "Dharvadi",
+      "Ganjisar",
+      "Gochnath",
+      "Javantri",
+      "Kamalpur D",
+      "Kamalpur S",
+      "Koliwada",
+      "Lodra",
+      "Lotia",
+      "Masali",
+      "Memdavad",
+      "Moti Pipli",
+      "Nani Pipli",
+      "Nanpura",
+      "Radhanpur",
+      "Radhanpur Rajgadhi",
+      "Radhanpur Rly Colony",
+      "Santhli",
+      "Satun",
+      "Sinad",
+      "Subapura"
+    ]
+  ],
+  "385350": [
+    "Patan",
+    "Gujarat",
+    [
+      "Charanka",
+      "Detrana",
+      "Dhokavada",
+      "Garambadi",
+      "Jakhotra",
+      "Madhutra",
+      "Par",
+      "Piprana",
+      "Santalpur",
+      "Vahuva"
+    ]
+  ],
+  "385360": [
+    "Patan",
+    "Gujarat",
+    [
+      "Abiyana",
+      "Agichana",
+      "Babra",
+      "Bamroli",
+      "Dholakda",
+      "Gadha",
+      "Gadsai",
+      "Gokhantar",
+      "Gotarka",
+      "Jakhel",
+      "Jarusha",
+      "Kilana",
+      "Korda",
+      "Sidhada",
+      "Varahi",
+      "Zandala",
+      "Zazam",
+      "Zekhada"
+    ]
+  ],
+  "385410": [
+    "Banas Kantha",
+    "Gujarat",
+    ["Badargadh", "Chhaniyana", "Gola", "Jasleni", "Magarwada", "Semodra", "Vadgam"]
+  ],
+  "385421": [
+    "Banas Kantha",
+    "Gujarat",
+    [
+      "Bhalgam",
+      "Dalwana",
+      "Dhota",
+      "Ghodiyal",
+      "Gidasan",
+      "Kaleda",
+      "Kodram",
+      "Memadpur",
+      "Nandotra",
+      "Navi Sendhani",
+      "Navisana",
+      "Panchada",
+      "Pepol",
+      "Pilucha",
+      "Rupal",
+      "Sendhani",
+      "Sisrana",
+      "Vansol",
+      "Vesa"
+    ]
+  ],
+  "385505": [
+    "Banas Kantha",
+    "Gujarat",
+    [
+      "Bhadlikotha",
+      "Bhakodar",
+      "Bhilachal",
+      "Chodungari",
+      "Dantiwada",
+      "Dantiwada Colony",
+      "Jegol",
+      "Odhava"
+    ]
+  ],
+  "385506": ["Banas Kantha", "Gujarat", ["Sardar Krishinagar"]],
+  "385510": [
+    "Banas Kantha",
+    "Gujarat",
+    [
+      "Bhakhar Moti",
+      "Chandisar",
+      "Dangia",
+      "Khodla",
+      "Kumbhalmer",
+      "Kushkal",
+      "Madana Dangia",
+      "Mota",
+      "Vaghrol",
+      "Vedancha"
+    ]
+  ],
+  "385515": [
+    "Banas Kantha",
+    "Gujarat",
+    ["Dalwada", "Gadh", "Kumbhasan", "Madana", "Patosan", "Salla", "Samdhi", "Sasam"]
+  ],
+  "385520": [
+    "Banas Kantha",
+    "Gujarat",
+    ["Badarpura", "Basu", "Changa", "Changwada", "Kanodar", "Meta", "Takarwada"]
+  ],
+  "385530": [
+    "Banas Kantha",
+    "Gujarat",
+    [
+      "Balodhar",
+      "Bhildi",
+      "Chhatrala",
+      "Khentva",
+      "Lorwada",
+      "Mudetha",
+      "Nesdajuna",
+      "Peplu"
+    ]
+  ],
+  "385535": [
+    "Banas Kantha",
+    "Gujarat",
+    [
+      "Agthala",
+      "Asarda",
+      "Baiwada",
+      "Bhachalva",
+      "Bhadath",
+      "Bhadramali",
+      "Bhoyan",
+      "Chekra",
+      "Dhunsol",
+      "Disa Bazar",
+      "Disa Mukhya Dak Ghar",
+      "Disa MY Pedal",
+      "Ghada",
+      "Jetda",
+      "Jherda",
+      "Kansari",
+      "Kapramota",
+      "Katarva",
+      "Kotda",
+      "Kuda",
+      "Lakhani",
+      "Mahadevia",
+      "Malgadh",
+      "Nagfana",
+      "Odhava D",
+      "Rajpur Disa",
+      "Rampura Disa",
+      "Ranpur Vvas",
+      "Rasana Mota",
+      "Robas Moti",
+      "Samau",
+      "Saviyana",
+      "Thervada",
+      "Tintoda",
+      "Varnoda",
+      "Vasana Vatam",
+      "Velavapura",
+      "Vithodar"
+    ]
+  ],
+  "385540": [
+    "Banas Kantha",
+    "Gujarat",
+    ["Dhuva", "Jhabadia", "Junadisa", "Khardosan", "Lunpur", "Vasna"]
+  ],
+  "385545": [
+    "Banas Kantha",
+    "Gujarat",
+    [
+      "Alwada",
+      "Anapur Chhota",
+      "Arkhi",
+      "Bapla",
+      "Bhadli Jhat",
+      "Bhandotra",
+      "Bhatram",
+      "Dhaniawada",
+      "Gundri",
+      "Jhat",
+      "Khimat",
+      "Kuchawada",
+      "Kumar",
+      "Mandal",
+      "Motimahudi",
+      "Panthawada",
+      "Runi",
+      "Vachhadal",
+      "Vachhol",
+      "Viruna"
+    ]
+  ],
+  "385550": [
+    "Banas Kantha",
+    "Gujarat",
+    [
+      "Bukoli",
+      "Chekhla",
+      "Dungrasan",
+      "Kakar",
+      "Kamboi",
+      "Khimana",
+      "Khoda",
+      "Khodla",
+      "Kunvarva",
+      "Laxmipura",
+      "Manpur",
+      "Padardi",
+      "Raner",
+      "Raviyana",
+      "Sihori",
+      "Umbari",
+      "Zalmor"
+    ]
+  ],
+  "385555": [
+    "Banas Kantha",
+    "Gujarat",
+    [
+      "Aganwada",
+      "Changa",
+      "Isarva",
+      "Jakhel",
+      "Kasara",
+      "Kharia",
+      "Motajampur",
+      "Nathpura",
+      "Thara",
+      "Vada"
+    ]
+  ],
+  "385560": [
+    "Banas Kantha",
+    "Gujarat",
+    [
+      "Bhadrewadi",
+      "Bhalgam",
+      "Mandla",
+      "Padar",
+      "Siya",
+      "Tatiyana",
+      "Totana",
+      "Un",
+      "Valpura"
+    ]
+  ],
+  "385565": [
+    "Banas Kantha",
+    "Gujarat",
+    [
+      "Asodar",
+      "Bevta",
+      "Bhordu",
+      "Changda",
+      "Charda",
+      "Chudmer",
+      "Dodgam",
+      "Dudhva",
+      "Jamda",
+      "Kamali",
+      "Khengarpura",
+      "Khoda",
+      "Lalpur",
+      "Luvana",
+      "Madal",
+      "Malupur",
+      "Mota Mesra",
+      "Moti Pavad",
+      "Piluda",
+      "Sanavia",
+      "Tharad",
+      "Undrana",
+      "Vadgamda",
+      "Valadar",
+      "Vami"
+    ]
+  ],
+  "385566": [
+    "Banas Kantha",
+    "Gujarat",
+    [
+      "Akoli",
+      "Bhakhari",
+      "Bhorol",
+      "Chuva",
+      "Daiyap",
+      "Dhima",
+      "Gadsisar",
+      "Idhata",
+      "Karbun",
+      "Mavsari",
+      "Naroli",
+      "Rampura",
+      "Sanval",
+      "Sapreda",
+      "Savapura",
+      "Sherau",
+      "Tadav",
+      "Vaghasan"
+    ]
+  ],
+  "385570": [
+    "Banas Kantha",
+    "Gujarat",
+    [
+      "Benap",
+      "Bharadva",
+      "Chala",
+      "Jaloya",
+      "Kumbharkha",
+      "Limbuni",
+      "Mamana",
+      "Radosan",
+      "Suigam"
+    ]
+  ],
+  "385575": [
+    "Banas Kantha",
+    "Gujarat",
+    [
+      "Asara",
+      "Baiyak",
+      "Baluntri",
+      "Bhachali",
+      "Bhatvar",
+      "Bukna",
+      "Dendava",
+      "Dethli",
+      "Dharadhara",
+      "Golgam",
+      "Jelana",
+      "Kundaliya",
+      "Lodrani",
+      "Madka",
+      "Morikha",
+      "Padan",
+      "Tithgam",
+      "Vasarda",
+      "Vav",
+      "Vavdi"
+    ]
+  ],
+  "387001": [
+    "Kheda",
+    "Gujarat",
+    [
+      "Ashram Road Nadiad",
+      "Desai Vago",
+      "Dumral Bazar",
+      "Nadiad",
+      "SRP Group Area Nadiad"
+    ]
+  ],
+  "387002": [
+    "Kheda",
+    "Gujarat",
+    ["Bilodara", "Methodist Hospital Tso Nad", "Patel Society Area Tso Nad"]
+  ],
+  "387003": ["Kheda", "Gujarat", ["Petlad Road"]],
+  "387110": [
+    "Kheda",
+    "Gujarat",
+    ["Ghodasar", "Haldarvas", "Hathnoli", "Jaravat", "Kuna", "Modaj"]
+  ],
+  "387115": [
+    "Kheda",
+    "Gujarat",
+    ["Alindra Nadiad", "Chalali", "Kanjoda", "Manghroli", "Surashamal", "Vansol"]
+  ],
+  "387120": [
+    "Kheda",
+    "Gujarat",
+    ["Bidaj", "Kanij", "Lali", "Mahij", "Raska", "Samadra", "Sankhej", "Vasna Margia"]
+  ],
+  "387130": [
+    "Kheda",
+    "Gujarat",
+    [
+      "Amrapura",
+      "Bavra",
+      "Chhapra",
+      "Devki Vansol",
+      "Ghodali",
+      "Gothaj",
+      "Kachchhai",
+      "Khatraj",
+      "Mahemdavad",
+      "Mankwa",
+      "Nenpur",
+      "Parsantaj",
+      "Sansoli",
+      "Vadadla",
+      "Varsola"
+    ]
+  ],
+  "387210": ["Anand", "Gujarat", ["Dabhou", "Dethli", "Manghrol"]],
+  "387220": ["Anand", "Gujarat", ["Malataj", "Petli"]],
+  "387230": ["Kheda", "Gujarat", ["Pij", "Tundel"]],
+  "387240": [
+    "Anand",
+    "Gujarat",
+    ["Balinta", "Bhalada", "Devataj", "Gada", "Palol", "Sojitra", "Trambovad", "Virol"]
+  ],
+  "387305": ["Kheda", "Gujarat", ["Alina", "Kaprupur", "Sheri"]],
+  "387310": ["Anand", "Gujarat", ["Boriavi", "Lambhvel"]],
+  "387315": ["Kheda", "Gujarat", ["Chaklashi"]],
+  "387320": [
+    "Kheda",
+    "Gujarat",
+    ["Arera", "Dabhan", "Degam", "Kamla", "Manjipura", "Silod"]
+  ],
+  "387325": ["Kheda", "Gujarat", ["Kanjari"]],
+  "387330": [
+    "Kheda",
+    "Gujarat",
+    ["Chunel", "Heranj", "Mohlel", "Palaiya", "Sanali", "Sodpur"]
+  ],
+  "387335": [
+    "Kheda",
+    "Gujarat",
+    [
+      "Abhripur",
+      "Dadusar",
+      "Jaliya",
+      "Karoli",
+      "Mahudha",
+      "Nani Khadol",
+      "Rudan",
+      "Ruppura",
+      "Sastapur",
+      "Torania",
+      "Undra",
+      "Vadthal",
+      "Vansoli"
+    ]
+  ],
+  "387340": ["Kheda", "Gujarat", ["Mahisa", "Nizampura", "Vasna"]],
+  "387345": ["Kheda", "Gujarat", ["Bamroli", "Narsanda", "Rajnagar"]],
+  "387350": ["Kheda", "Gujarat", ["Bamroli", "Davda", "Palana", "Sandhana"]],
+  "387355": ["Kheda", "Gujarat", ["Akhdol", "Dumral", "Keriavi", "Piplag", "Piplata"]],
+  "387360": ["Kheda", "Gujarat", ["Hathaj", "Marida", "Salun"]],
+  "387365": ["Kheda", "Gujarat", ["Antroli", "Dasalwada", "Kaniel", "Khadol", "Torna"]],
+  "387370": ["Kheda", "Gujarat", ["Bhumel", "Fatepur", "Gutal", "Uttarsanda"]],
+  "387375": ["Anand", "Gujarat", ["Ravli", "Sanjaya", "Vadtal"]],
+  "387380": ["Kheda", "Gujarat", ["Bhadkad", "Deva", "Laval", "Maliataj", "Vaso"]],
+  "387411": ["Kheda", "Gujarat", ["Kheda"]],
+  "387430": [
+    "Kheda",
+    "Gujarat",
+    [
+      "Aklacha",
+      "Bharkunda",
+      "Kesara",
+      "Khuntaj",
+      "Rinchhol",
+      "Saraswani",
+      "Shatrunda",
+      "Singhali",
+      "Sinhuj",
+      "Vansol Sundha",
+      "Vanthavali",
+      "Vina"
+    ]
+  ],
+  "387510": [
+    "Kheda",
+    "Gujarat",
+    ["Alindra Matar", "Garmala", "Heranj", "Khandhli", "Undhela"]
+  ],
+  "387520": ["Kheda", "Gujarat", ["Kharanti", "Limbasi", "Malavada"]],
+  "387530": [
+    "Kheda",
+    "Gujarat",
+    [
+      "Asamli",
+      "Khada",
+      "Koshial",
+      "Machhiel",
+      "Mahelaj",
+      "Matar",
+      "Nadhanpur",
+      "Palla",
+      "Sayla",
+      "Traj",
+      "Tranja"
+    ]
+  ],
+  "387540": ["Kheda", "Gujarat", ["Dharoda", "Goblej", "Kanera", "Navagam"]],
+  "387550": ["Kheda", "Gujarat", ["Dhathal", "Kaloli", "Nayka"]],
+  "387560": [
+    "Kheda",
+    "Gujarat",
+    ["Chandana", "Radhu", "Rasikpura", "Shetra", "Varsang", "Vasna Buzarg"]
+  ],
+  "387570": [
+    "Kheda",
+    "Gujarat",
+    ["Antroli", "Hariala", "Khumarwad", "Radhvanaj", "Ratanpur", "Sokhada"]
+  ],
+  "387610": [
+    "Kheda",
+    "Gujarat",
+    [
+      "Ajmavatkot",
+      "Apruji",
+      "Attarsumba",
+      "Bhailakui",
+      "Kosam",
+      "Punadra",
+      "Ravdavat",
+      "Sandesar",
+      "Ukardina Muvada",
+      "Vaghjipur"
+    ]
+  ],
+  "387620": [
+    "Kheda",
+    "Gujarat",
+    [
+      "Alwa",
+      "Ambaliara",
+      "Aminpura",
+      "Antisar",
+      "Antisar Gate Kpdvj",
+      "Bhungalia",
+      "Bhutia",
+      "Chapatiya",
+      "Dahiap",
+      "Danadra",
+      "Dudhathal",
+      "Garod",
+      "Ghadia",
+      "Jher",
+      "Kalaji",
+      "Kapadwanj",
+      "Kavath",
+      "Letar",
+      "Navagam",
+      "Savli",
+      "Sorna",
+      "Sunda",
+      "Thavad",
+      "Vadali",
+      "Vaghas",
+      "Vishnupura"
+    ]
+  ],
+  "387630": [
+    "Kheda",
+    "Gujarat",
+    [
+      "Anara",
+      "Bhaner",
+      "Bhatera",
+      "Dampat",
+      "Dana",
+      "Ghoghawada",
+      "Jamni",
+      "Kathlal",
+      "Minavada",
+      "Pithai",
+      "Porda Bhatera",
+      "Sarali"
+    ]
+  ],
+  "387635": [
+    "Kheda",
+    "Gujarat",
+    ["Badarpur", "Chhipdi", "Chhipial", "Kakarkhad", "Sarkhej"]
+  ],
+  "387640": [
+    "Kheda",
+    "Gujarat",
+    [
+      "Charan Nikol",
+      "Chikhlod",
+      "Fagvel",
+      "Kathana",
+      "Ladvel",
+      "Lasundra",
+      "Mal Itadi",
+      "Porda Fagvel",
+      "Vadol"
+    ]
+  ],
+  "387650": [
+    "Kheda",
+    "Gujarat",
+    ["Abvel", "Betawada", "Bhoja Na Muvada", "Nirmali", "Telnar", "Vyas Vasna"]
+  ],
+  "387710": [
+    "Kheda",
+    "Gujarat",
+    ["Demol", "Karoli", "Mitral", "Navagam", "Ramol", "Rampur"]
+  ],
+  "388001": [
+    "Anand",
+    "Gujarat",
+    [
+      "Amuldairy Anand",
+      "Anand",
+      "Anand Town Anand",
+      "District Court",
+      "Sardarganj Anand",
+      "Veternary College Anand"
+    ]
+  ],
+  "388110": ["Anand", "Gujarat", ["Anand Agri Inst Anand", "Hadgood"]],
+  "388120": ["Anand", "Gujarat", ["Vallabh Vidyanagar"]],
+  "388121": ["Anand", "Gujarat", ["Vithal Udyognagar"]],
+  "388130": [
+    "Anand",
+    "Gujarat",
+    [
+      "Agas",
+      "Ashi",
+      "Boria",
+      "Dhundakuva",
+      "Morad",
+      "Porda",
+      "Sandesar",
+      "Sinhol",
+      "Surkuva"
+    ]
+  ],
+  "388140": ["Anand", "Gujarat", ["Bochasan RS", "Chuva", "Dabhasi", "Rudel"]],
+  "388150": ["Anand", "Gujarat", ["Jalla", "Manaj", "Manpura", "Nar", "Runaj", "Sundra"]],
+  "388160": ["Anand", "Gujarat", ["Amod", "Khadana", "Pandoli"]],
+  "388170": [
+    "Anand",
+    "Gujarat",
+    ["Kalitalavadi", "Kanisa", "Kanzat", "Mobha", "Sayma", "Timba", "Untvada"]
+  ],
+  "388180": [
+    "Anand",
+    "Gujarat",
+    [
+      "Bamangam",
+      "Chagada",
+      "Gorad",
+      "Hadeva",
+      "Indranaj",
+      "Isarvada",
+      "Jichka",
+      "Kanavada",
+      "Kasbara",
+      "Khanpur",
+      "Mahiyari",
+      "Milarampura",
+      "Mitli",
+      "Moraj",
+      "Padra",
+      "Pariej",
+      "Sansej",
+      "Sinjivada",
+      "Tarapur",
+      "Varsada",
+      "Vastana"
+    ]
+  ],
+  "388205": [
+    "Anand",
+    "Gujarat",
+    [
+      "Ashipura",
+      "Badapura",
+      "Bhalej",
+      "Dagjipura",
+      "Jakhala",
+      "Kanbhaipura",
+      "Kasor",
+      "Khankuva",
+      "Untkhari"
+    ]
+  ],
+  "388210": [
+    "Anand",
+    "Gujarat",
+    ["Ahima", "Bajipura", "Bharoda", "Ode", "Shili", "Sundalpura", "Sureli"]
+  ],
+  "388215": ["Kheda", "Gujarat", ["Khijalpur", "Masra", "Thamna"]],
+  "388220": [
+    "Anand",
+    "Gujarat",
+    [
+      "Bechri",
+      "Bhatpura",
+      "Ghora",
+      "Hamidpura",
+      "Khankhanpur",
+      "Lingda",
+      "Pandvania",
+      "Pansora",
+      "Ratanpura",
+      "Umreth",
+      "Vinzol"
+    ]
+  ],
+  "388225": [
+    "Kheda",
+    "Gujarat",
+    [
+      "Ajupura",
+      "Bhavan S College",
+      "Bordi",
+      "Chandasar",
+      "Chetarsumba",
+      "Dakor",
+      "Malai",
+      "Muliad",
+      "Ozarala",
+      "Rakhial",
+      "Ravalia",
+      "Saiyat",
+      "Sui",
+      "Vanoti"
+    ]
+  ],
+  "388230": [
+    "Kheda",
+    "Gujarat",
+    [
+      "Agarwa",
+      "Aklacha",
+      "Bhadrasa",
+      "Chitlav",
+      "Dhunadra",
+      "Kalsar",
+      "Kotlindra",
+      "Manjipura",
+      "Mithapura Jesapura",
+      "Nes",
+      "Rania"
+    ]
+  ],
+  "388235": [
+    "Kheda",
+    "Gujarat",
+    [
+      "Kuni",
+      "Mahi Itadi",
+      "Padal",
+      "Rozva",
+      "Sanadra",
+      "Timbana Muvada",
+      "Vanoda",
+      "Wanakbori",
+      "Wanghroli"
+    ]
+  ],
+  "388239": ["Kheda", "Gujarat", ["Wanakbori TPS"]],
+  "388245": [
+    "Kheda",
+    "Gujarat",
+    ["Malvan", "Rustampura", "Sevalia Rs", "Sonaiya", "Sonipur", "Vaso"]
+  ],
+  "388250": [
+    "Kheda",
+    "Gujarat",
+    [
+      "Ambav Thasra",
+      "Angadi",
+      "Dabhali",
+      "Dhundi",
+      "Golaj",
+      "Gumadia",
+      "Kosam",
+      "Nanadara",
+      "Nepalpura",
+      "Pipalwada",
+      "Rasulpur",
+      "Sandheli",
+      "Thasra",
+      "Vadad"
+    ]
+  ],
+  "388255": [
+    "Mahisagar",
+    "Gujarat",
+    [
+      "Bhanthala",
+      "Felsani",
+      "Gadhavada",
+      "Guntheli",
+      "Janod",
+      "Jorapura",
+      "Khadgodhra",
+      "Navagama",
+      "Othwad",
+      "Rajpur",
+      "Saliawadi",
+      "Saroda",
+      "Vadasinor",
+      "Vadasinor Town Vadasinor",
+      "Vaddala"
+    ]
+  ],
+  "388260": [
+    "Mahisagar",
+    "Gujarat",
+    [
+      "Bharodi",
+      "Bhatpur",
+      "Birpur",
+      "Debhari",
+      "Gandhari",
+      "Kasodi",
+      "Khata",
+      "Kheroli",
+      "Koydam",
+      "Koyla",
+      "Kumbharwadi",
+      "Limbarwada",
+      "Rampura",
+      "Rasulpur",
+      "Ratankuva",
+      "Salaiya",
+      "Saradia",
+      "Vaghas"
+    ]
+  ],
+  "388265": [
+    "Mahisagar",
+    "Gujarat",
+    [
+      "Alela",
+      "Bar",
+      "Dev",
+      "Handia",
+      "Jetholi",
+      "Jodhpur",
+      "Kambopa",
+      "Kharod",
+      "Pandva",
+      "Pansroda",
+      "Sutaria"
+    ]
+  ],
+  "388270": [
+    "Mahisagar",
+    "Gujarat",
+    [
+      "Agarwada",
+      "Bhalada",
+      "Champeli",
+      "Charangam",
+      "Chori",
+      "Dhamod",
+      "Dhesia",
+      "Kadachhala",
+      "Kidia",
+      "Kolvan",
+      "Lakdi Poyada",
+      "Namnar",
+      "Ucharpi",
+      "Undra",
+      "Vardhari"
+    ]
+  ],
+  "388305": ["Anand", "Gujarat", ["Adas", "Sundan"]],
+  "388306": ["Anand", "Gujarat", ["Rajupura", "Vasad"]],
+  "388307": [
+    "Anand",
+    "Gujarat",
+    [
+      "Ambali",
+      "Ambav Kantharia",
+      "Amrol",
+      "Asodar",
+      "Bhetasi",
+      "Kahanvadi",
+      "Kantharia",
+      "Mujkuva"
+    ]
+  ],
+  "388310": ["Anand", "Gujarat", ["Ajarpura"]],
+  "388315": ["Anand", "Gujarat", ["Bakrol", "Jol"]],
+  "388320": ["Anand", "Gujarat", ["Bedva", "Chikhodra", "Gamdi", "Vaghashi"]],
+  "388325": ["Anand", "Gujarat", ["Karamsad", "Valasan"]],
+  "388330": ["Anand", "Gujarat", ["Khambholej"]],
+  "388335": ["Anand", "Gujarat", ["Kunjrav", "Rasnol", "Tranol"]],
+  "388340": ["Anand", "Gujarat", ["Mogar", "Ramnagar"]],
+  "388345": ["Anand", "Gujarat", ["Gana", "Jitodia", "Meghva", "Mogri"]],
+  "388350": ["Anand", "Gujarat", ["Khadol", "Napad"]],
+  "388355": ["Anand", "Gujarat", ["Navli"]],
+  "388360": ["Anand", "Gujarat", ["Ajupura", "Ravlapura", "Samarkha"]],
+  "388365": [
+    "Anand",
+    "Gujarat",
+    ["Dholi", "Khanpur", "Kherda", "Khorvad", "Pratappura", "Sarsa", "Verakhadi"]
+  ],
+  "388370": ["Anand", "Gujarat", ["Gopalpura", "Vadod"]],
+  "388410": ["Anand", "Gujarat", ["Bandhani"]],
+  "388421": ["Anand", "Gujarat", ["Changa"]],
+  "388430": [
+    "Anand",
+    "Gujarat",
+    ["Bhurakui", "Dharmaj", "Dharmajranoli", "Khanpur", "Vadadla"]
+  ],
+  "388440": ["Anand", "Gujarat", ["Ghunteli", "Mahelav", "Padgol", "Valetva"]],
+  "388450": [
+    "Anand",
+    "Gujarat",
+    [
+      "Ardi",
+      "Bhavanipura",
+      "Dantali",
+      "Davalpura",
+      "Fangani",
+      "Mariampura",
+      "Petlad",
+      "Petlad RS",
+      "Rangaipura"
+    ]
+  ],
+  "388460": ["Anand", "Gujarat", ["Isnav", "Kasor", "Piplav"]],
+  "388465": ["Anand", "Gujarat", ["Palaj"]],
+  "388470": ["Anand", "Gujarat", ["Sunav"]],
+  "388480": ["Anand", "Gujarat", ["Golel", "Rupiapura", "Simarda", "Sundarna", "Virol"]],
+  "388510": [
+    "Anand",
+    "Gujarat",
+    ["Anklav", "Asarma", "Joshikuva", "Kinkhlod", "Kosindra", "Navakhal", "Umeta"]
+  ],
+  "388520": [
+    "Anand",
+    "Gujarat",
+    ["Bamangam", "Bilpad", "Chamara", "Gambhira", "Kothiakhad", "Navapura"]
+  ],
+  "388530": [
+    "Anand",
+    "Gujarat",
+    ["Bhadran", "Gajna", "Kathol", "Khedasa", "Pipli", "Sarol", "Sisva", "Valvod"]
+  ],
+  "388540": [
+    "Anand",
+    "Gujarat",
+    ["Bodal", "Borsad", "Davol", "Kasumbad", "Nisraya", "Vasna", "Vera"]
+  ],
+  "388543": ["Anand", "Gujarat", ["Alarsa"]],
+  "388545": ["Anand", "Gujarat", ["Kavitha"]],
+  "388550": [
+    "Anand",
+    "Gujarat",
+    [
+      "Badalpur",
+      "Dahevan",
+      "Dali",
+      "Kalu",
+      "Kanbha",
+      "Kankapura",
+      "Kathana",
+      "Kathana RS"
+    ]
+  ],
+  "388560": [
+    "Anand",
+    "Gujarat",
+    ["Dedarda", "Dehmi", "Khandhli", "Napa", "Pamol", "Singlav"]
+  ],
+  "388570": ["Anand", "Gujarat", ["Amiyad", "Ras", "Saijpur"]],
+  "388580": [
+    "Anand",
+    "Gujarat",
+    ["Bamanva", "Banejada", "Finav", "Jalsan", "Jantral", "Vatadara", "Virsad"]
+  ],
+  "388590": ["Anand", "Gujarat", ["Jharola", "Kasari", "Vadeli"]],
+  "388610": ["Anand", "Gujarat", ["Dhuvaran", "Dhuvaran Power Station", "Khadodhi"]],
+  "388620": [
+    "Anand",
+    "Gujarat",
+    [
+      "Budhej",
+      "Chitari Bazar",
+      "Daheda",
+      "Jinaj",
+      "Khambhat",
+      "Laxmipura",
+      "Lunej",
+      "Malu",
+      "Metpur",
+      "Nagra",
+      "Pith Baza Khambhat",
+      "Rangpur",
+      "Shakarpur"
+    ]
+  ],
+  "388625": [
+    "Anand",
+    "Gujarat",
+    [
+      "Dugari",
+      "Galiana",
+      "Golana",
+      "Gudel",
+      "Khaksar",
+      "Naviakhol",
+      "Pachegam",
+      "Pandad",
+      "Rohini",
+      "Vadgam",
+      "Vainaj"
+    ]
+  ],
+  "388630": ["Anand", "Gujarat", ["Kansari", "Nana Kalodara"]],
+  "388640": [
+    "Anand",
+    "Gujarat",
+    ["Bhuvel", "Jalundh", "Kalamsar", "Khatnal", "Piploi", "Ralej", "Undel", "Vatra"]
+  ],
+  "388710": [
+    "Panch Mahals",
+    "Gujarat",
+    [
+      "Juni Dhari",
+      "Kalyana",
+      "Moti Kantadi",
+      "Nadisar",
+      "Ratanpur Kantdi",
+      "Timba Gam",
+      "Timba Road",
+      "Vachchhesar"
+    ]
+  ],
+  "388713": [
+    "Panch Mahals",
+    "Gujarat",
+    ["Dhanol", "Kakanpur", "Manipur C", "Padhiyar", "Ratanpur R", "Tuwa", "Veganpur"]
+  ],
+  "389001": [
+    "Panch Mahals",
+    "Gujarat",
+    ["Godhra", "Godhra City", "Godhra Civil Lines", "Godhra Vorwad"]
+  ],
+  "389002": [
+    "Panch Mahals",
+    "Gujarat",
+    [
+      "Ambali",
+      "Bahi",
+      "Dhanitra",
+      "Dharola",
+      "Godhra Bhuravav",
+      "Govindi",
+      "Mahulia",
+      "Mithali",
+      "Morva Rena",
+      "Motal",
+      "Rena",
+      "Samli",
+      "Sampa",
+      "Vadi",
+      "Vallavpur",
+      "Vavdi Buzarg"
+    ]
+  ],
+  "389110": [
+    "Panch Mahals",
+    "Gujarat",
+    [
+      "Anjanwa",
+      "Bhuvar",
+      "Chopda Buzarg",
+      "Doli",
+      "Gadia",
+      "Hareda",
+      "Kenpur",
+      "Limdi Doli",
+      "Metral",
+      "Mora",
+      "MotirelW",
+      "Navagam",
+      "Saraswa",
+      "Suliyat",
+      "Umber",
+      "Vankadi"
+    ]
+  ],
+  "389115": [
+    "Panch Mahals",
+    "Gujarat",
+    [
+      "Agarwada",
+      "Bhandoi",
+      "Dangaria",
+      "Kadadara",
+      "Kuwazar",
+      "Mataria Vejam",
+      "Mekhar",
+      "Morva Hadaf",
+      "Rajayata",
+      "Rampur Kasanpur",
+      "Sagawada",
+      "Vadodar",
+      "Vandeli"
+    ]
+  ],
+  "389120": [
+    "Panch Mahals",
+    "Gujarat",
+    [
+      "Bakkhar",
+      "Bhamaiya",
+      "Bodidra Buzarg",
+      "Chhavad",
+      "Dhamnod",
+      "Erandi",
+      "Mataria Vadi",
+      "Mirap",
+      "Mojari",
+      "Nada",
+      "Natapur",
+      "Orvada",
+      "Parvadi",
+      "Rasulpur",
+      "Sant Road",
+      "Sarsav",
+      "Vadelav",
+      "Vaghjipur"
+    ]
+  ],
+  "389130": [
+    "Dohad",
+    "Gujarat",
+    [
+      "Aasayadi",
+      "Chhaparwad",
+      "Chundadi",
+      "Dasa",
+      "Machhelai",
+      "Mander",
+      "Moti Zari",
+      "Panchela",
+      "Patangdi",
+      "Piplod",
+      "Rama",
+      "Randhikpur",
+      "Salia",
+      "Toyani",
+      "Valagota"
+    ]
+  ],
+  "389140": [
+    "Dohad",
+    "Gujarat",
+    [
+      "Agara",
+      "Andheri",
+      "Bandibar",
+      "Bar",
+      "Budhpur",
+      "Dabhada",
+      "Dantia",
+      "Dhadhela",
+      "Jada Kheria",
+      "Jetpur",
+      "Kamboi",
+      "Khirkhai",
+      "Kundha",
+      "Limkheda",
+      "Lukhavada",
+      "Manli",
+      "Pania",
+      "Pipodra",
+      "Rai",
+      "Vadela"
+    ]
+  ],
+  "389146": [
+    "Dohad",
+    "Gujarat",
+    ["Dudhia", "Nava Vadia", "Padalia", "Pahad", "Singapur", "Zerjitagadh"]
+  ],
+  "389151": ["Dohad", "Gujarat", ["Dahod", "Dahod RS"]],
+  "389152": [
+    "Dohad",
+    "Gujarat",
+    [
+      "Abhlod",
+      "Bavka",
+      "Chilakota",
+      "Jesawada",
+      "Kaliavad",
+      "Matva",
+      "Nandhelav",
+      "Pandadi",
+      "Vadva",
+      "Vejelav"
+    ]
+  ],
+  "389154": [
+    "Dohad",
+    "Gujarat",
+    [
+      "Agavada",
+      "Chandwana",
+      "Dasla",
+      "Gamla",
+      "Itawa",
+      "Jalat",
+      "Kathla",
+      "Katwara",
+      "Khangela",
+      "Simalia Khurd",
+      "Tarvadia Himat",
+      "Tarvadia Vaja",
+      "Vankiya"
+    ]
+  ],
+  "389155": [
+    "Dohad",
+    "Gujarat",
+    [
+      "Bhe",
+      "Bhutaradi",
+      "Boriala",
+      "Dadur",
+      "Gangardi",
+      "Garbada",
+      "Jambua",
+      "Mandor",
+      "Minakyar",
+      "Nava Nagar",
+      "Panchvada",
+      "Patia",
+      "Simlia Buzarg",
+      "Zari Buzarg"
+    ]
+  ],
+  "389160": [
+    "Dohad",
+    "Gujarat",
+    [
+      "Bharamkheda",
+      "Bhathiwada",
+      "Bordi RS",
+      "Chhapari",
+      "Chosala",
+      "Dharadungar",
+      "Freelandganj",
+      "Himala",
+      "Jekot",
+      "KaligamGujar",
+      "Kharod",
+      "Kharoda",
+      "Khredi",
+      "Mira Khedi",
+      "Moti Kharaj",
+      "Muvalia",
+      "Naghrala",
+      "Navagam",
+      "Pavdi",
+      "Rabdal",
+      "Rentia",
+      "Rozam",
+      "Tanda",
+      "Uchvania"
+    ]
+  ],
+  "389170": [
+    "Dohad",
+    "Gujarat",
+    [
+      "Bajarwada",
+      "Chitrodia",
+      "Dhadhela",
+      "Dhavadia",
+      "Fulpura",
+      "Gamdi",
+      "Garadu",
+      "Hirola",
+      "Jafarpura",
+      "Jetpur",
+      "Jhalod",
+      "Kadval",
+      "Kalijini Saraswani",
+      "Kharsana",
+      "Mahudi",
+      "Munkhosla",
+      "Shankarpura",
+      "Therka",
+      "Vagela",
+      "Velpura"
+    ]
+  ],
+  "389172": [
+    "Dohad",
+    "Gujarat",
+    [
+      "Batakvada",
+      "Bhanasimal",
+      "Bhichor",
+      "Chhalor",
+      "Dungar",
+      "Fatepura",
+      "Ghughas",
+      "Moti Nan Dukan",
+      "Moti Rel Purv",
+      "Nes Molara",
+      "Pratapgadh Khedapa",
+      "Salara",
+      "Simalia",
+      "Vadvas",
+      "Vangad"
+    ]
+  ],
+  "389175": [
+    "Dohad",
+    "Gujarat",
+    [
+      "Agara",
+      "Anika",
+      "Bhanpur",
+      "Chamaria",
+      "Dhediya",
+      "Jhunsa",
+      "Mandli",
+      "Methan",
+      "Moli",
+      "Nenki",
+      "Pichhoda",
+      "Sanjeli",
+      "Thala",
+      "Vansia"
+    ]
+  ],
+  "389180": [
+    "Dohad",
+    "Gujarat",
+    [
+      "Amba",
+      "Bhadkhadabar",
+      "Bilwani",
+      "Chakalia",
+      "Chhayan",
+      "Dantia",
+      "Dungri",
+      "Gultora",
+      "Kaliarai",
+      "Karamba",
+      "Karath",
+      "Kharvani",
+      "Limdi",
+      "Malvasi",
+      "Mundaheda",
+      "Parathampur",
+      "Pethapur",
+      "Raniyar Kanbi",
+      "Simlia",
+      "Sudia",
+      "Sutharvansa",
+      "Tandi",
+      "Thala",
+      "Varod"
+    ]
+  ],
+  "389190": [
+    "Dohad",
+    "Gujarat",
+    [
+      "Afwa",
+      "Balaiya",
+      "Bhojela",
+      "Gothib",
+      "Hindolia",
+      "Javesi",
+      "Lakhanpur",
+      "Margala",
+      "Nani Bhugedi",
+      "Nani Dhadheli",
+      "Nindka",
+      "Rupa Kheda",
+      "Sagdapada",
+      "Sukhsar",
+      "Vansia Kui"
+    ]
+  ],
+  "389210": [
+    "Panch Mahals",
+    "Gujarat",
+    [
+      "Aniyad",
+      "Bhadrala",
+      "Bodidra Khurd",
+      "Boriavi",
+      "Boriya",
+      "Chhanip",
+      "Chhogala",
+      "Dalwada",
+      "Dhandhalpur",
+      "Gangadiya",
+      "Kavali",
+      "Khojalvasa",
+      "Kotha",
+      "Makhalia",
+      "Mangliana",
+      "Matariya Vyas",
+      "Mor",
+      "Nandarva",
+      "Padardi",
+      "Sajivav",
+      "Shehera",
+      "Shekhpur",
+      "Sureli",
+      "Tadva"
+    ]
+  ],
+  "389220": [
+    "Mahisagar",
+    "Gujarat",
+    [
+      "Dharapur",
+      "Guneli",
+      "Hathivan",
+      "Jhara",
+      "Kharol",
+      "Kothamba",
+      "Ladvel",
+      "Rabadia",
+      "Thanasavli"
+    ]
+  ],
+  "389230": [
+    "Mahisagar",
+    "Gujarat",
+    [
+      "Bamroda",
+      "Bhadrod",
+      "Chatkabeli",
+      "Gangta",
+      "Godhar",
+      "Gothibada",
+      "Hardaspur",
+      "Kakachiya",
+      "Kakana Bhesavada",
+      "Kanesar",
+      "Karanta",
+      "Khanpur",
+      "Limadia",
+      "Limbodara",
+      "Lunawada",
+      "Madhvas",
+      "Mota Sonela",
+      "Moti Ghoda",
+      "Moti Sarsan",
+      "Mudavadekh",
+      "Nanidenavad",
+      "Naroda",
+      "Nasikpur",
+      "Nava Muvada",
+      "Rambhem Na Muvada",
+      "Rampatel Na Muvada",
+      "Ranijini Padedi",
+      "Sat Talav",
+      "Shamna",
+      "Vadagam",
+      "Viraniya"
+    ]
+  ],
+  "389232": [
+    "Mahisagar",
+    "Gujarat",
+    ["Bablia", "Bakor", "Borvai", "Khadodi", "Limdi Timba", "Pandaravada"]
+  ],
+  "389235": [
+    "Mahisagar",
+    "Gujarat",
+    [
+      "Kalibel",
+      "Malekpur",
+      "Movasa",
+      "Nanavadadala",
+      "Padedi Rampur",
+      "Vadina Gorda",
+      "Vania Vada Gorada"
+    ]
+  ],
+  "389250": [
+    "Mahisagar",
+    "Gujarat",
+    [
+      "Amthani",
+      "Ankalia",
+      "Antalwada",
+      "Bachkaria",
+      "Dadhalia",
+      "Dhingalwada",
+      "Ditvas",
+      "Diwda Colony",
+      "Ghaswada",
+      "Godhar North",
+      "Limbhola",
+      "Motirath",
+      "Munpur",
+      "Nana Rajanpur",
+      "Saraswa North",
+      "Sarsadi",
+      "Vagadia NI Andhari",
+      "Velanwada"
+    ]
+  ],
+  "389260": [
+    "Mahisagar",
+    "Gujarat",
+    [
+      "Babrol",
+      "Chitwa",
+      "Gada",
+      "Hirapur",
+      "Janvad",
+      "Kanajra",
+      "Motikayar",
+      "Padedi Ador",
+      "Sangavada",
+      "Sant",
+      "Santrampur",
+      "Surpur",
+      "Timbla",
+      "Ukhreli",
+      "Vanjiakhut"
+    ]
+  ],
+  "389265": [
+    "Mahisagar",
+    "Gujarat",
+    ["Kajali", "Kelamul", "Ladpur", "Malvan", "Nani Kharsoli", "Siyal", "Zinzwa"]
+  ],
+  "389310": [
+    "Panch Mahals",
+    "Gujarat",
+    ["Alwa", "Bedhiya", "Delol", "Kandach", "Malav", "Medapur", "Rabod"]
+  ],
+  "389320": [
+    "Panch Mahals",
+    "Gujarat",
+    [
+      "Bhadroli Khurd",
+      "Derol Gam",
+      "Derol R S",
+      "Jantral",
+      "Kanod",
+      "Karada",
+      "Nesda",
+      "Pingli",
+      "Sama",
+      "Sansoli",
+      "Satmana"
+    ]
+  ],
+  "389330": [
+    "Panch Mahals",
+    "Gujarat",
+    ["Boru Bakorl", "Kalol", "Madhvas", "Maghasar", "Ratanpura"]
+  ],
+  "389340": [
+    "Panch Mahals",
+    "Gujarat",
+    [
+      "Bhalania",
+      "Eral",
+      "Harkundi",
+      "Jitpura",
+      "Mehlol",
+      "Nandarkha",
+      "Rampur Jodka",
+      "Rinchhia",
+      "Sureli",
+      "Vejalpur",
+      "Vyasda"
+    ]
+  ],
+  "389341": [
+    "Panch Mahals",
+    "Gujarat",
+    [
+      "Adadra",
+      "Bhilod",
+      "Chalali",
+      "Goya Sundal",
+      "Gunesia",
+      "Karoli",
+      "Sajora",
+      "Sherpura",
+      "Simalia",
+      "Vavkulli"
+    ]
+  ],
+  "389350": [
+    "Panch Mahals",
+    "Gujarat",
+    [
+      "Arad",
+      "Baska",
+      "Chandrpura",
+      "Ghansar Muvadi",
+      "Halol",
+      "Halol Bazar",
+      "Indral",
+      "Kanjri",
+      "Madar",
+      "Motipura",
+      "Rameshra",
+      "Ravalia",
+      "Sathrota",
+      "Tajpura",
+      "Tarkhanda",
+      "Ujeti",
+      "Varsda",
+      "Vintoz"
+    ]
+  ],
+  "389360": [
+    "Panch Mahals",
+    "Gujarat",
+    [
+      "Bhamaria",
+      "Chandranagar",
+      "Chapra",
+      "Chelawada",
+      "Dhankuva",
+      "Dhinkva",
+      "Jepura",
+      "Jitpura",
+      "Manchi Haveli",
+      "Nathkuwa",
+      "Navakuwa",
+      "Pavagadh",
+      "Ranjitnagar",
+      "Rayanwadia",
+      "Rinchhia",
+      "Vada Talav",
+      "Zankharia"
+    ]
+  ],
+  "389365": [
+    "Panch Mahals",
+    "Gujarat",
+    [
+      "Bakrol",
+      "Davadra",
+      "Dhaneshawar",
+      "Farod",
+      "Gamani",
+      "Ghoghmba",
+      "Kanpur",
+      "Kharkhadi",
+      "Kharod",
+      "Labadadhara",
+      "Malu",
+      "Mol",
+      "Navagam",
+      "Padhora",
+      "Palla",
+      "Paroli",
+      "Rayan Muvada",
+      "Samalkuva",
+      "Saraswa",
+      "Zinzari"
+    ]
+  ],
+  "389370": [
+    "Panch Mahals",
+    "Gujarat",
+    [
+      "Bapotia",
+      "Kanteli",
+      "Moti Umaravan",
+      "Palikhanda",
+      "Shivrajpur",
+      "Talavdi",
+      "Vaghbod"
+    ]
+  ],
+  "389380": [
+    "Dohad",
+    "Gujarat",
+    [
+      "Ambakhunt",
+      "Antela",
+      "Baina",
+      "Bamroli",
+      "Bara",
+      "Bor",
+      "Chenpur",
+      "Chorbaria",
+      "Damavav",
+      "Devgadh Baria",
+      "Devirampura",
+      "Dudhia",
+      "Fangia",
+      "Godli",
+      "Gollav",
+      "Gundi",
+      "Juna Baria",
+      "Kali Dungri",
+      "Kantu",
+      "Kelia",
+      "Khandania",
+      "Moti Khajuri",
+      "Nadatod",
+      "Nakti",
+      "Rinchhvani",
+      "Ruvabari",
+      "Sagtala",
+      "Saniada",
+      "Sevania",
+      "Singedi",
+      "Training College",
+      "Udhavala",
+      "Vadbhet",
+      "Virol",
+      "Zab"
+    ]
+  ],
+  "389382": [
+    "Dohad",
+    "Gujarat",
+    [
+      "Agaswani",
+      "Bhorva",
+      "Dhanpur",
+      "Dudhamali",
+      "Dumka",
+      "Ghada",
+      "Kanjeta",
+      "Nalu",
+      "Pipero",
+      "Sajoi",
+      "Simamoi",
+      "Tokarva",
+      "Ved",
+      "Zabu"
+    ]
+  ],
+  "389390": [
+    "Panch Mahals",
+    "Gujarat",
+    [
+      "Duma",
+      "Haveli",
+      "Hirapur",
+      "Jaban",
+      "Jambughoda",
+      "Kanjipani",
+      "Khandivav",
+      "Masabar",
+      "Narukot",
+      "Uchet",
+      "Vav"
+    ]
+  ]
+}

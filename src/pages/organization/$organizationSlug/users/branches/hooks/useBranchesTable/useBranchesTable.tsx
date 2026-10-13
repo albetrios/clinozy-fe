@@ -7,8 +7,8 @@ import {
   dataTableFeatures,
   type DataTableFoldValue,
 } from '@/shared/components/DataTable/index.ts';
+import { useHoursFormat } from '@/shared/hooks/useHoursFormat/index.ts';
 
-import { useHoursFormat } from '../../../shared/hooks/useHoursFormat/index.ts';
 import { USERS_KEYS, USERS_NS } from '../../../users.constants.ts';
 import {
   branchAddressLine,

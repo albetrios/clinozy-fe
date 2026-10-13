@@ -1,0 +1,182 @@
+{
+  "drawer": {
+    "title": "إعداد {{clinic}}",
+    "sub": "دقيقة تقريبًا · الخطوة {{step}} من {{total}}",
+    "progressLabel": "تقدّم الإعداد",
+    "stepAnnounce": "الخطوة {{step}} من {{total}}",
+    "exploreFirst": "استكشف أولًا",
+    "next": "التالي: {{step}}",
+    "goLive": "بدء التشغيل",
+    "goingLive": "جارٍ بدء التشغيل…",
+    "saving": "جارٍ الحفظ…",
+    "notSaved": "لم يُحفظ · تغييراتك ما زالت هنا",
+    "lockedHint": "بعد «{{step}}»",
+    "lockedToast": "أكمل «{{step}}» أولًا",
+    "saveFailed": "تعذّر حفظ هذه الخطوة. إجاباتك ما زالت هنا — حاول مرة أخرى.",
+    "loadFailed": "تعذّر تحميل إعداد عيادتك."
+  },
+  "steps": {
+    "clinicType": {
+      "title": "ما نوع العيادة؟",
+      "why": "منه تنطلق خدماتك وفواتيرك.",
+      "label": "التخصصات",
+      "hint": "اختر تخصصًا أو أكثر",
+      "required": "اختر تخصصًا واحدًا على الأقل."
+    },
+    "location": {
+      "title": "أين تقع عيادتك؟",
+      "why": "الحجوزات والفواتير تحتاج إلى مكان.",
+      "pin": "الرمز البريدي",
+      "pinHint": "يملأ المنطقة والمدينة والولاية تلقائيًا",
+      "pinUnknown": "لا نعرف هذا الرمز البريدي — اكتب المنطقة والمدينة والولاية.",
+      "areaPick": "اختر منطقتك",
+      "area": "المنطقة",
+      "city": "المدينة",
+      "state": "الولاية",
+      "address": "العنوان",
+      "phone": "الهاتف",
+      "email": "البريد الإلكتروني",
+      "branchName": "اسم الفرع",
+      "hours": "مفتوح {{days}} · {{opens}}–{{closes}}",
+      "change": "تغيير",
+      "done": "تم",
+      "days": "أيام العمل",
+      "opens": "يفتح",
+      "closes": "يغلق",
+      "closesAfterOpens": "يجب أن يكون وقت الإغلاق بعد وقت الفتح.",
+      "requiredField": "حقل {{field}} مطلوب.",
+      "pinInvalid": "أدخل الرمز البريدي المكوّن من ستة أرقام.",
+      "emailInvalid": "أدخل بريدًا إلكترونيًا صالحًا.",
+      "phoneInvalid": "أدخل رقم هاتف صالحًا.",
+      "mainExists": "لدى عيادتك فرع رئيسي بالفعل — سيستخدمه الإعداد."
+    },
+    "you": {
+      "title": "هل تستقبل المرضى بنفسك؟",
+      "why": "ليتمكّن المرضى من الحجز معك من اليوم الأول.",
+      "label": "هل تستقبل المرضى بنفسك؟",
+      "doctor": "نعم، كطبيب",
+      "therapist": "نعم، كمعالج",
+      "no": "لا",
+      "noHint": "يمكنك دعوة طبيبك في الخطوة التالية.",
+      "required": "اختر خيارًا واحدًا."
+    }
+  },
+  "peek": {
+    "specialties": "التخصصات",
+    "branch": "الفرع",
+    "hours": "ساعات العمل",
+    "seesPatients": "يستقبل المرضى"
+  },
+  "checks": {
+    "clinic_type": "نوع العيادة",
+    "main_branch": "موقعها",
+    "services": "خدمة واحدة"
+  },
+  "goLiveRefused": "لا يمكن بدء التشغيل بعد — ما زال ينقص: {{missing}}.",
+  "live": {
+    "title": "بدأ التشغيل",
+    "sub": "يمكن لـ {{clinic}} الآن الحجز وإصدار الفواتير.",
+    "setUp": "أعددنا لك:",
+    "branch": "فرع {{branch}}",
+    "consultation": "{{name}} {{price}}",
+    "youAsDoctor": "أنت كطبيب",
+    "youAsTherapist": "أنت كمعالج",
+    "book": "احجز موعدك الأول",
+    "done": "تم",
+    "heardAbout": {
+      "label": "كيف سمعت عنا؟",
+      "options": {
+        "search": "بحث",
+        "socialMedia": "وسائل التواصل",
+        "friendOrColleague": "صديق أو زميل",
+        "blogOrArticle": "مدونة أو مقال",
+        "other": "أخرى"
+      },
+      "thanks": "شكرًا — هذا يساعدنا."
+    }
+  },
+  "guide": {
+    "title": "أكمل إعداد {{clinic}}",
+    "count": "اكتمل {{done}} من {{total}}",
+    "consultationAdded": "تمت إضافة الاستشارة",
+    "items": {
+      "treatments": {
+        "title": "أضف علاجاتك",
+        "sub": "اختر من القائمة المبدئية",
+        "action": "إضافة"
+      },
+      "inviteTeam": {
+        "title": "ادعُ فريقك",
+        "sub": "الأطباء، الاستقبال",
+        "action": "دعوة"
+      },
+      "inviteDoctor": {
+        "title": "ادعُ طبيبك",
+        "sub": "لا يمكن الحجز مع أحد بعد",
+        "action": "دعوة"
+      },
+      "firstAppointment": {
+        "title": "احجز موعدك الأول",
+        "action": "حجز"
+      }
+    },
+    "skip": "تخطٍّ",
+    "undoSkip": "تراجع عن التخطي",
+    "skipped": "تم التخطي",
+    "done": "تم",
+    "hide": "إخفاء هذا الدليل",
+    "hidden": "تم إخفاء الدليل — أعد فتحه من إعدادات العيادة.",
+    "ready": {
+      "title": "عيادتك جاهزة",
+      "sub": "كل ما عدا ذلك — ساعات العمل والغرف والتذكيرات — موجود في إعدادات العيادة.",
+      "settings": "إعدادات العيادة"
+    }
+  },
+  "starter": {
+    "title": "أضف علاجاتك",
+    "sub": "حدّد ما تقدّمه، وعدّل الاسم والدقائق والسعر وGST قبل الإضافة.",
+    "back": "العودة إلى الدليل",
+    "name": "الاسم",
+    "minutes": "الدقائق",
+    "price": "السعر",
+    "gst": "GST",
+    "rowLabel": "إضافة {{name}}",
+    "exists": "مُضاف",
+    "add_zero": "إضافة {{count}} علاج",
+    "add_one": "إضافة علاج واحد",
+    "add_two": "إضافة علاجين",
+    "add_few": "إضافة {{count}} علاجات",
+    "add_many": "إضافة {{count}} علاجًا",
+    "add_other": "إضافة {{count}} علاج",
+    "adding": "جارٍ الإضافة…",
+    "added_zero": "تمت إضافة {{count}} علاج",
+    "added_one": "تمت إضافة علاج واحد",
+    "added_two": "تمت إضافة علاجين",
+    "added_few": "تمت إضافة {{count}} علاجات",
+    "added_many": "تمت إضافة {{count}} علاجًا",
+    "added_other": "تمت إضافة {{count}} علاج",
+    "addOwn": "أضف علاجك الخاص",
+    "nothingTicked": "حدّد علاجًا واحدًا على الأقل.",
+    "consultationNamed": "استشارة {{specialty}}",
+    "names": {
+      "consultation": "استشارة",
+      "chemicalPeel": "تقشير كيميائي",
+      "hydrafacial": "Hydrafacial",
+      "laserHairRemovalFullFace": "LHR الوجه كاملًا (جلسة)",
+      "acneScarTreatment": "علاج ندبات حب الشباب",
+      "prpSession": "جلسة PRP",
+      "prpPack": "باقة PRP",
+      "scalpTreatment": "علاج فروة الرأس",
+      "scalingPolishing": "تنظيف الجير والتلميع",
+      "toothFilling": "حشو الأسنان",
+      "rootCanal": "علاج العصب",
+      "teethWhitening": "تبييض الأسنان",
+      "papSmear": "مسحة عنق الرحم",
+      "pelvicUltrasound": "سونار الحوض",
+      "physioSession": "جلسة علاج طبيعي",
+      "physioPack": "باقة علاج طبيعي",
+      "followUpVisit": "زيارة متابعة",
+      "dressing": "تضميد الجروح"
+    }
+  }
+}

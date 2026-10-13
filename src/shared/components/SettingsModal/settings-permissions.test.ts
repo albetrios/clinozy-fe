@@ -56,6 +56,23 @@ describe('canViewSettingsSection', () => {
     ).toBe(false);
   });
 
+  // Viewed with `organization:read` (both its GETs); the panel saves only with
+  // `organization:update` and is read-only otherwise.
+  it('clinic is reachable via organization:read', () => {
+    expect(
+      canViewSettingsSection(
+        { scope: 'organization', section: 'clinic' },
+        member(['organization:read']),
+      ),
+    ).toBe(true);
+    expect(
+      canViewSettingsSection(
+        { scope: 'organization', section: 'clinic' },
+        member(['branch:read']),
+      ),
+    ).toBe(false);
+  });
+
   it('integrations is reachable via api-key:read, and not via webhook:read', () => {
     // Regression: integrations was gated on `webhook:read`, so the whole section
     // (incl. API-key management the user IS entitled to) was unreachable for

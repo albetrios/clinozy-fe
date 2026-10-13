@@ -1,0 +1,1126 @@
+{
+  "400001": [
+    "Mumbai",
+    "Maharashtra",
+    ["Bazargate", "MPT", "Mumbai", "Stock Exchange", "Tajmahal", "Town Hall"]
+  ],
+  "400002": ["Mumbai", "Maharashtra", ["Kalbadevi", "S. C. Court", "Thakurdwar"]],
+  "400003": ["Mumbai", "Maharashtra", ["B.P.Lane", "Mandvi", "Masjid", "Null Bazar"]],
+  "400004": [
+    "Mumbai",
+    "Maharashtra",
+    ["Ambewadi", "Charni Road", "Chaupati", "Girgaon", "Madhavbaug", "Opera House"]
+  ],
+  "400005": [
+    "Mumbai",
+    "Maharashtra",
+    ["Asvini", "Colaba", "Colaba Bazar", "Holiday Camp", "VWTC"]
+  ],
+  "400006": ["Mumbai", "Maharashtra", ["Malabar Hill"]],
+  "400007": [
+    "Mumbai",
+    "Maharashtra",
+    ["Bharat Nagar", "Grant Road", "N.S.Patkar Marg", "S V Marg", "Tardeo"]
+  ],
+  "400008": [
+    "Mumbai",
+    "Maharashtra",
+    ["Falkland Road", "J.J.Hospital", "Kamathipura", "M A Marg", "Mumbai Central"]
+  ],
+  "400009": ["Mumbai", "Maharashtra", ["Chinchbunder", "Noor Baug", "Princess Dock"]],
+  "400010": [
+    "Mumbai",
+    "Maharashtra",
+    ["Dockyard Road", "Mazgaon", "Mazgaon Dock", "Mazgaon Road", "V K Bhavan"]
+  ],
+  "400011": [
+    "Mumbai",
+    "Maharashtra",
+    ["Agripada", "BPC Jacob Circle", "Chinchpokli", "Haines Road", "Jacob Circle"]
+  ],
+  "400012": [
+    "Mumbai",
+    "Maharashtra",
+    [
+      "BEST STaff Quarters",
+      "Chamarbaug",
+      "Haffkin Institute",
+      "Lal Baug",
+      "Parel",
+      "Parel Naka",
+      "Parel Rly Work Shop"
+    ]
+  ],
+  "400013": ["Mumbai", "Maharashtra", ["Delisle Road"]],
+  "400014": ["Mumbai", "Maharashtra", ["Dadar", "Dadar Colony", "Naigaon"]],
+  "400015": ["Mumbai", "Maharashtra", ["Sewri"]],
+  "400016": [
+    "Mumbai",
+    "Maharashtra",
+    ["Kapad Bazar", "Mahim", "Mahim Bazar", "Mahim East", "Mori Road"]
+  ],
+  "400017": ["Mumbai", "Maharashtra", ["Dharavi", "Dharavi Road"]],
+  "400018": ["Mumbai", "Maharashtra", ["Worli", "Worli Naka"]],
+  "400019": ["Mumbai", "Maharashtra", ["Matunga"]],
+  "400020": ["Mumbai", "Maharashtra", ["Central Building", "Churchgate", "Marine Lines"]],
+  "400021": [
+    "Mumbai",
+    "Maharashtra",
+    ["Elephanta Caves", "Nariman Point", "New Yogakshema"]
+  ],
+  "400022": [
+    "Mumbai",
+    "Maharashtra",
+    ["Chunabhatti", "Raoli Camp", "Sion", "Transit Camp"]
+  ],
+  "400024": ["Mumbai Suburban", "Maharashtra", ["Nehru Nagar"]],
+  "400025": ["Mumbai", "Maharashtra", ["New Prabhadevi Road", "Prabhadevi"]],
+  "400026": [
+    "Mumbai",
+    "Maharashtra",
+    ["Cumballa Hill", "Cumballa Sea Face", "Dr Deshmukh Marg", "Gowalia Tank"]
+  ],
+  "400027": ["Mumbai", "Maharashtra", ["V J B Udyan"]],
+  "400028": [
+    "Mumbai",
+    "Maharashtra",
+    [
+      "Bhawani Shankar",
+      "Bhawani Shankar Rd",
+      "Gokhale Road",
+      "Ranade Road",
+      "S V S Marg",
+      "Shivaji Park"
+    ]
+  ],
+  "400029": [
+    "Mumbai Suburban",
+    "Maharashtra",
+    ["A I Staff Colony", "Santacruz P and T Colony"]
+  ],
+  "400030": [
+    "Mumbai",
+    "Maharashtra",
+    ["Century Mill", "Worli Colony", "Worli Police Camp", "Worli Sea Face"]
+  ],
+  "400031": ["Mumbai", "Maharashtra", ["Kidwai Nagar", "Wadala", "Wadala Rs"]],
+  "400032": [
+    "Mumbai",
+    "Maharashtra",
+    ["High Court Building", "Mantralaya", "Secretariate"]
+  ],
+  "400033": [
+    "Mumbai",
+    "Maharashtra",
+    ["Cotton Exchange", "Kalachowki", "L B S N E Collage", "Reay Road", "Tank Road"]
+  ],
+  "400034": ["Mumbai", "Maharashtra", ["Haji Ali", "Tulsiwadi"]],
+  "400035": ["Mumbai", "Maharashtra", ["Rajbhavan"]],
+  "400037": [
+    "Mumbai",
+    "Maharashtra",
+    ["Antop Hill", "B P T Colony", "C G S Colony", "Wadala Truck Terminal"]
+  ],
+  "400042": ["Mumbai Suburban", "Maharashtra", ["Bhandup East"]],
+  "400043": ["Mumbai Suburban", "Maharashtra", ["DM Colony", "Shivaji Nagar"]],
+  "400049": ["Mumbai Suburban", "Maharashtra", ["Juhu"]],
+  "400050": ["Mumbai Suburban", "Maharashtra", ["Bandra West"]],
+  "400051": [
+    "Mumbai Suburban",
+    "Maharashtra",
+    ["Audit Bhavan", "B.N. Bhavan", "Bandra (East)", "Kherwadi"]
+  ],
+  "400052": [
+    "Mumbai Suburban",
+    "Maharashtra",
+    ["Danda", "Khar Colony", "Khar Delivery", "V.P. Road"]
+  ],
+  "400053": ["Mumbai Suburban", "Maharashtra", ["Andheri", "Azad Nagar"]],
+  "400054": ["Mumbai Suburban", "Maharashtra", ["Santacruz (West)", "Santacruz Central"]],
+  "400055": ["Mumbai Suburban", "Maharashtra", ["Santacruz (East)", "Vakola"]],
+  "400056": ["Mumbai Suburban", "Maharashtra", ["Irla", "Vileparle (West)"]],
+  "400057": [
+    "Mumbai Suburban",
+    "Maharashtra",
+    ["Hanuman Road", "Vileeparle (East)", "Vileparle Railway Station"]
+  ],
+  "400058": [
+    "Mumbai Suburban",
+    "Maharashtra",
+    ["Andheri Railway Station", "H.M.P. School"]
+  ],
+  "400059": [
+    "Mumbai Suburban",
+    "Maharashtra",
+    ["J.B. Nagar", "Marol Bazar", "Marol Naka"]
+  ],
+  "400060": ["Mumbai Suburban", "Maharashtra", ["Jogeshwari East"]],
+  "400061": ["Mumbai Suburban", "Maharashtra", ["Vesava"]],
+  "400063": ["Mumbai Suburban", "Maharashtra", ["Goregaon East", "Sharma Estate"]],
+  "400064": [
+    "Mumbai Suburban",
+    "Maharashtra",
+    ["Liberty Garden", "Malad", "Malad West Dely", "Orlem"]
+  ],
+  "400065": [
+    "Mumbai Suburban",
+    "Maharashtra",
+    ["Aareymilk Colony", "Nagari Niwara", "S R P F Camp"]
+  ],
+  "400066": [
+    "Mumbai Suburban",
+    "Maharashtra",
+    ["Borivali East", "Daulat Nagar", "Rajendra Nagar", "S KNagar"]
+  ],
+  "400067": [
+    "Mumbai Suburban",
+    "Maharashtra",
+    ["Charkop", "Kandivali RS", "Kandivali West"]
+  ],
+  "400068": ["Mumbai Suburban", "Maharashtra", ["Dahisar", "Dahisar RS"]],
+  "400069": ["Mumbai Suburban", "Maharashtra", ["Andheri East", "Nagardas Road"]],
+  "400070": [
+    "Mumbai Suburban",
+    "Maharashtra",
+    ["Kurla North", "Kurla West", "Netaji Nagar"]
+  ],
+  "400071": ["Mumbai Suburban", "Maharashtra", ["Chembur"]],
+  "400072": ["Mumbai Suburban", "Maharashtra", ["Sakinaka", "Vihar Road"]],
+  "400074": [
+    "Mumbai Suburban",
+    "Maharashtra",
+    ["Chembur Extension", "Fci", "Mahul Road"]
+  ],
+  "400075": [
+    "Mumbai Suburban",
+    "Maharashtra",
+    ["Best Staff Colony", "Pant Nagar", "RANagar"]
+  ],
+  "400076": ["Mumbai Suburban", "Maharashtra", ["Powai Iit"]],
+  "400077": ["Mumbai Suburban", "Maharashtra", ["Rajawadi"]],
+  "400078": [
+    "Mumbai Suburban",
+    "Maharashtra",
+    ["Bhandup Ind Estate", "Bhandup West", "JM Road", "PH Colony", "Usha Nagar"]
+  ],
+  "400079": ["Mumbai Suburban", "Maharashtra", ["Psm Colony", "Vikhroli"]],
+  "400080": [
+    "Mumbai Suburban",
+    "Maharashtra",
+    ["Mulund Dd Road", "Mulund West", "Nahur", "Nehru Road", "SB Road"]
+  ],
+  "400081": ["Mumbai Suburban", "Maharashtra", ["Mhada Colony", "Mulund East"]],
+  "400082": ["Mumbai Suburban", "Maharashtra", ["Bhandup Complex", "Mulund Colony"]],
+  "400083": ["Mumbai Suburban", "Maharashtra", ["Kannamwar Nagar", "Tagore Nagar"]],
+  "400084": ["Mumbai Suburban", "Maharashtra", ["Barve Nagar"]],
+  "400085": ["Mumbai Suburban", "Maharashtra", ["Barc"]],
+  "400086": [
+    "Mumbai Suburban",
+    "Maharashtra",
+    ["Ghatkopar West", "Rifle Range", "Sahakar Bhavan"]
+  ],
+  "400087": ["Mumbai Suburban", "Maharashtra", ["Nitie"]],
+  "400088": ["Mumbai Suburban", "Maharashtra", ["Govandi", "TFDonar", "Trombay"]],
+  "400089": ["Mumbai Suburban", "Maharashtra", ["Chembur Rs", "Tilak Nagar"]],
+  "400091": ["Mumbai Suburban", "Maharashtra", ["Borivali"]],
+  "400092": ["Mumbai Suburban", "Maharashtra", ["Borivali West"]],
+  "400093": ["Mumbai Suburban", "Maharashtra", ["Chakala Midc"]],
+  "400094": ["Mumbai Suburban", "Maharashtra", ["Anushakti Nagar"]],
+  "400095": ["Mumbai Suburban", "Maharashtra", ["Ins Hamla", "Kharodi"]],
+  "400096": ["Mumbai Suburban", "Maharashtra", ["Seepz"]],
+  "400097": ["Mumbai Suburban", "Maharashtra", ["Malad East", "Rani Sati Marg"]],
+  "400098": ["Mumbai Suburban", "Maharashtra", ["Vidyanagari"]],
+  "400099": [
+    "Mumbai Suburban",
+    "Maharashtra",
+    ["Airport", "International Airport", "Sahar P and T Colony"]
+  ],
+  "400101": ["Mumbai Suburban", "Maharashtra", ["Kandivali East"]],
+  "400102": ["Mumbai Suburban", "Maharashtra", ["Jogeshwari West", "Oshiwara"]],
+  "400103": ["Mumbai Suburban", "Maharashtra", ["Mandapeshwar"]],
+  "400104": [
+    "Mumbai Suburban",
+    "Maharashtra",
+    ["Bangur Nagar", "Goregaon", "Goregaon RS", "Motilal Nagar"]
+  ],
+  "400601": ["Thane", "Maharashtra", ["Thane", "Thane Bazar", "Thane R.S."]],
+  "400602": ["Thane", "Maharashtra", ["Gokhale Road", "Naupada"]],
+  "400603": ["Thane", "Maharashtra", ["Kopri Colony", "Thane East"]],
+  "400604": ["Thane", "Maharashtra", ["Wagle I.E."]],
+  "400605": ["Thane", "Maharashtra", ["Kalwa"]],
+  "400606": ["Thane", "Maharashtra", ["Jekegram"]],
+  "400607": ["Thane", "Maharashtra", ["Chitalsar Manpada", "Sandozbaugh"]],
+  "400608": ["Thane", "Maharashtra", ["Balkum", "Shrirangnagar", "Tapasenagar"]],
+  "400610": ["Thane", "Maharashtra", ["Apna Bazar"]],
+  "400612": [
+    "Thane",
+    "Maharashtra",
+    ["Dahisar", "Dawale", "Diwa", "Kausa", "Mumbra", "Waklan"]
+  ],
+  "400614": [
+    "Thane",
+    "Maharashtra",
+    ["Belapur Node III", "Belapur Node V", "Konkan Bhavan"]
+  ],
+  "400615": ["Thane", "Maharashtra", ["Ghodbunder Road", "Kasarvadavali"]],
+  "400701": ["Thane", "Maharashtra", ["Ghansoli"]],
+  "400702": [
+    "Raigad",
+    "Maharashtra",
+    ["Bokadvira", "Chanje", "Karanja", "Kegaon", "ONGC Dronagiri", "Sheva", "Uran"]
+  ],
+  "400703": [
+    "Thane",
+    "Maharashtra",
+    ["K.U.Bazar", "Turbhe", "Turbhe Market", "Vashi", "Vashi Sec 26", "Vashi VII"]
+  ],
+  "400704": ["Raigad", "Maharashtra", ["Mora", "N.S.Karanja"]],
+  "400705": ["Thane", "Maharashtra", ["Sanpada"]],
+  "400706": [
+    "Thane",
+    "Maharashtra",
+    ["Darave", "Nerul Node II", "Nerul Node III", "Nerul Sec 48"]
+  ],
+  "400707": ["Raigad", "Maharashtra", ["Jaskhar", "Jnpt", "Navghar"]],
+  "400708": ["Thane", "Maharashtra", ["Airoli"]],
+  "400709": ["Thane", "Maharashtra", ["Kopar Khairne"]],
+  "400710": ["Thane", "Maharashtra", ["Millenium Business Park"]],
+  "401101": ["Thane", "Maharashtra", ["Bhayander West", "Rai"]],
+  "401102": [
+    "Palghar",
+    "Maharashtra",
+    [
+      "Agarwadi",
+      "Dahisar Tymanor",
+      "Datiware",
+      "Dhekale",
+      "Edwan",
+      "Navghar",
+      "Pargaon",
+      "Tandulwadi",
+      "Tembhikhodave",
+      "Umbarpada",
+      "Usarani",
+      "Virathan Budruk"
+    ]
+  ],
+  "401103": [
+    "Palghar",
+    "Maharashtra",
+    ["Asangaon", "Bavada", "Chandigaon", "Gowane", "Vangaon"]
+  ],
+  "401105": ["Palghar", "Maharashtra", ["Bhayander East"]],
+  "401106": ["Thane", "Maharashtra", ["Dongari", "Uttan"]],
+  "401107": ["Thane", "Maharashtra", ["Ghodbander", "Kashi", "Mira", "Mira Road"]],
+  "401201": [
+    "Palghar",
+    "Maharashtra",
+    ["Bassein", "Bhuigaon", "Girij", "Holi Bazar", "Kaular Budruk", "Mulgaon", "Saloli"]
+  ],
+  "401202": ["Palghar", "Maharashtra", ["Bassein Road", "Umela", "Vasai Road E"]],
+  "401203": ["Palghar", "Maharashtra", ["Gass", "Nala", "Sopara", "Umrale"]],
+  "401204": [
+    "Palghar",
+    "Maharashtra",
+    ["Abje", "Kelthan", "Khaniwali", "Vajreshwari", "Vedhe"]
+  ],
+  "401206": ["Thane", "Maharashtra", ["Ganeshpuri"]],
+  "401207": ["Palghar", "Maharashtra", ["Naigaon", "Papdi"]],
+  "401208": [
+    "Palghar",
+    "Maharashtra",
+    [
+      "Gokhiware",
+      "Juchandra",
+      "Kaman",
+      "Pelhar",
+      "Rajawali",
+      "Sasun Navghar",
+      "Satiwali",
+      "Valiv",
+      "Vasai East IE"
+    ]
+  ],
+  "401209": ["Palghar", "Maharashtra", ["Nallosapare E"]],
+  "401301": ["Palghar", "Maharashtra", ["Agashi", "Chikhal Dongre", "Kophrad", "Vatar"]],
+  "401302": ["Palghar", "Maharashtra", ["Arnala"]],
+  "401303": [
+    "Palghar",
+    "Maharashtra",
+    [
+      "Bhatane",
+      "Bolinj",
+      "Chandansar",
+      "Dahisar T V",
+      "Khaniwade",
+      "Mandvi",
+      "Parol",
+      "Saiwan",
+      "Tilher",
+      "Virar"
+    ]
+  ],
+  "401304": ["Palghar", "Maharashtra", ["Kalamb", "Nirmal"]],
+  "401305": ["Palghar", "Maharashtra", ["Virar East"]],
+  "401401": ["Palghar", "Maharashtra", ["Kelwa", "Kelwa Road"]],
+  "401402": ["Palghar", "Maharashtra", ["Kelwa Mahim"]],
+  "401403": [
+    "Palghar",
+    "Maharashtra",
+    [
+      "Audhani",
+      "Bandhan",
+      "Bhopoli",
+      "Durves",
+      "Govade",
+      "Kev",
+      "Kondhan",
+      "Kurze",
+      "Manor",
+      "Maswan",
+      "Somta"
+    ]
+  ],
+  "401404": ["Palghar", "Maharashtra", ["Palghar"]],
+  "401405": [
+    "Palghar",
+    "Maharashtra",
+    [
+      "Dapoli",
+      "Katale",
+      "Kharekuran",
+      "Nandore",
+      "Nihe",
+      "Satpati",
+      "Shirgaon",
+      "Tembhode",
+      "Veur"
+    ]
+  ],
+  "401501": [
+    "Palghar",
+    "Maharashtra",
+    [
+      "Akkarpatti",
+      "Bategaon",
+      "Boisar",
+      "Borsheti",
+      "Dandi",
+      "Kumbhawali",
+      "Mahagaon",
+      "Murbe",
+      "Nandgaon Tarapur",
+      "Navapur",
+      "Sarawali",
+      "Shigaon",
+      "Umroli"
+    ]
+  ],
+  "401502": [
+    "Palghar",
+    "Maharashtra",
+    ["Dahisar Tarapur", "Ghiwali", "Kudan", "Tarapur", "Vengani"]
+  ],
+  "401503": ["Palghar", "Maharashtra", ["Chinchani", "Tanashi", "Vadhavan", "Varor"]],
+  "401504": ["Palghar", "Maharashtra", ["Parnali", "Salwad", "Tarapur App"]],
+  "401506": ["Palghar", "Maharashtra", ["Tarapur Ti"]],
+  "401601": ["Palghar", "Maharashtra", ["Badapokharan", "Dahanu", "Narpad"]],
+  "401602": [
+    "Palghar",
+    "Maharashtra",
+    [
+      "Agawan",
+      "Ashagad",
+      "Bapugaon",
+      "Charoti",
+      "Chikhale",
+      "Dahanu Road",
+      "Ganjad",
+      "Jamshet",
+      "Kainad",
+      "Karaj Gaon",
+      "Nikane",
+      "Ranshet",
+      "Saiwan",
+      "Sawata",
+      "Urse",
+      "Waki"
+    ]
+  ],
+  "401603": [
+    "Palghar",
+    "Maharashtra",
+    [
+      "Dabheri",
+      "Dehere",
+      "Dengachimet",
+      "Dhanoshi",
+      "Jamsar",
+      "Jawhar",
+      "Karhe",
+      "Khuded",
+      "Kogade",
+      "Nandgaon",
+      "Nyhale Budruk",
+      "Nyhale Khurdh",
+      "Pathardi",
+      "Pimpalshet",
+      "Sakhare",
+      "Sakharshet",
+      "Shiroshi",
+      "Valvande",
+      "Zap"
+    ]
+  ],
+  "401604": [
+    "Palghar",
+    "Maharashtra",
+    [
+      "Ase",
+      "Beriste",
+      "Chas",
+      "Dolhara",
+      "Gomghar",
+      "Karegaon",
+      "Khoch",
+      "Khodale",
+      "Mokhada",
+      "Morhanda",
+      "Poshera",
+      "Udhale",
+      "Vashala"
+    ]
+  ],
+  "401605": [
+    "Palghar",
+    "Maharashtra",
+    ["Dadade", "Khoste", "Medhi", "Ondhe", "Sukhasale", "Vikramgad"]
+  ],
+  "401606": [
+    "Palghar",
+    "Maharashtra",
+    [
+      "Acchad",
+      "Dabhadi",
+      "Dhaniwari",
+      "Dhundalwadi",
+      "Dongri",
+      "Girgaon",
+      "Kochai",
+      "Kurze",
+      "Modgaon",
+      "Talasari",
+      "Udhave",
+      "Uplat",
+      "Vevji",
+      "Zari"
+    ]
+  ],
+  "401607": [
+    "Palghar",
+    "Maharashtra",
+    ["Kasa", "Kasa Budruk", "Rankol", "Talawada", "Tawa", "Veti"]
+  ],
+  "401608": ["Palghar", "Maharashtra", ["Dahanu TPS"]],
+  "401701": ["Palghar", "Maharashtra", ["Bordi", "Borigaon"]],
+  "401702": ["Palghar", "Maharashtra", ["Gholvad"]],
+  "401703": ["Palghar", "Maharashtra", ["Kosbad Hill"]],
+  "402101": ["Raigad", "Maharashtra", ["Ambet", "Lipniwave", "Pangloli", "Sanderi"]],
+  "402102": ["Raigad", "Maharashtra", ["Dabhol", "Dasgaon", "TolBudruk", "Veer"]],
+  "402103": [
+    "Raigad",
+    "Maharashtra",
+    [
+      "Adhi",
+      "Devali",
+      "Goregaon",
+      "Harkol",
+      "Lonere",
+      "Mangarul",
+      "Nagaon",
+      "Nandvi",
+      "Panhalghar",
+      "Purar",
+      "Usarghar",
+      "Wadvali"
+    ]
+  ],
+  "402104": [
+    "Raigad",
+    "Maharashtra",
+    [
+      "Bamnoli",
+      "Hodgaon",
+      "Kavil Vahal",
+      "Kharavali",
+      "Lonshi",
+      "Mangaon",
+      "Palasgaon Khurd",
+      "Pen Tarfe Tale",
+      "Talegaon Tarfe Goregaon",
+      "Tempale",
+      "Unegaon",
+      "Usar Khurd"
+    ]
+  ],
+  "402105": [
+    "Raigad",
+    "Maharashtra",
+    [
+      "Chikhlap",
+      "Gondghar",
+      "Kelte",
+      "Khamgaon",
+      "Kharsai",
+      "Kolwat",
+      "Majgaon Tamhane",
+      "Mendadi",
+      "Mhasla",
+      "Pabhare",
+      "Salvinde",
+      "Talavade",
+      "Varvatane"
+    ]
+  ],
+  "402106": [
+    "Raigad",
+    "Maharashtra",
+    ["Amtem", "Bense", "Nagothane", "Palas", "Pigonde", "Wakanfata"]
+  ],
+  "402107": [
+    "Raigad",
+    "Maharashtra",
+    [
+      "Ambeghar",
+      "Balavali",
+      "Dadar",
+      "Dolvi",
+      "Gadab",
+      "Gagode Budruk",
+      "Hamrapur",
+      "Jite",
+      "Johe",
+      "Kamarli",
+      "Kandale",
+      "Kasu",
+      "Kharpale",
+      "Koproli",
+      "Pabal",
+      "Pen",
+      "Ransai",
+      "Rave",
+      "Sawarsai",
+      "Shirki",
+      "Sonkhar",
+      "Tarankhop",
+      "Vadhav",
+      "Vadkhal",
+      "Varsai",
+      "Washi"
+    ]
+  ],
+  "402108": [
+    "Raigad",
+    "Maharashtra",
+    ["Kurdus", "Kusumbale", "Poynad", "Shahabaj", "Shahapur"]
+  ],
+  "402109": [
+    "Raigad",
+    "Maharashtra",
+    [
+      "Ashtami",
+      "Bhalgaon",
+      "Chandgaon",
+      "Chanera",
+      "Chordhe",
+      "Dhamansai",
+      "Ghosale",
+      "Khaire Khurd",
+      "Khargaon",
+      "Kokban",
+      "Medha",
+      "Nhave",
+      "Pingalsai",
+      "Roha",
+      "Sanegaon",
+      "Sarsoli",
+      "Shedsai",
+      "Shenwai",
+      "Tambadi",
+      "Virjoli",
+      "Wali"
+    ]
+  ],
+  "402110": [
+    "Raigad",
+    "Maharashtra",
+    [
+      "Bhoste",
+      "Galsure",
+      "Hareshwar",
+      "Jasawali",
+      "Ranawali",
+      "Saigaon",
+      "Shriwardhan",
+      "Vadghar",
+      "Vadshetvave"
+    ]
+  ],
+  "402111": [
+    "Raigad",
+    "Maharashtra",
+    [
+      "Bhanang",
+      "Borghar Haveli",
+      "Mandad",
+      "Pitsai",
+      "Rahatad",
+      "Tala",
+      "Talegaon",
+      "Tokarde"
+    ]
+  ],
+  "402112": [
+    "Raigad",
+    "Maharashtra",
+    ["Mahagaon", "Muthavali Tarfe Tala", "Ratwad", "Talashet", "Wavediwali", "Wighawali"]
+  ],
+  "402113": ["Raigad", "Maharashtra", ["Aravi", "Chikhlap", "Shekhadi", "Walwati"]],
+  "402114": ["Raigad", "Maharashtra", ["Bagmandla", "Kolmandla"]],
+  "402115": [
+    "Raigad",
+    "Maharashtra",
+    ["Jui Budruk", "Narvan", "Ravdhal", "Upper Tudil", "Walang"]
+  ],
+  "402116": ["Raigad", "Maharashtra", ["Roha AV", "Varse"]],
+  "402117": ["Raigad", "Maharashtra", ["Dahivali", "Degaon", "Morba"]],
+  "402120": [
+    "Raigad",
+    "Maharashtra",
+    ["Bhale", "Borwadi", "Jite", "Koste Khurd", "Nizampur", "Shirawali"]
+  ],
+  "402122": ["Raigad", "Maharashtra", ["Chandore", "Govele", "Manjaravane", "Sai"]],
+  "402125": ["Raigad", "Maharashtra", ["PCTS Nagothane"]],
+  "402126": ["Raigad", "Maharashtra", ["Ainghar", "Pipenagar"]],
+  "402201": ["Raigad", "Maharashtra", ["Alibag"]],
+  "402202": [
+    "Raigad",
+    "Maharashtra",
+    ["Borlimandla", "Korlai", "Revdanda", "Vikram Baug", "Walke"]
+  ],
+  "402203": [
+    "Raigad",
+    "Maharashtra",
+    ["Agrav", "Baple", "Chaul", "Chinchoti", "Malyan", "Ramraj", "Sudkoli", "Usar"]
+  ],
+  "402204": ["Raigad", "Maharashtra", ["Akshi", "Bamangaon", "Nagaon"]],
+  "402207": ["Raigad", "Maharashtra", ["Thal"]],
+  "402208": [
+    "Raigad",
+    "Maharashtra",
+    [
+      "Awas",
+      "Chondhi",
+      "Dhokawade",
+      "Kihim",
+      "Mapgaon",
+      "Navedar Navgaon",
+      "RCF Thal",
+      "Sasawane",
+      "Zirad"
+    ]
+  ],
+  "402209": [
+    "Raigad",
+    "Maharashtra",
+    [
+      "Hashiware",
+      "Kamarle",
+      "Khandale",
+      "Kurul",
+      "Kurul RCF Colony",
+      "Narangi",
+      "Saral",
+      "Varsoli",
+      "Veshvi"
+    ]
+  ],
+  "402301": [
+    "Raigad",
+    "Maharashtra",
+    [
+      "Ambivali",
+      "Chandhave Budruk",
+      "Chochinde",
+      "Dharavali",
+      "Gondale",
+      "Kalavali",
+      "Karanjadi",
+      "Kemburli",
+      "Kinjaloli Budruk",
+      "Kotheri",
+      "Kurle",
+      "Mahad",
+      "Mumurshi",
+      "Nagaon",
+      "Natondi",
+      "Navipeth Mahad",
+      "Revtale",
+      "Salvadnaka Mahad No Dly",
+      "Sav",
+      "Sawad",
+      "Underi",
+      "Vahoor"
+    ]
+  ],
+  "402302": [
+    "Raigad",
+    "Maharashtra",
+    [
+      "Bhave",
+      "Birwadi",
+      "Dahivad",
+      "Dapoli",
+      "Dhamane",
+      "Jite",
+      "Mangrun",
+      "Mohot",
+      "Nigade",
+      "Wagholi",
+      "Waki Budruk",
+      "Walan Budruk",
+      "Walan Khurd"
+    ]
+  ],
+  "402303": [
+    "Raigad",
+    "Maharashtra",
+    [
+      "Adavale Budruk",
+      "Borghar",
+      "Chambhargani",
+      "Deopur",
+      "Devla",
+      "Dhamandevi",
+      "Divil",
+      "Golegani",
+      "Kapade Budruk",
+      "Kondhavi",
+      "Kotwal Budruk",
+      "Lohare",
+      "Mahargul",
+      "Ombali",
+      "Paithan",
+      "Palchil",
+      "Poladpur",
+      "Sadavali",
+      "Sakhar",
+      "Turbhe Khurd",
+      "Wakan"
+    ]
+  ],
+  "402304": [
+    "Raigad",
+    "Maharashtra",
+    [
+      "Chinchwali Tarfe Atone",
+      "Devkanhe",
+      "Khamb",
+      "Kolad",
+      "Pugaon",
+      "Talawali Terfe Diwali"
+    ]
+  ],
+  "402305": [
+    "Raigad",
+    "Maharashtra",
+    [
+      "Achloli",
+      "Khardi",
+      "Kolose",
+      "Konzar",
+      "Mandle",
+      "Nate",
+      "Pachad",
+      "Sandoshi",
+      "Savrat",
+      "Taloshi",
+      "Tetghar",
+      "Varandoli",
+      "Wagheri"
+    ]
+  ],
+  "402306": [
+    "Raigad",
+    "Maharashtra",
+    ["Barasgaon", "Kumbheshivthar", "Mazeri", "Padvi", "Taliye", "Varandh"]
+  ],
+  "402307": [
+    "Raigad",
+    "Maharashtra",
+    ["Ambavade", "Kavale", "Pangari", "Tamhane", "Vinhere"]
+  ],
+  "402308": ["Raigad", "Maharashtra", ["Bhira", "Jamgaon", "Kudli", "Patnus", "Vile"]],
+  "402309": [
+    "Raigad",
+    "Maharashtra",
+    ["Kamble Tarfe Birwadi", "Kamble Tarfe Mahad", "Kusgaon", "Midc Mahad", "Rajewadi"]
+  ],
+  "402401": [
+    "Raigad",
+    "Maharashtra",
+    [
+      "Agardanda",
+      "Janjira Murud",
+      "Kashid",
+      "Majgaon",
+      "Nandgaon",
+      "Rajpuri",
+      "Savli",
+      "Shighare",
+      "Usroli",
+      "Vihoor"
+    ]
+  ],
+  "402402": ["Raigad", "Maharashtra", ["Dighi", "Kudgaon"]],
+  "402403": [
+    "Raigad",
+    "Maharashtra",
+    ["Adgaon", "Borlipanchatan", "Sarve", "Velas", "Wadwali"]
+  ],
+  "402404": ["Raigad", "Maharashtra", ["Bharadkhol", "Dandguri", "Diveagar", "Nagloli"]],
+  "403001": [
+    "North Goa",
+    "Goa",
+    ["C.C.Altinho", "Miramar", "Panaji", "St Inez", "Tapal Bhavan"]
+  ],
+  "403002": ["North Goa", "Goa", ["Caranzalem"]],
+  "403004": ["North Goa", "Goa", ["Matri Indian Antartic Station", "Nio Dona Paula"]],
+  "403005": ["North Goa", "Goa", ["Santa Cruz"]],
+  "403006": ["North Goa", "Goa", ["Chimbel", "Ribandar"]],
+  "403101": ["North Goa", "Goa", ["Betim", "Penha De France", "Salvador Do Mundo"]],
+  "403102": ["North Goa", "Goa", ["Chorao"]],
+  "403103": ["South Goa", "Goa", ["Shiroda", "Tarvalem"]],
+  "403104": ["North Goa", "Goa", ["Mandur", "Neura"]],
+  "403105": ["North Goa", "Goa", ["Pale", "Velguem"]],
+  "403106": ["North Goa", "Goa", ["Sant Estevam"]],
+  "403107": [
+    "South Goa",
+    "Goa",
+    ["Amona", "Banastarim", "Betki", "Cumbharjua", "Marcela"]
+  ],
+  "403108": ["North Goa", "Goa", ["Goa Velha", "Siridao"]],
+  "403109": ["North Goa", "Goa", ["N B Verem"]],
+  "403110": ["North Goa", "Goa", ["Carambolim", "Corlim IE"]],
+  "403114": ["North Goa", "Goa", ["Nerul", "Pilerne", "Reis Magos"]],
+  "403115": ["South Goa", "Goa", ["Cundaim", "Cundaim I.E."]],
+  "403201": ["North Goa", "Goa", ["Bambolim Camp"]],
+  "403202": ["North Goa", "Goa", ["Bambolim Complex"]],
+  "403203": ["North Goa", "Goa", ["Pilar"]],
+  "403204": ["North Goa", "Goa", ["St. Lourence"]],
+  "403206": ["North Goa", "Goa", ["Goa University"]],
+  "403401": [
+    "South Goa",
+    "Goa",
+    [
+      "Agapur Adpoi",
+      "Bandora",
+      "Betora",
+      "Borim",
+      "Curti",
+      "Durbhat",
+      "Farmagudi",
+      "Nirankal",
+      "Ponda",
+      "Ponda Camp",
+      "Quela",
+      "Querim",
+      "Verem De Ponda"
+    ]
+  ],
+  "403402": ["North Goa", "Goa", ["Velha Goa"]],
+  "403403": ["North Goa", "Goa", ["Malar", "Piedade"]],
+  "403404": ["South Goa", "Goa", ["Marcaim", "Mardol", "Priol"]],
+  "403406": [
+    "South Goa",
+    "Goa",
+    ["Candepar", "Darbandora", "Pillem", "Sancordem", "Tisca", "Usgao"]
+  ],
+  "403409": ["South Goa", "Goa", ["Betora I.E."]],
+  "403410": ["South Goa", "Goa", ["Collem", "Mollem", "Sigao"]],
+  "403501": ["North Goa", "Goa", ["Porvorim"]],
+  "403502": ["North Goa", "Goa", ["Sirsaim", "Tivim"]],
+  "403503": [
+    "North Goa",
+    "Goa",
+    [
+      "Advalpal",
+      "Assonora",
+      "Dodamarg",
+      "Ibrampur",
+      "Mulgao",
+      "Nanora",
+      "Salem",
+      "Sirgao"
+    ]
+  ],
+  "403504": ["North Goa", "Goa", ["Bicholim", "Mauliguem", "Mayem", "Pilgao"]],
+  "403505": [
+    "North Goa",
+    "Goa",
+    [
+      "Carapur",
+      "Cudnem",
+      "Morlem",
+      "Navelim",
+      "Poriem",
+      "Pratapnagar Harvale",
+      "Querim",
+      "Sanquelim",
+      "Surla"
+    ]
+  ],
+  "403506": [
+    "North Goa",
+    "Goa",
+    [
+      "Birondem",
+      "Cotorem",
+      "Guleli",
+      "Mauze",
+      "Nagargaon",
+      "Nanorem",
+      "Sanvordem",
+      "Thana",
+      "Valpoi",
+      "Velguem O"
+    ]
+  ],
+  "403507": [
+    "North Goa",
+    "Goa",
+    [
+      "Assagao",
+      "Bastora",
+      "Camurlim",
+      "Gurim",
+      "Mapusa",
+      "Mapusa I.E.",
+      "Moira",
+      "Ucassiam"
+    ]
+  ],
+  "403508": ["North Goa", "Goa", ["Aldona", "Corjuem", "Nachinola"]],
+  "403509": ["North Goa", "Goa", ["Anjuna", "Caisua"]],
+  "403510": ["North Goa", "Goa", ["Canca", "Parra"]],
+  "403511": ["North Goa", "Goa", ["Saligao", "Sangolda", "Sem Saligao"]],
+  "403512": [
+    "North Goa",
+    "Goa",
+    [
+      "Agarwada",
+      "Cansarvornem",
+      "Corgao",
+      "Morjim",
+      "Nagzar",
+      "Parxem",
+      "Pernem",
+      "Poroscodem",
+      "Tamboxem",
+      "Torxem",
+      "Tuem",
+      "Tuem I E",
+      "Varconda",
+      "Virnora"
+    ]
+  ],
+  "403513": [
+    "North Goa",
+    "Goa",
+    ["Colvale", "Dhargalim", "Menkurem", "Ozari", "Pirna", "Revora"]
+  ],
+  "403515": ["North Goa", "Goa", ["Candolim", "Saipem"]],
+  "403516": ["North Goa", "Goa", ["Arpora", "Baga", "Calangute"]],
+  "403517": ["North Goa", "Goa", ["Oxel", "Siolim"]],
+  "403521": ["North Goa", "Goa", ["Alto Betim", "Alto Porvorim", "Secretariat"]],
+  "403523": ["North Goa", "Goa", ["Calvim", "Carona", "Pomburpa"]],
+  "403524": ["North Goa", "Goa", ["Arambol", "Querim", "Quiranpani"]],
+  "403526": ["North Goa", "Goa", ["Tivim Ie"]],
+  "403527": ["North Goa", "Goa", ["Mandrem"]],
+  "403529": ["North Goa", "Goa", ["Bicholim Industrial Estate"]],
+  "403530": ["North Goa", "Goa", ["Advoi", "Onda", "Onda I.E.", "Pissurlem"]],
+  "403601": [
+    "South Goa",
+    "Goa",
+    ["Aquem", "Gandhi Market Complex Margao", "Gogol", "Margao"]
+  ],
+  "403602": ["South Goa", "Goa", ["Fatorda"]],
+  "403701": ["South Goa", "Goa", ["Assolna"]],
+  "403702": [
+    "South Goa",
+    "Goa",
+    [
+      "Agonda",
+      "Bhatpal",
+      "Canacona",
+      "Cola",
+      "Cotigaon",
+      "Gaodongarim",
+      "Palolem",
+      "Poinguinim",
+      "Sadolxem"
+    ]
+  ],
+  "403703": [
+    "South Goa",
+    "Goa",
+    ["Balli", "Barcem", "Cananguinim", "Cuncolim", "Fatorpa", "Morpirla", "Veroda"]
+  ],
+  "403704": [
+    "South Goa",
+    "Goa",
+    ["Bati", "Calem", "Curdi", "Molcarnem", "Netorlim", "Sanguem", "Ugvem", "Valkini"]
+  ],
+  "403705": [
+    "South Goa",
+    "Goa",
+    ["Avedem", "Pirla", "Quepem", "Rivona", "Sirvoi", "Xeldem"]
+  ],
+  "403706": [
+    "South Goa",
+    "Goa",
+    ["Cacora", "Curchorem", "Panchwadi", "Quirlapale", "Xelvona"]
+  ],
+  "403707": ["South Goa", "Goa", ["Davorlim", "Navelim", "Talaulim"]],
+  "403708": ["South Goa", "Goa", ["Colva", "Seraulim", "Vanelim"]],
+  "403709": ["South Goa", "Goa", ["Curtorim", "Macazana", "St. Jose De Areal"]],
+  "403710": ["South Goa", "Goa", ["Cortalim", "Sancoale", "Thana"]],
+  "403711": ["South Goa", "Goa", ["Chicalim"]],
+  "403712": ["South Goa", "Goa", ["Cansaulim"]],
+  "403713": ["South Goa", "Goa", ["Betalbhatim", "Majorda", "Nuvem", "Utorda"]],
+  "403714": ["South Goa", "Goa", ["Assolda", "Cavorim", "Chandor"]],
+  "403715": ["South Goa", "Goa", ["Chinchinim"]],
+  "403716": ["South Goa", "Goa", ["Benaulim"]],
+  "403717": ["South Goa", "Goa", ["Carmona"]],
+  "403718": ["South Goa", "Goa", ["Camurlim", "Loutolim"]],
+  "403719": ["South Goa", "Goa", ["Sem Rachol Soso"]],
+  "403720": ["South Goa", "Goa", ["Raia"]],
+  "403721": ["South Goa", "Goa", ["Varca"]],
+  "403722": ["South Goa", "Goa", ["Verna"]],
+  "403723": ["South Goa", "Goa", ["Ambelim", "Betul", "ONGC Ipsem Betul", "Velim"]],
+  "403724": ["South Goa", "Goa", ["Orlim"]],
+  "403725": ["South Goa", "Goa", ["Dramapur"]],
+  "403726": ["South Goa", "Goa", ["Zuarinagar"]],
+  "403728": ["South Goa", "Goa", ["Loliem", "Loliem Polem"]],
+  "403729": ["South Goa", "Goa", ["Navelim Camp"]],
+  "403731": ["South Goa", "Goa", ["Cavelossim"]],
+  "403801": ["South Goa", "Goa", ["A.P.Dabolim", "A.P.Terminal"]],
+  "403802": [
+    "South Goa",
+    "Goa",
+    ["Baina", "Mangor Hill", "Vaddem", "Vademnagar", "Vasco Da Gama"]
+  ],
+  "403803": ["South Goa", "Goa", ["Mormugao"]],
+  "403804": ["South Goa", "Goa", ["Sada"]],
+  "403806": ["South Goa", "Goa", ["Bogmalo"]]
+}

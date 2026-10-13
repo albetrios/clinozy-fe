@@ -11,17 +11,9 @@
       "title": "Sobre ti",
       "description": "Cuéntanos un poco sobre ti."
     },
-    "questions": {
-      "title": "Unas preguntas rápidas",
-      "description": "Opcional — nos ayuda a adaptar tu espacio de trabajo."
-    },
     "workspace": {
       "title": "Tu espacio de trabajo",
       "description": "Pon nombre a la organización que quieres crear."
-    },
-    "invite": {
-      "title": "Invita a tu equipo",
-      "description": "Añade compañeros ahora u omite este paso."
     },
     "done": {
       "title": "Todo listo",
@@ -29,7 +21,7 @@
     }
   },
   "welcome": {
-    "body": "Te ayudaremos a configurar tu perfil, crear tu primera organización e invitar a tu equipo. Solo lleva un minuto.",
+    "body": "Te ayudaremos a configurar tu perfil y crear tu primera organización. Solo lleva un minuto.",
     "bodyPersonal": "Te ayudaremos a configurar tu perfil y personalizar tu espacio de trabajo. Solo lleva un minuto."
   },
   "profile": {
@@ -37,38 +29,6 @@
     "firstNamePlaceholder": "Ada",
     "lastNameLabel": "Apellido",
     "lastNamePlaceholder": "Lovelace"
-  },
-  "questions": {
-    "teamSize": {
-      "label": "¿Qué tamaño tiene tu equipo?",
-      "options": {
-        "justMe": "Solo yo",
-        "twoToTen": "2–10",
-        "elevenToFifty": "11–50",
-        "fiftyOneToTwoHundred": "51–200",
-        "twoHundredPlus": "200+"
-      }
-    },
-    "useCase": {
-      "label": "¿Para qué usarás {{productName}} principalmente?",
-      "options": {
-        "customerManagement": "Gestión de clientes",
-        "teamCollaboration": "Colaboración en equipo",
-        "analyticsReporting": "Análisis e informes",
-        "internalTools": "Herramientas internas",
-        "somethingElse": "Otra cosa"
-      }
-    },
-    "referral": {
-      "label": "¿Cómo nos conociste?",
-      "options": {
-        "search": "Búsqueda",
-        "socialMedia": "Redes sociales",
-        "friendOrColleague": "Amigo o colega",
-        "blogOrArticle": "Blog o artículo",
-        "other": "Otro"
-      }
-    }
   },
   "workspace": {
     "organizationNameLabel": "Nombre de la organización",
@@ -79,22 +39,10 @@
     "slugFallback": "tu-espacio",
     "slugInvalid": "Usa solo letras minúsculas, números y guiones."
   },
-  "invite": {
-    "emailLabel": "Correo del compañero",
-    "emailPlaceholder": "companero@empresa.com",
-    "addButton": "Añadir",
-    "invalidEmail": "Introduce un correo válido.",
-    "duplicateEmail": "Ese compañero ya está en la lista.",
-    "removeAriaLabel": "Eliminar {{email}}"
-  },
   "done": {
     "nameLabel": "Nombre",
     "organizationLabel": "Organización",
-    "invitesLabel": "Invitaciones",
-    "emptyValue": "—",
-    "invitesPending_one": "{{count}} pendiente",
-    "invitesPending_many": "{{count}} pendientes",
-    "invitesPending_other": "{{count}} pendientes"
+    "emptyValue": "—"
   },
   "actions": {
     "back": "Atrás",
@@ -103,20 +51,12 @@
     "settingUp": "Configurando…"
   },
   "defaults": {
-    "organizationName": "Mi organización",
-    "memberRoleName": "Miembro",
-    "memberRoleDescription": "Rol predeterminado para compañeros invitados."
+    "organizationName": "Mi organización"
   },
   "toast": {
     "finishSuccess": "¡Bienvenido! Tu espacio está listo.",
-    "finishSuccessWithInvites_one": "¡Bienvenido! Tu espacio está listo: {{count}} invitación enviada.",
-    "finishSuccessWithInvites_many": "¡Bienvenido! Tu espacio está listo: {{count}} de invitaciones enviadas.",
-    "finishSuccessWithInvites_other": "¡Bienvenido! Tu espacio está listo: {{count}} invitaciones enviadas.",
     "finishError": "Algo salió mal al finalizar la configuración. Inténtalo de nuevo.",
-    "profileSaveFailed": "No pudimos guardar tu nombre. Tu espacio de trabajo está listo: añádelo en Configuración.",
-    "invitePartialFailure_one": "Espacio listo — no se pudo enviar {{count}} invitación. Puedes reenviarla desde Miembros.",
-    "invitePartialFailure_many": "Espacio listo — no se pudieron enviar {{count}} de invitaciones. Puedes reenviarlas desde Miembros.",
-    "invitePartialFailure_other": "Espacio listo — no se pudieron enviar {{count}} invitaciones. Puedes reenviarlas desde Miembros."
+    "profileSaveFailed": "No pudimos guardar tu nombre. Tu espacio de trabajo está listo: añádelo en Configuración."
   },
   "session": {
     "loadError": "No pudimos cargar la configuración de tu cuenta. Comprueba tu conexión e inténtalo de nuevo."

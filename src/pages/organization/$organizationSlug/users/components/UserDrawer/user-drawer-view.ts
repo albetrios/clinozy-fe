@@ -17,9 +17,9 @@ import {
   RECORD_DRAWER_KEYS,
   RECORD_DRAWER_NS,
 } from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
+import type { HoursFormat } from '@/shared/hooks/useHoursFormat/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
-import type { HoursFormat } from '../../shared/hooks/useHoursFormat/index.ts';
 import { USERS_KEYS, USERS_NS } from '../../users.constants.ts';
 import type { TeamPill } from '../TeamCells/index.ts';
 import { missingUserFields, type UserFormValues } from './user-form.ts';

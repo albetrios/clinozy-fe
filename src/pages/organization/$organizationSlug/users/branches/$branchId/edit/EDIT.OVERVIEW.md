@@ -12,6 +12,11 @@ then its fields (`PATCH`, with the read's `updated_at`: someone else's save firs
 with Reload). A unique name; Main is read-only. There is no Delete: a branch is closed with Status
 "Closed". Gated like Branches; without `branch:update` the drawer is view only.
 
+Only here does the drawer have its fourth step, "Places & days" (clinic-setup KICKOFF §6.6, D23):
+the branch's rooms, machines and holidays, each row saved on its own by its `branch:*` code —
+add `branch:create`, rename and switch off `branch:update`, remove `branch:delete` — never by
+the drawer's Save (`../../BRANCHES.OVERVIEW.md`).
+
 ## Files
 
 | File                 | Responsibility                                                                                |

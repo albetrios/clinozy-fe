@@ -15,6 +15,7 @@ import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.
 import { useMeContext } from '@/shared/hooks/useMeContext/index.ts';
 import { useMyMembershipId } from '@/shared/hooks/useMyMembership/index.ts';
 import { useNow } from '@/shared/hooks/useNow/index.ts';
+import { useRequireOpenBranch } from '@/shared/hooks/useRequireOpenBranch/index.ts';
 import { useTeamDirectory } from '@/shared/hooks/useTeamDirectory/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
@@ -126,18 +127,23 @@ function useTodayLanes(
 
 /**
  * The greeting's two buttons, each only for a member who may act on it: New booking opens New lead
- * (`lead:create`); Walk-in opens the command menu to book someone (`appointment:create`, F4).
+ * (`lead:create`); Walk-in opens the command menu to book someone (`appointment:create`, F4). With
+ * no open branch a manager lands on the setup drawer's step 2 instead (feat-clinic-setup §6.3).
  */
 function useGreetingActions(organizationSlug: string) {
   const navigate = useNavigate();
   const access = useAppAccess();
+  const requireOpenBranch = useRequireOpenBranch();
   const newBooking =
     access.isResolved && access.can('leads', 'create')
-      ? () => void navigate(appCommandNavigation('newLead', { organizationSlug }))
+      ? () =>
+          requireOpenBranch(
+            () => void navigate(appCommandNavigation('newLead', { organizationSlug })),
+          )
       : undefined;
   const walkIn =
     access.isResolved && access.can('appointments', 'create')
-      ? () => useUIStore.getState().setCommandPaletteOpen(true)
+      ? () => requireOpenBranch(() => useUIStore.getState().setCommandPaletteOpen(true))
       : undefined;
   return { newBooking, walkIn };
 }

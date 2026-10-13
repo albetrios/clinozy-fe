@@ -548,14 +548,16 @@
       "newAppointment": "新建预约",
       "newPatient": "新建患者",
       "newReceipt": "新建收款",
-      "openTasks": "打开任务"
+      "openTasks": "打开任务",
+      "finishSetup": "完成设置"
     },
     "screen": "页面",
     "move": "移动",
     "open": "打开",
     "hint": "输入 3 个以上字母或 4 位以上数字以搜索人员",
     "empty": "没有匹配项。请尝试姓名、电话或 C 编号。",
-    "personSub": "{{id}} · •••• {{lastDigits}}"
+    "personSub": "{{id}} · •••• {{lastDigits}}",
+    "setupSub": "{{done}}/{{total}}"
   },
   "lists": {
     "loadError": "无法加载此列表 · 连接已断开。正在显示最近一次的副本。",

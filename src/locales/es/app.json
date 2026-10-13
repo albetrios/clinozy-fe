@@ -554,14 +554,16 @@
       "newAppointment": "Nueva cita",
       "newPatient": "Nuevo paciente",
       "newReceipt": "Nuevo cobro",
-      "openTasks": "Abrir tareas"
+      "openTasks": "Abrir tareas",
+      "finishSetup": "Terminar la configuración"
     },
     "screen": "Pantalla",
     "move": "moverse",
     "open": "abrir",
     "hint": "Escribe 3+ letras o 4+ dígitos para buscar personas",
     "empty": "Sin resultados. Prueba con un nombre, un teléfono o un número C.",
-    "personSub": "{{id}} · •••• {{lastDigits}}"
+    "personSub": "{{id}} · •••• {{lastDigits}}",
+    "setupSub": "{{done}} de {{total}}"
   },
   "lists": {
     "loadError": "No se pudo cargar esta lista · se perdió la conexión. Se muestra la última copia.",

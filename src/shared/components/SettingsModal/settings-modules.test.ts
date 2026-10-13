@@ -36,6 +36,10 @@ describe('settingsSectionModuleKey', () => {
     expect(
       settingsSectionModuleKey({ scope: 'organization', section: 'roles' }),
     ).toBeUndefined();
+    // The clinic's own values belong to no room: no clinic room's module switches them off.
+    expect(
+      settingsSectionModuleKey({ scope: 'organization', section: 'clinic' }),
+    ).toBeUndefined();
   });
 });
 

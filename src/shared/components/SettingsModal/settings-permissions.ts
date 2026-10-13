@@ -19,6 +19,9 @@ const ORGANIZATION_SECTION_PERMISSION: Record<
   OrganizationPermission
 > = {
   general: 'organization:read',
+  // Read with `organization:read` (`GET /tenancy/organization` and `…/settings`); the panel
+  // saves only with `organization:update`, read-only otherwise.
+  clinic: 'organization:read',
   members: 'membership:read',
   roles: 'role:read',
 };

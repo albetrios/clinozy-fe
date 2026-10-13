@@ -19,6 +19,7 @@ export const I18N_NAMESPACES = {
   users: 'users',
   app: 'app',
   print: 'print',
+  setup: 'setup',
 } as const;
 
 export type I18nNamespace = (typeof I18N_NAMESPACES)[keyof typeof I18N_NAMESPACES];

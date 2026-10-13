@@ -31,8 +31,8 @@ the permissions of and delete a role → Roles & access. Where the room is off o
 The toolbar (h1, the tab links, search, Filters, Columns, "New user" — the floating pill on a
 phone) is family-shared in `shared/components/UsersToolbar/`, with the role directory
 (`shared/hooks/useRoleDirectory/`, each role's name and tone), Roles & access itself
-(`shared/components/RolesAccess/`), "New role" (`shared/hooks/useNewRole/`) and the words for
-days and hours (`shared/hooks/useHoursFormat/`).
+(`shared/components/RolesAccess/`) and "New role" (`shared/hooks/useNewRole/`). The words for
+days and hours are root shared since the clinic setup reads them too (`src/shared/hooks/useHoursFormat/`).
 
 ## Files
 
@@ -55,7 +55,6 @@ days and hours (`shared/hooks/useHoursFormat/`).
 | `shared/components/RolesAccess/`  | Roles & access: the role list, the role page, the matrix, the special permissions; instant writes with rollback.                                                                                                  |
 | `shared/hooks/useRoleDirectory/`  | Every listed role named and toned (presets by the clinic vocabulary, custom roles by name).                                                                                                                       |
 | `shared/hooks/useNewRole/`        | "New role": the next "New role" name, `organization:read` only, the next custom tone; selects it.                                                                                                                 |
-| `shared/hooks/useHoursFormat/`    | The words for days and hours — "Mon–Sat · 10:00–19:00", "Every day" — for the Team, the user drawer and Branches.                                                                                                 |
 | `__tests__/integration/`          | The test router (the family's routes over a mocked clinozy-be) and the drawer / removal flows.                                                                                                                    |
 
 ## Test ids

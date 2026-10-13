@@ -1,0 +1,174 @@
+{
+  "drawer": {
+    "title": "{{clinic}} einrichten",
+    "sub": "Etwa eine Minute · Schritt {{step}} von {{total}}",
+    "progressLabel": "Einrichtungsfortschritt",
+    "stepAnnounce": "Schritt {{step}} von {{total}}",
+    "exploreFirst": "Erst umsehen",
+    "next": "Weiter: {{step}}",
+    "goLive": "Live schalten",
+    "goingLive": "Wird live geschaltet…",
+    "saving": "Wird gespeichert…",
+    "notSaved": "Nicht gespeichert · Ihre Änderungen bleiben erhalten",
+    "lockedHint": "Nach „{{step}}“",
+    "lockedToast": "Schließen Sie zuerst „{{step}}“ ab",
+    "saveFailed": "Dieser Schritt konnte nicht gespeichert werden. Ihre Antworten bleiben erhalten — versuchen Sie es erneut.",
+    "loadFailed": "Die Einrichtung Ihrer Klinik konnte nicht geladen werden."
+  },
+  "steps": {
+    "clinicType": {
+      "title": "Was für eine Klinik ist es?",
+      "why": "Ihre Leistungen und Rechnungen bauen darauf auf.",
+      "label": "Fachrichtungen",
+      "hint": "Eine oder mehrere wählen",
+      "required": "Wählen Sie mindestens eine Fachrichtung."
+    },
+    "location": {
+      "title": "Wo ist Ihre Klinik?",
+      "why": "Buchungen und Rechnungen brauchen einen Ort.",
+      "pin": "PLZ",
+      "pinHint": "Füllt Gebiet, Stadt und Bundesland aus",
+      "pinUnknown": "Diese PLZ kennen wir nicht — geben Sie Gebiet, Stadt und Bundesland ein.",
+      "areaPick": "Wählen Sie Ihr Gebiet",
+      "area": "Gebiet",
+      "city": "Stadt",
+      "state": "Bundesland",
+      "address": "Adresse",
+      "phone": "Telefon",
+      "email": "E-Mail",
+      "branchName": "Name der Filiale",
+      "hours": "Geöffnet {{days}} · {{opens}}–{{closes}}",
+      "change": "Ändern",
+      "done": "Fertig",
+      "days": "Arbeitstage",
+      "opens": "Öffnet",
+      "closes": "Schließt",
+      "closesAfterOpens": "Die Schließzeit muss nach der Öffnungszeit liegen.",
+      "requiredField": "{{field}} ist erforderlich.",
+      "pinInvalid": "Geben Sie die sechsstellige PLZ ein.",
+      "emailInvalid": "Geben Sie eine gültige E-Mail-Adresse ein.",
+      "phoneInvalid": "Geben Sie eine gültige Telefonnummer ein.",
+      "mainExists": "Ihre Klinik hat bereits eine Hauptfiliale — die Einrichtung verwendet sie."
+    },
+    "you": {
+      "title": "Behandeln Sie selbst Patienten?",
+      "why": "Damit Patienten ab dem ersten Tag bei Ihnen gebucht werden können.",
+      "label": "Behandeln Sie selbst Patienten?",
+      "doctor": "Ja, als Arzt",
+      "therapist": "Ja, als Therapeut",
+      "no": "Nein",
+      "noHint": "Sie können als Nächstes Ihren Arzt einladen.",
+      "required": "Wählen Sie eine Option."
+    }
+  },
+  "peek": {
+    "specialties": "Fachrichtungen",
+    "branch": "Filiale",
+    "hours": "Öffnungszeiten",
+    "seesPatients": "Behandelt Patienten"
+  },
+  "checks": {
+    "clinic_type": "die Art der Klinik",
+    "main_branch": "der Standort",
+    "services": "eine Leistung"
+  },
+  "goLiveRefused": "Live schalten ist noch nicht möglich — es fehlt noch: {{missing}}.",
+  "live": {
+    "title": "Sie sind live",
+    "sub": "{{clinic}} kann jetzt buchen und abrechnen.",
+    "setUp": "Wir haben eingerichtet:",
+    "branch": "Filiale {{branch}}",
+    "consultation": "{{name}} {{price}}",
+    "youAsDoctor": "Sie als Arzt",
+    "youAsTherapist": "Sie als Therapeut",
+    "book": "Ersten Termin buchen",
+    "done": "Fertig",
+    "heardAbout": {
+      "label": "Wie haben Sie von uns erfahren?",
+      "options": {
+        "search": "Suche",
+        "socialMedia": "Soziale Medien",
+        "friendOrColleague": "Freund oder Kollege",
+        "blogOrArticle": "Blog oder Artikel",
+        "other": "Sonstiges"
+      },
+      "thanks": "Danke — das hilft uns."
+    }
+  },
+  "guide": {
+    "title": "{{clinic}} fertig einrichten",
+    "count": "{{done}} von {{total}} erledigt",
+    "consultationAdded": "Beratung hinzugefügt",
+    "items": {
+      "treatments": {
+        "title": "Behandlungen hinzufügen",
+        "sub": "Aus der Startliste wählen",
+        "action": "Hinzufügen"
+      },
+      "inviteTeam": {
+        "title": "Team einladen",
+        "sub": "Ärzte, Empfang",
+        "action": "Einladen"
+      },
+      "inviteDoctor": {
+        "title": "Arzt einladen",
+        "sub": "Noch niemand ist buchbar",
+        "action": "Einladen"
+      },
+      "firstAppointment": {
+        "title": "Ersten Termin buchen",
+        "action": "Buchen"
+      }
+    },
+    "skip": "Überspringen",
+    "undoSkip": "Überspringen rückgängig",
+    "skipped": "Übersprungen",
+    "done": "Erledigt",
+    "hide": "Diesen Leitfaden ausblenden",
+    "hidden": "Leitfaden ausgeblendet — Sie können ihn in den Klinikeinstellungen wieder öffnen.",
+    "ready": {
+      "title": "Ihre Klinik ist bereit",
+      "sub": "Alles andere — Öffnungszeiten, Räume, Erinnerungen — finden Sie in den Klinikeinstellungen.",
+      "settings": "Klinikeinstellungen"
+    }
+  },
+  "starter": {
+    "title": "Behandlungen hinzufügen",
+    "sub": "Haken Sie an, was Sie anbieten; bearbeiten Sie Name, Minuten, Preis und GST vor dem Hinzufügen.",
+    "back": "Zurück zum Leitfaden",
+    "name": "Name",
+    "minutes": "Minuten",
+    "price": "Preis",
+    "gst": "GST",
+    "rowLabel": "{{name}} hinzufügen",
+    "exists": "Hinzugefügt",
+    "add_one": "{{count}} Behandlung hinzufügen",
+    "add_other": "{{count}} Behandlungen hinzufügen",
+    "adding": "Wird hinzugefügt…",
+    "added_one": "{{count}} Behandlung hinzugefügt",
+    "added_other": "{{count}} Behandlungen hinzugefügt",
+    "addOwn": "Eigene hinzufügen",
+    "nothingTicked": "Haken Sie mindestens eine Behandlung an.",
+    "consultationNamed": "Beratung {{specialty}}",
+    "names": {
+      "consultation": "Beratung",
+      "chemicalPeel": "Chemisches Peeling",
+      "hydrafacial": "Hydrafacial",
+      "laserHairRemovalFullFace": "LHR ganzes Gesicht (Sitzung)",
+      "acneScarTreatment": "Aknenarben-Behandlung",
+      "prpSession": "PRP-Sitzung",
+      "prpPack": "PRP-Paket",
+      "scalpTreatment": "Kopfhautbehandlung",
+      "scalingPolishing": "Zahnsteinentfernung & Politur",
+      "toothFilling": "Zahnfüllung",
+      "rootCanal": "Wurzelbehandlung",
+      "teethWhitening": "Zahnaufhellung",
+      "papSmear": "Pap-Abstrich",
+      "pelvicUltrasound": "Becken-Ultraschall",
+      "physioSession": "Physio-Sitzung",
+      "physioPack": "Physio-Paket",
+      "followUpVisit": "Kontrolltermin",
+      "dressing": "Verbandswechsel"
+    }
+  }
+}

@@ -1,0 +1,805 @@
+{
+  "250001": [
+    "Meerut",
+    "Uttar Pradesh",
+    [
+      "Abdullapur",
+      "Abulane",
+      "Bana",
+      "Begum Bagh",
+      "Belvedere",
+      "Bhatipura",
+      "Boundary Road",
+      "Chhipi Tank",
+      "Dabka",
+      "Defence Colony",
+      "Gandhi Ashram",
+      "Ganganagar",
+      "Gurukul Dorli",
+      "Incholi",
+      "Jatauli",
+      "Kanker Khera",
+      "Kaseru Khera",
+      "Kastla Shamshernagar",
+      "Kayastha Badha",
+      "Krishna Nagar",
+      "Mainthna Inder Singh",
+      "Maukhas",
+      "Meerut Cantt",
+      "Mundali",
+      "Muzaffarnagar Saini",
+      "P R C",
+      "RABazar",
+      "Rajpura",
+      "Rasulpur Aurangabad",
+      "Rukanpur Morna",
+      "Sardhana Road",
+      "Shivpuri",
+      "Sikhera",
+      "Suraj Kund Road",
+      "Thapar Nagar",
+      "Victoria Park",
+      "W K Road"
+    ]
+  ],
+  "250002": [
+    "Meerut",
+    "Uttar Pradesh",
+    [
+      "Anaj Mandi",
+      "Baghpat Gate",
+      "Banker Street",
+      "Budhana Gate",
+      "Budhera Zahidpur",
+      "Ghosipur",
+      "Kabari Bazar",
+      "Kaiser Ganj",
+      "Kishanpura",
+      "Lisari",
+      "Lisari Gate",
+      "Malyana",
+      "Meerut City",
+      "Meerut City R S",
+      "Meerut Tehsil",
+      "Nadir Ali Co",
+      "Navinmandi",
+      "Panchli Khurd",
+      "Ramlila Ground",
+      "Ramnagar",
+      "Rly Road Meerut",
+      "Sarrafa Bazar",
+      "SGMandi"
+    ]
+  ],
+  "250003": ["Meerut", "Uttar Pradesh", ["Meerut Kutchery", "Saket"]],
+  "250004": [
+    "Meerut",
+    "Uttar Pradesh",
+    [
+      "Datawali",
+      "Hasanpur Kadim",
+      "Jithauli",
+      "Kina Nagar",
+      "L L R M Medcollege",
+      "Meerut University",
+      "Murlipur Phool",
+      "Samai Pur",
+      "Shastri Nagar",
+      "Sisoli"
+    ]
+  ],
+  "250005": ["Meerut", "Uttar Pradesh", ["Miet"]],
+  "250101": [
+    "Baghpat",
+    "Uttar Pradesh",
+    [
+      "Baragaon",
+      "Bassi",
+      "Bhagot",
+      "Fakharpur",
+      "Garhi Kalanjiri",
+      "Gauna",
+      "Gothra",
+      "Khekra",
+      "Mubarikpur",
+      "Phulera",
+      "Rataul",
+      "Rly Road Khekra",
+      "Sankrodh",
+      "Sunehra"
+    ]
+  ],
+  "250103": [
+    "Meerut",
+    "Uttar Pradesh",
+    ["Bhoor Baral", "I E Partapur", "Partapur", "Rithani"]
+  ],
+  "250104": [
+    "Meerut",
+    "Uttar Pradesh",
+    [
+      "Aseelpur",
+      "Gesupur",
+      "Jaroda",
+      "Kithore",
+      "Lalyaana",
+      "Mahalwala",
+      "Muzaffarpur Bagarpur",
+      "Nagli Badli",
+      "Radhana",
+      "Sarwani Arifpur",
+      "Shafibad Loti",
+      "Shahjahanpur"
+    ]
+  ],
+  "250106": [
+    "Meerut",
+    "Uttar Pradesh",
+    ["Hasanpur Kalan", "Machhara", "Paswara", "Rachhauti", "Sholda"]
+  ],
+  "250110": [
+    "Meerut",
+    "Uttar Pradesh",
+    ["Dulhera", "Modipuram", "Pabli Khas", "Pallavpuram"]
+  ],
+  "250205": [
+    "Meerut",
+    "Uttar Pradesh",
+    ["Chhajupur", "Kanshi", "Kazamabad Goon", "Mohiuddinpur", "Muzakkipur"]
+  ],
+  "250221": [
+    "Meerut",
+    "Uttar Pradesh",
+    [
+      "Alipur",
+      "Daurala",
+      "Daurala Gaon",
+      "Kulanjan",
+      "Lohiya",
+      "Mataur",
+      "Samoli Khash Pur",
+      "Sarsawa"
+    ]
+  ],
+  "250222": ["Meerut", "Uttar Pradesh", ["Lawar", "Mahal", "Mahalka"]],
+  "250223": [
+    "Meerut",
+    "Uttar Pradesh",
+    ["Dadri", "Kailii", "Kapsad", "Mandora", "Ruhasa", "Sakoti Tanda"]
+  ],
+  "250341": [
+    "Meerut",
+    "Uttar Pradesh",
+    [
+      "B N Nanu",
+      "Bahadurpur",
+      "Bhalsona",
+      "Dabathwa",
+      "Ekri",
+      "Jangethi",
+      "Janjokhar",
+      "Khirwa Jalalpur",
+      "Pathauli",
+      "Pohli"
+    ]
+  ],
+  "250342": [
+    "Meerut",
+    "Uttar Pradesh",
+    [
+      "Baparsi",
+      "Bhamori",
+      "CBSardhana",
+      "Chhabariya",
+      "Chhur",
+      "Jhitkari",
+      "Kaland",
+      "Kalandi",
+      "Khera",
+      "Kushaoli",
+      "Laskarganj",
+      "Mahadev",
+      "Mulhera",
+      "Muzahidpur",
+      "Pithlokar",
+      "Rardhana",
+      "Salawa",
+      "Sardhana"
+    ]
+  ],
+  "250344": [
+    "Meerut",
+    "Uttar Pradesh",
+    [
+      "Bhooni",
+      "Dahar",
+      "Gotka",
+      "Harra",
+      "Jassar Sultan Nagar",
+      "Karnawal",
+      "Khiwai",
+      "Maina Poothi",
+      "Panchli Buzurg",
+      "Sarurpur Khurd"
+    ]
+  ],
+  "250345": [
+    "Baghpat",
+    "Uttar Pradesh",
+    [
+      "Barnawa",
+      "Bijwara",
+      "Binauli",
+      "Chandyan",
+      "Fatehpur Poothi",
+      "Fazalpur",
+      "Galheta",
+      "Jiwaana",
+      "Johri",
+      "Muzampur Kamala",
+      "Ranchhar",
+      "Sirsalgarh",
+      "Sirsali",
+      "Titroda"
+    ]
+  ],
+  "250401": [
+    "Meerut",
+    "Uttar Pradesh",
+    [
+      "Akbarpur Sadat",
+      "Alipur Morna",
+      "Assa",
+      "Bhainsa",
+      "Darveshpur",
+      "Dhanpura",
+      "Gadeena",
+      "Jai Singhpur",
+      "Kaull",
+      "Mawana",
+      "Mawana Khurd",
+      "Mawana Tehsil",
+      "Meewan",
+      "Nagla Hareru",
+      "Naidu",
+      "Niloha",
+      "Phalauda",
+      "Phitkari",
+      "Pilona",
+      "Rahaoti",
+      "Sandhan",
+      "Tofapur"
+    ]
+  ],
+  "250402": ["Meerut", "Uttar Pradesh", ["Dhikauli", "Mawana Factory", "Sathla"]],
+  "250404": [
+    "Meerut",
+    "Uttar Pradesh",
+    [
+      "Bastora",
+      "Behsuma",
+      "Digamber Jain Mandir",
+      "Doodhli",
+      "Ganeshpur",
+      "Hastinapur",
+      "Kishorepur",
+      "Latifpur",
+      "M P Sikhera",
+      "Maur Khurd",
+      "Saifpur Karamchanpur",
+      "Tarapur"
+    ]
+  ],
+  "250406": [
+    "Meerut",
+    "Uttar Pradesh",
+    [
+      "Agwanpur",
+      "Ahmedpur",
+      "Amarsinghpur",
+      "AP Badhla",
+      "Chitwana Sherpur",
+      "Ekla Rasulpur",
+      "Etmadpur",
+      "Jai",
+      "Khajuri",
+      "Manpur",
+      "Naarangpur",
+      "Parikshitgarh",
+      "Poothi",
+      "Siyal",
+      "Sondutt"
+    ]
+  ],
+  "250501": [
+    "Meerut",
+    "Uttar Pradesh",
+    [
+      "Behrampur",
+      "Bhola",
+      "Dahadra",
+      "Jani",
+      "Jani Kalan",
+      "Kalanjari",
+      "Khanpur",
+      "Kitholi",
+      "Kurali",
+      "Nek",
+      "Peepla Idrishpur",
+      "Siwal"
+    ]
+  ],
+  "250502": [
+    "Meerut",
+    "Uttar Pradesh",
+    [
+      "Amanullapur",
+      "Arnawali",
+      "Baram",
+      "Chandori Khas",
+      "Dalampur",
+      "Kaithwari",
+      "Kalina",
+      "Kalyanpur",
+      "Meerpur",
+      "Narangpur",
+      "Poothkhas",
+      "Rasna",
+      "Rasulpur Kinoni",
+      "Rasulpur Rohta",
+      "Satwai"
+    ]
+  ],
+  "250601": [
+    "Baghpat",
+    "Uttar Pradesh",
+    [
+      "Agarwal Mandi",
+      "Bali",
+      "Basaudh",
+      "Daula",
+      "Garhi",
+      "Mitli",
+      "Nerojpur Gujar",
+      "Nibali",
+      "Sujra"
+    ]
+  ],
+  "250606": [
+    "Baghpat",
+    "Uttar Pradesh",
+    [
+      "Aminagar Sarai",
+      "Bilochpura",
+      "Budhsaini",
+      "Garhi Hazurabad",
+      "Gwali Khera",
+      "Mawi Kalan",
+      "Ram Nagar",
+      "Saidbhar",
+      "Singhaoli Ahir",
+      "Tera"
+    ]
+  ],
+  "250609": [
+    "Baghpat",
+    "Uttar Pradesh",
+    ["Ahera", "Baghpat", "Baghpat Sugar Mill", "Khatta", "Sisana"]
+  ],
+  "250611": [
+    "Baghpat",
+    "Uttar Pradesh",
+    [
+      "Alwalpur",
+      "Audhapur",
+      "Baraut",
+      "Barawad",
+      "Barka",
+      "Bazidpur",
+      "Budhera",
+      "Chaubli",
+      "Dhanaura Silver Nagar",
+      "Dhikana",
+      "Dohja",
+      "Gandhi Chowk Baraut",
+      "Gurana",
+      "Hilwari",
+      "Jaunmana",
+      "Khwaja Nagla",
+      "Kotana",
+      "Lohadda",
+      "Luhari",
+      "Malakpur",
+      "Nai Mandi Baraut",
+      "Nehru Rd Baraut",
+      "Rajpur Khampur",
+      "Sadiqpur Sinoli",
+      "Shahpur Badholi",
+      "Shikohpur",
+      "Teodhi"
+    ]
+  ],
+  "250615": [
+    "Baghpat",
+    "Uttar Pradesh",
+    [
+      "Chamrawal",
+      "Dhikauli",
+      "Hisawda",
+      "Khatta Prahladpur",
+      "Lalyana",
+      "Pabla Begmabad",
+      "Pilana"
+    ]
+  ],
+  "250617": [
+    "Baghpat",
+    "Uttar Pradesh",
+    [
+      "Badarkha",
+      "Bodha",
+      "Chhaprauli",
+      "Halalpur",
+      "Hewa",
+      "Kakor Kalan",
+      "Kurri",
+      "Nangal",
+      "Rathaura",
+      "Sabga",
+      "Sherpur Luhari",
+      "Silana",
+      "Tugana"
+    ]
+  ],
+  "250619": [
+    "Baghpat",
+    "Uttar Pradesh",
+    ["Faizpur Ninana", "Gauripur", "Khera Hatana", "Kherki", "Sarurpur Kalan"]
+  ],
+  "250620": ["Baghpat", "Uttar Pradesh", ["Bamnauli", "Bijrol", "Kandera"]],
+  "250621": ["Baghpat", "Uttar Pradesh", ["Baoli", "Barwala", "Gunga Kheri", "Jalalpur"]],
+  "250622": [
+    "Baghpat",
+    "Uttar Pradesh",
+    [
+      "Azampur Mulsam",
+      "Begmabad Garhi",
+      "Bharal",
+      "Daha",
+      "Dhanaura Tikri",
+      "Doghat",
+      "Gaidbara",
+      "Idrishpur",
+      "Jhundpur",
+      "Kanhar",
+      "Muzaffarpur Kanwara",
+      "Palra",
+      "Palri",
+      "Pusar"
+    ]
+  ],
+  "250623": [
+    "Baghpat",
+    "Uttar Pradesh",
+    [
+      "Asara",
+      "Asarfabad Thal",
+      "Basauli",
+      "Budhpur",
+      "Ibrahimpur Mazra",
+      "Jiwana",
+      "Kakripur",
+      "Kasimpur Khari",
+      "Kirthal",
+      "Kishanpur Baral",
+      "Lumb",
+      "Ramala",
+      "Soop"
+    ]
+  ],
+  "250625": [
+    "Baghpat",
+    "Uttar Pradesh",
+    ["Gangnauli", "Mozizabad Nangal", "Nirpura", "Sujti", "Tikri"]
+  ],
+  "250626": [
+    "Baghpat",
+    "Uttar Pradesh",
+    ["Baleni", "Dhaulri", "Dolcha", "Duttnagar", "Mohd Pur Dhoomi", "Mukri"]
+  ],
+  "251001": [
+    "Muzaffarnagar",
+    "Uttar Pradesh",
+    [
+      "Agarwal Paper Mill",
+      "Anandpuri",
+      "Bagowali",
+      "Barwala",
+      "Bhopa Road",
+      "Brahmpuri",
+      "Datiyana",
+      "Dedheru Kalan",
+      "Gandhi Colony",
+      "Ganga Ram Pura",
+      "Harsauli",
+      "Karwara",
+      "Kinoni",
+      "Kukara",
+      "Kutchery Mzn",
+      "Makhiyali",
+      "Megha Kheri",
+      "Mussa Bilaspur",
+      "Muzaffarnagar",
+      "Navin Mandi Sthal",
+      "Nirmana",
+      "Pachanda Kalan",
+      "Rampur",
+      "Rampuram",
+      "Ratheri",
+      "Sahojani Tagan",
+      "Sarwat",
+      "Sher Nagar",
+      "South Civil Lines",
+      "Taoli"
+    ]
+  ],
+  "251002": [
+    "Muzaffarnagar",
+    "Uttar Pradesh",
+    ["Khala Par", "Laddhawala", "Muzaffar Nagar City", "Prempuri", "Shamli Road"]
+  ],
+  "251003": [
+    "Muzaffarnagar",
+    "Uttar Pradesh",
+    ["Industrial Estate", "Jaroda", "Lachera", "Sujroo", "Vehlana"]
+  ],
+  "251201": [
+    "Muzaffarnagar",
+    "Uttar Pradesh",
+    [
+      "Antwara",
+      "Barsoo",
+      "Bhainsi",
+      "Bhangela",
+      "Chand Samad",
+      "Chand Seena",
+      "Dayalpuri",
+      "Fahimpur Khurd",
+      "Galibpur",
+      "Incholi",
+      "Jasaula",
+      "Kailwara Kalan",
+      "Khanjapur",
+      "Khatauli",
+      "Khatauli Bazar",
+      "Kheri Rangdhang",
+      "Nawla",
+      "Pamnawali",
+      "Phulat",
+      "Pipalhera",
+      "Sarai Rasulpur",
+      "Satguru Nagar",
+      "Satheri",
+      "Sugar Mill Road Khatauli",
+      "Titoda"
+    ]
+  ],
+  "251202": [
+    "Muzaffarnagar",
+    "Uttar Pradesh",
+    [
+      "Badhai Kalan",
+      "Badhai Khurd",
+      "Baheri",
+      "Barkali",
+      "Kachauli",
+      "Maleera",
+      "Rohana Khurd",
+      "Rohana Mills"
+    ]
+  ],
+  "251203": [
+    "Muzaffarnagar",
+    "Uttar Pradesh",
+    [
+      "Bahadurpur",
+      "Beghrajpur",
+      "Bhikki",
+      "Bihari",
+      "Dudha Heri",
+      "Hussainpur Bhopara",
+      "Jeewana",
+      "Mansurpur",
+      "Mansurpur Village",
+      "Pura",
+      "Purbaliyan"
+    ]
+  ],
+  "251301": [
+    "Muzaffarnagar",
+    "Uttar Pradesh",
+    [
+      "Alipur Kheri",
+      "Budina Kalan",
+      "Jasoi",
+      "Mohamad Pur Madan",
+      "Nagala Pithora",
+      "Roni Hazipur",
+      "Sonta",
+      "Titawi"
+    ]
+  ],
+  "251305": [
+    "Shamli",
+    "Uttar Pradesh",
+    [
+      "Babri",
+      "Banti Khera",
+      "Butrara",
+      "Choonsa",
+      "Gogwan Jalalpur",
+      "Hiranwara",
+      "Karoda Hathi",
+      "Kedi",
+      "Kurmali",
+      "Pipal Hera"
+    ]
+  ],
+  "251306": [
+    "Muzaffarnagar",
+    "Uttar Pradesh",
+    [
+      "Amir Nagar",
+      "Baghra",
+      "Budina Khurd",
+      "Kazi Khera",
+      "Mandi",
+      "Mukandpur",
+      "Nasir Pur",
+      "Pinna"
+    ]
+  ],
+  "251307": [
+    "Muzaffarnagar",
+    "Uttar Pradesh",
+    ["Badheri", "Barla", "Chhapar", "Kasampur Patheri", "Khudda", "Phalauda", "Rai"]
+  ],
+  "251308": [
+    "Muzaffarnagar",
+    "Uttar Pradesh",
+    [
+      "Behra Thru",
+      "Belra",
+      "Bhopa",
+      "Jat Mujhera",
+      "Jauli",
+      "Jhal Nirgajani",
+      "Malpura",
+      "Nagla Bujurg",
+      "Rahakada",
+      "Rahamatpur Garwara",
+      "Sikkri",
+      "Tissa"
+    ]
+  ],
+  "251309": [
+    "Muzaffarnagar",
+    "Uttar Pradesh",
+    [
+      "Alipur Aterna",
+      "Barkata",
+      "Baroda",
+      "Bitawada",
+      "Budhana",
+      "Dabheri Rasulpur",
+      "Garhi Sakhawatpur",
+      "Grahi Noabad",
+      "Hussainabad Bhanwara",
+      "Hussainpur Kalan",
+      "Itawa",
+      "Jaula",
+      "Kamruddin Nagar",
+      "Kuralsi",
+      "Kurawa",
+      "Kurthal",
+      "Loi Sarai",
+      "Luhsana",
+      "Mohmand Pur Rai Singh",
+      "Nagwa",
+      "Nai Abadi Budhana",
+      "Raipur Aterna",
+      "Reoli Nagla",
+      "Tanda Majara",
+      "Toda"
+    ]
+  ],
+  "251310": [
+    "Muzaffarnagar",
+    "Uttar Pradesh",
+    ["Basera", "Gadhla", "Khaikheri", "Tejalhera", "Tuglakpur"]
+  ],
+  "251311": [
+    "Muzaffarnagar",
+    "Uttar Pradesh",
+    ["Charthawal", "Chokra", "Khusropur", "Kulheri", "Kutesra", "Luhari Khurd", "Paoti"]
+  ],
+  "251314": [
+    "Muzaffarnagar",
+    "Uttar Pradesh",
+    [
+      "Bajidpur Kawali",
+      "Behra Assa",
+      "Chittora",
+      "Dhansari",
+      "Ghatayan",
+      "Jandheri",
+      "Jansath",
+      "Kawal",
+      "Kujhera",
+      "Nagla Madore College",
+      "Rajpur Kalan",
+      "Salarpur",
+      "Sambhal Hera",
+      "Tehsil Jansath",
+      "Tissang"
+    ]
+  ],
+  "251315": [
+    "Muzaffarnagar",
+    "Uttar Pradesh",
+    ["Bhooma", "Kasampur Khola", "Katiya", "Kithora", "Kutubpur", "Miranpur"]
+  ],
+  "251316": [
+    "Muzaffarnagar",
+    "Uttar Pradesh",
+    [
+      "Behupura",
+      "Bhokarheri",
+      "Chorawala",
+      "Kakrauli",
+      "Khokani",
+      "Morna",
+      "Shukartal",
+      "Tendhera",
+      "Tewra"
+    ]
+  ],
+  "251318": [
+    "Muzaffarnagar",
+    "Uttar Pradesh",
+    [
+      "Dhanayan",
+      "Dhindawali",
+      "Dinkarpur",
+      "Goela",
+      "Kakra",
+      "Kaserwa",
+      "Kutba",
+      "Mubarikpur",
+      "Palri",
+      "Shahpur Muzaffarnagar",
+      "Shoram",
+      "Umarpur"
+    ]
+  ],
+  "251319": [
+    "Muzaffarnagar",
+    "Uttar Pradesh",
+    [
+      "Bhajju",
+      "Bhanera Jat",
+      "Bhoora Khurd",
+      "Bhora Kalan",
+      "Mundbhar",
+      "Sawtoo",
+      "Shikarpur",
+      "Sisauli"
+    ]
+  ],
+  "251320": ["Muzaffarnagar", "Uttar Pradesh", ["Hassanpur", "Ramraj"]],
+  "251327": [
+    "Muzaffarnagar",
+    "Uttar Pradesh",
+    ["Badiwala", "Hari Nagar", "Kelanpur", "Purkazi", "Sherpur"]
+  ]
+}

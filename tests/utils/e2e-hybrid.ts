@@ -2,6 +2,7 @@ import { expect, type Page } from '@playwright/test';
 
 import { PRODUCT_NAMESPACE } from '@/lib/product-identity.ts';
 import { installE2eCaptchaHeadersOnAuthApi } from '@/tests/utils/e2e-captcha.ts';
+import { exploreClinicSetupFirst } from '@/tests/utils/e2e-clinic-setup.ts';
 
 /**
  * Stable English accessible names from `src/locales/en/*.json` for hybrid E2E
@@ -22,7 +23,8 @@ export const AUTH_LABELS = {
  */
 export const LAYOUT_LABELS = {
   search: /^search or jump to/i,
-  userMenu: / · (online|away|busy)$/i,
+  // The status, then what else the avatar carries: pending invitations, the clinic setup's progress.
+  userMenu: / · (online|away|busy)(?: · |$)/i,
   accountMenu: /^account$/i,
   notifications: /notification/i,
   appearanceRow: /^appearance & language$/i,
@@ -124,6 +126,8 @@ export async function gotoApp(
   if (path === '/login' || path.startsWith('/login?')) {
     await installE2eCaptchaHeadersOnAuthApi(page);
   }
+  // A new clinic's setup drawer stays shut unless the spec lets it open (`letClinicSetupOpen`).
+  await exploreClinicSetupFirst(page);
   await page.goto(path, { waitUntil: 'domcontentloaded' });
   const timeout = opts?.timeout ?? 15000;
   const spinner = page.getByTestId('full-page-spinner');

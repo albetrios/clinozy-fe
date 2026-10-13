@@ -1,0 +1,4078 @@
+{
+  "440001": [
+    "Nagpur",
+    "Maharashtra",
+    [
+      "Bureau Of Mines",
+      "Coal Estate",
+      "Kasturchand Park",
+      "Mohan Nagar",
+      "Nagpur",
+      "Ravi Nagar",
+      "Sadar Bazar"
+    ]
+  ],
+  "440002": ["Nagpur", "Maharashtra", ["Nagpur City", "Nayapura"]],
+  "440003": ["Nagpur", "Maharashtra", ["Ajni", "Imamwada", "Medical College"]],
+  "440005": ["Nagpur", "Maharashtra", ["Nagpur Airport"]],
+  "440006": ["Nagpur", "Maharashtra", ["Seminary Hills"]],
+  "440007": ["Nagpur", "Maharashtra", ["Vayusena Nagar"]],
+  "440008": ["Nagpur", "Maharashtra", ["Bagadganj"]],
+  "440010": [
+    "Nagpur",
+    "Maharashtra",
+    ["Abhyankar Nagar", "Giripeth", "Gokulpeth", "Khare Town", "Shankar Nagar", "V R C E"]
+  ],
+  "440012": [
+    "Nagpur",
+    "Maharashtra",
+    [
+      "Congress Nagar",
+      "Dhantoli",
+      "Hitavada",
+      "Netaji Market",
+      "Patwardhan Ground",
+      "Sitabuldi"
+    ]
+  ],
+  "440013": ["Nagpur", "Maharashtra", ["Borgaon Road", "Katolroad"]],
+  "440014": ["Nagpur", "Maharashtra", ["Bezonbagh", "Jaripatka"]],
+  "440015": [
+    "Nagpur",
+    "Maharashtra",
+    ["Narendra Nagar", "Samartha Nagar", "Vivekanand Nagar"]
+  ],
+  "440016": ["Nagpur", "Maharashtra", ["Indl.Area Nagpur", "MIDC Nagpur", "SRPF"]],
+  "440017": ["Nagpur", "Maharashtra", ["Dr.Ambedkar Marg", "Panchsheel Nagar"]],
+  "440018": ["Nagpur", "Maharashtra", ["Ganjipeth", "Mahatma Fule Bazar", "Mominpura"]],
+  "440019": ["Nagpur", "Maharashtra", ["C.R.P.F. Nagpur"]],
+  "440020": ["Nagpur", "Maharashtra", ["Neeri"]],
+  "440021": ["Nagpur", "Maharashtra", ["A.D. Project"]],
+  "440022": [
+    "Nagpur",
+    "Maharashtra",
+    ["Laxmi Nagar", "Ranapratap Nagar", "Shradhananpeth", "Trimurti Nagar"]
+  ],
+  "440023": [
+    "Nagpur",
+    "Maharashtra",
+    [
+      "Adegaon",
+      "Bazargaon",
+      "Dattawadi",
+      "Dawlameti",
+      "Deoli Kalbande",
+      "Dhamna",
+      "Gondkhairi",
+      "Lava",
+      "Shiwa Sawanga",
+      "Umri Wagh",
+      "Vyahad Bzk",
+      "Waddhamna",
+      "Wadi"
+    ]
+  ],
+  "440024": [
+    "Nagpur",
+    "Maharashtra",
+    [
+      "Ayodhya Nagar",
+      "Dighori Naka",
+      "Hanuman Nagar",
+      "Manewada Road",
+      "Nandavan Colony",
+      "Raje Raghujinagar"
+    ]
+  ],
+  "440025": ["Nagpur", "Maharashtra", ["Khamla", "Ujwal Nagar"]],
+  "440026": ["Nagpur", "Maharashtra", ["Uppalwadi"]],
+  "440027": ["Nagpur", "Maharashtra", ["Parvati Nagar", "Vishwakarma Nagar"]],
+  "440030": ["Nagpur", "Maharashtra", ["Mankapur", "Nadt Campus"]],
+  "440032": ["Nagpur", "Maharashtra", ["Mahal"]],
+  "440033": ["Nagpur", "Maharashtra", ["University Campus"]],
+  "440034": ["Nagpur", "Maharashtra", ["Mhalginagar"]],
+  "440035": ["Nagpur", "Maharashtra", ["Kalmna Market Yard"]],
+  "440036": ["Nagpur", "Maharashtra", ["Jaitala"]],
+  "440037": ["Nagpur", "Maharashtra", ["BESA Road"]],
+  "441001": ["Nagpur", "Maharashtra", ["Kamthi", "Kamthi City"]],
+  "441101": [
+    "Nagpur",
+    "Maharashtra",
+    [
+      "Badegaon",
+      "Bichwa",
+      "Khapa",
+      "Khubala",
+      "Kodegaon",
+      "Kothurna",
+      "Nagalwadi",
+      "Wakodi"
+    ]
+  ],
+  "441102": [
+    "Nagpur",
+    "Maharashtra",
+    ["Bina", "Hingna Barabhai", "Khaperkheda", "Tamaswadi", "Walni Colliery"]
+  ],
+  "441103": [
+    "Nagpur",
+    "Maharashtra",
+    ["Dudhala", "Kachari Sawanga", "Khursapar", "Kondhali", "Masod", "Ridhora"]
+  ],
+  "441104": [
+    "Nagpur",
+    "Maharashtra",
+    [
+      "Bhandewadi",
+      "Bhugaon",
+      "Chirwa",
+      "Dhanla",
+      "Gowri",
+      "Gumthala",
+      "Kapsi BK",
+      "Marodi",
+      "Mathni",
+      "Mauda",
+      "Niharwani",
+      "Ungaon",
+      "Wadoda"
+    ]
+  ],
+  "441105": [
+    "Nagpur",
+    "Maharashtra",
+    [
+      "Dahegaon Joshi",
+      "Itgaon",
+      "Khandala",
+      "Mahuli",
+      "Navegaon Khairi",
+      "Nayakund",
+      "Parseoni"
+    ]
+  ],
+  "441106": [
+    "Nagpur",
+    "Maharashtra",
+    [
+      "Aroli",
+      "Babdeo",
+      "Bhandarbodi",
+      "Bhondewada",
+      "Chacher",
+      "Dudhala",
+      "Indora",
+      "Kachurwahi",
+      "Kavikulguru Nagar",
+      "Khairi Bijewada",
+      "Khat",
+      "Kodamendhi",
+      "Mahadula (Ramtek)",
+      "Morgaon",
+      "Musewadi",
+      "Nagardhan",
+      "Nimkheda",
+      "Ramtek",
+      "Satak",
+      "Seoni",
+      "Tarsa"
+    ]
+  ],
+  "441107": [
+    "Nagpur",
+    "Maharashtra",
+    [
+      "Adasa",
+      "Gaimukh Nanda",
+      "Khangaon",
+      "Malegaon",
+      "Saoner",
+      "Telgaon",
+      "Telkamathi",
+      "Umri",
+      "Waghoda"
+    ]
+  ],
+  "441108": [
+    "Nagpur",
+    "Maharashtra",
+    [
+      "Ashta",
+      "Bela",
+      "Bori",
+      "Borkhedi",
+      "Dongargaon",
+      "Khapri",
+      "Padri Thana",
+      "Pipra",
+      "Rama",
+      "Ridhora",
+      "Rui",
+      "Sawangi Asola"
+    ]
+  ],
+  "441109": ["Nagpur", "Maharashtra", ["Sillewara Project"]],
+  "441110": [
+    "Nagpur",
+    "Maharashtra",
+    ["Amgaon Deori", "Hingna", "Kanholibara", "Kawdas", "Mohgaon", "Mondha", "Wanadongri"]
+  ],
+  "441111": ["Nagpur", "Maharashtra", ["Gumthi", "Koradi Tps", "Lonkhairi"]],
+  "441112": ["Nagpur", "Maharashtra", ["Kelod", "Khairi Dhalgaon", "Mangsa"]],
+  "441113": [
+    "Nagpur",
+    "Maharashtra",
+    [
+      "Chanpa",
+      "Dahegaon Rangari",
+      "Patansaongi",
+      "Pipla Dakbanglow",
+      "Takli Bhansali",
+      "Waki"
+    ]
+  ],
+  "441122": [
+    "Nagpur",
+    "Maharashtra",
+    ["Gumgaon", "Industrial Area Butibori", "Salaidhabha", "Takalghat"]
+  ],
+  "441123": ["Nagpur", "Maharashtra", ["Godhani"]],
+  "441201": [
+    "Nagpur",
+    "Maharashtra",
+    [
+      "Adyar Dupache",
+      "Bhiwapur",
+      "Jaoli",
+      "Malewada",
+      "Menda",
+      "Mokhebardi",
+      "Naxi",
+      "Tas",
+      "Thutanbori",
+      "Virkhandi"
+    ]
+  ],
+  "441202": [
+    "Nagpur",
+    "Maharashtra",
+    [
+      "Ambadi",
+      "Chapegadi",
+      "Deoli Kalan",
+      "Dighori Kale",
+      "Dodma",
+      "Kuhi",
+      "Marni",
+      "Musalgaon",
+      "Navegaon Chinchghat",
+      "Navegaon Isapur",
+      "Rajola",
+      "Salva",
+      "Silli",
+      "Temsana",
+      "Titur"
+    ]
+  ],
+  "441203": [
+    "Nagpur",
+    "Maharashtra",
+    [
+      "Aptur",
+      "Bamhni",
+      "Bhagwanpur",
+      "Dawha",
+      "Godhani",
+      "Kargaon",
+      "Makardhokda",
+      "Mangrud",
+      "Nand",
+      "Navegaon Sadhu",
+      "Pahani Chinchala",
+      "Seo",
+      "Shirpur",
+      "Shiwapur",
+      "Tarna",
+      "Umred",
+      "Umred Bazar"
+    ]
+  ],
+  "441204": [
+    "Nagpur",
+    "Maharashtra",
+    [
+      "Champa",
+      "Kalamna",
+      "Matkazari",
+      "Narsala",
+      "Pachgaon",
+      "Pipla",
+      "Salaigodhni",
+      "Surgaon",
+      "Udasa",
+      "Umred Project",
+      "Vihirgaon"
+    ]
+  ],
+  "441205": [
+    "Chandrapur",
+    "Maharashtra",
+    [
+      "Dongargaon BK",
+      "Kanpa",
+      "Kotgaon",
+      "Mangali Arab",
+      "Mindhala",
+      "Mohali Mokasa",
+      "Nagbhid",
+      "Navegaon Hundeshwari",
+      "Navegaon Pandav",
+      "Navkhala",
+      "Paharni",
+      "Pardi",
+      "Vilam"
+    ]
+  ],
+  "441206": [
+    "Chandrapur",
+    "Maharashtra",
+    [
+      "Adyal Tekadi",
+      "Arher Nawargaon",
+      "Awalgaon",
+      "Baradkinhi",
+      "Bramhapuri",
+      "Chaugaon",
+      "Gangalwadi",
+      "Halda",
+      "Hardoli",
+      "Jugnala",
+      "Kahali",
+      "Kalamgaon",
+      "Khed",
+      "Kinhi",
+      "Kirmitimendha",
+      "Kurza",
+      "Maushi",
+      "Mendki",
+      "Mudza",
+      "Nanhori",
+      "Nilaj",
+      "Paradgaon",
+      "Pimpalgaon",
+      "Waigaon"
+    ]
+  ],
+  "441207": [
+    "Gadchiroli",
+    "Maharashtra",
+    [
+      "Amgaon Buti",
+      "Andhali",
+      "Artondi",
+      "Chikhli",
+      "Desaiganj",
+      "Deulgoan",
+      "Dongarmendha",
+      "Gewardha",
+      "Gurnoli",
+      "Kokdi",
+      "Kondali",
+      "Koregaon",
+      "Kurud",
+      "Sawangi",
+      "Shankarpur",
+      "Tulsi",
+      "Vihirgaon",
+      "Visora",
+      "Wadegaon"
+    ]
+  ],
+  "441208": [
+    "Gadchiroli",
+    "Maharashtra",
+    [
+      "Armori",
+      "Arsoda",
+      "Chamorshi BK",
+      "Churmura",
+      "Deulgaon",
+      "Jogisakhara",
+      "Kasawi",
+      "Pathargota",
+      "Shioni BK",
+      "Thanegaon",
+      "Wasala"
+    ]
+  ],
+  "441209": [
+    "Gadchiroli",
+    "Maharashtra",
+    [
+      "Antargaon",
+      "Antargav",
+      "Armurkasa",
+      "Bamani",
+      "Bedgaon",
+      "Bethakathi",
+      "Bori",
+      "Botekasa",
+      "Chandagad",
+      "Charbhatti",
+      "Chilamtola",
+      "Chirchedi",
+      "Chotimadai (ChotiMadhe)",
+      "Dadapur",
+      "Dawadi",
+      "Dongargav",
+      "Gajegoan",
+      "Ganuli",
+      "Gothangaon",
+      "Jambhulkheda",
+      "Khobramendha",
+      "Kohaka",
+      "Korchi",
+      "Kotgul",
+      "Kotra",
+      "Kulgondi (Fulgondi)",
+      "Kulkuli",
+      "Kurkheda",
+      "Lendaritola",
+      "Maldugi",
+      "Malewada",
+      "Masali",
+      "Morkekasa (Markekasa)",
+      "Motgoan (Mohgoan)",
+      "Moushi",
+      "Nanhi",
+      "Palasgad",
+      "Purada",
+      "Ramgarh",
+      "Shendepar",
+      "Sonsari",
+      "Sursundi",
+      "Talegaon",
+      "Tuchanhar (Tutekanhar)",
+      "Yengalkheda"
+    ]
+  ],
+  "441210": [
+    "Nagpur",
+    "Maharashtra",
+    [
+      "Adam",
+      "Ambhora",
+      "Channa",
+      "Donger Mauda",
+      "Fegad",
+      "Gohna",
+      "Gothangaon",
+      "Jiwnapur",
+      "Kujba",
+      "Mandhal",
+      "Pachkhedi",
+      "Sirsi Navegaon",
+      "Tekepar",
+      "Veltur",
+      "Wagh"
+    ]
+  ],
+  "441212": [
+    "Chandrapur",
+    "Maharashtra",
+    ["Chikhali", "Dongargaon", "Navegaon Lonkhairi", "Pedgaon", "Rajoli", "Saradpar"]
+  ],
+  "441214": ["Nagpur", "Maharashtra", ["Besur", "Hiwra Hiwri", "Mahalgaon", "Sirsi"]],
+  "441215": [
+    "Chandrapur",
+    "Maharashtra",
+    [
+      "Antargaon",
+      "Bormala",
+      "Gewara BK",
+      "Gunjewahi",
+      "Meha BK",
+      "Nifandra",
+      "Nimgaon",
+      "Palebarsa",
+      "Pathari",
+      "Tambegadimendha",
+      "Vihirgaon"
+    ]
+  ],
+  "441217": [
+    "Gadchiroli",
+    "Maharashtra",
+    [
+      "Angara",
+      "Bhakrondi",
+      "Delanwadi",
+      "Ghati",
+      "Kadholi",
+      "Khadki",
+      "Khambala",
+      "Kurundi",
+      "Manapur",
+      "Muska",
+      "Navezari",
+      "Nawargaon",
+      "Palasgaon",
+      "Salebatti",
+      "Sawalkheda",
+      "Sirshi",
+      "Sukala",
+      "Vairagadh"
+    ]
+  ],
+  "441221": [
+    "Chandrapur",
+    "Maharashtra",
+    [
+      "Alwahi",
+      "Balapur",
+      "Bond",
+      "Govindpur",
+      "Kanhalgaon Sonule",
+      "Kitali Bormal",
+      "Mangrul",
+      "Nanded",
+      "Palasgaon Khurd",
+      "Sawargaon",
+      "Sonurli BK",
+      "Talodhi Balapur",
+      "Ushral Mendha",
+      "Wadhona"
+    ]
+  ],
+  "441222": [
+    "Chandrapur",
+    "Maharashtra",
+    [
+      "Gramsevak Trg",
+      "Jamsala",
+      "Kalamgaon Ganna",
+      "Khatgaon",
+      "Kinhi",
+      "Ladbori",
+      "Mohali Naleshwar",
+      "Palasgaon Jat",
+      "Sindewahi",
+      "Waneri"
+    ]
+  ],
+  "441223": [
+    "Chandrapur",
+    "Maharashtra",
+    [
+      "Antargaon",
+      "Gadbori",
+      "Girgaon",
+      "Nachanbhatti",
+      "Nandgaon",
+      "Nawargaon",
+      "Ratnapur",
+      "Sheoni",
+      "Wasera"
+    ]
+  ],
+  "441224": [
+    "Chandrapur",
+    "Maharashtra",
+    [
+      "Borda",
+      "Chichpalli",
+      "Chimda",
+      "Chinchala",
+      "Chiroli",
+      "Kelzar",
+      "Kolsa",
+      "Maroda",
+      "Mul",
+      "Somnath Prakala"
+    ]
+  ],
+  "441225": [
+    "Chandrapur",
+    "Maharashtra",
+    [
+      "Bothali",
+      "Fiskuti",
+      "Haramba",
+      "Jibgaon",
+      "Kapsi",
+      "Kawathi",
+      "Keroda",
+      "Londholi",
+      "Mokhala",
+      "Nilsani Pedgaon",
+      "Pendhari Maktha",
+      "Rajgad",
+      "Samda Buzruk",
+      "Saoli",
+      "Vyahad BK",
+      "Vyhad Khurd"
+    ]
+  ],
+  "441226": [
+    "Chandrapur",
+    "Maharashtra",
+    [
+      "Bembal",
+      "Bhejgaon",
+      "Dighori",
+      "Futana",
+      "Gowardhan",
+      "Nandgaon",
+      "Pipari (Dixit)",
+      "Surla"
+    ]
+  ],
+  "441301": [
+    "Nagpur",
+    "Maharashtra",
+    [
+      "Datewadi",
+      "Dawsa",
+      "Jalalkheda",
+      "Kharbadi",
+      "Mendhala",
+      "Ramthi",
+      "Thadipauni",
+      "Thugaon Deo"
+    ]
+  ],
+  "441302": [
+    "Nagpur",
+    "Maharashtra",
+    [
+      "Dhawlapur",
+      "Isapur Khurd",
+      "Katol",
+      "Khangaon",
+      "Ladgaon",
+      "Lohgad",
+      "Mendhepathar",
+      "Metpanjra",
+      "Murti",
+      "Yenwa",
+      "Zilpa"
+    ]
+  ],
+  "441303": ["Nagpur", "Maharashtra", ["Khairgaon", "Mowad"]],
+  "441304": [
+    "Nagpur",
+    "Maharashtra",
+    ["Belona", "Kharsoli", "Mohadi Dalvi", "Narkher", "Tinkheda"]
+  ],
+  "441305": [
+    "Nagpur",
+    "Maharashtra",
+    [
+      "Bharsingi",
+      "Bhishnoor",
+      "Digras BK",
+      "Jamgaon BK",
+      "Khapa Ghudan",
+      "Lohari Sawanga",
+      "Maywadi",
+      "Paradsinga",
+      "Rohna",
+      "Thaturwada",
+      "Yerla (Dhote)"
+    ]
+  ],
+  "441306": [
+    "Nagpur",
+    "Maharashtra",
+    [
+      "Dorli Bhandwalkar",
+      "Masora",
+      "Mohgaon Bhadade",
+      "Pipla Kewalram",
+      "Sawargaon",
+      "Sindhi Umri",
+      "Sonoli",
+      "Yenikoni"
+    ]
+  ],
+  "441401": [
+    "Nagpur",
+    "Maharashtra",
+    [
+      "Ajni",
+      "Belda",
+      "Borda",
+      "Deolapar",
+      "Hiwra Bazar",
+      "Kandri",
+      "Kanhan Pipri",
+      "Karwahi",
+      "Khairi Akashwani",
+      "Khumari",
+      "Manegaon Tek",
+      "Mansar",
+      "Patharai",
+      "Pauni",
+      "Pipariya",
+      "Ranala",
+      "Rewral",
+      "Salwa",
+      "Tangla",
+      "Wadamba"
+    ]
+  ],
+  "441404": ["Nagpur", "Maharashtra", ["Gondegaon", "Kamthi Colliery"]],
+  "441501": [
+    "Nagpur",
+    "Maharashtra",
+    [
+      "Bamhni",
+      "Dhapewada",
+      "Fetri",
+      "Ghorad",
+      "Kalambi",
+      "Kalmeshwar",
+      "Mahurzari",
+      "Midc Kalmeshwar",
+      "Ubali",
+      "Uparwahi",
+      "Walni"
+    ]
+  ],
+  "441502": [
+    "Nagpur",
+    "Maharashtra",
+    ["Dorli Bhingare", "Kohli", "Mohpa", "Pardi Deshmukh", "Pipla Kinkhede", "Raulgaon"]
+  ],
+  "441601": [
+    "Gondia",
+    "Maharashtra",
+    [
+      "Asoli",
+      "Banathar",
+      "Batana",
+      "Chipiya",
+      "Chutiya",
+      "Garra",
+      "Girola",
+      "Gondia",
+      "Gondia Bazar",
+      "Gondia Khurd",
+      "Kamtha",
+      "Karanja",
+      "Kawlewada",
+      "Khamari",
+      "Khatiya",
+      "Nagra",
+      "Nagrakatangi",
+      "Navegaon Kalan",
+      "Paraswada",
+      "Phulchur",
+      "Rajegaon",
+      "Rawanwadi",
+      "Satona",
+      "Sawri",
+      "Tumkheda Khurd"
+    ]
+  ],
+  "441614": [
+    "Gondia",
+    "Maharashtra",
+    [
+      "Adasi",
+      "Berdipar",
+      "Boda",
+      "Chirchal Bandh",
+      "Dandegaon",
+      "Dasgaon Khurd",
+      "Datora",
+      "Dawaniwada",
+      "Dhakni",
+      "Dongargaon",
+      "Gangazari",
+      "Gondia City",
+      "Kachewani",
+      "Kati (Birsola)",
+      "Kudwa",
+      "Mohgaon BK",
+      "Nagpura",
+      "Pandharbodi",
+      "Ratnara",
+      "Shejgaon",
+      "Sitepar",
+      "Tanda",
+      "Yekodi (Gondia)"
+    ]
+  ],
+  "441701": [
+    "Gondia",
+    "Maharashtra",
+    [
+      "Arjuni Morgaon",
+      "Bakti",
+      "Bondgaon Devi",
+      "Etikheda",
+      "Korambitola",
+      "Mohgaon R.S.",
+      "Wadegaon R.S.",
+      "Zarpada"
+    ]
+  ],
+  "441702": [
+    "Gondia",
+    "Maharashtra",
+    [
+      "Barabhati",
+      "Bhivkhidki",
+      "Bondegaon (Surban)",
+      "Channa",
+      "Dhabetekdi",
+      "Ghonadi",
+      "Gothangaon",
+      "Kesori",
+      "Navegaon Bandh",
+      "Palandur Zamindari",
+      "Palasgaon",
+      "Parastola",
+      "Parsodi Rayatwadi",
+      "Pimpalgaon Khambi",
+      "Pratapgarh",
+      "Rajori (Bharnoli)",
+      "Tukum Narayan"
+    ]
+  ],
+  "441801": [
+    "Gondia",
+    "Maharashtra",
+    [
+      "Bhasgaon",
+      "Gankhaira",
+      "Ghoti",
+      "Gidhadi",
+      "Goregaon",
+      "Hirapur",
+      "Hirdamali",
+      "Kalimati",
+      "Katangi BK",
+      "Khodseoni",
+      "Kosamthondi",
+      "Kurhadi",
+      "Mundipar (Ishwar)",
+      "Pandhari",
+      "Pathri (Gondia)",
+      "Soni",
+      "Timezari"
+    ]
+  ],
+  "441802": [
+    "Bhandara",
+    "Maharashtra",
+    [
+      "Amgaon BK",
+      "Bampewada",
+      "Chandori",
+      "Khandala",
+      "Kumbhali",
+      "Lawri Umri",
+      "Malutola",
+      "Pindkepar",
+      "Sakoli",
+      "Sangadi",
+      "Sasra",
+      "Satalwada",
+      "Sendurwafa",
+      "Virshi",
+      "Wadad",
+      "Yekodi (Sakoli)"
+    ]
+  ],
+  "441803": [
+    "Bhandara",
+    "Maharashtra",
+    [
+      "Bhagdi",
+      "Kudegaon",
+      "Lakhandur",
+      "Moharna",
+      "Opera",
+      "Pimpalgaon Kohli",
+      "Soni Chapral"
+    ]
+  ],
+  "441804": [
+    "Bhandara",
+    "Maharashtra",
+    [
+      "Amgaon Dighori",
+      "Dhargaon",
+      "Gadegaon",
+      "Gunthara",
+      "Kesalwada",
+      "Lakhni",
+      "Lakhori",
+      "Pimpalgaon Sadak",
+      "Rengepar",
+      "Salebhata"
+    ]
+  ],
+  "441805": [
+    "Bhandara",
+    "Maharashtra",
+    ["Barwa", "Dighori", "Hardoli", "Kharashi", "Pardi"]
+  ],
+  "441806": [
+    "Gondia",
+    "Maharashtra",
+    ["Bopabodi", "Chikhali", "Gondumri", "Kokna", "Palasgaon", "Parsodi", "Soundad"]
+  ],
+  "441807": [
+    "Gondia",
+    "Maharashtra",
+    [
+      "Bamni",
+      "Chopa",
+      "Dawwa",
+      "Dongargaon Sadak",
+      "Khajari Dongargaon",
+      "Mohadi",
+      "Mundipar",
+      "Sadak Arjuni",
+      "Shenda",
+      "Tedha",
+      "Tilli Mohgaon"
+    ]
+  ],
+  "441809": [
+    "Bhandara",
+    "Maharashtra",
+    [
+      "Bhugaon",
+      "Channa",
+      "Gurdha",
+      "Kanheri",
+      "Kolari",
+      "Miregaon",
+      "Murmadi",
+      "Palandur (Chauras)",
+      "Pohra",
+      "Seloti",
+      "Shioni"
+    ]
+  ],
+  "441901": [
+    "Gondia",
+    "Maharashtra",
+    [
+      "Alewada",
+      "Borgaon",
+      "Chichgarh",
+      "Dawki",
+      "Deori",
+      "Futana",
+      "Kadikasa",
+      "Kokodi",
+      "Murdoli",
+      "Nilaj",
+      "Shirpurbagh Colony"
+    ]
+  ],
+  "441902": [
+    "Gondia",
+    "Maharashtra",
+    [
+      "Amgaon",
+      "Anjora",
+      "Bijepar",
+      "Borkanhar",
+      "Kalimati",
+      "Kattipar",
+      "Kotra",
+      "Lohara",
+      "Makkatola",
+      "Pandharwani",
+      "Phukimeta",
+      "Purada",
+      "Saoli Dongargaon",
+      "Sarkartola",
+      "Satgaon",
+      "Suplipar",
+      "Thana",
+      "Tigaon"
+    ]
+  ],
+  "441903": [
+    "Bhandara",
+    "Maharashtra",
+    [
+      "Adyar",
+      "Chinchal",
+      "Erli Khandar",
+      "Gosi BK",
+      "Kitadi",
+      "Kurza",
+      "Nerla",
+      "Pimpalgaon Nipani"
+    ]
+  ],
+  "441904": ["Bhandara", "Maharashtra", ["Bhandara", "Bhandara Town"]],
+  "441905": [
+    "Bhandara",
+    "Maharashtra",
+    [
+      "Betara",
+      "Bhandara Road",
+      "Koka",
+      "Kothurna",
+      "Mandvi",
+      "Mohgaon Devi",
+      "Mundri BK",
+      "Navegaon BK",
+      "Neri",
+      "Palora"
+    ]
+  ],
+  "441906": [
+    "Bhandara",
+    "Maharashtra",
+    ["Bela", "Bhandara Of", "Mohdura", "Pipri", "Shahpur", "Thana Petrol Pump"]
+  ],
+  "441907": [
+    "Bhandara",
+    "Maharashtra",
+    [
+      "Ashti",
+      "Chikhala",
+      "Chikhla Basti",
+      "Dongri BK",
+      "Gobarwahi",
+      "Lobhi",
+      "Nakadongri"
+    ]
+  ],
+  "441908": [
+    "Bhandara",
+    "Maharashtra",
+    ["Akot", "Belati", "Bhawad", "Konda Kosra", "Masal", "Palora", "Sarandi"]
+  ],
+  "441909": [
+    "Bhandara",
+    "Maharashtra",
+    ["Dongargaon", "Hardoli", "Kanalgaon", "Mandesar", "Mohadi"]
+  ],
+  "441910": [
+    "Bhandara",
+    "Maharashtra",
+    [
+      "Amgaon Adarsh Pauni",
+      "Asgaon",
+      "Bhendala",
+      "Bhuyar",
+      "Irli BK",
+      "Itan",
+      "Kanhalgaon",
+      "Khapri",
+      "Kodurli",
+      "Mangli",
+      "Pauni",
+      "Sawarla",
+      "Walni"
+    ]
+  ],
+  "441911": [
+    "Gondia",
+    "Maharashtra",
+    [
+      "Arjuni (Tirora)",
+      "Chikhali",
+      "Dhapewada",
+      "Gangla",
+      "Gond Mohadi",
+      "Gumdhawada",
+      "Indora Khurd",
+      "Karti BK",
+      "Kawalewada",
+      "Kesalwada",
+      "Kodelohara",
+      "Lakhegaon",
+      "Mundikota",
+      "Murdada",
+      "Navezari",
+      "Paraswada",
+      "Sarandi",
+      "Sukhali Dakaram",
+      "Thanegaon",
+      "Tirora",
+      "Wadegaon"
+    ]
+  ],
+  "441912": [
+    "Bhandara",
+    "Maharashtra",
+    [
+      "Alesure",
+      "Chincholi (Tumsar)",
+      "Garra Bageda",
+      "Kardi",
+      "Khapa",
+      "Lendezari",
+      "Mitewani",
+      "Tumsar",
+      "Umarwada",
+      "Yerli"
+    ]
+  ],
+  "441913": ["Bhandara", "Maharashtra", ["Devada Bzk", "Madgi", "Tumsar Road"]],
+  "441914": ["Bhandara", "Maharashtra", ["Andhalgaon", "Jamb", "Kandri", "Salaikhurd"]],
+  "441915": [
+    "Bhandara",
+    "Maharashtra",
+    ["Bapera", "Chulhad", "Mohgaon Khadan", "Sihora", "Wahani"]
+  ],
+  "441916": [
+    "Gondia",
+    "Maharashtra",
+    [
+      "Darekasa",
+      "Dhanoli",
+      "Kawarabandh",
+      "Latori",
+      "Lohara",
+      "Pauldauna",
+      "Pipariya",
+      "Salekasa",
+      "Sonpuri",
+      "Tirkhedi"
+    ]
+  ],
+  "441924": [
+    "Bhandara",
+    "Maharashtra",
+    ["Chandori", "Dawadipar", "Kardha", "Manegaon", "Matora", "Minshi", "Pahela", "Silli"]
+  ],
+  "442001": [
+    "Wardha",
+    "Maharashtra",
+    [
+      "Akoli",
+      "Anji",
+      "Borgaon Meghe",
+      "Dahegaon Gawande",
+      "Dahegaon Gosavi",
+      "Dahegaon Miskin",
+      "Dattapur",
+      "Gopuri",
+      "Indira Market Wardha",
+      "Manas Mandir Wardha",
+      "Mandwa",
+      "Mgihu",
+      "Nalwadi",
+      "Paloti",
+      "Paunoor",
+      "Pipri Meghe",
+      "Ramnagar Wardha",
+      "Salod Hirapur",
+      "Seloo Kate",
+      "Sukali Bai",
+      "Talegaon Talatule",
+      "Waifad",
+      "Waigaon Nipani",
+      "Wardha",
+      "Wardha Market",
+      "YAC Wardha",
+      "Yelakeli",
+      "Zadgaon Gosavi"
+    ]
+  ],
+  "442003": ["Wardha", "Maharashtra", ["Cotton Market", "Hindinagar"]],
+  "442101": [
+    "Wardha",
+    "Maharashtra",
+    [
+      "Agargaon",
+      "Andori",
+      "Bhidi",
+      "Chikni",
+      "Deoli",
+      "Gaul",
+      "Giroli",
+      "Kangaon",
+      "Kapsi",
+      "Khangaon",
+      "Mozari",
+      "Nagzari",
+      "Nandora Dafre",
+      "Padegaon",
+      "Pimpalgaon Lute",
+      "Selsura",
+      "Shirpur",
+      "Sonegaon Abaji",
+      "Wabgaon",
+      "Watkhed"
+    ]
+  ],
+  "442102": [
+    "Wardha",
+    "Maharashtra",
+    [
+      "Bothuda",
+      "Hamdapur",
+      "Junona",
+      "Kharangna Gode",
+      "Kopra",
+      "Madni Karanji",
+      "Mandgaon",
+      "Sewagram",
+      "Taroda"
+    ]
+  ],
+  "442104": [
+    "Wardha",
+    "Maharashtra",
+    [
+      "Bori",
+      "Ghorad",
+      "Hingani",
+      "Juwadi",
+      "Kelzar",
+      "Khapari",
+      "Kotamba",
+      "Mahabala",
+      "Rehaki Kala",
+      "Salaipevath",
+      "Seldoha",
+      "Seloo",
+      "Sukli Station",
+      "Surgaon",
+      "Zadsi"
+    ]
+  ],
+  "442105": ["Wardha", "Maharashtra", ["Sindi"]],
+  "442106": [
+    "Wardha",
+    "Maharashtra",
+    [
+      "Dahegaon Gondi",
+      "Kachnoor",
+      "Kasarkheda",
+      "Kharangna",
+      "Malegaon Theka",
+      "Masod",
+      "Panwadi",
+      "Pimpalkhuta"
+    ]
+  ],
+  "442107": ["Wardha", "Maharashtra", ["Sawangi Meghe"]],
+  "442111": ["Wardha", "Maharashtra", ["Paunar"]],
+  "442201": [
+    "Wardha",
+    "Maharashtra",
+    [
+      "Arvi",
+      "Bokenagar",
+      "Chincholi Dange",
+      "Chistur",
+      "Dahegaon Mustafa",
+      "Deorwara",
+      "Jalgaon",
+      "Jamalpur",
+      "Jasapur",
+      "Khubgaon",
+      "Nandpur",
+      "Neri Mirzapur",
+      "Nimboli",
+      "Pardi",
+      "Sarwadi",
+      "Sawali BK",
+      "Takarkheda",
+      "Talegaon (SP)",
+      "Wadhona",
+      "Wardhamaneri"
+    ]
+  ],
+  "442202": [
+    "Wardha",
+    "Maharashtra",
+    [
+      "Antora",
+      "Ashti",
+      "Bharaswara",
+      "Bhishnoor",
+      "Borgaon Tumni",
+      "Delwadi",
+      "Khadki",
+      "Lahan Arvi",
+      "Manikwara",
+      "Sahur",
+      "Tarasawanga",
+      "Wadala"
+    ]
+  ],
+  "442203": [
+    "Wardha",
+    "Maharashtra",
+    [
+      "Chincholi",
+      "Dhanoli",
+      "Junapani",
+      "Kajali",
+      "Kakda",
+      "Kannamwargram",
+      "Karanja",
+      "Nara",
+      "Sawali Khurd",
+      "Sindi Vihiri",
+      "Thanegaon",
+      "Umri"
+    ]
+  ],
+  "442301": [
+    "Wardha",
+    "Maharashtra",
+    [
+      "Bela",
+      "Bhosa",
+      "Chincholi",
+      "Dongargaon",
+      "Hinganghat",
+      "Hinganghat Town",
+      "Jam",
+      "Kajalsara",
+      "Kandhali",
+      "Khandala",
+      "Kora",
+      "Mangrul Dasoda",
+      "Nandori",
+      "Nimbha",
+      "Pardi (Nagaji)",
+      "Sawali Wagh",
+      "Shegaon Kund",
+      "Wagholi",
+      "Washi"
+    ]
+  ],
+  "442302": [
+    "Wardha",
+    "Maharashtra",
+    [
+      "Borgaon Hatla",
+      "Chincholi",
+      "Dhanodi Bahaddarpur",
+      "Kaotha",
+      "Pipri Pargothan",
+      "Pulgaon",
+      "Rasulabad",
+      "Rohana",
+      "Sorta",
+      "Virul"
+    ]
+  ],
+  "442303": ["Wardha", "Maharashtra", ["Pulgaon Camp"]],
+  "442304": [
+    "Wardha",
+    "Maharashtra",
+    ["Allipur", "Bhankheda", "Dhotra", "Goji", "Sirasgaon Bazar"]
+  ],
+  "442305": [
+    "Wardha",
+    "Maharashtra",
+    ["Girad", "Samudrapur", "Waigaon Gond", "Waigaon Haldya"]
+  ],
+  "442306": [
+    "Wardha",
+    "Maharashtra",
+    [
+      "Dahegaon Dhande",
+      "Inzhala",
+      "Kandegaon",
+      "Nachangaon",
+      "Rohani",
+      "Sonora",
+      "Vijaygopal"
+    ]
+  ],
+  "442307": [
+    "Wardha",
+    "Maharashtra",
+    [
+      "Ajansara",
+      "Arvi Chhoti",
+      "Daroda",
+      "Pipri",
+      "Pohana",
+      "Shekapur Bai",
+      "Wadner",
+      "Yerala"
+    ]
+  ],
+  "442401": ["Chandrapur", "Maharashtra", ["Chandrapur", "Shashtrinagar"]],
+  "442402": [
+    "Chandrapur",
+    "Maharashtra",
+    ["Chandrapur City", "Marda", "Mel", "Pathanpura"]
+  ],
+  "442403": ["Chandrapur", "Maharashtra", ["Babupeth", "Junona"]],
+  "442404": [
+    "Chandrapur",
+    "Maharashtra",
+    ["Chandrapur TPS", "Durgapur", "Mohorli", "Padmapur Rayatwari", "Payali Bhatali"]
+  ],
+  "442406": ["Chandrapur", "Maharashtra", ["Midc (P)", "Padoli", "Tadali"]],
+  "442501": ["Chandrapur", "Maharashtra", ["Chandrapur Ord Fact"]],
+  "442502": ["Chandrapur", "Maharashtra", ["Cementnagar"]],
+  "442503": ["Chandrapur", "Maharashtra", ["Kondha", "Kuchana", "Patala", "Shivjinagar"]],
+  "442504": [
+    "Gadchiroli",
+    "Maharashtra",
+    [
+      "Ankisa",
+      "Arda",
+      "Asaralli",
+      "Bamni",
+      "Gommalkonda",
+      "Janampalli",
+      "Jinganur",
+      "Kochampalli",
+      "Kopela",
+      "Korla Mal",
+      "Kotapalli",
+      "Madaram",
+      "Medaram",
+      "Moyabinpetta",
+      "Nagram",
+      "Narayanpur",
+      "Narkada",
+      "Narsihapalli",
+      "Pattagudam",
+      "Pentipaga",
+      "Ramanoorpur",
+      "Rameshgudam",
+      "Randhampetha",
+      "Rangaapalli",
+      "Regunta",
+      "Sirkanda",
+      "Sironcha",
+      "Sironcha Mal",
+      "Somanpalli",
+      "Tekada",
+      "Teklamotala",
+      "Tummnor",
+      "Vedmahim",
+      "Vyankatapura"
+    ]
+  ],
+  "442505": [
+    "Chandrapur",
+    "Maharashtra",
+    ["Dhanora Pipri", "Ghugus Colliery", "Mhatardevi", "Shengaon"]
+  ],
+  "442507": ["Chandrapur", "Maharashtra", ["H.L.C.", "Nandgaon Podey"]],
+  "442603": [
+    "Gadchiroli",
+    "Maharashtra",
+    [
+      "Amgaon (Mal)",
+      "Bhendala",
+      "Chamorshi",
+      "Dhargaon",
+      "Fharada",
+      "Gilgaon (Zamindari)",
+      "Haldimal",
+      "Kalamgaon",
+      "Kunghada",
+      "Kurud",
+      "Lakhamapur Bori",
+      "Malleramal",
+      "Markanda Deo",
+      "Murkhada",
+      "Murkhada Chak",
+      "Murmuri",
+      "Navegaon Rayatwari",
+      "Pavimuranda",
+      "Potegaon",
+      "Ramala",
+      "Sakela",
+      "Sonapur",
+      "Talodhi Mokasa",
+      "Vishnupur",
+      "Wagholi",
+      "Wakdijuni",
+      "Walsara",
+      "Yedanur"
+    ]
+  ],
+  "442604": [
+    "Gadchiroli",
+    "Maharashtra",
+    [
+      "Bhadbhidi",
+      "Chakpetala",
+      "Chapalwada",
+      "Ghot",
+      "Likhatwada",
+      "Makepalli",
+      "Nimgaon",
+      "Pauni",
+      "Regadi",
+      "Vikaspalli"
+    ]
+  ],
+  "442605": [
+    "Gadchiroli",
+    "Maharashtra",
+    [
+      "Ambeshioni",
+      "Amirza",
+      "Bamni",
+      "Bodhali",
+      "Churchura",
+      "Darli",
+      "Deloda",
+      "Devipur Camp",
+      "Dibhana",
+      "Gadchiroli",
+      "Gadchiroli Coll",
+      "Girgaon (Gilgaon)",
+      "Gogaon",
+      "Guruwala",
+      "Hirapur",
+      "Jambhali",
+      "Jepra",
+      "Kaneri",
+      "Karpundi",
+      "Katali Hitachal",
+      "Kotgad (Kotgal)",
+      "Madetukum",
+      "Maushi Khamb",
+      "Mudza",
+      "Murmadi",
+      "Nagrinavegaon",
+      "Navegaon",
+      "Pardikupi",
+      "Porla",
+      "Sakhara",
+      "Semana",
+      "Shioni",
+      "Vihirgoan",
+      "Wadadha",
+      "Wakdi",
+      "Wasa",
+      "Yeoli"
+    ]
+  ],
+  "442606": [
+    "Gadchiroli",
+    "Maharashtra",
+    [
+      "Arjuni",
+      "Bhapada",
+      "Bhimpur",
+      "Chatgaon",
+      "Chavela",
+      "Dhanora",
+      "Dudhmala",
+      "Durgapur",
+      "Gatta",
+      "Girola",
+      "Gyaraptti",
+      "Heti",
+      "Jambhali (B)",
+      "Jappi",
+      "Japtalai",
+      "Jarawandi",
+      "Karwafa",
+      "Khedi",
+      "Koregoan",
+      "Kosami",
+      "Kurumwada",
+      "Lekha",
+      "Mendhatola",
+      "Mohali",
+      "Mohgoan",
+      "Morchul",
+      "Muramgaon",
+      "Nawargoan",
+      "Palasgav",
+      "Pendhari",
+      "Pulkhal",
+      "Rangi",
+      "Ranveli",
+      "Sakhera",
+      "Sawanga",
+      "Sawargaon",
+      "Sode",
+      "Toyagondi",
+      "Yerkad"
+    ]
+  ],
+  "442701": [
+    "Chandrapur",
+    "Maharashtra",
+    [
+      "Ballarpur",
+      "Dudholi Bamini",
+      "Kothari",
+      "Manora",
+      "Palasgaon",
+      "Tohogaon",
+      "Umari Potdar",
+      "Visapur"
+    ]
+  ],
+  "442702": [
+    "Chandrapur",
+    "Maharashtra",
+    [
+      "Aksapur",
+      "Borgaon",
+      "Chakdarur",
+      "Chintaldhaba",
+      "Dhaba",
+      "Dhamangaon",
+      "Ghatkul",
+      "Gojoli Maktha",
+      "Gondpipri",
+      "Karanji",
+      "Lathi",
+      "Likhithwada",
+      "Nawegaon More",
+      "Sonapur Deshpande",
+      "Talodhi Bhangaram",
+      "Vithalwada",
+      "Wadholi",
+      "Wadkuli"
+    ]
+  ],
+  "442703": [
+    "Gadchiroli",
+    "Maharashtra",
+    ["Allapalli", "Elgur", "Govindpur", "Kasampeth", "Kristapur", "Medpalli", "Nagepalli"]
+  ],
+  "442704": [
+    "Gadchiroli",
+    "Maharashtra",
+    [
+      "Burgi",
+      "Ettapalli",
+      "Gatta",
+      "Geda",
+      "Ghotsur",
+      "Gurupalli",
+      "Jivangatta",
+      "Kasansur",
+      "Kothami",
+      "Sewari",
+      "Todsa",
+      "Tumurgunda",
+      "Udera"
+    ]
+  ],
+  "442705": [
+    "Gadchiroli",
+    "Maharashtra",
+    [
+      "Aheri",
+      "Bori",
+      "Chinchpundi",
+      "Chutuguntha",
+      "Dampur",
+      "Devalmari",
+      "Estapur",
+      "Indaram",
+      "Khamancheru",
+      "Kothari",
+      "Lagam",
+      "Mahagaon BK",
+      "Vatra",
+      "Venkatraopetta",
+      "Vyankatapura",
+      "Wangepalli"
+    ]
+  ],
+  "442707": [
+    "Gadchiroli",
+    "Maharashtra",
+    [
+      "Adapalli",
+      "Adyal",
+      "Ankhoda",
+      "Ashti",
+      "Chandankhedi",
+      "Chaudampalli",
+      "Chittaranjan",
+      "Ganpur Rayatwari",
+      "Gundapalli",
+      "Jairampur",
+      "Kalinagar",
+      "Khudirampalli",
+      "Konsari",
+      "Koparalli",
+      "Markhanda (K)",
+      "Mudholi Chak No. Ii",
+      "Thakri",
+      "Yenapur"
+    ]
+  ],
+  "442709": [
+    "Gadchiroli",
+    "Maharashtra",
+    [
+      "Challewada",
+      "Dechalipeta",
+      "Dhamrancha",
+      "Gudigudam",
+      "Jimalgatta",
+      "Kamlapur",
+      "Marpalli",
+      "Rajaram"
+    ]
+  ],
+  "442710": [
+    "Gadchiroli",
+    "Maharashtra",
+    [
+      "Arenda",
+      "Bhamragadh",
+      "Dubbaguda",
+      "Gothankandi",
+      "Halewar",
+      "Irasgumme",
+      "Kandoli",
+      "Kanewada",
+      "Kodari",
+      "Koti",
+      "Kudakodi",
+      "Kurumwelli",
+      "Laheri",
+      "Malankodur",
+      "Manne Rajaram",
+      "Pali",
+      "Palle",
+      "Permelli",
+      "Tadgaon",
+      "Tekla",
+      "Yechali",
+      "Yermana"
+    ]
+  ],
+  "442901": ["Chandrapur", "Maharashtra", ["Ballarpur Paper Mill"]],
+  "442902": [
+    "Chandrapur",
+    "Maharashtra",
+    ["Bhadrawati", "Ghodpeth", "Jena", "Kacharala", "Pirli", "Sakharwahi", "Sumthana"]
+  ],
+  "442903": [
+    "Chandrapur",
+    "Maharashtra",
+    [
+      "Ambenri",
+      "Amboli",
+      "Bhisi",
+      "Chimur",
+      "Doma",
+      "Hirapur",
+      "Jambhulghat",
+      "Jamgaon Komti",
+      "Kolara Tukum",
+      "Madnapur",
+      "Mahalgaon Kalu",
+      "Malewada",
+      "Mangalgaon",
+      "Masal",
+      "Metepar",
+      "Navtala",
+      "Palasgaon Piparda",
+      "Pimpalneri",
+      "Sathgaon",
+      "Shankarpur",
+      "Shiora",
+      "Talodhi Naik"
+    ]
+  ],
+  "442904": [
+    "Chandrapur",
+    "Maharashtra",
+    [
+      "Adegaon",
+      "Kajalsar",
+      "Kewada Mokasa",
+      "Khambada",
+      "Khutala Mokasa",
+      "Mhasali",
+      "Motegaon",
+      "Neri",
+      "Pendhari",
+      "Sawargaon",
+      "Sirpur",
+      "Wadsi"
+    ]
+  ],
+  "442905": [
+    "Chandrapur",
+    "Maharashtra",
+    [
+      "Aheri",
+      "Arvi",
+      "Bhedoda",
+      "Chandanwahi",
+      "Charli",
+      "Chincholi",
+      "Chunala",
+      "Dewada",
+      "Gowari",
+      "Kadholi",
+      "Lakhadkot",
+      "Nalfadi",
+      "Pachgaon",
+      "Pandharpauni",
+      "Rajura (M)",
+      "Sakhari",
+      "Sasti",
+      "Sindhi",
+      "Sondo",
+      "Subai",
+      "Tembhuwahi",
+      "Vihirgaon",
+      "Vir R.S.",
+      "Warud Road",
+      "Yergawhan (Dewada)"
+    ]
+  ],
+  "442906": [
+    "Chandrapur",
+    "Maharashtra",
+    [
+      "Amadi Beguide",
+      "Arjuni",
+      "Ashta",
+      "Belgaon",
+      "Bhendala",
+      "Bothali",
+      "Chandankheda",
+      "Chargaon BK",
+      "Chargaon KD",
+      "Chora",
+      "Gulgaon",
+      "Khadsangi",
+      "Mudholi",
+      "Sagra",
+      "Sakhara Rajapur",
+      "Saori",
+      "Segaon",
+      "Segaon KD",
+      "Viloda",
+      "Wadadha",
+      "Wahangaon",
+      "Waigaon Tukum"
+    ]
+  ],
+  "442907": [
+    "Chandrapur",
+    "Maharashtra",
+    [
+      "Charur Khati",
+      "Chikani",
+      "Dahegaon",
+      "Dongargaon",
+      "Dongargaon Khadi",
+      "Ekarjuna",
+      "Jamni",
+      "Khambada",
+      "Kosarsar",
+      "Madheli",
+      "Nagri",
+      "Nandori",
+      "Panjurni",
+      "Sembal",
+      "Soit",
+      "Tembhurda",
+      "Waghnakh",
+      "Warora"
+    ]
+  ],
+  "442908": [
+    "Chandrapur",
+    "Maharashtra",
+    [
+      "Bakhardi",
+      "Bhari",
+      "Bhoygaon",
+      "Chandur",
+      "Jiwati",
+      "Khirdi",
+      "Lakhampur",
+      "Nandgaon",
+      "Nandpa",
+      "Nokewada",
+      "Patan",
+      "Pudiyal Mohada",
+      "Shengaon",
+      "Tekamandava",
+      "Uparwahi",
+      "Yellapur"
+    ]
+  ],
+  "442914": [
+    "Chandrapur",
+    "Maharashtra",
+    ["Anandwan", "Bhatala", "Chinora", "Khemjai", "Salori"]
+  ],
+  "442916": [
+    "Chandrapur",
+    "Maharashtra",
+    [
+      "Dhanoli",
+      "Kadholi",
+      "Kanhalgaon",
+      "Kodsi",
+      "Korpana",
+      "Kothada",
+      "Mandwa",
+      "Matha",
+      "Naranda",
+      "Pardi",
+      "Pipri (Naranda)",
+      "Rupapet",
+      "Seraj",
+      "Sonurli",
+      "Vansadi",
+      "Yergavhan"
+    ]
+  ],
+  "442917": [
+    "Chandrapur",
+    "Maharashtra",
+    ["Antargaon", "Awalapur", "Awalpur Cement Project", "Nanda", "Virur Gadegaon"]
+  ],
+  "442918": [
+    "Chandrapur",
+    "Maharashtra",
+    [
+      "Dabgaon Maktha",
+      "Dewada Khurd",
+      "Gomani",
+      "Jamtukam",
+      "Kasargatta",
+      "Pombhurna",
+      "Subhashgram"
+    ]
+  ],
+  "442919": ["Gadchiroli", "Maharashtra", ["Mulchera", "Vasantpur"]],
+  "443001": ["Buldhana", "Maharashtra", ["Buldana"]],
+  "443002": [
+    "Buldhana",
+    "Maharashtra",
+    [
+      "Bhadola",
+      "Chaitanya Wadi",
+      "Dahid",
+      "Deulghat",
+      "Dhotra Bhangoji",
+      "Dongar Khandala",
+      "Dongarshewali",
+      "Gummi",
+      "Kelwad",
+      "Kesapur",
+      "Kinhola",
+      "Kolwad",
+      "Madh",
+      "Nandra Koli",
+      "Padali",
+      "Pangri",
+      "Pimpalgaon Sarai",
+      "Raipur",
+      "Sagwan",
+      "Sakhali",
+      "Sao",
+      "Shelsur",
+      "Shirpur",
+      "Sundarkhed",
+      "Warwand",
+      "Yelgaon"
+    ]
+  ],
+  "443101": [
+    "Buldhana",
+    "Maharashtra",
+    [
+      "Awha Yunuspur",
+      "Bhalegaon",
+      "Deodhaba",
+      "Didola",
+      "Dudhalgaon BK",
+      "Harankhed",
+      "Jambhuldhaba",
+      "Khamkhed",
+      "Liha BK",
+      "Malkapur",
+      "Malkapur City",
+      "Nipana",
+      "Panhera Wadoda",
+      "Pimpalgaon Devi",
+      "Shelapur",
+      "Sindkhed Lapali",
+      "Talkhed",
+      "Wadaji",
+      "Wadner Bholaji"
+    ]
+  ],
+  "443102": [
+    "Buldhana",
+    "Maharashtra",
+    [
+      "Belad",
+      "Bhadgani",
+      "Dabhadi",
+      "Datala",
+      "Ghirni",
+      "Makodi",
+      "Mendhali",
+      "Pimpri Gawali",
+      "Pophali",
+      "Sarola Maroti",
+      "Shelgaon Bazar",
+      "Shiradhon",
+      "Talni",
+      "Umali",
+      "Warkhed"
+    ]
+  ],
+  "443103": [
+    "Buldhana",
+    "Maharashtra",
+    [
+      "Advihir",
+      "Borakhedi",
+      "Jaipur",
+      "Khaira",
+      "Kharbadi",
+      "Kothali",
+      "Motala",
+      "Nimkhed",
+      "Pimpalgaon Nath",
+      "Rajur",
+      "Rohinkhed",
+      "Shemba",
+      "Takarkhed"
+    ]
+  ],
+  "443104": [
+    "Buldhana",
+    "Maharashtra",
+    ["Dhamangaon Badhe", "Korhala Bazar", "Panhera Khedi"]
+  ],
+  "443106": [
+    "Buldhana",
+    "Maharashtra",
+    [
+      "Bhadgaon",
+      "Chandol",
+      "Dhad",
+      "Dhalsawangi",
+      "Dhamangaon",
+      "Dudha",
+      "Hatedi",
+      "Jamb",
+      "Masrul",
+      "Mhasla BK",
+      "Satgaon Mhasla",
+      "Warud"
+    ]
+  ],
+  "443112": [
+    "Buldhana",
+    "Maharashtra",
+    [
+      "Chikhali",
+      "Dasarkhed",
+      "Dharangaon",
+      "Harsoda",
+      "Mhaiswadi",
+      "Narvel",
+      "Tadulwadi",
+      "Vivara",
+      "Zodga"
+    ]
+  ],
+  "443201": [
+    "Buldhana",
+    "Maharashtra",
+    [
+      "Ambashi",
+      "Ancharwadi",
+      "Andhera",
+      "Antri Khedekar",
+      "Bharosa",
+      "Borgaon Kakde",
+      "Chikhli",
+      "Cotton Market Chikhli",
+      "Dahigaon",
+      "Deulgaon Dhangar",
+      "Eklara",
+      "Gangalgaon",
+      "Godri",
+      "Hatni",
+      "Isrul",
+      "Kawhala",
+      "Khandala Makardhwaj",
+      "Kolara",
+      "Mendgaon",
+      "Mera BK",
+      "Mera Khurd",
+      "Palaskhed Daulat",
+      "Peth",
+      "Sakegaon",
+      "Satgaon Bhusari",
+      "Savkhed Nagare",
+      "Sawana",
+      "Sawargaon Dukare",
+      "Shelgaon Atol"
+    ]
+  ],
+  "443202": [
+    "Buldhana",
+    "Maharashtra",
+    [
+      "Bhumrala",
+      "Bibi",
+      "Daregaon",
+      "Gunj",
+      "Kingaon Jattu",
+      "Malkapur Pangra",
+      "Sakhar Kherda",
+      "Sawadad",
+      "Shendurjan",
+      "Sindi",
+      "Wadgaon Mali",
+      "Waghala",
+      "Zotinga"
+    ]
+  ],
+  "443203": [
+    "Buldhana",
+    "Maharashtra",
+    [
+      "Adgaon Raja",
+      "Dawargaon",
+      "Hiwarkhed",
+      "Kingaon Raja",
+      "Saokhed Tejan",
+      "Shioni Taka",
+      "Sindkhed Raja",
+      "Umrad"
+    ]
+  ],
+  "443204": [
+    "Buldhana",
+    "Maharashtra",
+    [
+      "Borakhedi Bawra",
+      "Deulgaon Raja",
+      "Khallad Gavhan",
+      "Saokhed Bhoi",
+      "Singaon Jahagir",
+      "Tuljapur",
+      "Umbarkhed"
+    ]
+  ],
+  "443206": [
+    "Buldhana",
+    "Maharashtra",
+    [
+      "Aland",
+      "Deulgaon Mahi",
+      "Digras BK",
+      "Mehuna",
+      "Pimpalgaon BK",
+      "Saramba",
+      "Sawangi Tekale"
+    ]
+  ],
+  "443301": [
+    "Buldhana",
+    "Maharashtra",
+    [
+      "Anjani",
+      "Anjani Khurd",
+      "Antri Deshmukh",
+      "Bhosa",
+      "Bramhapuri",
+      "Chaigaon",
+      "Chincholi Bore",
+      "Deulgaon Kol",
+      "Deulgaon Mali",
+      "Ghatbori",
+      "Hiwara BK",
+      "Kalyana",
+      "Khalegaon",
+      "Lawhala",
+      "Loni Gaoli",
+      "Mehkar",
+      "Mola",
+      "Naigaon Duttapur",
+      "Pimpalgaon Unda",
+      "Pimpri Khandare",
+      "Pimpri Mali",
+      "Rajegaon",
+      "Shendla",
+      "Shioni Pisa",
+      "Somthana",
+      "Sonati",
+      "Ukali"
+    ]
+  ],
+  "443302": [
+    "Buldhana",
+    "Maharashtra",
+    [
+      "Gandhari",
+      "Hirdao",
+      "Jambhul",
+      "Lonar",
+      "Nandra",
+      "Pangra Dole",
+      "Raigaon",
+      "Shara",
+      "Sultanpur",
+      "Tambola",
+      "Titvi",
+      "Veni",
+      "Wadgaon Tejan",
+      "Wadhao"
+    ]
+  ],
+  "443303": [
+    "Buldhana",
+    "Maharashtra",
+    [
+      "Aregaon",
+      "Belgaon",
+      "Dongaon",
+      "Gohogaon",
+      "Pangarkhed",
+      "Shelgaon Deshmukh",
+      "Vishvi"
+    ]
+  ],
+  "443304": [
+    "Buldhana",
+    "Maharashtra",
+    [
+      "Deulgaon Sakharsha",
+      "Hiwara Khurd",
+      "Janephal",
+      "Kalambeshwar",
+      "Sarshiv",
+      "Uti",
+      "Warwand"
+    ]
+  ],
+  "443308": [
+    "Buldhana",
+    "Maharashtra",
+    [
+      "Changephal",
+      "Dusarbid",
+      "Jambhora",
+      "Raheri BK",
+      "Sonoshi",
+      "Tadshioni",
+      "Wardadi BK"
+    ]
+  ],
+  "443401": [
+    "Buldhana",
+    "Maharashtra",
+    ["Chandur Biswa", "Dhanora Vitali", "Dighi", "Jigaon", "Mamulwadi", "Mominabad"]
+  ],
+  "443402": [
+    "Buldhana",
+    "Maharashtra",
+    [
+      "Asalgaon",
+      "Bhendwad",
+      "Chawara",
+      "Jalgaon",
+      "Jamod",
+      "Kherda",
+      "Madakhed",
+      "Niwana",
+      "Rudhana",
+      "Sawargaon",
+      "Sungaon",
+      "Wadshingi"
+    ]
+  ],
+  "443403": [
+    "Buldhana",
+    "Maharashtra",
+    [
+      "Adol BK",
+      "Dadulgaon",
+      "Dhanora Mahasidha",
+      "Gadegaon Khurd",
+      "Khandvi",
+      "Palsi Supo",
+      "Pimpalgaon Kale"
+    ]
+  ],
+  "443404": [
+    "Buldhana",
+    "Maharashtra",
+    [
+      "Alampur",
+      "Bhajisath Nandura",
+      "Bhota",
+      "Dahigaon M",
+      "Khumgaon",
+      "Malegaon",
+      "Naigaon",
+      "Nandura",
+      "Nandura Town",
+      "Narkhed",
+      "Nimgaon",
+      "Shelgaon Mukund",
+      "Wadi",
+      "Wasadi BK",
+      "Yerli"
+    ]
+  ],
+  "444001": ["Akola", "Maharashtra", ["Akola", "Ramdaspeth Akola", "Ranpisenagar Akola"]],
+  "444002": [
+    "Akola",
+    "Maharashtra",
+    ["Akola City", "Bhaurad", "Gajanan Nagar", "Rpts Akola"]
+  ],
+  "444003": [
+    "Akola",
+    "Maharashtra",
+    [
+      "Apoti",
+      "Dapura",
+      "Donwada",
+      "Ghusar",
+      "Mhaisang",
+      "Mhatodi",
+      "Shivaji Park Akola",
+      "Wadad"
+    ]
+  ],
+  "444004": [
+    "Akola",
+    "Maharashtra",
+    ["Chandur", "Gandhinagar Akola", "Kaulkhed", "Malkapur"]
+  ],
+  "444005": ["Akola", "Maharashtra", ["Gudadhi", "Jatharpeth Akola", "Umari"]],
+  "444006": [
+    "Akola",
+    "Maharashtra",
+    [
+      "Agar",
+      "Chikhalgaon",
+      "Gandhigram",
+      "Goregaon KD",
+      "Kapshi",
+      "Khambora",
+      "Lonagra",
+      "Mazod",
+      "Mhaispur",
+      "Nimbhora",
+      "Nimbi Malokar",
+      "Patkhed",
+      "Rajanda",
+      "Sangvi Kd",
+      "Sindkhed",
+      "Sukoda",
+      "Tajnapeth Akola",
+      "Ugawa",
+      "Wairat Rajapur"
+    ]
+  ],
+  "444007": ["Akola", "Maharashtra", ["Wholesale Kirana Market Sub Post Office, Akola"]],
+  "444101": [
+    "Akola",
+    "Maharashtra",
+    [
+      "Akoli Jahangir",
+      "Akolkhed",
+      "Akot",
+      "Akot Kut",
+      "Assegaon Bazar",
+      "Bordi",
+      "Chandikapur",
+      "Chohatta",
+      "Danori Panori",
+      "Deori",
+      "Kalwadi",
+      "Kawasa BK",
+      "Khirkund",
+      "Kutasa",
+      "Mohala",
+      "Palsod",
+      "Panaj",
+      "Popatkheda",
+      "Punda",
+      "Ruikhed",
+      "Sawara",
+      "Umara",
+      "Wadali Deshmukh",
+      "Warud Jaulka"
+    ]
+  ],
+  "444102": [
+    "Akola",
+    "Maharashtra",
+    [
+      "Anvi",
+      "Borgaon Manju",
+      "Dahigaon Gawande",
+      "Deoli",
+      "Dhotardi",
+      "Goregaon",
+      "Jambha",
+      "Kanshioni",
+      "Kaulkhed",
+      "Kolambi",
+      "Kurankhed",
+      "Morgaon Kakad",
+      "Nipana",
+      "Pailpada",
+      "Palso Badhe",
+      "Sanglood"
+    ]
+  ],
+  "444103": [
+    "Akola",
+    "Maharashtra",
+    [
+      "Chittalwadi",
+      "Hingani KD",
+      "Hiwarkhed Ruprao",
+      "Khandala",
+      "Saundala",
+      "Talegaon Bazar",
+      "Wari"
+    ]
+  ],
+  "444104": [
+    "Akola",
+    "Maharashtra",
+    ["Babhulgaon Jahangir", "Dongargaon", "Krishinagar Akola", "Midc Shivar", "Shioni"]
+  ],
+  "444105": [
+    "Washim",
+    "Maharashtra",
+    [
+      "Gurumandir Karanja",
+      "Jamb",
+      "Karanja",
+      "Kherda",
+      "Loni Arab",
+      "Manabha",
+      "Poha",
+      "Shaha",
+      "Sukali",
+      "Umbarda Bazar",
+      "Wai Pargane Mangrulpir",
+      "Yawardi",
+      "Yeota",
+      "Zodga"
+    ]
+  ],
+  "444106": [
+    "Akola",
+    "Maharashtra",
+    [
+      "Bapori",
+      "Borta",
+      "Bramhi",
+      "Hivara Mana",
+      "Jamathi",
+      "Kurum",
+      "Madhapuri",
+      "Mana",
+      "Pohi",
+      "Rajnapur Khinkhini",
+      "Ramtek",
+      "Shelubazar Mana"
+    ]
+  ],
+  "444107": [
+    "Akola",
+    "Maharashtra",
+    [
+      "Anbhora",
+      "Bhatori",
+      "Durgwada",
+      "Ghota",
+      "Ghungshi",
+      "Hatgaon",
+      "Hirpur",
+      "Kajaleshwar",
+      "Kanadi",
+      "Kanzara",
+      "Kherda Vilegaon",
+      "Kinkhed",
+      "Lakhpuri",
+      "Mahagaon",
+      "Mangrul Kambe",
+      "Murtizapur",
+      "Murtizapur City",
+      "Nimbha",
+      "Sirso",
+      "Sonori",
+      "Wai Pargane Mana"
+    ]
+  ],
+  "444108": [
+    "Akola",
+    "Maharashtra",
+    [
+      "Adsul",
+      "Belkhed",
+      "Bhamberi",
+      "Dahigaon",
+      "Danapur",
+      "Ghodegaon",
+      "Hanwadi",
+      "Kheldeshpande",
+      "Malegaon Bazar",
+      "Manabda",
+      "Ner",
+      "Panchgavhan",
+      "Raundala",
+      "Telhara",
+      "Ukali Bazar",
+      "Wadi Adampur",
+      "Warud"
+    ]
+  ],
+  "444109": [
+    "Akola",
+    "Maharashtra",
+    [
+      "Gaigaon",
+      "Hatrun",
+      "Kalambi Mahagaon",
+      "Kasura",
+      "Khandala",
+      "Manarkhed",
+      "Manjari",
+      "Morgaon Bhakre",
+      "Morzadi",
+      "Nimkarda",
+      "Paras",
+      "Vidyutnagar Paras"
+    ]
+  ],
+  "444110": [
+    "Washim",
+    "Maharashtra",
+    [
+      "Bembla",
+      "Bhamb",
+      "Dhanaj BK",
+      "Dhanaj KD",
+      "Hinganwadi",
+      "Kamargaon",
+      "Ladegaon",
+      "Pimpri Modak",
+      "Vilegaon"
+    ]
+  ],
+  "444111": [
+    "Akola",
+    "Maharashtra",
+    ["Dahihanda", "Jaulkhed", "Keliveli", "Kinkhed", "Rail"]
+  ],
+  "444117": ["Akola", "Maharashtra", ["Balegaon", "Mundgaon", "Pathardi"]],
+  "444126": [
+    "Akola",
+    "Maharashtra",
+    ["Adgaon Bk", "Adgaon KD", "Jalgaon Nahate", "Pimpri Kd", "Sirsoli"]
+  ],
+  "444201": [
+    "Buldhana",
+    "Maharashtra",
+    ["Jastgaon", "Kavthal", "Kodri", "Paturda", "Wankhed", "Warwat Khanderao"]
+  ],
+  "444202": [
+    "Buldhana",
+    "Maharashtra",
+    ["Bodkha", "Kankanwada", "Palsi Zanshi", "Sangrampur", "Warwat Bakal"]
+  ],
+  "444203": [
+    "Buldhana",
+    "Maharashtra",
+    [
+      "Adsul",
+      "Alsana",
+      "Bhongaon",
+      "Chincholi Karfarma",
+      "Janori Nipana",
+      "Jawala BK",
+      "Kherda",
+      "Manasgaon",
+      "Nagzari",
+      "Rokdiya Nagar",
+      "Sagoda",
+      "Shegaon",
+      "Takli Viro",
+      "Zadegaon"
+    ]
+  ],
+  "444204": [
+    "Buldhana",
+    "Maharashtra",
+    ["Banoda Eklara", "Bawanbir", "Katel Kolad", "Ladnapur", "Sonala", "Tunki"]
+  ],
+  "444301": [
+    "Buldhana",
+    "Maharashtra",
+    [
+      "Amdapur",
+      "Chinchpur",
+      "Dhotra Naik",
+      "Isoli",
+      "Karwand",
+      "Mangrul Navghare",
+      "Takarkhed Helga",
+      "Toranwada"
+    ]
+  ],
+  "444302": [
+    "Akola",
+    "Maharashtra",
+    ["Balapur", "Batwadi", "Kanheri Gawali", "Khirpuri", "Ridhora", "Vyala"]
+  ],
+  "444303": [
+    "Buldhana",
+    "Maharashtra",
+    [
+      "Ambetakali",
+      "Antraj",
+      "Atali",
+      "Awar",
+      "Bori Adgaon",
+      "Botha Kaji",
+      "Chitoda",
+      "Ganeshpur",
+      "Garadgaon",
+      "Gavhan",
+      "Gharod",
+      "Gondhanapur",
+      "Hingana Karegaon",
+      "Hiwarkhed",
+      "Jalamb",
+      "Kalegaon",
+      "Kelanagar",
+      "Khamgaon",
+      "Kinhi Mahadeo",
+      "Lakhanwada",
+      "Lasura KD",
+      "Lokhanda",
+      "Loni",
+      "Palshi",
+      "Pimpri Gawali",
+      "Rohna",
+      "Shahapur",
+      "Shirla Nemane",
+      "Tembhurna",
+      "Undri",
+      "Vihigaon",
+      "Warna",
+      "Wazar"
+    ]
+  ],
+  "444304": ["Buldhana", "Maharashtra", ["Matergaon"]],
+  "444306": [
+    "Buldhana",
+    "Maharashtra",
+    [
+      "Bhalegaon Bazar",
+      "Borjawala",
+      "Dhorapgaon",
+      "Ghanegaon",
+      "Jalka Bhadang",
+      "Nipana",
+      "Parkhed",
+      "Pimpalgaon Raja",
+      "Poraj"
+    ]
+  ],
+  "444311": [
+    "Akola",
+    "Maharashtra",
+    [
+      "Andura",
+      "Bahadura",
+      "Dongargaon",
+      "Hata",
+      "Karanja Ramzanpur",
+      "Kazikhed",
+      "Lohara",
+      "Mokha",
+      "Morgaon Sadijan",
+      "Nimba",
+      "Ural"
+    ]
+  ],
+  "444312": [
+    "Buldhana",
+    "Maharashtra",
+    [
+      "Amboda",
+      "G.S.College Khamgaon",
+      "Lanjud",
+      "M.I.D.C. (Khamgaon)",
+      "Pahurjira",
+      "Pimpri Deshmukh",
+      "Sutala BK"
+    ]
+  ],
+  "444401": [
+    "Akola",
+    "Maharashtra",
+    [
+      "Alanda",
+      "Barshitakli",
+      "Dagadparwa",
+      "Dhabha",
+      "Kajaleshwar",
+      "Kanheri Sarap",
+      "Lohgad",
+      "Punoti KD",
+      "Rajankhed",
+      "Vizora",
+      "Yeranda"
+    ]
+  ],
+  "444402": [
+    "Washim",
+    "Maharashtra",
+    ["Kanzara", "Pardi Tad", "Pedgaon", "Shelubazar", "Sonala", "Tarhala", "Wanoja"]
+  ],
+  "444403": [
+    "Washim",
+    "Maharashtra",
+    [
+      "Dabha",
+      "Dhamni",
+      "Fulumari",
+      "Gaiwal",
+      "Girda",
+      "Giroli",
+      "Hivra BK",
+      "Kasola",
+      "Kawathal",
+      "Kothari",
+      "Mangrulpir",
+      "Mendra",
+      "Mohari",
+      "Palodi",
+      "Parwa",
+      "Poghat",
+      "Poti",
+      "Sakhardoh",
+      "Shegi",
+      "Shendurjana"
+    ]
+  ],
+  "444404": [
+    "Washim",
+    "Maharashtra",
+    [
+      "Asola KD",
+      "Bhuli",
+      "Dapura Kd",
+      "Dhanora Ghatge",
+      "Dhawanda",
+      "Gawha",
+      "Inzori",
+      "Karkheda",
+      "Karli",
+      "Kondoli",
+      "Kupta",
+      "Manora",
+      "Pohara Devi",
+      "Rui",
+      "Shendona",
+      "Talap BK",
+      "Tornala",
+      "Umari",
+      "Vitholi",
+      "Waigaul",
+      "Waroli"
+    ]
+  ],
+  "444405": [
+    "Akola",
+    "Maharashtra",
+    ["Hatola", "Jamakeshwar", "Januna", "Kothali", "Mahan", "Titwa", "Wagha", "Zodga"]
+  ],
+  "444407": [
+    "Akola",
+    "Maharashtra",
+    ["Bhendi Mahal", "Borgaon KD", "Kherda Bhagai", "Patur Nandapur", "Pinjar", "Rahit"]
+  ],
+  "444409": [
+    "Washim",
+    "Maharashtra",
+    ["Arak", "Asegaon", "Dhanora KD", "Falegaon", "Kalamba Bodkhe", "Wara Jahangir"]
+  ],
+  "444501": [
+    "Akola",
+    "Maharashtra",
+    [
+      "Babhulgaon",
+      "Bhandaraj",
+      "Channi",
+      "Chatari",
+      "Deulgaon Bramhan",
+      "Digras",
+      "Gawandgaon",
+      "Khanapur",
+      "Khetri",
+      "Malrajura",
+      "Malsoor",
+      "Patur",
+      "Pimpalkhuta",
+      "Sasti",
+      "Sawargaon",
+      "Shirla Andhare",
+      "Tandali",
+      "Tulanga BK",
+      "Umara Balapur"
+    ]
+  ],
+  "444502": ["Akola", "Maharashtra", ["Degaon", "Vadegaon"]],
+  "444503": [
+    "Washim",
+    "Maharashtra",
+    [
+      "Amana",
+      "Amkheda",
+      "Anchal",
+      "Dawha",
+      "Dongarkinhi",
+      "Jaulka",
+      "Kalambeshwar",
+      "Kenwad",
+      "Kinhiraja",
+      "Malegaon",
+      "Marsul",
+      "Medshi",
+      "Mungla",
+      "Nagardas",
+      "Nandhana",
+      "Pangra Bandi",
+      "Pangri Kute",
+      "Pangri Navghare",
+      "Rajura",
+      "Yekamba"
+    ]
+  ],
+  "444504": [
+    "Washim",
+    "Maharashtra",
+    [
+      "Chinchambapen",
+      "Gobhani",
+      "Gowardhan",
+      "Karanji",
+      "Keshavnagar",
+      "Khandala Shinde",
+      "Lehani",
+      "Linga Kotwal",
+      "Mangul Zanak",
+      "Masalapen",
+      "Navali",
+      "Netansa",
+      "Shirpur",
+      "Tiwali",
+      "Wasari",
+      "Yeota"
+    ]
+  ],
+  "444505": [
+    "Washim",
+    "Maharashtra",
+    [
+      "Bhatumara",
+      "Chivara",
+      "Dhumka",
+      "Kajalamba",
+      "Kalamba Mahali",
+      "Karli",
+      "Kata",
+      "Kekatumara",
+      "Kokalgaon",
+      "Mohoja",
+      "Pardi Takmore",
+      "Soyata",
+      "Tamsi",
+      "Tandali BK",
+      "Tandali Shewai",
+      "Tondgaon",
+      "Tornala",
+      "Ukali Jahangir",
+      "Washim",
+      "Washim City",
+      "Yeranda"
+    ]
+  ],
+  "444506": [
+    "Washim",
+    "Maharashtra",
+    [
+      "Bhar",
+      "Chinchamba Bhar",
+      "Kawatha Naik",
+      "Loni Sm",
+      "Mahagaon",
+      "Mandwa",
+      "Mop",
+      "Mothegaon",
+      "Risod",
+      "Sawad",
+      "Shelukhadse",
+      "Wakad"
+    ]
+  ],
+  "444507": [
+    "Washim",
+    "Maharashtra",
+    [
+      "Ansing",
+      "Jaipur",
+      "Pardi Asra",
+      "Pimpalgaon",
+      "Sawali",
+      "Umara Shamshuddin",
+      "Warala"
+    ]
+  ],
+  "444510": [
+    "Washim",
+    "Maharashtra",
+    [
+      "Adoli",
+      "Assegaon Pen",
+      "Chikhali",
+      "Haral",
+      "Hivara Rohila",
+      "Koyali BK",
+      "Nagthana",
+      "Rithad",
+      "Sawargaon Jire",
+      "Vyad",
+      "Yeoti"
+    ]
+  ],
+  "444511": ["Akola", "Maharashtra", ["Alegaon", "Charangaon", "Chondhi", "Viwara"]],
+  "444601": [
+    "Amravati",
+    "Maharashtra",
+    [
+      "Ambapeth",
+      "Amravati",
+      "Bhaji Bazar Amravati",
+      "Old Cotton Market",
+      "Rajapeth",
+      "Walgaon Road Tso Amravati"
+    ]
+  ],
+  "444602": [
+    "Amravati",
+    "Maharashtra",
+    [
+      "Amravati Camp",
+      "Asra",
+      "Bhatkuli",
+      "Borgaon Dharmale",
+      "Dadhi",
+      "Ganoja Devi",
+      "Ganori",
+      "Kathora",
+      "Kawatha",
+      "Khalkoni",
+      "Nimbha",
+      "Parlam",
+      "Rahatgaon",
+      "Sant GadgebabaAmravatiUniversity",
+      "Sayat",
+      "SRPF Camp",
+      "Tapovan",
+      "Uttamsara",
+      "Wadgaon Mahore"
+    ]
+  ],
+  "444603": ["Amravati", "Maharashtra", ["Shivaji Nagar"]],
+  "444604": ["Amravati", "Maharashtra", ["V.M.V. (Amravati)"]],
+  "444605": ["Amravati", "Maharashtra", ["H. V. Nagar"]],
+  "444606": [
+    "Amravati",
+    "Maharashtra",
+    ["Congress Nagar", "Gokul Market", "Rukhmini Nagar"]
+  ],
+  "444607": ["Amravati", "Maharashtra", ["Sai Nagar"]],
+  "444701": [
+    "Amravati",
+    "Maharashtra",
+    [
+      "Anjangaon Bari E",
+      "Badnera",
+      "Badnera Town",
+      "Dabha",
+      "Dahigaon",
+      "Dhanora Fasi",
+      "Dhanora Gurav",
+      "Hiwara BK",
+      "Januna",
+      "Kajna",
+      "Lohgaon",
+      "Loni Takli",
+      "Mahuli Chor",
+      "Manjri Masla",
+      "Nandsawangi",
+      "Palasmandal",
+      "Papal",
+      "Pardi",
+      "Phulamala",
+      "Pimpalgaon Nipa",
+      "Pimpri Nipani",
+      "Sarsi Kothoda",
+      "Satargaon",
+      "Takli BK",
+      "Wadhona Ramnath",
+      "Wadura",
+      "Yerandgaon"
+    ]
+  ],
+  "444702": [
+    "Amravati",
+    "Maharashtra",
+    [
+      "Bairagad",
+      "Bijudhawadi",
+      "Bobdo",
+      "Chakarda",
+      "Chatwabod",
+      "Dahenda",
+      "Dharan Mahu",
+      "Dharni",
+      "Diya",
+      "Duni",
+      "Hirabambai",
+      "Kadhav",
+      "Khairi Tembhru",
+      "Kusumkot",
+      "Kutanga",
+      "Mandwa",
+      "Ranitamboli",
+      "Ratnapur",
+      "Shirpur",
+      "Tembli",
+      "Titamba"
+    ]
+  ],
+  "444704": [
+    "Amravati",
+    "Maharashtra",
+    [
+      "Belora",
+      "Borala",
+      "Chandur Bazar",
+      "Dahigaonpura",
+      "Deurwada",
+      "Hirur",
+      "Jasapur",
+      "Kharala",
+      "Madhan",
+      "Rithpur",
+      "Sonori"
+    ]
+  ],
+  "444705": [
+    "Amravati",
+    "Maharashtra",
+    [
+      "Adgaon Navapur",
+      "Anjangaon",
+      "Bhandaraj",
+      "Chausala",
+      "Chincholi BK",
+      "Dahigaon Reche",
+      "Dhanegaon",
+      "Gawandgaon",
+      "Gawhan",
+      "Hantoda",
+      "Jawala BK",
+      "Kalgawhan",
+      "Kapustalni",
+      "Karla",
+      "Khondgaon",
+      "Lakhad",
+      "Murha",
+      "Nimkhed Bazar",
+      "Sategaon",
+      "Songaon",
+      "Surji (Anjangaon)",
+      "Takarkheda More",
+      "Turkhed",
+      "Vihigaon"
+    ]
+  ],
+  "444706": [
+    "Amravati",
+    "Maharashtra",
+    [
+      "Adula Bazar",
+      "Antargaon",
+      "Bhamod",
+      "Jainpur",
+      "Lotwada",
+      "Nandrun",
+      "Pimplod",
+      "Sanglood",
+      "Sasan Ramapur",
+      "Umri Mamadabad",
+      "Wadnergangai",
+      "Warud Bk",
+      "Yeoda"
+    ]
+  ],
+  "444707": [
+    "Amravati",
+    "Maharashtra",
+    [
+      "Dapori Khurd",
+      "Dhamangaon",
+      "Katpur",
+      "Kawathal",
+      "Lahegaon",
+      "Nerpingalai",
+      "Porgawhan",
+      "Rajurwadi",
+      "Sawarkheda",
+      "Shirkhed",
+      "Talegaon",
+      "Vishnora"
+    ]
+  ],
+  "444708": [
+    "Amravati",
+    "Maharashtra",
+    [
+      "Bori",
+      "Chikhali Vaidya",
+      "Dhamak",
+      "Dhanora Mogal",
+      "Mangrul Chawala",
+      "Mokhad",
+      "Nandgaon Khandeshwar",
+      "Phubgaon",
+      "Rajura",
+      "Salod",
+      "Sawaner",
+      "Shivani Rasulpu",
+      "Sultanpur Nandu",
+      "Veni Ganeshpur",
+      "Yenas",
+      "Yeoti",
+      "Yerad"
+    ]
+  ],
+  "444709": [
+    "Amravati",
+    "Maharashtra",
+    [
+      "Anjansingi",
+      "Anjanwati",
+      "Ashoknagar",
+      "Bhatkkuli Ranak",
+      "Borda",
+      "Borgaon Dhande",
+      "Chinchpur",
+      "Dabhada",
+      "Deogaon",
+      "Dhamangaon R.S.",
+      "Dhamangaon Town",
+      "Hirpur",
+      "Jalka Patache",
+      "Juna Dhamangaon",
+      "Kamnapur Ghusal",
+      "Kasarkheda",
+      "Kawali",
+      "Kurha",
+      "Marda",
+      "Murtizapur Taro",
+      "Pimpalkhuta",
+      "Tiwara",
+      "Virul Ronghe",
+      "Wadgaon Rajdi",
+      "Wadhona"
+    ]
+  ],
+  "444710": [
+    "Amravati",
+    "Maharashtra",
+    ["Dhanodi", "Shendurjana Dha", "Talegaon Dashasar"]
+  ],
+  "444711": [
+    "Amravati",
+    "Maharashtra",
+    ["Dighi", "Mangrul Dastgir", "Nimbhora Bodkhe", "Nimboli", "Zada"]
+  ],
+  "444717": [
+    "Amravati",
+    "Maharashtra",
+    [
+      "Ambapati",
+      "Badnapur",
+      "Dhamangaon Gadhi",
+      "Gaurkheda Bazar",
+      "Jamli",
+      "Kulangana",
+      "Tambursonda",
+      "Telkhar",
+      "Wastapur"
+    ]
+  ],
+  "444719": [
+    "Amravati",
+    "Maharashtra",
+    [
+      "Bhokarbardi",
+      "Dabida",
+      "Dabka",
+      "Dhulghat Rly",
+      "Dhulghat Road",
+      "Kalamkhar",
+      "Khaparkheda",
+      "Sadrabadi",
+      "Sawalikheda",
+      "Susarda",
+      "Zilpi"
+    ]
+  ],
+  "444720": [
+    "Amravati",
+    "Maharashtra",
+    ["Brahmanwada Thadi", "Ghatladki", "Surali", "Vishroli", "Wani"]
+  ],
+  "444723": [
+    "Amravati",
+    "Maharashtra",
+    [
+      "Belaj",
+      "Kawitha",
+      "Kural",
+      "Pimpri",
+      "Sirajgaon Band",
+      "Talegaon Mohana",
+      "Tondgaon",
+      "Tuljapur Gadhi"
+    ]
+  ],
+  "444801": [
+    "Amravati",
+    "Maharashtra",
+    [
+      "Alangaon",
+      "Ashti",
+      "Chincholi Kale",
+      "Dhamori Kasba",
+      "Haturna",
+      "Jalka Hirapur",
+      "Jawala Shahpur",
+      "Khartalegaon",
+      "Mhaispur",
+      "Nandura Bl",
+      "Naya Akola",
+      "Pusda",
+      "Rewasa",
+      "Saur",
+      "Shirala",
+      "Takarkheda",
+      "Takli",
+      "Talwel",
+      "Virshi",
+      "Waigaon",
+      "Walgaon"
+    ]
+  ],
+  "444802": [
+    "Amravati",
+    "Maharashtra",
+    [
+      "Amla",
+      "Chendakapur",
+      "Darapur",
+      "Hartala",
+      "Kholapur",
+      "Markanda",
+      "Nanded BK",
+      "Shingnapur",
+      "Wathoda Sh."
+    ]
+  ],
+  "444803": [
+    "Amravati",
+    "Maharashtra",
+    [
+      "Arala",
+      "Babhli",
+      "Chincholi Shinghane",
+      "Daryapur",
+      "Daryapur Town",
+      "Dhamodi",
+      "Gaiwadi",
+      "Itki Antargaon",
+      "Kalashi",
+      "Kamalpur Taroda",
+      "Kanholi",
+      "Khallar",
+      "Khaspur",
+      "Kokarda",
+      "Kumbhargaon",
+      "Lehegaon",
+      "Mahuli Dhande",
+      "Nalwada",
+      "Nimbhari",
+      "Ramtirth",
+      "Samda",
+      "Shivar",
+      "Takli",
+      "Thilori",
+      "Tonglabad"
+    ]
+  ],
+  "444804": [
+    "Amravati",
+    "Maharashtra",
+    ["Khairi", "Nirul", "Purna Nagar", "Rama", "Sawalapur", "Waki Raipur", "Yesurna"]
+  ],
+  "444805": ["Amravati", "Maharashtra", ["Chhota Bazar", "Paratwada"]],
+  "444806": [
+    "Amravati",
+    "Maharashtra",
+    [
+      "Achalpur City",
+      "Asadpur",
+      "Asegaon Purna",
+      "Bhilona",
+      "Bhugaon",
+      "Bopapur",
+      "Bordi",
+      "Borgaon Peth",
+      "Chamak BK",
+      "Cotton Market",
+      "Dhoter Kheda",
+      "Gaurkheda",
+      "Haram",
+      "Kandli",
+      "Kohana",
+      "Malhara",
+      "Narayanpur",
+      "Rajna Purna",
+      "Rasegaon",
+      "Salepur",
+      "Talni Purna",
+      "Wasni Bzk",
+      "Yeota"
+    ]
+  ],
+  "444807": [
+    "Amravati",
+    "Maharashtra",
+    [
+      "Chikhaldara",
+      "Churni",
+      "Doma",
+      "Gangarkheda",
+      "Katkumbha",
+      "Maheriam",
+      "Motha",
+      "Salona",
+      "Shahapur"
+    ]
+  ],
+  "444808": [
+    "Amravati",
+    "Maharashtra",
+    [
+      "Borala",
+      "Kakda",
+      "Kolha",
+      "Kushta BK",
+      "Morgad",
+      "Pandhari",
+      "Parasapur",
+      "Pathrot",
+      "Sindi BK",
+      "Sonapur",
+      "Tawlar",
+      "Wadgaon Fatepur"
+    ]
+  ],
+  "444809": [
+    "Amravati",
+    "Maharashtra",
+    ["Karajgaon", "Karanja Bahiram", "Kharpi", "Kurha", "Sarfapur"]
+  ],
+  "444810": ["Amravati", "Maharashtra", ["Sirasgaon Kasba"]],
+  "444813": [
+    "Amravati",
+    "Maharashtra",
+    [
+      "Chikhali",
+      "Chourakund",
+      "Harisal",
+      "Hatru",
+      "Nanduri",
+      "Rahu",
+      "Raipur",
+      "Semadoh",
+      "Tarubanda"
+    ]
+  ],
+  "444901": [
+    "Amravati",
+    "Maharashtra",
+    [
+      "Brahmanwada Gov",
+      "Dawargaon",
+      "Kapustalni",
+      "Kekatpur",
+      "Mahuli Jahagir",
+      "Mangrul Bhilasp",
+      "Nandgaon Peth",
+      "Salora Khurd",
+      "Sirasgaon"
+    ]
+  ],
+  "444902": [
+    "Amravati",
+    "Maharashtra",
+    [
+      "Gurukunj Ashram",
+      "Mozri",
+      "Pimpal Vihir",
+      "Shendola BK",
+      "Shendola KH",
+      "Shivangaon",
+      "Sirasgaon Mozar",
+      "Talegaon Thakur"
+    ]
+  ],
+  "444903": [
+    "Amravati",
+    "Maharashtra",
+    [
+      "Kawadgavan",
+      "Nimbhora Delwad",
+      "Satargaon",
+      "Shendurjana Bazar",
+      "Tiosa",
+      "Verha",
+      "Werkhed"
+    ]
+  ],
+  "444904": [
+    "Amravati",
+    "Maharashtra",
+    [
+      "Amla Vishweshwar",
+      "Baggi",
+      "Bhankheda Khurd",
+      "Chandur Railway",
+      "Dhanora Mhali",
+      "Ghuikhed",
+      "Jalka Jagtap",
+      "Jawala",
+      "Kalamgaon",
+      "Karla",
+      "Kawatha Kadu",
+      "Malkhed",
+      "Manjarkhed",
+      "Mardi",
+      "Nimgavan",
+      "Palaskhed",
+      "Pimpalkhuta",
+      "Pohara",
+      "Satephal",
+      "Sawangi Magrapur",
+      "Sirasgaon Korde",
+      "Sonora BK"
+    ]
+  ],
+  "444905": [
+    "Amravati",
+    "Maharashtra",
+    [
+      "Ambada E",
+      "Ashtoli",
+      "Chikhal Savangi",
+      "Chincholi Gawal",
+      "Dapori",
+      "Hiwarkhed",
+      "Khanapur",
+      "Khed",
+      "Khopada",
+      "Kolvihir",
+      "Ladki",
+      "Morshi",
+      "Nimbhi",
+      "Pala",
+      "Pardi",
+      "Pimpalkhuta",
+      "Shingori",
+      "Taroda",
+      "Udkhed",
+      "Wathoda Naya",
+      "Yawali Dongar",
+      "Yerla"
+    ]
+  ],
+  "444906": [
+    "Amravati",
+    "Maharashtra",
+    [
+      "Amner",
+      "Bhemdi",
+      "Chandas Wathoda",
+      "Dhanodi",
+      "Ekdara",
+      "Gadegaon",
+      "Gavandkund",
+      "Haturna",
+      "Jamthi Ganeshpur",
+      "Kati",
+      "Linga",
+      "Pauni",
+      "Pusla",
+      "Rajura Bazar",
+      "Roshankheda",
+      "Sawangi",
+      "Surli",
+      "Tembhurkheda",
+      "Udapur",
+      "Warud"
+    ]
+  ],
+  "444907": ["Amravati", "Maharashtra", ["Satnoor", "Shendurjana Ghat", "Teosa Ghat"]],
+  "444908": [
+    "Amravati",
+    "Maharashtra",
+    [
+      "Aloda",
+      "Bargaon",
+      "Benoda",
+      "Isambari",
+      "Ittamgaon",
+      "Jamgaon",
+      "Jarud",
+      "Karajgaon (Gandhighar)",
+      "Loni",
+      "Mangruli",
+      "Sawanga"
+    ]
+  ],
+  "444915": [
+    "Amravati",
+    "Maharashtra",
+    ["Adgaon", "Dewara", "Dewara Antora", "Katsur", "Vichori", "Yawali"]
+  ],
+  "445001": [
+    "Yavatmal",
+    "Maharashtra",
+    [
+      "Asegaon Devi",
+      "Asola",
+      "Awdhutwadi (Yavatma)L",
+      "Chhoti Gujri (Yavatmal)",
+      "Govt Poly (Yavatmal)",
+      "Kapra Methad",
+      "Karalgaon",
+      "Moha",
+      "Postal Colony (Yavatmal)",
+      "Sawar",
+      "Tilakwadi (Yavatmal)",
+      "Yavatmal",
+      "Yavatmal Town"
+    ]
+  ],
+  "445002": [
+    "Yavatmal",
+    "Maharashtra",
+    [
+      "Bhari",
+      "Bhosa",
+      "Borgaon",
+      "Chinchghat",
+      "Ghodkhindi",
+      "Jamb",
+      "Jodmoha",
+      "Kinhi",
+      "Lasina",
+      "Lohara",
+      "M.I.D.C.",
+      "Madkona",
+      "Madni",
+      "Murzadi",
+      "Nanza",
+      "Sawargad",
+      "Talegaon",
+      "Umarsara",
+      "Wadgaon P.S.",
+      "Wadgaon Road",
+      "Waghapur",
+      "Yawali",
+      "Zillla Parishad (Yavatmal)"
+    ]
+  ],
+  "445101": [
+    "Yavatmal",
+    "Maharashtra",
+    [
+      "Ashti",
+      "Babhulgaon",
+      "Dabha (Pahur)",
+      "Dighi",
+      "Falegaon",
+      "Ganori",
+      "Gharfal",
+      "Kharda",
+      "Kotamba",
+      "Naigaon",
+      "Pachkhed",
+      "Pahur (Dabha)",
+      "Pardi (Sawlapur)",
+      "Pimpalkhuta",
+      "Rani Amravati",
+      "Sarul",
+      "Veni (Kotha)",
+      "Veni Kasba",
+      "Watkhed"
+    ]
+  ],
+  "445102": [
+    "Yavatmal",
+    "Maharashtra",
+    [
+      "Ajanti",
+      "Bangaon",
+      "Brahmanwada",
+      "Chikhali Domga",
+      "Chikhali Kanhoba",
+      "Kharadgaon",
+      "Kolura",
+      "Malked Khurd",
+      "Malkhed BK",
+      "Mangala Devi",
+      "Manikwada",
+      "Mozar",
+      "Ner Parsopant",
+      "Patharot",
+      "Pimpri Kalga",
+      "Sirasgaon Pandhari",
+      "Uttarwadhona",
+      "Watfali"
+    ]
+  ],
+  "445103": [
+    "Yavatmal",
+    "Maharashtra",
+    [
+      "Arni",
+      "Borgaon Vitholi",
+      "Chikhli Izara",
+      "Dabhadi",
+      "Kawatha Bazar",
+      "Lonbehel",
+      "Mahalungi",
+      "Rani Dhanora",
+      "Sakur",
+      "Sheloo",
+      "Sukli"
+    ]
+  ],
+  "445105": [
+    "Yavatmal",
+    "Maharashtra",
+    [
+      "Arjuna",
+      "Belora",
+      "Bhamb Raja",
+      "Hiwari",
+      "Jawala",
+      "Loni",
+      "Mhasola",
+      "Nakapardi",
+      "Rui"
+    ]
+  ],
+  "445106": [
+    "Yavatmal",
+    "Maharashtra",
+    ["Ayata", "Bhansara", "Datodi", "Palsi", "Sawali Sadoba", "Umri Kap"]
+  ],
+  "445109": [
+    "Yavatmal",
+    "Maharashtra",
+    [
+      "Akola Bazar",
+      "Kolambi",
+      "Pahur Naskari",
+      "Pardi Naskari",
+      "Pimpri Buti",
+      "Salod",
+      "Talni"
+    ]
+  ],
+  "445110": [
+    "Yavatmal",
+    "Maharashtra",
+    [
+      "Arambhi",
+      "Daheli",
+      "Deurwadi Lad",
+      "Gondegaon",
+      "Haru",
+      "Khedbid",
+      "Mahagaon Kasba",
+      "Mohatoli"
+    ]
+  ],
+  "445201": [
+    "Yavatmal",
+    "Maharashtra",
+    [
+      "Borgaon (Linga)",
+      "Bori Arab",
+      "Chikani",
+      "Jawalgaon",
+      "Kamathwada",
+      "Ladkhed",
+      "Mozar Izara",
+      "Shelodi",
+      "Tiwasa",
+      "Wadgaon Gadhwe"
+    ]
+  ],
+  "445202": [
+    "Yavatmal",
+    "Maharashtra",
+    [
+      "Bhandegaon",
+      "Bhulai",
+      "Chikhali Ramnath",
+      "Darwha",
+      "Dhamangaon Deo",
+      "Fubgaon Kharbi",
+      "Karajgaon",
+      "Khopadi BK",
+      "Lakh Khind",
+      "Mang Kinhi",
+      "Pimpalkhuta (R)",
+      "Ramgaon Rameshwar",
+      "Shendri (Bk) B..",
+      "Talegaon Deshmukh"
+    ]
+  ],
+  "445203": [
+    "Yavatmal",
+    "Maharashtra",
+    [
+      "Dehni",
+      "Deurwada",
+      "Digras",
+      "Harsul",
+      "Kalgaon",
+      "Kandali",
+      "Lakh Rayachi",
+      "Mal Hivara",
+      "Mokh",
+      "Sakhara Wai",
+      "Singad",
+      "Tiwari",
+      "Tuptakli",
+      "Vasant Nagar",
+      "Vithala"
+    ]
+  ],
+  "445204": [
+    "Yavatmal",
+    "Maharashtra",
+    [
+      "Bansi",
+      "Bhandari",
+      "Bhojla",
+      "Brahmangaon",
+      "Chikhali Camp",
+      "Gahuli",
+      "Hiwara",
+      "Jamb Bazar",
+      "Jamni Dhundi",
+      "Kali Daulat Khan",
+      "Kasola",
+      "Kondri",
+      "Lewa",
+      "Moha",
+      "Mohadi",
+      "Mokhad",
+      "Parwa",
+      "Pedhi",
+      "Pohandul",
+      "Pophali",
+      "Pusad",
+      "Wanwarla"
+    ]
+  ],
+  "445205": [
+    "Yavatmal",
+    "Maharashtra",
+    [
+      "Amboda",
+      "Gunj",
+      "Hudi",
+      "Kanha",
+      "Mahagaon (Yavatmal)",
+      "Morath",
+      "Mudana",
+      "Sawana",
+      "Wadad"
+    ]
+  ],
+  "445206": [
+    "Yavatmal",
+    "Maharashtra",
+    [
+      "Belkhed",
+      "Brahmangaon",
+      "Chatari",
+      "Deosari",
+      "Dhanora Sachaldev",
+      "Kharus BK",
+      "Marlegaon",
+      "Marsul",
+      "Sukli Jehangir",
+      "Umarkhed",
+      "Vidul"
+    ]
+  ],
+  "445207": [
+    "Yavatmal",
+    "Maharashtra",
+    ["Akoli", "Bittergaon", "Darati", "Dhanki", "Jeoli", "Korta", "Krishnapur"]
+  ],
+  "445209": [
+    "Yavatmal",
+    "Maharashtra",
+    ["Issapur", "Lohara Izara", "Sawargaon Bunglow", "Shembal Pimpri"]
+  ],
+  "445210": [
+    "Yavatmal",
+    "Maharashtra",
+    ["Adegaon", "Hatola", "Lohi", "Satefal", "Tarnoli"]
+  ],
+  "445211": ["Yavatmal", "Maharashtra", ["Mulawa", "Palsi", "Taroda"]],
+  "445215": [
+    "Yavatmal",
+    "Maharashtra",
+    [
+      "Adegaon",
+      "Belura",
+      "Bori Khurd",
+      "Dhansal",
+      "Dongargaon",
+      "Fetra",
+      "Gaul, Khurd",
+      "Harshi",
+      "Januna",
+      "Khadakdari",
+      "Khandala",
+      "Lakhi Jehangir",
+      "Mandawa",
+      "Manikdoh",
+      "Mop Jawala",
+      "Pardi Limbi",
+      "Rohda",
+      "Sandawa",
+      "Sawargaon Gore",
+      "Shelu BK",
+      "Soot Girni"
+    ]
+  ],
+  "445216": ["Yavatmal", "Maharashtra", ["P.N.C. Pusad"]],
+  "445230": [
+    "Yavatmal",
+    "Maharashtra",
+    ["Bhavani Jahagir", "Fulsavangi", "Kurli", "Ningnoor", "Tembhi"]
+  ],
+  "445301": [
+    "Yavatmal",
+    "Maharashtra",
+    [
+      "Akpuri",
+      "Anji (Nrusinha)",
+      "Ghatanji",
+      "Ghoti",
+      "Mowada",
+      "Pandhurna Khurd",
+      "Patapangra",
+      "Rajurwadi",
+      "Saikhada BK",
+      "Sakhra Khurd",
+      "Sayat Kharda",
+      "Shiroli",
+      "Shivani",
+      "Yelabara"
+    ]
+  ],
+  "445302": [
+    "Yavatmal",
+    "Maharashtra",
+    [
+      "Akhada Ward (Pandharkawada)",
+      "Akoli",
+      "Both",
+      "Chalbardi",
+      "Dharna",
+      "Karanji",
+      "Kelapur",
+      "Mangurda",
+      "Matharjun",
+      "Pahapal",
+      "Pandharkawda",
+      "Pimpri",
+      "Saikheda",
+      "Shibala",
+      "Sonbardi",
+      "Umari Road",
+      "Wai"
+    ]
+  ],
+  "445303": [
+    "Yavatmal",
+    "Maharashtra",
+    [
+      "Buranda",
+      "Chinchala",
+      "Chinchmandal",
+      "Chinchoni Botoni",
+      "Chopan",
+      "Hiwra Majra",
+      "Jalka Road",
+      "Kumbha",
+      "Mardi",
+      "Maregaon Road",
+      "Mhaisdodka",
+      "Narsala",
+      "Nawargaon",
+      "Pendhari",
+      "Pisgaon",
+      "Sagnapur",
+      "Wegaon"
+    ]
+  ],
+  "445304": [
+    "Yavatmal",
+    "Maharashtra",
+    [
+      "Adegaon",
+      "Belora",
+      "Bhalar",
+      "Borda",
+      "Ghonsa",
+      "Jatra Road (Wani)",
+      "Kayar",
+      "Kona",
+      "Mandar",
+      "Mendholi",
+      "Mohurli",
+      "Mukutban",
+      "Naigaon",
+      "Nandepera",
+      "Nerad Purad",
+      "Palsoni",
+      "Punwat",
+      "Rajur",
+      "Rasa",
+      "Sakharadara",
+      "Shirpur",
+      "Suknegaon",
+      "Ukni",
+      "Wani",
+      "Wanzari",
+      "Zamkola"
+    ]
+  ],
+  "445305": [
+    "Yavatmal",
+    "Maharashtra",
+    ["Arali", "Chanakha", "Dhoki", "Patanbori", "Satpalli", "Sunna"]
+  ],
+  "445306": [
+    "Yavatmal",
+    "Maharashtra",
+    [
+      "Chikhalwardha",
+      "Deodhari",
+      "Jamb",
+      "Kurli",
+      "Parwa",
+      "Tadsawali",
+      "Waghar Takli",
+      "Zatala"
+    ]
+  ],
+  "445307": [
+    "Yavatmal",
+    "Maharashtra",
+    ["Chikparam", "Kurai", "Sakhra Kolgaon", "Sindhola Mines", "Velabai"]
+  ],
+  "445308": [
+    "Yavatmal",
+    "Maharashtra",
+    ["Chahand", "Dahegaon", "Khairi", "Munzala", "Pimpalapur", "Wadki"]
+  ],
+  "445323": [
+    "Yavatmal",
+    "Maharashtra",
+    [
+      "Dabha",
+      "Dongarkharda",
+      "Loni",
+      "Metikheda",
+      "Mohda",
+      "Pahur Izara",
+      "Runza",
+      "Sawarkheda",
+      "Wardh"
+    ]
+  ],
+  "445324": ["Yavatmal", "Maharashtra", ["Dhanora", "Marki", "Patan", "Zari Jamni"]],
+  "445401": [
+    "Yavatmal",
+    "Maharashtra",
+    ["Dhotra", "Kalamb", "Katri", "Pimpalgaon Raja", "Sawargaon", "Sonegaon"]
+  ],
+  "445402": [
+    "Yavatmal",
+    "Maharashtra",
+    [
+      "Apti Rampur",
+      "Chikhali Kelapur",
+      "Dhanora",
+      "Gujari",
+      "Jalka",
+      "Ralegaon",
+      "Sawangi Perka",
+      "Undari",
+      "Wadhona Bazar",
+      "Warud JR",
+      "Zadgaon"
+    ]
+  ]
+}

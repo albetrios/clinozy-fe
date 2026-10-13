@@ -39,6 +39,7 @@ const NAMESPACE_LOADERS: Record<I18nLocale, NamespaceLoaders> = {
     users: () => import('@/locales/en/users.json'),
     app: () => import('@/locales/en/app.json'),
     print: () => import('@/locales/en/print.json'),
+    setup: () => import('@/locales/en/setup.json'),
   },
   es: {
     common: () => import('@/locales/es/common.json'),
@@ -60,6 +61,7 @@ const NAMESPACE_LOADERS: Record<I18nLocale, NamespaceLoaders> = {
     users: () => import('@/locales/es/users.json'),
     app: () => import('@/locales/es/app.json'),
     print: () => import('@/locales/es/print.json'),
+    setup: () => import('@/locales/es/setup.json'),
   },
   zh: {
     common: () => import('@/locales/zh/common.json'),
@@ -81,6 +83,7 @@ const NAMESPACE_LOADERS: Record<I18nLocale, NamespaceLoaders> = {
     users: () => import('@/locales/zh/users.json'),
     app: () => import('@/locales/zh/app.json'),
     print: () => import('@/locales/zh/print.json'),
+    setup: () => import('@/locales/zh/setup.json'),
   },
   fr: {
     common: () => import('@/locales/fr/common.json'),
@@ -102,6 +105,7 @@ const NAMESPACE_LOADERS: Record<I18nLocale, NamespaceLoaders> = {
     users: () => import('@/locales/fr/users.json'),
     app: () => import('@/locales/fr/app.json'),
     print: () => import('@/locales/fr/print.json'),
+    setup: () => import('@/locales/fr/setup.json'),
   },
   de: {
     common: () => import('@/locales/de/common.json'),
@@ -123,6 +127,7 @@ const NAMESPACE_LOADERS: Record<I18nLocale, NamespaceLoaders> = {
     users: () => import('@/locales/de/users.json'),
     app: () => import('@/locales/de/app.json'),
     print: () => import('@/locales/de/print.json'),
+    setup: () => import('@/locales/de/setup.json'),
   },
   ja: {
     common: () => import('@/locales/ja/common.json'),
@@ -144,6 +149,7 @@ const NAMESPACE_LOADERS: Record<I18nLocale, NamespaceLoaders> = {
     users: () => import('@/locales/ja/users.json'),
     app: () => import('@/locales/ja/app.json'),
     print: () => import('@/locales/ja/print.json'),
+    setup: () => import('@/locales/ja/setup.json'),
   },
   pt: {
     common: () => import('@/locales/pt/common.json'),
@@ -165,6 +171,7 @@ const NAMESPACE_LOADERS: Record<I18nLocale, NamespaceLoaders> = {
     users: () => import('@/locales/pt/users.json'),
     app: () => import('@/locales/pt/app.json'),
     print: () => import('@/locales/pt/print.json'),
+    setup: () => import('@/locales/pt/setup.json'),
   },
   ar: {
     common: () => import('@/locales/ar/common.json'),
@@ -186,6 +193,7 @@ const NAMESPACE_LOADERS: Record<I18nLocale, NamespaceLoaders> = {
     users: () => import('@/locales/ar/users.json'),
     app: () => import('@/locales/ar/app.json'),
     print: () => import('@/locales/ar/print.json'),
+    setup: () => import('@/locales/ar/setup.json'),
   },
   hi: {
     common: () => import('@/locales/hi/common.json'),
@@ -207,6 +215,7 @@ const NAMESPACE_LOADERS: Record<I18nLocale, NamespaceLoaders> = {
     users: () => import('@/locales/hi/users.json'),
     app: () => import('@/locales/hi/app.json'),
     print: () => import('@/locales/hi/print.json'),
+    setup: () => import('@/locales/hi/setup.json'),
   },
   ko: {
     common: () => import('@/locales/ko/common.json'),
@@ -228,6 +237,7 @@ const NAMESPACE_LOADERS: Record<I18nLocale, NamespaceLoaders> = {
     users: () => import('@/locales/ko/users.json'),
     app: () => import('@/locales/ko/app.json'),
     print: () => import('@/locales/ko/print.json'),
+    setup: () => import('@/locales/ko/setup.json'),
   },
   it: {
     common: () => import('@/locales/it/common.json'),
@@ -249,6 +259,7 @@ const NAMESPACE_LOADERS: Record<I18nLocale, NamespaceLoaders> = {
     users: () => import('@/locales/it/users.json'),
     app: () => import('@/locales/it/app.json'),
     print: () => import('@/locales/it/print.json'),
+    setup: () => import('@/locales/it/setup.json'),
   },
 };
 

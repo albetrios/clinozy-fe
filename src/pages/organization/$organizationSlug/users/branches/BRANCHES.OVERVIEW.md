@@ -20,23 +20,47 @@ one action. Main is read-only: one per clinic, set when it opened. A branch writ
 branch read and the Team, so the header picker and one-open-branch mode follow at once: with one
 open branch the clinic shows no branch UI, while this tab still lists the closed ones.
 
+**Places & days** (clinic-setup KICKOFF §6.6, D3, D23) is the drawer's fourth step, on an
+existing branch only: its rooms and machines (add, rename, switch on / off, remove) and its
+holidays from today on (date + label; add, remove), read from clinozy-be's
+`/app/branches/{branch_id}/rooms`, `…/machines` and `…/holidays`
+(`shared/api/app/branch-places-api.ts`). Each row saves on its own — never through the drawer's
+Save — as an inline row (RHF + Zod per row, Enter adds, Esc cancels a rename without closing the
+drawer); the switch changes in place at once and rolls back on a refusal; Remove goes through the
+reason confirm and offers Undo (`…/restore`). Every member reads the lists; adding needs
+`branch:create`, renaming and the switch `branch:update` (the switch stays, disabled, without
+it), removing `branch:delete` — a control the codes do not allow is not offered. A name (or day)
+the branch already has is refused at its field (a reasonless 409); someone else's change first
+(`409 record_changed`) toasts and reads the list again. Text typed in a row and not yet saved
+makes the drawer ask "Discard changes?" like its own fields. Collapsed, the step peeks at each
+list ("Rooms · 2 added"); while the lists load it shows a skeleton, and one retry when a read failed.
+
 ## Files
 
-| File                            | Responsibility                                                                                                           |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `branches.route.tsx`            | Route marker — exports `Component` rendering `BranchesPage`.                                                             |
-| `branches.manifest.ts`          | Manifest — `kind: 'layout'`, children `create`, `$branchId`; `branch:read`, module `app-users`.                          |
-| `branches.search.ts`            | `validateBranchesSearch` — `created` (entry chunk: no zod).                                                              |
-| `BranchesPage.tsx`              | The list: toolbar, table, the Edit row action, bulk Export and the branch drawers. Owns `users-branches-page`.           |
-| `components/BranchCells/`       | The cells — the chip with "Main", two-line Address / Contact / Default people, hours, the Team's avatars, Open / Closed. |
-| `components/BranchDrawer/`      | The branch drawer: form, read-outs, the three steps' fields and the save.                                                |
-| `hooks/useBranchRows/`          | The list ⨝ the Team: each branch's people and default people.                                                            |
-| `hooks/useBranchWrites/`        | Save a branch (`saveBranch` — create, or its team then its fields), refreshing every branch read and the Team.           |
-| `hooks/useBranchesTable/`       | The columns and table instance (Address is the primary cell; the Branch chip the phone row's key).                       |
-| `hooks/useBranchesDialogRoute/` | Which drawer the URL opens; refusal and "Branch not found" back to the list.                                             |
+| File                            | Responsibility                                                                                                                                                                                                                               |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `branches.route.tsx`            | Route marker — exports `Component` rendering `BranchesPage`.                                                                                                                                                                                 |
+| `branches.manifest.ts`          | Manifest — `kind: 'layout'`, children `create`, `$branchId`; `branch:read`, module `app-users`.                                                                                                                                              |
+| `branches.search.ts`            | `validateBranchesSearch` — `created` (entry chunk: no zod).                                                                                                                                                                                  |
+| `BranchesPage.tsx`              | The list: toolbar, table, the Edit row action, bulk Export and the branch drawers. Owns `users-branches-page`.                                                                                                                               |
+| `components/BranchCells/`       | The cells — the chip with "Main", two-line Address / Contact / Default people, hours, the Team's avatars, Open / Closed.                                                                                                                     |
+| `components/BranchDrawer/`      | The branch drawer: form, read-outs, the three steps' fields and the save; on an edit, "Places & days" (`BranchPlacesFields`, `branch-place-rows`, `branch-holiday-rows`, `branch-places-parts`, `branch-places-form`, `branch-places-view`). |
+| `hooks/useBranchRows/`          | The list ⨝ the Team: each branch's people and default people.                                                                                                                                                                                |
+| `hooks/useBranchWrites/`        | Save a branch (`saveBranch` — create, or its team then its fields), refreshing every branch read and the Team.                                                                                                                               |
+| `hooks/useBranchPlaces/`        | "Places & days" reads (rooms, machines, holidays from today) and each row's writes — add, rename / switch, remove, restore.                                                                                                                  |
+| `hooks/useBranchesTable/`       | The columns and table instance (Address is the primary cell; the Branch chip the phone row's key).                                                                                                                                           |
+| `hooks/useBranchesDialogRoute/` | Which drawer the URL opens; refusal and "Branch not found" back to the list.                                                                                                                                                                 |
 
 ## Test ids
 
 `users-branches-page`, `users-branches-table`, `branch-drawer` — and the shared toolbar and table
 ids with the prefix `users-branches`; the drawer's parts are listed in
 `docs/reference/e2e-testids-inventory.md` › Branch drawer.
+
+"Places & days" (`<d>` is `branch-drawer`, `<l>` a list: `rooms` · `machines` · `holidays`):
+`<d>-step-places` (`-trigger`, `-peek`), `<d>-places` (the step's body), `<l>` (a list's
+section), `<l>-row` (one row; `data-place-id` / `data-holiday-id`), `<l>-empty`,
+`<l>-row-action-rename` · `<l>-row-action-remove`, `<d>-rooms-active` · `<d>-machines-active`
+(a row's switch), `<l>-rename` (`-name`, `-submit`, `-cancel`, `-error`), `<l>-add` (rooms and
+machines: `-name`, `-submit`, `-error`; holidays: `-date`, `-date-option-<YYYY-MM-DD>`, `-label`,
+`-submit`, `-error`).

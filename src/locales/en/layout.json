@@ -152,6 +152,13 @@
         "showing": "Showing {{names}}",
         "keepOne": "Keep at least one branch"
       }
+    },
+    "setup": {
+      "finishSetup": "Finish setup · {{done}} of {{total}}",
+      "clinicSettings": "Clinic settings",
+      "ringLabel": "Setup {{done}} of {{total}} done",
+      "memberNotice": "Your clinic is still being set up — bookings open once it's ready.",
+      "drawerName": "Clinic setup"
     }
   }
 }

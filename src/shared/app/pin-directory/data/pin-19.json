@@ -1,0 +1,1070 @@
+{
+  "190001": [
+    "Srinagar",
+    "Jammu and Kashmir",
+    ["Badyar Balla", "Lal Chowk", "Nehru Park", "Sathu", "SKSectrate", "Srinagar"]
+  ],
+  "190002": [
+    "Srinagar",
+    "Jammu and Kashmir",
+    ["Fateh Kadal", "Jamia Masjid", "Safukadul", "SR Gunj"]
+  ],
+  "190003": [
+    "Srinagar",
+    "Jammu and Kashmir",
+    ["Abi Karlpora", "Khanyar", "Nandpora", "Rainawari"]
+  ],
+  "190004": ["Srinagar", "Jammu and Kashmir", ["Batwara"]],
+  "190005": ["Srinagar", "Jammu and Kashmir", ["Sanat Nagar"]],
+  "190006": [
+    "Srinagar",
+    "Jammu and Kashmir",
+    [
+      "Basurbagh",
+      "Chatterhama",
+      "Gulab Bagh",
+      "Kashmir University",
+      "Malbagh",
+      "Pandech",
+      "Saidpora Hamchi",
+      "Shuhama",
+      "Telbal"
+    ]
+  ],
+  "190007": ["Budgam", "Jammu and Kashmir", ["Sk Airport"]],
+  "190008": [
+    "Srinagar",
+    "Jammu and Kashmir",
+    ["Jawahar Nagar", "KPadshai Bagh", "Rajbagh"]
+  ],
+  "190009": [
+    "Srinagar",
+    "Jammu and Kashmir",
+    ["Central Market", "New Secretariat Srinagar", "Rambagh"]
+  ],
+  "190010": ["Srinagar", "Jammu and Kashmir", ["Batmaloo", "Court Road", "Karan Nagar"]],
+  "190011": ["Srinagar", "Jammu and Kashmir", ["Anchar", "Noushara"]],
+  "190012": ["Srinagar", "Jammu and Kashmir", ["Zainakote"]],
+  "190014": ["Budgam", "Jammu and Kashmir", ["Hyderpora"]],
+  "190015": [
+    "Srinagar",
+    "Jammu and Kashmir",
+    ["A K Pora", "Kenihama", "Natipora", "Nowgam"]
+  ],
+  "190017": [
+    "Srinagar",
+    "Jammu and Kashmir",
+    ["Bashipora", "Gund Hassibhat", "Paipora", "Parimpora"]
+  ],
+  "190018": ["Budgam", "Jammu and Kashmir", ["Bemina", "Bemina Chowk", "Sebdan"]],
+  "190019": ["Srinagar", "Jammu and Kashmir", ["Bagh Mehtab", "Kralpora"]],
+  "190020": ["Srinagar", "Jammu and Kashmir", ["Bachpora"]],
+  "190021": ["Budgam", "Jammu and Kashmir", ["Hamhama"]],
+  "190023": ["Srinagar", "Jammu and Kashmir", ["Lal Bazar"]],
+  "190024": ["Srinagar", "Jammu and Kashmir", ["Zakoora"]],
+  "190025": ["Srinagar", "Jammu and Kashmir", ["Skuast"]],
+  "191101": [
+    "Srinagar",
+    "Jammu and Kashmir",
+    ["Balhama", "Khanmouh", "Lasjan", "Pandrathan", "Pantha Chowk", "Zawan"]
+  ],
+  "191102": ["Pulwama", "Jammu and Kashmir", ["Wuyan"]],
+  "191103": ["Pulwama", "Jammu and Kashmir", ["Khrew", "Ludhoo", "Mandakpal", "Zantrag"]],
+  "191111": [
+    "Budgam",
+    "Jammu and Kashmir",
+    [
+      "Arath",
+      "Arigam",
+      "Bandgam",
+      "Budgam",
+      "Gariend",
+      "Ichgam",
+      "Jawalapora",
+      "Kachwari",
+      "Khan Shaib",
+      "Krim Shore",
+      "Later Chadoora",
+      "Ompora",
+      "Raithan",
+      "Shogapora",
+      "Sholipora",
+      "Soibugh",
+      "Watterhail"
+    ]
+  ],
+  "191112": [
+    "Budgam",
+    "Jammu and Kashmir",
+    [
+      "Abhama",
+      "Charsharief",
+      "Darwan Nawgam",
+      "Hardudalwan",
+      "Keller Mastpora",
+      "Kenidajan",
+      "Pakherpora"
+    ]
+  ],
+  "191113": [
+    "Budgam",
+    "Jammu and Kashmir",
+    [
+      "Bandipora",
+      "Bogam Batapora",
+      "Brinjan",
+      "Chadoora",
+      "Chattergam",
+      "Gogjipathri",
+      "Hanjura",
+      "Hayatpora",
+      "Kanir",
+      "Lalgam",
+      "Nagam",
+      "R N Hall",
+      "Rangar",
+      "Sogam",
+      "Suraryan",
+      "Wanpora",
+      "Watakala",
+      "Wathura"
+    ]
+  ],
+  "191121": ["Srinagar", "Jammu and Kashmir", ["Brein", "Harwan", "New Theed"]],
+  "191131": [
+    "Ganderbal",
+    "Jammu and Kashmir",
+    [
+      "Haran",
+      "Karhama",
+      "Qasbalar",
+      "Saloora",
+      "Sehpora",
+      "Shallabugh",
+      "Theru",
+      "Tulmulla",
+      "Wakura",
+      "Yangoora"
+    ]
+  ],
+  "191132": ["Budgam", "Jammu and Kashmir", ["Rangreth"]],
+  "191201": [
+    "Ganderbal",
+    "Jammu and Kashmir",
+    [
+      "Benihama",
+      "Chattergul",
+      "Daderhama",
+      "Ganderbal",
+      "Haripora",
+      "Manigam",
+      "Nuner",
+      "Wayil",
+      "Wussan"
+    ]
+  ],
+  "191202": [
+    "Ganderbal",
+    "Jammu and Kashmir",
+    ["Akhal", "Gund", "Hari Gaiwan", "Kangan", "Kulan", "Mamer", "S Bala", "Wangat"]
+  ],
+  "192101": [
+    "Anantnag",
+    "Jammu and Kashmir",
+    ["Anantnag", "Janglath Mandi", "Khanabal", "Quimoh", "Sarnal"]
+  ],
+  "192121": [
+    "Pulwama",
+    "Jammu and Kashmir",
+    ["Honipora", "Khanda", "Konibal", "Nehama", "Pahroo", "Pampore"]
+  ],
+  "192122": [
+    "Pulwama",
+    "Jammu and Kashmir",
+    [
+      "Anantnag City",
+      "Awantipora",
+      "Barsoo",
+      "Chandhara",
+      "Cheersoo",
+      "Gairoo",
+      "Gouripora",
+      "Lathpora"
+    ]
+  ],
+  "192123": [
+    "Pulwama",
+    "Jammu and Kashmir",
+    [
+      "Aripal",
+      "Baigund",
+      "Bargam",
+      "Batagund",
+      "Bathnoor",
+      "Bouli",
+      "Buchoo",
+      "Chattergam",
+      "Dadsar",
+      "Haripari",
+      "Kachachakote",
+      "Kahleel",
+      "Lurgam",
+      "Mandoora",
+      "Midroo",
+      "Pastana",
+      "Pinglish",
+      "Saimoh",
+      "Satura",
+      "Tral"
+    ]
+  ],
+  "192124": [
+    "Anantnag",
+    "Jammu and Kashmir",
+    [
+      "Arwani",
+      "Bijbehara",
+      "Chitragam",
+      "Digripora",
+      "Kanilwan",
+      "Krandigam",
+      "Marhama",
+      "Naina",
+      "Opzen",
+      "Panzgam",
+      "Qaimoh",
+      "Shalgam",
+      "Shamsipora",
+      "Tokna",
+      "Tulkhana",
+      "Urran Hall",
+      "Veeri",
+      "Waghama",
+      "Wanpoh",
+      "Zanipora"
+    ]
+  ],
+  "192125": [
+    "Anantnag",
+    "Jammu and Kashmir",
+    [
+      "Akura",
+      "Gopal Pora",
+      "Hutmarah",
+      "Kragsoo",
+      "Martand",
+      "Nambal",
+      "Nanil",
+      "Ranbirpora"
+    ]
+  ],
+  "192126": ["Anantnag", "Jammu and Kashmir", ["Laripora", "Phalgam"]],
+  "192129": [
+    "Anantnag",
+    "Jammu and Kashmir",
+    [
+      "Ashmuqam",
+      "Batakote",
+      "Chandrigam",
+      "Ganeshpora",
+      "Hapatnar",
+      "Khayar",
+      "Logripora",
+      "S K Gund",
+      "Salia",
+      "Siligam"
+    ]
+  ],
+  "192201": [
+    "Anantnag",
+    "Jammu and Kashmir",
+    [
+      "Achabal",
+      "Akingam",
+      "Brah",
+      "Bulbul Nowgam",
+      "Chakilpora",
+      "Chattargui",
+      "Dethunagnarian",
+      "Hardtour",
+      "Hiller Arahama",
+      "Nowgam",
+      "Omanagri",
+      "Shangas",
+      "Telwani",
+      "Utersoo"
+    ]
+  ],
+  "192202": [
+    "Anantnag",
+    "Jammu and Kashmir",
+    [
+      "Ahalangodol",
+      "Buchoo",
+      "Daksum",
+      "Danipora",
+      "Kharapora",
+      "Kokarnag",
+      "Larnoo",
+      "Muti Handoo",
+      "Nalasundhari",
+      "Narapora",
+      "Nowbug",
+      "Sagam",
+      "Soaf Shali",
+      "Vailobrang",
+      "Vandevalgam"
+    ]
+  ],
+  "192210": [
+    "Anantnag",
+    "Jammu and Kashmir",
+    ["Dialgam", "Fateh Pora", "Gosanigund", "Hakura Badasgam", "Larkipora"]
+  ],
+  "192211": [
+    "Anantnag",
+    "Jammu and Kashmir",
+    ["Dooru", "Hiller Shahabad", "Kriri Nowpora", "Obindora"]
+  ],
+  "192212": [
+    "Anantnag",
+    "Jammu and Kashmir",
+    [
+      "Batagund",
+      "Bonagand",
+      "Halsidar",
+      "Kaprin",
+      "Lower Mundah",
+      "Nowgam",
+      "Qanmar",
+      "Sadinare",
+      "Verinaag"
+    ]
+  ],
+  "192221": [
+    "Anantnag",
+    "Jammu and Kashmir",
+    [
+      "Brinal Lammer",
+      "Bumthan",
+      "Chowgam",
+      "Kund",
+      "Levidoora",
+      "Mandhole",
+      "Manjmoh",
+      "Monghal",
+      "Nissu",
+      "Panzeth",
+      "Qazigund",
+      "Sopat Tengpora",
+      "Vesshu",
+      "Wangund",
+      "Yarkhoshipora"
+    ]
+  ],
+  "192231": [
+    "Kulgam",
+    "Jammu and Kashmir",
+    [
+      "Akhal",
+      "Arrah",
+      "Ashmuji",
+      "Buchroo",
+      "Chadder",
+      "Chambgund",
+      "Devsar",
+      "Dhane Bougund",
+      "Gadipora",
+      "Guddar",
+      "HCGam",
+      "Kanipora",
+      "Kapran",
+      "Kilam Bazgam",
+      "Kulgam",
+      "Malwan",
+      "Mirhama",
+      "Nellow",
+      "Nowpora",
+      "Pahaloo",
+      "Pariwan",
+      "Ratnipora",
+      "Shurat",
+      "Vokey"
+    ]
+  ],
+  "192232": [
+    "Kulgam",
+    "Jammu and Kashmir",
+    [
+      "Awenura",
+      "Behibagh",
+      "Bugam",
+      "Demidulla",
+      "Frisal",
+      "Katrasoo",
+      "Khigogipora",
+      "Mgufan",
+      "Noonmai",
+      "Reban Gund",
+      "Tarigam",
+      "Turigam Devgubh",
+      "Yaripora"
+    ]
+  ],
+  "192233": [
+    "Kulgam",
+    "Jammu and Kashmir",
+    [
+      "Aharbal",
+      "Ahmedabad Thussu",
+      "Badjahalan",
+      "Chemmar",
+      "D K Marg",
+      "Damhal Hanji Pora",
+      "Gopalpora",
+      "Khull",
+      "Khuri Batpora B",
+      "Manzgam",
+      "Nandimarg",
+      "Nasnoor",
+      "Nehama"
+    ]
+  ],
+  "192301": [
+    "Pulwama",
+    "Jammu and Kashmir",
+    [
+      "Banderpora",
+      "Bandzoo",
+      "Inder",
+      "Karimabad",
+      "Koil",
+      "Lajoora",
+      "Malangpora",
+      "Mitrigam",
+      "Murram",
+      "Newa",
+      "Parigam Jagir",
+      "Pingliana",
+      "Pulwama",
+      "Romoh",
+      "Shale Tokna",
+      "Tahaba Shadipora",
+      "Waibugh"
+    ]
+  ],
+  "192302": [
+    "Pulwama",
+    "Jammu and Kashmir",
+    ["Ahagam", "Arihal", "Balpora", "Hawl", "Sindhshirmal", "Turkoo Babuar"]
+  ],
+  "192303": [
+    "Shopian",
+    "Jammu and Kashmir",
+    [
+      "Batpora",
+      "Herman",
+      "Hirapora",
+      "Kharawara",
+      "Memendar",
+      "Nadigam",
+      "Narapora",
+      "Pinjoora",
+      "Ramnagri",
+      "Saidpora",
+      "Sedow",
+      "Shopin",
+      "Tankiya Sahib",
+      "Trenz",
+      "Vaheel Chatarwatan",
+      "Zoora"
+    ]
+  ],
+  "192304": ["Pulwama", "Jammu and Kashmir", ["Kakapora", "Ratnipora", "Sumboora"]],
+  "192305": [
+    "Shopian",
+    "Jammu and Kashmir",
+    [
+      "Achan",
+      "Aglar",
+      "Chakura",
+      "Hef Shermal",
+      "Litter",
+      "Sugan",
+      "Turka Wangam",
+      "Wachi",
+      "Wasoora"
+    ]
+  ],
+  "192306": [
+    "Pulwama",
+    "Jammu and Kashmir",
+    ["Brithipora", "Drabgam", "Klampora", "Qasbiyar", "Rajpora", "Tiken Batpora"]
+  ],
+  "192401": [
+    "Anantnag",
+    "Jammu and Kashmir",
+    [
+      "Beerwara",
+      "Dalseer",
+      "Dhawtoo",
+      "Hugam",
+      "Kathsoo",
+      "Kharam",
+      "Kullar",
+      "Mohind",
+      "Pushkriri",
+      "Sallar",
+      "Sirhama",
+      "Srigufwaea",
+      "Wallarhama"
+    ]
+  ],
+  "193101": [
+    "Baramulla",
+    "Jammu and Kashmir",
+    [
+      "Baramulla",
+      "Gantmulla",
+      "Gohan",
+      "Heavan",
+      "Khadniyar",
+      "Khanpora",
+      "Laridora",
+      "Malpora",
+      "Sheeri",
+      "Sultanpora Kandi",
+      "Ushkura",
+      "Women College"
+    ]
+  ],
+  "193103": [
+    "Baramulla",
+    "Jammu and Kashmir",
+    ["Delina", "Kanispora", "Khawaja Bagh", "Singhpora Kalan"]
+  ],
+  "193108": [
+    "Baramulla",
+    "Jammu and Kashmir",
+    ["Athoora", "Kreeri", "Saloosa", "Tilgam", "Wanigam"]
+  ],
+  "193109": [
+    "Baramulla",
+    "Jammu and Kashmir",
+    ["Chandoosa", "Kachawa Muqam", "Kalantra", "Khaitangan", "Nowpora Jagir", "Wagoora"]
+  ],
+  "193121": [
+    "Baramulla",
+    "Jammu and Kashmir",
+    [
+      "Andergam",
+      "Check Sariwarpora",
+      "Ganasthan",
+      "Goshbugh",
+      "Gund Ibrahim",
+      "Hanjiwera",
+      "Khanpeth",
+      "Khore",
+      "Lalpora Bangil",
+      "Mamoosa",
+      "Matipora",
+      "Mirgund",
+      "Nehalpora",
+      "Palhallan",
+      "Pattan",
+      "Seru Dangerpora",
+      "Shirpora Bangil",
+      "Singhpora",
+      "Tapper Waripora",
+      "Yal"
+    ]
+  ],
+  "193122": [
+    "Baramulla",
+    "Jammu and Kashmir",
+    [
+      "Bijhama",
+      "Boniyar",
+      "Chandanwari",
+      "Dhanisaidan",
+      "Gingle",
+      "Ijara",
+      "Lachipora",
+      "Mohara",
+      "Nowshera",
+      "Pringal",
+      "Salamabad Dachina",
+      "Trikanjan"
+    ]
+  ],
+  "193123": [
+    "Baramulla",
+    "Jammu and Kashmir",
+    [
+      "Balkote",
+      "Dachi",
+      "Garkote",
+      "Isham",
+      "Jabla",
+      "Kamalkote",
+      "Nambla",
+      "Parampilla",
+      "Salamabad",
+      "Sultan Daki",
+      "Uri"
+    ]
+  ],
+  "193201": [
+    "Baramulla",
+    "Jammu and Kashmir",
+    [
+      "Bomai",
+      "Botingoo",
+      "Bulgam",
+      "Dangerpora",
+      "Doabgah",
+      "Dooru",
+      "Haigam",
+      "Hardushiva",
+      "Harwan",
+      "Hathlangoo",
+      "Jamia Qadim",
+      "Krankshivam",
+      "Ladoora",
+      "M.E.T",
+      "Mundji",
+      "Nowpora Kalan",
+      "Sagipora",
+      "Sangrama",
+      "Seelu",
+      "Seer",
+      "Sopore",
+      "Tarzoo",
+      "Tujar",
+      "Wadoora",
+      "Warpora",
+      "Watlab",
+      "Zaloora"
+    ]
+  ],
+  "193221": [
+    "Kupwara",
+    "Jammu and Kashmir",
+    [
+      "Handwara",
+      "Kandi Khaas",
+      "Magam",
+      "Maidan Chogal",
+      "Natnusa",
+      "Satkuji",
+      "Shilhal",
+      "Turkapora",
+      "Wadder Nichama",
+      "Wadipora",
+      "Wagat",
+      "Zachaldara"
+    ]
+  ],
+  "193222": [
+    "Kupwara",
+    "Jammu and Kashmir",
+    [
+      "Batergam",
+      "Batpora",
+      "Drugmulla",
+      "Dudi Machil",
+      "Gulgam",
+      "Haihama",
+      "Halmatpora",
+      "Jaggerpora",
+      "Kalaroose",
+      "Karihama",
+      "Khumriyal",
+      "Kupwara",
+      "Nagrimalpora",
+      "Pazipora",
+      "Sarkuli"
+    ]
+  ],
+  "193223": [
+    "Kupwara",
+    "Jammu and Kashmir",
+    [
+      "Chandigam",
+      "Cheerkoot",
+      "Dardpora",
+      "Dever Inderbugh",
+      "Gogal",
+      "Krusan",
+      "Kuligam",
+      "Lalpora",
+      "Maidanpora",
+      "Putushy",
+      "Sogam",
+      "Tekipora",
+      "Vernow",
+      "Wavoora"
+    ]
+  ],
+  "193224": [
+    "Kupwara",
+    "Jammu and Kashmir",
+    [
+      "Aloosa",
+      "Budnambal",
+      "Chowkibal Reddy",
+      "Gazriyal",
+      "Gugloosa",
+      "Hayan",
+      "Kachhama",
+      "Kakroosa",
+      "Keran",
+      "Kralpora",
+      "Manzgam",
+      "Meelyal",
+      "Owoora",
+      "Panzgam",
+      "Tarathpora",
+      "Trehgam",
+      "Villgam",
+      "Warsun",
+      "Zurhama"
+    ]
+  ],
+  "193225": [
+    "Kupwara",
+    "Jammu and Kashmir",
+    ["Chamkote", "Hajitarah", "Nachian", "Nowgabra", "Tad", "Tangdhar", "Teetwal"]
+  ],
+  "193301": [
+    "Baramulla",
+    "Jammu and Kashmir",
+    [
+      "Balhama",
+      "Binner",
+      "Chijhama",
+      "Chitloora",
+      "Hadipora",
+      "Khamoh",
+      "Nadihal",
+      "Panzala",
+      "Rohama",
+      "Shitloo"
+    ]
+  ],
+  "193302": [
+    "Kupwara",
+    "Jammu and Kashmir",
+    [
+      "Batagund",
+      "Gloora",
+      "Haril",
+      "Kalamchakla",
+      "Kralgund",
+      "Langate",
+      "Nowgam",
+      "Pohrupeth",
+      "Sahipora",
+      "Shatgund",
+      "Yaroo",
+      "Yunis Wahipora"
+    ]
+  ],
+  "193303": [
+    "Baramulla",
+    "Jammu and Kashmir",
+    [
+      "Ashpora",
+      "Behrampora",
+      "Chatoosa",
+      "Dangiwacha",
+      "Harduchanam",
+      "Rengpeth",
+      "Watergam",
+      "Zethan"
+    ]
+  ],
+  "193401": [
+    "Budgam",
+    "Jammu and Kashmir",
+    [
+      "Aripanthan",
+      "Badran",
+      "Gund Khaja Kasim",
+      "Kanihama",
+      "Kawoosa Khalisa",
+      "Magam",
+      "Malmoh",
+      "Narbal",
+      "Peth Kanihama",
+      "Peth Makhama",
+      "Ratsun",
+      "S K Pora"
+    ]
+  ],
+  "193402": [
+    "Baramulla",
+    "Jammu and Kashmir",
+    [
+      "Babareshi",
+      "Chandilora",
+      "Ferozpora",
+      "Hajibal",
+      "Hardichhloo",
+      "Hariwatnoo",
+      "Khaipora",
+      "Tangmarg"
+    ]
+  ],
+  "193403": ["Baramulla", "Jammu and Kashmir", ["Gulmarg"]],
+  "193404": [
+    "Baramulla",
+    "Jammu and Kashmir",
+    [
+      "Beewah",
+      "Chandil Wanigam",
+      "Devbough",
+      "Devpora Dardpora",
+      "Dhobiwan",
+      "Hardobora",
+      "Hardushora",
+      "Kawarhama",
+      "Kralweth",
+      "Kunzer",
+      "Mulgam",
+      "Tarahama",
+      "Wailoo Kralpora"
+    ]
+  ],
+  "193411": [
+    "Budgam",
+    "Jammu and Kashmir",
+    [
+      "Attina",
+      "Beerwah",
+      "Chanthan Checkpora",
+      "Chewdarah",
+      "Dachan",
+      "H Panzu",
+      "Iskanderpora",
+      "Kandoora",
+      "Khag",
+      "Lalpora",
+      "Otligam",
+      "Poshkar",
+      "Qumroo",
+      "Raiyar",
+      "Sail",
+      "Shonglipora",
+      "Zugu Khyran"
+    ]
+  ],
+  "193501": [
+    "Bandipora",
+    "Jammu and Kashmir",
+    [
+      "Amchikundal",
+      "Batvina",
+      "Gund Jahangir",
+      "Hajin",
+      "Madwan",
+      "Naidkhai",
+      "Nesbal",
+      "Nowgam",
+      "Panzinara",
+      "Shadipora",
+      "Shahgund",
+      "Sonawari",
+      "Sultanpora Khoi"
+    ]
+  ],
+  "193502": [
+    "Bandipora",
+    "Jammu and Kashmir",
+    [
+      "Ajas",
+      "Arin",
+      "Ayatmulla",
+      "Bandipora",
+      "Bandipora Chowk",
+      "Bankote",
+      "Chithi Bandi",
+      "Chutimulla",
+      "Gamroo",
+      "Garoora",
+      "Kaloosa",
+      "Lawaypora",
+      "Mantrigam",
+      "Nadihal",
+      "Onagam",
+      "Sonerwani"
+    ]
+  ],
+  "193503": [
+    "Bandipora",
+    "Jammu and Kashmir",
+    [
+      "Achoora",
+      "Baduab",
+      "Badugam",
+      "Bagtore",
+      "Barnoi Kashpeth",
+      "Gujran",
+      "Gurez",
+      "Kanzalwan",
+      "Markoot",
+      "Puranatulail",
+      "Saradab",
+      "Tarbal",
+      "Wampora"
+    ]
+  ],
+  "193504": [
+    "Bandipora",
+    "Jammu and Kashmir",
+    ["Asham", "Chiva", "Hakbara", "Sadarkoot Bala", "Sadunara", "Safapora"]
+  ],
+  "193505": [
+    "Bandipora",
+    "Jammu and Kashmir",
+    ["Aloosa", "Ashtingoo", "Kenusa", "Malangam", "Quilmuqam", "Watapora"]
+  ],
+  "194101": [
+    "Leh Ladakh",
+    "Ladakh",
+    ["Chuchul", "Durbuk", "Faing", "Horzey", "Leh", "Leh City", "Spituk"]
+  ],
+  "194102": [
+    "Kargil",
+    "Ladakh",
+    ["Bhimbat", "Chokiyal", "Drass", "Matayan", "Mushkoo", "Pandrass"]
+  ],
+  "194103": [
+    "Kargil",
+    "Ladakh",
+    [
+      "Akchamal",
+      "Batalik",
+      "Chanigund",
+      "Choskore",
+      "Garkon",
+      "Hardas",
+      "Kargil",
+      "Karkitchoo",
+      "Minji",
+      "Pashkum",
+      "Saliskot",
+      "Shaimshakharboo",
+      "Silmoh",
+      "Tambis",
+      "Thasgam",
+      "Trespone",
+      "Tumail",
+      "Tumail Colony",
+      "Yurbaltik"
+    ]
+  ],
+  "194104": [
+    "Leh Ladakh",
+    "Ladakh",
+    [
+      "Chuchot Gongma",
+      "Chuchot Shamma",
+      "Chuchot Yokma",
+      "Chuglamsar",
+      "Mathoo",
+      "Saboo",
+      "Stok"
+    ]
+  ],
+  "194105": ["Kargil", "Ladakh", ["Baroo", "Bazgo"]],
+  "194106": [
+    "Leh Ladakh",
+    "Ladakh",
+    [
+      "Biama",
+      "Dumkhar",
+      "Hanoo",
+      "Hemis Shukpacahan",
+      "Khalsi",
+      "Lamayuru",
+      "Nurla",
+      "Skurbuchan",
+      "Takmachik",
+      "Temisgam",
+      "Tia",
+      "Wanla"
+    ]
+  ],
+  "194107": [
+    "Leh Ladakh",
+    "Ladakh",
+    ["Alchi", "Basgo", "Likir", "Ney", "Nimoo", "Saspol"]
+  ],
+  "194109": [
+    "Kargil",
+    "Ladakh",
+    [
+      "Bodhkharboo",
+      "Chiktan",
+      "Karamba",
+      "Khangral",
+      "Lochum",
+      "Mulbek",
+      "Safi",
+      "Samray",
+      "Shakar",
+      "Shargol",
+      "Tache",
+      "Wakha"
+    ]
+  ],
+  "194201": [
+    "Leh Ladakh",
+    "Ladakh",
+    [
+      "Chamray",
+      "Gia Meru",
+      "Hemis Changa",
+      "Igoo",
+      "Karoo",
+      "Sakti",
+      "Shara",
+      "Shey",
+      "Thiksay"
+    ]
+  ],
+  "194202": [
+    "Leh Ladakh",
+    "Ladakh",
+    ["Chumathang", "Hemiya", "Kairy", "Kungyam", "Nyoma Mud"]
+  ],
+  "194301": [
+    "Kargil",
+    "Ladakh",
+    ["Barsoo", "Khasgam Thuina", "Lankarchey", "Omba", "Sangra", "Sankoo", "Tikat"]
+  ],
+  "194302": ["Kargil", "Ladakh", ["Cha Lungnak", "Karsha", "Padum", "Zangla"]],
+  "194303": [
+    "Kargil",
+    "Ladakh",
+    ["Namsuru", "Panikhar", "Parkachik", "Purtakchey", "Yuljuk"]
+  ],
+  "194401": [
+    "Leh Ladakh",
+    "Ladakh",
+    [
+      "Bogdang",
+      "Diskit",
+      "Hunder",
+      "Khardong",
+      "Kubat",
+      "Panamik",
+      "Terchey",
+      "Tiger Sumur",
+      "Turtuk"
+    ]
+  ],
+  "194402": ["Leh Ladakh", "Ladakh", ["Saspol"]],
+  "194404": ["Leh Ladakh", "Ladakh", ["Nyoma Mud"]]
+}

@@ -14,7 +14,14 @@ test.describe('Settings modal (hash-driven)', () => {
   test('opens from the user menu and writes the hash', async ({ page }) => {
     await page.getByTestId('user-menu-trigger').click();
     await expect(page.getByTestId('user-menu-settings')).toBeVisible();
-    await page.keyboard.press('ArrowDown');
+    // A new clinic's setup rows ("Finish setup", "Clinic settings") come first; the identity row
+    // — the profile — follows them.
+    const identity = page.getByTestId('account-menu-identity');
+    for (let step = 0; step < 4; step += 1) {
+      await page.keyboard.press('ArrowDown');
+      if (await identity.evaluate((row) => row === document.activeElement)) break;
+    }
+    await expect(identity).toBeFocused();
     await page.keyboard.press('Enter');
 
     await expect(page.getByTestId('settings-modal')).toBeVisible();

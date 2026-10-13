@@ -1816,6 +1816,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/app/onboarding-setup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get clinic setup */
+        get: operations["getAppOnboardingSetup"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Change clinic setup */
+        patch: operations["patchAppOnboardingSetup"];
+        trace?: never;
+    };
+    "/api/v1/app/onboarding-setup/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Go live */
+        post: operations["postAppOnboardingSetupComplete"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/app/patient-diagnoses": {
         parameters: {
             query?: never;
@@ -16662,6 +16697,221 @@ export interface operations {
                             /** Format: date-time */
                             updated_at?: string;
                             value?: number;
+                        };
+                        meta?: {
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["ApiError"];
+            401: components["responses"]["ApiError"];
+            403: components["responses"]["ApiError"];
+            404: components["responses"]["ApiError"];
+            409: components["responses"]["ApiError"];
+            413: components["responses"]["ApiError"];
+            415: components["responses"]["ApiError"];
+            422: components["responses"]["ApiError"];
+            429: components["responses"]["ApiError"];
+            500: components["responses"]["ApiError"];
+        };
+    };
+    getAppOnboardingSetup: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            answered_steps?: ("clinic_type" | "you")[];
+                            /** Format: date-time */
+                            completed_at?: string | null;
+                            completed_by_membership_id?: string | null;
+                            /** Format: date-time */
+                            deferred_at?: string | null;
+                            /** Format: date-time */
+                            guide_done_at?: string | null;
+                            guide_done_count?: number;
+                            /** Format: date-time */
+                            guide_hidden_at?: string | null;
+                            guide_items?: {
+                                can_skip?: boolean;
+                                is_done?: boolean;
+                                is_skipped?: boolean;
+                                /** @enum {string} */
+                                key?: "treatments" | "invite_team" | "first_appointment";
+                            }[];
+                            guide_total_count?: number;
+                            has_someone_to_book?: boolean;
+                            is_live?: boolean;
+                            live_checks?: {
+                                clinic_type?: boolean;
+                                main_branch?: boolean;
+                                services?: boolean;
+                            };
+                            main_branch_id?: string | null;
+                            /** @enum {string|null} */
+                            next_step?: "clinic_type" | "location" | "you" | "go_live" | null;
+                            skipped_items?: ("treatments" | "invite_team")[];
+                            /** Format: date-time */
+                            updated_at?: string;
+                        };
+                        meta?: {
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            401: components["responses"]["ApiError"];
+            403: components["responses"]["ApiError"];
+            404: components["responses"]["ApiError"];
+            429: components["responses"]["ApiError"];
+            500: components["responses"]["ApiError"];
+        };
+    };
+    patchAppOnboardingSetup: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    answered_steps_add?: ("clinic_type" | "you")[];
+                    /** @enum {boolean} */
+                    deferred?: true;
+                    /** Format: date-time */
+                    expected_updated_at?: string;
+                    guide_hidden?: boolean;
+                    skipped_items_add?: ("treatments" | "invite_team")[];
+                    skipped_items_remove?: ("treatments" | "invite_team")[];
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    "X-Idempotency-Replay"?: "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            answered_steps?: ("clinic_type" | "you")[];
+                            /** Format: date-time */
+                            completed_at?: string | null;
+                            completed_by_membership_id?: string | null;
+                            /** Format: date-time */
+                            deferred_at?: string | null;
+                            /** Format: date-time */
+                            guide_done_at?: string | null;
+                            guide_done_count?: number;
+                            /** Format: date-time */
+                            guide_hidden_at?: string | null;
+                            guide_items?: {
+                                can_skip?: boolean;
+                                is_done?: boolean;
+                                is_skipped?: boolean;
+                                /** @enum {string} */
+                                key?: "treatments" | "invite_team" | "first_appointment";
+                            }[];
+                            guide_total_count?: number;
+                            has_someone_to_book?: boolean;
+                            is_live?: boolean;
+                            live_checks?: {
+                                clinic_type?: boolean;
+                                main_branch?: boolean;
+                                services?: boolean;
+                            };
+                            main_branch_id?: string | null;
+                            /** @enum {string|null} */
+                            next_step?: "clinic_type" | "location" | "you" | "go_live" | null;
+                            skipped_items?: ("treatments" | "invite_team")[];
+                            /** Format: date-time */
+                            updated_at?: string;
+                        };
+                        meta?: {
+                            request_id: string;
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["ApiError"];
+            401: components["responses"]["ApiError"];
+            403: components["responses"]["ApiError"];
+            404: components["responses"]["ApiError"];
+            409: components["responses"]["ApiError"];
+            413: components["responses"]["ApiError"];
+            415: components["responses"]["ApiError"];
+            422: components["responses"]["ApiError"];
+            429: components["responses"]["ApiError"];
+            500: components["responses"]["ApiError"];
+        };
+    };
+    postAppOnboardingSetupComplete: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    "X-Idempotency-Replay"?: "true";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: {
+                            answered_steps?: ("clinic_type" | "you")[];
+                            /** Format: date-time */
+                            completed_at?: string | null;
+                            completed_by_membership_id?: string | null;
+                            /** Format: date-time */
+                            deferred_at?: string | null;
+                            /** Format: date-time */
+                            guide_done_at?: string | null;
+                            guide_done_count?: number;
+                            /** Format: date-time */
+                            guide_hidden_at?: string | null;
+                            guide_items?: {
+                                can_skip?: boolean;
+                                is_done?: boolean;
+                                is_skipped?: boolean;
+                                /** @enum {string} */
+                                key?: "treatments" | "invite_team" | "first_appointment";
+                            }[];
+                            guide_total_count?: number;
+                            has_someone_to_book?: boolean;
+                            is_live?: boolean;
+                            live_checks?: {
+                                clinic_type?: boolean;
+                                main_branch?: boolean;
+                                services?: boolean;
+                            };
+                            main_branch_id?: string | null;
+                            /** @enum {string|null} */
+                            next_step?: "clinic_type" | "location" | "you" | "go_live" | null;
+                            skipped_items?: ("treatments" | "invite_team")[];
+                            /** Format: date-time */
+                            updated_at?: string;
                         };
                         meta?: {
                             request_id: string;

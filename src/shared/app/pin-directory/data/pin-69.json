@@ -1,0 +1,940 @@
+{
+  "690101": [
+    "Alappuzha",
+    "Kerala",
+    ["Mavelikara", "Mavelikara Court", "Mavelikara Cutcherry", "Punnamoodu"]
+  ],
+  "690102": ["Alappuzha", "Kerala", ["Puthiyacavu", "Thazhakara"]],
+  "690103": ["Alappuzha", "Kerala", ["Kandiyoor", "Karipuzha", "Pela", "Thattarambalam"]],
+  "690104": ["Alappuzha", "Kerala", ["Cherukole", "Ezhakadavu", "Valiyakulangara"]],
+  "690105": [
+    "Alappuzha",
+    "Kerala",
+    ["Chennithala", "Chennithala South", "Thripperunthura"]
+  ],
+  "690106": [
+    "Alappuzha",
+    "Kerala",
+    ["Chettikulangara", "Erezha North", "Erezha South", "Kannamangalam"]
+  ],
+  "690107": ["Alappuzha", "Kerala", ["Pallarimangalam", "Thekkekara", "Varenickal"]],
+  "690108": ["Alappuzha", "Kerala", ["Eravankara", "Kunnam"]],
+  "690110": ["Alappuzha", "Kerala", ["Arunoottimangalam", "Kallumala"]],
+  "690501": ["Alappuzha", "Kerala", ["Kaduvinal", "Puthenchantha", "Vallikunnam"]],
+  "690502": ["Alappuzha", "Kerala", ["Kayangulam", "Kayangulam College"]],
+  "690503": [
+    "Alappuzha",
+    "Kerala",
+    [
+      "Bharanickavu",
+      "Illippakulam",
+      "Kattanam",
+      "Pallickal",
+      "Pallickal Naduvilemuri",
+      "Vetticode"
+    ]
+  ],
+  "690504": [
+    "Alappuzha",
+    "Kerala",
+    ["Athikattukulangara", "Nooranad", "Pallickal Nooranad", "Panayil", "Payyanallur"]
+  ],
+  "690505": [
+    "Alappuzha",
+    "Kerala",
+    ["Charumoodu", "Kannanakuzhy", "Komallur", "Vedaraplavu"]
+  ],
+  "690506": ["Alappuzha", "Kerala", ["Choolatheruvu", "Muthukulam", "Muthukulam South"]],
+  "690507": ["Alappuzha", "Kerala", ["Cheppaud", "Evur"]],
+  "690508": ["Alappuzha", "Kerala", ["Keerikad", "Pathiyoor"]],
+  "690509": ["Alappuzha", "Kerala", ["Kallimel", "Kollakadavu"]],
+  "690510": ["Alappuzha", "Kerala", ["Olakettiambalam"]],
+  "690511": ["Alappuzha", "Kerala", ["Muttomalleppey"]],
+  "690512": ["Alappuzha", "Kerala", ["Naduvattom", "Pallipad"]],
+  "690513": ["Alappuzha", "Kerala", ["Akamkudy", "Nangiarkulangara"]],
+  "690514": ["Alappuzha", "Kerala", ["Haripad", "Mannarasala", "Payipad", "Veeyapuram"]],
+  "690515": [
+    "Alappuzha",
+    "Kerala",
+    ["Arattupuzha North", "Mangalam", "Pallana", "Thrikkunnapuzha"]
+  ],
+  "690516": [
+    "Alappuzha",
+    "Kerala",
+    ["Erickavu", "Karthikappally", "Mahadevikadu", "Valiyaparambu"]
+  ],
+  "690517": [
+    "Alappuzha",
+    "Kerala",
+    ["Ayaparambu", "Cheruthana", "Karuvatta", "Karuvatta North", "Pandy"]
+  ],
+  "690518": ["Kollam", "Kerala", ["Karunagappally"]],
+  "690519": [
+    "Kollam",
+    "Kerala",
+    ["Kallelibhagom", "Mynagappally", "Mynagappally North", "Thottumugham"]
+  ],
+  "690520": [
+    "Kollam",
+    "Kerala",
+    ["Ambalathumbhagom", "Chathakulam", "Muthupilakkad", "Poruvazhy"]
+  ],
+  "690521": [
+    "Kollam",
+    "Kerala",
+    ["Karali Jn", "Pallisserickal", "Sasthamcottah", "Venga", "Vilanthara Jn"]
+  ],
+  "690522": ["Kollam", "Kerala", ["Kakkakunnu", "Patharam", "Sooranad", "Thengamom"]],
+  "690523": [
+    "Kollam",
+    "Kerala",
+    [
+      "Edakulangara",
+      "Kadathur Ward",
+      "Kuthirapanthy",
+      "Thazhava",
+      "Thodiyur",
+      "Thodiyur North"
+    ]
+  ],
+  "690524": ["Kollam", "Kerala", ["Padinjattakkara", "Thevalakkara"]],
+  "690525": ["Kollam", "Kerala", ["Clappana"]],
+  "690526": ["Kollam", "Kerala", ["Madathilkaranma", "Ochira"]],
+  "690527": ["Alappuzha", "Kerala", ["Govindamuttom", "Puthuppally"]],
+  "690528": ["Kollam", "Kerala", ["Varavila", "Vavvakkavu"]],
+  "690529": ["Alappuzha", "Kerala", ["Padanilam", "Pattoor"]],
+  "690530": ["Alappuzha", "Kerala", ["Thamarakulam"]],
+  "690531": ["Alappuzha", "Kerala", ["Pattolimarket", "Puthiyavila"]],
+  "690532": ["Alappuzha", "Kerala", ["Chingoli"]],
+  "690533": ["Alappuzha", "Kerala", ["Kappil East", "Krishnapuram", "Njakkanal"]],
+  "690534": ["Alappuzha", "Kerala", ["Chunakara", "Thannikunnu"]],
+  "690535": ["Alappuzha", "Kerala", ["Arattupuzha", "Kandallur", "Valiyazheekkal"]],
+  "690536": ["Kollam", "Kerala", ["Kollaka", "Vadakkumthala East"]],
+  "690537": ["Alappuzha", "Kerala", ["Pullikanakku"]],
+  "690538": ["Kollam", "Kerala", ["Arinallur", "Arinallur South", "Perungalam"]],
+  "690539": ["Kollam", "Kerala", ["S R P Market"]],
+  "690540": ["Kollam", "Kerala", ["Karimthottuva", "Kunnathur East", "Thuruthikara"]],
+  "690542": ["Kollam", "Kerala", ["Athinad North", "Kattilkadavu", "Kuzhithura"]],
+  "690544": ["Kollam", "Kerala", ["Karunagappally North", "Kulasekharapuram"]],
+  "690546": ["Kollam", "Kerala", ["Amrithapuri"]],
+  "690547": [
+    "Kollam",
+    "Kerala",
+    ["Alumpeedika", "Azheekkalthura", "Prayar", "Thattakkattu Market"]
+  ],
+  "690548": [
+    "Alappuzha",
+    "Kerala",
+    ["Kumarapuram", "Thamallackal", "Thamallackal North"]
+  ],
+  "690558": ["Alappuzha", "Kerala", ["Ayiranikudy", "Mankamkuzhy", "Vettiyar"]],
+  "690559": ["Alappuzha", "Kerala", ["Perungala"]],
+  "690561": ["Kollam", "Kerala", ["Anayadi", "Parakadavu", "Sooranad North"]],
+  "690571": ["Alappuzha", "Kerala", ["Nooranad Sanatorium"]],
+  "690572": ["Alappuzha", "Kerala", ["Eruva", "Kareelakulangara"]],
+  "690573": ["Kollam", "Kerala", ["Alumkadavu", "Cheriyazheekal", "S V Market"]],
+  "690574": ["Kollam", "Kerala", ["Manappally North", "Pavumba"]],
+  "691001": [
+    "Kollam",
+    "Kerala",
+    ["Kollam", "Kollam Bazar", "Kollam Cantonment", "Kollam Taluk Cutchery"]
+  ],
+  "691002": ["Kollam", "Kerala", ["Asramom"]],
+  "691003": ["Kollam", "Kerala", ["Kavanad", "Maruthadi"]],
+  "691004": ["Kollam", "Kerala", ["Kallumthazham", "Kilikollur"]],
+  "691005": ["Kollam", "Kerala", ["T K M College", "Thattarkonam"]],
+  "691006": ["Kollam", "Kerala", ["Pallithottam"]],
+  "691007": ["Kollam", "Kerala", ["Thangasserry"]],
+  "691008": ["Kollam", "Kerala", ["Kadappakada"]],
+  "691009": ["Kollam", "Kerala", ["Thevally"]],
+  "691010": ["Kollam", "Kerala", ["Mundakkal", "Vadakkevila"]],
+  "691011": ["Kollam", "Kerala", ["Eravipuram", "Valathungal"]],
+  "691012": ["Kollam", "Kerala", ["Thirumullavaram"]],
+  "691013": ["Kollam", "Kerala", ["Kollam Civil Station", "Kollam Cutchery"]],
+  "691014": ["Kollam", "Kerala", ["Chandanathope"]],
+  "691015": ["Kollam", "Kerala", ["Kilikollur East", "Mangad"]],
+  "691016": ["Kollam", "Kerala", ["Thekkevila"]],
+  "691019": ["Kollam", "Kerala", ["Uliyakovil"]],
+  "691020": ["Kollam", "Kerala", ["Koottikada", "Thattamala"]],
+  "691021": ["Kollam", "Kerala", ["Ayathil", "Pattathanam"]],
+  "691301": ["Kollam", "Kerala", ["Paravur"]],
+  "691302": [
+    "Kollam",
+    "Kerala",
+    ["Bhoothakulam", "Kalakode", "Nellettil", "Puthenkulam"]
+  ],
+  "691303": ["Kollam", "Kerala", ["Kakkotumoola", "Mayyanad"]],
+  "691304": ["Kollam", "Kerala", ["Pullichira"]],
+  "691305": ["Kollam", "Kerala", ["Punalur"]],
+  "691306": [
+    "Kollam",
+    "Kerala",
+    [
+      "Alayamon",
+      "Anchal",
+      "Cherukulam",
+      "Edamulackal",
+      "Ezhiyam Vattathra Mala Mukku",
+      "Karukone",
+      "Kottukkal",
+      "Nediyara",
+      "Thadicaud",
+      "Vadamon",
+      "Vayalaanchal"
+    ]
+  ],
+  "691307": [
+    "Kollam",
+    "Kerala",
+    ["Anapettakongal", "Ayiranallur", "Edamon", "Mampazhathara", "Urukunnu"]
+  ],
+  "691308": ["Kollam", "Kerala", ["Kallada Irrigation Project", "Ottackal", "Thenmala"]],
+  "691309": [
+    "Kollam",
+    "Kerala",
+    ["Ambanad", "Aryankavu", "Edapalayam", "Kalthuruthy", "Rosemala", "Venture"]
+  ],
+  "691310": [
+    "Kollam",
+    "Kerala",
+    [
+      "Chozhiakode",
+      "Dally",
+      "Koovakkad",
+      "Kulathupuzha",
+      "Samnagar",
+      "Thingalkarikom",
+      "Villumala"
+    ]
+  ],
+  "691311": ["Kollam", "Kerala", ["Anakulam", "Channapettah", "Mannuranchal"]],
+  "691312": [
+    "Kollam",
+    "Kerala",
+    [
+      "Ayilara",
+      "Bharatheepuram",
+      "Eroor",
+      "Kadamancode",
+      "Manalil",
+      "Marthandankara",
+      "Vilakkupara"
+    ]
+  ],
+  "691319": ["Kollam", "Kerala", ["Thekkumbhagom"]],
+  "691322": ["Kollam", "Kerala", ["Elampal", "Elicode", "Kottavattom", "Narikal"]],
+  "691331": [
+    "Kollam",
+    "Kerala",
+    [
+      "Kakkode",
+      "Nellipally",
+      "Placherry",
+      "Shaliacarry Estate",
+      "Valacode",
+      "Vilakkuvattom"
+    ]
+  ],
+  "691332": ["Kollam", "Kerala", ["Kariyara", "Punalur Paper Mills"]],
+  "691333": [
+    "Kollam",
+    "Kerala",
+    ["Areeplachy", "Karavaloor", "Maniyarupunalur", "Mathra", "Tholicode", "Venchempu"]
+  ],
+  "691334": ["Kollam", "Kerala", ["Nedungolam", "Polachira"]],
+  "691500": ["Kollam", "Kerala", ["Peruvelikara", "West Kallada"]],
+  "691501": [
+    "Kollam",
+    "Kerala",
+    ["Ambipoika", "Kanjiracode", "Kundara", "Kundara East", "Nedumpaikulam"]
+  ],
+  "691502": ["Kollam", "Kerala", ["East Kallada", "Koduvila", "Munroethuruthu"]],
+  "691503": ["Kollam", "Kerala", ["Kumbalam", "Mukkoodu", "Mulavana", "Padappakara"]],
+  "691504": ["Kollam", "Kerala", ["Perumpuzha"]],
+  "691505": [
+    "Kollam",
+    "Kerala",
+    [
+      "Ambalathumkala",
+      "Anakottur",
+      "Ezhukone",
+      "Idakkadom",
+      "Irumpanangadu",
+      "Kadakkode",
+      "Karuvelil",
+      "Maranad",
+      "Neeleswaram"
+    ]
+  ],
+  "691506": ["Kollam", "Kerala", ["Kottarakara"]],
+  "691507": [
+    "Kollam",
+    "Kerala",
+    [
+      "Iverkala East",
+      "Karimpinpuzha",
+      "Kottathala",
+      "Mavadi",
+      "Pavithreswaram",
+      "Puthurkollam",
+      "Thevalappuram",
+      "Vendar"
+    ]
+  ],
+  "691508": [
+    "Kollam",
+    "Kerala",
+    [
+      "Ambalathinnirappu",
+      "Avaneeswaram",
+      "Avaneeswaram RS",
+      "Chakkuvarakkal",
+      "Kunnicode",
+      "Manjakala",
+      "Melila",
+      "Thalavoor",
+      "Vilakudy"
+    ]
+  ],
+  "691509": [
+    "Kollam",
+    "Kerala",
+    ["Kuzhimathicaud", "Nedumoncavu", "Nellimukku", "Thrippilazhikom", "Vakkanad"]
+  ],
+  "691510": ["Kollam", "Kerala", ["Chenkulam", "Meeyana", "Oyur"]],
+  "691511": ["Kollam", "Kerala", ["Vellimon", "Vellimon West"]],
+  "691512": ["Kollam", "Kerala", ["Kudavattur", "Muttara", "Odanavattom"]],
+  "691515": ["Kollam", "Kerala", ["Nallila"]],
+  "691516": ["Kollam", "Kerala", ["Akkal", "Cheriyavelinallur", "Karingannur"]],
+  "691520": ["Kollam", "Kerala", ["Cheppara", "Ummannur", "Valiyode"]],
+  "691521": ["Kollam", "Kerala", ["Kulakada", "Kulakkada East", "Kulakkadathazham"]],
+  "691522": ["Kollam", "Kerala", ["Panthaplavu", "Pattazhy", "Thekketheri"]],
+  "691523": ["Pathanamthitta", "Kerala", ["Adur Kla"]],
+  "691524": ["Pathanamthitta", "Kerala", ["Elamannur", "MangaduElamannur", "Marur"]],
+  "691525": ["Pathanamthitta", "Kerala", ["Anandapally", "Parakara", "Thattayil"]],
+  "691526": [
+    "Pathanamthitta",
+    "Kerala",
+    ["Enathu", "Kaithaparambu", "Thazhathuvadakku", "Vadakkedathukavu Jn"]
+  ],
+  "691527": ["Kollam", "Kerala", ["Nellikunnam"]],
+  "691530": ["Pathanamthitta", "Kerala", ["Mannady"]],
+  "691531": [
+    "Kollam",
+    "Kerala",
+    [
+      "Court Complex",
+      "Extension Trg Centre",
+      "Karikkom",
+      "Kizhakketheruvu",
+      "Plappally",
+      "Pulamon",
+      "Sadanandapuram"
+    ]
+  ],
+  "691532": [
+    "Kollam",
+    "Kerala",
+    [
+      "Ambalakkara",
+      "Andoor",
+      "Edayam",
+      "Panavely",
+      "Perumannur",
+      "Podiyattuvila",
+      "Valakom",
+      "Vayakkal"
+    ]
+  ],
+  "691533": [
+    "Kollam",
+    "Kerala",
+    [
+      "Arkannur",
+      "Ayur",
+      "Cheruvakkal",
+      "Elamadu",
+      "Manjappara",
+      "Ozhukkuparackal",
+      "Thevannur",
+      "Vayyanam",
+      "Vengoor"
+    ]
+  ],
+  "691534": [
+    "Kollam",
+    "Kerala",
+    ["Chadayamangalam", "Elampazhannur", "Kuriyode", "Poredom"]
+  ],
+  "691535": ["Kollam", "Kerala", ["Kaithode", "Nilamel"]],
+  "691536": [
+    "Kollam",
+    "Kerala",
+    [
+      "Channappara",
+      "Chariparambu",
+      "Edathara",
+      "Kadakkal",
+      "Kummil",
+      "Kuttikadu",
+      "Mathira",
+      "Pulippara Jn",
+      "Pullupana",
+      "Thudayannur",
+      "Vattathamara"
+    ]
+  ],
+  "691537": [
+    "Kollam",
+    "Kerala",
+    ["Kattadi Jn", "Mailode", "Meeyannur", "Nettayam", "Pooyapally"]
+  ],
+  "691538": ["Kollam", "Kerala", ["Kokkad", "Thalachira", "Vettikavala"]],
+  "691540": ["Kollam", "Kerala", ["Veliyam", "Veliyam West"]],
+  "691541": ["Kollam", "Kerala", ["Kollayil", "Madathara", "Venkolla"]],
+  "691543": ["Kollam", "Kerala", ["Cherupoika", "Kaithacode"]],
+  "691551": [
+    "Pathanamthitta",
+    "Kerala",
+    ["Choorakode", "Manakala", "Nellimukal", "Parakoottam", "Peringanad"]
+  ],
+  "691552": ["Pathanamthitta", "Kerala", ["Edakkad", "Kadambanad", "Thuvayur South"]],
+  "691553": ["Kollam", "Kerala", ["Kadambanad South", "Manampuzha", "Puthenambalam"]],
+  "691554": [
+    "Pathanamthitta",
+    "Kerala",
+    ["Melood", "Parakode", "Pazhakulam", "Puthumala", "Theppupara", "Vayala Parakode"]
+  ],
+  "691555": [
+    "Pathanamthitta",
+    "Kerala",
+    ["Angadical South", "Edathitta", "Kodumon", "Kodumon East"]
+  ],
+  "691556": ["Pathanamthitta", "Kerala", ["Chayalode", "Chelikuzhy", "Nedumon"]],
+  "691557": ["Kollam", "Kerala", ["Chengamanad Jn", "Kura"]],
+  "691559": [
+    "Kollam",
+    "Kerala",
+    ["Ayirakuzhy", "Chithara", "Mancodekadakkal", "Valavupacha"]
+  ],
+  "691560": ["Kollam", "Kerala", ["Kalayapuram", "Mailom", "Thamarakudy"]],
+  "691566": ["Kollam", "Kerala", ["Pallickalkottarakara", "Perumkulam"]],
+  "691571": ["Kollam", "Kerala", ["Kottiyam", "Mylakkadu"]],
+  "691572": ["Kollam", "Kerala", ["Chathannur"]],
+  "691573": ["Kollam", "Kerala", ["Adichanallur", "Kummallur", "Velichikala"]],
+  "691574": ["Kollam", "Kerala", ["Kizhakkanela", "Parippally", "Velamannoor"]],
+  "691576": ["Kollam", "Kerala", ["Kannanallur", "Nedumpana", "Pallimon"]],
+  "691577": ["Kollam", "Kerala", ["Alumoodu", "Decent Jn", "Mukathala"]],
+  "691578": [
+    "Kollam",
+    "Kerala",
+    ["Chirakkara", "Chirakkarathazham", "Kalluvathukkal", "Vilavoorkonam"]
+  ],
+  "691579": ["Kollam", "Kerala", ["Aduthala", "Edanad", "Karamcode", "Uliyanadu"]],
+  "691581": ["Kollam", "Kerala", ["Sakthikulangara"]],
+  "691582": ["Kollam", "Kerala", ["Neendakara", "Puthenthura"]],
+  "691583": [
+    "Kollam",
+    "Kerala",
+    [
+      "Chavara",
+      "Chavara Bridge",
+      "Edappallycotta",
+      "Panmana",
+      "Panmana Puthen Chantha",
+      "Ponmana"
+    ]
+  ],
+  "691584": ["Kollam", "Kerala", ["Chavara South", "Vadakkumbhagom"]],
+  "691585": ["Kollam", "Kerala", ["Mukundapuram", "Puthukkadukara"]],
+  "691589": ["Kollam", "Kerala", ["Umayanallur I E"]],
+  "691590": ["Kollam", "Kerala", ["Koivila"]],
+  "691601": [
+    "Kollam",
+    "Kerala",
+    [
+      "Chemmakkad",
+      "Inchavila",
+      "Kureepuzha",
+      "Mathilil",
+      "Panayam",
+      "Pattamthuruth",
+      "Perinad",
+      "Perumon"
+    ]
+  ],
+  "691602": ["Kollam", "Kerala", ["Ashtamudi", "Kanjavely", "Prakkulam"]],
+  "695001": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Thiruvananthapuram", "Thiruvananthapuram AGs"]
+  ],
+  "695002": ["Thiruvananthapuram", "Kerala", ["Karamana", "Karumom"]],
+  "695003": ["Thiruvananthapuram", "Kerala", ["Kaudiar", "Kaudiar Square"]],
+  "695004": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Goureesapattom", "Mg College", "Pattom Palace"]
+  ],
+  "695005": ["Thiruvananthapuram", "Kerala", ["Ambalamukku", "Perurkada"]],
+  "695006": ["Thiruvananthapuram", "Kerala", ["Tirumala", "Valiavila"]],
+  "695007": ["Thiruvananthapuram", "Kerala", ["Thiruvananthapuram Beach"]],
+  "695008": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Beemapally", "Thope", "Valiathura", "Vallakkadavoo"]
+  ],
+  "695009": ["Thiruvananthapuram", "Kerala", ["Attukal", "Manacaud"]],
+  "695010": ["Thiruvananthapuram", "Kerala", ["Sasthamangalam", "TVM RK Mission"]],
+  "695011": [
+    "Thiruvananthapuram",
+    "Kerala",
+    [
+      "Cheruvikkal",
+      "Prasanth Nagar",
+      "Thiruvananthapuram Medical College",
+      "Thuruvikkal",
+      "Ulloor"
+    ]
+  ],
+  "695012": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Poojapura", "Poojapura Junction", "Thamalam"]
+  ],
+  "695013": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Cheriyakonni", "Kodunganur", "Manikanteswaram", "Nettayam", "Vattiyoorkavu"]
+  ],
+  "695014": ["Thiruvananthapuram", "Kerala", ["Cotton Hill", "Jagathy", "Thycaud"]],
+  "695015": ["Thiruvananthapuram", "Kerala", ["Mannanathala", "Nalanchira"]],
+  "695016": ["Thiruvananthapuram", "Kerala", ["Thiruvananthapuram Engg College"]],
+  "695017": ["Thiruvananthapuram", "Kerala", ["Sreekaryam"]],
+  "695018": ["Thiruvananthapuram", "Kerala", ["Pappanamcode"]],
+  "695019": ["Thiruvananthapuram", "Kerala", ["Industrial Estate"]],
+  "695020": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Nemom", "Ookode", "Pallichal", "Pravachambalam"]
+  ],
+  "695021": ["Thiruvananthapuram", "Kerala", ["Karikkakom", "Titanium", "Valiaveli"]],
+  "695022": ["Thiruvananthapuram", "Kerala", ["Thiruvananthapuram ISRO"]],
+  "695023": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Attakulangara", "Thiruvananthapuram Fort"]
+  ],
+  "695024": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Chakkai", "Kaithamukku", "Palkulangara", "Thiruvananthapuram Pettah"]
+  ],
+  "695025": ["Thiruvananthapuram", "Kerala", ["Muttada"]],
+  "695026": ["Thiruvananthapuram", "Kerala", ["Ambalathara", "Poonthura"]],
+  "695027": ["Thiruvananthapuram", "Kerala", ["Pachallur", "Thiruvallom"]],
+  "695028": ["Thiruvananthapuram", "Kerala", ["Pandalacode", "Vattappara", "Venkode"]],
+  "695029": ["Thiruvananthapuram", "Kerala", ["Anayara"]],
+  "695030": ["Thiruvananthapuram", "Kerala", ["Kanjirampara"]],
+  "695032": ["Thiruvananthapuram", "Kerala", ["Aramada"]],
+  "695033": ["Thiruvananthapuram", "Kerala", ["PMG Jn", "Public Office", "Vikas Bhavan"]],
+  "695034": ["Thiruvananthapuram", "Kerala", ["Thiruvananthapuram University"]],
+  "695035": ["Thiruvananthapuram", "Kerala", ["Vanchiyoor Junction", "Vanchiyur"]],
+  "695036": ["Thiruvananthapuram", "Kerala", ["Thiruvananthapuram Chalai"]],
+  "695038": ["Thiruvananthapuram", "Kerala", ["PTP Nagar"]],
+  "695040": ["Thiruvananthapuram", "Kerala", ["Kaimanam"]],
+  "695042": ["Thiruvananthapuram", "Kerala", ["Kalliyoor"]],
+  "695043": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Kallayam", "Kudappanakunnu", "Mukkolackal"]
+  ],
+  "695051": ["Thiruvananthapuram", "Kerala", []],
+  "695099": ["Thiruvananthapuram", "Kerala", ["Kerala Governors Camp"]],
+  "695101": ["Thiruvananthapuram", "Kerala", ["Attingal"]],
+  "695102": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Alamcode", "Altharamoodu", "Nedumparambu", "Perumkulam", "Vanchiyurattingal"]
+  ],
+  "695103": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Avanavancherry", "Ayilam", "Ilamba", "Mudakkal", "Poikamukku"]
+  ],
+  "695104": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Edakode", "Kandukrishi", "Kizhuvalam", "Kurakkada", "Oorupoika", "Parayathukonam"]
+  ],
+  "695121": ["Thiruvananthapuram", "Kerala", ["Neyyattinkara", "Neyyattinkara Town"]],
+  "695122": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Amaravila", "Arayur", "Chaikkottukonam", "Mariyapuram", "Plamootukada"]
+  ],
+  "695123": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Aralumoodu", "Kodungavila", "Thannimoodu", "Venpakal"]
+  ],
+  "695124": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Anavoor", "Keezharur", "Kottackal TVM", "Marayamuttom", "Perumkadavila"]
+  ],
+  "695125": [
+    "Thiruvananthapuram",
+    "Kerala",
+    [
+      "Dalmughom",
+      "Manchamcode",
+      "Mannamkonam",
+      "Ottasekharamangalam",
+      "Poozhanad",
+      "Vazhichal"
+    ]
+  ],
+  "695126": ["Thiruvananthapuram", "Kerala", ["Aruvipuram", "Perumpazhuthoor"]],
+  "695132": ["Thiruvananthapuram", "Kerala", ["Chenkal", "Vattavila"]],
+  "695133": ["Thiruvananthapuram", "Kerala", ["Mulluvila", "Olathanni", "Tirupuram"]],
+  "695134": ["Thiruvananthapuram", "Kerala", ["Vlathankara"]],
+  "695141": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Janardhanapuram", "Sivagiri Mutt", "Varkala", "Varkala South"]
+  ],
+  "695142": ["Thiruvananthapuram", "Kerala", ["Cherunniyur"]],
+  "695143": ["Thiruvananthapuram", "Kerala", ["Palachira", "Thokkad", "Vadasserikonam"]],
+  "695144": ["Thiruvananthapuram", "Kerala", ["Kavalayur", "Kulamuttam", "Moongode"]],
+  "695145": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Muttappalam", "Panayara", "Sreenivasapuram"]
+  ],
+  "695146": ["Thiruvananthapuram", "Kerala", ["Muthana", "Palayamkunnu"]],
+  "695301": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Channamkara", "Chittattumukku", "Kaniyapuram"]
+  ],
+  "695302": ["Thiruvananthapuram", "Kerala", ["Murukumpuzhaa"]],
+  "695303": ["Thiruvananthapuram", "Kerala", ["Perumathura", "Puthencurichy"]],
+  "695304": ["Thiruvananthapuram", "Kerala", ["Chirayinkeezhu", "Katakam", "Mudapuram"]],
+  "695305": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Azhurmarket", "Perunguzhi", "Sasthavattom"]
+  ],
+  "695306": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Anathalavattom", "Kadakkavur", "Keezhattingal", "Melkadakkavur", "Nilakkamukku"]
+  ],
+  "695307": ["Thiruvananthapuram", "Kerala", ["Kaikara", "Nedunganda"]],
+  "695308": ["Thiruvananthapuram", "Kerala", ["Vakkom"]],
+  "695309": ["Thiruvananthapuram", "Kerala", ["Anjengo", "Poothura"]],
+  "695310": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Ayroorvarkala", "Elakamon", "Elakamonkizhakkepuram", "Hariharapuram"]
+  ],
+  "695311": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Edava", "Kappil", "Odayam", "Pullanicode", "Venkulam"]
+  ],
+  "695312": ["Thiruvananthapuram", "Kerala", ["Melvettoor", "Vettoor"]],
+  "695313": ["Thiruvananthapuram", "Kerala", ["Kudavur", "Manjamala"]],
+  "695316": ["Thiruvananthapuram", "Kerala", ["Pallipuram"]],
+  "695317": ["Thiruvananthapuram", "Kerala", ["Thonnakkal"]],
+  "695318": ["Thiruvananthapuram", "Kerala", ["Vennicode"]],
+  "695501": [
+    "Thiruvananthapuram",
+    "Kerala",
+    [
+      "Balaramapuram",
+      "Bhagavathinada",
+      "Chowara",
+      "Kattachalkuzhy",
+      "Kottukal",
+      "Payattuvila",
+      "Russelpuram",
+      "Vedivachankoil"
+    ]
+  ],
+  "695502": ["Thiruvananthapuram", "Kerala", ["Ayira", "Cheruvarakonam", "Parassala"]],
+  "695503": ["Thiruvananthapuram", "Kerala", ["Dhanuvachapuram", "Manchavilakom"]],
+  "695504": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Cheriakolla", "Elluvila", "Karakonam", "Kunnathukal"]
+  ],
+  "695505": [
+    "Thiruvananthapuram",
+    "Kerala",
+    [
+      "Amboori",
+      "Karikuzhi",
+      "KoothaliTVM",
+      "Kudappanamoodu",
+      "Kudayal",
+      "Kuttamala",
+      "Manali",
+      "Mayam",
+      "Panachamoodu",
+      "Thekkupara",
+      "Vellarada"
+    ]
+  ],
+  "695506": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Kakkavila", "Karode", "Uchakada", "Venkadambu"]
+  ],
+  "695507": ["Thiruvananthapuram", "Kerala", ["Ooruttambalam"]],
+  "695508": ["Thiruvananthapuram", "Kerala", ["Parasuvaickal"]],
+  "695512": ["Thiruvananthapuram", "Kerala", ["Kandala", "Kuvalassery", "Veliyamcode"]],
+  "695513": ["Thiruvananthapuram", "Kerala", ["Pozhiyoor"]],
+  "695521": ["Thiruvananthapuram", "Kerala", ["Kottapuram", "Mullur", "Vizhinjam"]],
+  "695522": ["Thiruvananthapuram", "Kerala", ["Cgo Complex Poonkulam", "Vellayani"]],
+  "695523": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Kidarakuzhy", "Muttakadu", "Nellivila", "Venganur"]
+  ],
+  "695524": ["Thiruvananthapuram", "Kerala", ["Kanjiramkulam", "Nellimoodu"]],
+  "695525": ["Thiruvananthapuram", "Kerala", ["Arumanoor", "Kanjampazhanji", "Puvar"]],
+  "695526": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Kazhavur", "Lourdepuram", "Pulluvila", "Puthiathura"]
+  ],
+  "695527": ["Thiruvananthapuram", "Kerala", ["Kovalam", "Kovalam Beach"]],
+  "695528": ["Thiruvananthapuram", "Kerala", ["Naruvamoodu"]],
+  "695541": [
+    "Thiruvananthapuram",
+    "Kerala",
+    [
+      "Anad",
+      "Chullimanoor",
+      "Karipur",
+      "Mancha",
+      "Mannurkonam",
+      "Nedumangad",
+      "Paruthikuzhy",
+      "Puthukulangara",
+      "Tholicode"
+    ]
+  ],
+  "695542": [
+    "Thiruvananthapuram",
+    "Kerala",
+    [
+      "Aryanad",
+      "Changa",
+      "Kokkotela",
+      "Kottakkakom",
+      "Kulappada",
+      "Marangad",
+      "Meenankal",
+      "Panacode",
+      "Parandode",
+      "Vinobaniketan"
+    ]
+  ],
+  "695543": [
+    "Thiruvananthapuram",
+    "Kerala",
+    [
+      "Kuthirakalamvellanad",
+      "Mithraniketan",
+      "Mulayara",
+      "Mundela",
+      "Uriakode",
+      "Veliyannur",
+      "Vellanad"
+    ]
+  ],
+  "695547": ["Thiruvananthapuram", "Kerala", ["Valiamala"]],
+  "695551": [
+    "Thiruvananthapuram",
+    "Kerala",
+    [
+      "Anappara",
+      "Bonaccord",
+      "Chettachal",
+      "Kallar Tvm",
+      "Maruthamala",
+      "Memala",
+      "Parappara",
+      "Peppara Dam",
+      "Ponmudi",
+      "Vithura"
+    ]
+  ],
+  "695561": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Irinchayam", "Panayamuttom", "Pazhakutty", "Poovathur"]
+  ],
+  "695562": [
+    "Thiruvananthapuram",
+    "Kerala",
+    [
+      "Elavattom",
+      "Exservicemens Colony",
+      "Karimancode",
+      "Meenmutty",
+      "Pacha",
+      "Paluvally",
+      "Perayam",
+      "Vattakarikkakom"
+    ]
+  ],
+  "695563": [
+    "Thiruvananthapuram",
+    "Kerala",
+    [
+      "Daivapura",
+      "Idinjar",
+      "Ilanchiyam",
+      "Kochuvila",
+      "Panangode",
+      "Peringamala",
+      "Thennur"
+    ]
+  ],
+  "695564": ["Thiruvananthapuram", "Kerala", ["Aruvikara", "Chekkakonam", "Karakulam"]],
+  "695568": ["Thiruvananthapuram", "Kerala", ["Koonanvenga", "Panavoor", "Panayam"]],
+  "695570": ["Thiruvananthapuram", "Kerala", ["Machel"]],
+  "695571": ["Thiruvananthapuram", "Kerala", ["Kollode", "Malayam", "Malayinkil"]],
+  "695572": [
+    "Thiruvananthapuram",
+    "Kerala",
+    [
+      "Amachal",
+      "Ambalathinkala",
+      "Kattacode",
+      "Kattakada",
+      "Kuruthamcode",
+      "Mylakkara",
+      "Neyyar Dam",
+      "Pantha",
+      "Veeranakavu"
+    ]
+  ],
+  "695573": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Moongode", "Perukavu", "Peyad", "Puliyarakonam", "Vilappilsala"]
+  ],
+  "695574": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Kalliyal", "KottoorTVM", "Kuttichal", "Paruthipally"]
+  ],
+  "695575": ["Thiruvananthapuram", "Kerala", ["Panniyode", "Poovachal", "Punalal"]],
+  "695581": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Karyavattom", "Pangappara", "Technopark", "Thundathil"]
+  ],
+  "695582": ["Thiruvananthapuram", "Kerala", ["Kazhakuttam"]],
+  "695583": ["Thiruvananthapuram", "Kerala", ["Karimanal", "Kulathur"]],
+  "695584": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Andoorkonam", "Iroopara", "Kattaikonam", "Keezhavur", "Koithurkonam", "Pothencode"]
+  ],
+  "695585": ["Thiruvananthapuram", "Kerala", ["Sainik School"]],
+  "695586": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Pallithura", "Puthenthope", "StXaviers College"]
+  ],
+  "695587": ["Thiruvananthapuram", "Kerala", ["Chempazhanthy"]],
+  "695588": ["Thiruvananthapuram", "Kerala", ["Powdikonam"]],
+  "695589": ["Thiruvananthapuram", "Kerala", ["Nethajipuram", "Santhigiri"]],
+  "695601": [
+    "Thiruvananthapuram",
+    "Kerala",
+    [
+      "Charupara",
+      "Kilimanur Palace",
+      "Kilmanur",
+      "Nagaroor",
+      "Pazhayakunnumel",
+      "Peroor",
+      "Ponganadu",
+      "Pullayil",
+      "Vellallur"
+    ]
+  ],
+  "695602": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Madavoorpallickal", "Malakkal", "Njarayilkonam"]
+  ],
+  "695603": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Maruthikunnu", "Navaikulam", "Parakunnu", "Vettiyara"]
+  ],
+  "695604": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Kokkottukonam", "Moothala", "Pakalkuri", "Pallickal Kilimanur", "Puliyurkonam"]
+  ],
+  "695605": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Kallambalam", "Karavaram", "Puthusserimukku", "Thottakkad"]
+  ],
+  "695606": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Anakudy", "Kalamachal", "Karimkuttikara", "Kottukunnam", "Nellanad", "Vamanapuram"]
+  ],
+  "695607": [
+    "Thiruvananthapuram",
+    "Kerala",
+    [
+      "Aliyadu",
+      "Koliakode",
+      "Mukkudil",
+      "Palamkonam",
+      "Pirappancode",
+      "Pullampara",
+      "Vellumannady",
+      "Venjaramoodu"
+    ]
+  ],
+  "695608": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Kallara", "Kattumpuram", "Kodithookiyakunnu", "Kurumbayam"]
+  ],
+  "695609": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Bharathannur", "Kanchinada", "Moonnumukku", "Mylamoodu", "Pangode"]
+  ],
+  "695610": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Mithirmala", "Muthuvila", "Neeramankadavuu"]
+  ],
+  "695611": ["Thiruvananthapuram", "Kerala", ["Manambur"]],
+  "695612": ["Thiruvananthapuram", "Kerala", ["Koduvazhannur", "Pulimath", "Thalikuzhi"]],
+  "695614": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Adayamon", "Mulakkalathukavu", "Thattathumala"]
+  ],
+  "695615": [
+    "Thiruvananthapuram",
+    "Kerala",
+    ["Cheeranikkara", "Konchira", "Kuthirakulam", "Moonnanakuzhy", "Vembayam"]
+  ]
+}

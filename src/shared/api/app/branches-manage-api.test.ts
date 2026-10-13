@@ -135,6 +135,16 @@ describe('saveBranch', () => {
       expect.objectContaining({ body: expect.objectContaining({ is_active: false }) }),
     );
   });
+
+  it('names no team when none is given — a new branch gets its creator, an edit keeps its own', async () => {
+    await saveBranch({ save: { input: input() }, idempotencyKey: KEY });
+    const [, created] = vi.mocked(api.post).mock.calls[0] as [string, { body: object }];
+    expect(created.body).not.toHaveProperty('membership_ids');
+
+    await saveBranch({ save: { branch: appBranch(), input: input() } });
+    expect(api.put).not.toHaveBeenCalled();
+    expect(api.patch).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe('replaceBranchMembers', () => {

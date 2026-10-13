@@ -1,0 +1,5528 @@
+{
+  "841101": [
+    "Saran",
+    "Bihar",
+    [
+      "Baijalpur Keso",
+      "Barua",
+      "Bharpura",
+      "Darihara",
+      "Govindchak",
+      "Harihar Kshetra",
+      "Kharika",
+      "Pahleza Barka",
+      "Parmanandpur",
+      "Rahimpur",
+      "Sabalpur",
+      "Saraiya",
+      "Sikarpur",
+      "Sonepur",
+      "Sonepur RS",
+      "TMPal"
+    ]
+  ],
+  "841201": [
+    "Saran",
+    "Bihar",
+    ["Bareja", "Dharmapura", "Jamanpura", "Madansath", "Shitalpur Bazar"]
+  ],
+  "841202": [
+    "Saran",
+    "Bihar",
+    [
+      "Basant",
+      "DSultanpur",
+      "Fatehpur Chain",
+      "Itawa",
+      "Kudarbadha",
+      "Rahampur",
+      "Ramgarha"
+    ]
+  ],
+  "841203": [
+    "Siwan",
+    "Bihar",
+    [
+      "Ansar",
+      "Bakhari",
+      "Bangra Ke Bari",
+      "Chainpur",
+      "Chhitauli",
+      "Dighwalia",
+      "Jagdishpur",
+      "Nandamura",
+      "Ramgarh",
+      "Sarhara"
+    ]
+  ],
+  "841204": [
+    "Saran",
+    "Bihar",
+    ["Asahani", "Atarsan", "Chainwa", "Chanchaura", "Dohar", "Eksar", "Rasualpur Chatti"]
+  ],
+  "841205": [
+    "Saran",
+    "Bihar",
+    [
+      "Bangra",
+      "Barwakhurd",
+      "Daudpur",
+      "Inayatpur",
+      "Jaitpur Bharwalia",
+      "Khardahiya",
+      "Kohra",
+      "Kumna",
+      "Lejuar",
+      "Mane",
+      "Russi",
+      "Sonia",
+      "Tarwa Pojhia"
+    ]
+  ],
+  "841206": [
+    "Saran",
+    "Bihar",
+    ["Banpura Bazar", "Basahi", "Dayalpur", "Manikpura", "Puchitikala"]
+  ],
+  "841207": [
+    "Saran",
+    "Bihar",
+    [
+      "Aami",
+      "Dighwara",
+      "Goraipur",
+      "Haraji",
+      "Jaitipur",
+      "Khanpur",
+      "Malkhachak",
+      "Manupur",
+      "Mujauna",
+      "Saidpur"
+    ]
+  ],
+  "841208": [
+    "Saran",
+    "Bihar",
+    [
+      "Amdarhi",
+      "Bhorahopur",
+      "Bishunpura Kala",
+      "Chhitraulia",
+      "Ekma",
+      "Ekma Nautan",
+      "Harpur",
+      "Khanpur",
+      "Nachap",
+      "Rith",
+      "Safari"
+    ]
+  ],
+  "841209": [
+    "Saran",
+    "Bihar",
+    [
+      "Cheful",
+      "Dumaigarh",
+      "Fulwaria Tajpur",
+      "Gola Mubarkpur",
+      "Jayee Chapra",
+      "Khajuhatti",
+      "Matiyar"
+    ]
+  ],
+  "841210": [
+    "Siwan",
+    "Bihar",
+    [
+      "Bhagar",
+      "Gangpur Siswan",
+      "Gayaspur",
+      "Ghurghat",
+      "Kachnar",
+      "Madhopur",
+      "Noniyapatti"
+    ]
+  ],
+  "841211": [
+    "Saran",
+    "Bihar",
+    [
+      "Chirand",
+      "Doriganj",
+      "Gultenganj",
+      "JBishunpura",
+      "K P Rampur",
+      "Khalpura",
+      "Mehrauli",
+      "Rasalpura",
+      "Zilkabad"
+    ]
+  ],
+  "841212": ["Saran", "Bihar", ["Banpura", "Bigaha", "Deopura", "Jogia", "Saraon"]],
+  "841213": [
+    "Saran",
+    "Bihar",
+    [
+      "Anwal",
+      "Chatra",
+      "Deoria",
+      "Hasulahi Deoria",
+      "Kopa Samhota",
+      "Majlishpur",
+      "Methwalia",
+      "Mukrera",
+      "Rewari"
+    ]
+  ],
+  "841214": [
+    "Saran",
+    "Bihar",
+    ["Bhatwalia", "Dhelhari", "Kachnar", "Khairwar", "Kopa Bazar", "Natwar Semaria"]
+  ],
+  "841215": ["Saran", "Bihar", ["Baghakol", "Banauta", "Bhatha", "Maker", "Pirmaker"]],
+  "841216": [
+    "Saran",
+    "Bihar",
+    [
+      "Dumari Balua",
+      "Jhauwa",
+      "Kans Diara",
+      "Kotheya",
+      "Mirpur Zuara",
+      "Naraon",
+      "Saidpur"
+    ]
+  ],
+  "841217": ["Saran", "Bihar", ["Dumari Bujurg", "Gopalpur", "Nayagaon"]],
+  "841218": ["Saran", "Bihar", ["Koreya", "Paiga", "Pakri Mohammadpur"]],
+  "841219": [
+    "Saran",
+    "Bihar",
+    [
+      "Anjani",
+      "Babhangawa",
+      "Baksanda",
+      "Barka Baneya",
+      "Barwe",
+      "Bhagwanpur",
+      "BTKohra",
+      "Latrahiya",
+      "M Kuari",
+      "Marar",
+      "Masti Chak",
+      "Parsa",
+      "Parsauna",
+      "Pojhi",
+      "Sahar Chapra"
+    ]
+  ],
+  "841220": [
+    "Saran",
+    "Bihar",
+    [
+      "Hussepur",
+      "Karahi",
+      "Keshri Mathia",
+      "Manikpura",
+      "Pachua",
+      "Parsagarh",
+      "Rampur Bindalal"
+    ]
+  ],
+  "841221": [
+    "Saran",
+    "Bihar",
+    [
+      "Arbindnagar",
+      "Bajaiha",
+      "Basti Jalal",
+      "Bela",
+      "Dariapur",
+      "Ismela",
+      "Sitalpur",
+      "Unehchak"
+    ]
+  ],
+  "841222": [
+    "Saran",
+    "Bihar",
+    ["Fursatpur", "Jagarnathpur", "Kakrahat", "Patti Sital", "Piraridih", "Sutihar"]
+  ],
+  "841223": ["Saran", "Bihar", ["Baghauna", "Mohamadpur", "Narwan"]],
+  "841224": [
+    "Saran",
+    "Bihar",
+    [
+      "Aruwa",
+      "Badar Zamin",
+      "Dhamsar",
+      "Lahladpur",
+      "Panditpur",
+      "Purushottampur Nazirganj",
+      "Telcha"
+    ]
+  ],
+  "841225": ["Saran", "Bihar", ["Bodha Chapra", "Deoria", "Pratappur"]],
+  "841226": [
+    "Siwan",
+    "Bihar",
+    [
+      "Amlori",
+      "Badheyan",
+      "Barkagaon",
+      "Bhantapokher",
+      "Chakra",
+      "Chapia Bujurg",
+      "Chapra Road",
+      "Dhanuti",
+      "Habibnagar",
+      "Hardia",
+      "Jiyan",
+      "Mahodipur",
+      "Markan",
+      "Partap Pur",
+      "Sarsar",
+      "Satation Road",
+      "Siwan",
+      "Siwan Chowk Bazar",
+      "Tarwa",
+      "Tetria"
+    ]
+  ],
+  "841227": [
+    "Siwan",
+    "Bihar",
+    [
+      "Barhani Bazar",
+      "Barhni",
+      "Basopali",
+      "Benusar",
+      "Benusar Bujurg",
+      "Chanaur",
+      "Chhapmathia",
+      "Gaushalaroad Siwan",
+      "Hakam",
+      "Khalishpur",
+      "Mahuwari",
+      "Nathuchhap",
+      "Papaur",
+      "Sahlaur",
+      "Sarwe",
+      "Siwan Mission House",
+      "Surwala",
+      "Ukhai"
+    ]
+  ],
+  "841231": [
+    "Siwan",
+    "Bihar",
+    [
+      "Andar",
+      "Bhawrajpur",
+      "Faridpur",
+      "Gaighat",
+      "Jaijore",
+      "Kherai",
+      "Nadiwan",
+      "Nand Pur Amwari",
+      "Tiyan"
+    ]
+  ],
+  "841232": [
+    "Siwan",
+    "Bihar",
+    [
+      "Bahadurpur Bazar",
+      "Barhria",
+      "Bhaluan",
+      "Bhimpur",
+      "Hardia",
+      "Koerigawan",
+      "Madhopur",
+      "Mahmoodpur",
+      "Sadarpur",
+      "Tethali"
+    ]
+  ],
+  "841233": [
+    "Siwan",
+    "Bihar",
+    [
+      "Daronda",
+      "Harsardhanauti",
+      "Jalalpur",
+      "Kolhua",
+      "Laheji",
+      "Machhauta",
+      "Mandrauli",
+      "PHarsar",
+      "Ramsapur",
+      "Rasulpur Tilouta"
+    ]
+  ],
+  "841234": [
+    "Siwan",
+    "Bihar",
+    [
+      "Amarpur",
+      "Balahu",
+      "Bishwania",
+      "Darauli",
+      "Gauri",
+      "Keotalia",
+      "Krishnapali",
+      "Sareyarampur"
+    ]
+  ],
+  "841235": [
+    "Siwan",
+    "Bihar",
+    [
+      "Belaon",
+      "Done",
+      "Draili Mathia",
+      "Harnatar",
+      "Kanhauli",
+      "Kumhatti",
+      "Mathia",
+      "Murakhap",
+      "Murera",
+      "Netwar",
+      "Tariwani"
+    ]
+  ],
+  "841236": [
+    "Siwan",
+    "Bihar",
+    [
+      "Aranda",
+      "Bhikhpur Bhgwanpur",
+      "Dhanutihata",
+      "Hasanpura",
+      "Rajanpura",
+      "Rampur Ke Tola",
+      "Siswan Kala"
+    ]
+  ],
+  "841237": [
+    "Siwan",
+    "Bihar",
+    ["Ballia", "Bhikhpur", "Hathura", "Hussainganj", "Machakna"]
+  ],
+  "841238": [
+    "Siwan",
+    "Bihar",
+    [
+      "Balliapokhra",
+      "Bishunpura",
+      "Chhotkateghra",
+      "Deoria",
+      "Gohpur Bajrahia",
+      "Hahwa",
+      "Jigrawan",
+      "Karsaut",
+      "Kasdeora Bangra",
+      "Kothua Sarangpur",
+      "Mahrajganj",
+      "Pakwalia",
+      "Pasnauli",
+      "Rajapur",
+      "Rishura",
+      "Rukundipur",
+      "S Bangra"
+    ]
+  ],
+  "841239": [
+    "Siwan",
+    "Bihar",
+    [
+      "Akolhi",
+      "Anugrhnagar",
+      "Bargaon",
+      "Belaur",
+      "Belauri",
+      "Bilaspur",
+      "Bishunpura Bazar",
+      "Bishwar",
+      "Bkulari",
+      "Daraila",
+      "English",
+      "Jamuaon",
+      "Krom",
+      "Langarpura",
+      "Lebhri",
+      "Mairwa",
+      "Punak",
+      "Sarhrwa",
+      "Sematar",
+      "Seotapur",
+      "Sohgra",
+      "Talli"
+    ]
+  ],
+  "841240": ["Siwan", "Bihar", ["Chandparsa", "Mahuwal Mahal", "Merhi", "Tarwaparsa"]],
+  "841241": [
+    "Siwan",
+    "Bihar",
+    [
+      "Badram",
+      "Champ",
+      "Gambhria",
+      "Itwa Bartwalia",
+      "Jasauli",
+      "Nainpura",
+      "Pachrukhi",
+      "Sarauti",
+      "Sonbarsa"
+    ]
+  ],
+  "841242": ["Siwan", "Bihar", ["Choiapali", "Paterha", "Paterhi", "Ratanparauli"]],
+  "841243": [
+    "Siwan",
+    "Bihar",
+    [
+      "Barkamanjha",
+      "BPEkdanga",
+      "Chainpur Hata",
+      "Chhotka Manjha",
+      "Jagdishpur Kothi",
+      "Kabirpur",
+      "Keelpur",
+      "Khalwa",
+      "Nautan",
+      "Pachphera",
+      "Sahpur",
+      "Semaria",
+      "Sirisia"
+    ]
+  ],
+  "841244": [
+    "Siwan",
+    "Bihar",
+    [
+      "Balaun",
+      "Bhikha Bandh Satjora",
+      "Pipra",
+      "Ramgarh",
+      "Rasulpur Chakri",
+      "Siktia",
+      "Takipur"
+    ]
+  ],
+  "841245": [
+    "Siwan",
+    "Bihar",
+    [
+      "Banthu Sriram",
+      "Bardaha",
+      "Barhulia",
+      "Bhaisakhal",
+      "Bharuli",
+      "Chhitanpur",
+      "Kpmishrauli",
+      "Makariyar",
+      "Mania",
+      "Miyan Ke Bhatkan",
+      "Pachokhar",
+      "Piprahiya",
+      "Ruiyabangra",
+      "Sanjalpur",
+      "Shiopur Sakra",
+      "Sisahni",
+      "Thepaha Bazar",
+      "Titra",
+      "Zeradei"
+    ]
+  ],
+  "841286": [
+    "Siwan",
+    "Bihar",
+    ["Alapur", "Bakerganj", "Harihans", "Rafipur", "Sahuli", "Telkathu"]
+  ],
+  "841287": ["Siwan", "Bihar", ["Asaon", "Kandhpakar", "Kashila", "Pihuli"]],
+  "841301": [
+    "Saran",
+    "Bihar",
+    [
+      "Bhagwan Bazar",
+      "Chapra",
+      "Daulatganj",
+      "District Board",
+      "Jagdam College",
+      "Mauna",
+      "Rajendra College"
+    ]
+  ],
+  "841302": [
+    "Saran",
+    "Bihar",
+    [
+      "Gheghta",
+      "Gurukul Mehiya",
+      "Mahamda",
+      "Paharpur",
+      "Pirauna",
+      "Purwari Telpa",
+      "Sarha",
+      "Tari"
+    ]
+  ],
+  "841305": [
+    "Saran",
+    "Bihar",
+    [
+      "Brahampur",
+      "Enai",
+      "Jigna Parsa",
+      "Majhanpura",
+      "Revelganj",
+      "Sengar Tola",
+      "Sirsia"
+    ]
+  ],
+  "841311": [
+    "Saran",
+    "Bihar",
+    [
+      "Bhainsmara",
+      "Garkha",
+      "Gohpur",
+      "Katsa",
+      "Kewani",
+      "Madarpur",
+      "Mohammadpur",
+      "Parsajogini",
+      "Rampur",
+      "Saidsarai",
+      "Saraibuksh",
+      "Sobhepur"
+    ]
+  ],
+  "841312": [
+    "Saran",
+    "Bihar",
+    ["Gariba Tola", "Khawaspur", "Sahebzadatola", "Sitabdiara"]
+  ],
+  "841313": [
+    "Saran",
+    "Bihar",
+    ["Dumri", "GDurgapur", "Ghorhat Mathia", "Manjhi", "Nandpur", "Narpaliya", "Sonbarsa"]
+  ],
+  "841316": ["Saran", "Bihar", ["Fakuli", "Magaidih", "Naini"]],
+  "841401": [
+    "Saran",
+    "Bihar",
+    [
+      "Amnour",
+      "Amnour Harnarain",
+      "Baldiha",
+      "Basantpur Bangla",
+      "Bhawalpur",
+      "Deorhi",
+      "GNParshurampur",
+      "Jhakhra",
+      "Karanpura",
+      "Narayanpur",
+      "Nautan",
+      "PBChapra",
+      "Puraina",
+      "Sareya Basant"
+    ]
+  ],
+  "841402": [
+    "Saran",
+    "Bihar",
+    ["Aphar", "Bheldi", "Dharhara Kala", "Dholahi Kaithal", "Pachlakh", "Pachrukhi"]
+  ],
+  "841403": [
+    "Saran",
+    "Bihar",
+    [
+      "Baniapur",
+      "Berui",
+      "Bhatkeshri",
+      "Chorauwa",
+      "Dhanaw",
+      "Dhangarha",
+      "GPiparpanti",
+      "Hariharpur",
+      "HKarah",
+      "Kamta",
+      "KManohar",
+      "Lauwa Kala",
+      "Mirzapur Khurd Lauwa",
+      "Murarpur",
+      "Nagdiha",
+      "Puchhari",
+      "Saraya",
+      "Satua",
+      "Sohai Shahpur",
+      "Ushti"
+    ]
+  ],
+  "841404": ["Siwan", "Bihar", ["Bagaura", "KTBharauli"]],
+  "841405": [
+    "Gopalganj",
+    "Bihar",
+    [
+      "Achhaibar Pipra",
+      "Barauli",
+      "BASonbarsa",
+      "Batardey",
+      "BRampur",
+      "Devapur",
+      "Hassanpur Mathiya",
+      "Kahla",
+      "Kamalpur",
+      "Khajuri",
+      "Lohijara",
+      "MBiraicha",
+      "Nawada",
+      "Neori",
+      "Rupanchhap",
+      "Sadauwan",
+      "Salempur",
+      "Sareya Narendra",
+      "Sikatiya Sridhar Sahi"
+    ]
+  ],
+  "841406": [
+    "Siwan",
+    "Bihar",
+    [
+      "Baghi",
+      "Baijubarhoga",
+      "Basantpur",
+      "Basaowan",
+      "Chorauli",
+      "Chorma",
+      "Hussaipurnand",
+      "Jagatpur",
+      "Kauria",
+      "Kherwa",
+      "Mohmda Bazar",
+      "Molnapur",
+      "Sahrkola",
+      "Sekhpura",
+      "Sohilpatti",
+      "Sughri"
+    ]
+  ],
+  "841407": [
+    "Gopalganj",
+    "Bihar",
+    [
+      "Bishunpura",
+      "Dangsi",
+      "Hakam",
+      "Kashi Tengrahi",
+      "Khajuhatti",
+      "Maharani",
+      "Mahuwa",
+      "Mohammadpur",
+      "Reotith",
+      "Sher",
+      "Shyampur",
+      "Talimapur"
+    ]
+  ],
+  "841408": [
+    "Siwan",
+    "Bihar",
+    [
+      "Barhipurgop",
+      "Barkagaowan",
+      "Bhagwanpur Hat",
+      "Bhikhampur",
+      "Hulesra",
+      "Sahsrawan",
+      "Sondhani"
+    ]
+  ],
+  "841409": ["Gopalganj", "Bihar", ["Baikunthpur", "Dighwdubauli", "Usribazar"]],
+  "841410": [
+    "Saran",
+    "Bihar",
+    [
+      "Bellour",
+      "Brit Bhagwanpr",
+      "Chakia",
+      "Dubauli",
+      "Dumarshan Bangra",
+      "Pyarepur",
+      "Satjora Bazar",
+      "Sonbarsa"
+    ]
+  ],
+  "841411": [
+    "Saran",
+    "Bihar",
+    [
+      "Agauthar Nanda",
+      "Bhithi Sahabuddin",
+      "Chandpurwa",
+      "Ishuwapur",
+      "Kerwa",
+      "Maricha",
+      "Ram Chaura",
+      "Sahawa",
+      "Salempur",
+      "Shyam Kauria",
+      "Terha"
+    ]
+  ],
+  "841412": [
+    "Saran",
+    "Bihar",
+    [
+      "Ashok Nagar",
+      "Basdila",
+      "Dhoopnagar Dhobawal",
+      "GSBangra",
+      "Jalalpur Bazar",
+      "Kahi",
+      "Kishunpur",
+      "Kotheya",
+      "Mangolapur",
+      "Nawada",
+      "Sakaddi",
+      "Sawari Buxi Jee"
+    ]
+  ],
+  "841413": [
+    "Siwan",
+    "Bihar",
+    [
+      "Belsand",
+      "Hatimpur",
+      "Jamobazar",
+      "Jogapur Kothi",
+      "Madhopur",
+      "Paltuhatta",
+      "Sirisia",
+      "Sultanpur Kala"
+    ]
+  ],
+  "841414": [
+    "Saran",
+    "Bihar",
+    [
+      "Afaur",
+      "Amar Chapra",
+      "Badlu Tola",
+      "Chanchaura",
+      "Kakadhiya",
+      "Kanar Hariharpur",
+      "Khaira",
+      "Manpur",
+      "Meera Mushehri",
+      "Mushehri",
+      "Rampur Kala"
+    ]
+  ],
+  "841415": [
+    "Saran",
+    "Bihar",
+    [
+      "Bhualpur",
+      "Ferusa",
+      "Khodaibagh",
+      "Madhopur",
+      "Mubarakpur",
+      "Olahanpur",
+      "Rasidpur",
+      "Sadhpur"
+    ]
+  ],
+  "841416": [
+    "Siwan",
+    "Bihar",
+    [
+      "Chimanpura",
+      "Dumra",
+      "Khawaspur",
+      "Kishunpura",
+      "Lakari",
+      "Parauli",
+      "Safiabad",
+      "Sarif Jalalpur"
+    ]
+  ],
+  "841417": [
+    "Saran",
+    "Bihar",
+    [
+      "Arna",
+      "Bahrauli",
+      "Balsohi",
+      "Chhapia",
+      "Dhenuki",
+      "Dumari Chhapia",
+      "Jaithar",
+      "Kawalpura",
+      "Masrakh",
+      "Nawada",
+      "Pakari",
+      "Rasauli",
+      "Sagar Sultanpur",
+      "Sherukaha"
+    ]
+  ],
+  "841418": ["Saran", "Bihar", ["Marhowrah"]],
+  "841419": [
+    "Saran",
+    "Bihar",
+    [
+      "Atta",
+      "Awari",
+      "Bardahiya",
+      "Bhaluhi",
+      "Hussepur",
+      "Ishrauli",
+      "Mirzapur",
+      "Rasulpur",
+      "Senduari",
+      "Silhauri",
+      "Tarwar",
+      "Tejpurwa"
+    ]
+  ],
+  "841420": [
+    "Gopalganj",
+    "Bihar",
+    [
+      "Dabchhu",
+      "Faizullahpur",
+      "Gamhari",
+      "Gopalpur",
+      "Harpurjan",
+      "Katalpur",
+      "Matiyari",
+      "Paharpur",
+      "Rajapatti"
+    ]
+  ],
+  "841421": [
+    "Saran",
+    "Bihar",
+    [
+      "Amardah",
+      "Gamahria",
+      "Rampur Atauli",
+      "Sarhwara",
+      "Semri",
+      "Sikati Bhikham",
+      "Sonauli"
+    ]
+  ],
+  "841422": [
+    "Saran",
+    "Bihar",
+    ["Bankat", "Hafijpur", "Kolhua", "Madarpur", "Pipra", "Sahajitpur", "Sarmi", "Sisai"]
+  ],
+  "841423": [
+    "Gopalganj",
+    "Bihar",
+    [
+      "Amarpura",
+      "Barhima",
+      "Dumaria",
+      "Harpur Tengrahi",
+      "Jhanjhawa Mohamadpur",
+      "Sidhwalia",
+      "Sorahiya",
+      "Tekniwas"
+    ]
+  ],
+  "841424": [
+    "Saran",
+    "Bihar",
+    [
+      "Ardewa",
+      "Belhari",
+      "Bhagwatpur",
+      "Bhalua Bhikhari",
+      "Bhatgai",
+      "Bhorha",
+      "Dumri",
+      "Gawandri",
+      "Lauwa",
+      "Moreya",
+      "Pachbhinda",
+      "Pachraur",
+      "Parauna",
+      "Pokhrera",
+      "Rajdhani",
+      "Rampur Rudra",
+      "Taraiya",
+      "Ushri Chandpura"
+    ]
+  ],
+  "841425": [
+    "Gopalganj",
+    "Bihar",
+    ["Bathubazar", "Bhagwatparsa", "Chhitauna", "Kalyanpur", "Phulwaria", "Songharwa"]
+  ],
+  "841426": [
+    "Gopalganj",
+    "Bihar",
+    [
+      "Ahiyapur",
+      "Bankata Jagirdari",
+      "Bhore",
+      "Chakarwakhas",
+      "Chhitauna",
+      "DNarendra",
+      "Hussepur",
+      "Jagtauli",
+      "Jignadubey",
+      "Lamichaur",
+      "Matiyari",
+      "Musahri Bazar",
+      "Rudalpur",
+      "Sisai"
+    ]
+  ],
+  "841427": [
+    "Gopalganj",
+    "Bihar",
+    [
+      "Bhaisahi",
+      "Dharamparsa",
+      "Garhmanjha",
+      "Gausia",
+      "Koini",
+      "KSrirampur",
+      "Manjhariya",
+      "Mungarha",
+      "Nimuiya",
+      "Parsurampur",
+      "Pathra",
+      "Purdiltola",
+      "Rachhopali"
+    ]
+  ],
+  "841428": [
+    "Gopalganj",
+    "Bihar",
+    [
+      "Amwa Nakchhed",
+      "Babubishunpur",
+      "Baraiptti",
+      "Basdila",
+      "Bhitbherwa",
+      "Dahibhata",
+      "Dumaria Dhamapakar",
+      "Ekderwa",
+      "Gopalganj",
+      "Gopalganj College",
+      "Kararia",
+      "Khawajapur",
+      "Manikpur",
+      "Narkatia",
+      "Parwan",
+      "Pasrama",
+      "PBhagwanpur",
+      "Rajwahi",
+      "RP Tengrahi",
+      "Semrahi",
+      "Sukulwa",
+      "UR Bangra",
+      "VS Mill",
+      "Yadavpur Dukhharan"
+    ]
+  ],
+  "841434": [
+    "Siwan",
+    "Bihar",
+    [
+      "Bhithi",
+      "Dudhra",
+      "Goreakothi",
+      "Harihar Pur Lalgarh",
+      "Hariharpur Kala",
+      "Marachhi",
+      "Sarari",
+      "Sikandarpur"
+    ]
+  ],
+  "841435": [
+    "Siwan",
+    "Bihar",
+    [
+      "Balua",
+      "Bhlua",
+      "Chakari",
+      "Chitakhal",
+      "Dumrahar",
+      "Guthni",
+      "Srikalpur",
+      "Tarwa Parsia",
+      "Tenua"
+    ]
+  ],
+  "841436": [
+    "Gopalganj",
+    "Bihar",
+    [
+      "Aghaila",
+      "Barheyan",
+      "Barkagaon",
+      "BR Bhan",
+      "GS Manjha",
+      "Hasua",
+      "Hathwa",
+      "Jamsar",
+      "Kusaundhi",
+      "Machhagar",
+      "Mirja Pur",
+      "Pachlakhi",
+      "Peoli",
+      "Repura",
+      "Semraon",
+      "Siswania",
+      "Sohagpur"
+    ]
+  ],
+  "841437": [
+    "Gopalganj",
+    "Bihar",
+    [
+      "Belhi Khas",
+      "Bhagipatti Jhul",
+      "Dharhara",
+      "Gaura",
+      "Jasauli",
+      "Kateya",
+      "Mahuwan",
+      "Neori",
+      "Pachdeori",
+      "Rudrapur",
+      "Sohnariya"
+    ]
+  ],
+  "841438": [
+    "Gopalganj",
+    "Bihar",
+    [
+      "BA Pakwalia",
+      "Baleshra",
+      "Jagarnath",
+      "Jignamath",
+      "JJagarnath",
+      "Kailgarh",
+      "KK Kararia",
+      "Koila Deva",
+      "Lachhwar",
+      "Lakri Dargah",
+      "Line Bazar",
+      "M Madho",
+      "Mirganj",
+      "Mishra Batrahan",
+      "Mohamadpur",
+      "Paikauli Baddo",
+      "Pakri",
+      "Radhaganj",
+      "Rasulpur",
+      "Sakhekhas",
+      "Sathi",
+      "Sawana",
+      "Sawraje",
+      "Sundri",
+      "Uchkagaon"
+    ]
+  ],
+  "841439": [
+    "Siwan",
+    "Bihar",
+    [
+      "Agya",
+      "Chainpur",
+      "Kaladumra",
+      "Laxmiganj",
+      "Mustfabad",
+      "Purandarpur",
+      "Sahatwar",
+      "Saidpura",
+      "Sani Basantpur"
+    ]
+  ],
+  "841440": [
+    "Gopalganj",
+    "Bihar",
+    ["Dhatingna", "Jhirwa", "Manbodhparsauni", "Ramchandrapur", "Sukulbrindawan", "Thawe"]
+  ],
+  "841441": [
+    "Gopalganj",
+    "Bihar",
+    ["Baghibazar", "Bhathwa", "Khalgaon", "Rajapur", "Semaria"]
+  ],
+  "841442": [
+    "Saran",
+    "Bihar",
+    ["Arwa", "Deo Bahuara", "Mothaha", "Nagra", "Rampur Khorram", "Tujarpur"]
+  ],
+  "841443": [
+    "Saran",
+    "Bihar",
+    [
+      "Gaura",
+      "Khabsi",
+      "Narharpur",
+      "Pirauta",
+      "Salimapur",
+      "Shio Mohammadpur",
+      "Usari Kala"
+    ]
+  ],
+  "841446": ["Siwan", "Bihar", ["Gaziapur", "Narendrapur"]],
+  "841447": ["Siwan", "Bihar", ["Lakrinabiganj"]],
+  "841460": [
+    "Saran",
+    "Bihar",
+    ["Bhatha Sonho", "Kaituka Nandan", "Lachhi Kaituka", "Phulwaria", "Serampur"]
+  ],
+  "841501": [
+    "Gopalganj",
+    "Bihar",
+    [
+      "Baliwan Sagar",
+      "Bindwalia",
+      "Bishambharpur",
+      "Durgmatihania",
+      "Karwatahi Bazar",
+      "Kmatihaniya NRK Tola",
+      "Kuchaikote",
+      "Mateya Khas",
+      "Ratanpura",
+      "Salehpur",
+      "Sepaya",
+      "Uchka Gaon"
+    ]
+  ],
+  "841502": ["Siwan", "Bihar", ["Khujhwa", "Patar", "Santhi"]],
+  "841503": [
+    "Gopalganj",
+    "Bihar",
+    [
+      "Balthra",
+      "Bodhachhapar",
+      "Dhebwa",
+      "Gopalpur",
+      "Koiripatti",
+      "Narahwan Sukla",
+      "Nechwajalapur",
+      "Sanhaula",
+      "Semra Bazar",
+      "Siswa",
+      "Thakrahan"
+    ]
+  ],
+  "841504": [
+    "Siwan",
+    "Bihar",
+    [
+      "Admapur",
+      "Harnathpur",
+      "Karsar",
+      "Narhan",
+      "Nikhti Kala",
+      "Raghunathpur",
+      "Rajpur",
+      "Ramnagar"
+    ]
+  ],
+  "841505": ["Gopalganj", "Bihar", ["Khajuria", "Maniyara", "Rampur Daud", "Sasamusa"]],
+  "841506": [
+    "Siwan",
+    "Bihar",
+    [
+      "Babhanbara",
+      "Balia",
+      "Bhartpura",
+      "Chaukihasan",
+      "Dindayalpur",
+      "Jalalpur",
+      "Karanpura",
+      "Laxmiganj Sisai",
+      "Madhopur",
+      "Pipra Naryan",
+      "Ratanpura",
+      "Saraya Sah Mohamd",
+      "Shakara",
+      "Tarwara"
+    ]
+  ],
+  "841507": [
+    "Siwan",
+    "Bihar",
+    [
+      "Bherwania",
+      "Bithuna",
+      "Chakia",
+      "Govindapur",
+      "Lawa Rampur",
+      "Mora",
+      "PKRampur",
+      "Sadiha",
+      "Singhauli"
+    ]
+  ],
+  "841508": [
+    "Gopalganj",
+    "Bihar",
+    [
+      "Bairiya",
+      "BDMahuwan",
+      "Bharpurwa",
+      "Bijaipur",
+      "Jagdishpur",
+      "Maheshpur",
+      "Sahdi Giri"
+    ]
+  ],
+  "841509": ["Siwan", "Bihar", ["Gabhirar", "Newari", "Panjwar", "Tari"]],
+  "842001": [
+    "Muzaffarpur",
+    "Bihar",
+    [
+      "Amgola",
+      "Bihar University",
+      "Bmpvi",
+      "Chhata Bazar",
+      "Imlichatti",
+      "Kalyani",
+      "Malighat Maniari",
+      "Motijheel",
+      "Muz Collectorate",
+      "Muzaffarpur",
+      "Muzaffarpur Court",
+      "Pakki Sarai",
+      "Purani Bazar",
+      "Saraiyaganj",
+      "Sikandarpur",
+      "SSKBhawan"
+    ]
+  ],
+  "842002": [
+    "Muzaffarpur",
+    "Bihar",
+    [
+      "Aghoria Bazaar",
+      "APurushotampur",
+      "DRSah",
+      "Kachhi Sarai",
+      "Kanhauli Azra",
+      "Mushahari Farm",
+      "Narsinghpur",
+      "Naya Tola",
+      "Ramna",
+      "RDSCollege",
+      "RKAshram",
+      "Sheikhpur",
+      "Susta"
+    ]
+  ],
+  "842003": ["Muzaffarpur", "Bihar", ["Maripur", "Mit"]],
+  "842004": [
+    "Muzaffarpur",
+    "Bihar",
+    ["CRPF Camp", "Daud Chapra", "Jamalabad", "Jhapaha", "Mustafapur", "Umanagar"]
+  ],
+  "842005": ["Muzaffarpur", "Bihar", ["Mic"]],
+  "842006": ["Muzaffarpur", "Bihar", ["Kalwari"]],
+  "843101": [
+    "Muzaffarpur",
+    "Bihar",
+    [
+      "Bakhra",
+      "Bashantpur Patti",
+      "Choubey Ambara",
+      "Datapur Pachbhirwa",
+      "Kamalpura",
+      "Madhaul",
+      "Mansoorpur",
+      "Rewa Basantpur"
+    ]
+  ],
+  "843102": [
+    "Muzaffarpur",
+    "Bihar",
+    [
+      "Bariarpur",
+      "GKNagar",
+      "Katesar",
+      "Kishanpur Telour",
+      "Mohammadpur Bhopat",
+      "Newachak",
+      "Raja Pakar",
+      "Sahbajpur Puraina",
+      "Sundarpur"
+    ]
+  ],
+  "843103": [
+    "Muzaffarpur",
+    "Bihar",
+    [
+      "Amma",
+      "Baghakhal",
+      "Bochaha",
+      "Choumukh",
+      "Dahila",
+      "Gharbhara",
+      "Hasna",
+      "Kafen",
+      "Lohsari",
+      "Malpur",
+      "Mirzapur",
+      "PShyam",
+      "Ram Nagar",
+      "Sanathi",
+      "Unsar"
+    ]
+  ],
+  "843104": [
+    "Vaishali",
+    "Bihar",
+    [
+      "Alinagar Leorhan",
+      "Bhartipur",
+      "Chak Sarmastpur",
+      "Chandanpatti",
+      "Dargah Bela",
+      "Dehuli Buzurg",
+      "Dubaha Buzurg",
+      "Keshopur",
+      "Krishnawara",
+      "Majhaulia",
+      "Malpur Agrail",
+      "NChampapur"
+    ]
+  ],
+  "843105": [
+    "Muzaffarpur",
+    "Bihar",
+    [
+      "BBaghnagari",
+      "Beladam",
+      "Dholi",
+      "Govindpur Bejha",
+      "Govindpur Bela",
+      "Machhahi",
+      "Mehshi",
+      "Narsinghpur",
+      "Titra Ashanand"
+    ]
+  ],
+  "843106": [
+    "Muzaffarpur",
+    "Bihar",
+    ["Dubiahi", "Gidha", "Karja", "Partapur", "Rupauli"]
+  ],
+  "843107": [
+    "Muzaffarpur",
+    "Bihar",
+    [
+      "Chhap",
+      "Daudpur",
+      "Fatehabad",
+      "Geyaspur",
+      "Jaimal Dumari",
+      "Kalyanpur",
+      "Karamwari",
+      "Khutahi",
+      "Mohjama",
+      "Phular",
+      "Phulwaria",
+      "Repura Mahadeo",
+      "Sarmastpur"
+    ]
+  ],
+  "843108": [
+    "Muzaffarpur",
+    "Bihar",
+    ["Chapra Dharampur Jaddu", "Dadar Kolhua", "PKolhua", "Sirsia Buzurg"]
+  ],
+  "843109": [
+    "Muzaffarpur",
+    "Bihar",
+    [
+      "Birpur",
+      "BKesho",
+      "Bmahanand",
+      "BPandey",
+      "Haridaspur",
+      "Jamin Mathia",
+      "Kabilpur",
+      "Kanti",
+      "KHRamani",
+      "Mahartha",
+      "Nariar Panapur",
+      "Pakhnaha Shriram",
+      "Panapur Kariat",
+      "Pipra Asli",
+      "Raksha",
+      "Sadiquepur",
+      "Sainpatti SPSingh",
+      "SBarkagaon",
+      "Singar"
+    ]
+  ],
+  "843110": [
+    "Vaishali",
+    "Bihar",
+    [
+      "Ajijpur Chande",
+      "Bardiha Turki",
+      "Dabhaichh",
+      "Kumar Bajitpur",
+      "Malpur",
+      "Mandaidih",
+      "Marui"
+    ]
+  ],
+  "843111": [
+    "Muzaffarpur",
+    "Bihar",
+    [
+      "Ajna Kot",
+      "Bakatpur",
+      "Bakhari",
+      "Barjee",
+      "Baruraj",
+      "BBajitpur",
+      "BBarna",
+      "BFiroj",
+      "BKarman",
+      "BRudal",
+      "Chorghatta",
+      "Harnahi",
+      "Jasauli",
+      "Jasoda Math",
+      "Jhingaha",
+      "KBithraul",
+      "Mahmada",
+      "Mahual RS",
+      "Manohar Chapra",
+      "MBalmi",
+      "MGopinathpur",
+      "Morsandi",
+      "Motipur",
+      "Pakari",
+      "Pana Chapra",
+      "Rajepur",
+      "SJahangirpur",
+      "SSandha",
+      "Sundar Sarai"
+    ]
+  ],
+  "843112": [
+    "Muzaffarpur",
+    "Bihar",
+    [
+      "Bahdinpur",
+      "Bara Daud",
+      "Chochahi Saraiya",
+      "KBabhangaon",
+      "Koria Nizamat",
+      "Paroo",
+      "Saraiya Bazar"
+    ]
+  ],
+  "843113": [
+    "Muzaffarpur",
+    "Bihar",
+    [
+      "ABishanpur",
+      "Bhatauna",
+      "Bishundatpur",
+      "Chamarua",
+      "Damodarpur",
+      "Dumri",
+      "Khabra",
+      "Kharauna",
+      "Ladaura Pakari",
+      "Marwan",
+      "Pakari Pakohi",
+      "Patahi",
+      "Simra Urf Afzalpur",
+      "Subhankarpur"
+    ]
+  ],
+  "843114": [
+    "Vaishali",
+    "Bihar",
+    [
+      "Ababakarpur Kowahi",
+      "Baligaon Chandpura",
+      "Dhankaul",
+      "Kawadid",
+      "Khesrahi",
+      "Maudah",
+      "Maudah Buzurg",
+      "Pastara",
+      "Patepur",
+      "Ramouli",
+      "Saidpur Dumra",
+      "Simarwara Durgapur",
+      "Sukki"
+    ]
+  ],
+  "843115": [
+    "Muzaffarpur",
+    "Bihar",
+    [
+      "Bandra",
+      "Bariarpur Karpur",
+      "Ghosrama",
+      "Munni Bangari",
+      "Mutlupur",
+      "Noonfara",
+      "Patsara",
+      "PBishanpur",
+      "Piar",
+      "Pirapur",
+      "Rampur Dayal",
+      "Ratwara",
+      "Shrikant",
+      "Tepari"
+    ]
+  ],
+  "843116": [
+    "Muzaffarpur",
+    "Bihar",
+    [
+      "Bedaul Asli",
+      "Bhadai",
+      "BUmapat Basant",
+      "Dakrama",
+      "Dih Jiwar",
+      "GPitaunjhia",
+      "Hanswara",
+      "Janar",
+      "Kuahi",
+      "Manpur Ratnauli",
+      "Matihani",
+      "MFarakpur",
+      "Pitaunjhia",
+      "Sarhachia"
+    ]
+  ],
+  "843117": [
+    "Sitamarhi",
+    "Bihar",
+    [
+      "BBasudeo",
+      "Chak Shambhu",
+      "Dharampur",
+      "Gaus Nagar",
+      "Gorigama",
+      "Kharhar",
+      "Korlahia Mansingh",
+      "Lautan",
+      "Mahindwara",
+      "Maksudpur",
+      "Olipur Sarhachia",
+      "Rampur Hari",
+      "Sirkhiria",
+      "Subhaigarh",
+      "Tengraha"
+    ]
+  ],
+  "843118": [
+    "Muzaffarpur",
+    "Bihar",
+    [
+      "Adigopalpur",
+      "Athar",
+      "Balthi Mushahari",
+      "BKesho",
+      "Chiraila",
+      "Godanpatti",
+      "Ibrahimpur",
+      "Jarang Deorhi",
+      "Kamarthu",
+      "Kanhara",
+      "Loma",
+      "Maithi",
+      "Sakarwara",
+      "Sarfuddinpur"
+    ]
+  ],
+  "843119": [
+    "Muzaffarpur",
+    "Bihar",
+    [
+      "Amarakh",
+      "Bharwari",
+      "Binda",
+      "Budhnagra Radha",
+      "Chainpur Bangra",
+      "Chapra Megh",
+      "Chhitrauli",
+      "Dumari",
+      "Ganiari",
+      "Jagdishpur Baghnagari",
+      "Jalalpur",
+      "Madhopur",
+      "Mahanth Maniari",
+      "Manika",
+      "Markan",
+      "Marwan",
+      "MBadal",
+      "MPachdahi",
+      "MSusta",
+      "Narauli",
+      "Paigambarpur",
+      "Prahladpur",
+      "Sangopatti",
+      "Saraiya",
+      "Siho",
+      "Silout",
+      "Sonbarsa Dih"
+    ]
+  ],
+  "843120": [
+    "Muzaffarpur",
+    "Bihar",
+    [
+      "Bhagwanpur",
+      "Bhagwatpur",
+      "BMuza",
+      "Deoria",
+      "Dhanaiya",
+      "Dharfari",
+      "Gokhula Rupauli",
+      "Mohabatpur",
+      "Mohamadpur",
+      "Neknampur",
+      "PBasarat",
+      "Sahpurpatti",
+      "Sohansa",
+      "Tola Muza"
+    ]
+  ],
+  "843121": [
+    "Muzaffarpur",
+    "Bihar",
+    ["BBakhari", "DACollege", "IRNagar", "Mirapur", "Pilkhi Gajpatti", "Raini", "SMuraul"]
+  ],
+  "843122": [
+    "Muzaffarpur",
+    "Bihar",
+    [
+      "Berua",
+      "Chochahi Chapra",
+      "Hardi",
+      "Pagahia Aima",
+      "Parsauni Pagahia",
+      "Rampur Bheriahi"
+    ]
+  ],
+  "843123": [
+    "Muzaffarpur",
+    "Bihar",
+    [
+      "Amaitha",
+      "Bajitpur",
+      "Basara Shukul",
+      "Ginjas",
+      "Jaintpur Estate",
+      "Kolwara",
+      "Panapur Akhtiarpur",
+      "Repura RBishwanath",
+      "Sirkohia"
+    ]
+  ],
+  "843124": [
+    "Muzaffarpur",
+    "Bihar",
+    ["Fateha", "Jamalpur", "Kathaiya", "Patti Aswari", "PMushahari", "Thikaha Basudeo"]
+  ],
+  "843125": [
+    "Muzaffarpur",
+    "Bihar",
+    [
+      "Ahiyapur",
+      "Balthi Narhar",
+      "Basatpur",
+      "Basudeo Sarai",
+      "Bishunpur Patti",
+      "BKalyan",
+      "BNijamat",
+      "Hussepur",
+      "Jagdishpur",
+      "Kurnowl",
+      "Madhubani",
+      "Manain",
+      "MHazari",
+      "Paraspatti",
+      "Rajwara",
+      "Rup Chapra",
+      "Tarawa"
+    ]
+  ],
+  "843126": [
+    "Muzaffarpur",
+    "Bihar",
+    [
+      "Chakna",
+      "Gopalpur Neora",
+      "Laloo Chapra",
+      "Mirzapur",
+      "Muza Patrahia",
+      "Raghunathpur",
+      "Raja Rampur",
+      "RKMalahi",
+      "Saraiya Factory"
+    ]
+  ],
+  "843127": [
+    "Muzaffarpur",
+    "Bihar",
+    [
+      "Baburban Tajpur",
+      "Birihma Bazar",
+      "Jita Chapra",
+      "Parsauni Nath",
+      "Rampur Mina",
+      "Saraiya",
+      "Shirsia Jagdish"
+    ]
+  ],
+  "843128": [
+    "Muzaffarpur",
+    "Bihar",
+    [
+      "Barhanda",
+      "Chatursi",
+      "GDharampur",
+      "Ghosaut",
+      "Harser",
+      "HManshahi",
+      "Kodaria",
+      "Mahdaiya",
+      "Minapur",
+      "Mustafaganj",
+      "Raghai",
+      "Raghopur",
+      "Sagahari",
+      "Shitalpatti",
+      "Siwaipatti",
+      "Tengrari",
+      "Turki Khararu"
+    ]
+  ],
+  "843129": [
+    "Muzaffarpur",
+    "Bihar",
+    [
+      "Amnaur",
+      "Atrar",
+      "Barhad",
+      "Berai",
+      "HKhanpur",
+      "Narma",
+      "PTJiwar",
+      "Shahila Balli",
+      "Shahila Rampur"
+    ]
+  ],
+  "843130": ["Muzaffarpur", "Bihar", ["Kanti TPS"]],
+  "843131": [
+    "Muzaffarpur",
+    "Bihar",
+    [
+      "Aura",
+      "Belahi Lachchi",
+      "Brindawan",
+      "Meghua",
+      "Narwara",
+      "Sarwarpur",
+      "Sonbarsa",
+      "Tariyani Chowk"
+    ]
+  ],
+  "843301": ["Sitamarhi", "Bihar", ["Shaktipith Chandidham", "Sitamarhi"]],
+  "843302": [
+    "Sitamarhi",
+    "Bihar",
+    [
+      "Amghatta",
+      "Anhari",
+      "B Piprarhi",
+      "Banchauri",
+      "Bangaraha",
+      "Bariyarpur",
+      "Bathnaha",
+      "Bhairo Bhoop",
+      "Bhavdepur",
+      "Bishanpur",
+      "CC Union",
+      "Chakmahila",
+      "FGirmishani",
+      "Harnahiya",
+      "Janaki Asthan",
+      "Kishanpur",
+      "Koat Bazar",
+      "Koily",
+      "KSiroman",
+      "M Rampur",
+      "Maniyari",
+      "Paktola",
+      "Parmanandpur",
+      "Parsauni",
+      "Punaura",
+      "Rajopatti",
+      "RGosaipur",
+      "Shanki",
+      "Sirauli",
+      "Sitamarhi Bazar"
+    ]
+  ],
+  "843311": [
+    "Sitamarhi",
+    "Bihar",
+    ["Athri", "Belahi", "BhBhimpur", "Gisara", "Partapur", "RBagahi"]
+  ],
+  "843312": [
+    "Muzaffarpur",
+    "Bihar",
+    [
+      "Aurai",
+      "Bhalura",
+      "Chahuta",
+      "Kokilwara",
+      "Rajkhand",
+      "Ratwara Bindwara",
+      "RSaghari",
+      "Sahi Minapur"
+    ]
+  ],
+  "843313": [
+    "Sitamarhi",
+    "Bihar",
+    [
+      "Akhta",
+      "Ashogi Purshottam",
+      "Bairgania",
+      "Bairgania Bazar",
+      "Bel",
+      "Bengahi",
+      "Bhakurahar",
+      "Dumarbana",
+      "Jamua",
+      "Marpa Factory",
+      "Pachtaki Jaddu",
+      "Piprathi Punarvas"
+    ]
+  ],
+  "843314": [
+    "Sitamarhi",
+    "Bihar",
+    [
+      "Awapur",
+      "Baburban",
+      "Bajitpur",
+      "Bajpatti",
+      "Bangaon",
+      "Belahiya",
+      "BHarpur",
+      "BMachacha",
+      "BNarha",
+      "BPhulwariya",
+      "CTakiya",
+      "H Barharwa",
+      "Harpurwa",
+      "K Barhmtoli",
+      "Madhurapur",
+      "MBasaha",
+      "Muraul",
+      "Pachara",
+      "Patdaura",
+      "Siwaipaiti"
+    ]
+  ],
+  "843315": [
+    "Sitamarhi",
+    "Bihar",
+    [
+      "Barharwa",
+      "Basbitta",
+      "Bokhtha",
+      "D Kala",
+      "D Khurd",
+      "Dheng",
+      "Gamhariya",
+      "Gharwara",
+      "Harpurkala",
+      "Madhurapur",
+      "R Raghunathpur",
+      "S Kala",
+      "Suppi"
+    ]
+  ],
+  "843316": [
+    "Sitamarhi",
+    "Bihar",
+    [
+      "Belahiya",
+      "Belsand",
+      "Bhandari",
+      "Chandauli Timha",
+      "Dumra",
+      "J Kothia",
+      "Jaffarpur",
+      "K Motnaje",
+      "Kansar",
+      "Kathaur",
+      "P Murahi",
+      "P Tajpur",
+      "Patahi",
+      "Sauli",
+      "T Chhapra"
+    ]
+  ],
+  "843317": [
+    "Sitamarhi",
+    "Bihar",
+    [
+      "B Jay Nagar",
+      "Bhutahi",
+      "Fulkahan",
+      "Hanuman Nagar",
+      "Haribela",
+      "K Bhandar",
+      "M Kala",
+      "P Dadan",
+      "Singrahiya",
+      "Singwahini"
+    ]
+  ],
+  "843318": [
+    "Sitamarhi",
+    "Bihar",
+    ["Bhaurgarah", "Bokhra", "Budhnagra Deorhi", "Goraul Sharif", "Mahisautha", "Saterh"]
+  ],
+  "843319": [
+    "Sitamarhi",
+    "Bihar",
+    [
+      "BBehta",
+      "Choraut",
+      "DMathauna",
+      "Jadupatti Bazar",
+      "Koryahi",
+      "Pirokhar",
+      "Sujatpur"
+    ]
+  ],
+  "843320": [
+    "Sitamarhi",
+    "Bihar",
+    [
+      "B Dharmapur",
+      "B Maksudan",
+      "B Rasalpur",
+      "Bachharpur",
+      "Basotra",
+      "BBajitpur",
+      "Bedaul",
+      "Bhantabari",
+      "Chaipura",
+      "Chinachak",
+      "Dumharpatti",
+      "Gangati",
+      "Garha",
+      "H Chandei",
+      "Hardiya",
+      "Janakpur Road",
+      "Jhajhihat",
+      "KBP Pupri",
+      "Narayanpur",
+      "Piprarhi",
+      "Pokharbhinda",
+      "Pupari Bazar",
+      "Ratan Lasmi"
+    ]
+  ],
+  "843321": [
+    "Muzaffarpur",
+    "Bihar",
+    [
+      "Bandpura",
+      "Baraitha",
+      "Basua",
+      "Dhanaur",
+      "Gangeya",
+      "Harkhauli",
+      "Katra",
+      "Khangura",
+      "Mathurapur Buzurg",
+      "Pahsaul",
+      "Pindauli",
+      "Shivdaspur",
+      "Sonepur"
+    ]
+  ],
+  "843322": [
+    "Sitamarhi",
+    "Bihar",
+    [
+      "Dighi",
+      "Jogiwana",
+      "Kamaldah",
+      "Lattipur",
+      "Madhopur",
+      "Majhaulia Estate",
+      "Panthpakar"
+    ]
+  ],
+  "843323": [
+    "Sitamarhi",
+    "Bihar",
+    [
+      "B Dhanushi",
+      "Baghari",
+      "Garha",
+      "K Bishanpur",
+      "Kamaladah",
+      "Lagma Azamgarh",
+      "Lalpur",
+      "Manikchowk",
+      "Prem Nagar Subhai",
+      "Tikauli"
+    ]
+  ],
+  "843324": [
+    "Sitamarhi",
+    "Bihar",
+    [
+      "Andauli",
+      "Baburban",
+      "Bathuara",
+      "Betaha",
+      "Bishanpur",
+      "BMachhpakauni",
+      "Dharharwa",
+      "Indarwa",
+      "Jagdar",
+      "Kanhawa",
+      "Lahuriya",
+      "Mahadeopatti",
+      "Malahi",
+      "Manpaur",
+      "Narga",
+      "Parihar",
+      "Parsa",
+      "PKoria",
+      "PPhulhatta",
+      "RBhanpur",
+      "Sahargama",
+      "Sardalpatti",
+      "Sirsia",
+      "Vishwa"
+    ]
+  ],
+  "843325": [
+    "Sitamarhi",
+    "Bihar",
+    [
+      "Bakhari",
+      "Bhulli",
+      "Dhankaul",
+      "KGajpatti",
+      "Kuama",
+      "Madanpur",
+      "MBalaha",
+      "Parsauni",
+      "Parshurampur",
+      "Rampur Bakhari"
+    ]
+  ],
+  "843326": [
+    "Sitamarhi",
+    "Bihar",
+    [
+      "Balasath",
+      "Banaul",
+      "Bathasli",
+      "Batra",
+      "Gaura",
+      "Gauri",
+      "MSakrauli",
+      "Pandaul Buzurg",
+      "Pokhraira",
+      "Raipur"
+    ]
+  ],
+  "843327": [
+    "Sitamarhi",
+    "Bihar",
+    [
+      "Babhangama",
+      "Bairiya",
+      "Barahi",
+      "Bhagwanpur",
+      "BJairam",
+      "CBishanpur",
+      "Khairwa",
+      "Kharsan",
+      "KThikha",
+      "Maudah",
+      "MMandal",
+      "Narha",
+      "P Pataniya",
+      "PBasantpur",
+      "Pokharbhinda",
+      "Ranjitpur",
+      "Rewasi",
+      "RGanguly",
+      "Riga",
+      "Riga Colony",
+      "Riga Gote",
+      "Sahbajpur"
+    ]
+  ],
+  "843328": [
+    "Sitamarhi",
+    "Bihar",
+    [
+      "Baligarh",
+      "Bhanaspatti",
+      "Bharthua",
+      "CDharharwa",
+      "Chandwara",
+      "Ghanshyampur",
+      "Mehsaul",
+      "MMorsand",
+      "Rain Shankar",
+      "Raxiya",
+      "Runnisaidpur",
+      "Thahar",
+      "Thumma"
+    ]
+  ],
+  "843329": [
+    "Sheohar",
+    "Bihar",
+    [
+      "Bhatahan",
+      "Bhorahan",
+      "Chimanpur",
+      "D Katasari",
+      "Fatahapur",
+      "H Dumma",
+      "Harnahiya",
+      "Hiramma",
+      "Jahagirpur",
+      "Kamrauli",
+      "Kasturia",
+      "Khairwa Darp",
+      "Kushahar",
+      "M Chhatta",
+      "M Kararia",
+      "Mahuariya",
+      "Mathurapur",
+      "Nayagaon",
+      "Pardeshiya",
+      "Parrahi",
+      "Phulkahan",
+      "S Katsari",
+      "Salempur",
+      "Sheohar",
+      "Shyampur",
+      "Tajpur"
+    ]
+  ],
+  "843330": [
+    "Sitamarhi",
+    "Bihar",
+    [
+      "Araria",
+      "Dalkawa",
+      "Kohbarawa",
+      "Mayurwa",
+      "Mushaharniya",
+      "PParsain",
+      "PRajwara",
+      "Sonbersa"
+    ]
+  ],
+  "843331": [
+    "Sitamarhi",
+    "Bihar",
+    [
+      "Baghari",
+      "Bakhari",
+      "Barahi",
+      "Bhitha Bazar",
+      "H Dularpur",
+      "Hanumannagar",
+      "Kumma",
+      "Mahuawa",
+      "Majhaura",
+      "Malahi",
+      "Meghpur",
+      "Narha",
+      "Radhaur",
+      "Ragharpura",
+      "Shrikhandi Bhitta",
+      "Sursand",
+      "Sutihara"
+    ]
+  ],
+  "843332": [
+    "Sitamarhi",
+    "Bihar",
+    [
+      "Bagaha",
+      "Bahera",
+      "Chhaurahiya",
+      "KMadan",
+      "Majorganj",
+      "Malahi",
+      "Manariya",
+      "MMalinia",
+      "Pachaharwa",
+      "Sahiyara",
+      "Sonaul Mahoday"
+    ]
+  ],
+  "843333": [
+    "Sitamarhi",
+    "Bihar",
+    [
+      "B Jahidpur",
+      "B Shantikutir",
+      "Bhadiyan",
+      "Dadari",
+      "Dhadhi",
+      "Humayupur",
+      "Janipur",
+      "Koili",
+      "Madaripur",
+      "Mahammadpur Dalel",
+      "Majhaur",
+      "Nanpur",
+      "Ratwara",
+      "Saura",
+      "Sirsi"
+    ]
+  ],
+  "843334": [
+    "Sheohar",
+    "Bihar",
+    [
+      "Adauri",
+      "Amua",
+      "B Baaz",
+      "B Chandiha",
+      "B Jagjiwan",
+      "Basantpatti",
+      "Belwa",
+      "Chakfateha",
+      "Garahiya",
+      "Garhwa",
+      "M Pokharbinda",
+      "Mahuawa",
+      "MDostiya",
+      "Piprarhi",
+      "S Sultan"
+    ]
+  ],
+  "843335": ["Sheohar", "Bihar", ["B Jagdish", "Barahi Jagdish"]],
+  "843360": ["Muzaffarpur", "Bihar", ["Angoa", "BTayab", "Changel", "Jajuar", "Ufrauli"]],
+  "844101": ["Vaishali", "Bihar", ["Hajipur", "Hajipur Chowk", "Rambhadra", "Yusufpur"]],
+  "844102": [
+    "Vaishali",
+    "Bihar",
+    [
+      "Bhairopur Deodhi",
+      "Dighi Kala",
+      "Hajipur IndArea",
+      "Jadhua",
+      "Panapur Dharampur",
+      "Rajasan",
+      "Rajauli",
+      "Ratnakar",
+      "Sadullahpur",
+      "Subhai"
+    ]
+  ],
+  "844103": [
+    "Vaishali",
+    "Bihar",
+    [
+      "Anzanpeer Chok",
+      "Balwakuari",
+      "Chandralay",
+      "Gadaisarai",
+      "Harauli",
+      "Ishmilepur",
+      "Izra",
+      "Minapur Rai"
+    ]
+  ],
+  "844111": [
+    "Vaishali",
+    "Bihar",
+    [
+      "Aniruddha Belsar",
+      "Bahilwara Bhual",
+      "Bahilwara Govind",
+      "Bahilwara Roopnath",
+      "Belwar",
+      "Bibipur",
+      "Dharampur",
+      "Hauzpura",
+      "Karneji",
+      "Paterha Jairam",
+      "Sain"
+    ]
+  ],
+  "844112": [
+    "Vaishali",
+    "Bihar",
+    [
+      "Ababakarpur",
+      "Baghi",
+      "Balra Ismail",
+      "Bherokhara",
+      "Bishanpur Arara",
+      "Chapaith",
+      "Khajechand Chapra",
+      "Mansurpur Halaiya",
+      "Mathna Mallik",
+      "Sahpur Maricha",
+      "Sehan"
+    ]
+  ],
+  "844113": [
+    "Vaishali",
+    "Bihar",
+    [
+      "Amritpur",
+      "Balukaram",
+      "Chaklahlad",
+      "Daudnagar",
+      "Madarna",
+      "Madhopur Ram",
+      "Nandlalpur"
+    ]
+  ],
+  "844114": [
+    "Vaishali",
+    "Bihar",
+    [
+      "Asoi",
+      "Bhagwanpur",
+      "Bishanpur Bande",
+      "Bithauli",
+      "Boaria",
+      "Garjaul",
+      "Hansikewal",
+      "Husaina Khurd",
+      "Katarmala",
+      "Kiratpur Rajaram",
+      "Pirapur Mathura",
+      "Piroi",
+      "Raghunathpur Imadpur",
+      "Rasulpur Enayat",
+      "Rasulpur Korigaon",
+      "Satpura",
+      "Warispur"
+    ]
+  ],
+  "844115": [
+    "Vaishali",
+    "Bihar",
+    [
+      "Bishanpur Said Urf Bakarpur",
+      "Chaksikandar",
+      "Gauspur Bariarpur",
+      "Kalyanpur",
+      "Khanpur Pakari",
+      "Mohanpur"
+    ]
+  ],
+  "844116": [
+    "Vaishali",
+    "Bihar",
+    ["Bilandpur", "Bishanpur Bejha", "Dumari", "Fatehpur Fulwaria", "Rampur Ratnakar"]
+  ],
+  "844117": ["Vaishali", "Bihar", ["Dharhara", "Gurmia", "Paura"]],
+  "844118": [
+    "Vaishali",
+    "Bihar",
+    [
+      "Bathna Mahodat",
+      "Bhuwalpur Bahadurpur",
+      "Chakmaruf",
+      "Garahua",
+      "Goraul",
+      "Kheshramadih",
+      "Maganpur",
+      "Malikpura",
+      "Padmaul",
+      "Sondho"
+    ]
+  ],
+  "844119": ["Vaishali", "Bihar", ["Ghataro", "Kartahan", "Pachdamia"]],
+  "844120": [
+    "Muzaffarpur",
+    "Bihar",
+    [
+      "Anant Kamtaul",
+      "Azizpur",
+      "Balaur",
+      "Bhagwanpur",
+      "Chakwaja Nagma",
+      "Chandrahatti",
+      "Girigama Dih",
+      "Kurhani",
+      "M Afzalpur",
+      "Rajala"
+    ]
+  ],
+  "844121": [
+    "Vaishali",
+    "Bihar",
+    [
+      "Jaintipur",
+      "Jalalpur",
+      "Khanjahachak",
+      "Lalganj Vaishali",
+      "Manikpur Pakri",
+      "Purkhauli",
+      "Sahdullahpur"
+    ]
+  ],
+  "844122": [
+    "Vaishali",
+    "Bihar",
+    [
+      "Bakhri Dua",
+      "Baksama",
+      "Bhagwatpur Taraura",
+      "Bhanborhan",
+      "Chakmajahid",
+      "Chaksaid",
+      "Chandsarai Sahdullahchak",
+      "Chehrakala",
+      "Chhourahi",
+      "Hasapur Bhadwas",
+      "Kanhauli",
+      "Karhatia Buzurg",
+      "Laxmanpur",
+      "Madhaul",
+      "Madhopur Nijhma",
+      "Mahuwa",
+      "Mirza Nagar",
+      "Naharpur",
+      "Nilkanthpur",
+      "Phular",
+      "Rampur Ramhar",
+      "Rasalpur Fatah",
+      "Salempur Dumaria"
+    ]
+  ],
+  "844123": [
+    "Vaishali",
+    "Bihar",
+    [
+      "Abbul Hasanpur",
+      "Jarang Rampur",
+      "Majhauli",
+      "Prataptand",
+      "Rikhar",
+      "Sahtha",
+      "Sathiauta Bhagwan",
+      "Sirsabiran"
+    ]
+  ],
+  "844124": [
+    "Vaishali",
+    "Bihar",
+    ["Baikunthpur", "Basara", "Nainha", "Panapur Langa", "Rajapakar", "Senduari"]
+  ],
+  "844125": [
+    "Vaishali",
+    "Bihar",
+    [
+      "Akhtiyarpur Paterha",
+      "Anjani",
+      "Belkunda",
+      "Bhojpatti",
+      "Birna Lakhan Sen",
+      "Mani Bhakurahar",
+      "Sarai",
+      "Thathan Buzurg"
+    ]
+  ],
+  "844126": [
+    "Vaishali",
+    "Bihar",
+    [
+      "Adalpur",
+      "Chakaiya",
+      "Chitrauli",
+      "Gara Urf Govindpur Devi",
+      "Harpur Belwa",
+      "Jahangirpur Salkhanni",
+      "Mahathi Dharamchand",
+      "Milki Urf Chakwaje Khijirpur",
+      "Nari Khurd",
+      "Pour",
+      "Sarmaspura",
+      "Serpur Chatwara",
+      "Singhara",
+      "Tisiuta Dharampur"
+    ]
+  ],
+  "844127": [
+    "Muzaffarpur",
+    "Bihar",
+    [
+      "Basauli",
+      "Ch Harishankar",
+      "Charhua",
+      "Dariyapur Kafen",
+      "Dubiahi",
+      "Jhikati",
+      "Kerma",
+      "Kinaru",
+      "KMadhuban",
+      "KMohan",
+      "Pupari",
+      "Ratnauli",
+      "Sakari Saraiya",
+      "Turki"
+    ]
+  ],
+  "844128": ["Vaishali", "Bihar", ["Chakramdas", "Rahimpur Jagdish", "Vaishali"]],
+  "844501": [
+    "Vaishali",
+    "Bihar",
+    [
+      "Basudeopur Chandel",
+      "Hargovindpur",
+      "Harpur Fatikwara",
+      "Karnauti",
+      "Marai",
+      "Sarmastpur",
+      "Supaul"
+    ]
+  ],
+  "844502": [
+    "Vaishali",
+    "Bihar",
+    [
+      "Bahuara",
+      "Bajitpur Malahi",
+      "Balatand",
+      "Bidupur Rs",
+      "Bishanpur Titara",
+      "Chandpura",
+      "Dayalpur Garh",
+      "Hilalpur Madarpur",
+      "Lakhani",
+      "Rahimapur",
+      "Sahdullpur Dhabouli"
+    ]
+  ],
+  "844503": [
+    "Vaishali",
+    "Bihar",
+    [
+      "Bajitpur Saidat",
+      "Bidupur Bazar",
+      "Bishunpur Rajkhand",
+      "Chakgarho Daudnagar",
+      "Chechar",
+      "Dilawarpur Govardhan",
+      "Govindpur Gokhula",
+      "Jafrabad",
+      "Khilwat",
+      "Kutubpur Saidpur",
+      "Madhurapur",
+      "Mathurapur Sultan",
+      "Navanagar"
+    ]
+  ],
+  "844504": [
+    "Vaishali",
+    "Bihar",
+    [
+      "Azampur",
+      "Bakhari Supayan",
+      "Basantpur",
+      "Bhataulia",
+      "Chakamgola",
+      "Chandpura Nankar",
+      "Desari",
+      "Dhandhua",
+      "Jafarpatti",
+      "Jahangirpur Sham",
+      "Kadilpur",
+      "Kharika",
+      "Khokhsa Bujurg",
+      "Lakhmipur",
+      "Mamrejpur",
+      "Maniarpur",
+      "Mukundpur Grahi",
+      "Rampur Madhaul",
+      "Ufraul"
+    ]
+  ],
+  "844505": [
+    "Vaishali",
+    "Bihar",
+    [
+      "Arnia",
+      "Bhathahi",
+      "Bishanpur Bedaulia",
+      "Bitandipur",
+      "Chamarhara Mamsai",
+      "Chansarai",
+      "Dih Bichauli",
+      "Jhandaha",
+      "Jowaj",
+      "Kalapahar",
+      "Loma",
+      "Mahipura",
+      "Mahisaur",
+      "Mansingpur Bijhrauli",
+      "Murtuzapur",
+      "Narainpur Deopura",
+      "Pirapur",
+      "Rasulpur Purusottam",
+      "Sahpur",
+      "Salha",
+      "Shoharthi"
+    ]
+  ],
+  "844506": [
+    "Vaishali",
+    "Bihar",
+    [
+      "Alipur Hatta",
+      "Dhamaun",
+      "Hasanpur",
+      "Hasanpur Gurda",
+      "Hetanpur",
+      "Inayatpur",
+      "Lawapur Mahnar",
+      "Lawapur Narain",
+      "Mahnar",
+      "Marauatpur",
+      "Nayaganj",
+      "Palwaiya",
+      "Sultanpur",
+      "Taibpur"
+    ]
+  ],
+  "844507": [
+    "Vaishali",
+    "Bihar",
+    [
+      "Gorigama",
+      "Kazari Buzurg",
+      "Khopi",
+      "Mahnar Road Rs",
+      "Mukundpur Bhat",
+      "Parmanandpur",
+      "Pohiar",
+      "Rampur Bhaghel",
+      "Rampur Kumaharkol"
+    ]
+  ],
+  "844508": [
+    "Vaishali",
+    "Bihar",
+    [
+      "Birpur",
+      "Bishanpur",
+      "Chaksingar",
+      "Chandpura Idrak",
+      "Juramanpur Rampur",
+      "Jurawanpur Barari",
+      "Jurawanpur Karari",
+      "Mohanpur",
+      "Paharpur",
+      "Raghopur",
+      "Raghopur Chandel",
+      "Rampur Shyamchand",
+      "Rushtampur",
+      "Saistapur"
+    ]
+  ],
+  "844509": [
+    "Vaishali",
+    "Bihar",
+    [
+      "Bajitpur Kasturi",
+      "Chakjamal",
+      "Paharpur Toi",
+      "Sahdei Buzurg",
+      "Sarai Dhanesh",
+      "Sekhopur"
+    ]
+  ],
+  "845101": [
+    "Pashchim Champaran",
+    "Bihar",
+    [
+      "Bagaha",
+      "Bargaon",
+      "BB Bankatwa",
+      "Chandraha",
+      "Harpur",
+      "Lagunaha",
+      "Manpur",
+      "Mehura",
+      "Padar Khap",
+      "Parsa",
+      "Patilar",
+      "Piparia",
+      "Rajwatia",
+      "Singari",
+      "Sirisia"
+    ]
+  ],
+  "845103": [
+    "Pashchim Champaran",
+    "Bihar",
+    [
+      "Bagahi",
+      "Bargo",
+      "Dianmarawa",
+      "Dumaria Estate",
+      "Harinagar",
+      "Jharmahuee",
+      "Jogia",
+      "Mahui",
+      "Murali",
+      "Sabeya",
+      "Sitapur",
+      "Telpur"
+    ]
+  ],
+  "845104": [
+    "Pashchim Champaran",
+    "Bihar",
+    [
+      "Balua Thori Bazar",
+      "Bhitaha",
+      "Bhuidharwa",
+      "Binahi",
+      "Chilwania",
+      "Daunaha",
+      "Dhanaha",
+      "Dhumnagar",
+      "Dumari",
+      "Kathar",
+      "Khaira Tola",
+      "Machhaha",
+      "Madhubani",
+      "Mura Dih",
+      "Parsauna",
+      "Piprasi",
+      "Ranglalahi",
+      "Sisai",
+      "Taulaha"
+    ]
+  ],
+  "845105": [
+    "Pashchim Champaran",
+    "Bihar",
+    [
+      "Bakuli",
+      "Borwal",
+      "Harnatar",
+      "Khairpokhara",
+      "Kunai Bhelahi",
+      "Malkauli",
+      "Mangalpur",
+      "Naraipur",
+      "Naurangia",
+      "Pharsahani",
+      "Rampurwa",
+      "Semra Labedaha",
+      "Semra Medraul",
+      "Sidhaw",
+      "Sohagi Barwa",
+      "Taruanwa",
+      "Tarwalia",
+      "Tinferia"
+    ]
+  ],
+  "845106": [
+    "Pashchim Champaran",
+    "Bihar",
+    [
+      "Bakhari Pachrukhia",
+      "Bhairoganj",
+      "Bhawal",
+      "Cheutaha",
+      "Gobarahia Done",
+      "Gobardhana",
+      "Gudgudi",
+      "Kolhua",
+      "Majharia",
+      "Meghwal Mathia",
+      "Nauragia Done",
+      "Ramnagar",
+      "Semari Dumari",
+      "Serwa Done",
+      "Sigari Bigari",
+      "Tribhuani"
+    ]
+  ],
+  "845107": [
+    "Pashchim Champaran",
+    "Bihar",
+    ["Champapur Gonauli", "Laxmipur Bherihari", "Rampurwa", "Valmiki Nagar"]
+  ],
+  "845301": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Adapur",
+      "Auraia",
+      "Bakhathaura",
+      "Barawa",
+      "Belahiya",
+      "Bhawanipur Bazar",
+      "Bishunpurwa",
+      "Dubaha",
+      "Gamaharia Kala",
+      "Gamharia Khurd",
+      "Harpur",
+      "Narkatia",
+      "Purainia",
+      "Sirsia Khurd",
+      "Sirsiya Kala",
+      "Siswania"
+    ]
+  ],
+  "845302": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Barawa",
+      "Bella Champaran",
+      "Chanari",
+      "Chauradano",
+      "Darpa",
+      "Ekdari",
+      "Jitpur",
+      "Juafar",
+      "Kodarkat",
+      "Lakhaura",
+      "Latihanawa",
+      "Mahuawa Imilia",
+      "Mathia Brit",
+      "Pakaria",
+      "Purshottampur",
+      "Semrahia",
+      "Tikulia",
+      "Tinkoni"
+    ]
+  ],
+  "845303": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Amawa",
+      "Athmohan",
+      "Bankatwa",
+      "Bijwani",
+      "Ghora Sahan",
+      "Jamunia Koraiya",
+      "Jhajhara",
+      "Kadamawa",
+      "Khurahiya",
+      "Purnahiya",
+      "Sripur Kawaiya"
+    ]
+  ],
+  "845304": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Balua Tola",
+      "Barharwa FMohamad",
+      "Barwa Khurd",
+      "Chandanwara",
+      "Gawandri",
+      "Gurhanawa",
+      "Karmawa",
+      "Kundwa Chainpur",
+      "Phulwaria",
+      "Telhara Kala"
+    ]
+  ],
+  "845305": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Belwa",
+      "Bhelahi",
+      "Gonaha",
+      "Hardiya",
+      "Jokiyari",
+      "Kaurihar",
+      "Noniyadih",
+      "Parsurampur",
+      "Purandara",
+      "Raxaul",
+      "Sihpur",
+      "Siswa Sounaha"
+    ]
+  ],
+  "845306": [
+    "Pashchim Champaran",
+    "Bihar",
+    [
+      "Bastha",
+      "Bhaluahia",
+      "Ghorpakari",
+      "Inarwa Bazar",
+      "Mainatand",
+      "Marjadwa",
+      "Pindari",
+      "Siswa Bhangaha"
+    ]
+  ],
+  "845307": [
+    "Pashchim Champaran",
+    "Bihar",
+    [
+      "Baishakhawa",
+      "Behari Bankatwa",
+      "Behra",
+      "Bhawara",
+      "Dukhi Chhapar",
+      "Gopalpur",
+      "Haripur",
+      "Jagarnathpur",
+      "Kurshi Barawa",
+      "Mathia Kathia",
+      "Murli Parsauni",
+      "Purainia",
+      "Sargatia",
+      "Shikarpur",
+      "Sikta",
+      "Sugaha Bhawanipur",
+      "Sundar Gaon"
+    ]
+  ],
+  "845315": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Bagaha Champaran",
+      "Bhelwa Circle",
+      "Bijayee",
+      "Champapur Koiria",
+      "Dipahi Dharharwa",
+      "Inarwa Phulwar",
+      "Mathia Bhopat",
+      "Mazirwa",
+      "Nimoiya",
+      "Nonuara"
+    ]
+  ],
+  "845401": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Ajgarhimath",
+      "Bairia",
+      "Bariarpur",
+      "Chailaha",
+      "Dhekaha Bazar",
+      "Hardia",
+      "Katha Loknathpur",
+      "Khairi Ajgarwa",
+      "Laxmipur",
+      "Madhubanighat",
+      "Majharia",
+      "Motihari",
+      "Motihari Chowk",
+      "Motihari City",
+      "Motihari College",
+      "Motihari Court",
+      "Pataura",
+      "Rulahi",
+      "Rupdih",
+      "Sirsa Colony",
+      "Siswa",
+      "Siswania",
+      "Suraha"
+    ]
+  ],
+  "845406": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Bhurkurwa",
+      "Jhitkahiya",
+      "Kashi Pakari",
+      "Madhopur Keso",
+      "Nankardewa",
+      "Narha Panapur",
+      "Noniman",
+      "Rajepur Champaran",
+      "Salempur"
+    ]
+  ],
+  "845411": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Areraj",
+      "Bahadurpur",
+      "Chandrahia",
+      "Ghiwadhar",
+      "Gobindapur Bazar",
+      "Jagapakar",
+      "Kritpur Mathiya",
+      "Lauriya"
+    ]
+  ],
+  "845412": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Balo Chak",
+      "Bara Chakia",
+      "Baramania",
+      "Bhuwan Chapra",
+      "Biradban Mirchaiya",
+      "Harpur Nag",
+      "Koila Belwa",
+      "Kuawa",
+      "Pakari Dixit",
+      "Pipra Khem",
+      "Sawangia",
+      "Sital Pur"
+    ]
+  ],
+  "845413": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Ahiman Chapra",
+      "Bahlolpur",
+      "Bakarpur Jagat",
+      "Bakhari",
+      "Bakhari Mahesh",
+      "Bishambharapur",
+      "Kalyanpur",
+      "Katahariya",
+      "Parsauni Wajit",
+      "Shambhuchak"
+    ]
+  ],
+  "845414": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Bokane Kala",
+      "Chaita",
+      "Chapra Bihari",
+      "Chorma",
+      "Dulama",
+      "Jitaura",
+      "Majhaulia",
+      "Nawada",
+      "Siraha",
+      "Sundar Patti"
+    ]
+  ],
+  "845415": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Ahiraulia Bhinak",
+      "Baidnathpur",
+      "Chiraiya",
+      "Khartari",
+      "Madhopur",
+      "Mahuawa",
+      "Mirpur",
+      "Misraulia",
+      "Patjirwa",
+      "Rampur",
+      "Semra"
+    ]
+  ],
+  "845416": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Bediban Madhuban",
+      "Chintamanpur",
+      "Damodarpur",
+      "Khairimal",
+      "Kuriya",
+      "Parsauni Kishun",
+      "Parsurampur",
+      "Ramkaran Pakari",
+      "Sagar",
+      "Sariyatpur Khan Tola",
+      "Tikulia"
+    ]
+  ],
+  "845417": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Ahiraulia",
+      "Bhada Murli",
+      "Bhatwalia",
+      "Dariapur",
+      "Dumra",
+      "Kararia",
+      "Machhargawa",
+      "Mahatha Tola",
+      "Olaha Madubani",
+      "Parsauna",
+      "Shyampur"
+    ]
+  ],
+  "845418": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Bahlolpur",
+      "Bara Jai Ram",
+      "Barharwa Lakhansen",
+      "Barharwa Siwan",
+      "Dhaka",
+      "Haraj Narullahpur",
+      "Harnaraina",
+      "Harnatha",
+      "Jamua",
+      "Jhauaram",
+      "Kapur Pakari",
+      "Karsahiya",
+      "Kathmalia",
+      "Laukhan",
+      "Madhubani Kala",
+      "Raghopur Gangapipar",
+      "Ruphara",
+      "Semra Sagardina",
+      "Sirauna"
+    ]
+  ],
+  "845419": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Chandi Sthan",
+      "Gobindganj",
+      "Izara",
+      "Nawada Izara",
+      "Pipara",
+      "Salaha",
+      "Sareya Khas"
+    ]
+  ],
+  "845420": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Bazitpur",
+      "Bhelwa",
+      "Gulwara Madhuban",
+      "Kauriya",
+      "Khodadpur",
+      "Koilhara",
+      "Krishna Nagara",
+      "Madhurapur",
+      "Moglania",
+      "Naurangia",
+      "Rupani"
+    ]
+  ],
+  "845422": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Balua",
+      "Dhawahi",
+      "Harsiddhi",
+      "Jadopur",
+      "Kanchhedwa",
+      "Mankararia",
+      "Math Lohiyar",
+      "Nonea",
+      "Paharia",
+      "Panditpur",
+      "Pannapur Ranjeeta",
+      "Rai Kararia",
+      "Siswa Bazar",
+      "Son Barsa"
+    ]
+  ],
+  "845423": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Belwa Madho",
+      "Dumariaghat",
+      "Hussaini",
+      "Karhan",
+      "Mangalpur",
+      "Purvi Pakari",
+      "Rampur Khajuria",
+      "Sarotar",
+      "Sembhuapur"
+    ]
+  ],
+  "845424": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Bairiya",
+      "Bankat",
+      "Bijdhari Nizamat",
+      "Kesharia",
+      "Kunwar Dhekha",
+      "Naya Gaon",
+      "Sundarpur",
+      "Tajpur Patkhaulia"
+    ]
+  ],
+  "845425": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Bharwalia",
+      "Chatia",
+      "Damodarpur Mathia",
+      "Malahi",
+      "Mamarkha",
+      "MSikatia",
+      "Nagdaha",
+      "Sirni Bazar",
+      "Sonwal"
+    ]
+  ],
+  "845426": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Bans Ghat",
+      "Dilawarpur",
+      "Garahiya",
+      "Gawandra",
+      "Kasba Mehsi",
+      "Kataha",
+      "KHariram",
+      "Madan Sirsiya",
+      "Madhopur Govind",
+      "Mahamada",
+      "Mehsi",
+      "Puran Chapra",
+      "Sirsia Ganesh"
+    ]
+  ],
+  "845427": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Bhandar",
+      "Dalpat Bishunpur",
+      "Gonahi",
+      "Jhitkahiya",
+      "Jihuli",
+      "Khori Pakar",
+      "Narayanpur",
+      "Noonfarwa",
+      "Pachpakari",
+      "Padmuker"
+    ]
+  ],
+  "845428": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Ajgarwa",
+      "Barkagaon",
+      "Dhanujee",
+      "Itwa",
+      "Majhar Gohiya",
+      "Pakari Dayal",
+      "Sishani"
+    ]
+  ],
+  "845429": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Ashok Pakari",
+      "Bangari",
+      "Belwatia",
+      "Chandrahiya",
+      "Jhakhara",
+      "Jiwdhara",
+      "Mathurapur",
+      "MBBathana",
+      "Pipra Factory"
+    ]
+  ],
+  "845430": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Bisunpur Basant",
+      "Deokulia",
+      "Ibrahimpur Parsauni",
+      "Izor Bara",
+      "Kalu Pakar",
+      "Kodariya",
+      "Kumhrar",
+      "Mankarwa",
+      "Muzia",
+      "Phenhara"
+    ]
+  ],
+  "845431": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Gamharia",
+      "Jhitkahia",
+      "Kukurjari",
+      "Madhopur Karamwa",
+      "Mansingha",
+      "Pajiarwa",
+      "Phulwar",
+      "Raghunathpur Bazar"
+    ]
+  ],
+  "845432": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Bhgwatia",
+      "Bhopatpur",
+      "Darmaha",
+      "Gariba",
+      "Hazipur",
+      "Jasauli Jamunia",
+      "Konhia",
+      "Raghunathpur",
+      "Rajpur",
+      "Siswa Kharar",
+      "Siswa Patna"
+    ]
+  ],
+  "845433": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Adhkaparia Phulwaria",
+      "Ahiraulia",
+      "Amodei",
+      "Andhra",
+      "Bagahi",
+      "Bairiya",
+      "Bela",
+      "Chainpur",
+      "Champapur",
+      "Dhanhar Dihuli",
+      "Inrawa",
+      "Laxmipur Pokhariya",
+      "Majharia",
+      "Murla",
+      "Parsauna Madan",
+      "Patani",
+      "Raghunathpur",
+      "Ramgahrwa",
+      "Singasani",
+      "Tola Mauje"
+    ]
+  ],
+  "845434": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Bariariya",
+      "Manglapur Rajpur",
+      "Puchharia",
+      "Sangrampur",
+      "Sikandarpur",
+      "Thikaha Bhawanipur"
+    ]
+  ],
+  "845435": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Bairiadih",
+      "Belghati",
+      "Belwa Rai Khas",
+      "Bhargawan",
+      "BRTNariarwa",
+      "Chhapra Bahas",
+      "Janerwa",
+      "Khagani",
+      "Mukhalishpur Pachrukha",
+      "Sapaha",
+      "Semra"
+    ]
+  ],
+  "845436": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Bahuarwa Gopi Singh",
+      "Gheghawa",
+      "Kajraha",
+      "Madhuwahan Brit",
+      "Semraha",
+      "Tetaria Factory"
+    ]
+  ],
+  "845437": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Baharupia",
+      "Barharwa Kala",
+      "Barmashwa",
+      "Chainpur",
+      "Gai Ghat",
+      "Jagiraha",
+      "Jaishingpur",
+      "Jasauli Patti",
+      "Kotwa",
+      "Kushar",
+      "Madhopur",
+      "Makhuwa",
+      "Manikpur",
+      "Murarpur",
+      "Sabaiya",
+      "Sapahi",
+      "Shankar Sharaiya",
+      "Talwa Pokhar",
+      "Tikaita",
+      "Turkaulia"
+    ]
+  ],
+  "845438": [
+    "Pashchim Champaran",
+    "Bihar",
+    [
+      "Alpaha",
+      "B K Chowk",
+      "B Patkhaulia",
+      "B Ratanpura",
+      "Baijua",
+      "Bairiya Farm",
+      "Balua Rampurwa",
+      "Banu Chhapar",
+      "Barwat Pasrain",
+      "Barwat Sena",
+      "Belbagh",
+      "Bettiah",
+      "Bettiah Dih",
+      "Bettiah RS",
+      "Bhawanipur",
+      "Bhitaha Nizamat",
+      "Dhum Nagar",
+      "Gambhirpur",
+      "Gonauli",
+      "Khadda",
+      "KRHigh School",
+      "Lal Bazar Bettiah",
+      "Lalgarh",
+      "Laukariya",
+      "Mahna Gani",
+      "Meena Bazar Bettiah",
+      "Nautan Dubey",
+      "Naya Tola Bettiah",
+      "Pakhanaha Bazar",
+      "Patzirwa",
+      "Pipra Naurangia",
+      "Pipra Pakari",
+      "Pokharia",
+      "Refujee Camp",
+      "San Sariya",
+      "Sareya Ojhwalia",
+      "Sheorajpur",
+      "Surajpur",
+      "Tadhawa Nandpur"
+    ]
+  ],
+  "845440": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Gad Bahuari",
+      "Jaitapur Laukaria",
+      "Laukaria",
+      "Palanwa",
+      "ParsaunaTapasi",
+      "Sakarar"
+    ]
+  ],
+  "845449": [
+    "Pashchim Champaran",
+    "Bihar",
+    [
+      "Bakulahar Math",
+      "Belwa",
+      "Bhabhata",
+      "Bheriharwa",
+      "Chanpatia Bazar",
+      "Chanpatia R S",
+      "Chaubey Tola",
+      "Danial Parsauna",
+      "Dhamaura",
+      "Dhankutwa",
+      "Dharampur",
+      "Ghogha",
+      "Jaitia",
+      "Pokharia Rai",
+      "Puraina Gosai",
+      "Sathi",
+      "Sihpur",
+      "Tikulia"
+    ]
+  ],
+  "845450": [
+    "Pashchim Champaran",
+    "Bihar",
+    [
+      "Ashram Brindavan",
+      "Auraiya",
+      "Chuhari",
+      "Gurwalia",
+      "Jado Chhapar",
+      "Kurwa Mathia",
+      "Laxmipur",
+      "Mushahari",
+      "Sirisia",
+      "Turahapatti"
+    ]
+  ],
+  "845451": [
+    "Pashchim Champaran",
+    "Bihar",
+    [
+      "Bargajwa",
+      "Chauhatta",
+      "Damrapur",
+      "DKShikarpur",
+      "Gokhula",
+      "Maldi",
+      "Mangrahari",
+      "Maniari",
+      "Padraun",
+      "Rakhahi",
+      "Rampur"
+    ]
+  ],
+  "845452": [
+    "Pashchim Champaran",
+    "Bihar",
+    [
+      "Bagahi",
+      "Barwa Ojha",
+      "Chamukha",
+      "Dudhiawa",
+      "Dumari Bazar",
+      "Jaralpur Dih",
+      "Jogapatti",
+      "Machhargawan",
+      "Nawalpur",
+      "Puraina",
+      "Shiorajpur",
+      "Sirnagar"
+    ]
+  ],
+  "845453": [
+    "Pashchim Champaran",
+    "Bihar",
+    [
+      "Bariarwa",
+      "Baswariya",
+      "Belwa More",
+      "Bijbania",
+      "Briti Matiaria",
+      "Dhobini",
+      "Dumara",
+      "Gobraura",
+      "Kehunia",
+      "Lakhanpur",
+      "Lauriya",
+      "Mathia",
+      "Parsa Factory",
+      "Parsauni Farm",
+      "Ramparsauna",
+      "Roari",
+      "Sahadat Pur",
+      "Siswa Basantpur",
+      "Siswania"
+    ]
+  ],
+  "845454": [
+    "Pashchim Champaran",
+    "Bihar",
+    [
+      "Bakharia",
+      "Chailabhar",
+      "Chanayan Bandh",
+      "Dhokharaha",
+      "Gora Karamwa",
+      "Harpur Tola",
+      "Jawkatia",
+      "Kathaia",
+      "Lal Saraiya",
+      "Madhopur",
+      "Majhariya Sheikh",
+      "Majhaulia Rs",
+      "Mathia Brit",
+      "Mohachhinain",
+      "Rajabhar",
+      "Rampurwa",
+      "Rampurwa Mahanwa",
+      "Ratanmala Mathia",
+      "Rulahi Nizamat",
+      "Sariswa Bazar",
+      "Senwaria",
+      "Shikarpur"
+    ]
+  ],
+  "845455": [
+    "Pashchim Champaran",
+    "Bihar",
+    [
+      "Amolwa",
+      "Anjua",
+      "Belsandi",
+      "Belwa Bahuari",
+      "Bhikhana Thori",
+      "Bhitiharwa Ashram",
+      "Goithahi",
+      "Jamunia",
+      "Lachhnauta",
+      "Mahuawa",
+      "Manwa Parsi",
+      "Musharwa",
+      "Narkaiaganj",
+      "Rajpur Madan",
+      "Saidpur",
+      "Serwa Masjidwa",
+      "Sugauli",
+      "Taulaha Champaran"
+    ]
+  ],
+  "845456": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Bahuarawa",
+      "Bhataha",
+      "Chhapawa Phulwaria",
+      "Gudra",
+      "Kaithwalia",
+      "Mali",
+      "Parsa",
+      "Sripur",
+      "Sugaon",
+      "Sugauli",
+      "Sugauli Bazar",
+      "Sukul Pakar"
+    ]
+  ],
+  "845457": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Bakhari",
+      "Balua Zulfikarabad",
+      "Bara Shankar",
+      "Bela Baiju",
+      "Betauna",
+      "Mirzapur",
+      "Parsauni Kapoor",
+      "Patahi",
+      "Saraiya Gopal"
+    ]
+  ],
+  "845458": [
+    "Purbi Champaran",
+    "Bihar",
+    [
+      "Chhapkahia",
+      "Ganga Pipara",
+      "Manguraha",
+      "Nawadih",
+      "Paharpur",
+      "Radhia",
+      "Rampurwa Bazar"
+    ]
+  ],
+  "845459": [
+    "Pashchim Champaran",
+    "Bihar",
+    [
+      "Ahwar Shaikh",
+      "Alamganj Bazar",
+      "Amwa Majhar",
+      "B Banahura",
+      "Bishabhar Pur",
+      "Bisunpura",
+      "Jagarnath Pur",
+      "Jagdishpur",
+      "Jhakhara",
+      "Majharia Kisun",
+      "Mangalpur Gudaria",
+      "Ramnagar Bankat",
+      "Sareya",
+      "Shyampur Kotaraha",
+      "Teluha",
+      "Victoria Mission"
+    ]
+  ],
+  "846001": ["Darbhanga", "Bihar", ["Imambari", "Laheriasarai", "Laheriasarai Court"]],
+  "846002": [
+    "Darbhanga",
+    "Bihar",
+    [
+      "Bahadurpur",
+      "BMVPith",
+      "Chandanpatti",
+      "Dekuli",
+      "MPBahadurpur",
+      "RAPMills",
+      "Ratanpura",
+      "SHMC",
+      "Sirnia",
+      "Thalwara"
+    ]
+  ],
+  "846003": [
+    "Darbhanga",
+    "Bihar",
+    [
+      "Benta South",
+      "Dihrampur",
+      "Dilahi",
+      "DMC",
+      "Goriari",
+      "Kharajpur",
+      "MSinuara",
+      "Narsara",
+      "Ojhaul",
+      "Panchobe",
+      "PBasant",
+      "Rupauli Ghat",
+      "Taralahi"
+    ]
+  ],
+  "846004": [
+    "Darbhanga",
+    "Bihar",
+    [
+      "C M College",
+      "Darbhanga",
+      "Darbhanga Bara Bazar",
+      "Darbhanga Chowk",
+      "Darbhanga City",
+      "Kathalwari",
+      "Katki Bazar",
+      "Kilaghat",
+      "Qadirabad"
+    ]
+  ],
+  "846005": [
+    "Darbhanga",
+    "Bihar",
+    [
+      "Barhi",
+      "Bariaul",
+      "BBira",
+      "BKAsthan",
+      "Lalsahpur",
+      "Postal Traning Centre",
+      "Siso",
+      "Sisodih",
+      "Sonhaun"
+    ]
+  ],
+  "846006": ["Darbhanga", "Bihar", ["Subhankarpur"]],
+  "846007": ["Darbhanga", "Bihar", ["Atihar", "Bhuskaul", "GBasailha", "Saramohanpur"]],
+  "846008": ["Darbhanga", "Bihar", ["K D S U"]],
+  "846009": [
+    "Darbhanga",
+    "Bihar",
+    [
+      "Dhoi",
+      "Kabaria Khutwara",
+      "Kabirchak",
+      "Kapchhahi",
+      "Laxmisagar",
+      "Mahpara",
+      "Milkichak",
+      "Sonki"
+    ]
+  ],
+  "847101": [
+    "Darbhanga",
+    "Bihar",
+    [
+      "Anandpur",
+      "Baligaon",
+      "Bhacchi",
+      "Chilha Dilawarpur",
+      "Dhanauli",
+      "Gujrauli",
+      "Harhachcha",
+      "Hawasa",
+      "Jogiara",
+      "Jorja",
+      "Khaira Kunji",
+      "Madanpur",
+      "Mirzapur",
+      "Nimathi",
+      "Patore",
+      "Shivram",
+      "Sidhauli",
+      "Sirua Maner",
+      "Srirampur",
+      "Ughra"
+    ]
+  ],
+  "847102": [
+    "Madhubani",
+    "Bihar",
+    [
+      "Barri",
+      "Basaith Chandpura",
+      "Bisanpur",
+      "DChandpura",
+      "Karbi Dhankaul",
+      "Massa",
+      "Meghwan",
+      "Shahpur",
+      "Shivnagar",
+      "Taraiya"
+    ]
+  ],
+  "847103": [
+    "Darbhanga",
+    "Bihar",
+    [
+      "Andauli",
+      "Antaur",
+      "Benipur",
+      "Bhawanipur",
+      "Harsinghpur",
+      "Jayantipur",
+      "KJagdishpur",
+      "Korthu",
+      "Mahinam",
+      "Mohiuddinagar Pakari",
+      "Motipur",
+      "Nari",
+      "Neori",
+      "Pohhadi",
+      "Rohar",
+      "Ruchighat",
+      "Shivnagarghat"
+    ]
+  ],
+  "847104": [
+    "Darbhanga",
+    "Bihar",
+    ["Ashthua", "Bharwara", "Bhawanipur", "Kaligaon", "Kora", "Manikauli"]
+  ],
+  "847105": [
+    "Darbhanga",
+    "Bihar",
+    [
+      "Arga",
+      "Baghauni",
+      "Baghra Simri",
+      "Baheri",
+      "Bakmandal",
+      "Boraj",
+      "Inai",
+      "Khangraitha",
+      "Kothra",
+      "Matunia",
+      "Narayandohat",
+      "Paghari",
+      "PGhiwahi",
+      "Ranna",
+      "SMajarahia",
+      "Thathopur"
+    ]
+  ],
+  "847106": [
+    "Darbhanga",
+    "Bihar",
+    [
+      "Arai Birdipur",
+      "Araila",
+      "Barhaulia",
+      "Kansi Simri",
+      "Moro",
+      "Ratanpura",
+      "Sarwara"
+    ]
+  ],
+  "847107": [
+    "Darbhanga",
+    "Bihar",
+    [
+      "Balour",
+      "Baruary",
+      "Benibad",
+      "Gaighat",
+      "Janta",
+      "Keotsa Baruari",
+      "KPirochha",
+      "Ladour",
+      "Laxman Nagar",
+      "Maheshwara",
+      "Seodaha Barail",
+      "Subhash Keso",
+      "Susta",
+      "Tharma"
+    ]
+  ],
+  "847108": [
+    "Madhubani",
+    "Bihar",
+    [
+      "Auraha",
+      "Bangama",
+      "Belhi Bhawanipur",
+      "Bhaptiahi",
+      "Bharkhori",
+      "Chhajana",
+      "Chichorba",
+      "Dhabahi",
+      "Dhanchhiha Baruar",
+      "Kakardobh",
+      "Karhari",
+      "Kariot",
+      "Kukurdaura",
+      "Laukahi",
+      "Laukahi Dhanchhiha",
+      "Makhnaha",
+      "Mansapur",
+      "Narahiya",
+      "Neor",
+      "Rajaram Patti",
+      "Ratnasara"
+    ]
+  ],
+  "847109": [
+    "Madhubani",
+    "Bihar",
+    [
+      "Araria Sangra",
+      "Mahindwar Navtoli",
+      "Nanaour",
+      "Parsa",
+      "Sirkharia",
+      "Tazpur",
+      "Tulapatganj"
+    ]
+  ],
+  "847115": [
+    "Darbhanga",
+    "Bihar",
+    ["Adalpur", "Bijuli", "Kharua", "Loam", "Muria", "Tarsarai", "Telhan"]
+  ],
+  "847121": [
+    "Darbhanga",
+    "Bihar",
+    [
+      "ABabhangama",
+      "Ashraha",
+      "Banka",
+      "Basauli",
+      "Bhoj Pandaul",
+      "Darima",
+      "Dulha",
+      "Jalwara",
+      "Keoti Ranway",
+      "Khirma",
+      "Nayagaon",
+      "Singhaso",
+      "SLalganj"
+    ]
+  ],
+  "847122": [
+    "Madhubani",
+    "Bihar",
+    ["Bhatraghat", "Bisfi", "CQuaztola", "Noorchak", "Parohi"]
+  ],
+  "847123": [
+    "Darbhanga",
+    "Bihar",
+    ["Bihar Nursary", "Kathalia", "Paigambarpur", "Rampura", "Singhwara", "Tehwara"]
+  ],
+  "847201": [
+    "Darbhanga",
+    "Bihar",
+    [
+      "Adhloam",
+      "Atahar",
+      "Baghaul",
+      "Bahera",
+      "Baigani",
+      "Chakla",
+      "Dakaram Pauri",
+      "Jarso",
+      "Kanthudih",
+      "Laxmanpur",
+      "Mahuli",
+      "Nawada",
+      "Ramauli",
+      "Sahari",
+      "Sajanpura",
+      "Sajhuar",
+      "SRBithauli",
+      "Susari",
+      "Trimuhanighat"
+    ]
+  ],
+  "847202": [
+    "Darbhanga",
+    "Bihar",
+    [
+      "Baskatti",
+      "Brahampatti",
+      "Habidih",
+      "Itwa Shivnagar",
+      "Mahwa",
+      "Saho",
+      "Sahoparari",
+      "Sher Bijulia",
+      "Sihaul",
+      "Tarwara"
+    ]
+  ],
+  "847203": [
+    "Darbhanga",
+    "Bihar",
+    [
+      "Afzala",
+      "Ahilwara",
+      "Akabarpur Bank",
+      "Asi",
+      "Aurahi",
+      "Balthari",
+      "Bauram",
+      "Bhadhar",
+      "Biraul",
+      "BRusselpur",
+      "DKaskaur",
+      "Goraman Singh",
+      "Jakso Jamalpur",
+      "Kanhai",
+      "Kothram",
+      "Ladaho",
+      "Laxmipur Kakorba",
+      "Nadiami",
+      "Nishihara",
+      "Paghari",
+      "Patania",
+      "PBuzurg",
+      "Sahasram",
+      "Sonpur",
+      "Uchhati"
+    ]
+  ],
+  "847204": [
+    "Darbhanga",
+    "Bihar",
+    ["Bishnupur", "Kaithwar", "Kakorha", "Narayanpur", "Sherpur"]
+  ],
+  "847211": ["Madhubani", "Bihar", ["Madhubani", "Madhubani Court"]],
+  "847212": [
+    "Madhubani",
+    "Bihar",
+    [
+      "Basuara",
+      "Bhachhi",
+      "Bhowara",
+      "Dumari",
+      "Kakna",
+      "Khajuri",
+      "Kharra",
+      "Malangia",
+      "Sirpurhati"
+    ]
+  ],
+  "847213": [
+    "Madhubani",
+    "Bihar",
+    ["Jagatpur", "Kapsiya", "Loha", "Mdb Bara Bazar", "Saurath", "Shubhankarpur"]
+  ],
+  "847214": [
+    "Madhubani",
+    "Bihar",
+    ["M G Bazar", "Mangrauni", "Pilakhwar", "Raghunidehat", "Ranti", "Sapta"]
+  ],
+  "847215": [
+    "Madhubani",
+    "Bihar",
+    ["BBelahi", "Belhwar", "Jitwarpur", "Nazirpur", "RKCollage", "Shibipatti"]
+  ],
+  "847222": [
+    "Madhubani",
+    "Bihar",
+    [
+      "Arerhat",
+      "Belauza",
+      "Ektara",
+      "Jafra",
+      "Karhi",
+      "Kerwar",
+      "Nagdah Balain",
+      "Nagwas",
+      "Nahas Rupauli",
+      "Navkarhi",
+      "Simri"
+    ]
+  ],
+  "847223": [
+    "Madhubani",
+    "Bihar",
+    [
+      "Bankatta Uren",
+      "Barha",
+      "Barhampura",
+      "Benipatti",
+      "Biratpur Birauli",
+      "Chatra",
+      "Damodarpur",
+      "Deopura",
+      "Dhakjari",
+      "Ganguli",
+      "Genaur",
+      "Kataiya",
+      "Lorika",
+      "Parsauni",
+      "Parsuna",
+      "Pokhrouni",
+      "Salempur",
+      "Sohroul",
+      "Tisi Narsam"
+    ]
+  ],
+  "847224": [
+    "Madhubani",
+    "Bihar",
+    [
+      "Baboobarhi",
+      "Bela",
+      "Chandra Dih",
+      "Devhar",
+      "Dhamaura",
+      "Kharagwani",
+      "Khozpur",
+      "Mauahi",
+      "Misrauli",
+      "Pachrukhi",
+      "Pirhi",
+      "Ramnipatti",
+      "Satghara",
+      "Tirhuta"
+    ]
+  ],
+  "847225": [
+    "Madhubani",
+    "Bihar",
+    [
+      "Basopatti",
+      "Birpur",
+      "Chhatauni",
+      "Damo",
+      "Dighia Phent",
+      "Dubahi Mahinathpur",
+      "Ghorabanki",
+      "Hattapur",
+      "Jaso",
+      "Jonki",
+      "Kamalpur",
+      "Kataya",
+      "Marhia"
+    ]
+  ],
+  "847226": [
+    "Madhubani",
+    "Bihar",
+    [
+      "Baira",
+      "Barhi",
+      "Bela",
+      "Chachraha",
+      "Deodha",
+      "Dhamiapatti",
+      "Dorbar",
+      "Dullipatti",
+      "Jaynagar",
+      "Jaynagar Bazar",
+      "Kamalabari",
+      "Korahia",
+      "Kuar",
+      "Narar",
+      "Padma",
+      "Parwa",
+      "Pursaulia",
+      "Seli Beli",
+      "Sidhap Kalan",
+      "Uchhal",
+      "Usarahi Deodha"
+    ]
+  ],
+  "847227": [
+    "Madhubani",
+    "Bihar",
+    [
+      "Barhmotra",
+      "Bathnaha",
+      "Belhi",
+      "Birpur Harpatti",
+      "Ekhathha",
+      "Gajhara",
+      "Hudra",
+      "Khutauna",
+      "Malin Belha",
+      "Pathrahi",
+      "Siktiahi",
+      "Teghra"
+    ]
+  ],
+  "847228": [
+    "Madhubani",
+    "Bihar",
+    [
+      "Baruar",
+      "Benta",
+      "Bhakua",
+      "Bhatchaura",
+      "Biraul",
+      "Chatra",
+      "Chhaurahi",
+      "Datuar",
+      "Gobraura",
+      "Kalikapur",
+      "Kanhauli",
+      "Kasma Marar",
+      "Khajauli",
+      "Laxmipur",
+      "Maheaswara",
+      "Mahua Ekdara",
+      "Maina Sukki",
+      "Marukia",
+      "Palimohan",
+      "Sarabe Tarapatti",
+      "Selra",
+      "Thahar"
+    ]
+  ],
+  "847229": [
+    "Madhubani",
+    "Bihar",
+    [
+      "Dhanga",
+      "Haripur Baxi Tola",
+      "Haripur Dih Tol",
+      "Kaluahi",
+      "Karmauli",
+      "Malmal",
+      "Mureth",
+      "Paraul",
+      "Parjuar",
+      "Rashidpur"
+    ]
+  ],
+  "847230": [
+    "Madhubani",
+    "Bihar",
+    [
+      "Akaur",
+      "Benta Parsa",
+      "Bhaiyapatti",
+      "Hisardeorhi",
+      "Jiraul",
+      "Kauwaha Barhi",
+      "Keotha",
+      "Khirhar",
+      "Manpour",
+      "Siriapur"
+    ]
+  ],
+  "847231": [
+    "Madhubani",
+    "Bihar",
+    ["Bhour", "Gurmaha", "Lohat", "Shahpur", "Udaypur Bithwar"]
+  ],
+  "847232": [
+    "Madhubani",
+    "Bihar",
+    [
+      "Ekhari",
+      "Garha",
+      "Jhaloun",
+      "Khajedih",
+      "Kumarkhat",
+      "Ladania",
+      "Mahtha",
+      "Mirjapur",
+      "Piprahi",
+      "Sidhhap Parsahi",
+      "Tharhi Sidhhap"
+    ]
+  ],
+  "847233": [
+    "Darbhanga",
+    "Bihar",
+    [
+      "Amaithi",
+      "Badarbanna",
+      "Batho",
+      "Bishwanathpur Tarauni",
+      "Fardaha",
+      "Habi Bhuar",
+      "Haripur",
+      "Nehra",
+      "Ramnagar Dhusi",
+      "Shivram"
+    ]
+  ],
+  "847234": [
+    "Madhubani",
+    "Bihar",
+    [
+      "Andah",
+      "Bhawanipur",
+      "Birsair",
+      "Dahibatnathwan",
+      "Dahiwatmadhopur",
+      "Gandhwair",
+      "Jamsam",
+      "Makrampur",
+      "Maksuda",
+      "Pandaul",
+      "Salempur",
+      "Shambhuar"
+    ]
+  ],
+  "847235": [
+    "Madhubani",
+    "Bihar",
+    [
+      "Bhariabishanpur",
+      "Bhatsimar",
+      "Chapahi",
+      "Chichrikanungo",
+      "Gangdwar",
+      "Ghonghour",
+      "Kewalpatti",
+      "Korahiyabalha",
+      "Mailam",
+      "Nakti",
+      "Pariharpur",
+      "Patwara",
+      "Rajnagar",
+      "Shyamsidhap",
+      "Simri",
+      "Sugauna"
+    ]
+  ],
+  "847236": [
+    "Madhubani",
+    "Bihar",
+    [
+      "Bathne",
+      "Bhagwatipurnahar",
+      "Biroul",
+      "Kaithai",
+      "Koilakh",
+      "Raghopurbalat",
+      "Rampatti"
+    ]
+  ],
+  "847238": [
+    "Madhubani",
+    "Bihar",
+    ["Husainpur", "Kakraul", "Kapileshwar Asthan", "Kharaua", "Rahika"]
+  ],
+  "847239": [
+    "Madhubani",
+    "Bihar",
+    [
+      "Baliabikrampur",
+      "Bhalpatti",
+      "Dahaura",
+      "Kanhouli",
+      "Meghoul",
+      "Nainaghat",
+      "Najramahmda",
+      "Narpatinagar",
+      "Paithankabai",
+      "Raghopur Deorhi",
+      "Sagarpur",
+      "Sakri Madhubani"
+    ]
+  ],
+  "847240": [
+    "Madhubani",
+    "Bihar",
+    [
+      "Bishoul",
+      "Harlakhi",
+      "Khauna",
+      "Phulhar",
+      "Pipraun",
+      "Rampur",
+      "Sothgaon",
+      "Umgaon Kothi"
+    ]
+  ],
+  "847301": [
+    "Darbhanga",
+    "Bihar",
+    [
+      "Basatpur",
+      "Chakwa",
+      "Darshuar",
+      "Ghoshrama",
+      "Gobarsitha",
+      "Hathauri",
+      "Hayaghat Bilashpur",
+      "Jatmalpura Tira",
+      "Kharari",
+      "Kharsand",
+      "Kishanpur Baikunth",
+      "Koilam",
+      "MSajhouti",
+      "P Dharampur",
+      "Rasalpur",
+      "Ratwara",
+      "Sadhopur",
+      "Simariabhindia"
+    ]
+  ],
+  "847302": [
+    "Darbhanga",
+    "Bihar",
+    ["Doghra", "Jalley", "Katraul", "Kharkha", "Nayatola", "Rarhi", "Reorha"]
+  ],
+  "847303": [
+    "Darbhanga",
+    "Bihar",
+    ["Agai", "Bandhauli", "Bishanpur", "Chandauna", "Garri", "Jahangirtola", "Jogiara"]
+  ],
+  "847304": [
+    "Darbhanga",
+    "Bihar",
+    [
+      "Ahiyari",
+      "Alimabad Nimrauli",
+      "Bardaha",
+      "Bherwa",
+      "Chak Tataila",
+      "Damala",
+      "Dharia",
+      "Hiropatti",
+      "Jagwan",
+      "Kamtaul",
+      "Kumhrauli",
+      "Muraitha",
+      "Nagardih",
+      "Pali",
+      "Raghauli",
+      "Rathaus",
+      "Sadullahpur"
+    ]
+  ],
+  "847305": ["Madhubani", "Bihar", ["Basuki Bihari", "Madhwapur"]],
+  "847306": [
+    "Darbhanga",
+    "Bihar",
+    [
+      "Bhataura",
+      "Hariharpur",
+      "Kanaur",
+      "Karhatia",
+      "Karjapatti",
+      "KManjhigama",
+      "Kothia",
+      "Madhopatti",
+      "Madhupur",
+      "Nikasi",
+      "Pindaruch",
+      "SDangarwara",
+      "Singhia Deorhi"
+    ]
+  ],
+  "847307": [
+    "Darbhanga",
+    "Bihar",
+    [
+      "Brahampur Sotia",
+      "Chakauti",
+      "Katka",
+      "Lakhanpur",
+      "Narauchdham",
+      "Ratanpur",
+      "Sanahpurdih"
+    ]
+  ],
+  "847308": [
+    "Madhubani",
+    "Bihar",
+    ["Awari", "Bengra", "Durgapatti", "Gangaur", "Raima", "Sahar", "Sonai", "Uttra"]
+  ],
+  "847337": [
+    "Darbhanga",
+    "Bihar",
+    [
+      "Belhi",
+      "BParsa",
+      "Chatwan",
+      "Chhacha",
+      "Chhotaipatti",
+      "Izra",
+      "Lahwar",
+      "Pacharhi",
+      "Ryam Factory",
+      "Sadiquepur",
+      "Satghara"
+    ]
+  ],
+  "847401": [
+    "Madhubani",
+    "Bihar",
+    [
+      "Andhra",
+      "Bardaha",
+      "Barhara",
+      "Ganauli",
+      "Kulharia",
+      "Madna",
+      "Pastan",
+      "Sanpatahi",
+      "Tharhi"
+    ]
+  ],
+  "847402": [
+    "Madhubani",
+    "Bihar",
+    [
+      "Alola",
+      "Amahi",
+      "Amouza",
+      "Baikabishanpur",
+      "Basuari",
+      "Belha",
+      "Biraoul",
+      "Chikna",
+      "Dharmdiha",
+      "Gahuma Beria",
+      "Garatol",
+      "Ghoghardiha",
+      "Hatni",
+      "Jagatpur",
+      "Jageshwar Asthan",
+      "Kalikapur",
+      "Keotna",
+      "Matras",
+      "Parsa",
+      "Pirojgadh",
+      "Saini",
+      "Sangi",
+      "Sarauti",
+      "Sudairatauli",
+      "Tilath"
+    ]
+  ],
+  "847403": [
+    "Madhubani",
+    "Bihar",
+    [
+      "Behat Goth",
+      "Daiya Kharwar",
+      "Deep",
+      "Gangapur",
+      "Harbhanga",
+      "Jhanjharpur RS",
+      "Kaithinia",
+      "Lakhnour",
+      "Laufa",
+      "Raja Kharwar",
+      "Rataul",
+      "Rupauli",
+      "Umari"
+    ]
+  ],
+  "847404": [
+    "Madhubani",
+    "Bihar",
+    [
+      "Belarahi",
+      "Chanouraganj",
+      "Choramahrail",
+      "Harna",
+      "Harri",
+      "Hata Rupauli",
+      "Imadpatti",
+      "Jhanjharpur",
+      "Jhanjharpur Court",
+      "Kako",
+      "Kathia",
+      "Kotjia Bharam",
+      "Mahrail",
+      "Mehath",
+      "Raima",
+      "Sant Nagar",
+      "Simra",
+      "Sukhet",
+      "Vijai"
+    ]
+  ],
+  "847405": [
+    "Darbhanga",
+    "Bihar",
+    [
+      "Alinagar",
+      "Dadpatti",
+      "Dasauth",
+      "Dhamsain",
+      "Dhamuara",
+      "Gorkha",
+      "Jaideopatti",
+      "Kurso Nadiami",
+      "NN Patti",
+      "Sahjauli",
+      "Thengaha",
+      "Tumaul"
+    ]
+  ],
+  "847407": [
+    "Darbhanga",
+    "Bihar",
+    ["Gangauli", "LAGMA Rambhadrapur", "Lohna Road", "Naruar", "Pokhar Bhinda"]
+  ],
+  "847408": [
+    "Madhubani",
+    "Bihar",
+    [
+      "Banki",
+      "Basipatti",
+      "Bath",
+      "Bela",
+      "Belauncha",
+      "Bhagta",
+      "Bhakhrain",
+      "Bhargama",
+      "Bheja",
+      "Bhith Bhagwanpur",
+      "Chunni",
+      "Daldal",
+      "Dwalakh",
+      "Madhepur",
+      "Mahpatia",
+      "Pachahi",
+      "Phatki",
+      "Rahua Sangram",
+      "Ramchandra",
+      "Sunder Virajit",
+      "Tardiha",
+      "Tengraha"
+    ]
+  ],
+  "847409": [
+    "Madhubani",
+    "Bihar",
+    [
+      "Bagha Kusmar",
+      "Balua",
+      "Brahmpur",
+      "Dhanauja",
+      "Kalapatti",
+      "Mahthour",
+      "Murli",
+      "Phulparas",
+      "Sijaulia",
+      "Siswabarhi",
+      "Siswabazar",
+      "Sugapatti",
+      "Suriahi Ramnagar",
+      "Tengrar"
+    ]
+  ],
+  "847410": [
+    "Madhubani",
+    "Bihar",
+    ["Berma", "Kachhua", "Kachhubi", "Lawani", "Sonre", "Tamuria"]
+  ],
+  "847411": [
+    "Madhubani",
+    "Bihar",
+    ["Barsam", "Dumra", "Jalsain", "Rakhwari", "Rudrapur"]
+  ],
+  "847421": [
+    "Madhubani",
+    "Bihar",
+    [
+      "Basania",
+      "Basudevpur",
+      "Chaturbhuj Piprahi",
+      "Karmegh",
+      "Lalmania",
+      "Laukaha",
+      "Laxamipur",
+      "Madhopur",
+      "Parsahi Sirsiya"
+    ]
+  ],
+  "847422": [
+    "Darbhanga",
+    "Bihar",
+    [
+      "Baghant",
+      "Balour",
+      "Bazitpur",
+      "Bhandar Sogani",
+      "Brahampura",
+      "Chanaur",
+      "Manigachi",
+      "Tatuar"
+    ]
+  ],
+  "847423": [
+    "Darbhanga",
+    "Bihar",
+    [
+      "Bathia",
+      "Bauharwa",
+      "Garaul",
+      "Hariath",
+      "Kathra",
+      "Lahatta",
+      "Maun Behat",
+      "Putai",
+      "Rasidpur"
+    ]
+  ],
+  "847424": [
+    "Madhubani",
+    "Bihar",
+    ["Lohna", "Raje", "Rampur", "Sakhwar", "Sankorthu", "Sarisavpahi"]
+  ],
+  "847427": [
+    "Darbhanga",
+    "Bihar",
+    [
+      "Adharpur",
+      "Baghras",
+      "Galma",
+      "Ganaun",
+      "Ghanshyampur",
+      "Haripur",
+      "Jhagarua",
+      "Kasraur",
+      "Pali Mahathwar",
+      "Pohaddi Bela",
+      "Punhad",
+      "Rashiyari",
+      "Salempur Lagma",
+      "Tarwara"
+    ]
+  ],
+  "847428": [
+    "Darbhanga",
+    "Bihar",
+    ["Banauli", "Basatwara", "Bharathi", "Kamrouli", "Kansi"]
+  ],
+  "847429": ["Darbhanga", "Bihar", ["Kusothar", "Sinuar Gopal"]],
+  "847451": [
+    "Supaul",
+    "Bihar",
+    ["Dagmara", "Kamalpur", "Kunauali Bazar", "Kunauli", "Sikarhatta"]
+  ],
+  "847452": [
+    "Supaul",
+    "Bihar",
+    [
+      "Barhara",
+      "Belha",
+      "Belhi",
+      "Dighia",
+      "Hariyahi",
+      "Lalpur",
+      "Mahadev Math",
+      "Manoharpatti",
+      "Mouahi",
+      "Mungraha",
+      "Narendrapur",
+      "Nirmali",
+      "Parikonch",
+      "Sarojabela"
+    ]
+  ],
+  "848101": [
+    "Samastipur",
+    "Bihar",
+    [
+      "BAiloth",
+      "Begampur",
+      "BhDhurlak",
+      "BRBCollege",
+      "Hansa",
+      "Harpur Ailoth",
+      "Kashipur Samastipur",
+      "Lagunia Raghukanth",
+      "Lagunia Surya Kanth",
+      "LBPura",
+      "Mathurapur",
+      "Mohanpur",
+      "Rahmatpur",
+      "Rampur Dudhpura",
+      "Samastipur",
+      "Samastipur Bazar",
+      "Sari",
+      "Satmalpur",
+      "Shekhopur"
+    ]
+  ],
+  "848102": [
+    "Samastipur",
+    "Bihar",
+    ["Basudeopur", "Birsisngpur Deorhi", "Gopalpur", "Muktapur", "Nauraga"]
+  ],
+  "848113": [
+    "Samastipur",
+    "Bihar",
+    [
+      "Birouli Rural Institute",
+      "Koan Bajitpur",
+      "Pokhraira",
+      "Punas",
+      "Ranitol",
+      "Ratanpur Bela",
+      "Singhiakhurd"
+    ]
+  ],
+  "848114": [
+    "Samastipur",
+    "Bihar",
+    [
+      "Akhtiarpur Khajuri",
+      "Ashinchak",
+      "Bahadurpur",
+      "Bajitpur Meari",
+      "Banghara",
+      "BChaksekhu",
+      "Belamegh",
+      "Bombaiya Harlal",
+      "Chakbahauddin",
+      "Chaknawada",
+      "Chandchour",
+      "Chapta",
+      "Dalsinghsarai",
+      "Dalsingsarai Bazar",
+      "Depura",
+      "Ghataho",
+      "Janakpur",
+      "Kamraon",
+      "Keota",
+      "Konaila",
+      "Mathurapur",
+      "Mehsari",
+      "Mishratol",
+      "Mukhtiarpur",
+      "Musapur",
+      "Pachpaika",
+      "Pagra",
+      "Pan Basadhia",
+      "Pandit Tol Tabhka",
+      "Paroria",
+      "Rampur Jalalpur",
+      "Soeral"
+    ]
+  ],
+  "848115": [
+    "Samastipur",
+    "Bihar",
+    [
+      "Bishanpur Bathua",
+      "Chakhaji",
+      "Chandauli",
+      "Dharmagatpur Bathua",
+      "Dighra",
+      "Malikaur",
+      "Morsand",
+      "Thahra Gopalpur"
+    ]
+  ],
+  "848117": [
+    "Samastipur",
+    "Bihar",
+    [
+      "Balahi",
+      "Balha Nandenagar",
+      "Ballipur",
+      "Bandhar",
+      "Bhataura",
+      "Dinmanpur",
+      "Hansopur",
+      "Ilmasnagar",
+      "Jahangirpur Kothia",
+      "Karian",
+      "Khairi",
+      "Khanpur",
+      "Masina",
+      "Parwana",
+      "Raniparti",
+      "Rebra",
+      "RRBhadrapur",
+      "Sadipurghat",
+      "Shankarpur",
+      "Soman",
+      "Sripur Gahar"
+    ]
+  ],
+  "848121": [
+    "Samastipur",
+    "Bihar",
+    ["Gangapur", "Morwa", "Nikaspur Nisfi", "Ramapur Maheshpur"]
+  ],
+  "848122": [
+    "Samastipur",
+    "Bihar",
+    [
+      "Chakpahar",
+      "Chaksikandar",
+      "Harpur Bhindi",
+      "Madhopur Dighrua",
+      "Songar",
+      "Srichandpur Kothia"
+    ]
+  ],
+  "848125": [
+    "Samastipur",
+    "Bihar",
+    [
+      "Balhajainarain",
+      "Dhobgama",
+      "Hajpurwa Karua",
+      "Harpur Mahmada",
+      "Harpur Pusa",
+      "Hatha",
+      "Kalaunjar",
+      "Malinagar",
+      "Namapur",
+      "Pusa",
+      "Saidpur",
+      "Sakrichandpusa",
+      "Somnaha Mirzanagar",
+      "Sormar Baghla"
+    ]
+  ],
+  "848127": [
+    "Samastipur",
+    "Bihar",
+    [
+      "Akhtiarpur",
+      "Barbatta",
+      "Bathua Buzurg",
+      "Bazidpur Kumhira",
+      "Bhagwatpur",
+      "Harilochanpur",
+      "Harpur Barhetta",
+      "Jhakhra",
+      "Jitwarpur Kumhira",
+      "Manikpur",
+      "Ramchandarpur",
+      "Sarairanjan"
+    ]
+  ],
+  "848129": [
+    "Samastipur",
+    "Bihar",
+    ["Bikrampur Bandey", "Karpoorigram", "Nirpur", "Shambhupatti"]
+  ],
+  "848130": [
+    "Samastipur",
+    "Bihar",
+    [
+      "Adharpur",
+      "Baghi",
+      "Bherokhra",
+      "Fatehpur Bela",
+      "Gauspur Sarsauna",
+      "Kasba Tajpur",
+      "Manpura",
+      "Motipur",
+      "Rahimabad",
+      "Tajpur"
+    ]
+  ],
+  "848131": [
+    "Samastipur",
+    "Bihar",
+    ["Kubouliram", "Mohammedpur Koari", "Mohiuddinpur Rajwa", "Shahpur Baghauni", "Waini"]
+  ],
+  "848132": [
+    "Samastipur",
+    "Bihar",
+    [
+      "Akha Bishanpur",
+      "Belari",
+      "Bhagwanpur Lohagir",
+      "Bhagwarpur Kamla",
+      "Chaita",
+      "Chandauli",
+      "Gaopur",
+      "Karihara",
+      "LMPatti",
+      "Pataili",
+      "Rampur Samthu",
+      "Rupauli",
+      "Sagma",
+      "Satanpur",
+      "Ujiarpur"
+    ]
+  ],
+  "848133": [
+    "Samastipur",
+    "Bihar",
+    ["Gohi Bishanpur", "Kashore", "Rahua", "Sadipur", "Warish Nagar"]
+  ],
+  "848134": [
+    "Samastipur",
+    "Bihar",
+    [
+      "Bhagwanpur Desua",
+      "Birnamatula",
+      "Bishanpur Hakimabad",
+      "Chhatauna",
+      "Dadhia Asadhar",
+      "Harpur Rewari",
+      "Hasanpur Jitwarpur",
+      "Jitwarpur",
+      "Jitwarpur Chouth",
+      "Keos Nizamat",
+      "Kharaj Jitwarpur",
+      "Mordiwa"
+    ]
+  ],
+  "848160": [
+    "Samastipur",
+    "Bihar",
+    [
+      "Bajitpur Bombaiya",
+      "Chakhabib",
+      "Kalyanpur",
+      "Kerai",
+      "Mahmadpur Sakra",
+      "Mehsi",
+      "Samartha"
+    ]
+  ],
+  "848201": [
+    "Begusarai",
+    "Bihar",
+    [
+      "Bagras",
+      "BBazar",
+      "Chak Hamid",
+      "Deopura",
+      "Gamharia",
+      "Ghagrha",
+      "Mohanpur",
+      "Parihara",
+      "Rampur",
+      "Samsa",
+      "Sital Rampur",
+      "Sonihar",
+      "Sonma",
+      "Sumbha"
+    ]
+  ],
+  "848202": [
+    "Begusarai",
+    "Bihar",
+    [
+      "Akopur",
+      "Amaridih",
+      "Bariarpurtola Sirsi",
+      "Bashi",
+      "Bhoja",
+      "Chhourahi",
+      "Khodabandpur",
+      "Kumbhi",
+      "Malpur",
+      "Meghaul",
+      "Pansalla",
+      "Phaphaut",
+      "Sakarbasa",
+      "Sakrauli",
+      "Tarabariarpur"
+    ]
+  ],
+  "848203": [
+    "Khagaria",
+    "Bihar",
+    [
+      "Alauli",
+      "Amba",
+      "Anantpur",
+      "Bahadurpur",
+      "Budhaura",
+      "Burhwa",
+      "Chhera Khera",
+      "Goriyami",
+      "Haripur",
+      "Hathwan",
+      "Jogia",
+      "Machhra",
+      "Meghauna",
+      "Mohraghat Press",
+      "Raun",
+      "Saharbanni",
+      "Sahsi",
+      "Sakarpura",
+      "Sanokhar",
+      "Simraha"
+    ]
+  ],
+  "848204": [
+    "Begusarai",
+    "Bihar",
+    [
+      "Aijani",
+      "Baraipura",
+      "Dunhi",
+      "Ekamba",
+      "Garhpura",
+      "Korai",
+      "Kumharson",
+      "Lakhanpatti",
+      "Malipur",
+      "Parora",
+      "Purpathar",
+      "Rajaur",
+      "Sihmachakka"
+    ]
+  ],
+  "848205": [
+    "Samastipur",
+    "Bihar",
+    [
+      "Ahilwar",
+      "Aura",
+      "Gajpatti",
+      "Hasanpur",
+      "Hassanpur S Mill",
+      "Mauzi",
+      "Rampur Rajwa",
+      "Sakarpura",
+      "Sasan"
+    ]
+  ],
+  "848206": [
+    "Samastipur",
+    "Bihar",
+    [
+      "Barra",
+      "Bhatwan",
+      "Bishanpur Keothar",
+      "Kale Narpatnagar",
+      "Kundal",
+      "Nakuni",
+      "Patsa"
+    ]
+  ],
+  "848207": [
+    "Samastipur",
+    "Bihar",
+    [
+      "Barahi",
+      "Belsandi",
+      "Bithan",
+      "Jagmohra",
+      "Marthua",
+      "Narpa",
+      "Pushaho",
+      "Sakhwa",
+      "Salha Buzurg",
+      "Sihma",
+      "Sohma",
+      "Sugrain",
+      "Tetrahi",
+      "Tilkeshwar",
+      "Ujan"
+    ]
+  ],
+  "848208": [
+    "Samastipur",
+    "Bihar",
+    [
+      "Bharwari",
+      "Geeta Deodha",
+      "Jahangirpur Lagma",
+      "Mahen",
+      "Mahuli",
+      "Mangalgarh",
+      "Nayanagar"
+    ]
+  ],
+  "848209": [
+    "Samastipur",
+    "Bihar",
+    [
+      "Akauna",
+      "Bairampur",
+      "Balha",
+      "Banda",
+      "Bangarhatta",
+      "Basudeva",
+      "Bishanpur Diha",
+      "Dasaut",
+      "Deokuli",
+      "Hardia",
+      "Harinagar",
+      "Jagannathpur",
+      "Lilhaul",
+      "Morwarai",
+      "MorwaraIi",
+      "Nirpur Bharwaria",
+      "Nowdega Balha",
+      "Phulhara",
+      "Rahiyar Kochi",
+      "Singhia",
+      "Sonsa",
+      "Srikameshwar Nagar",
+      "Sumbha Deorhi",
+      "Tara",
+      "Wari"
+    ]
+  ],
+  "848210": [
+    "Samastipur",
+    "Bihar",
+    [
+      "Arout",
+      "Baidyanathpur",
+      "Barra",
+      "Bishanpur Abhi",
+      "Chakthat",
+      "Daulatpur",
+      "Hasanpur",
+      "Motipur",
+      "Muradpur",
+      "Rahua",
+      "Rajwara",
+      "Rasalpur Dharha",
+      "Rosera",
+      "Rusera Thana",
+      "Sonupur",
+      "Udaipur"
+    ]
+  ],
+  "848211": [
+    "Samastipur",
+    "Bihar",
+    [
+      "Bhuswar",
+      "Bibhutipur",
+      "Boria",
+      "Chora Tabhka",
+      "Desari",
+      "Madhopur",
+      "Mahathi",
+      "Manda",
+      "Narhan",
+      "Patailia",
+      "Raghopur",
+      "Sakhmohan",
+      "Surauli"
+    ]
+  ],
+  "848213": [
+    "Darbhanga",
+    "Bihar",
+    [
+      "Bargaon",
+      "Beridharsham",
+      "Bhindua",
+      "Chigri",
+      "Dinmo",
+      "Hirni",
+      "Ithar",
+      "Jhajhra",
+      "Keotgama",
+      "Kuseshwar Asthan",
+      "Satighat",
+      "Simartoka",
+      "Ujua",
+      "Usri"
+    ]
+  ],
+  "848216": ["Samastipur", "Bihar", ["Bihrha", "Haripur", "Jhakhar"]],
+  "848236": [
+    "Samastipur",
+    "Bihar",
+    [
+      "Angarghat",
+      "Belsandi Dih",
+      "Bharpura",
+      "Bhorejairam",
+      "Buzurgdwar",
+      "Kapan",
+      "MTAlampur",
+      "Nathudwar",
+      "Patpara",
+      "Singhia Ghat"
+    ]
+  ],
+  "848301": [
+    "Samastipur",
+    "Bihar",
+    ["Chhatneshwar", "Khajuri", "Kishanpur", "Paroria", "Purnahi", "Rampur Kushaiya"]
+  ],
+  "848302": [
+    "Samastipur",
+    "Bihar",
+    [
+      "Belsandi",
+      "Chakmehsi",
+      "Dhrubgama",
+      "Jagdish Paran",
+      "Janardanpur",
+      "Jitwaria",
+      "Kalyanpur Chowk",
+      "Kurba Barhetta",
+      "Ladaura Dargah",
+      "Madhurapur Tara"
+    ]
+  ],
+  "848501": [
+    "Samastipur",
+    "Bihar",
+    [
+      "Bakarpur",
+      "Bishanpur Beri",
+      "Chapar",
+      "Dashara",
+      "Harail",
+      "Jaunapur",
+      "Kursaha",
+      "Matiur",
+      "Mohiuddin N Baluahi",
+      "Mohiuddin Nagar",
+      "Rajpur",
+      "Sultanpur East",
+      "Sultanpur West"
+    ]
+  ],
+  "848502": [
+    "Samastipur",
+    "Bihar",
+    [
+      "Andaur",
+      "Barhauna",
+      "Bhadaiya",
+      "Gangeshwar Nagar",
+      "Kalyanpur Basti",
+      "Mahmmadipur",
+      "Mohiuddin Nagar RS",
+      "Rajajan",
+      "Sibaisingpur",
+      "Tetarpur"
+    ]
+  ],
+  "848503": [
+    "Samastipur",
+    "Bihar",
+    [
+      "Bazidpur",
+      "Bochaha",
+      "Garhsisai",
+      "Harpur Bochaha",
+      "Kancha",
+      "Khan Mirzapur",
+      "Madhaipur",
+      "Mau Dhaneshpur",
+      "Raspur Patasia",
+      "Sherpur Dhepura",
+      "Simri",
+      "Vidhyapati Nagar"
+    ]
+  ],
+  "848504": [
+    "Samastipur",
+    "Bihar",
+    [
+      "Bahadurpur Patory",
+      "Chaksaho",
+      "Chandpura",
+      "Dharampur Bandey",
+      "Gorgama",
+      "Jorpura",
+      "Keshonarainpur",
+      "Lagunia",
+      "Maricha",
+      "Patory",
+      "Patory Bazar Cinema Chowk",
+      "Sahpur Undi",
+      "Sheora",
+      "Taradhamaun"
+    ]
+  ],
+  "848505": [
+    "Samastipur",
+    "Bihar",
+    [
+      "Ahmadpur",
+      "Bajitpur Karnail",
+      "Darwa Mathurapur",
+      "Gangsara",
+      "Indrawara",
+      "Khalispur",
+      "Kishanpur Yusuf",
+      "Kumaiya",
+      "Larua",
+      "P Pur Halai",
+      "Pachbhinda",
+      "Raghunathpur",
+      "Raipur Buzurg",
+      "Sarangpur"
+    ]
+  ],
+  "848506": [
+    "Samastipur",
+    "Bihar",
+    [
+      "Baghra",
+      "Dharnipatti",
+      "Dumri Bindgama",
+      "Hardaspur Diara",
+      "Jahingra",
+      "Jalalpur",
+      "Madhopur",
+      "Mohanpur",
+      "Rasalpur"
+    ]
+  ]
+}

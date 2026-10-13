@@ -1,0 +1,2434 @@
+{
+  "800001": [
+    "Patna",
+    "Bihar",
+    [
+      "Bank Road",
+      "BC Road",
+      "BPSC",
+      "Chiraiyatand",
+      "Darul Mallick",
+      "Gardanibagh",
+      "Hotel Republic",
+      "Indian Nation",
+      "Jamal Road",
+      "Kidwaipuri",
+      "Mithapur",
+      "Navshakti",
+      "New Jakkanpur",
+      "Patna",
+      "Patna Collectoriate",
+      "Postal Park",
+      "Punaichak",
+      "RBlock",
+      "Sri Krishnapuri"
+    ]
+  ],
+  "800002": ["Patna", "Bihar", ["Anisabad", "Beur", "Pakri"]],
+  "800003": ["Patna", "Bihar", ["Kadamkuan"]],
+  "800004": [
+    "Patna",
+    "Bihar",
+    ["Bankipore", "JCRoad", "Machhuatoli", "Naya Tola", "PMCH"]
+  ],
+  "800005": ["Patna", "Bihar", ["Patna University"]],
+  "800006": ["Patna", "Bihar", ["Mahendru", "MYSandalpur"]],
+  "800007": [
+    "Patna",
+    "Bihar",
+    [
+      "Bairia",
+      "Dental College",
+      "Fatehpur",
+      "Gulzarbagh",
+      "Mangla Devi",
+      "Nadghat",
+      "Nanmuhia",
+      "Sonagopalpur"
+    ]
+  ],
+  "800008": [
+    "Patna",
+    "Bihar",
+    [
+      "Chaughara",
+      "Chowk Shikarpur",
+      "Diwan Mohalla",
+      "Katra Bazar",
+      "Machharhatta",
+      "Mahavir Asthan",
+      "Marufganj",
+      "Mehdiganj",
+      "Pachhim Darwaza",
+      "Patna City",
+      "Sri Madhoji Mills"
+    ]
+  ],
+  "800009": ["Patna", "Bihar", ["Begampur", "Kothia", "Maranchi", "Punadih", "Sabalpur"]],
+  "800010": ["Patna", "Bihar", ["Sadaquat Ashram"]],
+  "800011": ["Patna", "Bihar", ["Dighaghat", "Makhdumpur Digha"]],
+  "800012": ["Patna", "Bihar", ["Akilpur", "Digha", "Naya Panapur", "Panapur"]],
+  "800013": ["Patna", "Bihar", ["Patliputra"]],
+  "800014": ["Patna", "Bihar", ["BV College", "Patna Aerodrome", "Sheikhpura"]],
+  "800015": ["Patna", "Bihar", ["Patna Sectt"]],
+  "800016": ["Patna", "Bihar", ["Rajendra Nagar"]],
+  "800017": ["Patna", "Bihar", ["Bseboard"]],
+  "800018": ["Patna", "Bihar", ["Bataganj"]],
+  "800019": ["Patna", "Bihar", ["Cda"]],
+  "800020": [
+    "Patna",
+    "Bihar",
+    [
+      "Ashok Nagar",
+      "Chitragupta Nagar",
+      "Dhelma",
+      "KSector",
+      "Lohia Nagar",
+      "RMS Colony",
+      "West Lohianagar"
+    ]
+  ],
+  "800021": ["Patna", "Bihar", ["Vidyut Parisad"]],
+  "800022": ["Patna", "Bihar", ["Raj Bhawan"]],
+  "800023": ["Patna", "Bihar", ["LBS Nagar"]],
+  "800024": ["Patna", "Bihar", ["Keshari Nagar"]],
+  "800025": ["Patna", "Bihar", ["Ashiananagar"]],
+  "800026": ["Patna", "Bihar", ["BHColony", "Kumhrar"]],
+  "800027": ["Patna", "Bihar", ["New Jaganpura"]],
+  "800028": ["Patna", "Bihar", ["Patna High Court"]],
+  "800030": ["Patna", "Bihar", ["M Kachuara", "Pahari", "Purvi Laxmi Nagar"]],
+  "801102": [
+    "Patna",
+    "Bihar",
+    [
+      "Aikhan",
+      "Belhauri",
+      "Bharatpura",
+      "Jamui",
+      "Lala Bhadsara",
+      "Mdihuli",
+      "Sadawah",
+      "Sahora",
+      "Sihi",
+      "Singhara",
+      "Sorangpur"
+    ]
+  ],
+  "801103": [
+    "Patna",
+    "Bihar",
+    [
+      "Amhara",
+      "Anandpur",
+      "Anandpur Homeguard",
+      "Bahpura",
+      "Bihta",
+      "Dsimari",
+      "Kanchanpur",
+      "Kateshar",
+      "Kunjwan",
+      "Musepur",
+      "Ppainathi",
+      "Taranagar"
+    ]
+  ],
+  "801104": [
+    "Patna",
+    "Bihar",
+    [
+      "Akhtiyarpur",
+      "Arap",
+      "Beni Bigha",
+      "Bikram",
+      "Danara",
+      "Datiyana",
+      "Gorakhari",
+      "Kab",
+      "Mahajpura",
+      "Mgopalpur",
+      "Rajipur",
+      "Saidapbad",
+      "Wazirpur"
+    ]
+  ],
+  "801105": ["Patna", "Bihar", ["Khagaul", "Khagaul Bazar", "Mkurji", "Shikarpur"]],
+  "801106": ["Patna", "Bihar", ["IIT Patna Bihta"]],
+  "801108": [
+    "Patna",
+    "Bihar",
+    [
+      "Ahiyapur",
+      "Hulashi Tola",
+      "Kchauhattar",
+      "Madhopur",
+      "Maner",
+      "Mangarpal",
+      "Mehdawan",
+      "Patila",
+      "Ramnagar",
+      "Rampur Diara"
+    ]
+  ],
+  "801109": [
+    "Patna",
+    "Bihar",
+    [
+      "Ajwan",
+      "Amarpura",
+      "APiplawan",
+      "Bela Tarari",
+      "Cdariyapur",
+      "Chesi",
+      "Chiraura",
+      "Karai",
+      "Karanja",
+      "Khajuri",
+      "Korawan",
+      "Nagwan",
+      "Naubatpur",
+      "Rbjaitipur",
+      "Sarasat",
+      "Sgopalpur",
+      "Srampur"
+    ]
+  ],
+  "801110": [
+    "Patna",
+    "Bihar",
+    [
+      "Achua",
+      "Ankuri",
+      "Banauli Khurd",
+      "Chandhosh",
+      "Chikshi",
+      "Dahia",
+      "Janpur",
+      "Jarkha",
+      "Khanpura",
+      "Kurkuri",
+      "Mahabalipur",
+      "Masaurha",
+      "Mukhmilpur",
+      "Murika",
+      "Paipura Kala",
+      "Paliganj",
+      "Ranipur",
+      "Sarsi",
+      "Sehra",
+      "Sidhipur",
+      "Sigori",
+      "Sikaria",
+      "Siyarampur"
+    ]
+  ],
+  "801111": [
+    "Patna",
+    "Bihar",
+    [
+      "Bishunpura",
+      "D Kalapur",
+      "Kgopalpur",
+      "Painal",
+      "Sadisopur",
+      "Srichandpur",
+      "Tiskhora",
+      "Wazitpur"
+    ]
+  ],
+  "801112": [
+    "Patna",
+    "Bihar",
+    ["Barah", "Bindaul", "Doghra", "Enisarpura", "Lai", "Patut"]
+  ],
+  "801113": ["Patna", "Bihar", ["Anda", "Balua", "Faridpur", "Neora", "Sarai"]],
+  "801301": [
+    "Nalanda",
+    "Bihar",
+    [
+      "Aungari",
+      "Bajitpur Khiruti",
+      "Besai Bigha",
+      "Daniawan Pendapur",
+      "Dhangawan",
+      "Dhurgaon",
+      "Ekangerdih",
+      "Ekangersarai",
+      "Habbibpur",
+      "Jagai",
+      "Jamuawan",
+      "Juniar",
+      "Khaddi Lodipur",
+      "Koshiyawan",
+      "Madanpur",
+      "Nishchalganj",
+      "Ope",
+      "Oriyawan",
+      "Parthu",
+      "Pasanchi",
+      "Puna",
+      "Ranipur"
+    ]
+  ],
+  "801302": [
+    "Nalanda",
+    "Bihar",
+    [
+      "Akbarpur",
+      "Asharhi",
+      "Babhanbarui",
+      "Bhobhi",
+      "Bhoklapar",
+      "Chamarbigha",
+      "Chiksoura",
+      "Dahabigha",
+      "Hilsa",
+      "Kachiyawan",
+      "Kaliyachak",
+      "Kamta",
+      "Kapsima",
+      "Kawa",
+      "Keshopur",
+      "Korawan",
+      "Mai",
+      "Mirzapur",
+      "Mohiddinpur",
+      "Mominpur",
+      "Niriatulsipur",
+      "Yogipur"
+    ]
+  ],
+  "801303": [
+    "Nalanda",
+    "Bihar",
+    [
+      "Aatma",
+      "Arjunsarthuya",
+      "Barahgawan",
+      "Barai",
+      "Bardih",
+      "Bele",
+      "Beshwak",
+      "Borisarai",
+      "Chandhari",
+      "Dariyapur",
+      "Dhobdiha",
+      "Ichhos",
+      "Islampur",
+      "Khodaganj",
+      "Khorampur",
+      "Kobil",
+      "Kochra",
+      "Mahmuda",
+      "Murgawan",
+      "Panchlowa",
+      "Panhar",
+      "Pathana",
+      "Rasisa",
+      "Rustampur",
+      "Sanda"
+    ]
+  ],
+  "801304": [
+    "Nalanda",
+    "Bihar",
+    [
+      "Arai",
+      "Bahapar",
+      "Daniyawan",
+      "Diyawan",
+      "Karaipersurai",
+      "Korari",
+      "Makrauta",
+      "Merhma",
+      "Musarhi",
+      "Salempur",
+      "Sigaryawn",
+      "Top"
+    ]
+  ],
+  "801305": [
+    "Nalanda",
+    "Bihar",
+    [
+      "Akair",
+      "Arai Benipur",
+      "Ashrafpur",
+      "Bodhibigharamghat",
+      "Damodarpur Waldha",
+      "Khapura",
+      "Mahanandpur",
+      "Nagarnausa",
+      "Parasdiha",
+      "Pirbarhauna",
+      "Salarpur",
+      "Shahjahanpur",
+      "Tinalodipur"
+    ]
+  ],
+  "801306": [
+    "Nalanda",
+    "Bihar",
+    [
+      "Kanhaiya Ganj",
+      "Khojpura",
+      "Khushiyalpur",
+      "Mandachh",
+      "Naima",
+      "Narayanpur",
+      "Pitamberpur",
+      "Salepur",
+      "Soniawan",
+      "Telhara"
+    ]
+  ],
+  "801307": [
+    "Nalanda",
+    "Bihar",
+    ["Amraura", "Bansdih", "Bhathar", "Chhariari Bujurg", "Jaitpur", "Kachcharia"]
+  ],
+  "801503": [
+    "Patna",
+    "Bihar",
+    [
+      "B R Centre",
+      "Beapur",
+      "Chandmari",
+      "D.Cantt.",
+      "Dalipchak",
+      "Danapur Bazar",
+      "Daudpur",
+      "Gangahara",
+      "Jamsaut",
+      "Jrtola",
+      "Lalbengwa",
+      "Madhopur",
+      "Ram Jaipal Nagar",
+      "Sadikpur",
+      "Sherpur"
+    ]
+  ],
+  "801505": [
+    "Patna",
+    "Bihar",
+    ["Alampur Gonpura", "Dhibra", "Mobarakpur", "P.Sharif", "Sorampur"]
+  ],
+  "801506": ["Patna", "Bihar", ["Dhanaut", "Sahaynagar"]],
+  "801507": ["Patna", "Bihar", ["Aiims"]],
+  "802101": ["Buxar", "Bihar", ["Buxar", "Nai Bazar", "Sohni Patti"]],
+  "802102": [
+    "Buxar",
+    "Bihar",
+    ["Buxar Jail", "Kamarpur", "Karhshi", "MVCollege Buxar", "Pulia"]
+  ],
+  "802103": [
+    "Buxar",
+    "Bihar",
+    ["Boksa", "Buxar Gajadhar Ganj", "Mahdah", "Nadaoan", "Pandeypatti", "Sondhila"]
+  ],
+  "802111": [
+    "Buxar",
+    "Bihar",
+    ["Arak", "Diaman", "Jogia", "Kathar", "Nuaon", "Parasia", "Sowan"]
+  ],
+  "802112": [
+    "Buxar",
+    "Bihar",
+    [
+      "Barki Nainijor",
+      "Brahampur",
+      "Brahmapur Chaurasta",
+      "Deokuli",
+      "Isharapura",
+      "Kant",
+      "Karnamepur",
+      "LKDera",
+      "Mahuar",
+      "Nainijor",
+      "Prasaunda",
+      "Sonbarsa",
+      "Tikthi",
+      "Umedpur"
+    ]
+  ],
+  "802113": ["Buxar", "Bihar", ["Barkarajpur", "Chhotkarajpur", "Keshopur"]],
+  "802114": [
+    "Buxar",
+    "Bihar",
+    [
+      "Akhauripur Gola",
+      "Banarpur",
+      "Barka Sikraul",
+      "Chausa",
+      "Chunni",
+      "Dehari",
+      "Gosaipur",
+      "Pawani",
+      "Rampur",
+      "Sarenja",
+      "Sonpa",
+      "Sukarwalia"
+    ]
+  ],
+  "802115": ["Buxar", "Bihar", ["Chaugai", "Ojha Baraon", "Phaphadar"]],
+  "802116": [
+    "Buxar",
+    "Bihar",
+    [
+      "Ahirauli",
+      "Arjunpur",
+      "Barki Kulharia",
+      "Churamanpur",
+      "Dahiwar",
+      "Dalsagar",
+      "Majharia",
+      "Sarimpur"
+    ]
+  ],
+  "802117": [
+    "Buxar",
+    "Bihar",
+    [
+      "Bikaram English",
+      "Dhansoi",
+      "Gagaura",
+      "Indaur",
+      "Itarhian",
+      "Kakaria",
+      "Khocharia",
+      "Nehalpur",
+      "Saisar Ganghari"
+    ]
+  ],
+  "802118": [
+    "Buxar",
+    "Bihar",
+    [
+      "Dulahpur",
+      "Mansingh Patti Barkagaon",
+      "Nagpura",
+      "Sonbarsa",
+      "Umarpur Diar",
+      "Upadhyapandeypur"
+    ]
+  ],
+  "802119": [
+    "Buxar",
+    "Bihar",
+    [
+      "Ariaon",
+      "Attaon",
+      "Barki Basauli",
+      "Baruna RS",
+      "Dumraon",
+      "Ekauni",
+      "Hariyana Cattle Farm",
+      "Lakhandihara",
+      "Nandan",
+      "Nenua",
+      "Pasahara"
+    ]
+  ],
+  "802120": [
+    "Buxar",
+    "Bihar",
+    ["Barka Singhanpura", "Chakki", "Dumari", "Kharahatand", "Rani Singhanpura"]
+  ],
+  "802122": [
+    "Buxar",
+    "Bihar",
+    [
+      "Deoria",
+      "Hethua",
+      "Hitawarajpur",
+      "Mangraon Sangraon",
+      "Nagpur",
+      "Rauni",
+      "Sisrarh"
+    ]
+  ],
+  "802123": [
+    "Buxar",
+    "Bihar",
+    [
+      "Atrauna",
+      "Baikunthpur",
+      "Basantpur",
+      "Bashudhar",
+      "Diwan De Barka Gaon",
+      "Itarhi",
+      "Khanita",
+      "Kukurahan",
+      "Mahila",
+      "Unwas"
+    ]
+  ],
+  "802125": [
+    "Buxar",
+    "Bihar",
+    [
+      "Chanawath",
+      "Katiknar",
+      "Kesath",
+      "Mania",
+      "Salsala",
+      "Sheopur North",
+      "Sonbarsa",
+      "Waina"
+    ]
+  ],
+  "802126": [
+    "Buxar",
+    "Bihar",
+    [
+      "Amsari",
+      "Athar",
+      "Belahari",
+      "Bhadar",
+      "Kanjharua",
+      "Kasia",
+      "Khandricha",
+      "Kopawan",
+      "Koran Sarai",
+      "Mathila",
+      "Mugaon"
+    ]
+  ],
+  "802127": ["Buxar", "Bihar", ["Girdhar Baraon", "Murar", "Rampur"]],
+  "802128": [
+    "Buxar",
+    "Bihar",
+    [
+      "Banni",
+      "Chaubey Ke Prasia",
+      "Harpur",
+      "Jalahara",
+      "Jamauli",
+      "Kajaria",
+      "Kanehari",
+      "Khiri",
+      "Manikpur",
+      "Manoharpur",
+      "Moharihan",
+      "Mukhraon",
+      "Rasen"
+    ]
+  ],
+  "802129": [
+    "Buxar",
+    "Bihar",
+    [
+      "Atimi",
+      "Basaon Kalan",
+      "Belaon",
+      "Bhatauli",
+      "Bisikala",
+      "Dhanbakhra",
+      "Girdharpur",
+      "Jigna",
+      "Karsar",
+      "Nawanagar",
+      "Pararia Pramanpur",
+      "Rupsagar",
+      "Sikraul"
+    ]
+  ],
+  "802130": ["Buxar", "Bihar", ["Balua", "Dallupur", "Gaighat", "Hathilpur", "Nimej"]],
+  "802131": [
+    "Buxar",
+    "Bihar",
+    ["Ekauna Dubauli", "Gangauli", "Niazipur", "Rajpur", "Sahiyar", "Sheopur Diar"]
+  ],
+  "802132": [
+    "Kaimur (Bhabua)",
+    "Bihar",
+    [
+      "Akhini",
+      "Bagarhi",
+      "Chandesh",
+      "Dumduma",
+      "Karmhari",
+      "Mahila",
+      "Noan",
+      "Panjraon",
+      "Satowanti",
+      "Taraitha",
+      "Thakura",
+      "Upari"
+    ]
+  ],
+  "802133": [
+    "Buxar",
+    "Bihar",
+    [
+      "Barka Dhakaich",
+      "Chaukia",
+      "Chhatnawar",
+      "Chhilhari",
+      "Manjhawari",
+      "Nagwan",
+      "Naya Bhojpur",
+      "Purana Bhojpur",
+      "Tundiganjbazar"
+    ]
+  ],
+  "802134": [
+    "Buxar",
+    "Bihar",
+    [
+      "Bagen",
+      "Baruhan",
+      "Bhada",
+      "Bhadwar Barari",
+      "Dharauli",
+      "Ekrasi",
+      "Kaithi",
+      "Nachap",
+      "Pokharahan",
+      "Raghunathpur",
+      "Rahathua",
+      "Tiyar"
+    ]
+  ],
+  "802135": ["Buxar", "Bihar", ["Asha Parari", "Simari"]],
+  "802136": ["Buxar", "Bihar", ["Dumraon Textiles", "Khirauli"]],
+  "802152": [
+    "Bhojpur",
+    "Bihar",
+    [
+      "Baulipur",
+      "Bharasra Judge",
+      "Bihia",
+      "Bimwan",
+      "Chakai",
+      "Dawan",
+      "Haradiya",
+      "Kateyan"
+    ]
+  ],
+  "802154": [
+    "Bhojpur",
+    "Bihar",
+    [
+      "Amrainawada",
+      "Belauna",
+      "Belauti",
+      "Bemari",
+      "Chaurasta Bihia",
+      "Kalyanpur",
+      "Sandaur"
+    ]
+  ],
+  "802155": [
+    "Bhojpur",
+    "Bihar",
+    [
+      "Akarua",
+      "Ayar",
+      "Bambhawar",
+      "Chhwarhi",
+      "Dalippur",
+      "Hanswadih",
+      "Kesari",
+      "Kesawan",
+      "Rajapur",
+      "Tar",
+      "Waina Jamuni Pur"
+    ]
+  ],
+  "802156": [
+    "Bhojpur",
+    "Bihar",
+    [
+      "Agrsanda Behara",
+      "Basantpur",
+      "Dariapur",
+      "Dhamar",
+      "Dhobha Bazar",
+      "Khajuria",
+      "Mainpura"
+    ]
+  ],
+  "802157": ["Bhojpur", "Bihar", ["Chhotka Sasaram", "Gajrajganj", "Karisath"]],
+  "802158": [
+    "Bhojpur",
+    "Bihar",
+    [
+      "Babhaniaon",
+      "Bahuara",
+      "Bairahi",
+      "Barad Parwa",
+      "Hetampur",
+      "Jagdishpur",
+      "Kahathu Masurhi",
+      "Kakila",
+      "Manudehari",
+      "Masuri",
+      "Parasia",
+      "Sheopurkunai",
+      "Siaruan",
+      "Tenduni"
+    ]
+  ],
+  "802159": ["Bhojpur", "Bihar", ["Chaturbhujibaraon", "Jamuaon", "Jitaura", "Rajeyan"]],
+  "802160": [
+    "Bhojpur",
+    "Bihar",
+    ["Dhandihan", "Katkaira", "Koilwar", "Kulharia", "Pareo", "Sakaddi"]
+  ],
+  "802161": [
+    "Bhojpur",
+    "Bihar",
+    ["Allipur", "Bhadwar", "Jamira", "Khangaon", "Narhi Chandi"]
+  ],
+  "802162": ["Bhojpur", "Bihar", ["Kawara", "Masarh", "Nawada Ben", "Saneya Barhata"]],
+  "802163": [
+    "Bhojpur",
+    "Bihar",
+    [
+      "Babhangawan",
+      "Babura",
+      "Bagmajhauan",
+      "Bandhu Chhapra",
+      "Daulatpur",
+      "Manikpur",
+      "Naya Mohamad Pur",
+      "Pachrukhia Kala",
+      "Phuhan",
+      "Purana Haripur",
+      "Rajapur English"
+    ]
+  ],
+  "802164": [
+    "Bhojpur",
+    "Bihar",
+    [
+      "Baga",
+      "Chilhar",
+      "Chilhose",
+      "Kirkiri",
+      "Kori",
+      "Pandurarampur",
+      "Phulari",
+      "Ramasarh",
+      "Sandesh",
+      "Sandesh Bhatauli"
+    ]
+  ],
+  "802165": [
+    "Bhojpur",
+    "Bihar",
+    [
+      "Bariswan",
+      "Bharauli",
+      "Birpur",
+      "Horil Chhapra",
+      "Kundeshar",
+      "Ranisagar",
+      "Sarna",
+      "Semaria Patti Ojha",
+      "Shahjauli",
+      "Shahpurpatti",
+      "Suhia"
+    ]
+  ],
+  "802166": [
+    "Bhojpur",
+    "Bihar",
+    [
+      "Bahoranpur",
+      "Barakhrauni",
+      "Chamarpur",
+      "Chandakewatia",
+      "Charghat Chanaur",
+      "Damodarpur",
+      "Gaura",
+      "Umraonganj"
+    ]
+  ],
+  "802183": [
+    "Bhojpur",
+    "Bihar",
+    ["Banahi", "Bankat Sikaria", "Gaudarh Rudranagar", "Kamariaon", "Mahuaon", "Osain"]
+  ],
+  "802201": [
+    "Bhojpur",
+    "Bihar",
+    [
+      "Agiaon",
+      "Baghi",
+      "Bargaon",
+      "Berath",
+      "Chasi",
+      "Dilia",
+      "Karbasin",
+      "Kurmichak",
+      "Lasari",
+      "Madanpur",
+      "Narayanpur",
+      "Pawana",
+      "Pawar",
+      "Pharpur",
+      "Posawa",
+      "Sewatha"
+    ]
+  ],
+  "802202": [
+    "Bhojpur",
+    "Bihar",
+    [
+      "Agiaon Bazar",
+      "Amehata",
+      "Kahndani",
+      "Kataria",
+      "Lahthan",
+      "Narayan Pur Baghaur",
+      "Pitaru",
+      "Pitath"
+    ]
+  ],
+  "802203": [
+    "Bhojpur",
+    "Bihar",
+    [
+      "Ayer",
+      "Bagwan",
+      "Balbandh",
+      "Baligaon",
+      "Barnaon",
+      "Garhani",
+      "Hadiabad",
+      "Ichari",
+      "Kahen",
+      "Kaup",
+      "Ratnarh",
+      "Sahangi",
+      "Semraon",
+      "Sheopur"
+    ]
+  ],
+  "802204": [
+    "Bhojpur",
+    "Bihar",
+    [
+      "Derhgaon",
+      "Gaharuaon",
+      "Hasan Bazar",
+      "Jamorhi",
+      "Jethwar Bhatt",
+      "Narayanpur",
+      "Noaon",
+      "Pachma",
+      "Pachrukhia",
+      "Sakariramnagar",
+      "Sheopur"
+    ]
+  ],
+  "802205": [
+    "Bhojpur",
+    "Bihar",
+    [
+      "Bhakura",
+      "Chaugain",
+      "Karath",
+      "Kirhi",
+      "Kurur",
+      "Kushi",
+      "Sakla Bazar",
+      "Sonbarsa"
+    ]
+  ],
+  "802206": [
+    "Bhojpur",
+    "Bihar",
+    [
+      "Bankat",
+      "Belaur",
+      "Bichhiaon",
+      "Dularpur",
+      "Jamuaon Dihari",
+      "Kasap",
+      "Khopira",
+      "Maniachh",
+      "Sakhuan",
+      "Sarathua",
+      "Sonpura"
+    ]
+  ],
+  "802207": [
+    "Bhojpur",
+    "Bihar",
+    [
+      "Bachari",
+      "Baisadih",
+      "Barauli",
+      "Basauri",
+      "Chakia",
+      "Deochanda",
+      "Dhanauti",
+      "Dhrubdihan",
+      "Dumaria",
+      "Kurmurhi",
+      "Lahrabad",
+      "Lahritiwaridih",
+      "Nagraon",
+      "Nonar",
+      "Piru",
+      "Sedahan",
+      "Sikraulfatehpur",
+      "Sonbarsa",
+      "Thakuri"
+    ]
+  ],
+  "802208": [
+    "Bhojpur",
+    "Bihar",
+    [
+      "Baruhi",
+      "Dhanchhuhan",
+      "Dulamchak Chak Chaudhari",
+      "Ekwari",
+      "Guljarpur",
+      "Khraonkalan",
+      "Koshiar",
+      "Nawada Pataria",
+      "Perhap",
+      "Peur",
+      "Sahar"
+    ]
+  ],
+  "802209": [
+    "Bhojpur",
+    "Bihar",
+    ["Barkagaon", "Bhadsera", "Bihta English", "Deo", "Dhangawan", "Sara", "Tarari"]
+  ],
+  "802210": [
+    "Bhojpur",
+    "Bihar",
+    ["Ashni Jaitpur", "Dakhin Ekauna", "Deoria", "Piania", "Udawant Nagar"]
+  ],
+  "802211": [
+    "Rohtas",
+    "Bihar",
+    ["Awarhi", "Babhnaul", "Chatara", "Gunsej", "Mednipur", "Semri"]
+  ],
+  "802212": [
+    "Rohtas",
+    "Bihar",
+    [
+      "Bikramganj",
+      "Dhangain",
+      "Dharupur",
+      "Durgadi",
+      "Ghosia Kala",
+      "Goshaldih",
+      "Gotapa",
+      "Jamorhi",
+      "Jonhi",
+      "K Mahdeo",
+      "Karakat",
+      "Karma",
+      "Maidhara",
+      "Mani",
+      "Mohanpur",
+      "Motha",
+      "Munji",
+      "Nonhar",
+      "Tenduni Chauk"
+    ]
+  ],
+  "802213": [
+    "Rohtas",
+    "Bihar",
+    [
+      "Akorha",
+      "Andore",
+      "Basadihan",
+      "Belvaiyan",
+      "Bhanpur",
+      "Chilheuon",
+      "Dinara",
+      "Jamroh",
+      "Jigana",
+      "Kaniyari",
+      "Kund",
+      "Mahroh",
+      "Sikthi",
+      "Sujatpur"
+    ]
+  ],
+  "802214": [
+    "Rohtas",
+    "Bihar",
+    [
+      "Amoura",
+      "Bad",
+      "Baradih",
+      "Belwain",
+      "Burhwal",
+      "Deo",
+      "Dhawani",
+      "Gachhai",
+      "Gorakh Parasi",
+      "Gorari",
+      "Karup Itwa"
+    ]
+  ],
+  "802215": [
+    "Rohtas",
+    "Bihar",
+    [
+      "Babhni",
+      "Baraon",
+      "Barhari",
+      "Barki Akorhi",
+      "Bhaluahi",
+      "Bhelari",
+      "Chhatauna",
+      "Garh Nokha",
+      "Ghosia",
+      "Hathini",
+      "Jabra",
+      "Karahansi",
+      "Kharari",
+      "Mujrarh",
+      "Nonsari",
+      "Panjer",
+      "Penar",
+      "Ruphatha",
+      "Semra",
+      "Sirkhinda",
+      "Sisirit",
+      "Tararh",
+      "Tendua"
+    ]
+  ],
+  "802216": ["Rohtas", "Bihar", ["Bahuara", "Koath"]],
+  "802217": [
+    "Rohtas",
+    "Bihar",
+    [
+      "Belwan",
+      "Eghara",
+      "Karup Indrahiyan",
+      "Manipur",
+      "Meari Bazar",
+      "Muodihan",
+      "Pachpokhari",
+      "Pararia",
+      "Sisirita"
+    ]
+  ],
+  "802218": [
+    "Rohtas",
+    "Bihar",
+    [
+      "Arthu",
+      "Basudeo Dehri",
+      "Bhalunidham",
+      "Bishambhrpur",
+      "Dharkandha",
+      "Ganj Bharsara",
+      "Kusumhara",
+      "Lilwachh",
+      "Nadaon",
+      "Natwar",
+      "Natwar Khurd",
+      "Puhpi",
+      "Rajpur",
+      "Saraon",
+      "Surware Ke Bararhi"
+    ]
+  ],
+  "802219": [
+    "Rohtas",
+    "Bihar",
+    ["Bisheni Kala", "Bishunpur", "Rajandih", "Rajpur", "Siyawak", "Sokhara", "Suara"]
+  ],
+  "802220": [
+    "Rohtas",
+    "Bihar",
+    [
+      "Bensagar",
+      "Itriya",
+      "Kajhain",
+      "Karmaini",
+      "Masauna",
+      "Sanjhauli",
+      "Sioruan",
+      "Tilain",
+      "Udaipur"
+    ]
+  ],
+  "802221": ["Rohtas", "Bihar", ["Imirtha", "Surajpura"]],
+  "802222": [
+    "Bhojpur",
+    "Bihar",
+    [
+      "Andhari",
+      "Bagar",
+      "Imadpur",
+      "Khutahan",
+      "Kolodihri",
+      "Moapkalan",
+      "Panwari",
+      "Purahra",
+      "Sikrahta Kala"
+    ]
+  ],
+  "802223": [
+    "Bhojpur",
+    "Bihar",
+    [
+      "Chandi",
+      "Charpokhari",
+      "Koil",
+      "Kumhaila",
+      "Lilari",
+      "Majhiaon",
+      "Malaur",
+      "Mansagar",
+      "Mukundpur",
+      "Nagari",
+      "Pasaur",
+      "Siyadih"
+    ]
+  ],
+  "802226": ["Rohtas", "Bihar", ["A Kala", "Dawath"]],
+  "802301": [
+    "Bhojpur",
+    "Bihar",
+    [
+      "Arrah",
+      "Arrah Chowk",
+      "Arrah Kutchey",
+      "HDJain College",
+      "Maharaja College",
+      "Pakari",
+      "Shahbad DisttBoard Ara",
+      "Sheoganj",
+      "Waliganj"
+    ]
+  ],
+  "802302": ["Bhojpur", "Bihar", ["Anaith"]],
+  "802311": [
+    "Bhojpur",
+    "Bihar",
+    [
+      "Bakhorapur",
+      "Barahara",
+      "Ekauna",
+      "Lauhar Farna",
+      "Matukpur",
+      "Mohanpur Karja",
+      "Neknam Tola",
+      "Ramsahar"
+    ]
+  ],
+  "802312": [
+    "Bhojpur",
+    "Bihar",
+    [
+      "Bampali",
+      "Barka Dumra",
+      "Belghat Balua",
+      "Bhelai",
+      "Chandawa",
+      "Gangahar",
+      "Karwan",
+      "Mahuli",
+      "Pirauta",
+      "Ratanpur"
+    ]
+  ],
+  "802313": ["Bhojpur", "Bihar", ["Daulatpur", "Gunari", "Krishnagarh", "Saraiyan"]],
+  "802314": [
+    "Bhojpur",
+    "Bihar",
+    ["Birampur", "Bishunpur Dumaria", "Gidha", "Kayamnagar", "Sripalpur"]
+  ],
+  "802316": [
+    "Bhojpur",
+    "Bihar",
+    ["Mahulighat", "Nathmalpur", "Prashurampur", "Sinha", "Sinhaghat", "Sohara Tribhuani"]
+  ],
+  "802351": [
+    "Bhojpur",
+    "Bihar",
+    [
+      "Balua High School",
+      "Benwalia",
+      "Lachhutola",
+      "Lahang Dumaria",
+      "Salempur",
+      "Sunderpur Barja",
+      "Tola Achraj Lal"
+    ]
+  ],
+  "802352": [
+    "Bhojpur",
+    "Bihar",
+    ["Akhagaon", "Jalpura", "Jokta", "Nasaratpur", "Pratappur"]
+  ],
+  "803101": [
+    "Nalanda",
+    "Bihar",
+    ["Alinagar", "Amber", "Biharsharif", "Nalanda College", "Sakunat"]
+  ],
+  "803107": [
+    "Nalanda",
+    "Bihar",
+    [
+      "Abdachak",
+      "Andi",
+      "Asthawan",
+      "Belchi Sharif",
+      "Bind",
+      "Borhog",
+      "Desna",
+      "Hussain Pur",
+      "Itaura",
+      "Jamsari",
+      "Jana",
+      "Jear",
+      "Kaila",
+      "Kathrahi",
+      "Konand",
+      "Kulti",
+      "Mafi",
+      "Malti",
+      "Mohammadpur",
+      "Nerut",
+      "Noawan",
+      "Onda",
+      "Palatpura",
+      "Paroha",
+      "Sarbahadi",
+      "Sare",
+      "Uttarthu",
+      "Waiyao"
+    ]
+  ],
+  "803108": [
+    "Nalanda",
+    "Bihar",
+    [
+      "Badhauna",
+      "Bhadru",
+      "Chandi",
+      "Dayalpur",
+      "Gonkura",
+      "Gunjarchak",
+      "Kaila",
+      "Madhopur",
+      "Raisa",
+      "Rukhai",
+      "Satnag",
+      "Tulsigarh"
+    ]
+  ],
+  "803109": [
+    "Nalanda",
+    "Bihar",
+    [
+      "Adampur",
+      "Bindidih",
+      "Giriak",
+      "Gopalpur",
+      "Khanpur",
+      "Mow Bindidah",
+      "Purani",
+      "Railer"
+    ]
+  ],
+  "803110": [
+    "Nalanda",
+    "Bihar",
+    [
+      "Badarbali",
+      "Bajitpur Mudhari",
+      "Bakra",
+      "Bali Belchi",
+      "Barah",
+      "Basniwan",
+      "Belchi",
+      "Bena",
+      "Birju Milki",
+      "Chero",
+      "Chhatiana",
+      "Daily",
+      "Dosut",
+      "Gonawan",
+      "Gopalur",
+      "Gosaimath",
+      "Harnaut",
+      "Jagatpur",
+      "Jodhan Bigha",
+      "Kharthua",
+      "Kolawan",
+      "Korari",
+      "Lohra",
+      "Missi",
+      "Murgiachak",
+      "Narsanda",
+      "Nehusa",
+      "Pachoura",
+      "Poari",
+      "Sabnahua",
+      "Sarthua",
+      "Sirnawan",
+      "Sirsi",
+      "Sirsi Dihra"
+    ]
+  ],
+  "803111": [
+    "Nalanda",
+    "Bihar",
+    [
+      "Bargaon",
+      "Deepnagar",
+      "Dharahara",
+      "Machhalduhe",
+      "Mahuri",
+      "Mari",
+      "Mighi Nagma",
+      "Mirchaiganj",
+      "Nalanda",
+      "Nirpur",
+      "Sabait",
+      "Sakraurah"
+    ]
+  ],
+  "803113": [
+    "Nalanda",
+    "Bihar",
+    [
+      "Andhana",
+      "Barakhurd",
+      "Bheria",
+      "Charuipar",
+      "Ganpura",
+      "Kathauli",
+      "Koklakchak",
+      "Nailly",
+      "Nanaura",
+      "Nursarai",
+      "Pariouna"
+    ]
+  ],
+  "803114": [
+    "Nalanda",
+    "Bihar",
+    [
+      "Ajanaura",
+      "Alawan",
+      "Ant",
+      "Bain",
+      "Bangpur",
+      "Dahpar Sargaon",
+      "Eksara",
+      "Gaurav Nagar",
+      "Gurusaranpu",
+      "Jagdishpur Tiyari",
+      "Khaira",
+      "Murgaon",
+      "Nohsa",
+      "Parwalpur",
+      "Pillich",
+      "Rasalpur",
+      "Shankardih",
+      "Sinama",
+      "Sonchari",
+      "Soure"
+    ]
+  ],
+  "803115": [
+    "Nalanda",
+    "Bihar",
+    [
+      "Chorsua",
+      "Durgapur",
+      "Ghorsrawan",
+      "Nanand",
+      "Nepura",
+      "Pawa",
+      "Pawapuri",
+      "Pyarepur"
+    ]
+  ],
+  "803116": [
+    "Nalanda",
+    "Bihar",
+    [
+      "Barnausha",
+      "Goror",
+      "Karubigha",
+      "Lahuar",
+      "Laranpur",
+      "Meyar",
+      "Molanachak",
+      "Molanadih",
+      "Mukhtarganj",
+      "Nahub",
+      "Nekpur",
+      "Nimthu",
+      "Pathraura",
+      "Rajgir",
+      "Rajgir Kund",
+      "Sirhari",
+      "Sithaura",
+      "Suhawanpur",
+      "Veerayatan"
+    ]
+  ],
+  "803117": [
+    "Nalanda",
+    "Bihar",
+    [
+      "Akauna",
+      "Banarsibigha",
+      "Bara",
+      "Bhui",
+      "Eksari",
+      "Ghostawan",
+      "Gorawan",
+      "Karah",
+      "Karjara",
+      "Madhar",
+      "Mallikpur",
+      "Silao"
+    ]
+  ],
+  "803118": [
+    "Nalanda",
+    "Bihar",
+    [
+      "Ashanagar",
+      "Barara",
+      "Bhagan Bigha",
+      "Doiya",
+      "Kairi Meyar",
+      "Khaje Itwar Sarai",
+      "Mogalkuan",
+      "Moratalab",
+      "Musepur",
+      "Sohsarai"
+    ]
+  ],
+  "803119": [
+    "Nalanda",
+    "Bihar",
+    [
+      "Amba",
+      "Barandi",
+      "Bhandari",
+      "Chandoura",
+      "Itasang Bhadwa",
+      "Mai Farida",
+      "Peshaur",
+      "Punha",
+      "Rahui",
+      "Sonsa",
+      "Sosandi",
+      "Uttarnama"
+    ]
+  ],
+  "803120": [
+    "Nalanda",
+    "Bihar",
+    [
+      "Ajaypur",
+      "Asta",
+      "Choti Chariari",
+      "Dharampur",
+      "Diha",
+      "Narari",
+      "Pratappur",
+      "Raipur Koil Bigha"
+    ]
+  ],
+  "803121": ["Nalanda", "Bihar", ["Ordnance Factory Rajgir"]],
+  "803201": [
+    "Patna",
+    "Bihar",
+    [
+      "Baruna",
+      "Bmachheriama",
+      "Dumri",
+      "Fatwa",
+      "Garhochak",
+      "Gauri Pundo",
+      "Kachidargali",
+      "Kanchanpur",
+      "Mahiuddinpur",
+      "Masarhi",
+      "Parsa",
+      "Sultanpur"
+    ]
+  ],
+  "803202": [
+    "Patna",
+    "Bihar",
+    [
+      "Alipur Bihta",
+      "Baikatpur",
+      "Bhojpur",
+      "Chistipur",
+      "Doma",
+      "Gyaspur Mahaji",
+      "Kaladiara",
+      "Karauta",
+      "Katauna",
+      "Kayampur",
+      "Khusrupur",
+      "Kohawan",
+      "Lakhanpura",
+      "Mahkar",
+      "Manjhauli",
+      "Netar",
+      "Ramchaura",
+      "Salimpur",
+      "Sarhari",
+      "Telmar"
+    ]
+  ],
+  "803203": [
+    "Patna",
+    "Bihar",
+    ["Alawalpur", "Dgtola", "Nandlalabad", "Rukunpur", "Usfa"]
+  ],
+  "803211": [
+    "Patna",
+    "Bihar",
+    [
+      "Athmalgola",
+      "Bhuapur",
+      "Chaksawar",
+      "Dakshnichak",
+      "Fatehpur",
+      "Fulelpur",
+      "Jalalpur",
+      "Karjan",
+      "Nayabigha",
+      "Rahimapur",
+      "Ramnagar Karai Kachhar",
+      "Rupas",
+      "Saistapur",
+      "Shawani"
+    ]
+  ],
+  "803212": [
+    "Patna",
+    "Bihar",
+    [
+      "Bakhtiyarpur",
+      "Burhara",
+      "Chanda",
+      "Ghoswari",
+      "Karnauti",
+      "Madhopur",
+      "Ramnagar Diara",
+      "Rawaich",
+      "Sabnima Khurd",
+      "Satya Bhaiya",
+      "Tola Sohan Rai"
+    ]
+  ],
+  "803213": [
+    "Patna",
+    "Bihar",
+    [
+      "Achuara",
+      "Andauli",
+      "Atnama",
+      "Barh",
+      "Barh Court",
+      "Berhana",
+      "Bhatgaon",
+      "Chaknawada",
+      "Darveshpur",
+      "Ekdanga",
+      "Hazipur Belaur",
+      "Khajurar",
+      "Mahammadpur",
+      "Masathu",
+      "Mobarakpur",
+      "Nadama Tola",
+      "Saksohra",
+      "Tajnipur"
+    ]
+  ],
+  "803214": [
+    "Patna",
+    "Bihar",
+    [
+      "Agwanpur",
+      "Badopur",
+      "Bahrawan",
+      "Barh Rs",
+      "Bhagwatpur Karmaur",
+      "Bihari Bigha",
+      "Daulatpur",
+      "Dhabhma",
+      "Gowasa Shikhpura",
+      "Kondi",
+      "Parsawan",
+      "Ranabigha",
+      "Sahri",
+      "Sarhan"
+    ]
+  ],
+  "803215": ["Patna", "Bihar", ["NTPC Barh"]],
+  "803216": [
+    "Nalanda",
+    "Bihar",
+    [
+      "Baswanbigha",
+      "Chhabilapur",
+      "Daruara",
+      "Dumrawan",
+      "Hargawan",
+      "Maghra",
+      "Mahanandpur",
+      "Muraura",
+      "Naisarai",
+      "Pachauri",
+      "Ramchandrapur",
+      "Ranabigha",
+      "Singthu",
+      "Tetrawan",
+      "Tiuri",
+      "Tungi"
+    ]
+  ],
+  "803221": ["Patna", "Bihar", ["Kanhaipur", "Lemuabad", "Mekra", "Pandarak", "Raily"]],
+  "803301": ["Patna", "Bihar", ["Hathidah", "Malpur", "Maranchi", "Rampur Dumra"]],
+  "803302": [
+    "Patna",
+    "Bihar",
+    [
+      "Chintamanchak",
+      "Dhanak Dove",
+      "Karara",
+      "Mokama",
+      "Mokamachauk",
+      "More",
+      "Paijuna",
+      "Shivnar",
+      "Tartar"
+    ]
+  ],
+  "803303": ["Patna", "Bihar", ["Aunta", "Mokamaghat"]],
+  "803306": [
+    "Patna",
+    "Bihar",
+    ["Bakawa", "Prahladpur", "Sahdeopur Chaturbhujpur", "Samya Kurmichak", "Samyagarh"]
+  ],
+  "803307": ["Patna", "Bihar", ["Baruane", "Bhadaur"]],
+  "804401": [
+    "Arwal",
+    "Bihar",
+    [
+      "Akbarpur",
+      "Arwal",
+      "Bara Korium",
+      "Bhadasi",
+      "Jalpura",
+      "Kodra",
+      "Pakharpur",
+      "Prasadi English",
+      "Sakarichowki"
+    ]
+  ],
+  "804402": [
+    "Arwal",
+    "Bihar",
+    [
+      "Baidrabad",
+      "Fatehpur Sanda",
+      "Hasanpur",
+      "Khabhaini",
+      "Makhdumabad",
+      "Rampur Chouram",
+      "Rampur Waina",
+      "Sarwan",
+      "Walidad"
+    ]
+  ],
+  "804403": [
+    "Gaya",
+    "Bihar",
+    [
+      "Agni",
+      "Belaganj",
+      "Belhari",
+      "Bhimdaspur",
+      "Chandouti Bhagawanpur",
+      "Chhatiyana",
+      "Chirailla",
+      "Darampur",
+      "Derhma",
+      "Kachnama",
+      "Koiri Bigha",
+      "Neori",
+      "Railly",
+      "Rampur",
+      "Samaspur",
+      "Silounja",
+      "Umta"
+    ]
+  ],
+  "804404": [
+    "Gaya",
+    "Bihar",
+    [
+      "Bara Rahimbigha",
+      "Bhalua",
+      "Chakand",
+      "Chakand RS",
+      "Erki",
+      "Laxmipur",
+      "Meera Bigha",
+      "Rouna",
+      "Salepur Fatehpur"
+    ]
+  ],
+  "804405": [
+    "Jehanabad",
+    "Bihar",
+    [
+      "Allahganj",
+      "Banshi Bigha",
+      "Bhaikh",
+      "Birra",
+      "Bishunganj",
+      "Dharaut",
+      "Jamanganj",
+      "Kurre",
+      "Sonawa",
+      "Tilkai",
+      "Uber"
+    ]
+  ],
+  "804406": ["Jehanabad", "Bihar", ["Ghosi", "Ginji", "Korra", "Lakhawar", "Saho Bigha"]],
+  "804407": [
+    "Jehanabad",
+    "Bihar",
+    [
+      "Bauri Beldari",
+      "Bhagawanpur",
+      "Dhawal Bigha",
+      "Gangapur",
+      "Hathiawan",
+      "Hulashganj",
+      "Keur",
+      "Narma",
+      "Pathakchak",
+      "Satamas",
+      "Tajpur",
+      "Takiya Karpi"
+    ]
+  ],
+  "804408": ["Jehanabad", "Bihar", ["Jehanabad", "Jehanabad Kutchary"]],
+  "804417": [
+    "Jehanabad",
+    "Bihar",
+    [
+      "Babhana",
+      "Bharthua",
+      "Dhangawan",
+      "Dharampur",
+      "Jehanabad RS",
+      "Kalpa",
+      "Korauna",
+      "Kosdihra",
+      "Kumbhawan",
+      "Mandil",
+      "Muther",
+      "Nauru",
+      "Paigambarpur",
+      "Pandooi",
+      "Pinjora",
+      "Pinjore",
+      "Saidabad"
+    ]
+  ],
+  "804418": [
+    "Jehanabad",
+    "Bihar",
+    ["Alinagarpali", "Bhadsara", "Kako", "Nonhi", "Saistabad", "Utarsarthu", "Waina"]
+  ],
+  "804419": [
+    "Arwal",
+    "Bihar",
+    [
+      "Anandpur",
+      "Annua",
+      "Barnathu",
+      "Dora",
+      "Karpi",
+      "Keyal",
+      "Khajuri",
+      "Kharasin",
+      "Mali",
+      "Murari",
+      "Narga",
+      "Puran",
+      "Sahar Telpa",
+      "Sonbhadra",
+      "Terra"
+    ]
+  ],
+  "804420": [
+    "Jehanabad",
+    "Bihar",
+    ["Golakpur Dehuni", "Hati", "Kazisarai", "Mohiudinpur", "Nagma Erazi", "Tej Bigha"]
+  ],
+  "804421": [
+    "Arwal",
+    "Bihar",
+    [
+      "Aira",
+      "Bara",
+      "Bithra",
+      "Kurtha",
+      "Lari",
+      "Majhiyawan",
+      "Manikpur",
+      "Mednipur Brahiya",
+      "Narhi",
+      "Nighwan",
+      "Pondil",
+      "Rajepur",
+      "Ratni Bazar",
+      "Shadipur"
+    ]
+  ],
+  "804422": [
+    "Jehanabad",
+    "Bihar",
+    [
+      "Bandeya",
+      "Berka",
+      "Chhariyari",
+      "Dakra",
+      "Kachnawan",
+      "Makarpur",
+      "Makhdumpur",
+      "Ner",
+      "Sagarpur",
+      "Solhanda"
+    ]
+  ],
+  "804423": [
+    "Arwal",
+    "Bihar",
+    [
+      "Abgila",
+      "Barheta",
+      "Ibrahimpur",
+      "Karhari",
+      "Nagla Kinger",
+      "Pinjarawan",
+      "Sohariya",
+      "Waina Lakhaipur"
+    ]
+  ],
+  "804424": [
+    "Jehanabad",
+    "Bihar",
+    ["Gayani Bigha", "Ghejan", "Jagpura", "Kormathu", "Manjhosh", "Paibigha", "Patiyawan"]
+  ],
+  "804425": [
+    "Jehanabad",
+    "Bihar",
+    ["Amain", "Ikil", "Newari", "Pandoul", "Sakurabad", "Sikandarpur", "Sisamba"]
+  ],
+  "804426": [
+    "Arwal",
+    "Bihar",
+    [
+      "Aiara",
+      "Bajitpur",
+      "Junathi",
+      "Kochhasa",
+      "Mouri",
+      "Pariyari",
+      "Puarainia",
+      "Salempur",
+      "SP Imamganj"
+    ]
+  ],
+  "804427": [
+    "Jehanabad",
+    "Bihar",
+    [
+      "Charh",
+      "Kalanour",
+      "Kurtha Bazar",
+      "Malathi",
+      "Saren",
+      "Sarthua",
+      "Sugaon",
+      "Supi",
+      "Tehta"
+    ]
+  ],
+  "804428": [
+    "Arwal",
+    "Bihar",
+    [
+      "Bambhai",
+      "Belkhara",
+      "Injore",
+      "Jaipur",
+      "Jamuhari",
+      "Kamta",
+      "Koel Bhupat",
+      "Masadpur",
+      "Niranjanpur",
+      "Parasi",
+      "Rampurchai",
+      "Sakri Khurd",
+      "Sarwarpur",
+      "Seikhpura",
+      "Terri",
+      "Usari"
+    ]
+  ],
+  "804429": [
+    "Jehanabad",
+    "Bihar",
+    [
+      "Dhana Dehri",
+      "Jamuk",
+      "Junathi",
+      "Kaswan",
+      "Nehalpur",
+      "Noawan",
+      "Salarpur",
+      "Sarta",
+      "Surangapur"
+    ]
+  ],
+  "804432": [
+    "Jehanabad",
+    "Bihar",
+    [
+      "Atiawan",
+      "Bandhuganj",
+      "Bharthu",
+      "Chhotki Akouna",
+      "Daulatpur Arhit",
+      "Deora",
+      "Jagdari",
+      "Jaitipur Kurwa",
+      "Julfipur Modanganj",
+      "Korma"
+    ]
+  ],
+  "804435": ["Gaya", "Bihar", ["Main", "Nimsar", "Pandabigha", "Sadopur", "Turi"]],
+  "804451": [
+    "Patna",
+    "Bihar",
+    [
+      "Bahrampur",
+      "Bansbigha",
+      "Barhibigha",
+      "Baurahi",
+      "Berthu",
+      "Bhakhari",
+      "Bheragawan",
+      "Bir",
+      "Deodha",
+      "Dhanarua",
+      "Hazrat Sain",
+      "Jaitia",
+      "Kansari",
+      "Mallickpur",
+      "Mankipar",
+      "Nadpura",
+      "Nanauri",
+      "Nasaratpur",
+      "Nawasi Chak",
+      "Pabhera",
+      "Pabheri More",
+      "Panditganj",
+      "Rastranagar Rarha",
+      "Simhari",
+      "Sonmai",
+      "Vijaypura"
+    ]
+  ],
+  "804452": [
+    "Patna",
+    "Bihar",
+    [
+      "Barawan",
+      "Barni",
+      "Bedauli",
+      "Bhadaura",
+      "Bhasma",
+      "Charma",
+      "Chhata",
+      "Daulatpur",
+      "Dewan",
+      "Gangachak",
+      "Garihara",
+      "Ghorahua",
+      "Hansadih",
+      "Khainia",
+      "Knataul",
+      "Kosut",
+      "Lahsuna",
+      "Masaurhi",
+      "Pitwans",
+      "Poawan",
+      "Sanda",
+      "Usmanchak"
+    ]
+  ],
+  "804453": [
+    "Patna",
+    "Bihar",
+    [
+      "Akauna",
+      "Barah",
+      "Basuhar",
+      "Chipura Kurd",
+      "Dariyapur",
+      "Dehri",
+      "Jat Dumari",
+      "Kalyanpur",
+      "Kandap",
+      "Keora",
+      "Kurthaul",
+      "L Kachuara",
+      "Lakhana",
+      "Lakhanpar",
+      "Maranchi",
+      "Mittanchak",
+      "Mohanpur",
+      "Nadwan",
+      "Nisarpura",
+      "Paimarghat",
+      "Parsa",
+      "Parthu",
+      "Pathar Hat",
+      "Punpun",
+      "Sakraicha",
+      "Sripalpur",
+      "Suitha"
+    ]
+  ],
+  "804454": [
+    "Patna",
+    "Bihar",
+    [
+      "Bara",
+      "Berra",
+      "Bhagwanganj",
+      "Bsikaria",
+      "Kharauna",
+      "Mokar",
+      "Nadaul",
+      "Pataria",
+      "Rewan",
+      "Seonan"
+    ]
+  ],
+  "805101": ["Nawada", "Bihar", ["Barasolapur", "Dhamul", "Dhanar", "Dharhara"]],
+  "805102": ["Nawada", "Bihar", ["Bisunpur", "Govindpur", "Sarkanda", "Tetariya"]],
+  "805103": [
+    "Nawada",
+    "Bihar",
+    [
+      "Baijnathpur",
+      "Barat Sarai",
+      "Barhauna",
+      "Chhota Jamura",
+      "Chhotashekhpur",
+      "Chhotipali",
+      "Dhanwan",
+      "Dona",
+      "Hasua",
+      "Punther",
+      "Sachaul",
+      "Sihin"
+    ]
+  ],
+  "805104": [
+    "Nawada",
+    "Bihar",
+    [
+      "Bermi",
+      "Dermobara",
+      "Ghostama",
+      "Kadirganj",
+      "Khalsadhibari",
+      "Marue",
+      "Nazardih",
+      "Ohari",
+      "Paura",
+      "Rajapur Saur",
+      "Sadipur"
+    ]
+  ],
+  "805105": [
+    "Nalanda",
+    "Bihar",
+    ["Badi", "Bahadurganj", "Bhagwanpur", "Gazipur", "Katrisarai", "Maira Barich"]
+  ],
+  "805106": [
+    "Nawada",
+    "Bihar",
+    [
+      "D Garh Itpakwa",
+      "Kadhar",
+      "Kawakol",
+      "Kewaii",
+      "Kharsari",
+      "Lalpur",
+      "Madhurapur",
+      "Mahapurchhab",
+      "Manjhila",
+      "N Purwaritola",
+      "Okhariyagolab",
+      "Phuldih",
+      "Shekhodaura",
+      "Sundri Dumari"
+    ]
+  ],
+  "805107": [
+    "Nawada",
+    "Bihar",
+    ["Bhattagarh", "Kosi", "Kundabhalua", "Mahrawan", "Marara", "Roh", "Rupau", "Siur"]
+  ],
+  "805108": ["Nawada", "Bihar", ["Apsai", "Bajitpur", "Lalbigha", "Parwati"]],
+  "805109": [
+    "Nawada",
+    "Bihar",
+    [
+      "Aranikesopur",
+      "Dohra",
+      "Hanriya",
+      "Kahuara",
+      "Kosla",
+      "Masaurha",
+      "Nardiganj",
+      "Orro",
+      "Pachhiya",
+      "Prama",
+      "Reula",
+      "Sarsu",
+      "Seotar"
+    ]
+  ],
+  "805110": ["Nawada", "Bihar", ["Nawadha"]],
+  "805111": [
+    "Nawada",
+    "Bihar",
+    [
+      "Asarhi",
+      "Babhnaur",
+      "Chhatihar",
+      "Gonawan",
+      "Hasapur",
+      "Mahnadpur",
+      "Nawada Kutchery",
+      "Pachra",
+      "Sisma"
+    ]
+  ],
+  "805112": [
+    "Nawada",
+    "Bihar",
+    ["Derma", "Diri", "Frahimabad", "Makhar", "Nanaura", "Parnawada", "Pithauri", "Teyar"]
+  ],
+  "805113": [
+    "Nawada",
+    "Bihar",
+    [
+      "Bauri",
+      "Belar",
+      "Bhatta",
+      "Birnawan",
+      "Dergoan",
+      "Kashichak",
+      "Khakhari",
+      "Subhanpur"
+    ]
+  ],
+  "805114": ["Nawada", "Bihar", ["Bihar Keshri Sri Krishn Singh"]],
+  "805121": [
+    "Nawada",
+    "Bihar",
+    [
+      "Baksoti",
+      "Bhanail",
+      "Budhwara",
+      "Chhoti Amawa",
+      "Dumari",
+      "Lkhamohna",
+      "Mheshdih",
+      "Nemdarganj"
+    ]
+  ],
+  "805122": [
+    "Nawada",
+    "Bihar",
+    [
+      "Ankari",
+      "Bargaon",
+      "Biju Bigha",
+      "G B Kendua Konihar",
+      "Khanwan",
+      "Konibar",
+      "Lond",
+      "Merkuri",
+      "Meskaur",
+      "Narhat",
+      "Raja Bigha",
+      "Rajan",
+      "Rasalpur",
+      "Spur Gowasa",
+      "Tetariya"
+    ]
+  ],
+  "805123": [
+    "Nawada",
+    "Bihar",
+    [
+      "Akaunabazar",
+      "Bhadokhara",
+      "Kenasari",
+      "Oraina",
+      "Orhanpur",
+      "Pakariya",
+      "Sabhari",
+      "Sonsihari"
+    ]
+  ],
+  "805124": [
+    "Nawada",
+    "Bihar",
+    [
+      "Arha",
+      "Budhauli",
+      "Chandradeep",
+      "Datraul",
+      "Gulani",
+      "Juri",
+      "Konadpur",
+      "Marwa",
+      "Pakaribarwan",
+      "Rayes",
+      "Simariya"
+    ]
+  ],
+  "805125": [
+    "Nawada",
+    "Bihar",
+    [
+      "Andharwari",
+      "Bahadurpur",
+      "Bansgopal",
+      "Chamotha",
+      "Dhamani",
+      "Rajauli",
+      "Singar",
+      "Targir"
+    ]
+  ],
+  "805126": [
+    "Nawada",
+    "Bihar",
+    [
+      "B Garhrampur",
+      "Baksanda",
+      "Koriauna",
+      "Kuhila",
+      "Kusmuhar",
+      "Paharpur",
+      "Phatehpurmore",
+      "Rajhat",
+      "Sughari"
+    ]
+  ],
+  "805127": [
+    "Nawada",
+    "Bihar",
+    ["Chauby", "Manjhauli", "Ramraichack", "S Marighgawa", "Sherpur", "Sirdala"]
+  ],
+  "805128": [
+    "Gaya",
+    "Bihar",
+    [
+      "B Makdumpur",
+      "Baijdah",
+      "Chowar",
+      "Dharampur",
+      "Dumri",
+      "Kenar",
+      "Kother",
+      "M H Chack",
+      "Mahugain",
+      "Nagwan",
+      "Pasarhi",
+      "Tarwan"
+    ]
+  ],
+  "805129": [
+    "Nawada",
+    "Bihar",
+    ["Arnadi", "Bhadseni", "Dariyapur", "Dhandhar", "Khanpur", "Manjhaway", "Tungi"]
+  ],
+  "805130": [
+    "Nawada",
+    "Bihar",
+    [
+      "Bilari",
+      "Chackwai",
+      "Dariyapur",
+      "Jalalpur",
+      "Katauna",
+      "Kochagoan",
+      "Makanpur",
+      "Manjaur",
+      "Millky",
+      "Mosama",
+      "Nromurar",
+      "Paingari",
+      "Sambey",
+      "Warisaliganj"
+    ]
+  ],
+  "805131": [
+    "Gaya",
+    "Bihar",
+    [
+      "Amethi",
+      "Arawan",
+      "Bisunpur",
+      "Ghariya",
+      "Ghogha",
+      "Kajoor",
+      "Karisowa",
+      "Kharaua",
+      "Kharghara",
+      "Khirwan",
+      "Kurkihar",
+      "Manjhauli",
+      "Panley",
+      "Rajwara",
+      "S Nawada",
+      "Sahiya",
+      "Singhwara",
+      "Wazirganj"
+    ]
+  ],
+  "805132": [
+    "Nawada",
+    "Bihar",
+    ["Aruri", "Baghibardiha", "Dhewdha", "Dosut", "Dumrawan", "Keshauri", "Samharigarh"]
+  ]
+}
