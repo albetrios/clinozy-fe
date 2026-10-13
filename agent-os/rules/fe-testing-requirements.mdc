@@ -63,7 +63,7 @@ Vitest excludes `tests/e2e`. **Never** use `.spec.ts`, or the words "real"/"live
 | Security | `tests/security/` | `*.security.test.ts` |
 | E2E | `tests/e2e/` | `*.e2e.test.ts` — needs API on `:3000` when gated |
 | Visual regression | `tests/e2e/visual.e2e.test.ts` | screenshots |
-| Mutation | Stryker (CI scheduled) | `stryker.config.json` |
+| Mutation | Stryker (CI scheduled) | `stryker.config.json` — scope + local run: `docs/reference/testing.md` |
 
 ## Exceptions (no test required)
 

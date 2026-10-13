@@ -50,6 +50,8 @@
   //    context7, shadcn → shadcn, tailwindcss-mcp-server → tailwindcss,
   //    @colbymchenry/codegraph → codegraph, chrome-devtools-mcp →
   //    chrome-devtools (spawned by tooling/dev/chrome-devtools-mcp.mjs).
+  //  - @stryker-mutator/vitest-runner: imported by tooling/stryker/vitest-runner-shim.mjs,
+  //    installed ad-hoc (pinned) by mutation-test.yml, never a devDependency.
   "ignoreDependencies": [
     "tailwindcss",
     "tw-animate-css",
@@ -61,6 +63,7 @@
     "tailwindcss-mcp-server",
     "@colbymchenry/codegraph",
     "chrome-devtools-mcp",
+    "@stryker-mutator/vitest-runner",
   ],
   // External CLIs invoked from tooling/workflows but not npm dependencies:
   // gitleaks/semgrep (security scanners),

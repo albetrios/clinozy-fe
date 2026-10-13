@@ -1,13 +1,15 @@
 {
   "$schema": "https://raw.githubusercontent.com/stryker-mutator/stryker-js/master/packages/core/schema/stryker-schema.json",
   "packageManager": "pnpm",
-  "testRunner": "vitest",
-  "plugins": ["@stryker-mutator/vitest-runner"],
+  "testRunner": "vitest-shim",
+  "plugins": ["./tooling/stryker/vitest-runner-shim.mjs"],
   "ignorePatterns": [
     ".claude",
     ".cursor",
+    ".mcp.json",
     "agent-os",
     "docs",
+    "iterations",
     "coverage",
     "dist",
     "test-results",
@@ -31,6 +33,17 @@
     "!src/**/*.placeholder-data.ts",
     "!src/**/*.fixtures.ts",
     "!src/**/index.ts"
+  ],
+  "testFiles": [
+    "src/core/rbac/**/*.test.ts",
+    "src/core/config/env.test.ts",
+    "src/app/guards/**/*.test.{ts,tsx}",
+    "src/shared/auth/**/*.test.{ts,tsx}",
+    "src/shared/tenancy/**/*.test.ts",
+    "src/lib/routes/**/*.test.ts",
+    "src/lib/csv*.test.ts",
+    "src/lib/utils.test.ts",
+    "tests/security/**/*.security.test.ts"
   ],
   "mutator": {
     "excludedMutations": ["StringLiteral", "Regex", "TemplateLiteral"]

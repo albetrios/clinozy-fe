@@ -148,7 +148,9 @@ Further gates, all mirroring clinozy-be:
   public API); the only suppressions are declared in `knip.jsonc` with reasons. Runs in
   `pnpm health` and its own CI lane.
 - **Mutation testing** (`stryker.config.json`) — scheduled weekly over the pure runtime logic
-  (rbac, auth, tenancy, route helpers); report artifact in the Actions run.
+  (rbac, auth, tenancy, route helpers), killed by those modules' own tests; report artifact in
+  the Actions run. Scope, runtime and the local run: **`docs/reference/testing.md`** → Mutation
+  testing.
 - **Lighthouse budgets** (`.lighthouserc.cjs`) — scheduled weekly against the built app
   (perf ≥ 0.9 warn, a11y = 1.0 error, best-practices ≥ 0.95 warn). Locally:
   `pnpm build && pnpm preview --port 5173 --strictPort` then `npx @lhci/cli autorun`
