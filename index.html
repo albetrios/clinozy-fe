@@ -119,6 +119,16 @@
       #app-splash:not(.app-splash-exiting) ~ #root {
         opacity: 0;
       }
+      /* …starting one frame in, so its first frame is ~2% and never 0. Chrome
+         records no Largest Contentful Paint for a paint at opacity 0, and a fade
+         from exactly 0 runs on the compositor without painting the page again:
+         every boot ended with no LCP at all, and Lighthouse's performance score
+         was empty (NO_LCP). A first frame above 0 is painted, so LCP lands when
+         the app appears. Entering only: a fade taken back (`cancelExit` in
+         src/lib/app-splash.ts) runs the transition above from where it is. */
+      #app-splash.app-splash-exiting ~ #root {
+        transition-delay: -16ms;
+      }
       /* The load right after a sign-out (splash-init.js): no splash, and the app at
          once — nothing paints until the login screen does, so the browser keeps the
          page being left on screen until then. */

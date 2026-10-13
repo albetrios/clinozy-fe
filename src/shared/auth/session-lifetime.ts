@@ -59,11 +59,13 @@ export function getSessionAge(): number | null {
  * land on.
  *
  * @remarks
- * Two callers, both of which only ever gate *work*, never *access*:
+ * Three callers, all of which only ever gate *work*, never *access*:
  * - the boot warms the right chunks while `/auth/refresh` is still in flight;
  * - `startAuthBootstrap` skips that refresh entirely when the hint is absent,
  *   because a browser that has never signed in (or has signed out) has nothing
- *   for the server to restore and the call can only answer 401.
+ *   for the server to restore and the call can only answer 401;
+ * - the OAuth callback (`pages/callback`) skips its no-code refresh fallback for
+ *   the same reason, and fails the sign-in back to `/login` instead.
  *
  * Nothing may AUTHORIZE on it — the refresh cookie is HttpOnly and the server
  * alone knows whether the session is alive. A present hint still proves

@@ -1378,12 +1378,16 @@
    sage live dot's breathing halo. Used through arbitrary `animate-[…]` classes,
    not theme animations, so `cn()`'s registry (first paint) stays as it was;
    each element also carries `motion-reduce:animate-none`, so reduced motion
-   shows every stop lit. */
+   shows every stop lit.
+   A resting stop is still text (12px), so it dims only as far as WCAG AA allows:
+   at 0.85 its worst tone reads 5.3:1 in light and 7.3:1 in dark; below 0.79 the
+   light tones drop under 4.5:1 (0.4 measured ~2:1, and Lighthouse's
+   color-contrast audit failed every sign-in route). AuthShowcase.test.tsx pins it. */
 @keyframes journey-wave {
   0%,
   85%,
   100% {
-    opacity: 0.4;
+    opacity: 0.85;
     transform: none;
   }
   8% {

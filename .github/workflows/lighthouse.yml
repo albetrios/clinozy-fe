@@ -56,9 +56,14 @@ jobs:
       # configuration lives in .lighthouserc.cjs.
       - run: pnpm dlx @lhci/cli@0.15.x autorun
 
+      # Every run's reports (lhr-*.json/.html) and assertion-results.json.
+      # `.lighthouseci/` is a dot-folder, and upload-artifact skips hidden files
+      # unless told otherwise — without the flag it found "no files" and the
+      # artifact was never uploaded.
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: always()
         with:
           name: lighthouse-results
           path: .lighthouseci/
+          include-hidden-files: true
           retention-days: 30

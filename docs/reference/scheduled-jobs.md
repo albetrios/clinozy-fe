@@ -31,7 +31,7 @@ a PR gate, even though both compare docs to code.
 | Workflow                       | Cron (UTC)    | Cadence                         | Purpose                                                  | Signal on failure                       |
 | ------------------------------ | ------------- | ------------------------------- | -------------------------------------------------------- | --------------------------------------- |
 | `cleanup-cache.yml`            | `15 4 * * *`  | daily 04:15                     | GitHub Actions cache cleanup                             | none (housekeeping)                     |
-| `lighthouse.yml`               | `0 3 * * 1`   | weekly Mon 03:00                | performance budgets                                      | report                                  |
+| `lighthouse.yml`               | `0 3 * * 1`   | weekly Mon 03:00                | performance budgets                                      | report (`lighthouse-results` artifact)  |
 | `cross-browser.yml`            | `0 4 * * 1`   | weekly Mon 04:00                | Chrome/Firefox/Safari smoke                              | report                                  |
 | `codeql.yml`                   | `27 4 * * 1`  | weekly Mon 04:27                | security code scanning                                   | security alert                          |
 | `mutation-test.yml`            | `0 5 * * 1`   | weekly Mon 05:00                | Stryker mutation score, pure logic (break 70)            | report                                  |
