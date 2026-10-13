@@ -25,7 +25,8 @@ What was actually built, ledger row by ledger row, against the approved plan in
 - **Planned, not built** (deferred, user OK): none.
 - **Built, not planned:** a `NOSONAR(S6847)` reason on the cookie card's `<dialog>`
   (`ConsentBanner.tsx`, `fc111a3`) — the local SonarQube gate's one finding, on `main` since #57,
-  blocked the push (D10).
+  blocked the push (D10). `main` has since annotated the same line itself; the merge keeps `main`'s
+  wording, so this branch no longer changes the file.
 - **Gates:** `validate:tokens`, `validate:theme-axis`, `validate:structure`, `validate:testids`,
   `validate:public`, `type-check`, `lint`, `biome:check`, `docs:lint`, `sync:check`, `tsdoc:check`,
   `build` + `build:check` ✓; `pnpm size` ✓ initial JS **244.88 kB** in a clean build (ratchet 245 kB;
@@ -41,6 +42,12 @@ What was actually built, ledger row by ledger row, against the approved plan in
   the dev server on :5180 with this container's Chromium (the project pins a newer Playwright build
   than the one installed), video and trace off. SonarQube ran in a Docker daemon started for it,
   with Elasticsearch's disk watermark switched off (the session's disk allowance reads as 91% used).
+- **Before the freeze (D13):** `main` merged in (`3ce426b`: #61 Lighthouse, #55 release 1.13.0) —
+  `index.html` keeps both its new `#root` entering delay and this iteration's `.app-splash-skip`
+  rules; no iteration merged meanwhile, so no overlap to resolve. Re-checked on the merge: type-check,
+  ESLint, Biome (no new warning), 212 test files / 1,977 tests across the touched areas, a clean build
+  (initial JS **244.84 kB**), `build:check`, and the sign-out, boot-splash, cross-tab and
+  session-timeout E2E specs (17/17).
 - **Follow-ups:** none required. Possible later: ask about unsaved changes before signing out (D9).
 
 ## Standing deviations
