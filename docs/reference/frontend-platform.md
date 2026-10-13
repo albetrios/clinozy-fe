@@ -163,6 +163,17 @@ write path for API calls.
 
 - `OfflineIndicator` (`shared/components/OfflineIndicator/`) shows a dismissible
   banner when `navigator.onLine` is false.
+- **Navigations** (`src/sw.ts`) go to the network first; when that fetch fails the
+  worker serves the **precached app shell** (`index.html`), never a blanket
+  "offline" page. A failed fetch is not proof of being offline — a stale DNS answer
+  after a record change, a captive portal or a TLS failure reject it while the
+  device is online — and the shell boots without the network, so the app decides:
+  the splash's offline hold (`AppSplashSlot`) when `navigator.onLine` is false,
+  `OfflineIndicator` after boot, real errors and retries otherwise.
+  `public/offline.html` is the last resort, for a worker with no shell cached.
+  Precached files sit under revisioned cache keys (`?__WB_REVISION__=…`): look them
+  up with `matchPrecache('<file>')`, never `caches.match('/<file>')`, which misses.
+  Pinned by `src/sw.test.ts`.
 - TanStack Query retries skip 401 (auth interceptor owns refresh); other failures
   surface via `QueryBoundary` / `RetryError` on read paths.
 - Below that, `apiClient` retries idempotent requests (GET, HEAD, OPTIONS, PUT,
@@ -179,6 +190,24 @@ write path for API calls.
   while a save runs every exit is held.
 
 Do not silently drop failed writes — show error + retry affordance.
+
+### Service worker emergency reset
+
+Users cannot clear site data, so a misbehaving worker is fixed by a deploy. The
+browser checks `/sw.js` for a new version on navigation, bypassing the HTTP cache
+for the worker script, so an ordinary fix ships as a normal release and reaches
+every open tab through the version-update handshake below. When the worker itself
+has to go:
+
+1. Set `selfDestroying: true` in the `VitePWA` options (`vite.config.ts`) and
+   release. The emitted `sw.js` skips waiting, unregisters itself, reloads every
+   open tab onto the network and deletes every cache — no user action.
+2. Keep that release live long enough for returning users to visit (weeks, not
+   hours), then drop the flag in a follow-up release to bring the worker back.
+3. Never remove the worker by deleting `src/sw.ts` or the `VitePWA` plugin: the
+   SPA catch-all in `netlify.toml` would answer `/sw.js` with `index.html` (200,
+   `text/html`), the browser's update check fails on the MIME type, and the old
+   worker keeps control of every returning user.
 
 ---
 
@@ -214,6 +243,51 @@ Production only (`startVersionCheck()` in `main.tsx`):
   an unconditional `skipWaiting()`. Both error boundaries reuse the same helper.
 - User can tap **Refresh now** anytime — same reload path as the automatic one.
 - At most one reload per advertised `buildId` (sessionStorage loop guard).
+
+### Critical updates
+
+Most releases wait for a safe moment (above). A release that open tabs must not keep
+running — a security fix, a clinozy-be change an older bundle would break on — is
+**critical**, and every older tab is made to take it within a minute.
+
+- **Marking one:** set `MINIMUM_SUPPORTED_VERSION`
+  (`src/core/version/minimum-version.constants.ts`) to the patch bump of the current
+  release, in the PR that carries the fix —
+  [release-versioning.md → Critical releases](../process/release-versioning.md#critical-releases-forced-update).
+  Reviewed in code and pinned to the release tag, so a rollback rebuilds the older tag
+  with its own floor.
+- **The build** (`plugins/version-json.ts`) writes `version` (`VITE_APP_VERSION`) and,
+  only when this build meets the floor, `minimumVersion` into `version.json`
+  (`advertisedMinimumVersion`, `src/lib/app-version.ts`) — trunk builds still carrying
+  the previous release advertise nothing. A floor that is not `major.minor.patch` fails
+  the build.
+- **The tab** (`src/core/version/check.ts`) treats a deploy as critical only when it
+  is sure: its own baked-in version is below `minimumVersion` AND the advertised build
+  meets it. Anything unknown — no version (local builds), a missing or malformed field —
+  takes the ordinary path, so a guess never forces a reload.
+- **What the user sees:** on the boot splash or in a hidden tab, an immediate reload.
+  On screen, the **"Update required"** notice (`app/version/CriticalUpdateNotice.tsx`) —
+  the design's notice pill, bottom centre, as `OfflineIndicator`, one layer above the
+  cookie card (`z-[60]`) — counting down `CRITICAL_UPDATE_GRACE_MS` (60 s) with
+  **Update now** (a phone shows the bare time beside the title; the sentence does not
+  fit). It cannot be dismissed or snoozed, replaces any "Update available" toast, and
+  does not cover the page, so the user can still press Save. The root route mounts
+  only its lazy shell (`CriticalUpdateNoticeLazy`) — the pill loads, precached by the
+  service worker, when a countdown starts. At the deadline the tab reloads **even over a focused
+  field**; unsaved drawers, Settings and onboarding still get the browser's own leave
+  prompt (`useUnsavedChangesGuard`'s `enableBeforeUnload`). A safe moment before the
+  deadline (idle, the tab hidden) reloads sooner.
+- **Offline at the deadline:** the tab waits for the `online` event — an offline reload
+  would only re-serve the cached old shell — and the notice yields its slot to
+  `OfflineIndicator` meanwhile.
+- **Never a loop:** the deadline is set once (later checks never restart or extend
+  it), and the shared reload marker stands down if a reload for that build already
+  happened.
+- **Analytics:** `deployment_update_required`, `deployment_update_required_reload_clicked`.
+- **Pinned by:** `src/core/version/check.test.ts` (critical update),
+  `app/version/CriticalUpdateNotice.test.tsx`, `app/version/CriticalUpdateNoticeLazy.test.tsx`
+  (off the first paint), `app/version/show-critical-update.test.ts`,
+  `src/lib/app-version.test.ts`, `tests/ci/minimum-version.policy.test.ts`.
 
 See **`docs/reference/cross-browser-support.md`** and **`docs/reference/tools-and-usage.md`**.
 

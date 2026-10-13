@@ -74,7 +74,9 @@ export default defineConfig(({ command, mode }) => {
         modeFlag: env.BUILD_I18N_MODE,
         localeFlag: env.BUILD_I18N_LOCALE,
       }),
-      versionJson(buildId),
+      // The release version rides along so version.json can carry the critical-update
+      // floor (src/core/version/minimum-version.constants.ts).
+      versionJson(buildId, { version: env.VITE_APP_VERSION }),
       // Substitutes {{PRODUCT_*}} in index.html; runs `pre` so the CSP pass below
       // sees final markup. Keeps branding out of the rebrand surface entirely.
       productIdentityHtml(),

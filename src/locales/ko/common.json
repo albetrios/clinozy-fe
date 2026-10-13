@@ -96,7 +96,14 @@
   "versionUpdate": {
     "title": "업데이트 사용 가능",
     "description": "앱의 새 버전이 준비되었습니다.",
-    "refresh": "지금 새로 고침"
+    "refresh": "지금 새로 고침",
+    "required": {
+      "title": "업데이트 필요",
+      "countdown": "{{time}} 후 새로 고침",
+      "saveFirst": "작업을 저장한 뒤 업데이트하세요",
+      "announcement": "{{productName}}에 중요한 업데이트가 있어 {{time}} 후 새로 고침됩니다. 지금 작업을 저장하세요.",
+      "updateNow": "지금 업데이트"
+    }
   },
   "cells": {
     "patient": "환자",

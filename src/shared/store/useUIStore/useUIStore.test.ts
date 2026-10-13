@@ -69,3 +69,25 @@ describe('useUIStore — clinic session state', () => {
     expect(useUIStore.getState().previewRole).toBeNull();
   });
 });
+
+describe('useUIStore — critical update', () => {
+  afterEach(() => {
+    useUIStore.setState({ criticalUpdate: null });
+  });
+
+  it('starts with no critical update counting down', () => {
+    expect(useUIStore.getInitialState().criticalUpdate).toBeNull();
+  });
+
+  it('holds the critical update the notice counts down to', () => {
+    const reloadNow = vi.fn();
+    useUIStore
+      .getState()
+      .setCriticalUpdate({ buildId: 'build-NEW', reloadAt: 60_000, reloadNow });
+    expect(useUIStore.getState().criticalUpdate).toEqual({
+      buildId: 'build-NEW',
+      reloadAt: 60_000,
+      reloadNow,
+    });
+  });
+});
