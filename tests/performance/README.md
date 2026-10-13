@@ -58,6 +58,22 @@ above measured (`headroomPercent`), lowered as routes shrink, **never raised to
 absorb growth**. A breach prints the five largest chunks on that route, so it
 names its own cause instead of sending you to a bundle analyzer.
 
+`cssKb` measures the same file as `pnpm size`'s **Initial CSS** — every public
+route loads the one `index-*.css` — so a deliberate move of that limit in
+`tooling/ci/run-size-limit.mjs` re-pins `cssKb` here in the same change. CI runs
+this weekly (`lighthouse.yml`), not per PR, so a budget left behind is found a
+week late.
+
+### Re-pins
+
+Every raise is itemised here — the budget file is JSON and cannot carry its
+reasons. Measured on a CI-equivalent build (no `.env.local`, no ambient
+`VITE_*`), pinned with the script's own `headroomPercent`.
+
+| Date       | Budget                | Before → after | Measured | Cause                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ---------- | --------------------- | -------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-10-13 | `cssKb`, all 7 routes | 23.2 → 35.4 kB | 34.33 kB | The clinic launch's stylesheet (`launch-2026-09-30-jxmr`, decision D36): its design as the default look, the shadcn primitives it composes on and the shared clinic layer every room uses — Tailwind emits a source file's classes whether or not the first screen mounts it. Itemised row by row, with the trims made first, beside the Initial CSS limit in `run-size-limit.mjs` (23.5 → 35.9 kB); this budget was not moved with it. |
+
 ## Lighthouse CI
 
 Category scores and resource budgets for public routes —
