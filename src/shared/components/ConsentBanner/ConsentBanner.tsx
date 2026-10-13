@@ -59,6 +59,8 @@ type ConsentCardView = 'summary' | 'customize';
  * - **The bottom-START corner** (D8): the feedback trigger owns bottom-end. At most 456px wide
  *   (claude.com's), 24px in; below `sm` a full-width inset sheet that rides above the tab bar
  *   through `--floating-bottom-offset` (see `index.css`). Logical `start-*`, so it mirrors under RTL.
+ * - **Tighter than claude.com** (D23): 24px of padding from `sm` (claude.com: 32px) and 24px above
+ *   Save preferences (32px), as asked; phones keep claude.com's 16px.
  *
  * The answer is saved by `saveConsentPreferences` (this browser's cookie and {@link useConsentStore});
  * PostHog and Sentry's recording react to the store. `ConsentBannerLazy` decides when it is mounted.
@@ -137,7 +139,7 @@ export function ConsentBanner() {
       data-slot="surface"
       data-floating=""
       className={cn(
-        'bg-card text-card-foreground fixed z-50 m-0 flex h-auto max-h-[calc(100dvh-1.5rem)] w-auto flex-col overflow-y-auto rounded-3xl border p-4 sm:p-8',
+        'bg-card text-card-foreground fixed z-50 m-0 flex h-auto max-h-[calc(100dvh-1.5rem)] w-auto flex-col overflow-y-auto rounded-3xl border p-4 sm:p-6',
         'inset-x-3 bottom-[calc(var(--floating-bottom-offset,0rem)+env(safe-area-inset-bottom,0rem)+0.75rem)]',
         'sm:inset-x-auto sm:start-6 sm:w-[28.5rem]',
         'sm:bottom-[calc(var(--floating-bottom-offset,0rem)+env(safe-area-inset-bottom,0rem)+1.5rem)]',
@@ -250,7 +252,7 @@ export function ConsentBanner() {
           </div>
           <Button
             ref={saveRef}
-            className="mt-8 w-full"
+            className="mt-6 w-full"
             onClick={saveCustomized}
             data-testid="consent-save"
           >
