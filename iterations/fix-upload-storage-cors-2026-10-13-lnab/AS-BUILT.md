@@ -18,9 +18,9 @@ Baseline: none · KICKOFF.md approved 2026-10-13 ([UF3](plans/decisions.md))
   contact support." instead of "Network request failed". With Chromium's CORS checks off, both
   complete end to end (S3 204 → confirm 200 → the avatar or logo attach 200), so the bucket is
   the only thing left.
-- **Planned, not built:** none. **Built, not planned:** a `NOSONAR(S6847)` annotation on the consent
-  card's `<dialog>` (`ConsentBanner.tsx`) — the one open SonarQube issue, already on `main`, which
-  blocked the push's gate; no behaviour change ([UF9](plans/decisions.md)).
+- **Planned, not built:** none. **Built, not planned:** none in the final diff — the `NOSONAR(S6847)`
+  annotation on the consent card that unblocked the push ([UF9](plans/decisions.md)) gave way to
+  `main`'s own at the merge ([UF10](plans/decisions.md)).
 - **Definition of done (`KICKOFF.md` § 4):** 1 ✓ · 2 ✓ · 3 ✓ · 4 ✓ (`type-check`, `lint`,
   `biome:check`, `format:check`, `sync:check`, `tsdoc:check`; the touched suites 191/191).
 - **AMBER:** the 10 non-English translations are the agent's and want a native read (UF6).
