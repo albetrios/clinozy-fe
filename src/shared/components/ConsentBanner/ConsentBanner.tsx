@@ -126,7 +126,7 @@ export function ConsentBanner() {
   if (!open) return null;
 
   return (
-    <dialog
+    <dialog // NOSONAR(S6847): Escape on the card is Reject all — the dialog pattern's own key, and a non-modal <dialog open> fires no cancel event to listen to instead
       ref={cardRef}
       open
       aria-labelledby={titleId}
