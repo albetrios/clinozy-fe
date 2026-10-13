@@ -1,5 +1,4 @@
 import type { Tone } from '@/shared/api/app/app-schema.ts';
-import type { AUTH_KEYS } from '@/shared/auth/auth-shell.constants.ts';
 import {
   type AppIcon,
   Bell,
@@ -17,8 +16,61 @@ import {
   Wallet,
 } from '@/shared/icons/index.ts';
 
-/** The showcase's translation keys, as a type (the components read the values). */
-type ShowcaseKeys = typeof AUTH_KEYS.showcase;
+/**
+ * The showcase's keys in the `auth` namespace (`showcase.*`). Kept here, not in
+ * `AUTH_KEYS`: that table rides the first-paint chunk, and these belong to the
+ * lazily loaded auth layout (the bundle budget's ratchet).
+ */
+export const AUTH_SHOWCASE_KEYS = {
+  regionLabel: 'showcase.regionLabel',
+  eyebrow: 'showcase.eyebrow',
+  headline: 'showcase.headline',
+  lead: 'showcase.lead',
+  journey: {
+    title: 'showcase.journey.title',
+    live: 'showcase.journey.live',
+    label: 'showcase.journey.label',
+    stops: {
+      enquiry: 'showcase.journey.stops.enquiry',
+      booked: 'showcase.journey.stops.booked',
+      waiting: 'showcase.journey.stops.waiting',
+      withDoctor: 'showcase.journey.stops.withDoctor',
+      treatment: 'showcase.journey.stops.treatment',
+      checkout: 'showcase.journey.stops.checkout',
+      followUp: 'showcase.journey.stops.followUp',
+    },
+  },
+  moments: {
+    label: 'showcase.moments.label',
+    checkIn: {
+      title: 'showcase.moments.checkIn.title',
+      meta: 'showcase.moments.checkIn.meta',
+    },
+    followUp: {
+      title: 'showcase.moments.followUp.title',
+      meta: 'showcase.moments.followUp.meta',
+    },
+    invoice: {
+      title: 'showcase.moments.invoice.title',
+      meta: 'showcase.moments.invoice.meta',
+    },
+  },
+  values: {
+    label: 'showcase.values.label',
+    inStep: {
+      title: 'showcase.values.inStep.title',
+      body: 'showcase.values.inStep.body',
+    },
+    nothingSlips: {
+      title: 'showcase.values.nothingSlips.title',
+      body: 'showcase.values.nothingSlips.body',
+    },
+    calm: { title: 'showcase.values.calm.title', body: 'showcase.values.calm.body' },
+  },
+  privacy: 'showcase.privacy',
+} as const;
+
+type ShowcaseKeys = typeof AUTH_SHOWCASE_KEYS;
 
 /** The showcase's test ids (KICKOFF §6.4 of change-shell-polish-and-sign-in). */
 export const AUTH_SHOWCASE_TEST_IDS = {
@@ -91,9 +143,9 @@ export const SHOWCASE_VALUES: readonly ShowcaseValue[] = [
 ];
 
 /**
- * The showcase's soft tonal canvas: four section tones washed in from the
+ * The showcase's soft tonal canvas: three section tones washed in from the
  * corners over the card colour — tokens only, so dark mode and every preset
  * follow. One literal so Tailwind sees it.
  */
 export const SHOWCASE_WASH =
-  'bg-card bg-[radial-gradient(60%_55%_at_0%_0%,var(--color-tone-lav),transparent_70%),radial-gradient(50%_45%_at_100%_0%,var(--color-tone-sky),transparent_70%),radial-gradient(55%_50%_at_100%_100%,var(--color-tone-peach),transparent_70%),radial-gradient(50%_50%_at_0%_100%,var(--color-tone-sage),transparent_70%)]';
+  'bg-card bg-[radial-gradient(60%_55%_at_0%_0%,var(--color-tone-lav),transparent_70%),radial-gradient(50%_45%_at_100%_0%,var(--color-tone-sky),transparent_70%),radial-gradient(60%_50%_at_100%_100%,var(--color-tone-peach),transparent_70%)]';

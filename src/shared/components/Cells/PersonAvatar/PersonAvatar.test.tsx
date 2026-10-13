@@ -115,7 +115,12 @@ describe('PersonAvatar', () => {
       <PersonAvatar initials="NK" tone="sage" size="list" selected />,
     );
     const disc = container.querySelector('[data-slot="avatar"]');
-    expect(disc).toHaveClass('ring-[1.5px]', 'ring-offset-2', 'ring-tone-sage-edge');
+    expect(disc).toHaveClass(
+      'ring-[1.5px]',
+      'ring-offset-2',
+      'inset-ring-tone-sage-edge',
+      'ring-[color:var(--tw-inset-ring-color)]',
+    );
     expect(disc).not.toHaveClass('ring-1', 'ring-tone-sage-foreground');
   });
 

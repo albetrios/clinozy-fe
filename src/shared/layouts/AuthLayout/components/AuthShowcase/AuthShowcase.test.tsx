@@ -49,7 +49,10 @@ describe('AuthShowcase', () => {
       const pill = stop.querySelector('[data-slot="pill"]');
       expect(pill).toHaveAttribute('data-tone', JOURNEY_STOPS[index]?.tone);
       // The wave lights them in turn — and stands still under reduced motion.
-      expect(pill).toHaveClass('animate-journey-wave', 'motion-reduce:animate-none');
+      expect(pill).toHaveClass(
+        'animate-[journey-wave_8400ms_ease-in-out_infinite_both]',
+        'motion-reduce:animate-none',
+      );
       expect(pill).toHaveClass(JOURNEY_STOPS[index]?.delay ?? '');
     });
   });
@@ -59,7 +62,10 @@ describe('AuthShowcase', () => {
     const moments = await findByRole('list', { name: 'Moments from a clinic day' });
     expect(within(moments).getAllByRole('listitem')).toHaveLength(3);
     for (const moment of within(moments).getAllByRole('listitem')) {
-      expect(moment).toHaveClass('animate-drift', 'motion-reduce:animate-none');
+      expect(moment).toHaveClass(
+        'animate-[drift_6000ms_ease-in-out_infinite_alternate_both]',
+        'motion-reduce:animate-none',
+      );
     }
     const values = getByRole('list', { name: `Why clinics choose ${PRODUCT_NAME}` });
     expect(

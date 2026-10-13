@@ -8,17 +8,18 @@ import { TONE_VALUES } from '@/shared/api/app/app-schema.ts';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../../..');
 const css = readFileSync(join(root, 'src/index.css'), 'utf8');
-/** The inline theme without whitespace — Prettier wraps a long `color-mix()`. */
-const inlineTheme = css.slice(css.indexOf('@theme inline {')).replaceAll(/\s/g, '');
+/** The stylesheet without whitespace — Prettier wraps a long `color-mix()`. */
+const flat = css.replaceAll(/\s/g, '');
+const theme = flat.slice(flat.indexOf('@theme{'), flat.indexOf('@themeinline{'));
 
 describe('the picked-badge edge tokens', () => {
-  it('derives every tone’s edge from its own ink and dot, in the inline theme', () => {
+  it('derives every tone’s edge from its own ink and dot — declared once, in the theme', () => {
     for (const tone of TONE_VALUES.filter((value) => value !== 'stone')) {
-      expect(inlineTheme).toContain(
+      expect(theme).toContain(
         `--color-tone-${tone}-edge:color-mix(inoklab,var(--color-tone-${tone}-foreground)var(--tone-edge-ink),var(--color-tone-${tone}-dot));`,
       );
     }
-    expect(inlineTheme).toContain(
+    expect(theme).toContain(
       '--color-tone-stone-edge:color-mix(inoklab,var(--color-foreground-soft)55%,var(--color-border-strong));',
     );
   });

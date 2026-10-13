@@ -107,16 +107,16 @@ export const REASON_KINDS: Readonly<Record<ConfirmReasonKind, ReasonKindCopy>> =
 
 /**
  * Chip tones by position — blush · butter · lav, then stone for the rest: the
- * fill and ink; hover a 1px edge and picked a 1.5px edge, both in the tone's
- * edge colour, picked with a soft halo in its dot (the design's ink ring became
- * the tone's own hue in change-shell-polish-and-sign-in, D7). Whole literals so
- * Tailwind can see every class.
+ * fill and ink, and the edge colour the chip's hover (1px) and pick (1.5px and
+ * the shared halo, `ReasonConfirm`'s CHIP_CLASS) draw in — the design's ink ring
+ * became the tone's own hue in change-shell-polish-and-sign-in, D7. Whole
+ * literals so Tailwind can see every class.
  */
 const REASON_CHIP_TONES = [
-  'bg-tone-blush text-tone-blush-foreground hover:inset-ring-tone-blush-edge data-[state=checked]:inset-ring-tone-blush-edge data-[state=checked]:ring-tone-blush-dot/22',
-  'bg-tone-butter text-tone-butter-foreground hover:inset-ring-tone-butter-edge data-[state=checked]:inset-ring-tone-butter-edge data-[state=checked]:ring-tone-butter-dot/22',
-  'bg-tone-lav text-tone-lav-foreground hover:inset-ring-tone-lav-edge data-[state=checked]:inset-ring-tone-lav-edge data-[state=checked]:ring-tone-lav-dot/22',
-  'bg-tone-stone text-tone-stone-foreground hover:inset-ring-tone-stone-edge data-[state=checked]:inset-ring-tone-stone-edge data-[state=checked]:ring-tone-stone-dot/22',
+  'bg-tone-blush text-tone-blush-foreground inset-ring-tone-blush-edge',
+  'bg-tone-butter text-tone-butter-foreground inset-ring-tone-butter-edge',
+  'bg-tone-lav text-tone-lav-foreground inset-ring-tone-lav-edge',
+  'bg-tone-stone text-tone-stone-foreground inset-ring-tone-stone-edge',
 ] as const;
 
 /** The tone classes of the chip at `index` (stone from the fourth on). */

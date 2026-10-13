@@ -1,13 +1,16 @@
 import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 import { cn } from '@/lib/utils.ts';
 import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
-import { AUTH_KEYS, AUTH_NS } from '@/shared/auth/auth-shell.constants.ts';
-import { TonePill } from '@/shared/components/Cells/index.ts';
+// The unit, not the Cells barrel: the barrel would make this lazy chunk an
+// importer of every cell and re-split them onto the first-paint chunk map.
+import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import { Lock } from '@/shared/icons/index.ts';
 
 import {
+  AUTH_SHOWCASE_KEYS,
   AUTH_SHOWCASE_TEST_IDS,
   JOURNEY_STOPS,
   SHOWCASE_MOMENTS,
@@ -15,14 +18,17 @@ import {
   SHOWCASE_WASH,
 } from './auth-showcase.constants.ts';
 
-const K = AUTH_KEYS.showcase;
+const K = AUTH_SHOWCASE_KEYS;
+/** The `auth` namespace, read from the registry: importing `AUTH_NS` would pull
+ * the first-paint auth constants into this lazy chunk's graph and re-split them. */
+const AUTH_NS = I18N_NAMESPACES.auth;
 
 /** The live dot: the sage dot with a breathing halo (still under reduced motion). */
 function LiveDot() {
   return (
     <span
       aria-hidden="true"
-      className="bg-tone-sage-dot text-tone-sage-dot animate-pulse-dot size-1.5 flex-none rounded-full motion-reduce:animate-none"
+      className="bg-tone-sage-dot size-1.5 flex-none animate-[pulse-dot_2400ms_ease-in-out_infinite] rounded-full motion-reduce:animate-none"
     />
   );
 }
@@ -41,24 +47,24 @@ export function AuthShowcaseHero({ className }: { className?: string }) {
       aria-labelledby={headingId}
       data-testid={AUTH_SHOWCASE_TEST_IDS.hero}
       className={cn(
-        'flex flex-col items-center gap-3 text-center lg:items-start lg:gap-4 lg:text-start',
+        'flex flex-col items-center gap-3 text-center lg:items-start lg:text-start',
         className,
       )}
     >
       <span
         data-slot="pill"
-        className="bg-card/80 text-foreground-soft text-caption inline-flex h-7 items-center gap-2 rounded-full border px-3 font-medium backdrop-blur-sm"
+        className="bg-card text-foreground-soft text-caption inline-flex h-7 items-center gap-2 rounded-full border px-3 font-medium"
       >
         <LiveDot />
         {t(K.eyebrow)}
       </span>
       <h2
         id={headingId}
-        className="font-heading text-foreground text-3xl leading-[1.08] font-semibold tracking-[-0.03em] text-balance sm:text-4xl xl:text-5xl"
+        className="font-heading text-foreground text-4xl leading-[1.08] font-semibold tracking-[-0.03em] text-balance xl:text-5xl"
       >
         {t(K.headline)}
       </h2>
-      <p className="text-body sm:text-field text-muted-foreground-strong max-w-xl text-pretty">
+      <p className="text-body text-muted-foreground-strong max-w-xl text-pretty">
         {t(K.lead)}
       </p>
     </section>
@@ -72,7 +78,7 @@ function Journey() {
     <div
       data-slot="surface"
       data-testid={AUTH_SHOWCASE_TEST_IDS.journey}
-      className="bg-card/85 flex flex-col gap-3 rounded-2xl border p-4 backdrop-blur-sm"
+      className="bg-card flex flex-col gap-3 rounded-2xl border p-4"
     >
       <div className="flex items-center justify-between gap-3">
         <p className="text-detail text-foreground font-semibold">{t(K.journey.title)}</p>
@@ -94,7 +100,7 @@ function Journey() {
               icon={<stop.icon />}
               data-stop={stop.id}
               className={cn(
-                'animate-journey-wave motion-reduce:animate-none',
+                'animate-[journey-wave_8400ms_ease-in-out_infinite_both] motion-reduce:animate-none',
                 stop.delay,
               )}
             >
@@ -121,7 +127,7 @@ function Moments() {
           key={moment.id}
           data-slot="surface"
           className={cn(
-            'bg-card/90 animate-drift flex items-center gap-2.5 rounded-xl border px-3 py-2.5 backdrop-blur-sm motion-reduce:animate-none sm:flex-col sm:items-start',
+            'bg-card flex animate-[drift_6000ms_ease-in-out_infinite_alternate_both] flex-col items-start gap-2.5 rounded-xl border px-3 py-2.5 motion-reduce:animate-none',
             moment.delay,
           )}
         >
@@ -196,7 +202,7 @@ export function AuthShowcaseBoard({ className }: { className?: string }) {
       data-testid={AUTH_SHOWCASE_TEST_IDS.board}
       className={cn(
         SHOWCASE_WASH,
-        'flex flex-col gap-3 rounded-2xl border p-3 sm:p-4',
+        'flex flex-col gap-3 rounded-2xl border p-3',
         'lg:rounded-none lg:border-0 lg:bg-transparent lg:bg-none lg:p-0',
         className,
       )}

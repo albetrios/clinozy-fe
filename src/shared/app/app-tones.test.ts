@@ -20,6 +20,7 @@ import {
   PATIENT_CONVERSION_TONES,
   PATIENT_STATUS_TONES,
   PATIENT_TYPE_TONES,
+  PICKED_HALO,
   ROLE_TONES,
   SECTION_TONES,
   TONE_CLASSES,
@@ -125,11 +126,13 @@ describe('list-row states', () => {
   it('outlines a picked badge in its tone’s edge colour and halo, never its ink', () => {
     for (const tone of TONE_VALUES) {
       const { ring, selected, selectedHover } = TONE_CLASSES[tone];
-      expect(ring).toBe(`ring-1 ring-tone-${tone}-edge`);
-      expect(selected).toBe(
-        `inset-ring-[1.5px] inset-ring-tone-${tone}-edge ring-3 ring-tone-${tone}-dot/22`,
+      expect(ring).toBe(
+        `inset-ring-tone-${tone}-edge ring-1 ring-[color:var(--tw-inset-ring-color)]`,
       );
-      expect(selectedHover).toBe(`hover:inset-ring hover:inset-ring-tone-${tone}-edge`);
+      expect(selected).toBe(
+        `inset-ring-[1.5px] inset-ring-tone-${tone}-edge ${PICKED_HALO}`,
+      );
+      expect(selectedHover).toBe(`inset-ring-tone-${tone}-edge hover:inset-ring`);
       for (const value of [ring, selected, selectedHover]) {
         expect(value).not.toContain('-foreground');
       }

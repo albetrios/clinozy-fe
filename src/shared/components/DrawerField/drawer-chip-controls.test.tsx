@@ -132,11 +132,7 @@ describe('DrawerChips — the drawer’s chip field (H:905)', () => {
     );
     const doctor = screen.getByRole('button', { name: 'Doctor' });
     // Untoned: stone's edge and halo, not the black `foreground` ring.
-    expect(doctor).toHaveClass(
-      'bg-muted',
-      'inset-ring-tone-stone-edge',
-      'ring-tone-stone-dot/22',
-    );
+    expect(doctor).toHaveClass('bg-muted', 'inset-ring-tone-stone-edge', 'ring-3');
     expect(doctor).not.toHaveClass('ring-current', 'border-current', 'ring-foreground');
     expect(screen.getByRole('button', { name: 'Patient' }).className).toContain(
       'border-transparent',

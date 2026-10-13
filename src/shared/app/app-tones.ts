@@ -318,15 +318,19 @@ export interface ToneClasses {
    * A 1px ring in the tone's edge colour (`--color-tone-<tone>-edge` — its ink
    * mixed into its dot, never the near-black ink): a picked avatar, the current
    * file section, a fresh clinical chip. Callers may widen it (`ring-[1.5px]`).
+   * The colour rides `--tw-inset-ring-color`, so one ring rule serves every tone.
    */
   ring: string;
   /**
    * A picked chip or tile: a 1.5px inset edge in the tone's edge colour and a
-   * 3px halo in its dot at 22% — the badge stays in its own hue instead of the
-   * design's ink ring (iteration change-shell-polish-and-sign-in, D7).
+   * 3px halo of that edge at 24% ({@link PICKED_HALO}) — the badge stays in its
+   * own hue instead of the design's ink ring (change-shell-polish-and-sign-in, D7).
    */
   selected: string;
-  /** The hover preview of {@link ToneClasses.selected}: a 1px inset edge, no halo. */
+  /**
+   * The hover preview of {@link ToneClasses.selected}: the edge colour always
+   * set, a 1px inset edge only on hover, no halo.
+   */
   selectedHover: string;
   /** The tab-tint hover: the tone at 45% and an inset 1px ink ring at 16%. */
   hover: string;
@@ -349,6 +353,15 @@ export interface ToneClasses {
 }
 
 /**
+ * A picked badge's 3px halo, the same for every tone: its colour is the
+ * element's own edge (`--tw-inset-ring-color`, set by the tone's
+ * `inset-ring-tone-<tone>-edge`) at 24%. One rule for all eleven tones — the
+ * first-paint CSS budget is a ratchet.
+ */
+export const PICKED_HALO =
+  'ring-3 ring-[color-mix(in_oklab,var(--tw-inset-ring-color)_24%,transparent)]';
+
+/**
  * Tone → classes, as full literals so Tailwind can see every one (a class built
  * as `bg-tone-${tone}` is never generated). Tone rules: KICKOFF §3.1.
  */
@@ -361,10 +374,9 @@ export const TONE_CLASSES: Readonly<Record<Tone, ToneClasses>> = {
     border: 'border-tone-butter-border',
     dot: 'bg-tone-butter-dot',
     halo: 'ring-3 ring-tone-butter-dot/18',
-    ring: 'ring-1 ring-tone-butter-edge',
-    selected:
-      'inset-ring-[1.5px] inset-ring-tone-butter-edge ring-3 ring-tone-butter-dot/22',
-    selectedHover: 'hover:inset-ring hover:inset-ring-tone-butter-edge',
+    ring: 'inset-ring-tone-butter-edge ring-1 ring-[color:var(--tw-inset-ring-color)]',
+    selected: `inset-ring-[1.5px] inset-ring-tone-butter-edge ${PICKED_HALO}`,
+    selectedHover: 'inset-ring-tone-butter-edge hover:inset-ring',
     hover:
       'hover:bg-tone-butter/45 hover:inset-ring hover:inset-ring-tone-butter-foreground/16',
     active: 'data-[selected=true]:bg-tone-butter/55',
@@ -381,9 +393,9 @@ export const TONE_CLASSES: Readonly<Record<Tone, ToneClasses>> = {
     border: 'border-tone-lav-border',
     dot: 'bg-tone-lav-dot',
     halo: 'ring-3 ring-tone-lav-dot/18',
-    ring: 'ring-1 ring-tone-lav-edge',
-    selected: 'inset-ring-[1.5px] inset-ring-tone-lav-edge ring-3 ring-tone-lav-dot/22',
-    selectedHover: 'hover:inset-ring hover:inset-ring-tone-lav-edge',
+    ring: 'inset-ring-tone-lav-edge ring-1 ring-[color:var(--tw-inset-ring-color)]',
+    selected: `inset-ring-[1.5px] inset-ring-tone-lav-edge ${PICKED_HALO}`,
+    selectedHover: 'inset-ring-tone-lav-edge hover:inset-ring',
     hover:
       'hover:bg-tone-lav/45 hover:inset-ring hover:inset-ring-tone-lav-foreground/16',
     active: 'data-[selected=true]:bg-tone-lav/55',
@@ -400,9 +412,9 @@ export const TONE_CLASSES: Readonly<Record<Tone, ToneClasses>> = {
     border: 'border-tone-sky-border',
     dot: 'bg-tone-sky-dot',
     halo: 'ring-3 ring-tone-sky-dot/18',
-    ring: 'ring-1 ring-tone-sky-edge',
-    selected: 'inset-ring-[1.5px] inset-ring-tone-sky-edge ring-3 ring-tone-sky-dot/22',
-    selectedHover: 'hover:inset-ring hover:inset-ring-tone-sky-edge',
+    ring: 'inset-ring-tone-sky-edge ring-1 ring-[color:var(--tw-inset-ring-color)]',
+    selected: `inset-ring-[1.5px] inset-ring-tone-sky-edge ${PICKED_HALO}`,
+    selectedHover: 'inset-ring-tone-sky-edge hover:inset-ring',
     hover:
       'hover:bg-tone-sky/45 hover:inset-ring hover:inset-ring-tone-sky-foreground/16',
     active: 'data-[selected=true]:bg-tone-sky/55',
@@ -419,9 +431,9 @@ export const TONE_CLASSES: Readonly<Record<Tone, ToneClasses>> = {
     border: 'border-tone-sage-border',
     dot: 'bg-tone-sage-dot',
     halo: 'ring-3 ring-tone-sage-dot/18',
-    ring: 'ring-1 ring-tone-sage-edge',
-    selected: 'inset-ring-[1.5px] inset-ring-tone-sage-edge ring-3 ring-tone-sage-dot/22',
-    selectedHover: 'hover:inset-ring hover:inset-ring-tone-sage-edge',
+    ring: 'inset-ring-tone-sage-edge ring-1 ring-[color:var(--tw-inset-ring-color)]',
+    selected: `inset-ring-[1.5px] inset-ring-tone-sage-edge ${PICKED_HALO}`,
+    selectedHover: 'inset-ring-tone-sage-edge hover:inset-ring',
     hover:
       'hover:bg-tone-sage/45 hover:inset-ring hover:inset-ring-tone-sage-foreground/16',
     active: 'data-[selected=true]:bg-tone-sage/55',
@@ -438,10 +450,9 @@ export const TONE_CLASSES: Readonly<Record<Tone, ToneClasses>> = {
     border: 'border-tone-blush-border',
     dot: 'bg-tone-blush-dot',
     halo: 'ring-3 ring-tone-blush-dot/18',
-    ring: 'ring-1 ring-tone-blush-edge',
-    selected:
-      'inset-ring-[1.5px] inset-ring-tone-blush-edge ring-3 ring-tone-blush-dot/22',
-    selectedHover: 'hover:inset-ring hover:inset-ring-tone-blush-edge',
+    ring: 'inset-ring-tone-blush-edge ring-1 ring-[color:var(--tw-inset-ring-color)]',
+    selected: `inset-ring-[1.5px] inset-ring-tone-blush-edge ${PICKED_HALO}`,
+    selectedHover: 'inset-ring-tone-blush-edge hover:inset-ring',
     hover:
       'hover:bg-tone-blush/45 hover:inset-ring hover:inset-ring-tone-blush-foreground/16',
     active: 'data-[selected=true]:bg-tone-blush/55',
@@ -458,9 +469,9 @@ export const TONE_CLASSES: Readonly<Record<Tone, ToneClasses>> = {
     border: 'border-tone-mint-border',
     dot: 'bg-tone-mint-dot',
     halo: 'ring-3 ring-tone-mint-dot/18',
-    ring: 'ring-1 ring-tone-mint-edge',
-    selected: 'inset-ring-[1.5px] inset-ring-tone-mint-edge ring-3 ring-tone-mint-dot/22',
-    selectedHover: 'hover:inset-ring hover:inset-ring-tone-mint-edge',
+    ring: 'inset-ring-tone-mint-edge ring-1 ring-[color:var(--tw-inset-ring-color)]',
+    selected: `inset-ring-[1.5px] inset-ring-tone-mint-edge ${PICKED_HALO}`,
+    selectedHover: 'inset-ring-tone-mint-edge hover:inset-ring',
     hover:
       'hover:bg-tone-mint/45 hover:inset-ring hover:inset-ring-tone-mint-foreground/16',
     active: 'data-[selected=true]:bg-tone-mint/55',
@@ -477,10 +488,9 @@ export const TONE_CLASSES: Readonly<Record<Tone, ToneClasses>> = {
     border: 'border-tone-peach-border',
     dot: 'bg-tone-peach-dot',
     halo: 'ring-3 ring-tone-peach-dot/18',
-    ring: 'ring-1 ring-tone-peach-edge',
-    selected:
-      'inset-ring-[1.5px] inset-ring-tone-peach-edge ring-3 ring-tone-peach-dot/22',
-    selectedHover: 'hover:inset-ring hover:inset-ring-tone-peach-edge',
+    ring: 'inset-ring-tone-peach-edge ring-1 ring-[color:var(--tw-inset-ring-color)]',
+    selected: `inset-ring-[1.5px] inset-ring-tone-peach-edge ${PICKED_HALO}`,
+    selectedHover: 'inset-ring-tone-peach-edge hover:inset-ring',
     hover:
       'hover:bg-tone-peach/45 hover:inset-ring hover:inset-ring-tone-peach-foreground/16',
     active: 'data-[selected=true]:bg-tone-peach/55',
@@ -497,9 +507,9 @@ export const TONE_CLASSES: Readonly<Record<Tone, ToneClasses>> = {
     border: 'border-tone-plum-border',
     dot: 'bg-tone-plum-dot',
     halo: 'ring-3 ring-tone-plum-dot/18',
-    ring: 'ring-1 ring-tone-plum-edge',
-    selected: 'inset-ring-[1.5px] inset-ring-tone-plum-edge ring-3 ring-tone-plum-dot/22',
-    selectedHover: 'hover:inset-ring hover:inset-ring-tone-plum-edge',
+    ring: 'inset-ring-tone-plum-edge ring-1 ring-[color:var(--tw-inset-ring-color)]',
+    selected: `inset-ring-[1.5px] inset-ring-tone-plum-edge ${PICKED_HALO}`,
+    selectedHover: 'inset-ring-tone-plum-edge hover:inset-ring',
     hover:
       'hover:bg-tone-plum/45 hover:inset-ring hover:inset-ring-tone-plum-foreground/16',
     active: 'data-[selected=true]:bg-tone-plum/55',
@@ -516,9 +526,9 @@ export const TONE_CLASSES: Readonly<Record<Tone, ToneClasses>> = {
     border: 'border-tone-lime-border',
     dot: 'bg-tone-lime-dot',
     halo: 'ring-3 ring-tone-lime-dot/18',
-    ring: 'ring-1 ring-tone-lime-edge',
-    selected: 'inset-ring-[1.5px] inset-ring-tone-lime-edge ring-3 ring-tone-lime-dot/22',
-    selectedHover: 'hover:inset-ring hover:inset-ring-tone-lime-edge',
+    ring: 'inset-ring-tone-lime-edge ring-1 ring-[color:var(--tw-inset-ring-color)]',
+    selected: `inset-ring-[1.5px] inset-ring-tone-lime-edge ${PICKED_HALO}`,
+    selectedHover: 'inset-ring-tone-lime-edge hover:inset-ring',
     hover:
       'hover:bg-tone-lime/45 hover:inset-ring hover:inset-ring-tone-lime-foreground/16',
     active: 'data-[selected=true]:bg-tone-lime/55',
@@ -535,10 +545,9 @@ export const TONE_CLASSES: Readonly<Record<Tone, ToneClasses>> = {
     border: 'border-tone-slate-border',
     dot: 'bg-tone-slate-dot',
     halo: 'ring-3 ring-tone-slate-dot/18',
-    ring: 'ring-1 ring-tone-slate-edge',
-    selected:
-      'inset-ring-[1.5px] inset-ring-tone-slate-edge ring-3 ring-tone-slate-dot/22',
-    selectedHover: 'hover:inset-ring hover:inset-ring-tone-slate-edge',
+    ring: 'inset-ring-tone-slate-edge ring-1 ring-[color:var(--tw-inset-ring-color)]',
+    selected: `inset-ring-[1.5px] inset-ring-tone-slate-edge ${PICKED_HALO}`,
+    selectedHover: 'inset-ring-tone-slate-edge hover:inset-ring',
     hover:
       'hover:bg-tone-slate/45 hover:inset-ring hover:inset-ring-tone-slate-foreground/16',
     active: 'data-[selected=true]:bg-tone-slate/55',
@@ -555,10 +564,9 @@ export const TONE_CLASSES: Readonly<Record<Tone, ToneClasses>> = {
     border: 'border-tone-stone-border',
     dot: 'bg-tone-stone-dot',
     halo: 'ring-3 ring-tone-stone-dot/18',
-    ring: 'ring-1 ring-tone-stone-edge',
-    selected:
-      'inset-ring-[1.5px] inset-ring-tone-stone-edge ring-3 ring-tone-stone-dot/22',
-    selectedHover: 'hover:inset-ring hover:inset-ring-tone-stone-edge',
+    ring: 'inset-ring-tone-stone-edge ring-1 ring-[color:var(--tw-inset-ring-color)]',
+    selected: `inset-ring-[1.5px] inset-ring-tone-stone-edge ${PICKED_HALO}`,
+    selectedHover: 'inset-ring-tone-stone-edge hover:inset-ring',
     hover:
       'hover:bg-tone-stone/45 hover:inset-ring hover:inset-ring-tone-stone-foreground/16',
     active: 'data-[selected=true]:bg-tone-stone/55',

@@ -41,7 +41,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
       controls={<AuthControls surface="frame" />}
       className="justify-start pt-3 lg:justify-center lg:pt-2"
     >
-      <div className="grid w-full max-w-xl gap-6 lg:max-w-6xl lg:grid-cols-[minmax(0,1.25fr)_minmax(22.5rem,1fr)] lg:grid-rows-[auto_1fr] lg:gap-x-12 lg:gap-y-6">
+      <div className="grid w-full max-w-xl gap-6 lg:max-w-6xl lg:grid-cols-[5fr_4fr] lg:grid-rows-[auto_1fr] lg:gap-x-12 lg:gap-y-6">
         <AuthShowcaseCanvas className="lg:col-start-1 lg:row-span-2 lg:row-start-1" />
         <AuthShowcaseHero className="lg:col-start-1 lg:row-start-1 lg:px-10 lg:pt-10" />
         <div className="flex flex-col items-center gap-3 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-center">

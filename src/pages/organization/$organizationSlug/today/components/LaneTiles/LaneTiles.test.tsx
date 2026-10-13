@@ -80,14 +80,14 @@ describe('LaneTiles (KICKOFF §6.2 Lane tiles)', () => {
     );
     const group = await screen.findByRole('group', { name: 'Lanes' });
     const waiting = within(group).getByRole('button', { pressed: true });
-    expect(waiting).toHaveClass(
-      'border-tone-butter-edge',
-      'ring-3',
-      'ring-tone-butter-dot/22',
-    );
+    expect(waiting).toHaveClass('border-[color:var(--tw-inset-ring-color)]', 'ring-3');
+    expect(waiting).toHaveClass('inset-ring-tone-butter-edge');
     expect(waiting).not.toHaveClass('border-tone-butter-foreground');
     const arriving = within(group).getAllByRole('button', { pressed: false })[1];
-    expect(arriving).toHaveClass('hover:border-tone-sky-edge');
+    expect(arriving).toHaveClass(
+      'inset-ring-tone-sky-edge',
+      'hover:border-[color:var(--tw-inset-ring-color)]',
+    );
     expect(arriving).not.toHaveClass('ring-3');
   });
 
