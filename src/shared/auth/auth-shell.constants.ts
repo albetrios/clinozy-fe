@@ -138,6 +138,55 @@ export const AUTH_KEYS = {
     oauthNoRedirect: 'apiErrors.oauthNoRedirect',
     passkeyCancelled: 'apiErrors.passkeyCancelled',
   },
+  /** The sign-in screen's showcase (`AuthShowcase`): what Clinozy is, before a member signs in. */
+  showcase: {
+    regionLabel: 'showcase.regionLabel',
+    eyebrow: 'showcase.eyebrow',
+    headline: 'showcase.headline',
+    lead: 'showcase.lead',
+    journey: {
+      title: 'showcase.journey.title',
+      live: 'showcase.journey.live',
+      label: 'showcase.journey.label',
+      stops: {
+        enquiry: 'showcase.journey.stops.enquiry',
+        booked: 'showcase.journey.stops.booked',
+        waiting: 'showcase.journey.stops.waiting',
+        withDoctor: 'showcase.journey.stops.withDoctor',
+        treatment: 'showcase.journey.stops.treatment',
+        checkout: 'showcase.journey.stops.checkout',
+        followUp: 'showcase.journey.stops.followUp',
+      },
+    },
+    moments: {
+      label: 'showcase.moments.label',
+      checkIn: {
+        title: 'showcase.moments.checkIn.title',
+        meta: 'showcase.moments.checkIn.meta',
+      },
+      followUp: {
+        title: 'showcase.moments.followUp.title',
+        meta: 'showcase.moments.followUp.meta',
+      },
+      invoice: {
+        title: 'showcase.moments.invoice.title',
+        meta: 'showcase.moments.invoice.meta',
+      },
+    },
+    values: {
+      label: 'showcase.values.label',
+      inStep: {
+        title: 'showcase.values.inStep.title',
+        body: 'showcase.values.inStep.body',
+      },
+      nothingSlips: {
+        title: 'showcase.values.nothingSlips.title',
+        body: 'showcase.values.nothingSlips.body',
+      },
+      calm: { title: 'showcase.values.calm.title', body: 'showcase.values.calm.body' },
+    },
+    privacy: 'showcase.privacy',
+  },
 } as const;
 
 export const AUTH_EMAIL_VERIFICATION_CODE_LENGTH = 6;
