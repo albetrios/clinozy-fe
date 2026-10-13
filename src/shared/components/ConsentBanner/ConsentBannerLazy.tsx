@@ -5,7 +5,7 @@ import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
 import { onceAsync } from '@/lib/lazy-module.ts';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import {
-  selectCurrentConsent,
+  selectConsentCardOpen,
   useConsentStore,
 } from '@/shared/store/useConsentStore/index.ts';
 
@@ -16,28 +16,28 @@ const ConsentBannerCard = lazy(() =>
 );
 
 /**
- * The cookie-consent card, off the first-paint path.
+ * The cookie card, off the first-paint path.
  *
  * It is mounted on the ROOT route, so a static import put the whole card in the
- * entry chunk of every load — for a surface that a returning visitor (decision
- * already stored) never sees at all, and that a new one does not need until the
- * page they came for is up. Undecided visitors fetch it on demand; it slides in
- * a beat after the content, which is how it was designed to arrive anyway.
+ * entry chunk of every load — for a surface that a returning visitor (answer
+ * already in the cookie) never sees at all, and that a new one does not need until
+ * the page they came for is up. The card is fetched on demand — when this browser
+ * has no standing answer, or when Privacy choices reopens it — and slides in a
+ * beat after the content, which is how it was designed to arrive anyway.
  *
- * Failure is silent on purpose. No card means no decision, and no decision means
- * analytics stays OFF (`hasAnalyticsConsent()` is false until `granted`) — the
- * privacy-safe outcome — while an error card in a fixed corner would have
+ * Failure is silent on purpose. No card means no answer, and no answer means
+ * analytics stays OFF (`hasAnalyticsConsent()` is false until Analytics is on) —
+ * the privacy-safe outcome — while an error card in a fixed corner would have
  * nowhere sensible to sit. The throw is still reported by the boundary.
  */
 export function ConsentBannerLazy() {
   const { t } = useTranslation(LOCALE_NS);
-  // No standing answer — none yet, six months old, or to an older policy version (D161).
-  const undecided = useConsentStore((s) => selectCurrentConsent(s) === null);
+  const open = useConsentStore(selectConsentCardOpen);
 
-  if (!undecided) return null;
+  if (!open) return null;
 
   return (
-    <SectionErrorBoundary title={t(LOCALE_KEYS.cookieConsent)} variant="silent">
+    <SectionErrorBoundary title={t(LOCALE_KEYS.consentTitle)} variant="silent">
       <Suspense fallback={null}>
         <ConsentBannerCard />
       </Suspense>

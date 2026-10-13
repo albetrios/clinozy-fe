@@ -18,7 +18,7 @@ with `.env.local`. No production build required.
 
 Without a DSN, init is a no-op. Error reports are **not** gated by the consent card
 (legitimate-interest error monitoring); session replay and profiling are, like
-PostHog (see **Consent** below, D161).
+PostHog (see **Consent** below).
 
 To verify in dev:
 
@@ -84,7 +84,7 @@ not land on the critical preload path. `reportError` / `reportReactError` use th
 same lazy import pattern.
 
 **Consent:** error reports, logs and feedback run under **legitimate interest** and
-are **not** gated by the consent card. **Session replay and profiling are** (D161):
+are **not** gated by the consent card. **Session replay and profiling are** (the Analytics category of the cookie card):
 `buildIntegrations` adds them only while the analytics consent stands; a later grant
 adds replay (`Sentry.addIntegration`, sampled as configured), a withdrawal stops it at
 once (`Sentry.getReplay()?.stop()`). Profiling is decided at init only — the SDK can

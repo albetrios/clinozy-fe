@@ -6,8 +6,13 @@ import { platformConfig } from '@/core/config/env.ts';
 import type { AuthUser } from '@/shared/auth/types.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
-import { useConsentStore } from '@/shared/store/useConsentStore/index.ts';
+import {
+  ACCEPT_ALL_CONSENT_PREFERENCES,
+  REJECT_ALL_CONSENT_PREFERENCES,
+  useConsentStore,
+} from '@/shared/store/useConsentStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { resetConsentForTests } from '@/tests/utils/consent-cookie.ts';
 
 import { initSentry } from './sentry.ts';
 
@@ -48,7 +53,7 @@ describe('initSentry', () => {
     vi.resetAllMocks();
     useAuthStore.setState({ user: null });
     useOrganizationStore.getState().clearOrganization();
-    useConsentStore.getState().resetAnalyticsConsent();
+    resetConsentForTests();
   });
 
   afterEach(() => {
@@ -63,7 +68,7 @@ describe('initSentry', () => {
 
   it('initializes with the full integration set when a DSN is configured', async () => {
     config.sentryDsn = 'https://key@sentry.example/1';
-    useConsentStore.getState().setAnalyticsConsent('granted');
+    useConsentStore.getState().savePreferences(ACCEPT_ALL_CONSENT_PREFERENCES);
     await initSentry(ROUTER);
 
     expect(Sentry.init).toHaveBeenCalledTimes(1);
@@ -95,7 +100,7 @@ describe('initSentry', () => {
     expect(Sentry.setTag).toHaveBeenCalledWith('organization_id', undefined);
   });
 
-  it('keeps session recording and profiling off without the analytics consent (D161)', async () => {
+  it('keeps session recording and profiling off without the analytics consent', async () => {
     config.sentryDsn = 'https://key@sentry.example/1';
     await initSentry(ROUTER);
 
@@ -114,13 +119,13 @@ describe('initSentry', () => {
     >);
     await initSentry(ROUTER);
 
-    useConsentStore.getState().setAnalyticsConsent('granted');
+    useConsentStore.getState().savePreferences(ACCEPT_ALL_CONSENT_PREFERENCES);
     expect(Sentry.addIntegration).toHaveBeenCalledWith({ name: 'replay' });
 
-    useConsentStore.getState().setAnalyticsConsent('denied');
+    useConsentStore.getState().savePreferences(REJECT_ALL_CONSENT_PREFERENCES);
     expect(stop).toHaveBeenCalledTimes(1);
     // Granted again in the same page: not re-added (the SDK allows one replay integration).
-    useConsentStore.getState().setAnalyticsConsent('granted');
+    useConsentStore.getState().savePreferences(ACCEPT_ALL_CONSENT_PREFERENCES);
     expect(Sentry.addIntegration).toHaveBeenCalledTimes(1);
   });
 

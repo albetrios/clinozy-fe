@@ -1,8 +1,15 @@
 import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import { PRODUCT_NAME } from '@/lib/product-identity.ts';
+import {
+  REJECT_ALL_CONSENT_PREFERENCES,
+  selectConsentCardOpen,
+  useConsentStore,
+} from '@/shared/store/useConsentStore/index.ts';
+import { resetConsentForTests } from '@/tests/utils/consent-cookie.ts';
 
 import { PublicCard, PublicCardHeader, PublicFrame } from './PublicFrame.tsx';
 
@@ -28,16 +35,38 @@ describe('PublicFrame', () => {
     expect(
       within(screen.getByTestId('public-frame-controls')).getByRole('button'),
     ).toHaveTextContent('Theme');
-    // The header at the app header's metrics; main gives its height back below.
+    // The header at the app header's metrics; the footer matches it, so main centres.
     expect(screen.getByRole('banner')).toHaveClass(
       'min-h-13',
       'md:min-h-15',
       'px-(--room-header-pad-x)',
     );
+    expect(screen.getByRole('contentinfo')).toHaveClass('min-h-13', 'md:min-h-15');
     const main = screen.getByRole('main');
     expect(main).toHaveAttribute('id', 'frame-main');
-    expect(main).toHaveClass('items-center', 'justify-center', 'pb-13', 'md:pb-15');
+    expect(main).toHaveClass('items-center', 'justify-center', 'py-2');
     expect(within(main).getByText('Content')).toBeInTheDocument();
+  });
+
+  it('reopens the cookie card from "Privacy choices" in its footer (claude.com)', async () => {
+    resetConsentForTests();
+    useConsentStore.getState().savePreferences(REJECT_ALL_CONSENT_PREFERENCES);
+    const user = userEvent.setup();
+    render(
+      <PublicFrame>
+        <p>Content</p>
+      </PublicFrame>,
+    );
+    expect(selectConsentCardOpen(useConsentStore.getState())).toBe(false);
+
+    await user.click(
+      within(screen.getByRole('contentinfo')).getByRole('button', {
+        name: 'Privacy choices',
+      }),
+    );
+
+    expect(selectConsentCardOpen(useConsentStore.getState())).toBe(true);
+    resetConsentForTests();
   });
 
   it('skips to its own main', () => {

@@ -223,7 +223,7 @@ See **`docs/reference/cross-browser-support.md`** and **`docs/reference/tools-an
 
 Production error monitoring is wired whenever **`VITE_SENTRY_DSN` is set**
 (`.env.local` for local QA, Netlify/GitHub for deploys). Error reports are **not**
-consent-gated; session replay and profiling are, like PostHog (D161). Sentry env: **`local`** in `pnpm dev`, **`production`** on deploy.
+consent-gated; session replay and profiling are, like PostHog (the cookie card's Analytics category). Sentry env: **`local`** in `pnpm dev`, **`production`** on deploy.
 
 | Layer                      | Location                                       | Sentry product                 |
 | -------------------------- | ---------------------------------------------- | ------------------------------ |
@@ -232,7 +232,7 @@ consent-gated; session replay and profiling are, like PostHog (D161). Sentry env
 | Route boundary             | `app/routes/ErrorBoundary.tsx` → `reportError` | Issues                         |
 | Query/mutation failures    | `core/http/queryClient.ts`                     | Issues + query/mutation extras |
 | Router + fetch tracing     | TanStack + `httpClientIntegration`             | Performance                    |
-| Session replay + profiling | only with the analytics consent (D161)         | Replays, Profiles              |
+| Session replay + profiling | only while Analytics is allowed (cookie card)  | Replays, Profiles              |
 | Web Vitals (poor only)     | `app/observability/performance.ts`             | Issues (warning)               |
 | Source maps                | `vite.config.ts` + CI secrets                  | Releases                       |
 

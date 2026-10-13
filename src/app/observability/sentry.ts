@@ -6,8 +6,8 @@ import { scrubEventUrls } from '@/lib/telemetry-scrub.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import {
-  currentAnalyticsConsent,
   hasAnalyticsConsent,
+  selectAnalyticsAllowed,
   useConsentStore,
 } from '@/shared/store/useConsentStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
@@ -61,7 +61,7 @@ function buildIntegrations(
     }),
   ];
 
-  // Session recording and profiling only with the analytics consent (D161); error reports,
+  // Session recording and profiling only while Analytics is allowed (the cookie answer); error reports,
   // logs and feedback run whenever a DSN is configured — including local `pnpm dev`.
   if (options.recording) {
     integrations.push(
@@ -89,8 +89,8 @@ function followRecordingConsent(Sentry: SentryModule, recordingAtInit: boolean):
   // One follower per page, even if init runs again.
   stopFollowingRecordingConsent?.();
   stopFollowingRecordingConsent = useConsentStore.subscribe((state, previous) => {
-    const granted = currentAnalyticsConsent(state) === 'granted';
-    if (granted === (currentAnalyticsConsent(previous) === 'granted')) return;
+    const granted = selectAnalyticsAllowed(state);
+    if (granted === selectAnalyticsAllowed(previous)) return;
     if (granted && !replayAdded) {
       Sentry.addIntegration(sessionReplayIntegration(Sentry));
       replayAdded = true;

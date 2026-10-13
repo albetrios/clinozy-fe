@@ -1,10 +1,13 @@
 import type { ComponentProps, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
 import { cn } from '@/lib/utils.ts';
 import { BrandLogo } from '@/shared/components/ProductMark/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
 import { Card } from '@/shared/components/ui/card.tsx';
 import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
+import { useConsentStore } from '@/shared/store/useConsentStore/index.ts';
 
 /** Props for {@link PublicFrame}. */
 export interface PublicFrameProps {
@@ -27,7 +30,9 @@ export interface PublicFrameProps {
  * `--room-header-pad-x`) with the logo exactly where the section bar draws it
  * (`shell.md:18`) — so it does not move when the user signs in — and the
  * controls at the end, then a `<main>` that centres its content on the
- * viewport: the header's height is given back at the bottom.
+ * viewport, then a footer of the header's height (so the centring holds) with
+ * claude.com's "Privacy choices": it reopens the cookie card, so a signed-out
+ * visitor can change their answer (D12; signed in, Settings › Privacy does).
  */
 export function PublicFrame({
   children,
@@ -37,6 +42,8 @@ export function PublicFrame({
   className,
 }: PublicFrameProps) {
   const { t } = useTranslation(LAYOUT_NS);
+  const { t: tCommon } = useTranslation(LOCALE_NS);
+  const openPreferences = useConsentStore((s) => s.openPreferences);
   return (
     <div
       data-testid={testId}
@@ -62,12 +69,23 @@ export function PublicFrame({
       <main
         id={mainId}
         className={cn(
-          'flex flex-1 flex-col items-center justify-center px-4 pt-2 pb-13 md:pb-15',
+          'flex flex-1 flex-col items-center justify-center px-4 py-2',
           className,
         )}
       >
         {children}
       </main>
+      <footer className="flex min-h-13 flex-none items-center justify-center px-(--room-header-pad-x) md:min-h-15">
+        <Button
+          variant="link"
+          size="xs"
+          onClick={openPreferences}
+          className="text-muted-foreground hover:text-foreground text-xs font-normal"
+          data-testid="privacy-choices"
+        >
+          {tCommon(LOCALE_KEYS.consentPrivacyChoices)}
+        </Button>
+      </footer>
     </div>
   );
 }

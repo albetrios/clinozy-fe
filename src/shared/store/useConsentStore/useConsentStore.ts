@@ -1,118 +1,221 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
 import { PRODUCT_NAMESPACE } from '@/lib/product-identity.ts';
 
 /**
- * Analytics-consent decision. `null` = undecided (the card is shown);
- * `granted`/`denied` are explicit choices — closing the card is `denied`.
+ * The answer per optional cookie category. Necessary cookies are not a choice, so they have no
+ * entry; a category added later is one more key here.
  */
-export type ConsentDecision = 'granted' | 'denied' | null;
-
-/**
- * The consent policy the card asks about. Bump it when what is collected, or by whom, changes:
- * every saved answer to an older version is asked again (D161).
- */
-export const CONSENT_POLICY_VERSION = 1;
-
-/** An answer older than this is asked again (six months, D161). */
-export const CONSENT_MAX_AGE_DAYS = 182;
-
-const DAY_MS = 86_400_000;
-
-/** The localStorage key the decision is kept under (one per browser profile). */
-export const CONSENT_STORAGE_KEY = `${PRODUCT_NAMESPACE}-consent`;
-
-/** One saved answer: the decision, when it was given and to which policy version. */
-export interface ConsentRecord {
-  analyticsConsent: ConsentDecision;
-  /** When the answer was given (ISO 8601); `null` while undecided. */
-  decidedAt: string | null;
-  /** {@link CONSENT_POLICY_VERSION} at the time; `null` while undecided. */
-  policyVersion: number | null;
+export interface ConsentPreferences {
+  /** Product analytics (PostHog, web-vitals) and Sentry's session recording and profiling. */
+  analytics: boolean;
 }
 
-interface ConsentStore extends ConsentRecord {
-  /**
-   * Record a decision — the card, Settings › Privacy, or the account's saved answer at sign-in
-   * (which brings its own time and version).
-   */
-  setAnalyticsConsent: (
-    decision: Exclude<ConsentDecision, null>,
-    saved?: { decidedAt: string; policyVersion: number },
-  ) => void;
-  /** Forget this browser's answer — a session ended, so the next person is asked afresh. */
-  resetAnalyticsConsent: () => void;
-}
-
-const UNDECIDED: ConsentRecord = {
-  analyticsConsent: null,
-  decidedAt: null,
-  policyVersion: null,
-};
-
-/**
- * The decision while it still stands, else `null`: an answer to an older policy version, or one
- * older than {@link CONSENT_MAX_AGE_DAYS}, counts as not answered.
- */
-export function currentAnalyticsConsent(
-  record: ConsentRecord,
-  now: number = Date.now(),
-): ConsentDecision {
-  if (record.analyticsConsent === null || record.decidedAt === null) return null;
-  if (record.policyVersion !== CONSENT_POLICY_VERSION) return null;
-  const decidedAt = Date.parse(record.decidedAt);
-  if (Number.isNaN(decidedAt) || now - decidedAt > CONSENT_MAX_AGE_DAYS * DAY_MS)
-    return null;
-  return record.analyticsConsent;
-}
-
-/**
- * Persisted analytics-consent state (GDPR / ePrivacy, DPDP). Cookie-setting analytics (PostHog)
- * and Sentry's session recording and profiling start only while the decision is `granted`; see
- * `app/analytics/posthog.ts`, `app/observability/sentry.ts` and the boot sequence in `main.tsx`.
- * Error reports run under legitimate interest and are not gated here.
- *
- * @remarks
- * - **The person's, not the browser's (D161).** Signed in, the account's saved answer wins and a
- *   new answer is saved to the account (`shared/analytics/consent-account-sync.ts`); a session's
- *   end forgets this browser's answer.
- * - **Version 1 of the stored shape** added the time and the policy version. An answer stored
- *   before has neither, so it counts as not answered and the card asks once more.
- */
-export const useConsentStore = create<ConsentStore>()(
-  persist(
-    (set) => ({
-      ...UNDECIDED,
-      setAnalyticsConsent: (analyticsConsent, saved) =>
-        set({
-          analyticsConsent,
-          decidedAt: saved?.decidedAt ?? new Date().toISOString(),
-          policyVersion: saved?.policyVersion ?? CONSENT_POLICY_VERSION,
-        }),
-      resetAnalyticsConsent: () => set(UNDECIDED),
-    }),
-    {
-      name: CONSENT_STORAGE_KEY,
-      version: 1,
-      migrate: (persisted) => {
-        const stored = (persisted ?? {}) as Partial<ConsentRecord>;
-        return {
-          analyticsConsent: stored.analyticsConsent ?? null,
-          decidedAt: stored.decidedAt ?? null,
-          policyVersion: stored.policyVersion ?? null,
-        } as ConsentStore;
-      },
-    },
-  ),
+/** "Accept all cookies" (claude.com's name for the same constant). */
+export const ACCEPT_ALL_CONSENT_PREFERENCES: Readonly<ConsentPreferences> = Object.freeze(
+  {
+    analytics: true,
+  },
 );
 
-/** The standing decision for components (`useConsentStore(selectCurrentConsent)`). */
-export function selectCurrentConsent(state: ConsentRecord): ConsentDecision {
-  return currentAnalyticsConsent(state);
+/** "Reject all cookies" — also what Escape on the card and Global Privacy Control mean. */
+export const REJECT_ALL_CONSENT_PREFERENCES: Readonly<ConsentPreferences> = Object.freeze(
+  {
+    analytics: false,
+  },
+);
+
+/**
+ * The consent notice the card shows. Bump it when what is collected, or by whom, changes: an
+ * answer to another version is asked again. Version 2 is the claude.com-style card.
+ */
+export const CONSENT_POLICY_VERSION = 2;
+
+/** The first-party cookie that holds this browser's answer (claude.com: `anthropic-consent-preferences`). */
+export const CONSENT_COOKIE_NAME = `${PRODUCT_NAMESPACE}-consent-preferences`;
+
+/** One year, as claude.com — the cookie's expiry is when the card asks again. */
+export const CONSENT_COOKIE_MAX_AGE_SECONDS = 31_536_000;
+
+/** Where the launch kept the answer (localStorage, per account); removed by {@link startConsentFollow}. */
+const LEGACY_CONSENT_STORAGE_KEY = `${PRODUCT_NAMESPACE}-consent`;
+
+/** The cookie's value, as JSON. */
+interface StoredConsent {
+  analytics: boolean;
+  version: number;
+  decidedAt: string;
+}
+
+/** This browser's standing answer, or `null` while there is none. */
+interface StandingAnswer {
+  preferences: ConsentPreferences;
+  decidedAt: string;
+}
+
+function isStoredConsent(value: unknown): value is StoredConsent {
+  if (typeof value !== 'object' || value === null) return false;
+  const candidate = value as Record<string, unknown>;
+  return (
+    typeof candidate.analytics === 'boolean' &&
+    typeof candidate.version === 'number' &&
+    typeof candidate.decidedAt === 'string' &&
+    !Number.isNaN(Date.parse(candidate.decidedAt))
+  );
+}
+
+function readCookieValue(name: string): string | null {
+  if (typeof document === 'undefined') return null;
+  for (const part of document.cookie.split(';')) {
+    const separator = part.indexOf('=');
+    if (separator === -1) continue;
+    if (part.slice(0, separator).trim() === name) return part.slice(separator + 1).trim();
+  }
+  return null;
+}
+
+/**
+ * The cookie's answer while it stands: present, readable and given to the current
+ * {@link CONSENT_POLICY_VERSION}. Its age needs no check — the cookie expires after a year.
+ */
+function readStandingAnswer(): StandingAnswer | null {
+  const raw = readCookieValue(CONSENT_COOKIE_NAME);
+  if (raw === null) return null;
+  try {
+    const stored: unknown = JSON.parse(decodeURIComponent(raw));
+    if (!isStoredConsent(stored) || stored.version !== CONSENT_POLICY_VERSION)
+      return null;
+    return { preferences: { analytics: stored.analytics }, decidedAt: stored.decidedAt };
+  } catch {
+    return null;
+  }
+}
+
+function writeConsentCookie(stored: StoredConsent): void {
+  const attributes = [
+    `${CONSENT_COOKIE_NAME}=${encodeURIComponent(JSON.stringify(stored))}`,
+    `Max-Age=${CONSENT_COOKIE_MAX_AGE_SECONDS}`,
+    'Path=/',
+    'SameSite=Lax',
+  ];
+  // `Secure` wherever the page is https; a plain-http dev server would have the cookie refused.
+  if (globalThis.location?.protocol === 'https:') attributes.push('Secure');
+  // biome-ignore lint/suspicious/noDocumentCookie: the Cookie Store API is async and missing from some supported browsers; the card's answer must be readable on the next line.
+  document.cookie = attributes.join('; ');
+}
+
+/**
+ * True while the browser sends Global Privacy Control: every optional category is off, the card
+ * never asks on its own, and Analytics cannot be switched on (D6).
+ */
+export function isGlobalPrivacyControlOn(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  return (
+    (navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl ===
+    true
+  );
+}
+
+interface ConsentState {
+  /** This browser's answer; `null` while there is none (nothing optional runs). */
+  preferences: ConsentPreferences | null;
+  /** When the answer was given (ISO 8601); `null` with `preferences`. */
+  decidedAt: string | null;
+  /** The card was reopened from Privacy choices, whatever the answer. */
+  preferencesOpen: boolean;
+  /** Store an answer in this browser's cookie and close the card. */
+  savePreferences: (preferences: ConsentPreferences) => void;
+  /** Reopen the card (Privacy choices). */
+  openPreferences: () => void;
+  /** Take the cookie's answer again — another tab may have changed it. */
+  reloadFromCookie: () => void;
+}
+
+function stateFromCookie(): Pick<ConsentState, 'preferences' | 'decidedAt'> {
+  const answer = readStandingAnswer();
+  return {
+    preferences: answer?.preferences ?? null,
+    decidedAt: answer?.decidedAt ?? null,
+  };
+}
+
+/**
+ * This browser's cookie-consent answer (D1, claude.com's model). PostHog (and its web-vitals) and
+ * Sentry's session recording and profiling start only while Analytics is allowed — see `main.tsx`,
+ * `app/analytics/posthog.ts` and `app/observability/sentry.ts`. Error reports run under legitimate
+ * interest and are not gated here.
+ *
+ * @remarks
+ * - **The browser's, not the person's.** One first-party cookie ({@link CONSENT_COOKIE_NAME}, one
+ *   year, `SameSite=Lax`, `Secure` on https) holds it. Signing out never forgets it and signing in
+ *   never replaces it; an answer given while signed in is also sent to the account as a receipt
+ *   (`shared/analytics/record-consent-decision.ts`), never read back.
+ * - **Asked again** when the cookie expires, is unreadable, or answers another
+ *   {@link CONSENT_POLICY_VERSION}.
+ * - **Global Privacy Control** overrides the answer: {@link hasAnalyticsConsent} is false while
+ *   the browser sends it.
+ */
+export const useConsentStore = create<ConsentState>()((set) => ({
+  ...stateFromCookie(),
+  preferencesOpen: false,
+  savePreferences: (preferences) => {
+    const decidedAt = new Date().toISOString();
+    writeConsentCookie({
+      analytics: preferences.analytics,
+      version: CONSENT_POLICY_VERSION,
+      decidedAt,
+    });
+    set({
+      preferences: { analytics: preferences.analytics },
+      decidedAt,
+      preferencesOpen: false,
+    });
+  },
+  openPreferences: () => set({ preferencesOpen: true }),
+  reloadFromCookie: () => set(stateFromCookie()),
+}));
+
+/** Analytics may run: an answer that allows it, and no Global Privacy Control. */
+export function selectAnalyticsAllowed(
+  state: Pick<ConsentState, 'preferences'>,
+): boolean {
+  return !isGlobalPrivacyControlOn() && state.preferences?.analytics === true;
+}
+
+/** The card asks on its own: no standing answer, and no Global Privacy Control answering for it. */
+export function selectShouldAsk(state: Pick<ConsentState, 'preferences'>): boolean {
+  return state.preferences === null && !isGlobalPrivacyControlOn();
+}
+
+/** The card is up: asking on its own, or reopened from Privacy choices. */
+export function selectConsentCardOpen(
+  state: Pick<ConsentState, 'preferences' | 'preferencesOpen'>,
+): boolean {
+  return state.preferencesOpen || selectShouldAsk(state);
 }
 
 /** Imperative read for non-React callers (the boot sequence, analytics, Sentry). */
 export function hasAnalyticsConsent(): boolean {
-  return currentAnalyticsConsent(useConsentStore.getState()) === 'granted';
+  return selectAnalyticsAllowed(useConsentStore.getState());
+}
+
+/**
+ * Start following the answer outside this tab, once, from `main.tsx`: drop the launch's
+ * localStorage answer (asked again under policy version 2), and re-read the cookie whenever the tab
+ * is shown again — another tab may have answered meanwhile (cookies fire no storage event).
+ *
+ * @returns A stop function (tests).
+ */
+export function startConsentFollow(): () => void {
+  try {
+    localStorage.removeItem(LEGACY_CONSENT_STORAGE_KEY);
+  } catch {
+    // Storage unavailable (private mode): nothing was kept there either.
+  }
+  const onVisibilityChange = () => {
+    if (document.visibilityState === 'visible')
+      useConsentStore.getState().reloadFromCookie();
+  };
+  document.addEventListener('visibilitychange', onVisibilityChange);
+  return () => document.removeEventListener('visibilitychange', onVisibilityChange);
 }

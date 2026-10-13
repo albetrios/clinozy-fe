@@ -1,10 +1,19 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 import { PRODUCT_NAME } from '@/lib/product-identity.ts';
-import { useConsentStore } from '@/shared/store/useConsentStore/index.ts';
+import {
+  ACCEPT_ALL_CONSENT_PREFERENCES,
+  REJECT_ALL_CONSENT_PREFERENCES,
+  useConsentStore,
+} from '@/shared/store/useConsentStore/index.ts';
+import {
+  readConsentCookieForTests,
+  resetConsentForTests,
+  setGlobalPrivacyControlForTests,
+} from '@/tests/utils/consent-cookie.ts';
 
 import { ConsentBanner } from './ConsentBanner.tsx';
 
@@ -13,10 +22,9 @@ vi.mock('@/core/config/env.ts', () => ({
   platformConfig: env,
 }));
 
-const captureAnalyticsConsentDecision = vi.fn(async () => undefined);
-vi.mock('@/shared/analytics/capture-consent-decision.ts', () => ({
-  captureAnalyticsConsentDecision: (...args: unknown[]) =>
-    captureAnalyticsConsentDecision(...args),
+const recordConsentDecision = vi.fn(async () => undefined);
+vi.mock('@/shared/analytics/record-consent-decision.ts', () => ({
+  recordConsentDecision: (...args: unknown[]) => recordConsentDecision(...args),
 }));
 
 /** Tailwind classes on the card, as a list — assertions read better than regexes. */
@@ -26,149 +34,260 @@ function cardClasses(): string[] {
 
 describe('ConsentBanner', () => {
   beforeEach(() => {
-    useConsentStore.getState().resetAnalyticsConsent();
-    captureAnalyticsConsentDecision.mockClear();
+    setGlobalPrivacyControlForTests(false);
+    resetConsentForTests();
+    recordConsentDecision.mockClear();
     env.privacyPolicyUrl = undefined;
   });
 
-  it('renders the privacy link with a safe rel for an external _blank target', () => {
+  afterEach(() => {
+    setGlobalPrivacyControlForTests(false);
+  });
+
+  describe('the first view (claude.com: Customize · Reject · Accept)', () => {
+    it('is a non-modal dialog named "Cookie settings"', () => {
+      render(<ConsentBanner />);
+      const card = screen.getByRole('dialog', { name: 'Cookie settings' });
+      expect(card.tagName).toBe('DIALOG');
+      expect(card).toHaveAttribute('open');
+      expect(card).not.toHaveAttribute('aria-modal');
+      expect(screen.getByRole('heading', { name: 'Cookie settings' })).toBeVisible();
+    });
+
+    it('describes itself with translated copy that names the product', () => {
+      render(<ConsentBanner />);
+      // `{{productName}}` is an i18n default variable — locale files never carry the brand.
+      expect(
+        screen.getByRole('dialog', { name: 'Cookie settings' }),
+      ).toHaveAccessibleDescription(expect.stringContaining(PRODUCT_NAME));
+    });
+
+    it('offers Customize, Reject all and Accept all — long labels, short ones for a phone', () => {
+      render(<ConsentBanner />);
+      expect(screen.getByTestId('consent-customize')).toHaveTextContent(
+        'CustomizeCustomize cookie settings',
+      );
+      expect(screen.getByTestId('consent-reject')).toHaveTextContent(
+        'RejectReject all cookies',
+      );
+      expect(screen.getByTestId('consent-accept')).toHaveTextContent(
+        'AcceptAccept all cookies',
+      );
+      // There is no close button: closing without an answer is Escape, which rejects.
+      expect(screen.queryByTestId('consent-close')).not.toBeInTheDocument();
+    });
+
+    it('links the Privacy Policy with a safe rel for an external _blank target', () => {
+      env.privacyPolicyUrl = 'https://example.com/privacy';
+      render(<ConsentBanner />);
+      const link = screen.getByTestId('consent-policy-link');
+      expect(link).toHaveTextContent('here');
+      expect(link).toHaveAttribute('href', 'https://example.com/privacy');
+      expect(link).toHaveAttribute('target', '_blank');
+      expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+    });
+
+    it('omits the policy sentence when no policy URL is configured', () => {
+      render(<ConsentBanner />);
+      expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    });
+
+    it('gives Reject and Accept equal weight', () => {
+      render(<ConsentBanner />);
+      const reject = screen.getByTestId('consent-reject');
+      const accept = screen.getByTestId('consent-accept');
+      const sizing = (element: HTMLElement) =>
+        element.className
+          .split(/\s+/)
+          .filter((c) => /^(sm:)?(h|min-h|w|min-w|px|col-span)-/.test(c));
+      expect(sizing(accept)).toEqual(sizing(reject));
+    });
+
+    it('does not take focus when it appears', () => {
+      // A non-modal notice: stealing focus would pull a keyboard user out of the sign-in form.
+      render(<ConsentBanner />);
+      expect(screen.getByTestId('consent-banner')).not.toContainElement(
+        document.activeElement as HTMLElement | null,
+      );
+    });
+
+    it('Accept all saves Analytics on and records the decision', async () => {
+      const user = userEvent.setup();
+      render(<ConsentBanner />);
+      await user.click(screen.getByTestId('consent-accept'));
+      expect(useConsentStore.getState().preferences).toEqual(
+        ACCEPT_ALL_CONSENT_PREFERENCES,
+      );
+      expect(readConsentCookieForTests()).toMatchObject({ analytics: true });
+      await waitFor(() =>
+        expect(recordConsentDecision).toHaveBeenCalledWith(
+          ACCEPT_ALL_CONSENT_PREFERENCES,
+          'consent_banner',
+        ),
+      );
+      expect(screen.queryByTestId('consent-banner')).not.toBeInTheDocument();
+    });
+
+    it('Reject all saves Analytics off and records the decision', async () => {
+      const user = userEvent.setup();
+      render(<ConsentBanner />);
+      await user.click(screen.getByTestId('consent-reject'));
+      expect(useConsentStore.getState().preferences).toEqual(
+        REJECT_ALL_CONSENT_PREFERENCES,
+      );
+      await waitFor(() =>
+        expect(recordConsentDecision).toHaveBeenCalledWith(
+          REJECT_ALL_CONSENT_PREFERENCES,
+          'consent_banner',
+        ),
+      );
+    });
+
+    it('Escape inside the card rejects all (claude.com)', async () => {
+      const user = userEvent.setup();
+      render(<ConsentBanner />);
+      screen.getByTestId('consent-reject').focus();
+      await user.keyboard('{Escape}');
+      expect(useConsentStore.getState().preferences).toEqual(
+        REJECT_ALL_CONSENT_PREFERENCES,
+      );
+    });
+
+    it('Escape elsewhere on the page answers nothing (it closes the app’s own surfaces)', async () => {
+      const user = userEvent.setup();
+      render(
+        <>
+          <button type="button">elsewhere</button>
+          <ConsentBanner />
+        </>,
+      );
+      screen.getByRole('button', { name: 'elsewhere' }).focus();
+      await user.keyboard('{Escape}');
+      expect(useConsentStore.getState().preferences).toBeNull();
+    });
+  });
+
+  describe('Customize — the same card, categories and Save', () => {
+    it('swaps to Necessary (Required, locked on) and Analytics (Off), and focuses the switch', async () => {
+      const user = userEvent.setup();
+      render(<ConsentBanner />);
+      await user.click(screen.getByTestId('consent-customize'));
+
+      expect(screen.getByTestId('consent-banner')).toHaveAttribute(
+        'data-view',
+        'customize',
+      );
+      const necessary = screen.getByRole('switch', { name: 'Necessary' });
+      expect(necessary).toBeChecked();
+      expect(necessary).toBeDisabled();
+      expect(screen.getByTestId('consent-option-necessary')).toHaveTextContent(
+        'Required',
+      );
+
+      const analytics = screen.getByRole('switch', { name: 'Analytics' });
+      expect(analytics).not.toBeChecked();
+      expect(analytics).toHaveFocus();
+      expect(screen.getByTestId('consent-option-analytics')).toHaveTextContent('Off');
+      expect(screen.queryByTestId('consent-accept')).not.toBeInTheDocument();
+    });
+
+    it('starts from the current answer when reopened', async () => {
+      const user = userEvent.setup();
+      useConsentStore.getState().savePreferences(ACCEPT_ALL_CONSENT_PREFERENCES);
+      useConsentStore.getState().openPreferences();
+      render(<ConsentBanner />);
+      await user.click(screen.getByTestId('consent-customize'));
+      expect(screen.getByRole('switch', { name: 'Analytics' })).toBeChecked();
+      expect(screen.getByTestId('consent-option-analytics')).toHaveTextContent('On');
+    });
+
+    it('Save preferences stores exactly the switches', async () => {
+      const user = userEvent.setup();
+      render(<ConsentBanner />);
+      await user.click(screen.getByTestId('consent-customize'));
+      await user.click(screen.getByRole('switch', { name: 'Analytics' }));
+      expect(screen.getByTestId('consent-option-analytics')).toHaveTextContent('On');
+      await user.click(screen.getByTestId('consent-save'));
+
+      expect(useConsentStore.getState().preferences).toEqual({ analytics: true });
+      await waitFor(() =>
+        expect(recordConsentDecision).toHaveBeenCalledWith(
+          { analytics: true },
+          'consent_banner',
+        ),
+      );
+    });
+
+    it('a tap on the category name toggles its switch', async () => {
+      const user = userEvent.setup();
+      render(<ConsentBanner />);
+      await user.click(screen.getByTestId('consent-customize'));
+      await user.click(
+        within(screen.getByTestId('consent-option-analytics')).getByText('Analytics'),
+      );
+      expect(screen.getByRole('switch', { name: 'Analytics' })).toBeChecked();
+    });
+  });
+
+  describe('Global Privacy Control', () => {
+    it('says why, locks Accept all and the Analytics switch, and saves Analytics off', async () => {
+      setGlobalPrivacyControlForTests(true);
+      useConsentStore.getState().openPreferences();
+      const user = userEvent.setup();
+      render(<ConsentBanner />);
+
+      expect(screen.getByTestId('consent-gpc-note')).toHaveTextContent(
+        'Global Privacy Control',
+      );
+      expect(screen.getByTestId('consent-accept')).toBeDisabled();
+
+      await user.click(screen.getByTestId('consent-customize'));
+      expect(screen.getByRole('switch', { name: 'Analytics' })).toBeDisabled();
+      expect(screen.getByTestId('consent-save')).toHaveFocus();
+      await user.click(screen.getByTestId('consent-save'));
+      expect(useConsentStore.getState().preferences).toEqual(
+        REJECT_ALL_CONSENT_PREFERENCES,
+      );
+    });
+  });
+
+  it('has no accessibility violations, in either view', async () => {
     env.privacyPolicyUrl = 'https://example.com/privacy';
-    render(<ConsentBanner />);
-    const link = screen.getByRole('link', { name: 'Privacy Policy' });
-    expect(link).toHaveAttribute('target', '_blank');
-    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
-  });
-
-  it('omits the privacy link when no policy URL is configured', () => {
-    render(<ConsentBanner />);
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
-  });
-
-  it('shows while the decision is undecided, named by its visible title', () => {
-    render(<ConsentBanner />);
-    // <section aria-labelledby> exposes an implicit region role with that name.
-    const region = screen.getByRole('region', { name: 'Cookie consent' });
-    expect(region).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Cookie consent' })).toBeVisible();
-  });
-
-  it('describes itself with translated copy that names the product', () => {
-    render(<ConsentBanner />);
-    // `{{productName}}` is an i18n default variable — locale files never carry
-    // the brand, so a rebrand does not touch 11 translated strings.
-    expect(
-      screen.getByRole('region', { name: 'Cookie consent' }),
-    ).toHaveAccessibleDescription(
-      `With your OK, we use PostHog analytics and Sentry session recordings to improve ${PRODUCT_NAME}. Everything else, error reports included, works without them. Closing this means no.`,
-    );
-  });
-
-  it('Accept grants consent and hides the banner', async () => {
     const user = userEvent.setup();
-    const { rerender } = render(<ConsentBanner />);
-
-    await user.click(screen.getByTestId('consent-accept'));
-
-    expect(useConsentStore.getState().analyticsConsent).toBe('granted');
-    await waitFor(() => {
-      expect(captureAnalyticsConsentDecision).toHaveBeenCalledWith('granted');
-    });
-    rerender(<ConsentBanner />);
-    expect(screen.queryByTestId('consent-banner')).not.toBeInTheDocument();
-  });
-
-  it('Decline denies consent and hides the banner', async () => {
-    const user = userEvent.setup();
-    const { rerender } = render(<ConsentBanner />);
-
-    await user.click(screen.getByTestId('consent-decline'));
-
-    expect(useConsentStore.getState().analyticsConsent).toBe('denied');
-    await waitFor(() => {
-      expect(captureAnalyticsConsentDecision).toHaveBeenCalledWith('denied');
-    });
-    rerender(<ConsentBanner />);
-    expect(screen.queryByTestId('consent-banner')).not.toBeInTheDocument();
-  });
-
-  it('Close counts as declining (D161)', async () => {
-    const user = userEvent.setup();
-    render(<ConsentBanner />);
-
-    // a11y guard: the icon button says what closing does.
-    await user.click(screen.getByRole('button', { name: 'Close (counts as declining)' }));
-
-    expect(useConsentStore.getState().analyticsConsent).toBe('denied');
-    await waitFor(() => {
-      expect(captureAnalyticsConsentDecision).toHaveBeenCalledWith('denied');
-    });
-  });
-
-  it('asks again once the answer is six months old', () => {
-    useConsentStore.getState().setAnalyticsConsent('granted', {
-      decidedAt: '2020-01-01T00:00:00.000Z',
-      policyVersion: 1,
-    });
-    render(<ConsentBanner />);
-    expect(screen.getByTestId('consent-banner')).toBeInTheDocument();
-  });
-
-  it('renders nothing once a decision exists', () => {
-    useConsentStore.getState().setAnalyticsConsent('denied');
     const { container } = render(<ConsentBanner />);
-    expect(container).toBeEmptyDOMElement();
-  });
-
-  it('does not take focus when it appears', () => {
-    // A non-modal notice. Stealing focus on every first visit would yank a
-    // keyboard user out of the login form they were about to type into.
-    render(<ConsentBanner />);
-    expect(screen.getByTestId('consent-banner')).not.toContainElement(
-      document.activeElement as HTMLElement | null,
-    );
-  });
-
-  it('has no accessibility violations', async () => {
-    env.privacyPolicyUrl = 'https://example.com/privacy';
-    const { container } = render(<ConsentBanner />);
+    expect(await axe(container)).toHaveNoViolations();
+    await user.click(screen.getByTestId('consent-customize'));
     expect(await axe(container)).toHaveNoViolations();
   });
 
   // ── A corner card, not a full-width bar ──────────────────────────────────
 
   describe('placement', () => {
-    it('is a corner card from `sm` up — never a viewport-wide bar', () => {
-      // Regression: `inset-x-0 bottom-0` spanned the viewport, which put Accept
-      // in the bottom-end corner underneath the Sentry feedback trigger.
+    it('is a corner card at most 456px wide from `sm` up — never a viewport-wide bar', () => {
       render(<ConsentBanner />);
       const classes = cardClasses();
-
       expect(classes).not.toContain('inset-x-0');
       expect(classes).not.toContain('bottom-0');
       expect(classes).toContain('sm:inset-x-auto');
-      expect(classes.some((c) => c.startsWith('sm:w-'))).toBe(true);
+      expect(classes).toContain('sm:w-[28.5rem]');
     });
 
-    it('takes the bottom-START corner with logical properties, so RTL mirrors it', () => {
+    it('takes the bottom-START corner, 24px in, with logical properties so RTL mirrors it', () => {
       render(<ConsentBanner />);
       const classes = cardClasses();
-
-      expect(classes).toContain('sm:start-4');
+      expect(classes).toContain('sm:start-6');
       // The END corner belongs to the feedback trigger and the edge controls.
       expect(classes.filter((c) => /(^|:)(end|right|left)-/.test(c))).toEqual([]);
     });
 
     it('widens into an inset sheet below `sm` instead of touching the screen edges', () => {
       render(<ConsentBanner />);
-      expect(cardClasses()).toContain('inset-x-3');
+      expect(cardClasses()).toEqual(expect.arrayContaining(['inset-x-3', 'w-auto']));
     });
 
     it('rides above the mobile tab bar via --floating-bottom-offset', () => {
-      // A shell that renders the tab bar publishes its height (index.css); the
-      // card must consume it at EVERY width the bar exists, i.e. below `md`.
       render(<ConsentBanner />);
       const bottoms = cardClasses().filter((c) => c.includes('bottom-['));
-
       expect(bottoms).toHaveLength(2);
       for (const bottom of bottoms) {
         expect(bottom).toContain('var(--floating-bottom-offset,0rem)');
@@ -179,14 +298,13 @@ describe('ConsentBanner', () => {
     it('is a themed floating surface — elevation, separation and shape apply', () => {
       render(<ConsentBanner />);
       const card = screen.getByTestId('consent-banner');
-
       expect(card).toHaveAttribute('data-slot', 'surface');
       expect(card).toHaveAttribute('data-floating');
-      // Depth comes from the elevation axis, never from a hardcoded utility.
+      expect(cardClasses()).toContain('rounded-3xl');
       expect(cardClasses().filter((c) => c.includes('shadow'))).toEqual([]);
     });
 
-    it('honours reduced motion on its entrance', () => {
+    it('honors reduced motion on its entrance', () => {
       render(<ConsentBanner />);
       expect(cardClasses()).toContain('motion-reduce:animate-none');
     });
@@ -197,26 +315,19 @@ describe('ConsentBanner', () => {
       document.documentElement.style.getPropertyValue('--consent-card-height');
 
     it('publishes its measured height while it is up', () => {
-      // Below `sm` the card spans the width and can cover a page's last control
-      // (the onboarding wizard's Continue button). index.css reserves this much
-      // at the end of whatever scrolls, so that control can be scrolled clear.
       vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({
         height: 173.4,
       } as DOMRect);
-
       render(<ConsentBanner />);
-
       expect(published()).toBe('174px');
       vi.restoreAllMocks();
     });
 
-    it('withdraws the reservation once a decision is made', async () => {
+    it('withdraws the reservation once answered', async () => {
       const user = userEvent.setup();
       render(<ConsentBanner />);
       expect(published()).not.toBe('');
-
-      await user.click(screen.getByTestId('consent-decline'));
-
+      await user.click(screen.getByTestId('consent-reject'));
       await waitFor(() => expect(published()).toBe(''));
     });
 
@@ -226,22 +337,11 @@ describe('ConsentBanner', () => {
       expect(published()).toBe('');
     });
 
-    it('reserves nothing when a decision already exists', () => {
-      useConsentStore.getState().setAnalyticsConsent('granted');
+    it('renders and reserves nothing while an answer stands and nobody reopened it', () => {
+      useConsentStore.getState().savePreferences(ACCEPT_ALL_CONSENT_PREFERENCES);
       render(<ConsentBanner />);
+      expect(screen.queryByTestId('consent-banner')).not.toBeInTheDocument();
       expect(published()).toBe('');
     });
-  });
-
-  it('gives Accept and Decline equal weight', () => {
-    // Consent has to be as easy to refuse as to give: same size, same width.
-    render(<ConsentBanner />);
-    const accept = screen.getByTestId('consent-accept');
-    const decline = screen.getByTestId('consent-decline');
-
-    expect(accept).toHaveAttribute('data-size', 'sm');
-    expect(decline).toHaveAttribute('data-size', 'sm');
-    expect(accept).toHaveClass('flex-1');
-    expect(decline).toHaveClass('flex-1');
   });
 });
