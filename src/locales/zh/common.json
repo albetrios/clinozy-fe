@@ -96,7 +96,14 @@
   "versionUpdate": {
     "title": "有可用更新",
     "description": "应用的新版本已就绪。",
-    "refresh": "立即刷新"
+    "refresh": "立即刷新",
+    "required": {
+      "title": "需要更新",
+      "countdown": "{{time}} 后重新加载",
+      "saveFirst": "请先保存工作，再更新",
+      "announcement": "{{productName}} 需要一次重要更新，将在 {{time}} 后重新加载。请立即保存您的工作。",
+      "updateNow": "立即更新"
+    }
   },
   "cells": {
     "patient": "患者",

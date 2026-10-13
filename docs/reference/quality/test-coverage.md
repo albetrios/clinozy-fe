@@ -7,11 +7,11 @@ rules see [`tests/README.md`](../../../tests/README.md) and
 
 ## Runners
 
-| Tool       | Scope                                                            |
-| ---------- | ---------------------------------------------------------------- |
-| Vitest     | Unit/component — colocated `src/**/*.test.{ts,tsx}`              |
-| Playwright | E2E — `tests/e2e/*.e2e.test.ts` (requires clinozy-be on `:3000`) |
-| Stryker    | Mutation testing (CI-only, scheduled)                            |
+| Tool       | Scope                                                                                      |
+| ---------- | ------------------------------------------------------------------------------------------ |
+| Vitest     | Unit/component — colocated `src/**/*.test.{ts,tsx}`                                        |
+| Playwright | E2E — `tests/e2e/*.e2e.test.ts` (requires clinozy-be on `:3000`)                           |
+| Stryker    | Mutation testing (scheduled) — [testing.md](../testing.md#mutation-testing-stryker-weekly) |
 
 Vitest runs two projects: **`unit`** (colocated `src` suites) and **`security`**
 (`tests/security` — token storage, redirect safety, header tripwires). Coverage is collected by the `unit` project; the Vite config's React

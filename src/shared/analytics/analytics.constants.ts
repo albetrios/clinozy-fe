@@ -31,6 +31,8 @@ export const ANALYTICS_EVENTS = {
   deploymentUpdateAvailable: 'deployment_update_available',
   deploymentUpdateRefreshClicked: 'deployment_update_refresh_clicked',
   deploymentUpdateDismissed: 'deployment_update_dismissed',
+  deploymentUpdateRequired: 'deployment_update_required',
+  deploymentUpdateRequiredReloadClicked: 'deployment_update_required_reload_clicked',
 
   /** Performance */
   webVital: 'web_vital',

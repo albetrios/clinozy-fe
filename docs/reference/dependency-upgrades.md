@@ -138,21 +138,39 @@ The shared procedures are maintained in the
 were retired by the registry in July 2026; pnpm ships bulk support only from v11)
 should report **no high/critical** after overrides; **moderate** issues may remain
 in dev-only trees. Treat **production `dependencies`** first (`pnpm deps:audit:prod`
-audits the prod-reachable graph only); document accepted risk for dev-only
-transitives if no patched upgrade exists yet.
+audits the prod-reachable graph only). An advisory with no patched version
+published is accepted, not silenced — see [Accepted risk](#accepted-risk--no-fixed-version-published).
 
 ### CI posture — which audit blocks a merge
 
 The `Security audit` lane runs both, in this order:
 
-| Step                          |   Blocking    | Why                                                                                                                                                                                                                                                                                                     |
-| ----------------------------- | :-----------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `pnpm deps:audit:prod`        |    **Yes**    | These packages ship to users. Runs **first** so it is always reported — when the full-tree sweep ran first and failed, this step was skipped, so the audit that matters was never evaluated.                                                                                                            |
-| `pnpm deps:audit` (full tree) | No — advisory | A dev-only advisory with **no published fix** would otherwise wedge every PR with no honest exit: `bulk-audit.mjs` has no waiver list by design, and the alternative is dropping the offending tool. Failures stay visible in the job log, and `scheduled-deps-audit.yml` re-runs the full tree weekly. |
+| Step                          |   Blocking    | Why                                                                                                                                                                                                                                                                                                                                  |
+| ----------------------------- | :-----------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `pnpm deps:audit:prod`        |    **Yes**    | These packages ship to users. Runs **first** so it is always reported — when the full-tree sweep ran first and failed, this step was skipped, so the audit that matters was never evaluated.                                                                                                                                         |
+| `pnpm deps:audit` (full tree) | No — advisory | Accepted advisories (below) already pass it, so what can still fail here is drift that says nothing about the PR in hand: a dev-only advisory published this week, or an acceptance whose fix just shipped. Failures stay visible in the job log, and `scheduled-deps-audit.yml` re-runs the full tree weekly as a **blocking** job. |
 
-Make the full-tree step blocking again once the accepted-risk list below is empty.
+### Accepted risk — no fixed version published
 
-### Accepted risk — dev-only, no upgrade available
+One rule, shared with clinozy-be: an advisory with a published fix is **fixed** — an
+`overrides` entry in `pnpm-workspace.yaml`, or a bump. Only an advisory with **no fixed
+version** is accepted, in `auditConfig.ignoreGhsas` in the same file: one entry per GHSA,
+under a comment naming its `Package:`, `Path:`, `No fix:` and `Remove when:`. That is the
+list `pnpm audit` honours, and `tooling/ci/bulk-audit.mjs` reads it too — there is no
+second list:
+
+- an accepted advisory is still **reported** (`accepted (no fix published; newest <package> is <version>)`) but does not fail the run;
+- it **expires on its own**: each run puts the package's newest published version back to
+  the bulk advisory endpoint, and once the advisory no longer applies to it (or names
+  `patched_versions`), the run fails until the entry is removed and the package
+  overridden or bumped:
+  `GHSA-… now has a fix (x.y.z) — remove it from auditConfig.ignoreGhsas and override/bump instead`;
+- an entry no locked package reports any more fails the full-tree run, and an entry
+  without its four comment labels, or with a malformed id, fails every run;
+- every other advisory at or above `high` fails exactly as before.
+
+The table below lists the same GHSA ids as `auditConfig.ignoreGhsas`
+(`tests/ci/audit-accepted-advisories.policy.test.ts` keeps them equal).
 
 | Advisory                                                                                                                              | Path                                                                                                                                                                                              | Why accepted                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -163,9 +181,9 @@ Make the full-tree step blocking again once the accepted-risk list below is empt
 (GHSA-jmr9-qjv8-65gv), the two earlier entries, left the tree with later `netlify-cli`
 releases — neither is in `pnpm-lock.yaml` any more.
 
-While this list is not empty, the weekly `scheduled-deps-audit.yml` run is **red by
-design**: its full-tree step is blocking, because a scheduled run blocks no merge and a red
-run is how a finding stays visible.
+The weekly `scheduled-deps-audit.yml` run is blocking on both steps, because a scheduled
+run blocks no merge and a red run is how a finding stays visible: a new advisory, or an
+accepted one that now has a fix.
 
 ## Upgrade decisions log
 

@@ -9,4 +9,19 @@ export const VERSION_UPDATE_KEYS = {
   title: 'versionUpdate.title',
   description: 'versionUpdate.description',
   refresh: 'versionUpdate.refresh',
+  /** The critical update's notice (`CriticalUpdateNotice`). */
+  required: {
+    title: 'versionUpdate.required.title',
+    countdown: 'versionUpdate.required.countdown',
+    saveFirst: 'versionUpdate.required.saveFirst',
+    announcement: 'versionUpdate.required.announcement',
+    updateNow: 'versionUpdate.required.updateNow',
+  },
+} as const;
+
+/** Test ids of the "Update required" notice and its one button (`CriticalUpdateNotice`). */
+export const CRITICAL_UPDATE_TEST_IDS = {
+  notice: 'critical-update-notice',
+  time: 'critical-update-time',
+  updateNow: 'critical-update-now',
 } as const;

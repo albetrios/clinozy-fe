@@ -96,7 +96,14 @@
   "versionUpdate": {
     "title": "Mise à jour disponible",
     "description": "Une nouvelle version de l’application est prête.",
-    "refresh": "Actualiser maintenant"
+    "refresh": "Actualiser maintenant",
+    "required": {
+      "title": "Mise à jour requise",
+      "countdown": "Rechargement dans {{time}}",
+      "saveFirst": "Enregistrez votre travail, puis mettez à jour",
+      "announcement": "{{productName}} doit installer une mise à jour importante et se rechargera dans {{time}}. Enregistrez votre travail maintenant.",
+      "updateNow": "Mettre à jour"
+    }
   },
   "cells": {
     "patient": "Patient",

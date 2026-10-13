@@ -23,6 +23,34 @@ allowBuilds:
   # Optional native addon for hot-shots (netlify-cli telemetry over a unix socket); unused.
   unix-dgram: false
 
+# Advisories accepted because NO fixed version is published — the same rule as
+# clinozy-be. A fix exists → an override below (or a bump), never an entry here.
+# One entry per GHSA, under a comment naming its Package:, Path:, No fix: and
+# Remove when: (`pnpm deps:audit` refuses an entry without them). `pnpm audit`
+# honours this list; `tooling/ci/bulk-audit.mjs` reads it too, still REPORTS each
+# accepted advisory, and FAILS once the package's newest release is outside the
+# vulnerable range — so an entry cannot outlive its reason. The accepted-risk
+# table in docs/reference/dependency-upgrades.md lists the same ids.
+auditConfig:
+  ignoreGhsas:
+    # Package: braces <=3.0.3 (high) — stack-exhaustion DoS through deeply nested
+    #   brace patterns.
+    # Path: micromatch@4 ← netlify-cli, shadcn and markdownlint-cli2 (dev/tooling
+    #   only — `pnpm deps:audit:prod` is clean); they expand the repo's own globs.
+    # No fix: 3.0.3 is the newest release, and micromatch 4.0.8 (its newest)
+    #   declares ^3.0.3 — nothing to override or bump to.
+    # Remove when: braces publishes a release above 3.0.3; then override to it.
+    - GHSA-vfj7-8cjw-p6xm
+    # Package: node-forge <=1.4.0 (high) — RSA PKCS#1 v1.5 signature verification
+    #   accepts extra nested DigestAlgorithm elements.
+    # Path: netlify-cli → @netlify/dev / @netlify/images → ipx@3 → listhen, which
+    #   only CREATES the self-signed certificate for `netlify dev` (dev CLI only).
+    # No fix: 1.4.0 is the newest release, and listhen 1.10.1 (its newest)
+    #   declares ^1.4.0 — nothing to override or bump to.
+    # Remove when: node-forge publishes a release above 1.4.0, or @netlify/images
+    #   moves to ipx 4 (which drops listhen).
+    - GHSA-86w9-cpqp-85rv
+
 # Transitive pins: patched floors for advisories upstream has not picked up yet.
 # Prefer bounded ranges (>=x.y.z <nextMajor) so patches flow while the known-CVE
 # floor holds. A change here needs a regenerated pnpm-lock.yaml in the same commit.

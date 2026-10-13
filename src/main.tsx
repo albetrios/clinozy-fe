@@ -10,6 +10,7 @@ import {
   preloadSignedInShell,
   router,
 } from '@/app/routes/routeTree.tsx';
+import { showCriticalUpdate } from '@/app/version/show-critical-update.ts';
 import { showUpdateAvailableToast } from '@/app/version/show-update-available-toast.ts';
 import { platformConfig } from '@/core/config/env.ts';
 import { bootstrapResources } from '@/core/resources/index.ts';
@@ -179,10 +180,12 @@ import('@/shared/analytics/consent-account-sync.ts')
 // reload onto the current build per buildId, never over a field being typed in.
 startStaleChunkRecovery();
 
-// Start version check — notify + deferred reload when a new deployment ships (prod only)
+// Start version check — notify + deferred reload when a new deployment ships (prod only);
+// a critical one counts down from the "Update required" notice instead.
 startVersionCheck({
   onUpdateAvailable: ({ buildId, reloadNow, snooze }) =>
     showUpdateAvailableToast({ buildId, reloadNow, snooze }),
+  onCriticalUpdate: showCriticalUpdate,
 });
 
 // Cross-tab logout: when any tab's session dies (admin-suspend, logout-all,

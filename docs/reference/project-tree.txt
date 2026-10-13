@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2208 src files · ~1116 tests in src/ · 89 E2E specs · 27 shadcn UI primitives
+Stats: ~2214 src files · ~1122 tests in src/ · 89 E2E specs · 27 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -403,9 +403,12 @@ clinozy-fe/
 │   │   │   ├── UnauthorizedPage.tsx
 │   │   │   └── [10 test files]
 │   │   └── version/
+│   │       ├── CriticalUpdateNotice.tsx
+│   │       ├── CriticalUpdateNoticeLazy.tsx
+│   │       ├── show-critical-update.ts
 │   │       ├── show-update-available-toast.ts
 │   │       ├── version-update.constants.ts
-│   │       └── [1 test file]
+│   │       └── [4 test files]
 │   ├── core/
 │   │   ├── config/
 │   │   │   ├── app-manifest.ts
@@ -460,6 +463,7 @@ clinozy-fe/
 │   │   │   └── [3 test files]
 │   │   └── version/
 │   │       ├── check.ts
+│   │       ├── minimum-version.constants.ts
 │   │       ├── reload-marker.ts
 │   │       ├── stale-chunk-recovery.ts
 │   │       ├── version-check.constants.ts
@@ -514,10 +518,12 @@ clinozy-fe/
 │   │   │   ├── users-builders.ts
 │   │   │   └── [16 test files]
 │   │   ├── app-splash.ts
+│   │   ├── app-version.ts
 │   │   ├── appearance-surface.ts
 │   │   ├── bidi-isolate.ts
 │   │   ├── brand-wordmark.ts
 │   │   ├── chunk-prefetch.ts
+│   │   ├── countdown.ts
 │   │   ├── csp-api-origin.ts
 │   │   ├── csv.ts
 │   │   ├── editable-focus.ts
@@ -539,7 +545,7 @@ clinozy-fe/
 │   │   ├── signed-in-shell-warmup.ts
 │   │   ├── telemetry-scrub.ts
 │   │   ├── utils.ts
-│   │   └── [26 test files]
+│   │   └── [28 test files]
 │   ├── locales/
 │   │   ├── ar/
 │   │   │   ├── app-stock.json
@@ -2919,10 +2925,11 @@ clinozy-fe/
 │   ├── index.css
 │   ├── main.tsx
 │   ├── sw.ts
-│   └── vite-env.d.ts
+│   ├── vite-env.d.ts
+│   └── [1 test file]
 ├── tests/
 │   ├── ci/
-│   │   └── [36 test files]
+│   │   └── [39 test files]
 │   ├── cross-browser/
 │   │   └── [2 test files]
 │   ├── e2e/
@@ -3026,6 +3033,7 @@ clinozy-fe/
 │   ├── ci/
 │   │   ├── build.d.mts
 │   │   ├── build.mjs
+│   │   ├── bulk-audit.d.mts
 │   │   ├── bulk-audit.mjs
 │   │   ├── check-api-contract-drift.mjs
 │   │   ├── check-css-sources.mjs
@@ -3113,6 +3121,8 @@ clinozy-fe/
 │   │   └── setup.config.json
 │   ├── sonar/
 │   │   └── sonar-gate.mjs
+│   ├── stryker/
+│   │   └── vitest-runner-shim.mjs
 │   ├── test/
 │   │   └── empty-env/
 │   │       └── .gitkeep
@@ -3192,7 +3202,6 @@ clinozy-fe/
 ├── SETUP.md
 ├── sonar-project.properties
 ├── stryker.config.json
-├── stryker.config.mjs
 ├── tsconfig.app.json
 ├── tsconfig.json
 ├── tsconfig.node.json

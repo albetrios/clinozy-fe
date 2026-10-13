@@ -1,10 +1,14 @@
 name: Scheduled deps audit
 
-# Weekly `pnpm audit` over the full dependency tree. The PR `security-audit`
-# lane now runs only when a dependency manifest changes (pr-ci.yml `deps`
-# filter) — this cron restores advisory-drift coverage: a CVE published against
-# an already-installed, unchanged dependency is caught here even when no PR
-# touches package.json / pnpm-lock.yaml. Scheduled, so a finding surfaces as a
+# Weekly `pnpm deps:audit` (tooling/ci/bulk-audit.mjs) over the full dependency
+# tree. The PR `security-audit` lane now runs only when a dependency manifest
+# changes (pr-ci.yml `deps` filter) — this cron restores advisory-drift coverage:
+# a CVE published against an already-installed, unchanged dependency is caught
+# here even when no PR touches package.json / pnpm-lock.yaml. Both steps block:
+# an advisory with no published fix is accepted only through
+# `auditConfig.ignoreGhsas` in pnpm-workspace.yaml (reported, not failed), and
+# once a fix is published for one the run goes red until the entry is removed
+# and the package overridden or bumped. Scheduled, so a finding surfaces as a
 # red run on the Actions tab (there is no merge to block); trigger on demand
 # with workflow_dispatch. Same two steps as the PR lane (all + prod deps).
 
