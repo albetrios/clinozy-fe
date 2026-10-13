@@ -300,8 +300,28 @@ const config = [
      * Trimmed first: nothing — each is a shared helper the rooms now call
      * instead of their own copies, or the auth runtime itself. ~0.4 kB of
      * headroom.
+     *
+     * 243.8 → 245.0 kB: a declared exemption, itemised — the critical-update
+     * flow (a release can require every open tab to update; frontend-platform.md
+     * → Critical updates). Measured 244.63 kB, from 243.73 kB on its base (the
+     * npm-non-major bump had already spent the headroom above), both ends built
+     * the same way (no env file, as CI) and the first-paint chunks compared:
+     * - The checker's critical path (+0.79 kB, entry): `isCriticalUpdate`, the
+     *   countdown with its offline wait and its loop guard (`check.ts`),
+     *   `compareReleaseVersions` (`lib/app-version.ts`), the notice's lazy
+     *   shell, its `useUIStore` field and `showCriticalUpdate`. First paint by
+     *   definition: the checker runs in every tab from boot, and lazy-loading
+     *   the decision would make "must this tab update?" depend on fetching a
+     *   chunk the new deploy may already have removed.
+     * - The notice's copy in `common` (+0.09 kB, the `i18n` chunk) and its two
+     *   analytics event names (+0.03 kB).
+     * Trimmed first: the notice itself loads on demand
+     * (`CriticalUpdateNoticeLazy`, pinned by its test; −0.39 kB), and reads its
+     * copy through the shared i18n instance — importing react-i18next from the
+     * lazy chunk had split `useTranslation` into a first-paint chunk of its own
+     * (−0.37 kB). ~0.4 kB of headroom.
      */
-    limit: '243.8 kB',
+    limit: '245.0 kB',
     gzip: true,
   },
   ...(cssPaths.length

@@ -113,7 +113,14 @@
   "versionUpdate": {
     "title": "Update available",
     "description": "A new version of the app is ready.",
-    "refresh": "Refresh now"
+    "refresh": "Refresh now",
+    "required": {
+      "title": "Update required",
+      "countdown": "Reloading in {{time}}",
+      "saveFirst": "Save your work, then update",
+      "announcement": "{{productName}} needs an important update and reloads in {{time}}. Save your work now.",
+      "updateNow": "Update now"
+    }
   },
   "cells": {
     "patient": "Patient",
