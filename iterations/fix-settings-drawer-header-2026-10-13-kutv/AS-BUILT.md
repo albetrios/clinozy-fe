@@ -25,8 +25,13 @@ What was actually built, ledger row by ledger row, against the approved plan in
 
 - **Planned, not built** (deferred, user OK): none — every ledger row is done.
 - **Built, not planned:** none.
-- **Not run here:** the e2e Playwright suite and the pre-push SonarQube scan (they run at
-  `git push` through the pre-push hook, or on a machine with the full stack).
+- **The push gate:** the pre-push hook passed in full — Biome, type-check, build, `build:check`,
+  docs lint, the whole Vitest run (1,176 files / 9,367 tests), `contracts:drift`,
+  `api:types:check` and the local SonarQube gate (0 issues, 0 hotspots). SonarQube's first start in
+  this session needed `vm.max_map_count` raised and its Elasticsearch disk threshold switched off
+  (the session disk reads 91% used) — local machine settings, nothing in the repository.
+- **Not run here:** the Playwright e2e suite; the change is covered by the unit suites and the
+  measurement in the running app (#5).
 - **After done (D5):** the folder keeps only what this fix produced — `intake-files/BRIEF.md`, the
   plan, the decisions and this record; the 22 files copied from the launch are removed, so this
   iteration's intake gate no longer passes by design (as in the two `change-*` iterations).
