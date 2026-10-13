@@ -1,6 +1,6 @@
 # Clinic setup — kickoff plan
 
-> **Status: ready for approval, 2026-10-13** (self-check passed). Planned with `fe-iteration-planning` against Baseline
+> **Status: approved on 2026-10-13** (D31), after the self-check. Planned with `fe-iteration-planning` against Baseline
 > `launch-2026-09-30-jxmr`, from `BRIEF.md` (Intake mode `brief`). Every RED question is answered (D1–D30 in
 > `plans/decisions.md`). The backend half is in clinozy-be's same-named iteration: its route review
 > (`plans/routes-final.md` there, final) is the contract this plan builds against. `fe-kickoff-iteration` builds §3–§6
