@@ -473,8 +473,25 @@ const config = [
            * handle's slot, and the Appearance studio's controls — Tailwind emits
            * a file's classes whether or not anything mounts it. ~0.4 kB of
            * headroom.
+           *
+           * 35.9 → 36.3 kB: a declared exemption, itemised — the phone tab bar
+           * becomes a floating glass capsule (iterations/
+           * change-floating-tab-bar-2026-10-13-pkhy, decision D14), and the
+           * tab bar is the first paint of every signed-in phone screen. Main
+           * measured 35.89 kB (12 B under the old limit); this tree 36.25 kB,
+           * +0.36 kB: the capsule's geometry tokens and the derived
+           * `--floating-bottom-offset`, the glass and the scroll-edge fade
+           * (two `::before` layers on tokens, no `color-mix()` — each one
+           * ships twice), the dark glass, the sliding lens and its four slot
+           * positions, the press dip, and the page and feedback-trigger
+           * clearance. It was cut from +0.86 kB first: the same look as
+           * utilities cost 7.8 kB raw (the `rtl:` lens positions, the
+           * backdrop-filter chains and the `color-mix()` fallbacks), and the
+           * removed old-bar utilities pay back 0.15 kB raw. ~0.05 kB of
+           * headroom; lower it as soon as anything here can leave the first
+           * paint.
            */
-          limit: '35.9 kB',
+          limit: '36.3 kB',
           gzip: true,
         },
       ]

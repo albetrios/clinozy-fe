@@ -137,8 +137,9 @@ on its surface, in both modes.
     `change-floating-tab-bar-2026-10-13-pkhy`) — 62px tall, 12px from the sides,
     lifted off the bottom by `--tab-bar-gap` (12px, or the safe-area inset less
     12px over a home indicator), with a selection lens that slides to the current
-    room in its tone and a scroll-edge fade under it. Its geometry lives in
-    `index.css` (`--tab-bar-height`, `--tab-bar-gap`); the capsule is a
+    room in its tone and a scroll-edge fade under it. Its geometry and its
+    glass live in `index.css` (`--tab-bar-height`, `--tab-bar-gap`, two token
+    `::before` layers — no `color-mix()`, which ships twice); the capsule is a
     `floating-edge` slot, so the Shape and Elevation axes own its corners and
     shadow. Anything else pinned to the bottom edge rides above it through
     `--floating-bottom-offset` — the capsule's top edge less the inset, which

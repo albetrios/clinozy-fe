@@ -1652,6 +1652,79 @@
     --floating-bottom-offset: 0rem;
   }
 }
+/* The bar itself. Its material is drawn here rather than in utilities: one
+   rule is a fraction of the first-paint CSS the utility set costs (`pnpm
+   size`), and it mixes no colour (each `color-mix()` ships twice). Tokens
+   only, so every preset and dark mode follow. The nav's `::before` is the
+   scroll-edge fade (the nav takes no taps); the capsule is glass — a blurred
+   backdrop under its `::before` at 72%, which carries a top sheen — with an
+   inset hairline that takes none of the slots' 54px. In dark the card is the
+   page colour, so the glass lifts to the muted surface. */
+[data-slot='mobile-nav'] {
+  height: calc(var(--tab-bar-gap) + var(--tab-bar-height) + 1.5rem);
+}
+[data-slot='mobile-nav']::before,
+[data-slot='mobile-nav'] > [data-slot='floating-edge']::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.9;
+  background: linear-gradient(transparent, var(--color-background));
+}
+[data-slot='mobile-nav'] > [data-slot='floating-edge'] {
+  --glass: var(--color-card);
+  --glass-sheen: var(--color-card);
+  bottom: var(--tab-bar-gap);
+  height: var(--tab-bar-height);
+  outline: 1px solid var(--color-border);
+  outline-offset: -1px;
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  backdrop-filter: blur(24px) saturate(1.5);
+}
+[data-slot='mobile-nav'] > [data-slot='floating-edge']::before {
+  opacity: 0.72;
+  background: linear-gradient(var(--glass-sheen), var(--glass) 33%);
+}
+.dark [data-slot='mobile-nav'] > [data-slot='floating-edge'] {
+  --glass: var(--color-muted);
+  --glass-sheen: var(--color-muted-strong);
+  outline-color: var(--color-border-strong);
+}
+/* The selection lens: a fifth of the bar per slot (`data-lens`), mirrored for
+   right-to-left, sliding on the sheet curve. Reduced motion cuts the
+   transition (below), so it lands at once. */
+[data-lens] {
+  inset-block: 0.25rem;
+  inset-inline-start: 0.25rem;
+  width: calc(20% - 0.1rem);
+  translate: calc(var(--lens, 0) * 100%);
+  /* translate, the tone's crossfade and the fade-out alike. */
+  transition: 320ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+[dir='rtl'] [data-lens] {
+  translate: calc(var(--lens, 0) * -100%);
+}
+[data-lens='1'] {
+  --lens: 1;
+}
+[data-lens='2'] {
+  --lens: 2;
+}
+[data-lens='3'] {
+  --lens: 3;
+}
+[data-lens='4'] {
+  --lens: 4;
+}
+/* A pressed slot's icon and label dip to 92% and spring back. */
+[data-slot='tab-content'] {
+  transition: scale 100ms;
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-slot='mobile-nav'] :active > [data-slot='tab-content'] {
+    scale: 0.92;
+  }
+}
 /* The phone bottom stack (clinic screens, D30), bottom to top: tab bar →
    notice pill (centre, +14px) → floating "New" (inline end, +16px) → upload
    tray (inline end) → toasts (centre, top layer). A layer that is showing

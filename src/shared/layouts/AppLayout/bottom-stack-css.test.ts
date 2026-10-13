@@ -72,6 +72,52 @@ describe('phone bottom stack (index.css)', () => {
     );
   });
 
+  it('draws the capsule as glass on tokens, with no colour mixed', () => {
+    const capsule = declarations(
+      "[data-slot='mobile-nav'] > [data-slot='floating-edge']",
+    );
+    expect(capsule).toContain('bottom: var(--tab-bar-gap)');
+    expect(capsule).toContain('height: var(--tab-bar-height)');
+    expect(capsule).toContain('backdrop-filter: blur(24px) saturate(1.5)');
+    expect(capsule).toContain('outline-offset: -1px');
+    // The glass is the capsule's own `::before` at 72%, over a blurred backdrop
+    // (the first `::before` rule is the one it shares with the nav's fade).
+    expect(rules).toContain(
+      "[data-slot='mobile-nav'] > [data-slot='floating-edge']::before {\n  opacity: 0.72;",
+    );
+    expect(
+      declarations(".dark [data-slot='mobile-nav'] > [data-slot='floating-edge']"),
+    ).toContain('--glass: var(--color-muted)');
+    // Every `color-mix()` ships twice (a hex fallback plus an @supports copy).
+    const bar = rules.slice(
+      rules.indexOf("[data-slot='mobile-nav'] {"),
+      rules.indexOf("[dir='rtl'] [data-lens]"),
+    );
+    expect(bar).not.toContain('color-mix(');
+  });
+
+  it('places the lens a fifth of the bar per slot, mirrored for right-to-left', () => {
+    const lens = declarations('[data-lens]');
+    expect(lens).toContain('width: calc(20% - 0.1rem)');
+    expect(lens).toContain('translate: calc(var(--lens, 0) * 100%)');
+    expect(lens).toContain('transition: 320ms cubic-bezier(0.32, 0.72, 0, 1)');
+    expect(declarations("[dir='rtl'] [data-lens]")).toContain(
+      'translate: calc(var(--lens, 0) * -100%)',
+    );
+    for (const step of [1, 2, 3, 4]) {
+      expect(declarations(`[data-lens='${step}']`)).toContain(`--lens: ${step}`);
+    }
+  });
+
+  it('dips a pressed slot only when motion is allowed', () => {
+    expect(
+      declarations(
+        "[data-slot='mobile-nav'] :active > [data-slot='tab-content']",
+        '(prefers-reduced-motion: no-preference)',
+      ),
+    ).toContain('scale: 0.92');
+  });
+
   it('a showing notice pill publishes 52px and a mounted "New" 60px, on phone only', () => {
     expect(declarations(":root:has([data-slot='notice-pill'])", PHONE)).toContain(
       '--floating-notice-height: 3.25rem',

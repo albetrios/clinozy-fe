@@ -308,27 +308,23 @@ describe('SectionBarShell — floating tab bar (change-floating-tab-bar)', () =>
     return tone;
   }
 
-  it('floats a glass capsule inside a nav that takes no taps, over a scroll-edge fade', async () => {
+  it('floats the capsule inside a nav that takes no taps', async () => {
     const { bar } = await tabBar('/organization/acme/patients');
     const nav = bar.closest('nav');
     expect(nav).toHaveAttribute('data-slot', 'mobile-nav');
     expect(nav).toHaveClass('fixed', 'bottom-0', 'pointer-events-none', 'md:hidden');
     // The theme axes own it: Sharp squares `floating-edge`, Elevation shadows it.
+    // Its glass, height and lift are `index.css`'s (bottom-stack-css.test.ts).
     expect(bar).toHaveAttribute('data-slot', 'floating-edge');
+    expect(nav?.firstElementChild).toBe(bar);
     expect(bar).toHaveClass(
       'pointer-events-auto',
       'rounded-full',
+      'overflow-hidden',
       'inset-x-3',
       'max-w-md',
-      'h-(--tab-bar-height)',
-      'bottom-(--tab-bar-gap)',
-      'backdrop-blur-xl',
-      'bg-card/95',
-      'supports-backdrop-filter:bg-card/72',
+      'grid-cols-5',
     );
-    const fade = nav?.querySelector('[data-slot="scroll-edge"]');
-    expect(fade).toHaveAttribute('aria-hidden', 'true');
-    expect(fade).toHaveClass('bg-linear-to-t', 'from-background/90');
   });
 
   it('puts the lens under a pinned current room, in its tone', async () => {
@@ -338,11 +334,8 @@ describe('SectionBarShell — floating tab bar (change-floating-tab-bar)', () =>
     expect(lens).toHaveAttribute('data-lens', '2');
     expect(lens).toHaveAttribute('aria-hidden', 'true');
     expect(lens).toHaveAttribute('data-slot', 'pill');
-    expect(lens).toHaveClass(
-      'translate-x-[200%]',
-      'rtl:-translate-x-[200%]',
-      toneOf(slots[index] as HTMLElement).bg,
-    );
+    // `index.css` places it from `data-lens`, a fifth of the bar per slot.
+    expect(lens).toHaveClass('absolute', toneOf(slots[index] as HTMLElement).bg);
     expect(lens).not.toHaveClass('opacity-0');
   });
 
@@ -351,12 +344,7 @@ describe('SectionBarShell — floating tab bar (change-floating-tab-bar)', () =>
     const { lens, slots } = await tabBar('/organization/acme/patients');
     await user.click(slots[1] as HTMLElement);
     await waitFor(() => expect(lens).toHaveAttribute('data-lens', '1'));
-    expect(lens).toHaveClass(
-      'translate-x-full',
-      'rtl:-translate-x-full',
-      toneOf(slots[1] as HTMLElement).bg,
-    );
-    expect(lens).toHaveClass('duration-320', 'ease-[cubic-bezier(0.32,0.72,0,1)]');
+    expect(lens).toHaveClass(toneOf(slots[1] as HTMLElement).bg);
   });
 
   it('carries the lens to "More" when it names an unpinned current room', async () => {
@@ -364,7 +352,7 @@ describe('SectionBarShell — floating tab bar (change-floating-tab-bar)', () =>
     const more = slots[4] as HTMLElement;
     expect(more).toHaveAttribute('aria-current', 'page');
     expect(lens).toHaveAttribute('data-lens', '4');
-    expect(lens).toHaveClass('translate-x-[400%]', toneOf(more).bg);
+    expect(lens).toHaveClass(toneOf(more).bg);
   });
 
   it('fades the lens out when no room is current', async () => {
@@ -387,13 +375,13 @@ describe('SectionBarShell — floating tab bar (change-floating-tab-bar)', () =>
     );
   });
 
-  it('draws 22px icons and dips a pressed slot only when motion is allowed', async () => {
+  it('draws 22px icons over their labels, wrapped as the content that dips when pressed', async () => {
     const { slots } = await tabBar('/organization/acme/patients');
     for (const slot of slots) {
       const icon = slot.querySelector('svg');
       expect(icon).toHaveClass('size-5.5');
-      // The icon and its label dip together: their wrapper scales.
-      expect(icon?.parentElement).toHaveClass('motion-safe:group-active:scale-[0.92]');
+      // The icon and its label dip together (`index.css`): their wrapper.
+      expect(icon?.parentElement).toHaveAttribute('data-slot', 'tab-content');
     }
   });
 });

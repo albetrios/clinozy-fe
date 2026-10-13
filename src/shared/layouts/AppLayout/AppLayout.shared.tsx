@@ -83,10 +83,12 @@ export function SearchTrigger({ className }: { className?: string }) {
 
 /** A slot: icon over label, above the lens; its ink fades with the lens's slide. */
 const tabSlotClassName =
-  'group relative z-10 flex min-w-0 flex-col items-center justify-center transition-colors duration-320 [-webkit-tap-highlight-color:transparent]';
-/** The slot's content dips to 92% while pressed (not under reduced motion). */
-const tabContentClassName =
-  'flex w-full min-w-0 flex-col items-center gap-0.5 transition-transform duration-100 motion-safe:group-active:scale-[0.92]';
+  'relative flex min-w-0 flex-col items-center justify-center transition-colors duration-300 [-webkit-tap-highlight-color:transparent]';
+/**
+ * Icon over label; `tab-content` is what dips to 92% while the slot is
+ * pressed (`index.css`, not under reduced motion).
+ */
+const tabContentClassName = 'relative flex w-full min-w-0 flex-col items-center gap-0.5';
 const tabIconClassName = 'size-5.5 flex-none';
 /**
  * The 10.5px label, centred and unpadded — the slot's full width is what fits
@@ -94,18 +96,6 @@ const tabIconClassName = 'size-5.5 flex-none';
  * its weight.
  */
 const tabLabelClassName = 'text-center text-tiny leading-[1.1]';
-
-/**
- * Where the lens sits, by slot index — one literal class per slot so the
- * stylesheet holds every position, each mirrored for right-to-left.
- */
-const LENS_POSITION = [
-  'translate-x-0',
-  'translate-x-full rtl:-translate-x-full',
-  'translate-x-[200%] rtl:-translate-x-[200%]',
-  'translate-x-[300%] rtl:-translate-x-[300%]',
-  'translate-x-[400%] rtl:-translate-x-[400%]',
-] as const;
 
 /** One tab-bar slot: a 22px icon over a 10.5px label, in the room's tone ink when current. */
 function TabBarItem({
@@ -132,7 +122,7 @@ function TabBarItem({
         current ? tone.ink : 'text-muted-foreground-strong',
       )}
     >
-      <span className={tabContentClassName}>
+      <span data-slot="tab-content" className={tabContentClassName}>
         <entry.icon
           className={cn(tabIconClassName, !current && 'text-muted-foreground')}
           aria-hidden
@@ -148,9 +138,10 @@ function TabBarItem({
 
 /**
  * The selection lens: one capsule behind the current slot, in its room's
- * tone, sliding to the next slot when the room changes (320ms, the sheet
- * curve) and fading out when no slot is current. Reduced motion cuts the
- * transition (`index.css`), so it lands at once.
+ * tone. `index.css` places it from `data-lens` — a fifth of the bar per slot,
+ * mirrored for right-to-left — and slides it to the next slot when the room
+ * changes (320ms, the sheet curve); it fades out when no slot is current.
+ * Reduced motion cuts the transition, so it lands at once.
  */
 function TabBarLens({ index, tone }: { index: number | null; tone: string | null }) {
   return (
@@ -159,8 +150,8 @@ function TabBarLens({ index, tone }: { index: number | null; tone: string | null
       data-slot="pill"
       data-lens={index ?? 'none'}
       className={cn(
-        'pointer-events-none absolute inset-y-1 start-1 w-[calc((100%-0.5rem)/5)] rounded-full transition-[translate,background-color,opacity] duration-320 ease-[cubic-bezier(0.32,0.72,0,1)]',
-        index === null ? 'opacity-0' : LENS_POSITION[index],
+        'pointer-events-none absolute rounded-full',
+        index === null && 'opacity-0',
         tone ?? 'bg-muted',
       )}
     />
@@ -215,10 +206,10 @@ function SectionTabBar({
           <span
             aria-hidden
             data-slot="pill"
-            className="bg-muted absolute inset-0 -z-10 rounded-full"
+            className="bg-muted absolute inset-0 rounded-full"
           />
         ) : null}
-        <span className={tabContentClassName}>
+        <span data-slot="tab-content" className={tabContentClassName}>
           <Compass
             className={cn(tabIconClassName, !moreTone && 'text-muted-foreground')}
             aria-hidden
@@ -265,30 +256,19 @@ export function MobileNav({
       aria-label={t(LAYOUT_KEYS.app.sectionBar.nav)}
       // `mobile-nav` is what `index.css` looks for to lift floating corner
       // surfaces (consent card, feedback trigger, notice pills, the floating
-      // "New") clear of this bar, and where it declares the bar's geometry.
+      // "New") clear of this bar, and where it draws the bar: its geometry,
+      // the scroll-edge fade (this nav's `::before`) and the capsule's glass.
       // The nav itself takes no taps: only the capsule does.
       data-slot="mobile-nav"
-      className="pointer-events-none fixed inset-x-0 bottom-0 z-40 h-[calc(var(--tab-bar-gap)+var(--tab-bar-height)+1.5rem)] md:hidden"
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-40 md:hidden"
     >
-      <span
-        aria-hidden
-        data-slot="scroll-edge"
-        className="from-background/90 via-background/55 absolute inset-0 bg-linear-to-t to-transparent"
-      />
       {/* `floating-edge`: the Sharp shape squares it, the Elevation axis owns
-          its shadow. Near opaque where the browser cannot blur. The hairline
-          is an inset outline, so it takes none of the slots' 54px. In dark the
-          card is the page colour, so the glass lifts to the muted surface. */}
+          its shadow. */}
       <div
         data-slot="floating-edge"
         data-testid="mobile-bottom-bar"
-        className="bg-card/95 supports-backdrop-filter:bg-card/72 outline-border/70 dark:bg-muted/95 dark:supports-backdrop-filter:bg-muted/70 dark:outline-border-strong/80 pointer-events-auto absolute inset-x-3 bottom-(--tab-bar-gap) mx-auto grid h-(--tab-bar-height) max-w-md grid-cols-5 overflow-hidden rounded-full p-1 outline -outline-offset-1 backdrop-blur-xl backdrop-saturate-150"
+        className="pointer-events-auto absolute inset-x-3 mx-auto grid max-w-md grid-cols-5 overflow-hidden rounded-full p-1"
       >
-        {/* The glass's top highlight, clipped by the capsule. */}
-        <span
-          aria-hidden
-          className="from-card/80 dark:from-foreground/8 pointer-events-none absolute inset-x-0 top-0 h-1/3 bg-linear-to-b to-transparent"
-        />
         <SectionTabBar sections={sections} organizationSlug={organizationSlug} />
       </div>
     </nav>
@@ -412,14 +392,13 @@ export function AppMain({ flush = false }: { flush?: boolean } = {}) {
       id="main-content"
       ref={mainRef}
       // `app-main`: index.css extends the bottom padding by the consent card's
-      // height on phones. The `sm:pb-…` is not redundant — `sm:p-6` resets every
-      // side, and the tab bar this padding clears (its top edge plus 12px)
-      // stays until `md`.
+      // height on phones. `sm:pb-20` is not redundant — `sm:p-6` resets every
+      // side, and the tab bar this padding clears stays until `md`.
       data-slot="app-main"
       className={
         flush
           ? 'flex min-h-0 flex-1 flex-col overflow-y-auto pb-[calc(var(--floating-bottom-offset,0rem)+env(safe-area-inset-bottom))]'
-          : '3xl:p-8 flex-1 overflow-y-auto p-4 pb-[calc(var(--floating-bottom-offset,0rem)+env(safe-area-inset-bottom)+0.75rem)] sm:p-6 sm:pb-[calc(var(--floating-bottom-offset,0rem)+env(safe-area-inset-bottom)+0.75rem)] md:pb-6'
+          : '3xl:p-8 flex-1 overflow-y-auto p-4 pb-20 sm:p-6 sm:pb-20 md:pb-6'
       }
       data-testid="main-content"
       data-layout-width={layoutWidth}
