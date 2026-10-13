@@ -17,6 +17,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/shared/components/ui/tooltip.tsx';
+import { WeightStableLabel } from '@/shared/components/WeightStableLabel/index.ts';
 import { useElementWidth } from '@/shared/hooks/useElementWidth/index.ts';
 import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import { useViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
@@ -65,18 +66,29 @@ function SegmentLabel({
   label,
   badge,
   iconClassName,
+  stableWeight = false,
 }: {
   icon?: AppIcon;
   label?: string;
   badge?: ReactNode;
   iconClassName?: string;
+  /** The look draws the selected tab bolder: keep every label at its bold width. */
+  stableWeight?: boolean;
 }) {
+  let text: ReactNode = null;
+  if (label !== undefined) {
+    text = stableWeight ? (
+      <WeightStableLabel label={label} />
+    ) : (
+      <span className="min-w-0 truncate">{label}</span>
+    );
+  }
   return (
     <>
       {Icon ? (
         <Icon aria-hidden="true" className={cn('size-3.5 flex-none', iconClassName)} />
       ) : null}
-      {label === undefined ? null : <span className="min-w-0 truncate">{label}</span>}
+      {text}
       {badge}
     </>
   );
@@ -285,7 +297,15 @@ type RoomViewTabsLook = 'track' | 'card' | 'plain';
 const VIEW_LOOKS: Readonly<
   Record<
     RoomViewTabsLook,
-    { list: string; segment: string; selected: string; idle: string; icon?: string }
+    {
+      list: string;
+      segment: string;
+      selected: string;
+      idle: string;
+      icon?: string;
+      /** Selected is bolder than idle: labels keep their bold width (D6). */
+      stableWeight?: boolean;
+    }
   >
 > = {
   track: {
@@ -302,6 +322,7 @@ const VIEW_LOOKS: Readonly<
     selected:
       'bg-primary text-primary-foreground font-semibold shadow-(--elevation-control)',
     idle: 'text-muted-foreground-strong hover:bg-muted font-medium',
+    stableWeight: true,
   },
   // The patient file bar (H:710): no track, 32px tabs; an idle tab's icon is muted.
   plain: {
@@ -311,6 +332,7 @@ const VIEW_LOOKS: Readonly<
     selected: 'bg-muted text-foreground font-semibold',
     idle: 'text-foreground-soft hover:bg-muted font-medium',
     icon: 'text-muted-foreground group-data-[state=active]/view-tab:text-current',
+    stableWeight: true,
   },
 };
 
@@ -389,6 +411,7 @@ function ViewTab({
         label={tab.iconOnly ? undefined : tab.label}
         badge={tab.badge}
         iconClassName={styles.icon}
+        stableWeight={styles.stableWeight}
       />
     </TabsPrimitive.Trigger>
   );

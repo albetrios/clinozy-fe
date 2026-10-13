@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2208 src files · ~1117 tests in src/ · 89 E2E specs · 27 shadcn UI primitives
+Stats: ~2210 src files · ~1119 tests in src/ · 89 E2E specs · 27 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -472,7 +472,7 @@ clinozy-fe/
 │   │   │   ├── PageTransition.tsx
 │   │   │   ├── prefers-reduced-motion.ts
 │   │   │   ├── useReplayedAnimation.ts
-│   │   │   └── [2 test files]
+│   │   │   └── [3 test files]
 │   │   ├── billing/
 │   │   │   ├── stripe-return.ts
 │   │   │   └── [1 test file]
@@ -2247,6 +2247,10 @@ clinozy-fe/
 │   │   │   │   ├── upload-tray.constants.ts
 │   │   │   │   ├── UploadTray.tsx
 │   │   │   │   └── [2 test files]
+│   │   │   ├── WeightStableLabel/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── WeightStableLabel.tsx
+│   │   │   │   └── [1 test file]
 │   │   │   ├── WidgetErrorBoundary/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── WidgetErrorBoundary.tsx
