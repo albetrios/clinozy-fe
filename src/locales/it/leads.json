@@ -37,6 +37,8 @@
       "updated": "Aggiornato"
     },
     "empty": "Nessun lead corrisponde",
+    "emptyTitle": "Ancora nessun lead",
+    "emptyHint": "Qui arrivano le richieste da chiamate, WhatsApp e visite senza appuntamento.",
     "clearFilters": "Cancella filtri",
     "moreInterests_one": "Altro {{count}}: {{list}}",
     "moreInterests_many": "Altri {{count}}: {{list}}",

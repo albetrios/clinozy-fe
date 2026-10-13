@@ -8,6 +8,7 @@ import { type TaskRow, visibleTaskOutcomes } from '@/shared/api/app/tasks-contra
 import type { TodayLane } from '@/shared/api/app/today-contracts.ts';
 import { appCommandNavigation } from '@/shared/app/app-command-targets.ts';
 import { type TaskTarget, taskTargetNavigation } from '@/shared/app/task-targets.ts';
+import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useAppNavigate } from '@/shared/hooks/useAppNavigate/index.ts';
 import { useRolesInForce } from '@/shared/hooks/useAppRoles/index.ts';
@@ -16,6 +17,7 @@ import { useMeContext } from '@/shared/hooks/useMeContext/index.ts';
 import { useMyMembershipId } from '@/shared/hooks/useMyMembership/index.ts';
 import { useNow } from '@/shared/hooks/useNow/index.ts';
 import { useTeamDirectory } from '@/shared/hooks/useTeamDirectory/index.ts';
+import { House } from '@/shared/icons/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
 import { LanePanel } from './components/LanePanel/index.ts';
@@ -222,12 +224,13 @@ export function TodayPage() {
               />
             </>
           ) : (
-            <p
-              data-testid={TODAY_TEST_IDS.noLanes}
-              className="text-body text-muted-foreground-strong"
-            >
-              {t(TODAY_KEYS.lanes.none)}
-            </p>
+            // The room look in Today's butter (change-empty-states, built beyond R1–R7).
+            <EmptyState
+              tone="butter"
+              icon={<House />}
+              title={t(TODAY_KEYS.lanes.none)}
+              testId={TODAY_TEST_IDS.noLanes}
+            />
           )}
         </div>
         {queue.shown ? (

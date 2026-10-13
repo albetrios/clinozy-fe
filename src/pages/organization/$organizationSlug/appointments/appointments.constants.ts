@@ -70,7 +70,7 @@ export const APPOINTMENTS_KEYS = {
     },
     minutes: 'agenda.minutes',
     empty: 'agenda.empty',
-    bookOne: 'agenda.bookOne',
+    emptyHint: 'agenda.emptyHint',
     /** A day group's label and sub line (H:5906). */
     day: {
       today: 'agenda.day.today',

@@ -133,9 +133,15 @@ describe('TaskList (tasks.md:18–38)', () => {
     const onNewTask = vi.fn();
     renderList({ rows: [], onNewTask });
     expect(screen.queryAllByRole('rowgroup')).toHaveLength(1);
-    expect(screen.getByTestId('tasks-empty')).toHaveTextContent(
+    const empty = screen.getByTestId('tasks-empty');
+    expect(within(empty).getByRole('heading', { name: 'All caught up' })).toBeVisible();
+    expect(empty).toHaveTextContent(
       'Nothing needs you right now. New tasks appear here as leads write, visits come up and feedback arrives.',
     );
+    // The plum room look, centred: the list, its row group, row and cell grow.
+    expect(within(empty).getByTestId('empty-state')).toHaveAttribute('data-tone', 'plum');
+    expect(empty).toHaveClass('flex-1');
+    expect(screen.getByTestId('tasks-list')).toHaveClass('flex-1');
     await userEvent.setup().click(screen.getByTestId('tasks-empty-new'));
     expect(onNewTask).toHaveBeenCalledOnce();
   });
@@ -152,6 +158,9 @@ describe('TaskList (tasks.md:18–38)', () => {
     expect(within(snoozed).getByTestId('tasks-empty')).toHaveTextContent(
       'No snoozed tasks',
     );
+    expect(
+      within(snoozed).getByRole('heading', { name: 'No snoozed tasks' }),
+    ).toBeVisible();
     rerenderList({ tab: 'done', rows: [] });
     const done = screen.getByTestId('tasks-group-done');
     expect(done).toHaveTextContent('Resolved');

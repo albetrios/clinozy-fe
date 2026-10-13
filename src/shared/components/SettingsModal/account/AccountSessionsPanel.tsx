@@ -84,7 +84,7 @@ export function AccountSessionsPanel() {
         // The skeleton used to hand over to nothing at all — a blank panel that
         // reads as a still-loading screen (SET-21).
         <EmptyState
-          tone="stone"
+          tone="sky"
           icon={<Laptop />}
           title={t(panels.emptyTitle)}
           description={t(panels.emptyDescription)}

@@ -85,6 +85,8 @@ export const TASKS_KEYS = {
     patient: 'sources.patient',
     contact: 'sources.contact',
   } satisfies Record<TaskLinkKind | 'patient' | 'contact', string>,
+  /** To do's empty-state title over the queue line (change-empty-states R34). */
+  emptyCaughtUp: TASK_QUEUE_KEYS.caughtUp,
   empty: {
     open: TASK_QUEUE_KEYS.empty,
     snoozed: 'empty.snoozed',

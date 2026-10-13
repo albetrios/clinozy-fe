@@ -22,6 +22,7 @@ import {
   useLoadMoreSentinel,
 } from '@/shared/hooks/useLoadMoreSentinel/index.ts';
 import { useTaskDueLabel } from '@/shared/hooks/useTaskDueLabel/index.ts';
+import { type AppIcon, CheckCircle, Clock, SquareCheck } from '@/shared/icons/index.ts';
 
 import { TASKS_KEYS, TASKS_NS, TASKS_TEST_IDS } from '../../tasks.constants.ts';
 import { TaskRow, type TaskRowTeam } from '../TaskRow/index.ts';
@@ -97,26 +98,42 @@ function GroupHeader({ group }: { group: TaskGroup<TaskRowRecord> }) {
   );
 }
 
-/** A view's empty line (13px, muted, max 420px, centred, 48px down) — To do's with "New task". */
+/** Each view's empty-state glyph (change-empty-states R34–R36). */
+const EMPTY_ICONS: Readonly<Record<TaskTab, AppIcon>> = {
+  open: SquareCheck,
+  snoozed: Clock,
+  done: CheckCircle,
+};
+
+/**
+ * A view's empty state (change-empty-states R34–R36): the room look in the
+ * Tasks plum, centred in the list card — To do's "All caught up" over the
+ * queue line with "New task"; Snoozed's and Done's line as the title, under
+ * their group header.
+ */
 function EmptyLine({ tab, onNewTask }: { tab: TaskTab; onNewTask?: () => void }) {
   const { t } = useTranslation(TASKS_NS);
+  const Icon = EMPTY_ICONS[tab];
+  const open = tab === 'open';
   return (
     <div // NOSONAR(S6819): grid ARIA table, see the note above COLUMNS
       role="row"
       tabIndex={-1}
+      className="flex flex-1 flex-col"
     >
       <div // NOSONAR(S6819): grid ARIA table, see the note above COLUMNS
         role="cell"
         aria-colspan={COLUMNS}
         data-testid={TASKS_TEST_IDS.empty}
-        className="mx-auto my-12 max-w-105 px-(--table-pad-x)"
+        className="flex flex-1 flex-col"
       >
         <EmptyState
-          variant="inline"
-          title={t(TASKS_KEYS.empty[tab])}
-          className="text-body flex flex-col items-center gap-3 text-center leading-normal text-pretty"
+          tone="plum"
+          icon={<Icon />}
+          title={t(open ? TASKS_KEYS.emptyCaughtUp : TASKS_KEYS.empty[tab])}
+          description={open ? t(TASKS_KEYS.empty.open) : undefined}
           action={
-            tab === 'open' && onNewTask ? (
+            open && onNewTask ? (
               <EmptyStateAction data-testid={TASKS_TEST_IDS.emptyNew} onClick={onNewTask}>
                 {t(TASKS_KEYS.primary.newTask)}
               </EmptyStateAction>
@@ -165,6 +182,8 @@ function GroupedRows({
       aria-busy={refreshing || undefined}
       data-testid={TASKS_TEST_IDS.list}
       data-tab={tab}
+      // An empty view grows into the card, so its empty state centres there.
+      className={cn(rows.length === 0 && 'flex flex-1 flex-col')}
     >
       {groups.map((group) => (
         <div // NOSONAR(S6819): grid ARIA table, see the note above COLUMNS
@@ -173,6 +192,7 @@ function GroupedRows({
           // Bars in place while a new view loads — the rooms' one skeleton (index.css).
           data-refreshing={refreshing || undefined}
           data-testid={TASKS_TEST_IDS.group(group.id)}
+          className={cn(group.rows.length === 0 && 'flex flex-1 flex-col')}
         >
           <GroupHeader group={group} />
           {group.rows.map((row) => (
@@ -193,6 +213,7 @@ function GroupedRows({
       {groups.length === 0 ? (
         <div // NOSONAR(S6819): grid ARIA table, see the note above COLUMNS
           role="rowgroup"
+          className="flex flex-1 flex-col"
         >
           <EmptyLine tab={tab} onNewTask={onNewTask} />
         </div>
@@ -281,7 +302,7 @@ export function TaskList({
         className,
       )}
     >
-      <div className="min-h-0 flex-1 overflow-auto">
+      <div className="flex min-h-0 flex-1 flex-col overflow-auto">
         {body}
         {isFetchingNextPage ? (
           <SkeletonRows rows={LOADING_MORE_ROWS} avatar rowClassName={SKELETON_ROW} />

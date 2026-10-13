@@ -64,8 +64,8 @@
       "status": "ステータス"
     },
     "minutes": "{{minutes}} 分",
-    "empty": "ここには予約がありません · ",
-    "bookOne": "予約する",
+    "empty": "ここには予約がありません",
+    "emptyHint": "選んだ日の予約がここに表示されます。",
     "day": {
       "today": "今日",
       "tomorrow": "明日",

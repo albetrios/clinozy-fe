@@ -24,7 +24,8 @@ renders the family's Medical toolbar and its table:
 - **Tables** (`shared/components/MedicalTable/`): the shared table with folds on a tablet and
   rows on a phone, selection and the bulk bar from `md` (Export as CSV), infinite scroll over
   cursor pages, the footer count and the end line, and the blush empty state with the tab's
-  "New …".
+  own icon (a receipt for Sales, a truck for Suppliers, a factory for Manufacturers, …) and
+  its "New …".
 - **Data**: medicines are the shared `@/shared/api/app/medicines-api.ts` (the Invoice and Rx
   drawers read them) with their stock rules in `@/shared/api/app/medicine-stock.ts`; the
   rest is the family's `shared/medical-api.ts` over the fixture world (`REPLACE_WITH_API`).

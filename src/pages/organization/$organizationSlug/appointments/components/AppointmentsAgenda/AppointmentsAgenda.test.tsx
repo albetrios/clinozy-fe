@@ -375,12 +375,19 @@ describe('AppointmentsAgenda — the rows', () => {
     expect(router.state.location.search).toEqual({ status: 'all' });
   });
 
-  it('says "No appointments here · book one", and "book one" opens New appointment', async () => {
+  it('draws the sky empty state, and "New appointment" opens New appointment', async () => {
     const user = userEvent.setup();
     const { router } = renderAppointmentsRoutes(`${PAGE}?q=zzzz`, Agenda);
     const empty = await screen.findByTestId('appointments-empty');
-    expect(empty).toHaveTextContent('No appointments here · book one');
-    await user.click(await screen.findByTestId('appointments-book-one'));
+    expect(empty).toHaveAttribute('data-tone', 'sky');
+    expect(
+      within(empty).getByRole('heading', { name: 'No appointments here' }),
+    ).toBeInTheDocument();
+    expect(empty).toHaveTextContent('Bookings for the days you pick show up here.');
+    expect(within(empty).getByTestId('empty-state-illustration')).toBeInTheDocument();
+    const book = await screen.findByTestId('appointments-book-one');
+    expect(book).toHaveAccessibleName('New appointment');
+    await user.click(book);
     await waitFor(() => expect(router.state.location.pathname).toBe(`${PAGE}/create`));
     expect(router.state.location.search).toEqual({ q: 'zzzz' });
   });
@@ -503,7 +510,7 @@ describe('AppointmentsAgenda — Change status', () => {
     expect(screen.queryByTestId('appointments-status-popover')).not.toBeInTheDocument();
   });
 
-  it('shows the status alone without Edit, and no "book one" without Create', async () => {
+  it('shows the status alone without Edit, and no "New appointment" without Create', async () => {
     grantAppAccess('none');
     const list = renderAppointmentsRoutes(PAGE, Agenda);
     await rows();
@@ -511,7 +518,7 @@ describe('AppointmentsAgenda — Change status', () => {
     list.unmount();
     renderAppointmentsRoutes(`${PAGE}?q=zzzz`, Agenda);
     expect(await screen.findByTestId('appointments-empty')).toHaveTextContent(
-      'No appointments here ·',
+      'No appointments here',
     );
     expect(screen.queryByTestId('appointments-book-one')).toBeNull();
   });

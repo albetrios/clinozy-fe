@@ -27,7 +27,14 @@ import {
   type PaymentAccess,
   usePaymentAccess,
 } from '@/shared/hooks/usePaymentAccess/index.ts';
-import { PenLine, Receipt, RefreshCw, Trash, Wallet } from '@/shared/icons/index.ts';
+import {
+  Clock,
+  PenLine,
+  Receipt,
+  RefreshCw,
+  Trash,
+  Wallet,
+} from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { PAYMENTS_KEYS, PAYMENTS_NS, PENDING_TABLE_ID } from '../payments.constants.ts';
@@ -155,7 +162,7 @@ function PendingEmpty({
   return (
     <EmptyState
       tone="butter"
-      icon={<Wallet />}
+      icon={<Clock />}
       title={t(PAYMENTS_KEYS.empty.pendingTitle)}
       description={t(PAYMENTS_KEYS.empty.description)}
       action={

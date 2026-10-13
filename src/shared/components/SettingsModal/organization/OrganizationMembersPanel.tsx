@@ -479,7 +479,7 @@ function MembersList({
 
       {!(members.isPending || members.isError) && members.rows.length === 0 ? (
         <EmptyState
-          tone="slate"
+          tone="sky"
           className="pt-8 pb-9"
           icon={<Users />}
           title={isSearching ? t(panels.noResults) : t(panels.emptyTitle)}

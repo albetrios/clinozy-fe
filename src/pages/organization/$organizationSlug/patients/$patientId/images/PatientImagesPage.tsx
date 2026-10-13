@@ -9,6 +9,7 @@ import {
 } from '@/lib/routes/patient-file-builders.ts';
 import { cn } from '@/lib/utils.ts';
 import type { PatientPhoto } from '@/shared/api/app/patient-images-contracts.ts';
+import { EmptyState, EmptyStateAction } from '@/shared/components/EmptyState/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
@@ -18,7 +19,7 @@ import {
   type PatientPhotoList,
   usePatientPhotos,
 } from '@/shared/hooks/usePatientPhotos/index.ts';
-import { ImageIcon } from '@/shared/icons/index.ts';
+import { Camera } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useDevicePrefsStore } from '@/shared/store/useDevicePrefsStore/index.ts';
 
@@ -93,32 +94,26 @@ function usePrivateAlbumGuard(
   }, [refused, t, toGeneral]);
 }
 
-/** "No photos in General yet" — the dashed box, with "Upload images" for a member who may. */
+/**
+ * "No photos in General yet" (change-empty-states R15): the room look in the
+ * Photos blush with the `Camera` tile, centred below the toolbar, with "Upload"
+ * for a member who may.
+ */
 function PhotosEmpty({ album, onUpload }: { album: string; onUpload?: () => void }) {
   const { t } = useTranslation(PATIENT_PHOTOS_NS);
   return (
-    <div
-      data-testid={IDS.empty}
-      className="border-border-strong flex flex-col items-center gap-2.5 rounded-xl border-[1.5px] border-dashed px-(--table-pad-x) py-12 text-center"
-    >
-      <span
-        aria-hidden="true"
-        className="bg-muted text-muted-foreground flex size-11 items-center justify-center rounded-xl"
-      >
-        <ImageIcon className="size-5.5" />
-      </span>
-      <span className="text-sm font-semibold">{t(K.empty.title, { album })}</span>
-      <span className="text-detail text-muted-foreground">{t(K.empty.body)}</span>
-      {onUpload ? (
-        <Button
-          type="button"
-          onClick={onUpload}
-          className="text-body h-9 rounded-lg px-3.5"
-        >
-          {t(K.upload)}
-        </Button>
-      ) : null}
-    </div>
+    <EmptyState
+      tone="blush"
+      icon={<Camera />}
+      title={t(K.empty.title, { album })}
+      description={t(K.empty.body)}
+      testId={IDS.empty}
+      action={
+        onUpload ? (
+          <EmptyStateAction onClick={onUpload}>{t(K.upload)}</EmptyStateAction>
+        ) : undefined
+      }
+    />
   );
 }
 

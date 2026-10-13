@@ -453,6 +453,7 @@
   },
   "empty": {
     "queue": "Gerade braucht Sie nichts. Neue Aufgaben erscheinen hier, sobald Leads schreiben, Besuche anstehen und Feedback eintrifft.",
+    "caughtUp": "Alles erledigt",
     "snoozed": "Keine zurückgestellten Aufgaben",
     "done": "Heute noch nichts erledigt"
   },
