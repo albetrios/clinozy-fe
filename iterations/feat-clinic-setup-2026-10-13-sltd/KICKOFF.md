@@ -1,6 +1,6 @@
 # Clinic setup — kickoff plan
 
-> **Status: ready for review, 2026-10-13.** Planned with `fe-iteration-planning` against Baseline
+> **Status: ready for approval, 2026-10-13** (self-check passed). Planned with `fe-iteration-planning` against Baseline
 > `launch-2026-09-30-jxmr`, from `BRIEF.md` (Intake mode `brief`). Every RED question is answered (D1–D30 in
 > `plans/decisions.md`). The backend half is in clinozy-be's same-named iteration: its route review
 > (`plans/routes-final.md` there, final) is the contract this plan builds against. `fe-kickoff-iteration` builds §3–§6
@@ -180,6 +180,8 @@ decides (D5); the PIN directory in a store — no: a pure lookup module; the ste
   optional "How did you hear about us?" chip row (analytics only, moved from /onboarding, BRIEF.md:143).
 - **Closing** (×, Esc, backdrop, "Explore first") PATCHes `deferred` and clears the hash. With unsaved edits in the
   open step the house "Discard changes?" guard asks first; saved steps are never lost.
+- **Save and error copy:** the design's shared copy as built — "Saving…", "Not saved · your changes are kept", the
+  failed-save toast (`_patterns.md:285`; reconciliation F17).
 - **Keyboard and a11y:** focus moves to the open step's title on every step change; a polite live region announces
   "Step <n> of 3"; Enter = Next (not inside a multi-line field); Esc = close; focus trapped, returned to the opener.
 - **Timings:** drawer in `animate-drawer-in` 340ms cubic-bezier(0.32, 0.72, 0, 1), backdrop the same; a step body
@@ -210,8 +212,8 @@ decides (D5); the PIN directory in a store — no: a pure lookup module; the ste
 - **Book your first appointment** — the shared `AppointmentForm` over the room.
 - **Skip / Undo skip** and **Hide this guide** PATCH the setup; Hide closes the drawer and the ring and row go
   ("Clinic settings" stays). Reopening the guide from Settings › Clinic clears the hidden time.
-- When `guide_done_at` is set, the ring and the row go; the drawer at `#setup/guide` shows "All set" with "Clinic
-  settings".
+- When `guide_done_at` is set, the ring and the row go; the drawer at `#setup/guide` shows "Your clinic is ready" with
+  "Clinic settings" — never "All set", which is the splash's word (reconciliation F14).
 
 ### 6.3 The create-action guard (skills: fe-routing-tenancy · fe-test-generation)
 
@@ -328,10 +330,111 @@ MODE incremental: global → copy → styling (none) → structural → new scre
 | 10  | T2 · Branch drawer "Places & days" step (edit only): rooms, machines, holidays                                                                                                                  | structural | 8                   | fe-resource-crud · fe-http-forms-errors · fe-e2e-testids         | add, rename, switch off, remove; holidays add, remove (BRIEF.md:278)                                             | —        | open   |
 | 11  | T3 · Settings › Clinic section (organization scope, team only)                                                                                                                                  | structural | 1, 8                | fe-routing-tenancy · fe-http-forms-errors                        | saves specialties, timezone, reminder hour, lead hold, retarget (BRIEF.md:279); no float                         | —        | open   |
 | 12  | N1 · Setup drawer: header, steps 1–3, Go live, "You're live", close / dirty guard, keyboard and a11y                                                                                            | screen     | 1–8                 | fe-design-ditto · shadcn · fe-http-forms-errors · fe-e2e-testids | BRIEF.md:255–266, 281; one branch on repeat; no duplicate Consultation; 409 opens the missing step               | —        | open   |
-| 13  | N2 · Guide: 3 items, starter picker, invite (team / doctor), book, Skip, Hide, "All set"                                                                                                        | screen     | 12                  | fe-design-ditto · fe-http-forms-errors · fe-e2e-testids          | BRIEF.md:269–272; ticks from records; invitations carry the branch's hours                                       | —        | open   |
+| 13  | N2 · Guide: 3 items, starter picker, invite (team / doctor), book, Skip, Hide, "Your clinic is ready"                                                                                           | screen     | 12                  | fe-design-ditto · fe-http-forms-errors · fe-e2e-testids          | BRIEF.md:269–272; ticks from records; invitations carry the branch's hours                                       | —        | open   |
 | 14  | GT · The static gates, Vitest, `build:check`, `size`, `coverage:patch`                                                                                                                          | gate       | 1–13                | fe-code-quality-security                                         | every gate green                                                                                                 | —        | open   |
 | 15  | V1 · Verify: the 20 brief criteria, the Playwright flow at 375 / 1440, the full baseline set side by side                                                                                       | verify     | 14                  | fe-kickoff-iteration › Verify · fe-playwright-e2e                | §8 complete, each criterion with its evidence in `AS-BUILT.md`                                                   | —        | open   |
 | 16  | V2 · Close: `AS-BUILT.md` summary and Standing deviations → `done` → `frozen` in the last commit                                                                                                | verify     | 15                  | fe-kickoff-iteration › Close                                     | `pnpm iteration:status` done, then frozen                                                                        | —        | open   |
 
 **Cross-repository order:** clinozy-be ROUTE #1–#4 come before this ledger's row 1; clinozy-be ROUTE #6 (the e2e flow)
 and this ledger's row 15 prove the same journey from both sides.
+
+## Appendix A — Coverage matrix
+
+`intake-files/` holds 23 files: `BRIEF.md` (received, read in full) and 22 carried forward from the Baseline unchanged
+(`pnpm iteration:diff launch-2026-09-30-jxmr feat-clinic-setup-2026-10-13-sltd`: added `BRIEF.md`, nothing removed or
+changed). Of the carried-forward files, the patterns the brief names were re-read: `_patterns.md` › Right drawer, Step
+cards and the shared save copy; `shell.md` › account menu and System banner; `users.md` › Branches.
+
+### A.1 The brief, section by section
+
+| `BRIEF.md` lines | What it asks                                                                                                   | Plan section                                 | Ledger rows |
+| ---------------- | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------- | ----------- |
+| 13–34            | What changes, the journey                                                                                      | §2, §3                                       | 1–13        |
+| 36–52            | The drawer: when it opens, not tied to a room, its address, closing                                            | §4, §6.1                                     | 2, 3, 12    |
+| 54–71            | The three steps and "You're live"                                                                              | §6.1, §6.4                                   | 6, 12       |
+| 73–80            | Go live's Consultations, Book, the "why" lines, not asked                                                      | §6.1, §6.5                                   | 7, 12       |
+| 82–112           | The short guide and its three items                                                                            | §3, §6.2                                     | 5, 13       |
+| 113–114          | Create actions that need a branch                                                                              | §6.3                                         | 4           |
+| 115              | The command menu                                                                                               | §3                                           | 5           |
+| 117–121          | The members' notice                                                                                            | §3                                           | 5           |
+| 123–133          | Settings › Clinic, Places & days, no float                                                                     | §6.6                                         | 10, 11      |
+| 135–144          | /onboarding shortened                                                                                          | §6.7                                         | 9           |
+| 146–150          | The first branch becomes main                                                                                  | §6.1 (step 2 read-back); clinozy-be ROUTE #2 | 12          |
+| 152–167          | Setup states                                                                                                   | §6.1, §6.2                                   | 3, 12, 13   |
+| 169–181          | When each step writes                                                                                          | §5, §6.1                                     | 1, 12       |
+| 183–193          | Why                                                                                                            | §2 (context)                                 | —           |
+| 195–213          | Affected screens, entities and routes                                                                          | §4                                           | 2, 9–11     |
+| 215–247          | Rules (who, scope, live, never trapped, safe to repeat, PIN, existing clinics, personal, accessible, measured) | §3, §6.1–§6.8                                | 3–8, 12, 13 |
+| 249–281          | Acceptance criteria                                                                                            | §8, A.2                                      | 15          |
+| 283–296          | Out of scope, ideas for later (D29)                                                                            | §2                                           | —           |
+
+### A.2 The acceptance criteria, one by one
+
+| `BRIEF.md` lines | Criterion (short)                                          | Proved by ledger row                           |
+| ---------------- | ---------------------------------------------------------- | ---------------------------------------------- |
+| 251–252          | First landing opens the drawer at step 1                   | 3, 12                                          |
+| 253–254          | The same with the default room changed                     | 3, 15                                          |
+| 255              | The address reopens the same step on any room              | 2                                              |
+| 256–257          | Exactly three steps, in order; refresh resumes             | 12                                             |
+| 258              | PIN autofill; an unknown PIN blocks nothing                | 6                                              |
+| 259–260          | One main branch, the owner on it; no second on repeat      | 12 (+ clinozy-be ROUTE #2)                     |
+| 261–262          | "Yes, as a doctor" makes the owner bookable                | 12                                             |
+| 263–264          | Go live: one Consultation each, complete; Book saves       | 12                                             |
+| 265–266          | Closing leaves the room usable; "Finish setup" reopens     | 2, 12                                          |
+| 267–268          | Create actions open step 2 with no open branch             | 4                                              |
+| 269–270          | Ring, "Finish setup · n of 3", ticks, "Invite your doctor" | 5, 13                                          |
+| 271–272          | Done, skipped or hidden: ring and row go                   | 5, 13                                          |
+| 273–274          | Front desk: no drawer, ring or guide; the notice           | 3, 5                                           |
+| 275              | A clinic live before this ships sees nothing               | 3 (+ clinozy-be ROUTE #1)                      |
+| 276              | The server refuses to go live while one is missing         | clinozy-be ROUTE #4; 12 opens the missing step |
+| 277              | The first branch becomes main                              | clinozy-be ROUTE #2                            |
+| 278              | Rooms, machines and holidays in the branch drawer          | 10                                             |
+| 279              | Settings › Clinic saves its five values                    | 11                                             |
+| 280              | /onboarding asks four steps, sends no invitations          | 9                                              |
+| 281              | Keyboard only, 390px, accessibility checks                 | 12, 15                                         |
+
+## Appendix B — Reconciliation
+
+There is no drawn design for the new surfaces (Intake mode `brief`), so the brief is reconciled against the Baseline's
+patterns and what the launch built. The full table, with evidence, is shared with the backend:
+clinozy-be `iterations/feat-clinic-setup-2026-10-13-sltd/plans/coverage.md` › Reconciliation (F1–F24; its brief line
+numbers are from the earlier placement, as noted there).
+
+### B.0 The four rebuild-forcing facts, per surface
+
+| Surface                | Popup shape (desktop)                                                | Phone / tablet                                  | Conditional step sequence                                                                                         | Table vs card                                                         |
+| ---------------------- | -------------------------------------------------------------------- | ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Setup drawer           | right drawer, 560px (D26; BRIEF.md:43)                               | full-screen sheet below `md` (BRIEF.md:44, 244) | unlock in order (D14); "No" in step 3 writes no role and words the guide "your doctor"; Go live only after step 3 | chips, fields, a radio group — no table                               |
+| Guide                  | the same drawer, guide mode (BRIEF.md:93–101)                        | the same sheet                                  | none — items independent; Book has no Skip (RF§2)                                                                 | starter rows as editable rows, folded on a phone like Offerings' rows |
+| Avatar ring, menu rows | the account menu as built (260px)                                    | the same menu, as built                         | none                                                                                                              | menu rows                                                             |
+| Members' notice        | NoticeStack, the System banner pattern (`shell.md`)                  | the same, as built                              | none                                                                                                              | —                                                                     |
+| Places & days          | the branch drawer as built (680px), a fourth step on edit only (D23) | full width, as built                            | shown only when editing an existing branch                                                                        | inline rows (rooms, machines, holidays)                               |
+| Settings › Clinic      | a section of the Settings hash modal (D126)                          | Settings' phone layout as built                 | none                                                                                                              | form fields                                                           |
+| /onboarding            | a full page as built                                                 | as built                                        | four fixed steps                                                                                                  | —                                                                     |
+
+Every fact is resolved; no RED is raised.
+
+### B.1 The verdicts that touch the frontend
+
+| Row | Item                            | Verdict                                                    | Where it lands |
+| --- | ------------------------------- | ---------------------------------------------------------- | -------------- |
+| F2  | A second main branch            | the server keeps the `409`; the client reads the main back | §6.1 step 2    |
+| F3  | Branch name prefill             | the clinic name cut to 60, editable                        | §6.1 step 2    |
+| F6  | The drawer's address            | D11 — a hash surface like Settings                         | §4             |
+| F7  | Drawer width                    | D13 → D26: 560px                                           | §6.1           |
+| F8  | Steps that depend on each other | D14: unlock in order                                       | §6.1           |
+| F9  | Focus                           | trap, move to each step's title, return                    | §6.1           |
+| F10 | Progress colour                 | D23: the theme's progress green                            | §3, §6.1       |
+| F11 | Starter-row defaults            | D23: GST exclusive; lowest price 85% rounded to ₹50        | §6.5           |
+| F12 | Consultation category           | category `consultation`                                    | §6.5           |
+| F13 | Someone to book                 | D15: Doctor or Therapist                                   | §6.2           |
+| F14 | "All set"                       | never — "Your clinic is ready"                             | §6.2           |
+| F15 | Cash-drawer float               | D17: dropped                                               | §6.6           |
+| F17 | Save and error copy             | the shared copy as built                                   | §6.1           |
+| F18 | Default hours                   | Mon–Sat 10:00–20:00                                        | §6.1 step 2    |
+| F19 | City and State                  | superseded by D27: filled from the PIN, editable           | §6.4           |
+| F20 | Places & days                   | D23: a fourth step on edit                                 | §6.6           |
+| F21 | Homes for the entry points      | D28: account menu, ⌘K, Settings › Clinic                   | §3             |
+| F22 | Setup tied to a room            | D11: the shell                                             | §4             |
+| F23 | The launcher's slot             | superseded by D28: no launcher, the avatar's ring          | §3             |
+| F24 | Create actions with no branch   | a frontend guard; the server keeps refusing                | §6.3           |
