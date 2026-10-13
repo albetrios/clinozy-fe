@@ -152,7 +152,8 @@ Further gates, all mirroring clinozy-be:
   the Actions run. Scope, runtime and the local run: **`docs/reference/testing.md`** → Mutation
   testing.
 - **Lighthouse budgets** (`.lighthouserc.cjs`) — scheduled weekly against the built app
-  (perf ≥ 0.9 warn, a11y = 1.0 error, best-practices ≥ 0.95 warn). Locally:
+  (perf ≥ 0.9 warn, a11y = 1.0 error, best-practices ≥ 0.95 warn); every run's reports
+  upload as the `lighthouse-results` artifact. Locally:
   `pnpm build && pnpm preview --port 5173 --strictPort` then `npx @lhci/cli autorun`
   — see **`docs/reference/local-production-perf.md`** (never Lighthouse on `pnpm dev`).
 - **Bundle size** (`pnpm size`) — gzip limits on `dist/` via `tooling/ci/run-size-limit.mjs`.
