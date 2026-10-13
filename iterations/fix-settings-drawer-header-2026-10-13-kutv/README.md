@@ -8,7 +8,7 @@
 | Opened | 2026-10-13 |
 | Branch | fix/settings-drawer-header |
 | Baseline | launch-2026-09-30-jxmr |
-| Status | implementing |
+| Status | done |
 | Summary | The settings drawer's section header arrives whole: the stand-in drawn while a section loads shows the same title, sub line and meta as the section itself, so nothing appears or changes a beat later |
 | Drop placed | 2026-10-13 |
 | Drop source | /tmp/claude-0/-home-user/06a50335-ba2e-580f-a30d-e668569f424a/scratchpad/brief |
@@ -23,3 +23,4 @@
 - 2026-10-13 · planning → ready-for-approval · — · Claude
 - 2026-10-13 · ready-for-approval → approved · — · Claude
 - 2026-10-13 · approved → implementing · — · Claude
+- 2026-10-13 · implementing → done · — · Claude
