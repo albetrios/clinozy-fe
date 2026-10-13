@@ -32,12 +32,16 @@ What was actually built, ledger row by ledger row, against the approved plan in
 - **Not run here:** the pre-push SonarQube gate (`pnpm sonar:scan`) — this session has no Docker
   daemon; every other pre-push step passed (Biome, type-check, build, `build:check`, docs lint, the
   full Vitest suite 1160 files / 9218 tests, `contracts:drift`, `api:types:check`).
+- **After done (D19, D20):** the branch is renamed `feat/cookie-consent`, and `intake-files/` is
+  trimmed to `BRIEF.md`, `PRD.md` and `schema-routes.md` — so this iteration's intake gate no
+  longer passes by design.
 - **Follow-ups for the next iteration:**
   - The initial-JS size budget is already over on `main` in this environment (+12.88 kB); look at
     it separately (`pnpm size`).
   - Run the full e2e baseline and `pnpm sonar:scan` (pre-push) on a machine with Docker.
   - The launch iteration is still `implementing` although merged; closing it makes it an eligible
-    Baseline by the book (D17).
+    Baseline by the book (D17). Use the launch, not this iteration, as the next Baseline: this
+    snapshot is trimmed (D20), so plan against the Standing deviations below.
 
 ## Standing deviations
 
