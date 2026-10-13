@@ -1636,8 +1636,16 @@
    without a tab bar (login, onboarding) reserves nothing. The tab bar is
    `md:hidden`, so the reservation ends at the same breakpoint. */
 :root:has([data-slot='mobile-nav']) {
-  /* The tab bar's 58px; each consumer adds env(safe-area-inset-bottom). */
-  --floating-bottom-offset: 3.625rem;
+  /* The floating capsule (change-floating-tab-bar): 62px tall, lifted 12px off
+     the bottom — or, over a home indicator, the safe-area inset less 12px, the
+     way the iPhone tab bar sits over it. The bar reads both. */
+  --tab-bar-height: 3.875rem;
+  --tab-bar-gap: max(0.75rem, calc(env(safe-area-inset-bottom, 0px) - 0.75rem));
+  /* The capsule's top edge less the inset: each consumer adds
+     env(safe-area-inset-bottom) itself. */
+  --floating-bottom-offset: calc(
+    var(--tab-bar-gap) + var(--tab-bar-height) - env(safe-area-inset-bottom, 0px)
+  );
 }
 @media (min-width: 48rem) {
   :root:has([data-slot='mobile-nav']) {
@@ -1672,7 +1680,10 @@
     padding-bottom: var(--consent-card-height, 0px);
   }
   [data-slot='app-main'] {
-    padding-bottom: calc(5rem + var(--consent-card-height, 0px));
+    padding-bottom: calc(
+      var(--floating-bottom-offset, 0rem) + env(safe-area-inset-bottom, 0px) + 0.75rem +
+        var(--consent-card-height, 0px)
+    );
   }
 }
 
@@ -1680,7 +1691,8 @@
    positions itself from custom properties on its host — so it can be steered
    from here. It owns the bottom-END corner; lift it clear of the tab bar too. */
 #sentry-feedback {
-  --inset: auto 0 var(--floating-bottom-offset, 0rem) auto;
+  --inset: auto 0
+    calc(var(--floating-bottom-offset, 0rem) + env(safe-area-inset-bottom, 0px)) auto;
 }
 /* Below `sm` the consent card spans the full width, so the two would share a
    corner and the trigger lands on top of "Accept". The consent decision is a

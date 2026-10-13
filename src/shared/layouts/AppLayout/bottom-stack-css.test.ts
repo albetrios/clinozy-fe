@@ -44,13 +44,32 @@ function declarations(selector: string, media?: string): string {
 const PHONE = '(max-width: 47.9375rem) {\n  :root:has';
 
 describe('phone bottom stack (index.css)', () => {
-  it('the tab bar reserves its 58px below md and nothing from md', () => {
-    expect(declarations(":root:has([data-slot='mobile-nav'])")).toContain(
-      '--floating-bottom-offset: 3.625rem',
+  it('the floating tab bar declares its geometry and reserves its top edge below md, nothing from md', () => {
+    const bar = declarations(":root:has([data-slot='mobile-nav'])").replace(/\s+/g, ' ');
+    expect(bar).toContain('--tab-bar-height: 3.875rem');
+    expect(bar).toContain(
+      '--tab-bar-gap: max(0.75rem, calc(env(safe-area-inset-bottom, 0px) - 0.75rem))',
+    );
+    // Its top edge less the inset — every consumer adds the inset itself.
+    expect(bar).toContain(
+      '--floating-bottom-offset: calc( var(--tab-bar-gap) + var(--tab-bar-height) - env(safe-area-inset-bottom, 0px) )',
     );
     expect(
       declarations(":root:has([data-slot='mobile-nav'])", '(min-width: 48rem)'),
     ).toContain('--floating-bottom-offset: 0rem');
+  });
+
+  it('the page and the feedback trigger clear the capsule, inset included', () => {
+    const page = declarations(
+      "[data-slot='app-main']",
+      '(max-width: 39.9375rem)',
+    ).replace(/\s+/g, ' ');
+    expect(page).toContain(
+      'calc( var(--floating-bottom-offset, 0rem) + env(safe-area-inset-bottom, 0px) + 0.75rem + var(--consent-card-height, 0px) )',
+    );
+    expect(declarations('#sentry-feedback').replace(/\s+/g, ' ')).toContain(
+      'calc(var(--floating-bottom-offset, 0rem) + env(safe-area-inset-bottom, 0px))',
+    );
   });
 
   it('a showing notice pill publishes 52px and a mounted "New" 60px, on phone only', () => {
