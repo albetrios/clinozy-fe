@@ -39,7 +39,7 @@ overrides:
   undici@7: '^7.28.0'
   ws: '>=8.21.0'
   http-proxy-middleware: '>=3.0.7'
-  '@modelcontextprotocol/sdk': '>=1.30.0'
+  '@modelcontextprotocol/sdk': '>=1.31.0 <2'
   '@opentelemetry/core': '>=2.8.0'
   '@fastify/static': '>=10.1.2 <11'
   brace-expansion: '>=5.0.12 <6'
@@ -55,6 +55,8 @@ overrides:
   hono: '>=4.12.34 <5'
   axios: '>=1.20.0 <2'
   markdown-it@14: '>=14.3.1 <15'
+  seroval: '>=1.6.3 <2'
+  source-map-js: '>=1.2.2 <2'
 
 peerDependencyRules:
   allowedVersions:
