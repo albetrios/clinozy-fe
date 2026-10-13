@@ -8,7 +8,7 @@
 | Opened | 2026-10-13 |
 | Branch | claude/determined-rubin-c9i935 |
 | Baseline | launch-2026-09-30-jxmr |
-| Status | done |
+| Status | frozen |
 | Summary | Steady room switches (no scrollbar flash, no tab shift), soft tonal picked badges in place of the ink outline, and a new marketing-led sign-in screen. |
 | Drop placed | 2026-10-13 |
 | Drop source | /tmp/claude-0/-home-user/e63250e3-fb7a-5686-900b-584998ee5d0c/scratchpad/brief |
@@ -24,3 +24,4 @@
 - 2026-10-13 · ready-for-approval → approved · — · Claude
 - 2026-10-13 · approved → implementing · — · Claude
 - 2026-10-13 · implementing → done · — · Claude
+- 2026-10-13 · done → frozen · — · Claude
