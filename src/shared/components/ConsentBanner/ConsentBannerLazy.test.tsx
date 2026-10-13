@@ -1,7 +1,16 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { useConsentStore } from '@/shared/store/useConsentStore/index.ts';
+import {
+  ACCEPT_ALL_CONSENT_PREFERENCES,
+  REJECT_ALL_CONSENT_PREFERENCES,
+  useConsentStore,
+} from '@/shared/store/useConsentStore/index.ts';
+import {
+  answerConsentForTests,
+  resetConsentForTests,
+  setGlobalPrivacyControlForTests,
+} from '@/tests/utils/consent-cookie.ts';
 
 import { ConsentBannerLazy } from './ConsentBannerLazy.tsx';
 
@@ -16,27 +25,32 @@ vi.mock('@/shared/errors/errorHandler.ts', async (importOriginal) => ({
 
 describe('ConsentBannerLazy', () => {
   beforeEach(() => {
-    useConsentStore.getState().resetAnalyticsConsent();
+    setGlobalPrivacyControlForTests(false);
+    resetConsentForTests();
   });
 
   afterEach(() => {
+    setGlobalPrivacyControlForTests(false);
     vi.doUnmock('./ConsentBanner.tsx');
     vi.resetAllMocks();
   });
 
-  it('loads and shows the card for a visitor who has not decided', async () => {
+  it('loads and shows the card for a browser with no answer', async () => {
     render(<ConsentBannerLazy />);
 
     expect(await screen.findByTestId('consent-banner')).toBeInTheDocument();
-    expect(screen.getByRole('region', { name: 'Cookie consent' })).toBeVisible();
+    expect(screen.getByRole('dialog', { name: 'Cookie settings' })).toBeVisible();
   });
 
-  it.each(['granted', 'denied'] as const)(
-    'renders nothing — and mounts no card — once consent is %s',
-    (decision) => {
+  it.each([
+    ['accepted', ACCEPT_ALL_CONSENT_PREFERENCES],
+    ['rejected', REJECT_ALL_CONSENT_PREFERENCES],
+  ] as const)(
+    'renders nothing — and mounts no card — once cookies are %s',
+    (_, preferences) => {
       // The returning visitor is the common case, and the reason this is lazy:
       // they never see the card, so they should never download it.
-      useConsentStore.getState().setAnalyticsConsent(decision);
+      answerConsentForTests(preferences);
 
       const { container } = render(<ConsentBannerLazy />);
 
@@ -44,16 +58,34 @@ describe('ConsentBannerLazy', () => {
     },
   );
 
-  it('goes away as soon as a decision is made', async () => {
+  it('renders nothing for a browser that sends Global Privacy Control', () => {
+    setGlobalPrivacyControlForTests(true);
+    const { container } = render(<ConsentBannerLazy />);
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it('comes back when Privacy choices reopens it over a standing answer', async () => {
+    answerConsentForTests(REJECT_ALL_CONSENT_PREFERENCES);
+    render(<ConsentBannerLazy />);
+    expect(screen.queryByTestId('consent-banner')).not.toBeInTheDocument();
+
+    act(() => useConsentStore.getState().openPreferences());
+
+    expect(await screen.findByTestId('consent-banner')).toBeInTheDocument();
+  });
+
+  it('goes away as soon as an answer is given', async () => {
     render(<ConsentBannerLazy />);
     await screen.findByTestId('consent-banner');
 
-    screen.getByTestId('consent-decline').click();
+    act(() => screen.getByTestId('consent-reject').click());
 
     await vi.waitFor(() =>
       expect(screen.queryByTestId('consent-banner')).not.toBeInTheDocument(),
     );
-    expect(useConsentStore.getState().analyticsConsent).toBe('denied');
+    expect(useConsentStore.getState().preferences).toEqual(
+      REJECT_ALL_CONSENT_PREFERENCES,
+    );
   });
 
   // The chunk-in-flight case lives in ConsentBannerLazy.in-flight.test.tsx: it

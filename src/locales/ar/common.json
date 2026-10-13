@@ -123,7 +123,6 @@
     "loadingNamed": "جارٍ تحميل {{name}}…",
     "loadingPage": "جارٍ تحميل الصفحة",
     "toggleTheme": "تبديل السمة",
-    "cookieConsent": "موافقة ملفات تعريف الارتباط",
     "rowsPerPage": "صفوف لكل صفحة",
     "goFirstPage": "الذهاب إلى الصفحة الأولى",
     "goPreviousPage": "الذهاب إلى الصفحة السابقة",
@@ -192,11 +191,8 @@
     }
   },
   "consent": {
-    "description": "بموافقتك نستخدم تحليلات PostHog وتسجيلات الجلسات من Sentry لتحسين {{productName}}. يعمل كل شيء آخر، بما في ذلك تقارير الأخطاء، من دونها. الإغلاق يعني الرفض.",
-    "privacyPolicy": "سياسة الخصوصية",
-    "accept": "قبول",
-    "decline": "رفض",
-    "closeAndDecline": "إغلاق (يُعد رفضًا)"
+    "title": "إعدادات ملفات تعريف الارتباط",
+    "privacyChoices": "خيارات الخصوصية"
   },
   "confirm": {
     "accept": "تأكيد",

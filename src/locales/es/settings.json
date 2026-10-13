@@ -229,11 +229,8 @@
       "deleteBody": "Elimina permanentemente tu cuenta y todos los datos asociados.",
       "deleteAction": "Eliminar cuenta",
       "privacyTitle": "Privacidad",
-      "privacyDescription": "Tu decisión sobre la analítica del producto y las grabaciones de sesión, guardada en tu cuenta.",
-      "analyticsLabel": "Analítica del producto y grabaciones de sesión",
-      "analyticsHint": "Analítica de PostHog y grabaciones de sesión de Sentry. Los informes de errores funcionan en cualquier caso.",
-      "consentGrantedOn": "Permitido el {{date}}",
-      "consentDeniedOn": "Rechazado el {{date}}",
+      "privacyDescription": "Configuración de cookies de este navegador. Los cambios se aplican al instante.",
+      "consentSavedOn": "Guardado el {{date}}",
       "consentUnanswered": "Aún sin responder",
       "privacyPolicyLink": "Política de privacidad"
     },
