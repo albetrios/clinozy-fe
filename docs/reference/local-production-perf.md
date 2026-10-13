@@ -70,12 +70,12 @@ Cross-browser smoke: `pnpm test:cross-browser` — see [cross-browser-support.md
 
 ## What to measure
 
-| Gate                | Command                                                 | Notes                                                          |
-| ------------------- | ------------------------------------------------------- | -------------------------------------------------------------- |
-| Initial JS budget   | `pnpm size`                                             | Critical path + route chunks (`tooling/ci/run-size-limit.mjs`) |
-| Lighthouse perf     | `npx @lhci/cli autorun` or Chrome DevTools → Lighthouse | Production URL only                                            |
-| PWA precache weight | Inspect `dist/sw.js` or build log                       | Trimmed in `vite.config.ts` / custom SW                        |
-| Unit + security     | `pnpm test`                                             | Regression guard after perf refactors                          |
+| Gate                | Command                                                 | Notes                                                                   |
+| ------------------- | ------------------------------------------------------- | ----------------------------------------------------------------------- |
+| Initial JS budget   | `pnpm size`                                             | Critical path + route chunks (`tooling/ci/run-size-limit.mjs`)          |
+| Lighthouse perf     | `npx @lhci/cli autorun` or Chrome DevTools → Lighthouse | Production URL only; CI's weekly reports: `lighthouse-results` artifact |
+| PWA precache weight | Inspect `dist/sw.js` or build log                       | Trimmed in `vite.config.ts` / custom SW                                 |
+| Unit + security     | `pnpm test`                                             | Regression guard after perf refactors                                   |
 
 Historical Phase A-D notes targeted Lighthouse performance **~85+** on `/login`,
 TBT **&lt; 200ms**, and initial critical JS **~208 kB** gzip. These are not current

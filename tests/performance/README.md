@@ -78,4 +78,43 @@ reasons. Measured on a CI-equivalent build (no `.env.local`, no ambient
 
 Category scores and resource budgets for public routes —
 [`.lighthouserc.cjs`](../../.lighthouserc.cjs), run weekly by
-`.github/workflows/lighthouse.yml`.
+`.github/workflows/lighthouse.yml` (performance ≥ 0.9 warn, accessibility = 1.0
+error, best-practices ≥ 0.95 warn; Lighthouse's default mobile emulation and
+simulated throttling, three runs per URL).
+
+### The reports
+
+Every run's report (`lhr-*.json` and `lhr-*.html`) and `assertion-results.json`
+upload as the **`lighthouse-results`** artifact of the workflow run. Lighthouse
+writes them to `.lighthouseci/`, a dot-folder, and `actions/upload-artifact`
+skips hidden files unless the step sets `include-hidden-files: true` — without
+it the step found "no files" and the artifact was never created.
+`tests/ci/artifact-uploads.policy.test.ts` fails any upload of a hidden path
+without the flag. The log also links each URL's median report on temporary
+public storage, which expires after a few days.
+
+### A performance score needs an LCP
+
+Lighthouse leaves the performance category empty (score `NaN`, audit error
+`NO_LCP`) when Chrome records no Largest Contentful Paint — and Chrome records
+none for a paint at opacity 0. The boot splash holds the app at opacity 0
+underneath it, and a fade from exactly 0 runs on the compositor without
+painting the page again, so every public route reported none until 2026-10-13.
+The entering fade now starts one frame in (`index.html`, pinned in
+`src/lib/app-splash.test.ts`): its first frame is painted, and LCP lands when
+the app appears. A route that reports `NaN` again has content that first paints
+at opacity 0 and is never painted again — a fade-in from exactly 0 on its
+largest element, or on a wrapper around it.
+
+### Best practices
+
+Two misses fixed on 2026-10-13, each a real defect rather than a lab artefact:
+
+- **`inspector-issues`, every route.** Zod 4 probes `new Function('')` while it
+  builds an object schema, and the CSP (no `'unsafe-eval'`) blocks it — caught,
+  but reported as a violation on every page load. `src/lib/zod-jitless.ts`
+  sets `jitless` first, which skips the probe.
+- **`errors-in-console`, `/callback/google`.** With no `code`, the callback
+  asked `/auth/refresh` even when this browser had never signed in, and the
+  browser logs the refusal as a console error. It now asks only when the session
+  hint is present (`pages/callback/CallbackPage.tsx`), as the boot does.
