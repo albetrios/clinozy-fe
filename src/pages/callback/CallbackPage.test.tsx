@@ -10,6 +10,7 @@ const {
   silentRefreshMock,
   stashMfaHandoffMock,
   skipAutoGoogleSignInMock,
+  hasSessionHintMock,
   routeParamsHolder,
   navigateMock,
 } = vi.hoisted(() => ({
@@ -19,6 +20,7 @@ const {
   silentRefreshMock: vi.fn(async () => undefined),
   stashMfaHandoffMock: vi.fn(),
   skipAutoGoogleSignInMock: vi.fn(),
+  hasSessionHintMock: vi.fn(() => true),
   routeParamsHolder: { value: {} as Record<string, string> },
   navigateMock: vi.fn(),
 }));
@@ -64,12 +66,19 @@ vi.mock('@/shared/auth/auto-google-sign-in.ts', () => ({
   skipAutoGoogleSignIn: skipAutoGoogleSignInMock,
 }));
 
+vi.mock('@/shared/auth/session-lifetime.ts', () => ({
+  hasSessionHint: hasSessionHintMock,
+}));
+
 import { authApi, MfaRequiredError } from '@/shared/api/auth-api.ts';
 
 import { CallbackPage } from './CallbackPage.tsx';
 
 beforeEach(() => {
   vi.resetAllMocks();
+  // A browser that has signed in before, unless a test says otherwise: the
+  // no-code fallback asks the server only then.
+  hasSessionHintMock.mockReturnValue(true);
   routeParamsHolder.value = {};
   window.history.pushState({}, '', '/callback/google');
 });
@@ -185,6 +194,22 @@ describe('CallbackPage', () => {
     expect(oauthCallbackSpy).not.toHaveBeenCalled();
   });
 
+  it('still exchanges a code without a session hint (a first sign-in has none)', async () => {
+    arrangeProviderReturn();
+    hasSessionHintMock.mockReturnValue(false);
+    const oauthCallbackSpy = vi
+      .spyOn(authApi, 'oauthCallback')
+      .mockResolvedValue({ accessToken: 'oauth-access-token' });
+
+    renderWithProviders(<CallbackPage />);
+
+    await waitFor(() =>
+      expect(establishSessionMock).toHaveBeenCalledWith('oauth-access-token'),
+    );
+    expect(oauthCallbackSpy).toHaveBeenCalledTimes(1);
+    expect(notifyErrorMock).not.toHaveBeenCalled();
+  });
+
   it('does not read an email OTP token from the URL (code-entry flow only)', async () => {
     routeParamsHolder.value = { provider: 'google' };
     window.history.pushState({}, '', '/callback/google?token=should_be_ignored');
@@ -223,6 +248,42 @@ describe('CallbackPage failure reporting (CB-1)', () => {
       }),
     );
   });
+
+  // A direct visit or a provider denial from a browser with no session hint has
+  // nothing to restore: the refresh could only answer 401, and the browser logs
+  // that failed request as a console error (Lighthouse best-practices on
+  // /callback/google). The failure is reported exactly as that 401 was — without
+  // the round trip.
+  it.each([
+    ['a direct visit', '/callback/google'],
+    ['a provider denial', `/callback/google?error=access_denied&state=${TEST_STATE}`],
+  ])(
+    'fails %s with no session hint to /login without asking the server',
+    async (_case, url) => {
+      routeParamsHolder.value = { provider: 'google' };
+      window.history.pushState({}, '', url);
+      hasSessionHintMock.mockReturnValue(false);
+      const oauthCallbackSpy = vi.spyOn(authApi, 'oauthCallback');
+
+      renderWithProviders(<CallbackPage />);
+
+      await waitFor(() =>
+        expect(navigateMock).toHaveBeenCalledWith({
+          to: '/login',
+          search: { error: 'oauth_failed' },
+          replace: true,
+        }),
+      );
+      expect(silentRefreshMock).not.toHaveBeenCalled();
+      expect(oauthCallbackSpy).not.toHaveBeenCalled();
+      expect(notifyErrorMock).toHaveBeenCalledTimes(1);
+      expect(String(notifyErrorMock.mock.calls[0]?.[0])).toMatch(/didn.t complete/i);
+      expect(captureAnalyticsMock).toHaveBeenCalledWith('auth_oauth_failed', {
+        provider: 'google',
+      });
+      expect(skipAutoGoogleSignInMock).toHaveBeenCalledTimes(1);
+    },
+  );
 
   it('reports a failed silent refresh the same way', async () => {
     routeParamsHolder.value = { provider: 'google' };

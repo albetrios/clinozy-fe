@@ -3,7 +3,8 @@
  * `code` + `state` arrive on the OAuth provider's redirect back to the SPA and
  * are forwarded to clinozy-be's callback route by CallbackPage; `error` is the
  * provider's denial code (e.g. `access_denied`). All optional — a visit without
- * them falls back to the silent-refresh path.
+ * them falls back to the silent-refresh path (when this browser holds a session
+ * hint; otherwise straight back to /login).
  */
 export interface CallbackSearch {
   code?: string;
