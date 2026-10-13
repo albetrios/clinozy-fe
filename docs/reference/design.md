@@ -135,7 +135,7 @@ on its surface, in both modes.
   - **Below `md` there is a bottom tab bar** (`data-slot="mobile-nav"`). Anything
     else pinned to the bottom edge rides above it through
     `--floating-bottom-offset` (published by `index.css` via `:has()`), never
-    over it — the consent card and the Sentry feedback trigger both do, and the
+    over it — the consent card and the Report a bug trigger both do, and the
     toasts sit 16px above the whole bottom stack (`AppToaster`).
   - **Overlays are a sheet on phones and a dialog from `sm`.** The `sm:` half
     has to _undo_ the sheet (`sm:w-[calc(100%-2rem)] sm:rounded-lg`), not just
@@ -144,7 +144,7 @@ on its surface, in both modes.
     setting.
   - **User data wraps.** A name with no break opportunity (email-derived) gets
     `wrap-anywhere`, or it runs past its card and is clipped mid-word.
-  - **The end corner belongs to the feedback trigger and the edge handles.** A
+  - **The end corner belongs to the Report a bug trigger and the edge handles.** A
     new floating surface takes the bottom-_start_ corner (`start-*`, so it
     mirrors under RTL) — see `ConsentBanner`. The clinic bottom stack is the
     designed exception: a floating "New" (phone) and the upload tray (every

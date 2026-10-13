@@ -16,6 +16,7 @@ import {
   Bell as LuBell,
   BellOff as LuBellOff,
   Boxes as LuBoxes,
+  Bug as LuBug,
   Building2 as LuBuilding,
   Calendar as LuCalendar,
   Camera as LuCamera,
@@ -53,6 +54,7 @@ import {
   MapPin as LuMapPin,
   Maximize2 as LuMaximize,
   MessageSquare as LuMessageSquare,
+  Mic as LuMic,
   Minimize as LuMinimize,
   Minus as LuMinus,
   Monitor as LuMonitor,
@@ -124,6 +126,8 @@ export const ArrowUpRight: AppIcon = LuArrowUpRight;
 export const Bell: AppIcon = LuBell;
 export const BellOff: AppIcon = LuBellOff;
 export const Boxes: AppIcon = LuBoxes;
+/** Lucide `bug`: report a bug (the floating trigger and its panel). */
+export const Bug: AppIcon = LuBug;
 export const Building: AppIcon = LuBuilding;
 /** Lucide `calendar`: appointments and dates. */
 export const Calendar: AppIcon = LuCalendar;
@@ -182,6 +186,8 @@ export const MapPin: AppIcon = LuMapPin;
 export const Maximize: AppIcon = LuMaximize;
 /** Lucide `message-square`: notes, SMS and chat. */
 export const MessageSquare: AppIcon = LuMessageSquare;
+/** Lucide `mic`: dictate with the browser's own speech recognition. */
+export const Mic: AppIcon = LuMic;
 /** Lucide `minimize`: fit the table to its width. */
 export const Minimize: AppIcon = LuMinimize;
 export const Minus: AppIcon = LuMinus;

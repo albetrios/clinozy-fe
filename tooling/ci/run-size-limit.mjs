@@ -320,8 +320,20 @@ const config = [
      * copy through the shared i18n instance — importing react-i18next from the
      * lazy chunk had split `useTranslation` into a first-paint chunk of its own
      * (−0.37 kB). ~0.4 kB of headroom.
+     *
+     * 245.0 → 245.2 kB: a declared exemption, itemised — "Report a bug" with native voice
+     * (iteration feat-bug-report-2026-10-13-dgnx), replacing Sentry's injected widget. Measured
+     * 245.08 kB, both ends built the same way (no env file, as CI):
+     * - Two glyphs in the icon registry (+0.08 kB, the `icons` chunk): `Bug` (the trigger) and
+     *   `Mic` (the voice button). The registry is one first-paint chunk, so any icon the app uses
+     *   anywhere lands in it; drawing them outside the registry would break the one-file
+     *   icon-library swap.
+     * Trimmed first: the widget, its voice hook and its motion stylesheet load on demand
+     * (`BugReportLazy`, its own `BugReport-*.css` — −0.85 kB of initial CSS); its copy rides the
+     * clinic shell's existing `app` namespace rather than a namespace of its own (a new one adds a
+     * loader per language to the entry, −0.04 kB). ~0.1 kB of headroom.
      */
-    limit: '245.0 kB',
+    limit: '245.2 kB',
     gzip: true,
   },
   ...(cssPaths.length
