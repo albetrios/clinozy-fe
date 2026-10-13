@@ -69,7 +69,7 @@ export function versionJson(
     closeBundle() {
       if (MINIMUM_SUPPORTED_VERSION !== null && !minimumVersion) {
         console.info(
-          `version-json: minimumVersion ${MINIMUM_SUPPORTED_VERSION} is held back — this build is ${buildVersion ?? 'unversioned'}; it ships with the release that meets it.`,
+          `version-json: minimumVersion ${String(MINIMUM_SUPPORTED_VERSION)} is held back — this build is ${buildVersion ?? 'unversioned'}; it ships with the release that meets it.`,
         );
       }
       const outDir = resolve(process.cwd(), 'dist');
