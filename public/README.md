@@ -15,7 +15,7 @@ All files here are copied as-is to the build output (`dist/`). Required and opti
 | **app-icon.svg**         | App favicon + PWA SVG — the product mark (`#18181b` tile, the "C" stroke, the `brand-mark` dot; same drawing as `ProductMark`). | Regenerate PNGs: `rsvg-convert -w 192 -h 192 public/app-icon.svg -o public/pwa-192x192.png` |
 | **manifest.webmanifest** | PWA manifest — must match `buildWebManifest()` in `src/core/config/app-manifest.ts`.                                            | Edit `app-manifest.ts` first; run `app-manifest.test.ts`.                                   |
 | **\_headers**            | Netlify/static host headers (e.g. Permissions-Policy). Merged with host config.                                                 | Update when adding new security or caching headers.                                         |
-| **offline.html**         | PWA offline fallback page (when no cache match).                                                                                | Update copy or styles if branding changes.                                                  |
+| **offline.html**         | Last-resort fallback for a failed navigation when the precached app shell is missing (`src/sw.ts` serves the shell first).      | Update copy or styles if branding changes.                                                  |
 | **robots.txt**           | Crawler rules.                                                                                                                  | Update if you add a sitemap or need to disallow paths.                                      |
 
 ## PWA icons (required for install / no 404s)

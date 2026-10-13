@@ -163,6 +163,17 @@ write path for API calls.
 
 - `OfflineIndicator` (`shared/components/OfflineIndicator/`) shows a dismissible
   banner when `navigator.onLine` is false.
+- **Navigations** (`src/sw.ts`) go to the network first; when that fetch fails the
+  worker serves the **precached app shell** (`index.html`), never a blanket
+  "offline" page. A failed fetch is not proof of being offline — a stale DNS answer
+  after a record change, a captive portal or a TLS failure reject it while the
+  device is online — and the shell boots without the network, so the app decides:
+  the splash's offline hold (`AppSplashSlot`) when `navigator.onLine` is false,
+  `OfflineIndicator` after boot, real errors and retries otherwise.
+  `public/offline.html` is the last resort, for a worker with no shell cached.
+  Precached files sit under revisioned cache keys (`?__WB_REVISION__=…`): look them
+  up with `matchPrecache('<file>')`, never `caches.match('/<file>')`, which misses.
+  Pinned by `src/sw.test.ts`.
 - TanStack Query retries skip 401 (auth interceptor owns refresh); other failures
   surface via `QueryBoundary` / `RetryError` on read paths.
 - Below that, `apiClient` retries idempotent requests (GET, HEAD, OPTIONS, PUT,
@@ -179,6 +190,24 @@ write path for API calls.
   while a save runs every exit is held.
 
 Do not silently drop failed writes — show error + retry affordance.
+
+### Service worker emergency reset
+
+Users cannot clear site data, so a misbehaving worker is fixed by a deploy. The
+browser checks `/sw.js` for a new version on navigation, bypassing the HTTP cache
+for the worker script, so an ordinary fix ships as a normal release and reaches
+every open tab through the version-update handshake below. When the worker itself
+has to go:
+
+1. Set `selfDestroying: true` in the `VitePWA` options (`vite.config.ts`) and
+   release. The emitted `sw.js` skips waiting, unregisters itself, reloads every
+   open tab onto the network and deletes every cache — no user action.
+2. Keep that release live long enough for returning users to visit (weeks, not
+   hours), then drop the flag in a follow-up release to bring the worker back.
+3. Never remove the worker by deleting `src/sw.ts` or the `VitePWA` plugin: the
+   SPA catch-all in `netlify.toml` would answer `/sw.js` with `index.html` (200,
+   `text/html`), the browser's update check fails on the MIME type, and the old
+   worker keeps control of every returning user.
 
 ---
 

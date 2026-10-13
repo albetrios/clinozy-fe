@@ -538,6 +538,7 @@ read via `platformConfig.testMode`), the single home for any test-only behavior.
 - **Source of truth:** `src/core/config/app-manifest.ts` → `public/manifest.webmanifest` (drift test: `app-manifest.test.ts`).
 - **Icons:** `public/app-icon.svg` (the product mark — `ProductMark` — on its `#18181b` tile); PNGs via `rsvg-convert`. Skill: `agent-os/skills/fe-pwa-manifest/SKILL.md`.
 - **Local perf audit:** `pnpm build && pnpm preview` — see `docs/reference/local-production-perf.md` (never Lighthouse on dev server).
+- **Service worker navigations** (`src/sw.ts`): network first; a failed fetch gets the **precached app shell**, which owns the offline UX (splash offline hold, `OfflineIndicator`) — never a blanket offline page, since DNS/TLS failures reject while online. `offline.html` is the last resort. Read precached files with `matchPrecache`, never `caches.match` (revisioned keys). Emergency removal is `selfDestroying: true` in `VitePWA`, never deleting the worker — `docs/reference/frontend-platform.md` → Service worker emergency reset.
 
 ## Testing
 
