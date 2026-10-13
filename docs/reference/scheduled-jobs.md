@@ -37,7 +37,7 @@ a PR gate, even though both compare docs to code.
 | `mutation-test.yml`            | `0 5 * * 1`   | weekly Mon 05:00                | Stryker mutation score, pure logic (break 70)            | report                                  |
 | `scheduled-release-guards.yml` | `30 6 * * 1`  | weekly Mon 06:30                | GitHub env/ruleset drift + `RELEASE_PLEASE_TOKEN` expiry | annotations + hard fail                 |
 | `sync-drift-canary.yml`        | `0 7 * * 1`   | weekly Mon 07:00                | docs↔code drift (`sync:check` + `docs:staleness`)        | self-healing tracked `sync-drift` issue |
-| `scheduled-deps-audit.yml`     | `30 7 * * 1`  | weekly Mon 07:30                | `pnpm audit` advisory drift (deps unchanged by PRs)      | hard fail (Actions tab)                 |
+| `scheduled-deps-audit.yml`     | `30 7 * * 1`  | weekly Mon 07:30                | `pnpm deps:audit` drift + expired `ignoreGhsas` entries  | hard fail (Actions tab)                 |
 | `dead-code-audit-reminder.yml` | `0 7 1 */3 *` | quarterly (1st Jan/Apr/Jul/Oct) | reminder to run the barrel-hidden dead-code audit        | tracked `dead-code-audit` issue         |
 
 Times are UTC (GitHub cron is always UTC). Every **weekly** job runs Monday,

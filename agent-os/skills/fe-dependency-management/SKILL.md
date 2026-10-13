@@ -26,7 +26,14 @@ before-commit guard blocks it locally via `pnpm run validate:lockfile`.
    `pnpm.overrides` field in `package.json`), then `pnpm install`. This is how a
    CVE in a nested package is resolved without waiting on the parent.
 3. **Audit triage:** `pnpm deps:audit` (all) and `pnpm deps:audit:prod`
-   (shipped). Fix high/critical; for accepted risk, document why. Vulnerability
+   (shipped). Fix high/critical. **The rule (same as clinozy-be): a fix exists →
+   an `overrides` entry or a bump; NO fixed version published → its GHSA in
+   `auditConfig.ignoreGhsas` in `pnpm-workspace.yaml`, under a comment naming
+   `Package:`, `Path:`, `No fix:` and `Remove when:`, plus its row in the
+   accepted-risk table of `docs/reference/dependency-upgrades.md`.** Never accept
+   an advisory that has a fix, and never keep a second list: `bulk-audit.mjs`
+   reads that one, reports each accepted advisory, and fails once a fix is
+   published for it (remove the entry, then override or bump). Vulnerability
    policy and CI wiring live in `agent-os/skills/fe-code-quality-security/SKILL.md`.
 4. **License + bundle impact of a new dep:** confirm the license is compatible
    and check the first-paint cost — if it is heavy or client-shipped, prefer a
@@ -100,6 +107,11 @@ breaking major. Then `pnpm install`, and commit `pnpm-workspace.yaml` + `pnpm-lo
 **in the same commit** — a desynced lockfile fails every frozen-install job and
 reds any open release-please PR.
 
+Only when **no** version of the package itself fixes the advisory (the newest
+release is still in the vulnerable range) is there nothing to pin: accept it in
+`auditConfig.ignoreGhsas` as in step 3 of the procedure — never for an advisory
+with a published fix.
+
 Verify: `pnpm run validate:lockfile` then `pnpm deps:audit` (expect
-`none at high+`). If a lockfile error appears while the lockfile is fine, check
+`none at high+`, or `none other at high+` beside the accepted advisories it lists). If a lockfile error appears while the lockfile is fine, check
 the Node version first — see `fe-before-commit-guard`.
