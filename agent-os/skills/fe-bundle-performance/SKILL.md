@@ -158,6 +158,12 @@ For dependency or loading changes, also follow these checks:
 - Compare production builds with the same source and environment when attributing
   dependency growth. Keep experimental configs and output outside the checkout;
   record the installed versions and measured bytes, not only an estimate.
+- Measure with no `VITE_*` exported in the shell, as CI builds. Vite inlines ambient
+  `VITE_*` values even without an env file; a cloud container that exports
+  `VITE_POSTHOG_KEY`, `VITE_POSTHOG_HOST` and `VITE_STRIPE_PUBLISHABLE_KEY` adds
+  ~0.17 kB gzipped to the first-paint `env` chunk. Build with
+  `env -u VITE_POSTHOG_KEY -u VITE_POSTHOG_HOST -u VITE_STRIPE_PUBLISHABLE_KEY pnpm build`
+  (check `env | grep ^VITE_` first).
 - Use `pnpm size` on the real entry and modulepreload graph. Preserve its budgets;
   moving required work to an unconditional startup `import()` is not a saving.
 - Keep ready overlay shells and controls visible. Defer only the content or
