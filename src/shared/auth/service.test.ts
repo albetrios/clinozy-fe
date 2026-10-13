@@ -1,5 +1,7 @@
 import { type Mock, vi } from 'vitest';
 
+import { platformConfig } from '@/core/config/env.ts';
+import { queryClient } from '@/core/http/queryClient.ts';
 import { APP_SPLASH_SKIP } from '@/lib/app-splash.ts';
 import { PRODUCT_NAMESPACE } from '@/lib/product-identity.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
@@ -8,6 +10,7 @@ import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.
 import type { MeContext } from '@/shared/tenancy/me-context.ts';
 import { hydrateSessionContext } from '@/shared/tenancy/session-context.ts';
 
+import { cancelTokenRefresh } from './refresh-timer.ts';
 import { clearAccessToken, getAccessToken, setAccessToken } from './token.ts';
 import type { AuthUser } from './types.ts';
 
@@ -250,6 +253,35 @@ describe('auth/service', () => {
       window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true }));
 
       expect(reload).toHaveBeenCalledOnce();
+    });
+  });
+
+  describe('a clean-up step that throws', () => {
+    afterEach(() => {
+      platformConfig.debugLogging = false;
+    });
+
+    it('never stops the tab from leaving — and is reported when debugging', () => {
+      platformConfig.debugLogging = true;
+      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      (cancelTokenRefresh as Mock).mockImplementation(() => {
+        throw new Error('timer');
+      });
+      (queryClient.clear as Mock).mockImplementation(() => {
+        throw new Error('cache');
+      });
+      useAuthStore.getState().setUser(MOCK_USER);
+
+      forceLogout();
+      expect(window.location.href).toBe('/login');
+      window.dispatchEvent(new Event('pagehide'));
+
+      expect(useAuthStore.getState().user).toBeNull();
+      expect(consoleError).toHaveBeenCalledWith(
+        '[Auth] Cleanup failed during logout',
+        expect.objectContaining({ message: 'cache' }),
+      );
+      consoleError.mockRestore();
     });
   });
 
