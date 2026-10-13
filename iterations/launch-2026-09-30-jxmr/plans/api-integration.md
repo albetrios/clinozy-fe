@@ -266,7 +266,7 @@ Paths drop `/api/v1`. "Gap Gn" points into §8, "Mn" into §9, "Qn" into §10.
 
 ### 5.5 Medical store
 
-Planned 2026-10-13 ([D168](decisions.md), awaiting approval) on clinozy-be's medical store **rev 2** (its D88 and
+Planned and approved 2026-10-13 ([D168](decisions.md)) on clinozy-be's medical store **rev 2** (its D88 and
 D88–D91: routes-final §11 rev 2, MD23–MD34, ROUTE #181–#192), which answers this room's findings — G6, N8, N14, N19–N21,
 Q21, M22, M23, M34 — and Nikunj Mavani's note on the plan: **the store manages all its payments and its credits in
 Medical**.
@@ -300,7 +300,7 @@ Medical**.
 - **Gate:** `medicine:*`; Collect, Paid now, paying a supplier, recording a store payment and adding a customer credit
   `payment:create`; changing a payment `payment:update`; deleting, reversing, a return and giving a credit back
   `payment:delete`; a supplier credit's void `medicine:delete`; the payments CSV `medicine:export`.
-- **Medical room plan (D168 — proposed, awaiting approval).** Built after clinozy-be's rev 2 (its #181–#189), on the
+- **Medical room plan (D168 — approved 2026-10-13).** Built after clinozy-be's rev 2 (its #181–#189), on the
   Clinic stock room's pattern (D154): the room's data layer stays in `medical/shared/` — read wire schemas and mappers
   over the regenerated `openapi-types.d.ts`, write-body builders, reads and writes through `api`, each write with its
   own idempotency key — lists 50 a page keyed by organization, catalogues (manufacturers, suppliers, MRs, medicines,
