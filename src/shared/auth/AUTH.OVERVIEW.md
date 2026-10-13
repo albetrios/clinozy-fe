@@ -79,6 +79,22 @@ anybody out.
   back into the app. It is right only when the server session is **already
   gone**: a dead session in the fetch client, a deleted account, or the tail of
   `logout()` itself.
+- **The screen stays as it is until the login screen replaces it.** `forceLogout()`
+  ends at once only what the screen does not show (`endSessionOffScreen()`: the
+  work in flight, the token and its refresh timer, the session hint, the
+  onboarding progress saved on this device); what it shows — the user, the
+  organization and its permissions, the query cache — is cleared on `pagehide`,
+  as the page goes (`leaveForLogin()`). Clearing it before the browser left
+  repainted the app being left: the account menu emptied, rooms behind a
+  permission vanished and every list refetched without a token. `pagehide` also
+  fires for a page the back/forward cache keeps, and one restored from there
+  loads again (`pageshow` → `reload()`). The `/login` load that follows skips the
+  boot splash (`skipAppSplashOnNextLoad()` → `public/splash-init.js`), so the
+  login screen replaces the app directly. It stays a **full page load** on
+  purpose: that is what guarantees nothing of the session — the drafts,
+  outboxes and file links modules keep in memory included — reaches the next
+  person to sign in. A sibling tab hearing the broadcast leaves the same way;
+  one already on `/login` clears at once (`clearLocalAuthState()`).
 - **`logout({ reason })` is the ONE way to end a live session.** It dispatches
   the revoke (`POST /auth/logout` with the bearer) and calls `forceLogout()`
   **without waiting for it**. The Account menu, the command palette, **the
@@ -91,7 +107,7 @@ anybody out.
 safe.** Awaiting the revoke first left the user on the app they had just asked
 to leave whenever `/auth/logout` was slow. Three things make the instant
 redirect correct rather than merely faster: the bearer is read **before**
-`clearLocalAuthState()` wipes it; `clinozy:logout-pending` is written **before**
+`forceLogout()` clears it; `clinozy:logout-pending` is written **before**
 the redirect, so the `/login` bootstrap refuses to restore the session it would
 otherwise silently refresh back into; and the request goes out with
 `keepalive`, the one kind a browser finishes across the document unload that
@@ -103,11 +119,16 @@ response rarely arrives before the page is gone.
 commonest moment for an idle sign-out is a laptop waking past its deadline with
 Wi-Fi not back yet. `logout()` then records a `clinozy:logout-pending` flag (a
 boolean, never a token), and `startAuthBootstrap()` checks it before anything
-else: it mints a token from the refresh cookie, spends it on `/auth/logout`, and
-drops it — the session is never hydrated, so the caller stays a guest. The flag
-survives only while the outcome is unknown (still offline); a refresh the server
-_rejects_ means there is nothing left to revoke, and an interactive sign-in
-clears it so it can never revoke the new session.
+else: it settles the boot as a guest **at once** — the login screen never waits
+for the server — and finishes the revoke behind it: it mints a token from the
+refresh cookie, spends it on `/auth/logout`, and drops it; the session is never
+hydrated. A sign-in request waits for that revoke first (`settlePendingRevoke()`,
+awaited by `authFetch` in `shared/api/auth-api.ts`): its refresh answer sets the
+refresh cookie, and one landing after a sign-in's would put the signed-out
+session's cookie back over the new one. The flag survives only while the outcome
+is unknown (still offline); a refresh the server _rejects_ means there is nothing
+left to revoke, and an interactive sign-in clears it so it can never revoke the
+new session.
 
 **A deliberate end also suppresses auto-Google sign-in** for the tab
 (`skipAutoGoogleSignIn()`), including in sibling tabs that hear the logout

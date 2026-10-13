@@ -1,6 +1,7 @@
 import { API_BASE_PATH, API_ENDPOINTS, HTTP } from '@/core/config/constants.ts';
 import { platformConfig } from '@/core/config/env.ts';
 import { authCaptchaHeaders } from '@/shared/auth/captcha/auth-captcha-headers.ts';
+import { settlePendingRevoke } from '@/shared/auth/service.ts';
 import type { AuthTokenResponse, AuthUser } from '@/shared/auth/types.ts';
 import { authUserSchema } from '@/shared/auth/types.ts';
 import { AppError } from '@/shared/errors/AppError.ts';
@@ -42,6 +43,9 @@ async function authFetch(
   init: RequestInit & { timeout?: number; captchaToken?: string; captcha?: false } = {},
 ): Promise<Response> {
   const { timeout = HTTP.TIMEOUT, captchaToken, captcha, ...rest } = init;
+  // A sign-out the login screen's boot is still finishing goes first: its refresh answer sets the
+  // refresh cookie, and must not land after this request's (see `settlePendingRevoke`).
+  await settlePendingRevoke();
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeout);
   try {

@@ -1,5 +1,6 @@
 import { type Mock, vi } from 'vitest';
 
+import { APP_SPLASH_SKIP } from '@/lib/app-splash.ts';
 import { PRODUCT_NAMESPACE } from '@/lib/product-identity.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOnboardingStore } from '@/shared/store/useOnboardingStore/index.ts';
@@ -154,16 +155,35 @@ describe('auth/service', () => {
   });
 
   describe('forceLogout', () => {
-    it('clears token, auth store, and redirects to /login', () => {
+    /** The browser leaving the page — the one moment what the screen shows may go. */
+    const leaveThePage = () => window.dispatchEvent(new Event('pagehide'));
+
+    it('clears the token at once and hands the tab to /login', () => {
       setAccessToken(VALID_TOKEN);
       useAuthStore.getState().setUser(MOCK_USER);
 
       forceLogout();
 
       expect(getAccessToken()).toBeNull();
+      expect(window.location.href).toBe('/login');
+    });
+
+    it('keeps the screen as it is until the page goes, then clears what it showed', () => {
+      // Clearing the stores while the page was still up repainted the app being
+      // left: the account menu emptied, gated sections vanished, lists reloaded.
+      setAccessToken(VALID_TOKEN);
+      useAuthStore.getState().setUser(MOCK_USER);
+      useOrganizationStore.getState().setOrganization('org_prev', 'acme', 'active');
+
+      forceLogout();
+
+      expect(useAuthStore.getState().user).toEqual(MOCK_USER);
+      expect(useOrganizationStore.getState().organizationId).toBe('org_prev');
+
+      leaveThePage();
+
       expect(useAuthStore.getState().isAuthenticated).toBe(false);
       expect(useAuthStore.getState().user).toBeNull();
-      expect(window.location.href).toBe('/login');
     });
 
     it('wipes the active-org context + RBAC permissions (no privilege bleed to next sign-in)', () => {
@@ -174,9 +194,10 @@ describe('auth/service', () => {
       useOrganizationStore.setState({ permissions: ['membership:update'] });
 
       forceLogout();
+      leaveThePage();
 
-      // Must not rely on the post-logout reload — the store is cleared inline,
-      // so a non-reloading logout path can't leave one user's grants behind.
+      // Cleared in memory, not left to the reload — a page the back/forward
+      // cache keeps must not hold one user's grants either.
       expect(useOrganizationStore.getState().organizationId).toBeNull();
       expect(useOrganizationStore.getState().permissions).toEqual([]);
     });
@@ -188,16 +209,73 @@ describe('auth/service', () => {
       onboarding.claimForUser('usr_prev');
       onboarding.patch({ firstName: 'Prev', lastName: 'User' });
       onboarding.setStepIndex(3);
+      const storageKey = useOnboardingStore.persist.getOptions().name ?? '';
+      expect(localStorage.getItem(storageKey)).toContain('Prev');
 
       forceLogout();
 
-      // The NEXT user on this browser must start the wizard from scratch —
+      // What the next load would read is gone before the tab leaves...
+      expect(localStorage.getItem(storageKey)).toBeNull();
+
+      leaveThePage();
+
+      // ...and the NEXT user on this browser starts the wizard from scratch —
       // otherwise their finish step submits the PREVIOUS user's name.
       const state = useOnboardingStore.getState();
       expect(state.stepIndex).toBe(0);
       expect(state.data.firstName).toBe('');
       expect(state.data.lastName).toBe('');
       expect(state.forUserId).toBeNull();
+    });
+
+    it('lets the login load skip the boot splash', () => {
+      sessionStorage.removeItem(APP_SPLASH_SKIP);
+
+      forceLogout();
+
+      expect(sessionStorage.getItem(APP_SPLASH_SKIP)).toBe('1');
+    });
+
+    it('loads a page the back/forward cache restored again instead of showing it', () => {
+      const reload = vi.fn();
+      Object.defineProperty(window, 'location', {
+        writable: true,
+        value: { href: '', reload },
+      });
+
+      forceLogout();
+      leaveThePage();
+      window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: false }));
+      expect(reload).not.toHaveBeenCalled();
+      window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true }));
+
+      expect(reload).toHaveBeenCalledOnce();
+    });
+  });
+
+  describe('handleCrossTabLogout', () => {
+    it('leaves another page like forceLogout — its screen stays until the page goes', () => {
+      window.location.pathname = '/organization/acme/today';
+      setAccessToken(VALID_TOKEN);
+      useAuthStore.getState().setUser(MOCK_USER);
+
+      handleCrossTabLogout();
+
+      expect(getAccessToken()).toBeNull();
+      expect(window.location.href).toBe('/login');
+      expect(useAuthStore.getState().user).toEqual(MOCK_USER);
+      window.dispatchEvent(new Event('pagehide'));
+      expect(useAuthStore.getState().user).toBeNull();
+    });
+
+    it('clears at once on the login screen, where no page load follows', () => {
+      window.location.pathname = '/login';
+      useAuthStore.getState().setUser(MOCK_USER);
+
+      handleCrossTabLogout();
+
+      expect(window.location.href).toBe('');
+      expect(useAuthStore.getState().user).toBeNull();
     });
   });
 
