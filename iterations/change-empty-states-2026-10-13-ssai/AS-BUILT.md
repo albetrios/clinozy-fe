@@ -38,7 +38,7 @@ What was actually built, ledger row by ledger row, against the approved plan in
 - **Planned, not built** (deferred, user OK): —
 - **Built, not planned:** the `tinted` disc (#2), the exported `EmptyStateArt` (#3), Today's
   "not part of your role" line (#9), the billing invoices table (#14), the budget fit (#16), the
-  room baselines rewritten (#18).
+  room baselines rewritten (#18); the consent card's Sonar annotation the push gate needed (D15).
 - **Follow-ups for the next iteration:** a native read of the new strings in ten locales (D11,
   AMBER); more dedicated icons (an armchair for Waiting, a briefcase for MRs, a key for API keys)
   once the icon registry stops riding the first-paint chunk; the Medical and Clinic stock tabs'
