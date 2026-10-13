@@ -190,6 +190,11 @@ Why each of those exists:
   module had loaded ([#6144](https://github.com/stryker-mutator/stryker-js/issues/6144)). Delete the
   shim once a runner release fixes both.
 
+Measured on `ubuntu-latest` (2026-10-13): 58 files, 1,894 mutants (1,602 scored, the rest are the
+excluded string/regex/template mutators), initial run ≈ 3 minutes, whole run 26 m 38 s, score
+**76.09%**. The 48 static mutants are about half of that time, because each reloads and reruns its
+module's tests. The job limit is 60 minutes and the initial-run limit 15.
+
 Run it locally — Stryker is installed ad hoc, as in CI, and never lands in the lockfile:
 
 ```bash

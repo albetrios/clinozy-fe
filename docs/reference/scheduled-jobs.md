@@ -34,7 +34,7 @@ a PR gate, even though both compare docs to code.
 | `lighthouse.yml`               | `0 3 * * 1`   | weekly Mon 03:00                | performance budgets                                      | report                                  |
 | `cross-browser.yml`            | `0 4 * * 1`   | weekly Mon 04:00                | Chrome/Firefox/Safari smoke                              | report                                  |
 | `codeql.yml`                   | `27 4 * * 1`  | weekly Mon 04:27                | security code scanning                                   | security alert                          |
-| `mutation-test.yml`            | `0 5 * * 1`   | weekly Mon 05:00                | Stryker mutation tests                                   | report                                  |
+| `mutation-test.yml`            | `0 5 * * 1`   | weekly Mon 05:00                | Stryker mutation score, pure logic (break 70)            | report                                  |
 | `scheduled-release-guards.yml` | `30 6 * * 1`  | weekly Mon 06:30                | GitHub env/ruleset drift + `RELEASE_PLEASE_TOKEN` expiry | annotations + hard fail                 |
 | `sync-drift-canary.yml`        | `0 7 * * 1`   | weekly Mon 07:00                | docs↔code drift (`sync:check` + `docs:staleness`)        | self-healing tracked `sync-drift` issue |
 | `scheduled-deps-audit.yml`     | `30 7 * * 1`  | weekly Mon 07:30                | `pnpm audit` advisory drift (deps unchanged by PRs)      | hard fail (Actions tab)                 |
@@ -43,9 +43,11 @@ a PR gate, even though both compare docs to code.
 Times are UTC (GitHub cron is always UTC). Every **weekly** job runs Monday,
 staggered across the off-peak window (03:00 → 04:00 → 04:27 → 05:00 → 06:30 →
 07:00 → 07:30) so one Monday review covers every weekly signal and no two jobs
-contend for runners at the same minute. Off the weekly cadence: `cleanup-cache` runs
-daily, and `dead-code-audit-reminder` runs quarterly — it opens a reminder issue
-to run the manual barrel-hidden dead-code sweep that per-PR `knip` can't catch.
+contend for runners at the same minute. The heaviest, `mutation-test`, takes about
+27 minutes (job limit 60), so it ends well before the 06:30 guards. Off the weekly
+cadence: `cleanup-cache` runs daily, and `dead-code-audit-reminder` runs quarterly —
+it opens a reminder issue to run the manual barrel-hidden dead-code sweep that
+per-PR `knip` can't catch.
 
 ## Other periodic mechanisms (not workflow crons)
 
