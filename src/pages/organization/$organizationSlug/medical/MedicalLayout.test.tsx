@@ -15,6 +15,7 @@ describe('MedicalLayout', () => {
       'manufacturers',
       'mrs',
       'payments',
+      'credits',
     ]);
   });
 });

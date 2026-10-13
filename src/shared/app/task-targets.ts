@@ -3,6 +3,7 @@ import {
   organizationAppointmentCreate,
 } from '@/lib/routes/appointments-builders.ts';
 import { organizationLead } from '@/lib/routes/leads-builders.ts';
+import { organizationMrEdit } from '@/lib/routes/medical-builders.ts';
 import {
   organizationCheckInCreate,
   organizationCheckInEdit,
@@ -22,7 +23,7 @@ import {
  * (opened, or moved), a new booking for the person (a copy of the task's visit
  * when it rebooks), the lead drawer, a patient-file section, a check-in or
  * review on the patient file — a new one, or the one the task points at
- * (`checkInId`, `reviewId`) — an invoice. One vocabulary for the Tasks room's
+ * (`checkInId`, `reviewId`) — an invoice, a medical rep (Medical › MRs). One vocabulary for the Tasks room's
  * drawer and Today's work queue (Q-T3).
  */
 export type TaskTarget =
@@ -38,7 +39,8 @@ export type TaskTarget =
       checkInId?: string;
     }
   | { kind: 'review'; patientId: string; appointmentId?: string; reviewId?: string }
-  | { kind: 'invoice'; invoiceId: string };
+  | { kind: 'invoice'; invoiceId: string }
+  | { kind: 'medicalRep'; mrId: string };
 
 /** What a follow-on reads of a task: its link and its person. */
 type TaskTargetSource = Pick<TaskRow, 'link' | 'person'>;
@@ -189,5 +191,7 @@ export function taskTargetNavigation(
         recordId: target.invoiceId,
         referrer,
       });
+    case 'medicalRep':
+      return organizationMrEdit(organizationSlug, target.mrId);
   }
 }

@@ -2,18 +2,33 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import {
-  appFixtures,
-  resetAppFixtures,
-} from '@/shared/api/app/fixtures/world.fixtures.ts';
+vi.mock('../../medical-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchAllManufacturers: vi.fn(),
+  fetchAllSuppliers: vi.fn(),
+  fetchAllMedicalReps: vi.fn(),
+}));
+vi.mock('../../medical-records-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  createManufacturer: vi.fn(),
+}));
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
+import { manufacturerRow } from '@/tests/utils/medical-doubles.ts';
 
 import {
   renderMedicalDrawer,
   resetMedicalRoutes,
 } from '../../../__tests__/integration/medical-test-router.tsx';
 import { useMedicalStack } from '../../hooks/useMedicalStack/index.ts';
-import { MedicineDrawer } from '../MedicineDrawer/index.ts';
+import {
+  fetchAllManufacturers,
+  fetchAllMedicalReps,
+  fetchAllSuppliers,
+} from '../../medical-api.ts';
+import { createManufacturer } from '../../medical-records-api.ts';
+import { SupplierDrawer } from '../SupplierDrawer/index.ts';
 import { MedicalStackHost } from './MedicalStackHost.tsx';
 
 const viewport = vi.hoisted(() => ({ tier: 'desktop' as ViewportTier }));
@@ -40,38 +55,44 @@ vi.mock('@/shared/notify/index.ts', () => ({
 const setup = () =>
   userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
 
-/** New medicine with its stacked children, as a tab page hosts them. */
+const ZEN_ID = 'mfr_zen000000000000000000';
+
+/** New supplier with its stacked children, as a tab page hosts them. */
 function Host({ onClose }: { onClose: () => void }) {
   const stack = useMedicalStack();
   return (
     <>
-      <MedicineDrawer mode="create" open onClose={onClose} openChild={stack.open} />
+      <SupplierDrawer mode="create" open onClose={onClose} openChild={stack.open} />
       <MedicalStackHost stack={stack} />
     </>
   );
 }
 
-/** Open the medicine's maker picker, type `query` and ask for the full record. */
+/** Open the supplier's makers picker, type `query` and ask for the full record. */
 async function stackManufacturer(user: ReturnType<typeof setup>, query: string) {
-  const parent = await screen.findByTestId('medicine-drawer');
-  await waitFor(() =>
-    expect(within(parent).getByTestId('medicine-drawer-manufacturer')).toHaveTextContent(
-      'ALVI',
-    ),
+  const parent = await screen.findByTestId('supplier-drawer');
+  await user.click(
+    within(parent).getByTestId('supplier-drawer-step-distributes-trigger'),
   );
-  await user.click(within(parent).getByTestId('medicine-drawer-manufacturer'));
+  await user.click(within(parent).getByTestId('supplier-drawer-manufacturers'));
   await user.type(await screen.findByRole('combobox'), query);
-  await user.click(await screen.findByTestId('medicine-drawer-manufacturer-create-full'));
+  await user.click(
+    await screen.findByTestId('supplier-drawer-manufacturers-create-full'),
+  );
   return parent;
 }
 
 beforeEach(() => {
+  vi.resetAllMocks();
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetAppFixtures();
+  signInTestMember();
+  vi.mocked(fetchAllManufacturers).mockResolvedValue([manufacturerRow()]);
+  vi.mocked(fetchAllSuppliers).mockResolvedValue([]);
+  vi.mocked(fetchAllMedicalReps).mockResolvedValue([]);
 });
 afterEach(() => {
   resetMedicalRoutes();
-  resetAppFixtures();
+  useOrganizationStore.getState().clearOrganization();
 });
 
 describe('MedicalStackHost (medical.md:343–355)', () => {
@@ -93,12 +114,15 @@ describe('MedicalStackHost (medical.md:343–355)', () => {
     await waitFor(() =>
       expect(screen.queryByTestId('manufacturer-drawer-stacked')).not.toBeInTheDocument(),
     );
-    expect(screen.getByTestId('medicine-drawer')).toBeInTheDocument();
+    expect(screen.getByTestId('supplier-drawer')).toBeInTheDocument();
     expect(onClose).not.toHaveBeenCalled();
   });
 
   it('a child’s save picks the new record in the field that asked', async () => {
     const user = setup();
+    vi.mocked(createManufacturer).mockResolvedValue(
+      manufacturerRow({ id: ZEN_ID, name: 'ZEN', tone: 'lav', medicineCount: 0 }),
+    );
     renderMedicalDrawer(<Host onClose={vi.fn()} />);
     const parent = await stackManufacturer(user, 'zen');
     const child = await screen.findByTestId('manufacturer-drawer-stacked');
@@ -107,12 +131,13 @@ describe('MedicalStackHost (medical.md:343–355)', () => {
     await waitFor(() =>
       expect(screen.queryByTestId('manufacturer-drawer-stacked')).not.toBeInTheDocument(),
     );
-    expect(appFixtures.manufacturers.snapshot((row) => row.name === 'ZEN')).toHaveLength(
-      1,
-    );
+    expect(createManufacturer).toHaveBeenCalledWith({
+      input: expect.objectContaining({ name: 'ZEN' }),
+      idempotencyKey: expect.any(String),
+    });
     await waitFor(() =>
       expect(
-        within(parent).getByTestId('medicine-drawer-manufacturer'),
+        within(parent).getByTestId('supplier-drawer-manufacturers'),
       ).toHaveTextContent('ZEN'),
     );
   });

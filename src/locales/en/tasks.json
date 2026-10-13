@@ -521,6 +521,7 @@
       "treatment": "Open treatment",
       "patient": "Open patient",
       "invoice": "Open invoice",
+      "medicalRep": "Open MR",
       "checkIn": "Open check-in",
       "review": "Open review"
     },

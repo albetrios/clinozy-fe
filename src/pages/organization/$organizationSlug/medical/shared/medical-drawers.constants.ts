@@ -49,7 +49,6 @@ export const MEDICAL_DRAWER_KEYS = {
     manufacturer: 'drawers.quick.manufacturer',
     supplier: 'drawers.quick.supplier',
     mr: 'drawers.quick.mr',
-    medicine: 'drawers.quick.medicine',
   },
   /** The reason confirm (`medical.md:366`): titles and the "deleted" toast. */
   deleteConfirm: {
@@ -342,11 +341,15 @@ export const MEDICAL_DRAWER_KEYS = {
       damaged: 'drawers.saleReturn.reasons.damaged',
     },
     refundBy: 'drawers.saleReturn.refundBy',
+    /** "Refund by" · "Store credit": the money stays as the customer's credit (MD33). */
+    storeCredit: 'drawers.saleReturn.storeCredit',
     /** "1 medicine · ₹550" — the first step's head (plural). */
     peek: 'drawers.saleReturn.peek',
     quickFill: 'drawers.saleReturn.quickFill',
     /** "Refund ₹550". */
     save: 'drawers.saleReturn.save',
+    /** "Keep ₹550 as store credit". */
+    saveCredit: 'drawers.saleReturn.saveCredit',
     /** "Unused · ₹550". */
     summary: 'drawers.saleReturn.summary',
     nothing: 'drawers.saleReturn.nothing',
@@ -354,9 +357,11 @@ export const MEDICAL_DRAWER_KEYS = {
     refunded: 'drawers.saleReturn.refunded',
     /** "₹550 refunded · stock written off" (Damaged, Reaction). */
     refundedWrittenOff: 'drawers.saleReturn.refundedWrittenOff',
-    /** An unpaid sale's return lowers the due: "₹550 off the bill · stock added back". */
-    lowered: 'drawers.saleReturn.lowered',
-    loweredWrittenOff: 'drawers.saleReturn.loweredWrittenOff',
+    /** "₹550 kept as store credit · stock added back". */
+    credited: 'drawers.saleReturn.credited',
+    creditedWrittenOff: 'drawers.saleReturn.creditedWrittenOff',
+    /** A sale still owing takes no return (`409 sale_not_paid`, MD24): collect first. */
+    notPaid: 'drawers.saleReturn.notPaid',
   },
   /** Return expiring stock (`medical.md:297–309`). */
   expiring: {

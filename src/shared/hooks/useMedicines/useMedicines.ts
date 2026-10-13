@@ -10,12 +10,12 @@ import {
   quickCreateMedicine,
   restoreMedicine,
   setNearExpiryDiscount,
+  setNearExpiryDiscountWithin,
   updateMedicine,
 } from '@/shared/api/app/medicines-api.ts';
 import type {
   MedicineInput,
   MedicineListParams,
-  MedicineRecord,
   MedicineRow,
   QuickMedicineInput,
 } from '@/shared/api/app/medicines-contracts.ts';
@@ -23,10 +23,11 @@ import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
 import { useCursorList } from '@/shared/hooks/useCursorList/index.ts';
+import { useOrganizationId } from '@/shared/store/useOrganizationStore/index.ts';
 
 /**
- * What a medicine write refreshes: every medicine read, and the Medical
- * family's reads that join medicines (sales, orders, manufacturers' counts).
+ * What a medicine write refreshes: every medicine read, and the Medical room's reads that show
+ * medicines (sales, orders, manufacturers' counts).
  */
 export const MEDICINE_WRITE_KEYS = [
   medicineQueryKeys.all,
@@ -36,102 +37,126 @@ export const MEDICINE_WRITE_KEYS = [
 // ── Reads ──
 
 /**
- * The Medicines list, a cursor page of 50 at a time (D7, `S:1660`) — Medical ›
- * Medicines' infinite scroll. While new params load the previous rows stay
- * (`isRefreshing`); a failed read raises no toast here — the room keeps the
+ * The Medicines list on clinozy-be, a cursor page of 50 at a time — Medical › Medicines' infinite
+ * scroll, under the active organization and idle until there is one. While new params load the
+ * previous rows stay (`isRefreshing`); a failed read raises no toast here — the room keeps the
  * last copy and offers Retry (KICKOFF §6.0 List error).
  */
 export function useMedicineList(params: MedicineListParams) {
+  const organizationId = useOrganizationId();
   return useCursorList<MedicineRow>({
-    queryKey: medicineQueryKeys.list(params),
+    queryKey: medicineQueryKeys.list(organizationId, params),
     queryFn: async (after) => {
-      const page = await listMedicines(params, after ?? null);
-      return {
-        rows: page.items,
-        next: page.nextCursor,
-        hasMore: page.nextCursor !== null,
-      };
+      const page = await listMedicines(params, after);
+      return { rows: page.rows, next: page.next, hasMore: page.next !== null };
     },
     notifyOnError: false,
+    enabled: organizationId !== null,
   });
 }
 
-/** Every live medicine — the pickers' catalogue (New sale, the purchase order, the Rx drawer). */
-export function useMedicineCatalogue() {
+/**
+ * Every live medicine — the pickers' catalogue (New sale, the purchase order, the Rx drawer);
+ * idle while `enabled` is false (the Invoice drawer reads it for a Medical sale only).
+ */
+export function useMedicineCatalogue({ enabled = true }: { enabled?: boolean } = {}) {
+  const organizationId = useOrganizationId();
   return useAppQuery({
-    queryKey: medicineQueryKeys.catalogue(),
+    queryKey: medicineQueryKeys.catalogue(organizationId),
     queryFn: () => fetchAllMedicines(),
+    enabled: enabled && organizationId !== null,
   });
 }
 
 /** One medicine as its row; idle while there is no id. A deleted or unknown id fails with a 404. */
 export function useMedicine(id: string | undefined) {
+  const organizationId = useOrganizationId();
   return useAppQuery({
-    queryKey: medicineQueryKeys.detail(id ?? ''),
+    queryKey: medicineQueryKeys.detail(organizationId, id ?? ''),
     queryFn: () => fetchMedicine(id ?? ''),
-    enabled: Boolean(id),
+    enabled: Boolean(id) && organizationId !== null,
   });
 }
 
 // ── Writes ──
 
-/** What the near-expiry discount write sends: the medicines and the percent (0 removes it). */
+/** What the near-expiry discount write sends: the medicines as read and the percent (0 removes it). */
 export interface NearExpiryDiscountVars {
-  ids: readonly string[];
+  medicines: readonly Pick<MedicineRow, 'id' | 'updatedAt'>[];
   pct: number;
 }
 
 /**
- * Sell at 20% off near expiry, or remove it (Q-M3; a plan field, Appendix F)
- * — the row's toggle and "Sell all at 20% off". The caller toasts, with Undo.
+ * Sell at 20% off near expiry, or remove it (Q-M3) — the row's toggle and its Undo. The caller
+ * toasts, with Undo.
  */
 export function useSetNearExpiryDiscount(
-  options: CrudMutationOptions<MedicineRecord[], NearExpiryDiscountVars> = {},
+  options: CrudMutationOptions<MedicineRow[], NearExpiryDiscountVars> = {},
 ) {
-  return useAppMutation<MedicineRecord[], NearExpiryDiscountVars>({
-    mutationFn: ({ ids, pct }) => setNearExpiryDiscount(ids, pct),
+  return useAppMutation<MedicineRow[], NearExpiryDiscountVars>({
+    mutationFn: ({ medicines, pct }, action) =>
+      setNearExpiryDiscount(medicines, pct, action.idempotencyKey),
     invalidateKeys: [...MEDICINE_WRITE_KEYS],
     ...options,
   });
 }
 
-/** Create a medicine from its drawer (`createMedicine`, `S:1669`). */
+/** What "Sell all at 20% off" sends: the window and the percent (0 removes it). */
+export interface NearExpiryWindowVars {
+  expiringWithinDays: 30 | 60 | 90;
+  pct: number;
+}
+
+/** "Sell all at 20% off" — every medicine expiring within the window, in one write; answers how many. */
+export function useSetNearExpiryDiscountWithin(
+  options: CrudMutationOptions<number, NearExpiryWindowVars> = {},
+) {
+  return useAppMutation<number, NearExpiryWindowVars>({
+    mutationFn: ({ expiringWithinDays, pct }, action) =>
+      setNearExpiryDiscountWithin(expiringWithinDays, pct, action.idempotencyKey),
+    invalidateKeys: [...MEDICINE_WRITE_KEYS],
+    ...options,
+  });
+}
+
+/** Create a medicine from its drawer. */
 export function useCreateMedicine(
-  options: CrudMutationOptions<MedicineRecord, MedicineInput> = {},
+  options: CrudMutationOptions<MedicineRow, MedicineInput> = {},
 ) {
-  return useAppMutation<MedicineRecord, MedicineInput>({
-    mutationFn: createMedicine,
+  return useAppMutation<MedicineRow, MedicineInput>({
+    mutationFn: (input, action) => createMedicine(input, action.idempotencyKey),
     invalidateKeys: [...MEDICINE_WRITE_KEYS],
     ...options,
   });
 }
 
-/** What a medicine save sends: the record and its patch. */
+/** What a medicine save sends: the medicine as read — its `updated_at` guards the save — and the drawer's fields. */
 export interface MedicineUpdateVars {
-  id: string;
-  patch: Partial<MedicineInput>;
+  record: MedicineRow;
+  input: MedicineInput;
 }
 
-/** Save a medicine (`updateMedicine`, `S:1669`): a quick record loses its flag. */
+/** Save a medicine — refused when someone saved it since (`409 record_changed`); a quick record loses its flag. */
 export function useUpdateMedicine(
-  options: CrudMutationOptions<MedicineRecord, MedicineUpdateVars> = {},
+  options: CrudMutationOptions<MedicineRow, MedicineUpdateVars> = {},
 ) {
-  return useAppMutation<MedicineRecord, MedicineUpdateVars>({
-    mutationFn: ({ id, patch }) => updateMedicine(id, patch),
+  return useAppMutation<MedicineRow, MedicineUpdateVars>({
+    mutationFn: ({ record, input }, action) =>
+      updateMedicine(record, input, action.idempotencyKey),
     invalidateKeys: [...MEDICINE_WRITE_KEYS],
     ...options,
   });
 }
 
 /**
- * "Add medicine “Azel cream”" from a picker (`quickCreateMedicine`, `S:1670`):
- * MRP ₹0, "Needs MRP and composition" until a full save.
+ * "Add medicine “Azel cream”" from a picker: MRP ₹0, "Needs MRP and composition" until a full
+ * save.
  */
 export function useQuickCreateMedicine(
-  options: CrudMutationOptions<MedicineRecord, QuickMedicineInput> = {},
+  options: CrudMutationOptions<MedicineRow, QuickMedicineInput> = {},
 ) {
-  return useAppMutation<MedicineRecord, QuickMedicineInput>({
-    mutationFn: quickCreateMedicine,
+  return useAppMutation<MedicineRow, QuickMedicineInput>({
+    mutationFn: (input, action) => quickCreateMedicine(input, action.idempotencyKey),
     invalidateKeys: [...MEDICINE_WRITE_KEYS],
     ...options,
   });
@@ -145,17 +170,18 @@ export interface MedicineDeleteVars {
 }
 
 /**
- * Soft-delete a medicine (`S:1546`): optimistic — the row leaves every
- * Medicines list at once and comes back if the write fails.
+ * Soft-delete a medicine: optimistic — the row leaves every Medicines list at once and comes back
+ * if the write fails.
  */
 export function useDeleteMedicine(
-  options: CrudMutationOptions<MedicineRecord, MedicineDeleteVars> = {},
+  options: CrudMutationOptions<void, MedicineDeleteVars> = {},
 ) {
-  return useAppMutation<MedicineRecord, MedicineDeleteVars, unknown, MedicineRow>({
+  const organizationId = useOrganizationId();
+  return useAppMutation<void, MedicineDeleteVars, unknown, MedicineRow>({
     mutationFn: ({ id, reason, note }) => deleteMedicine(id, reason, note),
     invalidateKeys: [...MEDICINE_WRITE_KEYS],
     optimisticInfinite: {
-      queryKey: medicineQueryKeys.lists(),
+      queryKey: medicineQueryKeys.lists(organizationId),
       update: (rows, { id }) => rows.filter((row) => row.id !== id),
     },
     ...options,
@@ -164,10 +190,10 @@ export function useDeleteMedicine(
 
 /** Put a deleted medicine back — the Undo of its toast (10s, D32). */
 export function useRestoreMedicine(
-  options: CrudMutationOptions<MedicineRecord, string> = {},
+  options: CrudMutationOptions<MedicineRow, string> = {},
 ) {
-  return useAppMutation<MedicineRecord, string>({
-    mutationFn: restoreMedicine,
+  return useAppMutation<MedicineRow, string>({
+    mutationFn: (id, action) => restoreMedicine(id, action.idempotencyKey),
     invalidateKeys: [...MEDICINE_WRITE_KEYS],
     ...options,
   });

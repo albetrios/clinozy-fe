@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { automaticSection, roomFiltersOf } from './room-filter-sections.ts';
+import {
+  automaticSection,
+  roomFiltersOf,
+  singlePickSection,
+} from './room-filter-sections.ts';
 
 const MAKERS = [
   { id: 'a', name: 'ALVI', tone: 'lav' as const },
@@ -22,5 +26,14 @@ describe('room filter sections', () => {
   it('drops a section with as many values as the list has rows', () => {
     expect(automaticSection('Category', MAKERS, 2)).toBeNull();
     expect(automaticSection('Category', MAKERS, 3)).not.toBeNull();
+  });
+
+  it('makes a section pick one value at a time, and leaves a missing one missing', () => {
+    expect(singlePickSection(automaticSection('Manufacturer', MAKERS))?.field).toEqual({
+      kind: 'options',
+      values: ['a', 'b'],
+      single: true,
+    });
+    expect(singlePickSection(null)).toBeNull();
   });
 });

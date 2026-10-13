@@ -527,6 +527,7 @@
       "treatment": "Ouvrir le soin",
       "patient": "Ouvrir le patient",
       "invoice": "Ouvrir la facture",
+      "medicalRep": "Ouvrir le délégué",
       "checkIn": "Ouvrir le suivi",
       "review": "Ouvrir l’avis"
     },

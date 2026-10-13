@@ -1,7 +1,6 @@
 import { seedCommon } from '@/shared/api/app/app-fixture-seed.ts';
 import { invoiceTotals } from '@/shared/api/app/app-money.ts';
 import type {
-  CreditNote,
   ExpenseCategory,
   Invoice,
   InvoiceItem,
@@ -9,13 +8,8 @@ import type {
   PaymentMode,
 } from '@/shared/api/app/app-schema.ts';
 import { appToday } from '@/shared/api/app/app-time.ts';
-import type {
-  DayCloseRecord,
-  PaymentRecord,
-  PendingCreditRecord,
-} from '@/shared/api/app/payments-fixture-contracts.ts';
+import type { PaymentRecord } from '@/shared/api/app/payments-fixture-contracts.ts';
 
-import { medicineBySeq, SALE_ROWS } from './medical.fixtures.ts';
 import { findOfferingByName, offeringBySeq } from './offerings.fixtures.ts';
 import { branchRef, MAIN_BRANCH } from './organization.fixtures.ts';
 import { PACKAGE_ROWS } from './patient-records.fixtures.ts';
@@ -23,9 +17,12 @@ import { patientRef } from './patients.fixtures.ts';
 import { must, paise, readSeedLabel, ref, seedAt, seedDay } from './refs.fixtures.ts';
 import { type StaffKey, staffRef } from './staff.fixtures.ts';
 
+/**
+ * `PY_INV`'s types — Medical aside: a medical bill is the Medical room's sale on clinozy-be
+ * (MD28), so the fixture world seeds none.
+ */
 const INVOICE_TYPES: Record<string, InvoiceType> = {
   Clinic: 'clinic',
-  Medical: 'medical',
   Consultation: 'consultation',
 };
 /** `PY_MODES` (H:3612). */
@@ -49,15 +46,12 @@ interface LineRow {
   rate: number;
   disc: number;
   gst: number;
-  medicine?: number;
-  batch?: string;
 }
 
 interface InvoiceRow {
   seq: number;
   type: string;
   patient: string | null;
-  contact?: number;
   lines: readonly LineRow[];
   team: readonly StaffKey[];
   date: string;
@@ -65,12 +59,12 @@ interface InvoiceRow {
   at: string;
   by: StaffKey;
   remark: string;
-  sale?: number;
 }
 
 /**
- * `PY_INV` (H:3613–3622), verbatim. What was paid is not stored on an invoice —
- * it is the sum of the receipts below, which match each row's `paid`.
+ * `PY_INV` (H:3613–3622), verbatim but for its Medical rows (#785, #779 — the Medical room's
+ * sales, on clinozy-be). What was paid is not stored on an invoice — it is the sum of the
+ * receipts below, which match each row's `paid`.
  */
 const INVOICE_ROWS: readonly InvoiceRow[] = [
   {
@@ -94,22 +88,6 @@ const INVOICE_ROWS: readonly InvoiceRow[] = [
     at: '15:20',
     by: 'RS',
     remark: 'Free first visit',
-  },
-  {
-    seq: 785,
-    type: 'Medical',
-    patient: 'Rhea Shah',
-    lines: [
-      // Medicines sell at MRP, which includes GST — 0% on the line (KICKOFF §6.9,
-      // H:5054); the prototype's seed added 12% / 18% on top (a standing deviation).
-      { name: 'Flubolt 400', qty: 8, rate: 120, disc: 0, gst: 0 },
-      { name: 'Clonix-B Lotion', qty: 1, rate: 340, disc: 0, gst: 0 },
-    ],
-    team: ['DN'],
-    date: 'Today',
-    at: '10:10',
-    by: 'FA',
-    remark: '',
   },
   {
     seq: 784,
@@ -142,18 +120,6 @@ const INVOICE_ROWS: readonly InvoiceRow[] = [
     date: '28 Aug',
     at: '17:15',
     by: 'RS',
-    remark: '',
-  },
-  {
-    seq: 779,
-    type: 'Medical',
-    patient: 'Pooja Nair',
-    // MRP includes GST: 0% on the line (KICKOFF §6.9), not the seed's 18% on top.
-    lines: [{ name: 'Sunscreen SPF 50', qty: 2, rate: 650, disc: 0, gst: 0 }],
-    team: ['DD'],
-    date: '26 Aug',
-    at: '12:00',
-    by: 'FA',
     remark: '',
   },
   {
@@ -205,54 +171,20 @@ const PACKAGE_INVOICE_ROWS: readonly InvoiceRow[] = PACKAGE_ROWS.filter(
   };
 });
 
-/**
- * Every Medical sale owns its invoice (`Invoice.saleId`): the sold lines at MRP,
- * with 0% GST — the MRP already includes it (KICKOFF §6.9, H:5054). The
- * medicine's own rate is what a print splits out of the MRP, never added on top.
- */
-const SALE_INVOICE_ROWS: readonly InvoiceRow[] = SALE_ROWS.map((sale) => {
-  const sold = readSeedLabel(sale.at);
-  return {
-    seq: sale.invoice,
-    type: 'Medical',
-    patient: sale.patient,
-    contact: sale.contact ?? undefined,
-    lines: sale.lines.map(([medicine, qty, batch]) => {
-      const row = medicineBySeq(medicine);
-      return {
-        name: row.name,
-        qty,
-        rate: row.mrp,
-        disc: 0,
-        gst: 0,
-        medicine,
-        batch,
-      };
-    }),
-    team: [],
-    date: sold.date,
-    at: sold.time ?? '12:00',
-    by: sale.by,
-    remark: '',
-    sale: sale.seq,
-  };
-});
-
-const ALL_INVOICE_ROWS = [...INVOICE_ROWS, ...PACKAGE_INVOICE_ROWS, ...SALE_INVOICE_ROWS];
+const ALL_INVOICE_ROWS = [...INVOICE_ROWS, ...PACKAGE_INVOICE_ROWS];
 
 function invoiceItem(line: LineRow): InvoiceItem {
-  const offering =
-    line.medicine === undefined ? findOfferingByName(line.name) : undefined;
+  const offering = findOfferingByName(line.name);
   return {
     offeringId: offering ? ref.offering(offering.seq) : null,
-    medicineId: line.medicine === undefined ? null : ref.medicine(line.medicine),
+    medicineId: null,
     name: line.name,
     packSize: null,
     qty: line.qty,
     rate: paise(line.rate),
     discountPct: line.disc,
     gstPct: line.gst,
-    batchNo: line.batch ?? null,
+    batchNo: null,
   };
 }
 
@@ -264,20 +196,15 @@ export function invoiceSeed(today: string = appToday()): Invoice[] {
     type: must(INVOICE_TYPES[row.type], `invoice type ${row.type}`),
     branchId: branchRef(MAIN_BRANCH),
     patientId: row.patient ? patientRef(row.patient) : null,
-    medicalContactId: row.contact === undefined ? null : ref.medicalContact(row.contact),
+    medicalContactId: null,
     teamIds: row.team.map(staffRef),
     items: row.lines.map(invoiceItem),
     overallDiscount: 0,
     date: seedDay(row.date, today),
     remark: row.remark || null,
     prescriptionId: null,
-    saleId: row.sale === undefined ? null : ref.medicalSale(row.sale),
+    saleId: null,
   }));
-}
-
-/** No seed issues a credit note: the one refund (TX-5466) names CN-100 on INV-760, neither of which any seed defines. */
-export function creditNoteSeed(): CreditNote[] {
-  return [];
 }
 
 interface ReceiptRow {
@@ -293,20 +220,10 @@ interface ReceiptRow {
 }
 
 /**
- * `PY_TX` (H:3623–3630), verbatim ("TX-5512" is PAY-5512). The refund's INV-760
- * is in no seed, so it stays unlinked.
+ * `PY_TX` (H:3623–3630), verbatim ("TX-5509" is PAY-5509) but for the receipts on its Medical
+ * invoices (PAY-5512, PAY-5501). The refund's INV-760 is in no seed, so it stays unlinked.
  */
 const RECEIPT_ROWS: readonly ReceiptRow[] = [
-  {
-    seq: 5512,
-    at: 'Today 10:12',
-    patient: 'Rhea Shah',
-    invoice: 785,
-    mode: 'UPI',
-    amount: 600,
-    by: 'FA',
-    note: '',
-  },
   {
     seq: 5509,
     at: '27 Sep 18:40',
@@ -315,16 +232,6 @@ const RECEIPT_ROWS: readonly ReceiptRow[] = [
     mode: 'Card',
     amount: 3650,
     by: 'RS',
-    note: '',
-  },
-  {
-    seq: 5501,
-    at: '26 Aug 12:05',
-    patient: 'Pooja Nair',
-    invoice: 779,
-    mode: 'Cash',
-    amount: 1534,
-    by: 'FA',
     note: '',
   },
   {
@@ -359,7 +266,7 @@ const RECEIPT_ROWS: readonly ReceiptRow[] = [
   },
 ];
 
-/** Receipts for the invoices added above: the two package sales and the two paid Medical sales. */
+/** Receipts for the invoices added above: the two package sales. */
 const ADDED_RECEIPTS: readonly {
   seq: number;
   invoice: number;
@@ -368,8 +275,6 @@ const ADDED_RECEIPTS: readonly {
 }[] = [
   { seq: 5480, invoice: 780, at: '23 Aug · 12:35', by: 'RS' },
   { seq: 5505, invoice: 782, at: '24 Sep · 15:50', by: 'RS' },
-  { seq: 5507, invoice: 789, at: '26 Sep · 11:55', by: 'FA' },
-  { seq: 5513, invoice: 790, at: 'Today · 10:13', by: 'FA' },
 ];
 
 interface ExpenseRow {
@@ -448,31 +353,6 @@ const EXPENSE_ROWS: readonly ExpenseRow[] = [
   },
 ];
 
-interface CloseRow {
-  date: string;
-  by: StaffKey;
-  /** Counted cash, rupees. */
-  cash: number;
-}
-
-/** `DC_HIST` (H:3699), oldest first; each day opens on the last close's count. */
-const CLOSE_ROWS: readonly CloseRow[] = [
-  { date: '23 Sep', by: 'RS', cash: 6420 },
-  { date: '24 Sep', by: 'AS', cash: 4980 },
-  { date: '25 Sep', by: 'RS', cash: 7310 },
-];
-
-/** The first close opens on the default float (Appendix F: ₹2,000). */
-const DEFAULT_FLOAT = 2000;
-
-/** The close that locks a payment, when its day (main branch) was closed. */
-function closeOf(label: string): string | null {
-  const day = readSeedLabel(label).date;
-  return CLOSE_ROWS.some((row) => readSeedLabel(row.date).date === day)
-    ? ref.dayClose(day)
-    : null;
-}
-
 const paymentBase = (seq: number, at: string, by: StaffKey, today: string) => {
   const paidAt = seedAt(at, '12:00', today);
   return {
@@ -484,7 +364,8 @@ const paymentBase = (seq: number, at: string, by: StaffKey, today: string) => {
     creditNoteId: null,
     pendingCreditId: null,
     paidAt,
-    dayCloseId: closeOf(at),
+    // The fixture world closes no day: Day close is clinozy-be's.
+    dayCloseId: null,
     // The plan's fields (Appendix F): no seed carries a reference, an edit or a photo.
     reference: null,
     edits: [],
@@ -546,84 +427,4 @@ export function paymentSeed(today: string = appToday()): PaymentRecord[] {
     };
   });
   return [...receipts, ...added, ...expenses];
-}
-
-/**
- * `PY_CR0` (H:3683), verbatim: "them" is give (we owe them), "us" is take
- * (they owe us); "from" is the payment it came from.
- */
-export function pendingCreditSeed(today: string = appToday()): PendingCreditRecord[] {
-  const rows = [
-    {
-      seq: 2,
-      direction: 'give',
-      party: 'Tanvi Shah',
-      patient: 'Tanvi Shah',
-      amount: 500,
-      reason: 'Charged twice for corn removal',
-      from: 5466,
-      at: '4 Jun · 11:05',
-    },
-    {
-      seq: 1,
-      direction: 'take',
-      party: 'Medline Surgicals',
-      patient: null,
-      amount: 800,
-      reason: 'Returned a box of damaged gloves',
-      from: 305,
-      at: '24 Sep · 12:00',
-    },
-  ] as const;
-  return rows.map((row) => ({
-    ...seedCommon(seedAt(row.at, '12:00', today), staffRef('MJ')),
-    id: ref.pendingCredit(row.seq),
-    seq: row.seq,
-    direction: row.direction,
-    partyName: row.party,
-    patientId: row.patient === null ? null : patientRef(row.patient),
-    amount: paise(row.amount),
-    reason: row.reason,
-    sourcePaymentId: ref.payment(row.from),
-    status: 'open',
-    settledPaymentId: null,
-    // The plan's fields (Appendix F): the seeds' reasons are free text — no chip,
-    // no invoice, no settle-by day — and nothing is settled yet.
-    reasonKey: null,
-    note: null,
-    invoiceId: null,
-    settleBy: null,
-    adjusted: 0,
-    settledAt: null,
-  }));
-}
-
-/**
- * The closed days, main branch: opening accepted at opening time by the one who
- * closed after hours, nothing ticked in the review (the plan's fields, Appendix F).
- */
-export function dayCloseSeed(today: string = appToday()): DayCloseRecord[] {
-  return CLOSE_ROWS.map((row, index) => {
-    const previous = CLOSE_ROWS[index - 1];
-    const day = readSeedLabel(row.date).date;
-    const closedAt = seedAt(`${row.date} · 20:10`, '20:10', today);
-    return {
-      ...seedCommon(
-        seedAt(`${row.date} · 10:00`, '10:00', today),
-        staffRef(row.by),
-        closedAt,
-      ),
-      id: ref.dayClose(day),
-      branchId: branchRef(MAIN_BRANCH),
-      date: seedDay(row.date, today),
-      openingCash: paise(previous ? previous.cash : DEFAULT_FLOAT),
-      openingSource: previous ? 'carried' : 'default_float',
-      openingAcceptedAt: seedAt(`${row.date} · 10:00`, '10:00', today),
-      openingAcceptedById: staffRef(row.by),
-      countedCash: paise(row.cash),
-      closedAt,
-      closedById: staffRef(row.by),
-      checkedPaymentIds: [],
-    };
-  });
 }

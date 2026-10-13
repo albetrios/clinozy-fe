@@ -1,7 +1,8 @@
-import { Outlet, useSearch } from '@tanstack/react-router';
+import { Outlet, useNavigate, useParams, useSearch } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { organizationMedicalTab } from '@/lib/routes/medical-builders.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
 import {
   type RoomFilterFields,
@@ -10,11 +11,10 @@ import {
 } from '@/shared/components/RoomToolbar/index.ts';
 import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.ts';
-import { useFixtureOpenSupplierBills } from '@/shared/hooks/useFixtureLedger/index.ts';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
 import { usePayBill } from '@/shared/hooks/usePayBill/index.ts';
 import { useRoomList } from '@/shared/hooks/useRoomList/index.ts';
 import { useRoomTable } from '@/shared/hooks/useRoomTable/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 import { Eye, PenLine, SquareCheck, Trash, Wallet } from '@/shared/icons/index.ts';
 
 import { MEDICAL_KEYS, MEDICAL_NS, MEDICAL_TABLE_IDS } from '../medical.constants.ts';
@@ -40,7 +40,10 @@ import {
   useMedicalStack,
 } from '../shared/hooks/useMedicalStack/index.ts';
 import { fetchPurchaseOrder, medicalQueryKeys } from '../shared/medical-api.ts';
-import type { PurchaseOrderRow } from '../shared/medical-contracts.ts';
+import type {
+  PurchaseOrderRow,
+  SupplierListParams,
+} from '../shared/medical-contracts.ts';
 import { MEDICAL_DRAWER_KEYS } from '../shared/medical-drawers.constants.ts';
 import { PURCHASE_STAGE_TONES } from '../shared/medical-tones.ts';
 import { PurchaseOrderDrawer } from './components/PurchaseOrderDrawer/index.ts';
@@ -120,27 +123,36 @@ function OrderDrawers({
   return <PurchaseOrderView open order={dialog.record} onClose={close} onPay={onPay} />;
 }
 
+/** The suppliers owed something — what "Pay all received" totals and opens. */
+const OWED_SUPPLIERS: SupplierListParams = { hasPayable: true };
+
 /**
  * "Pay all received · ₹2,980" (`medical.md:17`; Q-M1): with Stage Received,
- * Send payment on the oldest open Medical bill — "Add & another" walks the
- * rest there (AMBER).
+ * what the store owes its suppliers (`meta.payable_total` of the suppliers
+ * owed something) — it opens Suppliers filtered to them (`payable=owed`),
+ * where each row's "Pay ₹X" pays one supplier, oldest bill first (route 13).
  */
-function PayAllReceived({ onPay }: { onPay: (purchaseId: string) => void }) {
+function PayAllReceived() {
   const { t } = useTranslation(MEDICAL_NS);
-  const formatPaise = usePaiseFormat();
-  const bills = (useFixtureOpenSupplierBills().data ?? []).filter(
-    (bill) => bill.kind === 'medical_po',
-  );
-  const [oldest] = bills;
-  if (!oldest) return null;
-  const total = bills.reduce((sum, bill) => sum + bill.due, 0);
+  const formatRupees = useRupeeFormat();
+  const navigate = useNavigate();
+  const { organizationSlug = '' } = useParams({ strict: false });
+  const payable = useMedicalSummary('suppliers', OWED_SUPPLIERS).data?.payable ?? 0;
+  if (payable <= 0) return null;
   return (
     <RoomViewAction
       actionId="pay-received"
       tableId={TABLE_ID}
       icon={Wallet}
-      label={t(MEDICAL_KEYS.viewActions.payAllReceived, { amount: formatPaise(total) })}
-      onClick={() => onPay(oldest.purchaseId)}
+      label={t(MEDICAL_KEYS.viewActions.payAllReceived, {
+        amount: formatRupees(payable),
+      })}
+      onClick={() =>
+        void navigate({
+          ...organizationMedicalTab(organizationSlug, 'suppliers'),
+          search: { payable: 'owed' },
+        })
+      }
     />
   );
 }
@@ -150,14 +162,15 @@ function PayAllReceived({ onPay }: { onPay: (purchaseId: string) => void }) {
  * over the purchase orders. The sequence follows the stage (`medical.md:434`):
  * an Ordered order opens for editing and offers "Receive goods" and the red
  * "Cancel order" (Admin); a Received one its read-only view and "Pay ₹2,980",
- * which — like "Pay all received" with Stage Received — opens Payments › Send
- * payment on the bill (Q-M1); a Paid one its view. The search, Stage, Created
- * and the sort live in the URL; the footer counts the orders they match. The
- * dialog routes render nothing: this page opens their drawers.
+ * which opens Payments › Send payment on the bill (Q-M1); a Paid one its view.
+ * "Pay all received", with Stage Received, opens the Suppliers owed something.
+ * The search, Stage, Created and the sort (PO, Date, Total — the API's) live in
+ * the URL; the footer counts the orders they match. The dialog routes render
+ * nothing: this page opens their drawers.
  */
 export function PurchasesPage() {
   const { t } = useTranslation(MEDICAL_NS);
-  const formatPaise = usePaiseFormat();
+  const formatRupees = useRupeeFormat();
   const search = validateMedicalSearch(useSearch({ strict: false }));
   const params = purchaseOrderParamsOf(search);
   const { patchSearch } = useDataTableUrlState(true);
@@ -210,7 +223,7 @@ export function PurchasesPage() {
       if (order.stage === 'received' && order.due > 0 && canPay) {
         actions.push({
           id: 'pay',
-          label: t(keys.rowActions.pay, { amount: formatPaise(order.due) }),
+          label: t(keys.rowActions.pay, { amount: formatRupees(order.due) }),
           icon: Wallet,
           onSelect: () => payOrder(order.id),
         });
@@ -249,7 +262,7 @@ export function PurchasesPage() {
             kind: 'cancelOrder',
             id: order.id,
             seq: order.seq,
-            record: [order.supplierName, formatPaise(order.total)].join(' · '),
+            record: [order.supplier.name, formatRupees(order.total)].join(' · '),
           }),
       });
     }
@@ -279,11 +292,7 @@ export function PurchasesPage() {
             },
           },
         }}
-        viewAction={
-          search.stage === 'received' && canPay ? (
-            <PayAllReceived onPay={payOrder} />
-          ) : null
-        }
+        viewAction={search.stage === 'received' && canPay ? <PayAllReceived /> : null}
       />
       <MedicalTable
         tab="purchases"

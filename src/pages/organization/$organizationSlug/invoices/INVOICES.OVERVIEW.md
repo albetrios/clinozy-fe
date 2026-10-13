@@ -25,7 +25,10 @@ Each child renders nothing — the host (`InvoicesLayout.tsx`) reads the URL thr
 `hooks/useInvoicesDialogRoute/` and opens:
 
 - `create/` — New invoice (the shared `InvoiceDrawer`), prefilled from `?type=&patient=`
-  (`S:92`). On `?copyOf=` it opens as a copy of a saved invoice, once that invoice is read: the
+  (`S:92`). Its type switch offers Clinic and Consultation only: a medical bill is the Medical
+  room's New sale, and clinozy-be refuses one on `/app/invoices` (`400 sold_through_store`,
+  MD28) — `?type=medical` is dropped, and a clinic or consultation invoice never lists or reads
+  medicines. A Medical invoice already billed still previews here, read-only. On `?copyOf=` it opens as a copy of a saved invoice, once that invoice is read: the
   patient file's "Copy invoice" (`patient-file.md:43`). It takes the invoice's party, team,
   lines, discount and remark, dated today with nothing paid (`copiedInvoiceForm`), and its
   save says "Copied as #788" (H:5017). A copy of an invoice that is gone answers "Invoice not
@@ -43,9 +46,8 @@ the server prices every line — the best live offer at the branch and date, nev
 lowest price (#159) — and the drawer shows its preview (`POST /app/invoices/preview`, an edit's
 `POST /app/invoices/{invoice_id}/preview`) as the member types, never its own sums. The save is
 `POST /app/invoices` with "Paid now" as one receipt, or `PATCH /app/invoices/{invoice_id}` with
-what changed and the read's `updated_at`. Medical's New sale stays on the fixture world
-(`@/shared/api/app/invoices-fixture-api.ts`, its sums in `@/shared/api/app/app-money.ts`;
-D153 seam).
+what changed and the read's `updated_at`. Medical's New sale is the same drawer in sale mode,
+opened by the Medical room with its own write (`POST /app/medical-sales`).
 
 ## Files
 

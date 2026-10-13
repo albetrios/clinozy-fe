@@ -75,37 +75,6 @@ export function definedFields<T extends object>(fields: T): Partial<T> {
 export const compareText = (a: string, b: string) => Number(a > b) - Number(a < b);
 
 /**
- * One cursor page of rows a read has already searched, filtered and ordered —
- * the fixture cursor is an offset into them (D7, pages of 50).
- */
-export function cursorPageOf<T>(
-  rows: readonly T[],
-  cursor: string | null,
-): CursorPage<T> {
-  const start = cursor ? Number(cursor) : 0;
-  const end = start + APP_PAGE_SIZE;
-  return {
-    items: rows.slice(start, end),
-    nextCursor: end < rows.length ? String(end) : null,
-  };
-}
-
-/** `compare` run in the asked direction — ascending unless `desc`. */
-export function directedCompare<T>(
-  compare: (a: T, b: T) => number,
-  order: 'asc' | 'desc' | undefined,
-): (a: T, b: T) => number {
-  const direction = order === 'desc' ? -1 : 1;
-  return (a, b) => direction * compare(a, b);
-}
-
-/** Whether any of `fields` contains the search `q`, case folded; an empty search matches. */
-export function searchMatches(q: string | undefined, fields: readonly string[]): boolean {
-  const needle = (q ?? '').trim().toLowerCase();
-  return !needle || fields.some((field) => field.toLowerCase().includes(needle));
-}
-
-/**
  * A 422 on `field` when one of `ids` names no record in `known` — a foreign
  * key the server would refuse.
  */

@@ -3,16 +3,13 @@ import { afterEach, describe, expect, it } from 'vitest';
 import {
   balanceOf as billBalance,
   belowFloor,
-  dayModeTotals,
   discountableSubtotal,
   discountForFinal,
-  expectedDrawerCash,
   invoiceBalance,
   invoiceLineAmounts,
   invoicePaid,
   invoiceTotals,
   lineFinal,
-  lineFloor,
   overallDiscountFromPercent,
   overallDiscountPercent,
   purchaseLineAmount,
@@ -167,36 +164,6 @@ describe('invoiceBalance', () => {
   });
 });
 
-describe('dayModeTotals / expectedDrawerCash (Q-G5, S:715)', () => {
-  const entry = (overrides: Partial<Payment>) =>
-    ({ direction: 'received', deletedAt: null, splits: [], ...overrides }) as Payment;
-
-  it('counts each split row under its own mode, Credit apart, deleted entries not at all', () => {
-    const totals = dayModeTotals([
-      entry({
-        splits: [
-          { mode: 'cash', amount: 30_000 },
-          { mode: 'upi', amount: 20_000 },
-        ],
-      }),
-      entry({ direction: 'paid', splits: [{ mode: 'cash', amount: 26_000 }] }),
-      entry({ splits: [{ mode: 'credit', amount: 50_000 }] }),
-      entry({
-        splits: [{ mode: 'cash', amount: 99_000 }],
-        deletedAt: '2026-10-03T05:00:00Z',
-      }),
-    ]);
-    expect(totals).toEqual({
-      cash: { in: 30_000, out: 26_000 },
-      upi: { in: 20_000, out: 0 },
-      card: { in: 0, out: 0 },
-      credit: { in: 50_000, out: 0 },
-    });
-    // The drawer: ₹2,000 opening + ₹300 in − ₹260 out.
-    expect(expectedDrawerCash(200_000, totals)).toBe(204_000);
-  });
-});
-
 describe('the fixture world', () => {
   afterEach(() => resetAppFixtures());
 
@@ -206,14 +173,12 @@ describe('the fixture world', () => {
     return invoiceBalance(invoice, appFixtures.payments.snapshot());
   };
 
-  it('reads the seeded dues (PY_INV, H:3613–3622) — medicine at MRP, GST included', () => {
-    // INV-785: Flubolt 400 × 8 at ₹120 and Clonix-B Lotion at ₹340, MRP with GST
-    // included (KICKOFF §6.9) — the prototype's seed added 12% / 18% on top
-    // (₹1,476.40); a standing deviation. ₹600 paid.
-    expect(balanceOf(785)).toEqual({
-      bill: 130_000,
-      paid: 60_000,
-      due: 70_000,
+  it('reads the seeded dues (PY_INV, H:3613–3622)', () => {
+    // INV-772: Corn Removal at ₹1,000, ₹400 paid.
+    expect(balanceOf(772)).toEqual({
+      bill: 100_000,
+      paid: 40_000,
+      due: 60_000,
       status: 'partial',
     });
     expect(balanceOf(787)).toMatchObject({ bill: 480_000, status: 'unpaid' });
@@ -265,17 +230,9 @@ describe('the invoice drawer’s figures (KICKOFF §6.9)', () => {
     expect(discountForFinal(item({ rate: 0 }), 5_000)).toBe(0);
   });
 
-  it('floors a line at its floor per unit × the quantity, GST on top unless included (H:5059)', () => {
-    const line = { qty: 2, gstPct: 18 };
-    expect(lineFloor(line, 400_000)).toBe(944_000);
-    expect(lineFloor(line, 400_000, true)).toBe(800_000);
-    expect(lineFloor(line, 0)).toBeNull();
-    expect(lineFloor(line, null)).toBeNull();
-  });
-
   it('flags a Final below its floor, half a rupee of rounding allowed', () => {
     // LHR Full Face · B4G7 — ₹4,800, lowest price ₹4,000.
-    const floor = lineFloor({ qty: 1, gstPct: 0 }, 400_000);
+    const floor = 400_000;
     // 16% off: ₹4,032. 17% off: ₹3,984.
     expect(belowFloor(item({ rate: 480_000, discountPct: 16 }), floor)).toBe(false);
     expect(belowFloor(item({ rate: 480_000, discountPct: 17 }), floor)).toBe(true);

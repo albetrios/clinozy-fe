@@ -2,20 +2,24 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
-import {
-  appFixtures,
-  resetAppFixtures,
-} from '@/shared/api/app/fixtures/world.fixtures.ts';
+vi.mock('../../../shared/medical-records-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  returnSale: vi.fn(),
+}));
+
+import { HttpError } from '@/shared/errors/HttpError.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 import { fsi } from '@/tests/utils/bidi-marks.ts';
+import { paidSaleRow, TEST_SALE_ID } from '@/tests/utils/medical-doubles.ts';
 
 import {
   renderMedicalDrawer,
   resetMedicalRoutes,
 } from '../../../__tests__/integration/medical-test-router.tsx';
-import { fetchMedicalSale } from '../../../shared/medical-api.ts';
+import type { SaleLine, SaleReturn, SaleRow } from '../../../shared/medical-contracts.ts';
+import { returnSale } from '../../../shared/medical-records-api.ts';
 import { SaleReturnDrawer } from './SaleReturnDrawer.tsx';
 
 const viewport = vi.hoisted(() => ({ tier: 'desktop' as ViewportTier }));
@@ -39,37 +43,96 @@ vi.mock('@/shared/notify/index.ts', () => ({
   TOAST_DURATION_MS: { default: 5200, error: 9000, undo: 10_000 },
 }));
 
-/** 10:00 on 3 Oct, clinic time. */
-const NOW = new Date('2026-10-03T04:30:00Z');
+/** 10:00 on 10 Oct, clinic time. */
+const NOW = new Date('2026-10-10T04:30:00Z');
 const D = 'sale-return-drawer';
+const ADMOSH_LINE = 'iitm_admosh0000000000000000';
+const UNCAP_LINE = 'iitm_uncap00000000000000000';
 const setup = () =>
   userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
+
+/** A sold line as the API answers it. */
+const line = (patch: Partial<SaleLine>): SaleLine => ({
+  invoiceItemId: ADMOSH_LINE,
+  medicineId: 'med_admosh000000000000000',
+  name: 'Admosh Cream',
+  qty: 1,
+  batchNo: 'AD2511',
+  expiry: '05/27',
+  rate: 550,
+  discountPct: 0,
+  amount: 550,
+  returnedQty: 0,
+  ...patch,
+});
+
+/** Sale #983, paid ₹1,200: Admosh ₹550 + two Uncap at ₹325. */
+const SALE = paidSaleRow({
+  id: TEST_SALE_ID,
+  seq: 983,
+  bill: 1200,
+  paid: 1200,
+  lines: [
+    line({}),
+    line({
+      invoiceItemId: UNCAP_LINE,
+      medicineId: 'med_uncap0000000000000000',
+      name: 'Uncap Gel',
+      qty: 2,
+      batchNo: 'UC2604',
+      rate: 325,
+      amount: 650,
+    }),
+  ],
+});
+
+/** The sale as the server answers the return: one more return on it. */
+function answered(entry: Partial<SaleReturn>): SaleRow {
+  return {
+    ...SALE,
+    status: 'returned',
+    returns: [
+      {
+        id: 'msrt_back00000000000000000',
+        reason: 'unused',
+        refundMode: 'cash',
+        note: null,
+        amount: 1200,
+        creditNoteId: 'icn_back00000000000000000',
+        pendingCreditId: null,
+        items: [{ invoiceItemId: ADMOSH_LINE, qty: 1, amount: 550, restocked: true }],
+        returnedById: null,
+        at: '2026-10-10T04:30:00.000Z',
+        ...entry,
+      },
+    ],
+  };
+}
 
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] });
   vi.setSystemTime(NOW);
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetAppFixtures();
+  signInTestMember();
 });
 afterEach(() => {
   vi.useRealTimers();
   resetMedicalRoutes();
-  resetAppFixtures();
+  vi.mocked(returnSale).mockReset();
 });
 
 describe('SaleReturnDrawer (medical.md:283–295)', () => {
   it('asks what is coming back first, then refunds everything back: "₹1,200 refunded · stock added back"', async () => {
     const user = setup();
     const onClose = vi.fn();
-    // #983, paid ₹1,200: Admosh ₹550 + Uncap ₹650.
-    const sale = await fetchMedicalSale(ref.medicalSale(983));
-    renderMedicalDrawer(<SaleReturnDrawer open sale={sale} onClose={onClose} />);
+    vi.mocked(returnSale).mockResolvedValue(answered({}));
+    renderMedicalDrawer(<SaleReturnDrawer open sale={SALE} onClose={onClose} />);
     const drawer = await screen.findByTestId(D);
     expect(within(drawer).getByTestId(`${D}-title`)).toHaveTextContent(
       'Return from patient',
     );
     expect(drawer).toHaveTextContent(
-      `${fsi('Rhea Shah')} · returned stock goes back into its batch`,
+      `${fsi('Priya Shah')} · returned stock goes back into its batch`,
     );
     expect(within(drawer).getAllByTestId(`${D}-lines-row`)).toHaveLength(2);
 
@@ -87,41 +150,89 @@ describe('SaleReturnDrawer (medical.md:283–295)', () => {
 
     await user.click(within(drawer).getByTestId(`${D}-save`));
     await waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect(returnSale).toHaveBeenCalledWith({
+      id: TEST_SALE_ID,
+      input: {
+        lines: [
+          { invoiceItemId: ADMOSH_LINE, qty: 1 },
+          { invoiceItemId: UNCAP_LINE, qty: 2 },
+        ],
+        reason: 'unused',
+        mode: 'cash',
+        note: null,
+      },
+      idempotencyKey: expect.any(String),
+    });
     expect(notifyMock.success).toHaveBeenCalledWith('₹1,200 refunded · stock added back');
-    expect((await fetchMedicalSale(ref.medicalSale(983))).returned).toBe(120_000);
   });
 
-  it('a damaged return on an unpaid sale lowers its due: "… returned · stock written off"', async () => {
+  it('a damaged return kept as store credit (MD33): "₹325 kept as store credit · stock written off"', async () => {
     const user = setup();
     const onClose = vi.fn();
-    // #978, unpaid: return one of the two Glycolac.
-    const sale = await fetchMedicalSale(ref.medicalSale(978));
-    renderMedicalDrawer(<SaleReturnDrawer open sale={sale} onClose={onClose} />);
+    vi.mocked(returnSale).mockResolvedValue(
+      answered({
+        reason: 'damaged',
+        refundMode: 'credit',
+        amount: 325,
+        pendingCreditId: 'pcr_credit000000000000000',
+        items: [{ invoiceItemId: UNCAP_LINE, qty: 1, amount: 325, restocked: false }],
+      }),
+    );
+    renderMedicalDrawer(<SaleReturnDrawer open sale={SALE} onClose={onClose} />);
     const drawer = await screen.findByTestId(D);
-    const [, glycolac] = within(drawer).getAllByTestId(`${D}-lines-return-increase`);
-    if (!glycolac) throw new Error('expected the Glycolac line');
-    await user.click(glycolac);
+    const [, uncap] = within(drawer).getAllByTestId(`${D}-lines-return-increase`);
+    if (!uncap) throw new Error('expected the Uncap line');
+    await user.click(uncap);
 
     await user.click(within(drawer).getByTestId(`${D}-step-reason-trigger`));
     await user.click(within(drawer).getByTestId(`${D}-reason-damaged`));
-    await user.click(within(drawer).getByTestId(`${D}-mode-upi`));
+    const credit = within(drawer).getByTestId(`${D}-mode-credit`);
+    expect(credit).toHaveTextContent('Store credit');
+    await user.click(credit);
     expect(within(drawer).getByTestId(`${D}-summary`)).toHaveTextContent(
-      'Damaged · ₹162',
+      'Damaged · ₹325',
+    );
+    expect(within(drawer).getByTestId(`${D}-save`)).toHaveTextContent(
+      'Keep ₹325 as store credit',
     );
 
     await user.click(within(drawer).getByTestId(`${D}-save`));
     await waitFor(() => expect(onClose).toHaveBeenCalled());
-    expect(notifyMock.success).toHaveBeenCalledWith('₹162 returned · stock written off');
-    const batch = (await appFixtures.medicines.get(ref.medicine(456))).batches[0];
-    expect(batch?.qty).toBe(3);
-    expect((await fetchMedicalSale(ref.medicalSale(978))).due).toBe(40_100);
+    expect(vi.mocked(returnSale).mock.calls[0]?.[0].input).toEqual({
+      lines: [{ invoiceItemId: UNCAP_LINE, qty: 1 }],
+      reason: 'damaged',
+      mode: 'credit',
+      note: null,
+    });
+    expect(notifyMock.success).toHaveBeenCalledWith(
+      '₹325 kept as store credit · stock written off',
+    );
   });
 
-  it('opens read-only for a viewer, and shimmers until the sale is read', async () => {
-    const sale = await fetchMedicalSale(ref.medicalSale(983));
+  it('a sale still owing takes no return: "collect first" (409 sale_not_paid, MD24)', async () => {
+    const user = setup();
+    const onClose = vi.fn();
+    vi.mocked(returnSale).mockRejectedValue(
+      new HttpError('refused', 409, '/app/medical-sales', 'POST', {
+        error: { reason: 'sale_not_paid', detail: 'The sale is not paid in full' },
+      }),
+    );
+    renderMedicalDrawer(<SaleReturnDrawer open sale={SALE} onClose={onClose} />);
+    const drawer = await screen.findByTestId(D);
+    await user.click(within(drawer).getByTestId(`${D}-quick-fill-everything`));
+    await user.click(within(drawer).getByTestId(`${D}-save`));
+    await waitFor(() =>
+      expect(notifyMock.error).toHaveBeenCalledWith(
+        'Collect the full bill first · only a sale paid in full takes a return',
+      ),
+    );
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it('opens read-only for a member who gives no money back, and shimmers until the sale is read', async () => {
     const view = renderMedicalDrawer(
-      <SaleReturnDrawer open sale={sale} onClose={vi.fn()} />,
-      { role: 'accountant' },
+      <SaleReturnDrawer open sale={SALE} onClose={vi.fn()} />,
+      { role: 'pharmacist' },
     );
     const drawer = await screen.findByTestId(D);
     expect(within(drawer).queryByTestId(`${D}-save`)).not.toBeInTheDocument();

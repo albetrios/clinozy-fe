@@ -23,5 +23,6 @@ export const manifest = {
     'manufacturers',
     'mrs',
     'payments',
+    'credits',
   ],
 } as const satisfies PageManifest;

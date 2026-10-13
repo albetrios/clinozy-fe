@@ -515,6 +515,7 @@
       "treatment": "打开治疗",
       "patient": "打开患者",
       "invoice": "打开发票",
+      "medicalRep": "打开医药代表",
       "checkIn": "打开回访",
       "review": "打开评价"
     },

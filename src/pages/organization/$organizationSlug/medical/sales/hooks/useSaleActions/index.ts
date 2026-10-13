@@ -1,1 +1,6 @@
-export { type SaleActions, useSaleActions } from './useSaleActions.ts';
+export {
+  type SaleActions,
+  type SalePayment,
+  salePaymentOf,
+  useSaleActions,
+} from './useSaleActions.ts';

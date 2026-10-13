@@ -3,17 +3,23 @@ import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
-import {
-  appFixtures,
-  resetAppFixtures,
-} from '@/shared/api/app/fixtures/world.fixtures.ts';
+vi.mock('../../../shared/medical-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  listPrescriptionsToFill: vi.fn(),
+}));
+
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
+import {
+  prescriptionToFill,
+  TEST_PRESCRIPTION_ID,
+} from '@/tests/utils/medical-doubles.ts';
 
 import {
   renderMedicalDrawer,
   resetMedicalRoutes,
 } from '../../../__tests__/integration/medical-test-router.tsx';
+import { listPrescriptionsToFill } from '../../../shared/medical-api.ts';
 import { PrescriptionsToFill } from './PrescriptionsToFill.tsx';
 
 const viewport = vi.hoisted(() => ({ tier: 'desktop' as ViewportTier }));
@@ -26,10 +32,23 @@ const TRIGGER = 'medical-sales-view-action-prescriptions';
 const setup = () =>
   userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
 
-beforeEach(() => resetAppFixtures());
+beforeEach(() => {
+  signInTestMember();
+  vi.mocked(listPrescriptionsToFill).mockResolvedValue([
+    prescriptionToFill({
+      medicines: ['Azelaic gel 15g', 'Tretinoin 0.025% cream 20 g'],
+    }),
+    prescriptionToFill({
+      id: 'rx_rx5700000000000000000',
+      seq: 57,
+      patientName: 'Harsh Trivedi',
+      date: '2026-10-08',
+    }),
+  ]);
+});
 afterEach(() => {
   resetMedicalRoutes();
-  resetAppFixtures();
+  vi.mocked(listPrescriptionsToFill).mockReset();
 });
 
 describe('PrescriptionsToFill (medical.md:417–431)', () => {
@@ -43,21 +62,23 @@ describe('PrescriptionsToFill (medical.md:417–431)', () => {
 
     await user.click(trigger);
     const panel = await screen.findByTestId('prescriptions-to-fill-panel');
-    const [newest] = within(panel).getAllByRole('option');
-    expect(newest).toHaveTextContent('Harsh Trivedi');
-    expect(newest).toHaveTextContent(/Rx #501 · .+ · Tretinoin 0\.025% cream 20 g/);
+    const [newest, older] = within(panel).getAllByRole('option');
+    expect(newest).toHaveTextContent('Priya Shah');
+    expect(newest).toHaveTextContent(
+      /Rx #58 · .+ · Azelaic gel 15g, Tretinoin 0\.025% cream 20 g/,
+    );
+    expect(older).toHaveTextContent('Harsh Trivedi');
     if (!newest) throw new Error('expected a prescription');
     await user.click(newest);
     expect(onPick).toHaveBeenCalledWith(
-      expect.objectContaining({ id: ref.prescription(501), seq: 501 }),
+      expect.objectContaining({ id: TEST_PRESCRIPTION_ID, seq: 58 }),
     );
   });
 
   it('hides while every prescription is filled', async () => {
-    for (const rx of appFixtures.prescriptions.snapshot()) {
-      await appFixtures.prescriptions.update(rx.id, { items: [] });
-    }
+    vi.mocked(listPrescriptionsToFill).mockResolvedValue([]);
     renderMedicalDrawer(<PrescriptionsToFill onPick={vi.fn()} />);
+    await waitFor(() => expect(listPrescriptionsToFill).toHaveBeenCalled());
     await waitFor(() => expect(screen.queryByTestId(TRIGGER)).not.toBeInTheDocument());
   });
 });

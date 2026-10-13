@@ -5,7 +5,6 @@ import { useForm } from 'react-hook-form';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { InvoiceRecord } from '@/shared/api/app/invoices-contracts.ts';
-import type { InvoiceSaveResult as SaleSaveResult } from '@/shared/api/app/invoices-fixture-contracts.ts';
 import type { OfferingRecord } from '@/shared/api/app/offerings-contracts.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
@@ -24,7 +23,7 @@ import {
   TEST_MONEY_PATIENT_ID,
 } from '@/tests/utils/payments-doubles.ts';
 
-const { notifyMock, invoicesApi, salesApi } = vi.hoisted(() => ({
+const { notifyMock, invoicesApi, contactsApi, saleWrite } = vi.hoisted(() => ({
   notifyMock: {
     success: vi.fn(),
     error: vi.fn(),
@@ -34,16 +33,18 @@ const { notifyMock, invoicesApi, salesApi } = vi.hoisted(() => ({
     dismiss: vi.fn(),
   },
   invoicesApi: { createInvoice: vi.fn(), updateInvoice: vi.fn() },
-  salesApi: { createSale: vi.fn() },
+  contactsApi: { createContact: vi.fn() },
+  /** The Medical room's write, as New sale hands it in. */
+  saleWrite: { create: vi.fn() },
 }));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
 vi.mock('@/shared/api/app/invoices-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   ...invoicesApi,
 }));
-vi.mock('@/shared/api/app/invoices-fixture-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/contacts-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
-  ...salesApi,
+  ...contactsApi,
 }));
 
 import type { InvoiceFigures } from './invoice-figures.ts';
@@ -57,7 +58,7 @@ import type { InvoiceCatalogItem } from './invoice-lines.ts';
 import type { InvoiceCatalog } from './use-invoice-catalog.ts';
 import { useInvoiceSave } from './use-invoice-save.ts';
 
-const GLYCOLAC = 'med_glycolac';
+const GLYCOLAC = 'med_glycolac0000000000000';
 
 /** Kavya Mehta, the patient every invoice here bills. */
 const KAVYA = {
@@ -180,6 +181,7 @@ describe('useInvoiceSave — the Invoice drawer’s save', () => {
             form,
             invoice,
             sale,
+            saleWrite: sale ? saleWrite : null,
             fallbackBranchId: TEST_VESU_BRANCH_ID,
             catalog: catalog(stock),
             figures: drawerFigures,
@@ -207,7 +209,8 @@ describe('useInvoiceSave — the Invoice drawer’s save', () => {
     for (const fn of [
       ...Object.values(notifyMock),
       ...Object.values(invoicesApi),
-      ...Object.values(salesApi),
+      ...Object.values(contactsApi),
+      ...Object.values(saleWrite),
     ]) {
       fn.mockReset();
     }
@@ -377,30 +380,36 @@ describe('useInvoiceSave — the Invoice drawer’s save', () => {
     });
   });
 
-  describe('a Medical sale (the fixture world)', () => {
+  describe('a Medical sale (the Medical room’s write, MD19)', () => {
     const glycolacRow = (qty: number) =>
       line({ medicineId: GLYCOLAC, name: 'Glycolac Cream', qty, rate: 16_200 });
 
-    const saleValues = (items: InvoiceLineForm[]): InvoiceFormValues => ({
+    /** Priya Shah, a buyer with a contact. */
+    const PRIYA = {
+      kind: 'contact' as const,
+      id: 'con_priya0000000000000000',
+      contactId: 'con_priya0000000000000000',
+      name: 'Priya Shah',
+      phone: '+919900011122',
+    };
+
+    const saleValues = (
+      items: InvoiceLineForm[],
+      party: InvoiceFormValues['party'] = PRIYA,
+    ): InvoiceFormValues => ({
       ...emptyInvoiceForm('2026-10-12', {
         type: 'medical',
         branchId: TEST_VESU_BRANCH_ID,
       }),
-      party: {
-        kind: 'contact',
-        id: 'mcon_walkin',
-        contactId: null,
-        name: 'Walk-in',
-        phone: null,
-      },
+      party,
       items,
     });
 
-    it('sells a named medicine with no offering — and asks no patient’s contact', async () => {
-      salesApi.createSale.mockResolvedValue({
-        detail: { invoice: { id: 'inv_sale_1', seq: 901, type: 'medical' } },
-        planLinked: 0,
-      } as unknown as SaleSaveResult);
+    it('hands the room’s write the buyer’s contact and each medicine — no rate, no invoice', async () => {
+      saleWrite.create.mockResolvedValue({
+        invoiceId: 'invc_sale90100000000000000',
+        seq: 901,
+      });
       const { result, onDone } = render({
         values: saleValues([glycolacRow(2)]),
         sale: true,
@@ -409,23 +418,64 @@ describe('useInvoiceSave — the Invoice drawer’s save', () => {
       await act(() => result.current.drawer.save());
 
       expect(invoicesApi.createInvoice).not.toHaveBeenCalled();
-      expect(salesApi.createSale).toHaveBeenCalledWith(
+      expect(saleWrite.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          type: 'medical',
-          medicalContactId: 'mcon_walkin',
-          patientId: null,
-          items: [
-            expect.objectContaining({ medicineId: GLYCOLAC, qty: 2, rate: 16_200 }),
-          ],
+          branchId: TEST_VESU_BRANCH_ID,
+          contactId: PRIYA.contactId,
+          items: [{ medicineId: GLYCOLAC, qty: 2, discountPct: 0 }],
+          payment: null,
         }),
-        expect.anything(),
       );
       expect(onDone).toHaveBeenCalledWith({
-        invoiceId: 'inv_sale_1',
+        invoiceId: 'invc_sale90100000000000000',
         seq: 901,
         type: 'medical',
         planLinked: 0,
       });
+    });
+
+    it('saves a new customer’s contact first — their mobile asked for — then the sale on it', async () => {
+      const walkIn = {
+        kind: 'contact' as const,
+        id: 'new-customer',
+        contactId: null,
+        name: 'Viral Sheth',
+        phone: null,
+      };
+      contactsApi.createContact.mockResolvedValue({ id: 'con_viral0000000000000000' });
+      saleWrite.create.mockResolvedValue({
+        invoiceId: 'invc_sale90200000000000000',
+        seq: 902,
+      });
+      const noMobile = render({
+        values: saleValues([glycolacRow(1)], walkIn),
+        sale: true,
+      });
+      await act(() => noMobile.result.current.drawer.save());
+      expect(lastWarning()).toBe('Enter a 10-digit mobile');
+      expect(contactsApi.createContact).not.toHaveBeenCalled();
+
+      const withMobile = render({
+        values: saleValues([glycolacRow(1)], { ...walkIn, phone: '+919825000111' }),
+        sale: true,
+      });
+      await act(() => withMobile.result.current.drawer.save());
+      expect(contactsApi.createContact).toHaveBeenCalledWith(
+        expect.objectContaining({
+          fields: expect.objectContaining({
+            firstName: 'Viral',
+            lastName: 'Sheth',
+            phones: [{ phone: '+919825000111', isOnWhatsapp: true }],
+          }),
+        }),
+      );
+      expect(saleWrite.create).toHaveBeenCalledWith(
+        expect.objectContaining({ contactId: 'con_viral0000000000000000' }),
+      );
+      // Kept on the form: a retry after a refused sale writes no second contact.
+      expect(withMobile.result.current.form.getValues('party')?.contactId).toBe(
+        'con_viral0000000000000000',
+      );
     });
 
     it('refuses more of a medicine than the store holds — its rows counted together', async () => {
@@ -438,14 +488,14 @@ describe('useInvoiceSave — the Invoice drawer’s save', () => {
 
       expect(lastWarning()).toBe('Only 3 of Glycolac Cream in stock');
       expect(onStep).toHaveBeenCalledWith('items');
-      expect(salesApi.createSale).not.toHaveBeenCalled();
+      expect(saleWrite.create).not.toHaveBeenCalled();
     });
 
     it('sells exactly what is in stock, and anything of a medicine with no stock count', async () => {
-      salesApi.createSale.mockResolvedValue({
-        detail: { invoice: { id: 'inv_sale_2', seq: 902, type: 'medical' } },
-        planLinked: 0,
-      } as unknown as SaleSaveResult);
+      saleWrite.create.mockResolvedValue({
+        invoiceId: 'invc_sale90200000000000000',
+        seq: 902,
+      });
       const exact = render({ values: saleValues([glycolacRow(3)]), sale: true });
       await act(() => exact.result.current.drawer.save());
       const uncounted = render({
@@ -454,8 +504,21 @@ describe('useInvoiceSave — the Invoice drawer’s save', () => {
         stock: null,
       });
       await act(() => uncounted.result.current.drawer.save());
-      expect(salesApi.createSale).toHaveBeenCalledTimes(2);
+      expect(saleWrite.create).toHaveBeenCalledTimes(2);
       expect(notifyMock.warning).not.toHaveBeenCalled();
+    });
+
+    it('says a refused sale in the server’s words (`409 not_enough_stock`)', async () => {
+      saleWrite.create.mockRejectedValue(conflict('not_enough_stock'));
+      const { result, onDone } = render({
+        values: saleValues([glycolacRow(1)]),
+        sale: true,
+      });
+
+      await act(() => result.current.drawer.save());
+
+      expect(notifyMock.error).toHaveBeenCalledWith('Refused: not_enough_stock');
+      expect(onDone).not.toHaveBeenCalled();
     });
   });
 

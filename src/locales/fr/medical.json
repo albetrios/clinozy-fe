@@ -11,6 +11,7 @@
     "manufacturers": "Fabricants",
     "mrs": "Délégués",
     "payments": "Paiements",
+    "credits": "Avoirs",
     "groups": {
       "selling": "Vente",
       "stock": "Stock",
@@ -53,7 +54,9 @@
     "manufacturer": "Fabricant",
     "manufacturers": "Fabricants",
     "suppliers": "Fournisseurs",
-    "mrs": "Délégués"
+    "mrs": "Délégués",
+    "payable": "À payer",
+    "owed": "Avec un montant dû"
   },
   "table": {
     "percent": "{{value}} %",
@@ -190,6 +193,7 @@
     "ageing_one": "{{count}} jour",
     "ageing_many": "{{count}} jours",
     "ageing_other": "{{count}} jours",
+    "paidUp": "Plus rien n’est dû à {{name}}",
     "rowActions": {
       "pay": "Payer {{amount}}",
       "newOrder": "Nouveau bon de commande",
@@ -239,7 +243,74 @@
   },
   "payments": {
     "records": "paiements pharmacie",
-    "empty": "Aucun paiement pharmacie pour l’instant"
+    "empty": "Aucun paiement pharmacie pour l’instant",
+    "export": "Exporter",
+    "exportTitle": "Exporter ces paiements en CSV",
+    "exported": "Paiements exportés en CSV",
+    "exportTruncated": "Les 10 000 premiers paiements ont été exportés — affinez les filtres pour le reste"
+  },
+  "credits": {
+    "records": "avoirs pharmacie",
+    "sides": {
+      "label": "Avoirs de qui",
+      "suppliers": "Des fournisseurs",
+      "customers": "Avec les clients"
+    },
+    "columns": {
+      "credit": "Avoir",
+      "supplier": "Fournisseur",
+      "packs": "Boîtes",
+      "amount": "Montant",
+      "applied": "Imputé",
+      "state": "État",
+      "since": "Depuis",
+      "who": "Qui",
+      "way": "Sens",
+      "left": "Restant"
+    },
+    "creditRef": "{{medicine}} · {{batch}}",
+    "packs_one": "{{count}} boîte",
+    "packs_many": "{{count}} boîtes",
+    "packs_other": "{{count}} boîtes",
+    "states": {
+      "open": "Ouvert",
+      "adjusted": "Imputé"
+    },
+    "customerStates": {
+      "open": "Ouvert",
+      "given_back": "Rendu",
+      "got_back": "Récupéré",
+      "used": "Utilisé"
+    },
+    "ways": {
+      "give": "Nous rendons",
+      "take": "On nous rend"
+    },
+    "rowActions": {
+      "void": "Annuler l’avoir",
+      "giveBack": "Rendre",
+      "gotBack": "Récupéré",
+      "open": "Ouvrir dans En attente"
+    },
+    "empty": {
+      "suppliers": "Aucun avoir fournisseur pour l’instant — retournez le stock proche de péremption depuis Médicaments",
+      "customers": "Aucun avoir client pour l’instant"
+    },
+    "addCredit": "Ajouter un avoir",
+    "void": {
+      "title": "Annuler cet avoir ?",
+      "effect": "Ses boîtes reviennent en stock et le fournisseur redevient créancier.",
+      "voided": "Avoir · {{batch}} annulé",
+      "reasons": {
+        "mistake": "Ajouté par erreur",
+        "wrongQuantity": "Mauvaise quantité",
+        "supplierRefused": "Refusé par le fournisseur"
+      }
+    },
+    "filters": {
+      "state": "État",
+      "way": "Sens"
+    }
   },
   "drawers": {
     "records": {
@@ -274,8 +345,7 @@
     "quick": {
       "manufacturer": "Fabricant {{name}} ajouté",
       "supplier": "Fournisseur {{name}} ajouté · téléphone et GST plus tard",
-      "mr": "Délégué {{name}} ajouté",
-      "medicine": "{{name}} ajouté · fixez le prix max. plus tard dans Stock"
+      "mr": "Délégué {{name}} ajouté"
     },
     "deleteConfirm": {
       "medicine": "Supprimer ce médicament ?",
@@ -636,8 +706,11 @@
       "nothing": "Saisissez ce qui est retourné",
       "refunded": "{{amount}} remboursé · stock réintégré",
       "refundedWrittenOff": "{{amount}} remboursé · stock mis au rebut",
-      "lowered": "{{amount}} retourné · stock réintégré",
-      "loweredWrittenOff": "{{amount}} retourné · stock mis au rebut"
+      "storeCredit": "Avoir boutique",
+      "saveCredit": "Garder {{amount}} en avoir",
+      "credited": "{{amount}} gardé en avoir · stock réintégré",
+      "creditedWrittenOff": "{{amount}} gardé en avoir · stock mis au rebut",
+      "notPaid": "Encaissez d’abord toute la facture · seule une vente entièrement payée accepte un retour"
     },
     "expiring": {
       "title": "Retourner le stock proche de l’expiration",

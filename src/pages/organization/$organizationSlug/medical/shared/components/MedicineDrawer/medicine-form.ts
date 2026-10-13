@@ -1,9 +1,16 @@
-import { MONEY_SCALE, numberFromText, textFromNumber } from '@/lib/number-text.ts';
+import {
+  MONEY_SCALE,
+  numberFromText,
+  paiseOfRupees,
+  rupeesOfPaise,
+  textFromNumber,
+} from '@/lib/number-text.ts';
 import type { SupplierRate } from '@/shared/api/app/app-schema.ts';
 import { cheapestRate } from '@/shared/api/app/medicine-stock.ts';
 import type {
+  MedicineGst,
   MedicineInput,
-  MedicineRecord,
+  MedicineRow,
 } from '@/shared/api/app/medicines-contracts.ts';
 
 /*
@@ -11,15 +18,19 @@ import type {
  * typed — the MRP in rupees, as the field shows it — the GST rate, the two
  * levels as whole packs, and the batch and supplier-price rows with money in
  * paise (the items table's own unit). {@link medicineInputOf} turns it into
- * the contract's fields.
+ * the contract's fields, in the API's rupees.
  */
 
-/** One batch row: its number, "MM/YY", whole packs, the purchase rate in paise. */
+/** One batch row: its id once saved, its number, "MM/YY", whole packs, the purchase rate in paise. */
 export interface BatchFormRow {
+  /** A saved batch's id — the API keeps the batch by it. */
+  id?: string;
   batchNo: string;
   expiry: string;
   qty: number;
   purchaseRate: number;
+  /** Who it was bought from, as saved. */
+  supplierId?: string | null;
 }
 
 /** One supplier-price row: the supplier ('' until picked), its rate in paise, free units, lead days. */
@@ -91,19 +102,31 @@ export function emptyMedicineForm(
   };
 }
 
-/** A saved medicine's form. */
-export function medicineFormOf(medicine: MedicineRecord): MedicineFormValues {
+/** A saved medicine's form — the API's rupees as the fields' paise. */
+export function medicineFormOf(medicine: MedicineRow): MedicineFormValues {
   return {
     name: medicine.name,
-    manufacturerId: medicine.manufacturerId,
+    manufacturerId: medicine.manufacturer?.id ?? null,
     composition: medicine.composition ?? '',
     prescriptionOnly: medicine.prescriptionOnly,
-    mrp: textFromNumber(medicine.mrp, MONEY_SCALE),
+    mrp: textFromNumber(paiseOfRupees(medicine.mrp), MONEY_SCALE),
     gstPct: medicine.gstPct,
     minStock: medicine.minStock,
     maxStock: medicine.maxStock,
-    batches: medicine.batches.map((batch) => ({ ...batch })),
-    supplierRates: medicine.supplierRates.map((rate) => ({ ...rate })),
+    batches: medicine.batches.map((batch) => ({
+      id: batch.id,
+      batchNo: batch.batchNo,
+      expiry: batch.expiry,
+      qty: batch.qty,
+      purchaseRate: paiseOfRupees(batch.purchaseRate ?? 0),
+      supplierId: batch.supplierId,
+    })),
+    supplierRates: medicine.supplierRates.map((rate) => ({
+      supplierId: rate.supplierId,
+      rate: paiseOfRupees(rate.rate),
+      free: rate.free,
+      leadDays: rate.leadDays,
+    })),
   };
 }
 
@@ -178,8 +201,9 @@ export function medicineRowProblem(
 
 /**
  * The contract's fields for a form (`createMedicine` / `updateMedicine`): the
- * name and composition trimmed, the MRP in paise, the batches nobody started
- * and the supplier prices with no supplier dropped.
+ * name and composition trimmed, the money in rupees, the batches nobody
+ * started and the supplier prices with no supplier dropped. A saved batch
+ * keeps its id; one without a purchase rate sends none.
  */
 export function medicineInputOf(values: MedicineFormValues): MedicineInput {
   return {
@@ -187,19 +211,24 @@ export function medicineInputOf(values: MedicineFormValues): MedicineInput {
     composition: values.composition.trim() || null,
     manufacturerId: values.manufacturerId ?? '',
     prescriptionOnly: values.prescriptionOnly,
-    mrp: mrpPaiseOf(values),
-    gstPct: values.gstPct,
+    mrp: rupeesOfPaise(mrpPaiseOf(values)),
+    gstPct: values.gstPct as MedicineGst,
     minStock: values.minStock,
     maxStock: values.maxStock,
     batches: values.batches
       .filter((batch) => !blankBatch(batch))
       .map((batch) => ({
+        ...(batch.id ? { id: batch.id } : {}),
         batchNo: batch.batchNo.trim(),
         expiry: batch.expiry.trim(),
         qty: batch.qty,
-        purchaseRate: batch.purchaseRate,
+        purchaseRate: batch.purchaseRate > 0 ? rupeesOfPaise(batch.purchaseRate) : null,
+        supplierId: batch.supplierId ?? null,
       })),
-    supplierRates: pickedRates(values),
+    supplierRates: pickedRates(values).map((rate) => ({
+      ...rate,
+      rate: rupeesOfPaise(rate.rate),
+    })),
   };
 }
 

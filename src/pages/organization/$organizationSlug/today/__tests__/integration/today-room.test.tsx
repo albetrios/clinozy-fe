@@ -361,8 +361,9 @@ describe('the Today room (KICKOFF §6.2)', () => {
     await user.click(
       within(await screen.findByTestId('today-panel')).getByTestId('today-card-action'),
     );
-    // New sale opens over Today, which stays — the URL bar on the sale (A-P1).
-    const sale = `medical/sales/create?prescription=${publicId('rx', 501)}&from=today`;
+    // New sale opens over Today, which stays — the URL bar on the sale (A-P1) — on the Rx and
+    // its patient, whose prescriptions New sale reads it among.
+    const sale = `medical/sales/create?prescription=${publicId('rx', 501)}&customer=${publicId('pat', 2)}&from=today`;
     await waitFor(() =>
       expect(router.history.location.href).toBe(`/organization/acme/${sale}`),
     );

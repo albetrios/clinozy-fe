@@ -51,7 +51,7 @@ beforeEach(() => {
 afterEach(() => resetMedicalRoutes());
 
 describe('MedicalToolbar', () => {
-  it('carries the h1, the seven tabs, the view action and the split New', async () => {
+  it('carries the h1, the eight tabs, the view action and the split New', async () => {
     const user = userEvent.setup();
     const { container } = renderMedicalRoutes('/organization/acme/medical/medicines', {
       medicines: Toolbar,
@@ -73,6 +73,7 @@ describe('MedicalToolbar', () => {
       'Manufacturers',
       'MRs',
       'Payments',
+      'Credits',
     ]);
     const action = screen.getByTestId('medical-medicines-view-action-discount');
     expect(action).toHaveAccessibleName('Sell all at 20% off');

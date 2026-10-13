@@ -400,7 +400,6 @@ describe('a patient’s history, end to end', () => {
       'Check-in · Same · 6/10 · after Consultation',
       'Clinic invoice #782 · ₹9,000 · Paid',
       'Received ₹9,000 · UPI · #782',
-      'Medical invoice #788 · ₹563 · ₹563 due',
       'Check-in · Better · 7/10 · after Day-2 call after LHR',
       'Google review · 5★',
       'Appointment #2859 · Peel · Confirmed · Dr. Nisha',

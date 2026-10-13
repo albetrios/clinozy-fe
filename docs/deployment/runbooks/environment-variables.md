@@ -146,16 +146,12 @@ Comma-separated **product module keys** (e.g. `billing,members`). Disabled modul
 - Routes with `manifest.module` → 404 via `requireModuleGate`
 - Nav/settings entries should hide via `isPlatformModuleEnabled()`
 
-**A production deploy must switch off every fixture-backed clinic room** —
-`FIXTURE_BACKED_APP_MODULES` in `src/core/config/app-modules.ts`, today `app-medical`
-(launch D8). It is a GitHub Environment **variable** (`deployVariables` in
-`tooling/setup/setup.config.json`): put `VITE_DISABLED_MODULES=app-medical` (plus anything else
-to hide) in `.env.production` and run `pnpm github:sync`; the deploy and preview builds write it
-into the build's env file. `pnpm validate:client-env` refuses a production deploy whose value
-leaves a fixture-backed room on — without it the build would ship every room, fixtures included.
-It is deliberately **not** a production profile default: `github:sync` prunes a variable equal to
-its default (assuming the runtime falls back to it), and the runtime never applies this one.
-Development keeps every room on.
+Every clinic room reads clinozy-be — Medical was the last to leave the fixtures (launch D168) —
+so a production deploy no longer has to switch any room off (the launch's `FIXTURE_ROOMS_OFF_RULE`
+and its `FIXTURE_BACKED_APP_MODULES` list retired with it). The variable stays a GitHub Environment
+**variable** (`deployVariables` in `tooling/setup/setup.config.json`) for hiding a room on purpose:
+put `VITE_DISABLED_MODULES=<keys>` in `.env.production` and run `pnpm github:sync`. Development
+keeps every room on.
 
 See module catalog in [`docs/reference/frontend-platform.md`](../../reference/frontend-platform.md).
 

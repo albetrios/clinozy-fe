@@ -1,5 +1,6 @@
 import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 import type { InvoiceType, Tone } from '@/shared/api/app/app-schema.ts';
+import type { ClinicInvoiceType } from '@/shared/api/app/invoices-contracts.ts';
 
 /**
  * The Invoice drawer's copy lives in `app`, not the room's `payments`: the
@@ -65,10 +66,8 @@ export const INVOICE_DRAWER_KEYS = {
   items: {
     quickLine: 'invoiceDrawer.items.quickLine',
     quickLineMedical: 'invoiceDrawer.items.quickLineMedical',
-    hint: 'invoiceDrawer.items.hint',
-    /** An invoice's quick line takes a quantity and a discount — the server prices the line. */
+    /** The quick line takes a quantity and a discount — the server prices the line, a sale's too. */
     hintInvoice: 'invoiceDrawer.items.hintInvoice',
-    oftenBilled: 'invoiceDrawer.items.oftenBilled',
     browse: {
       all: 'invoiceDrawer.items.browse.all',
       oral: 'invoiceDrawer.items.browse.oral',
@@ -192,7 +191,6 @@ export const INVOICE_DRAWER_KEYS = {
     saved: 'invoiceDrawer.toasts.saved',
     savedPlan: 'invoiceDrawer.toasts.savedPlan',
     promo: 'invoiceDrawer.toasts.promo',
-    contactSaved: 'invoiceDrawer.toasts.contactSaved',
     rxUnmatched: 'invoiceDrawer.toasts.rxUnmatched',
     deleted: 'invoiceDrawer.toasts.deleted',
   },
@@ -236,10 +234,13 @@ export const INVOICE_TYPE_TONES: Readonly<Record<InvoiceType, Tone>> = {
   consultation: 'lav',
 };
 
-/** The types in the switch's order (`payments.md:134`). */
-export const INVOICE_TYPE_ORDER: readonly InvoiceType[] = [
+/**
+ * The types the switch offers, in its order (`payments.md:134`): Clinic · Consultation. Medical
+ * is not among them — a medical bill is the Medical room's New sale, and clinozy-be refuses one
+ * on `/app/invoices` (`400 sold_through_store`, MD28).
+ */
+export const INVOICE_TYPE_ORDER: readonly ClinicInvoiceType[] = [
   'clinic',
-  'medical',
   'consultation',
 ];
 

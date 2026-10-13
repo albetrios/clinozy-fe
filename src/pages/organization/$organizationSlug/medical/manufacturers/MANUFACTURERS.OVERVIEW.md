@@ -3,11 +3,11 @@
 Route: `/organization/$organizationSlug/medical/manufacturers` (KICKOFF §6.7, L-50). Same gates as
 the Medical room.
 
-Every manufacturer (`medical.md:89–103`): the maker's pill in its tone · Medicines · Suppliers (grey) · MRs (mint); the row edge is the maker's tone. Filters: the automatic Suppliers and MRs sections · Created; the footer counts the makers. A row opens Edit manufacturer.
+Every manufacturer on clinozy-be (`GET /app/manufacturers`, `medical.md:89–103`): the maker's pill in its tone · Medicines (the server's count) · Suppliers (grey) · MRs (mint); the row edge is the maker's tone. Filters: the automatic Suppliers and MRs sections — one of each at a time, the API filters by one — · Created; the footer counts the makers. A row opens Edit manufacturer.
 
 The search, filters and sort live in the URL (the room reads them in `../medical.search.ts`); the list read follows them —
 a sort keeps the rows until the new page arrives, a search or "Apply filter" shows the skeleton.
-A failed read keeps the last copy and toasts "Retry".
+A failed first read shows in place with Retry.
 
 ## Dialog routes
 

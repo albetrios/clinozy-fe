@@ -2,10 +2,7 @@ import { Outlet, useSearch } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import {
-  MEDICINE_STOCK_TONES,
-  medicineStockLevel,
-} from '@/shared/api/app/medicine-stock.ts';
+import { MEDICINE_STOCK_TONES } from '@/shared/api/app/medicine-stock.ts';
 import { fetchMedicine, medicineQueryKeys } from '@/shared/api/app/medicines-api.ts';
 import type { MedicineRow } from '@/shared/api/app/medicines-contracts.ts';
 import type { DataTableRowAction } from '@/shared/components/DataTableRowActions/index.ts';
@@ -20,6 +17,7 @@ import { useDataTableUrlState } from '@/shared/hooks/useDataTableUrlState/index.
 import {
   useMedicineList,
   useSetNearExpiryDiscount,
+  useSetNearExpiryDiscountWithin,
 } from '@/shared/hooks/useMedicines/index.ts';
 import { useRoomList } from '@/shared/hooks/useRoomList/index.ts';
 import { useRoomTable } from '@/shared/hooks/useRoomTable/index.ts';
@@ -91,32 +89,58 @@ function useMedicineFilters() {
   });
 }
 
+/** A Nearest expiry window as the near-expiry write takes it. */
+type ExpiryWindow = 30 | 60 | 90;
+
 /**
- * The near-expiry discount, on or off, with its toast and Undo (Q-M3): one
- * medicine from its row, or every expiring one from "Sell all at 20% off".
+ * The row's near-expiry discount, on or off, with its toast and Undo (Q-M3):
+ * the Undo puts back the percent the medicine had.
  */
 function useDiscountToggle() {
   const { t } = useTranslation(MEDICAL_NS);
   const discount = useSetNearExpiryDiscount();
-  return (rows: readonly MedicineRow[], on: boolean) => {
-    const ids = rows.map((row) => row.id);
-    const before = rows.map((row) => ({ id: row.id, pct: row.nearExpiryDiscountPct }));
-    let message = t(MEDICAL_KEYS.toasts.discountOff);
-    if (on) {
-      message =
-        rows.length === 1 && rows[0]
-          ? t(MEDICAL_KEYS.toasts.discountOnOne, { name: rows[0].name })
-          : t(MEDICAL_KEYS.toasts.discountOn);
-    }
+  return (row: MedicineRow, on: boolean) => {
+    const before = row.nearExpiryDiscountPct;
+    const message = on
+      ? t(MEDICAL_KEYS.toasts.discountOnOne, { name: row.name })
+      : t(MEDICAL_KEYS.toasts.discountOff);
     discount.mutate(
-      { ids, pct: on ? NEAR_EXPIRY_PCT : 0 },
+      { medicines: [row], pct: on ? NEAR_EXPIRY_PCT : 0 },
       {
         onSuccess: () =>
           notify.undo(message, {
-            onUndo: () => {
-              for (const row of before) discount.mutate({ ids: [row.id], pct: row.pct });
-            },
+            onUndo: () => discount.mutate({ medicines: [row], pct: before }),
           }),
+      },
+    );
+  };
+}
+
+/**
+ * "Sell all at 20% off" / "Remove near-expiry discount" (Q-M3, H:5438): every
+ * medicine with stock expiring within the filter's window, in one write
+ * (`POST /app/medicines/near-expiry-discount`) — the medicines past the loaded
+ * page too. Its Undo is the opposite write over the same window.
+ */
+function useWindowDiscount() {
+  const { t } = useTranslation(MEDICAL_NS);
+  const discount = useSetNearExpiryDiscountWithin();
+  return (expiringWithinDays: ExpiryWindow, on: boolean) => {
+    const pct = on ? NEAR_EXPIRY_PCT : 0;
+    discount.mutate(
+      { expiringWithinDays, pct },
+      {
+        onSuccess: () =>
+          notify.undo(
+            t(on ? MEDICAL_KEYS.toasts.discountOn : MEDICAL_KEYS.toasts.discountOff),
+            {
+              onUndo: () =>
+                discount.mutate({
+                  expiringWithinDays,
+                  pct: on ? 0 : NEAR_EXPIRY_PCT,
+                }),
+            },
+          ),
       },
     );
   };
@@ -143,6 +167,7 @@ export function MedicinesPage() {
   const { fields, copy } = useMedicineFilters();
   const filters = useRoomFilters(fields);
   const toggleDiscount = useDiscountToggle();
+  const windowDiscount = useWindowDiscount();
   const stack = useMedicalStack();
   const [deleting, setDeleting] = useState<MedicalDeleteTarget | null>(null);
   const [returning, setReturning] = useState<MedicineRow | null>(null);
@@ -187,7 +212,7 @@ export function MedicinesPage() {
         id: 'discount',
         label: t(on ? keys.discount : keys.removeDiscount),
         icon: Tag,
-        onSelect: () => toggleDiscount([row], on),
+        onSelect: () => toggleDiscount(row, on),
       });
     }
     actions.push({
@@ -212,6 +237,7 @@ export function MedicinesPage() {
   // every expiring medicine; Low stock → "Reorder low stock".
   let viewAction = null;
   if (search.expiry && canEdit && rows.length > 0) {
+    const expiryWindow = Number(search.expiry) as ExpiryWindow;
     const allOn = rows.every((row) => row.nearExpiryDiscountPct > 0);
     viewAction = (
       <RoomViewAction
@@ -223,7 +249,7 @@ export function MedicinesPage() {
             ? MEDICAL_KEYS.viewActions.removeDiscount
             : MEDICAL_KEYS.viewActions.sellAllDiscount,
         )}
-        onClick={() => toggleDiscount(rows, !allOn)}
+        onClick={() => windowDiscount(expiryWindow, !allOn)}
       />
     );
   } else if (search.stock === 'low' && canCreate && rows.length > 0) {
@@ -268,9 +294,7 @@ export function MedicinesPage() {
         recordsLabel={t(MEDICAL_KEYS.medicines.records)}
         minWidth={1240}
         onRowClick={(row) => nav.medicineEdit(row.id)}
-        rowTone={(row) =>
-          MEDICINE_STOCK_TONES[medicineStockLevel(row.stock, row.minStock)]
-        }
+        rowTone={(row) => MEDICINE_STOCK_TONES[row.stockLevel]}
         rowActions={rowActions}
         exportName="medicines.csv"
       />

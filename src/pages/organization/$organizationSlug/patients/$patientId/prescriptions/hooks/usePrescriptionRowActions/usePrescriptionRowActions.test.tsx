@@ -156,6 +156,7 @@ describe('usePrescriptionRowActions (H:4753; Q19)', () => {
     );
     expect(shownLocation(view.router).search).toMatchObject({
       prescription: APPROVED.id,
+      customer: APPROVED.patientId,
     });
   });
 

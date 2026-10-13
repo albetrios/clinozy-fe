@@ -11,6 +11,7 @@
     "manufacturers": "生产商",
     "mrs": "医药代表",
     "payments": "付款",
+    "credits": "抵扣",
     "groups": {
       "selling": "销售",
       "stock": "库存",
@@ -53,7 +54,9 @@
     "manufacturer": "生产商",
     "manufacturers": "生产商",
     "suppliers": "供应商",
-    "mrs": "医药代表"
+    "mrs": "医药代表",
+    "payable": "应付",
+    "owed": "有应付款"
   },
   "table": {
     "percent": "{{value}}%",
@@ -176,6 +179,7 @@
     "orders_other": "{{count}} 张订单",
     "noOrders": "无订单",
     "ageing_other": "{{count}} 天",
+    "paidUp": "现在已不欠 {{name}} 任何款项",
     "rowActions": {
       "pay": "支付 {{amount}}",
       "newOrder": "新建采购单",
@@ -219,7 +223,72 @@
   },
   "payments": {
     "records": "药房付款",
-    "empty": "暂无药房付款"
+    "empty": "暂无药房付款",
+    "export": "导出",
+    "exportTitle": "将这些付款导出为 CSV",
+    "exported": "付款已导出为 CSV",
+    "exportTruncated": "已导出前 10,000 笔付款——请缩小筛选范围导出其余部分"
+  },
+  "credits": {
+    "records": "药房抵扣",
+    "sides": {
+      "label": "抵扣对象",
+      "suppliers": "来自供应商",
+      "customers": "与顾客"
+    },
+    "columns": {
+      "credit": "抵扣",
+      "supplier": "供应商",
+      "packs": "盒数",
+      "amount": "金额",
+      "applied": "已冲抵",
+      "state": "状态",
+      "since": "起始",
+      "who": "对象",
+      "way": "方向",
+      "left": "剩余"
+    },
+    "creditRef": "{{medicine}} · {{batch}}",
+    "packs_other": "{{count}} 盒",
+    "states": {
+      "open": "未冲抵",
+      "adjusted": "已冲抵"
+    },
+    "customerStates": {
+      "open": "未结",
+      "given_back": "已退还",
+      "got_back": "已收回",
+      "used": "已使用"
+    },
+    "ways": {
+      "give": "我们退还",
+      "take": "我们收回"
+    },
+    "rowActions": {
+      "void": "作废抵扣",
+      "giveBack": "退还",
+      "gotBack": "已收回",
+      "open": "在待处理中打开"
+    },
+    "empty": {
+      "suppliers": "暂无供应商抵扣——请在药品中退回临期库存",
+      "customers": "暂无顾客抵扣"
+    },
+    "addCredit": "添加抵扣",
+    "void": {
+      "title": "作废此抵扣？",
+      "effect": "其盒数将退回库存，供应商的应付款将恢复。",
+      "voided": "抵扣 · {{batch}} 已作废",
+      "reasons": {
+        "mistake": "误添加",
+        "wrongQuantity": "数量错误",
+        "supplierRefused": "供应商拒绝"
+      }
+    },
+    "filters": {
+      "state": "状态",
+      "way": "方向"
+    }
   },
   "drawers": {
     "records": {
@@ -252,8 +321,7 @@
     "quick": {
       "manufacturer": "已添加生产商 {{name}}",
       "supplier": "已添加供应商 {{name}} · 稍后补充电话和 GST",
-      "mr": "已添加医药代表 {{name}}",
-      "medicine": "已添加 {{name}} · 稍后在库存中设置零售价"
+      "mr": "已添加医药代表 {{name}}"
     },
     "deleteConfirm": {
       "medicine": "删除此药品？",
@@ -596,8 +664,11 @@
       "nothing": "请输入退回的内容",
       "refunded": "已退款 {{amount}} · 库存已退回",
       "refundedWrittenOff": "已退款 {{amount}} · 库存已报废",
-      "lowered": "已退货 {{amount}} · 库存已退回",
-      "loweredWrittenOff": "已退货 {{amount}} · 库存已报废"
+      "storeCredit": "店内余额",
+      "saveCredit": "将 {{amount}} 留作店内余额",
+      "credited": "已将 {{amount}} 留作店内余额 · 库存已退回",
+      "creditedWrittenOff": "已将 {{amount}} 留作店内余额 · 库存已报废",
+      "notPaid": "请先收齐全部账款 · 只有已全额付款的销售才能退货"
     },
     "expiring": {
       "title": "退回临期库存",

@@ -6,7 +6,7 @@ import {
   seedInstant,
   seedPhone,
 } from '@/shared/api/app/app-fixture-seed.ts';
-import { addCivilDays, appToday, civilDayOffset } from '@/shared/api/app/app-time.ts';
+import { addCivilDays, appToday } from '@/shared/api/app/app-time.ts';
 
 /**
  * Shared plumbing of the clinic fixture world (REPLACE_WITH_API): the stable id
@@ -30,29 +30,12 @@ export const ref = {
   patientReport: (key: number) => fixtureUuid('patient-report', key),
   patientPackage: (key: number) => fixtureUuid('patient-package', key),
   patientNote: (key: number) => fixtureUuid('patient-note', key),
-  offeringSuggestion: (key: number) => fixtureUuid('offering-suggestion', key),
   checkIn: (key: number) => fixtureUuid('check-in', key),
   review: (key: number) => fixtureUuid('review', key),
   offering: (seq: number) => fixtureUuid('offering', seq),
-  offer: (key: number) => fixtureUuid('offer', key),
   invoice: (seq: number) => fixtureUuid('invoice', seq),
   payment: (seq: number) => fixtureUuid('payment', seq),
-  pendingCredit: (seq: number) => fixtureUuid('pending-credit', seq),
-  /** Keyed by the prototype calendar date of the close (`2026-09-25`). */
-  dayClose: (date: string) => fixtureUuid('day-close', date),
   task: (key: string) => fixtureUuid('task', key),
-  manufacturer: (key: number) => fixtureUuid('manufacturer', key),
-  supplier: (key: number) => fixtureUuid('supplier', key),
-  medicalRep: (key: number) => fixtureUuid('medical-rep', key),
-  mrVisit: (key: number) => fixtureUuid('mr-visit', key),
-  medicine: (seq: number) => fixtureUuid('medicine', seq),
-  purchaseOrder: (seq: number) => fixtureUuid('purchase-order', seq),
-  medicalContact: (key: number) => fixtureUuid('medical-contact', key),
-  medicalSale: (seq: number) => fixtureUuid('medical-sale', seq),
-  stockVendor: (key: number) => fixtureUuid('stock-vendor', key),
-  stockItem: (seq: number) => fixtureUuid('stock-item', seq),
-  stockPurchase: (seq: number) => fixtureUuid('stock-purchase', seq),
-  stockMovement: (key: number) => fixtureUuid('stock-movement', key),
 } as const;
 
 /** A lookup that must hit — a miss is a broken seed, so it fails loudly. */
@@ -130,14 +113,4 @@ export function bookedOn(visitDate: string): string {
 export function seedMobile(display: string): string {
   const mobile = seedPhone(display);
   return /^\+91[6-9]/.test(mobile) ? mobile : `+919${mobile.slice(4)}`;
-}
-
-/** A batch expiry (`MM/YY`) moved by the same days as every other seed date. */
-export function seedExpiry(expiry: string, today: string = appToday()): string {
-  const [month = '01', year = '00'] = expiry.split('/');
-  const shifted = addCivilDays(
-    `20${year}-${month}-15`,
-    civilDayOffset(PROTOTYPE_SEED_DAY, today),
-  );
-  return `${shifted.slice(5, 7)}/${shifted.slice(2, 4)}`;
 }

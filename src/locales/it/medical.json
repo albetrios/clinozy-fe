@@ -11,6 +11,7 @@
     "manufacturers": "Produttori",
     "mrs": "Informatori",
     "payments": "Pagamenti",
+    "credits": "Crediti",
     "groups": {
       "selling": "Vendita",
       "stock": "Scorte",
@@ -53,7 +54,9 @@
     "manufacturer": "Produttore",
     "manufacturers": "Produttori",
     "suppliers": "Fornitori",
-    "mrs": "Informatori"
+    "mrs": "Informatori",
+    "payable": "Da pagare",
+    "owed": "Con importo dovuto"
   },
   "table": {
     "percent": "{{value}}%",
@@ -190,6 +193,7 @@
     "ageing_one": "{{count}} giorno",
     "ageing_many": "{{count}} giorni",
     "ageing_other": "{{count}} giorni",
+    "paidUp": "Non è più dovuto nulla a {{name}}",
     "rowActions": {
       "pay": "Paga {{amount}}",
       "newOrder": "Nuovo ordine d’acquisto",
@@ -239,7 +243,74 @@
   },
   "payments": {
     "records": "pagamenti della farmacia",
-    "empty": "Ancora nessun pagamento della farmacia"
+    "empty": "Ancora nessun pagamento della farmacia",
+    "export": "Esporta",
+    "exportTitle": "Esporta questi pagamenti in CSV",
+    "exported": "Pagamenti esportati in CSV",
+    "exportTruncated": "Esportati i primi 10.000 pagamenti: restringi i filtri per il resto"
+  },
+  "credits": {
+    "records": "crediti della farmacia",
+    "sides": {
+      "label": "Di chi sono i crediti",
+      "suppliers": "Dai fornitori",
+      "customers": "Con i clienti"
+    },
+    "columns": {
+      "credit": "Credito",
+      "supplier": "Fornitore",
+      "packs": "Confezioni",
+      "amount": "Importo",
+      "applied": "Compensato",
+      "state": "Stato",
+      "since": "Dal",
+      "who": "Chi",
+      "way": "Direzione",
+      "left": "Residuo"
+    },
+    "creditRef": "{{medicine}} · {{batch}}",
+    "packs_one": "{{count}} confezione",
+    "packs_many": "{{count}} confezioni",
+    "packs_other": "{{count}} confezioni",
+    "states": {
+      "open": "Aperto",
+      "adjusted": "Compensato"
+    },
+    "customerStates": {
+      "open": "Aperto",
+      "given_back": "Restituito",
+      "got_back": "Recuperato",
+      "used": "Usato"
+    },
+    "ways": {
+      "give": "Restituiamo",
+      "take": "Ci restituiscono"
+    },
+    "rowActions": {
+      "void": "Annulla credito",
+      "giveBack": "Restituisci",
+      "gotBack": "Recuperato",
+      "open": "Apri in In sospeso"
+    },
+    "empty": {
+      "suppliers": "Ancora nessun credito dai fornitori: restituisci la merce in scadenza da Farmaci",
+      "customers": "Ancora nessun credito con i clienti"
+    },
+    "addCredit": "Aggiungi credito",
+    "void": {
+      "title": "Annullare questo credito?",
+      "effect": "Le confezioni tornano in magazzino e il fornitore torna a credito.",
+      "voided": "Credito · {{batch}} annullato",
+      "reasons": {
+        "mistake": "Aggiunto per errore",
+        "wrongQuantity": "Quantità errata",
+        "supplierRefused": "Rifiutato dal fornitore"
+      }
+    },
+    "filters": {
+      "state": "Stato",
+      "way": "Direzione"
+    }
   },
   "drawers": {
     "records": {
@@ -274,8 +345,7 @@
     "quick": {
       "manufacturer": "Produttore {{name}} aggiunto",
       "supplier": "Fornitore {{name}} aggiunto · telefono e GST più tardi",
-      "mr": "Informatore {{name}} aggiunto",
-      "medicine": "{{name}} aggiunto · imposta il prezzo max. più tardi in Scorte"
+      "mr": "Informatore {{name}} aggiunto"
     },
     "deleteConfirm": {
       "medicine": "Eliminare questo farmaco?",
@@ -636,8 +706,11 @@
       "nothing": "Inserisci cosa viene restituito",
       "refunded": "{{amount}} rimborsati · scorte reintegrate",
       "refundedWrittenOff": "{{amount}} rimborsati · scorte eliminate",
-      "lowered": "{{amount}} resi · scorte reintegrate",
-      "loweredWrittenOff": "{{amount}} resi · scorte eliminate"
+      "storeCredit": "Credito in negozio",
+      "saveCredit": "Tieni {{amount}} come credito in negozio",
+      "credited": "{{amount}} tenuti come credito in negozio · scorte reintegrate",
+      "creditedWrittenOff": "{{amount}} tenuti come credito in negozio · scorte eliminate",
+      "notPaid": "Incassa prima l’intero conto · solo una vendita pagata per intero accetta un reso"
     },
     "expiring": {
       "title": "Restituisci scorte in scadenza",

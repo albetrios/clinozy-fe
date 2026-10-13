@@ -15,6 +15,7 @@ const MEDICAL_TAB_PATHS = {
   manufacturers: '/organization/$organizationSlug/medical/manufacturers',
   mrs: '/organization/$organizationSlug/medical/mrs',
   payments: '/organization/$organizationSlug/medical/payments',
+  credits: '/organization/$organizationSlug/medical/credits',
 } as const;
 
 /** One Medical tab. */

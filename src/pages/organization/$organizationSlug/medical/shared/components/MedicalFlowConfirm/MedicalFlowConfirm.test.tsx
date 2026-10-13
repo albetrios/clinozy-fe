@@ -2,17 +2,33 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
-import {
-  appFixtures,
-  resetAppFixtures,
-} from '@/shared/api/app/fixtures/world.fixtures.ts';
+vi.mock('../../medical-records-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  cancelPurchaseOrder: vi.fn(),
+  restorePurchaseOrder: vi.fn(),
+  voidSale: vi.fn(),
+  restoreSale: vi.fn(),
+}));
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
+import {
+  purchaseOrderRow,
+  saleRow,
+  TEST_PURCHASE_ORDER_ID,
+  TEST_SALE_ID,
+} from '@/tests/utils/medical-doubles.ts';
 
 import {
   renderMedicalDrawer,
   resetMedicalRoutes,
 } from '../../../__tests__/integration/medical-test-router.tsx';
+import {
+  cancelPurchaseOrder,
+  restorePurchaseOrder,
+  restoreSale,
+  voidSale,
+} from '../../medical-records-api.ts';
 import { MedicalFlowConfirm, type MedicalFlowTarget } from './MedicalFlowConfirm.tsx';
 
 const viewport = vi.hoisted(() => ({ tier: 'desktop' as ViewportTier }));
@@ -40,12 +56,13 @@ const setup = () =>
   userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
 
 beforeEach(() => {
+  vi.resetAllMocks();
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetAppFixtures();
+  signInTestMember();
 });
 afterEach(() => {
   resetMedicalRoutes();
-  resetAppFixtures();
+  useOrganizationStore.getState().clearOrganization();
 });
 
 /** Open the confirm on `target` and confirm with `reason`; resolve once its write is done. */
@@ -78,56 +95,47 @@ function pressUndo(message: string) {
   options.onUndo();
 }
 
-/** A medicine's batch quantity, by the medicine's number and the batch. */
-async function batchQty(medicineSeq: number, batchNo: string) {
-  const medicine = await appFixtures.medicines.get(ref.medicine(medicineSeq));
-  return medicine.batches.find((batch) => batch.batchNo === batchNo)?.qty;
-}
-
 describe('MedicalFlowConfirm (medical.md:357–368)', () => {
-  it('cancels an Ordered purchase order with its reason, and Undo puts it back', async () => {
-    const id = ref.purchaseOrder(430);
+  it('cancels an Ordered purchase order with the API’s reason, and Undo restores it', async () => {
+    vi.mocked(cancelPurchaseOrder).mockResolvedValue(undefined);
+    vi.mocked(restorePurchaseOrder).mockResolvedValue(purchaseOrderRow());
     await confirm(
-      { kind: 'cancelOrder', id, seq: 430, record: '₹4,236' },
+      { kind: 'cancelOrder', id: TEST_PURCHASE_ORDER_ID, seq: 430, record: '₹4,236' },
       'Cancel this purchase order?',
       'Ordered by mistake',
       'Cancel order',
     );
-    expect(await appFixtures.purchaseOrders.get(id)).toMatchObject({
-      stage: 'cancelled',
-      cancelReason: 'mistake',
-    });
+    expect(cancelPurchaseOrder).toHaveBeenCalledWith(
+      TEST_PURCHASE_ORDER_ID,
+      'mistake',
+      null,
+    );
     // One answer: "PO #430 cancelled" with Undo — no plain success beside it.
     expect(notifyMock.success).not.toHaveBeenCalled();
     pressUndo('PO #430 cancelled');
-    await waitFor(async () =>
-      expect(await appFixtures.purchaseOrders.get(id)).toMatchObject({
-        stage: 'ordered',
-        cancelReason: null,
-      }),
+    await waitFor(() =>
+      expect(restorePurchaseOrder).toHaveBeenCalledWith(
+        TEST_PURCHASE_ORDER_ID,
+        expect.any(String),
+      ),
     );
   });
 
-  it('voids an unpaid sale, and Undo brings it back — its invoice and its stock', async () => {
-    const id = ref.medicalSale(978);
-    const before = await batchQty(453, 'ADE25510');
+  it('voids an unpaid sale with the API’s reason, and Undo restores it', async () => {
+    vi.mocked(voidSale).mockResolvedValue(undefined);
+    vi.mocked(restoreSale).mockResolvedValue(saleRow());
     await confirm(
-      { kind: 'voidSale', id, seq: 978, record: 'Dharti Galani' },
+      { kind: 'voidSale', id: TEST_SALE_ID, seq: 978, record: 'Priya Shah' },
       'Void this sale?',
       'Billed by mistake',
       'Void sale',
     );
-    expect((await appFixtures.medicalSales.get(id)).voidedAt).not.toBeNull();
-    expect(await batchQty(453, 'ADE25510')).toBeGreaterThan(before ?? 0);
+    expect(voidSale).toHaveBeenCalledWith(TEST_SALE_ID, 'billed_by_mistake', null);
     expect(notifyMock.success).not.toHaveBeenCalled();
     pressUndo('Sale #978 voided');
-    await waitFor(async () =>
-      expect((await appFixtures.medicalSales.get(id)).voidedAt).toBeNull(),
+    await waitFor(() =>
+      expect(restoreSale).toHaveBeenCalledWith(TEST_SALE_ID, expect.any(String)),
     );
-    expect(await batchQty(453, 'ADE25510')).toBe(before);
-    expect(
-      appFixtures.invoices.snapshot((invoice) => invoice.id === ref.invoice(788)),
-    ).toHaveLength(1);
   });
 
   it('stays closed without a target', () => {

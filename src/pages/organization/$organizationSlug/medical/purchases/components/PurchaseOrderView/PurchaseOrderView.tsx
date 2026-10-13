@@ -4,8 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { isolateText } from '@/lib/bidi-isolate.ts';
-import { purchaseLineAmount } from '@/shared/api/app/app-money.ts';
-import type { PurchaseItem } from '@/shared/api/app/app-schema.ts';
+import { paiseOfRupees } from '@/lib/number-text.ts';
 import { SECTION_TONES } from '@/shared/app/app-tones.ts';
 import {
   DrawerField,
@@ -15,6 +14,7 @@ import {
 import {
   printDocument,
   PurchaseOrderPrint,
+  type PurchaseOrderPrintProps,
 } from '@/shared/components/PrintTemplate/index.ts';
 import {
   RecordDrawer,
@@ -30,7 +30,8 @@ import {
   ItemsField,
   ItemsReadCell,
 } from '@/shared/forms/ItemsField/index.ts';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
+import { useOrganizationId } from '@/shared/store/useOrganizationStore/index.ts';
 
 import { useMedicalDates } from '../../../shared/components/MedicalCells/medical-dates.ts';
 import {
@@ -38,6 +39,7 @@ import {
   medicalQueryKeys,
 } from '../../../shared/medical-api.ts';
 import type {
+  PurchaseOrderLine,
   PurchaseOrderRow,
   PurchaseOrderSheet,
 } from '../../../shared/medical-contracts.ts';
@@ -67,26 +69,21 @@ export interface PurchaseOrderViewProps {
   testId?: string;
 }
 
-/** One read-only line: its medicine's name beside the stored item. */
-interface ViewLine extends PurchaseItem {
-  name: string;
-}
-
-/** The read-only table's own form: the rows it shows, never sent. */
+/** The read-only table's own form: the order's lines, never sent. */
 interface LinesForm {
-  lines: ViewLine[];
+  lines: PurchaseOrderLine[];
 }
 
-/** Medicine · Qty · Free · Rate · Amount (H:5419). */
+/** Medicine · Qty · Free · Rate · Amount (H:5419) — the API's rupees, its amounts read. */
 function useColumns(): ItemsColumn<LinesForm, 'lines'>[] {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
-  const formatPaise = usePaiseFormat();
+  const formatRupees = useRupeeFormat();
   return [
     {
       id: 'medicine',
       header: t(F.medicine),
       track: 'minmax(0,2fr)',
-      cell: ({ row }) => <ItemsReadCell strong>{row.name}</ItemsReadCell>,
+      cell: ({ row }) => <ItemsReadCell strong>{row.medicineName}</ItemsReadCell>,
     },
     {
       id: 'qty',
@@ -107,16 +104,14 @@ function useColumns(): ItemsColumn<LinesForm, 'lines'>[] {
       header: t(F.rate),
       track: '90px',
       align: 'end',
-      cell: ({ row }) => <ItemsReadCell>{formatPaise(row.rate)}</ItemsReadCell>,
+      cell: ({ row }) => <ItemsReadCell>{formatRupees(row.rate)}</ItemsReadCell>,
     },
     {
       id: 'amount',
       header: t(F.amount),
       track: '100px',
       align: 'end',
-      cell: ({ row }) => (
-        <ItemsReadCell strong>{formatPaise(purchaseLineAmount(row))}</ItemsReadCell>
-      ),
+      cell: ({ row }) => <ItemsReadCell strong>{formatRupees(row.amount)}</ItemsReadCell>,
     },
   ];
 }
@@ -124,19 +119,15 @@ function useColumns(): ItemsColumn<LinesForm, 'lines'>[] {
 /** The order's lines as read-only item rows. */
 function OrderLines({ order, testId }: { order: PurchaseOrderRow; testId: string }) {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
-  const formatPaise = usePaiseFormat();
-  const lines = order.items.map((item, index) => ({
-    ...item,
-    name: order.itemNames[index] ?? '',
-  }));
-  const form = useForm<LinesForm>({ values: { lines } });
+  const formatRupees = useRupeeFormat();
+  const form = useForm<LinesForm>({ values: { lines: order.lines } });
   return (
     <ItemsField
       control={form.control}
       name="lines"
       label={t(F.items)}
       columns={useColumns()}
-      total={formatPaise(order.total)}
+      total={formatRupees(order.total)}
       totalLabel={t(F.total)}
       readOnly
       removable={false}
@@ -145,42 +136,78 @@ function OrderLines({ order, testId }: { order: PurchaseOrderRow; testId: string
   );
 }
 
-/** "Payable ₹2,980", "Paid ₹1,296" or "Paid ₹1,200 of ₹1,296" (`medical.md:334`). */
+/**
+ * "Payable ₹2,980", "Paid ₹1,296" or "Paid ₹1,200 of ₹1,296" (`medical.md:334`) — the server's
+ * due and paid, rupees (a paid order's credits make up the rest).
+ */
 function summaryOf(
   order: PurchaseOrderRow,
-  formatPaise: (paise: number) => string,
+  formatRupees: (rupees: number) => string,
   t: TFunction,
 ): string {
-  if (order.stage === 'received') return t(K.payable, { amount: formatPaise(order.due) });
-  if (order.paid >= order.total) return t(K.paid, { amount: formatPaise(order.total) });
-  return t(K.paidOf, { paid: formatPaise(order.paid), total: formatPaise(order.total) });
+  if (order.stage === 'received')
+    return t(K.payable, { amount: formatRupees(order.due) });
+  if (order.paid >= order.total) return t(K.paid, { amount: formatRupees(order.total) });
+  return t(K.paidOf, {
+    paid: formatRupees(order.paid),
+    total: formatRupees(order.total),
+  });
+}
+
+/**
+ * The A4 sheet's props for an order as read (Q-M7): its lines as the sheet's items — the
+ * API's rupees as the sheet's paise, batch and expiry as received — and the clinic's footer.
+ */
+function purchaseOrderPrintOf({
+  order,
+  organization,
+  branch,
+}: PurchaseOrderSheet): PurchaseOrderPrintProps {
+  return {
+    order: {
+      seq: order.seq,
+      date: order.date,
+      stage: order.stage,
+      supplierBillNo: order.supplierBillNo,
+      items: order.lines.map((line) => ({
+        medicineId: line.medicineId,
+        qty: line.qty,
+        free: line.free,
+        rate: paiseOfRupees(line.rate),
+        batchNo: line.batchNo,
+        expiry: line.expiry,
+        received: line.received ?? false,
+      })),
+      paid: paiseOfRupees(order.paid),
+    },
+    itemNames: order.lines.map((line) => line.medicineName),
+    supplier: {
+      name: order.supplier.name,
+      phone: order.supplier.phone,
+      gstNumber: order.supplier.gstNumber,
+    },
+    organization: {
+      name: organization.name,
+      specialties: organization.specialties,
+      currency: organization.currency,
+    },
+    branch,
+  };
 }
 
 /** An order's A4 purchase order — the browser's dialog 260ms after the sheet renders (H:4423). */
-function printPurchaseOrder({
-  order,
-  supplier,
-  organization,
-  branch,
-}: PurchaseOrderSheet) {
-  return printDocument(
-    <PurchaseOrderPrint
-      order={order}
-      itemNames={order.itemNames}
-      supplier={supplier}
-      organization={organization}
-      branch={branch}
-    />,
-  );
+function printPurchaseOrder(sheet: PurchaseOrderSheet) {
+  return printDocument(<PurchaseOrderPrint {...purchaseOrderPrintOf(sheet)} />);
 }
 
 /** "Print" on a paid order (Q-M7): its sheet read, then printed; a failed read is a toast. */
 function usePrintOrder(order: PurchaseOrderRow) {
   const queryClient = useQueryClient();
+  const organizationId = useOrganizationId();
   return () =>
     void queryClient
       .query({
-        queryKey: medicalQueryKeys.purchaseOrderSheet(order.id),
+        queryKey: medicalQueryKeys.purchaseOrderSheet(organizationId, order.id),
         queryFn: () => fetchPurchaseOrderSheet(order.id),
       })
       .then(printPurchaseOrder)
@@ -200,7 +227,7 @@ function OrderViewSession({
 }) {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
   const { t: tDrawer } = useTranslation(RECORD_DRAWER_NS);
-  const formatPaise = usePaiseFormat();
+  const formatRupees = useRupeeFormat();
   const dates = useMedicalDates();
   const print = usePrintOrder(order);
   const paid = order.stage === 'paid';
@@ -217,19 +244,19 @@ function OrderViewSession({
       title={t(K.title)}
       tag={`#${order.seq}`}
       sub={t(paid ? K.subPaid : K.subReceived, {
-        supplier: isolateText(order.supplierName),
+        supplier: isolateText(order.supplier.name),
       })}
       content={CONTENT_PROFILE}
       tone={SECTION_TONES.medical}
-      summary={summaryOf(order, formatPaise, t)}
+      summary={summaryOf(order, formatRupees, t)}
       dismissLabel={tDrawer(RECORD_DRAWER_KEYS.close)}
-      saveLabel={paid ? t(K.print) : t(K.pay, { amount: formatPaise(order.due) })}
+      saveLabel={paid ? t(K.print) : t(K.pay, { amount: formatRupees(order.due) })}
       onSave={primary}
       testId={testId}
     >
       <DrawerFieldGrid>
         <DrawerField span="half" label={t(F.supplier)}>
-          <DrawerInfo testId={`${testId}-supplier`}>{order.supplierName}</DrawerInfo>
+          <DrawerInfo testId={`${testId}-supplier`}>{order.supplier.name}</DrawerInfo>
         </DrawerField>
         <DrawerField span="third" label={t(F.billNo)}>
           <DrawerInfo testId={`${testId}-bill-no`}>

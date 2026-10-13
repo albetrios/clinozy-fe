@@ -74,7 +74,8 @@ padding inside; row dense), Clinical, Photos and Team notes two columns wide —
   is due, else to Checkout; a session to Checkout) — Today's card changes lane (L-64). "Write
   prescription" and "New treatment" keep the flow open behind their drawer (`?visit=open`) and
   close back to it — the Rx there is "Approve · print · send to pharmacy"; its "Save & sell" opens
-  New sale in Medical with the flow as its way back (`from=patients/<id>/timeline?visit=open`).
+  New sale in Medical on the Rx and its patient, with the flow as its way back
+  (`from=patients/<id>/timeline?visit=open`).
   "Complete visit" leaves the flow; opened from Today's "Open session" or "Checkout"
   (`from=today`), Pause and that exit go back to Today. **Invoice** reads the patient's invoices of
   the visit's day (`GET /app/invoices?patient_id=&invoice_date_from/_to=`) and finds the visit's —

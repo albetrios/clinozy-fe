@@ -1,4 +1,4 @@
-import type { FieldValues } from 'react-hook-form';
+import { type FieldValues, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import type { MedicineRow } from '@/shared/api/app/medicines-contracts.ts';
@@ -14,8 +14,11 @@ import {
   MEDICAL_DRAWERS_NS,
 } from '../../../shared/medical-drawers.constants.ts';
 import type { OrderLineMedicine } from './order-medicine.ts';
-import { supplierRateOf } from './purchase-order-form.ts';
-import { useOrderMedicineCreate } from './use-order-quick-line.ts';
+import {
+  supplierRateOf,
+  typedMedicineKey,
+  typedMedicineName,
+} from './purchase-order-form.ts';
 
 const K = MEDICAL_DRAWER_KEYS.purchaseOrder.fields;
 
@@ -25,12 +28,12 @@ export interface OrderMedicineCellProps<TForm extends FieldValues> {
   binding: ItemsCellBinding<TForm>;
   /** `useMedicineOptions` for the order's supplier. */
   options: PickerOption<MedicineRow>[];
-  /** The order's supplier: its rate fills the line; a typed name is linked to it. */
+  /** The order's supplier: its rate fills the line. */
   supplierId: string | null;
   /** "New medicine · “q”" opens on top; without it there are no full details. */
   openChild?: OpenMedicalChild;
   disabled: boolean;
-  /** A medicine picked, quick-made or saved on top: the line takes it. */
+  /** A medicine picked, typed or saved on top: the line takes it. */
   onMedicine: (medicine: OrderLineMedicine) => void;
 }
 
@@ -38,8 +41,9 @@ export interface OrderMedicineCellProps<TForm extends FieldValues> {
  * A purchase line's medicine picker (`medical.md:261`, `:319`) — the purchase
  * order's rows and Receive goods' unexpected lines (H:5388): the options
  * grouped by the supplier's price list; "Add medicine “q”" — or a typed name
- * left behind — makes a quick one linked to the supplier ("Azel cream added ·
- * set MRP later in Stock"), and "New medicine · “q”" opens it in full on top.
+ * left behind — keeps the name on the line, "New medicine" under it, and the
+ * save sends it for the server to add as a quick medicine (MD26); "New
+ * medicine · “q”" opens it in full on top.
  */
 export function OrderMedicineCell<TForm extends FieldValues>({
   binding,
@@ -50,13 +54,27 @@ export function OrderMedicineCell<TForm extends FieldValues>({
   onMedicine,
 }: OrderMedicineCellProps<TForm>) {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
-  const createMedicine = useOrderMedicineCreate(supplierId);
+  const value: unknown = useWatch({ control: binding.control, name: binding.name });
+  const typed = typeof value === 'string' ? typedMedicineName(value) : null;
+  // The line's typed medicine is an option of its own, so the cell names it.
+  const lineOptions: PickerOption<MedicineRow>[] =
+    typed === null
+      ? options
+      : [
+          {
+            key: typedMedicineKey(typed),
+            label: typed,
+            sub: t(K.newMedicine),
+            leading: { kind: 'none' },
+          },
+          ...options,
+        ];
   const made = (medicine: { id: string; name: string }) =>
     onMedicine({ id: medicine.id, name: medicine.name, rate: 0 });
   return (
     <ItemsPickerCell<TForm, MedicineRow>
       {...binding}
-      options={options}
+      options={lineOptions}
       placeholder={t(K.selectMedicine)}
       searchPlaceholder={t(K.searchMedicine)}
       searchable
@@ -70,11 +88,7 @@ export function OrderMedicineCell<TForm extends FieldValues>({
           });
         }
       }}
-      onCreate={(query) => {
-        void createMedicine(query).then((medicine) => {
-          if (medicine) made(medicine);
-        });
-      }}
+      onCreate={(query) => made({ id: typedMedicineKey(query), name: query.trim() })}
       autoCreate
       createLabel={t(K.addMedicine)}
       onCreateFull={

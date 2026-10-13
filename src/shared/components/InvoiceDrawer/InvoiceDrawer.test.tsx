@@ -44,16 +44,16 @@ vi.mock('@/shared/api/app/treatments-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   listVisitTreatmentsToBill: vi.fn(),
 }));
+vi.mock('@/shared/api/app/medicines-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchAllMedicines: vi.fn(),
+  quickCreateMedicine: vi.fn(),
+}));
 
 import type { OrganizationPermission } from '@/core/types/permissions.ts';
 import type { Role } from '@/shared/api/app/app-schema.ts';
 import * as branchesApi from '@/shared/api/app/branches-api.ts';
 import { fetchTeamDirectory } from '@/shared/api/app/directory-api.ts';
-import { patientRef } from '@/shared/api/app/fixtures/patients.fixtures.ts';
-import {
-  appFixtures,
-  resetAppFixtures,
-} from '@/shared/api/app/fixtures/world.fixtures.ts';
 import {
   createInvoice,
   deleteInvoice,
@@ -70,6 +70,10 @@ import type {
   InvoiceInput,
   InvoicePreview,
 } from '@/shared/api/app/invoices-contracts.ts';
+import {
+  fetchAllMedicines,
+  quickCreateMedicine,
+} from '@/shared/api/app/medicines-api.ts';
 import {
   createOffering,
   fetchAllOfferings,
@@ -100,6 +104,7 @@ import {
   TEST_PEEL_ID,
   TEST_PEEL_OFFER_ID,
 } from '@/tests/utils/invoice-doubles.ts';
+import { medicineRow } from '@/tests/utils/medical-doubles.ts';
 import { patientRecord } from '@/tests/utils/patient-doubles.ts';
 import {
   invoiceRecord,
@@ -142,7 +147,18 @@ import { InvoiceDrawer } from './InvoiceDrawer.tsx';
 
 /** 10:00 on 10 Oct, clinic time. */
 const NOW = new Date('2026-10-10T04:30:00Z');
-const RHEA = patientRef('Rhea Shah');
+
+/** Glycolac Cream in the store: ₹162 (the API's rupees), three in stock. */
+const GLYCOLAC = medicineRow({
+  id: 'med_glycolac0000000000000',
+  name: 'Glycolac Cream',
+  mrp: 162,
+  stock: 3,
+  nearExpiryDiscountPct: 0,
+});
+
+/** The Medical room's write, as New sale hands it in (`POST /app/medical-sales`). */
+const saleWrite = { create: vi.fn() };
 
 /** Every money code an Owner holds, the lowest price and New offering among them. */
 const OWNER_CODES: readonly OrganizationPermission[] = [
@@ -174,7 +190,7 @@ function signIn(codes: readonly OrganizationPermission[] = OWNER_CODES) {
 function renderCreate(
   prefill: {
     patientId?: string;
-    type?: 'clinic' | 'medical' | 'consultation';
+    type?: 'clinic' | 'consultation';
     copyOf?: InvoiceDetail;
     appointmentId?: string;
   } = {},
@@ -186,7 +202,7 @@ function renderCreate(
     <InvoiceDrawer
       mode="create"
       open
-      sale={sale}
+      sale={sale ? saleWrite : undefined}
       prefill={prefill}
       onClose={onClose}
       onCreated={onCreated}
@@ -287,7 +303,17 @@ beforeEach(() => {
   viewport.tier = 'desktop';
   for (const fn of Object.values(notifyMock)) fn.mockReset();
   printMock.mockReset();
-  resetAppFixtures();
+  saleWrite.create.mockReset();
+  vi.mocked(fetchAllMedicines).mockResolvedValue([GLYCOLAC]);
+  vi.mocked(quickCreateMedicine).mockImplementation(async ({ name }) =>
+    medicineRow({
+      id: 'med_quick00000000000000000',
+      name,
+      mrp: 0,
+      stock: 0,
+      isQuick: true,
+    }),
+  );
   vi.spyOn(branchesApi, 'fetchActiveBranches').mockResolvedValue(INVOICE_TEST_BRANCHES);
   vi.mocked(fetchAllOfferings).mockResolvedValue(INVOICE_TEST_OFFERINGS);
   vi.mocked(fetchAllOffers).mockResolvedValue(INVOICE_TEST_OFFERS);
@@ -347,7 +373,6 @@ beforeEach(() => {
 afterEach(() => {
   vi.useRealTimers();
   vi.restoreAllMocks();
-  resetAppFixtures();
   useUIStore.setState({ previewRole: null });
   useOrganizationStore.getState().clearOrganization();
 });
@@ -367,8 +392,8 @@ describe('InvoiceDrawer — New invoice on clinozy-be (KICKOFF §6.9)', () => {
         .getAllByRole('radio')
         .map((radio) => [radio.textContent, radio.getAttribute('aria-checked')]),
     ).toEqual([
+      // No Medical: a medical bill is the Medical room's New sale (MD28).
       ['Clinic', 'true'],
-      ['Medical', 'false'],
       ['Consultation', 'false'],
     ]);
     for (const step of ['party', 'items', 'payment']) {
@@ -1093,8 +1118,9 @@ describe('InvoiceDrawer — Medical sale (§6.7, §6.9)', () => {
 
   it('adds a medicine the store lacks as a quick draft (Q-M4) — from the line and from Browse', async () => {
     const user = setUser();
+    signIn();
     asRole('pharmacist');
-    renderCreate({ patientId: RHEA, type: 'medical' }, true);
+    renderCreate({ patientId: TEST_MONEY_PATIENT_ID }, true);
     await user.click(await screen.findByTestId('invoice-drawer-step-items-trigger'));
     const line = await screen.findByTestId('invoice-drawer-quick-line-input');
     await user.type(line, 'azel cream 2');
@@ -1104,9 +1130,10 @@ describe('InvoiceDrawer — Medical sale (§6.7, §6.9)', () => {
         'Azel Cream added · set MRP later in Stock',
       ),
     );
-    expect(
-      appFixtures.medicines.snapshot((medicine) => medicine.name === 'Azel Cream')[0],
-    ).toMatchObject({ isQuick: true, mrp: 0 });
+    expect(quickCreateMedicine).toHaveBeenCalledWith(
+      { name: 'Azel Cream' },
+      expect.any(String),
+    );
     await waitFor(() =>
       expect(screen.getByTestId('invoice-drawer-items-row')).toHaveTextContent(
         'Azel Cream',
@@ -1123,35 +1150,78 @@ describe('InvoiceDrawer — Medical sale (§6.7, §6.9)', () => {
     await waitFor(() =>
       expect(screen.getAllByTestId('invoice-drawer-items-row')).toHaveLength(2),
     );
-    expect(
-      appFixtures.medicines.snapshot((medicine) => medicine.name === 'Derma gel'),
-    ).toHaveLength(1);
+    expect(quickCreateMedicine).toHaveBeenCalledTimes(2);
   });
 
-  it('offers no new medicine to a role that cannot create one', async () => {
+  it('never offers a medicine on a clinic invoice — none read, none listed, none to add (MD28)', async () => {
     const user = setUser();
-    asRole('accountant');
-    renderCreate({ patientId: RHEA, type: 'medical' });
+    signIn();
+    asRole('admin');
+    vi.mocked(fetchAllMedicines).mockClear();
+    renderCreate({ patientId: TEST_MONEY_PATIENT_ID });
     await user.click(await screen.findByTestId('invoice-drawer-step-items-trigger'));
-    await user.type(await screen.findByTestId('invoice-drawer-quick-line-input'), 'zzq');
+    await user.type(
+      await screen.findByTestId('invoice-drawer-quick-line-input'),
+      'glycolac',
+    );
     expect(await screen.findByTestId('invoice-drawer-quick-line-no-match')).toBeVisible();
     expect(screen.queryByTestId('invoice-drawer-quick-line-typed')).toBeNull();
     await user.click(screen.getByTestId('invoice-drawer-quick-line-browse'));
     const browse = await screen.findByTestId('invoice-drawer-quick-line-browse-panel');
+    expect(browse).not.toHaveTextContent('Glycolac Cream');
     expect(
       within(browse).queryByTestId('invoice-drawer-quick-line-browse-new'),
     ).toBeNull();
+    expect(fetchAllMedicines).not.toHaveBeenCalled();
   });
 
   it('bills a medicine at its MRP with no GST on top (D45), and refuses more than the stock', async () => {
     const user = setUser();
-    renderCreate({ patientId: RHEA, type: 'medical' }, true);
+    signIn();
+    asRole('pharmacist');
+    renderCreate({ patientId: TEST_MONEY_PATIENT_ID }, true);
     await quickAdd(user, 'glycolac 4');
     const row = within(screen.getByTestId('invoice-drawer-items-row'));
     expect(row.getByText('0%')).toBeInTheDocument();
     expect(totals('bill')).toHaveTextContent('₹648');
     await user.click(screen.getByTestId('invoice-drawer-save'));
     expect(notifyMock.warning).toHaveBeenCalledWith('Only 3 of Glycolac Cream in stock');
+    expect(saleWrite.create).not.toHaveBeenCalled();
+  });
+
+  it('saves through the Medical room’s write: the buyer’s contact, each medicine — no rate (MD19)', async () => {
+    const user = setUser();
+    signIn();
+    asRole('pharmacist');
+    saleWrite.create.mockResolvedValue({
+      invoiceId: 'invc_sale97800000000000000',
+      seq: 978,
+    });
+    const { onCreated } = renderCreate({ patientId: TEST_MONEY_PATIENT_ID }, true);
+    await waitFor(() =>
+      expect(screen.getByTestId('invoice-drawer-customer')).toHaveTextContent(
+        'Kavya Mehta',
+      ),
+    );
+    await quickAdd(user, 'glycolac 2');
+    await user.click(screen.getByTestId('invoice-drawer-save'));
+    await waitFor(() => expect(onCreated).toHaveBeenCalled());
+    expect(saleWrite.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        contactId: TEST_MONEY_CONTACT_ID,
+        items: [{ medicineId: GLYCOLAC.id, qty: 2, discountPct: 0 }],
+        overallDiscount: 0,
+        memberIds: [TEST_MONEY_AUTHOR_ID],
+      }),
+    );
+    expect(onCreated).toHaveBeenCalledWith({
+      invoiceId: 'invc_sale97800000000000000',
+      seq: 978,
+      type: 'medical',
+      planLinked: 0,
+    });
+    expect(notifyMock.success).toHaveBeenCalledWith('Medical invoice #978 created');
+    expect(createInvoice).not.toHaveBeenCalled();
   });
 });
 describe('InvoiceDrawer — phone (below md)', () => {

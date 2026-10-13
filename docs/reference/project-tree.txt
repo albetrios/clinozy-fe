@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2208 src files · ~1116 tests in src/ · 89 E2E specs · 27 shadcn UI primitives
+Stats: ~2199 src files · ~1114 tests in src/ · 89 E2E specs · 27 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -935,6 +935,14 @@ clinozy-fe/
 │   │       │   ├── medical/
 │   │       │   │   ├── __tests__/
 │   │       │   │   │   └── integration/
+│   │       │   │   ├── credits/
+│   │       │   │   │   ├── components/
+│   │       │   │   │   ├── hooks/
+│   │       │   │   │   ├── credits.manifest.ts
+│   │       │   │   │   ├── CREDITS.OVERVIEW.md
+│   │       │   │   │   ├── credits.route.tsx
+│   │       │   │   │   ├── MedicalCreditsPage.tsx
+│   │       │   │   │   └── [1 test file]
 │   │       │   │   ├── manufacturers/
 │   │       │   │   │   ├── $manufacturerId/
 │   │       │   │   │   ├── create/
@@ -944,7 +952,7 @@ clinozy-fe/
 │   │       │   │   │   ├── manufacturers.params.ts
 │   │       │   │   │   ├── manufacturers.route.tsx
 │   │       │   │   │   ├── ManufacturersPage.tsx
-│   │       │   │   │   └── [1 test file]
+│   │       │   │   │   └── [2 test files]
 │   │       │   │   ├── medicines/
 │   │       │   │   │   ├── $medicineId/
 │   │       │   │   │   ├── components/
@@ -966,7 +974,7 @@ clinozy-fe/
 │   │       │   │   │   ├── mrs.params.ts
 │   │       │   │   │   ├── mrs.route.tsx
 │   │       │   │   │   ├── MrsPage.tsx
-│   │       │   │   │   └── [1 test file]
+│   │       │   │   │   └── [2 test files]
 │   │       │   │   ├── payments/
 │   │       │   │   │   ├── MedicalPaymentsPage.tsx
 │   │       │   │   │   ├── payments.manifest.ts
@@ -1002,13 +1010,10 @@ clinozy-fe/
 │   │       │   │   │   ├── medical-contracts.ts
 │   │       │   │   │   ├── medical-drawer-form.ts
 │   │       │   │   │   ├── medical-drawers.constants.ts
-│   │       │   │   │   ├── medical-flows-api.ts
-│   │       │   │   │   ├── medical-flows-contracts.ts
-│   │       │   │   │   ├── medical-partners-api.ts
-│   │       │   │   │   ├── medical-partners-contracts.ts
-│   │       │   │   │   ├── medical-supplier-credits.ts
+│   │       │   │   │   ├── medical-records-api.ts
+│   │       │   │   │   ├── medical-records-contracts.ts
 │   │       │   │   │   ├── medical-tones.ts
-│   │       │   │   │   └── [4 test files]
+│   │       │   │   │   └── [3 test files]
 │   │       │   │   ├── suppliers/
 │   │       │   │   │   ├── $supplierId/
 │   │       │   │   │   ├── create/
@@ -1018,7 +1023,7 @@ clinozy-fe/
 │   │       │   │   │   ├── suppliers.params.ts
 │   │       │   │   │   ├── suppliers.route.tsx
 │   │       │   │   │   ├── SuppliersPage.tsx
-│   │       │   │   │   └── [1 test file]
+│   │       │   │   │   └── [2 test files]
 │   │       │   │   ├── medical.constants.ts
 │   │       │   │   ├── medical.dialog-search.ts
 │   │       │   │   ├── medical.manifest.ts
@@ -1384,9 +1389,7 @@ clinozy-fe/
 │   │   │   │   ├── fixtures/
 │   │   │   │   │   ├── appointments.fixtures.ts
 │   │   │   │   │   ├── contact-threads.fixtures.ts
-│   │   │   │   │   ├── invoices-server.fixtures.ts
 │   │   │   │   │   ├── leads.fixtures.ts
-│   │   │   │   │   ├── medical.fixtures.ts
 │   │   │   │   │   ├── messages.fixtures.ts
 │   │   │   │   │   ├── money.fixtures.ts
 │   │   │   │   │   ├── offerings.fixtures.ts
@@ -1395,7 +1398,6 @@ clinozy-fe/
 │   │   │   │   │   ├── patients.fixtures.ts
 │   │   │   │   │   ├── refs.fixtures.ts
 │   │   │   │   │   ├── staff.fixtures.ts
-│   │   │   │   │   ├── stock.fixtures.ts
 │   │   │   │   │   ├── tasks.fixtures.ts
 │   │   │   │   │   ├── world.fixtures.ts
 │   │   │   │   │   └── [1 test file]
@@ -1431,15 +1433,12 @@ clinozy-fe/
 │   │   │   │   ├── credits-contracts.ts
 │   │   │   │   ├── day-close-api.ts
 │   │   │   │   ├── day-close-contracts.ts
-│   │   │   │   ├── day-close-fixture-api.ts
 │   │   │   │   ├── directory-api.ts
 │   │   │   │   ├── feedback-api.ts
 │   │   │   │   ├── feedback-contracts.ts
 │   │   │   │   ├── file-links.ts
 │   │   │   │   ├── invoices-api.ts
 │   │   │   │   ├── invoices-contracts.ts
-│   │   │   │   ├── invoices-fixture-api.ts
-│   │   │   │   ├── invoices-fixture-contracts.ts
 │   │   │   │   ├── leads-api.ts
 │   │   │   │   ├── leads-contracts.ts
 │   │   │   │   ├── leads-fixture-contracts.ts
@@ -1453,7 +1452,6 @@ clinozy-fe/
 │   │   │   │   ├── offerings-api.ts
 │   │   │   │   ├── offerings-contracts.ts
 │   │   │   │   ├── offerings-fixture-contracts.ts
-│   │   │   │   ├── offerings-fixture-pricing.ts
 │   │   │   │   ├── offerings-pricing.ts
 │   │   │   │   ├── patient-file-api.ts
 │   │   │   │   ├── patient-file-contracts.ts
@@ -1466,11 +1464,9 @@ clinozy-fe/
 │   │   │   │   ├── patient-search-api.ts
 │   │   │   │   ├── patients-api.ts
 │   │   │   │   ├── patients-contracts.ts
-│   │   │   │   ├── patients-fixture-api.ts
 │   │   │   │   ├── patients-fixture-contracts.ts
 │   │   │   │   ├── payments-api.ts
 │   │   │   │   ├── payments-contracts.ts
-│   │   │   │   ├── payments-fixture-api.ts
 │   │   │   │   ├── payments-fixture-contracts.ts
 │   │   │   │   ├── plan-api.ts
 │   │   │   │   ├── plan-contracts.ts
@@ -1478,7 +1474,6 @@ clinozy-fe/
 │   │   │   │   ├── prescriptions-api.ts
 │   │   │   │   ├── prescriptions-contracts.ts
 │   │   │   │   ├── presence-api.ts
-│   │   │   │   ├── staff-fixture-api.ts
 │   │   │   │   ├── staff-fixture-contracts.ts
 │   │   │   │   ├── stock-room-query-key.ts
 │   │   │   │   ├── task-views.ts
@@ -1493,7 +1488,7 @@ clinozy-fe/
 │   │   │   │   ├── users-contracts.ts
 │   │   │   │   ├── visits-api.ts
 │   │   │   │   ├── visits-contracts.ts
-│   │   │   │   └── [65 test files]
+│   │   │   │   └── [60 test files]
 │   │   │   ├── API.OVERVIEW.md
 │   │   │   ├── auth-api.ts
 │   │   │   ├── auth-contracts.ts
@@ -2467,18 +2462,6 @@ clinozy-fe/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useFeedback.ts
 │   │   │   │   └── [1 test file]
-│   │   │   ├── useFixtureLedger/
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── useFixtureLedger.ts
-│   │   │   │   └── [1 test file]
-│   │   │   ├── useFixturePatients/
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── useFixturePatients.ts
-│   │   │   │   └── [1 test file]
-│   │   │   ├── useFixtureStaff/
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── useFixtureStaff.ts
-│   │   │   │   └── [1 test file]
 │   │   │   ├── useFormValues/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── useFormValues.ts
@@ -2979,6 +2962,7 @@ clinozy-fe/
 │   │   ├── e2e-tenancy.ts
 │   │   ├── e2e-verification-code.ts
 │   │   ├── invoice-doubles.ts
+│   │   ├── medical-doubles.ts
 │   │   ├── offering-doubles.ts
 │   │   ├── patient-doubles.ts
 │   │   ├── payments-doubles.ts

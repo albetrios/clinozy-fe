@@ -4,33 +4,30 @@ import type { ReactNode } from 'react';
 import { useForm } from 'react-hook-form';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { InvoiceRxPreset } from '@/shared/api/app/invoices-fixture-contracts.ts';
-import type { MedicineRecord } from '@/shared/api/app/medicines-contracts.ts';
+import type { PrescriptionRecord } from '@/shared/api/app/prescriptions-contracts.ts';
 import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { TEST_VESU_BRANCH_ID } from '@/tests/utils/invoice-doubles.ts';
+import { medicineRow } from '@/tests/utils/medical-doubles.ts';
 import { offeringRecord } from '@/tests/utils/offering-doubles.ts';
 
-const { notifyMock, saleApi, invoiceApi, offersApi, membership, staffApi } = vi.hoisted(
-  () => ({
-    notifyMock: {
-      success: vi.fn(),
-      error: vi.fn(),
-      info: vi.fn(),
-      warning: vi.fn(),
-      undo: vi.fn(),
-      dismiss: vi.fn(),
-    },
-    saleApi: { fetchPrescriptionPreset: vi.fn(), fetchSalePresets: vi.fn() },
-    invoiceApi: { fetchInvoicePresets: vi.fn() },
-    offersApi: { fetchAllOffers: vi.fn() },
-    membership: { id: 'mem_me000000000000000000' as string | null },
-    staffApi: { fetchFixtureMyStaff: vi.fn() },
-  }),
-);
+const { notifyMock, rxApi, invoiceApi, offersApi, membership } = vi.hoisted(() => ({
+  notifyMock: {
+    success: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    warning: vi.fn(),
+    undo: vi.fn(),
+    dismiss: vi.fn(),
+  },
+  rxApi: { listPatientPrescriptions: vi.fn() },
+  invoiceApi: { fetchInvoicePresets: vi.fn() },
+  offersApi: { fetchAllOffers: vi.fn() },
+  membership: { id: 'mem_me000000000000000000' as string | null },
+}));
 vi.mock('@/shared/notify/index.ts', () => ({ notify: notifyMock }));
-vi.mock('@/shared/api/app/invoices-fixture-api.ts', async (importOriginal) => ({
+vi.mock('@/shared/api/app/prescriptions-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
-  ...saleApi,
+  ...rxApi,
 }));
 vi.mock('@/shared/api/app/invoices-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
@@ -39,10 +36,6 @@ vi.mock('@/shared/api/app/invoices-api.ts', async (importOriginal) => ({
 vi.mock('@/shared/api/app/offerings-api.ts', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   ...offersApi,
-}));
-vi.mock('@/shared/api/app/staff-fixture-api.ts', async (importOriginal) => ({
-  ...(await importOriginal<object>()),
-  ...staffApi,
 }));
 vi.mock('@/shared/hooks/useMyMembership/index.ts', () => ({
   useMyMembershipId: () => membership.id,
@@ -55,6 +48,7 @@ import {
   type InvoicePartyForm,
 } from './invoice-form.ts';
 import { type InvoiceCatalogItem, medicineCatalogItem } from './invoice-lines.ts';
+import { salePrescriptionOf } from './sale-form.ts';
 import {
   useBranchPrefill,
   useInvoiceStacks,
@@ -63,26 +57,65 @@ import {
   useTeamPrefill,
 } from './use-invoice-drawer.ts';
 
-/** Glycolac Cream as the sale's catalogue lists it — 3 in stock at ₹162. */
-const GLYCOLAC: InvoiceCatalogItem = medicineCatalogItem({
-  id: 'med_glycolac',
-  name: 'Glycolac Cream',
-  composition: 'Glycolic acid 6%',
-  mrp: 16_200,
-  minStock: 2,
-  nearExpiryDiscountPct: 20,
-  batches: [{ batchNo: 'GL-1', qty: 3, expiry: '2027-06-30', rate: 9000 }],
-} as unknown as MedicineRecord);
+const GLYCOLAC_ID = 'med_glycolac0000000000000';
+const PRIYA_ID = 'pat_priya0000000000000000';
 
-/** Rx #500 for Priya: Glycolac ×2, and a name the store does not list. */
-const RX: InvoiceRxPreset = {
-  id: 'rx_500',
+/** Glycolac Cream as the sale's catalogue lists it — 3 in stock at ₹162. */
+const GLYCOLAC: InvoiceCatalogItem = medicineCatalogItem(
+  medicineRow({
+    id: GLYCOLAC_ID,
+    name: 'Glycolac Cream',
+    composition: 'Glycolic acid 6%',
+    mrp: 162,
+    stock: 3,
+    nearExpiryDiscountPct: 20,
+  }),
+);
+
+/** One line of a prescription, as the patient file writes it. */
+const rxItem = (medicineId: string | null, medicineName: string, qty: number) => ({
+  medicineId,
+  medicineName,
+  doseMorning: 1,
+  doseAfternoon: 0,
+  doseNight: 1,
+  sos: false,
+  meal: null,
+  timing: null,
+  timingText: null,
+  bodyPart: null,
+  bodyPartText: null,
+  qty,
+  remarks: null,
+});
+
+/** Rx #500 for Priya, approved: Glycolac ×2, and a name the store does not list. */
+const RX: PrescriptionRecord = {
+  id: 'rx_rx5000000000000000000',
   seq: 500,
-  patientId: 'pat_priya',
-  medicines: [
-    { medicineId: 'med_glycolac', name: 'Glycolac Cream', qty: 2 },
-    { medicineId: null, name: 'Flubolt 400', qty: 1 },
-  ],
+  patientId: PRIYA_ID,
+  appointmentId: null,
+  doctorId: 'mem_drashti00000000000000',
+  date: '2026-10-10',
+  items: [rxItem(GLYCOLAC_ID, 'Glycolac Cream', 2), rxItem(null, 'Flubolt 400', 1)],
+  advice: null,
+  labReport: null,
+  procedureToday: null,
+  followUpDate: null,
+  status: 'approved',
+  approvedAt: '2026-10-10T05:00:00.000Z',
+  approvedById: 'mem_drashti00000000000000',
+  createdAt: '2026-10-10T05:00:00.000Z',
+  updatedAt: '2026-10-10T05:00:00.000Z',
+};
+
+/** Priya as the sale's prefilled patient, once read. */
+const PRIYA: InvoicePartyForm = {
+  kind: 'patient',
+  id: PRIYA_ID,
+  contactId: 'con_priya0000000000000000',
+  name: 'Priya Shah',
+  phone: null,
 };
 
 let client: QueryClient;
@@ -103,91 +136,77 @@ beforeEach(() => {
   membership.id = 'mem_me000000000000000000';
   for (const fn of [
     ...Object.values(notifyMock),
-    ...Object.values(saleApi),
+    ...Object.values(rxApi),
     ...Object.values(invoiceApi),
     ...Object.values(offersApi),
-    ...Object.values(staffApi),
   ]) {
     fn.mockReset();
   }
   offersApi.fetchAllOffers.mockResolvedValue([]);
-  staffApi.fetchFixtureMyStaff.mockResolvedValue(null);
 });
 afterEach(() => client.clear());
 
-describe('usePrescriptionPrefill — a sale from a prescription (fixture world)', () => {
+describe('usePrescriptionPrefill — a sale from a prescription (clinozy-be’s)', () => {
   function render(
     values: InvoiceFormValues,
     catalog: InvoiceCatalogItem[] = [GLYCOLAC],
     prescriptionId: string | null = RX.id,
+    patientId: string | null = PRIYA_ID,
   ) {
     return renderHook(
       ({ items }) => {
         const form = useForm<InvoiceFormValues>({ defaultValues: values });
-        usePrescriptionPrefill(form, prescriptionId, items);
+        usePrescriptionPrefill(form, { prescriptionId, patientId, catalog: items });
         return form;
       },
       { wrapper, initialProps: { items: catalog } },
     );
   }
 
-  it('bills its medicines in stock, names its patient and the Rx, and says which it could not find', async () => {
-    saleApi.fetchPrescriptionPreset.mockResolvedValue(RX);
-    const { result } = render(saleForm());
+  it('bills its medicines in stock, names the Rx, and says which it could not find — the buyer kept', async () => {
+    rxApi.listPatientPrescriptions.mockResolvedValue([RX]);
+    const { result } = render(saleForm({ party: PRIYA }));
 
     await waitFor(() => expect(result.current.getValues('remark')).toBe('From Rx #500'));
-    expect(saleApi.fetchPrescriptionPreset).toHaveBeenCalledWith('rx_500');
+    expect(rxApi.listPatientPrescriptions).toHaveBeenCalledWith(PRIYA_ID);
     expect(result.current.getValues('items')).toEqual([
       expect.objectContaining({
-        medicineId: 'med_glycolac',
+        medicineId: GLYCOLAC_ID,
         name: 'Glycolac Cream',
         qty: 2,
       }),
     ]);
-    expect(result.current.getValues('party')).toEqual({
-      kind: 'patient',
-      id: 'pat_priya',
-      contactId: null,
-      name: '',
-      phone: null,
-    });
+    expect(result.current.getValues('party')).toEqual(PRIYA);
     expect(notifyMock.info).toHaveBeenCalledOnce();
     expect(notifyMock.info).toHaveBeenCalledWith(
       'Flubolt 400 not in the medicine list · add from the quick line',
     );
   });
 
-  it('keeps a customer already picked', async () => {
-    saleApi.fetchPrescriptionPreset.mockResolvedValue(RX);
-    const walkIn: InvoicePartyForm = {
-      kind: 'contact',
-      id: 'mcon_walkin',
-      contactId: null,
-      name: 'Walk-in',
-      phone: null,
-    };
-    const { result } = render(saleForm({ party: walkIn }));
+  it('fills nothing from a draft — only an approved prescription is sold', async () => {
+    rxApi.listPatientPrescriptions.mockResolvedValue([{ ...RX, status: 'draft' }]);
+    const { result } = render(saleForm({ party: PRIYA }));
 
-    await waitFor(() => expect(result.current.getValues('remark')).toBe('From Rx #500'));
-    expect(result.current.getValues('party')).toEqual(walkIn);
+    await waitFor(() => expect(rxApi.listPatientPrescriptions).toHaveBeenCalled());
+    expect(result.current.getValues('remark')).toBe('');
+    expect(result.current.getValues('items')).toEqual([blankLine()]);
   });
 
   it('keeps the blank row when nothing it names is in the store', async () => {
-    saleApi.fetchPrescriptionPreset.mockResolvedValue({
-      ...RX,
-      medicines: [{ medicineId: null, name: 'Flubolt 400', qty: 1 }],
-    });
-    const { result } = render(saleForm());
+    rxApi.listPatientPrescriptions.mockResolvedValue([
+      { ...RX, items: [rxItem(null, 'Flubolt 400', 1)] },
+    ]);
+    const { result } = render(saleForm({ party: PRIYA }));
 
     await waitFor(() => expect(result.current.getValues('remark')).toBe('From Rx #500'));
     expect(result.current.getValues('items')).toEqual([blankLine()]);
   });
 
   it('waits for the catalogue, then fills once — a later catalogue never refills', async () => {
-    saleApi.fetchPrescriptionPreset.mockResolvedValue(RX);
-    const { result, rerender } = render(saleForm(), []);
+    rxApi.listPatientPrescriptions.mockResolvedValue([RX]);
+    const { result, rerender } = render(saleForm({ party: PRIYA }), []);
 
-    await waitFor(() => expect(saleApi.fetchPrescriptionPreset).toHaveBeenCalled());
+    await waitFor(() => expect(rxApi.listPatientPrescriptions).toHaveBeenCalled());
     expect(result.current.getValues('remark')).toBe('');
 
     rerender({ items: [GLYCOLAC] });
@@ -199,9 +218,10 @@ describe('usePrescriptionPrefill — a sale from a prescription (fixture world)'
     expect(notifyMock.info).toHaveBeenCalledOnce();
   });
 
-  it('reads nothing without a prescription', () => {
-    render(saleForm(), [GLYCOLAC], null);
-    expect(saleApi.fetchPrescriptionPreset).not.toHaveBeenCalled();
+  it('reads nothing without a prescription, or without a patient to read it among', () => {
+    render(saleForm({ party: PRIYA }), [GLYCOLAC], null);
+    render(saleForm(), [GLYCOLAC], RX.id, null);
+    expect(rxApi.listPatientPrescriptions).not.toHaveBeenCalled();
   });
 });
 
@@ -237,7 +257,7 @@ describe('useTeamPrefill — the team a new invoice starts with', () => {
     await waitFor(() =>
       expect(result.current.form.getValues('teamIds')).toEqual(['mem_rhea', 'mem_nisha']),
     );
-    expect(saleApi.fetchSalePresets).not.toHaveBeenCalled();
+    expect(rxApi.listPatientPrescriptions).not.toHaveBeenCalled();
   });
 
   it('falls back to the member themself, and to nobody when they are unknown', async () => {
@@ -256,31 +276,34 @@ describe('useTeamPrefill — the team a new invoice starts with', () => {
     expect(unknown.result.current.form.getValues('teamIds')).toEqual([]);
   });
 
-  it('takes a sale’s team from the fixture world, with its patient’s latest Rx', async () => {
-    saleApi.fetchSalePresets.mockResolvedValue({
-      packages: [],
-      lastByType: {},
-      latestRx: RX,
-      recentTeamIds: ['usr_staff_rhea'],
-    });
-    const { result } = render({ values: saleForm(), sale: true });
+  it('starts a sale’s "Prescribed by" with the member themself, with its patient’s latest approved Rx', async () => {
+    rxApi.listPatientPrescriptions.mockResolvedValue([
+      { ...RX, id: 'rx_rx5010000000000000000', seq: 501, status: 'draft' },
+      RX,
+    ]);
+    const { result } = render({ values: saleForm(), sale: true, patientId: PRIYA_ID });
 
     await waitFor(() =>
-      expect(result.current.form.getValues('teamIds')).toEqual(['usr_staff_rhea']),
+      expect(result.current.form.getValues('teamIds')).toEqual([
+        'mem_me000000000000000000',
+      ]),
     );
-    expect(result.current.team.latestRx).toEqual(RX);
+    await waitFor(() =>
+      expect(result.current.team.latestRx).toEqual(salePrescriptionOf(RX)),
+    );
     expect(result.current.team.presets).toBeNull();
     expect(invoiceApi.fetchInvoicePresets).not.toHaveBeenCalled();
   });
 
-  it('starts a walk-in sale’s team with the member’s own fixture staff record', async () => {
-    staffApi.fetchFixtureMyStaff.mockResolvedValue({ id: 'usr_staff_me' });
+  it('starts a walk-in sale with the member themself, reading no prescriptions', async () => {
     const { result } = render({ values: saleForm(), sale: true, patientId: null });
     await waitFor(() =>
-      expect(result.current.form.getValues('teamIds')).toEqual(['usr_staff_me']),
+      expect(result.current.form.getValues('teamIds')).toEqual([
+        'mem_me000000000000000000',
+      ]),
     );
-    expect(saleApi.fetchSalePresets).not.toHaveBeenCalled();
-    expect(staffApi.fetchFixtureMyStaff).toHaveBeenCalledWith('member@clinic.test');
+    expect(result.current.team.latestRx).toBeNull();
+    expect(rxApi.listPatientPrescriptions).not.toHaveBeenCalled();
   });
 
   it('never replaces a team of its own, or one the member changed', async () => {

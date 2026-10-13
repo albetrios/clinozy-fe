@@ -17,6 +17,11 @@ export function mrParamsOf(search: MedicalSearch): MrListParams {
   };
 }
 
+/** The params the footer reads — the filters alone: a sort changes no count. */
+export function mrSummaryParamsOf({ q, created }: MrListParams): MrListParams {
+  return { q, created };
+}
+
 /** The read's filter part — a change shows the skeleton; a sort keeps the rows. */
 export function mrFilterKey(params: MrListParams): string {
   return JSON.stringify([params.q, params.created]);

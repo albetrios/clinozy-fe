@@ -2,15 +2,15 @@ import { useId, useState } from 'react';
 import { useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import type { InvoiceType } from '@/shared/api/app/app-schema.ts';
 import { appToday } from '@/shared/api/app/app-time.ts';
 import { fetchInvoice, invoiceQueryKeys } from '@/shared/api/app/invoices-api.ts';
 import type {
+  ClinicInvoiceType,
   InvoiceDetail,
   InvoiceRecord,
 } from '@/shared/api/app/invoices-contracts.ts';
 import { defaultBranchId } from '@/shared/app/app-branch.ts';
-import { personFullName, shortPersonName } from '@/shared/components/Cells/index.ts';
+import { shortPersonName } from '@/shared/components/Cells/index.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
 import type {
   DrawerPeekPill,
@@ -25,13 +25,8 @@ import {
   type EditingRecordRead,
   useEditingRecord,
 } from '@/shared/hooks/useEditingRecord/index.ts';
-import { useFixtureStaff } from '@/shared/hooks/useFixtureStaff/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
-import {
-  useDeleteInvoice,
-  useOftenBilled,
-  useRestoreInvoice,
-} from '@/shared/hooks/useInvoices/index.ts';
+import { useDeleteInvoice, useRestoreInvoice } from '@/shared/hooks/useInvoices/index.ts';
 import { usePlan } from '@/shared/hooks/usePlan/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
 import { useTeamDirectory } from '@/shared/hooks/useTeamDirectory/index.ts';
@@ -54,7 +49,6 @@ import {
   type InvoiceFormValues,
   type InvoicePrefill,
 } from './invoice-form.ts';
-import { oftenBilledItems } from './invoice-lines.ts';
 import { useInvoiceQuickFill } from './invoice-presets.ts';
 import { printInvoice } from './invoice-sheet.tsx';
 import { InvoiceItemsField } from './InvoiceItemsField.tsx';
@@ -62,6 +56,7 @@ import { InvoicePartyFields } from './InvoicePartyFields.tsx';
 import { InvoicePaymentFields } from './InvoicePaymentFields.tsx';
 import { InvoiceTotals } from './InvoiceTotals.tsx';
 import { InvoiceTypeSwitch } from './InvoiceTypeSwitch.tsx';
+import type { InvoiceSaleWrite } from './sale-form.ts';
 import { type InvoiceCatalog, useInvoiceCatalog } from './use-invoice-catalog.ts';
 import {
   type InvoiceDrawerOutcome,
@@ -86,16 +81,20 @@ interface InvoiceDrawerBaseProps {
   onClose: () => void;
   /**
    * Medical's New sale (`medical/sales/create`, `S:50`): the type locked to
-   * Medical — "New sale", "Medical invoice · stock updates by earliest expiry".
+   * Medical — "New sale", "Medical invoice · stock updates by earliest expiry"
+   * — and the Medical room's write (`POST /app/medical-sales`), handed in.
    */
-  sale?: boolean;
+  sale?: InvoiceSaleWrite;
 }
 
 /** What a new invoice opens on — the URL's `?type=` and `?patient=`, a prescription to sell, an invoice to copy. */
 export interface InvoiceCreatePrefill {
-  type?: InvoiceType;
+  /** A clinic or consultation invoice — never Medical: a sale is the room's `sale` (MD28). */
+  type?: ClinicInvoiceType;
   /** The patient's file (`pat_…`) — the invoice bills their contact once it is read. */
   patientId?: string | null;
+  /** A sale's buyer by their contact (`con_…`) — named, and their file found, once it is read. */
+  contactId?: string | null;
   /** `?prescription=` (Medical, `S:50`): its patient, medicines and "From Rx #500". */
   prescriptionId?: string | null;
   /**
@@ -135,7 +134,10 @@ export type InvoiceDrawerProps = InvoiceCreateDrawerProps | InvoiceEditDrawerPro
 /** The item rows a non-compact items field needs: the drawer is 840px (H:3850). */
 const CONTENT_PROFILE = { fieldCount: 9, hasItems: true } as const;
 
-/** A new invoice's starting form: the URL's type (Medical for a sale), its patient once read. */
+/**
+ * A new invoice's starting form: the URL's type (Medical for a sale), its patient or buyer once
+ * read.
+ */
 function startingForm(
   props: InvoiceDrawerProps,
   today: string,
@@ -146,13 +148,18 @@ function startingForm(
     return copiedInvoiceForm(props.prefill.copyOf, today, branchId);
   }
   const patientId = props.prefill?.patientId;
+  const contactId = props.prefill?.contactId;
+  let party: InvoicePrefill['party'] = null;
+  if (patientId) {
+    party = { kind: 'patient', id: patientId, contactId: null, name: '', phone: null };
+  } else if (contactId) {
+    party = { kind: 'contact', id: contactId, contactId, name: '', phone: null };
+  }
   const prefill: InvoicePrefill = {
     type: props.sale ? 'medical' : (props.prefill?.type ?? 'clinic'),
     branchId,
     prescriptionId: props.prefill?.prescriptionId ?? null,
-    party: patientId
-      ? { kind: 'patient', id: patientId, contactId: null, name: '', phone: null }
-      : null,
+    party,
   };
   return emptyInvoiceForm(today, prefill);
 }
@@ -201,20 +208,11 @@ const readInvoiceDetail = (
 });
 
 /**
- * The team by id as the Team peek's pills, in their own tones: an invoice's clinozy-be members
- * ("Dr. Drashti"), a sale's fixture staff ("Kiran P.").
+ * The team by id as the Team peek's pills, in their own tones: clinozy-be's members ("Dr.
+ * Drashti") — an invoice's team, a sale's "Prescribed by".
  */
-function useStaffPills(sale: boolean): ReadonlyMap<string, DrawerPeekPill> {
-  const staff = useFixtureStaff();
+function useStaffPills(): ReadonlyMap<string, DrawerPeekPill> {
   const team = useTeamDirectory();
-  if (sale) {
-    return new Map(
-      (staff.data ?? []).map((person) => [
-        person.id,
-        { label: shortPersonName(personFullName(person)), tone: person.tone },
-      ]),
-    );
-  }
   return new Map(
     team.members.map((member) => [
       member.id,
@@ -230,7 +228,6 @@ interface StepsInput {
   view: InvoiceDrawerView;
   money: DrawerFigures;
   catalog: InvoiceCatalog;
-  oftenBilled: Parameters<typeof InvoiceItemsField>[0]['oftenBilled'];
   access: InvoiceDrawerAccess;
   /** The Payment step's form: a sale's, a new invoice's or a saved one's. */
   paymentMode: 'sale' | 'create' | 'edit';
@@ -271,7 +268,6 @@ function invoiceSteps(input: StepsInput): DrawerStep[] {
           catalog={input.catalog}
           rowFigures={money.rowFigures}
           onFinal={money.onFinal}
-          oftenBilled={input.oftenBilled}
           total={money.figures.bill}
           readOnly={access.readOnly}
           locked={access.locked === 'sale'}
@@ -297,17 +293,17 @@ function invoiceSteps(input: StepsInput): DrawerStep[] {
   ];
 }
 
-/** The reads the form's type and party need: the catalogue, a sale's "Often billed", the plan. */
+/**
+ * The reads the form's type and party need: the catalogue and the plan. The design's "Often
+ * billed" has no clinozy-be read (G-P6) and is not drawn.
+ */
 function useInvoiceReads(values: InvoiceFormValues, sale: boolean) {
   const patientId = values.party?.kind === 'patient' ? values.party.id : null;
   const catalog = useInvoiceCatalog(values.type, values.branchId);
-  // "Often billed" is the fixture world's, for a sale only (G-P6: no clinozy-be read).
-  const often = useOftenBilled('medical');
   const plan = usePlan(sale ? null : patientId);
   return {
     patientId,
     catalog,
-    oftenBilled: sale ? oftenBilledItems(often.data ?? [], catalog.items) : [],
     plan: plan.data?.suggestions ?? [],
   };
 }
@@ -396,7 +392,11 @@ function useSessionParts(
   const access = useInvoiceAccess(invoice, newRecord && Boolean(props.sale));
   const reads = useInvoiceReads(values, sale);
   usePrefillPatientName(form);
-  usePrescriptionPrefill(form, input.prescriptionId, reads.catalog.items);
+  usePrescriptionPrefill(form, {
+    prescriptionId: input.prescriptionId,
+    patientId: reads.patientId,
+    catalog: reads.catalog.items,
+  });
   useVisitPrefill(form, {
     patientId: reads.patientId,
     appointmentId: input.appointmentId,
@@ -430,7 +430,7 @@ function useSessionParts(
     seq: invoice?.seq ?? null,
     sale: Boolean(props.sale),
     sessionLines: money.sessionLines,
-    staff: useStaffPills(sale),
+    staff: useStaffPills(),
     branch: session.branches.find((branch) => branch.id === values.branchId) ?? null,
   });
   const quickFill = useInvoiceQuickFill({
@@ -447,6 +447,7 @@ function useSessionParts(
     form,
     invoice,
     sale,
+    saleWrite: props.sale ?? null,
     fallbackBranchId,
     catalog: reads.catalog,
     figures: money.figures,
@@ -483,12 +484,11 @@ function InvoiceDrawerSession(props: InvoiceDrawerProps) {
   const parts = useSessionParts(session, props, setOpenStep);
   const { access, view, money } = parts;
 
-  const switchType = (type: InvoiceType) => {
+  const switchType = (type: ClinicInvoiceType) => {
     form.setValue('type', type, { shouldDirty: true });
     // Switching clears the items (`payments.md:134`); only a patient bills a clinic invoice.
     form.setValue('items', [blankLine()], { shouldDirty: true });
-    const party = form.getValues('party');
-    if (type !== 'medical' && party?.kind !== 'patient') parts.stacks.setParty(null);
+    if (form.getValues('party')?.kind !== 'patient') parts.stacks.setParty(null);
   };
 
   const steps = invoiceSteps({
@@ -497,7 +497,6 @@ function InvoiceDrawerSession(props: InvoiceDrawerProps) {
     view,
     money,
     catalog: parts.reads.catalog,
-    oftenBilled: parts.reads.oftenBilled,
     access,
     paymentMode: paymentModeOf(parts.sale, invoice),
     editing: invoice !== null,
@@ -509,8 +508,10 @@ function InvoiceDrawerSession(props: InvoiceDrawerProps) {
   const missingParty = t(
     values.type === 'medical' ? K.errors.pickCustomer : K.errors.pickPatient,
   );
-  // The type is chosen once: a sale's is Medical, a saved invoice keeps its own.
-  const switchable = !(props.sale || invoice);
+  // The type is chosen once: a sale's is Medical, a saved invoice keeps its own; a new invoice
+  // switches between Clinic and Consultation only (MD28).
+  const switchValue =
+    props.sale || invoice || values.type === 'medical' ? null : values.type;
 
   return (
     <>
@@ -523,9 +524,9 @@ function InvoiceDrawerSession(props: InvoiceDrawerProps) {
         badges={view.badges}
         quickFill={parts.quickFill}
         headerStrip={
-          switchable && (
+          switchValue && (
             <InvoiceTypeSwitch
-              value={values.type}
+              value={switchValue}
               onChange={switchType}
               disabled={access.readOnly}
             />
@@ -650,14 +651,16 @@ export function InvoiceDeleteConfirm({
  * The shared Invoice drawer (KICKOFF §6.9; `payments.md:132–150`; H:5051–5068) on the record
  * drawer, 840px for its item rows: New invoice / Edit invoice — or Medical's New sale, the type
  * locked — in three steps, "Patient & team" · "Items" ("Medicines") · "Payment", the type switch
- * (Clinic · Medical · Consultation; switching clears the items), Quick fill, the badges (type ·
+ * (Clinic · Consultation; switching clears the items — a medical bill is only ever a sale, MD28,
+ * so a clinic or consultation invoice never lists medicines), Quick fill, the badges (type ·
  * "Bill ₹324" · "Covers 6 sessions" · "Cash + UPI" · "Draft" / "₹324 due" / "Fully paid") and
  * the totals above the footer. A clinic or consultation invoice is clinozy-be's: the server
  * prices every line — the best live offer at the branch and date, never under the lowest price
  * — and the drawer shows its preview as the member types, never its own sums; the save creates
  * the invoice with "Paid now" as one receipt, or changes what differs with the read's
- * `updated_at`. A Medical sale stays on the fixture world (D153 seam). Every opening starts a
- * fresh form.
+ * `updated_at`. A Medical sale is the Medical room's write, handed in (`sale`): the server draws
+ * its batches and prices it, the drawer's sums a guide till then. Every opening starts a fresh
+ * form.
  */
 export function InvoiceDrawer(props: InvoiceDrawerProps) {
   const { session } = useDrawerSession(props.open);

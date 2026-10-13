@@ -11,6 +11,7 @@
     "manufacturers": "メーカー",
     "mrs": "MR",
     "payments": "支払い",
+    "credits": "クレジット",
     "groups": {
       "selling": "販売",
       "stock": "在庫",
@@ -53,7 +54,9 @@
     "manufacturer": "メーカー",
     "manufacturers": "メーカー",
     "suppliers": "仕入先",
-    "mrs": "MR"
+    "mrs": "MR",
+    "payable": "未払い",
+    "owed": "未払いあり"
   },
   "table": {
     "percent": "{{value}}%",
@@ -176,6 +179,7 @@
     "orders_other": "発注 {{count}} 件",
     "noOrders": "発注なし",
     "ageing_other": "{{count}} 日",
+    "paidUp": "{{name}} への未払いは今はありません",
     "rowActions": {
       "pay": "{{amount}} を支払う",
       "newOrder": "新しい発注",
@@ -219,7 +223,72 @@
   },
   "payments": {
     "records": "薬局の支払い",
-    "empty": "薬局の支払いはまだありません"
+    "empty": "薬局の支払いはまだありません",
+    "export": "エクスポート",
+    "exportTitle": "これらの支払いを CSV でエクスポート",
+    "exported": "支払いを CSV でエクスポートしました",
+    "exportTruncated": "最初の 10,000 件の支払いをエクスポートしました — 残りはフィルターを絞ってください"
+  },
+  "credits": {
+    "records": "薬局のクレジット",
+    "sides": {
+      "label": "クレジットの相手",
+      "suppliers": "仕入先から",
+      "customers": "顧客との"
+    },
+    "columns": {
+      "credit": "クレジット",
+      "supplier": "仕入先",
+      "packs": "箱数",
+      "amount": "金額",
+      "applied": "充当済み",
+      "state": "状態",
+      "since": "登録日",
+      "who": "相手",
+      "way": "方向",
+      "left": "残額"
+    },
+    "creditRef": "{{medicine}} · {{batch}}",
+    "packs_other": "{{count}} 箱",
+    "states": {
+      "open": "未充当",
+      "adjusted": "充当済み"
+    },
+    "customerStates": {
+      "open": "未精算",
+      "given_back": "返金済み",
+      "got_back": "回収済み",
+      "used": "使用済み"
+    },
+    "ways": {
+      "give": "こちらが返す",
+      "take": "返してもらう"
+    },
+    "rowActions": {
+      "void": "クレジットを取り消す",
+      "giveBack": "返金する",
+      "gotBack": "回収した",
+      "open": "保留中で開く"
+    },
+    "empty": {
+      "suppliers": "仕入先クレジットはまだありません — 医薬品から期限間近の在庫を返品してください",
+      "customers": "顧客クレジットはまだありません"
+    },
+    "addCredit": "クレジットを追加",
+    "void": {
+      "title": "このクレジットを取り消しますか？",
+      "effect": "箱は在庫に戻り、仕入先への支払いが再び発生します。",
+      "voided": "クレジット · {{batch}} を取り消しました",
+      "reasons": {
+        "mistake": "誤って追加",
+        "wrongQuantity": "数量の誤り",
+        "supplierRefused": "仕入先が拒否"
+      }
+    },
+    "filters": {
+      "state": "状態",
+      "way": "方向"
+    }
   },
   "drawers": {
     "records": {
@@ -252,8 +321,7 @@
     "quick": {
       "manufacturer": "メーカー {{name}} を追加しました",
       "supplier": "仕入先 {{name}} を追加しました · 電話と GST は後で追加",
-      "mr": "MR {{name}} を追加しました",
-      "medicine": "{{name}} を追加しました · 希望小売価格は後で在庫で設定"
+      "mr": "MR {{name}} を追加しました"
     },
     "deleteConfirm": {
       "medicine": "この医薬品を削除しますか？",
@@ -596,8 +664,11 @@
       "nothing": "返品するものを入力してください",
       "refunded": "{{amount}} を返金しました · 在庫に戻しました",
       "refundedWrittenOff": "{{amount}} を返金しました · 在庫は廃棄",
-      "lowered": "{{amount}} を返品 · 在庫に戻しました",
-      "loweredWrittenOff": "{{amount}} を返品 · 在庫は廃棄"
+      "storeCredit": "ストアクレジット",
+      "saveCredit": "{{amount}} をストアクレジットとして保持",
+      "credited": "{{amount}} をストアクレジットとして保持しました · 在庫に戻しました",
+      "creditedWrittenOff": "{{amount}} をストアクレジットとして保持しました · 在庫は廃棄",
+      "notPaid": "先に全額を回収してください · 全額支払い済みの販売のみ返品できます"
     },
     "expiring": {
       "title": "期限間近の在庫を返品",

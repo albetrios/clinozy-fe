@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import type { MedicineRecord } from '@/shared/api/app/medicines-contracts.ts';
+import { medicineRow } from '@/tests/utils/medical-doubles.ts';
 
 import {
   bestFormRate,
@@ -45,25 +45,53 @@ describe('the medicine drawer form (medical.md:170–188)', () => {
     expect(emptyMedicineForm().manufacturerId).toBeNull();
   });
 
-  it('reads a saved medicine back with its MRP in rupees', () => {
-    const saved = {
+  it('reads a saved medicine back — the API’s rupees as the MRP typed and the rows’ paise', () => {
+    const saved = medicineRow({
       name: 'Glycolac Cream',
-      manufacturerId: MAKER,
       composition: null,
       prescriptionOnly: true,
-      mrp: 16_250,
-      gstPct: 12,
-      minStock: 2,
-      maxStock: 10,
-      batches: [{ batchNo: '026-312', expiry: '11/26', qty: 3, purchaseRate: 12_300 }],
-      supplierRates: [{ supplierId: AKSHAR, rate: 12_300, free: 0, leadDays: 2 }],
-    } as unknown as MedicineRecord;
+      mrp: 162.5,
+      batches: [
+        {
+          id: 'mbt_glyco0260000000000000',
+          batchNo: '026-312',
+          expiry: '11/26',
+          qty: 3,
+          purchaseRate: 123,
+          supplierId: AKSHAR,
+          expired: false,
+        },
+      ],
+      supplierRates: [
+        {
+          supplierId: AKSHAR,
+          supplierName: 'Akshar Medicines',
+          rate: 123,
+          free: 0,
+          leadDays: 2,
+        },
+      ],
+    });
     const values = medicineFormOf(saved);
     expect(values.mrp).toBe('162.5');
     expect(values.composition).toBe('');
     expect(values.prescriptionOnly).toBe(true);
     expect(mrpPaiseOf(values)).toBe(16_250);
     expect(formStock(values)).toBe(3);
+    // A saved batch keeps its id — the API keeps the batch by it.
+    expect(values.batches).toEqual([
+      {
+        id: 'mbt_glyco0260000000000000',
+        batchNo: '026-312',
+        expiry: '11/26',
+        qty: 3,
+        purchaseRate: 12_300,
+        supplierId: AKSHAR,
+      },
+    ]);
+    expect(values.supplierRates).toEqual([
+      { supplierId: AKSHAR, rate: 12_300, free: 0, leadDays: 2 },
+    ]);
   });
 
   it('names the required fields still empty', () => {
@@ -120,7 +148,7 @@ describe('the medicine drawer form (medical.md:170–188)', () => {
     expect(medicineRowProblem(form({ batches: [emptyBatch()] }))).toBeNull();
   });
 
-  it('sends the contract’s fields: trimmed, paise, blank rows dropped', () => {
+  it('sends the contract’s fields: trimmed, in rupees, blank rows dropped, a saved batch by its id', () => {
     expect(
       medicineInputOf(
         form({
@@ -130,6 +158,13 @@ describe('the medicine drawer form (medical.md:170–188)', () => {
           batches: [
             emptyBatch(),
             { batchNo: ' B1 ', expiry: '11/27 ', qty: 4, purchaseRate: 30_000 },
+            {
+              id: 'mbt_saved0000000000000000',
+              batchNo: 'B0',
+              expiry: '01/27',
+              qty: 1,
+              purchaseRate: 0,
+            },
           ],
           supplierRates: [
             { supplierId: '', rate: 0, free: 0, leadDays: 2 },
@@ -142,12 +177,22 @@ describe('the medicine drawer form (medical.md:170–188)', () => {
       composition: null,
       manufacturerId: MAKER,
       prescriptionOnly: false,
-      mrp: 65_050,
+      mrp: 650.5,
       gstPct: 12,
       minStock: 2,
       maxStock: 10,
-      batches: [{ batchNo: 'B1', expiry: '11/27', qty: 4, purchaseRate: 30_000 }],
-      supplierRates: [{ supplierId: AKSHAR, rate: 30_000, free: 1, leadDays: 3 }],
+      batches: [
+        { batchNo: 'B1', expiry: '11/27', qty: 4, purchaseRate: 300, supplierId: null },
+        {
+          id: 'mbt_saved0000000000000000',
+          batchNo: 'B0',
+          expiry: '01/27',
+          qty: 1,
+          purchaseRate: null,
+          supplierId: null,
+        },
+      ],
+      supplierRates: [{ supplierId: AKSHAR, rate: 300, free: 1, leadDays: 3 }],
     });
   });
 

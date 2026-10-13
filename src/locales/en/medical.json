@@ -11,6 +11,7 @@
     "manufacturers": "Manufacturers",
     "mrs": "MRs",
     "payments": "Payments",
+    "credits": "Credits",
     "groups": {
       "selling": "Selling",
       "stock": "Stock",
@@ -53,7 +54,9 @@
     "manufacturer": "Manufacturer",
     "manufacturers": "Manufacturers",
     "suppliers": "Suppliers",
-    "mrs": "MRs"
+    "mrs": "MRs",
+    "payable": "Payable",
+    "owed": "Owed something"
   },
   "table": {
     "percent": "{{value}}%",
@@ -183,6 +186,7 @@
     "noOrders": "No orders",
     "ageing_one": "{{count}} day",
     "ageing_other": "{{count}} days",
+    "paidUp": "Nothing is owed to {{name}} now",
     "rowActions": {
       "pay": "Pay {{amount}}",
       "newOrder": "New purchase order",
@@ -229,7 +233,73 @@
   },
   "payments": {
     "records": "Medical payments",
-    "empty": "No Medical payments yet"
+    "empty": "No Medical payments yet",
+    "export": "Export",
+    "exportTitle": "Export these payments as CSV",
+    "exported": "Payments exported as CSV",
+    "exportTruncated": "Exported the first 10,000 payments — narrow the filters for the rest"
+  },
+  "credits": {
+    "records": "Medical credits",
+    "sides": {
+      "label": "Whose credits",
+      "suppliers": "From suppliers",
+      "customers": "With customers"
+    },
+    "columns": {
+      "credit": "Credit",
+      "supplier": "Supplier",
+      "packs": "Packs",
+      "amount": "Amount",
+      "applied": "Adjusted",
+      "state": "State",
+      "since": "Since",
+      "who": "Who",
+      "way": "Which way",
+      "left": "Left"
+    },
+    "creditRef": "{{medicine}} · {{batch}}",
+    "packs_one": "{{count}} pack",
+    "packs_other": "{{count}} packs",
+    "states": {
+      "open": "Open",
+      "adjusted": "Adjusted"
+    },
+    "customerStates": {
+      "open": "Open",
+      "given_back": "Given back",
+      "got_back": "Got back",
+      "used": "Used"
+    },
+    "ways": {
+      "give": "We give back",
+      "take": "We get back"
+    },
+    "rowActions": {
+      "void": "Void credit",
+      "giveBack": "Give back",
+      "gotBack": "Got it back",
+      "open": "Open in Pending"
+    },
+    "empty": {
+      "suppliers": "No supplier credits yet — return expiring stock from Medicines",
+      "customers": "No customer credits yet"
+    },
+    "addCredit": "Add credit",
+    "void": {
+      "title": "Void this credit?",
+      "effect": "Its packs go back into stock and the supplier is owed again.",
+      "voided": "Credit · {{batch}} voided",
+      "reasons": {
+        "mistake": "Added by mistake",
+        "wrongQuantity": "Wrong quantity",
+        "supplierRefused": "Supplier refused"
+      }
+    },
+    "filters": {
+      "state": "State",
+      "way": "Which way"
+    }
   },
   "drawers": {
     "records": {
@@ -263,8 +333,7 @@
     "quick": {
       "manufacturer": "Manufacturer {{name}} added",
       "supplier": "Supplier {{name}} added · add phone and GST later",
-      "mr": "MR {{name}} added",
-      "medicine": "{{name}} added · set MRP later in Stock"
+      "mr": "MR {{name}} added"
     },
     "deleteConfirm": {
       "medicine": "Delete this medicine?",
@@ -616,8 +685,11 @@
       "nothing": "Enter what is being returned",
       "refunded": "{{amount}} refunded · stock added back",
       "refundedWrittenOff": "{{amount}} refunded · stock written off",
-      "lowered": "{{amount}} returned · stock added back",
-      "loweredWrittenOff": "{{amount}} returned · stock written off"
+      "storeCredit": "Store credit",
+      "saveCredit": "Keep {{amount}} as store credit",
+      "credited": "{{amount}} kept as store credit · stock added back",
+      "creditedWrittenOff": "{{amount}} kept as store credit · stock written off",
+      "notPaid": "Collect the full bill first · only a sale paid in full takes a return"
     },
     "expiring": {
       "title": "Return expiring stock",

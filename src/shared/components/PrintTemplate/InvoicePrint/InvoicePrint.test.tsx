@@ -55,7 +55,6 @@ function propsFor(invoice: InvoiceRecord = peelInvoice()): InvoicePrintProps {
   const detail = invoiceDetail(invoice);
   return {
     invoice: detail.invoice,
-    sale: detail.sale,
     party: detail.party,
     organization: detail.sheet.organization,
     branch: detail.sheet.branch,

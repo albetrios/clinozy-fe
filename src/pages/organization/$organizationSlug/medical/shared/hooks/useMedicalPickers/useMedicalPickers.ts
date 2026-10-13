@@ -1,15 +1,11 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type {
-  Manufacturer,
-  MedicalRep,
-  Supplier,
-  Tone,
-} from '@/shared/api/app/app-schema.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
 import { formatAppPhone } from '@/shared/app/app-phone.ts';
 import type { PickerOption } from '@/shared/components/Picker/index.ts';
 
+import type { ManufacturerRow, MrRow, SupplierRow } from '../../medical-contracts.ts';
 import {
   MEDICAL_DRAWER_KEYS,
   MEDICAL_DRAWERS_NS,
@@ -77,9 +73,9 @@ export interface MedicalPickers {
   addMr: (name: string) => Promise<string>;
   /** List a record a stacked child created until the catalogue does. */
   remember: {
-    manufacturer: (maker: Manufacturer) => void;
-    supplier: (supplier: Supplier) => void;
-    mr: (rep: MedicalRep) => void;
+    manufacturer: (maker: ManufacturerRow) => void;
+    supplier: (supplier: SupplierRow) => void;
+    mr: (rep: MrRow) => void;
   };
 }
 
@@ -106,10 +102,10 @@ export function useMedicalPickers(): MedicalPickers {
     successMessage: (rep) => t(K.quick.mr, { name: rep.name }),
   });
 
-  const listMaker = (maker: Manufacturer) =>
+  const listMaker = (maker: ManufacturerRow) =>
     setAdded((current) => ({
       ...current,
-      manufacturers: [...current.manufacturers, { ...maker, medicineCount: 0 }],
+      manufacturers: [...current.manufacturers, maker],
     }));
   const listPartner = (key: 'suppliers' | 'mrs', partner: PartnerEntry) =>
     setAdded((current) => ({ ...current, [key]: [...current[key], partner] }));

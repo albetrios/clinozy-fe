@@ -22,7 +22,7 @@ import type { MedicalCreateSearch } from '../../../medical.dialog-search.ts';
 import { validateMedicalSearch } from '../../../medical.search.ts';
 
 /** A Medical tab with a create dialog route. */
-export type MedicalCreateTab = Exclude<MedicalTab, 'payments'>;
+export type MedicalCreateTab = Exclude<MedicalTab, 'payments' | 'credits'>;
 
 /** The list params a dialog route keeps from its tab: the search, filters and sort. */
 const listSearch = (current: Record<string, unknown>) => validateMedicalSearch(current);

@@ -1232,8 +1232,6 @@
     "items": {
       "quickLine": "서비스, 수량, 할인 입력 · 예: lhr face 1 10%",
       "quickLineMedical": "의약품과 수량 입력 · 예: sun 2",
-      "hint": "2 = 수량 · 10% = 할인 · @500 = 단가",
-      "oftenBilled": "자주 청구",
       "browse": {
         "all": "전체",
         "oral": "경구",
@@ -1332,7 +1330,6 @@
       "saved": "청구서 #{{seq}} 저장됨",
       "savedPlan": "청구서 #{{seq}} 저장됨 · 제안 업데이트됨",
       "promo": "{{offering}}에 {{offer}} 적용됨",
-      "contactSaved": "{{name}}을(를) 약국 연락처로 저장함 · 아래에 휴대폰 추가",
       "rxUnmatched": "{{name}}은(는) 의약품 목록에 없습니다 · 빠른 추가에서 추가하세요",
       "deleted": "청구서 #{{seq}} 삭제됨"
     },

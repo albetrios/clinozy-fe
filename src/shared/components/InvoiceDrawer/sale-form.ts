@@ -1,3 +1,4 @@
+import { rupeesOfPaise } from '@/lib/number-text.ts';
 import {
   balanceOf,
   type InvoiceBalance,
@@ -5,22 +6,31 @@ import {
   invoiceTotals,
   overallDiscountFromPercent,
 } from '@/shared/api/app/app-money.ts';
-import type { InvoiceInput as SaleInput } from '@/shared/api/app/invoices-fixture-contracts.ts';
+import type { MoneySplit } from '@/shared/api/app/payments-contracts.ts';
+import type { PrescriptionRecord } from '@/shared/api/app/prescriptions-contracts.ts';
 
 import {
   type InvoiceFormValues,
   namedLines,
-  paidNowSplits,
+  paidNowMoney,
   paidNowTotal,
   percentOf,
 } from './invoice-form.ts';
 
 /*
- * Medical's New sale in the shared drawer (`type: 'medical'`, D153 seam): the parked Medical
- * room sells on the fixture world, which prices its own lines — the medicines at MRP, the
- * overall percent before tax (Q-G7) — in paise. Its figures and its write live here, apart from
- * a clinic invoice's, which clinozy-be prices (`invoice-form.ts`).
+ * Medical's New sale in the shared drawer (`type: 'medical'`): the Medical room writes it
+ * (`POST /app/medical-sales`, handed in as {@link InvoiceSaleWrite} — shared code reads no
+ * room). The server draws each medicine from its batches by earliest expiry and prices it; the
+ * drawer's own sums — the medicines at MRP, the overall percent before tax (Q-G7), in paise like
+ * every form's money — are a guide until the sale is saved. No rate, free line or sale date is
+ * sent (MD19).
  */
+
+/**
+ * The id a new customer carries until the sale saves their contact ("Add contact “q”") — not a
+ * record id, so nothing reads it as one.
+ */
+export const NEW_CUSTOMER_ID = 'new-customer';
 
 /** A sale's figures: the totals, and the balance once "Paid now" lands. */
 export interface SaleDraftFigures {
@@ -50,38 +60,80 @@ export function draftFigures(
   };
 }
 
-/** What a sale's save sends to the fixture sales server (`S:1666`). */
-export function saleInputOf(
+/**
+ * A sale as the drawer hands the Medical room's write: the branch, the buyer's contact, each
+ * medicine with its quantity and discount, the overall discount (rupees), the team, the
+ * prescription it fills, the remark and "Paid now" (rupees).
+ */
+export interface SaleDraft {
+  branchId: string;
+  /** The buyer's contact (`con_…`). */
+  contactId: string;
+  items: { medicineId: string; qty: number; discountPct: number }[];
+  /** Off the whole bill, rupees. */
+  overallDiscount: number;
+  memberIds: string[];
+  prescriptionId: string | null;
+  remark: string | null;
+  payment: { splits: MoneySplit[] } | null;
+}
+
+/** What a written sale answers the drawer: its invoice, and the number its toast names. */
+export interface SaleDraftOutcome {
+  invoiceId: string;
+  seq: number;
+}
+
+/** Medical's New sale: the room's write, handed in (`POST /app/medical-sales`). */
+export interface InvoiceSaleWrite {
+  create: (draft: SaleDraft) => Promise<SaleDraftOutcome>;
+}
+
+/** What a sale's save hands the room's write, for the buyer's contact. */
+export function saleDraftOf(
   values: InvoiceFormValues,
-  fallbackBranchId: string,
-): SaleInput {
+  { contactId, fallbackBranchId }: { contactId: string; fallbackBranchId: string },
+): SaleDraft {
   const lines = namedLines(values.items);
-  const party = values.party;
   const remark = values.remark.trim();
+  const splits = paidNowMoney(values.paidNow);
   return {
-    type: values.type,
     branchId: values.branchId ?? fallbackBranchId,
-    patientId: party?.kind === 'patient' ? party.id : null,
-    medicalContactId: party?.kind === 'contact' ? party.id : null,
-    leadId: party?.kind === 'lead' ? party.id : null,
-    teamIds: values.teamIds,
-    items: lines.map((line) => ({
-      offeringId: line.offeringId,
-      medicineId: line.medicineId,
-      name: line.name.trim(),
-      packSize: line.packSize,
-      qty: line.qty,
-      rate: line.rate,
-      discountPct: line.discountPct,
-      gstPct: line.gstPct,
-    })),
-    overallDiscount: overallDiscountFromPercent(
-      lines,
-      percentOf(values.overallDiscountPct),
+    contactId,
+    items: lines.flatMap((line) =>
+      line.medicineId
+        ? [{ medicineId: line.medicineId, qty: line.qty, discountPct: line.discountPct }]
+        : [],
     ),
-    date: values.date,
-    remark: remark === '' ? null : remark,
+    overallDiscount: rupeesOfPaise(
+      overallDiscountFromPercent(lines, percentOf(values.overallDiscountPct)),
+    ),
+    memberIds: values.teamIds,
     prescriptionId: values.prescriptionId,
-    paidNow: paidNowSplits(values.paidNow),
+    remark: remark === '' ? null : remark,
+    payment: splits.length > 0 ? { splits } : null,
+  };
+}
+
+/** A prescription as a sale fills it: its number, its patient and its medicines. */
+export interface SalePrescription {
+  id: string;
+  seq: number;
+  /** The patient it was written for — a sale from it bills them. */
+  patientId: string;
+  medicines: { medicineId: string | null; name: string; qty: number }[];
+}
+
+/** A patient's prescription (clinozy-be's) as a sale reads it. */
+export function salePrescriptionOf(record: PrescriptionRecord): SalePrescription {
+  return {
+    id: record.id,
+    seq: record.seq,
+    patientId: record.patientId,
+    medicines: record.items.map((item) => ({
+      medicineId: item.medicineId,
+      name: item.medicineName,
+      qty: Math.max(1, item.qty),
+    })),
   };
 }

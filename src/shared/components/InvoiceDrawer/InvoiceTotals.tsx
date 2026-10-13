@@ -89,8 +89,8 @@ function TotalsCaption({
  * The totals above the footer (KICKOFF §6.9 Totals; AMBER placement): Subtotal · "Discount +
  * GST" ("−₹500 · +₹1,674") · Bill · "Due after this" — blush while something is due, else sage.
  * An invoice's are the server's preview of the save, captioned as such (`preview`); a Medical
- * sale's the fixture world's. Four cells in a row from `md`, two by two on a phone; dimmed while
- * a new preview is on its way.
+ * sale's the drawer's own sums at MRP (the server prices it on save). Four cells in a row from
+ * `md`, two by two on a phone; dimmed while a new preview is on its way.
  */
 export function InvoiceTotals({
   figures,

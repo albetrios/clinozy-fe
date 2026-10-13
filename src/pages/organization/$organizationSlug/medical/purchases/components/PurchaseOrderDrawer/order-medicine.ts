@@ -24,7 +24,7 @@ const K = MEDICAL_DRAWER_KEYS.purchaseOrder;
  * The medicine picker's options (`medical.md:261`): with a supplier picked,
  * the medicines it prices first ("From K R Medical Agency") then "Other
  * medicines"; each "8 in stock · ALVI" or "Out of stock · DERM", the
- * supplier's rate at the end.
+ * supplier's rate at the end (the API's rupees, as the line's paise).
  */
 export function useMedicineOptions(
   supplierId: string | null,
@@ -62,11 +62,11 @@ export function useMedicineOptions(
   ];
 }
 
-/** The medicine a line takes: its id and name, and the rate it starts at. */
+/** The medicine a line takes: its id (or a typed one's key) and name, and the rate it starts at. */
 export interface OrderLineMedicine {
   id: string;
   name: string;
-  /** The supplier's rate for it, else its best rate; 0 for a medicine just made. */
+  /** The supplier's rate for it, else its best rate, paise; 0 for a medicine just typed or made. */
   rate: number;
 }
 

@@ -9,6 +9,7 @@ import {
   useRestoreSale,
   useVoidSale,
 } from '../../hooks/useMedicalFlows/index.ts';
+import type { PurchaseCancelReason, SaleVoidReason } from '../../medical-contracts.ts';
 import {
   MEDICAL_DRAWER_KEYS,
   MEDICAL_DRAWERS_NS,
@@ -28,6 +29,20 @@ export interface MedicalFlowTarget {
    */
   record: string;
 }
+
+/** The void chips' values as the API names them (MD20); Wrong items and Other are the same. */
+const VOID_REASONS: Readonly<Record<string, SaleVoidReason>> = {
+  mistake: 'billed_by_mistake',
+  wrong_items: 'wrong_items',
+  changed_mind: 'customer_changed_mind',
+};
+
+/** The cancel chips are the API's own reasons (MD15); anything else is Other. */
+const CANCEL_REASONS = new Set<string>([
+  'mistake',
+  'supplier_cant_deliver',
+  'price_changed',
+]);
 
 /** Props of {@link MedicalFlowConfirm}. */
 export interface MedicalFlowConfirmProps {
@@ -80,10 +95,18 @@ export function MedicalFlowConfirm({ target, onClose, onDone }: MedicalFlowConfi
             }
           : undefined,
       }}
-      onConfirm={async ({ reason, note }) => {
+      onConfirm={async ({ picked, comment }) => {
         if (!target) return;
-        const write = cancelling ? cancel : voidSale;
-        await write.mutateAsync({ id: target.id, reason, note });
+        const note = comment || null;
+        if (cancelling) {
+          const reason = (
+            CANCEL_REASONS.has(picked.value) ? picked.value : 'other'
+          ) as PurchaseCancelReason;
+          await cancel.mutateAsync({ id: target.id, reason, note });
+        } else {
+          const reason = VOID_REASONS[picked.value] ?? 'other';
+          await voidSale.mutateAsync({ id: target.id, reason, note });
+        }
         onDone?.();
       }}
     />

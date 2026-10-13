@@ -1,193 +1,466 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
+vi.mock('@/core/http/api.ts', () => ({
+  api: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
+}));
+import { api } from '@/core/http/api.ts';
+import { appInstant } from '@/shared/api/app/app-time.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import {
-  appFixtures,
-  clinicOrganization,
-  resetAppFixtures,
-} from '@/shared/api/app/fixtures/world.fixtures.ts';
+  manufacturerWire,
+  medicalRepVisitWire,
+  medicalRepWire,
+  prescriptionToFillWire,
+  purchaseOrderWire,
+  saleDueWire,
+  saleWire,
+  supplierCreditWire,
+  supplierWire,
+  TEST_BUYER_CONTACT_ID,
+  TEST_MAKER_ID,
+  TEST_MR_ID,
+  TEST_PRESCRIPTION_ID,
+  TEST_PURCHASE_ORDER_ID,
+  TEST_SALE_ID,
+  TEST_SUPPLIER_CREDIT_ID,
+  TEST_SUPPLIER_ID,
+} from '@/tests/utils/medical-doubles.ts';
 
 import {
+  fetchAllManufacturers,
   fetchMedicalSale,
-  fetchPurchaseOrder,
+  fetchMrVisits,
+  fetchOldestOpenPurchaseOrder,
   fetchPurchaseOrderSheet,
-  fetchSupplier,
+  fetchSupplierAccount,
   listManufacturers,
   listMedicalReps,
   listMedicalSales,
+  listPrescriptionsToFill,
   listPurchaseOrders,
   listSaleReminders,
+  listSupplierCredits,
   listSuppliers,
   medicalListSummary,
+  medicalQueryKeys,
+  purchaseOrderListQuery,
+  saleListQuery,
 } from './medical-api.ts';
 
-afterEach(() => resetAppFixtures());
+/** The clinic's day every range here is read on. */
+const TODAY = '2026-10-10';
 
-describe('payment reminders (`medical.md:17`, Q-M6)', () => {
-  it('lists each customer the unpaid sales name, with their due and sales', async () => {
-    const { clinicName, customers } = await listSaleReminders();
-    expect(clinicName).toBe(clinicOrganization().name);
-    expect(customers).toEqual([
+/** A list page as the API answers it. */
+const page = (
+  data: unknown[],
+  next: string | null = null,
+  meta: Record<string, unknown> = {},
+) => ({
+  data,
+  meta: {
+    request_id: 'req',
+    pagination: {
+      per_page: 50,
+      next,
+      has_more: next !== null,
+      estimated_total: data.length,
+    },
+    ...meta,
+  },
+});
+
+/** Answer each GET by its path. */
+function answer(byPath: Record<string, (query: Record<string, unknown>) => unknown>) {
+  vi.mocked(api.get).mockImplementation(((path: string, init?: { query?: object }) => {
+    const reply = byPath[path];
+    if (!reply) throw new Error(`unexpected GET ${path}`);
+    return Promise.resolve(reply((init?.query ?? {}) as Record<string, unknown>));
+  }) as never);
+}
+
+/** The query a GET to `path` was sent with (the last one). */
+function queryOf(path: string) {
+  const call = vi
+    .mocked(api.get)
+    .mock.calls.filter(([called]) => called === path)
+    .at(-1);
+  return (call?.[1] as { query?: Record<string, unknown> } | undefined)?.query;
+}
+
+beforeEach(() => {
+  vi.resetAllMocks();
+  signInTestMember();
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(new Date(appInstant(TODAY, '10:00')));
+});
+afterEach(() => {
+  vi.useRealTimers();
+  useOrganizationStore.getState().clearOrganization();
+});
+
+describe('the keys', () => {
+  it('all sit under the room’s prefix and the organization', () => {
+    expect(medicalQueryKeys.sales('org_test', { status: 'unpaid' })).toEqual([
+      'app',
+      'medical',
+      'org_test',
+      'sales',
+      { status: 'unpaid' },
+    ]);
+    expect(medicalQueryKeys.catalogue('org_test', 'suppliers')).toEqual([
+      'app',
+      'medical',
+      'org_test',
+      'catalogue',
+      'suppliers',
+    ]);
+  });
+});
+
+describe('Sales', () => {
+  it('the query: search, status, Created, the sorts as the API names them', () => {
+    expect(saleListQuery({}, TODAY)).toEqual({
+      limit: 50,
+      q: undefined,
+      status: undefined,
+      created_from: undefined,
+      created_to: undefined,
+      sort: undefined,
+      order: undefined,
+    });
+    expect(
+      saleListQuery(
+        {
+          q: ' S-978 ',
+          status: 'unpaid',
+          created: 'today',
+          sort: 'customer',
+          order: 'asc',
+        },
+        TODAY,
+      ),
+    ).toEqual({
+      limit: 50,
+      q: 'S-978',
+      status: 'unpaid',
+      created_from: appInstant(TODAY, '00:00'),
+      created_to: appInstant('2026-10-11', '00:00'),
+      sort: 'contact_name',
+      order: 'asc',
+    });
+  });
+
+  it('a page maps each sale — its buyer, invoice, lines and money in rupees', async () => {
+    answer({ '/app/medical-sales': () => page([saleWire()], 'cursor_b') });
+    const result = await listMedicalSales({ status: 'unpaid' }, 'cursor_a');
+    expect(queryOf('/app/medical-sales')).toMatchObject({
+      status: 'unpaid',
+      after: 'cursor_a',
+    });
+    expect(result.next).toBe('cursor_b');
+    expect(result.rows[0]).toMatchObject({
+      id: TEST_SALE_ID,
+      seq: 978,
+      status: 'unpaid',
+      customer: { id: TEST_BUYER_CONTACT_ID, name: 'Priya Shah' },
+      invoice: { number: 'INV-25-0042', total: 1300, due: 1300 },
+      bill: 1300,
+      due: 1300,
+      lines: [{ name: 'Azelaic gel 15g', qty: 2, expiry: '12/27', amount: 1300 }],
+    });
+  });
+
+  it('one sale, its returns as kept (a store credit names its credit)', async () => {
+    answer({
+      '/app/medical-sales/{medical_sale_id}': () => ({
+        data: saleWire({
+          status: 'returned',
+          returned_amount: 650,
+          returns: [
+            {
+              id: 'msrt_one00000000000000000',
+              reason: 'unused',
+              refund_mode: 'credit',
+              note: null,
+              amount: 650,
+              invoice_credit_note_id: 'cn_one000000000000000000',
+              pending_credit_id: 'pcr_one00000000000000000',
+              items: [
+                {
+                  invoice_item_id: 'iitm_line00000000000000000',
+                  quantity: 1,
+                  amount: 650,
+                  is_restocked: true,
+                },
+              ],
+              returned_by_membership_id: null,
+              created_at: '2026-10-10T06:00:00.000Z',
+            },
+          ],
+        }),
+      }),
+    });
+    const sale = await fetchMedicalSale(TEST_SALE_ID);
+    expect(sale.returned).toBe(650);
+    expect(sale.returns[0]).toMatchObject({
+      refundMode: 'credit',
+      pendingCreditId: 'pcr_one00000000000000000',
+      items: [{ qty: 1, restocked: true }],
+    });
+  });
+
+  it('the reminders: who owes, from the clinic — a sale without a buyer has no one', async () => {
+    answer({
+      '/app/medical-sales/dues': () =>
+        page([saleDueWire(), saleDueWire({ contact: null, patient_id: null })]),
+      '/tenancy/organization': () => ({ data: { name: 'Skin Studio' } }),
+    });
+    const reminders = await listSaleReminders({ q: 'Priya' }, TODAY);
+    expect(queryOf('/app/medical-sales/dues')).toMatchObject({ limit: 100, q: 'Priya' });
+    expect(reminders.clinicName).toBe('Skin Studio');
+    expect(reminders.customers).toEqual([
       {
-        customer: expect.objectContaining({ kind: 'patient', name: 'Dharti Galani' }),
-        due: 56_300,
-        saleSeqs: [978],
+        customer: {
+          id: TEST_BUYER_CONTACT_ID,
+          name: 'Priya Shah',
+          phone: '+919900011122',
+          patientId: expect.any(String),
+        },
+        due: 1300,
+        sales: [{ id: TEST_SALE_ID, seq: 978, due: 1300, soldAt: expect.any(String) }],
       },
     ]);
-    // The list's search applies: Rhea's sale is paid, so no one is left.
-    expect((await listSaleReminders({ q: 'rhea' })).customers).toEqual([]);
   });
 
-  it('sums a customer’s unpaid sales, oldest first', async () => {
-    // Rhea's #983 becomes Dharti's, its payment undone.
-    const dharti = (await appFixtures.medicalSales.get(ref.medicalSale(978))).patientId;
-    const sale = await appFixtures.medicalSales.update(ref.medicalSale(983), {
-      patientId: dharti,
+  it('Prescriptions to fill: the approved ones no sale has filled, with their patient', async () => {
+    answer({
+      '/app/patient-prescriptions': () =>
+        page([prescriptionToFillWire(), prescriptionToFillWire({ patient: null })]),
     });
-    for (const payment of appFixtures.payments.snapshot(
-      (row) => row.invoiceId === sale.invoiceId,
-    )) {
-      await appFixtures.payments.remove(payment.id, 'mistake', null);
-    }
-    const { bill } = await fetchMedicalSale(sale.id);
-    const { customers } = await listSaleReminders();
-    expect(customers).toHaveLength(1);
-    expect(customers[0]).toMatchObject({ due: 56_300 + bill, saleSeqs: [978, 983] });
+    const queue = await listPrescriptionsToFill();
+    expect(queryOf('/app/patient-prescriptions')).toEqual({
+      limit: 20,
+      status: 'approved',
+      is_filled: 'false',
+      sort: 'prescription_date',
+      order: 'desc',
+    });
+    expect(queue).toEqual([
+      {
+        id: TEST_PRESCRIPTION_ID,
+        seq: 58,
+        patientId: expect.any(String),
+        contactId: TEST_BUYER_CONTACT_ID,
+        patientName: 'Priya Shah',
+        date: '2026-10-10',
+        medicines: ['Azelaic gel 15g'],
+      },
+    ]);
   });
 });
 
-describe('the purchase order sheet (Q-M7)', () => {
-  it('reads the order with its supplier, the clinic and its main branch', async () => {
-    const sheet = await fetchPurchaseOrderSheet(ref.purchaseOrder(428));
-    expect(sheet.order).toMatchObject({ seq: 428, supplierName: 'Akshar Medicines' });
-    expect(sheet.supplier.name).toBe('Akshar Medicines');
-    expect(sheet.organization).toMatchObject({ name: clinicOrganization().name });
-    const [main] = appFixtures.branches.snapshot((row) => row.isMain);
-    expect(sheet.branch).toEqual({
-      phone: main?.phone,
-      gstNumber: main?.gstNumber ?? null,
+describe('Purchases', () => {
+  it('the Stage filter: Paid is a received order paid in full', () => {
+    expect(purchaseOrderListQuery({ stage: 'ordered' }, TODAY)).toMatchObject({
+      stage: 'ordered',
     });
-    // A supplier removed since still prints on its order.
-    await appFixtures.suppliers.remove(ref.supplier(52), 'mistake', null);
-    expect((await fetchPurchaseOrderSheet(ref.purchaseOrder(428))).supplier.name).toBe(
-      'Akshar Medicines',
+    expect(purchaseOrderListQuery({ stage: 'received' }, TODAY)).toMatchObject({
+      stage: 'received',
+      payment_status: 'unpaid,partial',
+    });
+    expect(
+      purchaseOrderListQuery({ stage: 'paid', sort: 'total', order: 'desc' }, TODAY),
+    ).toMatchObject({ stage: 'received', payment_status: 'paid', sort: 'total' });
+  });
+
+  it('a received order paid in full shows as Paid', async () => {
+    answer({
+      '/app/medical-purchase-orders': () =>
+        page([
+          purchaseOrderWire(),
+          purchaseOrderWire({
+            id: 'mpo_paid0000000000000000',
+            payment_status: 'paid',
+            paid_amount: 4236,
+            due_amount: 0,
+          }),
+        ]),
+    });
+    const { rows } = await listPurchaseOrders();
+    expect(rows.map((row) => [row.apiStage, row.stage])).toEqual([
+      ['received', 'received'],
+      ['received', 'paid'],
+    ]);
+    expect(rows[0]?.lines[0]).toMatchObject({ expiry: '12/27', rate: 423.6 });
+  });
+
+  it('"Pay ₹X" reads the supplier’s oldest received order still due', async () => {
+    answer({ '/app/medical-purchase-orders': () => page([purchaseOrderWire()]) });
+    expect((await fetchOldestOpenPurchaseOrder(TEST_SUPPLIER_ID))?.id).toBe(
+      TEST_PURCHASE_ORDER_ID,
     );
+    expect(queryOf('/app/medical-purchase-orders')).toEqual({
+      supplier_id: TEST_SUPPLIER_ID,
+      stage: 'received',
+      payment_status: 'unpaid,partial',
+      sort: 'order_date',
+      order: 'asc',
+      limit: 1,
+    });
+    answer({ '/app/medical-purchase-orders': () => page([]) });
+    expect(await fetchOldestOpenPurchaseOrder(TEST_SUPPLIER_ID)).toBeNull();
+  });
+
+  it('the print sheet: the order, the clinic, and its main branch', async () => {
+    answer({
+      '/app/medical-purchase-orders/{medical_purchase_order_id}': () => ({
+        data: purchaseOrderWire(),
+      }),
+      '/tenancy/organization': () => ({
+        data: { name: 'Skin Studio', specialties: ['skin'], currency: 'INR' },
+      }),
+      '/app/branches/my': () =>
+        page([
+          { is_main: false, phone: '+910000000000', gst_number: null },
+          { is_main: true, phone: '+912612345678', gst_number: '24ABCDE1234F1Z5' },
+        ]),
+    });
+    const sheet = await fetchPurchaseOrderSheet(TEST_PURCHASE_ORDER_ID);
+    expect(sheet.order.seq).toBe(431);
+    expect(sheet.organization.name).toBe('Skin Studio');
+    expect(sheet.branch).toEqual({
+      phone: '+912612345678',
+      gstNumber: '24ABCDE1234F1Z5',
+    });
   });
 });
 
-describe('sales (`S:1657`)', () => {
-  it('reads each sale with its customer, lines, bill, cost and status, newest first', async () => {
-    const { items } = await listMedicalSales();
-    expect(items.map((sale) => sale.seq)).toEqual([983, 982, 978]);
-    const unpaid = await fetchMedicalSale(ref.medicalSale(978));
-    expect(unpaid).toMatchObject({
-      invoiceSeq: 788,
-      customer: { kind: 'patient', name: 'Dharti Galani' },
-      bill: 56_300,
-      due: 56_300,
-      status: 'unpaid',
+describe('Suppliers', () => {
+  it('a page with the filters as the API takes them', async () => {
+    answer({ '/app/suppliers': () => page([supplierWire()]) });
+    const { rows } = await listSuppliers({
+      manufacturer: TEST_MAKER_ID,
+      hasPayable: true,
+      sort: 'payable',
+      order: 'desc',
     });
-    expect(unpaid.lines.map((line) => [line.name, line.qty, line.batchNo])).toEqual([
-      ['Beyolaic Cream', 1, 'ADE25510'],
-      ['Glycolac Cream', 2, '026-312'],
-    ]);
-    // Cost at the best buy rates: 1 × ₹227 + 2 × ₹123.
-    expect(unpaid.cost).toBe(47_300);
-    expect(items.find((sale) => sale.seq === 982)?.customer).toMatchObject({
-      kind: 'contact',
-      name: 'Viral Sheth',
+    expect(queryOf('/app/suppliers')).toMatchObject({
+      manufacturer_id: TEST_MAKER_ID,
+      has_payable: 'true',
+      sort: 'payable',
+      order: 'desc',
+    });
+    expect(rows[0]).toMatchObject({
+      payable: 827,
+      ageingDays: 5,
+      manufacturerIds: [TEST_MAKER_ID],
+      orderTotal: 4236,
     });
   });
 
-  it('filters Unpaid and Returned, searches the customer or "#983"', async () => {
-    expect((await listMedicalSales({ status: 'unpaid' })).items).toHaveLength(1);
-    expect((await listMedicalSales({ status: 'returned' })).items).toHaveLength(0);
-    expect((await listMedicalSales({ q: 'rhea' })).items.map((s) => s.seq)).toEqual([
-      983,
+  it('an Account: its orders and credits, the latest first', async () => {
+    answer({
+      '/app/medical-purchase-orders': () => page([purchaseOrderWire()]),
+      '/app/suppliers/{supplier_id}/credits': () => page([supplierCreditWire()]),
+    });
+    expect(await fetchSupplierAccount(TEST_SUPPLIER_ID)).toEqual([
+      {
+        kind: 'credit',
+        id: TEST_SUPPLIER_CREDIT_ID,
+        batchNo: '026-312',
+        date: '2026-10-08',
+        amount: 840,
+      },
+      {
+        kind: 'order',
+        id: TEST_PURCHASE_ORDER_ID,
+        seq: 431,
+        billNo: 'T-82370',
+        date: '2026-10-04',
+        stage: 'received',
+        amount: 4236,
+        due: 827,
+      },
     ]);
-    expect((await listMedicalSales({ q: '#982' })).items.map((s) => s.seq)).toEqual([
-      982,
-    ]);
-    const byBill = await listMedicalSales({ sort: 'bill', order: 'asc' });
-    expect(byBill.items.map((sale) => sale.seq)).toEqual([982, 978, 983]);
+  });
+
+  it('the credits: every supplier’s, or one supplier’s', async () => {
+    answer({
+      '/app/supplier-credits': () => page([supplierCreditWire()]),
+      '/app/suppliers/{supplier_id}/credits': () => page([supplierCreditWire()]),
+    });
+    const all = await listSupplierCredits({ status: 'open' });
+    expect(queryOf('/app/supplier-credits')).toMatchObject({ limit: 50, status: 'open' });
+    expect(all.rows[0]).toMatchObject({
+      amount: 840,
+      status: 'open',
+      batchNo: '026-312',
+    });
+    await listSupplierCredits({ supplier: TEST_SUPPLIER_ID });
+    expect(vi.mocked(api.get).mock.calls.at(-1)?.[1]).toMatchObject({
+      params: { supplier_id: TEST_SUPPLIER_ID },
+    });
+  });
+
+  it('the footer reads what the filtered suppliers are owed', async () => {
+    answer({
+      '/app/suppliers': () => page([supplierWire()], null, { payable_total: 2980 }),
+    });
+    expect(await medicalListSummary('suppliers', { hasPayable: true }, TODAY)).toEqual({
+      total: 1,
+      payable: 2980,
+    });
+    expect(queryOf('/app/suppliers')).toMatchObject({ has_payable: 'true', limit: 1 });
   });
 });
 
-describe('purchase orders (`S:1661`)', () => {
-  it('reads each order’s supplier, items, free units, total and due — owed only once received', async () => {
-    const { items } = await listPurchaseOrders();
-    expect(items.map((order) => order.seq)).toEqual([431, 430, 428]);
-    const received = await fetchPurchaseOrder(ref.purchaseOrder(431));
-    expect(received).toMatchObject({
-      supplierName: 'Shree Ramdev Medical Agency',
-      itemNames: ['Admosh UV Sunscreen 60g', 'Arganlif Hair Serum 50 ml'],
-      freeCount: 1,
-      total: 298_000,
-      due: 298_000,
+describe('Manufacturers and MRs', () => {
+  it('a manufacturers page by name, filtered by one supplier and one MR', async () => {
+    answer({ '/app/manufacturers': () => page([manufacturerWire()]) });
+    const { rows } = await listManufacturers({
+      supplier: TEST_SUPPLIER_ID,
+      mr: TEST_MR_ID,
     });
-    expect((await fetchPurchaseOrder(ref.purchaseOrder(430))).due).toBe(0);
-    // Paid ₹1,200 of ₹1,296 is still Paid: settled, nothing owed.
-    expect((await fetchPurchaseOrder(ref.purchaseOrder(428))).due).toBe(0);
+    expect(queryOf('/app/manufacturers')).toMatchObject({
+      supplier_id: TEST_SUPPLIER_ID,
+      medical_rep_id: TEST_MR_ID,
+      sort: 'name',
+    });
+    expect(rows[0]).toMatchObject({
+      name: 'SUN PHARMA',
+      medicineCount: 14,
+      suppliers: [{ id: TEST_SUPPLIER_ID, name: 'Ankur Pharma' }],
+      mrs: [{ id: TEST_MR_ID, name: 'Rahul Mehta' }],
+    });
   });
 
-  it('filters by stage and searches the bill number', async () => {
-    expect((await listPurchaseOrders({ stage: 'ordered' })).items).toHaveLength(1);
-    expect((await listPurchaseOrders({ q: '1631' })).items.map((o) => o.seq)).toEqual([
-      431,
-    ]);
-  });
-});
-
-describe('suppliers, manufacturers and MRs (`S:1662`)', () => {
-  it('derives what each supplier is owed, since when, and its oldest open bill', async () => {
-    const owed = await fetchSupplier(ref.supplier(58));
-    expect(owed).toMatchObject({
-      payable: 298_000,
-      orderCount: 1,
-      hasOpenOrder: true,
-      oldestOpenBill: { id: ref.purchaseOrder(431), seq: 431, due: 298_000 },
-    });
-    expect(owed.ageingDays).toBeGreaterThanOrEqual(0);
-    const clear = await fetchSupplier(ref.supplier(59));
-    expect(clear).toMatchObject({ payable: 0, ageingDays: null, orderCount: 0 });
-    const { items } = await listSuppliers({ manufacturer: [ref.manufacturer(6)] });
-    expect(items.map((supplier) => supplier.name)).toEqual([
-      'Akshar Medicines',
-      'NH Pharma',
+  it('the whole manufacturer list reads every page', async () => {
+    vi.mocked(api.get)
+      .mockResolvedValueOnce(page([manufacturerWire()], 'cursor_b') as never)
+      .mockResolvedValueOnce(
+        page([
+          manufacturerWire({ id: 'mfr_other00000000000000000', name: 'ALVI' }),
+        ]) as never,
+      );
+    expect((await fetchAllManufacturers()).map((maker) => maker.name)).toEqual([
+      'SUN PHARMA',
+      'ALVI',
     ]);
   });
 
-  it('joins each maker’s medicines, suppliers and MRs', async () => {
-    const { items } = await listManufacturers();
-    const alvi = items.find((maker) => maker.name === 'ALVI');
-    expect(alvi).toMatchObject({
-      medicineCount: 1,
-      suppliers: [{ name: 'K R Medical Agency' }, { name: 'Akshar Medicines' }],
-      mrs: [{ name: 'Alvio Pharma · Rakesh' }],
+  it('an MRs page and an MR’s visits, the latest first', async () => {
+    answer({
+      '/app/medical-reps': () => page([medicalRepWire({ is_visit_overdue: true })]),
+      '/app/medical-reps/{medical_rep_id}/visits': () => page([medicalRepVisitWire()]),
     });
-    const filtered = await listManufacturers({ mrs: [ref.medicalRep(3)] });
-    expect(filtered.items.map((maker) => maker.name)).toEqual(['AVRI', 'PHARM']);
-  });
-
-  it('reads each MR’s makers and last visit', async () => {
-    const { items } = await listMedicalReps();
-    expect(items.map((mr) => mr.name)).toEqual([
-      'Alvio Pharma · Rakesh',
-      'Atopic Dermocare · Meet',
-      'Avriva Skintech · Jay',
-    ]);
-    expect(items[0]).toMatchObject({ samples: '5 samples' });
-    expect(items[2]).toMatchObject({ samples: null });
-  });
-
-  it('answers the footers’ counts and what the suppliers are owed', async () => {
-    expect(await medicalListSummary('sales', {})).toEqual({ total: 3, payable: 0 });
-    expect(await medicalListSummary('suppliers', {})).toEqual({
-      total: 4,
-      payable: 298_000,
+    const { rows } = await listMedicalReps({ q: 'Rahul' });
+    expect(rows[0]).toMatchObject({ name: 'Rahul Mehta', visitOverdue: true });
+    const visits = await fetchMrVisits(TEST_MR_ID);
+    expect(queryOf('/app/medical-reps/{medical_rep_id}/visits')).toMatchObject({
+      sort: 'visit_date',
+      order: 'desc',
     });
-    expect((await medicalListSummary('manufacturers', {})).total).toBe(6);
-    expect((await medicalListSummary('mrs', {})).total).toBe(3);
-    expect((await medicalListSummary('purchases', { stage: 'paid' })).total).toBe(1);
+    expect(visits[0]).toMatchObject({ mrId: TEST_MR_ID, date: '2026-10-01' });
   });
 });

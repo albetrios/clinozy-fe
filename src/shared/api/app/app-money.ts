@@ -3,7 +3,6 @@ import type {
   InvoiceItem,
   MedicalPurchaseOrder,
   Payment,
-  PaymentMode,
   PurchaseItem,
 } from '@/shared/api/app/app-schema.ts';
 
@@ -112,44 +111,6 @@ export interface InvoiceBalance {
   status: InvoiceStatus;
 }
 
-/** Money in and out of one payment mode, in paise. */
-interface ModeFlow {
-  in: number;
-  out: number;
-}
-
-/** A day's money by payment mode. */
-export type DayModeTotals = Readonly<Record<PaymentMode, ModeFlow>>;
-
-/**
- * A day's entries by mode (Q-G5): each split row counts under its own mode, and
- * Credit — a credit used on a bill — apart from the cash. Deleted entries do not
- * count (`S:715`; the prototype dropped split entries, H:5111).
- */
-export function dayModeTotals(
-  payments: readonly Pick<Payment, 'direction' | 'splits' | 'deletedAt'>[],
-): DayModeTotals {
-  const totals: Record<PaymentMode, ModeFlow> = {
-    cash: { in: 0, out: 0 },
-    upi: { in: 0, out: 0 },
-    card: { in: 0, out: 0 },
-    credit: { in: 0, out: 0 },
-  };
-  for (const payment of payments) {
-    if (payment.deletedAt !== null) continue;
-    for (const split of payment.splits) {
-      if (payment.direction === 'received') totals[split.mode].in += split.amount;
-      else totals[split.mode].out += split.amount;
-    }
-  }
-  return totals;
-}
-
-/** What the drawer should hold: the opening cash, plus cash in, less cash out (`S:715`). */
-export function expectedDrawerCash(openingCash: number, totals: DayModeTotals): number {
-  return openingCash + totals.cash.in - totals.cash.out;
-}
-
 /**
  * A bill against what has been paid on it (H:3633): what is still due — never
  * below zero — and the status, "Paid" once nothing is due, "Partly paid" once
@@ -228,25 +189,13 @@ export function discountForFinal(item: LineFields, final: number): number {
   return Math.max(0, Math.min(100, (1 - wanted / full) * 100));
 }
 
-/**
- * The lowest Final a line may come to (H:5059): its floor per unit times the
- * quantity, with the line's GST on top unless the floor already includes it
- * (a GST-inclusive offering, Q-O3). `null` when the line has no floor.
- */
-export function lineFloor(
-  line: Pick<InvoiceItem, 'qty' | 'gstPct'>,
-  floorPerUnit: number | null,
-  gstInclusive = false,
-): number | null {
-  if (floorPerUnit === null || floorPerUnit <= 0) return null;
-  const base = floorPerUnit * line.qty;
-  return gstInclusive ? base : base * (1 + line.gstPct / 100);
-}
-
 /** Half a rupee: a Final that rounds to its floor is not below it (H:5059). */
 const FLOOR_TOLERANCE = 50;
 
-/** Whether a line comes to less than its floor ({@link lineFloor}). */
+/**
+ * Whether a line comes to less than its floor — the lowest Final it may come to, its floor per
+ * unit times the quantity (H:5059).
+ */
 export function belowFloor(item: LineFields, floor: number | null): boolean {
   return floor !== null && invoiceLineAmounts(item).net + FLOOR_TOLERANCE < floor;
 }

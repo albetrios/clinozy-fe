@@ -8,7 +8,11 @@ import { sortParamsOf } from '@/lib/routes/search-params.ts';
 import type { MedicalSearch } from '../medical.search.ts';
 import type { SaleListParams } from '../shared/medical-contracts.ts';
 
-/** The list read's params for the URL as it stands — what the tab hands `useSaleList`. */
+/**
+ * The list read's params for the URL as it stands — what the tab hands `useSaleList`: the
+ * search, Status (Unpaid · Paid · Returned), Created and the sort the API serves (Sale,
+ * Customer, Bill).
+ */
 export function saleParamsOf(search: MedicalSearch): SaleListParams {
   return {
     q: search.q,

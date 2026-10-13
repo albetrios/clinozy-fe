@@ -3,26 +3,23 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
-import {
-  appFixtures,
-  resetAppFixtures,
-} from '@/shared/api/app/fixtures/world.fixtures.ts';
-import { fixtureLedgerQueryKeys } from '@/shared/api/app/payments-fixture-api.ts';
-
-import { medicalQueryKeys } from '../../medical-api.ts';
-import {
-  useCancelPurchaseOrder,
-  useCollectSale,
-  useCreatePurchaseOrder,
-  usePrescriptionsToFill,
-  useReceivePurchaseOrder,
-  useReturnExpiringStock,
-  useReturnSale,
-  useUpdatePurchaseOrder,
-  useVoidSale,
-} from './useMedicalFlows.ts';
-
+vi.mock('../../medical-records-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  createPurchaseOrder: vi.fn(),
+  updatePurchaseOrder: vi.fn(),
+  cancelPurchaseOrder: vi.fn(),
+  receivePurchaseOrder: vi.fn(),
+  createSale: vi.fn(),
+  collectSale: vi.fn(),
+  returnSale: vi.fn(),
+  voidSale: vi.fn(),
+  createSupplierCredit: vi.fn(),
+  voidSupplierCredit: vi.fn(),
+}));
+vi.mock('../../medical-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  listPrescriptionsToFill: vi.fn(),
+}));
 vi.mock('@/shared/notify/index.ts', () => ({
   notify: {
     success: vi.fn(),
@@ -35,21 +32,60 @@ vi.mock('@/shared/notify/index.ts', () => ({
   TOAST_DURATION_MS: { default: 5200, error: 9000, undo: 10_000 },
 }));
 
-/** 10:00 on 3 Oct, clinic time. */
-const NOW = new Date('2026-10-03T04:30:00Z');
+import { creditQueryKeys } from '@/shared/api/app/credits-api.ts';
+import { medicineQueryKeys } from '@/shared/api/app/medicines-api.ts';
+import { paymentQueryKeys } from '@/shared/api/app/payments-api.ts';
+import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
+import {
+  paidSaleRow,
+  prescriptionToFill,
+  purchaseOrderRow,
+  saleRow,
+  supplierCreditRow,
+  TEST_BATCH_ID,
+  TEST_MEDICINE_ID,
+  TEST_SALE_INVOICE_ITEM_ID,
+  TEST_SUPPLIER_CREDIT_ID,
+  TEST_SUPPLIER_ID,
+} from '@/tests/utils/medical-doubles.ts';
+import { ledgerRow } from '@/tests/utils/payments-doubles.ts';
+
+import { listPrescriptionsToFill, medicalQueryKeys } from '../../medical-api.ts';
+import {
+  cancelPurchaseOrder,
+  collectSale,
+  createPurchaseOrder,
+  createSupplierCredit,
+  receivePurchaseOrder,
+  returnSale,
+  voidSale,
+  voidSupplierCredit,
+} from '../../medical-records-api.ts';
+import {
+  useCancelPurchaseOrder,
+  useCollectSale,
+  useCreatePurchaseOrder,
+  usePrescriptionsToFill,
+  useReceivePurchaseOrder,
+  useReturnExpiringStock,
+  useReturnSale,
+  useVoidSale,
+  useVoidSupplierCredit,
+} from './useMedicalFlows.ts';
 
 /** Every write under test, on one query client. */
 function useAll() {
   const quiet = { notifyOnError: false } as const;
   return {
     create: useCreatePurchaseOrder(quiet),
-    update: useUpdatePurchaseOrder(quiet),
     cancel: useCancelPurchaseOrder(quiet),
     receive: useReceivePurchaseOrder(quiet),
     collect: useCollectSale(quiet),
     returnSale: useReturnSale(quiet),
     voidSale: useVoidSale(quiet),
     returnExpiring: useReturnExpiringStock(quiet),
+    voidCredit: useVoidSupplierCredit(quiet),
   };
 }
 
@@ -65,124 +101,138 @@ function invalidated(spy: ReturnType<typeof vi.spyOn>): unknown[] {
 }
 
 beforeEach(() => {
-  vi.useFakeTimers({ toFake: ['Date'] });
-  vi.setSystemTime(NOW);
-  resetAppFixtures();
+  vi.resetAllMocks();
+  signInTestMember();
   client = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
 });
 afterEach(() => {
-  vi.useRealTimers();
-  resetAppFixtures();
+  client.clear();
+  useOrganizationStore.getState().clearOrganization();
 });
 
 describe('the purchase-order writes', () => {
-  it('create, save, receive and cancel, refreshing the room — a receipt also Send payment’s bills', async () => {
+  it('each carries its own idempotency key and refreshes the room and its medicines', async () => {
+    vi.mocked(createPurchaseOrder).mockResolvedValue(purchaseOrderRow());
     const spy = vi.spyOn(client, 'invalidateQueries');
     const { result } = renderHook(useAll, { wrapper });
-    let created = '';
-    await act(async () => {
-      const order = await result.current.create.mutateAsync({
-        supplierId: ref.supplier(61),
-        supplierBillNo: null,
-        date: '2026-10-03',
-        items: [{ medicineId: ref.medicine(458), qty: 2, free: 0, rate: 44_000 }],
-      });
-      created = order.id;
-    });
+    const input = {
+      supplierId: TEST_SUPPLIER_ID,
+      supplierBillNo: null,
+      date: '2026-10-10',
+      items: [{ medicineId: TEST_MEDICINE_ID, qty: 2, free: 0, rate: 420 }],
+    };
+    await act(() => result.current.create.mutateAsync(input));
+    const sent = vi.mocked(createPurchaseOrder).mock.calls[0]?.[0];
+    expect(sent?.input).toEqual(input);
+    expect(sent?.idempotencyKey).toEqual(expect.any(String));
     expect(invalidated(spy)).toContainEqual(medicalQueryKeys.all);
+    expect(invalidated(spy)).toContainEqual(medicineQueryKeys.all);
+  });
 
-    await act(async () => {
-      await result.current.update.mutateAsync({
-        id: created,
-        input: {
-          supplierId: ref.supplier(61),
-          supplierBillNo: 'T-1',
-          date: '2026-10-03',
-          items: [{ medicineId: ref.medicine(458), qty: 3, free: 0, rate: 44_000 }],
-        },
-      });
-    });
-    expect((await appFixtures.purchaseOrders.get(created)).supplierBillNo).toBe('T-1');
-
-    spy.mockClear();
-    await act(async () => {
-      await result.current.receive.mutateAsync({
-        id: created,
-        input: { lines: [{ arrived: true, batchNo: 'B-1', expiry: '12/27' }] },
-      });
-    });
-    expect(invalidated(spy)).toContainEqual(fixtureLedgerQueryKeys.openBills());
-
-    await act(async () => {
-      await result.current.cancel.mutateAsync({
-        id: ref.purchaseOrder(430),
-        reason: 'mistake',
+  it('a receipt refreshes the bills Send payment offers; a cancel sends why', async () => {
+    vi.mocked(receivePurchaseOrder).mockResolvedValue(purchaseOrderRow());
+    vi.mocked(cancelPurchaseOrder).mockResolvedValue(undefined);
+    const spy = vi.spyOn(client, 'invalidateQueries');
+    const { result } = renderHook(useAll, { wrapper });
+    await act(() =>
+      result.current.receive.mutateAsync({
+        id: purchaseOrderRow().id,
+        input: { lines: [] },
+      }),
+    );
+    expect(invalidated(spy)).toContainEqual(paymentQueryKeys.openBills());
+    await act(() =>
+      result.current.cancel.mutateAsync({
+        id: purchaseOrderRow().id,
+        reason: 'price_changed',
         note: null,
-      });
-    });
-    expect((await appFixtures.purchaseOrders.get(ref.purchaseOrder(430))).stage).toBe(
-      'cancelled',
+      }),
+    );
+    expect(cancelPurchaseOrder).toHaveBeenCalledWith(
+      purchaseOrderRow().id,
+      'price_changed',
+      null,
     );
   });
 });
 
 describe('the sale writes', () => {
-  it('collect, return and void, refreshing the ledger and its readers', async () => {
+  it('collect, return and void refresh the ledger, its readers and the credits', async () => {
+    vi.mocked(collectSale).mockResolvedValue(ledgerRow());
+    vi.mocked(returnSale).mockResolvedValue(paidSaleRow());
+    vi.mocked(voidSale).mockResolvedValue(undefined);
     const spy = vi.spyOn(client, 'invalidateQueries');
     const { result } = renderHook(useAll, { wrapper });
-    await act(async () => {
-      await result.current.collect.mutateAsync(ref.medicalSale(978));
+    await act(() => result.current.collect.mutateAsync({ sale: saleRow(), mode: 'upi' }));
+    expect(vi.mocked(collectSale).mock.calls[0]?.[0]).toMatchObject({
+      sale: saleRow(),
+      mode: 'upi',
+      idempotencyKey: expect.any(String),
     });
-    expect(invalidated(spy)).toContainEqual(fixtureLedgerQueryKeys.all);
+    expect(invalidated(spy)).toContainEqual(paymentQueryKeys.all);
+    expect(invalidated(spy)).toContainEqual(creditQueryKeys.all);
 
-    await act(async () => {
-      const back = await result.current.returnSale.mutateAsync({
-        saleId: ref.medicalSale(983),
-        input: {
-          lines: [{ medicineId: ref.medicine(454), batchNo: 'ASC002', qty: 1 }],
-          reason: 'unused',
-          mode: 'cash',
-        },
-      });
-      expect(back.refunded).toBe(55_000);
+    const back = {
+      lines: [{ invoiceItemId: TEST_SALE_INVOICE_ITEM_ID, qty: 1 }],
+      reason: 'unused' as const,
+      mode: 'credit' as const,
+      note: null,
+    };
+    await act(() =>
+      result.current.returnSale.mutateAsync({ saleId: paidSaleRow().id, input: back }),
+    );
+    expect(vi.mocked(returnSale).mock.calls[0]?.[0]).toMatchObject({
+      id: paidSaleRow().id,
+      input: back,
     });
-  });
 
-  it('voids an unpaid sale', async () => {
-    const { result } = renderHook(useAll, { wrapper });
-    await act(async () => {
-      await result.current.voidSale.mutateAsync({
-        id: ref.medicalSale(978),
-        reason: 'mistake',
+    await act(() =>
+      result.current.voidSale.mutateAsync({
+        id: saleRow().id,
+        reason: 'wrong_items',
         note: null,
-      });
-    });
-    expect(
-      (await appFixtures.medicalSales.get(ref.medicalSale(978))).voidedAt,
-    ).not.toBeNull();
+      }),
+    );
+    expect(voidSale).toHaveBeenCalledWith(saleRow().id, 'wrong_items', null);
   });
 });
 
 describe('stock back to a supplier, and the prescriptions to fill', () => {
-  it('returns expiring stock for a credit', async () => {
+  it('returns expiring stock for a credit, and voids one', async () => {
+    vi.mocked(createSupplierCredit).mockResolvedValue(supplierCreditRow());
+    vi.mocked(voidSupplierCredit).mockResolvedValue(undefined);
     const { result } = renderHook(useAll, { wrapper });
     await act(async () => {
       const credit = await result.current.returnExpiring.mutateAsync({
-        medicineId: ref.medicine(456),
-        batchNo: '026-312',
-        supplierId: ref.supplier(52),
-        qty: 1,
+        supplierId: TEST_SUPPLIER_ID,
+        batchId: TEST_BATCH_ID,
+        qty: 2,
       });
-      expect(credit).toMatchObject({ qty: 1, credit: 12_300 });
+      expect(credit).toMatchObject({ qty: 2, amount: 840 });
+    });
+    await act(() =>
+      result.current.voidCredit.mutateAsync({
+        supplierId: TEST_SUPPLIER_ID,
+        creditId: TEST_SUPPLIER_CREDIT_ID,
+        reason: 'supplier_refused',
+        note: null,
+      }),
+    );
+    expect(voidSupplierCredit).toHaveBeenCalledWith({
+      supplierId: TEST_SUPPLIER_ID,
+      creditId: TEST_SUPPLIER_CREDIT_ID,
+      reason: 'supplier_refused',
+      note: null,
     });
   });
 
   it('reads the prescriptions to fill only when asked', async () => {
+    vi.mocked(listPrescriptionsToFill).mockResolvedValue([prescriptionToFill()]);
     const idle = renderHook(() => usePrescriptionsToFill(false), { wrapper });
     expect(idle.result.current.fetchStatus).toBe('idle');
     const { result } = renderHook(() => usePrescriptionsToFill(), { wrapper });
-    await waitFor(() => expect(result.current.data?.[0]?.seq).toBe(501));
+    await waitFor(() => expect(result.current.data?.[0]?.seq).toBe(58));
   });
 });

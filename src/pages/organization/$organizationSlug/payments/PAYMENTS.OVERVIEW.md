@@ -124,8 +124,9 @@ opens the entry's drawer over Day close. Accept and Close day need `payment:upda
 The data is the shared money domain on clinozy-be: `@/shared/api/app/payments-api.ts`,
 `@/shared/api/app/invoices-api.ts`, `@/shared/api/app/credits-api.ts` and
 `@/shared/api/app/day-close-api.ts`, their contracts beside them, and the hooks in
-`@/shared/hooks/usePayments/` and `@/shared/hooks/useCredits/`. Medical › Payments stays on the
-fixture copies (`@/shared/api/app/payments-fixture-api.ts`, `@/shared/hooks/useFixtureLedger/`).
+`@/shared/hooks/usePayments/` and `@/shared/hooks/useCredits/`. Medical › Payments and Credits
+read the store's own slice through the same modules (`GET /app/medical-payments`,
+`GET /app/medical-pending-credits`).
 
 ## Files
 

@@ -15,7 +15,8 @@ import {
   supplierAgeingTone,
 } from './medical-tones.ts';
 
-const ID = '0b9c7a3e-2f6d-4f8a-9c1e-5d4b3a2f1e0d';
+// A public id as clinozy-be sends it (`<prefix>_<21 [a-z0-9]>`); a UUID is dropped.
+const ID = 'mfr_sunpharma000000000000';
 
 describe('medical.search.ts (the entry chunk’s reader)', () => {
   it('keeps every tab’s valid keys and drops the rest', () => {
@@ -27,8 +28,9 @@ describe('medical.search.ts (the entry chunk’s reader)', () => {
         expiry: 30,
         stage: 'received',
         manufacturer: `${ID},nope`,
+        payable: 'owed',
         suppliers: [ID],
-        mrs: 'x',
+        mrs: '0b9c7a3e-2f6d-4f8a-9c1e-5d4b3a2f1e0d',
         sort: 'bill:desc',
         created: 'last_7',
       }),
@@ -39,6 +41,7 @@ describe('medical.search.ts (the entry chunk’s reader)', () => {
       expiry: '30',
       stage: 'received',
       manufacturer: [ID],
+      payable: 'owed',
       suppliers: [ID],
       mrs: undefined,
       sort: 'bill:desc',
@@ -52,7 +55,7 @@ describe('medical.search.ts (the entry chunk’s reader)', () => {
 
   it('pins the filter values to the contract (the reader cannot import the schema)', () => {
     expect([...PURCHASE_STAGES, 'cancelled'].sort()).toEqual([...PO_STAGE_VALUES].sort());
-    expect(SALE_STATUSES).toEqual(['unpaid', 'returned']);
+    expect(SALE_STATUSES).toEqual(['unpaid', 'paid', 'returned']);
     expect(MEDICINE_EXPIRY_FILTERS).toEqual(['30', '60', '90']);
     expect(STOCK_CATEGORY_VALUES).toContain('consumables');
   });
@@ -67,7 +70,7 @@ describe('the family’s rules', () => {
     });
     expect(SALE_STATUS_TONES).toEqual({ paid: 'sage', unpaid: 'blush' });
     expect([3, 7, 30].map(supplierAgeingTone)).toEqual(['sage', 'butter', 'blush']);
-    expect(nextVisitTone('2026-10-03', '2026-10-04')).toBe('blush');
-    expect(nextVisitTone('2026-10-04', '2026-10-04')).toBe('sky');
+    expect(nextVisitTone(true)).toBe('blush');
+    expect(nextVisitTone(false)).toBe('sky');
   });
 });

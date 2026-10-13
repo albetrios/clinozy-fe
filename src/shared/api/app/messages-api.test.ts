@@ -107,7 +107,6 @@ describe('the contact history (Appendix F merged feed)', () => {
       'checkIn',
       'invoice',
       'payment',
-      'invoice',
       'checkIn',
       'review',
       'appointment',

@@ -83,7 +83,7 @@ test.describe('Organization switching (Account menu › Switch clinic)', () => {
     const claims: string[] = [];
     page.on('request', (request) => {
       const authorization = request.headers().authorization;
-      if (!authorization || !request.url().includes('/api/v1/app/')) return;
+      if (!(authorization && request.url().includes('/api/v1/app/'))) return;
       claims.push(
         organizationClaimOf(authorization.replace(/^Bearer\s+/i, '')) ?? 'none',
       );

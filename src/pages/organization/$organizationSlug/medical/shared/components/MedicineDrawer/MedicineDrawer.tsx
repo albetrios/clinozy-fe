@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import { isolateText, isolateValues } from '@/lib/bidi-isolate.ts';
 import { displayId } from '@/shared/api/app/app-display-id.ts';
-import type { MedicineRecord } from '@/shared/api/app/medicines-contracts.ts';
+import type { MedicineRow } from '@/shared/api/app/medicines-contracts.ts';
 import { SECTION_TONES } from '@/shared/app/app-tones.ts';
 import {
   DrawerChips,
@@ -89,7 +89,7 @@ interface MedicineDrawerBaseProps {
   /** Stacked on another drawer: "Back", "Add medicine", no "full details" of its own. */
   stacked?: boolean;
   /** The saved record — a stacked child hands it to the field that asked. */
-  onSaved?: (medicine: MedicineRecord) => void;
+  onSaved?: (medicine: MedicineRow) => void;
   /** Opens a manufacturer or supplier on top for "full details"; a stacked drawer passes none. */
   openChild?: OpenMedicalChild;
   testId?: string;
@@ -99,7 +99,7 @@ interface MedicineDrawerBaseProps {
 export type MedicineDrawerProps = MedicineDrawerBaseProps &
   (
     | { mode: 'create'; prefill?: { name?: string } }
-    | { mode: 'edit'; medicine: MedicineRecord | undefined }
+    | { mode: 'edit'; medicine: MedicineRow | undefined }
   );
 
 /** What the bodies read. */
@@ -375,8 +375,8 @@ function useFirstMaker(
 /** The write: a create or a save, its toast, and whose the record is after. */
 function useMedicineSave(
   form: UseFormReturn<MedicineFormValues>,
-  medicine: MedicineRecord | null,
-  onDone: (record: MedicineRecord) => void,
+  medicine: MedicineRow | null,
+  onDone: (record: MedicineRow) => void,
   openStep: (step: string) => void,
 ) {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
@@ -388,7 +388,7 @@ function useMedicineSave(
     notifyOnError: false,
     successMessage: (record) => t(K.toasts.saved, { name: record.name }),
   });
-  return useDrawerSave<MedicineFormValues, MedicineRecord>({
+  return useDrawerSave<MedicineFormValues, MedicineRow>({
     form,
     fieldOrder: [
       'name',
@@ -424,7 +424,7 @@ function useMedicineSave(
     write: () => {
       const input = medicineInputOf(form.getValues());
       return medicine
-        ? update.mutateAsync({ id: medicine.id, patch: input })
+        ? update.mutateAsync({ record: medicine, input })
         : create.mutateAsync(input);
     },
     onDone,
@@ -442,7 +442,7 @@ function MedicineSession({
   openChild,
   testId,
 }: MedicineDrawerBaseProps & {
-  medicine: MedicineRecord | null;
+  medicine: MedicineRow | null;
   prefill?: { name?: string };
   testId: string;
 }) {

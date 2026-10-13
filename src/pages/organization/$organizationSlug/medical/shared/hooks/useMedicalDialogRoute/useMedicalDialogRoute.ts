@@ -6,6 +6,7 @@ import {
   type RoomDialogRouteState,
   useRoomDialogRoute,
 } from '@/shared/hooks/useRoomDialogRoute/index.ts';
+import { useOrganizationId } from '@/shared/store/useOrganizationStore/index.ts';
 
 import {
   type MedicalCreateSearch,
@@ -24,7 +25,8 @@ export interface UseMedicalDialogRouteOptions<T> {
   tab: MedicalTab;
   /** The route param naming the record (`medicineId`, `supplierId`). */
   param: string;
-  queryKey: (id: string) => QueryKey;
+  /** The record's query key in the organization (`medicalQueryKeys.supplier`). */
+  queryKey: (organizationId: string | null, id: string) => QueryKey;
   fetchRecord: (id: string) => Promise<T>;
   /** The record's name in "<Record> not found · it may have been deleted". */
   recordLabel: string;
@@ -34,15 +36,19 @@ export interface UseMedicalDialogRouteOptions<T> {
  * Which drawer a Medical tab's URL opens (KICKOFF §6.7 Routes) — the shared
  * room dialog route over the Medical section: a create needs Medical Create,
  * an unknown id goes back to the list with "<Record> not found", and `close`
- * keeps the tab's search, filters and sort.
+ * keeps the tab's search, filters and sort. The record's key carries the
+ * active organization.
  */
 export function useMedicalDialogRoute<T>({
   tab,
+  queryKey,
   ...options
 }: UseMedicalDialogRouteOptions<T>): MedicalDialogRouteState<T> {
   const nav = useMedicalNav();
+  const organizationId = useOrganizationId();
   return useRoomDialogRoute({
     ...options,
+    queryKey: (id) => queryKey(organizationId, id),
     section: 'medical',
     close: () => nav.close(tab),
     readPrefill: validateMedicalCreateSearch,

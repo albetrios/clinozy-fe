@@ -2,16 +2,27 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ref } from '@/shared/api/app/fixtures/refs.fixtures.ts';
-import { resetAppFixtures } from '@/shared/api/app/fixtures/world.fixtures.ts';
+vi.mock('../../../shared/medical-records-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  collectSale: vi.fn(),
+}));
+vi.mock('@/shared/api/app/payments-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  deletePayment: vi.fn(),
+}));
+
+import { deletePayment } from '@/shared/api/app/payments-api.ts';
 import type { ViewportTier } from '@/shared/hooks/useViewportTier/index.ts';
+import { signInTestMember } from '@/tests/utils/app-shell-doubles.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { paidSaleRow, saleRow } from '@/tests/utils/medical-doubles.ts';
+import { ledgerRow } from '@/tests/utils/payments-doubles.ts';
 
 import {
   renderMedicalDrawer,
   resetMedicalRoutes,
 } from '../../../__tests__/integration/medical-test-router.tsx';
-import { fetchMedicalSale } from '../../../shared/medical-api.ts';
+import { collectSale } from '../../../shared/medical-records-api.ts';
 import { SaleDrawer } from './SaleDrawer.tsx';
 
 const viewport = vi.hoisted(() => ({ tier: 'desktop' as ViewportTier }));
@@ -35,9 +46,10 @@ vi.mock('@/shared/notify/index.ts', () => ({
   TOAST_DURATION_MS: { default: 5200, error: 9000, undo: 10_000 },
 }));
 
-/** 10:00 on 3 Oct, clinic time. */
-const NOW = new Date('2026-10-03T04:30:00Z');
+/** 10:00 on 10 Oct, clinic time. */
+const NOW = new Date('2026-10-10T04:30:00Z');
 const D = 'sale-drawer';
+const RECEIPT_ID = 'pay_receipt00000000000000';
 const setup = () =>
   userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
 
@@ -45,58 +57,82 @@ beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] });
   vi.setSystemTime(NOW);
   for (const fn of Object.values(notifyMock)) fn.mockReset();
-  resetAppFixtures();
+  signInTestMember();
+  vi.mocked(collectSale).mockResolvedValue(ledgerRow({ id: RECEIPT_ID, amount: 1300 }));
+  vi.mocked(deletePayment).mockResolvedValue(undefined);
 });
 afterEach(() => {
   vi.useRealTimers();
   resetMedicalRoutes();
-  resetAppFixtures();
+  vi.mocked(collectSale).mockReset();
+  vi.mocked(deletePayment).mockReset();
 });
 
 describe('SaleDrawer (medical.md:333–338)', () => {
-  it('an unpaid sale: its badges and medicines, "Collect ₹563" on the ledger with Undo', async () => {
+  it('an unpaid sale: its badges and medicines, "Collect ₹1,300" on the ledger with Undo', async () => {
     const user = setup();
-    const sale = await fetchMedicalSale(ref.medicalSale(978));
+    const sale = saleRow();
     renderMedicalDrawer(
       <SaleDrawer open sale={sale} onClose={vi.fn()} onReturn={vi.fn()} />,
     );
     const drawer = await screen.findByTestId(D);
     expect(within(drawer).getByTestId(`${D}-title`)).toHaveTextContent('Sale');
     expect(within(drawer).getByTestId(`${D}-tag`)).toHaveTextContent('#978');
-    expect(drawer).toHaveTextContent('Dharti Galani');
+    expect(drawer).toHaveTextContent('Priya Shah');
     const badges = within(drawer).getByTestId(`${D}-badges`);
     expect(badges).toHaveTextContent('Unpaid');
-    expect(badges).toHaveTextContent('Invoice #788 · in patient file');
-    expect(badges).toHaveTextContent('₹563');
-    expect(within(drawer).getAllByTestId(`${D}-lines-row`)).toHaveLength(2);
+    expect(badges).toHaveTextContent('Invoice #INV-25-0042 · in patient file');
+    expect(badges).toHaveTextContent('₹1,300');
+    const [line] = within(drawer).getAllByTestId(`${D}-lines-row`);
+    expect(line).toHaveTextContent('Azelaic gel 15g');
+    expect(line).toHaveTextContent('026-312');
     expect(within(drawer).getByTestId(`${D}-summary`)).toHaveTextContent(
-      '2 medicines · ₹563',
+      '1 medicine · ₹1,300',
     );
     expect(await axeForDialog(drawer)).toHaveNoViolations();
 
     const collect = within(drawer).getByTestId(`${D}-save`);
-    expect(collect).toHaveTextContent('Collect ₹563');
+    expect(collect).toHaveTextContent('Collect ₹1,300');
     await user.click(collect);
     await waitFor(() =>
       expect(notifyMock.undo).toHaveBeenCalledWith(
-        '₹563 received',
+        '₹1,300 received',
         expect.objectContaining({ onUndo: expect.any(Function) }),
       ),
     );
-    expect((await fetchMedicalSale(ref.medicalSale(978))).status).toBe('paid');
+    expect(collectSale).toHaveBeenCalledWith(
+      expect.objectContaining({ sale, mode: 'upi', idempotencyKey: expect.any(String) }),
+    );
 
     const [, options] = notifyMock.undo.mock.calls[0] as [string, { onUndo: () => void }];
     options.onUndo();
-    await waitFor(async () =>
-      expect((await fetchMedicalSale(ref.medicalSale(978))).status).toBe('unpaid'),
+    await waitFor(() =>
+      expect(deletePayment).toHaveBeenCalledWith({
+        paymentId: RECEIPT_ID,
+        reason: 'mistake',
+        note: null,
+      }),
     );
+  });
+
+  it('a Pharmacist collects without an Undo — deleting a payment is not theirs', async () => {
+    const user = setup();
+    renderMedicalDrawer(
+      <SaleDrawer open sale={saleRow()} onClose={vi.fn()} onReturn={vi.fn()} />,
+      { role: 'pharmacist' },
+    );
+    const drawer = await screen.findByTestId(D);
+    await user.click(within(drawer).getByTestId(`${D}-save`));
+    await waitFor(() =>
+      expect(notifyMock.success).toHaveBeenCalledWith('₹1,300 received'),
+    );
+    expect(notifyMock.undo).not.toHaveBeenCalled();
   });
 
   it('offers Void on an unpaid sale with nothing paid or returned', async () => {
     const user = setup();
-    const sale = await fetchMedicalSale(ref.medicalSale(978));
     renderMedicalDrawer(
-      <SaleDrawer open sale={sale} onClose={vi.fn()} onReturn={vi.fn()} />,
+      <SaleDrawer open sale={saleRow()} onClose={vi.fn()} onReturn={vi.fn()} />,
     );
     const drawer = await screen.findByTestId(D);
     const voidButton = within(drawer).getByTestId(`${D}-delete`);
@@ -104,20 +140,15 @@ describe('SaleDrawer (medical.md:333–338)', () => {
     await user.click(voidButton);
     const dialog = await screen.findByRole('alertdialog');
     expect(within(dialog).getByText('Void this sale?')).toBeInTheDocument();
-    expect(dialog).toHaveTextContent('2 medicines · ₹563');
+    expect(dialog).toHaveTextContent('1 medicine · ₹1,300');
   });
 
-  it('a paid sale offers "Return medicines" and its returned amount', async () => {
+  it('a sale paid in full offers "Return medicines" and its returned amount', async () => {
     const user = setup();
     const onReturn = vi.fn();
-    const sale = await fetchMedicalSale(ref.medicalSale(983));
+    const sale = paidSaleRow({ status: 'returned', returned: 239 });
     renderMedicalDrawer(
-      <SaleDrawer
-        open
-        sale={{ ...sale, returned: 23_900 }}
-        onClose={vi.fn()}
-        onReturn={onReturn}
-      />,
+      <SaleDrawer open sale={sale} onClose={vi.fn()} onReturn={onReturn} />,
     );
     const drawer = await screen.findByTestId(D);
     const badges = within(drawer).getByTestId(`${D}-badges`);
@@ -128,19 +159,34 @@ describe('SaleDrawer (medical.md:333–338)', () => {
     expect(onReturn).toHaveBeenCalledWith(expect.objectContaining({ id: sale.id }));
   });
 
-  it('a walk-in’s sale names no patient file, and a viewer gets only Close', async () => {
-    const sale = await fetchMedicalSale(ref.medicalSale(978));
+  it('never offers a return to a Pharmacist (`payment:delete`, MD23)', async () => {
+    renderMedicalDrawer(
+      <SaleDrawer open sale={paidSaleRow()} onClose={vi.fn()} onReturn={vi.fn()} />,
+      { role: 'pharmacist' },
+    );
+    const drawer = await screen.findByTestId(D);
+    expect(within(drawer).queryByTestId(`${D}-save`)).not.toBeInTheDocument();
+  });
+
+  it('a buyer with no patient file names no invoice, and a viewer gets only Close', async () => {
     renderMedicalDrawer(
       <SaleDrawer
         open
-        sale={{ ...sale, customer: null }}
+        sale={saleRow({
+          customer: {
+            id: 'con_walkin0000000000000000',
+            name: 'Meera Joshi',
+            phone: null,
+            patientId: null,
+          },
+        })}
         onClose={vi.fn()}
         onReturn={vi.fn()}
       />,
-      { role: 'accountant' },
+      { role: 'doctor' },
     );
     const drawer = await screen.findByTestId(D);
-    expect(drawer).toHaveTextContent('Walk-in customer');
+    expect(drawer).toHaveTextContent('Meera Joshi');
     expect(within(drawer).getByTestId(`${D}-badges`)).not.toHaveTextContent('Invoice');
     expect(within(drawer).queryByTestId(`${D}-save`)).not.toBeInTheDocument();
     expect(within(drawer).queryByTestId(`${D}-delete`)).not.toBeInTheDocument();

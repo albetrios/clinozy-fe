@@ -527,6 +527,7 @@
       "treatment": "Apri trattamento",
       "patient": "Apri paziente",
       "invoice": "Apri fattura",
+      "medicalRep": "Apri informatore",
       "checkIn": "Apri check-in",
       "review": "Apri recensione"
     },

@@ -37,7 +37,7 @@ export function usePlainProps<T>(props: PickerProps<T>): PickerProps<T> {
     [plain, selectedOptions],
   );
   const plainLoader = useMemo((): PickerLoader<T> | undefined => {
-    if (!plain || !loadOptions) return loadOptions;
+    if (!(plain && loadOptions)) return loadOptions;
     return (query, cursor) =>
       loadOptions(query, cursor).then((page) => ({
         ...page,

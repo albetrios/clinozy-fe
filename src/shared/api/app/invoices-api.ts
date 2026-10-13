@@ -218,7 +218,7 @@ async function detailOf(invoice: InvoiceRecord): Promise<InvoiceDetail> {
     listInvoicePayments(invoice.id),
     sheetOf(invoice.branchId),
   ]);
-  return { invoice, party: invoicePartyOf(invoice), sale: null, payments, sheet };
+  return { invoice, party: invoicePartyOf(invoice), payments, sheet };
 }
 
 /**

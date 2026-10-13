@@ -3,6 +3,7 @@ export {
   type MedicineDeleteVars,
   type MedicineUpdateVars,
   type NearExpiryDiscountVars,
+  type NearExpiryWindowVars,
   useCreateMedicine,
   useDeleteMedicine,
   useMedicine,
@@ -11,5 +12,6 @@ export {
   useQuickCreateMedicine,
   useRestoreMedicine,
   useSetNearExpiryDiscount,
+  useSetNearExpiryDiscountWithin,
   useUpdateMedicine,
 } from './useMedicines.ts';

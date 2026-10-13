@@ -22,28 +22,11 @@ import type {
   InvoiceRecord,
   InvoiceSaveResult,
 } from '@/shared/api/app/invoices-contracts.ts';
-import {
-  addMedicalContact,
-  createSale,
-  fetchOftenBilled,
-  fetchPrescriptionPreset,
-  fetchSalePresets,
-  fixtureInvoiceQueryKeys,
-  setMedicalContactPhone,
-} from '@/shared/api/app/invoices-fixture-api.ts';
-import type {
-  InvoiceInput as SaleInput,
-  InvoiceSaveResult as SaleSaveResult,
-  OftenBilledKind,
-  SaleContact,
-} from '@/shared/api/app/invoices-fixture-contracts.ts';
 import { taskQueryKeys } from '@/shared/api/app/tasks-api.ts';
 import { useAppMutation } from '@/shared/hooks/useAppMutation/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import type { CrudMutationOptions } from '@/shared/hooks/useCreate/index.ts';
 import { useCursorList } from '@/shared/hooks/useCursorList/index.ts';
-import { FIXTURE_MONEY_WRITE_KEYS } from '@/shared/hooks/useFixtureLedger/index.ts';
-import { MEDICINE_WRITE_KEYS } from '@/shared/hooks/useMedicines/index.ts';
 import { MONEY_WRITE_KEYS } from '@/shared/hooks/usePayments/index.ts';
 import { useOrganizationId } from '@/shared/store/useOrganizationStore/index.ts';
 
@@ -149,8 +132,8 @@ export function useInvoicePreview(
 
 /**
  * Bill a clinic or consultation invoice — not optimistic: the drawer shows "Saving…" and raises
- * its own toast ("Clinic invoice #788 created"). A Medical sale goes through
- * {@link useCreateSale}.
+ * its own toast ("Clinic invoice #788 created"). A Medical sale is the Medical room's write
+ * (`POST /app/medical-sales`), handed to the drawer.
  */
 export function useCreateInvoice(
   options: CrudMutationOptions<InvoiceSaveResult, InvoiceInput> = {},
@@ -212,91 +195,6 @@ export function useRestoreInvoice(
   return useAppMutation<InvoiceRecord, string>({
     mutationFn: (id, action) => restoreInvoice(id, action.idempotencyKey),
     invalidateKeys: [...INVOICE_WRITE_KEYS],
-    ...options,
-  });
-}
-
-// ── A Medical sale (the parked Medical room's, on the fixture world — D153 seam) ──
-
-/**
- * What a fixture sale refreshes: the fixture money reads, the tasks, and the medicines' stock and
- * the Medical room.
- */
-const SALE_WRITE_KEYS: readonly QueryKey[] = [
-  ...FIXTURE_MONEY_WRITE_KEYS,
-  fixtureInvoiceQueryKeys.all,
-  taskQueryKeys.all,
-  ...MEDICINE_WRITE_KEYS,
-];
-
-/** Quick fill's reads for a sale's patient — their latest prescription; idle without one. */
-export function useSalePresets(patientId: string | null) {
-  return useAppQuery({
-    queryKey: fixtureInvoiceQueryKeys.presets(patientId ?? ''),
-    queryFn: () => fetchSalePresets(patientId ?? ''),
-    enabled: patientId !== null,
-  });
-}
-
-/** A prescription a sale starts from (`?prescription=`); idle without one. */
-export function usePrescriptionPreset(id: string | null) {
-  return useAppQuery({
-    queryKey: fixtureInvoiceQueryKeys.prescription(id ?? ''),
-    queryFn: () => fetchPrescriptionPreset(id ?? ''),
-    enabled: id !== null,
-  });
-}
-
-/** "Often billed" (H:5058): the five names a sale bills most, medicines or offerings. */
-export function useOftenBilled(kind: OftenBilledKind) {
-  return useAppQuery({
-    queryKey: fixtureInvoiceQueryKeys.oftenBilled(kind),
-    queryFn: () => fetchOftenBilled(kind),
-    staleTime: 5 * 60_000,
-  });
-}
-
-/**
- * Create a Medical sale — its invoice, the stock drawn by earliest expiry, the receipt — not
- * optimistic; the drawer raises its own toast.
- */
-export function useCreateSale(
-  options: CrudMutationOptions<SaleSaveResult, SaleInput> = {},
-) {
-  return useAppMutation<SaleSaveResult, SaleInput>({
-    mutationFn: createSale,
-    invalidateKeys: [...SALE_WRITE_KEYS],
-    ...options,
-  });
-}
-
-/**
- * "Add contact “q”" in a Medical sale's customer field — saved at once (the drawer toasts "Viral
- * Sheth saved as a Medical contact · add a mobile below").
- */
-export function useAddMedicalContact(
-  options: CrudMutationOptions<SaleContact, string> = {},
-) {
-  return useAppMutation<SaleContact, string>({
-    mutationFn: addMedicalContact,
-    invalidateKeys: [fixtureInvoiceQueryKeys.customers()],
-    ...options,
-  });
-}
-
-/** What a new contact's mobile sends. */
-export interface MedicalContactPhoneVars {
-  id: string;
-  phone: string | null;
-}
-
-/** The Mobile field under a new Medical contact — "saved on the contact". */
-export function useSetMedicalContactPhone(
-  options: CrudMutationOptions<SaleContact, MedicalContactPhoneVars> = {},
-) {
-  return useAppMutation<SaleContact, MedicalContactPhoneVars>({
-    mutationFn: ({ id, phone }) => setMedicalContactPhone(id, phone),
-    invalidateKeys: [fixtureInvoiceQueryKeys.customers()],
     ...options,
   });
 }

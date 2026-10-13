@@ -2,32 +2,38 @@ import { Outlet, useNavigate, useParams, useSearch } from '@tanstack/react-route
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { downloadCsv } from '@/lib/csv.ts';
 import { organizationPaymentEdit } from '@/lib/routes/payments-builders.ts';
 import { LEDGER_FILTER_VALUES } from '@/shared/api/app/ledger-filter-values.ts';
-import type { LedgerRow } from '@/shared/api/app/payments-contracts.ts';
-import type { FixtureLedgerListParams } from '@/shared/api/app/payments-fixture-contracts.ts';
+import { exportStoreLedger } from '@/shared/api/app/payments-api.ts';
+import type { LedgerListParams, LedgerRow } from '@/shared/api/app/payments-contracts.ts';
 import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
 import { PAYMENT_KIND_TONES, PAYMENT_MODE_TONES } from '@/shared/app/app-tones.ts';
 import {
   LEDGER_KEYS,
   LEDGER_NS,
+  ledgerEntryEditable,
+  ledgerEntryFixed,
   ledgerEntryLock,
 } from '@/shared/components/LedgerCells/index.ts';
 import {
   PaymentDeleteConfirm,
   type PaymentDeleteTarget,
 } from '@/shared/components/PaymentDeleteConfirm/index.ts';
+import { PaymentReverseConfirm } from '@/shared/components/PaymentReverseConfirm/index.ts';
 import {
   type RoomFilterCopy,
   type RoomFilterFields,
+  RoomViewAction,
   useRoomFilters,
 } from '@/shared/components/RoomToolbar/index.ts';
-import { useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
-import { useFixtureLedgerList } from '@/shared/hooks/useFixtureLedger/index.ts';
+import { notifyError } from '@/shared/errors/errorHandler.ts';
+import { canExportRows, useAppAccess } from '@/shared/hooks/useAppAccess/index.ts';
 import { useLedgerRowActions } from '@/shared/hooks/useLedgerRowActions/index.ts';
 import { ledgerRowTone, useLedgerTable } from '@/shared/hooks/useLedgerTable/index.ts';
 import { usePreferences } from '@/shared/hooks/usePreferences/index.ts';
 import { useRoomList } from '@/shared/hooks/useRoomList/index.ts';
+import { FileIcon } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 import { MEDICAL_KEYS, MEDICAL_NS, MEDICAL_TABLE_IDS } from '../medical.constants.ts';
@@ -37,6 +43,7 @@ import {
 } from '../medical.search.ts';
 import { MedicalTable } from '../shared/components/MedicalTable/index.ts';
 import { MedicalToolbar } from '../shared/components/MedicalToolbar/index.ts';
+import { useStoreLedger } from '../shared/hooks/useMedicalLists/index.ts';
 import { useMedicalNav } from '../shared/hooks/useMedicalNav/index.ts';
 
 const TABLE_ID = MEDICAL_TABLE_IDS.payments;
@@ -80,30 +87,63 @@ function useFilterCopy(): Readonly<Record<string, RoomFilterCopy>> {
   };
 }
 
-/** The ledger read for the URL: its filters and search, the header branches, the Medical scope. */
+/** The store's ledger read for the URL: its filters and search, and the header branches. */
 function ledgerParamsOf(
   search: MedicalPaymentsSearch,
   branchIds: readonly string[],
-): FixtureLedgerListParams {
+): LedgerListParams {
   return {
     kind: search.kind,
     mode: search.mode,
     created: search.created,
     q: search.q,
     branchIds: branchIds.length > 0 ? [...branchIds] : undefined,
-    scope: 'medical',
   };
 }
 
+/** The export file the server names, when it names none. */
+const EXPORT_FILE_NAME = 'medical-payments.csv';
+
 /**
- * Medical › Payments (KICKOFF §6.7; `medical.md:121–135`): the Payments ledger
- * limited to Medical (`scope=medical`, `S:71`, `S:1662`) — receipts on Medical
- * invoices ("Sale · Invoice #785"), payments of Medical PO bills and expenses
- * in Medicines — under the Medical toolbar, "New sale" its primary. The shared
- * ledger columns, no sort; What, Mode, Created and the search in the URL. An
- * open day's entry opens in Payments (`/payments/$paymentId/edit` — the
- * drawer over the Payments ledger, a standing deviation, `S:87`) with Edit and
- * Delete in its row; a closed day's answers "PAY-5501 · Day closed".
+ * Export (`medicine:export`, MD31): the server's CSV of every payment the filters match — not
+ * only the rows loaded — saved as a file; past the API's 10,000 it says so.
+ */
+function ExportAction({ params }: { params: LedgerListParams }) {
+  const { t } = useTranslation(MEDICAL_NS);
+  const [busy, setBusy] = useState(false);
+  const run = () => {
+    setBusy(true);
+    exportStoreLedger(params)
+      .then((file) => {
+        downloadCsv(file.fileName || EXPORT_FILE_NAME, file.content);
+        if (file.truncated) notify.warning(t(MEDICAL_KEYS.payments.exportTruncated));
+        else notify.success(t(MEDICAL_KEYS.payments.exported));
+      })
+      .catch((error: unknown) => notifyError(error))
+      .finally(() => setBusy(false));
+  };
+  return (
+    <RoomViewAction
+      actionId="export"
+      icon={FileIcon}
+      label={t(MEDICAL_KEYS.payments.export)}
+      title={t(MEDICAL_KEYS.payments.exportTitle)}
+      tableId={TABLE_ID}
+      disabled={busy}
+      onClick={run}
+    />
+  );
+}
+
+/**
+ * Medical › Payments (KICKOFF §6.7; `medical.md:121–135`) on clinozy-be — the store's slice of
+ * the ledger (`GET /app/medical-payments`, MD31): receipts and refunds on its sales, supplier
+ * bills of its orders, `medicines` expenses and their reversals — under the Medical toolbar,
+ * "New sale" its primary. The shared ledger columns, no sort; What, Mode, Created and the search
+ * in the URL. The store manages its money here (D89): an open day's entry opens in Payments
+ * (`/payments/$paymentId/edit` — the drawer over the Payments ledger, a standing deviation,
+ * `S:87`) with Edit and Delete (Undo) in its row; a closed day's answers "PAY-5501 · Day closed"
+ * and offers Reverse; Export saves the server's CSV of the filtered payments.
  */
 export function MedicalPaymentsPage() {
   const { t } = useTranslation(MEDICAL_NS);
@@ -117,8 +157,10 @@ export function MedicalPaymentsPage() {
   const filters = useRoomFilters(MEDICAL_LEDGER_FILTER_FIELDS);
   const filterCopy = useFilterCopy();
   const [deleting, setDeleting] = useState<PaymentDeleteTarget | null>(null);
+  const [reversing, setReversing] = useState<LedgerRow | null>(null);
 
-  const list = useFixtureLedgerList(ledgerParamsOf(search, preferences.branchFilter));
+  const params = ledgerParamsOf(search, preferences.branchFilter);
+  const list = useStoreLedger(params);
   const { rows, loading } = useRoomList(
     list,
     TABLE_ID,
@@ -132,10 +174,19 @@ export function MedicalPaymentsPage() {
       notify.info(lock);
       return;
     }
+    if (!ledgerEntryEditable(row)) {
+      notify.info(ledgerEntryFixed(row, tLedger));
+      return;
+    }
     void navigate({ ...organizationPaymentEdit(organizationSlug, row.id), search: {} });
   };
-  const rowActions = useLedgerRowActions({ onEdit: openEntry, onDelete: setDeleting });
+  const rowActions = useLedgerRowActions({
+    onEdit: openEntry,
+    onDelete: setDeleting,
+    onReverse: setReversing,
+  });
   const canCreate = access.isResolved && access.can('medical', 'create');
+  const canExport = canExportRows(access, 'medicine:export');
 
   return (
     <section data-testid="medical-payments-page" className="flex min-h-0 flex-1 flex-col">
@@ -143,6 +194,7 @@ export function MedicalPaymentsPage() {
         tab="payments"
         table={table}
         filters={{ fields: MEDICAL_LEDGER_FILTER_FIELDS, copy: filterCopy }}
+        viewAction={canExport ? <ExportAction params={params} /> : undefined}
       />
       <MedicalTable
         tab="payments"
@@ -165,7 +217,8 @@ export function MedicalPaymentsPage() {
         exportName="medical-payments.csv"
         avatar
       />
-      <PaymentDeleteConfirm target={deleting} onClose={() => setDeleting(null)} fixture />
+      <PaymentDeleteConfirm target={deleting} onClose={() => setDeleting(null)} />
+      <PaymentReverseConfirm entry={reversing} onClose={() => setReversing(null)} />
       <Outlet />
     </section>
   );

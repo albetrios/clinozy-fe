@@ -7,7 +7,6 @@ import {
   expiryTone,
   listMarginTone,
   MEDICINE_STOCK_TONES,
-  medicineStockLevel,
   stockFillPercent,
 } from '@/shared/api/app/medicine-stock.ts';
 import type { MedicineRow } from '@/shared/api/app/medicines-contracts.ts';
@@ -20,7 +19,7 @@ import {
   TonePill,
 } from '@/shared/components/Cells/index.ts';
 import type { DataTableFeatures } from '@/shared/components/DataTable/index.ts';
-import { usePaiseFormat } from '@/shared/hooks/usePaiseFormat/index.ts';
+import { useRupeeFormat } from '@/shared/hooks/useRupeeFormat/index.ts';
 
 import { MEDICAL_KEYS, MEDICAL_NS } from '../../../medical.constants.ts';
 
@@ -29,19 +28,20 @@ const rowOf = (original: unknown) => original as MedicineRow;
 /** The medicine's words a cell and its folded value share. */
 function useMedicineWords() {
   const { t } = useTranslation(MEDICAL_NS);
-  const formatPaise = usePaiseFormat();
+  const formatRupees = useRupeeFormat();
   const keys = MEDICAL_KEYS.medicines;
   return {
     t,
-    formatPaise,
-    stock: (row: MedicineRow) => {
-      const level = medicineStockLevel(row.stock, row.minStock);
-      return {
-        level,
-        tone: MEDICINE_STOCK_TONES[level],
-        label: t(keys.stockLine, { count: row.stock, level: t(keys.levels[level]) }),
-      };
-    },
+    formatRupees,
+    // The level is the server's (Out at 0, Low at or below the reorder level).
+    stock: (row: MedicineRow) => ({
+      level: row.stockLevel,
+      tone: MEDICINE_STOCK_TONES[row.stockLevel],
+      label: t(keys.stockLine, {
+        count: row.stock,
+        level: t(keys.levels[row.stockLevel]),
+      }),
+    }),
     expiry: (row: MedicineRow) =>
       row.nearest
         ? {
@@ -53,7 +53,9 @@ function useMedicineWords() {
           }
         : { label: t(keys.noStock), tone: null },
     margin: (row: MedicineRow) =>
-      row.margin === null ? null : t(MEDICAL_KEYS.table.percent, { value: row.margin }),
+      row.margin === null
+        ? null
+        : t(MEDICAL_KEYS.table.percent, { value: Math.round(row.margin) }),
   };
 }
 
@@ -67,7 +69,7 @@ function useMedicineWords() {
  */
 export function useMedicineColumns(): ColumnDef<DataTableFeatures, MedicineRow>[] {
   const words = useMedicineWords();
-  const { t, formatPaise } = words;
+  const { t, formatRupees } = words;
   const keys = MEDICAL_KEYS.medicines;
   return [
     {
@@ -91,8 +93,12 @@ export function useMedicineColumns(): ColumnDef<DataTableFeatures, MedicineRow>[
         <TextCell
           text={row.original.name}
           weight="medium"
-          sub={row.original.isQuick ? t(keys.needsMrp) : (row.original.composition ?? '')}
-          subTone={row.original.isQuick ? 'butter' : undefined}
+          sub={
+            row.original.needsDetails
+              ? t(keys.needsMrp)
+              : (row.original.composition ?? '')
+          }
+          subTone={row.original.needsDetails ? 'butter' : undefined}
         />
       ),
       meta: { track: 'minmax(220px,1.6fr)', primary: true },
@@ -170,7 +176,7 @@ export function useMedicineColumns(): ColumnDef<DataTableFeatures, MedicineRow>[
         <TextCell
           align="end"
           weight="medium"
-          text={<MoneyCell paise={row.original.mrp} />}
+          text={<MoneyCell rupees={row.original.mrp} />}
           sub={
             row.original.nearExpiryDiscountPct > 0
               ? t(keys.discount, { pct: row.original.nearExpiryDiscountPct })
@@ -182,7 +188,7 @@ export function useMedicineColumns(): ColumnDef<DataTableFeatures, MedicineRow>[
       meta: {
         track: '100px',
         align: 'end',
-        foldValue: (original) => formatPaise(rowOf(original).mrp),
+        foldValue: (original) => formatRupees(rowOf(original).mrp),
       },
     },
     {
@@ -194,7 +200,7 @@ export function useMedicineColumns(): ColumnDef<DataTableFeatures, MedicineRow>[
         row.original.bestRate ? (
           <TextCell
             align="end"
-            text={<MoneyCell paise={row.original.bestRate.rate} />}
+            text={<MoneyCell rupees={row.original.bestRate.rate} />}
             sub={row.original.bestRate.supplierName}
           />
         ) : (
@@ -206,7 +212,7 @@ export function useMedicineColumns(): ColumnDef<DataTableFeatures, MedicineRow>[
         defaultHidden: true,
         foldValue: (original) => {
           const best = rowOf(original).bestRate;
-          return best ? formatPaise(best.rate) : null;
+          return best ? formatRupees(best.rate) : null;
         },
       },
     },

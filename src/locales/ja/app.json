@@ -1232,8 +1232,6 @@
     "items": {
       "quickLine": "サービス・数量・割引を入力 · 例: lhr face 1 10%",
       "quickLineMedical": "医薬品と数量を入力 · 例: sun 2",
-      "hint": "2 = 数量 · 10% = 割引 · @500 = 単価",
-      "oftenBilled": "よく請求する項目",
       "browse": {
         "all": "すべて",
         "oral": "内服",
@@ -1332,7 +1330,6 @@
       "saved": "請求書 #{{seq}} を保存しました",
       "savedPlan": "請求書 #{{seq}} を保存しました · 提案を更新しました",
       "promo": "{{offering}} に {{offer}} を適用しました",
-      "contactSaved": "{{name}} を薬局の連絡先として保存しました · 下に携帯番号を追加",
       "rxUnmatched": "{{name}} は医薬品リストにありません · クイック追加から追加してください",
       "deleted": "請求書 #{{seq}} を削除しました"
     },

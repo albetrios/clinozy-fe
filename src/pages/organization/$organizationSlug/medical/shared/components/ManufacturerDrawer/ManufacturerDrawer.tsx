@@ -3,7 +3,7 @@ import { useId, useState } from 'react';
 import { Controller, useForm, type UseFormReturn, useFormState } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import type { Manufacturer, Tone } from '@/shared/api/app/app-schema.ts';
+import type { Tone } from '@/shared/api/app/app-schema.ts';
 import { SECTION_TONES } from '@/shared/app/app-tones.ts';
 import {
   DrawerField,
@@ -50,7 +50,7 @@ import {
 import {
   MANUFACTURER_TONES,
   type ManufacturerInput,
-} from '../../medical-partners-contracts.ts';
+} from '../../medical-records-contracts.ts';
 import { MedicalDeleteConfirm } from '../MedicalDeleteConfirm/index.ts';
 import { MedicalPartnerPicker } from '../MedicalPartnerPicker/index.ts';
 
@@ -78,7 +78,7 @@ interface ManufacturerDrawerBaseProps {
   /** Stacked on another drawer: "Back", "Add manufacturer", no "full details" of its own. */
   stacked?: boolean;
   /** The saved record — a stacked child hands it to the field that asked. */
-  onSaved?: (maker: Manufacturer) => void;
+  onSaved?: (maker: ManufacturerRow) => void;
   /** Opens a supplier or MR on top for "full details"; a stacked drawer passes none. */
   openChild?: OpenMedicalChild;
   testId?: string;
@@ -376,7 +376,7 @@ function ManufacturerSession({
     notifyOnError: false,
     successMessage: t(K.saved),
   });
-  const { saveState, save } = useDrawerSave<ManufacturerFormValues, Manufacturer>({
+  const { saveState, save } = useDrawerSave<ManufacturerFormValues, ManufacturerRow>({
     form,
     fieldOrder: ['name', 'tone', 'supplierIds', 'mrIds'],
     toastId: 'manufacturer-save-failed',
@@ -385,7 +385,7 @@ function ManufacturerSession({
     write: () => {
       const input = inputOf(form.getValues());
       return maker
-        ? update.mutateAsync({ id: maker.id, patch: input })
+        ? update.mutateAsync({ record: maker, input })
         : create.mutateAsync(input);
     },
     onDone: (record) => (onSaved ? onSaved(record) : onClose()),

@@ -1262,8 +1262,6 @@
     "items": {
       "quickLine": "Digite serviço, quantidade, desconto · ex.: lhr face 1 10%",
       "quickLineMedical": "Digite medicamento e quantidade · ex.: sun 2",
-      "hint": "2 = quantidade · 10% = desconto · @500 = preço",
-      "oftenBilled": "Faturados com frequência",
       "browse": {
         "all": "Todos",
         "oral": "Oral",
@@ -1370,7 +1368,6 @@
       "saved": "Fatura #{{seq}} salva",
       "savedPlan": "Fatura #{{seq}} salva · sugestões atualizadas",
       "promo": "{{offer}} aplicado a {{offering}}",
-      "contactSaved": "{{name}} salvo como contato médico · adicione um celular abaixo",
       "rxUnmatched": "{{name}} não está na lista de medicamentos · adicione pela adição rápida",
       "deleted": "Fatura #{{seq}} excluída"
     },

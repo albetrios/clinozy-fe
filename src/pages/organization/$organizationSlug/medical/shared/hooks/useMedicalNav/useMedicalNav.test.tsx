@@ -9,21 +9,33 @@ import {
 import { useMedicalNav } from './useMedicalNav.ts';
 
 const ROOM = '/organization/acme/medical';
-const ID = '0b9c7a3e-2f6d-4f8a-9c1e-5d4b3a2f1e0d';
+// Public ids as clinozy-be sends them (`<prefix>_<21 [a-z0-9]>`).
+const ORDER_ID = 'mpo_order4310000000000000';
+const SUPPLIER_ID = 'sup_ankur0000000000000000';
+const MR_ID = 'mrep_rahul0000000000000000';
 
 /** Buttons that run the hook's navigations. */
 function Probe() {
   const nav = useMedicalNav();
   return (
     <>
-      <button type="button" onClick={() => nav.purchaseOrderReceive(ID)}>
+      <button type="button" onClick={() => nav.purchaseOrderReceive(ORDER_ID)}>
         receive
       </button>
       <button type="button" onClick={() => nav.close('purchases')}>
         close
       </button>
-      <button type="button" onClick={() => nav.create('purchases', { supplier: ID })}>
+      <button
+        type="button"
+        onClick={() => nav.create('purchases', { supplier: SUPPLIER_ID })}
+      >
         new order
+      </button>
+      <button type="button" onClick={() => nav.supplierEdit(SUPPLIER_ID)}>
+        edit supplier
+      </button>
+      <button type="button" onClick={() => nav.mrVisit(MR_ID)}>
+        log visit
       </button>
       <button type="button" onClick={() => nav.closeTo('sales', 'today')}>
         back to today
@@ -48,7 +60,9 @@ describe('useMedicalNav', () => {
     });
     await user.click(await screen.findByRole('button', { name: 'receive' }));
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe(`${ROOM}/purchases/${ID}/receive`),
+      expect(router.state.location.pathname).toBe(
+        `${ROOM}/purchases/${ORDER_ID}/receive`,
+      ),
     );
     expect(router.state.location.search).toMatchObject({ stage: 'ordered' });
     await user.click(screen.getByRole('button', { name: 'close' }));
@@ -63,7 +77,31 @@ describe('useMedicalNav', () => {
     await waitFor(() =>
       expect(router.state.location.pathname).toBe(`${ROOM}/purchases/create`),
     );
-    expect(router.state.location.search).toMatchObject({ supplier: ID });
+    expect(router.state.location.search).toMatchObject({ supplier: SUPPLIER_ID });
+  });
+
+  it('opens a supplier’s edit and an MR’s visit over their tabs, keeping the list’s params', async () => {
+    const user = userEvent.setup();
+    const first = renderMedicalRoutes(`${ROOM}/suppliers?payable=owed`, {
+      suppliers: Probe,
+    });
+    await user.click(await screen.findByRole('button', { name: 'edit supplier' }));
+    await waitFor(() =>
+      expect(first.router.state.location.pathname).toBe(
+        `${ROOM}/suppliers/${SUPPLIER_ID}/edit`,
+      ),
+    );
+    expect(first.router.state.location.search).toMatchObject({ payable: 'owed' });
+    first.unmount();
+
+    const second = renderMedicalRoutes(`${ROOM}/mrs?q=rahul`, { mrs: Probe });
+    await user.click(await screen.findByRole('button', { name: 'log visit' }));
+    await waitFor(() =>
+      expect(second.router.state.location.pathname).toBe(
+        `${ROOM}/mrs/${MR_ID}/visits/create`,
+      ),
+    );
+    expect(second.router.state.location.search).toMatchObject({ q: 'rahul' });
   });
 
   it('closes New sale back to the room it opened from, when the allow-list has it', async () => {

@@ -11,6 +11,7 @@
     "manufacturers": "Fabricantes",
     "mrs": "Visitadores",
     "payments": "Pagos",
+    "credits": "Créditos",
     "groups": {
       "selling": "Venta",
       "stock": "Existencias",
@@ -53,7 +54,9 @@
     "manufacturer": "Fabricante",
     "manufacturers": "Fabricantes",
     "suppliers": "Proveedores",
-    "mrs": "Visitadores"
+    "mrs": "Visitadores",
+    "payable": "Por pagar",
+    "owed": "Con saldo por pagar"
   },
   "table": {
     "percent": "{{value}} %",
@@ -190,6 +193,7 @@
     "ageing_one": "{{count}} día",
     "ageing_many": "{{count}} días",
     "ageing_other": "{{count}} días",
+    "paidUp": "Ya no se debe nada a {{name}}",
     "rowActions": {
       "pay": "Pagar {{amount}}",
       "newOrder": "Nueva orden de compra",
@@ -239,7 +243,74 @@
   },
   "payments": {
     "records": "pagos de farmacia",
-    "empty": "Aún no hay pagos de farmacia"
+    "empty": "Aún no hay pagos de farmacia",
+    "export": "Exportar",
+    "exportTitle": "Exportar estos pagos como CSV",
+    "exported": "Pagos exportados como CSV",
+    "exportTruncated": "Se exportaron los primeros 10.000 pagos; acota los filtros para el resto"
+  },
+  "credits": {
+    "records": "créditos de farmacia",
+    "sides": {
+      "label": "De quién son los créditos",
+      "suppliers": "De proveedores",
+      "customers": "Con clientes"
+    },
+    "columns": {
+      "credit": "Crédito",
+      "supplier": "Proveedor",
+      "packs": "Envases",
+      "amount": "Importe",
+      "applied": "Ajustado",
+      "state": "Estado",
+      "since": "Desde",
+      "who": "Quién",
+      "way": "Sentido",
+      "left": "Pendiente"
+    },
+    "creditRef": "{{medicine}} · {{batch}}",
+    "packs_one": "{{count}} envase",
+    "packs_many": "{{count}} envases",
+    "packs_other": "{{count}} envases",
+    "states": {
+      "open": "Abierto",
+      "adjusted": "Ajustado"
+    },
+    "customerStates": {
+      "open": "Abierto",
+      "given_back": "Devuelto",
+      "got_back": "Recuperado",
+      "used": "Usado"
+    },
+    "ways": {
+      "give": "Devolvemos",
+      "take": "Nos devuelven"
+    },
+    "rowActions": {
+      "void": "Anular crédito",
+      "giveBack": "Devolver",
+      "gotBack": "Recuperado",
+      "open": "Abrir en Pendientes"
+    },
+    "empty": {
+      "suppliers": "Aún no hay créditos de proveedores: devuelve el stock por caducar desde Medicamentos",
+      "customers": "Aún no hay créditos de clientes"
+    },
+    "addCredit": "Añadir crédito",
+    "void": {
+      "title": "¿Anular este crédito?",
+      "effect": "Sus envases vuelven al stock y se vuelve a deber al proveedor.",
+      "voided": "Crédito · {{batch}} anulado",
+      "reasons": {
+        "mistake": "Añadido por error",
+        "wrongQuantity": "Cantidad incorrecta",
+        "supplierRefused": "El proveedor lo rechazó"
+      }
+    },
+    "filters": {
+      "state": "Estado",
+      "way": "Sentido"
+    }
   },
   "drawers": {
     "records": {
@@ -274,8 +345,7 @@
     "quick": {
       "manufacturer": "Fabricante {{name}} añadido",
       "supplier": "Proveedor {{name}} añadido · añade teléfono y GST después",
-      "mr": "Visitador {{name}} añadido",
-      "medicine": "{{name}} añadido · fija el PVP luego en Existencias"
+      "mr": "Visitador {{name}} añadido"
     },
     "deleteConfirm": {
       "medicine": "¿Eliminar este medicamento?",
@@ -636,8 +706,11 @@
       "nothing": "Introduce lo que se devuelve",
       "refunded": "{{amount}} reembolsado · existencias repuestas",
       "refundedWrittenOff": "{{amount}} reembolsado · existencias dadas de baja",
-      "lowered": "{{amount}} devuelto · existencias repuestas",
-      "loweredWrittenOff": "{{amount}} devuelto · existencias dadas de baja"
+      "storeCredit": "Crédito en tienda",
+      "saveCredit": "Guardar {{amount}} como crédito en tienda",
+      "credited": "{{amount}} guardado como crédito en tienda · existencias repuestas",
+      "creditedWrittenOff": "{{amount}} guardado como crédito en tienda · existencias dadas de baja",
+      "notPaid": "Cobra primero la factura completa · solo una venta pagada por completo admite devolución"
     },
     "expiring": {
       "title": "Devolver existencias por caducar",

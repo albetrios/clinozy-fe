@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  medicineForm,
-  type MedicineRecord,
-} from '@/shared/api/app/medicines-contracts.ts';
+import { medicineForm } from '@/shared/api/app/medicines-contracts.ts';
 import {
   INVOICE_TEST_OFFERINGS,
   INVOICE_TEST_OFFERS,
@@ -11,6 +8,7 @@ import {
   TEST_LHR_ID,
   TEST_PEEL_ID,
 } from '@/tests/utils/invoice-doubles.ts';
+import { medicineRow } from '@/tests/utils/medical-doubles.ts';
 
 import { blankLine } from './invoice-form.ts';
 import {
@@ -19,7 +17,6 @@ import {
   medicineCatalogItem,
   offeringCatalogItem,
   offeringsFor,
-  oftenBilledItems,
 } from './invoice-lines.ts';
 import { rxLines } from './invoice-presets.ts';
 import { withAddedLine, withSteppedLine } from './invoice-rows.ts';
@@ -31,15 +28,15 @@ const byId = (id: string) => {
 };
 const item = (id: string) => offeringCatalogItem(byId(id), null, INVOICE_TEST_OFFERS);
 
-const glycolac = {
-  id: 'med-456',
+/** Glycolac at ₹162 (the API's rupees), three in stock, 20% off near its expiry. */
+const glycolac = medicineRow({
+  id: 'med_glycolac0000000000000',
   name: 'Glycolac Cream',
   composition: 'Glycolic acid 6%',
-  mrp: 16_200,
-  minStock: 2,
+  mrp: 162,
+  stock: 3,
   nearExpiryDiscountPct: 20,
-  batches: [{ batchNo: '026-312', expiry: '11/26', qty: 3, purchaseRate: 9_000 }],
-} as unknown as MedicineRecord;
+});
 
 describe('what an invoice lists (KICKOFF §6.9 Items)', () => {
   it('lists active offerings of the type: consultations alone for a consultation invoice', () => {
@@ -77,7 +74,7 @@ describe('what an invoice lists (KICKOFF §6.9 Items)', () => {
     expect(item(TEST_LHR_ID)).toMatchObject({ price: 480_000, promo: null, sessions: 7 });
   });
 
-  it('bills a medicine at its MRP, no GST on top (D45), the near-expiry discount on (Q-M3)', () => {
+  it('bills a medicine at its MRP in paise, no GST on top (D45), the near-expiry discount on (Q-M3), the server’s stock', () => {
     const entry = medicineCatalogItem(glycolac);
     expect(entry).toMatchObject({
       kind: 'medicine',
@@ -98,16 +95,6 @@ describe('what an invoice lists (KICKOFF §6.9 Items)', () => {
         { qty: 1, sessionsTotal: null },
       ]),
     ).toBe(7);
-  });
-
-  it('finds "Often billed" names in the catalogue, in its order, five at most', () => {
-    const catalog = [item(TEST_LHR_ID), item(TEST_PEEL_ID)];
-    expect(
-      oftenBilledItems(['Research', 'LHR Full Face', 'Gone'], catalog).map(
-        (entry) => entry.label,
-      ),
-    ).toEqual(['Research Peel', 'LHR Full Face']);
-    expect(oftenBilledItems(Array(8).fill('LHR'), catalog)).toHaveLength(5);
   });
 });
 

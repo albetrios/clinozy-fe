@@ -1,18 +1,45 @@
+import type { FieldPath } from 'react-hook-form';
+
+import { paiseOfRupees, rupeesOfPaise } from '@/lib/number-text.ts';
 import { appToday } from '@/shared/api/app/app-time.ts';
-import { medicineStockLevel, reorderQuantity } from '@/shared/api/app/medicine-stock.ts';
+import { reorderQuantity } from '@/shared/api/app/medicine-stock.ts';
 import type { MedicineRow } from '@/shared/api/app/medicines-contracts.ts';
 
 import type { PurchaseOrderRow } from '../../../shared/medical-contracts.ts';
-import type { PurchaseOrderInput } from '../../../shared/medical-flows-contracts.ts';
+import type {
+  PurchaseOrderInput,
+  PurchaseOrderLineInput,
+} from '../../../shared/medical-records-contracts.ts';
 
 /*
  * New / Edit purchase order's form (`medical.md:254–267`) — pure, so the
  * drawer, its steps' heads, its Quick fill and its checks read one set of
- * rules. Money is integer paise.
+ * rules. A line's rate is paise, the money cell's unit, converted to the
+ * API's rupees at the edge: a saved order's rupees in, the input's rupees out.
+ * The totals here preview what is being typed; a saved order's are the
+ * server's.
  */
 
-/** One line of the order: the medicine, how many, the free units and the rate. */
+/** What marks a line's medicine as typed, not picked: `new:Azel cream`. */
+const TYPED_MEDICINE_PREFIX = 'new:';
+
+/**
+ * A medicine typed on a line that the store does not stock yet (MD26): its
+ * line holds this key until the save, which sends the name and the server
+ * adds it as a quick medicine — "Needs MRP and composition".
+ */
+export const typedMedicineKey = (name: string) =>
+  `${TYPED_MEDICINE_PREFIX}${name.trim()}`;
+
+/** The typed name a line's medicine key holds; null for a medicine the store stocks. */
+export function typedMedicineName(medicineId: string | null): string | null {
+  if (!medicineId?.startsWith(TYPED_MEDICINE_PREFIX)) return null;
+  return medicineId.slice(TYPED_MEDICINE_PREFIX.length) || null;
+}
+
+/** One line of the order: the medicine (or a typed one's key), how many, the free units and the rate. */
 export interface OrderLineValues {
+  /** A medicine's id, or {@link typedMedicineKey} for one typed on the line. */
   medicineId: string | null;
   qty: number;
   free: number;
@@ -39,15 +66,15 @@ export const emptyOrderLine = (): OrderLineValues => ({
 /** A line with no medicine yet: the quick line's next add fills it. */
 export const isBlankOrderLine = (line: OrderLineValues) => line.medicineId === null;
 
-/** A line's amount: qty × rate — free units cost nothing (`S:830`). */
+/** A line's amount, paise: qty × rate — free units cost nothing (`S:830`). */
 export const lineAmount = (line: OrderLineValues) =>
-  line.medicineId ? line.qty * line.rate : 0;
+  line.medicineId ? Math.round(line.qty * line.rate) : 0;
 
 /** The order's total, paise — the summary "₹4,236". */
 export const orderTotal = (lines: readonly OrderLineValues[]) =>
   lines.reduce((sum, line) => sum + lineAmount(line), 0);
 
-/** The lines with a medicine picked. */
+/** The lines with a medicine picked or typed. */
 export const pickedLines = (lines: readonly OrderLineValues[]) =>
   lines.filter((line) => line.medicineId !== null);
 
@@ -57,20 +84,23 @@ export const pricedBy = (
   supplierId: string | null,
 ) => medicine.supplierRates.some((rate) => rate.supplierId === supplierId);
 
-/** This supplier's rate for a medicine, else its best rate, else nothing (0). */
+/** This supplier's rate for a medicine, else its best rate, else nothing (0) — paise. */
 export function supplierRateOf(
   medicine: Pick<MedicineRow, 'supplierRates' | 'bestRate'> | undefined,
   supplierId: string | null,
 ): number {
   if (!medicine) return 0;
   const own = medicine.supplierRates.find((rate) => rate.supplierId === supplierId);
-  return own?.rate ?? medicine.bestRate?.rate ?? 0;
+  return paiseOfRupees(own?.rate ?? medicine.bestRate?.rate ?? 0);
 }
 
-/** Every medicine at or below its reorder level — Out included (H:5436): the "Low stock" chips. */
-export const lowStockMedicines = <T extends Pick<MedicineRow, 'stock' | 'minStock'>>(
+/**
+ * Every medicine the server reads at or below its reorder level — Out included
+ * (H:5436): the "Low stock" chips.
+ */
+export const lowStockMedicines = <T extends Pick<MedicineRow, 'stockLevel'>>(
   medicines: readonly T[],
-) => medicines.filter((row) => medicineStockLevel(row.stock, row.minStock) !== 'ok');
+) => medicines.filter((row) => row.stockLevel !== 'ok');
 
 /**
  * A medicine's line as the quick line, Browse and "Reorder low stock" add it
@@ -129,17 +159,17 @@ export function newOrderForm(
   return { supplierId, billNo: '', date: appToday(), lines };
 }
 
-/** A saved order's form. */
+/** A saved order's form — its rupees as the rate cells' paise. */
 export function orderFormOf(order: PurchaseOrderRow): PurchaseOrderFormValues {
   return {
-    supplierId: order.supplierId,
+    supplierId: order.supplier.id,
     billNo: order.supplierBillNo ?? '',
     date: order.date,
-    lines: order.items.map((item) => ({
-      medicineId: item.medicineId,
-      qty: item.qty,
-      free: item.free,
-      rate: item.rate,
+    lines: order.lines.map((line) => ({
+      medicineId: line.medicineId,
+      qty: line.qty,
+      free: line.free,
+      rate: paiseOfRupees(line.rate),
     })),
   };
 }
@@ -148,17 +178,58 @@ export function orderFormOf(order: PurchaseOrderRow): PurchaseOrderFormValues {
 export const linesMissingRate = (lines: readonly OrderLineValues[]) =>
   lines.flatMap((line, index) => (line.medicineId && line.rate <= 0 ? [index] : []));
 
+/**
+ * A line as the API's input takes it, rupees: the medicine — or a typed one's
+ * name, which the server adds (MD26).
+ */
+export function orderLineInputOf(
+  line: Pick<OrderLineValues, 'medicineId' | 'qty' | 'free' | 'rate'>,
+): PurchaseOrderLineInput {
+  const typed = typedMedicineName(line.medicineId);
+  return {
+    medicineId: typed === null ? line.medicineId : null,
+    ...(typed === null ? {} : { newMedicineName: typed }),
+    qty: line.qty,
+    free: line.free,
+    rate: rupeesOfPaise(line.rate),
+  };
+}
+
 /** The contract's fields for a form; lines without a medicine are left out. */
 export function orderInputOf(values: PurchaseOrderFormValues): PurchaseOrderInput {
   return {
     supplierId: values.supplierId ?? '',
     supplierBillNo: values.billNo.trim() || null,
     date: values.date,
-    items: pickedLines(values.lines).map((line) => ({
-      medicineId: line.medicineId ?? '',
-      qty: line.qty,
-      free: line.free,
-      rate: line.rate,
-    })),
+    items: pickedLines(values.lines).map(orderLineInputOf),
   };
+}
+
+/** A field of the drawer's form a refused save can name. */
+type OrderField = FieldPath<PurchaseOrderFormValues>;
+
+/**
+ * The API's names for the form's fields (`supplierBillNumber` → `billNo`), and
+ * each sent line's by its row — blank rows are not sent, so `items.1` may be
+ * the third row: a refused save outlines the cell it names.
+ */
+export function orderServerFields(
+  lines: readonly OrderLineValues[],
+): Record<string, OrderField> {
+  const fields: Record<string, OrderField> = {
+    supplierId: 'supplierId',
+    supplierBillNumber: 'billNo',
+    orderDate: 'date',
+    items: 'lines',
+  };
+  const sent = lines.flatMap((line, row) => (line.medicineId === null ? [] : [row]));
+  sent.forEach((row, index) => {
+    fields[`items.${index}`] = `lines.${row}.medicineId`;
+    fields[`items.${index}.medicineId`] = `lines.${row}.medicineId`;
+    fields[`items.${index}.newMedicineName`] = `lines.${row}.medicineId`;
+    fields[`items.${index}.quantity`] = `lines.${row}.qty`;
+    fields[`items.${index}.freeQuantity`] = `lines.${row}.free`;
+    fields[`items.${index}.rate`] = `lines.${row}.rate`;
+  });
+  return fields;
 }

@@ -344,6 +344,23 @@ Medical**.
     sale, a supplier credit voided and undone, a store payment edited and reversed, an unexpected line received, a stale save, a closed day; the e2e lanes
     `app-rooms`, `app-dialog-routes`, `app-roles` and axe.
 
+- **Medical room (D168, AS-BUILT #121–#129):** built as above with these outcomes — the eight tabs read
+  their lists 50 a page keyed by organization through the stock room's four files (clinozy-be D91),
+  the catalogues once each through `collectAllPages`, rows in rupees; one record by public id per
+  dialog route. Sales: Status gains Paid (the bill's due decides it), Collect on `payment:create`,
+  Return on `payment:delete` and only for a sale paid in full (`409 sale_not_paid`), refunded or kept
+  as store credit; New sale is the shared Invoice drawer in sale mode with the room's write, a new
+  customer's contact created first, no typed rate and no "Often billed". Purchases: number, date and
+  total sorts; a typed medicine as `new_medicine_name`; lines not ordered received too. Suppliers:
+  one manufacturer per filter, Payable (owed), "Pay ₹X" at the oldest open order, "Pay all received"
+  to Suppliers filtered owed; delete only at a payable of 0. Payments manages the store's money
+  (edit, delete and Undo, reverse, export); Credits holds supplier credits (void and Undo) and the
+  customers' credits on sales. The neighbours open the live New sale with the customer and the
+  prescription, the clinic Invoice drawer offers no medicines and the Invoices room no Medical type
+  (clinozy-be MD28). The fixtures went (M8); with them `FIXTURE_BACKED_APP_MODULES`,
+  `FIXTURE_ROOMS_OFF_RULE` and production's required `VITE_DISABLED_MODULES` (Q-MED1). Removed: the
+  Sales "Follow-up date" filter, editing a sale, a return on a partly paid sale, facets (N8).
+
 ### 5.6 Clinic stock
 
 | Design operation                        | Route                                                                                                        | What changes in the screen                                                                                           |

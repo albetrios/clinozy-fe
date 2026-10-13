@@ -515,6 +515,7 @@
       "treatment": "시술 열기",
       "patient": "환자 열기",
       "invoice": "청구서 열기",
+      "medicalRep": "MR 열기",
       "checkIn": "체크인 열기",
       "review": "리뷰 열기"
     },

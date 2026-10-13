@@ -527,6 +527,7 @@
       "treatment": "Abrir tratamiento",
       "patient": "Abrir paciente",
       "invoice": "Abrir factura",
+      "medicalRep": "Abrir visitador",
       "checkIn": "Abrir seguimiento",
       "review": "Abrir reseña"
     },

@@ -46,6 +46,17 @@ export function automaticSection(
 }
 
 /**
+ * `section` picking one value at a time — a pick replaces the last, tapping it again clears — for a
+ * list the API filters by a single id (a supplier's manufacturer); `null` stays `null`.
+ */
+export function singlePickSection(
+  section: RoomFilterSection | null,
+): RoomFilterSection | null {
+  if (section?.field.kind !== 'options') return section;
+  return { ...section, field: { ...section.field, single: true } };
+}
+
+/**
  * A room tab's Filters from its sections, in order — `null` sections (automatic
  * ones that do not qualify) are left out — then Created.
  */
