@@ -97,7 +97,7 @@ export function LaneTiles({
           const faces = laneFaces(cards);
           const hint = laneHint(lane, cards);
           let border = paint.border;
-          if (pressed) border = tile.ink;
+          if (pressed) border = tile.pressed;
           else if (dimmed) border = tile.dimBorder;
           return (
             <button

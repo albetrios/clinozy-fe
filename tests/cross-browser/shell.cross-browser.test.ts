@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { PRODUCT_NAME } from '@/lib/product-identity.ts';
+import { PRODUCT_NAME, PRODUCT_THEME_COLOR } from '@/lib/product-identity.ts';
 
 test.describe('production shell', () => {
   test('login page renders with manifest and theme', async ({ page }) => {
@@ -11,7 +11,7 @@ test.describe('production shell', () => {
     await expect(manifest).toHaveAttribute('href', '/manifest.webmanifest');
 
     const themeColor = page.locator('meta[name="theme-color"]');
-    await expect(themeColor).toHaveAttribute('content', '#0a0a0a');
+    await expect(themeColor).toHaveAttribute('content', PRODUCT_THEME_COLOR);
   });
 
   test('manifest.webmanifest is valid JSON with app icons', async ({ request }) => {
@@ -23,7 +23,7 @@ test.describe('production shell', () => {
       icons: Array<{ src: string }>;
     };
     expect(body.name).toContain(PRODUCT_NAME);
-    expect(body.theme_color).toBe('#0a0a0a');
+    expect(body.theme_color).toBe(PRODUCT_THEME_COLOR);
     expect(body.icons.some((i) => i.src.includes('app-icon'))).toBeTruthy();
   });
 

@@ -14,8 +14,8 @@ import {
  * A drawer's colour field (the design's `swatch` kind, H:1600): one 30px
  * circle per tone, 8px apart, filled with the tone and edged in its line; the
  * picked one carries "✓" in the tone's ink — or the screen's `mark`, the
- * person's initials on the user drawer (`users.md:109`) — and a 1.5px ring of
- * it. A radio group — one colour is always picked; each swatch is named by its
+ * person's initials on the user drawer (`users.md:109`) — and a 1.5px ring in
+ * the tone's edge colour. A radio group — one colour is always picked; each swatch is named by its
  * colour ("Sage"), aloud and as its tooltip.
  */
 export function DrawerSwatches({
@@ -69,9 +69,10 @@ export function DrawerSwatches({
               tone.bg,
               tone.border,
               tone.ink,
+              // The tone's edge colour, never its ink (change-shell-polish-and-sign-in, D7).
               picked
-                ? 'shadow-(--elevation-control) ring-[1.5px] ring-current'
-                : 'hover:ring-1 hover:ring-current',
+                ? cn('shadow-(--elevation-control)', tone.ring, 'ring-[1.5px]')
+                : tone.selectedHover,
             )}
           >
             {picked ? <span aria-hidden="true">{pickedMark}</span> : null}

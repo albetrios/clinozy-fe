@@ -40,13 +40,17 @@ version-update notification, toast dismiss, PWA manifest, and local production p
 | Live routes integration     | ✅     | ✅      | ✅              |
 | Org switcher dual-URL       | ✅     | ✅      | ✅              |
 
-Run locally (static preview smoke):
+Run locally (static preview smoke — the config builds its own bundle with `VITE_VERSION_CHECK=true`
+and serves it on `:4173`, so nothing may already hold that port):
 
 ```bash
-pnpm build
-pnpm preview --port 4173 --strictPort
 pnpm test:cross-browser
 ```
+
+The update specs advertise the new build only **after the boot splash has left**. The app's first
+version check fires 2s after bootstrap and the splash never leaves before 2,050ms; a new build seen
+while the splash is up reloads the tab at once, with no toast (`check.ts` → `safeToReload`). The spec
+then re-checks the way the app does when a tab comes back into view (`visibilitychange`).
 
 Live integration (requires clinozy-be on `:3000` and `DATABASE_URL`):
 

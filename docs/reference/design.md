@@ -162,8 +162,15 @@ Motion is **subtle, fast, and purposeful** — it orients, it doesn't perform.
 - **Vocabulary.** `fade-in` (0.2s) for overlays; **`route-rise`** (0.28s, via the
   `animate-fade-in-up` utility name) for page/route reveals — **transform only, no
   opacity fade** so copy stays visible if animation is skipped or reduced-motion
-  short-circuits duration. `accordion` for disclosure; `shimmer` for skeleton
-  loading. Overlays use the shadcn enter/exit utilities (`tw-animate-css`).
+  short-circuits duration. A flush room fills `<main>` exactly, so while the rise
+  plays (`data-replaying`, set by `useReplayedAnimation`) the room frame clips its
+  vertical overflow — the 6px never flashes `<main>`'s scrollbar. `accordion` for
+  disclosure; `shimmer` for skeleton loading. Overlays use the shadcn enter/exit
+  utilities (`tw-animate-css`). The sign-in showcase is the one ambient motion —
+  `journey-wave` (8.4s), `drift` (6s), `pulse-dot` (2.4s) — and every element of it
+  carries `motion-reduce:animate-none`.
+- **Tabs keep their place.** A tab drawn bolder when current keeps its bold width
+  (`WeightStableLabel`), so switching tabs never moves its neighbours.
 - **Product motion.** Prefer **Anime.js** for intentional numeric or timeline
   motion (`useOnboardingStepMotion` on the onboarding steps). Avoid stacking Framer-style page
   fades on content shells.
