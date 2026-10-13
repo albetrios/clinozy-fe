@@ -1,8 +1,8 @@
 import './bug-report.css';
 
 import {
-  type FormEvent,
   type KeyboardEvent,
+  type SubmitEvent,
   useCallback,
   useEffect,
   useRef,
@@ -49,9 +49,8 @@ const DESCRIPTION_ID = 'bug-report-description';
 function BugReportSent() {
   const { t } = useTranslation(BUG_REPORT_NS);
   return (
-    <div
+    <output
       data-testid={BUG_REPORT_TEST_IDS.sent}
-      role="status"
       className="bug-report-sent flex flex-col items-center gap-3 px-6 py-8 text-center"
     >
       <svg
@@ -76,8 +75,10 @@ function BugReportSent() {
           strokeLinejoin="round"
         />
       </svg>
-      <p className="text-foreground text-sm font-medium">{t(BUG_REPORT_KEYS.sent)}</p>
-    </div>
+      <span className="text-foreground text-sm font-medium">
+        {t(BUG_REPORT_KEYS.sent)}
+      </span>
+    </output>
   );
 }
 
@@ -224,11 +225,11 @@ function BugReportPanel({ onClose }: { onClose: () => void }) {
       description: draft.trim(),
       input_method: inputMethodOf({ usedVoice: usedVoice || interim.length > 0, typed }),
       page_path: currentPagePath(),
-      app_version: platformConfig.appVersion || null,
+      app_version: platformConfig.appVersion?.trim() ? platformConfig.appVersion : null,
     });
   };
 
-  const onSubmit = (event: FormEvent) => {
+  const onSubmit = (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
     send();
   };

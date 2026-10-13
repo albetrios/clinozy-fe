@@ -18,7 +18,11 @@ warnings) ✓ · `pnpm validate:structure` / `validate:tokens` / `validate:theme
 `validate:testids` ✓ · `pnpm sync:check` (incl. i18n parity) ✓ · `pnpm docs:lint` ✓ · the full Vitest
 suite **1182 files / 9384 tests** ✓ · `pnpm build` + `pnpm build:check` ✓ (the widget and its CSS
 stay off the first-paint path) · `pnpm size` ✓ on a CI-style build (no env file): initial JS
-245.08 / 245.2 kB, initial CSS 35.89 / 35.9 kB.
+245.08 / 245.2 kB, initial CSS 35.89 / 35.9 kB · `pnpm sonar:scan` ✓ (0 issues, 0 hotspots) after fixing its four findings in
+`BugReport.tsx` — `<output>` for the sent status (not `role="status"`), `SubmitEvent` (not the
+deprecated `FormEvent`), no `||` fallback for the app version. To start SonarQube here the
+session's Docker daemon was restarted and Elasticsearch's disk watermark lifted at runtime (the
+session's disk allowance reads 8.9% free); no repository change.
 
 ## Revisions to upcoming rows
 
