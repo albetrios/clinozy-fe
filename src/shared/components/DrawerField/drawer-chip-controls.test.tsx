@@ -118,7 +118,7 @@ describe('DrawerChips — the drawer’s chip field (H:905)', () => {
     expect(screen.getByRole('status')).toHaveTextContent('aesthetic,clinical');
   });
 
-  it('marks a pick with its ink edge and ring, and draws an untoned chip on muted', () => {
+  it('marks a pick with its own hue’s edge and halo — never its ink — and draws an untoned chip on muted', () => {
     render(
       <DrawerChips
         label="Referrer type"
@@ -131,8 +131,9 @@ describe('DrawerChips — the drawer’s chip field (H:905)', () => {
       />,
     );
     const doctor = screen.getByRole('button', { name: 'Doctor' });
-    expect(doctor.className).toContain('ring-current');
-    expect(doctor.className).toContain('bg-muted');
+    // Untoned: stone's edge and halo, not the black `foreground` ring.
+    expect(doctor).toHaveClass('bg-muted', 'inset-ring-tone-stone-edge', 'ring-3');
+    expect(doctor).not.toHaveClass('ring-current', 'border-current', 'ring-foreground');
     expect(screen.getByRole('button', { name: 'Patient' }).className).toContain(
       'border-transparent',
     );
@@ -173,7 +174,8 @@ describe('DrawerChips — the drawer’s chip field (H:905)', () => {
     const off = screen.getByRole('button', { name: 'No calls' });
     const on = screen.getByRole('button', { name: 'Hindi' });
     expect(off).toHaveClass('h-6', 'border-dashed', 'bg-card');
-    expect(on).toHaveClass('bg-muted', 'border-foreground');
+    expect(on).toHaveClass('bg-muted', 'inset-ring-tone-stone-edge');
+    expect(on).not.toHaveClass('border-foreground');
     expect(on).not.toHaveClass('border-dashed');
     expect(on.querySelector('svg')).toBeNull();
   });
@@ -193,7 +195,13 @@ describe('DrawerChips — the drawer’s chip field (H:905)', () => {
     );
     const on = screen.getByRole('button', { name: 'WhatsApp' });
     const off = screen.getByRole('button', { name: 'Call' });
-    expect(on).toHaveClass('h-8', 'rounded-lg', 'bg-tone-sage', 'border-current');
+    expect(on).toHaveClass(
+      'h-8',
+      'rounded-lg',
+      'bg-tone-sage',
+      'inset-ring-tone-sage-edge',
+    );
+    expect(on).not.toHaveClass('border-current');
     expect(on).toHaveAttribute('data-slot', 'button');
     expect(off).toHaveClass('bg-card', 'border-border');
     expect(off).not.toHaveClass('bg-tone-sky');

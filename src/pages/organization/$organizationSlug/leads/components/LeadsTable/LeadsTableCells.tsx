@@ -97,7 +97,7 @@ function HoldPill({ lead }: { lead: LeadRecord }) {
             'text-caption flex h-6 flex-none items-center rounded-full border px-2.25 leading-none font-semibold whitespace-nowrap transition-colors',
             TONE_CLASSES.butter.surface,
             TONE_CLASSES.butter.border,
-            'hover:border-tone-butter-foreground',
+            'hover:border-tone-butter-edge',
           )}
         >
           {t(LEADS_KEYS.team.claim)}

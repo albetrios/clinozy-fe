@@ -1,5 +1,8 @@
 import { type RefObject, useLayoutEffect } from 'react';
 
+/** Present on an element while {@link useReplayedAnimation}'s replay plays. */
+export const REPLAYING_ATTRIBUTE = 'data-replaying';
+
 /**
  * Replays a CSS keyframe animation on an element that STAYS MOUNTED.
  *
@@ -23,6 +26,13 @@ import { type RefObject, useLayoutEffect } from 'react';
  * isomorphic-layout-effect guard, matching every other layout effect here:
  * nothing in this app renders on the server (`main.tsx` is a client
  * `createRoot`) and the unit suite runs in jsdom.
+ *
+ * While a replay plays, the element carries {@link REPLAYING_ATTRIBUTE}, so a
+ * container can react to the motion for exactly its length — the app shell's
+ * room frame clips the 6px rise instead of letting it flash `<main>`'s
+ * scrollbar. The attribute leaves when every animation on the element settles
+ * (finished or cancelled), at once when none runs (reduced motion, no Web
+ * Animations), and on cleanup — it never outlives the motion.
  */
 export function useReplayedAnimation(
   ref: RefObject<HTMLElement | null>,
@@ -38,5 +48,21 @@ export function useReplayedAnimation(
     // remove + add into no change at all and the animation never replays.
     el.getBoundingClientRect();
     el.classList.add(animationClass);
+
+    // `getAnimations()` flushes style, so the replay just started is in it.
+    const running = el.getAnimations?.() ?? [];
+    if (running.length === 0) return;
+    let live = true;
+    el.setAttribute(REPLAYING_ATTRIBUTE, '');
+    const settle = () => {
+      if (live) el.removeAttribute(REPLAYING_ATTRIBUTE);
+    };
+    // A cancelled animation rejects `finished`: settled all the same.
+    void Promise.allSettled(running.map((animation) => animation.finished)).then(settle);
+    return () => {
+      // The next replay (or the unmount) owns the attribute from here.
+      live = false;
+      el.removeAttribute(REPLAYING_ATTRIBUTE);
+    };
   }, [ref, animationClass, replayKey]);
 }

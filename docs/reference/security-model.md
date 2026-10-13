@@ -33,8 +33,8 @@ everything — frontend controls are defense-in-depth and UX, never the only gat
 Sentry and PostHog run in the same JS context as the in-memory token, so their
 capture settings are part of the threat model — verified:
 
-- **Sentry replay** — **consent-gated** with profiling (D161: added only while the
-  analytics consent stands, stopped at once on a withdrawal; profiling follows the
+- **Sentry replay** — **consent-gated** with profiling (added only while the cookie
+  card's Analytics category is on, stopped at once on a withdrawal; profiling follows the
   answer at page load). `maskAllText: true` + `blockAllMedia: true`; inputs are
   masked by default and **network request headers/bodies are not captured**
   (no `networkDetailAllowUrls`), so the `Authorization: Bearer` header never
@@ -53,20 +53,29 @@ capture settings are part of the threat model — verified:
   `$current_url`-style properties; and
   `posthog.reset()` runs when the session ends so successive users on a shared
   device never chain into one anonymous profile. Accepting the banner emits a
-  single `analytics_consent_decision` event (`shared/analytics/capture-consent-decision.ts`).
+  single `analytics_consent_decision` event (`shared/analytics/record-consent-decision.ts`).
   ([`app/analytics/posthog.ts`](../../src/app/analytics/posthog.ts)) Sentry's error
   reports are **not** gated — no tracking cookies, legitimate interest.
-- **Consent is the person's, not the browser's** (D161, clinozy-be D85) — the answer is
-  stored with its time and the policy version (`CONSENT_POLICY_VERSION`); one older than
-  six months or to an older version counts as not answered, and the card asks again.
-  Closing the card is declining. Signed in, the later of the account's and the
-  browser's answers wins and is kept on both (`PATCH /users/me/settings`; clinozy-be
-  audits each answer as the proof of consent); when the session ends the browser's
-  answer and PostHog's `ph_*` identifiers are removed, so the next person at a shared
-  computer is asked afresh. Tabs follow each other's answer. Settings › Account ›
-  Privacy withdraws it with one switch. `index.html` no longer preconnects to PostHog,
-  so nothing reaches it before a grant.
-  ([`shared/analytics/consent-account-sync.ts`](../../src/shared/analytics/consent-account-sync.ts))
+- **Consent is the browser's, as on claude.com** (iteration
+  `change-cookie-consent-2026-10-13-fmal`) — one first-party cookie,
+  `clinozy-consent-preferences` (`{analytics, version, decidedAt}`, one year, `Path=/`,
+  `SameSite=Lax`, `Secure` on https), holds the answer per category: Necessary is always on,
+  Analytics is the choice. A missing, unreadable or older-policy (`CONSENT_POLICY_VERSION`)
+  cookie counts as not answered and the card asks again. **Signing out never forgets it and
+  signing in never replaces it**, so a shared clinic computer is not asked at every sign-out;
+  PostHog's identity is still reset at sign-out (above). Escape inside the card is Reject all;
+  Global Privacy Control is Reject all and is never asked. Signed in, each new answer is also
+  sent to the account as a **receipt** (`PATCH /users/me/settings` with the policy version;
+  clinozy-be audits it as the proof of consent) — never read back. Refusing Analytics purges
+  PostHog's `ph_*` identifiers. "Privacy choices" on the signed-out frame and Settings ›
+  Account › Privacy change it. `index.html` does not preconnect to PostHog, so nothing reaches
+  it before a grant.
+  ([`shared/store/useConsentStore/useConsentStore.ts`](../../src/shared/store/useConsentStore/useConsentStore.ts)
+  reads it on every first paint;
+  [`shared/components/ConsentBanner/save-consent-preferences.ts`](../../src/shared/components/ConsentBanner/save-consent-preferences.ts)
+  writes it, from the card and Settings only;
+  [`shared/analytics/record-consent-decision.ts`](../../src/shared/analytics/record-consent-decision.ts)
+  sends the event and the receipt)
 - **Service worker** — precaches only static build assets + fonts; **no runtime
   caching of `/api`** or auth responses, so a shared device cannot serve one
   user's data to another from the SW cache. ([`src/sw.ts`](../../src/sw.ts))

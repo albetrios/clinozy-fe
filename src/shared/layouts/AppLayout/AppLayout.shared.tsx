@@ -8,6 +8,7 @@ import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { cn } from '@/lib/utils.ts';
 import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { preloadCommandPalette } from '@/shared/components/CommandPalette/index.ts';
+import { WeightStableLabel } from '@/shared/components/WeightStableLabel/index.ts';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import type { AppNavEntry } from '@/shared/hooks/useAppNav/index.ts';
 import { Compass, Search } from '@/shared/icons/index.ts';
@@ -84,7 +85,8 @@ const tabSlotClassName =
   'flex min-w-0 flex-col items-center justify-center gap-0.75 rounded-lg [-webkit-tap-highlight-color:transparent]';
 const tabPillClassName =
   'flex h-7 w-11.5 items-center justify-center rounded-full transition-colors duration-160';
-const tabLabelClassName = 'max-w-full truncate px-0.5 text-tiny leading-[1.1]';
+/** The 10.5px label, centred; `WeightStableLabel` keeps its 600 width whatever its weight. */
+const tabLabelClassName = 'px-0.5 text-center text-tiny leading-[1.1]';
 
 /** One tab-bar slot: a 46×28 icon pill over a 10.5px label, in the room's tone when current. */
 function TabBarItem({
@@ -117,9 +119,10 @@ function TabBarItem({
       >
         <entry.icon className="size-4" aria-hidden />
       </span>
-      <span className={cn(tabLabelClassName, current ? 'font-semibold' : 'font-medium')}>
-        {t(entry.labelKey, { ns: entry.labelNs })}
-      </span>
+      <WeightStableLabel
+        label={t(entry.labelKey, { ns: entry.labelNs })}
+        className={cn(tabLabelClassName, current ? 'font-semibold' : 'font-medium')}
+      />
     </Link>
   );
 }
@@ -167,13 +170,14 @@ function SectionTabBar({
         <span data-slot="pill" className={cn(tabPillClassName, morePill)}>
           <Compass className="size-4.5" aria-hidden />
         </span>
-        <span
+        <WeightStableLabel
+          label={
+            elsewhere
+              ? t(elsewhere.labelKey, { ns: elsewhere.labelNs })
+              : t(LAYOUT_KEYS.app.sectionBar.more)
+          }
           className={cn(tabLabelClassName, elsewhere ? 'font-semibold' : 'font-medium')}
-        >
-          {elsewhere
-            ? t(elsewhere.labelKey, { ns: elsewhere.labelNs })
-            : t(LAYOUT_KEYS.app.sectionBar.more)}
-        </span>
+        />
       </button>
     </>
   );
@@ -343,10 +347,17 @@ export function AppMain({ flush = false }: { flush?: boolean } = {}) {
       data-layout-width={layoutWidth}
       data-flush={flush || undefined}
     >
+      {/* A flush room fills `<main>` exactly, so the page's 6px rise would push
+          it past the bottom and flash `<main>`'s scrollbar for the length of
+          the motion. While the rise plays (`data-replaying`, set by
+          `useReplayedAnimation`) the frame clips its vertical overflow — `clip`,
+          not `hidden`: no new scroll container, sticky headers keep sticking —
+          and lets go the moment it settles, so a room taller than a short
+          screen still scrolls. */}
       <div
         className={cn(
           layoutMainClassName(layoutWidth),
-          flush && 'flex min-h-0 flex-1 flex-col',
+          flush && 'flex min-h-0 flex-1 flex-col has-[>[data-replaying]]:overflow-y-clip',
         )}
       >
         <SectionErrorBoundary

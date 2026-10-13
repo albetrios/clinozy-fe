@@ -57,7 +57,7 @@ The frontend **shell** is solid:
 
 ### D. In-repo gaps closed in prior waves
 
-- [x] **Cookie consent** — PostHog and Sentry replay / profiling gated behind `ConsentBanner` + `useConsentStore`; the answer is the person's, kept on their account with its time and policy version, asked again after six months, withdrawn in Settings › Account › Privacy (D161).
+- [x] **Cookie consent** — PostHog and Sentry replay / profiling gated behind `ConsentBanner` + `useConsentStore` (claude.com's model: Customize · Reject all · Accept all, Necessary / Analytics); the answer is this browser's, kept in a one-year first-party cookie with its policy version, never cleared by signing out, Global Privacy Control honored, changed from "Privacy choices" or Settings › Account › Privacy; signed-in answers go to the account as a receipt.
 - [x] **robots.txt** — `Disallow: /` (auth-gated admin app).
 - [x] **HTTP-only frontend** — always `apiClient` / `authFetch` → clinozy-be.
 - [x] This document.

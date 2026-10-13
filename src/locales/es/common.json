@@ -123,7 +123,6 @@
     "loadingNamed": "Cargando {{name}}…",
     "loadingPage": "Cargando página",
     "toggleTheme": "Cambiar tema",
-    "cookieConsent": "Consentimiento de cookies",
     "rowsPerPage": "Filas por página",
     "goFirstPage": "Ir a la primera página",
     "goPreviousPage": "Ir a la página anterior",
@@ -189,11 +188,8 @@
     }
   },
   "consent": {
-    "description": "Con tu permiso, usamos la analítica de PostHog y las grabaciones de sesión de Sentry para mejorar {{productName}}. Todo lo demás, incluidos los informes de errores, funciona sin ellas. Cerrar esto equivale a no.",
-    "privacyPolicy": "Política de privacidad",
-    "accept": "Aceptar",
-    "decline": "Rechazar",
-    "closeAndDecline": "Cerrar (cuenta como rechazar)"
+    "title": "Configuración de cookies",
+    "privacyChoices": "Opciones de privacidad"
   },
   "confirm": {
     "accept": "Confirmar",

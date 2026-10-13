@@ -175,8 +175,8 @@ function TypeChips({
             className={cn(
               'h-6 rounded-full px-2.5 text-xs font-medium whitespace-nowrap transition-shadow',
               tone ? TONE_CLASSES[tone].surface : 'bg-muted text-foreground',
-              on && (tone ? TONE_CLASSES[tone].ring : 'ring-foreground ring-1'),
-              on && 'ring-[1.5px]',
+              // Picked in its own hue's edge and halo ("All" in stone's), not the ink.
+              on && TONE_CLASSES[tone ?? 'stone'].selected,
             )}
           >
             {feedbackTypeLabel(option, t)}

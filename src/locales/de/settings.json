@@ -226,11 +226,8 @@
       "deleteBody": "Löschen Sie Ihr Konto und alle zugehörigen Daten dauerhaft.",
       "deleteAction": "Konto löschen",
       "privacyTitle": "Datenschutz",
-      "privacyDescription": "Ihre Entscheidung zu Produktanalysen und Sitzungsaufzeichnungen, gespeichert in Ihrem Konto.",
-      "analyticsLabel": "Produktanalysen und Sitzungsaufzeichnungen",
-      "analyticsHint": "PostHog-Analysen und Sentry-Sitzungsaufzeichnungen. Fehlerberichte laufen in jedem Fall.",
-      "consentGrantedOn": "Erlaubt am {{date}}",
-      "consentDeniedOn": "Abgelehnt am {{date}}",
+      "privacyDescription": "Cookie-Einstellungen für diesen Browser. Änderungen gelten sofort.",
+      "consentSavedOn": "Gespeichert am {{date}}",
       "consentUnanswered": "Noch nicht beantwortet",
       "privacyPolicyLink": "Datenschutzerklärung"
     },

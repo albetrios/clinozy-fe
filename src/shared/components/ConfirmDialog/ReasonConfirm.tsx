@@ -12,6 +12,7 @@ import type { UseFormSetError } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
+import { PICKED_HALO } from '@/shared/app/app-tones.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { RadioGroup } from '@/shared/components/ui/radio-group.tsx';
 import { Textarea } from '@/shared/components/ui/textarea.tsx';
@@ -257,7 +258,7 @@ function ReasonDescription({
 }
 
 const CHIP_CLASS =
-  'text-detail inline-flex h-7 items-center px-3 font-medium whitespace-nowrap transition-shadow hover:ring-1 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:ring-[1.5px]';
+  'text-detail inline-flex h-7 items-center px-3 font-medium whitespace-nowrap transition-shadow hover:inset-ring disabled:cursor-not-allowed disabled:opacity-50';
 
 /** A field's message from the server (a 422), announced as it appears. */
 function FieldError({
@@ -316,7 +317,13 @@ function ReasonFields({ draft, ids }: { draft: ReasonDraft; ids: ReasonIds }) {
             value={option.value}
             data-slot="pill"
             data-testid={confirmReasonTestId(option.value)}
-            className={cn(CHIP_CLASS, 'rounded-full', reasonChipTone(index))}
+            className={cn(
+              CHIP_CLASS,
+              'rounded-full',
+              reasonChipTone(index),
+              // Picked: the tone's 1.5px edge and the shared halo, never its ink.
+              draft.picked === option.value && `inset-ring-[1.5px] ${PICKED_HALO}`,
+            )}
           >
             {t(option.labelKey)}
           </RadioGroupPrimitive.Item>

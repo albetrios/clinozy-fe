@@ -70,6 +70,29 @@ describe('AuthLayout', () => {
     expect(within(layout).getByRole('main')).toHaveAttribute('id', 'main-content');
   });
 
+  it('frames the card with the showcase, in the order hero → card → showcase', async () => {
+    const { findByTestId, getByTestId } = renderWithProviders(
+      <AuthLayout>
+        <span>child</span>
+      </AuthLayout>,
+    );
+    const card = (await findByTestId('auth-form-container')).parentElement;
+    const hero = getByTestId('auth-showcase-hero');
+    const board = getByTestId('auth-showcase');
+    const follows = (first: Node, second: Node) =>
+      Boolean(first.compareDocumentPosition(second) & Node.DOCUMENT_POSITION_FOLLOWING);
+    // The tab order reaches the email field before anything in the showcase.
+    expect(card && follows(hero, card)).toBe(true);
+    expect(card && follows(card, board)).toBe(true);
+    // The card stays the page's `h1`; the hero's headline is an `h2`.
+    expect(within(hero).getByRole('heading', { level: 2 })).toHaveTextContent(
+      'Your whole clinic, calm in one place.',
+    );
+    expect(getByTestId('auth-showcase-privacy')).toHaveTextContent(
+      'Private by design — each clinic sees only its own records.',
+    );
+  });
+
   it('on a theme-locked deployment, the header keeps the language picker and drops the theme toggle', async () => {
     platformOverrides.themeLock = true;
     const { findByTestId, getByTestId } = renderWithProviders(

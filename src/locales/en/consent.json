@@ -1,0 +1,24 @@
+{
+  "banner": {
+    "description": "We use cookies to deliver and improve our services and, if you agree, to analyze how {{productName}} is used.",
+    "policy": "You can read our Privacy Policy <1>here</1>.",
+    "customizeDescription": "Cookies let us tell you apart from other people using {{productName}}, keep you signed in and secure and, if you allow it, show us how features are used so we can improve them. You can choose not to allow some types of cookies.",
+    "customize": "Customize cookie settings",
+    "customizeShort": "Customize",
+    "rejectAll": "Reject all cookies",
+    "rejectShort": "Reject",
+    "acceptAll": "Accept all cookies",
+    "acceptShort": "Accept",
+    "save": "Save preferences"
+  },
+  "preferences": {
+    "necessaryTitle": "Necessary",
+    "necessaryDescription": "Enables security and basic functionality.",
+    "analyticsTitle": "Analytics",
+    "analyticsDescription": "Enables product analytics and session recordings that show how features are used.",
+    "required": "Required",
+    "on": "On",
+    "off": "Off",
+    "gpcNote": "Your browser sends Global Privacy Control, so analytics stays off."
+  }
+}
