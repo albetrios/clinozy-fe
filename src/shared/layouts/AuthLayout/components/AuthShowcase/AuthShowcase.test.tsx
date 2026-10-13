@@ -2,6 +2,7 @@ import { render, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { axe } from 'vitest-axe';
 
+import { PRODUCT_NAME } from '@/lib/product-identity.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { JOURNEY_STOPS } from './auth-showcase.constants.ts';
@@ -13,7 +14,7 @@ import {
 } from './AuthShowcase.tsx';
 
 describe('AuthShowcase', () => {
-  it('says who Clinozy is for, the promise, and what it replaces', async () => {
+  it('says who the product is for, the promise, and what it replaces', async () => {
     const { findByTestId } = renderWithProviders(<AuthShowcaseHero />);
     const hero = await findByTestId('auth-showcase-hero');
     expect(
@@ -32,7 +33,7 @@ describe('AuthShowcase', () => {
   it('walks one patient through the seven rooms, each stop in its room’s tone', async () => {
     const { findByRole } = renderWithProviders(<AuthShowcaseBoard />);
     const journey = await findByRole('list', {
-      name: 'A patient’s journey through Clinozy',
+      name: `A patient’s journey through ${PRODUCT_NAME}`,
     });
     const stops = within(journey).getAllByRole('listitem');
     expect(stops.map((stop) => stop.textContent)).toEqual([
@@ -60,7 +61,7 @@ describe('AuthShowcase', () => {
     for (const moment of within(moments).getAllByRole('listitem')) {
       expect(moment).toHaveClass('animate-drift', 'motion-reduce:animate-none');
     }
-    const values = getByRole('list', { name: 'Why clinics choose Clinozy' });
+    const values = getByRole('list', { name: `Why clinics choose ${PRODUCT_NAME}` });
     expect(
       within(values)
         .getAllByRole('listitem')
