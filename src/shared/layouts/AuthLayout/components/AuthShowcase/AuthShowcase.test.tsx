@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { render, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { axe } from 'vitest-axe';
@@ -55,6 +58,21 @@ describe('AuthShowcase', () => {
       );
       expect(pill).toHaveClass(JOURNEY_STOPS[index]?.delay ?? '');
     });
+  });
+
+  it('dims a resting stop only as far as its text keeps WCAG AA contrast', () => {
+    // A resting stop is 12px text over its tone: below 0.79 opacity the light
+    // tones fall under 4.5:1 (0.4 measured ~2:1 and failed Lighthouse's
+    // color-contrast audit on every sign-in route).
+    const css = readFileSync(join(process.cwd(), 'src/index.css'), 'utf8');
+    const start = css.indexOf('@keyframes journey-wave');
+    expect(start).toBeGreaterThan(-1);
+    const block = css.slice(start, css.indexOf('@keyframes', start + 1));
+    const opacities = [...block.matchAll(/opacity:\s*([\d.]+)/g)].map((match) =>
+      Number(match[1]),
+    );
+    expect(opacities.length).toBeGreaterThan(0);
+    expect(Math.min(...opacities)).toBeGreaterThanOrEqual(0.79);
   });
 
   it('shows three anonymous moments and three reasons, with no numbers or names', async () => {

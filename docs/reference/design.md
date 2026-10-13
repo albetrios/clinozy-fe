@@ -168,7 +168,9 @@ Motion is **subtle, fast, and purposeful** — it orients, it doesn't perform.
   disclosure; `shimmer` for skeleton loading. Overlays use the shadcn enter/exit
   utilities (`tw-animate-css`). The sign-in showcase is the one ambient motion —
   `journey-wave` (8.4s), `drift` (6s), `pulse-dot` (2.4s) — and every element of it
-  carries `motion-reduce:animate-none`.
+  carries `motion-reduce:animate-none`. Motion never takes text below WCAG AA: a
+  resting journey stop dims only to 85% opacity (its light tones fall under 4.5:1
+  below 0.79), pinned in `AuthShowcase.test.tsx`.
 - **Tabs keep their place.** A tab drawn bolder when current keeps its bold width
   (`WeightStableLabel`), so switching tabs never moves its neighbours.
 - **Product motion.** Prefer **Anime.js** for intentional numeric or timeline
