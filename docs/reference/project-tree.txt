@@ -21,7 +21,7 @@ src/shared/    UI, auth, api, errors, forms, hooks, layouts, store (Zustand)
 src/lib/       Pure utilities, animations, route-island helpers
 tests/         E2E, utils (project root)
 
-Stats: ~2214 src files · ~1122 tests in src/ · 89 E2E specs · 27 shadcn UI primitives
+Stats: ~2215 src files · ~1123 tests in src/ · 89 E2E specs · 27 shadcn UI primitives
 
 ================================================================================
 §2  FULL DIRECTORY TREE
@@ -516,7 +516,8 @@ clinozy-fe/
 │   │   ├── signed-in-shell-warmup.ts
 │   │   ├── telemetry-scrub.ts
 │   │   ├── utils.ts
-│   │   └── [28 test files]
+│   │   ├── zod-jitless.ts
+│   │   └── [29 test files]
 │   ├── locales/
 │   │   ├── ar/
 │   │   │   ├── app-stock.json

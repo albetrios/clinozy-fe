@@ -204,7 +204,14 @@ export default defineConfig(({ command, mode }) => {
           manualChunks(id) {
             if (id.includes('node_modules/@sentry')) return 'sentry';
             if (id.includes('node_modules/posthog-js')) return 'posthog';
-            if (id.includes('node_modules/zod')) return 'zod';
+            // src/lib/zod-jitless.ts rides in the zod chunk so it runs before any
+            // chunk builds a schema — see that module.
+            if (
+              id.includes('node_modules/zod') ||
+              id.endsWith('/src/lib/zod-jitless.ts')
+            ) {
+              return 'zod';
+            }
             if (id.includes('node_modules/react-hook-form')) return 'rhf';
             if (
               id.includes('node_modules/react/') ||
