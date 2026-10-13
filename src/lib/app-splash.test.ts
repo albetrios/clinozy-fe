@@ -19,7 +19,6 @@ import {
   markAppContentSettled,
   onAppSplashDismissed,
   reloadFromAppSplash,
-  skipAppSplashOnNextLoad,
   SPLASH_BLOCK_AT_MS,
   SPLASH_FRAMES_MS,
   SPLASH_REDUCED_FRAMES_MS,
@@ -588,18 +587,11 @@ describe('app-splash', () => {
 
   // ── index.html owns the frames and the fade; this module owns when they end ──
 
-  describe('skipped after a sign-out (skipAppSplashOnNextLoad)', () => {
+  describe('skipped after a sign-out (APP_SPLASH_SKIP)', () => {
     const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
 
     afterEach(() => {
       document.documentElement.classList.remove(APP_SPLASH_SKIP);
-      sessionStorage.removeItem(APP_SPLASH_SKIP);
-    });
-
-    it('asks the next load of this tab to skip it', () => {
-      skipAppSplashOnNextLoad();
-
-      expect(sessionStorage.getItem(APP_SPLASH_SKIP)).toBe('1');
     });
 
     it('leaves as soon as the screen is up — no frames to wait for, nothing to fade', () => {

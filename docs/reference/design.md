@@ -223,7 +223,7 @@ Motion is **subtle, fast, and purposeful** — it orients, it doesn't perform.
 - **Signing out goes straight to the login screen.** The app stays exactly as it
   is until the login screen replaces it: nothing it shows is cleared before the
   page goes (`pagehide`), and the `/login` load a sign-out hands the tab to skips
-  the splash (`skipAppSplashOnNextLoad` → `public/splash-init.js`: the splash is
+  the splash (`forceLogout` → `public/splash-init.js` → `APP_SPLASH_SKIP`: the splash is
   hidden and `#root` shown before the first paint, so the browser keeps the page
   being left on screen until the login screen paints). The login screen does not
   wait for a revoke still owed to the server — that finishes behind it.

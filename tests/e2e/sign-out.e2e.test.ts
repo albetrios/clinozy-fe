@@ -17,7 +17,7 @@ import { verifyDatabaseConnection } from '@/tests/utils/e2e-session.ts';
  * The app stays exactly as it is until the login screen replaces it: nothing it
  * shows is cleared before the page goes (`leaveForLogin` in
  * `shared/auth/service.ts`), the `/login` load skips the boot splash
- * (`skipAppSplashOnNextLoad` → `public/splash-init.js`), and the login screen
+ * (`forceLogout` → `public/splash-init.js` → `APP_SPLASH_SKIP`), and the login screen
  * does not wait for the revoke still owed to the server.
  */
 

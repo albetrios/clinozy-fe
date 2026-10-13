@@ -6,7 +6,6 @@ import {
 } from '@/core/config/constants.ts';
 import { platformConfig } from '@/core/config/env.ts';
 import { queryClient } from '@/core/http/queryClient.ts';
-import { skipAppSplashOnNextLoad } from '@/lib/app-splash.ts';
 import { PRODUCT_NAMESPACE } from '@/lib/product-identity.ts';
 import { ANALYTICS_EVENTS } from '@/shared/analytics/analytics.constants.ts';
 import { captureAnalyticsEvent } from '@/shared/analytics/capture.ts';
@@ -123,6 +122,24 @@ function clearLocalAuthState(): void {
   }
 }
 
+/**
+ * The sessionStorage key `public/splash-init.js` reads — once — before the next
+ * page load paints: that load skips the boot splash (`APP_SPLASH_SKIP` in
+ * `lib/app-splash.ts`, which reads the class the script sets). Declared here, not
+ * imported: that module lives in the entry chunk, and importing it from this one
+ * split it out (+0.25 kB of first-paint JS). `service.test.ts` pins the two.
+ */
+const SPLASH_SKIP_KEY = 'app-splash-skip';
+
+/** Let the `/login` load a sign-out hands the tab to go straight to the login screen. */
+function skipSplashOnNextLoad(): void {
+  try {
+    sessionStorage.setItem(SPLASH_SKIP_KEY, '1');
+  } catch {
+    /* storage unavailable (private mode) — that load plays the splash */
+  }
+}
+
 /** A page the back/forward cache kept after a sign-out loads again instead of showing. */
 function reloadIfRestored(event: PageTransitionEvent): void {
   if (event.persisted) window.location.reload();
@@ -149,7 +166,7 @@ function reloadIfRestored(event: PageTransitionEvent): void {
 function leaveForLogin(): void {
   window.addEventListener('pagehide', clearLocalAuthState, { once: true });
   window.addEventListener('pageshow', reloadIfRestored);
-  skipAppSplashOnNextLoad();
+  skipSplashOnNextLoad();
   window.location.href = AUTH_ROUTES.LOGIN;
 }
 

@@ -89,7 +89,7 @@ anybody out.
   permission vanished and every list refetched without a token. `pagehide` also
   fires for a page the back/forward cache keeps, and one restored from there
   loads again (`pageshow` → `reload()`). The `/login` load that follows skips the
-  boot splash (`skipAppSplashOnNextLoad()` → `public/splash-init.js`), so the
+  boot splash (`skipSplashOnNextLoad()` → `public/splash-init.js`), so the
   login screen replaces the app directly. It stays a **full page load** on
   purpose: that is what guarantees nothing of the session — the drafts,
   outboxes and file links modules keep in memory included — reaches the next

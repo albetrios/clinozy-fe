@@ -231,7 +231,7 @@ describe('auth/service', () => {
       expect(state.forUserId).toBeNull();
     });
 
-    it('lets the login load skip the boot splash', () => {
+    it('lets the login load skip the boot splash — under the key splash-init.js reads', () => {
       sessionStorage.removeItem(APP_SPLASH_SKIP);
 
       forceLogout();

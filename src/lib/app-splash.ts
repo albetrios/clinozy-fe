@@ -6,7 +6,7 @@
  * the wordmark lands, never while a loader holds it, never while the device was
  * offline at mount — and gives the React slot (`AppSplashSlot`) the splash's
  * clock and the node it renders the greeting block into. One load skips it: the
- * one right after a sign-out ({@link skipAppSplashOnNextLoad}).
+ * one right after a sign-out ({@link APP_SPLASH_SKIP}).
  */
 
 const SPLASH_ID = 'app-splash';
@@ -15,10 +15,15 @@ const SLOT_CLASS = 'app-splash-slot';
 const DISMISS_EVENT = 'app-splash-dismissed';
 
 /**
- * The sessionStorage key {@link skipAppSplashOnNextLoad} writes and
- * `public/splash-init.js` reads — and removes — before the first paint, and the
- * class that script puts on `<html>` for index.html's CSS. Keep the three files
- * in step (`app-splash.test.ts` › skipped after a sign-out).
+ * The load right after a sign-out skips the splash: the class `public/splash-init.js`
+ * puts on `<html>` before the first paint, for index.html's CSS and for this module,
+ * when it finds this sessionStorage key — which `forceLogout()` writes
+ * (`shared/auth/service.ts`, declared there so its chunk does not pull this module
+ * out of the entry). On that load the splash is hidden and `#root` shown, and
+ * nothing paints until the login screen has rendered — so browsers keep the page
+ * being left on screen until then. The splash node stays (hidden), so the loaders'
+ * holds still keep React's own full-page loader away. Pinned across the files by
+ * `app-splash.test.ts` and `service.test.ts`.
  */
 export const APP_SPLASH_SKIP = 'app-splash-skip';
 
@@ -179,27 +184,6 @@ export function appSplashElapsedMs(): number {
     if (typeof at === 'number' && at < start) start = at;
   }
   return Number.isFinite(start) ? now - start : now;
-}
-
-/**
- * Let this tab's next page load go straight to its screen, without the boot splash.
- *
- * @remarks
- * For the load a sign-out hands the tab to: `/login` after the app. The splash
- * there was a 2.5-second stop between two screens the user already knows,
- * right after asking to leave. On that load `public/splash-init.js` hides the
- * splash and shows `#root` before the first paint, and nothing else draws until
- * the login screen has rendered — so browsers keep the page being left on screen
- * until then, and the login screen replaces it directly. The splash node stays
- * (hidden), so the loaders' holds still keep React's own full-page loader away.
- * One load only: the script removes the key as it reads it.
- */
-export function skipAppSplashOnNextLoad(): void {
-  try {
-    sessionStorage.setItem(APP_SPLASH_SKIP, '1');
-  } catch {
-    /* storage unavailable (private mode) — that load plays the splash */
-  }
 }
 
 /** This load skips the splash (`public/splash-init.js` read the key). */
