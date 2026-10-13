@@ -21,6 +21,14 @@ describe('settingsSectionModuleKey', () => {
     );
   });
 
+  it('gates Integrations where it lives now — the Account scope', () => {
+    // It moved out of Organization, and its key stayed behind there: a deployment
+    // that disabled `integrations` still showed the section.
+    expect(settingsSectionModuleKey({ scope: 'account', section: 'integrations' })).toBe(
+      'integrations',
+    );
+  });
+
   it('returns undefined for sections without a module gate', () => {
     expect(
       settingsSectionModuleKey({ scope: 'account', section: 'profile' }),
@@ -41,8 +49,11 @@ describe('isSettingsModuleEnabled', () => {
   });
 
   it('blocks disabled module sections', () => {
-    disabledModulesRef.value = new Set(['billing', 'members']);
+    disabledModulesRef.value = new Set(['billing', 'members', 'integrations']);
     expect(isSettingsModuleEnabled({ scope: 'account', section: 'billing' })).toBe(false);
+    expect(isSettingsModuleEnabled({ scope: 'account', section: 'integrations' })).toBe(
+      false,
+    );
     expect(isSettingsModuleEnabled({ scope: 'organization', section: 'members' })).toBe(
       false,
     );

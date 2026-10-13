@@ -1,0 +1,1466 @@
+{
+  "sections": {
+    "today": {
+      "label": "اليوم",
+      "description": "العيادة الآن: الوصول، الانتظار، مع الطبيب، الخروج"
+    },
+    "leads": {
+      "label": "العملاء المحتملون",
+      "description": "الاستفسارات ومحادثاتها حتى تصبح مرضى"
+    },
+    "appointments": {
+      "label": "المواعيد",
+      "description": "الحجوزات حسب الطبيب والغرفة والجهاز"
+    },
+    "patients": {
+      "label": "المرضى",
+      "description": "المرضى المسجلون، مع الوصفات والجلسات والصور"
+    },
+    "medical": {
+      "label": "الصيدلية",
+      "description": "الصيدلية: الأدوية المعروضة للبيع، الموردون، المندوبون، المشتريات، المبيعات"
+    },
+    "stock": {
+      "label": "مخزون العيادة",
+      "description": "مستلزمات العيادة ومعداتها المستخدمة في الإجراءات · ليست للبيع"
+    },
+    "payments": {
+      "label": "المدفوعات",
+      "description": "التحصيلات والفواتير والمستحقات"
+    },
+    "tasks": {
+      "label": "المهام",
+      "description": "المتابعات ومكالمات الملاحظات والتذكيرات، مع مسؤول وموعد نهائي"
+    },
+    "offerings": {
+      "label": "الخدمات",
+      "description": "ما تبيعه العيادة: الخدمات والباقات والعروض والأسعار"
+    },
+    "users": {
+      "label": "المستخدمون",
+      "description": "الفريق، الأدوار والصلاحيات، الفروع"
+    }
+  },
+  "tones": {
+    "butter": "زبدي",
+    "lav": "خزامى",
+    "sky": "سماوي",
+    "sage": "مريمية",
+    "blush": "وردي",
+    "mint": "نعناعي",
+    "peach": "خوخي",
+    "plum": "برقوقي",
+    "lime": "ليموني",
+    "slate": "أردوازي",
+    "stone": "حجري"
+  },
+  "roles": {
+    "admin": "مسؤول",
+    "doctor": "طبيب",
+    "therapist": "معالج",
+    "front_desk": "الاستقبال",
+    "counsellor": "مستشار",
+    "pharmacist": "صيدلي",
+    "accountant": "محاسب",
+    "marketing": "التسويق",
+    "owner": "المالك"
+  },
+  "leads": {
+    "statuses": {
+      "new": "جديد",
+      "contacted": "تم التواصل",
+      "follow_up": "متابعة",
+      "clinic_visited": "زار العيادة",
+      "no_response": "لا رد",
+      "not_interested": "غير مهتم",
+      "invalid": "غير صالح",
+      "lost": "مفقود"
+    },
+    "retargeted": "أُعيد استهدافه",
+    "sources": {
+      "instagram": "إنستغرام",
+      "google": "Google",
+      "whatsapp": "واتساب",
+      "facebook": "فيسبوك",
+      "walk_in": "زيارة مباشرة",
+      "referral": "إحالة",
+      "retarget": "إعادة استهداف",
+      "phone_call": "مكالمة هاتفية"
+    },
+    "interests": {
+      "others": "أخرى",
+      "clinical": "علاجي",
+      "peel": "تقشير",
+      "lhr": "LHR",
+      "hydrafacial": "Hydrafacial",
+      "prp": "PRP"
+    }
+  },
+  "appointments": {
+    "statuses": {
+      "scheduled": "مجدول",
+      "confirmed": "مؤكَّد",
+      "checked_in": "حضر",
+      "completed": "مكتمل",
+      "cancelled": "ملغى",
+      "no_show": "لم يحضر"
+    },
+    "moves": {
+      "reschedule": "نقل إلى وقت آخر",
+      "cancelled": "إلغاء"
+    },
+    "moveHints": {
+      "scheduled": "الموعد محجوز · طلب التأكيد في قائمة الانتظار",
+      "confirmed": "قالوا نعم",
+      "checked_in": "وصلوا · في يوم الموعد فقط",
+      "completed": "تمت الزيارة · يُضبط عادةً من الزيارة",
+      "reschedule": "النقل إلى وقت جديد · الموعد نفسه، ويبقى الوقت القديم في السجل",
+      "cancelled": "يحرر الوقت ويوقف التذكيرات",
+      "no_show": "فقط بعد مرور وقت البدء"
+    },
+    "guards": {
+      "final": "حالة نهائية. استخدم «إعادة الحجز» لإنشاء موعد جديد.",
+      "visitDay": "فقط {{day}}",
+      "beforeStart": "متاح بعد {{time}} · {{day}}",
+      "needsPatient": "أنشئ سجل المريض أولًا · الاكتمال يتطلب مريضًا"
+    },
+    "nextActions": {
+      "check_in": "تسجيل الحضور",
+      "confirm": "تأكيد",
+      "complete": "إكمال",
+      "rebook": "إعادة الحجز"
+    },
+    "tiles": {
+      "booked": "محجوز",
+      "said_yes": "قالوا نعم",
+      "visit_day": "متاح يوم الموعد",
+      "after_check_in": "بعد تسجيل الحضور"
+    },
+    "hints": {
+      "scheduled": "الموعد محجوز · ينتظر طلب التأكيد في القائمة حتى يتم ربط المراسلة",
+      "confirmed": "تم التأكيد هاتفيًا بالفعل · يُرسل التذكير",
+      "checked_in": "المريض في العيادة · تم إبلاغ قائمة انتظار الطبيب · حدده مكتملًا عند الانتهاء",
+      "completed": "تمت الزيارة · تُرسل مهمة تقييم غدًا",
+      "needs_patient": "أنشئ سجل المريض لإكمال هذه الزيارة",
+      "cancelled": "استعده لإعادته · الوقت متاح للآخرين في الأثناء",
+      "closed": "هذا الموعد مغلق · {{status}}"
+    },
+    "cancelReasons": {
+      "patient_asked": "طلب المريض",
+      "unreachable": "تعذر الوصول إلى المريض",
+      "doctor_unavailable": "الطبيب غير متاح",
+      "resource_unavailable": "الجهاز أو الغرفة غير متاحة",
+      "rescheduling_later": "ستُعاد الجدولة لاحقًا",
+      "booked_by_mistake": "حُجز بالخطأ",
+      "other": "أخرى"
+    },
+    "cancelSides": {
+      "patient": "المريض",
+      "clinic": "العيادة"
+    },
+    "cancelConfirm": {
+      "title": "إلغاء هذا الموعد؟",
+      "record": "{{name}} · {{service}}",
+      "effect": "يُحرَّر الوقت وتتوقف التذكيرات. يمكنك استعادته حتى يمر وقته.",
+      "action": "إلغاء"
+    },
+    "formCancelReasons": {
+      "patient_cancelled": "ألغى المريض",
+      "rescheduling_later": "ستُعاد الجدولة لاحقًا",
+      "doctor_unavailable": "الطبيب غير متاح",
+      "booked_by_mistake": "حُجز بالخطأ",
+      "other": "أخرى"
+    },
+    "toasts": {
+      "booked": "تم حجز {{id}} · {{day}} {{time}} · طلب التأكيد في قائمة الانتظار",
+      "bookedQueued": "تم حجز {{id}} · {{day}} {{time}} · التذكير في قائمة الانتظار",
+      "bookedOnly": "تم حجز {{id}} · {{day}} {{time}}",
+      "moved": "نُقل {{id}} إلى {{day}} {{time}} · طلب التأكيد في قائمة الانتظار",
+      "movedOnly": "نُقل {{id}} إلى {{day}} {{time}}",
+      "updated": "تم تحديث {{id}}",
+      "statusChanged": "{{name}} ← {{status}}",
+      "statusConfirmed": "{{name}} ← {{status}} · التذكير في قائمة الانتظار",
+      "statusCancelled": "{{name}} ← {{status}} · {{reason}} · تم تحرير الوقت وإيقاف التذكيرات",
+      "cancelled": "تم إلغاء الموعد {{id}}",
+      "restored": "تمت استعادة الموعد · يُرسل التذكير مجددًا"
+    }
+  },
+  "offerings": {
+    "categories": {
+      "consultation": "استشارة",
+      "treatment": "علاج",
+      "package": "باقة",
+      "lhr": "LHR",
+      "product": "منتج"
+    },
+    "offerKinds": {
+      "percent": "خصم %",
+      "amount": "خصم ₹",
+      "fixed": "سعر ثابت",
+      "extra": "جلسات إضافية"
+    },
+    "offerStates": {
+      "live": "سارٍ",
+      "scheduled": "مجدول",
+      "paused": "متوقف مؤقتًا",
+      "ended": "منتهٍ"
+    },
+    "toasts": {
+      "offeringCreated": "تم إنشاء الخدمة {{id}}",
+      "offeringSaved": "تم حفظ الخدمة {{id}}",
+      "offeringRemoved": "تمت إزالة الخدمة {{id}}",
+      "offerCreated": "تم إنشاء {{name}} · يُطبَّق تلقائيًا",
+      "offerSaved": "تم حفظ {{name}}",
+      "offerRemoved": "تمت إزالة {{name}}",
+      "offerPaused": "تم إيقاف {{name}} مؤقتًا",
+      "offerResumed": "{{name}} سارٍ من جديد"
+    },
+    "specialties": {
+      "skin": "الجلدية",
+      "hair": "الشعر",
+      "dental": "الأسنان",
+      "gynac": "النسائية",
+      "physio": "العلاج الطبيعي",
+      "general": "عام"
+    }
+  },
+  "patients": {
+    "types": {
+      "aesthetic": "تجميلي",
+      "clinical": "سريري",
+      "lhr": "LHR",
+      "dental": "أسنان",
+      "physio": "علاج طبيعي",
+      "gynac": "نسائية"
+    },
+    "statuses": {
+      "new": "جديد",
+      "regular": "منتظم",
+      "vip": "VIP",
+      "inactive": "غير نشط"
+    },
+    "conversions": {
+      "converted": "T-تم التحويل",
+      "not_converted": "T-لم يتم التحويل"
+    },
+    "referralSources": {
+      "patient": "مريض",
+      "doctor": "طبيب",
+      "instagram": "إنستغرام",
+      "google": "Google",
+      "walk_in": "زيارة مباشرة",
+      "other": "أخرى"
+    }
+  },
+  "visits": {
+    "record": "الزيارة"
+  },
+  "patientDelete": {
+    "title": "حذف هذا المريض؟",
+    "titleRecord": "حذف هذا السجل؟",
+    "removed": "تمت إزالة {{name}}"
+  },
+  "patientDrawer": {
+    "title": {
+      "create": "مريض جديد",
+      "edit": "تعديل المريض"
+    },
+    "sub": {
+      "full": "ينشئ جهة الاتصال أو يحدّثها أيضًا",
+      "quick": "ما تحتاجه العيادة قبل إتمام الزيارة"
+    },
+    "quickFill": {
+      "walkIn": "زيارة مباشرة اليوم",
+      "referred": "بإحالة من مريض",
+      "instagram": "من إنستغرام",
+      "lhr": "مريض LHR"
+    },
+    "steps": {
+      "contact": "الاتصال والبيانات الشخصية",
+      "clinic": "العيادة والإحالة والمتابعة"
+    },
+    "groups": {
+      "contact": "الاتصال",
+      "personal": "البيانات الشخصية",
+      "clinic": "العيادة",
+      "referral": "الإحالة والمتابعة"
+    },
+    "fields": {
+      "firstName": "الاسم الأول",
+      "lastName": "اسم العائلة",
+      "mobile": "الجوال",
+      "mobileHint": "أساسي · واتساب",
+      "phone2": "جوال ثانوي",
+      "phone2Hint": "10 أرقام",
+      "address": "العنوان",
+      "addressPlaceholder": "المنطقة، المدينة",
+      "homeBranch": "الفرع الأساسي",
+      "gender": "الجنس",
+      "birthDate": "تاريخ الميلاد",
+      "age": "العمر {{age}}",
+      "types": "نوع المريض",
+      "typesHint": "اختر ما تشاء",
+      "status": "الحالة",
+      "conversion": "التحويل",
+      "referredBy": "أحاله",
+      "referredByPlaceholder": "الاسم",
+      "referrerType": "نوع الإحالة",
+      "followUp": "المتابعة",
+      "followUpDate": "تاريخ المتابعة",
+      "followUpTime": "وقت المتابعة",
+      "notes": "ملاحظات",
+      "notesPlaceholder": "ما يجب أن يعرفه الفريق",
+      "consent": "الموافقة",
+      "consentHint": "ما تم توقيعه",
+      "photos": "الصور الأولى",
+      "photosHint": "صور قبل · تُحفظ في زيارة اليوم",
+      "photosDrop": "التقط الصور أو أفلتها هنا",
+      "photosLimit": "JPG أو PNG · حتى {{limit}} لكل صورة",
+      "photosRemove": "إزالة {{name}}"
+    },
+    "followUpQuick": {
+      "tomorrow": "غدًا {{time}}",
+      "week": "بعد أسبوع",
+      "twentyDays": "بعد 20 يومًا",
+      "month": "بعد شهر"
+    },
+    "save": {
+      "create": "إنشاء المريض",
+      "edit": "حفظ التغييرات",
+      "createAnother": "إنشاء وإضافة آخر"
+    },
+    "missing": "أضف الاسم والجوال",
+    "mobileInvalid": "أدخل رقم جوال من 10 أرقام",
+    "created": "تم إنشاء المريض {{id}}",
+    "openFile": "فتح الملف",
+    "saved": "تم حفظ {{name}}",
+    "registered": "تم تسجيل {{name}} كمريض {{id}}",
+    "registeredPhotos_zero": "تم تسجيل {{name}} كمريض {{id}} · {{count}} صورة محفوظة",
+    "registeredPhotos_one": "تم تسجيل {{name}} كمريض {{id}} · {{count}} صورة محفوظة",
+    "registeredPhotos_two": "تم تسجيل {{name}} كمريض {{id}} · صورتان محفوظتان",
+    "registeredPhotos_few": "تم تسجيل {{name}} كمريض {{id}} · {{count}} صور محفوظة",
+    "registeredPhotos_many": "تم تسجيل {{name}} كمريض {{id}} · {{count}} صورة محفوظة",
+    "registeredPhotos_other": "تم تسجيل {{name}} كمريض {{id}} · {{count}} صورة محفوظة",
+    "duplicate": "نفس رقم الجوال لدى {{name}} · {{id}}",
+    "useExisting": "استخدام الموجود",
+    "summaryEmpty": "مريض جديد",
+    "knownPerson": "{{name}} موجود بالفعل في جهات الاتصال · سيُفتح الملف باسمه"
+  },
+  "recordDrawer": {
+    "cancel": "إلغاء",
+    "back": "رجوع",
+    "close": "إغلاق",
+    "save": "حفظ",
+    "saving": "جارٍ الحفظ…",
+    "retrySave": "إعادة محاولة الحفظ",
+    "saveAndAdd": "حفظ وإضافة آخر",
+    "delete": "حذف",
+    "notSaved": "لم يُحفظ · تغييراتك ما زالت هنا",
+    "saveFailed": "تعذّر الحفظ · انقطع الاتصال. كل ما أدخلته ما زال هنا.",
+    "readOnly": "للعرض فقط · لا يمكن لدورك تغيير هذا",
+    "quickFill": "تعبئة سريعة",
+    "step": {
+      "next": "التالي: {{step}} ←",
+      "edit": "تعديل",
+      "open": "فتح",
+      "missing": "ناقص: {{fields, list(type: unit)}}",
+      "notFilled": "لم يُملأ بعد"
+    },
+    "peek": {
+      "empty": "فارغ",
+      "added_zero": "{{count}} مُضاف",
+      "added_one": "{{count}} مُضاف",
+      "added_two": "{{count}} مُضافان",
+      "added_few": "{{count}} مُضافة",
+      "added_many": "{{count}} مُضافًا",
+      "added_other": "{{count}} مُضاف",
+      "noneYet": "لا شيء بعد"
+    },
+    "stepper": {
+      "decrease": "إنقاص",
+      "increase": "زيادة"
+    },
+    "colours": {
+      "butter": "زبدي",
+      "lav": "لافندر",
+      "sky": "سماوي",
+      "sage": "أخضر مريمي",
+      "blush": "وردي فاتح",
+      "mint": "نعناعي",
+      "peach": "خوخي",
+      "plum": "برقوقي",
+      "lime": "ليموني",
+      "slate": "رمادي أردوازي",
+      "stone": "حجري"
+    },
+    "currency": "₹"
+  },
+  "personCard": {
+    "contactLabel": "جهة الاتصال",
+    "openPatientFile": "فتح ملف المريض",
+    "since": "منذ {{date}}",
+    "leadSince": "عميل محتمل منذ {{date}}",
+    "kind": {
+      "patient": "مريض",
+      "lead": "عميل محتمل",
+      "contact": "جهة اتصال"
+    },
+    "editContact": "تعديل جهة الاتصال",
+    "changeContact": "تغيير جهة الاتصال",
+    "changeContactHint": "اختيار جهة اتصال أخرى",
+    "reach": "وسائل التواصل",
+    "team": "الفريق",
+    "about": "نبذة",
+    "reachSub": {
+      "whatsappPrimary": "واتساب · أساسي",
+      "whatsappAlternate": "واتساب · بديل",
+      "phonePrimary": "هاتف · أساسي",
+      "phoneAlternate": "هاتف · بديل",
+      "instagram": "إنستغرام"
+    },
+    "whatsApp": "واتساب",
+    "call": "اتصال",
+    "openInstagram": "فتح إنستغرام",
+    "copy": "نسخ",
+    "copied": "تم نسخ {{value}}",
+    "noReach": "لم يُحفظ رقم هاتف أو معرّف بعد",
+    "claim": "مفتوح · استلام",
+    "claimHint": "يوجد عميل محتمل مفتوح لهذا الشخص · استلمه",
+    "gender": {
+      "female": "أنثى",
+      "male": "ذكر",
+      "other": "آخر"
+    },
+    "genderAge": "{{gender}} · {{age}} سنة",
+    "age": "{{age}} سنة",
+    "cameVia": "جاء عبر {{source}}",
+    "owedToThem": "{{amount}} مستحقة لهم",
+    "owedByThem": "{{amount}} مستحقة عليهم للعيادة",
+    "reviews_zero": "لا مراجعات · الأحدث {{rating}}★ على {{source}} · {{date}}",
+    "reviews_one": "مراجعة واحدة · الأحدث {{rating}}★ على {{source}} · {{date}}",
+    "reviews_two": "مراجعتان · الأحدث {{rating}}★ على {{source}} · {{date}}",
+    "reviews_few": "{{count}} مراجعات · الأحدث {{rating}}★ على {{source}} · {{date}}",
+    "reviews_many": "{{count}} مراجعة · الأحدث {{rating}}★ على {{source}} · {{date}}",
+    "reviews_other": "{{count}} مراجعة · الأحدث {{rating}}★ على {{source}} · {{date}}",
+    "consent": {
+      "data": "البيانات",
+      "photos": "الصور",
+      "marketing": "التسويق",
+      "hint": "الموافقة · {{label}}",
+      "given": "{{label}}: تمت الموافقة",
+      "missing": "{{label}}: لا موافقة"
+    },
+    "newLead": "+ عميل محتمل",
+    "newLeadHint": "استفسار جديد لجهة الاتصال هذه",
+    "newAppointment": "+ موعد",
+    "newAppointmentHint": "احجز لجهة الاتصال هذه",
+    "newPatient": "+ مريض",
+    "newPatientHint": "إنشاء سجل مريض لجهة الاتصال هذه",
+    "online": "متصل الآن",
+    "offline": "غير متصل",
+    "memberKind": {
+      "assigned": "مُسنَد",
+      "sentThis": "أرسل هذا",
+      "treating": "يعالج",
+      "involved": "مشارك"
+    },
+    "assignToYourself": "إسناده إليّ",
+    "works": "يعمل {{from}} – {{to}}",
+    "updated": "آخر تحديث {{time}}",
+    "fetching": "جارٍ جلب الأحدث…"
+  },
+  "reasonConfirm": {
+    "keep": "الإبقاء عليه",
+    "reason": "السبب",
+    "note": "ملاحظة",
+    "notePlaceholder": "أضف ملاحظة (اختياري)",
+    "noteRequired": "أخبر الفريق بالسبب (مطلوب)",
+    "hintPickReason": "اختر سببًا للمتابعة",
+    "hintAddNote": "أضف ملاحظة قصيرة لـ «أخرى»",
+    "kinds": {
+      "delete": {
+        "action": "حذف",
+        "effect": "يختفي من القوائم وأدوات الاختيار. يمكنك التراجع من الإشعار بعد ذلك مباشرة."
+      },
+      "cancel": {
+        "action": "إلغاء الطلب",
+        "effect": "يتوقف الطلب هنا. لا يتغير المخزون ولا مستحقات المورّد."
+      },
+      "void": {
+        "action": "إبطال البيع",
+        "effect": "يُبطَل البيع وتُلغى فاتورته. تعود البضاعة إلى المخزون."
+      }
+    },
+    "reasons": {
+      "mistake": "أُنشئ بالخطأ",
+      "duplicate": "مكرر",
+      "notNeeded": "لم يعد مطلوبًا",
+      "other": "أخرى",
+      "orderedByMistake": "طُلب بالخطأ",
+      "supplierCantDeliver": "المورّد لا يستطيع التسليم",
+      "priceChanged": "تغيّر السعر",
+      "billedByMistake": "فُوتر بالخطأ",
+      "wrongItems": "أصناف خاطئة",
+      "customerChangedMind": "غيّر العميل رأيه"
+    }
+  },
+  "itemsField": {
+    "addRow": "إضافة صف",
+    "removeRow": "إزالة الصف",
+    "remove": "إزالة",
+    "decrease": "إنقاص",
+    "increase": "زيادة",
+    "note": "ملاحظة",
+    "notePlaceholder": "ملاحظات",
+    "moneyPlaceholder": "₹ 0"
+  },
+  "roomToolbar": {
+    "more": "المزيد",
+    "moreSections": "مزيد من الأقسام",
+    "searchTitle": "بحث · اضغط /",
+    "moreCreate": "إجراءات إنشاء أخرى"
+  },
+  "filters": {
+    "title": "عوامل التصفية",
+    "appliedCount": "{{count}} مطبّقة",
+    "clearAll": "مسح الكل",
+    "clearAllFilters": "مسح كل عوامل التصفية",
+    "apply": "تطبيق التصفية",
+    "saveView": "حفظ كعرض",
+    "savedView": "محفوظ كعرض",
+    "viewSaved": "تم حفظ العرض «{{name}}»",
+    "any": "الكل",
+    "from": "من",
+    "to": "إلى",
+    "created": {
+      "label": "تاريخ الإنشاء",
+      "today": "اليوم",
+      "yesterday": "أمس",
+      "lastSevenDays": "آخر 7 أيام",
+      "lastThirtyDays": "آخر 30 يومًا",
+      "thisMonth": "هذا الشهر",
+      "range": "نطاق مخصص"
+    },
+    "followUp": {
+      "label": "تاريخ المتابعة",
+      "overdue": "متأخرة",
+      "today": "اليوم",
+      "tomorrow": "غدًا",
+      "nextSevenDays": "الأيام السبعة القادمة",
+      "notSet": "غير محدد",
+      "range": "نطاق مخصص"
+    }
+  },
+  "commandMenu": {
+    "results": "النتائج",
+    "groups": {
+      "actions": "إجراءات",
+      "goTo": "انتقل إلى",
+      "people": "الأشخاص"
+    },
+    "actions": {
+      "newLead": "عميل محتمل جديد",
+      "newAppointment": "موعد جديد",
+      "newPatient": "مريض جديد",
+      "newReceipt": "تحصيل جديد",
+      "openTasks": "فتح المهام"
+    },
+    "screen": "شاشة",
+    "move": "تنقّل",
+    "open": "فتح",
+    "hint": "اكتب 3 أحرف أو 4 أرقام أو أكثر للبحث عن الأشخاص",
+    "empty": "لا توجد نتائج مطابقة. جرّب اسمًا أو رقم هاتف أو رقم C.",
+    "personSub": "{{id}} · •••• {{lastDigits}}"
+  },
+  "lists": {
+    "loadError": "تعذّر تحميل هذه القائمة · انقطع الاتصال. يتم عرض آخر نسخة.",
+    "retry": "إعادة المحاولة"
+  },
+  "clock": {
+    "todayTime": "اليوم {{time}}",
+    "dayTime": "{{day}} {{time}}"
+  },
+  "channels": {
+    "whatsapp": "واتساب",
+    "call": "مكالمة",
+    "sms": "رسالة نصية",
+    "instagram": "إنستغرام",
+    "email": "بريد إلكتروني",
+    "note": "ملاحظة"
+  },
+  "checkInFeels": {
+    "much_better": "أفضل بكثير",
+    "better": "أفضل",
+    "same": "كما هو",
+    "worse": "أسوأ"
+  },
+  "reviewSources": {
+    "google": "Google",
+    "video": "فيديو",
+    "instagram": "إنستغرام",
+    "internal_form": "نموذج الملاحظات",
+    "whatsapp": "واتساب"
+  },
+  "paymentModes": {
+    "cash": "نقدًا",
+    "upi": "UPI",
+    "card": "بطاقة",
+    "credit": "رصيد"
+  },
+  "invoiceTypes": {
+    "clinic": "العيادة",
+    "medical": "الصيدلية",
+    "consultation": "الاستشارة"
+  },
+  "invoiceStatuses": {
+    "paid": "مدفوعة",
+    "partial": "مدفوعة جزئيًا",
+    "unpaid": "مستحقة"
+  },
+  "taskOutcomes": {
+    "log_check_in": "تسجيل متابعة",
+    "doing_well": "بحالة جيدة",
+    "no_answer": "لا رد",
+    "happy": "راضٍ",
+    "done": "تم"
+  },
+  "chatColumn": {
+    "thread": "الرسائل",
+    "separator": " · ",
+    "created": {
+      "lead": "تم إنشاء العميل المحتمل · {{time}} · عبر {{source}}",
+      "patientThread": "مريض · دردشة فقط · بلا عميل محتمل",
+      "contactThread": "جهة اتصال · دردشة فقط · بلا عميل محتمل"
+    },
+    "history": {
+      "appointment": "الموعد #{{seq}}",
+      "reminder": "تم إرسال التذكير",
+      "prescription": "الوصفة #{{seq}}",
+      "session": "الجلسة {{session}}",
+      "invoice": "فاتورة {{type}} #{{seq}}",
+      "due": "{{amount}} مستحق",
+      "paid": "مدفوعة",
+      "received": "تم استلام {{amount}}",
+      "refund": "استرداد {{amount}}",
+      "invoiceRef": "#{{seq}}",
+      "checkIn": "متابعة",
+      "score": "{{score}}/10",
+      "after": "بعد {{context}}",
+      "review": "تقييم {{source}}",
+      "rating": "{{rating}}★",
+      "task": "مهمة · {{title}} ← {{result}}",
+      "masked": "₹ ••••"
+    },
+    "delivery": {
+      "sending": "جارٍ الإرسال…",
+      "sent": "أُرسلت",
+      "delivered": "وصلت",
+      "read": "قُرئت",
+      "queued": "في قائمة الانتظار",
+      "notSent": "لم تُرسل",
+      "retry": "إعادة المحاولة"
+    },
+    "sender": {
+      "call": "{{name}} · مكالمة",
+      "note": "{{name}} · ملاحظة"
+    },
+    "empty": {
+      "title": "لا توجد محادثة بعد",
+      "visit": "موعد {{service}} لـ{{first}} {{when}} الساعة {{time}} · رسالة واتساب سريعة تحفظ الموعد",
+      "pastVisits": "كل رسائل واتساب والمكالمات والملاحظات مع {{first}} تظهر هنا",
+      "noVisits": "ابدأ برسالة واتساب · تظهر الردود هنا",
+      "today": "اليوم",
+      "tomorrow": "غدًا",
+      "onDate": "في {{date}}"
+    },
+    "starters": {
+      "onTheWay": "هل أنت في الطريق؟",
+      "directions": "إرسال الاتجاهات",
+      "newTime": "اقتراح وقت آخر",
+      "confirm": "تأكيد الزيارة",
+      "prep": "تعليمات التحضير",
+      "howItWent": "السؤال عن الزيارة",
+      "nextSession": "حجز الجلسة التالية",
+      "offer": "مشاركة عرض",
+      "hello": "إلقاء التحية",
+      "consultation": "اقتراح استشارة"
+    },
+    "sendVia": "الإرسال عبر",
+    "modes": {
+      "whatsapp": "واتساب",
+      "instagram": "إنستغرام",
+      "call": "سجل المكالمة",
+      "note": "ملاحظة"
+    },
+    "noInstagram": "لا يوجد حساب إنستغرام لجهة الاتصال هذه",
+    "message": "الرسالة",
+    "placeholder": {
+      "message": "رسالة إلى {{first}} عبر {{channel}}",
+      "messageNoName": "رسالة إلى العميل المحتمل عبر {{channel}}",
+      "note": "ملاحظة للفريق، لن تُرسل إلى {{first}}",
+      "noteNoName": "ملاحظة للفريق، لن تُرسل إلى العميل المحتمل",
+      "call": "ماذا حدث في المكالمة؟"
+    },
+    "send": {
+      "whatsapp": "إرسال واتساب",
+      "instagram": "إرسال إنستغرام",
+      "call": "تسجيل المكالمة",
+      "note": "إضافة ملاحظة"
+    },
+    "replyHint": "آخر ما كتبه {{first}} كان هنا",
+    "mismatch": "كتب {{first}} عبر {{channel}} · تبديل",
+    "outage": "واتساب متوقف · ستنتظر الردود في قائمة الانتظار",
+    "notConnected": "تنتظر الرسائل في قائمة الانتظار · تُرسل بعد ربط خدمة المراسلة",
+    "prefersNoCalls": "لا يفضّل المكالمات · أرسل رسالة بدلًا منها",
+    "prefersAfterSix": "يفضّل التواصل بعد الساعة 6 مساءً",
+    "suggest": "اقتراح",
+    "suggestions": "الاقتراحات",
+    "suggestHint": "الاقتراحات والقوالب · أو اكتب /",
+    "book": "حجز موعد",
+    "bookHint": "حجز موعد · السبب من رسالته",
+    "suggestedFor": "اقتراحات لـ{{first}}",
+    "closeSuggestions": "إغلاق الاقتراحات",
+    "templatesLabel": "القوالب · اكتب / في المربع للبحث",
+    "noTemplate": "لا يوجد قالب يطابق «{{query}}»",
+    "fillIn": "املأ",
+    "chips": {
+      "price": "مشاركة السعر",
+      "priceHint": "سأل عن السعر",
+      "slots": "اقتراح موعدين",
+      "slotsHint": "سأل عن الوقت",
+      "location": "إرسال الموقع",
+      "explain": "شرح {{term}}",
+      "greet": "تحية",
+      "followUp": "متابعة"
+    },
+    "templates": {
+      "greeting": "تحية",
+      "price": "السعر",
+      "slots": "المواعيد المتاحة",
+      "location": "الموقع",
+      "reminder": "تذكير",
+      "aftercare": "العناية بعد الجلسة",
+      "followUp": "متابعة",
+      "review": "تقييم"
+    },
+    "content": {
+      "starters": {
+        "onTheWay": "مرحبًا {{first}}، نحن جاهزون لموعد {{service}} الساعة {{time}}. هل أنت في الطريق؟",
+        "directionsToday": "مرحبًا {{first}}، هذا موقع العيادة: {{maps}}. نراك الساعة {{time}}!",
+        "newTime": "مرحبًا {{first}}، إذا لم يناسبك الساعة {{time}} اليوم، فأرسل لنا وقتًا يناسبك وسننقل الموعد.",
+        "confirm": "مرحبًا {{first}}، نذكّرك بموعد {{service}} {{when}} الساعة {{time}}. أرسل نعم للتأكيد.",
+        "prep": "مرحبًا {{first}}، قبل موعد {{service}} {{when}}: تعالَ دون مكياج وتجنّب الشمس لمدة 24 ساعة. نراك الساعة {{time}}!",
+        "directionsLater": "مرحبًا {{first}}، هذا موقع العيادة: {{maps}}. نراك {{when}} الساعة {{time}}.",
+        "howItWent": "مرحبًا {{first}}، كيف حال بشرتك بعد الزيارة الأخيرة؟ هل لديك أسئلة للطبيب؟",
+        "nextSession": "مرحبًا {{first}}، هل نحجز جلستك التالية؟ أرسل لنا يومًا يناسبك.",
+        "offer": "مرحبًا {{first}}، لدينا عرض خاص على علاجك المعتاد هذا الشهر. هل تريد التفاصيل؟",
+        "hello": "مرحبًا {{first}}، معك {{me}} من {{clinic}}. يسعدني مساعدتك في أي شيء تحتاجه.",
+        "consultation": "مرحبًا {{first}}، يمكن لطبيبنا رؤيتك هذا الأسبوع. هل أحجز لك استشارة؟",
+        "directions": "مرحبًا {{first}}، هذا موقع العيادة: {{maps}}."
+      },
+      "templates": {
+        "greeting": "مرحبًا {{first}}، معك {{me}} من {{clinic}} 😊 كيف يمكنني مساعدتك اليوم؟",
+        "price": "سعر {{offering}} هو {{price}}، ويشمل استشارة مع الطبيب. هل أحجز لك؟",
+        "priceSessions": "سعر {{offering}} هو {{price}} مقابل {{sessions}} جلسات، ويشمل استشارة مع الطبيب. هل أحجز لك؟",
+        "slots": "لدينا {{slots}} متاحان لـ{{interest}}. أيهما يناسبك؟",
+        "location": "نحن في {{address}} · خرائط Google: {{maps}}. يتوفر موقف سيارات أمام العيادة مباشرة.",
+        "reminder": "مرحبًا {{first}}، نذكّرك بزيارتك {{dayTime}}. أرسل نعم للتأكيد أو أخبرنا بوقت أنسب.",
+        "aftercare": "مرحبًا {{first}}، كيف حال البشرة اليوم؟ حافظ على ترطيبها واستخدم واقي الشمس وتجنّب المقشّرات لمدة 48 ساعة.",
+        "followUp": "مرحبًا {{first}}، أتابع معك بخصوص {{interest}}. هل تريد أن أحجز لك موعدًا هذا الأسبوع؟",
+        "review": "شكرًا لزيارتك يا {{first}}! إن أعجبتك، فتقييم سريع على Google يساعدنا كثيرًا: {{reviewLink}}"
+      },
+      "explain": "سؤال رائع! {{offering}} مناسب جدًا لهذا — يرى معظم الناس النتائج خلال {{results}}. سيفحص الطبيب ويضع الخطة في استشارتك.",
+      "sessions": "{{n}} جلسات",
+      "fewWeeks": "بضعة أسابيع",
+      "slotPair": "{{first}} أو {{second}}",
+      "slot": "{{day}} الساعة {{time}}",
+      "dayTime": "{{day}} الساعة {{time}}",
+      "dayTimeFallback": "غدًا الساعة 11 صباحًا",
+      "today": "اليوم",
+      "tomorrow": "غدًا",
+      "onDate": "في {{date}}",
+      "there": "بك",
+      "yourTreatment": "علاجك",
+      "interests": {
+        "clinical": "العلاج السريري",
+        "peel": "التقشير",
+        "lhr": "إزالة الشعر بالليزر",
+        "hydrafacial": "هيدرافيشل",
+        "prp": "البلازما (PRP)"
+      },
+      "fill": {
+        "address": "العنوان",
+        "maps": "رابط الخرائط",
+        "dayTime": "اليوم والوقت",
+        "reviewLink": "رابط التقييم"
+      }
+    }
+  },
+  "offeringSuggestions": {
+    "title": "اقتراحات الخدمات",
+    "suggested_zero": "لا اقتراحات",
+    "suggested_one": "اقتراح واحد",
+    "suggested_two": "اقتراحان",
+    "suggested_few": "{{count}} اقتراحات",
+    "suggested_many": "{{count}} اقتراحًا",
+    "suggested_other": "{{count}} اقتراح",
+    "planned_zero": "لا شيء مخطط",
+    "planned_one": "واحد مخطط",
+    "planned_two": "اثنان مخططان",
+    "planned_few": "{{count}} مخططة",
+    "planned_many": "{{count}} مخططًا",
+    "planned_other": "{{count}} مخطط",
+    "accepted_zero": "{{count}} مقبول",
+    "accepted_one": "{{count}} مقبول",
+    "accepted_two": "{{count}} مقبولان",
+    "accepted_few": "{{count}} مقبولة",
+    "accepted_many": "{{count}} مقبولًا",
+    "accepted_other": "{{count}} مقبول",
+    "pastPurchases_zero": "لا مشتريات سابقة",
+    "pastPurchases_one": "عملية شراء سابقة واحدة",
+    "pastPurchases_two": "عمليتا شراء سابقتان",
+    "pastPurchases_few": "{{count}} عمليات شراء سابقة",
+    "pastPurchases_many": "{{count}} عملية شراء سابقة",
+    "pastPurchases_other": "{{count}} عملية شراء سابقة",
+    "ideas_zero": "لا أفكار",
+    "ideas_one": "فكرة واحدة",
+    "ideas_two": "فكرتان",
+    "ideas_few": "{{count}} أفكار",
+    "ideas_many": "{{count}} فكرة",
+    "ideas_other": "{{count}} فكرة",
+    "nothingSuggested": "لا اقتراحات بعد",
+    "noSuggestions": "لا اقتراحات بعد",
+    "pricesHidden": "الأسعار مخفية",
+    "masked": "₹ ••••",
+    "pricesHiddenHint": "الأسعار مخفية · استخدم العين لإظهارها",
+    "showPrices": "إظهار الأسعار",
+    "hidePrices": "إخفاء الأسعار",
+    "columns": {
+      "suggested": "المقترح",
+      "qty": "الكمية",
+      "price": "السعر",
+      "status": "الحالة"
+    },
+    "less": "أقل",
+    "more": "أكثر",
+    "quantity": "الكمية",
+    "finalPrice": "السعر النهائي",
+    "belowFloor": "أقل من أدنى سعر",
+    "tooMuchDiscount": "خصم كبير جدًا · اسأل مسؤولًا",
+    "details": "تفاصيل الخدمة",
+    "statuses": {
+      "planned": "مخطط",
+      "accepted": "مقبول",
+      "next_time": "في المرة القادمة",
+      "declined": "مرفوض"
+    },
+    "statusHints": {
+      "planned": "مقترح · لم يُحسم بعد",
+      "accepted": "وافقوا · أصدر الفاتورة عند حدوثه",
+      "next_time": "مهتمون · اذكره في الزيارة القادمة",
+      "declined": "غير مهتمين · محفوظ كسجل"
+    },
+    "statusLabel": "الحالة · {{status}}",
+    "invoiced": "مُفوتر",
+    "invoicedOf": "مُفوتر · {{done}} من {{total}}",
+    "remove": "إزالة",
+    "empty": "لا اقتراحات لـ {{first}} بعد.",
+    "whyIdea": "لماذا هذه الفكرة",
+    "idea": "فكرة",
+    "add": "+ إضافة",
+    "addNamed": "إضافة {{name}}",
+    "addHint": "إضافة إلى الاقتراحات",
+    "addOffering": "إضافة خدمة",
+    "purchasesTitle": "آخر مشتريات {{first}}",
+    "purchaseColumns": {
+      "date": "التاريخ",
+      "bought": "المشترى",
+      "sessions": "الجلسات"
+    },
+    "sessionsUsed": "استُخدم {{used}} من {{total}}",
+    "activityTitle": "نشاط جهة الاتصال",
+    "openChat": "فتح المحادثة",
+    "activityColumns": {
+      "when": "متى",
+      "channel": "القناة",
+      "message": "الرسالة",
+      "status": "الحالة"
+    },
+    "sent": "مُرسلة",
+    "got": "مُستلمة",
+    "removeConfirm": {
+      "title": "إزالة هذا السجل؟",
+      "record": "{{name}} من الاقتراحات",
+      "effect": "سيُزال من اقتراحات خدمات {{first}}. استخدم «مرفوض» بدلًا من ذلك للاحتفاظ بسجل بأنه عُرض.",
+      "reasons": {
+        "addedByMistake": "أُضيف بالخطأ",
+        "duplicate": "مكرر",
+        "planChanged": "تغيّرت الخطة",
+        "other": "أخرى"
+      }
+    },
+    "searchOfferings": "البحث في الخدمات",
+    "single": "مفردة",
+    "minPrice": "الحد الأدنى {{price}}",
+    "added": "تمت إضافة {{name}} إلى اقتراحات {{first}}",
+    "removed": "تمت إزالة {{name}} من الاقتراحات",
+    "offeringRemoved": "تمت إزالة الخدمة",
+    "info": {
+      "sessions_zero": "لا جلسات",
+      "sessions_one": "جلسة واحدة",
+      "sessions_two": "جلستان",
+      "sessions_few": "{{count}} جلسات",
+      "sessions_many": "{{count}} جلسة",
+      "sessions_other": "{{count}} جلسة",
+      "visits_zero": "لا زيارات",
+      "visits_one": "زيارة واحدة",
+      "visits_two": "زيارتان",
+      "visits_few": "{{count}} زيارات",
+      "visits_many": "{{count}} زيارة",
+      "visits_other": "{{count}} زيارة",
+      "list": "السعر المعلن {{price}}",
+      "lowest": "الأدنى {{price}}"
+    },
+    "ideaReasons": {
+      "history": "فكرة من السجل"
+    },
+    "delivery": {
+      "queued": "في الانتظار",
+      "sent": "أُرسلت",
+      "delivered": "وصلت",
+      "read": "قُرئت",
+      "failed": "لم تصل",
+      "received": "مستلمة"
+    },
+    "activityLead": "عميل محتمل {{id}}",
+    "purchasesCount_zero": "لا بنود",
+    "purchasesCount_one": "بند واحد",
+    "purchasesCount_two": "بندان",
+    "purchasesCount_few": "{{count}} بنود",
+    "purchasesCount_many": "{{count}} بندًا",
+    "purchasesCount_other": "{{count}} بند"
+  },
+  "contactEditor": {
+    "title": "تعديل جهة الاتصال",
+    "sub": "يُحفظ مرة واحدة · يُستخدم في كل عميل محتمل ومريض ومحادثة",
+    "newContact": "جهة اتصال جديدة",
+    "steps": {
+      "identity": "الهوية وطرق التواصل",
+      "preferences": "تفضيلات التواصل"
+    },
+    "idHelp": "جهة اتصال واحدة · مشتركة بين العملاء المحتملين والمرضى والمحادثات",
+    "idTooltip": "معرّف جهة الاتصال · انقر للنسخ",
+    "idAria": "نسخ معرّف جهة الاتصال {{id}}",
+    "idCopied": "تم نسخ معرّف جهة الاتصال {{id}}",
+    "firstName": "الاسم الأول",
+    "firstNamePlaceholder": "الاسم الأول",
+    "lastName": "اسم العائلة",
+    "lastNamePlaceholder": "اسم العائلة (اختياري)",
+    "mobiles": "أرقام الجوال",
+    "mobileAria": "الجوال {{n}}",
+    "primary": "أساسي",
+    "primaryTitle": "الرقم الأساسي · يُستخدم للمكالمات والمطابقة",
+    "setPrimary": "تعيين كأساسي",
+    "setPrimaryTitle": "اجعل هذا الرقم الأساسي",
+    "primaryChanged": "{{number}} هو الرقم الأساسي الآن",
+    "whatsAppOn": "على واتساب · انقر للإيقاف",
+    "whatsAppOff": "ليس على واتساب · انقر للتشغيل",
+    "removeNumber": "إزالة الرقم",
+    "addNumber": "+ إضافة رقم",
+    "addInstagram": "+ إنستغرام",
+    "handlePlaceholder": "@اسم_المستخدم",
+    "handleAria": "إنستغرام {{n}}",
+    "removeHandle": "إزالة اسم المستخدم",
+    "removeHandleTitle": "إزالة اسم المستخدم هذا",
+    "handleRemoved": "تمت إزالة {{handle}}",
+    "addHandle": "+ إضافة اسم مستخدم",
+    "defaultChannel": "القناة الافتراضية",
+    "defaultChannelHint": "· يتحوّل إلى آخر قناة مستخدمة",
+    "custom": "+ مخصّص",
+    "customPlaceholder": "اكتب تفضيلًا",
+    "customAria": "تفضيل مخصّص",
+    "done": "تم",
+    "updated": "تم تحديث جهة الاتصال · يسري في كل مكان",
+    "preferences": {
+      "noCalls": "بدون مكالمات",
+      "sundaysOnly": "أيام الأحد فقط",
+      "weekdaysOnly": "أيام الأسبوع فقط",
+      "afterSix": "بعد السادسة مساءً",
+      "mornings": "الصباح",
+      "evenings": "المساء",
+      "weekendsOnly": "عطلات نهاية الأسبوع فقط",
+      "gujarati": "الغوجاراتية",
+      "hindi": "الهندية",
+      "english": "الإنجليزية",
+      "femaleDoctor": "طبيبة",
+      "textFirst": "رسالة قبل الاتصال"
+    }
+  },
+  "offeringQuickCreate": {
+    "title": "خدمة جديدة",
+    "sub": "خدمة أو علاج أو باقة تُفوترها",
+    "steps": {
+      "offering": "الخدمة",
+      "details": "التفاصيل",
+      "payment": "الدفع"
+    },
+    "fields": {
+      "name": "الاسم",
+      "namePlaceholder": "مثال: ليزر الوجه كاملًا",
+      "duration": "المدة",
+      "minutesUnit": "د",
+      "minutes": "{{minutes}} د",
+      "category": "الفئة",
+      "price": "السعر"
+    },
+    "save": "إضافة الخدمة",
+    "toasts": {
+      "name": "أضف اسمًا",
+      "price": "أدخل السعر",
+      "added": "تمت إضافة الخدمة {{name}}"
+    }
+  },
+  "appointmentForm": {
+    "title": {
+      "loading": "موعد",
+      "create": "موعد جديد",
+      "edit": "الموعد {{id}}",
+      "reschedule": "تغيير موعد {{id}}"
+    },
+    "sub": "تُعرض الأوقات المتاحة فقط · الأوقات الماضية مقفلة",
+    "who": {
+      "search": "ابحث عن مريض أو عميل محتمل بالاسم أو الهاتف أو المعرّف",
+      "searchLabel": "البحث عن شخص",
+      "useContact": "استخدام جهة الاتصال",
+      "patient": "مريض",
+      "createContact": "+ إنشاء جهة اتصال «{{query}}»",
+      "newContact": "جهة اتصال جديدة · أضف الجوال للحجز",
+      "mobile": "رقم الجوال",
+      "name": "الاسم",
+      "mobileLabel": "الجوال",
+      "save": "حفظ",
+      "addName": "أضف اسمًا",
+      "mobileDigits": "يجب أن يتكوّن الجوال من 10 أرقام"
+    },
+    "links": {
+      "connected": "العميل المحتمل المرتبط",
+      "chip": "{{id}} · {{status}}",
+      "chipHint": "عميل محتمل {{id}} · {{source}} · المسؤول {{owner}}",
+      "movesAtCheckIn": "· ينتقل إلى «زار العيادة» عند تسجيل الحضور"
+    },
+    "status": {
+      "section": "حالة الزيارة",
+      "group": "الحالة",
+      "copy": "نسخ",
+      "copyHint": "نسخ · الخدمة والطبيب والسبب والملاحظات نفسها",
+      "cancelVisit": "إلغاء الزيارة",
+      "cancelHint": "إلغاء هذا الموعد",
+      "cancelledReason": "{{reason}} · تم تحرير الوقت · توقفت التذكيرات",
+      "cancelledNoReason": "تم تحرير الوقت · توقفت التذكيرات",
+      "restore": "استعادة",
+      "rescheduledConfirm": "تم تغيير الموعد · كان {{day}} {{time}} · يحتاج إلى تأكيد من جديد · يُرسل تذكير جديد عند الحفظ",
+      "rescheduled": "تم تغيير الموعد · كان {{day}} {{time}} · يُرسل تذكير جديد عند الحفظ",
+      "planReady_zero": "الخطة جاهزة · لا خدمات",
+      "planReady_one": "الخطة جاهزة · خدمة واحدة",
+      "planReady_two": "الخطة جاهزة · خدمتان",
+      "planReady_few": "الخطة جاهزة · {{count}} خدمات",
+      "planReady_many": "الخطة جاهزة · {{count}} خدمة",
+      "planReady_other": "الخطة جاهزة · {{count}} خدمة",
+      "planVisit_zero": "لا شيء مخطط لهذه الزيارة",
+      "planVisit_one": "خدمة واحدة مخططة لهذه الزيارة",
+      "planVisit_two": "خدمتان مخططتان لهذه الزيارة",
+      "planVisit_few": "{{count}} خدمات مخططة لهذه الزيارة",
+      "planVisit_many": "{{count}} خدمة مخططة لهذه الزيارة",
+      "planVisit_other": "{{count}} خدمة مخططة لهذه الزيارة",
+      "planEarlier_zero": "لا شيء من زيارات سابقة",
+      "planEarlier_one": "خدمة واحدة من زيارات سابقة",
+      "planEarlier_two": "خدمتان من زيارات سابقة",
+      "planEarlier_few": "{{count}} خدمات من زيارات سابقة",
+      "planEarlier_many": "{{count}} خدمة من زيارات سابقة",
+      "planEarlier_other": "{{count}} خدمة من زيارات سابقة"
+    },
+    "details": {
+      "title": "الموعد",
+      "notFilled": "لم يُملأ بعد",
+      "open": "فتح",
+      "type": "النوع",
+      "typeGroup": "نوع الموعد",
+      "types": {
+        "consultation": "استشارة",
+        "follow_up": "متابعة",
+        "treatment": "علاج",
+        "package_session": "جلسة من باقة",
+        "other": "أخرى"
+      },
+      "typeHints": {
+        "consultation": "زيارة أولى أو مراجعة لدى الطبيب",
+        "follow_up": "مراجعة قصيرة بعد علاج أو وصفة",
+        "treatment": "جلسة واحدة تُحاسب في الزيارة",
+        "package_session": "يستخدم جلسة واحدة من باقة مدفوعة",
+        "other": "أي شيء ليس مما سبق"
+      },
+      "typeLines": {
+        "consultation": "تُضاف رسوم الاستشارة إلى الفاتورة عند الدفع",
+        "follow_up": "مجانية عادةً · لا فاتورة ما لم يُضف شيء",
+        "other": "اذكر ما هو في الملاحظات أدناه"
+      },
+      "treatment": "العلاج",
+      "pickTreatment": "اختر علاجًا",
+      "searchTreatments": "البحث في العلاجات",
+      "common": "الأكثر استخدامًا",
+      "fromOfferings": "من الخدمات",
+      "doctor": "الطبيب",
+      "pickDoctor": "اختر طبيبًا",
+      "searchDoctors": "البحث عن الأطباء والمعالجين",
+      "length": "المدة",
+      "minutes": "{{minutes}} د",
+      "minutesHint": "{{minutes}} دقيقة",
+      "reason": "السبب",
+      "reasonPlaceholder": "ما طلبه · مثل التصبغ على الخدين",
+      "notes": "ملاحظات",
+      "notesPlaceholder": "أي شيء يجب أن يعرفه الطبيب أو الاستقبال"
+    },
+    "slot": {
+      "title": "التاريخ والوقت",
+      "nextWeek": "الأسبوع القادم",
+      "calendar": "التقويم",
+      "previousMonth": "الشهر السابق",
+      "nextMonth": "الشهر التالي",
+      "step": "الفاصل الزمني",
+      "stepOption": "{{minutes}} د",
+      "time": "الوقت",
+      "pickDate": "اختر تاريخًا لعرض الأوقات",
+      "none": "لا أوقات متاحة للحجز في هذا اليوم · اختر تاريخًا آخر",
+      "closed": {
+        "past": "انقضى هذا اليوم · اختر تاريخًا آخر",
+        "branchInactive": "هذا الفرع لا يستقبل الحجوزات",
+        "closedDay": "العيادة مغلقة في هذا اليوم · اختر تاريخًا آخر",
+        "holiday": "مغلق بمناسبة {{label}} · اختر تاريخًا آخر",
+        "doctorOff": "الطبيب في إجازة هذا اليوم · اختر تاريخًا آخر أو طبيبًا آخر"
+      },
+      "am": "ص",
+      "pm": "م",
+      "hour": "{{hour}} {{period}}",
+      "free": "{{time}} · متاح",
+      "locked": "مقفل",
+      "lockedSummary": "{{day}} · {{time}} · مقفل بعد تسجيل الحضور",
+      "lockedToast": "يُقفل التاريخ والوقت بعد تسجيل حضور المريض"
+    },
+    "footer": {
+      "pickTime": "اختر وقتًا",
+      "book": "حجز {{day}}، {{time}}",
+      "move": "نقل إلى {{day}}، {{time}}",
+      "saveChanges": "حفظ التغييرات",
+      "minutes": "{{minutes}} د"
+    },
+    "validation": {
+      "who": "اختر لمن هذا الموعد",
+      "slot": "اختر التاريخ والوقت",
+      "passed": "مضى هذا الوقت · اختر وقتًا قادمًا",
+      "taken": "حُجز للتو · اختر وقتًا آخر",
+      "doctor": "اختر طبيبًا",
+      "branch": "لا يوجد فرع مفتوح للحجز"
+    },
+    "copied": "تم النسخ · اختر التاريخ والوقت"
+  },
+  "expenseCategories": {
+    "medicines": "أدوية",
+    "consumables": "مستهلكات",
+    "salary": "رواتب",
+    "rent": "إيجار",
+    "marketing": "تسويق",
+    "utilities": "مرافق",
+    "maintenance": "صيانة",
+    "misc": "متفرقات"
+  },
+  "patientPicker": {
+    "label": "المريض",
+    "placeholder": "ابحث عن المرضى",
+    "hint": "يمكن اختيار المرضى فقط",
+    "due": "مستحق {{amount}}",
+    "nothingDue": "لا مستحقات"
+  },
+  "splitRows": {
+    "mode": "الطريقة",
+    "amount": "المبلغ"
+  },
+  "settleCredit": {
+    "title": {
+      "give": "ردّ المبلغ",
+      "take": "تم الاستلام"
+    },
+    "sub": {
+      "give": "إلى {{name}} · {{reason}} · يضيف قيدًا صادرًا إلى المدفوعات",
+      "take": "من {{name}} · {{reason}} · يضيف قيدًا واردًا إلى المدفوعات"
+    },
+    "section": {
+      "give": "طريقة الردّ",
+      "take": "طريقة الاستلام"
+    },
+    "rows": {
+      "give": "رُدّ عبر",
+      "take": "استُلم كـ"
+    },
+    "add": "أضف طريقة أخرى",
+    "total": "الإجمالي {{total}} · من {{owed}}",
+    "save": {
+      "give": "ردّ {{amount}}",
+      "take": "سجّل {{amount}}"
+    },
+    "enterAmount": "أدخل المبلغ",
+    "moreThanOwed": "أكثر من {{amount}} المستحق",
+    "done": {
+      "give": "رُدّ {{amount}} إلى {{name}} · {{entry}}",
+      "take": "استُلم {{amount}} من {{name}} · {{entry}}"
+    },
+    "branch": "الفرع",
+    "date": "التاريخ",
+    "dayClosed": "هذا اليوم مُقفل في هذا الفرع · اختر يومًا مفتوحًا",
+    "moreThanPaid": "أكثر مما دُفع على فاتورته",
+    "closed": "سُوّي {{ref}} بالكامل بالفعل",
+    "entry": {
+      "give": "أُضيف قيد صادر",
+      "take": "أُضيف قيد وارد"
+    }
+  },
+  "quickLine": {
+    "label": "إضافة سريعة",
+    "enter": "↵ إضافة",
+    "matches": "النتائج",
+    "suggested": "مقترحات · انقر للإضافة",
+    "typed": "ليس في القائمة · أضِف كما كُتب",
+    "noMatch": "لا نتائج. تحقق من الإملاء أو اكتب أحرفًا أقل.",
+    "keys": "↑↓ اختيار · ↵ إضافة · Esc مسح",
+    "browse": "تصفح",
+    "browseAll": "تصفح الكل",
+    "groups": "المجموعة",
+    "closeBrowse": "إغلاق التصفح",
+    "added_zero": "لم يُضَف شيء",
+    "added_one": "أُضيف عنصر واحد",
+    "added_two": "أُضيف عنصران",
+    "added_few": "أُضيفت {{count}} عناصر",
+    "added_many": "أُضيف {{count}} عنصرًا",
+    "added_other": "أُضيف {{count}} عنصر",
+    "tapToAdd": "انقر على مربع لإضافته",
+    "showing": "يُعرض {{shown}} من {{total}} · اكتب للتضييق",
+    "done": "تم",
+    "emptyGroup": "لا شيء في هذه المجموعة يطابق.",
+    "addOne": "إضافة واحد",
+    "removeOne": "إزالة واحد",
+    "addNew": "إضافة جديد",
+    "tags": {
+      "qty": "×{{count}}",
+      "free": "+{{count}} مجانًا",
+      "rate": "@ {{amount}}",
+      "discount": "خصم {{percent}}%"
+    }
+  },
+  "invoiceDrawer": {
+    "title": {
+      "create": "فاتورة جديدة",
+      "edit": "تعديل الفاتورة",
+      "createSale": "بيع جديد",
+      "editSale": "تعديل البيع"
+    },
+    "sub": {
+      "create": "اختر النوع، ثم أضف البنود",
+      "edit": "تُسجَّل التغييرات على الفاتورة",
+      "sale": "فاتورة طبية · يُحدَّث المخزون حسب أقرب انتهاء صلاحية"
+    },
+    "type": "النوع",
+    "steps": {
+      "party": "المريض والفريق",
+      "items": "البنود",
+      "medicines": "الأدوية",
+      "payment": "الدفع"
+    },
+    "fields": {
+      "branch": "الفرع",
+      "newPatient": "مريض جديد",
+      "customer": "العميل",
+      "customerHint": "مريض أو أي جهة اتصال · تُحفظ الأسماء الجديدة كجهة اتصال طبية",
+      "customerPlaceholder": "ابحث عن المرضى أو العملاء المحتملين أو جهات الاتصال الطبية",
+      "addContact": "إضافة جهة اتصال",
+      "mobile": "الجوال",
+      "mobileHint": "يُحفظ في جهة الاتصال",
+      "mobilePlaceholder": "98765 43210",
+      "team": "الفريق",
+      "prescribedBy": "وصفه",
+      "teamPlaceholder": "اختر الفريق",
+      "teamHint": "طبيب، معالج، مستشار",
+      "teamFrom": "من فريق {{name}}",
+      "overallDiscount": "الخصم الإجمالي",
+      "quickFill": "تعبئة سريعة",
+      "paidNow": "المدفوع الآن",
+      "remark": "ملاحظة",
+      "remarkPlaceholder": "تظهر على الفاتورة المطبوعة",
+      "paid": "المدفوع حتى الآن"
+    },
+    "customerGroups": {
+      "patient": "المرضى",
+      "lead": "العملاء المحتملون",
+      "contact": "جهات الاتصال الطبية"
+    },
+    "customerSub": {
+      "noMobile": "لا رقم جوال بعد"
+    },
+    "items": {
+      "quickLine": "اكتب الخدمة والكمية والخصم · مثال: lhr face 1 10%",
+      "quickLineMedical": "اكتب الدواء والكمية · مثال: sun 2",
+      "hint": "2 = الكمية · 10% = الخصم · @500 = السعر",
+      "oftenBilled": "الأكثر فوترة",
+      "browse": {
+        "all": "الكل",
+        "oral": "فموي",
+        "topical": "موضعي"
+      },
+      "columns": {
+        "offering": "الخدمة",
+        "medicine": "الدواء",
+        "qty": "الكمية",
+        "rate": "السعر",
+        "discount": "خصم %",
+        "gst": "GST",
+        "final": "النهائي"
+      },
+      "pickItem": "اختر بندًا",
+      "selectOffering": "اختر الخدمة…",
+      "selectMedicine": "اختر الدواء…",
+      "newOffering": "خدمة جديدة",
+      "addItem": "إضافة بند",
+      "addMedicine": "إضافة دواء",
+      "total": "الإجمالي",
+      "sessions_zero": "لا جلسات",
+      "sessions_one": "جلسة واحدة",
+      "sessions_two": "جلستان",
+      "sessions_few": "{{count}} جلسات",
+      "sessions_many": "{{count}} جلسة",
+      "sessions_other": "{{count}} جلسة",
+      "inStock": "متوفر {{count}}",
+      "outOfStock": "غير متوفر",
+      "belowFloor": "أقل من أدنى سعر {{amount}} لـ {{name}}",
+      "newMedicineName": "اسم دواء جديد",
+      "medicineAdded": "تمت إضافة {{name}} · حدّد السعر الأقصى لاحقًا في المخزون",
+      "hintInvoice": "2 = الكمية · 10% = الخصم",
+      "belowLowest": "أقل من أدنى سعر لـ {{name}}",
+      "offerApplied": "عرض مطبّق: {{offer}}"
+    },
+    "payment": {
+      "full": "كامل · {{amount}} عبر {{mode}}",
+      "split": "تقسيم نقدًا + UPI",
+      "nothing": "لا شيء الآن",
+      "mode": "الطريقة",
+      "amount": "المبلغ",
+      "addMode": "أضف طريقة أخرى",
+      "paidTotal": "المدفوع {{paid}} · المستحق {{due}}"
+    },
+    "totals": {
+      "label": "الإجماليات",
+      "subtotal": "المجموع الفرعي",
+      "discountGst": "الخصم + GST",
+      "discountGstValue": "{{discount}} · +{{gst}}",
+      "bill": "الفاتورة",
+      "dueAfter": "المستحق بعد هذا",
+      "preview": "السعر كما سيُحفظ",
+      "pending": "جارٍ التسعير…",
+      "refused": "لم يُسعَّر · صحّح السطر المحدد",
+      "failed": "تعذّر تسعير هذه الفاتورة",
+      "retry": "إعادة المحاولة"
+    },
+    "badges": {
+      "bill": "الفاتورة {{amount}}",
+      "sessions_zero": "لا جلسات",
+      "sessions_one": "يشمل جلسة واحدة",
+      "sessions_two": "يشمل جلستين",
+      "sessions_few": "يشمل {{count}} جلسات",
+      "sessions_many": "يشمل {{count}} جلسة",
+      "sessions_other": "يشمل {{count}} جلسة",
+      "draft": "مسودة",
+      "due": "مستحق {{amount}}",
+      "paid": "مدفوعة بالكامل"
+    },
+    "presets": {
+      "print": "طباعة الفاتورة",
+      "plan": "الخطة · {{name}}",
+      "planQty": "الخطة · {{name}} ×{{count}}",
+      "package": "باقة · {{name}}",
+      "repeat": "تكرار #{{seq}}",
+      "consultation": "استشارة جديدة · {{amount}}",
+      "rx": "من الوصفة #{{seq}}"
+    },
+    "save": {
+      "clinic": "إنشاء فاتورة العيادة",
+      "medical": "إنشاء فاتورة طبية",
+      "consultation": "إنشاء فاتورة استشارة",
+      "edit": "حفظ التغييرات"
+    },
+    "summary": "{{type}} · {{name}} · {{items}}",
+    "summaryItems_zero": "لا بنود",
+    "summaryItems_one": "بند واحد",
+    "summaryItems_two": "بندان",
+    "summaryItems_few": "{{count}} بنود",
+    "summaryItems_many": "{{count}} بندًا",
+    "summaryItems_other": "{{count}} بند",
+    "noPatient": "لا مريض",
+    "errors": {
+      "pickPatient": "اختر مريضًا",
+      "pickCustomer": "اختر عميلًا",
+      "addItem": "أضف بندًا واحدًا على الأقل",
+      "paidAboveBill": "المدفوع {{paid}} أكثر من الفاتورة {{bill}}",
+      "stock": "لا يتوفر من {{name}} سوى {{count}}",
+      "belowFloor": "{{name}} أقل من أدنى سعر له {{amount}} · ارفع السعر النهائي",
+      "belowLowest": "{{name}} أقل من أدنى سعر له · ارفع السعر النهائي"
+    },
+    "toasts": {
+      "created": {
+        "clinic": "أُنشئت فاتورة العيادة #{{seq}}",
+        "medical": "أُنشئت الفاتورة الطبية #{{seq}}",
+        "consultation": "أُنشئت فاتورة الاستشارة #{{seq}}"
+      },
+      "copied": "نُسخت الفاتورة برقم #{{seq}}",
+      "createdPlan_zero": "{{created}} · لم يُعلَّم أي بند من الاقتراحات",
+      "createdPlan_one": "{{created}} · عُلّم بند واحد من الاقتراحات كمُفوتَر",
+      "createdPlan_two": "{{created}} · عُلّم بندان من الاقتراحات كمُفوتَرين",
+      "createdPlan_few": "{{created}} · عُلّمت {{count}} بنود من الاقتراحات كمُفوتَرة",
+      "createdPlan_many": "{{created}} · عُلّم {{count}} بندًا من الاقتراحات كمُفوتَر",
+      "createdPlan_other": "{{created}} · عُلّم {{count}} بند من الاقتراحات كمُفوتَر",
+      "saved": "حُفظت الفاتورة #{{seq}}",
+      "savedPlan": "حُفظت الفاتورة #{{seq}} · حُدّثت الاقتراحات",
+      "promo": "طُبّق {{offer}} على {{offering}}",
+      "contactSaved": "حُفظ {{name}} كجهة اتصال طبية · أضف رقم الجوال أدناه",
+      "rxUnmatched": "{{name}} غير موجود في قائمة الأدوية · أضفه من الإضافة السريعة",
+      "deleted": "حُذفت الفاتورة #{{seq}}"
+    },
+    "deleteTitle": "حذف هذه الفاتورة؟",
+    "previewTitle": {
+      "clinic": "الفاتورة #{{seq}}",
+      "medical": "الفاتورة الطبية #{{seq}}",
+      "consultation": "فاتورة الاستشارة #{{seq}}"
+    },
+    "record": "الفاتورة",
+    "refusals": {
+      "moreThanDue": "المدفوع الآن أكثر من الفاتورة",
+      "dayClosed": "ذلك اليوم مُغلق · لا يمكن إضافة دفعة إليه",
+      "settled": "هذه الفاتورة مُسوّاة · إحدى دفعاتها في يوم مُغلق",
+      "belowPaid": "لا يمكن أن تقل الفاتورة عن المبلغ المدفوع",
+      "offeringInUse": "تم استخدام جلسة من هذه الباقة · أبقِ سطرها",
+      "treatmentBilled": "تمت فوترة علاج في هذه الفاتورة في الأثناء · أزِله واحفظ مجددًا",
+      "ofSale": "هذه الفاتورة تابعة لبيع طبي · عدّلها من قسم الصيدلية",
+      "paid": "على هذه الفاتورة مبالغ مدفوعة أو إشعار دائن · لا يمكن حذفها",
+      "inUseDelete": "تم استخدام جلسة من هذه الباقة · لا يمكن حذف الفاتورة"
+    },
+    "notices": {
+      "settled": "مُسوّاة · إحدى دفعات هذه الفاتورة في يوم مُغلق، فلا يمكن تعديلها",
+      "sale": "فاتورة بيع طبي · عدّلها من قسم الصيدلية"
+    }
+  },
+  "printPreview": {
+    "title": "معاينة الطباعة · {{title}}",
+    "close": "إغلاق",
+    "print": "طباعة / حفظ PDF"
+  },
+  "appHomeEmpty": {
+    "title": "لم يُفعَّل أي شيء هنا بعد",
+    "description": "ستظهر أقسام عيادتك هنا فور تفعيلها لك."
+  }
+}

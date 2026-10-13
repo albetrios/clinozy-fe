@@ -1,68 +1,14 @@
 {
-  "brand": {
-    "name": "{{productName}}"
-  },
   "a11y": {
-    "skipToMain": "본문으로 건너뛰기",
-    "mainNavigation": "주 탐색",
-    "sidebarNavigation": "사이드바 탐색",
-    "mobileNavigation": "모바일 탐색"
-  },
-  "auth": {
-    "switchToRegister": "계정 만들기",
-    "switchToSignIn": "로그인",
-    "statusOperational": "모든 시스템 정상",
-    "badge": "운영, 하나로",
-    "heroTitle": "조직을 위한 운영 체제.",
-    "heroSubtitle": "멤버, 역할, 결제, 보안 — 모든 팀을 위한 빠르고 키보드 우선의 워크스페이스.",
-    "features": {
-      "multiOrg": {
-        "title": "멀티 조직 설계",
-        "body": "도구를 바꾸지 않고 팀을 전환하세요."
-      },
-      "secure": {
-        "title": "기본부터 안전",
-        "body": "RBAC, MFA, 패스키, 감사 추적."
-      },
-      "fast": {
-        "title": "어디서나 빠르게",
-        "body": "키보드 우선의 실시간 작업을 위해 설계되었습니다."
-      }
-    },
-    "stats": {
-      "teams": "팀",
-      "uptime": "가동률",
-      "compliant": "준수"
-    }
+    "skipToMain": "본문으로 건너뛰기"
   },
   "app": {
     "search": "검색",
-    "searchPlaceholder": "검색...",
     "searchShortcutMac": "⌘K",
     "searchShortcutWindows": "Ctrl+K",
-    "userMenu": "사용자 메뉴",
     "userFallback": "사용자",
     "settings": "설정",
     "logOut": "로그아웃",
-    "toggleSidebar": "사이드바 전환",
-    "footerCopyright": "© {{year}} {{productName}} Platform",
-    "nav": {
-      "dashboard": "대시보드"
-    },
-    "sidebar": {
-      "workspace": "워크스페이스",
-      "menu": "메뉴",
-      "shortcuts": "단축키"
-    },
-    "contextStrip": {
-      "label": "빠른 이동",
-      "labelSolo": "이동",
-      "profile": "프로필",
-      "security": "보안",
-      "billing": "결제",
-      "appearance": "모양",
-      "shortcuts": "단축키"
-    },
     "workspaceSwitch": {
       "preparing": "워크스페이스를 준비하는 중입니다",
       "loadingAccess": "멤버와 권한을 불러오는 중입니다",
@@ -74,7 +20,10 @@
       "personal": "개인",
       "yourOrganizations": "내 조직",
       "organizations": "조직",
-      "addOrganization": "조직 추가"
+      "addOrganization": "조직 추가",
+      "invited": "초대",
+      "invitedRow": "초대됨 · {{roles}}",
+      "invitationCount": "초대: {{count}}"
     },
     "notifications": {
       "title": "알림",
@@ -90,17 +39,15 @@
       "settingsLink": "알림 설정"
     },
     "commandPalette": {
-      "ariaLabel": "명령 팔레트",
-      "placeholder": "명령을 입력하거나 검색...",
+      "ariaLabel": "명령 메뉴",
+      "placeholder": "검색 또는 이동…",
       "empty": "결과가 없습니다.",
       "groups": {
-        "navigation": "탐색",
         "theme": "테마",
         "account": "계정",
         "organizations": "조직",
         "shortcuts": "단축키"
       },
-      "dashboard": "대시보드",
       "userSettings": "사용자 설정",
       "organizationSettings": "조직 설정",
       "lightMode": "라이트 모드",
@@ -118,6 +65,10 @@
       "commandPalette": "명령 팔레트 열기",
       "showShortcuts": "키보드 단축키 표시",
       "showShortcutsAlt": "키보드 단축키 표시 (대체)",
+      "allSections": "모든 섹션 열기 또는 닫기",
+      "jumpToSection": "섹션으로 이동",
+      "listSearch": "목록 검색",
+      "leadRows": "다음 또는 이전 리드 (리드에서)",
       "closeDialog": "대화상자 닫기"
     },
     "emailVerify": {
@@ -143,16 +94,64 @@
       "nameLabel": "조직 이름",
       "slugLabel": "워크스페이스 URL (선택)",
       "submit": "조직 만들기",
-      "submitting": "만드는 중…"
+      "submitting": "만드는 중…",
+      "cancel": "취소"
     },
     "theme": {
       "light": "라이트",
       "dark": "다크",
-      "system": "시스템",
-      "shuffle": "테마 셔플"
+      "system": "시스템"
+    },
+    "sectionBar": {
+      "nav": "섹션",
+      "allSections": "모든 섹션",
+      "allSectionsTitle": "모든 섹션 (G)",
+      "more": "더보기",
+      "morePinned": "고정된 섹션 더보기",
+      "tabTitle": "{{section}} · {{description}}",
+      "searchLabel": "검색 또는 이동 (Command K)",
+      "searchTitleMac": "검색 또는 이동… (⌘K)",
+      "searchTitleWindows": "검색 또는 이동… (Ctrl K)",
+      "searchPlaceholder": "환자, 리드 검색…",
+      "pin": "바에 고정",
+      "unpin": "바에서 고정 해제",
+      "pinAria": "바에 고정 · {{section}}",
+      "unpinAria": "바에서 고정 해제 · {{section}}",
+      "pinFooter": "고정하면 바에 유지됩니다",
+      "keysHint": "G · 1–9",
+      "account": "계정",
+      "avatarLabel": "{{name}} · {{status}}",
+      "identityRole": "{{role}} · {{branch}}",
+      "status": "상태",
+      "presence": {
+        "online": "온라인",
+        "away": "자리 비움",
+        "busy": "바쁨"
+      },
+      "statusToast": "상태 · {{status}}",
+      "switchClinic": "클리닉 전환",
+      "security": "보안",
+      "billing": "결제",
+      "devices": "기기",
+      "appearance": "모양",
+      "appearanceLanguage": "모양 및 언어",
+      "viewAs": {
+        "previewing": "{{role}}(으)로 미리 보는 중",
+        "noSections": "섹션 없음",
+        "exit": "미리 보기 종료",
+        "exitToast": "내 권한으로 돌아왔습니다"
+      },
+      "branch": {
+        "label": "지점 · {{label}}",
+        "title": "지점 · {{names}}",
+        "all": "모든 지점",
+        "allSub": "통합 보기 · {{count}}개 지점 합계",
+        "viewGroup": "보기",
+        "branchesGroup": "지점",
+        "showingAll": "모든 지점 표시 중",
+        "showing": "{{names}} 표시 중",
+        "keepOne": "지점을 하나 이상 유지하세요"
+      }
     }
-  },
-  "public": {
-    "brandTagline": "팀을 위한 안전한 워크스페이스"
   }
 }

@@ -1,40 +1,45 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import { axe } from 'vitest-axe';
 
 const { dismissMock } = vi.hoisted(() => ({ dismissMock: vi.fn() }));
 vi.mock('sonner', () => ({ toast: { dismiss: dismissMock } }));
 
-import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
-
 import { CustomToast } from './CustomToast.tsx';
 
 describe('CustomToast', () => {
-  it('renders the title + description and resolves a design variant', () => {
-    render(<CustomToast id="t1" type="success" title="Saved" description="All good" />);
-    const el = screen.getByTestId('app-toast');
-    expect(el).toHaveTextContent('Saved');
-    expect(el).toHaveTextContent('All good');
-    expect(el.getAttribute('data-toast-variant')).toBeTruthy();
-  });
-
-  it('reflects the toastVariant from the theme store', () => {
-    useThemeStore.getState().setToastVariant(1);
-    render(<CustomToast id="t2" type="info" title="Info" />);
-    expect(screen.getByTestId('app-toast')).toHaveAttribute(
-      'data-toast-variant',
-      'solid',
+  it('draws the design bar: the title and description, no icon, no ×', async () => {
+    const { container } = render(
+      <CustomToast id="t1" type="success" title="Saved" description="All good" />,
     );
-    useThemeStore.getState().setToastVariant(0);
+    const el = screen.getByTestId('app-toast');
+    expect(el).toHaveTextContent('Saved · All good');
+    expect(el).toHaveClass('bg-primary', 'text-primary-foreground');
+    expect(el.querySelector('svg')).toBeNull();
+    expect(screen.queryByTestId('toast-dismiss')).toBeNull();
+    expect(await axe(container)).toHaveNoViolations();
   });
 
-  it('dismisses via the close button', async () => {
+  it('a persistent toast gets the dismiss ×, which dismisses its own id', async () => {
+    // The caller's onDismiss rides on the Sonner toast, which fires it on this
+    // dismiss — the surface only asks Sonner to let go of the toast.
     const user = userEvent.setup();
-    const onDismiss = vi.fn();
-    render(<CustomToast id="t3" type="error" title="Oops" onDismiss={onDismiss} />);
-    await user.click(screen.getByTestId('toast-dismiss'));
-    expect(onDismiss).toHaveBeenCalled();
-    expect(dismissMock).toHaveBeenCalledWith('t3');
+    dismissMock.mockReset();
+    const { container } = render(
+      <CustomToast
+        id="update"
+        type="info"
+        title="Update available"
+        persistent
+        action={{ label: 'Refresh now', onClick: vi.fn() }}
+      />,
+    );
+    const dismiss = screen.getByTestId('toast-dismiss');
+    expect(dismiss).toHaveAccessibleName('Dismiss notification');
+    await user.click(dismiss);
+    expect(dismissMock).toHaveBeenCalledExactlyOnceWith('update');
+    expect(await axe(container)).toHaveNoViolations();
   });
 
   it('dismisses its OWN id right after running the inline action', async () => {
@@ -60,10 +65,18 @@ describe('CustomToast', () => {
     dismissMock.mockReset();
   });
 
-  it('renders a loading toast with a spinner', () => {
-    render(<CustomToast id="t4" type="loading" title="Saving…" />);
-    const el = screen.getByTestId('app-toast');
-    expect(el).toHaveTextContent('Saving…');
-    expect(el.querySelector('.animate-spin')).toBeTruthy();
+  it('a loading toast shows its text with neither an action nor a ×', () => {
+    render(
+      <CustomToast
+        id="t4"
+        type="loading"
+        title="Saving…"
+        persistent
+        action={{ label: 'Undo', onClick: vi.fn() }}
+      />,
+    );
+    expect(screen.getByTestId('app-toast')).toHaveTextContent('Saving…');
+    expect(screen.queryByTestId('toast-action')).toBeNull();
+    expect(screen.queryByTestId('toast-dismiss')).toBeNull();
   });
 });

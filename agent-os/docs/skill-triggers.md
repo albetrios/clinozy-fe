@@ -17,7 +17,7 @@ Read in order; **project guardrails always win** over skill suggestions.
 | 3             | **web-design-guidelines** | A11y, forms, focus, UX audit                                     |
 | Advisory      | **ui-ux-pro-max**         | Query UX/style/chart DB (`python3 …/search.py`) — hints only     |
 | Explicit pass | **impeccable**            | User says redesign / audit / polish / “impeccable” on product UI |
-| Motion impl   | **animejs**               | Implement animations (dashboard uses this today)                 |
+| Motion impl   | **animejs**               | Implement animations (onboarding uses this today)                |
 | Motion bar    | **emil-design-eng**       | Decide if/when/how motion should exist                           |
 | Motion review | **review-animations**     | Review animation diffs in PRs only                               |
 
@@ -94,7 +94,7 @@ Read in order; **project guardrails always win** over skill suggestions.
 | `vite.config.ts` · `tooling/ci/run-size-limit.mjs` · size budget                                                                       | `fe-bundle-performance`                                                                                    |
 | `src/core/config/app-manifest.ts` · `public/manifest.webmanifest` · `app-icon.svg`                                                     | `fe-pwa-manifest`                                                                                          |
 | `docs/**/*.md` · `**/*.OVERVIEW.md`                                                                                                    | `fe-documentation-maintenance`                                                                             |
-| `useAnimeCountUp.ts` · animation hooks                                                                                                 | `animejs`, `emil-design-eng`                                                                               |
+| `useOnboardingStepMotion.ts` · animation hooks                                                                                         | `animejs`, `emil-design-eng`                                                                               |
 
 ## Gates (definition of done)
 

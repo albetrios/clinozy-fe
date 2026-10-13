@@ -1,17 +1,20 @@
 import { describe, expect, it } from 'vitest';
 
-import { layoutMainClassName, resolveEffectiveLayoutWidth } from './layout-width.ts';
+import {
+  LAUNCH_LAYOUT_WIDTH,
+  layoutMainClassName,
+  resolveEffectiveLayoutWidth,
+} from './layout-width.ts';
 
 describe('layout-width', () => {
-  it('resolveEffectiveLayoutWidth prefers forced deploy value', () => {
-    expect(resolveEffectiveLayoutWidth('full', 'reading')).toBe('full');
-    expect(resolveEffectiveLayoutWidth('contained', 'full')).toBe('contained');
+  it('resolveEffectiveLayoutWidth takes the deployment’s forced width', () => {
+    expect(resolveEffectiveLayoutWidth('reading')).toBe('reading');
+    expect(resolveEffectiveLayoutWidth('contained')).toBe('contained');
   });
 
-  it('resolveEffectiveLayoutWidth uses preference when not forced', () => {
-    expect(resolveEffectiveLayoutWidth(null, 'reading')).toBe('reading');
-    expect(resolveEffectiveLayoutWidth(null, undefined)).toBe('contained');
-    expect(resolveEffectiveLayoutWidth(null, 'bogus')).toBe('contained');
+  it('is the launch’s full width when nothing forces one', () => {
+    expect(LAUNCH_LAYOUT_WIDTH).toBe('full');
+    expect(resolveEffectiveLayoutWidth(null)).toBe('full');
   });
 
   it('layoutMainClassName maps each width id', () => {

@@ -1,41 +1,34 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { copySensitiveText } from '@/lib/sensitive-clipboard.ts';
 import type { MfaEnrollment } from '@/shared/api/mfa-api.ts';
+import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
+import { DrawerField, DrawerInput } from '@/shared/components/DrawerField/index.ts';
+import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { PanelSkeleton } from '@/shared/components/PanelSkeleton/index.ts';
 import { QrCode } from '@/shared/components/QrCode/index.ts';
+import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { RecoveryCodesPanel } from '@/shared/components/RecoveryCodesPanel/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import { SecurityOverviewCard } from '@/shared/components/SecurityOverviewCard/index.ts';
+import {
+  SettingsCard,
+  SettingsList,
+  SettingsListRow,
+  settingsRowActionClass,
+  SettingsRowTile,
+} from '@/shared/components/SettingsCard/index.ts';
 import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { SectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
+import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
 import { useStepUpGuard } from '@/shared/components/StepUpDialog/index.ts';
 import { TotpCodeInput } from '@/shared/components/TotpCodeInput/index.ts';
-import { Badge } from '@/shared/components/ui/badge.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/shared/components/ui/card.tsx';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/shared/components/ui/dialog.tsx';
-import { Input } from '@/shared/components/ui/input.tsx';
-import { Label } from '@/shared/components/ui/label.tsx';
-import { Skeleton } from '@/shared/components/ui/skeleton.tsx';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import {
   useBeginMfaEnrollment,
@@ -51,7 +44,25 @@ import {
 import { Copy, Fingerprint, ShieldCheck, Trash } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 
-/** Two-factor card: QR enroll → 6-digit OTP → recovery codes + disable. */
+/** The QR, the secret and the code — a light form: the 560px drawer (`_patterns.md:28`). */
+const MFA_SETUP_PROFILE = { fieldCount: 2 } as const;
+
+/** One name to type: the light 560px drawer. */
+const PASSKEY_ADD_PROFILE = { fieldCount: 1 } as const;
+
+/** The setup drawer's head for its phase: scan and verify, then the recovery codes. */
+function mfaSetupCopy(recoveryShown: boolean) {
+  const mfa = SETTINGS_KEYS.security.mfa;
+  return recoveryShown
+    ? { title: mfa.recoveryTitle, sub: mfa.recoveryDescription }
+    : { title: mfa.setupTitle, sub: mfa.setupDescription };
+}
+
+/**
+ * Two-factor card: QR enroll → 6-digit OTP → recovery codes + disable. Setup
+ * is a child drawer stacked on Settings (L-65): Back returns to Security, and
+ * the recovery codes' own Done closes it.
+ */
 function MfaCard() {
   const { t } = useTranslation(SETTINGS_NS);
   // The WHOLE query, not just `data`: `?? false` is indistinguishable from a
@@ -72,6 +83,7 @@ function MfaCard() {
   const [confirmError, setConfirmError] = useState<string | null>(null);
   const [disableOpen, setDisableOpen] = useState(false);
   const [secretCopied, setSecretCopied] = useState(false);
+  const setupCopy = mfaSetupCopy(recoveryCodes !== null);
 
   function closeSetup() {
     setSetupOpen(false);
@@ -147,36 +159,31 @@ function MfaCard() {
   );
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <CardTitle className="text-base">
-              {t(SETTINGS_KEYS.security.mfa.title)}
-            </CardTitle>
-            <CardDescription>{t(SETTINGS_KEYS.security.mfa.description)}</CardDescription>
-          </div>
+    <SettingsCard
+      title={t(SETTINGS_KEYS.security.mfa.title)}
+      description={t(SETTINGS_KEYS.security.mfa.description)}
+      action={
+        <>
           {mfaStatus.isSuccess ? (
-            <Badge
-              variant={mfaEnabled ? 'success' : 'secondary'}
-              data-testid="mfa-status"
-            >
+            <TonePill tone={mfaEnabled ? 'sage' : 'neutral'} dot data-testid="mfa-status">
               {mfaEnabled
                 ? t(SETTINGS_KEYS.security.mfa.enabled)
                 : t(SETTINGS_KEYS.security.mfa.disabled)}
-            </Badge>
+            </TonePill>
           ) : null}
           {mfaStatus.isPending ? (
-            <Skeleton
-              className="h-5 w-16 rounded-full"
-              data-testid="mfa-status-loading"
-            />
+            <span data-testid="mfa-status-loading" className="flex">
+              <SkeletonBar className="h-6 w-16" />
+            </span>
           ) : null}
-        </div>
-      </CardHeader>
-      <CardContent>
+        </>
+      }
+    >
+      <div>
         {mfaStatus.isPending ? (
-          <Skeleton className="h-8 w-28" data-testid="mfa-loading" />
+          <span data-testid="mfa-loading" className="flex">
+            <SkeletonBar shape="field" className="w-32" />
+          </span>
         ) : null}
         {mfaStatus.isError ? (
           <div data-testid="mfa-error">
@@ -188,76 +195,50 @@ function MfaCard() {
           </div>
         ) : null}
         {mfaStatus.isSuccess ? mfaAction : null}
-      </CardContent>
+      </div>
 
-      <Dialog
+      <RecordDrawer
         open={setupOpen}
-        onOpenChange={(open) => {
-          if (!open) closeSetup();
-        }}
+        onClose={closeSetup}
+        title={t(setupCopy.title)}
+        sub={t(setupCopy.sub)}
+        content={MFA_SETUP_PROFILE}
+        stacked
+        saveLabel={t(SETTINGS_KEYS.security.mfa.verifyEnable)}
+        onSave={() => handleSubmitCode()}
+        saveDisabled={code.length < 6 || confirm.isPending}
+        saveTestId="mfa-verify"
+        hideFooter={recoveryCodes !== null}
+        testId="mfa-setup-dialog"
       >
-        <DialogContent className="sm:max-w-md" data-testid="mfa-setup-dialog">
-          {recoveryCodes ? (
-            <>
-              <DialogHeader>
-                <DialogTitle>{t(SETTINGS_KEYS.security.mfa.recoveryTitle)}</DialogTitle>
-                <DialogDescription>
-                  {t(SETTINGS_KEYS.security.mfa.recoveryDescription)}
-                </DialogDescription>
-              </DialogHeader>
-              <RecoveryCodesPanel codes={recoveryCodes} onDone={closeSetup} />
-            </>
-          ) : (
-            <>
-              <DialogHeader>
-                <DialogTitle>{t(SETTINGS_KEYS.security.mfa.setupTitle)}</DialogTitle>
-                <DialogDescription>
-                  {t(SETTINGS_KEYS.security.mfa.setupDescription)}
-                </DialogDescription>
-              </DialogHeader>
-              <div className="flex flex-col gap-4">
-                <MfaEnrollmentSecret
-                  enrollment={enrollment}
-                  secretCopied={secretCopied}
-                  onCopy={() => void handleCopySecret()}
-                />
+        {recoveryCodes ? (
+          <RecoveryCodesPanel codes={recoveryCodes} onDone={closeSetup} />
+        ) : (
+          <div className="flex flex-col gap-4">
+            <MfaEnrollmentSecret
+              enrollment={enrollment}
+              secretCopied={secretCopied}
+              onCopy={() => void handleCopySecret()}
+            />
 
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="mfa-code">
-                    {t(SETTINGS_KEYS.security.mfa.codeLabel)}
-                  </Label>
-                  <TotpCodeInput
-                    id="mfa-code"
-                    value={code}
-                    onChange={setCode}
-                    onComplete={handleSubmitCode}
-                    invalid={!!confirmError}
-                    testId="mfa-code"
-                    aria-label={t(SETTINGS_KEYS.security.mfa.codeAria)}
-                  />
-                  {confirmError ? (
-                    <p className="text-destructive text-xs" role="alert">
-                      {confirmError}
-                    </p>
-                  ) : null}
-                </div>
-              </div>
-              <DialogFooter>
-                <Button variant="ghost" onClick={closeSetup}>
-                  {t(SETTINGS_KEYS.security.mfa.cancel)}
-                </Button>
-                <Button
-                  onClick={() => handleSubmitCode()}
-                  disabled={code.length < 6 || confirm.isPending}
-                  data-testid="mfa-verify"
-                >
-                  {t(SETTINGS_KEYS.security.mfa.verifyEnable)}
-                </Button>
-              </DialogFooter>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+            <DrawerField
+              label={t(SETTINGS_KEYS.security.mfa.codeLabel)}
+              htmlFor="mfa-code"
+              error={confirmError ?? undefined}
+            >
+              <TotpCodeInput
+                id="mfa-code"
+                value={code}
+                onChange={setCode}
+                onComplete={handleSubmitCode}
+                invalid={!!confirmError}
+                testId="mfa-code"
+                aria-label={t(SETTINGS_KEYS.security.mfa.codeAria)}
+              />
+            </DrawerField>
+          </div>
+        )}
+      </RecordDrawer>
 
       <MfaDisableConfirm
         open={disableOpen}
@@ -271,7 +252,7 @@ function MfaCard() {
       />
 
       {stepUpDialog}
-    </Card>
+    </SettingsCard>
   );
 }
 
@@ -290,23 +271,25 @@ function MfaEnrollmentSecret({
     <>
       {enrollment?.otpauthUri ? (
         <div className="flex flex-col items-center gap-2">
-          <Card className="gap-0 py-0" data-testid="mfa-qr">
-            <CardContent className="flex size-44 items-center justify-center p-3">
-              <QrCode data={enrollment.otpauthUri} />
-            </CardContent>
-          </Card>
+          <div
+            data-slot="card"
+            className="bg-card flex size-44 items-center justify-center rounded-xl border p-3"
+            data-testid="mfa-qr"
+          >
+            <QrCode data={enrollment.otpauthUri} />
+          </div>
           <p className="text-muted-foreground text-center text-xs">
             {t(SETTINGS_KEYS.security.mfa.scanHint)}
           </p>
         </div>
       ) : null}
 
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="mfa-secret">{t(SETTINGS_KEYS.security.mfa.secretLabel)}</Label>
+      <DrawerField label={t(SETTINGS_KEYS.security.mfa.secretLabel)} htmlFor="mfa-secret">
         <div className="flex gap-2">
           <div
             id="mfa-secret"
-            className="bg-muted flex-1 rounded-md p-3 font-mono text-sm break-all"
+            dir="ltr"
+            className="bg-canvas text-detail flex min-h-9 flex-1 items-center rounded-lg border px-2.5 py-1.5 font-mono break-all"
             data-testid="mfa-secret"
           >
             {enrollment?.secret}
@@ -318,6 +301,7 @@ function MfaEnrollmentSecret({
             aria-label={t(SETTINGS_KEYS.security.mfa.copySecret)}
             onClick={onCopy}
             data-testid="mfa-copy-secret"
+            className={settingsRowActionClass()}
           >
             <Copy data-icon="inline-start" />
           </Button>
@@ -327,7 +311,7 @@ function MfaEnrollmentSecret({
             {t(SETTINGS_KEYS.security.mfa.copiedSecret)}
           </p>
         ) : null}
-      </div>
+      </DrawerField>
     </>
   );
 }
@@ -381,17 +365,15 @@ function PasskeyRow({
   const remove = useRemovePasskey();
 
   return (
-    <div
-      className="flex items-center justify-between rounded-md border px-3 py-2"
-      data-testid="passkey-row"
-    >
-      <div className="flex items-center gap-2 text-sm">
-        <Fingerprint className="text-muted-foreground" aria-hidden />
+    <SettingsListRow data-testid="passkey-row">
+      <SettingsRowTile icon={Fingerprint} />
+      <span dir="auto" className="text-body min-w-0 flex-1 truncate font-medium">
         {passkey.name}
-      </div>
+      </span>
       <Button
-        variant="ghost"
+        variant="outline"
         size="icon-sm"
+        className={settingsRowActionClass(true)}
         aria-label={t(SETTINGS_KEYS.security.passkeys.removeAria, { name: passkey.name })}
         onClick={() =>
           // Destructive — STRONG step-up only (never the email code).
@@ -405,9 +387,9 @@ function PasskeyRow({
         data-testid="passkey-remove"
         data-passkey-id={passkey.id}
       >
-        {remove.isPending ? null : <Trash />}
+        {remove.isPending ? null : <Trash className="size-3.5" />}
       </Button>
-    </div>
+    </SettingsListRow>
   );
 }
 
@@ -421,6 +403,8 @@ function PasskeysCard() {
   const { guard, isGuarding, isSteppingUp, stepUpDialog } = useStepUpGuard();
   const [addOpen, setAddOpen] = useState(false);
   const [name, setName] = useState('');
+  // The name takes focus on open, as it did when this was a dialog.
+  const nameRef = useRef<HTMLInputElement>(null);
 
   function closeAdd() {
     setAddOpen(false);
@@ -435,44 +419,42 @@ function PasskeysCard() {
   // Only rendered once the list is KNOWN — see passkeysQuery above.
   const passkeysBody =
     passkeys.length === 0 ? (
-      <p className="text-muted-foreground text-sm" data-testid="passkeys-empty">
-        {t(SETTINGS_KEYS.security.passkeys.empty)}
-      </p>
+      <EmptyState
+        variant="inline"
+        title={t(SETTINGS_KEYS.security.passkeys.empty)}
+        testId="passkeys-empty"
+        className="text-body"
+      />
     ) : (
-      passkeys.map((passkey) => (
-        <PasskeyRow
-          key={passkey.id}
-          passkey={passkey}
-          guard={guard}
-          isSteppingUp={isSteppingUp}
-        />
-      ))
+      <SettingsList>
+        {passkeys.map((passkey) => (
+          <PasskeyRow
+            key={passkey.id}
+            passkey={passkey}
+            guard={guard}
+            isSteppingUp={isSteppingUp}
+          />
+        ))}
+      </SettingsList>
     );
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="text-base">
-              {t(SETTINGS_KEYS.security.passkeys.title)}
-            </CardTitle>
-            <CardDescription>
-              {t(SETTINGS_KEYS.security.passkeys.description)}
-            </CardDescription>
-          </div>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => setAddOpen(true)}
-            data-testid="add-passkey"
-          >
-            <Fingerprint data-icon="inline-start" />
-            {t(SETTINGS_KEYS.security.passkeys.add)}
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-2">
+    <SettingsCard
+      title={t(SETTINGS_KEYS.security.passkeys.title)}
+      description={t(SETTINGS_KEYS.security.passkeys.description)}
+      action={
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => setAddOpen(true)}
+          data-testid="add-passkey"
+        >
+          <Fingerprint data-icon="inline-start" />
+          {t(SETTINGS_KEYS.security.passkeys.add)}
+        </Button>
+      }
+    >
+      <div className="flex flex-col gap-2">
         {passkeysQuery.isPending ? <PanelSkeleton testId="passkeys-loading" /> : null}
         {passkeysQuery.isError ? (
           <div data-testid="passkeys-error">
@@ -484,50 +466,40 @@ function PasskeysCard() {
           </div>
         ) : null}
         {passkeysQuery.isSuccess ? passkeysBody : null}
-      </CardContent>
+      </div>
 
-      <Dialog
+      {/* Naming a new passkey: a child drawer stacked on Settings (L-65). */}
+      <RecordDrawer
         open={addOpen}
-        onOpenChange={(open) => {
-          if (!open) closeAdd();
-        }}
+        onClose={closeAdd}
+        title={t(SETTINGS_KEYS.security.passkeys.addTitle)}
+        sub={t(SETTINGS_KEYS.security.passkeys.addDescription)}
+        content={PASSKEY_ADD_PROFILE}
+        stacked
+        initialFocusRef={nameRef}
+        saveLabel={t(SETTINGS_KEYS.security.passkeys.submit)}
+        onSave={submitAdd}
+        saveDisabled={register.isPending || isGuarding}
+        saveTestId="passkey-add-submit"
+        testId="passkey-add-dialog"
       >
-        <DialogContent data-testid="passkey-add-dialog">
-          <DialogHeader>
-            <DialogTitle>{t(SETTINGS_KEYS.security.passkeys.addTitle)}</DialogTitle>
-            <DialogDescription>
-              {t(SETTINGS_KEYS.security.passkeys.addDescription)}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="passkey-name">
-              {t(SETTINGS_KEYS.security.passkeys.nameLabel)}
-            </Label>
-            <Input
-              id="passkey-name"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              placeholder={t(SETTINGS_KEYS.security.passkeys.namePlaceholder)}
-              data-testid="passkey-name"
-            />
-          </div>
-          <DialogFooter>
-            <Button variant="ghost" onClick={closeAdd}>
-              {t(SETTINGS_KEYS.security.passkeys.cancel)}
-            </Button>
-            <Button
-              onClick={submitAdd}
-              disabled={register.isPending || isGuarding}
-              data-testid="passkey-add-submit"
-            >
-              {t(SETTINGS_KEYS.security.passkeys.submit)}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        <DrawerField
+          label={t(SETTINGS_KEYS.security.passkeys.nameLabel)}
+          htmlFor="passkey-name"
+        >
+          <DrawerInput
+            ref={nameRef}
+            id="passkey-name"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            placeholder={t(SETTINGS_KEYS.security.passkeys.namePlaceholder)}
+            data-testid="passkey-name"
+          />
+        </DrawerField>
+      </RecordDrawer>
 
       {stepUpDialog}
-    </Card>
+    </SettingsCard>
   );
 }
 
@@ -548,7 +520,7 @@ export function AccountSecurityPanel() {
   const overviewFailed = mfaStatus.isError || passkeysQuery.isError;
 
   return (
-    <div className="flex flex-col gap-6" data-testid="settings-section-security">
+    <div className="flex flex-col gap-4" data-testid="settings-section-security">
       <SectionHeader
         title={t(SETTINGS_KEYS.security.heading)}
         description={t(SETTINGS_KEYS.security.description)}
@@ -561,21 +533,18 @@ export function AccountSecurityPanel() {
         />
       ) : null}
       {overviewReady || overviewFailed ? null : (
-        <Card data-testid="security-overview-loading" aria-busy="true">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">
-              {t(SETTINGS_KEYS.security.overview.title)}
-            </CardTitle>
-            <CardDescription>
-              {t(SETTINGS_KEYS.security.overview.description)}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-2" aria-hidden="true">
-            <Skeleton className="h-5 w-3/4" />
-            <Skeleton className="h-5 w-2/3" />
-            <Skeleton className="h-5 w-1/2" />
-          </CardContent>
-        </Card>
+        <SettingsCard
+          data-testid="security-overview-loading"
+          aria-busy="true"
+          title={t(SETTINGS_KEYS.security.overview.title)}
+          description={t(SETTINGS_KEYS.security.overview.description)}
+        >
+          <div className="flex flex-col gap-2.5 py-1" aria-hidden="true">
+            <SkeletonBar index={0} />
+            <SkeletonBar index={1} />
+            <SkeletonBar index={2} />
+          </div>
+        </SettingsCard>
       )}
 
       {/* Two independent credential features in one panel: a throw in the

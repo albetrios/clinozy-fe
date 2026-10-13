@@ -1,0 +1,75 @@
+{
+  "manifest": {
+    "title": "Today"
+  },
+  "greeting": {
+    "morning": "Good morning, {{name}}",
+    "afternoon": "Good afternoon, {{name}}",
+    "evening": "Good evening, {{name}}",
+    "nobody": "there"
+  },
+  "pulse": "{{inClinic}} in clinic · {{waiting}} waiting · {{arriving}} arriving · {{day}}, {{time}}",
+  "newBooking": "New booking",
+  "walkIn": "Walk-in",
+  "loading": "Loading today’s floor",
+  "lanes": {
+    "label": "Lanes",
+    "names": {
+      "enquiries": "Enquiries",
+      "arriving": "Arriving",
+      "waiting": "Waiting",
+      "withDoctor": "With doctor",
+      "treatment": "Treatment",
+      "checkout": "Checkout",
+      "pharmacy": "Pharmacy"
+    },
+    "hints": {
+      "oldest": "oldest {{time}}",
+      "next": "next {{time}}",
+      "since": "since {{time}}",
+      "none": "—"
+    },
+    "more": "+{{more}}",
+    "count_one": "{{count}} person",
+    "count_other": "{{count}} people",
+    "empty": "No one here right now.",
+    "none": "The clinic floor and enquiries are not part of your role."
+  },
+  "actions": {
+    "book": "Book",
+    "checkIn": "Check in",
+    "sendIn": "Send in",
+    "openSession": "Open session",
+    "checkout": "Checkout",
+    "dispense": "Dispense"
+  },
+  "card": {
+    "service": "{{service}} · {{where}}",
+    "medicines_one": "{{count}} medicine prescribed",
+    "medicines_other": "{{count}} medicines prescribed"
+  },
+  "flags": {
+    "newLead": "New lead",
+    "confirmed": "Confirmed",
+    "unconfirmed": "Unconfirmed",
+    "waiting": "Waiting {{minutes}} min",
+    "inRoom": "In room {{minutes}} min",
+    "rxApproved": "Rx approved {{time}}",
+    "toPay": "{{amount}} to pay"
+  },
+  "toasts": {
+    "checkedIn": "{{name}} checked in · Dr. queue and room notified",
+    "sentIn": "{{name}} sent in to the doctor",
+    "noRecord": "No patient record yet for {{name}}",
+    "outcome": "{{name}}: {{result}}",
+    "snoozed": "Snoozed · {{label}}"
+  },
+  "queue": {
+    "title": "Work queue",
+    "sub": "{{open}} open · each has an owner and a due time",
+    "scope": "Whose tasks",
+    "owner": "Owner: {{name}}",
+    "you": "{{name}} (you)",
+    "closed": "✓ {{result}}"
+  }
+}

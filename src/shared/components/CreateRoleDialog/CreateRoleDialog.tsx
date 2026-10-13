@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -11,28 +11,24 @@ import {
   type RoleSummary,
 } from '@/shared/api/organization-contracts.ts';
 import {
+  DrawerField,
+  DrawerInput,
+  DrawerTextarea,
+} from '@/shared/components/DrawerField/index.ts';
+import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
+import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
+import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { Checkbox } from '@/shared/components/ui/checkbox.tsx';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/shared/components/ui/dialog.tsx';
-import { Input } from '@/shared/components/ui/input.tsx';
 import { Label } from '@/shared/components/ui/label.tsx';
-import { Skeleton } from '@/shared/components/ui/skeleton.tsx';
-import { Textarea } from '@/shared/components/ui/textarea.tsx';
 import {
   type AssignablePermissions,
   useAssignablePermissions,
 } from '@/shared/hooks/useAssignablePermissions/index.ts';
+import { resetFormInPlace } from '@/shared/hooks/useEditingRecord/index.ts';
 import {
   useCreateRole,
   useRolePermissions,
@@ -41,6 +37,12 @@ import {
 import { Plus } from '@/shared/icons/index.ts';
 
 const EMPTY_ROLE: RoleInput = { name: '', description: '', permissions: [] };
+
+/**
+ * Name, a description textarea and the permission checklist — heavy fields, so
+ * the drawer takes the everyday 680px (`_patterns.md:28`).
+ */
+const ROLE_FORM_PROFILE = { fieldCount: 3, hasHeavyField: true } as const;
 
 /** Selected permission codes with `perm` added. */
 function withPermission(
@@ -65,7 +67,7 @@ function roleSubmitLabel(isEdit: boolean, isSubmitting: boolean): string {
 }
 
 interface CreateRoleDialogProps {
-  /** When provided, the dialog edits this role (controlled) instead of creating. */
+  /** When provided, the drawer edits this role (controlled) instead of creating. */
   role?: RoleSummary;
   /** Controlled open state — required in edit mode (the parent owns the trigger). */
   open?: boolean;
@@ -75,7 +77,7 @@ interface CreateRoleDialogProps {
 /**
  * The permission checkboxes, plus the catalog's own loading and error states.
  *
- * Split out of {@link CreateRoleDialog} so those two extra states do not push the dialog past
+ * Split out of {@link CreateRoleDialog} so those two extra states do not push the drawer past
  * the complexity ceiling — and because "render the grants this caller may delegate" is a
  * coherent unit on its own.
  */
@@ -135,12 +137,13 @@ function PermissionChecklist({
 }
 
 /**
- * Dialog + form for creating OR editing a custom role (name, description, and a
- * checklist of assignable permissions). In **create** mode it renders its own
+ * Drawer + form for creating OR editing a custom role (name, description, and a
+ * checklist of assignable permissions) — a child drawer stacked on Settings ›
+ * Roles (L-65), whose Back returns there. In **create** mode it renders its own
  * "New role" trigger (a fresh org has only the system Owner role, so this is the
  * entry point for the Admin/Member/Viewer roles that make inviting possible). In
  * **edit** mode (`role` given) it is controlled by the parent — no trigger — and
- * saves via `useUpdateRole`. Gated by the caller (render only for `role:manage`).
+ * saves via `useUpdateRole`. Gated by the caller (render only for `role:create`, or `role:update` to edit).
  */
 export function CreateRoleDialog({
   role,
@@ -160,21 +163,26 @@ export function CreateRoleDialog({
   // The catalog clinozy-be enforces, narrowed to what this caller may actually grant —
   // `assertCallerCanGrantPermissionCodes` refuses anything else.
   const assignable = useAssignablePermissions();
+  // The name takes focus on open, as it did when this was a dialog.
+  const nameRef = useRef<HTMLInputElement | null>(null);
+  /** The form the footer's primary submits — Enter in the name saves too. */
+  const formId = `role-form-${useId().replace(/:/g, '')}`;
 
   const initialValues: RoleInput = role
     ? { name: role.name, description: role.description, permissions: role.permissions }
     : EMPTY_ROLE;
 
+  const form = useForm<RoleInput>({
+    resolver: zodResolver(roleInputSchema),
+    defaultValues: initialValues,
+  });
   const {
     register,
     handleSubmit,
     control,
-    reset,
     formState: { errors, isSubmitting },
-  } = useForm<RoleInput>({
-    resolver: zodResolver(roleInputSchema),
-    defaultValues: initialValues,
-  });
+  } = form;
+  const { ref: registerNameRef, ...nameField } = register('name');
 
   /**
    * Which role this form has already been pre-filled for. The permissions query
@@ -192,12 +200,12 @@ export function CreateRoleDialog({
     }
     if (!rolePermissions.isSuccess || hydratedFor.current === role.id) return;
     hydratedFor.current = role.id;
-    reset({
+    resetFormInPlace(form, {
       name: role.name,
       description: role.description,
       permissions: rolePermissions.data,
     });
-  }, [role, rolePermissions.isSuccess, rolePermissions.data, reset]);
+  }, [role, rolePermissions.isSuccess, rolePermissions.data, form]);
 
   // In edit mode, don't allow a save before the real permissions load.
   const permissionsPending = isEdit && !rolePermissions.isSuccess;
@@ -208,30 +216,41 @@ export function CreateRoleDialog({
     } else {
       await createRole.mutateAsync(data);
     }
-    reset(isEdit ? data : EMPTY_ROLE);
+    resetFormInPlace(form, isEdit ? data : EMPTY_ROLE);
     setOpen(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <>
       {isEdit ? null : (
-        <DialogTrigger asChild>
-          <Button size="sm" data-testid="role-create-open">
-            <Plus className="me-2 h-4 w-4" />
-            New role
-          </Button>
-        </DialogTrigger>
+        <Button size="sm" onClick={() => setOpen(true)} data-testid="role-create-open">
+          <Plus className="size-4" />
+          New role
+        </Button>
       )}
-      <DialogContent className="max-h-[85vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{isEdit ? 'Edit role' : 'Create a role'}</DialogTitle>
-          <DialogDescription>
-            {isEdit
-              ? 'Update the name, description, and permissions.'
-              : 'Define a permission set you can assign to members.'}
-          </DialogDescription>
-        </DialogHeader>
+      <RecordDrawer
+        open={open}
+        onClose={() => setOpen(false)}
+        title={isEdit ? 'Edit role' : 'Create a role'}
+        sub={
+          isEdit
+            ? 'Update the name, description, and permissions.'
+            : 'Define a permission set you can assign to members.'
+        }
+        content={ROLE_FORM_PROFILE}
+        stacked
+        initialFocusRef={nameRef}
+        saveLabel={roleSubmitLabel(isEdit, false)}
+        savingLabel={roleSubmitLabel(isEdit, true)}
+        saveFormId={formId}
+        saveState={isSubmitting ? 'saving' : 'idle'}
+        // The drawer keeps its action, disabled, while the grants load.
+        saveDisabled={permissionsPending}
+        saveTestId="role-create-submit"
+        testId="role-create-dialog"
+      >
         <form
+          id={formId}
           onSubmit={handleSubmit(onSubmit)}
           className="space-y-4"
           data-testid="role-create-form"
@@ -239,48 +258,51 @@ export function CreateRoleDialog({
           {permissionsPending ? (
             // The checklist is a statement about what this role can do. Rendered
             // from the list row — which carries no permissions — it opens with
-            // every box unchecked and then visibly ticks itself.
-            <div className="space-y-3" data-testid="role-edit-loading">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-20 w-full" />
-              <Skeleton className="h-24 w-full" />
+            // every box unchecked and then visibly ticks itself. The name, the
+            // description and the checklist as the design's flat bars.
+            <div className="flex flex-col gap-3" data-testid="role-edit-loading">
+              <SkeletonBar shape="field" />
+              <SkeletonBar shape="field" className="h-20" />
+              <SkeletonBar shape="field" className="h-24" />
             </div>
           ) : (
             <>
-              <div className="space-y-2">
-                <Label htmlFor="role-name">Name</Label>
-                <Input
+              <DrawerField
+                label="Name"
+                htmlFor="role-name"
+                error={translateFormMessage(errors.name?.message)}
+              >
+                <DrawerInput
                   id="role-name"
                   placeholder={t(SETTINGS_KEYS.panels.roles.namePlaceholder)}
                   aria-invalid={!!errors.name}
                   data-testid="role-create-name"
-                  {...register('name')}
+                  {...nameField}
+                  ref={(node) => {
+                    registerNameRef(node);
+                    nameRef.current = node;
+                  }}
                 />
-                {errors.name && (
-                  <p className="text-destructive text-xs" role="alert">
-                    {translateFormMessage(errors.name.message)}
-                  </p>
-                )}
-              </div>
+              </DrawerField>
 
-              <div className="space-y-2">
-                <Label htmlFor="role-description">Description</Label>
-                <Textarea
+              <DrawerField
+                label="Description"
+                htmlFor="role-description"
+                error={translateFormMessage(errors.description?.message)}
+              >
+                <DrawerTextarea
                   id="role-description"
                   placeholder={t(SETTINGS_KEYS.panels.roles.descriptionPlaceholder)}
                   aria-invalid={!!errors.description}
                   data-testid="role-create-description"
                   {...register('description')}
                 />
-                {errors.description && (
-                  <p className="text-destructive text-xs" role="alert">
-                    {translateFormMessage(errors.description.message)}
-                  </p>
-                )}
-              </div>
+              </DrawerField>
 
-              <div className="space-y-2">
-                <Label>Permissions</Label>
+              <DrawerField
+                label="Permissions"
+                error={translateFormMessage(errors.permissions?.message)}
+              >
                 <Controller
                   control={control}
                   name="permissions"
@@ -292,28 +314,11 @@ export function CreateRoleDialog({
                     />
                   )}
                 />
-                {errors.permissions && (
-                  <p className="text-destructive text-xs" role="alert">
-                    {translateFormMessage(errors.permissions.message)}
-                  </p>
-                )}
-              </div>
+              </DrawerField>
             </>
           )}
-
-          {/* Always rendered — the dialog keeps its action, disabled, rather
-              than losing it while the grants load. */}
-          <DialogFooter>
-            <Button
-              type="submit"
-              disabled={isSubmitting || permissionsPending}
-              data-testid="role-create-submit"
-            >
-              {roleSubmitLabel(isEdit, isSubmitting)}
-            </Button>
-          </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+      </RecordDrawer>
+    </>
   );
 }

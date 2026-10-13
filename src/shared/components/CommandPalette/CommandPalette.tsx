@@ -1,52 +1,47 @@
-import { useNavigate } from '@tanstack/react-router';
-import { Command } from 'cmdk';
+import { useNavigate, useParams } from '@tanstack/react-router';
 import { useCallback, useLayoutEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { logout } from '@/shared/auth/service.ts';
-import { SETTINGS_NS } from '@/shared/components/SettingsModal/settings.constants.ts';
-import { settingsHash } from '@/shared/components/SettingsModal/settings-hash-grammar.ts';
-import { mapApiError, reportError } from '@/shared/errors/errorHandler.ts';
+import { isCommandSearchQuery } from '@/shared/api/app/command-search-api.ts';
+import type { AppCommandNavigation } from '@/shared/app/app-command-targets.ts';
+import { PICKER_KEYS, PICKER_NS } from '@/shared/components/Picker/picker.constants.ts';
+import {
+  Command,
+  CommandEmpty,
+  CommandInput,
+  CommandList,
+} from '@/shared/components/ui/command.tsx';
+import { useAppNav } from '@/shared/hooks/useAppNav/index.ts';
+import { useAppNavigate } from '@/shared/hooks/useAppNavigate/index.ts';
 import { useDeploymentFlags } from '@/shared/hooks/useDeploymentFlags/index.ts';
 import { useMeContext } from '@/shared/hooks/useMeContext/index.ts';
-import { useVisibleSettingsSections } from '@/shared/hooks/useSettingsNav/index.ts';
-import {
-  Building,
-  LayoutDashboard,
-  LogOut,
-  Monitor,
-  Moon,
-  Search,
-  Settings,
-  Sun,
-} from '@/shared/icons/index.ts';
+import { Search } from '@/shared/icons/index.ts';
 import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
-import { notify } from '@/shared/notify/index.ts';
-import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
 import {
+  type AppCommandGroups,
+  NO_APP_COMMANDS,
+  useAppCommandGroups,
+} from './app-command-groups.ts';
+import { COMMAND_MENU_KEYS, COMMAND_MENU_NS } from './command-palette.constants.ts';
+import {
   COMMAND_SEARCH_CLASS,
+  COMMAND_SEARCH_ICON_CLASS,
+  COMMAND_SEARCH_MAX_LENGTH,
+  COMMAND_SEARCH_ROW_CLASS,
   useCommandPaletteSearch,
 } from './command-palette-context.ts';
-import { CommandItem } from './CommandPaletteItem.tsx';
+import { isSelectionMove, useCommandSelection } from './command-palette-model.ts';
+import { CommandPaletteFooter } from './CommandPaletteFooter.tsx';
+import { CommandPaletteGroup } from './CommandPaletteGroup.tsx';
+import { CommandPaletteKbd } from './CommandPaletteKbd.tsx';
 import { CommandPaletteOrgGroup } from './CommandPaletteOrgGroup.tsx';
 import { CommandPaletteShell } from './CommandPaletteShell.tsx';
+import { usePlatformCommandGroups } from './platform-command-groups.ts';
 
-/**
- * Stable id for the logout-failed toast (house rule 7): a user whose sign-out
- * failed will try again, and the second failure should replace the first
- * message rather than stack another copy of it.
- */
-export const PALETTE_LOGOUT_TOAST_ID = 'command-palette-logout-failed';
-
-/**
- * cmdk matches a row against its rendered label, and these three labels are
- * translated — so a search for "theme" reached them in English and nowhere
- * else. Keywords are locale-independent, which is what the dashboard's
- * "Change theme" suggestion seeds the palette with.
- */
-const THEME_KEYWORDS = ['theme', 'appearance', 'light', 'dark', 'system'] as const;
+/** The empty line (H:2675): 32px 16px, centred, 13px muted. */
+const EMPTY_CLASS = 'text-muted-foreground text-body px-4 py-8 text-center';
 
 /**
  * Global command palette powered by cmdk.
@@ -62,27 +57,27 @@ export function CommandPalette() {
   );
 }
 
-/** Deferred command engine and results inside the persistent search shell. */
+/**
+ * Deferred command engine and results inside the persistent search shell — the
+ * design's command menu (KICKOFF §6.0; `_patterns.md:195–207`; H:4598–4611).
+ * Inside an organization the clinic groups lead; a personal workspace has no
+ * clinic, so it lists the platform rows alone and runs no clinic query.
+ */
 export function CommandPaletteContent() {
-  const { t } = useTranslation(LAYOUT_NS);
   const open = useUIStore((s) => s.commandPaletteOpen);
-  const setOpen = useUIStore((s) => s.setCommandPaletteOpen);
-  const navigate = useNavigate();
-  const setTheme = useThemeStore((s) => s.setTheme);
-  const { data: meContext } = useMeContext();
-  // Organization settings only has sections for a team workspace; on a personal
-  // workspace the command would just fall back to account/profile — so hide it.
-  const isTeamOrg = meContext?.activeOrganization?.type === 'TEAM';
-  // Settings destinations, gated exactly like the Settings modal nav (permission +
-  // org type + deployment) so ⌘K can jump straight to e.g. Billing or Members.
-  const { t: tSettings } = useTranslation(SETTINGS_NS);
-  const deploymentFlags = useDeploymentFlags();
-  const settingsItems = useVisibleSettingsSections();
-  const setShortcutsOpen = useUIStore((s) => s.setShortcutsOpen);
-  const closePalette = useCallback(() => {
-    setOpen(false);
-  }, [setOpen]);
+  const { organizationSlug = '' } = useParams({ strict: false });
+  if (!open) return null;
+  return organizationSlug ? (
+    <OrganizationCommandMenu organizationSlug={organizationSlug} />
+  ) : (
+    <PersonalCommandMenu />
+  );
+}
 
+/** Close the palette, then run a command — or navigate. */
+function usePaletteCommands() {
+  const setOpen = useUIStore((s) => s.setCommandPaletteOpen);
+  const navigate = useAppNavigate();
   const runCommand = useCallback(
     (command: () => void) => {
       setOpen(false);
@@ -90,175 +85,141 @@ export function CommandPaletteContent() {
     },
     [setOpen],
   );
+  const go = useCallback(
+    (navigation: AppCommandNavigation) => runCommand(() => navigate(navigation)),
+    [navigate, runCommand],
+  );
+  return { runCommand, go };
+}
 
-  if (!open) return null;
+function OrganizationCommandMenu({ organizationSlug }: { organizationSlug: string }) {
+  const { query } = useCommandPaletteSearch();
+  // The same entries as the shell's nav: manifest-driven, and narrowed by the
+  // member's clinic access and any View-as preview.
+  const { entries } = useAppNav();
+  const { go } = usePaletteCommands();
+  const appCommands = useAppCommandGroups({
+    query,
+    organizationSlug,
+    navEntries: entries,
+    go,
+  });
+  return <CommandMenu organizationSlug={organizationSlug} appCommands={appCommands} />;
+}
+
+function PersonalCommandMenu() {
+  return <CommandMenu organizationSlug="" appCommands={NO_APP_COMMANDS} />;
+}
+
+/**
+ * The menu itself. The clinic groups lead: "Actions" alone until something is
+ * typed, then "Go to" and, once the contacts search takes the query, People.
+ * The platform rows (settings, workspaces, shortcuts, theme, sign out) follow
+ * once typing — the relocation table keeps them here (§3.2) — or at once
+ * where the clinic offers nothing.
+ */
+function CommandMenu({
+  organizationSlug,
+  appCommands,
+}: {
+  organizationSlug: string;
+  appCommands: AppCommandGroups;
+}) {
+  const { t } = useTranslation(LAYOUT_NS);
+  const { t: tMenu } = useTranslation(COMMAND_MENU_NS);
+  const setOpen = useUIStore((s) => s.setCommandPaletteOpen);
+  const navigate = useNavigate();
+  const { query } = useCommandPaletteSearch();
+  const { data: meContext } = useMeContext();
+  const deploymentFlags = useDeploymentFlags();
+  const { runCommand } = usePaletteCommands();
+  const inOrganization = organizationSlug !== '';
+  const platform = usePlatformCommandGroups({ query, runCommand });
+  const selection = useCommandSelection(query, appCommands.groups[0]?.rows[0]?.value);
+  const closePalette = useCallback(() => {
+    setOpen(false);
+  }, [setOpen]);
 
   const cp = LAYOUT_KEYS.app.commandPalette;
+  const typed = query.trim();
+  // The design's empty query shows Actions alone (H:4600); the platform rows
+  // join once typing — or at once, when the clinic has nothing to offer.
+  const showPlatform = typed !== '' || appCommands.groups.length === 0;
+  // The clinic's empty line names what it searches, and waits for the search
+  // to answer — "No matches" never flashes ahead of the rows.
+  let empty: string | null = t(cp.empty);
+  if (appCommands.searchable) {
+    empty = typed && !appCommands.isSearching ? tMenu(COMMAND_MENU_KEYS.empty) : null;
+  }
+  const hint =
+    appCommands.searchable && !isCommandSearchQuery(typed)
+      ? tMenu(COMMAND_MENU_KEYS.hint)
+      : null;
 
   return (
     <Command
-      onKeyDown={(e) => {
-        if (e.key === 'Escape') setOpen(false);
+      // cmdk names its input through this label (an `aria-labelledby` that
+      // outranks `aria-label`): the design's "Search" (H:2672).
+      label={t(LAYOUT_KEYS.app.search)}
+      shouldFilter={false}
+      loop
+      value={selection.value}
+      onValueChange={selection.onValueChange}
+      // Esc belongs to the shell's dialog — the top-most layer takes it.
+      onKeyDown={(event) => {
+        if (isSelectionMove(event)) selection.markMoved();
       }}
+      className="flex min-h-0 flex-1 flex-col rounded-none bg-transparent"
     >
-      <CommandPaletteInput />
+      <CommandPaletteInput searching={appCommands.isSearching} />
 
-      <Command.List className="max-h-[300px] overflow-y-auto p-2">
-        <Command.Empty className="text-muted-foreground py-6 text-center text-sm">
-          {t(cp.empty)}
-        </Command.Empty>
+      <CommandList
+        label={inOrganization ? tMenu(COMMAND_MENU_KEYS.results) : undefined}
+        onPointerMove={selection.markMoved}
+        className="max-h-none min-h-0 flex-1 scroll-py-1.5 p-1.5"
+      >
+        {empty ? (
+          <CommandEmpty data-testid="command-palette-empty" className={EMPTY_CLASS}>
+            {empty}
+          </CommandEmpty>
+        ) : null}
 
-        <Command.Group
-          heading={t(cp.groups.navigation)}
-          className="text-muted-foreground px-1 py-1.5 text-xs font-medium"
-        >
-          <CommandItem
-            onSelect={() => runCommand(() => navigate({ to: '/' }))}
-            icon={LayoutDashboard}
-          >
-            {t(cp.dashboard)}
-          </CommandItem>
-          <CommandItem
-            onSelect={() =>
-              runCommand(() =>
-                navigate({ to: '.', hash: settingsHash('account', 'profile') }),
-              )
-            }
-            icon={Settings}
-          >
-            {t(cp.userSettings)}
-          </CommandItem>
-          {isTeamOrg ? (
-            <CommandItem
-              onSelect={() =>
-                runCommand(() =>
-                  navigate({
-                    to: '.',
-                    hash: settingsHash('organization', 'general'),
-                  }),
-                )
-              }
-              icon={Building}
-            >
-              {t(cp.organizationSettings)}
-            </CommandItem>
-          ) : null}
-        </Command.Group>
+        {appCommands.groups.map((group) => (
+          <CommandPaletteGroup key={group.id} group={group} />
+        ))}
 
-        {settingsItems.length > 0 ? (
-          <Command.Group
-            heading={t(cp.settings)}
-            className="text-muted-foreground px-1 py-1.5 text-xs font-medium"
-          >
-            {settingsItems.map((item) => (
-              <CommandItem
-                key={`${item.scope}/${item.section}`}
-                icon={item.icon}
-                keywords={item.keywords}
-                onSelect={() =>
-                  runCommand(() =>
-                    navigate({
-                      to: '.',
-                      hash: settingsHash(item.scope, item.section),
-                    }),
-                  )
-                }
-              >
-                {tSettings(item.labelKey)}
-              </CommandItem>
+        {showPlatform ? (
+          <>
+            {platform.leading.map((group) => (
+              <CommandPaletteGroup key={group.id} group={group} />
             ))}
-          </Command.Group>
+            {meContext ? (
+              <CommandPaletteOrgGroup
+                personalOrganizationsEnabled={deploymentFlags.personalOrganizations}
+                heading={t(cp.groups.organizations)}
+                currentOrganizationLabel={(name) => t(cp.currentOrganization, { name })}
+                switchOrganizationLabel={(name) => t(cp.switchOrganization, { name })}
+                closePalette={closePalette}
+                navigate={navigate}
+                query={typed}
+              />
+            ) : null}
+            {platform.trailing.map((group) => (
+              <CommandPaletteGroup key={group.id} group={group} />
+            ))}
+          </>
         ) : null}
+      </CommandList>
 
-        {meContext ? (
-          <CommandPaletteOrgGroup
-            personalOrganizationsEnabled={deploymentFlags.personalOrganizations}
-            heading={t(cp.groups.organizations)}
-            currentOrganizationLabel={(name) => t(cp.currentOrganization, { name })}
-            switchOrganizationLabel={(name) => t(cp.switchOrganization, { name })}
-            closePalette={closePalette}
-            navigate={navigate}
-          />
-        ) : null}
-
-        <Command.Separator className="bg-border my-1 h-px" />
-
-        <Command.Group
-          heading={t(cp.groups.shortcuts)}
-          className="text-muted-foreground px-1 py-1.5 text-xs font-medium"
-        >
-          <CommandItem
-            onSelect={() => runCommand(() => setShortcutsOpen(true))}
-            icon={Settings}
-          >
-            {t(cp.openShortcuts)}
-          </CommandItem>
-        </Command.Group>
-
-        <Command.Separator className="bg-border my-1 h-px" />
-
-        <Command.Group
-          heading={t(cp.groups.theme)}
-          className="text-muted-foreground px-1 py-1.5 text-xs font-medium"
-        >
-          <CommandItem
-            onSelect={() => runCommand(() => setTheme('light'))}
-            icon={Sun}
-            keywords={THEME_KEYWORDS}
-          >
-            {t(cp.lightMode)}
-          </CommandItem>
-          <CommandItem
-            onSelect={() => runCommand(() => setTheme('dark'))}
-            icon={Moon}
-            keywords={THEME_KEYWORDS}
-          >
-            {t(cp.darkMode)}
-          </CommandItem>
-          <CommandItem
-            onSelect={() => runCommand(() => setTheme('system'))}
-            icon={Monitor}
-            keywords={THEME_KEYWORDS}
-          >
-            {t(cp.systemTheme)}
-          </CommandItem>
-        </Command.Group>
-
-        <Command.Separator className="bg-border my-1 h-px" />
-
-        <Command.Group
-          heading={t(cp.groups.account)}
-          className="text-muted-foreground px-1 py-1.5 text-xs font-medium"
-        >
-          <CommandItem
-            onSelect={() =>
-              runCommand(() => {
-                logout().catch((error: unknown) => {
-                  // `.catch(() => {})` meant a sign-out that did not happen
-                  // looked exactly like one that did: the palette closed,
-                  // nothing else moved, and the user was still signed in
-                  // with nothing said and nothing reported (SHELL-12).
-                  reportError(error, { scope: 'command-palette-logout' });
-                  notify.error(mapApiError(error), {
-                    id: PALETTE_LOGOUT_TOAST_ID,
-                  });
-                });
-              })
-            }
-            icon={LogOut}
-            destructive
-          >
-            {t(cp.logOut)}
-          </CommandItem>
-        </Command.Group>
-      </Command.List>
+      {inOrganization ? <CommandPaletteFooter hint={hint} /> : null}
     </Command>
   );
 }
 
-function CommandPaletteInput() {
+/** The 52px input row (H:2672): search mark · input ("Search or jump to…") · "esc". */
+function CommandPaletteInput({ searching }: { searching: boolean }) {
   const { t } = useTranslation(LAYOUT_NS);
-  const cp = LAYOUT_KEYS.app.commandPalette;
+  const { t: tPicker } = useTranslation(PICKER_NS);
   const { query, setQuery, searchFocus, rememberFocus } = useCommandPaletteSearch();
   const inputRef = useRef<HTMLInputElement>(null);
   useLayoutEffect(() => {
@@ -272,23 +233,36 @@ function CommandPaletteInput() {
   }, [searchFocus]);
 
   return (
-    <div className="flex items-center border-b px-3">
-      <Search className="text-muted-foreground me-2 h-4 w-4 shrink-0" />
-      <Command.Input
-        data-slot="input"
-        placeholder={t(cp.placeholder)}
-        aria-label={t(cp.placeholder)}
-        className={COMMAND_SEARCH_CLASS}
-        ref={inputRef}
-        value={query}
-        onValueChange={setQuery}
-        onFocus={() => {
-          rememberFocus(true);
-        }}
-        onBlur={() => {
-          rememberFocus(false);
-        }}
-      />
-    </div>
+    <CommandInput
+      wrapperClassName={COMMAND_SEARCH_ROW_CLASS}
+      icon={<Search aria-hidden="true" className={COMMAND_SEARCH_ICON_CLASS} />}
+      trailing={
+        <>
+          {searching ? (
+            <span
+              aria-hidden="true"
+              data-slot="pill"
+              data-testid="command-palette-searching"
+              className="border-border border-t-foreground animate-spinner size-3.5 flex-none rounded-full border-2"
+            />
+          ) : null}
+          <CommandPaletteKbd>{tPicker(PICKER_KEYS.escKey)}</CommandPaletteKbd>
+        </>
+      }
+      data-slot="input"
+      data-testid="command-palette-search"
+      placeholder={t(LAYOUT_KEYS.app.commandPalette.placeholder)}
+      maxLength={COMMAND_SEARCH_MAX_LENGTH}
+      className={COMMAND_SEARCH_CLASS}
+      ref={inputRef}
+      value={query}
+      onValueChange={setQuery}
+      onFocus={() => {
+        rememberFocus(true);
+      }}
+      onBlur={() => {
+        rememberFocus(false);
+      }}
+    />
   );
 }

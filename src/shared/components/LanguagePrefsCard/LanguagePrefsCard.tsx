@@ -16,14 +16,9 @@ import {
 } from '@/lib/i18n/locale.constants.ts';
 import { I18N_LOCALES, LOCALE_NATIVE_LABELS } from '@/lib/i18n/locales.ts';
 import { cn } from '@/lib/utils.ts';
-import { OptionPills } from '@/shared/components/OptionPills/index.ts';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/shared/components/ui/card.tsx';
+import { DrawerChips } from '@/shared/components/DrawerField/drawer-chip-controls.tsx';
+import { FieldLabel } from '@/shared/components/FieldLabel/index.ts';
+import { SettingsCard } from '@/shared/components/SettingsCard/index.ts';
 import { Check } from '@/shared/icons/index.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 
@@ -41,24 +36,22 @@ export function LanguagePrefsCard() {
   const multiLocale = isMultiLocaleBuild();
 
   return (
-    <Card data-testid={LOCALE_TEST_IDS.languageCard}>
-      <CardHeader>
-        <CardTitle className="text-base">
-          {multiLocale
-            ? t(LOCALE_KEYS.languageHeading)
-            : t(LOCALE_KEYS.textDirectionHeading)}
-        </CardTitle>
-        <CardDescription>
-          {multiLocale
-            ? t(LOCALE_KEYS.languageDescription)
-            : t(LOCALE_KEYS.languageDirectionDescription)}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-5">
+    <SettingsCard
+      data-testid={LOCALE_TEST_IDS.languageCard}
+      title={
+        multiLocale ? t(LOCALE_KEYS.languageHeading) : t(LOCALE_KEYS.textDirectionHeading)
+      }
+      description={
+        multiLocale
+          ? t(LOCALE_KEYS.languageDescription)
+          : t(LOCALE_KEYS.languageDirectionDescription)
+      }
+    >
+      <div className="flex flex-col gap-4">
         {multiLocale ? (
           <fieldset className="m-0 min-w-0 border-0 p-0">
             <legend className="sr-only">{t(LOCALE_KEYS.languageHeading)}</legend>
-            <div className="grid gap-2 sm:grid-cols-2">
+            <div className="grid gap-1.5 sm:grid-cols-2">
               {I18N_LOCALES.map((code) => {
                 const active = locale === code;
                 return (
@@ -83,7 +76,7 @@ export function LanguagePrefsCard() {
                       })}
                     </span>
                     {active ? (
-                      <Check className="text-primary size-4 shrink-0" aria-hidden />
+                      <Check className="text-foreground size-4 shrink-0" aria-hidden />
                     ) : null}
                   </button>
                 );
@@ -92,20 +85,24 @@ export function LanguagePrefsCard() {
           </fieldset>
         ) : null}
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1.5">
           {multiLocale ? (
-            <p className="text-sm font-medium">{t(LOCALE_KEYS.textDirectionHeading)}</p>
+            <FieldLabel>{t(LOCALE_KEYS.textDirectionHeading)}</FieldLabel>
           ) : null}
-          <OptionPills
-            ariaLabel={t(LOCALE_KEYS.textDirectionHeading)}
+          <DrawerChips
+            label={t(LOCALE_KEYS.textDirectionHeading)}
             value={textDirection}
-            options={TEXT_DIRECTION_PREFERENCE_LIST}
-            labelFor={(id) => t(TEXT_DIRECTION_LABEL_KEYS[id])}
-            onPick={(id) => setTextDirection(id)}
-            testPrefix="text-direction"
+            options={TEXT_DIRECTION_PREFERENCE_LIST.map((id) => ({
+              value: id,
+              label: t(TEXT_DIRECTION_LABEL_KEYS[id]),
+            }))}
+            onChange={(id) => {
+              if (id) setTextDirection(id);
+            }}
+            testId="text-direction"
           />
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </SettingsCard>
   );
 }

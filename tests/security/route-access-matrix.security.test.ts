@@ -12,7 +12,7 @@ import { requireModuleGate } from '@/core/security/gates/require-module.ts';
 import { requirePermissionGate } from '@/core/security/gates/require-permission.ts';
 import { requireSession } from '@/core/security/gates/require-session.ts';
 import { gateway, gatewayFromManifest } from '@/core/security/gateway.ts';
-import { manifest as dashboardManifest } from '@/pages/organization/$organizationSlug/dashboard/dashboard.manifest.ts';
+import { manifest as todayManifest } from '@/pages/organization/$organizationSlug/today/today.manifest.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
@@ -36,41 +36,42 @@ const GUARDS = {
   'members:manage': gateway(
     requireSession,
     requirePermissionGate('membership:read'),
-    requirePermissionGate('membership:manage'),
+    requirePermissionGate('membership:update'),
   ),
-  'dashboard-manifest': gatewayFromManifest(dashboardManifest),
+  'today-manifest': gatewayFromManifest(todayManifest),
 } as const;
 
 type GuardName = keyof typeof GUARDS;
-type Perm = 'membership:read' | 'membership:manage' | 'organization:read';
+type Perm = 'membership:read' | 'membership:update' | 'organization:read';
 
 interface UserState {
   name: string;
   authed: boolean;
   perms: Perm[];
-  billingEnabled: boolean;
+  /** Whether the deployment switches the Today room's module (`app-today`) on. */
+  todayEnabled: boolean;
 }
 
 const STATES: UserState[] = [
-  { name: 'signed-out', authed: false, perms: [], billingEnabled: true },
-  { name: 'limited (no perms)', authed: true, perms: [], billingEnabled: true },
+  { name: 'signed-out', authed: false, perms: [], todayEnabled: true },
+  { name: 'limited (no perms)', authed: true, perms: [], todayEnabled: true },
   {
     name: 'member (read-only)',
     authed: true,
     perms: ['membership:read', 'organization:read'],
-    billingEnabled: true,
+    todayEnabled: true,
   },
   {
     name: 'admin',
     authed: true,
-    perms: ['membership:read', 'membership:manage', 'organization:read'],
-    billingEnabled: true,
+    perms: ['membership:read', 'membership:update', 'organization:read'],
+    todayEnabled: true,
   },
   {
-    name: 'admin (billing disabled)',
+    name: 'admin (Today switched off)',
     authed: true,
     perms: ['organization:read'],
-    billingEnabled: false,
+    todayEnabled: false,
   },
 ];
 
@@ -78,17 +79,17 @@ const STATES: UserState[] = [
 function expectedReachable(state: UserState, guard: GuardName): boolean {
   if (!state.authed) return false;
   if (guard === 'authed-only') return true;
-  if (guard === 'dashboard-manifest') {
-    if (!state.billingEnabled) return false;
+  if (guard === 'today-manifest') {
+    if (!state.todayEnabled) return false;
     return state.perms.includes('organization:read');
   }
   const canRead = state.perms.includes('membership:read');
   if (guard === 'members:read') return canRead;
-  return canRead && state.perms.includes('membership:manage');
+  return canRead && state.perms.includes('membership:update');
 }
 
 function applyState(state: UserState) {
-  disabledModulesRef.value = state.billingEnabled ? new Set() : new Set(['billing']);
+  disabledModulesRef.value = state.todayEnabled ? new Set() : new Set(['app-today']);
   if (state.authed) {
     useAuthStore.setState({
       user: { id: 'u', email: 'a@b.test', role: 'user' },

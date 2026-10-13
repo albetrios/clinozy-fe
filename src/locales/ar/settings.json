@@ -47,7 +47,6 @@
       "recoveryTitle": "احفظ رموز الاسترداد",
       "recoveryDescription": "خزّنها في مكان آمن. يعمل كل منها مرة واحدة إذا فقدت جهازك.",
       "done": "تم",
-      "cancel": "إلغاء",
       "verifyEnable": "تحقق وتفعيل",
       "codeLabel": "أدخل الرمز المكون من 6 أرقام",
       "codeAria": "رمز المصادقة المكون من ستة أرقام",
@@ -70,7 +69,6 @@
       "addDescription": "سمِّه لتتعرف عليه لاحقًا. سيطلب جهازك إنشاء مفتاح المرور.",
       "nameLabel": "الاسم",
       "namePlaceholder": "MacBook Touch ID",
-      "cancel": "إلغاء",
       "submit": "إضافة مفتاح مرور"
     },
     "overview": {
@@ -115,12 +113,6 @@
       "sendFailed": "تعذّر إرسال الرمز. حاول مرة أخرى."
     }
   },
-  "discard": {
-    "title": "تجاهل التغييرات غير المحفوظة؟",
-    "description": "لديك تغييرات غير محفوظة. مغادرة هذا القسم ستتجاهلها.",
-    "stay": "متابعة التحرير",
-    "leave": "تجاهل التغييرات"
-  },
   "dialog": {
     "title": "الإعدادات"
   },
@@ -156,7 +148,10 @@
       "cancelInviteDescription": "سيتوقف الرابط الموجود في بريدهم الإلكتروني عن العمل. يمكنك التراجع لبضع ثوانٍ بعد التأكيد، أو دعوتهم مرة أخرى لاحقًا.",
       "cancelInviteConfirm": "إلغاء الدعوة",
       "cancelInviteKeep": "الإبقاء على الدعوة",
-      "cancelInvitePending": "جارٍ إلغاء الدعوة المرسلة إلى {{email}}…"
+      "cancelInvitePending": "جارٍ إلغاء الدعوة المرسلة إلى {{email}}…",
+      "movedTitle": "الأعضاء الآن في المستخدمون",
+      "movedBody": "ادعُ الأشخاص وغيّر أدوارهم وأوقفهم أو أزلهم، وأعد إرسال الدعوات أو ألغِها — كل ذلك من الفريق.",
+      "open": "فتح المستخدمون"
     },
     "roles": {
       "title": "الأدوار",
@@ -187,7 +182,10 @@
       "create": "دور جديد",
       "roleFallback": "هذا الدور",
       "permissionsLoading": "جارٍ تحميل الأذونات…",
-      "permissionsLoadFailed": "تعذر تحميل قائمة الأذونات. يرجى المحاولة مجددًا."
+      "permissionsLoadFailed": "تعذر تحميل قائمة الأذونات. يرجى المحاولة مجددًا.",
+      "movedTitle": "الأدوار الآن في المستخدمون",
+      "movedBody": "أضف الأدوار وأعد تسميتها واحذفها، واختر ما يمكن لكل دور فعله — أقسام العيادة والمستخدمون وصلاحيات مساحة العمل — في الأدوار والصلاحيات.",
+      "open": "فتح الأدوار والصلاحيات"
     },
     "listSort": {
       "label": "ترتيب حسب",
@@ -238,7 +236,15 @@
       "dangerZoneDescription": "إجراءات لا يمكن التراجع عنها لحسابك.",
       "deleteHeading": "حذف الحساب",
       "deleteBody": "احذف حسابك وجميع البيانات المرتبطة به نهائيًا.",
-      "deleteAction": "حذف الحساب"
+      "deleteAction": "حذف الحساب",
+      "privacyTitle": "الخصوصية",
+      "privacyDescription": "اختيارك بشأن تحليلات المنتج وتسجيلات الجلسات، محفوظ في حسابك.",
+      "analyticsLabel": "تحليلات المنتج وتسجيلات الجلسات",
+      "analyticsHint": "تحليلات PostHog وتسجيلات الجلسات من Sentry. تعمل تقارير الأخطاء في كل الأحوال.",
+      "consentGrantedOn": "مسموح في {{date}}",
+      "consentDeniedOn": "مرفوض في {{date}}",
+      "consentUnanswered": "لم تتم الإجابة بعد",
+      "privacyPolicyLink": "سياسة الخصوصية"
     },
     "general": {
       "namePlaceholder": "Acme Inc.",
@@ -273,6 +279,7 @@
       "apiKeysNoResults": "لا مفاتيح API مطابقة",
       "apiKeysNoResultsDescription": "لا مفاتيح API تطابق بحثك.",
       "apiKeyFallback": "مفتاح API هذا",
+      "addedOn": "أُضيف <1></1>",
       "createApiKey": "إنشاء مفتاح API",
       "createApiKeyTitle": "إنشاء مفتاح API",
       "createApiKeyDescription": "سمِّ المفتاح، واختر ما يمكنه فعله ومدة صلاحيته.",
@@ -311,7 +318,6 @@
       "addWebhookDescription": "سنرسل الأحداث المحددة إلى هذا الرابط عبر POST.",
       "payloadUrlLabel": "رابط الحمولة",
       "eventsLabel": "الأحداث",
-      "cancel": "إلغاء",
       "createWebhook": "إنشاء ويب هوك",
       "creating": "جارٍ الإنشاء…",
       "deleteWebhookAria": "حذف الويب هوك {{url}}",
@@ -339,7 +345,6 @@
       "attemptCodeColumn": "الرمز",
       "attemptWhenColumn": "الوقت",
       "attemptCountLabel": "المحاولة {{count}}",
-      "closeDialog": "إغلاق",
       "eventsLoadFailed": "تعذّر تحميل قائمة الأحداث. حاول مرة أخرى.",
       "eventsLoading": "جارٍ تحميل الأحداث…",
       "eventsEmpty": "لا توجد أحداث متاحة للاشتراك."
@@ -363,12 +368,14 @@
         "email": "البريد الإلكتروني",
         "inApp": "داخل التطبيق",
         "desktop": "سطح المكتب"
-      }
+      },
+      "kind": "الإشعار",
+      "loadFailed": "تعذّر تحميل تفضيلاتك. حاول مرة أخرى.",
+      "desktopDenied": "تحتاج إشعارات سطح المكتب إلى إذن من المتصفح. فعّلها من إعدادات المتصفح، ثم شغّل هذا الخيار مرة أخرى."
     },
     "appearance": {
       "title": "المظهر",
-      "description": "محفوظ على هذا الجهاز — تُطبَّق التغييرات فورًا.",
-      "shuffle": "عشوائي"
+      "description": "محفوظ على هذا الجهاز — تُطبَّق التغييرات فورًا."
     },
     "sessions": {
       "title": "الجلسات",
@@ -420,6 +427,13 @@
         "expires": "تنتهي في {{month}}/{{year}}",
         "defaultBadge": "افتراضية"
       },
+      "paymentForm": {
+        "saveMethod": "حفظ طريقة الدفع",
+        "savingMethod": "جارٍ الحفظ…",
+        "confirmPayment": "تأكيد الدفع",
+        "confirmingPayment": "جارٍ التأكيد…",
+        "cancel": "إلغاء"
+      },
       "invoices": {
         "title": "الفواتير",
         "description": "التاريخ وتاريخ الاستحقاق والمبلغ والحالة من مزوّد الفوترة.",
@@ -444,8 +458,7 @@
         "confirmTitle": "إلغاء الاشتراك؟",
         "confirmDescription": "تحتفظ مساحة عملك بالوصول الكامل حتى {{date}}. بعد ذلك ينتهي الاشتراك وقد تُقيَّد الميزات المدفوعة.",
         "keep": "الإبقاء على الاشتراك",
-        "confirm": "تأكيد الإلغاء",
-        "cancelling": "جارٍ الإلغاء…"
+        "confirm": "تأكيد الإلغاء"
       }
     }
   }

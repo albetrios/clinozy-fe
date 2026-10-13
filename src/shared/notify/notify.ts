@@ -1,3 +1,5 @@
+import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
+import i18n from '@/lib/i18n/i18n.ts';
 import { onceAsync } from '@/lib/lazy-module.ts';
 
 import type { ToastType } from './CustomToast.tsx';
@@ -18,6 +20,25 @@ export interface NotifyOptions {
   duration?: number;
   action?: NotifyAction;
   onDismiss?: () => void;
+}
+
+/**
+ * A toast's lifetime when it names none (KICKOFF §6.0 Timers, T14): 5,200ms,
+ * and 9,000ms for a failure — long enough to read and reach its "Retry".
+ * Loading toasts stay until they are replaced.
+ */
+export const TOAST_DURATION_MS = { default: 5_200, error: 9_000 } as const;
+
+/**
+ * How long an Undo toast stays: the schema's restore window (`POST
+ * …/restore` within 10s — `schema-routes.md:1546`, D32).
+ */
+export const UNDO_TOAST_DURATION_MS = 10_000;
+
+/** {@link notify.undo}'s options: everything but the action and lifetime, which it owns. */
+export interface NotifyUndoOptions extends Omit<NotifyOptions, 'action' | 'duration'> {
+  /** Puts back what the toast reports gone — runs when Undo is pressed inside the window. */
+  onUndo: () => void;
 }
 
 interface PendingToast {
@@ -75,7 +96,7 @@ function enqueue(item: QueuedToast) {
   }
   const id = item.preview.id;
   clearTimeout(queued.get(id)?.timer);
-  const duration = item.preview.options.duration ?? 4000;
+  const duration = item.preview.options.duration ?? TOAST_DURATION_MS.default;
   if (Number.isFinite(duration)) {
     item.expiresAt = Date.now() + duration;
     item.timer = setTimeout(() => expireQueued(id), duration);
@@ -98,7 +119,12 @@ function expireQueued(id: string | number) {
 
 function show(type: ToastType, message: string, options: NotifyOptions = {}) {
   const id = options.id ?? `core-toast-${++sequence}`;
-  const resolvedOptions = { ...options, id };
+  // Always explicit: the immediate host and Sonner then expire a toast at the
+  // same moment, and a same-id write still replaces a loading toast's Infinity.
+  const duration =
+    options.duration ??
+    (type === 'error' ? TOAST_DURATION_MS.error : TOAST_DURATION_MS.default);
+  const resolvedOptions = { ...options, id, duration };
   enqueue({
     preview: { id, type, message, options: resolvedOptions },
     publish: (loaded, remainingDuration) =>
@@ -157,6 +183,21 @@ export const notify = {
   warning: (message: string, opts?: NotifyOptions) => show('warning', message, opts),
   loading: (message: string, opts?: NotifyOptions) =>
     show('loading', message, { duration: Infinity, ...opts }),
+  /**
+   * "<record> removed" with an Undo button, kept up for the restore window
+   * ({@link UNDO_TOAST_DURATION_MS}). For a write that already happened and
+   * can be reversed (soft delete → restore); a write that waits for the window
+   * to close is `notifyDeferredCommit`.
+   */
+  undo: (message: string, { onUndo, ...opts }: NotifyUndoOptions) =>
+    show('success', message, {
+      ...opts,
+      duration: UNDO_TOAST_DURATION_MS,
+      action: {
+        label: i18n.t(ERRORS_KEYS.toast.undo, { ns: ERRORS_NS }),
+        onClick: onUndo,
+      },
+    }),
   promise,
   dismiss,
 };

@@ -15,6 +15,15 @@
     // tooling/conventions, not imported at runtime).
     "src/pages/**/*.route.tsx",
     "src/pages/**/*.manifest.ts",
+    // The clinic data contract, GENERATED from the launch's schema-routes.md
+    // ('pnpm app:schema'; byte-identical in clinozy-be): its exports are the
+    // contract's surface — every entity, enum and server set — whether or not
+    // a screen reads one yet, and a hand edit would only be regenerated away.
+    "src/shared/api/app/app-schema.ts",
+    // clinozy-be's API as types, GENERATED from its OpenAPI document ('pnpm api:types'):
+    // every route, operation and shape is the API's surface whether or not a screen calls
+    // it yet, and a hand edit would only be regenerated away.
+    "src/core/http/openapi-types.d.ts",
     // Folder-per-unit barrels are the unit's public API (validator-enforced);
     // treating them as entries means "exported from the barrel" counts as the
     // unit's surface, mirroring the file-structure contract.
@@ -28,11 +37,13 @@
   ],
   "project": ["src/**/*.{ts,tsx}", "plugins/**/*.ts", "tooling/**/*.{mjs,ts}"],
   // Nothing suppressed — every prior ignore (vendored ui/**, staged
-  // organization-contracts, recharts-via-chart) is now genuinely used or
-  // reachable, so knip stays clean without them. Keep it that way.
+  // organization-contracts, recharts-via-chart) is now genuinely used, reachable
+  // or gone, so knip stays clean without them. Keep it that way.
   "ignore": [],
   // Dependencies knip cannot see (no CSS parsing; shell-script / MCP invocation):
   //  - tailwindcss + tw-animate-css: imported in src/index.css (Tailwind v4 CSS-first)
+  //  - @fontsource/inter + @fontsource/jetbrains-mono: their woff2 files are
+  //    url()-referenced by the @font-face rules in src/index.css
   //  - lint-staged: invoked by tooling/validate/before-commit-guard.sh (pre-commit)
   //  - MCP server binaries: launched via `pnpm exec` in agent-os/mcp/mcp.json
   //    (symlinked as .mcp.json), never imported — @upstash/context7-mcp →
@@ -42,6 +53,8 @@
   "ignoreDependencies": [
     "tailwindcss",
     "tw-animate-css",
+    "@fontsource/inter",
+    "@fontsource/jetbrains-mono",
     "lint-staged",
     "@upstash/context7-mcp",
     "shadcn",

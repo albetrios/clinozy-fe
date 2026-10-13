@@ -1,0 +1,396 @@
+{
+  "manifest": {
+    "title": "ユーザー"
+  },
+  "record": "ユーザー",
+  "tabs": {
+    "label": "ユーザーの表示",
+    "team": "チーム",
+    "roles": "ロールとアクセス",
+    "branches": "拠点"
+  },
+  "search": {
+    "placeholder": "名前、メール、携帯番号、#ID",
+    "label": "ユーザーを検索"
+  },
+  "primary": {
+    "newUser": "新しいユーザー",
+    "newRole": "新しいロール",
+    "newBranch": "新しい拠点"
+  },
+  "columns": {
+    "seq": "ID",
+    "user": "ユーザー",
+    "email": "メール",
+    "roles": "ロール",
+    "branches": "拠点",
+    "hours": "勤務時間",
+    "commission": "歩合",
+    "status": "ステータス",
+    "updated": "更新"
+  },
+  "table": {
+    "records": "ユーザー",
+    "mainRole": "メインのロール",
+    "alsoRole": "兼任",
+    "commission": "{{value}}%"
+  },
+  "status": {
+    "active": "有効",
+    "inactive": "無効",
+    "invited": "招待中",
+    "expires": "招待の期限 {{date}}",
+    "expired": "招待の期限切れ"
+  },
+  "hours": {
+    "everyDay": "毎日",
+    "run": "{{from}}–{{to}}",
+    "list": "{{days, list(type: unit)}}",
+    "line": "{{days}} · {{from}}–{{to}}"
+  },
+  "filters": {
+    "roles": "ロール",
+    "all": "すべて",
+    "branches": "拠点",
+    "status": "ステータス"
+  },
+  "rowActions": {
+    "edit": "編集",
+    "delete": "削除",
+    "leave": "クリニックを退出"
+  },
+  "bulk": {
+    "export": "エクスポート",
+    "exported_other": "{{count}} 行を CSV でエクスポートしました"
+  },
+  "empty": {
+    "title": "該当するユーザーはいません",
+    "description": "まだ何もありません。別のタブや検索をお試しください。"
+  },
+  "drawer": {
+    "title": {
+      "create": "新しいユーザー",
+      "edit": "ユーザーを編集"
+    },
+    "sub": "サインイン、ロール、拠点、勤務時間",
+    "steps": {
+      "profile": "プロフィール、ロール、拠点",
+      "hours": "勤務時間と報酬"
+    },
+    "groups": {
+      "profile": "プロフィール",
+      "rolesBranches": "ロールと拠点",
+      "hours": "勤務時間",
+      "pay": "報酬"
+    },
+    "fields": {
+      "name": "名前",
+      "mobile": "携帯番号",
+      "email": "メール",
+      "colour": "カラー",
+      "roles": "ロール",
+      "access": "アクセスできる画面",
+      "branches": "拠点",
+      "days": "曜日",
+      "from": "開始",
+      "to": "終了",
+      "commission": "歩合 / インセンティブ",
+      "status": "ステータス"
+    },
+    "hints": {
+      "mobile": "10桁",
+      "colour": "バッジに使われます",
+      "roles": "1つ以上選択 · アクセスは合算されます",
+      "branches": "勤務する拠点",
+      "days": "予約ではこの曜日だけが選べます",
+      "name": "本人がプロフィールで設定します"
+    },
+    "placeholders": {
+      "name": "フルネーム(例: Dr. Nisha Mavani)",
+      "email": "name@clinic.com",
+      "time": "時刻を選択",
+      "commission": "0"
+    },
+    "commissionSuffix": "請求額の %",
+    "commissionQuick": "{{value}}%",
+    "decrease": "減らす",
+    "increase": "増やす",
+    "pickRole": "ロールを選択",
+    "statusOn": "有効 · サインインできます",
+    "statusOff": "無効 · このクリニックを利用できません",
+    "resend": "招待を再送",
+    "quickFill": {
+      "doctor": "医師 · 10:00–19:00",
+      "therapist": "セラピスト · 10:00–19:00",
+      "front_desk": "受付 · 09:30–19:30",
+      "pharmacist": "薬剤師 · 09:00–21:00"
+    },
+    "summaryNew": "新しいユーザー",
+    "save": {
+      "create": "ユーザーを作成",
+      "edit": "変更を保存",
+      "createAnother": "作成して続けて追加"
+    },
+    "missing": "メールアドレスを入力してください",
+    "noRole": "ロールを1つ以上選んでください",
+    "emailInvalid": "有効なメールアドレスを入力してください",
+    "mobileInvalid": "携帯番号は10桁で入力してください",
+    "noPlatformRole": "まだ割り当てられるロールがありません · 管理者に依頼してください",
+    "added": "{{name}} を追加しました",
+    "saved": "{{name}} を保存しました"
+  },
+  "deleteUser": {
+    "title": "このユーザーを削除しますか?",
+    "removed": "{{name}} を削除しました"
+  },
+  "leave": {
+    "title": "{{clinic}} を退出しますか？",
+    "description": "{{clinic}} のセクション、記録、チームにアクセスできなくなり、クリニックの一覧に戻ります。確認後数秒間は元に戻せます。",
+    "confirm": "クリニックを退出",
+    "stay": "とどまる",
+    "pending": "{{clinic}} を退出しています…",
+    "done": "{{clinic}} を退出しました",
+    "clinicFallback": "このクリニック"
+  },
+  "roles": {
+    "label": "ロール",
+    "purposes": {
+      "admin": "クリニックを運営 — 料金、チーム、拠点、すべての画面。",
+      "doctor": "診察・処方し、患者ごとの治療を計画します。",
+      "therapist": "施術とアフターケアの電話を担当します。",
+      "front_desk": "クリニックの顔 — リード、予約、チェックイン、会計。",
+      "counsellor": "問い合わせをプランやパッケージにつなげます。",
+      "pharmacist": "薬の窓口とその在庫を担当します。",
+      "accountant": "入出金を確認し、日次締めを行います。",
+      "marketing": "リードを集めてフォローします。",
+      "custom": "カスタムロール",
+      "customPage": "カスタムロール · できることを下で設定します"
+    },
+    "nameLabel": "ロール名",
+    "descriptionLabel": "ロールの説明",
+    "copyFrom": "アクセスをコピー",
+    "copied": "{{role}} に {{from}} と同じアクセスを設定しました",
+    "preview": "{{role}} としてプレビュー",
+    "previewHint": "このロールから見た {{productName}} を表示します",
+    "previewing": "{{productName}} を {{role}} としてプレビュー中",
+    "back": "ロール一覧に戻る",
+    "people": "このロールの人",
+    "openPerson": "{{name}} を開く",
+    "also": "+ {{roles}}",
+    "nobody": "このロールの人はまだいません · ユーザーの詳細から割り当ててください。",
+    "matrix": {
+      "title": "見られること・できること",
+      "section": "セクション",
+      "view": "閲覧",
+      "create": "作成",
+      "edit": "編集",
+      "delete": "削除",
+      "row": "行",
+      "full": "すべて",
+      "some": "一部",
+      "none": "なし",
+      "rowHint": "行全体をオンまたはオフにします",
+      "cell": {
+        "view": "{{role}} は閲覧できます · {{section}}",
+        "create": "{{role}} は作成できます · {{section}}",
+        "edit": "{{role}} は編集できます · {{section}}",
+        "delete": "{{role}} は削除できます · {{section}}"
+      },
+      "notApplicable": "この行には該当しません",
+      "resources": {
+        "contact": {
+          "label": "連絡先",
+          "description": "リードと患者の連絡先"
+        },
+        "contact_activity": {
+          "label": "メッセージとメモ",
+          "description": "WhatsApp・通話・チームメモ"
+        },
+        "patient_prescription": {
+          "label": "処方",
+          "description": "処方の作成と承認"
+        },
+        "patient_treatment": {
+          "label": "施術",
+          "description": "セッションと経過"
+        },
+        "patient_review": {
+          "label": "レビュー",
+          "description": "Google・動画レビュー · 患者と一緒に閲覧"
+        },
+        "role": {
+          "label": "ロール",
+          "description": "ロールとアクセス"
+        },
+        "branch": {
+          "label": "拠点",
+          "description": "拠点と各拠点のスタッフ"
+        }
+      }
+    },
+    "notes": {
+      "admin": "管理者はすべての操作ができます · このロールは制限できません。",
+      "readOnly": "ここでロールを確認できます。変更には「ロールの更新」が必要です。",
+      "live": "変更はこのロールの全員にすぐ反映されます。2 つのロールを持つ人は、どちらかのロールで許可されたことがすべてできます。",
+      "beyond": "このロールにはあなたにない権限があります · 権限を持つ人だけが変更できます。"
+    },
+    "locked": {
+      "admin": "管理者は常にフルアクセスです",
+      "noPerms": "ロールを変更できません · 管理者に依頼してください",
+      "noAdd": "ロールを追加できません · 管理者に依頼してください",
+      "beyond": "このロールにはあなたにない権限があります · 管理者に依頼してください",
+      "notYours": "自分が持っている権限だけを付与できます"
+    },
+    "added": "ロールを追加しました · 名前を付けて、できることを選んでください",
+    "newRoleName": "新しいロール",
+    "duplicateName": "{{name}} という名前のロールはすでにあります",
+    "deleteRole": {
+      "action": "ロールを削除",
+      "title": "{{name}} を削除しますか？",
+      "description": "このロールのメンバーには新しいロールの割り当てが必要です。確認後数秒間は元に戻せます。",
+      "confirm": "削除",
+      "pending": "{{name}} を削除中…"
+    },
+    "workspace": {
+      "title": "ワークスペースの権限",
+      "hint": "設定、連携、請求、監査ログ — 上のセクション以外の権限です。付与できるのは自分が持っている権限だけです。",
+      "none": "このロールに付与できる権限は他にありません。",
+      "loadFailed": "ワークスペースの権限を読み込めませんでした。"
+    },
+    "specials": {
+      "title": "特別な権限",
+      "floor": {
+        "label": "最低価格を表示",
+        "description": "提供サービスと請求書に隠れた最低価格を表示します"
+      },
+      "clinical": {
+        "label": "診療メモを読む",
+        "description": "主訴・診断・メモ・写真・レポートを開けます"
+      },
+      "export": {
+        "label": "エクスポート · {{section}}",
+        "description": "一覧をダウンロード"
+      },
+      "privateAlbum": {
+        "label": "非公開アルバムを見る",
+        "description": "患者ファイルの非公開写真を開けます"
+      }
+    }
+  },
+  "branches": {
+    "record": "拠点",
+    "columns": {
+      "branch": "拠点",
+      "address": "住所",
+      "contact": "連絡先",
+      "hours": "営業時間",
+      "team": "チーム",
+      "defaults": "既定の担当者",
+      "status": "ステータス"
+    },
+    "main": "本院",
+    "notSet": "未設定",
+    "defaults": {
+      "doctor": "医師 · {{name}}",
+      "desk": "受付 · {{name}}",
+      "therapist": "セラピスト · {{name}}",
+      "pharmacist": "薬局 · {{name}}"
+    },
+    "status": {
+      "open": "営業中",
+      "closed": "閉鎖"
+    },
+    "records": "拠点",
+    "empty": "拠点はまだありません",
+    "drawer": {
+      "title": {
+        "create": "新しい拠点",
+        "edit": "拠点を編集"
+      },
+      "sub": "住所、営業時間、ここで働く人",
+      "summaryNew": "新しい拠点",
+      "people_other": "{{count}} 人",
+      "mainBadge": "本院",
+      "steps": {
+        "place": "拠点と住所",
+        "contact": "連絡先と営業時間",
+        "people": "担当者"
+      },
+      "groups": {
+        "branch": "拠点",
+        "address": "住所",
+        "contact": "連絡先",
+        "hours": "営業時間"
+      },
+      "fields": {
+        "name": "名前",
+        "colour": "色",
+        "main": "本院",
+        "status": "ステータス",
+        "line1": "住所 1",
+        "line2": "住所 2",
+        "area": "エリア",
+        "city": "市区町村",
+        "pin": "郵便番号",
+        "state": "州・県",
+        "phone": "電話",
+        "email": "メール",
+        "gstin": "GSTIN",
+        "days": "曜日",
+        "opens": "開店",
+        "closes": "閉店",
+        "team": "チーム",
+        "doctor": "既定の医師",
+        "desk": "既定の受付",
+        "therapist": "既定のセラピスト",
+        "pharmacist": "既定の薬剤師"
+      },
+      "placeholders": {
+        "name": "例: Vesu",
+        "line1": "店舗 / 階、建物",
+        "line2": "通り、目印",
+        "area": "例: Vesu",
+        "city": "市区町村",
+        "pin": "6 桁",
+        "state": "州・県",
+        "email": "branch@clinic.com",
+        "gstin": "15 文字",
+        "team": "チームを選択"
+      },
+      "hints": {
+        "colour": "この拠点をどこでも示す色です",
+        "phone": "10 桁",
+        "team": "ここで働く人",
+        "preselected": "この拠点のフォームで事前に選択されます",
+        "addFirst": {
+          "doctor": "先に医師をチームに追加してください",
+          "desk": "先に受付担当をチームに追加してください",
+          "therapist": "先にセラピストをチームに追加してください",
+          "pharmacist": "先に薬剤師をチームに追加してください"
+        },
+        "main": "クリニックに1つ · 開設時に設定"
+      },
+      "toggles": {
+        "mainOn": "本院 · 本部",
+        "mainOff": "本院ではありません",
+        "openOn": "営業中 · 選択肢に表示",
+        "openOff": "閉鎖 · どこにも表示しない"
+      },
+      "nobody": "なし",
+      "you": "{{name}}（あなた）",
+      "save": {
+        "create": "拠点を追加",
+        "edit": "拠点を保存"
+      },
+      "nameMissing": "拠点に名前を付けてください",
+      "addressMissing": "住所・地域・市区町村・PINコードを入力してください",
+      "duplicate": "{{name}} という拠点はすでにあります",
+      "phoneInvalid": "電話番号は 10 桁で入力してください",
+      "emailInvalid": "有効なメールアドレスを入力してください",
+      "added": "拠点 {{name}} を追加しました",
+      "saved": "{{name}} を保存しました",
+      "contactMissing": "電話番号とメールを入力してください",
+      "pinInvalid": "PINコードは6桁です"
+    }
+  }
+}

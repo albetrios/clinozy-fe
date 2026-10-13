@@ -13,8 +13,11 @@
     "goHome": "返回首页",
     "refresh": "刷新页面",
     "forbidden": "你没有访问此页面的权限。",
+    "forbiddenTitle": "无权访问此页面",
     "signOut": "退出登录",
-    "signingOut": "正在退出…"
+    "signingOut": "正在退出…",
+    "pageNotFound": "找不到页面",
+    "recordNotFound": "找不到{{record}} · 可能已被删除"
   },
   "widget": {
     "unavailable": "{{title}} 不可用",
@@ -25,34 +28,17 @@
     "pageContent": "页面内容",
     "navigation": "导航",
     "emailBanner": "邮箱验证",
-    "notifications": "通知",
     "organizationSwitcher": "组织切换",
     "commandPalette": "命令面板",
     "settings": "设置",
     "appearance": "外观",
-    "analytics": "分析",
-    "members": "成员",
-    "schedule": "日程",
-    "highlights": "精选",
-    "themeShowcase": "主题展示",
     "sessionTimeout": "会话计时器",
     "securityCheck": "安全检查",
-    "appearanceControls": "外观控件",
     "payment": "付款",
     "cancellation": "取消订阅"
   },
   "toast": {
     "dismiss": "关闭通知",
-    "preview": {
-      "successTitle": "已保存更改",
-      "successDescription": "您的设置已生效。",
-      "errorTitle": "出了点问题",
-      "errorDescription": "请重试。",
-      "warningTitle": "请注意",
-      "warningDescription": "此操作需要审核。",
-      "infoTitle": "你知道吗？",
-      "infoDescription": "随机切换也会改变此设计。"
-    },
     "undo": "撤销",
     "undone": "已取消操作",
     "processing": "处理中…"
@@ -69,7 +55,21 @@
     "http429": "请求过于频繁。请稍后再试。",
     "http500": "发生内部错误。请稍后重试。",
     "http502": "服务器暂时不可用。请稍后重试。",
-    "http503": "服务暂时不可用。请稍后重试。"
+    "http503": "服务暂时不可用。请稍后重试。",
+    "reload": "重新加载",
+    "recordChanged": "其他人在此期间保存了此内容。请重新加载查看其更改，然后重新进行你的更改。",
+    "reasons": {
+      "missingPermission": "你没有执行此操作的权限。请联系诊所所有者或管理员。",
+      "ownerMembershipFixed": "无法更改诊所所有者的角色和状态。请先转让所有权。",
+      "ownerCannotLeave": "诊所所有者无法退出。请先转让所有权。",
+      "ownerRoleFixed": "无法更改诊所所有者所持角色的访问权限。",
+      "systemRoleFixed": "预设角色无法重命名或删除。",
+      "roleLocked": "此角色的访问权限是固定的，无法更改。",
+      "seatLimitReached": "你的方案没有空余席位。请在 设置 › 账单 中添加席位，然后重新邀请。",
+      "membershipAlreadyExists": "此人已在诊所中。",
+      "organizationSlugExists": "该工作空间 URL 已被占用，请选择其他 URL。",
+      "disposableEmail": "请使用长期有效的邮箱地址——不接受一次性邮箱。"
+    }
   },
   "frontend": {
     "query": {
@@ -91,12 +91,7 @@
     },
     "account": {
       "copyFailed": "无法复制到剪贴板",
-      "themeCodeNumeric": "请输入数字主题代码",
       "copySuccess": "账户 ID 已复制",
-      "themeLinkCopied": "主题链接已复制",
-      "themeLinkCopiedDescription": "分享此 URL 以复现外观。",
-      "notificationStylePreview": "通知样式",
-      "notificationStylePreviewDescription": "{{variant}} — 使用您的强调色和语义颜色。",
       "accountDeletionPending": "账户已删除，正在登出…",
       "avatarInvalidType": "请选择图片文件。",
       "avatarTooLarge": "头像必须小于 2 MB。",
@@ -122,7 +117,8 @@
         "updateRoleSuccess": "成员角色已更新",
         "removeSuccess": "成员已移除",
         "suspendSuccess": "成员已暂停",
-        "reactivateSuccess": "成员已重新激活"
+        "reactivateSuccess": "成员已重新激活",
+        "updateSuccess": "成员已保存"
       },
       "roles": {
         "createFailed": "无法创建角色",

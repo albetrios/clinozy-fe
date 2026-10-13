@@ -1,44 +1,19 @@
 import { useNavigate, useRouter, useRouterState } from '@tanstack/react-router';
-import {
-  Suspense,
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ORGANIZATION } from '@/core/config/constants.ts';
 import { onceAsync, useRetryableLazy } from '@/lib/lazy-module.ts';
-import { cn } from '@/lib/utils.ts';
 import { ANALYTICS_EVENTS } from '@/shared/analytics/analytics.constants.ts';
 import { captureAnalyticsEvent } from '@/shared/analytics/capture.ts';
-import { useEnterAnimationProps } from '@/shared/components/LazyOverlay/index.ts';
 import { PanelSkeleton } from '@/shared/components/PanelSkeleton/index.ts';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/shared/components/ui/alert-dialog.tsx';
-import { Dialog, DialogContent, DialogTitle } from '@/shared/components/ui/dialog.tsx';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/components/ui/select.tsx';
+import { Picker } from '@/shared/components/Picker/index.ts';
+import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import { useAccessResolved } from '@/shared/hooks/useCan/index.ts';
 import { useDeploymentFlags } from '@/shared/hooks/useDeploymentFlags/index.ts';
 import { useMeContext } from '@/shared/hooks/useMeContext/index.ts';
+import { useUnsavedChangesGuard } from '@/shared/hooks/useUnsavedChangesGuard/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
@@ -59,6 +34,10 @@ import {
   visibleSettingsNavGroups,
 } from './settings-nav-visibility.ts';
 import { resolveSettingsSection } from './settings-resolve.ts';
+import {
+  SETTINGS_SCOPE_TONES,
+  SettingsSectionContext,
+} from './settings-section-context.ts';
 import type {
   SettingsScope,
   SettingsSection,
@@ -68,10 +47,10 @@ import { SettingsNav } from './SettingsNav.tsx';
 import { SectionHeader } from './SettingsPanelShell.tsx';
 
 /**
- * Global settings modal — ONE modal for account + organization settings,
+ * Global settings drawer — ONE drawer for account + organization settings,
  * driven by the URL hash (`#settings/<scope>/<section>`), mounted once on the
  * root route so it overlays any page without unmounting it. Deep links
- * reproduce page + modal, refresh keeps the section, back/Esc closes.
+ * reproduce page + drawer, refresh keeps the section, back/Esc closes.
  *
  * Route guards never see hashes: auth, organization-context, and permission
  * gating all happen here (settings-permissions.ts). routing-and-tenancy.md §7.
@@ -84,20 +63,12 @@ export function SettingsModal() {
   );
 }
 
-/** One dialog shell for both the loading and the resolved states. */
 /**
- * A full-screen sheet on phones (square — it IS the screen), a dialog from `sm`.
- *
- * The `sm:` half has to undo the sheet, not just cap it: `w-full` with only a
- * `max-w` left the modal flush against both edges on anything between 640px and
- * 960px (every tablet), and an unconditional `rounded-none` kept it square on
- * desktop under every radius setting. `sm:rounded-lg` is token-backed and the
- * dialog slot squares it again under the Sharp shape.
+ * The drawer's width from `md`: the widest record drawer, so the rail
+ * (220–264px) and a section's page sit side by side as the Users room's
+ * master–detail split does. Below `md` the drawer is the full screen.
  */
-const SETTINGS_DIALOG_CLASS =
-  'h-dvh max-h-dvh w-full max-w-full gap-0 overflow-hidden rounded-none p-0 ' +
-  'sm:h-[640px] sm:max-h-[85vh] sm:w-[calc(100%-2rem)] sm:max-w-[960px] sm:rounded-lg ' +
-  '3xl:h-[760px] 3xl:max-w-[1120px]';
+const SETTINGS_DRAWER_WIDTH = 1040;
 
 /**
  * Which settings section to show, and which nav groups exist yet: derived from the URL hash, the
@@ -193,53 +164,12 @@ function useSettingsSection() {
 }
 
 /**
- * The unsaved-changes guard: runs an action straight away, or — while a panel is dirty — parks
- * it behind the discard confirmation until the user leaves or stays.
- */
-function useDiscardGuard() {
-  const dirtyCtx = useSettingsDirty();
-  const [discardOpen, setDiscardOpen] = useState(false);
-  const pendingActionRef = useRef<(() => void) | null>(null);
-
-  const runOrConfirmDiscard = useCallback(
-    (action: () => void) => {
-      if (dirtyCtx?.isDirty) {
-        pendingActionRef.current = action;
-        setDiscardOpen(true);
-        return;
-      }
-      action();
-    },
-    [dirtyCtx?.isDirty],
-  );
-
-  const confirmDiscard = () => {
-    const action = pendingActionRef.current;
-    pendingActionRef.current = null;
-    setDiscardOpen(false);
-    action?.();
-  };
-
-  return { discardOpen, setDiscardOpen, runOrConfirmDiscard, confirmDiscard };
-}
-
-/**
- * Mobile section picker — the sidebar is hidden below sm. `ps-4` is
- * the content pane's gutter, so the picker and the fields under it
- * share a left edge.
- *
- * `pe-14` reserves room for the dialog's close button, which is
- * now pinned on the logical end too (`ui/dialog.tsx`) — so the two
- * mirror together. They did not: the button was physical
- * (`right-4`) while this inset was logical, which put them on
- * opposite sides in Arabic and Hebrew and ran the picker under the
- * X. Fixed in the primitive rather than here, because every dialog
- * had it.
- *
- * 14 rather than 12: the button is 32px wide inset 16px, so 48px of
- * reservation left the picker flush against the X with nothing
- * between them. 56px is the same 16px gutter the rest of the pane
- * uses, and is what "feels tight" was about (QA-V3 suggestion 7).
+ * Mobile section switch — the rail is hidden below `md`, where the drawer is
+ * the full screen, so a phone picks the section from the shared Picker (its
+ * 72% bottom sheet), as the phone list toolbars pick: a 44px trigger, each row
+ * the section's icon tile, the two scopes as groups. `px-4` is the content
+ * pane's gutter, so the switch and the fields under it share their edges; the
+ * drawer's × sits in its header above, so nothing here makes room for it.
  */
 function MobileSectionPicker({
   groups,
@@ -251,84 +181,58 @@ function MobileSectionPicker({
   onSelect: (next: SettingsSectionRef) => void;
 }) {
   const { t } = useTranslation(SETTINGS_NS);
+  const options = groups.flatMap((group) =>
+    group.items.map((item) => ({
+      key: `${item.scope}/${item.section}`,
+      label: t(item.labelKey),
+      group: t(group.labelKey),
+      groupTone: SETTINGS_SCOPE_TONES[group.scope],
+      tone: SETTINGS_SCOPE_TONES[item.scope],
+      leading: { kind: 'icon' as const, icon: item.icon },
+      keywords: item.keywords,
+    })),
+  );
   return (
-    <div className="shrink-0 border-b py-3 ps-4 pe-14 sm:hidden">
-      <Select
+    <div className="shrink-0 border-b px-4 py-2 md:hidden">
+      <Picker
+        label={t(SETTINGS_KEYS.nav.ariaSections)}
         value={`${active.scope}/${active.section}`}
-        onValueChange={(value) => {
-          const [scope, section] = value.split('/') as [SettingsScope, SettingsSection];
+        options={options}
+        plain
+        size="lg"
+        placeholder={t(SETTINGS_SECTION_LABEL_KEYS[active.section])}
+        onChange={(key) => {
+          if (!key) return;
+          const [scope, section] = key.split('/') as [SettingsScope, SettingsSection];
           onSelect({ scope, section });
         }}
-      >
-        <SelectTrigger
-          className="w-full"
-          data-testid="settings-mobile-section"
-          aria-label={t(SETTINGS_KEYS.nav.ariaSections)}
-        >
-          <SelectValue placeholder={t(SETTINGS_SECTION_LABEL_KEYS[active.section])} />
-        </SelectTrigger>
-        <SelectContent>
-          {groups
-            .flatMap((group) => group.items)
-            .map((item) => (
-              <SelectItem
-                key={`${item.scope}/${item.section}`}
-                value={`${item.scope}/${item.section}`}
-              >
-                {t(item.labelKey)}
-              </SelectItem>
-            ))}
-        </SelectContent>
-      </Select>
+        testId="settings-mobile-section"
+        className="w-full"
+      />
     </div>
   );
 }
 
-/** "Discard your changes?" — shown when a guarded action meets a dirty panel. */
-function DiscardChangesDialog({
-  open,
-  onOpenChange,
-  onLeave,
-}: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onLeave: () => void;
-}) {
-  const { t } = useTranslation(SETTINGS_NS);
-  return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent data-testid="settings-discard-dialog">
-        <AlertDialogHeader>
-          <AlertDialogTitle>{t(SETTINGS_KEYS.discard.title)}</AlertDialogTitle>
-          <AlertDialogDescription>
-            {t(SETTINGS_KEYS.discard.description)}
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel data-testid="settings-discard-stay">
-            {t(SETTINGS_KEYS.discard.stay)}
-          </AlertDialogCancel>
-          <AlertDialogAction onClick={onLeave} data-testid="settings-discard-leave">
-            {t(SETTINGS_KEYS.discard.leave)}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  );
-}
+/** The discard prompt's test ids (`settings-discard-*`, as the Settings specs name them). */
+const SETTINGS_DISCARD_TEST_IDS = {
+  dialog: 'settings-discard-dialog',
+  cancel: 'settings-discard-stay',
+  accept: 'settings-discard-leave',
+} as const;
 
 function SettingsModalBody() {
   const { t } = useTranslation(SETTINGS_NS);
   // The shell stays mounted while panels load or change sections.
-  const enterProps = useEnterAnimationProps();
   const { active, readyGroups, contextReady } = useSettingsSection();
-  const { discardOpen, setDiscardOpen, runOrConfirmDiscard, confirmDiscard } =
-    useDiscardGuard();
+  const isDirty = useSettingsDirty()?.isDirty ?? false;
+  // A guarded action (close, a section switch, Back) meets a dirty panel: the
+  // shared "Discard changes?" prompt — with the ids the Settings specs know.
+  const { guardDialog, confirmDiscard } = useUnsavedChangesGuard({
+    when: isDirty,
+    testIds: SETTINGS_DISCARD_TEST_IDS,
+  });
   const navigate = useNavigate();
   const router = useRouter();
-  // Drives the top scroll-shadow on the content panel (elevates the header bar
-  // once the user scrolls down past the top).
-  const [scrolled, setScrolled] = useState(false);
 
   const close = useCallback(() => {
     if (router.history.length > 1) {
@@ -340,12 +244,12 @@ function SettingsModalBody() {
 
   if (!active) return null;
 
-  const guardedClose = () => runOrConfirmDiscard(close);
+  const guardedClose = () => confirmDiscard(close);
 
   // Section switches replace the history entry so a single Back closes the
   // modal from anywhere instead of replaying every visited section.
   const goTo = (next: SettingsSectionRef) => {
-    runOrConfirmDiscard(() => {
+    confirmDiscard(() => {
       void navigate({
         to: '.',
         hash: settingsHash(next.scope, next.section),
@@ -355,40 +259,38 @@ function SettingsModalBody() {
     });
   };
 
+  // The record drawer's frame (header, floating ×, full screen on a phone); the
+  // body is Settings' own two panes, and every section saves itself, so there
+  // is no footer. Its dirty guard is the one above — with the ids the Settings
+  // specs know, and covering section switches too — so the drawer is handed
+  // the guarded close rather than a `dirty` flag of its own. A press on a toast
+  // is not an outside press: the toaster sits in the layer's branch.
   return (
     <>
-      <Dialog open onOpenChange={(o) => !o && guardedClose()}>
-        <DialogContent
-          className={SETTINGS_DIALOG_CLASS}
-          data-testid="settings-modal"
-          {...enterProps}
-          onInteractOutside={(e) => {
-            // Toasts render outside the dialog (sonner) — clicking one (e.g. its
-            // close button) must dismiss the toast, not close Settings.
-            const node = e.detail.originalEvent.target as Element | null;
-            if (node?.closest('[data-sonner-toaster]')) e.preventDefault();
-          }}
-        >
-          <DialogTitle className="sr-only">{t(SETTINGS_KEYS.dialog.title)}</DialogTitle>
-          <div className="grid h-full min-h-0 grid-cols-1 sm:grid-cols-[240px_1fr]">
-            <SettingsNav groups={readyGroups} active={active} onSelect={goTo} />
-            <div className="flex min-h-0 flex-col">
-              <MobileSectionPicker groups={readyGroups} active={active} onSelect={goTo} />
-              {/* Desktop: empty header strip — gives the dialog's close button room
-                and elevates with a shadow once the content scrolls beneath it. */}
-              <div
-                aria-hidden
-                className={cn(
-                  'pointer-events-none z-10 hidden h-12 shrink-0 transition-shadow duration-200 sm:block',
-                  scrolled && 'scroll-shadow-top',
-                )}
-              />
-              <div
-                // `sm:px-6` / `sm:pb-6`: the standard dialog inset (see SettingsNav).
-                className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-6 sm:px-6 sm:pt-2 sm:pb-6"
-                data-testid="settings-content"
-                onScroll={(e) => setScrolled(e.currentTarget.scrollTop > 0)}
-              >
+      <RecordDrawer
+        open
+        onClose={guardedClose}
+        title={t(SETTINGS_KEYS.dialog.title)}
+        width={SETTINGS_DRAWER_WIDTH}
+        flushBody
+        hideFooter
+        testId="settings-modal"
+      >
+        {/* The Users room's master–detail split (`users.md:19`; H:1117): the
+            rail on `canvas`, minmax(220px, 264px), and the section's page
+            scrolling on its own beside it. */}
+        <div className="grid min-h-0 flex-1 grid-cols-1 md:grid-cols-[minmax(220px,264px)_minmax(0,1fr)]">
+          <SettingsNav groups={readyGroups} active={active} onSelect={goTo} />
+          <div className="flex min-h-0 flex-col">
+            <MobileSectionPicker groups={readyGroups} active={active} onSelect={goTo} />
+            <div
+              // `sm:px-6` / `sm:pb-6`: the standard pane inset. No top inset:
+              // each section's head row is the pane's header, pinned to its top
+              // while the panel scrolls beneath it (`SectionHeader`).
+              className="min-h-0 flex-1 overflow-y-auto px-4 pb-6 sm:px-6 sm:pb-6"
+              data-testid="settings-content"
+            >
+              <SettingsSectionContext value={active}>
                 {contextReady ? (
                   <ActivePanel
                     key={`${active.scope}/${active.section}`}
@@ -397,17 +299,13 @@ function SettingsModalBody() {
                 ) : (
                   <SettingsContentLoading active={active} />
                 )}
-              </div>
+              </SettingsSectionContext>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+      </RecordDrawer>
 
-      <DiscardChangesDialog
-        open={discardOpen}
-        onOpenChange={setDiscardOpen}
-        onLeave={confirmDiscard}
-      />
+      {guardDialog}
     </>
   );
 }
@@ -470,7 +368,7 @@ function SettingsContentLoading({ active }: { active: SettingsSectionRef }) {
   // panel draws while its own query resolves, so the shell-to-panel handoff
   // swaps identical markup instead of one skeleton shape for another.
   return (
-    <div className="flex flex-col gap-6" data-testid="settings-content-loading">
+    <div className="flex flex-col gap-4" data-testid="settings-content-loading">
       <SectionHeader title={sectionLabel} />
       {/* No width override here. The panel below draws the SAME component when its
           own query resolves, so any difference between the two — a max-width, a

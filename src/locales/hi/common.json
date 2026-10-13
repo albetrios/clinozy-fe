@@ -98,13 +98,24 @@
     "description": "ऐप का नया संस्करण तैयार है।",
     "refresh": "अभी रीफ़्रेश करें"
   },
+  "cells": {
+    "patient": "मरीज़",
+    "patientMark": "म",
+    "leadMark": "ल",
+    "moreCount": "{{count}} और"
+  },
+  "emptyState": {
+    "fallbackTitle": "यहाँ अभी कुछ नहीं है",
+    "filteredTitle": "कोई मेल नहीं",
+    "filteredHint": "इन फ़िल्टर से कुछ भी मेल नहीं खाता। सब कुछ फिर से देखने के लिए इन्हें हटाएँ।",
+    "clearFilters": "फ़िल्टर हटाएँ"
+  },
   "a11y": {
     "close": "बंद करें",
     "loading": "लोड हो रहा है",
     "loadingNamed": "{{name}} लोड हो रहा है…",
     "loadingPage": "पेज लोड हो रहा है",
     "toggleTheme": "थीम बदलें",
-    "openAppearance": "दिखावट खोलें",
     "cookieConsent": "कुकी सहमति",
     "rowsPerPage": "प्रति पृष्ठ पंक्तियाँ",
     "goFirstPage": "पहला पृष्ठ",
@@ -114,84 +125,149 @@
     "selectAll": "सभी चुनें",
     "copyAccountId": "खाता ID कॉपी करें",
     "onboardingProgress": "ऑनबोर्डिंग प्रगति",
-    "themeCode": "थीम कोड",
     "mode": "मोड"
   },
   "appearance": {
     "themeTitle": "थीम",
     "themeLocked": "थीम आपके संगठन के कॉन्फ़िगरेशन द्वारा प्रबंधित है और इसे यहाँ बदला नहीं जा सकता।",
-    "themeDescription": "नामित एक्सेंट प्रीसेट — या लिंक कॉपी करें / थीम कोड पेस्ट करके ठीक वही रूप दोबारा बनाएँ।",
-    "presetAria": "नामित एक्सेंट प्रीसेट",
-    "copyLink": "लिंक कॉपी करें",
-    "shuffleHint": "कोड बनाने के लिए शफ़ल करें।",
-    "codeLabel": "कोड: {{seed}}",
-    "codePlaceholder": "थीम कोड पेस्ट करें",
-    "apply": "लागू करें",
-    "pickAnyColour": "कोई भी रंग चुनें",
     "modeTitle": "मोड",
-    "modeDescription": "इस डिवाइस पर सहेजा गया।",
-    "colourTitle": "रंग",
-    "colourDescription": "एक्सेंट, चार्ट और न्यूट्रल बेस।",
-    "accentColour": "एक्सेंट रंग",
-    "chartColour": "चार्ट रंग",
-    "baseColour": "बेस रंग",
-    "harmony": "सामंजस्य",
-    "harmonyAria": "रंग सामंजस्य",
-    "accentIntensity": "एक्सेंट तीव्रता",
-    "typeTitle": "टाइप और आकार",
-    "typeDescription": "फ़ॉन्ट, कोने की त्रिज्या और मेन्यू सतह।",
-    "bodyFont": "मुख्य फ़ॉन्ट",
-    "headingFont": "शीर्षक फ़ॉन्ट",
-    "radius": "त्रिज्या",
-    "shapeLanguage": "आकार भाषा",
-    "typeScale": "टाइप स्केल",
-    "menu": "मेन्यू",
-    "menuAria": "मेन्यू शैली",
-    "iconsTitle": "आइकन",
-    "iconsDescription": "स्ट्रोक मोटाई, रंग और आइकन सेट।",
-    "iconWeight": "आइकन मोटाई",
-    "iconColour": "आइकन रंग",
-    "iconLibrary": "आइकन लाइब्रेरी",
-    "layoutTitle": "लेआउट",
-    "layoutDescription": "मुख्य कार्यक्षेत्र की चौड़ाई — डैशबोर्ड के लिए मानक, केंद्रित पाठ के लिए पठन चौड़ाई।",
-    "contentWidth": "सामग्री चौड़ाई",
-    "dashboardTitle": "डैशबोर्ड",
-    "dashboardDescription": "डैशबोर्ड अपने अनुभागों को कैसे व्यवस्थित करता है।",
-    "dashboardArrangement": "व्यवस्था",
-    "surfaceTitle": "सतह और गति",
-    "surfaceDescription": "अंतराल, गहराई, कंट्रास्ट और गति।",
-    "density": "घनत्व",
-    "contrast": "कंट्रास्ट",
-    "elevation": "ऊँचाई",
-    "separation": "पृथक्करण",
-    "separationAria": "सतह पृथक्करण",
-    "motion": "गति",
-    "focusRing": "फ़ोकस रिंग",
-    "notificationsTitle": "सूचनाएँ",
-    "notificationsDescription": "टोस्ट डिज़ाइन चुनें या शफ़ल करें — पूर्वावलोकन आपके सक्रिय थीम टोकन का उपयोग करते हैं।",
-    "toastDesign": "टोस्ट डिज़ाइन",
-    "position": "स्थिति",
-    "positionAria": "टोस्ट स्थिति",
-    "previewSuccess": "सफलता",
-    "previewError": "त्रुटि",
-    "previewWarning": "चेतावनी",
-    "previewInfo": "जानकारी",
-    "shuffleSection": "{{section}} शफ़ल करें",
-    "sectionColour": "रंग",
-    "sectionType": "टाइप और आकार",
-    "sectionSurface": "सतह और गति",
-    "sectionDashboard": "डैशबोर्ड लेआउट",
-    "sectionNotifications": "सूचना शैली",
-    "custom": "कस्टम",
-    "customWith": "कस्टम — {{look}}"
+    "modeDescription": "इस डिवाइस पर सहेजा गया।"
   },
   "table": {
-    "searchPlaceholder": "खोजें..."
+    "searchPlaceholder": "खोजें...",
+    "empty": "कोई परिणाम नहीं।",
+    "sortBy": "{{column}} के अनुसार क्रमित करें",
+    "actions": "कार्रवाइयाँ",
+    "moreActions": "और कार्रवाइयाँ",
+    "columns": {
+      "trigger": "कॉलम दिखाएँ या छिपाएँ",
+      "title": "कॉलम · {{total}} में से {{shown}} दिख रहे हैं",
+      "showAll": "सभी कॉलम दिखाएँ",
+      "recommendedHides": "सुझाया गया सेट {{count}} छिपाता है",
+      "tapForRecommended": "सुझाए गए सेट के लिए फिर से टैप करें",
+      "allShown": "सभी {{count}} कॉलम दिख रहे हैं",
+      "hiddenCount": "{{count}} छिपे हुए",
+      "search": "कॉलम खोजें",
+      "shown": "{{total}} में से {{shown}} दिख रहे हैं",
+      "viewGroup": "दृश्य",
+      "columnsGroup": "कॉलम"
+    },
+    "fold": {
+      "showAll_one": "{{count}} कॉलम पंक्तियों में · सभी दिखाएँ",
+      "showAll_other": "{{count}} कॉलम पंक्तियों में · सभी दिखाएँ",
+      "showAllHint": "हर कॉलम को साथ-साथ दिखाएँ (बगल में स्क्रॉल होता है)",
+      "fitToWidth": "चौड़ाई में फ़िट करें",
+      "fitToWidthHint": "अतिरिक्त कॉलम को हर पंक्ति में समेटें"
+    },
+    "selection": {
+      "selectRow": "{{name}} चुनें",
+      "selected": "{{count}} चुने गए",
+      "selectAllCount": "सभी {{count}} चुनें",
+      "clear": "चयन हटाएँ",
+      "clearHint": "चयन हटाएँ · Esc",
+      "escape": "Esc",
+      "bulkActions": "सामूहिक कार्रवाइयाँ"
+    },
+    "length": {
+      "allLoaded": "सभी {{records}} लोड हो गए",
+      "loadingMore": "और {{records}} लोड हो रहे हैं"
+    },
+    "savedViews": {
+      "label": "सहेजे गए व्यू",
+      "apply": "व्यू लागू करें",
+      "remove": "व्यू हटाएँ",
+      "removed": "व्यू हटाया गया",
+      "defaultName": "मेरा व्यू"
+    }
   },
   "consent": {
-    "description": "हम {{productName}} को बेहतर बनाने के लिए उत्पाद विश्लेषण हेतु कुकीज़ का उपयोग करते हैं। आवश्यक सुविधाएँ और त्रुटि निगरानी इनके बिना भी काम करती हैं।",
+    "description": "आपकी अनुमति से हम {{productName}} को बेहतर बनाने के लिए PostHog विश्लेषण और Sentry सत्र रिकॉर्डिंग का उपयोग करते हैं। त्रुटि रिपोर्ट सहित बाकी सब इनके बिना काम करता है। बंद करने का अर्थ है ‘नहीं’।",
     "privacyPolicy": "गोपनीयता नीति",
     "accept": "स्वीकार करें",
-    "decline": "अस्वीकार करें"
+    "decline": "अस्वीकार करें",
+    "closeAndDecline": "बंद करें (अस्वीकार माना जाएगा)"
+  },
+  "confirm": {
+    "accept": "पुष्टि करें",
+    "cancel": "रद्द करें",
+    "fallbackDescription": "कृपया इस कार्रवाई की पुष्टि करें।"
+  },
+  "picker": {
+    "placeholder": "चुनें…",
+    "search": "{{label}} खोजें",
+    "searchDefault": "खोजें",
+    "escKey": "Esc",
+    "options": "विकल्प",
+    "recent": "हाल के",
+    "all": "सभी",
+    "create": "“{{query}}” बनाएँ",
+    "createNamed": "{{label}} “{{query}}”",
+    "createFull": "नया {{label}}",
+    "createFullQuery": "{{label}} · “{{query}}”",
+    "fullDetails": "पूरा विवरण",
+    "empty": "अभी चुनने के लिए कुछ नहीं है",
+    "noResults": "“{{query}}” के लिए कोई नतीजा नहीं",
+    "noResultsHint": "वर्तनी जाँचें या कम अक्षर आज़माएँ",
+    "noResultsRemoteHint": "नाम, फ़ोन नंबर या ID आज़माएँ",
+    "loadingMore": "और लोड हो रहे हैं",
+    "clear": "साफ़ करें",
+    "triggerLabel": "{{label}} · {{value}}",
+    "date": {
+      "label": "तारीख",
+      "placeholder": "तारीख चुनें",
+      "search": "तारीख लिखें · जैसे 12 sep",
+      "today": "आज",
+      "tomorrow": "आने वाला कल",
+      "yesterday": "बीता कल",
+      "comingUp": "आने वाले",
+      "relative": "{{relative}} · {{date}}"
+    },
+    "time": {
+      "label": "समय",
+      "placeholder": "समय चुनें"
+    }
+  },
+  "unsavedChanges": {
+    "title": "परिवर्तन छोड़ें?",
+    "description": "आपके परिवर्तन सहेजे नहीं गए हैं और खो जाएँगे।",
+    "discard": "छोड़ें",
+    "keepEditing": "संपादन जारी रखें"
+  },
+  "uploadTray": {
+    "label": "अपलोड",
+    "uploading": "{{total}} में से {{left}} अपलोड हो रहे हैं…",
+    "complete": "सभी अपलोड पूरे हुए",
+    "failed_one": "{{count}} अपलोड विफल रहा",
+    "failed_other": "{{count}} अपलोड विफल रहे",
+    "skipped_one": "{{limit}} से बड़ी {{count}} फ़ाइल छोड़ी गई",
+    "skipped_other": "{{limit}} से बड़ी {{count}} फ़ाइलें छोड़ी गईं",
+    "show": "अपलोड दिखाएँ",
+    "hide": "अपलोड छिपाएँ",
+    "uploadFailed": "अपलोड नहीं हो सका",
+    "attachFailed": "संलग्न नहीं हो सका",
+    "retry": "{{name}} फिर से आज़माएँ",
+    "remove": "{{name}} हटाएँ",
+    "stoppedBySwitch": "अपलोड रुक गए · आपने वर्कस्पेस बदल दिया",
+    "size": {
+      "kilobytes": "{{value}} KB",
+      "megabytes": "{{value}} MB"
+    }
+  },
+  "splash": {
+    "label": "{{productName}} लोड हो रहा है",
+    "greeting": {
+      "morning": "सुप्रभात, {{name}}",
+      "afternoon": "शुभ दोपहर, {{name}}",
+      "evening": "शुभ संध्या, {{name}}"
+    },
+    "ticker": {
+      "opening": "{{weekday}} का शेड्यूल खोला जा रहा है",
+      "syncing": "मरीज़ और लीड्स सिंक हो रहे हैं",
+      "ready": "सब तैयार है"
+    },
+    "offline": {
+      "message": "{{productName}} से कनेक्ट नहीं हो पा रहा · इंटरनेट कनेक्शन जाँचें",
+      "retry": "फिर कोशिश करें"
+    }
   }
 }

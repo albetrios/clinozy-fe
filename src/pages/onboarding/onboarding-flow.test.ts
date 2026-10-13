@@ -42,6 +42,14 @@ describe('deriveOnboardingSteps', () => {
     ]);
   });
 
+  it('asks only for the profile in team-only mode when the person already joined a clinic (D84)', () => {
+    expect(
+      deriveOnboardingSteps(TEAM_ONLY, [
+        { id: 'org_team', type: 'TEAM' as const, slug: 'acme' },
+      ]),
+    ).toEqual(['welcome', 'profile', 'questions', 'done']);
+  });
+
   it('skips workspace and invite in both mode when personal org already exists', () => {
     expect(deriveOnboardingSteps(BOTH_FLAGS, ORGS_WITH_PERSONAL)).toEqual([
       'welcome',
@@ -89,8 +97,16 @@ describe('shouldCreateOrganizationOnFinish', () => {
     expect(shouldCreateOrganizationOnFinish(PERSONAL_ONLY, ORGS_EMPTY)).toBe(false);
   });
 
-  it('always creates in team-only mode', () => {
+  it('creates in team-only mode for someone with no clinic yet', () => {
     expect(shouldCreateOrganizationOnFinish(TEAM_ONLY, ORGS_EMPTY)).toBe(true);
+  });
+
+  it('never creates a second clinic for an invited person who joined one (D84)', () => {
+    expect(
+      shouldCreateOrganizationOnFinish(TEAM_ONLY, [
+        { id: 'org_team', type: 'TEAM' as const, slug: 'acme' },
+      ]),
+    ).toBe(false);
   });
 
   it('never creates in both mode (team orgs come from the switcher)', () => {

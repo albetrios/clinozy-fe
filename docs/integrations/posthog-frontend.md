@@ -13,7 +13,8 @@ Core Web Vitals (feature flags are planned — see [Feature flags](#feature-flag
 
 PostHog runs only when **all** of the following are true:
 
-1. User **accepted** the cookie banner (`useConsentStore.analyticsConsent === 'granted'`)
+1. The person's **standing** answer is a grant (`hasAnalyticsConsent()` — given on the card or in
+   Settings › Account › Privacy, to the current policy version, within six months; D161)
 2. **`VITE_POSTHOG_KEY`** is set at build time (or `window.__CONFIG__.POSTHOG_KEY`)
 3. Boot completes — `initPostHog(router)` runs from `main.tsx` after splash + idle
 
@@ -81,9 +82,9 @@ Every custom event includes **shared context** from `getAnalyticsContext()`:
 
 ### Consent
 
-| Event                        | When                | Extra properties                     |
-| ---------------------------- | ------------------- | ------------------------------------ |
-| `analytics_consent_decision` | User accepts banner | `decision`, `source: consent_banner` |
+| Event                        | When                    | Extra properties                                 |
+| ---------------------------- | ----------------------- | ------------------------------------------------ |
+| `analytics_consent_decision` | Analytics consent given | `decision`, `source: consent_banner \| settings` |
 
 ### Auth funnel
 

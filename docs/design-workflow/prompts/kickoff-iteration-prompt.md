@@ -37,13 +37,11 @@ passes: `pnpm iteration:status <iteration> implementing`, and start
 ratio yourself — do not trust ratios stated in the spec. A brand colour failing
 AA keeps its true value only on non-text tokens. Register in all four places.
 
-**2. Shell as a new variant, then MAKE IT LIVE.** Add it; never overwrite an
-existing one. Policy is **relocate, never delete** — every platform surface keeps
-a home (audit the live shell; do not trust a remembered one). Settings stays a
-hash modal. **A variant isn't done until it's the default AND pinned:** point the
-store default at it, turn off shuffle (`SHUFFLE_TEMP.<axis> = false`), and
-confirm the default isn't overridden by a persisted value. Report "default = X,
-pinned, not persisted."
+**2. Shell — one design per surface.** The new design replaces the old one in
+the same change; no preview variant is kept beside it. Policy is **relocate,
+never delete** for the platform surfaces — each keeps a home (audit the live
+shell; do not trust a remembered one). Settings stays a hash modal. Report
+"<surface>: one design — <file>; the old one removed."
 
 **3. Screens.** Interaction shell → flow skeleton → regions (desktop and mobile
 together, never desktop-then-retrofit) → content → states → motion.

@@ -4,9 +4,8 @@ import { useCallback, useMemo } from 'react';
 
 /**
  * URL search-param shape this hook reads and writes. A structural subset — any
- * route whose `validateSearch` schema includes these keys is compatible (e.g.
- * the dashboard's `dashboardSearchSchema`). Other search params the route
- * defines are preserved untouched.
+ * route whose `validateSearch` schema includes these keys is compatible. Other
+ * search params the route defines are preserved untouched.
  */
 export interface DataTableSearch {
   /** Global table search query. */
@@ -87,15 +86,14 @@ export function useDataTableUrlState(enabled: boolean) {
   const initialPageSize = enabled && search.size ? search.size : 10;
 
   const patchSearch = useCallback(
-    (patch: Partial<DataTableSearch>) => {
+    (patch: Readonly<Record<string, unknown>>) => {
       if (!enabled) return;
-      const updater = (prev: DataTableSearch): DataTableSearch => {
-        const next: DataTableSearch = { ...prev, ...patch };
-        if (next.q === undefined) delete next.q;
-        if (next.role === undefined) delete next.role;
-        if (next.page === undefined) delete next.page;
-        if (next.size === undefined) delete next.size;
-        if (next.sort === undefined) delete next.sort;
+      const updater = (prev: Record<string, unknown>): Record<string, unknown> => {
+        const next: Record<string, unknown> = { ...prev, ...patch };
+        // A key patched to `undefined` leaves the URL rather than printing as one.
+        for (const key of Object.keys(patch)) {
+          if (next[key] === undefined) delete next[key];
+        }
         return next;
       };
       void navigate({
@@ -114,6 +112,12 @@ export function useDataTableUrlState(enabled: boolean) {
   );
 
   return {
+    /**
+     * Merge `patch` over the current search in place (no history entry, hash
+     * kept); a key patched to `undefined` is removed. Any key, not only the
+     * table's — a room's filters write through it too.
+     */
+    patchSearch,
     initialSorting,
     initialFilters,
     initialPageIndex,

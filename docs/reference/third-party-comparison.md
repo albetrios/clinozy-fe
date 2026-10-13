@@ -4,15 +4,15 @@ Verdict summary for major libraries used in this repo. Full stack list: [tools-a
 
 ## Charts
 
-| Current                         | Size (gzip, approx.)             | Alternatives                           | Verdict                                                                    |
-| ------------------------------- | -------------------------------- | -------------------------------------- | -------------------------------------------------------------------------- |
-| **Recharts** via shadcn `chart` | ~40–60 KB in lazy `charts` chunk | @nivo (~110 KB), visx, Chart.js, uPlot | **KEEP** — shadcn-canonical, lazy-loaded on dashboard only. @nivo removed. |
+| Current                         | Size (gzip, approx.)             | Alternatives                           | Verdict                                                                  |
+| ------------------------------- | -------------------------------- | -------------------------------------- | ------------------------------------------------------------------------ |
+| **Recharts** via shadcn `chart` | ~40–60 KB in lazy `charts` chunk | @nivo (~110 KB), visx, Chart.js, uPlot | **REMOVED** (L-63) — the old dashboard was its only user. @nivo removed. |
 
 ## Animation
 
-| Current                             | Alternatives                                     | Verdict                                                                                                                                                                          |
-| ----------------------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Anime.js + CSS + tw-animate-css** | framer-motion (~39 KB), motion-one, react-spring | **KEEP** — Anime.js for the few JS-driven motions (dashboard count-up, onboarding steps); overlays use `tw-animate-css`; page fade via custom keyframes. framer-motion not used. |
+| Current                             | Alternatives                                     | Verdict                                                                                                                                                      |
+| ----------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Anime.js + CSS + tw-animate-css** | framer-motion (~39 KB), motion-one, react-spring | **KEEP** — Anime.js for the few JS-driven motions (onboarding steps); overlays use `tw-animate-css`; page fade via custom keyframes. framer-motion not used. |
 
 ## Error tracking
 

@@ -5,6 +5,7 @@ import {
   formatDateValue,
   formatNumberValue,
   type LocaleFormatInput,
+  zonedClockParts,
 } from '@/lib/i18n/format.ts';
 
 /** Build a full prefs object; formatting keys off `formatLocale` (region). */
@@ -88,6 +89,26 @@ describe('formatDateValue', () => {
     expect(withCivil).not.toBe(absolute);
   });
 
+  it('shows a wall-clock date and time as written, whatever the display timezone', () => {
+    // A clinic-local 10:30 on 3 Oct is "10:30" in Tokyo, New York or device time.
+    const slot = new Date(2026, 9, 3, 10, 30);
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    };
+    const labels = (['auto', 'Asia/Tokyo', 'America/New_York'] as const).map((timeZone) =>
+      formatDateValue(slot, prefs({ formatLocale: 'en-GB', timeZone }), options, {
+        wallClock: true,
+      }),
+    );
+    expect(new Set(labels).size).toBe(1);
+    expect(labels[0]).toMatch(/Sat,? 3 Oct,? 10:30/);
+  });
+
   it('still shifts absolute ISO instants across display timezones', () => {
     const tokyo = formatDateValue(
       '2026-06-18T00:30:00.000Z',
@@ -139,6 +160,21 @@ describe('formatCurrencyValue', () => {
     expect(jp).toMatch(/[\d¥]/);
   });
 
+  it('takes shape options but keeps the currency and the chosen display', () => {
+    const whole = { minimumFractionDigits: 0, maximumFractionDigits: 0 };
+    expect(
+      formatCurrencyValue(12345600, 'INR', prefs({ formatLocale: 'en-IN' }), whole),
+    ).toBe('₹1,23,456');
+    // An option cannot swap the currency, the style or the user's display.
+    expect(
+      formatCurrencyValue(9900, 'INR', prefs({ currencyDisplay: 'code' }), {
+        currency: 'USD',
+        style: 'decimal',
+        currencyDisplay: 'symbol',
+      }),
+    ).toMatch(/^INR\s99\.00$/);
+  });
+
   it('does not throw on a malformed server currency code (falls back gracefully)', () => {
     // Intl.NumberFormat throws RangeError on a non-alpha-3 currency; the billing
     // UI must never crash over one bad server value.
@@ -156,5 +192,26 @@ describe('formatNumberValue', () => {
     expect(us).toMatch(/1/);
     expect(de).toMatch(/1/);
     expect(us).not.toBe(de);
+  });
+});
+
+describe('zonedClockParts', () => {
+  it('reads the wall clock of a zone, not the runtime one', () => {
+    // 18:45 UTC is 00:15 the next day in Kolkata (+05:30).
+    const instant = new Date('2026-10-03T18:45:30.000Z');
+    expect(zonedClockParts(instant, 'Asia/Kolkata')).toEqual({
+      year: 2026,
+      month: 10,
+      day: 4,
+      hour: 0,
+      minute: 15,
+      second: 30,
+    });
+    expect(zonedClockParts(instant, 'UTC')).toMatchObject({ day: 3, hour: 18 });
+  });
+
+  it('keeps midnight at hour 0, never 24', () => {
+    const midnight = new Date('2026-10-03T18:30:00.000Z');
+    expect(zonedClockParts(midnight, 'Asia/Kolkata')).toMatchObject({ day: 4, hour: 0 });
   });
 });

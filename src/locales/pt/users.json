@@ -1,0 +1,400 @@
+{
+  "manifest": {
+    "title": "Usuários"
+  },
+  "record": "Usuário",
+  "tabs": {
+    "label": "Visualizações de usuários",
+    "team": "Equipe",
+    "roles": "Funções e acesso",
+    "branches": "Unidades"
+  },
+  "search": {
+    "placeholder": "Nome, e-mail, celular ou #ID",
+    "label": "Buscar usuários"
+  },
+  "primary": {
+    "newUser": "Novo usuário",
+    "newRole": "Nova função",
+    "newBranch": "Nova unidade"
+  },
+  "columns": {
+    "seq": "ID",
+    "user": "Usuário",
+    "email": "E-mail",
+    "roles": "Funções",
+    "branches": "Unidades",
+    "hours": "Horário",
+    "commission": "Comissão",
+    "status": "Status",
+    "updated": "Atualizado"
+  },
+  "table": {
+    "records": "usuários",
+    "mainRole": "Função principal",
+    "alsoRole": "Também",
+    "commission": "{{value}}%"
+  },
+  "status": {
+    "active": "Ativo",
+    "inactive": "Inativo",
+    "invited": "Convidado",
+    "expires": "O convite expira em {{date}}",
+    "expired": "Convite expirado"
+  },
+  "hours": {
+    "everyDay": "Todos os dias",
+    "run": "{{from}}–{{to}}",
+    "list": "{{days, list(type: unit)}}",
+    "line": "{{days}} · {{from}}–{{to}}"
+  },
+  "filters": {
+    "roles": "Funções",
+    "all": "Todos",
+    "branches": "Unidades",
+    "status": "Status"
+  },
+  "rowActions": {
+    "edit": "Editar",
+    "delete": "Excluir",
+    "leave": "Sair da clínica"
+  },
+  "bulk": {
+    "export": "Exportar",
+    "exported_one": "{{count}} linha exportada como CSV",
+    "exported_many": "{{count}} linhas exportadas como CSV",
+    "exported_other": "{{count}} linhas exportadas como CSV"
+  },
+  "empty": {
+    "title": "Nenhum usuário corresponde",
+    "description": "Ainda não há nada aqui. Tente outra aba ou busca."
+  },
+  "drawer": {
+    "title": {
+      "create": "Novo usuário",
+      "edit": "Editar usuário"
+    },
+    "sub": "Acesso, funções, unidades e horário",
+    "steps": {
+      "profile": "Perfil, funções e unidades",
+      "hours": "Horário e pagamento"
+    },
+    "groups": {
+      "profile": "Perfil",
+      "rolesBranches": "Funções e unidades",
+      "hours": "Horário",
+      "pay": "Pagamento"
+    },
+    "fields": {
+      "name": "Nome",
+      "mobile": "Celular",
+      "email": "E-mail",
+      "colour": "Cor",
+      "roles": "Funções",
+      "access": "Tem acesso a",
+      "branches": "Unidades",
+      "days": "Dias",
+      "from": "Das",
+      "to": "Até",
+      "commission": "Comissão / incentivo",
+      "status": "Status"
+    },
+    "hints": {
+      "mobile": "10 dígitos",
+      "colour": "usada nos seus selos",
+      "roles": "escolha uma ou mais · os acessos se somam",
+      "branches": "onde trabalha",
+      "days": "Os agendamentos só oferecem estes dias",
+      "name": "definido pela pessoa no próprio perfil"
+    },
+    "placeholders": {
+      "name": "Nome completo, ex.: Dr. Nisha Mavani",
+      "email": "name@clinic.com",
+      "time": "Escolha um horário",
+      "commission": "0"
+    },
+    "commissionSuffix": "% do faturado",
+    "commissionQuick": "{{value}}%",
+    "decrease": "Diminuir",
+    "increase": "Aumentar",
+    "pickRole": "Escolha uma função",
+    "statusOn": "Ativo · pode entrar",
+    "statusOff": "Inativo · não pode usar esta clínica",
+    "resend": "Reenviar convite",
+    "quickFill": {
+      "doctor": "Médico · 10:00–19:00",
+      "therapist": "Terapeuta · 10:00–19:00",
+      "front_desk": "Recepção · 09:30–19:30",
+      "pharmacist": "Farmacêutico · 09:00–21:00"
+    },
+    "summaryNew": "Novo usuário",
+    "save": {
+      "create": "Criar usuário",
+      "edit": "Salvar alterações",
+      "createAnother": "Criar e adicionar outro"
+    },
+    "missing": "Adicione o e-mail",
+    "noRole": "Escolha pelo menos uma função",
+    "emailInvalid": "Informe um e-mail válido",
+    "mobileInvalid": "O celular precisa de 10 dígitos",
+    "noPlatformRole": "Ainda não há uma função para atribuir · peça a um administrador",
+    "added": "{{name}} adicionado",
+    "saved": "{{name}} salvo"
+  },
+  "deleteUser": {
+    "title": "Excluir este usuário?",
+    "removed": "{{name}} removido"
+  },
+  "leave": {
+    "title": "Sair de {{clinic}}?",
+    "description": "Você perderá o acesso a {{clinic}} — suas seções, registros e equipe — e voltará às suas clínicas. Você pode desfazer por alguns segundos após confirmar.",
+    "confirm": "Sair da clínica",
+    "stay": "Ficar",
+    "pending": "Saindo de {{clinic}}…",
+    "done": "Você saiu de {{clinic}}",
+    "clinicFallback": "esta clínica"
+  },
+  "roles": {
+    "label": "Funções",
+    "purposes": {
+      "admin": "Comanda a clínica — preços, equipe, unidades e todas as telas.",
+      "doctor": "Atende, prescreve e planeja o tratamento de cada paciente.",
+      "therapist": "Conduz sessões e ligações de acompanhamento.",
+      "front_desk": "A primeira cara da clínica — leads, agendamentos, check-in e cobrança.",
+      "counsellor": "Transforma consultas em planos e pacotes.",
+      "pharmacist": "Cuida do balcão de medicamentos e do estoque.",
+      "accountant": "Confere entradas e saídas de dinheiro e fecha os dias.",
+      "marketing": "Traz leads e faz o acompanhamento.",
+      "custom": "Função personalizada",
+      "customPage": "Função personalizada · defina abaixo o que ela pode fazer"
+    },
+    "nameLabel": "Nome da função",
+    "descriptionLabel": "Descrição da função",
+    "copyFrom": "Copiar acesso de",
+    "copied": "{{role}} agora tem o mesmo acesso que {{from}}",
+    "preview": "Visualizar como {{role}}",
+    "previewHint": "Veja o {{productName}} como esta função vê",
+    "previewing": "Visualizando o {{productName}} como {{role}}",
+    "back": "Voltar às funções",
+    "people": "Pessoas com esta função",
+    "openPerson": "Abrir {{name}}",
+    "also": "+ {{roles}}",
+    "nobody": "Ninguém tem esta função ainda · atribua-a a alguém pela ficha de usuário.",
+    "matrix": {
+      "title": "O que pode ver e fazer",
+      "section": "Seção",
+      "view": "Ver",
+      "create": "Criar",
+      "edit": "Editar",
+      "delete": "Excluir",
+      "row": "Linha",
+      "full": "Total",
+      "some": "Parcial",
+      "none": "Nenhum",
+      "rowHint": "Ativar ou desativar a linha inteira",
+      "cell": {
+        "view": "{{role}} pode ver · {{section}}",
+        "create": "{{role}} pode criar · {{section}}",
+        "edit": "{{role}} pode editar · {{section}}",
+        "delete": "{{role}} pode excluir · {{section}}"
+      },
+      "notApplicable": "Não se aplica a esta linha",
+      "resources": {
+        "contact": {
+          "label": "Contatos",
+          "description": "As pessoas por trás de leads e pacientes"
+        },
+        "contact_activity": {
+          "label": "Mensagens e notas",
+          "description": "WhatsApp, chamadas e notas da equipe"
+        },
+        "patient_prescription": {
+          "label": "Receitas",
+          "description": "Escrever e aprovar a receita"
+        },
+        "patient_treatment": {
+          "label": "Tratamentos",
+          "description": "Sessões e como foram"
+        },
+        "patient_review": {
+          "label": "Avaliações",
+          "description": "Avaliações do Google e em vídeo · lidas com o paciente"
+        },
+        "role": {
+          "label": "Funções",
+          "description": "Funções e acesso"
+        },
+        "branch": {
+          "label": "Unidades",
+          "description": "Unidades e quem trabalha em cada uma"
+        }
+      }
+    },
+    "notes": {
+      "admin": "Administradores podem fazer tudo · esta função não pode ser limitada.",
+      "readOnly": "Aqui você vê as funções. Alterá-las exige “Atualizar funções”.",
+      "live": "As mudanças valem na hora para todos com esta função. Quem tem duas funções recebe tudo o que qualquer uma delas permite.",
+      "beyond": "Esta função tem acessos que você não tem · só quem os tem pode alterá-la."
+    },
+    "locked": {
+      "admin": "Administradores sempre têm acesso total",
+      "noPerms": "Você não pode alterar funções · peça a um administrador",
+      "noAdd": "Você não pode adicionar funções · peça a um administrador",
+      "beyond": "Esta função tem acessos que você não tem · peça a um administrador",
+      "notYours": "Você só pode dar os acessos que tem"
+    },
+    "added": "Função adicionada · dê um nome e escolha o que ela pode fazer",
+    "newRoleName": "Nova função",
+    "duplicateName": "Já existe uma função chamada {{name}}",
+    "deleteRole": {
+      "action": "Excluir função",
+      "title": "Excluir {{name}}?",
+      "description": "Membros com esta função precisarão de uma nova. Você pode desfazer por alguns segundos após confirmar.",
+      "confirm": "Excluir",
+      "pending": "Excluindo {{name}}…"
+    },
+    "workspace": {
+      "title": "Permissões do espaço de trabalho",
+      "hint": "Configurações, integrações, cobrança e registro de auditoria — além das seções acima. Você só pode dar o que você mesmo tem.",
+      "none": "Não há mais nada que você possa dar a esta função.",
+      "loadFailed": "Não foi possível carregar as permissões do espaço de trabalho."
+    },
+    "specials": {
+      "title": "Permissões especiais",
+      "floor": {
+        "label": "Ver o preço mínimo",
+        "description": "Mostra o preço mínimo oculto em serviços e faturas"
+      },
+      "clinical": {
+        "label": "Ler notas clínicas",
+        "description": "Abre queixas, diagnóstico, notas, fotos e relatórios"
+      },
+      "export": {
+        "label": "Exportar · {{section}}",
+        "description": "Baixar a tabela"
+      },
+      "privateAlbum": {
+        "label": "Ver o álbum privado",
+        "description": "Abre as fotos privadas da ficha do paciente"
+      }
+    }
+  },
+  "branches": {
+    "record": "Unidade",
+    "columns": {
+      "branch": "Unidade",
+      "address": "Endereço",
+      "contact": "Contato",
+      "hours": "Horário",
+      "team": "Equipe",
+      "defaults": "Pessoas padrão",
+      "status": "Status"
+    },
+    "main": "Principal",
+    "notSet": "Não definido",
+    "defaults": {
+      "doctor": "Médico · {{name}}",
+      "desk": "Recepção · {{name}}",
+      "therapist": "Terapeuta · {{name}}",
+      "pharmacist": "Farmácia · {{name}}"
+    },
+    "status": {
+      "open": "Aberta",
+      "closed": "Fechada"
+    },
+    "records": "unidades",
+    "empty": "Nenhuma unidade ainda",
+    "drawer": {
+      "title": {
+        "create": "Nova unidade",
+        "edit": "Editar unidade"
+      },
+      "sub": "Endereço, horário e as pessoas que trabalham aqui",
+      "summaryNew": "Nova unidade",
+      "people_one": "{{count}} pessoa",
+      "people_many": "{{count}} pessoas",
+      "people_other": "{{count}} pessoas",
+      "mainBadge": "Unidade principal",
+      "steps": {
+        "place": "Unidade e endereço",
+        "contact": "Contato e horário",
+        "people": "Pessoas"
+      },
+      "groups": {
+        "branch": "Unidade",
+        "address": "Endereço",
+        "contact": "Contato",
+        "hours": "Horário"
+      },
+      "fields": {
+        "name": "Nome",
+        "colour": "Cor",
+        "main": "Unidade principal",
+        "status": "Status",
+        "line1": "Endereço (linha 1)",
+        "line2": "Endereço (linha 2)",
+        "area": "Bairro",
+        "city": "Cidade",
+        "pin": "CEP",
+        "state": "Estado",
+        "phone": "Telefone",
+        "email": "E-mail",
+        "gstin": "GSTIN",
+        "days": "Dias",
+        "opens": "Abre",
+        "closes": "Fecha",
+        "team": "Equipe",
+        "doctor": "Médico padrão",
+        "desk": "Recepção padrão",
+        "therapist": "Terapeuta padrão",
+        "pharmacist": "Farmacêutico padrão"
+      },
+      "placeholders": {
+        "name": "ex.: Vesu",
+        "line1": "Loja / andar, prédio",
+        "line2": "Rua, ponto de referência",
+        "area": "ex.: Vesu",
+        "city": "Cidade",
+        "pin": "6 dígitos",
+        "state": "Estado",
+        "email": "unidade@clinica.com",
+        "gstin": "15 caracteres",
+        "team": "Escolha a equipe"
+      },
+      "hints": {
+        "colour": "identifica esta unidade em todo lugar",
+        "phone": "10 dígitos",
+        "team": "quem trabalha aqui",
+        "preselected": "pré-selecionado nos formulários daqui",
+        "addFirst": {
+          "doctor": "adicione primeiro um médico à equipe",
+          "desk": "adicione primeiro alguém da recepção à equipe",
+          "therapist": "adicione primeiro um terapeuta à equipe",
+          "pharmacist": "adicione primeiro um farmacêutico à equipe"
+        },
+        "main": "uma por clínica · definida na abertura"
+      },
+      "toggles": {
+        "mainOn": "Principal · sede",
+        "mainOff": "Não é a unidade principal",
+        "openOn": "Aberta · aparece nas listas",
+        "openOff": "Fechada · oculta em todo lugar"
+      },
+      "nobody": "Ninguém",
+      "you": "{{name}} (você)",
+      "save": {
+        "create": "Adicionar unidade",
+        "edit": "Salvar unidade"
+      },
+      "nameMissing": "Dê um nome à unidade",
+      "addressMissing": "Adicione o endereço, o bairro, a cidade e o código PIN",
+      "duplicate": "Já existe uma unidade chamada {{name}}",
+      "phoneInvalid": "O telefone precisa de 10 dígitos",
+      "emailInvalid": "Digite um e-mail válido",
+      "added": "Unidade {{name}} adicionada",
+      "saved": "{{name}} salva",
+      "contactMissing": "Adicione o telefone e o e-mail",
+      "pinInvalid": "O código PIN precisa de 6 dígitos"
+    }
+  }
+}

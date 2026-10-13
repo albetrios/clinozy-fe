@@ -111,7 +111,7 @@ Every key sits under exactly one half. Sub-sections (`# --- Title ---`) group re
 ## Auth vs modules (do not mix)
 
 - **Auth** = individual `VITE_AUTH_*` booleans (never `VITE_DISABLED_MODULES`).
-- **Modules** = `VITE_DISABLED_MODULES` comma list (`billing`, `members`, …).
+- **Modules** = `VITE_DISABLED_MODULES` comma list (`billing`, `members`, the rooms' `app-<room>` keys …).
 
 ## config.js contract
 

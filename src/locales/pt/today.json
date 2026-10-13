@@ -1,0 +1,77 @@
+{
+  "manifest": {
+    "title": "Hoje"
+  },
+  "greeting": {
+    "morning": "Bom dia, {{name}}",
+    "afternoon": "Boa tarde, {{name}}",
+    "evening": "Boa noite, {{name}}",
+    "nobody": "equipe"
+  },
+  "pulse": "{{inClinic}} na clínica · {{waiting}} aguardando · {{arriving}} chegando · {{day}}, {{time}}",
+  "newBooking": "Novo agendamento",
+  "walkIn": "Sem agendamento",
+  "loading": "Carregando o dia de hoje",
+  "lanes": {
+    "label": "Etapas",
+    "names": {
+      "enquiries": "Solicitações",
+      "arriving": "Chegando",
+      "waiting": "Aguardando",
+      "withDoctor": "Com o médico",
+      "treatment": "Tratamento",
+      "checkout": "Caixa",
+      "pharmacy": "Farmácia"
+    },
+    "hints": {
+      "oldest": "mais antiga {{time}}",
+      "next": "próxima {{time}}",
+      "since": "desde {{time}}",
+      "none": "—"
+    },
+    "more": "+{{more}}",
+    "count_one": "{{count}} pessoa",
+    "count_many": "{{count}} pessoas",
+    "count_other": "{{count}} pessoas",
+    "empty": "Ninguém aqui agora.",
+    "none": "O atendimento da clínica e as consultas não fazem parte da sua função."
+  },
+  "actions": {
+    "book": "Agendar",
+    "checkIn": "Registrar chegada",
+    "sendIn": "Chamar",
+    "openSession": "Abrir sessão",
+    "checkout": "Cobrar",
+    "dispense": "Dispensar"
+  },
+  "card": {
+    "service": "{{service}} · {{where}}",
+    "medicines_one": "{{count}} medicamento prescrito",
+    "medicines_many": "{{count}} medicamentos prescritos",
+    "medicines_other": "{{count}} medicamentos prescritos"
+  },
+  "flags": {
+    "newLead": "Novo lead",
+    "confirmed": "Confirmada",
+    "unconfirmed": "Não confirmada",
+    "waiting": "Aguardando {{minutes}} min",
+    "inRoom": "Na sala {{minutes}} min",
+    "rxApproved": "Receita aprovada {{time}}",
+    "toPay": "{{amount}} a pagar"
+  },
+  "toasts": {
+    "checkedIn": "Chegada de {{name}} registrada · fila do médico e sala avisadas",
+    "sentIn": "{{name}} encaminhado ao médico",
+    "noRecord": "Ainda não há ficha de paciente para {{name}}",
+    "outcome": "{{name}}: {{result}}",
+    "snoozed": "Adiada · {{label}}"
+  },
+  "queue": {
+    "title": "Fila de trabalho",
+    "sub": "{{open}} abertas · cada uma com responsável e prazo",
+    "scope": "De quem são as tarefas",
+    "owner": "Responsável: {{name}}",
+    "you": "{{name}} (você)",
+    "closed": "✓ {{result}}"
+  }
+}

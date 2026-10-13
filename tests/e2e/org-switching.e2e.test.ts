@@ -1,18 +1,32 @@
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 
+import { organizationClaimOf } from '@/shared/auth/token.ts';
 import {
-  createTeamOrgViaSwitcher,
-  registerNewUserAndGoToDashboard,
+  createTeamOrgAndOpenToday,
+  navigateInApp,
+  openOrganizationSwitcher,
+  registerNewUserAndGoToToday,
   selectOrganizationInSwitcher,
 } from '@/tests/utils/e2e-auth.ts';
-import { byTestId } from '@/tests/utils/e2e-hybrid.ts';
 import { verifyDatabaseConnection } from '@/tests/utils/e2e-session.ts';
 
 /**
- * Dual-URL org switching: personal `/dashboard` ↔ team `/organization/$slug/dashboard`.
- * Requires live clinozy-be, DATABASE_URL, and deployment flags that expose the switcher.
+ * Organization switching through the section-bar shell's Account menu — its
+ * "Switch clinic" row, shown once the member belongs to two or more workspaces.
+ * Team ↔ team is the clinic case; personal ↔ team runs only where the deployment
+ * still has personal workspaces.
  */
-test.describe('Organization switching (dual-URL)', () => {
+
+/** Waits for a switcher option to show — the submenu animates in. */
+async function optionShown(page: Page, slug: string): Promise<boolean> {
+  return page
+    .getByTestId(`organization-switcher-option-${slug}`)
+    .waitFor({ state: 'visible', timeout: 5_000 })
+    .then(() => true)
+    .catch(() => false);
+}
+
+test.describe('Organization switching (Account menu › Switch clinic)', () => {
   test.beforeEach(async () => {
     test.skip(
       !(await verifyDatabaseConnection()),
@@ -20,34 +34,99 @@ test.describe('Organization switching (dual-URL)', () => {
     );
   });
 
-  test('switcher moves between personal dashboard and a new team org', async ({
-    page,
-  }) => {
-    await registerNewUserAndGoToDashboard(page);
+  test('switch clinic moves between two clinics', async ({ page }) => {
+    await registerNewUserAndGoToToday(page);
+    const first = await createTeamOrgAndOpenToday(page);
+    const second = await createTeamOrgAndOpenToday(page);
 
-    const switcher = byTestId(page, 'organization-switcher-trigger');
-    test.skip(!(await switcher.isVisible()), 'org switcher hidden for deployment mode');
-
-    const { slug: teamSlug } = await createTeamOrgViaSwitcher(page);
-    await expect(page).toHaveURL(new RegExp(`/organization/${teamSlug}/dashboard`));
-
-    await byTestId(page, 'organization-switcher-trigger').click();
-    const personalOption = page.getByTestId('organization-switcher-option-personal');
-    test.skip(!(await personalOption.isVisible()), 'personal org section disabled');
-    await page.keyboard.press('Escape');
-    // Radix closes the menu with an exit animation. A trigger click that lands
-    // mid-close is swallowed (the same trap `theme.e2e` documents), so wait for
-    // the menu to be fully gone before the helper opens it again.
-    await expect(personalOption).toBeHidden();
-
-    await selectOrganizationInSwitcher(page, 'personal');
-    await expect(page).toHaveURL(/\/dashboard(?:\?|$|#)/, { timeout: 15000 });
-    await expect(page.getByTestId('dashboard-page')).toBeVisible();
-
-    await selectOrganizationInSwitcher(page, teamSlug);
-    await expect(page).toHaveURL(new RegExp(`/organization/${teamSlug}/dashboard`), {
+    await selectOrganizationInSwitcher(page, first.slug);
+    // Landed: Today in the clinic switched to — its home picks the owner's role
+    // home (D25) — and the menu is gone.
+    await expect(page).toHaveURL(new RegExp(`/organization/${first.slug}/today`), {
       timeout: 15000,
     });
-    await expect(page.getByTestId('dashboard-page')).toBeVisible();
+    await expect(page.getByTestId('today-page')).toBeVisible({ timeout: 15000 });
+    await expect(page.getByTestId('account-menu')).toHaveCount(0);
+
+    await selectOrganizationInSwitcher(page, second.slug);
+    await expect(page).toHaveURL(new RegExp(`/organization/${second.slug}/today`), {
+      timeout: 15000,
+    });
+    await expect(page.getByTestId('today-page')).toBeVisible({ timeout: 15000 });
+  });
+
+  /*
+   * clinozy-be keeps one live access token per session, scoped to the clinic the session was last
+   * switched to. A second tab opening another clinic retires the first tab's token; the first
+   * tab's refresh then answers with a token for the OTHER clinic. Carried, it would read and
+   * write that clinic's records under this tab's screen — so the tab switches back first.
+   */
+  test('a tab keeps its own clinic when another tab moves the session', async ({
+    page,
+    context,
+  }) => {
+    await registerNewUserAndGoToToday(page);
+    const first = await createTeamOrgAndOpenToday(page);
+    const second = await createTeamOrgAndOpenToday(page);
+    await selectOrganizationInSwitcher(page, first.slug);
+    await expect(page).toHaveURL(new RegExp(`/organization/${first.slug}/today`), {
+      timeout: 15000,
+    });
+    await expect(page.getByTestId('today-page')).toBeVisible({ timeout: 15000 });
+
+    // Tab two opens the second clinic: its switch moves the session to it.
+    const otherTab = await context.newPage();
+    await otherTab.goto(`/organization/${second.slug}/today`);
+    await expect(otherTab.getByTestId('today-page')).toBeVisible({ timeout: 20000 });
+
+    // Tab one carries on in the first clinic.
+    const claims: string[] = [];
+    page.on('request', (request) => {
+      const authorization = request.headers().authorization;
+      if (!authorization || !request.url().includes('/api/v1/app/')) return;
+      claims.push(
+        organizationClaimOf(authorization.replace(/^Bearer\s+/i, '')) ?? 'none',
+      );
+    });
+    const switchBack = page.waitForRequest(
+      (request) =>
+        request.method() === 'POST' &&
+        request.url().includes('/auth/switch-to-organization'),
+      { timeout: 20000 },
+    );
+    await navigateInApp(page, `/organization/${first.slug}/patients`);
+
+    // Its refresh answered for the second clinic, so it switched back to its own first.
+    const { organization_id: ownClinic } = (await switchBack).postDataJSON() as {
+      organization_id: string;
+    };
+    await expect(page.getByTestId('patients-page')).toBeVisible({ timeout: 20000 });
+    await expect.poll(() => claims.length, { timeout: 10000 }).toBeGreaterThan(0);
+    // Every clinic request tab one sent names its own clinic — never the other tab's.
+    expect(claims.filter((claim) => claim !== ownClinic)).toEqual([]);
+    await expect(page).toHaveURL(new RegExp(`/organization/${first.slug}/patients`));
+    await otherTab.close();
+  });
+
+  test('switcher moves between the personal workspace and a team', async ({ page }) => {
+    await registerNewUserAndGoToToday(page);
+    const team = await createTeamOrgAndOpenToday(page);
+
+    await openOrganizationSwitcher(page);
+    test.skip(
+      !(await optionShown(page, 'personal')),
+      'personal workspaces are off on this deployment',
+    );
+    // A personal workspace has no clinic (D44): it lands on the picker, whose
+    // list leads back into one.
+    await page.getByTestId('organization-switcher-option-personal').click();
+    await expect(page).toHaveURL(/\/organization(?:[?#]|$)/, { timeout: 15000 });
+    await expect(page.getByTestId('organization-page')).toBeVisible({ timeout: 15000 });
+
+    await page.getByTestId(`organization-picker-option-${team.slug}`).click();
+    await expect(page).toHaveURL(new RegExp(`/organization/${team.slug}/today`), {
+      timeout: 15000,
+    });
+    await expect(page.getByTestId('today-page')).toBeVisible({ timeout: 15000 });
   });
 });

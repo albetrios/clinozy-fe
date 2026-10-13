@@ -1,0 +1,466 @@
+{
+  "manifest": {
+    "title": "Payments"
+  },
+  "tabs": {
+    "label": "Payments sections",
+    "ledger": "Payments",
+    "pending": "Pending"
+  },
+  "search": {
+    "placeholder": "Patient, invoice or receipt",
+    "label": "Search payments"
+  },
+  "toolbar": {
+    "dayClose": "Day close",
+    "pay": "Pay",
+    "payTitle": "Pay · money out (rent, supplies, vendors, refunds)",
+    "receive": "Receive",
+    "receiveTitle": "Receive · money in from a patient",
+    "addPending": "Add pending",
+    "give": "Give",
+    "giveSub": "We pay a patient or party back",
+    "take": "Take",
+    "takeSub": "A patient or party pays us"
+  },
+  "columns": {
+    "ref": "Ref",
+    "what": "What",
+    "when": "When",
+    "party": "From / to",
+    "mode": "Mode",
+    "amount": "Amount",
+    "by": "By",
+    "who": "Who",
+    "way": "Which way",
+    "why": "Why",
+    "since": "Since",
+    "state": "State"
+  },
+  "filters": {
+    "show": "Show",
+    "all": "All"
+  },
+  "directions": {
+    "received": "Received",
+    "paid": "Paid"
+  },
+  "kinds": {
+    "receipt": "Received",
+    "refund": "Refund to patient",
+    "expense": "Paid",
+    "money_back": "Money back",
+    "reversal": "Reversal"
+  },
+  "ledger": {
+    "records": "entries",
+    "edited_one": "Edited {{count}}× · last {{from}} → {{to}}",
+    "edited_other": "Edited {{count}}× · last {{from}} → {{to}}",
+    "editSide": "{{amount}} {{modes}}",
+    "received": "+ {{amount}}",
+    "paid": "− {{amount}}",
+    "sub": {
+      "invoice": "Invoice #{{seq}}",
+      "sale": "Sale · Invoice #{{seq}}",
+      "refund": "Refund · Credit note",
+      "refundNote": "Refund · Credit note {{note}}",
+      "refundFor": "for Invoice #{{seq}}",
+      "moneyBack": "Money back",
+      "medicalBill": "Medical PO #{{seq}} · bill {{bill}}",
+      "stockBill": "Stock PO #{{seq}} · bill {{bill}}",
+      "fromCredit": "From {{ref}}",
+      "reversed": "Reversed",
+      "medicalOrder": "Medical PO #{{seq}}",
+      "stockPurchase": "Stock PO #{{seq}}"
+    },
+    "dayClosed": "{{ref}} · Day closed",
+    "dayClosedEdited_one": "{{ref}} · Day closed · edited {{count}}×",
+    "dayClosedEdited_other": "{{ref}} · Day closed · edited {{count}}×",
+    "creditEntry": "{{ref}} · From {{credit}}",
+    "fixedEntry": "{{ref}} · its amount can’t change · delete it on its day to undo it",
+    "search": "Patient, payee or PAY- number",
+    "count_one": "{{count}} entry",
+    "count_other": "{{count}} entries"
+  },
+  "rowActions": {
+    "edit": "Edit",
+    "delete": "Delete",
+    "giveBack": "Give back",
+    "gotBack": "Got it back",
+    "useOnBill": "Use on next bill",
+    "reverse": "Reverse"
+  },
+  "bulk": {
+    "export": "Export",
+    "exported_one": "{{count}} row exported as CSV",
+    "exported_other": "{{count}} rows exported as CSV"
+  },
+  "empty": {
+    "ledgerTitle": "No entry matches",
+    "pendingTitle": "Nothing pending",
+    "description": "Nothing here yet. Try another tab or search.",
+    "receive": "Receive"
+  },
+  "deleteEntry": {
+    "title": "Delete this payment?",
+    "effect": "Allowed until the day is closed. The deletion is kept in the audit log.",
+    "effectInvoice": "Allowed until the day is closed. Invoice #{{seq}} goes back to {{due}} due. The deletion is kept in the audit log.",
+    "reasons": {
+      "twice": "Entered twice",
+      "amount": "Wrong amount",
+      "party": "Wrong patient or payee"
+    },
+    "removed": "{{ref}} removed",
+    "removedInvoice": "{{ref}} removed · invoice balance restored",
+    "blocked": {
+      "dayClosed": "{{ref}} · its day is closed now · reverse it instead",
+      "moreThanPaid": "{{ref}} · a refund already gave this money back · delete the refund first"
+    }
+  },
+  "dialog": {
+    "record": "Payment",
+    "credit": "Pending",
+    "dayClosed": "Day closed · this can’t be saved now"
+  },
+  "pending": {
+    "records": "pending",
+    "patient": "Patient",
+    "party": "Supplier / party",
+    "ways": {
+      "give": "Give",
+      "take": "Take"
+    },
+    "wayTitles": {
+      "give": "We pay them back",
+      "take": "They pay us"
+    },
+    "states": {
+      "open": "Open",
+      "given_back": "Returned",
+      "got_back": "Received",
+      "used": "Adjusted"
+    },
+    "settledToday": "{{state}} · Today",
+    "adjusted": "{{amount}} adjusted",
+    "invoice": "Invoice #{{seq}}",
+    "byHand": "By hand",
+    "deleteTitle": "Delete this pending?",
+    "deleted": "{{ref}} deleted",
+    "reasons": {
+      "charged_twice": "Charged twice",
+      "advance_not_used": "Advance not used",
+      "package_cancelled": "Package cancelled",
+      "overpaid": "Overpaid",
+      "returned_items": "Returned items",
+      "short_payment": "Short payment",
+      "damaged_goods": "Damaged goods returned",
+      "advance_given": "Advance given",
+      "loan_to_staff": "Loan to staff",
+      "other": "Other"
+    },
+    "adjustedOn": "{{amount}} of {{ref}} adjusted on invoice #{{seq}}",
+    "nothingDue": "Nothing due for {{name}} to adjust against",
+    "search": "Person, supplier or CR-",
+    "fromEntry": "From a ledger entry",
+    "forInvoice": "For an invoice",
+    "settledLocked": "{{ref}} · {{amount}} settled · it can’t change now",
+    "conflicts": {
+      "settled": "Part of {{ref}} is settled now · it can’t change or be deleted",
+      "closed": "{{ref}} is already settled",
+      "dayClosed": "Today is closed at invoice #{{seq}}’s branch · reopen it to use this credit",
+      "dueChanged": "Invoice #{{seq}}’s due changed · try again"
+    }
+  },
+  "receive": {
+    "title": "Receive payment",
+    "titleEdit": "Edit payment in",
+    "sub": "The receipt is queued for the patient on WhatsApp",
+    "subEdit": "Open until the day is closed · every change is logged",
+    "section": "Who is paying",
+    "branch": "Branch",
+    "invoice": "Against invoice",
+    "invoiceOpen_one": "{{count}} open",
+    "invoiceOpen_other": "{{count}} open",
+    "invoiceChip": "{{id}} · {{due}}",
+    "pickPatientFirst": "Pick the patient first",
+    "nothingDue": "Nothing due",
+    "amount": "Amount received",
+    "split": "Split · add a mode",
+    "total": "Total {{total}}",
+    "totalDue": "Total {{total}} · due {{due}}",
+    "reference": "Reference",
+    "referenceHint": "UPI ref / card last 4",
+    "referencePlaceholder": "e.g. 4321",
+    "note": "Note",
+    "notePlaceholder": "Optional",
+    "quickFill": {
+      "full": "Full · {{amount}}",
+      "half": "Half · {{amount}}",
+      "cashUpi": "Cash + UPI"
+    },
+    "save": "Record {{amount}}",
+    "saveEdit": "Save {{amount}}",
+    "summary": "{{modes}} · {{amount}}",
+    "received": "{{amount}} received from {{name}}",
+    "updated": "{{ref}} updated · change logged",
+    "enterAmount": "Enter an amount",
+    "pickPatient": "Pick a patient",
+    "aboveDue": "More than the {{due}} due",
+    "moreThanDue": "More than the invoice’s due now · it was paid meanwhile",
+    "totalAdvance": "Total {{total}} · advance",
+    "advance": "Advance · no invoice",
+    "invoicesFailed": "Couldn’t load the open invoices"
+  },
+  "send": {
+    "title": "Send payment",
+    "titleEdit": "Edit payment out",
+    "sub": "Clinic spend · shows in day close",
+    "steps": {
+      "bill": "Pay against a bill",
+      "expense": "Expense",
+      "payment": "Payment"
+    },
+    "bill": "Supplier bill",
+    "billHint_one": "{{count}} open · search PO #, supplier or bill no",
+    "billHint_other": "{{count}} open · search PO #, supplier or bill no",
+    "billPlaceholder": "Search PO #, supplier or bill no",
+    "otherSpend": "Other spend",
+    "otherSpendSub": "Not against a purchase order",
+    "groups": {
+      "other": "Other",
+      "medical": "Medical purchase orders",
+      "stock": "Clinic stock purchase orders"
+    },
+    "billLabel": {
+      "medical": "Medical PO #{{seq}} · {{supplier}}",
+      "stock": "Stock PO #{{seq}} · {{supplier}}"
+    },
+    "billRef": {
+      "medical": "Medical PO #{{seq}}",
+      "stock": "Stock PO #{{seq}}"
+    },
+    "billNo": "Bill {{bill}}",
+    "daysPending_one": "{{count}} day pending",
+    "daysPending_other": "{{count}} days pending",
+    "pendingToday": "Today",
+    "oldest": "Pending longest",
+    "oldestChip": "#{{seq}} · {{supplier}} · {{due}} · {{age}}",
+    "category": "Category",
+    "paidTo": "Paid to",
+    "paidToPlaceholder": "Vendor or person",
+    "note": "Note",
+    "notePlaceholder": "What was bought",
+    "amount": "Amount",
+    "date": "Date",
+    "mode": "Mode",
+    "files": "Bill / receipt",
+    "filesDrop": "Drop the bill photo or browse",
+    "filesHint": "Optional · JPG, PNG or PDF",
+    "filesRemove": "Remove {{name}}",
+    "electricity": "Electricity",
+    "presets": {
+      "tea": "Tea & snacks",
+      "courier": "Courier"
+    },
+    "save": "Add expense",
+    "saveEdit": "Save changes",
+    "another": "Add & another",
+    "added": "Expense {{ref}} added",
+    "paidBill": "{{amount}} paid against {{bill}}",
+    "saved": "{{ref}} saved · change logged",
+    "missing": "Add who was paid and the amount",
+    "moreThanDue": "More than the bill’s due now · it was paid meanwhile",
+    "billsFailed": "Couldn’t load the open bills"
+  },
+  "credit": {
+    "title": "Add pending",
+    "titleEdit": "Edit pending",
+    "sub": "Money the clinic has to give back or take · settle it later from Pending",
+    "subEdit": "Editable while it is open · changes are logged",
+    "steps": {
+      "way": "Which way",
+      "why": "Why"
+    },
+    "way": "Which way",
+    "who": "Who",
+    "whoPlaceholder": "Search patients, contacts or suppliers",
+    "add": "Add",
+    "groups": {
+      "patients": "Patients",
+      "contacts": "Contacts",
+      "suppliers": "Suppliers & vendors"
+    },
+    "parties": {
+      "patient": "Patient · {{id}}",
+      "contact": "Contact",
+      "contactPhone": "Contact · {{phone}}",
+      "vendor": "Clinic vendor",
+      "supplier": "Medical supplier"
+    },
+    "amount": "Amount",
+    "reason": "Reason",
+    "invoice": "For invoice",
+    "invoiceHint": "optional · links the credit to a bill",
+    "noInvoice": "No invoice",
+    "invoicePaid": "{{bill}} · paid",
+    "invoiceDue": "{{bill}} · {{due}} due",
+    "settleBy": "Settle by",
+    "note": "Note",
+    "notePlaceholder": {
+      "give": "e.g. Refund to the same UPI id",
+      "take": "e.g. Supplier will adjust in the next bill"
+    },
+    "problems": {
+      "who": "Pick who",
+      "amount": "Enter the amount",
+      "reason": "Pick a reason",
+      "otherNote": "Add a note for “Other”"
+    },
+    "save": {
+      "give": "Save · give later",
+      "take": "Save · take later"
+    },
+    "saveEdit": "Save changes",
+    "summary": {
+      "give": "Give {{amount}} back to {{name}}",
+      "take": "Take {{amount}} from {{name}}"
+    },
+    "saved": {
+      "give": "{{ref}} saved · give {{amount}} to {{name}}",
+      "take": "{{ref}} saved · take {{amount}} from {{name}}"
+    },
+    "updated": "{{ref}} updated"
+  },
+  "dayClose": {
+    "title": "Day close",
+    "day": "Day",
+    "status": {
+      "open": "Open",
+      "openAuto_one": "Open · auto-closes in {{count}} h",
+      "openAuto_other": "Open · auto-closes in {{count}} h",
+      "closedBy": "Closed by {{name}}",
+      "closed": "Closed",
+      "forceClosed": "Force-closed"
+    },
+    "entries_one": "{{count}} entry on {{day}}",
+    "entries_other": "{{count}} entries on {{day}}",
+    "openDay_one": "{{day}} not closed · {{count}} h left · Review",
+    "openDay_other": "{{day}} not closed · {{count}} h left · Review",
+    "openDayTitle": "Review the entries and close it · it closes by itself when the time runs out",
+    "previous": "Previous closes",
+    "previousCash": "Cash {{amount}}",
+    "previousAuto": "Auto-closed",
+    "previousTitle": "Review {{day}}",
+    "closeDay": "Close day",
+    "countFirst": "Count the cash first",
+    "closed": "Day closed",
+    "reopened": "Day reopened",
+    "gate": {
+      "title": "Opening cash · {{day}}",
+      "sources": {
+        "carried": "Carried from {{day}} close",
+        "recounted": "Recounted",
+        "first": "No earlier close · nothing to carry"
+      },
+      "recount": "Recount",
+      "recountLabel": "Recount opening cash",
+      "recountTitle": "Recount if it doesn’t match",
+      "accept": "Accept {{amount}}",
+      "acceptRecount": "Accept recount",
+      "starting": "You’re starting the day as {{name}} · this is stamped on the day",
+      "accepted": "Opening cash {{amount}} accepted · stamped {{time}}"
+    },
+    "strip": {
+      "opening": "Opening cash",
+      "acceptedBy": "Accepted by {{name}} · {{time}}",
+      "cashInOut": "Cash in · out",
+      "cashIn": "+{{amount}}",
+      "cashOut": "−{{amount}}",
+      "expected": "Expected in drawer {{amount}}",
+      "counted": "Counted now",
+      "countPlaceholder": "Count the drawer",
+      "countLabel": "Counted cash",
+      "netByMode": "Net by mode",
+      "staffTitle_one": "{{name}} · {{count}} entry · {{amount}}",
+      "staffTitle_other": "{{name}} · {{count}} entries · {{amount}}",
+      "staffOther": "Not on the team",
+      "reason": "Why is the count off?",
+      "reasonPlaceholder": "What happened · e.g. ₹20 given as change from the drawer",
+      "reasonFirst": "Say why the count is off first"
+    },
+    "report": {
+      "title": "{{day}} is closed",
+      "closedBy": "Closed by {{name}} · {{time}}",
+      "autoClosed": "Closed at {{time}} · auto-closed after the grace period",
+      "reopen": "Reopen",
+      "acceptedBy": "Accepted by {{name}}",
+      "takenAsExpected": "Taken as expected",
+      "received_one": "{{count}} received",
+      "received_other": "{{count}} received",
+      "paid_one": "{{count}} paid",
+      "paid_other": "{{count}} paid",
+      "cashCounted": "Cash counted",
+      "expected": "Expected {{amount}}",
+      "difference": "Difference",
+      "matched": "Drawer matched",
+      "extra": "Extra in drawer",
+      "short": "Short in drawer",
+      "log": "What happened",
+      "logAccepted": "{{name}} accepted the opening cash {{amount}}",
+      "logRecounted": "{{name}} accepted the opening cash {{amount}} (recounted)",
+      "logMatched": "Drawer counted at {{amount}} · matched",
+      "logExtra": "Drawer counted at {{amount}} · {{diff}} extra",
+      "logShort": "Drawer counted at {{amount}} · {{diff}} short",
+      "logClosed": "{{name}} closed the day",
+      "logAuto": "Auto-closed after the grace period · cash taken as expected",
+      "openedAuto": "Opened automatically",
+      "notCounted": "Not counted",
+      "logOpened": "{{name}} opened the day",
+      "logReopened": "{{name}} reopened the day · {{reason}}",
+      "logReason": "“{{reason}}”",
+      "someone": "Someone"
+    },
+    "review": {
+      "title": "Review every entry",
+      "none": "No entries",
+      "empty": "No entries on this day",
+      "states": {
+        "canEdit": "Can edit",
+        "canEditTitle": "Can be edited or deleted until the day is closed",
+        "dayClosed": "Day closed",
+        "dayClosedTitle": "The day is closed · its entries can’t be changed",
+        "fromCredit": "From {{credit}}"
+      },
+      "count_one": "{{count}} entry",
+      "count_other": "{{count}} entries"
+    },
+    "previousNone": "No closes before this day",
+    "refusals": {
+      "alreadyOpened": "Someone opened this day meanwhile · showing it now",
+      "alreadyClosed": "Someone closed this day meanwhile · showing it now",
+      "alreadyOpen": "This day is already open again · showing it now"
+    },
+    "reopen": {
+      "title": "Reopen this day?",
+      "effect": "The count is cleared and the day’s entries can be changed again until it is closed.",
+      "action": "Reopen day",
+      "record": "{{branch}} · {{day}}",
+      "reasons": {
+        "miscounted": "Counted wrong",
+        "missed": "An entry was missed",
+        "wrongEntry": "An entry is wrong"
+      }
+    }
+  },
+  "reverseEntry": {
+    "title": "Reverse this payment?",
+    "effect": "Its day is closed, so it stays as it was. A reversal for the same money goes on today’s ledger at its branch, and what it paid goes back. Both entries are kept.",
+    "action": "Reverse",
+    "reversed": "{{ref}} reversed · {{reversal}}",
+    "blocked": {
+      "alreadyReversed": "{{ref}} is already reversed",
+      "dayOpen": "{{ref}}’s day is open again · delete it instead",
+      "dayClosed": "Today is closed at {{ref}}’s branch · reopen it to reverse"
+    }
+  }
+}

@@ -1,6 +1,6 @@
 import { expect, type Page, type PlaywrightWorkerArgs, test } from '@playwright/test';
 
-import { navigateInApp } from '@/tests/utils/e2e-auth.ts';
+import { establishSessionInPage, navigateInApp } from '@/tests/utils/e2e-auth.ts';
 import { uniqueE2eEmail } from '@/tests/utils/e2e-faker.ts';
 import { byTestId, gotoApp, openSettingsHash } from '@/tests/utils/e2e-hybrid.ts';
 import {
@@ -17,9 +17,10 @@ import { createTeamOrganization } from '@/tests/utils/e2e-tenancy.ts';
 
 /**
  * Provision a team org via the API and hydrate the team-scoped browser session,
- * landing on its dashboard. Returns `null` when the env can't provision one.
+ * landing on its home — Today, its owner's role home. Returns `null` when the env
+ * can't provision one.
  */
-async function landOnTeamDashboard(
+async function landInTeamClinic(
   page: Page,
   playwright: PlaywrightWorkerArgs['playwright'],
 ): Promise<{ slug: string } | null> {
@@ -30,22 +31,11 @@ async function landOnTeamDashboard(
     if (!org) return null;
 
     await gotoApp(page, '/login');
-    await page.waitForFunction(
-      () => globalThis.__clinozyFeEstablishSession != null,
-      null,
-      {
-        timeout: 10_000,
-      },
-    );
-    await page.evaluate(async (token) => {
-      const establish = globalThis.__clinozyFeEstablishSession;
-      if (!establish) throw new Error('__clinozyFeEstablishSession missing');
-      await establish(token);
-    }, teamToken);
+    await establishSessionInPage(page, teamToken);
 
     if (!org.slug) throw new Error('team org slug missing');
-    await navigateInApp(page, `/organization/${org.slug}/dashboard`);
-    await expect(page.getByTestId('dashboard-page')).toBeVisible({ timeout: 15000 });
+    await navigateInApp(page, `/organization/${org.slug}`);
+    await expect(page.getByTestId('today-page')).toBeVisible({ timeout: 15000 });
     return { slug: org.slug };
   } finally {
     await api.dispose();
@@ -61,7 +51,7 @@ test.describe('Organization settings', () => {
   });
 
   test('general section renders the org profile panel', async ({ page, playwright }) => {
-    const ctx = await landOnTeamDashboard(page, playwright);
+    const ctx = await landInTeamClinic(page, playwright);
     test.skip(ctx === null, 'team org could not be provisioned in this environment');
 
     await openSettingsHash(page, 'organization', 'general');
@@ -71,23 +61,33 @@ test.describe('Organization settings', () => {
     await expect(page.getByRole('dialog')).toBeVisible();
   });
 
-  test('members section lists the creating owner', async ({ page, playwright }) => {
-    const ctx = await landOnTeamDashboard(page, playwright);
+  /**
+   * The Users room is the members surface (D17): where it is open — the local
+   * environment turns the clinic rooms on, and the owner holds every code —
+   * Settings › Members is a link to the Team, which drops the hash.
+   */
+  test('members section links into the Users room, which lists the creating owner', async ({
+    page,
+    playwright,
+  }) => {
+    const ctx = await landInTeamClinic(page, playwright);
     test.skip(ctx === null, 'team org could not be provisioned in this environment');
 
     await openSettingsHash(page, 'organization', 'members');
-    await expect(page.getByTestId('settings-organization-members')).toBeVisible({
+    const section = page.getByTestId('settings-organization-members');
+    await expect(section).toBeVisible({ timeout: 15000 });
+    // a11y guard: the section heading is exposed.
+    await expect(section.getByRole('heading', { name: 'Members' })).toBeVisible();
+
+    await byTestId(page, 'settings-members-open-users').click();
+    await expect(page).toHaveURL(new RegExp(`/organization/${ctx?.slug}/users$`), {
       timeout: 15000,
     });
-    // a11y guard: the section heading is exposed.
-    await expect(
-      page.getByTestId('settings-organization-members').getByRole('heading', {
-        name: 'Members',
-      }),
-    ).toBeVisible();
+    await expect(page.getByTestId('settings-modal')).toHaveCount(0);
     // The creating owner is the sole member row.
-    await expect(page.getByTestId('members-list')).toBeVisible();
-    await expect(page.getByTestId('members-list').getByRole('listitem')).toHaveCount(1);
+    await expect(page.getByTestId('users-team-table-row')).toHaveCount(1, {
+      timeout: 15000,
+    });
   });
 
   /**
@@ -105,30 +105,26 @@ test.describe('Organization settings', () => {
    * fresh team org sits on a one-seat plan, so the invite itself is answered
    * 409 `seat_limit_reached` here — a plan verdict, not a lost recipient.
    */
-  test('the invite dialog sends the recipient a user typed', async ({
+  test('the New user drawer sends the recipient a user typed', async ({
     page,
     playwright,
   }) => {
-    const ctx = await landOnTeamDashboard(page, playwright);
+    const ctx = await landInTeamClinic(page, playwright);
     test.skip(ctx === null, 'team org could not be provisioned in this environment');
 
-    await openSettingsHash(page, 'organization', 'members');
-    await expect(page.getByTestId('settings-organization-members')).toBeVisible({
-      timeout: 15000,
-    });
-
-    await byTestId(page, 'invite-member-open').click();
-    await expect(page.getByTestId('invite-member-form')).toBeVisible({ timeout: 15000 });
+    // Inviting moved from Settings to the Users room's "New user" (D17).
+    await navigateInApp(page, `/organization/${ctx?.slug}/users/create`);
+    await expect(page.getByTestId('user-drawer')).toBeVisible({ timeout: 15000 });
 
     const recipient = uniqueE2eEmail('invite-retained');
-    const emailField = byTestId(page, 'invite-member-email');
+    const emailField = byTestId(page, 'user-drawer-email');
     await emailField.click();
     await page.keyboard.type(recipient, { delay: 20 });
 
     // The property — what the form submits, and what the report read past.
     await expect(emailField).toHaveValue(recipient);
     // a11y guard: a retained, valid address leaves the field un-flagged.
-    await expect(emailField).toHaveAttribute('aria-invalid', /false|^$/);
+    await expect(emailField).not.toHaveAttribute('aria-invalid', 'true');
 
     const invite = page.waitForRequest(
       (request) =>
@@ -136,7 +132,7 @@ test.describe('Organization settings', () => {
         request.url().includes('/tenancy/organization/memberships'),
       { timeout: 15000 },
     );
-    await byTestId(page, 'invite-member-submit').click();
+    await byTestId(page, 'user-drawer-save').click();
     expect((await invite).postDataJSON()).toMatchObject({ email: recipient });
   });
 
@@ -156,7 +152,7 @@ test.describe('Organization settings', () => {
     page,
     playwright,
   }) => {
-    const ctx = await landOnTeamDashboard(page, playwright);
+    const ctx = await landInTeamClinic(page, playwright);
     test.skip(ctx === null, 'team org could not be provisioned in this environment');
 
     await openSettingsHash(page, 'account', 'integrations');
@@ -188,17 +184,21 @@ test.describe('Organization settings', () => {
     ).toBeVisible({ timeout: 15000 });
   });
 
-  test('roles section lists the seeded organization roles', async ({
+  test('roles section links into Roles & access, which lists the organization roles', async ({
     page,
     playwright,
   }) => {
-    const ctx = await landOnTeamDashboard(page, playwright);
+    const ctx = await landInTeamClinic(page, playwright);
     test.skip(ctx === null, 'team org could not be provisioned in this environment');
 
     await openSettingsHash(page, 'organization', 'roles');
     await expect(page.getByTestId('settings-organization-roles')).toBeVisible({
       timeout: 15000,
     });
-    await expect(page.getByTestId('roles-list')).toBeVisible();
+    await byTestId(page, 'settings-roles-open-users').click();
+    await expect(page).toHaveURL(new RegExp(`/organization/${ctx?.slug}/users/roles`), {
+      timeout: 15000,
+    });
+    await expect(byTestId(page, 'users-roles-list')).toBeVisible({ timeout: 15000 });
   });
 });

@@ -24,11 +24,13 @@ volume — a real concern for a clinic app). Internal DB ids never appear in URL
 
 ```text
 /organization                                                    organization picker
-/organization/$organizationSlug/dashboard
+/organization/$organizationSlug                                   the clinic's home → the member's role home
+/organization/$organizationSlug/today
 /organization/$organizationSlug/patients
 /organization/$organizationSlug/patients/$patientId
-/organization/$organizationSlug/patients/$patientId/appointments/$appointmentId
-/organization/$organizationSlug/appointments                      org-wide calendar (list only)
+/organization/$organizationSlug/appointments                      agenda · day · week · month
+/organization/$organizationSlug/appointments/create               URL-driven dialog over the agenda
+/organization/$organizationSlug/appointments/$appointmentId       URL-driven dialog over the agenda
 /organization/$organizationSlug/billing/invoices/$invoiceId
 /organization/$organizationSlug/reports
 /organization/$organizationSlug/suspended                         blocked-state page (status guard target)
@@ -36,14 +38,23 @@ volume — a real concern for a clinic app). Internal DB ids never appear in URL
 
 - **Do not use:** `/o/…`, `/org/…`, `/app/…`, session-based organization, query-param organization.
 - **Canonical-URL rule:** every resource has exactly one detail URL. Appointment detail lives
-  **only** under `patients/$patientId/appointments/$appointmentId`; the org-wide appointments list
-  links into it. Never add a second detail URL for the same resource.
-- **`/` (root):** a resolver route — reads `me/context` and redirects. **Onboarding first:**
+  **only** at `appointments/$appointmentId` — a dialog route over the org-wide agenda, because an
+  appointment belongs to a patient **or** a lead, so it cannot nest under either. The patient
+  file and the lead drawer link into it, keeping the page they came from behind the drawer
+  (`from`). Never add a second detail URL for the same resource.
+- **`/` (root):** a resolver route — reads `me/context` and redirects. **Invitations first
+  (D84):** someone with pending invitations (`GET /users/me/membership-invitations`, read only
+  when there is no active team org) and no clinic to enter → the `/organization` picker, which
+  lists them with Accept / Decline — never the onboarding whose team-only finish would create a
+  second, empty clinic. **Then onboarding:**
   a not-yet-onboarded user (`!user.onboarding_completed`) → `/onboarding` in every deployment
-  mode (even personal, whose org is auto-provisioned). Once onboarded: PERSONAL → root
-  `/dashboard`, TEAM → `/organization/$organizationSlug/dashboard`, else `/organization` picker.
-  Dual-URL: the personal org lives on root URLs (no org param), the team org on its
-  `$organizationSlug/` space. The shared `<Dashboard/>` renders in both; `/` keeps no UI.
+  mode (even personal, whose org is auto-provisioned); after an accept the wizard asks only for
+  the profile. Once onboarded: an active TEAM →
+  `/organization/$organizationSlug` (the clinic's home, which sends the member on to their
+  role home — Today for most roles), else the `/organization` picker. Personal workspaces
+  have no clinic (D44), so a PERSONAL active org lands on the picker too: its list and
+  "Create organization" lead into one. `/` keeps no UI, and the retired `/dashboard`
+  redirects to it (L-63).
 - Auth islands (`/login`, `/mfa`, `/callback`, …), `/onboarding`, `/accept-invite/$invitationId`
   stay top-level, unchanged.
 
@@ -53,9 +64,10 @@ volume — a real concern for a clinic app). Internal DB ids never appear in URL
 "sub-pages" segment and the mirror must be literal. "Everything between two `*.route.tsx` files
 belongs to the parent" still holds.
 
-> **Built today:** only `dashboard/` and `suspended/` exist under `$organizationSlug/`.
-> The `patients/`, `appointments/`, `billing/`, and `reports/` islands below are the **Phase 3
-> shapes** (planned, not on disk) — scaffold them against these rules when requirements land.
+> **Built today:** `suspended/` and the ten clinic rooms (`today/`, `leads/`, `appointments/`,
+> `patients/`, `medical/`, `stock/`, `payments/`, `tasks/`, `offerings/`, `users/`) exist under
+> `$organizationSlug/`. The `billing/` and `reports/` islands below are **shapes** (planned,
+> not on disk) — scaffold them against these rules when requirements land.
 
 ```text
 src/pages/
@@ -71,21 +83,20 @@ src/pages/
         ├── organization-slug.route.tsx            ← layout boundary; org guards in beforeLoad/loader
         ├── organization-slug.manifest.ts              kind: 'layout', children: [...]
         ├── OrganizationLayout.tsx               shell UI + <Outlet />
-        ├── dashboard/                           4-file island
+        ├── today/                               4-file island (the role home for most roles)
         ├── patients/
         │   ├── PATIENTS.OVERVIEW.md
         │   ├── patients.route.tsx  patients.manifest.ts  PatientsPage.tsx
         │   └── $patientId/
         │       ├── PATIENT_ID.OVERVIEW.md
-        │       ├── patient-id.route.tsx  patient-id.manifest.ts  PatientDetailPage.tsx
-        │       └── appointments/
-        │           ├── APPOINTMENTS.OVERVIEW.md
-        │           ├── appointments.route.tsx  appointments.manifest.ts  AppointmentsPage.tsx
-        │           └── $appointmentId/
-        │               ├── APPOINTMENT_ID.OVERVIEW.md
-        │               ├── appointment-id.route.tsx  appointment-id.manifest.ts
-        │               └── AppointmentDetailPage.tsx
-        ├── appointments/                        org-wide list (4-file island)
+        │       └── patient-id.route.tsx  patient-id.manifest.ts  PatientDetailPage.tsx
+        ├── appointments/
+        │   ├── APPOINTMENTS.OVERVIEW.md
+        │   ├── appointments.route.tsx  appointments.manifest.ts  AppointmentsPage.tsx
+        │   ├── create/                          dialog route (renders null; the page opens the drawer)
+        │   └── $appointmentId/
+        │       ├── APPOINTMENT_ID.OVERVIEW.md
+        │       └── appointment-id.route.tsx  appointment-id.manifest.ts  AppointmentPage.tsx
         ├── billing/
         │   ├── BILLING.OVERVIEW.md
         │   ├── billing.route.tsx  billing.manifest.ts  BillingLayout.tsx
@@ -111,7 +122,7 @@ src/pages/
    can never be URL segments / route folders, and a folder with one of those names never contains
    a `*.route.tsx`.
 4. **Duplicate prefixes** are allowed only when the same URL segment legitimately repeats at
-   different depths (the two `appointments/` islands). The validator reports them as a notice —
+   different depths (the `create/` dialog routes under several rooms). The validator reports them as a notice —
    the full path disambiguates. Avoidable collisions (parent/child like
    `organization`/`organization-id`) are designed out by rule 2.
 5. **Every URL folder keeps the same 4-file contract** — `<prefix>.route.tsx`, `<prefix>.manifest.ts`,
@@ -175,25 +186,35 @@ store, organization APIs, and storage — so it lives in `shared/`, exactly like
 src/shared/tenancy/
 ├── TENANCY.OVERVIEW.md            (+ FLOWS / PATTERNS / POLICIES docs)
 ├── organization-context.ts        read canonical organization from route → sync store
-├── organization-resolver.ts       "/" resolver logic (me/context → my-organizations → onboarding)
+├── organization-resolver.ts       "/" resolver logic (me/context → invitations → onboarding → my-organizations)
 ├── organization-membership.ts     membership + per-organization permission loading
 ├── deployment-mode.ts             personal/team deployment-mode model (two flags → three modes)
 ├── me-context.ts                  GET /auth/me/context schema + query
 ├── session-context.ts             session hydrate/invalidate
 ├── switch.ts                      /auth/switch-to-organization (token re-mint, generation guard)
 ├── tenancy-service.ts             (moved from shared/api/)
-└── my-organizations.ts            (moved from shared/api/my-orgs.ts)
+├── my-organizations.ts            (moved from shared/api/my-orgs.ts)
+├── my-invitations.ts              the person's pending invitations + decline (D84)
+└── accept-invitation.ts           accept (link token or none) → switch → refresh (D84)
 ```
 
 Slug parsing lives in `lib/routes/params.ts` (`parseOrganizationSlugParam`), not in this module;
 contracts are colocated per file (there is no `tenancy-contracts.ts`).
 
-## 7. Settings — one global modal, hash-based
+## 7. Settings — one global drawer, hash-based
 
 Hash state (`#settings/<scope>/<section>`) replaces the current `/settings/*` chrome routes,
-because the modal must overlay **any** page — including deep organization URLs — without
-unmounting it (a path change re-runs route matching; a hash change does not). Copy-link
-reproduces page + modal, refresh survives, back/Esc closes.
+because the Settings drawer must overlay **any** page — including deep organization URLs —
+without unmounting it (a path change re-runs route matching; a hash change does not).
+Copy-link reproduces page + drawer, refresh survives, back/Esc closes.
+
+**The UI is a drawer (L-65)** — the shared `RecordDrawer` at 1040px from `md`
+(`min(1040px, 100vw − 56px)`), the full screen below, where the section switch (the
+`Picker`) stands in for the rail. Its header reads "Settings" under the floating ×; there is no
+footer, because every section saves itself. The forms Settings opens — API key, webhook,
+delivery history, two-factor setup, passkey, step-up, new role, invite — stack on it as child
+drawers whose Back returns to Settings. The unit keeps its name (`SettingsModal`,
+`SettingsModalLazy`) and its `settings-modal` test id.
 
 ```text
 #settings/account/{profile|account|security|notifications|sessions|billing|integrations}
@@ -211,21 +232,21 @@ there — a personal workspace has no organization sections at all. It still req
 is the separate `AppearanceDialog` on the root route.)
 
 - Invalid hash → fall back to `#settings/account/profile` (or close). The fallback is
-  **written back to the URL**, so it is only decided once the modal has both answers:
+  **written back to the URL**, so it is only decided once the drawer has both answers:
   me/context (which sections exist) **and** the permission set (`useAccessResolved()`).
   Entering an organization clears the store's permissions a beat before the real set
   lands, and an empty _unresolved_ list means "not known yet" — reading it as "not allowed"
   rewrote a valid organization deep link to `account/profile` for good. If me/context settled
-  without data there is nothing to derive permissions from, and the modal does not wait.
+  without data there is nothing to derive permissions from, and the drawer does not wait.
 - **Same-route navigation must state the hash.** The router resolves an _omitted_ `hash` to
-  none, so `navigate({ to: '.', search, replace: true })` also closes this modal. Use
+  none, so `navigate({ to: '.', search, replace: true })` also closes this drawer. Use
   `hash: true` (keep) or `hash: ''` (clear on purpose) — ESLint rejects a same-route
   `navigate()` with neither. Stripe's return params are cleared through
   `stripeReturnCleanupNavigation()` (`lib/billing/stripe-return.ts`).
 - Organization scope requires organization context + permission (`settings-permissions.ts`,
   reusing `core/rbac` policies — never forked); outside an organization → "Select organization
   first" / redirect to `/organization`.
-- **Route guards never see hashes** — all gating lives inside the modal.
+- **Route guards never see hashes** — all gating lives inside the drawer.
 - **Analytics are hash-blind** — fire an explicit PostHog event on open/section change.
 - Lives in `src/shared/components/SettingsModal/`, with `settings-hash-grammar.ts`
   (the **dependency-free** hash grammar — `settingsHash` / `isSettingsHash` etc. — kept
@@ -239,6 +260,12 @@ is the separate `AppearanceDialog` on the root route.)
 - **Escape hatch:** members / roles / billing / integrations may later be promoted to real pages
   (they are table-heavy admin surfaces — expect it). When promoted, keep a
   `#settings/organization/members` → path redirect shim so old links survive.
+- **Members and Roles live in the Users room (D17).** Where the room is open to the member — the
+  `app-users` module is on and their codes view Users (`membership:read` + `role:read`,
+  `useUsersRoomOpen`) — `#settings/organization/members` and `…/roles` keep their nav entries
+  and hash but render `UsersRoomLink`: what moved and a link to `/users` or `/users/roles`
+  that drops the hash, closing the drawer. Everywhere else (the module off, or a member
+  without `role:read`) the panels stay as they were.
 
 ## 8. IDs and route params
 
@@ -252,15 +279,60 @@ is the separate `AppearanceDialog` on the root route.)
 ```text
 src/lib/routes/
 ├── params.ts        Zod param schemas + parsers (incl. parseOrganizationSlugParam)
-├── builders.ts      organizationDashboard(organizationSlug), … (path constants live here — no paths.ts)
+├── builders.ts      organizationHome(organizationSlug), … (path constants live here — no paths.ts)
+├── <room>-builders.ts  one per clinic room: leads-, appointments-, patients-, medical-, stock-, …
+├── invoice-builders.ts, patient-file-builders.ts
 ├── page-head.ts     manifestHead(manifest) → document title
 ├── page-manifest.ts manifest types/helpers
-└── index.ts
+└── index.ts         re-exports builders.ts only
 ```
 
 Builders return **`{ to, params }` objects consumed by TanStack's typed `Link`/`navigate`** —
 not hand-built strings — so the router's type safety stays intact. Raw-string variants only
 where the router isn't available (e2e helpers). No hand-built route strings anywhere in app code.
+`builders.ts` and the `index.ts` barrel hold the organization-level builders only: the guards,
+the resolver and `routeTree.tsx` import them, so they ride the entry chunk. A room's builders
+live in their own module, imported by path, and load with the code that navigates there.
+
+**Clinic route plumbing (L-12a).** The org index (`/organization/<slug>`) and any
+unknown path under it redirect to the member's **role home** (D25,
+`shared/app/app-home.ts`: Pharmacist Medical, Accountant Payments,
+Marketing Leads, everyone else Today; the first open room when that one is
+closed) — the unknown path with a "Page not found" toast (S:115). When no clinic
+room is open to the member (every module off, D8, or no View), the org index
+renders `AppHomeEmpty` in a room's place instead of redirecting — "Nothing is
+switched on here yet" — and the unknown path lands there (L-63). An unknown organization slug keeps the platform's
+404 (identical for an unknown and a non-member slug, so existence never leaks).
+A URL-driven dialog route renders nothing of its own, so `routeTree.tsx` — the entry
+chunk — carries only its path: its manifest and component load with one lazy registry,
+`src/app/routes/dialog-routes.ts`, and `dialogRoute(name)` awaits the manifest before
+running the same gate as the page under it (gateway, then the org status guard), then
+titles the document from it. The rooms' own pages and tabs reach the entry the same way — one
+lazy module, `src/app/routes/room-routes.ts` (`roomRoute(name)`), which the org shell's loader
+warms. A URL-driven drawer route reads its record through `useDialogRouteRecord`: an id
+that matches nothing leaves the parent page behind, toasts "<Record> not found ·
+it may have been deleted" and replaces the URL with the parent. A room tab reads all
+of its dialog routes through `useRoomDialogRoute` (`shared/hooks/useRoomDialogRoute/`):
+a create with its prefill — read from the same location as the path, so the drawer's
+opening render already has it — a tab's own action route (Stock check's
+`items/check`), or a record route; a create or an action the member's access does
+not allow goes back to the list with the permission toast. A drawer opened
+from another room keeps that room behind it through a `from` search param that
+must match the allow-list in `shared/app/app-referrer.ts`; anything else
+falls back to the drawer's own parent.
+
+**The primary nav is manifest-driven.** A route the nav lists carries its manifest as
+`staticData: { manifest }` in `routeTree.tsx`, and the manifest's `nav` field says how it shows:
+a clinic room names its `section` (order, label, icon and View access follow the section).
+`useAppNav()` (`shared/hooks/useAppNav/`) reads those routes off the tree — so shared code never
+imports a page — keeps the rooms whose module the deployment enables, then filters by the
+manifest's platform permission and the member's clinic access, View-as included. With no room
+enabled the nav is empty and the org home shows its empty state. Every shell's nav and the ⌘K
+"Go to" group draw the same list; each entry links to
+its route's own path with `organizationSlug` as the only param. A clinic room in the URL that the
+access in force can't view — a role previewed from Users › Roles & access, or the member's own
+access after "Exit preview" — is replaced (history `replace`, hash kept) by the first viewable
+room in nav order after Today: `useRoomLanding` in the org layout (Q-U11).
 
 ## 10. Rename inventory (full-name sweep over existing code)
 
@@ -271,7 +343,7 @@ Executed as phase 0 of the epic:
 | `useOrganizationStore` (`shared/store/useOrganizationStore/`) | `useOrganizationStore` (+ eslint runtime-trio config + `fe-file-structure.mdc` trio text) |
 | `OrgPermission` (`core/types/permissions.ts`)                 | `OrganizationPermission`                                                                  |
 | `shared/api/my-orgs.ts`                                       | `shared/tenancy/my-organizations.ts`                                                      |
-| `OrgSwitcher`, `OrgBadges` (`shared/components/`)             | `OrganizationSwitcher`, `OrganizationBadges`                                              |
+| `OrgSwitcher` (`shared/components/`)                          | `OrganizationSwitcher`                                                                    |
 | `TENANT.*` constants                                          | `ORGANIZATION.*` constants                                                                |
 | Settings section id `org-general`                             | scope `organization`, section `general`                                                   |
 
@@ -293,7 +365,7 @@ Executed as phase 0 of the epic:
 | Pages layout         | mirrors URLs; `$param` folders; direct nesting (no `sub-pages/`)                          |
 | `$param` file naming | strip `$`, kebab-case: `organization-slug.route.tsx`, `ORGANIZATION_SLUG.OVERVIEW.md`     |
 | Per-island contract  | 4 files + optional prefixed role files; no `*.layout.tsx`                                 |
-| Settings             | one global modal, `#settings/<scope>/<section>`, in `shared/components/SettingsModal/`    |
+| Settings             | one global drawer, `#settings/<scope>/<section>`, in `shared/components/SettingsModal/`   |
 | Tenancy              | `src/shared/tenancy/` (kernel stays pure); URL is the source of truth                     |
 | Guards               | composable `beforeLoad` chain; resource scope = loader fetch + error mapping              |
 | Route strings        | `lib/routes/` builders returning `{ to, params }`                                         |

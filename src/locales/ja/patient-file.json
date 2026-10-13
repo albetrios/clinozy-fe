@@ -1,0 +1,992 @@
+{
+  "manifest": {
+    "title": "患者ファイル"
+  },
+  "sections": {
+    "timeline": "概要",
+    "overview": "診療メモ",
+    "visits": "来院",
+    "prescriptions": "処方箋",
+    "treatments": "施術",
+    "images": "写真",
+    "reports": "検査報告",
+    "invoices": "請求書",
+    "payments": "支払い",
+    "packages": "パッケージ",
+    "notes": "チームメモ"
+  },
+  "layout": {
+    "notFoundRecord": "患者",
+    "loading": "患者ファイルを開いています"
+  },
+  "fileBar": {
+    "back": "患者一覧に戻る",
+    "backHint": "患者一覧に戻る (Esc)",
+    "patients": "患者",
+    "identity": "{{id}} · {{phone}}",
+    "maskedPhone": "+91 ••••• •{{last4}}",
+    "visitPill": "来院対応中 · 再開",
+    "tabs": "患者のセクション",
+    "notPinned": "未固定 · 開いている間だけ表示",
+    "addToRecord": "記録に追加",
+    "startVisit": "来院を開始",
+    "activity": "アクティビティ",
+    "showActivity": "メッセージとアクティビティを表示",
+    "hideActivity": "メッセージとアクティビティを隠す",
+    "awaitingReply": "返信待ち"
+  },
+  "sectionsPopover": {
+    "trigger": "患者ファイル · すべてのセクション",
+    "label": "患者ファイルのセクション",
+    "title": "患者ファイル",
+    "groups": {
+      "clinical": "診療",
+      "care": "ケア",
+      "billing": "会計",
+      "team": "チーム"
+    },
+    "openNow": "表示中",
+    "pin": "バーに固定",
+    "unpin": "バーから外す",
+    "pinAria": "バーに固定 · {{section}}",
+    "unpinAria": "バーから外す · {{section}}",
+    "footer": "固定したセクションはバーに残ります"
+  },
+  "addMenu": {
+    "label": "記録に追加",
+    "headerFile": "{{name}}さんに追加",
+    "headerSection": "{{name}}さん · 選択済み"
+  },
+  "addActions": {
+    "items": {
+      "prescription": "処方箋",
+      "treatment": "施術",
+      "photo": "写真",
+      "appointment": "予約",
+      "report": "検査報告",
+      "note": "メモ",
+      "invoice": "請求書",
+      "payment": "支払い"
+    },
+    "nothingDue": "{{name}}さんの未払いはありません"
+  },
+  "section": {
+    "primary": {
+      "visits": "新しい予約",
+      "prescriptions": "新しい処方箋",
+      "treatments": "新しい施術",
+      "images": "画像をアップロード",
+      "reports": "検査報告をアップロード",
+      "invoices": "新しい請求書",
+      "payments": "支払いを記録"
+    },
+    "more": "{{name}}さんのその他"
+  },
+  "rail": {
+    "copyId": "患者IDをコピー",
+    "idCopied": "患者IDをコピーしました",
+    "since": "{{date}}から",
+    "joinedToday": "本日登録",
+    "daysAsPatient_other": "患者になって{{count}}日",
+    "monthsAsPatient_other": "患者になって{{count}}か月",
+    "editContact": "連絡先を編集",
+    "reach": "連絡手段",
+    "reachSub": {
+      "whatsappPrimary": "WhatsApp · メイン",
+      "mobile": "携帯",
+      "instagram": "Instagram"
+    },
+    "maskedNumber": "•••• {{last4}}",
+    "showNumber": "番号を表示",
+    "hideNumber": "番号を隠す",
+    "openWhatsApp": "WhatsAppのチャットを新しいタブで開く",
+    "call": "電話する",
+    "openInstagram": "Instagramを新しいタブで開く",
+    "numberCopied": "番号をコピーしました",
+    "handleCopied": "ユーザー名をコピーしました",
+    "about": "概要",
+    "birthdayIn_other": "🎂 あと{{count}}日",
+    "birthdayToday": "🎂 今日",
+    "noAddress": "住所なし",
+    "upNext": "次の予定",
+    "reschedule": "日時を変更",
+    "book": "予約",
+    "notBooked": "未予約",
+    "noUpcoming": "今後の来院なし",
+    "feedback": "フィードバック",
+    "feedbackScore": "{{feel}} · {{score}}/10",
+    "feedbackReview": "{{source}}で{{rating}}★",
+    "checkIns_other": "経過確認{{count}}件",
+    "reviews_other": "レビュー{{count}}件",
+    "feedbackCounts": "{{checkIns}} · {{reviews}}",
+    "noFeedback": "フィードバックはまだありません",
+    "showAmount": "金額を表示",
+    "hideAmount": "金額を隠す",
+    "collect": "集金",
+    "allPaid": "支払い済み · 未払いなし"
+  },
+  "photos": {
+    "albums": {
+      "general": "一般",
+      "private": "プライベート",
+      "lhr": "LHR"
+    },
+    "albumTabs": "アルバム",
+    "count_other": "写真{{count}}枚",
+    "visitFilter": {
+      "label": "来院",
+      "all": "すべての写真",
+      "allSub": "{{album}}に{{count}}枚",
+      "none": "来院に紐付けなし",
+      "noneSub": "カルテからアップロード",
+      "visit": "{{day}} · {{service}}",
+      "visitSub": "#{{seq}} · {{status}}"
+    },
+    "sizes": {
+      "label": "サムネイルのサイズ",
+      "small": "小さいサムネイル",
+      "medium": "中くらいのサムネイル",
+      "large": "大きいサムネイル",
+      "smallShort": "S",
+      "mediumShort": "M",
+      "largeShort": "L"
+    },
+    "tile": {
+      "open": "{{name}}を開く",
+      "edit": "詳細を編集",
+      "editHint": "名前・日付・部位を編集",
+      "delete": "写真を削除"
+    },
+    "loadMore_other": "さらに読み込む · 残り{{count}}枚",
+    "empty": {
+      "title": "{{album}}にはまだ写真がありません",
+      "body": "ここに写真をドラッグするか、パソコンからアップロードしてください。"
+    },
+    "upload": "画像をアップロード",
+    "notImages": "画像ファイルをドロップしてください",
+    "uploaded_other": "写真{{count}}枚を{{album}}にアップロードしました",
+    "delete": {
+      "title": "この写真を削除しますか?",
+      "reasons": {
+        "wrongPatient": "患者の取り違え",
+        "blurry": "ぼやけている / 撮り直し",
+        "duplicate": "重複",
+        "other": "その他"
+      },
+      "deleted": "写真を削除しました"
+    },
+    "bodyParts": {
+      "face": "顔",
+      "scalp": "頭皮",
+      "hair": "髪",
+      "body": "体",
+      "chest": "胸",
+      "back": "背中",
+      "underarm": "わき",
+      "legs": "脚",
+      "arms": "腕",
+      "other": "その他",
+      "upperLip": "鼻下",
+      "chin": "あご",
+      "neck": "首",
+      "hands": "手",
+      "fullBody": "全身"
+    },
+    "viewer": {
+      "label": "写真ビューアー",
+      "position": "{{index}} / {{total}}",
+      "close": "ビューアーを閉じる",
+      "closeHint": "閉じる (Esc)",
+      "previous": "前の写真",
+      "previousHint": "前へ (←)",
+      "next": "次の写真",
+      "nextHint": "次へ (→)",
+      "zoom": "ズーム",
+      "zoomOut": "縮小",
+      "zoomOutHint": "縮小 (−)",
+      "zoomIn": "拡大",
+      "zoomInHint": "拡大 (+)",
+      "zoomReset": "画面に合わせる (0)",
+      "hints": {
+        "browse": "← → 切り替え",
+        "zoom": "スクロールまたは + − でズーム",
+        "pan": "ドラッグで移動 · ダブルクリックでリセット",
+        "close": "Esc で閉じる"
+      },
+      "missing": "プレビューは利用できません",
+      "notFoundRecord": "写真"
+    },
+    "details": {
+      "title": "写真の詳細",
+      "sub": "任意 · 名前・日付・部位があると後で見つけやすくなります",
+      "name": "名前",
+      "namePlaceholder": "例: ピーリング前の左頬",
+      "date": "日付",
+      "album": "アルバム",
+      "bodyPart": "部位",
+      "optional": "任意",
+      "visit": "来院",
+      "visitHint": "任意 · その予約に写真を紐付けます",
+      "notAttached": "紐付けなし",
+      "save": "詳細を保存",
+      "saved": "写真の詳細を保存しました",
+      "stage": "段階"
+    },
+    "loading": "写真を読み込んでいます",
+    "stages": {
+      "before": "施術前",
+      "after": "施術後"
+    }
+  },
+  "rx": {
+    "record": "処方箋",
+    "title": {
+      "create": "新しい処方箋",
+      "edit": "処方箋を編集"
+    },
+    "sub": "{{name}} · {{id}}",
+    "medicines_other": "薬{{count}}件",
+    "quickFill": {
+      "print": "処方箋を印刷",
+      "repeat": "前回の処方箋 {{number}} を繰り返す"
+    },
+    "steps": {
+      "prescription": "処方箋",
+      "medicines": "薬",
+      "notes": "臨床メモ"
+    },
+    "date": "日付",
+    "doctor": "医師",
+    "doctorPlaceholder": "医師を選択",
+    "quick": {
+      "placeholder": "薬・用量・タイミングを入力 · 例: flu 0-0-1 af 10d",
+      "hint": "od · bd · tds · hs · af/bf · 5d · x8",
+      "groups": {
+        "all": "すべて",
+        "oral": "内服",
+        "topical": "外用"
+      },
+      "newMedicine": "リストにない薬",
+      "lastSaved": "前回の用量を保存済み",
+      "noDosage": "前回の用量なし",
+      "inStock_other": "在庫 {{count}}",
+      "outOfStock": "在庫切れ",
+      "added": "{{name}} を追加しました",
+      "qty": "×{{qty}}"
+    },
+    "items": {
+      "label": "薬",
+      "medicine": "薬",
+      "dose": "用量 · 朝 昼 夜",
+      "meal": "食事",
+      "where": "部位",
+      "qty": "数量",
+      "searchMedicine": "薬を検索",
+      "addMedicine": "薬を追加",
+      "use": "使用",
+      "note": "メモ · 例: 10日間、薄く塗る、日光を避ける"
+    },
+    "dose": {
+      "group": "用量 朝 · 昼 · 夜",
+      "times": {
+        "morning": "朝",
+        "afternoon": "昼",
+        "night": "夜"
+      },
+      "on": "{{time}} · {{taps}} — クリックで変更",
+      "off": "{{time}} · なし — クリックで変更",
+      "sos": "SOS",
+      "sosHint": "必要なときのみ (SOS)"
+    },
+    "meal": {
+      "before": "食前",
+      "after": "食後",
+      "beforeHint": "食前",
+      "afterHint": "食後",
+      "more": "ほかのタイミング",
+      "change": "{{timing}} · 変更"
+    },
+    "timings": {
+      "empty_stomach": "空腹時",
+      "with_meal": "食事と一緒に",
+      "morning": "朝",
+      "night": "夜",
+      "morning_night": "朝と夜",
+      "thrice_week": "週3回",
+      "once_week": "週1回",
+      "alternate_days": "1日おき"
+    },
+    "places": {
+      "face": "顔",
+      "scalp": "頭皮",
+      "hair": "髪",
+      "body": "体",
+      "underarm": "わき",
+      "neck": "首",
+      "back": "背中",
+      "chest": "胸",
+      "hands": "手",
+      "legs": "脚",
+      "feet": "足",
+      "lips": "唇",
+      "underEyes": "目の下",
+      "affectedArea": "患部"
+    },
+    "notes": {
+      "advice": "メモ",
+      "advicePlaceholder": "患者さんへのアドバイス",
+      "lab": "検査結果",
+      "labPlaceholder": "推奨検査または結果",
+      "procedure": "本日の処置",
+      "procedurePlaceholder": "本日行ったこと"
+    },
+    "daysNote_other": "{{count}}日間",
+    "dayWords": "日, 日間",
+    "save": {
+      "create": "処方箋を保存",
+      "edit": "変更を保存",
+      "sell": "保存して販売",
+      "visit": "承認 · 印刷 · 薬局へ送信",
+      "summary": "{{medicines}} · {{doctor}}",
+      "noMedicine": "薬を追加してください",
+      "saved": "処方箋を保存しました",
+      "savedNumber": "処方箋 {{number}} を保存しました",
+      "approve": "保存して承認",
+      "approvedNumber": "処方箋 {{number}} を承認しました"
+    },
+    "delete": {
+      "title": "この処方箋を削除しますか？",
+      "deleted": "処方箋を削除しました"
+    },
+    "preview": "処方箋 {{number}}",
+    "status": {
+      "draft": "下書き",
+      "approved": "承認済み"
+    },
+    "approvedNote": "承認済み · 承認済みの処方箋は変更できません"
+  },
+  "treatment": {
+    "record": "施術",
+    "title": {
+      "create": "新しい施術",
+      "edit": "施術を編集"
+    },
+    "sub": "項目はクリニックの専門分野に合わせています · 必要なら切り替えてください",
+    "session": "{{session}}回目",
+    "quickFill": {
+      "next": "{{name}} の次の回",
+      "checkIn": "経過を記録"
+    },
+    "type": "種類",
+    "templates": {
+      "skin": "肌 · レーザー",
+      "dental": "歯科",
+      "physio": "理学療法",
+      "gynac": "婦人科",
+      "general": "一般"
+    },
+    "steps": {
+      "session": "回",
+      "details": "{{template}} の詳細",
+      "aftercare": "アフターケア"
+    },
+    "name": "施術",
+    "namePlaceholder": "選択または入力",
+    "sessionNo": "回数",
+    "doctor": "医師",
+    "doctorPlaceholder": "医師を選択",
+    "therapist": "施術者",
+    "therapistPlaceholder": "施術者を選択",
+    "skin": {
+      "therapyType": "施術の種類",
+      "therapyTypes": {
+        "laser": "レーザー",
+        "peel": "ピーリング",
+        "facial": "フェイシャル",
+        "injectable": "注入",
+        "microneedling": "マイクロニードル"
+      },
+      "bodyPart": "部位",
+      "pickAny": "複数選択可",
+      "areas": {
+        "face": "顔",
+        "upperLip": "鼻下",
+        "chin": "あご",
+        "underarm": "わき",
+        "arms": "腕",
+        "legs": "脚",
+        "back": "背中",
+        "chest": "胸",
+        "fullBody": "全身"
+      },
+      "skinType": "スキンタイプ",
+      "skinTypeValue": "タイプ {{type}}",
+      "machine": "機器",
+      "machinePlaceholder": "例: Soprano Ice",
+      "wavelength": "波長",
+      "startReading": "開始時カウント",
+      "endReading": "終了時カウント",
+      "readingPlaceholder": "ショット数 / カウンター",
+      "power": "出力 · 周波数 · PD · モード",
+      "powerPlaceholder": "例: 10 J · 3 Hz · 20 ms · HR"
+    },
+    "dental": {
+      "procedure": "処置",
+      "procedures": {
+        "scaling": "スケーリング",
+        "filling": "充填",
+        "rct": "根管治療",
+        "extraction": "抜歯",
+        "crown": "クラウン",
+        "implant": "インプラント",
+        "whitening": "ホワイトニング"
+      },
+      "teeth": "歯",
+      "teethHint": "FDI 表記 · タップで選択",
+      "quadrants": {
+        "upperRight": "右上",
+        "upperLeft": "左上",
+        "lowerRight": "右下",
+        "lowerLeft": "左下"
+      },
+      "tooth": "歯 {{tooth}}",
+      "material": "材料",
+      "materialPlaceholder": "例: コンポジット A2",
+      "anaesthesia": "麻酔",
+      "given": "あり",
+      "notGiven": "なし"
+    },
+    "physio": {
+      "region": "部位",
+      "regions": {
+        "neck": "首",
+        "shoulder": "肩",
+        "back": "背中",
+        "hip": "股関節",
+        "knee": "膝",
+        "ankle": "足首"
+      },
+      "modality": "療法",
+      "modalities": {
+        "tens": "TENS",
+        "ift": "IFT",
+        "ultrasound": "超音波",
+        "exercise": "運動療法",
+        "manualTherapy": "徒手療法",
+        "traction": "牽引"
+      },
+      "painBefore": "施術前の痛み",
+      "painAfter": "施術後の痛み",
+      "painHint": "0–10",
+      "exercises": "自宅での運動",
+      "exercisesPlaceholder": "セット数、回数、頻度"
+    },
+    "gynac": {
+      "visitType": "受診の種類",
+      "visitTypes": {
+        "anc": "妊婦健診",
+        "pnc": "産後健診",
+        "infertility": "不妊",
+        "contraception": "避妊",
+        "general": "一般"
+      },
+      "lmp": "最終月経",
+      "gestation": "妊娠週数",
+      "weeks": "週",
+      "bp": "血圧",
+      "bpPlaceholder": "120/80",
+      "weight": "体重",
+      "kg": "kg",
+      "findings": "所見",
+      "findingsPlaceholder": "診察所見"
+    },
+    "general": {
+      "area": "部位",
+      "areaPlaceholder": "カンマ区切り",
+      "parameters": "パラメーター",
+      "parametersPlaceholder": "1行に1つ、例: 用量: 2 ml"
+    },
+    "aftercare": {
+      "remark": "備考",
+      "remarkPlaceholder": "反応、アドバイス、次の予定",
+      "call": "アフターケアの電話",
+      "callHint": "経過と実践状況を聞くタスクを作成します",
+      "calls": {
+        "none": "電話なし",
+        "next_day": "翌日",
+        "in_week": "1週間後",
+        "in_two_days": "2日後"
+      },
+      "feedback": "この施術のフィードバック",
+      "feedbackItem": "{{date}} · {{feel}} {{score}}/10",
+      "noCheckIn": "まだチェックインはありません · 上の「チェックインを記録」を使ってください"
+    },
+    "save": {
+      "create": "施術を保存",
+      "edit": "変更を保存",
+      "saved": "施術を保存しました"
+    },
+    "package": {
+      "label": "パッケージから",
+      "hint": "保存すると1回分を使用します",
+      "option": "{{name}} · {{total}} 回中 {{used}} 回使用",
+      "numbered": "パッケージで決まります",
+      "uses": "{{name}} を1回使用"
+    },
+    "reverse": {
+      "title": "この施術を取り消しますか？",
+      "body": "記録はファイルに残り、取り消し済みと表示されます。使用したパッケージの回数は戻ります。元に戻せません。",
+      "action": "取り消す",
+      "done": "施術を取り消しました",
+      "status": "取り消し済み",
+      "note": "{{date}} に取り消し · {{reason}}",
+      "reasons": {
+        "mistake": "誤って記録",
+        "wrongPatient": "患者の取り違え",
+        "notDone": "施術は未実施"
+      }
+    }
+  },
+  "report": {
+    "record": "検査報告",
+    "types": {
+      "lab": "検査",
+      "scan": "画像",
+      "consent": "同意書",
+      "other": "その他"
+    },
+    "steps": {
+      "report": "検査報告",
+      "details": "詳細",
+      "notes": "メモ"
+    },
+    "type": "種類",
+    "name": "名前",
+    "date": "日付",
+    "file": "ファイル",
+    "upload": {
+      "title": "検査報告をアップロード",
+      "namePlaceholder": "例: 血液検査",
+      "drop": "報告をドロップ、または参照",
+      "fileHint": "PDF・JPG・PNG · {{limit}}まで",
+      "remove": "{{name}}を削除",
+      "note": "メモ",
+      "notePlaceholder": "任意",
+      "summary": "{{type}} · {{files}}",
+      "save": "アップロード",
+      "noName": "報告の名前を入力してください",
+      "uploaded": "検査報告をアップロードしました",
+      "files_other": "ファイル{{count}}件"
+    },
+    "view": {
+      "sub": "{{name}} · {{date}}",
+      "notes": "メモ",
+      "noNotes": "この報告にメモはありません",
+      "download": "ダウンロード",
+      "downloading": "{{name}} をダウンロードしています",
+      "fileGone": "利用できなくなりました"
+    }
+  },
+  "package": {
+    "title": "パッケージを編集",
+    "summary": "施術が完了すると回数がカウントされます",
+    "save": "変更を保存",
+    "card": {
+      "left_other": "残り {{count}} 回",
+      "used": "{{total}} 回中 {{used}} 回使用",
+      "validTill": "{{date}} まで有効",
+      "book": "次回を予約",
+      "empty": "パッケージはまだありません",
+      "noExpiry": "有効期限なし",
+      "statuses": {
+        "used_up": "使い切り",
+        "expired": "期限切れ"
+      },
+      "edit": "編集"
+    },
+    "validUntil": "有効期限",
+    "sessions": "回数",
+    "saved": "パッケージを保存しました"
+  },
+  "clinical": {
+    "titles": {
+      "complaints": "主訴",
+      "diagnosis": "診断",
+      "treatmentSuggestions": "提案中の施術",
+      "futureSuggestions": "今後の提案"
+    },
+    "newHint": "前回の来院以降に追加",
+    "empty": "まだありません",
+    "placeholder": "入力して Enter で追加",
+    "add": "{{title}}を追加",
+    "remove": "{{name}}を削除",
+    "newCount_other": "新規{{count}}件",
+    "removed": "{{name}}を削除しました"
+  },
+  "feedback": {
+    "title": "フィードバック",
+    "log": "フィードバックを記録",
+    "typesLabel": "フィードバックの種類",
+    "types": {
+      "all": "すべて",
+      "visit": "診察",
+      "treatment": "施術のフィードバック"
+    },
+    "previous": "前へ",
+    "next": "次へ",
+    "emptyTitle": "まだフィードバックはありません",
+    "emptySub": "次回の来院後に経過確認かレビューを記録 · フィードバックを記録",
+    "notRated": "未評価",
+    "score": "{{score}}/10",
+    "stars": "{{rating}}/5",
+    "trendUp": "▲ {{points}}",
+    "trendDown": "▼ {{points}}",
+    "trendSame": "= 変化なし",
+    "followed": "指示の実行: {{how}}",
+    "appointment": "予約 {{number}}",
+    "visitWith": "{{service}} · 予約 {{number}}",
+    "visit": "来院",
+    "noVisit": "来院に紐付いていません",
+    "noNow": "現在の状態のメモなし",
+    "noText": "レビュー本文なし",
+    "nextLabel": "次",
+    "linkLabel": "リンク",
+    "noNext": "次の予定の記載なし",
+    "noLink": "リンクなし",
+    "actions": "操作",
+    "edit": "編集",
+    "remove": "削除",
+    "actionNeeded": "対応が必要",
+    "logAction": "対応を記録",
+    "nextAction": "次の対応",
+    "actionBy": "✓ {{action}} · {{name}}",
+    "actionLogged": "✓ {{action}} · 記録済み",
+    "actionKinds": {
+      "doctor_called": "医師が電話",
+      "asked_revisit": "再来院を依頼",
+      "free_review_booked": "無料の確認来院を予約",
+      "plan_changed": "プランを変更",
+      "replied_google": "Google で返信",
+      "replied_instagram": "Instagram で返信",
+      "replied_whatsapp": "WhatsApp で返信",
+      "refund_credit": "返金 / クレジットを付与",
+      "other": "その他"
+    },
+    "loadMore": "さらに読み込む",
+    "loading": "読み込み中…",
+    "removeCheckIn": "この経過確認を削除しますか？",
+    "removeReview": "このレビューを削除しますか？",
+    "checkInRemoved": "経過確認を削除しました",
+    "reviewRemoved": "レビューを削除しました",
+    "more_other": "さらに{{count}}件",
+    "files_other": "▶ {{count}}件のファイル"
+  },
+  "checkIn": {
+    "titles": {
+      "visit": "来院後の経過確認",
+      "aftercare": "アフターケアの経過確認"
+    },
+    "last": "前回の経過確認 {{date}}: {{feel}}",
+    "steps": {
+      "now": "現在の状態",
+      "followed": "実行したこと",
+      "next": "次の計画"
+    },
+    "feel": "前回の来院と比べて",
+    "score": "患者さん自身の評価",
+    "scoreHint": "1 = とても不満 · 10 = とても満足",
+    "words": "患者さんの言葉",
+    "wordsLast": "前回: {{text}}",
+    "wordsPlaceholder": "変わったこと、まだ気になること",
+    "followed": "アドバイスの実行",
+    "followedValues": {
+      "fully": "すべて",
+      "mostly": "ほぼ",
+      "partly": "一部",
+      "not_at_all": "まったく"
+    },
+    "details": "詳細",
+    "detailsLast": "前回のアドバイス: {{text}}",
+    "detailsPlaceholder": "ホームケア、薬、日焼け止め、欠席したセッション",
+    "plan": "計画",
+    "planPlaceholder": "次に何をいつ行うか",
+    "offerings": "提案に追加",
+    "offeringsHint": "任意 · 患者さんの提案に「予定」として追加",
+    "offeringsPlaceholder": "メニューを検索",
+    "offeringSessions_other": "{{price}} · {{count}}回",
+    "save": "経過確認を保存",
+    "saveEdit": "変更を保存",
+    "noFeel": "現在の状態を選んでください",
+    "saved": "{{name}} さんの経過確認を保存しました",
+    "added": " · 提案に{{count}}件追加",
+    "callBack": " · 医師の折り返しタスクを作成",
+    "updated": "経過確認を更新しました",
+    "record": "経過確認",
+    "noScore": "患者さん自身の評価を選んでください",
+    "offeringsPlanned": "提案に追加済み"
+  },
+  "review": {
+    "title": "レビューを記録",
+    "sub": "{{name}} · 誰でも後で見られるよう患者ファイルに保存されます",
+    "steps": {
+      "review": "レビュー",
+      "details": "詳細",
+      "notes": "メモ"
+    },
+    "where": "掲載先",
+    "rating": "評価",
+    "link": "リンク",
+    "linkHint": "Google レビュー、投稿、ドライブのリンク",
+    "linkPlaceholder": "https://",
+    "files": "動画またはスクリーンショット",
+    "filesDrop": "動画またはスクリーンショットをドロップ",
+    "filesHint": "MP4、MOV、JPG、PNG · {{limit}}まで",
+    "removeFile": "{{name}}を削除",
+    "attached": "添付済み",
+    "text": "内容",
+    "textPlaceholder": "レビュー本文か短い要約を貼り付け",
+    "save": "レビューを保存",
+    "saveEdit": "変更を保存",
+    "saved": "{{name}} さんの {{source}} レビュー（{{rating}}★）を保存しました",
+    "callBack": " · 折り返しタスクを作成",
+    "updated": "レビューを更新しました",
+    "badLink": "https:// のリンクを追加してください",
+    "notRated": "未評価",
+    "record": "レビュー",
+    "attachedFiles_other": "{{count}}件のファイル"
+  },
+  "logFeedback": {
+    "title": "フィードバックを記録",
+    "sub": "{{name}} · 記録する内容を選んでください",
+    "groups": {
+      "checkIn": "経過確認",
+      "treatment": "施術のフィードバック",
+      "review": "レビュー"
+    },
+    "consultation": "診察",
+    "after": "{{name}} の後",
+    "close": "閉じる",
+    "hints": {
+      "consultation": "来院後 · 現在の状態 · 守れたこと · 次の計画",
+      "google": "リンクとレビュー本文を貼り付け",
+      "video": "体験談の動画をアップロード",
+      "other": "評価・本文・スクリーンショット"
+    }
+  },
+  "tables": {
+    "export": "エクスポート",
+    "exported_other": "{{count}} 行を CSV でエクスポートしました",
+    "visits": {
+      "records": "予約",
+      "count_other": "{{count}} 件の予約",
+      "empty": "予約はまだありません"
+    },
+    "prescriptions": {
+      "records": "処方",
+      "count_other": "{{count}} 件の処方",
+      "empty": "処方はまだありません",
+      "copied": "処方をコピーしました"
+    },
+    "treatments": {
+      "records": "施術",
+      "count_other": "{{count}} 件の施術",
+      "empty": "施術はまだありません",
+      "copied": "{{session}} 回目を追加しました",
+      "feedbackScore": "{{feel}} · {{score}}/10",
+      "checkInOn": "経過確認 {{date}}",
+      "callNextDay": "翌日に電話",
+      "callInDays_other": "{{count}} 日後に電話"
+    },
+    "reports": {
+      "records": "レポート",
+      "count_other": "{{count}} 件のレポート",
+      "empty": "レポートはまだありません",
+      "fileSub": "{{format}} · ご希望に応じて患者に共有",
+      "deleteTitle": "このレポートを削除しますか？",
+      "deleted": "レポートを削除しました"
+    },
+    "invoices": {
+      "records": "請求書",
+      "count_other": "{{count}} 件の請求書",
+      "empty": "請求書はまだありません",
+      "countDue_other": "{{count}} 件の請求書 · 未払い {{due}}",
+      "itemCount_other": "{{count}} 品目",
+      "due": "未払い {{amount}}",
+      "nothingDue": "未払いなし"
+    },
+    "payments": {
+      "records": "取引",
+      "count_other": "{{count}} 件の取引",
+      "empty": "支払いはまだありません",
+      "received": "+ {{amount}}",
+      "paid": "− {{amount}}"
+    },
+    "columns": {
+      "id": "ID",
+      "offering": "メニュー",
+      "doctor": "医師",
+      "status": "状態",
+      "date": "日付",
+      "medicines": "薬",
+      "notes": "メモ",
+      "updated": "更新",
+      "treatment": "施術",
+      "area": "部位",
+      "team": "チーム",
+      "session": "回数",
+      "details": "詳細",
+      "feedback": "フィードバック",
+      "report": "レポート",
+      "type": "種類",
+      "invoice": "請求書",
+      "items": "品目",
+      "bill": "請求額",
+      "paid": "支払済 / 未払い",
+      "receipt": "領収書",
+      "when": "日時",
+      "mode": "方法",
+      "amount": "金額",
+      "by": "担当"
+    },
+    "actions": {
+      "print": "印刷",
+      "preview": "プレビュー",
+      "copyRx": "処方をコピー",
+      "sell": "薬を販売",
+      "copyInvoice": "請求書をコピー",
+      "checkIn": "経過確認",
+      "copyTreatment": "次回の施術としてコピー",
+      "open": "開く",
+      "pay": "支払いを記録",
+      "edit": "編集",
+      "delete": "削除"
+    }
+  },
+  "notes": {
+    "label": "新しいメモ",
+    "placeholder": "チームへのメモを追加",
+    "add": "メモを追加",
+    "by": "{{name}} · {{date}}",
+    "empty": "メモはまだありません"
+  },
+  "timeline": {
+    "open": "{{card}}を開く",
+    "clinical": {
+      "suggested": "提案",
+      "later": "今後",
+      "smartLabel": "スマートメモ",
+      "smartPlaceholder": "スマートメモ · 自由に入力（例: {{example}}）",
+      "smartExample": "2か月前から抜け毛、PRPを提案",
+      "add": "追加",
+      "added_other": "メモから{{count}}件を追加しました",
+      "nothing": "まだ何も認識されていません"
+    },
+    "visits": {
+      "empty": "来院はまだありません"
+    },
+    "photos": {
+      "upload": "アップロード",
+      "empty": "写真はまだありません · 最初の1枚をアップロード"
+    },
+    "packages": {
+      "progress": "{{used}} / {{total}}",
+      "done": "すべての回が完了",
+      "empty": "有効なパッケージはありません"
+    },
+    "prescriptions": {
+      "title": "処方箋 {{number}}"
+    },
+    "treatments": {
+      "sub": "{{session}}回目 · {{date}}"
+    },
+    "reports": {
+      "sub": "{{type}} · {{date}}"
+    },
+    "notes": {
+      "label": "チームメモ",
+      "placeholder": "チームへのメモを書く…",
+      "post": "投稿"
+    },
+    "activity": {
+      "filtersLabel": "アクティビティの絞り込み",
+      "notes": "メモ",
+      "empty": "アクティビティはまだありません",
+      "masked": "₹ ••••"
+    },
+    "billing": {
+      "due": "未払い",
+      "paid": "支払済み",
+      "show": "金額を表示",
+      "hide": "金額を隠す",
+      "invoice": "{{type}}請求書 {{number}}",
+      "sub": "{{date}} · {{amount}}",
+      "collect": "支払いを受け取る"
+    }
+  },
+  "visitFlow": {
+    "pill": "来院対応中",
+    "lead": "今日の来院に必要なことを1画面で",
+    "pause": "一時停止",
+    "complete": "✓ 来院を完了",
+    "completed": "来院を完了しました",
+    "packageUsed": "パッケージを1回使用",
+    "followUp": "フォローアップを{{date}}に設定",
+    "loading": "来院情報",
+    "steps": {
+      "checks": "受付と安全確認",
+      "rx": "処方箋",
+      "treatment": "施術",
+      "invoice": "請求書",
+      "collect": "集金"
+    },
+    "checks": {
+      "labels": {
+        "consent": "同意書に署名済み",
+        "photos": "ビフォー写真を撮影済み",
+        "allergies": "アレルギーと服用薬を確認済み"
+      },
+      "hints": {
+        "consent": "これがないと施術を開始できません",
+        "photos": "アフター写真と自動でペアになります",
+        "allergies": "来院のたびに確認します"
+      },
+      "left_other": "残りの確認 {{count}} 件",
+      "done": "すべての確認が完了"
+    },
+    "rx": {
+      "kit": "⚡ {{name}}",
+      "write": "処方箋を書く",
+      "empty": "キットからワンタップで、または手動で作成",
+      "prescribed": "{{name}} を処方しました"
+    },
+    "treatment": {
+      "repeat": "⚡ 繰り返す · {{name}} · {{session}}回目",
+      "new": "新しい施術",
+      "memo": "この患者について記憶: {{memo}}",
+      "pack": "{{name}} を1回使用",
+      "blocked": "先に受付を完了してください",
+      "empty": "今日の施術を記録",
+      "last": "前回の設定: {{memo}}",
+      "done": "{{name}} · {{session}}回目",
+      "repeated": "{{session}}回目を前回の設定で記録しました",
+      "repeatPackage": "⚡ 繰り返す · {{name}}"
+    },
+    "paused": "来院対応を一時停止中",
+    "resume": "再開",
+    "invoice": {
+      "create": "来院から請求書を作成",
+      "custom": "カスタム請求書",
+      "nothing": "請求するものはありません",
+      "covered": "パッケージで対応 · 請求なし",
+      "empty": "まだ請求するものはありません",
+      "done": "{{number}} · {{total}}",
+      "ready_other": "{{count}} 品目の準備完了"
+    },
+    "collect": {
+      "action": "{{amount}} を集金",
+      "due": "未払い {{amount}}",
+      "nothing": "未払いなし",
+      "waiting": "先に来院の請求書を作成してください"
+    }
+  }
+}

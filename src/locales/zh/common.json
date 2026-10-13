@@ -98,13 +98,24 @@
     "description": "应用的新版本已就绪。",
     "refresh": "立即刷新"
   },
+  "cells": {
+    "patient": "患者",
+    "patientMark": "患",
+    "leadMark": "潜",
+    "moreCount": "另外 {{count}} 人"
+  },
+  "emptyState": {
+    "fallbackTitle": "这里还没有内容",
+    "filteredTitle": "没有匹配项",
+    "filteredHint": "没有内容符合这些筛选条件。清除筛选即可重新查看全部。",
+    "clearFilters": "清除筛选"
+  },
   "a11y": {
     "close": "关闭",
     "loading": "加载中",
     "loadingNamed": "正在加载 {{name}}…",
     "loadingPage": "正在加载页面",
     "toggleTheme": "切换主题",
-    "openAppearance": "打开外观",
     "cookieConsent": "Cookie 同意",
     "rowsPerPage": "每页行数",
     "goFirstPage": "第一页",
@@ -114,84 +125,146 @@
     "selectAll": "全选",
     "copyAccountId": "复制账户 ID",
     "onboardingProgress": "入门进度",
-    "themeCode": "主题代码",
     "mode": "模式"
   },
   "appearance": {
     "themeTitle": "主题",
     "themeLocked": "主题由您所在组织的配置管理，无法在此处更改。",
-    "themeDescription": "具名强调色预设——或复制链接／粘贴主题代码以重现完全相同的外观。",
-    "presetAria": "具名强调色预设",
-    "copyLink": "复制链接",
-    "shuffleHint": "随机一次即可生成代码。",
-    "codeLabel": "代码：{{seed}}",
-    "codePlaceholder": "粘贴主题代码",
-    "apply": "应用",
-    "pickAnyColour": "选择任意颜色",
     "modeTitle": "模式",
-    "modeDescription": "已保存在此设备上。",
-    "colourTitle": "颜色",
-    "colourDescription": "强调色、图表与中性底色。",
-    "accentColour": "强调色",
-    "chartColour": "图表颜色",
-    "baseColour": "底色",
-    "harmony": "配色关系",
-    "harmonyAria": "配色关系",
-    "accentIntensity": "强调色强度",
-    "typeTitle": "字体与形状",
-    "typeDescription": "字体、圆角半径与菜单表面。",
-    "bodyFont": "正文字体",
-    "headingFont": "标题字体",
-    "radius": "圆角半径",
-    "shapeLanguage": "形状语言",
-    "typeScale": "字号比例",
-    "menu": "菜单",
-    "menuAria": "菜单样式",
-    "iconsTitle": "图标",
-    "iconsDescription": "线条粗细、颜色与图标集。",
-    "iconWeight": "图标粗细",
-    "iconColour": "图标颜色",
-    "iconLibrary": "图标库",
-    "layoutTitle": "布局",
-    "layoutDescription": "主工作区的宽度——标准适合仪表板，阅读宽度适合专注阅读。",
-    "contentWidth": "内容宽度",
-    "dashboardTitle": "仪表盘",
-    "dashboardDescription": "仪表盘各区域的排列方式。",
-    "dashboardArrangement": "布局",
-    "surfaceTitle": "表面与动效",
-    "surfaceDescription": "间距、层次、对比度以及动效表现。",
-    "density": "密度",
-    "contrast": "对比度",
-    "elevation": "层次",
-    "separation": "分隔",
-    "separationAria": "表面分隔",
-    "motion": "动效",
-    "focusRing": "焦点环",
-    "notificationsTitle": "通知",
-    "notificationsDescription": "选择或随机一种提示样式——预览使用您当前的主题令牌。",
-    "toastDesign": "提示样式",
-    "position": "位置",
-    "positionAria": "提示位置",
-    "previewSuccess": "成功",
-    "previewError": "错误",
-    "previewWarning": "警告",
-    "previewInfo": "信息",
-    "shuffleSection": "随机{{section}}",
-    "sectionColour": "颜色",
-    "sectionType": "字体与形状",
-    "sectionSurface": "表面与动效",
-    "sectionDashboard": "仪表盘布局",
-    "sectionNotifications": "通知样式",
-    "custom": "自定义",
-    "customWith": "自定义 — {{look}}"
+    "modeDescription": "已保存在此设备上。"
   },
   "table": {
-    "searchPlaceholder": "搜索..."
+    "searchPlaceholder": "搜索...",
+    "empty": "没有结果。",
+    "sortBy": "按{{column}}排序",
+    "actions": "操作",
+    "moreActions": "更多操作",
+    "columns": {
+      "trigger": "显示或隐藏列",
+      "title": "列 · 显示 {{shown}}/{{total}}",
+      "showAll": "显示所有列",
+      "recommendedHides": "推荐设置隐藏 {{count}} 列",
+      "tapForRecommended": "再次点按恢复推荐设置",
+      "allShown": "已显示全部 {{count}} 列",
+      "hiddenCount": "已隐藏 {{count}} 列",
+      "search": "搜索列",
+      "shown": "显示 {{shown}}/{{total}}",
+      "viewGroup": "视图",
+      "columnsGroup": "列"
+    },
+    "fold": {
+      "showAll_other": "{{count}} 列收在行内 · 全部显示",
+      "showAllHint": "并排显示所有列（可横向滚动）",
+      "fitToWidth": "适应宽度",
+      "fitToWidthHint": "将多出的列收进每一行"
+    },
+    "selection": {
+      "selectRow": "选择 {{name}}",
+      "selected": "已选 {{count}} 项",
+      "selectAllCount": "全选 {{count}} 项",
+      "clear": "清除选择",
+      "clearHint": "清除选择 · Esc",
+      "escape": "Esc",
+      "bulkActions": "批量操作"
+    },
+    "length": {
+      "allLoaded": "已加载全部{{records}}",
+      "loadingMore": "正在加载更多{{records}}"
+    },
+    "savedViews": {
+      "label": "已保存的视图",
+      "apply": "应用视图",
+      "remove": "移除视图",
+      "removed": "视图已移除",
+      "defaultName": "我的视图"
+    }
   },
   "consent": {
-    "description": "我们使用 Cookie 进行产品分析，以改进 {{productName}}。基本功能和错误监控无需 Cookie 即可运行。",
+    "description": "经您同意，我们会使用 PostHog 分析和 Sentry 会话录制来改进 {{productName}}。其他一切功能（包括错误报告）无需它们即可运行。关闭即表示拒绝。",
     "privacyPolicy": "隐私政策",
     "accept": "接受",
-    "decline": "拒绝"
+    "decline": "拒绝",
+    "closeAndDecline": "关闭（视为拒绝）"
+  },
+  "confirm": {
+    "accept": "确认",
+    "cancel": "取消",
+    "fallbackDescription": "请确认此操作。"
+  },
+  "picker": {
+    "placeholder": "请选择…",
+    "search": "搜索{{label}}",
+    "searchDefault": "搜索",
+    "escKey": "Esc",
+    "options": "选项",
+    "recent": "最近",
+    "all": "全部",
+    "create": "创建“{{query}}”",
+    "createNamed": "{{label}}“{{query}}”",
+    "createFull": "新建{{label}}",
+    "createFullQuery": "{{label}} · “{{query}}”",
+    "fullDetails": "填写完整信息",
+    "empty": "暂无可选项",
+    "noResults": "没有与“{{query}}”匹配的结果",
+    "noResultsHint": "请检查拼写或减少字数",
+    "noResultsRemoteHint": "试试姓名、电话号码或 ID",
+    "loadingMore": "正在加载更多",
+    "clear": "清除",
+    "triggerLabel": "{{label}} · {{value}}",
+    "date": {
+      "label": "日期",
+      "placeholder": "选择日期",
+      "search": "输入日期 · 例如 9/12",
+      "today": "今天",
+      "tomorrow": "明天",
+      "yesterday": "昨天",
+      "comingUp": "即将到来",
+      "relative": "{{relative}} · {{date}}"
+    },
+    "time": {
+      "label": "时间",
+      "placeholder": "选择时间"
+    }
+  },
+  "unsavedChanges": {
+    "title": "放弃更改？",
+    "description": "您的更改尚未保存，将会丢失。",
+    "discard": "放弃",
+    "keepEditing": "继续编辑"
+  },
+  "uploadTray": {
+    "label": "上传",
+    "uploading": "正在上传 {{total}} 个中的 {{left}} 个…",
+    "complete": "全部上传完成",
+    "failed_other": "{{count}} 个上传失败",
+    "skipped_other": "已跳过 {{count}} 个超过 {{limit}} 的文件",
+    "show": "显示上传",
+    "hide": "隐藏上传",
+    "uploadFailed": "无法上传",
+    "attachFailed": "无法附加",
+    "retry": "重试 {{name}}",
+    "remove": "移除 {{name}}",
+    "stoppedBySwitch": "上传已停止 · 你已切换工作区",
+    "size": {
+      "kilobytes": "{{value}} KB",
+      "megabytes": "{{value}} MB"
+    }
+  },
+  "splash": {
+    "label": "正在加载 {{productName}}",
+    "greeting": {
+      "morning": "早上好，{{name}}",
+      "afternoon": "下午好，{{name}}",
+      "evening": "晚上好，{{name}}"
+    },
+    "ticker": {
+      "opening": "正在打开{{weekday}}的日程",
+      "syncing": "正在同步患者和潜在客户",
+      "ready": "一切就绪"
+    },
+    "offline": {
+      "message": "无法连接 {{productName}} · 请检查网络连接",
+      "retry": "重试"
+    }
   }
 }

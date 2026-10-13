@@ -33,10 +33,25 @@ export const orgQueryKeys = {
     [...orgQueryKeys.org(organizationId), 'members'] as const,
   membersList: (organizationId: string | null, params: OrgListKeyParams) =>
     [...orgQueryKeys.members(organizationId), 'list', params] as const,
+  /**
+   * Every member at once (the Users room's Team, which searches and sorts in
+   * place) — under the `members` prefix, so every member write refreshes it.
+   */
+  membersAll: (organizationId: string | null) =>
+    [...orgQueryKeys.members(organizationId), 'all'] as const,
   roles: (organizationId: string | null) =>
     [...orgQueryKeys.org(organizationId), 'roles'] as const,
   rolesList: (organizationId: string | null, params: OrgListKeyParams) =>
     [...orgQueryKeys.roles(organizationId), 'list', params] as const,
+  /** Every role at once (Users › Roles & access) — under the `roles` prefix, so every role write refreshes it. */
+  rolesAll: (organizationId: string | null) =>
+    [...orgQueryKeys.roles(organizationId), 'all'] as const,
+  /**
+   * One role's permission codes (an edit's pre-fill, View-as) — under the `roles` prefix, so
+   * every role write refreshes it.
+   */
+  rolePermissions: (organizationId: string | null, roleId: string | undefined) =>
+    [...orgQueryKeys.roles(organizationId), 'permissions', roleId] as const,
   apiKeys: (organizationId: string | null) =>
     [...orgQueryKeys.org(organizationId), 'api-keys'] as const,
   apiKeysList: (organizationId: string | null, params: OrgListKeyParams) =>

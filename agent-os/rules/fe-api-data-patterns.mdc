@@ -97,14 +97,15 @@ Component (useUsers hook)
             → writes auto-carry an X-Idempotency-Key (minted once, reused across retries/replay)
             → in-client retry (exponential backoff + Retry-After for 429/5xx)
             → Vite proxy (/api → backend)
-            → single-flight 401 refresh + one replay (a second 401 → forceLogout)
+            → 401: replay with the current token if it was replaced in flight; else
+              single-flight refresh + replay (at most 2 per request, then forceLogout)
         → TanStack Query (cache update)
     → Component (re-render with data)
 ```
 
 ## Error Handling
 
-- **401 errors**: Handled exclusively by the fetch client — single-flight refresh + one replay; a second 401 after a fresh token means the session is dead → `forceLogout()`
+- **401 errors**: Handled exclusively by the fetch client. clinozy-be keeps one live access token per session (a refresh or workspace switch retires the one before it), so a 401 for a token replaced while the request was in flight is replayed with the current token, no refresh. Otherwise single-flight refresh + replay, at most twice per request; a refused refresh, or a token still rejected after two refreshes, means the session is dead → `forceLogout()`
 - **Network/5xx/429 errors**: Retried by the fetch client (exponential backoff + `Retry-After`, max 3)
 - **Validation errors**: Returned in response body, handled by mutation onError
 - **Query errors**: Logged by QueryCache.onError (non-401 only)

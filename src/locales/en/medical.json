@@ -1,0 +1,658 @@
+{
+  "manifest": {
+    "title": "Medical"
+  },
+  "tabs": {
+    "label": "Medical sections",
+    "sales": "Sales",
+    "medicines": "Medicines",
+    "purchases": "Purchases",
+    "suppliers": "Suppliers",
+    "manufacturers": "Manufacturers",
+    "mrs": "MRs",
+    "payments": "Payments",
+    "groups": {
+      "selling": "Selling",
+      "stock": "Stock",
+      "buying": "Buying",
+      "money": "Money"
+    }
+  },
+  "search": {
+    "placeholder": "Search name, composition, supplier…",
+    "label": "Search medical"
+  },
+  "create": {
+    "sale": "New sale",
+    "medicine": "New medicine",
+    "purchaseOrder": "New purchase order",
+    "supplier": "New supplier",
+    "manufacturer": "New manufacturer",
+    "mr": "New MR",
+    "menu": "Create something else"
+  },
+  "viewActions": {
+    "reorderLow": "Reorder low stock",
+    "sellAllDiscount": "Sell all at 20% off",
+    "removeDiscount": "Remove near-expiry discount",
+    "prescriptions": "Prescriptions to fill",
+    "paymentReminders": "Send payment reminders",
+    "payAllReceived": "Pay all received · {{amount}}"
+  },
+  "filters": {
+    "all": "All",
+    "any": "Any",
+    "stock": "Stock",
+    "lowStock": "Low stock",
+    "expiry": "Nearest expiry",
+    "within30": "Within 30 days",
+    "within60": "Within 60 days",
+    "within90": "Within 90 days",
+    "status": "Status",
+    "stage": "Stage",
+    "manufacturer": "Manufacturer",
+    "manufacturers": "Manufacturers",
+    "suppliers": "Suppliers",
+    "mrs": "MRs"
+  },
+  "table": {
+    "percent": "{{value}}%",
+    "addPhone": "Add phone",
+    "noValue": "—"
+  },
+  "empty": {
+    "hint": "Nothing here yet. Try another tab or search.",
+    "store": "Nothing in the medicine store"
+  },
+  "bulk": {
+    "export": "Export",
+    "exported_one": "{{count}} row exported as CSV",
+    "exported_other": "{{count}} rows exported as CSV"
+  },
+  "toasts": {
+    "discountOn": "20% off on expiring medicines",
+    "discountOnOne": "20% off applied to {{name}}",
+    "discountOff": "Discount removed"
+  },
+  "sales": {
+    "records": "sales",
+    "count_one": "{{count}} sale",
+    "count_other": "{{count}} sales",
+    "columns": {
+      "seq": "Sale",
+      "customer": "Customer",
+      "medicines": "Medicines",
+      "bill": "Bill",
+      "margin": "Margin",
+      "status": "Status",
+      "when": "When"
+    },
+    "patient": "Patient",
+    "contact": "Medical contact",
+    "line": "{{name}} ×{{qty}}",
+    "batches": "Batches: {{batches}}",
+    "returned": "− {{amount}} returned",
+    "refunded": "{{amount}} refunded",
+    "statuses": {
+      "paid": "Paid",
+      "unpaid": "Unpaid",
+      "returned": "Returned"
+    },
+    "rowActions": {
+      "collect": "Collect {{amount}}",
+      "return": "Return medicines",
+      "print": "Print",
+      "void": "Void sale"
+    }
+  },
+  "medicines": {
+    "records": "medicines",
+    "empty": "No medicine matches",
+    "columns": {
+      "seq": "ID",
+      "name": "Medicine",
+      "manufacturer": "Manufacturer",
+      "stock": "Stock",
+      "expiry": "Nearest expiry",
+      "mrp": "MRP",
+      "bestRate": "Best rate",
+      "margin": "Margin"
+    },
+    "needsMrp": "Needs MRP and composition",
+    "stockLine": "{{count}} in stock · {{level}}",
+    "levels": {
+      "ok": "OK",
+      "low": "Low",
+      "out": "Out"
+    },
+    "expiry": "{{expiry}} · {{batch}}",
+    "noStock": "No stock",
+    "discount": "−{{pct}}% near expiry",
+    "rowActions": {
+      "returnExpiring": "Return expiring stock to supplier",
+      "discount": "Sell at 20% off (near expiry)",
+      "removeDiscount": "Remove near-expiry discount",
+      "edit": "Edit",
+      "delete": "Delete"
+    }
+  },
+  "purchases": {
+    "records": "purchase orders",
+    "count_one": "{{count}} order",
+    "count_other": "{{count}} orders",
+    "columns": {
+      "seq": "PO",
+      "supplier": "Supplier",
+      "items": "Items",
+      "date": "Date",
+      "total": "Total",
+      "stage": "Stage"
+    },
+    "items_one": "{{count}} item",
+    "items_other": "{{count}} items",
+    "free": "{{count}} free",
+    "partPaid": "{{amount}} paid",
+    "stages": {
+      "ordered": "Ordered",
+      "received": "Received",
+      "paid": "Paid",
+      "cancelled": "Cancelled"
+    },
+    "rowActions": {
+      "receive": "Receive goods",
+      "edit": "Edit",
+      "cancel": "Cancel order",
+      "pay": "Pay {{amount}}",
+      "view": "View"
+    }
+  },
+  "suppliers": {
+    "records": "suppliers",
+    "empty": "No supplier matches",
+    "count_one": "{{count}} supplier · {{payable}} payable",
+    "count_other": "{{count}} suppliers · {{payable}} payable",
+    "columns": {
+      "name": "Supplier",
+      "manufacturers": "Manufacturers",
+      "orders": "Orders",
+      "payable": "Payable",
+      "ageing": "Ageing"
+    },
+    "orders_one": "{{count}} order",
+    "orders_other": "{{count}} orders",
+    "noOrders": "No orders",
+    "ageing_one": "{{count}} day",
+    "ageing_other": "{{count}} days",
+    "rowActions": {
+      "pay": "Pay {{amount}}",
+      "newOrder": "New purchase order",
+      "edit": "Edit",
+      "delete": "Delete"
+    }
+  },
+  "manufacturers": {
+    "records": "manufacturers",
+    "empty": "No manufacturer matches",
+    "count_one": "{{count}} manufacturer",
+    "count_other": "{{count}} manufacturers",
+    "columns": {
+      "name": "Manufacturer",
+      "medicines": "Medicines",
+      "suppliers": "Suppliers",
+      "mrs": "MRs"
+    },
+    "medicines_one": "{{count}} medicine",
+    "medicines_other": "{{count}} medicines",
+    "noMedicines": "None yet",
+    "rowActions": {
+      "edit": "Edit",
+      "delete": "Delete"
+    }
+  },
+  "mrs": {
+    "records": "MRs",
+    "empty": "No MR matches",
+    "count_one": "{{count}} MR",
+    "count_other": "{{count}} MRs",
+    "columns": {
+      "name": "MR",
+      "represents": "Represents",
+      "lastVisit": "Last visit",
+      "nextVisit": "Next visit",
+      "samples": "Samples"
+    },
+    "rowActions": {
+      "logVisit": "Log visit",
+      "edit": "Edit",
+      "delete": "Delete"
+    }
+  },
+  "payments": {
+    "records": "Medical payments",
+    "empty": "No Medical payments yet"
+  },
+  "drawers": {
+    "records": {
+      "medicine": "Medicine",
+      "supplier": "Supplier",
+      "manufacturer": "Manufacturer",
+      "mr": "MR",
+      "sale": "Sale",
+      "purchaseOrder": "Purchase order"
+    },
+    "saveChanges": "Save changes",
+    "addName": "Add a name",
+    "pickers": {
+      "searchManufacturer": "Search manufacturer",
+      "searchManufacturers": "Search manufacturers",
+      "searchSupplier": "Search supplier",
+      "searchSuppliers": "Search suppliers",
+      "searchMrs": "Search MRs",
+      "medicineCount_one": "{{count}} medicine",
+      "medicineCount_other": "{{count}} medicines",
+      "noPhone": "No phone yet",
+      "distributes": "Distributes {{maker}}",
+      "otherSuppliers": "Other suppliers",
+      "addManufacturer": "Add manufacturer",
+      "newManufacturer": "New manufacturer",
+      "addSupplier": "Add supplier",
+      "newSupplier": "New supplier",
+      "addMr": "Add MR",
+      "newMr": "New MR"
+    },
+    "quick": {
+      "manufacturer": "Manufacturer {{name}} added",
+      "supplier": "Supplier {{name}} added · add phone and GST later",
+      "mr": "MR {{name}} added",
+      "medicine": "{{name}} added · set MRP later in Stock"
+    },
+    "deleteConfirm": {
+      "medicine": "Delete this medicine?",
+      "supplier": "Delete this supplier?",
+      "manufacturer": "Delete this manufacturer?",
+      "mr": "Delete this MR?",
+      "deleted": "{{name}} deleted"
+    },
+    "manufacturer": {
+      "title": {
+        "create": "New manufacturer",
+        "edit": "Edit manufacturer"
+      },
+      "sub": "The brand on the pack · links suppliers and MRs",
+      "steps": {
+        "maker": "Manufacturer",
+        "connections": "Connections"
+      },
+      "fields": {
+        "name": "Name",
+        "colour": "Colour",
+        "suppliers": "Suppliers",
+        "suppliersHint": "who distributes it",
+        "mrs": "MRs",
+        "mrsHint": "who represents it",
+        "medicines": "Medicines",
+        "medicineCount_one": "{{count}} medicine in Stock",
+        "medicineCount_other": "{{count}} medicines in Stock",
+        "noMedicines": "None yet · add them from Stock"
+      },
+      "summary": {
+        "suppliers_one": "{{count}} supplier",
+        "suppliers_other": "{{count}} suppliers",
+        "mrs_one": "{{count}} MR",
+        "mrs_other": "{{count}} MRs"
+      },
+      "save": "Add manufacturer",
+      "saved": "Manufacturer saved · connections updated"
+    },
+    "supplier": {
+      "title": {
+        "create": "New supplier",
+        "edit": "Edit supplier"
+      },
+      "sub": "Agency you buy from",
+      "steps": {
+        "supplier": "Supplier",
+        "distributes": "Distributes",
+        "account": "Account"
+      },
+      "fields": {
+        "name": "Agency name",
+        "phone": "Phone",
+        "phoneHint": "10 digits",
+        "gst": "GST number",
+        "manufacturers": "Manufacturers",
+        "manufacturersHint": "pick any",
+        "payable": "Payable",
+        "payableValue_one": "{{amount}} · {{count}} day",
+        "payableValue_other": "{{amount}} · {{count}} days",
+        "nothingDue": "Nothing due",
+        "orders": "Orders",
+        "ordersValue_one": "{{count}} order · {{amount}}",
+        "ordersValue_other": "{{count}} orders · {{amount}}",
+        "noOrders": "No orders yet"
+      },
+      "account": {
+        "label": "Account",
+        "reference": "Reference",
+        "date": "Date",
+        "stage": "Stage",
+        "amount": "Amount",
+        "balance": "Balance",
+        "notBilled": "Not billed",
+        "due": "{{amount}} due",
+        "paid": "Paid",
+        "credit": "Credit · {{batch}}",
+        "creditStage": "Credit",
+        "adjusted": "Adjusted"
+      },
+      "quickFill": {
+        "newOrder": "New purchase order",
+        "pay": "Pay {{amount}}"
+      },
+      "save": "Add supplier",
+      "saved": "Supplier saved"
+    },
+    "mr": {
+      "title": {
+        "create": "New MR",
+        "edit": "Edit MR"
+      },
+      "sub": "Medical representative",
+      "steps": {
+        "mr": "MR",
+        "represents": "Represents"
+      },
+      "fields": {
+        "name": "Name",
+        "phone": "Phone",
+        "phoneHint": "10 digits",
+        "nextVisit": "Next visit",
+        "manufacturers": "Manufacturers",
+        "manufacturersHint": "one MR can represent many"
+      },
+      "save": "Add MR",
+      "saved": "MR saved"
+    },
+    "visit": {
+      "title": "Log MR visit",
+      "steps": {
+        "visit": "Visit",
+        "details": "Details",
+        "notes": "Notes"
+      },
+      "fields": {
+        "date": "Date",
+        "nextVisit": "Next visit",
+        "twoWeeks": "2 weeks",
+        "oneMonth": "1 month",
+        "samples": "Samples given",
+        "samplesPlaceholder": "e.g. 4 tubes Azelan",
+        "note": "Note"
+      },
+      "summary": "Next visit {{date}}",
+      "save": "Log visit",
+      "saved": "Visit logged · reminder set for {{date}}",
+      "savedNoReminder": "Visit logged"
+    },
+    "medicine": {
+      "title": {
+        "create": "New medicine",
+        "edit": "Edit medicine"
+      },
+      "sub": "{{maker}} · {{composition}}",
+      "subNoComposition": "{{maker}} · composition not set",
+      "steps": {
+        "main": "Medicine, price & stock",
+        "batches": "Batches & supplier prices"
+      },
+      "groups": {
+        "medicine": "Medicine",
+        "price": "Price & stock"
+      },
+      "fields": {
+        "name": "Name",
+        "manufacturer": "Manufacturer",
+        "composition": "Composition",
+        "compositionHint": "used for substitutes",
+        "compositionPlaceholder": "e.g. Tretinoin 0.025%",
+        "soldWith": "Sold with",
+        "prescriptionOnly": "Prescription only",
+        "overTheCounter": "Over the counter"
+      },
+      "price": {
+        "mrp": "MRP",
+        "inclGst": "incl. GST",
+        "gst": "GST",
+        "beforeGst": "Before GST",
+        "gstAmount": "GST {{pct}}%",
+        "bestBuyRate": "Best buy rate",
+        "addSupplierPrice": "Add a supplier price",
+        "margin": "Margin"
+      },
+      "stock": {
+        "title": "Stock levels",
+        "now": "{{count}} in stock · {{state}}",
+        "states": {
+          "healthy": "Healthy",
+          "reorder": "Reorder",
+          "overstocked": "Overstocked",
+          "out": "Out"
+        },
+        "reorderAt": "Reorder at",
+        "fillUpTo": "Fill up to",
+        "decreaseReorder": "Decrease reorder level",
+        "increaseReorder": "Increase reorder level",
+        "decreaseFill": "Decrease fill level",
+        "increaseFill": "Increase fill level",
+        "hintAlert": "Reorder alert when stock falls to {{count}}.",
+        "hintOrder": "Order {{qty}} to fill up to {{max}}. Shows under Stock › Low stock."
+      },
+      "batches": {
+        "title": "Batches",
+        "batch": "Batch",
+        "expiry": "Expiry",
+        "expiryPlaceholder": "MM/YY",
+        "qty": "Qty",
+        "rate": "Rate",
+        "add": "Add batch",
+        "total": "{{count}} in stock",
+        "expiryInvalid": "Enter the expiry as MM/YY",
+        "batchMissing": "Enter the batch"
+      },
+      "rates": {
+        "title": "Supplier prices",
+        "supplier": "Supplier",
+        "rate": "Rate",
+        "free": "Free",
+        "leadDays": "Lead days",
+        "add": "Add supplier price",
+        "rateMissing": "Enter this supplier’s rate"
+      },
+      "badges": {
+        "inStock": "{{count}} in stock",
+        "best": "Best {{rate}} · {{supplier}}"
+      },
+      "save": "Add medicine",
+      "toasts": {
+        "added": "Added {{name}}",
+        "saved": "Saved {{name}}",
+        "enterMrp": "Enter the MRP",
+        "enterRates": "Enter a rate for every supplier price",
+        "pickManufacturer": "Pick a manufacturer"
+      }
+    },
+    "flowConfirm": {
+      "cancelOrder": "Cancel this purchase order?",
+      "voidSale": "Void this sale?",
+      "cancelled": "{{order}} cancelled",
+      "voided": "Sale #{{seq}} voided"
+    },
+    "purchaseOrder": {
+      "title": {
+        "create": "New purchase order",
+        "edit": "Edit purchase order"
+      },
+      "sub": "Order → receive → pay",
+      "steps": {
+        "order": "Order",
+        "items": "Items"
+      },
+      "fields": {
+        "supplier": "Supplier",
+        "billNo": "Invoice no.",
+        "date": "Order date",
+        "items": "Items",
+        "medicine": "Medicine",
+        "selectMedicine": "Select medicine…",
+        "searchMedicine": "Search medicine",
+        "qty": "Qty",
+        "free": "Free",
+        "rate": "Rate",
+        "amount": "Amount",
+        "add": "Add medicine",
+        "total": "Total",
+        "fromSupplier": "From {{supplier}}",
+        "otherMedicines": "Other medicines",
+        "inStock": "{{count}} in stock · {{maker}}",
+        "outOfStock": "Out of stock · {{maker}}",
+        "addMedicine": "Add medicine",
+        "newMedicine": "New medicine",
+        "enterRate": "Enter the purchase rate",
+        "peek_one": "{{count}} medicine · {{amount}}",
+        "peek_other": "{{count}} medicines · {{amount}}",
+        "quickLine": "Type medicine, qty, free, rate · e.g. azel 20 +2 @180",
+        "quickHint": "20 = qty · +2 = free · @180 = rate",
+        "lowStockChip": "{{name}} · {{quantity}} left",
+        "newMedicineName": "New medicine name"
+      },
+      "quickFill": {
+        "reorder": "Reorder low stock"
+      },
+      "rateFor": "Enter the rate for {{name}}",
+      "rateForCount_one": "Enter the rate for {{count}} medicine",
+      "rateForCount_other": "Enter the rate for {{count}} medicines",
+      "pickSupplier": "Pick a supplier",
+      "save": "Create order",
+      "saved": "Purchase order saved",
+      "cancelOrder": "Cancel order"
+    },
+    "receive": {
+      "title": "Receive goods",
+      "sub": "{{supplier}} · tick each item and enter batch & expiry",
+      "section": "Tick what arrived",
+      "arrived": "Arrived",
+      "notArrived": "Not arrived",
+      "medicine": "Medicine",
+      "qty": "Qty",
+      "free": "Free",
+      "batch": "Batch",
+      "expiry": "Expiry",
+      "expiryPlaceholder": "MM/YY",
+      "enterExpiry": "Enter the expiry",
+      "tickArrived": "Tick what arrived",
+      "addUnexpected": "Add unexpected item",
+      "enterQuantity": "Enter a quantity",
+      "save": "Mark received",
+      "saved": "Goods received · stock and free quantity added"
+    },
+    "orderView": {
+      "title": "Purchase order",
+      "subReceived": "{{supplier}} · received, stock added · items locked",
+      "subPaid": "{{supplier}} · paid, locked",
+      "payable": "Payable {{amount}}",
+      "paid": "Paid {{amount}}",
+      "paidOf": "Paid {{paid}} of {{total}}",
+      "pay": "Pay {{amount}}",
+      "print": "Print"
+    },
+    "sale": {
+      "title": "Sale",
+      "sub": "{{customer}} · {{when}} · a sale is changed by a return, not edited",
+      "walkIn": "Walk-in customer",
+      "badges": {
+        "paid": "Paid",
+        "unpaid": "Unpaid",
+        "returned": "Returned {{amount}}",
+        "invoice": "Invoice #{{seq}} · in patient file"
+      },
+      "medicines": "Medicines",
+      "medicine": "Medicine",
+      "batch": "Batch",
+      "qty": "Qty",
+      "amount": "Amount",
+      "summary_one": "{{count}} medicine · {{amount}}",
+      "summary_other": "{{count}} medicines · {{amount}}",
+      "collect": "Collect {{amount}}",
+      "returnMedicines": "Return medicines",
+      "voidSale": "Void sale",
+      "collected": "{{amount}} received"
+    },
+    "saleReturn": {
+      "title": "Return from patient",
+      "sub": "{{customer}} · returned stock goes back into its batch",
+      "steps": {
+        "back": "What is coming back",
+        "reason": "Reason & refund"
+      },
+      "medicine": "Medicine",
+      "batch": "Batch",
+      "sold": "Sold",
+      "refund": "Refund",
+      "return": "Return",
+      "reason": "Reason",
+      "reasons": {
+        "unused": "Unused",
+        "reaction": "Reaction",
+        "rx_changed": "Doctor changed Rx",
+        "wrong_item": "Wrong item",
+        "damaged": "Damaged"
+      },
+      "refundBy": "Refund by",
+      "peek_one": "{{count}} medicine · {{amount}}",
+      "peek_other": "{{count}} medicines · {{amount}}",
+      "quickFill": "Return everything",
+      "save": "Refund {{amount}}",
+      "summary": "{{reason}} · {{amount}}",
+      "nothing": "Enter what is being returned",
+      "refunded": "{{amount}} refunded · stock added back",
+      "refundedWrittenOff": "{{amount}} refunded · stock written off",
+      "lowered": "{{amount}} returned · stock added back",
+      "loweredWrittenOff": "{{amount}} returned · stock written off"
+    },
+    "expiring": {
+      "title": "Return expiring stock",
+      "sub": "{{medicine}} · batch {{batch}} · expires {{expiry}}",
+      "supplier": "Supplier",
+      "boughtAt": "Bought at {{amount}}",
+      "quantity": "Quantity",
+      "of": "of {{count}}",
+      "creditNote": "Credit note",
+      "badges": {
+        "credit": "Credit {{amount}}",
+        "daysLeft_one": "{{count}} day left",
+        "daysLeft_other": "{{count}} days left"
+      },
+      "summary": "Credit reduces what you owe {{supplier}}",
+      "save": "Return & take credit",
+      "saved": "{{count}} returned · {{amount}} credit from {{supplier}}"
+    },
+    "prescriptions": {
+      "sub": "Rx {{rx}} · {{date}} · {{medicines}}"
+    },
+    "reminders": {
+      "title": "Payment reminders",
+      "summary_one": "{{count}} customer owes {{amount}}",
+      "summary_other": "{{count}} customers owe {{amount}}",
+      "hint": "WhatsApp opens with the reminder typed — you send it from there.",
+      "dueOne": "{{amount}} due · Sale #{{seq}}",
+      "dueMany_one": "{{amount}} due · {{count}} sale",
+      "dueMany_other": "{{amount}} due · {{count}} sales",
+      "noPhone": "No phone saved",
+      "whatsApp": "Remind {{name}} on WhatsApp",
+      "call": "Call {{name}}",
+      "copy": "Copy the reminder for {{name}}",
+      "copied": "Reminder for {{name}} copied",
+      "message": "Hi {{name}}, this is a reminder from {{clinic}} that {{amount}} is due for your medicines. Reply here if you have any questions. Thank you!"
+    }
+  }
+}

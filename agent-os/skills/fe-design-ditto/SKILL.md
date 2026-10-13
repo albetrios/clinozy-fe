@@ -55,7 +55,7 @@ tokens/typography; the screens are the Slugs in `_index.md`.
 | Input | Role | Authority |
 | ----- | ---- | --------- |
 | `intake-files/preset.md` | Theme — tokens, type, radius, density, motion | Theme truth |
-| `intake-files/shell.md` | Header, sidebar, nav chrome | Shell truth — **see Step 4b** |
+| `intake-files/shell.md` | Header, nav chrome | Shell truth — **see Step 4b** |
 | `intake-files/<slug>.md` | Per-screen structure, copy, states | Screen truth |
 | `intake-files/*.html`, `intake-files/*.js` | Prototype, when present | **Outranks the md for behaviour** |
 
@@ -180,19 +180,20 @@ hand-rolled markup specifies *appearance and behaviour*, not what to import:
   `beforeLoad`, never a route-file loader) and `docs/reference/routes-and-ui.md`.
   Scaffold new pages with `fe-page-scaffolding`.
 
-### Step 4b — The shell is a variant, never an overwrite
+### Step 4b — The shell has one design: replace it, never fork it
 
-The header/sidebar/nav frame is **shared by every page**, including platform
-surfaces the design source has never seen. Treat it differently from screens.
+The header/nav frame is **shared by every page**, including platform surfaces
+the design source has never seen. Treat it differently from screens.
 
-**Add a new shell variant; do not edit the existing ones.** clinozy-fe ships four
-(`sidebar`, `topNav`, `rail`, `focus` — see
-`src/shared/layouts/AppLayout/resolve-app-shell.ts`). A ditto shell becomes a
-fifth, selectable and reversible. Overwriting `AppLayoutSidebar.tsx` breaks every
-other preset and there is no way back.
-
-To make it the default, change the resolver's default variant — one line, and
-still reversible — rather than deleting what it replaced.
+**One design per surface — a new design replaces the old one.** clinozy-fe has
+exactly one app shell, the section bar
+(`src/shared/layouts/AppLayout/AppLayoutSectionBar.tsx`, mounted by
+`AppLayout.tsx`). A ditto shell is built in its place: edit it, or write the new
+shell and delete the old one in the same change, together with everything only
+the old one used (components, i18n keys, tests). Never keep the old design beside
+the new one as a "preview variant" behind a store index or a shuffle switch —
+nobody sees it, the default drifts away from the design, and dead shells pile up.
+Git history is the way back.
 
 **Then slot the platform surfaces. Policy: relocate, never delete.** The design
 source specified *its* product's chrome and has never seen this app's platform
@@ -201,29 +202,29 @@ drop them. Fold each into the design's nearest equivalent slot (usually an
 avatar/user menu). Fill this in **before building**; where the design offers no
 natural slot, present options to the user rather than guessing:
 
-Audited against `AppLayout.shared.tsx` + all four variants — this is every
-surface the shell mounts. Re-run the audit if the shell changes:
+Audited against `AppLayoutSectionBar.tsx`, `AppLayout.shared.tsx` and the
+shell's components (`AccountMenu`, `NoticeStack`, `BranchPicker`, `PinnedTabs`,
+`AllSections`) — this is every surface the shell mounts. Re-run the audit if the
+shell changes:
 
-| Platform surface | Where it lives now | Variants | Relocate to? |
-| ---------------- | ------------------ | -------- | ------------ |
-| Brand logo / wordmark | sidebar top / header left | all 4 | ? |
-| Primary nav items | sidebar / top bar | all 4 | ? |
-| Organization switcher | sidebar top | all 4 | ? |
-| Global search / ⌘K trigger | header + sidebar quick links | all 4 | ? |
-| Notifications | header | all 4 | ? |
-| **Theme mode toggle (light/dark)** | header | all 4 | ? |
-| User menu — profile + **sign-out** | header right | all 4 | ? |
-| Settings entry (`#settings/*` hash modal) | sidebar quick links | Sidebar | ? |
-| **Account launcher strip** — palette, profile, security, billing, appearance, devices | under header | Focus | ? |
-| Email-verification banner | above content | all 4 | ? |
-| Mobile bottom nav | bottom, mobile only | all 4 | ? |
-| Mobile menu trigger | header left, mobile only | all 4 | ? |
+| Platform surface | Where it lives now | Relocate to? |
+| ---------------- | ------------------ | ------------ |
+| Brand logo / wordmark | header start | ? |
+| Primary nav items | All sections + pinned tabs (header, `md`+); section chip, All sections sheet and tab bar (phone) | ? |
+| Organization switcher | Account menu › "Switch clinic" (hides with one workspace) | ? |
+| Branch picker | header end | ? |
+| Global search / ⌘K trigger | header search field; ⌘K | ? |
+| Notifications | Account menu row → the inbox under the avatar | ? |
+| **Theme mode (light/dark/system)** | Account menu › Appearance pills | ? |
+| Profile + **sign-out** | Account menu identity block + Log out | ? |
+| Settings entry (`#settings/*` hash modal) | Account menu rows (Settings, Security, Billing, Devices) | ? |
+| Keyboard shortcuts | Account menu row; G and 1–9 | ? |
+| Email-verification notice, View-as | the notice pills above the tab bar | ? |
+| Mobile bottom nav | tab bar, phone only (four pins + More) | ? |
 
-The bolded rows are easy to miss: the **light/dark toggle** is a shell control
-separate from the appearance picker inside settings, and the Focus shell's
-**account launcher** deep-links to five settings sections
-(`account/profile`, `account/security`, `account/billing`, appearance, devices)
-that have no other one-click entry in that shell.
+The bolded rows are easy to miss: the **light/dark choice** is a shell control
+separate from the appearance picker inside settings, and **sign-out** has no
+other one-click home.
 
 A surface with no answer is a **RED blocker** — the same class as an unknown
 popup shape. Dropping it silently loses functionality the design never knew
@@ -240,8 +241,9 @@ these move):
 | Notifications · ⌘K trigger · verification banner | Palette keeps working via its shortcut; banner is conditional anyway | Yes — fold or drop |
 
 The single exception to relocate-never-delete: in `personal-only` deployment
-mode the org switcher is genuinely meaningless (the `focus` shell already omits
-the sidebar for that mode). Confirm the mode before treating it as removable.
+mode the org switcher is genuinely meaningless (such a deployment never reaches
+the clinic shell — `requireTeamDeployment`, D44). Confirm the mode before
+treating it as removable.
 
 Two rules that keep this honest:
 
@@ -295,14 +297,14 @@ Each produced a real rebuild in this repo.
 | 9 | Inferred the API contract from a plan doc | Read the backend's routes/serializers |
 | 10 | Shipped a brand colour failing AA for text | Step 4 — recompute ratios |
 | 11 | Adopted a design's shell and lost the org switcher / settings entry | Step 4b slotting table |
-| 12 | Overwrote a shell variant; every other preset broke, no way back | Step 4b — add a variant |
+| 12 | Kept the old shell beside the new one as a preview variant; the default drifted and dead shells piled up | Step 4b — one design per surface |
 
 ## Anti-patterns
 
 - **"It looks close enough."** If the user said ditto, it isn't.
 - **Reading only the md** when a prototype is on disk.
 - **Building screens before applying the preset.**
-- **Overwriting an existing shell variant** instead of adding one.
+- **Keeping the old design beside the new one** (a "preview variant") instead of replacing it.
 - **Dropping a platform surface** because the design spec didn't mention it.
 - **Building desktop, then making it responsive.** Rebuild, not retrofit.
 - **Raising a tolerance** to make a comparison pass.

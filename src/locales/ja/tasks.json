@@ -1,0 +1,593 @@
+{
+  "manifest": {
+    "title": "タスク"
+  },
+  "ruleGroups": {
+    "leads": "リード",
+    "appointments": "予約",
+    "feedback": "フィードバック",
+    "treatments": "施術",
+    "patients": "患者",
+    "team": "チーム",
+    "payments": "支払い",
+    "medical": "医薬"
+  },
+  "rules": {
+    "reply": {
+      "label": "未返信のメッセージ",
+      "description": "リードからメッセージがあり、まだ誰も返信していません",
+      "how": {
+        "first": "右側で最新のメッセージを読む",
+        "second": "料金と2つの空き枠を添えて返信する",
+        "third": "選ばれたら来院を予約する"
+      },
+      "outcomes": {
+        "bookedVisit": {
+          "label": "来院を予約した",
+          "effect": "予約フォームが開きます · リードはフォローアップに移動"
+        },
+        "notInterested": {
+          "label": "興味なし",
+          "effect": "リードのステータス → 興味なし"
+        },
+        "spamOrWrongNumber": {
+          "label": "スパムまたは番号違い",
+          "effect": "リードのステータス → 無効"
+        }
+      }
+    },
+    "follow": {
+      "label": "リードのフォローアップ",
+      "description": "フォローアップ日になりました",
+      "how": {
+        "first": "何に興味があったか確認する",
+        "second": "電話かWhatsAppで気軽に声をかける",
+        "third": "予約する、新しいフォローアップを設定する、またはリードをクローズする"
+      },
+      "outcomes": {
+        "bookedVisit": {
+          "label": "来院を予約した",
+          "effect": "予約フォームが開きます"
+        },
+        "callBackTomorrow": {
+          "label": "明日かけ直す",
+          "effect": "フォローアップ日 → 明日 11:00"
+        },
+        "noAnswer": {
+          "label": "応答なし",
+          "effect": "通話を記録 · タスクを3時間スヌーズ"
+        },
+        "notInterested": {
+          "label": "興味なし",
+          "effect": "リードのステータス → 興味なし"
+        }
+      }
+    },
+    "claim": {
+      "label": "引き継ぎ可能なリード",
+      "description": "担当者が保留期間を過ぎても対応していません",
+      "how": {
+        "first": "チャット履歴を確認する",
+        "second": "対応できるなら引き継ぐ",
+        "third": "できなければチームに任せる"
+      },
+      "outcomes": {
+        "claimIt": {
+          "label": "引き継ぐ",
+          "effect": "あなたが担当者になります"
+        },
+        "leaveWithOwner": {
+          "label": "担当者に任せる",
+          "effect": "明日まで非表示"
+        }
+      }
+    },
+    "failed": {
+      "label": "未配信のメッセージ",
+      "description": "プロバイダーがメッセージを配信できませんでした",
+      "how": {
+        "first": "携帯番号を確認する",
+        "second": "WhatsAppまたはSMSで再送する",
+        "third": "再び失敗したら電話する"
+      },
+      "outcomes": {
+        "retrySend": {
+          "label": "再送する",
+          "effect": "同じチャネルで再送します"
+        },
+        "calledInstead": {
+          "label": "代わりに電話した",
+          "effect": "通話を記録"
+        },
+        "fixTheNumber": {
+          "label": "番号を修正する",
+          "effect": "記録を開いて編集します"
+        }
+      }
+    },
+    "confirm": {
+      "label": "来院の確認",
+      "description": "48時間以内の来院がまだ確認されていません",
+      "automation": "リマインダーを送り、「はい」の返信で確定する",
+      "how": {
+        "first": "リマインダーを送る、または再送する",
+        "second": "夕方までに返信がなければ電話する",
+        "third": "来られない場合は枠を変更する"
+      },
+      "outcomes": {
+        "confirmedOnCall": {
+          "label": "電話で確認済み",
+          "effect": "予約 → 確定"
+        },
+        "moveToAnotherSlot": {
+          "label": "別の枠に変更",
+          "effect": "予約を開いて日時を変更します"
+        },
+        "cancelledByPatient": {
+          "label": "患者がキャンセル",
+          "effect": "予約 → キャンセル · 枠を解放"
+        },
+        "noAnswer": {
+          "label": "応答なし",
+          "effect": "通話を記録 · タスクを3時間スヌーズ"
+        }
+      }
+    },
+    "arrive": {
+      "label": "来院済みか無断キャンセルか",
+      "description": "開始から15分経ってもチェックインがありません",
+      "how": {
+        "first": "患者に電話する",
+        "second": "到着したらチェックイン済みにする",
+        "third": "30分経ったら無断キャンセルにする"
+      },
+      "outcomes": {
+        "checkedIn": {
+          "label": "チェックイン済み",
+          "effect": "予約 → チェックイン済み"
+        },
+        "runningLate": {
+          "label": "遅れている",
+          "effect": "タスクを30分スヌーズ"
+        },
+        "noShow": {
+          "label": "無断キャンセル",
+          "effect": "予約 → 無断キャンセル · 再予約タスクが続きます"
+        }
+      }
+    },
+    "rebook": {
+      "label": "無断キャンセルの再予約",
+      "description": "患者が来院しませんでした",
+      "how": {
+        "first": "空き枠2つを添えて電話かWhatsAppで連絡する",
+        "second": "選ばれた枠を予約する",
+        "third": "戻ってこない場合はクローズする"
+      },
+      "outcomes": {
+        "rebooked": {
+          "label": "再予約した",
+          "effect": "同じサービスで予約フォームが開きます"
+        },
+        "willCallBack": {
+          "label": "折り返し連絡あり",
+          "effect": "タスクを明日までスヌーズ"
+        },
+        "notComingBack": {
+          "label": "戻ってこない",
+          "effect": "理由を付けてクローズ"
+        }
+      }
+    },
+    "feedback": {
+      "label": "フィードバックの収集",
+      "description": "昨日、来院が完了しました",
+      "automation": "フィードバックフォームを送り、4–5★ならクローズする",
+      "how": {
+        "first": "来院の感想を尋ねる",
+        "second": "4–5★ならGoogleレビューを依頼する",
+        "third": "次の施術を予約する"
+      },
+      "outcomes": {
+        "happy": {
+          "label": "満足 · 4–5★",
+          "effect": "レビュー記録を開く"
+        },
+        "unhappy": {
+          "label": "不満",
+          "effect": "{{doctor}}の折り返しタスクを作成"
+        },
+        "logCheckIn": {
+          "label": "チェックインを記録",
+          "effect": "現在の状態 · 守ったこと · 次の計画"
+        },
+        "sentTheForm": {
+          "label": "フォームを送った",
+          "effect": "明日までスヌーズ"
+        }
+      }
+    },
+    "aftercare": {
+      "label": "アフターケアの電話",
+      "description": "施術後のフォローアップ電話が必要です",
+      "how": {
+        "first": "電話して肌の調子を尋ねる",
+        "second": "アフターケアを守れたか確認する",
+        "third": "回答をチェックインとして記録する"
+      },
+      "outcomes": {
+        "logCheckIn": {
+          "label": "チェックインを記録",
+          "effect": "調子 · 守ったこと · 次の計画"
+        },
+        "doingWell": {
+          "label": "順調",
+          "effect": "簡単な「改善」チェックインを記録"
+        },
+        "noAnswer": {
+          "label": "応答なし",
+          "effect": "通話を記録 · 3時間スヌーズ"
+        }
+      }
+    },
+    "unhappy": {
+      "label": "不満のある患者",
+      "description": "患者が低い評価を付けたか、不満を示しました",
+      "how": {
+        "first": "まずフィードバックを読む",
+        "second": "医師またはマネージャーが折り返す",
+        "third": "必要なら再診やクレジットを提案する"
+      },
+      "outcomes": {
+        "calledResolved": {
+          "label": "電話済み · 解決",
+          "effect": "メモを付けてクローズ"
+        },
+        "offeredReviewVisit": {
+          "label": "再診を提案した",
+          "effect": "予約フォームが開きます"
+        }
+      }
+    },
+    "nextvisit": {
+      "label": "次回来院が未設定",
+      "description": "来院は完了しましたが、フォローアップ日も次の予約もありません",
+      "how": {
+        "first": "医師の指示を確認する",
+        "second": "次回来院の枠を2つ提案する",
+        "third": "まだ決められない場合はフォローアップ日を設定する"
+      },
+      "outcomes": {
+        "bookNextVisit": {
+          "label": "次回来院を予約",
+          "effect": "{{first}}さんの予約フォームが開きます"
+        },
+        "setFollowUpDate": {
+          "label": "フォローアップ日を設定",
+          "effect": "フォローアップを今日から2週間後に設定"
+        },
+        "noFollowUpNeeded": {
+          "label": "フォローアップ不要",
+          "effect": "クローズ · 施術完了"
+        }
+      }
+    },
+    "noreply": {
+      "label": "連絡が途絶えた常連患者",
+      "description": "パッケージの残り回数がある患者が30日以上来院せず、予約もありません",
+      "how": {
+        "first": "パッケージと最終来院を確認する",
+        "second": "一度電話し、その後カムバック特典を送る",
+        "third": "戻ってこない場合はクローズする"
+      },
+      "outcomes": {
+        "callNow": {
+          "label": "今すぐ電話",
+          "effect": "患者ファイルを開く · そこで通話を記録"
+        },
+        "sendOffer": {
+          "label": "特典を送る",
+          "effect": "1週間スヌーズ"
+        },
+        "notComingBack": {
+          "label": "戻ってこない",
+          "effect": "理由を付けてクローズ"
+        }
+      },
+      "automation": "チーム向けに再アプローチのリードを作成"
+    },
+    "manual": {
+      "label": "設定したフォローアップ",
+      "description": "別のタスクをクローズした後に設定",
+      "how": {
+        "first": "予定していたことを行う",
+        "second": "結果を記録する",
+        "third": "必要なら次のステップを設定する"
+      },
+      "outcomes": {
+        "done": {
+          "label": "完了",
+          "effect": "クローズ · 次の対応を選ぶ"
+        },
+        "noAnswer": {
+          "label": "応答なし",
+          "effect": "3時間スヌーズ"
+        },
+        "bookedVisit": {
+          "label": "来院を予約した",
+          "effect": "予約フォームが開きます"
+        }
+      }
+    },
+    "payment": {
+      "label": "支払い期限",
+      "description": "請求書に未払い残高があります",
+      "outcomes": {
+        "collectAtCheckout": {
+          "label": "会計時に回収",
+          "effect": "クローズ · 会計時に回収"
+        },
+        "sendUpiLink": {
+          "label": "UPIリンクを送る",
+          "effect": "クローズ · リンクはチャットから送信"
+        },
+        "called": {
+          "label": "電話した",
+          "effect": "メモを付けてクローズ"
+        }
+      },
+      "automation": "WhatsAppで支払いリマインダーを送る"
+    },
+    "settleBy": {
+      "label": "精算待ちのクレジット",
+      "description": "保留中のクレジットの精算日になりました",
+      "outcomes": {
+        "done": {
+          "label": "完了",
+          "effect": "クローズ · 支払いで精算"
+        }
+      }
+    },
+    "medicalRepVisit": {
+      "label": "MRの訪問",
+      "description": "MRの訪問予定があります",
+      "outcomes": {
+        "done": {
+          "label": "完了",
+          "effect": "クローズ · 訪問は医薬で記録"
+        }
+      }
+    }
+  },
+  "snoozeOptions": {
+    "oneHour": "1時間",
+    "threeHours": "3時間",
+    "tomorrow": "明日 10:00",
+    "nextWeek": "来週"
+  },
+  "followUpWhen": {
+    "inThreeHours": "3時間後",
+    "tomorrow": "明日 午前11時",
+    "inThreeDays": "3日後",
+    "nextWeek": "来週"
+  },
+  "record": "タスク",
+  "views": {
+    "label": "タスクの表示",
+    "queue": "未対応",
+    "snoozed": "スヌーズ中",
+    "done": "完了"
+  },
+  "search": {
+    "placeholder": "タスクや人を検索",
+    "label": "タスクを検索"
+  },
+  "type": {
+    "label": "タスクの種類",
+    "all": "すべての種類",
+    "count_other": "{{count}} 種類"
+  },
+  "scope": {
+    "label": "範囲",
+    "mine": "自分",
+    "everyone": "全員"
+  },
+  "rulesPopover": {
+    "button": "ルール",
+    "label": "タスクのルール",
+    "title": "タスクが作られる条件",
+    "description": "{{productName}} はリード、予約、フィードバックを見守り、誰かの対応が必要になるとタスクを作成します。記録が変わるとタスクは自動で閉じます。",
+    "line": "{{source}} · {{description}}",
+    "handle": "{{productName}} に任せる",
+    "handled": "{{productName}} が対応中",
+    "readOnly": "これらのルールを変更できるのはオーナーまたは管理者のみです"
+  },
+  "primary": {
+    "newTask": "新しいタスク"
+  },
+  "groups": {
+    "overdue": "期限切れ",
+    "today": "今日が期限",
+    "later": "今後",
+    "snoozed": "スヌーズ中",
+    "done": "解決済み"
+  },
+  "row": {
+    "automation": "{{productName}} が対応できます",
+    "anyone": "誰でも",
+    "was": "{{name}} · 以前は{{first}}",
+    "result": "✓ {{result}}"
+  },
+  "sources": {
+    "lead": "リード",
+    "appointment": "予約",
+    "treatment": "施術",
+    "patient": "患者",
+    "invoice": "請求書",
+    "contact": "連絡先",
+    "checkIn": "チェックイン",
+    "review": "レビュー",
+    "pendingCredit": "クレジット",
+    "medicalRep": "MR"
+  },
+  "due": {
+    "snoozed": "スヌーズ · {{label}}",
+    "done": "完了 · {{time}}",
+    "doneNow": "完了 · たった今",
+    "doneByClinozy": "{{productName}} が完了",
+    "overdue": {
+      "minutes_other": "{{count}}分超過",
+      "hours_other": "{{count}}時間超過",
+      "days_other": "{{count}}日超過"
+    },
+    "soon": {
+      "minutes_other": "{{count}}分後",
+      "hours_other": "{{count}}時間後"
+    }
+  },
+  "empty": {
+    "queue": "今対応が必要なものはありません。リードからの連絡、近づく来院、届いたフィードバックに応じて新しいタスクがここに表示されます。",
+    "snoozed": "スヌーズ中のタスクはありません",
+    "done": "今日はまだ解決済みのものはありません"
+  },
+  "newTask": {
+    "title": "新しいタスク",
+    "sub": "{{person}} 向け · タスクとこの人のタイムラインに表示されます",
+    "subNoPerson": "タスクに表示され、対象者がいればその人のタイムラインにも表示されます",
+    "steps": {
+      "what": "やること",
+      "when": "いつ・誰が",
+      "how": "方法とメモ"
+    },
+    "forField": {
+      "label": "対象",
+      "placeholder": "人を選択",
+      "search": "名前、携帯番号、番号で検索",
+      "empty": "名前、携帯番号、連絡先番号を入力してください"
+    },
+    "titleField": {
+      "label": "タイトル",
+      "placeholder": "やること",
+      "fallback": "フォローアップ · {{first}}",
+      "missing": "タイトルを入力するか、タスクの対象者を選んでください"
+    },
+    "due": {
+      "label": "期限",
+      "today": "今日 午後5時",
+      "tomorrow": "明日 午前11時",
+      "inThreeDays": "3日後",
+      "nextWeek": "来週",
+      "date": "期限日",
+      "time": "期限時刻"
+    },
+    "owner": {
+      "label": "担当者",
+      "missing": "担当者を選んでください"
+    },
+    "priority": {
+      "label": "優先度",
+      "normal": "通常",
+      "high": "高"
+    },
+    "notes": {
+      "label": "タスクのメモ",
+      "placeholder": "メモ（任意）"
+    },
+    "footer": "↔ {{person}}",
+    "save": "タスクを追加",
+    "added": "{{owner}} にタスクを追加しました · {{due}}"
+  },
+  "assignee": {
+    "you": "{{name}}（自分）"
+  },
+  "drawer": {
+    "sub": "{{productName}} が作成 · {{rule}}",
+    "assignedTo": "担当者",
+    "sections": {
+      "what": "1 · 内容",
+      "how": "2 · 方法",
+      "close": "3 · 完了の仕方 · 次の手を選ぶ"
+    },
+    "quote": "「{{message}}」",
+    "source": {
+      "appointment": "予約を開く",
+      "lead": "リードを開く",
+      "treatment": "施術を開く",
+      "patient": "患者を開く",
+      "invoice": "請求書を開く",
+      "checkIn": "チェックインを開く",
+      "review": "レビューを開く"
+    },
+    "tiles": {
+      "visit": "来院",
+      "service": "サービス",
+      "doctor": "医師",
+      "status": "ステータス",
+      "treatment": "施術",
+      "doneOn": "実施日",
+      "session": "回数",
+      "therapist": "セラピスト",
+      "source": "流入元",
+      "interestedIn": "関心",
+      "owner": "担当",
+      "mobile": "携帯"
+    },
+    "tileValues": {
+      "visit": "{{day}} · {{time}} · {{minutes}}分",
+      "session": "#{{number}}"
+    },
+    "outcomeNote": {
+      "label": "結果メモ",
+      "placeholder": "結果にメモを追加（任意）"
+    },
+    "snooze": "スヌーズ",
+    "assigned": "担当",
+    "assignTip": "このタスクを別の人に移す",
+    "searchTeam": "チームを検索",
+    "was": "以前 {{names}}",
+    "close": "閉じる",
+    "subByHand": "手動で追加",
+    "assignGroups": {
+      "team": "チーム",
+      "queues": "役割ごとのキュー"
+    },
+    "deleteTitle": "このタスクを削除しますか？"
+  },
+  "toasts": {
+    "closed": "{{title}} · {{result}}",
+    "snoozed": "スヌーズ · {{label}}",
+    "claimed": "{{name}} の担当になりました",
+    "moved": "{{title}} → {{name}}",
+    "removed": "{{title}} を削除しました",
+    "alreadyClosed": "このタスクはすでに完了しています",
+    "claimNeedsLeads": "リードを引き受けるにはリードの編集権限が必要です。オーナーまたは管理者に依頼してください",
+    "reassignNeedsLeads": "リードのタスクを移すにはリードの編集権限が必要です。オーナーまたは管理者に依頼してください"
+  },
+  "whatsNext": {
+    "title": "{{first}} さんの次は？",
+    "sub": "完了 · {{title}} · {{result}}",
+    "section": "次のタスク",
+    "step": {
+      "label": "次のステップ",
+      "callAgain": "もう一度電話",
+      "sendWhatsApp": "WhatsAppを送る",
+      "bookVisit": "来院を予約",
+      "collectPayment": "支払いを回収",
+      "sendOffer": "オファーを送る"
+    },
+    "when": "いつ",
+    "owner": "担当者",
+    "note": {
+      "label": "メモ",
+      "placeholder": "例：ピーリングの料金を確認する"
+    },
+    "nothingNext": "次はなし",
+    "create": "タスクを作成",
+    "pickStep": "次のステップを選んでください",
+    "pickWhen": "いつかを選んでください",
+    "created": "次のタスクを設定しました · {{step}} · {{when}}",
+    "taskTitle": "{{step}} · {{first}}",
+    "plannedAfter": "次の後に予定: {{after}}",
+    "titleNoPerson": "次は何をしますか？"
+  }
+}

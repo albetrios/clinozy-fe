@@ -34,6 +34,61 @@ clobbers this section — restore it and re-run `pnpm agent-os:lock`.
   base `radix`, Tailwind v4 CSS-first (`src/index.css`), UI alias `@/shared/components/ui`.
 - **Structure:** vendored primitives stay FLAT in `src/shared/components/ui/`; everything
   composed on top follows folder-per-unit (`agent-os/rules/fe-file-structure.mdc`).
+- **One component per job (L-62 — these override the Component Selection table below):**
+  - Pick one value or several from a list → the shared **`Picker`**
+    (`@/shared/components/Picker`; `multiple` for several, `plain` for a neutral list,
+    `menu` for a list of places). There is no `ui/select` (deleted in L-62) — never
+    re-add it, and never a hand-built Popover + `Command` list.
+  - Pick a day on a month → **`LocalizedCalendar`** (`look`: `picker` inside
+    `CalendarPicker`, `compact` the booking step, `regular` the Filters; `tone`, a
+    `dots` modifier, `testIds`). Never a hand-built grid of day buttons, never
+    `ui/calendar`.
+  - A button → **`ui/button`** at the design's sizes (13px: `default` 36px, `sm` 32,
+    `xs` 28, the square `icon` / `icon-sm` / `icon-xs`, the phone's floating `pill`) —
+    `variant` `default` (the z900 fill), `outline`, `ghost`, `link`, `danger` (the
+    light-red row action) or `destructive` (the red fill). Never a raw `<button>` styled
+    as one; chips, list rows, steppers, tiles, the `Picker` trigger and the
+    `floating-edge` handles stay raw.
+  - A menu of ACTIONS (Account, "+", row ⋯, theme toggle) → `ui/dropdown-menu`.
+  - Confirm an action → **`ConfirmDialog`** (`reason` for a record delete / cancel /
+    void; plain otherwise — it busy-blocks dismissal); "discard changes?" →
+    `useUnsavedChangesGuard`. Never a raw `ui/alert-dialog` in a surface.
+  - A search box → `RoomSearch` (a room list, wired to the URL's `q`) or its field
+    `RoomSearchField` (`layout="fill"` never folds — Settings). Never `Input` + an icon.
+  - A status or label pill → **`TonePill`** (`Cells`; a section tone, `neutral` for a
+    plain label, `dot` for a status — the rooms' words: positive sage, pending butter,
+    trouble blush). There is no `ui/badge`, and never a styled span.
+  - A toggle chip (pick one or several, a filter value, an Appearance choice) →
+    **`DrawerChips`** (each option's `tone`, untoned on `muted`; `multiple`,
+    `clearable`, `ordered`; `labelledBy` when a visible heading names the row). Pills
+    that do not toggle stay `TonePill` / `IdPill` / `PersonChip`.
+  - An 18px count on a button or heading → **`CountBadge`** (`Cells`; `tone` primary /
+    success / inverse, "99+", `srLabel`). Never a hand-rolled `rounded-full` count.
+  - A row of tabs → **`RoomTabs`** (links to a room's child routes) or **`RoomViewTabs`**
+    (in-page views, panes, modes: `look` track / card / plain, `fill`, `activation`
+    automatic, per-tab colours, `disabled` + `hint`). Never a hand-built `role="tablist"`;
+    the Settings nav and `ToggleGroup` stay.
+  - Nothing to list → **`EmptyState`** (`tone` the room's illustration, `onClearFilters`
+    the filtered one, `variant="card"` a thread's starter, `variant="inline"` a list's or
+    a card's one-liner sized by `className`; `testId`). Never a hand-rolled muted `<p>`;
+    the Picker's and ⌘K's own one-line empties stay.
+  - A side drawer (a record, a form, a detail view) → **`RecordDrawer`** (steps, an `aside`
+    column with phone `panes`, `headerStart` / `titleEnd` / `band` / `footerStart`,
+    `hideFooter`; `dirty` asks before discarding — `useDrawerSave`, `useDrawerSession`;
+    a stale save's "Reload" through `useEditingRecord`, every other restart of a mounted
+    form through `resetFormInPlace`, never a bare `form.reset`).
+    Never a hand-built `ui/sheet` or Radix Dialog panel. Every overlay is a `RecordDrawer`,
+    the confirm frame (`ConfirmPanel`, through `ConfirmDialog`) or the ⌘K palette — menus,
+    popovers and the `Picker`'s own sheet aside. There is no `ui/dialog` (retired once
+    Settings, Appearance, the shortcuts and the platform dialogs became drawers): never
+    re-add it, and never build another centred dialog.
+  - A person's avatar → **`PersonAvatar`** (`Cells`; initials in a tone, `src` for a
+    photo, sizes 16–64px, presence / "P" badge). `ui/avatar` is its primitive only.
+  - A form field → **`DrawerField`** + `DrawerInput` / `DrawerTextarea` / the drawer
+    controls (`capitalize={false}` for slugs, codes, emails, handles, passwords; the
+    right `type` / `inputMode` / `autoComplete`). Never a bare `Label` + `Input`.
+  - Toasts → `notify` (`@/shared/notify`) — one design, the clinic bar, bottom-centre;
+    never `sonner` directly.
 
 ### Selection workflow
 

@@ -2,9 +2,9 @@ import { useNavigate } from '@tanstack/react-router';
 import { type ReactNode, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { iconOnSidebarSurface } from '@/lib/icon-surface.ts';
-import { organizationDashboard } from '@/lib/routes/index.ts';
+import { organizationHome, organizationPicker } from '@/lib/routes/index.ts';
 import { cn } from '@/lib/utils.ts';
+import { CountBadge } from '@/shared/components/Cells/CountBadge/index.ts';
 import { CreateOrganizationDialog } from '@/shared/components/CreateOrganizationDialog/index.ts';
 import { Spinner } from '@/shared/components/Spinner/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
@@ -14,14 +14,16 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu.tsx';
-import { mapApiError, reportError } from '@/shared/errors/errorHandler.ts';
+import { notifyError, reportError } from '@/shared/errors/errorHandler.ts';
 import { useDeploymentFlags } from '@/shared/hooks/useDeploymentFlags/index.ts';
 import { useMeContext } from '@/shared/hooks/useMeContext/index.ts';
 import { Check, ChevronsUpDown, Plus } from '@/shared/icons/index.ts';
 import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
-import { notify } from '@/shared/notify/index.ts';
 import { useWorkspaceSwitchStore } from '@/shared/store/useWorkspaceSwitchStore/index.ts';
 import {
   resolveDeploymentMode,
@@ -29,31 +31,26 @@ import {
   shouldShowOrganizationSwitcher,
 } from '@/shared/tenancy/deployment-mode.ts';
 import type { OrganizationSummary } from '@/shared/tenancy/me-context.ts';
+import { type MyInvitation, useMyInvitations } from '@/shared/tenancy/my-invitations.ts';
 import { useMyOrganizationSummaries } from '@/shared/tenancy/my-organization-summaries.ts';
 import { switchToPersonal } from '@/shared/tenancy/switch.ts';
 
 interface OrganizationSwitcherProps {
-  /** Extra classes for the trigger button (e.g. `flex-1` inside the sidebar). */
+  /** Extra classes for the trigger button. */
   className?: string;
   /** Dropdown alignment relative to the trigger. */
   align?: 'start' | 'end';
-  /** Tinted shell the trigger sits on — adjusts trigger contrast. */
-  surface?: 'default' | 'sidebar';
   /**
-   * Turns the trigger into a **brand lockup**: `leading` (the product mark)
-   * takes the place of the organization's initial and the trigger becomes one
-   * borderless identity row — mark · name · chevrons — instead of a small
-   * outlined field.
-   *
-   * This is what the sidebar header uses. The mark and the switcher used to be
-   * two separate things stacked in a column: a 32px logo top-aligned against an
-   * 11px caption, with the dropdown indented on a second row beneath them, so
-   * nothing in the block shared a baseline or an edge. As ONE control they are
-   * centred on one axis by construction, and the whole row is the hit target.
+   * `submenu` renders the switcher as a row inside a parent dropdown — the
+   * section-bar Account menu's "Switch clinic" (KICKOFF §3.2) — instead of its
+   * own trigger and menu. It lists the workspaces only (no "Add"), and hides
+   * when there is nothing to switch to.
    */
-  leading?: ReactNode;
-  /** Second line under the organization name in the lockup (the product name). */
-  caption?: string;
+  presentation?: 'menu' | 'submenu';
+  /** The submenu row's label (`presentation: 'submenu'`). */
+  submenuLabel?: string;
+  /** Called once a switch has landed — a parent menu closes itself. */
+  onSwitched?: () => void;
 }
 
 /**
@@ -68,83 +65,25 @@ function initialOf(name: string): string {
 }
 
 /**
- * The trigger's two shapes: a compact outlined **field** (headers), or the
- * sidebar's borderless, taller brand **lockup**.
+ * What the trigger says about the active organization: its initial in a small
+ * chip, then its name, on one line.
  */
-const TRIGGER_LAYOUTS = {
-  field: { name: 'field', variant: 'outline', className: 'h-9 gap-2' },
-  lockup: { name: 'lockup', variant: 'ghost', className: 'h-11 gap-3 px-2' },
-} as const;
-
-/**
- * What the trigger says about the active organization: a leading mark and its
- * name. In the **lockup** (`leading` given) the mark is the caller's — the
- * product logo — and a caption sits under the name; otherwise it is the
- * organization's initial in a small chip, on one line.
- */
-function TriggerIdentity({
-  name,
-  leading,
-  caption,
-  onSidebar,
-}: {
-  name: string;
-  leading: ReactNode | undefined;
-  caption: string | undefined;
-  onSidebar: boolean;
-}) {
-  const lockup = leading !== undefined;
+function TriggerIdentity({ name }: { name: string }) {
   return (
     <>
-      {lockup ? (
-        leading
-      ) : (
-        <span
-          // `icon-chip`, not a bare `rounded`: the chip follows the radius and
-          // shape axes (square under Sharp) like every other tile.
-          data-slot="icon-chip"
-          className={cn(
-            'flex size-6 shrink-0 items-center justify-center text-xs font-semibold',
-            onSidebar
-              ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-              : 'bg-primary/10 text-primary',
-          )}
-        >
-          {initialOf(name)}
-        </span>
-      )}
+      <span
+        // `icon-chip`, not a bare `rounded`: the chip follows the radius and
+        // shape axes (square under Sharp) like every other tile.
+        data-slot="icon-chip"
+        className="bg-primary/10 text-primary flex size-6 shrink-0 items-center justify-center text-xs font-semibold"
+      >
+        {initialOf(name)}
+      </span>
       <span className="min-w-0 flex-1 text-start">
         <span className="block truncate text-sm leading-5 font-medium">{name}</span>
-        {lockup && caption ? (
-          <span
-            className={cn(
-              'block truncate text-xs leading-4 font-normal',
-              onSidebar ? 'text-sidebar-foreground/60' : 'text-muted-foreground',
-            )}
-            data-testid="organization-switcher-caption"
-          >
-            {caption}
-          </span>
-        ) : null}
       </span>
     </>
   );
-}
-
-/** The trigger's layout and surface classes: field or lockup, on the default or sidebar surface. */
-function triggerAppearance(
-  surface: 'default' | 'sidebar',
-  leading: ReactNode | undefined,
-) {
-  const onSidebar = surface === 'sidebar';
-  return {
-    layout: TRIGGER_LAYOUTS[leading === undefined ? 'field' : 'lockup'],
-    onSidebar,
-    surfaceClass: onSidebar
-      ? 'border-sidebar-border bg-transparent text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
-      : undefined,
-    chevronClass: onSidebar ? iconOnSidebarSurface : undefined,
-  };
 }
 
 /**
@@ -204,16 +143,56 @@ function OrganizationOption({
   );
 }
 
+/**
+ * One pending invitation in the menu (D84): the clinic's initial and name, "Invited · <roles>".
+ * Choosing it opens the organization picker, where it is accepted or declined.
+ */
+function InvitedOption({
+  invitation,
+  onChoose,
+}: {
+  invitation: MyInvitation;
+  onChoose: () => void;
+}) {
+  const { t } = useTranslation(LAYOUT_NS);
+  const { name } = invitation.organization;
+  return (
+    <DropdownMenuItem
+      onSelect={onChoose}
+      data-testid={`organization-switcher-invitation-${invitation.id}`}
+      className="gap-2"
+    >
+      <span
+        data-slot="icon-chip"
+        className="bg-muted text-muted-foreground flex size-7 shrink-0 items-center justify-center text-xs font-semibold"
+      >
+        {initialOf(name)}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-sm font-medium">{name}</span>
+        <span className="text-muted-foreground block truncate text-xs">
+          {t(LAYOUT_KEYS.app.orgSwitcher.invitedRow, {
+            roles: invitation.roleNames.join(', '),
+          })}
+        </span>
+      </span>
+    </DropdownMenuItem>
+  );
+}
+
 /** The menu's body: the personal section (when there is one), the organizations, and "Add". */
 function OrganizationMenuSections({
   personalOptions,
   teamOptions,
+  invitedOptions,
   teamOnly,
   showCreateTeam,
   onCreate,
 }: {
   personalOptions: ReactNode[];
   teamOptions: ReactNode[];
+  /** The pending invitations (D84), listed first so they are seen. */
+  invitedOptions: ReactNode[];
   teamOnly: boolean;
   showCreateTeam: boolean;
   onCreate: () => void;
@@ -221,6 +200,15 @@ function OrganizationMenuSections({
   const { t } = useTranslation(LAYOUT_NS);
   return (
     <>
+      {invitedOptions.length > 0 ? (
+        <>
+          <DropdownMenuLabel className="text-muted-foreground text-xs font-medium">
+            {t(LAYOUT_KEYS.app.orgSwitcher.invited)}
+          </DropdownMenuLabel>
+          {invitedOptions}
+          <DropdownMenuSeparator />
+        </>
+      ) : null}
       {personalOptions.length > 0 ? (
         <>
           <DropdownMenuLabel className="text-muted-foreground text-xs font-medium">
@@ -253,23 +241,70 @@ function OrganizationMenuSections({
   );
 }
 
-/**
- * Active-organization switcher (dual-URL aware, FE-24). Lists the user's
- * organizations from `me/context`, split into **Personal** and **Organizations**
- * sections. Switching to a **team** org navigates to its
- * `/organization/$organizationSlug/dashboard` (the org guard performs the
- * switch-on-navigation); switching to the **personal** org has no URL to drive
- * it, so it calls `switchToPersonal()` and lands on the root `/dashboard`.
- */
-export function OrganizationSwitcher({
-  className,
-  align = 'start',
-  surface = 'default',
-  leading,
-  caption,
-}: OrganizationSwitcherProps) {
+/** The switcher as a row inside a parent menu: its label, the active name, the list beside it. */
+function OrganizationSubmenu({
+  open,
+  onOpenChange,
+  label,
+  activeName,
+  busy,
+  invitationCount,
+  children,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  label: string | undefined;
+  activeName: string;
+  busy: boolean;
+  /** Pending invitations (D84): a count beside the label while there are any. */
+  invitationCount: number;
+  children: ReactNode;
+}) {
   const { t } = useTranslation(LAYOUT_NS);
-  const [createOpen, setCreateOpen] = useState(false);
+  return (
+    <DropdownMenuSub open={open} onOpenChange={onOpenChange}>
+      <DropdownMenuSubTrigger
+        className="text-body h-9 gap-2.5 rounded-lg px-2.5 font-medium"
+        disabled={busy}
+        aria-busy={busy}
+        data-testid="organization-switcher-trigger"
+        data-layout="submenu"
+      >
+        {/* The label keeps its width; the clinic name gives way to the invitation count. */}
+        <span className="shrink-0 whitespace-nowrap">{label}</span>
+        {invitationCount > 0 ? (
+          <CountBadge
+            count={invitationCount}
+            srLabel={t(LAYOUT_KEYS.app.orgSwitcher.invitationCount, {
+              count: invitationCount,
+            })}
+            data-testid="organization-switcher-invitation-count"
+          />
+        ) : null}
+        <span className="text-muted-foreground text-caption ms-auto max-w-28 min-w-0 truncate">
+          {activeName}
+        </span>
+      </DropdownMenuSubTrigger>
+      <DropdownMenuSubContent className="w-64">{children}</DropdownMenuSubContent>
+    </DropdownMenuSub>
+  );
+}
+
+/**
+ * The switch itself, shared by both presentations: the controlled menu state,
+ * which row's switch is in flight, and `selectOrg` — single-flight, with the
+ * workspace-switch overlay, a reported and toasted failure, and the menu closed
+ * only once a switch has landed.
+ */
+function useOrganizationSwitch({
+  activeId,
+  personalOrganizations,
+  onSwitched,
+}: {
+  activeId: string | undefined;
+  personalOrganizations: boolean;
+  onSwitched: (() => void) | undefined;
+}) {
   /**
    * The menu is CONTROLLED so it can be closed once a switch settles.
    *
@@ -278,7 +313,7 @@ export function OrganizationSwitcher({
    * second half to that: nothing ever closed it again. Team → team is a param
    * change on the `$organizationSlug` shell this control lives inside, so the
    * component stays mounted and the menu was left hanging open over the
-   * freshly-switched dashboard. Radix still drives every OTHER open/close —
+   * freshly-switched clinic. Radix still drives every OTHER open/close —
    * trigger, Escape, outside click, re-picking the active row — through
    * `onOpenChange`; this state only adds the missing close-on-success.
    */
@@ -307,46 +342,20 @@ export function OrganizationSwitcher({
   const navigate = useNavigate();
   const beginSwitch = useWorkspaceSwitchStore((state) => state.beginSwitch);
   const endSwitch = useWorkspaceSwitchStore((state) => state.endSwitch);
-  // A failed me/context used to pass in silence: the trigger just read "Select
-  // organization" over an empty list, indistinguishable from a real empty
-  // account (X-1). It now raises one toast carrying a Retry that refetches.
-  // Deliberately NOT `throwOnError` — swapping the switcher for an error card
-  // reflows the header around a control the user is mid-reach for; the toast
-  // says the same thing without moving anything.
-  const { data: ctx, isLoading } = useMeContext({ notifyOnError: true });
-  const deploymentFlags = useDeploymentFlags();
-  // Above the early return below: a hook after a conditional `return` is called
-  // in a different order once the switcher is hidden, which is exactly what
-  // rules-of-hooks forbids.
-  const orgs = useMyOrganizationSummaries().data ?? [];
-
-  if (!shouldShowOrganizationSwitcher(deploymentFlags)) {
-    return null;
-  }
-
-  const mode = resolveDeploymentMode(deploymentFlags);
-  const showPersonalSection = deploymentFlags.personalOrganizations;
-  const showCreateTeam = shouldAllowCreateTeam(deploymentFlags);
-
-  const personalOrgs = showPersonalSection
-    ? orgs.filter((o) => o.type === 'PERSONAL')
-    : [];
-  const teamOrgs = orgs.filter((o) => o.type === 'TEAM');
-  const activeId = ctx?.activeOrganization?.id;
-  const activeName =
-    ctx?.activeOrganization?.name ?? t(LAYOUT_KEYS.app.orgSwitcher.selectPlaceholder);
 
   async function applySelect(org: OrganizationSummary) {
     if (org.type === 'PERSONAL') {
-      if (!deploymentFlags.personalOrganizations) return;
+      if (!personalOrganizations) return;
       await switchToPersonal();
+      // A personal workspace has no clinic (D44), so it lands on the picker —
+      // its list and "Create organization" are the way back into one.
       // Awaited, not `void`: a navigation that rejects is the other half of
       // "and on failure, nothing happens ever" — fire-and-forget put it out of
       // reach of the catch below, so it could not be reported either.
-      await navigate({ to: '/dashboard' });
+      await navigate(organizationPicker());
       return;
     }
-    if (org.slug) await navigate(organizationDashboard(org.slug));
+    if (org.slug) await navigate(organizationHome(org.slug));
   }
 
   function selectOrg(org: OrganizationSummary) {
@@ -373,6 +382,7 @@ export function OrganizationSwitcher({
         // failure has somewhere to land other than a screen the user has
         // already been handed back.
         setMenuOpen(false);
+        onSwitched?.();
       })
       .catch((error: unknown) => {
         // The bare `.catch(() => undefined)` was the bug: a failed switch looked
@@ -383,7 +393,7 @@ export function OrganizationSwitcher({
           organizationId: org.id,
           organizationType: org.type,
         });
-        notify.error(mapApiError(error), { id: ORG_SWITCH_TOAST_ID });
+        notifyError(error, { id: ORG_SWITCH_TOAST_ID });
       })
       .finally(() => {
         endSwitch();
@@ -409,6 +419,43 @@ export function OrganizationSwitcher({
       });
   }
 
+  return { menuOpen, setMenuOpen, switchingId, selectOrg };
+}
+
+/**
+ * Active-organization switcher (dual-URL aware, FE-24). Lists the user's
+ * organizations from `me/context`, split into **Personal** and **Organizations**
+ * sections. Switching to a **team** org navigates to its home,
+ * `/organization/$organizationSlug` (the org guard performs the
+ * switch-on-navigation); switching to the **personal** org has no URL to drive
+ * it, so it calls `switchToPersonal()` and lands on the `/organization` picker.
+ */
+/**
+ * What both presentations read: whether the switcher shows at all, the
+ * workspaces split into personal and team, the active one, and the switch.
+ */
+function useSwitcherModel(onSwitched: (() => void) | undefined) {
+  const { t } = useTranslation(LAYOUT_NS);
+  // A failed me/context used to pass in silence: the trigger just read "Select
+  // organization" over an empty list, indistinguishable from a real empty
+  // account (X-1). It now raises one toast carrying a Retry that refetches.
+  // Deliberately NOT `throwOnError` — swapping the switcher for an error card
+  // reflows the header around a control the user is mid-reach for; the toast
+  // says the same thing without moving anything.
+  const { data: ctx, isLoading } = useMeContext({ notifyOnError: true });
+  const deploymentFlags = useDeploymentFlags();
+  const orgs = useMyOrganizationSummaries().data ?? [];
+  const visible = shouldShowOrganizationSwitcher(deploymentFlags);
+  const invitations = useMyInvitations({ enabled: visible }).data ?? [];
+  const navigate = useNavigate();
+  const activeId = ctx?.activeOrganization?.id;
+  const switching = useOrganizationSwitch({
+    activeId,
+    personalOrganizations: deploymentFlags.personalOrganizations,
+    onSwitched,
+  });
+  const { switchingId, selectOrg } = switching;
+
   const renderOrg = (org: OrganizationSummary) => (
     <OrganizationOption
       key={org.id}
@@ -420,53 +467,152 @@ export function OrganizationSwitcher({
     />
   );
 
+  const renderInvitation = (invitation: MyInvitation) => (
+    <InvitedOption
+      key={invitation.id}
+      invitation={invitation}
+      onChoose={() => {
+        // Accept and Decline live on the picker; a parent menu closes on the way.
+        onSwitched?.();
+        void navigate(organizationPicker());
+      }}
+    />
+  );
+
+  return {
+    ...switching,
+    visible,
+    invitations,
+    renderInvitation,
+    teamOnly: resolveDeploymentMode(deploymentFlags) === 'team-only',
+    showCreateTeam: shouldAllowCreateTeam(deploymentFlags),
+    personalOrgs: deploymentFlags.personalOrganizations
+      ? orgs.filter((o) => o.type === 'PERSONAL')
+      : [],
+    teamOrgs: orgs.filter((o) => o.type === 'TEAM'),
+    activeName:
+      ctx?.activeOrganization?.name ?? t(LAYOUT_KEYS.app.orgSwitcher.selectPlaceholder),
+    busy: isLoading || switchingId !== null,
+    isLoading,
+    renderOrg,
+  };
+}
+
+/**
+ * The switcher as a row of a parent menu (`presentation: 'submenu'`): the
+ * workspaces beside it, no "Add", nothing at all with one workspace.
+ */
+function OrganizationSwitcherSubmenu({
+  submenuLabel,
+  onSwitched,
+}: Pick<OrganizationSwitcherProps, 'submenuLabel' | 'onSwitched'>) {
+  const model = useSwitcherModel(onSwitched);
+  const workspaces = model.personalOrgs.length + model.teamOrgs.length;
+  // Shown with somewhere to switch to — or an invitation to answer (D84).
+  if (!model.visible || (workspaces <= 1 && model.invitations.length === 0)) {
+    return null;
+  }
+  return (
+    <OrganizationSubmenu
+      open={model.menuOpen}
+      onOpenChange={model.setMenuOpen}
+      label={submenuLabel}
+      activeName={model.activeName}
+      busy={model.busy}
+      invitationCount={model.invitations.length}
+    >
+      <OrganizationMenuSections
+        personalOptions={model.personalOrgs.map(model.renderOrg)}
+        teamOptions={model.teamOrgs.map(model.renderOrg)}
+        invitedOptions={model.invitations.map(model.renderInvitation)}
+        teamOnly={model.teamOnly}
+        showCreateTeam={false}
+        onCreate={() => undefined}
+      />
+    </OrganizationSubmenu>
+  );
+}
+
+/**
+ * Active-organization switcher (dual-URL aware, FE-24). Lists the user's
+ * organizations from `me/context`, split into **Personal** and **Organizations**
+ * sections. Switching to a **team** org navigates to its home,
+ * `/organization/$organizationSlug` (the org guard performs the
+ * switch-on-navigation); switching to the **personal** org has no URL to drive
+ * it, so it calls `switchToPersonal()` and lands on the `/organization` picker.
+ */
+export function OrganizationSwitcher({
+  presentation,
+  submenuLabel,
+  ...menuProps
+}: OrganizationSwitcherProps) {
+  return presentation === 'submenu' ? (
+    <OrganizationSwitcherSubmenu
+      submenuLabel={submenuLabel}
+      onSwitched={menuProps.onSwitched}
+    />
+  ) : (
+    <OrganizationSwitcherMenu {...menuProps} />
+  );
+}
+
+/** The switcher with its own trigger — a compact outlined field. */
+function OrganizationSwitcherMenu({
+  className,
+  align = 'start',
+  onSwitched,
+}: Pick<OrganizationSwitcherProps, 'className' | 'align' | 'onSwitched'>) {
+  const { t } = useTranslation(LAYOUT_NS);
+  const [createOpen, setCreateOpen] = useState(false);
   const {
-    layout: triggerLayout,
-    onSidebar,
-    surfaceClass: triggerSurfaceClass,
-    chevronClass,
-  } = triggerAppearance(surface, leading);
+    visible,
+    menuOpen,
+    setMenuOpen,
+    switchingId,
+    isLoading,
+    activeName,
+    personalOrgs,
+    teamOrgs,
+    teamOnly,
+    showCreateTeam,
+    renderOrg,
+    invitations,
+    renderInvitation,
+  } = useSwitcherModel(onSwitched);
+
+  if (!visible) return null;
 
   return (
     <>
       <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
         <DropdownMenuTrigger asChild>
           <Button
-            variant={triggerLayout.variant}
+            variant="outline"
             size="sm"
-            className={cn(
-              'min-w-0 justify-start',
-              triggerLayout.className,
-              triggerSurfaceClass,
-              className,
-            )}
+            className={cn('h-9 min-w-0 justify-start gap-2', className)}
             disabled={isLoading || switchingId !== null}
             aria-busy={switchingId !== null}
             aria-label={t(LAYOUT_KEYS.app.orgSwitcher.triggerLabel, {
               name: activeName,
             })}
             data-testid="organization-switcher-trigger"
-            data-layout={triggerLayout.name}
+            data-layout="field"
           >
-            <TriggerIdentity
-              name={activeName}
-              leading={leading}
-              caption={caption}
-              onSidebar={onSidebar}
-            />
-            <ChevronsUpDown className={cn('h-4 w-4 shrink-0 opacity-60', chevronClass)} />
+            <TriggerIdentity name={activeName} />
+            <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-60" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align={align}
-          // Never narrower than the control that opened it: under the full-width
-          // lockup a fixed 16rem menu stopped short of the trigger's end edge.
+          // Never narrower than the control that opened it: under a wide
+          // trigger a fixed 16rem menu stopped short of its end edge.
           className="w-[max(16rem,var(--radix-dropdown-menu-trigger-width))]"
         >
           <OrganizationMenuSections
             personalOptions={personalOrgs.map(renderOrg)}
             teamOptions={teamOrgs.map(renderOrg)}
-            teamOnly={mode === 'team-only'}
+            invitedOptions={invitations.map(renderInvitation)}
+            teamOnly={teamOnly}
             showCreateTeam={showCreateTeam}
             onCreate={() => setCreateOpen(true)}
           />

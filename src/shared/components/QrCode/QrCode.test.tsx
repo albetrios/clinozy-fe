@@ -11,6 +11,15 @@ vi.mock('qrcode', () => ({
 }));
 
 describe('QrCode', () => {
+  it('holds its place with one flat bar while the code is generated — no pulse', () => {
+    render(<QrCode data="otpauth://totp/test?secret=ABC" />);
+    const bar = screen
+      .getByTestId('qr-code-skeleton')
+      .querySelector('[data-slot="skeleton"]');
+    expect(bar).toHaveClass('bg-muted-strong', 'animate-none', 'size-full');
+    expect(bar).not.toHaveClass('animate-pulse');
+  });
+
   it('renders generated SVG', async () => {
     render(<QrCode data="otpauth://totp/test?secret=ABC" />);
     await waitFor(() => expect(screen.getByTestId('qr-code')).toBeInTheDocument());

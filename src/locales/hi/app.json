@@ -1,0 +1,1390 @@
+{
+  "sections": {
+    "today": {
+      "label": "आज",
+      "description": "अभी क्लिनिक: आगमन, प्रतीक्षा, डॉक्टर के साथ, चेकआउट"
+    },
+    "leads": {
+      "label": "लीड्स",
+      "description": "पूछताछ और उनकी बातचीत, जब तक वे मरीज़ न बन जाएँ"
+    },
+    "appointments": {
+      "label": "अपॉइंटमेंट",
+      "description": "डॉक्टर, कमरे और मशीन के अनुसार बुकिंग"
+    },
+    "patients": {
+      "label": "मरीज़",
+      "description": "पंजीकृत मरीज़, पर्चों, सत्रों और तस्वीरों के साथ"
+    },
+    "medical": {
+      "label": "मेडिकल",
+      "description": "दवा की दुकान: बिक्री के लिए दवाएँ, आपूर्तिकर्ता, एमआर, खरीद, बिक्री"
+    },
+    "stock": {
+      "label": "क्लिनिक स्टॉक",
+      "description": "प्रक्रियाओं में इस्तेमाल होने वाली क्लिनिक की सामग्री और उपकरण · बिक्री के लिए नहीं"
+    },
+    "payments": {
+      "label": "भुगतान",
+      "description": "वसूली, चालान और बकाया"
+    },
+    "tasks": {
+      "label": "कार्य",
+      "description": "फ़ॉलो-अप, फ़ीडबैक कॉल और रिमाइंडर, ज़िम्मेदार व्यक्ति और समय-सीमा के साथ"
+    },
+    "offerings": {
+      "label": "सेवाएँ",
+      "description": "क्लिनिक क्या बेचता है: सेवाएँ, पैकेज, ऑफ़र और कीमतें"
+    },
+    "users": {
+      "label": "उपयोगकर्ता",
+      "description": "टीम, भूमिकाएँ और पहुँच, शाखाएँ"
+    }
+  },
+  "tones": {
+    "butter": "मक्खनी",
+    "lav": "लैवेंडर",
+    "sky": "आसमानी",
+    "sage": "सेज",
+    "blush": "गुलाबी",
+    "mint": "पुदीना",
+    "peach": "आड़ू",
+    "plum": "बेर",
+    "lime": "नींबू",
+    "slate": "स्लेटी",
+    "stone": "पत्थर"
+  },
+  "roles": {
+    "admin": "एडमिन",
+    "doctor": "डॉक्टर",
+    "therapist": "थेरेपिस्ट",
+    "front_desk": "फ्रंट डेस्क",
+    "counsellor": "काउंसलर",
+    "pharmacist": "फ़ार्मासिस्ट",
+    "accountant": "अकाउंटेंट",
+    "marketing": "मार्केटिंग",
+    "owner": "मालिक"
+  },
+  "leads": {
+    "statuses": {
+      "new": "नया",
+      "contacted": "संपर्क किया",
+      "follow_up": "फ़ॉलो-अप",
+      "clinic_visited": "क्लिनिक आए",
+      "no_response": "कोई जवाब नहीं",
+      "not_interested": "रुचि नहीं",
+      "invalid": "अमान्य",
+      "lost": "खो गया"
+    },
+    "retargeted": "री-टारगेट किया",
+    "sources": {
+      "instagram": "Instagram",
+      "google": "Google",
+      "whatsapp": "WhatsApp",
+      "facebook": "Facebook",
+      "walk_in": "सीधे आए",
+      "referral": "रेफ़रल",
+      "retarget": "री-टारगेट",
+      "phone_call": "फ़ोन कॉल"
+    },
+    "interests": {
+      "others": "अन्य",
+      "clinical": "क्लिनिकल",
+      "peel": "पील",
+      "lhr": "LHR",
+      "hydrafacial": "Hydrafacial",
+      "prp": "PRP"
+    }
+  },
+  "appointments": {
+    "statuses": {
+      "scheduled": "निर्धारित",
+      "confirmed": "पुष्ट",
+      "checked_in": "चेक-इन हुआ",
+      "completed": "पूरा हुआ",
+      "cancelled": "रद्द",
+      "no_show": "नहीं आए"
+    },
+    "moves": {
+      "reschedule": "दूसरे समय पर ले जाएँ",
+      "cancelled": "रद्द करें"
+    },
+    "moveHints": {
+      "scheduled": "स्लॉट रोका गया · पुष्टि अनुरोध कतार में है",
+      "confirmed": "उन्होंने हाँ कहा",
+      "checked_in": "वे आ गए हैं · सिर्फ़ उसी दिन",
+      "completed": "विज़िट हो गई · आमतौर पर विज़िट से सेट होता है",
+      "reschedule": "नए स्लॉट पर ले जाएँ · वही अपॉइंटमेंट, पुराना स्लॉट इतिहास में रहता है",
+      "cancelled": "स्लॉट खाली करता है और रिमाइंडर रोकता है",
+      "no_show": "सिर्फ़ शुरू होने का समय बीतने के बाद"
+    },
+    "guards": {
+      "final": "अंतिम स्थिति। नया अपॉइंटमेंट बनाने के लिए फिर से बुक करें का उपयोग करें।",
+      "visitDay": "सिर्फ़ {{day}}",
+      "beforeStart": "{{day}} {{time}} के बाद उपलब्ध",
+      "needsPatient": "पहले मरीज़ का रिकॉर्ड बनाएँ · पूरा करने के लिए मरीज़ चाहिए"
+    },
+    "nextActions": {
+      "check_in": "चेक-इन करें",
+      "confirm": "पुष्टि करें",
+      "complete": "पूरा करें",
+      "rebook": "फिर से बुक करें"
+    },
+    "tiles": {
+      "booked": "बुक हुआ",
+      "said_yes": "उन्होंने हाँ कहा",
+      "visit_day": "विज़िट के दिन उपलब्ध",
+      "after_check_in": "चेक-इन के बाद"
+    },
+    "hints": {
+      "scheduled": "स्लॉट रोका गया · मैसेजिंग जुड़ने तक पुष्टि अनुरोध कतार में रहता है",
+      "confirmed": "कॉल पर पहले ही पुष्टि हो गई · रिमाइंडर जाता है",
+      "checked_in": "मरीज़ क्लिनिक में है · डॉक्टर की कतार को सूचना दी गई · हो जाने पर पूरा चिह्नित करें",
+      "completed": "विज़िट हो गई · कल एक फ़ीडबैक टास्क जाएगा",
+      "needs_patient": "यह विज़िट पूरी करने के लिए मरीज़ का रिकॉर्ड बनाएँ",
+      "cancelled": "वापस लाने के लिए पुनर्स्थापित करें · तब तक स्लॉट दूसरों के लिए खाली है",
+      "closed": "यह अपॉइंटमेंट बंद है · {{status}}"
+    },
+    "cancelReasons": {
+      "patient_asked": "मरीज़ ने कहा",
+      "unreachable": "मरीज़ से संपर्क नहीं हो सका",
+      "doctor_unavailable": "डॉक्टर उपलब्ध नहीं",
+      "resource_unavailable": "मशीन या कमरा उपलब्ध नहीं",
+      "rescheduling_later": "बाद में फिर से तय करेंगे",
+      "booked_by_mistake": "गलती से बुक हुआ",
+      "other": "अन्य"
+    },
+    "cancelSides": {
+      "patient": "मरीज़",
+      "clinic": "क्लिनिक"
+    },
+    "cancelConfirm": {
+      "title": "यह अपॉइंटमेंट रद्द करें?",
+      "record": "{{name}} · {{service}}",
+      "effect": "स्लॉट खाली हो जाता है और रिमाइंडर रुक जाते हैं। समय बीतने तक आप इसे वापस ला सकते हैं।",
+      "action": "रद्द करें"
+    },
+    "formCancelReasons": {
+      "patient_cancelled": "मरीज़ ने रद्द किया",
+      "rescheduling_later": "बाद में फिर से तय करेंगे",
+      "doctor_unavailable": "डॉक्टर उपलब्ध नहीं",
+      "booked_by_mistake": "गलती से बुक हुआ",
+      "other": "अन्य"
+    },
+    "toasts": {
+      "booked": "बुक हुआ {{id}} · {{day}} {{time}} · पुष्टि अनुरोध कतार में है",
+      "bookedQueued": "बुक हुआ {{id}} · {{day}} {{time}} · रिमाइंडर कतार में",
+      "bookedOnly": "बुक हुआ {{id}} · {{day}} {{time}}",
+      "moved": "{{id}} को {{day}} {{time}} पर ले जाया गया · पुष्टि अनुरोध कतार में है",
+      "movedOnly": "{{id}} को {{day}} {{time}} पर ले जाया गया",
+      "updated": "{{id}} अपडेट हुआ",
+      "statusChanged": "{{name}} → {{status}}",
+      "statusConfirmed": "{{name}} → {{status}} · रिमाइंडर कतार में",
+      "statusCancelled": "{{name}} → {{status}} · {{reason}} · स्लॉट खाली, रिमाइंडर रुके",
+      "cancelled": "अपॉइंटमेंट {{id}} रद्द",
+      "restored": "अपॉइंटमेंट पुनर्स्थापित · रिमाइंडर फिर से जाएगा"
+    }
+  },
+  "offerings": {
+    "categories": {
+      "consultation": "परामर्श",
+      "treatment": "उपचार",
+      "package": "पैकेज",
+      "lhr": "LHR",
+      "product": "उत्पाद"
+    },
+    "offerKinds": {
+      "percent": "% छूट",
+      "amount": "₹ छूट",
+      "fixed": "निश्चित मूल्य",
+      "extra": "अतिरिक्त सत्र"
+    },
+    "offerStates": {
+      "live": "चालू",
+      "scheduled": "निर्धारित",
+      "paused": "रोका गया",
+      "ended": "समाप्त"
+    },
+    "toasts": {
+      "offeringCreated": "सेवा {{id}} बनाई गई",
+      "offeringSaved": "सेवा {{id}} सहेजी गई",
+      "offeringRemoved": "सेवा {{id}} हटाई गई",
+      "offerCreated": "{{name}} बनाया गया · अपने-आप लागू होता है",
+      "offerSaved": "{{name}} सहेजा गया",
+      "offerRemoved": "{{name}} हटाया गया",
+      "offerPaused": "{{name}} रोका गया",
+      "offerResumed": "{{name}} फिर से चालू"
+    },
+    "specialties": {
+      "skin": "त्वचा",
+      "hair": "बाल",
+      "dental": "दंत",
+      "gynac": "स्त्री रोग",
+      "physio": "फ़िज़ियो",
+      "general": "सामान्य"
+    }
+  },
+  "patients": {
+    "types": {
+      "aesthetic": "एस्थेटिक",
+      "clinical": "क्लिनिकल",
+      "lhr": "LHR",
+      "dental": "डेंटल",
+      "physio": "फ़िज़ियो",
+      "gynac": "गायनैक"
+    },
+    "statuses": {
+      "new": "नया",
+      "regular": "नियमित",
+      "vip": "VIP",
+      "inactive": "निष्क्रिय"
+    },
+    "conversions": {
+      "converted": "T-कन्वर्टेड",
+      "not_converted": "T-नॉट कन्वर्टेड"
+    },
+    "referralSources": {
+      "patient": "मरीज़",
+      "doctor": "डॉक्टर",
+      "instagram": "Instagram",
+      "google": "Google",
+      "walk_in": "सीधे आए",
+      "other": "अन्य"
+    }
+  },
+  "visits": {
+    "record": "विज़िट"
+  },
+  "patientDelete": {
+    "title": "इस मरीज़ को हटाएँ?",
+    "titleRecord": "इस रिकॉर्ड को हटाएँ?",
+    "removed": "{{name}} हटाया गया"
+  },
+  "patientDrawer": {
+    "title": {
+      "create": "नया मरीज़",
+      "edit": "मरीज़ संपादित करें"
+    },
+    "sub": {
+      "full": "संपर्क भी बनाता या अपडेट करता है",
+      "quick": "विज़िट पूरी होने से पहले क्लिनिक को क्या चाहिए"
+    },
+    "quickFill": {
+      "walkIn": "आज सीधे आए",
+      "referred": "मरीज़ ने भेजा",
+      "instagram": "Instagram से",
+      "lhr": "LHR मरीज़"
+    },
+    "steps": {
+      "contact": "संपर्क और व्यक्तिगत",
+      "clinic": "क्लिनिक, रेफ़रल और फ़ॉलो-अप"
+    },
+    "groups": {
+      "contact": "संपर्क",
+      "personal": "व्यक्तिगत",
+      "clinic": "क्लिनिक",
+      "referral": "रेफ़रल और फ़ॉलो-अप"
+    },
+    "fields": {
+      "firstName": "पहला नाम",
+      "lastName": "उपनाम",
+      "mobile": "मोबाइल",
+      "mobileHint": "मुख्य · WhatsApp",
+      "phone2": "दूसरा मोबाइल",
+      "phone2Hint": "10 अंक",
+      "address": "पता",
+      "addressPlaceholder": "इलाका, शहर",
+      "homeBranch": "मुख्य शाखा",
+      "gender": "लिंग",
+      "birthDate": "जन्म तिथि",
+      "age": "उम्र {{age}}",
+      "types": "मरीज़ का प्रकार",
+      "typesHint": "कितने भी चुनें",
+      "status": "स्थिति",
+      "conversion": "कन्वर्ज़न",
+      "referredBy": "किसने भेजा",
+      "referredByPlaceholder": "नाम",
+      "referrerType": "रेफ़रल का प्रकार",
+      "followUp": "फ़ॉलो-अप",
+      "followUpDate": "फ़ॉलो-अप की तारीख",
+      "followUpTime": "फ़ॉलो-अप का समय",
+      "notes": "नोट्स",
+      "notesPlaceholder": "टीम को जो जानना चाहिए",
+      "consent": "सहमति",
+      "consentHint": "किस पर हस्ताक्षर हुए",
+      "photos": "पहली तस्वीरें",
+      "photosHint": "पहले की तस्वीरें · आज की विज़िट में रखी जाएँगी",
+      "photosDrop": "तस्वीरें लें या यहाँ छोड़ें",
+      "photosLimit": "JPG या PNG · हर एक {{limit}} तक",
+      "photosRemove": "{{name}} हटाएँ"
+    },
+    "followUpQuick": {
+      "tomorrow": "कल {{time}}",
+      "week": "1 हफ़्ते में",
+      "twentyDays": "20 दिन",
+      "month": "1 महीना"
+    },
+    "save": {
+      "create": "मरीज़ बनाएँ",
+      "edit": "बदलाव सहेजें",
+      "createAnother": "बनाएँ और एक और जोड़ें"
+    },
+    "missing": "नाम और मोबाइल जोड़ें",
+    "mobileInvalid": "10 अंकों का मोबाइल नंबर डालें",
+    "created": "मरीज़ {{id}} बनाया गया",
+    "openFile": "फ़ाइल खोलें",
+    "saved": "{{name}} सहेजा गया",
+    "registered": "{{name}} को मरीज़ {{id}} के रूप में दर्ज किया गया",
+    "registeredPhotos_one": "{{name}} को मरीज़ {{id}} के रूप में दर्ज किया गया · {{count}} तस्वीर रखी गई",
+    "registeredPhotos_other": "{{name}} को मरीज़ {{id}} के रूप में दर्ज किया गया · {{count}} तस्वीरें रखी गईं",
+    "duplicate": "{{name}} जैसा ही मोबाइल · {{id}}",
+    "useExisting": "मौजूदा इस्तेमाल करें",
+    "summaryEmpty": "नया मरीज़",
+    "knownPerson": "{{name}} पहले से आपके संपर्कों में हैं · फ़ाइल उन्हीं के नाम पर खुलेगी"
+  },
+  "recordDrawer": {
+    "cancel": "रद्द करें",
+    "back": "वापस",
+    "close": "बंद करें",
+    "save": "सहेजें",
+    "saving": "सहेजा जा रहा है…",
+    "retrySave": "फिर से सहेजें",
+    "saveAndAdd": "सहेजें और एक और जोड़ें",
+    "delete": "हटाएँ",
+    "notSaved": "सहेजा नहीं गया · आपके परिवर्तन बने हुए हैं",
+    "saveFailed": "सहेजा नहीं जा सका · कनेक्शन टूट गया। आपने जो भी भरा है, वह अब भी यहीं है।",
+    "readOnly": "केवल देखने के लिए · आपकी भूमिका इसे बदल नहीं सकती",
+    "quickFill": "झटपट भरें",
+    "step": {
+      "next": "अगला: {{step}} →",
+      "edit": "संपादित करें",
+      "open": "खोलें",
+      "missing": "बाकी: {{fields, list(type: unit)}}",
+      "notFilled": "अभी भरा नहीं गया"
+    },
+    "peek": {
+      "empty": "खाली",
+      "added_one": "{{count}} जोड़ा गया",
+      "added_other": "{{count}} जोड़े गए",
+      "noneYet": "अभी कोई नहीं"
+    },
+    "stepper": {
+      "decrease": "घटाएँ",
+      "increase": "बढ़ाएँ"
+    },
+    "colours": {
+      "butter": "मक्खनी",
+      "lav": "लैवेंडर",
+      "sky": "आसमानी",
+      "sage": "सेज हरा",
+      "blush": "हल्का गुलाबी",
+      "mint": "पुदीना",
+      "peach": "आड़ू",
+      "plum": "बेर",
+      "lime": "नींबू हरा",
+      "slate": "स्लेटी",
+      "stone": "पत्थर"
+    },
+    "currency": "₹"
+  },
+  "personCard": {
+    "contactLabel": "संपर्क",
+    "openPatientFile": "मरीज़ की फ़ाइल खोलें",
+    "since": "{{date}} से",
+    "leadSince": "{{date}} से लीड",
+    "kind": {
+      "patient": "मरीज़",
+      "lead": "लीड",
+      "contact": "संपर्क"
+    },
+    "editContact": "संपर्क संपादित करें",
+    "changeContact": "संपर्क बदलें",
+    "changeContactHint": "कोई दूसरा संपर्क चुनें",
+    "reach": "संपर्क के तरीके",
+    "team": "टीम",
+    "about": "जानकारी",
+    "reachSub": {
+      "whatsappPrimary": "WhatsApp · मुख्य",
+      "whatsappAlternate": "WhatsApp · वैकल्पिक",
+      "phonePrimary": "फ़ोन · मुख्य",
+      "phoneAlternate": "फ़ोन · वैकल्पिक",
+      "instagram": "Instagram"
+    },
+    "whatsApp": "WhatsApp",
+    "call": "कॉल करें",
+    "openInstagram": "Instagram खोलें",
+    "copy": "कॉपी करें",
+    "copied": "{{value}} कॉपी किया गया",
+    "noReach": "अभी कोई फ़ोन या हैंडल सहेजा नहीं गया",
+    "claim": "खुला · लें",
+    "claimHint": "इस व्यक्ति की एक लीड खुली है · इसे लें",
+    "gender": {
+      "female": "महिला",
+      "male": "पुरुष",
+      "other": "अन्य"
+    },
+    "genderAge": "{{gender}} · {{age}} वर्ष",
+    "age": "{{age}} वर्ष",
+    "cameVia": "{{source}} से आए",
+    "owedToThem": "{{amount}} उन्हें लौटाने हैं",
+    "owedByThem": "{{amount}} उन पर क्लिनिक का बकाया",
+    "reviews_one": "{{count}} समीक्षा · नवीनतम {{rating}}★ {{source}} पर · {{date}}",
+    "reviews_other": "{{count}} समीक्षाएँ · नवीनतम {{rating}}★ {{source}} पर · {{date}}",
+    "consent": {
+      "data": "डेटा",
+      "photos": "फ़ोटो",
+      "marketing": "मार्केटिंग",
+      "hint": "सहमति · {{label}}",
+      "given": "{{label}}: सहमति दी गई",
+      "missing": "{{label}}: सहमति नहीं"
+    },
+    "newLead": "+ लीड",
+    "newLeadHint": "इस संपर्क के लिए नई पूछताछ",
+    "newAppointment": "+ अपॉइंटमेंट",
+    "newAppointmentHint": "इस संपर्क के लिए बुक करें",
+    "newPatient": "+ मरीज़",
+    "newPatientHint": "इस संपर्क के लिए मरीज़ रिकॉर्ड बनाएँ",
+    "online": "अभी ऑनलाइन",
+    "offline": "ऑफ़लाइन",
+    "memberKind": {
+      "assigned": "सौंपा गया",
+      "sentThis": "इन्होंने भेजा",
+      "treating": "इलाज कर रहे हैं",
+      "involved": "शामिल"
+    },
+    "assignToYourself": "ख़ुद को सौंपें",
+    "works": "काम का समय {{from}} – {{to}}",
+    "updated": "{{time}} पर अपडेट हुआ",
+    "fetching": "नवीनतम जानकारी ला रहे हैं…"
+  },
+  "reasonConfirm": {
+    "keep": "रहने दें",
+    "reason": "कारण",
+    "note": "नोट",
+    "notePlaceholder": "नोट जोड़ें (वैकल्पिक)",
+    "noteRequired": "टीम को कारण बताएँ (आवश्यक)",
+    "hintPickReason": "जारी रखने के लिए कोई कारण चुनें",
+    "hintAddNote": "“अन्य” के लिए एक छोटा नोट जोड़ें",
+    "kinds": {
+      "delete": {
+        "action": "हटाएँ",
+        "effect": "यह सूचियों और पिकर से हट जाएगा। ठीक बाद आने वाली सूचना से आप इसे पूर्ववत कर सकते हैं।"
+      },
+      "cancel": {
+        "action": "ऑर्डर रद्द करें",
+        "effect": "ऑर्डर यहीं रुक जाता है। स्टॉक और सप्लायर का बकाया नहीं बदलता।"
+      },
+      "void": {
+        "action": "बिक्री रद्द करें",
+        "effect": "बिक्री रद्द हो जाती है और उसका इनवॉइस भी। स्टॉक वापस आ जाता है।"
+      }
+    },
+    "reasons": {
+      "mistake": "गलती से बनाया गया",
+      "duplicate": "डुप्लिकेट",
+      "notNeeded": "अब ज़रूरत नहीं",
+      "other": "अन्य",
+      "orderedByMistake": "गलती से ऑर्डर किया",
+      "supplierCantDeliver": "सप्लायर डिलीवर नहीं कर सकता",
+      "priceChanged": "कीमत बदल गई",
+      "billedByMistake": "गलती से बिल किया",
+      "wrongItems": "गलत आइटम",
+      "customerChangedMind": "ग्राहक ने मन बदल लिया"
+    }
+  },
+  "itemsField": {
+    "addRow": "पंक्ति जोड़ें",
+    "removeRow": "पंक्ति हटाएँ",
+    "remove": "हटाएँ",
+    "decrease": "घटाएँ",
+    "increase": "बढ़ाएँ",
+    "note": "नोट",
+    "notePlaceholder": "टिप्पणियाँ",
+    "moneyPlaceholder": "₹ 0"
+  },
+  "roomToolbar": {
+    "more": "और",
+    "moreSections": "और अनुभाग",
+    "searchTitle": "खोजें · / दबाएँ",
+    "moreCreate": "बनाने के और विकल्प"
+  },
+  "filters": {
+    "title": "फ़िल्टर",
+    "appliedCount": "{{count}} लागू",
+    "clearAll": "सब हटाएँ",
+    "clearAllFilters": "सभी फ़िल्टर हटाएँ",
+    "apply": "फ़िल्टर लागू करें",
+    "saveView": "व्यू के रूप में सहेजें",
+    "savedView": "व्यू के रूप में सहेजा गया",
+    "viewSaved": "व्यू “{{name}}” सहेजा गया",
+    "any": "कोई भी",
+    "from": "से",
+    "to": "तक",
+    "created": {
+      "label": "बनाया गया",
+      "today": "आज",
+      "yesterday": "बीता कल",
+      "lastSevenDays": "पिछले 7 दिन",
+      "lastThirtyDays": "पिछले 30 दिन",
+      "thisMonth": "इस महीने",
+      "range": "कस्टम अवधि"
+    },
+    "followUp": {
+      "label": "फ़ॉलो-अप तारीख",
+      "overdue": "बकाया",
+      "today": "आज",
+      "tomorrow": "आने वाला कल",
+      "nextSevenDays": "अगले 7 दिन",
+      "notSet": "तय नहीं",
+      "range": "कस्टम अवधि"
+    }
+  },
+  "commandMenu": {
+    "results": "परिणाम",
+    "groups": {
+      "actions": "क्रियाएँ",
+      "goTo": "यहाँ जाएँ",
+      "people": "लोग"
+    },
+    "actions": {
+      "newLead": "नई लीड",
+      "newAppointment": "नया अपॉइंटमेंट",
+      "newPatient": "नया मरीज़",
+      "newReceipt": "नई रसीद",
+      "openTasks": "कार्य खोलें"
+    },
+    "screen": "स्क्रीन",
+    "move": "चलें",
+    "open": "खोलें",
+    "hint": "लोगों को खोजने के लिए 3+ अक्षर या 4+ अंक लिखें",
+    "empty": "कोई मिलान नहीं। नाम, फ़ोन या C-नंबर आज़माएँ।",
+    "personSub": "{{id}} · •••• {{lastDigits}}"
+  },
+  "lists": {
+    "loadError": "यह सूची लोड नहीं हो सकी · कनेक्शन टूट गया। आख़िरी कॉपी दिखाई जा रही है।",
+    "retry": "फिर से कोशिश करें"
+  },
+  "clock": {
+    "todayTime": "आज {{time}}",
+    "dayTime": "{{day}} {{time}}"
+  },
+  "channels": {
+    "whatsapp": "WhatsApp",
+    "call": "कॉल",
+    "sms": "SMS",
+    "instagram": "Instagram",
+    "email": "ईमेल",
+    "note": "नोट"
+  },
+  "checkInFeels": {
+    "much_better": "काफ़ी बेहतर",
+    "better": "बेहतर",
+    "same": "वैसा ही",
+    "worse": "बदतर"
+  },
+  "reviewSources": {
+    "google": "Google",
+    "video": "वीडियो",
+    "instagram": "Instagram",
+    "internal_form": "फ़ीडबैक फ़ॉर्म",
+    "whatsapp": "WhatsApp"
+  },
+  "paymentModes": {
+    "cash": "नकद",
+    "upi": "UPI",
+    "card": "कार्ड",
+    "credit": "क्रेडिट"
+  },
+  "invoiceTypes": {
+    "clinic": "क्लिनिक",
+    "medical": "मेडिकल",
+    "consultation": "परामर्श"
+  },
+  "invoiceStatuses": {
+    "paid": "चुकाया",
+    "partial": "आंशिक भुगतान",
+    "unpaid": "बकाया"
+  },
+  "taskOutcomes": {
+    "log_check_in": "चेक-इन दर्ज करें",
+    "doing_well": "ठीक हैं",
+    "no_answer": "जवाब नहीं मिला",
+    "happy": "संतुष्ट",
+    "done": "हो गया"
+  },
+  "chatColumn": {
+    "thread": "संदेश",
+    "separator": " · ",
+    "created": {
+      "lead": "लीड बनी · {{time}} · {{source}} से",
+      "patientThread": "मरीज़ · सिर्फ़ चैट · कोई लीड नहीं",
+      "contactThread": "संपर्क · सिर्फ़ चैट · कोई लीड नहीं"
+    },
+    "history": {
+      "appointment": "अपॉइंटमेंट #{{seq}}",
+      "reminder": "रिमाइंडर भेजा",
+      "prescription": "पर्चा #{{seq}}",
+      "session": "सत्र {{session}}",
+      "invoice": "{{type}} इनवॉइस #{{seq}}",
+      "due": "{{amount}} बाकी",
+      "paid": "भुगतान हुआ",
+      "received": "{{amount}} मिले",
+      "refund": "{{amount}} लौटाए",
+      "invoiceRef": "#{{seq}}",
+      "checkIn": "हाल-चाल",
+      "score": "{{score}}/10",
+      "after": "{{context}} के बाद",
+      "review": "{{source}} रिव्यू",
+      "rating": "{{rating}}★",
+      "task": "काम · {{title}} → {{result}}",
+      "masked": "₹ ••••"
+    },
+    "delivery": {
+      "sending": "भेजा जा रहा है…",
+      "sent": "भेजा गया",
+      "delivered": "पहुँचा",
+      "read": "पढ़ा गया",
+      "queued": "कतार में",
+      "notSent": "नहीं भेजा गया",
+      "retry": "फिर कोशिश करें"
+    },
+    "sender": {
+      "call": "{{name}} · कॉल",
+      "note": "{{name}} · नोट"
+    },
+    "empty": {
+      "title": "अभी कोई बातचीत नहीं",
+      "visit": "{{first}} का {{service}} {{when}} {{time}} बजे है · एक छोटा WhatsApp स्लॉट पक्का रखता है",
+      "pastVisits": "{{first}} के साथ हर WhatsApp, कॉल और नोट यहाँ दिखता है",
+      "noVisits": "एक WhatsApp से शुरू करें · जवाब यहाँ आएँगे",
+      "today": "आज",
+      "tomorrow": "कल",
+      "onDate": "{{date}} को"
+    },
+    "starters": {
+      "onTheWay": "क्या आप रास्ते में हैं?",
+      "directions": "रास्ता भेजें",
+      "newTime": "नया समय सुझाएँ",
+      "confirm": "विज़िट पक्की करें",
+      "prep": "तैयारी के निर्देश",
+      "howItWent": "पूछें कैसा रहा",
+      "nextSession": "अगला सत्र बुक करें",
+      "offer": "ऑफ़र साझा करें",
+      "hello": "नमस्ते कहें",
+      "consultation": "परामर्श का प्रस्ताव दें"
+    },
+    "sendVia": "इससे भेजें",
+    "modes": {
+      "whatsapp": "WhatsApp",
+      "instagram": "Instagram",
+      "call": "कॉल लॉग",
+      "note": "नोट"
+    },
+    "noInstagram": "इस संपर्क का Instagram नहीं है",
+    "message": "संदेश",
+    "placeholder": {
+      "message": "{{channel}} पर {{first}} को संदेश",
+      "messageNoName": "{{channel}} पर लीड को संदेश",
+      "note": "टीम के लिए नोट, {{first}} को नहीं भेजा जाएगा",
+      "noteNoName": "टीम के लिए नोट, लीड को नहीं भेजा जाएगा",
+      "call": "कॉल पर क्या हुआ?"
+    },
+    "send": {
+      "whatsapp": "WhatsApp भेजें",
+      "instagram": "Instagram भेजें",
+      "call": "कॉल दर्ज करें",
+      "note": "नोट जोड़ें"
+    },
+    "replyHint": "{{first}} ने आख़िरी बार यहीं लिखा",
+    "mismatch": "{{first}} ने {{channel}} पर लिखा · बदलें",
+    "outage": "WhatsApp बंद है · जवाब कतार में रहेंगे",
+    "notConnected": "संदेश कतार में रहते हैं · मैसेजिंग जुड़ने पर भेजे जाएंगे",
+    "prefersNoCalls": "कॉल नहीं चाहते · संदेश भेजें",
+    "prefersAfterSix": "शाम 6 बजे के बाद संपर्क पसंद है",
+    "suggest": "सुझाएँ",
+    "suggestions": "सुझाव",
+    "suggestHint": "सुझाव और टेम्पलेट · या / टाइप करें",
+    "book": "अपॉइंटमेंट बुक करें",
+    "bookHint": "अपॉइंटमेंट बुक करें · कारण उनके संदेश से",
+    "suggestedFor": "{{first}} के लिए सुझाव",
+    "closeSuggestions": "सुझाव बंद करें",
+    "templatesLabel": "टेम्पलेट · खोजने के लिए बॉक्स में / टाइप करें",
+    "noTemplate": "“{{query}}” से कोई टेम्पलेट मेल नहीं खाता",
+    "fillIn": "भरें",
+    "chips": {
+      "price": "कीमत बताएँ",
+      "priceHint": "उन्होंने कीमत पूछी",
+      "slots": "2 स्लॉट सुझाएँ",
+      "slotsHint": "उन्होंने समय पूछा",
+      "location": "लोकेशन भेजें",
+      "explain": "{{term}} समझाएँ",
+      "greet": "अभिवादन",
+      "followUp": "फ़ॉलो-अप"
+    },
+    "templates": {
+      "greeting": "अभिवादन",
+      "price": "कीमत",
+      "slots": "खाली स्लॉट",
+      "location": "लोकेशन",
+      "reminder": "रिमाइंडर",
+      "aftercare": "बाद की देखभाल",
+      "followUp": "फ़ॉलो-अप",
+      "review": "रिव्यू"
+    },
+    "content": {
+      "starters": {
+        "onTheWay": "नमस्ते {{first}}, हम {{time}} बजे आपके {{service}} के लिए तैयार हैं। क्या आप रास्ते में हैं?",
+        "directionsToday": "नमस्ते {{first}}, क्लिनिक की लोकेशन यह है: {{maps}}। {{time}} बजे मिलते हैं!",
+        "newTime": "नमस्ते {{first}}, अगर आज {{time}} बजे का समय ठीक नहीं है, तो अपनी सुविधा का समय बताएँ, हम बदल देंगे।",
+        "confirm": "नमस्ते {{first}}, याद दिला दें: आपका {{service}} {{when}} {{time}} बजे है। पक्का करने के लिए हाँ लिखें।",
+        "prep": "नमस्ते {{first}}, {{when}} आपके {{service}} से पहले: बिना मेकअप के आएँ और 24 घंटे धूप से बचें। {{time}} बजे मिलते हैं!",
+        "directionsLater": "नमस्ते {{first}}, क्लिनिक की लोकेशन यह है: {{maps}}। {{when}} {{time}} बजे मिलते हैं।",
+        "howItWent": "नमस्ते {{first}}, पिछली विज़िट के बाद आपकी त्वचा कैसी है? डॉक्टर के लिए कोई सवाल?",
+        "nextSession": "नमस्ते {{first}}, क्या आपका अगला सत्र बुक करें? अपनी सुविधा का दिन बताएँ।",
+        "offer": "नमस्ते {{first}}, इस महीने आपके नियमित ट्रीटमेंट पर खास ऑफ़र है। जानकारी चाहिए?",
+        "hello": "नमस्ते {{first}}, मैं {{clinic}} से {{me}} बोल रही/रहा हूँ। किसी भी मदद के लिए हाज़िर हूँ।",
+        "consultation": "नमस्ते {{first}}, हमारे डॉक्टर इस हफ़्ते आपसे मिल सकते हैं। क्या परामर्श बुक कर दूँ?",
+        "directions": "नमस्ते {{first}}, क्लिनिक की लोकेशन यह है: {{maps}}।"
+      },
+      "templates": {
+        "greeting": "नमस्ते {{first}}, मैं {{clinic}} से {{me}} हूँ 😊 आज मैं आपकी क्या मदद कर सकती/सकता हूँ?",
+        "price": "{{offering}} की कीमत {{price}} है। इसमें डॉक्टर से परामर्श शामिल है। क्या आपकी बुकिंग कर दूँ?",
+        "priceSessions": "{{offering}} की कीमत {{sessions}} सत्रों के लिए {{price}} है। इसमें डॉक्टर से परामर्श शामिल है। क्या आपकी बुकिंग कर दूँ?",
+        "slots": "{{interest}} के लिए हमारे पास {{slots}} खाली हैं। आपको कौन-सा ठीक लगेगा?",
+        "location": "हम यहाँ हैं: {{address}} · Google Maps: {{maps}}। ठीक सामने पार्किंग उपलब्ध है।",
+        "reminder": "नमस्ते {{first}}, याद दिला दें: आपकी विज़िट {{dayTime}} है। पक्का करने के लिए हाँ लिखें या बेहतर समय बताएँ।",
+        "aftercare": "नमस्ते {{first}}, आज त्वचा कैसी है? इसे नम रखें, सनस्क्रीन लगाएँ और 48 घंटे स्क्रब से बचें।",
+        "followUp": "नमस्ते {{first}}, {{interest}} के बारे में हाल-चाल पूछना था। क्या इस हफ़्ते आपके लिए एक स्लॉट रख दूँ?",
+        "review": "आने के लिए धन्यवाद, {{first}}! अगर आपको अच्छा लगा, तो एक छोटा-सा Google रिव्यू हमारी बहुत मदद करेगा: {{reviewLink}}"
+      },
+      "explain": "अच्छा सवाल! {{offering}} इसके लिए अच्छा काम करता है — ज़्यादातर लोगों को {{results}} में असर दिखता है। डॉक्टर परामर्श में जाँचकर योजना बनाएँगे।",
+      "sessions": "{{n}} सत्रों",
+      "fewWeeks": "कुछ हफ़्तों",
+      "slotPair": "{{first}} या {{second}}",
+      "slot": "{{day}} {{time}}",
+      "dayTime": "{{day}} {{time}} बजे",
+      "dayTimeFallback": "कल सुबह 11 बजे",
+      "today": "आज",
+      "tomorrow": "कल",
+      "onDate": "{{date}} को",
+      "there": "जी",
+      "yourTreatment": "आपका ट्रीटमेंट",
+      "interests": {
+        "clinical": "क्लिनिकल ट्रीटमेंट",
+        "peel": "पील",
+        "lhr": "LHR",
+        "hydrafacial": "हाइड्राफ़ेशियल",
+        "prp": "PRP"
+      },
+      "fill": {
+        "address": "पता",
+        "maps": "मैप्स लिंक",
+        "dayTime": "दिन और समय",
+        "reviewLink": "रिव्यू लिंक"
+      }
+    }
+  },
+  "offeringSuggestions": {
+    "title": "सेवा सुझाव",
+    "suggested_one": "{{count}} सुझाए गए",
+    "suggested_other": "{{count}} सुझाए गए",
+    "planned_one": "{{count}} योजना में",
+    "planned_other": "{{count}} योजना में",
+    "accepted_one": "{{count}} स्वीकार",
+    "accepted_other": "{{count}} स्वीकार",
+    "pastPurchases_one": "{{count}} पिछली खरीद",
+    "pastPurchases_other": "{{count}} पिछली खरीद",
+    "ideas_one": "{{count}} आइडिया",
+    "ideas_other": "{{count}} आइडिया",
+    "nothingSuggested": "अभी कुछ सुझाया नहीं गया",
+    "noSuggestions": "अभी कोई सुझाव नहीं",
+    "pricesHidden": "कीमतें छिपी हैं",
+    "masked": "₹ ••••",
+    "pricesHiddenHint": "कीमतें छिपी हैं · दिखाने के लिए आँख का उपयोग करें",
+    "showPrices": "कीमतें दिखाएँ",
+    "hidePrices": "कीमतें छिपाएँ",
+    "columns": {
+      "suggested": "सुझाया गया",
+      "qty": "मात्रा",
+      "price": "कीमत",
+      "status": "स्थिति"
+    },
+    "less": "कम",
+    "more": "ज़्यादा",
+    "quantity": "मात्रा",
+    "finalPrice": "अंतिम कीमत",
+    "belowFloor": "न्यूनतम कीमत से कम",
+    "tooMuchDiscount": "बहुत ज़्यादा छूट · किसी एडमिन से पूछें",
+    "details": "सेवा का विवरण",
+    "statuses": {
+      "planned": "योजना में",
+      "accepted": "स्वीकार",
+      "next_time": "अगली बार",
+      "declined": "अस्वीकार"
+    },
+    "statusHints": {
+      "planned": "सुझाया गया · अभी तय नहीं",
+      "accepted": "वे मान गए · होने पर इनवॉइस बनाएँ",
+      "next_time": "रुचि है · अगली विज़िट पर बात करें",
+      "declined": "रुचि नहीं · रिकॉर्ड के तौर पर रखा गया"
+    },
+    "statusLabel": "स्थिति · {{status}}",
+    "invoiced": "इनवॉइस बना",
+    "invoicedOf": "इनवॉइस बना · {{total}} में से {{done}}",
+    "remove": "हटाएँ",
+    "empty": "{{first}} के लिए अभी कुछ सुझाया नहीं गया।",
+    "whyIdea": "यह आइडिया क्यों",
+    "idea": "आइडिया",
+    "add": "+ जोड़ें",
+    "addNamed": "{{name}} जोड़ें",
+    "addHint": "सुझावों में जोड़ें",
+    "addOffering": "सेवा जोड़ें",
+    "purchasesTitle": "{{first}} की पिछली खरीद",
+    "purchaseColumns": {
+      "date": "तारीख",
+      "bought": "खरीदा",
+      "sessions": "सत्र"
+    },
+    "sessionsUsed": "{{total}} में से {{used}} इस्तेमाल",
+    "activityTitle": "संपर्क गतिविधि",
+    "openChat": "चैट खोलें",
+    "activityColumns": {
+      "when": "कब",
+      "channel": "चैनल",
+      "message": "संदेश",
+      "status": "स्थिति"
+    },
+    "sent": "भेजा",
+    "got": "मिला",
+    "removeConfirm": {
+      "title": "यह रिकॉर्ड हटाएँ?",
+      "record": "सुझावों से {{name}}",
+      "effect": "यह {{first}} के सेवा सुझावों से हट जाएगा। ऑफ़र किए जाने का रिकॉर्ड रखने के लिए इसके बजाय “अस्वीकार” चुनें।",
+      "reasons": {
+        "addedByMistake": "गलती से जोड़ा गया",
+        "duplicate": "डुप्लिकेट",
+        "planChanged": "योजना बदल गई",
+        "other": "अन्य"
+      }
+    },
+    "searchOfferings": "सेवाएँ खोजें",
+    "single": "एकल",
+    "minPrice": "कम से कम {{price}}",
+    "added": "{{name}} को {{first}} के सुझावों में जोड़ा गया",
+    "removed": "{{name}} को सुझावों से हटाया गया",
+    "offeringRemoved": "सेवा हटाई गई",
+    "info": {
+      "sessions_one": "{{count}} सेशन",
+      "sessions_other": "{{count}} सेशन",
+      "visits_one": "{{count}} विज़िट",
+      "visits_other": "{{count}} विज़िट",
+      "list": "सूची मूल्य {{price}}",
+      "lowest": "न्यूनतम {{price}}"
+    },
+    "ideaReasons": {
+      "history": "इतिहास से सुझाव"
+    },
+    "delivery": {
+      "queued": "कतार में",
+      "sent": "भेजा गया",
+      "delivered": "पहुँचा",
+      "read": "पढ़ा गया",
+      "failed": "नहीं पहुँचा",
+      "received": "मिला"
+    },
+    "activityLead": "लीड {{id}}",
+    "purchasesCount_one": "{{count}} लाइन",
+    "purchasesCount_other": "{{count}} लाइन"
+  },
+  "contactEditor": {
+    "title": "संपर्क संपादित करें",
+    "sub": "एक बार सेव · हर लीड, मरीज़ और चैट में इस्तेमाल",
+    "newContact": "नया संपर्क",
+    "steps": {
+      "identity": "पहचान और संपर्क के तरीके",
+      "preferences": "संपर्क की पसंद"
+    },
+    "idHelp": "एक संपर्क · लीड, मरीज़ों और चैट में साझा",
+    "idTooltip": "संपर्क ID · कॉपी करने के लिए क्लिक करें",
+    "idAria": "संपर्क ID {{id}} कॉपी करें",
+    "idCopied": "संपर्क ID {{id}} कॉपी हो गया",
+    "firstName": "पहला नाम",
+    "firstNamePlaceholder": "पहला नाम",
+    "lastName": "उपनाम",
+    "lastNamePlaceholder": "उपनाम (वैकल्पिक)",
+    "mobiles": "मोबाइल नंबर",
+    "mobileAria": "मोबाइल {{n}}",
+    "primary": "मुख्य",
+    "primaryTitle": "मुख्य नंबर · कॉल और मिलान के लिए",
+    "setPrimary": "मुख्य बनाएँ",
+    "setPrimaryTitle": "इसे मुख्य नंबर बनाएँ",
+    "primaryChanged": "{{number}} अब मुख्य नंबर है",
+    "whatsAppOn": "WhatsApp पर · बंद करने के लिए क्लिक करें",
+    "whatsAppOff": "WhatsApp पर नहीं · चालू करने के लिए क्लिक करें",
+    "removeNumber": "नंबर हटाएँ",
+    "addNumber": "+ नंबर जोड़ें",
+    "addInstagram": "+ Instagram",
+    "handlePlaceholder": "@हैंडल",
+    "handleAria": "Instagram {{n}}",
+    "removeHandle": "हैंडल हटाएँ",
+    "removeHandleTitle": "यह हैंडल हटाएँ",
+    "handleRemoved": "{{handle}} हटा दिया गया",
+    "addHandle": "+ हैंडल जोड़ें",
+    "defaultChannel": "डिफ़ॉल्ट चैनल",
+    "defaultChannelHint": "· आख़िरी इस्तेमाल किए गए चैनल पर बदल जाता है",
+    "custom": "+ अपनी पसंद",
+    "customPlaceholder": "पसंद लिखें",
+    "customAria": "अपनी पसंद",
+    "done": "हो गया",
+    "updated": "संपर्क अपडेट हुआ · हर जगह लागू",
+    "preferences": {
+      "noCalls": "कॉल नहीं",
+      "sundaysOnly": "सिर्फ़ रविवार",
+      "weekdaysOnly": "सिर्फ़ कार्यदिवस",
+      "afterSix": "शाम 6 बजे के बाद",
+      "mornings": "सुबह",
+      "evenings": "शाम",
+      "weekendsOnly": "सिर्फ़ सप्ताहांत",
+      "gujarati": "गुजराती",
+      "hindi": "हिंदी",
+      "english": "अंग्रेज़ी",
+      "femaleDoctor": "महिला डॉक्टर",
+      "textFirst": "कॉल से पहले मैसेज करें"
+    }
+  },
+  "offeringQuickCreate": {
+    "title": "नई सेवा",
+    "sub": "सेवा, उपचार या पैकेज जिसका आप बिल बनाते हैं",
+    "steps": {
+      "offering": "सेवा",
+      "details": "विवरण",
+      "payment": "भुगतान"
+    },
+    "fields": {
+      "name": "नाम",
+      "namePlaceholder": "जैसे LHR फ़ुल फ़ेस",
+      "duration": "अवधि",
+      "minutesUnit": "मिनट",
+      "minutes": "{{minutes}} मिनट",
+      "category": "श्रेणी",
+      "price": "कीमत"
+    },
+    "save": "सेवा जोड़ें",
+    "toasts": {
+      "name": "नाम जोड़ें",
+      "price": "कीमत दर्ज करें",
+      "added": "सेवा {{name}} जोड़ी गई"
+    }
+  },
+  "appointmentForm": {
+    "title": {
+      "loading": "अपॉइंटमेंट",
+      "create": "नया अपॉइंटमेंट",
+      "edit": "अपॉइंटमेंट {{id}}",
+      "reschedule": "{{id}} का समय बदलें"
+    },
+    "sub": "केवल खाली समय दिखाए जाते हैं · बीता हुआ समय लॉक रहता है",
+    "who": {
+      "search": "मरीज़ या लीड को नाम, फ़ोन, ID से खोजें",
+      "searchLabel": "व्यक्ति खोजें",
+      "useContact": "संपर्क चुनें",
+      "patient": "मरीज़",
+      "createContact": "+ संपर्क “{{query}}” बनाएँ",
+      "newContact": "नया संपर्क · बुक करने के लिए मोबाइल जोड़ें",
+      "mobile": "मोबाइल नंबर",
+      "name": "नाम",
+      "mobileLabel": "मोबाइल",
+      "save": "सहेजें",
+      "addName": "नाम जोड़ें",
+      "mobileDigits": "मोबाइल में 10 अंक होने चाहिए"
+    },
+    "links": {
+      "connected": "जुड़ी हुई लीड",
+      "chip": "{{id}} · {{status}}",
+      "chipHint": "लीड {{id}} · {{source}} · ज़िम्मेदार {{owner}}",
+      "movesAtCheckIn": "· चेक-इन पर “क्लिनिक आए” में चली जाती है"
+    },
+    "status": {
+      "section": "विज़िट की स्थिति",
+      "group": "स्थिति",
+      "copy": "कॉपी करें",
+      "copyHint": "कॉपी करें · वही सेवा, डॉक्टर, कारण और नोट्स",
+      "cancelVisit": "विज़िट रद्द करें",
+      "cancelHint": "यह अपॉइंटमेंट रद्द करें",
+      "cancelledReason": "{{reason}} · समय खाली हुआ · रिमाइंडर बंद",
+      "cancelledNoReason": "समय खाली हुआ · रिमाइंडर बंद",
+      "restore": "वापस लाएँ",
+      "rescheduledConfirm": "समय बदला · पहले {{day}} {{time}} था · फिर से पुष्टि करनी होगी · सहेजने पर नया रिमाइंडर जाएगा",
+      "rescheduled": "समय बदला · पहले {{day}} {{time}} था · सहेजने पर नया रिमाइंडर जाएगा",
+      "planReady_one": "प्लान तैयार · {{count}} सेवा",
+      "planReady_other": "प्लान तैयार · {{count}} सेवाएँ",
+      "planVisit_one": "इस विज़िट के लिए {{count}} तय",
+      "planVisit_other": "इस विज़िट के लिए {{count}} तय",
+      "planEarlier_one": "पिछली विज़िट से {{count}}",
+      "planEarlier_other": "पिछली विज़िट से {{count}}"
+    },
+    "details": {
+      "title": "अपॉइंटमेंट",
+      "notFilled": "अभी भरा नहीं",
+      "open": "खोलें",
+      "type": "प्रकार",
+      "typeGroup": "अपॉइंटमेंट का प्रकार",
+      "types": {
+        "consultation": "परामर्श",
+        "follow_up": "फ़ॉलो-अप",
+        "treatment": "उपचार",
+        "package_session": "पैकेज सेशन",
+        "other": "अन्य"
+      },
+      "typeHints": {
+        "consultation": "पहली विज़िट या डॉक्टर की जाँच",
+        "follow_up": "उपचार या पर्चे के बाद छोटी जाँच",
+        "treatment": "एक सेशन, विज़िट पर बिल होता है",
+        "package_session": "चुकाए गए पैकेज का एक सेशन इस्तेमाल होता है",
+        "other": "ऊपर दिए किसी में न आने वाला कुछ भी"
+      },
+      "typeLines": {
+        "consultation": "चेकआउट पर परामर्श शुल्क इनवॉइस में जुड़ जाता है",
+        "follow_up": "आम तौर पर मुफ़्त · कुछ जुड़े बिना कोई इनवॉइस नहीं",
+        "other": "नीचे नोट्स में बताएँ कि यह क्या है"
+      },
+      "treatment": "उपचार",
+      "pickTreatment": "उपचार चुनें",
+      "searchTreatments": "उपचार खोजें",
+      "common": "आम",
+      "fromOfferings": "सेवाओं से",
+      "doctor": "डॉक्टर",
+      "pickDoctor": "डॉक्टर चुनें",
+      "searchDoctors": "डॉक्टर और थेरेपिस्ट खोजें",
+      "length": "अवधि",
+      "minutes": "{{minutes}} मिनट",
+      "minutesHint": "{{minutes}} मिनट",
+      "reason": "कारण",
+      "reasonPlaceholder": "उन्होंने क्या माँगा · जैसे गालों पर पिगमेंटेशन",
+      "notes": "नोट्स",
+      "notesPlaceholder": "डॉक्टर या डेस्क को जो जानना चाहिए"
+    },
+    "slot": {
+      "title": "तारीख़ और समय",
+      "nextWeek": "अगला हफ़्ता",
+      "calendar": "कैलेंडर",
+      "previousMonth": "पिछला महीना",
+      "nextMonth": "अगला महीना",
+      "step": "स्लॉट अंतराल",
+      "stepOption": "{{minutes}} मिनट",
+      "time": "समय",
+      "pickDate": "समय देखने के लिए तारीख़ चुनें",
+      "none": "इस दिन बुक करने के लिए कोई समय नहीं · दूसरी तारीख़ चुनें",
+      "closed": {
+        "past": "यह दिन बीत चुका है · दूसरी तारीख़ चुनें",
+        "branchInactive": "यह शाखा बुकिंग नहीं ले रही है",
+        "closedDay": "इस दिन क्लिनिक बंद है · दूसरी तारीख़ चुनें",
+        "holiday": "{{label}} के लिए बंद · दूसरी तारीख़ चुनें",
+        "doctorOff": "इस दिन डॉक्टर छुट्टी पर हैं · दूसरी तारीख़ या डॉक्टर चुनें"
+      },
+      "am": "AM",
+      "pm": "PM",
+      "hour": "{{hour}} {{period}}",
+      "free": "{{time}} · खाली",
+      "locked": "लॉक",
+      "lockedSummary": "{{day}} · {{time}} · चेक-इन के बाद लॉक",
+      "lockedToast": "मरीज़ के चेक-इन के बाद तारीख़ और समय लॉक हो जाते हैं"
+    },
+    "footer": {
+      "pickTime": "समय चुनें",
+      "book": "{{day}}, {{time}} बुक करें",
+      "move": "{{day}}, {{time}} पर ले जाएँ",
+      "saveChanges": "बदलाव सहेजें",
+      "minutes": "{{minutes}} मिनट"
+    },
+    "validation": {
+      "who": "चुनें कि अपॉइंटमेंट किसके लिए है",
+      "slot": "तारीख़ और समय चुनें",
+      "passed": "वह समय बीत चुका है · आगे का समय चुनें",
+      "taken": "अभी-अभी बुक हुआ · दूसरा समय चुनें",
+      "doctor": "डॉक्टर चुनें",
+      "branch": "बुक करने के लिए कोई खुली शाखा नहीं"
+    },
+    "copied": "कॉपी हुआ · तारीख़ और समय चुनें"
+  },
+  "expenseCategories": {
+    "medicines": "दवाइयाँ",
+    "consumables": "उपभोग्य सामग्री",
+    "salary": "वेतन",
+    "rent": "किराया",
+    "marketing": "मार्केटिंग",
+    "utilities": "बिजली-पानी",
+    "maintenance": "रखरखाव",
+    "misc": "विविध"
+  },
+  "patientPicker": {
+    "label": "मरीज़",
+    "placeholder": "मरीज़ खोजें",
+    "hint": "सिर्फ़ मरीज़ चुने जा सकते हैं",
+    "due": "{{amount}} बकाया",
+    "nothingDue": "कोई बकाया नहीं"
+  },
+  "splitRows": {
+    "mode": "माध्यम",
+    "amount": "राशि"
+  },
+  "settleCredit": {
+    "title": {
+      "give": "वापस दें",
+      "take": "वापस मिला"
+    },
+    "sub": {
+      "give": "{{name}} को · {{reason}} · पेमेंट्स में एक जावक एंट्री जुड़ती है",
+      "take": "{{name}} से · {{reason}} · पेमेंट्स में एक आवक एंट्री जुड़ती है"
+    },
+    "section": {
+      "give": "कैसे लौटाया जा रहा है",
+      "take": "कैसे आया"
+    },
+    "rows": {
+      "give": "किससे लौटाया",
+      "take": "किस रूप में मिला"
+    },
+    "add": "दूसरा माध्यम जोड़ें",
+    "total": "कुल {{total}} · {{owed}} में से",
+    "save": {
+      "give": "{{amount}} लौटाएँ",
+      "take": "{{amount}} दर्ज करें"
+    },
+    "enterAmount": "राशि डालें",
+    "moreThanOwed": "बकाया {{amount}} से ज़्यादा",
+    "done": {
+      "give": "{{name}} को {{amount}} लौटाए · {{entry}}",
+      "take": "{{name}} से {{amount}} वापस मिले · {{entry}}"
+    },
+    "branch": "शाखा",
+    "date": "तारीख़",
+    "dayClosed": "इस शाखा में वह दिन बंद है · कोई खुला दिन चुनें",
+    "moreThanPaid": "इसके इनवॉइस पर चुकाई गई राशि से ज़्यादा",
+    "closed": "{{ref}} पहले ही निपट चुका है",
+    "entry": {
+      "give": "जावक एंट्री जुड़ी",
+      "take": "आवक एंट्री जुड़ी"
+    }
+  },
+  "quickLine": {
+    "label": "जल्दी जोड़ें",
+    "enter": "↵ जोड़ें",
+    "matches": "मिलान",
+    "suggested": "सुझाव · जोड़ने के लिए क्लिक करें",
+    "typed": "सूची में नहीं · जैसा लिखा वैसा जोड़ें",
+    "noMatch": "कोई मिलान नहीं। वर्तनी जाँचें या कम अक्षर लिखें।",
+    "keys": "↑↓ चुनें · ↵ जोड़ें · Esc साफ़ करें",
+    "browse": "ब्राउज़ करें",
+    "browseAll": "सब ब्राउज़ करें",
+    "groups": "समूह",
+    "closeBrowse": "ब्राउज़ बंद करें",
+    "added_one": "{{count}} जोड़ा गया",
+    "added_other": "{{count}} जोड़े गए",
+    "tapToAdd": "जोड़ने के लिए किसी टाइल पर टैप करें",
+    "showing": "{{total}} में से {{shown}} दिख रहे हैं · सीमित करने के लिए लिखें",
+    "done": "हो गया",
+    "emptyGroup": "इस समूह में कुछ मेल नहीं खाता।",
+    "addOne": "एक जोड़ें",
+    "removeOne": "एक हटाएँ",
+    "addNew": "नया जोड़ें",
+    "tags": {
+      "qty": "×{{count}}",
+      "free": "+{{count}} मुफ़्त",
+      "rate": "@ {{amount}}",
+      "discount": "{{percent}}% छूट"
+    }
+  },
+  "invoiceDrawer": {
+    "title": {
+      "create": "नया इनवॉइस",
+      "edit": "इनवॉइस बदलें",
+      "createSale": "नई बिक्री",
+      "editSale": "बिक्री बदलें"
+    },
+    "sub": {
+      "create": "पहले प्रकार चुनें, फिर आइटम जोड़ें",
+      "edit": "बदलाव इनवॉइस पर दर्ज होते हैं",
+      "sale": "मेडिकल इनवॉइस · स्टॉक सबसे पहले ख़त्म होने वाले से घटता है"
+    },
+    "type": "प्रकार",
+    "steps": {
+      "party": "मरीज़ और टीम",
+      "items": "आइटम",
+      "medicines": "दवाइयाँ",
+      "payment": "भुगतान"
+    },
+    "fields": {
+      "branch": "शाखा",
+      "newPatient": "नया मरीज़",
+      "customer": "ग्राहक",
+      "customerHint": "मरीज़ या कोई भी संपर्क · नए नाम मेडिकल संपर्क के रूप में सहेजे जाते हैं",
+      "customerPlaceholder": "मरीज़, लीड या मेडिकल संपर्क खोजें",
+      "addContact": "संपर्क जोड़ें",
+      "mobile": "मोबाइल",
+      "mobileHint": "संपर्क पर सहेजा जाता है",
+      "mobilePlaceholder": "98765 43210",
+      "team": "टीम",
+      "prescribedBy": "किसने लिखा",
+      "teamPlaceholder": "टीम चुनें",
+      "teamHint": "डॉक्टर, थेरेपिस्ट, काउंसलर",
+      "teamFrom": "{{name}} की टीम से",
+      "overallDiscount": "कुल छूट",
+      "quickFill": "झटपट भरें",
+      "paidNow": "अभी भुगतान",
+      "remark": "टिप्पणी",
+      "remarkPlaceholder": "प्रिंट इनवॉइस पर दिखती है",
+      "paid": "अब तक भुगतान"
+    },
+    "customerGroups": {
+      "patient": "मरीज़",
+      "lead": "लीड",
+      "contact": "मेडिकल संपर्क"
+    },
+    "customerSub": {
+      "noMobile": "अभी मोबाइल नहीं"
+    },
+    "items": {
+      "quickLine": "सर्विस, मात्रा, छूट लिखें · जैसे lhr face 1 10%",
+      "quickLineMedical": "दवा और मात्रा लिखें · जैसे sun 2",
+      "hint": "2 = मात्रा · 10% = छूट · @500 = रेट",
+      "oftenBilled": "अक्सर बिल होने वाले",
+      "browse": {
+        "all": "सभी",
+        "oral": "खाने वाली",
+        "topical": "लगाने वाली"
+      },
+      "columns": {
+        "offering": "सर्विस",
+        "medicine": "दवा",
+        "qty": "मात्रा",
+        "rate": "रेट",
+        "discount": "छूट %",
+        "gst": "GST",
+        "final": "फ़ाइनल"
+      },
+      "pickItem": "आइटम चुनें",
+      "selectOffering": "सर्विस चुनें…",
+      "selectMedicine": "दवा चुनें…",
+      "newOffering": "नई सर्विस",
+      "addItem": "आइटम जोड़ें",
+      "addMedicine": "दवा जोड़ें",
+      "total": "कुल",
+      "sessions_one": "{{count}} सेशन",
+      "sessions_other": "{{count}} सेशन",
+      "inStock": "स्टॉक में {{count}}",
+      "outOfStock": "स्टॉक ख़त्म",
+      "belowFloor": "{{name}} के न्यूनतम मूल्य {{amount}} से कम",
+      "newMedicineName": "नई दवा का नाम",
+      "medicineAdded": "{{name}} जोड़ा गया · एमआरपी बाद में स्टॉक में भरें",
+      "hintInvoice": "2 = मात्रा · 10% = छूट",
+      "belowLowest": "{{name}} के न्यूनतम मूल्य से कम",
+      "offerApplied": "ऑफ़र लागू: {{offer}}"
+    },
+    "payment": {
+      "full": "पूरा · {{amount}} {{mode}} में",
+      "split": "नकद + UPI में बाँटें",
+      "nothing": "अभी कुछ नहीं",
+      "mode": "माध्यम",
+      "amount": "राशि",
+      "addMode": "दूसरा माध्यम जोड़ें",
+      "paidTotal": "भुगतान {{paid}} · बकाया {{due}}"
+    },
+    "totals": {
+      "label": "कुल",
+      "subtotal": "उप-योग",
+      "discountGst": "छूट + GST",
+      "discountGstValue": "{{discount}} · +{{gst}}",
+      "bill": "बिल",
+      "dueAfter": "इसके बाद बकाया",
+      "preview": "सेव होने पर यही दाम लगेंगे",
+      "pending": "दाम निकाले जा रहे हैं…",
+      "refused": "दाम नहीं निकला · चिह्नित पंक्ति ठीक करें",
+      "failed": "इस इनवॉइस के दाम नहीं निकल सके",
+      "retry": "फिर से कोशिश करें"
+    },
+    "badges": {
+      "bill": "बिल {{amount}}",
+      "sessions_one": "{{count}} सेशन शामिल",
+      "sessions_other": "{{count}} सेशन शामिल",
+      "draft": "ड्राफ़्ट",
+      "due": "{{amount}} बकाया",
+      "paid": "पूरा भुगतान"
+    },
+    "presets": {
+      "print": "इनवॉइस प्रिंट करें",
+      "plan": "प्लान · {{name}}",
+      "planQty": "प्लान · {{name}} ×{{count}}",
+      "package": "पैकेज · {{name}}",
+      "repeat": "#{{seq}} दोहराएँ",
+      "consultation": "नया कंसल्टेशन · {{amount}}",
+      "rx": "पर्चा #{{seq}} से"
+    },
+    "save": {
+      "clinic": "क्लिनिक इनवॉइस बनाएँ",
+      "medical": "मेडिकल इनवॉइस बनाएँ",
+      "consultation": "कंसल्टेशन इनवॉइस बनाएँ",
+      "edit": "बदलाव सहेजें"
+    },
+    "summary": "{{type}} · {{name}} · {{items}}",
+    "summaryItems_one": "{{count}} आइटम",
+    "summaryItems_other": "{{count}} आइटम",
+    "noPatient": "कोई मरीज़ नहीं",
+    "errors": {
+      "pickPatient": "मरीज़ चुनें",
+      "pickCustomer": "ग्राहक चुनें",
+      "addItem": "कम से कम एक आइटम जोड़ें",
+      "paidAboveBill": "भुगतान {{paid}} बिल {{bill}} से ज़्यादा है",
+      "stock": "{{name}} के सिर्फ़ {{count}} स्टॉक में हैं",
+      "belowFloor": "{{name}} अपने न्यूनतम मूल्य {{amount}} से कम है · फ़ाइनल कीमत बढ़ाएँ",
+      "belowLowest": "{{name}} अपने न्यूनतम मूल्य से कम है · अंतिम मूल्य बढ़ाएँ"
+    },
+    "toasts": {
+      "created": {
+        "clinic": "क्लिनिक इनवॉइस #{{seq}} बनाया गया",
+        "medical": "मेडिकल इनवॉइस #{{seq}} बनाया गया",
+        "consultation": "कंसल्टेशन इनवॉइस #{{seq}} बनाया गया"
+      },
+      "copied": "इनवॉइस #{{seq}} के रूप में कॉपी किया गया",
+      "createdPlan_one": "{{created}} · {{count}} सुझाव इनवॉइस्ड मार्क हुआ",
+      "createdPlan_other": "{{created}} · {{count}} सुझाव इनवॉइस्ड मार्क हुए",
+      "saved": "इनवॉइस #{{seq}} सहेजा गया",
+      "savedPlan": "इनवॉइस #{{seq}} सहेजा गया · सुझाव अपडेट हुए",
+      "promo": "{{offering}} पर {{offer}} लागू",
+      "contactSaved": "{{name}} मेडिकल संपर्क के रूप में सहेजा गया · नीचे मोबाइल जोड़ें",
+      "rxUnmatched": "{{name}} दवा सूची में नहीं है · क्विक ऐड से जोड़ें",
+      "deleted": "इनवॉइस #{{seq}} हटाया गया"
+    },
+    "deleteTitle": "यह इनवॉइस हटाएँ?",
+    "previewTitle": {
+      "clinic": "इनवॉइस #{{seq}}",
+      "medical": "मेडिकल इनवॉइस #{{seq}}",
+      "consultation": "कंसल्टेशन इनवॉइस #{{seq}}"
+    },
+    "record": "इनवॉइस",
+    "refusals": {
+      "moreThanDue": "अभी का भुगतान बिल से ज़्यादा है",
+      "dayClosed": "वह दिन बंद हो चुका है · उसमें भुगतान नहीं जोड़ा जा सकता",
+      "settled": "यह इनवॉइस सेटल है · इसका एक भुगतान बंद दिन पर है",
+      "belowPaid": "बिल पहले से चुकाई गई राशि से कम नहीं हो सकता",
+      "offeringInUse": "इस पैकेज का एक सेशन इस्तेमाल हो चुका है · उसकी पंक्ति रहने दें",
+      "treatmentBilled": "इस बीच इस इनवॉइस का एक ट्रीटमेंट बिल हो गया · उसे हटाकर फिर सेव करें",
+      "ofSale": "यह इनवॉइस मेडिकल बिक्री का है · इसे मेडिकल से बदलें",
+      "paid": "इस इनवॉइस पर भुगतान या क्रेडिट नोट है · इसे हटाया नहीं जा सकता",
+      "inUseDelete": "इस पैकेज का एक सेशन इस्तेमाल हो चुका है · इनवॉइस हटाया नहीं जा सकता"
+    },
+    "notices": {
+      "settled": "सेटल · इस इनवॉइस का एक भुगतान बंद दिन पर है, इसलिए इसे बदला नहीं जा सकता",
+      "sale": "मेडिकल बिक्री का इनवॉइस · इसे मेडिकल से बदलें"
+    }
+  },
+  "printPreview": {
+    "title": "प्रिंट प्रीव्यू · {{title}}",
+    "close": "बंद करें",
+    "print": "प्रिंट करें / PDF सहेजें"
+  },
+  "appHomeEmpty": {
+    "title": "यहाँ अभी कुछ भी चालू नहीं है",
+    "description": "आपके क्लिनिक के अनुभाग आपके लिए चालू होते ही यहाँ दिखाई देंगे।"
+  }
+}

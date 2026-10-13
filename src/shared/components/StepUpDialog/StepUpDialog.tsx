@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { authApi } from '@/shared/api/auth-api.ts';
@@ -8,29 +8,24 @@ import {
   stepUpWithPassword,
   stepUpWithTotp,
 } from '@/shared/api/step-up-api.ts';
+import { DrawerField, DrawerInput } from '@/shared/components/DrawerField/index.ts';
+import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
+import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
 import { TotpCodeInput } from '@/shared/components/TotpCodeInput/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/shared/components/ui/dialog.tsx';
-import { Input } from '@/shared/components/ui/input.tsx';
-import { Label } from '@/shared/components/ui/label.tsx';
-import { Skeleton } from '@/shared/components/ui/skeleton.tsx';
 import { FormError } from '@/shared/forms/FormError/index.ts';
 import { useAppQuery } from '@/shared/hooks/useAppQuery/index.ts';
 import { useMfaStatus } from '@/shared/hooks/useMfa/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 
 type StepUpFactor = 'password' | 'totp' | 'email';
+
+/** One factor to enter: the light 560px drawer (`_patterns.md:28`). */
+const STEP_UP_PROFILE = { fieldCount: 1 } as const;
 
 export interface StepUpDialogProps {
   open: boolean;
@@ -91,11 +86,11 @@ function StepUpFactorFields({
 
   if (factor === 'password') {
     return (
-      <div className="space-y-2">
-        <Label htmlFor="step-up-password">{t(keys.passwordLabel)}</Label>
-        <Input
+      <DrawerField label={t(keys.passwordLabel)} htmlFor="step-up-password">
+        <DrawerInput
           id="step-up-password"
           type="password"
+          capitalize={false}
           autoComplete="current-password"
           value={password}
           onChange={(event) => onPasswordChange(event.target.value)}
@@ -104,27 +99,25 @@ function StepUpFactorFields({
         {showPasswordHint ? (
           <p className="text-muted-foreground text-xs">{t(keys.passwordRequired)}</p>
         ) : null}
-      </div>
+      </DrawerField>
     );
   }
 
   if (factor === 'totp') {
     return (
-      <div className="space-y-2">
-        <Label htmlFor="step-up-code">{t(keys.totpLabel)}</Label>
+      <DrawerField label={t(keys.totpLabel)} htmlFor="step-up-code">
         <TotpCodeInput
           id="step-up-code"
           value={code}
           onChange={onCodeChange}
           testId="step-up-code"
         />
-      </div>
+      </DrawerField>
     );
   }
 
   return (
-    <div className="space-y-2">
-      <Label htmlFor="step-up-code">{t(keys.emailCodeLabel)}</Label>
+    <DrawerField label={t(keys.emailCodeLabel)} htmlFor="step-up-code">
       <TotpCodeInput
         id="step-up-code"
         value={code}
@@ -143,22 +136,24 @@ function StepUpFactorFields({
         type="button"
         variant="link"
         size="sm"
-        className="h-auto p-0"
+        className="h-auto self-start p-0"
         isLoading={isSending}
         onClick={onResend}
         data-testid="step-up-resend"
       >
         {codeSent ? t(keys.resent) : t(keys.resend)}
       </Button>
-    </div>
+    </DrawerField>
   );
 }
 
 /**
- * Re-authentication dialog for clinozy-be's "recent step-up" gate on sensitive
+ * Re-authentication drawer for clinozy-be's "recent step-up" gate on sensitive
  * credential mutations (MFA enrollment, passkey registration, revokes). Picks
  * the right factor for the account, verifies it, then hands control back via
- * `onVerified` so the caller retries the original action.
+ * `onVerified` so the caller retries the original action. Every caller sits in
+ * Settings, so it opens as a child drawer stacked on whatever asked (Back
+ * returns there), and it holds every exit while the factor is being verified.
  */
 export function StepUpDialog({
   open,
@@ -198,6 +193,8 @@ export function StepUpDialog({
    */
   const submittingRef = useRef(false);
   const sendingRef = useRef(false);
+  /** The form the footer's Verify submits — Enter in the field verifies too. */
+  const formId = `step-up-form-${useId().replace(/:/g, '')}`;
 
   const hasPassword = (methods.data ?? []).some((m) => m.methodType === 'PASSWORD');
   /** Both reads answered — until then the factor is a guess, not a decision. */
@@ -270,59 +267,58 @@ export function StepUpDialog({
     (factor === 'password' ? password.length === 0 : code.length < 6);
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-md" data-testid="step-up-dialog">
-        <DialogHeader>
-          <DialogTitle>{t(keys.title)}</DialogTitle>
-          <DialogDescription>{t(keys.description)}</DialogDescription>
-        </DialogHeader>
+    <RecordDrawer
+      open={open}
+      onClose={() => handleOpenChange(false)}
+      title={t(keys.title)}
+      sub={t(keys.description)}
+      content={STEP_UP_PROFILE}
+      stacked
+      saveLabel={t(keys.verify)}
+      savingLabel={t(keys.verifying)}
+      saveFormId={formId}
+      saveState={submitting ? 'saving' : 'idle'}
+      saveDisabled={submitDisabled}
+      saveTestId="step-up-submit"
+      testId="step-up-dialog"
+    >
+      <form
+        id={formId}
+        className="space-y-4"
+        onSubmit={(event) => {
+          event.preventDefault();
+          void submit();
+        }}
+      >
+        {factorResolved ? (
+          <StepUpFactorFields
+            factor={factor}
+            password={password}
+            onPasswordChange={setPassword}
+            code={code}
+            onCodeChange={setCode}
+            showPasswordHint={passwordlessDeadEnd}
+            email={email}
+            codeSent={codeSent}
+            isSending={isSending}
+            onResend={sendEmailCode}
+          />
+        ) : (
+          // The factor's field while the account's factors are read: its
+          // label and its input as the design's flat bars (`_patterns.md:282`).
+          <div className="flex flex-col gap-1.5" data-testid="step-up-loading">
+            <SkeletonBar className="w-40" />
+            <SkeletonBar shape="field" />
+          </div>
+        )}
 
-        <form
-          className="space-y-4"
-          onSubmit={(event) => {
-            event.preventDefault();
-            void submit();
-          }}
-        >
-          {factorResolved ? (
-            <StepUpFactorFields
-              factor={factor}
-              password={password}
-              onPasswordChange={setPassword}
-              code={code}
-              onCodeChange={setCode}
-              showPasswordHint={passwordlessDeadEnd}
-              email={email}
-              codeSent={codeSent}
-              isSending={isSending}
-              onResend={sendEmailCode}
-            />
-          ) : (
-            <div className="space-y-2" data-testid="step-up-loading">
-              <Skeleton className="h-4 w-40" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-          )}
-
-          {/*
-            The house error surface (icon + tinted card, `role="alert"`), the
-            same one the sign-in form uses — a bare red sentence read as a hint
-            under the field rather than as the thing that went wrong (SET-25).
-          */}
-          <FormError message={error} data-testid="step-up-error" />
-
-          <DialogFooter>
-            <Button
-              type="submit"
-              isLoading={submitting}
-              disabled={submitDisabled}
-              data-testid="step-up-submit"
-            >
-              {submitting ? t(keys.verifying) : t(keys.verify)}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+        {/*
+          The house error surface (icon + tinted card, `role="alert"`), the
+          same one the sign-in form uses — a bare red sentence read as a hint
+          under the field rather than as the thing that went wrong (SET-25).
+        */}
+        <FormError message={error} data-testid="step-up-error" />
+      </form>
+    </RecordDrawer>
   );
 }

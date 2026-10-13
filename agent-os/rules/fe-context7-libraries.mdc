@@ -37,7 +37,7 @@ Use **Context7 MCP** when working with library APIs, setup, or code generation. 
 
 ## Prompt Patterns
 
-- **Single lib**: `Add a shadcn Dialog. use context7 /shadcn-ui/ui`
+- **Single lib**: `Add a submenu to a shadcn Dropdown Menu. use context7 /shadcn-ui/ui`
 - **Multi-lib**: `Tailwind + shadcn theme. use context7 for tailwindcss, shadcn`
 - **Version-specific**: `React 19 context provider. use context7 /facebook/react`
 - **Token limit**: `tokens:2000` via MCP params for focused snippets

@@ -71,7 +71,7 @@ export function useVisibleNav<T extends AccessCheck>(items: readonly T[]): T[] {
   // every render, and this one is handed to every shell variant as a prop — so
   // an unmemoised result silently defeats any `React.memo` placed on the shell
   // subtree later, and re-renders the whole nav on unrelated state changes
-  // (SHELL-11). The only production caller passes a module-level constant, so
+  // (SHELL-11). The production caller (`useAppNav`) passes a memoised list, so
   // `items` is referentially stable and the memo actually holds.
   return useMemo(
     () =>

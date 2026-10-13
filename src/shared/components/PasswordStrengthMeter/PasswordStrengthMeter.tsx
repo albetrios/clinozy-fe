@@ -4,12 +4,14 @@ import { type BreachResult, checkPasswordBreached } from '@/lib/password-breach.
 import { estimatePasswordStrength, type PasswordScore } from '@/lib/password-strength.ts';
 import { cn } from '@/lib/utils.ts';
 
-/** Filled-segment colour per score (semantic tokens only). */
+/** Filled-segment colour per score (semantic tokens only). Fair and good use
+ *  tone dots, not `warning` / `info`: a preset may make those pale fills that
+ *  only work under their `-foreground` ink (clinozy-zinc-pastel does). */
 const SEGMENT_TONE: Record<PasswordScore, string> = {
   0: 'bg-destructive',
   1: 'bg-destructive',
-  2: 'bg-warning',
-  3: 'bg-info',
+  2: 'bg-tone-butter-dot',
+  3: 'bg-tone-sky-dot',
   4: 'bg-success',
 };
 

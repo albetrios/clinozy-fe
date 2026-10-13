@@ -10,7 +10,7 @@ Canonical layout for everything under `src/`. Read before adding any file. The f
 
 ## The pages rule in five lines
 
-1. **`src/pages/` mirrors the URL tree 1:1.** `/login` → `pages/login/`; `/organization/acme/dashboard` → `pages/organization/$organizationSlug/dashboard/`. Children nest **directly** (no `sub-pages/` bucket); dynamic segments are `$param` folders with full-word names. One exception: `/` is a pure resolver route (redirect only, no island).
+1. **`src/pages/` mirrors the URL tree 1:1.** `/login` → `pages/login/`; `/organization/acme/today` → `pages/organization/$organizationSlug/today/`. Children nest **directly** (no `sub-pages/` bucket); dynamic segments are `$param` folders with full-word names. One exception: `/` is a pure resolver route (redirect only, no island).
 2. **Every page folder maintains the same 4 files** — `<page>.route.tsx`, `<page>.manifest.ts`, `<Page>Page.tsx` (or `<Page>Layout.tsx`), `<PAGE>.OVERVIEW.md` — plus 2 registrations: `src/app/routes/routeTree.tsx` and `docs/reference/routes-and-ui.md`. `$param` folders derive their prefix mechanically (strip `$`, kebab-case).
 3. **Page shells live in `shared/layouts/`** — `AuthLayout` via the pathless `auth-shell` route; `AppLayout` via the `pages/organization/$organizationSlug/` layout island (the org guard boundary). No grouping directories under `pages/`.
 4. **Promotion ladder:** one page → inside that page; a page + its OWN nested children → that page's `shared/` (family-shared, e.g. `pages/organization/$organizationSlug/shared/`); pages from different families or any `src/shared` component → root `src/shared/` (`shared/api/auth-api.ts`, `shared/tenancy/`, …).
@@ -37,6 +37,24 @@ src/
 - Zustand client state → **`src/shared/store/<X>Store/`** (folder-per-unit) — all 7 stores including `useAuthStore` and `useOrganizationStore`
 - Cross-page API helpers → **`src/shared/api/`** (`auth-*`, `organization-*`)
 - Organization/tenancy runtime (URL-driven context, membership, `/` resolver, my-organizations) → **`src/shared/tenancy/`**
+- The clinic rooms' shared layer (section order, tones, i18n keys, phone and time words, cross-room referrers) → **`src/shared/app/`**; their contracts, fetchers and fixture world on clinozy-be's `/api/v1/app/*` → **`src/shared/api/app/`**
+
+### `app` — the code name of the clinic rooms
+
+Code calls the clinic rooms' layer **`app`** — the word clinozy-be uses for the same records
+(`/api/v1/app/…`, Postgres schema `app`). So: module keys `app-<room>` (`APP_MODULES`), the
+i18n namespaces `app` and `app-stock` (`APP_NS`, `APP_KEYS`), query keys under `['app', …]`,
+hooks and helpers `useAppAccess` · `useAppClock` · `useAppRoles` · `appToday` · `formatAppPhone`,
+and the folders `src/shared/app/` and `src/shared/api/app/`. Never `clinic` in a new code name
+for that layer.
+
+`clinic` stays where it means the **real clinic**, or where the word reaches a person or the wire:
+the text on screen ("Switch clinic", "Clinic stock"), the organization itself and its name or
+letterhead (`clinicName`, `RxSheetClinic`, `openNewClinic` in e2e), a patient physically there
+(`inClinic`), wire values (invoice type `clinic`, lead status `clinic_visited`, cancel side
+`clinic`), stored keys (`<namespace>-clinic-device-prefs`), download names
+(`clinic-stock-items.csv`) and design-file names (`clinic-stock.md`). `clinical` is another
+word and never changes. `src/shared/app/` is not `src/app/` (the application shell).
 
 ## Naming — three categories
 
@@ -93,7 +111,7 @@ Apply to:
 
 **Exception — shadcn primitives stay flat.** `src/shared/components/ui/` keeps the shadcn convention (`button.tsx`, `card.tsx`, etc.) — no folder-per-unit.
 
-**Exception — cohesive flat groups.** A multi-file component group that only makes sense as a set keeps flat files inside its parent folder: the `SettingsModal` panel groups (`account/`, `organization/`). Tests colocate beside the group's logic files. Everything else follows folder-per-unit (the former `data-table/` flat group is now four folder-per-unit components: `DataTable/`, `DataTableColumnHeader/`, `DataTablePagination/`, `DataTableToolbar/`).
+**Exception — cohesive flat groups.** A multi-file component group that only makes sense as a set keeps flat files inside its parent folder: the `SettingsModal` panel groups (`account/`, `organization/`). Tests colocate beside the group's logic files. Everything else follows folder-per-unit (the former `data-table/` flat group is now folder-per-unit components: `DataTable/`, `DataTableColumnHeader/`, `DataTableColumnChooser/` and their siblings; a list's toolbar is `RoomToolbar/`).
 
 ## Page Naming (directory)
 
@@ -120,7 +138,7 @@ segment is itself a page (`organization/$organizationSlug/`).
 
 ### Custom page
 
-For pages that aren't a backend resource (dashboard, login, callback, onboarding, accept-invite):
+For pages that aren't a backend resource (login, callback, onboarding, accept-invite):
 
 ```
 src/pages/<page>/                          ← folder = URL segment
@@ -218,7 +236,7 @@ const indexRoute = createRoute({
 ```
 
 Established cases:
-- `/` → resolver route (active organization's dashboard, else `/organization`, else `/onboarding`)
+- `/` → resolver route (`/onboarding` first, then the active organization's home, else `/organization`)
 - Future resource layouts with multiple children pick a default child
 
 ## Nested routes — direct children (`<segment>/`, `$param/`)
@@ -236,9 +254,9 @@ pages/organization/                       → /organization (picker)
 ├── OrganizationPickerPage.tsx
 └── $organizationSlug/                      → /organization/$organizationSlug (org guard boundary)
     ├── organization-slug.route.tsx
-    ├── organization-slug.manifest.ts         kind: 'layout', children: ['dashboard', 'suspended']
+    ├── organization-slug.manifest.ts         kind: 'layout', children: ['suspended', 'today', …]
     ├── OrganizationLayout.tsx
-    ├── dashboard/                        full island shape, recursively
+    ├── today/                            full island shape, recursively (one of the ten clinic rooms)
     └── suspended/
 ```
 
@@ -253,7 +271,7 @@ Two invariants follow from "the modal lives in the hash", and both have shipped 
 - **Same-route navigation must state the hash.** TanStack Router resolves an *omitted* `hash` to none, so `navigate({ to: '.', search, replace: true })` — "just patch the search" — also closes the modal. Write `hash: true` to keep it (or `hash: ''` to clear it on purpose); ESLint rejects a same-route `navigate()` that says neither. Clearing Stripe's return params goes through `stripeReturnCleanupNavigation()` (`lib/billing/stripe-return.ts`) — three hand-written copies of those options dropped a customer who had just finished 3DS onto a bare dashboard.
 - **The modal decides nothing until it has BOTH answers**: me/context (which sections exist) *and* the permission set (`useAccessResolved()`). Entering an organization clears the store's permissions a beat before the real set lands; an empty **unresolved** list is "not known yet", never "you may do nothing". Treating it as an answer rewrote an organization deep link to `account/profile` — permanently, because the fallback is written back to the URL. The one exception: when me/context settled **without data** there is nothing to derive permissions from, so the modal does not wait.
 
-`/` is the other folder-less URL: a pure resolver route (active organization's dashboard, else the `/organization` picker, else `/onboarding`) registered inline in `routeTree.tsx`.
+`/` is the other folder-less URL: a pure resolver route (`/onboarding` first, then the active organization's home, else the `/organization` picker) registered inline in `routeTree.tsx`; the retired `/dashboard` redirects to it.
 
 ## Dialog vs full page — decision tree
 
@@ -305,9 +323,11 @@ src/shared/
 │   ├── use<X>/                             cross-page custom hooks
 │   ├── useList/, useOne/                   standard CRUD hooks (Refine-style)
 │   ├── useCreate/, useUpdate/, useDelete/
-├── layouts/<Name>/{...}                    AppLayout, AuthLayout, PublicLayout, LayoutVariantFallback
+├── layouts/<Name>/{...}                    AppLayout, AuthLayout, PublicLayout
 │   └── layout.constants.ts                 sanctioned cross-layout plain module (i18n keys, testids)
 ├── api/                                    cross-page API helpers (auth, organization, billing, …) — plain modules
+│   └── app/                                the clinic rooms' contracts + fetchers (clinozy-be /api/v1/app/*)
+├── app/                                    the clinic rooms' shared layer (sections, tones, keys) — not src/app/
 ├── auth/                                   auth runtime (token, refresh-timer, idle-timeout, service, captcha)
 ├── tenancy/                                URL-driven org context, membership, resolver, deployment-mode
 ├── icons/                                  icon registry (import from @/shared/icons, never lucide-react)
@@ -324,7 +344,7 @@ src/shared/
 
 A folder-per-unit directory may carry a **plain constants module** at its root when the
 constants span every unit inside it (e.g. `layouts/layout.constants.ts` — shared i18n
-keys + testids for all layout variants). Same idea as a family island's plain
+keys + testids for all layouts). Same idea as a family island's plain
 `<name>-contracts.ts` modules: cohesion beats forcing a fake unit folder.
 
 ## Core Layer

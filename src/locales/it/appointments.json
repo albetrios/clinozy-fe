@@ -1,0 +1,161 @@
+{
+  "manifest": {
+    "title": "Appuntamenti"
+  },
+  "record": "Appuntamento",
+  "records": "appuntamenti",
+  "toolbar": {
+    "viewsLabel": "Vista",
+    "views": {
+      "agenda": "Agenda",
+      "day": "Giorno",
+      "week": "Settimana",
+      "month": "Mese"
+    },
+    "today": {
+      "day": "Oggi",
+      "week": "Questa settimana",
+      "month": "Questo mese"
+    },
+    "jump": {
+      "day": "Vai al giorno corrente",
+      "week": "Vai alla settimana corrente",
+      "month": "Vai al mese corrente"
+    },
+    "period": "Periodo",
+    "weekRange": "{{from}} – {{to}}",
+    "previous": {
+      "day": "Giorno precedente",
+      "week": "Settimana precedente",
+      "month": "Mese precedente"
+    },
+    "next": {
+      "day": "Giorno successivo",
+      "week": "Settimana successiva",
+      "month": "Mese successivo"
+    },
+    "search": "Paziente, telefono o #ID",
+    "searchLabel": "Cerca appuntamenti",
+    "newAppointment": "Nuovo appuntamento"
+  },
+  "filters": {
+    "label": "Filtri appuntamenti",
+    "previousMonth": "Mese precedente",
+    "nextMonth": "Mese successivo",
+    "upcoming": "Prossimi (predefinito)",
+    "dayBooked_one": "{{date}} · {{count}} prenotato",
+    "dayBooked_many": "{{date}} · {{count}} di prenotati",
+    "dayBooked_other": "{{date}} · {{count}} prenotati",
+    "appointedTo": "Assegnato a",
+    "allDoctors": "Tutti i medici",
+    "searchTeam": "Cerca nel team",
+    "showAll": "Mostra tutti",
+    "done": "Fatto",
+    "status": "Stato",
+    "all": "Tutti",
+    "active": "Attivi (aperti)"
+  },
+  "agenda": {
+    "columns": {
+      "time": "Ora",
+      "contact": "Contatto",
+      "service": "Servizio",
+      "doctor": "Assegnato a",
+      "latest": "Ultimo aggiornamento",
+      "quickView": "Anteprima rapida",
+      "status": "Stato"
+    },
+    "minutes": "{{minutes}} min",
+    "empty": "Nessun appuntamento qui · ",
+    "bookOne": "prenotane uno",
+    "day": {
+      "today": "Oggi",
+      "tomorrow": "Domani",
+      "yesterday": "Ieri",
+      "inDays_one": "Tra {{count}} giorno",
+      "inDays_many": "Tra {{count}} di giorni",
+      "inDays_other": "Tra {{count}} giorni",
+      "nextWeek": "La prossima settimana",
+      "inWeeks_one": "Tra {{count}} settimana",
+      "inWeeks_many": "Tra {{count}} di settimane",
+      "inWeeks_other": "Tra {{count}} settimane",
+      "daysAgo_one": "{{count}} giorno fa",
+      "daysAgo_many": "{{count}} di giorni fa",
+      "daysAgo_other": "{{count}} giorni fa"
+    },
+    "counts": {
+      "confirmed_one": "<n>{{count}}</n> confermato",
+      "confirmed_many": "<n>{{count}}</n> confermati",
+      "confirmed_other": "<n>{{count}}</n> confermati",
+      "awaiting_one": "<n>{{count}}</n> in attesa di risposta",
+      "awaiting_many": "<n>{{count}}</n> in attesa di risposta",
+      "awaiting_other": "<n>{{count}}</n> in attesa di risposta",
+      "allSet": "· tutto pronto",
+      "confirmedHint_one": "{{count}} confermato",
+      "confirmedHint_many": "{{count}} confermati",
+      "confirmedHint_other": "{{count}} confermati",
+      "waitingHint_one": "{{count}} in attesa di una risposta",
+      "waitingHint_many": "{{count}} in attesa di una risposta",
+      "waitingHint_other": "{{count}} in attesa di una risposta",
+      "hint": "{{confirmed}} · {{waiting}}"
+    },
+    "latest": {
+      "reminderSent": "✓ Promemoria inviato",
+      "repliedYes": "✓ Ha risposto Sì",
+      "moved": "✓ Spostato",
+      "movedTimes": "✓ Spostato ×{{times}}",
+      "checkedIn": "✓ Arrivato"
+    },
+    "latestHints": {
+      "reminderSent": "Promemoria inviato",
+      "repliedYes": "Confermato automaticamente da un Sì su WhatsApp",
+      "moved": "Spostato da {{day}} {{time}}",
+      "checkedIn": "Paziente arrivato"
+    },
+    "changeStatus": "Cambia stato · {{status}}"
+  },
+  "status": {
+    "title": "Cambia stato",
+    "now": "Ora: <b>{{status}}</b>",
+    "nowReason": "Ora: <b>{{status}} · {{reason}}</b>",
+    "why": "Perché viene annullato?",
+    "back": "Indietro"
+  },
+  "card": {
+    "when": "{{day}} · {{time}} · {{minutes}} min",
+    "noUpdate": "Ancora nessun aggiornamento",
+    "open": "Apri",
+    "reschedule": "Riprogramma",
+    "cancel": "Annulla",
+    "tracker": "Stato"
+  },
+  "calendar": {
+    "dayLoad_one": "{{count}} prenotato · {{hours}} h",
+    "dayLoad_many": "{{count}} prenotati · {{hours}} h",
+    "dayLoad_other": "{{count}} prenotati · {{hours}} h",
+    "free": "Libero tutto il giorno",
+    "doctor": "Medico",
+    "bookSlot": "Fai clic su un orario libero per prenotare",
+    "newAt": "Nuovo appuntamento · {{day}} · {{time}}",
+    "pastDay": "Non si possono prenotare date passate",
+    "doctorBooked_one": "{{count}} prenotato",
+    "doctorBooked_many": "{{count}} prenotati",
+    "doctorBooked_other": "{{count}} prenotati",
+    "doctorFree": "libero",
+    "chairTime_one": "{{count}} prenotato · {{percent}}% del tempo poltrona",
+    "chairTime_many": "{{count}} prenotati · {{percent}}% del tempo poltrona",
+    "chairTime_other": "{{count}} prenotati · {{percent}}% del tempo poltrona",
+    "chairTimeOverlap_one": "{{count}} prenotato · {{percent}}% del tempo poltrona · prenotazione sovrapposta",
+    "chairTimeOverlap_many": "{{count}} prenotati · {{percent}}% del tempo poltrona · prenotazione sovrapposta",
+    "chairTimeOverlap_other": "{{count}} prenotati · {{percent}}% del tempo poltrona · prenotazione sovrapposta",
+    "overlap": "Prenotazione sovrapposta",
+    "more": "+{{count}} altri",
+    "dayCount_one": "{{day}} · {{count}} appuntamento",
+    "dayCount_many": "{{day}} · {{count}} appuntamenti",
+    "dayCount_other": "{{day}} · {{count}} appuntamenti",
+    "openDay": "Apri giorno",
+    "block": "{{name}} · {{time}} · {{minutes}} min · {{service}} · {{doctor}} · {{status}}",
+    "blockClash": "{{name}} · {{time}} · {{minutes}} min · {{service}} · {{doctor}} · {{status}} · si sovrappone a un’altra prenotazione",
+    "blockTime": "{{time}} · {{minutes}} min"
+  }
+}

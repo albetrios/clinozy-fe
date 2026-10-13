@@ -2,6 +2,7 @@ import { type APIRequestContext, expect, test } from '@playwright/test';
 
 import {
   fetchMeContextWire,
+  fetchMyOrganizationsWire,
   type ProbedDeployment,
   probeLiveDeployment,
   skipUnlessDeploymentMode,
@@ -11,7 +12,7 @@ import {
   createSessionViaEmailCode,
   verifyDatabaseConnection,
 } from '@/tests/utils/e2e-session.ts';
-import { bearerHeaders } from '@/tests/utils/e2e-tenancy.ts';
+import { bearerHeaders, expectNoPersonalBilling } from '@/tests/utils/e2e-tenancy.ts';
 
 /**
  * Personal-only deployment contract (clinozy-be env):
@@ -57,7 +58,8 @@ test.describe('deployment — personal-only', () => {
     expect(ctx.active_organization).not.toBeNull();
     expect(ctx.active_organization?.type).toBe('PERSONAL');
     expect(ctx.user.personal_organization_id).toBeTruthy();
-    expect(ctx.organizations.every((o) => o.type === 'PERSONAL')).toBe(true);
+    const organizations = await fetchMyOrganizationsWire(api, accessToken);
+    expect(organizations.every((o) => o.type === 'PERSONAL')).toBe(true);
   });
 
   test('POST /tenancy/organizations is rejected (team orgs disabled)', async () => {
@@ -70,11 +72,11 @@ test.describe('deployment — personal-only', () => {
     expect(res.status()).toBe(403);
   });
 
-  test('billing subscriptions are forbidden on the personal workspace token', async () => {
+  test('the personal workspace token reads no billing', async () => {
     const { accessToken } = await createSessionViaEmailCode(api);
     const res = await api.get(`${API}/billing/subscriptions`, {
       headers: bearerHeaders(accessToken),
     });
-    expect(res.status()).toBe(403);
+    await expectNoPersonalBilling(res);
   });
 });

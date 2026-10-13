@@ -7,7 +7,7 @@ import {
 import { useCallback, useMemo, useRef } from 'react';
 
 import { isStepUpRequiredError } from '@/shared/api/step-up-api.ts';
-import { mapApiError } from '@/shared/errors/errorHandler.ts';
+import { notifyError } from '@/shared/errors/errorHandler.ts';
 import { notify, type NotifyOptions } from '@/shared/notify/index.ts';
 
 /**
@@ -36,8 +36,46 @@ interface OptimisticInfiniteConfig<TVars, TRow> {
   update: (rows: TRow[], vars: TVars) => TRow[];
 }
 
+/**
+ * Optimistic update for EVERY cached query under a prefix, whatever each one
+ * holds — an infinite list's pages, a plain list, one record. For a record
+ * several reads show at once (an appointment in the Agenda pages, a calendar
+ * range and its own drawer): `update` maps one cached value and returns it
+ * unchanged when it holds nothing to patch. Every match is snapshotted and
+ * restored if the write fails.
+ */
+interface OptimisticQueriesConfig<TVars> {
+  /** Prefix key matching every cached query to patch. */
+  queryKey: QueryKey;
+  /** The next value of one cached query (never called for a query with no data yet). */
+  update: (data: unknown, vars: TVars) => unknown;
+}
+
+/**
+ * How a domain write hook reports itself when a screen reports the write in
+ * its own words — one "<name> saved" for a whole drawer save, a failure shown
+ * in place (the Users room's drawer, Roles & access).
+ */
+export interface WriteReportOptions {
+  /** No success toast of the hook's own. */
+  suppressSuccessToast?: boolean;
+  /** Toast a failure (default true); off when the caller shows it in place. */
+  notifyOnError?: boolean;
+}
+
+/**
+ * The user action a write belongs to, handed to `mutationFn` as its second argument. Its
+ * `idempotencyKey` is the same for every attempt at the same write — the same variables, until
+ * one succeeds — so a "Retry save" after a dropped answer replays clinozy-be's first answer
+ * instead of acting twice; different variables are a different action with a new key.
+ */
+export interface MutationAction {
+  idempotencyKey: string;
+}
+
 export interface AppMutationOptions<TData, TVars, TCache = unknown, TRow = unknown> {
-  mutationFn: (vars: TVars) => Promise<TData>;
+  /** The write. Pass `action.idempotencyKey` to the api call (`api.post(path, { idempotencyKey })`). */
+  mutationFn: (vars: TVars, action: MutationAction) => Promise<TData>;
   /**
    * Query keys to invalidate after a successful mutation. Fired, not awaited —
    * the refetch runs in the background and `isPending` ends with the write.
@@ -61,6 +99,8 @@ export interface AppMutationOptions<TData, TVars, TCache = unknown, TRow = unkno
   optimistic?: OptimisticConfig<TVars, TCache>;
   /** Optimistically patch a cursor-paginated infinite list (prefix-matched). */
   optimisticInfinite?: OptimisticInfiniteConfig<TVars, TRow>;
+  /** Optimistically patch every cached query under a prefix, any shape. Pass one optimistic option. */
+  optimisticQueries?: OptimisticQueriesConfig<TVars>;
 }
 
 /**
@@ -78,7 +118,7 @@ type InfiniteListPage<TRow> = { rows: TRow[] };
 /** Rollback snapshot carried from `onMutate` to `onError`. */
 type OptimisticContext =
   | { kind: 'single'; previous: unknown }
-  | { kind: 'infinite'; snapshots: [QueryKey, unknown][] };
+  | { kind: 'many'; snapshots: [QueryKey, unknown][] };
 
 /**
  * Text identity of one call's variables — depth-first, object keys emitted in
@@ -161,8 +201,8 @@ function once<TArgs extends unknown[]>(
 }
 
 /**
- * The standard write mutation. Runs `mutationFn` (the fetch client auto-attaches
- * the `Idempotency-Key` on writes), invalidates the given query keys, and
+ * The standard write mutation. Runs `mutationFn` with the user action's idempotency key
+ * ({@link MutationAction} — one key per write, kept across its retries), invalidates the given query keys, and
  * surfaces a success / error toast through the single `notify` surface — so
  * every Phase 6–7 mutation behaves identically. Returns the TanStack mutation,
  * so callers still get `mutate` / `mutateAsync` / `isPending`.
@@ -193,11 +233,27 @@ export function useAppMutation<
   TRow = unknown,
 >(options: AppMutationOptions<TData, TVars, TCache, TRow>) {
   const queryClient = useQueryClient();
-  const { optimistic, optimisticInfinite } = options;
+  const { optimistic, optimisticInfinite, optimisticQueries } = options;
   /** In-flight requests on this hook instance, keyed by their variables. */
   const inFlightRef = useRef(new Map<string, Promise<TData>>());
+  /**
+   * The idempotency key of each write not yet done, keyed by its variables: every attempt at the
+   * same write sends the same key until one succeeds (clinozy-be releases a key on an error answer,
+   * so a retry after a refusal runs again). Variables with no stable text form get a key per call.
+   */
+  const actionKeysRef = useRef(new Map<string, string>());
+  const actionFor = (vars: TVars): MutationAction => {
+    const key = variablesKey(vars);
+    if (key === null) return { idempotencyKey: crypto.randomUUID() };
+    let idempotencyKey = actionKeysRef.current.get(key);
+    if (idempotencyKey === undefined) {
+      idempotencyKey = crypto.randomUUID();
+      actionKeysRef.current.set(key, idempotencyKey);
+    }
+    return { idempotencyKey };
+  };
   const mutation = useMutation<TData, Error, TVars, OptimisticContext | undefined>({
-    mutationFn: options.mutationFn,
+    mutationFn: (vars) => options.mutationFn(vars, actionFor(vars)),
     onMutate: async (vars) => {
       if (optimisticInfinite) {
         // Cancel in-flight refetches so they can't clobber the optimistic patch.
@@ -218,7 +274,19 @@ export function useAppMutation<
                 }
               : old,
         );
-        return { kind: 'infinite', snapshots };
+        return { kind: 'many', snapshots };
+      }
+      if (optimisticQueries) {
+        await queryClient.cancelQueries({ queryKey: optimisticQueries.queryKey });
+        const snapshots = queryClient.getQueriesData({
+          queryKey: optimisticQueries.queryKey,
+        });
+        for (const [key, data] of snapshots) {
+          if (data !== undefined) {
+            queryClient.setQueryData(key, optimisticQueries.update(data, vars));
+          }
+        }
+        return { kind: 'many', snapshots };
       }
       if (optimistic) {
         await queryClient.cancelQueries({ queryKey: optimistic.queryKey });
@@ -231,6 +299,9 @@ export function useAppMutation<
       return undefined;
     },
     onSuccess: async (data, vars) => {
+      // The action is done: the same variables again are a new action with a new key.
+      const doneKey = variablesKey(vars);
+      if (doneKey !== null) actionKeysRef.current.delete(doneKey);
       // Marked stale synchronously, refetched in the background. Awaiting
       // `invalidateQueries` waits for every active observer to finish refetching
       // — and `isPending` stays true for all of it, so a button bound to it
@@ -251,7 +322,7 @@ export function useAppMutation<
     },
     onError: (error, _vars, context) => {
       // Restore the pre-mutation snapshot(s) before surfacing the error.
-      if (context?.kind === 'infinite') {
+      if (context?.kind === 'many') {
         for (const [key, data] of context.snapshots) {
           queryClient.setQueryData(key, data);
         }
@@ -261,7 +332,7 @@ export function useAppMutation<
       // Step-up-required is a flow signal, not a user-facing failure — the
       // caller opens the StepUpDialog and retries, so a toast would be noise.
       if (options.notifyOnError !== false && !isStepUpRequiredError(error)) {
-        notify.error(mapApiError(error), ...toastArgs(options.toastId));
+        notifyError(error, ...toastArgs(options.toastId));
       }
     },
   });

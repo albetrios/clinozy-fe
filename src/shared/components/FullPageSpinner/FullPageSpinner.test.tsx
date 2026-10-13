@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { axe } from 'vitest-axe';
 
-import { dismissAppSplash } from '@/lib/app-splash.ts';
+import { dismissAppSplash, SPLASH_FRAMES_MS } from '@/lib/app-splash.ts';
 
 import { FullPageSpinner } from './FullPageSpinner.tsx';
 
@@ -67,8 +67,10 @@ describe('FullPageSpinner', () => {
       dismissAppSplash();
       unmount();
 
-      vi.advanceTimersByTime(250);
-      vi.advanceTimersByTime(480);
+      // Released — but the splash still plays its frames to the wordmark first.
+      vi.advanceTimersByTime(SPLASH_FRAMES_MS - 1);
+      expect(document.getElementById('app-splash')).not.toBeNull();
+      vi.advanceTimersByTime(1 + 520);
 
       expect(document.getElementById('app-splash')).toBeNull();
     });

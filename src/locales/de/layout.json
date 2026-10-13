@@ -1,68 +1,14 @@
 {
-  "brand": {
-    "name": "{{productName}}"
-  },
   "a11y": {
-    "skipToMain": "Zum Hauptinhalt springen",
-    "mainNavigation": "Hauptnavigation",
-    "sidebarNavigation": "Seitennavigation",
-    "mobileNavigation": "Mobilnavigation"
-  },
-  "auth": {
-    "switchToRegister": "Konto erstellen",
-    "switchToSignIn": "Anmelden",
-    "statusOperational": "Alle Systeme betriebsbereit",
-    "badge": "Betrieb, vereint",
-    "heroTitle": "Das Betriebssystem für Ihre Organisation.",
-    "heroSubtitle": "Mitglieder, Rollen, Abrechnung und Sicherheit — ein schneller, tastaturorientierter Arbeitsbereich für jedes Team.",
-    "features": {
-      "multiOrg": {
-        "title": "Multi-Org by Design",
-        "body": "Teams wechseln, ohne das Tool zu wechseln."
-      },
-      "secure": {
-        "title": "Standardmäßig sicher",
-        "body": "RBAC, MFA, Passkeys und Audit-Trails."
-      },
-      "fast": {
-        "title": "Überall schnell",
-        "body": "Für tastaturorientierte Echtzeitarbeit gebaut."
-      }
-    },
-    "stats": {
-      "teams": "Teams",
-      "uptime": "Verfügbarkeit",
-      "compliant": "konform"
-    }
+    "skipToMain": "Zum Hauptinhalt springen"
   },
   "app": {
     "search": "Suchen",
-    "searchPlaceholder": "Suchen...",
     "searchShortcutMac": "⌘K",
     "searchShortcutWindows": "Ctrl+K",
-    "userMenu": "Benutzermenü",
     "userFallback": "Benutzer",
     "settings": "Einstellungen",
     "logOut": "Abmelden",
-    "toggleSidebar": "Seitenleiste umschalten",
-    "footerCopyright": "© {{year}} {{productName}} Platform",
-    "nav": {
-      "dashboard": "Dashboard"
-    },
-    "sidebar": {
-      "workspace": "Arbeitsbereich",
-      "menu": "Menü",
-      "shortcuts": "Tastenkürzel"
-    },
-    "contextStrip": {
-      "label": "Schnellzugriff",
-      "labelSolo": "Gehe zu",
-      "profile": "Profil",
-      "security": "Sicherheit",
-      "billing": "Abrechnung",
-      "appearance": "Darstellung",
-      "shortcuts": "Tastenkürzel"
-    },
     "workspaceSwitch": {
       "preparing": "Arbeitsbereich wird vorbereitet",
       "loadingAccess": "Mitglieder und Berechtigungen werden geladen",
@@ -74,7 +20,10 @@
       "personal": "Persönlich",
       "yourOrganizations": "Ihre Organisationen",
       "organizations": "Organisationen",
-      "addOrganization": "Organisation hinzufügen"
+      "addOrganization": "Organisation hinzufügen",
+      "invited": "Eingeladen",
+      "invitedRow": "Eingeladen · {{roles}}",
+      "invitationCount": "Einladungen: {{count}}"
     },
     "notifications": {
       "title": "Benachrichtigungen",
@@ -90,17 +39,15 @@
       "settingsLink": "Benachrichtigungseinstellungen"
     },
     "commandPalette": {
-      "ariaLabel": "Befehlspalette",
-      "placeholder": "Befehl eingeben oder suchen...",
+      "ariaLabel": "Befehlsmenü",
+      "placeholder": "Suchen oder springen zu…",
       "empty": "Keine Ergebnisse gefunden.",
       "groups": {
-        "navigation": "Navigation",
         "theme": "Design",
         "account": "Konto",
         "organizations": "Organisationen",
         "shortcuts": "Tastenkürzel"
       },
-      "dashboard": "Dashboard",
       "userSettings": "Benutzereinstellungen",
       "organizationSettings": "Organisationseinstellungen",
       "lightMode": "Heller Modus",
@@ -118,6 +65,10 @@
       "commandPalette": "Befehlspalette öffnen",
       "showShortcuts": "Tastenkürzel anzeigen",
       "showShortcutsAlt": "Tastenkürzel anzeigen (Alternative)",
+      "allSections": "Alle Bereiche öffnen oder schließen",
+      "jumpToSection": "Zu einem Bereich springen",
+      "listSearch": "Liste durchsuchen",
+      "leadRows": "Nächster oder vorheriger Lead (in Leads)",
       "closeDialog": "Dialog schließen"
     },
     "emailVerify": {
@@ -143,16 +94,64 @@
       "nameLabel": "Name der Organisation",
       "slugLabel": "Workspace-URL (optional)",
       "submit": "Organisation erstellen",
-      "submitting": "Wird erstellt…"
+      "submitting": "Wird erstellt…",
+      "cancel": "Abbrechen"
     },
     "theme": {
       "light": "Hell",
       "dark": "Dunkel",
-      "system": "System",
-      "shuffle": "Theme zufällig wählen"
+      "system": "System"
+    },
+    "sectionBar": {
+      "nav": "Bereiche",
+      "allSections": "Alle Bereiche",
+      "allSectionsTitle": "Alle Bereiche (G)",
+      "more": "Mehr",
+      "morePinned": "Weitere angeheftete Bereiche",
+      "tabTitle": "{{section}} · {{description}}",
+      "searchLabel": "Suchen oder springen zu (Befehl K)",
+      "searchTitleMac": "Suchen oder springen zu… (⌘K)",
+      "searchTitleWindows": "Suchen oder springen zu… (Strg K)",
+      "searchPlaceholder": "Patienten, Leads suchen…",
+      "pin": "An Leiste anheften",
+      "unpin": "Von Leiste lösen",
+      "pinAria": "An Leiste anheften · {{section}}",
+      "unpinAria": "Von Leiste lösen · {{section}}",
+      "pinFooter": "Anheften, um es in der Leiste zu behalten",
+      "keysHint": "G · 1–9",
+      "account": "Konto",
+      "avatarLabel": "{{name}} · {{status}}",
+      "identityRole": "{{role}} · {{branch}}",
+      "status": "Status",
+      "presence": {
+        "online": "Online",
+        "away": "Abwesend",
+        "busy": "Beschäftigt"
+      },
+      "statusToast": "Status · {{status}}",
+      "switchClinic": "Klinik wechseln",
+      "security": "Sicherheit",
+      "billing": "Abrechnung",
+      "devices": "Geräte",
+      "appearance": "Darstellung",
+      "appearanceLanguage": "Darstellung & Sprache",
+      "viewAs": {
+        "previewing": "Vorschau als {{role}}",
+        "noSections": "Keine Bereiche",
+        "exit": "Vorschau beenden",
+        "exitToast": "Zurück zu deinem eigenen Zugriff"
+      },
+      "branch": {
+        "label": "Filiale · {{label}}",
+        "title": "Filiale · {{names}}",
+        "all": "Alle Filialen",
+        "allSub": "Gesamtansicht · Summen über {{count}}",
+        "viewGroup": "Ansicht",
+        "branchesGroup": "Filialen",
+        "showingAll": "Alle Filialen werden angezeigt",
+        "showing": "Angezeigt: {{names}}",
+        "keepOne": "Mindestens eine Filiale behalten"
+      }
     }
-  },
-  "public": {
-    "brandTagline": "Sicherer Arbeitsbereich für Ihr Team"
   }
 }

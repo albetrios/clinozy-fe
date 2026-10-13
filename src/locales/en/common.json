@@ -5,7 +5,6 @@
     "loadingNamed": "Loading {{name}}…",
     "loadingPage": "Loading page",
     "toggleTheme": "Toggle theme",
-    "openAppearance": "Open appearance",
     "cookieConsent": "Cookie consent",
     "rowsPerPage": "Rows per page",
     "goFirstPage": "Go to first page",
@@ -15,7 +14,6 @@
     "selectAll": "Select all",
     "copyAccountId": "Copy account ID",
     "onboardingProgress": "Onboarding progress",
-    "themeCode": "Theme code",
     "mode": "Mode"
   },
   "language": {
@@ -117,81 +115,159 @@
     "description": "A new version of the app is ready.",
     "refresh": "Refresh now"
   },
+  "cells": {
+    "patient": "Patient",
+    "patientMark": "P",
+    "leadMark": "L",
+    "moreCount": "{{count}} more"
+  },
+  "emptyState": {
+    "fallbackTitle": "Nothing here yet",
+    "filteredTitle": "No matches",
+    "filteredHint": "Nothing matches these filters. Clear them to see everything again.",
+    "clearFilters": "Clear filters"
+  },
   "appearance": {
     "themeTitle": "Theme",
     "themeLocked": "The theme is managed by your organization's configuration and can't be changed here.",
-    "themeDescription": "Named accent presets — or copy a link / paste a theme code to reproduce an exact generated look.",
-    "presetAria": "Named accent preset",
-    "copyLink": "Copy link",
-    "shuffleHint": "Shuffle to generate a code.",
-    "codeLabel": "Code: {{seed}}",
-    "codePlaceholder": "Paste a theme code",
-    "apply": "Apply",
-    "pickAnyColour": "Pick any colour",
     "modeTitle": "Mode",
-    "modeDescription": "Saved on this device.",
-    "colourTitle": "Colour",
-    "colourDescription": "Accent, charts, and the neutral base.",
-    "accentColour": "Accent colour",
-    "chartColour": "Chart colour",
-    "baseColour": "Base colour",
-    "harmony": "Harmony",
-    "harmonyAria": "Colour harmony",
-    "accentIntensity": "Accent intensity",
-    "typeTitle": "Type & shape",
-    "typeDescription": "Fonts, corner radius, and menu surface.",
-    "bodyFont": "Body font",
-    "headingFont": "Heading font",
-    "radius": "Radius",
-    "shapeLanguage": "Shape language",
-    "typeScale": "Type scale",
-    "menu": "Menu",
-    "menuAria": "Menu style",
-    "iconsTitle": "Icons",
-    "iconsDescription": "Stroke weight, colour, and icon set.",
-    "iconWeight": "Icon weight",
-    "iconColour": "Icon colour",
-    "iconLibrary": "Icon library",
-    "layoutTitle": "Layout",
-    "layoutDescription": "How wide the main workspace is — standard for dashboards, reading for focused copy.",
-    "contentWidth": "Content width",
-    "dashboardTitle": "Dashboard",
-    "dashboardDescription": "How the dashboard arranges its sections.",
-    "dashboardArrangement": "Arrangement",
-    "surfaceTitle": "Surface & motion",
-    "surfaceDescription": "Spacing, depth, contrast, and how it moves.",
-    "density": "Density",
-    "contrast": "Contrast",
-    "elevation": "Elevation",
-    "separation": "Separation",
-    "separationAria": "Surface separation",
-    "motion": "Motion",
-    "focusRing": "Focus ring",
-    "notificationsTitle": "Notifications",
-    "notificationsDescription": "Pick or shuffle a toast design — previews use your live theme tokens.",
-    "toastDesign": "Toast design",
-    "position": "Position",
-    "positionAria": "Toast position",
-    "previewSuccess": "Success",
-    "previewError": "Error",
-    "previewWarning": "Warning",
-    "previewInfo": "Info",
-    "shuffleSection": "Shuffle {{section}}",
-    "sectionColour": "colour",
-    "sectionType": "type & shape",
-    "sectionSurface": "surface & motion",
-    "sectionDashboard": "dashboard layout",
-    "sectionNotifications": "notification style",
-    "custom": "Custom",
-    "customWith": "Custom — {{look}}"
+    "modeDescription": "Saved on this device."
   },
   "table": {
-    "searchPlaceholder": "Search..."
+    "searchPlaceholder": "Search...",
+    "empty": "No results.",
+    "sortBy": "Sort by {{column}}",
+    "actions": "Actions",
+    "moreActions": "More actions",
+    "columns": {
+      "trigger": "Show or hide columns",
+      "title": "Columns · {{shown}} of {{total}} shown",
+      "showAll": "Show all columns",
+      "recommendedHides": "Recommended set hides {{count}}",
+      "tapForRecommended": "Tap again for the recommended set",
+      "allShown": "All {{count}} columns shown",
+      "hiddenCount": "{{count}} hidden",
+      "search": "Search columns",
+      "shown": "{{shown}} of {{total}} shown",
+      "viewGroup": "View",
+      "columnsGroup": "Columns"
+    },
+    "fold": {
+      "showAll_one": "{{count}} column in rows · Show all",
+      "showAll_other": "{{count}} columns in rows · Show all",
+      "showAllHint": "Show every column side by side (scrolls sideways)",
+      "fitToWidth": "Fit to width",
+      "fitToWidthHint": "Fold extra columns into each row"
+    },
+    "selection": {
+      "selectRow": "Select {{name}}",
+      "selected": "{{count}} selected",
+      "selectAllCount": "Select all {{count}}",
+      "clear": "Clear selection",
+      "clearHint": "Clear selection · Esc",
+      "escape": "Esc",
+      "bulkActions": "Bulk actions"
+    },
+    "length": {
+      "allLoaded": "All {{records}} loaded",
+      "loadingMore": "Loading more {{records}}"
+    },
+    "savedViews": {
+      "label": "Saved views",
+      "apply": "Apply view",
+      "remove": "Remove view",
+      "removed": "View removed",
+      "defaultName": "My view"
+    }
   },
   "consent": {
-    "description": "We use cookies for product analytics to improve {{productName}}. Essential functionality and error monitoring work without them.",
+    "description": "With your OK, we use PostHog analytics and Sentry session recordings to improve {{productName}}. Everything else, error reports included, works without them. Closing this means no.",
     "privacyPolicy": "Privacy Policy",
     "accept": "Accept",
-    "decline": "Decline"
+    "decline": "Decline",
+    "closeAndDecline": "Close (counts as declining)"
+  },
+  "confirm": {
+    "accept": "Confirm",
+    "cancel": "Cancel",
+    "fallbackDescription": "Please confirm this action."
+  },
+  "picker": {
+    "placeholder": "Select…",
+    "search": "Search {{label}}",
+    "searchDefault": "Search",
+    "escKey": "esc",
+    "options": "Options",
+    "recent": "Recent",
+    "all": "All",
+    "create": "Create “{{query}}”",
+    "createNamed": "{{label}} “{{query}}”",
+    "createFull": "New {{label}}",
+    "createFullQuery": "{{label}} · “{{query}}”",
+    "fullDetails": "full details",
+    "empty": "Nothing to pick yet",
+    "noResults": "No results for “{{query}}”",
+    "noResultsHint": "Check the spelling or try fewer letters",
+    "noResultsRemoteHint": "Try a name, phone number or ID",
+    "loadingMore": "Loading more",
+    "clear": "Clear",
+    "triggerLabel": "{{label}} · {{value}}",
+    "date": {
+      "label": "Date",
+      "placeholder": "Pick a date",
+      "search": "Type a date · e.g. 12 sep",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "yesterday": "Yesterday",
+      "comingUp": "Coming up",
+      "relative": "{{relative}} · {{date}}"
+    },
+    "time": {
+      "label": "Time",
+      "placeholder": "Pick a time"
+    }
+  },
+  "unsavedChanges": {
+    "title": "Discard changes?",
+    "description": "Your changes haven’t been saved and will be lost.",
+    "discard": "Discard",
+    "keepEditing": "Keep editing"
+  },
+  "uploadTray": {
+    "label": "Uploads",
+    "uploading": "Uploading {{left}} of {{total}}…",
+    "complete": "All uploads complete",
+    "failed_one": "{{count}} upload failed",
+    "failed_other": "{{count}} uploads failed",
+    "skipped_one": "{{count}} file over {{limit}} skipped",
+    "skipped_other": "{{count}} files over {{limit}} skipped",
+    "show": "Show uploads",
+    "hide": "Hide uploads",
+    "uploadFailed": "Couldn’t upload",
+    "attachFailed": "Couldn’t attach",
+    "retry": "Retry {{name}}",
+    "remove": "Remove {{name}}",
+    "stoppedBySwitch": "Uploads stopped · you switched workspace",
+    "size": {
+      "kilobytes": "{{value}} KB",
+      "megabytes": "{{value}} MB"
+    }
+  },
+  "splash": {
+    "label": "Loading {{productName}}",
+    "greeting": {
+      "morning": "Good morning, {{name}}",
+      "afternoon": "Good afternoon, {{name}}",
+      "evening": "Good evening, {{name}}"
+    },
+    "ticker": {
+      "opening": "Opening {{weekday}}’s schedule",
+      "syncing": "Syncing patients and leads",
+      "ready": "All set"
+    },
+    "offline": {
+      "message": "Can’t reach {{productName}} · check the internet connection",
+      "retry": "Retry"
+    }
   }
 }

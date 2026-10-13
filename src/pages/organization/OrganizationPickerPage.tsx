@@ -2,18 +2,81 @@ import { Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { organizationDashboard } from '@/lib/routes/index.ts';
+import { organizationHome } from '@/lib/routes/index.ts';
+import { cn } from '@/lib/utils.ts';
+import { toneForLabel } from '@/shared/app/app-tone-label.ts';
+import { TONE_CLASSES } from '@/shared/app/app-tones.ts';
 import { AUTH_KEYS, AUTH_NS } from '@/shared/auth/auth-shell.constants.ts';
 import { CreateOrganizationDialog } from '@/shared/components/CreateOrganizationDialog/index.ts';
+import { EmptyState } from '@/shared/components/EmptyState/index.ts';
+import {
+  PublicCard,
+  PublicCardHeader,
+  PublicFrame,
+} from '@/shared/components/PublicFrame/index.ts';
+import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
+import { ThemeModeToggle } from '@/shared/components/ThemeModeToggle/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { Card, CardContent } from '@/shared/components/ui/card.tsx';
-import { Skeleton } from '@/shared/components/ui/skeleton.tsx';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
-import { AlertCircle, Building, ChevronRight, Plus } from '@/shared/icons/index.ts';
+import { Building, ChevronRight, Plus } from '@/shared/icons/index.ts';
+import { useMyInvitations } from '@/shared/tenancy/my-invitations.ts';
 import {
   type MyOrganizationSummary,
   useMyOrganizationSummaries,
 } from '@/shared/tenancy/my-organization-summaries.ts';
+
+import { InvitationList } from './components/InvitationList/index.ts';
+
+/**
+ * One organization as an All sections row (`shell.md:43`; H:532): the 28px
+ * tile in the name's hashed tone with the 16px icon, the name 13px/600 over
+ * the slug 11.5px, a chevron at the end. The active organization is the
+ * current row — `canvas` with the `border-strong` edge — and hover is `muted`.
+ */
+function OrganizationRow({
+  organization,
+}: {
+  organization: MyOrganizationSummary & { slug: string };
+}) {
+  return (
+    <Link
+      {...organizationHome(organization.slug)}
+      aria-current={organization.isActive ? 'true' : undefined}
+      className={cn(
+        'flex min-w-0 items-center gap-2.5 rounded-lg border py-1.5 ps-1.5 pe-2 text-start transition-colors',
+        organization.isActive
+          ? 'bg-canvas border-border-strong'
+          : 'hover:bg-muted border-transparent',
+      )}
+      data-testid={`organization-picker-option-${organization.slug}`}
+    >
+      <span
+        aria-hidden="true"
+        className={cn(
+          'flex size-7 flex-none items-center justify-center rounded-md',
+          TONE_CLASSES[toneForLabel(organization.name)].surface,
+        )}
+      >
+        <Building className="size-4" />
+      </span>
+      <span className="flex min-w-0 flex-1 flex-col">
+        <span dir="auto" className="text-body truncate leading-[1.3] font-semibold">
+          {organization.name}
+        </span>
+        <span
+          dir="ltr"
+          className="text-muted-foreground text-caption truncate [text-align:match-parent] leading-[1.3]"
+        >
+          {organization.slug}
+        </span>
+      </span>
+      <ChevronRight
+        className="text-muted-foreground size-4 shrink-0 rtl:rotate-180"
+        aria-hidden="true"
+      />
+    </Link>
+  );
+}
 
 /**
  * The organization list. Split out so the boundary below wraps a real unit: a
@@ -22,11 +85,11 @@ import {
  * matters because this screen is where the resolver sends a user who has
  * nowhere else to land.
  */
-function OrganizationList() {
+function OrganizationList({ invited }: { invited: boolean }) {
   const { t } = useTranslation(AUTH_NS);
   /*
-   * The same list, under the same cache key, that the guard chain, the switcher
-   * and the dashboard read. The guard that sent the user here already resolved
+   * The same list, under the same cache key, that the guard chain and the
+   * switcher read. The guard that sent the user here already resolved
    * it, so the FIRST paint shows the real list instead of flashing two skeletons
    * for the length of a cached response (PICK-2). The hook raises no toast; this
    * list renders its own error card with a retry.
@@ -37,76 +100,56 @@ function OrganizationList() {
     (org): org is MyOrganizationSummary & { slug: string } => org.slug !== null,
   );
 
-  const isEmpty = !(isLoading || isError) && organizations.length === 0;
+  // Someone who is only invited has their invitations above, not "you're not part of any yet".
+  const isEmpty = !(isLoading || isError || invited) && organizations.length === 0;
 
   return (
     <>
       {isLoading && (
         <>
-          <Skeleton className="h-16 w-full" />
-          <Skeleton className="h-16 w-full" />
+          <SkeletonBar shape="field" className="h-11" />
+          <SkeletonBar shape="field" className="h-11" />
         </>
       )}
 
       {isError && (
-        <Card data-testid="organization-picker-error">
-          <CardContent className="flex flex-col items-center gap-3 p-6 text-center">
-            <AlertCircle className="text-destructive h-6 w-6" />
-            <p className="text-muted-foreground text-sm">
-              {t(AUTH_KEYS.organizationPicker.loadError)}
-            </p>
-            {/*
-              No `disabled`/spinner here on purpose. Retrying resets the query to
-              pending, so this whole card unmounts and the skeletons below take
-              its place — the feedback PICK-1 asked for, and a button that is
-              gone cannot be spammed. A disabled state would never be rendered.
-            */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => void refetch()}
-              data-testid="organization-picker-retry"
-            >
-              {t(AUTH_KEYS.common.tryAgain)}
-            </Button>
-          </CardContent>
-        </Card>
+        // The design's dashed card (EmptyState `card`), with the retry as its action.
+        <div data-testid="organization-picker-error">
+          <EmptyState
+            variant="card"
+            title={t(AUTH_KEYS.organizationPicker.loadError)}
+            action={
+              /*
+                No `disabled`/spinner here on purpose. Retrying resets the query to
+                pending, so this whole card unmounts and the skeletons below take
+                its place — the feedback PICK-1 asked for, and a button that is
+                gone cannot be spammed. A disabled state would never be rendered.
+              */
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => void refetch()}
+                data-testid="organization-picker-retry"
+              >
+                {t(AUTH_KEYS.common.tryAgain)}
+              </Button>
+            }
+          />
+        </div>
       )}
 
       {isEmpty && (
-        <Card data-testid="organization-picker-empty">
-          <CardContent className="text-muted-foreground p-6 text-center text-sm">
-            {t(AUTH_KEYS.organizationPicker.empty)}
-          </CardContent>
-        </Card>
+        <EmptyState
+          variant="inline"
+          testId="organization-picker-empty"
+          title={t(AUTH_KEYS.organizationPicker.empty)}
+          className="px-1.5 py-2"
+        />
       )}
 
       {!(isLoading || isError) &&
         organizations.map((organization) => (
-          <Link
-            key={organization.id}
-            {...organizationDashboard(organization.slug)}
-            className="block"
-            data-testid={`organization-picker-option-${organization.slug}`}
-          >
-            <Card className="hover:bg-muted/50 hover:border-primary/30 cursor-pointer py-0 transition-colors">
-              <CardContent className="flex items-center gap-3 p-4">
-                <div
-                  data-slot="icon-chip"
-                  className="bg-primary/10 text-primary flex size-9 shrink-0 items-center justify-center"
-                >
-                  <Building className="h-5 w-5" />
-                </div>
-                <div className="min-w-0 flex-1 text-start">
-                  <p className="truncate text-sm font-medium">{organization.name}</p>
-                  <p className="text-muted-foreground truncate text-xs">
-                    {organization.slug}
-                  </p>
-                </div>
-                <ChevronRight className="text-muted-foreground h-4 w-4 shrink-0" />
-              </CardContent>
-            </Card>
-          </Link>
+          <OrganizationRow key={organization.id} organization={organization} />
         ))}
     </>
   );
@@ -114,34 +157,63 @@ function OrganizationList() {
 
 /**
  * Organization picker — choose which organization to enter. Selecting one
- * navigates to its dashboard; the organization guard syncs context from the
- * URL and persists the choice for the `/` resolver.
+ * navigates to its home (the member's role home); the organization guard syncs
+ * context from the URL and persists the choice for the `/` resolver. The
+ * signed-out canvas and its 360px card: the heading, the pending invitations
+ * (D84 — Accept or Decline each), the list as All sections rows, then "Create
+ * organization". Someone invited into no organization yet reads "You're
+ * invited", and the create action becomes "Create my own organization instead".
  */
 export function OrganizationPickerPage() {
   const { t } = useTranslation(AUTH_NS);
   const [createOpen, setCreateOpen] = useState(false);
+  const invitations = useMyInvitations().data ?? [];
+  const organizations = useMyOrganizationSummaries().data;
+  const invited = invitations.length > 0;
+  // Invited and in no organization yet: this screen is their invitations (D84), with
+  // "create my own" as the way out instead of the main path.
+  const onlyInvited =
+    invited &&
+    organizations !== undefined &&
+    !organizations.some((org) => org.slug !== null);
 
   return (
-    <main
-      className="bg-background flex min-h-screen items-center justify-center p-6"
-      data-testid="organization-page"
+    <PublicFrame
+      testId="organization-page"
+      mainId="organization-main"
+      controls={<ThemeModeToggle surface="frame" />}
     >
-      <div className="w-full max-w-md space-y-6">
-        <header className="space-y-1 text-center">
-          <h1 className="text-2xl font-bold tracking-tight">
-            {t(AUTH_KEYS.organizationPicker.heading)}
-          </h1>
-          <p className="text-muted-foreground text-sm">
-            {t(AUTH_KEYS.organizationPicker.subheading)}
-          </p>
-        </header>
+      <PublicCard>
+        <PublicCardHeader
+          title={t(
+            onlyInvited
+              ? AUTH_KEYS.organizationPicker.invitedHeading
+              : AUTH_KEYS.organizationPicker.heading,
+          )}
+          description={t(
+            onlyInvited
+              ? AUTH_KEYS.organizationPicker.invitedSubheading
+              : AUTH_KEYS.organizationPicker.subheading,
+          )}
+        />
 
-        <div className="space-y-2">
+        {invited ? (
+          <div className="-mx-1.5">
+            <SectionErrorBoundary
+              title={t(AUTH_KEYS.organizationPicker.invitationsTitle)}
+              testId="organization-picker-invitations-error"
+            >
+              <InvitationList invitations={invitations} />
+            </SectionErrorBoundary>
+          </div>
+        ) : null}
+
+        <div className="-mx-1.5 flex flex-col gap-0.5">
           <SectionErrorBoundary
             title={t(AUTH_KEYS.organizationPicker.listTitle)}
             testId="organization-picker-list-error"
           >
-            <OrganizationList />
+            <OrganizationList invited={invited} />
           </SectionErrorBoundary>
         </div>
 
@@ -151,12 +223,16 @@ export function OrganizationPickerPage() {
           onClick={() => setCreateOpen(true)}
           data-testid="organization-picker-create"
         >
-          <Plus className="me-2 h-4 w-4" />
-          {t(AUTH_KEYS.organizationPicker.create)}
+          <Plus className="size-4" />
+          {t(
+            onlyInvited
+              ? AUTH_KEYS.organizationPicker.createOwn
+              : AUTH_KEYS.organizationPicker.create,
+          )}
         </Button>
-      </div>
+      </PublicCard>
 
       <CreateOrganizationDialog open={createOpen} onOpenChange={setCreateOpen} />
-    </main>
+    </PublicFrame>
   );
 }

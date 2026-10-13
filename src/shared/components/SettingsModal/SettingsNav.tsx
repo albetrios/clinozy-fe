@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/utils.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
+import { RoomSearchField } from '@/shared/components/RoomToolbar/RoomSearchField/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { Input } from '@/shared/components/ui/input.tsx';
 import { Search } from '@/shared/icons/index.ts';
 
 import { SETTINGS_KEYS, SETTINGS_NS } from './settings.constants.ts';
@@ -18,6 +18,12 @@ interface SettingsNavProps {
   onSelect: (next: SettingsSectionRef) => void;
 }
 
+/**
+ * The Settings rail, as the Users room's role list (`users.md:44–53`;
+ * H:1118–1121): the search over a `canvas` column of sections, each scope under
+ * its 11px uppercase label; a section is a 36px row (16px icon, 13px label) and
+ * the open one takes the card's fill, edge and shadow with `aria-current`.
+ */
 export function SettingsNav({ groups, active, onSelect }: SettingsNavProps) {
   const { t } = useTranslation(SETTINGS_NS);
   const [query, setQuery] = useState('');
@@ -63,28 +69,20 @@ export function SettingsNav({ groups, active, onSelect }: SettingsNavProps) {
     <aside
       aria-label={t(SETTINGS_KEYS.nav.ariaSections)}
       data-testid="settings-nav"
-      className="bg-muted/30 hidden h-full flex-col border-e sm:flex"
+      className="bg-canvas hidden h-full min-h-0 flex-col border-e md:flex"
     >
-      {/* 24px — the inset every other dialog in the app gets from `DialogContent`
-          (`p-6`). This modal opts out of it (`p-0`, it lays out its own panes), so
-          each pane has to put it back: the search box used to sit 12px from the
-          corner beside a content pane inset 32px. */}
-      <div className="space-y-2 px-6 pt-6 pb-3">
-        <div className="relative">
-          <Search
-            className="text-muted-foreground absolute start-2.5 top-1/2 size-4 -translate-y-1/2"
-            aria-hidden
-          />
-          <Input
-            type="search"
-            placeholder={t(SETTINGS_KEYS.nav.searchPlaceholder)}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="bg-background h-9 ps-8"
-            aria-label={t(SETTINGS_KEYS.nav.searchAria)}
-            data-testid="settings-search"
-          />
-        </div>
+      {/* The rail's own 8px inset (the role list's `p-2`), on the spacing scale so
+          the theme's Density setting moves it; the search sits on the rows' 10px
+          sides and lines up with the content pane's head row (20px down). */}
+      <div className="flex flex-col gap-2 px-2.5 pt-5 pb-2">
+        <RoomSearchField
+          layout="fill"
+          value={query}
+          onValueChange={setQuery}
+          placeholder={t(SETTINGS_KEYS.nav.searchPlaceholder)}
+          label={t(SETTINGS_KEYS.nav.searchAria)}
+          inputTestId="settings-search"
+        />
         {/* How many sections the query actually matched. Without it the rail
             silently shrank with no way to tell a one-hit search from a list
             that had always been that short — and now that the open section
@@ -94,7 +92,7 @@ export function SettingsNav({ groups, active, onSelect }: SettingsNavProps) {
         {searching ? (
           <output
             aria-live="polite"
-            className="text-muted-foreground block text-xs"
+            className="text-muted-foreground text-caption block px-0.5"
             data-testid="settings-search-count"
           >
             {t(SETTINGS_KEYS.nav.matches, { count: matchCount })}
@@ -103,7 +101,7 @@ export function SettingsNav({ groups, active, onSelect }: SettingsNavProps) {
       </div>
 
       <nav
-        className="flex-1 space-y-4 overflow-y-auto px-6 pb-6"
+        className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-2 pb-3"
         aria-label={t(SETTINGS_KEYS.nav.ariaSettings)}
       >
         {matches.length === 0 && (
@@ -122,7 +120,7 @@ export function SettingsNav({ groups, active, onSelect }: SettingsNavProps) {
           */
           <div data-testid="settings-nav-empty">
             <EmptyState
-              className="gap-2 border-b px-2 pt-2 pb-6 [&_svg]:h-6 [&_svg]:w-6"
+              className="gap-2 border-b px-2 pt-2 pb-5 [&_svg]:size-6"
               icon={<Search aria-hidden />}
               title={t(SETTINGS_KEYS.nav.empty)}
               description={t(SETTINGS_KEYS.nav.emptyHint, { query: query.trim() })}
@@ -142,10 +140,10 @@ export function SettingsNav({ groups, active, onSelect }: SettingsNavProps) {
         )}
         {visible.map((group) => (
           <div key={group.scope}>
-            <p className="text-muted-foreground mb-1.5 px-2 text-xs font-medium tracking-wide uppercase">
+            <p className="text-micro text-muted-foreground px-2.5 pt-1 pb-1.5 font-semibold tracking-[0.05em] uppercase">
               {t(group.labelKey)}
             </p>
-            <ul className="space-y-0.5">
+            <ul className="flex flex-col gap-0.5">
               {group.items.map((item) => {
                 const isActive =
                   item.scope === active.scope && item.section === active.section;
@@ -166,14 +164,20 @@ export function SettingsNav({ groups, active, onSelect }: SettingsNavProps) {
                       aria-current={isActive ? 'page' : undefined}
                       data-testid={`settings-nav-${item.scope}-${item.section}`}
                       className={cn(
-                        'flex w-full items-center gap-2 px-2 py-2 text-start text-sm transition-colors',
+                        'text-body flex h-9 w-full items-center gap-2.5 rounded-lg border px-2.5 text-start transition-colors duration-150',
                         isActive
-                          ? 'bg-accent text-accent-foreground font-medium'
-                          : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground',
+                          ? 'bg-card border-border-strong text-foreground font-semibold shadow-xs'
+                          : 'text-foreground-soft hover:bg-background hover:text-foreground border-transparent font-medium',
                       )}
                     >
-                      <item.icon className="size-4 shrink-0" aria-hidden />
-                      {t(item.labelKey)}
+                      <item.icon
+                        className={cn(
+                          'size-4 shrink-0',
+                          isActive ? 'text-foreground' : 'text-muted-foreground',
+                        )}
+                        aria-hidden
+                      />
+                      <span className="min-w-0 truncate">{t(item.labelKey)}</span>
                     </button>
                   </li>
                 );

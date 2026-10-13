@@ -1,17 +1,8 @@
-import { render, waitFor } from '@testing-library/react';
-import { afterEach, describe, expect, it } from 'vitest';
+import { render } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
 import { axe } from 'vitest-axe';
 
-import { loadIconSet } from '@/shared/icons/icon-registry.ts';
-import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
-import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
-
 import { Spinner } from './Spinner.tsx';
-
-afterEach(() => {
-  useThemeStore.setState({ iconLibrary: 'lucide' });
-  useAuthStore.setState({ isAuthenticated: false, isLoading: false });
-});
 
 function svgOf(container: HTMLElement): SVGSVGElement {
   const svg = container.querySelector('svg');
@@ -47,22 +38,11 @@ describe('Spinner', () => {
   });
 
   // The reason this is not shadcn's vendored spinner: that one imports Lucide directly, so it
-  // would ignore the Icon library appearance setting that every other app icon follows.
-  it('follows the selected icon library and keeps spinning', async () => {
-    useAuthStore.setState({ isAuthenticated: true, isLoading: false });
+  // would bypass the icon barrel every other app icon is named through.
+  it('draws the barrel’s Loader glyph', () => {
     const { container } = render(<Spinner />);
     expect(svgOf(container).getAttribute('class')).toContain('lucide');
-
-    useThemeStore.getState().setIconLibrary('tabler');
-    loadIconSet('tabler');
-    await waitFor(
-      () => {
-        expect(svgOf(container).getAttribute('class')).toContain('tabler-icon');
-      },
-      { timeout: 12_000 },
-    );
-    expect(svgOf(container)).toHaveClass('animate-spin');
-    expect(svgOf(container)).toHaveAttribute('aria-hidden', 'true');
+    expect(svgOf(container).childElementCount).toBeGreaterThan(0);
   });
 
   it('has no accessibility violations', async () => {

@@ -1,10 +1,10 @@
 import { Suspense, useEffect, useLayoutEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Skeleton } from '@/lib/animations/Skeleton.tsx';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
-import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
 import { onceAsync, useRetryableLazy } from '@/lib/lazy-module.ts';
+import { PICKER_KEYS, PICKER_NS } from '@/shared/components/Picker/picker.constants.ts';
+import { SkeletonBar, SkeletonRows } from '@/shared/components/SkeletonRows/index.ts';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import { Search } from '@/shared/icons/index.ts';
 import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
@@ -12,8 +12,12 @@ import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
 import {
   COMMAND_SEARCH_CLASS,
+  COMMAND_SEARCH_ICON_CLASS,
+  COMMAND_SEARCH_MAX_LENGTH,
+  COMMAND_SEARCH_ROW_CLASS,
   useCommandPaletteSearch,
 } from './command-palette-context.ts';
+import { CommandPaletteKbd } from './CommandPaletteKbd.tsx';
 import { CommandPaletteShell } from './CommandPaletteShell.tsx';
 
 // cmdk stays behind this import, outside the entry preload graph.
@@ -23,7 +27,7 @@ const loadCommandPalette = onceAsync(() =>
 
 function CommandPalettePending() {
   const { t } = useTranslation(LAYOUT_NS);
-  const { t: tLocale } = useTranslation(LOCALE_NS);
+  const { t: tPicker } = useTranslation(PICKER_NS);
   const { query, setQuery, searchFocus, rememberFocus, rememberSelection } =
     useCommandPaletteSearch();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -43,13 +47,14 @@ function CommandPalettePending() {
 
   return (
     <>
-      <div className="flex items-center border-b px-3">
-        <Search className="text-muted-foreground me-2 h-4 w-4 shrink-0" />
+      <div className={COMMAND_SEARCH_ROW_CLASS}>
+        <Search aria-hidden="true" className={COMMAND_SEARCH_ICON_CLASS} />
         <input
           ref={inputRef}
           data-slot="input"
-          aria-label={t(LAYOUT_KEYS.app.commandPalette.placeholder)}
+          aria-label={t(LAYOUT_KEYS.app.search)}
           placeholder={t(LAYOUT_KEYS.app.commandPalette.placeholder)}
+          maxLength={COMMAND_SEARCH_MAX_LENGTH}
           className={COMMAND_SEARCH_CLASS}
           value={query}
           onChange={(event) => setQuery(event.target.value)}
@@ -60,17 +65,17 @@ function CommandPalettePending() {
             rememberFocus(false);
           }}
         />
+        <CommandPaletteKbd>{tPicker(PICKER_KEYS.escKey)}</CommandPaletteKbd>
       </div>
-      <div data-testid="command-palette-pending" className="flex flex-col gap-1.5 p-2">
-        <output className="sr-only">{tLocale(LOCALE_KEYS.loading)}</output>
-        <Skeleton aria-hidden="true" className="ms-2 h-3.5 w-20" />
-        <Skeleton aria-hidden="true" className="h-9 w-full" />
-        <Skeleton aria-hidden="true" className="h-9 w-full" />
-        <Skeleton aria-hidden="true" className="ms-2 h-3.5 w-16" />
-        <Skeleton aria-hidden="true" className="h-9 w-full" />
-        <Skeleton aria-hidden="true" className="h-9 w-full" />
-        <Skeleton aria-hidden="true" className="h-9 w-full" />
-        <Skeleton aria-hidden="true" className="h-9 w-full" />
+      {/* The design's list geometry (H:2674): a heading, then 40px rows — their
+          text replaced in place by the flat bars (`_patterns.md:282`). The rows
+          announce the load. */}
+      <div
+        data-testid="command-palette-pending"
+        className="text-body flex flex-col p-1.5"
+      >
+        <SkeletonBar className="ms-2.5 mt-2.5 mb-1 w-16" />
+        <SkeletonRows rows={5} rowClassName="h-10 px-2.5" />
       </div>
     </>
   );

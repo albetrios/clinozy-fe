@@ -8,8 +8,9 @@ import type { MeContext } from '@/shared/tenancy/me-context.ts';
 import type * as MyOrganizationSummariesModule from '@/shared/tenancy/my-organization-summaries.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
-import { CommandPalette, PALETTE_LOGOUT_TOAST_ID } from './CommandPalette.tsx';
+import { CommandPalette } from './CommandPalette.tsx';
 import { PALETTE_SWITCH_TOAST_ID } from './CommandPaletteOrgGroup.tsx';
+import { PALETTE_LOGOUT_TOAST_ID } from './platform-command-groups.ts';
 
 const {
   useMeContextMock,
@@ -18,6 +19,7 @@ const {
   switchToPersonalMock,
   notifyErrorMock,
   reportErrorMock,
+  platformOverrides,
 } = vi.hoisted(() => ({
   useMeContextMock: vi.fn(),
   navigateMock: vi.fn(),
@@ -25,7 +27,25 @@ const {
   switchToPersonalMock: vi.fn(),
   notifyErrorMock: vi.fn(),
   reportErrorMock: vi.fn(),
+  platformOverrides: { themeLock: false },
 }));
+// The deployment's theme lock (`VITE_THEME_LOCK`), read per render.
+vi.mock('@/core/config/env.ts', async (importOriginal) => {
+  const actual = await importOriginal<{ platformConfig: Record<string, unknown> }>();
+  return {
+    ...actual,
+    platformConfig: {
+      ...actual.platformConfig,
+      get themeLock() {
+        return platformOverrides.themeLock;
+      },
+    },
+  };
+});
+vi.mock('@/shared/hooks/useAppNav/index.ts', async () => {
+  const { TODAY_ONLY_NAV } = await import('@/tests/utils/app-nav-fixture.ts');
+  return { useAppNav: () => TODAY_ONLY_NAV };
+});
 vi.mock('@/shared/auth/service.ts', async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>();
   return { ...actual, logout: logoutMock };
@@ -56,7 +76,8 @@ vi.mock('@/shared/tenancy/my-organization-summaries.ts', async (importOriginal) 
 
 vi.mock('@tanstack/react-router', async (importOriginal) => {
   const actual = (await importOriginal()) as Record<string, unknown>;
-  return { ...actual, useNavigate: () => navigateMock };
+  // `rerender` drops the router provider, so the palette's params read is stubbed too.
+  return { ...actual, useNavigate: () => navigateMock, useParams: () => ({}) };
 });
 
 /** The org list now comes from `GET /users/me/organizations`, not me/context. */
@@ -119,17 +140,43 @@ describe('CommandPalette', () => {
     switchToPersonalMock.mockResolvedValue(undefined);
     notifyErrorMock.mockClear();
     reportErrorMock.mockClear();
+    platformOverrides.themeLock = false;
     useOrganizationStore.setState({
       deploymentFlags: { personalOrganizations: true, teamOrganizations: true },
     });
   });
 
-  it('renders navigation and settings commands when open', async () => {
+  it('renders the settings commands when open', async () => {
     renderWithProviders(<CommandPalette />);
 
-    expect(await screen.findByText('Dashboard')).toBeInTheDocument();
-    expect(screen.getByText('User settings')).toBeInTheDocument();
+    expect(await screen.findByText('User settings')).toBeInTheDocument();
     expect(screen.getByText('Organization settings')).toBeInTheDocument();
+  });
+
+  it('draws the platform rows as the clinic rows: scope subs, the menu’s glyphs', async () => {
+    useOrganizationStore.setState({ permissions: ['organization:read'] });
+    renderWithProviders(<CommandPalette />);
+
+    // A settings row names its scope at the inline end, as an action names its room.
+    const user = (await screen.findByText('User settings')).closest('[cmdk-item]');
+    expect(user).toHaveTextContent(/User settings\s*Account/);
+    const org = screen.getByText('Organization settings').closest('[cmdk-item]');
+    expect(org).toHaveTextContent(/Organization settings\s*Organization/);
+    // …unless that would repeat the row's own label (the Account section).
+    const account = screen
+      .getAllByText('Account')
+      .map((node) => node.closest('[cmdk-item]'))
+      .find((row) => row?.getAttribute('data-value') === 'settings:account/account');
+    expect(account?.textContent).toBe('Account');
+
+    // Shortcuts and Log out take the Account menu's keyboard and mirrored chevron;
+    // Log out is red, icon included.
+    const shortcuts = screen.getByText('Keyboard shortcuts').closest('[cmdk-item]');
+    expect(shortcuts?.querySelector('svg.lucide-keyboard')).not.toBeNull();
+    const logOut = screen.getByText('Log out').closest('[cmdk-item]');
+    const chevron = logOut?.querySelector('svg.lucide-chevron-left');
+    expect(chevron).toHaveClass('text-destructive', 'rtl:rotate-180');
+    expect(logOut).toHaveClass('data-[selected=true]:bg-destructive-tint');
   });
 
   it('navigates to organization settings when the command is selected', async () => {
@@ -156,10 +203,7 @@ describe('CommandPalette', () => {
     const user = userEvent.setup();
     renderWithProviders(<CommandPalette />);
 
-    await user.type(
-      await screen.findByPlaceholderText('Type a command or search...'),
-      'billing',
-    );
+    await user.type(await screen.findByPlaceholderText('Search or jump to…'), 'billing');
 
     expect(await screen.findByText('Billing')).toBeInTheDocument();
     expect(screen.queryByText('Profile')).not.toBeInTheDocument();
@@ -188,12 +232,11 @@ describe('CommandPalette', () => {
   });
 
   /**
-   * DASH-5: the dashboard's suggestion chips seed the palette with a cmdk
-   * KEYWORD, and a keyword that matches nothing would reopen the same blank
-   * palette the chips were meant to replace. These pin the contract from the
-   * chip's side of it — `AiAssistantCard` owns which seed each chip sends.
+   * The settings and theme rows answer a locale-independent KEYWORD as well as
+   * their translated label, so a search reaches them in every language — the
+   * theme rows carry `THEME_KEYWORDS` for exactly this.
    */
-  describe('opens on the seed a caller left in the store', () => {
+  describe('answers a keyword typed in any language', () => {
     beforeEach(() => {
       useOrganizationStore.setState({
         // Organization sections need a real organization in context, not just
@@ -201,75 +244,60 @@ describe('CommandPalette', () => {
         organizationId: 'org_acme',
         permissions: ['organization:read', 'membership:read'],
       });
-      // A seed left over from an earlier opening must never decide this one.
-      useUIStore.setState({ commandPaletteSeed: 'stale' });
     });
 
-    it('"usage" (Track usage) reaches Billing, and nothing else', async () => {
-      useUIStore.getState().openCommandPaletteWith('usage');
+    async function search(text: string) {
+      const user = userEvent.setup();
       renderWithProviders(<CommandPalette />);
+      const input = await screen.findByPlaceholderText('Search or jump to…');
+      expect(input).toHaveFocus();
+      expect(input).toHaveValue('');
+      await user.type(input, text);
+    }
+
+    it('"usage" reaches Billing, and nothing else', async () => {
+      await search('usage');
 
       expect(await screen.findByText('Billing')).toBeInTheDocument();
       expect(screen.queryByText('Profile')).not.toBeInTheDocument();
-      expect(screen.getByPlaceholderText('Type a command or search...')).toHaveValue(
-        'usage',
-      );
     });
 
-    it('"invitations" (Invite members) reaches Members', async () => {
-      useUIStore.getState().openCommandPaletteWith('invitations');
-      renderWithProviders(<CommandPalette />);
+    it('"invitations" reaches Members', async () => {
+      await search('invitations');
 
       expect(await screen.findByText('Members')).toBeInTheDocument();
       expect(screen.queryByText('Billing')).not.toBeInTheDocument();
     });
 
-    it('"theme" (Change theme) reaches the theme commands in any language', async () => {
-      // The labels are translated, so cmdk could only ever have matched them in
-      // English; the theme rows carry `THEME_KEYWORDS` for exactly this.
-      useUIStore.getState().openCommandPaletteWith('theme');
-      renderWithProviders(<CommandPalette />);
+    it('"theme" reaches the theme commands', async () => {
+      await search('theme');
 
       expect(await screen.findByText('Light mode')).toBeInTheDocument();
       expect(screen.getByText('Dark mode')).toBeInTheDocument();
       expect(screen.getByText('System theme')).toBeInTheDocument();
       expect(screen.queryByText('Profile')).not.toBeInTheDocument();
     });
+  });
 
-    it('typing over a seed does not write back to the store', async () => {
-      // The seed is a starting value, not a bound field: a palette that echoed
-      // every keystroke into global state would reopen mid-word next time.
-      const user = userEvent.setup();
-      useUIStore.getState().openCommandPaletteWith('usage');
-      renderWithProviders(<CommandPalette />);
+  it('offers no theme rows on a theme-locked deployment — the mode is pinned', async () => {
+    platformOverrides.themeLock = true;
+    const user = userEvent.setup();
+    renderWithProviders(<CommandPalette />);
 
-      const input = await screen.findByPlaceholderText('Type a command or search...');
-      await user.clear(input);
-      await user.type(input, 'roles');
+    // The other platform rows stay; the Theme group and its three modes go.
+    expect(await screen.findByText('Keyboard shortcuts')).toBeInTheDocument();
+    expect(screen.getByText('Log out')).toBeInTheDocument();
+    expect(screen.queryByText('Theme')).not.toBeInTheDocument();
+    for (const mode of ['Light mode', 'Dark mode', 'System theme']) {
+      expect(screen.queryByText(mode)).not.toBeInTheDocument();
+    }
 
-      expect(input).toHaveValue('roles');
-      expect(useUIStore.getState().commandPaletteSeed).toBe('usage');
-    });
-
-    it('drops the caret after the seed so typing extends it', async () => {
-      const user = userEvent.setup();
-      useUIStore.getState().openCommandPaletteWith('role');
-      renderWithProviders(<CommandPalette />);
-
-      const input = await screen.findByPlaceholderText('Type a command or search...');
-      expect(input).toHaveFocus();
-      await user.keyboard('s');
-
-      expect(input).toHaveValue('roles');
-    });
-
-    it('a plain ⌘K open carries no seed', async () => {
-      useUIStore.getState().setCommandPaletteOpen(true);
-      renderWithProviders(<CommandPalette />);
-
-      expect(await screen.findByText('Dashboard')).toBeInTheDocument();
-      expect(screen.getByPlaceholderText('Type a command or search...')).toHaveValue('');
-    });
+    // Nor does a search reach them: "theme", the rows' own keyword, finds nothing.
+    await user.type(screen.getByPlaceholderText('Search or jump to…'), 'theme');
+    expect(await screen.findByTestId('command-palette-empty')).toHaveTextContent(
+      'No results found.',
+    );
+    expect(screen.queryByText('Dark mode')).not.toBeInTheDocument();
   });
 
   it('renders nothing when closed', () => {
@@ -307,7 +335,7 @@ describe('CommandPalette', () => {
       expect(document.activeElement).toBe(opener);
 
       act(() => useUIStore.getState().setCommandPaletteOpen(true));
-      await screen.findByPlaceholderText(/type a command or search/i);
+      await screen.findByPlaceholderText(/search or jump to/i);
 
       // Close exactly as the app does — the component is removed, not re-rendered.
       act(() => useUIStore.getState().setCommandPaletteOpen(false));
@@ -323,7 +351,7 @@ describe('CommandPalette', () => {
       const opener = await screen.findByTestId('opener');
       opener.focus();
       act(() => useUIStore.getState().setCommandPaletteOpen(true));
-      await screen.findByPlaceholderText(/type a command or search/i);
+      await screen.findByPlaceholderText(/search or jump to/i);
 
       // Selecting a palette item navigates away, so the trigger is gone by the
       // time the palette closes — exactly the case a naive restore would focus
@@ -350,19 +378,18 @@ describe('CommandPalette', () => {
       expect(screen.getByText(/Acme Inc\./)).toBeInTheDocument();
     });
 
-    it('switches to the personal workspace by its own route', async () => {
+    it('switches to the personal workspace, landing on the organization picker', async () => {
       useMeContextMock.mockReturnValue({ data: meContextWithBoth() });
       const user = userEvent.setup();
       renderWithProviders(<CommandPalette />);
 
       await user.click(await screen.findByText(/Ada Lovelace/));
 
-      // No slug to drive the org guard, so the switch has to happen first.
+      // No slug to drive the org guard, so the switch has to happen first; a
+      // personal workspace has no clinic (D44), so the picker is where it lands.
       await waitFor(() => expect(switchToPersonalMock).toHaveBeenCalledTimes(1));
       await waitFor(() =>
-        expect(navigateMock).toHaveBeenCalledWith(
-          expect.objectContaining({ to: '/dashboard' }),
-        ),
+        expect(navigateMock).toHaveBeenCalledWith({ to: '/organization' }),
       );
     });
 
@@ -373,7 +400,7 @@ describe('CommandPalette', () => {
       });
       renderWithProviders(<CommandPalette />);
 
-      await screen.findByText('Dashboard');
+      await screen.findByText('User settings');
       expect(screen.queryByText(/Ada Lovelace/)).not.toBeInTheDocument();
     });
 
@@ -435,7 +462,7 @@ describe('CommandPalette', () => {
 
       expect(switchToPersonalMock).not.toHaveBeenCalled();
       expect(navigateMock).not.toHaveBeenCalledWith(
-        expect.objectContaining({ to: '/dashboard' }),
+        expect.objectContaining({ to: '/organization' }),
       );
     });
 
@@ -453,7 +480,7 @@ describe('CommandPalette', () => {
       });
       renderWithProviders(<CommandPalette />);
 
-      await screen.findByText('Dashboard');
+      await screen.findByText('User settings');
       expect(screen.queryByText(/Acme Inc\./)).not.toBeInTheDocument();
     });
 

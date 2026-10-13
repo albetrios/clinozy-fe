@@ -1,0 +1,191 @@
+{
+  "manifest": {
+    "title": "लीड्स"
+  },
+  "record": "लीड",
+  "toasts": {
+    "created": "लीड {{id}} बनाई गई",
+    "saved": "लीड सेव हुई",
+    "statusChanged": "{{name}} → {{status}}",
+    "claimed": "अब {{name}} आपकी है · {{owner}} जुड़े रहेंगे",
+    "claimedUnowned": "अब {{name}} आपकी है",
+    "released": "टीम के लिए खोली गई · कोई भी ले सकता है",
+    "assigned": "{{name}} अब ज़िम्मेदार हैं · सूचना भेजी गई"
+  },
+  "list": {
+    "records": "लीड्स",
+    "views": {
+      "label": "लीड व्यू",
+      "mine": "मेरी",
+      "unreplied": "बिना जवाब",
+      "all": "सभी",
+      "unrepliedCount_one": "{{count}} बिना जवाब",
+      "unrepliedCount_other": "{{count}} बिना जवाब"
+    },
+    "search": {
+      "placeholder": "नाम, फ़ोन, #ID खोजें",
+      "label": "लीड्स खोजें"
+    },
+    "newLead": "नई लीड",
+    "columns": {
+      "lead": "लीड",
+      "status": "स्थिति",
+      "source": "स्रोत",
+      "interests": "रुचि",
+      "team": "टीम",
+      "updated": "अपडेट"
+    },
+    "empty": "कोई मेल खाती लीड नहीं",
+    "clearFilters": "फ़िल्टर हटाएँ",
+    "moreInterests_one": "{{count}} और: {{list}}",
+    "moreInterests_other": "{{count}} और: {{list}}"
+  },
+  "team": {
+    "claim": "खुली · लें",
+    "openHint": "किसी के पास नहीं है · कोई भी इसे ले सकता है",
+    "openMine": "टीम के लिए खुली",
+    "openMineHint": "आपकी होल्ड खत्म हो गई · कोई भी इसे ले सकता है",
+    "releasesToday": "आज {{time}} बजे टीम के पास लौटेगी",
+    "releasesTomorrow": "कल {{time}} बजे टीम के पास लौटेगी",
+    "claimFirst": "{{first}} को लें",
+    "takeOver": "{{first}} से ज़िम्मेदारी लें"
+  },
+  "filters": {
+    "status": "स्थिति",
+    "source": "स्रोत · कोई भी चुनें",
+    "clear": "हटाएँ",
+    "hold": {
+      "label": "स्वामित्व · लेने के बाद होल्ड",
+      "any": "कोई भी",
+      "open": "लेने के लिए खुली",
+      "soon": "आज खुलेंगी",
+      "held": "होल्ड पर"
+    },
+    "team": {
+      "label": "टीम · ज़िम्मेदार या जुड़े हुए",
+      "anyone": "टीम में कोई भी",
+      "count_one": "{{count}} व्यक्ति",
+      "count_other": "{{count}} लोग",
+      "search": "टीम खोजें",
+      "noMatch": "कोई मेल नहीं"
+    }
+  },
+  "drawer": {
+    "title": "लीड संपादित करें",
+    "sub": "अपने बदलाव करें, फिर लीड सेव करें",
+    "idTooltip": "लीड #{{seq}} · {{created}} को बनाया गया · कॉपी करने के लिए क्लिक करें",
+    "idAria": "लीड ID #{{seq}} कॉपी करें",
+    "idCopied": "लीड ID #{{seq}} कॉपी हो गया",
+    "retarget": "री-टारगेट",
+    "panels": "लीड पैनल",
+    "details": "विवरण",
+    "chat": "चैट",
+    "resize": "पैनल का आकार बदलें",
+    "resizeHint": "आकार बदलने के लिए खींचें · रीसेट के लिए डबल-क्लिक करें",
+    "cards": {
+      "details": "लीड का विवरण",
+      "progress": "प्रगति",
+      "info": "जानकारी"
+    },
+    "source": "स्रोत",
+    "interests": "रुचि",
+    "people": "असाइन और शामिल",
+    "peopleAria": "असाइन और शामिल लोग",
+    "addInvolved": "+ शामिल व्यक्ति जोड़ें",
+    "claim": "क्लेम करें",
+    "release": "छोड़ें",
+    "releaseHint": "टीम में कोई भी इसे ले सके",
+    "progressAria": "लीड की प्रगति",
+    "steps": {
+      "done": "पूरा",
+      "current": "मौजूदा",
+      "next": "अगला"
+    },
+    "stepTips": {
+      "done": "{{status}} · पूरा हुआ",
+      "current": "{{status}} · मौजूदा चरण",
+      "next": "{{status}} पर ले जाएँ",
+      "byCheckIn": "क्लिनिक आए · चेक-इन पर सेट होता है"
+    },
+    "closeAs": "इस रूप में बंद करें",
+    "info": {
+      "created": "बनाया गया",
+      "lastActivity": "पिछली गतिविधि",
+      "none": "अभी कोई नहीं",
+      "patient": "मरीज़",
+      "linked": "जुड़ा हुआ",
+      "notYet": "अभी नहीं",
+      "openTasks": "खुले कार्य",
+      "retargetReason": "री-टारगेट का कारण"
+    },
+    "footer": {
+      "remove": "लीड हटाएँ",
+      "discard": "छोड़ें",
+      "save": "लीड सेव करें"
+    },
+    "popover": {
+      "title": "इस लीड पर लोग",
+      "search": "टीम में खोजें",
+      "assignedTo": "असाइन · अभी यह लीड कौन संभाल रहा है",
+      "assign": "असाइन करें",
+      "assigned": "असाइन है",
+      "currentlyAssigned": "अभी असाइन है",
+      "assignTo": "{{name}} को असाइन करें",
+      "involved": "शामिल · इस लीड पर काम किया",
+      "noMatch": "कोई मेल नहीं",
+      "note": "✓ शामिल = इस लीड पर काम करने वाले सभी लोग। जवाब देने, कॉल करने, नोट लिखने या बुक करने पर अपने-आप जुड़ जाते हैं · आप किसी को ख़ुद भी जोड़ सकते हैं"
+    },
+    "remove": {
+      "title": "यह लीड हटाएँ?",
+      "effect": "लीड हर सूची और ज़िम्मेदार व्यक्ति की कतार से हट जाता है। चैट इतिहास रखा जाता है। आप तुरंत बाद नोटिफ़िकेशन से इसे पूर्ववत कर सकते हैं।",
+      "reasons": {
+        "duplicate": "डुप्लिकेट",
+        "testEntry": "टेस्ट एंट्री",
+        "spam": "स्पैम",
+        "other": "अन्य"
+      },
+      "removed": "लीड #{{seq}} हटाया गया · {{reason}}"
+    }
+  },
+  "newLead": {
+    "title": "नई लीड",
+    "sub": "शुरू करने के लिए नाम और मोबाइल काफ़ी हैं",
+    "contact": "संपर्क",
+    "search": "नाम या मोबाइल से खोजें",
+    "searchAria": "मौजूदा मरीज़ या संपर्क खोजें",
+    "quickStart": "झटपट शुरुआत",
+    "presets": {
+      "walkIn": "सीधे आए",
+      "instagramDm": "Instagram DM"
+    },
+    "presetHints": {
+      "walkIn": "अभी डेस्क पर · स्रोत सीधे आए",
+      "instagramDm": "Instagram पर DM"
+    },
+    "hits": {
+      "patient": "मरीज़ · {{id}} · {{phone}}",
+      "contact": "{{id}} · {{phone}}",
+      "openLead": "खुली लीड · {{id}} · {{phone}}",
+      "open": "लीड खोलें",
+      "recreate": "लीड फिर से बनाएँ",
+      "useContact": "संपर्क इस्तेमाल करें"
+    },
+    "noMatch": "कोई मौजूदा मेल नहीं",
+    "more_one": " · +{{count}} और",
+    "more_other": " · +{{count}} और",
+    "change": "बदलें",
+    "changeTitle": "कोई दूसरा संपर्क चुनें",
+    "afterContact": "संपर्क के बाद",
+    "detailsSummary": "स्रोत, रुचि और कौन संभालेगा",
+    "footer": "एक संपर्क बनाता या अपडेट करता है",
+    "create": "लीड बनाएँ",
+    "toasts": {
+      "pickFirst": "पहले संपर्क चुनें या जोड़ें",
+      "presetApplied": "{{preset}} प्रीसेट लागू हुआ",
+      "existingPatient": "मौजूदा मरीज़ {{id}} · नई लीड जोड़ दी जाएगी",
+      "existingContact": "मौजूदा संपर्क {{name}} इस्तेमाल हो रहा है",
+      "missing": "नाम और 10 अंकों का मोबाइल नंबर जोड़ें",
+      "open": "खोलें"
+    }
+  }
+}

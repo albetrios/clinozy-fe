@@ -16,8 +16,9 @@ wired through error handlers, TanStack Query, and the router.
 **Activation:** whenever **`VITE_SENTRY_DSN`** is set — including **`pnpm dev`**
 with `.env.local`. No production build required.
 
-Without a DSN, init is a no-op. Sentry is **not** gated by the analytics cookie
-banner (legitimate-interest error monitoring); PostHog is consent-gated separately.
+Without a DSN, init is a no-op. Error reports are **not** gated by the consent card
+(legitimate-interest error monitoring); session replay and profiling are, like
+PostHog (see **Consent** below, D161).
 
 To verify in dev:
 
@@ -82,9 +83,12 @@ flowchart TB
 not land on the critical preload path. `reportError` / `reportReactError` use the
 same lazy import pattern.
 
-**Consent:** Sentry runs under **legitimate interest** (error monitoring, masked
-replay). It is **not** gated by the analytics cookie banner — see
-`ConsentBanner` copy and `main.tsx` comments.
+**Consent:** error reports, logs and feedback run under **legitimate interest** and
+are **not** gated by the consent card. **Session replay and profiling are** (D161):
+`buildIntegrations` adds them only while the analytics consent stands; a later grant
+adds replay (`Sentry.addIntegration`, sampled as configured), a withdrawal stops it at
+once (`Sentry.getReplay()?.stop()`). Profiling is decided at init only — the SDK can
+neither add nor stop it mid-session — so a changed answer reaches it at the next load.
 
 ---
 

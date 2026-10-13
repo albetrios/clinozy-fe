@@ -1,5 +1,6 @@
 import { type APIRequestContext, expect, test } from '@playwright/test';
 
+import { probeLiveDeployment } from '@/tests/utils/e2e-deployment-mode.ts';
 import {
   e2eOrganizationName,
   e2eOrganizationSlug,
@@ -140,7 +141,7 @@ test.describe('clinozy-be — organization lifecycle', () => {
     test.skip(!org, 'team creation unavailable on this deployment');
 
     const tokenB = await sessionToken();
-    const listB = await api.get(`${API}/tenancy/organizations`, {
+    const listB = await api.get(`${API}/users/me/organizations`, {
       headers: bearerHeaders(tokenB),
     });
     const ids = ((await listB.json()) as { data: Array<{ id: string }> }).data.map(
@@ -163,7 +164,7 @@ test.describe('clinozy-be — roles, members & permission catalog', () => {
       (p) => p.code,
     );
     expect(codes).toContain('organization:read');
-    expect(codes).toContain('membership:manage');
+    expect(codes).toContain('membership:update');
   });
 
   test('[+] a team lists roles, memberships and api-keys', async () => {
@@ -216,25 +217,39 @@ test.describe('clinozy-be — roles, members & permission catalog', () => {
   });
 });
 
-test.describe('clinozy-be — personal-org guards (422)', () => {
+/**
+ * A new account's session is scoped to its personal workspace where the deployment has them — a
+ * 422, a personal workspace holds no members or roles — and to no organization at all in a
+ * team-only deployment — a 403, "Organization context required".
+ */
+test.describe('clinozy-be — guards for a session outside any clinic', () => {
   test.describe.configure({ mode: 'serial' });
 
-  test('[-] cannot add a member to a personal org → 422', async () => {
-    const token = await sessionToken(); // token is scoped to the personal org
-    const res = await api.post(`${API}/tenancy/organization/memberships`, {
-      headers: bearerHeaders(token, true),
-      data: { email: uniqueE2eEmail(), role_id: 'rol_zzzzzzzzzzzzzzzzzzzzz' },
-    });
-    expect(res.status()).toBe(422);
+  let refused = 422;
+
+  test.beforeAll(async () => {
+    const token = await sessionToken();
+    refused = (await probeLiveDeployment(api, token)).flags.personalOrganizations
+      ? 422
+      : 403;
   });
 
-  test('[-] cannot create a role in a personal org → 422', async () => {
+  test('[-] cannot add a member outside a clinic → 422 personal · 403 none', async () => {
+    const token = await sessionToken();
+    const res = await api.post(`${API}/tenancy/organization/memberships`, {
+      headers: bearerHeaders(token, true),
+      data: { email: uniqueE2eEmail(), role_ids: ['rol_zzzzzzzzzzzzzzzzzzzzz'] },
+    });
+    expect(res.status()).toBe(refused);
+  });
+
+  test('[-] cannot create a role outside a clinic → 422 personal · 403 none', async () => {
     const token = await sessionToken();
     const res = await api.post(`${API}/tenancy/organization/roles`, {
       headers: bearerHeaders(token, true),
       data: { name: 'Should Fail' },
     });
-    expect(res.status()).toBe(422);
+    expect(res.status()).toBe(refused);
   });
 });
 

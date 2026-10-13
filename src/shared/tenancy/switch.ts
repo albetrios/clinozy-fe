@@ -6,6 +6,7 @@ import { queryClient } from '@/core/http/queryClient.ts';
 import { ANALYTICS_EVENTS } from '@/shared/analytics/analytics.constants.ts';
 import { captureAnalyticsEvent } from '@/shared/analytics/capture.ts';
 import { scheduleTokenRefresh } from '@/shared/auth/refresh-timer.ts';
+import { settleInFlightRefresh } from '@/shared/auth/service.ts';
 import { setAccessToken } from '@/shared/auth/token.ts';
 
 import {
@@ -62,6 +63,9 @@ async function liveSwitch(
 ): Promise<MeContext | undefined> {
   switchGeneration += 1;
   const generation = switchGeneration;
+  // A refresh answered after the switch would put back a token for the workspace being left.
+  await settleInFlightRefresh();
+  if (generation !== switchGeneration) return undefined;
   const res = await apiClient.post<unknown>(`${API_BASE_PATH}${path}`, body);
   // A newer switch superseded this one while the POST was in flight — discard
   // its token + context so it cannot clobber the active org.

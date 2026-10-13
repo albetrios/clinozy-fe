@@ -1,0 +1,278 @@
+{
+  "manifest": {
+    "title": "Offerings"
+  },
+  "offerLabels": {
+    "percentOff": "{{value}}% off",
+    "amountOff": "{{amount}} off",
+    "fixedAt": "at {{amount}}",
+    "extraSessions_one": "+{{count}} session",
+    "extraSessions_other": "+{{count}} sessions"
+  },
+  "toolbar": {
+    "tabsLabel": "Offerings sections",
+    "tabOfferings": "Offerings",
+    "tabOffers": "Offers",
+    "searchOfferings": "Search name or search term",
+    "searchOffers": "Search offers or codes",
+    "searchLabel": "Search offerings",
+    "newOffering": "New offering",
+    "newOffer": "New offer"
+  },
+  "catalogueCells": {
+    "allBranches": "All branches"
+  },
+  "deleteConfirm": {
+    "offeringTitle": "Delete this offering?",
+    "offerTitle": "Delete this offer?"
+  },
+  "columns": {
+    "seq": "ID",
+    "name": "Offering",
+    "category": "Category",
+    "price": "Price",
+    "offer": "Offer",
+    "branches": "Branches",
+    "duration": "Duration",
+    "sessions": "Sessions",
+    "status": "Status",
+    "updated": "Updated"
+  },
+  "table": {
+    "records": "offerings"
+  },
+  "cells": {
+    "validDays_one": "Valid {{count}} day",
+    "validDays_other": "Valid {{count}} days",
+    "validFor_one": "valid {{count}} day",
+    "validFor_other": "valid {{count}} days",
+    "wasPrice": "was {{price}} · {{percent}}% off",
+    "listPrice": "list price",
+    "minutes": "{{minutes}} min",
+    "sessions_one": "{{count}} session",
+    "sessions_other": "{{count}} sessions",
+    "sessionsFree_one": "{{sessions}} + {{count}} free",
+    "sessionsFree_other": "{{sessions}} + {{count}} free",
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "rowActions": {
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "bulk": {
+    "export": "Export",
+    "exported_one": "{{count}} row exported as CSV",
+    "exported_other": "{{count}} rows exported as CSV"
+  },
+  "empty": {
+    "title": "No offerings yet",
+    "description": "Add treatments and packages with prices so they can be booked and billed.",
+    "noMatchTitle": "No offering matches",
+    "noMatchDescription": "Nothing here yet. Try another tab or search.",
+    "newOffering": "New offering"
+  },
+  "offers": {
+    "columns": {
+      "offer": "Offer",
+      "type": "Type",
+      "appliesTo": "Applies to",
+      "branches": "Branches",
+      "valid": "Valid",
+      "status": "Status",
+      "updated": "Updated"
+    },
+    "table": {
+      "records": "offers"
+    },
+    "cells": {
+      "more": "+{{count}}",
+      "range": "{{start}} – {{end}}",
+      "now": "Now",
+      "noEnd": "no end",
+      "endsToday": "Ends today",
+      "endsTomorrow": "Ends tomorrow",
+      "endsIn_one": "Ends in {{count}} day",
+      "endsIn_other": "Ends in {{count}} days",
+      "startsOn": "Starts {{date}}",
+      "over": "Over",
+      "noOfferings": "No offerings"
+    },
+    "rowActions": {
+      "edit": "Edit",
+      "pause": "Pause",
+      "resume": "Resume",
+      "delete": "Delete"
+    },
+    "bulk": {
+      "export": "Export",
+      "exported_one": "{{count}} row exported as CSV",
+      "exported_other": "{{count}} rows exported as CSV"
+    },
+    "empty": {
+      "title": "No offers yet",
+      "description": "Nothing here yet. Try another tab or search.",
+      "newOffer": "New offer"
+    },
+    "record": "Offer"
+  },
+  "record": "Offering",
+  "offeringDrawer": {
+    "title": {
+      "create": "New offering",
+      "edit": "Edit offering"
+    },
+    "sub": "Used in bookings, invoices and packages",
+    "quickFill": {
+      "single": "Single session",
+      "pack": "6-session pack",
+      "lhr": "LHR 10-pack",
+      "consultation": "Consultation"
+    },
+    "steps": {
+      "main": "Offering, price & sessions",
+      "timeDetails": "Time, validity & details",
+      "offersTime": "Offers on this, time & validity",
+      "details": "Details"
+    },
+    "groups": {
+      "offering": "Offering",
+      "price": "Price & sessions",
+      "offers": "Offers on this",
+      "time": "Time & validity",
+      "details": "Details"
+    },
+    "fields": {
+      "name": "Name",
+      "namePlaceholder": "e.g. LHR Full Face",
+      "category": "Category",
+      "colour": "Colour",
+      "colourHint": "used for this offering everywhere",
+      "availableAt": "Available at",
+      "availableAtHint": "hidden from bookings and bills elsewhere",
+      "price": "Price",
+      "priceHint": "list price · shown on the invoice",
+      "offerPrice": "Offer price",
+      "offerPriceHint": "what you bill · leave empty = list price",
+      "offerPriceBelow": "what you bill · {{percent}}% below list",
+      "sessions": "Sessions",
+      "sessionsHint": "treatments allowed against one invoice",
+      "gstRate": "GST rate",
+      "gst": "GST",
+      "gstInclusive": "Inclusive",
+      "gstExclusive": "Exclusive",
+      "floor": "Lowest price",
+      "floorShown": "Shown · only you can see it",
+      "floorHidden": "Hidden · tap to set",
+      "floorHint": "the desk can never bill below this",
+      "billedToday": "Billed today",
+      "freeSessions_one": "+{{count}} free session",
+      "freeSessions_other": "+{{count}} free sessions",
+      "belowList": "{{percent}}% below list",
+      "duration": "Duration",
+      "durationQuick": "{{minutes}}m",
+      "minutesUnit": "min",
+      "validity": "Validity",
+      "validityHint": "0 = no expiry · sessions left after this are lost",
+      "daysUnit": "days",
+      "days_one": "{{count}} day",
+      "days_other": "{{count}} days",
+      "validityQuick": {
+        "none": "None",
+        "quarter": "3 mo",
+        "half": "6 mo",
+        "year": "1 yr"
+      },
+      "searchTerms": "Search terms",
+      "searchTermsHint": "comma separated",
+      "searchTermsPlaceholder": "laser, face, hair removal",
+      "description": "Description",
+      "descriptionPlaceholder": "What is included",
+      "status": "Status",
+      "active": "Active · bookable",
+      "inactive": "Inactive · hidden",
+      "gstChip": "{{value}}%",
+      "gstHint": "0% for a consultation, 18% otherwise — until you pick one"
+    },
+    "offerTill": "till {{date}}",
+    "untitled": "Untitled",
+    "save": {
+      "create": "Create offering",
+      "edit": "Save changes",
+      "createAnother": "Create & add another"
+    },
+    "toasts": {
+      "addName": "Add a name",
+      "addPrice": "Add a price",
+      "offerAbovePrice": "Offer price can’t be above the price",
+      "floorAboveOffer": "Lowest price can’t be above the offer price",
+      "offerBelowFloor": "Below this offering’s lowest price — ask an Owner or Admin",
+      "floorAbovePrice": "Lowest price can’t be above the price",
+      "floorNeedsPermission": "Your role can’t change the lowest price — ask an Owner or Admin"
+    }
+  },
+  "offerDrawer": {
+    "title": {
+      "create": "New offer",
+      "edit": "Edit offer"
+    },
+    "sub": "A limited-time price on one or more offerings · applies by itself",
+    "untitled": "New offer",
+    "steps": {
+      "offer": "Offer",
+      "where": "Where it applies",
+      "notes": "Notes"
+    },
+    "fields": {
+      "name": "Name",
+      "namePlaceholder": "e.g. Diwali glow",
+      "code": "Code",
+      "codeHint": "optional · for ads",
+      "codePlaceholder": "GLOW20",
+      "type": "Type",
+      "value": {
+        "percent": "Discount",
+        "amount": "Amount off",
+        "fixed": "Offer price",
+        "extra": "Free sessions"
+      },
+      "percentQuick": "{{value}}%",
+      "sessionsUnit": "sessions",
+      "colour": "Colour",
+      "colourHint": "marks this offer on offerings and bills",
+      "offerings": "Offerings",
+      "offeringsHint": "pick one or more",
+      "offeringsSearch": "Search offerings",
+      "branches": "Branches",
+      "branchesHint": "where the desk can use it",
+      "starts": "Starts",
+      "ends": "Ends",
+      "previewPrice": "{{before}} → {{after}}",
+      "previewSessions_one": "{{before}} → {{count}} session",
+      "previewSessions_other": "{{before}} → {{count}} sessions",
+      "note": "Note",
+      "notePlaceholder": "Who it is for, how the desk should mention it",
+      "status": "Status",
+      "live": "Live · applies automatically",
+      "paused": "Paused"
+    },
+    "offeringCount_one": "{{count}} offering",
+    "offeringCount_other": "{{count}} offerings",
+    "save": {
+      "create": "Create offer",
+      "edit": "Save offer"
+    },
+    "toasts": {
+      "name": "Name the offer",
+      "offerings": "Pick at least one offering",
+      "value": {
+        "percent": "Set the discount",
+        "amount": "Set the amount",
+        "fixed": "Set the amount",
+        "extra": "Set the free sessions"
+      },
+      "endsBeforeStart": "Ends before it starts",
+      "offeringInactive": "{{name}} is no longer active — remove it or pick another"
+    }
+  }
+}

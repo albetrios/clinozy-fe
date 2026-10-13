@@ -65,8 +65,8 @@ export async function hydrateSessionContext(
  * `me/context` fetch: `establishSession` populates the cache microseconds before
  * the destination route's `beforeLoad` runs, and during an awaited `beforeLoad`
  * TanStack Router keeps the *previous* screen (the login form) mounted — so an
- * extra fetch there paints `/login` while the URL already reads `/dashboard`
- * (the "flash of login" between the OTP code and the dashboard). Mutations that
+ * extra fetch there paints `/login` while the URL already reads the destination
+ * (the "flash of login" between the OTP code and the workspace). Mutations that
  * change server-side context (onboarding finish, org create, logout) call
  * `hydrateSessionContext()` / `invalidateSessionContext()` directly, so a stale
  * routing decision cannot persist; `me/context` staleTime (60s) governs the rest.

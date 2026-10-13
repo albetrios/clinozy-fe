@@ -21,7 +21,8 @@ export type BillingPlan = {
   name: string;
   description: string | null;
   priceMonthly: number;
-  priceYearly: number;
+  /** Null when the plan does not offer annual billing. */
+  priceYearly: number | null;
   currency: string;
   isActive: boolean;
   seatLimit: number | null;
@@ -58,7 +59,7 @@ export const billingPlanWireSchema = z.object({
   name: z.string(),
   description: z.string().nullable(),
   price_monthly: z.string(),
-  price_yearly: z.string(),
+  price_yearly: z.string().nullable(),
   currency: z.string(),
   is_active: z.boolean(),
   features: z.record(z.string(), z.union([z.boolean(), z.number(), z.string()])),

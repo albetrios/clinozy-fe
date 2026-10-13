@@ -13,8 +13,11 @@
     "goHome": "ホームへ",
     "refresh": "ページを更新",
     "forbidden": "このページにアクセスする権限がありません。",
+    "forbiddenTitle": "このページにはアクセスできません",
     "signOut": "サインアウト",
-    "signingOut": "サインアウトしています…"
+    "signingOut": "サインアウトしています…",
+    "pageNotFound": "ページが見つかりません",
+    "recordNotFound": "{{record}}が見つかりません · 削除された可能性があります"
   },
   "widget": {
     "unavailable": "{{title}} は利用できません",
@@ -25,19 +28,12 @@
     "pageContent": "ページコンテンツ",
     "navigation": "ナビゲーション",
     "emailBanner": "メール確認",
-    "notifications": "通知",
     "organizationSwitcher": "組織スイッチャー",
     "commandPalette": "コマンドパレット",
     "settings": "設定",
     "appearance": "外観",
-    "analytics": "分析",
-    "members": "メンバー",
-    "schedule": "スケジュール",
-    "highlights": "ハイライト",
-    "themeShowcase": "テーマショーケース",
     "sessionTimeout": "セッションタイマー",
     "securityCheck": "セキュリティチェック",
-    "appearanceControls": "外観コントロール",
     "payment": "お支払い",
     "cancellation": "解約"
   },
@@ -45,17 +41,7 @@
     "dismiss": "通知を閉じる",
     "undo": "元に戻す",
     "undone": "操作をキャンセルしました",
-    "processing": "処理中…",
-    "preview": {
-      "successTitle": "変更を保存しました",
-      "successDescription": "設定が反映されています。",
-      "errorTitle": "問題が発生しました",
-      "errorDescription": "もう一度お試しください。",
-      "warningTitle": "ご注意",
-      "warningDescription": "この操作には確認が必要です。",
-      "infoTitle": "ご存じですか？",
-      "infoDescription": "シャッフルでもこのデザインが変わります。"
-    }
+    "processing": "処理中…"
   },
   "api": {
     "fallback": "問題が発生しました。もう一度お試しください。",
@@ -69,7 +55,21 @@
     "http429": "リクエストが多すぎます。しばらく待ってから再試行してください。",
     "http500": "内部サーバーエラーが発生しました。後でもう一度お試しください。",
     "http502": "サーバーは一時的に利用できません。後でもう一度お試しください。",
-    "http503": "サービスは一時的に利用できません。後でもう一度お試しください。"
+    "http503": "サービスは一時的に利用できません。後でもう一度お試しください。",
+    "reload": "再読み込み",
+    "recordChanged": "この間に別の人が保存しました。再読み込みして変更内容を確認してから、もう一度変更してください。",
+    "reasons": {
+      "missingPermission": "この操作を行う権限がありません。クリニックのオーナーまたは管理者に依頼してください。",
+      "ownerMembershipFixed": "クリニックのオーナーのロールとステータスは変更できません。先に所有権を移譲してください。",
+      "ownerCannotLeave": "クリニックのオーナーは退出できません。先に所有権を移譲してください。",
+      "ownerRoleFixed": "クリニックのオーナーが持つロールのアクセス権は変更できません。",
+      "systemRoleFixed": "プリセットのロールは名前の変更も削除もできません。",
+      "roleLocked": "このロールのアクセス権は固定されており、変更できません。",
+      "seatLimitReached": "プランに空きシートがありません。設定 › 請求でシートを追加してから、もう一度招待してください。",
+      "membershipAlreadyExists": "この人はすでにクリニックのメンバーです。",
+      "organizationSlugExists": "このワークスペース URL はすでに使われています。別の URL を選んでください。",
+      "disposableEmail": "恒久的なメールアドレスを使ってください。使い捨てのアドレスは使用できません。"
+    }
   },
   "frontend": {
     "query": {
@@ -91,12 +91,7 @@
     },
     "account": {
       "copyFailed": "クリップボードにコピーできませんでした",
-      "themeCodeNumeric": "数値のテーマコードを入力してください",
       "copySuccess": "アカウント ID をコピーしました",
-      "themeLinkCopied": "テーマリンクをコピーしました",
-      "themeLinkCopiedDescription": "この URL を共有して見た目を再現できます。",
-      "notificationStylePreview": "通知スタイル",
-      "notificationStylePreviewDescription": "{{variant}} — アクセントとセマンティックカラーでテーマ化。",
       "accountDeletionPending": "アカウントを削除しました。サインアウト中…",
       "avatarInvalidType": "画像ファイルを選択してください。",
       "avatarTooLarge": "アバターは 2 MB 未満である必要があります。",
@@ -122,7 +117,8 @@
         "updateRoleSuccess": "メンバーのロールを更新しました",
         "removeSuccess": "メンバーを削除しました",
         "suspendSuccess": "メンバーを停止しました",
-        "reactivateSuccess": "メンバーを再有効化しました"
+        "reactivateSuccess": "メンバーを再有効化しました",
+        "updateSuccess": "メンバーを保存しました"
       },
       "roles": {
         "createFailed": "ロールを作成できませんでした",

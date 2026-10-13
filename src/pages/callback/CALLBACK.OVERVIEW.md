@@ -4,8 +4,9 @@ Route: `/callback/$provider` (e.g. `/callback/google`, `/callback/github`).
 Provider-specific redirect target for OAuth and future third-party sign-in —
 each provider registers its own URL, so the path itself names the provider that
 is returning; one island still serves every provider, so adding one never
-touches this page. Outside the `auth-shell` route: it renders a bare spinner,
-not the split-screen auth chrome.
+touches this page. Outside the `auth-shell` route: it renders the boot loader
+(`FullPageSpinner` — the splash's mark and wordmark, already the launch's look),
+not the sign-in canvas.
 
 ## Files
 

@@ -1,0 +1,398 @@
+{
+  "manifest": {
+    "title": "Users"
+  },
+  "record": "User",
+  "tabs": {
+    "label": "Users views",
+    "team": "Team",
+    "roles": "Roles & access",
+    "branches": "Branches"
+  },
+  "search": {
+    "placeholder": "Name, email, mobile or #ID",
+    "label": "Search users"
+  },
+  "primary": {
+    "newUser": "New user",
+    "newRole": "New role",
+    "newBranch": "New branch"
+  },
+  "columns": {
+    "seq": "ID",
+    "user": "User",
+    "email": "Email",
+    "roles": "Roles",
+    "branches": "Branches",
+    "hours": "Working hours",
+    "commission": "Commission",
+    "status": "Status",
+    "updated": "Updated"
+  },
+  "table": {
+    "records": "users",
+    "mainRole": "Main role",
+    "alsoRole": "Also",
+    "commission": "{{value}}%"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "invited": "Invited",
+    "expires": "Invitation expires {{date}}",
+    "expired": "Invitation expired"
+  },
+  "hours": {
+    "everyDay": "Every day",
+    "run": "{{from}}–{{to}}",
+    "list": "{{days, list(type: unit)}}",
+    "line": "{{days}} · {{from}}–{{to}}"
+  },
+  "filters": {
+    "roles": "Roles",
+    "all": "All",
+    "branches": "Branches",
+    "status": "Status"
+  },
+  "rowActions": {
+    "edit": "Edit",
+    "delete": "Delete",
+    "leave": "Leave clinic"
+  },
+  "bulk": {
+    "export": "Export",
+    "exported_one": "{{count}} row exported as CSV",
+    "exported_other": "{{count}} rows exported as CSV"
+  },
+  "empty": {
+    "title": "No user matches",
+    "description": "Nothing here yet. Try another tab or search."
+  },
+  "drawer": {
+    "title": {
+      "create": "New user",
+      "edit": "Edit user"
+    },
+    "sub": "Sign-in, roles, branches and working hours",
+    "steps": {
+      "profile": "Profile, roles & branches",
+      "hours": "Working hours & pay"
+    },
+    "groups": {
+      "profile": "Profile",
+      "rolesBranches": "Roles & branches",
+      "hours": "Working hours",
+      "pay": "Pay"
+    },
+    "fields": {
+      "name": "Name",
+      "mobile": "Mobile",
+      "email": "Email",
+      "colour": "Colour",
+      "roles": "Roles",
+      "access": "Gets access to",
+      "branches": "Branches",
+      "days": "Days",
+      "from": "From",
+      "to": "To",
+      "commission": "Commission / incentive",
+      "status": "Status"
+    },
+    "hints": {
+      "mobile": "10 digits",
+      "colour": "used on their badges",
+      "roles": "pick one or more · access adds up",
+      "branches": "where they work",
+      "days": "Appointments only offer these days",
+      "name": "set on their own profile"
+    },
+    "placeholders": {
+      "name": "Full name, e.g. Dr. Nisha Mavani",
+      "email": "name@clinic.com",
+      "time": "Pick a time",
+      "commission": "0"
+    },
+    "commissionSuffix": "% of billed",
+    "commissionQuick": "{{value}}%",
+    "decrease": "Decrease",
+    "increase": "Increase",
+    "pickRole": "Pick a role",
+    "statusOn": "Active · can sign in",
+    "statusOff": "Inactive · can't use this clinic",
+    "resend": "Resend invitation",
+    "quickFill": {
+      "doctor": "Doctor · 10:00–19:00",
+      "therapist": "Therapist · 10:00–19:00",
+      "front_desk": "Front desk · 09:30–19:30",
+      "pharmacist": "Pharmacist · 09:00–21:00"
+    },
+    "summaryNew": "New user",
+    "save": {
+      "create": "Create user",
+      "edit": "Save changes",
+      "createAnother": "Create & add another"
+    },
+    "missing": "Add their email",
+    "noRole": "Pick at least one role",
+    "emailInvalid": "Enter a valid email address",
+    "mobileInvalid": "Mobile needs 10 digits",
+    "noPlatformRole": "There’s no role to give them yet · ask an admin",
+    "added": "{{name}} added",
+    "saved": "{{name}} saved"
+  },
+  "deleteUser": {
+    "title": "Delete this user?",
+    "removed": "{{name}} removed"
+  },
+  "leave": {
+    "title": "Leave {{clinic}}?",
+    "description": "You’ll lose access to {{clinic}} — its rooms, records and team — and go back to your clinics. You can undo for a few seconds after confirming.",
+    "confirm": "Leave clinic",
+    "stay": "Stay",
+    "pending": "Leaving {{clinic}}…",
+    "done": "You left {{clinic}}",
+    "clinicFallback": "this clinic"
+  },
+  "roles": {
+    "label": "Roles",
+    "purposes": {
+      "admin": "Runs the clinic — prices, team, branches and every screen.",
+      "doctor": "Consults, prescribes and plans each patient’s treatment.",
+      "therapist": "Runs sessions and aftercare calls.",
+      "front_desk": "First face of the clinic — leads, bookings, check-in and billing.",
+      "counsellor": "Turns enquiries into plans and packages.",
+      "pharmacist": "Runs the medicine counter and its stock.",
+      "accountant": "Checks money in and out and closes the days.",
+      "marketing": "Brings in leads and follows them up.",
+      "custom": "Custom role",
+      "customPage": "Custom role · set what it can do below"
+    },
+    "nameLabel": "Role name",
+    "descriptionLabel": "Role description",
+    "copyFrom": "Copy access from",
+    "copied": "{{role}} now has the same access as {{from}}",
+    "preview": "Preview as {{role}}",
+    "previewHint": "See {{productName}} the way this role sees it",
+    "previewing": "Previewing {{productName}} as {{role}}",
+    "back": "Back to roles",
+    "people": "People with this role",
+    "openPerson": "Open {{name}}",
+    "also": "+ {{roles}}",
+    "nobody": "Nobody has this role yet · give it to someone from their user drawer.",
+    "matrix": {
+      "title": "What it can see and do",
+      "section": "Section",
+      "view": "View",
+      "create": "Create",
+      "edit": "Edit",
+      "delete": "Delete",
+      "row": "Row",
+      "full": "Full",
+      "some": "Some",
+      "none": "None",
+      "rowHint": "Turn the whole row on or off",
+      "cell": {
+        "view": "{{role}} can view · {{section}}",
+        "create": "{{role}} can create · {{section}}",
+        "edit": "{{role}} can edit · {{section}}",
+        "delete": "{{role}} can delete · {{section}}"
+      },
+      "notApplicable": "Not part of this row",
+      "resources": {
+        "contact": {
+          "label": "Contacts",
+          "description": "The people behind leads and patients"
+        },
+        "contact_activity": {
+          "label": "Messages & notes",
+          "description": "WhatsApp, calls and team notes"
+        },
+        "patient_prescription": {
+          "label": "Prescriptions",
+          "description": "Writing and approving the Rx"
+        },
+        "patient_treatment": {
+          "label": "Treatments",
+          "description": "Sessions and how they went"
+        },
+        "patient_review": {
+          "label": "Reviews",
+          "description": "Google and video reviews · read with the patient"
+        },
+        "role": {
+          "label": "Roles",
+          "description": "Roles & access"
+        },
+        "branch": {
+          "label": "Branches",
+          "description": "Branches and who works at each"
+        }
+      }
+    },
+    "notes": {
+      "admin": "Admins can do everything · this role can’t be narrowed.",
+      "readOnly": "You can see roles here. Changing them needs “Update roles”.",
+      "live": "Changes apply right away to everyone with this role. Someone with two roles gets everything either role allows.",
+      "beyond": "This role has access you don’t have · only someone who has it can change the role."
+    },
+    "locked": {
+      "admin": "Admins always have full access",
+      "noPerms": "You can’t change roles · ask an admin",
+      "noAdd": "You can’t add roles · ask an admin",
+      "beyond": "This role has access you don’t have · ask an admin",
+      "notYours": "You can only give access you have yourself"
+    },
+    "added": "Role added · name it and pick what it can do",
+    "newRoleName": "New role",
+    "duplicateName": "A role called {{name}} already exists",
+    "deleteRole": {
+      "action": "Delete role",
+      "title": "Delete {{name}}?",
+      "description": "Members with this role will need a new one assigned. You can undo for a few seconds after confirming.",
+      "confirm": "Delete",
+      "pending": "Deleting {{name}}…"
+    },
+    "workspace": {
+      "title": "Workspace permissions",
+      "hint": "Settings, integrations, billing and the audit log — beyond the sections above. You can only give what you have yourself.",
+      "none": "There’s nothing else you can give this role.",
+      "loadFailed": "Couldn’t load the workspace permissions."
+    },
+    "specials": {
+      "title": "Special permissions",
+      "floor": {
+        "label": "See the lowest price",
+        "description": "Shows the hidden floor price on offerings and invoices"
+      },
+      "clinical": {
+        "label": "Read clinical notes",
+        "description": "Open complaints, diagnosis, notes, photos and reports"
+      },
+      "export": {
+        "label": "Export · {{section}}",
+        "description": "Download its table"
+      },
+      "privateAlbum": {
+        "label": "See the private album",
+        "description": "Opens the private photos in a patient file"
+      }
+    }
+  },
+  "branches": {
+    "record": "Branch",
+    "columns": {
+      "branch": "Branch",
+      "address": "Address",
+      "contact": "Contact",
+      "hours": "Opening hours",
+      "team": "Team",
+      "defaults": "Default people",
+      "status": "Status"
+    },
+    "main": "Main",
+    "notSet": "Not set",
+    "defaults": {
+      "doctor": "Doctor · {{name}}",
+      "desk": "Desk · {{name}}",
+      "therapist": "Therapist · {{name}}",
+      "pharmacist": "Pharmacy · {{name}}"
+    },
+    "status": {
+      "open": "Open",
+      "closed": "Closed"
+    },
+    "records": "branches",
+    "empty": "No branches yet",
+    "drawer": {
+      "title": {
+        "create": "New branch",
+        "edit": "Edit branch"
+      },
+      "sub": "Address, hours and the people who work here",
+      "summaryNew": "New branch",
+      "people_one": "{{count}} person",
+      "people_other": "{{count}} people",
+      "mainBadge": "Main branch",
+      "steps": {
+        "place": "Branch & address",
+        "contact": "Contact & opening hours",
+        "people": "People"
+      },
+      "groups": {
+        "branch": "Branch",
+        "address": "Address",
+        "contact": "Contact",
+        "hours": "Opening hours"
+      },
+      "fields": {
+        "name": "Name",
+        "colour": "Colour",
+        "main": "Main branch",
+        "status": "Status",
+        "line1": "Address line 1",
+        "line2": "Address line 2",
+        "area": "Area",
+        "city": "City",
+        "pin": "PIN code",
+        "state": "State",
+        "phone": "Phone",
+        "email": "Email",
+        "gstin": "GSTIN",
+        "days": "Days",
+        "opens": "Opens",
+        "closes": "Closes",
+        "team": "Team",
+        "doctor": "Default doctor",
+        "desk": "Default front desk",
+        "therapist": "Default therapist",
+        "pharmacist": "Default pharmacist"
+      },
+      "placeholders": {
+        "name": "e.g. Vesu",
+        "line1": "Shop / floor, building",
+        "line2": "Street, landmark",
+        "area": "e.g. Vesu",
+        "city": "City",
+        "pin": "6 digits",
+        "state": "State",
+        "email": "branch@clinic.com",
+        "gstin": "15 characters",
+        "team": "Pick team"
+      },
+      "hints": {
+        "colour": "marks this branch everywhere",
+        "phone": "10 digits",
+        "team": "who works here",
+        "preselected": "preselected in forms here",
+        "addFirst": {
+          "doctor": "add a doctor to the team first",
+          "desk": "add a front desk to the team first",
+          "therapist": "add a therapist to the team first",
+          "pharmacist": "add a pharmacist to the team first"
+        },
+        "main": "one per clinic · set when it opened"
+      },
+      "toggles": {
+        "mainOn": "Main · head office",
+        "mainOff": "Not the main branch",
+        "openOn": "Open · shown in pickers",
+        "openOff": "Closed · hidden everywhere"
+      },
+      "nobody": "Nobody",
+      "you": "{{name}} (you)",
+      "save": {
+        "create": "Add branch",
+        "edit": "Save branch"
+      },
+      "nameMissing": "Name the branch",
+      "addressMissing": "Add the address, area, city and PIN code",
+      "duplicate": "A branch called {{name}} already exists",
+      "phoneInvalid": "Phone needs 10 digits",
+      "emailInvalid": "Enter a valid email address",
+      "added": "{{name}} branch added",
+      "saved": "{{name}} saved",
+      "contactMissing": "Add the phone and email",
+      "pinInvalid": "PIN code needs 6 digits"
+    }
+  }
+}

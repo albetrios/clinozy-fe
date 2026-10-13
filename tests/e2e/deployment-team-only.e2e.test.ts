@@ -2,6 +2,7 @@ import { type APIRequestContext, expect, test } from '@playwright/test';
 
 import {
   fetchMeContextWire,
+  fetchMyOrganizationsWire,
   type ProbedDeployment,
   probeLiveDeployment,
   skipUnlessDeploymentMode,
@@ -54,7 +55,8 @@ test.describe('deployment — team-only', () => {
     const { accessToken } = await createSessionViaEmailCode(api);
     const ctx = await fetchMeContextWire(api, accessToken);
     expect(ctx.user.personal_organization_id ?? null).toBeNull();
-    expect(ctx.organizations.some((o) => o.type === 'PERSONAL')).toBe(false);
+    const organizations = await fetchMyOrganizationsWire(api, accessToken);
+    expect(organizations.some((o) => o.type === 'PERSONAL')).toBe(false);
   });
 
   test('user can create a TEAM organization', async () => {

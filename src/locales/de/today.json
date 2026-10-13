@@ -1,0 +1,75 @@
+{
+  "manifest": {
+    "title": "Heute"
+  },
+  "greeting": {
+    "morning": "Guten Morgen, {{name}}",
+    "afternoon": "Guten Tag, {{name}}",
+    "evening": "Guten Abend, {{name}}",
+    "nobody": "zusammen"
+  },
+  "pulse": "{{inClinic}} in der Klinik · {{waiting}} wartend · {{arriving}} erwartet · {{day}}, {{time}}",
+  "newBooking": "Neue Buchung",
+  "walkIn": "Laufkundschaft",
+  "loading": "Der heutige Betrieb wird geladen",
+  "lanes": {
+    "label": "Bereiche",
+    "names": {
+      "enquiries": "Anfragen",
+      "arriving": "Erwartet",
+      "waiting": "Wartend",
+      "withDoctor": "Beim Arzt",
+      "treatment": "Behandlung",
+      "checkout": "Kasse",
+      "pharmacy": "Apotheke"
+    },
+    "hints": {
+      "oldest": "älteste {{time}}",
+      "next": "nächste {{time}}",
+      "since": "seit {{time}}",
+      "none": "—"
+    },
+    "more": "+{{more}}",
+    "count_one": "{{count}} Person",
+    "count_other": "{{count}} Personen",
+    "empty": "Gerade ist niemand hier.",
+    "none": "Der Praxisbetrieb und die Anfragen gehören nicht zu Ihrer Rolle."
+  },
+  "actions": {
+    "book": "Buchen",
+    "checkIn": "Einchecken",
+    "sendIn": "Hereinbitten",
+    "openSession": "Sitzung öffnen",
+    "checkout": "Kasse",
+    "dispense": "Ausgeben"
+  },
+  "card": {
+    "service": "{{service}} · {{where}}",
+    "medicines_one": "{{count}} Medikament verordnet",
+    "medicines_other": "{{count}} Medikamente verordnet"
+  },
+  "flags": {
+    "newLead": "Neuer Lead",
+    "confirmed": "Bestätigt",
+    "unconfirmed": "Unbestätigt",
+    "waiting": "Wartet {{minutes}} Min.",
+    "inRoom": "Im Raum {{minutes}} Min.",
+    "rxApproved": "Rezept freigegeben {{time}}",
+    "toPay": "{{amount}} zu zahlen"
+  },
+  "toasts": {
+    "checkedIn": "{{name}} eingecheckt · Arztliste und Raum benachrichtigt",
+    "sentIn": "{{name}} zum Arzt geschickt",
+    "noRecord": "Noch keine Patientenakte für {{name}}",
+    "outcome": "{{name}}: {{result}}",
+    "snoozed": "Zurückgestellt · {{label}}"
+  },
+  "queue": {
+    "title": "Arbeitsliste",
+    "sub": "{{open}} offen · jede mit Zuständigkeit und Fälligkeit",
+    "scope": "Wessen Aufgaben",
+    "owner": "Zuständig: {{name}}",
+    "you": "{{name}} (Sie)",
+    "closed": "✓ {{result}}"
+  }
+}

@@ -1,6 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 
-import { registerNewUserAndGoToDashboard } from '@/tests/utils/e2e-auth.ts';
+import { registerNewUserAndGoToToday } from '@/tests/utils/e2e-auth.ts';
 import { expectLoginFormReady } from '@/tests/utils/e2e-hybrid.ts';
 
 /**
@@ -28,9 +28,9 @@ test.describe('Responsive @ 320px', () => {
     expect(await horizontalOverflow(page)).toBeLessThanOrEqual(1);
   });
 
-  test('dashboard (app shell) fits with no horizontal scroll', async ({ page }) => {
-    await registerNewUserAndGoToDashboard(page);
-    await expect(page.getByTestId('dashboard-page')).toBeVisible();
+  test('Today (app shell) fits with no horizontal scroll', async ({ page }) => {
+    await registerNewUserAndGoToToday(page);
+    await expect(page.getByTestId('today-page')).toBeVisible();
     // Sidebar is an off-canvas drawer on mobile; content must not overflow.
     expect(await horizontalOverflow(page)).toBeLessThanOrEqual(1);
   });
@@ -38,12 +38,12 @@ test.describe('Responsive @ 320px', () => {
   test('settings modal uses the mobile section picker (sidebar hidden) and fits', async ({
     page,
   }) => {
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
     const orgPath = new URL(page.url()).pathname.replace(/\/$/, '');
     await page.goto(`${orgPath}#settings/account/profile`);
 
     await expect(page.getByTestId('settings-modal')).toBeVisible();
-    // Mobile: the section <Select> drives nav; the desktop sidebar is hidden.
+    // Mobile: the section picker drives nav; the desktop sidebar is hidden.
     await expect(page.getByTestId('settings-mobile-section')).toBeVisible();
     await expect(page.getByTestId('settings-nav')).toBeHidden();
     expect(await horizontalOverflow(page)).toBeLessThanOrEqual(1);
@@ -59,9 +59,9 @@ test.describe('Responsive @ 768px (tablet)', () => {
     expect(await horizontalOverflow(page)).toBeLessThanOrEqual(1);
   });
 
-  test('dashboard (app shell) fits with no horizontal scroll', async ({ page }) => {
-    await registerNewUserAndGoToDashboard(page);
-    await expect(page.getByTestId('dashboard-page')).toBeVisible();
+  test('Today (app shell) fits with no horizontal scroll', async ({ page }) => {
+    await registerNewUserAndGoToToday(page);
+    await expect(page.getByTestId('today-page')).toBeVisible();
     expect(await horizontalOverflow(page)).toBeLessThanOrEqual(1);
   });
 });
@@ -72,12 +72,12 @@ test.describe('Responsive @ 1280px (desktop)', () => {
   test('settings modal shows the desktop nav sidebar (mobile picker hidden) and fits', async ({
     page,
   }) => {
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
     const orgPath = new URL(page.url()).pathname.replace(/\/$/, '');
     await page.goto(`${orgPath}#settings/account/profile`);
 
     await expect(page.getByTestId('settings-modal')).toBeVisible();
-    // Desktop: the sidebar nav drives navigation; the mobile <Select> is hidden
+    // Desktop: the sidebar nav drives navigation; the mobile picker is hidden
     // (inverse of the 320px case).
     await expect(page.getByTestId('settings-nav')).toBeVisible();
     await expect(page.getByTestId('settings-mobile-section')).toBeHidden();

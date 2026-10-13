@@ -14,14 +14,17 @@ extreme values are pinned as pixels.
 
 ## Ground rules
 
-- **Local-only lane.** Baselines are platform-pinned (`*-chromium-darwin.png`);
-  the suite needs clinozy-be on `:3000` (Playwright `global-setup` enforces it — env
+- **Local-only lane.** Baselines are platform-pinned: `*-chromium-darwin.png` for macOS,
+  `*-chromium-linux.png` for a Linux machine or cloud container. Make a Linux set from a
+  checkout whose `node_modules` is a real folder — a git worktree's symlinked one makes Vite
+  refuse the font files (`/@fs/` 403), and the shots fall back to system fonts. The suite
+  needs clinozy-be on `:3000` (Playwright `global-setup` enforces it — env
   steps in `agent-os/skills/fe-playwright-e2e/SKILL.md`). CI never runs it; do not
   wire it into a workflow without a Docker-pinned runner and a fresh baseline set.
 - **Determinism is non-negotiable.** Every test inherits
   `page.emulateMedia({ reducedMotion: 'reduce' })` (spec-level `beforeEach`) and
   passes `animations: 'disabled'`. Diff budget: `maxDiffPixelRatio: 0.02` for
-  static screens, `0.03` for data-bearing pages (e.g. dashboard). Do not raise a
+  static screens, `0.03` for data-bearing pages (e.g. Today). Do not raise a
   budget to make a failure pass — that hides the regression the lane exists to
   catch.
 - **A failed visual test is a finding, not an obstacle.** Inspect the
@@ -56,6 +59,14 @@ each cell must earn its maintenance cost:
    after `gotoApp`.
 3. **Axis interactions** only when an audit found a real bug in a combination
    (e.g. `dark + separation:hairline + menu:glass`) — pin the fixed combination.
+4. **The clinic rooms** are one test per pass — light at desktop, light at the phone's
+   width, dark at desktop — that opens a new clinic (`openNewClinic(page, { name })`, a fixed
+   name) under a fixed clock and shoots every room of `APP_ROOMS` in turn as a soft
+   assertion (`room-<room>-<desktop|phone|dark>.png`). Empty rooms, on purpose: a seeded row
+   carries server times no browser clock can hold still. Mask what is per run — the
+   avatar, Today's greeting, the owner's row in Users. A new room joins `APP_ROOMS` and is
+   shot by all three passes; record its PNGs on each platform you keep baselines for
+   (`pnpm test:visual:update` on macOS writes the `-darwin` set).
 
 Do **not** snapshot every axis × every route (matrix explosion), transient states
 (toasts, spinners), or pages whose content is nondeterministic without fixtures.
@@ -64,7 +75,7 @@ Do **not** snapshot every axis × every route (matrix explosion), transient stat
 
 Follow the existing spec: `gotoApp(page, '<path>')` +
 `expectAuthScreenReady`/testid wait from `tests/utils/e2e-hybrid.ts`, authenticated
-routes via `registerNewUserAndGoToDashboard` from `tests/utils/e2e-auth.ts`,
+routes via `registerNewUserAndGoToToday` from `tests/utils/e2e-auth.ts`,
 `fullPage: true`, kebab-case snapshot names (`<route>-<variant>.png`). Selector
 conventions stay `fe-playwright-e2e` (hybrid selectors); test ids come from
 `fe-e2e-testids`.

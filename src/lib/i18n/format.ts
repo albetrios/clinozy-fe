@@ -32,6 +32,13 @@ export type FormatDateMeta = {
    * cannot shift. Opt-in — absolute instants must not use this.
    */
   civilDay?: boolean;
+  /**
+   * Treat a `Date` input as a wall-clock date and time (its local fields) and
+   * show it as written, in no timezone — a clinic-local 10:30 reads "10:30 am"
+   * whatever the display timezone. Opt-in like `civilDay`; an instant never
+   * uses it.
+   */
+  wallClock?: boolean;
 };
 
 /**
@@ -64,8 +71,21 @@ export function formatDateValue(
   options?: Intl.DateTimeFormatOptions,
   meta?: FormatDateMeta,
 ): string {
-  const timeZone = resolvedTimeZone(prefs.timeZone);
-  const date = resolveFormatInstant(iso, timeZone, meta?.civilDay === true);
+  const wallClock = meta?.wallClock === true && iso instanceof Date;
+  // A wall-clock value is formatted from its own fields in UTC, so no zone moves it.
+  const timeZone = wallClock ? 'UTC' : resolvedTimeZone(prefs.timeZone);
+  const date = wallClock
+    ? new Date(
+        Date.UTC(
+          iso.getFullYear(),
+          iso.getMonth(),
+          iso.getDate(),
+          iso.getHours(),
+          iso.getMinutes(),
+          iso.getSeconds(),
+        ),
+      )
+    : resolveFormatInstant(iso, timeZone, meta?.civilDay === true);
   if (Number.isNaN(date.getTime())) return '—';
   const locale = intlLocaleFor(prefs.formatLocale);
   const baseOptions = options ?? dateFormatOptions(prefs.dateFormat, prefs.hourCycle);
@@ -85,6 +105,45 @@ export function formatDateValue(
   }
 }
 
+/** An instant's wall-clock fields in an IANA zone — numbers, ready for arithmetic. */
+export interface ZonedClockParts {
+  year: number;
+  month: number;
+  day: number;
+  hour: number;
+  minute: number;
+  second: number;
+}
+
+/**
+ * The wall clock an IANA zone shows at `instant` — the input to timezone
+ * arithmetic (a zone's "today", its offset, a local date and time back to an
+ * instant), never a display string: what the user reads goes through
+ * {@link formatDateValue} and their own preferences.
+ */
+export function zonedClockParts(instant: Date, timeZone: string): ZonedClockParts {
+  const fields = new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(instant);
+  const value = (type: Intl.DateTimeFormatPartTypes) =>
+    Number(fields.find((part) => part.type === type)?.value ?? 0);
+  return {
+    year: value('year'),
+    month: value('month'),
+    day: value('day'),
+    hour: value('hour'),
+    minute: value('minute'),
+    second: value('second'),
+  };
+}
+
 export function formatNumberValue(
   value: number,
   prefs: LocaleFormatInput,
@@ -96,18 +155,26 @@ export function formatNumberValue(
   }).format(value);
 }
 
+/**
+ * Money from minor units (cents, paise) in the user's format locale and
+ * currency display. `options` refine the shape (e.g. no fraction digits for a
+ * whole amount); they cannot change the style, the currency or a currency
+ * display the user picked.
+ */
 export function formatCurrencyValue(
   cents: number,
   currency: string,
   prefs: LocaleFormatInput,
+  options?: Intl.NumberFormatOptions,
 ): string {
   const code = (currency || prefs.currencyCode || 'USD').toUpperCase();
   const amount = cents / 100;
   try {
     return new Intl.NumberFormat(intlLocaleFor(prefs.formatLocale), {
+      ...options,
+      ...currencyFormatOptions(prefs.currencyDisplay),
       style: 'currency',
       currency: code,
-      ...currencyFormatOptions(prefs.currencyDisplay),
     }).format(amount);
   } catch {
     // `Intl` throws `RangeError` on a malformed currency code (it validates the

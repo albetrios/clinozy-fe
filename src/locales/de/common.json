@@ -98,13 +98,24 @@
     "description": "Eine neue Version der App ist bereit.",
     "refresh": "Jetzt aktualisieren"
   },
+  "cells": {
+    "patient": "Patient",
+    "patientMark": "P",
+    "leadMark": "L",
+    "moreCount": "{{count}} weitere"
+  },
+  "emptyState": {
+    "fallbackTitle": "Hier ist noch nichts",
+    "filteredTitle": "Keine Treffer",
+    "filteredHint": "Nichts entspricht diesen Filtern. Setze sie zurück, um wieder alles zu sehen.",
+    "clearFilters": "Filter zurücksetzen"
+  },
   "a11y": {
     "close": "Schließen",
     "loading": "Wird geladen",
     "loadingNamed": "{{name}} wird geladen…",
     "loadingPage": "Seite wird geladen",
     "toggleTheme": "Design umschalten",
-    "openAppearance": "Darstellung öffnen",
     "cookieConsent": "Cookie-Einwilligung",
     "rowsPerPage": "Zeilen pro Seite",
     "goFirstPage": "Zur ersten Seite",
@@ -114,84 +125,149 @@
     "selectAll": "Alle auswählen",
     "copyAccountId": "Konto-ID kopieren",
     "onboardingProgress": "Onboarding-Fortschritt",
-    "themeCode": "Theme-Code",
     "mode": "Modus"
   },
   "appearance": {
     "themeTitle": "Design",
     "themeLocked": "Das Design wird durch die Konfiguration Ihrer Organisation verwaltet und kann hier nicht geändert werden.",
-    "themeDescription": "Benannte Akzent-Voreinstellungen — oder Link kopieren / Design-Code einfügen, um ein exaktes Erscheinungsbild zu reproduzieren.",
-    "presetAria": "Benannte Akzent-Voreinstellung",
-    "copyLink": "Link kopieren",
-    "shuffleHint": "Mischen, um einen Code zu erzeugen.",
-    "codeLabel": "Code: {{seed}}",
-    "codePlaceholder": "Design-Code einfügen",
-    "apply": "Anwenden",
-    "pickAnyColour": "Beliebige Farbe wählen",
     "modeTitle": "Modus",
-    "modeDescription": "Auf diesem Gerät gespeichert.",
-    "colourTitle": "Farbe",
-    "colourDescription": "Akzent, Diagramme und die neutrale Basis.",
-    "accentColour": "Akzentfarbe",
-    "chartColour": "Diagrammfarbe",
-    "baseColour": "Basisfarbe",
-    "harmony": "Harmonie",
-    "harmonyAria": "Farbharmonie",
-    "accentIntensity": "Akzentintensität",
-    "typeTitle": "Schrift & Form",
-    "typeDescription": "Schriften, Eckenradius und Menüoberfläche.",
-    "bodyFont": "Fließtextschrift",
-    "headingFont": "Überschriftenschrift",
-    "radius": "Radius",
-    "shapeLanguage": "Formensprache",
-    "typeScale": "Schriftskala",
-    "menu": "Menü",
-    "menuAria": "Menüstil",
-    "iconsTitle": "Symbole",
-    "iconsDescription": "Strichstärke, Farbe und Symbolsatz.",
-    "iconWeight": "Symbolstärke",
-    "iconColour": "Symbolfarbe",
-    "iconLibrary": "Symbolbibliothek",
-    "layoutTitle": "Layout",
-    "layoutDescription": "Wie breit der Hauptarbeitsbereich ist — Standard für Dashboards, Lesebreite für konzentrierte Texte.",
-    "contentWidth": "Inhaltsbreite",
-    "dashboardTitle": "Dashboard",
-    "dashboardDescription": "Wie das Dashboard seine Bereiche anordnet.",
-    "dashboardArrangement": "Anordnung",
-    "surfaceTitle": "Oberfläche & Bewegung",
-    "surfaceDescription": "Abstände, Tiefe, Kontrast und Bewegung.",
-    "density": "Dichte",
-    "contrast": "Kontrast",
-    "elevation": "Erhöhung",
-    "separation": "Trennung",
-    "separationAria": "Oberflächentrennung",
-    "motion": "Bewegung",
-    "focusRing": "Fokusring",
-    "notificationsTitle": "Benachrichtigungen",
-    "notificationsDescription": "Wählen oder mischen Sie ein Toast-Design — Vorschauen nutzen Ihre aktiven Design-Tokens.",
-    "toastDesign": "Toast-Design",
-    "position": "Position",
-    "positionAria": "Toast-Position",
-    "previewSuccess": "Erfolg",
-    "previewError": "Fehler",
-    "previewWarning": "Warnung",
-    "previewInfo": "Info",
-    "shuffleSection": "{{section}} mischen",
-    "sectionColour": "Farbe",
-    "sectionType": "Schrift & Form",
-    "sectionSurface": "Oberfläche & Bewegung",
-    "sectionDashboard": "Dashboard-Layout",
-    "sectionNotifications": "Benachrichtigungsstil",
-    "custom": "Benutzerdefiniert",
-    "customWith": "Benutzerdefiniert — {{look}}"
+    "modeDescription": "Auf diesem Gerät gespeichert."
   },
   "table": {
-    "searchPlaceholder": "Suchen..."
+    "searchPlaceholder": "Suchen...",
+    "empty": "Keine Ergebnisse.",
+    "sortBy": "Nach {{column}} sortieren",
+    "actions": "Aktionen",
+    "moreActions": "Weitere Aktionen",
+    "columns": {
+      "trigger": "Spalten ein- oder ausblenden",
+      "title": "Spalten · {{shown}} von {{total}} sichtbar",
+      "showAll": "Alle Spalten anzeigen",
+      "recommendedHides": "Empfohlene Auswahl blendet {{count}} aus",
+      "tapForRecommended": "Erneut tippen für die empfohlene Auswahl",
+      "allShown": "Alle {{count}} Spalten sichtbar",
+      "hiddenCount": "{{count}} ausgeblendet",
+      "search": "Spalten suchen",
+      "shown": "{{shown}} von {{total}} sichtbar",
+      "viewGroup": "Ansicht",
+      "columnsGroup": "Spalten"
+    },
+    "fold": {
+      "showAll_one": "{{count}} Spalte in Zeilen · Alle anzeigen",
+      "showAll_other": "{{count}} Spalten in Zeilen · Alle anzeigen",
+      "showAllHint": "Alle Spalten nebeneinander zeigen (scrollt seitlich)",
+      "fitToWidth": "An Breite anpassen",
+      "fitToWidthHint": "Zusätzliche Spalten in jede Zeile falten"
+    },
+    "selection": {
+      "selectRow": "{{name}} auswählen",
+      "selected": "{{count}} ausgewählt",
+      "selectAllCount": "Alle {{count}} auswählen",
+      "clear": "Auswahl aufheben",
+      "clearHint": "Auswahl aufheben · Esc",
+      "escape": "Esc",
+      "bulkActions": "Sammelaktionen"
+    },
+    "length": {
+      "allLoaded": "Alle {{records}} geladen",
+      "loadingMore": "Weitere {{records}} werden geladen"
+    },
+    "savedViews": {
+      "label": "Gespeicherte Ansichten",
+      "apply": "Ansicht anwenden",
+      "remove": "Ansicht entfernen",
+      "removed": "Ansicht entfernt",
+      "defaultName": "Meine Ansicht"
+    }
   },
   "consent": {
-    "description": "Wir verwenden Cookies für Produktanalysen, um {{productName}} zu verbessern. Wesentliche Funktionen und die Fehlerüberwachung funktionieren auch ohne sie.",
+    "description": "Mit Ihrer Zustimmung nutzen wir PostHog-Analysen und Sentry-Sitzungsaufzeichnungen, um {{productName}} zu verbessern. Alles andere, auch Fehlerberichte, funktioniert ohne sie. Schließen bedeutet Nein.",
     "privacyPolicy": "Datenschutzerklärung",
     "accept": "Akzeptieren",
-    "decline": "Ablehnen"
+    "decline": "Ablehnen",
+    "closeAndDecline": "Schließen (gilt als Ablehnung)"
+  },
+  "confirm": {
+    "accept": "Bestätigen",
+    "cancel": "Abbrechen",
+    "fallbackDescription": "Bitte bestätigen Sie diese Aktion."
+  },
+  "picker": {
+    "placeholder": "Auswählen…",
+    "search": "{{label}} suchen",
+    "searchDefault": "Suchen",
+    "escKey": "Esc",
+    "options": "Optionen",
+    "recent": "Zuletzt",
+    "all": "Alle",
+    "create": "„{{query}}“ erstellen",
+    "createNamed": "{{label}} „{{query}}“",
+    "createFull": "Neu: {{label}}",
+    "createFullQuery": "{{label}} · „{{query}}“",
+    "fullDetails": "alle Details",
+    "empty": "Noch nichts zur Auswahl",
+    "noResults": "Keine Ergebnisse für „{{query}}“",
+    "noResultsHint": "Prüfen Sie die Schreibweise oder geben Sie weniger Buchstaben ein",
+    "noResultsRemoteHint": "Versuchen Sie einen Namen, eine Telefonnummer oder eine ID",
+    "loadingMore": "Weitere werden geladen",
+    "clear": "Leeren",
+    "triggerLabel": "{{label}} · {{value}}",
+    "date": {
+      "label": "Datum",
+      "placeholder": "Datum wählen",
+      "search": "Datum eingeben · z. B. 12 sep",
+      "today": "Heute",
+      "tomorrow": "Morgen",
+      "yesterday": "Gestern",
+      "comingUp": "Demnächst",
+      "relative": "{{relative}} · {{date}}"
+    },
+    "time": {
+      "label": "Uhrzeit",
+      "placeholder": "Uhrzeit wählen"
+    }
+  },
+  "unsavedChanges": {
+    "title": "Änderungen verwerfen?",
+    "description": "Ihre Änderungen wurden nicht gespeichert und gehen verloren.",
+    "discard": "Verwerfen",
+    "keepEditing": "Weiter bearbeiten"
+  },
+  "uploadTray": {
+    "label": "Uploads",
+    "uploading": "{{left}} von {{total}} werden hochgeladen…",
+    "complete": "Alle Uploads abgeschlossen",
+    "failed_one": "{{count}} Upload fehlgeschlagen",
+    "failed_other": "{{count}} Uploads fehlgeschlagen",
+    "skipped_one": "{{count}} Datei über {{limit}} übersprungen",
+    "skipped_other": "{{count}} Dateien über {{limit}} übersprungen",
+    "show": "Uploads einblenden",
+    "hide": "Uploads ausblenden",
+    "uploadFailed": "Hochladen fehlgeschlagen",
+    "attachFailed": "Anhängen fehlgeschlagen",
+    "retry": "{{name}} erneut versuchen",
+    "remove": "{{name}} entfernen",
+    "stoppedBySwitch": "Uploads gestoppt · Sie haben den Arbeitsbereich gewechselt",
+    "size": {
+      "kilobytes": "{{value}} KB",
+      "megabytes": "{{value}} MB"
+    }
+  },
+  "splash": {
+    "label": "{{productName}} wird geladen",
+    "greeting": {
+      "morning": "Guten Morgen, {{name}}",
+      "afternoon": "Guten Tag, {{name}}",
+      "evening": "Guten Abend, {{name}}"
+    },
+    "ticker": {
+      "opening": "Terminplan für {{weekday}} wird geöffnet",
+      "syncing": "Patienten und Leads werden synchronisiert",
+      "ready": "Alles bereit"
+    },
+    "offline": {
+      "message": "{{productName}} nicht erreichbar · Internetverbindung prüfen",
+      "retry": "Erneut versuchen"
+    }
   }
 }

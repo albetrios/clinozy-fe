@@ -9,25 +9,16 @@ import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import i18n from '@/lib/i18n/i18n.ts';
 import { authApi } from '@/shared/api/auth-api.ts';
 import { getAccessToken } from '@/shared/auth/token.ts';
+import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
+import { DrawerField, DrawerInput } from '@/shared/components/DrawerField/index.ts';
 import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { useRegisterSettingsDirty } from '@/shared/components/SettingsModal/settings-dirty.tsx';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/shared/components/ui/alert-dialog.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { Input } from '@/shared/components/ui/input.tsx';
-import { Label } from '@/shared/components/ui/label.tsx';
 import { mapFrontendError } from '@/shared/errors/map-frontend-error.ts';
+import { resetFormInPlace } from '@/shared/hooks/useEditingRecord/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { meContextQueryKey } from '@/shared/tenancy/me-context.ts';
@@ -60,16 +51,16 @@ export function ProfileForm({ email, defaultValues, onValuesChange }: ProfileFor
   const panels = SETTINGS_KEYS.panels.profile;
   const [showConfirm, setShowConfirm] = useState(false);
 
+  const form = useForm<ProfileInput>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: toDefaults(defaultValues),
+  });
   const {
     register,
     handleSubmit,
     watch,
-    reset,
     formState: { errors, isDirty },
-  } = useForm<ProfileInput>({
-    resolver: zodResolver(profileSchema),
-    defaultValues: toDefaults(defaultValues),
-  });
+  } = form;
 
   useRegisterSettingsDirty('profile', isDirty && !showConfirm);
 
@@ -94,11 +85,11 @@ export function ProfileForm({ email, defaultValues, onValuesChange }: ProfileFor
       return;
     }
     seededRef.current = next;
-    if (!isDirty) reset(next);
+    if (!isDirty) resetFormInPlace(form, next);
     // Compare the VALUES, not the object identity: the panel rebuilds this
     // object on every store write.
     // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed on the two fields, not the object
-  }, [defaultValues?.name, defaultValues?.jobTitle, isDirty, reset]);
+  }, [defaultValues?.name, defaultValues?.jobTitle, isDirty, form]);
 
   useEffect(() => {
     if (!onValuesChange) return undefined;
@@ -119,7 +110,7 @@ export function ProfileForm({ email, defaultValues, onValuesChange }: ProfileFor
     },
     onSuccess: async (values) => {
       // Reflect the new name in the app shell (avatar + header) right away, and
-      // refetch me/context so the dashboard greeting picks it up too.
+      // refetch me/context so every greeting picks it up too.
       const user = useAuthStore.getState().user;
       if (user) {
         useAuthStore.getState().setUser({
@@ -128,7 +119,7 @@ export function ProfileForm({ email, defaultValues, onValuesChange }: ProfileFor
           jobTitle: values.jobTitle,
         });
       }
-      reset(values);
+      resetFormInPlace(form, values);
       setShowConfirm(false);
       notify.success(i18n.t(ERRORS_KEYS.frontend.profileUpdated, { ns: ERRORS_NS }));
       await queryClient.invalidateQueries({ queryKey: meContextQueryKey });
@@ -138,14 +129,15 @@ export function ProfileForm({ email, defaultValues, onValuesChange }: ProfileFor
     },
   });
 
-  const onConfirmedSubmit = handleSubmit((values) => {
-    save.mutate(values);
+  // Re-validated on confirm; a failed save rejects, so the confirm stays open.
+  const onConfirmedSubmit = handleSubmit(async (values) => {
+    await save.mutateAsync(values);
   });
 
   return (
     <>
       <form
-        className="space-y-5"
+        className="flex flex-col gap-(--form-gap)"
         data-testid="profile-form"
         onSubmit={handleSubmit(() => {
           // Validate BEFORE the confirm dialog — an invalid field (e.g. an
@@ -154,44 +146,40 @@ export function ProfileForm({ email, defaultValues, onValuesChange }: ProfileFor
           if (isDirty) setShowConfirm(true);
         })}
       >
-        <div className="grid gap-5 sm:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="profile-name">{t(panels.nameLabel)}</Label>
-            <Input
+        {/* The drawer form's grid gap (`--form-gap`): half-width names from `sm`. */}
+        <div className="grid gap-(--form-gap) sm:grid-cols-2">
+          <DrawerField
+            label={t(panels.nameLabel)}
+            htmlFor="profile-name"
+            error={errors.name?.message}
+          >
+            <DrawerInput
               id="profile-name"
+              autoComplete="name"
               {...register('name')}
               placeholder={t(SETTINGS_KEYS.panels.profile.namePlaceholder)}
               aria-invalid={!!errors.name}
               aria-describedby={errors.name ? 'profile-name-error' : undefined}
               data-testid="profile-name"
             />
-            {errors.name && (
-              <p
-                id="profile-name-error"
-                className="text-destructive text-xs"
-                role="alert"
-              >
-                {errors.name.message}
-              </p>
-            )}
-          </div>
+          </DrawerField>
 
-          <div className="space-y-2">
-            <Label htmlFor="profile-job-title">{t(panels.jobTitleLabel)}</Label>
-            <Input
+          <DrawerField label={t(panels.jobTitleLabel)} htmlFor="profile-job-title">
+            <DrawerInput
               id="profile-job-title"
+              autoComplete="organization-title"
               {...register('jobTitle')}
               placeholder={t(SETTINGS_KEYS.panels.profile.jobTitlePlaceholder)}
               data-testid="profile-job-title"
             />
-          </div>
+          </DrawerField>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="profile-email">{t(panels.emailLabel)}</Label>
-          <Input
+        <DrawerField label={t(panels.emailLabel)} htmlFor="profile-email">
+          <DrawerInput
             id="profile-email"
             type="email"
+            capitalize={false}
             value={email}
             disabled
             readOnly
@@ -202,44 +190,30 @@ export function ProfileForm({ email, defaultValues, onValuesChange }: ProfileFor
           <p id="profile-email-desc" className="text-muted-foreground text-xs">
             {t(panels.emailHint)}
           </p>
-        </div>
+        </DrawerField>
 
-        <Button
-          type="submit"
-          disabled={save.isPending || !isDirty}
-          data-testid="profile-submit"
-        >
-          {save.isPending ? t(panels.saving) : t(panels.save)}
-        </Button>
+        <div className="flex justify-end">
+          <Button
+            type="submit"
+            disabled={save.isPending || !isDirty}
+            data-testid="profile-submit"
+          >
+            {save.isPending ? t(panels.saving) : t(panels.save)}
+          </Button>
+        </div>
       </form>
 
-      <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t(panels.confirmTitle)}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t(panels.confirmDescription)}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel data-testid="profile-confirm-cancel">
-              {t(panels.confirmCancel)}
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={(e) => {
-                // Keep the dialog open until the mutation resolves (onSuccess
-                // closes it); Radix would otherwise close on click.
-                e.preventDefault();
-                void onConfirmedSubmit();
-              }}
-              isLoading={save.isPending}
-              data-testid="profile-confirm-save"
-            >
-              {save.isPending ? t(panels.saving) : t(panels.confirmSave)}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Open until the save resolves (onSuccess closes it), and not dismissible meanwhile. */}
+      <ConfirmDialog
+        open={showConfirm}
+        onOpenChange={setShowConfirm}
+        title={t(panels.confirmTitle)}
+        description={t(panels.confirmDescription)}
+        cancelLabel={t(panels.confirmCancel)}
+        confirmLabel={t(panels.confirmSave)}
+        onConfirm={onConfirmedSubmit}
+        testIds={{ cancel: 'profile-confirm-cancel', accept: 'profile-confirm-save' }}
+      />
     </>
   );
 }

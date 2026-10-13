@@ -42,7 +42,6 @@
       "recoveryTitle": "リカバリーコードを保存",
       "recoveryDescription": "安全な場所に保管してください。端末を紛失した場合、各コードは一度だけ使えます。",
       "done": "完了",
-      "cancel": "キャンセル",
       "verifyEnable": "確認して有効化",
       "codeLabel": "6桁のコードを入力",
       "codeAria": "6桁の認証コード",
@@ -65,7 +64,6 @@
       "addDescription": "後で識別できる名前を付けてください。デバイスがパスキー作成を促します。",
       "nameLabel": "名前",
       "namePlaceholder": "MacBook Touch ID",
-      "cancel": "キャンセル",
       "submit": "パスキーを追加"
     },
     "overview": {
@@ -106,12 +104,6 @@
       "sendFailed": "コードを送信できませんでした。もう一度お試しください。"
     }
   },
-  "discard": {
-    "title": "未保存の変更を破棄しますか？",
-    "description": "未保存の変更があります。このセクションを離れると破棄されます。",
-    "stay": "編集を続ける",
-    "leave": "変更を破棄"
-  },
   "dialog": {
     "title": "設定"
   },
@@ -147,7 +139,10 @@
       "cancelInviteDescription": "メールのリンクは使えなくなります。確認後数秒間は元に戻せます。後から再度招待することもできます。",
       "cancelInviteConfirm": "招待を取り消す",
       "cancelInviteKeep": "招待を残す",
-      "cancelInvitePending": "{{email}} への招待を取り消し中…"
+      "cancelInvitePending": "{{email}} への招待を取り消し中…",
+      "movedTitle": "メンバーは「ユーザー」に移動しました",
+      "movedBody": "ユーザーの招待、ロールの変更、一時停止や削除、招待の再送や取り消しは、すべて「チーム」から行えます。",
+      "open": "ユーザーを開く"
     },
     "roles": {
       "title": "ロール",
@@ -174,7 +169,10 @@
       "create": "新しいロール",
       "roleFallback": "このロール",
       "permissionsLoading": "権限を読み込み中…",
-      "permissionsLoadFailed": "権限リストを読み込めませんでした。もう一度お試しください。"
+      "permissionsLoadFailed": "権限リストを読み込めませんでした。もう一度お試しください。",
+      "movedTitle": "ロールは「ユーザー」に移動しました",
+      "movedBody": "ロールの追加・名前の変更・削除や、各ロールにできること（クリニックの各セクション、ユーザー、ワークスペースの権限）の設定は「ロールとアクセス」で行えます。",
+      "open": "ロールとアクセスを開く"
     },
     "listSort": {
       "label": "並び替え",
@@ -225,7 +223,15 @@
       "dangerZoneDescription": "アカウントに対する取り消せない操作。",
       "deleteHeading": "アカウントを削除",
       "deleteBody": "アカウントと関連するすべてのデータを完全に削除します。",
-      "deleteAction": "アカウントを削除"
+      "deleteAction": "アカウントを削除",
+      "privacyTitle": "プライバシー",
+      "privacyDescription": "製品分析とセッション記録に関するあなたの選択（アカウントに保存されます）。",
+      "analyticsLabel": "製品分析とセッション記録",
+      "analyticsHint": "PostHog の分析と Sentry のセッション記録。エラーレポートはどちらの場合も送信されます。",
+      "consentGrantedOn": "{{date}} に許可",
+      "consentDeniedOn": "{{date}} に拒否",
+      "consentUnanswered": "未回答",
+      "privacyPolicyLink": "プライバシーポリシー"
     },
     "general": {
       "namePlaceholder": "Acme Inc.",
@@ -260,6 +266,7 @@
       "apiKeysNoResults": "一致する API キーがありません",
       "apiKeysNoResultsDescription": "検索に一致する API キーがありません。",
       "apiKeyFallback": "この API キー",
+      "addedOn": "<1></1> に追加",
       "createApiKey": "APIキーを作成",
       "createApiKeyTitle": "APIキーを作成する",
       "createApiKeyDescription": "キーに名前を付け、できることと有効期間を選びます。",
@@ -293,7 +300,6 @@
       "addWebhookDescription": "選択したイベントをこの URL に POST します。",
       "payloadUrlLabel": "ペイロード URL",
       "eventsLabel": "イベント",
-      "cancel": "キャンセル",
       "createWebhook": "Webhook を作成",
       "creating": "作成中…",
       "deleteWebhookAria": "Webhook {{url}} を削除",
@@ -321,7 +327,6 @@
       "attemptCodeColumn": "コード",
       "attemptWhenColumn": "日時",
       "attemptCountLabel": "{{count}} 回目",
-      "closeDialog": "閉じる",
       "eventsLoadFailed": "イベント一覧を読み込めませんでした。もう一度お試しください。",
       "eventsLoading": "イベントを読み込み中…",
       "eventsEmpty": "購読できるイベントがありません。"
@@ -345,12 +350,14 @@
         "email": "メール",
         "inApp": "アプリ内",
         "desktop": "デスクトップ"
-      }
+      },
+      "kind": "通知",
+      "loadFailed": "通知の設定を読み込めませんでした。もう一度お試しください。",
+      "desktopDenied": "デスクトップ通知にはブラウザの許可が必要です。ブラウザの設定で許可してから、もう一度オンにしてください。"
     },
     "appearance": {
       "title": "外観",
-      "description": "この端末に保存されます。変更はすぐに反映されます。",
-      "shuffle": "シャッフル"
+      "description": "この端末に保存されます。変更はすぐに反映されます。"
     },
     "sessions": {
       "title": "セッション",
@@ -402,6 +409,13 @@
         "expires": "有効期限 {{month}}/{{year}}",
         "defaultBadge": "既定"
       },
+      "paymentForm": {
+        "saveMethod": "支払い方法を保存",
+        "savingMethod": "保存中…",
+        "confirmPayment": "支払いを確定",
+        "confirmingPayment": "確定中…",
+        "cancel": "キャンセル"
+      },
       "invoices": {
         "title": "請求書",
         "description": "請求プロバイダーからの日付、支払期日、金額、ステータス。",
@@ -426,8 +440,7 @@
         "confirmTitle": "サブスクリプションを解約しますか？",
         "confirmDescription": "ワークスペースは {{date}} まで完全なアクセスを維持します。その後はサブスクリプションが終了し、有料機能が制限される場合があります。",
         "keep": "解約しない",
-        "confirm": "解約を確定",
-        "cancelling": "解約中…"
+        "confirm": "解約を確定"
       }
     }
   }

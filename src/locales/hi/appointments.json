@@ -1,0 +1,148 @@
+{
+  "manifest": {
+    "title": "अपॉइंटमेंट"
+  },
+  "record": "अपॉइंटमेंट",
+  "records": "अपॉइंटमेंट",
+  "toolbar": {
+    "viewsLabel": "व्यू",
+    "views": {
+      "agenda": "एजेंडा",
+      "day": "दिन",
+      "week": "सप्ताह",
+      "month": "महीना"
+    },
+    "today": {
+      "day": "आज",
+      "week": "इस सप्ताह",
+      "month": "इस महीने"
+    },
+    "jump": {
+      "day": "आज के दिन पर जाएँ",
+      "week": "इस सप्ताह पर जाएँ",
+      "month": "इस महीने पर जाएँ"
+    },
+    "period": "अवधि",
+    "weekRange": "{{from}} – {{to}}",
+    "previous": {
+      "day": "पिछला दिन",
+      "week": "पिछला सप्ताह",
+      "month": "पिछला महीना"
+    },
+    "next": {
+      "day": "अगला दिन",
+      "week": "अगला सप्ताह",
+      "month": "अगला महीना"
+    },
+    "search": "मरीज़, फ़ोन या #ID",
+    "searchLabel": "अपॉइंटमेंट खोजें",
+    "newAppointment": "नया अपॉइंटमेंट"
+  },
+  "filters": {
+    "label": "अपॉइंटमेंट फ़िल्टर",
+    "previousMonth": "पिछला महीना",
+    "nextMonth": "अगला महीना",
+    "upcoming": "आगामी (डिफ़ॉल्ट)",
+    "dayBooked_one": "{{date}} · {{count}} बुक",
+    "dayBooked_other": "{{date}} · {{count}} बुक",
+    "appointedTo": "किसे सौंपा गया",
+    "allDoctors": "सभी डॉक्टर",
+    "searchTeam": "टीम में खोजें",
+    "showAll": "सभी दिखाएँ",
+    "done": "हो गया",
+    "status": "स्थिति",
+    "all": "सभी",
+    "active": "सक्रिय (खुले)"
+  },
+  "agenda": {
+    "columns": {
+      "time": "समय",
+      "contact": "संपर्क",
+      "service": "सेवा",
+      "doctor": "किसे सौंपा गया",
+      "latest": "ताज़ा अपडेट",
+      "quickView": "झलक",
+      "status": "स्थिति"
+    },
+    "minutes": "{{minutes}} मिनट",
+    "empty": "यहाँ कोई अपॉइंटमेंट नहीं · ",
+    "bookOne": "एक बुक करें",
+    "day": {
+      "today": "आज",
+      "tomorrow": "आने वाला कल",
+      "yesterday": "बीता कल",
+      "inDays_one": "{{count}} दिन में",
+      "inDays_other": "{{count}} दिन में",
+      "nextWeek": "अगले सप्ताह",
+      "inWeeks_one": "{{count}} सप्ताह में",
+      "inWeeks_other": "{{count}} सप्ताह में",
+      "daysAgo_one": "{{count}} दिन पहले",
+      "daysAgo_other": "{{count}} दिन पहले"
+    },
+    "counts": {
+      "confirmed_one": "<n>{{count}}</n> पुष्ट",
+      "confirmed_other": "<n>{{count}}</n> पुष्ट",
+      "awaiting_one": "<n>{{count}}</n> जवाब की प्रतीक्षा में",
+      "awaiting_other": "<n>{{count}}</n> जवाब की प्रतीक्षा में",
+      "allSet": "· सब तैयार",
+      "confirmedHint_one": "{{count}} पुष्ट",
+      "confirmedHint_other": "{{count}} पुष्ट",
+      "waitingHint_one": "{{count}} जवाब की प्रतीक्षा में",
+      "waitingHint_other": "{{count}} जवाब की प्रतीक्षा में",
+      "hint": "{{confirmed}} · {{waiting}}"
+    },
+    "latest": {
+      "reminderSent": "✓ रिमाइंडर भेजा गया",
+      "repliedYes": "✓ हाँ में जवाब",
+      "moved": "✓ समय बदला",
+      "movedTimes": "✓ समय बदला ×{{times}}",
+      "checkedIn": "✓ चेक-इन हुआ"
+    },
+    "latestHints": {
+      "reminderSent": "रिमाइंडर भेजा गया",
+      "repliedYes": "WhatsApp पर “हाँ” के जवाब से अपने आप पुष्ट",
+      "moved": "{{day}} {{time}} से बदला गया",
+      "checkedIn": "मरीज़ ने चेक-इन किया"
+    },
+    "changeStatus": "स्थिति बदलें · {{status}}"
+  },
+  "status": {
+    "title": "स्थिति बदलें",
+    "now": "अभी: <b>{{status}}</b>",
+    "nowReason": "अभी: <b>{{status}} · {{reason}}</b>",
+    "why": "इसे क्यों रद्द किया जा रहा है?",
+    "back": "वापस"
+  },
+  "card": {
+    "when": "{{day}} · {{time}} · {{minutes}} मिनट",
+    "noUpdate": "अभी कोई अपडेट नहीं",
+    "open": "खोलें",
+    "reschedule": "समय बदलें",
+    "cancel": "रद्द करें",
+    "tracker": "स्थिति"
+  },
+  "calendar": {
+    "dayLoad_one": "{{count}} बुक · {{hours}} घं.",
+    "dayLoad_other": "{{count}} बुक · {{hours}} घं.",
+    "free": "पूरा दिन खाली",
+    "doctor": "डॉक्टर",
+    "bookSlot": "बुक करने के लिए किसी खाली स्लॉट पर क्लिक करें",
+    "newAt": "नया अपॉइंटमेंट · {{day}} · {{time}}",
+    "pastDay": "बीती तारीखें बुक नहीं की जा सकतीं",
+    "doctorBooked_one": "{{count}} बुक",
+    "doctorBooked_other": "{{count}} बुक",
+    "doctorFree": "खाली",
+    "chairTime_one": "{{count}} बुक · चेयर टाइम का {{percent}}%",
+    "chairTime_other": "{{count}} बुक · चेयर टाइम का {{percent}}%",
+    "chairTimeOverlap_one": "{{count}} बुक · चेयर टाइम का {{percent}}% · ओवरलैपिंग बुकिंग",
+    "chairTimeOverlap_other": "{{count}} बुक · चेयर टाइम का {{percent}}% · ओवरलैपिंग बुकिंग",
+    "overlap": "ओवरलैपिंग बुकिंग",
+    "more": "+{{count}} और",
+    "dayCount_one": "{{day}} · {{count}} अपॉइंटमेंट",
+    "dayCount_other": "{{day}} · {{count}} अपॉइंटमेंट",
+    "openDay": "दिन खोलें",
+    "block": "{{name}} · {{time}} · {{minutes}} मिनट · {{service}} · {{doctor}} · {{status}}",
+    "blockClash": "{{name}} · {{time}} · {{minutes}} मिनट · {{service}} · {{doctor}} · {{status}} · किसी दूसरी बुकिंग से टकराता है",
+    "blockTime": "{{time}} · {{minutes}} मि."
+  }
+}

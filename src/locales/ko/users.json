@@ -1,0 +1,396 @@
+{
+  "manifest": {
+    "title": "사용자"
+  },
+  "record": "사용자",
+  "tabs": {
+    "label": "사용자 보기",
+    "team": "팀",
+    "roles": "역할 및 권한",
+    "branches": "지점"
+  },
+  "search": {
+    "placeholder": "이름, 이메일, 휴대폰 또는 #ID",
+    "label": "사용자 검색"
+  },
+  "primary": {
+    "newUser": "새 사용자",
+    "newRole": "새 역할",
+    "newBranch": "새 지점"
+  },
+  "columns": {
+    "seq": "ID",
+    "user": "사용자",
+    "email": "이메일",
+    "roles": "역할",
+    "branches": "지점",
+    "hours": "근무 시간",
+    "commission": "수수료",
+    "status": "상태",
+    "updated": "업데이트"
+  },
+  "table": {
+    "records": "사용자",
+    "mainRole": "주 역할",
+    "alsoRole": "추가",
+    "commission": "{{value}}%"
+  },
+  "status": {
+    "active": "활성",
+    "inactive": "비활성",
+    "invited": "초대됨",
+    "expires": "초대 만료 {{date}}",
+    "expired": "초대 만료됨"
+  },
+  "hours": {
+    "everyDay": "매일",
+    "run": "{{from}}–{{to}}",
+    "list": "{{days, list(type: unit)}}",
+    "line": "{{days}} · {{from}}–{{to}}"
+  },
+  "filters": {
+    "roles": "역할",
+    "all": "전체",
+    "branches": "지점",
+    "status": "상태"
+  },
+  "rowActions": {
+    "edit": "편집",
+    "delete": "삭제",
+    "leave": "클리닉 나가기"
+  },
+  "bulk": {
+    "export": "내보내기",
+    "exported_other": "{{count}}개 행을 CSV로 내보냈습니다"
+  },
+  "empty": {
+    "title": "일치하는 사용자가 없습니다",
+    "description": "아직 아무것도 없습니다. 다른 탭이나 검색어를 사용해 보세요."
+  },
+  "drawer": {
+    "title": {
+      "create": "새 사용자",
+      "edit": "사용자 편집"
+    },
+    "sub": "로그인, 역할, 지점, 근무 시간",
+    "steps": {
+      "profile": "프로필, 역할 및 지점",
+      "hours": "근무 시간 및 급여"
+    },
+    "groups": {
+      "profile": "프로필",
+      "rolesBranches": "역할 및 지점",
+      "hours": "근무 시간",
+      "pay": "급여"
+    },
+    "fields": {
+      "name": "이름",
+      "mobile": "휴대폰",
+      "email": "이메일",
+      "colour": "색상",
+      "roles": "역할",
+      "access": "접근 가능한 화면",
+      "branches": "지점",
+      "days": "요일",
+      "from": "시작",
+      "to": "종료",
+      "commission": "수수료 / 인센티브",
+      "status": "상태"
+    },
+    "hints": {
+      "mobile": "10자리",
+      "colour": "배지에 사용됩니다",
+      "roles": "하나 이상 선택 · 권한이 합산됩니다",
+      "branches": "근무 지점",
+      "days": "예약은 이 요일만 제공됩니다",
+      "name": "본인이 프로필에서 설정합니다"
+    },
+    "placeholders": {
+      "name": "전체 이름, 예: Dr. Nisha Mavani",
+      "email": "name@clinic.com",
+      "time": "시간 선택",
+      "commission": "0"
+    },
+    "commissionSuffix": "청구액의 %",
+    "commissionQuick": "{{value}}%",
+    "decrease": "줄이기",
+    "increase": "늘리기",
+    "pickRole": "역할 선택",
+    "statusOn": "활성 · 로그인 가능",
+    "statusOff": "비활성 · 이 클리닉을 사용할 수 없음",
+    "resend": "초대 다시 보내기",
+    "quickFill": {
+      "doctor": "의사 · 10:00–19:00",
+      "therapist": "치료사 · 10:00–19:00",
+      "front_desk": "프런트 데스크 · 09:30–19:30",
+      "pharmacist": "약사 · 09:00–21:00"
+    },
+    "summaryNew": "새 사용자",
+    "save": {
+      "create": "사용자 만들기",
+      "edit": "변경 사항 저장",
+      "createAnother": "만들고 하나 더 추가"
+    },
+    "missing": "이메일을 입력하세요",
+    "noRole": "역할을 하나 이상 선택하세요",
+    "emailInvalid": "올바른 이메일 주소를 입력하세요",
+    "mobileInvalid": "휴대폰 번호는 10자리여야 합니다",
+    "noPlatformRole": "아직 부여할 역할이 없습니다 · 관리자에게 요청하세요",
+    "added": "{{name}} 추가됨",
+    "saved": "{{name}} 저장됨"
+  },
+  "deleteUser": {
+    "title": "이 사용자를 삭제할까요?",
+    "removed": "{{name}} 삭제됨"
+  },
+  "leave": {
+    "title": "{{clinic}}에서 나갈까요?",
+    "description": "{{clinic}}의 섹션, 기록, 팀에 더 이상 접근할 수 없으며 내 클리닉 목록으로 돌아갑니다. 확인 후 몇 초 동안 취소할 수 있습니다.",
+    "confirm": "클리닉 나가기",
+    "stay": "머무르기",
+    "pending": "{{clinic}}에서 나가는 중…",
+    "done": "{{clinic}}에서 나갔습니다",
+    "clinicFallback": "이 클리닉"
+  },
+  "roles": {
+    "label": "역할",
+    "purposes": {
+      "admin": "클리닉 운영 — 가격, 팀, 지점, 모든 화면.",
+      "doctor": "진료하고 처방하며 환자별 치료를 계획합니다.",
+      "therapist": "시술과 사후 관리 통화를 맡습니다.",
+      "front_desk": "클리닉의 첫 얼굴 — 리드, 예약, 체크인, 수납.",
+      "counsellor": "문의를 플랜과 패키지로 연결합니다.",
+      "pharmacist": "약 판매 창구와 재고를 맡습니다.",
+      "accountant": "입출금을 확인하고 하루를 마감합니다.",
+      "marketing": "리드를 모으고 후속 연락을 합니다.",
+      "custom": "사용자 지정 역할",
+      "customPage": "사용자 지정 역할 · 아래에서 할 수 있는 일을 정하세요"
+    },
+    "nameLabel": "역할 이름",
+    "descriptionLabel": "역할 설명",
+    "copyFrom": "권한 복사해 오기",
+    "copied": "{{role}} 역할이 이제 {{from}} 역할과 같은 권한을 가집니다",
+    "preview": "{{role}}(으)로 미리 보기",
+    "previewHint": "이 역할이 보는 그대로 {{productName}}을(를) 봅니다",
+    "previewing": "{{productName}}을(를) {{role}}(으)로 미리 보는 중",
+    "back": "역할 목록으로",
+    "people": "이 역할을 가진 사람",
+    "openPerson": "{{name}} 열기",
+    "also": "+ {{roles}}",
+    "nobody": "아직 이 역할을 가진 사람이 없습니다 · 사용자 상세 화면에서 역할을 부여하세요.",
+    "matrix": {
+      "title": "보고 할 수 있는 일",
+      "section": "섹션",
+      "view": "보기",
+      "create": "만들기",
+      "edit": "편집",
+      "delete": "삭제",
+      "row": "행",
+      "full": "전체",
+      "some": "일부",
+      "none": "없음",
+      "rowHint": "행 전체를 켜거나 끕니다",
+      "cell": {
+        "view": "{{role}}: 볼 수 있음 · {{section}}",
+        "create": "{{role}}: 만들 수 있음 · {{section}}",
+        "edit": "{{role}}: 편집할 수 있음 · {{section}}",
+        "delete": "{{role}}: 삭제할 수 있음 · {{section}}"
+      },
+      "notApplicable": "이 행에는 해당되지 않습니다",
+      "resources": {
+        "contact": {
+          "label": "연락처",
+          "description": "리드와 환자의 연락처"
+        },
+        "contact_activity": {
+          "label": "메시지 및 메모",
+          "description": "WhatsApp, 통화, 팀 메모"
+        },
+        "patient_prescription": {
+          "label": "처방",
+          "description": "처방 작성 및 승인"
+        },
+        "patient_treatment": {
+          "label": "시술",
+          "description": "세션과 진행 결과"
+        },
+        "patient_review": {
+          "label": "리뷰",
+          "description": "Google 및 영상 리뷰 · 환자와 함께 열람"
+        },
+        "role": {
+          "label": "역할",
+          "description": "역할 및 접근 권한"
+        },
+        "branch": {
+          "label": "지점",
+          "description": "지점과 지점별 근무자"
+        }
+      }
+    },
+    "notes": {
+      "admin": "관리자는 모든 것을 할 수 있습니다 · 이 역할은 제한할 수 없습니다.",
+      "readOnly": "여기서 역할을 볼 수 있습니다. 변경하려면 “역할 업데이트”가 필요합니다.",
+      "live": "변경 사항은 이 역할을 가진 모든 사람에게 바로 적용됩니다. 역할이 두 개인 사람은 두 역할 중 하나라도 허용하는 모든 것을 할 수 있습니다.",
+      "beyond": "이 역할에는 내게 없는 권한이 있습니다 · 그 권한이 있는 사람만 변경할 수 있습니다."
+    },
+    "locked": {
+      "admin": "관리자는 항상 전체 권한을 가집니다",
+      "noPerms": "역할을 변경할 수 없습니다 · 관리자에게 요청하세요",
+      "noAdd": "역할을 추가할 수 없습니다 · 관리자에게 요청하세요",
+      "beyond": "이 역할에는 내게 없는 권한이 있습니다 · 관리자에게 요청하세요",
+      "notYours": "내가 가진 권한만 부여할 수 있습니다"
+    },
+    "added": "역할을 추가했습니다 · 이름을 정하고 할 수 있는 일을 고르세요",
+    "newRoleName": "새 역할",
+    "duplicateName": "{{name}} 역할이 이미 있습니다",
+    "deleteRole": {
+      "action": "역할 삭제",
+      "title": "{{name}}을(를) 삭제하시겠습니까?",
+      "description": "이 역할의 멤버에게는 새 역할이 필요합니다. 확인 후 몇 초 동안 취소할 수 있습니다.",
+      "confirm": "삭제",
+      "pending": "{{name}} 삭제 중…"
+    },
+    "workspace": {
+      "title": "워크스페이스 권한",
+      "hint": "설정, 연동, 결제, 감사 로그 — 위 섹션 밖의 권한입니다. 내가 가진 권한만 줄 수 있습니다.",
+      "none": "이 역할에 더 줄 수 있는 권한이 없습니다.",
+      "loadFailed": "워크스페이스 권한을 불러오지 못했습니다."
+    },
+    "specials": {
+      "title": "특별 권한",
+      "floor": {
+        "label": "최저가 보기",
+        "description": "서비스와 청구서에 숨겨진 최저가를 표시합니다"
+      },
+      "clinical": {
+        "label": "임상 메모 읽기",
+        "description": "증상, 진단, 메모, 사진, 리포트를 엽니다"
+      },
+      "export": {
+        "label": "내보내기 · {{section}}",
+        "description": "표를 다운로드합니다"
+      },
+      "privateAlbum": {
+        "label": "비공개 앨범 보기",
+        "description": "환자 파일의 비공개 사진을 엽니다"
+      }
+    }
+  },
+  "branches": {
+    "record": "지점",
+    "columns": {
+      "branch": "지점",
+      "address": "주소",
+      "contact": "연락처",
+      "hours": "운영 시간",
+      "team": "팀",
+      "defaults": "기본 담당자",
+      "status": "상태"
+    },
+    "main": "본점",
+    "notSet": "설정 안 됨",
+    "defaults": {
+      "doctor": "의사 · {{name}}",
+      "desk": "데스크 · {{name}}",
+      "therapist": "치료사 · {{name}}",
+      "pharmacist": "약국 · {{name}}"
+    },
+    "status": {
+      "open": "운영 중",
+      "closed": "닫힘"
+    },
+    "records": "지점",
+    "empty": "아직 지점이 없습니다",
+    "drawer": {
+      "title": {
+        "create": "새 지점",
+        "edit": "지점 편집"
+      },
+      "sub": "주소, 운영 시간, 이곳에서 일하는 사람",
+      "summaryNew": "새 지점",
+      "people_other": "{{count}}명",
+      "mainBadge": "본점",
+      "steps": {
+        "place": "지점 및 주소",
+        "contact": "연락처 및 운영 시간",
+        "people": "담당자"
+      },
+      "groups": {
+        "branch": "지점",
+        "address": "주소",
+        "contact": "연락처",
+        "hours": "운영 시간"
+      },
+      "fields": {
+        "name": "이름",
+        "colour": "색상",
+        "main": "본점",
+        "status": "상태",
+        "line1": "주소 1",
+        "line2": "주소 2",
+        "area": "지역",
+        "city": "도시",
+        "pin": "우편번호",
+        "state": "주",
+        "phone": "전화",
+        "email": "이메일",
+        "gstin": "GSTIN",
+        "days": "요일",
+        "opens": "여는 시간",
+        "closes": "닫는 시간",
+        "team": "팀",
+        "doctor": "기본 의사",
+        "desk": "기본 프런트 데스크",
+        "therapist": "기본 치료사",
+        "pharmacist": "기본 약사"
+      },
+      "placeholders": {
+        "name": "예: Vesu",
+        "line1": "매장 / 층, 건물",
+        "line2": "도로명, 랜드마크",
+        "area": "예: Vesu",
+        "city": "도시",
+        "pin": "6자리",
+        "state": "주",
+        "email": "branch@clinic.com",
+        "gstin": "15자",
+        "team": "팀 선택"
+      },
+      "hints": {
+        "colour": "이 지점을 어디서나 표시합니다",
+        "phone": "10자리",
+        "team": "이곳에서 일하는 사람",
+        "preselected": "이 지점 양식에서 미리 선택됨",
+        "addFirst": {
+          "doctor": "먼저 팀에 의사를 추가하세요",
+          "desk": "먼저 팀에 프런트 데스크를 추가하세요",
+          "therapist": "먼저 팀에 치료사를 추가하세요",
+          "pharmacist": "먼저 팀에 약사를 추가하세요"
+        },
+        "main": "클리닉당 하나 · 개설 시 지정"
+      },
+      "toggles": {
+        "mainOn": "본점 · 본사",
+        "mainOff": "본점이 아님",
+        "openOn": "운영 중 · 선택 목록에 표시",
+        "openOff": "닫힘 · 어디에도 표시 안 함"
+      },
+      "nobody": "없음",
+      "you": "{{name}} (나)",
+      "save": {
+        "create": "지점 추가",
+        "edit": "지점 저장"
+      },
+      "nameMissing": "지점 이름을 입력하세요",
+      "addressMissing": "주소, 지역, 도시, PIN 코드를 입력하세요",
+      "duplicate": "{{name}} 지점이 이미 있습니다",
+      "phoneInvalid": "전화번호는 10자리여야 합니다",
+      "emailInvalid": "올바른 이메일 주소를 입력하세요",
+      "added": "{{name}} 지점을 추가했습니다",
+      "saved": "{{name}}을(를) 저장했습니다",
+      "contactMissing": "전화번호와 이메일을 입력하세요",
+      "pinInvalid": "PIN 코드는 6자리여야 합니다"
+    }
+  }
+}

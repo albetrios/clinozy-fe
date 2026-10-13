@@ -40,9 +40,7 @@ const lines = matches
   .filter((line) => !line.startsWith('src/lib/i18n/'))
   .filter((line) => !line.startsWith('src/shared/components/ui/'))
   .filter((line) => !line.includes('.test.'))
-  .filter((line) => !line.includes('.fixtures.'))
-  // Placeholder analytics default formatter — only used when no formatLabel passed.
-  .filter((line) => !line.includes('dashboard.placeholder-data.ts'));
+  .filter((line) => !line.includes('.fixtures.'));
 
 if (lines.length) {
   console.error('Bare Intl / toLocale* formatter(s) outside lib/i18n (+ vendored ui/):');

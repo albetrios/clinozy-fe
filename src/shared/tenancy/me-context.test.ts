@@ -37,7 +37,7 @@ const WIRE: MeContextWire = {
     created_at: '2026-01-01T00:00:00.000Z',
     updated_at: '2026-01-01T00:00:00.000Z',
   },
-  my_permissions: ['organization:read', 'membership:manage', 'subscription:manage'],
+  my_permissions: ['organization:read', 'membership:update', 'subscription:manage'],
   global_role: null,
   organizations: [
     {
@@ -124,6 +124,28 @@ describe('toMeContext', () => {
   // it was a flat array with no cursor filled by a default-paginated read, so a
   // caller in more than 25 organizations was silently truncated. The context
   // still names the ACTIVE organization, which is what it is for.
+  it('maps the caller’s membership and named roles, main role first (N10, S3)', () => {
+    const ctx = toMeContext({
+      ...WIRE,
+      membership_id: 'mem_abcdefghij0123456789x',
+      my_roles: [
+        { id: 'rol_a', name: 'Doctor', tone: 'sky', is_system: true },
+        { id: 'rol_b', name: 'Floor manager', tone: 'lime', is_system: false },
+      ],
+    });
+    expect(ctx.membershipId).toBe('mem_abcdefghij0123456789x');
+    expect(ctx.myRoles).toEqual([
+      { id: 'rol_a', name: 'Doctor', tone: 'sky', isSystem: true },
+      { id: 'rol_b', name: 'Floor manager', tone: 'lime', isSystem: false },
+    ]);
+  });
+
+  it('reads no membership and no roles when me/context sends none', () => {
+    const ctx = toMeContext(WIRE);
+    expect(ctx.membershipId).toBeNull();
+    expect(ctx.myRoles).toEqual([]);
+  });
+
   it('does not carry the organization list', () => {
     expect(toMeContext(WIRE)).not.toHaveProperty('organizations');
   });

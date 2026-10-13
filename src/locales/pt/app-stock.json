@@ -1,0 +1,457 @@
+{
+  "manifest": {
+    "title": "Estoque da clínica"
+  },
+  "tabs": {
+    "label": "Seções do estoque",
+    "items": "Itens",
+    "purchases": "Compras",
+    "movements": "Movimentações",
+    "vendors": "Fornecedores"
+  },
+  "search": {
+    "label": "Buscar no estoque",
+    "placeholder": {
+      "items": "Busque nome do item ou #ID…",
+      "purchases": "Busque nota fiscal, #ID ou fornecedor…",
+      "vendors": "Busque nome do fornecedor…"
+    }
+  },
+  "create": {
+    "item": "Novo item",
+    "purchase": "Nova compra",
+    "vendor": "Novo fornecedor da clínica"
+  },
+  "check": "Contagem de estoque",
+  "filters": {
+    "all": "Todos",
+    "stock": "Estoque",
+    "lowStock": "Estoque baixo",
+    "category": "Categoria",
+    "lasts": "Dura",
+    "status": "Status",
+    "type": "Tipo",
+    "lastsWithin": {
+      "week": "Em até uma semana",
+      "three_weeks": "Em até 3 semanas"
+    }
+  },
+  "table": {
+    "addPhone": "Adicionar telefone",
+    "noValue": "—"
+  },
+  "empty": {
+    "hint": "Ainda não há nada aqui. Tente outra aba ou busca.",
+    "stock": "Nenhum item de estoque aqui"
+  },
+  "bulk": {
+    "export": "Exportar",
+    "exported_one": "{{count}} linha exportada como CSV",
+    "exported_many": "{{count}} de linhas exportadas como CSV",
+    "exported_other": "{{count}} linhas exportadas como CSV"
+  },
+  "categories": {
+    "creams_serums": "Cremes e séruns",
+    "peels": "Peelings e neutralizantes",
+    "masks": "Máscaras",
+    "consumables": "Consumíveis",
+    "equipment": "Equipamentos",
+    "other": "Outro estoque da clínica"
+  },
+  "units": {
+    "piece": "unidade",
+    "tube": "tubo",
+    "bottle": "frasco",
+    "kit": "kit",
+    "pack": "pacote",
+    "box": "caixa",
+    "vial": "frasco-ampola",
+    "ampoule": "ampola",
+    "sachet": "sachê",
+    "jar": "pote",
+    "roll": "rolo",
+    "pair": "par",
+    "ml": "ml",
+    "g": "g",
+    "litre": "litro"
+  },
+  "measures": {
+    "ml": "ml",
+    "g": "g",
+    "pcs": "unid.",
+    "units": "unidades"
+  },
+  "quantity": {
+    "amount": "{{value}} {{unit}}",
+    "measured": "{{units}} · {{measure}}"
+  },
+  "levels": {
+    "ok": "OK",
+    "low": "Baixo",
+    "out": "Esgotado"
+  },
+  "runway": {
+    "days_one": "~{{count}} dia",
+    "days_many": "~{{count}} de dias",
+    "days_other": "~{{count}} dias",
+    "weeks_one": "~{{count}} semana",
+    "weeks_many": "~{{count}} de semanas",
+    "weeks_other": "~{{count}} semanas",
+    "none": "Sem uso"
+  },
+  "items": {
+    "records": "itens",
+    "empty": "Nenhum item corresponde",
+    "columns": {
+      "seq": "ID",
+      "name": "Item",
+      "category": "Categoria",
+      "stock": "Estoque",
+      "lasts": "Dura",
+      "vendor": "Fornecedor",
+      "lastRate": "Último preço"
+    },
+    "sub": "por {{unit}} · usa ~{{usage}}/semana",
+    "subContents": "por {{unit}} de {{contents}} · usa ~{{usage}}/semana",
+    "stockLine": "{{quantity}} · {{level}}",
+    "rowActions": {
+      "use": "Usar",
+      "receive": "Receber estoque",
+      "log": "Registrar uso…",
+      "adjust": "Ajustar contagem",
+      "edit": "Editar",
+      "delete": "Excluir"
+    }
+  },
+  "purchases": {
+    "records": "compras",
+    "count_one": "{{count}} compra · {{due}} pendente",
+    "count_many": "{{count}} de compras · {{due}} pendente",
+    "count_other": "{{count}} compras · {{due}} pendente",
+    "columns": {
+      "seq": "ID",
+      "vendor": "Fornecedor",
+      "billNo": "Nota fiscal",
+      "date": "Data",
+      "bill": "Valor",
+      "due": "Pendente",
+      "status": "Status"
+    },
+    "statuses": {
+      "paid": "Pago",
+      "unpaid": "Não pago",
+      "partial": "Pago em parte"
+    },
+    "rowActions": {
+      "edit": "Editar",
+      "delete": "Excluir",
+      "pay": "Pagar {{amount}}"
+    },
+    "vendorFilter": {
+      "any": "Qualquer fornecedor",
+      "count_one": "{{count}} fornecedor",
+      "count_other": "{{count}} fornecedores",
+      "count_many": "{{count}} fornecedores",
+      "search": "Buscar fornecedores",
+      "noMatch": "Nenhum resultado",
+      "clear": "Limpar"
+    }
+  },
+  "movements": {
+    "records": "movimentações",
+    "count_one": "{{count}} registro",
+    "count_many": "{{count}} de registros",
+    "count_other": "{{count}} registros",
+    "columns": {
+      "type": "Tipo",
+      "party": "Item / parte",
+      "when": "Quando",
+      "by": "Por",
+      "change": "Alteração"
+    },
+    "types": {
+      "used": "Usado",
+      "received": "Recebido",
+      "adjust": "Ajuste",
+      "damaged": "Danificado",
+      "returned": "Devolvido",
+      "reverted": "Revertido",
+      "opening": "Estoque inicial"
+    },
+    "reverted": "Revertido",
+    "purchase": "Da compra #{{seq}}",
+    "change": "{{sign}} {{amount}}",
+    "rowActions": {
+      "revert": "Reverter"
+    },
+    "purchaseBill": "Da compra #{{seq}} · nota {{billNo}}",
+    "deletedItem": "Item excluído",
+    "itemFilter": {
+      "any": "Qualquer item",
+      "search": "Buscar itens",
+      "noMatch": "Nenhum resultado",
+      "clear": "Limpar",
+      "count_one": "{{count}} item",
+      "count_other": "{{count}} itens",
+      "count_many": "{{count}} de itens"
+    }
+  },
+  "vendors": {
+    "records": "fornecedores",
+    "empty": "Nenhum fornecedor corresponde",
+    "count_one": "{{count}} fornecedor · {{payable}} a pagar",
+    "count_many": "{{count}} de fornecedores · {{payable}} a pagar",
+    "count_other": "{{count}} fornecedores · {{payable}} a pagar",
+    "columns": {
+      "name": "Fornecedor",
+      "purchases": "Compras",
+      "payable": "A pagar"
+    },
+    "purchases_one": "{{count}} compra",
+    "purchases_many": "{{count}} de compras",
+    "purchases_other": "{{count}} compras",
+    "noPurchases": "Nenhuma compra",
+    "rowActions": {
+      "edit": "Editar",
+      "delete": "Excluir",
+      "pay": "Pagar {{amount}}"
+    },
+    "paidUp": "Já não há nada em dívida a {{name}}"
+  },
+  "drawers": {
+    "records": {
+      "item": "Item",
+      "purchase": "Compra",
+      "vendor": "Fornecedor"
+    },
+    "saveChanges": "Salvar alterações",
+    "addName": "Adicione um nome",
+    "pickers": {
+      "searchVendors": "Buscar fornecedores da clínica",
+      "vendorsHint": "fornecedores da clínica",
+      "newVendor": "Novo fornecedor da clínica",
+      "selectItem": "Selecione um item…",
+      "newItem": "Novo item da clínica",
+      "inStock": "{{quantity}} em estoque"
+    },
+    "treatments": {
+      "lhr": "Depilação a laser",
+      "peel": "Peeling",
+      "facial": "Limpeza facial",
+      "mole": "Remoção de pinta",
+      "general": "Geral"
+    },
+    "item": {
+      "title": {
+        "create": "Novo item",
+        "edit": "Editar item"
+      },
+      "sub": "Consumível ou equipamento da clínica",
+      "steps": {
+        "item": "Item",
+        "levels": "Níveis",
+        "vendor": "Fornecedor"
+      },
+      "fields": {
+        "name": "Nome",
+        "category": "Categoria",
+        "unit": "Unidade",
+        "contents": "Conteúdo por {{unit}}",
+        "contentsHint": "opcional · permite que a equipe use parte de um {{unit}}",
+        "measure": "Medido em",
+        "inStock": "Em estoque",
+        "decimals": "decimais permitidos",
+        "usage": "Uso por semana",
+        "min": "Mínimo",
+        "max": "Máximo",
+        "vendor": "Fornecedor"
+      },
+      "save": "Adicionar item",
+      "saved": "Item salvo",
+      "nameTaken": "Já existe um item com este nome"
+    },
+    "quickItem": {
+      "title": "Novo item da clínica",
+      "sub": "Usado em procedimentos · não é vendido",
+      "steps": {
+        "item": "Item",
+        "details": "Detalhes"
+      },
+      "added": "{{name}} adicionado aos itens da clínica"
+    },
+    "vendor": {
+      "title": {
+        "create": "Novo fornecedor da clínica",
+        "edit": "Editar fornecedor da clínica"
+      },
+      "sub": "Fornece consumíveis para procedimentos · não medicamentos",
+      "fields": {
+        "name": "Nome",
+        "phone": "Telefone",
+        "phoneHint": "10 dígitos"
+      },
+      "save": "Adicionar fornecedor",
+      "added": "Fornecedor {{name}} adicionado",
+      "saved": "Fornecedor salvo",
+      "nameTaken": "Já existe um fornecedor com este nome"
+    },
+    "movement": {
+      "title": {
+        "used": "Registrar uso",
+        "received": "Receber estoque",
+        "adjust": "Ajustar estoque"
+      },
+      "sub": "{{name}} · {{quantity}} agora",
+      "after": "Depois: {{quantity}}",
+      "steps": {
+        "movement": "Movimentação",
+        "details": "Detalhes",
+        "notes": "Notas"
+      },
+      "fields": {
+        "type": "Tipo",
+        "quantity": "Quantidade",
+        "counted": "Quantidade contada",
+        "decimals": "decimais permitidos",
+        "measureIn": "Medir em",
+        "measureOption": "{{measure}} (1 {{unit}} = {{contents}})",
+        "usedFor": "Usado para",
+        "optional": "opcional",
+        "remark": "Observação",
+        "remarkPlaceholder": "Paciente, lote ou motivo"
+      },
+      "save": "Salvar movimentação",
+      "summary": "{{name}} · {{change}}",
+      "enterQuantity": "Informe uma quantidade",
+      "onlyInStock": "Apenas {{quantity}} em estoque",
+      "saved": "{{type}} salvo · restam {{quantity}}",
+      "notEnoughStock": "Já não há tanto em estoque — alguém usou parte desde então. Confira a quantidade e tente de novo."
+    },
+    "use": {
+      "label": "Usar {{name}}",
+      "inStock": "Em estoque · {{quantity}}",
+      "measureIn": "Medir em",
+      "conversion": "1 {{unit}} = {{contents}}",
+      "quantity": "Quantidade",
+      "less": "Menos",
+      "more": "Mais",
+      "usedFor": "Usado para",
+      "after": "Depois · {{quantity}}",
+      "moreDetails": "Mais detalhes",
+      "save": "Usar {{quantity}}",
+      "used": "{{quantity}} de {{name}} usado · restam {{left}}",
+      "outOfStock": "{{name}} está esgotado"
+    },
+    "purchase": {
+      "title": {
+        "create": "Nova compra",
+        "edit": "Editar compra"
+      },
+      "sub": "Os itens recebidos entram no estoque",
+      "reorder": "Repor itens baixos",
+      "noSupplier": "Sem fornecedor",
+      "bill": "Nota {{amount}}",
+      "due": "{{amount}} pendente",
+      "paid": "Pago",
+      "steps": {
+        "bill": "Nota",
+        "items": "Itens recebidos",
+        "payment": "Pagamento"
+      },
+      "fields": {
+        "vendor": "Fornecedor",
+        "billNo": "Nº da nota",
+        "date": "Data da nota",
+        "items": "Itens recebidos",
+        "item": "Item",
+        "qty": "Qtd.",
+        "rate": "Preço",
+        "amount": "Valor",
+        "addItem": "Adicionar item",
+        "total": "Total",
+        "billAmount": "Valor da nota",
+        "paid": "Pago",
+        "full": "Integral",
+        "nothing": "Nada",
+        "enterRate": "Informe o preço",
+        "peek_one": "{{count}} item · {{amount}}",
+        "peek_many": "{{count}} de itens · {{amount}}",
+        "peek_other": "{{count}} itens · {{amount}}",
+        "quickLine": "Digite item e quantidade · ex.: gloves 10 @250",
+        "quickHint": "10 = quantidade · @250 = preço",
+        "lowStockChip": "{{name}} · restam {{quantity}}",
+        "mode": "Forma",
+        "branch": "Pago por",
+        "paidSoFar": "{{amount}} pago · {{status}}",
+        "moreThanBill": "O valor pago é maior que a conta",
+        "dayClosed": "O dia desta unidade está fechado — hoje não é possível pagar por ela",
+        "addLine": "Adicione pelo menos um item",
+        "tooManyLines": "Uma compra aceita até {{max}} itens"
+      },
+      "save": "Criar compra",
+      "pickSupplier": "Escolha um fornecedor",
+      "saved": "Compra salva",
+      "savedStock": "Compra salva · estoque atualizado"
+    },
+    "check": {
+      "title": "Contagem de estoque",
+      "sub": "Digite o que está na prateleira. Só os itens diferentes são salvos, cada um como um ajuste.",
+      "counted": "{{counted}} de {{total}} contados",
+      "allItems": "Todos os itens",
+      "fillRest": "Preencher o resto como igual",
+      "heads": {
+        "item": "Item",
+        "inSystem": "No sistema",
+        "counted": "Contado",
+        "difference": "Diferença"
+      },
+      "inSystem": "No sistema · {{quantity}}",
+      "countedLabel": "{{name}} contado",
+      "same": "Igual ao sistema",
+      "measured": "= {{quantity}}",
+      "notCounted": "Não contado",
+      "matches": "Confere",
+      "willChange_one": "{{count}} item vai mudar",
+      "willChange_many": "{{count}} de itens vão mudar",
+      "willChange_other": "{{count}} itens vão mudar",
+      "nothing": "Nada muda ainda",
+      "save": "Salvar contagem",
+      "failed": "Não salvo · suas contagens foram mantidas",
+      "saved_one": "Contagem salva · {{count}} item atualizado",
+      "saved_many": "Contagem salva · {{count}} de itens atualizados",
+      "saved_other": "Contagem salva · {{count}} itens atualizados",
+      "empty": "Ainda não há itens para contar"
+    },
+    "confirm": {
+      "deleteItem": "Excluir este item?",
+      "deletePurchase": "Excluir esta compra?",
+      "deleteVendor": "Excluir este fornecedor da clínica?",
+      "removed": "{{name}} removido",
+      "deleted": "{{name}} excluído",
+      "purchaseDeleted": "Compra #{{seq}} excluída",
+      "revert": {
+        "title": "Reverter esta movimentação?",
+        "record": "{{type}} de {{quantity}} {{name}}",
+        "body": "O estoque volta ao que era antes deste registro. Os dois registros ficam no histórico.",
+        "action": "Reverter",
+        "reasons": {
+          "mistake": "Registrado por engano",
+          "wrongItem": "Item errado",
+          "wrongQty": "Quantidade errada"
+        },
+        "done": "{{type}} revertido · {{name}} volta a {{quantity}}",
+        "note": "Reverte {{type}} de {{when}} · {{reason}}",
+        "blocked": {
+          "alreadyReverted": "Este movimento já foi revertido",
+          "notEnoughStock": "Não há estoque suficiente para reverter este registro"
+        }
+      },
+      "blocked": {
+        "itemHasStock": "Só é possível excluir um item sem estoque — ajuste-o para 0 primeiro",
+        "purchasePaid": "Não é possível excluir uma compra com pagamento registrado",
+        "vendorHasDues": "Quite primeiro as compras deste fornecedor",
+        "stockUsed": "Parte do que esta compra recebeu já foi usada — não é possível desfazer"
+      }
+    }
+  }
+}

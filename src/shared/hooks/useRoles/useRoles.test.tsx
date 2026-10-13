@@ -112,11 +112,11 @@ describe('useRoles', () => {
 
 describe('useRolePermissions', () => {
   it("fetches a role's permission codes when a roleId is given", async () => {
-    getRolePermissions.mockResolvedValue(['membership:read', 'membership:manage']);
+    getRolePermissions.mockResolvedValue(['membership:read', 'membership:update']);
     const { result } = renderHook(() => useRolePermissions('rol_1'), { wrapper });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(getRolePermissions).toHaveBeenCalledWith('rol_1');
-    expect(result.current.data).toEqual(['membership:read', 'membership:manage']);
+    expect(result.current.data).toEqual(['membership:read', 'membership:update']);
   });
 
   it('stays disabled (never fetches) while the roleId is undefined', () => {
@@ -158,7 +158,7 @@ describe('useDeleteRole', () => {
     deleteRole.mockRejectedValue(new Error('nope'));
     const { result } = renderHook(() => useDeleteRole(), { wrapper });
 
-    result.current.mutate('role_1');
+    result.current.mutate({ roleId: 'role_1', reason: 'not_needed' });
 
     await waitFor(() => expect(result.current.isError).toBe(true));
     expect(ids(client)).toEqual(['role_1', 'role_2']);

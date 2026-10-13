@@ -1,36 +1,19 @@
-import { lazy, Suspense } from 'react';
+import { Outlet } from '@tanstack/react-router';
 
-import { onceAsync } from '@/lib/lazy-module.ts';
+import { PublicFrame } from '@/shared/components/PublicFrame/index.ts';
+import { ThemeModeToggle } from '@/shared/components/ThemeModeToggle/index.ts';
 import { WorkspaceSwitchOverlay } from '@/shared/components/WorkspaceSwitchOverlay/index.ts';
-import { LayoutVariantFallback } from '@/shared/layouts/LayoutVariantFallback/index.ts';
-import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
-
-// Each variant is fetched on first render (or preload) and shared from then on.
-// A module-scope `import()` would instead fetch all three the moment this
-// module evaluates, which defeats the split.
-const loadCentered = onceAsync(() => import('./variants/PublicLayoutCentered.tsx'));
-const loadCard = onceAsync(() => import('./variants/PublicLayoutCard.tsx'));
-const loadBrand = onceAsync(() => import('./variants/PublicLayoutBrand.tsx'));
-
-const CenteredPublic = lazy(() =>
-  loadCentered().then((m) => ({ default: m.CenteredPublic })),
-);
-const CardPublic = lazy(() => loadCard().then((m) => ({ default: m.CardPublic })));
-const BrandPublic = lazy(() => loadBrand().then((m) => ({ default: m.BrandPublic })));
-
-const PUBLIC_SHELLS = [CenteredPublic, CardPublic, BrandPublic] as const;
 
 /**
- * Minimal centered chrome for public, non-app routes — `/callback`, `/unauthorized`,
- * `/onboarding`, `/accept-invite/$id`, and the 404. Three TEMP preview shells
- * (centered, card, brand) lazy-load via `publicVariant` (Shuffle cycles).
+ * Chrome for public, non-app routes — `/callback`, `/unauthorized`,
+ * `/onboarding` and `/accept-invite/$id` — the launch's signed-out canvas
+ * (L-65): the same frame as sign-in — the logo where the clinic header draws
+ * it, the theme toggle at the end — around the routed page, which brings its
+ * own card or empty state.
  */
 export function PublicLayout() {
-  const variant = useThemeStore((s) => s.publicVariant);
-  const Shell = PUBLIC_SHELLS[variant] ?? CenteredPublic;
-
   return (
-    <Suspense fallback={<LayoutVariantFallback />}>
+    <>
       {/*
         The workspace-switch cover, mounted HERE as well as in `AppLayout`.
         Finishing onboarding activates a workspace and then hands the user over
@@ -46,15 +29,13 @@ export function PublicLayout() {
         a switch is in flight, so the two mounts never collide.
       */}
       <WorkspaceSwitchOverlay />
-      <Shell />
-    </Suspense>
+      <PublicFrame
+        testId="public-layout"
+        mainId="public-main-content"
+        controls={<ThemeModeToggle surface="frame" />}
+      >
+        <Outlet />
+      </PublicFrame>
+    </>
   );
 }
-
-/** Warms every variant chunk so tests can render any shell without a Suspense race. */
-const preloadPublicLayoutVariants = () =>
-  Promise.all([loadCentered(), loadCard(), loadBrand()]);
-
-/* eslint-disable react-refresh/only-export-components -- test-facing preload hook */
-export { preloadPublicLayoutVariants };
-/* eslint-enable react-refresh/only-export-components */

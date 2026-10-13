@@ -1,68 +1,14 @@
 {
-  "brand": {
-    "name": "{{productName}}"
-  },
   "a11y": {
-    "skipToMain": "跳至主要内容",
-    "mainNavigation": "主导航",
-    "sidebarNavigation": "侧边栏导航",
-    "mobileNavigation": "移动端导航"
-  },
-  "auth": {
-    "switchToRegister": "创建账户",
-    "switchToSignIn": "登录",
-    "statusOperational": "所有系统运行正常",
-    "badge": "运营，一体化",
-    "heroTitle": "您组织的操作系统。",
-    "heroSubtitle": "成员、角色、账单与安全 —— 为每个团队提供快速、键盘优先的工作空间。",
-    "features": {
-      "multiOrg": {
-        "title": "原生多组织",
-        "body": "切换团队，无需切换工具。"
-      },
-      "secure": {
-        "title": "默认安全",
-        "body": "RBAC、MFA、通行密钥与审计追踪。"
-      },
-      "fast": {
-        "title": "处处快速",
-        "body": "为键盘优先的实时工作而构建。"
-      }
-    },
-    "stats": {
-      "teams": "团队",
-      "uptime": "可用性",
-      "compliant": "合规"
-    }
+    "skipToMain": "跳至主要内容"
   },
   "app": {
     "search": "搜索",
     "searchShortcutMac": "⌘K",
     "searchShortcutWindows": "Ctrl+K",
-    "searchPlaceholder": "搜索...",
-    "userMenu": "用户菜单",
     "userFallback": "用户",
     "settings": "设置",
     "logOut": "退出登录",
-    "toggleSidebar": "切换侧边栏",
-    "footerCopyright": "© {{year}} {{productName}} Platform",
-    "nav": {
-      "dashboard": "控制台"
-    },
-    "sidebar": {
-      "workspace": "工作区",
-      "menu": "菜单",
-      "shortcuts": "快捷方式"
-    },
-    "contextStrip": {
-      "label": "快速访问",
-      "labelSolo": "前往",
-      "profile": "个人资料",
-      "security": "安全",
-      "billing": "账单",
-      "appearance": "外观",
-      "shortcuts": "快捷键"
-    },
     "workspaceSwitch": {
       "preparing": "正在准备您的工作区",
       "loadingAccess": "正在加载成员和权限",
@@ -74,7 +20,10 @@
       "personal": "个人",
       "yourOrganizations": "您的组织",
       "organizations": "组织",
-      "addOrganization": "添加组织"
+      "addOrganization": "添加组织",
+      "invited": "邀请",
+      "invitedRow": "已邀请 · {{roles}}",
+      "invitationCount": "邀请：{{count}}"
     },
     "notifications": {
       "title": "通知",
@@ -90,17 +39,15 @@
       "settingsLink": "通知设置"
     },
     "commandPalette": {
-      "ariaLabel": "命令面板",
-      "placeholder": "输入命令或搜索…",
+      "ariaLabel": "命令菜单",
+      "placeholder": "搜索或跳转…",
       "empty": "未找到结果。",
       "groups": {
-        "navigation": "导航",
         "theme": "主题",
         "account": "账户",
         "organizations": "组织",
         "shortcuts": "快捷键"
       },
-      "dashboard": "控制台",
       "userSettings": "用户设置",
       "organizationSettings": "组织设置",
       "lightMode": "浅色模式",
@@ -134,6 +81,10 @@
       "commandPalette": "打开命令面板",
       "showShortcuts": "显示键盘快捷键",
       "showShortcutsAlt": "显示快捷键（备用）",
+      "allSections": "打开或关闭所有版块",
+      "jumpToSection": "跳转到版块",
+      "listSearch": "搜索列表",
+      "leadRows": "下一个或上一个潜在客户（在潜在客户中）",
       "closeDialog": "关闭对话框"
     },
     "orgCreate": {
@@ -143,16 +94,64 @@
       "nameLabel": "组织名称",
       "slugLabel": "工作区 URL（可选）",
       "submit": "新建组织",
-      "submitting": "正在创建…"
+      "submitting": "正在创建…",
+      "cancel": "取消"
     },
     "theme": {
       "light": "浅色",
       "dark": "深色",
-      "system": "跟随系统",
-      "shuffle": "随机主题"
+      "system": "跟随系统"
+    },
+    "sectionBar": {
+      "nav": "版块",
+      "allSections": "所有版块",
+      "allSectionsTitle": "所有版块 (G)",
+      "more": "更多",
+      "morePinned": "更多已固定版块",
+      "tabTitle": "{{section}} · {{description}}",
+      "searchLabel": "搜索或跳转 (Command K)",
+      "searchTitleMac": "搜索或跳转… (⌘K)",
+      "searchTitleWindows": "搜索或跳转… (Ctrl K)",
+      "searchPlaceholder": "搜索患者、线索…",
+      "pin": "固定到栏",
+      "unpin": "从栏取消固定",
+      "pinAria": "固定到栏 · {{section}}",
+      "unpinAria": "从栏取消固定 · {{section}}",
+      "pinFooter": "固定后保留在栏中",
+      "keysHint": "G · 1–9",
+      "account": "账户",
+      "avatarLabel": "{{name}} · {{status}}",
+      "identityRole": "{{role}} · {{branch}}",
+      "status": "状态",
+      "presence": {
+        "online": "在线",
+        "away": "离开",
+        "busy": "忙碌"
+      },
+      "statusToast": "状态 · {{status}}",
+      "switchClinic": "切换诊所",
+      "security": "安全",
+      "billing": "账单",
+      "devices": "设备",
+      "appearance": "外观",
+      "appearanceLanguage": "外观与语言",
+      "viewAs": {
+        "previewing": "正在以{{role}}身份预览",
+        "noSections": "没有版块",
+        "exit": "退出预览",
+        "exitToast": "已恢复你自己的访问权限"
+      },
+      "branch": {
+        "label": "分院 · {{label}}",
+        "title": "分院 · {{names}}",
+        "all": "所有分院",
+        "allSub": "合并视图 · {{count}} 家分院合计",
+        "viewGroup": "视图",
+        "branchesGroup": "分院",
+        "showingAll": "正在显示所有分院",
+        "showing": "正在显示 {{names}}",
+        "keepOne": "至少保留一个分院"
+      }
     }
-  },
-  "public": {
-    "brandTagline": "团队安全工作空间"
   }
 }

@@ -37,7 +37,7 @@ export function useRequirePermission(permission: OrganizationPermission): void {
  * @returns `true` if the user holds the permission in the active organization.
  *
  * @example
- * const canManage = useHasPermission('membership:manage');
+ * const canManage = useHasPermission('membership:update');
  * {canManage && <InviteButton />}
  */
 export function useHasPermission(permission: OrganizationPermission): boolean {

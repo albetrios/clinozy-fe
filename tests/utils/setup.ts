@@ -1,15 +1,43 @@
 import '@testing-library/jest-dom/vitest';
 import '@/lib/i18n/i18n.ts';
 
-import { beforeAll, beforeEach, expect } from 'vitest';
+import { configure } from '@testing-library/react';
+import { beforeAll, beforeEach, expect, vi } from 'vitest';
 import * as matchers from 'vitest-axe/matchers';
 
 import { ensureLocale } from '@/lib/i18n/load-namespace.ts';
+import type { AppPreferences } from '@/shared/api/app/preferences-api.ts';
+
+import { resetPreferencesDouble } from './app-shell-doubles.ts';
 
 expect.extend(matchers);
 
+// How long `findBy*` / `waitFor` wait before failing. Testing Library's 1s default is tight for a
+// route island's first, cold lazy load when the whole suite runs four workers beside a build (the
+// pre-push run): first opens took 1.5–1.6s there — Day close's gate, the booking drawer's slot
+// pick — and passed 3 of 3 alone. A real failure still fails; it takes up to 5s to say so.
+configure({ asyncUtilTimeout: 5000 });
+
 beforeAll(async () => {
   await ensureLocale('en');
+});
+
+// The clinic shell's server reads — the member's branches and preferences — as doubles, so no
+// component test reaches for HTTP (app-shell-doubles.ts). Each test starts on the defaults.
+vi.mock('@/shared/api/app/preferences-api.ts', async (importOriginal) => {
+  const actual = await importOriginal<{
+    DEFAULT_APP_PREFERENCES: AppPreferences;
+  }>();
+  const { preferencesDouble } = await import('./app-shell-doubles.ts');
+  return { ...actual, ...preferencesDouble(actual.DEFAULT_APP_PREFERENCES) };
+});
+vi.mock('@/shared/api/app/branches-api.ts', async (importOriginal) => {
+  const actual = await importOriginal<object>();
+  const { fixtureActiveBranches } = await import('./app-shell-doubles.ts');
+  return { ...actual, fetchActiveBranches: fixtureActiveBranches };
+});
+beforeEach(() => {
+  resetPreferencesDouble();
 });
 
 // jsdom >= 30.1 parks the focus pointer on the Document when the focused node is
@@ -52,7 +80,7 @@ class ResizeObserverStub {
 }
 globalThis.ResizeObserver ??= ResizeObserverStub as unknown as typeof ResizeObserver;
 
-// jsdom does not implement IntersectionObserver — required by embla-carousel
+// jsdom does not implement IntersectionObserver — required by the load-more sentinel
 class IntersectionObserverStub {
   observe(): void {}
   unobserve(): void {}

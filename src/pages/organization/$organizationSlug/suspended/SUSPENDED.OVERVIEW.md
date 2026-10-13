@@ -5,7 +5,7 @@ Route: `/organization/$organizationSlug/suspended`. Blocked state rendered when
 Offers switching organization via the picker.
 
 Guarded by `requireSuspendedOrgStatus`, the inverse of the guard that sends users
-here: an organization that is **not** suspended is redirected to its dashboard
+here: an organization that is **not** suspended is redirected to its home
 rather than shown this page. The route stays outside `requireOrgStatus` so a
 suspended organization can render without looping, and the inverse guard keeps
 that exemption from meaning "unguarded in both directions".

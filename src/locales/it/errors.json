@@ -13,8 +13,11 @@
     "goHome": "Vai alla home",
     "refresh": "Aggiorna pagina",
     "forbidden": "Non hai i permessi per accedere a questa pagina.",
+    "forbiddenTitle": "Nessun accesso a questa pagina",
     "signOut": "Esci",
-    "signingOut": "Disconnessione…"
+    "signingOut": "Disconnessione…",
+    "pageNotFound": "Pagina non trovata",
+    "recordNotFound": "{{record}} non trovato · potrebbe essere stato eliminato"
   },
   "widget": {
     "unavailable": "{{title}} non disponibile",
@@ -25,19 +28,12 @@
     "pageContent": "Contenuto della pagina",
     "navigation": "Navigazione",
     "emailBanner": "Verifica e-mail",
-    "notifications": "Notifiche",
     "organizationSwitcher": "Selettore organizzazione",
     "commandPalette": "Palette dei comandi",
     "settings": "Impostazioni",
     "appearance": "Aspetto",
-    "analytics": "Analisi",
-    "members": "Membri",
-    "schedule": "Programma",
-    "highlights": "In evidenza",
-    "themeShowcase": "Vetrina dei temi",
     "sessionTimeout": "Timer della sessione",
     "securityCheck": "Verifica di sicurezza",
-    "appearanceControls": "Controlli aspetto",
     "payment": "Pagamento",
     "cancellation": "Annullamento"
   },
@@ -45,17 +41,7 @@
     "dismiss": "Chiudi notifica",
     "undo": "Annulla",
     "undone": "Azione annullata",
-    "processing": "Elaborazione…",
-    "preview": {
-      "successTitle": "Modifiche salvate",
-      "successDescription": "Le tue impostazioni sono attive.",
-      "errorTitle": "Qualcosa è andato storto",
-      "errorDescription": "Riprova.",
-      "warningTitle": "Attenzione",
-      "warningDescription": "Questa azione richiede una revisione.",
-      "infoTitle": "Lo sapevi?",
-      "infoDescription": "Anche mescolare cambia questo design."
-    }
+    "processing": "Elaborazione…"
   },
   "api": {
     "fallback": "Qualcosa è andato storto. Riprova.",
@@ -69,7 +55,21 @@
     "http429": "Troppe richieste. Attendi un momento e riprova.",
     "http500": "Si è verificato un errore interno del server. Riprova più tardi.",
     "http502": "Il server è temporaneamente non disponibile. Riprova più tardi.",
-    "http503": "Il servizio è temporaneamente non disponibile. Riprova più tardi."
+    "http503": "Il servizio è temporaneamente non disponibile. Riprova più tardi.",
+    "reload": "Ricarica",
+    "recordChanged": "Qualcun altro l’ha salvato nel frattempo. Ricarica per vedere le sue modifiche, poi rifai le tue.",
+    "reasons": {
+      "missingPermission": "Non hai il permesso di farlo. Chiedi al titolare della clinica o a un amministratore.",
+      "ownerMembershipFixed": "Non è possibile modificare i ruoli e lo stato del titolare della clinica. Trasferisci prima la proprietà.",
+      "ownerCannotLeave": "Il titolare della clinica non può uscire. Trasferisci prima la proprietà.",
+      "ownerRoleFixed": "Non è possibile modificare l'accesso del ruolo del titolare della clinica.",
+      "systemRoleFixed": "Un ruolo predefinito non può essere rinominato né eliminato.",
+      "roleLocked": "L'accesso di questo ruolo è fisso e non può essere modificato.",
+      "seatLimitReached": "Il tuo piano non ha posti liberi. Aggiungi un posto in Impostazioni › Fatturazione, poi invita di nuovo.",
+      "membershipAlreadyExists": "Questa persona è già nella clinica.",
+      "organizationSlugExists": "Questo URL dello spazio è già in uso. Scegline un altro.",
+      "disposableEmail": "Usa un indirizzo email permanente: quelli usa e getta non sono accettati."
+    }
   },
   "frontend": {
     "query": {
@@ -91,12 +91,7 @@
     },
     "account": {
       "copyFailed": "Impossibile copiare negli appunti",
-      "themeCodeNumeric": "Inserisci un codice tema numerico",
       "copySuccess": "ID account copiato",
-      "themeLinkCopied": "Link del tema copiato",
-      "themeLinkCopiedDescription": "Condividi questo URL per riprodurre l'aspetto.",
-      "notificationStylePreview": "Stile notifica",
-      "notificationStylePreviewDescription": "{{variant}} — temizzato con il tuo accento e i colori semantici.",
       "accountDeletionPending": "Account eliminato. Disconnessione…",
       "avatarInvalidType": "Scegli un file immagine.",
       "avatarTooLarge": "L'avatar deve essere inferiore a 2 MB.",
@@ -122,7 +117,8 @@
         "updateRoleSuccess": "Ruolo del membro aggiornato",
         "removeSuccess": "Membro rimosso",
         "suspendSuccess": "Membro sospeso",
-        "reactivateSuccess": "Membro riattivato"
+        "reactivateSuccess": "Membro riattivato",
+        "updateSuccess": "Membro salvato"
       },
       "roles": {
         "createFailed": "Impossibile creare il ruolo",

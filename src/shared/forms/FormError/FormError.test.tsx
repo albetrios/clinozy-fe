@@ -27,4 +27,26 @@ describe('FormError', () => {
     const results = await axe(container);
     expect(results).toHaveNoViolations();
   });
+
+  it("is the design's danger soft line — flat, never a lifted card", () => {
+    render(<FormError message="Invalid code" data-testid="banner" />);
+    const banner = screen.getByTestId('banner');
+    expect(banner).toHaveClass(
+      'bg-destructive-tint',
+      'text-destructive',
+      'border-destructive-border',
+      'rounded-lg',
+      'text-body',
+    );
+    expect(banner).not.toHaveAttribute('data-slot');
+  });
+
+  it('carries an inline action after the message', () => {
+    render(
+      <FormError message="Couldn’t save" action={<button type="button">Retry</button>} />,
+    );
+    expect(screen.getByRole('alert')).toContainElement(
+      screen.getByRole('button', { name: 'Retry' }),
+    );
+  });
 });

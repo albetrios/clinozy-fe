@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 import { APP_TITLE } from '@/lib/routes/page-head.ts';
 import {
   authenticateViaEmailCodeAndLand,
-  registerNewUserAndGoToDashboard,
+  registerNewUserAndGoToToday,
 } from '@/tests/utils/e2e-auth.ts';
 import {
   clickTestId,
@@ -58,7 +58,10 @@ test.describe('Live routes integration', () => {
     test('unauthorized page renders without auth', async ({ page }) => {
       await gotoApp(page, '/unauthorized');
       await expect(page.getByTestId('unauthorized-page')).toBeVisible({ timeout: 15000 });
-      await expect(page.getByRole('heading', { name: /^403$/ })).toBeVisible();
+      // The status is a pill inside the page's one h1, before its title (L-65a).
+      await expect(
+        page.getByRole('heading', { level: 1, name: /^403\s*No access to this page$/ }),
+      ).toBeVisible();
     });
 
     test('the document title is composed from the route manifest', async ({ page }) => {
@@ -76,7 +79,13 @@ test.describe('Live routes integration', () => {
   });
 
   test.describe('auth guards', () => {
-    const protectedPaths = ['/', '/dashboard', '/onboarding', '/organization'] as const;
+    const protectedPaths = [
+      '/',
+      '/dashboard',
+      '/onboarding',
+      '/organization',
+      '/organization/acme/today',
+    ] as const;
 
     for (const path of protectedPaths) {
       test(`${path} redirects unauthenticated visitors to login`, async ({ page }) => {
@@ -100,37 +109,38 @@ test.describe('Live routes integration', () => {
       );
     });
 
-    test('email-code sign-in lands on dashboard with app shell', async ({ page }) => {
-      await registerNewUserAndGoToDashboard(page);
+    test('email-code sign-in lands on Today with the app shell', async ({ page }) => {
+      await registerNewUserAndGoToToday(page);
       await expectAppHeaderReady(page);
       await expect(page.getByTestId('app-layout')).toBeVisible();
+      await expect(page.getByTestId('today-page')).toBeVisible();
     });
 
-    test('root resolver and personal dashboard route both serve the dashboard shell', async ({
+    test('the root resolver and the retired /dashboard both land on the role home', async ({
       page,
     }) => {
-      await registerNewUserAndGoToDashboard(page);
+      await registerNewUserAndGoToToday(page);
 
       await navigateAuthenticated(page, '/');
-      await expect(page.getByTestId('dashboard-page')).toBeVisible({ timeout: 10000 });
+      await expect(page).toHaveURL(/\/organization\/[^/]+\/today/, { timeout: 10000 });
+      await expect(page.getByTestId('today-page')).toBeVisible({ timeout: 10000 });
 
       await navigateAuthenticated(page, '/dashboard');
-      await expect(page.getByTestId('dashboard-page')).toBeVisible();
+      await expect(page).toHaveURL(/\/organization\/[^/]+\/today/, { timeout: 10000 });
+      await expect(page.getByTestId('today-page')).toBeVisible();
     });
 
-    test('organization picker redirects personal workspace users to dashboard', async ({
-      page,
-    }) => {
-      await registerNewUserAndGoToDashboard(page);
+    test('the organization picker opens for a provisioned member', async ({ page }) => {
+      await registerNewUserAndGoToToday(page);
       await navigateAuthenticated(page, '/organization');
-      await expect(page).toHaveURL(/\/dashboard/, { timeout: 10000 });
-      await expect(page.getByTestId('dashboard-page')).toBeVisible();
+      await expect(page).toHaveURL(/\/organization(?:[?#]|$)/, { timeout: 10000 });
+      await expect(page.getByTestId('organization-page')).toBeVisible();
     });
 
-    test('settings hash modal opens over org dashboard and closes with Escape', async ({
+    test('settings hash modal opens over Today and closes with Escape', async ({
       page,
     }) => {
-      await registerNewUserAndGoToDashboard(page);
+      await registerNewUserAndGoToToday(page);
       await openSettingsHash(page, 'account', 'profile');
 
       await expect(page.getByTestId('settings-modal')).toBeVisible();
@@ -140,27 +150,27 @@ test.describe('Live routes integration', () => {
     });
 
     test('onboarding is skipped once the user is provisioned', async ({ page }) => {
-      await registerNewUserAndGoToDashboard(page);
+      await registerNewUserAndGoToToday(page);
       await navigateAuthenticated(page, '/onboarding');
       await expect(page).not.toHaveURL(/\/onboarding/, { timeout: 10000 });
-      await expect(page.getByTestId('dashboard-page')).toBeVisible();
+      await expect(page.getByTestId('today-page')).toBeVisible();
     });
 
     test('404 while authenticated still renders not-found', async ({ page }) => {
-      await registerNewUserAndGoToDashboard(page);
+      await registerNewUserAndGoToToday(page);
       await navigateAuthenticated(page, '/authenticated-missing-route');
       await expect(page.getByTestId('not-found-page')).toBeVisible({ timeout: 5000 });
     });
 
-    test('API session hydrate via refresh cookie resolves `/` to dashboard', async ({
+    test('API session hydrate via refresh cookie resolves `/` to Today', async ({
       page,
     }) => {
       await authenticateViaEmailCodeAndLand(page);
-      await expect(page.getByTestId('dashboard-page')).toBeVisible();
+      await expect(page.getByTestId('today-page')).toBeVisible();
     });
 
     test('logout returns to login', async ({ page }) => {
-      await registerNewUserAndGoToDashboard(page);
+      await registerNewUserAndGoToToday(page);
       await page.getByTestId('user-menu-trigger').click();
       await clickTestId(page, 'logout-button');
       await expect(page).toHaveURL(/\/login/, { timeout: 10000 });
@@ -170,14 +180,14 @@ test.describe('Live routes integration', () => {
     test('after logout the session is torn down and protected routes re-guard', async ({
       page,
     }) => {
-      await registerNewUserAndGoToDashboard(page);
+      await registerNewUserAndGoToToday(page);
       await page.getByTestId('user-menu-trigger').click();
       await clickTestId(page, 'logout-button');
       await expect(page).toHaveURL(/\/login/, { timeout: 10000 });
 
       // A full reload proves the session is truly gone (in-memory token cleared
       // and the refresh cookie revoked) — the guard sends us back to login.
-      await gotoApp(page, '/dashboard');
+      await gotoApp(page, '/');
       await expect(page).toHaveURL(/\/login/, { timeout: 10000 });
       await expectLoginFormReady(page);
     });

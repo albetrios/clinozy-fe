@@ -1,63 +1,88 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
+import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
+import type { ReactNode } from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
+import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
 
 import { CommandPaletteShell } from './CommandPaletteShell.tsx';
+
+// Radix turns pointer events off outside the top-most modal layer.
+const user = () => userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
+
+/** The dim behind the menu (a Radix overlay, portaled beside the dialog). */
+function overlay(): HTMLElement {
+  const node = document.querySelector('[data-slot="dialog-overlay"]');
+  if (!(node instanceof HTMLElement)) throw new Error('no command menu overlay');
+  return node;
+}
+
+/** Open the store, render the shell around `children` and wait for the dialog. */
+async function renderShell(children: ReactNode) {
+  useUIStore.setState({ commandPaletteOpen: true });
+  const view = render(<CommandPaletteShell>{children}</CommandPaletteShell>);
+  // Also lets Radix arm its outside-press listener (a tick after mount).
+  const dialog = await screen.findByRole('dialog', { name: 'Command menu' });
+  return { ...view, dialog };
+}
 
 describe('CommandPaletteShell', () => {
   afterEach(() => act(() => useUIStore.setState({ commandPaletteOpen: false })));
 
-  it('retains dialog geometry and dismisses even when content has no keyboard handler', () => {
-    useUIStore.setState({ commandPaletteOpen: true });
-    render(
-      <CommandPaletteShell>
-        <span>Content unavailable</span>
-      </CommandPaletteShell>,
-    );
-    expect(screen.getByRole('dialog', { name: 'Command palette' })).toHaveAttribute(
-      'aria-modal',
-      'true',
-    );
-    expect(screen.getByText('Content unavailable').parentElement).toHaveAttribute(
-      'data-slot',
-      'popover-content',
-    );
-    fireEvent.keyDown(document, { key: 'Escape' });
+  it('is a modal "Command menu" dialog that Esc closes even when the content has no keyboard handler', async () => {
+    const { dialog } = await renderShell(<span>Content unavailable</span>);
+
+    expect(dialog).toHaveAttribute('aria-modal', 'true');
+    // The dialog slot carries the command menu's elevation and the theme axes.
+    expect(dialog).toHaveAttribute('data-slot', 'dialog-content');
+    expect(screen.getByText('Content unavailable').parentElement).toBe(dialog);
+
+    await user().keyboard('{Escape}');
     expect(useUIStore.getState().commandPaletteOpen).toBe(false);
   });
 
-  it('keeps a gutter on phones and grows on big monitors', () => {
-    // Regression: `w-full` under `max-w-lg` ran edge to edge on any screen
-    // narrower than 32rem — the palette touched both sides of a phone.
-    useUIStore.setState({ commandPaletteOpen: true });
-    render(
-      <CommandPaletteShell>
-        <span>Content</span>
-      </CommandPaletteShell>,
-    );
+  it('sits 12vh from the top, min(640px, 100% − 32px) wide and at most min(560px, 76vh) tall', async () => {
+    // The design's frame (H:2669–2671): a 16px gutter at every width (358px at
+    // 390) — the old `w-full` under `max-w-lg` touched both sides of a phone.
+    const { dialog } = await renderShell(<span>Content</span>);
 
-    const frame = screen.getByText('Content').parentElement?.parentElement;
-    expect(frame).toHaveClass('w-[calc(100%-1.5rem)]', 'max-w-lg', '3xl:max-w-xl');
-    expect(frame).not.toHaveClass('w-full');
+    expect(dialog).toHaveClass(
+      'w-full',
+      'max-w-160',
+      'max-h-[min(35rem,76vh)]',
+      'rounded-xl',
+      'animate-dropdown-in',
+    );
+    expect(dialog.parentElement).toHaveClass('px-4', 'pt-[12vh]', 'items-start');
   });
 
-  it('cycles reverse Tab inside the shell while content changes', () => {
-    useUIStore.setState({ commandPaletteOpen: true });
-    render(
-      <CommandPaletteShell>
+  it('dims the page under the menu and closes on a press outside', async () => {
+    await renderShell(<span>Content</span>);
+
+    expect(overlay()).toHaveClass('bg-overlay/35', 'animate-fade');
+    await user().click(overlay());
+
+    await waitFor(() => expect(useUIStore.getState().commandPaletteOpen).toBe(false));
+  });
+
+  it('keeps Tab inside the menu, both ways', async () => {
+    await renderShell(
+      <>
         <input aria-label="Search" />
         <button type="button">Retry</button>
-      </CommandPaletteShell>,
+      </>,
     );
-    screen.getByRole('textbox').focus();
-    fireEvent.keyDown(document, { key: 'Tab', shiftKey: true });
+    const u = user();
+    expect(screen.getByRole('textbox')).toHaveFocus();
+
+    await u.tab({ shift: true });
     expect(screen.getByRole('button', { name: 'Retry' })).toHaveFocus();
-    fireEvent.keyDown(document, { key: 'Tab' });
+    await u.tab();
     expect(screen.getByRole('textbox')).toHaveFocus();
   });
 
-  it('recovers forward and reverse Tab from outside the modal', () => {
+  it('pulls focus back inside when something behind the menu takes it', async () => {
     useUIStore.setState({ commandPaletteOpen: true });
     render(
       <>
@@ -68,12 +93,18 @@ describe('CommandPaletteShell', () => {
         </CommandPaletteShell>
       </>,
     );
-    const background = screen.getByRole('button', { name: 'Background' });
-    background.focus();
-    fireEvent.keyDown(document, { key: 'Tab' });
-    expect(screen.getByRole('textbox')).toHaveFocus();
-    background.focus();
-    fireEvent.keyDown(document, { key: 'Tab', shiftKey: true });
-    expect(screen.getByRole('button', { name: 'Retry' })).toHaveFocus();
+    await screen.findByRole('dialog', { name: 'Command menu' });
+    const search = screen.getByRole('textbox');
+    expect(search).toHaveFocus();
+
+    // The page behind is hidden from assistive tech while the menu is up.
+    screen.getByText('Background').focus();
+
+    expect(search).toHaveFocus();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { baseElement } = await renderShell(<input aria-label="Search" />);
+    expect(await axeForDialog(baseElement)).toHaveNoViolations();
   });
 });

@@ -6,6 +6,7 @@
 #   2. Hardcoded focus-visible:ring / focus:ring (data-focus owns focus via data-slot)
 #   3. Direct lucide-react imports (must use @/shared/icons barrel)
 #   4. bg-card / bg-popover class shells with no data-slot within 4 lines above
+#      (a class on a <Button …> is fine: the button brings data-slot="button")
 #   5. Off-scale corner radius — a bare `rounded`, or an arbitrary `rounded-[…]`
 #      that is not a `var(--radius-*)`. Neither is driven by the Corner radius
 #      axis, so the element stays round when the rest of the app goes square.
@@ -14,7 +15,7 @@
 #   6. `rounded-full` the Sharp shape cannot reach — round-by-design is a SHAPE
 #      decision, so the element needs a slot the `[data-shape='sharp']` list in
 #      index.css squares: its own `data-slot=` (usually "pill"), or a primitive
-#      that brings one (<Button>, <Badge>, <Avatar>, <Skeleton>). Indicators are
+#      that brings one (<Button>, <Avatar>, <Skeleton>). Indicators are
 #      exempt — status dots ≤ 10px, blurred glows, the ping halo, and
 #      pseudo-element markers (squared in index.css through their nav item).
 #   7. Fixed-size spacing — a padding / margin / gap written as `p-[24px]` or
@@ -121,28 +122,53 @@ without_nearby() {
   done | filter_allowlist
 }
 
+# Keep the hits whose nearest opening tag above them (within $2 lines, the
+# hit's own line included) is not one of the primitives in $3: a class on a
+# `<Button …>` is vouched for by the button's own `data-slot="button"`, however
+# many props stand between the tag and its className. A tag inside a prop
+# (`icon={<Plus />}`) is the nearest one, so that hit stays — it fails closed.
+outside_primitive() {
+  raw="$1"
+  window="$2"
+  tags="$3"
+  [ -z "$raw" ] && return 0
+  printf '%s\n' "$raw" | while IFS= read -r line; do
+    [ -z "$line" ] && continue
+    file=${line%%:*}
+    rest=${line#*:}
+    linenum=${rest%%:*}
+    start=$((linenum - window))
+    [ "$start" -lt 1 ] && start=1
+    if sed -n "${start},${linenum}p" "$file" | grep -E '<[A-Za-z]' | tail -n 1 \
+      | grep -Eq "<($tags)([[:space:]/>]|\$)"; then
+      continue
+    fi
+    printf '%s\n' "$line"
+  done
+}
+
 SLOT_RAW=$(grep -rEn 'className=.*\bbg-(card|popover)\b' src --include='*.tsx' \
   | grep -v '^src/shared/components/ui/' \
   | grep -v '\.test\.' \
   || true)
 report_hits "bg-card/bg-popover without data-slot (within 4 lines)" \
-  "$(without_nearby "$SLOT_RAW" 4 'data-slot=')"
+  "$(outside_primitive "$(without_nearby "$SLOT_RAW" 4 'data-slot=')" 20 'Button')"
 
 # 6 — `rounded-full` with nothing for the Sharp shape to grab. Dropped before the
 # look-back, because they are indicators and not surfaces: comment lines, blurred
-# glows, the ping halo, pseudo-element markers, and dots of at most 10px
-# (`size-2.5`, `h-2 w-2`). Prettier's Tailwind plugin fixes the class order, so
-# `h-N w-N` is the only spelling a dot can have.
+# glows, the ping halo, pseudo-element markers, and dots of at most 10px — every
+# quarter step up to `size-2.5` (`size-1.75`, `h-2 w-2`). Prettier's Tailwind plugin
+# fixes the class order, so `h-N w-N` is the only spelling a dot can have.
 PILL_RAW=$(grep -rEn 'rounded-full' src --include='*.tsx' --include='*.ts' \
   | grep -v '^src/shared/components/ui/' \
   | grep -v '\.test\.' \
   | grep -v '\.fixtures\.' \
   | grep -Ev ':[0-9]+:[[:space:]]*(//|\*|/\*|\{/\*)' \
   | grep -Ev 'blur-|animate-ping|(before|after):rounded-full' \
-  | grep -Ev "(^|[\"'\` ])(size-(1|1\.5|2|2\.5)|h-(1|1\.5|2|2\.5) w-(1|1\.5|2|2\.5))([^0-9.]|\$)" \
+  | grep -Ev "(^|[\"'\` ])(size-(1|1\.25|1\.5|1\.75|2|2\.25|2\.5)|h-(1|1\.25|1\.5|1\.75|2|2\.25|2\.5) w-(1|1\.25|1\.5|1\.75|2|2\.25|2\.5))([^0-9.]|\$)" \
   || true)
 report_hits "rounded-full the Sharp shape cannot square (add data-slot=\"pill\")" \
-  "$(without_nearby "$PILL_RAW" 5 'data-slot=|<(Button|Badge|Avatar|AvatarFallback|Skeleton|SkeletonShimmer)([[:space:]/>]|$)')"
+  "$(without_nearby "$PILL_RAW" 5 'data-slot=|<(Button|Avatar|AvatarFallback|Skeleton)([[:space:]/>]|$)')"
 
 # 7 — spacing that ignores the Density axis. Only the spacing utilities, and
 # only a bare number + unit: sizes (`h-[640px]`), offsets (`top-[20%]`) and

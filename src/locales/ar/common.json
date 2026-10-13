@@ -98,13 +98,24 @@
     "description": "إصدار جديد من التطبيق جاهز.",
     "refresh": "التحديث الآن"
   },
+  "cells": {
+    "patient": "مريض",
+    "patientMark": "م",
+    "leadMark": "ع",
+    "moreCount": "{{count}} آخرون"
+  },
+  "emptyState": {
+    "fallbackTitle": "لا يوجد شيء هنا بعد",
+    "filteredTitle": "لا توجد نتائج مطابقة",
+    "filteredHint": "لا شيء يطابق هذه الفلاتر. امسحها لرؤية كل شيء مرة أخرى.",
+    "clearFilters": "مسح الفلاتر"
+  },
   "a11y": {
     "close": "إغلاق",
     "loading": "جارٍ التحميل",
     "loadingNamed": "جارٍ تحميل {{name}}…",
     "loadingPage": "جارٍ تحميل الصفحة",
     "toggleTheme": "تبديل السمة",
-    "openAppearance": "فتح المظهر",
     "cookieConsent": "موافقة ملفات تعريف الارتباط",
     "rowsPerPage": "صفوف لكل صفحة",
     "goFirstPage": "الذهاب إلى الصفحة الأولى",
@@ -114,84 +125,161 @@
     "selectAll": "تحديد الكل",
     "copyAccountId": "نسخ معرّف الحساب",
     "onboardingProgress": "تقدّم الإعداد",
-    "themeCode": "رمز السمة",
     "mode": "الوضع"
   },
   "appearance": {
     "themeTitle": "السمة",
     "themeLocked": "تتم إدارة السمة من خلال إعدادات مؤسستك ولا يمكن تغييرها هنا.",
-    "themeDescription": "إعدادات مسبقة للون المميّز — أو انسخ رابطًا / الصق رمز سمة لإعادة إنتاج المظهر نفسه بدقة.",
-    "presetAria": "إعداد مسبق للون المميّز",
-    "copyLink": "نسخ الرابط",
-    "shuffleHint": "استخدم الخلط لتوليد رمز.",
-    "codeLabel": "الرمز: {{seed}}",
-    "codePlaceholder": "الصق رمز السمة",
-    "apply": "تطبيق",
-    "pickAnyColour": "اختر أي لون",
     "modeTitle": "الوضع",
-    "modeDescription": "محفوظ على هذا الجهاز.",
-    "colourTitle": "اللون",
-    "colourDescription": "اللون المميّز والمخططات والأساس المحايد.",
-    "accentColour": "اللون المميّز",
-    "chartColour": "لون المخططات",
-    "baseColour": "اللون الأساسي",
-    "harmony": "التناغم",
-    "harmonyAria": "تناغم الألوان",
-    "accentIntensity": "شدة اللون المميّز",
-    "typeTitle": "الخطوط والأشكال",
-    "typeDescription": "الخطوط ونصف قطر الزوايا وسطح القائمة.",
-    "bodyFont": "خط المتن",
-    "headingFont": "خط العناوين",
-    "radius": "نصف القطر",
-    "shapeLanguage": "لغة الأشكال",
-    "typeScale": "مقياس الخط",
-    "menu": "القائمة",
-    "menuAria": "نمط القائمة",
-    "iconsTitle": "الأيقونات",
-    "iconsDescription": "سماكة الخط واللون ومجموعة الأيقونات.",
-    "iconWeight": "سماكة الأيقونات",
-    "iconColour": "لون الأيقونات",
-    "iconLibrary": "مكتبة الأيقونات",
-    "layoutTitle": "التخطيط",
-    "layoutDescription": "عرض مساحة العمل الرئيسية — القياسي للوحات المعلومات، وعرض القراءة للنصوص المركّزة.",
-    "contentWidth": "عرض المحتوى",
-    "dashboardTitle": "لوحة المعلومات",
-    "dashboardDescription": "كيف تُرتّب لوحة المعلومات أقسامها.",
-    "dashboardArrangement": "الترتيب",
-    "surfaceTitle": "السطح والحركة",
-    "surfaceDescription": "التباعد والعمق والتباين وطريقة الحركة.",
-    "density": "الكثافة",
-    "contrast": "التباين",
-    "elevation": "الارتفاع",
-    "separation": "الفصل",
-    "separationAria": "الفصل بين الأسطح",
-    "motion": "الحركة",
-    "focusRing": "حلقة التركيز",
-    "notificationsTitle": "الإشعارات",
-    "notificationsDescription": "اختر أو اخلط تصميم التنبيه — تستخدم المعاينات رموز السمة الحالية.",
-    "toastDesign": "تصميم التنبيه",
-    "position": "الموضع",
-    "positionAria": "موضع التنبيه",
-    "previewSuccess": "نجاح",
-    "previewError": "خطأ",
-    "previewWarning": "تحذير",
-    "previewInfo": "معلومات",
-    "shuffleSection": "خلط {{section}}",
-    "sectionColour": "اللون",
-    "sectionType": "الخطوط والأشكال",
-    "sectionSurface": "السطح والحركة",
-    "sectionDashboard": "تخطيط لوحة المعلومات",
-    "sectionNotifications": "نمط الإشعارات",
-    "custom": "مخصص",
-    "customWith": "مخصص — {{look}}"
+    "modeDescription": "محفوظ على هذا الجهاز."
   },
   "table": {
-    "searchPlaceholder": "بحث..."
+    "searchPlaceholder": "بحث...",
+    "empty": "لا توجد نتائج.",
+    "sortBy": "الترتيب حسب {{column}}",
+    "actions": "الإجراءات",
+    "moreActions": "إجراءات أخرى",
+    "columns": {
+      "trigger": "إظهار الأعمدة أو إخفاؤها",
+      "title": "الأعمدة · {{shown}} من {{total}} ظاهرة",
+      "showAll": "إظهار كل الأعمدة",
+      "recommendedHides": "المجموعة المقترحة تخفي {{count}}",
+      "tapForRecommended": "انقر مرة أخرى للمجموعة المقترحة",
+      "allShown": "كل الأعمدة ظاهرة ({{count}})",
+      "hiddenCount": "{{count}} مخفية",
+      "search": "البحث في الأعمدة",
+      "shown": "{{shown}} من {{total}} ظاهرة",
+      "viewGroup": "العرض",
+      "columnsGroup": "الأعمدة"
+    },
+    "fold": {
+      "showAll_zero": "لا أعمدة داخل الصفوف · إظهار الكل",
+      "showAll_one": "عمود واحد داخل الصفوف · إظهار الكل",
+      "showAll_two": "عمودان داخل الصفوف · إظهار الكل",
+      "showAll_few": "{{count}} أعمدة داخل الصفوف · إظهار الكل",
+      "showAll_many": "{{count}} عمودًا داخل الصفوف · إظهار الكل",
+      "showAll_other": "{{count}} عمود داخل الصفوف · إظهار الكل",
+      "showAllHint": "إظهار كل الأعمدة جنبًا إلى جنب (تمرير أفقي)",
+      "fitToWidth": "ملاءمة العرض",
+      "fitToWidthHint": "طيّ الأعمدة الزائدة داخل كل صف"
+    },
+    "selection": {
+      "selectRow": "تحديد {{name}}",
+      "selected": "تم تحديد {{count}}",
+      "selectAllCount": "تحديد الكل ({{count}})",
+      "clear": "مسح التحديد",
+      "clearHint": "مسح التحديد · Esc",
+      "escape": "Esc",
+      "bulkActions": "إجراءات جماعية"
+    },
+    "length": {
+      "allLoaded": "تم تحميل كل {{records}}",
+      "loadingMore": "جارٍ تحميل المزيد من {{records}}"
+    },
+    "savedViews": {
+      "label": "العروض المحفوظة",
+      "apply": "تطبيق العرض",
+      "remove": "إزالة العرض",
+      "removed": "تمت إزالة العرض",
+      "defaultName": "عرضي"
+    }
   },
   "consent": {
-    "description": "نستخدم ملفات تعريف الارتباط لتحليلات المنتج بهدف تحسين {{productName}}. تعمل الوظائف الأساسية ومراقبة الأخطاء من دونها.",
+    "description": "بموافقتك نستخدم تحليلات PostHog وتسجيلات الجلسات من Sentry لتحسين {{productName}}. يعمل كل شيء آخر، بما في ذلك تقارير الأخطاء، من دونها. الإغلاق يعني الرفض.",
     "privacyPolicy": "سياسة الخصوصية",
     "accept": "قبول",
-    "decline": "رفض"
+    "decline": "رفض",
+    "closeAndDecline": "إغلاق (يُعد رفضًا)"
+  },
+  "confirm": {
+    "accept": "تأكيد",
+    "cancel": "إلغاء",
+    "fallbackDescription": "يرجى تأكيد هذا الإجراء."
+  },
+  "picker": {
+    "placeholder": "اختر…",
+    "search": "ابحث في {{label}}",
+    "searchDefault": "بحث",
+    "escKey": "Esc",
+    "options": "الخيارات",
+    "recent": "الأخيرة",
+    "all": "الكل",
+    "create": "إنشاء «{{query}}»",
+    "createNamed": "{{label}} «{{query}}»",
+    "createFull": "{{label}} جديد",
+    "createFullQuery": "{{label}} · «{{query}}»",
+    "fullDetails": "كل التفاصيل",
+    "empty": "لا شيء للاختيار بعد",
+    "noResults": "لا نتائج لـ «{{query}}»",
+    "noResultsHint": "تحقق من الإملاء أو جرّب أحرفًا أقل",
+    "noResultsRemoteHint": "جرّب اسمًا أو رقم هاتف أو معرّفًا",
+    "loadingMore": "جارٍ تحميل المزيد",
+    "clear": "مسح",
+    "triggerLabel": "{{label}} · {{value}}",
+    "date": {
+      "label": "التاريخ",
+      "placeholder": "اختر تاريخًا",
+      "search": "اكتب تاريخًا · مثل 12 sep",
+      "today": "اليوم",
+      "tomorrow": "غدًا",
+      "yesterday": "أمس",
+      "comingUp": "قريبًا",
+      "relative": "{{relative}} · {{date}}"
+    },
+    "time": {
+      "label": "الوقت",
+      "placeholder": "اختر وقتًا"
+    }
+  },
+  "unsavedChanges": {
+    "title": "تجاهل التغييرات؟",
+    "description": "لم تُحفظ تغييراتك وستضيع.",
+    "discard": "تجاهل",
+    "keepEditing": "متابعة التحرير"
+  },
+  "uploadTray": {
+    "label": "عمليات الرفع",
+    "uploading": "جارٍ رفع {{left}} من {{total}}…",
+    "complete": "اكتملت جميع عمليات الرفع",
+    "failed_zero": "لا توجد عمليات رفع فاشلة",
+    "failed_one": "فشلت عملية رفع واحدة",
+    "failed_two": "فشلت عمليتا رفع",
+    "failed_few": "فشلت {{count}} عمليات رفع",
+    "failed_many": "فشلت {{count}} عملية رفع",
+    "failed_other": "فشلت {{count}} عملية رفع",
+    "skipped_zero": "لم يُتخطَّ أي ملف",
+    "skipped_one": "تم تخطي ملف واحد يتجاوز {{limit}}",
+    "skipped_two": "تم تخطي ملفين يتجاوزان {{limit}}",
+    "skipped_few": "تم تخطي {{count}} ملفات تتجاوز {{limit}}",
+    "skipped_many": "تم تخطي {{count}} ملفًا يتجاوز {{limit}}",
+    "skipped_other": "تم تخطي {{count}} ملف يتجاوز {{limit}}",
+    "show": "إظهار عمليات الرفع",
+    "hide": "إخفاء عمليات الرفع",
+    "uploadFailed": "تعذّر الرفع",
+    "attachFailed": "تعذّر الإرفاق",
+    "retry": "إعادة محاولة {{name}}",
+    "remove": "إزالة {{name}}",
+    "stoppedBySwitch": "توقفت عمليات الرفع · انتقلت إلى مساحة عمل أخرى",
+    "size": {
+      "kilobytes": "{{value}} كيلوبايت",
+      "megabytes": "{{value}} ميغابايت"
+    }
+  },
+  "splash": {
+    "label": "جارٍ تحميل {{productName}}",
+    "greeting": {
+      "morning": "صباح الخير، {{name}}",
+      "afternoon": "طاب يومك، {{name}}",
+      "evening": "مساء الخير، {{name}}"
+    },
+    "ticker": {
+      "opening": "جارٍ فتح جدول يوم {{weekday}}",
+      "syncing": "جارٍ مزامنة المرضى والعملاء المحتملين",
+      "ready": "كل شيء جاهز"
+    },
+    "offline": {
+      "message": "تعذّر الوصول إلى {{productName}} · تحقّق من الاتصال بالإنترنت",
+      "retry": "إعادة المحاولة"
+    }
   }
 }

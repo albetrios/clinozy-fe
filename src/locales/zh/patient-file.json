@@ -1,0 +1,992 @@
+{
+  "manifest": {
+    "title": "患者档案"
+  },
+  "sections": {
+    "timeline": "概览",
+    "overview": "临床笔记",
+    "visits": "就诊",
+    "prescriptions": "处方",
+    "treatments": "治疗",
+    "images": "照片",
+    "reports": "报告",
+    "invoices": "发票",
+    "payments": "付款",
+    "packages": "套餐",
+    "notes": "团队笔记"
+  },
+  "layout": {
+    "notFoundRecord": "患者",
+    "loading": "正在打开患者档案"
+  },
+  "fileBar": {
+    "back": "返回患者列表",
+    "backHint": "返回患者列表 (Esc)",
+    "patients": "患者",
+    "identity": "{{id}} · {{phone}}",
+    "maskedPhone": "+91 ••••• •{{last4}}",
+    "visitPill": "就诊进行中 · 继续",
+    "tabs": "患者分区",
+    "notPinned": "未固定 · 打开时显示",
+    "addToRecord": "添加到档案",
+    "startVisit": "开始就诊",
+    "activity": "动态",
+    "showActivity": "显示消息和动态",
+    "hideActivity": "隐藏消息和动态",
+    "awaitingReply": "等待回复"
+  },
+  "sectionsPopover": {
+    "trigger": "患者档案 · 全部分区",
+    "label": "患者档案分区",
+    "title": "患者档案",
+    "groups": {
+      "clinical": "临床",
+      "care": "护理",
+      "billing": "账务",
+      "team": "团队"
+    },
+    "openNow": "当前打开",
+    "pin": "固定到栏",
+    "unpin": "从栏中取消固定",
+    "pinAria": "固定到栏 · {{section}}",
+    "unpinAria": "从栏中取消固定 · {{section}}",
+    "footer": "固定的分区会保留在栏中"
+  },
+  "addMenu": {
+    "label": "添加到档案",
+    "headerFile": "为 {{name}} 添加",
+    "headerSection": "为 {{name}} · 已选择"
+  },
+  "addActions": {
+    "items": {
+      "prescription": "处方",
+      "treatment": "治疗",
+      "photo": "照片",
+      "appointment": "预约",
+      "report": "报告",
+      "note": "笔记",
+      "invoice": "发票",
+      "payment": "付款"
+    },
+    "nothingDue": "{{name}} 没有待付款项"
+  },
+  "section": {
+    "primary": {
+      "visits": "新建预约",
+      "prescriptions": "新建处方",
+      "treatments": "新建治疗",
+      "images": "上传图片",
+      "reports": "上传报告",
+      "invoices": "新建发票",
+      "payments": "记录付款"
+    },
+    "more": "{{name}} 的更多操作"
+  },
+  "rail": {
+    "copyId": "复制患者 ID",
+    "idCopied": "已复制患者 ID",
+    "since": "自 {{date}} 起",
+    "joinedToday": "今天加入",
+    "daysAsPatient_other": "成为患者 {{count}} 天",
+    "monthsAsPatient_other": "成为患者 {{count}} 个月",
+    "editContact": "编辑联系人",
+    "reach": "联系方式",
+    "reachSub": {
+      "whatsappPrimary": "WhatsApp · 主要",
+      "mobile": "手机",
+      "instagram": "Instagram"
+    },
+    "maskedNumber": "•••• {{last4}}",
+    "showNumber": "显示号码",
+    "hideNumber": "隐藏号码",
+    "openWhatsApp": "在新标签页中打开 WhatsApp 聊天",
+    "call": "拨打电话",
+    "openInstagram": "在新标签页中打开 Instagram",
+    "numberCopied": "已复制号码",
+    "handleCopied": "已复制账号",
+    "about": "简介",
+    "birthdayIn_other": "🎂 {{count}} 天后",
+    "birthdayToday": "🎂 今天",
+    "noAddress": "无地址",
+    "upNext": "即将到来",
+    "reschedule": "改期",
+    "book": "预约",
+    "notBooked": "未预约",
+    "noUpcoming": "暂无即将到来的就诊",
+    "feedback": "反馈",
+    "feedbackScore": "{{feel}} · {{score}}/10",
+    "feedbackReview": "{{source}} 上 {{rating}}★",
+    "checkIns_other": "{{count}} 次回访",
+    "reviews_other": "{{count}} 条评价",
+    "feedbackCounts": "{{checkIns}} · {{reviews}}",
+    "noFeedback": "暂无反馈",
+    "showAmount": "显示金额",
+    "hideAmount": "隐藏金额",
+    "collect": "收款",
+    "allPaid": "已全部付清 · 无欠款"
+  },
+  "photos": {
+    "albums": {
+      "general": "常规",
+      "private": "私密",
+      "lhr": "LHR"
+    },
+    "albumTabs": "相册",
+    "count_other": "{{count}} 张照片",
+    "visitFilter": {
+      "label": "就诊",
+      "all": "全部照片",
+      "allSub": "{{album}}中 {{count}} 张",
+      "none": "未关联就诊",
+      "noneSub": "从档案上传",
+      "visit": "{{day}} · {{service}}",
+      "visitSub": "#{{seq}} · {{status}}"
+    },
+    "sizes": {
+      "label": "缩略图大小",
+      "small": "小缩略图",
+      "medium": "中缩略图",
+      "large": "大缩略图",
+      "smallShort": "S",
+      "mediumShort": "M",
+      "largeShort": "L"
+    },
+    "tile": {
+      "open": "打开 {{name}}",
+      "edit": "编辑详情",
+      "editHint": "编辑名称、日期和部位",
+      "delete": "删除照片"
+    },
+    "loadMore_other": "加载更多 · 还剩 {{count}} 张",
+    "empty": {
+      "title": "{{album}}中还没有照片",
+      "body": "将照片拖到这里，或从电脑上传。"
+    },
+    "upload": "上传图片",
+    "notImages": "请拖入图片文件",
+    "uploaded_other": "已上传 {{count}} 张照片到{{album}}",
+    "delete": {
+      "title": "删除这张照片？",
+      "reasons": {
+        "wrongPatient": "患者错误",
+        "blurry": "模糊 / 需重拍",
+        "duplicate": "重复",
+        "other": "其他"
+      },
+      "deleted": "照片已删除"
+    },
+    "bodyParts": {
+      "face": "面部",
+      "scalp": "头皮",
+      "hair": "头发",
+      "body": "身体",
+      "chest": "胸部",
+      "back": "背部",
+      "underarm": "腋下",
+      "legs": "腿部",
+      "arms": "手臂",
+      "other": "其他",
+      "upperLip": "上唇",
+      "chin": "下巴",
+      "neck": "颈部",
+      "hands": "手部",
+      "fullBody": "全身"
+    },
+    "viewer": {
+      "label": "照片查看器",
+      "position": "第 {{index}} 张，共 {{total}} 张",
+      "close": "关闭查看器",
+      "closeHint": "关闭 (Esc)",
+      "previous": "上一张",
+      "previousHint": "上一张 (←)",
+      "next": "下一张",
+      "nextHint": "下一张 (→)",
+      "zoom": "缩放",
+      "zoomOut": "缩小",
+      "zoomOutHint": "缩小 (−)",
+      "zoomIn": "放大",
+      "zoomInHint": "放大 (+)",
+      "zoomReset": "适应屏幕 (0)",
+      "hints": {
+        "browse": "← → 浏览",
+        "zoom": "滚动或 + − 缩放",
+        "pan": "拖动以移动 · 双击重置",
+        "close": "Esc 关闭"
+      },
+      "missing": "无法预览",
+      "notFoundRecord": "照片"
+    },
+    "details": {
+      "title": "照片详情",
+      "sub": "可选 · 名称、日期和部位便于以后查找",
+      "name": "名称",
+      "namePlaceholder": "例如：换肤前的左脸颊",
+      "date": "日期",
+      "album": "相册",
+      "bodyPart": "部位",
+      "optional": "可选",
+      "visit": "就诊",
+      "visitHint": "可选 · 将照片归入该预约",
+      "notAttached": "未关联",
+      "save": "保存详情",
+      "saved": "照片详情已保存",
+      "stage": "阶段"
+    },
+    "loading": "正在加载照片",
+    "stages": {
+      "before": "治疗前",
+      "after": "治疗后"
+    }
+  },
+  "rx": {
+    "record": "处方",
+    "title": {
+      "create": "新建处方",
+      "edit": "编辑处方"
+    },
+    "sub": "{{name}} · {{id}}",
+    "medicines_other": "{{count}} 种药",
+    "quickFill": {
+      "print": "打印处方",
+      "repeat": "重复上次处方 {{number}}"
+    },
+    "steps": {
+      "prescription": "处方",
+      "medicines": "药物",
+      "notes": "临床备注"
+    },
+    "date": "日期",
+    "doctor": "医生",
+    "doctorPlaceholder": "选择医生",
+    "quick": {
+      "placeholder": "输入药物、剂量、时间 · 例如 flu 0-0-1 af 10d",
+      "hint": "od · bd · tds · hs · af/bf · 5d · x8",
+      "groups": {
+        "all": "全部",
+        "oral": "口服",
+        "topical": "外用"
+      },
+      "newMedicine": "列表中没有的药物",
+      "lastSaved": "已保存上次剂量",
+      "noDosage": "无既往剂量",
+      "inStock_other": "库存 {{count}}",
+      "outOfStock": "无库存",
+      "added": "已添加 {{name}}",
+      "qty": "×{{qty}}"
+    },
+    "items": {
+      "label": "药物",
+      "medicine": "药物",
+      "dose": "剂量 · 早 中 晚",
+      "meal": "用餐",
+      "where": "部位",
+      "qty": "数量",
+      "searchMedicine": "搜索药物",
+      "addMedicine": "添加药物",
+      "use": "使用",
+      "note": "备注 · 例如 10 天、薄涂一层、避免日晒"
+    },
+    "dose": {
+      "group": "剂量 早 · 中 · 晚",
+      "times": {
+        "morning": "早上",
+        "afternoon": "中午",
+        "night": "晚上"
+      },
+      "on": "{{time}} · {{taps}} — 点击更改",
+      "off": "{{time}} · 无 — 点击更改",
+      "sos": "SOS",
+      "sosHint": "仅在需要时 (SOS)"
+    },
+    "meal": {
+      "before": "饭前",
+      "after": "饭后",
+      "beforeHint": "饭前",
+      "afterHint": "饭后",
+      "more": "更多时间",
+      "change": "{{timing}} · 更改"
+    },
+    "timings": {
+      "empty_stomach": "空腹",
+      "with_meal": "随餐",
+      "morning": "早上",
+      "night": "晚上",
+      "morning_night": "早晚各一次",
+      "thrice_week": "每周三次",
+      "once_week": "每周一次",
+      "alternate_days": "隔天一次"
+    },
+    "places": {
+      "face": "面部",
+      "scalp": "头皮",
+      "hair": "头发",
+      "body": "身体",
+      "underarm": "腋下",
+      "neck": "颈部",
+      "back": "背部",
+      "chest": "胸部",
+      "hands": "手部",
+      "legs": "腿部",
+      "feet": "足部",
+      "lips": "嘴唇",
+      "underEyes": "眼下",
+      "affectedArea": "患处"
+    },
+    "notes": {
+      "advice": "备注",
+      "advicePlaceholder": "给患者的建议",
+      "lab": "化验报告",
+      "labPlaceholder": "建议的检查或结果",
+      "procedure": "今日处理",
+      "procedurePlaceholder": "今天做了什么"
+    },
+    "daysNote_other": "{{count}} 天",
+    "dayWords": "天, 日",
+    "save": {
+      "create": "保存处方",
+      "edit": "保存更改",
+      "sell": "保存并销售",
+      "visit": "批准 · 打印 · 发送至药房",
+      "summary": "{{medicines}} · {{doctor}}",
+      "noMedicine": "请添加药物",
+      "saved": "处方已保存",
+      "savedNumber": "处方 {{number}} 已保存",
+      "approve": "保存并批准",
+      "approvedNumber": "处方 {{number}} 已批准"
+    },
+    "delete": {
+      "title": "删除此处方？",
+      "deleted": "处方已删除"
+    },
+    "preview": "处方 {{number}}",
+    "status": {
+      "draft": "草稿",
+      "approved": "已批准"
+    },
+    "approvedNote": "已批准 · 已批准的处方无法更改"
+  },
+  "treatment": {
+    "record": "治疗",
+    "title": {
+      "create": "新建治疗",
+      "edit": "编辑治疗"
+    },
+    "sub": "字段按诊所专科设置 · 如有需要可切换",
+    "session": "第 {{session}} 次",
+    "quickFill": {
+      "next": "{{name}} 的下一次",
+      "checkIn": "记录回访"
+    },
+    "type": "类型",
+    "templates": {
+      "skin": "皮肤 · 激光",
+      "dental": "牙科",
+      "physio": "理疗",
+      "gynac": "妇科",
+      "general": "通用"
+    },
+    "steps": {
+      "session": "疗程",
+      "details": "{{template}}详情",
+      "aftercare": "术后护理"
+    },
+    "name": "治疗",
+    "namePlaceholder": "选择或输入",
+    "sessionNo": "疗程次数",
+    "doctor": "医生",
+    "doctorPlaceholder": "选择医生",
+    "therapist": "治疗师",
+    "therapistPlaceholder": "选择治疗师",
+    "skin": {
+      "therapyType": "治疗类型",
+      "therapyTypes": {
+        "laser": "激光",
+        "peel": "换肤",
+        "facial": "面部护理",
+        "injectable": "注射",
+        "microneedling": "微针"
+      },
+      "bodyPart": "部位",
+      "pickAny": "可多选",
+      "areas": {
+        "face": "面部",
+        "upperLip": "上唇",
+        "chin": "下巴",
+        "underarm": "腋下",
+        "arms": "手臂",
+        "legs": "腿部",
+        "back": "背部",
+        "chest": "胸部",
+        "fullBody": "全身"
+      },
+      "skinType": "肤质类型",
+      "skinTypeValue": "{{type}} 型",
+      "machine": "设备",
+      "machinePlaceholder": "例如 Soprano Ice",
+      "wavelength": "波长",
+      "startReading": "开始读数",
+      "endReading": "结束读数",
+      "readingPlaceholder": "发数 / 计数器",
+      "power": "能量 · 频率 · PD · 模式",
+      "powerPlaceholder": "例如 10 J · 3 Hz · 20 ms · HR"
+    },
+    "dental": {
+      "procedure": "处理",
+      "procedures": {
+        "scaling": "洁牙",
+        "filling": "补牙",
+        "rct": "根管治疗",
+        "extraction": "拔牙",
+        "crown": "牙冠",
+        "implant": "种植",
+        "whitening": "美白"
+      },
+      "teeth": "牙齿",
+      "teethHint": "FDI 编号 · 点按选择",
+      "quadrants": {
+        "upperRight": "右上",
+        "upperLeft": "左上",
+        "lowerRight": "右下",
+        "lowerLeft": "左下"
+      },
+      "tooth": "牙齿 {{tooth}}",
+      "material": "材料",
+      "materialPlaceholder": "例如 复合树脂 A2",
+      "anaesthesia": "麻醉",
+      "given": "已麻醉",
+      "notGiven": "未麻醉"
+    },
+    "physio": {
+      "region": "部位",
+      "regions": {
+        "neck": "颈部",
+        "shoulder": "肩部",
+        "back": "背部",
+        "hip": "髋部",
+        "knee": "膝部",
+        "ankle": "踝部"
+      },
+      "modality": "方式",
+      "modalities": {
+        "tens": "TENS",
+        "ift": "IFT",
+        "ultrasound": "超声",
+        "exercise": "运动",
+        "manualTherapy": "手法治疗",
+        "traction": "牵引"
+      },
+      "painBefore": "治疗前疼痛",
+      "painAfter": "治疗后疼痛",
+      "painHint": "0–10",
+      "exercises": "居家锻炼",
+      "exercisesPlaceholder": "组数、次数、频率"
+    },
+    "gynac": {
+      "visitType": "就诊类型",
+      "visitTypes": {
+        "anc": "产前检查",
+        "pnc": "产后检查",
+        "infertility": "不孕",
+        "contraception": "避孕",
+        "general": "通用"
+      },
+      "lmp": "末次月经",
+      "gestation": "孕周",
+      "weeks": "周",
+      "bp": "血压",
+      "bpPlaceholder": "120/80",
+      "weight": "体重",
+      "kg": "公斤",
+      "findings": "检查所见",
+      "findingsPlaceholder": "检查结果"
+    },
+    "general": {
+      "area": "部位",
+      "areaPlaceholder": "用逗号分隔",
+      "parameters": "参数",
+      "parametersPlaceholder": "每行一个，例如 剂量: 2 ml"
+    },
+    "aftercare": {
+      "remark": "备注",
+      "remarkPlaceholder": "反应、建议、下一步计划",
+      "call": "术后回访电话",
+      "callHint": "创建任务，询问感觉如何以及是否遵照执行",
+      "calls": {
+        "none": "不回访",
+        "next_day": "第二天",
+        "in_week": "一周后",
+        "in_two_days": "2 天后"
+      },
+      "feedback": "本次治疗的反馈",
+      "feedbackItem": "{{date}} · {{feel}} {{score}}/10",
+      "noCheckIn": "暂无回访 · 请使用上方的记录回访"
+    },
+    "save": {
+      "create": "保存治疗",
+      "edit": "保存更改",
+      "saved": "治疗已保存"
+    },
+    "package": {
+      "label": "来自套餐",
+      "hint": "保存时使用其中 1 次",
+      "option": "{{name}} · 已用 {{used}}/{{total}} 次",
+      "numbered": "由套餐决定",
+      "uses": "使用 1 次 {{name}}"
+    },
+    "reverse": {
+      "title": "撤销此治疗？",
+      "body": "记录保留在档案中并标记为已撤销，所用的套餐次数会退回。此操作无法撤回。",
+      "action": "撤销",
+      "done": "治疗已撤销",
+      "status": "已撤销",
+      "note": "{{date}} 已撤销 · {{reason}}",
+      "reasons": {
+        "mistake": "误记录",
+        "wrongPatient": "患者错误",
+        "notDone": "未进行治疗"
+      }
+    }
+  },
+  "report": {
+    "record": "报告",
+    "types": {
+      "lab": "化验",
+      "scan": "影像",
+      "consent": "知情同意",
+      "other": "其他"
+    },
+    "steps": {
+      "report": "报告",
+      "details": "详情",
+      "notes": "备注"
+    },
+    "type": "类型",
+    "name": "名称",
+    "date": "日期",
+    "file": "文件",
+    "upload": {
+      "title": "上传报告",
+      "namePlaceholder": "例如 血常规",
+      "drop": "拖放报告或浏览",
+      "fileHint": "PDF、JPG 或 PNG · 最大 {{limit}}",
+      "remove": "移除 {{name}}",
+      "note": "备注",
+      "notePlaceholder": "可选",
+      "summary": "{{type}} · {{files}}",
+      "save": "上传",
+      "noName": "请为报告命名",
+      "uploaded": "报告已上传",
+      "files_other": "{{count}} 个文件"
+    },
+    "view": {
+      "sub": "{{name}} · {{date}}",
+      "notes": "备注",
+      "noNotes": "此报告没有备注",
+      "download": "下载",
+      "downloading": "正在下载 {{name}}",
+      "fileGone": "已不可用"
+    }
+  },
+  "package": {
+    "title": "编辑套餐",
+    "summary": "完成治疗后计入次数",
+    "save": "保存更改",
+    "card": {
+      "left_other": "剩 {{count}} 次",
+      "used": "已用 {{used}}/{{total}} 次",
+      "validTill": "有效期至 {{date}}",
+      "book": "预约下次",
+      "empty": "暂无套餐",
+      "noExpiry": "无有效期",
+      "statuses": {
+        "used_up": "已用完",
+        "expired": "已过期"
+      },
+      "edit": "编辑"
+    },
+    "validUntil": "有效期至",
+    "sessions": "次数",
+    "saved": "套餐已保存"
+  },
+  "clinical": {
+    "titles": {
+      "complaints": "主诉",
+      "diagnosis": "诊断",
+      "treatmentSuggestions": "建议治疗",
+      "futureSuggestions": "后续建议"
+    },
+    "newHint": "上次就诊后新增",
+    "empty": "尚未添加",
+    "placeholder": "输入后按 Enter 添加",
+    "add": "添加{{title}}",
+    "remove": "移除{{name}}",
+    "newCount_other": "{{count}} 条新增",
+    "removed": "已移除{{name}}"
+  },
+  "feedback": {
+    "title": "反馈",
+    "log": "记录反馈",
+    "typesLabel": "反馈类型",
+    "types": {
+      "all": "全部",
+      "visit": "问诊",
+      "treatment": "治疗反馈"
+    },
+    "previous": "上一个",
+    "next": "下一个",
+    "emptyTitle": "暂无反馈",
+    "emptySub": "下次就诊后记录回访或评价 · 记录反馈",
+    "notRated": "未评分",
+    "score": "{{score}}/10",
+    "stars": "{{rating}}/5",
+    "trendUp": "▲ {{points}}",
+    "trendDown": "▼ {{points}}",
+    "trendSame": "= 持平",
+    "followed": "遵医嘱：{{how}}",
+    "appointment": "预约 {{number}}",
+    "visitWith": "{{service}} · 预约 {{number}}",
+    "visit": "就诊",
+    "noVisit": "未关联就诊",
+    "noNow": "没有记录目前情况",
+    "noText": "没有评价内容",
+    "nextLabel": "下一步",
+    "linkLabel": "链接",
+    "noNext": "未记录下一步",
+    "noLink": "未添加链接",
+    "actions": "操作",
+    "edit": "编辑",
+    "remove": "移除",
+    "actionNeeded": "需要处理",
+    "logAction": "记录处理",
+    "nextAction": "下一步处理",
+    "actionBy": "✓ {{action}} · {{name}}",
+    "actionLogged": "✓ {{action}} · 已记录",
+    "actionKinds": {
+      "doctor_called": "医生已致电",
+      "asked_revisit": "已请其复诊",
+      "free_review_booked": "已预约免费复查",
+      "plan_changed": "方案已调整",
+      "replied_google": "已在 Google 回复",
+      "replied_instagram": "已在 Instagram 回复",
+      "replied_whatsapp": "已在 WhatsApp 回复",
+      "refund_credit": "已退款 / 已给积分",
+      "other": "其他"
+    },
+    "loadMore": "加载更多",
+    "loading": "加载中…",
+    "removeCheckIn": "移除这条回访？",
+    "removeReview": "移除这条评价？",
+    "checkInRemoved": "回访已移除",
+    "reviewRemoved": "评价已移除",
+    "more_other": "还有 {{count}} 条",
+    "files_other": "▶ {{count}} 个文件"
+  },
+  "checkIn": {
+    "titles": {
+      "visit": "就诊回访",
+      "aftercare": "术后回访"
+    },
+    "last": "上次回访 {{date}}：{{feel}}",
+    "steps": {
+      "now": "目前情况",
+      "followed": "执行情况",
+      "next": "下一步计划"
+    },
+    "feel": "与上次就诊相比",
+    "score": "患者自评分",
+    "scoreHint": "1 = 非常不满意 · 10 = 非常满意",
+    "words": "患者原话",
+    "wordsLast": "上次：{{text}}",
+    "wordsPlaceholder": "有哪些变化，还有哪些困扰",
+    "followed": "是否遵医嘱",
+    "followedValues": {
+      "fully": "完全",
+      "mostly": "大部分",
+      "partly": "部分",
+      "not_at_all": "完全没有"
+    },
+    "details": "详情",
+    "detailsLast": "上次建议：{{text}}",
+    "detailsPlaceholder": "居家护理、药物、防晒、错过的疗程",
+    "plan": "计划",
+    "planPlaceholder": "接下来做什么、什么时候做",
+    "offerings": "加入服务建议",
+    "offeringsHint": "可选 · 以“计划中”加入患者的建议",
+    "offeringsPlaceholder": "搜索服务",
+    "offeringSessions_other": "{{price}} · {{count}} 次",
+    "save": "保存回访",
+    "saveEdit": "保存更改",
+    "noFeel": "请选择目前情况",
+    "saved": "已为{{name}}保存回访",
+    "added": " · {{count}} 项已加入建议",
+    "callBack": " · 已创建医生回电任务",
+    "updated": "回访已更新",
+    "record": "回访",
+    "noScore": "请选择患者自评分",
+    "offeringsPlanned": "已加入服务建议"
+  },
+  "review": {
+    "title": "记录评价",
+    "sub": "{{name}} · 保存在患者档案中，方便大家查找",
+    "steps": {
+      "review": "评价",
+      "details": "详情",
+      "notes": "备注"
+    },
+    "where": "来源",
+    "rating": "评分",
+    "link": "链接",
+    "linkHint": "Google 评价、帖子或网盘链接",
+    "linkPlaceholder": "https://",
+    "files": "视频或截图",
+    "filesDrop": "拖放视频或截图",
+    "filesHint": "MP4、MOV、JPG 或 PNG · 最大 {{limit}}",
+    "removeFile": "移除 {{name}}",
+    "attached": "已附文件",
+    "text": "评价内容",
+    "textPlaceholder": "粘贴评价内容或简短摘要",
+    "save": "保存评价",
+    "saveEdit": "保存更改",
+    "saved": "已为{{name}}保存 {{rating}}★ {{source}} 评价",
+    "callBack": " · 已创建回电任务",
+    "updated": "评价已更新",
+    "badLink": "请添加 https:// 链接",
+    "notRated": "未评分",
+    "record": "评价",
+    "attachedFiles_other": "{{count}} 个文件"
+  },
+  "logFeedback": {
+    "title": "记录反馈",
+    "sub": "{{name}} · 选择要记录的内容",
+    "groups": {
+      "checkIn": "回访",
+      "treatment": "治疗反馈",
+      "review": "评价"
+    },
+    "consultation": "问诊",
+    "after": "{{name}}之后",
+    "close": "关闭",
+    "hints": {
+      "consultation": "就诊后 · 现在的情况 · 遵循情况 · 下一步计划",
+      "google": "粘贴链接和评价内容",
+      "video": "上传视频评价",
+      "other": "评分、文字和截图"
+    }
+  },
+  "tables": {
+    "export": "导出",
+    "exported_other": "已将 {{count}} 行导出为 CSV",
+    "visits": {
+      "records": "预约",
+      "count_other": "{{count}} 个预约",
+      "empty": "暂无预约"
+    },
+    "prescriptions": {
+      "records": "处方",
+      "count_other": "{{count}} 张处方",
+      "empty": "暂无处方",
+      "copied": "已复制处方"
+    },
+    "treatments": {
+      "records": "治疗",
+      "count_other": "{{count}} 次治疗",
+      "empty": "暂无治疗",
+      "copied": "已添加第 {{session}} 次",
+      "feedbackScore": "{{feel}} · {{score}}/10",
+      "checkInOn": "回访 {{date}}",
+      "callNextDay": "次日回电",
+      "callInDays_other": "{{count}} 天后回电"
+    },
+    "reports": {
+      "records": "报告",
+      "count_other": "{{count}} 份报告",
+      "empty": "暂无报告",
+      "fileSub": "{{format}} · 应患者要求可分享",
+      "deleteTitle": "删除这份报告？",
+      "deleted": "已删除报告"
+    },
+    "invoices": {
+      "records": "账单",
+      "count_other": "{{count}} 张账单",
+      "empty": "暂无账单",
+      "countDue_other": "{{count}} 张账单 · 待付 {{due}}",
+      "itemCount_other": "{{count}} 项",
+      "due": "待付 {{amount}}",
+      "nothingDue": "无待付"
+    },
+    "payments": {
+      "records": "收支记录",
+      "count_other": "{{count}} 笔收支",
+      "empty": "暂无付款",
+      "received": "+ {{amount}}",
+      "paid": "− {{amount}}"
+    },
+    "columns": {
+      "id": "编号",
+      "offering": "项目",
+      "doctor": "医生",
+      "status": "状态",
+      "date": "日期",
+      "medicines": "药品",
+      "notes": "备注",
+      "updated": "更新",
+      "treatment": "治疗",
+      "area": "部位",
+      "team": "团队",
+      "session": "次数",
+      "details": "详情",
+      "feedback": "反馈",
+      "report": "报告",
+      "type": "类型",
+      "invoice": "账单",
+      "items": "项目明细",
+      "bill": "金额",
+      "paid": "已付 / 待付",
+      "receipt": "收据",
+      "when": "时间",
+      "mode": "方式",
+      "amount": "金额",
+      "by": "经手人"
+    },
+    "actions": {
+      "print": "打印",
+      "preview": "预览",
+      "copyRx": "复制处方",
+      "sell": "售出药品",
+      "copyInvoice": "复制发票",
+      "checkIn": "回访",
+      "copyTreatment": "复制为下一次",
+      "open": "打开",
+      "pay": "记录付款",
+      "edit": "编辑",
+      "delete": "删除"
+    }
+  },
+  "notes": {
+    "label": "新备注",
+    "placeholder": "给团队添加备注",
+    "add": "添加备注",
+    "by": "{{name}} · {{date}}",
+    "empty": "暂无备注"
+  },
+  "timeline": {
+    "open": "打开{{card}}",
+    "clinical": {
+      "suggested": "建议",
+      "later": "以后",
+      "smartLabel": "智能备注",
+      "smartPlaceholder": "智能备注 · 自然输入，例如 {{example}}",
+      "smartExample": "脱发2个月，建议PRP",
+      "add": "添加",
+      "added_other": "已从备注中添加 {{count}} 项",
+      "nothing": "尚未识别到内容"
+    },
+    "visits": {
+      "empty": "暂无就诊"
+    },
+    "photos": {
+      "upload": "上传",
+      "empty": "暂无照片 · 上传第一张"
+    },
+    "packages": {
+      "progress": "{{used}} / {{total}}",
+      "done": "所有疗程已完成",
+      "empty": "暂无有效套餐"
+    },
+    "prescriptions": {
+      "title": "处方 {{number}}"
+    },
+    "treatments": {
+      "sub": "第 {{session}} 次 · {{date}}"
+    },
+    "reports": {
+      "sub": "{{type}} · {{date}}"
+    },
+    "notes": {
+      "label": "团队备注",
+      "placeholder": "给团队写备注…",
+      "post": "发布"
+    },
+    "activity": {
+      "filtersLabel": "动态筛选",
+      "notes": "备注",
+      "empty": "暂无动态",
+      "masked": "₹ ••••"
+    },
+    "billing": {
+      "due": "待付",
+      "paid": "已付",
+      "show": "显示金额",
+      "hide": "隐藏金额",
+      "invoice": "{{type}}发票 {{number}}",
+      "sub": "{{date}} · {{amount}}",
+      "collect": "收款"
+    }
+  },
+  "visitFlow": {
+    "pill": "就诊进行中",
+    "lead": "今天就诊的所有内容都在一个屏幕上",
+    "pause": "暂停",
+    "complete": "✓ 完成就诊",
+    "completed": "就诊已完成",
+    "packageUsed": "已使用 1 次套餐",
+    "followUp": "随访定于 {{date}}",
+    "loading": "就诊信息",
+    "steps": {
+      "checks": "签到与安全",
+      "rx": "处方",
+      "treatment": "治疗",
+      "invoice": "发票",
+      "collect": "收款"
+    },
+    "checks": {
+      "labels": {
+        "consent": "已签署同意书",
+        "photos": "已拍术前照片",
+        "allergies": "已核对过敏史和用药"
+      },
+      "hints": {
+        "consent": "没有它无法开始治疗",
+        "photos": "自动与术后照片配对",
+        "allergies": "每次就诊都会询问"
+      },
+      "left_other": "还剩 {{count}} 项检查",
+      "done": "所有检查已完成"
+    },
+    "rx": {
+      "kit": "⚡ {{name}}",
+      "write": "开处方",
+      "empty": "从套装一键开具，或手动开具",
+      "prescribed": "已开具 {{name}}"
+    },
+    "treatment": {
+      "repeat": "⚡ 重复 · {{name}} · 第 {{session}} 次",
+      "new": "新建治疗",
+      "memo": "已为此患者记住：{{memo}}",
+      "pack": "使用 1 次 {{name}}",
+      "blocked": "请先完成签到",
+      "empty": "记录今天的治疗",
+      "last": "上次参数：{{memo}}",
+      "done": "{{name}} · 第 {{session}} 次",
+      "repeated": "已按上次参数记录第 {{session}} 次",
+      "repeatPackage": "⚡ 重复 · {{name}}"
+    },
+    "paused": "就诊已暂停",
+    "resume": "继续",
+    "invoice": {
+      "create": "根据就诊创建发票",
+      "custom": "自定义发票",
+      "nothing": "无可开票项目",
+      "covered": "已由套餐覆盖 · 无需开票",
+      "empty": "暂无可开票项目",
+      "done": "{{number}} · {{total}}",
+      "ready_other": "{{count}} 项已就绪"
+    },
+    "collect": {
+      "action": "收款 {{amount}}",
+      "due": "欠款 {{amount}}",
+      "nothing": "无欠款",
+      "waiting": "请先为本次就诊开票"
+    }
+  }
+}

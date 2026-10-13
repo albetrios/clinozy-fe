@@ -12,8 +12,6 @@ import {
   requireActiveOrganization,
   requireOnboardingWorkspace,
   requireOrganizationContext,
-  requirePersonalOrganizationsDeployment,
-  requireProvisionedPersonalDashboard,
   requireProvisionedTeamWorkspace,
   requireSuspendedOrganization,
   requireTeamOrganizationsDeployment,
@@ -185,7 +183,7 @@ describe('requireSuspendedOrganization', () => {
     expect(() => requireSuspendedOrganization('acme')).not.toThrow();
   });
 
-  it('sends an ACTIVE organization back to its dashboard', () => {
+  it('sends an ACTIVE organization back to its home', () => {
     // Regression: `suspended/` sat outside `requireOrgStatus` so it could
     // render its blocked state without looping — which also left it unguarded
     // in the other direction. Typing the URL told the owner of a demonstrably
@@ -195,7 +193,7 @@ describe('requireSuspendedOrganization', () => {
     expect(isRedirect(thrown)).toBe(true);
     expect(thrown).toMatchObject({
       options: {
-        to: '/organization/$organizationSlug/dashboard',
+        to: '/organization/$organizationSlug',
         params: { organizationSlug: 'acme' },
       },
     });
@@ -214,8 +212,8 @@ describe('requireSuspendedOrganization', () => {
   });
 
   it('partitions the status space with its twin, so neither can loop', () => {
-    // active  -> suspended passes it on to dashboard, dashboard accepts it
-    // suspended -> dashboard passes it on to suspended, suspended accepts it
+    // active  -> suspended passes it on to the home, the home accepts it
+    // suspended -> the home passes it on to suspended, suspended accepts it
     useOrganizationStore.getState().setOrganization('org_acme', 'acme', 'active');
     expect(() => requireActiveOrganization('acme')).not.toThrow();
     expect(() => requireSuspendedOrganization('acme')).toThrow();
@@ -235,7 +233,7 @@ describe('deployment mode guards', () => {
     };
   });
 
-  it('requireTeamOrganizationsDeployment redirects personal-only to /dashboard', () => {
+  it('requireTeamOrganizationsDeployment sends personal-only to the organization picker', () => {
     useOrganizationStore
       .getState()
       .setDeploymentContext(
@@ -244,19 +242,7 @@ describe('deployment mode guards', () => {
       );
     const thrown = thrownBy(() => requireTeamOrganizationsDeployment());
     expect(isRedirect(thrown)).toBe(true);
-    expect(thrown).toMatchObject({ options: { to: '/dashboard' } });
-  });
-
-  it('requirePersonalOrganizationsDeployment redirects team-only to /', () => {
-    useOrganizationStore
-      .getState()
-      .setDeploymentContext(
-        { personalOrganizations: false, teamOrganizations: true },
-        null,
-      );
-    const thrown = thrownBy(() => requirePersonalOrganizationsDeployment());
-    expect(isRedirect(thrown)).toBe(true);
-    expect(thrown).toMatchObject({ options: { to: '/' } });
+    expect(thrown).toMatchObject({ options: { to: '/organization' } });
   });
 
   it('passes when both deployment modes are enabled', () => {
@@ -267,7 +253,6 @@ describe('deployment mode guards', () => {
         'org_personal',
       );
     expect(() => requireTeamOrganizationsDeployment()).not.toThrow();
-    expect(() => requirePersonalOrganizationsDeployment()).not.toThrow();
   });
 
   it('env override restricts pre-network even when the store holds permissive defaults', () => {
@@ -279,47 +264,13 @@ describe('deployment mode guards', () => {
     };
     const thrown = thrownBy(() => requireTeamOrganizationsDeployment());
     expect(isRedirect(thrown)).toBe(true);
-    expect(thrown).toMatchObject({ options: { to: '/dashboard' } });
-  });
-
-  it('team-only env override redirects the personal dashboard guard to /', () => {
-    platformConfig.deploymentOverrides = {
-      personalOrganizations: false,
-      teamOrganizations: null,
-    };
-    const thrown = thrownBy(() => requirePersonalOrganizationsDeployment());
-    expect(isRedirect(thrown)).toBe(true);
-    expect(thrown).toMatchObject({ options: { to: '/' } });
+    expect(thrown).toMatchObject({ options: { to: '/organization' } });
   });
 });
 
 describe('workspace provision guards', () => {
   beforeEach(() => {
     vi.mocked(ensureSessionContext).mockReset();
-  });
-
-  it('requireProvisionedPersonalDashboard redirects to onboarding when no orgs yet', async () => {
-    vi.mocked(ensureSessionContext).mockResolvedValue({
-      user: { onboardingCompleted: false } as MeContext['user'],
-      activeOrganization: null,
-      organizations: [],
-      deploymentFlags: { personalOrganizations: true, teamOrganizations: true },
-    } as MeContext);
-
-    await expect(requireProvisionedPersonalDashboard()).rejects.toSatisfy(isRedirect);
-    await expect(requireProvisionedPersonalDashboard()).rejects.toMatchObject({
-      options: { to: '/onboarding' },
-    });
-  });
-
-  it('requireProvisionedPersonalDashboard passes when personal org is active', async () => {
-    vi.mocked(ensureSessionContext).mockResolvedValue({
-      user: { onboardingCompleted: true } as MeContext['user'],
-      activeOrganization: { id: 'org_p', type: 'PERSONAL', slug: null, status: 'ACTIVE' },
-      deploymentFlags: { personalOrganizations: true, teamOrganizations: true },
-    } as MeContext);
-
-    await expect(requireProvisionedPersonalDashboard()).resolves.toBeUndefined();
   });
 
   it('requireProvisionedTeamWorkspace redirects to onboarding when no orgs yet', async () => {
@@ -350,6 +301,20 @@ describe('workspace provision guards', () => {
     await expect(requireProvisionedTeamWorkspace()).resolves.toBeUndefined();
   });
 
+  it('lets a personal-active session onto the picker — where `/` sends it (D44)', async () => {
+    // The picker used to bounce a personal-active session to `/dashboard`. The
+    // personal space is gone, so the picker IS that session's landing: bouncing
+    // it anywhere would loop.
+    vi.mocked(ensureSessionContext).mockResolvedValue({
+      user: { onboardingCompleted: true } as MeContext['user'],
+      activeOrganization: { id: 'org_p', type: 'PERSONAL', slug: null, status: 'ACTIVE' },
+      organizations: [],
+      deploymentFlags: { personalOrganizations: true, teamOrganizations: true },
+    } as MeContext);
+
+    await expect(requireProvisionedTeamWorkspace()).resolves.toBeUndefined();
+  });
+
   it('onboarding redirects carry the guarded deep link as ?redirect=', async () => {
     vi.mocked(ensureSessionContext).mockResolvedValue({
       user: { onboardingCompleted: false } as MeContext['user'],
@@ -359,17 +324,12 @@ describe('workspace provision guards', () => {
     } as MeContext);
 
     await expect(
-      requireProvisionedTeamWorkspace({ redirectFrom: '/organization/acme/dashboard' }),
+      requireProvisionedTeamWorkspace({ redirectFrom: '/organization/acme/today' }),
     ).rejects.toMatchObject({
       options: {
         to: '/onboarding',
-        search: { redirect: '/organization/acme/dashboard' },
+        search: { redirect: '/organization/acme/today' },
       },
-    });
-    await expect(
-      requireProvisionedPersonalDashboard({ redirectFrom: '/dashboard' }),
-    ).rejects.toMatchObject({
-      options: { to: '/onboarding', search: { redirect: '/dashboard' } },
     });
   });
 
@@ -430,11 +390,11 @@ describe('workspace provision guards', () => {
     } as MeContext);
 
     await expect(requireOnboardingWorkspace()).rejects.toMatchObject({
-      options: { to: '/dashboard' },
+      options: { to: '/organization' },
     });
   });
 
-  it('requireOnboardingWorkspace redirects to dashboard when personal org is active', async () => {
+  it('requireOnboardingWorkspace sends a personal-active session to the picker', async () => {
     vi.mocked(ensureSessionContext).mockResolvedValue({
       user: { onboardingCompleted: true } as MeContext['user'],
       activeOrganization: { id: 'org_p', type: 'PERSONAL', slug: null, status: 'ACTIVE' },
@@ -442,11 +402,11 @@ describe('workspace provision guards', () => {
     } as MeContext);
 
     await expect(requireOnboardingWorkspace()).rejects.toMatchObject({
-      options: { to: '/dashboard' },
+      options: { to: '/organization' },
     });
   });
 
-  it('requireOnboardingWorkspace redirects to team dashboard when team org is active', async () => {
+  it('requireOnboardingWorkspace sends an active team org to its home', async () => {
     vi.mocked(ensureSessionContext).mockResolvedValue({
       user: { onboardingCompleted: true } as MeContext['user'],
       activeOrganization: {
@@ -455,14 +415,14 @@ describe('workspace provision guards', () => {
         slug: 'acme',
         status: 'ACTIVE',
       },
-      // A member landing on the team dashboard can read the org.
+      // A member landing on the clinic's rooms can read the org.
       myPermissions: ['organization:read'],
       deploymentFlags: { personalOrganizations: true, teamOrganizations: true },
     } as MeContext);
 
     await expect(requireOnboardingWorkspace()).rejects.toMatchObject({
       options: {
-        to: '/organization/$organizationSlug/dashboard',
+        to: '/organization/$organizationSlug',
         params: { organizationSlug: 'acme' },
       },
     });

@@ -1,0 +1,400 @@
+{
+  "manifest": {
+    "title": "Utilisateurs"
+  },
+  "record": "Utilisateur",
+  "tabs": {
+    "label": "Vues des utilisateurs",
+    "team": "Équipe",
+    "roles": "Rôles et accès",
+    "branches": "Établissements"
+  },
+  "search": {
+    "placeholder": "Nom, e-mail, mobile ou #ID",
+    "label": "Rechercher des utilisateurs"
+  },
+  "primary": {
+    "newUser": "Nouvel utilisateur",
+    "newRole": "Nouveau rôle",
+    "newBranch": "Nouvel établissement"
+  },
+  "columns": {
+    "seq": "ID",
+    "user": "Utilisateur",
+    "email": "E-mail",
+    "roles": "Rôles",
+    "branches": "Établissements",
+    "hours": "Horaires",
+    "commission": "Commission",
+    "status": "Statut",
+    "updated": "Mis à jour"
+  },
+  "table": {
+    "records": "utilisateurs",
+    "mainRole": "Rôle principal",
+    "alsoRole": "Aussi",
+    "commission": "{{value}}%"
+  },
+  "status": {
+    "active": "Actif",
+    "inactive": "Inactif",
+    "invited": "Invité",
+    "expires": "L’invitation expire le {{date}}",
+    "expired": "Invitation expirée"
+  },
+  "hours": {
+    "everyDay": "Tous les jours",
+    "run": "{{from}}–{{to}}",
+    "list": "{{days, list(type: unit)}}",
+    "line": "{{days}} · {{from}}–{{to}}"
+  },
+  "filters": {
+    "roles": "Rôles",
+    "all": "Tous",
+    "branches": "Établissements",
+    "status": "Statut"
+  },
+  "rowActions": {
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "leave": "Quitter la clinique"
+  },
+  "bulk": {
+    "export": "Exporter",
+    "exported_one": "{{count}} ligne exportée en CSV",
+    "exported_many": "{{count}} lignes exportées en CSV",
+    "exported_other": "{{count}} lignes exportées en CSV"
+  },
+  "empty": {
+    "title": "Aucun utilisateur ne correspond",
+    "description": "Rien ici pour l’instant. Essayez un autre onglet ou une autre recherche."
+  },
+  "drawer": {
+    "title": {
+      "create": "Nouvel utilisateur",
+      "edit": "Modifier l’utilisateur"
+    },
+    "sub": "Connexion, rôles, établissements et horaires",
+    "steps": {
+      "profile": "Profil, rôles et établissements",
+      "hours": "Horaires et rémunération"
+    },
+    "groups": {
+      "profile": "Profil",
+      "rolesBranches": "Rôles et établissements",
+      "hours": "Horaires",
+      "pay": "Rémunération"
+    },
+    "fields": {
+      "name": "Nom",
+      "mobile": "Mobile",
+      "email": "E-mail",
+      "colour": "Couleur",
+      "roles": "Rôles",
+      "access": "A accès à",
+      "branches": "Établissements",
+      "days": "Jours",
+      "from": "De",
+      "to": "À",
+      "commission": "Commission / prime",
+      "status": "Statut"
+    },
+    "hints": {
+      "mobile": "10 chiffres",
+      "colour": "utilisée sur ses badges",
+      "roles": "un ou plusieurs · les accès s’additionnent",
+      "branches": "où il ou elle travaille",
+      "days": "Les rendez-vous ne proposent que ces jours",
+      "name": "défini par la personne dans son profil"
+    },
+    "placeholders": {
+      "name": "Nom complet, p. ex. Dr Nisha Mavani",
+      "email": "name@clinic.com",
+      "time": "Choisir une heure",
+      "commission": "0"
+    },
+    "commissionSuffix": "% du facturé",
+    "commissionQuick": "{{value}}%",
+    "decrease": "Diminuer",
+    "increase": "Augmenter",
+    "pickRole": "Choisir un rôle",
+    "statusOn": "Actif · peut se connecter",
+    "statusOff": "Inactif · ne peut pas utiliser cette clinique",
+    "resend": "Renvoyer l’invitation",
+    "quickFill": {
+      "doctor": "Médecin · 10:00–19:00",
+      "therapist": "Thérapeute · 10:00–19:00",
+      "front_desk": "Accueil · 09:30–19:30",
+      "pharmacist": "Pharmacien · 09:00–21:00"
+    },
+    "summaryNew": "Nouvel utilisateur",
+    "save": {
+      "create": "Créer l’utilisateur",
+      "edit": "Enregistrer les modifications",
+      "createAnother": "Créer et en ajouter un autre"
+    },
+    "missing": "Ajoutez son e-mail",
+    "noRole": "Choisissez au moins un rôle",
+    "emailInvalid": "Saisissez une adresse e-mail valide",
+    "mobileInvalid": "Le mobile doit comporter 10 chiffres",
+    "noPlatformRole": "Aucun rôle à attribuer pour l’instant · demandez à un administrateur",
+    "added": "{{name}} ajouté",
+    "saved": "{{name}} enregistré"
+  },
+  "deleteUser": {
+    "title": "Supprimer cet utilisateur ?",
+    "removed": "{{name}} supprimé"
+  },
+  "leave": {
+    "title": "Quitter {{clinic}} ?",
+    "description": "Vous perdrez l’accès à {{clinic}} — ses sections, ses dossiers et son équipe — et reviendrez à vos cliniques. Vous pourrez annuler pendant quelques secondes après confirmation.",
+    "confirm": "Quitter la clinique",
+    "stay": "Rester",
+    "pending": "Départ de {{clinic}}…",
+    "done": "Vous avez quitté {{clinic}}",
+    "clinicFallback": "cette clinique"
+  },
+  "roles": {
+    "label": "Rôles",
+    "purposes": {
+      "admin": "Dirige la clinique — tarifs, équipe, établissements et tous les écrans.",
+      "doctor": "Consulte, prescrit et planifie le traitement de chaque patient.",
+      "therapist": "Assure les séances et les appels de suivi.",
+      "front_desk": "Premier visage de la clinique — prospects, rendez-vous, accueil et facturation.",
+      "counsellor": "Transforme les demandes en plans et forfaits.",
+      "pharmacist": "Tient le comptoir des médicaments et son stock.",
+      "accountant": "Contrôle les entrées et sorties d’argent et clôture les journées.",
+      "marketing": "Attire des prospects et assure leur suivi.",
+      "custom": "Rôle personnalisé",
+      "customPage": "Rôle personnalisé · définissez ci-dessous ce qu’il peut faire"
+    },
+    "nameLabel": "Nom du rôle",
+    "descriptionLabel": "Description du rôle",
+    "copyFrom": "Copier l’accès de",
+    "copied": "{{role}} a désormais le même accès que {{from}}",
+    "preview": "Aperçu en tant que {{role}}",
+    "previewHint": "Voir {{productName}} comme ce rôle le voit",
+    "previewing": "Aperçu de {{productName}} en tant que {{role}}",
+    "back": "Retour aux rôles",
+    "people": "Personnes ayant ce rôle",
+    "openPerson": "Ouvrir {{name}}",
+    "also": "+ {{roles}}",
+    "nobody": "Personne n’a encore ce rôle · attribuez-le depuis la fiche d’un utilisateur.",
+    "matrix": {
+      "title": "Ce qu’il peut voir et faire",
+      "section": "Section",
+      "view": "Voir",
+      "create": "Créer",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "row": "Ligne",
+      "full": "Complet",
+      "some": "Partiel",
+      "none": "Aucun",
+      "rowHint": "Activer ou désactiver toute la ligne",
+      "cell": {
+        "view": "{{role}} peut voir · {{section}}",
+        "create": "{{role}} peut créer · {{section}}",
+        "edit": "{{role}} peut modifier · {{section}}",
+        "delete": "{{role}} peut supprimer · {{section}}"
+      },
+      "notApplicable": "Ne s’applique pas à cette ligne",
+      "resources": {
+        "contact": {
+          "label": "Contacts",
+          "description": "Les personnes derrière les prospects et les patients"
+        },
+        "contact_activity": {
+          "label": "Messages et notes",
+          "description": "WhatsApp, appels et notes d’équipe"
+        },
+        "patient_prescription": {
+          "label": "Ordonnances",
+          "description": "Rédiger et valider l’ordonnance"
+        },
+        "patient_treatment": {
+          "label": "Traitements",
+          "description": "Les séances et leur déroulé"
+        },
+        "patient_review": {
+          "label": "Avis",
+          "description": "Avis Google et vidéo · lus avec le patient"
+        },
+        "role": {
+          "label": "Rôles",
+          "description": "Rôles et accès"
+        },
+        "branch": {
+          "label": "Sites",
+          "description": "Les sites et qui y travaille"
+        }
+      }
+    },
+    "notes": {
+      "admin": "Les administrateurs peuvent tout faire · ce rôle ne peut pas être restreint.",
+      "readOnly": "Vous voyez les rôles ici. Les modifier nécessite « Mettre à jour les rôles ».",
+      "live": "Les changements s’appliquent immédiatement à toutes les personnes ayant ce rôle. Une personne avec deux rôles obtient tout ce que l’un ou l’autre permet.",
+      "beyond": "Ce rôle a des accès que vous n’avez pas · seule une personne qui les a peut le modifier."
+    },
+    "locked": {
+      "admin": "Les administrateurs ont toujours un accès complet",
+      "noPerms": "Vous ne pouvez pas modifier les rôles · demandez à un administrateur",
+      "noAdd": "Vous ne pouvez pas ajouter de rôles · demandez à un administrateur",
+      "beyond": "Ce rôle a des accès que vous n’avez pas · demandez à un administrateur",
+      "notYours": "Vous ne pouvez donner que les accès que vous avez"
+    },
+    "added": "Rôle ajouté · nommez-le et choisissez ce qu’il peut faire",
+    "newRoleName": "Nouveau rôle",
+    "duplicateName": "Un rôle nommé {{name}} existe déjà",
+    "deleteRole": {
+      "action": "Supprimer le rôle",
+      "title": "Supprimer {{name}} ?",
+      "description": "Les membres avec ce rôle devront en recevoir un nouveau. Vous pourrez annuler pendant quelques secondes après confirmation.",
+      "confirm": "Supprimer",
+      "pending": "Suppression de {{name}}…"
+    },
+    "workspace": {
+      "title": "Autorisations de l’espace de travail",
+      "hint": "Paramètres, intégrations, facturation et journal d’audit — au-delà des sections ci-dessus. Vous ne pouvez accorder que ce que vous avez vous-même.",
+      "none": "Vous n’avez rien d’autre à accorder à ce rôle.",
+      "loadFailed": "Impossible de charger les autorisations de l’espace de travail."
+    },
+    "specials": {
+      "title": "Autorisations spéciales",
+      "floor": {
+        "label": "Voir le prix plancher",
+        "description": "Affiche le prix plancher masqué sur les prestations et les factures"
+      },
+      "clinical": {
+        "label": "Lire les notes cliniques",
+        "description": "Ouvre les plaintes, le diagnostic, les notes, les photos et les rapports"
+      },
+      "export": {
+        "label": "Exporter · {{section}}",
+        "description": "Télécharger son tableau"
+      },
+      "privateAlbum": {
+        "label": "Voir l’album privé",
+        "description": "Ouvre les photos privées du dossier patient"
+      }
+    }
+  },
+  "branches": {
+    "record": "Établissement",
+    "columns": {
+      "branch": "Établissement",
+      "address": "Adresse",
+      "contact": "Contact",
+      "hours": "Horaires",
+      "team": "Équipe",
+      "defaults": "Personnes par défaut",
+      "status": "Statut"
+    },
+    "main": "Principal",
+    "notSet": "Non défini",
+    "defaults": {
+      "doctor": "Médecin · {{name}}",
+      "desk": "Accueil · {{name}}",
+      "therapist": "Thérapeute · {{name}}",
+      "pharmacist": "Pharmacie · {{name}}"
+    },
+    "status": {
+      "open": "Ouvert",
+      "closed": "Fermé"
+    },
+    "records": "établissements",
+    "empty": "Aucun établissement pour l’instant",
+    "drawer": {
+      "title": {
+        "create": "Nouvel établissement",
+        "edit": "Modifier l’établissement"
+      },
+      "sub": "Adresse, horaires et les personnes qui y travaillent",
+      "summaryNew": "Nouvel établissement",
+      "people_one": "{{count}} personne",
+      "people_many": "{{count}} personnes",
+      "people_other": "{{count}} personnes",
+      "mainBadge": "Établissement principal",
+      "steps": {
+        "place": "Établissement et adresse",
+        "contact": "Contact et horaires",
+        "people": "Personnes"
+      },
+      "groups": {
+        "branch": "Établissement",
+        "address": "Adresse",
+        "contact": "Contact",
+        "hours": "Horaires"
+      },
+      "fields": {
+        "name": "Nom",
+        "colour": "Couleur",
+        "main": "Établissement principal",
+        "status": "Statut",
+        "line1": "Adresse (ligne 1)",
+        "line2": "Adresse (ligne 2)",
+        "area": "Quartier",
+        "city": "Ville",
+        "pin": "Code postal",
+        "state": "État",
+        "phone": "Téléphone",
+        "email": "E-mail",
+        "gstin": "GSTIN",
+        "days": "Jours",
+        "opens": "Ouvre",
+        "closes": "Ferme",
+        "team": "Équipe",
+        "doctor": "Médecin par défaut",
+        "desk": "Accueil par défaut",
+        "therapist": "Thérapeute par défaut",
+        "pharmacist": "Pharmacien par défaut"
+      },
+      "placeholders": {
+        "name": "ex. Vesu",
+        "line1": "Boutique / étage, bâtiment",
+        "line2": "Rue, point de repère",
+        "area": "ex. Vesu",
+        "city": "Ville",
+        "pin": "6 chiffres",
+        "state": "État",
+        "email": "etablissement@clinique.fr",
+        "gstin": "15 caractères",
+        "team": "Choisir l’équipe"
+      },
+      "hints": {
+        "colour": "identifie cet établissement partout",
+        "phone": "10 chiffres",
+        "team": "qui travaille ici",
+        "preselected": "présélectionné dans les formulaires ici",
+        "addFirst": {
+          "doctor": "ajoutez d’abord un médecin à l’équipe",
+          "desk": "ajoutez d’abord une personne de l’accueil à l’équipe",
+          "therapist": "ajoutez d’abord un thérapeute à l’équipe",
+          "pharmacist": "ajoutez d’abord un pharmacien à l’équipe"
+        },
+        "main": "un par clinique · défini à l’ouverture"
+      },
+      "toggles": {
+        "mainOn": "Principal · siège",
+        "mainOff": "Pas l’établissement principal",
+        "openOn": "Ouvert · visible dans les listes",
+        "openOff": "Fermé · masqué partout"
+      },
+      "nobody": "Personne",
+      "you": "{{name}} (vous)",
+      "save": {
+        "create": "Ajouter l’établissement",
+        "edit": "Enregistrer l’établissement"
+      },
+      "nameMissing": "Nommez l’établissement",
+      "addressMissing": "Ajoutez l’adresse, le quartier, la ville et le code PIN",
+      "duplicate": "Un établissement nommé {{name}} existe déjà",
+      "phoneInvalid": "Le téléphone doit comporter 10 chiffres",
+      "emailInvalid": "Saisissez une adresse e-mail valide",
+      "added": "Établissement {{name}} ajouté",
+      "saved": "{{name}} enregistré",
+      "contactMissing": "Ajoutez le téléphone et l’e-mail",
+      "pinInvalid": "Le code PIN doit comporter 6 chiffres"
+    }
+  }
+}

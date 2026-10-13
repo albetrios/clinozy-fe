@@ -75,18 +75,25 @@ function collectKeyLiterals(fileText) {
   return keys;
 }
 
+// `I18N_NAMESPACES.<property>` → the namespace's file name. They differ for
+// hyphenated namespaces (`appStock: 'app-stock'`), so read the real value.
+const NAMESPACE_FILES = Object.fromEntries(
+  [
+    ...readFileSync(join(SRC, 'lib/i18n/namespaces.ts'), 'utf8').matchAll(
+      /^\s*(\w+):\s*'([\w-]+)',$/gm,
+    ),
+  ].map((match) => [match[1], match[2]]),
+);
+
 function inferNamespace(filePath, fileText) {
   const nsMatch = fileText.match(/_NS\s*=\s*I18N_NAMESPACES\.(\w+)/);
-  if (nsMatch) return nsMatch[1];
+  if (nsMatch) return NAMESPACE_FILES[nsMatch[1]] ?? nsMatch[1];
   const nsMatch2 = fileText.match(/_NS\s*=\s*['"]([\w-]+)['"]/);
   if (nsMatch2) return nsMatch2[1];
 
   const rel = relative(SRC, filePath);
   const segment = rel.split('/')[1];
-  if (
-    segment &&
-    ['onboarding', 'login', 'auth', 'dashboard', 'settings'].includes(segment)
-  ) {
+  if (segment && ['onboarding', 'login', 'auth', 'settings'].includes(segment)) {
     return segment;
   }
   if (rel.includes('/SettingsModal/')) return 'settings';

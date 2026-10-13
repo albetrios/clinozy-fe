@@ -3,8 +3,6 @@ import type { Gate } from '@/core/security/gate.types.ts';
 import {
   requireActiveOrganization,
   requireOrganizationContext,
-  requirePersonalOrganizationsDeployment,
-  requireProvisionedPersonalDashboard,
   requireProvisionedTeamWorkspace,
   requireSuspendedOrganization,
   requireTeamOrganizationsDeployment,
@@ -45,7 +43,7 @@ export const requireOrgStatus = ((ctx) => {
 
 /**
  * **L4b — org status, inverted.** The only status guard on `suspended/`: send an
- * organization that is NOT suspended back to its dashboard (wraps
+ * organization that is NOT suspended back to its home (wraps
  * {@link requireSuspendedOrganization}).
  */
 export const requireSuspendedOrgStatus = ((ctx) => {
@@ -57,22 +55,7 @@ export const requireTeamDeployment = ((_ctx) => {
   requireTeamOrganizationsDeployment();
 }) satisfies Gate<OrgRouteCtx>;
 
-/** Block root personal dashboard when this deployment is team-only. */
-export const requirePersonalDeployment = ((_ctx) => {
-  requirePersonalOrganizationsDeployment();
-}) satisfies Gate<unknown>;
-
-/** `/dashboard` — session must have a personal active org (else onboarding / team URL). */
-export const requirePersonalDashboardWorkspace: Gate<{ redirectFrom?: string }> = async (
-  ctx,
-) => {
-  await requireProvisionedPersonalDashboard({ redirectFrom: ctx?.redirectFrom });
-};
-
-/** Team slug space — no active org → onboarding or picker; personal active org → `/dashboard`. */
+/** Team slug space and the picker — a user who still needs onboarding goes there first. */
 export const requireProvisionedWorkspace: Gate<OrgRouteCtx> = async (ctx) => {
-  await requireProvisionedTeamWorkspace({
-    organizationPicker: !ctx.params.organizationSlug,
-    redirectFrom: ctx.redirectFrom,
-  });
+  await requireProvisionedTeamWorkspace({ redirectFrom: ctx.redirectFrom });
 };

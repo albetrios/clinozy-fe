@@ -25,7 +25,7 @@
     },
     "done": {
       "title": "Todo listo",
-      "description": "Revisa y entra en tu panel."
+      "description": "Revisa y entra en tu espacio de trabajo."
     }
   },
   "welcome": {
@@ -99,7 +99,7 @@
   "actions": {
     "back": "Atrás",
     "continue": "Continuar",
-    "enterDashboard": "Entrar al panel",
+    "enterWorkspace": "Entrar a tu espacio",
     "settingUp": "Configurando…"
   },
   "defaults": {

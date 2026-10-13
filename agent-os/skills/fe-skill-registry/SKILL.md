@@ -304,7 +304,6 @@ For each common task, the skills below are required/auto-invoked. `fe-auto-imple
 **Project-specific implementations:**
 
 - `React.memo` on `DataTable` component
-- `useMemo` on `DataTableToolbar` computations
 - `preconnect`/`dns-prefetch` hints in `index.html`
 - Lazy loading via route-level code splitting
 - Bundle budgets enforced via `size-limit`
@@ -407,7 +406,7 @@ python3 agent-os/skills/ui-ux-pro-max/scripts/search.py "<query>" --stack shadcn
 ### 4e. animejs (installed — motion implementation)
 
 **Path:** `agent-os/skills/animejs/SKILL.md`
-**Purpose:** Anime.js v4 timelines, object tweens, stagger — **this repo's animation library** (`useAnimeCountUp` on dashboard stats).
+**Purpose:** Anime.js v4 timelines, object tweens, stagger — **this repo's animation library** (`useOnboardingStepMotion` on the onboarding steps).
 
 **Trigger keywords:** "anime.js", "count up", "timeline animation", "stagger animation"
 
@@ -671,7 +670,7 @@ python3 agent-os/skills/ui-ux-pro-max/scripts/search.py "<query>" --stack shadcn
 - Skill: `agent-os/skills/fe-route-island/SKILL.md`
 - Reference: `docs/reference/route-island-structure.md`
 - Template: `docs/getting-started/route-island-template.md`
-- Examples: `src/pages/organization/$organizationSlug/dashboard/`, `src/pages/login/`
+- Examples: `src/pages/organization/$organizationSlug/today/`, `src/pages/login/`
 
 ---
 
@@ -782,7 +781,7 @@ python3 agent-os/skills/ui-ux-pro-max/scripts/search.py "<query>" --stack shadcn
 
 **Path:** `agent-os/skills/fe-design-ditto/SKILL.md`
 
-**Purpose:** Build faithfully ("ditto") from the specs in an iteration's `intake-files/` — preset first, then a new shell variant, then screens — and verify side by side against the source at 375px and 1440px. The per-screen build skill `fe-kickoff-iteration` drives for each ledger row.
+**Purpose:** Build faithfully ("ditto") from the specs in an iteration's `intake-files/` — preset first, then the shell (replacing the old design), then screens — and verify side by side against the source at 375px and 1440px. The per-screen build skill `fe-kickoff-iteration` drives for each ledger row.
 
 **Trigger keywords:** "ditto", "same as the html", "like the legacy", "ditto from legacy", "match the design exactly", "build from legacy"
 

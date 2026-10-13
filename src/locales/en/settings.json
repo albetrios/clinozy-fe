@@ -43,7 +43,6 @@
       "recoveryTitle": "Save your recovery codes",
       "recoveryDescription": "Store these somewhere safe. Each one works once if you lose your device.",
       "done": "Done",
-      "cancel": "Cancel",
       "verifyEnable": "Verify & enable",
       "codeLabel": "Enter the 6-digit code",
       "codeAria": "Six-digit authenticator code",
@@ -66,7 +65,6 @@
       "addDescription": "Name it so you can recognize it later. Your device will prompt you to create the passkey.",
       "nameLabel": "Name",
       "namePlaceholder": "MacBook Touch ID",
-      "cancel": "Cancel",
       "submit": "Add passkey"
     },
     "overview": {
@@ -107,12 +105,6 @@
       "sendFailed": "We couldn't send the code. Please try again."
     }
   },
-  "discard": {
-    "title": "Discard unsaved changes?",
-    "description": "You have unsaved changes. Leaving this section will discard them.",
-    "stay": "Keep editing",
-    "leave": "Discard changes"
-  },
   "dialog": {
     "title": "Settings"
   },
@@ -148,7 +140,10 @@
       "cancelInviteDescription": "The link in their email will stop working. You can undo for a few seconds after confirming, or invite them again later.",
       "cancelInviteConfirm": "Cancel invitation",
       "cancelInviteKeep": "Keep invitation",
-      "cancelInvitePending": "Cancelling the invitation to {{email}}…"
+      "cancelInvitePending": "Cancelling the invitation to {{email}}…",
+      "movedTitle": "Members now live in Users",
+      "movedBody": "Invite people, change their roles, pause or remove them, and resend or cancel invitations — all from the Team.",
+      "open": "Open Users"
     },
     "roles": {
       "title": "Roles",
@@ -175,7 +170,10 @@
       "create": "New role",
       "roleFallback": "this role",
       "permissionsLoading": "Loading permissions…",
-      "permissionsLoadFailed": "Couldn't load the permission list. Please try again."
+      "permissionsLoadFailed": "Couldn't load the permission list. Please try again.",
+      "movedTitle": "Roles now live in Users",
+      "movedBody": "Add, rename and delete roles, and choose what each can do — the clinic sections, Users and workspace permissions — in Roles & access.",
+      "open": "Open Roles & access"
     },
     "listSort": {
       "label": "Sort by",
@@ -226,7 +224,15 @@
       "dangerZoneDescription": "Irreversible actions for your account.",
       "deleteHeading": "Delete account",
       "deleteBody": "Permanently delete your account and all associated data.",
-      "deleteAction": "Delete account"
+      "deleteAction": "Delete account",
+      "privacyTitle": "Privacy",
+      "privacyDescription": "Your choice about product analytics and session recordings, saved to your account.",
+      "analyticsLabel": "Product analytics and session recordings",
+      "analyticsHint": "PostHog analytics and Sentry session recordings. Error reports run either way.",
+      "consentGrantedOn": "Allowed on {{date}}",
+      "consentDeniedOn": "Declined on {{date}}",
+      "consentUnanswered": "Not answered yet",
+      "privacyPolicyLink": "Privacy policy"
     },
     "general": {
       "namePlaceholder": "Acme Inc.",
@@ -261,6 +267,7 @@
       "apiKeysNoResults": "No matching API keys",
       "apiKeysNoResultsDescription": "No API keys match your search.",
       "apiKeyFallback": "this API key",
+      "addedOn": "added <1></1>",
       "createApiKey": "Create API key",
       "createApiKeyTitle": "Create an API key",
       "createApiKeyDescription": "Name the key, choose what it may do, and set how long it lasts.",
@@ -295,7 +302,6 @@
       "addWebhookDescription": "We'll POST the selected events to this URL.",
       "payloadUrlLabel": "Payload URL",
       "eventsLabel": "Events",
-      "cancel": "Cancel",
       "createWebhook": "Create webhook",
       "creating": "Creating…",
       "deleteWebhookAria": "Delete webhook {{url}}",
@@ -323,7 +329,6 @@
       "attemptCodeColumn": "Code",
       "attemptWhenColumn": "When",
       "attemptCountLabel": "Attempt {{count}}",
-      "closeDialog": "Close",
       "eventsLoadFailed": "Couldn't load the event list. Please try again.",
       "eventsLoading": "Loading events…",
       "eventsEmpty": "No events are available to subscribe to."
@@ -347,12 +352,14 @@
         "email": "Email",
         "inApp": "In-app",
         "desktop": "Desktop"
-      }
+      },
+      "kind": "Notification",
+      "loadFailed": "Couldn't load your preferences. Please try again.",
+      "desktopDenied": "Desktop notifications need browser permission. Enable them in your browser settings, then turn this on again."
     },
     "appearance": {
       "title": "Appearance",
-      "description": "Saved on this device — changes apply live.",
-      "shuffle": "Shuffle"
+      "description": "Saved on this device — changes apply live."
     },
     "sessions": {
       "title": "Sessions",
@@ -404,6 +411,13 @@
         "expires": "Expires {{month}}/{{year}}",
         "defaultBadge": "Default"
       },
+      "paymentForm": {
+        "saveMethod": "Save payment method",
+        "savingMethod": "Saving…",
+        "confirmPayment": "Confirm payment",
+        "confirmingPayment": "Confirming…",
+        "cancel": "Cancel"
+      },
       "invoices": {
         "title": "Invoices",
         "description": "Date, due date, amount, and status from your billing provider.",
@@ -428,8 +442,7 @@
         "confirmTitle": "Cancel subscription?",
         "confirmDescription": "Your workspace keeps full access until {{date}}. After that, the subscription ends and paid features may be limited.",
         "keep": "Keep subscription",
-        "confirm": "Confirm cancellation",
-        "cancelling": "Cancelling…"
+        "confirm": "Confirm cancellation"
       }
     }
   }

@@ -1,5 +1,5 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type * as LazyModule from '@/lib/lazy-module.ts';
@@ -13,6 +13,10 @@ const transport = vi.hoisted(() => ({
 }));
 
 // Keep the production cache and React.lazy retry behavior; delay only transport.
+vi.mock('@/shared/hooks/useAppNav/index.ts', async () => {
+  const { TODAY_ONLY_NAV } = await import('@/tests/utils/app-nav-fixture.ts');
+  return { useAppNav: () => TODAY_ONLY_NAV };
+});
 vi.mock('@/lib/lazy-module.ts', async (importOriginal) => {
   const actual = await importOriginal<typeof LazyModule>();
   return {
@@ -43,6 +47,7 @@ function deferred() {
 vi.mock('@tanstack/react-router', async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
   useNavigate: () => vi.fn(),
+  useParams: () => ({}),
 }));
 vi.mock('@/shared/hooks/useMeContext/index.ts', () => ({
   useMeContext: () => ({ data: undefined }),
@@ -102,11 +107,31 @@ describe('CommandPaletteLazy', () => {
     expect(trigger).toHaveFocus();
   });
 
-  it('dismisses using the scrim while the list is loading', () => {
+  it("draws the loading list as the design's flat bars — a heading, then 40px rows, no pulse", async () => {
     useUIStore.setState({ commandPaletteOpen: true });
     render(<CommandPaletteLazy />);
-    fireEvent.click(screen.getByRole('dialog').querySelector('[aria-hidden="true"]')!);
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    const pending = await screen.findByTestId('command-palette-pending');
+
+    const rows = within(pending).getAllByTestId('skeleton-row');
+    expect(rows).toHaveLength(5);
+    for (const row of rows) expect(row).toHaveClass('h-10');
+    const bars = pending.querySelectorAll('[data-slot="skeleton"]');
+    expect(bars).toHaveLength(6);
+    for (const bar of bars) {
+      expect(bar).toHaveClass('bg-muted-strong', 'animate-none');
+      expect(bar).not.toHaveClass('animate-pulse');
+    }
+  });
+
+  it('dismisses using the scrim while the list is loading', async () => {
+    const user = userEvent.setup({ pointerEventsCheck: PointerEventsCheckLevel.Never });
+    useUIStore.setState({ commandPaletteOpen: true });
+    render(<CommandPaletteLazy />);
+    await screen.findByTestId('command-palette-pending');
+    await user.click(
+      document.querySelector<HTMLElement>('[data-slot="dialog-overlay"]')!,
+    );
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
   it('hands typed query, focus and selection to cmdk without replacing the dialog', async () => {

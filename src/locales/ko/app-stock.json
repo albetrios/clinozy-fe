@@ -1,0 +1,433 @@
+{
+  "manifest": {
+    "title": "클리닉 재고"
+  },
+  "tabs": {
+    "label": "클리닉 재고 섹션",
+    "items": "품목",
+    "purchases": "구매",
+    "movements": "입출고",
+    "vendors": "거래처"
+  },
+  "search": {
+    "label": "재고 내 검색",
+    "placeholder": {
+      "items": "품목 이름 또는 #ID 검색…",
+      "purchases": "청구서, #ID 또는 공급업체 검색…",
+      "vendors": "거래처 이름 검색…"
+    }
+  },
+  "create": {
+    "item": "새 품목",
+    "purchase": "새 구매",
+    "vendor": "새 클리닉 거래처"
+  },
+  "check": "재고 점검",
+  "filters": {
+    "all": "전체",
+    "stock": "재고",
+    "lowStock": "재고 부족",
+    "category": "카테고리",
+    "lasts": "사용 가능 기간",
+    "status": "상태",
+    "type": "유형",
+    "lastsWithin": {
+      "week": "1주 이내",
+      "three_weeks": "3주 이내"
+    }
+  },
+  "table": {
+    "addPhone": "전화번호 추가",
+    "noValue": "—"
+  },
+  "empty": {
+    "hint": "아직 아무것도 없습니다. 다른 탭이나 검색어를 사용해 보세요.",
+    "stock": "여기에 재고 품목이 없습니다"
+  },
+  "bulk": {
+    "export": "내보내기",
+    "exported_other": "{{count}}개 행을 CSV로 내보냈습니다"
+  },
+  "categories": {
+    "creams_serums": "크림 및 세럼",
+    "peels": "필링 및 중화제",
+    "masks": "마스크",
+    "consumables": "소모품",
+    "equipment": "장비",
+    "other": "기타 클리닉 재고"
+  },
+  "units": {
+    "piece": "개",
+    "tube": "튜브",
+    "bottle": "병",
+    "kit": "키트",
+    "pack": "팩",
+    "box": "상자",
+    "vial": "바이알",
+    "ampoule": "앰플",
+    "sachet": "포",
+    "jar": "용기",
+    "roll": "롤",
+    "pair": "켤레",
+    "ml": "ml",
+    "g": "g",
+    "litre": "리터"
+  },
+  "measures": {
+    "ml": "ml",
+    "g": "g",
+    "pcs": "개",
+    "units": "단위"
+  },
+  "quantity": {
+    "amount": "{{value}}{{unit}}",
+    "measured": "{{units}} · {{measure}}"
+  },
+  "levels": {
+    "ok": "양호",
+    "low": "부족",
+    "out": "품절"
+  },
+  "runway": {
+    "days_other": "약 {{count}}일",
+    "weeks_other": "약 {{count}}주",
+    "none": "사용 없음"
+  },
+  "items": {
+    "records": "품목",
+    "empty": "일치하는 품목이 없습니다",
+    "columns": {
+      "seq": "ID",
+      "name": "품목",
+      "category": "카테고리",
+      "stock": "재고",
+      "lasts": "사용 가능 기간",
+      "vendor": "공급업체",
+      "lastRate": "최근 단가"
+    },
+    "sub": "{{unit}}당 · 주당 약 {{usage}} 사용",
+    "subContents": "{{contents}} {{unit}}당 · 주당 약 {{usage}} 사용",
+    "stockLine": "{{quantity}} · {{level}}",
+    "rowActions": {
+      "use": "사용",
+      "receive": "입고 기록",
+      "log": "사용 기록…",
+      "adjust": "수량 조정",
+      "edit": "편집",
+      "delete": "삭제"
+    }
+  },
+  "purchases": {
+    "records": "구매",
+    "count_other": "구매 {{count}}건 · 미지급 {{due}}",
+    "columns": {
+      "seq": "ID",
+      "vendor": "공급업체",
+      "billNo": "청구서",
+      "date": "날짜",
+      "bill": "청구액",
+      "due": "미지급",
+      "status": "상태"
+    },
+    "statuses": {
+      "paid": "결제 완료",
+      "unpaid": "미결제",
+      "partial": "부분 결제"
+    },
+    "rowActions": {
+      "edit": "편집",
+      "delete": "삭제",
+      "pay": "{{amount}} 지불"
+    },
+    "vendorFilter": {
+      "any": "모든 공급처",
+      "count_other": "공급처 {{count}}곳",
+      "search": "공급처 검색",
+      "noMatch": "일치하는 항목 없음",
+      "clear": "지우기"
+    }
+  },
+  "movements": {
+    "records": "입출고",
+    "count_other": "{{count}}건",
+    "columns": {
+      "type": "유형",
+      "party": "품목 / 거래 상대",
+      "when": "일시",
+      "by": "담당",
+      "change": "변동"
+    },
+    "types": {
+      "used": "사용",
+      "received": "입고",
+      "adjust": "조정",
+      "damaged": "파손",
+      "returned": "반품",
+      "reverted": "되돌림",
+      "opening": "기초 재고"
+    },
+    "reverted": "되돌림",
+    "purchase": "구매 #{{seq}}에서",
+    "change": "{{sign}} {{amount}}",
+    "rowActions": {
+      "revert": "되돌리기"
+    },
+    "purchaseBill": "구매 #{{seq}}에서 · 청구서 {{billNo}}",
+    "deletedItem": "삭제된 품목",
+    "itemFilter": {
+      "any": "모든 품목",
+      "search": "품목 검색",
+      "noMatch": "일치 항목 없음",
+      "clear": "지우기",
+      "count_other": "{{count}}개 품목"
+    }
+  },
+  "vendors": {
+    "records": "거래처",
+    "empty": "일치하는 거래처가 없습니다",
+    "count_other": "거래처 {{count}}곳 · 미지급 {{payable}}",
+    "columns": {
+      "name": "거래처",
+      "purchases": "구매",
+      "payable": "미지급"
+    },
+    "purchases_other": "구매 {{count}}건",
+    "noPurchases": "구매 없음",
+    "rowActions": {
+      "edit": "편집",
+      "delete": "삭제",
+      "pay": "{{amount}} 지불"
+    },
+    "paidUp": "이제 {{name}}에게 지불할 금액이 없습니다"
+  },
+  "drawers": {
+    "records": {
+      "item": "품목",
+      "purchase": "구매",
+      "vendor": "거래처"
+    },
+    "saveChanges": "변경 사항 저장",
+    "addName": "이름을 입력하세요",
+    "pickers": {
+      "searchVendors": "클리닉 거래처 검색",
+      "vendorsHint": "클리닉 거래처",
+      "newVendor": "새 클리닉 거래처",
+      "selectItem": "품목 선택…",
+      "newItem": "새 클리닉 품목",
+      "inStock": "재고 {{quantity}}"
+    },
+    "treatments": {
+      "lhr": "레이저 제모",
+      "peel": "필링",
+      "facial": "페이셜",
+      "mole": "점 제거",
+      "general": "일반"
+    },
+    "item": {
+      "title": {
+        "create": "새 품목",
+        "edit": "품목 편집"
+      },
+      "sub": "클리닉 소모품 또는 장비",
+      "steps": {
+        "item": "품목",
+        "levels": "재고 수준",
+        "vendor": "공급업체"
+      },
+      "fields": {
+        "name": "이름",
+        "category": "카테고리",
+        "unit": "단위",
+        "contents": "{{unit}}당 내용량",
+        "contentsHint": "선택 · 팀이 {{unit}}의 일부만 사용할 수 있습니다",
+        "measure": "측정 단위",
+        "inStock": "재고",
+        "decimals": "소수 입력 가능",
+        "usage": "주간 사용량",
+        "min": "최소",
+        "max": "최대",
+        "vendor": "공급업체"
+      },
+      "save": "품목 추가",
+      "saved": "품목을 저장했습니다",
+      "nameTaken": "같은 이름의 품목이 이미 있습니다"
+    },
+    "quickItem": {
+      "title": "새 클리닉 품목",
+      "sub": "시술에 사용 · 판매용 아님",
+      "steps": {
+        "item": "품목",
+        "details": "세부 정보"
+      },
+      "added": "{{name}}을(를) 클리닉 품목에 추가했습니다"
+    },
+    "vendor": {
+      "title": {
+        "create": "새 클리닉 거래처",
+        "edit": "클리닉 거래처 편집"
+      },
+      "sub": "시술용 소모품 공급 · 의약품 아님",
+      "fields": {
+        "name": "이름",
+        "phone": "전화",
+        "phoneHint": "10자리"
+      },
+      "save": "거래처 추가",
+      "added": "거래처 {{name}}을(를) 추가했습니다",
+      "saved": "거래처를 저장했습니다",
+      "nameTaken": "이 이름의 거래처가 이미 있습니다"
+    },
+    "movement": {
+      "title": {
+        "used": "사용 기록",
+        "received": "입고 기록",
+        "adjust": "재고 조정"
+      },
+      "sub": "{{name}} · 현재 {{quantity}}",
+      "after": "변경 후: {{quantity}}",
+      "steps": {
+        "movement": "입출고",
+        "details": "세부 정보",
+        "notes": "메모"
+      },
+      "fields": {
+        "type": "유형",
+        "quantity": "수량",
+        "counted": "실사 수량",
+        "decimals": "소수 입력 가능",
+        "measureIn": "측정 단위",
+        "measureOption": "{{measure}} (1 {{unit}} = {{contents}})",
+        "usedFor": "사용 목적",
+        "optional": "선택",
+        "remark": "비고",
+        "remarkPlaceholder": "환자, 배치 또는 사유"
+      },
+      "save": "입출고 저장",
+      "summary": "{{name}} · {{change}}",
+      "enterQuantity": "수량을 입력하세요",
+      "onlyInStock": "재고는 {{quantity}}뿐입니다",
+      "saved": "{{type}} 저장됨 · {{quantity}} 남음",
+      "notEnoughStock": "재고가 더 이상 그만큼 없습니다. 그사이 누군가 사용했습니다. 수량을 확인하고 다시 시도하세요."
+    },
+    "use": {
+      "label": "{{name}} 사용",
+      "inStock": "재고 · {{quantity}}",
+      "measureIn": "측정 단위",
+      "conversion": "1 {{unit}} = {{contents}}",
+      "quantity": "수량",
+      "less": "줄이기",
+      "more": "늘리기",
+      "usedFor": "사용 목적",
+      "after": "사용 후 · {{quantity}}",
+      "moreDetails": "자세히 입력",
+      "save": "{{quantity}} 사용",
+      "used": "{{name}} {{quantity}} 사용 · {{left}} 남음",
+      "outOfStock": "{{name}} 재고가 없습니다"
+    },
+    "purchase": {
+      "title": {
+        "create": "새 구매",
+        "edit": "구매 편집"
+      },
+      "sub": "입고 품목은 재고에 추가됩니다",
+      "reorder": "부족 품목 재주문",
+      "noSupplier": "공급업체 없음",
+      "bill": "청구 {{amount}}",
+      "due": "미지급 {{amount}}",
+      "paid": "결제 완료",
+      "steps": {
+        "bill": "청구서",
+        "items": "입고 품목",
+        "payment": "결제"
+      },
+      "fields": {
+        "vendor": "공급업체",
+        "billNo": "청구서 번호",
+        "date": "청구일",
+        "items": "입고 품목",
+        "item": "품목",
+        "qty": "수량",
+        "rate": "단가",
+        "amount": "금액",
+        "addItem": "품목 추가",
+        "total": "합계",
+        "billAmount": "청구 금액",
+        "paid": "결제 완료",
+        "full": "전액",
+        "nothing": "없음",
+        "enterRate": "단가를 입력하세요",
+        "peek_other": "품목 {{count}}개 · {{amount}}",
+        "quickLine": "품목과 수량 입력 · 예: gloves 10 @250",
+        "quickHint": "10 = 수량 · @250 = 단가",
+        "lowStockChip": "{{name}} · {{quantity}}개 남음",
+        "mode": "결제 수단",
+        "branch": "결제 지점",
+        "paidSoFar": "{{amount}} 결제됨 · {{status}}",
+        "moreThanBill": "결제 금액이 청구액보다 많아요",
+        "dayClosed": "이 지점의 오늘 마감이 끝났어요. 오늘은 여기서 결제할 수 없어요",
+        "addLine": "품목을 하나 이상 추가하세요",
+        "tooManyLines": "한 번의 구매에는 최대 {{max}}개 품목까지 넣을 수 있어요"
+      },
+      "save": "구매 만들기",
+      "pickSupplier": "공급업체를 선택하세요",
+      "saved": "구매를 저장했습니다",
+      "savedStock": "구매 저장됨 · 재고가 업데이트되었습니다"
+    },
+    "check": {
+      "title": "재고 점검",
+      "sub": "선반에 있는 수량을 입력하세요. 차이가 있는 품목만 각각 조정으로 저장됩니다.",
+      "counted": "{{total}}개 중 {{counted}}개 확인",
+      "allItems": "모든 품목",
+      "fillRest": "나머지를 일치로 채우기",
+      "heads": {
+        "item": "품목",
+        "inSystem": "시스템",
+        "counted": "실사",
+        "difference": "차이"
+      },
+      "inSystem": "시스템 · {{quantity}}",
+      "countedLabel": "{{name}} 실사 수량",
+      "same": "시스템과 동일",
+      "measured": "= {{quantity}}",
+      "notCounted": "미확인",
+      "matches": "일치",
+      "willChange_other": "품목 {{count}}개가 변경됩니다",
+      "nothing": "아직 변경 사항이 없습니다",
+      "save": "실사 저장",
+      "failed": "저장되지 않음 · 입력한 수량은 유지됩니다",
+      "saved_other": "재고 점검 저장됨 · 품목 {{count}}개 업데이트",
+      "empty": "아직 셀 품목이 없습니다"
+    },
+    "confirm": {
+      "deleteItem": "이 품목을 삭제할까요?",
+      "deletePurchase": "이 구매를 삭제할까요?",
+      "deleteVendor": "이 클리닉 거래처를 삭제할까요?",
+      "removed": "{{name}}을(를) 삭제했습니다",
+      "deleted": "{{name}}을(를) 삭제했습니다",
+      "purchaseDeleted": "구매 #{{seq}}을(를) 삭제했습니다",
+      "revert": {
+        "title": "이 입출고를 되돌릴까요?",
+        "record": "{{name}} {{quantity}} · {{type}}",
+        "body": "재고가 이 기록 이전 상태로 돌아갑니다. 두 기록 모두 내역에 남습니다.",
+        "action": "되돌리기",
+        "reasons": {
+          "mistake": "실수로 기록함",
+          "wrongItem": "잘못된 품목",
+          "wrongQty": "잘못된 수량"
+        },
+        "done": "{{type}} 되돌림 · {{name}} {{quantity}}(으)로 복원",
+        "note": "{{when}} {{type}} 되돌림 · {{reason}}",
+        "blocked": {
+          "alreadyReverted": "이 입출고는 이미 되돌려졌습니다",
+          "notEnoughStock": "이 기록을 되돌릴 만큼 재고가 남아 있지 않습니다"
+        }
+      },
+      "blocked": {
+        "itemHasStock": "재고가 없는 품목만 삭제할 수 있어요. 먼저 0으로 조정하세요",
+        "purchasePaid": "결제된 금액이 있는 구매는 삭제할 수 없어요",
+        "vendorHasDues": "먼저 이 공급업체의 구매 대금을 정산하세요",
+        "stockUsed": "이 구매로 입고된 일부가 이미 사용되어 되돌릴 수 없어요"
+      }
+    }
+  }
+}

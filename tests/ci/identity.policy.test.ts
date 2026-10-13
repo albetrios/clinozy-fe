@@ -12,6 +12,9 @@ import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
+import { wordmarkParts } from '@/lib/brand-wordmark.ts';
+
+import { productWordmarkHtml } from '../../plugins/product-identity-html.ts';
 import {
   backendDirEnvVar,
   derivedSurfaces,
@@ -111,8 +114,30 @@ describe('product identity', () => {
     const html = read('index.html');
     expect(html).toContain('<title>{{PRODUCT_NAME}}</title>');
     expect(html).toContain('{{PRODUCT_THEME_COLOR}}');
-    expect(html).toContain('class="app-splash-name">{{PRODUCT_NAME}}<');
+    // The boot splash: its label and its wordmark drawing. The wordmark span may
+    // carry more attributes (its `dir="ltr"`) on any lines Prettier puts them;
+    // what holds is that its content is the token, never a drawn name.
+    expect(html).toContain('aria-label="Loading {{PRODUCT_NAME}}"');
+    expect(html).toMatch(
+      /class="app-splash-word"(?:\s+[\w-]+="[^"]*")*\s*>\{\{PRODUCT_WORDMARK\}\}</,
+    );
     expect(html).not.toContain(`<title>${identity.productName}</title>`);
+    const { head, tail } = wordmarkParts(identity.productName);
+    expect(html).not.toContain(`${head}<svg`);
+    expect(html).not.toContain(`</svg>${tail}`);
+  });
+
+  it('draws the splash wordmark from the product name, like ProductWordmark', () => {
+    const { head, ring, tail } = wordmarkParts(identity.productName);
+    const markup = productWordmarkHtml(identity.productName);
+    expect(markup.startsWith(head)).toBe(true);
+    expect(markup.endsWith(tail)).toBe(true);
+    expect(markup.includes('<svg')).toBe(ring);
+    // A brand without an "o" is plain text — and the markup escapes the name.
+    expect(productWordmarkHtml('Acme & Co')).toBe(
+      'acme &amp; c<svg class="app-splash-ring" viewBox="0 0 20 20" aria-hidden="true"><circle class="app-splash-ring-line" cx="10" cy="10" r="7.6" fill="none" stroke-width="4.2" /><circle class="app-splash-ring-dot" cx="10" cy="10" r="3" /></svg>',
+    );
+    expect(productWordmarkHtml('Acme')).toBe('acme');
   });
 
   it('routes app code through the generated module, not a literal', () => {
@@ -134,7 +159,9 @@ describe('product identity', () => {
     });
 
     it.each(LOCALES)('%s locale uses the variable, not the product name', (locale) => {
-      for (const namespace of ['layout', 'onboarding']) {
+      // The shared namespaces that name the product. (`layout` no longer does: its only
+      // brand line was the old login hero, removed with the preview layouts — 889d150e.)
+      for (const namespace of ['common', 'onboarding']) {
         const json = read(`src/locales/${locale}/${namespace}.json`);
         expect(json).toContain('{{productName}}');
       }

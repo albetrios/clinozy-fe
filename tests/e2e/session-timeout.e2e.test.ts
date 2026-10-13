@@ -1,6 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 
-import { registerNewUserAndGoToDashboard } from '@/tests/utils/e2e-auth.ts';
+import { registerNewUserAndGoToToday } from '@/tests/utils/e2e-auth.ts';
 import { byTestId, expectLoginFormReady } from '@/tests/utils/e2e-hybrid.ts';
 import { verifyDatabaseConnection } from '@/tests/utils/e2e-session.ts';
 
@@ -44,7 +44,7 @@ function recordAuthRequests(page: Page): string[] {
 async function reloadUnderVirtualClock(page: Page): Promise<void> {
   await page.clock.install();
   await page.reload();
-  await expect(byTestId(page, 'dashboard-page')).toBeVisible({ timeout: 30_000 });
+  await expect(byTestId(page, 'today-page')).toBeVisible({ timeout: 30_000 });
 }
 
 /** The session is really gone: a fresh load cannot silently restore it. */
@@ -66,7 +66,7 @@ test.describe('Idle session timeout', () => {
 
   test('"Sign out" on the inactivity dialog ends the session', async ({ page }) => {
     test.setTimeout(120_000);
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
     await reloadUnderVirtualClock(page);
     const authCalls = recordAuthRequests(page);
 
@@ -96,7 +96,7 @@ test.describe('Idle session timeout', () => {
 
   test('the keyboard can sign out from the inactivity dialog', async ({ page }) => {
     test.setTimeout(120_000);
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
     await reloadUnderVirtualClock(page);
 
     await page.clock.fastForward(IDLE_WARNING);
@@ -118,7 +118,7 @@ test.describe('Idle session timeout', () => {
     page,
   }) => {
     test.setTimeout(120_000);
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
     await reloadUnderVirtualClock(page);
     const authCalls = recordAuthRequests(page);
 
@@ -134,7 +134,7 @@ test.describe('Idle session timeout', () => {
 
   test('"Stay signed in" keeps the session and restarts the clock', async ({ page }) => {
     test.setTimeout(120_000);
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
     await reloadUnderVirtualClock(page);
     const authCalls = recordAuthRequests(page);
 
@@ -147,7 +147,7 @@ test.describe('Idle session timeout', () => {
 
     // The old deadline passes and nothing happens…
     await page.clock.fastForward(GRACE_PERIOD);
-    await expect(byTestId(page, 'dashboard-page')).toBeVisible();
+    await expect(byTestId(page, 'today-page')).toBeVisible();
     await expect(page).not.toHaveURL(/\/login/);
     expect(authCalls).not.toContain('POST /auth/logout');
 

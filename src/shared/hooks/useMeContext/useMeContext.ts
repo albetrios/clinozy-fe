@@ -32,7 +32,7 @@ interface UseMeContextOptions {
  * The caller's session context — user, active organization (+ status),
  * resolved permissions, global role, and the org-switcher list
  * (`GET /auth/me/context`). Server state via TanStack Query; never mirrored
- * into Zustand. Powers the dashboard today; nav/RBAC/settings later.
+ * into Zustand. The shell, Settings, onboarding and the switcher read it.
  */
 export function useMeContext({
   throwOnError = false,

@@ -1,0 +1,290 @@
+{
+  "manifest": {
+    "title": "Servicios"
+  },
+  "offerLabels": {
+    "percentOff": "{{value}} % de descuento",
+    "amountOff": "{{amount}} de descuento",
+    "fixedAt": "a {{amount}}",
+    "extraSessions_one": "+{{count}} sesión",
+    "extraSessions_many": "+{{count}} sesiones",
+    "extraSessions_other": "+{{count}} sesiones"
+  },
+  "toolbar": {
+    "tabsLabel": "Secciones de servicios",
+    "tabOfferings": "Servicios",
+    "tabOffers": "Ofertas",
+    "searchOfferings": "Busca por nombre o término",
+    "searchOffers": "Busca ofertas o códigos",
+    "searchLabel": "Buscar servicios",
+    "newOffering": "Nuevo servicio",
+    "newOffer": "Nueva oferta"
+  },
+  "catalogueCells": {
+    "allBranches": "Todas las sucursales"
+  },
+  "deleteConfirm": {
+    "offeringTitle": "¿Eliminar este servicio?",
+    "offerTitle": "¿Eliminar esta oferta?"
+  },
+  "columns": {
+    "seq": "ID",
+    "name": "Servicio",
+    "category": "Categoría",
+    "price": "Precio",
+    "offer": "Oferta",
+    "branches": "Sucursales",
+    "duration": "Duración",
+    "sessions": "Sesiones",
+    "status": "Estado",
+    "updated": "Actualizado"
+  },
+  "table": {
+    "records": "servicios"
+  },
+  "cells": {
+    "validDays_one": "Válido {{count}} día",
+    "validDays_many": "Válido {{count}} días",
+    "validDays_other": "Válido {{count}} días",
+    "validFor_one": "válido {{count}} día",
+    "validFor_many": "válido {{count}} días",
+    "validFor_other": "válido {{count}} días",
+    "wasPrice": "antes {{price}} · {{percent}} % de descuento",
+    "listPrice": "precio de lista",
+    "minutes": "{{minutes}} min",
+    "sessions_one": "{{count}} sesión",
+    "sessions_many": "{{count}} sesiones",
+    "sessions_other": "{{count}} sesiones",
+    "sessionsFree_one": "{{sessions}} + {{count}} gratis",
+    "sessionsFree_many": "{{sessions}} + {{count}} gratis",
+    "sessionsFree_other": "{{sessions}} + {{count}} gratis",
+    "active": "Activo",
+    "inactive": "Inactivo"
+  },
+  "rowActions": {
+    "edit": "Editar",
+    "delete": "Eliminar"
+  },
+  "bulk": {
+    "export": "Exportar",
+    "exported_one": "{{count}} fila exportada como CSV",
+    "exported_many": "{{count}} filas exportadas como CSV",
+    "exported_other": "{{count}} filas exportadas como CSV"
+  },
+  "empty": {
+    "title": "Aún no hay servicios",
+    "description": "Añade tratamientos y paquetes con precios para poder reservarlos y facturarlos.",
+    "noMatchTitle": "Ningún servicio coincide",
+    "noMatchDescription": "Aún no hay nada aquí. Prueba otra pestaña o búsqueda.",
+    "newOffering": "Nuevo servicio"
+  },
+  "offers": {
+    "columns": {
+      "offer": "Oferta",
+      "type": "Tipo",
+      "appliesTo": "Se aplica a",
+      "branches": "Sucursales",
+      "valid": "Vigencia",
+      "status": "Estado",
+      "updated": "Actualizado"
+    },
+    "table": {
+      "records": "ofertas"
+    },
+    "cells": {
+      "more": "+{{count}}",
+      "range": "{{start}} – {{end}}",
+      "now": "Ahora",
+      "noEnd": "sin fin",
+      "endsToday": "Termina hoy",
+      "endsTomorrow": "Termina mañana",
+      "endsIn_one": "Termina en {{count}} día",
+      "endsIn_many": "Termina en {{count}} días",
+      "endsIn_other": "Termina en {{count}} días",
+      "startsOn": "Empieza el {{date}}",
+      "over": "Terminada",
+      "noOfferings": "Sin servicios"
+    },
+    "rowActions": {
+      "edit": "Editar",
+      "pause": "Pausar",
+      "resume": "Reanudar",
+      "delete": "Eliminar"
+    },
+    "bulk": {
+      "export": "Exportar",
+      "exported_one": "{{count}} fila exportada como CSV",
+      "exported_many": "{{count}} filas exportadas como CSV",
+      "exported_other": "{{count}} filas exportadas como CSV"
+    },
+    "empty": {
+      "title": "Aún no hay ofertas",
+      "description": "Aún no hay nada aquí. Prueba otra pestaña o búsqueda.",
+      "newOffer": "Nueva oferta"
+    },
+    "record": "Oferta"
+  },
+  "record": "Servicio",
+  "offeringDrawer": {
+    "title": {
+      "create": "Nuevo servicio",
+      "edit": "Editar servicio"
+    },
+    "sub": "Se usa en citas, facturas y paquetes",
+    "quickFill": {
+      "single": "Sesión única",
+      "pack": "Pack de 6 sesiones",
+      "lhr": "Pack láser de 10",
+      "consultation": "Consulta"
+    },
+    "steps": {
+      "main": "Servicio, precio y sesiones",
+      "timeDetails": "Duración, validez y detalles",
+      "offersTime": "Ofertas, duración y validez",
+      "details": "Detalles"
+    },
+    "groups": {
+      "offering": "Servicio",
+      "price": "Precio y sesiones",
+      "offers": "Ofertas aplicadas",
+      "time": "Duración y validez",
+      "details": "Detalles"
+    },
+    "fields": {
+      "name": "Nombre",
+      "namePlaceholder": "p. ej. Láser rostro completo",
+      "category": "Categoría",
+      "colour": "Color",
+      "colourHint": "se usa para este servicio en todas partes",
+      "availableAt": "Disponible en",
+      "availableAtHint": "oculto en citas y facturas de otras sedes",
+      "price": "Precio",
+      "priceHint": "precio de lista · aparece en la factura",
+      "offerPrice": "Precio de oferta",
+      "offerPriceHint": "lo que cobra · vacío = precio de lista",
+      "offerPriceBelow": "lo que cobra · {{percent}} % bajo lista",
+      "sessions": "Sesiones",
+      "sessionsHint": "tratamientos permitidos por factura",
+      "gstRate": "Tasa de GST",
+      "gst": "GST",
+      "gstInclusive": "Incluido",
+      "gstExclusive": "No incluido",
+      "floor": "Precio mínimo",
+      "floorShown": "Visible · solo usted lo ve",
+      "floorHidden": "Oculto · toque para fijarlo",
+      "floorHint": "recepción nunca puede cobrar menos",
+      "billedToday": "Se cobra hoy",
+      "freeSessions_one": "+{{count}} sesión gratis",
+      "freeSessions_many": "+{{count}} sesiones gratis",
+      "freeSessions_other": "+{{count}} sesiones gratis",
+      "belowList": "{{percent}} % bajo lista",
+      "duration": "Duración",
+      "durationQuick": "{{minutes}} min",
+      "minutesUnit": "min",
+      "validity": "Validez",
+      "validityHint": "0 = sin caducidad · luego se pierden las sesiones que queden",
+      "daysUnit": "días",
+      "days_one": "{{count}} día",
+      "days_many": "{{count}} días",
+      "days_other": "{{count}} días",
+      "validityQuick": {
+        "none": "Ninguna",
+        "quarter": "3 meses",
+        "half": "6 meses",
+        "year": "1 año"
+      },
+      "searchTerms": "Términos de búsqueda",
+      "searchTermsHint": "separados por comas",
+      "searchTermsPlaceholder": "láser, rostro, depilación",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Qué incluye",
+      "status": "Estado",
+      "active": "Activo · reservable",
+      "inactive": "Inactivo · oculto",
+      "gstChip": "{{value}} %",
+      "gstHint": "0 % para una consulta, 18 % para lo demás — hasta que elijas uno"
+    },
+    "offerTill": "hasta el {{date}}",
+    "untitled": "Sin nombre",
+    "save": {
+      "create": "Crear servicio",
+      "edit": "Guardar cambios",
+      "createAnother": "Crear y añadir otro"
+    },
+    "toasts": {
+      "addName": "Añade un nombre",
+      "addPrice": "Añade un precio",
+      "offerAbovePrice": "El precio de oferta no puede superar el precio",
+      "floorAboveOffer": "El precio mínimo no puede superar el precio de oferta",
+      "offerBelowFloor": "Por debajo del precio mínimo de este servicio — pídeselo a un propietario o administrador",
+      "floorAbovePrice": "El precio mínimo no puede superar el precio",
+      "floorNeedsPermission": "Tu rol no puede cambiar el precio mínimo — pídeselo a un propietario o administrador"
+    }
+  },
+  "offerDrawer": {
+    "title": {
+      "create": "Nueva oferta",
+      "edit": "Editar oferta"
+    },
+    "sub": "Un precio por tiempo limitado en uno o más servicios · se aplica solo",
+    "untitled": "Nueva oferta",
+    "steps": {
+      "offer": "Oferta",
+      "where": "Dónde se aplica",
+      "notes": "Notas"
+    },
+    "fields": {
+      "name": "Nombre",
+      "namePlaceholder": "p. ej. Brillo de Diwali",
+      "code": "Código",
+      "codeHint": "opcional · para anuncios",
+      "codePlaceholder": "GLOW20",
+      "type": "Tipo",
+      "value": {
+        "percent": "Descuento",
+        "amount": "Importe de descuento",
+        "fixed": "Precio de oferta",
+        "extra": "Sesiones gratis"
+      },
+      "percentQuick": "{{value}} %",
+      "sessionsUnit": "sesiones",
+      "colour": "Color",
+      "colourHint": "marca esta oferta en servicios y facturas",
+      "offerings": "Servicios",
+      "offeringsHint": "elige uno o más",
+      "offeringsSearch": "Buscar servicios",
+      "branches": "Sucursales",
+      "branchesHint": "dónde puede usarla recepción",
+      "starts": "Empieza",
+      "ends": "Termina",
+      "previewPrice": "{{before}} → {{after}}",
+      "previewSessions_one": "{{before}} → {{count}} sesión",
+      "previewSessions_many": "{{before}} → {{count}} sesiones",
+      "previewSessions_other": "{{before}} → {{count}} sesiones",
+      "note": "Nota",
+      "notePlaceholder": "Para quién es y cómo debe mencionarla recepción",
+      "status": "Estado",
+      "live": "Activa · se aplica sola",
+      "paused": "En pausa"
+    },
+    "offeringCount_one": "{{count}} servicio",
+    "offeringCount_many": "{{count}} servicios",
+    "offeringCount_other": "{{count}} servicios",
+    "save": {
+      "create": "Crear oferta",
+      "edit": "Guardar oferta"
+    },
+    "toasts": {
+      "name": "Pon nombre a la oferta",
+      "offerings": "Elige al menos un servicio",
+      "value": {
+        "percent": "Indica el descuento",
+        "amount": "Indica el importe",
+        "fixed": "Indica el importe",
+        "extra": "Indica las sesiones gratis"
+      },
+      "endsBeforeStart": "Termina antes de empezar",
+      "offeringInactive": "{{name}} ya no está activo — quítalo o elige otro"
+    }
+  }
+}

@@ -1,13 +1,24 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-import { build, createServer } from 'vite';
-import { describe, expect, it } from 'vitest';
+import { build, createServer, type HotUpdateOptions, type Plugin } from 'vite';
+import { describe, expect, it, vi } from 'vitest';
 
-import { i18nBuild } from '../../plugins/i18n-build.ts';
+import { i18nBuild, localeNamespaceOf } from '../../plugins/i18n-build.ts';
 import { I18N_NAMESPACES } from '../../src/lib/i18n/namespaces.ts';
 
+/**
+ * The throwaway servers' own cache. Left at Vite's default (`node_modules/.vite`), their
+ * optimizer met a config unlike the dev server's and rewrote `node_modules/.vite/deps` — so
+ * every `pnpm test` pulled the pre-bundled deps out from under a running `pnpm dev`, and each
+ * lazy chunk importing one (the Security panel's `qrcode`, the theme's `culori`) died on a
+ * `504 (Outdated Optimize Dep)` until that server restarted.
+ */
+const POLICY_CACHE_DIR = resolve('node_modules/.vite/i18n-build-policy');
+
 const RESOURCE_ID = '\0virtual:clinozy-fe-i18n-resources';
+const NAMESPACE_ID = (namespace: string) =>
+  `\0virtual:clinozy-fe-i18n-namespace/${namespace}`;
 
 describe('production i18n resource boundaries', () => {
   it.each([
@@ -18,6 +29,7 @@ describe('production i18n resource boundaries', () => {
     const server = await createServer({
       configFile: false,
       envFile: false,
+      cacheDir: POLICY_CACHE_DIR,
       plugins: [i18nBuild({ modeFlag: 'single', localeFlag })],
       server: { middlewareMode: true, watch: null },
     });
@@ -34,7 +46,6 @@ describe('production i18n resource boundaries', () => {
         onboarding: { manifest: expect.any(Object) },
         settings: {
           dialog: expect.any(Object),
-          discard: expect.any(Object),
           nav: expect.any(Object),
           panels: { appearance: expect.any(Object) },
         },
@@ -86,6 +97,7 @@ describe('production i18n resource boundaries', () => {
     const server = await createServer({
       configFile: false,
       envFile: false,
+      cacheDir: POLICY_CACHE_DIR,
       plugins: [i18nBuild({ modeFlag: 'multi' })],
       server: { middlewareMode: true, watch: null },
     });
@@ -97,5 +109,89 @@ describe('production i18n resource boundaries', () => {
     } finally {
       await server.close();
     }
+  });
+});
+
+/**
+ * The plugin's `hotUpdate` hook against a stand-in dev environment: a module
+ * graph holding `loaded` and a hot channel that records what it sends.
+ */
+async function hotUpdate(plugin: Plugin, file: string, loaded: readonly string[]) {
+  const modules = new Map(loaded.map((id) => [id, { id }]));
+  const environment = {
+    moduleGraph: {
+      getModuleById: (id: string) => modules.get(id),
+      invalidateModule: vi.fn(),
+    },
+    hot: { send: vi.fn() },
+  };
+  const hook = plugin.hotUpdate;
+  const handler = typeof hook === 'function' ? hook : hook?.handler;
+  if (!handler) throw new Error('the plugin has no hotUpdate hook');
+  const result = await handler.call(
+    { environment } as never,
+    {
+      type: 'update',
+      file,
+      timestamp: 0,
+      modules: [],
+      read: () => '',
+      server: {},
+    } as unknown as HotUpdateOptions,
+  );
+  return { result, environment };
+}
+
+describe('dev server: a locale edit reaches the page without a restart', () => {
+  it('names the namespace a file feeds — the build’s locale or its English fallback', () => {
+    expect(localeNamespaceOf('/repo/src/locales/en/app.json', 'en')).toBe('app');
+    expect(localeNamespaceOf('/repo/src/locales/es/patients.json', 'es')).toBe(
+      'patients',
+    );
+    expect(localeNamespaceOf('/repo/src/locales/en/patients.json', 'es')).toBe(
+      'patients',
+    );
+    expect(localeNamespaceOf('C:\\repo\\src\\locales\\en\\app.json', 'en')).toBe('app');
+    expect(localeNamespaceOf('/repo/src/locales/de/app.json', 'en')).toBeUndefined();
+    expect(localeNamespaceOf('/repo/src/locales/en/unknown.json', 'en')).toBeUndefined();
+    expect(localeNamespaceOf('/repo/src/pages/patients.json', 'en')).toBeUndefined();
+  });
+
+  it('drops the modules built from an edited locale file and reloads the page', async () => {
+    const plugin = i18nBuild({ modeFlag: 'single', localeFlag: 'en-US' });
+    const { result, environment } = await hotUpdate(
+      plugin,
+      resolve('src/locales/en/app.json'),
+      [NAMESPACE_ID('app'), NAMESPACE_ID('patients'), RESOURCE_ID],
+    );
+    expect(result).toEqual([]);
+    expect(
+      environment.moduleGraph.invalidateModule.mock.calls.map(([module]) => module),
+    ).toEqual([{ id: NAMESPACE_ID('app') }, { id: RESOURCE_ID }]);
+    expect(environment.hot.send).toHaveBeenCalledWith({ type: 'full-reload' });
+  });
+
+  it('leaves every other edit to Vite', async () => {
+    const single = i18nBuild({ modeFlag: 'single', localeFlag: 'en-US' });
+    const loaded = [NAMESPACE_ID('app'), RESOURCE_ID];
+    for (const file of [
+      resolve('src/pages/organization/$organizationSlug/patients/PatientsPage.tsx'),
+      resolve('src/locales/de/app.json'),
+    ]) {
+      const { result, environment } = await hotUpdate(single, file, loaded);
+      expect(result).toBeUndefined();
+      expect(environment.hot.send).not.toHaveBeenCalled();
+    }
+    // Nothing built from the file yet: nothing to drop, no reload.
+    const unloaded = await hotUpdate(single, resolve('src/locales/en/app.json'), []);
+    expect(unloaded.result).toBeUndefined();
+    expect(unloaded.environment.hot.send).not.toHaveBeenCalled();
+    // Multi mode imports the JSON itself, which Vite already tracks.
+    const multi = await hotUpdate(
+      i18nBuild({ modeFlag: 'multi' }),
+      resolve('src/locales/en/app.json'),
+      loaded,
+    );
+    expect(multi.result).toBeUndefined();
   });
 });

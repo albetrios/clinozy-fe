@@ -19,7 +19,6 @@ import {
   resolvedTextDirection,
   resolvedTimeZone,
 } from './intl-config.ts';
-import { formatLocaleTestId, timeZoneTestId } from './locale.constants.ts';
 
 describe('normalizeFormatLocaleTag', () => {
   it('keeps a valid tag, maps a UI locale, then falls back to en-US', () => {
@@ -163,15 +162,5 @@ describe('number & currency format options', () => {
     expect(currencyFormatOptions('auto')).toEqual({});
     expect(currencyFormatOptions('code')).toEqual({ currencyDisplay: 'code' });
     expect(currencyFormatOptions('name')).toEqual({ currencyDisplay: 'name' });
-  });
-});
-
-describe('locale test-id builders', () => {
-  it('builds stable timezone test ids', () => {
-    expect(timeZoneTestId('America/New_York')).toBe('time-zone-America_New_York');
-  });
-
-  it('builds stable format-locale test ids', () => {
-    expect(formatLocaleTestId('ja-JP')).toBe('format-locale-ja_JP');
   });
 });

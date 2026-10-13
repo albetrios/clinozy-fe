@@ -15,6 +15,8 @@ import type { RoleSummary } from '@/shared/api/organization-contracts.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
+import type * as UsersRoomLinkModule from './UsersRoomLink.tsx';
+
 /**
  * The panel schedules its deferred removal through the query cache now, so it
  * needs a client. Kept local (rather than renderWithProviders) so these stay
@@ -32,9 +34,9 @@ const {
   removeMutate,
   removeMutateSync,
   removeMemberOptions,
-  updateRoleMutate,
-  updateStatusMutate,
-  useRolesMock,
+  updateMemberMutate,
+  rowMenuCrash,
+  usePlatformRolesMock,
 } = vi.hoisted(() => ({
   useMembersMock: vi.fn(),
   /** `mutateAsync` — the only removal entry point the panel may use. */
@@ -43,9 +45,10 @@ const {
   removeMutateSync: vi.fn(),
   /** Every options object `useRemoveMember` was constructed with. */
   removeMemberOptions: [] as (Record<string, unknown> | undefined)[],
-  updateRoleMutate: vi.fn(),
-  updateStatusMutate: vi.fn(),
-  useRolesMock: vi.fn(),
+  updateMemberMutate: vi.fn(),
+  /** When set, the row menu's write hook throws — a crash inside one row. */
+  rowMenuCrash: { current: false },
+  usePlatformRolesMock: vi.fn(),
 }));
 vi.mock('@/shared/hooks/useMembers/index.ts', async () => {
   const { useState } = await import('react');
@@ -56,20 +59,22 @@ vi.mock('@/shared/hooks/useMembers/index.ts', async () => {
       return { mutate: removeMutateSync, mutateAsync: removeMutate };
     },
     // Real pending state: the flag is the subject of the SET-12 tests below.
-    useUpdateMemberRole: () => {
+    useUpdateMember: () => {
       const [isPending, setIsPending] = useState(false);
+      if (rowMenuCrash.current) throw new Error('row menu exploded');
       return {
         isPending,
         mutate: (vars: unknown) => {
-          updateRoleMutate(vars);
+          updateMemberMutate(vars);
           setIsPending(true);
         },
       };
     },
-    useUpdateMemberStatus: () => ({ isPending: false, mutate: updateStatusMutate }),
   };
 });
-vi.mock('@/shared/hooks/useRoles/index.ts', () => ({ useRoles: useRolesMock }));
+vi.mock('@/shared/hooks/useTeam/index.ts', () => ({
+  usePlatformRoles: usePlatformRolesMock,
+}));
 const { resendMutate, revokeMutateAsync, revokeInvitationOptions } = vi.hoisted(() => ({
   resendMutate: vi.fn(),
   /** `mutateAsync` — the deferred commit has to await the revoke, as it does a removal. */
@@ -83,6 +88,13 @@ vi.mock('@/shared/hooks/useInvitations/index.ts', () => ({
     revokeInvitationOptions.push(options);
     return { mutateAsync: revokeMutateAsync };
   },
+}));
+// The Users room's link has its own suite; here only which surface the panel shows.
+vi.mock('./UsersRoomLink.tsx', async (importOriginal) => ({
+  ...(await importOriginal<typeof UsersRoomLinkModule>()),
+  UsersRoomLink: ({ section }: { section: string }) => (
+    <p data-testid={`users-room-link-${section}`}>{section}</p>
+  ),
 }));
 vi.mock('@/shared/components/InviteMemberDialog/index.ts', () => ({
   InviteMemberDialog: () => (
@@ -127,9 +139,9 @@ const OWNER = {
   userId: 'usr_owner',
   name: 'Ada Byron',
   email: 'ada@acme.test',
-  role: 'owner',
+  roleIds: ['rol_owner'],
   roleId: 'rol_owner',
-  roleName: 'Owner',
+  isOwner: true,
   status: 'active',
   joinedAt: '2026-01-01T00:00:00.000Z',
 };
@@ -138,9 +150,9 @@ const MEMBER = {
   userId: 'usr_1',
   name: 'Jo Rivera',
   email: 'jo@acme.test',
-  role: 'member',
+  roleIds: ['rol_member', 'rol_extra'],
   roleId: 'rol_member',
-  roleName: 'Member',
+  isOwner: false,
   status: 'active',
   joinedAt: '2026-02-01T00:00:00.000Z',
 };
@@ -157,7 +169,7 @@ const PENDING_INVITE = {
   ...INVITED,
   invitation: { id: 'inv_aaaaaaaaaaaaaaaaaaaaa', expiresAt: '2099-01-01T00:00:00.000Z' },
 };
-/** An invitation whose link has lapsed — clinozy-be refuses to resend it. */
+/** An invitation whose link has lapsed — a resend sends a fresh one. */
 const EXPIRED_INVITE = {
   ...INVITED,
   id: 'mem_lapsed',
@@ -173,7 +185,10 @@ function role(id: string, name: string): RoleSummary {
     description: '',
     permissions: [],
     memberCount: 0,
-    isSystem: name.toLowerCase() === 'owner',
+    isSystem: name === 'Owner',
+    isLocked: false,
+    tone: 'sky',
+    updatedAt: '2026-01-01T00:00:00.000Z',
   };
 }
 
@@ -194,17 +209,8 @@ function membersQueryResult(
   };
 }
 
-function rolesResult(rows: RoleSummary[]) {
-  return {
-    rows,
-    isPending: false,
-    isError: false,
-    isFetching: false,
-    hasNextPage: false,
-    isFetchingNextPage: false,
-    fetchNextPage: vi.fn(),
-    refetch: vi.fn(),
-  };
+function rolesResult(roles: RoleSummary[]) {
+  return { roles, isPending: false, isError: false, error: null, refetch: vi.fn() };
 }
 
 function setCanManage(value: boolean) {
@@ -214,9 +220,11 @@ function setCanManage(value: boolean) {
   });
   useOrganizationStore.setState({
     organizationType: value ? 'TEAM' : 'PERSONAL',
-    // Invite calls `POST .../memberships` (`membership:manage`) and its dialog needs the
-    // roles list (`role:read`); `invitation:manage` guards only the resend/revoke routes.
-    permissions: value ? ['membership:manage', 'role:read'] : [],
+    // Invite calls `POST .../memberships` (`membership:create`) and its dialog needs the
+    // roles list (`role:read`); edits are `membership:update`, removal `membership:delete`.
+    permissions: value
+      ? ['membership:create', 'membership:update', 'membership:delete', 'role:read']
+      : [],
     // A session whose guard chain has ANSWERED — the unresolved case is its own
     // test below (SET-23).
     permissionsResolved: true,
@@ -236,9 +244,10 @@ function setPermissions(permissions: OrganizationPermission[]) {
   });
 }
 const MANAGES_EVERYTHING: OrganizationPermission[] = [
-  'membership:manage',
+  'membership:create',
+  'membership:update',
+  'membership:delete',
   'role:read',
-  'invitation:manage',
 ];
 
 beforeEach(() => {
@@ -250,8 +259,9 @@ beforeEach(() => {
   removeMemberOptions.length = 0;
   revokeInvitationOptions.length = 0;
   deferredCommits.length = 0;
+  rowMenuCrash.current = false;
   useOrganizationStore.getState().clearOrganization();
-  useRolesMock.mockReturnValue(
+  usePlatformRolesMock.mockReturnValue(
     rolesResult([role('rol_owner', 'Owner'), role('rol_member', 'Member')]),
   );
 });
@@ -262,6 +272,24 @@ async function confirmRemoval(user: ReturnType<typeof userEvent.setup>) {
   await user.click(await screen.findByTestId('member-remove-mem_1'));
   await user.click(await screen.findByTestId('confirm-accept'));
 }
+
+describe('OrganizationMembersPanel — the Users room (D17)', () => {
+  it('links into the Team when the member can open the Users room', () => {
+    setPermissions(['membership:read', 'role:read', 'membership:update']);
+    render(<OrganizationMembersPanel />);
+    expect(screen.getByTestId('users-room-link-members')).toBeInTheDocument();
+    expect(screen.queryByTestId('members-list')).toBeNull();
+    expect(useMembersMock).not.toHaveBeenCalled();
+  });
+
+  it('keeps the members list for a member the room is shut to — no membership:read', () => {
+    useMembersMock.mockReturnValue(membersQueryResult({ rows: [MEMBER] }));
+    setPermissions(['organization:read']);
+    render(<OrganizationMembersPanel />);
+    expect(screen.queryByTestId('users-room-link-members')).toBeNull();
+    expect(screen.getByTestId('members-list')).toBeInTheDocument();
+  });
+});
 
 describe('OrganizationMembersPanel', () => {
   it('shows an empty state when there are no members', () => {
@@ -317,11 +345,11 @@ describe('OrganizationMembersPanel', () => {
     expect(screen.queryByTestId('member-actions-mem_1')).not.toBeInTheDocument();
   });
 
-  it('changes a member role to a real org role (sends role_id)', async () => {
+  it('changes the main role to a real org role and keeps the others (sends role_ids)', async () => {
     // Regression: the reachable Members panel could not change a member's role.
     // Picks a DIFFERENT role than the member's own — re-picking the current one
     // is a no-op by design now (SET-12).
-    useRolesMock.mockReturnValue(
+    usePlatformRolesMock.mockReturnValue(
       rolesResult([
         role('rol_owner', 'Owner'),
         role('rol_member', 'Member'),
@@ -337,9 +365,10 @@ describe('OrganizationMembersPanel', () => {
     await user.click(await screen.findByTestId('member-set-role-rol_admin'));
 
     await waitFor(() =>
-      expect(updateRoleMutate).toHaveBeenCalledWith(
-        expect.objectContaining({ membershipId: 'mem_1', roleId: 'rol_admin' }),
-      ),
+      expect(updateMemberMutate).toHaveBeenCalledWith({
+        membershipId: 'mem_1',
+        change: { roleIds: ['rol_admin', 'rol_extra'] },
+      }),
     );
   });
 
@@ -357,13 +386,13 @@ describe('OrganizationMembersPanel', () => {
     await user.click(screen.getByTestId('member-actions-mem_1'));
     await user.click(await screen.findByTestId('member-set-role-rol_member'));
 
-    expect(updateRoleMutate).not.toHaveBeenCalled();
+    expect(updateMemberMutate).not.toHaveBeenCalled();
   });
 
   it('disables the role menu while a role change is in flight', async () => {
     // `useAppMutation` JOINS a second call to the one already running, so a
     // second pick looked accepted and then vanished. Say "busy" instead.
-    useRolesMock.mockReturnValue(
+    usePlatformRolesMock.mockReturnValue(
       rolesResult([
         role('rol_owner', 'Owner'),
         role('rol_member', 'Member'),
@@ -377,7 +406,7 @@ describe('OrganizationMembersPanel', () => {
 
     await user.click(screen.getByTestId('member-actions-mem_1'));
     await user.click(await screen.findByTestId('member-set-role-rol_admin'));
-    expect(updateRoleMutate).toHaveBeenCalledTimes(1);
+    expect(updateMemberMutate).toHaveBeenCalledTimes(1);
 
     // The menu closes on select, so the disabled items are out of sight — the
     // row's own control has to carry the busy state.
@@ -391,16 +420,14 @@ describe('OrganizationMembersPanel', () => {
     expect(other).toHaveAttribute('aria-disabled', 'true');
 
     await user.click(other);
-    expect(updateRoleMutate).toHaveBeenCalledTimes(1);
+    expect(updateMemberMutate).toHaveBeenCalledTimes(1);
   });
 
   it('contains a crash in a row menu to that row', async () => {
     // One member's actions are their own failure domain — a throw there must
     // not blank the whole list.
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
-    useRolesMock.mockImplementation(() => {
-      throw new Error('roles hook exploded');
-    });
+    rowMenuCrash.current = true;
     useMembersMock.mockReturnValue(membersQueryResult({ rows: [MEMBER] }));
     setCanManage(true);
     render(<OrganizationMembersPanel />);
@@ -421,23 +448,23 @@ describe('OrganizationMembersPanel', () => {
     await user.click(await screen.findByTestId('member-toggle-status-mem_1'));
 
     await waitFor(() =>
-      expect(updateStatusMutate).toHaveBeenCalledWith({
+      expect(updateMemberMutate).toHaveBeenCalledWith({
         membershipId: 'mem_1',
-        status: 'suspended',
+        change: { status: 'suspended' },
       }),
     );
   });
 
   it('hides suspend/reactivate for an invited (never-joined) member', async () => {
     // clinozy-be rejects flipping a never-joined membership to active, so the FE
-    // must not offer it — invited members get role-change + remove only.
-    useMembersMock.mockReturnValue(membersQueryResult({ rows: [INVITED] }));
+    // must not offer it — invited members get role-change + the invitation's actions.
+    useMembersMock.mockReturnValue(membersQueryResult({ rows: [PENDING_INVITE] }));
     setCanManage(true);
     const user = userEvent.setup();
     render(<OrganizationMembersPanel />);
 
     await user.click(screen.getByTestId('member-actions-mem_inv'));
-    await screen.findByTestId('member-remove-mem_inv');
+    await screen.findByTestId('member-cancel-invite-mem_inv');
     expect(screen.queryByTestId('member-toggle-status-mem_inv')).not.toBeInTheDocument();
   });
 
@@ -449,7 +476,12 @@ describe('OrganizationMembersPanel', () => {
 
     await confirmRemoval(user);
 
-    await waitFor(() => expect(removeMutate).toHaveBeenCalledWith('mem_1'));
+    await waitFor(() =>
+      expect(removeMutate).toHaveBeenCalledWith({
+        membershipId: 'mem_1',
+        reason: 'not_needed',
+      }),
+    );
     // Through `mutateAsync` only — `mutate` returns void and cannot be awaited.
     expect(removeMutateSync).not.toHaveBeenCalled();
   });
@@ -549,7 +581,7 @@ describe('OrganizationMembersPanel', () => {
     expect(screen.getByTestId('invite-member-open')).toBeInTheDocument();
   });
 
-  it('hides the invite button without membership:manage', () => {
+  it('hides the invite button without membership:create', () => {
     useMembersMock.mockReturnValue(membersQueryResult({ rows: [MEMBER] }));
     setCanManage(false);
     render(<OrganizationMembersPanel />);
@@ -558,7 +590,7 @@ describe('OrganizationMembersPanel', () => {
 
   // The dialog cannot complete an invite without a role to assign, and
   // `GET .../roles` enforces `role:read` — so a caller holding only
-  // `membership:manage` gets no trigger rather than a dead picker.
+  // `membership:create` gets no trigger rather than a dead picker.
   it('hides the invite button without role:read', () => {
     useMembersMock.mockReturnValue(membersQueryResult({ rows: [MEMBER] }));
     useAuthStore.setState({
@@ -567,7 +599,7 @@ describe('OrganizationMembersPanel', () => {
     });
     useOrganizationStore.setState({
       organizationType: 'TEAM',
-      permissions: ['membership:manage'],
+      permissions: ['membership:create'],
       permissionsResolved: true,
     });
     render(<OrganizationMembersPanel />);
@@ -657,9 +689,8 @@ describe('OrganizationMembersPanel — pending invitations', () => {
     );
   });
 
-  it('says an invitation has expired, and offers cancel but not resend', async () => {
-    // clinozy-be answers a resend of a lapsed invitation with 400; cancel and
-    // invite again is the only way forward.
+  it('says an invitation has expired, and still offers resend and cancel', async () => {
+    // clinozy-be sends a lapsed invitation again with a fresh link (T11).
     useMembersMock.mockReturnValue(membersQueryResult({ rows: [EXPIRED_INVITE] }));
     setPermissions(MANAGES_EVERYTHING);
     const user = userEvent.setup();
@@ -672,12 +703,10 @@ describe('OrganizationMembersPanel — pending invitations', () => {
     expect(
       await screen.findByTestId('member-cancel-invite-mem_lapsed'),
     ).toBeInTheDocument();
-    expect(
-      screen.queryByTestId('member-resend-invite-mem_lapsed'),
-    ).not.toBeInTheDocument();
+    expect(screen.getByTestId('member-resend-invite-mem_lapsed')).toBeInTheDocument();
   });
 
-  it('resends by the INVITATION id, not the membership id', async () => {
+  it('resends by the invited MEMBERSHIP id', async () => {
     useMembersMock.mockReturnValue(membersQueryResult({ rows: [PENDING_INVITE] }));
     setPermissions(MANAGES_EVERYTHING);
     const user = userEvent.setup();
@@ -686,7 +715,7 @@ describe('OrganizationMembersPanel — pending invitations', () => {
     await user.click(screen.getByTestId('member-actions-mem_inv'));
     await user.click(await screen.findByTestId('member-resend-invite-mem_inv'));
 
-    expect(resendMutate).toHaveBeenCalledWith('inv_aaaaaaaaaaaaaaaaaaaaa');
+    expect(resendMutate).toHaveBeenCalledWith('mem_inv');
   });
 
   it('confirms, then revokes the invitation — never the bare membership delete', async () => {
@@ -706,7 +735,7 @@ describe('OrganizationMembersPanel — pending invitations', () => {
     await act(async () => {
       await lastDeferred().commit;
     });
-    expect(revokeMutateAsync).toHaveBeenCalledWith('inv_aaaaaaaaaaaaaaaaaaaaa');
+    expect(revokeMutateAsync).toHaveBeenCalledWith('mem_inv');
     expect(removeMutate).not.toHaveBeenCalled();
     expect(removeMutateSync).not.toHaveBeenCalled();
   });
@@ -750,33 +779,44 @@ describe('OrganizationMembersPanel — pending invitations', () => {
     expect(revokeInvitationOptions.at(-1)).toEqual({ suppressSuccessToast: true });
   });
 
-  it('falls back to Remove without invitation:manage', async () => {
+  it('with membership:update alone, an invited row offers resend — never cancel', async () => {
     useMembersMock.mockReturnValue(membersQueryResult({ rows: [PENDING_INVITE] }));
-    setPermissions(['membership:manage', 'role:read']);
+    setPermissions(['membership:update']);
     const user = userEvent.setup();
     render(<OrganizationMembersPanel />);
 
-    await user.click(screen.getByTestId('member-actions-mem_inv'));
-
-    expect(await screen.findByTestId('member-remove-mem_inv')).toBeInTheDocument();
-    expect(screen.queryByTestId('member-resend-invite-mem_inv')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('member-cancel-invite-mem_inv')).not.toBeInTheDocument();
-  });
-
-  it('with invitation:manage alone, menus only the invited rows, and only their actions', async () => {
-    useMembersMock.mockReturnValue(
-      membersQueryResult({ rows: [MEMBER, PENDING_INVITE] }),
-    );
-    setPermissions(['invitation:manage']);
-    const user = userEvent.setup();
-    render(<OrganizationMembersPanel />);
-
-    expect(screen.queryByTestId('member-actions-mem_1')).not.toBeInTheDocument();
     await user.click(screen.getByTestId('member-actions-mem_inv'));
 
     expect(await screen.findByTestId('member-resend-invite-mem_inv')).toBeInTheDocument();
-    expect(screen.getByTestId('member-cancel-invite-mem_inv')).toBeInTheDocument();
-    expect(screen.queryByTestId('member-set-role-rol_member')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('member-cancel-invite-mem_inv')).not.toBeInTheDocument();
     expect(screen.queryByTestId('member-remove-mem_inv')).not.toBeInTheDocument();
+  });
+
+  it('with membership:delete alone, cancel and remove only — no role or status change', async () => {
+    useMembersMock.mockReturnValue(
+      membersQueryResult({ rows: [MEMBER, PENDING_INVITE] }),
+    );
+    setPermissions(['membership:delete']);
+    const user = userEvent.setup();
+    render(<OrganizationMembersPanel />);
+
+    await user.click(screen.getByTestId('member-actions-mem_inv'));
+    expect(await screen.findByTestId('member-cancel-invite-mem_inv')).toBeInTheDocument();
+    expect(screen.queryByTestId('member-resend-invite-mem_inv')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('member-set-role-rol_member')).not.toBeInTheDocument();
+    await user.keyboard('{Escape}');
+
+    await user.click(screen.getByTestId('member-actions-mem_1'));
+    expect(await screen.findByTestId('member-remove-mem_1')).toBeInTheDocument();
+    expect(screen.queryByTestId('member-toggle-status-mem_1')).not.toBeInTheDocument();
+  });
+
+  it('names the main role only for a caller who may read roles', () => {
+    useMembersMock.mockReturnValue(membersQueryResult({ rows: [MEMBER] }));
+    usePlatformRolesMock.mockReturnValue(rolesResult([]));
+    setPermissions(['organization:read']);
+    render(<OrganizationMembersPanel />);
+    expect(screen.getByText('Jo Rivera')).toBeInTheDocument();
+    expect(screen.queryByText('Member')).not.toBeInTheDocument();
   });
 });

@@ -1,0 +1,207 @@
+{
+  "manifest": {
+    "title": "العملاء المحتملون"
+  },
+  "record": "عميل محتمل",
+  "toasts": {
+    "created": "تم إنشاء العميل المحتمل {{id}}",
+    "saved": "تم حفظ العميل المحتمل",
+    "statusChanged": "{{name}} ← {{status}}",
+    "claimed": "أصبحت مسؤولاً عن {{name}} · يبقى {{owner}} مشاركاً",
+    "claimedUnowned": "أصبحت مسؤولاً عن {{name}}",
+    "released": "أُتيح للفريق · يمكن لأي شخص استلامه",
+    "assigned": "{{name}} هو المسؤول الآن · تم إرسال إشعار"
+  },
+  "list": {
+    "records": "العملاء المحتملين",
+    "views": {
+      "label": "عروض العملاء المحتملين",
+      "mine": "لي",
+      "unreplied": "بلا رد",
+      "all": "الكل",
+      "unrepliedCount_zero": "لا شيء بلا رد",
+      "unrepliedCount_one": "واحد بلا رد",
+      "unrepliedCount_two": "اثنان بلا رد",
+      "unrepliedCount_few": "{{count}} بلا رد",
+      "unrepliedCount_many": "{{count}} بلا رد",
+      "unrepliedCount_other": "{{count}} بلا رد"
+    },
+    "search": {
+      "placeholder": "ابحث بالاسم أو الهاتف أو #المعرّف",
+      "label": "البحث في العملاء المحتملين"
+    },
+    "newLead": "عميل محتمل جديد",
+    "columns": {
+      "lead": "العميل المحتمل",
+      "status": "الحالة",
+      "source": "المصدر",
+      "interests": "مهتم بـ",
+      "team": "الفريق",
+      "updated": "آخر تحديث"
+    },
+    "empty": "لا يوجد عملاء محتملون مطابقون",
+    "clearFilters": "مسح عوامل التصفية",
+    "moreInterests_zero": "{{list}}",
+    "moreInterests_one": "واحد آخر: {{list}}",
+    "moreInterests_two": "اثنان آخران: {{list}}",
+    "moreInterests_few": "{{count}} أخرى: {{list}}",
+    "moreInterests_many": "{{count}} أخرى: {{list}}",
+    "moreInterests_other": "{{count}} أخرى: {{list}}"
+  },
+  "team": {
+    "claim": "مفتوح · استلم",
+    "openHint": "لا أحد يحجزه · يمكن لأي شخص المطالبة به",
+    "openMine": "مفتوح للفريق",
+    "openMineHint": "انتهى حجزك · يمكن لأي شخص المطالبة به",
+    "releasesToday": "يعود إلى الفريق اليوم الساعة {{time}}",
+    "releasesTomorrow": "يعود إلى الفريق غدًا الساعة {{time}}",
+    "claimFirst": "استلم {{first}}",
+    "takeOver": "تولَّ المسؤولية بدلًا من {{first}}"
+  },
+  "filters": {
+    "status": "الحالة",
+    "source": "المصدر · اختر أيًّا منها",
+    "clear": "مسح",
+    "hold": {
+      "label": "الملكية · محجوز بعد المطالبة",
+      "any": "الكل",
+      "open": "متاح للاستلام",
+      "soon": "يُتاح اليوم",
+      "held": "محتفظ به"
+    },
+    "team": {
+      "label": "الفريق · المسؤول أو المشارك",
+      "anyone": "أي شخص في الفريق",
+      "count_zero": "لا أحد",
+      "count_one": "شخص واحد",
+      "count_two": "شخصان",
+      "count_few": "{{count}} أشخاص",
+      "count_many": "{{count}} شخصًا",
+      "count_other": "{{count}} شخص",
+      "search": "ابحث في الفريق",
+      "noMatch": "لا تطابق"
+    }
+  },
+  "drawer": {
+    "title": "تعديل العميل المحتمل",
+    "sub": "أجرِ تغييراتك، ثم احفظ العميل المحتمل",
+    "idTooltip": "العميل المحتمل #{{seq}} · أُنشئ {{created}} · انقر للنسخ",
+    "idAria": "نسخ معرّف العميل المحتمل #{{seq}}",
+    "idCopied": "تم نسخ معرّف العميل المحتمل #{{seq}}",
+    "retarget": "إعادة الاستهداف",
+    "panels": "لوحات العميل المحتمل",
+    "details": "التفاصيل",
+    "chat": "المحادثة",
+    "resize": "تغيير حجم اللوحة",
+    "resizeHint": "اسحب لتغيير الحجم · انقر نقرًا مزدوجًا للإعادة",
+    "cards": {
+      "details": "تفاصيل العميل المحتمل",
+      "progress": "التقدّم",
+      "info": "معلومات"
+    },
+    "source": "المصدر",
+    "interests": "مهتم بـ",
+    "people": "المُسنَد إليه والمشاركون",
+    "peopleAria": "الأشخاص المُسنَد إليهم والمشاركون",
+    "addInvolved": "+ إضافة مشارك",
+    "claim": "استلام",
+    "release": "تحرير",
+    "releaseHint": "دع أي شخص في الفريق يستلمه",
+    "progressAria": "تقدّم العميل المحتمل",
+    "steps": {
+      "done": "تم",
+      "current": "الحالي",
+      "next": "التالي"
+    },
+    "stepTips": {
+      "done": "{{status}} · مكتمل",
+      "current": "{{status}} · الخطوة الحالية",
+      "next": "الانتقال إلى {{status}}",
+      "byCheckIn": "زار العيادة · يُضبط عند تسجيل الحضور"
+    },
+    "closeAs": "إغلاق بحالة",
+    "info": {
+      "created": "تاريخ الإنشاء",
+      "lastActivity": "آخر نشاط",
+      "none": "لا يوجد بعد",
+      "patient": "المريض",
+      "linked": "مرتبط",
+      "notYet": "ليس بعد",
+      "openTasks": "المهام المفتوحة",
+      "retargetReason": "سبب إعادة الاستهداف"
+    },
+    "footer": {
+      "remove": "إزالة العميل المحتمل",
+      "discard": "تجاهل",
+      "save": "حفظ العميل المحتمل"
+    },
+    "popover": {
+      "title": "الأشخاص في هذا العميل المحتمل",
+      "search": "ابحث في الفريق",
+      "assignedTo": "مُسنَد إلى · من يتولى هذا العميل المحتمل الآن",
+      "assign": "إسناد",
+      "assigned": "مُسنَد",
+      "currentlyAssigned": "مُسنَد حاليًا",
+      "assignTo": "إسناد إلى {{name}}",
+      "involved": "مشارك · عمل على هذا العميل المحتمل",
+      "noMatch": "لا توجد نتائج",
+      "note": "✓ المشاركون = كل من عمل على هذا العميل المحتمل. يُضافون تلقائيًا عند الرد أو الاتصال أو كتابة ملاحظة أو الحجز · ويمكنك إضافة شخص أيضًا"
+    },
+    "remove": {
+      "title": "إزالة هذا العميل المحتمل؟",
+      "effect": "يختفي العميل المحتمل من كل القوائم ومن قائمة انتظار المسؤول. يُحتفظ بسجل المحادثة. يمكنك التراجع من الإشعار مباشرةً بعد ذلك.",
+      "reasons": {
+        "duplicate": "مكرر",
+        "testEntry": "إدخال تجريبي",
+        "spam": "رسائل مزعجة",
+        "other": "أخرى"
+      },
+      "removed": "تمت إزالة العميل المحتمل #{{seq}} · {{reason}}"
+    }
+  },
+  "newLead": {
+    "title": "عميل محتمل جديد",
+    "sub": "الاسم ورقم الجوال يكفيان للبدء",
+    "contact": "جهة الاتصال",
+    "search": "ابحث بالاسم أو رقم الجوال",
+    "searchAria": "ابحث عن مريض أو جهة اتصال موجودة",
+    "quickStart": "بداية سريعة",
+    "presets": {
+      "walkIn": "زيارة مباشرة",
+      "instagramDm": "رسالة إنستغرام"
+    },
+    "presetHints": {
+      "walkIn": "في الاستقبال الآن · المصدر زيارة مباشرة",
+      "instagramDm": "رسالة على إنستغرام"
+    },
+    "hits": {
+      "patient": "مريض · {{id}} · {{phone}}",
+      "contact": "{{id}} · {{phone}}",
+      "openLead": "عميل محتمل مفتوح · {{id}} · {{phone}}",
+      "open": "فتح العميل المحتمل",
+      "recreate": "إعادة إنشاء العميل المحتمل",
+      "useContact": "استخدام جهة الاتصال"
+    },
+    "noMatch": "لا توجد نتيجة مطابقة",
+    "more_zero": " · +{{count}} أخرى",
+    "more_one": " · +{{count}} أخرى",
+    "more_two": " · +{{count}} أخرى",
+    "more_few": " · +{{count}} أخرى",
+    "more_many": " · +{{count}} أخرى",
+    "more_other": " · +{{count}} أخرى",
+    "change": "تغيير",
+    "changeTitle": "اختر جهة اتصال أخرى",
+    "afterContact": "بعد جهة الاتصال",
+    "detailsSummary": "المصدر والاهتمام ومن يتولاه",
+    "footer": "ينشئ جهة اتصال واحدة أو يحدّثها",
+    "create": "إنشاء عميل محتمل",
+    "toasts": {
+      "pickFirst": "اختر جهة الاتصال أو أضفها أولًا",
+      "presetApplied": "تم تطبيق الإعداد المسبق {{preset}}",
+      "existingPatient": "مريض موجود {{id}} · سيُربط العميل المحتمل الجديد",
+      "existingContact": "استخدام جهة الاتصال الموجودة {{name}}",
+      "missing": "أضف اسمًا ورقم جوال من 10 أرقام",
+      "open": "فتح"
+    }
+  }
+}

@@ -1,0 +1,179 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { act, renderHook, waitFor } from '@testing-library/react';
+import type { ReactNode } from 'react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('@/shared/notify/index.ts', () => ({
+  notify: { success: vi.fn(), error: vi.fn(), info: vi.fn(), undo: vi.fn() },
+}));
+/** The member's access: resolved, whether they read appointments and the pharmacy queue. */
+const access = vi.hoisted(() => ({
+  isResolved: true,
+  readsAppointments: true,
+  readsPrescriptions: false,
+}));
+vi.mock('@/shared/hooks/useAppAccess/index.ts', () => ({
+  useAppAccess: () => ({
+    isResolved: access.isResolved,
+    can: (section: string, action: string) =>
+      section === 'appointments' && action === 'view' && access.readsAppointments,
+    canCode: (code: string) =>
+      code === 'patient_prescription:read' && access.readsPrescriptions,
+  }),
+}));
+vi.mock('@/shared/api/app/today-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  fetchTodayFloor: vi.fn(),
+  fetchTodayEnquiries: vi.fn(),
+  moveFloorStage: vi.fn(),
+}));
+vi.mock('@/shared/api/app/appointments-api.ts', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  moveAppointment: vi.fn(),
+}));
+
+import { moveAppointment } from '@/shared/api/app/appointments-api.ts';
+import {
+  fetchTodayEnquiries,
+  fetchTodayFloor,
+  moveFloorStage,
+  todayQueryKeys,
+} from '@/shared/api/app/today-api.ts';
+import { TODAY_REFETCH_MS } from '@/shared/api/app/today-contracts.ts';
+
+import { useTodayEnquiries, useTodayFloor, useTodayMoves } from './useTodayFloor.ts';
+
+let client: QueryClient;
+function wrapper({ children }: { children: ReactNode }) {
+  return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
+}
+
+beforeEach(() => {
+  vi.resetAllMocks();
+  client = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+  Object.assign(access, {
+    isResolved: true,
+    readsAppointments: true,
+    readsPrescriptions: false,
+  });
+  vi.mocked(fetchTodayFloor).mockResolvedValue([]);
+  vi.mocked(fetchTodayEnquiries).mockResolvedValue([]);
+});
+afterEach(() => {
+  client.clear();
+});
+
+describe('useTodayFloor / useTodayEnquiries (KICKOFF §6.2)', () => {
+  it('read the floor and the enquiries, polled every 60s', async () => {
+    const { result } = renderHook(
+      () => ({ floor: useTodayFloor(), enquiries: useTodayEnquiries() }),
+      { wrapper },
+    );
+    await waitFor(() => expect(result.current.floor.isSuccess).toBe(true));
+    await waitFor(() => expect(result.current.enquiries.isSuccess).toBe(true));
+    expect(fetchTodayFloor).toHaveBeenCalledWith({}, { readsPrescriptions: false });
+    const polled = client
+      .getQueryCache()
+      .findAll({ queryKey: todayQueryKeys.floors() })
+      .map((query) => (query.options as { refetchInterval?: number }).refetchInterval);
+    expect(polled).toEqual([TODAY_REFETCH_MS]);
+  });
+
+  it('reads the pharmacy queue for a member who holds patient_prescription:read', async () => {
+    access.readsPrescriptions = true;
+    const { result } = renderHook(() => useTodayFloor(), { wrapper });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(fetchTodayFloor).toHaveBeenCalledWith({}, { readsPrescriptions: true });
+  });
+
+  it('waits for the member’s access, so the floor is read once', () => {
+    access.isResolved = false;
+    const { result } = renderHook(() => useTodayFloor(), { wrapper });
+    expect(result.current.fetchStatus).toBe('idle');
+    expect(fetchTodayFloor).not.toHaveBeenCalled();
+  });
+
+  it('never reads the floor without appointment:read — no 403 for an Accountant or Marketing', () => {
+    access.readsAppointments = false;
+    const { result } = renderHook(() => useTodayFloor(), { wrapper });
+    expect(result.current.fetchStatus).toBe('idle');
+    expect(fetchTodayFloor).not.toHaveBeenCalled();
+  });
+
+  it('wait while disabled — until the header’s branches are known', () => {
+    const { result } = renderHook(() => useTodayFloor({}, { enabled: false }), {
+      wrapper,
+    });
+    expect(result.current.fetchStatus).toBe('idle');
+    expect(fetchTodayFloor).not.toHaveBeenCalled();
+  });
+});
+
+describe('useTodayMoves', () => {
+  it('checks in and undoes it through the booking’s move routes, each with its own key, and refreshes the floor', async () => {
+    const { result } = renderHook(useTodayMoves, { wrapper });
+    const refresh = vi.spyOn(client, 'invalidateQueries');
+
+    await act(() => result.current.checkIn.mutateAsync('appt_1'));
+    await act(() => result.current.undoCheckIn.mutateAsync('appt_1'));
+    await act(() =>
+      result.current.moveStage.mutateAsync({
+        appointmentId: 'appt_1',
+        stage: 'with_doctor',
+      }),
+    );
+
+    const [checkIn, undo] = vi.mocked(moveAppointment).mock.calls.map(([vars]) => vars);
+    expect(checkIn).toEqual({
+      appointmentId: 'appt_1',
+      route: 'check-in',
+      idempotencyKey: expect.any(String),
+    });
+    expect(undo).toEqual({
+      appointmentId: 'appt_1',
+      route: 'undo-check-in',
+      idempotencyKey: expect.any(String),
+    });
+    expect(undo?.idempotencyKey).not.toBe(checkIn?.idempotencyKey);
+    expect(moveFloorStage).toHaveBeenCalledWith({
+      appointmentId: 'appt_1',
+      stage: 'with_doctor',
+      idempotencyKey: expect.any(String),
+    });
+    expect(refresh).toHaveBeenCalledWith(
+      expect.objectContaining({ queryKey: ['app', 'appointments'] }),
+    );
+  });
+
+  it('reads the tasks again once the rules have run on a check-in or its Undo — not on a stage move (D81 T7)', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout'] });
+    try {
+      const { result } = renderHook(useTodayMoves, { wrapper });
+      const refresh = vi.spyOn(client, 'invalidateQueries');
+      const taskReads = () =>
+        refresh.mock.calls.filter(([filters]) => filters?.queryKey?.[1] === 'tasks');
+
+      await act(() => result.current.checkIn.mutateAsync('appt_1'));
+      expect(taskReads()).toHaveLength(0);
+      await act(() => vi.advanceTimersByTimeAsync(1_500));
+      expect(taskReads()).toHaveLength(1);
+
+      await act(() => result.current.undoCheckIn.mutateAsync('appt_1'));
+      await act(() => vi.advanceTimersByTimeAsync(1_500));
+      expect(taskReads()).toHaveLength(2);
+
+      await act(() =>
+        result.current.moveStage.mutateAsync({
+          appointmentId: 'appt_1',
+          stage: 'treatment',
+        }),
+      );
+      await act(() => vi.advanceTimersByTimeAsync(1_500));
+      expect(taskReads()).toHaveLength(2);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});

@@ -5,10 +5,12 @@
  */
 import { z } from 'zod';
 
+import { FIXTURE_BACKED_APP_MODULES } from './app-modules.ts';
 import {
   enabledOAuthProviders,
   hasAnyAuthSurface,
   resolveBooleanFlag,
+  resolveDisabledModules,
   resolveOAuthProviderFlags,
 } from './env-resolvers.ts';
 
@@ -130,13 +132,14 @@ export const envFieldDescriptions: Readonly<Record<string, string>> = {
   VITE_STRIPE_PUBLISHABLE_KEY:
     'Stripe publishable key (pk_test_ in dev, pk_live_ in prod); public, safe to expose.',
   VITE_LAYOUT_WIDTH: 'App layout width: contained (default), full, or reading.',
-  VITE_THEME_LOCK: '"true" hides the runtime theme switcher + shuffle.',
+  VITE_THEME_LOCK:
+    '"true" pins the theme mode: the Account menu hides its Light / Dark / System pills and Appearance shows a note in place of its Mode card.',
   VITE_PRIVACY_POLICY_URL:
     'Privacy-policy URL shown in the consent banner/footer (optional).',
   VITE_CSP_REPORT_URI:
     'CSP violation report collector URI (e.g. a Sentry CSP ingest URL); empty = violations reach each visitor console only. Warned on in both deploy environments.',
   VITE_DISABLED_MODULES:
-    'Comma-separated module keys to disable (e.g. billing,members); routes 404 via the module gate.',
+    'Comma-separated module keys to disable (e.g. billing,members); routes 404 via the module gate. Clinic rooms are app-today … app-users; production disables the fixture-backed ones until their API lands.',
   VITE_PERSONAL_ORGANIZATIONS:
     'Tri-state override for personal-org deployment mode (true/false/unset).',
   VITE_TEAM_ORGANIZATIONS:
@@ -154,8 +157,7 @@ export const envFieldDescriptions: Readonly<Record<string, string>> = {
     'Cloudflare Turnstile site key; required in production unless VITE_CAPTCHA_DISABLED is true.',
   VITE_DEBUG_LOGGING:
     '"true" emits [Module] diagnostic console logs (on locally and in the development deploy, off in production).',
-  VITE_DEVTOOLS:
-    '"true" mounts React Query Devtools + the localhost debug panel + theme-shuffle shortcut.',
+  VITE_DEVTOOLS: '"true" mounts React Query Devtools + the localhost debug panel.',
   VITE_E2E_HOOKS:
     '"true" installs Playwright E2E hooks on globalThis (navigateInApp, establishSession).',
   VITE_VERSION_CHECK:
@@ -308,6 +310,8 @@ interface RequiredKeyRule {
   readonly condition?: string;
   /** `error` fails the gate; `warn` only reports. Defaults to `error`. */
   readonly level?: 'error' | 'warn';
+  /** Set is not enough: the value must also pass this. Omit = any non-empty value. */
+  readonly satisfiedBy?: (value: string) => boolean;
 }
 
 /** A key that must NOT reach an environment (optionally only when value matches). */
@@ -391,6 +395,23 @@ const CSP_REPORT_URI_RULE: RequiredKeyRule = {
   level: 'warn',
 };
 
+/**
+ * Production keeps every fixture-backed clinic room switched off until its API lands (D8): a
+ * production deploy must name each in `VITE_DISABLED_MODULES`. The profile's default says the
+ * same, but defaults are not applied at runtime — a build without the key would ship the
+ * fixture rooms to real clinics, so the deploy is refused instead.
+ */
+const FIXTURE_ROOMS_OFF_RULE: RequiredKeyRule = {
+  key: 'VITE_DISABLED_MODULES',
+  when: () => FIXTURE_BACKED_APP_MODULES.length > 0,
+  satisfiedBy: (value) => {
+    const off = resolveDisabledModules(value);
+    return FIXTURE_BACKED_APP_MODULES.every((module) => off.has(module));
+  },
+  condition: `naming every fixture-backed clinic room (${FIXTURE_BACKED_APP_MODULES.join(', ')}) until its API lands — D8`,
+  level: 'error',
+};
+
 const devLikeContract: Omit<EnvProfile, 'defaults'> = {
   required: [],
   forbidden: [
@@ -437,6 +458,15 @@ export const envProfiles: Readonly<Record<AppEnvironment, EnvProfile>> = {
       VITE_VERSION_CHECK: 'false',
       // Multi-locale so Appearance → Language works locally; prod defaults single.
       BUILD_I18N_MODE: 'multi',
+      // Team-only deployment (D44): clinozy-be no longer sends the deployment flags on
+      // me/context, so the front end states the mode itself.
+      VITE_TEAM_ORGANIZATIONS: 'true',
+      VITE_PERSONAL_ORGANIZATIONS: 'false',
+      // Turnstile on, with Cloudflare's public always-pass TEST site key — it pairs with
+      // clinozy-be's local test secret, so the real sign-in flow runs on localhost and in a
+      // cloud session with no secret to hand over. Deploys use their own real key.
+      VITE_CAPTCHA_DISABLED: 'false',
+      VITE_TURNSTILE_SITE_KEY: '1x00000000000000000000AA',
     },
     // Test-mode Stripe (development forbids pk_live_) and PostHog work on localhost as-is.
     externalCredentials: [
@@ -480,6 +510,7 @@ export const envProfiles: Readonly<Record<AppEnvironment, EnvProfile>> = {
         level: 'warn',
       },
       CSP_REPORT_URI_RULE,
+      FIXTURE_ROOMS_OFF_RULE,
     ],
     forbidden: [
       ...SONAR_LOCAL_ONLY,
@@ -497,7 +528,10 @@ export const envProfiles: Readonly<Record<AppEnvironment, EnvProfile>> = {
       VITE_E2E_HOOKS: ['false'],
       VITE_VERSION_CHECK: ['true'],
     },
-    // Production-safe defaults (each ∈ allowed above): diagnostics off, polling on.
+    // Production-safe defaults (each ∈ allowed above): diagnostics off, polling on. The
+    // fixture-backed rooms are NOT a default: `github:sync` prunes a variable equal to its
+    // default (assuming the runtime falls back to it), and the runtime never applies this one —
+    // the deploy would ship every room. `FIXTURE_ROOMS_OFF_RULE` refuses that deploy instead (D8).
     defaults: {
       VITE_APP_ENV: 'production',
       VITE_DEBUG_LOGGING: 'false',

@@ -1,0 +1,48 @@
+{
+  "manifest": {
+    "title": "Patienten"
+  },
+  "views": {
+    "label": "Patientenansichten",
+    "all": "Alle",
+    "follow": "Wiedervorlage fällig",
+    "recall": "Recall"
+  },
+  "search": {
+    "placeholder": "Name, Mobilnummer oder #ID",
+    "label": "Patienten suchen"
+  },
+  "primary": {
+    "newPatient": "Neuer Patient"
+  },
+  "columns": {
+    "seq": "ID",
+    "name": "Patient",
+    "gender": "Geschlecht",
+    "types": "Typ",
+    "status": "Status",
+    "conversion": "Konversion",
+    "age": "Alter",
+    "followUp": "Wiedervorlage",
+    "updated": "Aktualisiert"
+  },
+  "table": {
+    "records": "Patienten",
+    "age_one": "{{count}} J.",
+    "age_other": "{{count}} J."
+  },
+  "rowActions": {
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "newInvoice": "Neue Rechnung"
+  },
+  "bulk": {
+    "export": "Exportieren",
+    "exported_one": "{{count}} Zeile als CSV exportiert",
+    "exported_other": "{{count}} Zeilen als CSV exportiert"
+  },
+  "empty": {
+    "title": "Kein passender Patient",
+    "description": "Hier ist noch nichts. Versuchen Sie einen anderen Tab oder eine andere Suche."
+  }
+}

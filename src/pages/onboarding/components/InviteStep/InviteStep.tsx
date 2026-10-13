@@ -2,10 +2,15 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
-import { closeControlClassName } from '@/lib/icon-surface.ts';
+import { toneForLabel } from '@/shared/app/app-tone-label.ts';
+import {
+  PersonAvatar,
+  personInitials,
+} from '@/shared/components/Cells/PersonAvatar/index.ts';
+import { DrawerInput } from '@/shared/components/DrawerField/drawer-text-controls.tsx';
+// The field and its input by their own modules: onboarding stays free of the drawer controls.
+import { DrawerField } from '@/shared/components/DrawerField/DrawerField.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { Input } from '@/shared/components/ui/input.tsx';
-import { Label } from '@/shared/components/ui/label.tsx';
 import { Plus, X } from '@/shared/icons/index.ts';
 import { useOnboardingStore } from '@/shared/store/useOnboardingStore/index.ts';
 
@@ -50,11 +55,16 @@ export function InviteStep() {
   return (
     <div className="space-y-4">
       <div className="flex items-end gap-2">
-        <div className="flex-1 space-y-2">
-          <Label htmlFor="ob-invite">{t(ONBOARDING_KEYS.invite.emailLabel)}</Label>
-          <Input
+        <DrawerField
+          label={t(ONBOARDING_KEYS.invite.emailLabel)}
+          htmlFor="ob-invite"
+          className="flex-1"
+        >
+          <DrawerInput
             id="ob-invite"
             type="email"
+            capitalize={false}
+            autoComplete="email"
             value={email}
             onChange={(e) => {
               setEmail(e.target.value);
@@ -71,14 +81,14 @@ export function InviteStep() {
             placeholder={t(ONBOARDING_KEYS.invite.emailPlaceholder)}
             data-testid={ONBOARDING_TEST_IDS.inviteEmail}
           />
-        </div>
+        </DrawerField>
         <Button
           type="button"
           variant="outline"
           onClick={add}
           data-testid={ONBOARDING_TEST_IDS.inviteAdd}
         >
-          <Plus className="me-1 h-4 w-4" />
+          <Plus className="size-4" />
           {t(ONBOARDING_KEYS.invite.addButton)}
         </Button>
       </div>
@@ -93,22 +103,38 @@ export function InviteStep() {
         </p>
       )}
       {invites.length > 0 && (
-        <ul className="space-y-2" data-testid={ONBOARDING_TEST_IDS.inviteList}>
+        // The design's item rows (`_patterns.md:139`): one 12px-cornered frame,
+        // rows split by hairlines — each invitee as a person row (the 26px
+        // avatar in their name's hashed tone) with the remove "×" at the end.
+        <ul
+          className="divide-y overflow-hidden rounded-xl border"
+          data-testid={ONBOARDING_TEST_IDS.inviteList}
+        >
           {invites.map((invite) => (
-            <li
-              key={invite}
-              className="bg-muted/50 flex items-center justify-between rounded-md px-3 py-2 text-sm"
-            >
-              {invite}
-              <button
+            <li key={invite} className="text-body flex items-center gap-2.5 px-3 py-2">
+              <PersonAvatar
+                size="option"
+                initials={personInitials(
+                  invite.split('@')[0]?.replaceAll(/[._-]+/g, ' ') ?? invite,
+                )}
+                tone={toneForLabel(invite)}
+              />
+              <span
+                dir="ltr"
+                className="min-w-0 flex-1 truncate [text-align:match-parent]"
+              >
+                {invite}
+              </span>
+              <Button
                 type="button"
-                data-slot="button"
+                variant="ghost"
+                size="icon-xs"
                 aria-label={t(ONBOARDING_KEYS.invite.removeAriaLabel, { email: invite })}
                 onClick={() => patch({ invites: invites.filter((i) => i !== invite) })}
-                className={closeControlClassName}
+                className="text-muted-foreground hover:bg-destructive-tint dark:hover:bg-destructive-tint hover:text-destructive size-6.5 rounded-md"
               >
-                <X className="h-4 w-4" />
-              </button>
+                <X className="size-3.5" />
+              </Button>
             </li>
           ))}
         </ul>

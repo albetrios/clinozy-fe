@@ -43,7 +43,6 @@
       "recoveryTitle": "Wiederherstellungscodes speichern",
       "recoveryDescription": "Bewahren Sie diese sicher auf. Jeder funktioniert einmal, wenn Sie Ihr Gerät verlieren.",
       "done": "Fertig",
-      "cancel": "Abbrechen",
       "verifyEnable": "Bestätigen & aktivieren",
       "codeLabel": "6-stelligen Code eingeben",
       "codeAria": "Sechsstelliger Authenticator-Code",
@@ -66,7 +65,6 @@
       "addDescription": "Benennen Sie ihn, damit Sie ihn später erkennen. Ihr Gerät fordert Sie zur Erstellung auf.",
       "nameLabel": "Name",
       "namePlaceholder": "MacBook Touch ID",
-      "cancel": "Abbrechen",
       "submit": "Passkey hinzufügen"
     },
     "overview": {
@@ -107,12 +105,6 @@
       "sendFailed": "Der Code konnte nicht gesendet werden. Bitte erneut versuchen."
     }
   },
-  "discard": {
-    "title": "Ungespeicherte Änderungen verwerfen?",
-    "description": "Sie haben ungespeicherte Änderungen. Beim Verlassen dieses Bereichs gehen sie verloren.",
-    "stay": "Weiter bearbeiten",
-    "leave": "Änderungen verwerfen"
-  },
   "dialog": {
     "title": "Einstellungen"
   },
@@ -148,7 +140,10 @@
       "cancelInviteDescription": "Der Link in der E-Mail funktioniert dann nicht mehr. Sie können kurz nach der Bestätigung rückgängig machen oder die Person später erneut einladen.",
       "cancelInviteConfirm": "Einladung zurückziehen",
       "cancelInviteKeep": "Einladung behalten",
-      "cancelInvitePending": "Einladung an {{email}} wird zurückgezogen…"
+      "cancelInvitePending": "Einladung an {{email}} wird zurückgezogen…",
+      "movedTitle": "Mitglieder finden Sie jetzt unter Benutzer",
+      "movedBody": "Laden Sie Personen ein, ändern Sie ihre Rollen, pausieren oder entfernen Sie sie und senden Sie Einladungen erneut oder widerrufen Sie sie — alles im Team.",
+      "open": "Benutzer öffnen"
     },
     "roles": {
       "title": "Rollen",
@@ -175,7 +170,10 @@
       "create": "Neue Rolle",
       "roleFallback": "diese Rolle",
       "permissionsLoading": "Berechtigungen werden geladen…",
-      "permissionsLoadFailed": "Die Berechtigungsliste konnte nicht geladen werden. Bitte erneut versuchen."
+      "permissionsLoadFailed": "Die Berechtigungsliste konnte nicht geladen werden. Bitte erneut versuchen.",
+      "movedTitle": "Rollen finden Sie jetzt unter Benutzer",
+      "movedBody": "Legen Sie Rollen an, benennen oder löschen Sie sie und bestimmen Sie, was jede darf — Klinikbereiche, Benutzer und Arbeitsbereich-Rechte — unter Rollen & Zugriff.",
+      "open": "Rollen & Zugriff öffnen"
     },
     "listSort": {
       "label": "Sortieren nach",
@@ -226,7 +224,15 @@
       "dangerZoneDescription": "Unwiderrufliche Aktionen für Ihr Konto.",
       "deleteHeading": "Konto löschen",
       "deleteBody": "Löschen Sie Ihr Konto und alle zugehörigen Daten dauerhaft.",
-      "deleteAction": "Konto löschen"
+      "deleteAction": "Konto löschen",
+      "privacyTitle": "Datenschutz",
+      "privacyDescription": "Ihre Entscheidung zu Produktanalysen und Sitzungsaufzeichnungen, gespeichert in Ihrem Konto.",
+      "analyticsLabel": "Produktanalysen und Sitzungsaufzeichnungen",
+      "analyticsHint": "PostHog-Analysen und Sentry-Sitzungsaufzeichnungen. Fehlerberichte laufen in jedem Fall.",
+      "consentGrantedOn": "Erlaubt am {{date}}",
+      "consentDeniedOn": "Abgelehnt am {{date}}",
+      "consentUnanswered": "Noch nicht beantwortet",
+      "privacyPolicyLink": "Datenschutzerklärung"
     },
     "general": {
       "namePlaceholder": "Acme Inc.",
@@ -261,6 +267,7 @@
       "apiKeysNoResults": "Keine passenden API-Schlüssel",
       "apiKeysNoResultsDescription": "Keine API-Schlüssel entsprechen Ihrer Suche.",
       "apiKeyFallback": "diesen API-Schlüssel",
+      "addedOn": "hinzugefügt am <1></1>",
       "createApiKey": "API-Schlüssel erstellen",
       "createApiKeyTitle": "Einen API-Schlüssel erstellen",
       "createApiKeyDescription": "Benennen Sie den Schlüssel, wählen Sie seine Rechte und seine Laufzeit.",
@@ -295,7 +302,6 @@
       "addWebhookDescription": "Wir senden die ausgewählten Ereignisse per POST an diese URL.",
       "payloadUrlLabel": "Payload-URL",
       "eventsLabel": "Ereignisse",
-      "cancel": "Abbrechen",
       "createWebhook": "Webhook erstellen",
       "creating": "Wird erstellt…",
       "deleteWebhookAria": "Webhook {{url}} löschen",
@@ -323,7 +329,6 @@
       "attemptCodeColumn": "Code",
       "attemptWhenColumn": "Wann",
       "attemptCountLabel": "Versuch {{count}}",
-      "closeDialog": "Schließen",
       "eventsLoadFailed": "Ereignisliste konnte nicht geladen werden. Bitte erneut versuchen.",
       "eventsLoading": "Ereignisse werden geladen…",
       "eventsEmpty": "Es stehen keine Ereignisse zum Abonnieren bereit."
@@ -347,12 +352,14 @@
         "email": "E-Mail",
         "inApp": "In der App",
         "desktop": "Desktop"
-      }
+      },
+      "kind": "Benachrichtigung",
+      "loadFailed": "Ihre Einstellungen konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
+      "desktopDenied": "Desktop-Benachrichtigungen benötigen die Erlaubnis des Browsers. Aktivieren Sie sie in Ihren Browsereinstellungen und schalten Sie dies dann erneut ein."
     },
     "appearance": {
       "title": "Darstellung",
-      "description": "Auf diesem Gerät gespeichert – Änderungen greifen sofort.",
-      "shuffle": "Zufall"
+      "description": "Auf diesem Gerät gespeichert – Änderungen greifen sofort."
     },
     "sessions": {
       "title": "Sitzungen",
@@ -404,6 +411,13 @@
         "expires": "Gültig bis {{month}}/{{year}}",
         "defaultBadge": "Standard"
       },
+      "paymentForm": {
+        "saveMethod": "Zahlungsmethode speichern",
+        "savingMethod": "Wird gespeichert…",
+        "confirmPayment": "Zahlung bestätigen",
+        "confirmingPayment": "Wird bestätigt…",
+        "cancel": "Abbrechen"
+      },
       "invoices": {
         "title": "Rechnungen",
         "description": "Datum, Fälligkeit, Betrag und Status von Ihrem Abrechnungsanbieter.",
@@ -428,8 +442,7 @@
         "confirmTitle": "Abo kündigen?",
         "confirmDescription": "Ihr Workspace behält bis zum {{date}} vollen Zugriff. Danach endet das Abo und kostenpflichtige Funktionen können eingeschränkt werden.",
         "keep": "Abo behalten",
-        "confirm": "Kündigung bestätigen",
-        "cancelling": "Wird gekündigt…"
+        "confirm": "Kündigung bestätigen"
       }
     }
   }

@@ -25,7 +25,7 @@
     },
     "done": {
       "title": "Tudo pronto",
-      "description": "Revise e entre no seu painel."
+      "description": "Revise e entre no seu espaço de trabalho."
     }
   },
   "welcome": {
@@ -99,7 +99,7 @@
   "actions": {
     "back": "Voltar",
     "continue": "Continuar",
-    "enterDashboard": "Entrar no painel",
+    "enterWorkspace": "Entrar no espaço de trabalho",
     "settingUp": "Configurando…"
   },
   "defaults": {

@@ -98,13 +98,24 @@
     "description": "Une nouvelle version de l’application est prête.",
     "refresh": "Actualiser maintenant"
   },
+  "cells": {
+    "patient": "Patient",
+    "patientMark": "P",
+    "leadMark": "L",
+    "moreCount": "{{count}} de plus"
+  },
+  "emptyState": {
+    "fallbackTitle": "Rien ici pour l’instant",
+    "filteredTitle": "Aucun résultat",
+    "filteredHint": "Rien ne correspond à ces filtres. Effacez-les pour tout revoir.",
+    "clearFilters": "Effacer les filtres"
+  },
   "a11y": {
     "close": "Fermer",
     "loading": "Chargement",
     "loadingNamed": "Chargement de {{name}}…",
     "loadingPage": "Chargement de la page",
     "toggleTheme": "Changer de thème",
-    "openAppearance": "Ouvrir l’apparence",
     "cookieConsent": "Consentement aux cookies",
     "rowsPerPage": "Lignes par page",
     "goFirstPage": "Première page",
@@ -114,84 +125,152 @@
     "selectAll": "Tout sélectionner",
     "copyAccountId": "Copier l’ID du compte",
     "onboardingProgress": "Progression de l’intégration",
-    "themeCode": "Code du thème",
     "mode": "Mode"
   },
   "appearance": {
     "themeTitle": "Thème",
     "themeLocked": "Le thème est géré par la configuration de votre organisation et ne peut pas être modifié ici.",
-    "themeDescription": "Préréglages d'accent nommés — ou copiez un lien / collez un code de thème pour reproduire un rendu exact.",
-    "presetAria": "Préréglage d'accent nommé",
-    "copyLink": "Copier le lien",
-    "shuffleHint": "Utilisez Aléatoire pour générer un code.",
-    "codeLabel": "Code : {{seed}}",
-    "codePlaceholder": "Collez un code de thème",
-    "apply": "Appliquer",
-    "pickAnyColour": "Choisissez une couleur",
     "modeTitle": "Mode",
-    "modeDescription": "Enregistré sur cet appareil.",
-    "colourTitle": "Couleur",
-    "colourDescription": "Accent, graphiques et base neutre.",
-    "accentColour": "Couleur d'accent",
-    "chartColour": "Couleur des graphiques",
-    "baseColour": "Couleur de base",
-    "harmony": "Harmonie",
-    "harmonyAria": "Harmonie des couleurs",
-    "accentIntensity": "Intensité de l'accent",
-    "typeTitle": "Typographie et formes",
-    "typeDescription": "Polices, rayon des angles et surface des menus.",
-    "bodyFont": "Police du corps",
-    "headingFont": "Police des titres",
-    "radius": "Rayon",
-    "shapeLanguage": "Langage des formes",
-    "typeScale": "Échelle typographique",
-    "menu": "Menu",
-    "menuAria": "Style de menu",
-    "iconsTitle": "Icônes",
-    "iconsDescription": "Épaisseur du trait, couleur et jeu d'icônes.",
-    "iconWeight": "Épaisseur des icônes",
-    "iconColour": "Couleur des icônes",
-    "iconLibrary": "Bibliothèque d'icônes",
-    "layoutTitle": "Mise en page",
-    "layoutDescription": "Largeur de l'espace de travail principal — standard pour les tableaux de bord, lecture pour les textes longs.",
-    "contentWidth": "Largeur du contenu",
-    "dashboardTitle": "Tableau de bord",
-    "dashboardDescription": "Comment le tableau de bord organise ses sections.",
-    "dashboardArrangement": "Disposition",
-    "surfaceTitle": "Surface et mouvement",
-    "surfaceDescription": "Espacement, profondeur, contraste et animation.",
-    "density": "Densité",
-    "contrast": "Contraste",
-    "elevation": "Élévation",
-    "separation": "Séparation",
-    "separationAria": "Séparation des surfaces",
-    "motion": "Mouvement",
-    "focusRing": "Anneau de focus",
-    "notificationsTitle": "Notifications",
-    "notificationsDescription": "Choisissez ou mélangez un style de notification — les aperçus utilisent vos jetons de thème en direct.",
-    "toastDesign": "Style de notification",
-    "position": "Position",
-    "positionAria": "Position des notifications",
-    "previewSuccess": "Succès",
-    "previewError": "Erreur",
-    "previewWarning": "Avertissement",
-    "previewInfo": "Information",
-    "shuffleSection": "Mélanger {{section}}",
-    "sectionColour": "couleur",
-    "sectionType": "typographie et formes",
-    "sectionSurface": "surface et mouvement",
-    "sectionDashboard": "disposition du tableau de bord",
-    "sectionNotifications": "style de notification",
-    "custom": "Personnalisé",
-    "customWith": "Personnalisé — {{look}}"
+    "modeDescription": "Enregistré sur cet appareil."
   },
   "table": {
-    "searchPlaceholder": "Rechercher..."
+    "searchPlaceholder": "Rechercher...",
+    "empty": "Aucun résultat.",
+    "sortBy": "Trier par {{column}}",
+    "actions": "Actions",
+    "moreActions": "Plus d’actions",
+    "columns": {
+      "trigger": "Afficher ou masquer des colonnes",
+      "title": "Colonnes · {{shown}} sur {{total}} affichées",
+      "showAll": "Afficher toutes les colonnes",
+      "recommendedHides": "La sélection recommandée en masque {{count}}",
+      "tapForRecommended": "Touchez à nouveau pour la sélection recommandée",
+      "allShown": "Les {{count}} colonnes affichées",
+      "hiddenCount": "{{count}} masquées",
+      "search": "Rechercher des colonnes",
+      "shown": "{{shown}} sur {{total}} affichées",
+      "viewGroup": "Vue",
+      "columnsGroup": "Colonnes"
+    },
+    "fold": {
+      "showAll_one": "{{count}} colonne dans les lignes · Tout afficher",
+      "showAll_many": "{{count}} colonnes dans les lignes · Tout afficher",
+      "showAll_other": "{{count}} colonnes dans les lignes · Tout afficher",
+      "showAllHint": "Afficher toutes les colonnes côte à côte (défilement horizontal)",
+      "fitToWidth": "Ajuster à la largeur",
+      "fitToWidthHint": "Replier les colonnes en trop dans chaque ligne"
+    },
+    "selection": {
+      "selectRow": "Sélectionner {{name}}",
+      "selected": "{{count}} sélectionnés",
+      "selectAllCount": "Tout sélectionner ({{count}})",
+      "clear": "Effacer la sélection",
+      "clearHint": "Effacer la sélection · Échap",
+      "escape": "Échap",
+      "bulkActions": "Actions groupées"
+    },
+    "length": {
+      "allLoaded": "Tous les {{records}} sont chargés",
+      "loadingMore": "Chargement d’autres {{records}}"
+    },
+    "savedViews": {
+      "label": "Vues enregistrées",
+      "apply": "Appliquer la vue",
+      "remove": "Supprimer la vue",
+      "removed": "Vue supprimée",
+      "defaultName": "Ma vue"
+    }
   },
   "consent": {
-    "description": "Nous utilisons des cookies d’analyse produit pour améliorer {{productName}}. Les fonctions essentielles et la surveillance des erreurs fonctionnent sans eux.",
+    "description": "Avec votre accord, nous utilisons l’analyse PostHog et les enregistrements de session Sentry pour améliorer {{productName}}. Tout le reste, y compris les rapports d’erreurs, fonctionne sans eux. Fermer vaut refus.",
     "privacyPolicy": "Politique de confidentialité",
     "accept": "Accepter",
-    "decline": "Refuser"
+    "decline": "Refuser",
+    "closeAndDecline": "Fermer (vaut refus)"
+  },
+  "confirm": {
+    "accept": "Confirmer",
+    "cancel": "Annuler",
+    "fallbackDescription": "Veuillez confirmer cette action."
+  },
+  "picker": {
+    "placeholder": "Sélectionner…",
+    "search": "Rechercher {{label}}",
+    "searchDefault": "Rechercher",
+    "escKey": "Échap",
+    "options": "Options",
+    "recent": "Récents",
+    "all": "Tous",
+    "create": "Créer « {{query}} »",
+    "createNamed": "{{label}} « {{query}} »",
+    "createFull": "Nouveau : {{label}}",
+    "createFullQuery": "{{label}} · « {{query}} »",
+    "fullDetails": "tous les détails",
+    "empty": "Rien à choisir pour l’instant",
+    "noResults": "Aucun résultat pour « {{query}} »",
+    "noResultsHint": "Vérifiez l’orthographe ou essayez avec moins de lettres",
+    "noResultsRemoteHint": "Essayez un nom, un numéro de téléphone ou un identifiant",
+    "loadingMore": "Chargement de la suite",
+    "clear": "Effacer",
+    "triggerLabel": "{{label}} · {{value}}",
+    "date": {
+      "label": "Date",
+      "placeholder": "Choisir une date",
+      "search": "Saisissez une date · ex. 12 sept",
+      "today": "Aujourd’hui",
+      "tomorrow": "Demain",
+      "yesterday": "Hier",
+      "comingUp": "À venir",
+      "relative": "{{relative}} · {{date}}"
+    },
+    "time": {
+      "label": "Heure",
+      "placeholder": "Choisir une heure"
+    }
+  },
+  "unsavedChanges": {
+    "title": "Abandonner les modifications ?",
+    "description": "Vos modifications n’ont pas été enregistrées et seront perdues.",
+    "discard": "Abandonner",
+    "keepEditing": "Continuer l’édition"
+  },
+  "uploadTray": {
+    "label": "Importations",
+    "uploading": "Importation de {{left}} sur {{total}}…",
+    "complete": "Toutes les importations sont terminées",
+    "failed_one": "{{count}} importation a échoué",
+    "failed_many": "{{count}} importations ont échoué",
+    "failed_other": "{{count}} importations ont échoué",
+    "skipped_one": "{{count}} fichier de plus de {{limit}} ignoré",
+    "skipped_many": "{{count}} fichiers de plus de {{limit}} ignorés",
+    "skipped_other": "{{count}} fichiers de plus de {{limit}} ignorés",
+    "show": "Afficher les importations",
+    "hide": "Masquer les importations",
+    "uploadFailed": "Échec de l’importation",
+    "attachFailed": "Échec de l’ajout",
+    "retry": "Réessayer {{name}}",
+    "remove": "Retirer {{name}}",
+    "stoppedBySwitch": "Envois interrompus · vous avez changé d’espace de travail",
+    "size": {
+      "kilobytes": "{{value}} Ko",
+      "megabytes": "{{value}} Mo"
+    }
+  },
+  "splash": {
+    "label": "Chargement de {{productName}}",
+    "greeting": {
+      "morning": "Bonjour, {{name}}",
+      "afternoon": "Bon après-midi, {{name}}",
+      "evening": "Bonsoir, {{name}}"
+    },
+    "ticker": {
+      "opening": "Ouverture du planning de {{weekday}}",
+      "syncing": "Synchronisation des patients et des prospects",
+      "ready": "Tout est prêt"
+    },
+    "offline": {
+      "message": "Impossible de joindre {{productName}} · vérifiez la connexion internet",
+      "retry": "Réessayer"
+    }
   }
 }

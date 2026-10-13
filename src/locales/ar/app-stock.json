@@ -1,0 +1,493 @@
+{
+  "manifest": {
+    "title": "مخزون العيادة"
+  },
+  "tabs": {
+    "label": "أقسام مخزون العيادة",
+    "items": "الأصناف",
+    "purchases": "المشتريات",
+    "movements": "الحركات",
+    "vendors": "الموردون"
+  },
+  "search": {
+    "label": "البحث في المخزون",
+    "placeholder": {
+      "items": "ابحث باسم الصنف أو #ID…",
+      "purchases": "ابحث برقم الفاتورة أو #ID أو المورد…",
+      "vendors": "ابحث باسم المورد…"
+    }
+  },
+  "create": {
+    "item": "صنف جديد",
+    "purchase": "مشتريات جديدة",
+    "vendor": "مورد عيادة جديد"
+  },
+  "check": "جرد المخزون",
+  "filters": {
+    "all": "الكل",
+    "stock": "المخزون",
+    "lowStock": "مخزون منخفض",
+    "category": "الفئة",
+    "lasts": "يكفي",
+    "status": "الحالة",
+    "type": "النوع",
+    "lastsWithin": {
+      "week": "خلال أسبوع",
+      "three_weeks": "خلال 3 أسابيع"
+    }
+  },
+  "table": {
+    "addPhone": "إضافة هاتف",
+    "noValue": "—"
+  },
+  "empty": {
+    "hint": "لا يوجد شيء هنا بعد. جرّب علامة تبويب أخرى أو بحثًا آخر.",
+    "stock": "لا توجد أصناف مخزون هنا"
+  },
+  "bulk": {
+    "export": "تصدير",
+    "exported_zero": "تم تصدير {{count}} صف بصيغة CSV",
+    "exported_one": "تم تصدير {{count}} صف بصيغة CSV",
+    "exported_two": "تم تصدير {{count}} صفين بصيغة CSV",
+    "exported_few": "تم تصدير {{count}} صفوف بصيغة CSV",
+    "exported_many": "تم تصدير {{count}} صفًا بصيغة CSV",
+    "exported_other": "تم تصدير {{count}} صف بصيغة CSV"
+  },
+  "categories": {
+    "creams_serums": "الكريمات والأمصال",
+    "peels": "التقشير والمعادِلات",
+    "masks": "الأقنعة",
+    "consumables": "المستهلكات",
+    "equipment": "المعدات",
+    "other": "مخزون عيادة آخر"
+  },
+  "units": {
+    "piece": "قطعة",
+    "tube": "أنبوب",
+    "bottle": "زجاجة",
+    "kit": "طقم",
+    "pack": "عبوة",
+    "box": "علبة",
+    "vial": "قارورة",
+    "ampoule": "أمبولة",
+    "sachet": "كيس",
+    "jar": "برطمان",
+    "roll": "لفة",
+    "pair": "زوج",
+    "ml": "ml",
+    "g": "g",
+    "litre": "لتر"
+  },
+  "measures": {
+    "ml": "ml",
+    "g": "g",
+    "pcs": "قطع",
+    "units": "وحدات"
+  },
+  "quantity": {
+    "amount": "{{value}} {{unit}}",
+    "measured": "{{units}} · {{measure}}"
+  },
+  "levels": {
+    "ok": "جيد",
+    "low": "منخفض",
+    "out": "نفد"
+  },
+  "runway": {
+    "days_zero": "~{{count}} يوم",
+    "days_one": "~{{count}} يوم",
+    "days_two": "~{{count}} يومان",
+    "days_few": "~{{count}} أيام",
+    "days_many": "~{{count}} يومًا",
+    "days_other": "~{{count}} يوم",
+    "weeks_zero": "~{{count}} أسبوع",
+    "weeks_one": "~{{count}} أسبوع",
+    "weeks_two": "~{{count}} أسبوعان",
+    "weeks_few": "~{{count}} أسابيع",
+    "weeks_many": "~{{count}} أسبوعًا",
+    "weeks_other": "~{{count}} أسبوع",
+    "none": "لا استخدام"
+  },
+  "items": {
+    "records": "الأصناف",
+    "empty": "لا يوجد صنف مطابق",
+    "columns": {
+      "seq": "ID",
+      "name": "الصنف",
+      "category": "الفئة",
+      "stock": "المخزون",
+      "lasts": "يكفي",
+      "vendor": "المورد",
+      "lastRate": "آخر سعر"
+    },
+    "sub": "لكل {{unit}} · استخدام ~{{usage}}/أسبوع",
+    "subContents": "لكل {{unit}} من {{contents}} · استخدام ~{{usage}}/أسبوع",
+    "stockLine": "{{quantity}} · {{level}}",
+    "rowActions": {
+      "use": "استخدام",
+      "receive": "استلام مخزون",
+      "log": "تسجيل الاستخدام…",
+      "adjust": "تعديل العدد",
+      "edit": "تعديل",
+      "delete": "حذف"
+    }
+  },
+  "purchases": {
+    "records": "المشتريات",
+    "count_zero": "{{count}} مشتريات · {{due}} مستحق",
+    "count_one": "{{count}} عملية شراء · {{due}} مستحق",
+    "count_two": "{{count}} عمليتا شراء · {{due}} مستحق",
+    "count_few": "{{count}} عمليات شراء · {{due}} مستحق",
+    "count_many": "{{count}} عملية شراء · {{due}} مستحق",
+    "count_other": "{{count}} عملية شراء · {{due}} مستحق",
+    "columns": {
+      "seq": "ID",
+      "vendor": "المورد",
+      "billNo": "الفاتورة",
+      "date": "التاريخ",
+      "bill": "المبلغ",
+      "due": "المستحق",
+      "status": "الحالة"
+    },
+    "statuses": {
+      "paid": "مدفوع",
+      "unpaid": "غير مدفوع",
+      "partial": "مدفوع جزئيًا"
+    },
+    "rowActions": {
+      "edit": "تعديل",
+      "delete": "حذف",
+      "pay": "ادفع {{amount}}"
+    },
+    "vendorFilter": {
+      "any": "أي مورد",
+      "count_one": "مورد واحد",
+      "count_other": "{{count}} مورد",
+      "count_zero": "{{count}} موردين",
+      "count_two": "موردان",
+      "count_few": "{{count}} موردين",
+      "count_many": "{{count}} موردًا",
+      "search": "ابحث عن الموردين",
+      "noMatch": "لا توجد نتيجة",
+      "clear": "مسح"
+    }
+  },
+  "movements": {
+    "records": "الحركات",
+    "count_zero": "{{count}} قيود",
+    "count_one": "{{count}} قيد",
+    "count_two": "{{count}} قيدان",
+    "count_few": "{{count}} قيود",
+    "count_many": "{{count}} قيدًا",
+    "count_other": "{{count}} قيد",
+    "columns": {
+      "type": "النوع",
+      "party": "الصنف / الطرف",
+      "when": "متى",
+      "by": "بواسطة",
+      "change": "التغيير"
+    },
+    "types": {
+      "used": "مستخدم",
+      "received": "مستلم",
+      "adjust": "تعديل",
+      "damaged": "تالف",
+      "returned": "مُرتجع",
+      "reverted": "مُلغى",
+      "opening": "رصيد افتتاحي"
+    },
+    "reverted": "مُلغى",
+    "purchase": "من المشتريات #{{seq}}",
+    "change": "{{sign}} {{amount}}",
+    "rowActions": {
+      "revert": "تراجع"
+    },
+    "purchaseBill": "من المشتريات #{{seq}} · فاتورة {{billNo}}",
+    "deletedItem": "صنف محذوف",
+    "itemFilter": {
+      "any": "أي صنف",
+      "search": "ابحث في الأصناف",
+      "noMatch": "لا تطابق",
+      "clear": "مسح",
+      "count_one": "{{count}} صنف",
+      "count_other": "{{count}} صنف",
+      "count_zero": "{{count}} أصناف",
+      "count_two": "{{count}} صنفان",
+      "count_few": "{{count}} أصناف",
+      "count_many": "{{count}} صنفًا"
+    }
+  },
+  "vendors": {
+    "records": "الموردون",
+    "empty": "لا يوجد مورد مطابق",
+    "count_zero": "{{count}} موردين · {{payable}} مستحق",
+    "count_one": "{{count}} مورد · {{payable}} مستحق",
+    "count_two": "{{count}} موردان · {{payable}} مستحق",
+    "count_few": "{{count}} موردين · {{payable}} مستحق",
+    "count_many": "{{count}} موردًا · {{payable}} مستحق",
+    "count_other": "{{count}} مورد · {{payable}} مستحق",
+    "columns": {
+      "name": "المورد",
+      "purchases": "المشتريات",
+      "payable": "المستحق"
+    },
+    "purchases_zero": "{{count}} مشتريات",
+    "purchases_one": "{{count}} عملية شراء",
+    "purchases_two": "{{count}} عمليتا شراء",
+    "purchases_few": "{{count}} عمليات شراء",
+    "purchases_many": "{{count}} عملية شراء",
+    "purchases_other": "{{count}} عملية شراء",
+    "noPurchases": "لا مشتريات",
+    "rowActions": {
+      "edit": "تعديل",
+      "delete": "حذف",
+      "pay": "ادفع {{amount}}"
+    },
+    "paidUp": "لا يوجد مبلغ مستحق لـ {{name}} الآن"
+  },
+  "drawers": {
+    "records": {
+      "item": "الصنف",
+      "purchase": "المشتريات",
+      "vendor": "المورد"
+    },
+    "saveChanges": "حفظ التغييرات",
+    "addName": "أضف اسمًا",
+    "pickers": {
+      "searchVendors": "ابحث عن موردي العيادة",
+      "vendorsHint": "موردو العيادة",
+      "newVendor": "مورد عيادة جديد",
+      "selectItem": "اختر صنفًا…",
+      "newItem": "صنف عيادة جديد",
+      "inStock": "{{quantity}} في المخزون"
+    },
+    "treatments": {
+      "lhr": "إزالة الشعر بالليزر",
+      "peel": "تقشير",
+      "facial": "عناية بالوجه",
+      "mole": "إزالة الشامة",
+      "general": "عام"
+    },
+    "item": {
+      "title": {
+        "create": "صنف جديد",
+        "edit": "تعديل الصنف"
+      },
+      "sub": "مستهلكات أو معدات العيادة",
+      "steps": {
+        "item": "الصنف",
+        "levels": "المستويات",
+        "vendor": "المورد"
+      },
+      "fields": {
+        "name": "الاسم",
+        "category": "الفئة",
+        "unit": "الوحدة",
+        "contents": "المحتوى لكل {{unit}}",
+        "contentsHint": "اختياري · يتيح للفريق استخدام جزء من {{unit}}",
+        "measure": "يُقاس بـ",
+        "inStock": "في المخزون",
+        "decimals": "يُسمح بالكسور العشرية",
+        "usage": "الاستخدام أسبوعيًا",
+        "min": "الحد الأدنى",
+        "max": "الحد الأقصى",
+        "vendor": "المورد"
+      },
+      "save": "إضافة الصنف",
+      "saved": "تم حفظ الصنف",
+      "nameTaken": "يوجد صنف بهذا الاسم بالفعل"
+    },
+    "quickItem": {
+      "title": "صنف عيادة جديد",
+      "sub": "يُستخدم في الإجراءات · ليس للبيع",
+      "steps": {
+        "item": "الصنف",
+        "details": "التفاصيل"
+      },
+      "added": "تمت إضافة {{name}} إلى أصناف العيادة"
+    },
+    "vendor": {
+      "title": {
+        "create": "مورد عيادة جديد",
+        "edit": "تعديل مورد العيادة"
+      },
+      "sub": "يورّد مستهلكات للإجراءات · وليس الأدوية",
+      "fields": {
+        "name": "الاسم",
+        "phone": "الهاتف",
+        "phoneHint": "10 أرقام"
+      },
+      "save": "إضافة المورد",
+      "added": "تمت إضافة المورد {{name}}",
+      "saved": "تم حفظ المورد",
+      "nameTaken": "يوجد مورد بهذا الاسم بالفعل"
+    },
+    "movement": {
+      "title": {
+        "used": "تسجيل الاستخدام",
+        "received": "استلام مخزون",
+        "adjust": "تعديل المخزون"
+      },
+      "sub": "{{name}} · {{quantity}} حاليًا",
+      "after": "بعد ذلك: {{quantity}}",
+      "steps": {
+        "movement": "الحركة",
+        "details": "التفاصيل",
+        "notes": "ملاحظات"
+      },
+      "fields": {
+        "type": "النوع",
+        "quantity": "الكمية",
+        "counted": "الكمية المعدودة",
+        "decimals": "يُسمح بالكسور العشرية",
+        "measureIn": "القياس بـ",
+        "measureOption": "{{measure}} (1 {{unit}} = {{contents}})",
+        "usedFor": "استُخدم في",
+        "optional": "اختياري",
+        "remark": "ملاحظة",
+        "remarkPlaceholder": "المريض أو التشغيلة أو السبب"
+      },
+      "save": "حفظ الحركة",
+      "summary": "{{name}} · {{change}}",
+      "enterQuantity": "أدخل كمية",
+      "onlyInStock": "المتوفر {{quantity}} فقط",
+      "saved": "تم حفظ {{type}} · المتبقي {{quantity}}",
+      "notEnoughStock": "لم تعد هذه الكمية متوفرة في المخزون — استخدم أحدهم جزءًا منها. تحقّق من العدد وحاول مرة أخرى."
+    },
+    "use": {
+      "label": "استخدام {{name}}",
+      "inStock": "في المخزون · {{quantity}}",
+      "measureIn": "القياس بـ",
+      "conversion": "1 {{unit}} = {{contents}}",
+      "quantity": "الكمية",
+      "less": "أقل",
+      "more": "أكثر",
+      "usedFor": "استُخدم في",
+      "after": "بعد ذلك · {{quantity}}",
+      "moreDetails": "مزيد من التفاصيل",
+      "save": "استخدام {{quantity}}",
+      "used": "تم استخدام {{quantity}} من {{name}} · المتبقي {{left}}",
+      "outOfStock": "نفد {{name}} من المخزون"
+    },
+    "purchase": {
+      "title": {
+        "create": "مشتريات جديدة",
+        "edit": "تعديل المشتريات"
+      },
+      "sub": "تُضاف الأصناف المستلمة إلى المخزون",
+      "reorder": "إعادة طلب الأصناف المنخفضة",
+      "noSupplier": "لا مورد",
+      "bill": "الفاتورة {{amount}}",
+      "due": "{{amount}} مستحق",
+      "paid": "مدفوع",
+      "steps": {
+        "bill": "الفاتورة",
+        "items": "الأصناف المستلمة",
+        "payment": "الدفع"
+      },
+      "fields": {
+        "vendor": "المورد",
+        "billNo": "رقم الفاتورة",
+        "date": "تاريخ الفاتورة",
+        "items": "الأصناف المستلمة",
+        "item": "الصنف",
+        "qty": "الكمية",
+        "rate": "السعر",
+        "amount": "المبلغ",
+        "addItem": "إضافة الصنف",
+        "total": "الإجمالي",
+        "billAmount": "مبلغ الفاتورة",
+        "paid": "مدفوع",
+        "full": "كامل",
+        "nothing": "لا شيء",
+        "enterRate": "أدخل السعر",
+        "peek_zero": "{{count}} أصناف · {{amount}}",
+        "peek_one": "صنف واحد · {{amount}}",
+        "peek_two": "صنفان · {{amount}}",
+        "peek_few": "{{count}} أصناف · {{amount}}",
+        "peek_many": "{{count}} صنفًا · {{amount}}",
+        "peek_other": "{{count}} صنف · {{amount}}",
+        "quickLine": "اكتب الصنف والكمية · مثال: gloves 10 @250",
+        "quickHint": "10 = الكمية · @250 = السعر",
+        "lowStockChip": "{{name}} · متبقٍ {{quantity}}",
+        "mode": "الطريقة",
+        "branch": "دُفع من",
+        "paidSoFar": "{{amount}} مدفوع · {{status}}",
+        "moreThanBill": "المبلغ المدفوع أكبر من الفاتورة",
+        "dayClosed": "يوم هذا الفرع مُغلق — لا يمكن الدفع منه اليوم",
+        "addLine": "أضف صنفًا واحدًا على الأقل",
+        "tooManyLines": "تقبل عملية الشراء {{max}} صنفًا كحد أقصى"
+      },
+      "save": "إنشاء المشتريات",
+      "pickSupplier": "اختر موردًا",
+      "saved": "تم حفظ المشتريات",
+      "savedStock": "تم حفظ المشتريات · تم تحديث المخزون"
+    },
+    "check": {
+      "title": "جرد المخزون",
+      "sub": "اكتب ما على الرف. تُحفظ الأصناف المختلفة فقط، كلٌّ منها كتعديل.",
+      "counted": "تم عدّ {{counted}} من {{total}}",
+      "allItems": "كل الأصناف",
+      "fillRest": "املأ الباقي كمطابق",
+      "heads": {
+        "item": "الصنف",
+        "inSystem": "في النظام",
+        "counted": "المعدود",
+        "difference": "الفرق"
+      },
+      "inSystem": "في النظام · {{quantity}}",
+      "countedLabel": "عدد {{name}}",
+      "same": "مثل النظام",
+      "measured": "= {{quantity}}",
+      "notCounted": "لم يُعدّ",
+      "matches": "مطابق",
+      "willChange_zero": "سيتغيّر {{count}} أصناف",
+      "willChange_one": "سيتغيّر صنف واحد",
+      "willChange_two": "سيتغيّر صنفان",
+      "willChange_few": "ستتغيّر {{count}} أصناف",
+      "willChange_many": "سيتغيّر {{count}} صنفًا",
+      "willChange_other": "سيتغيّر {{count}} صنف",
+      "nothing": "لا يتغيّر شيء بعد",
+      "save": "حفظ العدّ",
+      "failed": "لم يُحفظ · تم الاحتفاظ بأعدادك",
+      "saved_zero": "تم حفظ الجرد · تم تحديث {{count}} أصناف",
+      "saved_one": "تم حفظ الجرد · تم تحديث صنف واحد",
+      "saved_two": "تم حفظ الجرد · تم تحديث صنفين",
+      "saved_few": "تم حفظ الجرد · تم تحديث {{count}} أصناف",
+      "saved_many": "تم حفظ الجرد · تم تحديث {{count}} صنفًا",
+      "saved_other": "تم حفظ الجرد · تم تحديث {{count}} صنف",
+      "empty": "لا توجد أصناف لعدّها بعد"
+    },
+    "confirm": {
+      "deleteItem": "هل تريد حذف هذا الصنف؟",
+      "deletePurchase": "هل تريد حذف هذه المشتريات؟",
+      "deleteVendor": "هل تريد حذف مورد العيادة هذا؟",
+      "removed": "تمت إزالة {{name}}",
+      "deleted": "تم حذف {{name}}",
+      "purchaseDeleted": "تم حذف المشتريات #{{seq}}",
+      "revert": {
+        "title": "هل تريد التراجع عن هذه الحركة؟",
+        "record": "{{type}} {{quantity}} {{name}}",
+        "body": "يعود المخزون إلى ما كان عليه قبل هذا القيد. يبقى القيدان في السجل.",
+        "action": "تراجع",
+        "reasons": {
+          "mistake": "سُجّل بالخطأ",
+          "wrongItem": "صنف خاطئ",
+          "wrongQty": "كمية خاطئة"
+        },
+        "done": "تم التراجع عن {{type}} · عاد {{name}} إلى {{quantity}}",
+        "note": "تراجع عن {{type}} بتاريخ {{when}} · {{reason}}",
+        "blocked": {
+          "alreadyReverted": "تم التراجع عن هذه الحركة من قبل",
+          "notEnoughStock": "لا يكفي المتبقي في المخزون للتراجع عن هذا القيد"
+        }
+      },
+      "blocked": {
+        "itemHasStock": "لا يمكن حذف إلا صنف لا مخزون له — عدّله إلى 0 أولًا",
+        "purchasePaid": "لا يمكن حذف مشترى دُفع عليه مبلغ",
+        "vendorHasDues": "سدّد مشتريات هذا المورّد أولًا",
+        "stockUsed": "استُخدم بعض ما استُلم في هذا المشترى منذ ذلك الحين — لا يمكن استرجاعه"
+      }
+    }
+  }
+}

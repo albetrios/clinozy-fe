@@ -1,5 +1,6 @@
-import { Link, useRouterState } from '@tanstack/react-router';
-import { type ReactNode, useRef } from 'react';
+import { useRouterState } from '@tanstack/react-router';
+import { type ComponentType, type ReactNode, Suspense, useRef } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 import { useTranslation } from 'react-i18next';
 
 import { useReplayedAnimation } from '@/lib/animations/index.ts';
@@ -10,111 +11,98 @@ import {
   LOCALE_NS,
 } from '@/lib/i18n/locale.constants.ts';
 import { I18N_LOCALES, isI18nLocale, LOCALE_NATIVE_LABELS } from '@/lib/i18n/locales.ts';
-import { iconOnBrandSurface, iconOnPrimarySurface } from '@/lib/icon-surface.ts';
+import { onceAsync, useRetryableLazy } from '@/lib/lazy-module.ts';
 import { cn } from '@/lib/utils.ts';
+import type { PickerSingleProps } from '@/shared/components/Picker/index.ts';
 import { ThemeModeToggle } from '@/shared/components/ThemeModeToggle/index.ts';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/components/ui/select.tsx';
-import { Boxes, ShieldCheck, Sparkles, Users, Zap } from '@/shared/icons/index.ts';
-import {
-  AUTH_LAYOUT_STAT_KEYS,
-  LAYOUT_KEYS,
-  LAYOUT_NS,
-} from '@/shared/layouts/layout.constants.ts';
+import { ChevronDown } from '@/shared/icons/index.ts';
+import { LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
 
 /** The keyframe class on the form slot. Replayed imperatively — see {@link AuthForm}. */
 const AUTH_FORM_ANIMATION_CLASS = 'animate-fade-in-up';
 
-// eslint-disable-next-line react-refresh/only-export-components -- static config colocated with the layout shell
-export const AUTH_MARKETING_FEATURES = [
-  { ...LAYOUT_KEYS.auth.features.multiOrg, Icon: Users },
-  { ...LAYOUT_KEYS.auth.features.secure, Icon: ShieldCheck },
-  { ...LAYOUT_KEYS.auth.features.fast, Icon: Zap },
-] as const;
+/**
+ * The shared Picker, fetched on its own: `/login` paints its form without
+ * waiting for the picker's list, bottom sheet and search.
+ */
+const loadLocalePicker = onceAsync(() =>
+  import('@/shared/components/Picker/index.ts').then((module) => ({
+    default: module.Picker as ComponentType<PickerSingleProps<unknown>>,
+  })),
+);
 
-export type AuthLayoutShellProps = {
-  children: ReactNode;
-};
-
-export function SkipLink() {
-  const { t } = useTranslation(LAYOUT_NS);
+/**
+ * The language trigger as it looks before the picker arrives (and if its chunk
+ * fails): the picker's `sm` field with the current language — inert, so the
+ * real control replaces it without a shift.
+ */
+function LocaleTriggerPlaceholder({ label }: { label: string }) {
   return (
-    <a
-      href="#main-content"
-      className="focus:bg-background focus:text-foreground sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:underline"
+    <span
+      aria-hidden="true"
+      className="bg-background text-body flex min-h-8 min-w-[9.5rem] items-center gap-2 rounded-lg border ps-2.5 pe-2.5 shadow-(--elevation-control)"
     >
-      {t(LAYOUT_KEYS.a11y.skipToMain)}
-    </a>
+      <span className="min-w-0 flex-1 truncate">{label}</span>
+      <ChevronDown className="text-muted-foreground size-3.5 flex-none" />
+    </span>
   );
 }
 
 /** Compact language switcher — sets UI locale (and auto RTL for Arabic) on auth. */
-function AuthLocaleSelect() {
+function AuthLocalePicker() {
   const { t } = useTranslation(LOCALE_NS);
   const locale = useLocaleStore((s) => s.locale);
   const setLocale = useLocaleStore((s) => s.setLocale);
+  const { Component: LocalePicker } = useRetryableLazy(loadLocalePicker);
 
   if (!isMultiLocaleBuild()) return null;
 
+  const options = I18N_LOCALES.map((code) => ({
+    key: code,
+    label: t(LOCALE_LABEL_KEYS[code], { defaultValue: LOCALE_NATIVE_LABELS[code] }),
+  }));
+  const placeholder = (
+    <LocaleTriggerPlaceholder
+      label={options.find((option) => option.key === locale)?.label ?? locale}
+    />
+  );
   return (
-    <Select
-      value={locale}
-      onValueChange={(value) => {
-        if (isI18nLocale(value)) void setLocale(value);
-      }}
-    >
-      <SelectTrigger
-        size="sm"
-        className="min-w-[9.5rem]"
-        aria-label={t(LOCALE_KEYS.openAria)}
-        data-testid="auth-locale-select"
-      >
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent align="end">
-        {I18N_LOCALES.map((code) => (
-          <SelectItem key={code} value={code}>
-            {}
-            {t(LOCALE_LABEL_KEYS[code], { defaultValue: LOCALE_NATIVE_LABELS[code] })}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <ErrorBoundary fallback={placeholder}>
+      <Suspense fallback={placeholder}>
+        <LocalePicker
+          label={t(LOCALE_KEYS.openAria)}
+          value={locale}
+          options={options}
+          plain
+          onChange={(key) => {
+            if (key && isI18nLocale(key)) void setLocale(key);
+          }}
+          size="sm"
+          align="end"
+          minWidth={180}
+          testId="auth-locale-select"
+          className="min-w-[9.5rem]"
+        />
+      </Suspense>
+    </ErrorBoundary>
   );
 }
 
-/** Theme + language controls for auth shell variants (single auth screen). */
-export function AuthControls({ surface = 'default' }: { surface?: 'default' | 'brand' }) {
+/**
+ * Theme + language controls for the sign-in screen. `frame` is the signed-out
+ * canvas's header (`PublicFrame`): two 32px bordered controls, 8px apart, as
+ * the clinic header draws its own. A theme-locked deployment keeps the language
+ * alone (`ThemeModeToggle` renders nothing there).
+ */
+export function AuthControls({ surface = 'default' }: { surface?: 'default' | 'frame' }) {
   // Subscribe to the layout namespace so the control re-renders on locale change.
   useTranslation(LAYOUT_NS);
   return (
-    <div className="flex items-center gap-3">
-      <AuthLocaleSelect />
-      <ThemeModeToggle surface={surface === 'brand' ? 'brand' : 'default'} />
+    <div className={cn('flex items-center', surface === 'frame' ? 'gap-2' : 'gap-3')}>
+      <AuthLocalePicker />
+      <ThemeModeToggle surface={surface} />
     </div>
-  );
-}
-
-export function BrandMark({ className }: { className?: string }) {
-  const { t } = useTranslation(LAYOUT_NS);
-  return (
-    <Link to="/login" className={cn('flex items-center gap-2.5', className)}>
-      <div
-        data-slot="icon-chip"
-        className="bg-primary text-primary-foreground flex size-9 items-center justify-center"
-      >
-        <Boxes className={cn('h-5 w-5', iconOnPrimarySurface)} />
-      </div>
-      <span className="text-lg font-semibold tracking-tight">
-        {t(LAYOUT_KEYS.brand.name)}
-      </span>
-    </Link>
   );
 }
 
@@ -151,52 +139,6 @@ export function AuthForm({ children }: { children: ReactNode }) {
       data-testid="auth-form-container"
     >
       {children}
-    </div>
-  );
-}
-
-export function AuthHeroBadge() {
-  const { t } = useTranslation(LAYOUT_NS);
-  return (
-    <span
-      data-slot="pill"
-      className="border-brand-foreground/20 bg-brand-foreground/10 text-brand-foreground inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium"
-    >
-      <Sparkles className={cn('h-3 w-3', iconOnBrandSurface)} aria-hidden="true" />{' '}
-      {t(LAYOUT_KEYS.auth.badge)}
-    </span>
-  );
-}
-
-export function MobileBrandMark() {
-  const { t } = useTranslation(LAYOUT_NS);
-  return (
-    <Link
-      to="/login"
-      className="flex items-center gap-2 lg:hidden"
-      data-testid="auth-mobile-logo"
-    >
-      <div
-        data-slot="icon-chip"
-        className="bg-primary text-primary-foreground flex size-8 items-center justify-center"
-      >
-        <Boxes className={cn('h-4 w-4', iconOnPrimarySurface)} />
-      </div>
-      <span className="text-sm font-semibold">{t(LAYOUT_KEYS.brand.name)}</span>
-    </Link>
-  );
-}
-
-export function AuthMarketingStats() {
-  const { t } = useTranslation(LAYOUT_NS);
-  return (
-    <div className="border-primary/20 flex items-center gap-8 border-t pt-6">
-      {AUTH_LAYOUT_STAT_KEYS.map((stat) => (
-        <div key={stat.labelKey}>
-          <p className="text-xl font-semibold tracking-tight">{stat.value}</p>
-          <p className="text-brand-foreground/50 text-xs">{t(stat.labelKey)}</p>
-        </div>
-      ))}
     </div>
   );
 }

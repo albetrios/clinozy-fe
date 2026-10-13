@@ -541,4 +541,4 @@ anime({
 - **review-animations** — PR review of motion code only
 - **frontend-design** — Visual craft within React/shadcn guardrails
 
-**Anime.js in clinozy-fe:** Use for object tweens and timelines (e.g. `useAnimeCountUp`). Do not add Framer Motion — removed to avoid conflicting motion stacks.
+**Anime.js in clinozy-fe:** Use for object tweens and timelines (e.g. `useOnboardingStepMotion`). Do not add Framer Motion — removed to avoid conflicting motion stacks.

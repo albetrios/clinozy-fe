@@ -1,0 +1,480 @@
+{
+  "manifest": {
+    "title": "Pagamenti"
+  },
+  "tabs": {
+    "label": "Sezioni dei pagamenti",
+    "ledger": "Pagamenti",
+    "pending": "In sospeso"
+  },
+  "search": {
+    "placeholder": "Paziente, fattura o ricevuta",
+    "label": "Cerca pagamenti"
+  },
+  "toolbar": {
+    "dayClose": "Chiusura giornata",
+    "pay": "Paga",
+    "payTitle": "Paga · uscite (affitto, forniture, fornitori, rimborsi)",
+    "receive": "Incassa",
+    "receiveTitle": "Incassa · entrata da un paziente",
+    "addPending": "Aggiungi in sospeso",
+    "give": "Dare",
+    "giveSub": "Rimborsiamo un paziente o una controparte",
+    "take": "Avere",
+    "takeSub": "Un paziente o una controparte ci paga"
+  },
+  "columns": {
+    "ref": "Rif.",
+    "what": "Tipo",
+    "when": "Quando",
+    "party": "Da / a",
+    "mode": "Modalità",
+    "amount": "Importo",
+    "by": "Da",
+    "who": "Chi",
+    "way": "Direzione",
+    "why": "Motivo",
+    "since": "Dal",
+    "state": "Stato"
+  },
+  "filters": {
+    "show": "Mostra",
+    "all": "Tutti"
+  },
+  "directions": {
+    "received": "Ricevuto",
+    "paid": "Pagato"
+  },
+  "kinds": {
+    "receipt": "Ricevuto",
+    "refund": "Rimborso al paziente",
+    "expense": "Pagato",
+    "money_back": "Rimborso ricevuto",
+    "reversal": "Storno"
+  },
+  "ledger": {
+    "records": "movimenti",
+    "edited_one": "Modificato {{count}}× · ultimo {{from}} → {{to}}",
+    "edited_many": "Modificato {{count}}× · ultimo {{from}} → {{to}}",
+    "edited_other": "Modificato {{count}}× · ultimo {{from}} → {{to}}",
+    "editSide": "{{amount}} {{modes}}",
+    "received": "+ {{amount}}",
+    "paid": "− {{amount}}",
+    "sub": {
+      "invoice": "Fattura #{{seq}}",
+      "sale": "Vendita · Fattura #{{seq}}",
+      "refund": "Rimborso · Nota di credito",
+      "refundNote": "Rimborso · Nota di credito {{note}}",
+      "refundFor": "per la fattura #{{seq}}",
+      "moneyBack": "Rimborso ricevuto",
+      "medicalBill": "Ordine medico #{{seq}} · fattura {{bill}}",
+      "stockBill": "Ordine scorte #{{seq}} · fattura {{bill}}",
+      "fromCredit": "Da {{ref}}",
+      "reversed": "Stornato",
+      "medicalOrder": "Ordine medicinali #{{seq}}",
+      "stockPurchase": "Ordine scorte #{{seq}}"
+    },
+    "dayClosed": "{{ref}} · Giornata chiusa",
+    "dayClosedEdited_one": "{{ref}} · Giornata chiusa · modificato {{count}}×",
+    "dayClosedEdited_many": "{{ref}} · Giornata chiusa · modificato {{count}}×",
+    "dayClosedEdited_other": "{{ref}} · Giornata chiusa · modificato {{count}}×",
+    "creditEntry": "{{ref}} · Da {{credit}}",
+    "fixedEntry": "{{ref}} · l’importo non si può cambiare · eliminalo nel suo giorno per annullarlo",
+    "search": "Paziente, beneficiario o numero PAY-",
+    "count_one": "{{count}} movimento",
+    "count_other": "{{count}} movimenti",
+    "count_many": "{{count}} movimenti"
+  },
+  "rowActions": {
+    "edit": "Modifica",
+    "delete": "Elimina",
+    "giveBack": "Restituisci",
+    "gotBack": "Riavuto",
+    "useOnBill": "Usa nella prossima fattura",
+    "reverse": "Storna"
+  },
+  "bulk": {
+    "export": "Esporta",
+    "exported_one": "{{count}} riga esportata in CSV",
+    "exported_many": "{{count}} righe esportate in CSV",
+    "exported_other": "{{count}} righe esportate in CSV"
+  },
+  "empty": {
+    "ledgerTitle": "Nessun movimento corrisponde",
+    "pendingTitle": "Niente in sospeso",
+    "description": "Qui non c’è ancora niente. Prova un’altra scheda o un’altra ricerca.",
+    "receive": "Incassa"
+  },
+  "deleteEntry": {
+    "title": "Eliminare questo pagamento?",
+    "effect": "Consentito fino alla chiusura della giornata. L’eliminazione resta nel registro di controllo.",
+    "effectInvoice": "Consentito fino alla chiusura della giornata. La fattura #{{seq}} torna a {{due}} da pagare. L’eliminazione resta nel registro di controllo.",
+    "reasons": {
+      "twice": "Inserito due volte",
+      "amount": "Importo errato",
+      "party": "Paziente o beneficiario errato"
+    },
+    "removed": "{{ref}} rimosso",
+    "removedInvoice": "{{ref}} rimosso · saldo della fattura ripristinato",
+    "blocked": {
+      "dayClosed": "{{ref}} · la sua giornata ora è chiusa · stornalo invece",
+      "moreThanPaid": "{{ref}} · un rimborso ha già restituito questo denaro · elimina prima il rimborso"
+    }
+  },
+  "dialog": {
+    "record": "Pagamento",
+    "credit": "Elemento in sospeso",
+    "dayClosed": "Giornata chiusa · non si può più salvare"
+  },
+  "pending": {
+    "records": "elementi in sospeso",
+    "patient": "Paziente",
+    "party": "Fornitore / controparte",
+    "ways": {
+      "give": "Dare",
+      "take": "Avere"
+    },
+    "wayTitles": {
+      "give": "Li rimborsiamo noi",
+      "take": "Ci pagano loro"
+    },
+    "states": {
+      "open": "Aperto",
+      "given_back": "Restituito",
+      "got_back": "Ricevuto",
+      "used": "Compensato"
+    },
+    "settledToday": "{{state}} · Oggi",
+    "adjusted": "{{amount}} compensato",
+    "invoice": "Fattura #{{seq}}",
+    "byHand": "A mano",
+    "deleteTitle": "Eliminare questo elemento in sospeso?",
+    "deleted": "{{ref}} eliminato",
+    "reasons": {
+      "charged_twice": "Addebitato due volte",
+      "advance_not_used": "Anticipo non usato",
+      "package_cancelled": "Pacchetto annullato",
+      "overpaid": "Pagato in eccesso",
+      "returned_items": "Articoli restituiti",
+      "short_payment": "Pagamento insufficiente",
+      "damaged_goods": "Merce danneggiata restituita",
+      "advance_given": "Anticipo dato",
+      "loan_to_staff": "Prestito al personale",
+      "other": "Altro"
+    },
+    "adjustedOn": "{{amount}} di {{ref}} compensati sulla fattura #{{seq}}",
+    "nothingDue": "{{name}} non ha nulla da saldare su cui compensare",
+    "search": "Persona, fornitore o CR-",
+    "fromEntry": "Da un movimento",
+    "forInvoice": "Per una fattura",
+    "settledLocked": "{{ref}} · {{amount}} saldati · non si può più modificare",
+    "conflicts": {
+      "settled": "Una parte di {{ref}} ora è saldata · non si può modificare né eliminare",
+      "closed": "{{ref}} è già saldato",
+      "dayClosed": "Oggi è chiuso nella sede della fattura #{{seq}} · riaprilo per usare questo credito",
+      "dueChanged": "Il dovuto della fattura #{{seq}} è cambiato · riprova"
+    }
+  },
+  "receive": {
+    "title": "Incassa pagamento",
+    "titleEdit": "Modifica incasso",
+    "sub": "La ricevuta è in coda per il paziente su WhatsApp",
+    "subEdit": "Aperto fino alla chiusura · ogni modifica è registrata",
+    "section": "Chi paga",
+    "branch": "Sede",
+    "invoice": "Su fattura",
+    "invoiceOpen_one": "{{count}} aperta",
+    "invoiceOpen_many": "{{count}} aperte",
+    "invoiceOpen_other": "{{count}} aperte",
+    "invoiceChip": "{{id}} · {{due}}",
+    "pickPatientFirst": "Scegli prima il paziente",
+    "nothingDue": "Niente da saldare",
+    "amount": "Importo incassato",
+    "split": "Dividi · aggiungi una modalità",
+    "total": "Totale {{total}}",
+    "totalDue": "Totale {{total}} · da saldare {{due}}",
+    "reference": "Riferimento",
+    "referenceHint": "Rif. UPI / ultime 4 della carta",
+    "referencePlaceholder": "es. 4321",
+    "note": "Nota",
+    "notePlaceholder": "Facoltativa",
+    "quickFill": {
+      "full": "Intero · {{amount}}",
+      "half": "Metà · {{amount}}",
+      "cashUpi": "Contanti + UPI"
+    },
+    "save": "Registra {{amount}}",
+    "saveEdit": "Salva {{amount}}",
+    "summary": "{{modes}} · {{amount}}",
+    "received": "{{amount}} incassati da {{name}}",
+    "updated": "{{ref}} aggiornato · modifica registrata",
+    "enterAmount": "Inserisci un importo",
+    "pickPatient": "Scegli un paziente",
+    "aboveDue": "Più dei {{due}} da saldare",
+    "moreThanDue": "Più di quanto resta ora sulla fattura · è stata pagata nel frattempo",
+    "totalAdvance": "Totale {{total}} · acconto",
+    "advance": "Acconto · nessuna fattura",
+    "invoicesFailed": "Impossibile caricare le fatture aperte"
+  },
+  "send": {
+    "title": "Registra pagamento",
+    "titleEdit": "Modifica uscita",
+    "sub": "Spesa della clinica · compare nella chiusura",
+    "steps": {
+      "bill": "Paga una fattura",
+      "expense": "Spesa",
+      "payment": "Pagamento"
+    },
+    "bill": "Fattura fornitore",
+    "billHint_one": "{{count}} aperta · cerca n° ordine, fornitore o fattura",
+    "billHint_many": "{{count}} aperte · cerca n° ordine, fornitore o fattura",
+    "billHint_other": "{{count}} aperte · cerca n° ordine, fornitore o fattura",
+    "billPlaceholder": "Cerca n° ordine, fornitore o fattura",
+    "otherSpend": "Altra spesa",
+    "otherSpendSub": "Non legata a un ordine",
+    "groups": {
+      "other": "Altro",
+      "medical": "Ordini medici",
+      "stock": "Ordini di magazzino"
+    },
+    "billLabel": {
+      "medical": "Ordine medico #{{seq}} · {{supplier}}",
+      "stock": "Ordine magazzino #{{seq}} · {{supplier}}"
+    },
+    "billRef": {
+      "medical": "Ordine medico #{{seq}}",
+      "stock": "Ordine magazzino #{{seq}}"
+    },
+    "billNo": "Fattura {{bill}}",
+    "daysPending_one": "in sospeso da {{count}} giorno",
+    "daysPending_many": "in sospeso da {{count}} giorni",
+    "daysPending_other": "in sospeso da {{count}} giorni",
+    "pendingToday": "Oggi",
+    "oldest": "In sospeso da più tempo",
+    "oldestChip": "#{{seq}} · {{supplier}} · {{due}} · {{age}}",
+    "category": "Categoria",
+    "paidTo": "Pagato a",
+    "paidToPlaceholder": "Fornitore o persona",
+    "note": "Nota",
+    "notePlaceholder": "Cosa è stato acquistato",
+    "amount": "Importo",
+    "date": "Data",
+    "mode": "Modalità",
+    "files": "Fattura / ricevuta",
+    "filesDrop": "Trascina la foto della fattura o sfoglia",
+    "filesHint": "Facoltativo · JPG, PNG o PDF",
+    "filesRemove": "Rimuovi {{name}}",
+    "electricity": "Elettricità",
+    "presets": {
+      "tea": "Tè e snack",
+      "courier": "Corriere"
+    },
+    "save": "Aggiungi spesa",
+    "saveEdit": "Salva modifiche",
+    "another": "Aggiungi e un altro",
+    "added": "Spesa {{ref}} aggiunta",
+    "paidBill": "{{amount}} pagati su {{bill}}",
+    "saved": "{{ref}} salvato · modifica registrata",
+    "missing": "Indica chi è stato pagato e l’importo",
+    "moreThanDue": "Più di quanto resta ora sulla fattura del fornitore · è stata pagata nel frattempo",
+    "billsFailed": "Impossibile caricare le fatture aperte"
+  },
+  "credit": {
+    "title": "Aggiungi in sospeso",
+    "titleEdit": "Modifica in sospeso",
+    "sub": "Denaro che la clinica deve restituire o avere · da saldare poi da In sospeso",
+    "subEdit": "Modificabile finché è aperto · le modifiche sono registrate",
+    "steps": {
+      "way": "Direzione",
+      "why": "Perché"
+    },
+    "way": "Direzione",
+    "who": "Chi",
+    "whoPlaceholder": "Cerca pazienti, contatti o fornitori",
+    "add": "Aggiungi",
+    "groups": {
+      "patients": "Pazienti",
+      "contacts": "Contatti",
+      "suppliers": "Fornitori e venditori"
+    },
+    "parties": {
+      "patient": "Paziente · {{id}}",
+      "contact": "Contatto",
+      "contactPhone": "Contatto · {{phone}}",
+      "vendor": "Fornitore della clinica",
+      "supplier": "Fornitore medico"
+    },
+    "amount": "Importo",
+    "reason": "Motivo",
+    "invoice": "Per la fattura",
+    "invoiceHint": "facoltativo · collega l’importo a una fattura",
+    "noInvoice": "Nessuna fattura",
+    "invoicePaid": "{{bill}} · pagata",
+    "invoiceDue": "{{bill}} · {{due}} da saldare",
+    "settleBy": "Da saldare entro",
+    "note": "Nota",
+    "notePlaceholder": {
+      "give": "es. Rimborso sullo stesso ID UPI",
+      "take": "es. Il fornitore lo scalerà nella prossima fattura"
+    },
+    "problems": {
+      "who": "Scegli chi",
+      "amount": "Inserisci l’importo",
+      "reason": "Scegli un motivo",
+      "otherNote": "Aggiungi una nota per «Altro»"
+    },
+    "save": {
+      "give": "Salva · dare dopo",
+      "take": "Salva · avere dopo"
+    },
+    "saveEdit": "Salva modifiche",
+    "summary": {
+      "give": "Restituire {{amount}} a {{name}}",
+      "take": "Avere {{amount}} da {{name}}"
+    },
+    "saved": {
+      "give": "{{ref}} salvato · dare {{amount}} a {{name}}",
+      "take": "{{ref}} salvato · avere {{amount}} da {{name}}"
+    },
+    "updated": "{{ref}} aggiornato"
+  },
+  "dayClose": {
+    "title": "Chiusura giornaliera",
+    "day": "Giorno",
+    "status": {
+      "open": "Aperto",
+      "openAuto_one": "Aperto · si chiude da solo tra {{count}} h",
+      "openAuto_many": "Aperto · si chiude da solo tra {{count}} h",
+      "openAuto_other": "Aperto · si chiude da solo tra {{count}} h",
+      "closedBy": "Chiuso da {{name}}",
+      "closed": "Chiuso",
+      "forceClosed": "Chiusura forzata"
+    },
+    "entries_one": "{{count}} movimento il {{day}}",
+    "entries_many": "{{count}} movimenti il {{day}}",
+    "entries_other": "{{count}} movimenti il {{day}}",
+    "openDay_one": "{{day}} non chiuso · mancano {{count}} h · Controlla",
+    "openDay_many": "{{day}} non chiuso · mancano {{count}} h · Controlla",
+    "openDay_other": "{{day}} non chiuso · mancano {{count}} h · Controlla",
+    "openDayTitle": "Controlla i movimenti e chiudilo · si chiude da solo allo scadere del tempo",
+    "previous": "Chiusure precedenti",
+    "previousCash": "Contanti {{amount}}",
+    "previousAuto": "Chiusura automatica",
+    "previousTitle": "Controlla {{day}}",
+    "closeDay": "Chiudi la giornata",
+    "countFirst": "Prima conta i contanti",
+    "closed": "Giornata chiusa",
+    "reopened": "Giornata riaperta",
+    "gate": {
+      "title": "Fondo cassa iniziale · {{day}}",
+      "sources": {
+        "carried": "Riportato dalla chiusura del {{day}}",
+        "recounted": "Ricontato",
+        "first": "Nessuna chiusura precedente · niente da riportare"
+      },
+      "recount": "Riconta",
+      "recountLabel": "Riconta il fondo cassa iniziale",
+      "recountTitle": "Riconta se non corrisponde",
+      "accept": "Accetta {{amount}}",
+      "acceptRecount": "Accetta il riconteggio",
+      "starting": "Inizi la giornata come {{name}} · resta registrato sulla giornata",
+      "accepted": "Fondo cassa iniziale di {{amount}} accettato · registrato alle {{time}}"
+    },
+    "strip": {
+      "opening": "Fondo iniziale",
+      "acceptedBy": "Accettato da {{name}} · {{time}}",
+      "cashInOut": "Contanti in · out",
+      "cashIn": "+{{amount}}",
+      "cashOut": "−{{amount}}",
+      "expected": "Atteso in cassa {{amount}}",
+      "counted": "Contato ora",
+      "countPlaceholder": "Conta la cassa",
+      "countLabel": "Contanti contati",
+      "netByMode": "Netto per modalità",
+      "staffTitle_one": "{{name}} · {{count}} movimento · {{amount}}",
+      "staffTitle_many": "{{name}} · {{count}} movimenti · {{amount}}",
+      "staffTitle_other": "{{name}} · {{count}} movimenti · {{amount}}",
+      "staffOther": "Fuori dal team",
+      "reason": "Perché il conteggio non torna?",
+      "reasonPlaceholder": "Cos’è successo · ad es. ₹20 dati come resto dalla cassa",
+      "reasonFirst": "Prima indica perché il conteggio non torna"
+    },
+    "report": {
+      "title": "{{day}} è chiuso",
+      "closedBy": "Chiuso da {{name}} · {{time}}",
+      "autoClosed": "Chiuso alle {{time}} · automaticamente dopo il periodo di tolleranza",
+      "reopen": "Riapri",
+      "acceptedBy": "Accettato da {{name}}",
+      "takenAsExpected": "Preso come atteso",
+      "received_one": "{{count}} incassato",
+      "received_many": "{{count}} incassati",
+      "received_other": "{{count}} incassati",
+      "paid_one": "{{count}} pagato",
+      "paid_many": "{{count}} pagati",
+      "paid_other": "{{count}} pagati",
+      "cashCounted": "Contanti contati",
+      "expected": "Atteso {{amount}}",
+      "difference": "Differenza",
+      "matched": "Cassa in pari",
+      "extra": "Eccedenza in cassa",
+      "short": "Ammanco in cassa",
+      "log": "Cosa è successo",
+      "logAccepted": "{{name}} ha accettato il fondo cassa iniziale di {{amount}}",
+      "logRecounted": "{{name}} ha accettato il fondo cassa iniziale di {{amount}} (ricontato)",
+      "logMatched": "Cassa contata a {{amount}} · in pari",
+      "logExtra": "Cassa contata a {{amount}} · {{diff}} in più",
+      "logShort": "Cassa contata a {{amount}} · {{diff}} in meno",
+      "logClosed": "{{name}} ha chiuso la giornata",
+      "logAuto": "Chiusura automatica dopo il periodo di tolleranza · contanti presi come attesi",
+      "openedAuto": "Aperto automaticamente",
+      "notCounted": "Non contato",
+      "logOpened": "{{name}} ha aperto la giornata",
+      "logReopened": "{{name}} ha riaperto la giornata · {{reason}}",
+      "logReason": "«{{reason}}»",
+      "someone": "Qualcuno"
+    },
+    "review": {
+      "title": "Controlla ogni movimento",
+      "none": "Nessun movimento",
+      "empty": "Nessun movimento in questa giornata",
+      "states": {
+        "canEdit": "Modificabile",
+        "canEditTitle": "Modificabile o eliminabile fino alla chiusura della giornata",
+        "dayClosed": "Giornata chiusa",
+        "dayClosedTitle": "La giornata è chiusa · i suoi movimenti non si possono modificare",
+        "fromCredit": "Da {{credit}}"
+      },
+      "count_one": "{{count}} movimento",
+      "count_many": "{{count}} movimenti",
+      "count_other": "{{count}} movimenti"
+    },
+    "previousNone": "Nessuna chiusura prima di questa giornata",
+    "refusals": {
+      "alreadyOpened": "Qualcuno ha aperto questa giornata nel frattempo · ora è visibile",
+      "alreadyClosed": "Qualcuno ha chiuso questa giornata nel frattempo · ora è visibile",
+      "alreadyOpen": "Questa giornata è già stata riaperta · ora è visibile"
+    },
+    "reopen": {
+      "title": "Riaprire questa giornata?",
+      "effect": "Il conteggio viene cancellato e i movimenti della giornata si possono di nuovo modificare finché non viene chiusa.",
+      "action": "Riapri giornata",
+      "record": "{{branch}} · {{day}}",
+      "reasons": {
+        "miscounted": "Contato male",
+        "missed": "Mancava un movimento",
+        "wrongEntry": "Un movimento è sbagliato"
+      }
+    }
+  },
+  "reverseEntry": {
+    "title": "Stornare questo pagamento?",
+    "effect": "La sua giornata è chiusa, quindi resta com’è. Uno storno dello stesso importo va oggi nel registro della sua sede e ciò che ha pagato viene annullato. Entrambi i movimenti restano.",
+    "action": "Storna",
+    "reversed": "{{ref}} stornato · {{reversal}}",
+    "blocked": {
+      "alreadyReversed": "{{ref}} è già stornato",
+      "dayOpen": "La giornata di {{ref}} è di nuovo aperta · eliminalo invece",
+      "dayClosed": "Oggi è chiuso nella sede di {{ref}} · riaprilo per stornare"
+    }
+  }
+}

@@ -2,16 +2,20 @@ import { expect, test } from '@playwright/test';
 
 import {
   authenticateViaEmailCodeAndLand,
-  registerNewUserAndGoToDashboard,
+  registerNewUserAndGoToToday,
 } from '@/tests/utils/e2e-auth.ts';
-import { openSettingsHash } from '@/tests/utils/e2e-hybrid.ts';
+import {
+  openAccountMenu,
+  openNotificationCenter,
+  openSettingsHash,
+} from '@/tests/utils/e2e-hybrid.ts';
 import { verifyDatabaseConnection } from '@/tests/utils/e2e-session.ts';
 
 /**
- * Account settings + header UX for a signed-in (personal) account: profile edit
- * with its confirm dialog, the sessions and notifications sections, the
- * danger-zone delete confirmation, and the notification center popover. These
- * are personal-account surfaces, so a plain registration is enough.
+ * Account settings + header UX for a signed-in account: profile edit with its
+ * confirm dialog, the sessions and notifications sections, the danger-zone
+ * delete confirmation, and the notification center popover. These are account
+ * surfaces — the same in any workspace — so a plain registration is enough.
  */
 
 test.describe('Account settings', () => {
@@ -20,7 +24,7 @@ test.describe('Account settings', () => {
       !(await verifyDatabaseConnection()),
       'DATABASE_URL must reach clinozy-be Postgres (mail_outbox)',
     );
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
   });
 
   test('profile section renders the form and saves through the confirm dialog', async ({
@@ -88,10 +92,12 @@ test.describe('Account settings', () => {
     await expect(page.getByTestId('account-delete-confirm')).toHaveCount(0);
   });
 
-  test('the notification bell opens the notification center', async ({ page }) => {
-    // a11y guard: the bell is a labelled control.
-    await expect(page.getByTestId('notification-bell')).toBeVisible();
-    await page.getByTestId('notification-bell').click();
+  test('the Account menu opens the notification center', async ({ page }) => {
+    // The section bar has no bell: Notifications is a row of the Account menu.
+    await openAccountMenu(page);
+    // a11y guard: the row is a labelled menu item.
+    await expect(page.getByRole('menuitem', { name: /notifications/i })).toBeVisible();
+    await page.getByTestId('account-menu-notifications').click();
     // The center opens; a fresh account shows the empty inbox state inside it.
     await expect(page.getByTestId('notification-popover')).toBeVisible();
   });
@@ -129,8 +135,7 @@ test.describe('Account settings', () => {
   });
 
   test('the notification center closes on Escape', async ({ page }) => {
-    await page.getByTestId('notification-bell').click();
-    await expect(page.getByTestId('notification-popover')).toBeVisible();
+    await openNotificationCenter(page);
 
     await page.keyboard.press('Escape');
     await expect(page.getByTestId('notification-popover')).not.toBeVisible();
@@ -150,7 +155,7 @@ test.describe('Account settings — search', () => {
       !(await verifyDatabaseConnection()),
       'DATABASE_URL must reach clinozy-be Postgres (mail_outbox)',
     );
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
     await openSettingsHash(page, 'account', 'profile');
     await expect(page.getByTestId('settings-section-profile')).toBeVisible({
       timeout: 15000,

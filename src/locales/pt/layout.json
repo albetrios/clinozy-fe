@@ -1,68 +1,14 @@
 {
-  "brand": {
-    "name": "{{productName}}"
-  },
   "a11y": {
-    "skipToMain": "Ir para o conteúdo principal",
-    "mainNavigation": "Navegação principal",
-    "sidebarNavigation": "Navegação lateral",
-    "mobileNavigation": "Navegação móvel"
-  },
-  "auth": {
-    "switchToRegister": "Criar uma conta",
-    "switchToSignIn": "Entrar",
-    "statusOperational": "Todos os sistemas operacionais",
-    "badge": "Operações, unificadas",
-    "heroTitle": "O sistema operacional da sua organização.",
-    "heroSubtitle": "Membros, funções, cobrança e segurança — um espaço de trabalho rápido e focado no teclado para cada equipe.",
-    "features": {
-      "multiOrg": {
-        "title": "Multi-organização por design",
-        "body": "Troque de equipe sem trocar de ferramenta."
-      },
-      "secure": {
-        "title": "Seguro por padrão",
-        "body": "RBAC, MFA, passkeys e trilhas de auditoria."
-      },
-      "fast": {
-        "title": "Rápido em todo lugar",
-        "body": "Feito para trabalho em tempo real com o teclado."
-      }
-    },
-    "stats": {
-      "teams": "equipes",
-      "uptime": "disponibilidade",
-      "compliant": "conforme"
-    }
+    "skipToMain": "Ir para o conteúdo principal"
   },
   "app": {
     "search": "Pesquisar",
-    "searchPlaceholder": "Pesquisar...",
     "searchShortcutMac": "⌘K",
     "searchShortcutWindows": "Ctrl+K",
-    "userMenu": "Menu do usuário",
     "userFallback": "Usuário",
     "settings": "Configurações",
     "logOut": "Sair",
-    "toggleSidebar": "Alternar barra lateral",
-    "footerCopyright": "© {{year}} {{productName}} Platform",
-    "nav": {
-      "dashboard": "Painel"
-    },
-    "sidebar": {
-      "workspace": "Espaço de trabalho",
-      "menu": "Menu",
-      "shortcuts": "Atalhos"
-    },
-    "contextStrip": {
-      "label": "Acesso rápido",
-      "labelSolo": "Ir para",
-      "profile": "Perfil",
-      "security": "Segurança",
-      "billing": "Cobrança",
-      "appearance": "Aparência",
-      "shortcuts": "Atalhos"
-    },
     "workspaceSwitch": {
       "preparing": "Preparando seu espaço de trabalho",
       "loadingAccess": "Carregando membros e permissões",
@@ -74,7 +20,10 @@
       "personal": "Pessoal",
       "yourOrganizations": "Suas organizações",
       "organizations": "Organizações",
-      "addOrganization": "Adicionar organização"
+      "addOrganization": "Adicionar organização",
+      "invited": "Convites",
+      "invitedRow": "Convidado · {{roles}}",
+      "invitationCount": "Convites: {{count}}"
     },
     "notifications": {
       "title": "Notificações",
@@ -90,17 +39,15 @@
       "settingsLink": "Configurações de notificação"
     },
     "commandPalette": {
-      "ariaLabel": "Paleta de comandos",
-      "placeholder": "Digite um comando ou pesquise...",
+      "ariaLabel": "Menu de comandos",
+      "placeholder": "Pesquisar ou ir para…",
       "empty": "Nenhum resultado encontrado.",
       "groups": {
-        "navigation": "Navegação",
         "theme": "Tema",
         "account": "Conta",
         "organizations": "Organizações",
         "shortcuts": "Atalhos"
       },
-      "dashboard": "Painel",
       "userSettings": "Configurações do usuário",
       "organizationSettings": "Configurações da organização",
       "lightMode": "Modo claro",
@@ -118,6 +65,10 @@
       "commandPalette": "Abrir paleta de comandos",
       "showShortcuts": "Mostrar atalhos de teclado",
       "showShortcutsAlt": "Mostrar atalhos de teclado (alternativo)",
+      "allSections": "Abrir ou fechar Todas as seções",
+      "jumpToSection": "Ir para uma seção",
+      "listSearch": "Pesquisar na lista",
+      "leadRows": "Lead seguinte ou anterior (em Leads)",
       "closeDialog": "Fechar diálogo"
     },
     "emailVerify": {
@@ -143,16 +94,64 @@
       "nameLabel": "Nome da organização",
       "slugLabel": "URL do espaço (opcional)",
       "submit": "Criar organização",
-      "submitting": "Criando…"
+      "submitting": "Criando…",
+      "cancel": "Cancelar"
     },
     "theme": {
       "light": "Claro",
       "dark": "Escuro",
-      "system": "Sistema",
-      "shuffle": "Tema aleatório"
+      "system": "Sistema"
+    },
+    "sectionBar": {
+      "nav": "Seções",
+      "allSections": "Todas as seções",
+      "allSectionsTitle": "Todas as seções (G)",
+      "more": "Mais",
+      "morePinned": "Mais seções fixadas",
+      "tabTitle": "{{section}} · {{description}}",
+      "searchLabel": "Pesquisar ou ir para (Comando K)",
+      "searchTitleMac": "Pesquisar ou ir para… (⌘K)",
+      "searchTitleWindows": "Pesquisar ou ir para… (Ctrl K)",
+      "searchPlaceholder": "Pesquisar pacientes, leads…",
+      "pin": "Fixar na barra",
+      "unpin": "Desafixar da barra",
+      "pinAria": "Fixar na barra · {{section}}",
+      "unpinAria": "Desafixar da barra · {{section}}",
+      "pinFooter": "Fixe para manter na barra",
+      "keysHint": "G · 1–9",
+      "account": "Conta",
+      "avatarLabel": "{{name}} · {{status}}",
+      "identityRole": "{{role}} · {{branch}}",
+      "status": "Status",
+      "presence": {
+        "online": "Online",
+        "away": "Ausente",
+        "busy": "Ocupado"
+      },
+      "statusToast": "Status · {{status}}",
+      "switchClinic": "Trocar de clínica",
+      "security": "Segurança",
+      "billing": "Cobrança",
+      "devices": "Dispositivos",
+      "appearance": "Aparência",
+      "appearanceLanguage": "Aparência e idioma",
+      "viewAs": {
+        "previewing": "Visualizando como {{role}}",
+        "noSections": "Nenhuma seção",
+        "exit": "Sair da visualização",
+        "exitToast": "De volta ao seu próprio acesso"
+      },
+      "branch": {
+        "label": "Unidade · {{label}}",
+        "title": "Unidade · {{names}}",
+        "all": "Todas as unidades",
+        "allSub": "Visão combinada · totais de {{count}}",
+        "viewGroup": "Visão",
+        "branchesGroup": "Unidades",
+        "showingAll": "Mostrando todas as unidades",
+        "showing": "Mostrando {{names}}",
+        "keepOne": "Mantenha pelo menos uma unidade"
+      }
     }
-  },
-  "public": {
-    "brandTagline": "Espaço de trabalho seguro para sua equipe"
   }
 }

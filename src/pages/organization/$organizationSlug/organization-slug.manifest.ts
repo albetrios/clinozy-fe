@@ -12,5 +12,17 @@ export const manifest = {
   testId: 'app-layout',
   permission: null,
   kind: 'layout',
-  children: ['dashboard', 'suspended'],
+  children: [
+    'suspended',
+    'today',
+    'leads',
+    'appointments',
+    'patients',
+    'medical',
+    'stock',
+    'payments',
+    'tasks',
+    'offerings',
+    'users',
+  ],
 } as const satisfies PageManifest;

@@ -13,8 +13,11 @@
     "goHome": "Go home",
     "refresh": "Refresh page",
     "forbidden": "You do not have permission to access this page.",
+    "forbiddenTitle": "No access to this page",
     "signOut": "Sign out",
-    "signingOut": "Signing out…"
+    "signingOut": "Signing out…",
+    "pageNotFound": "Page not found",
+    "recordNotFound": "{{record}} not found · it may have been deleted"
   },
   "widget": {
     "unavailable": "{{title}} unavailable",
@@ -25,19 +28,12 @@
     "pageContent": "Page content",
     "navigation": "Navigation",
     "emailBanner": "Email verification",
-    "notifications": "Notifications",
     "organizationSwitcher": "Organization switcher",
     "commandPalette": "Command palette",
     "settings": "Settings",
     "appearance": "Appearance",
-    "analytics": "Analytics",
-    "members": "Members",
-    "schedule": "Schedule",
-    "highlights": "Highlights",
-    "themeShowcase": "Theme showcase",
     "sessionTimeout": "Session timer",
     "securityCheck": "Security check",
-    "appearanceControls": "Appearance controls",
     "payment": "Payment",
     "cancellation": "Cancellation"
   },
@@ -45,17 +41,7 @@
     "dismiss": "Dismiss notification",
     "undo": "Undo",
     "undone": "Action cancelled",
-    "processing": "Processing…",
-    "preview": {
-      "successTitle": "Changes saved",
-      "successDescription": "Your settings are live.",
-      "errorTitle": "Something went wrong",
-      "errorDescription": "Please try again.",
-      "warningTitle": "Heads up",
-      "warningDescription": "This action needs a review.",
-      "infoTitle": "Did you know?",
-      "infoDescription": "Shuffle also rolls this design."
-    }
+    "processing": "Processing…"
   },
   "api": {
     "fallback": "Something went wrong. Please try again.",
@@ -69,7 +55,21 @@
     "http429": "Too many requests. Please wait a moment and try again.",
     "http500": "An internal server error occurred. Please try again later.",
     "http502": "The server is temporarily unavailable. Please try again later.",
-    "http503": "The service is temporarily unavailable. Please try again later."
+    "http503": "The service is temporarily unavailable. Please try again later.",
+    "reload": "Reload",
+    "recordChanged": "Someone else saved this meanwhile. Reload to see their changes, then make yours again.",
+    "reasons": {
+      "missingPermission": "You don't have permission to do this. Ask the clinic's owner or an admin.",
+      "ownerMembershipFixed": "The clinic owner's roles and status can't be changed. Transfer ownership first.",
+      "ownerCannotLeave": "The clinic owner can't leave. Transfer ownership first.",
+      "ownerRoleFixed": "The access of the role the clinic owner holds can't be changed.",
+      "systemRoleFixed": "A preset role can't be renamed or deleted.",
+      "roleLocked": "This role's access is fixed and can't be changed.",
+      "seatLimitReached": "Your plan has no free seat. Add a seat in Settings › Billing, then invite again.",
+      "membershipAlreadyExists": "This person is already in the clinic.",
+      "organizationSlugExists": "That workspace URL is already taken. Choose another one.",
+      "disposableEmail": "Use a permanent email address — disposable ones aren't accepted."
+    }
   },
   "frontend": {
     "query": {
@@ -91,12 +91,7 @@
     },
     "account": {
       "copyFailed": "Could not copy to clipboard",
-      "themeCodeNumeric": "Enter a numeric theme code",
       "copySuccess": "Account ID copied",
-      "themeLinkCopied": "Theme link copied",
-      "themeLinkCopiedDescription": "Share this URL to reproduce the look.",
-      "notificationStylePreview": "Notification style",
-      "notificationStylePreviewDescription": "{{variant}} — themed with your accent and semantic colors.",
       "accountDeletionPending": "Account deleted. Signing you out…",
       "avatarInvalidType": "Please choose an image file.",
       "avatarTooLarge": "Avatar must be under 2 MB.",
@@ -122,7 +117,8 @@
         "updateRoleSuccess": "Member role updated",
         "removeSuccess": "Member removed",
         "suspendSuccess": "Member suspended",
-        "reactivateSuccess": "Member reactivated"
+        "reactivateSuccess": "Member reactivated",
+        "updateSuccess": "Member saved"
       },
       "roles": {
         "createFailed": "Could not create role",

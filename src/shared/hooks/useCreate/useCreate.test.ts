@@ -23,7 +23,7 @@ vi.mock('@/core/data-provider/index.ts', () => ({
 }));
 
 const { dataProvider } = await import('@/core/data-provider/index.ts');
-const { useCreate } = await import('./useCreate.ts');
+const { useCreate, withUndoToast } = await import('./useCreate.ts');
 
 function makeContext() {
   const queryClient = new QueryClient({
@@ -115,5 +115,24 @@ describe('useCreate', () => {
       expect(result.current.isSuccess).toBe(true);
       releaseRefetch();
     });
+  });
+});
+
+describe('withUndoToast', () => {
+  it('raises its own toast, then the caller’s onSuccess', async () => {
+    const toast = vi.fn();
+    const onSuccess = vi.fn();
+    const options = withUndoToast<string, number>({ onSuccess }, toast);
+    await options.onSuccess?.('saved', 1);
+    expect(toast).toHaveBeenCalledWith('saved', 1);
+    expect(onSuccess).toHaveBeenCalledWith('saved', 1);
+  });
+
+  it('leaves the toast to a caller that brings its own successMessage', async () => {
+    const toast = vi.fn();
+    const options = withUndoToast<string, number>({ successMessage: 'Done' }, toast);
+    await options.onSuccess?.('saved', 1);
+    expect(toast).not.toHaveBeenCalled();
+    expect(options.successMessage).toBe('Done');
   });
 });

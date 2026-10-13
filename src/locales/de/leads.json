@@ -1,0 +1,191 @@
+{
+  "manifest": {
+    "title": "Leads"
+  },
+  "record": "Lead",
+  "toasts": {
+    "created": "Lead {{id}} erstellt",
+    "saved": "Lead gespeichert",
+    "statusChanged": "{{name}} → {{status}}",
+    "claimed": "{{name}} gehört jetzt Ihnen · {{owner}} bleibt beteiligt",
+    "claimedUnowned": "{{name}} gehört jetzt Ihnen",
+    "released": "Für das Team freigegeben · jeder kann übernehmen",
+    "assigned": "{{name}} ist jetzt zuständig · benachrichtigt"
+  },
+  "list": {
+    "records": "Leads",
+    "views": {
+      "label": "Lead-Ansichten",
+      "mine": "Meine",
+      "unreplied": "Unbeantwortet",
+      "all": "Alle",
+      "unrepliedCount_one": "{{count}} unbeantwortet",
+      "unrepliedCount_other": "{{count}} unbeantwortet"
+    },
+    "search": {
+      "placeholder": "Name, Telefon, #ID suchen",
+      "label": "Leads durchsuchen"
+    },
+    "newLead": "Neuer Lead",
+    "columns": {
+      "lead": "Lead",
+      "status": "Status",
+      "source": "Quelle",
+      "interests": "Interessiert an",
+      "team": "Team",
+      "updated": "Aktualisiert"
+    },
+    "empty": "Keine passenden Leads",
+    "clearFilters": "Filter löschen",
+    "moreInterests_one": "{{count}} weiteres: {{list}}",
+    "moreInterests_other": "{{count}} weitere: {{list}}"
+  },
+  "team": {
+    "claim": "Offen · Übernehmen",
+    "openHint": "Niemand hält ihn · jeder kann ihn übernehmen",
+    "openMine": "Offen fürs Team",
+    "openMineHint": "Deine Reservierung ist abgelaufen · jeder kann ihn übernehmen",
+    "releasesToday": "Geht heute um {{time}} zurück ans Team",
+    "releasesTomorrow": "Geht morgen um {{time}} zurück ans Team",
+    "claimFirst": "{{first}} übernehmen",
+    "takeOver": "Von {{first}} übernehmen"
+  },
+  "filters": {
+    "status": "Status",
+    "source": "Quelle · beliebig wählen",
+    "clear": "Löschen",
+    "hold": {
+      "label": "Zuständigkeit · gehalten nach Übernahme",
+      "any": "Alle",
+      "open": "Zur Übernahme offen",
+      "soon": "Wird heute frei",
+      "held": "Gehalten"
+    },
+    "team": {
+      "label": "Team · zuständig oder beteiligt",
+      "anyone": "Jeder im Team",
+      "count_one": "{{count}} Person",
+      "count_other": "{{count}} Personen",
+      "search": "Team durchsuchen",
+      "noMatch": "Kein Treffer"
+    }
+  },
+  "drawer": {
+    "title": "Lead bearbeiten",
+    "sub": "Nehmen Sie Ihre Änderungen vor und speichern Sie dann den Lead",
+    "idTooltip": "Lead #{{seq}} · erstellt {{created}} · zum Kopieren klicken",
+    "idAria": "Lead-ID #{{seq}} kopieren",
+    "idCopied": "Lead-ID #{{seq}} kopiert",
+    "retarget": "Re-Targeting",
+    "panels": "Lead-Bereiche",
+    "details": "Details",
+    "chat": "Chat",
+    "resize": "Bereichsgröße ändern",
+    "resizeHint": "Ziehen zum Ändern · Doppelklick zum Zurücksetzen",
+    "cards": {
+      "details": "Lead-Details",
+      "progress": "Fortschritt",
+      "info": "Info"
+    },
+    "source": "Quelle",
+    "interests": "Interessiert an",
+    "people": "Zugewiesen & beteiligt",
+    "peopleAria": "Zugewiesene und beteiligte Personen",
+    "addInvolved": "+ Beteiligte hinzufügen",
+    "claim": "Übernehmen",
+    "release": "Freigeben",
+    "releaseHint": "Jede Person im Team darf ihn übernehmen",
+    "progressAria": "Lead-Fortschritt",
+    "steps": {
+      "done": "Erledigt",
+      "current": "Aktuell",
+      "next": "Als Nächstes"
+    },
+    "stepTips": {
+      "done": "{{status}} · abgeschlossen",
+      "current": "{{status}} · aktueller Schritt",
+      "next": "Zu {{status}} wechseln",
+      "byCheckIn": "Klinik besucht · wird beim Check-in gesetzt"
+    },
+    "closeAs": "Schließen als",
+    "info": {
+      "created": "Erstellt",
+      "lastActivity": "Letzte Aktivität",
+      "none": "Noch keine",
+      "patient": "Patient",
+      "linked": "Verknüpft",
+      "notYet": "Noch nicht",
+      "openTasks": "Offene Aufgaben",
+      "retargetReason": "Re-Targeting-Grund"
+    },
+    "footer": {
+      "remove": "Lead entfernen",
+      "discard": "Verwerfen",
+      "save": "Lead speichern"
+    },
+    "popover": {
+      "title": "Personen bei diesem Lead",
+      "search": "Team durchsuchen",
+      "assignedTo": "Zugewiesen an · wer diesen Lead jetzt betreut",
+      "assign": "Zuweisen",
+      "assigned": "Zugewiesen",
+      "currentlyAssigned": "Derzeit zugewiesen",
+      "assignTo": "{{name}} zuweisen",
+      "involved": "Beteiligt · hat an diesem Lead gearbeitet",
+      "noMatch": "Kein Treffer",
+      "note": "✓ Beteiligt = alle, die an diesem Lead gearbeitet haben. Automatisch hinzugefügt, wenn sie antworten, anrufen, eine Notiz schreiben oder buchen · Sie können auch selbst jemanden hinzufügen"
+    },
+    "remove": {
+      "title": "Diesen Lead entfernen?",
+      "effect": "Der Lead verschwindet aus allen Listen und aus der Warteschlange der zuständigen Person. Der Chatverlauf bleibt erhalten. Sie können es direkt danach in der Meldung rückgängig machen.",
+      "reasons": {
+        "duplicate": "Duplikat",
+        "testEntry": "Testeintrag",
+        "spam": "Spam",
+        "other": "Sonstiges"
+      },
+      "removed": "Lead #{{seq}} entfernt · {{reason}}"
+    }
+  },
+  "newLead": {
+    "title": "Neuer Lead",
+    "sub": "Name und Mobilnummer genügen für den Anfang",
+    "contact": "Kontakt",
+    "search": "Nach Name oder Mobilnummer suchen",
+    "searchAria": "Vorhandenen Patienten oder Kontakt suchen",
+    "quickStart": "Schnellstart",
+    "presets": {
+      "walkIn": "Laufkundschaft",
+      "instagramDm": "Instagram-DM"
+    },
+    "presetHints": {
+      "walkIn": "Jetzt am Empfang · Quelle Laufkundschaft",
+      "instagramDm": "DM auf Instagram"
+    },
+    "hits": {
+      "patient": "Patient · {{id}} · {{phone}}",
+      "contact": "{{id}} · {{phone}}",
+      "openLead": "Offener Lead · {{id}} · {{phone}}",
+      "open": "Lead öffnen",
+      "recreate": "Lead neu anlegen",
+      "useContact": "Kontakt verwenden"
+    },
+    "noMatch": "Kein vorhandener Treffer",
+    "more_one": " · +{{count}} weitere",
+    "more_other": " · +{{count}} weitere",
+    "change": "Ändern",
+    "changeTitle": "Anderen Kontakt wählen",
+    "afterContact": "Nach dem Kontakt",
+    "detailsSummary": "Quelle, Interesse und wer sich kümmert",
+    "footer": "Legt einen Kontakt an oder aktualisiert ihn",
+    "create": "Lead anlegen",
+    "toasts": {
+      "pickFirst": "Wählen Sie zuerst den Kontakt oder legen Sie ihn an",
+      "presetApplied": "Vorgabe „{{preset}}“ übernommen",
+      "existingPatient": "Vorhandener Patient {{id}} · der neue Lead wird verknüpft",
+      "existingContact": "Vorhandener Kontakt {{name}} wird verwendet",
+      "missing": "Geben Sie einen Namen und eine 10-stellige Mobilnummer ein",
+      "open": "Öffnen"
+    }
+  }
+}

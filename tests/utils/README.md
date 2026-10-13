@@ -18,6 +18,19 @@ test('renders component', () => {
 - `initialEntries?: string[]` — initial route entries (default: `['/']`)
 - `queryClient?: QueryClient` — custom client (default: fresh, no retries)
 
+## renderWithQueryClient
+
+The same fresh QueryClient without the router — synchronous, for a unit that needs
+the client but no route (anything that renders the shared `Picker`, whose data hooks
+read it).
+
+```tsx
+import { renderWithQueryClient } from '@/tests/utils/renderWithProviders.tsx';
+
+renderWithQueryClient(<DateTimePrefsCard />);
+expect(screen.getByTestId('time-zone-select')).toBeInTheDocument();
+```
+
 ### Isolating HTTP in unit tests
 
 Stub `apiClient` or module dependencies with `vi.mock()` and `vi.fn()` at the top of the test file — unit tests never start a server.
@@ -52,17 +65,42 @@ Faker-backed disposable data for Playwright/API E2E (emails stay on `@acme.test`
 
 Requires **clinozy-be** on `:3000` — Vite proxies `/api` in dev.
 
-| Helper                                     | Purpose                                                                                   |
-| ------------------------------------------ | ----------------------------------------------------------------------------------------- |
-| `createSessionViaEmailCode(api)`           | API helper — send-code + login; needs `DATABASE_URL` (reads code from `auth.mail_outbox`) |
-| `authenticateViaEmailCode(page)`           | Browser/API helper — same flow via Playwright request (needs `DATABASE_URL`)              |
-| `authenticateViaSignup(page)`              | Alias of `authenticateViaEmailCode` (legacy signup route removed)                         |
-| `completeOnboardingWizard(page)`           | Walk onboarding when `needsOnboarding`                                                    |
-| `registerNewUserAndGoToDashboard(page)`    | UI email-code login + onboarding when needed → dashboard                                  |
-| `loginViaEmailCodeUI(page)`                | Email-code login via `/login` UI only (needs `DATABASE_URL`)                              |
-| `authenticateViaEmailCodeAndLand(page)`    | API session + `/` resolver hydrate (needs `DATABASE_URL`)                                 |
-| `createTeamOrgViaSwitcher(page)`           | Create team org via org switcher dialog                                                   |
-| `selectOrganizationInSwitcher(page, slug)` | Switch active org in the header switcher                                                  |
+| Helper                                     | Purpose                                                                                                                                       |
+| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `createSessionViaEmailCode(api)`           | API helper — send-code + login; needs `DATABASE_URL` (reads code from `auth.mail_outbox`)                                                     |
+| `authenticateViaEmailCode(page)`           | Browser/API helper — same flow via Playwright request (needs `DATABASE_URL`)                                                                  |
+| `authenticateViaSignup(page)`              | Alias of `authenticateViaEmailCode` (legacy signup route removed)                                                                             |
+| `completeOnboardingWizard(page)`           | Walk onboarding when `needsOnboarding`                                                                                                        |
+| `registerNewUserAndGoToToday(page)`        | Email-code login + onboarding when needed → Today in a clinic the user owns (one is made through the API when onboarding lands on the picker) |
+| `loginViaEmailCodeUI(page)`                | Email-code login via `/login` UI only (needs `DATABASE_URL`)                                                                                  |
+| `authenticateViaEmailCodeAndLand(page)`    | API session + `/` resolver hydrate, ending on Today (needs `DATABASE_URL`)                                                                    |
+| `registerNewUserOnPersonalWorkspace(page)` | A new user left on their personal workspace — the organization picker (D44); skips where personal workspaces are off                          |
+| `createTeamOrgViaApi(page)`                | Create a team org through the API (cookie refresh → token); skips when team orgs are off                                                      |
+| `createTeamOrgAndOpenToday(page)`          | `createTeamOrgViaApi`, then open that clinic's home in the app — Today, its owner's role home                                                 |
+| `openOrganizationSwitcher(page)`           | Open the switcher — Account menu › "Switch clinic" in the section bar, else the header's                                                      |
+| `selectOrganizationInSwitcher(page, slug)` | Switch active org through that switcher                                                                                                       |
+
+### `e2e-hybrid.ts` — the section-bar shell
+
+The clinic shell has no sidebar, bell or header theme toggle: the Account menu (the avatar,
+`user-menu-trigger`) holds them.
+
+| Helper                         | Purpose                                                                    |
+| ------------------------------ | -------------------------------------------------------------------------- |
+| `expectAppHeaderReady(page)`   | Header, search ("Search or jump to") and avatar ("<name> · <status>")      |
+| `openAccountMenu(page)`        | Open the Account menu (`account-menu`, named "Account")                    |
+| `openNotificationCenter(page)` | Account menu › Notifications → `notification-popover`                      |
+| `chooseThemeMode(page, mode)`  | Account menu › Appearance pills (`account-menu-theme-<mode>`), then closes |
+
+### `e2e-app.ts` — the clinic rooms
+
+| Helper                                | Purpose                                                                                                                      |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `openNewClinic(page)`                 | A new owner of a new clinic (team org) via `page.request`, standing on their role home (Today); skips when team orgs are off |
+| `openRoomFromShell(page, room, tier)` | Open a room as a member does: pinned tab (header / phone tab bar) or All sections (popover / "More" sheet)                   |
+| `expectRoomReady(page, room)`         | The room's URL, page root and its `h1` (a11y guard)                                                                          |
+| `APP_ROOMS` · `APP_VIEWPORTS`         | The ten rooms in nav order · desktop 1440×900 and phone 375×812                                                              |
+| `hideDevtools(page)`                  | Hide the React Query devtools (`VITE_DEVTOOLS`) — their toggle covers the phone tab bar's "More"                             |
 
 ### `e2e-tenancy.ts`
 
@@ -81,6 +119,20 @@ Radix dialogs portal outside the render container — use `axeForDialog` instead
 
 ```ts
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+```
+
+### `bidi-marks.ts` (isolated data tokens)
+
+A data token inside a translated sentence is wrapped in invisible bidi marks
+(`src/lib/bidi-isolate.ts`). `fsi(text)` / `lri(text)` build the expected text
+from literal marks; `withoutBidiMarks(text)` strips them when a test checks only
+the words and their order:
+
+```ts
+import { fsi, withoutBidiMarks } from '@/tests/utils/bidi-marks.ts';
+
+expect(row).toHaveTextContent(`Patient ${fsi('#3508')} · last visit`);
+expect(withoutBidiMarks(chip.textContent)).toBe('Appointment #2740 · Peel');
 ```
 
 ## Test fixtures (`tests/fixtures/`)

@@ -138,7 +138,7 @@ That second check exists because this repo already proved the failure mode: befo
 
 The platform is everything under `src/core/`, `src/app/`, `src/shared/{auth,tenancy,errors,components/ui}`, `agent-os/`, `tooling/`, and `.github/`. Keep all of it.
 
-`src/pages/` is a mix: the login/MFA/callback/onboarding/organization islands are the platform's own flows, while the dashboard's placeholder data and the billing surface are **sample product code** you will likely replace. Module-level switches live in `VITE_DISABLED_MODULES` (see `src/core/config/env-schema.ts`).
+`src/pages/` is a mix: the login/MFA/callback/onboarding/organization islands are the platform's own flows, while the billing surface is **sample product code** you will likely replace. Module-level switches live in `VITE_DISABLED_MODULES` (see `src/core/config/env-schema.ts`).
 
 > A fuller "keep vs replace vs demo" inventory — the wrapper contract — is planned as a follow-up. Until it lands, `pnpm knip` and `pnpm validate:structure` are the practical guardrails: delete an island, run both, and they will tell you what you broke.
 

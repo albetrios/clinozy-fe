@@ -1,0 +1,433 @@
+{
+  "manifest": {
+    "title": "诊所库存"
+  },
+  "tabs": {
+    "label": "诊所库存分区",
+    "items": "物品",
+    "purchases": "采购",
+    "movements": "出入库",
+    "vendors": "供应商"
+  },
+  "search": {
+    "label": "在库存中搜索",
+    "placeholder": {
+      "items": "搜索物品名称或 #ID…",
+      "purchases": "搜索发票、#ID 或供应商…",
+      "vendors": "搜索供应商名称…"
+    }
+  },
+  "create": {
+    "item": "新建物品",
+    "purchase": "新建采购",
+    "vendor": "新建诊所供应商"
+  },
+  "check": "库存盘点",
+  "filters": {
+    "all": "全部",
+    "stock": "库存",
+    "lowStock": "库存不足",
+    "category": "类别",
+    "lasts": "可用",
+    "status": "状态",
+    "type": "类型",
+    "lastsWithin": {
+      "week": "一周内",
+      "three_weeks": "三周内"
+    }
+  },
+  "table": {
+    "addPhone": "添加电话",
+    "noValue": "—"
+  },
+  "empty": {
+    "hint": "这里还没有内容。试试其他标签页或搜索。",
+    "stock": "这里没有库存物品"
+  },
+  "bulk": {
+    "export": "导出",
+    "exported_other": "已将 {{count}} 行导出为 CSV"
+  },
+  "categories": {
+    "creams_serums": "面霜和精华",
+    "peels": "焕肤剂和中和剂",
+    "masks": "面膜",
+    "consumables": "耗材",
+    "equipment": "设备",
+    "other": "其他诊所库存"
+  },
+  "units": {
+    "piece": "件",
+    "tube": "支",
+    "bottle": "瓶",
+    "kit": "套",
+    "pack": "包",
+    "box": "盒",
+    "vial": "小瓶",
+    "ampoule": "安瓿",
+    "sachet": "小袋",
+    "jar": "罐",
+    "roll": "卷",
+    "pair": "双",
+    "ml": "ml",
+    "g": "g",
+    "litre": "升"
+  },
+  "measures": {
+    "ml": "ml",
+    "g": "g",
+    "pcs": "件",
+    "units": "单位"
+  },
+  "quantity": {
+    "amount": "{{value}} {{unit}}",
+    "measured": "{{units}} · {{measure}}"
+  },
+  "levels": {
+    "ok": "正常",
+    "low": "偏低",
+    "out": "缺货"
+  },
+  "runway": {
+    "days_other": "约 {{count}} 天",
+    "weeks_other": "约 {{count}} 周",
+    "none": "无用量"
+  },
+  "items": {
+    "records": "物品",
+    "empty": "没有匹配的物品",
+    "columns": {
+      "seq": "ID",
+      "name": "物品",
+      "category": "类别",
+      "stock": "库存",
+      "lasts": "可用",
+      "vendor": "供应商",
+      "lastRate": "上次单价"
+    },
+    "sub": "每{{unit}} · 每周约用 {{usage}}",
+    "subContents": "每{{unit}} {{contents}} · 每周约用 {{usage}}",
+    "stockLine": "{{quantity}} · {{level}}",
+    "rowActions": {
+      "use": "使用",
+      "receive": "入库",
+      "log": "记录使用…",
+      "adjust": "调整数量",
+      "edit": "编辑",
+      "delete": "删除"
+    }
+  },
+  "purchases": {
+    "records": "采购",
+    "count_other": "{{count}} 笔采购 · 应付 {{due}}",
+    "columns": {
+      "seq": "ID",
+      "vendor": "供应商",
+      "billNo": "发票",
+      "date": "日期",
+      "bill": "账单",
+      "due": "应付",
+      "status": "状态"
+    },
+    "statuses": {
+      "paid": "已付款",
+      "unpaid": "未付款",
+      "partial": "部分付款"
+    },
+    "rowActions": {
+      "edit": "编辑",
+      "delete": "删除",
+      "pay": "支付 {{amount}}"
+    },
+    "vendorFilter": {
+      "any": "任意供应商",
+      "count_other": "{{count}} 个供应商",
+      "search": "搜索供应商",
+      "noMatch": "无匹配项",
+      "clear": "清除"
+    }
+  },
+  "movements": {
+    "records": "出入库记录",
+    "count_other": "{{count}} 条记录",
+    "columns": {
+      "type": "类型",
+      "party": "物品 / 对方",
+      "when": "时间",
+      "by": "操作人",
+      "change": "变动"
+    },
+    "types": {
+      "used": "已用",
+      "received": "入库",
+      "adjust": "调整",
+      "damaged": "损坏",
+      "returned": "退回",
+      "reverted": "已撤销",
+      "opening": "期初库存"
+    },
+    "reverted": "已撤销",
+    "purchase": "来自采购 #{{seq}}",
+    "change": "{{sign}} {{amount}}",
+    "rowActions": {
+      "revert": "撤销"
+    },
+    "purchaseBill": "来自采购 #{{seq}} · 账单 {{billNo}}",
+    "deletedItem": "已删除的物品",
+    "itemFilter": {
+      "any": "任意物品",
+      "search": "搜索物品",
+      "noMatch": "无匹配",
+      "clear": "清除",
+      "count_other": "{{count}} 个物品"
+    }
+  },
+  "vendors": {
+    "records": "供应商",
+    "empty": "没有匹配的供应商",
+    "count_other": "{{count}} 家供应商 · 应付 {{payable}}",
+    "columns": {
+      "name": "供应商",
+      "purchases": "采购",
+      "payable": "应付"
+    },
+    "purchases_other": "{{count}} 笔采购",
+    "noPurchases": "无采购",
+    "rowActions": {
+      "edit": "编辑",
+      "delete": "删除",
+      "pay": "支付 {{amount}}"
+    },
+    "paidUp": "现在已不欠 {{name}} 任何款项"
+  },
+  "drawers": {
+    "records": {
+      "item": "物品",
+      "purchase": "采购",
+      "vendor": "供应商"
+    },
+    "saveChanges": "保存更改",
+    "addName": "请输入名称",
+    "pickers": {
+      "searchVendors": "搜索诊所供应商",
+      "vendorsHint": "诊所供应商",
+      "newVendor": "新建诊所供应商",
+      "selectItem": "选择物品…",
+      "newItem": "新建诊所物品",
+      "inStock": "库存 {{quantity}}"
+    },
+    "treatments": {
+      "lhr": "激光脱毛",
+      "peel": "换肤",
+      "facial": "面部护理",
+      "mole": "祛痣",
+      "general": "常规"
+    },
+    "item": {
+      "title": {
+        "create": "新建物品",
+        "edit": "编辑物品"
+      },
+      "sub": "诊所耗材或设备",
+      "steps": {
+        "item": "物品",
+        "levels": "库存水平",
+        "vendor": "供应商"
+      },
+      "fields": {
+        "name": "名称",
+        "category": "类别",
+        "unit": "单位",
+        "contents": "每{{unit}}含量",
+        "contentsHint": "可选 · 便于团队使用部分{{unit}}",
+        "measure": "计量单位",
+        "inStock": "库存",
+        "decimals": "可输入小数",
+        "usage": "每周用量",
+        "min": "最少",
+        "max": "最多",
+        "vendor": "供应商"
+      },
+      "save": "添加物品",
+      "saved": "物品已保存",
+      "nameTaken": "已有同名物品"
+    },
+    "quickItem": {
+      "title": "新建诊所物品",
+      "sub": "用于治疗 · 不对外销售",
+      "steps": {
+        "item": "物品",
+        "details": "详情"
+      },
+      "added": "已将 {{name}} 添加到诊所物品"
+    },
+    "vendor": {
+      "title": {
+        "create": "新建诊所供应商",
+        "edit": "编辑诊所供应商"
+      },
+      "sub": "供应治疗耗材 · 不含药品",
+      "fields": {
+        "name": "名称",
+        "phone": "电话",
+        "phoneHint": "10 位数字"
+      },
+      "save": "添加供应商",
+      "added": "已添加供应商 {{name}}",
+      "saved": "供应商已保存",
+      "nameTaken": "已存在同名供应商"
+    },
+    "movement": {
+      "title": {
+        "used": "记录使用",
+        "received": "入库",
+        "adjust": "调整库存"
+      },
+      "sub": "{{name}} · 当前 {{quantity}}",
+      "after": "之后：{{quantity}}",
+      "steps": {
+        "movement": "出入库",
+        "details": "详情",
+        "notes": "备注"
+      },
+      "fields": {
+        "type": "类型",
+        "quantity": "数量",
+        "counted": "盘点数量",
+        "decimals": "可输入小数",
+        "measureIn": "计量单位",
+        "measureOption": "{{measure}} (1 {{unit}} = {{contents}})",
+        "usedFor": "用于",
+        "optional": "可选",
+        "remark": "备注",
+        "remarkPlaceholder": "患者、批次或原因"
+      },
+      "save": "保存出入库",
+      "summary": "{{name}} · {{change}}",
+      "enterQuantity": "请输入数量",
+      "onlyInStock": "库存仅有 {{quantity}}",
+      "saved": "已保存{{type}} · 剩余 {{quantity}}",
+      "notEnoughStock": "库存已不足——有人在此期间用掉了一些。请核对数量后重试。"
+    },
+    "use": {
+      "label": "使用 {{name}}",
+      "inStock": "库存 · {{quantity}}",
+      "measureIn": "计量单位",
+      "conversion": "1 {{unit}} = {{contents}}",
+      "quantity": "数量",
+      "less": "减少",
+      "more": "增加",
+      "usedFor": "用于",
+      "after": "使用后 · {{quantity}}",
+      "moreDetails": "更多详情",
+      "save": "使用 {{quantity}}",
+      "used": "已使用 {{name}} {{quantity}} · 剩余 {{left}}",
+      "outOfStock": "{{name}} 已缺货"
+    },
+    "purchase": {
+      "title": {
+        "create": "新建采购",
+        "edit": "编辑采购"
+      },
+      "sub": "收到的物品会计入库存",
+      "reorder": "补货低库存物品",
+      "noSupplier": "无供应商",
+      "bill": "账单 {{amount}}",
+      "due": "待付 {{amount}}",
+      "paid": "已付款",
+      "steps": {
+        "bill": "账单",
+        "items": "已收物品",
+        "payment": "付款"
+      },
+      "fields": {
+        "vendor": "供应商",
+        "billNo": "发票号",
+        "date": "账单日期",
+        "items": "已收物品",
+        "item": "物品",
+        "qty": "数量",
+        "rate": "单价",
+        "amount": "金额",
+        "addItem": "添加物品",
+        "total": "合计",
+        "billAmount": "账单金额",
+        "paid": "已付款",
+        "full": "全额",
+        "nothing": "无",
+        "enterRate": "请输入单价",
+        "peek_other": "{{count}} 件物品 · {{amount}}",
+        "quickLine": "输入物品和数量 · 例如 gloves 10 @250",
+        "quickHint": "10 = 数量 · @250 = 单价",
+        "lowStockChip": "{{name}} · 剩 {{quantity}}",
+        "mode": "方式",
+        "branch": "付款分店",
+        "paidSoFar": "已付 {{amount}} · {{status}}",
+        "moreThanBill": "已付金额超过账单金额",
+        "dayClosed": "该分店今日已结账——今天无法从这里付款",
+        "addLine": "请至少添加一个物品",
+        "tooManyLines": "一次采购最多 {{max}} 个物品"
+      },
+      "save": "创建采购",
+      "pickSupplier": "请选择供应商",
+      "saved": "采购已保存",
+      "savedStock": "采购已保存 · 库存已更新"
+    },
+    "check": {
+      "title": "库存盘点",
+      "sub": "填写货架上的实际数量。只保存有差异的物品，每项记为一次调整。",
+      "counted": "已盘点 {{counted}}/{{total}}",
+      "allItems": "全部物品",
+      "fillRest": "其余按一致填写",
+      "heads": {
+        "item": "物品",
+        "inSystem": "系统",
+        "counted": "盘点",
+        "difference": "差异"
+      },
+      "inSystem": "系统 · {{quantity}}",
+      "countedLabel": "{{name}} 盘点数量",
+      "same": "与系统一致",
+      "measured": "= {{quantity}}",
+      "notCounted": "未盘点",
+      "matches": "一致",
+      "willChange_other": "{{count}} 件物品将变更",
+      "nothing": "暂无变更",
+      "save": "保存盘点",
+      "failed": "未保存 · 已保留你的盘点",
+      "saved_other": "盘点已保存 · 已更新 {{count}} 件物品",
+      "empty": "暂无可盘点的物品"
+    },
+    "confirm": {
+      "deleteItem": "删除此物品？",
+      "deletePurchase": "删除此采购？",
+      "deleteVendor": "删除此诊所供应商？",
+      "removed": "已移除 {{name}}",
+      "deleted": "已删除 {{name}}",
+      "purchaseDeleted": "已删除采购 #{{seq}}",
+      "revert": {
+        "title": "撤销此出入库记录？",
+        "record": "{{name}} {{quantity}} · {{type}}",
+        "body": "库存恢复到这条记录之前的数量。两条记录都会保留在历史中。",
+        "action": "撤销",
+        "reasons": {
+          "mistake": "误记",
+          "wrongItem": "物品错误",
+          "wrongQty": "数量错误"
+        },
+        "done": "已撤销{{type}} · {{name}} 恢复为 {{quantity}}",
+        "note": "撤销 {{when}} 的{{type}} · {{reason}}",
+        "blocked": {
+          "alreadyReverted": "此记录已被撤销",
+          "notEnoughStock": "库存不足，无法撤销此记录"
+        }
+      },
+      "blocked": {
+        "itemHasStock": "只能删除库存为零的物品——请先将其调整为 0",
+        "purchasePaid": "已有付款的采购不能删除",
+        "vendorHasDues": "请先结清该供应商的采购款",
+        "stockUsed": "该采购入库的部分已被使用，无法撤回"
+      }
+    }
+  }
+}

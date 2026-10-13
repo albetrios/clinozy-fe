@@ -4,6 +4,7 @@ import {
   AUTH_EMAIL_CODE_LOGIN_PATH,
   AUTH_EMAIL_CODE_SEND_PATH,
 } from '@/tests/utils/auth-api-paths.ts';
+import { probeLiveDeployment } from '@/tests/utils/e2e-deployment-mode.ts';
 import { e2eTeamOrgProfile } from '@/tests/utils/e2e-faker.ts';
 import {
   createSessionViaEmailCode,
@@ -29,6 +30,15 @@ test.afterAll(async () => {
 test.describe('clinozy-be server — auth & tenancy contracts', () => {
   test.describe.configure({ mode: 'serial' });
 
+  /** Whether a new account gets a personal workspace here — a team-only deployment gives none. */
+  let personalWorkspaces = true;
+
+  test.beforeAll(async () => {
+    const { accessToken } = await createSessionViaEmailCode(api);
+    personalWorkspaces = (await probeLiveDeployment(api, accessToken)).flags
+      .personalOrganizations;
+  });
+
   test('[+] email send-code returns uniform 200 + request_id', async () => {
     const email = uniqueE2eEmail();
     const res = await api.post(AUTH_EMAIL_CODE_SEND_PATH, {
@@ -48,6 +58,7 @@ test.describe('clinozy-be server — auth & tenancy contracts', () => {
   });
 
   test('[+] me/context exposes the auto-created PERSONAL org (status ACTIVE)', async () => {
+    test.skip(!personalWorkspaces, 'personal workspaces are off on this deployment');
     const { accessToken } = await createSessionViaEmailCode(api);
     const ctx = await api.get('/api/v1/auth/me/context', {
       headers: { Authorization: `Bearer ${accessToken}` },
@@ -56,20 +67,39 @@ test.describe('clinozy-be server — auth & tenancy contracts', () => {
     const { data } = await ctx.json();
     expect(data.active_organization.type).toBe('PERSONAL');
     expect(data.active_organization.status).toBe('ACTIVE');
+    expect(data.user.personal_organization_id).toBe(data.active_organization.id);
     expect(Array.isArray(data.my_permissions)).toBe(true);
-    expect(data.organizations.length).toBeGreaterThanOrEqual(1);
   });
 
-  test('[+] list my organizations includes the personal org', async () => {
+  test('[+] me/context has no workspace until a clinic is made (team-only)', async () => {
+    test.skip(
+      personalWorkspaces,
+      'this deployment gives a new account a personal workspace',
+    );
     const { accessToken } = await createSessionViaEmailCode(api);
-    const list = await api.get('/api/v1/tenancy/organizations', {
+    const ctx = await api.get('/api/v1/auth/me/context', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    expect(ctx.status()).toBe(200);
+    const { data } = await ctx.json();
+    expect(data.active_organization).toBeNull();
+    expect(data.user.personal_organization_id ?? null).toBeNull();
+  });
+
+  // The workspace list lives at /users/me/organizations (me/context carries none).
+  test('[+] list my organizations includes the personal org', async () => {
+    test.skip(!personalWorkspaces, 'personal workspaces are off on this deployment');
+    const { accessToken } = await createSessionViaEmailCode(api);
+    const list = await api.get('/api/v1/users/me/organizations', {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
     expect(list.status()).toBe(200);
-    expect((await list.json()).data.length).toBeGreaterThanOrEqual(1);
+    const { data } = (await list.json()) as { data: Array<{ type: string }> };
+    expect(data.some((org) => org.type === 'PERSONAL')).toBe(true);
   });
 
   test('[+] switch-to-personal re-mints an access token', async () => {
+    test.skip(!personalWorkspaces, 'personal workspaces are off on this deployment');
     const { accessToken } = await createSessionViaEmailCode(api);
     const sw = await api.post('/api/v1/auth/switch-to-personal', {
       headers: { Authorization: `Bearer ${accessToken}` },
@@ -97,7 +127,9 @@ test.describe('clinozy-be server — auth & tenancy contracts', () => {
   });
 
   test('[-] protected tenancy route without auth → 401', async () => {
-    expect((await api.get('/api/v1/tenancy/organizations')).status()).toBe(401);
+    expect((await api.get('/api/v1/tenancy/organizations/by-slug/acme')).status()).toBe(
+      401,
+    );
   });
 
   test('[-] switch to a non-member organization → 403/404', async () => {

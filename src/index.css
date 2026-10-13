@@ -11,9 +11,141 @@
    never loads this CSS, so nothing under test needs it. */
 @source not './**/*.test.ts';
 @source not './**/*.test.tsx';
+/* …nor are the A4 print sheets the first paint: their millimetre boxes are
+   utilities no screen draws until a sheet does, so they load with the sheets
+   (`shared/components/PrintTemplate/print-template.css`). */
+@source not './shared/components/PrintTemplate';
+/* …all but the sheets' token utilities no screen spells: those need the app's
+   theme, which only this stylesheet has (`print-template-css.test.ts` keeps the
+   list whole). */
+@source inline('*:border-border *:border-border-strong');
 /* Enter/exit utilities (animate-in / animate-out / fade / zoom / slide)
    used by the shadcn overlays: dialog, dropdown, popover, tooltip, select. */
 @import 'tw-animate-css';
+
+/* `dark:` follows the APP's theme, not the operating system's. Dark mode is the
+   `.dark` class `useThemeStore` (and `theme-init.js`, pre-paint) puts on <html>;
+   left to Tailwind's default, `dark:` was `prefers-color-scheme`, so a light app
+   on a dark OS drew the shadcn primitives' dark tints (and a dark app on a
+   light OS lost them). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ── Fonts: Inter + JetBrains Mono, self-hosted ──
+   The CSP is `font-src 'self'`, so a font CDN can't load: the faces ship from
+   @fontsource as same-origin hashed assets (`assetsInlineLimit: 0` keeps them
+   out of `data:` URIs; the service worker precaches `*.woff2`). Only the weights
+   the product draws (Inter 400–700, Mono 400–500) and only the Latin subsets:
+   `latin` covers the Latin UI locales, `latin-ext` carries ₹ (U+20B9) — Mono
+   sets ids, keys and kbd hints, so it ships `latin` alone. Arabic,
+   Devanagari and CJK text falls back to the system stack in `--font-sans`.
+   Unicode ranges are fontsource's own — the per-subset CSS files ship without
+   them, so the faces are declared here instead of imported. */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url('@fontsource/inter/files/inter-latin-ext-400-normal.woff2') format('woff2');
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308,
+    U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0,
+    U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url('@fontsource/inter/files/inter-latin-400-normal.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308,
+    U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url('@fontsource/inter/files/inter-latin-ext-500-normal.woff2') format('woff2');
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308,
+    U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0,
+    U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url('@fontsource/inter/files/inter-latin-500-normal.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308,
+    U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 600;
+  src: url('@fontsource/inter/files/inter-latin-ext-600-normal.woff2') format('woff2');
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308,
+    U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0,
+    U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 600;
+  src: url('@fontsource/inter/files/inter-latin-600-normal.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308,
+    U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 700;
+  src: url('@fontsource/inter/files/inter-latin-ext-700-normal.woff2') format('woff2');
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308,
+    U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0,
+    U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 700;
+  src: url('@fontsource/inter/files/inter-latin-700-normal.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308,
+    U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url('@fontsource/jetbrains-mono/files/jetbrains-mono-latin-400-normal.woff2')
+    format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308,
+    U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url('@fontsource/jetbrains-mono/files/jetbrains-mono-latin-500-normal.woff2')
+    format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308,
+    U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 
 /* ── Design tokens via @theme directive ── */
 @theme {
@@ -67,6 +199,83 @@
   --color-chart-4: oklch(0.708 0 0);
   --color-chart-5: oklch(0.835 0 0);
 
+  /* Neutral steps between the shadcn ones — the clinic screens draw with a
+     13-step ramp. Stock (achromatic) defaults here and in `.dark`; the
+     clinozy-zinc-pastel preset sets its zinc values. */
+  --color-canvas: oklch(0.985 0 0);
+  --color-muted-strong: oklch(0.945 0 0);
+  --color-border-strong: oklch(0.87 0 0);
+  --color-disabled: oklch(0.708 0 0);
+  --color-muted-foreground-strong: oklch(0.439 0 0);
+  --color-foreground-soft: oklch(0.371 0 0);
+  /* Hue-specific tokens — the same under every preset (light here, dark in
+     `.dark`). Values from the design's colour map (KICKOFF Appendix E). */
+  --color-brand-mark: oklch(0.72 0.14 150);
+  --color-brand-mark-strong: oklch(0.6 0.14 150);
+  --color-destructive-tint: oklch(0.97 0.02 25);
+  --color-destructive-border: oklch(0.85 0.08 25);
+  --color-highlight: oklch(0.94 0.08 95);
+  --color-assist: oklch(0.5 0.14 295);
+  --color-success-strong: oklch(0.45 0.12 150);
+  --color-channel-whatsapp: oklch(0.52 0.13 150);
+  --color-channel-whatsapp-tint: oklch(0.95 0.035 150);
+  --color-channel-call: oklch(0.5 0.12 235);
+  --color-channel-call-tint: oklch(0.96 0.02 235);
+  --color-channel-call-foreground: oklch(0.4 0.08 235);
+  --color-channel-note: oklch(0.52 0.11 70);
+  --color-channel-instagram: oklch(0.58 0.218 359.7);
+  --color-channel-instagram-tint: oklch(0.95 0.03 350);
+  --color-channel-instagram-foreground: oklch(0.48 0.13 350);
+  --color-now-indicator: oklch(0.62 0.18 25);
+  --color-presence-online: oklch(0.65 0.14 150);
+
+  /* Section tones — one per clinic room. bg + ink (`-foreground`) + line
+     (`-border`) + dot; text sits in ink on bg, selected = ink fill. Dots are the
+     same in both modes. */
+  --color-tone-butter: oklch(0.935 0.06 85);
+  --color-tone-butter-foreground: oklch(0.38 0.085 65);
+  --color-tone-butter-border: oklch(0.85 0.08 80);
+  --color-tone-butter-dot: oklch(0.74 0.11 75);
+  --color-tone-butter-tint: oklch(0.97 0.03 85);
+  --color-tone-lav: oklch(0.925 0.045 295);
+  --color-tone-lav-foreground: oklch(0.37 0.09 295);
+  --color-tone-lav-border: oklch(0.83 0.06 295);
+  --color-tone-lav-dot: oklch(0.68 0.1 295);
+  --color-tone-lav-tint: oklch(0.975 0.012 295);
+  --color-tone-sky: oklch(0.925 0.04 235);
+  --color-tone-sky-foreground: oklch(0.37 0.08 235);
+  --color-tone-sky-border: oklch(0.83 0.055 235);
+  --color-tone-sky-dot: oklch(0.68 0.09 235);
+  --color-tone-sage: oklch(0.925 0.045 150);
+  --color-tone-sage-foreground: oklch(0.37 0.08 150);
+  --color-tone-sage-border: oklch(0.83 0.06 150);
+  --color-tone-sage-dot: oklch(0.66 0.1 150);
+  --color-tone-sage-tint: oklch(0.97 0.02 150);
+  --color-tone-blush: oklch(0.925 0.04 20);
+  --color-tone-blush-foreground: oklch(0.38 0.1 20);
+  --color-tone-blush-border: oklch(0.83 0.06 20);
+  --color-tone-blush-dot: oklch(0.68 0.1 20);
+  --color-tone-mint: oklch(0.93 0.04 190);
+  --color-tone-mint-foreground: oklch(0.37 0.07 195);
+  --color-tone-mint-border: oklch(0.83 0.055 190);
+  --color-tone-mint-dot: oklch(0.68 0.08 190);
+  --color-tone-peach: oklch(0.93 0.045 55);
+  --color-tone-peach-foreground: oklch(0.4 0.1 50);
+  --color-tone-peach-border: oklch(0.84 0.07 55);
+  --color-tone-peach-dot: oklch(0.72 0.12 55);
+  --color-tone-plum: oklch(0.925 0.04 330);
+  --color-tone-plum-foreground: oklch(0.38 0.1 330);
+  --color-tone-plum-border: oklch(0.83 0.06 330);
+  --color-tone-plum-dot: oklch(0.68 0.1 330);
+  --color-tone-lime: oklch(0.935 0.055 120);
+  --color-tone-lime-foreground: oklch(0.38 0.08 125);
+  --color-tone-lime-border: oklch(0.85 0.07 120);
+  --color-tone-lime-dot: oklch(0.72 0.11 120);
+  --color-tone-slate: oklch(0.925 0.02 255);
+  --color-tone-slate-foreground: oklch(0.37 0.04 255);
+  --color-tone-slate-border: oklch(0.83 0.03 255);
+  --color-tone-slate-dot: oklch(0.66 0.05 255);
+
   /* Breakpoints past Tailwind's `2xl` (96rem) — the big-monitor tier. `2xl`
      stops at a 1536px laptop; a 1920px desktop and a 2560px+ monitor are
      different canvases again, and without a name for them every layout simply
@@ -75,8 +284,8 @@
   --breakpoint-3xl: 120rem;
   --breakpoint-4xl: 160rem;
 
-  /* Radii. `sm`/`md`/`lg`/`xl` are the ones the Corner radius axis sets inline
-     (presets.ts). Every OTHER step DERIVES from `--radius-lg`, so `rounded-xs`,
+  /* Radii. `sm`/`md`/`lg`/`xl` are the ones the old Corner radius axis set
+     inline. Every OTHER step DERIVES from `--radius-lg`, so `rounded-xs`,
      `rounded-2xl`… follow the axis too: left at Tailwind's fixed defaults they
      kept a 16px corner under radius "None", which is how the dashboard hero
      stayed round in an otherwise square app. With the default `lg` of 0.5rem
@@ -100,12 +309,141 @@
   /* Animations */
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
-  --animate-shimmer: shimmer 1.5s ease-in-out infinite;
   /* Subtle, professional content reveal used for page/route transitions. */
   --animate-fade-in: fade-in 0.2s ease-out both;
   --animate-fade-in-up: route-rise 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-caret-blink: caret-blink 1.25s ease-out infinite;
   --animate-otp-shake: otp-shake 0.42s ease-in-out;
+  /* Clinic motion (the design's cz* keyframes, named without digits). Declared
+     inside @theme so a keyframe ships only once a component uses it. */
+  --animate-dropdown-in: dropdown-in 160ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  --animate-dropdown-up: dropdown-up 160ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  --animate-drawer-in: drawer-in 340ms cubic-bezier(0.32, 0.72, 0, 1) both;
+  --animate-backdrop-in: backdrop-in 340ms cubic-bezier(0.32, 0.72, 0, 1) both;
+  --animate-pop-in: pop-in 200ms ease 200ms both;
+  --animate-bulk-in: bulk-in 220ms cubic-bezier(0.32, 0.72, 0, 1) both;
+  --animate-reveal: reveal 240ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  --animate-fade: fade-in 150ms ease both;
+  --animate-spinner: spinner 700ms linear infinite;
+  --animate-sheet-up: sheet-up 260ms cubic-bezier(0.32, 0.72, 0, 1) both;
+
+  @keyframes dropdown-in {
+    from {
+      opacity: 0;
+      transform: translateY(-4px) scale(0.985);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes dropdown-up {
+    from {
+      opacity: 0;
+      transform: translateY(4px) scale(0.985);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  /* `--drawer-enter-from` flips to -100% under RTL, where the drawer anchors
+     to the left (inline end). */
+  @keyframes drawer-in {
+    from {
+      transform: translate3d(var(--drawer-enter-from, 100%), 0, 0);
+    }
+    to {
+      transform: translate3d(0, 0, 0);
+    }
+  }
+  @keyframes backdrop-in {
+    from {
+      background-color: transparent;
+    }
+  }
+  @keyframes pop-in {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes bulk-in {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: none;
+    }
+  }
+  @keyframes reveal {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes spinner {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @keyframes sheet-up {
+    from {
+      opacity: 0;
+      transform: translateY(28px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+/* Tokens that point at other tokens. `inline` writes the reference into each
+   utility, so a scope that re-declares the target (the light-pinned panels)
+   is followed too. */
+@theme inline {
+  /* Stone — the fallback section tone (no room of its own). */
+  --color-tone-stone: var(--color-muted);
+  --color-tone-stone-foreground: var(--color-foreground-soft);
+  --color-tone-stone-border: var(--color-border);
+  --color-tone-stone-dot: var(--color-border-strong);
+
+  /* The clinic type scale — the design's half-pixel steps, named (no digits)
+     and DERIVED from the stock steps so the Type scale axis still moves them;
+     at the default ratio they resolve to exactly 10.5 · 11 · 11.5 · 12.5 · 13 ·
+     13.5 · 15 · 23 · 26 · 32px. */
+  --text-tiny: calc(var(--text-xs) * 0.875);
+  --text-tiny--line-height: 1.1;
+  --text-micro: calc(var(--text-xs) * 11 / 12);
+  --text-micro--line-height: 1.3;
+  --text-caption: calc(var(--text-xs) * 23 / 24);
+  --text-caption--line-height: 1.3;
+  --text-detail: calc(var(--text-xs) * 25 / 24);
+  --text-detail--line-height: 1.4;
+  --text-body: calc(var(--text-sm) * 13 / 14);
+  --text-body--line-height: 1.45;
+  --text-field: calc(var(--text-sm) * 27 / 28);
+  --text-field--line-height: 1.45;
+  --text-title: calc(var(--text-base) * 15 / 16);
+  --text-title--line-height: 1.3;
+  --text-greeting: calc(var(--text-2xl) * 23 / 24);
+  --text-greeting--line-height: 1.1;
+  --text-greeting--letter-spacing: -0.02em;
+  --text-stat: calc(var(--text-2xl) * 13 / 12);
+  --text-stat--line-height: 1.1;
+  --text-stat--letter-spacing: -0.02em;
+  --text-display: calc(var(--text-3xl) * 16 / 15);
+  --text-display--line-height: 1.1;
+  --text-display--letter-spacing: -0.02em;
 }
 
 /* ── Dark mode overrides via .dark class ── */
@@ -125,7 +463,9 @@
   --color-accent: oklch(0.269 0 0);
   --color-accent-foreground: oklch(0.985 0 0);
   --color-destructive: oklch(0.704 0.191 22.216);
-  --color-destructive-foreground: oklch(0.985 0 0);
+  /* Dark ink on the lighter dark-mode red (white on it is ~3.5:1). The button
+     variant paints the token itself — no `dark:` alpha wash. */
+  --color-destructive-foreground: oklch(0.205 0 0);
   --color-success: oklch(0.765 0.177 163.223);
   --color-success-foreground: oklch(0.205 0 0);
   --color-warning: oklch(0.828 0.189 84.429);
@@ -153,104 +493,61 @@
   --color-chart-3: oklch(0.65 0 0);
   --color-chart-4: oklch(0.5 0 0);
   --color-chart-5: oklch(0.35 0 0);
-}
 
-/* ── Theme presets (data-theme) — accent overrides, composed with .dark ── */
-[data-theme='violet'] {
-  --color-primary: oklch(0.55 0.22 290);
-  --color-primary-foreground: oklch(0.985 0 0);
-  --color-ring: oklch(0.55 0.22 290);
-  --color-sidebar-primary: oklch(0.55 0.22 290);
-  --color-sidebar-primary-foreground: oklch(0.985 0 0);
-  --color-chart-1: oklch(0.58 0.18 290);
-  --color-chart-2: oklch(0.66 0.15 314);
-  --color-chart-3: oklch(0.62 0.16 266);
-  --color-chart-4: oklch(0.72 0.13 338);
-  --color-chart-5: oklch(0.52 0.17 278);
-}
-.dark[data-theme='violet'] {
-  --color-primary: oklch(0.62 0.19 290);
-  --color-primary-foreground: oklch(0.985 0 0);
-  --color-ring: oklch(0.62 0.19 290);
-  --color-sidebar-primary: oklch(0.62 0.19 290);
-  --color-sidebar-primary-foreground: oklch(0.985 0 0);
-  --color-chart-1: oklch(0.72 0.17 290);
-  --color-chart-2: oklch(0.78 0.15 314);
-  --color-chart-3: oklch(0.68 0.16 266);
-  --color-chart-4: oklch(0.82 0.13 338);
-  --color-chart-5: oklch(0.62 0.17 278);
-}
-[data-theme='emerald'] {
-  --color-primary: oklch(0.6 0.14 162);
-  --color-primary-foreground: oklch(0.985 0 0);
-  --color-ring: oklch(0.6 0.14 162);
-  --color-sidebar-primary: oklch(0.6 0.14 162);
-  --color-sidebar-primary-foreground: oklch(0.985 0 0);
-  --color-chart-1: oklch(0.58 0.18 162);
-  --color-chart-2: oklch(0.66 0.15 186);
-  --color-chart-3: oklch(0.62 0.16 138);
-  --color-chart-4: oklch(0.72 0.13 210);
-  --color-chart-5: oklch(0.52 0.17 150);
-}
-.dark[data-theme='emerald'] {
-  --color-primary: oklch(0.7 0.15 162);
-  --color-primary-foreground: oklch(0.205 0 0);
-  --color-ring: oklch(0.7 0.15 162);
-  --color-sidebar-primary: oklch(0.7 0.15 162);
-  --color-sidebar-primary-foreground: oklch(0.205 0 0);
-  --color-chart-1: oklch(0.72 0.17 162);
-  --color-chart-2: oklch(0.78 0.15 186);
-  --color-chart-3: oklch(0.68 0.16 138);
-  --color-chart-4: oklch(0.82 0.13 210);
-  --color-chart-5: oklch(0.62 0.17 150);
-}
-[data-theme='rose'] {
-  --color-primary: oklch(0.58 0.21 12);
-  --color-primary-foreground: oklch(0.985 0 0);
-  --color-ring: oklch(0.58 0.21 12);
-  --color-sidebar-primary: oklch(0.58 0.21 12);
-  --color-sidebar-primary-foreground: oklch(0.985 0 0);
-  --color-chart-1: oklch(0.58 0.18 12);
-  --color-chart-2: oklch(0.66 0.15 36);
-  --color-chart-3: oklch(0.62 0.16 348);
-  --color-chart-4: oklch(0.72 0.13 60);
-  --color-chart-5: oklch(0.52 0.17 0);
-}
-.dark[data-theme='rose'] {
-  --color-primary: oklch(0.65 0.19 12);
-  --color-primary-foreground: oklch(0.985 0 0);
-  --color-ring: oklch(0.65 0.19 12);
-  --color-sidebar-primary: oklch(0.65 0.19 12);
-  --color-sidebar-primary-foreground: oklch(0.985 0 0);
-  --color-chart-1: oklch(0.72 0.17 12);
-  --color-chart-2: oklch(0.78 0.15 36);
-  --color-chart-3: oklch(0.68 0.16 348);
-  --color-chart-4: oklch(0.82 0.13 60);
-  --color-chart-5: oklch(0.62 0.17 0);
-}
-[data-theme='ocean'] {
-  --color-primary: oklch(0.55 0.16 230);
-  --color-primary-foreground: oklch(0.985 0 0);
-  --color-ring: oklch(0.55 0.16 230);
-  --color-sidebar-primary: oklch(0.55 0.16 230);
-  --color-sidebar-primary-foreground: oklch(0.985 0 0);
-  --color-chart-1: oklch(0.58 0.18 230);
-  --color-chart-2: oklch(0.66 0.15 254);
-  --color-chart-3: oklch(0.62 0.16 206);
-  --color-chart-4: oklch(0.72 0.13 278);
-  --color-chart-5: oklch(0.52 0.17 218);
-}
-.dark[data-theme='ocean'] {
-  --color-primary: oklch(0.62 0.14 230);
-  --color-primary-foreground: oklch(0.985 0 0);
-  --color-ring: oklch(0.62 0.14 230);
-  --color-sidebar-primary: oklch(0.62 0.14 230);
-  --color-sidebar-primary-foreground: oklch(0.985 0 0);
-  --color-chart-1: oklch(0.72 0.17 230);
-  --color-chart-2: oklch(0.78 0.15 254);
-  --color-chart-3: oklch(0.68 0.16 206);
-  --color-chart-4: oklch(0.82 0.13 278);
-  --color-chart-5: oklch(0.62 0.17 218);
+  --color-canvas: oklch(0.175 0 0);
+  --color-muted-strong: oklch(0.3 0 0);
+  --color-border-strong: oklch(0.371 0 0);
+  --color-disabled: oklch(0.5 0 0);
+  --color-muted-foreground-strong: oklch(0.8 0 0);
+  --color-foreground-soft: oklch(0.87 0 0);
+  --color-destructive-tint: oklch(0.22 0.014 25);
+  --color-destructive-border: oklch(0.4 0.064 25);
+  --color-highlight: oklch(0.25 0.056 95);
+  --color-assist: oklch(0.64 0.14 295);
+  --color-success-strong: oklch(0.82 0.09 150);
+  --color-channel-whatsapp: oklch(0.66 0.13 150);
+  --color-channel-whatsapp-tint: oklch(0.24 0.025 150);
+  --color-channel-call: oklch(0.64 0.12 235);
+  --color-channel-call-tint: oklch(0.23 0.014 235);
+  --color-channel-call-foreground: oklch(0.845 0.06 235);
+  --color-channel-note: oklch(0.66 0.11 70);
+  --color-channel-instagram: oklch(0.66 0.18 359.7);
+  --color-channel-instagram-tint: oklch(0.24 0.021 350);
+  --color-channel-instagram-foreground: oklch(0.68 0.13 350);
+
+  --color-tone-butter: oklch(0.255 0.042 85);
+  --color-tone-butter-foreground: oklch(0.855 0.064 65);
+  --color-tone-butter-border: oklch(0.4 0.064 80);
+  --color-tone-butter-tint: oklch(0.22 0.021 85);
+  --color-tone-lav: oklch(0.265 0.032 295);
+  --color-tone-lav-foreground: oklch(0.86 0.068 295);
+  --color-tone-lav-border: oklch(0.4 0.048 295);
+  --color-tone-lav-tint: oklch(0.215 0.008 295);
+  --color-tone-sky: oklch(0.265 0.028 235);
+  --color-tone-sky-foreground: oklch(0.86 0.06 235);
+  --color-tone-sky-border: oklch(0.4 0.044 235);
+  --color-tone-sage: oklch(0.265 0.032 150);
+  --color-tone-sage-foreground: oklch(0.86 0.06 150);
+  --color-tone-sage-border: oklch(0.4 0.048 150);
+  --color-tone-sage-tint: oklch(0.22 0.014 150);
+  --color-tone-blush: oklch(0.265 0.028 20);
+  --color-tone-blush-foreground: oklch(0.855 0.075 20);
+  --color-tone-blush-border: oklch(0.4 0.048 20);
+  --color-tone-mint: oklch(0.26 0.028 190);
+  --color-tone-mint-foreground: oklch(0.86 0.053 195);
+  --color-tone-mint-border: oklch(0.4 0.044 190);
+  --color-tone-peach: oklch(0.26 0.032 55);
+  --color-tone-peach-foreground: oklch(0.845 0.075 50);
+  --color-tone-peach-border: oklch(0.4 0.056 55);
+  --color-tone-plum: oklch(0.265 0.028 330);
+  --color-tone-plum-foreground: oklch(0.855 0.075 330);
+  --color-tone-plum-border: oklch(0.4 0.048 330);
+  --color-tone-lime: oklch(0.255 0.038 120);
+  --color-tone-lime-foreground: oklch(0.855 0.06 125);
+  --color-tone-lime-border: oklch(0.4 0.056 120);
+  --color-tone-slate: oklch(0.265 0.014 255);
+  --color-tone-slate-foreground: oklch(0.86 0.03 255);
+  --color-tone-slate-border: oklch(0.4 0.024 255);
 }
 
 /* ── Base colour (data-base) — tint the neutral surfaces/borders, keeping each
@@ -386,33 +683,283 @@
   --color-sidebar-border: oklch(0.32 0.018 75);
 }
 
-/* ── Accent swatches (Appearance pickers) — fixed catalog hues ── */
-.theme-dot-rose {
-  background-color: oklch(0.58 0.21 12);
+/* ── The app's one look: Clinozy Zinc Pastel (`clinozy-zinc-pastel`) ──
+   `public/theme-init.js` and `applyTheme()` put it on <html>. It sets every
+   surface token, so it sits after the base-colour blocks: a `data-base` does
+   not tint its zinc surfaces. Light here (also what prints), dark below.
+   Values: the design's preset (`preset.md`, prototype H:11 / H:12) —
+   KICKOFF §3.1. */
+[data-theme='clinozy-zinc-pastel'] {
+  --color-background: oklch(1 0 0);
+  --color-foreground: oklch(0.141 0.004 285.8);
+  --color-card: oklch(1 0 0);
+  --color-card-foreground: oklch(0.141 0.004 285.8);
+  --color-popover: oklch(1 0 0);
+  --color-popover-foreground: oklch(0.141 0.004 285.8);
+  --color-canvas: oklch(0.985 0 0);
+  --color-primary: oklch(0.21 0.006 285.9);
+  --color-primary-foreground: oklch(0.985 0 0);
+  --color-secondary: oklch(0.967 0.001 286.4);
+  --color-secondary-foreground: oklch(0.21 0.006 285.9);
+  --color-muted: oklch(0.967 0.001 286.4);
+  --color-muted-foreground: oklch(0.552 0.014 285.9);
+  --color-muted-strong: oklch(0.953 0.003 286.3);
+  --color-muted-foreground-strong: oklch(0.442 0.015 285.8);
+  --color-foreground-soft: oklch(0.37 0.012 285.8);
+  --color-accent: oklch(0.967 0.001 286.4);
+  --color-accent-foreground: oklch(0.141 0.004 285.8);
+  --color-border: oklch(0.92 0.004 286.3);
+  --color-border-strong: oklch(0.871 0.005 286.3);
+  --color-input: oklch(0.92 0.004 286.3);
+  --color-disabled: oklch(0.712 0.013 286.1);
+  --color-ring: oklch(0.21 0.006 285.9);
+  --color-destructive: oklch(0.53 0.2 25);
+  --color-destructive-foreground: oklch(1 0 0);
+  --color-success: oklch(0.52 0.12 150);
+  --color-success-foreground: oklch(1 0 0);
+  /* Warning and info are the design's PAIRS — a pale fill with an ink — so a
+     single-colour use reads `-foreground` (or a tone dot), never the fill. */
+  --color-warning: oklch(0.935 0.06 85);
+  --color-warning-foreground: oklch(0.38 0.085 65);
+  --color-info: oklch(0.925 0.04 235);
+  --color-info-foreground: oklch(0.37 0.08 235);
+  /* The text-bearing brand colour is the ink (the logo green is non-text). */
+  --color-brand: oklch(0.21 0.006 285.9);
+  --color-brand-foreground: oklch(0.985 0 0);
+  --color-overlay: oklch(0.141 0.004 285.8);
+  --color-chart-1: oklch(0.52 0.12 150);
+  --color-chart-2: oklch(0.68 0.09 235);
+  --color-chart-3: oklch(0.74 0.11 75);
+  --color-chart-4: oklch(0.68 0.1 295);
+  --color-chart-5: oklch(0.68 0.1 20);
+  --color-sidebar: oklch(0.985 0 0);
+  --color-sidebar-foreground: oklch(0.141 0.004 285.8);
+  --color-sidebar-primary: oklch(0.21 0.006 285.9);
+  --color-sidebar-primary-foreground: oklch(0.985 0 0);
+  --color-sidebar-accent: oklch(0.967 0.001 286.4);
+  --color-sidebar-accent-foreground: oklch(0.141 0.004 285.8);
+  --color-sidebar-border: oklch(0.92 0.004 286.3);
+  --color-sidebar-ring: oklch(0.21 0.006 285.9);
+  /* Elevation (axis `soft`, separation `border`): the design's shadows, the
+     same in both modes, applied to the [data-slot] surfaces below. */
+  --elevation-card: 0 1px 2px oklch(0 0 0 / 0.04), 0 4px 16px -8px oklch(0 0 0 / 0.06);
+  --elevation-panel:
+    0 16px 40px -12px oklch(0 0 0 / 0.22), 0 4px 12px -4px oklch(0 0 0 / 0.08);
+  --elevation-menu:
+    0 10px 15px -3px oklch(0 0 0 / 0.1), 0 4px 6px -4px oklch(0 0 0 / 0.08);
+  --elevation-dialog: 0 24px 64px oklch(0 0 0 / 0.22), 0 4px 12px oklch(0 0 0 / 0.08);
+  --elevation-drawer: -16px 0 40px oklch(0 0 0 / 0.16);
+  --elevation-control: 0 1px 2px oklch(0 0 0 / 0.05);
+  --elevation-close: 0 4px 14px oklch(0 0 0 / 0.18);
+  --elevation-tray: 0 12px 32px oklch(0 0 0 / 0.14);
+  --elevation-fab: 0 10px 28px -8px oklch(0 0 0 / 0.45);
 }
-.theme-dot-orange {
-  background-color: oklch(0.58 0.21 50);
+[dir='rtl'][data-theme='clinozy-zinc-pastel'] {
+  --elevation-drawer: 16px 0 40px oklch(0 0 0 / 0.16);
 }
-.theme-dot-amber {
-  background-color: oklch(0.58 0.21 75);
+/* Dark is screen-only, as in the design: printing always uses the light
+   tokens. Brand, overlay and charts 2–5 do not change. */
+@media screen {
+  .dark[data-theme='clinozy-zinc-pastel'] {
+    color-scheme: dark;
+    --color-background: oklch(0.193 0.006 285.8);
+    --color-foreground: oklch(0.985 0 0);
+    --color-card: oklch(0.193 0.006 285.8);
+    --color-card-foreground: oklch(0.985 0 0);
+    --color-popover: oklch(0.193 0.006 285.8);
+    --color-popover-foreground: oklch(0.985 0 0);
+    --color-canvas: oklch(0.165 0.004 285.9);
+    --color-primary: oklch(0.967 0.001 286.4);
+    --color-primary-foreground: oklch(0.165 0.004 285.9);
+    --color-secondary: oklch(0.237 0.008 285.8);
+    --color-secondary-foreground: oklch(0.967 0.001 286.4);
+    --color-muted: oklch(0.237 0.008 285.8);
+    --color-muted-foreground: oklch(0.699 0.013 286.1);
+    --color-muted-strong: oklch(0.258 0.007 285.9);
+    --color-muted-foreground-strong: oklch(0.772 0.011 286.1);
+    --color-foreground-soft: oklch(0.859 0.008 286.2);
+    --color-accent: oklch(0.237 0.008 285.8);
+    --color-accent-foreground: oklch(0.985 0 0);
+    --color-border: oklch(0.295 0.009 285.8);
+    --color-border-strong: oklch(0.351 0.01 285.9);
+    --color-input: oklch(0.295 0.009 285.8);
+    --color-disabled: oklch(0.474 0.013 285.9);
+    --color-ring: oklch(0.967 0.001 286.4);
+    --color-destructive: oklch(0.67 0.2 25);
+    --color-destructive-foreground: oklch(0.193 0.006 285.8);
+    --color-success: oklch(0.66 0.12 150);
+    --color-success-foreground: oklch(0.193 0.006 285.8);
+    --color-warning: oklch(0.255 0.042 85);
+    --color-warning-foreground: oklch(0.855 0.064 65);
+    --color-info: oklch(0.265 0.028 235);
+    --color-info-foreground: oklch(0.86 0.06 235);
+    --color-chart-1: oklch(0.66 0.12 150);
+    --color-sidebar: oklch(0.165 0.004 285.9);
+    --color-sidebar-foreground: oklch(0.985 0 0);
+    --color-sidebar-primary: oklch(0.967 0.001 286.4);
+    --color-sidebar-primary-foreground: oklch(0.165 0.004 285.9);
+    --color-sidebar-accent: oklch(0.237 0.008 285.8);
+    --color-sidebar-accent-foreground: oklch(0.985 0 0);
+    --color-sidebar-border: oklch(0.295 0.009 285.8);
+    --color-sidebar-ring: oklch(0.967 0.001 286.4);
+  }
+  /* Light-pinned panels (the bulk-actions bar, the photo viewer, photo
+     captions): in dark mode they keep the light ramp, with primary one step
+     softer (#27272a) — the design's H:14 rule. */
+  .dark[data-theme='clinozy-zinc-pastel'] [data-surface='light-pinned'] {
+    color-scheme: light;
+    --color-background: oklch(1 0 0);
+    --color-foreground: oklch(0.141 0.004 285.8);
+    --color-card: oklch(1 0 0);
+    --color-card-foreground: oklch(0.141 0.004 285.8);
+    --color-popover: oklch(1 0 0);
+    --color-popover-foreground: oklch(0.141 0.004 285.8);
+    --color-canvas: oklch(0.985 0 0);
+    --color-primary: oklch(0.274 0.005 286);
+    --color-primary-foreground: oklch(0.985 0 0);
+    --color-secondary: oklch(0.967 0.001 286.4);
+    --color-secondary-foreground: oklch(0.274 0.005 286);
+    --color-muted: oklch(0.967 0.001 286.4);
+    --color-muted-foreground: oklch(0.552 0.014 285.9);
+    --color-muted-strong: oklch(0.953 0.003 286.3);
+    --color-muted-foreground-strong: oklch(0.442 0.015 285.8);
+    --color-foreground-soft: oklch(0.37 0.012 285.8);
+    --color-accent: oklch(0.967 0.001 286.4);
+    --color-accent-foreground: oklch(0.141 0.004 285.8);
+    --color-border: oklch(0.92 0.004 286.3);
+    --color-border-strong: oklch(0.871 0.005 286.3);
+    --color-input: oklch(0.92 0.004 286.3);
+    --color-disabled: oklch(0.712 0.013 286.1);
+    --color-ring: oklch(0.274 0.005 286);
+  }
 }
-.theme-dot-lime {
-  background-color: oklch(0.58 0.21 130);
+/* Surfaces — the design's shadows on the platform slots. */
+[data-theme='clinozy-zinc-pastel'] [data-slot='card'] {
+  box-shadow: var(--elevation-card);
 }
-.theme-dot-emerald {
-  background-color: oklch(0.58 0.21 160);
+[data-theme='clinozy-zinc-pastel']
+  :is(
+    [data-slot='popover-content'],
+    [data-slot='select-content'],
+    [data-slot='hover-card-content']
+  ) {
+  box-shadow: var(--elevation-panel);
 }
-.theme-dot-teal {
-  background-color: oklch(0.58 0.21 190);
+[data-theme='clinozy-zinc-pastel']
+  :is([data-slot='dropdown-menu-content'], [data-slot='dropdown-menu-sub-content']) {
+  box-shadow: var(--elevation-menu);
 }
-.theme-dot-blue {
-  background-color: oklch(0.58 0.21 255);
+[data-theme='clinozy-zinc-pastel']
+  :is([data-slot='dialog-content'], [data-slot='alert-dialog-content']) {
+  box-shadow: var(--elevation-dialog);
 }
-.theme-dot-violet {
-  background-color: oklch(0.58 0.21 290);
+/* Every confirm opens as a panel at the inline end (from `md`, `ConfirmPanel`):
+   a drawer's shadow, not a centred dialog's. */
+[data-theme='clinozy-zinc-pastel']
+  [data-slot='alert-dialog-content'][data-layout='panel'] {
+  box-shadow: var(--elevation-drawer);
 }
-.theme-dot-pink {
-  background-color: oklch(0.58 0.21 350);
+[data-theme='clinozy-zinc-pastel'] [data-slot='floating-edge'] {
+  box-shadow: var(--elevation-close);
+}
+/* Drawers (H:882) lift off the page from `md` up; below it the record drawer
+   is the full screen and casts nothing (H:26), so the rule stops there. */
+@media (min-width: 48rem) {
+  [data-theme='clinozy-zinc-pastel'] [data-slot='sheet-content'] {
+    box-shadow: var(--elevation-drawer);
+  }
+}
+/* Keyboard focus: the design's fill (muted-strong, primary text) — kept — plus
+   the platform ring each control already draws, because the fill alone is
+   1.15:1 against the page (WCAG 1.4.11). Controls whose own fill IS their
+   state (switch, checkbox) keep it. `:where()`, not `:is()`: the element list
+   adds no weight, and `:is()` lists are reserved for single-slot axis lists. */
+[data-theme='clinozy-zinc-pastel']
+  :where(button, a, [role='tab'], [role='option'], [tabindex]:not([tabindex='-1'])):not(
+    [role='switch'],
+    [role='checkbox'],
+    [data-slot='switch'],
+    [data-slot='checkbox']
+  ):focus-visible {
+  background-color: var(--color-muted-strong);
+  color: var(--color-primary);
+}
+[data-theme='clinozy-zinc-pastel'] body {
+  font-feature-settings: 'cv11', 'ss01';
+  letter-spacing: -0.005em;
+}
+[data-theme='clinozy-zinc-pastel'] ::selection {
+  background-color: var(--color-border);
+}
+/* Scrollbars: a pill thumb one step stronger than the app default. */
+[data-theme='clinozy-zinc-pastel'] * {
+  scrollbar-color: var(--color-border-strong) transparent;
+}
+[data-theme='clinozy-zinc-pastel'] *:hover {
+  scrollbar-color: var(--color-muted-foreground) transparent;
+}
+[data-theme='clinozy-zinc-pastel'] *::-webkit-scrollbar-thumb {
+  background-color: var(--color-border-strong);
+}
+[data-theme='clinozy-zinc-pastel'] *::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-disabled);
+}
+
+/* ── Clinic room metrics by tier (D23) ──
+   Layout values, not colours, so they hold under every preset: compact by
+   default (tablet, and any desktop narrower than 1440 or shorter than 800),
+   comfortable at ≥ 1440 × 800, the phone column below `md`. Read them as
+   `p-(--room-toolbar-pad)` and the like. They are not the Density axis
+   (`--spacing`), which keeps scaling the rest of the app. */
+:root {
+  --room-header-pad-x: 0.75rem;
+  --room-header-height: 3.75rem;
+  --room-toolbar-pad: 0.75rem;
+  --room-card-margin: 0 0.75rem 0.75rem;
+  --table-pad-x: 1rem;
+  --table-pad-start: 0.8125rem;
+  --table-row-pad-y: 0.625rem;
+  --drawer-header-pad: 0.75rem 1.25rem;
+  --drawer-header-height: 4.75rem;
+  --drawer-pad-x: 1.25rem;
+  --drawer-body-pad: 1rem 1.25rem 1.25rem;
+  --drawer-footer-pad: 0.75rem 1.25rem;
+  --form-gap: 0.75rem 0.625rem;
+  --step-pad: 0.75rem 0.875rem;
+  --drawer-enter-from: 100%;
+}
+[dir='rtl'] {
+  --drawer-enter-from: -100%;
+}
+@media (min-width: 90rem) and (min-height: 50rem) {
+  :root {
+    --room-header-pad-x: 1.25rem;
+    --room-toolbar-pad: 1rem 1.25rem;
+    --room-card-margin: 0 1.25rem 1.25rem;
+    --table-pad-x: 1.25rem;
+    --table-pad-start: 1.0625rem;
+    --drawer-header-pad: 0.875rem 1.5rem;
+    --drawer-pad-x: 1.5rem;
+    --drawer-body-pad: 1.25rem 1.5rem 1.75rem;
+    --drawer-footer-pad: 0.75rem 1.5rem;
+    --form-gap: 1rem 0.75rem;
+    --step-pad: 0.875rem 1rem;
+  }
+}
+@media (max-width: 47.9375rem) {
+  :root {
+    --room-header-height: 3.25rem;
+    --room-toolbar-pad: 0.5rem 0.75rem;
+    --room-card-margin: 0;
+    --table-pad-x: 0.875rem;
+    --table-pad-start: 0.6875rem;
+    --table-row-pad-y: 0.75rem;
+    --drawer-header-pad: 0.625rem 1rem;
+    --drawer-header-height: 3.75rem;
+    --drawer-pad-x: 1rem;
+    --drawer-body-pad: 0.875rem 1rem 1.25rem;
+    --drawer-footer-pad: 0.625rem 0.75rem calc(0.625rem + env(safe-area-inset-bottom));
+  }
 }
 
 /* ── Menu style (data-menu) — translucent dropdowns/popovers/selects ── */
@@ -644,11 +1191,9 @@
      nothing is round. Primitives first, then `pill`: the opt-in slot for
      app-level chips, count badges, icon discs and tracks. Status dots (≤ 10px)
      and blurred glows are indicators, not surfaces, and deliberately do not
-     opt in. The vendored carousel RE-SLOTS its arrow <Button>s, so `button`
-     above no longer matches them — found by the browser sweep
-     (theme-shape.e2e), not by reading: the class string says `rounded-full`,
-     the slot says nothing. */
-  [data-slot='badge'],
+     opt in. A vendored primitive that RE-SLOTS its own <Button>s needs its
+     slot here too — `button` above no longer matches them (theme-shape.e2e
+     measures it; the class string says `rounded-full`, the slot says nothing). */
   [data-slot='avatar'],
   [data-slot='avatar-fallback'],
   [data-slot='checkbox'],
@@ -658,8 +1203,6 @@
   [data-slot='progress-indicator'],
   [data-slot='input-otp-slot'],
   [data-slot='floating-edge'],
-  [data-slot='carousel-previous'],
-  [data-slot='carousel-next'],
   [data-slot='kbd'],
   [data-slot='pill']
 ),
@@ -730,15 +1273,6 @@
   }
 }
 
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -805,24 +1339,8 @@
   }
 }
 
-/* Gentle "breathing" pulse for the branded boot loader (FullPageSpinner + HTML
-   splash). Softer scale/opacity so the HTML→React handoff never blinks. */
-@keyframes breathe {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(0.94);
-    opacity: 0.88;
-  }
-}
-
-.animate-boot-breathe {
-  animation: breathe 2.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
-}
-
+/* The branded loader's bar (BrandLoader): an indeterminate sweep — the boot
+   splash's own frames live in index.html. */
 .animate-boot-progress {
   animation: route-progress 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
@@ -837,27 +1355,61 @@
   color: var(--color-card-foreground);
 }
 
-.skeleton-shimmer-bg {
-  background: linear-gradient(
-    90deg,
-    transparent 25%,
-    var(--color-muted) 50%,
-    transparent 75%
-  );
-  background-size: 200% 100%;
+/* The in-place skeleton, one look for every room (KICKOFF §3.5 Skeletons,
+   §6.0 "Table refresh"; the prototype's `[data-fetch]` rules, H:269): a
+   subtree whose content belongs to the previous params while the next load
+   lands carries `data-refreshing` — DataTable's rowgroup, a calendar's blocks,
+   Today's floor and queue, a task list's groups. Its clicks are off; in each
+   of its items (its children — a table's group headers stay, like its column
+   header) every leaf text run, screen-reader text aside, becomes a flat
+   `muted-strong` bar 0.72em tall, `rounded-md`, its width cycling 64 / 48 /
+   60% down the items; an icon nothing; an avatar a plain disc without its
+   badge. Kept short: it ships in the first-paint CSS. */
+[data-refreshing] {
+  pointer-events: none;
 }
-
-/* Elevation shown under a sticky header once content scrolls beneath it.
-   Mode-aware via `--color-foreground` (which flips with .dark): a soft dark
-   shadow on the light surface, and a faint light separator on the dark surface —
-   a fixed dark shadow would be invisible there. Same rule, the token adapts. */
-.scroll-shadow-top {
-  box-shadow: 0 6px 10px -8px
-    color-mix(in oklch, var(--color-foreground) 22%, transparent);
+[data-refreshing] > * {
+  --refresh-bar: 64%;
 }
-.dark .scroll-shadow-top {
-  box-shadow: 0 6px 10px -8px
-    color-mix(in oklch, var(--color-foreground) 14%, transparent);
+[data-refreshing] > :nth-child(3n + 2) {
+  --refresh-bar: 48%;
+}
+[data-refreshing] > :nth-child(3n) {
+  --refresh-bar: 60%;
+}
+[data-refreshing]
+  > :not([data-slot='data-table-group'])
+  :where(span, a, button, p, time):not(:has(:not(.sr-only))):not(:empty):not(
+    .sr-only,
+    [data-slot='avatar-fallback']
+  ),
+[data-refreshing] > :where(span, a, button, p, time):not(:has(*)):not(:empty) {
+  display: inline-block;
+  width: var(--refresh-bar);
+  min-width: 18px;
+  max-width: calc(100% - 4px);
+  height: 0.72em;
+  margin-block: 0.28em;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--radius-md);
+  background-color: var(--color-muted-strong);
+  color: transparent;
+  line-height: 0.72em;
+  white-space: nowrap;
+  text-decoration-color: transparent;
+  vertical-align: middle;
+}
+[data-refreshing] > :not([data-slot='data-table-group']) svg {
+  opacity: 0;
+}
+[data-refreshing] [data-slot='avatar-fallback'] {
+  background-color: var(--color-muted-strong);
+  color: transparent;
+}
+[data-refreshing] [data-slot='person-avatar'] [data-slot='pill'] {
+  visibility: hidden;
 }
 
 /* shadcn menu/select items ship a `cursor-default` utility (utilities layer),
@@ -911,32 +1463,33 @@
   h6 {
     font-family: var(--font-heading, var(--font-sans));
   }
-  /* Icon weight — Lucide/Tabler stroke-width, driven by the Appearance picker.
-     (Phosphor uses fixed path weights, so it ignores this.) */
-  svg.lucide,
-  svg.tabler-icon {
-    stroke-width: var(--icon-stroke, 2);
+  /* Keyboard hints read left to right in every locale: under dir="rtl" the
+     bidi algorithm would set "⌘K" as "K⌘" (the ⌘ is neutral). */
+  kbd {
+    direction: ltr;
+    unicode-bidi: isolate;
+  }
+  /* Icon weight — the Lucide stroke. The launch's look draws the thin 1.5
+     (the Appearance picker that varied it is retired; `--icon-stroke` stays
+     the one knob). */
+  svg.lucide {
+    stroke-width: var(--icon-stroke, 1.5);
     color: var(--icon-app-color, currentColor);
   }
 
-  [data-icon-color='foreground'] svg.lucide,
-  [data-icon-color='foreground'] svg.tabler-icon {
+  [data-icon-color='foreground'] svg.lucide {
     --icon-app-color: var(--color-foreground);
   }
-  [data-icon-color='muted'] svg.lucide,
-  [data-icon-color='muted'] svg.tabler-icon {
+  [data-icon-color='muted'] svg.lucide {
     --icon-app-color: var(--color-muted-foreground);
   }
-  [data-icon-color='primary'] svg.lucide,
-  [data-icon-color='primary'] svg.tabler-icon {
+  [data-icon-color='primary'] svg.lucide {
     --icon-app-color: var(--color-primary);
   }
-  [data-icon-color='accent'] svg.lucide,
-  [data-icon-color='accent'] svg.tabler-icon {
+  [data-icon-color='accent'] svg.lucide {
     --icon-app-color: var(--color-primary);
   }
-  [data-icon-color='destructive'] svg.lucide,
-  [data-icon-color='destructive'] svg.tabler-icon {
+  [data-icon-color='destructive'] svg.lucide {
     --icon-app-color: var(--color-destructive);
   }
 
@@ -967,11 +1520,30 @@
    without a tab bar (login, onboarding) reserves nothing. The tab bar is
    `md:hidden`, so the reservation ends at the same breakpoint. */
 :root:has([data-slot='mobile-nav']) {
-  --floating-bottom-offset: 3.75rem;
+  /* The tab bar's 58px; each consumer adds env(safe-area-inset-bottom). */
+  --floating-bottom-offset: 3.625rem;
 }
 @media (min-width: 48rem) {
   :root:has([data-slot='mobile-nav']) {
     --floating-bottom-offset: 0rem;
+  }
+}
+/* The phone bottom stack (clinic screens, D30), bottom to top: tab bar →
+   notice pill (centre, +14px) → floating "New" (inline end, +16px) → upload
+   tray (inline end) → toasts (centre, top layer). A layer that is showing
+   publishes its height, and the one above adds it to its own bottom, so a
+   View-as pill never covers the "New" button and the tray never sits on
+   either. Two notices (an unverified email over View-as) publish both
+   heights. Phone only: from `md` the primary is back in the toolbar. */
+@media (max-width: 47.9375rem) {
+  :root:has([data-slot='notice-pill']) {
+    --floating-notice-height: 3.25rem;
+  }
+  :root:has([data-slot='notice-pill'] ~ [data-slot='notice-pill']) {
+    --floating-notice-height: 6.5rem;
+  }
+  :root:has([data-slot='fab']) {
+    --floating-fab-height: 3.75rem;
   }
 }
 
@@ -1002,20 +1574,72 @@
     display: none;
   }
 }
-/* Same rule, the other direction: a MODAL dialog owns the screen while it is
-   open, and the trigger is pinned above everything the dialog dims — so it sat
-   lit up over Settings, over a confirm, over the invite form, at every width.
-   Keyed on the OVERLAY rather than the content: that is what marks a dialog as
-   modal, so the non-modal Appearance panel (no scrim, page stays live) keeps
-   its trigger, which is right — nothing is being interrupted there. */
-:root:has([data-slot='dialog-overlay'], [data-slot='alert-dialog-overlay'])
+/* A floating "New" owns the same corner on a phone (a primary action beats a
+   feedback button), so the trigger steps aside while one is mounted. */
+@media (max-width: 47.9375rem) {
+  :root:has([data-slot='fab']) #sentry-feedback {
+    display: none;
+  }
+}
+/* The upload tray takes the same corner at every width while files are moving
+   (KICKOFF §3.5). It is a seconds-long state, so the trigger waits for it, as
+   it does for the consent card — otherwise it sits on the tray's last row. */
+:root:has([data-slot='upload-tray']) #sentry-feedback {
+  display: none;
+}
+/* Same rule, the other direction: a MODAL surface owns the screen while it is
+   open, and the feedback trigger is pinned above everything it dims — it sat
+   lit up over Settings, over a confirm, over the invite form. A side drawer is
+   as modal as a centred dialog, so the sheets and the phone sheets count too.
+   Keyed on the OVERLAY rather than the content: that is what marks a surface
+   as modal, so a popover or a menu (no scrim, page stays live) keeps the
+   trigger, which is right — nothing is being interrupted there. */
+:root:has(
+    [data-slot='dialog-overlay'],
+    [data-slot='alert-dialog-overlay'],
+    [data-slot='sheet-overlay'],
+    [data-slot='drawer-overlay']
+  )
   #sentry-feedback {
   display: none;
 }
 
+/* ── Print documents (invoice, sale and prescription sheets — KICKOFF §3.5, L-22) ──
+   `printDocument()` (shared/components/PrintTemplate) renders one A4 sheet into
+   a `[data-print-root]` host at the end of <body> and sets `data-printing` on
+   <html> until `afterprint`. The host never shows on screen; while a document
+   prints it is the only thing that does. The page is the sheet: A4 with no
+   margins, so the sheet's own letterhead space is exact (H:434). The sheet keeps
+   the light tokens because the preset's dark block is screen-only. */
+@media screen {
+  [data-print-root] {
+    display: none;
+  }
+}
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+  html[data-printing],
+  html[data-printing] body {
+    height: auto;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+  }
+  html[data-printing] body > :not([data-print-root]) {
+    display: none !important;
+  }
+  [data-print-root] {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
 /* ── Accessibility: honour reduced-motion globally ──
    Users who set "reduce motion" get a near-instant, motion-free experience
-   (page fades, overlay transitions, shimmer, and hover lifts are neutralised). */
+   (page fades, overlay transitions and hover lifts are neutralised). */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

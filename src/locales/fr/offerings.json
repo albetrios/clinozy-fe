@@ -1,0 +1,290 @@
+{
+  "manifest": {
+    "title": "Prestations"
+  },
+  "offerLabels": {
+    "percentOff": "{{value}} % de remise",
+    "amountOff": "{{amount}} de remise",
+    "fixedAt": "à {{amount}}",
+    "extraSessions_one": "+{{count}} séance",
+    "extraSessions_many": "+{{count}} séances",
+    "extraSessions_other": "+{{count}} séances"
+  },
+  "toolbar": {
+    "tabsLabel": "Sections des prestations",
+    "tabOfferings": "Prestations",
+    "tabOffers": "Offres",
+    "searchOfferings": "Rechercher un nom ou un mot-clé",
+    "searchOffers": "Rechercher des offres ou des codes",
+    "searchLabel": "Rechercher des prestations",
+    "newOffering": "Nouvelle prestation",
+    "newOffer": "Nouvelle offre"
+  },
+  "catalogueCells": {
+    "allBranches": "Tous les établissements"
+  },
+  "deleteConfirm": {
+    "offeringTitle": "Supprimer cette prestation ?",
+    "offerTitle": "Supprimer cette offre ?"
+  },
+  "columns": {
+    "seq": "ID",
+    "name": "Prestation",
+    "category": "Catégorie",
+    "price": "Prix",
+    "offer": "Offre",
+    "branches": "Établissements",
+    "duration": "Durée",
+    "sessions": "Séances",
+    "status": "Statut",
+    "updated": "Mis à jour"
+  },
+  "table": {
+    "records": "prestations"
+  },
+  "cells": {
+    "validDays_one": "Valable {{count}} jour",
+    "validDays_many": "Valable {{count}} jours",
+    "validDays_other": "Valable {{count}} jours",
+    "validFor_one": "valable {{count}} jour",
+    "validFor_many": "valable {{count}} jours",
+    "validFor_other": "valable {{count}} jours",
+    "wasPrice": "au lieu de {{price}} · {{percent}} % de remise",
+    "listPrice": "prix catalogue",
+    "minutes": "{{minutes}} min",
+    "sessions_one": "{{count}} séance",
+    "sessions_many": "{{count}} séances",
+    "sessions_other": "{{count}} séances",
+    "sessionsFree_one": "{{sessions}} + {{count}} offerte",
+    "sessionsFree_many": "{{sessions}} + {{count}} offertes",
+    "sessionsFree_other": "{{sessions}} + {{count}} offertes",
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "rowActions": {
+    "edit": "Modifier",
+    "delete": "Supprimer"
+  },
+  "bulk": {
+    "export": "Exporter",
+    "exported_one": "{{count}} ligne exportée en CSV",
+    "exported_many": "{{count}} lignes exportées en CSV",
+    "exported_other": "{{count}} lignes exportées en CSV"
+  },
+  "empty": {
+    "title": "Aucune prestation pour l’instant",
+    "description": "Ajoutez des soins et des forfaits avec leurs prix pour pouvoir les réserver et les facturer.",
+    "noMatchTitle": "Aucune prestation ne correspond",
+    "noMatchDescription": "Rien ici pour l’instant. Essayez un autre onglet ou une autre recherche.",
+    "newOffering": "Nouvelle prestation"
+  },
+  "offers": {
+    "columns": {
+      "offer": "Offre",
+      "type": "Type",
+      "appliesTo": "S’applique à",
+      "branches": "Établissements",
+      "valid": "Validité",
+      "status": "Statut",
+      "updated": "Mis à jour"
+    },
+    "table": {
+      "records": "offres"
+    },
+    "cells": {
+      "more": "+{{count}}",
+      "range": "{{start}} – {{end}}",
+      "now": "Maintenant",
+      "noEnd": "sans fin",
+      "endsToday": "Se termine aujourd’hui",
+      "endsTomorrow": "Se termine demain",
+      "endsIn_one": "Se termine dans {{count}} jour",
+      "endsIn_many": "Se termine dans {{count}} jours",
+      "endsIn_other": "Se termine dans {{count}} jours",
+      "startsOn": "Commence le {{date}}",
+      "over": "Terminée",
+      "noOfferings": "Aucune prestation"
+    },
+    "rowActions": {
+      "edit": "Modifier",
+      "pause": "Mettre en pause",
+      "resume": "Reprendre",
+      "delete": "Supprimer"
+    },
+    "bulk": {
+      "export": "Exporter",
+      "exported_one": "{{count}} ligne exportée en CSV",
+      "exported_many": "{{count}} lignes exportées en CSV",
+      "exported_other": "{{count}} lignes exportées en CSV"
+    },
+    "empty": {
+      "title": "Aucune offre pour l’instant",
+      "description": "Rien ici pour l’instant. Essayez un autre onglet ou une autre recherche.",
+      "newOffer": "Nouvelle offre"
+    },
+    "record": "Offre"
+  },
+  "record": "Prestation",
+  "offeringDrawer": {
+    "title": {
+      "create": "Nouvelle prestation",
+      "edit": "Modifier la prestation"
+    },
+    "sub": "Utilisée dans les rendez-vous, les factures et les forfaits",
+    "quickFill": {
+      "single": "Séance unique",
+      "pack": "Forfait 6 séances",
+      "lhr": "Forfait laser 10 séances",
+      "consultation": "Consultation"
+    },
+    "steps": {
+      "main": "Prestation, prix et séances",
+      "timeDetails": "Durée, validité et détails",
+      "offersTime": "Offres associées, durée et validité",
+      "details": "Détails"
+    },
+    "groups": {
+      "offering": "Prestation",
+      "price": "Prix et séances",
+      "offers": "Offres associées",
+      "time": "Durée et validité",
+      "details": "Détails"
+    },
+    "fields": {
+      "name": "Nom",
+      "namePlaceholder": "ex. Laser visage complet",
+      "category": "Catégorie",
+      "colour": "Couleur",
+      "colourHint": "utilisée partout pour cette prestation",
+      "availableAt": "Disponible dans",
+      "availableAtHint": "masquée des rendez-vous et factures ailleurs",
+      "price": "Prix",
+      "priceHint": "prix catalogue · affiché sur la facture",
+      "offerPrice": "Prix proposé",
+      "offerPriceHint": "ce que vous facturez · vide = prix catalogue",
+      "offerPriceBelow": "ce que vous facturez · {{percent}} % sous le catalogue",
+      "sessions": "Séances",
+      "sessionsHint": "soins autorisés pour une facture",
+      "gstRate": "Taux de GST",
+      "gst": "GST",
+      "gstInclusive": "Inclus",
+      "gstExclusive": "Non inclus",
+      "floor": "Prix plancher",
+      "floorShown": "Affiché · vous seul le voyez",
+      "floorHidden": "Masqué · touchez pour le définir",
+      "floorHint": "l’accueil ne peut jamais facturer moins",
+      "billedToday": "Facturé aujourd’hui",
+      "freeSessions_one": "+{{count}} séance offerte",
+      "freeSessions_many": "+{{count}} séances offertes",
+      "freeSessions_other": "+{{count}} séances offertes",
+      "belowList": "{{percent}} % sous le catalogue",
+      "duration": "Durée",
+      "durationQuick": "{{minutes}} min",
+      "minutesUnit": "min",
+      "validity": "Validité",
+      "validityHint": "0 = sans expiration · les séances restantes sont ensuite perdues",
+      "daysUnit": "jours",
+      "days_one": "{{count}} jour",
+      "days_many": "{{count}} jours",
+      "days_other": "{{count}} jours",
+      "validityQuick": {
+        "none": "Aucune",
+        "quarter": "3 mois",
+        "half": "6 mois",
+        "year": "1 an"
+      },
+      "searchTerms": "Mots-clés",
+      "searchTermsHint": "séparés par des virgules",
+      "searchTermsPlaceholder": "laser, visage, épilation",
+      "description": "Description",
+      "descriptionPlaceholder": "Ce qui est inclus",
+      "status": "Statut",
+      "active": "Active · réservable",
+      "inactive": "Inactive · masquée",
+      "gstChip": "{{value}} %",
+      "gstHint": "0 % pour une consultation, 18 % sinon — tant que vous n’en choisissez pas"
+    },
+    "offerTill": "jusqu’au {{date}}",
+    "untitled": "Sans nom",
+    "save": {
+      "create": "Créer la prestation",
+      "edit": "Enregistrer les modifications",
+      "createAnother": "Créer et en ajouter une autre"
+    },
+    "toasts": {
+      "addName": "Ajoutez un nom",
+      "addPrice": "Ajoutez un prix",
+      "offerAbovePrice": "Le prix proposé ne peut pas dépasser le prix",
+      "floorAboveOffer": "Le prix plancher ne peut pas dépasser le prix proposé",
+      "offerBelowFloor": "Sous le prix plancher de cette prestation — demandez à un propriétaire ou un admin",
+      "floorAbovePrice": "Le prix plancher ne peut pas dépasser le prix",
+      "floorNeedsPermission": "Votre rôle ne permet pas de modifier le prix plancher — demandez à un propriétaire ou un admin"
+    }
+  },
+  "offerDrawer": {
+    "title": {
+      "create": "Nouvelle offre",
+      "edit": "Modifier l’offre"
+    },
+    "sub": "Un prix limité dans le temps sur une ou plusieurs prestations · s’applique tout seul",
+    "untitled": "Nouvelle offre",
+    "steps": {
+      "offer": "Offre",
+      "where": "Où elle s’applique",
+      "notes": "Notes"
+    },
+    "fields": {
+      "name": "Nom",
+      "namePlaceholder": "ex. Éclat de Diwali",
+      "code": "Code",
+      "codeHint": "facultatif · pour les annonces",
+      "codePlaceholder": "GLOW20",
+      "type": "Type",
+      "value": {
+        "percent": "Remise",
+        "amount": "Montant de la remise",
+        "fixed": "Prix de l’offre",
+        "extra": "Séances offertes"
+      },
+      "percentQuick": "{{value}} %",
+      "sessionsUnit": "séances",
+      "colour": "Couleur",
+      "colourHint": "signale cette offre sur les prestations et les factures",
+      "offerings": "Prestations",
+      "offeringsHint": "choisissez-en une ou plusieurs",
+      "offeringsSearch": "Rechercher des prestations",
+      "branches": "Établissements",
+      "branchesHint": "où l’accueil peut l’utiliser",
+      "starts": "Début",
+      "ends": "Fin",
+      "previewPrice": "{{before}} → {{after}}",
+      "previewSessions_one": "{{before}} → {{count}} séance",
+      "previewSessions_many": "{{before}} → {{count}} séances",
+      "previewSessions_other": "{{before}} → {{count}} séances",
+      "note": "Note",
+      "notePlaceholder": "À qui elle s’adresse, comment l’accueil doit en parler",
+      "status": "Statut",
+      "live": "Active · s’applique automatiquement",
+      "paused": "En pause"
+    },
+    "offeringCount_one": "{{count}} prestation",
+    "offeringCount_many": "{{count}} prestations",
+    "offeringCount_other": "{{count}} prestations",
+    "save": {
+      "create": "Créer l’offre",
+      "edit": "Enregistrer l’offre"
+    },
+    "toasts": {
+      "name": "Nommez l’offre",
+      "offerings": "Choisissez au moins une prestation",
+      "value": {
+        "percent": "Indiquez la remise",
+        "amount": "Indiquez le montant",
+        "fixed": "Indiquez le montant",
+        "extra": "Indiquez les séances offertes"
+      },
+      "endsBeforeStart": "Se termine avant de commencer",
+      "offeringInactive": "{{name}} n’est plus active — retirez-la ou choisissez-en une autre"
+    }
+  }
+}

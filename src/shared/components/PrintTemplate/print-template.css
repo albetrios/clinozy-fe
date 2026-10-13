@@ -1,0 +1,19 @@
+/* The A4 print sheets' own utilities (KICKOFF §3.5) — their millimetre boxes,
+   Arial and table layout — generated from this folder alone and loaded with
+   the sheets, not on every first paint: `src/index.css` leaves this folder out
+   of the main scan (L-54). Only Tailwind's default theme is known here, so a
+   sheet may use the app's token utilities (`text-foreground`, `bg-background`,
+   …) only where the screens use them too — the main stylesheet then has them;
+   `print-template-css.test.ts` holds the sheets to that.
+   The utilities go in the `components` layer, which the main stylesheet orders
+   before `utilities`. This file loads after the main one, and outside a layer
+   its copies of shared utilities (`w-full`, `flex`, `flex-col` …) outranked
+   every screen's responsive class: a record drawer's `w-full
+   md:w-[min(840px,…)]` filled the viewport, and `flex md:hidden` showed on
+   desktop, on any page where a sheet had loaded. Under `utilities` they still
+   style the sheets, since the sheets' millimetre boxes are theirs alone. */
+@import 'tailwindcss/theme' theme(reference);
+@import 'tailwindcss/utilities' layer(components) source(none);
+@source './';
+@source not './**/*.test.ts';
+@source not './**/*.test.tsx';

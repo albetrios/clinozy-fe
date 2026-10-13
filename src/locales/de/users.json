@@ -1,0 +1,398 @@
+{
+  "manifest": {
+    "title": "Benutzer"
+  },
+  "record": "Benutzer",
+  "tabs": {
+    "label": "Benutzeransichten",
+    "team": "Team",
+    "roles": "Rollen & Zugriff",
+    "branches": "Filialen"
+  },
+  "search": {
+    "placeholder": "Name, E-Mail, Mobilnummer oder #ID",
+    "label": "Benutzer suchen"
+  },
+  "primary": {
+    "newUser": "Neuer Benutzer",
+    "newRole": "Neue Rolle",
+    "newBranch": "Neue Filiale"
+  },
+  "columns": {
+    "seq": "ID",
+    "user": "Benutzer",
+    "email": "E-Mail",
+    "roles": "Rollen",
+    "branches": "Filialen",
+    "hours": "Arbeitszeiten",
+    "commission": "Provision",
+    "status": "Status",
+    "updated": "Aktualisiert"
+  },
+  "table": {
+    "records": "Benutzer",
+    "mainRole": "Hauptrolle",
+    "alsoRole": "Außerdem",
+    "commission": "{{value}}%"
+  },
+  "status": {
+    "active": "Aktiv",
+    "inactive": "Inaktiv",
+    "invited": "Eingeladen",
+    "expires": "Einladung läuft am {{date}} ab",
+    "expired": "Einladung abgelaufen"
+  },
+  "hours": {
+    "everyDay": "Jeden Tag",
+    "run": "{{from}}–{{to}}",
+    "list": "{{days, list(type: unit)}}",
+    "line": "{{days}} · {{from}}–{{to}}"
+  },
+  "filters": {
+    "roles": "Rollen",
+    "all": "Alle",
+    "branches": "Filialen",
+    "status": "Status"
+  },
+  "rowActions": {
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "leave": "Klinik verlassen"
+  },
+  "bulk": {
+    "export": "Exportieren",
+    "exported_one": "{{count}} Zeile als CSV exportiert",
+    "exported_other": "{{count}} Zeilen als CSV exportiert"
+  },
+  "empty": {
+    "title": "Kein passender Benutzer",
+    "description": "Hier ist noch nichts. Versuchen Sie einen anderen Tab oder eine andere Suche."
+  },
+  "drawer": {
+    "title": {
+      "create": "Neuer Benutzer",
+      "edit": "Benutzer bearbeiten"
+    },
+    "sub": "Anmeldung, Rollen, Filialen und Arbeitszeiten",
+    "steps": {
+      "profile": "Profil, Rollen & Filialen",
+      "hours": "Arbeitszeiten & Vergütung"
+    },
+    "groups": {
+      "profile": "Profil",
+      "rolesBranches": "Rollen & Filialen",
+      "hours": "Arbeitszeiten",
+      "pay": "Vergütung"
+    },
+    "fields": {
+      "name": "Name",
+      "mobile": "Mobilnummer",
+      "email": "E-Mail",
+      "colour": "Farbe",
+      "roles": "Rollen",
+      "access": "Erhält Zugriff auf",
+      "branches": "Filialen",
+      "days": "Tage",
+      "from": "Von",
+      "to": "Bis",
+      "commission": "Provision / Bonus",
+      "status": "Status"
+    },
+    "hints": {
+      "mobile": "10 Ziffern",
+      "colour": "für ihre Abzeichen",
+      "roles": "eine oder mehrere wählen · Zugriffe addieren sich",
+      "branches": "wo sie arbeiten",
+      "days": "Termine bieten nur diese Tage an",
+      "name": "legt die Person im eigenen Profil fest"
+    },
+    "placeholders": {
+      "name": "Vollständiger Name, z. B. Dr. Nisha Mavani",
+      "email": "name@clinic.com",
+      "time": "Uhrzeit wählen",
+      "commission": "0"
+    },
+    "commissionSuffix": "% des Umsatzes",
+    "commissionQuick": "{{value}}%",
+    "decrease": "Verringern",
+    "increase": "Erhöhen",
+    "pickRole": "Rolle wählen",
+    "statusOn": "Aktiv · kann sich anmelden",
+    "statusOff": "Inaktiv · kann diese Praxis nicht nutzen",
+    "resend": "Einladung erneut senden",
+    "quickFill": {
+      "doctor": "Arzt · 10:00–19:00",
+      "therapist": "Therapeut · 10:00–19:00",
+      "front_desk": "Empfang · 09:30–19:30",
+      "pharmacist": "Apotheker · 09:00–21:00"
+    },
+    "summaryNew": "Neuer Benutzer",
+    "save": {
+      "create": "Benutzer anlegen",
+      "edit": "Änderungen speichern",
+      "createAnother": "Anlegen & weiteren hinzufügen"
+    },
+    "missing": "E-Mail-Adresse angeben",
+    "noRole": "Mindestens eine Rolle wählen",
+    "emailInvalid": "Geben Sie eine gültige E-Mail-Adresse ein",
+    "mobileInvalid": "Die Mobilnummer braucht 10 Ziffern",
+    "noPlatformRole": "Es gibt noch keine Rolle, die vergeben werden kann · fragen Sie einen Administrator",
+    "added": "{{name}} hinzugefügt",
+    "saved": "{{name}} gespeichert"
+  },
+  "deleteUser": {
+    "title": "Diesen Benutzer löschen?",
+    "removed": "{{name}} entfernt"
+  },
+  "leave": {
+    "title": "{{clinic}} verlassen?",
+    "description": "Sie verlieren den Zugriff auf {{clinic}} — ihre Bereiche, Daten und das Team — und kehren zu Ihren Kliniken zurück. Sie können kurz nach der Bestätigung rückgängig machen.",
+    "confirm": "Klinik verlassen",
+    "stay": "Bleiben",
+    "pending": "{{clinic}} wird verlassen…",
+    "done": "Sie haben {{clinic}} verlassen",
+    "clinicFallback": "diese Klinik"
+  },
+  "roles": {
+    "label": "Rollen",
+    "purposes": {
+      "admin": "Führt die Klinik — Preise, Team, Filialen und jede Ansicht.",
+      "doctor": "Berät, verordnet und plant die Behandlung jedes Patienten.",
+      "therapist": "Führt Sitzungen und Nachsorge-Anrufe durch.",
+      "front_desk": "Das erste Gesicht der Klinik — Leads, Buchungen, Check-in und Abrechnung.",
+      "counsellor": "Macht aus Anfragen Pläne und Pakete.",
+      "pharmacist": "Führt die Medikamentenausgabe und ihren Bestand.",
+      "accountant": "Prüft Ein- und Ausgänge und schließt die Tage ab.",
+      "marketing": "Gewinnt Leads und fasst bei ihnen nach.",
+      "custom": "Eigene Rolle",
+      "customPage": "Eigene Rolle · legen Sie unten fest, was sie darf"
+    },
+    "nameLabel": "Rollenname",
+    "descriptionLabel": "Rollenbeschreibung",
+    "copyFrom": "Zugriff kopieren von",
+    "copied": "{{role}} hat jetzt denselben Zugriff wie {{from}}",
+    "preview": "Vorschau als {{role}}",
+    "previewHint": "{{productName}} so sehen, wie diese Rolle es sieht",
+    "previewing": "Vorschau von {{productName}} als {{role}}",
+    "back": "Zurück zu den Rollen",
+    "people": "Personen mit dieser Rolle",
+    "openPerson": "{{name}} öffnen",
+    "also": "+ {{roles}}",
+    "nobody": "Noch niemand hat diese Rolle · weisen Sie sie in den Benutzerdetails einer Person zu.",
+    "matrix": {
+      "title": "Was sie sehen und tun kann",
+      "section": "Bereich",
+      "view": "Ansehen",
+      "create": "Erstellen",
+      "edit": "Bearbeiten",
+      "delete": "Löschen",
+      "row": "Zeile",
+      "full": "Voll",
+      "some": "Teils",
+      "none": "Keine",
+      "rowHint": "Die ganze Zeile ein- oder ausschalten",
+      "cell": {
+        "view": "{{role}} darf ansehen · {{section}}",
+        "create": "{{role}} darf erstellen · {{section}}",
+        "edit": "{{role}} darf bearbeiten · {{section}}",
+        "delete": "{{role}} darf löschen · {{section}}"
+      },
+      "notApplicable": "Gibt es in dieser Zeile nicht",
+      "resources": {
+        "contact": {
+          "label": "Kontakte",
+          "description": "Die Personen hinter Leads und Patienten"
+        },
+        "contact_activity": {
+          "label": "Nachrichten & Notizen",
+          "description": "WhatsApp, Anrufe und Teamnotizen"
+        },
+        "patient_prescription": {
+          "label": "Rezepte",
+          "description": "Rezepte schreiben und freigeben"
+        },
+        "patient_treatment": {
+          "label": "Behandlungen",
+          "description": "Sitzungen und ihr Verlauf"
+        },
+        "patient_review": {
+          "label": "Bewertungen",
+          "description": "Google- und Videobewertungen · mit dem Patienten lesbar"
+        },
+        "role": {
+          "label": "Rollen",
+          "description": "Rollen & Zugriff"
+        },
+        "branch": {
+          "label": "Filialen",
+          "description": "Filialen und wer dort arbeitet"
+        }
+      }
+    },
+    "notes": {
+      "admin": "Administratoren dürfen alles · diese Rolle lässt sich nicht einschränken.",
+      "readOnly": "Du siehst hier die Rollen. Ändern braucht „Rollen aktualisieren“.",
+      "live": "Änderungen gelten sofort für alle mit dieser Rolle. Wer zwei Rollen hat, bekommt alles, was eine der beiden erlaubt.",
+      "beyond": "Diese Rolle hat Zugriff, den du nicht hast · nur wer ihn hat, kann die Rolle ändern."
+    },
+    "locked": {
+      "admin": "Administratoren haben immer vollen Zugriff",
+      "noPerms": "Sie können Rollen nicht ändern · fragen Sie einen Administrator",
+      "noAdd": "Sie können keine Rollen hinzufügen · fragen Sie einen Administrator",
+      "beyond": "Diese Rolle hat Zugriff, den du nicht hast · frag eine Admin-Person",
+      "notYours": "Du kannst nur Zugriff vergeben, den du selbst hast"
+    },
+    "added": "Rolle hinzugefügt · geben Sie ihr einen Namen und legen Sie fest, was sie darf",
+    "newRoleName": "Neue Rolle",
+    "duplicateName": "Eine Rolle namens {{name}} gibt es bereits",
+    "deleteRole": {
+      "action": "Rolle löschen",
+      "title": "{{name}} löschen?",
+      "description": "Mitglieder mit dieser Rolle benötigen eine neue Zuweisung. Sie können kurz nach der Bestätigung rückgängig machen.",
+      "confirm": "Löschen",
+      "pending": "{{name}} wird gelöscht…"
+    },
+    "workspace": {
+      "title": "Arbeitsbereich-Rechte",
+      "hint": "Einstellungen, Integrationen, Abrechnung und Audit-Protokoll — über die Bereiche oben hinaus. Sie können nur vergeben, was Sie selbst haben.",
+      "none": "Mehr können Sie dieser Rolle nicht geben.",
+      "loadFailed": "Die Arbeitsbereich-Rechte konnten nicht geladen werden."
+    },
+    "specials": {
+      "title": "Sonderrechte",
+      "floor": {
+        "label": "Mindestpreis sehen",
+        "description": "Zeigt den verborgenen Mindestpreis bei Leistungen und Rechnungen"
+      },
+      "clinical": {
+        "label": "Klinische Notizen lesen",
+        "description": "Öffnet Beschwerden, Diagnose, Notizen, Fotos und Berichte"
+      },
+      "export": {
+        "label": "Exportieren · {{section}}",
+        "description": "Tabelle herunterladen"
+      },
+      "privateAlbum": {
+        "label": "Privates Album sehen",
+        "description": "Öffnet die privaten Fotos in einer Patientenakte"
+      }
+    }
+  },
+  "branches": {
+    "record": "Filiale",
+    "columns": {
+      "branch": "Filiale",
+      "address": "Adresse",
+      "contact": "Kontakt",
+      "hours": "Öffnungszeiten",
+      "team": "Team",
+      "defaults": "Standardpersonen",
+      "status": "Status"
+    },
+    "main": "Haupt",
+    "notSet": "Nicht festgelegt",
+    "defaults": {
+      "doctor": "Arzt · {{name}}",
+      "desk": "Empfang · {{name}}",
+      "therapist": "Therapeut · {{name}}",
+      "pharmacist": "Apotheke · {{name}}"
+    },
+    "status": {
+      "open": "Geöffnet",
+      "closed": "Geschlossen"
+    },
+    "records": "Filialen",
+    "empty": "Noch keine Filialen",
+    "drawer": {
+      "title": {
+        "create": "Neue Filiale",
+        "edit": "Filiale bearbeiten"
+      },
+      "sub": "Adresse, Öffnungszeiten und die Menschen, die hier arbeiten",
+      "summaryNew": "Neue Filiale",
+      "people_one": "{{count}} Person",
+      "people_other": "{{count}} Personen",
+      "mainBadge": "Hauptfiliale",
+      "steps": {
+        "place": "Filiale & Adresse",
+        "contact": "Kontakt & Öffnungszeiten",
+        "people": "Personen"
+      },
+      "groups": {
+        "branch": "Filiale",
+        "address": "Adresse",
+        "contact": "Kontakt",
+        "hours": "Öffnungszeiten"
+      },
+      "fields": {
+        "name": "Name",
+        "colour": "Farbe",
+        "main": "Hauptfiliale",
+        "status": "Status",
+        "line1": "Adresszeile 1",
+        "line2": "Adresszeile 2",
+        "area": "Gebiet",
+        "city": "Stadt",
+        "pin": "PLZ",
+        "state": "Bundesland",
+        "phone": "Telefon",
+        "email": "E-Mail",
+        "gstin": "GSTIN",
+        "days": "Tage",
+        "opens": "Öffnet",
+        "closes": "Schließt",
+        "team": "Team",
+        "doctor": "Standardarzt",
+        "desk": "Standard-Empfang",
+        "therapist": "Standardtherapeut",
+        "pharmacist": "Standardapotheker"
+      },
+      "placeholders": {
+        "name": "z. B. Vesu",
+        "line1": "Laden / Etage, Gebäude",
+        "line2": "Straße, Orientierungspunkt",
+        "area": "z. B. Vesu",
+        "city": "Stadt",
+        "pin": "6 Ziffern",
+        "state": "Bundesland",
+        "email": "filiale@klinik.de",
+        "gstin": "15 Zeichen",
+        "team": "Team auswählen"
+      },
+      "hints": {
+        "colour": "kennzeichnet diese Filiale überall",
+        "phone": "10 Ziffern",
+        "team": "wer hier arbeitet",
+        "preselected": "in Formularen hier vorausgewählt",
+        "addFirst": {
+          "doctor": "fügen Sie zuerst einen Arzt zum Team hinzu",
+          "desk": "fügen Sie zuerst jemanden vom Empfang zum Team hinzu",
+          "therapist": "fügen Sie zuerst einen Therapeuten zum Team hinzu",
+          "pharmacist": "fügen Sie zuerst einen Apotheker zum Team hinzu"
+        },
+        "main": "eine pro Praxis · bei der Eröffnung festgelegt"
+      },
+      "toggles": {
+        "mainOn": "Haupt · Zentrale",
+        "mainOff": "Nicht die Hauptfiliale",
+        "openOn": "Geöffnet · in Auswahllisten",
+        "openOff": "Geschlossen · überall ausgeblendet"
+      },
+      "nobody": "Niemand",
+      "you": "{{name}} (Sie)",
+      "save": {
+        "create": "Filiale hinzufügen",
+        "edit": "Filiale speichern"
+      },
+      "nameMissing": "Geben Sie der Filiale einen Namen",
+      "addressMissing": "Adresse, Gebiet, Stadt und PIN angeben",
+      "duplicate": "Eine Filiale namens {{name}} gibt es bereits",
+      "phoneInvalid": "Die Telefonnummer braucht 10 Ziffern",
+      "emailInvalid": "Geben Sie eine gültige E-Mail-Adresse ein",
+      "added": "Filiale {{name}} hinzugefügt",
+      "saved": "{{name}} gespeichert",
+      "contactMissing": "Telefon und E-Mail angeben",
+      "pinInvalid": "Die PIN braucht 6 Ziffern"
+    }
+  }
+}

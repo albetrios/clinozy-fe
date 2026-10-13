@@ -80,6 +80,8 @@ agent-os/mcp/mcp.json
 
 # Claude Code — machine-local permission overrides (merges with agent-os/platforms/claude/settings.json)
 .claude/settings.local.json
+# Claude Code agent worktrees (each a full checkout with its own biome.json)
+.claude/worktrees/
 
 # codegraph — local code-intelligence index (rebuilt via `codegraph init` / `codegraph sync`;
 # auto-refreshed on branch switch + merge/pull by the .husky/post-checkout + post-merge hooks;
@@ -99,3 +101,6 @@ docs/api/
 # Python bytecode from the agent-os skill scripts — generated on every run.
 __pycache__/
 *.pyc
+
+# Playwright MCP scratch output (screenshots, console logs) from browser checks
+.playwright-mcp/

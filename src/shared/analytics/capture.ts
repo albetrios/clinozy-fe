@@ -35,12 +35,36 @@ export function markPostHogActive(): void {
   postHogActive = true;
 }
 
+/** PostHog keeps its identifiers under `ph_…` in localStorage and in cookies. */
+const POSTHOG_STORAGE_PREFIX = 'ph_';
+
 /**
- * Consent withdrawn → stop capture and purge PostHog's stored identifiers
- * (localStorage + cookie). No-op when PostHog never initialized, so a
- * decline-from-start never loads the analytics chunk.
+ * Remove PostHog's stored identifiers from this browser without loading PostHog — what an
+ * earlier grant on a shared computer left behind (D161).
+ */
+function forgetStoredAnalyticsIdentifiers(): void {
+  try {
+    for (const key of Object.keys(localStorage)) {
+      if (key.startsWith(POSTHOG_STORAGE_PREFIX)) localStorage.removeItem(key);
+    }
+  } catch {
+    /* storage can be unavailable (private mode); nothing to forget then */
+  }
+  for (const cookie of document.cookie.split(';')) {
+    const name = cookie.split('=')[0]?.trim() ?? '';
+    if (name.startsWith(POSTHOG_STORAGE_PREFIX)) {
+      document.cookie = `${name}=; Max-Age=0; path=/`;
+    }
+  }
+}
+
+/**
+ * Consent withdrawn, or the session ended → stop capture and purge PostHog's stored identifiers
+ * (localStorage + cookie). Never loads the analytics chunk when PostHog did not start in this
+ * tab, so a decline-from-start stays free of it.
  */
 export function purgeAnalyticsOnConsentRevoked(): void {
+  forgetStoredAnalyticsIdentifiers();
   if (!postHogActive) return;
   postHogActive = false;
   import('posthog-js')
@@ -48,6 +72,24 @@ export function purgeAnalyticsOnConsentRevoked(): void {
       if (!posthog.__loaded) return;
       posthog.opt_out_capturing();
       posthog.reset(true);
+    })
+    .catch(() => {
+      /* analytics must never throw */
+    });
+}
+
+/**
+ * Consent given again in a tab where it was withdrawn → PostHog, still loaded and opted out,
+ * captures again. A tab where PostHog never started is left to the boot sequence, which starts
+ * it on a grant.
+ */
+export function resumeAnalyticsOnConsentGranted(): void {
+  if (postHogActive) return;
+  import('posthog-js')
+    .then(({ default: posthog }) => {
+      if (!posthog.__loaded) return;
+      posthog.opt_in_capturing();
+      postHogActive = true;
     })
     .catch(() => {
       /* analytics must never throw */

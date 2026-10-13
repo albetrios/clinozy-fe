@@ -25,7 +25,7 @@
     },
     "done": {
       "title": "準備完了",
-      "description": "確認してダッシュボードへ進みましょう。"
+      "description": "確認してワークスペースへ進みましょう。"
     }
   },
   "welcome": {
@@ -97,7 +97,7 @@
   "actions": {
     "back": "戻る",
     "continue": "続行",
-    "enterDashboard": "ダッシュボードへ入る",
+    "enterWorkspace": "ワークスペースへ入る",
     "settingUp": "設定中…"
   },
   "defaults": {

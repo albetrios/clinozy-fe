@@ -53,6 +53,18 @@ dev server — see `docs/reference/local-production-perf.md`.
    in the entry chunk. Import the loaders it calls **dynamically, inside the
    function** — two tiny static imports were enough to break the budget. (That is
    an `import()` in a function body, not the module-scope one below.)
+8. **Route registration is first-paint weight.** Every manifest, validator,
+   builder and `import()` that `routeTree.tsx` holds ships on every load — and
+   Vite gives each `import()` a preload list naming every chunk the island
+   shares, which the entry carries too. L-54 measured that as most of the route
+   registration: the clinic rooms' imports now sit behind ONE lazy module
+   (`src/app/routes/room-routes.ts`, mounted with `roomRoute(name)` and warmed
+   by the org shell's loader), the dialog routes' manifests behind another
+   (`dialog-routes.ts`, `...dialogRoute(name)`, which awaits the manifest
+   before the gate), and each room's builders are imported by their own path,
+   never through the `@/lib/routes/index.ts` barrel. `pnpm build:check`
+   (`check-entry-routes.mjs`) trips on a dialog manifest or a room builder in
+   the first-paint chunks.
 
 ## Attribute a regression before you chase it
 
@@ -93,6 +105,18 @@ a gate's test fixtures (`p-[24px]`, `rounded-[3px]`), an E2E spec. That was **19
 Before widening it, know what it protects against: a class the app only **composes at
 runtime** (`` `col-span-${n}` ``) was never safe — it merely worked while some doc happened to
 spell it. Write the full class name in source.
+
+**A surface no first paint draws can carry its own stylesheet.** The A4 print sheets' millimetre
+utilities were ~0.9 kB gzipped of the initial CSS. `src/index.css` now leaves
+`shared/components/PrintTemplate/` out of the scan (`@source not`), and
+`print-template.css` there generates that folder's utilities with Tailwind's default theme,
+imported by `PrintTemplate.tsx` — Vite ships it with the lazy chunks that print. Its limit:
+the default theme knows no app token, so a sheet may use a token utility only where a screen
+spells it too (`print-template-css.test.ts` fails otherwise). **A split stylesheet's utilities
+go in a layer below `utilities`** (`@import 'tailwindcss/utilities' layer(components)`): it loads
+after the main one, and outside a layer its copies of shared utilities (`w-full`, `flex`) outrank
+every screen's responsive class. Every record drawer filled the viewport, and `flex md:hidden`
+showed on desktop, once a sheet had loaded (the same test pins the layer).
 
 - **Tripwire:** `pnpm build:check` → `tooling/ci/check-css-sources.mjs`. Every raw-palette
   utility in `dist/` must be spelled in non-test `src/` (vendored `ui/` is the legitimate

@@ -1,54 +1,27 @@
-import { lazy, type ReactNode, Suspense } from 'react';
+import type { ReactNode } from 'react';
 
+import { PublicCard, PublicFrame } from '@/shared/components/PublicFrame/index.ts';
 import {
-  loadMinimalAuth,
-  loadSplitAuth,
-  loadSpotlightAuth,
-  preloadAllAuthLayoutVariants,
-} from '@/shared/layouts/AuthLayout/auth-layout-variants.ts';
-import { LayoutVariantFallback } from '@/shared/layouts/LayoutVariantFallback/index.ts';
-import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
-
-// The loaders live in `auth-layout-variants.ts` so the route tree can warm the
-// active variant without importing this layout into the entry chunk.
-const SplitAuth = lazy(() => loadSplitAuth().then((m) => ({ default: m.SplitAuth })));
-const SpotlightAuth = lazy(() =>
-  loadSpotlightAuth().then((m) => ({ default: m.SpotlightAuth })),
-);
-const MinimalAuth = lazy(() =>
-  loadMinimalAuth().then((m) => ({ default: m.MinimalAuth })),
-);
+  AuthControls,
+  AuthForm,
+} from '@/shared/layouts/AuthLayout/AuthLayout.shared.tsx';
 
 interface AuthLayoutProps {
   children: ReactNode;
 }
 
-const AUTH_SHELLS = [SplitAuth, SpotlightAuth, MinimalAuth] as const;
-
-function AuthLayoutShell({
-  variant,
-  children,
-}: {
-  variant: number;
-  children: ReactNode;
-}) {
-  const Shell = AUTH_SHELLS[variant] ?? SplitAuth;
-  return (
-    <Suspense fallback={<LayoutVariantFallback />}>
-      <Shell>{children}</Shell>
-    </Suspense>
-  );
-}
-
 /**
- * Auth layout shell for the sign-in / sign-up surfaces.
- * Variant index comes from the Appearance shuffle (`authVariant`).
+ * The sign-in screen's layout (L-65) — sign-in, MFA and the OAuth hand-off:
+ * the signed-out canvas with the logo where the clinic header will draw it,
+ * the language picker and the theme toggle at the end, and the form in one
+ * 360px card — the design's "Signed out" card (H:515).
  */
 export function AuthLayout({ children }: AuthLayoutProps) {
-  const authVariant = useThemeStore((s) => s.authVariant);
-  return <AuthLayoutShell variant={authVariant}>{children}</AuthLayoutShell>;
+  return (
+    <PublicFrame testId="auth-layout" controls={<AuthControls surface="frame" />}>
+      <PublicCard>
+        <AuthForm>{children}</AuthForm>
+      </PublicCard>
+    </PublicFrame>
+  );
 }
-
-/* eslint-disable react-refresh/only-export-components -- test-facing preload hook */
-export { preloadAllAuthLayoutVariants as preloadAuthLayoutVariants };
-/* eslint-enable react-refresh/only-export-components */

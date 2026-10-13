@@ -16,7 +16,7 @@ vi.mock('@/shared/api/organization-api.ts', () => ({
 
 const CATALOG = [
   { code: 'organization:read', name: 'View Organization', category: 'tenancy' },
-  { code: 'role:manage', name: 'Manage Roles', category: 'tenancy' },
+  { code: 'role:update', name: 'Update Roles', category: 'tenancy' },
   { code: 'organization:delete', name: 'Delete Organization', category: 'tenancy' },
   { code: 'webhook:manage', name: 'Manage Webhooks', category: 'notify' },
 ];
@@ -41,7 +41,7 @@ describe('useAssignablePermissions', () => {
   it('offers only the catalog codes the caller actually holds', async () => {
     listPermissionCatalog.mockResolvedValue(CATALOG);
     useOrganizationStore.setState({
-      permissions: ['organization:read', 'role:manage'],
+      permissions: ['organization:read', 'role:update'],
       permissionsResolved: true,
     });
 
@@ -50,7 +50,7 @@ describe('useAssignablePermissions', () => {
     await waitFor(() => expect(result.current.rows).toHaveLength(2));
     expect(result.current.rows.map((row) => row.code)).toEqual([
       'organization:read',
-      'role:manage',
+      'role:update',
     ]);
     // The code that separates an Admin from an Owner — never offered to a caller without it.
     expect(result.current.rows.map((row) => row.code)).not.toContain(

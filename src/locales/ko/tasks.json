@@ -1,0 +1,593 @@
+{
+  "manifest": {
+    "title": "작업"
+  },
+  "ruleGroups": {
+    "leads": "리드",
+    "appointments": "예약",
+    "feedback": "피드백",
+    "treatments": "시술",
+    "patients": "환자",
+    "team": "팀",
+    "payments": "결제",
+    "medical": "의약"
+  },
+  "rules": {
+    "reply": {
+      "label": "답장하지 않은 메시지",
+      "description": "리드가 메시지를 보냈지만 아무도 답하지 않았습니다",
+      "how": {
+        "first": "오른쪽에서 마지막 메시지를 읽으세요",
+        "second": "가격과 빈 시간 두 개로 답하세요",
+        "third": "하나를 고르면 방문을 예약하세요"
+      },
+      "outcomes": {
+        "bookedVisit": {
+          "label": "방문 예약함",
+          "effect": "예약 양식이 열림 · 리드가 후속 조치로 이동"
+        },
+        "notInterested": {
+          "label": "관심 없음",
+          "effect": "리드 상태 → 관심 없음"
+        },
+        "spamOrWrongNumber": {
+          "label": "스팸 또는 잘못된 번호",
+          "effect": "리드 상태 → 유효하지 않음"
+        }
+      }
+    },
+    "follow": {
+      "label": "리드 후속 조치",
+      "description": "후속 조치 날짜가 되었습니다",
+      "how": {
+        "first": "무엇에 관심이 있었는지 확인하세요",
+        "second": "전화나 WhatsApp으로 부드럽게 연락하세요",
+        "third": "예약하거나 새 후속 조치를 정하거나 리드를 종료하세요"
+      },
+      "outcomes": {
+        "bookedVisit": {
+          "label": "방문 예약함",
+          "effect": "예약 양식이 열림"
+        },
+        "callBackTomorrow": {
+          "label": "내일 다시 전화",
+          "effect": "후속 조치 날짜 → 내일 11:00"
+        },
+        "noAnswer": {
+          "label": "응답 없음",
+          "effect": "통화 기록됨 · 작업 3시간 미룸"
+        },
+        "notInterested": {
+          "label": "관심 없음",
+          "effect": "리드 상태 → 관심 없음"
+        }
+      }
+    },
+    "claim": {
+      "label": "가져갈 수 있는 리드",
+      "description": "담당자가 보류 기간이 지나도록 활동이 없습니다",
+      "how": {
+        "first": "채팅 기록을 확인하세요",
+        "second": "맡을 수 있다면 가져가세요",
+        "third": "아니면 팀에 남겨 두세요"
+      },
+      "outcomes": {
+        "claimIt": {
+          "label": "가져가기",
+          "effect": "내가 담당자가 됨"
+        },
+        "leaveWithOwner": {
+          "label": "담당자에게 두기",
+          "effect": "내일까지 숨김"
+        }
+      }
+    },
+    "failed": {
+      "label": "전달되지 않은 메시지",
+      "description": "공급자가 메시지를 전달하지 못했습니다",
+      "how": {
+        "first": "휴대폰 번호를 확인하세요",
+        "second": "WhatsApp이나 SMS로 다시 보내세요",
+        "third": "다시 실패하면 전화하세요"
+      },
+      "outcomes": {
+        "retrySend": {
+          "label": "다시 보내기",
+          "effect": "같은 채널로 다시 보냄"
+        },
+        "calledInstead": {
+          "label": "대신 전화함",
+          "effect": "통화 기록됨"
+        },
+        "fixTheNumber": {
+          "label": "번호 수정",
+          "effect": "기록을 열어 편집합니다"
+        }
+      }
+    },
+    "confirm": {
+      "label": "방문 확인",
+      "description": "48시간 이내 방문이 아직 확인되지 않았습니다",
+      "automation": "알림을 보내고 “예”라고 답하면 확정",
+      "how": {
+        "first": "알림을 보내거나 다시 보내세요",
+        "second": "저녁까지 답이 없으면 전화하세요",
+        "third": "올 수 없다면 시간을 옮기세요"
+      },
+      "outcomes": {
+        "confirmedOnCall": {
+          "label": "전화로 확인함",
+          "effect": "예약 → 확정"
+        },
+        "moveToAnotherSlot": {
+          "label": "다른 시간으로 변경",
+          "effect": "예약을 열어 일정 변경"
+        },
+        "cancelledByPatient": {
+          "label": "환자가 취소함",
+          "effect": "예약 → 취소 · 시간 비움"
+        },
+        "noAnswer": {
+          "label": "응답 없음",
+          "effect": "통화 기록됨 · 작업 3시간 미룸"
+        }
+      }
+    },
+    "arrive": {
+      "label": "도착 또는 노쇼",
+      "description": "시작 15분이 지나도 체크인하지 않았습니다",
+      "how": {
+        "first": "환자에게 전화하세요",
+        "second": "도착하면 체크인으로 표시하세요",
+        "third": "30분이 지나면 노쇼로 표시하세요"
+      },
+      "outcomes": {
+        "checkedIn": {
+          "label": "체크인함",
+          "effect": "예약 → 체크인"
+        },
+        "runningLate": {
+          "label": "늦는 중",
+          "effect": "작업 30분 미룸"
+        },
+        "noShow": {
+          "label": "노쇼",
+          "effect": "예약 → 노쇼 · 재예약 작업이 이어짐"
+        }
+      }
+    },
+    "rebook": {
+      "label": "노쇼 재예약",
+      "description": "환자가 방문을 놓쳤습니다",
+      "how": {
+        "first": "빈 시간 두 개로 전화나 WhatsApp 연락",
+        "second": "고른 시간으로 예약",
+        "third": "다시 오지 않으면 종료"
+      },
+      "outcomes": {
+        "rebooked": {
+          "label": "재예약함",
+          "effect": "같은 서비스로 예약 양식이 열림"
+        },
+        "willCallBack": {
+          "label": "다시 연락 예정",
+          "effect": "작업을 내일까지 미룸"
+        },
+        "notComingBack": {
+          "label": "다시 오지 않음",
+          "effect": "사유와 함께 종료"
+        }
+      }
+    },
+    "feedback": {
+      "label": "피드백 받기",
+      "description": "어제 방문이 완료되었습니다",
+      "automation": "피드백 양식을 보내고 4–5★이면 종료",
+      "how": {
+        "first": "방문이 어땠는지 물어보세요",
+        "second": "4–5★이면 Google 리뷰를 요청하세요",
+        "third": "다음 회차를 예약하세요"
+      },
+      "outcomes": {
+        "happy": {
+          "label": "만족 · 4–5★",
+          "effect": "리뷰 기록 열기"
+        },
+        "unhappy": {
+          "label": "불만족",
+          "effect": "{{doctor}}의 콜백 작업 생성"
+        },
+        "logCheckIn": {
+          "label": "체크인 기록",
+          "effect": "현재 상태 · 지킨 사항 · 다음 계획"
+        },
+        "sentTheForm": {
+          "label": "양식 보냄",
+          "effect": "내일까지 미룸"
+        }
+      }
+    },
+    "aftercare": {
+      "label": "사후 관리 전화",
+      "description": "시술 후 확인 전화가 필요합니다",
+      "how": {
+        "first": "전화해서 피부 상태를 물어보세요",
+        "second": "사후 관리 수칙을 지켰는지 확인하세요",
+        "third": "답변으로 체크인을 기록하세요"
+      },
+      "outcomes": {
+        "logCheckIn": {
+          "label": "체크인 기록",
+          "effect": "느낌 · 지킨 사항 · 다음 계획"
+        },
+        "doingWell": {
+          "label": "잘 지냄",
+          "effect": "간단한 “좋아짐” 체크인 기록"
+        },
+        "noAnswer": {
+          "label": "응답 없음",
+          "effect": "통화 기록됨 · 3시간 미룸"
+        }
+      }
+    },
+    "unhappy": {
+      "label": "불만족 환자",
+      "description": "환자가 낮은 평점을 남겼거나 불만족했습니다",
+      "how": {
+        "first": "먼저 피드백을 읽으세요",
+        "second": "의사나 매니저가 다시 전화하세요",
+        "third": "필요하면 재진이나 크레딧을 제안하세요"
+      },
+      "outcomes": {
+        "calledResolved": {
+          "label": "전화함 · 해결됨",
+          "effect": "메모와 함께 종료"
+        },
+        "offeredReviewVisit": {
+          "label": "재진 제안함",
+          "effect": "예약 양식이 열림"
+        }
+      }
+    },
+    "nextvisit": {
+      "label": "다음 방문 미정",
+      "description": "방문은 완료되었지만 후속 날짜도 다음 예약도 없습니다",
+      "how": {
+        "first": "의사의 권고를 확인하세요",
+        "second": "다음 방문 시간 두 개를 제안하세요",
+        "third": "아직 준비되지 않았다면 후속 날짜를 정하세요"
+      },
+      "outcomes": {
+        "bookNextVisit": {
+          "label": "다음 방문 예약",
+          "effect": "{{first}} 님의 예약 양식이 열림"
+        },
+        "setFollowUpDate": {
+          "label": "후속 날짜 설정",
+          "effect": "후속 날짜를 오늘부터 2주 뒤로 설정"
+        },
+        "noFollowUpNeeded": {
+          "label": "후속 조치 필요 없음",
+          "effect": "종료 · 시술 완료"
+        }
+      }
+    },
+    "noreply": {
+      "label": "연락이 끊긴 단골 환자",
+      "description": "패키지 잔여 회차가 있는 환자가 30일 넘게 방문하지 않았고 예약도 없습니다",
+      "how": {
+        "first": "패키지와 마지막 방문을 확인하세요",
+        "second": "한 번 전화한 뒤 복귀 혜택을 보내세요",
+        "third": "다시 오지 않으면 종료하세요"
+      },
+      "outcomes": {
+        "callNow": {
+          "label": "지금 전화",
+          "effect": "환자 파일 열기 · 거기서 통화 기록"
+        },
+        "sendOffer": {
+          "label": "혜택 보내기",
+          "effect": "1주일 미룸"
+        },
+        "notComingBack": {
+          "label": "다시 오지 않음",
+          "effect": "사유와 함께 종료"
+        }
+      },
+      "automation": "팀을 위한 재유치 리드 열기"
+    },
+    "manual": {
+      "label": "내가 정한 후속 조치",
+      "description": "다른 작업을 종료한 뒤 예약됨",
+      "how": {
+        "first": "계획한 일을 하세요",
+        "second": "결과를 기록하세요",
+        "third": "필요하면 다음 단계를 정하세요"
+      },
+      "outcomes": {
+        "done": {
+          "label": "완료",
+          "effect": "종료 · 다음 할 일 선택"
+        },
+        "noAnswer": {
+          "label": "응답 없음",
+          "effect": "3시간 미룸"
+        },
+        "bookedVisit": {
+          "label": "방문 예약함",
+          "effect": "예약 양식이 열림"
+        }
+      }
+    },
+    "payment": {
+      "label": "결제 예정",
+      "description": "청구서에 미결제 잔액이 있습니다",
+      "outcomes": {
+        "collectAtCheckout": {
+          "label": "수납 시 받기",
+          "effect": "종료 · 체크아웃 때 받기"
+        },
+        "sendUpiLink": {
+          "label": "UPI 링크 보내기",
+          "effect": "종료 · 채팅에서 링크 보내기"
+        },
+        "called": {
+          "label": "전화함",
+          "effect": "메모와 함께 종료"
+        }
+      },
+      "automation": "WhatsApp으로 결제 알림 보내기"
+    },
+    "settleBy": {
+      "label": "정산할 크레딧",
+      "description": "보류 중인 크레딧의 정산일이 되었습니다",
+      "outcomes": {
+        "done": {
+          "label": "완료",
+          "effect": "종료 · 결제에서 정산"
+        }
+      }
+    },
+    "medicalRepVisit": {
+      "label": "제약 영업 담당자 방문",
+      "description": "제약 영업 담당자 방문이 예정되어 있습니다",
+      "outcomes": {
+        "done": {
+          "label": "완료",
+          "effect": "종료 · 방문은 의약에서 기록"
+        }
+      }
+    }
+  },
+  "snoozeOptions": {
+    "oneHour": "1시간",
+    "threeHours": "3시간",
+    "tomorrow": "내일 10:00",
+    "nextWeek": "다음 주"
+  },
+  "followUpWhen": {
+    "inThreeHours": "3시간 후",
+    "tomorrow": "내일 오전 11시",
+    "inThreeDays": "3일 후",
+    "nextWeek": "다음 주"
+  },
+  "record": "작업",
+  "views": {
+    "label": "작업 보기",
+    "queue": "할 일",
+    "snoozed": "다시 알림",
+    "done": "완료"
+  },
+  "search": {
+    "placeholder": "작업 또는 사람 검색",
+    "label": "작업 검색"
+  },
+  "type": {
+    "label": "작업 유형",
+    "all": "모든 유형",
+    "count_other": "{{count}}개 유형"
+  },
+  "scope": {
+    "label": "범위",
+    "mine": "내 작업",
+    "everyone": "모두"
+  },
+  "rulesPopover": {
+    "button": "규칙",
+    "label": "작업 규칙",
+    "title": "작업이 만들어지는 조건",
+    "description": "{{productName}}이(가) 리드, 예약, 피드백을 지켜보다가 누군가 조치해야 할 때 작업을 만듭니다. 기록이 바뀌면 작업은 자동으로 닫힙니다.",
+    "line": "{{source}} · {{description}}",
+    "handle": "{{productName}}에 맡기기",
+    "handled": "{{productName}}이(가) 처리 중",
+    "readOnly": "소유자 또는 관리자만 이 규칙을 바꿀 수 있습니다"
+  },
+  "primary": {
+    "newTask": "새 작업"
+  },
+  "groups": {
+    "overdue": "기한 지남",
+    "today": "오늘 마감",
+    "later": "예정",
+    "snoozed": "다시 알림",
+    "done": "해결됨"
+  },
+  "row": {
+    "automation": "{{productName}}이(가) 할 수 있음",
+    "anyone": "누구나",
+    "was": "{{name}} · 이전 {{first}}",
+    "result": "✓ {{result}}"
+  },
+  "sources": {
+    "lead": "리드",
+    "appointment": "예약",
+    "treatment": "시술",
+    "patient": "환자",
+    "invoice": "청구서",
+    "contact": "연락처",
+    "checkIn": "체크인",
+    "review": "리뷰",
+    "pendingCredit": "크레딧",
+    "medicalRep": "제약 영업 담당자"
+  },
+  "due": {
+    "snoozed": "다시 알림 · {{label}}",
+    "done": "완료 · {{time}}",
+    "doneNow": "완료 · 방금",
+    "doneByClinozy": "{{productName}}이(가) 완료",
+    "overdue": {
+      "minutes_other": "{{count}}분 지남",
+      "hours_other": "{{count}}시간 지남",
+      "days_other": "{{count}}일 지남"
+    },
+    "soon": {
+      "minutes_other": "{{count}}분 후",
+      "hours_other": "{{count}}시간 후"
+    }
+  },
+  "empty": {
+    "queue": "지금은 처리할 일이 없습니다. 리드가 연락하거나 방문이 다가오거나 피드백이 오면 새 작업이 여기에 표시됩니다.",
+    "snoozed": "다시 알림 작업이 없습니다",
+    "done": "오늘 아직 해결된 작업이 없습니다"
+  },
+  "newTask": {
+    "title": "새 작업",
+    "sub": "{{person}} 대상 · 작업과 이 사람의 타임라인에 표시됩니다",
+    "subNoPerson": "작업에 표시되며, 대상이 있으면 그 사람의 타임라인에도 표시됩니다",
+    "steps": {
+      "what": "할 일",
+      "when": "언제·누가",
+      "how": "방법·메모"
+    },
+    "forField": {
+      "label": "대상",
+      "placeholder": "사람 선택",
+      "search": "이름, 휴대폰 또는 번호로 검색",
+      "empty": "이름, 휴대폰 또는 연락처 번호를 입력하세요"
+    },
+    "titleField": {
+      "label": "제목",
+      "placeholder": "할 일",
+      "fallback": "후속 연락 · {{first}}",
+      "missing": "제목을 입력하거나 작업 대상을 선택하세요"
+    },
+    "due": {
+      "label": "기한",
+      "today": "오늘 오후 5시",
+      "tomorrow": "내일 오전 11시",
+      "inThreeDays": "3일 후",
+      "nextWeek": "다음 주",
+      "date": "기한 날짜",
+      "time": "기한 시간"
+    },
+    "owner": {
+      "label": "담당자 지정",
+      "missing": "담당자를 선택하세요"
+    },
+    "priority": {
+      "label": "우선순위",
+      "normal": "보통",
+      "high": "높음"
+    },
+    "notes": {
+      "label": "작업 메모",
+      "placeholder": "메모(선택)"
+    },
+    "footer": "↔ {{person}}",
+    "save": "작업 추가",
+    "added": "{{owner}}에게 작업 추가됨 · {{due}}"
+  },
+  "assignee": {
+    "you": "{{name}} (나)"
+  },
+  "drawer": {
+    "sub": "{{productName}}이(가) 만듦 · {{rule}}",
+    "assignedTo": "담당자",
+    "sections": {
+      "what": "1 · 무엇",
+      "how": "2 · 방법",
+      "close": "3 · 이렇게 마무리 · 다음 할 일 선택"
+    },
+    "quote": "“{{message}}”",
+    "source": {
+      "appointment": "예약 열기",
+      "lead": "리드 열기",
+      "treatment": "시술 열기",
+      "patient": "환자 열기",
+      "invoice": "청구서 열기",
+      "checkIn": "체크인 열기",
+      "review": "리뷰 열기"
+    },
+    "tiles": {
+      "visit": "방문",
+      "service": "서비스",
+      "doctor": "의사",
+      "status": "상태",
+      "treatment": "시술",
+      "doneOn": "시술일",
+      "session": "회차",
+      "therapist": "치료사",
+      "source": "유입 경로",
+      "interestedIn": "관심 항목",
+      "owner": "담당",
+      "mobile": "휴대폰"
+    },
+    "tileValues": {
+      "visit": "{{day}} · {{time}} · {{minutes}}분",
+      "session": "#{{number}}"
+    },
+    "outcomeNote": {
+      "label": "결과 메모",
+      "placeholder": "결과에 메모 추가(선택)"
+    },
+    "snooze": "다시 알림",
+    "assigned": "담당",
+    "assignTip": "이 작업을 다른 사람에게 넘기기",
+    "searchTeam": "팀 검색",
+    "was": "이전 {{names}}",
+    "close": "닫기",
+    "subByHand": "직접 추가함",
+    "assignGroups": {
+      "team": "팀",
+      "queues": "역할별 대기열"
+    },
+    "deleteTitle": "이 작업을 삭제할까요?"
+  },
+  "toasts": {
+    "closed": "{{title}} · {{result}}",
+    "snoozed": "다시 알림 · {{label}}",
+    "claimed": "이제 {{name}} 담당입니다",
+    "moved": "{{title}} → {{name}}",
+    "removed": "{{title}} 삭제됨",
+    "alreadyClosed": "이 작업은 이미 종료되었습니다",
+    "claimNeedsLeads": "리드를 가져오려면 리드 편집 권한이 필요합니다. 소유자나 관리자에게 요청하세요",
+    "reassignNeedsLeads": "리드의 작업을 옮기려면 리드 편집 권한이 필요합니다. 소유자나 관리자에게 요청하세요"
+  },
+  "whatsNext": {
+    "title": "{{first}} 님의 다음 할 일은?",
+    "sub": "완료 · {{title}} · {{result}}",
+    "section": "다음 작업",
+    "step": {
+      "label": "다음 단계",
+      "callAgain": "다시 전화",
+      "sendWhatsApp": "WhatsApp 보내기",
+      "bookVisit": "방문 예약",
+      "collectPayment": "결제 받기",
+      "sendOffer": "오퍼 보내기"
+    },
+    "when": "언제",
+    "owner": "담당자",
+    "note": {
+      "label": "메모",
+      "placeholder": "예: 필링 가격 문의"
+    },
+    "nothingNext": "다음 없음",
+    "create": "작업 만들기",
+    "pickStep": "다음 단계를 선택하세요",
+    "pickWhen": "언제인지 선택하세요",
+    "created": "다음 작업 설정됨 · {{step}} · {{when}}",
+    "taskTitle": "{{step}} · {{first}}",
+    "plannedAfter": "다음 후 계획: {{after}}",
+    "titleNoPerson": "다음은 무엇인가요?"
+  }
+}

@@ -1,33 +1,27 @@
 import { cn } from '@/lib/utils.ts';
 
 /**
- * Appearance-studio surfaces — always use theme CSS vars (`--radius-*`) so mode
- * tiles, language pickers, and option pills track the active corner-radius axis.
+ * The Appearance drawer's selectable tiles in the launch's language — named
+ * radius steps, so the mode tiles and the language rows track the corner-radius
+ * scale.
  */
 
-/** Large selectable tile (mode cards, language rows). */
+/** Large selectable tile (mode cards, language rows): the settings card's frame. */
 export const appearanceTileClassName =
-  'bg-background relative border text-start transition-all outline-none focus-visible:outline-hidden rounded-[var(--radius-lg)]';
+  'bg-card relative rounded-xl border text-start transition-[background-color,border-color,box-shadow] duration-150 outline-none focus-visible:outline-hidden';
 
-export const appearanceTileActiveClassName = 'border-primary ring-primary/20 ring-2';
-export const appearanceTileIdleClassName = 'border-border hover:border-primary/50';
+/** The picked tile: the ink edge a picked chip carries (`preset.md:64`). */
+export const appearanceTileActiveClassName = 'border-foreground ring-foreground ring-1';
+export const appearanceTileIdleClassName = 'border-border hover:bg-canvas';
 
-/** Compact option pill (presets, formats, axis choices). */
-export const appearanceChoiceClassName =
-  'border px-3 py-1.5 text-sm transition-colors outline-none focus-visible:outline-hidden rounded-[var(--radius-md)]';
-
-/** Mode card — column layout with padding. */
+/** Mode card — column layout on a step card's padding. */
 export const appearanceModeCardClassName = cn(
   appearanceTileClassName,
-  'flex flex-col items-start gap-2 p-4',
+  'flex flex-col items-start gap-2 p-(--step-pad)',
 );
 
 /** Language / compact row tile. */
 export const appearanceRowTileClassName = cn(
   appearanceTileClassName,
-  'flex items-center justify-between gap-2 px-3 py-2.5 text-sm',
+  'text-body flex items-center justify-between gap-2 px-3 py-2.5',
 );
-
-/** Preview / icon sample well. */
-export const appearancePreviewWellClassName =
-  'bg-muted/40 flex items-center justify-center gap-4 rounded-[var(--radius-lg)] border border-dashed px-4 py-3';

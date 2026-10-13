@@ -4,8 +4,11 @@ import userEvent from '@testing-library/user-event';
 import type { ReactElement } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type { OrganizationPermission } from '@/core/rbac/policies.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
+
+import type * as UsersRoomLinkModule from './UsersRoomLink.tsx';
 
 /**
  * The panel schedules its deferred removal through the query cache now, so it
@@ -36,6 +39,13 @@ vi.mock('@/shared/hooks/useRoles/index.ts', () => ({
     deleteRoleOptions.push(options);
     return { mutate: deleteMutateSync, mutateAsync: deleteMutate };
   },
+}));
+// The Users room's link has its own suite; here only which surface the panel shows.
+vi.mock('./UsersRoomLink.tsx', async (importOriginal) => ({
+  ...(await importOriginal<typeof UsersRoomLinkModule>()),
+  UsersRoomLink: ({ section }: { section: string }) => (
+    <p data-testid={`users-room-link-${section}`}>{section}</p>
+  ),
 }));
 // CreateRoleDialog has its own suite; here we only assert the panel renders it
 // (create trigger + controlled edit instance), so stub it to reflect its mode.
@@ -123,7 +133,7 @@ function setCanManage(value: boolean) {
   });
   useOrganizationStore.setState({
     organizationType: value ? 'TEAM' : 'PERSONAL',
-    permissions: value ? ['role:manage'] : [],
+    permissions: value ? ['role:create', 'role:update', 'role:delete'] : [],
     // These tests stand in for a session whose guard chain has ANSWERED; the
     // unresolved case has its own test below (SET-23).
     permissionsResolved: true,
@@ -147,6 +157,37 @@ async function confirmDeletion(user: ReturnType<typeof userEvent.setup>) {
   await user.click(await screen.findByTestId('role-delete-rol_1'));
   await user.click(await screen.findByTestId('confirm-accept'));
 }
+
+/** A resolved TEAM session holding exactly these codes. */
+function holdCodes(permissions: OrganizationPermission[]) {
+  useAuthStore.setState({
+    user: { id: 'u', email: 'a@b.test', role: 'user' },
+    isAuthenticated: true,
+  });
+  useOrganizationStore.setState({
+    organizationType: 'TEAM',
+    permissions,
+    permissionsResolved: true,
+  });
+}
+
+describe('OrganizationRolesPanel — the Users room (D17)', () => {
+  it('links into Roles & access when the member can open the Users room', () => {
+    holdCodes(['membership:read', 'role:read', 'role:update']);
+    render(<OrganizationRolesPanel />);
+    expect(screen.getByTestId('users-room-link-roles')).toBeInTheDocument();
+    expect(screen.queryByTestId('roles-list')).toBeNull();
+    expect(useRolesMock).not.toHaveBeenCalled();
+  });
+
+  it('keeps the roles list for a member the room is shut to — no membership:read', () => {
+    useRolesMock.mockReturnValue(rolesQueryResult({ rows: [CUSTOM_ROLE] }));
+    holdCodes(['role:read', 'role:update']);
+    render(<OrganizationRolesPanel />);
+    expect(screen.queryByTestId('users-room-link-roles')).toBeNull();
+    expect(screen.getByTestId('roles-list')).toBeInTheDocument();
+  });
+});
 
 describe('OrganizationRolesPanel', () => {
   it('shows an empty state when there are no roles', () => {
@@ -177,7 +218,25 @@ describe('OrganizationRolesPanel', () => {
     expect(screen.queryByTestId('role-actions-rol_owner')).not.toBeInTheDocument();
   });
 
-  it('hides actions without the manage-roles permission', () => {
+  it('offers Edit only with role:update and Delete only with role:delete', async () => {
+    useRolesMock.mockReturnValue(rolesQueryResult({ rows: [CUSTOM_ROLE] }));
+    holdCodes(['role:read', 'role:delete']);
+    const user = userEvent.setup();
+    const { unmount } = render(<OrganizationRolesPanel />);
+    await user.click(screen.getByTestId('role-actions-rol_1'));
+    expect(await screen.findByTestId('role-delete-rol_1')).toBeInTheDocument();
+    expect(screen.queryByTestId('role-edit-rol_1')).not.toBeInTheDocument();
+    unmount();
+
+    holdCodes(['role:read', 'role:update']);
+    render(<OrganizationRolesPanel />);
+    await user.click(screen.getByTestId('role-actions-rol_1'));
+    expect(await screen.findByTestId('role-edit-rol_1')).toBeInTheDocument();
+    expect(screen.queryByTestId('role-delete-rol_1')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('role-create-open')).not.toBeInTheDocument();
+  });
+
+  it('hides actions without the role codes', () => {
     useRolesMock.mockReturnValue(rolesQueryResult({ rows: [CUSTOM_ROLE] }));
     setCanManage(false);
     render(<OrganizationRolesPanel />);
@@ -205,7 +264,7 @@ describe('OrganizationRolesPanel', () => {
     expect(screen.getByTestId('role-create-open')).toBeInTheDocument();
   });
 
-  it('hides the New role button without role:manage', () => {
+  it('hides the New role button without role:create', () => {
     useRolesMock.mockReturnValue(rolesQueryResult({ rows: [SYSTEM_ROLE] }));
     setCanManage(false);
     render(<OrganizationRolesPanel />);
@@ -220,7 +279,12 @@ describe('OrganizationRolesPanel', () => {
 
     await confirmDeletion(user);
 
-    await waitFor(() => expect(deleteMutate).toHaveBeenCalledWith('rol_1'));
+    await waitFor(() =>
+      expect(deleteMutate).toHaveBeenCalledWith({
+        roleId: 'rol_1',
+        reason: 'not_needed',
+      }),
+    );
     // Through `mutateAsync` only — `mutate` returns void and cannot be awaited.
     expect(deleteMutateSync).not.toHaveBeenCalled();
   });

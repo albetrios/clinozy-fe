@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { toPaginated } from './pagination.ts';
+import { pageOf, toPaginated } from './pagination.ts';
 
 describe('toPaginated', () => {
   it('maps meta.pagination into a UI page descriptor', () => {
@@ -42,6 +42,34 @@ describe('toPaginated', () => {
     expect(toPaginated(res)).toEqual({
       items: [],
       pageInfo: { perPage: 0, next: null, hasMore: false, estimatedTotal: undefined },
+    });
+  });
+});
+
+describe('pageOf', () => {
+  it('reads the cursor and the estimated total of a page with more to come', () => {
+    const pagination = {
+      per_page: 2,
+      next: 'cur_2',
+      has_more: true,
+      estimated_total: 10,
+    };
+    expect(pageOf(pagination)).toEqual({ next: 'cur_2', total: 10 });
+  });
+
+  it('drops a stray cursor on the last page', () => {
+    expect(pageOf({ next: 'cur_2', has_more: false })).toEqual({
+      next: null,
+      total: null,
+    });
+  });
+
+  it('reads null for a missing cursor, total or pagination block', () => {
+    expect(pageOf({ has_more: true })).toEqual({ next: null, total: null });
+    expect(pageOf(undefined)).toEqual({ next: null, total: null });
+    expect(pageOf({ has_more: false, estimated_total: 0 })).toEqual({
+      next: null,
+      total: 0,
     });
   });
 });

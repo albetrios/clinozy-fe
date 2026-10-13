@@ -34,3 +34,34 @@ export function toPaginated<T>(res: { data: T[]; meta?: ResponseMeta }): Paginat
     },
   };
 }
+
+/**
+ * The `meta.pagination` fields a cursor page reads — loose on purpose, so a
+ * typed `api` response and a hand-shaped one both fit.
+ */
+export interface CursorPaginationMeta {
+  has_more?: boolean;
+  next?: string | null;
+  estimated_total?: number;
+}
+
+/** A cursor page's forward cursor and the server's count, as {@link pageOf} reads them. */
+export interface CursorPageInfo {
+  /** The next page's cursor while `has_more` says there is one; `null` on the last page. */
+  next: string | null;
+  /** `estimated_total` — how many rows the list matches; `null` when the page does not say. */
+  total: number | null;
+}
+
+/**
+ * Read a list response's `meta.pagination` as a cursor page's `{ next, total }`:
+ * the cursor only while `has_more` is true (a stray `next` on the last page is
+ * ignored), and the server's estimated count or `null`. The one mapping every
+ * keyset list fetcher shares; {@link toPaginated} keeps the full descriptor.
+ */
+export function pageOf(pagination: CursorPaginationMeta | undefined): CursorPageInfo {
+  return {
+    next: pagination?.has_more ? (pagination.next ?? null) : null,
+    total: pagination?.estimated_total ?? null,
+  };
+}

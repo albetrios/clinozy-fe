@@ -1,0 +1,191 @@
+{
+  "manifest": {
+    "title": "Leads"
+  },
+  "record": "Lead",
+  "toasts": {
+    "created": "Lead {{id}} created",
+    "saved": "Lead saved",
+    "statusChanged": "{{name}} → {{status}}",
+    "claimed": "You now own {{name}} · {{owner}} stays involved",
+    "claimedUnowned": "You now own {{name}}",
+    "released": "Released to the team · anyone can claim",
+    "assigned": "{{name}} is now assigned · notified"
+  },
+  "list": {
+    "records": "leads",
+    "views": {
+      "label": "Lead views",
+      "mine": "Mine",
+      "unreplied": "Unreplied",
+      "all": "All",
+      "unrepliedCount_one": "{{count}} unreplied",
+      "unrepliedCount_other": "{{count}} unreplied"
+    },
+    "search": {
+      "placeholder": "Search name, phone, #ID",
+      "label": "Search leads"
+    },
+    "newLead": "New lead",
+    "columns": {
+      "lead": "Lead",
+      "status": "Status",
+      "source": "Source",
+      "interests": "Interested in",
+      "team": "Team",
+      "updated": "Updated"
+    },
+    "empty": "No leads match",
+    "clearFilters": "Clear filters",
+    "moreInterests_one": "{{count}} more: {{list}}",
+    "moreInterests_other": "{{count}} more: {{list}}"
+  },
+  "team": {
+    "claim": "Open · Claim",
+    "openHint": "Nobody holds it · anyone can claim it",
+    "openMine": "Open to team",
+    "openMineHint": "Your hold has ended · anyone can claim it",
+    "releasesToday": "Back to the team today at {{time}}",
+    "releasesTomorrow": "Back to the team tomorrow at {{time}}",
+    "claimFirst": "Claim {{first}}",
+    "takeOver": "Take over from {{first}}"
+  },
+  "filters": {
+    "status": "Status",
+    "source": "Source · pick any",
+    "clear": "Clear",
+    "hold": {
+      "label": "Ownership · held after a claim",
+      "any": "Any",
+      "open": "Open to claim",
+      "soon": "Releasing today",
+      "held": "Held"
+    },
+    "team": {
+      "label": "Team · assigned or involved",
+      "anyone": "Anyone on the team",
+      "count_one": "{{count}} person",
+      "count_other": "{{count}} people",
+      "search": "Search team",
+      "noMatch": "No match"
+    }
+  },
+  "drawer": {
+    "title": "Edit lead",
+    "sub": "Make your changes, then Save lead",
+    "idTooltip": "Lead #{{seq}} · created {{created}} · click to copy",
+    "idAria": "Copy lead ID #{{seq}}",
+    "idCopied": "Lead ID #{{seq}} copied",
+    "retarget": "Re-target",
+    "panels": "Lead panels",
+    "details": "Details",
+    "chat": "Chat",
+    "resize": "Resize panel",
+    "resizeHint": "Drag to resize · double-click to reset",
+    "cards": {
+      "details": "Lead details",
+      "progress": "Progress",
+      "info": "Info"
+    },
+    "source": "Source",
+    "interests": "Interested in",
+    "people": "Assigned & involved",
+    "peopleAria": "Assigned and involved people",
+    "addInvolved": "+ Add involved",
+    "claim": "Claim",
+    "release": "Release",
+    "releaseHint": "Let anyone on the team take it",
+    "progressAria": "Lead progress",
+    "steps": {
+      "done": "Done",
+      "current": "Current",
+      "next": "Next"
+    },
+    "stepTips": {
+      "done": "{{status}} · completed",
+      "current": "{{status}} · current step",
+      "next": "Move to {{status}}",
+      "byCheckIn": "Clinic visited · set when they check in"
+    },
+    "closeAs": "Close as",
+    "info": {
+      "created": "Created",
+      "lastActivity": "Last activity",
+      "none": "None yet",
+      "patient": "Patient",
+      "linked": "Linked",
+      "notYet": "Not yet",
+      "openTasks": "Open tasks",
+      "retargetReason": "Re-target reason"
+    },
+    "footer": {
+      "remove": "Remove lead",
+      "discard": "Discard",
+      "save": "Save lead"
+    },
+    "popover": {
+      "title": "People on this lead",
+      "search": "Search team",
+      "assignedTo": "Assigned to · who handles this lead now",
+      "assign": "Assign",
+      "assigned": "Assigned",
+      "currentlyAssigned": "Currently assigned",
+      "assignTo": "Assign to {{name}}",
+      "involved": "Involved · worked on this lead",
+      "noMatch": "No match",
+      "note": "✓ Involved = everyone who worked on this lead. Added automatically when they reply, call, note or book · you can add someone too"
+    },
+    "remove": {
+      "title": "Remove this lead?",
+      "effect": "The lead leaves every list and the owner’s queue. Chat history is kept. You can undo from the toast right after.",
+      "reasons": {
+        "duplicate": "Duplicate",
+        "testEntry": "Test entry",
+        "spam": "Spam",
+        "other": "Other"
+      },
+      "removed": "Lead #{{seq}} removed · {{reason}}"
+    }
+  },
+  "newLead": {
+    "title": "New lead",
+    "sub": "Name and mobile are enough to start",
+    "contact": "Contact",
+    "search": "Search by name or mobile",
+    "searchAria": "Search existing patient or contact",
+    "quickStart": "Quick start",
+    "presets": {
+      "walkIn": "Walk-in",
+      "instagramDm": "Instagram DM"
+    },
+    "presetHints": {
+      "walkIn": "At the desk now · source Walk-in",
+      "instagramDm": "DM on Instagram"
+    },
+    "hits": {
+      "patient": "Patient · {{id}} · {{phone}}",
+      "contact": "{{id}} · {{phone}}",
+      "openLead": "Open lead · {{id}} · {{phone}}",
+      "open": "Open lead",
+      "recreate": "Re-create lead",
+      "useContact": "Use contact"
+    },
+    "noMatch": "No existing match",
+    "more_one": " · +{{count}} more",
+    "more_other": " · +{{count}} more",
+    "change": "Change",
+    "changeTitle": "Pick a different contact",
+    "afterContact": "After contact",
+    "detailsSummary": "Source, interest and who handles it",
+    "footer": "Creates or updates one contact",
+    "create": "Create lead",
+    "toasts": {
+      "pickFirst": "Pick or add the contact first",
+      "presetApplied": "{{preset}} preset applied",
+      "existingPatient": "Existing patient {{id}} · new lead will be linked",
+      "existingContact": "Using existing contact {{name}}",
+      "missing": "Add a name and a 10-digit mobile",
+      "open": "Open"
+    }
+  }
+}

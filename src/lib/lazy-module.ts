@@ -66,11 +66,14 @@ function peekModule<T>(load: () => Promise<T>): T | undefined {
  * which is why those buttons did nothing (SHELL-3). {@link onceAsync} clears the
  * cached *import* promise; this clears the cached *component*. Both are needed.
  *
- * @param load - Import thunk, ideally wrapped in {@link onceAsync}.
+ * @param load - Import thunk, ideally wrapped in {@link onceAsync}; its
+ *   component's props are the lazy component's.
  * @returns The current lazy component and a `retry` that builds a fresh one.
  */
-export function useRetryableLazy(load: () => Promise<{ default: ComponentType }>): {
-  Component: ComponentType;
+export function useRetryableLazy<P extends object>(
+  load: () => Promise<{ default: ComponentType<P> }>,
+): {
+  Component: ComponentType<P>;
   retry: () => void;
 } {
   const [attempt, setAttempt] = useState(0);

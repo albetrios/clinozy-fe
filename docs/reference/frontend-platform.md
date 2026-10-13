@@ -91,7 +91,7 @@ gateway(requireSession, requirePermissionGate(...), requireModuleGate(...))
 ```
 
 Protected routes in `routeTree.tsx` call `gatewayFromManifest` where the island
-declares RBAC/module policy (e.g. dashboard). Org-scoped tenancy gates
+declares RBAC/module policy (e.g. a clinic room). Org-scoped tenancy gates
 (`resolveActiveOrg`, `requireOrgStatus`, …) run **before** or **after** per route
 needs — see [`GUARDS.OVERVIEW.md`](../../src/app/guards/GUARDS.OVERVIEW.md).
 
@@ -107,11 +107,28 @@ resolve to `notFound()` (404).
 Deployment env `VITE_DISABLED_MODULES` (comma-separated) disables feature
 surfaces. Manifest `module` keys must match this catalog:
 
-| Key            | Surfaces (today / planned)                                               |
-| -------------- | ------------------------------------------------------------------------ |
-| `billing`      | Dashboard reference manifest; settings billing panel; subscription hooks |
-| `members`      | Members resource registry reference; settings members panel              |
-| `integrations` | Settings integrations panel (planned)                                    |
+| Key            | Surfaces (today / planned)                                  |
+| -------------- | ----------------------------------------------------------- |
+| `billing`      | Settings billing panel; subscription hooks                  |
+| `members`      | Members resource registry reference; settings members panel |
+| `integrations` | Settings integrations panel (planned)                       |
+
+The clinic rooms carry one key each (`APP_MODULES`, `src/core/config/app-modules.ts`).
+The `app-` prefix is the rooms' code name — the word clinozy-be uses for the same
+records (`/api/v1/app/…`, schema `app`); the screens still say "clinic".
+
+| Key                | Room (its routes and nav entry)                            |
+| ------------------ | ---------------------------------------------------------- |
+| `app-today`        | Today                                                      |
+| `app-leads`        | Leads                                                      |
+| `app-appointments` | Appointments                                               |
+| `app-patients`     | Patients and the patient file                              |
+| `app-medical`      | Medical — still on fixtures, so production must disable it |
+| `app-stock`        | Clinic stock                                               |
+| `app-payments`     | Payments and invoices                                      |
+| `app-tasks`        | Tasks                                                      |
+| `app-offerings`    | Offerings                                                  |
+| `app-users`        | Users (Team, Roles & access, Branches)                     |
 
 UI should hide nav/settings entries via `isModuleEnabled()` when a module is
 off — routes still 404 via the gateway if linked directly.
@@ -155,7 +172,11 @@ write path for API calls.
   `HTTP.MAX_RETRY_AFTER_MS` (5 s) surfaces the error instead, as a 429's does.
 - Users should not lose in-progress **local** drafts: onboarding uses
   `useUnsavedChangesGuard` + persisted `useOnboardingStore`; settings panels
-  register dirty state via `SettingsDirtyProvider`.
+  register dirty state via `SettingsDirtyProvider`. The record drawer
+  (`shared/components/RecordDrawer/`) routes every exit of a dirty drawer — ×,
+  Cancel, backdrop, Esc — through the guard's `confirmDiscard`, and the browser
+  Back through its route blocker, so all of them ask "Discard changes?" first;
+  while a save runs every exit is held.
 
 Do not silently drop failed writes — show error + retry affordance.
 
@@ -201,8 +222,8 @@ See **`docs/reference/cross-browser-support.md`** and **`docs/reference/tools-an
 ## Observability (Sentry)
 
 Production error monitoring is wired whenever **`VITE_SENTRY_DSN` is set**
-(`.env.local` for local QA, Netlify/GitHub for deploys). **Not** consent-gated
-(unlike PostHog). Sentry env: **`local`** in `pnpm dev`, **`production`** on deploy.
+(`.env.local` for local QA, Netlify/GitHub for deploys). Error reports are **not**
+consent-gated; session replay and profiling are, like PostHog (D161). Sentry env: **`local`** in `pnpm dev`, **`production`** on deploy.
 
 | Layer                      | Location                                       | Sentry product                 |
 | -------------------------- | ---------------------------------------------- | ------------------------------ |
@@ -211,19 +232,19 @@ Production error monitoring is wired whenever **`VITE_SENTRY_DSN` is set**
 | Route boundary             | `app/routes/ErrorBoundary.tsx` → `reportError` | Issues                         |
 | Query/mutation failures    | `core/http/queryClient.ts`                     | Issues + query/mutation extras |
 | Router + fetch tracing     | TanStack + `httpClientIntegration`             | Performance                    |
-| Session replay + profiling | prod integrations only                         | Replays, Profiles              |
+| Session replay + profiling | only with the analytics consent (D161)         | Replays, Profiles              |
 | Web Vitals (poor only)     | `app/observability/performance.ts`             | Issues (warning)               |
 | Source maps                | `vite.config.ts` + CI secrets                  | Releases                       |
 
 Full data catalog, env vars, local verification, and Sentry project checklist:
 **[`docs/integrations/sentry-frontend.md`](../integrations/sentry-frontend.md)**.
-PostHog + web-vitals analytics remain consent-gated; Sentry is not. Full PostHog
+PostHog, web-vitals and Sentry's replay and profiling are consent-gated; error reports are not. Full PostHog
 event catalog: **[`docs/integrations/posthog-frontend.md`](../integrations/posthog-frontend.md)**.
 
 ---
 
 Use `shared/components/QueryBoundary` for **server-state panels** (settings
-sections, dashboard widgets) that depend on TanStack Query:
+sections) that depend on TanStack Query:
 
 1. **Wrap the query at the panel boundary** — parent holds `useQuery` / hook;
    child render-prop receives typed `data`.
@@ -237,14 +258,15 @@ sections, dashboard widgets) that depend on TanStack Query:
    uses `errors` namespace.
 
 Migrated panels: `OrganizationMembersPanel`, `OrganizationRolesPanel`,
-`AccountBillingPanel`, `OrganizationGeneralPanel`, dashboard widgets.
+`AccountBillingPanel`, `OrganizationGeneralPanel`.
 
 ---
 
 ## Loading Contract
 
 Settings, appearance, and search keep their ready shell and static controls
-visible. Skeletons belong only to unavailable dynamic content and reserve the
+visible (a drawer that loads on demand shows its own frame — title, sub line,
+card bars — while its chunk is in flight). Skeletons belong only to unavailable dynamic content and reserve the
 space that content will occupy. Existing content stays visible during refetch;
 unknown authentication or permission state must not expose actionable controls.
 

@@ -2,13 +2,15 @@ import { expect, test } from '@playwright/test';
 
 import {
   completeOnboardingWizard,
-  createTeamOrgViaSwitcher,
+  createTeamOrgAndOpenToday,
+  createTeamOrgViaApi,
+  establishSessionInPage,
   loginViaEmailCodeUI,
   navigateInApp,
-  registerNewUserAndGoToDashboard,
+  registerNewUserAndGoToToday,
 } from '@/tests/utils/e2e-auth.ts';
+import { e2eOrganizationSlug } from '@/tests/utils/e2e-faker.ts';
 import {
-  byTestId,
   clickTestId,
   expectAppHeaderReady,
   expectLoginFormReady,
@@ -33,13 +35,17 @@ test.describe('Product journeys', () => {
     );
   });
 
-  test('onboarding wizard completes and lands on dashboard', async ({ page }) => {
+  test('onboarding wizard completes and lands in the workspace', async ({ page }) => {
     requireDatabaseUrl();
     await loginViaEmailCodeUI(page, uniqueE2eEmail('onboard-ui'));
     if (page.url().includes('/onboarding')) {
       await completeOnboardingWizard(page);
     }
-    await expect(page.getByTestId('dashboard-page')).toBeVisible({ timeout: 15000 });
+    // Team-only: the clinic the wizard made, on its owner's role home (Today).
+    // Personal workspaces on: the organization picker — no clinic yet (D44).
+    await expect(
+      page.getByTestId('today-page').or(page.getByTestId('organization-page')),
+    ).toBeVisible({ timeout: 15000 });
   });
 
   test('accept invite happy path joins team org', async ({ page, playwright }) => {
@@ -72,18 +78,7 @@ test.describe('Product journeys', () => {
       const inviteeSession = await createSessionViaEmailCode(inviteeApi, inviteeEmail);
 
       await gotoApp(page, '/login');
-      await page.waitForFunction(
-        () => globalThis.__clinozyFeEstablishSession != null,
-        null,
-        {
-          timeout: 10_000,
-        },
-      );
-      await page.evaluate(async (token) => {
-        const establish = globalThis.__clinozyFeEstablishSession;
-        if (!establish) throw new Error('__clinozyFeEstablishSession missing');
-        await establish(token);
-      }, inviteeSession.accessToken);
+      await establishSessionInPage(page, inviteeSession.accessToken);
 
       await navigateInApp(
         page,
@@ -92,10 +87,12 @@ test.describe('Product journeys', () => {
       await expect(page.getByTestId('accept-invite-success')).toBeVisible({
         timeout: 15000,
       });
-      await expect(page).toHaveURL(new RegExp(`/organization/${orgSlug}/dashboard`), {
-        timeout: 20000,
-      });
-      await expect(page.getByTestId('dashboard-page')).toBeVisible();
+      // The clinic's home, which sends the member on to their role home.
+      await expect(page).toHaveURL(
+        new RegExp(`/organization/${orgSlug}(?:/[^/?#]+)?(?:[?#]|$)`),
+        { timeout: 20000 },
+      );
+      await expect(page.getByTestId('app-layout')).toBeVisible();
     } finally {
       await ownerApi.dispose();
       await inviteeApi.dispose();
@@ -119,29 +116,66 @@ test.describe('Product journeys', () => {
     await expectLoginFormReady(page);
   });
 
-  test('suspended page renders for authenticated team member', async ({ page }) => {
-    await registerNewUserAndGoToDashboard(page);
-    const switcher = byTestId(page, 'organization-switcher-trigger');
-    test.skip(!(await switcher.isVisible()), 'org switcher hidden');
-    const { slug } = await createTeamOrgViaSwitcher(page);
-    await navigateAuthenticated(page, `/organization/${slug}/suspended`);
+  /**
+   * A member of a SUSPENDED organization is held on its blocked page. clinozy-be
+   * suspends an organization itself (a lapsed plan, an admin) — nothing a local run
+   * can trigger — so the three answers that carry the status (the workspace list the
+   * org guard resolves the slug from, the switch into it, and me/context) say what
+   * they would then say. An active organization's `…/suspended` sends the member
+   * back instead (`org-lifecycle.e2e.test.ts`).
+   */
+  test('suspended page renders for a member of a suspended team organization', async ({
+    page,
+  }) => {
+    await registerNewUserAndGoToToday(page);
+    // The answers say "suspended" from the moment the organization exists. The org
+    // guard reads the workspace list cache-first, and the app may read it as soon as
+    // the organization is created — so the routes go in first, then the create.
+    const slug = e2eOrganizationSlug();
+    type OrgWire = { slug?: string | null; status?: string };
+    const suspend = (org: OrgWire | null | undefined) => {
+      if (org?.slug === slug) org.status = 'SUSPENDED';
+    };
+    await page.route('**/api/v1/users/me/organizations*', async (route) => {
+      const response = await route.fetch();
+      const body = (await response.json()) as { data?: OrgWire[] };
+      body.data?.forEach(suspend);
+      await route.fulfill({ response, json: body });
+    });
+    for (const path of ['auth/me/context', 'auth/switch-to-organization']) {
+      await page.route(`**/api/v1/${path}`, async (route) => {
+        const response = await route.fetch();
+        const body = (await response.json()) as {
+          data?: { active_organization?: OrgWire | null };
+        };
+        suspend(body.data?.active_organization);
+        await route.fulfill({ response, json: body });
+      });
+    }
+    await createTeamOrgViaApi(page, { slug });
+
+    // The clinic's home runs the status guard before it picks a room.
+    await navigateAuthenticated(page, `/organization/${slug}`);
+    await expect(page).toHaveURL(new RegExp(`/organization/${slug}/suspended`), {
+      timeout: 15000,
+    });
     await expect(page.getByTestId('suspended-page')).toBeVisible({ timeout: 10000 });
     await expect(page.getByTestId('suspended-switch-organization')).toBeVisible();
   });
 
   test('logout clears session and blocks protected routes', async ({ page }) => {
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
     await expectAppHeaderReady(page);
     await page.getByTestId('user-menu-trigger').click();
     await clickTestId(page, 'logout-button');
     await expect(page).toHaveURL(/\/login/, { timeout: 10000 });
     await expectLoginFormReady(page);
-    await navigateInApp(page, '/dashboard');
+    await navigateInApp(page, '/organization');
     await expect(page).toHaveURL(/\/login/, { timeout: 10000 });
   });
 
   test('settings account and organization section smoke matrix', async ({ page }) => {
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
 
     const accountSections: Array<{ section: string; panel: string }> = [
       { section: 'profile', panel: 'settings-section-profile' },
@@ -154,23 +188,18 @@ test.describe('Product journeys', () => {
       await expect(page.getByTestId(panel)).toBeVisible({ timeout: 10000 });
     }
 
-    // The modal's overlay (correctly) swallows clicks on the shell behind it, so
-    // leave settings before reaching for the switcher. Not with Escape: closing
-    // is `history.back()`, and each deep link above PUSHED an entry, so one
-    // Escape only steps back to the previous section. (In-app section switches
-    // `replace`, which is why a real user needs just one.) Drop the hash instead.
+    // Leave settings before entering the new organization. Not with Escape:
+    // closing is `history.back()`, and each deep link above PUSHED an entry, so
+    // one Escape only steps back to the previous section. (In-app section
+    // switches `replace`, which is why a real user needs just one.) Drop the
+    // hash instead.
     const withoutHash = new URL(page.url());
     withoutHash.hash = '';
     await page.goto(withoutHash.toString());
     await expect(page.getByTestId('settings-modal')).toHaveCount(0);
-    // `isVisible()` below is an instantaneous feature check, not a wait — make
-    // sure the shell is back first, or a slow paint reads as "no switcher" and
-    // the rest of this test skips without anyone noticing.
     await expectAppHeaderReady(page);
 
-    const switcher = byTestId(page, 'organization-switcher-trigger');
-    test.skip(!(await switcher.isVisible()), 'org switcher hidden');
-    await createTeamOrgViaSwitcher(page);
+    await createTeamOrgAndOpenToday(page);
 
     // Regression: deep-linking to an organization section the instant the org
     // exists used to land on Account · Profile. Entering an org clears the store's
@@ -193,7 +222,7 @@ test.describe('Product journeys', () => {
   test('account settings nav tour switches sections via nav clicks and syncs the URL', async ({
     page,
   }) => {
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
     await openSettingsHash(page, 'account', 'profile');
     await expect(page.getByTestId('settings-section-profile')).toBeVisible({
       timeout: 10000,
@@ -217,7 +246,7 @@ test.describe('Product journeys', () => {
   test('the active settings nav item is marked with aria-current=page', async ({
     page,
   }) => {
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
     await openSettingsHash(page, 'account', 'security');
 
     await expect(page.getByTestId('settings-nav-account-security')).toHaveAttribute(

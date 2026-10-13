@@ -38,9 +38,34 @@ The current-session state itself (the `user` + `isAuthenticated`) lives in `src/
   (falls back to in-tab dedupe where Web Locks is unavailable).
 - Why it matters: the backend rotates refresh sessions with reuse-detection — two parallel
   refreshes look like token theft and kill the whole session. Never add a second caller.
-- A failed refresh means the session is gone: callers run `forceLogout()`, which clears
-  local auth state, broadcasts logout to every tab via `auth-channel.ts`, and hard-redirects
-  to `/login`.
+- clinozy-be keeps **one live access token per session**: a refresh, a workspace switch
+  (`shared/tenancy/switch.ts`) or another tab's refresh retires the token before it. So a
+  refresh that waited for the lock while a newer token arrived **does not rotate again** (it
+  would retire the token the app now carries), and the 401 handler replays a request whose
+  token was replaced while it was in flight with the current token instead of refreshing.
+  Only a refused refresh, or a token still rejected after two refreshes, ends the session.
+- That one token also names **one organization** — the one the session was last switched to.
+  Another tab's switch (or a switch of this tab whose answer was lost) makes the refresh answer
+  with a token for that other organization. Inside the refresh lock, a tab whose `me/context`
+  names a different organization switches back before the token is set
+  (`onThisTabsOrganization`): carried, it would read and write the other clinic's records under
+  this tab's screen. A refused switch-back hands the tab to the `/` resolver; one with no answer
+  fails the request as unreachable. The org store is not the source — before `me/context` it
+  holds the URL's placeholder. And a workspace switch waits for a refresh already in flight
+  (`settleInFlightRefresh`), so the refresh's later answer cannot put the left workspace back.
+- A refresh the server **refused** (401/403) means the session is gone: callers run
+  `forceLogout()`, which clears local auth state, broadcasts logout to every tab via
+  `auth-channel.ts`, and hard-redirects to `/login`.
+- A refresh that got **no usable answer** — offline, timed out (`HTTP.REFRESH_TIMEOUT`, 5 s),
+  throttled (429) or a server fault (5xx) — says nothing about the session. It is retried
+  **once** after 600 ms, inside clinozy-be's 10-second grace for the just-superseded refresh
+  secret (a lost answer may already have rotated the cookie); a second retry could land outside
+  that grace and read as a replay, which revokes every session of the user. If the retry is
+  unanswered too, `isRefreshUnanswered()` is true and the 401 handler fails the request as
+  unreachable (status 0) **without** signing anyone out. At boot the same goes for `me/context`
+  unreachable, throttled or failing: the bootstrap is not settled as signed out — the next guard
+  to wait on it (the `/login` page's) asks again, and lands the visitor back in the app once the
+  server answers.
 
 ## Ending a session: `logout()` vs `forceLogout()`
 
@@ -51,12 +76,12 @@ anybody out.
   broadcasts to sibling tabs and redirects to `/login` — and leaves the HttpOnly
   refresh cookie valid. Called for a session that is still alive, `/login` boots,
   the silent refresh succeeds, and the guest-only guard sends the user straight
-  back to the dashboard. It is right only when the server session is **already
+  back into the app. It is right only when the server session is **already
   gone**: a dead session in the fetch client, a deleted account, or the tail of
   `logout()` itself.
 - **`logout({ reason })` is the ONE way to end a live session.** It dispatches
   the revoke (`POST /auth/logout` with the bearer) and calls `forceLogout()`
-  **without waiting for it**. The user menu, the command palette, **the
+  **without waiting for it**. The Account menu, the command palette, **the
   idle-timeout dialog (its button AND its deadline) and the absolute session
   cap** all go through it. `reason` (`logout` · `idle_timeout` ·
   `session_expired`) only labels the `session_ended` analytics event. It is
@@ -121,10 +146,13 @@ suite that mocks the timer cannot see bug 1 — it lived _between_ the two modul
 
 `core/` is reserved for framework-agnostic _platform_ services that don't know about React or any specific app concern. Auth has app-specific knowledge (the API shape, the user shape) and needs to be reachable by every layer:
 
-- `core/http/fetch-client` — reads the token on every request; on 401 it awaits the
-  shared `refreshAccessToken()` and calls `forceLogout()` for dead sessions
+- `core/http/fetch-client` — reads the token on every request; on 401 it replays with the
+  current token when it was replaced in flight, else awaits the shared `refreshAccessToken()`,
+  and calls `forceLogout()` for dead sessions
 - `shared/components/SessionTimeoutDialog` — reads auth state, runs the idle timer + the
-  absolute cap, and ends the session through `logout()` (never `forceLogout()` alone)
+  absolute cap, and ends the session through `logout()` (never `forceLogout()` alone);
+  the warning sits in the confirm frame every confirm shares (`ConfirmPanel`: the end
+  panel from `md`, the bottom sheet below) with no × — nothing but its two buttons answers it
 - `shared/components/PermissionGuard` — reads `isAuthenticated`
 - Most pages — call `login()`, `logout()`, read user
 

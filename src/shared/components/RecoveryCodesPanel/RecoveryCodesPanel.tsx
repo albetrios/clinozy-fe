@@ -106,7 +106,7 @@ export function RecoveryCodesPanel({
 
       <ul
         className={cn(
-          'bg-muted grid grid-cols-2 gap-2 rounded-md p-3 font-mono text-sm tabular-nums',
+          'bg-canvas text-detail grid grid-cols-2 gap-2 rounded-lg border p-3 font-mono tabular-nums',
           !revealed && 'blur-sm select-none',
         )}
         data-testid="mfa-recovery-codes"
@@ -117,7 +117,9 @@ export function RecoveryCodesPanel({
         ))}
       </ul>
 
-      <p className="text-muted-foreground text-xs">{t(keys.clipboardNotice)}</p>
+      <p className="text-muted-foreground text-xs leading-[1.45]">
+        {t(keys.clipboardNotice)}
+      </p>
 
       <div className="flex items-start gap-2">
         <Checkbox
@@ -126,7 +128,7 @@ export function RecoveryCodesPanel({
           onCheckedChange={(checked) => setSavedAck(checked === true)}
           data-testid={`${testId}-ack`}
         />
-        <Label htmlFor={`${testId}-ack`} className="text-sm leading-snug font-normal">
+        <Label htmlFor={`${testId}-ack`} className="text-body leading-snug font-normal">
           {t(keys.acknowledge)}
         </Label>
       </div>

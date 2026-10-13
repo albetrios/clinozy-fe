@@ -13,8 +13,11 @@
     "goHome": "होम पर जाएँ",
     "refresh": "पृष्ठ रीफ़्रेश करें",
     "forbidden": "आपके पास इस पेज तक पहुँचने की अनुमति नहीं है।",
+    "forbiddenTitle": "इस पेज तक पहुँच नहीं है",
     "signOut": "साइन आउट",
-    "signingOut": "साइन आउट हो रहा है…"
+    "signingOut": "साइन आउट हो रहा है…",
+    "pageNotFound": "पेज नहीं मिला",
+    "recordNotFound": "{{record}} नहीं मिला · शायद इसे हटा दिया गया है"
   },
   "widget": {
     "unavailable": "{{title}} अनुपलब्ध",
@@ -25,19 +28,12 @@
     "pageContent": "पृष्ठ सामग्री",
     "navigation": "नेविगेशन",
     "emailBanner": "ईमेल सत्यापन",
-    "notifications": "सूचनाएँ",
     "organizationSwitcher": "संगठन स्विचर",
     "commandPalette": "कमांड पैलेट",
     "settings": "सेटिंग्स",
     "appearance": "दिखावट",
-    "analytics": "एनालिटिक्स",
-    "members": "सदस्य",
-    "schedule": "शेड्यूल",
-    "highlights": "मुख्य बातें",
-    "themeShowcase": "थीम शोकेस",
     "sessionTimeout": "सत्र टाइमर",
     "securityCheck": "सुरक्षा जाँच",
-    "appearanceControls": "दिखावट नियंत्रण",
     "payment": "भुगतान",
     "cancellation": "रद्दीकरण"
   },
@@ -45,17 +41,7 @@
     "dismiss": "सूचना खारिज करें",
     "undo": "पूर्ववत",
     "undone": "क्रिया रद्द",
-    "processing": "प्रसंस्करण…",
-    "preview": {
-      "successTitle": "परिवर्तन सहेजे गए",
-      "successDescription": "आपकी सेटिंग्स लाइव हैं।",
-      "errorTitle": "कुछ गलत हो गया",
-      "errorDescription": "कृपया फिर कोशिश करें।",
-      "warningTitle": "ध्यान दें",
-      "warningDescription": "इस क्रिया की समीक्षा आवश्यक है।",
-      "infoTitle": "क्या आप जानते हैं?",
-      "infoDescription": "शफ़ल भी इस डिज़ाइन को बदलता है।"
-    }
+    "processing": "प्रसंस्करण…"
   },
   "api": {
     "fallback": "कुछ गलत हो गया। कृपया फिर कोशिश करें।",
@@ -69,7 +55,21 @@
     "http429": "बहुत अधिक अनुरोध। कृपया थोड़ी प्रतीक्षा करें और फिर कोशिश करें।",
     "http500": "एक आंतरिक सर्वर त्रुटि हुई। कृपया बाद में फिर कोशिश करें।",
     "http502": "सर्वर अस्थायी रूप से अनुपलब्ध है। कृपया बाद में फिर कोशिश करें।",
-    "http503": "सेवा अस्थायी रूप से अनुपलब्ध है। कृपया बाद में फिर कोशिश करें।"
+    "http503": "सेवा अस्थायी रूप से अनुपलब्ध है। कृपया बाद में फिर कोशिश करें।",
+    "reload": "फिर से लोड करें",
+    "recordChanged": "इस बीच किसी और ने इसे सहेज लिया। उनके बदलाव देखने के लिए फिर से लोड करें, फिर अपने बदलाव दोबारा करें।",
+    "reasons": {
+      "missingPermission": "आपको यह करने की अनुमति नहीं है। क्लिनिक के मालिक या किसी एडमिन से कहें।",
+      "ownerMembershipFixed": "क्लिनिक के मालिक की भूमिकाएँ और स्थिति नहीं बदली जा सकतीं। पहले स्वामित्व स्थानांतरित करें।",
+      "ownerCannotLeave": "क्लिनिक का मालिक क्लिनिक नहीं छोड़ सकता। पहले स्वामित्व स्थानांतरित करें।",
+      "ownerRoleFixed": "क्लिनिक के मालिक की भूमिका की पहुँच नहीं बदली जा सकती।",
+      "systemRoleFixed": "पहले से तय भूमिका का नाम बदला या हटाया नहीं जा सकता।",
+      "roleLocked": "इस भूमिका की पहुँच तय है और बदली नहीं जा सकती।",
+      "seatLimitReached": "आपके प्लान में कोई खाली सीट नहीं है। सेटिंग्स › बिलिंग में सीट जोड़ें, फिर दोबारा आमंत्रित करें।",
+      "membershipAlreadyExists": "यह व्यक्ति पहले से क्लिनिक में है।",
+      "organizationSlugExists": "यह वर्कस्पेस URL पहले से लिया जा चुका है। कोई दूसरा चुनें।",
+      "disposableEmail": "स्थायी ईमेल पता इस्तेमाल करें — अस्थायी पते स्वीकार नहीं किए जाते।"
+    }
   },
   "frontend": {
     "query": {
@@ -91,12 +91,7 @@
     },
     "account": {
       "copyFailed": "क्लिपबोर्ड पर कॉपी नहीं हो सका",
-      "themeCodeNumeric": "एक संख्यात्मक थीम कोड दर्ज करें",
       "copySuccess": "खाता ID कॉपी किया गया",
-      "themeLinkCopied": "थीम लिंक कॉपी किया गया",
-      "themeLinkCopiedDescription": "दिखावट दोहराने के लिए यह URL साझा करें।",
-      "notificationStylePreview": "सूचना शैली",
-      "notificationStylePreviewDescription": "{{variant}} — आपके एक्सेंट और सिमेंटिक रंगों के साथ।",
       "accountDeletionPending": "खाता हटाया गया। साइन आउट हो रहा है…",
       "avatarInvalidType": "कृपया एक छवि फ़ाइल चुनें।",
       "avatarTooLarge": "अवतार 2 MB से कम होना चाहिए।",
@@ -122,7 +117,8 @@
         "updateRoleSuccess": "सदस्य भूमिका अपडेट की गई",
         "removeSuccess": "सदस्य हटाया गया",
         "suspendSuccess": "सदस्य निलंबित",
-        "reactivateSuccess": "सदस्य पुनः सक्रिय"
+        "reactivateSuccess": "सदस्य पुनः सक्रिय",
+        "updateSuccess": "सदस्य सहेजा गया"
       },
       "roles": {
         "createFailed": "भूमिका बनाई नहीं जा सकी",

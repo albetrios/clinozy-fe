@@ -424,7 +424,7 @@ the reset, in the same `beforeEach`, and type them with `import type * as X`
 **Observe what was fetched through the loader, not through the mock factory.** A
 `vi.mock` factory runs once per registry, so a spy inside it stops counting after the
 first test. For `onceAsync` loaders assert on `loader.peek()` instead
-(`app-layout-variants.test.ts`).
+(`appearance-panel-loader.test.ts`).
 
 **A CSS contract is tested by reading the stylesheet.** jsdom resolves neither
 `@theme` nor `calc()`. For rules that live in `index.css` (token scales, `[data-*]`

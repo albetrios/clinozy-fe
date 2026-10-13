@@ -17,6 +17,6 @@ When the user asks to change app name, favicon, PWA icons, `theme_color`,
 
 **Do not** hand-edit manifest JSON without updating `buildWebManifest()` — the drift test will fail CI.
 
-**Colors** must stay aligned with the default preset (`#ffffff` background, `#0a0a0a` theme/shell).
+**Colors** must stay aligned with the default preset (`#ffffff` background, `#18181b` theme/shell — the product mark's tile).
 
-**Icons:** Lucide Boxes on `#0a0a0a` tile; regenerate PNGs with `rsvg-convert`, not `sips`.
+**Icons:** the product mark (`ProductMark`) on its `#18181b` tile; regenerate PNGs with `rsvg-convert`, not `sips`.

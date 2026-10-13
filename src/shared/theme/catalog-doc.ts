@@ -1,30 +1,9 @@
 /**
- * Doc-sync assertions for theme catalogs — built from the same constants as
- * Appearance / Shuffle (`presets.ts`). `pnpm validate:theme-catalog` reads this.
+ * Doc-sync assertions for the theme — what the theming docs must say about the
+ * app's one look, and what they must no longer describe as live now that the
+ * Appearance studio is retired. `pnpm validate:theme-catalog` reads this.
  */
-import {
-  ACCENT_COLORS,
-  ACCENT_INTENSITIES,
-  BASE_COLORS,
-  CONTRAST_MODES,
-  DENSITY_SCALES,
-  ELEVATION_LEVELS,
-  FOCUS_RINGS,
-  GENERATED_FONTS,
-  GENERATED_RADII,
-  HARMONY_RULES,
-  ICON_COLORS,
-  ICON_LIBRARIES,
-  ICON_WEIGHTS,
-  MENU_STYLES,
-  MOTION_PRESETS,
-  SEPARATION_STRATEGIES,
-  SHAPE_LANGUAGES,
-  THEME_PRESETS,
-  TOAST_POSITIONS,
-  TOAST_VARIANTS,
-  TYPE_SCALES,
-} from './presets.ts';
+import { THEME_ID } from './presets.ts';
 
 interface DocAssertion {
   label: string;
@@ -32,118 +11,27 @@ interface DocAssertion {
   mustExclude?: readonly string[];
 }
 
-function ids<const T extends readonly { id: string }[]>(items: T): string[] {
-  return items.map((item) => item.id);
-}
-
-function recordKeys(rec: Record<string, { label: string }>): string[] {
-  return Object.keys(rec);
-}
-
-/** Canonical option ids per axis — single source for doc validation. */
-export const CATALOG_OPTION_IDS = {
-  namedPresets: ids(THEME_PRESETS),
-  accentColors: ids(ACCENT_COLORS),
-  baseColors: ids(BASE_COLORS),
-  menuStyles: ids(MENU_STYLES),
-  iconWeights: ids(ICON_WEIGHTS),
-  iconColors: ids(ICON_COLORS),
-  iconLibraries: ids(ICON_LIBRARIES),
-  radii: recordKeys(GENERATED_RADII),
-  fonts: recordKeys(GENERATED_FONTS),
-  density: recordKeys(DENSITY_SCALES),
-  motion: recordKeys(MOTION_PRESETS),
-  elevation: ids(ELEVATION_LEVELS),
-  contrast: ids(CONTRAST_MODES),
-  harmony: recordKeys(HARMONY_RULES),
-  intensity: recordKeys(ACCENT_INTENSITIES),
-  separation: ids(SEPARATION_STRATEGIES),
-  shape: ids(SHAPE_LANGUAGES),
-  typeScale: recordKeys(TYPE_SCALES),
-  focus: ids(FOCUS_RINGS),
-  toastVariants: [...TOAST_VARIANTS],
-  toastPositions: [...TOAST_POSITIONS],
-} as const;
+/**
+ * The retired studio's machinery, by the names a doc would have to use to
+ * describe it as live: the shared-look link, the store's shuffle and seed, the
+ * generated preset.
+ */
+const RETIRED_STUDIO = ['?theme=', 'shuffleTheme', 'applyThemeSeed', 'GENERATED_PRESET'];
 
 /** @public Loaded by tooling/validate/theme-catalog.mjs through a computed import. */
 export const THEME_DOC_ASSERTIONS: Record<string, DocAssertion[]> = {
   'docs/reference/theming.md': [
     {
-      label: 'base colours',
-      mustInclude: CATALOG_OPTION_IDS.baseColors,
-    },
-    {
-      label: 'menu styles',
-      mustInclude: CATALOG_OPTION_IDS.menuStyles,
-    },
-    {
-      label: 'elevation',
-      mustInclude: CATALOG_OPTION_IDS.elevation,
-    },
-    {
-      label: 'contrast',
-      mustInclude: CATALOG_OPTION_IDS.contrast,
-      mustExclude: ['default, high'],
-    },
-    {
-      label: 'separation',
-      mustInclude: CATALOG_OPTION_IDS.separation,
-    },
-    {
-      label: 'shape',
-      mustInclude: CATALOG_OPTION_IDS.shape,
-    },
-    {
-      label: 'density',
-      mustInclude: CATALOG_OPTION_IDS.density,
-      mustExclude: ['compact, default, airy'],
-    },
-    {
-      label: 'motion',
-      mustInclude: CATALOG_OPTION_IDS.motion,
-      mustExclude: ['default, fluid'],
-    },
-    {
-      label: 'type scale',
-      mustInclude: CATALOG_OPTION_IDS.typeScale,
-    },
-    {
-      label: 'focus ring',
-      mustInclude: CATALOG_OPTION_IDS.focus,
-    },
-    {
-      label: 'toast variants',
-      mustInclude: CATALOG_OPTION_IDS.toastVariants,
-    },
-    {
-      label: 'harmony',
-      mustInclude: CATALOG_OPTION_IDS.harmony,
-    },
-    {
-      label: 'accent intensity',
-      mustInclude: CATALOG_OPTION_IDS.intensity,
-    },
-    {
-      label: 'icon colour',
-      mustInclude: CATALOG_OPTION_IDS.iconColors,
+      label: 'the one look',
+      mustInclude: [THEME_ID, 'data-theme', 'theme-init.js'],
+      mustExclude: RETIRED_STUDIO,
     },
   ],
   'docs/reference/design.md': [
     {
-      label: 'accent catalog',
-      mustInclude: CATALOG_OPTION_IDS.accentColors,
-    },
-    {
-      label: 'base tint',
-      mustInclude: ['neutral', 'stone', 'slate', 'zinc', 'warm', 'olive'],
-    },
-    {
-      label: 'menu styles',
-      mustInclude: ['translucent', 'glass'],
-    },
-    {
-      label: 'appearance axes',
-      mustInclude: ['density', 'motion', 'elevation', 'harmony', 'intensity'],
+      label: 'the one look',
+      mustInclude: [THEME_ID],
+      mustExclude: RETIRED_STUDIO,
     },
     {
       label: 'catalog source of truth',
@@ -152,16 +40,9 @@ export const THEME_DOC_ASSERTIONS: Record<string, DocAssertion[]> = {
   ],
   'docs/reference/theme-axis-audit-playbook.md': [
     {
-      label: 'base colours',
-      mustInclude: CATALOG_OPTION_IDS.baseColors,
-    },
-    {
-      label: 'elevation',
-      mustInclude: CATALOG_OPTION_IDS.elevation,
-    },
-    {
-      label: 'contrast',
-      mustInclude: CATALOG_OPTION_IDS.contrast,
+      label: 'the one look',
+      mustInclude: [THEME_ID],
+      mustExclude: RETIRED_STUDIO,
     },
   ],
 };

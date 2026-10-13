@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 
 import { cn } from '@/lib/utils.ts';
-import { Card, CardContent } from '@/shared/components/ui/card.tsx';
 import { AlertCircle } from '@/shared/icons/index.ts';
 
 interface FormErrorProps {
@@ -17,7 +16,10 @@ interface FormErrorProps {
 }
 
 /**
- * Standalone error display for non-field errors (API errors, general form errors).
+ * Standalone error display for non-field errors (API errors, general form errors):
+ * the design's "danger soft" — `destructive-tint` with `destructive` text and a
+ * `destructive-border` hairline, 8px corners, 13px copy (`preset.md` Status and
+ * soft fills). Flat: an inline message, not a card, so it casts no shadow.
  */
 export function FormError({
   message,
@@ -28,19 +30,17 @@ export function FormError({
   if (!message) return null;
 
   return (
-    <Card
+    <div
       data-testid={dataTestId ?? 'form-error'}
       className={cn(
-        'border-destructive/20 bg-destructive/10 text-destructive gap-0 py-0 shadow-none',
+        'border-destructive-border bg-destructive-tint text-destructive text-body flex flex-wrap items-center gap-x-2 gap-y-1 rounded-lg border px-3 py-2.5',
         className,
       )}
       role="alert"
     >
-      <CardContent className="flex flex-wrap items-center gap-x-2 gap-y-1 px-4 py-3 text-sm">
-        <AlertCircle className="h-4 w-4 shrink-0" />
-        <span>{message}</span>
-        {action}
-      </CardContent>
-    </Card>
+      <AlertCircle className="size-4 shrink-0" aria-hidden="true" />
+      <span className="min-w-0 flex-1 text-pretty">{message}</span>
+      {action}
+    </div>
   );
 }

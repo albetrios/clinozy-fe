@@ -3,7 +3,7 @@ import i18n from '@/lib/i18n/i18n.ts';
 import { AppError } from '@/shared/errors/AppError.ts';
 import { isHttpError } from '@/shared/errors/HttpError.ts';
 import { resolveKnownFrontendError } from '@/shared/errors/map-frontend-error.ts';
-import { notify } from '@/shared/notify/index.ts';
+import { notify, type NotifyOptions } from '@/shared/notify/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
@@ -157,10 +157,12 @@ export function mapApiError(error: unknown): string {
  * Toast a user-facing error through the single `notify` surface, with the
  * message run through {@link mapApiError}. Used by the global query/mutation
  * error handlers (opt-in via `meta.notifyOnError`) and any catch site that wants
- * the standard wording without re-deriving it.
+ * the standard wording without re-deriving it. The options are the toast's own
+ * (`id`, `action`, `duration`, …), handed to `notify.error` unchanged — and
+ * none at all when none are given, so the call keeps its one-argument shape.
  */
-export function notifyError(error: unknown, opts?: { id?: string | number }): void {
-  notify.error(mapApiError(error), opts);
+export function notifyError(error: unknown, ...opts: [opts?: NotifyOptions]): void {
+  notify.error(mapApiError(error), ...opts);
 }
 
 /**
@@ -170,16 +172,29 @@ export function notifyError(error: unknown, opts?: { id?: string | number }): vo
  * swapped for an error card without reflowing the header around a control the
  * user is mid-reach for. One toast says the same thing beside it and moves
  * nothing, and its action re-runs the query that failed, so the message is
- * something the user can act on rather than just read (X-1).
+ * something the user can act on rather than just read (X-1). A caller with its
+ * own copy for the failure passes `message` (and `retryLabel`); the error is
+ * then not read.
  */
 export function notifyQueryError(
   error: unknown,
-  opts: { id: string; onRetry: () => void },
+  opts: {
+    id: string;
+    onRetry: () => void;
+    /** The toast's own words instead of the mapped error — a room list's "Couldn’t load this list". */
+    message?: string;
+    /** How long the toast stays, in ms; the error default when omitted. */
+    duration?: number;
+    /** The action's label; the errors namespace's retry when omitted. */
+    retryLabel?: string;
+  },
 ): void {
-  notify.error(mapApiError(error), {
+  notify.error(opts.message ?? mapApiError(error), {
     id: opts.id,
+    ...(opts.duration !== undefined && { duration: opts.duration }),
     action: {
-      label: i18n.t(ERRORS_KEYS.frontend.query.retry, { ns: ERRORS_NS }),
+      label:
+        opts.retryLabel ?? i18n.t(ERRORS_KEYS.frontend.query.retry, { ns: ERRORS_NS }),
       onClick: opts.onRetry,
     },
   });

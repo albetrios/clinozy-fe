@@ -308,9 +308,7 @@ function validateForms() {
 
       const hasSubmit =
         new RegExp(`${testIdAttr}submit`, 'i').test(content) ||
-        new RegExp(`${testIdAttr}(signIn|dashboard|continue|action)`, 'i').test(
-          content,
-        ) ||
+        new RegExp(`${testIdAttr}(signIn|continue|action)`, 'i').test(content) ||
         content.includes(`"${slug}-submit"`) ||
         content.includes(`'${slug}-submit'`);
 
@@ -324,6 +322,17 @@ function validateForms() {
   }
 }
 
+/**
+ * A shell surface drawn through a shared component that forwards its `testId`
+ * prop to `data-testid` — the Settings drawer is a `RecordDrawer` (L-65).
+ */
+function fileForwardsTestId(filePath, testId) {
+  const content = readText(filePath);
+  return (
+    content.includes(`testId="${testId}"`) || content.includes(`testId={'${testId}'}`)
+  );
+}
+
 function validateShellContracts() {
   const contracts = [
     {
@@ -332,7 +341,7 @@ function validateShellContracts() {
       rule: 'app-layout',
     },
     {
-      file: 'src/shared/layouts/AuthLayout/variants/AuthLayoutSplit.tsx',
+      file: 'src/shared/layouts/AuthLayout/AuthLayout.tsx',
       testId: 'auth-layout',
       rule: 'auth-layout',
     },
@@ -347,7 +356,7 @@ function validateShellContracts() {
     const full = join(ROOT, file);
     const rel = relative(ROOT, full);
     if (isAllowlisted(rel, rule)) continue;
-    if (!fileUsesTestId(full, testId, [])) {
+    if (!(fileUsesTestId(full, testId, []) || fileForwardsTestId(full, testId))) {
       fail(`${rel}: missing required shell data-testid="${testId}"`);
     }
   }

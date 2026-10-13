@@ -1,16 +1,18 @@
 import { cn } from '@/lib/utils.ts';
-import { type LayoutWidthId, normalizeLayoutWidthId } from '@/shared/theme/presets.ts';
+
+/** The main column's widths a deployment can force (`VITE_LAYOUT_WIDTH`). */
+export type LayoutWidthId = 'contained' | 'full' | 'reading';
 
 /**
- * Effective layout width: deploy env wins when `forced` is set; otherwise user
- * preference from {@link useThemeStore}.
+ * The launch's width — the one look was designed edge to edge for the clinic's
+ * wide tables. No longer a per-user preference: the Appearance studio that set
+ * it is retired.
  */
-export function resolveEffectiveLayoutWidth(
-  forced: LayoutWidthId | null,
-  preference: string | undefined,
-): LayoutWidthId {
-  if (forced !== null) return forced;
-  return normalizeLayoutWidthId(preference);
+export const LAUNCH_LAYOUT_WIDTH: LayoutWidthId = 'full';
+
+/** Effective layout width: the deployment's forced width, else the launch's. */
+export function resolveEffectiveLayoutWidth(forced: LayoutWidthId | null): LayoutWidthId {
+  return forced ?? LAUNCH_LAYOUT_WIDTH;
 }
 
 /** Tailwind classes for the inner wrapper inside `#main-content`. */
@@ -24,5 +26,3 @@ export function layoutMainClassName(width: LayoutWidthId): string {
     width === 'reading' && 'mx-auto max-w-3xl',
   );
 }
-
-export type { LayoutWidthId };

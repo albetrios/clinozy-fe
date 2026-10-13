@@ -173,7 +173,7 @@ Every directory under `src/pages/` that corresponds to a frontend URL path **mus
 
 **The rule in five lines (read this first):**
 
-1. **`src/pages/` mirrors the URL tree 1:1.** `/login` → `pages/login/`; `/organization/acme/dashboard` → `pages/organization/$organizationSlug/dashboard/`. Children nest **directly** (no `sub-pages/` bucket); dynamic segments are `$param` folders — except a **param-only leaf**, which owns the param in its route path instead of a `$param/` folder (`accept-invite/` owns `/accept-invite/$invitationId` flat because the parent segment has no page of its own). Exceptions: `/` is a pure resolver route (redirect only, no island); app-shell routes with no feature island — `/unauthorized`, the `$` 404 splat (`UnauthorizedPage`/`NotFoundPage`), and the personal-mode `/dashboard` shell (deployment-mode split, reuses the org dashboard island) — live in `src/app/routes/`, not `src/pages/`.
+1. **`src/pages/` mirrors the URL tree 1:1.** `/login` → `pages/login/`; `/organization/acme/today` → `pages/organization/$organizationSlug/today/`. Children nest **directly** (no `sub-pages/` bucket); dynamic segments are `$param` folders — except a **param-only leaf**, which owns the param in its route path instead of a `$param/` folder (`accept-invite/` owns `/accept-invite/$invitationId` flat because the parent segment has no page of its own). Exceptions: `/` is a pure resolver route (redirect only, no island), and so is the retired `/dashboard` (a redirect to `/`); app-shell routes with no feature island — `/unauthorized` and the `$` 404 splat (`UnauthorizedPage`/`NotFoundPage`) — live in `src/app/routes/`, not `src/pages/`.
 2. **Every page folder maintains the same 4 files** — `<page>.route.tsx`, `<page>.manifest.ts`, `<Page>Page.tsx` (or `Layout`), `<PAGE>.OVERVIEW.md` — plus 2 registrations: `routeTree.tsx` and `docs/reference/routes-and-ui.md`. In `$param` folders the prefix derives mechanically: strip `$`, kebab-case (`$organizationSlug/` → `organization-slug.route.tsx`, `ORGANIZATION_SLUG.OVERVIEW.md`).
 3. **Page shells live in `shared/layouts/`** — AuthLayout via the pathless `auth-shell` route; AppLayout via the `pages/organization/$organizationSlug/` layout island (the org guard boundary). No grouping directories under `pages/`.
 4. **Code used by 2+ page islands lives in `shared/`** (e.g. `shared/api/auth-api.ts`, `shared/tenancy/`).
@@ -199,10 +199,10 @@ src/pages/
     ├── OrganizationPickerPage.tsx
     └── $organizationSlug/             ← /organization/acme — org guard boundary
         ├── organization-slug.route.tsx     ($param folder → strip-$ kebab prefix)
-        ├── organization-slug.manifest.ts       kind: 'layout', children: [dashboard, suspended]
+        ├── organization-slug.manifest.ts       kind: 'layout', children: [suspended, today, …]
         ├── OrganizationLayout.tsx        mounts shared AppLayout
         ├── ORGANIZATION_SLUG.OVERVIEW.md
-        ├── dashboard/               ← …/dashboard — full island (api, contracts, hooks/, components/)
+        ├── today/                   ← …/today — full island; the role home for most roles (D25)
         ├── suspended/               ← …/suspended — status-guard target
         └── patients/                ← (example) future islands nest directly: patients/$patientId/…
 ```
@@ -299,9 +299,12 @@ src/shared/
 ├── hooks/
 │   ├── use<X>/                      # cross-page custom hooks — folder-per-unit
 │   └── useList/, useOne/, useCreate/, useUpdate/, useDelete/   # standard CRUD hooks
-├── layouts/<Name>/                  # AuthLayout, AppLayout, PublicLayout, LayoutVariantFallback
+├── layouts/<Name>/                  # AuthLayout, AppLayout, PublicLayout
 ├── api/                             # cross-page API helpers (auth, organization, billing, mfa,
 │                                    #   passkeys, sessions, webhooks, notifications) — plain modules
+│   └── app/                         # the clinic rooms' contracts + fetchers (clinozy-be /api/v1/app/*)
+├── app/                             # the clinic rooms' shared layer (sections, tones, keys) — not src/app/;
+│                                    #   `app` is the rooms' code name everywhere (fe-file-structure.mdc)
 ├── auth/                            # auth runtime (token, refresh-timer, idle-timeout, service, captcha)
 ├── tenancy/                         # URL-driven org context, membership, resolver, deployment-mode
 ├── icons/                           # icon registry (import from @/shared/icons, never lucide-react)
@@ -337,7 +340,7 @@ Family-shared is importable by the parent island and its descendants only — ne
 - Use `type` imports for type-only imports: `import type { User } from './types.ts'`
 - **Icons:** import from `@/shared/icons/index.ts` — never `lucide-react` directly (eslint-enforced; vendored `components/ui/` is exempt). One-file icon-library swap.
 - **Heavy deferred modules** (`@sentry/react`, `posthog-js`, the SettingsModal/CommandPalette trees) are **dynamic-import only** — a single static import drags their chunk onto the first-paint preload path (`pnpm build:check` tripwires this).
-- **`routeTree.tsx` IS the entry chunk.** A surface the root route mounts exports **only its lazy shell** from its barrel (`SettingsModalLazy`, `AppearanceDialogLazy`, `ConsentBannerLazy`), and an entry-resident module never imports a large constants table for a few keys — declare them locally and pin them with a drift test. Attribution method + the other levers: `agent-os/skills/fe-bundle-performance/SKILL.md`.
+- **`routeTree.tsx` IS the entry chunk.** A surface the root route mounts exports **only its lazy shell** from its barrel (`SettingsModalLazy`, `AppearanceDialogLazy`, `ConsentBannerLazy`), and an entry-resident module never imports a large constants table for a few keys — declare them locally and pin them with a drift test. A URL-driven dialog route never imports its manifest there — register it with `...dialogRoute(name)`, its manifest and component in `src/app/routes/dialog-routes.ts` — and a room's route builders are imported by their own path (`@/lib/routes/<room>-builders.ts`), never through the `@/lib/routes/index.ts` barrel; `pnpm build:check` trips on either. Attribution method + the other levers: `agent-os/skills/fe-bundle-performance/SKILL.md`.
 
 ```tsx
 // Good
@@ -387,7 +390,7 @@ import { User } from './contracts';
 - Dark mode via `.dark` class — managed by `useThemeStore`.
 - Never use inline styles — use Tailwind utility classes.
 - **Corner radius + shape follow the theme, everywhere.** Use a **named** radius step (`rounded-xs` … `rounded-4xl` — all derive from the Corner radius axis); a bare `rounded` or `rounded-[3px]` follows nothing and fails `pnpm validate:theme-axis`. `rounded-full` on a surface (chip, count badge, icon disc, track) carries `data-slot="pill"` so the **Sharp** shape can square it; status dots and blurred glows stay round. Never an unconditional `rounded-none`.
-- **Screen tiers:** Tailwind's scale plus `3xl` (1920px) and `4xl` (2560px) from `index.css` — layouts keep growing on big monitors. The sidebar is a **drawer below `lg`** (invisible when closed); the bottom tab bar lives below `md` and anything else pinned to the bottom rides above it via `--floating-bottom-offset`. Full rules: `docs/reference/design.md` → Screen tiers.
+- **Screen tiers:** Tailwind's scale plus `3xl` (1920px) and `4xl` (2560px) from `index.css` — layouts keep growing on big monitors. There is **no sidebar** — the section bar's one header holds the nav on every viewport; the bottom tab bar lives below `md` and anything else pinned to the bottom rides above it via `--floating-bottom-offset`. Full rules: `docs/reference/design.md` → Screen tiers.
 - **Semantic tokens only** in app code — `bg-background`, `text-success`, `bg-brand`, `bg-overlay/50`, never raw palette classes (`bg-emerald-400`, `text-white`); enforced by `pnpm validate:tokens` (vendored `components/ui/` exempt). A future theme is then just a CSS file of token values.
 - shadcn/ui components live in `src/shared/components/ui/`.
 - **Aesthetic quality:** when building/styling/beautifying UI, apply **`agent-os/skills/frontend-design/SKILL.md`** (typography hierarchy, intentional theme, high-impact motion, composition, memorable details) — but **within** the guardrails: shadcn components, neutral semantic tokens (no raw colors), configured fonts/brand, and `web-design-guidelines` for a11y. It elevates craft; it does not override the component library, tokens, or brand.
@@ -398,8 +401,17 @@ import { User } from './contracts';
 - Use `apiClient` from `@/core/http/fetch-client.ts` for all API calls.
 - Exception: the auth service uses raw `fetch` (`authFetch`) to avoid interceptor recursion.
 - The fetch client is the reactive auth layer: Bearer attach, single-flight 401 refresh
-  (concurrent 401s share ONE refresh) + one replay — a second 401 after a fresh token
-  means the session is dead → `forceLogout()`. Writes auto-carry an `X-Idempotency-Key`
+  (concurrent 401s share ONE refresh) + replay. clinozy-be keeps ONE live access token per
+  session — every refresh, workspace switch or other tab's refresh retires the one before it —
+  so a 401 for a token replaced while the request was in flight is replayed with the current
+  token, no new refresh; a refresh that waited for the lock while a newer token arrived does
+  not rotate again. Only a refused refresh, or a token still rejected after two refreshes,
+  means the session is dead → `forceLogout()`. The session's one token names the organization
+  it was last switched to, so a refresh answering for **another** organization than this tab's
+  `me/context` (another tab switched) switches the tab back before any request carries it —
+  never another clinic's records under this tab's screen. A switch waits for a refresh in
+  flight. A boot that got no answer (refresh or `me/context` offline, 429, 5xx) is asked again
+  by the next guard, not settled as signed out. Writes auto-carry an `X-Idempotency-Key`
   (minted once per logical request, reused across retries/replay). Organization context:
   the **app URL** drives the active org — guards sync it via `/auth/switch-to-organization`,
   which re-mints the access token with a signed `org` claim. API requests carry **no**
@@ -524,7 +536,7 @@ read via `platformConfig.testMode`), the single home for any test-only behavior.
 ## PWA manifest and icons
 
 - **Source of truth:** `src/core/config/app-manifest.ts` → `public/manifest.webmanifest` (drift test: `app-manifest.test.ts`).
-- **Icons:** `public/app-icon.svg` (Lucide Boxes on `#0a0a0a`); PNGs via `rsvg-convert`. Skill: `agent-os/skills/fe-pwa-manifest/SKILL.md`.
+- **Icons:** `public/app-icon.svg` (the product mark — `ProductMark` — on its `#18181b` tile); PNGs via `rsvg-convert`. Skill: `agent-os/skills/fe-pwa-manifest/SKILL.md`.
 - **Local perf audit:** `pnpm build && pnpm preview` — see `docs/reference/local-production-perf.md` (never Lighthouse on dev server).
 
 ## Testing

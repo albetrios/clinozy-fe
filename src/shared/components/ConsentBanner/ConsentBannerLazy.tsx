@@ -4,7 +4,10 @@ import { useTranslation } from 'react-i18next';
 import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
 import { onceAsync } from '@/lib/lazy-module.ts';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
-import { useConsentStore } from '@/shared/store/useConsentStore/index.ts';
+import {
+  selectCurrentConsent,
+  useConsentStore,
+} from '@/shared/store/useConsentStore/index.ts';
 
 const loadConsentBanner = onceAsync(() => import('./ConsentBanner.tsx'));
 
@@ -28,7 +31,8 @@ const ConsentBannerCard = lazy(() =>
  */
 export function ConsentBannerLazy() {
   const { t } = useTranslation(LOCALE_NS);
-  const undecided = useConsentStore((s) => s.analyticsConsent === null);
+  // No standing answer — none yet, six months old, or to an older policy version (D161).
+  const undecided = useConsentStore((s) => selectCurrentConsent(s) === null);
 
   if (!undecided) return null;
 

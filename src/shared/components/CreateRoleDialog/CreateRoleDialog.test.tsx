@@ -1,9 +1,11 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useReducer } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { RoleSummary } from '@/shared/api/organization-contracts.ts';
 import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { CreateRoleDialog } from './CreateRoleDialog.tsx';
 
@@ -25,8 +27,8 @@ const { useAssignablePermissionsMock } = vi.hoisted(() => ({
     rows: [
       { code: 'organization:read', name: 'View Organization', category: 'tenancy' },
       { code: 'membership:read', name: 'View Members', category: 'tenancy' },
-      { code: 'membership:manage', name: 'Manage Members', category: 'tenancy' },
-      { code: 'invitation:manage', name: 'Manage Invitations', category: 'tenancy' },
+      { code: 'membership:update', name: 'Update Members', category: 'tenancy' },
+      { code: 'membership:create', name: 'Create Members', category: 'tenancy' },
       { code: 'webhook:manage', name: 'Manage Webhooks', category: 'notify' },
     ],
     isPending: false,
@@ -46,26 +48,43 @@ const EDIT_ROLE: RoleSummary = {
   isSystem: false,
 };
 
+/** Mounts the trigger (the drawer's dirty guard needs the router) and opens the drawer. */
 async function open() {
+  const view = renderWithProviders(<CreateRoleDialog />);
   const user = userEvent.setup();
-  await user.click(screen.getByTestId('role-create-open'));
+  await user.click(await screen.findByTestId('role-create-open'));
   await screen.findByTestId('role-create-form');
-  return user;
+  return { user, view };
+}
+
+/**
+ * The edit drawer, with a way to re-render it as a refetch landing would (its
+ * hooks re-run). The button sits outside the modal, so it is pressed with
+ * `fireEvent` — a pointer cannot reach it past the drawer.
+ */
+function RoleEditHarness() {
+  const [, rerender] = useReducer((count: number) => count + 1, 0);
+  return (
+    <>
+      <button type="button" data-testid="refetch-lands" onClick={rerender}>
+        Refetch
+      </button>
+      <CreateRoleDialog role={EDIT_ROLE} open onOpenChange={() => {}} />
+    </>
+  );
 }
 
 describe('CreateRoleDialog', () => {
   it('opens a form with name, description, and a permission checklist', async () => {
-    render(<CreateRoleDialog />);
     await open();
     expect(screen.getByTestId('role-create-name')).toBeInTheDocument();
     expect(screen.getByTestId('role-create-description')).toBeInTheDocument();
-    expect(screen.getByTestId('role-perm-membership:manage')).toBeInTheDocument();
-    expect(screen.getByTestId('role-perm-invitation:manage')).toBeInTheDocument();
+    expect(screen.getByTestId('role-perm-membership:update')).toBeInTheDocument();
+    expect(screen.getByTestId('role-perm-membership:create')).toBeInTheDocument();
   });
 
   it('blocks submit until at least one permission is selected', async () => {
-    render(<CreateRoleDialog />);
-    const user = await open();
+    const { user } = await open();
 
     await user.type(screen.getByTestId('role-create-name'), 'Member');
     await user.type(screen.getByTestId('role-create-description'), 'Everyday access');
@@ -77,8 +96,7 @@ describe('CreateRoleDialog', () => {
 
   it('creates a role with the chosen name, description, and permissions', async () => {
     createRoleMutate.mockResolvedValueOnce({ id: 'rol_x', name: 'Member' });
-    render(<CreateRoleDialog />);
-    const user = await open();
+    const { user } = await open();
 
     await user.type(screen.getByTestId('role-create-name'), 'Member');
     await user.type(screen.getByTestId('role-create-description'), 'Everyday access');
@@ -95,9 +113,27 @@ describe('CreateRoleDialog', () => {
   });
 
   it('has no accessibility violations', async () => {
-    const { baseElement } = render(<CreateRoleDialog />);
-    await open();
-    expect(await axeForDialog(baseElement)).toHaveNoViolations();
+    const { view } = await open();
+    expect(await axeForDialog(view.baseElement)).toHaveNoViolations();
+  });
+
+  it('is a child drawer stacked on Settings › Roles: named, Back returns, the name focused', async () => {
+    const { user } = await open();
+
+    const drawer = screen.getByTestId('role-create-dialog');
+    expect(screen.getByRole('dialog', { name: 'Create a role' })).toBe(drawer);
+    const submit = screen.getByTestId('role-create-submit');
+    expect(submit).toHaveTextContent('Create role');
+    // It submits the form, so Enter in the name saves too.
+    expect(submit).toHaveAttribute('form', screen.getByTestId('role-create-form').id);
+    await waitFor(() => expect(screen.getByTestId('role-create-name')).toHaveFocus());
+
+    const back = screen.getByTestId('role-create-dialog-dismiss');
+    expect(back).toHaveTextContent('Back');
+    await user.click(back);
+    await waitFor(() =>
+      expect(screen.queryByTestId('role-create-dialog')).not.toBeInTheDocument(),
+    );
   });
 
   it('edits an existing role: pre-filled and saves via updateRole', async () => {
@@ -110,7 +146,9 @@ describe('CreateRoleDialog', () => {
     });
     updateRoleMutate.mockResolvedValueOnce(EDIT_ROLE);
     const user = userEvent.setup();
-    render(<CreateRoleDialog role={EDIT_ROLE} open onOpenChange={vi.fn()} />);
+    renderWithProviders(
+      <CreateRoleDialog role={EDIT_ROLE} open onOpenChange={vi.fn()} />,
+    );
 
     const form = await screen.findByTestId('role-create-form');
     expect(form).toBeInTheDocument();
@@ -124,7 +162,7 @@ describe('CreateRoleDialog', () => {
       ),
     );
     // Add a permission and save.
-    await user.click(screen.getByTestId('role-perm-membership:manage'));
+    await user.click(screen.getByTestId('role-perm-membership:update'));
     await user.click(screen.getByTestId('role-create-submit'));
 
     await waitFor(() =>
@@ -132,7 +170,7 @@ describe('CreateRoleDialog', () => {
         expect.objectContaining({
           id: 'rol_x',
           name: 'Member',
-          permissions: expect.arrayContaining(['membership:read', 'membership:manage']),
+          permissions: expect.arrayContaining(['membership:read', 'membership:update']),
         }),
       ),
     );
@@ -144,11 +182,16 @@ describe('CreateRoleDialog', () => {
     // Regression: the list row carries no permissions, so the edit form opened
     // with every box unchecked and then visibly ticked itself.
     useRolePermissionsMock.mockReturnValue({ data: undefined, isSuccess: false });
-    render(<CreateRoleDialog role={EDIT_ROLE} open onOpenChange={() => {}} />);
+    renderWithProviders(
+      <CreateRoleDialog role={EDIT_ROLE} open onOpenChange={() => {}} />,
+    );
 
-    expect(await screen.findByTestId('role-edit-loading')).toBeInTheDocument();
+    const loading = await screen.findByTestId('role-edit-loading');
     expect(screen.queryByTestId('role-perm-membership:read')).not.toBeInTheDocument();
     expect(screen.getByTestId('role-create-submit')).toBeDisabled();
+    // The design's flat bars (`_patterns.md:282`), not a pulse.
+    expect(loading.querySelectorAll('[data-slot="skeleton"]')).toHaveLength(3);
+    expect(loading.querySelector('.animate-pulse')).toBeNull();
   });
 
   it('keeps in-progress edits when the permissions query refetches', async () => {
@@ -160,26 +203,24 @@ describe('CreateRoleDialog', () => {
       data: ['membership:read'],
       isSuccess: true,
     });
-    const { rerender } = render(
-      <CreateRoleDialog role={EDIT_ROLE} open onOpenChange={() => {}} />,
-    );
+    renderWithProviders(<RoleEditHarness />);
 
     const name = await screen.findByTestId('role-create-name');
     await user.clear(name);
     await user.type(name, 'Editor');
-    await user.click(screen.getByTestId('role-perm-invitation:manage'));
+    await user.click(screen.getByTestId('role-perm-membership:create'));
 
     // A refetch lands: same values, brand-new array identity.
     useRolePermissionsMock.mockReturnValue({
       data: ['membership:read'],
       isSuccess: true,
     });
-    rerender(<CreateRoleDialog role={EDIT_ROLE} open onOpenChange={() => {}} />);
+    fireEvent.click(screen.getByTestId('refetch-lands'));
 
     await waitFor(() =>
       expect(screen.getByTestId('role-create-name')).toHaveValue('Editor'),
     );
-    expect(screen.getByTestId('role-perm-invitation:manage')).toBeChecked();
+    expect(screen.getByTestId('role-perm-membership:create')).toBeChecked();
   });
 
   // The catalog is fetched now, so the picker has two states it never had when the list was
@@ -190,10 +231,9 @@ describe('CreateRoleDialog', () => {
       isPending: true,
       isError: false,
     });
-    render(<CreateRoleDialog />);
     await open();
 
-    expect(screen.queryByTestId('role-perm-membership:manage')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('role-perm-membership:update')).not.toBeInTheDocument();
     expect(screen.getByText(/loading permissions/i)).toBeInTheDocument();
   });
 
@@ -203,7 +243,6 @@ describe('CreateRoleDialog', () => {
       isPending: false,
       isError: true,
     });
-    render(<CreateRoleDialog />);
     await open();
 
     expect(screen.getByRole('alert')).toHaveTextContent(/permission list/i);

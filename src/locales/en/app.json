@@ -1,0 +1,1390 @@
+{
+  "sections": {
+    "today": {
+      "label": "Today",
+      "description": "The clinic floor now: arrivals, waiting, with doctor, checkout"
+    },
+    "leads": {
+      "label": "Leads",
+      "description": "Enquiries and their conversations, until they become patients"
+    },
+    "appointments": {
+      "label": "Appointments",
+      "description": "Bookings by doctor, room and machine"
+    },
+    "patients": {
+      "label": "Patients",
+      "description": "Registered patients, with prescriptions, sessions and photos"
+    },
+    "medical": {
+      "label": "Medical",
+      "description": "The medicine store: medicines for sale, suppliers, MRs, purchases, sales"
+    },
+    "stock": {
+      "label": "Clinic stock",
+      "description": "Clinic consumables and equipment used in procedures · not for sale"
+    },
+    "payments": {
+      "label": "Payments",
+      "description": "Collections, invoices and dues"
+    },
+    "tasks": {
+      "label": "Tasks",
+      "description": "Follow-ups, feedback calls, reminders, with an owner and due time"
+    },
+    "offerings": {
+      "label": "Offerings",
+      "description": "What the clinic sells: offerings, packages, offers and prices"
+    },
+    "users": {
+      "label": "Users",
+      "description": "Team, roles & access, branches"
+    }
+  },
+  "tones": {
+    "butter": "Butter",
+    "lav": "Lavender",
+    "sky": "Sky",
+    "sage": "Sage",
+    "blush": "Blush",
+    "mint": "Mint",
+    "peach": "Peach",
+    "plum": "Plum",
+    "lime": "Lime",
+    "slate": "Slate",
+    "stone": "Stone"
+  },
+  "roles": {
+    "admin": "Admin",
+    "doctor": "Doctor",
+    "therapist": "Therapist",
+    "front_desk": "Front desk",
+    "counsellor": "Counsellor",
+    "pharmacist": "Pharmacist",
+    "accountant": "Accountant",
+    "marketing": "Marketing",
+    "owner": "Owner"
+  },
+  "leads": {
+    "statuses": {
+      "new": "New",
+      "contacted": "Contacted",
+      "follow_up": "Follow-up",
+      "clinic_visited": "Clinic visited",
+      "no_response": "No response",
+      "not_interested": "Not interested",
+      "invalid": "Invalid",
+      "lost": "Lost"
+    },
+    "retargeted": "Re-targeted",
+    "sources": {
+      "instagram": "Instagram",
+      "google": "Google",
+      "whatsapp": "WhatsApp",
+      "facebook": "Facebook",
+      "walk_in": "Walk-in",
+      "referral": "Referral",
+      "retarget": "Re-target",
+      "phone_call": "Phone call"
+    },
+    "interests": {
+      "others": "Others",
+      "clinical": "Clinical",
+      "peel": "Peel",
+      "lhr": "LHR",
+      "hydrafacial": "Hydrafacial",
+      "prp": "PRP"
+    }
+  },
+  "appointments": {
+    "statuses": {
+      "scheduled": "Scheduled",
+      "confirmed": "Confirmed",
+      "checked_in": "Checked in",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "no_show": "No show"
+    },
+    "moves": {
+      "reschedule": "Move to another time",
+      "cancelled": "Cancel"
+    },
+    "moveHints": {
+      "scheduled": "Slot held · confirm request queued",
+      "confirmed": "They said yes",
+      "checked_in": "They have arrived · only on the day",
+      "completed": "Visit done · usually set from the visit",
+      "reschedule": "Move to a new slot · same appointment, old slot kept in history",
+      "cancelled": "Frees the slot and stops reminders",
+      "no_show": "Only after the start time has passed"
+    },
+    "guards": {
+      "final": "Final status. Use Rebook to make a new appointment.",
+      "visitDay": "Only on {{day}}",
+      "beforeStart": "Available after {{time}} on {{day}}",
+      "needsPatient": "Create the patient record first · Completed needs a patient"
+    },
+    "nextActions": {
+      "check_in": "Check in",
+      "confirm": "Confirm",
+      "complete": "Complete",
+      "rebook": "Rebook"
+    },
+    "tiles": {
+      "booked": "Booked",
+      "said_yes": "They said yes",
+      "visit_day": "Available on the visit day",
+      "after_check_in": "After check-in"
+    },
+    "hints": {
+      "scheduled": "Slot held · the confirm request waits in the queue until messaging is connected",
+      "confirmed": "Already confirmed on a call · reminder goes out",
+      "checked_in": "Patient is at the clinic · doctor queue notified · mark Completed when done",
+      "completed": "Visit done · a feedback task goes out tomorrow",
+      "needs_patient": "Create the patient record to complete this visit",
+      "cancelled": "Restore to bring it back · the slot is free for others meanwhile",
+      "closed": "This appointment is closed · {{status}}"
+    },
+    "cancelReasons": {
+      "patient_asked": "Patient asked",
+      "unreachable": "Could not reach patient",
+      "doctor_unavailable": "Doctor unavailable",
+      "resource_unavailable": "Machine or room unavailable",
+      "rescheduling_later": "Rescheduling later",
+      "booked_by_mistake": "Booked by mistake",
+      "other": "Other"
+    },
+    "cancelSides": {
+      "patient": "PATIENT",
+      "clinic": "CLINIC"
+    },
+    "cancelConfirm": {
+      "title": "Cancel this appointment?",
+      "record": "{{name}} · {{service}}",
+      "effect": "The slot is released and reminders stop. You can restore it until the time passes.",
+      "action": "Cancel"
+    },
+    "formCancelReasons": {
+      "patient_cancelled": "Patient cancelled",
+      "rescheduling_later": "Rescheduling later",
+      "doctor_unavailable": "Doctor unavailable",
+      "booked_by_mistake": "Booked by mistake",
+      "other": "Other"
+    },
+    "toasts": {
+      "booked": "Booked {{id}} · {{day}} {{time}} · confirm request queued",
+      "bookedQueued": "Booked {{id}} · {{day}} {{time}} · reminder queued",
+      "bookedOnly": "Booked {{id}} · {{day}} {{time}}",
+      "moved": "{{id}} moved to {{day}} {{time}} · confirm request queued",
+      "movedOnly": "{{id}} moved to {{day}} {{time}}",
+      "updated": "{{id}} updated",
+      "statusChanged": "{{name}} → {{status}}",
+      "statusConfirmed": "{{name}} → {{status}} · reminder queued",
+      "statusCancelled": "{{name}} → {{status}} · {{reason}} · slot freed, reminders stopped",
+      "cancelled": "Appointment {{id}} cancelled",
+      "restored": "Appointment restored · reminder goes out again"
+    }
+  },
+  "offerings": {
+    "categories": {
+      "consultation": "Consultation",
+      "treatment": "Treatment",
+      "package": "Package",
+      "lhr": "LHR",
+      "product": "Product"
+    },
+    "offerKinds": {
+      "percent": "% off",
+      "amount": "₹ off",
+      "fixed": "Fixed price",
+      "extra": "Extra sessions"
+    },
+    "offerStates": {
+      "live": "Running",
+      "scheduled": "Scheduled",
+      "paused": "Paused",
+      "ended": "Ended"
+    },
+    "toasts": {
+      "offeringCreated": "Offering {{id}} created",
+      "offeringSaved": "Offering {{id}} saved",
+      "offeringRemoved": "Offering {{id}} removed",
+      "offerCreated": "{{name}} created · applies automatically",
+      "offerSaved": "{{name}} saved",
+      "offerRemoved": "{{name}} removed",
+      "offerPaused": "{{name}} paused",
+      "offerResumed": "{{name}} running again"
+    },
+    "specialties": {
+      "skin": "Skin",
+      "hair": "Hair",
+      "dental": "Dental",
+      "gynac": "Gynac",
+      "physio": "Physio",
+      "general": "General"
+    }
+  },
+  "patients": {
+    "types": {
+      "aesthetic": "Aesthetic",
+      "clinical": "Clinical",
+      "lhr": "LHR",
+      "dental": "Dental",
+      "physio": "Physio",
+      "gynac": "Gynac"
+    },
+    "statuses": {
+      "new": "New",
+      "regular": "Regular",
+      "vip": "VIP",
+      "inactive": "Inactive"
+    },
+    "conversions": {
+      "converted": "T-Converted",
+      "not_converted": "T-Not converted"
+    },
+    "referralSources": {
+      "patient": "Patient",
+      "doctor": "Doctor",
+      "instagram": "Instagram",
+      "google": "Google",
+      "walk_in": "Walk-in",
+      "other": "Other"
+    }
+  },
+  "visits": {
+    "record": "Visit"
+  },
+  "patientDelete": {
+    "title": "Delete this patient?",
+    "titleRecord": "Delete this record?",
+    "removed": "{{name}} removed"
+  },
+  "patientDrawer": {
+    "title": {
+      "create": "New patient",
+      "edit": "Edit patient"
+    },
+    "sub": {
+      "full": "Creates or updates the contact too",
+      "quick": "What the clinic needs before a visit is completed"
+    },
+    "quickFill": {
+      "walkIn": "Walk-in today",
+      "referred": "Referred by patient",
+      "instagram": "From Instagram",
+      "lhr": "LHR patient"
+    },
+    "steps": {
+      "contact": "Contact & personal",
+      "clinic": "Clinic, referral & follow-up"
+    },
+    "groups": {
+      "contact": "Contact",
+      "personal": "Personal",
+      "clinic": "Clinic",
+      "referral": "Referral & follow-up"
+    },
+    "fields": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "mobile": "Mobile",
+      "mobileHint": "primary · WhatsApp",
+      "phone2": "Secondary mobile",
+      "phone2Hint": "10 digits",
+      "address": "Address",
+      "addressPlaceholder": "Area, city",
+      "homeBranch": "Home branch",
+      "gender": "Gender",
+      "birthDate": "Birth date",
+      "age": "Age {{age}}",
+      "types": "Patient type",
+      "typesHint": "pick any",
+      "status": "Status",
+      "conversion": "Conversion",
+      "referredBy": "Referred by",
+      "referredByPlaceholder": "Name",
+      "referrerType": "Referrer type",
+      "followUp": "Follow-up",
+      "followUpDate": "Follow-up date",
+      "followUpTime": "Follow-up time",
+      "notes": "Notes",
+      "notesPlaceholder": "Anything the team should know",
+      "consent": "Consent",
+      "consentHint": "what was signed",
+      "photos": "First photos",
+      "photosHint": "before photos · filed under today’s visit",
+      "photosDrop": "Take or drop photos",
+      "photosLimit": "JPG or PNG · up to {{limit}} each",
+      "photosRemove": "Remove {{name}}"
+    },
+    "followUpQuick": {
+      "tomorrow": "Tomorrow {{time}}",
+      "week": "In 1 week",
+      "twentyDays": "20 days",
+      "month": "1 month"
+    },
+    "save": {
+      "create": "Create patient",
+      "edit": "Save changes",
+      "createAnother": "Create & add another"
+    },
+    "missing": "Add name and mobile",
+    "mobileInvalid": "Enter a 10-digit mobile",
+    "created": "Patient {{id}} created",
+    "openFile": "Open file",
+    "saved": "{{name}} saved",
+    "registered": "{{name}} registered as patient {{id}}",
+    "registeredPhotos_one": "{{name}} registered as patient {{id}} · {{count}} photo filed",
+    "registeredPhotos_other": "{{name}} registered as patient {{id}} · {{count}} photos filed",
+    "duplicate": "Same mobile as {{name}} · {{id}}",
+    "useExisting": "Use existing",
+    "summaryEmpty": "New patient",
+    "knownPerson": "{{name}} is already in your contacts · the file opens on them"
+  },
+  "recordDrawer": {
+    "cancel": "Cancel",
+    "back": "Back",
+    "close": "Close",
+    "save": "Save",
+    "saving": "Saving…",
+    "retrySave": "Retry save",
+    "saveAndAdd": "Save & add another",
+    "delete": "Delete",
+    "notSaved": "Not saved · your changes are kept",
+    "saveFailed": "Couldn’t save · connection dropped. Everything you entered is still here.",
+    "readOnly": "View only · your role can’t change this",
+    "quickFill": "Quick fill",
+    "step": {
+      "next": "Next: {{step}} →",
+      "edit": "Edit",
+      "open": "Open",
+      "missing": "Missing: {{fields, list(type: unit)}}",
+      "notFilled": "Not filled yet"
+    },
+    "peek": {
+      "empty": "Empty",
+      "added_one": "{{count}} added",
+      "added_other": "{{count}} added",
+      "noneYet": "None yet"
+    },
+    "stepper": {
+      "decrease": "Decrease",
+      "increase": "Increase"
+    },
+    "colours": {
+      "butter": "Butter",
+      "lav": "Lavender",
+      "sky": "Sky",
+      "sage": "Sage",
+      "blush": "Blush",
+      "mint": "Mint",
+      "peach": "Peach",
+      "plum": "Plum",
+      "lime": "Lime",
+      "slate": "Slate",
+      "stone": "Stone"
+    },
+    "currency": "₹"
+  },
+  "personCard": {
+    "contactLabel": "Contact",
+    "openPatientFile": "Open patient file",
+    "since": "Since {{date}}",
+    "leadSince": "Lead since {{date}}",
+    "kind": {
+      "patient": "Patient",
+      "lead": "Lead",
+      "contact": "Contact"
+    },
+    "editContact": "Edit contact",
+    "changeContact": "Change contact",
+    "changeContactHint": "Pick a different contact",
+    "reach": "Reach",
+    "team": "Team",
+    "about": "About",
+    "reachSub": {
+      "whatsappPrimary": "WhatsApp · primary",
+      "whatsappAlternate": "WhatsApp · alternate",
+      "phonePrimary": "Phone · primary",
+      "phoneAlternate": "Phone · alternate",
+      "instagram": "Instagram"
+    },
+    "whatsApp": "WhatsApp",
+    "call": "Call",
+    "openInstagram": "Open Instagram",
+    "copy": "Copy",
+    "copied": "Copied {{value}}",
+    "noReach": "No phone or handle saved yet",
+    "claim": "Open · Claim",
+    "claimHint": "A lead with this person is open · claim it",
+    "gender": {
+      "female": "Female",
+      "male": "Male",
+      "other": "Other"
+    },
+    "genderAge": "{{gender}} · {{age}} yrs",
+    "age": "{{age}} yrs",
+    "cameVia": "Came via {{source}}",
+    "owedToThem": "{{amount}} to return to them",
+    "owedByThem": "{{amount}} they owe the clinic",
+    "reviews_one": "{{count}} review · latest {{rating}}★ on {{source}} · {{date}}",
+    "reviews_other": "{{count}} reviews · latest {{rating}}★ on {{source}} · {{date}}",
+    "consent": {
+      "data": "Data",
+      "photos": "Photos",
+      "marketing": "Marketing",
+      "hint": "Consent · {{label}}",
+      "given": "{{label}}: consent given",
+      "missing": "{{label}}: no consent"
+    },
+    "newLead": "+ Lead",
+    "newLeadHint": "New enquiry for this contact",
+    "newAppointment": "+ Appointment",
+    "newAppointmentHint": "Book for this contact",
+    "newPatient": "+ Patient",
+    "newPatientHint": "Create a patient record for this contact",
+    "online": "Online now",
+    "offline": "Offline",
+    "memberKind": {
+      "assigned": "Assigned",
+      "sentThis": "Sent this",
+      "treating": "Treating",
+      "involved": "Involved"
+    },
+    "assignToYourself": "Assign to yourself",
+    "works": "Works {{from}} – {{to}}",
+    "updated": "Updated {{time}}",
+    "fetching": "Fetching latest…"
+  },
+  "reasonConfirm": {
+    "keep": "Keep it",
+    "reason": "Reason",
+    "note": "Note",
+    "notePlaceholder": "Add a note (optional)",
+    "noteRequired": "Tell the team why (required)",
+    "hintPickReason": "Pick a reason to continue",
+    "hintAddNote": "Add a short note for “Other”",
+    "kinds": {
+      "delete": {
+        "action": "Delete",
+        "effect": "It disappears from lists and pickers. You can undo from the toast right after."
+      },
+      "cancel": {
+        "action": "Cancel order",
+        "effect": "The order stops here. Stock and supplier dues are not changed."
+      },
+      "void": {
+        "action": "Void sale",
+        "effect": "The sale is voided and its invoice is cancelled. Stock goes back."
+      }
+    },
+    "reasons": {
+      "mistake": "Created by mistake",
+      "duplicate": "Duplicate",
+      "notNeeded": "No longer needed",
+      "other": "Other",
+      "orderedByMistake": "Ordered by mistake",
+      "supplierCantDeliver": "Supplier can’t deliver",
+      "priceChanged": "Price changed",
+      "billedByMistake": "Billed by mistake",
+      "wrongItems": "Wrong items",
+      "customerChangedMind": "Customer changed mind"
+    }
+  },
+  "itemsField": {
+    "addRow": "Add row",
+    "removeRow": "Remove row",
+    "remove": "Remove",
+    "decrease": "Decrease",
+    "increase": "Increase",
+    "note": "Note",
+    "notePlaceholder": "Remarks",
+    "moneyPlaceholder": "₹ 0"
+  },
+  "roomToolbar": {
+    "more": "More",
+    "moreSections": "More sections",
+    "searchTitle": "Search · press /",
+    "moreCreate": "More create actions"
+  },
+  "filters": {
+    "title": "Filters",
+    "appliedCount": "{{count}} applied",
+    "clearAll": "Clear all",
+    "clearAllFilters": "Clear all filters",
+    "apply": "Apply filter",
+    "saveView": "Save as view",
+    "savedView": "Saved as view",
+    "viewSaved": "View “{{name}}” saved",
+    "any": "Any",
+    "from": "From",
+    "to": "To",
+    "created": {
+      "label": "Created",
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "lastSevenDays": "Last 7 days",
+      "lastThirtyDays": "Last 30 days",
+      "thisMonth": "This month",
+      "range": "Custom range"
+    },
+    "followUp": {
+      "label": "Follow-up date",
+      "overdue": "Overdue",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "nextSevenDays": "Next 7 days",
+      "notSet": "Not set",
+      "range": "Custom range"
+    }
+  },
+  "commandMenu": {
+    "results": "Results",
+    "groups": {
+      "actions": "Actions",
+      "goTo": "Go to",
+      "people": "People"
+    },
+    "actions": {
+      "newLead": "New lead",
+      "newAppointment": "New appointment",
+      "newPatient": "New patient",
+      "newReceipt": "New receipt",
+      "openTasks": "Open tasks"
+    },
+    "screen": "Screen",
+    "move": "move",
+    "open": "open",
+    "hint": "Type 3+ letters or 4+ digits to search people",
+    "empty": "No matches. Try a name, phone or C-number.",
+    "personSub": "{{id}} · •••• {{lastDigits}}"
+  },
+  "lists": {
+    "loadError": "Couldn’t load this list · connection dropped. Showing the last copy.",
+    "retry": "Retry"
+  },
+  "clock": {
+    "todayTime": "Today {{time}}",
+    "dayTime": "{{day}} {{time}}"
+  },
+  "channels": {
+    "whatsapp": "WhatsApp",
+    "call": "Call",
+    "sms": "SMS",
+    "instagram": "Instagram",
+    "email": "Email",
+    "note": "Note"
+  },
+  "checkInFeels": {
+    "much_better": "Much better",
+    "better": "Better",
+    "same": "Same",
+    "worse": "Worse"
+  },
+  "reviewSources": {
+    "google": "Google",
+    "video": "Video",
+    "instagram": "Instagram",
+    "internal_form": "Feedback form",
+    "whatsapp": "WhatsApp"
+  },
+  "paymentModes": {
+    "cash": "Cash",
+    "upi": "UPI",
+    "card": "Card",
+    "credit": "Credit"
+  },
+  "invoiceTypes": {
+    "clinic": "Clinic",
+    "medical": "Medical",
+    "consultation": "Consultation"
+  },
+  "invoiceStatuses": {
+    "paid": "Paid",
+    "partial": "Partly paid",
+    "unpaid": "Due"
+  },
+  "taskOutcomes": {
+    "log_check_in": "Log check-in",
+    "doing_well": "Doing well",
+    "no_answer": "No answer",
+    "happy": "Happy",
+    "done": "Done"
+  },
+  "chatColumn": {
+    "thread": "Messages",
+    "separator": " · ",
+    "created": {
+      "lead": "Lead created · {{time}} · via {{source}}",
+      "patientThread": "Patient · chat only · no lead",
+      "contactThread": "Contact · chat only · no lead"
+    },
+    "history": {
+      "appointment": "Appointment #{{seq}}",
+      "reminder": "Reminder sent",
+      "prescription": "Rx #{{seq}}",
+      "session": "session {{session}}",
+      "invoice": "{{type}} invoice #{{seq}}",
+      "due": "{{amount}} due",
+      "paid": "Paid",
+      "received": "Received {{amount}}",
+      "refund": "Refund {{amount}}",
+      "invoiceRef": "#{{seq}}",
+      "checkIn": "Check-in",
+      "score": "{{score}}/10",
+      "after": "after {{context}}",
+      "review": "{{source}} review",
+      "rating": "{{rating}}★",
+      "task": "Task · {{title}} → {{result}}",
+      "masked": "₹ ••••"
+    },
+    "delivery": {
+      "sending": "Sending…",
+      "sent": "Sent",
+      "delivered": "Delivered",
+      "read": "Read",
+      "queued": "Queued",
+      "notSent": "Not sent",
+      "retry": "Retry"
+    },
+    "sender": {
+      "call": "{{name}} · call",
+      "note": "{{name}} · note"
+    },
+    "empty": {
+      "title": "No conversation yet",
+      "visit": "{{first}}’s {{service}} is {{when}} at {{time}} · a quick WhatsApp keeps the slot",
+      "pastVisits": "Every WhatsApp, call and note with {{first}} shows here",
+      "noVisits": "Start with a WhatsApp · replies land here",
+      "today": "today",
+      "tomorrow": "tomorrow",
+      "onDate": "on {{date}}"
+    },
+    "starters": {
+      "onTheWay": "Are you on your way?",
+      "directions": "Send directions",
+      "newTime": "Offer a new time",
+      "confirm": "Confirm the visit",
+      "prep": "Prep instructions",
+      "howItWent": "Ask how it went",
+      "nextSession": "Book the next session",
+      "offer": "Share an offer",
+      "hello": "Say hello",
+      "consultation": "Offer a consultation"
+    },
+    "sendVia": "Send via",
+    "modes": {
+      "whatsapp": "WhatsApp",
+      "instagram": "Instagram",
+      "call": "Call log",
+      "note": "Note"
+    },
+    "noInstagram": "No Instagram on this contact",
+    "message": "Message",
+    "placeholder": {
+      "message": "Message to {{first}} on {{channel}}",
+      "messageNoName": "Message to the lead on {{channel}}",
+      "note": "Note for the team, not sent to {{first}}",
+      "noteNoName": "Note for the team, not sent to the lead",
+      "call": "What happened on the call?"
+    },
+    "send": {
+      "whatsapp": "Send WhatsApp",
+      "instagram": "Send Instagram",
+      "call": "Log call",
+      "note": "Add note"
+    },
+    "replyHint": "{{first}} last wrote here",
+    "mismatch": "{{first}} wrote on {{channel}} · Switch",
+    "outage": "WhatsApp down · replies will queue",
+    "notConnected": "Messages wait in the queue · they go out once messaging is connected",
+    "prefersNoCalls": "Prefers no calls · message instead",
+    "prefersAfterSix": "Prefers contact after 6 pm",
+    "suggest": "Suggest",
+    "suggestions": "Suggestions",
+    "suggestHint": "Suggestions and templates · or type /",
+    "book": "Book an appointment",
+    "bookHint": "Book an appointment · reason from their message",
+    "suggestedFor": "Suggested for {{first}}",
+    "closeSuggestions": "Close suggestions",
+    "templatesLabel": "Templates · type / in the box to search",
+    "noTemplate": "No template matches “{{query}}”",
+    "fillIn": "Fill in",
+    "chips": {
+      "price": "Share price",
+      "priceHint": "They asked about price",
+      "slots": "Offer 2 slots",
+      "slotsHint": "They asked about timing",
+      "location": "Send location",
+      "explain": "Explain {{term}}",
+      "greet": "Greet",
+      "followUp": "Follow up"
+    },
+    "templates": {
+      "greeting": "Greeting",
+      "price": "Price",
+      "slots": "Free slots",
+      "location": "Location",
+      "reminder": "Reminder",
+      "aftercare": "Aftercare",
+      "followUp": "Follow-up",
+      "review": "Review"
+    },
+    "content": {
+      "starters": {
+        "onTheWay": "Hi {{first}}, we are ready for your {{service}} at {{time}}. Are you on your way?",
+        "directionsToday": "Hi {{first}}, here is the clinic location: {{maps}}. See you at {{time}}!",
+        "newTime": "Hi {{first}}, if {{time}} does not work today, reply with a time that suits you and we will move it.",
+        "confirm": "Hi {{first}}, a reminder of your {{service}} {{when}} at {{time}}. Reply Yes to confirm.",
+        "prep": "Hi {{first}}, before your {{service}} {{when}}: come without makeup and avoid sun for 24 hours. See you at {{time}}!",
+        "directionsLater": "Hi {{first}}, here is the clinic location: {{maps}}. See you {{when}} at {{time}}.",
+        "howItWent": "Hi {{first}}, how is your skin feeling after the last visit? Any questions for the doctor?",
+        "nextSession": "Hi {{first}}, shall we book your next session? Reply with a day that suits you.",
+        "offer": "Hi {{first}}, we have a special on your usual treatment this month. Want the details?",
+        "hello": "Hi {{first}}, this is {{me}} from {{clinic}}. Happy to help with anything you need.",
+        "consultation": "Hi {{first}}, our doctor can see you this week. Shall I book a consultation?",
+        "directions": "Hi {{first}}, here is the clinic location: {{maps}}."
+      },
+      "templates": {
+        "greeting": "Hi {{first}}, this is {{me}} from {{clinic}} 😊 How can I help you today?",
+        "price": "{{offering}} is {{price}}. It includes a consultation with the doctor. Shall I book you in?",
+        "priceSessions": "{{offering}} is {{price}} for {{sessions}} sessions. It includes a consultation with the doctor. Shall I book you in?",
+        "slots": "We have {{slots}} open for {{interest}}. Which one suits you?",
+        "location": "We are at {{address}} · Google Maps: {{maps}}. Parking is available right outside.",
+        "reminder": "Hi {{first}}, a reminder of your visit {{dayTime}}. Reply Yes to confirm or tell us a better time.",
+        "aftercare": "Hi {{first}}, how is the skin feeling today? Keep it moisturised, use sunscreen and avoid scrubs for 48 hours.",
+        "followUp": "Hi {{first}}, just checking in about {{interest}}. Would you like me to hold a slot for you this week?",
+        "review": "Thank you for visiting us, {{first}}! If you loved it, a quick Google review helps us a lot: {{reviewLink}}"
+      },
+      "explain": "Great question! {{offering}} works well for this — most people see results in {{results}}. The doctor will check and plan it at your consultation.",
+      "sessions": "{{n}} sessions",
+      "fewWeeks": "a few weeks",
+      "slotPair": "{{first}} or {{second}}",
+      "slot": "{{day}} {{time}}",
+      "dayTime": "{{day}} at {{time}}",
+      "dayTimeFallback": "tomorrow at 11 am",
+      "today": "today",
+      "tomorrow": "tomorrow",
+      "onDate": "on {{date}}",
+      "there": "there",
+      "yourTreatment": "your treatment",
+      "interests": {
+        "clinical": "Clinical",
+        "peel": "Peel",
+        "lhr": "LHR",
+        "hydrafacial": "Hydrafacial",
+        "prp": "PRP"
+      },
+      "fill": {
+        "address": "address",
+        "maps": "maps link",
+        "dayTime": "day time",
+        "reviewLink": "review link"
+      }
+    }
+  },
+  "offeringSuggestions": {
+    "title": "Offering suggestions",
+    "suggested_one": "{{count}} suggested",
+    "suggested_other": "{{count}} suggested",
+    "planned_one": "{{count}} planned",
+    "planned_other": "{{count}} planned",
+    "accepted_one": "{{count}} accepted",
+    "accepted_other": "{{count}} accepted",
+    "pastPurchases_one": "{{count}} past purchase",
+    "pastPurchases_other": "{{count}} past purchases",
+    "ideas_one": "{{count}} idea",
+    "ideas_other": "{{count}} ideas",
+    "nothingSuggested": "Nothing suggested yet",
+    "noSuggestions": "No suggestions yet",
+    "pricesHidden": "Prices hidden",
+    "masked": "₹ ••••",
+    "pricesHiddenHint": "Prices hidden · use the eye to show",
+    "showPrices": "Show prices",
+    "hidePrices": "Hide prices",
+    "columns": {
+      "suggested": "Suggested",
+      "qty": "Qty",
+      "price": "Price",
+      "status": "Status"
+    },
+    "less": "Less",
+    "more": "More",
+    "quantity": "Quantity",
+    "finalPrice": "Final price",
+    "belowFloor": "Below the lowest price",
+    "tooMuchDiscount": "Too much discount · ask an admin",
+    "details": "Offering details",
+    "statuses": {
+      "planned": "Planned",
+      "accepted": "Accepted",
+      "next_time": "Next time",
+      "declined": "Declined"
+    },
+    "statusHints": {
+      "planned": "Suggested · not decided yet",
+      "accepted": "They agreed · invoice when it happens",
+      "next_time": "Interested · bring it up at the next visit",
+      "declined": "Not interested · kept as a record"
+    },
+    "statusLabel": "Status · {{status}}",
+    "invoiced": "Invoiced",
+    "invoicedOf": "Invoiced · {{done}} of {{total}}",
+    "remove": "Remove",
+    "empty": "Nothing suggested for {{first}} yet.",
+    "whyIdea": "Why this idea",
+    "idea": "Idea",
+    "add": "+ Add",
+    "addNamed": "Add {{name}}",
+    "addHint": "Add to suggestions",
+    "addOffering": "Add offering",
+    "purchasesTitle": "{{first}}’s last purchases",
+    "purchaseColumns": {
+      "date": "Date",
+      "bought": "Bought",
+      "sessions": "Sessions"
+    },
+    "sessionsUsed": "{{used}} of {{total}} used",
+    "activityTitle": "Contact activity",
+    "openChat": "Open chat",
+    "activityColumns": {
+      "when": "When",
+      "channel": "Channel",
+      "message": "Message",
+      "status": "Status"
+    },
+    "sent": "Sent",
+    "got": "Got",
+    "removeConfirm": {
+      "title": "Remove this record?",
+      "record": "{{name}} from suggestions",
+      "effect": "It leaves {{first}}’s offering suggestions. Use Declined instead to keep a record that it was offered.",
+      "reasons": {
+        "addedByMistake": "Added by mistake",
+        "duplicate": "Duplicate",
+        "planChanged": "Plan changed",
+        "other": "Other"
+      }
+    },
+    "searchOfferings": "Search offerings",
+    "single": "Single",
+    "minPrice": "min {{price}}",
+    "added": "{{name}} added to {{first}}’s suggestions",
+    "removed": "{{name}} removed from suggestions",
+    "offeringRemoved": "Offering removed",
+    "info": {
+      "sessions_one": "{{count}} session",
+      "sessions_other": "{{count}} sessions",
+      "visits_one": "{{count}} visit",
+      "visits_other": "{{count}} visits",
+      "list": "List {{price}}",
+      "lowest": "lowest {{price}}"
+    },
+    "ideaReasons": {
+      "history": "Idea from history"
+    },
+    "delivery": {
+      "queued": "Queued",
+      "sent": "Sent",
+      "delivered": "Delivered",
+      "read": "Read",
+      "failed": "Not delivered",
+      "received": "Received"
+    },
+    "activityLead": "Lead {{id}}",
+    "purchasesCount_one": "{{count}} line",
+    "purchasesCount_other": "{{count}} lines"
+  },
+  "contactEditor": {
+    "title": "Edit contact",
+    "sub": "Saved once · used by every lead, patient and chat",
+    "newContact": "New contact",
+    "steps": {
+      "identity": "Identity & reach",
+      "preferences": "Contact preferences"
+    },
+    "idHelp": "One contact · shared by leads, patients and chats",
+    "idTooltip": "Contact ID · click to copy",
+    "idAria": "Copy contact ID {{id}}",
+    "idCopied": "Contact ID {{id}} copied",
+    "firstName": "First name",
+    "firstNamePlaceholder": "Given name",
+    "lastName": "Last name",
+    "lastNamePlaceholder": "Surname (optional)",
+    "mobiles": "Mobile numbers",
+    "mobileAria": "Mobile {{n}}",
+    "primary": "Primary",
+    "primaryTitle": "Primary number · used for calls and matching",
+    "setPrimary": "Set primary",
+    "setPrimaryTitle": "Make this the primary number",
+    "primaryChanged": "{{number}} is now the primary number",
+    "whatsAppOn": "On WhatsApp · click to turn off",
+    "whatsAppOff": "Not on WhatsApp · click to turn on",
+    "removeNumber": "Remove number",
+    "addNumber": "+ Add number",
+    "addInstagram": "+ Instagram",
+    "handlePlaceholder": "@handle",
+    "handleAria": "Instagram {{n}}",
+    "removeHandle": "Remove handle",
+    "removeHandleTitle": "Remove this handle",
+    "handleRemoved": "Removed {{handle}}",
+    "addHandle": "+ Add handle",
+    "defaultChannel": "Default channel",
+    "defaultChannelHint": "· switches to the last channel used",
+    "custom": "+ Custom",
+    "customPlaceholder": "Type a preference",
+    "customAria": "Custom preference",
+    "done": "Done",
+    "updated": "Contact updated · applies everywhere",
+    "preferences": {
+      "noCalls": "No calls",
+      "sundaysOnly": "Sundays only",
+      "weekdaysOnly": "Weekdays only",
+      "afterSix": "After 6 pm",
+      "mornings": "Mornings",
+      "evenings": "Evenings",
+      "weekendsOnly": "Weekends only",
+      "gujarati": "Gujarati",
+      "hindi": "Hindi",
+      "english": "English",
+      "femaleDoctor": "Female doctor",
+      "textFirst": "Text before calling"
+    }
+  },
+  "offeringQuickCreate": {
+    "title": "New offering",
+    "sub": "Service, treatment or package you bill",
+    "steps": {
+      "offering": "Offering",
+      "details": "Details",
+      "payment": "Payment"
+    },
+    "fields": {
+      "name": "Name",
+      "namePlaceholder": "e.g. LHR Full Face",
+      "duration": "Duration",
+      "minutesUnit": "min",
+      "minutes": "{{minutes}} min",
+      "category": "Category",
+      "price": "Price"
+    },
+    "save": "Add offering",
+    "toasts": {
+      "name": "Add a name",
+      "price": "Enter the price",
+      "added": "Offering {{name}} added"
+    }
+  },
+  "appointmentForm": {
+    "title": {
+      "loading": "Appointment",
+      "create": "New appointment",
+      "edit": "Appointment {{id}}",
+      "reschedule": "Reschedule {{id}}"
+    },
+    "sub": "Only free slots are offered · past times are locked",
+    "who": {
+      "search": "Search patient or lead by name, phone, ID",
+      "searchLabel": "Search person",
+      "useContact": "Use contact",
+      "patient": "Patient",
+      "createContact": "+ Create contact “{{query}}”",
+      "newContact": "New contact · add their mobile to book",
+      "mobile": "Mobile number",
+      "name": "Name",
+      "mobileLabel": "Mobile",
+      "save": "Save",
+      "addName": "Add a name",
+      "mobileDigits": "Mobile needs 10 digits"
+    },
+    "links": {
+      "connected": "Connected lead",
+      "chip": "{{id}} · {{status}}",
+      "chipHint": "Lead {{id}} · {{source}} · owner {{owner}}",
+      "movesAtCheckIn": "· moves to Clinic visited at check-in"
+    },
+    "status": {
+      "section": "Visit status",
+      "group": "Status",
+      "copy": "Copy",
+      "copyHint": "Copy · same service, doctor, reason and notes",
+      "cancelVisit": "Cancel visit",
+      "cancelHint": "Cancel this appointment",
+      "cancelledReason": "{{reason}} · slot released · reminders stopped",
+      "cancelledNoReason": "Slot released · reminders stopped",
+      "restore": "Restore",
+      "rescheduledConfirm": "Rescheduled · was {{day}} {{time}} · needs confirming again · a new reminder goes out on save",
+      "rescheduled": "Rescheduled · was {{day}} {{time}} · a new reminder goes out on save",
+      "planReady_one": "Plan ready · {{count}} offering",
+      "planReady_other": "Plan ready · {{count}} offerings",
+      "planVisit_one": "{{count}} planned for this visit",
+      "planVisit_other": "{{count}} planned for this visit",
+      "planEarlier_one": "{{count}} from earlier visits",
+      "planEarlier_other": "{{count}} from earlier visits"
+    },
+    "details": {
+      "title": "Appointment",
+      "notFilled": "Not filled yet",
+      "open": "Open",
+      "type": "Type",
+      "typeGroup": "Appointment type",
+      "types": {
+        "consultation": "Consultation",
+        "follow_up": "Follow-up",
+        "treatment": "Treatment",
+        "package_session": "Package session",
+        "other": "Other"
+      },
+      "typeHints": {
+        "consultation": "First visit or doctor review",
+        "follow_up": "Short review after a treatment or Rx",
+        "treatment": "A single session, billed on the visit",
+        "package_session": "Uses one session from a paid package",
+        "other": "Anything that is not one of the above"
+      },
+      "typeLines": {
+        "consultation": "Consultation fee is added to the invoice at checkout",
+        "follow_up": "Usually free · no invoice unless something is added",
+        "other": "Say what it is in Notes below"
+      },
+      "treatment": "Treatment",
+      "pickTreatment": "Pick a treatment",
+      "searchTreatments": "Search treatments",
+      "common": "Common",
+      "fromOfferings": "From offerings",
+      "doctor": "Doctor",
+      "pickDoctor": "Pick a doctor",
+      "searchDoctors": "Search doctors and therapists",
+      "length": "Length",
+      "minutes": "{{minutes}} min",
+      "minutesHint": "{{minutes}} minutes",
+      "reason": "Reason",
+      "reasonPlaceholder": "What they asked for · e.g. pigmentation on cheeks",
+      "notes": "Notes",
+      "notesPlaceholder": "Anything the doctor or desk should know"
+    },
+    "slot": {
+      "title": "Date & time",
+      "nextWeek": "Next week",
+      "calendar": "Calendar",
+      "previousMonth": "Previous month",
+      "nextMonth": "Next month",
+      "step": "Slot step",
+      "stepOption": "{{minutes}} min",
+      "time": "Time",
+      "pickDate": "Pick a date to see times",
+      "none": "No times to book on this day · pick another date",
+      "closed": {
+        "past": "This day has passed · pick another date",
+        "branchInactive": "This branch is not taking bookings",
+        "closedDay": "The clinic is closed on this day · pick another date",
+        "holiday": "Closed for {{label}} · pick another date",
+        "doctorOff": "The doctor is off on this day · pick another date or doctor"
+      },
+      "am": "AM",
+      "pm": "PM",
+      "hour": "{{hour}} {{period}}",
+      "free": "{{time}} · free",
+      "locked": "Locked",
+      "lockedSummary": "{{day}} · {{time}} · locked after check-in",
+      "lockedToast": "Date & time are locked once the patient is checked in"
+    },
+    "footer": {
+      "pickTime": "Pick a time",
+      "book": "Book {{day}}, {{time}}",
+      "move": "Move to {{day}}, {{time}}",
+      "saveChanges": "Save changes",
+      "minutes": "{{minutes}} min"
+    },
+    "validation": {
+      "who": "Pick who the appointment is for",
+      "slot": "Pick a date and time",
+      "passed": "That time has passed · pick a future slot",
+      "taken": "Just taken · pick another slot",
+      "doctor": "Pick a doctor",
+      "branch": "No open branch to book at"
+    },
+    "copied": "Copied · pick a date and time"
+  },
+  "expenseCategories": {
+    "medicines": "Medicines",
+    "consumables": "Consumables",
+    "salary": "Salary",
+    "rent": "Rent",
+    "marketing": "Marketing",
+    "utilities": "Utilities",
+    "maintenance": "Maintenance",
+    "misc": "Misc"
+  },
+  "patientPicker": {
+    "label": "Patient",
+    "placeholder": "Search patients",
+    "hint": "only patients can be picked",
+    "due": "{{amount}} due",
+    "nothingDue": "Nothing due"
+  },
+  "splitRows": {
+    "mode": "Mode",
+    "amount": "Amount"
+  },
+  "settleCredit": {
+    "title": {
+      "give": "Give back",
+      "take": "Got it back"
+    },
+    "sub": {
+      "give": "To {{name}} · {{reason}} · adds an Out entry to Payments",
+      "take": "From {{name}} · {{reason}} · adds an In entry to Payments"
+    },
+    "section": {
+      "give": "How it goes back",
+      "take": "How it came in"
+    },
+    "rows": {
+      "give": "Paid back by",
+      "take": "Received as"
+    },
+    "add": "Add another mode",
+    "total": "Total {{total}} · of {{owed}}",
+    "save": {
+      "give": "Return {{amount}}",
+      "take": "Record {{amount}}"
+    },
+    "enterAmount": "Enter the amount",
+    "moreThanOwed": "More than the {{amount}} owed",
+    "done": {
+      "give": "{{amount}} given back to {{name}} · {{entry}}",
+      "take": "{{amount}} got back from {{name}} · {{entry}}"
+    },
+    "branch": "Branch",
+    "date": "Date",
+    "dayClosed": "That day is closed at this branch · pick an open day",
+    "moreThanPaid": "More than its invoice has paid",
+    "closed": "{{ref}} is already settled",
+    "entry": {
+      "give": "Out entry added",
+      "take": "In entry added"
+    }
+  },
+  "quickLine": {
+    "label": "Quick add",
+    "enter": "↵ add",
+    "matches": "Matches",
+    "suggested": "Suggested · click to add",
+    "typed": "Not in the list · add as typed",
+    "noMatch": "No match. Check the spelling or try fewer letters.",
+    "keys": "↑↓ choose · ↵ add · Esc clear",
+    "browse": "Browse",
+    "browseAll": "Browse all",
+    "groups": "Group",
+    "closeBrowse": "Close browse",
+    "added_one": "{{count}} added",
+    "added_other": "{{count}} added",
+    "tapToAdd": "Tap a tile to add",
+    "showing": "Showing {{shown}} of {{total}} · type to narrow",
+    "done": "Done",
+    "emptyGroup": "Nothing in this group matches.",
+    "addOne": "Add one",
+    "removeOne": "Remove one",
+    "addNew": "Add new",
+    "tags": {
+      "qty": "×{{count}}",
+      "free": "+{{count}} free",
+      "rate": "@ {{amount}}",
+      "discount": "{{percent}}% off"
+    }
+  },
+  "invoiceDrawer": {
+    "title": {
+      "create": "New invoice",
+      "edit": "Edit invoice",
+      "createSale": "New sale",
+      "editSale": "Edit sale"
+    },
+    "sub": {
+      "create": "Pick the type, then add items",
+      "edit": "Changes are logged on the invoice",
+      "sale": "Medical invoice · stock updates by earliest expiry"
+    },
+    "type": "Type",
+    "steps": {
+      "party": "Patient & team",
+      "items": "Items",
+      "medicines": "Medicines",
+      "payment": "Payment"
+    },
+    "fields": {
+      "branch": "Branch",
+      "newPatient": "New patient",
+      "customer": "Customer",
+      "customerHint": "patient or any contact · new names are saved as a Medical contact",
+      "customerPlaceholder": "Search patients, leads or medical contacts",
+      "addContact": "Add contact",
+      "mobile": "Mobile",
+      "mobileHint": "saved on the contact",
+      "mobilePlaceholder": "98765 43210",
+      "team": "Team",
+      "prescribedBy": "Prescribed by",
+      "teamPlaceholder": "Pick team",
+      "teamHint": "doctor, therapist, counsellor",
+      "teamFrom": "from {{name}}’s team",
+      "overallDiscount": "Overall discount",
+      "quickFill": "Quick fill",
+      "paidNow": "Paid now",
+      "remark": "Remark",
+      "remarkPlaceholder": "Shown on the printed invoice",
+      "paid": "Paid so far"
+    },
+    "customerGroups": {
+      "patient": "Patients",
+      "lead": "Leads",
+      "contact": "Medical contacts"
+    },
+    "customerSub": {
+      "noMobile": "No mobile yet"
+    },
+    "items": {
+      "quickLine": "Type offering, qty, discount · e.g. lhr face 1 10%",
+      "quickLineMedical": "Type medicine and qty · e.g. sun 2",
+      "hint": "2 = qty · 10% = discount · @500 = rate",
+      "oftenBilled": "Often billed",
+      "browse": {
+        "all": "All",
+        "oral": "Oral",
+        "topical": "Topical"
+      },
+      "columns": {
+        "offering": "Offering",
+        "medicine": "Medicine",
+        "qty": "Qty",
+        "rate": "Rate",
+        "discount": "Disc %",
+        "gst": "GST",
+        "final": "Final"
+      },
+      "pickItem": "Pick item",
+      "selectOffering": "Select offering…",
+      "selectMedicine": "Select medicine…",
+      "newOffering": "New offering",
+      "addItem": "Add item",
+      "addMedicine": "Add medicine",
+      "total": "Total",
+      "sessions_one": "{{count}} session",
+      "sessions_other": "{{count}} sessions",
+      "inStock": "{{count}} in stock",
+      "outOfStock": "Out of stock",
+      "belowFloor": "Below the lowest price {{amount}} for {{name}}",
+      "newMedicineName": "New medicine name",
+      "medicineAdded": "{{name}} added · set MRP later in Stock",
+      "hintInvoice": "2 = qty · 10% = discount",
+      "belowLowest": "Below the lowest price for {{name}}",
+      "offerApplied": "Offer applied: {{offer}}"
+    },
+    "payment": {
+      "full": "Full · {{amount}} in {{mode}}",
+      "split": "Split cash + UPI",
+      "nothing": "Nothing now",
+      "mode": "Mode",
+      "amount": "Amount",
+      "addMode": "Add another mode",
+      "paidTotal": "Paid {{paid}} · due {{due}}"
+    },
+    "totals": {
+      "label": "Totals",
+      "subtotal": "Subtotal",
+      "discountGst": "Discount + GST",
+      "discountGstValue": "{{discount}} · +{{gst}}",
+      "bill": "Bill",
+      "dueAfter": "Due after this",
+      "preview": "Priced as the save will write it",
+      "pending": "Pricing…",
+      "refused": "Not priced · fix the marked line",
+      "failed": "Couldn’t price this invoice",
+      "retry": "Retry"
+    },
+    "badges": {
+      "bill": "Bill {{amount}}",
+      "sessions_one": "Covers {{count}} session",
+      "sessions_other": "Covers {{count}} sessions",
+      "draft": "Draft",
+      "due": "{{amount}} due",
+      "paid": "Fully paid"
+    },
+    "presets": {
+      "print": "Print invoice",
+      "plan": "Plan · {{name}}",
+      "planQty": "Plan · {{name}} ×{{count}}",
+      "package": "Package · {{name}}",
+      "repeat": "Repeat #{{seq}}",
+      "consultation": "New consultation · {{amount}}",
+      "rx": "From Rx #{{seq}}"
+    },
+    "save": {
+      "clinic": "Create clinic invoice",
+      "medical": "Create medical invoice",
+      "consultation": "Create consultation invoice",
+      "edit": "Save changes"
+    },
+    "summary": "{{type}} · {{name}} · {{items}}",
+    "summaryItems_one": "{{count}} item",
+    "summaryItems_other": "{{count}} items",
+    "noPatient": "No patient",
+    "errors": {
+      "pickPatient": "Pick a patient",
+      "pickCustomer": "Pick a customer",
+      "addItem": "Add at least one item",
+      "paidAboveBill": "Paid {{paid}} is more than the bill {{bill}}",
+      "stock": "Only {{count}} of {{name}} in stock",
+      "belowFloor": "{{name}} is below its lowest price {{amount}} · raise the final price",
+      "belowLowest": "{{name}} is below its lowest price · raise the final price"
+    },
+    "toasts": {
+      "created": {
+        "clinic": "Clinic invoice #{{seq}} created",
+        "medical": "Medical invoice #{{seq}} created",
+        "consultation": "Consultation invoice #{{seq}} created"
+      },
+      "copied": "Copied as #{{seq}}",
+      "createdPlan_one": "{{created}} · {{count}} offering suggestions item marked invoiced",
+      "createdPlan_other": "{{created}} · {{count}} offering suggestions items marked invoiced",
+      "saved": "Invoice #{{seq}} saved",
+      "savedPlan": "Invoice #{{seq}} saved · offering suggestions updated",
+      "promo": "{{offer}} applied to {{offering}}",
+      "contactSaved": "{{name}} saved as a Medical contact · add a mobile below",
+      "rxUnmatched": "{{name}} not in the medicine list · add from the quick line",
+      "deleted": "Invoice #{{seq}} deleted"
+    },
+    "deleteTitle": "Delete this invoice?",
+    "previewTitle": {
+      "clinic": "Invoice #{{seq}}",
+      "medical": "Medical invoice #{{seq}}",
+      "consultation": "Consultation invoice #{{seq}}"
+    },
+    "record": "Invoice",
+    "refusals": {
+      "moreThanDue": "Paid now is more than the bill",
+      "dayClosed": "That day is closed · no payment can be added to it",
+      "settled": "This invoice is settled · a payment on it falls on a closed day",
+      "belowPaid": "The bill can’t go below what is already paid",
+      "offeringInUse": "A session of this package is already used · keep its line",
+      "treatmentBilled": "A treatment on this invoice was billed meanwhile · remove it and save again",
+      "ofSale": "This invoice belongs to a Medical sale · change it from Medical",
+      "paid": "This invoice has money paid or a credit note · it can’t be deleted",
+      "inUseDelete": "A session of this package is already used · the invoice can’t be deleted"
+    },
+    "notices": {
+      "settled": "Settled · a payment on this invoice falls on a closed day, so it can’t change",
+      "sale": "A Medical sale’s invoice · change it from Medical"
+    }
+  },
+  "printPreview": {
+    "title": "Print preview · {{title}}",
+    "close": "Close",
+    "print": "Print / Save PDF"
+  },
+  "appHomeEmpty": {
+    "title": "Nothing is switched on here yet",
+    "description": "Your clinic's sections appear here as soon as they're switched on for you."
+  }
+}

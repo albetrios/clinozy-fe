@@ -13,6 +13,7 @@ import type { ConsentDecision } from '@/shared/store/useConsentStore/index.ts';
  */
 export async function captureAnalyticsConsentDecision(
   decision: Exclude<ConsentDecision, null>,
+  source: 'consent_banner' | 'settings' = 'consent_banner',
 ): Promise<void> {
   if (decision === 'denied') {
     // Withdrawal: purge any analytics state stored under a prior grant.
@@ -22,6 +23,6 @@ export async function captureAnalyticsConsentDecision(
 
   captureAnalyticsEvent(ANALYTICS_EVENTS.consentDecision, {
     decision: 'granted',
-    source: 'consent_banner',
+    source,
   });
 }

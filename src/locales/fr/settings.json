@@ -44,7 +44,6 @@
       "recoveryTitle": "Enregistrez vos codes de récupération",
       "recoveryDescription": "Conservez-les en lieu sûr. Chacun ne fonctionne qu'une fois si vous perdez votre appareil.",
       "done": "Terminé",
-      "cancel": "Annuler",
       "verifyEnable": "Vérifier et activer",
       "codeLabel": "Entrez le code à 6 chiffres",
       "codeAria": "Code d'authentificateur à six chiffres",
@@ -67,7 +66,6 @@
       "addDescription": "Donnez-lui un nom pour la reconnaître plus tard. Votre appareil vous demandera de créer la clé.",
       "nameLabel": "Nom",
       "namePlaceholder": "MacBook Touch ID",
-      "cancel": "Annuler",
       "submit": "Ajouter la clé d'accès"
     },
     "overview": {
@@ -109,12 +107,6 @@
       "sendFailed": "Impossible d'envoyer le code. Veuillez réessayer."
     }
   },
-  "discard": {
-    "title": "Abandonner les modifications non enregistrées ?",
-    "description": "Vous avez des modifications non enregistrées. Quitter cette section les abandonnera.",
-    "stay": "Continuer l'édition",
-    "leave": "Abandonner les modifications"
-  },
   "dialog": {
     "title": "Paramètres"
   },
@@ -150,7 +142,10 @@
       "cancelInviteDescription": "Le lien reçu par e-mail ne fonctionnera plus. Vous pourrez annuler pendant quelques secondes après confirmation, ou renvoyer une invitation plus tard.",
       "cancelInviteConfirm": "Annuler l'invitation",
       "cancelInviteKeep": "Conserver l'invitation",
-      "cancelInvitePending": "Annulation de l'invitation envoyée à {{email}}…"
+      "cancelInvitePending": "Annulation de l'invitation envoyée à {{email}}…",
+      "movedTitle": "Les membres sont désormais dans Utilisateurs",
+      "movedBody": "Invitez des personnes, changez leurs rôles, mettez-les en pause ou retirez-les, et renvoyez ou annulez les invitations — le tout depuis l’Équipe.",
+      "open": "Ouvrir Utilisateurs"
     },
     "roles": {
       "title": "Rôles",
@@ -178,7 +173,10 @@
       "create": "Nouveau rôle",
       "roleFallback": "ce rôle",
       "permissionsLoading": "Chargement des autorisations…",
-      "permissionsLoadFailed": "Impossible de charger la liste des autorisations. Veuillez réessayer."
+      "permissionsLoadFailed": "Impossible de charger la liste des autorisations. Veuillez réessayer.",
+      "movedTitle": "Les rôles sont désormais dans Utilisateurs",
+      "movedBody": "Ajoutez, renommez et supprimez des rôles, et choisissez ce que chacun peut faire — les sections de la clinique, Utilisateurs et les autorisations de l’espace de travail — dans Rôles et accès.",
+      "open": "Ouvrir Rôles et accès"
     },
     "listSort": {
       "label": "Trier par",
@@ -229,7 +227,15 @@
       "dangerZoneDescription": "Actions irréversibles sur votre compte.",
       "deleteHeading": "Supprimer le compte",
       "deleteBody": "Supprimez définitivement votre compte et toutes les données associées.",
-      "deleteAction": "Supprimer le compte"
+      "deleteAction": "Supprimer le compte",
+      "privacyTitle": "Confidentialité",
+      "privacyDescription": "Votre choix concernant l’analyse produit et les enregistrements de session, enregistré sur votre compte.",
+      "analyticsLabel": "Analyse produit et enregistrements de session",
+      "analyticsHint": "Analyse PostHog et enregistrements de session Sentry. Les rapports d’erreurs fonctionnent dans tous les cas.",
+      "consentGrantedOn": "Autorisé le {{date}}",
+      "consentDeniedOn": "Refusé le {{date}}",
+      "consentUnanswered": "Pas encore répondu",
+      "privacyPolicyLink": "Politique de confidentialité"
     },
     "general": {
       "namePlaceholder": "Acme Inc.",
@@ -264,6 +270,7 @@
       "apiKeysNoResults": "Aucune clé d'API correspondante",
       "apiKeysNoResultsDescription": "Aucune clé d'API ne correspond à votre recherche.",
       "apiKeyFallback": "cette clé d'API",
+      "addedOn": "ajoutée le <1></1>",
       "createApiKey": "Créer une clé d'API",
       "createApiKeyTitle": "Créer une clé d'API",
       "createApiKeyDescription": "Nommez la clé, choisissez ce qu'elle peut faire et sa durée de vie.",
@@ -299,7 +306,6 @@
       "addWebhookDescription": "Nous enverrons les événements sélectionnés à cette URL en POST.",
       "payloadUrlLabel": "URL de destination",
       "eventsLabel": "Événements",
-      "cancel": "Annuler",
       "createWebhook": "Créer le webhook",
       "creating": "Création…",
       "deleteWebhookAria": "Supprimer le webhook {{url}}",
@@ -327,7 +333,6 @@
       "attemptCodeColumn": "Code",
       "attemptWhenColumn": "Quand",
       "attemptCountLabel": "Tentative {{count}}",
-      "closeDialog": "Fermer",
       "eventsLoadFailed": "Impossible de charger la liste d'événements. Veuillez réessayer.",
       "eventsLoading": "Chargement des événements…",
       "eventsEmpty": "Aucun événement disponible."
@@ -351,12 +356,14 @@
         "email": "E-mail",
         "inApp": "Dans l'app",
         "desktop": "Bureau"
-      }
+      },
+      "kind": "Notification",
+      "loadFailed": "Impossible de charger vos préférences. Veuillez réessayer.",
+      "desktopDenied": "Les notifications de bureau nécessitent l'autorisation du navigateur. Activez-les dans les paramètres de votre navigateur, puis réactivez cette option."
     },
     "appearance": {
       "title": "Apparence",
-      "description": "Enregistré sur cet appareil — les changements sont immédiats.",
-      "shuffle": "Aléatoire"
+      "description": "Enregistré sur cet appareil — les changements sont immédiats."
     },
     "sessions": {
       "title": "Sessions",
@@ -408,6 +415,13 @@
         "expires": "Expire le {{month}}/{{year}}",
         "defaultBadge": "Par défaut"
       },
+      "paymentForm": {
+        "saveMethod": "Enregistrer le moyen de paiement",
+        "savingMethod": "Enregistrement…",
+        "confirmPayment": "Confirmer le paiement",
+        "confirmingPayment": "Confirmation…",
+        "cancel": "Annuler"
+      },
       "invoices": {
         "title": "Factures",
         "description": "Date, échéance, montant et statut fournis par votre prestataire de facturation.",
@@ -432,8 +446,7 @@
         "confirmTitle": "Résilier l'abonnement ?",
         "confirmDescription": "Votre espace de travail conserve l'accès complet jusqu'au {{date}}. Ensuite, l'abonnement prend fin et les fonctionnalités payantes peuvent être limitées.",
         "keep": "Conserver l'abonnement",
-        "confirm": "Confirmer la résiliation",
-        "cancelling": "Résiliation…"
+        "confirm": "Confirmer la résiliation"
       }
     }
   }

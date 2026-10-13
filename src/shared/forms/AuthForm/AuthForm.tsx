@@ -17,7 +17,11 @@ import {
   isPasskeySignInAvailable,
   signInWithPasskey,
 } from '@/shared/auth/passkey-sign-in.ts';
-import { isSafeExternalHttpsUrl, stashReturnTo } from '@/shared/auth/redirect-safety.ts';
+import {
+  isSafeExternalHttpsUrl,
+  isSafeRedirectPath,
+  stashReturnTo,
+} from '@/shared/auth/redirect-safety.ts';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import { mapFrontendError } from '@/shared/errors/map-frontend-error.ts';
 import { FormError } from '@/shared/forms/FormError/index.ts';
@@ -435,7 +439,13 @@ export function AuthForm() {
     setPending({ method: 'passkey' });
     try {
       await signInWithPasskey();
-      void navigate({ to: '/', replace: true });
+      // The page the person signed in for, when it is a safe in-app path (an
+      // invitation link among them) — else `/`, whose resolver decides.
+      const { redirect } = location.search as { redirect?: unknown };
+      void navigate({
+        to: typeof redirect === 'string' && isSafeRedirectPath(redirect) ? redirect : '/',
+        replace: true,
+      });
     } catch (err) {
       surfaceError(err);
     } finally {
@@ -465,8 +475,8 @@ export function AuthForm() {
 
   if (!hasAnyMethod) {
     return (
-      <div className="space-y-6" data-testid={AUTH_FORM_TEST_IDS.form}>
-        <p className="text-muted-foreground text-center text-sm">
+      <div data-testid={AUTH_FORM_TEST_IDS.form}>
+        <p className="text-muted-foreground text-body text-center">
           {t(AUTH_KEYS.auth.unavailable)}
         </p>
       </div>
@@ -475,11 +485,7 @@ export function AuthForm() {
 
   if (autoGooglePending) {
     return (
-      <div
-        className="space-y-6"
-        data-testid={AUTH_FORM_TEST_IDS.form}
-        data-auto-google-pending=""
-      >
+      <div data-testid={AUTH_FORM_TEST_IDS.form} data-auto-google-pending="">
         <AuthAutoGooglePending onSkip={cancelAutoGoogle} />
       </div>
     );
@@ -487,7 +493,7 @@ export function AuthForm() {
 
   return (
     <div
-      className={`flex flex-col ${isEmailVerify ? 'gap-5' : 'gap-7'}`}
+      className="flex flex-col gap-5"
       data-testid={AUTH_FORM_TEST_IDS.form}
       data-email-verify={isEmailVerify ? '' : undefined}
     >

@@ -1,68 +1,14 @@
 {
-  "brand": {
-    "name": "{{productName}}"
-  },
   "a11y": {
-    "skipToMain": "Aller au contenu principal",
-    "mainNavigation": "Navigation principale",
-    "sidebarNavigation": "Navigation latérale",
-    "mobileNavigation": "Navigation mobile"
-  },
-  "auth": {
-    "switchToRegister": "Créer un compte",
-    "switchToSignIn": "Se connecter",
-    "statusOperational": "Tous les systèmes opérationnels",
-    "badge": "Opérations, unifiées",
-    "heroTitle": "Le système d'exploitation de votre organisation.",
-    "heroSubtitle": "Membres, rôles, facturation et sécurité — un espace de travail rapide et pensé pour le clavier, pour chaque équipe.",
-    "features": {
-      "multiOrg": {
-        "title": "Multi-organisation dès la conception",
-        "body": "Changez d'équipe sans changer d'outil."
-      },
-      "secure": {
-        "title": "Sécurisé par défaut",
-        "body": "RBAC, MFA, clés d'accès et pistes d'audit."
-      },
-      "fast": {
-        "title": "Rapide partout",
-        "body": "Conçu pour un travail en temps réel, clavier d'abord."
-      }
-    },
-    "stats": {
-      "teams": "équipes",
-      "uptime": "disponibilité",
-      "compliant": "conforme"
-    }
+    "skipToMain": "Aller au contenu principal"
   },
   "app": {
     "search": "Rechercher",
-    "searchPlaceholder": "Rechercher...",
     "searchShortcutMac": "⌘K",
     "searchShortcutWindows": "Ctrl+K",
-    "userMenu": "Menu utilisateur",
     "userFallback": "Utilisateur",
     "settings": "Paramètres",
     "logOut": "Se déconnecter",
-    "toggleSidebar": "Afficher/masquer la barre latérale",
-    "footerCopyright": "© {{year}} {{productName}} Platform",
-    "nav": {
-      "dashboard": "Tableau de bord"
-    },
-    "sidebar": {
-      "workspace": "Espace de travail",
-      "menu": "Menu",
-      "shortcuts": "Raccourcis"
-    },
-    "contextStrip": {
-      "label": "Accès rapide",
-      "labelSolo": "Aller à",
-      "profile": "Profil",
-      "security": "Sécurité",
-      "billing": "Facturation",
-      "appearance": "Apparence",
-      "shortcuts": "Raccourcis"
-    },
     "workspaceSwitch": {
       "preparing": "Préparation de votre espace de travail",
       "loadingAccess": "Chargement des membres et des autorisations",
@@ -74,7 +20,10 @@
       "personal": "Personnel",
       "yourOrganizations": "Vos organisations",
       "organizations": "Organisations",
-      "addOrganization": "Ajouter une organisation"
+      "addOrganization": "Ajouter une organisation",
+      "invited": "Invitations",
+      "invitedRow": "Invité · {{roles}}",
+      "invitationCount": "Invitations : {{count}}"
     },
     "notifications": {
       "title": "Notifications",
@@ -90,17 +39,15 @@
       "settingsLink": "Paramètres de notification"
     },
     "commandPalette": {
-      "ariaLabel": "Palette de commandes",
-      "placeholder": "Tapez une commande ou recherchez...",
+      "ariaLabel": "Menu de commandes",
+      "placeholder": "Rechercher ou aller à…",
       "empty": "Aucun résultat trouvé.",
       "groups": {
-        "navigation": "Navigation",
         "theme": "Thème",
         "account": "Compte",
         "organizations": "Organisations",
         "shortcuts": "Raccourcis"
       },
-      "dashboard": "Tableau de bord",
       "userSettings": "Paramètres utilisateur",
       "organizationSettings": "Paramètres de l'organisation",
       "lightMode": "Mode clair",
@@ -118,6 +65,10 @@
       "commandPalette": "Ouvrir la palette de commandes",
       "showShortcuts": "Afficher les raccourcis clavier",
       "showShortcutsAlt": "Afficher les raccourcis clavier (alternatif)",
+      "allSections": "Ouvrir ou fermer Toutes les sections",
+      "jumpToSection": "Aller à une section",
+      "listSearch": "Rechercher dans la liste",
+      "leadRows": "Prospect suivant ou précédent (dans Prospects)",
       "closeDialog": "Fermer la boîte de dialogue"
     },
     "emailVerify": {
@@ -143,16 +94,64 @@
       "nameLabel": "Nom de l’organisation",
       "slugLabel": "URL de l’espace (facultatif)",
       "submit": "Créer une organisation",
-      "submitting": "Création…"
+      "submitting": "Création…",
+      "cancel": "Annuler"
     },
     "theme": {
       "light": "Clair",
       "dark": "Sombre",
-      "system": "Système",
-      "shuffle": "Thème aléatoire"
+      "system": "Système"
+    },
+    "sectionBar": {
+      "nav": "Sections",
+      "allSections": "Toutes les sections",
+      "allSectionsTitle": "Toutes les sections (G)",
+      "more": "Plus",
+      "morePinned": "Autres sections épinglées",
+      "tabTitle": "{{section}} · {{description}}",
+      "searchLabel": "Rechercher ou aller à (Commande K)",
+      "searchTitleMac": "Rechercher ou aller à… (⌘K)",
+      "searchTitleWindows": "Rechercher ou aller à… (Ctrl K)",
+      "searchPlaceholder": "Rechercher des patients, des prospects…",
+      "pin": "Épingler à la barre",
+      "unpin": "Désépingler de la barre",
+      "pinAria": "Épingler à la barre · {{section}}",
+      "unpinAria": "Désépingler de la barre · {{section}}",
+      "pinFooter": "Épinglez pour la garder dans la barre",
+      "keysHint": "G · 1–9",
+      "account": "Compte",
+      "avatarLabel": "{{name}} · {{status}}",
+      "identityRole": "{{role}} · {{branch}}",
+      "status": "Statut",
+      "presence": {
+        "online": "En ligne",
+        "away": "Absent",
+        "busy": "Occupé"
+      },
+      "statusToast": "Statut · {{status}}",
+      "switchClinic": "Changer de clinique",
+      "security": "Sécurité",
+      "billing": "Facturation",
+      "devices": "Appareils",
+      "appearance": "Apparence",
+      "appearanceLanguage": "Apparence et langue",
+      "viewAs": {
+        "previewing": "Aperçu en tant que {{role}}",
+        "noSections": "Aucune section",
+        "exit": "Quitter l’aperçu",
+        "exitToast": "Retour à vos propres accès"
+      },
+      "branch": {
+        "label": "Établissement · {{label}}",
+        "title": "Établissement · {{names}}",
+        "all": "Tous les établissements",
+        "allSub": "Vue combinée · totaux sur {{count}}",
+        "viewGroup": "Vue",
+        "branchesGroup": "Établissements",
+        "showingAll": "Tous les établissements affichés",
+        "showing": "Affichage : {{names}}",
+        "keepOne": "Gardez au moins un établissement"
+      }
     }
-  },
-  "public": {
-    "brandTagline": "Espace de travail sécurisé pour votre équipe"
   }
 }

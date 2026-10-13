@@ -1,6 +1,7 @@
 import { act, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import { axe } from 'vitest-axe';
 
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
@@ -16,6 +17,23 @@ describe('UnauthorizedPage', () => {
     renderWithProviders(<UnauthorizedPage />);
     expect(await screen.findByTestId('unauthorized-page')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /go home/i })).toBeInTheDocument();
+  });
+
+  it('is the empty state: the 403 pill and "No access to this page" as the page heading', async () => {
+    renderWithProviders(<UnauthorizedPage />);
+    const page = await screen.findByTestId('unauthorized-page');
+    const heading = screen.getByRole('heading', { level: 1, name: /403/ });
+    expect(heading).toHaveTextContent('No access to this page');
+    expect(
+      screen.getByText('You do not have permission to access this page.'),
+    ).toBeInTheDocument();
+    expect(page.querySelector('[data-tone]')).toHaveAttribute('data-tone', 'stone');
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = renderWithProviders(<UnauthorizedPage />);
+    await screen.findByTestId('unauthorized-page');
+    expect(await axe(container)).toHaveNoViolations();
   });
 
   it('sends one logout for a double-clicked Sign out', async () => {

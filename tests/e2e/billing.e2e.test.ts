@@ -1,8 +1,9 @@
 import { expect, type Page, type PlaywrightWorkerArgs, test } from '@playwright/test';
 
 import {
+  establishSessionInPage,
   navigateInApp,
-  registerNewUserAndGoToDashboard,
+  registerNewUserOnPersonalWorkspace,
 } from '@/tests/utils/e2e-auth.ts';
 import { gotoApp, openSettingsHash } from '@/tests/utils/e2e-hybrid.ts';
 import {
@@ -25,9 +26,13 @@ const API = 'http://localhost:3000/api/v1';
 
 type TeamContext = { slug: string; subscribed: boolean; planCount: number };
 
+/** Why a subscription spec skips: no paid plan carries a Stripe sandbox price. */
+const NO_PAID_SUBSCRIPTION =
+  'no paid plan with a Stripe sandbox price — run `pnpm db:seed:stripe-catalog` in clinozy-be';
+
 /**
- * Create a team org via the API, optionally seed a free-plan subscription, then
- * hydrate the browser with the team-scoped token and land on its dashboard.
+ * Create a team org via the API, optionally subscribe it to the cheapest paid plan, then
+ * hydrate the browser with the team-scoped token and land on its home (Today).
  * Returns `null` when the environment can't provision one (seat seed / Stripe).
  * `planCount` reflects the seeded plan catalog so plan-dependent specs can skip
  * gracefully when no plans exist in this environment.
@@ -56,34 +61,28 @@ async function setUpTeamBilling(
 
     let subscribed = false;
     if (opts.withSubscription) {
-      // A free plan activates without a payment method — the reliable seed path.
-      const freePlan = plans.find((p) => Number(p.price_monthly) === 0) ?? plans[0];
-      if (freePlan) {
+      // Free is the tier an organization with no subscription is on: clinozy-be refuses a
+      // subscription to it (it has no provider price). The cheapest paid plan — priced in the
+      // Stripe sandbox by clinozy-be's `pnpm db:seed:stripe-catalog` — is subscribed to, and
+      // waits for its first payment.
+      const paidPlan = plans
+        .filter((p) => Number(p.price_monthly) > 0)
+        .sort((a, b) => Number(a.price_monthly) - Number(b.price_monthly))[0];
+      if (paidPlan) {
         const sub = await api.post(`${API}/billing/subscriptions`, {
           headers: bearerHeaders(teamToken, true),
-          data: { plan_id: freePlan.id, billing_cycle: 'monthly' },
+          data: { plan_id: paidPlan.id, billing_cycle: 'monthly' },
         });
         subscribed = sub.ok();
       }
     }
 
     await gotoApp(page, '/login');
-    await page.waitForFunction(
-      () => globalThis.__clinozyFeEstablishSession != null,
-      null,
-      {
-        timeout: 10_000,
-      },
-    );
-    await page.evaluate(async (token) => {
-      const establish = globalThis.__clinozyFeEstablishSession;
-      if (!establish) throw new Error('__clinozyFeEstablishSession missing');
-      await establish(token);
-    }, teamToken);
+    await establishSessionInPage(page, teamToken);
 
     if (!org.slug) throw new Error('team org slug missing');
-    await navigateInApp(page, `/organization/${org.slug}/dashboard`);
-    await expect(page.getByTestId('dashboard-page')).toBeVisible({ timeout: 15000 });
+    await navigateInApp(page, `/organization/${org.slug}`);
+    await expect(page.getByTestId('today-page')).toBeVisible({ timeout: 15000 });
     return { slug: org.slug, subscribed, planCount: plans.length };
   } finally {
     await api.dispose();
@@ -147,16 +146,13 @@ test.describe('Billing & subscription', () => {
     await expect(page.getByText(/\/\s*mo/).first()).toBeVisible();
   });
 
-  test('an active subscription surfaces summary, invoices, payment methods, and cancellation', async ({
+  test('a subscription surfaces summary, invoices, payment methods, and cancellation', async ({
     page,
     playwright,
   }) => {
     const ctx = await setUpTeamBilling(page, playwright, { withSubscription: true });
     test.skip(ctx === null, 'team org could not be provisioned in this environment');
-    test.skip(
-      !ctx?.subscribed,
-      'no free plan seeded / subscription create unavailable in this environment',
-    );
+    test.skip(!ctx?.subscribed, NO_PAID_SUBSCRIPTION);
 
     await openSettingsHash(page, 'account', 'billing');
 
@@ -165,11 +161,14 @@ test.describe('Billing & subscription', () => {
     await expect(page.getByTestId('billing-invoices-card')).toBeVisible();
     await expect(page.getByTestId('billing-payment-methods-card')).toBeVisible();
     await expect(page.getByTestId('billing-cancellation-card')).toBeVisible();
+    // A subscription keeps its own cycle (change-plan takes the plan alone), so the
+    // Monthly · Yearly switch is offered only before there is one.
+    await expect(page.getByTestId('billing-cycle-toggle')).toHaveCount(0);
   });
 
   test('a personal account cannot manage billing (team-gated)', async ({ page }) => {
-    // Default registration lands in personal mode (no team org).
-    await registerNewUserAndGoToDashboard(page);
+    // A personal workspace reaches Settings over the organization picker (D44).
+    await registerNewUserOnPersonalWorkspace(page);
 
     await openSettingsHash(page, 'account', 'billing');
     await expect(page.getByTestId('settings-account-billing')).toBeVisible({
@@ -187,7 +186,7 @@ test.describe('Billing & subscription', () => {
   }) => {
     const ctx = await setUpTeamBilling(page, playwright, { withSubscription: true });
     test.skip(ctx === null, 'team org could not be provisioned in this environment');
-    test.skip(!ctx?.subscribed, 'subscription create unavailable in this environment');
+    test.skip(!ctx?.subscribed, NO_PAID_SUBSCRIPTION);
 
     await openSettingsHash(page, 'account', 'billing');
     await expect(page.getByTestId('billing-cancellation-card')).toBeVisible({
@@ -197,7 +196,9 @@ test.describe('Billing & subscription', () => {
     const cancelButton = page.getByTestId('billing-cancel');
     test.skip(
       !(await cancelButton.isEnabled()),
-      'subscription not in a cancellable state',
+      // The subscription waits for its first payment; only Stripe's webhook marks it paid, so
+      // locally it needs `stripe listen --forward-to localhost:3000/api/v1/billing/webhook`.
+      'subscription not cancellable yet: its first payment is unconfirmed (forward Stripe webhooks with `stripe listen`)',
     );
 
     await cancelButton.click();
@@ -216,7 +217,7 @@ test.describe('Billing & subscription', () => {
   }) => {
     const ctx = await setUpTeamBilling(page, playwright, { withSubscription: true });
     test.skip(ctx === null, 'team org could not be provisioned in this environment');
-    test.skip(!ctx?.subscribed, 'subscription create unavailable in this environment');
+    test.skip(!ctx?.subscribed, NO_PAID_SUBSCRIPTION);
 
     await openSettingsHash(page, 'account', 'billing');
     const summary = page.getByTestId('billing-summary');
@@ -240,13 +241,18 @@ test.describe('Billing & subscription', () => {
   }) => {
     const ctx = await setUpTeamBilling(page, playwright, { withSubscription: true });
     test.skip(ctx === null, 'team org could not be provisioned in this environment');
-    test.skip(!ctx?.subscribed, 'subscription create unavailable in this environment');
+    test.skip(!ctx?.subscribed, NO_PAID_SUBSCRIPTION);
 
     await openSettingsHash(page, 'account', 'billing');
     await expect(page.getByTestId('billing-invoices-card')).toBeVisible({
       timeout: 15000,
     });
 
+    // The card frames the list before Stripe's answer arrives: decide on the table itself, once
+    // the invoices have loaded — not on the card, which is up while they are still loading.
+    await expect(page.getByTestId('billing-invoices-table')).toBeVisible({
+      timeout: 15000,
+    });
     const viewLink = page.getByTestId('billing-invoice-view').first();
     test.skip(
       !(await viewLink.isVisible()),

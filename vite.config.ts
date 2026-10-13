@@ -111,9 +111,6 @@ export default defineConfig(({ command, mode }) => {
             '**/sentry-*.js',
             '**/posthog-*.js',
             '**/SettingsModal-*.js',
-            '**/dashboard.route-*.js',
-            '**/iconset-phosphor-*.js',
-            '**/iconset-tabler-*.js',
             '**/CommandPalette-*.js',
             '**/AppearanceDialog-*.js',
           ],
@@ -215,13 +212,12 @@ export default defineConfig(({ command, mode }) => {
               return 'vendor';
             }
             if (id.includes('node_modules/@tanstack/react-query')) return 'query';
-            // NO manual chunk for cmdk or recharts (command palette + charts):
-            // they are only ever reached via dynamic imports (CommandPaletteLazy,
-            // the lazy dashboard route), so natural splitting already isolates them.
-            // Forcing such a lib into a named chunk makes rollup hoist a shared
-            // helper there, statically chaining the whole chunk to the entry (this
-            // regressed first-paint when `recharts` was a 'charts' chunk — see
-            // tooling/ci/check-preload-graph.mjs).
+            // NO manual chunk for cmdk (the command palette): it is only ever
+            // reached via a dynamic import (CommandPaletteLazy), so natural
+            // splitting already isolates it. Forcing such a lib into a named chunk
+            // makes rollup hoist a shared helper there, statically chaining the
+            // whole chunk to the entry (this regressed first-paint when `recharts`
+            // was a 'charts' chunk — see tooling/ci/check-preload-graph.mjs).
           },
         },
       },
@@ -229,8 +225,8 @@ export default defineConfig(({ command, mode }) => {
 
     // Dev-server pre-bundling ONLY — this does not touch the production build.
     //
-    // Every dep listed here is reachable only from a lazy route (dashboard charts,
-    // tables, billing, the deferred icon sets). Left undeclared, Vite first meets
+    // Every dep listed here is reachable only from a lazy route (tables,
+    // billing). Left undeclared, Vite first meets
     // them when you navigate to that route, re-optimizes mid-session and hands the
     // page a new dep hash. Modules already evaluated keep the old one, so the tab
     // ends up running TWO copies of React: `react/compiler-runtime` then reads a
@@ -244,12 +240,9 @@ export default defineConfig(({ command, mode }) => {
         'react-dom',
         // Pinned to the same pass as react — it reads React's internals directly.
         'react/compiler-runtime',
-        'recharts',
         '@tanstack/react-table',
         '@stripe/react-stripe-js',
         '@stripe/stripe-js',
-        '@phosphor-icons/react',
-        '@tabler/icons-react',
         '@sentry/react',
         // The MFA enrollment QR code (`shared/components/QrCode`) is their only
         // importer, and it sits behind the lazy Security settings panel. Missing

@@ -10,6 +10,8 @@ export const ERRORS_KEYS = {
   },
   route: {
     notFound: 'route.notFound',
+    pageNotFound: 'route.pageNotFound',
+    recordNotFound: 'route.recordNotFound',
     generic: 'route.generic',
     pageTitle: 'route.pageTitle',
     pageMessage: 'route.pageMessage',
@@ -17,6 +19,8 @@ export const ERRORS_KEYS = {
     goHome: 'route.goHome',
     refresh: 'route.refresh',
     forbidden: 'route.forbidden',
+    /** The 403's heading — the sentence above is its line. */
+    forbiddenTitle: 'route.forbiddenTitle',
     signOut: 'route.signOut',
     signingOut: 'route.signingOut',
   },
@@ -35,19 +39,12 @@ export const ERRORS_KEYS = {
     pageContent: 'widget.pageContent',
     navigation: 'widget.navigation',
     emailBanner: 'widget.emailBanner',
-    notifications: 'widget.notifications',
     organizationSwitcher: 'widget.organizationSwitcher',
     commandPalette: 'widget.commandPalette',
     settings: 'widget.settings',
     appearance: 'widget.appearance',
-    analytics: 'widget.analytics',
-    members: 'widget.members',
-    schedule: 'widget.schedule',
-    highlights: 'widget.highlights',
-    themeShowcase: 'widget.themeShowcase',
     sessionTimeout: 'widget.sessionTimeout',
     securityCheck: 'widget.securityCheck',
-    appearanceControls: 'widget.appearanceControls',
     payment: 'widget.payment',
     cancellation: 'widget.cancellation',
   },
@@ -56,16 +53,6 @@ export const ERRORS_KEYS = {
     undo: 'toast.undo',
     undone: 'toast.undone',
     processing: 'toast.processing',
-    preview: {
-      successTitle: 'toast.preview.successTitle',
-      successDescription: 'toast.preview.successDescription',
-      errorTitle: 'toast.preview.errorTitle',
-      errorDescription: 'toast.preview.errorDescription',
-      warningTitle: 'toast.preview.warningTitle',
-      warningDescription: 'toast.preview.warningDescription',
-      infoTitle: 'toast.preview.infoTitle',
-      infoDescription: 'toast.preview.infoDescription',
-    },
   },
   api: {
     fallback: 'api.fallback',
@@ -80,6 +67,26 @@ export const ERRORS_KEYS = {
     http500: 'api.http500',
     http502: 'api.http502',
     http503: 'api.http503',
+    /** A stale save's toast action: load the record again (`409 record_changed`). */
+    reload: 'api.reload',
+    /**
+     * A stale save in our own words (`409 record_changed`) — never the server's detail, which
+     * names a user id and an ISO time.
+     */
+    recordChanged: 'api.recordChanged',
+    /** clinozy-be's `error.reason` codes said in our own words (D83 #170 and the tenancy guards). */
+    reasons: {
+      missingPermission: 'api.reasons.missingPermission',
+      ownerMembershipFixed: 'api.reasons.ownerMembershipFixed',
+      ownerCannotLeave: 'api.reasons.ownerCannotLeave',
+      ownerRoleFixed: 'api.reasons.ownerRoleFixed',
+      systemRoleFixed: 'api.reasons.systemRoleFixed',
+      roleLocked: 'api.reasons.roleLocked',
+      seatLimitReached: 'api.reasons.seatLimitReached',
+      membershipAlreadyExists: 'api.reasons.membershipAlreadyExists',
+      organizationSlugExists: 'api.reasons.organizationSlugExists',
+      disposableEmail: 'api.reasons.disposableEmail',
+    },
   },
   frontend: {
     query: {
@@ -102,12 +109,6 @@ export const ERRORS_KEYS = {
     account: {
       copyFailed: 'frontend.account.copyFailed',
       copySuccess: 'frontend.account.copySuccess',
-      themeCodeNumeric: 'frontend.account.themeCodeNumeric',
-      themeLinkCopied: 'frontend.account.themeLinkCopied',
-      themeLinkCopiedDescription: 'frontend.account.themeLinkCopiedDescription',
-      notificationStylePreview: 'frontend.account.notificationStylePreview',
-      notificationStylePreviewDescription:
-        'frontend.account.notificationStylePreviewDescription',
       accountDeletionPending: 'frontend.account.accountDeletionPending',
       avatarInvalidType: 'frontend.account.avatarInvalidType',
       avatarTooLarge: 'frontend.account.avatarTooLarge',
@@ -132,6 +133,7 @@ export const ERRORS_KEYS = {
         removeFailed: 'frontend.hooks.members.removeFailed',
         updateFailed: 'frontend.hooks.members.updateFailed',
         updateRoleSuccess: 'frontend.hooks.members.updateRoleSuccess',
+        updateSuccess: 'frontend.hooks.members.updateSuccess',
         removeSuccess: 'frontend.hooks.members.removeSuccess',
         suspendSuccess: 'frontend.hooks.members.suspendSuccess',
         reactivateSuccess: 'frontend.hooks.members.reactivateSuccess',

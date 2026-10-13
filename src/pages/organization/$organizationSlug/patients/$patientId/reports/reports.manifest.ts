@@ -1,0 +1,18 @@
+import type { PageManifest } from '@/lib/routes/page-manifest.ts';
+
+/**
+ * Patient file › Reports
+ * (`/organization/$organizationSlug/patients/$patientId/reports`; KICKOFF §6.6,
+ * D26). The file layout's gate covers it (membership, the `app-patients`
+ * module, the org status); in-room access is `useAppAccess`.
+ */
+export const manifest = {
+  segment: 'reports',
+  path: '/organization/$organizationSlug/patients/$patientId/reports',
+  title: 'Reports',
+  testId: 'patient-section-reports',
+  permission: 'organization:read',
+  module: 'app-patients',
+  kind: 'layout',
+  children: ['create', '$reportId'],
+} as const satisfies PageManifest;

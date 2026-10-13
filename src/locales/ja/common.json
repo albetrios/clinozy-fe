@@ -98,13 +98,24 @@
     "description": "アプリの新しいバージョンが利用可能です。",
     "refresh": "今すぐ更新"
   },
+  "cells": {
+    "patient": "患者",
+    "patientMark": "患",
+    "leadMark": "リ",
+    "moreCount": "ほか{{count}}人"
+  },
+  "emptyState": {
+    "fallbackTitle": "まだ何もありません",
+    "filteredTitle": "一致する結果はありません",
+    "filteredHint": "このフィルターに一致するものはありません。すべて表示するにはフィルターをクリアしてください。",
+    "clearFilters": "フィルターをクリア"
+  },
   "a11y": {
     "close": "閉じる",
     "loading": "読み込み中",
     "loadingNamed": "{{name}} を読み込み中…",
     "loadingPage": "ページを読み込み中",
     "toggleTheme": "テーマを切り替え",
-    "openAppearance": "外観を開く",
     "cookieConsent": "Cookieの同意",
     "rowsPerPage": "ページあたりの行数",
     "goFirstPage": "最初のページへ",
@@ -114,84 +125,146 @@
     "selectAll": "すべて選択",
     "copyAccountId": "アカウントIDをコピー",
     "onboardingProgress": "オンボーディングの進捗",
-    "themeCode": "テーマコード",
     "mode": "モード"
   },
   "appearance": {
     "themeTitle": "テーマ",
     "themeLocked": "テーマは組織の設定で管理されているため、ここでは変更できません。",
-    "themeDescription": "名前付きアクセントプリセット、またはリンクをコピー／テーマコードを貼り付けて、まったく同じ外観を再現できます。",
-    "presetAria": "名前付きアクセントプリセット",
-    "copyLink": "リンクをコピー",
-    "shuffleHint": "シャッフルするとコードが生成されます。",
-    "codeLabel": "コード: {{seed}}",
-    "codePlaceholder": "テーマコードを貼り付け",
-    "apply": "適用",
-    "pickAnyColour": "任意の色を選択",
     "modeTitle": "モード",
-    "modeDescription": "このデバイスに保存されます。",
-    "colourTitle": "カラー",
-    "colourDescription": "アクセント、チャート、ニュートラルベース。",
-    "accentColour": "アクセントカラー",
-    "chartColour": "チャートカラー",
-    "baseColour": "ベースカラー",
-    "harmony": "ハーモニー",
-    "harmonyAria": "カラーハーモニー",
-    "accentIntensity": "アクセントの強さ",
-    "typeTitle": "書体と形状",
-    "typeDescription": "フォント、角丸、メニューのサーフェス。",
-    "bodyFont": "本文フォント",
-    "headingFont": "見出しフォント",
-    "radius": "角丸",
-    "shapeLanguage": "シェイプランゲージ",
-    "typeScale": "タイプスケール",
-    "menu": "メニュー",
-    "menuAria": "メニューのスタイル",
-    "iconsTitle": "アイコン",
-    "iconsDescription": "線の太さ、色、アイコンセット。",
-    "iconWeight": "アイコンの太さ",
-    "iconColour": "アイコンの色",
-    "iconLibrary": "アイコンライブラリ",
-    "layoutTitle": "レイアウト",
-    "layoutDescription": "メインワークスペースの幅 — ダッシュボードには標準、集中して読む場合は読みやすい幅。",
-    "contentWidth": "コンテンツ幅",
-    "dashboardTitle": "ダッシュボード",
-    "dashboardDescription": "ダッシュボードのセクション配置を選べます。",
-    "dashboardArrangement": "レイアウト",
-    "surfaceTitle": "サーフェスとモーション",
-    "surfaceDescription": "余白、奥行き、コントラスト、動きの質感。",
-    "density": "密度",
-    "contrast": "コントラスト",
-    "elevation": "エレベーション",
-    "separation": "区切り",
-    "separationAria": "サーフェスの区切り",
-    "motion": "モーション",
-    "focusRing": "フォーカスリング",
-    "notificationsTitle": "通知",
-    "notificationsDescription": "トーストのデザインを選択またはシャッフルします — プレビューには現在のテーマトークンが使われます。",
-    "toastDesign": "トーストのデザイン",
-    "position": "位置",
-    "positionAria": "トーストの位置",
-    "previewSuccess": "成功",
-    "previewError": "エラー",
-    "previewWarning": "警告",
-    "previewInfo": "情報",
-    "shuffleSection": "{{section}}をシャッフル",
-    "sectionColour": "カラー",
-    "sectionType": "書体と形状",
-    "sectionSurface": "サーフェスとモーション",
-    "sectionDashboard": "ダッシュボードレイアウト",
-    "sectionNotifications": "通知スタイル",
-    "custom": "カスタム",
-    "customWith": "カスタム — {{look}}"
+    "modeDescription": "このデバイスに保存されます。"
   },
   "table": {
-    "searchPlaceholder": "検索..."
+    "searchPlaceholder": "検索...",
+    "empty": "結果がありません。",
+    "sortBy": "{{column}}で並べ替え",
+    "actions": "操作",
+    "moreActions": "その他の操作",
+    "columns": {
+      "trigger": "列の表示・非表示",
+      "title": "列 · {{total}}列中{{shown}}列を表示",
+      "showAll": "すべての列を表示",
+      "recommendedHides": "おすすめ設定では{{count}}列を非表示",
+      "tapForRecommended": "もう一度タップでおすすめ設定に戻す",
+      "allShown": "全{{count}}列を表示中",
+      "hiddenCount": "{{count}}列を非表示",
+      "search": "列を検索",
+      "shown": "{{total}}列中{{shown}}列を表示",
+      "viewGroup": "表示",
+      "columnsGroup": "列"
+    },
+    "fold": {
+      "showAll_other": "{{count}}列を行内に表示 · すべて表示",
+      "showAllHint": "すべての列を横に並べて表示（横スクロール）",
+      "fitToWidth": "幅に合わせる",
+      "fitToWidthHint": "入りきらない列を各行に折りたたむ"
+    },
+    "selection": {
+      "selectRow": "{{name}}を選択",
+      "selected": "{{count}}件選択中",
+      "selectAllCount": "{{count}}件すべて選択",
+      "clear": "選択を解除",
+      "clearHint": "選択を解除 · Esc",
+      "escape": "Esc",
+      "bulkActions": "一括操作"
+    },
+    "length": {
+      "allLoaded": "すべての{{records}}を読み込みました",
+      "loadingMore": "{{records}}をさらに読み込み中"
+    },
+    "savedViews": {
+      "label": "保存したビュー",
+      "apply": "ビューを適用",
+      "remove": "ビューを削除",
+      "removed": "ビューを削除しました",
+      "defaultName": "マイビュー"
+    }
   },
   "consent": {
-    "description": "{{productName}} の改善を目的とした製品分析に Cookie を使用します。基本機能とエラー監視は Cookie がなくても動作します。",
+    "description": "同意いただいた場合、{{productName}} の改善のために PostHog の分析と Sentry のセッション記録を使用します。エラーレポートを含め、その他の機能はこれらなしで動作します。閉じると「拒否」になります。",
     "privacyPolicy": "プライバシーポリシー",
     "accept": "同意する",
-    "decline": "拒否する"
+    "decline": "拒否する",
+    "closeAndDecline": "閉じる（拒否として扱われます）"
+  },
+  "confirm": {
+    "accept": "確認",
+    "cancel": "キャンセル",
+    "fallbackDescription": "この操作を確認してください。"
+  },
+  "picker": {
+    "placeholder": "選択…",
+    "search": "{{label}}を検索",
+    "searchDefault": "検索",
+    "escKey": "Esc",
+    "options": "選択肢",
+    "recent": "最近",
+    "all": "すべて",
+    "create": "「{{query}}」を作成",
+    "createNamed": "{{label}}「{{query}}」",
+    "createFull": "新しい{{label}}",
+    "createFullQuery": "{{label}} · 「{{query}}」",
+    "fullDetails": "詳細を入力",
+    "empty": "まだ選べる項目がありません",
+    "noResults": "「{{query}}」の結果はありません",
+    "noResultsHint": "つづりを確認するか、文字数を減らしてください",
+    "noResultsRemoteHint": "名前、電話番号、IDで試してください",
+    "loadingMore": "さらに読み込み中",
+    "clear": "クリア",
+    "triggerLabel": "{{label}} · {{value}}",
+    "date": {
+      "label": "日付",
+      "placeholder": "日付を選択",
+      "search": "日付を入力 · 例: 9/12",
+      "today": "今日",
+      "tomorrow": "明日",
+      "yesterday": "昨日",
+      "comingUp": "今後",
+      "relative": "{{relative}} · {{date}}"
+    },
+    "time": {
+      "label": "時刻",
+      "placeholder": "時刻を選択"
+    }
+  },
+  "unsavedChanges": {
+    "title": "変更を破棄しますか？",
+    "description": "変更は保存されておらず、失われます。",
+    "discard": "破棄",
+    "keepEditing": "編集を続ける"
+  },
+  "uploadTray": {
+    "label": "アップロード",
+    "uploading": "{{total}} 件中 {{left}} 件をアップロード中…",
+    "complete": "すべてのアップロードが完了しました",
+    "failed_other": "{{count}} 件のアップロードに失敗しました",
+    "skipped_other": "{{limit}} を超える {{count}} 件のファイルをスキップしました",
+    "show": "アップロードを表示",
+    "hide": "アップロードを非表示",
+    "uploadFailed": "アップロードできませんでした",
+    "attachFailed": "添付できませんでした",
+    "retry": "{{name}} を再試行",
+    "remove": "{{name}} を削除",
+    "stoppedBySwitch": "アップロードを停止しました · ワークスペースを切り替えました",
+    "size": {
+      "kilobytes": "{{value}} KB",
+      "megabytes": "{{value}} MB"
+    }
+  },
+  "splash": {
+    "label": "{{productName}} を読み込み中",
+    "greeting": {
+      "morning": "おはようございます、{{name}}さん",
+      "afternoon": "こんにちは、{{name}}さん",
+      "evening": "こんばんは、{{name}}さん"
+    },
+    "ticker": {
+      "opening": "{{weekday}}の予定を開いています",
+      "syncing": "患者とリードを同期しています",
+      "ready": "準備完了"
+    },
+    "offline": {
+      "message": "{{productName}} に接続できません · インターネット接続を確認してください",
+      "retry": "再試行"
+    }
   }
 }

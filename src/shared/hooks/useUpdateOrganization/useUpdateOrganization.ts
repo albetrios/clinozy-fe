@@ -12,8 +12,8 @@ import {
 /**
  * Rename the active organization (name-only — the URL/slug is unchanged). The
  * name is rendered from TWO server queries: the organization list (the General
- * panel, the org switcher, the dashboard panel, the command palette and the
- * picker all read {@link myOrganizationsQueryKey}) and `me/context`
+ * panel, the org switcher, the command palette and the picker all read
+ * {@link myOrganizationsQueryKey}) and `me/context`
  * (`activeOrganization.name`). Invalidate BOTH on success, or those surfaces keep
  * showing the old name until the next reload.
  */

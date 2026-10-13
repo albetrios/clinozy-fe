@@ -1,0 +1,635 @@
+{
+  "manifest": {
+    "title": "약국"
+  },
+  "tabs": {
+    "label": "약국 섹션",
+    "sales": "판매",
+    "medicines": "의약품",
+    "purchases": "구매",
+    "suppliers": "공급업체",
+    "manufacturers": "제조사",
+    "mrs": "MR",
+    "payments": "결제",
+    "groups": {
+      "selling": "판매",
+      "stock": "재고",
+      "buying": "구매",
+      "money": "자금"
+    }
+  },
+  "search": {
+    "placeholder": "이름, 성분, 공급업체 검색…",
+    "label": "약국 검색"
+  },
+  "create": {
+    "sale": "새 판매",
+    "medicine": "새 의약품",
+    "purchaseOrder": "새 구매 주문",
+    "supplier": "새 공급업체",
+    "manufacturer": "새 제조사",
+    "mr": "새 MR",
+    "menu": "다른 항목 만들기"
+  },
+  "viewActions": {
+    "reorderLow": "재고 부족 재주문",
+    "sellAllDiscount": "모두 20% 할인 판매",
+    "removeDiscount": "유효기간 임박 할인 해제",
+    "prescriptions": "조제할 처방전",
+    "paymentReminders": "결제 알림 보내기",
+    "payAllReceived": "입고분 모두 지불 · {{amount}}"
+  },
+  "filters": {
+    "all": "전체",
+    "any": "전체",
+    "stock": "재고",
+    "lowStock": "재고 부족",
+    "expiry": "가장 빠른 유효기간",
+    "within30": "30일 이내",
+    "within60": "60일 이내",
+    "within90": "90일 이내",
+    "status": "상태",
+    "stage": "단계",
+    "manufacturer": "제조사",
+    "manufacturers": "제조사",
+    "suppliers": "공급업체",
+    "mrs": "MR"
+  },
+  "table": {
+    "percent": "{{value}}%",
+    "addPhone": "전화번호 추가",
+    "noValue": "—"
+  },
+  "empty": {
+    "hint": "아직 아무것도 없습니다. 다른 탭이나 검색어를 사용해 보세요.",
+    "store": "약국에 아무것도 없습니다"
+  },
+  "bulk": {
+    "export": "내보내기",
+    "exported_other": "{{count}}개 행을 CSV로 내보냈습니다"
+  },
+  "toasts": {
+    "discountOn": "유효기간 임박 의약품 20% 할인",
+    "discountOnOne": "{{name}}에 20% 할인 적용",
+    "discountOff": "할인을 해제했습니다"
+  },
+  "sales": {
+    "records": "판매",
+    "count_other": "판매 {{count}}건",
+    "columns": {
+      "seq": "판매",
+      "customer": "고객",
+      "medicines": "의약품",
+      "bill": "청구액",
+      "margin": "마진",
+      "status": "상태",
+      "when": "일시"
+    },
+    "patient": "환자",
+    "contact": "약국 연락처",
+    "line": "{{name}} ×{{qty}}",
+    "batches": "배치: {{batches}}",
+    "returned": "− {{amount}} 반품",
+    "refunded": "{{amount}} 환불됨",
+    "statuses": {
+      "paid": "결제 완료",
+      "unpaid": "미결제",
+      "returned": "반품됨"
+    },
+    "rowActions": {
+      "collect": "{{amount}} 수금",
+      "return": "의약품 반품",
+      "print": "인쇄",
+      "void": "판매 무효화"
+    }
+  },
+  "medicines": {
+    "records": "의약품",
+    "empty": "일치하는 의약품이 없습니다",
+    "columns": {
+      "seq": "ID",
+      "name": "의약품",
+      "manufacturer": "제조사",
+      "stock": "재고",
+      "expiry": "가장 빠른 유효기간",
+      "mrp": "최대 소매가",
+      "bestRate": "최저 매입가",
+      "margin": "마진"
+    },
+    "needsMrp": "최대 소매가와 성분 필요",
+    "stockLine": "재고 {{count}} · {{level}}",
+    "levels": {
+      "ok": "양호",
+      "low": "부족",
+      "out": "품절"
+    },
+    "expiry": "{{expiry}} · {{batch}}",
+    "noStock": "재고 없음",
+    "discount": "유효기간 임박 −{{pct}}%",
+    "rowActions": {
+      "returnExpiring": "유효기간 임박 재고를 공급업체에 반품",
+      "discount": "20% 할인 판매(유효기간 임박)",
+      "removeDiscount": "유효기간 임박 할인 해제",
+      "edit": "편집",
+      "delete": "삭제"
+    }
+  },
+  "purchases": {
+    "records": "구매 주문",
+    "count_other": "주문 {{count}}건",
+    "columns": {
+      "seq": "주문",
+      "supplier": "공급업체",
+      "items": "품목",
+      "date": "날짜",
+      "total": "합계",
+      "stage": "단계"
+    },
+    "items_other": "{{count}}개 품목",
+    "free": "무상 {{count}}",
+    "partPaid": "{{amount}} 결제됨",
+    "stages": {
+      "ordered": "주문됨",
+      "received": "입고됨",
+      "paid": "결제 완료",
+      "cancelled": "취소됨"
+    },
+    "rowActions": {
+      "receive": "입고 처리",
+      "edit": "편집",
+      "cancel": "주문 취소",
+      "pay": "{{amount}} 지불",
+      "view": "보기"
+    }
+  },
+  "suppliers": {
+    "records": "공급업체",
+    "empty": "일치하는 공급업체가 없습니다",
+    "count_other": "공급업체 {{count}}곳 · 미지급 {{payable}}",
+    "columns": {
+      "name": "공급업체",
+      "manufacturers": "제조사",
+      "orders": "주문",
+      "payable": "미지급",
+      "ageing": "경과일"
+    },
+    "orders_other": "주문 {{count}}건",
+    "noOrders": "주문 없음",
+    "ageing_other": "{{count}}일",
+    "rowActions": {
+      "pay": "{{amount}} 지불",
+      "newOrder": "새 구매 주문",
+      "edit": "편집",
+      "delete": "삭제"
+    }
+  },
+  "manufacturers": {
+    "records": "제조사",
+    "empty": "일치하는 제조사가 없습니다",
+    "count_other": "제조사 {{count}}곳",
+    "columns": {
+      "name": "제조사",
+      "medicines": "의약품",
+      "suppliers": "공급업체",
+      "mrs": "MR"
+    },
+    "medicines_other": "의약품 {{count}}개",
+    "noMedicines": "아직 없음",
+    "rowActions": {
+      "edit": "편집",
+      "delete": "삭제"
+    }
+  },
+  "mrs": {
+    "records": "MR",
+    "empty": "일치하는 MR이 없습니다",
+    "count_other": "MR {{count}}명",
+    "columns": {
+      "name": "MR",
+      "represents": "담당",
+      "lastVisit": "최근 방문",
+      "nextVisit": "다음 방문",
+      "samples": "샘플"
+    },
+    "rowActions": {
+      "logVisit": "방문 기록",
+      "edit": "편집",
+      "delete": "삭제"
+    }
+  },
+  "payments": {
+    "records": "약국 결제",
+    "empty": "아직 약국 결제가 없습니다"
+  },
+  "drawers": {
+    "records": {
+      "medicine": "의약품",
+      "supplier": "공급업체",
+      "manufacturer": "제조사",
+      "mr": "MR",
+      "sale": "판매",
+      "purchaseOrder": "구매 주문"
+    },
+    "saveChanges": "변경 사항 저장",
+    "addName": "이름을 입력하세요",
+    "pickers": {
+      "searchManufacturer": "제조사 검색",
+      "searchManufacturers": "제조사 검색",
+      "searchSupplier": "공급업체 검색",
+      "searchSuppliers": "공급업체 검색",
+      "searchMrs": "MR 검색",
+      "medicineCount_other": "의약품 {{count}}개",
+      "noPhone": "아직 전화번호 없음",
+      "distributes": "{{maker}} 유통",
+      "otherSuppliers": "다른 공급업체",
+      "addManufacturer": "제조사 추가",
+      "newManufacturer": "새 제조사",
+      "addSupplier": "공급업체 추가",
+      "newSupplier": "새 공급업체",
+      "addMr": "MR 추가",
+      "newMr": "새 MR"
+    },
+    "quick": {
+      "manufacturer": "제조사 {{name}} 추가됨",
+      "supplier": "공급업체 {{name}} 추가됨 · 전화와 GST는 나중에 추가",
+      "mr": "MR {{name}} 추가됨",
+      "medicine": "{{name}} 추가됨 · 최대 소매가는 나중에 재고에서 설정"
+    },
+    "deleteConfirm": {
+      "medicine": "이 의약품을 삭제할까요?",
+      "supplier": "이 공급업체를 삭제할까요?",
+      "manufacturer": "이 제조사를 삭제할까요?",
+      "mr": "이 MR을 삭제할까요?",
+      "deleted": "{{name}} 삭제됨"
+    },
+    "manufacturer": {
+      "title": {
+        "create": "새 제조사",
+        "edit": "제조사 편집"
+      },
+      "sub": "포장의 브랜드 · 공급업체와 MR 연결",
+      "steps": {
+        "maker": "제조사",
+        "connections": "연결"
+      },
+      "fields": {
+        "name": "이름",
+        "colour": "색상",
+        "suppliers": "공급업체",
+        "suppliersHint": "유통하는 곳",
+        "mrs": "MR",
+        "mrsHint": "대표하는 MR",
+        "medicines": "의약품",
+        "medicineCount_other": "재고에 의약품 {{count}}개",
+        "noMedicines": "아직 없음 · 재고에서 추가"
+      },
+      "summary": {
+        "suppliers_other": "공급업체 {{count}}곳",
+        "mrs_other": "MR {{count}}명"
+      },
+      "save": "제조사 추가",
+      "saved": "제조사 저장됨 · 연결 업데이트됨"
+    },
+    "supplier": {
+      "title": {
+        "create": "새 공급업체",
+        "edit": "공급업체 편집"
+      },
+      "sub": "구매하는 도매업체",
+      "steps": {
+        "supplier": "공급업체",
+        "distributes": "유통",
+        "account": "거래 내역"
+      },
+      "fields": {
+        "name": "업체명",
+        "phone": "전화",
+        "phoneHint": "10자리",
+        "gst": "GST 번호",
+        "manufacturers": "제조사",
+        "manufacturersHint": "여러 개 선택 가능",
+        "payable": "미지급",
+        "payableValue_other": "{{amount}} · {{count}}일",
+        "nothingDue": "미지급 없음",
+        "orders": "주문",
+        "ordersValue_other": "주문 {{count}}건 · {{amount}}",
+        "noOrders": "아직 주문 없음"
+      },
+      "account": {
+        "label": "거래 내역",
+        "reference": "참조",
+        "date": "날짜",
+        "stage": "단계",
+        "amount": "금액",
+        "balance": "잔액",
+        "notBilled": "미청구",
+        "due": "미지급 {{amount}}",
+        "paid": "결제 완료",
+        "credit": "크레딧 · {{batch}}",
+        "creditStage": "크레딧",
+        "adjusted": "정산됨"
+      },
+      "quickFill": {
+        "newOrder": "새 구매 주문",
+        "pay": "{{amount}} 지불"
+      },
+      "save": "공급업체 추가",
+      "saved": "공급업체 저장됨"
+    },
+    "mr": {
+      "title": {
+        "create": "새 MR",
+        "edit": "MR 편집"
+      },
+      "sub": "제약 영업 담당자",
+      "steps": {
+        "mr": "MR",
+        "represents": "담당"
+      },
+      "fields": {
+        "name": "이름",
+        "phone": "전화",
+        "phoneHint": "10자리",
+        "nextVisit": "다음 방문",
+        "manufacturers": "제조사",
+        "manufacturersHint": "한 명이 여러 곳 담당 가능"
+      },
+      "save": "MR 추가",
+      "saved": "MR 저장됨"
+    },
+    "visit": {
+      "title": "MR 방문 기록",
+      "steps": {
+        "visit": "방문",
+        "details": "세부 정보",
+        "notes": "메모"
+      },
+      "fields": {
+        "date": "날짜",
+        "nextVisit": "다음 방문",
+        "twoWeeks": "2주",
+        "oneMonth": "1개월",
+        "samples": "받은 샘플",
+        "samplesPlaceholder": "예: Azelan 4튜브",
+        "note": "메모"
+      },
+      "summary": "다음 방문 {{date}}",
+      "save": "방문 기록",
+      "saved": "방문 기록됨 · {{date}} 알림 설정",
+      "savedNoReminder": "방문 기록됨"
+    },
+    "medicine": {
+      "title": {
+        "create": "새 의약품",
+        "edit": "의약품 편집"
+      },
+      "sub": "{{maker}} · {{composition}}",
+      "subNoComposition": "{{maker}} · 성분 미입력",
+      "steps": {
+        "main": "의약품, 가격, 재고",
+        "batches": "배치 및 공급업체 가격"
+      },
+      "groups": {
+        "medicine": "의약품",
+        "price": "가격 및 재고"
+      },
+      "fields": {
+        "name": "이름",
+        "manufacturer": "제조사",
+        "composition": "성분",
+        "compositionHint": "대체품 추천에 사용",
+        "compositionPlaceholder": "예: 트레티노인 0.025%",
+        "soldWith": "판매 구분",
+        "prescriptionOnly": "처방전 필요",
+        "overTheCounter": "일반 판매"
+      },
+      "price": {
+        "mrp": "최대 소매가",
+        "inclGst": "GST 포함",
+        "gst": "GST",
+        "beforeGst": "GST 전",
+        "gstAmount": "GST {{pct}}%",
+        "bestBuyRate": "최저 매입가",
+        "addSupplierPrice": "공급업체 가격 추가",
+        "margin": "마진"
+      },
+      "stock": {
+        "title": "재고 수준",
+        "now": "재고 {{count}} · {{state}}",
+        "states": {
+          "healthy": "적정",
+          "reorder": "재주문",
+          "overstocked": "과잉 재고",
+          "out": "품절"
+        },
+        "reorderAt": "재주문 기준",
+        "fillUpTo": "채울 수량",
+        "decreaseReorder": "재주문 기준 낮추기",
+        "increaseReorder": "재주문 기준 높이기",
+        "decreaseFill": "채울 수량 낮추기",
+        "increaseFill": "채울 수량 높이기",
+        "hintAlert": "재고가 {{count}}개가 되면 재주문 알림.",
+        "hintOrder": "{{max}}개까지 채우려면 {{qty}}개 주문하세요. 재고 › 재고 부족에 표시됩니다."
+      },
+      "batches": {
+        "title": "배치",
+        "batch": "배치",
+        "expiry": "유효기간",
+        "expiryPlaceholder": "MM/YY",
+        "qty": "수량",
+        "rate": "단가",
+        "add": "배치 추가",
+        "total": "재고 {{count}}",
+        "expiryInvalid": "유효기간을 MM/YY로 입력하세요",
+        "batchMissing": "배치 번호를 입력하세요"
+      },
+      "rates": {
+        "title": "공급업체 가격",
+        "supplier": "공급업체",
+        "rate": "단가",
+        "free": "무상",
+        "leadDays": "리드 타임(일)",
+        "add": "공급업체 가격 추가",
+        "rateMissing": "이 공급업체의 단가를 입력하세요"
+      },
+      "badges": {
+        "inStock": "재고 {{count}}",
+        "best": "최저 {{rate}} · {{supplier}}"
+      },
+      "save": "의약품 추가",
+      "toasts": {
+        "added": "{{name}} 추가됨",
+        "saved": "{{name}} 저장됨",
+        "enterMrp": "최대 소매가를 입력하세요",
+        "enterRates": "모든 공급업체 가격에 단가를 입력하세요",
+        "pickManufacturer": "제조사를 선택하세요"
+      }
+    },
+    "flowConfirm": {
+      "cancelOrder": "이 구매 주문을 취소할까요?",
+      "voidSale": "이 판매를 무효화할까요?",
+      "cancelled": "{{order}} 취소됨",
+      "voided": "판매 #{{seq}} 무효화됨"
+    },
+    "purchaseOrder": {
+      "title": {
+        "create": "새 구매 주문",
+        "edit": "구매 주문 편집"
+      },
+      "sub": "주문 → 입고 → 지불",
+      "steps": {
+        "order": "주문",
+        "items": "품목"
+      },
+      "fields": {
+        "supplier": "공급업체",
+        "billNo": "송장 번호",
+        "date": "주문일",
+        "items": "품목",
+        "medicine": "의약품",
+        "selectMedicine": "의약품 선택…",
+        "searchMedicine": "의약품 검색",
+        "qty": "수량",
+        "free": "무상",
+        "rate": "단가",
+        "amount": "금액",
+        "add": "의약품 추가",
+        "total": "합계",
+        "fromSupplier": "{{supplier}}에서",
+        "otherMedicines": "기타 의약품",
+        "inStock": "재고 {{count}}개 · {{maker}}",
+        "outOfStock": "재고 없음 · {{maker}}",
+        "addMedicine": "의약품 추가",
+        "newMedicine": "새 의약품",
+        "enterRate": "구매 단가를 입력하세요",
+        "peek_other": "의약품 {{count}}개 · {{amount}}",
+        "quickLine": "의약품, 수량, 무상, 단가 입력 · 예: azel 20 +2 @180",
+        "quickHint": "20 = 수량 · +2 = 무상 · @180 = 단가",
+        "lowStockChip": "{{name}} · {{quantity}}개 남음",
+        "newMedicineName": "새 의약품 이름"
+      },
+      "quickFill": {
+        "reorder": "재고 부족 재주문"
+      },
+      "rateFor": "{{name}}의 단가를 입력하세요",
+      "rateForCount_other": "의약품 {{count}}개의 단가를 입력하세요",
+      "pickSupplier": "공급업체를 선택하세요",
+      "save": "주문 만들기",
+      "saved": "구매 주문 저장됨",
+      "cancelOrder": "주문 취소"
+    },
+    "receive": {
+      "title": "입고 처리",
+      "sub": "{{supplier}} · 각 품목을 체크하고 배치와 유효기간을 입력하세요",
+      "section": "도착한 품목 체크",
+      "arrived": "도착",
+      "notArrived": "미도착",
+      "medicine": "의약품",
+      "qty": "수량",
+      "free": "무상",
+      "batch": "배치",
+      "expiry": "유효기간",
+      "expiryPlaceholder": "MM/YY",
+      "enterExpiry": "유효기간을 입력하세요",
+      "tickArrived": "도착한 품목을 체크하세요",
+      "addUnexpected": "예상치 못한 품목 추가",
+      "enterQuantity": "수량을 입력하세요",
+      "save": "입고 완료로 표시",
+      "saved": "입고 완료 · 재고와 무상 수량 추가됨"
+    },
+    "orderView": {
+      "title": "구매 주문",
+      "subReceived": "{{supplier}} · 입고됨, 재고 추가 · 품목 잠김",
+      "subPaid": "{{supplier}} · 결제 완료, 잠김",
+      "payable": "미지급 {{amount}}",
+      "paid": "지급 {{amount}}",
+      "paidOf": "{{total}} 중 {{paid}} 지급",
+      "pay": "{{amount}} 지불",
+      "print": "인쇄"
+    },
+    "sale": {
+      "title": "판매",
+      "sub": "{{customer}} · {{when}} · 판매는 편집하지 않고 반품으로 변경합니다",
+      "walkIn": "방문 고객",
+      "badges": {
+        "paid": "결제 완료",
+        "unpaid": "미결제",
+        "returned": "반품 {{amount}}",
+        "invoice": "청구서 #{{seq}} · 환자 파일에 있음"
+      },
+      "medicines": "의약품",
+      "medicine": "의약품",
+      "batch": "배치",
+      "qty": "수량",
+      "amount": "금액",
+      "summary_other": "의약품 {{count}}개 · {{amount}}",
+      "collect": "{{amount}} 수금",
+      "returnMedicines": "의약품 반품",
+      "voidSale": "판매 무효화",
+      "collected": "{{amount}} 수금됨"
+    },
+    "saleReturn": {
+      "title": "환자 반품",
+      "sub": "{{customer}} · 반품된 재고는 원래 배치로 돌아갑니다",
+      "steps": {
+        "back": "반품되는 품목",
+        "reason": "사유 및 환불"
+      },
+      "medicine": "의약품",
+      "batch": "배치",
+      "sold": "판매",
+      "refund": "환불",
+      "return": "반품",
+      "reason": "사유",
+      "reasons": {
+        "unused": "미사용",
+        "reaction": "부작용",
+        "rx_changed": "의사가 처방 변경",
+        "wrong_item": "잘못된 품목",
+        "damaged": "파손"
+      },
+      "refundBy": "환불 방법",
+      "peek_other": "의약품 {{count}}개 · {{amount}}",
+      "quickFill": "모두 반품",
+      "save": "{{amount}} 환불",
+      "summary": "{{reason}} · {{amount}}",
+      "nothing": "반품할 품목을 입력하세요",
+      "refunded": "{{amount}} 환불됨 · 재고 복원",
+      "refundedWrittenOff": "{{amount}} 환불됨 · 재고 폐기",
+      "lowered": "{{amount}} 반품됨 · 재고 복원",
+      "loweredWrittenOff": "{{amount}} 반품됨 · 재고 폐기"
+    },
+    "expiring": {
+      "title": "유효기간 임박 재고 반품",
+      "sub": "{{medicine}} · 배치 {{batch}} · {{expiry}} 만료",
+      "supplier": "공급업체",
+      "boughtAt": "구매가 {{amount}}",
+      "quantity": "수량",
+      "of": "/ {{count}}",
+      "creditNote": "크레딧 노트",
+      "badges": {
+        "credit": "크레딧 {{amount}}",
+        "daysLeft_other": "{{count}}일 남음"
+      },
+      "summary": "크레딧으로 {{supplier}}에 대한 미지급금이 줄어듭니다",
+      "save": "반품하고 크레딧 받기",
+      "saved": "{{count}}개 반품 · {{supplier}}에서 {{amount}} 크레딧"
+    },
+    "prescriptions": {
+      "sub": "처방 {{rx}} · {{date}} · {{medicines}}"
+    },
+    "reminders": {
+      "title": "결제 알림",
+      "summary_other": "고객 {{count}}명이 {{amount}}을(를) 미결제 중입니다",
+      "hint": "WhatsApp이 알림이 작성된 상태로 열리며, 전송은 WhatsApp에서 직접 합니다.",
+      "dueOne": "{{amount}} 미결제 · 판매 #{{seq}}",
+      "dueMany_other": "{{amount}} 미결제 · 판매 {{count}}건",
+      "noPhone": "저장된 전화번호 없음",
+      "whatsApp": "WhatsApp으로 {{name}}님에게 알림",
+      "call": "{{name}}님에게 전화",
+      "copy": "{{name}}님에게 보낼 알림 복사",
+      "copied": "{{name}}님에게 보낼 알림을 복사했습니다",
+      "message": "{{name}}님, 안녕하세요. {{clinic}}에서 알려 드립니다. 의약품 대금 {{amount}}이(가) 아직 결제되지 않았습니다. 궁금한 점이 있으시면 여기로 답장해 주세요. 감사합니다!"
+    }
+  }
+}

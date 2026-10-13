@@ -1,5 +1,8 @@
 # Theme axis follow-up plan
 
+> **Historical (2026-10, L-65):** the Appearance studio these items polished is retired —
+> one look, `clinozy-zinc-pastel`; see [theming.md](theming.md). Kept as the record.
+
 Post-audit hardening and polish after the 18-axis compliance pass
 (`docs/reference/theme-axis-audit-playbook.md`). Work **one item per cycle**;
 mark ✅ when done.

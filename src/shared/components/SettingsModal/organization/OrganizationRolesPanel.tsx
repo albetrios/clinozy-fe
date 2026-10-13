@@ -4,22 +4,26 @@ import { useTranslation } from 'react-i18next';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import i18n from '@/lib/i18n/i18n.ts';
 import { isListStale, listRefreshClass } from '@/lib/list-refresh.ts';
-import { cn } from '@/lib/utils.ts';
 import type { RoleSummary } from '@/shared/api/organization-contracts.ts';
 import { orgQueryKeys } from '@/shared/api/organization-query-keys.ts';
+import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
 import { CreateRoleDialog } from '@/shared/components/CreateRoleDialog/index.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { PanelSkeleton } from '@/shared/components/PanelSkeleton/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import {
+  SettingsList,
+  SettingsListRow,
+  settingsRowActionClass,
+  SettingsRowTile,
+} from '@/shared/components/SettingsCard/index.ts';
+import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { SectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
-import { Badge } from '@/shared/components/ui/badge.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { Card } from '@/shared/components/ui/card.tsx';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,14 +43,26 @@ import {
   orgListSortToParams,
 } from './org-list-sort.ts';
 import { OrgListControls } from './OrgListControls.tsx';
+import { useUsersRoomOpen } from './users-room-open.ts';
+import { UsersRoomLink } from './UsersRoomLink.tsx';
 
-/** Per-role actions menu (custom roles only): edit or delete. */
+/** What the caller may do to a custom role — each its own clinozy-be code. */
+interface RoleRowAccess {
+  /** Edit its name, description and codes (`role:update`). */
+  canUpdate: boolean;
+  /** Delete it (`role:delete`). */
+  canDelete: boolean;
+}
+
+/** Per-role actions menu (custom roles only): edit and delete, each by its code. */
 function RoleRowActions({
   role,
+  access,
   onEdit,
   onDelete,
 }: {
   role: RoleSummary;
+  access: RoleRowAccess;
   onEdit: (role: RoleSummary) => void;
   onDelete: (role: RoleSummary) => void;
 }) {
@@ -56,8 +72,9 @@ function RoleRowActions({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="ghost"
-          size="icon"
+          variant="outline"
+          size="icon-sm"
+          className={settingsRowActionClass()}
           aria-label={t(panels.actionsAria, { name: role.name })}
           data-testid={`role-actions-${role.id}`}
         >
@@ -65,19 +82,23 @@ function RoleRowActions({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem
-          onSelect={() => onEdit(role)}
-          data-testid={`role-edit-${role.id}`}
-        >
-          {t(panels.editAction)}
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          variant="destructive"
-          onSelect={() => onDelete(role)}
-          data-testid={`role-delete-${role.id}`}
-        >
-          {t(panels.deleteAction)}
-        </DropdownMenuItem>
+        {access.canUpdate ? (
+          <DropdownMenuItem
+            onSelect={() => onEdit(role)}
+            data-testid={`role-edit-${role.id}`}
+          >
+            {t(panels.editAction)}
+          </DropdownMenuItem>
+        ) : null}
+        {access.canDelete ? (
+          <DropdownMenuItem
+            variant="destructive"
+            onSelect={() => onDelete(role)}
+            data-testid={`role-delete-${role.id}`}
+          >
+            {t(panels.deleteAction)}
+          </DropdownMenuItem>
+        ) : null}
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -86,35 +107,42 @@ function RoleRowActions({
 /** One role row: name, system badge, member count, and (for custom roles) actions. */
 function RoleListItem({
   role,
-  canManage,
+  access,
   onEdit,
   onDelete,
 }: {
   role: RoleSummary;
-  canManage: boolean;
+  access: RoleRowAccess;
   onEdit: (role: RoleSummary) => void;
   onDelete: (role: RoleSummary) => void;
 }) {
   const { t } = useTranslation(SETTINGS_NS);
   const panels = SETTINGS_KEYS.panels.roles;
   return (
-    <li className="flex items-center gap-3 p-3">
+    <SettingsListRow>
+      <SettingsRowTile icon={ShieldCheck} tone="slate" />
       <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2">
-          <p className="truncate text-sm font-medium">{role.name}</p>
+        <div className="flex min-w-0 items-center gap-2">
+          <p dir="auto" className="text-body truncate font-medium">
+            {role.name}
+          </p>
           {role.isSystem ? (
-            <Badge variant="outline">{t(panels.systemBadge)}</Badge>
+            <TonePill tone="neutral" size="sm">
+              {t(panels.systemBadge)}
+            </TonePill>
           ) : null}
         </div>
-        <p className="text-muted-foreground truncate text-xs">{role.description}</p>
+        <p dir="auto" className="text-muted-foreground text-caption truncate">
+          {role.description}
+        </p>
       </div>
-      <span className="text-muted-foreground shrink-0 text-xs">
+      <span className="text-muted-foreground text-caption shrink-0 tabular-nums">
         {t(panels.memberCount, { count: role.memberCount })}
       </span>
-      {canManage && !role.isSystem ? (
-        <RoleRowActions role={role} onEdit={onEdit} onDelete={onDelete} />
+      {(access.canUpdate || access.canDelete) && !role.isSystem ? (
+        <RoleRowActions role={role} access={access} onEdit={onEdit} onDelete={onDelete} />
       ) : null}
-    </li>
+    </SettingsListRow>
   );
 }
 
@@ -127,7 +155,7 @@ function RolesResults({
   roles,
   isSearching,
   isStale,
-  canManage,
+  access,
   onEdit,
   onDelete,
 }: {
@@ -135,7 +163,7 @@ function RolesResults({
   isSearching: boolean;
   /** The rows answer a question the user has already changed. */
   isStale: boolean;
-  canManage: boolean;
+  access: RoleRowAccess;
   onEdit: (role: RoleSummary) => void;
   onDelete: (role: RoleSummary) => void;
 }) {
@@ -156,6 +184,8 @@ function RolesResults({
   if (roles.rows.length === 0) {
     return (
       <EmptyState
+        tone="slate"
+        className="pt-8 pb-9"
         icon={<ShieldCheck />}
         title={isSearching ? t(panels.noResults) : t(panels.emptyTitle)}
         description={isSearching ? '' : t(panels.emptyDescription)}
@@ -164,22 +194,21 @@ function RolesResults({
   }
   return (
     <>
-      <Card
-        className={cn('gap-0 overflow-hidden py-0', listRefreshClass(stale))}
+      <SettingsList
+        frameClassName={listRefreshClass(stale)}
         aria-busy={stale}
+        data-testid="roles-list"
       >
-        <ul className="divide-border divide-y" data-testid="roles-list">
-          {roles.rows.map((role) => (
-            <RoleListItem
-              key={role.id}
-              role={role}
-              canManage={canManage}
-              onEdit={onEdit}
-              onDelete={onDelete}
-            />
-          ))}
-        </ul>
-      </Card>
+        {roles.rows.map((role) => (
+          <RoleListItem
+            key={role.id}
+            role={role}
+            access={access}
+            onEdit={onEdit}
+            onDelete={onDelete}
+          />
+        ))}
+      </SettingsList>
       {roles.hasNextPage ? (
         <div className="flex justify-center">
           <Button
@@ -198,10 +227,19 @@ function RolesResults({
 }
 
 /**
- * Roles panel — permission sets assignable to members. System roles are read-only;
- * custom roles can be deleted with undo-capable deferred commit.
+ * Roles panel — a link into Users › Roles & access where the Users room is
+ * this member's members surface (D17, {@link useUsersRoomOpen}); everywhere
+ * else the roles list itself ({@link RolesManager}).
  */
 export function OrganizationRolesPanel() {
+  return useUsersRoomOpen() ? <UsersRoomLink section="roles" /> : <RolesManager />;
+}
+
+/**
+ * Permission sets assignable to members. System roles are read-only;
+ * custom roles can be deleted with undo-capable deferred commit.
+ */
+function RolesManager() {
   const { t } = useTranslation(SETTINGS_NS);
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState<OrgListSortPreset>(DEFAULT_ORG_LIST_SORT);
@@ -212,7 +250,11 @@ export function OrganizationRolesPanel() {
     q: debouncedSearch || undefined,
     ...sortParams,
   });
-  const canManage = useCan({ permission: 'role:manage', teamOrganizationOnly: true });
+  const canCreate = useCan({ permission: 'role:create', teamOrganizationOnly: true });
+  const access: RoleRowAccess = {
+    canUpdate: useCan({ permission: 'role:update' }),
+    canDelete: useCan({ permission: 'role:delete' }),
+  };
   // See the members panel: a `false` before the guard chain answers is "not yet",
   // not "not allowed" (SET-23).
   const accessResolved = useAccessResolved();
@@ -232,7 +274,7 @@ export function OrganizationRolesPanel() {
   const isSearching = debouncedSearch.length > 0;
 
   return (
-    <section className="space-y-6" data-testid="settings-organization-roles">
+    <section className="flex flex-col gap-4" data-testid="settings-organization-roles">
       <SectionHeader title={t(panels.title)} description={t(panels.description)} />
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -247,18 +289,18 @@ export function OrganizationRolesPanel() {
         />
         {accessResolved ? null : (
           <Button size="sm" disabled data-testid="role-create-pending">
-            <Plus className="me-2 h-4 w-4" />
+            <Plus className="size-4" />
             {t(panels.create)}
           </Button>
         )}
-        {accessResolved && canManage ? <CreateRoleDialog /> : null}
+        {accessResolved && canCreate ? <CreateRoleDialog /> : null}
       </div>
 
       <RolesResults
         roles={roles}
         isSearching={isSearching}
         isStale={isSearchPending}
-        canManage={canManage}
+        access={access}
         onEdit={setToEdit}
         onDelete={setToDelete}
       />
@@ -287,7 +329,9 @@ export function OrganizationRolesPanel() {
             toastId: `delete-role-${role.id}`,
             // `mutateAsync`, never `mutate` — see the members panel: `mutate`
             // returns void, so nothing was awaited and nothing could reject.
-            commit: () => deleteRole.mutateAsync(role.id),
+            // Settings asks no reason: a deleted role is "not needed" (research Q-U-D).
+            commit: () =>
+              deleteRole.mutateAsync({ roleId: role.id, reason: 'not_needed' }),
           });
         }}
       />

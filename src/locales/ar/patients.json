@@ -1,0 +1,56 @@
+{
+  "manifest": {
+    "title": "المرضى"
+  },
+  "views": {
+    "label": "عروض المرضى",
+    "all": "الكل",
+    "follow": "متابعة مستحقة",
+    "recall": "استدعاء"
+  },
+  "search": {
+    "placeholder": "الاسم أو الجوال أو #ID",
+    "label": "البحث عن المرضى"
+  },
+  "primary": {
+    "newPatient": "مريض جديد"
+  },
+  "columns": {
+    "seq": "المعرّف",
+    "name": "المريض",
+    "gender": "الجنس",
+    "types": "النوع",
+    "status": "الحالة",
+    "conversion": "التحويل",
+    "age": "العمر",
+    "followUp": "المتابعة",
+    "updated": "آخر تحديث"
+  },
+  "table": {
+    "records": "المرضى",
+    "age_zero": "{{count}} سنة",
+    "age_one": "{{count}} سنة",
+    "age_two": "{{count}} سنتان",
+    "age_few": "{{count}} سنوات",
+    "age_many": "{{count}} سنة",
+    "age_other": "{{count}} سنة"
+  },
+  "rowActions": {
+    "edit": "تعديل",
+    "delete": "حذف",
+    "newInvoice": "فاتورة جديدة"
+  },
+  "bulk": {
+    "export": "تصدير",
+    "exported_zero": "تم تصدير {{count}} صف بصيغة CSV",
+    "exported_one": "تم تصدير {{count}} صف بصيغة CSV",
+    "exported_two": "تم تصدير {{count}} صفين بصيغة CSV",
+    "exported_few": "تم تصدير {{count}} صفوف بصيغة CSV",
+    "exported_many": "تم تصدير {{count}} صفًا بصيغة CSV",
+    "exported_other": "تم تصدير {{count}} صف بصيغة CSV"
+  },
+  "empty": {
+    "title": "لا يوجد مريض مطابق",
+    "description": "لا يوجد شيء هنا بعد. جرّب علامة تبويب أخرى أو بحثًا آخر."
+  }
+}

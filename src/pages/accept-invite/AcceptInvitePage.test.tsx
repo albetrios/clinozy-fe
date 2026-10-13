@@ -1,6 +1,7 @@
 import { act, render, screen, waitFor } from '@testing-library/react';
 import { StrictMode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { axe } from 'vitest-axe';
 
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
@@ -75,12 +76,9 @@ const AFTER_REDIRECT_MS = ACCEPT_INVITE_REDIRECT_MS + 400;
 beforeEach(() => {
   vi.resetAllMocks();
   getAccessTokenMock.mockReturnValue('token');
-  acceptInvitationMock.mockResolvedValue({
-    organizationId: 'org_1',
-    organizationName: 'Acme',
-    organizationSlug: 'acme',
-  });
-  switchToOrganizationMock.mockResolvedValue(undefined);
+  acceptInvitationMock.mockResolvedValue({ organizationId: 'org_1' });
+  // The accept names the organization only; its slug comes from the switch.
+  switchToOrganizationMock.mockResolvedValue({ activeOrganization: { slug: 'acme' } });
   silentRefreshMock.mockResolvedValue(undefined);
   checkIconMock.mockImplementation((props: Record<string, unknown>) => (
     <svg data-testid={props['data-testid'] as string} />
@@ -162,6 +160,50 @@ describe('AcceptInvitePage', () => {
     expect(navigateMock).not.toHaveBeenCalledWith(LOGIN_REDIRECT);
   });
 
+  describe('the status card (the "Signed out" card holding the empty state)', () => {
+    it('reads pending in butter while it accepts', async () => {
+      acceptInvitationMock.mockImplementation(() => new Promise(() => undefined));
+      renderWithProviders(<AcceptInvitePage />);
+
+      await screen.findByTestId('accept-invite-loading');
+      expect(document.querySelector('[data-tone]')).toHaveAttribute(
+        'data-tone',
+        'butter',
+      );
+      expect(
+        screen.getByRole('heading', { level: 1, name: 'Joining organization' }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByTestId('accept-invite-page').querySelector('[data-slot="card"]'),
+      ).toHaveClass('max-w-90');
+    });
+
+    it('turns sage once the join is done', async () => {
+      renderWithProviders(<AcceptInvitePage />);
+
+      await screen.findByTestId('accept-invite-success');
+      expect(document.querySelector('[data-tone]')).toHaveAttribute('data-tone', 'sage');
+    });
+
+    it('turns blush for trouble, with its ways on as 36px buttons', async () => {
+      acceptInvitationMock.mockRejectedValue(
+        new HttpError('Gone', 410, '/x', 'POST', { error: { detail: 'Expired' } }),
+      );
+      const { container } = renderWithProviders(<AcceptInvitePage />);
+
+      await screen.findByTestId('accept-invite-error');
+      expect(document.querySelector('[data-tone]')).toHaveAttribute('data-tone', 'blush');
+      expect(
+        screen.getByRole('heading', { level: 1, name: 'Invitation problem' }),
+      ).toBeInTheDocument();
+      expect(screen.getByTestId('accept-invite-retry')).toHaveClass('h-9', 'rounded-lg');
+      const login = screen.getByTestId('accept-invite-login');
+      expect(login.tagName).toBe('A');
+      expect(login).toHaveAttribute('href', '/login');
+      expect(await axe(container)).toHaveNoViolations();
+    });
+  });
+
   describe('when the accept succeeds but opening the organization fails (INV-1)', () => {
     it('stays signed in, explains it, and lands on the resolver — never /login', async () => {
       switchToOrganizationMock.mockRejectedValue(new Error('switch exploded'));
@@ -191,7 +233,7 @@ describe('AcceptInvitePage', () => {
       );
     });
 
-    it('still opens the dashboard when the switch succeeds', async () => {
+    it('still opens the clinic home when the switch succeeds', async () => {
       renderWithProviders(<AcceptInvitePage />);
 
       expect(await screen.findByTestId('accept-invite-success')).toBeInTheDocument();
@@ -199,7 +241,7 @@ describe('AcceptInvitePage', () => {
         () =>
           expect(navigateMock).toHaveBeenCalledWith(
             expect.objectContaining({
-              to: '/organization/$organizationSlug/dashboard',
+              to: '/organization/$organizationSlug',
               params: { organizationSlug: 'acme' },
               replace: true,
             }),
@@ -223,11 +265,7 @@ describe('AcceptInvitePage', () => {
       const retry = await screen.findByTestId('accept-invite-retry');
       expect(acceptInvitationMock).toHaveBeenCalledTimes(1);
 
-      acceptInvitationMock.mockResolvedValue({
-        organizationId: 'org_1',
-        organizationName: 'Acme',
-        organizationSlug: 'acme',
-      });
+      acceptInvitationMock.mockResolvedValue({ organizationId: 'org_1' });
       act(() => {
         retry.dispatchEvent(new MouseEvent('click', { bubbles: true }));
       });
@@ -277,7 +315,7 @@ describe('AcceptInvitePage', () => {
       await waitFor(() => expect(acceptInvitationMock).toHaveBeenCalled());
 
       unmount();
-      settleAccept?.({ organizationId: 'org_1', organizationSlug: 'acme' });
+      settleAccept?.({ organizationId: 'org_1' });
       await waitFor(() => expect(switchToOrganizationMock).toHaveBeenCalled());
       await new Promise((r) => setTimeout(r, 50));
 
@@ -299,7 +337,7 @@ describe('AcceptInvitePage', () => {
       await waitFor(() => expect(acceptInvitationMock).toHaveBeenCalled());
 
       unmount();
-      settleAccept?.({ organizationId: 'org_1', organizationSlug: 'acme' });
+      settleAccept?.({ organizationId: 'org_1' });
 
       // Silence for the user, but not for the logs — the membership exists.
       await waitFor(() => expect(reportErrorMock).toHaveBeenCalled());

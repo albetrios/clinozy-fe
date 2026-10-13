@@ -192,7 +192,16 @@ step "[7/${TOTAL}] Environment (.env.local)"
 # --only-env is REQUIRED: a bare `pnpm setup:local` runs through to phase 5/5
 # and spawns a long-lived `pnpm dev`, which would hang this script.
 pnpm setup:local --only-env >&2 || die "env scaffold failed (pnpm setup:local --only-env)"
-ok "[7/${TOTAL}] .env.local ready"
+# A cloud session has no real browser or provider accounts, so Google / GitHub sign-in can
+# never complete there: hide their buttons. Local machines keep the schema default (true).
+for oauth_key in VITE_AUTH_OAUTH_GOOGLE VITE_AUTH_OAUTH_GITHUB; do
+  if grep -q "^${oauth_key}=" .env.local; then
+    sed -i.bak "s/^${oauth_key}=.*/${oauth_key}=false/" .env.local && rm -f .env.local.bak
+  else
+    printf '%s=false\n' "${oauth_key}" >> .env.local
+  fi
+done
+ok "[7/${TOTAL}] .env.local ready (OAuth buttons off in the cloud)"
 
 # 8) MCP default pair --------------------------------------------------------
 step "[8/${TOTAL}] MCP default pair (.mcp.json)"

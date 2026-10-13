@@ -1,0 +1,187 @@
+{
+  "manifest": {
+    "title": "리드"
+  },
+  "record": "리드",
+  "toasts": {
+    "created": "리드 {{id}} 생성됨",
+    "saved": "리드 저장됨",
+    "statusChanged": "{{name}} → {{status}}",
+    "claimed": "이제 {{name}} 담당입니다 · {{owner}} 님은 계속 참여합니다",
+    "claimedUnowned": "이제 {{name}} 담당입니다",
+    "released": "팀에 공개됨 · 누구나 가져갈 수 있습니다",
+    "assigned": "{{name}} 님이 이제 담당자입니다 · 알림 전송됨"
+  },
+  "list": {
+    "records": "리드",
+    "views": {
+      "label": "리드 보기",
+      "mine": "내 리드",
+      "unreplied": "미응답",
+      "all": "전체",
+      "unrepliedCount_other": "미응답 {{count}}건"
+    },
+    "search": {
+      "placeholder": "이름, 전화번호, #ID 검색",
+      "label": "리드 검색"
+    },
+    "newLead": "새 리드",
+    "columns": {
+      "lead": "리드",
+      "status": "상태",
+      "source": "출처",
+      "interests": "관심 분야",
+      "team": "팀",
+      "updated": "업데이트"
+    },
+    "empty": "일치하는 리드가 없습니다",
+    "clearFilters": "필터 지우기",
+    "moreInterests_other": "외 {{count}}개: {{list}}"
+  },
+  "team": {
+    "claim": "공개됨 · 가져오기",
+    "openHint": "아무도 맡고 있지 않음 · 누구나 가져갈 수 있습니다",
+    "openMine": "팀에 공개됨",
+    "openMineHint": "내 보류 기간이 끝났습니다 · 누구나 가져갈 수 있습니다",
+    "releasesToday": "오늘 {{time}}에 팀으로 돌아갑니다",
+    "releasesTomorrow": "내일 {{time}}에 팀으로 돌아갑니다",
+    "claimFirst": "{{first}} 가져오기",
+    "takeOver": "{{first}} 님에게서 넘겨받기"
+  },
+  "filters": {
+    "status": "상태",
+    "source": "출처 · 여러 개 선택 가능",
+    "clear": "지우기",
+    "hold": {
+      "label": "담당 · 가져간 후 보유",
+      "any": "전체",
+      "open": "가져갈 수 있음",
+      "soon": "오늘 공개",
+      "held": "보유 중"
+    },
+    "team": {
+      "label": "팀 · 담당 또는 참여",
+      "anyone": "팀원 누구나",
+      "count_other": "{{count}}명",
+      "search": "팀 검색",
+      "noMatch": "일치 항목 없음"
+    }
+  },
+  "drawer": {
+    "title": "리드 편집",
+    "sub": "변경한 다음 리드를 저장하세요",
+    "idTooltip": "리드 #{{seq}} · {{created}} 생성 · 클릭하여 복사",
+    "idAria": "리드 ID #{{seq}} 복사",
+    "idCopied": "리드 ID #{{seq}} 복사됨",
+    "retarget": "리타겟",
+    "panels": "리드 패널",
+    "details": "세부정보",
+    "chat": "채팅",
+    "resize": "패널 크기 조정",
+    "resizeHint": "드래그하여 크기 조정 · 더블 클릭하여 초기화",
+    "cards": {
+      "details": "리드 세부정보",
+      "progress": "진행 상황",
+      "info": "정보"
+    },
+    "source": "유입 경로",
+    "interests": "관심 분야",
+    "people": "담당자 및 참여자",
+    "peopleAria": "담당자 및 참여자",
+    "addInvolved": "+ 참여자 추가",
+    "claim": "가져오기",
+    "release": "놓아주기",
+    "releaseHint": "팀원 누구나 가져갈 수 있게 합니다",
+    "progressAria": "리드 진행 상황",
+    "steps": {
+      "done": "완료",
+      "current": "현재",
+      "next": "다음"
+    },
+    "stepTips": {
+      "done": "{{status}} · 완료",
+      "current": "{{status}} · 현재 단계",
+      "next": "{{status}}(으)로 이동",
+      "byCheckIn": "내원함 · 체크인할 때 설정됩니다"
+    },
+    "closeAs": "종료 사유",
+    "info": {
+      "created": "생성일",
+      "lastActivity": "최근 활동",
+      "none": "아직 없음",
+      "patient": "환자",
+      "linked": "연결됨",
+      "notYet": "아직 아님",
+      "openTasks": "열린 작업",
+      "retargetReason": "리타겟 사유"
+    },
+    "footer": {
+      "remove": "리드 삭제",
+      "discard": "취소",
+      "save": "리드 저장"
+    },
+    "popover": {
+      "title": "이 리드의 담당자",
+      "search": "팀 검색",
+      "assignedTo": "담당자 · 지금 이 리드를 처리하는 사람",
+      "assign": "배정",
+      "assigned": "배정됨",
+      "currentlyAssigned": "현재 담당자",
+      "assignTo": "{{name}}에게 배정",
+      "involved": "참여자 · 이 리드를 담당한 적 있음",
+      "noMatch": "일치 항목 없음",
+      "note": "✓ 참여자 = 이 리드를 담당한 모든 사람. 답장, 통화, 메모, 예약 시 자동으로 추가됩니다 · 직접 추가할 수도 있습니다"
+    },
+    "remove": {
+      "title": "이 리드를 삭제할까요?",
+      "effect": "리드가 모든 목록과 담당자의 대기열에서 빠집니다. 채팅 기록은 유지됩니다. 바로 알림에서 실행을 취소할 수 있습니다.",
+      "reasons": {
+        "duplicate": "중복",
+        "testEntry": "테스트 항목",
+        "spam": "스팸",
+        "other": "기타"
+      },
+      "removed": "리드 #{{seq}} 삭제됨 · {{reason}}"
+    }
+  },
+  "newLead": {
+    "title": "새 리드",
+    "sub": "이름과 휴대폰 번호만 있으면 시작할 수 있습니다",
+    "contact": "연락처",
+    "search": "이름 또는 휴대폰 번호로 검색",
+    "searchAria": "기존 환자 또는 연락처 검색",
+    "quickStart": "빠른 시작",
+    "presets": {
+      "walkIn": "직접 방문",
+      "instagramDm": "Instagram DM"
+    },
+    "presetHints": {
+      "walkIn": "지금 데스크에 있음 · 유입 경로 직접 방문",
+      "instagramDm": "Instagram DM"
+    },
+    "hits": {
+      "patient": "환자 · {{id}} · {{phone}}",
+      "contact": "{{id}} · {{phone}}",
+      "openLead": "진행 중인 리드 · {{id}} · {{phone}}",
+      "open": "리드 열기",
+      "recreate": "리드 다시 만들기",
+      "useContact": "연락처 사용"
+    },
+    "noMatch": "일치하는 항목 없음",
+    "more_other": " · +{{count}}개 더",
+    "change": "변경",
+    "changeTitle": "다른 연락처 선택",
+    "afterContact": "연락처 다음",
+    "detailsSummary": "유입 경로, 관심 분야, 담당자",
+    "footer": "연락처 하나를 만들거나 업데이트합니다",
+    "create": "리드 만들기",
+    "toasts": {
+      "pickFirst": "먼저 연락처를 선택하거나 추가하세요",
+      "presetApplied": "{{preset}} 프리셋 적용됨",
+      "existingPatient": "기존 환자 {{id}} · 새 리드가 연결됩니다",
+      "existingContact": "기존 연락처 {{name}} 사용",
+      "missing": "이름과 10자리 휴대폰 번호를 입력하세요",
+      "open": "열기"
+    }
+  }
+}

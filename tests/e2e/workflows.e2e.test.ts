@@ -8,11 +8,12 @@ import {
   completeOnboardingWizard,
   loginViaEmailCodeUI,
   navigateInApp,
-  registerNewUserAndGoToDashboard,
+  registerNewUserAndGoToToday,
   selectOrganizationInSwitcher,
 } from '@/tests/utils/e2e-auth.ts';
+import { probeLiveDeployment } from '@/tests/utils/e2e-deployment-mode.ts';
 import { e2eTeamOrgProfile } from '@/tests/utils/e2e-faker.ts';
-import { byTestId, gotoApp } from '@/tests/utils/e2e-hybrid.ts';
+import { byTestId, gotoApp, navigateAuthenticated } from '@/tests/utils/e2e-hybrid.ts';
 import {
   createSessionViaEmailCode,
   e2eAuthHeaders,
@@ -52,9 +53,15 @@ test.describe('Auth workflow (API)', () => {
       headers: bearerHeaders(accessToken),
     });
     expect(ctx.status()).toBe(200);
+    // A personal workspace where the deployment has them; none until a clinic in team-only.
     const activeOrg = (await ctx.json()).data.active_organization;
-    expect(activeOrg.type).toBe('PERSONAL');
-    expect(activeOrg.status).toBe('ACTIVE');
+    const { flags } = await probeLiveDeployment(api, accessToken);
+    if (flags.personalOrganizations) {
+      expect(activeOrg.type).toBe('PERSONAL');
+      expect(activeOrg.status).toBe('ACTIVE');
+    } else {
+      expect(activeOrg).toBeNull();
+    }
 
     const logout = await api.post(`${API}/auth/logout`, {
       headers: bearerHeaders(accessToken),
@@ -100,21 +107,25 @@ test.describe('Tenancy workflow (API)', () => {
     expect(bySlug.status()).toBe(200);
   });
 
-  test('personal org cannot create memberships (422 guard)', async () => {
+  test('a session outside any clinic cannot create memberships (422 personal · 403 none)', async () => {
     const { accessToken } = await createSessionViaEmailCode(api);
+    const { flags } = await probeLiveDeployment(api, accessToken);
     const res = await api.post(`${API}/tenancy/organization/memberships`, {
       headers: bearerHeaders(accessToken, true),
-      data: { email: uniqueE2eEmail('invite'), role_id: 'rol_zzzzzzzzzzzzzzzzzzzzz' },
+      data: { email: uniqueE2eEmail('invite'), role_ids: ['rol_zzzzzzzzzzzzzzzzzzzzz'] },
     });
-    expect(res.status()).toBe(422);
+    expect(res.status()).toBe(flags.personalOrganizations ? 422 : 403);
   });
 });
 
 test.describe('Invitations workflow (API)', () => {
   test('accept invite without auth returns 401 (not 500)', async () => {
-    const res = await api.post(`${API}/tenancy/invitations/inv_expired/accept`, {
-      data: {},
-    });
+    const res = await api.post(
+      `${API}/tenancy/membership-invitations/inv_expired/accept`,
+      {
+        data: {},
+      },
+    );
     expect(res.status()).toBe(401);
     expect((await res.json()).error).toBeTruthy();
   });
@@ -122,7 +133,7 @@ test.describe('Invitations workflow (API)', () => {
   test('authenticated accept of an unknown invitation fails cleanly (4xx, not 500)', async () => {
     const { accessToken } = await createSessionViaEmailCode(api);
     const res = await api.post(
-      `${API}/tenancy/invitations/inv_${'z'.repeat(21)}/accept`,
+      `${API}/tenancy/membership-invitations/inv_${'z'.repeat(21)}/accept`,
       {
         headers: bearerHeaders(accessToken),
         data: {},
@@ -135,19 +146,22 @@ test.describe('Invitations workflow (API)', () => {
 
   test('authenticated accept of a malformed invitation id fails cleanly (4xx, not 500)', async () => {
     const { accessToken } = await createSessionViaEmailCode(api);
-    const res = await api.post(`${API}/tenancy/invitations/not-a-valid-id/accept`, {
-      headers: bearerHeaders(accessToken),
-      data: {},
-    });
+    const res = await api.post(
+      `${API}/tenancy/membership-invitations/not-a-valid-id/accept`,
+      {
+        headers: bearerHeaders(accessToken),
+        data: {},
+      },
+    );
     expect(res.status()).toBeGreaterThanOrEqual(400);
     expect(res.status()).toBeLessThan(500);
   });
 });
 
 test.describe('Auth workflow (UI)', () => {
-  test('API session hydrate lands on dashboard with app shell', async ({ page }) => {
-    await registerNewUserAndGoToDashboard(page);
-    await expect(page.getByTestId('dashboard-page')).toBeVisible({ timeout: 15000 });
+  test('API session hydrate lands on Today with the app shell', async ({ page }) => {
+    await registerNewUserAndGoToToday(page);
+    await expect(page.getByTestId('today-page')).toBeVisible({ timeout: 15000 });
     await expect(page.getByTestId('app-layout')).toBeVisible();
   });
 
@@ -157,52 +171,56 @@ test.describe('Auth workflow (UI)', () => {
     if (page.url().includes('/onboarding')) {
       await completeOnboardingWizard(page);
     }
-    await expect(page.getByTestId('dashboard-page')).toBeVisible({ timeout: 15000 });
+    // Team-only: the new clinic's Today. Personal workspaces on: the picker (D44).
+    await expect(
+      page.getByTestId('today-page').or(page.getByTestId('organization-page')),
+    ).toBeVisible({ timeout: 15000 });
   });
 
-  test('session persists across in-app navigation on dashboard', async ({ page }) => {
-    await registerNewUserAndGoToDashboard(page);
-    const dashboardUrl = page.url();
+  test('session persists across in-app navigation on Today', async ({ page }) => {
+    await registerNewUserAndGoToToday(page);
+    const todayUrl = new URL(page.url()).pathname;
     await page.evaluate(() => {
       window.location.hash = '#settings/account/profile';
     });
     await expect(page.getByTestId('settings-modal')).toBeVisible({ timeout: 15000 });
     await page.keyboard.press('Escape');
     await navigateInApp(page, '/');
-    await expect(page.getByTestId('dashboard-page')).toBeVisible({ timeout: 15000 });
-    expect(page.url()).toMatch(/\/dashboard|\/organization\/[^/]+\/dashboard/);
-    if (dashboardUrl.includes('/organization/')) {
-      expect(page.url()).toContain('/organization/');
-    }
+    await expect(page.getByTestId('today-page')).toBeVisible({ timeout: 15000 });
+    // `/` resolves back into the same clinic, on the same role home.
+    expect(new URL(page.url()).pathname).toBe(todayUrl);
   });
 });
 
 test.describe('Org switch workflow (UI)', () => {
-  test('create team via switcher then switch back to personal', async ({ page }) => {
-    await registerNewUserAndGoToDashboard(page);
-    const switcher = byTestId(page, 'organization-switcher-trigger');
-    test.skip(!(await switcher.isVisible()), 'org switcher hidden');
+  // Through the UI end to end: a second clinic made in the picker's create dialog (the API
+  // helpers make every other spec's clinics), then Switch clinic back into the first. A
+  // personal workspace is not a destination any more (D44): personal workspaces are off.
+  test('create a second clinic from the picker, then switch back to the first', async ({
+    page,
+  }) => {
+    await registerNewUserAndGoToToday(page);
+    const first = /^\/organization\/([^/]+)\//.exec(new URL(page.url()).pathname)?.[1];
+    expect(first, 'landed outside a clinic').toBeTruthy();
 
-    await switcher.click();
-    await page.getByTestId('organization-switcher-create').click();
+    await navigateAuthenticated(page, '/organization');
+    await expect(page.getByTestId('organization-page')).toBeVisible({ timeout: 10000 });
+    await byTestId(page, 'organization-picker-create').click();
     const { name, slug } = e2eTeamOrgProfile({ label: 'wf' });
     await page.getByTestId('create-organization-dialog-name').fill(name);
     await page.getByTestId('create-organization-dialog-slug').fill(slug);
     await page.getByTestId('create-organization-dialog-submit').click();
-    await expect(page).toHaveURL(new RegExp(`/organization/${slug}/dashboard`), {
+    // The new clinic's home lands its owner on Today.
+    await expect(page).toHaveURL(new RegExp(`/organization/${slug}/today`), {
       timeout: 15000,
     });
+    await expect(page.getByTestId('today-page')).toBeVisible({ timeout: 15000 });
 
-    await byTestId(page, 'organization-switcher-trigger').click();
-    const personal = page.getByTestId('organization-switcher-option-personal');
-    test.skip(!(await personal.isVisible()), 'personal org disabled');
-    await page.keyboard.press('Escape');
-    // Radix closes the menu with an exit animation. A trigger click that lands
-    // mid-close is swallowed (the same trap `theme.e2e` documents), so wait for
-    // the menu to be fully gone before the helper opens it again.
-    await expect(personal).toBeHidden();
-    await selectOrganizationInSwitcher(page, 'personal');
-    await expect(page).toHaveURL(/\/dashboard(?:\?|$|#)/, { timeout: 15000 });
+    await selectOrganizationInSwitcher(page, first ?? '');
+    await expect(page).toHaveURL(new RegExp(`/organization/${first}/today`), {
+      timeout: 15000,
+    });
+    await expect(page.getByTestId('today-page')).toBeVisible({ timeout: 15000 });
   });
 });
 

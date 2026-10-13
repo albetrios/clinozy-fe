@@ -1,68 +1,14 @@
 {
-  "brand": {
-    "name": "{{productName}}"
-  },
   "a11y": {
-    "skipToMain": "Vai al contenuto principale",
-    "mainNavigation": "Navigazione principale",
-    "sidebarNavigation": "Navigazione laterale",
-    "mobileNavigation": "Navigazione mobile"
-  },
-  "auth": {
-    "switchToRegister": "Crea un account",
-    "switchToSignIn": "Accedi",
-    "statusOperational": "Tutti i sistemi operativi",
-    "badge": "Operazioni, unificate",
-    "heroTitle": "Il sistema operativo della tua organizzazione.",
-    "heroSubtitle": "Membri, ruoli, fatturazione e sicurezza — uno spazio di lavoro veloce e pensato per la tastiera, per ogni team.",
-    "features": {
-      "multiOrg": {
-        "title": "Multi-organizzazione di progettazione",
-        "body": "Cambia team senza cambiare strumento."
-      },
-      "secure": {
-        "title": "Sicuro per impostazione predefinita",
-        "body": "RBAC, MFA, passkey e tracce di audit."
-      },
-      "fast": {
-        "title": "Veloce ovunque",
-        "body": "Progettato per il lavoro in tempo reale, tastiera prima."
-      }
-    },
-    "stats": {
-      "teams": "team",
-      "uptime": "uptime",
-      "compliant": "conforme"
-    }
+    "skipToMain": "Vai al contenuto principale"
   },
   "app": {
     "search": "Cerca",
-    "searchPlaceholder": "Cerca...",
     "searchShortcutMac": "⌘K",
     "searchShortcutWindows": "Ctrl+K",
-    "userMenu": "Menu utente",
     "userFallback": "Utente",
     "settings": "Impostazioni",
     "logOut": "Esci",
-    "toggleSidebar": "Mostra/nascondi barra laterale",
-    "footerCopyright": "© {{year}} {{productName}} Platform",
-    "nav": {
-      "dashboard": "Dashboard"
-    },
-    "sidebar": {
-      "workspace": "Spazio di lavoro",
-      "menu": "Menu",
-      "shortcuts": "Scorciatoie"
-    },
-    "contextStrip": {
-      "label": "Accesso rapido",
-      "labelSolo": "Vai a",
-      "profile": "Profilo",
-      "security": "Sicurezza",
-      "billing": "Fatturazione",
-      "appearance": "Aspetto",
-      "shortcuts": "Scorciatoie"
-    },
     "workspaceSwitch": {
       "preparing": "Preparazione del tuo spazio di lavoro",
       "loadingAccess": "Caricamento di membri e autorizzazioni",
@@ -74,7 +20,10 @@
       "personal": "Personale",
       "yourOrganizations": "Le tue organizzazioni",
       "organizations": "Organizzazioni",
-      "addOrganization": "Aggiungi organizzazione"
+      "addOrganization": "Aggiungi organizzazione",
+      "invited": "Inviti",
+      "invitedRow": "Invitato · {{roles}}",
+      "invitationCount": "Inviti: {{count}}"
     },
     "notifications": {
       "title": "Notifiche",
@@ -90,17 +39,15 @@
       "settingsLink": "Impostazioni notifiche"
     },
     "commandPalette": {
-      "ariaLabel": "Palette comandi",
-      "placeholder": "Digita un comando o cerca...",
+      "ariaLabel": "Menu comandi",
+      "placeholder": "Cerca o vai a…",
       "empty": "Nessun risultato trovato.",
       "groups": {
-        "navigation": "Navigazione",
         "theme": "Tema",
         "account": "Account",
         "organizations": "Organizzazioni",
         "shortcuts": "Scorciatoie"
       },
-      "dashboard": "Dashboard",
       "userSettings": "Impostazioni utente",
       "organizationSettings": "Impostazioni organizzazione",
       "lightMode": "Modalità chiara",
@@ -118,6 +65,10 @@
       "commandPalette": "Apri palette comandi",
       "showShortcuts": "Mostra scorciatoie da tastiera",
       "showShortcutsAlt": "Mostra scorciatoie da tastiera (alternativa)",
+      "allSections": "Apri o chiudi Tutte le sezioni",
+      "jumpToSection": "Vai a una sezione",
+      "listSearch": "Cerca nell’elenco",
+      "leadRows": "Lead successivo o precedente (in Lead)",
       "closeDialog": "Chiudi finestra di dialogo"
     },
     "emailVerify": {
@@ -143,16 +94,64 @@
       "nameLabel": "Nome dell’organizzazione",
       "slugLabel": "URL dello spazio (facoltativo)",
       "submit": "Crea organizzazione",
-      "submitting": "Creazione…"
+      "submitting": "Creazione…",
+      "cancel": "Annulla"
     },
     "theme": {
       "light": "Chiaro",
       "dark": "Scuro",
-      "system": "Sistema",
-      "shuffle": "Tema casuale"
+      "system": "Sistema"
+    },
+    "sectionBar": {
+      "nav": "Sezioni",
+      "allSections": "Tutte le sezioni",
+      "allSectionsTitle": "Tutte le sezioni (G)",
+      "more": "Altro",
+      "morePinned": "Altre sezioni fissate",
+      "tabTitle": "{{section}} · {{description}}",
+      "searchLabel": "Cerca o vai a (Comando K)",
+      "searchTitleMac": "Cerca o vai a… (⌘K)",
+      "searchTitleWindows": "Cerca o vai a… (Ctrl K)",
+      "searchPlaceholder": "Cerca pazienti, lead…",
+      "pin": "Fissa nella barra",
+      "unpin": "Rimuovi dalla barra",
+      "pinAria": "Fissa nella barra · {{section}}",
+      "unpinAria": "Rimuovi dalla barra · {{section}}",
+      "pinFooter": "Fissa per tenerla nella barra",
+      "keysHint": "G · 1–9",
+      "account": "Account",
+      "avatarLabel": "{{name}} · {{status}}",
+      "identityRole": "{{role}} · {{branch}}",
+      "status": "Stato",
+      "presence": {
+        "online": "Online",
+        "away": "Assente",
+        "busy": "Occupato"
+      },
+      "statusToast": "Stato · {{status}}",
+      "switchClinic": "Cambia clinica",
+      "security": "Sicurezza",
+      "billing": "Fatturazione",
+      "devices": "Dispositivi",
+      "appearance": "Aspetto",
+      "appearanceLanguage": "Aspetto e lingua",
+      "viewAs": {
+        "previewing": "Anteprima come {{role}}",
+        "noSections": "Nessuna sezione",
+        "exit": "Esci dall’anteprima",
+        "exitToast": "Di nuovo con il tuo accesso"
+      },
+      "branch": {
+        "label": "Sede · {{label}}",
+        "title": "Sede · {{names}}",
+        "all": "Tutte le sedi",
+        "allSub": "Vista combinata · totali su {{count}}",
+        "viewGroup": "Vista",
+        "branchesGroup": "Sedi",
+        "showingAll": "Mostrate tutte le sedi",
+        "showing": "Mostrate: {{names}}",
+        "keepOne": "Tieni almeno una sede"
+      }
     }
-  },
-  "public": {
-    "brandTagline": "Spazio di lavoro sicuro per il tuo team"
   }
 }

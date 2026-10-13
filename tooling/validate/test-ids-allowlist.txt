@@ -1,2 +1,91 @@
 # One path fragment per line; optional #rule suffix to scope the exemption.
 # Example: src/pages/foo/FooPage.tsx #page-root
+
+# URL-driven dialog routes (KICKOFF §4, D24): the route renders nothing — the
+# parent list page reads the URL and opens the drawer its manifest's testId
+# names, so that id lives in the parent island, never in the route's own folder.
+src/pages/organization/$organizationSlug/leads/create/ #page-root
+src/pages/organization/$organizationSlug/leads/$leadId/ #page-root
+src/pages/organization/$organizationSlug/appointments/create/ #page-root
+src/pages/organization/$organizationSlug/appointments/$appointmentId/ #page-root
+src/pages/organization/$organizationSlug/offerings/create/ #page-root
+src/pages/organization/$organizationSlug/offerings/$offeringId/edit/ #page-root
+src/pages/organization/$organizationSlug/offerings/offers/create/ #page-root
+src/pages/organization/$organizationSlug/offerings/offers/$offerId/edit/ #page-root
+src/pages/organization/$organizationSlug/patients/create/ #page-root
+src/pages/organization/$organizationSlug/tasks/$taskId/ #page-root
+src/pages/organization/$organizationSlug/tasks/create/ #page-root
+src/pages/organization/$organizationSlug/users/create/ #page-root
+src/pages/organization/$organizationSlug/users/$userId/edit/ #page-root
+src/pages/organization/$organizationSlug/users/branches/create/ #page-root
+src/pages/organization/$organizationSlug/users/branches/$branchId/edit/ #page-root
+src/pages/organization/$organizationSlug/payments/receive/ #page-root
+src/pages/organization/$organizationSlug/payments/pay/ #page-root
+src/pages/organization/$organizationSlug/payments/$paymentId/edit/ #page-root
+src/pages/organization/$organizationSlug/payments/day-close/ #page-root
+src/pages/organization/$organizationSlug/payments/pending/create/ #page-root
+src/pages/organization/$organizationSlug/payments/pending/$creditId/edit/ #page-root
+src/pages/organization/$organizationSlug/medical/sales/create/ #page-root
+src/pages/organization/$organizationSlug/medical/sales/$saleId/ #page-root
+src/pages/organization/$organizationSlug/medical/sales/$saleId/return/ #page-root
+src/pages/organization/$organizationSlug/medical/medicines/create/ #page-root
+src/pages/organization/$organizationSlug/medical/medicines/$medicineId/edit/ #page-root
+src/pages/organization/$organizationSlug/medical/purchases/create/ #page-root
+src/pages/organization/$organizationSlug/medical/purchases/$purchaseOrderId/ #page-root
+src/pages/organization/$organizationSlug/medical/purchases/$purchaseOrderId/edit/ #page-root
+src/pages/organization/$organizationSlug/medical/purchases/$purchaseOrderId/receive/ #page-root
+src/pages/organization/$organizationSlug/medical/suppliers/create/ #page-root
+src/pages/organization/$organizationSlug/medical/suppliers/$supplierId/edit/ #page-root
+src/pages/organization/$organizationSlug/medical/manufacturers/create/ #page-root
+src/pages/organization/$organizationSlug/medical/manufacturers/$manufacturerId/edit/ #page-root
+src/pages/organization/$organizationSlug/medical/mrs/create/ #page-root
+src/pages/organization/$organizationSlug/medical/mrs/$mrId/edit/ #page-root
+src/pages/organization/$organizationSlug/medical/mrs/$mrId/visits/create/ #page-root
+src/pages/organization/$organizationSlug/stock/items/create/ #page-root
+src/pages/organization/$organizationSlug/stock/items/$itemId/edit/ #page-root
+src/pages/organization/$organizationSlug/stock/items/check/ #page-root
+src/pages/organization/$organizationSlug/stock/purchases/create/ #page-root
+src/pages/organization/$organizationSlug/stock/purchases/$purchaseId/edit/ #page-root
+src/pages/organization/$organizationSlug/stock/vendors/create/ #page-root
+src/pages/organization/$organizationSlug/stock/vendors/$vendorId/edit/ #page-root
+
+# The shared Invoice drawer's island (KICKOFF §4, §6.9): no page of its own —
+# its routes open, over the Payments ledger, the shared drawer (`invoice-drawer`,
+# set in `src/shared/components/InvoiceDrawer/`) or the shared print preview
+# (`invoice-preview`, handed to `src/shared/components/PrintPreview/` as its
+# `testId`); its dialog routes render nothing.
+src/pages/organization/$organizationSlug/invoices/invoices.manifest.ts #page-root
+src/pages/organization/$organizationSlug/invoices/create/ #page-root
+src/pages/organization/$organizationSlug/invoices/$invoiceId/ #page-root
+
+# A patient file's file-level drawer route (KICKOFF §6.6, `S:34`): it renders the
+# section it opened over and a shared drawer whose testId lives in that shared
+# component (`patient-drawer`, `src/shared/components/PatientDrawer/`).
+src/pages/organization/$organizationSlug/patients/$patientId/edit/ #page-root
+# Photo details (`S:41`) renders the shared RecordDrawer, which takes its root
+# id (`patient-photo-details`) as the `testId` prop.
+src/pages/organization/$organizationSlug/patients/$patientId/images/$imageId/edit/ #page-root
+# The check-in and review drawers (`S:44–47`) render the section they opened over
+# and a family-shared drawer that passes its root id (`check-in-drawer`,
+# `review-drawer`) to the shared RecordDrawer as a constant.
+src/pages/organization/$organizationSlug/patients/$patientId/check-ins/create/ #page-root
+src/pages/organization/$organizationSlug/patients/$patientId/check-ins/$checkInId/edit/ #page-root
+src/pages/organization/$organizationSlug/patients/$patientId/reviews/create/ #page-root
+src/pages/organization/$organizationSlug/patients/$patientId/reviews/$reviewId/edit/ #page-root
+
+# A form on the record drawer: its root is `appointment-form`, its submit is the
+# drawer's primary, which the drawer derives from its own id
+# (`new-appointment-drawer-save`, `appointment-drawer-save`) — there is no
+# `*-submit` attribute in the form's file to find.
+src/shared/forms/AppointmentForm/ #form
+
+# The patient file's record dialogs (`S:35–39, 42–43`): each renders nothing — its
+# section reads the URL and opens the drawer, which passes its root id
+# (`rx-drawer`, `rx-print-preview`, `treatment-drawer`, `report-drawer`,
+# `report-view`) to the shared RecordDrawer or Sheet as a constant.
+src/pages/organization/$organizationSlug/patients/$patientId/prescriptions/create/ #page-root
+src/pages/organization/$organizationSlug/patients/$patientId/prescriptions/$prescriptionId/ #page-root
+src/pages/organization/$organizationSlug/patients/$patientId/treatments/create/ #page-root
+src/pages/organization/$organizationSlug/patients/$patientId/treatments/$treatmentId/edit/ #page-root
+src/pages/organization/$organizationSlug/patients/$patientId/reports/create/ #page-root
+src/pages/organization/$organizationSlug/patients/$patientId/reports/$reportId/ #page-root

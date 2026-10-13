@@ -34,7 +34,12 @@ const { fetchMeContextMock, captureMock } = vi.hoisted(() => ({
 }));
 
 vi.mock('@/core/http/queryClient.ts', () => ({
-  queryClient: { clear: vi.fn(), setQueryData: vi.fn(), removeQueries: vi.fn() },
+  queryClient: {
+    clear: vi.fn(),
+    setQueryData: vi.fn(),
+    getQueryData: vi.fn(),
+    removeQueries: vi.fn(),
+  },
 }));
 vi.mock('@/shared/tenancy/me-context.ts', () => ({
   fetchMeContext: fetchMeContextMock,

@@ -146,14 +146,33 @@ Comma-separated **product module keys** (e.g. `billing,members`). Disabled modul
 - Routes with `manifest.module` → 404 via `requireModuleGate`
 - Nav/settings entries should hide via `isPlatformModuleEnabled()`
 
+**A production deploy must switch off every fixture-backed clinic room** —
+`FIXTURE_BACKED_APP_MODULES` in `src/core/config/app-modules.ts`, today `app-medical`
+(launch D8). It is a GitHub Environment **variable** (`deployVariables` in
+`tooling/setup/setup.config.json`): put `VITE_DISABLED_MODULES=app-medical` (plus anything else
+to hide) in `.env.production` and run `pnpm github:sync`; the deploy and preview builds write it
+into the build's env file. `pnpm validate:client-env` refuses a production deploy whose value
+leaves a fixture-backed room on — without it the build would ship every room, fixtures included.
+It is deliberately **not** a production profile default: `github:sync` prunes a variable equal to
+its default (assuming the runtime falls back to it), and the runtime never applies this one.
+Development keeps every room on.
+
 See module catalog in [`docs/reference/frontend-platform.md`](../../reference/frontend-platform.md).
 
-### Deployment mode overrides
+### Deployment mode (`VITE_PERSONAL_ORGANIZATIONS`, `VITE_TEAM_ORGANIZATIONS`)
 
-Optional tri-state env overrides (when set, override API flags from `me/context`):
+Tri-state (`true` / `false` / unset). clinozy-be serves no deployment flags, so these decide the
+mode; unset, the client assumes both kinds (hybrid). Set them to match the backend's
+`PERSONAL_ORGANIZATION_ENABLED` / `TEAM_ORGANIZATION_ENABLED` — Clinozy is team-only:
 
-- `VITE_PERSONAL_ORGANIZATIONS`
-- `VITE_TEAM_ORGANIZATIONS`
+- `VITE_PERSONAL_ORGANIZATIONS=false`
+- `VITE_TEAM_ORGANIZATIONS=true`
+
+Locally `pnpm setup:local` writes these (`envProfiles.local.defaults`). In a deploy they are GitHub
+Environment **variables** (`deployVariables` in `tooling/setup/setup.config.json`): put them in
+`.env.development` / `.env.production` and run `pnpm github:sync`; the deploy and preview builds
+write them into the build's env file. Keep them out of the dev / prod `envProfiles` defaults —
+`github:sync` prunes a variable equal to its default, and the build would then run hybrid.
 
 ### Diagnostics / dev tooling — named flags (no build-mode sniffing)
 

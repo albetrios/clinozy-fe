@@ -34,6 +34,24 @@ const CODE_TO_AUTH_KEY: Record<string, string> = {
     ERRORS_KEYS.frontend.organization.roleRequired,
 };
 
+/**
+ * clinozy-be `error.reason` codes said in our own words (the `errors` namespace) instead of the
+ * server's English `detail`.
+ */
+const REASON_TO_ERRORS_KEY: Record<string, string> = {
+  record_changed: ERRORS_KEYS.api.recordChanged,
+  missing_permission: ERRORS_KEYS.api.reasons.missingPermission,
+  owner_membership_fixed: ERRORS_KEYS.api.reasons.ownerMembershipFixed,
+  owner_cannot_leave: ERRORS_KEYS.api.reasons.ownerCannotLeave,
+  owner_role_fixed: ERRORS_KEYS.api.reasons.ownerRoleFixed,
+  system_role_fixed: ERRORS_KEYS.api.reasons.systemRoleFixed,
+  role_locked: ERRORS_KEYS.api.reasons.roleLocked,
+  seat_limit_reached: ERRORS_KEYS.api.reasons.seatLimitReached,
+  membership_already_exists: ERRORS_KEYS.api.reasons.membershipAlreadyExists,
+  organization_slug_exists: ERRORS_KEYS.api.reasons.organizationSlugExists,
+  disposable_email: ERRORS_KEYS.api.reasons.disposableEmail,
+};
+
 function translateKey(key: string): string {
   if (key.startsWith('frontend.')) {
     return tErrors(key);
@@ -85,6 +103,8 @@ function resolveHttpReason(error: unknown): string | undefined {
     { error?: { reason?: string; detail?: string } } | null | undefined;
   const reason = body?.error?.reason;
   if (typeof reason === 'string') {
+    const errorsKey = REASON_TO_ERRORS_KEY[reason];
+    if (errorsKey) return tErrors(errorsKey);
     const fromReason = resolveByCode(reason);
     if (fromReason) return fromReason;
   }

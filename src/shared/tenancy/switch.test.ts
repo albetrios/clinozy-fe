@@ -12,14 +12,18 @@ import {
 } from './me-context.ts';
 import { myOrganizationsQueryKey } from './my-organization-summaries.ts';
 
-const { postMock, setAccessTokenMock, captureMock } = vi.hoisted(() => ({
-  postMock: vi.fn(),
-  setAccessTokenMock: vi.fn(),
-  captureMock: vi.fn(),
-}));
+const { postMock, setAccessTokenMock, captureMock, settleRefreshMock } = vi.hoisted(
+  () => ({
+    postMock: vi.fn(),
+    setAccessTokenMock: vi.fn(),
+    captureMock: vi.fn(),
+    settleRefreshMock: vi.fn(),
+  }),
+);
 vi.mock('@/core/http/fetch-client.ts', () => ({ apiClient: { post: postMock } }));
 vi.mock('@/shared/auth/token.ts', () => ({ setAccessToken: setAccessTokenMock }));
 vi.mock('@/shared/auth/refresh-timer.ts', () => ({ scheduleTokenRefresh: vi.fn() }));
+vi.mock('@/shared/auth/service.ts', () => ({ settleInFlightRefresh: settleRefreshMock }));
 vi.mock('@/shared/analytics/capture.ts', () => ({ captureAnalyticsEvent: captureMock }));
 
 import { switchToOrganization, switchToPersonal } from './switch.ts';
@@ -79,7 +83,7 @@ const BASE_CTX: MeContext = {
     createdAt: TS,
     updatedAt: TS,
   },
-  myPermissions: ['membership:manage'],
+  myPermissions: ['membership:update'],
   globalRole: null,
   deploymentFlags: { personalOrganizations: true, teamOrganizations: true },
   personalOrganizationId: PERSONAL_ID,
@@ -100,6 +104,8 @@ beforeEach(() => {
   postMock.mockReset();
   setAccessTokenMock.mockReset();
   captureMock.mockReset();
+  settleRefreshMock.mockReset();
+  settleRefreshMock.mockResolvedValue(undefined);
   useOrganizationStore.getState().clearOrganization();
   queryClient.setQueryData(meContextQueryKey, structuredClone(BASE_CTX));
   queryClient.setQueryData(myOrganizationsQueryKey, structuredClone(BASE_ORGS));
@@ -110,6 +116,38 @@ afterEach(() => {
 });
 
 describe('tenancy/switch', () => {
+  /*
+   * clinozy-be keeps one live access token per session: a refresh and a switch each retire the
+   * token before them. A switch sent while a refresh was in flight could be answered first, and
+   * the refresh's answer then put its own token — minted for the workspace being left — back.
+   */
+  it('waits for a refresh in flight before it sends the switch', async () => {
+    let finishRefresh: () => void = () => undefined;
+    settleRefreshMock.mockReturnValue(
+      new Promise<void>((resolve) => {
+        finishRefresh = resolve;
+      }),
+    );
+    postMock.mockResolvedValue({
+      data: {
+        access_token: 'switched_tok',
+        active_organization: PERSONAL_WIRE,
+        my_permissions: [],
+        global_role: null,
+      },
+    });
+
+    const switching = switchToPersonal();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(postMock).not.toHaveBeenCalled();
+
+    finishRefresh();
+    await switching;
+    expect(postMock).toHaveBeenCalledTimes(1);
+    expect(setAccessTokenMock).toHaveBeenCalledWith('switched_tok');
+  });
+
   it('re-mints the token + applies the inline delta (live switch-to-personal)', async () => {
     postMock.mockResolvedValue({
       data: {
@@ -174,7 +212,7 @@ describe('tenancy/switch', () => {
           type: 'TEAM',
           slug: 'acme',
         },
-        my_permissions: ['membership:manage'],
+        my_permissions: ['membership:update'],
         global_role: 'super_admin',
       },
     });
@@ -258,6 +296,40 @@ describe('tenancy/switch', () => {
     ]);
   });
 
+  it('never sends a switch superseded while it waited for a refresh', async () => {
+    let finishRefresh: () => void = () => undefined;
+    settleRefreshMock.mockReturnValueOnce(
+      new Promise<void>((resolve) => {
+        finishRefresh = resolve;
+      }),
+    );
+    postMock.mockResolvedValue({
+      data: {
+        access_token: 'latest_tok',
+        active_organization: {
+          ...PERSONAL_WIRE,
+          id: TEAM_ID,
+          type: 'TEAM',
+          slug: 'acme',
+        },
+        my_permissions: [],
+        global_role: null,
+      },
+    });
+
+    const superseded = switchToPersonal();
+    const latest = switchToOrganization(TEAM_ID);
+    finishRefresh();
+
+    expect(await superseded).toBeUndefined();
+    await latest;
+    expect(postMock).toHaveBeenCalledTimes(1);
+    expect(postMock).toHaveBeenCalledWith(
+      expect.stringContaining('/auth/switch-to-organization'),
+      { organization_id: TEAM_ID },
+    );
+  });
+
   it('drops a superseded switch so the latest org wins the token (race guard)', async () => {
     const ORG_A = 'org_aaaaaaaaaaaaaaaaaaaaa';
     const ORG_B = 'org_bbbbbbbbbbbbbbbbbbbbb';
@@ -282,8 +354,9 @@ describe('tenancy/switch', () => {
     });
     postMock.mockReturnValueOnce(pendingA).mockReturnValueOnce(pendingB);
 
-    // Two switches initiated back-to-back: A first (older), then B (latest).
+    // Two switches, A first (older) and already sent, then B (latest).
     const switchA = switchToOrganization(ORG_A);
+    await vi.waitFor(() => expect(postMock).toHaveBeenCalledTimes(1));
     const switchB = switchToOrganization(ORG_B);
 
     // The latest switch (B) resolves first and applies its token + context.

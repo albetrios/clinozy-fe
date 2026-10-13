@@ -1,0 +1,135 @@
+{
+  "manifest": {
+    "title": "予約"
+  },
+  "record": "予約",
+  "records": "予約",
+  "toolbar": {
+    "viewsLabel": "表示",
+    "views": {
+      "agenda": "アジェンダ",
+      "day": "日",
+      "week": "週",
+      "month": "月"
+    },
+    "today": {
+      "day": "今日",
+      "week": "今週",
+      "month": "今月"
+    },
+    "jump": {
+      "day": "今日に移動",
+      "week": "今週に移動",
+      "month": "今月に移動"
+    },
+    "period": "期間",
+    "weekRange": "{{from}} – {{to}}",
+    "previous": {
+      "day": "前日",
+      "week": "前の週",
+      "month": "前の月"
+    },
+    "next": {
+      "day": "翌日",
+      "week": "次の週",
+      "month": "次の月"
+    },
+    "search": "患者、電話番号、#ID",
+    "searchLabel": "予約を検索",
+    "newAppointment": "新規予約"
+  },
+  "filters": {
+    "label": "予約のフィルター",
+    "previousMonth": "前の月",
+    "nextMonth": "次の月",
+    "upcoming": "今後の予約（既定）",
+    "dayBooked_other": "{{date}} · 予約 {{count}} 件",
+    "appointedTo": "担当者",
+    "allDoctors": "すべての医師",
+    "searchTeam": "チームを検索",
+    "showAll": "すべて表示",
+    "done": "完了",
+    "status": "ステータス",
+    "all": "すべて",
+    "active": "有効（未完了）"
+  },
+  "agenda": {
+    "columns": {
+      "time": "時間",
+      "contact": "連絡先",
+      "service": "サービス",
+      "doctor": "担当者",
+      "latest": "最新の更新",
+      "quickView": "クイックビュー",
+      "status": "ステータス"
+    },
+    "minutes": "{{minutes}} 分",
+    "empty": "ここには予約がありません · ",
+    "bookOne": "予約する",
+    "day": {
+      "today": "今日",
+      "tomorrow": "明日",
+      "yesterday": "昨日",
+      "inDays_other": "{{count}} 日後",
+      "nextWeek": "来週",
+      "inWeeks_other": "{{count}} 週間後",
+      "daysAgo_other": "{{count}} 日前"
+    },
+    "counts": {
+      "confirmed_other": "確認済み <n>{{count}}</n>",
+      "awaiting_other": "返信待ち <n>{{count}}</n>",
+      "allSet": "· 準備完了",
+      "confirmedHint_other": "確認済み {{count}} 件",
+      "waitingHint_other": "返信待ち {{count}} 件",
+      "hint": "{{confirmed}} · {{waiting}}"
+    },
+    "latest": {
+      "reminderSent": "✓ リマインダー送信済み",
+      "repliedYes": "✓ 「はい」と返信",
+      "moved": "✓ 日時変更済み",
+      "movedTimes": "✓ 日時変更済み ×{{times}}",
+      "checkedIn": "✓ 受付済み"
+    },
+    "latestHints": {
+      "reminderSent": "リマインダーを送信しました",
+      "repliedYes": "WhatsApp の「はい」の返信で自動的に確認済み",
+      "moved": "{{day}} {{time}} から変更",
+      "checkedIn": "患者の受付が完了しました"
+    },
+    "changeStatus": "ステータスを変更 · {{status}}"
+  },
+  "status": {
+    "title": "ステータスを変更",
+    "now": "現在: <b>{{status}}</b>",
+    "nowReason": "現在: <b>{{status}} · {{reason}}</b>",
+    "why": "キャンセルの理由は？",
+    "back": "戻る"
+  },
+  "card": {
+    "when": "{{day}} · {{time}} · {{minutes}} 分",
+    "noUpdate": "まだ更新はありません",
+    "open": "開く",
+    "reschedule": "日時を変更",
+    "cancel": "キャンセル",
+    "tracker": "ステータス"
+  },
+  "calendar": {
+    "dayLoad_other": "予約 {{count}} 件 · {{hours}} 時間",
+    "free": "終日空き",
+    "doctor": "医師",
+    "bookSlot": "空いている枠をクリックして予約",
+    "newAt": "新規予約 · {{day}} · {{time}}",
+    "pastDay": "過去の日付は予約できません",
+    "doctorBooked_other": "予約 {{count}} 件",
+    "doctorFree": "空き",
+    "chairTime_other": "予約 {{count}} 件 · チェア稼働率 {{percent}}%",
+    "chairTimeOverlap_other": "予約 {{count}} 件 · チェア稼働率 {{percent}}% · 重複予約あり",
+    "overlap": "重複予約",
+    "more": "他 {{count}} 件",
+    "dayCount_other": "{{day}} · 予約 {{count}} 件",
+    "openDay": "日を開く",
+    "block": "{{name}} · {{time}} · {{minutes}} 分 · {{service}} · {{doctor}} · {{status}}",
+    "blockClash": "{{name}} · {{time}} · {{minutes}} 分 · {{service}} · {{doctor}} · {{status}} · 他の予約と重複",
+    "blockTime": "{{time}} · {{minutes}}分"
+  }
+}

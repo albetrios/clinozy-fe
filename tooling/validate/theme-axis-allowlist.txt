@@ -1,16 +1,9 @@
 # Documented theme-axis exceptions (substring match against each violation line).
-# CustomToast solid variant keeps shadow-md for toast design depth.
-CustomToast.tsx
-# ThemeShowcase decorative primary glow (not a card surface).
-ThemeShowcase.tsx
 # Appearance picker *selection* rings (not focus — category D in playbook).
 AppearancePanel.tsx
 # Intentional flat semantic surfaces.
 FormError.tsx
 App.tsx
-# Highlights tab pill: active-state shadow-sm mirrors the vendored shadcn
-# tabs-trigger depth (category D — not a card surface; focus uses data-slot).
-'bg-background text-foreground shadow-sm'
 # The icon barrel IS the one module allowed to import lucide-react — every other
 # file goes through it (that is the rule this check enforces).
 src/shared/icons/index.ts
@@ -23,7 +16,11 @@ src/shared/icons/index.ts
 # data-slot="pill". Both are squared under Sharp; only the string lives elsewhere.
 gap-1.5 rounded-full px-3 text-xs font-medium
 justify-center rounded-full text-xs transition-all
-# The assistant orb's core sits inside its own blurred halo (exempt as a glow).
-# It is an illustration, not a surface: a square core in a round halo reads as a
-# rendering bug, so the pair stays round in every shape.
-inset-1 rounded-full bg-gradient-to-tl
+# Section-bar class constants: `tabPillClassName` lands on the tab-bar icon pill
+# (a span tagged data-slot="pill"); `radioPillClassName` lands on the Account
+# menu's radio items, whose Radix primitive owns its own data-slot.
+'flex h-7 w-11.5 items-center justify-center rounded-full transition-colors duration-160'
+h-7 gap-1.5 rounded-full border border-border px-2.5 text-xs font-medium focus:bg-muted
+# A calendar block's status pill sits white on the block's tint (H:2063): the
+# class lands on TonePill, whose span carries data-slot="pill" itself.
+bg-card ps-1.5 pe-1.75

@@ -1,7 +1,7 @@
 import { Trans, useTranslation } from 'react-i18next';
 
-import { cn } from '@/lib/utils.ts';
 import { AUTH_KEYS, AUTH_NS } from '@/shared/auth/auth-shell.constants.ts';
+import { PublicCardHeader } from '@/shared/components/PublicFrame/index.ts';
 
 type AuthWelcomeHeaderProps = {
   className?: string;
@@ -11,7 +11,10 @@ type AuthWelcomeHeaderProps = {
   email?: string;
 };
 
-/** Welcome copy for the unified auth entry — tuned for split and card layouts. */
+/**
+ * Welcome copy for the unified auth entry — the sign-in card's heading in the
+ * drawer title's anatomy (`PublicCardHeader`): 18px/600 over a 13px muted line.
+ */
 export function AuthWelcomeHeader({
   className,
   variant = 'welcome',
@@ -21,32 +24,32 @@ export function AuthWelcomeHeader({
 
   if (variant === 'emailVerify') {
     return (
-      <header className={cn('space-y-2 text-center lg:text-start', className)}>
-        <h1 className="text-2xl font-semibold tracking-tight text-balance sm:text-[1.75rem]">
-          {t(AUTH_KEYS.auth.verify.heading)}
-        </h1>
-        {email ? (
-          <p className="text-muted-foreground text-sm leading-relaxed text-pretty">
+      <PublicCardHeader
+        className={className}
+        title={t(AUTH_KEYS.auth.verify.heading)}
+        description={
+          email ? (
             <Trans
               ns={AUTH_NS}
               i18nKey={AUTH_KEYS.auth.email.codeSentTo}
               values={{ email }}
-              components={{ 1: <span className="text-foreground font-medium" /> }}
+              components={{
+                1: (
+                  <span dir="ltr" className="text-foreground font-medium wrap-anywhere" />
+                ),
+              }}
             />
-          </p>
-        ) : null}
-      </header>
+          ) : undefined
+        }
+      />
     );
   }
 
   return (
-    <header className={cn('space-y-2 text-center lg:text-start', className)}>
-      <h1 className="text-2xl font-semibold tracking-tight text-balance sm:text-[1.75rem]">
-        {t(AUTH_KEYS.auth.heading)}
-      </h1>
-      <p className="text-muted-foreground text-sm leading-relaxed text-pretty">
-        {t(AUTH_KEYS.auth.subheading)}
-      </p>
-    </header>
+    <PublicCardHeader
+      className={className}
+      title={t(AUTH_KEYS.auth.heading)}
+      description={t(AUTH_KEYS.auth.subheading)}
+    />
   );
 }

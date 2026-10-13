@@ -62,12 +62,11 @@ Use Tailwind's mobile-first breakpoints:
 Breakpoints: `sm` (640px), `md` (768px), `lg` (1024px), `xl` (1280px), `2xl` (1536px),
 plus two declared in `index.css` for the big-monitor tier — **`3xl` (1920px)** and
 **`4xl` (2560px)**. A layout that stops growing at `2xl` floats in the middle of a big
-monitor: let the content column, the sidebar, hero type and large overlays keep scaling.
+monitor: let the content column, hero type and large overlays keep scaling.
 
 House rules (full reasoning: `docs/reference/design.md` → Screen tiers):
 
-- The sidebar is a **drawer below `lg`**, not `md`; closed means `invisible`, not just
-  translated away (off-screen is still focusable).
+- There is no sidebar: the section bar's one header holds the nav on every viewport.
 - The bottom tab bar exists below `md`. Anything else pinned to the bottom edge uses
   `bottom-[calc(var(--floating-bottom-offset,0rem)+…)]` so it rides above the bar.
 - An overlay that is a sheet on phones must **undo** the sheet from `sm`
@@ -92,9 +91,9 @@ for free. A literal (`p-[24px]`, `gap-[0.5rem]`) is pixel-identical on the defau
 ignores the setting — `pnpm validate:theme-axis` (check 7) rejects it; `[var(--…)]` and
 `[calc(…)]` are fine.
 
-Dialogs are inset `p-6` by `DialogContent`. A surface that opts out with `p-0` to lay out
-its own panes (the settings modal) repeats that same step on **every** pane, so no pane
-hugs a corner while its neighbor floats.
+A `RecordDrawer` insets its body by `--drawer-body-pad`. A drawer that opts out
+(`flushBody`) to lay out its own panes (Settings) gives **every** pane the same step, so no
+pane hugs a corner while its neighbor floats.
 
 ## Corner radius
 
@@ -105,7 +104,7 @@ A bare `rounded` and an arbitrary `rounded-[3px]` follow nothing and are rejecte
 
 `rounded-full` is a **shape** decision. On anything that is a surface — a chip, a count
 badge, an icon disc, a track — add `data-slot="pill"` (or use a primitive that already has
-a slot: `Badge`, `Avatar`, `Button`, `Skeleton`) so the Sharp shape can square it.
+a slot: `Avatar`, `Button`, `Skeleton`) so the Sharp shape can square it.
 `pnpm validate:theme-axis` (check 6) rejects a `rounded-full` with no slot within 5 lines
 above it. Status dots (at most 10px — `size-2.5`), blurred glows and pseudo-element markers
 stay round / are squared in `index.css`. Never write an unconditional `rounded-none`; scope

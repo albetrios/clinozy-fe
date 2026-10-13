@@ -1,0 +1,75 @@
+{
+  "manifest": {
+    "title": "आज"
+  },
+  "greeting": {
+    "morning": "सुप्रभात, {{name}}",
+    "afternoon": "शुभ दोपहर, {{name}}",
+    "evening": "शुभ संध्या, {{name}}",
+    "nobody": "टीम"
+  },
+  "pulse": "{{inClinic}} क्लिनिक में · {{waiting}} प्रतीक्षा में · {{arriving}} आने वाले · {{day}}, {{time}}",
+  "newBooking": "नई बुकिंग",
+  "walkIn": "सीधे आए",
+  "loading": "आज का फ़्लोर लोड हो रहा है",
+  "lanes": {
+    "label": "चरण",
+    "names": {
+      "enquiries": "पूछताछ",
+      "arriving": "आने वाले",
+      "waiting": "प्रतीक्षा में",
+      "withDoctor": "डॉक्टर के पास",
+      "treatment": "उपचार",
+      "checkout": "भुगतान",
+      "pharmacy": "फ़ार्मेसी"
+    },
+    "hints": {
+      "oldest": "सबसे पुरानी {{time}}",
+      "next": "अगला {{time}}",
+      "since": "{{time}} से",
+      "none": "—"
+    },
+    "more": "+{{more}}",
+    "count_one": "{{count}} व्यक्ति",
+    "count_other": "{{count}} लोग",
+    "empty": "अभी यहाँ कोई नहीं है।",
+    "none": "क्लिनिक का फ़्लोर और पूछताछ आपकी भूमिका का हिस्सा नहीं हैं।"
+  },
+  "actions": {
+    "book": "बुक करें",
+    "checkIn": "चेक-इन करें",
+    "sendIn": "अंदर भेजें",
+    "openSession": "सत्र खोलें",
+    "checkout": "भुगतान",
+    "dispense": "दवा दें"
+  },
+  "card": {
+    "service": "{{service}} · {{where}}",
+    "medicines_one": "{{count}} दवा लिखी गई",
+    "medicines_other": "{{count}} दवाएँ लिखी गईं"
+  },
+  "flags": {
+    "newLead": "नई लीड",
+    "confirmed": "पुष्ट",
+    "unconfirmed": "अपुष्ट",
+    "waiting": "{{minutes}} मिनट से प्रतीक्षा",
+    "inRoom": "कमरे में {{minutes}} मिनट",
+    "rxApproved": "पर्चा स्वीकृत {{time}}",
+    "toPay": "{{amount}} देना है"
+  },
+  "toasts": {
+    "checkedIn": "{{name}} चेक-इन हुए · डॉक्टर की कतार और कमरे को सूचना दी गई",
+    "sentIn": "{{name}} को डॉक्टर के पास भेजा गया",
+    "noRecord": "{{name}} का अभी कोई मरीज़ रिकॉर्ड नहीं है",
+    "outcome": "{{name}}: {{result}}",
+    "snoozed": "स्थगित · {{label}}"
+  },
+  "queue": {
+    "title": "काम की कतार",
+    "sub": "{{open}} खुले · हर एक का ज़िम्मेदार और नियत समय है",
+    "scope": "किसके कार्य",
+    "owner": "ज़िम्मेदार: {{name}}",
+    "you": "{{name}} (आप)",
+    "closed": "✓ {{result}}"
+  }
+}

@@ -311,7 +311,7 @@ When your layouts contain something equivalent to the list below, using the same
 name makes the port mechanical instead of interpretive. **This is a glossary, not
 a shopping list** — if your design has no equivalent, it doesn't need one:
 
-`SkipLink` · `BrandMark` · `MobileBrandMark` · `AuthControls` (theme + language)
-· `AuthForm` (the card wrapping route content) · `PublicMain`
+`PublicFrame` (the canvas: skip link, header with `BrandLogo`, `<main>`) · `PublicCard`
+· `AuthControls` (theme + language) · `AuthForm` (the animated slot wrapping route content)
 
 Anything you invent, name clearly and say what it does.

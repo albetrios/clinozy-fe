@@ -12,9 +12,14 @@ import { LAYOUT_KEYS, LAYOUT_NS } from '@/shared/layouts/layout.constants.ts';
 import { notify } from '@/shared/notify/index.ts';
 
 /**
- * App-shell banner shown when the signed-in user's email is not yet verified.
+ * App-shell notice shown when the signed-in user's email is not yet verified.
  * Sends a fresh sign-in code via `POST /auth/email/send-code` (public, same flow as `/login`).
  * Renders nothing once verified — or while the session context is still loading.
+ *
+ * The section bar's system-notice shape — the design's View-as pill ("use the
+ * same pill for system notices", `shell.md:63`): a 44px dark pill the shell
+ * stacks above the bottom tab bar, publishing its height through
+ * `data-slot="notice-pill"`.
  */
 export function EmailVerificationBanner() {
   const { t } = useTranslation(LAYOUT_NS);
@@ -60,27 +65,32 @@ export function EmailVerificationBanner() {
   };
 
   return (
-    <output
-      data-testid="email-verify-banner"
-      className="bg-muted/60 flex flex-wrap items-center gap-x-2 gap-y-1 border-b px-4 py-2 text-sm sm:px-6"
-    >
-      <Mail className="text-muted-foreground h-4 w-4 shrink-0" aria-hidden="true" />
-      <span className="text-foreground">{t(keys.message)}</span>
-      <Button
-        variant="outline"
-        size="sm"
-        className="ms-auto h-7"
-        disabled={sending || sent || !turnstileReady}
-        isLoading={sending || !turnstileReady}
-        onClick={resend}
-        data-testid="email-verify-resend"
+    <div className="flex max-w-full flex-col items-center gap-2">
+      <output
+        data-testid="email-verify-banner"
+        data-slot="notice-pill"
+        className="bg-primary text-primary-foreground animate-dropdown-up pointer-events-auto flex h-11 max-w-full items-center gap-2.5 rounded-full ps-3.5 pe-1.5 shadow-(--elevation-menu)"
       >
-        {resendButtonLabel()}
-      </Button>
-
-      {/* Resend is captcha-gated: when Turnstile escalates, the challenge renders on a
-          full row beneath the banner line rather than floating elsewhere. */}
-      <CaptchaSlot className="basis-full" testId="email-verify-captcha-slot" />
-    </output>
+        <Mail className="size-3.5 flex-none opacity-70" aria-hidden="true" />
+        <span className="text-body min-w-0 truncate font-semibold">
+          {t(keys.message)}
+        </span>
+        <Button
+          variant="ghost"
+          size="sm"
+          data-slot="pill"
+          className="bg-canvas text-foreground hover:bg-border h-8 flex-none rounded-full px-3"
+          disabled={sending || sent || !turnstileReady}
+          isLoading={sending || !turnstileReady}
+          onClick={resend}
+          data-testid="email-verify-resend"
+        >
+          {resendButtonLabel()}
+        </Button>
+      </output>
+      {/* Resend is captcha-gated: an escalated Turnstile challenge sits under
+          the pill, never inside it. */}
+      <CaptchaSlot testId="email-verify-captcha-slot" />
+    </div>
   );
 }

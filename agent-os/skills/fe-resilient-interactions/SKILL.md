@@ -607,7 +607,7 @@ if (isWriting || role === member.role) return;
   a grid of plan buttons greys out all of them and spins none — the click reads as a freeze. Track
   *which* item is running (`pendingPlanId === plan.id`) and pass `isLoading` to that one only
   (SET-13).
-- **A confirm dialog waits for its own request.** `AlertDialogAction` closes on click; without
+- **A confirm dialog waits for its own request.** Radix's `AlertDialog.Action` closes on click (the shared confirm's buttons are plain for that reason); without
   `event.preventDefault()`, `disabled={isPending}`, and closing in `onSuccess`, the outcome lands
   on a screen the dialog has already left. Block `onOpenChange` while the request runs, too.
 - **Never `void` a promise that can reject.** A click handler owns its failure: catch inside, so
@@ -1133,10 +1133,11 @@ preloadBootRoutes({ likelySignedIn: hasSessionHint() });
   being wrong is a few idle kilobytes. **Nothing may authorize on it**: the refresh cookie is HttpOnly
   and the server alone knows whether the session is alive. A hint that skipped the refresh call would
   break every session the hint does not know about (cleared storage, a parent-domain cookie).
-- **Warm the level below, too.** A layout that lazy-loads its variant *after mounting* adds a round
-  trip the router's preloader cannot see. Fetch it from the route `loader` — after `beforeLoad` has
-  put `me/context` in the store, so the choice is exact, not a guess — and the layout finds it in
-  memory (`preloadSessionAppShell()`, `preloadAuthLayoutVariant()`).
+- **Warm the level below, too.** A layout or island a route renders inside its own component is
+  invisible to the router's preloader, and lazy-loading it *after mounting* adds a round trip. Fetch
+  it from the route `loader` — after `beforeLoad` has put `me/context` in the store, so the choice is
+  exact, not a guess — and the component finds it in memory (`preloadAppShell()`, `preloadAuthShell()`
+  in `routeTree.tsx`).
 - **Speculation swallows its failures.** A rejected warm-up is not an error: the router loads the same
   chunk again through the normal path, where a failure has a boundary and a Retry. (`onceAsync` does
   not cache a rejection, so the retry really refetches.)

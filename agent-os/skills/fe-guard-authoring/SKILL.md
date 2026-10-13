@@ -98,7 +98,7 @@ class constant to the element it lands on, and a sibling's slot inside the windo
 for its neighbor. That is an accepted limit, not a bug: document it next to the helper,
 allowlist the class constants with their reason, and put the claim that actually matters
 under a test that can measure it (for the theme axes: a computed-style sweep in a
-browser — `tests/e2e/theme-shape.e2e.test.ts`).
+browser — what `theme-shape.e2e.test.ts` did until the theme studio retired).
 
 ### 2. The gate runs only locally
 

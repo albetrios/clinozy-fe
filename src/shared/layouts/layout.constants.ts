@@ -3,65 +3,72 @@ import { I18N_NAMESPACES } from '@/lib/i18n/namespaces.ts';
 export const LAYOUT_NS = I18N_NAMESPACES.layout;
 
 export const LAYOUT_KEYS = {
-  brand: { name: 'brand.name' },
   a11y: {
     skipToMain: 'a11y.skipToMain',
-    mainNavigation: 'a11y.mainNavigation',
-    sidebarNavigation: 'a11y.sidebarNavigation',
-    mobileNavigation: 'a11y.mobileNavigation',
-  },
-  auth: {
-    switchToRegister: 'auth.switchToRegister',
-    switchToSignIn: 'auth.switchToSignIn',
-    statusOperational: 'auth.statusOperational',
-    badge: 'auth.badge',
-    heroTitle: 'auth.heroTitle',
-    heroSubtitle: 'auth.heroSubtitle',
-    features: {
-      multiOrg: {
-        title: 'auth.features.multiOrg.title',
-        body: 'auth.features.multiOrg.body',
-      },
-      secure: { title: 'auth.features.secure.title', body: 'auth.features.secure.body' },
-      fast: { title: 'auth.features.fast.title', body: 'auth.features.fast.body' },
-    },
-    stats: {
-      teams: 'auth.stats.teams',
-      uptime: 'auth.stats.uptime',
-      compliant: 'auth.stats.compliant',
-    },
   },
   app: {
     theme: {
       light: 'app.theme.light',
       dark: 'app.theme.dark',
       system: 'app.theme.system',
-      shuffle: 'app.theme.shuffle',
     },
     search: 'app.search',
-    searchPlaceholder: 'app.searchPlaceholder',
     searchShortcutMac: 'app.searchShortcutMac',
     searchShortcutWindows: 'app.searchShortcutWindows',
-    userMenu: 'app.userMenu',
     userFallback: 'app.userFallback',
     settings: 'app.settings',
     logOut: 'app.logOut',
-    toggleSidebar: 'app.toggleSidebar',
-    footerCopyright: 'app.footerCopyright',
-    nav: { dashboard: 'app.nav.dashboard' },
-    sidebar: {
-      workspace: 'app.sidebar.workspace',
-      menu: 'app.sidebar.menu',
-      shortcuts: 'app.sidebar.shortcuts',
-    },
-    contextStrip: {
-      label: 'app.contextStrip.label',
-      labelSolo: 'app.contextStrip.labelSolo',
-      profile: 'app.contextStrip.profile',
-      security: 'app.contextStrip.security',
-      billing: 'app.contextStrip.billing',
-      appearance: 'app.contextStrip.appearance',
-      shortcuts: 'app.contextStrip.shortcuts',
+    sectionBar: {
+      nav: 'app.sectionBar.nav',
+      allSections: 'app.sectionBar.allSections',
+      allSectionsTitle: 'app.sectionBar.allSectionsTitle',
+      more: 'app.sectionBar.more',
+      morePinned: 'app.sectionBar.morePinned',
+      tabTitle: 'app.sectionBar.tabTitle',
+      searchLabel: 'app.sectionBar.searchLabel',
+      searchTitleMac: 'app.sectionBar.searchTitleMac',
+      searchTitleWindows: 'app.sectionBar.searchTitleWindows',
+      searchPlaceholder: 'app.sectionBar.searchPlaceholder',
+      pin: 'app.sectionBar.pin',
+      unpin: 'app.sectionBar.unpin',
+      pinAria: 'app.sectionBar.pinAria',
+      unpinAria: 'app.sectionBar.unpinAria',
+      pinFooter: 'app.sectionBar.pinFooter',
+      keysHint: 'app.sectionBar.keysHint',
+      account: 'app.sectionBar.account',
+      avatarLabel: 'app.sectionBar.avatarLabel',
+      identityRole: 'app.sectionBar.identityRole',
+      status: 'app.sectionBar.status',
+      presence: {
+        online: 'app.sectionBar.presence.online',
+        away: 'app.sectionBar.presence.away',
+        busy: 'app.sectionBar.presence.busy',
+      },
+      statusToast: 'app.sectionBar.statusToast',
+      switchClinic: 'app.sectionBar.switchClinic',
+      security: 'app.sectionBar.security',
+      billing: 'app.sectionBar.billing',
+      devices: 'app.sectionBar.devices',
+      appearance: 'app.sectionBar.appearance',
+      /** The row under the mode pills that opens the Appearance drawer. */
+      appearanceLanguage: 'app.sectionBar.appearanceLanguage',
+      branch: {
+        label: 'app.sectionBar.branch.label',
+        title: 'app.sectionBar.branch.title',
+        all: 'app.sectionBar.branch.all',
+        allSub: 'app.sectionBar.branch.allSub',
+        viewGroup: 'app.sectionBar.branch.viewGroup',
+        branchesGroup: 'app.sectionBar.branch.branchesGroup',
+        showingAll: 'app.sectionBar.branch.showingAll',
+        showing: 'app.sectionBar.branch.showing',
+        keepOne: 'app.sectionBar.branch.keepOne',
+      },
+      viewAs: {
+        previewing: 'app.sectionBar.viewAs.previewing',
+        noSections: 'app.sectionBar.viewAs.noSections',
+        exit: 'app.sectionBar.viewAs.exit',
+        exitToast: 'app.sectionBar.viewAs.exitToast',
+      },
     },
     orgCreate: {
       namePlaceholder: 'app.orgCreate.namePlaceholder',
@@ -71,6 +78,11 @@ export const LAYOUT_KEYS = {
       slugLabel: 'app.orgCreate.slugLabel',
       submit: 'app.orgCreate.submit',
       submitting: 'app.orgCreate.submitting',
+      /**
+       * The drawer's own "Cancel": it also opens over the organization picker,
+       * outside the org shell, where the drawers' shared `app` copy is not loaded.
+       */
+      cancel: 'app.orgCreate.cancel',
     },
     workspaceSwitch: {
       preparing: 'app.workspaceSwitch.preparing',
@@ -84,6 +96,9 @@ export const LAYOUT_KEYS = {
       yourOrganizations: 'app.orgSwitcher.yourOrganizations',
       organizations: 'app.orgSwitcher.organizations',
       addOrganization: 'app.orgSwitcher.addOrganization',
+      invited: 'app.orgSwitcher.invited',
+      invitedRow: 'app.orgSwitcher.invitedRow',
+      invitationCount: 'app.orgSwitcher.invitationCount',
     },
     notifications: {
       title: 'app.notifications.title',
@@ -103,13 +118,11 @@ export const LAYOUT_KEYS = {
       placeholder: 'app.commandPalette.placeholder',
       empty: 'app.commandPalette.empty',
       groups: {
-        navigation: 'app.commandPalette.groups.navigation',
         theme: 'app.commandPalette.groups.theme',
         account: 'app.commandPalette.groups.account',
         organizations: 'app.commandPalette.groups.organizations',
         shortcuts: 'app.commandPalette.groups.shortcuts',
       },
-      dashboard: 'app.commandPalette.dashboard',
       userSettings: 'app.commandPalette.userSettings',
       organizationSettings: 'app.commandPalette.organizationSettings',
       lightMode: 'app.commandPalette.lightMode',
@@ -128,6 +141,10 @@ export const LAYOUT_KEYS = {
       showShortcuts: 'app.shortcuts.showShortcuts',
       showShortcutsAlt: 'app.shortcuts.showShortcutsAlt',
       closeDialog: 'app.shortcuts.closeDialog',
+      allSections: 'app.shortcuts.allSections',
+      jumpToSection: 'app.shortcuts.jumpToSection',
+      listSearch: 'app.shortcuts.listSearch',
+      leadRows: 'app.shortcuts.leadRows',
     },
     emailVerify: {
       message: 'app.emailVerify.message',
@@ -146,17 +163,4 @@ export const LAYOUT_KEYS = {
       signingOutDescription: 'app.sessionTimeout.signingOutDescription',
     },
   },
-  public: {
-    brandTagline: 'public.brandTagline',
-  },
-} as const;
-
-export const AUTH_LAYOUT_STAT_KEYS = [
-  { value: '10k+', labelKey: LAYOUT_KEYS.auth.stats.teams },
-  { value: '99.99%', labelKey: LAYOUT_KEYS.auth.stats.uptime },
-  { value: 'SOC 2', labelKey: LAYOUT_KEYS.auth.stats.compliant },
-] as const;
-
-export const APP_NAV_SEGMENT_KEYS = {
-  dashboard: LAYOUT_KEYS.app.nav.dashboard,
 } as const;

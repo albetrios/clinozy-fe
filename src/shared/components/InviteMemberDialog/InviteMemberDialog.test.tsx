@@ -1,8 +1,11 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useReducer } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { RoleSummary } from '@/shared/api/organization-contracts.ts';
+import { axeForDialog } from '@/tests/utils/axe-for-dialog.ts';
+import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
 import { InviteMemberDialog } from './InviteMemberDialog.tsx';
 
@@ -24,7 +27,10 @@ function role(id: string, name: string): RoleSummary {
     description: '',
     permissions: [],
     memberCount: 0,
-    isSystem: name.toLowerCase() === 'owner',
+    isSystem: name === 'Owner',
+    isLocked: false,
+    tone: 'sky',
+    updatedAt: '2026-01-01T00:00:00.000Z',
   };
 }
 
@@ -41,31 +47,82 @@ function rolesResult(rows: RoleSummary[], isPending = false) {
   };
 }
 
+/** Mounts the trigger (the drawer's dirty guard needs the router) and opens the drawer. */
 async function open() {
+  renderWithProviders(<InviteMemberDialog />);
   const user = userEvent.setup();
-  await user.click(screen.getByTestId('invite-member-open'));
+  await user.click(await screen.findByTestId('invite-member-open'));
   return user;
 }
 
+/**
+ * The drawer with a way to re-render it as a refetch landing would. The button
+ * sits outside the modal, so it is pressed with `fireEvent`.
+ */
+function InviteHarness() {
+  const [, rerender] = useReducer((count: number) => count + 1, 0);
+  return (
+    <>
+      <button type="button" data-testid="refetch-lands" onClick={rerender}>
+        Refetch
+      </button>
+      <InviteMemberDialog />
+    </>
+  );
+}
+
 describe('InviteMemberDialog', () => {
-  it('submits the email + selected role_id (the org has real roles)', async () => {
+  it('is a child drawer stacked on Settings › Members: named, Back returns, the email focused', async () => {
+    useRolesMock.mockReturnValue(
+      rolesResult([role('rol_owner', 'Owner'), role('rol_mem', 'Member')]),
+    );
+    const user = await open();
+
+    const drawer = await screen.findByTestId('invite-member-dialog');
+    expect(screen.getByRole('dialog', { name: 'Invite a member' })).toBe(drawer);
+    const submit = screen.getByTestId('invite-member-submit');
+    expect(submit).toHaveTextContent('Send invitation');
+    // It submits the form, so Enter in the email sends too.
+    expect(submit).toHaveAttribute('form', screen.getByTestId('invite-member-form').id);
+    await waitFor(() => expect(screen.getByTestId('invite-member-email')).toHaveFocus());
+    expect(await axeForDialog(drawer)).toHaveNoViolations();
+
+    const back = screen.getByTestId('invite-member-dialog-dismiss');
+    expect(back).toHaveTextContent('Back');
+    await user.click(back);
+    await waitFor(() =>
+      expect(screen.queryByTestId('invite-member-dialog')).not.toBeInTheDocument(),
+    );
+  });
+
+  it('offers only Back while there is no role to assign', async () => {
+    useRolesMock.mockReturnValue(rolesResult([role('rol_owner', 'Owner')]));
+    await open();
+
+    expect(await screen.findByTestId('invite-member-no-roles')).toBeInTheDocument();
+    expect(screen.getByTestId('invite-member-dialog-dismiss')).toHaveTextContent('Back');
+    expect(screen.queryByTestId('invite-member-submit')).not.toBeInTheDocument();
+  });
+
+  it('submits the email + the picked role as role_ids (the org has real roles)', async () => {
     // Regression: the form used to submit a hardcoded role NAME to a
-    // non-existent /invitations endpoint. It must post a real role_id.
+    // non-existent /invitations endpoint. It must post real role ids.
     useRolesMock.mockReturnValue(
       rolesResult([role('rol_owner', 'Owner'), role('rol_mem', 'Member')]),
     );
     inviteMutate.mockResolvedValueOnce({ email: 'new@x.test' });
-    render(<InviteMemberDialog />);
     const user = await open();
 
     await screen.findByTestId('invite-member-form');
     await user.type(screen.getByTestId('invite-member-email'), 'new@x.test');
+    await user.click(screen.getByTestId('invite-member-role'));
+    await user.click(await screen.findByRole('option', { name: 'Member' }));
     await user.click(screen.getByTestId('invite-member-submit'));
 
     await waitFor(() =>
       expect(inviteMutate).toHaveBeenCalledWith({
         email: 'new@x.test',
-        roleId: 'rol_mem',
+        roleIds: ['rol_mem'],
       }),
     );
   });
@@ -74,7 +131,6 @@ describe('InviteMemberDialog', () => {
     useRolesMock.mockReturnValue(
       rolesResult([role('rol_owner', 'Owner'), role('rol_mem', 'Member')]),
     );
-    render(<InviteMemberDialog />);
     const user = await open();
     await user.click(await screen.findByTestId('invite-member-role'));
 
@@ -84,7 +140,6 @@ describe('InviteMemberDialog', () => {
 
   it('guides the user to create a role when only Owner exists', async () => {
     useRolesMock.mockReturnValue(rolesResult([role('rol_owner', 'Owner')]));
-    render(<InviteMemberDialog />);
     await open();
 
     expect(await screen.findByTestId('invite-member-no-roles')).toBeInTheDocument();
@@ -93,7 +148,6 @@ describe('InviteMemberDialog', () => {
 
   it('shows a loading state while roles are fetching', async () => {
     useRolesMock.mockReturnValue(rolesResult([], true));
-    render(<InviteMemberDialog />);
     await open();
 
     expect(await screen.findByTestId('invite-member-loading')).toBeInTheDocument();
@@ -113,8 +167,8 @@ describe('InviteMemberDialog', () => {
       isError: true,
       refetch,
     });
-    render(<InviteMemberDialog />);
-    await user.click(screen.getByTestId('invite-member-open'));
+    renderWithProviders(<InviteMemberDialog />);
+    await user.click(await screen.findByTestId('invite-member-open'));
 
     expect(await screen.findByTestId('invite-member-roles-error')).toBeInTheDocument();
     expect(screen.queryByTestId('invite-member-no-roles')).not.toBeInTheDocument();
@@ -126,40 +180,28 @@ describe('InviteMemberDialog', () => {
   it('still guides the user when the fetch SUCCEEDS with no assignable role', async () => {
     const user = userEvent.setup();
     useRolesMock.mockReturnValue(rolesResult([role('rol_owner', 'Owner')]));
-    render(<InviteMemberDialog />);
-    await user.click(screen.getByTestId('invite-member-open'));
+    renderWithProviders(<InviteMemberDialog />);
+    await user.click(await screen.findByTestId('invite-member-open'));
 
     expect(await screen.findByTestId('invite-member-no-roles')).toBeInTheDocument();
     expect(screen.queryByTestId('invite-member-roles-error')).not.toBeInTheDocument();
   });
 
-  // ── Least-privilege default ───────────────────────────────────────────────
+  // ── No default role ──────────────────────────────────────────────────────
 
-  it('opens on Member, not on whatever the roster sorts first', async () => {
-    // Regression: the field defaulted to `invitableRoles[0]`, and every
-    // organization this app provisions sorts `Admin` first — so the quiet path
-    // through the dialog handed a new teammate admin rights.
+  it('opens on no role, not on whatever the roster sorts first', async () => {
+    // Regression: the field defaulted to `invitableRoles[0]`, and every clinic
+    // this app provisions sorts `Admin` first — so the quiet path through the
+    // dialog handed a new teammate admin rights. The presets each carry a clinic
+    // job, so the inviter picks one.
     useRolesMock.mockReturnValue(
-      rolesResult([
-        role('rol_admin', 'Admin'),
-        role('rol_mem', 'Member'),
-        role('rol_view', 'Viewer'),
-      ]),
+      rolesResult([role('rol_admin', 'Admin'), role('rol_doc', 'Doctor')]),
     );
-    render(<InviteMemberDialog />);
     await open();
 
-    expect(await screen.findByTestId('invite-member-role')).toHaveTextContent('Member');
-  });
-
-  it('falls back to Viewer when the organization has no Member role', async () => {
-    useRolesMock.mockReturnValue(
-      rolesResult([role('rol_admin', 'Admin'), role('rol_view', 'Viewer')]),
-    );
-    render(<InviteMemberDialog />);
-    await open();
-
-    expect(await screen.findByTestId('invite-member-role')).toHaveTextContent('Viewer');
+    const trigger = await screen.findByTestId('invite-member-role');
+    expect(trigger).not.toHaveTextContent('Admin');
+    expect(trigger).not.toHaveTextContent('Doctor');
   });
 
   it('preselects nothing — and says so — when only custom roles exist', async () => {
@@ -170,8 +212,8 @@ describe('InviteMemberDialog', () => {
     useRolesMock.mockReturnValue(
       rolesResult([role('rol_a', 'Support'), role('rol_b', 'Editor')]),
     );
-    render(<InviteMemberDialog />);
-    await user.click(screen.getByTestId('invite-member-open'));
+    renderWithProviders(<InviteMemberDialog />);
+    await user.click(await screen.findByTestId('invite-member-open'));
     await screen.findByTestId('invite-member-form');
 
     const roleTrigger = screen.getByTestId('invite-member-role');
@@ -193,8 +235,8 @@ describe('InviteMemberDialog', () => {
     useRolesMock.mockReturnValue(
       rolesResult([role('rol_a', 'Support'), role('rol_b', 'Editor')]),
     );
-    const { rerender } = render(<InviteMemberDialog />);
-    await user.click(screen.getByTestId('invite-member-open'));
+    renderWithProviders(<InviteHarness />);
+    await user.click(await screen.findByTestId('invite-member-open'));
     await screen.findByTestId('invite-member-role');
 
     await user.click(screen.getByTestId('invite-member-role'));
@@ -210,7 +252,7 @@ describe('InviteMemberDialog', () => {
         role('rol_b', 'Editor'),
       ]),
     );
-    rerender(<InviteMemberDialog />);
+    fireEvent.click(screen.getByTestId('refetch-lands'));
 
     await waitFor(() =>
       expect(screen.getByTestId('invite-member-role')).toHaveTextContent('Editor'),

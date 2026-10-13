@@ -13,8 +13,11 @@
     "goHome": "홈으로",
     "refresh": "페이지 새로고침",
     "forbidden": "이 페이지에 접근할 권한이 없습니다.",
+    "forbiddenTitle": "이 페이지에 접근할 수 없습니다",
     "signOut": "로그아웃",
-    "signingOut": "로그아웃 중…"
+    "signingOut": "로그아웃 중…",
+    "pageNotFound": "페이지를 찾을 수 없습니다",
+    "recordNotFound": "{{record}}을(를) 찾을 수 없습니다 · 삭제되었을 수 있습니다"
   },
   "widget": {
     "unavailable": "{{title}}을(를) 사용할 수 없음",
@@ -25,19 +28,12 @@
     "pageContent": "페이지 콘텐츠",
     "navigation": "내비게이션",
     "emailBanner": "이메일 확인",
-    "notifications": "알림",
     "organizationSwitcher": "조직 전환기",
     "commandPalette": "명령 팔레트",
     "settings": "설정",
     "appearance": "모양",
-    "analytics": "분석",
-    "members": "멤버",
-    "schedule": "일정",
-    "highlights": "하이라이트",
-    "themeShowcase": "테마 쇼케이스",
     "sessionTimeout": "세션 타이머",
     "securityCheck": "보안 확인",
-    "appearanceControls": "모양 컨트롤",
     "payment": "결제",
     "cancellation": "해지"
   },
@@ -45,17 +41,7 @@
     "dismiss": "알림 닫기",
     "undo": "실행 취소",
     "undone": "작업이 취소됨",
-    "processing": "처리 중…",
-    "preview": {
-      "successTitle": "변경 사항이 저장됨",
-      "successDescription": "설정이 적용되었습니다.",
-      "errorTitle": "문제가 발생했습니다",
-      "errorDescription": "다시 시도해 주세요.",
-      "warningTitle": "주의",
-      "warningDescription": "이 작업에는 검토가 필요합니다.",
-      "infoTitle": "알고 계셨나요?",
-      "infoDescription": "셔플하면 이 디자인도 바뀝니다."
-    }
+    "processing": "처리 중…"
   },
   "api": {
     "fallback": "문제가 발생했습니다. 다시 시도해 주세요.",
@@ -69,7 +55,21 @@
     "http429": "요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.",
     "http500": "내부 서버 오류가 발생했습니다. 나중에 다시 시도해 주세요.",
     "http502": "서버를 일시적으로 사용할 수 없습니다. 나중에 다시 시도해 주세요.",
-    "http503": "서비스를 일시적으로 사용할 수 없습니다. 나중에 다시 시도해 주세요."
+    "http503": "서비스를 일시적으로 사용할 수 없습니다. 나중에 다시 시도해 주세요.",
+    "reload": "다시 불러오기",
+    "recordChanged": "그동안 다른 사람이 저장했습니다. 다시 불러와 변경 내용을 확인한 뒤 다시 변경하세요.",
+    "reasons": {
+      "missingPermission": "이 작업을 할 권한이 없습니다. 클리닉 소유자나 관리자에게 요청하세요.",
+      "ownerMembershipFixed": "클리닉 소유자의 역할과 상태는 변경할 수 없습니다. 먼저 소유권을 이전하세요.",
+      "ownerCannotLeave": "클리닉 소유자는 나갈 수 없습니다. 먼저 소유권을 이전하세요.",
+      "ownerRoleFixed": "클리닉 소유자가 가진 역할의 접근 권한은 변경할 수 없습니다.",
+      "systemRoleFixed": "기본 역할은 이름을 바꾸거나 삭제할 수 없습니다.",
+      "roleLocked": "이 역할의 접근 권한은 고정되어 있어 변경할 수 없습니다.",
+      "seatLimitReached": "요금제에 남은 좌석이 없습니다. 설정 › 결제에서 좌석을 추가한 뒤 다시 초대하세요.",
+      "membershipAlreadyExists": "이 사람은 이미 클리닉에 있습니다.",
+      "organizationSlugExists": "이 워크스페이스 URL은 이미 사용 중입니다. 다른 URL을 선택하세요.",
+      "disposableEmail": "영구적인 이메일 주소를 사용하세요. 일회용 주소는 허용되지 않습니다."
+    }
   },
   "frontend": {
     "query": {
@@ -91,12 +91,7 @@
     },
     "account": {
       "copyFailed": "클립보드에 복사할 수 없습니다",
-      "themeCodeNumeric": "숫자 테마 코드를 입력하세요",
       "copySuccess": "계정 ID가 복사됨",
-      "themeLinkCopied": "테마 링크가 복사됨",
-      "themeLinkCopiedDescription": "이 URL을 공유해 외관을 재현하세요.",
-      "notificationStylePreview": "알림 스타일",
-      "notificationStylePreviewDescription": "{{variant}} — 액센트와 시맨틱 색상으로 테마 적용.",
       "accountDeletionPending": "계정이 삭제됨. 로그아웃 중…",
       "avatarInvalidType": "이미지 파일을 선택해 주세요.",
       "avatarTooLarge": "아바타는 2MB 미만이어야 합니다.",
@@ -122,7 +117,8 @@
         "updateRoleSuccess": "멤버 역할이 업데이트됨",
         "removeSuccess": "멤버가 제거됨",
         "suspendSuccess": "멤버가 정지됨",
-        "reactivateSuccess": "멤버가 재활성화됨"
+        "reactivateSuccess": "멤버가 재활성화됨",
+        "updateSuccess": "멤버를 저장했습니다"
       },
       "roles": {
         "createFailed": "역할을 만들 수 없습니다",

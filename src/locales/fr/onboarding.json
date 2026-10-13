@@ -25,7 +25,7 @@
     },
     "done": {
       "title": "Tout est prêt",
-      "description": "Vérifiez et accédez à votre tableau de bord."
+      "description": "Vérifiez et accédez à votre espace de travail."
     }
   },
   "welcome": {
@@ -99,7 +99,7 @@
   "actions": {
     "back": "Retour",
     "continue": "Continuer",
-    "enterDashboard": "Entrer dans le tableau de bord",
+    "enterWorkspace": "Accéder à l'espace de travail",
     "settingUp": "Configuration…"
   },
   "defaults": {

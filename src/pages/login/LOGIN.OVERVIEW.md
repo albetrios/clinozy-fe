@@ -19,6 +19,12 @@ New passwordless users → `/onboarding` → app.
 | `LoginPage.tsx`          | Thin wrapper around shared `<AuthForm />`.                |
 | `shared/forms/AuthForm/` | Unified auth UI — default email OTP + provider buttons.   |
 
+The frame is `AuthLayout`, the launch's sign-in canvas (L-65,
+`shared/layouts/AuthLayout/AuthLayout.tsx`): the signed-out canvas with the logo where
+the clinic header draws it, the language picker and theme toggle at the end, and the
+form in one 360px card (the design's "Signed out" card, H:515). One design — the
+earlier previews are gone.
+
 ## Flow
 
 1. **Email (default):** email → Continue → 6-digit code → verify → onboarding (new) or app (returning)
@@ -27,7 +33,7 @@ New passwordless users → `/onboarding` → app.
      `debug_verification_code` and the verify step **prefills** it (fills, never
      auto-submits). Field presence is the gate — no client flag; the echo never
      exists in production (clinozy-be `.refine()`-forbids `TEST_MODE` there).
-2. **OAuth / passkey:** `/callback` → `silentRefresh()` → post-auth resolver (onboarding or dashboard)
+2. **OAuth / passkey:** `/callback` → `silentRefresh()` → post-auth resolver (onboarding, the clinic home, or the picker)
 
 ### The hand-off is one-way (LOGIN-5, LOGIN-7)
 

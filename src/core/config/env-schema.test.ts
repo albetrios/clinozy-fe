@@ -1,3 +1,4 @@
+import { FIXTURE_BACKED_APP_MODULES } from './app-modules.ts';
 import {
   assertAuthPlatformInvariants,
   branchEnvironmentMap,
@@ -94,10 +95,31 @@ describe('envProfiles required keys', () => {
       'VITE_TURNSTILE_SITE_KEY',
       'VITE_API_BASE_URL',
       'VITE_CSP_REPORT_URI',
+      'VITE_DISABLED_MODULES',
     ]);
     for (const entry of envSchemaConditionallyRequiredKeys) {
       expect(entry.condition.length).toBeGreaterThan(0);
     }
+  });
+
+  it('refuses a production deploy that leaves a fixture-backed room on (D8)', () => {
+    const rule = envProfiles.production.required.find(
+      (candidate) => candidate.key === 'VITE_DISABLED_MODULES',
+    );
+    expect(rule?.level).toBe('error');
+    expect(rule?.when?.(() => undefined)).toBe(true);
+    const fixtureRooms = FIXTURE_BACKED_APP_MODULES.join(',');
+    expect(rule?.satisfiedBy?.(fixtureRooms)).toBe(true);
+    expect(rule?.satisfiedBy?.(` billing , ${fixtureRooms} `)).toBe(true);
+    expect(rule?.satisfiedBy?.('billing')).toBe(false);
+    // Not a production default: `github:sync` would prune the variable as equal to it.
+    expect(envProfiles.production.defaults?.VITE_DISABLED_MODULES).toBeUndefined();
+    // Development keeps every room on for testing: no such rule there.
+    expect(
+      envProfiles.development.required.some(
+        (candidate) => candidate.key === 'VITE_DISABLED_MODULES',
+      ),
+    ).toBe(false);
   });
 
   it('requires VITE_APP_ENV unconditionally in both deploy environments', () => {

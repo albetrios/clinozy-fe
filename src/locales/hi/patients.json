@@ -1,0 +1,48 @@
+{
+  "manifest": {
+    "title": "मरीज़"
+  },
+  "views": {
+    "label": "मरीज़ों के व्यू",
+    "all": "सभी",
+    "follow": "फ़ॉलो-अप बाकी",
+    "recall": "रीकॉल"
+  },
+  "search": {
+    "placeholder": "नाम, मोबाइल या #ID",
+    "label": "मरीज़ खोजें"
+  },
+  "primary": {
+    "newPatient": "नया मरीज़"
+  },
+  "columns": {
+    "seq": "ID",
+    "name": "मरीज़",
+    "gender": "लिंग",
+    "types": "प्रकार",
+    "status": "स्थिति",
+    "conversion": "कन्वर्ज़न",
+    "age": "उम्र",
+    "followUp": "फ़ॉलो-अप",
+    "updated": "अपडेट किया"
+  },
+  "table": {
+    "records": "मरीज़",
+    "age_one": "{{count}} वर्ष",
+    "age_other": "{{count}} वर्ष"
+  },
+  "rowActions": {
+    "edit": "संपादित करें",
+    "delete": "हटाएँ",
+    "newInvoice": "नया इनवॉइस"
+  },
+  "bulk": {
+    "export": "एक्सपोर्ट करें",
+    "exported_one": "{{count}} पंक्ति CSV के रूप में एक्सपोर्ट हुई",
+    "exported_other": "{{count}} पंक्तियाँ CSV के रूप में एक्सपोर्ट हुईं"
+  },
+  "empty": {
+    "title": "कोई मरीज़ मेल नहीं खाता",
+    "description": "यहाँ अभी कुछ नहीं है। कोई दूसरा टैब या खोज आज़माएँ।"
+  }
+}

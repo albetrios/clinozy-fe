@@ -154,6 +154,11 @@ describe('notification preferences', () => {
             channel: 'EMAIL',
             is_enabled: true,
           },
+          {
+            notification_type: 'membership.invite_declined',
+            channel: 'EMAIL',
+            is_enabled: true,
+          },
         ],
       },
     );

@@ -14,10 +14,18 @@ export const AUTH_LABELS = {
   enterVerificationCode: /enter verification code/i,
 } as const;
 
+/**
+ * The clinic shell's header (the section bar, KICKOFF §3.2 — the default shell
+ * for a team deployment): search is "Search or jump to (Command K)", the
+ * avatar names the member and their status ("Riya S. · Online") and opens the
+ * Account menu, which holds the platform rows the old header carried.
+ */
 export const LAYOUT_LABELS = {
-  search: /^search$/i,
-  userMenu: /user menu/i,
+  search: /^search or jump to/i,
+  userMenu: / · (online|away|busy)$/i,
+  accountMenu: /^account$/i,
   notifications: /notification/i,
+  appearanceRow: /^appearance & language$/i,
 } as const;
 
 /**
@@ -45,24 +53,39 @@ export async function clickTestId(page: Page, testId: string): Promise<void> {
 }
 
 /**
- * Enters a 6-character email sign-in code into TotpCodeInput (alphanumeric).
- * Uses the hidden `input-otp` input — `keyboard.type` on the container is flaky in WebKit/Firefox.
+ * Types a 6-character email sign-in code into TotpCodeInput (alphanumeric); the sixth
+ * character submits. Uses the hidden `input-otp` input — `keyboard.type` on the
+ * container is flaky in WebKit/Firefox. clinozy-be's local echo prefills the field
+ * (`debug_verification_code`), and a full field takes no more keys, so it is cleared
+ * first and gets the code this caller holds.
  */
-export async function fillEmailVerificationCode(
+export async function typeEmailVerificationCode(
   page: Page,
   verificationCode: string,
 ): Promise<void> {
   const input = page.getByTestId('auth-email-code');
   // eslint-disable-next-line sonarjs/no-forced-browser-interaction -- the OTP field renders slot overlays above the real input; a plain click targets the overlay and never focuses it
   await input.click({ force: true });
+  await input.fill('');
   await input.pressSequentially(verificationCode, { delay: 20 });
+}
+
+/**
+ * {@link typeEmailVerificationCode}, then presses Verify when the sign-in screen is
+ * still up a beat later (the auto-submit did not fire).
+ */
+export async function fillEmailVerificationCode(
+  page: Page,
+  verificationCode: string,
+): Promise<void> {
+  await typeEmailVerificationCode(page, verificationCode);
 
   const verifyButton = page.getByTestId('auth-email-verify');
   await expect(verifyButton)
     .toBeEnabled({ timeout: 5000 })
     .catch(() => undefined);
 
-  const leftLogin = page.waitForURL(/\/(onboarding|dashboard|organization\/)/, {
+  const leftLogin = page.waitForURL(/\/(onboarding|organization(?:[/?#]|$))/, {
     timeout: 15000,
   });
 
@@ -219,4 +242,74 @@ export async function expectAppHeaderReady(page: Page): Promise<void> {
     role: 'button',
     name: LAYOUT_LABELS.userMenu,
   });
+}
+
+/**
+ * Opens the Account menu from the avatar. In the section-bar shell it holds
+ * what the old header carried: Switch clinic, Status, Appearance, Notifications,
+ * Settings and Log out.
+ */
+export async function openAccountMenu(page: Page): Promise<void> {
+  await clickTestId(page, 'user-menu-trigger');
+  await expect(page.getByTestId('account-menu')).toBeVisible();
+  // a11y guard: the menu is exposed as "Account".
+  await expect(page.getByRole('menu', { name: LAYOUT_LABELS.accountMenu })).toBeVisible();
+}
+
+/**
+ * Opens the Appearance drawer from the Account menu's "Appearance & language"
+ * row (the old right-edge handle is gone) and waits for its cards.
+ */
+export async function openAppearanceDrawer(page: Page): Promise<void> {
+  await openAccountMenu(page);
+  // a11y guard: the row is a labelled menu item.
+  await expect(
+    page.getByRole('menuitem', { name: LAYOUT_LABELS.appearanceRow }),
+  ).toBeVisible();
+  await clickTestId(page, 'account-menu-appearance');
+  await expect(page.getByTestId('appearance-panel')).toBeVisible({ timeout: 10_000 });
+}
+
+/** Opens the notification center — the Account menu's Notifications row (the section bar has no bell). */
+export async function openNotificationCenter(page: Page): Promise<void> {
+  await openAccountMenu(page);
+  await clickTestId(page, 'account-menu-notifications');
+  await expect(page.getByTestId('notification-popover')).toBeVisible();
+}
+
+/** `<html>`'s class in dark mode — assert it before a dark shot or scan. */
+export const DARK_HTML_CLASS = /(?:^|\s)dark(?:\s|$)/;
+
+/**
+ * Dark mode the way a member has it: the saved preference (`useThemeStore`'s
+ * `theme-preference`), seeded before the app boots, so `theme-init.js` paints
+ * dark from the first frame and the store rehydrates to dark. Adding `.dark`
+ * after the load raced that rehydrate, which put the saved mode — light, the
+ * default — back: the "dark" 404 was shot light whenever it lost (flaky).
+ */
+export async function seedDarkMode(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      'theme-preference',
+      JSON.stringify({ state: { theme: 'dark' }, version: 8 }),
+    );
+  });
+}
+
+/**
+ * Picks Light, Dark or System from the Account menu's Appearance pills, then
+ * closes the menu (a pill keeps it open) and waits for it to be gone.
+ */
+export async function chooseThemeMode(
+  page: Page,
+  mode: 'light' | 'dark' | 'system',
+): Promise<void> {
+  await openAccountMenu(page);
+  await clickTestId(page, `account-menu-theme-${mode}`);
+  await expect(page.getByTestId(`account-menu-theme-${mode}`)).toHaveAttribute(
+    'aria-checked',
+    'true',
+  );
+  await page.keyboard.press('Escape');
+  await expect(page.getByTestId('account-menu')).toHaveCount(0);
 }

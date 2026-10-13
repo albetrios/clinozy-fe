@@ -13,9 +13,14 @@ import { HttpError, isUnauthorized } from '@/shared/errors/HttpError.ts';
 // shared/auth/service.test.ts — here we only assert fetch-client DELEGATES.
 vi.mock('@/shared/auth/service.ts', () => ({
   forceLogout: vi.fn(),
+  isRefreshUnanswered: vi.fn(),
   refreshAccessToken: vi.fn(),
 }));
-import { forceLogout, refreshAccessToken } from '@/shared/auth/service.ts';
+import {
+  forceLogout,
+  isRefreshUnanswered,
+  refreshAccessToken,
+} from '@/shared/auth/service.ts';
 
 import { apiClient } from './fetch-client.ts';
 
@@ -245,15 +250,105 @@ describe('fetch-client', () => {
       expect(forceLogout).not.toHaveBeenCalled();
     });
 
-    it('replay that 401s AGAIN means a dead session: forceLogout, no refresh loop', async () => {
+    it('a token still rejected after two refreshes means a dead session: forceLogout, no refresh loop', async () => {
       fetchMock
         .mockResolvedValueOnce(unauthorized()) // original request
-        .mockResolvedValueOnce(unauthorized()); // replay STILL 401
+        .mockResolvedValueOnce(unauthorized()) // first replay STILL 401
+        .mockResolvedValueOnce(unauthorized()); // second replay STILL 401
 
       await expect(apiClient.get('/protected')).rejects.toBeInstanceOf(HttpError);
-      // never refreshes twice for one request
-      expect(refreshAccessToken).toHaveBeenCalledTimes(1);
+      // Bounded: two refreshes for one request, never a loop.
+      expect(refreshAccessToken).toHaveBeenCalledTimes(2);
+      expect(fetchMock).toHaveBeenCalledTimes(3);
       expect(forceLogout).toHaveBeenCalledTimes(1);
+    });
+
+    /** A JWT-shaped access token told apart by its subject. */
+    const tokenNamed = (name: string): string => makeJwt({ sub: name, exp: 9999999999 });
+
+    /** The bearer token one fetch call carried. */
+    const bearerOf = (call: unknown[]): string | null =>
+      ((call[1] as RequestInit).headers as Headers).get('Authorization');
+
+    // clinozy-be keeps ONE live access token per session: every refresh and every workspace
+    // switch retires the token before it. A 401 is therefore about the token a request carried,
+    // and that token may have been replaced while the request was in flight.
+    it('a 401 for a token replaced mid-flight replays with the current token, without a refresh', async () => {
+      setAccessToken(tokenNamed('token-first'));
+      fetchMock
+        .mockImplementationOnce(() => {
+          setAccessToken(tokenNamed('token-switched')); // a workspace switch landed meanwhile
+          return Promise.resolve(unauthorized());
+        })
+        .mockResolvedValueOnce(ok());
+
+      const { data } = await apiClient.get<{ ok: boolean }>('/protected');
+
+      expect(data).toEqual({ ok: true });
+      expect(refreshAccessToken).not.toHaveBeenCalled();
+      expect(bearerOf(fetchMock.mock.calls[1] as unknown[])).toBe(
+        `Bearer ${tokenNamed('token-switched')}`,
+      );
+      expect(forceLogout).not.toHaveBeenCalled();
+    });
+
+    it('a replay retired by another rotation replays again instead of signing out', async () => {
+      setAccessToken(tokenNamed('token-first'));
+      vi.mocked(refreshAccessToken).mockImplementationOnce(async () => {
+        setAccessToken(tokenNamed('token-refreshed'));
+      });
+      fetchMock
+        .mockResolvedValueOnce(unauthorized()) // original request
+        .mockImplementationOnce(() => {
+          setAccessToken(tokenNamed('token-switched')); // a switch retired the refreshed token
+          return Promise.resolve(unauthorized());
+        })
+        .mockResolvedValueOnce(ok());
+
+      const { data } = await apiClient.get<{ ok: boolean }>('/protected');
+
+      expect(data).toEqual({ ok: true });
+      expect(refreshAccessToken).toHaveBeenCalledTimes(1);
+      expect(bearerOf(fetchMock.mock.calls[2] as unknown[])).toBe(
+        `Bearer ${tokenNamed('token-switched')}`,
+      );
+      expect(forceLogout).not.toHaveBeenCalled();
+    });
+
+    it('a replay rejected with its token unchanged refreshes once more before giving up', async () => {
+      setAccessToken(tokenNamed('token-first'));
+      vi.mocked(refreshAccessToken)
+        .mockImplementationOnce(async () => setAccessToken(tokenNamed('token-refreshed')))
+        .mockImplementationOnce(async () =>
+          setAccessToken(tokenNamed('token-refreshed-again')),
+        );
+      fetchMock
+        .mockResolvedValueOnce(unauthorized()) // original request
+        .mockResolvedValueOnce(unauthorized()) // retired by another tab's refresh
+        .mockResolvedValueOnce(ok());
+
+      const { data } = await apiClient.get<{ ok: boolean }>('/protected');
+
+      expect(data).toEqual({ ok: true });
+      expect(refreshAccessToken).toHaveBeenCalledTimes(2);
+      expect(bearerOf(fetchMock.mock.calls[2] as unknown[])).toBe(
+        `Bearer ${tokenNamed('token-refreshed-again')}`,
+      );
+      expect(forceLogout).not.toHaveBeenCalled();
+    });
+
+    it('a token that keeps rotating under a request is replayed a bounded number of times', async () => {
+      let rotation = 0;
+      setAccessToken(tokenNamed('token-0'));
+      fetchMock.mockImplementation(() => {
+        rotation += 1;
+        setAccessToken(tokenNamed(`token-${rotation}`));
+        return Promise.resolve(unauthorized());
+      });
+
+      await expect(apiClient.get('/protected')).rejects.toBeInstanceOf(HttpError);
+      // Never an endless loop, whatever keeps rotating the token.
+      expect(fetchMock.mock.calls.length).toBeLessThanOrEqual(8);
     });
 
     it('every concurrent 401 awaits the shared single-flight (no direct refresh fetch)', async () => {
@@ -282,6 +377,35 @@ describe('fetch-client', () => {
       // The refresh error surfaces to the caller after the local logout.
       await expect(apiClient.get('/protected')).rejects.toThrow('session revoked');
       expect(forceLogout).toHaveBeenCalledTimes(1);
+    });
+
+    it('a refresh that got no answer keeps the session and fails the request as unreachable', async () => {
+      vi.mocked(refreshAccessToken).mockRejectedValueOnce(
+        new Error('Refresh failed (503)'),
+      );
+      vi.mocked(isRefreshUnanswered).mockReturnValueOnce(true);
+      fetchMock.mockResolvedValueOnce(unauthorized()); // original request
+
+      const error = await apiClient.get('/protected').catch((caught: unknown) => caught);
+      expect(error).toBeInstanceOf(HttpError);
+      expect((error as HttpError).status).toBe(0);
+      // A slow or failing network says nothing about the session: nobody is signed out.
+      expect(forceLogout).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Accept-Language', () => {
+    it("carries the app's language, so the server words its messages in it", async () => {
+      const i18n = (await import('@/lib/i18n/i18n.ts')).default;
+      const before = i18n.language;
+      await i18n.changeLanguage('es');
+      fetchMock.mockImplementation(() => Promise.resolve(ok()));
+
+      await apiClient.get('/things');
+
+      const headers = (fetchMock.mock.calls[0][1] as RequestInit).headers as Headers;
+      expect(headers.get('Accept-Language')).toBe('es');
+      await i18n.changeLanguage(before);
     });
   });
 
@@ -321,6 +445,45 @@ describe('fetch-client', () => {
       const replay = (fetchMock.mock.calls[1][1] as RequestInit).headers as Headers;
       expect(first.get('X-Idempotency-Key')).toBe(replay.get('X-Idempotency-Key'));
       expect(first.get('X-Idempotency-Key')).toMatch(/[0-9a-f-]{36}/);
+    });
+
+    it("a caller's key (one per user action) is sent as given, on every write method", async () => {
+      fetchMock.mockImplementation(() => Promise.resolve(ok()));
+
+      await apiClient.post('/things', { a: 1 }, { idempotencyKey: 'action-key-0001' });
+      await apiClient.patch('/things/1', { a: 2 }, { idempotencyKey: 'action-key-0002' });
+      await apiClient.put('/things/1', { a: 3 }, { idempotencyKey: 'action-key-0003' });
+      await apiClient.delete('/things/1', { idempotencyKey: 'action-key-0004' });
+
+      const keys = fetchMock.mock.calls.map((call) =>
+        ((call[1] as RequestInit).headers as Headers).get('X-Idempotency-Key'),
+      );
+      expect(keys).toEqual([
+        'action-key-0001',
+        'action-key-0002',
+        'action-key-0003',
+        'action-key-0004',
+      ]);
+    });
+
+    it("a caller's key survives the 401 refresh replay", async () => {
+      fetchMock.mockResolvedValueOnce(unauthorized()).mockResolvedValueOnce(ok());
+
+      await apiClient.post('/things', { a: 1 }, { idempotencyKey: 'action-key-0005' });
+
+      const keys = fetchMock.mock.calls.map((call) =>
+        ((call[1] as RequestInit).headers as Headers).get('X-Idempotency-Key'),
+      );
+      expect(keys).toEqual(['action-key-0005', 'action-key-0005']);
+    });
+
+    it('a read ignores a key it is given', async () => {
+      fetchMock.mockImplementation(() => Promise.resolve(ok()));
+
+      await apiClient.get('/things', { idempotencyKey: 'action-key-0006' });
+
+      const headers = (fetchMock.mock.calls[0][1] as RequestInit).headers as Headers;
+      expect(headers.get('X-Idempotency-Key')).toBeNull();
     });
   });
 

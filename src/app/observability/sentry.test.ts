@@ -6,6 +6,7 @@ import { platformConfig } from '@/core/config/env.ts';
 import type { AuthUser } from '@/shared/auth/types.ts';
 import { HttpError } from '@/shared/errors/HttpError.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
+import { useConsentStore } from '@/shared/store/useConsentStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
 import { initSentry } from './sentry.ts';
@@ -23,6 +24,8 @@ vi.mock('@sentry/react', () => ({
   browserProfilingIntegration: vi.fn(() => ({ name: 'profiling' })),
   consoleLoggingIntegration: vi.fn(() => ({ name: 'logs' })),
   feedbackIntegration: vi.fn(() => ({ name: 'feedback' })),
+  addIntegration: vi.fn(),
+  getReplay: vi.fn(),
 }));
 
 type MutableConfig = { sentryDsn: string | undefined };
@@ -45,6 +48,7 @@ describe('initSentry', () => {
     vi.resetAllMocks();
     useAuthStore.setState({ user: null });
     useOrganizationStore.getState().clearOrganization();
+    useConsentStore.getState().resetAnalyticsConsent();
   });
 
   afterEach(() => {
@@ -59,6 +63,7 @@ describe('initSentry', () => {
 
   it('initializes with the full integration set when a DSN is configured', async () => {
     config.sentryDsn = 'https://key@sentry.example/1';
+    useConsentStore.getState().setAnalyticsConsent('granted');
     await initSentry(ROUTER);
 
     expect(Sentry.init).toHaveBeenCalledTimes(1);
@@ -88,6 +93,35 @@ describe('initSentry', () => {
     // Signed-out boot: user context cleared, org tags cleared.
     expect(Sentry.setUser).toHaveBeenCalledWith(null);
     expect(Sentry.setTag).toHaveBeenCalledWith('organization_id', undefined);
+  });
+
+  it('keeps session recording and profiling off without the analytics consent (D161)', async () => {
+    config.sentryDsn = 'https://key@sentry.example/1';
+    await initSentry(ROUTER);
+
+    const names = (initConfig().integrations as { name: string }[]).map((i) => i.name);
+    expect(names).not.toContain('replay');
+    expect(names).not.toContain('profiling');
+    // Error reports, logs and feedback still run.
+    expect(names).toEqual(expect.arrayContaining(['router', 'logs', 'feedback']));
+  });
+
+  it('adds session recording on a later grant and stops it on a withdrawal', async () => {
+    config.sentryDsn = 'https://key@sentry.example/1';
+    const stop = vi.fn(() => Promise.resolve());
+    vi.mocked(Sentry.getReplay).mockReturnValue({ stop } as unknown as ReturnType<
+      typeof Sentry.getReplay
+    >);
+    await initSentry(ROUTER);
+
+    useConsentStore.getState().setAnalyticsConsent('granted');
+    expect(Sentry.addIntegration).toHaveBeenCalledWith({ name: 'replay' });
+
+    useConsentStore.getState().setAnalyticsConsent('denied');
+    expect(stop).toHaveBeenCalledTimes(1);
+    // Granted again in the same page: not re-added (the SDK allows one replay integration).
+    useConsentStore.getState().setAnalyticsConsent('granted');
+    expect(Sentry.addIntegration).toHaveBeenCalledTimes(1);
   });
 
   it('beforeSend drops expected 4xx outcomes and keeps 5xx + filters input breadcrumbs', async () => {

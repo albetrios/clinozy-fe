@@ -1,68 +1,14 @@
 {
-  "brand": {
-    "name": "{{productName}}"
-  },
   "a11y": {
-    "skipToMain": "Saltar al contenido principal",
-    "mainNavigation": "Navegación principal",
-    "sidebarNavigation": "Navegación lateral",
-    "mobileNavigation": "Navegación móvil"
-  },
-  "auth": {
-    "switchToRegister": "Crear una cuenta",
-    "switchToSignIn": "Iniciar sesión",
-    "statusOperational": "Todos los sistemas operativos",
-    "badge": "Operaciones, unificadas",
-    "heroTitle": "El sistema operativo de su organización.",
-    "heroSubtitle": "Miembros, roles, facturación y seguridad — un espacio de trabajo rápido y orientado al teclado para cada equipo.",
-    "features": {
-      "multiOrg": {
-        "title": "Multi-organización por diseño",
-        "body": "Cambie de equipo sin cambiar de herramienta."
-      },
-      "secure": {
-        "title": "Seguro por defecto",
-        "body": "RBAC, MFA, llaves de acceso y registros de auditoría."
-      },
-      "fast": {
-        "title": "Rápido en todas partes",
-        "body": "Diseñado para trabajo en tiempo real con el teclado."
-      }
-    },
-    "stats": {
-      "teams": "equipos",
-      "uptime": "disponibilidad",
-      "compliant": "certificado"
-    }
+    "skipToMain": "Saltar al contenido principal"
   },
   "app": {
     "search": "Buscar",
     "searchShortcutMac": "⌘K",
     "searchShortcutWindows": "Ctrl+K",
-    "searchPlaceholder": "Buscar...",
-    "userMenu": "Menú de usuario",
     "userFallback": "Usuario",
     "settings": "Configuración",
     "logOut": "Cerrar sesión",
-    "toggleSidebar": "Alternar barra lateral",
-    "footerCopyright": "© {{year}} {{productName}} Platform",
-    "nav": {
-      "dashboard": "Panel"
-    },
-    "sidebar": {
-      "workspace": "Espacio de trabajo",
-      "menu": "Menú",
-      "shortcuts": "Accesos directos"
-    },
-    "contextStrip": {
-      "label": "Acceso rápido",
-      "labelSolo": "Ir a",
-      "profile": "Perfil",
-      "security": "Seguridad",
-      "billing": "Facturación",
-      "appearance": "Apariencia",
-      "shortcuts": "Atajos"
-    },
     "workspaceSwitch": {
       "preparing": "Preparando tu espacio de trabajo",
       "loadingAccess": "Cargando miembros y permisos",
@@ -74,7 +20,10 @@
       "personal": "Personal",
       "yourOrganizations": "Tus organizaciones",
       "organizations": "Organizaciones",
-      "addOrganization": "Añadir organización"
+      "addOrganization": "Añadir organización",
+      "invited": "Invitaciones",
+      "invitedRow": "Invitado · {{roles}}",
+      "invitationCount": "Invitaciones: {{count}}"
     },
     "notifications": {
       "title": "Notificaciones",
@@ -90,17 +39,15 @@
       "settingsLink": "Configuración de notificaciones"
     },
     "commandPalette": {
-      "ariaLabel": "Paleta de comandos",
-      "placeholder": "Escribe un comando o busca...",
+      "ariaLabel": "Menú de comandos",
+      "placeholder": "Buscar o ir a…",
       "empty": "No se encontraron resultados.",
       "groups": {
-        "navigation": "Navegación",
         "theme": "Tema",
         "account": "Cuenta",
         "organizations": "Organizaciones",
         "shortcuts": "Atajos"
       },
-      "dashboard": "Panel",
       "userSettings": "Configuración de usuario",
       "organizationSettings": "Configuración de organización",
       "lightMode": "Modo claro",
@@ -134,6 +81,10 @@
       "commandPalette": "Abrir paleta de comandos",
       "showShortcuts": "Mostrar atajos de teclado",
       "showShortcutsAlt": "Mostrar atajos (alternativo)",
+      "allSections": "Abrir o cerrar Todas las secciones",
+      "jumpToSection": "Ir a una sección",
+      "listSearch": "Buscar en la lista",
+      "leadRows": "Prospecto siguiente o anterior (en Prospectos)",
       "closeDialog": "Cerrar diálogo"
     },
     "orgCreate": {
@@ -143,16 +94,64 @@
       "nameLabel": "Nombre de la organización",
       "slugLabel": "URL del espacio (opcional)",
       "submit": "Crear organización",
-      "submitting": "Creando…"
+      "submitting": "Creando…",
+      "cancel": "Cancelar"
     },
     "theme": {
       "light": "Claro",
       "dark": "Oscuro",
-      "system": "Sistema",
-      "shuffle": "Tema aleatorio"
+      "system": "Sistema"
+    },
+    "sectionBar": {
+      "nav": "Secciones",
+      "allSections": "Todas las secciones",
+      "allSectionsTitle": "Todas las secciones (G)",
+      "more": "Más",
+      "morePinned": "Más secciones fijadas",
+      "tabTitle": "{{section}} · {{description}}",
+      "searchLabel": "Buscar o ir a (Comando K)",
+      "searchTitleMac": "Buscar o ir a… (⌘K)",
+      "searchTitleWindows": "Buscar o ir a… (Ctrl K)",
+      "searchPlaceholder": "Buscar pacientes, leads…",
+      "pin": "Fijar en la barra",
+      "unpin": "Quitar de la barra",
+      "pinAria": "Fijar en la barra · {{section}}",
+      "unpinAria": "Quitar de la barra · {{section}}",
+      "pinFooter": "Fija para mantenerla en la barra",
+      "keysHint": "G · 1–9",
+      "account": "Cuenta",
+      "avatarLabel": "{{name}} · {{status}}",
+      "identityRole": "{{role}} · {{branch}}",
+      "status": "Estado",
+      "presence": {
+        "online": "En línea",
+        "away": "Ausente",
+        "busy": "Ocupado"
+      },
+      "statusToast": "Estado · {{status}}",
+      "switchClinic": "Cambiar de clínica",
+      "security": "Seguridad",
+      "billing": "Facturación",
+      "devices": "Dispositivos",
+      "appearance": "Apariencia",
+      "appearanceLanguage": "Apariencia e idioma",
+      "viewAs": {
+        "previewing": "Vista previa como {{role}}",
+        "noSections": "Sin secciones",
+        "exit": "Salir de la vista previa",
+        "exitToast": "De vuelta a tu propio acceso"
+      },
+      "branch": {
+        "label": "Sucursal · {{label}}",
+        "title": "Sucursal · {{names}}",
+        "all": "Todas las sucursales",
+        "allSub": "Vista combinada · totales de {{count}}",
+        "viewGroup": "Vista",
+        "branchesGroup": "Sucursales",
+        "showingAll": "Mostrando todas las sucursales",
+        "showing": "Mostrando {{names}}",
+        "keepOne": "Deja al menos una sucursal"
+      }
     }
-  },
-  "public": {
-    "brandTagline": "Espacio de trabajo seguro para tu equipo"
   }
 }

@@ -44,7 +44,6 @@
       "recoveryTitle": "Salva i tuoi codici di recupero",
       "recoveryDescription": "Conservali in un posto sicuro. Ognuno funziona una sola volta se perdi il dispositivo.",
       "done": "Fatto",
-      "cancel": "Annulla",
       "verifyEnable": "Verifica e attiva",
       "codeLabel": "Inserisci il codice a 6 cifre",
       "codeAria": "Codice autenticatore a sei cifre",
@@ -67,7 +66,6 @@
       "addDescription": "Assegnale un nome per riconoscerla in seguito. Il dispositivo ti chiederà di crearla.",
       "nameLabel": "Nome",
       "namePlaceholder": "MacBook Touch ID",
-      "cancel": "Annulla",
       "submit": "Aggiungi passkey"
     },
     "overview": {
@@ -109,12 +107,6 @@
       "sendFailed": "Non è stato possibile inviare il codice. Riprova."
     }
   },
-  "discard": {
-    "title": "Scartare le modifiche non salvate?",
-    "description": "Hai modifiche non salvate. Lasciare questa sezione le scarterà.",
-    "stay": "Continua a modificare",
-    "leave": "Scarta modifiche"
-  },
   "dialog": {
     "title": "Impostazioni"
   },
@@ -150,7 +142,10 @@
       "cancelInviteDescription": "Il link nell'email smetterà di funzionare. Potrai annullare per alcuni secondi dopo la conferma o invitare di nuovo più tardi.",
       "cancelInviteConfirm": "Annulla l'invito",
       "cancelInviteKeep": "Mantieni l'invito",
-      "cancelInvitePending": "Annullamento dell'invito a {{email}}…"
+      "cancelInvitePending": "Annullamento dell'invito a {{email}}…",
+      "movedTitle": "I membri ora sono in Utenti",
+      "movedBody": "Invita persone, cambia i loro ruoli, sospendile o rimuovile, e invia di nuovo o annulla gli inviti — tutto dal Team.",
+      "open": "Apri Utenti"
     },
     "roles": {
       "title": "Ruoli",
@@ -178,7 +173,10 @@
       "create": "Nuovo ruolo",
       "roleFallback": "questo ruolo",
       "permissionsLoading": "Caricamento autorizzazioni…",
-      "permissionsLoadFailed": "Impossibile caricare l'elenco delle autorizzazioni. Riprova."
+      "permissionsLoadFailed": "Impossibile caricare l'elenco delle autorizzazioni. Riprova.",
+      "movedTitle": "I ruoli ora sono in Utenti",
+      "movedBody": "Aggiungi, rinomina ed elimina ruoli, e scegli cosa può fare ciascuno — le sezioni della clinica, Utenti e i permessi dell’area di lavoro — in Ruoli e accesso.",
+      "open": "Apri Ruoli e accesso"
     },
     "listSort": {
       "label": "Ordina per",
@@ -229,7 +227,15 @@
       "dangerZoneDescription": "Azioni irreversibili per il tuo account.",
       "deleteHeading": "Elimina account",
       "deleteBody": "Elimina definitivamente il tuo account e tutti i dati associati.",
-      "deleteAction": "Elimina account"
+      "deleteAction": "Elimina account",
+      "privacyTitle": "Privacy",
+      "privacyDescription": "La tua scelta su analisi del prodotto e registrazioni di sessione, salvata nel tuo account.",
+      "analyticsLabel": "Analisi del prodotto e registrazioni di sessione",
+      "analyticsHint": "Analisi di PostHog e registrazioni di sessione di Sentry. I rapporti sugli errori funzionano comunque.",
+      "consentGrantedOn": "Consentito il {{date}}",
+      "consentDeniedOn": "Rifiutato il {{date}}",
+      "consentUnanswered": "Non ancora risposto",
+      "privacyPolicyLink": "Informativa sulla privacy"
     },
     "general": {
       "namePlaceholder": "Acme Inc.",
@@ -264,6 +270,7 @@
       "apiKeysNoResults": "Nessuna chiave API corrispondente",
       "apiKeysNoResultsDescription": "Nessuna chiave API corrisponde alla ricerca.",
       "apiKeyFallback": "questa chiave API",
+      "addedOn": "aggiunta il <1></1>",
       "createApiKey": "Crea chiave API",
       "createApiKeyTitle": "Crea una chiave API",
       "createApiKeyDescription": "Dai un nome alla chiave, scegli cosa può fare e quanto dura.",
@@ -299,7 +306,6 @@
       "addWebhookDescription": "Invieremo gli eventi selezionati a questo URL tramite POST.",
       "payloadUrlLabel": "URL di destinazione",
       "eventsLabel": "Eventi",
-      "cancel": "Annulla",
       "createWebhook": "Crea webhook",
       "creating": "Creazione…",
       "deleteWebhookAria": "Elimina il webhook {{url}}",
@@ -327,7 +333,6 @@
       "attemptCodeColumn": "Codice",
       "attemptWhenColumn": "Quando",
       "attemptCountLabel": "Tentativo {{count}}",
-      "closeDialog": "Chiudi",
       "eventsLoadFailed": "Impossibile caricare l'elenco eventi. Riprova.",
       "eventsLoading": "Caricamento eventi…",
       "eventsEmpty": "Nessun evento disponibile."
@@ -351,12 +356,14 @@
         "email": "Email",
         "inApp": "Nell'app",
         "desktop": "Desktop"
-      }
+      },
+      "kind": "Notifica",
+      "loadFailed": "Impossibile caricare le tue preferenze. Riprova.",
+      "desktopDenied": "Le notifiche desktop richiedono il permesso del browser. Attivale nelle impostazioni del browser, poi riattiva questa opzione."
     },
     "appearance": {
       "title": "Aspetto",
-      "description": "Salvato su questo dispositivo: le modifiche sono immediate.",
-      "shuffle": "Casuale"
+      "description": "Salvato su questo dispositivo: le modifiche sono immediate."
     },
     "sessions": {
       "title": "Sessioni",
@@ -408,6 +415,13 @@
         "expires": "Scade il {{month}}/{{year}}",
         "defaultBadge": "Predefinito"
       },
+      "paymentForm": {
+        "saveMethod": "Salva metodo di pagamento",
+        "savingMethod": "Salvataggio…",
+        "confirmPayment": "Conferma pagamento",
+        "confirmingPayment": "Conferma in corso…",
+        "cancel": "Annulla"
+      },
       "invoices": {
         "title": "Fatture",
         "description": "Data, scadenza, importo e stato dal tuo provider di fatturazione.",
@@ -432,8 +446,7 @@
         "confirmTitle": "Disdire l'abbonamento?",
         "confirmDescription": "Il tuo spazio di lavoro mantiene l'accesso completo fino al {{date}}. Dopo, l'abbonamento termina e le funzioni a pagamento potrebbero essere limitate.",
         "keep": "Mantieni abbonamento",
-        "confirm": "Conferma disdetta",
-        "cancelling": "Disdetta in corso…"
+        "confirm": "Conferma disdetta"
       }
     }
   }

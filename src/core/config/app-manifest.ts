@@ -30,7 +30,7 @@ const APP_MANIFEST_THEME_COLOR = PRODUCT_THEME_COLOR;
 export const APP_MANIFEST_DISPLAY = 'standalone';
 export const APP_MANIFEST_ORIENTATION = 'portrait-primary';
 
-/** Lucide {@link Boxes} brand mark — same icon as AuthLayout / FullPageSpinner. */
+/** The product mark (`ProductMark`) — the same drawing as the shell, AuthLayout and the splash. */
 const APP_ICON_PATHS = {
   svg: '/app-icon.svg',
   png192: '/pwa-192x192.png',
@@ -107,10 +107,10 @@ export function buildWebManifest(): {
     screenshots: [],
     shortcuts: [
       {
-        name: 'Dashboard',
+        name: 'Home',
         short_name: 'Home',
         url: '/',
-        description: 'Go to the main dashboard',
+        description: 'Open your clinic',
       },
     ],
   };

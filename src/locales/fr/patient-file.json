@@ -1,0 +1,1054 @@
+{
+  "manifest": {
+    "title": "Dossier patient"
+  },
+  "sections": {
+    "timeline": "Vue d’ensemble",
+    "overview": "Notes cliniques",
+    "visits": "Visites",
+    "prescriptions": "Ordonnances",
+    "treatments": "Traitements",
+    "images": "Photos",
+    "reports": "Comptes rendus",
+    "invoices": "Factures",
+    "payments": "Paiements",
+    "packages": "Forfaits",
+    "notes": "Notes d’équipe"
+  },
+  "layout": {
+    "notFoundRecord": "Patient",
+    "loading": "Ouverture du dossier patient"
+  },
+  "fileBar": {
+    "back": "Retour aux patients",
+    "backHint": "Retour aux patients (Échap)",
+    "patients": "Patients",
+    "identity": "{{id}} · {{phone}}",
+    "maskedPhone": "+91 ••••• •{{last4}}",
+    "visitPill": "Visite en cours · Reprendre",
+    "tabs": "Sections du patient",
+    "notPinned": "Non épinglé · affiché tant qu’il est ouvert",
+    "addToRecord": "Ajouter au dossier",
+    "startVisit": "Démarrer la visite",
+    "activity": "Activité",
+    "showActivity": "Afficher les messages et l’activité",
+    "hideActivity": "Masquer les messages et l’activité",
+    "awaitingReply": "En attente d’une réponse"
+  },
+  "sectionsPopover": {
+    "trigger": "Dossier patient · toutes les sections",
+    "label": "Sections du dossier patient",
+    "title": "Dossier patient",
+    "groups": {
+      "clinical": "Clinique",
+      "care": "Soins",
+      "billing": "Facturation",
+      "team": "Équipe"
+    },
+    "openNow": "Ouvert",
+    "pin": "Épingler à la barre",
+    "unpin": "Retirer de la barre",
+    "pinAria": "Épingler à la barre · {{section}}",
+    "unpinAria": "Retirer de la barre · {{section}}",
+    "footer": "Les sections épinglées restent dans la barre"
+  },
+  "addMenu": {
+    "label": "Ajouter au dossier",
+    "headerFile": "Ajouter pour {{name}}",
+    "headerSection": "Pour {{name}} · déjà sélectionné"
+  },
+  "addActions": {
+    "items": {
+      "prescription": "Ordonnance",
+      "treatment": "Traitement",
+      "photo": "Photo",
+      "appointment": "Rendez-vous",
+      "report": "Compte rendu",
+      "note": "Note",
+      "invoice": "Facture",
+      "payment": "Paiement"
+    },
+    "nothingDue": "Rien à régler pour {{name}}"
+  },
+  "section": {
+    "primary": {
+      "visits": "Nouveau rendez-vous",
+      "prescriptions": "Nouvelle ordonnance",
+      "treatments": "Nouveau traitement",
+      "images": "Importer des photos",
+      "reports": "Importer un compte rendu",
+      "invoices": "Nouvelle facture",
+      "payments": "Enregistrer un paiement"
+    },
+    "more": "Plus pour {{name}}"
+  },
+  "rail": {
+    "copyId": "Copier l’identifiant patient",
+    "idCopied": "Identifiant patient copié",
+    "since": "Depuis le {{date}}",
+    "joinedToday": "Arrivé aujourd’hui",
+    "daysAsPatient_one": "Patient depuis {{count}} jour",
+    "daysAsPatient_many": "Patient depuis {{count}} de jours",
+    "daysAsPatient_other": "Patient depuis {{count}} jours",
+    "monthsAsPatient_one": "Patient depuis {{count}} mois",
+    "monthsAsPatient_many": "Patient depuis {{count}} de mois",
+    "monthsAsPatient_other": "Patient depuis {{count}} mois",
+    "editContact": "Modifier le contact",
+    "reach": "Coordonnées",
+    "reachSub": {
+      "whatsappPrimary": "WhatsApp · Principal",
+      "mobile": "Mobile",
+      "instagram": "Instagram"
+    },
+    "maskedNumber": "•••• {{last4}}",
+    "showNumber": "Afficher le numéro",
+    "hideNumber": "Masquer le numéro",
+    "openWhatsApp": "Ouvrir la discussion WhatsApp dans un nouvel onglet",
+    "call": "Appeler",
+    "openInstagram": "Ouvrir Instagram dans un nouvel onglet",
+    "numberCopied": "Numéro copié",
+    "handleCopied": "Identifiant copié",
+    "about": "À propos",
+    "birthdayIn_one": "🎂 dans {{count}} jour",
+    "birthdayIn_many": "🎂 dans {{count}} de jours",
+    "birthdayIn_other": "🎂 dans {{count}} jours",
+    "birthdayToday": "🎂 aujourd’hui",
+    "noAddress": "Aucune adresse",
+    "upNext": "À venir",
+    "reschedule": "Reprogrammer",
+    "book": "Réserver",
+    "notBooked": "Non réservé",
+    "noUpcoming": "Aucune visite à venir",
+    "feedback": "Avis",
+    "feedbackScore": "{{feel}} · {{score}}/10",
+    "feedbackReview": "{{rating}}★ sur {{source}}",
+    "checkIns_one": "{{count}} suivi",
+    "checkIns_many": "{{count}} de suivis",
+    "checkIns_other": "{{count}} suivis",
+    "reviews_one": "{{count}} avis",
+    "reviews_many": "{{count}} d’avis",
+    "reviews_other": "{{count}} avis",
+    "feedbackCounts": "{{checkIns}} · {{reviews}}",
+    "noFeedback": "Pas encore d’avis",
+    "showAmount": "Afficher le montant",
+    "hideAmount": "Masquer le montant",
+    "collect": "Encaisser",
+    "allPaid": "Tout est réglé · rien à payer"
+  },
+  "photos": {
+    "albums": {
+      "general": "Général",
+      "private": "Privé",
+      "lhr": "LHR"
+    },
+    "albumTabs": "Albums",
+    "count_one": "{{count}} photo",
+    "count_many": "{{count}} de photos",
+    "count_other": "{{count}} photos",
+    "visitFilter": {
+      "label": "Visite",
+      "all": "Toutes les photos",
+      "allSub": "{{count}} dans {{album}}",
+      "none": "Rattachées à aucune visite",
+      "noneSub": "Importées depuis le dossier",
+      "visit": "{{day}} · {{service}}",
+      "visitSub": "#{{seq}} · {{status}}"
+    },
+    "sizes": {
+      "label": "Taille des vignettes",
+      "small": "Petites vignettes",
+      "medium": "Vignettes moyennes",
+      "large": "Grandes vignettes",
+      "smallShort": "S",
+      "mediumShort": "M",
+      "largeShort": "L"
+    },
+    "tile": {
+      "open": "Ouvrir {{name}}",
+      "edit": "Modifier les détails",
+      "editHint": "Modifier le nom, la date et la zone du corps",
+      "delete": "Supprimer la photo"
+    },
+    "loadMore_one": "Charger plus · {{count}} restante",
+    "loadMore_many": "Charger plus · {{count}} restantes",
+    "loadMore_other": "Charger plus · {{count}} restantes",
+    "empty": {
+      "title": "Aucune photo dans {{album}} pour l’instant",
+      "body": "Glissez des photos ici ou importez-les depuis votre ordinateur."
+    },
+    "upload": "Importer des images",
+    "notImages": "Déposez des fichiers image",
+    "uploaded_one": "{{count}} photo importée dans {{album}}",
+    "uploaded_many": "{{count}} de photos importées dans {{album}}",
+    "uploaded_other": "{{count}} photos importées dans {{album}}",
+    "delete": {
+      "title": "Supprimer cette photo ?",
+      "reasons": {
+        "wrongPatient": "Mauvais patient",
+        "blurry": "Floue / à refaire",
+        "duplicate": "Doublon",
+        "other": "Autre"
+      },
+      "deleted": "Photo supprimée"
+    },
+    "bodyParts": {
+      "face": "Visage",
+      "scalp": "Cuir chevelu",
+      "hair": "Cheveux",
+      "body": "Corps",
+      "chest": "Poitrine",
+      "back": "Dos",
+      "underarm": "Aisselles",
+      "legs": "Jambes",
+      "arms": "Bras",
+      "other": "Autre",
+      "upperLip": "Lèvre supérieure",
+      "chin": "Menton",
+      "neck": "Cou",
+      "hands": "Mains",
+      "fullBody": "Corps entier"
+    },
+    "viewer": {
+      "label": "Visionneuse de photos",
+      "position": "{{index}} sur {{total}}",
+      "close": "Fermer la visionneuse",
+      "closeHint": "Fermer (Échap)",
+      "previous": "Photo précédente",
+      "previousHint": "Précédente (←)",
+      "next": "Photo suivante",
+      "nextHint": "Suivante (→)",
+      "zoom": "Zoom",
+      "zoomOut": "Dézoomer",
+      "zoomOutHint": "Dézoomer (−)",
+      "zoomIn": "Zoomer",
+      "zoomInHint": "Zoomer (+)",
+      "zoomReset": "Ajuster à l’écran (0)",
+      "hints": {
+        "browse": "← → parcourir",
+        "zoom": "Défiler ou + − pour zoomer",
+        "pan": "Glisser pour déplacer · double-clic pour réinitialiser",
+        "close": "Échap pour fermer"
+      },
+      "missing": "Aperçu indisponible",
+      "notFoundRecord": "Photo"
+    },
+    "details": {
+      "title": "Détails de la photo",
+      "sub": "Facultatif · le nom, la date et la zone du corps aident à la retrouver",
+      "name": "Nom",
+      "namePlaceholder": "p. ex. joue gauche avant le peeling",
+      "date": "Date",
+      "album": "Album",
+      "bodyPart": "Zone du corps",
+      "optional": "facultatif",
+      "visit": "Visite",
+      "visitHint": "facultatif · classe la photo dans ce rendez-vous",
+      "notAttached": "Non rattachée",
+      "save": "Enregistrer les détails",
+      "saved": "Détails de la photo enregistrés",
+      "stage": "Étape"
+    },
+    "loading": "Chargement des photos",
+    "stages": {
+      "before": "Avant",
+      "after": "Après"
+    }
+  },
+  "rx": {
+    "record": "Ordonnance",
+    "title": {
+      "create": "Nouvelle ordonnance",
+      "edit": "Modifier l’ordonnance"
+    },
+    "sub": "{{name}} · {{id}}",
+    "medicines_one": "{{count}} médicament",
+    "medicines_many": "{{count}} médicaments",
+    "medicines_other": "{{count}} médicaments",
+    "quickFill": {
+      "print": "Imprimer l’ordonnance",
+      "repeat": "Reprendre la dernière ordonnance {{number}}"
+    },
+    "steps": {
+      "prescription": "Ordonnance",
+      "medicines": "Médicaments",
+      "notes": "Notes cliniques"
+    },
+    "date": "Date",
+    "doctor": "Médecin",
+    "doctorPlaceholder": "Choisir le médecin",
+    "quick": {
+      "placeholder": "Saisissez médicament, dose, moment · p. ex. flu 0-0-1 af 10d",
+      "hint": "od · bd · tds · hs · af/bf · 5d · x8",
+      "groups": {
+        "all": "Tous",
+        "oral": "Oral",
+        "topical": "Topique"
+      },
+      "newMedicine": "Médicament absent de la liste",
+      "lastSaved": "Dernière posologie enregistrée",
+      "noDosage": "Aucune posologie précédente",
+      "inStock_one": "{{count}} en stock",
+      "inStock_many": "{{count}} en stock",
+      "inStock_other": "{{count}} en stock",
+      "outOfStock": "en rupture",
+      "added": "{{name}} ajouté",
+      "qty": "×{{qty}}"
+    },
+    "items": {
+      "label": "Médicaments",
+      "medicine": "Médicament",
+      "dose": "Dose · M M S",
+      "meal": "Repas",
+      "where": "Où",
+      "qty": "Qté",
+      "searchMedicine": "Rechercher un médicament",
+      "addMedicine": "Ajouter un médicament",
+      "use": "Utiliser",
+      "note": "Remarques · p. ex. 10 jours, couche fine, éviter le soleil"
+    },
+    "dose": {
+      "group": "Dose matin · midi · soir",
+      "times": {
+        "morning": "Matin",
+        "afternoon": "Midi",
+        "night": "Soir"
+      },
+      "on": "{{time}} · {{taps}} — cliquez pour changer",
+      "off": "{{time}} · aucune — cliquez pour changer",
+      "sos": "SOS",
+      "sosHint": "Seulement si besoin (SOS)"
+    },
+    "meal": {
+      "before": "Avant",
+      "after": "Après",
+      "beforeHint": "Avant le repas",
+      "afterHint": "Après le repas",
+      "more": "Autres moments",
+      "change": "{{timing}} · changer"
+    },
+    "timings": {
+      "empty_stomach": "À jeun",
+      "with_meal": "Pendant le repas",
+      "morning": "Le matin",
+      "night": "Le soir",
+      "morning_night": "Matin et soir",
+      "thrice_week": "Trois fois par semaine",
+      "once_week": "Une fois par semaine",
+      "alternate_days": "Un jour sur deux"
+    },
+    "places": {
+      "face": "Visage",
+      "scalp": "Cuir chevelu",
+      "hair": "Cheveux",
+      "body": "Corps",
+      "underarm": "Aisselle",
+      "neck": "Cou",
+      "back": "Dos",
+      "chest": "Poitrine",
+      "hands": "Mains",
+      "legs": "Jambes",
+      "feet": "Pieds",
+      "lips": "Lèvres",
+      "underEyes": "Sous les yeux",
+      "affectedArea": "Zone atteinte"
+    },
+    "notes": {
+      "advice": "Notes",
+      "advicePlaceholder": "Conseils pour le patient",
+      "lab": "Bilan biologique",
+      "labPlaceholder": "Examens conseillés ou résultats",
+      "procedure": "Soin du jour",
+      "procedurePlaceholder": "Ce qui a été fait aujourd’hui"
+    },
+    "daysNote_one": "{{count}} jour",
+    "daysNote_many": "{{count}} jours",
+    "daysNote_other": "{{count}} jours",
+    "dayWords": "jour, jours",
+    "save": {
+      "create": "Enregistrer l’ordonnance",
+      "edit": "Enregistrer les modifications",
+      "sell": "Enregistrer et vendre",
+      "visit": "Valider · imprimer · envoyer à la pharmacie",
+      "summary": "{{medicines}} · {{doctor}}",
+      "noMedicine": "Ajoutez un médicament",
+      "saved": "Ordonnance enregistrée",
+      "savedNumber": "Ordonnance {{number}} enregistrée",
+      "approve": "Enregistrer et valider",
+      "approvedNumber": "Ordonnance {{number}} validée"
+    },
+    "delete": {
+      "title": "Supprimer cette ordonnance ?",
+      "deleted": "Ordonnance supprimée"
+    },
+    "preview": "Ordonnance {{number}}",
+    "status": {
+      "draft": "Brouillon",
+      "approved": "Validée"
+    },
+    "approvedNote": "Validée · une ordonnance validée ne peut pas être modifiée"
+  },
+  "treatment": {
+    "record": "Soin",
+    "title": {
+      "create": "Nouveau soin",
+      "edit": "Modifier le soin"
+    },
+    "sub": "Les champs suivent la spécialité du cabinet · changez si besoin",
+    "session": "Séance {{session}}",
+    "quickFill": {
+      "next": "Séance suivante de {{name}}",
+      "checkIn": "Saisir un suivi"
+    },
+    "type": "Type",
+    "templates": {
+      "skin": "Peau · laser",
+      "dental": "Dentaire",
+      "physio": "Kiné",
+      "gynac": "Gynéco",
+      "general": "Général"
+    },
+    "steps": {
+      "session": "Séance",
+      "details": "Détails {{template}}",
+      "aftercare": "Suivi"
+    },
+    "name": "Soin",
+    "namePlaceholder": "Choisir ou saisir",
+    "sessionNo": "Numéro de séance",
+    "doctor": "Médecin",
+    "doctorPlaceholder": "Choisir le médecin",
+    "therapist": "Thérapeute",
+    "therapistPlaceholder": "Choisir le thérapeute",
+    "skin": {
+      "therapyType": "Type de thérapie",
+      "therapyTypes": {
+        "laser": "Laser",
+        "peel": "Peeling",
+        "facial": "Soin du visage",
+        "injectable": "Injection",
+        "microneedling": "Microneedling"
+      },
+      "bodyPart": "Zone",
+      "pickAny": "au choix",
+      "areas": {
+        "face": "Visage",
+        "upperLip": "Lèvre supérieure",
+        "chin": "Menton",
+        "underarm": "Aisselle",
+        "arms": "Bras",
+        "legs": "Jambes",
+        "back": "Dos",
+        "chest": "Poitrine",
+        "fullBody": "Corps entier"
+      },
+      "skinType": "Phototype",
+      "skinTypeValue": "Type {{type}}",
+      "machine": "Appareil",
+      "machinePlaceholder": "p. ex. Soprano Ice",
+      "wavelength": "Longueur d’onde",
+      "startReading": "Compteur début",
+      "endReading": "Compteur fin",
+      "readingPlaceholder": "Tirs / compteur",
+      "power": "Puissance · fréquence · PD · mode",
+      "powerPlaceholder": "p. ex. 10 J · 3 Hz · 20 ms · HR"
+    },
+    "dental": {
+      "procedure": "Acte",
+      "procedures": {
+        "scaling": "Détartrage",
+        "filling": "Obturation",
+        "rct": "Dévitalisation",
+        "extraction": "Extraction",
+        "crown": "Couronne",
+        "implant": "Implant",
+        "whitening": "Blanchiment"
+      },
+      "teeth": "Dents",
+      "teethHint": "Numérotation FDI · touchez pour choisir",
+      "quadrants": {
+        "upperRight": "Haut droite",
+        "upperLeft": "Haut gauche",
+        "lowerRight": "Bas droite",
+        "lowerLeft": "Bas gauche"
+      },
+      "tooth": "Dent {{tooth}}",
+      "material": "Matériau",
+      "materialPlaceholder": "p. ex. Composite A2",
+      "anaesthesia": "Anesthésie",
+      "given": "Faite",
+      "notGiven": "Non faite"
+    },
+    "physio": {
+      "region": "Région",
+      "regions": {
+        "neck": "Cou",
+        "shoulder": "Épaule",
+        "back": "Dos",
+        "hip": "Hanche",
+        "knee": "Genou",
+        "ankle": "Cheville"
+      },
+      "modality": "Technique",
+      "modalities": {
+        "tens": "TENS",
+        "ift": "IFT",
+        "ultrasound": "Ultrasons",
+        "exercise": "Exercices",
+        "manualTherapy": "Thérapie manuelle",
+        "traction": "Traction"
+      },
+      "painBefore": "Douleur avant",
+      "painAfter": "Douleur après",
+      "painHint": "0–10",
+      "exercises": "Exercices à la maison",
+      "exercisesPlaceholder": "Séries, répétitions, fréquence"
+    },
+    "gynac": {
+      "visitType": "Type de visite",
+      "visitTypes": {
+        "anc": "Prénatal",
+        "pnc": "Postnatal",
+        "infertility": "Fertilité",
+        "contraception": "Contraception",
+        "general": "Général"
+      },
+      "lmp": "DDR",
+      "gestation": "Grossesse",
+      "weeks": "semaines",
+      "bp": "Tension",
+      "bpPlaceholder": "120/80",
+      "weight": "Poids",
+      "kg": "kg",
+      "findings": "Constatations",
+      "findingsPlaceholder": "Résultats de l’examen"
+    },
+    "general": {
+      "area": "Zone",
+      "areaPlaceholder": "Séparées par des virgules",
+      "parameters": "Paramètres",
+      "parametersPlaceholder": "Un par ligne, p. ex. Dose : 2 ml"
+    },
+    "aftercare": {
+      "remark": "Remarque",
+      "remarkPlaceholder": "Réaction, conseils, suite",
+      "call": "Appel de suivi",
+      "callHint": "crée une tâche pour demander comment ça va et ce qui a été suivi",
+      "calls": {
+        "none": "Pas d’appel",
+        "next_day": "Le lendemain",
+        "in_week": "Dans une semaine",
+        "in_two_days": "Dans 2 jours"
+      },
+      "feedback": "Retour sur ce soin",
+      "feedbackItem": "{{date}} · {{feel}} {{score}}/10",
+      "noCheckIn": "Pas encore de suivi · utilisez Noter un suivi ci-dessus"
+    },
+    "save": {
+      "create": "Enregistrer le soin",
+      "edit": "Enregistrer les modifications",
+      "saved": "Soin enregistré"
+    },
+    "package": {
+      "label": "Depuis un forfait",
+      "hint": "l’enregistrement utilise une de ses séances",
+      "option": "{{name}} · {{used}} sur {{total}} utilisées",
+      "numbered": "Fixé par le forfait",
+      "uses": "Utilise 1 séance de {{name}}"
+    },
+    "reverse": {
+      "title": "Annuler ce soin ?",
+      "body": "Il reste dans le dossier, marqué comme annulé, et la séance de forfait utilisée est rendue. Action irréversible.",
+      "action": "Annuler le soin",
+      "done": "Soin annulé",
+      "status": "Annulé",
+      "note": "Annulé le {{date}} · {{reason}}",
+      "reasons": {
+        "mistake": "Enregistré par erreur",
+        "wrongPatient": "Mauvais patient",
+        "notDone": "Séance non réalisée"
+      }
+    }
+  },
+  "report": {
+    "record": "Compte rendu",
+    "types": {
+      "lab": "Analyse",
+      "scan": "Imagerie",
+      "consent": "Consentement",
+      "other": "Autre"
+    },
+    "steps": {
+      "report": "Compte rendu",
+      "details": "Détails",
+      "notes": "Notes"
+    },
+    "type": "Type",
+    "name": "Nom",
+    "date": "Date",
+    "file": "Fichier",
+    "upload": {
+      "title": "Importer un compte rendu",
+      "namePlaceholder": "ex. NFS",
+      "drop": "Déposez le compte rendu ou parcourez",
+      "fileHint": "PDF, JPG ou PNG · jusqu’à {{limit}}",
+      "remove": "Retirer {{name}}",
+      "note": "Note",
+      "notePlaceholder": "Facultatif",
+      "summary": "{{type}} · {{files}}",
+      "save": "Importer",
+      "noName": "Nommez le compte rendu",
+      "uploaded": "Compte rendu importé",
+      "files_one": "{{count}} fichier",
+      "files_many": "{{count}} de fichiers",
+      "files_other": "{{count}} fichiers"
+    },
+    "view": {
+      "sub": "{{name}} · {{date}}",
+      "notes": "Notes",
+      "noNotes": "Aucune note sur ce compte rendu",
+      "download": "Télécharger",
+      "downloading": "Téléchargement de {{name}}",
+      "fileGone": "N’est plus disponible"
+    }
+  },
+  "package": {
+    "title": "Modifier le forfait",
+    "summary": "Les séances sont décomptées à la fin d’un soin",
+    "save": "Enregistrer les modifications",
+    "card": {
+      "left_one": "{{count}} restante",
+      "left_many": "{{count}} restantes",
+      "left_other": "{{count}} restantes",
+      "used": "{{used}} sur {{total}} utilisées",
+      "validTill": "Valable jusqu’au {{date}}",
+      "book": "Réserver la suivante",
+      "empty": "Aucun forfait pour le moment",
+      "noExpiry": "Sans expiration",
+      "statuses": {
+        "used_up": "Épuisé",
+        "expired": "Expiré"
+      },
+      "edit": "Modifier"
+    },
+    "validUntil": "Valable jusqu’au",
+    "sessions": "Séances",
+    "saved": "Forfait enregistré"
+  },
+  "clinical": {
+    "titles": {
+      "complaints": "Plaintes",
+      "diagnosis": "Diagnostic",
+      "treatmentSuggestions": "Soins suggérés",
+      "futureSuggestions": "Suggestions futures"
+    },
+    "newHint": "Ajouté depuis la dernière visite",
+    "empty": "Rien pour l’instant",
+    "placeholder": "Saisissez puis appuyez sur Entrée",
+    "add": "Ajouter : {{title}}",
+    "remove": "Retirer {{name}}",
+    "newCount_one": "{{count}} nouveau",
+    "newCount_many": "{{count}} de nouveaux",
+    "newCount_other": "{{count}} nouveaux",
+    "removed": "Retiré : {{name}}"
+  },
+  "feedback": {
+    "title": "Retours",
+    "log": "Noter un retour",
+    "typesLabel": "Type de retour",
+    "types": {
+      "all": "Tous",
+      "visit": "Consultation",
+      "treatment": "Retour sur le soin"
+    },
+    "previous": "Précédent",
+    "next": "Suivant",
+    "emptyTitle": "Aucun retour",
+    "emptySub": "Notez un suivi ou un avis après la prochaine visite · Noter un retour",
+    "notRated": "Non noté",
+    "score": "{{score}}/10",
+    "stars": "{{rating}}/5",
+    "trendUp": "▲ {{points}}",
+    "trendDown": "▼ {{points}}",
+    "trendSame": "= identique",
+    "followed": "Suivi : {{how}}",
+    "appointment": "RDV {{number}}",
+    "visitWith": "{{service}} · RDV {{number}}",
+    "visit": "Visite",
+    "noVisit": "Lié à aucune visite",
+    "noNow": "Aucune note sur l’état actuel",
+    "noText": "Aucun texte d’avis",
+    "nextLabel": "Suite",
+    "linkLabel": "Lien",
+    "noNext": "Aucune suite notée",
+    "noLink": "Aucun lien",
+    "actions": "Actions",
+    "edit": "Modifier",
+    "remove": "Retirer",
+    "actionNeeded": "Action requise",
+    "logAction": "Noter une action",
+    "nextAction": "Action suivante",
+    "actionBy": "✓ {{action}} · {{name}}",
+    "actionLogged": "✓ {{action}} · noté",
+    "actionKinds": {
+      "doctor_called": "Le médecin a appelé",
+      "asked_revisit": "Invité à revenir",
+      "free_review_booked": "Contrôle gratuit réservé",
+      "plan_changed": "Plan modifié",
+      "replied_google": "Réponse sur Google",
+      "replied_instagram": "Réponse sur Instagram",
+      "replied_whatsapp": "Réponse sur WhatsApp",
+      "refund_credit": "Remboursement / avoir accordé",
+      "other": "Autre"
+    },
+    "loadMore": "Charger plus",
+    "loading": "Chargement…",
+    "removeCheckIn": "Retirer ce suivi ?",
+    "removeReview": "Retirer cet avis ?",
+    "checkInRemoved": "Suivi retiré",
+    "reviewRemoved": "Avis retiré",
+    "more_one": "{{count}} de plus",
+    "more_many": "{{count}} de plus",
+    "more_other": "{{count}} de plus",
+    "files_one": "▶ {{count}} fichier",
+    "files_many": "▶ {{count}} fichiers",
+    "files_other": "▶ {{count}} fichiers"
+  },
+  "checkIn": {
+    "titles": {
+      "visit": "Suivi de visite",
+      "aftercare": "Suivi post-soin"
+    },
+    "last": "dernier suivi {{date}} : {{feel}}",
+    "steps": {
+      "now": "Où en est-on",
+      "followed": "Ce qui a été suivi",
+      "next": "Prochaines étapes"
+    },
+    "feel": "Par rapport à la dernière visite",
+    "score": "Note du patient",
+    "scoreHint": "1 = très mécontent · 10 = très content",
+    "words": "Avec ses mots",
+    "wordsLast": "La dernière fois : {{text}}",
+    "wordsPlaceholder": "Ce qui a changé, ce qui gêne encore",
+    "followed": "A suivi les conseils",
+    "followedValues": {
+      "fully": "Entièrement",
+      "mostly": "En grande partie",
+      "partly": "En partie",
+      "not_at_all": "Pas du tout"
+    },
+    "details": "Détails",
+    "detailsLast": "Conseillé la dernière fois : {{text}}",
+    "detailsPlaceholder": "Soins à domicile, médicaments, écran solaire, séances manquées",
+    "plan": "Plan",
+    "planPlaceholder": "Ce qui suit, et quand",
+    "offerings": "Ajouter aux suggestions",
+    "offeringsHint": "facultatif · ajouté aux suggestions du patient comme Prévu",
+    "offeringsPlaceholder": "Rechercher des prestations",
+    "offeringSessions_one": "{{price}} · {{count}} séance",
+    "offeringSessions_many": "{{price}} · {{count}} séances",
+    "offeringSessions_other": "{{price}} · {{count}} séances",
+    "save": "Enregistrer le suivi",
+    "saveEdit": "Enregistrer",
+    "noFeel": "Choisissez où en est le patient",
+    "saved": "Suivi enregistré pour {{name}}",
+    "added": " · {{count}} ajoutés aux suggestions",
+    "callBack": " · tâche de rappel du médecin créée",
+    "updated": "Suivi mis à jour",
+    "record": "Suivi",
+    "noScore": "Choisissez la note du patient",
+    "offeringsPlanned": "Ajouté aux suggestions"
+  },
+  "review": {
+    "title": "Noter un avis",
+    "sub": "{{name}} · conservé dans le dossier pour que chacun le retrouve",
+    "steps": {
+      "review": "Avis",
+      "details": "Détails",
+      "notes": "Notes"
+    },
+    "where": "Où",
+    "rating": "Note",
+    "link": "Lien",
+    "linkHint": "Lien vers l’avis Google, la publication ou le Drive",
+    "linkPlaceholder": "https://",
+    "files": "Vidéo ou capture",
+    "filesDrop": "Déposez la vidéo ou la capture",
+    "filesHint": "MP4, MOV, JPG ou PNG · jusqu’à {{limit}}",
+    "removeFile": "Retirer {{name}}",
+    "attached": "Pièces jointes",
+    "text": "Ce qui a été dit",
+    "textPlaceholder": "Collez le texte de l’avis ou un court résumé",
+    "save": "Enregistrer l’avis",
+    "saveEdit": "Enregistrer",
+    "saved": "Avis {{source}} {{rating}}★ enregistré pour {{name}}",
+    "callBack": " · tâche de rappel créée",
+    "updated": "Avis mis à jour",
+    "badLink": "Ajoutez un lien https://",
+    "notRated": "Non noté",
+    "record": "Avis",
+    "attachedFiles_one": "{{count}} fichier",
+    "attachedFiles_many": "{{count}} fichiers",
+    "attachedFiles_other": "{{count}} fichiers"
+  },
+  "logFeedback": {
+    "title": "Noter un retour",
+    "sub": "{{name}} · choisissez ce que vous voulez noter",
+    "groups": {
+      "checkIn": "Suivi",
+      "treatment": "Retour sur le soin",
+      "review": "Avis"
+    },
+    "consultation": "Consultation",
+    "after": "Après {{name}}",
+    "close": "Fermer",
+    "hints": {
+      "consultation": "Après une visite · état actuel · conseils suivis · prochain plan",
+      "google": "Collez le lien et le texte de l’avis",
+      "video": "Importez le témoignage",
+      "other": "Note, texte et capture d’écran"
+    }
+  },
+  "tables": {
+    "export": "Exporter",
+    "exported_one": "{{count}} ligne exportée en CSV",
+    "exported_many": "{{count}} lignes exportées en CSV",
+    "exported_other": "{{count}} lignes exportées en CSV",
+    "visits": {
+      "records": "rendez-vous",
+      "count_one": "{{count}} rendez-vous",
+      "count_many": "{{count}} rendez-vous",
+      "count_other": "{{count}} rendez-vous",
+      "empty": "Aucun rendez-vous pour le moment"
+    },
+    "prescriptions": {
+      "records": "ordonnances",
+      "count_one": "{{count}} ordonnance",
+      "count_many": "{{count}} ordonnances",
+      "count_other": "{{count}} ordonnances",
+      "empty": "Aucune ordonnance pour le moment",
+      "copied": "Ordonnance copiée"
+    },
+    "treatments": {
+      "records": "soins",
+      "count_one": "{{count}} soin",
+      "count_many": "{{count}} soins",
+      "count_other": "{{count}} soins",
+      "empty": "Aucun soin pour le moment",
+      "copied": "Séance {{session}} ajoutée",
+      "feedbackScore": "{{feel}} · {{score}}/10",
+      "checkInOn": "Suivi {{date}}",
+      "callNextDay": "Appeler le lendemain",
+      "callInDays_one": "Appeler dans {{count}} jour",
+      "callInDays_many": "Appeler dans {{count}} jours",
+      "callInDays_other": "Appeler dans {{count}} jours"
+    },
+    "reports": {
+      "records": "comptes rendus",
+      "count_one": "{{count}} compte rendu",
+      "count_many": "{{count}} comptes rendus",
+      "count_other": "{{count}} comptes rendus",
+      "empty": "Aucun compte rendu pour le moment",
+      "fileSub": "{{format}} · partagé avec le patient sur demande",
+      "deleteTitle": "Supprimer ce compte rendu ?",
+      "deleted": "Compte rendu supprimé"
+    },
+    "invoices": {
+      "records": "factures",
+      "count_one": "{{count}} facture",
+      "count_many": "{{count}} factures",
+      "count_other": "{{count}} factures",
+      "empty": "Aucune facture pour le moment",
+      "countDue_one": "{{count}} facture · {{due}} dû",
+      "countDue_many": "{{count}} factures · {{due}} dû",
+      "countDue_other": "{{count}} factures · {{due}} dû",
+      "itemCount_one": "{{count}} ligne",
+      "itemCount_many": "{{count}} lignes",
+      "itemCount_other": "{{count}} lignes",
+      "due": "{{amount}} dû",
+      "nothingDue": "Rien à payer"
+    },
+    "payments": {
+      "records": "opérations",
+      "count_one": "{{count}} opération",
+      "count_many": "{{count}} opérations",
+      "count_other": "{{count}} opérations",
+      "empty": "Aucun paiement pour le moment",
+      "received": "+ {{amount}}",
+      "paid": "− {{amount}}"
+    },
+    "columns": {
+      "id": "ID",
+      "offering": "Prestation",
+      "doctor": "Médecin",
+      "status": "Statut",
+      "date": "Date",
+      "medicines": "Médicaments",
+      "notes": "Notes",
+      "updated": "Modifié",
+      "treatment": "Soin",
+      "area": "Zone",
+      "team": "Équipe",
+      "session": "Séance",
+      "details": "Détails",
+      "feedback": "Avis",
+      "report": "Compte rendu",
+      "type": "Type",
+      "invoice": "Facture",
+      "items": "Lignes",
+      "bill": "Montant",
+      "paid": "Payé / dû",
+      "receipt": "Reçu",
+      "when": "Quand",
+      "mode": "Mode",
+      "amount": "Montant",
+      "by": "Par"
+    },
+    "actions": {
+      "print": "Imprimer",
+      "preview": "Aperçu",
+      "copyRx": "Copier l’ordonnance",
+      "sell": "Vendre les médicaments",
+      "copyInvoice": "Copier la facture",
+      "checkIn": "Suivi",
+      "copyTreatment": "Copier comme séance suivante",
+      "open": "Ouvrir",
+      "pay": "Enregistrer un paiement",
+      "edit": "Modifier",
+      "delete": "Supprimer"
+    }
+  },
+  "notes": {
+    "label": "Nouvelle note",
+    "placeholder": "Ajouter une note pour l’équipe",
+    "add": "Ajouter la note",
+    "by": "{{name}} · {{date}}",
+    "empty": "Aucune note pour le moment"
+  },
+  "timeline": {
+    "open": "Ouvrir {{card}}",
+    "clinical": {
+      "suggested": "Suggéré",
+      "later": "Plus tard",
+      "smartLabel": "Note intelligente",
+      "smartPlaceholder": "Note intelligente · écrivez librement, p. ex. {{example}}",
+      "smartExample": "chute de cheveux 2 mois, PRP",
+      "add": "Ajouter",
+      "added_one": "{{count}} élément ajouté depuis votre note",
+      "added_many": "{{count}} d’éléments ajoutés depuis votre note",
+      "added_other": "{{count}} éléments ajoutés depuis votre note",
+      "nothing": "Rien de reconnu pour le moment"
+    },
+    "visits": {
+      "empty": "Aucune visite pour le moment"
+    },
+    "photos": {
+      "upload": "Importer",
+      "empty": "Aucune photo pour le moment · importez la première"
+    },
+    "packages": {
+      "progress": "{{used}} / {{total}}",
+      "done": "Toutes les séances effectuées",
+      "empty": "Aucun forfait actif"
+    },
+    "prescriptions": {
+      "title": "Ordonnance {{number}}"
+    },
+    "treatments": {
+      "sub": "Séance {{session}} · {{date}}"
+    },
+    "reports": {
+      "sub": "{{type}} · {{date}}"
+    },
+    "notes": {
+      "label": "Note d’équipe",
+      "placeholder": "Écrivez une note pour l’équipe…",
+      "post": "Publier"
+    },
+    "activity": {
+      "filtersLabel": "Filtres d’activité",
+      "notes": "Notes",
+      "empty": "Aucune activité pour le moment",
+      "masked": "₹ ••••"
+    },
+    "billing": {
+      "due": "Dû",
+      "paid": "Payé",
+      "show": "Afficher les montants",
+      "hide": "Masquer les montants",
+      "invoice": "Facture {{type}} {{number}}",
+      "sub": "{{date}} · {{amount}}",
+      "collect": "Encaisser le paiement"
+    }
+  },
+  "visitFlow": {
+    "pill": "Visite en cours",
+    "lead": "Tout pour la visite du jour sur un seul écran",
+    "pause": "Mettre en pause",
+    "complete": "✓ Terminer la visite",
+    "completed": "Visite terminée",
+    "packageUsed": "1 séance du forfait utilisée",
+    "followUp": "suivi prévu le {{date}}",
+    "loading": "la visite",
+    "steps": {
+      "checks": "Arrivée et sécurité",
+      "rx": "Ordonnance",
+      "treatment": "Traitement",
+      "invoice": "Facture",
+      "collect": "Encaisser"
+    },
+    "checks": {
+      "labels": {
+        "consent": "Consentement signé",
+        "photos": "Photos avant prises",
+        "allergies": "Allergies et médicaments vérifiés"
+      },
+      "hints": {
+        "consent": "Le traitement ne peut pas commencer sans lui",
+        "photos": "Associées automatiquement aux photos après",
+        "allergies": "Demandé à chaque visite"
+      },
+      "left_one": "{{count}} vérification restante",
+      "left_many": "{{count}} vérifications restantes",
+      "left_other": "{{count}} vérifications restantes",
+      "done": "Toutes les vérifications sont faites"
+    },
+    "rx": {
+      "kit": "⚡ {{name}}",
+      "write": "Rédiger une ordonnance",
+      "empty": "En un geste depuis un kit, ou rédigez-en une",
+      "prescribed": "{{name}} prescrit"
+    },
+    "treatment": {
+      "repeat": "⚡ Répéter · {{name}} · séance {{session}}",
+      "new": "Nouveau traitement",
+      "memo": "Mémorisé pour ce patient : {{memo}}",
+      "pack": "Utilise 1 séance de {{name}}",
+      "blocked": "Terminez d’abord l’arrivée",
+      "empty": "Enregistrer la séance du jour",
+      "last": "Derniers réglages : {{memo}}",
+      "done": "{{name}} · séance {{session}}",
+      "repeated": "Séance {{session}} enregistrée avec les derniers réglages",
+      "repeatPackage": "⚡ Répéter · {{name}}"
+    },
+    "paused": "Visite en pause",
+    "resume": "Reprendre",
+    "invoice": {
+      "create": "Créer la facture depuis la visite",
+      "custom": "Facture personnalisée",
+      "nothing": "Rien à facturer",
+      "covered": "Couvert par le forfait · rien à facturer",
+      "empty": "Rien à facturer pour l’instant",
+      "done": "{{number}} · {{total}}",
+      "ready_many": "{{count}} lignes prêtes",
+      "ready_one": "{{count}} ligne prête",
+      "ready_other": "{{count}} lignes prêtes"
+    },
+    "collect": {
+      "action": "Encaisser {{amount}}",
+      "due": "{{amount}} dû",
+      "nothing": "Rien à payer",
+      "waiting": "Facturez d’abord la visite"
+    }
+  }
+}

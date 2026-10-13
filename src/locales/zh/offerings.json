@@ -1,0 +1,266 @@
+{
+  "manifest": {
+    "title": "服务项目"
+  },
+  "offerLabels": {
+    "percentOff": "优惠 {{value}}%",
+    "amountOff": "立减 {{amount}}",
+    "fixedAt": "仅 {{amount}}",
+    "extraSessions_other": "+{{count}} 次"
+  },
+  "toolbar": {
+    "tabsLabel": "服务项目分区",
+    "tabOfferings": "服务项目",
+    "tabOffers": "优惠活动",
+    "searchOfferings": "搜索名称或搜索词",
+    "searchOffers": "搜索优惠活动或代码",
+    "searchLabel": "搜索服务项目",
+    "newOffering": "新建服务项目",
+    "newOffer": "新建优惠活动"
+  },
+  "catalogueCells": {
+    "allBranches": "所有分院"
+  },
+  "deleteConfirm": {
+    "offeringTitle": "删除此服务项目？",
+    "offerTitle": "删除此优惠活动？"
+  },
+  "columns": {
+    "seq": "ID",
+    "name": "服务项目",
+    "category": "类别",
+    "price": "价格",
+    "offer": "优惠活动",
+    "branches": "分院",
+    "duration": "时长",
+    "sessions": "疗程数",
+    "status": "状态",
+    "updated": "更新时间"
+  },
+  "table": {
+    "records": "服务项目"
+  },
+  "cells": {
+    "validDays_other": "有效期 {{count}} 天",
+    "validFor_other": "有效期 {{count}} 天",
+    "wasPrice": "原价 {{price}} · 优惠 {{percent}}%",
+    "listPrice": "标价",
+    "minutes": "{{minutes}} 分钟",
+    "sessions_other": "{{count}} 次",
+    "sessionsFree_other": "{{sessions}} + 赠送 {{count}} 次",
+    "active": "启用",
+    "inactive": "停用"
+  },
+  "rowActions": {
+    "edit": "编辑",
+    "delete": "删除"
+  },
+  "bulk": {
+    "export": "导出",
+    "exported_other": "已将 {{count}} 行导出为 CSV"
+  },
+  "empty": {
+    "title": "还没有服务项目",
+    "description": "添加带价格的治疗和套餐，即可用于预约和开票。",
+    "noMatchTitle": "没有匹配的服务项目",
+    "noMatchDescription": "这里还没有内容。试试其他标签页或搜索。",
+    "newOffering": "新建服务项目"
+  },
+  "offers": {
+    "columns": {
+      "offer": "优惠活动",
+      "type": "类型",
+      "appliesTo": "适用于",
+      "branches": "分院",
+      "valid": "有效期",
+      "status": "状态",
+      "updated": "更新时间"
+    },
+    "table": {
+      "records": "优惠活动"
+    },
+    "cells": {
+      "more": "+{{count}}",
+      "range": "{{start}} – {{end}}",
+      "now": "即日起",
+      "noEnd": "无结束日期",
+      "endsToday": "今天结束",
+      "endsTomorrow": "明天结束",
+      "endsIn_other": "{{count}} 天后结束",
+      "startsOn": "{{date}} 开始",
+      "over": "已结束",
+      "noOfferings": "无服务项目"
+    },
+    "rowActions": {
+      "edit": "编辑",
+      "pause": "暂停",
+      "resume": "恢复",
+      "delete": "删除"
+    },
+    "bulk": {
+      "export": "导出",
+      "exported_other": "已将 {{count}} 行导出为 CSV"
+    },
+    "empty": {
+      "title": "还没有优惠活动",
+      "description": "这里还没有内容。试试其他标签页或搜索。",
+      "newOffer": "新建优惠"
+    },
+    "record": "优惠"
+  },
+  "record": "服务项目",
+  "offeringDrawer": {
+    "title": {
+      "create": "新建服务项目",
+      "edit": "编辑服务项目"
+    },
+    "sub": "用于预约、发票和套餐",
+    "quickFill": {
+      "single": "单次疗程",
+      "pack": "6 次疗程套餐",
+      "lhr": "激光脱毛 10 次套餐",
+      "consultation": "问诊"
+    },
+    "steps": {
+      "main": "服务项目、价格与次数",
+      "timeDetails": "时长、有效期与详情",
+      "offersTime": "相关优惠、时长与有效期",
+      "details": "详情"
+    },
+    "groups": {
+      "offering": "服务项目",
+      "price": "价格与次数",
+      "offers": "相关优惠",
+      "time": "时长与有效期",
+      "details": "详情"
+    },
+    "fields": {
+      "name": "名称",
+      "namePlaceholder": "例如：全脸激光脱毛",
+      "category": "类别",
+      "colour": "颜色",
+      "colourHint": "在所有地方用于此服务项目",
+      "availableAt": "适用分院",
+      "availableAtHint": "其他分院的预约和账单中不显示",
+      "price": "价格",
+      "priceHint": "标价 · 显示在发票上",
+      "offerPrice": "优惠价",
+      "offerPriceHint": "实收金额 · 留空即按标价",
+      "offerPriceBelow": "实收金额 · 低于标价 {{percent}}%",
+      "sessions": "次数",
+      "sessionsHint": "一张发票可做的疗程数",
+      "gstRate": "GST 税率",
+      "gst": "GST",
+      "gstInclusive": "含税",
+      "gstExclusive": "不含税",
+      "floor": "最低价",
+      "floorShown": "已显示 · 仅您可见",
+      "floorHidden": "已隐藏 · 点按设置",
+      "floorHint": "前台收费不能低于此价",
+      "billedToday": "今日实收",
+      "freeSessions_other": "+赠送 {{count}} 次",
+      "belowList": "低于标价 {{percent}}%",
+      "duration": "时长",
+      "durationQuick": "{{minutes}} 分钟",
+      "minutesUnit": "分钟",
+      "validity": "有效期",
+      "validityHint": "0 = 永久有效 · 到期后剩余次数作废",
+      "daysUnit": "天",
+      "days_other": "{{count}} 天",
+      "validityQuick": {
+        "none": "无",
+        "quarter": "3 个月",
+        "half": "6 个月",
+        "year": "1 年"
+      },
+      "searchTerms": "搜索词",
+      "searchTermsHint": "用逗号分隔",
+      "searchTermsPlaceholder": "激光, 面部, 脱毛",
+      "description": "说明",
+      "descriptionPlaceholder": "包含哪些内容",
+      "status": "状态",
+      "active": "启用 · 可预约",
+      "inactive": "停用 · 已隐藏",
+      "gstChip": "{{value}}%",
+      "gstHint": "问诊为 0%，其余为 18% — 直到您选择税率"
+    },
+    "offerTill": "至 {{date}}",
+    "untitled": "未命名",
+    "save": {
+      "create": "创建服务项目",
+      "edit": "保存更改",
+      "createAnother": "创建并继续添加"
+    },
+    "toasts": {
+      "addName": "请填写名称",
+      "addPrice": "请填写价格",
+      "offerAbovePrice": "优惠价不能高于价格",
+      "floorAboveOffer": "最低价不能高于优惠价",
+      "offerBelowFloor": "低于该服务项目的最低价 — 请联系所有者或管理员",
+      "floorAbovePrice": "最低价不能高于价格",
+      "floorNeedsPermission": "您的角色无法修改最低价 — 请联系所有者或管理员"
+    }
+  },
+  "offerDrawer": {
+    "title": {
+      "create": "新建优惠",
+      "edit": "编辑优惠"
+    },
+    "sub": "一个或多个服务项目的限时价格 · 自动适用",
+    "untitled": "新建优惠",
+    "steps": {
+      "offer": "优惠",
+      "where": "适用范围",
+      "notes": "备注"
+    },
+    "fields": {
+      "name": "名称",
+      "namePlaceholder": "例如：排灯节焕彩",
+      "code": "代码",
+      "codeHint": "可选 · 用于广告",
+      "codePlaceholder": "GLOW20",
+      "type": "类型",
+      "value": {
+        "percent": "折扣",
+        "amount": "减免金额",
+        "fixed": "优惠价",
+        "extra": "赠送次数"
+      },
+      "percentQuick": "{{value}}%",
+      "sessionsUnit": "次",
+      "colour": "颜色",
+      "colourHint": "在服务项目和账单上标记此优惠",
+      "offerings": "服务项目",
+      "offeringsHint": "选择一个或多个",
+      "offeringsSearch": "搜索服务项目",
+      "branches": "分院",
+      "branchesHint": "前台可使用的分院",
+      "starts": "开始",
+      "ends": "结束",
+      "previewPrice": "{{before}} → {{after}}",
+      "previewSessions_other": "{{before}} → {{count}} 次",
+      "note": "备注",
+      "notePlaceholder": "适用人群，以及前台如何介绍",
+      "status": "状态",
+      "live": "生效中 · 自动适用",
+      "paused": "已暂停"
+    },
+    "offeringCount_other": "{{count}} 个服务项目",
+    "save": {
+      "create": "创建优惠",
+      "edit": "保存优惠"
+    },
+    "toasts": {
+      "name": "请为优惠命名",
+      "offerings": "请至少选择一个服务项目",
+      "value": {
+        "percent": "请设置折扣",
+        "amount": "请设置金额",
+        "fixed": "请设置金额",
+        "extra": "请设置赠送次数"
+      },
+      "endsBeforeStart": "结束日期早于开始日期",
+      "offeringInactive": "{{name}} 已停用 — 请移除或选择其他服务项目"
+    }
+  }
+}

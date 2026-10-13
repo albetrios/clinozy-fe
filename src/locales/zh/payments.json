@@ -1,0 +1,452 @@
+{
+  "manifest": {
+    "title": "付款"
+  },
+  "tabs": {
+    "label": "付款分区",
+    "ledger": "付款",
+    "pending": "待处理"
+  },
+  "search": {
+    "placeholder": "患者、发票或收据",
+    "label": "搜索付款"
+  },
+  "toolbar": {
+    "dayClose": "日结",
+    "pay": "付款",
+    "payTitle": "付款 · 支出(租金、物资、供应商、退款)",
+    "receive": "收款",
+    "receiveTitle": "收款 · 来自患者的收入",
+    "addPending": "添加待处理",
+    "give": "应付",
+    "giveSub": "我们退款给患者或对方",
+    "take": "应收",
+    "takeSub": "患者或对方付款给我们"
+  },
+  "columns": {
+    "ref": "编号",
+    "what": "类型",
+    "when": "时间",
+    "party": "来源 / 去向",
+    "mode": "方式",
+    "amount": "金额",
+    "by": "经手人",
+    "who": "对象",
+    "way": "方向",
+    "why": "原因",
+    "since": "起始",
+    "state": "状态"
+  },
+  "filters": {
+    "show": "显示",
+    "all": "全部"
+  },
+  "directions": {
+    "received": "已收",
+    "paid": "已付"
+  },
+  "kinds": {
+    "receipt": "已收",
+    "refund": "退款给患者",
+    "expense": "已付",
+    "money_back": "退回款",
+    "reversal": "冲销"
+  },
+  "ledger": {
+    "records": "记录",
+    "edited_other": "已编辑 {{count}} 次 · 最近 {{from}} → {{to}}",
+    "editSide": "{{amount}} {{modes}}",
+    "received": "+ {{amount}}",
+    "paid": "− {{amount}}",
+    "sub": {
+      "invoice": "发票 #{{seq}}",
+      "sale": "销售 · 发票 #{{seq}}",
+      "refund": "退款 · 贷项通知单",
+      "refundNote": "退款 · 贷项通知单 {{note}}",
+      "refundFor": "对应发票 #{{seq}}",
+      "moneyBack": "退回款",
+      "medicalBill": "药房采购单 #{{seq}} · 账单 {{bill}}",
+      "stockBill": "库存采购单 #{{seq}} · 账单 {{bill}}",
+      "fromCredit": "来自 {{ref}}",
+      "reversed": "已冲销",
+      "medicalOrder": "药品采购单 #{{seq}}",
+      "stockPurchase": "库存采购单 #{{seq}}"
+    },
+    "dayClosed": "{{ref}} · 当日已结",
+    "dayClosedEdited_other": "{{ref}} · 当日已结 · 已编辑 {{count}} 次",
+    "creditEntry": "{{ref}} · 来自 {{credit}}",
+    "fixedEntry": "{{ref}} · 金额不能修改 · 如需撤销,请在当日删除",
+    "search": "患者、收款方或 PAY- 编号",
+    "count_other": "{{count}} 条记录"
+  },
+  "rowActions": {
+    "edit": "编辑",
+    "delete": "删除",
+    "giveBack": "退还",
+    "gotBack": "已收回",
+    "useOnBill": "抵扣下一张账单",
+    "reverse": "冲销"
+  },
+  "bulk": {
+    "export": "导出",
+    "exported_other": "已将 {{count}} 行导出为 CSV"
+  },
+  "empty": {
+    "ledgerTitle": "没有匹配的记录",
+    "pendingTitle": "没有待处理项",
+    "description": "这里还没有内容。试试其他标签页或搜索。",
+    "receive": "收款"
+  },
+  "deleteEntry": {
+    "title": "删除这笔付款?",
+    "effect": "日结前可以删除。删除记录会保留在审计日志中。",
+    "effectInvoice": "日结前可以删除。发票 #{{seq}} 将恢复为应付 {{due}}。删除记录会保留在审计日志中。",
+    "reasons": {
+      "twice": "重复录入",
+      "amount": "金额错误",
+      "party": "患者或收款方错误"
+    },
+    "removed": "已删除 {{ref}}",
+    "removedInvoice": "已删除 {{ref}} · 发票余额已恢复",
+    "blocked": {
+      "dayClosed": "{{ref}} · 当日已结 · 请改为冲销",
+      "moreThanPaid": "{{ref}} · 这笔钱已被退款退回 · 请先删除退款"
+    }
+  },
+  "dialog": {
+    "record": "付款",
+    "credit": "待处理项",
+    "dayClosed": "当日已结账 · 无法保存"
+  },
+  "pending": {
+    "records": "待处理项",
+    "patient": "患者",
+    "party": "供应商 / 对方",
+    "ways": {
+      "give": "应付",
+      "take": "应收"
+    },
+    "wayTitles": {
+      "give": "我们退款给对方",
+      "take": "对方付款给我们"
+    },
+    "states": {
+      "open": "未结",
+      "given_back": "已退还",
+      "got_back": "已收回",
+      "used": "已抵扣"
+    },
+    "settledToday": "{{state}} · 今天",
+    "adjusted": "已抵扣 {{amount}}",
+    "invoice": "发票 #{{seq}}",
+    "byHand": "手动",
+    "deleteTitle": "删除这条待处理项?",
+    "deleted": "已删除 {{ref}}",
+    "reasons": {
+      "charged_twice": "重复收费",
+      "advance_not_used": "预付款未使用",
+      "package_cancelled": "套餐取消",
+      "overpaid": "多付",
+      "returned_items": "退回物品",
+      "short_payment": "少付",
+      "damaged_goods": "退回损坏货物",
+      "advance_given": "已付预付款",
+      "loan_to_staff": "借给员工",
+      "other": "其他"
+    },
+    "adjustedOn": "{{ref}} 的 {{amount}} 已抵扣发票 #{{seq}}",
+    "nothingDue": "{{name}} 没有可抵扣的欠款",
+    "search": "人员、供应商或 CR-",
+    "fromEntry": "来自一笔流水",
+    "forInvoice": "针对一张发票",
+    "settledLocked": "{{ref}} · 已结清 {{amount}} · 现在无法更改",
+    "conflicts": {
+      "settled": "{{ref}} 已部分结清 · 无法更改或删除",
+      "closed": "{{ref}} 已结清",
+      "dayClosed": "发票 #{{seq}} 所在分店今日已结账 · 请重新开账后再抵扣",
+      "dueChanged": "发票 #{{seq}} 的欠款已变化 · 请重试"
+    }
+  },
+  "receive": {
+    "title": "收款",
+    "titleEdit": "编辑收款",
+    "sub": "收据将排队通过 WhatsApp 发给患者",
+    "subEdit": "结账前可修改 · 每次更改都会记录",
+    "section": "付款人",
+    "branch": "分店",
+    "invoice": "对应发票",
+    "invoiceOpen_other": "{{count}} 张未结",
+    "invoiceChip": "{{id}} · {{due}}",
+    "pickPatientFirst": "请先选择患者",
+    "nothingDue": "无欠款",
+    "amount": "收款金额",
+    "split": "拆分 · 添加方式",
+    "total": "合计 {{total}}",
+    "totalDue": "合计 {{total}} · 欠款 {{due}}",
+    "reference": "参考号",
+    "referenceHint": "UPI 参考号 / 卡号后4位",
+    "referencePlaceholder": "例如 4321",
+    "note": "备注",
+    "notePlaceholder": "选填",
+    "quickFill": {
+      "full": "全额 · {{amount}}",
+      "half": "一半 · {{amount}}",
+      "cashUpi": "现金 + UPI"
+    },
+    "save": "记录 {{amount}}",
+    "saveEdit": "保存 {{amount}}",
+    "summary": "{{modes}} · {{amount}}",
+    "received": "已向 {{name}} 收款 {{amount}}",
+    "updated": "{{ref}} 已更新 · 已记录更改",
+    "enterAmount": "请输入金额",
+    "pickPatient": "请选择患者",
+    "aboveDue": "超过欠款 {{due}}",
+    "moreThanDue": "超过发票当前的应付金额 · 其间已有付款",
+    "totalAdvance": "合计 {{total}} · 预付款",
+    "advance": "预付款 · 无发票",
+    "invoicesFailed": "无法加载未结发票"
+  },
+  "send": {
+    "title": "付款",
+    "titleEdit": "编辑付款",
+    "sub": "诊所支出 · 显示在当日结账中",
+    "steps": {
+      "bill": "支付账单",
+      "expense": "支出",
+      "payment": "付款"
+    },
+    "bill": "供应商账单",
+    "billHint_other": "{{count}} 张未结 · 搜索采购单号、供应商或账单号",
+    "billPlaceholder": "搜索采购单号、供应商或账单号",
+    "otherSpend": "其他支出",
+    "otherSpendSub": "不对应采购单",
+    "groups": {
+      "other": "其他",
+      "medical": "药房采购单",
+      "stock": "诊所库存采购单"
+    },
+    "billLabel": {
+      "medical": "药房采购单 #{{seq}} · {{supplier}}",
+      "stock": "库存采购单 #{{seq}} · {{supplier}}"
+    },
+    "billRef": {
+      "medical": "药房采购单 #{{seq}}",
+      "stock": "库存采购单 #{{seq}}"
+    },
+    "billNo": "账单 {{bill}}",
+    "daysPending_other": "已待付 {{count}} 天",
+    "pendingToday": "今天",
+    "oldest": "待付最久",
+    "oldestChip": "#{{seq}} · {{supplier}} · {{due}} · {{age}}",
+    "category": "类别",
+    "paidTo": "收款方",
+    "paidToPlaceholder": "供应商或个人",
+    "note": "备注",
+    "notePlaceholder": "购买了什么",
+    "amount": "金额",
+    "date": "日期",
+    "mode": "方式",
+    "files": "账单 / 收据",
+    "filesDrop": "拖入账单照片或浏览",
+    "filesHint": "选填 · JPG、PNG 或 PDF",
+    "filesRemove": "移除 {{name}}",
+    "electricity": "电费",
+    "presets": {
+      "tea": "茶点",
+      "courier": "快递"
+    },
+    "save": "添加支出",
+    "saveEdit": "保存更改",
+    "another": "添加并继续",
+    "added": "已添加支出 {{ref}}",
+    "paidBill": "已为 {{bill}} 支付 {{amount}}",
+    "saved": "{{ref}} 已保存 · 已记录更改",
+    "missing": "请填写收款方和金额",
+    "moreThanDue": "超过账单当前的应付金额 · 其间已有付款",
+    "billsFailed": "无法加载未付账单"
+  },
+  "credit": {
+    "title": "添加待处理",
+    "titleEdit": "编辑待处理",
+    "sub": "诊所需要退还或收回的钱 · 稍后在待处理中结清",
+    "subEdit": "未结期间可编辑 · 更改会被记录",
+    "steps": {
+      "way": "方向",
+      "why": "原因"
+    },
+    "way": "方向",
+    "who": "对象",
+    "whoPlaceholder": "搜索患者、联系人或供应商",
+    "add": "添加",
+    "groups": {
+      "patients": "患者",
+      "contacts": "联系人",
+      "suppliers": "供应商和商家"
+    },
+    "parties": {
+      "patient": "患者 · {{id}}",
+      "contact": "联系人",
+      "contactPhone": "联系人 · {{phone}}",
+      "vendor": "诊所供应商",
+      "supplier": "药品供应商"
+    },
+    "amount": "金额",
+    "reason": "原因",
+    "invoice": "对应发票",
+    "invoiceHint": "可选 · 将此款项关联到账单",
+    "noInvoice": "无发票",
+    "invoicePaid": "{{bill}} · 已付清",
+    "invoiceDue": "{{bill}} · 欠款 {{due}}",
+    "settleBy": "结清期限",
+    "note": "备注",
+    "notePlaceholder": {
+      "give": "例如：退回同一个 UPI 账号",
+      "take": "例如：供应商会在下张账单中抵扣"
+    },
+    "problems": {
+      "who": "请选择对象",
+      "amount": "请输入金额",
+      "reason": "请选择原因",
+      "otherNote": "选择“其他”时请添加备注"
+    },
+    "save": {
+      "give": "保存 · 稍后支付",
+      "take": "保存 · 稍后收取"
+    },
+    "saveEdit": "保存更改",
+    "summary": {
+      "give": "退还 {{amount}} 给 {{name}}",
+      "take": "向 {{name}} 收取 {{amount}}"
+    },
+    "saved": {
+      "give": "{{ref}} 已保存 · 应付 {{name}} {{amount}}",
+      "take": "{{ref}} 已保存 · 应收 {{name}} {{amount}}"
+    },
+    "updated": "{{ref}} 已更新"
+  },
+  "dayClose": {
+    "title": "日结",
+    "day": "日期",
+    "status": {
+      "open": "未结",
+      "openAuto_other": "未结 · {{count}} 小时后自动结算",
+      "closedBy": "由 {{name}} 结算",
+      "closed": "已结",
+      "forceClosed": "强制结算"
+    },
+    "entries_other": "{{day}} 共 {{count}} 笔",
+    "openDay_other": "{{day}} 未结 · 剩 {{count}} 小时 · 查看",
+    "openDayTitle": "核对记录后结算 · 时间到后会自动结算",
+    "previous": "以往日结",
+    "previousCash": "现金 {{amount}}",
+    "previousAuto": "自动结算",
+    "previousTitle": "查看 {{day}}",
+    "closeDay": "结算当天",
+    "countFirst": "请先清点现金",
+    "closed": "当天已结算",
+    "reopened": "当天已重新打开",
+    "gate": {
+      "title": "期初现金 · {{day}}",
+      "sources": {
+        "carried": "结转自 {{day}} 日结",
+        "recounted": "已重新清点",
+        "first": "没有更早的日结 · 无可结转"
+      },
+      "recount": "重新清点",
+      "recountLabel": "重新清点期初现金",
+      "recountTitle": "不一致时请重新清点",
+      "accept": "确认 {{amount}}",
+      "acceptRecount": "确认重新清点",
+      "starting": "您以 {{name}} 的身份开始今天 · 这会记录在当天",
+      "accepted": "已确认期初现金 {{amount}} · 记录于 {{time}}"
+    },
+    "strip": {
+      "opening": "期初现金",
+      "acceptedBy": "{{name}} 已确认 · {{time}}",
+      "cashInOut": "现金 收 · 支",
+      "cashIn": "+{{amount}}",
+      "cashOut": "−{{amount}}",
+      "expected": "钱箱应有 {{amount}}",
+      "counted": "当前清点",
+      "countPlaceholder": "清点钱箱",
+      "countLabel": "清点的现金",
+      "netByMode": "按方式净额",
+      "staffTitle_other": "{{name}} · {{count}} 笔 · {{amount}}",
+      "staffOther": "非团队成员",
+      "reason": "清点为何不符？",
+      "reasonPlaceholder": "发生了什么 · 例如：从钱箱找零 ₹20",
+      "reasonFirst": "请先说明清点为何不符"
+    },
+    "report": {
+      "title": "{{day}} 已结算",
+      "closedBy": "由 {{name}} 结算 · {{time}}",
+      "autoClosed": "{{time}} 结算 · 宽限期后自动结算",
+      "reopen": "重新打开",
+      "acceptedBy": "{{name}} 已确认",
+      "takenAsExpected": "按应有金额计",
+      "received_other": "收款 {{count}} 笔",
+      "paid_other": "支出 {{count}} 笔",
+      "cashCounted": "清点现金",
+      "expected": "应有 {{amount}}",
+      "difference": "差额",
+      "matched": "钱箱相符",
+      "extra": "钱箱多出",
+      "short": "钱箱短少",
+      "log": "经过",
+      "logAccepted": "{{name}} 确认了期初现金 {{amount}}",
+      "logRecounted": "{{name}} 确认了期初现金 {{amount}}（重新清点）",
+      "logMatched": "钱箱清点 {{amount}} · 相符",
+      "logExtra": "钱箱清点 {{amount}} · 多出 {{diff}}",
+      "logShort": "钱箱清点 {{amount}} · 短少 {{diff}}",
+      "logClosed": "{{name}} 已结算当天",
+      "logAuto": "宽限期后自动结算 · 现金按应有金额计",
+      "openedAuto": "自动打开",
+      "notCounted": "未清点",
+      "logOpened": "{{name}} 打开了当天",
+      "logReopened": "{{name}} 重新打开了当天 · {{reason}}",
+      "logReason": "“{{reason}}”",
+      "someone": "某人"
+    },
+    "review": {
+      "title": "逐笔核对",
+      "none": "没有记录",
+      "empty": "这天没有记录",
+      "states": {
+        "canEdit": "可编辑",
+        "canEditTitle": "当天结算前可编辑或删除",
+        "dayClosed": "当天已结",
+        "dayClosedTitle": "当天已结算 · 记录不能更改",
+        "fromCredit": "来自 {{credit}}"
+      },
+      "count_other": "{{count}} 笔"
+    },
+    "previousNone": "这天之前没有日结",
+    "refusals": {
+      "alreadyOpened": "其他人已在此期间打开这一天 · 现已显示",
+      "alreadyClosed": "其他人已在此期间结算这一天 · 现已显示",
+      "alreadyOpen": "这一天已重新打开 · 现已显示"
+    },
+    "reopen": {
+      "title": "重新打开这一天？",
+      "effect": "清点将被清除，在再次结算前可以修改当天的记录。",
+      "action": "重新打开当天",
+      "record": "{{branch}} · {{day}}",
+      "reasons": {
+        "miscounted": "清点有误",
+        "missed": "漏记了一笔",
+        "wrongEntry": "有一笔记录有误"
+      }
+    }
+  },
+  "reverseEntry": {
+    "title": "冲销这笔付款?",
+    "effect": "当日已结,原记录保持不变。一笔同额的冲销会记入其分店今天的账本,原先支付的款项随之退回。两条记录都会保留。",
+    "action": "冲销",
+    "reversed": "已冲销 {{ref}} · {{reversal}}",
+    "blocked": {
+      "alreadyReversed": "{{ref}} 已被冲销",
+      "dayOpen": "{{ref}} 所在日期已重新打开 · 请改为删除",
+      "dayClosed": "{{ref}} 所在分店今天已结 · 请重新打开后再冲销"
+    }
+  }
+}

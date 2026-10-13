@@ -1,0 +1,187 @@
+{
+  "manifest": {
+    "title": "潜在客户"
+  },
+  "record": "潜在客户",
+  "toasts": {
+    "created": "已创建潜在客户 {{id}}",
+    "saved": "潜在客户已保存",
+    "statusChanged": "{{name}} → {{status}}",
+    "claimed": "你现在负责 {{name}} · {{owner}} 仍参与其中",
+    "claimedUnowned": "你现在负责 {{name}}",
+    "released": "已释放给团队 · 任何人都可以认领",
+    "assigned": "{{name}} 现在是负责人 · 已通知"
+  },
+  "list": {
+    "records": "潜在客户",
+    "views": {
+      "label": "潜在客户视图",
+      "mine": "我的",
+      "unreplied": "未回复",
+      "all": "全部",
+      "unrepliedCount_other": "{{count}} 个未回复"
+    },
+    "search": {
+      "placeholder": "搜索姓名、电话、#ID",
+      "label": "搜索潜在客户"
+    },
+    "newLead": "新建潜在客户",
+    "columns": {
+      "lead": "潜在客户",
+      "status": "状态",
+      "source": "来源",
+      "interests": "感兴趣",
+      "team": "团队",
+      "updated": "更新时间"
+    },
+    "empty": "没有匹配的潜在客户",
+    "clearFilters": "清除筛选",
+    "moreInterests_other": "另外 {{count}} 项：{{list}}"
+  },
+  "team": {
+    "claim": "开放 · 认领",
+    "openHint": "无人认领 · 任何人都可认领",
+    "openMine": "向团队开放",
+    "openMineHint": "你的保留期已结束 · 任何人都可认领",
+    "releasesToday": "今天 {{time}} 交回团队",
+    "releasesTomorrow": "明天 {{time}} 交回团队",
+    "claimFirst": "认领 {{first}}",
+    "takeOver": "从 {{first}} 接手"
+  },
+  "filters": {
+    "status": "状态",
+    "source": "来源 · 可多选",
+    "clear": "清除",
+    "hold": {
+      "label": "归属 · 认领后保留",
+      "any": "不限",
+      "open": "可认领",
+      "soon": "今天释放",
+      "held": "保留中"
+    },
+    "team": {
+      "label": "团队 · 负责或参与",
+      "anyone": "团队中任何人",
+      "count_other": "{{count}} 人",
+      "search": "搜索团队",
+      "noMatch": "无匹配"
+    }
+  },
+  "drawer": {
+    "title": "编辑线索",
+    "sub": "完成修改后，保存线索",
+    "idTooltip": "线索 #{{seq}} · 创建于 {{created}} · 点击复制",
+    "idAria": "复制线索 ID #{{seq}}",
+    "idCopied": "已复制线索 ID #{{seq}}",
+    "retarget": "再营销",
+    "panels": "线索面板",
+    "details": "详情",
+    "chat": "聊天",
+    "resize": "调整面板大小",
+    "resizeHint": "拖动调整大小 · 双击重置",
+    "cards": {
+      "details": "线索详情",
+      "progress": "进度",
+      "info": "信息"
+    },
+    "source": "来源",
+    "interests": "感兴趣的项目",
+    "people": "负责人与参与者",
+    "peopleAria": "负责人与参与者",
+    "addInvolved": "+ 添加参与者",
+    "claim": "认领",
+    "release": "释放",
+    "releaseHint": "让团队中的任何人都可以接手",
+    "progressAria": "线索进度",
+    "steps": {
+      "done": "已完成",
+      "current": "当前",
+      "next": "下一步"
+    },
+    "stepTips": {
+      "done": "{{status}} · 已完成",
+      "current": "{{status}} · 当前步骤",
+      "next": "移至{{status}}",
+      "byCheckIn": "已到诊 · 签到时设置"
+    },
+    "closeAs": "关闭为",
+    "info": {
+      "created": "创建时间",
+      "lastActivity": "最近动态",
+      "none": "暂无",
+      "patient": "患者",
+      "linked": "已关联",
+      "notYet": "尚未",
+      "openTasks": "待办任务",
+      "retargetReason": "再营销原因"
+    },
+    "footer": {
+      "remove": "移除线索",
+      "discard": "放弃",
+      "save": "保存线索"
+    },
+    "popover": {
+      "title": "此线索的相关人员",
+      "search": "搜索团队",
+      "assignedTo": "负责人 · 当前处理此线索的人",
+      "assign": "指派",
+      "assigned": "已指派",
+      "currentlyAssigned": "当前负责人",
+      "assignTo": "指派给{{name}}",
+      "involved": "参与者 · 处理过此线索",
+      "noMatch": "无匹配结果",
+      "note": "✓ 参与者 = 处理过此线索的所有人。回复、通话、记录或预约时会自动加入 · 你也可以手动添加"
+    },
+    "remove": {
+      "title": "移除此线索？",
+      "effect": "该线索会从所有列表和负责人的队列中移除。聊天记录会保留。之后可立即在提示中撤销。",
+      "reasons": {
+        "duplicate": "重复",
+        "testEntry": "测试条目",
+        "spam": "垃圾信息",
+        "other": "其他"
+      },
+      "removed": "已移除线索 #{{seq}} · {{reason}}"
+    }
+  },
+  "newLead": {
+    "title": "新线索",
+    "sub": "有姓名和手机号即可开始",
+    "contact": "联系人",
+    "search": "按姓名或手机号搜索",
+    "searchAria": "搜索已有患者或联系人",
+    "quickStart": "快速开始",
+    "presets": {
+      "walkIn": "到店咨询",
+      "instagramDm": "Instagram 私信"
+    },
+    "presetHints": {
+      "walkIn": "正在前台 · 来源到店咨询",
+      "instagramDm": "Instagram 私信"
+    },
+    "hits": {
+      "patient": "患者 · {{id}} · {{phone}}",
+      "contact": "{{id}} · {{phone}}",
+      "openLead": "进行中的线索 · {{id}} · {{phone}}",
+      "open": "打开线索",
+      "recreate": "重新创建线索",
+      "useContact": "使用联系人"
+    },
+    "noMatch": "没有匹配项",
+    "more_other": " · 另 +{{count}}",
+    "change": "更换",
+    "changeTitle": "选择其他联系人",
+    "afterContact": "先填联系人",
+    "detailsSummary": "来源、意向和负责人",
+    "footer": "创建或更新一个联系人",
+    "create": "创建线索",
+    "toasts": {
+      "pickFirst": "请先选择或添加联系人",
+      "presetApplied": "已应用“{{preset}}”预设",
+      "existingPatient": "已有患者 {{id}} · 新线索将与其关联",
+      "existingContact": "使用已有联系人 {{name}}",
+      "missing": "请填写姓名和 10 位手机号",
+      "open": "打开"
+    }
+  }
+}

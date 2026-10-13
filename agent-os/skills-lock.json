@@ -5,7 +5,7 @@
       "source": "freshtechbro/claudedesignskills",
       "sourceType": "github",
       "skillPath": "agent-os/skills/animejs/SKILL.md",
-      "computedHash": "6d6b103e6043181c752ca2448983626a635642ee2165497b34ddd66e1ec08009"
+      "computedHash": "70f054066e078d4003c695dc1a0cbd1caebacc1e894b9ff09b7acf7d0ee31cd6"
     },
     "emil-design-eng": {
       "source": "emilkowalski/skill",
@@ -41,7 +41,7 @@
       "source": "shadcn/ui",
       "sourceType": "github",
       "skillPath": "agent-os/skills/shadcn/SKILL.md",
-      "computedHash": "70161c4f8ef148e00f8185ea33a5152d3739596cdeee1d17fced6a72d9d123db"
+      "computedHash": "970ee5c9f6ca4badaf62c8894b8c9780f1c9c8677b55eb08bc6fd59c4bfe32e1"
     },
     "systematic-debugging": {
       "source": "obra/superpowers",

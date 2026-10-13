@@ -80,9 +80,35 @@ export function useRevokeApiKey() {
 }
 ```
 
-Rollback snapshots **every matched variant**, not just one. The two configs are not
+Rollback snapshots **every matched variant**, not just one. The configs are not
 combined: `optimisticInfinite` is checked first, so a hook that sets both never
 reaches the single-key path.
+
+## The `optimisticQueries` API — one record shown in several shapes
+
+Some records are cached in more than one shape at once: an appointment sits in the
+Agenda's pages (`data.pages[].rows`), in a calendar range (a plain array) and in its
+own drawer (one record). `optimisticQueries` patches **every** cached query under a
+prefix, whatever it holds — `update` maps one cached value and returns it unchanged
+when there is nothing to patch (a day count, a slot list). Every match is snapshotted
+and restored on error, like `optimisticInfinite`; it is checked after it and before
+the single-key path, so pass one optimistic config per hook.
+
+```ts
+export function useMoveAppointment() {
+  return useAppMutation({
+    mutationFn: ({ appointment, route }, action) =>
+      moveAppointment({ appointmentId: appointment.id, route, ...action }),
+    invalidateKeys: APPOINTMENT_WRITE_KEYS,
+    optimisticQueries: {
+      queryKey: [...appointmentQueryKeys.all, organizationId],
+      // (oneCachedValue, vars) => nextValue — pages, lists and the record alike
+      update: (data, { appointment, route }) =>
+        withAppointmentStatus(data, appointment.id, MOVE_STATUSES[route]),
+    },
+  });
+}
+```
 
 ## Single-flight: one write per set of variables
 
@@ -164,20 +190,42 @@ sequence on one toast id, and takes the confirmation copy as `committedMessage`)
 nothing is awaited, the toast reports success before the request lands, and a rejection
 can never reach the rollback.
 
+## Delete with a reason, Undo through restore — the clinic rooms
+
+The clinic contract soft-deletes **at once** and restores on Undo
+(`DELETE /<resource>/:id` with `{ reason, note }`, then `POST …/restore` within 10s —
+`schema-routes.md:1546`), so it does not use `useDeferredRowRemoval`. Its confirm is
+[`ConfirmDialog`](../../src/shared/components/ConfirmDialog) with `reason`: an end panel
+from `md`, a bottom sheet below, the `delete_reason` chips and a note ("Other" needs
+one). `onConfirm({ reason, note })` runs the delete — optimistic, so the row hides at
+once — and must return its promise: a 422 on the reason or note shows at the field and
+the confirm stays open. Given `reason.undo`, a confirmed delete raises
+`notify.undo("<name> removed", { onUndo })` — "Undo" for `UNDO_TOAST_DURATION_MS`
+(10s) — and `onUndo` runs the restore. A reason the schema lacks (Leads' "Spam") is
+stored as `other` with its label leading the note.
+
 ## Current inventory (snapshot — 2026-09-24)
 
 **Optimistic** (instant, auto-rollback) — all safe removals + field-patches:
 
-| Domain        | Mutation                                                          | Mode                             |
-| ------------- | ----------------------------------------------------------------- | -------------------------------- |
-| Roles         | `useUpdateRole`, `useDeleteRole`                                  | `optimisticInfinite`             |
-| API keys      | `useRenameApiKey`, `useRevokeApiKey`                              | `optimisticInfinite`             |
-| Members       | `useUpdateMemberRole`, `useUpdateMemberStatus`, `useRemoveMember` | `optimisticInfinite`             |
-| Invitations   | `useRevokeInvitation` (patches the members list)                  | `optimisticInfinite`             |
-| Sessions      | `useRevokeSession`                                                | `optimistic`                     |
-| Passkeys      | `useRemovePasskey`                                                | `optimistic`                     |
-| Webhooks      | `useDeleteWebhook`                                                | `optimistic`                     |
-| Notifications | `useMarkNotificationRead`                                         | hand-rolled on raw `useMutation` |
+| Domain        | Mutation                                                                                   | Mode                             |
+| ------------- | ------------------------------------------------------------------------------------------ | -------------------------------- |
+| Roles         | `useUpdateRole`, `useDeleteRole`                                                           | `optimisticInfinite`             |
+| API keys      | `useRenameApiKey`, `useRevokeApiKey`                                                       | `optimisticInfinite`             |
+| Members       | `useUpdateMember`, `useRemoveMember`                                                       | `optimisticInfinite`             |
+| Invitations   | `useRevokeInvitation` (patches the members list)                                           | `optimisticInfinite`             |
+| Sessions      | `useRevokeSession`                                                                         | `optimistic`                     |
+| Passkeys      | `useRemovePasskey`                                                                         | `optimistic`                     |
+| Webhooks      | `useDeleteWebhook`                                                                         | `optimistic`                     |
+| Offerings     | `useDeleteOffering`                                                                        | `optimistic`                     |
+| Leads         | `useDeleteLead` (every cached list page at once)                                           | `optimisticInfinite`             |
+| Offers        | `useSetOfferActive`, `useDeleteOffer`                                                      | `optimistic`                     |
+| Clinic stock  | `useDeleteStockItem`, `useDeleteStockPurchase`, `useDeleteStockVendor` (each list's pages) | `optimisticInfinite`             |
+| Appointments  | `useMoveAppointment` (Agenda, calendars and drawer at once)                                | `optimisticQueries`              |
+| Tasks         | `useTaskOutcome`, `useSnoozeTask`, `useDeleteTask` (every cached list's pages at once)     | `optimisticInfinite`             |
+| Task rules    | `useSaveTaskRuleSettings` (the Rules popover's switches)                                   | `optimistic`                     |
+| Payments      | `useDeletePayment`, `useDeleteCredit` (every cached ledger or Pending page at once)        | `optimisticInfinite`             |
+| Notifications | `useMarkNotificationRead`                                                                  | hand-rolled on raw `useMutation` |
 
 The cursor-paginated panels (members, roles, API keys) are `optimisticInfinite`; the
 single-key lists are `optimistic`. `useMarkNotificationRead` is the one write that does
@@ -189,20 +237,26 @@ behind the undo toast by their panels (see above), which is why all three take a
 
 **Non-optimistic** (must show in-progress) — creates + shapes we can't safely patch:
 
-- **Creates:** `useInviteMember`, `useCreateRole`, `useCreateApiKey`, `useCreateWebhook`, `useRegisterPasskey`
+- **Creates:** `useInviteMember`, `useCreateRole`, `useCreateApiKey`, `useCreateWebhook`, `useRegisterPasskey`, `useCreateOffering`, `useCreateOffer`, `useCreateLead`, `useCreateAppointment`, `useCopyAppointment`, `useCreateContact` (a new person before their booking)
+- **Clinic saves and restores:** `useUpdateOffering`, `useUpdateOffer`, `useUpdateLead`, `useUpdateAppointment` (the drawer shows "Saving…"; sends `expected_updated_at`), `useRestoreOffering`, `useRestoreOffer`, `useRestoreLead` (the Undo of the Reason confirm's "removed" toast — the row returns with the refetch), `useReinstateAppointment` (a cancelled booking back to Scheduled, `POST …/reinstate`)
+- **Appointment status:** one route per move (`useMoveAppointment`, optimistic) and `useCancelAppointment` (not optimistic); clinozy-be has a way back for two of them, so only their toasts carry Undo — a check-in's runs `undo-check-in`, a cancel's `reinstate`
+- **Lead ownership:** `useClaimLead`, `useAssignLead`, `useReleaseLead`, `useSetLeadInvolved` — clinozy-be has no undo for a claim, an assign or a release, so their toasts carry none, and neither does a status save's "<name> → <status>" (`useUpdateLead`)
+- **Contacts:** `useUpdateContact` (the lead drawer's Edit contact; sends `expected_updated_at`, a `409 record_changed` offers Reload)
+- **Tasks:** `useCreateTask` (New task, What's next), `useReassignTask` (a lead's task moves its lead too), `useRestoreTask` (the Undo of a deleted task's toast) — clinozy-be has no way back for an outcome, a snooze or a reassign, so their toasts carry no Undo (Q7); an outcome, a booking write and a floor check-in read the tasks again once the server's rules have run (`useRefreshTasksAfterRules`, D81 T7)
+- **Payments and invoices:** `useReceivePayment`, `usePayExpense`, `useCreateInvoice`, `useCreateCredit` (creates); `useUpdatePayment`, `useUpdateInvoice`, `useUpdateCredit` (send `expected_updated_at`; a `409 record_changed` offers Reload); `useDeleteInvoice` (the drawer's Reason confirm) and `useRestorePayment`, `useRestoreInvoice`, `useRestoreCredit` (the Undo of a deleted row's toast); `useReversePayment` (a closed day's entry — answers the `reversal`), `useSettleCredit` (Give back, Got it back, Use on a bill), and Day close's `useAcceptOpeningCash`, `useCloseDay`, `useReopenDay` — clinozy-be has no way back for a reverse, a settlement or a day's close, so their toasts carry no Undo. Medical's fixture ledger keeps its own `useFixtureDeletePayment` / `useFixtureRestorePayment` until Medical moves
 - `useResendInvitation` (clinozy-be sets the new expiry), `useMarkAllNotificationsRead`, `useUpdateNotificationPreferences`, `useUpdateOrganization`, billing/MFA
 
 > **Invitations ride on memberships.** clinozy-be has no invitation list: an invite is
 > created as an `INVITED` membership (`POST .../memberships`), so `useInviteMember` (a
 > create — hence non-optimistic) refreshes the members list, and each invited row
 > carries its live invitation (`invitation: { id, expires_at }`). Resend and cancel act
-> on that id: `useResendInvitation` (`POST .../invitations/:id/resend`) and
-> `useRevokeInvitation` (`DELETE .../invitations/:id`, which revokes the invitation
-> **and** removes the invited membership). Cancel no longer goes through
-> `useRemoveMember` — deleting the membership alone left the invitation unrevoked, so
-> the invitee's link answered "not found" instead of "revoked". `useRemoveMember` stays
-> the fallback for a caller holding `membership:manage` but not `invitation:manage`. See
-> the docstrings in
+> on the membership: `useResendInvitation` (`POST .../memberships/:membership_id/invitation/resend`,
+> an expired invitation included) and `useRevokeInvitation`
+> (`DELETE .../memberships/:membership_id/invitation`, which revokes the invitation **and**
+> removes the invited membership). Cancel never goes through `useRemoveMember` — deleting
+> the membership alone would leave the invitation unrevoked, so the invitee's link would
+> answer "not found" instead of "revoked". Resend needs `membership:update`, cancel
+> `membership:delete`. See the docstrings in
 > [`useInvitations.ts`](../../src/shared/hooks/useInvitations/useInvitations.ts).
 >
 > The inventory drifts as hooks are added — the **policy** above is the durable

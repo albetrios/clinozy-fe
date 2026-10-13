@@ -222,12 +222,12 @@ A section may say `n/a — <reason>`; it may never be absent.
      in `public/theme-init.js`. **Recompute every contrast ratio locally** —
      never trust ratios stated in a spec; AA-failing brand colours keep their
      true value only on non-text tokens. Fonts self-hosted (CSP `font-src 'self'`).
-   - **Shell** — a **new** `AppLayout` variant (`resolve-app-shell.ts`), never an
-     overwrite; the platform-surface relocation table (relocate, never delete —
-     org switcher, ⌘K, notifications, mode toggle, user menu + sign-out,
-     settings hash-modal entry, account shortcuts, verification banner, mobile
-     nav + trigger); and the **make-it-live** contract: default variant + shuffle
-     pinned off + not overridden by a persisted value.
+   - **Shell** — one design per surface: the new shell **replaces** the old one
+     (`AppLayoutSectionBar.tsx`) in the same change, no preview variant kept
+     beside it; and the platform-surface relocation table (relocate, never
+     delete — org switcher, branch picker, ⌘K, notifications, mode choice,
+     profile + sign-out, settings hash-modal entry, keyboard shortcuts,
+     verification notice, mobile tab bar).
    - **Stores** — any new global store with its exact scope and default.
    - **Icons** — the preset's library via `@/shared/icons/index.ts` only; list
      the exports to add.

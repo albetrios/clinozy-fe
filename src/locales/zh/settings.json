@@ -42,7 +42,6 @@
       "recoveryTitle": "保存恢复代码",
       "recoveryDescription": "请妥善保管。丢失设备时每个代码只能使用一次。",
       "done": "完成",
-      "cancel": "取消",
       "verifyEnable": "验证并启用",
       "codeLabel": "输入 6 位代码",
       "codeAria": "六位验证器代码",
@@ -65,7 +64,6 @@
       "addDescription": "为其命名以便识别。设备将提示您创建通行密钥。",
       "nameLabel": "名称",
       "namePlaceholder": "MacBook Touch ID",
-      "cancel": "取消",
       "submit": "添加通行密钥"
     },
     "overview": {
@@ -106,12 +104,6 @@
       "sendFailed": "无法发送验证码，请重试。"
     }
   },
-  "discard": {
-    "title": "放弃未保存的更改？",
-    "description": "您有未保存的更改。离开将丢弃它们。",
-    "stay": "继续编辑",
-    "leave": "放弃更改"
-  },
   "dialog": {
     "title": "设置"
   },
@@ -147,7 +139,10 @@
       "cancelInviteDescription": "邮件中的链接将失效。确认后几秒内可撤销，也可以稍后重新邀请。",
       "cancelInviteConfirm": "取消邀请",
       "cancelInviteKeep": "保留邀请",
-      "cancelInvitePending": "正在取消发送给 {{email}} 的邀请…"
+      "cancelInvitePending": "正在取消发送给 {{email}} 的邀请…",
+      "movedTitle": "成员已移至“用户”",
+      "movedBody": "邀请成员、更改角色、暂停或移除成员，以及重新发送或取消邀请，都可以在“团队”中完成。",
+      "open": "打开用户"
     },
     "roles": {
       "title": "角色",
@@ -174,7 +169,10 @@
       "create": "新建角色",
       "roleFallback": "该角色",
       "permissionsLoading": "正在加载权限…",
-      "permissionsLoadFailed": "无法加载权限列表。请重试。"
+      "permissionsLoadFailed": "无法加载权限列表。请重试。",
+      "movedTitle": "角色已移至“用户”",
+      "movedBody": "在“角色与权限”中添加、重命名和删除角色，并设置每个角色能做什么——诊所各版块、用户和工作区权限。",
+      "open": "打开角色与权限"
     },
     "listSort": {
       "label": "排序方式",
@@ -225,7 +223,15 @@
       "dangerZoneDescription": "针对您账户的不可撤销操作。",
       "deleteHeading": "删除账户",
       "deleteBody": "永久删除您的账户及所有关联数据。",
-      "deleteAction": "删除账户"
+      "deleteAction": "删除账户",
+      "privacyTitle": "隐私",
+      "privacyDescription": "您对产品分析和会话录制的选择，保存在您的账户中。",
+      "analyticsLabel": "产品分析和会话录制",
+      "analyticsHint": "PostHog 分析和 Sentry 会话录制。错误报告始终运行。",
+      "consentGrantedOn": "于 {{date}} 允许",
+      "consentDeniedOn": "于 {{date}} 拒绝",
+      "consentUnanswered": "尚未回答",
+      "privacyPolicyLink": "隐私政策"
     },
     "general": {
       "namePlaceholder": "Acme Inc.",
@@ -260,6 +266,7 @@
       "apiKeysNoResults": "没有匹配的 API 密钥",
       "apiKeysNoResultsDescription": "没有与搜索匹配的 API 密钥。",
       "apiKeyFallback": "该 API 密钥",
+      "addedOn": "添加于 <1></1>",
       "createApiKey": "创建 API 密钥",
       "createApiKeyTitle": "创建一个 API 密钥",
       "createApiKeyDescription": "为密钥命名，选择它能做什么以及有效期。",
@@ -293,7 +300,6 @@
       "addWebhookDescription": "我们会将所选事件以 POST 方式发送到此 URL。",
       "payloadUrlLabel": "负载 URL",
       "eventsLabel": "事件",
-      "cancel": "取消",
       "createWebhook": "创建 Webhook",
       "creating": "创建中…",
       "deleteWebhookAria": "删除 Webhook {{url}}",
@@ -321,7 +327,6 @@
       "attemptCodeColumn": "状态码",
       "attemptWhenColumn": "时间",
       "attemptCountLabel": "第 {{count}} 次尝试",
-      "closeDialog": "关闭",
       "eventsLoadFailed": "无法加载事件列表，请重试。",
       "eventsLoading": "正在加载事件…",
       "eventsEmpty": "没有可订阅的事件。"
@@ -345,12 +350,14 @@
         "email": "邮件",
         "inApp": "应用内",
         "desktop": "桌面"
-      }
+      },
+      "kind": "通知",
+      "loadFailed": "无法加载你的通知偏好。请重试。",
+      "desktopDenied": "桌面通知需要浏览器授权。请先在浏览器设置中允许，然后再次开启此项。"
     },
     "appearance": {
       "title": "外观",
-      "description": "保存在此设备上，更改即时生效。",
-      "shuffle": "随机"
+      "description": "保存在此设备上，更改即时生效。"
     },
     "sessions": {
       "title": "会话",
@@ -402,6 +409,13 @@
         "expires": "有效期至 {{month}}/{{year}}",
         "defaultBadge": "默认"
       },
+      "paymentForm": {
+        "saveMethod": "保存付款方式",
+        "savingMethod": "保存中…",
+        "confirmPayment": "确认付款",
+        "confirmingPayment": "确认中…",
+        "cancel": "取消"
+      },
       "invoices": {
         "title": "发票",
         "description": "来自账单服务商的日期、到期日、金额和状态。",
@@ -426,8 +440,7 @@
         "confirmTitle": "取消订阅？",
         "confirmDescription": "您的工作区在 {{date}} 之前保持完整访问权限。之后订阅结束，付费功能可能受限。",
         "keep": "保留订阅",
-        "confirm": "确认取消",
-        "cancelling": "取消中…"
+        "confirm": "确认取消"
       }
     }
   }

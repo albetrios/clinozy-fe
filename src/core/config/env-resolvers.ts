@@ -78,7 +78,10 @@ export function resolveLayoutWidthForced(
   return null;
 }
 
-/** When true, theme switcher + shuffle are hidden. @internal Exported for unit tests. */
+/**
+ * When true, the deployment pins the theme mode: no surface offers Light / Dark /
+ * System. @internal Exported for unit tests.
+ */
 export function resolveThemeLock(flag: string | undefined): boolean {
   return flag === 'true';
 }

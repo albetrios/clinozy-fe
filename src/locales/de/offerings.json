@@ -1,0 +1,278 @@
+{
+  "manifest": {
+    "title": "Leistungen"
+  },
+  "offerLabels": {
+    "percentOff": "{{value}} % Rabatt",
+    "amountOff": "{{amount}} Rabatt",
+    "fixedAt": "für {{amount}}",
+    "extraSessions_one": "+{{count}} Sitzung",
+    "extraSessions_other": "+{{count}} Sitzungen"
+  },
+  "toolbar": {
+    "tabsLabel": "Leistungsbereiche",
+    "tabOfferings": "Leistungen",
+    "tabOffers": "Angebote",
+    "searchOfferings": "Name oder Suchbegriff suchen",
+    "searchOffers": "Angebote oder Codes suchen",
+    "searchLabel": "Leistungen suchen",
+    "newOffering": "Neue Leistung",
+    "newOffer": "Neues Angebot"
+  },
+  "catalogueCells": {
+    "allBranches": "Alle Filialen"
+  },
+  "deleteConfirm": {
+    "offeringTitle": "Diese Leistung löschen?",
+    "offerTitle": "Dieses Angebot löschen?"
+  },
+  "columns": {
+    "seq": "ID",
+    "name": "Leistung",
+    "category": "Kategorie",
+    "price": "Preis",
+    "offer": "Angebot",
+    "branches": "Filialen",
+    "duration": "Dauer",
+    "sessions": "Sitzungen",
+    "status": "Status",
+    "updated": "Aktualisiert"
+  },
+  "table": {
+    "records": "Leistungen"
+  },
+  "cells": {
+    "validDays_one": "{{count}} Tag gültig",
+    "validDays_other": "{{count}} Tage gültig",
+    "validFor_one": "{{count}} Tag gültig",
+    "validFor_other": "{{count}} Tage gültig",
+    "wasPrice": "statt {{price}} · {{percent}} % Rabatt",
+    "listPrice": "Listenpreis",
+    "minutes": "{{minutes}} Min.",
+    "sessions_one": "{{count}} Sitzung",
+    "sessions_other": "{{count}} Sitzungen",
+    "sessionsFree_one": "{{sessions}} + {{count}} gratis",
+    "sessionsFree_other": "{{sessions}} + {{count}} gratis",
+    "active": "Aktiv",
+    "inactive": "Inaktiv"
+  },
+  "rowActions": {
+    "edit": "Bearbeiten",
+    "delete": "Löschen"
+  },
+  "bulk": {
+    "export": "Exportieren",
+    "exported_one": "{{count}} Zeile als CSV exportiert",
+    "exported_other": "{{count}} Zeilen als CSV exportiert"
+  },
+  "empty": {
+    "title": "Noch keine Leistungen",
+    "description": "Fügen Sie Behandlungen und Pakete mit Preisen hinzu, damit sie gebucht und abgerechnet werden können.",
+    "noMatchTitle": "Keine passende Leistung",
+    "noMatchDescription": "Hier ist noch nichts. Versuchen Sie einen anderen Tab oder eine andere Suche.",
+    "newOffering": "Neue Leistung"
+  },
+  "offers": {
+    "columns": {
+      "offer": "Angebot",
+      "type": "Art",
+      "appliesTo": "Gilt für",
+      "branches": "Filialen",
+      "valid": "Gültig",
+      "status": "Status",
+      "updated": "Aktualisiert"
+    },
+    "table": {
+      "records": "Angebote"
+    },
+    "cells": {
+      "more": "+{{count}}",
+      "range": "{{start}} – {{end}}",
+      "now": "Ab sofort",
+      "noEnd": "ohne Ende",
+      "endsToday": "Endet heute",
+      "endsTomorrow": "Endet morgen",
+      "endsIn_one": "Endet in {{count}} Tag",
+      "endsIn_other": "Endet in {{count}} Tagen",
+      "startsOn": "Beginnt am {{date}}",
+      "over": "Vorbei",
+      "noOfferings": "Keine Leistungen"
+    },
+    "rowActions": {
+      "edit": "Bearbeiten",
+      "pause": "Pausieren",
+      "resume": "Fortsetzen",
+      "delete": "Löschen"
+    },
+    "bulk": {
+      "export": "Exportieren",
+      "exported_one": "{{count}} Zeile als CSV exportiert",
+      "exported_other": "{{count}} Zeilen als CSV exportiert"
+    },
+    "empty": {
+      "title": "Noch keine Angebote",
+      "description": "Hier ist noch nichts. Versuchen Sie einen anderen Tab oder eine andere Suche.",
+      "newOffer": "Neues Angebot"
+    },
+    "record": "Angebot"
+  },
+  "record": "Leistung",
+  "offeringDrawer": {
+    "title": {
+      "create": "Neue Leistung",
+      "edit": "Leistung bearbeiten"
+    },
+    "sub": "Wird in Terminen, Rechnungen und Paketen verwendet",
+    "quickFill": {
+      "single": "Einzelsitzung",
+      "pack": "6er-Paket",
+      "lhr": "Laser-10er-Paket",
+      "consultation": "Beratung"
+    },
+    "steps": {
+      "main": "Leistung, Preis & Sitzungen",
+      "timeDetails": "Dauer, Gültigkeit & Details",
+      "offersTime": "Angebote dazu, Dauer & Gültigkeit",
+      "details": "Details"
+    },
+    "groups": {
+      "offering": "Leistung",
+      "price": "Preis & Sitzungen",
+      "offers": "Angebote dazu",
+      "time": "Dauer & Gültigkeit",
+      "details": "Details"
+    },
+    "fields": {
+      "name": "Name",
+      "namePlaceholder": "z. B. Laser Gesicht komplett",
+      "category": "Kategorie",
+      "colour": "Farbe",
+      "colourHint": "gilt überall für diese Leistung",
+      "availableAt": "Verfügbar in",
+      "availableAtHint": "anderswo in Terminen und Rechnungen ausgeblendet",
+      "price": "Preis",
+      "priceHint": "Listenpreis · steht auf der Rechnung",
+      "offerPrice": "Angebotspreis",
+      "offerPriceHint": "was Sie berechnen · leer = Listenpreis",
+      "offerPriceBelow": "was Sie berechnen · {{percent}} % unter Liste",
+      "sessions": "Sitzungen",
+      "sessionsHint": "Behandlungen pro Rechnung",
+      "gstRate": "GST-Satz",
+      "gst": "GST",
+      "gstInclusive": "Inklusive",
+      "gstExclusive": "Exklusive",
+      "floor": "Mindestpreis",
+      "floorShown": "Sichtbar · nur Sie sehen ihn",
+      "floorHidden": "Ausgeblendet · zum Festlegen tippen",
+      "floorHint": "die Rezeption kann nie darunter abrechnen",
+      "billedToday": "Heute berechnet",
+      "freeSessions_one": "+{{count}} Gratissitzung",
+      "freeSessions_other": "+{{count}} Gratissitzungen",
+      "belowList": "{{percent}} % unter Liste",
+      "duration": "Dauer",
+      "durationQuick": "{{minutes}} Min.",
+      "minutesUnit": "Min.",
+      "validity": "Gültigkeit",
+      "validityHint": "0 = unbegrenzt · danach verfallen offene Sitzungen",
+      "daysUnit": "Tage",
+      "days_one": "{{count}} Tag",
+      "days_other": "{{count}} Tage",
+      "validityQuick": {
+        "none": "Keine",
+        "quarter": "3 Mon.",
+        "half": "6 Mon.",
+        "year": "1 Jahr"
+      },
+      "searchTerms": "Suchbegriffe",
+      "searchTermsHint": "durch Kommas getrennt",
+      "searchTermsPlaceholder": "Laser, Gesicht, Haarentfernung",
+      "description": "Beschreibung",
+      "descriptionPlaceholder": "Was enthalten ist",
+      "status": "Status",
+      "active": "Aktiv · buchbar",
+      "inactive": "Inaktiv · ausgeblendet",
+      "gstChip": "{{value}} %",
+      "gstHint": "0 % für eine Beratung, sonst 18 % — bis Sie einen Satz wählen"
+    },
+    "offerTill": "bis {{date}}",
+    "untitled": "Ohne Namen",
+    "save": {
+      "create": "Leistung anlegen",
+      "edit": "Änderungen speichern",
+      "createAnother": "Anlegen & weitere hinzufügen"
+    },
+    "toasts": {
+      "addName": "Geben Sie einen Namen ein",
+      "addPrice": "Geben Sie einen Preis ein",
+      "offerAbovePrice": "Der Angebotspreis darf nicht über dem Preis liegen",
+      "floorAboveOffer": "Der Mindestpreis darf nicht über dem Angebotspreis liegen",
+      "offerBelowFloor": "Unter dem Mindestpreis dieser Leistung — fragen Sie einen Inhaber oder Admin",
+      "floorAbovePrice": "Der Mindestpreis darf nicht über dem Preis liegen",
+      "floorNeedsPermission": "Ihre Rolle darf den Mindestpreis nicht ändern — fragen Sie einen Inhaber oder Admin"
+    }
+  },
+  "offerDrawer": {
+    "title": {
+      "create": "Neues Angebot",
+      "edit": "Angebot bearbeiten"
+    },
+    "sub": "Ein befristeter Preis für eine oder mehrere Leistungen · gilt von selbst",
+    "untitled": "Neues Angebot",
+    "steps": {
+      "offer": "Angebot",
+      "where": "Wo es gilt",
+      "notes": "Notizen"
+    },
+    "fields": {
+      "name": "Name",
+      "namePlaceholder": "z. B. Diwali-Glow",
+      "code": "Code",
+      "codeHint": "optional · für Werbung",
+      "codePlaceholder": "GLOW20",
+      "type": "Art",
+      "value": {
+        "percent": "Rabatt",
+        "amount": "Rabattbetrag",
+        "fixed": "Angebotspreis",
+        "extra": "Gratissitzungen"
+      },
+      "percentQuick": "{{value}} %",
+      "sessionsUnit": "Sitzungen",
+      "colour": "Farbe",
+      "colourHint": "markiert dieses Angebot bei Leistungen und Rechnungen",
+      "offerings": "Leistungen",
+      "offeringsHint": "eine oder mehrere wählen",
+      "offeringsSearch": "Leistungen suchen",
+      "branches": "Filialen",
+      "branchesHint": "wo die Rezeption es nutzen kann",
+      "starts": "Beginnt",
+      "ends": "Endet",
+      "previewPrice": "{{before}} → {{after}}",
+      "previewSessions_one": "{{before}} → {{count}} Sitzung",
+      "previewSessions_other": "{{before}} → {{count}} Sitzungen",
+      "note": "Notiz",
+      "notePlaceholder": "Für wen es ist und wie die Rezeption es erwähnen soll",
+      "status": "Status",
+      "live": "Aktiv · gilt automatisch",
+      "paused": "Pausiert"
+    },
+    "offeringCount_one": "{{count}} Leistung",
+    "offeringCount_other": "{{count}} Leistungen",
+    "save": {
+      "create": "Angebot anlegen",
+      "edit": "Angebot speichern"
+    },
+    "toasts": {
+      "name": "Geben Sie dem Angebot einen Namen",
+      "offerings": "Wählen Sie mindestens eine Leistung",
+      "value": {
+        "percent": "Legen Sie den Rabatt fest",
+        "amount": "Legen Sie den Betrag fest",
+        "fixed": "Legen Sie den Betrag fest",
+        "extra": "Legen Sie die Gratissitzungen fest"
+      },
+      "endsBeforeStart": "Endet vor dem Beginn",
+      "offeringInactive": "{{name}} ist nicht mehr aktiv — entfernen Sie die Leistung oder wählen Sie eine andere"
+    }
+  }
+}

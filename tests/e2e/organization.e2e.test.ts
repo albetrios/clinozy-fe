@@ -1,10 +1,24 @@
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 
 import {
-  createTeamOrgViaSwitcher,
-  registerNewUserAndGoToDashboard,
+  createTeamOrgAndOpenToday,
+  openOrganizationSwitcher,
+  registerNewUserAndGoToToday,
 } from '@/tests/utils/e2e-auth.ts';
 import { byTestId, gotoApp, navigateAuthenticated } from '@/tests/utils/e2e-hybrid.ts';
+
+/**
+ * Opens "Create organization" where a member finds it: the organization picker
+ * (`/organization`). The clinic shell's Switch clinic lists workspaces and creates
+ * none (D44), so the picker is the one way into the create dialog.
+ */
+async function openCreateFromPicker(page: Page): Promise<void> {
+  await registerNewUserAndGoToToday(page);
+  await navigateAuthenticated(page, '/organization');
+  await expect(page.getByTestId('organization-page')).toBeVisible({ timeout: 10000 });
+  await byTestId(page, 'organization-picker-create').click();
+  await expect(page.getByTestId('create-organization-dialog-form')).toBeVisible();
+}
 
 test.describe('Organization picker', () => {
   test('redirects unauthenticated visitors to login', async ({ page }) => {
@@ -12,40 +26,35 @@ test.describe('Organization picker', () => {
     await expect(page).toHaveURL(/\/login/, { timeout: 5000 });
   });
 
-  test('redirects provisioned personal users to dashboard', async ({ page }) => {
-    await registerNewUserAndGoToDashboard(page);
+  test('lists a provisioned member’s clinic and leads back into it', async ({ page }) => {
+    await registerNewUserAndGoToToday(page);
+    const slug = /^\/organization\/([^/]+)\//.exec(new URL(page.url()).pathname)?.[1];
     await navigateAuthenticated(page, '/organization');
-    await expect(page).toHaveURL(/\/dashboard/, { timeout: 10000 });
-    await expect(page.getByTestId('dashboard-page')).toBeVisible();
+    await expect(page.getByTestId('organization-page')).toBeVisible({ timeout: 10000 });
+
+    await page.getByTestId(`organization-picker-option-${slug ?? ''}`).click();
+    await expect(page).toHaveURL(new RegExp(`/organization/${slug ?? ''}/today`), {
+      timeout: 15000,
+    });
+    await expect(page.getByTestId('today-page')).toBeVisible();
   });
 
   test('the switcher opens an accessible menu and closes on Escape', async ({ page }) => {
-    await registerNewUserAndGoToDashboard(page);
-    const trigger = byTestId(page, 'organization-switcher-trigger');
-    test.skip(!(await trigger.isVisible()), 'org switcher hidden');
+    await registerNewUserAndGoToToday(page);
+    const { slug } = await createTeamOrgAndOpenToday(page);
+    await openOrganizationSwitcher(page);
 
-    await trigger.click();
-    // Radix DropdownMenuContent exposes role="menu".
-    await expect(page.getByRole('menu')).toBeVisible();
+    const option = page.getByTestId(`organization-switcher-option-${slug}`);
+    await expect(option).toBeVisible({ timeout: 10000 });
+    // a11y guard: a workspace is a menu item of the switcher's own menu.
+    await expect(page.getByRole('menuitem', { name: new RegExp(slug) })).toBeVisible();
 
     await page.keyboard.press('Escape');
-    await expect(page.getByRole('menu')).toBeHidden();
+    await expect(option).toBeHidden();
   });
 
   test('the create-organization action opens the create dialog', async ({ page }) => {
-    await registerNewUserAndGoToDashboard(page);
-    const trigger = byTestId(page, 'organization-switcher-trigger');
-    test.skip(!(await trigger.isVisible()), 'org switcher hidden');
-
-    await trigger.click();
-    const createItem = page.getByTestId('organization-switcher-create');
-    test.skip(
-      !(await createItem.isVisible()),
-      'team creation disabled in this deployment mode',
-    );
-
-    await createItem.click();
-    await expect(page.getByTestId('create-organization-dialog-form')).toBeVisible();
+    await openCreateFromPicker(page);
     await expect(page.getByTestId('create-organization-dialog-name')).toBeVisible();
     await expect(
       page.getByRole('heading', { name: /create organization/i }),
@@ -63,18 +72,7 @@ test.describe('Organization picker', () => {
   test('an invalid Workspace URL is explained, not silently refused', async ({
     page,
   }) => {
-    await registerNewUserAndGoToDashboard(page);
-    const trigger = byTestId(page, 'organization-switcher-trigger');
-    test.skip(!(await trigger.isVisible()), 'org switcher hidden');
-
-    await trigger.click();
-    const createItem = page.getByTestId('organization-switcher-create');
-    test.skip(
-      !(await createItem.isVisible()),
-      'team creation disabled in this deployment mode',
-    );
-    await createItem.click();
-    await expect(page.getByTestId('create-organization-dialog-form')).toBeVisible();
+    await openCreateFromPicker(page);
 
     await byTestId(page, 'create-organization-dialog-name').fill('QA Org');
     await byTestId(page, 'create-organization-dialog-slug').fill('QA Org 4877!');
@@ -93,11 +91,9 @@ test.describe('Organization picker', () => {
   });
 
   test('organization switcher lists team org after create', async ({ page }) => {
-    await registerNewUserAndGoToDashboard(page);
-    const switcher = byTestId(page, 'organization-switcher-trigger');
-    test.skip(!(await switcher.isVisible()), 'org switcher hidden');
-    const { slug } = await createTeamOrgViaSwitcher(page);
-    await byTestId(page, 'organization-switcher-trigger').click();
+    await registerNewUserAndGoToToday(page);
+    const { slug } = await createTeamOrgAndOpenToday(page);
+    await openOrganizationSwitcher(page);
     await expect(page.getByTestId(`organization-switcher-option-${slug}`)).toBeVisible({
       timeout: 10000,
     });

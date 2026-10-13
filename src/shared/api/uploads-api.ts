@@ -17,11 +17,25 @@ export const UPLOAD_IMAGE_CONTENT_TYPES = [
 /** One of the content types clinozy-be accepts for an image upload. */
 export type UploadImageContentType = (typeof UPLOAD_IMAGE_CONTENT_TYPES)[number];
 
-/** Per-purpose size ceilings, mirroring clinozy-be's `upload.constants.ts`. */
+/**
+ * Per-purpose size ceilings, mirroring clinozy-be's `upload.constants.ts`. An
+ * `organization-file` is a clinic's own document — a patient photo, a report, a bill — and
+ * its 10 MB is the one limit the clinic screens apply everywhere (KICKOFF Q-P5).
+ */
 export const UPLOAD_MAX_BYTES = {
   'organization-logo': 5 * 1024 * 1024,
   avatar: 2 * 1024 * 1024,
+  'organization-file': 10 * 1024 * 1024,
 } as const;
+
+type UploadPurpose = keyof typeof UPLOAD_MAX_BYTES;
+
+/** Who owns each purpose's object; clinozy-be refuses any other `{ purpose, for }` pair. */
+const UPLOAD_PURPOSE_OWNER: Readonly<Record<UploadPurpose, 'organization' | 'user'>> = {
+  'organization-logo': 'organization',
+  avatar: 'user',
+  'organization-file': 'organization',
+};
 
 const presignWire = z.object({
   id: z.string(),
@@ -63,26 +77,32 @@ function assertSafeFileName(fileName: string): void {
  *   (HEAD + magic bytes) and promotes `pending/<key>` to `<key>`. The returned `key` is the
  *   **final** one, which is what `PUT /tenancy/organization/logo` and `PUT /users/me/avatar`
  *   expect — never the `pending/` path the presigned URL points at.
- * - **Why the raw `fetch`:** step two must NOT go through `apiClient`. That client is
+ * - **Why a raw `XMLHttpRequest`:** step two must NOT go through `apiClient`. That client is
  *   JSON-only, and `isApiOriginUrl` deliberately refuses to attach the bearer token to a
  *   foreign origin — sending a credential to the storage host is exactly what that pin
  *   exists to prevent. This is the one call in the app that legitimately leaves the API
- *   origin, and it carries no credential of ours.
+ *   origin, and it carries no credential of ours. It is an XHR rather than `fetch` because
+ *   only XHR reports upload progress, which the upload tray shows as "<n>%".
  * - **Failure modes:** a refused presign (403 without `upload:manage` on the organization),
  *   a storage write that does not return 2xx, or a confirm that comes back anything other
  *   than `UPLOADED` all throw. Nothing is attached until confirm succeeds, so a failure
  *   leaves the existing logo/avatar in place.
+ *
+ * @param input - The file, its clinozy-be purpose (an organization-owned purpose also needs
+ *   `organizationId`), and an optional `onProgress` that receives the storage write's
+ *   progress as a fraction from 0 to 1.
  */
 export async function uploadFile(input: {
   file: File;
-  purpose: 'organization-logo' | 'avatar';
+  purpose: UploadPurpose;
   organizationId?: string;
+  onProgress?: (fraction: number) => void;
 }): Promise<{ key: string }> {
   assertSafeFileName(input.file.name);
 
   const presignRes = await apiClient.post<unknown>(UPLOADS_API, {
     purpose: input.purpose,
-    for: input.purpose === 'organization-logo' ? 'organization' : 'user',
+    for: UPLOAD_PURPOSE_OWNER[input.purpose],
     ...(input.organizationId ? { organization_id: input.organizationId } : {}),
     content_type: input.file.type,
     file_name: input.file.name,
@@ -90,7 +110,7 @@ export async function uploadFile(input: {
   });
   const presign = presignWire.parse(presignRes.data);
 
-  await putBytes(presign, input.file);
+  await putBytes(presign, input.file, input.onProgress);
 
   const confirmRes = await apiClient.post<unknown>(
     `${UPLOADS_API}/${encodeURIComponent(presign.id)}/confirm`,
@@ -108,26 +128,57 @@ export async function uploadFile(input: {
   return { key: presign.key };
 }
 
-async function putBytes(presign: z.infer<typeof presignWire>, file: File): Promise<void> {
-  const response =
-    presign.upload_method === 'POST'
-      ? await fetch(presign.upload_url, {
-          method: 'POST',
-          body: toMultipart(presign.fields ?? {}, file),
-        })
-      : await fetch(presign.upload_url, {
-          method: 'PUT',
-          headers: { 'Content-Type': file.type },
-          body: file,
-        });
-
-  if (!response.ok) {
-    throw new AppError(
-      FRONTEND_ERROR_CODES.UPLOAD_STORAGE_REJECTED,
-      response.status,
-      FRONTEND_ERROR_CODES.UPLOAD_STORAGE_REJECTED,
-    );
-  }
+/**
+ * Write the bytes to the presigned destination.
+ *
+ * @remarks
+ * The only header is the content type, and `withCredentials` stays off, so neither a token
+ * nor a cookie of ours reaches the storage host. A dropped connection rejects with a
+ * `TypeError`, the shape `fetch` gives the same failure, so callers classify it as before.
+ * An `upload` progress listener makes the browser preflight a cross-origin POST, so it is
+ * registered only when someone is listening.
+ */
+function putBytes(
+  presign: z.infer<typeof presignWire>,
+  file: File,
+  onProgress?: (fraction: number) => void,
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const request = new XMLHttpRequest();
+    request.open(presign.upload_method, presign.upload_url);
+    if (onProgress) {
+      request.upload.addEventListener('progress', (event) => {
+        if (event.lengthComputable && event.total > 0) {
+          onProgress(event.loaded / event.total);
+        }
+      });
+    }
+    request.addEventListener('load', () => {
+      if (request.status >= 200 && request.status < 300) {
+        resolve();
+        return;
+      }
+      reject(
+        new AppError(
+          FRONTEND_ERROR_CODES.UPLOAD_STORAGE_REJECTED,
+          request.status,
+          FRONTEND_ERROR_CODES.UPLOAD_STORAGE_REJECTED,
+        ),
+      );
+    });
+    request.addEventListener('error', () => {
+      reject(new TypeError('Network request failed'));
+    });
+    request.addEventListener('abort', () => {
+      reject(new DOMException('The upload was aborted', 'AbortError'));
+    });
+    if (presign.upload_method === 'POST') {
+      request.send(toMultipart(presign.fields ?? {}, file));
+      return;
+    }
+    request.setRequestHeader('Content-Type', file.type);
+    request.send(file);
+  });
 }
 
 /** The file must be appended last — S3 ignores any form field that follows it. */

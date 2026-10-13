@@ -98,13 +98,24 @@
     "description": "앱의 새 버전이 준비되었습니다.",
     "refresh": "지금 새로 고침"
   },
+  "cells": {
+    "patient": "환자",
+    "patientMark": "환",
+    "leadMark": "리",
+    "moreCount": "외 {{count}}명"
+  },
+  "emptyState": {
+    "fallbackTitle": "아직 아무것도 없습니다",
+    "filteredTitle": "일치하는 항목 없음",
+    "filteredHint": "이 필터와 일치하는 항목이 없습니다. 전체를 다시 보려면 필터를 지우세요.",
+    "clearFilters": "필터 지우기"
+  },
   "a11y": {
     "close": "닫기",
     "loading": "로딩 중",
     "loadingNamed": "{{name}} 불러오는 중…",
     "loadingPage": "페이지 로딩 중",
     "toggleTheme": "테마 전환",
-    "openAppearance": "모양 열기",
     "cookieConsent": "쿠키 동의",
     "rowsPerPage": "페이지당 행 수",
     "goFirstPage": "첫 페이지로",
@@ -114,84 +125,146 @@
     "selectAll": "모두 선택",
     "copyAccountId": "계정 ID 복사",
     "onboardingProgress": "온보딩 진행률",
-    "themeCode": "테마 코드",
     "mode": "모드"
   },
   "appearance": {
     "themeTitle": "테마",
     "themeLocked": "테마는 조직 구성에서 관리되며 여기서는 변경할 수 없습니다.",
-    "themeDescription": "이름이 지정된 강조색 프리셋 — 또는 링크를 복사하거나 테마 코드를 붙여넣어 동일한 모양을 재현할 수 있습니다.",
-    "presetAria": "이름이 지정된 강조색 프리셋",
-    "copyLink": "링크 복사",
-    "shuffleHint": "셔플하면 코드가 생성됩니다.",
-    "codeLabel": "코드: {{seed}}",
-    "codePlaceholder": "테마 코드 붙여넣기",
-    "apply": "적용",
-    "pickAnyColour": "원하는 색상 선택",
     "modeTitle": "모드",
-    "modeDescription": "이 기기에 저장됩니다.",
-    "colourTitle": "색상",
-    "colourDescription": "강조색, 차트, 중립 기본색.",
-    "accentColour": "강조 색상",
-    "chartColour": "차트 색상",
-    "baseColour": "기본 색상",
-    "harmony": "조화",
-    "harmonyAria": "색상 조화",
-    "accentIntensity": "강조 강도",
-    "typeTitle": "서체 및 형태",
-    "typeDescription": "글꼴, 모서리 반경, 메뉴 표면.",
-    "bodyFont": "본문 글꼴",
-    "headingFont": "제목 글꼴",
-    "radius": "모서리 반경",
-    "shapeLanguage": "형태 언어",
-    "typeScale": "타입 스케일",
-    "menu": "메뉴",
-    "menuAria": "메뉴 스타일",
-    "iconsTitle": "아이콘",
-    "iconsDescription": "선 두께, 색상, 아이콘 세트.",
-    "iconWeight": "아이콘 두께",
-    "iconColour": "아이콘 색상",
-    "iconLibrary": "아이콘 라이브러리",
-    "layoutTitle": "레이아웃",
-    "layoutDescription": "기본 작업 영역의 너비 — 대시보드에는 표준, 집중해서 읽는 글에는 읽기 너비.",
-    "contentWidth": "콘텐츠 너비",
-    "dashboardTitle": "대시보드",
-    "dashboardDescription": "대시보드 섹션 배치 방식을 선택합니다.",
-    "dashboardArrangement": "배치",
-    "surfaceTitle": "표면 및 모션",
-    "surfaceDescription": "간격, 깊이, 대비, 그리고 움직임.",
-    "density": "밀도",
-    "contrast": "대비",
-    "elevation": "높이",
-    "separation": "구분",
-    "separationAria": "표면 구분",
-    "motion": "모션",
-    "focusRing": "포커스 링",
-    "notificationsTitle": "알림",
-    "notificationsDescription": "토스트 디자인을 선택하거나 셔플하세요 — 미리보기는 현재 테마 토큰을 사용합니다.",
-    "toastDesign": "토스트 디자인",
-    "position": "위치",
-    "positionAria": "토스트 위치",
-    "previewSuccess": "성공",
-    "previewError": "오류",
-    "previewWarning": "경고",
-    "previewInfo": "정보",
-    "shuffleSection": "{{section}} 셔플",
-    "sectionColour": "색상",
-    "sectionType": "서체 및 형태",
-    "sectionSurface": "표면 및 모션",
-    "sectionDashboard": "대시보드 레이아웃",
-    "sectionNotifications": "알림 스타일",
-    "custom": "사용자 지정",
-    "customWith": "사용자 지정 — {{look}}"
+    "modeDescription": "이 기기에 저장됩니다."
   },
   "table": {
-    "searchPlaceholder": "검색..."
+    "searchPlaceholder": "검색...",
+    "empty": "결과가 없습니다.",
+    "sortBy": "{{column}} 기준 정렬",
+    "actions": "작업",
+    "moreActions": "더 보기",
+    "columns": {
+      "trigger": "열 표시 또는 숨기기",
+      "title": "열 · {{total}}개 중 {{shown}}개 표시",
+      "showAll": "모든 열 표시",
+      "recommendedHides": "추천 설정은 {{count}}개를 숨깁니다",
+      "tapForRecommended": "추천 설정으로 돌아가려면 다시 탭하세요",
+      "allShown": "{{count}}개 열 모두 표시",
+      "hiddenCount": "{{count}}개 숨김",
+      "search": "열 검색",
+      "shown": "{{total}}개 중 {{shown}}개 표시",
+      "viewGroup": "보기",
+      "columnsGroup": "열"
+    },
+    "fold": {
+      "showAll_other": "{{count}}개 열이 행 안에 · 모두 표시",
+      "showAllHint": "모든 열을 나란히 표시(가로 스크롤)",
+      "fitToWidth": "너비에 맞추기",
+      "fitToWidthHint": "넘치는 열을 각 행에 접어 넣기"
+    },
+    "selection": {
+      "selectRow": "{{name}} 선택",
+      "selected": "{{count}}개 선택됨",
+      "selectAllCount": "{{count}}개 모두 선택",
+      "clear": "선택 해제",
+      "clearHint": "선택 해제 · Esc",
+      "escape": "Esc",
+      "bulkActions": "일괄 작업"
+    },
+    "length": {
+      "allLoaded": "{{records}}을(를) 모두 불러왔습니다",
+      "loadingMore": "{{records}} 더 불러오는 중"
+    },
+    "savedViews": {
+      "label": "저장된 보기",
+      "apply": "보기 적용",
+      "remove": "보기 삭제",
+      "removed": "보기를 삭제했습니다",
+      "defaultName": "내 보기"
+    }
   },
   "consent": {
-    "description": "{{productName}} 개선을 위한 제품 분석에 쿠키를 사용합니다. 필수 기능과 오류 모니터링은 쿠키 없이도 작동합니다.",
+    "description": "동의하시면 {{productName}} 개선을 위해 PostHog 분석과 Sentry 세션 기록을 사용합니다. 오류 보고를 포함한 나머지 기능은 이것 없이도 작동합니다. 닫으면 거부로 처리됩니다.",
     "privacyPolicy": "개인정보 처리방침",
     "accept": "동의",
-    "decline": "거부"
+    "decline": "거부",
+    "closeAndDecline": "닫기(거부로 처리됨)"
+  },
+  "confirm": {
+    "accept": "확인",
+    "cancel": "취소",
+    "fallbackDescription": "이 작업을 확인해 주세요."
+  },
+  "picker": {
+    "placeholder": "선택…",
+    "search": "{{label}} 검색",
+    "searchDefault": "검색",
+    "escKey": "Esc",
+    "options": "옵션",
+    "recent": "최근",
+    "all": "전체",
+    "create": "“{{query}}” 만들기",
+    "createNamed": "{{label}} “{{query}}”",
+    "createFull": "새 {{label}}",
+    "createFullQuery": "{{label}} · “{{query}}”",
+    "fullDetails": "전체 정보",
+    "empty": "아직 선택할 항목이 없습니다",
+    "noResults": "“{{query}}”에 대한 결과가 없습니다",
+    "noResultsHint": "철자를 확인하거나 더 짧게 입력해 보세요",
+    "noResultsRemoteHint": "이름, 전화번호 또는 ID로 검색해 보세요",
+    "loadingMore": "더 불러오는 중",
+    "clear": "지우기",
+    "triggerLabel": "{{label}} · {{value}}",
+    "date": {
+      "label": "날짜",
+      "placeholder": "날짜 선택",
+      "search": "날짜 입력 · 예: 9/12",
+      "today": "오늘",
+      "tomorrow": "내일",
+      "yesterday": "어제",
+      "comingUp": "예정",
+      "relative": "{{relative}} · {{date}}"
+    },
+    "time": {
+      "label": "시간",
+      "placeholder": "시간 선택"
+    }
+  },
+  "unsavedChanges": {
+    "title": "변경 사항을 버리시겠습니까?",
+    "description": "변경 사항이 저장되지 않았으며 사라집니다.",
+    "discard": "버리기",
+    "keepEditing": "편집 계속"
+  },
+  "uploadTray": {
+    "label": "업로드",
+    "uploading": "{{total}}개 중 {{left}}개 업로드 중…",
+    "complete": "모든 업로드 완료",
+    "failed_other": "업로드 {{count}}개 실패",
+    "skipped_other": "{{limit}} 초과 파일 {{count}}개 건너뜀",
+    "show": "업로드 표시",
+    "hide": "업로드 숨기기",
+    "uploadFailed": "업로드하지 못함",
+    "attachFailed": "첨부하지 못함",
+    "retry": "{{name}} 다시 시도",
+    "remove": "{{name}} 제거",
+    "stoppedBySwitch": "업로드가 중지되었습니다 · 워크스페이스를 전환했습니다",
+    "size": {
+      "kilobytes": "{{value}} KB",
+      "megabytes": "{{value}} MB"
+    }
+  },
+  "splash": {
+    "label": "{{productName}} 로딩 중",
+    "greeting": {
+      "morning": "좋은 아침입니다, {{name}}님",
+      "afternoon": "안녕하세요, {{name}}님",
+      "evening": "좋은 저녁입니다, {{name}}님"
+    },
+    "ticker": {
+      "opening": "{{weekday}} 일정을 여는 중",
+      "syncing": "환자와 리드를 동기화하는 중",
+      "ready": "준비 완료"
+    },
+    "offline": {
+      "message": "{{productName}}에 연결할 수 없습니다 · 인터넷 연결을 확인하세요",
+      "retry": "다시 시도"
+    }
   }
 }

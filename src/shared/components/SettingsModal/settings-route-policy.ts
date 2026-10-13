@@ -1,7 +1,7 @@
 /**
  * Routes where the global settings hash modal must not open — focused funnels
  * where a full-screen overlay would fight the page (onboarding, auth, invites).
- * App surfaces (dashboard, org URLs, picker) remain allowed.
+ * App surfaces (the clinic's rooms and home, the picker) remain allowed.
  */
 const SETTINGS_BLOCKED_PATH_PREFIXES = [
   '/onboarding',

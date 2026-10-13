@@ -1,0 +1,1023 @@
+{
+  "manifest": {
+    "title": "Patientenakte"
+  },
+  "sections": {
+    "timeline": "Übersicht",
+    "overview": "Klinische Notizen",
+    "visits": "Besuche",
+    "prescriptions": "Rezepte",
+    "treatments": "Behandlungen",
+    "images": "Fotos",
+    "reports": "Befunde",
+    "invoices": "Rechnungen",
+    "payments": "Zahlungen",
+    "packages": "Pakete",
+    "notes": "Teamnotizen"
+  },
+  "layout": {
+    "notFoundRecord": "Patient",
+    "loading": "Patientenakte wird geöffnet"
+  },
+  "fileBar": {
+    "back": "Zurück zu den Patienten",
+    "backHint": "Zurück zu den Patienten (Esc)",
+    "patients": "Patienten",
+    "identity": "{{id}} · {{phone}}",
+    "maskedPhone": "+91 ••••• •{{last4}}",
+    "visitPill": "Besuch läuft · Fortsetzen",
+    "tabs": "Bereiche des Patienten",
+    "notPinned": "Nicht angeheftet · nur sichtbar, solange geöffnet",
+    "addToRecord": "Zur Akte hinzufügen",
+    "startVisit": "Besuch starten",
+    "activity": "Aktivität",
+    "showActivity": "Nachrichten & Aktivität anzeigen",
+    "hideActivity": "Nachrichten & Aktivität ausblenden",
+    "awaitingReply": "Wartet auf Antwort"
+  },
+  "sectionsPopover": {
+    "trigger": "Patientenakte · alle Bereiche",
+    "label": "Bereiche der Patientenakte",
+    "title": "Patientenakte",
+    "groups": {
+      "clinical": "Klinisch",
+      "care": "Versorgung",
+      "billing": "Abrechnung",
+      "team": "Team"
+    },
+    "openNow": "Jetzt geöffnet",
+    "pin": "An die Leiste heften",
+    "unpin": "Von der Leiste lösen",
+    "pinAria": "An die Leiste heften · {{section}}",
+    "unpinAria": "Von der Leiste lösen · {{section}}",
+    "footer": "Angeheftete Bereiche bleiben in der Leiste"
+  },
+  "addMenu": {
+    "label": "Zur Akte hinzufügen",
+    "headerFile": "Hinzufügen für {{name}}",
+    "headerSection": "Für {{name}} · bereits ausgewählt"
+  },
+  "addActions": {
+    "items": {
+      "prescription": "Rezept",
+      "treatment": "Behandlung",
+      "photo": "Foto",
+      "appointment": "Termin",
+      "report": "Befund",
+      "note": "Notiz",
+      "invoice": "Rechnung",
+      "payment": "Zahlung"
+    },
+    "nothingDue": "Für {{name}} ist nichts offen"
+  },
+  "section": {
+    "primary": {
+      "visits": "Neuer Termin",
+      "prescriptions": "Neues Rezept",
+      "treatments": "Neue Behandlung",
+      "images": "Bilder hochladen",
+      "reports": "Befund hochladen",
+      "invoices": "Neue Rechnung",
+      "payments": "Zahlung erfassen"
+    },
+    "more": "Mehr für {{name}}"
+  },
+  "rail": {
+    "copyId": "Patienten-ID kopieren",
+    "idCopied": "Patienten-ID kopiert",
+    "since": "Seit {{date}}",
+    "joinedToday": "Heute hinzugekommen",
+    "daysAsPatient_one": "Seit {{count}} Tag Patient",
+    "daysAsPatient_other": "Seit {{count}} Tagen Patient",
+    "monthsAsPatient_one": "Seit {{count}} Monat Patient",
+    "monthsAsPatient_other": "Seit {{count}} Monaten Patient",
+    "editContact": "Kontakt bearbeiten",
+    "reach": "Erreichbarkeit",
+    "reachSub": {
+      "whatsappPrimary": "WhatsApp · Primär",
+      "mobile": "Mobil",
+      "instagram": "Instagram"
+    },
+    "maskedNumber": "•••• {{last4}}",
+    "showNumber": "Nummer anzeigen",
+    "hideNumber": "Nummer ausblenden",
+    "openWhatsApp": "WhatsApp-Chat in neuem Tab öffnen",
+    "call": "Anrufen",
+    "openInstagram": "Instagram in neuem Tab öffnen",
+    "numberCopied": "Nummer kopiert",
+    "handleCopied": "Benutzername kopiert",
+    "about": "Info",
+    "birthdayIn_one": "🎂 in {{count}} Tag",
+    "birthdayIn_other": "🎂 in {{count}} Tagen",
+    "birthdayToday": "🎂 heute",
+    "noAddress": "Keine Adresse",
+    "upNext": "Als Nächstes",
+    "reschedule": "Verschieben",
+    "book": "Buchen",
+    "notBooked": "Nicht gebucht",
+    "noUpcoming": "Kein anstehender Besuch",
+    "feedback": "Feedback",
+    "feedbackScore": "{{feel}} · {{score}}/10",
+    "feedbackReview": "{{rating}}★ auf {{source}}",
+    "checkIns_one": "{{count}} Check-in",
+    "checkIns_other": "{{count}} Check-ins",
+    "reviews_one": "{{count}} Bewertung",
+    "reviews_other": "{{count}} Bewertungen",
+    "feedbackCounts": "{{checkIns}} · {{reviews}}",
+    "noFeedback": "Noch kein Feedback",
+    "showAmount": "Betrag anzeigen",
+    "hideAmount": "Betrag ausblenden",
+    "collect": "Kassieren",
+    "allPaid": "Alles bezahlt · nichts offen"
+  },
+  "photos": {
+    "albums": {
+      "general": "Allgemein",
+      "private": "Privat",
+      "lhr": "LHR"
+    },
+    "albumTabs": "Alben",
+    "count_one": "{{count}} Foto",
+    "count_other": "{{count}} Fotos",
+    "visitFilter": {
+      "label": "Besuch",
+      "all": "Alle Fotos",
+      "allSub": "{{count}} in {{album}}",
+      "none": "Keinem Besuch zugeordnet",
+      "noneSub": "Aus der Akte hochgeladen",
+      "visit": "{{day}} · {{service}}",
+      "visitSub": "#{{seq}} · {{status}}"
+    },
+    "sizes": {
+      "label": "Vorschaugröße",
+      "small": "Kleine Vorschaubilder",
+      "medium": "Mittlere Vorschaubilder",
+      "large": "Große Vorschaubilder",
+      "smallShort": "S",
+      "mediumShort": "M",
+      "largeShort": "L"
+    },
+    "tile": {
+      "open": "{{name}} öffnen",
+      "edit": "Details bearbeiten",
+      "editHint": "Name, Datum und Körperstelle bearbeiten",
+      "delete": "Foto löschen"
+    },
+    "loadMore_one": "Mehr laden · {{count}} übrig",
+    "loadMore_other": "Mehr laden · {{count}} übrig",
+    "empty": {
+      "title": "Noch keine Fotos in {{album}}",
+      "body": "Ziehen Sie Fotos hierher oder laden Sie sie von Ihrem Computer hoch."
+    },
+    "upload": "Bilder hochladen",
+    "notImages": "Bitte Bilddateien ablegen",
+    "uploaded_one": "{{count}} Foto in {{album}} hochgeladen",
+    "uploaded_other": "{{count}} Fotos in {{album}} hochgeladen",
+    "delete": {
+      "title": "Dieses Foto löschen?",
+      "reasons": {
+        "wrongPatient": "Falscher Patient",
+        "blurry": "Unscharf / neu aufnehmen",
+        "duplicate": "Duplikat",
+        "other": "Sonstiges"
+      },
+      "deleted": "Foto gelöscht"
+    },
+    "bodyParts": {
+      "face": "Gesicht",
+      "scalp": "Kopfhaut",
+      "hair": "Haare",
+      "body": "Körper",
+      "chest": "Brust",
+      "back": "Rücken",
+      "underarm": "Achsel",
+      "legs": "Beine",
+      "arms": "Arme",
+      "other": "Andere",
+      "upperLip": "Oberlippe",
+      "chin": "Kinn",
+      "neck": "Hals",
+      "hands": "Hände",
+      "fullBody": "Ganzkörper"
+    },
+    "viewer": {
+      "label": "Fotoansicht",
+      "position": "{{index}} von {{total}}",
+      "close": "Ansicht schließen",
+      "closeHint": "Schließen (Esc)",
+      "previous": "Vorheriges Foto",
+      "previousHint": "Zurück (←)",
+      "next": "Nächstes Foto",
+      "nextHint": "Weiter (→)",
+      "zoom": "Zoom",
+      "zoomOut": "Verkleinern",
+      "zoomOutHint": "Verkleinern (−)",
+      "zoomIn": "Vergrößern",
+      "zoomInHint": "Vergrößern (+)",
+      "zoomReset": "An Bildschirm anpassen (0)",
+      "hints": {
+        "browse": "← → blättern",
+        "zoom": "Scrollen oder + − zum Zoomen",
+        "pan": "Ziehen zum Verschieben · Doppelklick zum Zurücksetzen",
+        "close": "Esc schließt"
+      },
+      "missing": "Vorschau nicht verfügbar",
+      "notFoundRecord": "Foto"
+    },
+    "details": {
+      "title": "Fotodetails",
+      "sub": "Optional · Name, Datum und Körperstelle helfen Ihnen, es später zu finden",
+      "name": "Name",
+      "namePlaceholder": "z. B. linke Wange vor dem Peeling",
+      "date": "Datum",
+      "album": "Album",
+      "bodyPart": "Körperstelle",
+      "optional": "optional",
+      "visit": "Besuch",
+      "visitHint": "optional · ordnet das Foto diesem Termin zu",
+      "notAttached": "Nicht zugeordnet",
+      "save": "Details speichern",
+      "saved": "Fotodetails gespeichert",
+      "stage": "Phase"
+    },
+    "loading": "Fotos werden geladen",
+    "stages": {
+      "before": "Vorher",
+      "after": "Nachher"
+    }
+  },
+  "rx": {
+    "record": "Rezept",
+    "title": {
+      "create": "Neues Rezept",
+      "edit": "Rezept bearbeiten"
+    },
+    "sub": "{{name}} · {{id}}",
+    "medicines_one": "{{count}} Medikament",
+    "medicines_other": "{{count}} Medikamente",
+    "quickFill": {
+      "print": "Rezept drucken",
+      "repeat": "Letztes Rezept {{number}} wiederholen"
+    },
+    "steps": {
+      "prescription": "Rezept",
+      "medicines": "Medikamente",
+      "notes": "Klinische Notizen"
+    },
+    "date": "Datum",
+    "doctor": "Arzt",
+    "doctorPlaceholder": "Arzt wählen",
+    "quick": {
+      "placeholder": "Medikament, Dosis, Zeitpunkt eingeben · z. B. flu 0-0-1 af 10d",
+      "hint": "od · bd · tds · hs · af/bf · 5d · x8",
+      "groups": {
+        "all": "Alle",
+        "oral": "Oral",
+        "topical": "Topisch"
+      },
+      "newMedicine": "Medikament nicht in der Liste",
+      "lastSaved": "Letzte Dosierung gespeichert",
+      "noDosage": "Keine frühere Dosierung",
+      "inStock_one": "{{count}} auf Lager",
+      "inStock_other": "{{count}} auf Lager",
+      "outOfStock": "nicht auf Lager",
+      "added": "{{name}} hinzugefügt",
+      "qty": "×{{qty}}"
+    },
+    "items": {
+      "label": "Medikamente",
+      "medicine": "Medikament",
+      "dose": "Dosis · M M A",
+      "meal": "Mahlzeit",
+      "where": "Wo",
+      "qty": "Menge",
+      "searchMedicine": "Medikament suchen",
+      "addMedicine": "Medikament hinzufügen",
+      "use": "Übernehmen",
+      "note": "Hinweise · z. B. 10 Tage, dünn auftragen, Sonne meiden"
+    },
+    "dose": {
+      "group": "Dosis morgens · mittags · abends",
+      "times": {
+        "morning": "Morgens",
+        "afternoon": "Mittags",
+        "night": "Abends"
+      },
+      "on": "{{time}} · {{taps}} — zum Ändern klicken",
+      "off": "{{time}} · keine — zum Ändern klicken",
+      "sos": "SOS",
+      "sosHint": "Nur bei Bedarf (SOS)"
+    },
+    "meal": {
+      "before": "Vorher",
+      "after": "Nachher",
+      "beforeHint": "Vor dem Essen",
+      "afterHint": "Nach dem Essen",
+      "more": "Weitere Zeitpunkte",
+      "change": "{{timing}} · ändern"
+    },
+    "timings": {
+      "empty_stomach": "Auf nüchternen Magen",
+      "with_meal": "Zum Essen",
+      "morning": "Morgens",
+      "night": "Abends",
+      "morning_night": "Morgens & abends",
+      "thrice_week": "Dreimal pro Woche",
+      "once_week": "Einmal pro Woche",
+      "alternate_days": "Jeden zweiten Tag"
+    },
+    "places": {
+      "face": "Gesicht",
+      "scalp": "Kopfhaut",
+      "hair": "Haare",
+      "body": "Körper",
+      "underarm": "Achsel",
+      "neck": "Hals",
+      "back": "Rücken",
+      "chest": "Brust",
+      "hands": "Hände",
+      "legs": "Beine",
+      "feet": "Füße",
+      "lips": "Lippen",
+      "underEyes": "Unter den Augen",
+      "affectedArea": "Betroffene Stelle"
+    },
+    "notes": {
+      "advice": "Notizen",
+      "advicePlaceholder": "Hinweise für den Patienten",
+      "lab": "Laborbefund",
+      "labPlaceholder": "Empfohlene Tests oder Ergebnisse",
+      "procedure": "Heutige Behandlung",
+      "procedurePlaceholder": "Was heute gemacht wurde"
+    },
+    "daysNote_one": "{{count}} Tag",
+    "daysNote_other": "{{count}} Tage",
+    "dayWords": "Tag, Tage, Tagen",
+    "save": {
+      "create": "Rezept speichern",
+      "edit": "Änderungen speichern",
+      "sell": "Speichern & verkaufen",
+      "visit": "Freigeben · drucken · an Apotheke senden",
+      "summary": "{{medicines}} · {{doctor}}",
+      "noMedicine": "Fügen Sie ein Medikament hinzu",
+      "saved": "Rezept gespeichert",
+      "savedNumber": "Rezept {{number}} gespeichert",
+      "approve": "Speichern & freigeben",
+      "approvedNumber": "Rezept {{number}} freigegeben"
+    },
+    "delete": {
+      "title": "Dieses Rezept löschen?",
+      "deleted": "Rezept gelöscht"
+    },
+    "preview": "Rezept {{number}}",
+    "status": {
+      "draft": "Entwurf",
+      "approved": "Freigegeben"
+    },
+    "approvedNote": "Freigegeben · ein freigegebenes Rezept kann nicht geändert werden"
+  },
+  "treatment": {
+    "record": "Behandlung",
+    "title": {
+      "create": "Neue Behandlung",
+      "edit": "Behandlung bearbeiten"
+    },
+    "sub": "Felder richten sich nach dem Fachgebiet der Praxis · bei Bedarf wechseln",
+    "session": "Sitzung {{session}}",
+    "quickFill": {
+      "next": "Nächste Sitzung von {{name}}",
+      "checkIn": "Check-in erfassen"
+    },
+    "type": "Art",
+    "templates": {
+      "skin": "Haut · Laser",
+      "dental": "Zahn",
+      "physio": "Physio",
+      "gynac": "Gynäkologie",
+      "general": "Allgemein"
+    },
+    "steps": {
+      "session": "Sitzung",
+      "details": "Details · {{template}}",
+      "aftercare": "Nachsorge"
+    },
+    "name": "Behandlung",
+    "namePlaceholder": "Wählen oder eingeben",
+    "sessionNo": "Sitzungsnummer",
+    "doctor": "Arzt",
+    "doctorPlaceholder": "Arzt wählen",
+    "therapist": "Therapeut",
+    "therapistPlaceholder": "Therapeut wählen",
+    "skin": {
+      "therapyType": "Therapieart",
+      "therapyTypes": {
+        "laser": "Laser",
+        "peel": "Peeling",
+        "facial": "Gesichtsbehandlung",
+        "injectable": "Injektion",
+        "microneedling": "Microneedling"
+      },
+      "bodyPart": "Körperstelle",
+      "pickAny": "beliebig viele",
+      "areas": {
+        "face": "Gesicht",
+        "upperLip": "Oberlippe",
+        "chin": "Kinn",
+        "underarm": "Achsel",
+        "arms": "Arme",
+        "legs": "Beine",
+        "back": "Rücken",
+        "chest": "Brust",
+        "fullBody": "Ganzkörper"
+      },
+      "skinType": "Hauttyp",
+      "skinTypeValue": "Typ {{type}}",
+      "machine": "Gerät",
+      "machinePlaceholder": "z. B. Soprano Ice",
+      "wavelength": "Wellenlänge",
+      "startReading": "Zählerstand Beginn",
+      "endReading": "Zählerstand Ende",
+      "readingPlaceholder": "Schüsse / Zähler",
+      "power": "Leistung · Frequenz · PD · Modus",
+      "powerPlaceholder": "z. B. 10 J · 3 Hz · 20 ms · HR"
+    },
+    "dental": {
+      "procedure": "Eingriff",
+      "procedures": {
+        "scaling": "Zahnsteinentfernung",
+        "filling": "Füllung",
+        "rct": "Wurzelbehandlung",
+        "extraction": "Extraktion",
+        "crown": "Krone",
+        "implant": "Implantat",
+        "whitening": "Bleaching"
+      },
+      "teeth": "Zähne",
+      "teethHint": "FDI-Schema · zum Auswählen tippen",
+      "quadrants": {
+        "upperRight": "Oben rechts",
+        "upperLeft": "Oben links",
+        "lowerRight": "Unten rechts",
+        "lowerLeft": "Unten links"
+      },
+      "tooth": "Zahn {{tooth}}",
+      "material": "Material",
+      "materialPlaceholder": "z. B. Komposit A2",
+      "anaesthesia": "Anästhesie",
+      "given": "Gegeben",
+      "notGiven": "Nicht gegeben"
+    },
+    "physio": {
+      "region": "Region",
+      "regions": {
+        "neck": "Nacken",
+        "shoulder": "Schulter",
+        "back": "Rücken",
+        "hip": "Hüfte",
+        "knee": "Knie",
+        "ankle": "Sprunggelenk"
+      },
+      "modality": "Methode",
+      "modalities": {
+        "tens": "TENS",
+        "ift": "IFT",
+        "ultrasound": "Ultraschall",
+        "exercise": "Übungen",
+        "manualTherapy": "Manuelle Therapie",
+        "traction": "Traktion"
+      },
+      "painBefore": "Schmerz vorher",
+      "painAfter": "Schmerz nachher",
+      "painHint": "0–10",
+      "exercises": "Übungen für zu Hause",
+      "exercisesPlaceholder": "Sätze, Wiederholungen, Häufigkeit"
+    },
+    "gynac": {
+      "visitType": "Besuchsart",
+      "visitTypes": {
+        "anc": "Schwangerschaftsvorsorge",
+        "pnc": "Wochenbett",
+        "infertility": "Kinderwunsch",
+        "contraception": "Verhütung",
+        "general": "Allgemein"
+      },
+      "lmp": "Letzte Periode",
+      "gestation": "Schwangerschaftswoche",
+      "weeks": "Wochen",
+      "bp": "Blutdruck",
+      "bpPlaceholder": "120/80",
+      "weight": "Gewicht",
+      "kg": "kg",
+      "findings": "Befund",
+      "findingsPlaceholder": "Untersuchungsbefund"
+    },
+    "general": {
+      "area": "Bereich",
+      "areaPlaceholder": "Durch Komma getrennt",
+      "parameters": "Parameter",
+      "parametersPlaceholder": "Einer pro Zeile, z. B. Dosis: 2 ml"
+    },
+    "aftercare": {
+      "remark": "Bemerkung",
+      "remarkPlaceholder": "Reaktion, Hinweise, nächster Plan",
+      "call": "Nachsorgeanruf",
+      "callHint": "erstellt eine Aufgabe, um nach dem Befinden und der Umsetzung zu fragen",
+      "calls": {
+        "none": "Kein Anruf",
+        "next_day": "Am nächsten Tag",
+        "in_week": "In einer Woche",
+        "in_two_days": "In 2 Tagen"
+      },
+      "feedback": "Rückmeldung zu dieser Behandlung",
+      "feedbackItem": "{{date}} · {{feel}} {{score}}/10",
+      "noCheckIn": "Noch kein Check-in · nutzen Sie oben „Check-in erfassen“"
+    },
+    "save": {
+      "create": "Behandlung speichern",
+      "edit": "Änderungen speichern",
+      "saved": "Behandlung gespeichert"
+    },
+    "package": {
+      "label": "Aus Paket",
+      "hint": "Speichern nutzt eine seiner Sitzungen",
+      "option": "{{name}} · {{used}} von {{total}} genutzt",
+      "numbered": "Vom Paket vergeben",
+      "uses": "Nutzt 1 Sitzung von {{name}}"
+    },
+    "reverse": {
+      "title": "Diese Behandlung stornieren?",
+      "body": "Sie bleibt in der Akte, als storniert markiert, und eine genutzte Paketsitzung wird zurückgebucht. Das lässt sich nicht rückgängig machen.",
+      "action": "Stornieren",
+      "done": "Behandlung storniert",
+      "status": "Storniert",
+      "note": "Storniert am {{date}} · {{reason}}",
+      "reasons": {
+        "mistake": "Versehentlich erfasst",
+        "wrongPatient": "Falscher Patient",
+        "notDone": "Sitzung nicht durchgeführt"
+      }
+    }
+  },
+  "report": {
+    "record": "Befund",
+    "types": {
+      "lab": "Labor",
+      "scan": "Bildgebung",
+      "consent": "Einwilligung",
+      "other": "Sonstiges"
+    },
+    "steps": {
+      "report": "Befund",
+      "details": "Details",
+      "notes": "Notizen"
+    },
+    "type": "Typ",
+    "name": "Name",
+    "date": "Datum",
+    "file": "Datei",
+    "upload": {
+      "title": "Befund hochladen",
+      "namePlaceholder": "z. B. Blutbild",
+      "drop": "Befund hier ablegen oder durchsuchen",
+      "fileHint": "PDF, JPG oder PNG · bis {{limit}}",
+      "remove": "{{name}} entfernen",
+      "note": "Notiz",
+      "notePlaceholder": "Optional",
+      "summary": "{{type}} · {{files}}",
+      "save": "Hochladen",
+      "noName": "Benennen Sie den Befund",
+      "uploaded": "Befund hochgeladen",
+      "files_one": "{{count}} Datei",
+      "files_other": "{{count}} Dateien"
+    },
+    "view": {
+      "sub": "{{name}} · {{date}}",
+      "notes": "Notizen",
+      "noNotes": "Keine Notizen zu diesem Befund",
+      "download": "Herunterladen",
+      "downloading": "{{name}} wird heruntergeladen",
+      "fileGone": "Nicht mehr verfügbar"
+    }
+  },
+  "package": {
+    "title": "Paket bearbeiten",
+    "summary": "Sitzungen werden gezählt, wenn eine Behandlung abgeschlossen ist",
+    "save": "Änderungen speichern",
+    "card": {
+      "left_one": "{{count}} übrig",
+      "left_other": "{{count}} übrig",
+      "used": "{{used}} von {{total}} genutzt",
+      "validTill": "Gültig bis {{date}}",
+      "book": "Nächste buchen",
+      "empty": "Noch keine Pakete",
+      "noExpiry": "Ohne Ablaufdatum",
+      "statuses": {
+        "used_up": "Aufgebraucht",
+        "expired": "Abgelaufen"
+      },
+      "edit": "Bearbeiten"
+    },
+    "validUntil": "Gültig bis",
+    "sessions": "Sitzungen",
+    "saved": "Paket gespeichert"
+  },
+  "clinical": {
+    "titles": {
+      "complaints": "Beschwerden",
+      "diagnosis": "Diagnose",
+      "treatmentSuggestions": "Behandlungsvorschläge",
+      "futureSuggestions": "Spätere Vorschläge"
+    },
+    "newHint": "Seit dem letzten Besuch hinzugefügt",
+    "empty": "Noch nichts hinzugefügt",
+    "placeholder": "Eingeben und Enter drücken",
+    "add": "{{title}} hinzufügen",
+    "remove": "{{name}} entfernen",
+    "newCount_one": "{{count}} neu",
+    "newCount_other": "{{count}} neu",
+    "removed": "{{name}} entfernt"
+  },
+  "feedback": {
+    "title": "Feedback",
+    "log": "Feedback erfassen",
+    "typesLabel": "Feedback-Art",
+    "types": {
+      "all": "Alle",
+      "visit": "Beratung",
+      "treatment": "Behandlungsfeedback"
+    },
+    "previous": "Zurück",
+    "next": "Weiter",
+    "emptyTitle": "Noch kein Feedback",
+    "emptySub": "Nach dem nächsten Besuch einen Check-in oder eine Bewertung erfassen · Feedback erfassen",
+    "notRated": "Nicht bewertet",
+    "score": "{{score}}/10",
+    "stars": "{{rating}}/5",
+    "trendUp": "▲ {{points}}",
+    "trendDown": "▼ {{points}}",
+    "trendSame": "= gleich",
+    "followed": "Befolgt: {{how}}",
+    "appointment": "Termin {{number}}",
+    "visitWith": "{{service}} · Termin {{number}}",
+    "visit": "Besuch",
+    "noVisit": "Mit keinem Besuch verknüpft",
+    "noNow": "Keine Notiz zum aktuellen Zustand",
+    "noText": "Kein Bewertungstext",
+    "nextLabel": "Nächstes",
+    "linkLabel": "Link",
+    "noNext": "Kein nächster Schritt notiert",
+    "noLink": "Kein Link hinzugefügt",
+    "actions": "Aktionen",
+    "edit": "Bearbeiten",
+    "remove": "Entfernen",
+    "actionNeeded": "Handlungsbedarf",
+    "logAction": "Aktion erfassen",
+    "nextAction": "Nächste Aktion",
+    "actionBy": "✓ {{action}} · {{name}}",
+    "actionLogged": "✓ {{action}} · erfasst",
+    "actionKinds": {
+      "doctor_called": "Arzt hat angerufen",
+      "asked_revisit": "Zum erneuten Besuch gebeten",
+      "free_review_booked": "Kostenlose Kontrolle gebucht",
+      "plan_changed": "Plan geändert",
+      "replied_google": "Auf Google geantwortet",
+      "replied_instagram": "Auf Instagram geantwortet",
+      "replied_whatsapp": "Auf WhatsApp geantwortet",
+      "refund_credit": "Erstattung / Gutschrift gewährt",
+      "other": "Sonstiges"
+    },
+    "loadMore": "Mehr laden",
+    "loading": "Wird geladen…",
+    "removeCheckIn": "Diesen Check-in entfernen?",
+    "removeReview": "Diese Bewertung entfernen?",
+    "checkInRemoved": "Check-in entfernt",
+    "reviewRemoved": "Bewertung entfernt",
+    "more_one": "{{count}} weiterer",
+    "more_other": "{{count}} weitere",
+    "files_one": "▶ {{count}} Datei",
+    "files_other": "▶ {{count}} Dateien"
+  },
+  "checkIn": {
+    "titles": {
+      "visit": "Besuchs-Check-in",
+      "aftercare": "Nachsorge-Check-in"
+    },
+    "last": "letzter Check-in {{date}}: {{feel}}",
+    "steps": {
+      "now": "Wie es jetzt ist",
+      "followed": "Was befolgt wurde",
+      "next": "Nächste Schritte"
+    },
+    "feel": "Im Vergleich zum letzten Besuch",
+    "score": "Eigene Bewertung",
+    "scoreHint": "1 = sehr unzufrieden · 10 = sehr zufrieden",
+    "words": "In eigenen Worten",
+    "wordsLast": "Letztes Mal: {{text}}",
+    "wordsPlaceholder": "Was sich geändert hat, was noch stört",
+    "followed": "Rat befolgt",
+    "followedValues": {
+      "fully": "Vollständig",
+      "mostly": "Größtenteils",
+      "partly": "Teilweise",
+      "not_at_all": "Gar nicht"
+    },
+    "details": "Details",
+    "detailsLast": "Letztes Mal geraten: {{text}}",
+    "detailsPlaceholder": "Heimpflege, Medikamente, Sonnenschutz, versäumte Sitzungen",
+    "plan": "Plan",
+    "planPlaceholder": "Was als Nächstes passiert und wann",
+    "offerings": "Zu den Angebotsvorschlägen hinzufügen",
+    "offeringsHint": "optional · landet als „Geplant“ bei den Vorschlägen des Patienten",
+    "offeringsPlaceholder": "Angebote suchen",
+    "offeringSessions_one": "{{price}} · {{count}} Sitzung",
+    "offeringSessions_other": "{{price}} · {{count}} Sitzungen",
+    "save": "Check-in speichern",
+    "saveEdit": "Änderungen speichern",
+    "noFeel": "Wählen Sie, wie es jetzt ist",
+    "saved": "Check-in für {{name}} gespeichert",
+    "added": " · {{count}} zu den Vorschlägen hinzugefügt",
+    "callBack": " · Rückruf-Aufgabe für den Arzt erstellt",
+    "updated": "Check-in aktualisiert",
+    "record": "Check-in",
+    "noScore": "Wählen Sie die Bewertung des Patienten",
+    "offeringsPlanned": "Zu den Angebotsvorschlägen hinzugefügt"
+  },
+  "review": {
+    "title": "Bewertung erfassen",
+    "sub": "{{name}} · in der Patientenakte gespeichert, damit sie jeder findet",
+    "steps": {
+      "review": "Bewertung",
+      "details": "Details",
+      "notes": "Notizen"
+    },
+    "where": "Wo",
+    "rating": "Bewertung",
+    "link": "Link",
+    "linkHint": "Link zur Google-Bewertung, zum Beitrag oder zum Drive",
+    "linkPlaceholder": "https://",
+    "files": "Video oder Screenshot",
+    "filesDrop": "Video oder Screenshot hier ablegen",
+    "filesHint": "MP4, MOV, JPG oder PNG · bis {{limit}}",
+    "removeFile": "{{name}} entfernen",
+    "attached": "Angehängt",
+    "text": "Was gesagt wurde",
+    "textPlaceholder": "Bewertungstext oder kurze Zusammenfassung einfügen",
+    "save": "Bewertung speichern",
+    "saveEdit": "Änderungen speichern",
+    "saved": "{{rating}}★-{{source}}-Bewertung für {{name}} gespeichert",
+    "callBack": " · Rückruf-Aufgabe erstellt",
+    "updated": "Bewertung aktualisiert",
+    "badLink": "Fügen Sie einen https://-Link hinzu",
+    "notRated": "Nicht bewertet",
+    "record": "Bewertung",
+    "attachedFiles_one": "{{count}} Datei",
+    "attachedFiles_other": "{{count}} Dateien"
+  },
+  "logFeedback": {
+    "title": "Feedback erfassen",
+    "sub": "{{name}} · wählen Sie, was Sie erfassen möchten",
+    "groups": {
+      "checkIn": "Check-in",
+      "treatment": "Behandlungsfeedback",
+      "review": "Bewertung"
+    },
+    "consultation": "Beratung",
+    "after": "Nach {{name}}",
+    "close": "Schließen",
+    "hints": {
+      "consultation": "Nach einem Besuch · wie es jetzt ist · befolgt · nächster Plan",
+      "google": "Link und Bewertungstext einfügen",
+      "video": "Das Erfahrungsvideo hochladen",
+      "other": "Bewertung, Text und Screenshot"
+    }
+  },
+  "tables": {
+    "export": "Exportieren",
+    "exported_one": "{{count}} Zeile als CSV exportiert",
+    "exported_other": "{{count}} Zeilen als CSV exportiert",
+    "visits": {
+      "records": "Termine",
+      "count_one": "{{count}} Termin",
+      "count_other": "{{count}} Termine",
+      "empty": "Noch keine Termine"
+    },
+    "prescriptions": {
+      "records": "Rezepte",
+      "count_one": "{{count}} Rezept",
+      "count_other": "{{count}} Rezepte",
+      "empty": "Noch keine Rezepte",
+      "copied": "Rezept kopiert"
+    },
+    "treatments": {
+      "records": "Behandlungen",
+      "count_one": "{{count}} Behandlung",
+      "count_other": "{{count}} Behandlungen",
+      "empty": "Noch keine Behandlungen",
+      "copied": "Sitzung {{session}} hinzugefügt",
+      "feedbackScore": "{{feel}} · {{score}}/10",
+      "checkInOn": "Check-in {{date}}",
+      "callNextDay": "Anruf am nächsten Tag",
+      "callInDays_one": "Anruf in {{count}} Tag",
+      "callInDays_other": "Anruf in {{count}} Tagen"
+    },
+    "reports": {
+      "records": "Befunde",
+      "count_one": "{{count}} Befund",
+      "count_other": "{{count}} Befunde",
+      "empty": "Noch keine Befunde",
+      "fileSub": "{{format}} · auf Wunsch mit dem Patienten geteilt",
+      "deleteTitle": "Diesen Befund löschen?",
+      "deleted": "Befund gelöscht"
+    },
+    "invoices": {
+      "records": "Rechnungen",
+      "count_one": "{{count}} Rechnung",
+      "count_other": "{{count}} Rechnungen",
+      "empty": "Noch keine Rechnungen",
+      "countDue_one": "{{count}} Rechnung · {{due}} offen",
+      "countDue_other": "{{count}} Rechnungen · {{due}} offen",
+      "itemCount_one": "{{count}} Position",
+      "itemCount_other": "{{count}} Positionen",
+      "due": "{{amount}} offen",
+      "nothingDue": "Nichts offen"
+    },
+    "payments": {
+      "records": "Buchungen",
+      "count_one": "{{count}} Buchung",
+      "count_other": "{{count}} Buchungen",
+      "empty": "Noch keine Zahlungen",
+      "received": "+ {{amount}}",
+      "paid": "− {{amount}}"
+    },
+    "columns": {
+      "id": "ID",
+      "offering": "Leistung",
+      "doctor": "Arzt",
+      "status": "Status",
+      "date": "Datum",
+      "medicines": "Medikamente",
+      "notes": "Notizen",
+      "updated": "Geändert",
+      "treatment": "Behandlung",
+      "area": "Bereich",
+      "team": "Team",
+      "session": "Sitzung",
+      "details": "Details",
+      "feedback": "Rückmeldung",
+      "report": "Befund",
+      "type": "Art",
+      "invoice": "Rechnung",
+      "items": "Positionen",
+      "bill": "Betrag",
+      "paid": "Bezahlt / offen",
+      "receipt": "Beleg",
+      "when": "Wann",
+      "mode": "Zahlart",
+      "amount": "Betrag",
+      "by": "Von"
+    },
+    "actions": {
+      "print": "Drucken",
+      "preview": "Vorschau",
+      "copyRx": "Rezept kopieren",
+      "sell": "Medikamente verkaufen",
+      "copyInvoice": "Rechnung kopieren",
+      "checkIn": "Check-in",
+      "copyTreatment": "Als nächste Sitzung kopieren",
+      "open": "Öffnen",
+      "pay": "Zahlung erfassen",
+      "edit": "Bearbeiten",
+      "delete": "Löschen"
+    }
+  },
+  "notes": {
+    "label": "Neue Notiz",
+    "placeholder": "Notiz für das Team hinzufügen",
+    "add": "Notiz hinzufügen",
+    "by": "{{name}} · {{date}}",
+    "empty": "Noch keine Notizen"
+  },
+  "timeline": {
+    "open": "{{card}} öffnen",
+    "clinical": {
+      "suggested": "Vorgeschlagen",
+      "later": "Später",
+      "smartLabel": "Smarte Notiz",
+      "smartPlaceholder": "Smarte Notiz · einfach frei schreiben, z. B. {{example}}",
+      "smartExample": "Haarausfall 2 Mon., PRP empf.",
+      "add": "Hinzufügen",
+      "added_one": "{{count}} Eintrag aus Ihrer Notiz hinzugefügt",
+      "added_other": "{{count}} Einträge aus Ihrer Notiz hinzugefügt",
+      "nothing": "Noch nichts erkannt"
+    },
+    "visits": {
+      "empty": "Noch keine Besuche"
+    },
+    "photos": {
+      "upload": "Hochladen",
+      "empty": "Noch keine Fotos · laden Sie das erste hoch"
+    },
+    "packages": {
+      "progress": "{{used}} / {{total}}",
+      "done": "Alle Sitzungen erledigt",
+      "empty": "Keine aktiven Pakete"
+    },
+    "prescriptions": {
+      "title": "Rezept {{number}}"
+    },
+    "treatments": {
+      "sub": "Sitzung {{session}} · {{date}}"
+    },
+    "reports": {
+      "sub": "{{type}} · {{date}}"
+    },
+    "notes": {
+      "label": "Teamnotiz",
+      "placeholder": "Notiz für das Team schreiben…",
+      "post": "Posten"
+    },
+    "activity": {
+      "filtersLabel": "Aktivitätsfilter",
+      "notes": "Notizen",
+      "empty": "Noch keine Aktivität",
+      "masked": "₹ ••••"
+    },
+    "billing": {
+      "due": "Offen",
+      "paid": "Bezahlt",
+      "show": "Beträge anzeigen",
+      "hide": "Beträge ausblenden",
+      "invoice": "{{type}}-Rechnung {{number}}",
+      "sub": "{{date}} · {{amount}}",
+      "collect": "Zahlung kassieren"
+    }
+  },
+  "visitFlow": {
+    "pill": "Besuch läuft",
+    "lead": "Alles für den heutigen Besuch auf einem Bildschirm",
+    "pause": "Pausieren",
+    "complete": "✓ Besuch abschließen",
+    "completed": "Besuch abgeschlossen",
+    "packageUsed": "1 Paketsitzung genutzt",
+    "followUp": "Wiedervorlage am {{date}}",
+    "loading": "Der Besuch",
+    "steps": {
+      "checks": "Check-in & Sicherheit",
+      "rx": "Rezept",
+      "treatment": "Behandlung",
+      "invoice": "Rechnung",
+      "collect": "Kassieren"
+    },
+    "checks": {
+      "labels": {
+        "consent": "Einwilligung unterschrieben",
+        "photos": "Vorher-Fotos gemacht",
+        "allergies": "Allergien & Medikamente geprüft"
+      },
+      "hints": {
+        "consent": "Ohne sie kann die Behandlung nicht beginnen",
+        "photos": "Automatisch mit den Nachher-Fotos gepaart",
+        "allergies": "Bei jedem Besuch erfragt"
+      },
+      "left_one": "Noch {{count}} Prüfung offen",
+      "left_other": "Noch {{count}} Prüfungen offen",
+      "done": "Alle Prüfungen erledigt"
+    },
+    "rx": {
+      "kit": "⚡ {{name}}",
+      "write": "Rezept schreiben",
+      "empty": "Mit einem Tippen aus einem Set – oder selbst schreiben",
+      "prescribed": "{{name}} verordnet"
+    },
+    "treatment": {
+      "repeat": "⚡ Wiederholen · {{name}} · Sitzung {{session}}",
+      "new": "Neue Behandlung",
+      "memo": "Für diesen Patienten gemerkt: {{memo}}",
+      "pack": "Nutzt 1 Sitzung von {{name}}",
+      "blocked": "Schließen Sie zuerst den Check-in ab",
+      "empty": "Heutige Sitzung erfassen",
+      "last": "Letzte Einstellungen: {{memo}}",
+      "done": "{{name}} · Sitzung {{session}}",
+      "repeated": "Sitzung {{session}} mit den letzten Einstellungen erfasst",
+      "repeatPackage": "⚡ Wiederholen · {{name}}"
+    },
+    "paused": "Besuch pausiert",
+    "resume": "Fortsetzen",
+    "invoice": {
+      "create": "Rechnung aus dem Besuch erstellen",
+      "custom": "Individuelle Rechnung",
+      "nothing": "Nichts abzurechnen",
+      "covered": "Durch das Paket abgedeckt · nichts abzurechnen",
+      "empty": "Noch nichts abzurechnen",
+      "done": "{{number}} · {{total}}",
+      "ready_one": "{{count}} Position bereit",
+      "ready_other": "{{count}} Positionen bereit"
+    },
+    "collect": {
+      "action": "{{amount}} kassieren",
+      "due": "{{amount}} offen",
+      "nothing": "Nichts offen",
+      "waiting": "Zuerst den Besuch abrechnen"
+    }
+  }
+}

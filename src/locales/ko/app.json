@@ -1,0 +1,1371 @@
+{
+  "sections": {
+    "today": {
+      "label": "오늘",
+      "description": "지금 클리닉: 도착, 대기, 진료 중, 수납"
+    },
+    "leads": {
+      "label": "리드",
+      "description": "환자가 될 때까지의 문의와 대화"
+    },
+    "appointments": {
+      "label": "예약",
+      "description": "의사, 진료실, 장비별 예약"
+    },
+    "patients": {
+      "label": "환자",
+      "description": "처방, 시술 회차, 사진이 있는 등록 환자"
+    },
+    "medical": {
+      "label": "약국",
+      "description": "약국: 판매 의약품, 공급업체, MR, 구매, 판매"
+    },
+    "stock": {
+      "label": "클리닉 재고",
+      "description": "시술에 쓰는 클리닉 소모품과 장비 · 판매용 아님"
+    },
+    "payments": {
+      "label": "결제",
+      "description": "수납, 청구서, 미수금"
+    },
+    "tasks": {
+      "label": "작업",
+      "description": "담당자와 기한이 있는 후속 조치, 피드백 전화, 알림"
+    },
+    "offerings": {
+      "label": "서비스",
+      "description": "클리닉 판매 항목: 서비스, 패키지, 프로모션, 가격"
+    },
+    "users": {
+      "label": "사용자",
+      "description": "팀, 역할 및 권한, 지점"
+    }
+  },
+  "tones": {
+    "butter": "버터",
+    "lav": "라벤더",
+    "sky": "스카이",
+    "sage": "세이지",
+    "blush": "블러시",
+    "mint": "민트",
+    "peach": "피치",
+    "plum": "플럼",
+    "lime": "라임",
+    "slate": "슬레이트",
+    "stone": "스톤"
+  },
+  "roles": {
+    "admin": "관리자",
+    "doctor": "의사",
+    "therapist": "치료사",
+    "front_desk": "프런트 데스크",
+    "counsellor": "상담사",
+    "pharmacist": "약사",
+    "accountant": "회계 담당",
+    "marketing": "마케팅",
+    "owner": "소유자"
+  },
+  "leads": {
+    "statuses": {
+      "new": "신규",
+      "contacted": "연락함",
+      "follow_up": "후속 조치",
+      "clinic_visited": "내원함",
+      "no_response": "응답 없음",
+      "not_interested": "관심 없음",
+      "invalid": "유효하지 않음",
+      "lost": "이탈"
+    },
+    "retargeted": "재타깃팅",
+    "sources": {
+      "instagram": "Instagram",
+      "google": "Google",
+      "whatsapp": "WhatsApp",
+      "facebook": "Facebook",
+      "walk_in": "직접 방문",
+      "referral": "추천",
+      "retarget": "재방문 유도",
+      "phone_call": "전화"
+    },
+    "interests": {
+      "others": "기타",
+      "clinical": "임상",
+      "peel": "필링",
+      "lhr": "LHR",
+      "hydrafacial": "Hydrafacial",
+      "prp": "PRP"
+    }
+  },
+  "appointments": {
+    "statuses": {
+      "scheduled": "예정",
+      "confirmed": "확정",
+      "checked_in": "체크인",
+      "completed": "완료",
+      "cancelled": "취소됨",
+      "no_show": "미내원"
+    },
+    "moves": {
+      "reschedule": "다른 시간으로 이동",
+      "cancelled": "취소"
+    },
+    "moveHints": {
+      "scheduled": "시간 확보됨 · 확인 요청이 대기열에 있습니다",
+      "confirmed": "응답함",
+      "checked_in": "도착했습니다 · 당일에만",
+      "completed": "진료 완료 · 보통 진료 화면에서 설정됩니다",
+      "reschedule": "새 시간으로 이동 · 같은 예약이며, 이전 시간은 기록에 남습니다",
+      "cancelled": "시간을 비우고 알림을 중지합니다",
+      "no_show": "시작 시간이 지난 후에만"
+    },
+    "guards": {
+      "final": "최종 상태입니다. 새 예약을 만들려면 다시 예약을 사용하세요.",
+      "visitDay": "{{day}}에만 가능",
+      "beforeStart": "{{day}} {{time}} 이후 가능",
+      "needsPatient": "먼저 환자 기록을 만드세요 · 완료하려면 환자가 필요합니다"
+    },
+    "nextActions": {
+      "check_in": "체크인",
+      "confirm": "확정",
+      "complete": "완료 처리",
+      "rebook": "다시 예약"
+    },
+    "tiles": {
+      "booked": "예약됨",
+      "said_yes": "응답함",
+      "visit_day": "방문일에 가능",
+      "after_check_in": "체크인 후"
+    },
+    "hints": {
+      "scheduled": "시간 확보됨 · 메시징이 연결될 때까지 확인 요청이 대기열에서 기다립니다",
+      "confirmed": "전화로 이미 확정 · 알림이 발송됩니다",
+      "checked_in": "환자가 클리닉에 있습니다 · 의사 대기열에 알림 · 끝나면 완료로 표시하세요",
+      "completed": "진료 완료 · 내일 피드백 작업이 발송됩니다",
+      "needs_patient": "이 방문을 완료하려면 환자 기록을 만드세요",
+      "cancelled": "되돌리려면 복원하세요 · 그동안 시간은 다른 사람이 쓸 수 있습니다",
+      "closed": "이 예약은 종료되었습니다 · {{status}}"
+    },
+    "cancelReasons": {
+      "patient_asked": "환자 요청",
+      "unreachable": "환자와 연락 불가",
+      "doctor_unavailable": "의사 일정 불가",
+      "resource_unavailable": "장비 또는 방 사용 불가",
+      "rescheduling_later": "나중에 다시 일정 조정",
+      "booked_by_mistake": "실수로 예약함",
+      "other": "기타"
+    },
+    "cancelSides": {
+      "patient": "환자",
+      "clinic": "클리닉"
+    },
+    "cancelConfirm": {
+      "title": "이 예약을 취소할까요?",
+      "record": "{{name}} · {{service}}",
+      "effect": "시간이 비워지고 알림이 중지됩니다. 예약 시간이 지나기 전까지 복원할 수 있습니다.",
+      "action": "취소"
+    },
+    "formCancelReasons": {
+      "patient_cancelled": "환자가 취소함",
+      "rescheduling_later": "나중에 다시 일정 조정",
+      "doctor_unavailable": "의사 일정 불가",
+      "booked_by_mistake": "실수로 예약함",
+      "other": "기타"
+    },
+    "toasts": {
+      "booked": "{{id}} 예약됨 · {{day}} {{time}} · 확인 요청이 대기열에 있습니다",
+      "bookedQueued": "{{id}} 예약됨 · {{day}} {{time}} · 알림 예약됨",
+      "bookedOnly": "{{id}} 예약됨 · {{day}} {{time}}",
+      "moved": "{{id}} 이동됨 · {{day}} {{time}} · 확인 요청이 대기열에 있습니다",
+      "movedOnly": "{{id}} 이동됨 · {{day}} {{time}}",
+      "updated": "{{id}} 업데이트됨",
+      "statusChanged": "{{name}} → {{status}}",
+      "statusConfirmed": "{{name}} → {{status}} · 알림 예약됨",
+      "statusCancelled": "{{name}} → {{status}} · {{reason}} · 시간 해제, 알림 중지",
+      "cancelled": "예약 {{id}} 취소됨",
+      "restored": "예약 복원됨 · 알림이 다시 발송됩니다"
+    }
+  },
+  "offerings": {
+    "categories": {
+      "consultation": "상담",
+      "treatment": "시술",
+      "package": "패키지",
+      "lhr": "LHR",
+      "product": "제품"
+    },
+    "offerKinds": {
+      "percent": "% 할인",
+      "amount": "₹ 할인",
+      "fixed": "고정 가격",
+      "extra": "추가 세션"
+    },
+    "offerStates": {
+      "live": "진행 중",
+      "scheduled": "예정",
+      "paused": "일시 중지",
+      "ended": "종료"
+    },
+    "toasts": {
+      "offeringCreated": "서비스 {{id}} 생성됨",
+      "offeringSaved": "서비스 {{id}} 저장됨",
+      "offeringRemoved": "서비스 {{id}} 삭제됨",
+      "offerCreated": "{{name}} 생성됨 · 자동으로 적용됩니다",
+      "offerSaved": "{{name}} 저장됨",
+      "offerRemoved": "{{name}} 삭제됨",
+      "offerPaused": "{{name}} 일시 중지됨",
+      "offerResumed": "{{name}} 다시 진행 중"
+    },
+    "specialties": {
+      "skin": "피부",
+      "hair": "모발",
+      "dental": "치과",
+      "gynac": "산부인과",
+      "physio": "물리치료",
+      "general": "일반"
+    }
+  },
+  "patients": {
+    "types": {
+      "aesthetic": "미용",
+      "clinical": "일반 진료",
+      "lhr": "LHR",
+      "dental": "치과",
+      "physio": "물리치료",
+      "gynac": "부인과"
+    },
+    "statuses": {
+      "new": "신규",
+      "regular": "정기",
+      "vip": "VIP",
+      "inactive": "비활성"
+    },
+    "conversions": {
+      "converted": "T-전환됨",
+      "not_converted": "T-미전환"
+    },
+    "referralSources": {
+      "patient": "환자",
+      "doctor": "의사",
+      "instagram": "Instagram",
+      "google": "Google",
+      "walk_in": "직접 방문",
+      "other": "기타"
+    }
+  },
+  "visits": {
+    "record": "방문"
+  },
+  "patientDelete": {
+    "title": "이 환자를 삭제할까요?",
+    "titleRecord": "이 기록을 삭제할까요?",
+    "removed": "{{name}} 삭제됨"
+  },
+  "patientDrawer": {
+    "title": {
+      "create": "새 환자",
+      "edit": "환자 수정"
+    },
+    "sub": {
+      "full": "연락처도 함께 생성하거나 업데이트합니다",
+      "quick": "방문을 마치기 전에 클리닉에 필요한 정보"
+    },
+    "quickFill": {
+      "walkIn": "오늘 직접 방문",
+      "referred": "환자 소개",
+      "instagram": "Instagram 유입",
+      "lhr": "LHR 환자"
+    },
+    "steps": {
+      "contact": "연락처 및 개인 정보",
+      "clinic": "클리닉, 소개 및 후속 조치"
+    },
+    "groups": {
+      "contact": "연락처",
+      "personal": "개인 정보",
+      "clinic": "클리닉",
+      "referral": "소개 및 후속 조치"
+    },
+    "fields": {
+      "firstName": "이름",
+      "lastName": "성",
+      "mobile": "휴대폰",
+      "mobileHint": "기본 · WhatsApp",
+      "phone2": "보조 휴대폰",
+      "phone2Hint": "10자리",
+      "address": "주소",
+      "addressPlaceholder": "지역, 도시",
+      "homeBranch": "소속 지점",
+      "gender": "성별",
+      "birthDate": "생년월일",
+      "age": "{{age}}세",
+      "types": "환자 유형",
+      "typesHint": "여러 개 선택 가능",
+      "status": "상태",
+      "conversion": "전환",
+      "referredBy": "소개한 사람",
+      "referredByPlaceholder": "이름",
+      "referrerType": "소개 유형",
+      "followUp": "후속 조치",
+      "followUpDate": "후속 조치 날짜",
+      "followUpTime": "후속 조치 시간",
+      "notes": "메모",
+      "notesPlaceholder": "팀이 알아야 할 내용",
+      "consent": "동의",
+      "consentHint": "서명한 항목",
+      "photos": "첫 사진",
+      "photosHint": "시술 전 사진 · 오늘 방문에 저장",
+      "photosDrop": "사진을 찍거나 끌어다 놓기",
+      "photosLimit": "JPG 또는 PNG · 장당 {{limit}}까지",
+      "photosRemove": "{{name}} 삭제"
+    },
+    "followUpQuick": {
+      "tomorrow": "내일 {{time}}",
+      "week": "1주 후",
+      "twentyDays": "20일 후",
+      "month": "1개월 후"
+    },
+    "save": {
+      "create": "환자 생성",
+      "edit": "변경 사항 저장",
+      "createAnother": "생성 후 계속 추가"
+    },
+    "missing": "이름과 휴대폰 번호를 입력하세요",
+    "mobileInvalid": "10자리 휴대폰 번호를 입력하세요",
+    "created": "환자 {{id}} 생성됨",
+    "openFile": "파일 열기",
+    "saved": "{{name}} 저장됨",
+    "registered": "{{name}} 님이 환자 {{id}}(으)로 등록됨",
+    "registeredPhotos_other": "{{name}} 님이 환자 {{id}}(으)로 등록됨 · 사진 {{count}}장 저장됨",
+    "duplicate": "{{name}} 님과 같은 휴대폰 번호 · {{id}}",
+    "useExisting": "기존 환자 사용",
+    "summaryEmpty": "새 환자",
+    "knownPerson": "{{name}} 님은 이미 연락처에 있습니다 · 이분의 파일로 생성됩니다"
+  },
+  "recordDrawer": {
+    "cancel": "취소",
+    "back": "뒤로",
+    "close": "닫기",
+    "save": "저장",
+    "saving": "저장 중…",
+    "retrySave": "다시 저장",
+    "saveAndAdd": "저장 후 계속 추가",
+    "delete": "삭제",
+    "notSaved": "저장되지 않음 · 변경 사항은 유지됩니다",
+    "saveFailed": "저장하지 못했습니다 · 연결이 끊겼습니다. 입력한 내용은 모두 그대로 있습니다.",
+    "readOnly": "보기 전용 · 현재 역할로는 변경할 수 없습니다",
+    "quickFill": "빠른 입력",
+    "step": {
+      "next": "다음: {{step}} →",
+      "edit": "수정",
+      "open": "열기",
+      "missing": "누락: {{fields, list(type: unit)}}",
+      "notFilled": "아직 입력되지 않음"
+    },
+    "peek": {
+      "empty": "비어 있음",
+      "added_other": "{{count}}개 추가됨",
+      "noneYet": "아직 없음"
+    },
+    "stepper": {
+      "decrease": "줄이기",
+      "increase": "늘리기"
+    },
+    "colours": {
+      "butter": "버터",
+      "lav": "라벤더",
+      "sky": "하늘색",
+      "sage": "세이지",
+      "blush": "블러시",
+      "mint": "민트",
+      "peach": "피치",
+      "plum": "자두색",
+      "lime": "라임",
+      "slate": "슬레이트",
+      "stone": "스톤"
+    },
+    "currency": "₹"
+  },
+  "personCard": {
+    "contactLabel": "연락처",
+    "openPatientFile": "환자 파일 열기",
+    "since": "{{date}}부터",
+    "leadSince": "{{date}}부터 리드",
+    "kind": {
+      "patient": "환자",
+      "lead": "리드",
+      "contact": "연락처"
+    },
+    "editContact": "연락처 편집",
+    "changeContact": "연락처 변경",
+    "changeContactHint": "다른 연락처 선택",
+    "reach": "연락 방법",
+    "team": "팀",
+    "about": "정보",
+    "reachSub": {
+      "whatsappPrimary": "WhatsApp · 기본",
+      "whatsappAlternate": "WhatsApp · 보조",
+      "phonePrimary": "전화 · 기본",
+      "phoneAlternate": "전화 · 보조",
+      "instagram": "Instagram"
+    },
+    "whatsApp": "WhatsApp",
+    "call": "전화",
+    "openInstagram": "Instagram 열기",
+    "copy": "복사",
+    "copied": "{{value}} 복사됨",
+    "noReach": "저장된 전화번호나 핸들이 아직 없습니다",
+    "claim": "미배정 · 가져오기",
+    "claimHint": "이 사람의 리드가 열려 있습니다 · 가져오세요",
+    "gender": {
+      "female": "여성",
+      "male": "남성",
+      "other": "기타"
+    },
+    "genderAge": "{{gender}} · {{age}}세",
+    "age": "{{age}}세",
+    "cameVia": "{{source}} 통해 유입",
+    "owedToThem": "돌려줄 금액 {{amount}}",
+    "owedByThem": "클리닉에 갚을 금액 {{amount}}",
+    "reviews_other": "리뷰 {{count}}개 · 최근 {{source}}에서 {{rating}}★ · {{date}}",
+    "consent": {
+      "data": "데이터",
+      "photos": "사진",
+      "marketing": "마케팅",
+      "hint": "동의 · {{label}}",
+      "given": "{{label}}: 동의함",
+      "missing": "{{label}}: 동의 안 함"
+    },
+    "newLead": "+ 리드",
+    "newLeadHint": "이 연락처의 새 문의",
+    "newAppointment": "+ 예약",
+    "newAppointmentHint": "이 연락처로 예약",
+    "newPatient": "+ 환자",
+    "newPatientHint": "이 연락처의 환자 기록 만들기",
+    "online": "지금 온라인",
+    "offline": "오프라인",
+    "memberKind": {
+      "assigned": "담당",
+      "sentThis": "보낸 사람",
+      "treating": "치료 중",
+      "involved": "참여"
+    },
+    "assignToYourself": "나에게 배정",
+    "works": "근무 {{from}} – {{to}}",
+    "updated": "{{time}} 업데이트",
+    "fetching": "최신 정보를 가져오는 중…"
+  },
+  "reasonConfirm": {
+    "keep": "유지",
+    "reason": "사유",
+    "note": "메모",
+    "notePlaceholder": "메모 추가(선택)",
+    "noteRequired": "팀에 이유를 알려 주세요(필수)",
+    "hintPickReason": "계속하려면 사유를 선택하세요",
+    "hintAddNote": "“기타”에 대한 짧은 메모를 추가하세요",
+    "kinds": {
+      "delete": {
+        "action": "삭제",
+        "effect": "목록과 선택 항목에서 사라집니다. 바로 뒤에 나오는 알림에서 실행 취소할 수 있습니다."
+      },
+      "cancel": {
+        "action": "주문 취소",
+        "effect": "주문이 여기서 중단됩니다. 재고와 공급업체 미지급금은 바뀌지 않습니다."
+      },
+      "void": {
+        "action": "판매 무효화",
+        "effect": "판매가 무효화되고 송장도 취소됩니다. 재고는 돌아옵니다."
+      }
+    },
+    "reasons": {
+      "mistake": "실수로 생성",
+      "duplicate": "중복",
+      "notNeeded": "더 이상 필요 없음",
+      "other": "기타",
+      "orderedByMistake": "실수로 주문",
+      "supplierCantDeliver": "공급업체가 배송할 수 없음",
+      "priceChanged": "가격 변경",
+      "billedByMistake": "실수로 청구",
+      "wrongItems": "잘못된 품목",
+      "customerChangedMind": "고객 변심"
+    }
+  },
+  "itemsField": {
+    "addRow": "행 추가",
+    "removeRow": "행 삭제",
+    "remove": "삭제",
+    "decrease": "줄이기",
+    "increase": "늘리기",
+    "note": "메모",
+    "notePlaceholder": "비고",
+    "moneyPlaceholder": "₹ 0"
+  },
+  "roomToolbar": {
+    "more": "더보기",
+    "moreSections": "섹션 더보기",
+    "searchTitle": "검색 · / 누르기",
+    "moreCreate": "다른 만들기 작업"
+  },
+  "filters": {
+    "title": "필터",
+    "appliedCount": "{{count}}개 적용됨",
+    "clearAll": "모두 지우기",
+    "clearAllFilters": "모든 필터 지우기",
+    "apply": "필터 적용",
+    "saveView": "보기로 저장",
+    "savedView": "보기로 저장됨",
+    "viewSaved": "보기 “{{name}}” 저장됨",
+    "any": "전체",
+    "from": "시작",
+    "to": "종료",
+    "created": {
+      "label": "생성일",
+      "today": "오늘",
+      "yesterday": "어제",
+      "lastSevenDays": "최근 7일",
+      "lastThirtyDays": "최근 30일",
+      "thisMonth": "이번 달",
+      "range": "사용자 지정 기간"
+    },
+    "followUp": {
+      "label": "후속 조치일",
+      "overdue": "기한 지남",
+      "today": "오늘",
+      "tomorrow": "내일",
+      "nextSevenDays": "다음 7일",
+      "notSet": "미설정",
+      "range": "사용자 지정 기간"
+    }
+  },
+  "commandMenu": {
+    "results": "결과",
+    "groups": {
+      "actions": "액션",
+      "goTo": "이동",
+      "people": "사람"
+    },
+    "actions": {
+      "newLead": "새 리드",
+      "newAppointment": "새 예약",
+      "newPatient": "새 환자",
+      "newReceipt": "새 수납",
+      "openTasks": "작업 열기"
+    },
+    "screen": "화면",
+    "move": "이동",
+    "open": "열기",
+    "hint": "사람을 검색하려면 3자 이상 또는 숫자 4자리 이상을 입력하세요",
+    "empty": "일치하는 항목이 없습니다. 이름, 전화번호 또는 C 번호로 시도해 보세요.",
+    "personSub": "{{id}} · •••• {{lastDigits}}"
+  },
+  "lists": {
+    "loadError": "이 목록을 불러오지 못했습니다 · 연결이 끊겼습니다. 마지막 사본을 표시합니다.",
+    "retry": "다시 시도"
+  },
+  "clock": {
+    "todayTime": "오늘 {{time}}",
+    "dayTime": "{{day}} {{time}}"
+  },
+  "channels": {
+    "whatsapp": "WhatsApp",
+    "call": "전화",
+    "sms": "SMS",
+    "instagram": "Instagram",
+    "email": "이메일",
+    "note": "메모"
+  },
+  "checkInFeels": {
+    "much_better": "훨씬 좋아짐",
+    "better": "좋아짐",
+    "same": "비슷함",
+    "worse": "나빠짐"
+  },
+  "reviewSources": {
+    "google": "Google",
+    "video": "동영상",
+    "instagram": "Instagram",
+    "internal_form": "피드백 양식",
+    "whatsapp": "WhatsApp"
+  },
+  "paymentModes": {
+    "cash": "현금",
+    "upi": "UPI",
+    "card": "카드",
+    "credit": "적립금"
+  },
+  "invoiceTypes": {
+    "clinic": "클리닉",
+    "medical": "약국",
+    "consultation": "상담"
+  },
+  "invoiceStatuses": {
+    "paid": "결제 완료",
+    "partial": "일부 결제",
+    "unpaid": "미결제"
+  },
+  "taskOutcomes": {
+    "log_check_in": "경과 기록",
+    "doing_well": "잘 지냄",
+    "no_answer": "응답 없음",
+    "happy": "만족",
+    "done": "완료"
+  },
+  "chatColumn": {
+    "thread": "메시지",
+    "separator": " · ",
+    "created": {
+      "lead": "리드 생성 · {{time}} · {{source}} 경유",
+      "patientThread": "환자 · 채팅만 · 리드 없음",
+      "contactThread": "연락처 · 채팅만 · 리드 없음"
+    },
+    "history": {
+      "appointment": "예약 #{{seq}}",
+      "reminder": "알림 발송됨",
+      "prescription": "처방 #{{seq}}",
+      "session": "{{session}}회차",
+      "invoice": "{{type}} 청구서 #{{seq}}",
+      "due": "{{amount}} 미납",
+      "paid": "결제 완료",
+      "received": "{{amount}} 수납",
+      "refund": "{{amount}} 환불",
+      "invoiceRef": "#{{seq}}",
+      "checkIn": "경과 확인",
+      "score": "{{score}}/10",
+      "after": "{{context}} 후",
+      "review": "{{source}} 리뷰",
+      "rating": "{{rating}}★",
+      "task": "할 일 · {{title}} → {{result}}",
+      "masked": "₹ ••••"
+    },
+    "delivery": {
+      "sending": "보내는 중…",
+      "sent": "보냄",
+      "delivered": "전달됨",
+      "read": "읽음",
+      "queued": "대기 중",
+      "notSent": "보내지 못함",
+      "retry": "다시 시도"
+    },
+    "sender": {
+      "call": "{{name}} · 전화",
+      "note": "{{name}} · 메모"
+    },
+    "empty": {
+      "title": "아직 대화가 없습니다",
+      "visit": "{{first}}님의 {{service}} 예약은 {{when}} {{time}}입니다 · WhatsApp을 짧게 보내 두면 예약이 유지됩니다",
+      "pastVisits": "{{first}}님과의 모든 WhatsApp, 전화, 메모가 여기에 표시됩니다",
+      "noVisits": "WhatsApp으로 시작하세요 · 답장은 여기에 표시됩니다",
+      "today": "오늘",
+      "tomorrow": "내일",
+      "onDate": "{{date}}"
+    },
+    "starters": {
+      "onTheWay": "오시는 중인가요?",
+      "directions": "오시는 길 보내기",
+      "newTime": "다른 시간 제안",
+      "confirm": "방문 확인",
+      "prep": "사전 안내",
+      "howItWent": "경과 묻기",
+      "nextSession": "다음 회차 예약",
+      "offer": "혜택 안내",
+      "hello": "인사하기",
+      "consultation": "상담 제안"
+    },
+    "sendVia": "보낼 채널",
+    "modes": {
+      "whatsapp": "WhatsApp",
+      "instagram": "Instagram",
+      "call": "통화 기록",
+      "note": "메모"
+    },
+    "noInstagram": "이 연락처에는 Instagram이 없습니다",
+    "message": "메시지",
+    "placeholder": {
+      "message": "{{channel}}으로 {{first}}님에게 메시지",
+      "messageNoName": "{{channel}}으로 리드에게 메시지",
+      "note": "팀 메모 ({{first}}님에게는 보내지 않음)",
+      "noteNoName": "팀 메모 (리드에게는 보내지 않음)",
+      "call": "통화 내용은 무엇이었나요?"
+    },
+    "send": {
+      "whatsapp": "WhatsApp 보내기",
+      "instagram": "Instagram 보내기",
+      "call": "통화 기록",
+      "note": "메모 추가"
+    },
+    "replyHint": "{{first}}님이 마지막으로 연락한 채널",
+    "mismatch": "{{first}}님은 {{channel}}으로 연락 · 전환",
+    "outage": "WhatsApp 장애 · 답장은 대기열에 쌓입니다",
+    "notConnected": "메시지는 대기열에 있습니다 · 메시징이 연결되면 발송됩니다",
+    "prefersNoCalls": "전화 원치 않음 · 메시지로 연락",
+    "prefersAfterSix": "오후 6시 이후 연락 선호",
+    "suggest": "제안",
+    "suggestions": "제안",
+    "suggestHint": "제안 및 템플릿 · 또는 / 입력",
+    "book": "예약하기",
+    "bookHint": "예약하기 · 사유는 메시지에서",
+    "suggestedFor": "{{first}}님을 위한 제안",
+    "closeSuggestions": "제안 닫기",
+    "templatesLabel": "템플릿 · 입력란에 / 를 입력해 검색",
+    "noTemplate": "“{{query}}”와 일치하는 템플릿이 없습니다",
+    "fillIn": "채우기",
+    "chips": {
+      "price": "가격 안내",
+      "priceHint": "가격을 문의함",
+      "slots": "2개 시간 제안",
+      "slotsHint": "시간을 문의함",
+      "location": "위치 보내기",
+      "explain": "{{term}} 설명",
+      "greet": "인사",
+      "followUp": "후속 연락"
+    },
+    "templates": {
+      "greeting": "인사",
+      "price": "가격",
+      "slots": "빈 시간",
+      "location": "위치",
+      "reminder": "알림",
+      "aftercare": "사후 관리",
+      "followUp": "후속 연락",
+      "review": "리뷰"
+    },
+    "content": {
+      "starters": {
+        "onTheWay": "{{first}}님, 안녕하세요. {{time}} {{service}} 준비가 되어 있습니다. 오시는 중인가요?",
+        "directionsToday": "{{first}}님, 안녕하세요. 클리닉 위치입니다: {{maps}}. {{time}}에 뵙겠습니다!",
+        "newTime": "{{first}}님, 안녕하세요. 오늘 {{time}}이 어려우시면 편하신 시간을 답장해 주세요. 옮겨 드리겠습니다.",
+        "confirm": "{{first}}님, 안녕하세요. {{when}} {{time}} {{service}} 예약 알림입니다. 확인하시려면 \"네\"라고 답장해 주세요.",
+        "prep": "{{first}}님, 안녕하세요. {{when}} {{service}} 전에: 화장하지 않고 오시고 24시간 동안 햇빛을 피해 주세요. {{time}}에 뵙겠습니다!",
+        "directionsLater": "{{first}}님, 안녕하세요. 클리닉 위치입니다: {{maps}}. {{when}} {{time}}에 뵙겠습니다.",
+        "howItWent": "{{first}}님, 안녕하세요. 지난 방문 후 피부 상태는 어떠신가요? 원장님께 궁금한 점이 있으신가요?",
+        "nextSession": "{{first}}님, 안녕하세요. 다음 회차를 예약해 드릴까요? 편하신 날짜를 답장해 주세요.",
+        "offer": "{{first}}님, 안녕하세요. 이번 달 평소 받으시는 시술에 특별 혜택이 있습니다. 자세히 알려 드릴까요?",
+        "hello": "{{first}}님, 안녕하세요. {{clinic}}의 {{me}}입니다. 필요하신 것이 있으면 무엇이든 도와드리겠습니다.",
+        "consultation": "{{first}}님, 안녕하세요. 이번 주에 원장님 진료가 가능합니다. 상담을 예약해 드릴까요?",
+        "directions": "{{first}}님, 안녕하세요. 클리닉 위치입니다: {{maps}}."
+      },
+      "templates": {
+        "greeting": "{{first}}님, 안녕하세요. {{clinic}}의 {{me}}입니다 😊 오늘 무엇을 도와드릴까요?",
+        "price": "{{offering}}은(는) {{price}}입니다. 원장님 상담이 포함됩니다. 예약해 드릴까요?",
+        "priceSessions": "{{offering}}은(는) {{sessions}}회에 {{price}}입니다. 원장님 상담이 포함됩니다. 예약해 드릴까요?",
+        "slots": "{{interest}} 예약은 {{slots}}에 가능합니다. 어느 시간이 편하신가요?",
+        "location": "저희 위치는 {{address}}입니다 · Google 지도: {{maps}}. 바로 앞에 주차하실 수 있습니다.",
+        "reminder": "{{first}}님, 안녕하세요. {{dayTime}} 방문 알림입니다. 확인하시려면 \"네\"라고 답장하시거나 더 편한 시간을 알려 주세요.",
+        "aftercare": "{{first}}님, 안녕하세요. 오늘 피부 상태는 어떠신가요? 보습을 유지하고 자외선 차단제를 바르며 48시간 동안 스크럽은 피해 주세요.",
+        "followUp": "{{first}}님, 안녕하세요. {{interest}} 관련해 연락드렸습니다. 이번 주에 시간을 잡아 둘까요?",
+        "review": "{{first}}님, 방문해 주셔서 감사합니다! 만족하셨다면 짧은 Google 리뷰가 큰 도움이 됩니다: {{reviewLink}}"
+      },
+      "explain": "좋은 질문입니다! {{offering}}이(가) 이에 효과적이며, 대부분 {{results}} 안에 효과를 보십니다. 상담 때 원장님이 확인하고 계획을 세워 드립니다.",
+      "sessions": "{{n}}회",
+      "fewWeeks": "몇 주",
+      "slotPair": "{{first}} 또는 {{second}}",
+      "slot": "{{day}} {{time}}",
+      "dayTime": "{{day}} {{time}}",
+      "dayTimeFallback": "내일 오전 11시",
+      "today": "오늘",
+      "tomorrow": "내일",
+      "onDate": "{{date}}",
+      "there": "고객",
+      "yourTreatment": "원하시는 시술",
+      "interests": {
+        "clinical": "피부과 치료",
+        "peel": "필링",
+        "lhr": "레이저 제모",
+        "hydrafacial": "하이드라페이셜",
+        "prp": "PRP"
+      },
+      "fill": {
+        "address": "주소",
+        "maps": "지도 링크",
+        "dayTime": "날짜와 시간",
+        "reviewLink": "리뷰 링크"
+      }
+    }
+  },
+  "offeringSuggestions": {
+    "title": "서비스 제안",
+    "suggested_other": "{{count}}개 제안",
+    "planned_other": "{{count}}개 예정",
+    "accepted_other": "{{count}}개 수락",
+    "pastPurchases_other": "이전 구매 {{count}}건",
+    "ideas_other": "아이디어 {{count}}개",
+    "nothingSuggested": "아직 제안이 없습니다",
+    "noSuggestions": "아직 제안이 없습니다",
+    "pricesHidden": "가격 숨김",
+    "masked": "₹ ••••",
+    "pricesHiddenHint": "가격 숨김 · 눈 아이콘으로 표시",
+    "showPrices": "가격 표시",
+    "hidePrices": "가격 숨기기",
+    "columns": {
+      "suggested": "제안",
+      "qty": "수량",
+      "price": "가격",
+      "status": "상태"
+    },
+    "less": "줄이기",
+    "more": "늘리기",
+    "quantity": "수량",
+    "finalPrice": "최종 가격",
+    "belowFloor": "최저가 미만",
+    "tooMuchDiscount": "할인이 너무 큽니다 · 관리자에게 문의하세요",
+    "details": "서비스 정보",
+    "statuses": {
+      "planned": "예정",
+      "accepted": "수락",
+      "next_time": "다음에",
+      "declined": "거절"
+    },
+    "statusHints": {
+      "planned": "제안함 · 아직 결정 전",
+      "accepted": "동의함 · 진행 시 청구",
+      "next_time": "관심 있음 · 다음 방문 때 다시 언급",
+      "declined": "관심 없음 · 기록으로 보관"
+    },
+    "statusLabel": "상태 · {{status}}",
+    "invoiced": "청구됨",
+    "invoicedOf": "청구됨 · {{total}}개 중 {{done}}개",
+    "remove": "삭제",
+    "empty": "{{first}} 님에게 아직 제안된 것이 없습니다.",
+    "whyIdea": "이 아이디어를 제안하는 이유",
+    "idea": "아이디어",
+    "add": "+ 추가",
+    "addNamed": "{{name}} 추가",
+    "addHint": "제안에 추가",
+    "addOffering": "서비스 추가",
+    "purchasesTitle": "{{first}} 님의 최근 구매",
+    "purchaseColumns": {
+      "date": "날짜",
+      "bought": "구매 항목",
+      "sessions": "회차"
+    },
+    "sessionsUsed": "{{total}}회 중 {{used}}회 사용",
+    "activityTitle": "연락처 활동",
+    "openChat": "채팅 열기",
+    "activityColumns": {
+      "when": "시간",
+      "channel": "채널",
+      "message": "메시지",
+      "status": "상태"
+    },
+    "sent": "보냄",
+    "got": "받음",
+    "removeConfirm": {
+      "title": "이 기록을 삭제할까요?",
+      "record": "제안에서 {{name}}",
+      "effect": "{{first}} 님의 서비스 제안에서 빠집니다. 제안했던 기록을 남기려면 대신 ‘거절’을 사용하세요.",
+      "reasons": {
+        "addedByMistake": "실수로 추가",
+        "duplicate": "중복",
+        "planChanged": "계획 변경",
+        "other": "기타"
+      }
+    },
+    "searchOfferings": "서비스 검색",
+    "single": "단일",
+    "minPrice": "최소 {{price}}",
+    "added": "{{name}}을(를) {{first}} 님의 제안에 추가했습니다",
+    "removed": "{{name}}을(를) 제안에서 뺐습니다",
+    "offeringRemoved": "서비스가 삭제되었습니다",
+    "info": {
+      "sessions_other": "{{count}}회",
+      "visits_other": "방문 {{count}}회",
+      "list": "정가 {{price}}",
+      "lowest": "최저 {{price}}"
+    },
+    "ideaReasons": {
+      "history": "이력 기반 제안"
+    },
+    "delivery": {
+      "queued": "대기 중",
+      "sent": "보냄",
+      "delivered": "전달됨",
+      "read": "읽음",
+      "failed": "전달 실패",
+      "received": "받음"
+    },
+    "activityLead": "리드 {{id}}",
+    "purchasesCount_other": "{{count}}개 항목"
+  },
+  "contactEditor": {
+    "title": "연락처 편집",
+    "sub": "한 번 저장 · 모든 리드, 환자, 채팅에서 사용",
+    "newContact": "새 연락처",
+    "steps": {
+      "identity": "신원 및 연락 수단",
+      "preferences": "연락 선호"
+    },
+    "idHelp": "하나의 연락처 · 리드, 환자, 채팅이 함께 사용",
+    "idTooltip": "연락처 ID · 클릭하여 복사",
+    "idAria": "연락처 ID {{id}} 복사",
+    "idCopied": "연락처 ID {{id}} 복사됨",
+    "firstName": "이름",
+    "firstNamePlaceholder": "이름",
+    "lastName": "성",
+    "lastNamePlaceholder": "성 (선택)",
+    "mobiles": "휴대폰 번호",
+    "mobileAria": "휴대폰 {{n}}",
+    "primary": "기본",
+    "primaryTitle": "기본 번호 · 전화와 대조에 사용",
+    "setPrimary": "기본으로 설정",
+    "setPrimaryTitle": "이 번호를 기본 번호로 설정",
+    "primaryChanged": "{{number}}이(가) 이제 기본 번호입니다",
+    "whatsAppOn": "WhatsApp 사용 · 클릭하여 끄기",
+    "whatsAppOff": "WhatsApp 미사용 · 클릭하여 켜기",
+    "removeNumber": "번호 삭제",
+    "addNumber": "+ 번호 추가",
+    "addInstagram": "+ Instagram",
+    "handlePlaceholder": "@핸들",
+    "handleAria": "Instagram {{n}}",
+    "removeHandle": "핸들 삭제",
+    "removeHandleTitle": "이 핸들 삭제",
+    "handleRemoved": "{{handle}} 삭제됨",
+    "addHandle": "+ 핸들 추가",
+    "defaultChannel": "기본 채널",
+    "defaultChannelHint": "· 마지막으로 사용한 채널로 바뀝니다",
+    "custom": "+ 직접 입력",
+    "customPlaceholder": "선호 사항 입력",
+    "customAria": "직접 입력한 선호 사항",
+    "done": "완료",
+    "updated": "연락처 업데이트됨 · 모든 곳에 적용",
+    "preferences": {
+      "noCalls": "전화 사절",
+      "sundaysOnly": "일요일만",
+      "weekdaysOnly": "평일만",
+      "afterSix": "오후 6시 이후",
+      "mornings": "오전",
+      "evenings": "저녁",
+      "weekendsOnly": "주말만",
+      "gujarati": "구자라트어",
+      "hindi": "힌디어",
+      "english": "영어",
+      "femaleDoctor": "여성 의사",
+      "textFirst": "전화 전에 문자"
+    }
+  },
+  "offeringQuickCreate": {
+    "title": "새 서비스",
+    "sub": "청구하는 서비스, 시술 또는 패키지",
+    "steps": {
+      "offering": "서비스",
+      "details": "세부 정보",
+      "payment": "결제"
+    },
+    "fields": {
+      "name": "이름",
+      "namePlaceholder": "예: 얼굴 전체 레이저 제모",
+      "duration": "소요 시간",
+      "minutesUnit": "분",
+      "minutes": "{{minutes}}분",
+      "category": "카테고리",
+      "price": "가격"
+    },
+    "save": "서비스 추가",
+    "toasts": {
+      "name": "이름을 입력하세요",
+      "price": "가격을 입력하세요",
+      "added": "서비스 {{name}}을(를) 추가했습니다"
+    }
+  },
+  "appointmentForm": {
+    "title": {
+      "loading": "예약",
+      "create": "새 예약",
+      "edit": "예약 {{id}}",
+      "reschedule": "{{id}} 일정 변경"
+    },
+    "sub": "빈 시간만 표시됩니다 · 지난 시간은 잠겨 있습니다",
+    "who": {
+      "search": "이름, 전화번호, ID로 환자 또는 리드 검색",
+      "searchLabel": "사람 검색",
+      "useContact": "연락처 사용",
+      "patient": "환자",
+      "createContact": "+ 연락처 “{{query}}” 만들기",
+      "newContact": "새 연락처 · 예약하려면 휴대폰 번호 추가",
+      "mobile": "휴대폰 번호",
+      "name": "이름",
+      "mobileLabel": "휴대폰",
+      "save": "저장",
+      "addName": "이름을 입력하세요",
+      "mobileDigits": "휴대폰 번호는 10자리여야 합니다"
+    },
+    "links": {
+      "connected": "연결된 리드",
+      "chip": "{{id}} · {{status}}",
+      "chipHint": "리드 {{id}} · {{source}} · 담당 {{owner}}",
+      "movesAtCheckIn": "· 체크인 시 “내원함”으로 이동"
+    },
+    "status": {
+      "section": "방문 상태",
+      "group": "상태",
+      "copy": "복사",
+      "copyHint": "복사 · 같은 서비스, 의사, 사유, 메모",
+      "cancelVisit": "방문 취소",
+      "cancelHint": "이 예약 취소",
+      "cancelledReason": "{{reason}} · 시간 해제됨 · 알림 중지됨",
+      "cancelledNoReason": "시간 해제됨 · 알림 중지됨",
+      "restore": "복원",
+      "rescheduledConfirm": "일정 변경됨 · 이전 {{day}} {{time}} · 다시 확인 필요 · 저장하면 새 알림이 발송됩니다",
+      "rescheduled": "일정 변경됨 · 이전 {{day}} {{time}} · 저장하면 새 알림이 발송됩니다",
+      "planReady_other": "플랜 준비됨 · 서비스 {{count}}개",
+      "planVisit_other": "이번 방문에 {{count}}개 계획",
+      "planEarlier_other": "이전 방문에서 {{count}}개"
+    },
+    "details": {
+      "title": "예약",
+      "notFilled": "아직 입력되지 않음",
+      "open": "열기",
+      "type": "유형",
+      "typeGroup": "예약 유형",
+      "types": {
+        "consultation": "상담",
+        "follow_up": "경과 확인",
+        "treatment": "시술",
+        "package_session": "패키지 회차",
+        "other": "기타"
+      },
+      "typeHints": {
+        "consultation": "첫 방문 또는 의사 진료",
+        "follow_up": "시술이나 처방 후 짧은 확인",
+        "treatment": "단일 회차, 방문 시 청구",
+        "package_session": "결제한 패키지에서 1회 사용",
+        "other": "위에 해당하지 않는 모든 것"
+      },
+      "typeLines": {
+        "consultation": "결제 시 상담료가 청구서에 추가됩니다",
+        "follow_up": "보통 무료 · 추가 항목이 없으면 청구서 없음",
+        "other": "아래 메모에 내용을 적어 주세요"
+      },
+      "treatment": "시술",
+      "pickTreatment": "시술 선택",
+      "searchTreatments": "시술 검색",
+      "common": "자주 쓰는 항목",
+      "fromOfferings": "서비스에서",
+      "doctor": "의사",
+      "pickDoctor": "의사 선택",
+      "searchDoctors": "의사 및 치료사 검색",
+      "length": "소요 시간",
+      "minutes": "{{minutes}}분",
+      "minutesHint": "{{minutes}}분",
+      "reason": "사유",
+      "reasonPlaceholder": "요청 내용 · 예: 볼 색소 침착",
+      "notes": "메모",
+      "notesPlaceholder": "의사나 데스크가 알아야 할 내용"
+    },
+    "slot": {
+      "title": "날짜 및 시간",
+      "nextWeek": "다음 주",
+      "calendar": "캘린더",
+      "previousMonth": "이전 달",
+      "nextMonth": "다음 달",
+      "step": "시간 간격",
+      "stepOption": "{{minutes}}분",
+      "time": "시간",
+      "pickDate": "날짜를 선택하면 시간이 표시됩니다",
+      "none": "이 날은 예약할 수 있는 시간이 없습니다 · 다른 날짜를 선택하세요",
+      "closed": {
+        "past": "지난 날짜입니다 · 다른 날짜를 선택하세요",
+        "branchInactive": "이 지점은 예약을 받지 않습니다",
+        "closedDay": "이 날은 휴진입니다 · 다른 날짜를 선택하세요",
+        "holiday": "{{label}} 휴진 · 다른 날짜를 선택하세요",
+        "doctorOff": "이 날은 의사가 근무하지 않습니다 · 다른 날짜나 의사를 선택하세요"
+      },
+      "am": "오전",
+      "pm": "오후",
+      "hour": "{{period}} {{hour}}시",
+      "free": "{{time}} · 비어 있음",
+      "locked": "잠김",
+      "lockedSummary": "{{day}} · {{time}} · 체크인 후 잠김",
+      "lockedToast": "환자가 체크인하면 날짜와 시간이 잠깁니다"
+    },
+    "footer": {
+      "pickTime": "시간 선택",
+      "book": "{{day}} {{time}} 예약",
+      "move": "{{day}} {{time}}(으)로 변경",
+      "saveChanges": "변경 사항 저장",
+      "minutes": "{{minutes}}분"
+    },
+    "validation": {
+      "who": "예약 대상자를 선택하세요",
+      "slot": "날짜와 시간을 선택하세요",
+      "passed": "지난 시간입니다 · 이후 시간을 선택하세요",
+      "taken": "방금 예약되었습니다 · 다른 시간을 선택하세요",
+      "doctor": "의사를 선택하세요",
+      "branch": "예약할 수 있는 운영 중인 지점이 없습니다"
+    },
+    "copied": "복사됨 · 날짜와 시간을 선택하세요"
+  },
+  "expenseCategories": {
+    "medicines": "의약품",
+    "consumables": "소모품",
+    "salary": "급여",
+    "rent": "임대료",
+    "marketing": "마케팅",
+    "utilities": "공과금",
+    "maintenance": "유지보수",
+    "misc": "기타"
+  },
+  "patientPicker": {
+    "label": "환자",
+    "placeholder": "환자 검색",
+    "hint": "환자만 선택할 수 있음",
+    "due": "미수 {{amount}}",
+    "nothingDue": "미수 없음"
+  },
+  "splitRows": {
+    "mode": "수단",
+    "amount": "금액"
+  },
+  "settleCredit": {
+    "title": {
+      "give": "돌려주기",
+      "take": "돌려받음"
+    },
+    "sub": {
+      "give": "{{name}}에게 · {{reason}} · 결제에 출금 항목이 추가됩니다",
+      "take": "{{name}}에게서 · {{reason}} · 결제에 입금 항목이 추가됩니다"
+    },
+    "section": {
+      "give": "돌려주는 방법",
+      "take": "받은 방법"
+    },
+    "rows": {
+      "give": "돌려준 수단",
+      "take": "받은 수단"
+    },
+    "add": "다른 수단 추가",
+    "total": "합계 {{total}} · {{owed}} 중",
+    "save": {
+      "give": "{{amount}} 돌려주기",
+      "take": "{{amount}} 기록"
+    },
+    "enterAmount": "금액을 입력하세요",
+    "moreThanOwed": "남은 {{amount}}보다 많습니다",
+    "done": {
+      "give": "{{name}}에게 {{amount}} 돌려줌 · {{entry}}",
+      "take": "{{name}}에게서 {{amount}} 돌려받음 · {{entry}}"
+    },
+    "branch": "지점",
+    "date": "날짜",
+    "dayClosed": "이 지점에서 그날은 마감되었습니다 · 열린 날을 고르세요",
+    "moreThanPaid": "청구서에 결제된 금액보다 많습니다",
+    "closed": "{{ref}}은(는) 이미 정산되었습니다",
+    "entry": {
+      "give": "출금 항목 추가됨",
+      "take": "입금 항목 추가됨"
+    }
+  },
+  "quickLine": {
+    "label": "빠른 추가",
+    "enter": "↵ 추가",
+    "matches": "검색 결과",
+    "suggested": "추천 · 클릭해서 추가",
+    "typed": "목록에 없음 · 입력한 대로 추가",
+    "noMatch": "일치하는 항목이 없습니다. 철자를 확인하거나 더 적게 입력하세요.",
+    "keys": "↑↓ 선택 · ↵ 추가 · Esc 지우기",
+    "browse": "둘러보기",
+    "browseAll": "전체 둘러보기",
+    "groups": "그룹",
+    "closeBrowse": "둘러보기 닫기",
+    "added_other": "{{count}}개 추가됨",
+    "tapToAdd": "타일을 눌러 추가하세요",
+    "showing": "{{total}}개 중 {{shown}}개 표시 · 입력해서 좁히기",
+    "done": "완료",
+    "emptyGroup": "이 그룹에 일치하는 항목이 없습니다.",
+    "addOne": "하나 추가",
+    "removeOne": "하나 빼기",
+    "addNew": "새로 추가",
+    "tags": {
+      "qty": "×{{count}}",
+      "free": "무상 +{{count}}",
+      "rate": "@ {{amount}}",
+      "discount": "{{percent}}% 할인"
+    }
+  },
+  "invoiceDrawer": {
+    "title": {
+      "create": "새 청구서",
+      "edit": "청구서 수정",
+      "createSale": "새 판매",
+      "editSale": "판매 수정"
+    },
+    "sub": {
+      "create": "유형을 고른 뒤 항목을 추가하세요",
+      "edit": "변경 사항은 청구서에 기록됩니다",
+      "sale": "의약품 청구서 · 재고는 유효기한이 가까운 순으로 차감됩니다"
+    },
+    "type": "유형",
+    "steps": {
+      "party": "환자 및 팀",
+      "items": "항목",
+      "medicines": "의약품",
+      "payment": "결제"
+    },
+    "fields": {
+      "branch": "지점",
+      "newPatient": "새 환자",
+      "customer": "고객",
+      "customerHint": "환자 또는 아무 연락처 · 새 이름은 약국 연락처로 저장됩니다",
+      "customerPlaceholder": "환자, 리드 또는 약국 연락처 검색",
+      "addContact": "연락처 추가",
+      "mobile": "휴대폰",
+      "mobileHint": "연락처에 저장됨",
+      "mobilePlaceholder": "98765 43210",
+      "team": "팀",
+      "prescribedBy": "처방자",
+      "teamPlaceholder": "팀 선택",
+      "teamHint": "의사, 치료사, 상담사",
+      "teamFrom": "{{name}}님의 팀에서",
+      "overallDiscount": "전체 할인",
+      "quickFill": "빠른 입력",
+      "paidNow": "지금 결제",
+      "remark": "비고",
+      "remarkPlaceholder": "인쇄된 청구서에 표시됩니다",
+      "paid": "지금까지 결제"
+    },
+    "customerGroups": {
+      "patient": "환자",
+      "lead": "리드",
+      "contact": "약국 연락처"
+    },
+    "customerSub": {
+      "noMobile": "아직 휴대폰 없음"
+    },
+    "items": {
+      "quickLine": "서비스, 수량, 할인 입력 · 예: lhr face 1 10%",
+      "quickLineMedical": "의약품과 수량 입력 · 예: sun 2",
+      "hint": "2 = 수량 · 10% = 할인 · @500 = 단가",
+      "oftenBilled": "자주 청구",
+      "browse": {
+        "all": "전체",
+        "oral": "경구",
+        "topical": "외용"
+      },
+      "columns": {
+        "offering": "서비스",
+        "medicine": "의약품",
+        "qty": "수량",
+        "rate": "단가",
+        "discount": "할인 %",
+        "gst": "GST",
+        "final": "최종"
+      },
+      "pickItem": "항목 선택",
+      "selectOffering": "서비스 선택…",
+      "selectMedicine": "의약품 선택…",
+      "newOffering": "새 서비스",
+      "addItem": "항목 추가",
+      "addMedicine": "의약품 추가",
+      "total": "합계",
+      "sessions_other": "{{count}}회",
+      "inStock": "재고 {{count}}",
+      "outOfStock": "재고 없음",
+      "belowFloor": "{{name}}의 최저가 {{amount}}보다 낮습니다",
+      "newMedicineName": "새 의약품 이름",
+      "medicineAdded": "{{name}} 추가됨 · 최대 소매가는 나중에 재고에서 설정",
+      "hintInvoice": "2 = 수량 · 10% = 할인",
+      "belowLowest": "{{name}}의 최저가보다 낮음",
+      "offerApplied": "적용된 오퍼: {{offer}}"
+    },
+    "payment": {
+      "full": "전액 · {{mode}}로 {{amount}}",
+      "split": "현금 + UPI 분할",
+      "nothing": "지금은 없음",
+      "mode": "수단",
+      "amount": "금액",
+      "addMode": "다른 수단 추가",
+      "paidTotal": "결제 {{paid}} · 미수 {{due}}"
+    },
+    "totals": {
+      "label": "합계",
+      "subtotal": "소계",
+      "discountGst": "할인 + GST",
+      "discountGstValue": "{{discount}} · +{{gst}}",
+      "bill": "청구액",
+      "dueAfter": "이후 미수",
+      "preview": "저장될 금액 그대로 계산됨",
+      "pending": "금액 계산 중…",
+      "refused": "계산되지 않음 · 표시된 줄을 수정하세요",
+      "failed": "이 청구서의 금액을 계산하지 못했습니다",
+      "retry": "다시 시도"
+    },
+    "badges": {
+      "bill": "청구액 {{amount}}",
+      "sessions_other": "{{count}}회 포함",
+      "draft": "임시",
+      "due": "미수 {{amount}}",
+      "paid": "전액 결제"
+    },
+    "presets": {
+      "print": "청구서 인쇄",
+      "plan": "플랜 · {{name}}",
+      "planQty": "플랜 · {{name}} ×{{count}}",
+      "package": "패키지 · {{name}}",
+      "repeat": "#{{seq}} 반복",
+      "consultation": "신규 상담 · {{amount}}",
+      "rx": "처방전 #{{seq}}에서"
+    },
+    "save": {
+      "clinic": "클리닉 청구서 만들기",
+      "medical": "의약품 청구서 만들기",
+      "consultation": "상담 청구서 만들기",
+      "edit": "변경 사항 저장"
+    },
+    "summary": "{{type}} · {{name}} · {{items}}",
+    "summaryItems_other": "항목 {{count}}개",
+    "noPatient": "환자 없음",
+    "errors": {
+      "pickPatient": "환자를 선택하세요",
+      "pickCustomer": "고객을 선택하세요",
+      "addItem": "항목을 하나 이상 추가하세요",
+      "paidAboveBill": "결제액 {{paid}}이(가) 청구액 {{bill}}보다 많습니다",
+      "stock": "{{name}} 재고가 {{count}}개뿐입니다",
+      "belowFloor": "{{name}}이(가) 최저가 {{amount}}보다 낮습니다 · 최종 가격을 올리세요",
+      "belowLowest": "{{name}}이(가) 최저가보다 낮습니다 · 최종 가격을 올리세요"
+    },
+    "toasts": {
+      "created": {
+        "clinic": "클리닉 청구서 #{{seq}} 생성됨",
+        "medical": "의약품 청구서 #{{seq}} 생성됨",
+        "consultation": "상담 청구서 #{{seq}} 생성됨"
+      },
+      "copied": "사본 청구서 #{{seq}} 생성됨",
+      "createdPlan_other": "{{created}} · 제안 {{count}}건을 청구 완료로 표시함",
+      "saved": "청구서 #{{seq}} 저장됨",
+      "savedPlan": "청구서 #{{seq}} 저장됨 · 제안 업데이트됨",
+      "promo": "{{offering}}에 {{offer}} 적용됨",
+      "contactSaved": "{{name}}을(를) 약국 연락처로 저장함 · 아래에 휴대폰 추가",
+      "rxUnmatched": "{{name}}은(는) 의약품 목록에 없습니다 · 빠른 추가에서 추가하세요",
+      "deleted": "청구서 #{{seq}} 삭제됨"
+    },
+    "deleteTitle": "이 청구서를 삭제할까요?",
+    "previewTitle": {
+      "clinic": "청구서 #{{seq}}",
+      "medical": "의약품 청구서 #{{seq}}",
+      "consultation": "상담 청구서 #{{seq}}"
+    },
+    "record": "청구서",
+    "refusals": {
+      "moreThanDue": "지금 결제액이 청구액보다 많습니다",
+      "dayClosed": "그날은 마감되었습니다 · 결제를 추가할 수 없습니다",
+      "settled": "이 청구서는 정산되었습니다 · 결제 중 하나가 마감된 날에 있습니다",
+      "belowPaid": "청구액은 이미 결제된 금액보다 낮을 수 없습니다",
+      "offeringInUse": "이 패키지의 세션이 이미 사용되었습니다 · 해당 줄을 유지하세요",
+      "treatmentBilled": "이 청구서의 시술이 그 사이 청구되었습니다 · 제거하고 다시 저장하세요",
+      "ofSale": "이 청구서는 의약품 판매 건입니다 · 의약품에서 변경하세요",
+      "paid": "이 청구서에는 결제 또는 대변 메모가 있습니다 · 삭제할 수 없습니다",
+      "inUseDelete": "이 패키지의 세션이 이미 사용되었습니다 · 청구서를 삭제할 수 없습니다"
+    },
+    "notices": {
+      "settled": "정산됨 · 이 청구서의 결제가 마감된 날에 있어 변경할 수 없습니다",
+      "sale": "의약품 판매 청구서 · 의약품에서 변경하세요"
+    }
+  },
+  "printPreview": {
+    "title": "인쇄 미리보기 · {{title}}",
+    "close": "닫기",
+    "print": "인쇄 / PDF 저장"
+  },
+  "appHomeEmpty": {
+    "title": "아직 켜진 항목이 없습니다",
+    "description": "클리닉의 섹션이 켜지면 바로 여기에 표시됩니다."
+  }
+}

@@ -1,68 +1,14 @@
 {
-  "brand": {
-    "name": "{{productName}}"
-  },
   "a11y": {
-    "skipToMain": "Skip to main content",
-    "mainNavigation": "Main navigation",
-    "sidebarNavigation": "Sidebar navigation",
-    "mobileNavigation": "Mobile navigation"
-  },
-  "auth": {
-    "switchToRegister": "Create an account",
-    "switchToSignIn": "Sign in",
-    "statusOperational": "All systems operational",
-    "badge": "Operations, unified",
-    "heroTitle": "The operating system for your organization.",
-    "heroSubtitle": "Members, roles, billing, and security — one fast, keyboard-first workspace for every team you run.",
-    "features": {
-      "multiOrg": {
-        "title": "Multi-org by design",
-        "body": "Switch teams without switching tools."
-      },
-      "secure": {
-        "title": "Secure by default",
-        "body": "RBAC, MFA, passkeys, and audit trails."
-      },
-      "fast": {
-        "title": "Fast everywhere",
-        "body": "Built for keyboard-first, real-time work."
-      }
-    },
-    "stats": {
-      "teams": "teams",
-      "uptime": "uptime",
-      "compliant": "compliant"
-    }
+    "skipToMain": "Skip to main content"
   },
   "app": {
     "search": "Search",
-    "searchPlaceholder": "Search...",
     "searchShortcutMac": "⌘K",
     "searchShortcutWindows": "Ctrl+K",
-    "userMenu": "User menu",
     "userFallback": "User",
     "settings": "Settings",
     "logOut": "Log out",
-    "toggleSidebar": "Toggle sidebar",
-    "footerCopyright": "© {{year}} {{productName}} Platform",
-    "nav": {
-      "dashboard": "Dashboard"
-    },
-    "sidebar": {
-      "workspace": "Workspace",
-      "menu": "Menu",
-      "shortcuts": "Shortcuts"
-    },
-    "contextStrip": {
-      "label": "Quick access",
-      "labelSolo": "Jump to",
-      "profile": "Profile",
-      "security": "Security",
-      "billing": "Billing",
-      "appearance": "Appearance",
-      "shortcuts": "Shortcuts"
-    },
     "workspaceSwitch": {
       "preparing": "Preparing your workspace",
       "loadingAccess": "Loading members and permissions",
@@ -74,7 +20,10 @@
       "personal": "Personal",
       "yourOrganizations": "Your organizations",
       "organizations": "Organizations",
-      "addOrganization": "Add organization"
+      "addOrganization": "Add organization",
+      "invited": "Invited",
+      "invitedRow": "Invited · {{roles}}",
+      "invitationCount": "Invitations: {{count}}"
     },
     "notifications": {
       "title": "Notifications",
@@ -90,17 +39,15 @@
       "settingsLink": "Notification settings"
     },
     "commandPalette": {
-      "ariaLabel": "Command palette",
-      "placeholder": "Type a command or search...",
+      "ariaLabel": "Command menu",
+      "placeholder": "Search or jump to…",
       "empty": "No results found.",
       "groups": {
-        "navigation": "Navigation",
         "theme": "Theme",
         "account": "Account",
         "organizations": "Organizations",
         "shortcuts": "Shortcuts"
       },
-      "dashboard": "Dashboard",
       "userSettings": "User settings",
       "organizationSettings": "Organization settings",
       "lightMode": "Light mode",
@@ -118,6 +65,10 @@
       "commandPalette": "Open command palette",
       "showShortcuts": "Show keyboard shortcuts",
       "showShortcutsAlt": "Show keyboard shortcuts (alternate)",
+      "allSections": "Open or close All sections",
+      "jumpToSection": "Jump to a section",
+      "listSearch": "Search the list",
+      "leadRows": "Next or previous lead (in Leads)",
       "closeDialog": "Close dialog"
     },
     "emailVerify": {
@@ -143,16 +94,64 @@
       "nameLabel": "Organization name",
       "slugLabel": "Workspace URL (optional)",
       "submit": "Create organization",
-      "submitting": "Creating…"
+      "submitting": "Creating…",
+      "cancel": "Cancel"
     },
     "theme": {
       "light": "Light",
       "dark": "Dark",
-      "system": "System",
-      "shuffle": "Shuffle theme"
+      "system": "System"
+    },
+    "sectionBar": {
+      "nav": "Sections",
+      "allSections": "All sections",
+      "allSectionsTitle": "All sections (G)",
+      "more": "More",
+      "morePinned": "More pinned sections",
+      "tabTitle": "{{section}} · {{description}}",
+      "searchLabel": "Search or jump to (Command K)",
+      "searchTitleMac": "Search or jump to… (⌘K)",
+      "searchTitleWindows": "Search or jump to… (Ctrl K)",
+      "searchPlaceholder": "Search patients, leads…",
+      "pin": "Pin to bar",
+      "unpin": "Unpin from bar",
+      "pinAria": "Pin to bar · {{section}}",
+      "unpinAria": "Unpin from bar · {{section}}",
+      "pinFooter": "Pin to keep in the bar",
+      "keysHint": "G · 1–9",
+      "account": "Account",
+      "avatarLabel": "{{name}} · {{status}}",
+      "identityRole": "{{role}} · {{branch}}",
+      "status": "Status",
+      "presence": {
+        "online": "Online",
+        "away": "Away",
+        "busy": "Busy"
+      },
+      "statusToast": "Status · {{status}}",
+      "switchClinic": "Switch clinic",
+      "security": "Security",
+      "billing": "Billing",
+      "devices": "Devices",
+      "appearance": "Appearance",
+      "appearanceLanguage": "Appearance & language",
+      "viewAs": {
+        "previewing": "Previewing as {{role}}",
+        "noSections": "No sections",
+        "exit": "Exit preview",
+        "exitToast": "Back to your own access"
+      },
+      "branch": {
+        "label": "Branch · {{label}}",
+        "title": "Branch · {{names}}",
+        "all": "All branches",
+        "allSub": "Combined view · totals across {{count}}",
+        "viewGroup": "View",
+        "branchesGroup": "Branches",
+        "showingAll": "Showing all branches",
+        "showing": "Showing {{names}}",
+        "keepOne": "Keep at least one branch"
+      }
     }
-  },
-  "public": {
-    "brandTagline": "Secure workspace for your team"
   }
 }

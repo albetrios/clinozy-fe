@@ -1,4 +1,4 @@
-import type { APIRequestContext } from '@playwright/test';
+import { type APIRequestContext, type APIResponse, expect } from '@playwright/test';
 
 import { e2eTeamOrgProfile } from './e2e-faker.ts';
 
@@ -15,20 +15,43 @@ export function bearerHeaders(token: string, withIdem = false): Record<string, s
 
 export type TeamOrg = { id: string; slug: string | null; name?: string };
 
-/** Create a TEAM org and optionally switch the token into it. */
+/**
+ * A personal workspace has no billing of its own, and a read never leaks
+ * another organization's. clinozy-be's billing reads are open to both kinds of
+ * workspace (`docs/routes.txt`: `both`): the subscriptions list answers with an
+ * empty page, the rest (invoices, payment methods) with 422 "create a team
+ * organization".
+ */
+export async function expectNoPersonalBilling(res: APIResponse): Promise<void> {
+  if (res.status() === 200) {
+    expect(((await res.json()) as { data: unknown[] }).data).toEqual([]);
+    return;
+  }
+  expect([403, 404, 422]).toContain(res.status());
+}
+
+/**
+ * Create a TEAM org and, unless `switchInto` is false, switch the session into
+ * it — `teamToken` is then the session's new token, scoped to the org (the
+ * switch retires `token`); without the switch it is `token`, still live.
+ */
 export async function createTeamOrganization(
   api: APIRequestContext,
   token: string,
-  opts?: { name?: string; slug?: string },
+  opts?: { name?: string; slug?: string; switchInto?: boolean },
 ): Promise<{ createStatus: number; org: TeamOrg | null; teamToken: string }> {
-  const { name, slug } = e2eTeamOrgProfile({ label: 'team', ...opts });
+  const { name, slug } = e2eTeamOrgProfile({
+    label: 'team',
+    name: opts?.name,
+    slug: opts?.slug,
+  });
   const create = await api.post(`${API}/tenancy/organizations`, {
     headers: bearerHeaders(token, true),
     data: { name, slug },
   });
   const org = create.ok() ? ((await create.json()) as { data: TeamOrg }).data : null;
   let teamToken = token;
-  if (org) {
+  if (org && opts?.switchInto !== false) {
     const sw = await api.post(`${API}/auth/switch-to-organization`, {
       headers: bearerHeaders(token),
       data: { organization_id: org.id },
@@ -79,7 +102,7 @@ export async function createTeamInvitation(
   const roleId = await resolveMemberRoleId(api, teamToken);
   const res = await api.post(`${API}/tenancy/organization/memberships`, {
     headers: bearerHeaders(teamToken, true),
-    data: { email: inviteeEmail, role_id: roleId },
+    data: { email: inviteeEmail, role_ids: [roleId] },
   });
   if (res.status() !== 200) {
     if (res.status() === 409) {

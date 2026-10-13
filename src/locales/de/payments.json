@@ -1,0 +1,466 @@
+{
+  "manifest": {
+    "title": "Zahlungen"
+  },
+  "tabs": {
+    "label": "Bereiche der Zahlungen",
+    "ledger": "Zahlungen",
+    "pending": "Offen"
+  },
+  "search": {
+    "placeholder": "Patient, Rechnung oder Beleg",
+    "label": "Zahlungen durchsuchen"
+  },
+  "toolbar": {
+    "dayClose": "Tagesabschluss",
+    "pay": "Zahlen",
+    "payTitle": "Zahlen · Geld raus (Miete, Material, Lieferanten, Erstattungen)",
+    "receive": "Einnehmen",
+    "receiveTitle": "Einnehmen · Geld rein von einem Patienten",
+    "addPending": "Offenen Betrag hinzufügen",
+    "give": "Geben",
+    "giveSub": "Wir zahlen einem Patienten oder Partner zurück",
+    "take": "Nehmen",
+    "takeSub": "Ein Patient oder Partner zahlt uns"
+  },
+  "columns": {
+    "ref": "Ref.",
+    "what": "Art",
+    "when": "Wann",
+    "party": "Von / an",
+    "mode": "Zahlart",
+    "amount": "Betrag",
+    "by": "Von",
+    "who": "Wer",
+    "way": "Richtung",
+    "why": "Grund",
+    "since": "Seit",
+    "state": "Status"
+  },
+  "filters": {
+    "show": "Anzeigen",
+    "all": "Alle"
+  },
+  "directions": {
+    "received": "Erhalten",
+    "paid": "Bezahlt"
+  },
+  "kinds": {
+    "receipt": "Erhalten",
+    "refund": "Erstattung an Patienten",
+    "expense": "Bezahlt",
+    "money_back": "Rückzahlung",
+    "reversal": "Storno"
+  },
+  "ledger": {
+    "records": "Buchungen",
+    "edited_one": "{{count}}× geändert · zuletzt {{from}} → {{to}}",
+    "edited_other": "{{count}}× geändert · zuletzt {{from}} → {{to}}",
+    "editSide": "{{amount}} {{modes}}",
+    "received": "+ {{amount}}",
+    "paid": "− {{amount}}",
+    "sub": {
+      "invoice": "Rechnung #{{seq}}",
+      "sale": "Verkauf · Rechnung #{{seq}}",
+      "refund": "Erstattung · Gutschrift",
+      "refundNote": "Erstattung · Gutschrift {{note}}",
+      "refundFor": "zu Rechnung #{{seq}}",
+      "moneyBack": "Rückzahlung",
+      "medicalBill": "Medizin-Bestellung #{{seq}} · Rechnung {{bill}}",
+      "stockBill": "Lager-Bestellung #{{seq}} · Rechnung {{bill}}",
+      "fromCredit": "Aus {{ref}}",
+      "reversed": "Storniert",
+      "medicalOrder": "Medizin-Bestellung #{{seq}}",
+      "stockPurchase": "Lager-Bestellung #{{seq}}"
+    },
+    "dayClosed": "{{ref}} · Tag abgeschlossen",
+    "dayClosedEdited_one": "{{ref}} · Tag abgeschlossen · {{count}}× geändert",
+    "dayClosedEdited_other": "{{ref}} · Tag abgeschlossen · {{count}}× geändert",
+    "creditEntry": "{{ref}} · Aus {{credit}}",
+    "fixedEntry": "{{ref}} · der Betrag lässt sich nicht ändern · zum Rückgängigmachen am selben Tag löschen",
+    "search": "Patient, Empfänger oder PAY-Nummer",
+    "count_one": "{{count}} Buchung",
+    "count_other": "{{count}} Buchungen"
+  },
+  "rowActions": {
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "giveBack": "Zurückgeben",
+    "gotBack": "Zurückerhalten",
+    "useOnBill": "Mit nächster Rechnung verrechnen",
+    "reverse": "Stornieren"
+  },
+  "bulk": {
+    "export": "Exportieren",
+    "exported_one": "{{count}} Zeile als CSV exportiert",
+    "exported_other": "{{count}} Zeilen als CSV exportiert"
+  },
+  "empty": {
+    "ledgerTitle": "Keine passende Buchung",
+    "pendingTitle": "Nichts offen",
+    "description": "Hier ist noch nichts. Versuchen Sie einen anderen Tab oder eine andere Suche.",
+    "receive": "Einnehmen"
+  },
+  "deleteEntry": {
+    "title": "Diese Zahlung löschen?",
+    "effect": "Möglich, bis der Tag abgeschlossen ist. Die Löschung bleibt im Prüfprotokoll.",
+    "effectInvoice": "Möglich, bis der Tag abgeschlossen ist. Rechnung #{{seq}} ist wieder mit {{due}} offen. Die Löschung bleibt im Prüfprotokoll.",
+    "reasons": {
+      "twice": "Doppelt erfasst",
+      "amount": "Falscher Betrag",
+      "party": "Falscher Patient oder Empfänger"
+    },
+    "removed": "{{ref}} entfernt",
+    "removedInvoice": "{{ref}} entfernt · Rechnungssaldo wiederhergestellt",
+    "blocked": {
+      "dayClosed": "{{ref}} · der Tag ist jetzt abgeschlossen · stattdessen stornieren",
+      "moreThanPaid": "{{ref}} · eine Erstattung hat dieses Geld schon zurückgegeben · zuerst die Erstattung löschen"
+    }
+  },
+  "dialog": {
+    "record": "Zahlung",
+    "credit": "Offener Betrag",
+    "dayClosed": "Tag abgeschlossen · speichern ist nicht mehr möglich"
+  },
+  "pending": {
+    "records": "offenen Beträge",
+    "patient": "Patient",
+    "party": "Lieferant / Partner",
+    "ways": {
+      "give": "Geben",
+      "take": "Nehmen"
+    },
+    "wayTitles": {
+      "give": "Wir zahlen zurück",
+      "take": "Sie zahlen uns"
+    },
+    "states": {
+      "open": "Offen",
+      "given_back": "Zurückgezahlt",
+      "got_back": "Erhalten",
+      "used": "Verrechnet"
+    },
+    "settledToday": "{{state}} · Heute",
+    "adjusted": "{{amount}} verrechnet",
+    "invoice": "Rechnung #{{seq}}",
+    "byHand": "Manuell",
+    "deleteTitle": "Diesen offenen Betrag löschen?",
+    "deleted": "{{ref}} gelöscht",
+    "reasons": {
+      "charged_twice": "Doppelt berechnet",
+      "advance_not_used": "Anzahlung nicht genutzt",
+      "package_cancelled": "Paket storniert",
+      "overpaid": "Zu viel gezahlt",
+      "returned_items": "Zurückgegebene Artikel",
+      "short_payment": "Zu wenig gezahlt",
+      "damaged_goods": "Beschädigte Ware zurückgegeben",
+      "advance_given": "Vorschuss gegeben",
+      "loan_to_staff": "Darlehen an Mitarbeiter",
+      "other": "Sonstiges"
+    },
+    "adjustedOn": "{{amount}} aus {{ref}} mit Rechnung #{{seq}} verrechnet",
+    "nothingDue": "Bei {{name}} ist nichts offen, womit verrechnet werden kann",
+    "search": "Person, Lieferant oder CR-",
+    "fromEntry": "Aus einer Buchung",
+    "forInvoice": "Zu einer Rechnung",
+    "settledLocked": "{{ref}} · {{amount}} beglichen · nicht mehr änderbar",
+    "conflicts": {
+      "settled": "Ein Teil von {{ref}} ist jetzt beglichen · nicht mehr änderbar oder löschbar",
+      "closed": "{{ref}} ist bereits beglichen",
+      "dayClosed": "Heute ist in der Filiale von Rechnung #{{seq}} abgeschlossen · zum Verrechnen wieder öffnen",
+      "dueChanged": "Der offene Betrag von Rechnung #{{seq}} hat sich geändert · bitte erneut versuchen"
+    }
+  },
+  "receive": {
+    "title": "Zahlung einnehmen",
+    "titleEdit": "Einnahme bearbeiten",
+    "sub": "Der Beleg wird für den Patienten per WhatsApp in die Warteschlange gestellt",
+    "subEdit": "Offen bis zum Tagesabschluss · jede Änderung wird protokolliert",
+    "section": "Wer zahlt",
+    "branch": "Filiale",
+    "invoice": "Auf Rechnung",
+    "invoiceOpen_one": "{{count}} offen",
+    "invoiceOpen_other": "{{count}} offen",
+    "invoiceChip": "{{id}} · {{due}}",
+    "pickPatientFirst": "Zuerst den Patienten wählen",
+    "nothingDue": "Nichts offen",
+    "amount": "Erhaltener Betrag",
+    "split": "Aufteilen · Zahlart hinzufügen",
+    "total": "Gesamt {{total}}",
+    "totalDue": "Gesamt {{total}} · offen {{due}}",
+    "reference": "Referenz",
+    "referenceHint": "UPI-Ref. / letzte 4 der Karte",
+    "referencePlaceholder": "z. B. 4321",
+    "note": "Notiz",
+    "notePlaceholder": "Optional",
+    "quickFill": {
+      "full": "Voll · {{amount}}",
+      "half": "Hälfte · {{amount}}",
+      "cashUpi": "Bar + UPI"
+    },
+    "save": "{{amount}} erfassen",
+    "saveEdit": "{{amount}} speichern",
+    "summary": "{{modes}} · {{amount}}",
+    "received": "{{amount}} von {{name}} eingenommen",
+    "updated": "{{ref}} aktualisiert · Änderung protokolliert",
+    "enterAmount": "Geben Sie einen Betrag ein",
+    "pickPatient": "Wählen Sie einen Patienten",
+    "aboveDue": "Mehr als die offenen {{due}}",
+    "moreThanDue": "Mehr als jetzt auf der Rechnung offen ist · sie wurde inzwischen bezahlt",
+    "totalAdvance": "Gesamt {{total}} · Anzahlung",
+    "advance": "Anzahlung · keine Rechnung",
+    "invoicesFailed": "Die offenen Rechnungen konnten nicht geladen werden"
+  },
+  "send": {
+    "title": "Zahlung leisten",
+    "titleEdit": "Ausgabe bearbeiten",
+    "sub": "Praxisausgabe · erscheint im Tagesabschluss",
+    "steps": {
+      "bill": "Gegen eine Rechnung zahlen",
+      "expense": "Ausgabe",
+      "payment": "Zahlung"
+    },
+    "bill": "Lieferantenrechnung",
+    "billHint_one": "{{count}} offen · Bestell-Nr., Lieferant oder Rechnungs-Nr. suchen",
+    "billHint_other": "{{count}} offen · Bestell-Nr., Lieferant oder Rechnungs-Nr. suchen",
+    "billPlaceholder": "Bestell-Nr., Lieferant oder Rechnungs-Nr. suchen",
+    "otherSpend": "Sonstige Ausgabe",
+    "otherSpendSub": "Nicht zu einer Bestellung",
+    "groups": {
+      "other": "Sonstiges",
+      "medical": "Medizin-Bestellungen",
+      "stock": "Bestellungen Praxisbestand"
+    },
+    "billLabel": {
+      "medical": "Medizin-Bestellung #{{seq}} · {{supplier}}",
+      "stock": "Bestand-Bestellung #{{seq}} · {{supplier}}"
+    },
+    "billRef": {
+      "medical": "Medizin-Bestellung #{{seq}}",
+      "stock": "Bestand-Bestellung #{{seq}}"
+    },
+    "billNo": "Rechnung {{bill}}",
+    "daysPending_one": "seit {{count}} Tag offen",
+    "daysPending_other": "seit {{count}} Tagen offen",
+    "pendingToday": "Heute",
+    "oldest": "Am längsten offen",
+    "oldestChip": "#{{seq}} · {{supplier}} · {{due}} · {{age}}",
+    "category": "Kategorie",
+    "paidTo": "Bezahlt an",
+    "paidToPlaceholder": "Lieferant oder Person",
+    "note": "Notiz",
+    "notePlaceholder": "Was gekauft wurde",
+    "amount": "Betrag",
+    "date": "Datum",
+    "mode": "Zahlart",
+    "files": "Rechnung / Beleg",
+    "filesDrop": "Foto der Rechnung ablegen oder auswählen",
+    "filesHint": "Optional · JPG, PNG oder PDF",
+    "filesRemove": "{{name}} entfernen",
+    "electricity": "Strom",
+    "presets": {
+      "tea": "Tee & Snacks",
+      "courier": "Kurier"
+    },
+    "save": "Ausgabe hinzufügen",
+    "saveEdit": "Änderungen speichern",
+    "another": "Hinzufügen & weitere",
+    "added": "Ausgabe {{ref}} hinzugefügt",
+    "paidBill": "{{amount}} auf {{bill}} gezahlt",
+    "saved": "{{ref}} gespeichert · Änderung protokolliert",
+    "missing": "Geben Sie Empfänger und Betrag an",
+    "moreThanDue": "Mehr als jetzt auf der Rechnung offen ist · sie wurde inzwischen bezahlt",
+    "billsFailed": "Die offenen Rechnungen konnten nicht geladen werden"
+  },
+  "credit": {
+    "title": "Offenen Betrag hinzufügen",
+    "titleEdit": "Offenen Betrag bearbeiten",
+    "sub": "Geld, das die Praxis zurückgeben oder bekommen muss · später unter Offen ausgleichen",
+    "subEdit": "Bearbeitbar, solange offen · Änderungen werden protokolliert",
+    "steps": {
+      "way": "Richtung",
+      "why": "Warum"
+    },
+    "way": "Richtung",
+    "who": "Wer",
+    "whoPlaceholder": "Patienten, Kontakte oder Lieferanten suchen",
+    "add": "Hinzufügen",
+    "groups": {
+      "patients": "Patienten",
+      "contacts": "Kontakte",
+      "suppliers": "Lieferanten & Händler"
+    },
+    "parties": {
+      "patient": "Patient · {{id}}",
+      "contact": "Kontakt",
+      "contactPhone": "Kontakt · {{phone}}",
+      "vendor": "Praxislieferant",
+      "supplier": "Medizinlieferant"
+    },
+    "amount": "Betrag",
+    "reason": "Grund",
+    "invoice": "Zur Rechnung",
+    "invoiceHint": "optional · verknüpft den Betrag mit einer Rechnung",
+    "noInvoice": "Keine Rechnung",
+    "invoicePaid": "{{bill}} · bezahlt",
+    "invoiceDue": "{{bill}} · {{due}} offen",
+    "settleBy": "Ausgleichen bis",
+    "note": "Notiz",
+    "notePlaceholder": {
+      "give": "z. B. Erstattung an dieselbe UPI-ID",
+      "take": "z. B. Lieferant verrechnet es mit der nächsten Rechnung"
+    },
+    "problems": {
+      "who": "Wählen Sie, wer",
+      "amount": "Geben Sie den Betrag ein",
+      "reason": "Wählen Sie einen Grund",
+      "otherNote": "Fügen Sie für „Sonstiges“ eine Notiz hinzu"
+    },
+    "save": {
+      "give": "Speichern · später geben",
+      "take": "Speichern · später nehmen"
+    },
+    "saveEdit": "Änderungen speichern",
+    "summary": {
+      "give": "{{amount}} an {{name}} zurückgeben",
+      "take": "{{amount}} von {{name}} bekommen"
+    },
+    "saved": {
+      "give": "{{ref}} gespeichert · {{amount}} an {{name}} geben",
+      "take": "{{ref}} gespeichert · {{amount}} von {{name}} nehmen"
+    },
+    "updated": "{{ref}} aktualisiert"
+  },
+  "dayClose": {
+    "title": "Tagesabschluss",
+    "day": "Tag",
+    "status": {
+      "open": "Offen",
+      "openAuto_one": "Offen · schließt automatisch in {{count}} Std.",
+      "openAuto_other": "Offen · schließt automatisch in {{count}} Std.",
+      "closedBy": "Abgeschlossen von {{name}}",
+      "closed": "Abgeschlossen",
+      "forceClosed": "Zwangsweise abgeschlossen"
+    },
+    "entries_one": "{{count}} Buchung am {{day}}",
+    "entries_other": "{{count}} Buchungen am {{day}}",
+    "openDay_one": "{{day}} nicht abgeschlossen · noch {{count}} Std. · Prüfen",
+    "openDay_other": "{{day}} nicht abgeschlossen · noch {{count}} Std. · Prüfen",
+    "openDayTitle": "Prüfen Sie die Buchungen und schließen Sie den Tag ab · er schließt sich selbst, wenn die Zeit abläuft",
+    "previous": "Frühere Abschlüsse",
+    "previousCash": "Bar {{amount}}",
+    "previousAuto": "Automatisch abgeschlossen",
+    "previousTitle": "{{day}} prüfen",
+    "closeDay": "Tag abschließen",
+    "countFirst": "Zählen Sie zuerst das Bargeld",
+    "closed": "Tag abgeschlossen",
+    "reopened": "Tag wieder geöffnet",
+    "gate": {
+      "title": "Anfangsbestand · {{day}}",
+      "sources": {
+        "carried": "Übernommen vom Abschluss am {{day}}",
+        "recounted": "Neu gezählt",
+        "first": "Kein früherer Abschluss · nichts zu übernehmen"
+      },
+      "recount": "Neu zählen",
+      "recountLabel": "Anfangsbestand neu zählen",
+      "recountTitle": "Neu zählen, wenn es nicht stimmt",
+      "accept": "{{amount}} übernehmen",
+      "acceptRecount": "Neue Zählung übernehmen",
+      "starting": "Sie beginnen den Tag als {{name}} · das wird am Tag vermerkt",
+      "accepted": "Anfangsbestand {{amount}} übernommen · vermerkt um {{time}}"
+    },
+    "strip": {
+      "opening": "Anfangsbestand",
+      "acceptedBy": "Übernommen von {{name}} · {{time}}",
+      "cashInOut": "Bar ein · aus",
+      "cashIn": "+{{amount}}",
+      "cashOut": "−{{amount}}",
+      "expected": "Erwartet in der Kasse {{amount}}",
+      "counted": "Jetzt gezählt",
+      "countPlaceholder": "Kasse zählen",
+      "countLabel": "Gezähltes Bargeld",
+      "netByMode": "Netto nach Zahlart",
+      "staffTitle_one": "{{name}} · {{count}} Buchung · {{amount}}",
+      "staffTitle_other": "{{name}} · {{count}} Buchungen · {{amount}}",
+      "staffOther": "Nicht im Team",
+      "reason": "Warum weicht die Zählung ab?",
+      "reasonPlaceholder": "Was ist passiert · z. B. ₹20 als Wechselgeld aus der Kasse gegeben",
+      "reasonFirst": "Geben Sie zuerst an, warum die Zählung abweicht"
+    },
+    "report": {
+      "title": "{{day}} ist abgeschlossen",
+      "closedBy": "Abgeschlossen von {{name}} · {{time}}",
+      "autoClosed": "Abgeschlossen um {{time}} · automatisch nach der Kulanzzeit",
+      "reopen": "Wieder öffnen",
+      "acceptedBy": "Übernommen von {{name}}",
+      "takenAsExpected": "Wie erwartet übernommen",
+      "received_one": "{{count}} eingenommen",
+      "received_other": "{{count}} eingenommen",
+      "paid_one": "{{count}} ausgezahlt",
+      "paid_other": "{{count}} ausgezahlt",
+      "cashCounted": "Gezähltes Bargeld",
+      "expected": "Erwartet {{amount}}",
+      "difference": "Differenz",
+      "matched": "Kasse stimmt",
+      "extra": "Überschuss in der Kasse",
+      "short": "Fehlbetrag in der Kasse",
+      "log": "Was passiert ist",
+      "logAccepted": "{{name}} hat den Anfangsbestand {{amount}} übernommen",
+      "logRecounted": "{{name}} hat den Anfangsbestand {{amount}} übernommen (neu gezählt)",
+      "logMatched": "Kasse gezählt: {{amount}} · stimmt",
+      "logExtra": "Kasse gezählt: {{amount}} · {{diff}} zu viel",
+      "logShort": "Kasse gezählt: {{amount}} · {{diff}} zu wenig",
+      "logClosed": "{{name}} hat den Tag abgeschlossen",
+      "logAuto": "Automatisch nach der Kulanzzeit abgeschlossen · Bargeld wie erwartet übernommen",
+      "openedAuto": "Automatisch geöffnet",
+      "notCounted": "Nicht gezählt",
+      "logOpened": "{{name}} hat den Tag geöffnet",
+      "logReopened": "{{name}} hat den Tag wieder geöffnet · {{reason}}",
+      "logReason": "„{{reason}}“",
+      "someone": "Jemand"
+    },
+    "review": {
+      "title": "Jede Buchung prüfen",
+      "none": "Keine Buchungen",
+      "empty": "Keine Buchungen an diesem Tag",
+      "states": {
+        "canEdit": "Bearbeitbar",
+        "canEditTitle": "Bis zum Tagesabschluss bearbeitbar oder löschbar",
+        "dayClosed": "Tag abgeschlossen",
+        "dayClosedTitle": "Der Tag ist abgeschlossen · die Buchungen lassen sich nicht ändern",
+        "fromCredit": "Aus {{credit}}"
+      },
+      "count_one": "{{count}} Buchung",
+      "count_other": "{{count}} Buchungen"
+    },
+    "previousNone": "Keine Abschlüsse vor diesem Tag",
+    "refusals": {
+      "alreadyOpened": "Jemand hat diesen Tag inzwischen geöffnet · er wird jetzt angezeigt",
+      "alreadyClosed": "Jemand hat diesen Tag inzwischen abgeschlossen · er wird jetzt angezeigt",
+      "alreadyOpen": "Dieser Tag ist bereits wieder geöffnet · er wird jetzt angezeigt"
+    },
+    "reopen": {
+      "title": "Diesen Tag wieder öffnen?",
+      "effect": "Die Zählung wird gelöscht, und die Buchungen des Tages lassen sich wieder ändern, bis er abgeschlossen ist.",
+      "action": "Tag wieder öffnen",
+      "record": "{{branch}} · {{day}}",
+      "reasons": {
+        "miscounted": "Falsch gezählt",
+        "missed": "Eine Buchung fehlte",
+        "wrongEntry": "Eine Buchung ist falsch"
+      }
+    }
+  },
+  "reverseEntry": {
+    "title": "Diese Zahlung stornieren?",
+    "effect": "Sein Tag ist abgeschlossen, daher bleibt er unverändert. Ein Storno über denselben Betrag kommt heute in das Journal seiner Filiale, und was er bezahlt hat, wird zurückgebucht. Beide Buchungen bleiben erhalten.",
+    "action": "Stornieren",
+    "reversed": "{{ref}} storniert · {{reversal}}",
+    "blocked": {
+      "alreadyReversed": "{{ref}} ist bereits storniert",
+      "dayOpen": "Der Tag von {{ref}} ist wieder offen · stattdessen löschen",
+      "dayClosed": "Heute ist in der Filiale von {{ref}} abgeschlossen · zum Stornieren wieder öffnen"
+    }
+  }
+}

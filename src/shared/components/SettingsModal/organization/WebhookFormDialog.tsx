@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
@@ -8,40 +8,43 @@ import {
   updateWebhookSchema,
   type Webhook,
 } from '@/shared/api/webhook-contracts.ts';
+import {
+  DrawerChips,
+  DrawerField,
+  DrawerInput,
+} from '@/shared/components/DrawerField/index.ts';
+import { EmptyState } from '@/shared/components/EmptyState/index.ts';
+import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
-import { Button } from '@/shared/components/ui/button.tsx';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/shared/components/ui/dialog.tsx';
-import { Input } from '@/shared/components/ui/input.tsx';
-import { Label } from '@/shared/components/ui/label.tsx';
-import { Skeleton } from '@/shared/components/ui/skeleton.tsx';
+import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
 import { mapApiError } from '@/shared/errors/errorHandler.ts';
 import { FormError } from '@/shared/forms/FormError/index.ts';
 import { useWebhookEvents } from '@/shared/hooks/useWebhookEvents/index.ts';
 import { useCreateWebhook, useUpdateWebhook } from '@/shared/hooks/useWebhooks/index.ts';
 
+/**
+ * Two fields, the events a chip group of many: a heavy field, so the drawer
+ * takes the everyday 680px (`_patterns.md:28`).
+ */
+const WEBHOOK_FORM_PROFILE = { fieldCount: 2, hasHeavyField: true } as const;
+
 /** Props for {@link WebhookFormDialog}. */
 export interface WebhookFormDialogProps {
-  /** Whether the dialog is open. */
+  /** Whether the drawer is open. */
   open: boolean;
-  /** Called when the dialog wants to open or close. */
+  /** Called when the drawer wants to open or close. */
   onOpenChange: (open: boolean) => void;
   /** The webhook being edited, or `null` to create a new one. */
   webhook: Webhook | null;
 }
 
 /**
- * Create or edit a webhook — one form for both, because the fields are identical.
+ * Create or edit a webhook — one form for both, because the fields are identical:
+ * a child drawer stacked on Settings (L-65), whose Back returns to Integrations.
  *
  * @remarks
  * The event checklist comes from `GET /notify/webhook-events`, never a client-side list.
@@ -70,7 +73,7 @@ export function WebhookFormDialog({
   const update = useUpdateWebhook();
 
   const isEdit = webhook !== null;
-  // Seeded once, at mount. The panel gives this dialog a fresh `key` every time it opens, so
+  // Seeded once, at mount. The panel gives this drawer a fresh `key` every time it opens, so
   // editing a second row never shows the first row's values and a cancelled edit never leaks
   // into the next open — without an effect that writes state during render.
   const [url, setUrl] = useState(() => webhook?.url ?? '');
@@ -78,14 +81,10 @@ export function WebhookFormDialog({
     webhook ? [...webhook.events] : [],
   );
   const [error, setError] = useState<string | null>(null);
+  // The URL takes focus on open, as it did when this was a dialog.
+  const urlRef = useRef<HTMLInputElement>(null);
 
   const isPending = isEdit ? update.isPending : create.isPending;
-
-  function toggleEvent(event: string) {
-    setEvents((prev) =>
-      prev.includes(event) ? prev.filter((e) => e !== event) : [...prev, event],
-    );
-  }
 
   function close() {
     onOpenChange(false);
@@ -114,68 +113,50 @@ export function WebhookFormDialog({
     create.mutate(parsed.data, { onSuccess: close, onError });
   }
 
+  // A running write holds every exit (the drawer never closes mid-save), so the
+  // ×, Back, Esc and the backdrop cannot abandon it.
   return (
-    <Dialog
+    <RecordDrawer
       open={open}
-      onOpenChange={(next) => {
-        // Esc and the overlay are dismissals too — none of them may abandon a write
-        // that is already running.
-        if (!isPending) onOpenChange(next);
-      }}
+      onClose={close}
+      title={t(isEdit ? integrations.editWebhookTitle : integrations.addWebhookTitle)}
+      sub={t(
+        isEdit ? integrations.editWebhookDescription : integrations.addWebhookDescription,
+      )}
+      content={WEBHOOK_FORM_PROFILE}
+      stacked
+      initialFocusRef={urlRef}
+      saveLabel={t(submitLabelKey({ isEdit, isPending: false }))}
+      savingLabel={t(submitLabelKey({ isEdit, isPending: true }))}
+      onSave={submit}
+      saveState={isPending ? 'saving' : 'idle'}
+      saveTestId="webhook-save"
+      dismissTestId="webhook-cancel"
+      testId="webhook-form-dialog"
     >
-      <DialogContent data-testid="webhook-form-dialog">
-        <DialogHeader>
-          <DialogTitle>
-            {t(isEdit ? integrations.editWebhookTitle : integrations.addWebhookTitle)}
-          </DialogTitle>
-          <DialogDescription>
-            {t(
-              isEdit
-                ? integrations.editWebhookDescription
-                : integrations.addWebhookDescription,
-            )}
-          </DialogDescription>
-        </DialogHeader>
-        <div className="space-y-3">
-          <div className="space-y-1.5">
-            <Label htmlFor="webhook-url">{t(integrations.payloadUrlLabel)}</Label>
-            <Input
-              id="webhook-url"
-              value={url}
-              onChange={(event) => setUrl(event.target.value)}
-              placeholder={t(integrations.webhookUrlPlaceholder)}
-              data-testid="webhook-url"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label>{t(integrations.eventsLabel)}</Label>
-            <WebhookEventChecklist
-              catalog={catalog}
-              selected={events}
-              onToggle={toggleEvent}
-            />
-          </div>
-          {/*
-            The same error card the sign-in form and the step-up dialog use — a bare red
-            line under the events reads as a caption, not as the thing that went wrong.
-          */}
-          <FormError message={error} data-testid="webhook-error" />
-        </div>
-        <DialogFooter>
-          <Button
-            variant="ghost"
-            onClick={close}
-            disabled={isPending}
-            data-testid="webhook-cancel"
-          >
-            {t(integrations.cancel)}
-          </Button>
-          <Button onClick={submit} isLoading={isPending} data-testid="webhook-save">
-            {t(submitLabelKey({ isEdit, isPending }))}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      <DrawerField label={t(integrations.payloadUrlLabel)} htmlFor="webhook-url">
+        <DrawerInput
+          ref={urlRef}
+          id="webhook-url"
+          inputMode="url"
+          capitalize={false}
+          autoComplete="url"
+          spellCheck={false}
+          value={url}
+          onChange={(event) => setUrl(event.target.value)}
+          placeholder={t(integrations.webhookUrlPlaceholder)}
+          data-testid="webhook-url"
+        />
+      </DrawerField>
+      <DrawerField label={t(integrations.eventsLabel)}>
+        <WebhookEventChecklist catalog={catalog} selected={events} onChange={setEvents} />
+      </DrawerField>
+      {/*
+        The same error card the sign-in form and the step-up drawer use — a bare red
+        line under the events reads as a caption, not as the thing that went wrong.
+      */}
+      <FormError message={error} data-testid="webhook-error" />
+    </RecordDrawer>
   );
 }
 
@@ -188,21 +169,29 @@ function submitLabelKey({ isEdit, isPending }: { isEdit: boolean; isPending: boo
   return isPending ? integrations.creating : integrations.createWebhook;
 }
 
-/** The subscribe checklist, with its own loading / error / empty states. */
+/**
+ * The subscribe checklist — a drawer's chip field (pick any; a picked chip
+ * carries its boxed check, picks kept in the order they were made) — with its
+ * own loading / error / empty states.
+ */
 function WebhookEventChecklist({
   catalog,
   selected,
-  onToggle,
+  onChange,
 }: {
   catalog: ReturnType<typeof useWebhookEvents>;
   selected: string[];
-  onToggle: (event: string) => void;
+  onChange: (events: string[]) => void;
 }) {
   const { t } = useTranslation(SETTINGS_NS);
   const integrations = SETTINGS_KEYS.panels.integrations;
 
   if (catalog.isPending) {
-    return <Skeleton className="h-16 w-full" data-testid="webhook-events-loading" />;
+    return (
+      <span data-testid="webhook-events-loading" className="flex">
+        <SkeletonBar shape="field" className="h-16" />
+      </span>
+    );
   }
 
   // A failed catalog must not read as "there are no events" — that would invite saving a
@@ -221,28 +210,28 @@ function WebhookEventChecklist({
 
   if (catalog.rows.length === 0) {
     return (
-      <p className="text-muted-foreground text-sm" data-testid="webhook-events-empty">
-        {t(integrations.eventsEmpty)}
-      </p>
+      <EmptyState
+        variant="inline"
+        title={t(integrations.eventsEmpty)}
+        testId="webhook-events-empty"
+        className="text-body"
+      />
     );
   }
 
   return (
-    <div className="flex flex-wrap gap-2">
-      {catalog.rows.map((entry) => (
-        <Button
-          key={entry.event}
-          type="button"
-          size="sm"
-          variant={selected.includes(entry.event) ? 'default' : 'outline'}
-          onClick={() => onToggle(entry.event)}
-          title={entry.description}
-          aria-pressed={selected.includes(entry.event)}
-          data-testid={`webhook-event-${entry.event}`}
-        >
-          {entry.event}
-        </Button>
-      ))}
-    </div>
+    <DrawerChips
+      multiple
+      ordered
+      label={t(integrations.eventsLabel)}
+      options={catalog.rows.map((entry) => ({
+        value: entry.event,
+        label: entry.event,
+        hint: entry.description,
+      }))}
+      value={selected}
+      onChange={onChange}
+      testId="webhook-event"
+    />
   );
 }

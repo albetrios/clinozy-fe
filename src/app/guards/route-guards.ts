@@ -2,12 +2,16 @@ import { notFound, redirect } from '@tanstack/react-router';
 
 import { platformConfig } from '@/core/config/env.ts';
 import { queryClient } from '@/core/http/queryClient.ts';
-import { organizationDashboard } from '@/lib/routes/index.ts';
+import { organizationHome, organizationPicker } from '@/lib/routes/index.ts';
 import { parseOrganizationSlugParam } from '@/lib/routes/params.ts';
 import { useOnboardingStore } from '@/shared/store/useOnboardingStore/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 import { mergeDeploymentFlags } from '@/shared/tenancy/deployment-mode.ts';
-import { type MeContext, meContextQueryKey } from '@/shared/tenancy/me-context.ts';
+import {
+  type MeContext,
+  meContextQueryKey,
+  needsOnboarding,
+} from '@/shared/tenancy/me-context.ts';
 import type { Organization } from '@/shared/tenancy/my-organizations.ts';
 import { syncOrganizationFromRoute } from '@/shared/tenancy/organization-context.ts';
 import {
@@ -16,8 +20,8 @@ import {
 } from '@/shared/tenancy/organization-membership.ts';
 import type { RootTarget } from '@/shared/tenancy/organization-resolver.ts';
 import {
-  resolveRootTarget,
-  workspaceRedirectForPersonalDashboard,
+  countLandingInvitations,
+  resolveRootTargetWithInvitations,
   workspaceRedirectForTeamEntry,
 } from '@/shared/tenancy/organization-resolver.ts';
 import { ensureSessionContext } from '@/shared/tenancy/session-context.ts';
@@ -32,8 +36,7 @@ function throwWorkspaceRedirect(target: RootTarget, redirectFrom?: string): neve
       search: redirectFrom ? { redirect: redirectFrom } : undefined,
     });
   }
-  if (target.to === '/dashboard') throw redirect({ to: '/dashboard' });
-  if (target.to === '/organization') throw redirect({ to: '/organization' });
+  if (target.to === '/organization') throw redirect(organizationPicker());
   throw redirect({ to: target.to, params: target.params });
 }
 
@@ -71,7 +74,7 @@ export async function requireOrganizationContext(
   syncOrganizationFromRoute(organization.id, organization.slug, organization.status);
   // Switch-on-navigation: when the URL targets a different org than the cached
   // active one, switch the active-org context (me/context cache + access token)
-  // so the switcher, dashboard, and RBAC all reflect the org in the URL.
+  // so the switcher, the rooms, and RBAC all reflect the org in the URL.
   const activeId =
     queryClient.getQueryData<MeContext>(meContextQueryKey)?.activeOrganization?.id;
   if (activeId !== organization.id) {
@@ -105,22 +108,21 @@ export function requireActiveOrganization(organizationSlug: string): void {
 
 /**
  * The mirror of {@link requireActiveOrganization}, and the ONLY guard on
- * `suspended/`: send an organization that is not suspended back to its
- * dashboard.
+ * `suspended/`: send an organization that is not suspended back to its home.
  *
  * `suspended/` sits outside `requireOrgStatus` so a blocked organization can
  * render its blocked state without redirect-looping. That left the route with
  * no status guard in EITHER direction, so typing the URL told the owner of a
- * demonstrably active organization that it was suspended — the dashboard one
- * click away still showed it as Active. A screen that contradicts the rest of
+ * demonstrably active organization that it was suspended — while every room
+ * one click away treated it as Active. A screen that contradicts the rest of
  * the app is worse than a missing screen.
  *
  * The two guards partition the status space, so no organization can satisfy
- * both and the pair cannot loop: active goes to `dashboard` (where
- * `requireOrgStatus` passes it), anything else goes to `suspended` (where this
- * passes it). The unknown-status default matches its twin — `active` — so a
- * status that never resolved lands on the dashboard rather than on a blocked
- * screen it cannot justify.
+ * both and the pair cannot loop: active goes to the org home (whose rooms and
+ * empty state `requireOrgStatus` passes), anything else goes to `suspended`
+ * (where this passes it). The unknown-status default matches its twin —
+ * `active` — so a status that never resolved lands on the home rather than on
+ * a blocked screen it cannot justify.
  */
 export function requireSuspendedOrganization(organizationSlug: string): void {
   const store = useOrganizationStore.getState();
@@ -131,7 +133,7 @@ export function requireSuspendedOrganization(organizationSlug: string): void {
   }
   const status = store.organizationStatus ?? 'active';
   if (status === 'active') {
-    throw redirect(organizationDashboard(organizationSlug));
+    throw redirect(organizationHome(organizationSlug));
   }
 }
 
@@ -149,17 +151,13 @@ function effectiveDeploymentFlags() {
   );
 }
 
-/** Personal-only deployments have no team slug space — redirect to root dashboard. */
+/**
+ * Personal-only deployments have no team slug space — and so no clinic: send
+ * them to the organization picker, where `/` lands them too.
+ */
 export function requireTeamOrganizationsDeployment(): void {
   if (!effectiveDeploymentFlags().teamOrganizations) {
-    throw redirect({ to: '/dashboard' });
-  }
-}
-
-/** Team-only deployments use slug URLs — root personal dashboard is not a product surface. */
-export function requirePersonalOrganizationsDeployment(): void {
-  if (!effectiveDeploymentFlags().personalOrganizations) {
-    throw redirect({ to: '/' });
+    throw redirect(organizationPicker());
   }
 }
 
@@ -175,35 +173,26 @@ export async function requireOnboardingWorkspace(): Promise<void> {
   // user's name and workspace for a frame first (ONB-4). `claimForUser` is a
   // no-op once the store already belongs to this user.
   useOnboardingStore.getState().claimForUser(ctx.user.id);
-  const target = resolveRootTarget(ctx);
+  // With invitations and no clinic, the picker lists them first (D84) — not the wizard.
+  const target = await resolveRootTargetWithInvitations(ctx);
   if (target.to !== '/onboarding') throwWorkspaceRedirect(target);
 }
 
 /**
- * Block `/dashboard` when `me/context` says the user still belongs on onboarding
- * or a team slug dashboard (same rule as `/` resolver). `redirectFrom` (the
+ * Block the team slug space and the picker until the workspace is provisioned —
+ * a user who still needs onboarding goes there first. `redirectFrom` (the
  * guarded location) rides along on the onboarding redirect so the wizard can
- * return the user to it.
- */
-export async function requireProvisionedPersonalDashboard(options?: {
-  redirectFrom?: string;
-}): Promise<void> {
-  const ctx = await ensureSessionContext();
-  const redirectTarget = workspaceRedirectForPersonalDashboard(ctx);
-  if (redirectTarget) throwWorkspaceRedirect(redirectTarget, options?.redirectFrom);
-}
-
-/**
- * Block team slug space when there is no provisioned workspace yet, or when the
- * active org is personal-only (dual-URL sends those users to `/dashboard`).
- * `redirectFrom` (the guarded location) rides along on the onboarding redirect
- * so the wizard can return the user to the deep link they asked for.
+ * return the user to the deep link they asked for.
  */
 export async function requireProvisionedTeamWorkspace(options?: {
-  organizationPicker?: boolean;
   redirectFrom?: string;
 }): Promise<void> {
   const ctx = await ensureSessionContext();
-  const redirectTarget = workspaceRedirectForTeamEntry(ctx, options);
+  // Only an onboarding redirect is decided here, so the invitations are read only for someone
+  // who still needs onboarding: invited with no clinic, they stay on the picker (D84).
+  const pendingInvitations = needsOnboarding(ctx)
+    ? await countLandingInvitations(ctx)
+    : 0;
+  const redirectTarget = workspaceRedirectForTeamEntry(ctx, { pendingInvitations });
   if (redirectTarget) throwWorkspaceRedirect(redirectTarget, options?.redirectFrom);
 }

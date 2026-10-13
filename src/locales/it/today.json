@@ -1,0 +1,77 @@
+{
+  "manifest": {
+    "title": "Oggi"
+  },
+  "greeting": {
+    "morning": "Buongiorno, {{name}}",
+    "afternoon": "Buon pomeriggio, {{name}}",
+    "evening": "Buonasera, {{name}}",
+    "nobody": "a tutti"
+  },
+  "pulse": "{{inClinic}} in clinica · {{waiting}} in attesa · {{arriving}} in arrivo · {{day}}, {{time}}",
+  "newBooking": "Nuova prenotazione",
+  "walkIn": "Senza appuntamento",
+  "loading": "Caricamento della giornata",
+  "lanes": {
+    "label": "Fasi",
+    "names": {
+      "enquiries": "Richieste",
+      "arriving": "In arrivo",
+      "waiting": "In attesa",
+      "withDoctor": "Dal medico",
+      "treatment": "Trattamento",
+      "checkout": "Cassa",
+      "pharmacy": "Farmacia"
+    },
+    "hints": {
+      "oldest": "la più vecchia {{time}}",
+      "next": "prossimo {{time}}",
+      "since": "dalle {{time}}",
+      "none": "—"
+    },
+    "more": "+{{more}}",
+    "count_one": "{{count}} persona",
+    "count_many": "{{count}} persone",
+    "count_other": "{{count}} persone",
+    "empty": "Nessuno qui al momento.",
+    "none": "La sala della clinica e le richieste non fanno parte del tuo ruolo."
+  },
+  "actions": {
+    "book": "Prenota",
+    "checkIn": "Registra arrivo",
+    "sendIn": "Fai entrare",
+    "openSession": "Apri seduta",
+    "checkout": "Cassa",
+    "dispense": "Dispensa"
+  },
+  "card": {
+    "service": "{{service}} · {{where}}",
+    "medicines_one": "{{count}} farmaco prescritto",
+    "medicines_many": "{{count}} farmaci prescritti",
+    "medicines_other": "{{count}} farmaci prescritti"
+  },
+  "flags": {
+    "newLead": "Nuovo lead",
+    "confirmed": "Confermato",
+    "unconfirmed": "Non confermato",
+    "waiting": "In attesa da {{minutes}} min",
+    "inRoom": "In sala da {{minutes}} min",
+    "rxApproved": "Ricetta approvata {{time}}",
+    "toPay": "{{amount}} da pagare"
+  },
+  "toasts": {
+    "checkedIn": "Arrivo di {{name}} registrato · coda del medico e sala avvisate",
+    "sentIn": "{{name}} mandato dal medico",
+    "noRecord": "Nessuna cartella paziente per {{name}}",
+    "outcome": "{{name}}: {{result}}",
+    "snoozed": "Posticipata · {{label}}"
+  },
+  "queue": {
+    "title": "Coda di lavoro",
+    "sub": "{{open}} aperte · ognuna con un responsabile e una scadenza",
+    "scope": "Di chi sono le attività",
+    "owner": "Responsabile: {{name}}",
+    "you": "{{name}} (tu)",
+    "closed": "✓ {{result}}"
+  }
+}

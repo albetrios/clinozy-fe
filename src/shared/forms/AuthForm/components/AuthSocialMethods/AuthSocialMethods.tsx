@@ -37,7 +37,7 @@ export function AuthSocialMethods({
   const { t } = useTranslation(AUTH_NS);
 
   return (
-    <div className="flex flex-col gap-3" data-testid={AUTH_FORM_TEST_IDS.socialMethods}>
+    <div className="flex flex-col gap-2" data-testid={AUTH_FORM_TEST_IDS.socialMethods}>
       {providers.map((provider) => (
         <AuthMethodButton
           key={provider}

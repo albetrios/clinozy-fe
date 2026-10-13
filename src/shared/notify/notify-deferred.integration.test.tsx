@@ -158,9 +158,9 @@ describe('notifyDeferredCommit (real toast surface)', () => {
     });
     await waitFor(() => expect(screen.getByText(COMMITTED_COPY)).toBeInTheDocument());
 
-    // `AppToaster` sets no `duration`, so a finite toast lives for sonner's 4s
-    // TOAST_LIFETIME plus its 200ms unmount. Still on screen after twice that
-    // and it is on no timer at all — which is exactly the bug.
+    // The committed toast names no lifetime, so it gets `TOAST_DURATION_MS.default`
+    // (5.2s) plus sonner's 200ms unmount. Still on screen well past that and it
+    // is on no timer at all — which is exactly the bug.
     await waitFor(
       () => expect(screen.queryByText(COMMITTED_COPY)).not.toBeInTheDocument(),
       { timeout: 9000, interval: 100 },

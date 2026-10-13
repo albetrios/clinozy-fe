@@ -78,30 +78,34 @@ Front-loads the expensive-to-change decisions:
 
 1. **Preset** — tokens first. Screens on the wrong tokens look wrong even when
    structurally right; re-theming later means re-screenshotting everything.
-2. **Shell** — as a **new variant**, never overwriting an existing one. Policy:
-   **relocate, never delete** — every platform surface keeps a home.
+2. **Shell** — the new design **replaces** the old one (one design per surface,
+   below). Policy: **relocate, never delete** — every platform surface keeps a
+   home.
 3. **Screens** — one at a time: interaction shell → flow skeleton → regions
    (desktop and mobile _together_) → content → states → motion.
 
-## Making a variant live — the two-step nobody remembers
+## One design per surface — a new design replaces the old one
 
-**A restyled or new layout/shell variant is not done when the code is written. It
-is done when it is the default AND pinned.** Skipping either is why "I don't see
-my design as the default" keeps happening.
+**A surface has exactly one design. A restyled or new layout, shell or screen
+replaces the one before it — the old design goes in the same change.** No preview
+variant is kept beside it behind a store index or a shuffle switch: a second
+design nobody sees is how "I don't see my design" kept happening (the default
+still pointed at the old one) and how dead shells piled up.
 
-For **any** layout, shell, or theme variant you add or restyle, do all three:
+For **any** layout or shell you restyle or replace:
 
-1. **Write the variant** (the code).
-2. **Point the default at it** — set the store default index / preset id to the
-   new variant. In clinozy-fe: `authVariant` / `publicVariant` in
-   `useThemeStore`, `DEFAULT_PRESET` in `presets.ts`.
-3. **Pin it** — turn OFF any shuffle/preview cycling so it can't rotate away. In
-   clinozy-fe: `SHUFFLE_TEMP.<axis> = false` in `presets.ts`.
+1. **Build the new design in place of the old one** — edit the surface's file,
+   or add the new file and delete the old one together with everything only it
+   used (loaders, store fields, i18n keys, tests). In clinozy-fe the app shell
+   is `src/shared/layouts/AppLayout/AppLayoutSectionBar.tsx`.
+2. **Relocate, never delete, the platform surfaces** — sign-out, the settings
+   entry, the switcher… each keeps a home in the new design.
+3. **Verify it is what loads** — with the old design gone there is no index, no
+   persisted value and no shuffle that can put it back.
 
-Verify the default actually resolves to your variant — check it isn't overridden
-by a persisted value (is the field in `partialize`? does `migrate` reset it?).
-State in the recap: _"default = <variant>, pinned, not persisted."_ If you can't
-say that sentence, the variant isn't live.
+The look is data, not a design fork: the one look is `THEME_ID` in `presets.ts`.
+
+State in the recap: _"<surface>: one design — <file>; the old one removed."_
 
 ## The ledger — nothing closes with an open row
 

@@ -5,27 +5,36 @@ import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import i18n from '@/lib/i18n/i18n.ts';
 import { isListStale, listRefreshClass } from '@/lib/list-refresh.ts';
 import { cn } from '@/lib/utils.ts';
-import type {
-  Member,
-  MemberInvitation,
-  OrgRole,
+import {
+  isInvitableRole,
+  isInvitationExpired,
+  type Member,
+  type MemberInvitation,
+  type RoleSummary,
 } from '@/shared/api/organization-contracts.ts';
 import { orgQueryKeys } from '@/shared/api/organization-query-keys.ts';
+import {
+  PersonAvatar,
+  personInitials,
+} from '@/shared/components/Cells/PersonAvatar/index.ts';
+import { type PillTone, TonePill } from '@/shared/components/Cells/TonePill/index.ts';
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
 import { EmptyState } from '@/shared/components/EmptyState/index.ts';
 import { InviteMemberDialog } from '@/shared/components/InviteMemberDialog/index.ts';
 import { PanelSkeleton } from '@/shared/components/PanelSkeleton/index.ts';
 import { RetryError } from '@/shared/components/RetryError/index.ts';
 import {
+  SettingsList,
+  SettingsListRow,
+  settingsRowActionClass,
+} from '@/shared/components/SettingsCard/index.ts';
+import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { SectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
 import { Spinner } from '@/shared/components/Spinner/index.ts';
-import { Avatar, AvatarFallback } from '@/shared/components/ui/avatar.tsx';
-import { Badge } from '@/shared/components/ui/badge.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { Card } from '@/shared/components/ui/card.tsx';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -48,10 +57,9 @@ import { useLocaleFormat } from '@/shared/hooks/useLocaleFormat/index.ts';
 import {
   useMembers,
   useRemoveMember,
-  useUpdateMemberRole,
-  useUpdateMemberStatus,
+  useUpdateMember,
 } from '@/shared/hooks/useMembers/index.ts';
-import { useRoles } from '@/shared/hooks/useRoles/index.ts';
+import { usePlatformRoles } from '@/shared/hooks/useTeam/index.ts';
 import { MoreHorizontal, UserPlus, Users } from '@/shared/icons/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
@@ -61,38 +69,21 @@ import {
   orgListSortToParams,
 } from './org-list-sort.ts';
 import { OrgListControls } from './OrgListControls.tsx';
+import { useUsersRoomOpen } from './users-room-open.ts';
+import { UsersRoomLink } from './UsersRoomLink.tsx';
 
-function initials(name: string): string {
-  const letters = name
-    .split(' ')
-    .filter(Boolean)
-    .map((part) => part.charAt(0))
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
-  return letters || '?';
-}
-
-function statusVariant(
-  status: Member['status'],
-): 'secondary' | 'destructive' | 'outline' {
-  if (status === 'suspended') return 'destructive';
-  if (status === 'invited') return 'outline';
-  return 'secondary';
+/**
+ * A member status's pill tone, as the Users room paints it: active sage,
+ * invited butter, suspended (the room's "Inactive") plain.
+ */
+function statusTone(status: Member['status']): PillTone {
+  if (status === 'active') return 'sage';
+  if (status === 'invited') return 'butter';
+  return 'neutral';
 }
 
 function MembersLoading() {
   return <PanelSkeleton testId="members-loading" />;
-}
-
-/**
- * Whether the invitation's link has expired. clinozy-be refuses to resend it after
- * that, so the row offers Cancel only. Read at render: an invitation that expires
- * while the panel is open keeps its Resend until the list refreshes, and clinozy-be
- * then answers the resend with its own "expired" reason.
- */
-function isInvitationExpired(invitation: MemberInvitation): boolean {
-  return Date.parse(invitation.expiresAt) <= Date.now();
 }
 
 /**
@@ -103,36 +94,40 @@ function pendingInvitationOf(member: Member): MemberInvitation | null {
   return member.status === 'invited' ? (member.invitation ?? null) : null;
 }
 
-/** Best-effort map of a role's display name to the coarse OrgRole (optimistic label only). */
-function toOrgRoleName(name: string): OrgRole {
-  const n = name.toLowerCase();
-  return n === 'owner' || n === 'admin' || n === 'viewer' ? n : 'member';
+/** A member's roles with their main role replaced — the others stay as they are. */
+function withMainRole(member: Member, roleId: string): string[] {
+  return [roleId, ...member.roleIds.slice(1).filter((id) => id !== roleId)];
+}
+
+/** What the caller may do to a member row — each its own clinozy-be code. */
+interface MemberRowAccess {
+  /** Roles, suspend / reactivate, and resend an invitation (`membership:update`). */
+  canUpdate: boolean;
+  /** Remove a member, cancel an invitation (`membership:delete`). */
+  canDelete: boolean;
 }
 
 /**
- * The row menu's last group. For an invitation the caller may manage: resend
- * (until its link expires) and cancel. Otherwise Remove, for a caller who may
- * manage members.
+ * The row menu's last group. On an invited row: resend (`membership:update` —
+ * an expired link too: clinozy-be sends a fresh one) and cancel
+ * (`membership:delete`). Otherwise Remove (`membership:delete`).
  *
- * Cancel replaces Remove on an invited row: removing the membership alone left
- * the invitation unrevoked, so the invitee's link failed with "not found" instead
- * of saying it was revoked. Remove stays as the fallback for a caller who may
- * manage members but not invitations.
+ * Cancel replaces Remove on an invited row: clinozy-be revokes the link and
+ * ends the invited membership in one step, so the invitee's link says it was
+ * revoked rather than "not found".
  */
 function MemberRowEndItems({
   member,
-  canManageMembers,
-  canManageInvitations,
+  access,
   isWriting,
   onResend,
   onRemove,
   onCancelInvitation,
 }: {
   member: Member;
-  canManageMembers: boolean;
-  canManageInvitations: boolean;
+  access: MemberRowAccess;
   isWriting: boolean;
-  onResend: (invitation: MemberInvitation) => void;
+  onResend: (member: Member) => void;
   onRemove: (member: Member) => void;
   onCancelInvitation: (member: Member, invitation: MemberInvitation) => void;
 }) {
@@ -140,29 +135,31 @@ function MemberRowEndItems({
   const panels = SETTINGS_KEYS.panels.members;
   const invitation = pendingInvitationOf(member);
 
-  if (canManageInvitations && invitation) {
+  if (invitation) {
     return (
       <>
-        {isInvitationExpired(invitation) ? null : (
+        {access.canUpdate ? (
           <DropdownMenuItem
             disabled={isWriting}
-            onSelect={() => onResend(invitation)}
+            onSelect={() => onResend(member)}
             data-testid={`member-resend-invite-${member.id}`}
           >
             {t(panels.resendInvite)}
           </DropdownMenuItem>
-        )}
-        <DropdownMenuItem
-          variant="destructive"
-          onSelect={() => onCancelInvitation(member, invitation)}
-          data-testid={`member-cancel-invite-${member.id}`}
-        >
-          {t(panels.cancelInvite)}
-        </DropdownMenuItem>
+        ) : null}
+        {access.canDelete ? (
+          <DropdownMenuItem
+            variant="destructive"
+            onSelect={() => onCancelInvitation(member, invitation)}
+            data-testid={`member-cancel-invite-${member.id}`}
+          >
+            {t(panels.cancelInvite)}
+          </DropdownMenuItem>
+        ) : null}
       </>
     );
   }
-  if (!canManageMembers) return null;
+  if (!access.canDelete) return null;
   return (
     <DropdownMenuItem
       variant="destructive"
@@ -175,45 +172,41 @@ function MemberRowEndItems({
 }
 
 /**
- * Per-member management menu. With `membership:manage`: change role (to any of
- * the org's real non-owner roles), suspend/reactivate a joined member, and
- * remove. With `invitation:manage`, an invited row also gets resend (until the
- * link expires) and cancel. The owner's own row shows no actions (an org can't
- * manage its owner from here).
+ * Per-member management menu. With `membership:update`: change the main role
+ * (to any role but the owner's; the member's other roles stay), suspend or
+ * reactivate a joined member, resend an invitation. With `membership:delete`:
+ * remove, or cancel an invitation. The owner's row shows no actions (an
+ * organization can't manage its owner from here).
  */
 function MemberRowActions({
   member,
-  canManageMembers,
-  canManageInvitations,
+  roles,
+  access,
   onRemove,
   onCancelInvitation,
 }: {
   member: Member;
-  canManageMembers: boolean;
-  canManageInvitations: boolean;
+  roles: readonly RoleSummary[];
+  access: MemberRowAccess;
   onRemove: (member: Member) => void;
   onCancelInvitation: (member: Member, invitation: MemberInvitation) => void;
 }) {
   const { t } = useTranslation(SETTINGS_NS);
   const panels = SETTINGS_KEYS.panels.members;
-  const roles = useRoles();
-  const updateRole = useUpdateMemberRole();
-  const updateStatus = useUpdateMemberStatus();
+  const updateMember = useUpdateMember();
   const resendInvitation = useResendInvitation();
 
-  // Exclude the system roles by their flag, not by matching the name "owner" — a custom role
-  // called "Owners" slipped straight through that string compare. This is UI robustness only;
-  // clinozy-be runs the real guard (`assertCallerCanGrantPermissionCodes` on membership create
-  // and update refuses any role carrying a code the caller does not hold).
-  const assignableRoles = (roles.rows ?? []).filter((role) => !role.isSystem);
+  // Every role but the owner's preset, by its system flag and fixed name — never a bare name
+  // compare (a custom role called "Owners" slipped through one). UI robustness only: clinozy-be
+  // runs the real guard and refuses a role carrying a code the caller does not hold.
+  const assignableRoles = roles.filter(isInvitableRole);
   const isSuspended = member.status === 'suspended';
   /**
    * One membership write at a time. The menu is still clickable while a change
    * is in flight, and `useAppMutation` JOINS a second call to the first - so
    * the second pick looked accepted and then vanished. Disable it (SET-12).
    */
-  const isWriting =
-    updateRole.isPending || updateStatus.isPending || resendInvitation.isPending;
+  const isWriting = updateMember.isPending || resendInvitation.isPending;
   // Suspend/reactivate only applies once a member has actually joined — clinozy-be
   // rejects flipping a never-joined (invited) membership to active. Invited
   // members get role-change plus the invitation actions below.
@@ -223,8 +216,9 @@ function MemberRowActions({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="ghost"
-          size="icon"
+          variant="outline"
+          size="icon-sm"
+          className={settingsRowActionClass()}
           aria-label={t(panels.actionsAria, { name: member.name })}
           data-testid={`member-actions-${member.id}`}
           aria-busy={isWriting}
@@ -235,7 +229,7 @@ function MemberRowActions({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        {canManageMembers && assignableRoles.length > 0 ? (
+        {access.canUpdate && assignableRoles.length > 0 ? (
           <>
             <DropdownMenuLabel>{t(panels.changeRole)}</DropdownMenuLabel>
             <DropdownMenuRadioGroup
@@ -245,12 +239,10 @@ function MemberRowActions({
                 // the member's current role is not a change, and used to send a
                 // PATCH and toast "Role updated" for nothing.
                 if (isWriting || roleId === member.roleId) return;
-                const role = assignableRoles.find((r) => r.id === roleId);
-                if (role) {
-                  updateRole.mutate({
+                if (assignableRoles.some((role) => role.id === roleId)) {
+                  updateMember.mutate({
                     membershipId: member.id,
-                    role: toOrgRoleName(role.name),
-                    roleId: role.id,
+                    change: { roleIds: withMainRole(member, roleId) },
                   });
                 }
               }}
@@ -269,13 +261,13 @@ function MemberRowActions({
             <DropdownMenuSeparator />
           </>
         ) : null}
-        {canManageMembers && hasJoined ? (
+        {access.canUpdate && hasJoined ? (
           <DropdownMenuItem
             disabled={isWriting}
             onSelect={() =>
-              updateStatus.mutate({
+              updateMember.mutate({
                 membershipId: member.id,
-                status: isSuspended ? 'active' : 'suspended',
+                change: { status: isSuspended ? 'active' : 'suspended' },
               })
             }
             data-testid={`member-toggle-status-${member.id}`}
@@ -285,10 +277,9 @@ function MemberRowActions({
         ) : null}
         <MemberRowEndItems
           member={member}
-          canManageMembers={canManageMembers}
-          canManageInvitations={canManageInvitations}
+          access={access}
           isWriting={isWriting}
-          onResend={(invitation) => resendInvitation.mutate(invitation.id)}
+          onResend={(row) => resendInvitation.mutate(row.id)}
           onRemove={onRemove}
           onCancelInvitation={onCancelInvitation}
         />
@@ -333,43 +324,56 @@ function InvitationExpiry({
  */
 function MemberRow({
   member,
-  canManageMembers,
-  canManageInvitations,
+  roles,
+  access,
   onRemove,
   onCancelInvitation,
 }: {
   member: Member;
-  canManageMembers: boolean;
-  canManageInvitations: boolean;
+  roles: readonly RoleSummary[];
+  access: MemberRowAccess;
   onRemove: (member: Member) => void;
   onCancelInvitation: (member: Member, invitation: MemberInvitation) => void;
 }) {
   const invitation = pendingInvitationOf(member);
-  // A caller who may manage invitations but not members still gets the menu on
-  // an invited row: resend and cancel are all it holds.
-  const hasActions = canManageMembers || (canManageInvitations && invitation !== null);
+  const hasActions = access.canUpdate || access.canDelete;
+  // The main role's name — only for a caller who may read the roles.
+  const mainRoleName = roles.find((role) => role.id === member.roleId)?.name;
 
   return (
-    <li className="flex items-center gap-3 p-3">
-      <Avatar className="size-9">
-        <AvatarFallback className="text-xs">{initials(member.name)}</AvatarFallback>
-      </Avatar>
+    <SettingsListRow>
+      {/* A table row's primary cell: the 32px avatar, the name 13px/500, the
+          email under it 11.5px muted. */}
+      <PersonAvatar
+        initials={personInitials(member.name) || '?'}
+        tone="stone"
+        size="cell"
+      />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium">{member.name}</p>
+        <p dir="auto" className="text-body truncate font-medium">
+          {member.name}
+        </p>
         {member.email !== member.name ? (
-          <p className="text-muted-foreground truncate text-xs">{member.email}</p>
+          <p
+            dir="ltr"
+            className="text-muted-foreground text-caption truncate [text-align:match-parent]"
+          >
+            {member.email}
+          </p>
         ) : null}
         {invitation ? (
           <InvitationExpiry memberId={member.id} invitation={invitation} />
         ) : null}
       </div>
-      <Badge variant="secondary" className="hidden capitalize sm:inline-flex">
-        {member.roleName}
-      </Badge>
-      <Badge variant={statusVariant(member.status)} className="capitalize">
+      {mainRoleName ? (
+        <TonePill tone="neutral" size="sm" className="hidden capitalize sm:inline-flex">
+          {mainRoleName}
+        </TonePill>
+      ) : null}
+      <TonePill tone={statusTone(member.status)} size="sm" dot className="capitalize">
         {member.status}
-      </Badge>
-      {hasActions && member.role !== 'owner' ? (
+      </TonePill>
+      {hasActions && !member.isOwner ? (
         // One row's menu is its own failure domain - a member with
         // malformed data must not blank the whole list.
         <SectionErrorBoundary
@@ -379,14 +383,14 @@ function MemberRow({
         >
           <MemberRowActions
             member={member}
-            canManageMembers={canManageMembers}
-            canManageInvitations={canManageInvitations}
+            roles={roles}
+            access={access}
             onRemove={onRemove}
             onCancelInvitation={onCancelInvitation}
           />
         </SectionErrorBoundary>
       ) : null}
-    </li>
+    </SettingsListRow>
   );
 }
 
@@ -427,36 +431,35 @@ function CancelInvitationDialog({
 /**
  * Whether this caller can complete an invite, which takes two grants rather than one.
  *
- * Invite calls `POST /tenancy/organization/memberships`, gated on `membership:manage` —
- * NOT `invitation:manage`, which guards only resend and cancel (the invited row's menu),
- * so gating on it showed the button to a caller the API answers with 403. The dialog
- * also has to list roles to pick one (`GET .../roles`, `role:read`); without that the picker
- * renders empty and the invite cannot be finished, so offering the trigger would be a dead end.
+ * Invite calls `POST /tenancy/organization/memberships`, gated on `membership:create` (team
+ * organizations only). The dialog also has to list roles to pick one (`GET .../roles`,
+ * `role:read`); without that the picker renders empty and the invite cannot be finished, so
+ * offering the trigger would be a dead end.
  */
 function useCanInviteMembers(): boolean {
-  const canManageMembers = useCan({
-    permission: 'membership:manage',
+  const canCreateMembers = useCan({
+    permission: 'membership:create',
     teamOrganizationOnly: true,
   });
   const canReadRoles = useCan({ permission: 'role:read' });
-  return canManageMembers && canReadRoles;
+  return canCreateMembers && canReadRoles;
 }
 
 /** The list area: loading, a retryable error, the empty state, or the members and "Load more". */
 function MembersList({
   members,
+  roles,
   isSearching,
   isStale,
-  canManageMembers,
-  canManageInvitations,
+  access,
   onRemove,
   onCancelInvitation,
 }: {
   members: ReturnType<typeof useMembers>;
+  roles: readonly RoleSummary[];
   isSearching: boolean;
   isStale: boolean;
-  canManageMembers: boolean;
-  canManageInvitations: boolean;
+  access: MemberRowAccess;
   onRemove: (member: Member) => void;
   onCancelInvitation: (member: Member, invitation: MemberInvitation) => void;
 }) {
@@ -476,6 +479,8 @@ function MembersList({
 
       {!(members.isPending || members.isError) && members.rows.length === 0 ? (
         <EmptyState
+          tone="slate"
+          className="pt-8 pb-9"
           icon={<Users />}
           title={isSearching ? t(panels.noResults) : t(panels.emptyTitle)}
           description={isSearching ? '' : t(panels.emptyDescription)}
@@ -484,23 +489,22 @@ function MembersList({
 
       {!members.isError && members.rows.length > 0 ? (
         <>
-          <Card
-            className={cn('gap-0 overflow-hidden py-0', listRefreshClass(isStale))}
+          <SettingsList
+            frameClassName={listRefreshClass(isStale)}
             aria-busy={isStale}
+            data-testid="members-list"
           >
-            <ul className="divide-border divide-y" data-testid="members-list">
-              {members.rows.map((member) => (
-                <MemberRow
-                  key={member.id}
-                  member={member}
-                  canManageMembers={canManageMembers}
-                  canManageInvitations={canManageInvitations}
-                  onRemove={onRemove}
-                  onCancelInvitation={onCancelInvitation}
-                />
-              ))}
-            </ul>
-          </Card>
+            {members.rows.map((member) => (
+              <MemberRow
+                key={member.id}
+                member={member}
+                roles={roles}
+                access={access}
+                onRemove={onRemove}
+                onCancelInvitation={onCancelInvitation}
+              />
+            ))}
+          </SettingsList>
           {members.hasNextPage ? (
             <div className="flex justify-center">
               <Button
@@ -521,13 +525,24 @@ function MembersList({
 }
 
 /**
- * Members panel — the active organization's people. Lists members with their
- * role + status; removal is gated on the membership:manage permission (team
- * orgs only) and confirmed via undo-capable deferred commit. An invited row shows
- * when its invitation expires, and `invitation:manage` can resend or cancel it —
- * cancel through the same confirm + undo flow as removal.
+ * Members panel — a link into the Users room's Team where the room is this
+ * member's members surface (D17, {@link useUsersRoomOpen}); everywhere else the
+ * members list itself ({@link MembersManager}), so no deployment and no
+ * permission set loses what it could do here.
  */
 export function OrganizationMembersPanel() {
+  return useUsersRoomOpen() ? <UsersRoomLink section="members" /> : <MembersManager />;
+}
+
+/**
+ * The active organization's people. Lists members with their main role (for a
+ * caller who may read roles) and status. Edits need `membership:update`;
+ * removal needs `membership:delete` (team organizations only) and goes through
+ * an undo-capable deferred commit. An invited row shows when its invitation
+ * expires; `membership:update` resends it, `membership:delete` cancels it —
+ * through the same confirm + undo flow as removal.
+ */
+function MembersManager() {
   const { t } = useTranslation(SETTINGS_NS);
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState<OrgListSortPreset>(DEFAULT_ORG_LIST_SORT);
@@ -538,13 +553,15 @@ export function OrganizationMembersPanel() {
     q: debouncedSearch || undefined,
     ...sortParams,
   });
-  const canManage = useCan({
-    permission: 'membership:manage',
+  const canUpdate = useCan({ permission: 'membership:update' });
+  const canDelete = useCan({
+    permission: 'membership:delete',
     teamOrganizationOnly: true,
   });
+  const access: MemberRowAccess = { canUpdate, canDelete };
   const canInvite = useCanInviteMembers();
-  // Resend and cancel are the invitation routes' own permission, not membership's.
-  const canManageInvitations = useCan({ permission: 'invitation:manage' });
+  // The role names and the picker's choices — nothing for a caller without `role:read`.
+  const { roles } = usePlatformRoles();
   /**
    * `useCan` is synchronous and the guard chain fills the permission set a beat
    * after this panel first renders, so a `false` here can mean "not yet". A
@@ -580,7 +597,7 @@ export function OrganizationMembersPanel() {
   const isStale = isListStale(members.isRefreshing, isSearchPending);
 
   return (
-    <section className="space-y-6" data-testid="settings-organization-members">
+    <section className="flex flex-col gap-4" data-testid="settings-organization-members">
       <SectionHeader title={t(panels.title)} description={t(panels.description)} />
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -595,7 +612,7 @@ export function OrganizationMembersPanel() {
         />
         {accessResolved ? null : (
           <Button size="sm" disabled data-testid="invite-member-pending">
-            <UserPlus className="me-2 h-4 w-4" />
+            <UserPlus className="size-4" />
             {t(panels.invite)}
           </Button>
         )}
@@ -604,10 +621,10 @@ export function OrganizationMembersPanel() {
 
       <MembersList
         members={members}
+        roles={roles}
         isSearching={isSearching}
         isStale={isStale}
-        canManageMembers={canManage}
-        canManageInvitations={canManageInvitations}
+        access={access}
         onRemove={setToRemove}
         onCancelInvitation={(row, invitation) => setToCancel({ member: row, invitation })}
       />
@@ -640,7 +657,9 @@ export function OrganizationMembersPanel() {
             // the DELETE. `mutate` returns void, so the toast reported success
             // before the request landed and a rejection could never reach
             // `onCommitError` — the row stayed gone after a failed delete.
-            commit: () => removeMember.mutateAsync(member.id),
+            // Settings asks no reason: a removal here is "not needed" (as the Users room's default).
+            commit: () =>
+              removeMember.mutateAsync({ membershipId: member.id, reason: 'not_needed' }),
           });
         }}
       />
@@ -648,11 +667,11 @@ export function OrganizationMembersPanel() {
       <CancelInvitationDialog
         target={toCancel}
         onClose={() => setToCancel(null)}
-        onConfirm={({ member, invitation }) => {
+        onConfirm={({ member }) => {
           setToCancel(null);
           // The row leaves now and comes back on undo or a failed revoke, exactly
-          // as a removal does. The write is the invitation's revoke, which clinozy-be
-          // pairs with removing the invited membership.
+          // as a removal does. The write is the invited membership's invitation
+          // revoke, which clinozy-be pairs with ending that membership.
           scheduleRemoval({
             id: member.id,
             pendingMessage: t(panels.cancelInvitePending, { email: member.email }),
@@ -663,7 +682,7 @@ export function OrganizationMembersPanel() {
               },
             ),
             toastId: `cancel-invite-${member.id}`,
-            commit: () => revokeInvitation.mutateAsync(invitation.id),
+            commit: () => revokeInvitation.mutateAsync(member.id),
           });
         }}
       />

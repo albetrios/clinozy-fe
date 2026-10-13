@@ -3,8 +3,8 @@ import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { PRODUCT_NAME } from '@/lib/product-identity.ts';
 import type { MeContext, OrganizationType } from '@/shared/tenancy/me-context.ts';
+import type { MyInvitation } from '@/shared/tenancy/my-invitations.ts';
 import type * as MyOrganizationSummariesModule from '@/shared/tenancy/my-organization-summaries.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
@@ -13,6 +13,7 @@ import { ORG_SWITCH_TOAST_ID, OrganizationSwitcher } from './OrganizationSwitche
 const {
   useMeContextMock,
   useMyOrganizationSummariesMock,
+  useMyInvitationsMock,
   switchToPersonalMock,
   navigateMock,
   deploymentFlagsMock,
@@ -21,6 +22,7 @@ const {
 } = vi.hoisted(() => ({
   useMeContextMock: vi.fn(),
   useMyOrganizationSummariesMock: vi.fn(),
+  useMyInvitationsMock: vi.fn(),
   switchToPersonalMock: vi.fn(),
   navigateMock: vi.fn(async () => undefined),
   deploymentFlagsMock: {
@@ -34,7 +36,7 @@ const {
 /*
  * Only `useNavigate` is stubbed; the rest of the router is real because
  * renderWithProviders mounts a RouterProvider. The harness route tree has no
- * /dashboard, so a real navigation renders "Not Found" and unmounts the
+ * clinic routes, so a real navigation renders "Not Found" and unmounts the
  * switcher — which would make the post-success latch test pass for the wrong
  * reason, by removing the component whose mounted state is the point.
  */
@@ -56,6 +58,9 @@ vi.mock('@/shared/errors/errorHandler.ts', async (importOriginal) => {
 vi.mock('@/shared/tenancy/my-organization-summaries.ts', async (importOriginal) => ({
   ...(await importOriginal<typeof MyOrganizationSummariesModule>()),
   useMyOrganizationSummaries: useMyOrganizationSummariesMock,
+}));
+vi.mock('@/shared/tenancy/my-invitations.ts', () => ({
+  useMyInvitations: useMyInvitationsMock,
 }));
 vi.mock('@/shared/hooks/useMeContext/index.ts', () => ({
   useMeContext: useMeContextMock,
@@ -113,7 +118,16 @@ beforeEach(() => {
   switchToPersonalMock.mockResolvedValue(undefined);
   useMeContextMock.mockReturnValue({ data: CTX, isLoading: false });
   useMyOrganizationSummariesMock.mockReturnValue({ data: ORGS, isPending: false });
+  useMyInvitationsMock.mockReturnValue({ data: [] });
 });
+
+const INVITATION: MyInvitation = {
+  id: `inv_${'i'.repeat(21)}`,
+  organization: { id: 'org_beta', name: 'Beta Clinic', slug: 'beta', logoUrl: null },
+  roleNames: ['Doctor'],
+  inviterName: null,
+  expiresAt: '2026-10-17T10:00:00.000Z',
+};
 
 describe('OrganizationSwitcher', () => {
   it('shows the active organization name', async () => {
@@ -127,7 +141,7 @@ describe('OrganizationSwitcher', () => {
     expect(trigger).toHaveAccessibleName(/switch organization.*acme inc\./i);
   });
 
-  // ── Trigger layout: a small field, or the sidebar's brand lockup ──────────
+  // ── Trigger layout: a small outlined field ─────────────────────────────────
 
   describe('trigger layout', () => {
     it('is a compact outlined field by default, led by the organization initial', async () => {
@@ -151,61 +165,10 @@ describe('OrganizationSwitcher', () => {
       expect(chip?.className.split(/\s+/)).not.toContain('rounded');
     });
 
-    it('ignores a caption outside the lockup — the field has one line', async () => {
-      renderWithProviders(<OrganizationSwitcher caption={PRODUCT_NAME} />);
-      await screen.findByTestId('organization-switcher-trigger');
-
-      expect(
-        screen.queryByTestId('organization-switcher-caption'),
-      ).not.toBeInTheDocument();
-    });
-
-    it('becomes ONE brand lockup when given a leading mark', async () => {
-      // The sidebar header: the product mark and the switcher used to be two
-      // things stacked in a column — a logo top-aligned to an 11px caption with
-      // the dropdown indented beneath — so nothing shared an edge or a baseline.
-      renderWithProviders(
-        <OrganizationSwitcher
-          surface="sidebar"
-          leading={<span data-testid="brand-mark" />}
-          caption={PRODUCT_NAME}
-        />,
-      );
-      const trigger = await screen.findByTestId('organization-switcher-trigger');
-
-      expect(trigger).toHaveAttribute('data-layout', 'lockup');
-      // The mark replaces the initial rather than sitting beside it…
-      expect(trigger).toContainElement(screen.getByTestId('brand-mark'));
-      expect(trigger.querySelector('[data-slot="icon-chip"]')).toBeNull();
-      // …the name and the product caption stack as two lines of one row…
-      expect(trigger).toHaveTextContent('Acme Inc.');
-      expect(screen.getByTestId('organization-switcher-caption')).toHaveTextContent(
-        PRODUCT_NAME,
-      );
-      // …and it is a borderless row, not a bordered field inside the header.
-      expect(trigger).toHaveAttribute('data-variant', 'ghost');
-      expect(trigger).toHaveClass('h-11');
-    });
-
-    it('keeps its accessible name in the lockup (the caption is not part of it)', async () => {
-      renderWithProviders(
-        <OrganizationSwitcher
-          leading={<span aria-hidden="true" />}
-          caption={PRODUCT_NAME}
-        />,
-      );
-
-      expect(
-        await screen.findByRole('button', { name: /switch organization.*acme inc\./i }),
-      ).toBeInTheDocument();
-    });
-
     it('opens a menu at least as wide as the trigger', async () => {
-      // A fixed 16rem menu stopped short of the full-width lockup's end edge.
+      // A fixed 16rem menu stopped short of a wide trigger's end edge.
       const user = userEvent.setup();
-      renderWithProviders(
-        <OrganizationSwitcher leading={<span />} caption={PRODUCT_NAME} />,
-      );
+      renderWithProviders(<OrganizationSwitcher className="w-80" />);
 
       await user.click(await screen.findByTestId('organization-switcher-trigger'));
 
@@ -238,6 +201,23 @@ describe('OrganizationSwitcher', () => {
     ).not.toBeInTheDocument();
     expect(screen.getByTestId('organization-switcher-option-acme')).toBeInTheDocument();
     expect(screen.getByTestId('organization-switcher-create')).toBeInTheDocument();
+  });
+
+  it('lists pending invitations first, each opening the picker to answer it (D84)', async () => {
+    useMyInvitationsMock.mockReturnValue({ data: [INVITATION] });
+    const user = userEvent.setup();
+    renderWithProviders(<OrganizationSwitcher />);
+    await user.click(await screen.findByTestId('organization-switcher-trigger'));
+
+    const invited = await screen.findByTestId(
+      `organization-switcher-invitation-${INVITATION.id}`,
+    );
+    expect(invited).toHaveTextContent('Beta Clinic');
+    expect(invited).toHaveTextContent('Invited · Doctor');
+    expect(screen.getByText('Invited')).toBeInTheDocument();
+
+    await user.click(invited);
+    expect(navigateMock).toHaveBeenCalledWith({ to: '/organization' });
   });
 
   it('opens the create-organization dialog from the menu', async () => {
@@ -325,7 +305,7 @@ describe('OrganizationSwitcher', () => {
        * row can act as the progress indicator — but the menu was UNCONTROLLED,
        * so nothing ever closed it again. Team → team is a param change on the
        * `$organizationSlug` shell this control lives inside, which keeps the
-       * component mounted, so the menu hung open over the new dashboard.
+       * component mounted, so the menu hung open over the new clinic.
        *
        * `useNavigate` is stubbed at module level ON PURPOSE (see the top of this
        * file). A real navigation renders "Not Found" and unmounts the switcher,
@@ -426,7 +406,7 @@ describe('OrganizationSwitcher', () => {
     it('re-arms the latch after a SUCCESSFUL switch (the component stays mounted)', async () => {
       /*
        * `useNavigate` is stubbed to a no-op ON PURPOSE. The harness router has
-       * no /dashboard route, so a real navigation renders "Not Found" and tears
+       * no clinic route, so a real navigation renders "Not Found" and tears
        * the switcher out — which would make this test pass for the wrong reason,
        * by unmounting the component whose mounted state is the whole point.
        * Production keeps it mounted: team → team is a param change on the

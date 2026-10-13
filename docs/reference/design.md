@@ -2,7 +2,7 @@
 
 The **principles** behind Core — the point of view, the feel, and the rules
 that keep every screen coherent. This is the _why_; for the _how_ (token names,
-adopting a shadcn-create theme, the Shuffle engine internals) see
+adopting a shadcn-create theme, the one look and its axes) see
 [theming.md](theming.md), and for accessibility/UX review criteria use the
 `web-design-guidelines` skill. Everything here lives **within the guardrails**:
 shadcn/ui components, semantic tokens only (no raw palette), the configured
@@ -10,11 +10,10 @@ fonts/brand. Craft is elevated inside those rails, never around them.
 
 ## 1. Point of view
 
-This product is a **quiet, neutral control surface that turns expressive on
-demand.** The default look is monochrome and content-first — the chrome recedes
-so data and actions lead. Personality (accent hue, fonts, density, icon set) is
-**opt-in** through the Appearance studio and Shuffle, never forced onto a fresh
-install.
+This product is a **quiet, neutral control surface.** It wears one look — the
+launch's Clinozy Zinc Pastel (`clinozy-zinc-pastel`) — in light or dark: monochrome
+and content-first, so the chrome recedes and data and actions lead. The mode is the
+user's; the look is not (the Appearance studio that varied it is retired).
 
 Three commitments shape every decision:
 
@@ -26,10 +25,10 @@ Three commitments shape every decision:
   `text-muted-foreground`, `border-border`, `bg-primary` — never `bg-white` or
   `text-zinc-500`. A new theme is then a different set of token _values_ with
   zero component churn. This is enforced (`pnpm validate:tokens`).
-- **Themeable to the core.** Light/dark, accent, base tint, radius, menu style,
-  and icon set are **orthogonal axes** that compose. The system is designed so a
-  single CSS file (or one Shuffle click) can restyle the whole app and still read
-  correctly in both modes.
+- **Themeable to the core.** Light/dark, the accent, radius, elevation and the
+  rest are **token-driven axes** in `index.css` that compose. The system is
+  designed so a single CSS file can restyle the whole app and still read correctly
+  in both modes — the one look is exactly that file's worth of values.
 
 The litmus test for any new UI: _remove the accent and the data — does it still
 feel calm, legible, and intentional?_
@@ -39,11 +38,11 @@ feel calm, legible, and intentional?_
 A single, highly-legible sans carries the product; hierarchy comes from **size,
 weight, and colour**, not from many typefaces.
 
-| Role      | Token            | Default        | Use                                                                      |
-| --------- | ---------------- | -------------- | ------------------------------------------------------------------------ |
-| Body / UI | `--font-sans`    | Inter / system | Everything by default (`GENERATED_FONTS.inter`)                          |
-| Headings  | `--font-heading` | Inter / system | `h1`–`h6` (own axis, so Shuffle can split it)                            |
-| Mono      | `--font-mono`    | JetBrains Mono | Code, IDs, keys, tabular figures (fixed stack in `@theme`, not shuffled) |
+| Role      | Token            | Default        | Use                                                        |
+| --------- | ---------------- | -------------- | ---------------------------------------------------------- |
+| Body / UI | `--font-sans`    | Inter          | Everything by default                                      |
+| Headings  | `--font-heading` | Inter          | `h1`–`h6` (its own token, so a theme can split it)         |
+| Mono      | `--font-mono`    | JetBrains Mono | Code, IDs, keys, tabular figures (fixed stack in `@theme`) |
 
 Principles:
 
@@ -51,17 +50,17 @@ Principles:
   section → label → body → meta) and lean on `text-muted-foreground` to demote
   secondary text rather than shrinking everything. Two weights (regular +
   medium/semibold) cover most needs.
-- **Headings are their own axis.** `--font-heading` is separate from
-  `--font-sans` so a theme — or Shuffle — can pair a characterful display face
-  with a calm body face without touching markup.
+- **Headings are their own token.** `--font-heading` is separate from
+  `--font-sans` so a theme can pair a characterful display face with a calm body
+  face without touching markup.
 - **Measure and rhythm.** Keep body copy to a comfortable measure; prefer
   consistent vertical rhythm (the spacing scale) over ad-hoc margins.
 - **Minimum readable size.** Product UI labels and hints use at least `text-xs`
   (12px). Sub-12px arbitrary sizes are for decorative meta only — not dashboard
   stats, quick actions, or form labels.
-- **Fonts are web-safe stacks.** The CSP is `font-src 'self'`, so the Shuffle
-  catalog (`GENERATED_FONTS` in `shared/theme`) uses real system-stack families —
-  expressive range without a network fetch.
+- **Fonts never come from a CDN.** The CSP is `font-src 'self'`: Inter (400–700)
+  and JetBrains Mono (400–500) are self-hosted from `@fontsource` — Latin subsets
+  only, declared in `src/index.css`.
 
 ## 3. Colour
 
@@ -75,23 +74,20 @@ and dark-mode variants stay balanced.
   on `bg-card`, `text-popover-foreground` on popovers, etc. Custom markup on
   cards must use the paired token — not `text-foreground` by default.
 - **One accent.** `primary` (with `ring` + `sidebar-primary`) is the single brand
-  hue. The Appearance picker offers nine named hues from `ACCENT_COLORS` (rose ·
-  orange · amber · lime · emerald · teal · blue · violet · pink) at OKLCH lightness
-  `0.58` with chroma driven by the **accent intensity** axis (`subtle` … `max` in
-  `ACCENT_INTENSITIES`). Dominant-neutral-plus-one-accent beats an evenly-distributed
-  rainbow every time.
+  hue — in the one look, its zinc ink. Dominant-neutral-plus-one-accent beats an
+  evenly-distributed rainbow every time.
 - **Semantic state.** `success` (green), `warning` (amber), `info` (blue),
   `destructive` (red) each ship a `*-foreground` pair and are tuned per mode. Use
   them for _meaning only_ — a green button that isn't "success" is a mistake.
-- **Special surfaces.** `brand` is the always-dark marketing panel (AuthLayout) —
-  constant across light/dark. `overlay` is the scrim, only ever used with opacity
-  (`bg-overlay/50`). `chart-1..5` is a monochrome ramp by default; a theme/Shuffle
-  spreads it from the accent.
-- **Base tint (opt-in).** `data-base` = `stone` · `slate` · `olive` · `zinc` · `warm`
-  (`neutral` = no attribute) warms or cools the neutrals by injecting a tiny chroma
-  while preserving each token's per-mode lightness — the _one_ sanctioned exception
-  to "neutrals stay neutral", shipped as curated sets (not a free picker) so light
-  and dark both read right. Full catalog: `BASE_COLORS` in `presets.ts`.
+- **Special surfaces.** `brand` is the always-dark brand panel — constant across
+  light/dark (the sign-in screen is the canvas, not a brand panel). `overlay` is the scrim, only ever used with opacity
+  (`bg-overlay/50`). `chart-1..5` is a monochrome ramp by default; a theme can
+  spread it from the accent.
+- **Base tint (a hook, not offered).** `data-base` = `stone` · `slate` · `olive` ·
+  `zinc` · `warm` (`neutral` = no attribute) warms or cools the neutrals by
+  injecting a tiny chroma while preserving each token's per-mode lightness. The
+  blocks stay in `index.css`; nothing sets the attribute since the studio retired,
+  and the one look's own neutrals sit after them anyway.
 
 Contrast is non-negotiable: every `*-foreground` token is chosen to clear WCAG AA
 on its surface, in both modes.
@@ -103,28 +99,26 @@ on its surface, in both modes.
   cheapest way to look considered. Density is intentional, never accidental.
 - **Radius scale.** `--radius-sm` `0.25rem` · `md` `0.375` · `lg` `0.5` · `xl`
   `0.75`. Controls and inputs sit around `md`/`lg`; cards and popovers at `lg`.
-  The whole scale derives from one base, so Shuffle/themes can go sharp or soft in
-  one move while keeping the _relationship_ between elements.
+  The whole scale derives from one base, so a theme can go sharp or soft in one
+  move while keeping the _relationship_ between elements.
 - **Surfaces & elevation.** Depth is communicated with `card`/`popover` surfaces,
-  `border`, and restrained shadow — not heavy drop-shadows. The **elevation** axis
-  (`flat` · `soft` · `lifted` · `floating`) and **separation** axis (`border` ·
-  `hairline` · `shadow`) retone all `[data-slot]` surfaces together. Overlays darken
-  with the `overlay` scrim. **Menu style** (`default` · `translucent` · `glass`)
-  makes dropdowns/popovers/selects glassy (`color-mix` + `backdrop-blur`) for a
-  lighter, layered feel.
+  `border`, and restrained shadow — not heavy drop-shadows; the one look gives each
+  platform slot the design's shadow (`--elevation-*`). The **elevation**,
+  **separation** and **menu style** hooks (`[data-elevation]`, `[data-separation]`,
+  `[data-menu]`) still retone every `[data-slot]` surface together, at their defaults
+  unless set by hand. Overlays darken with the `overlay` scrim.
 - **Composition.** Align to a grid; let related actions cluster and unrelated
   ones breathe. Asymmetry and overlap are welcome _when intentional_ — but an
   admin surface earns trust through predictability first.
 - **Layout layers (product default).** Three tiers — do not collapse into one
   max-width:
-  1. **App shell** — `contained` → `max-w-screen-2xl` (1536px) centered in
-     `AppMain` (default), growing to `112rem` at `3xl` and `136rem` at `4xl` so
-     the column does not float in the middle of a big monitor; **Full** and
-     **Reading** (~768px) via Appearance → Layout; deploy lock via
+  1. **App shell** — **full** width, the launch's (the clinic's wide tables); a
+     deployment can pin `contained` → `max-w-screen-2xl` (1536px) centered in
+     `AppMain`, growing to `112rem` at `3xl` and `136rem` at `4xl` so the column
+     does not float in the middle of a big monitor, or **Reading** (~768px), with
      `VITE_LAYOUT_WIDTH`.
   2. **Page grid** — free responsive grids: `auto-fit` + `minmax()` for tile rows,
-     `2fr / 1fr` splits for asymmetric panels (`src/lib/responsive-grid.ts`); see
-     dashboard.
+     `2fr / 1fr` splits for asymmetric panels.
   3. **Reading measure** — `max-w-prose` (~65ch) for paragraphs only; **not**
      the whole app. Claude-style ~768px caps belong on reading/chat pages
      locally, not on admin shells.
@@ -133,18 +127,16 @@ on its surface, in both modes.
   (96rem, a 1536px laptop). Two more are declared in `index.css` for the
   big-monitor tier: **`3xl:` = 120rem (1920px)** and **`4xl:` = 160rem
   (2560px)**. Use them wherever a layout would otherwise stop growing — the
-  content column, the sidebar (`3xl:w-80`), the auth hero's type and padding,
-  large overlays. At the other end:
-  - **Below `lg` the sidebar is a drawer**, not a column. `lg`, not `md`: at
-    768px a 280px column is over a third of a portrait tablet. The drawer is
-    `invisible` while closed (translated-away is still focusable), closes on
-    navigation and on Escape, and never exceeds `85vw`. From `lg` up the column
-    is pinned by CSS and ignores drawer state — `rtl:lg:translate-x-0` included,
-    because `rtl:translate-x-full` outranks a bare `lg:` utility.
+  content column, the auth hero's type and padding, large overlays. At the
+  other end:
+  - **There is no sidebar on any viewport.** The app's one shell is the section
+    bar (`AppLayoutSectionBar.tsx`, `shell.md`): a single header holds the nav —
+    All sections and the pinned tabs from `md`, the section chip on a phone.
   - **Below `md` there is a bottom tab bar** (`data-slot="mobile-nav"`). Anything
     else pinned to the bottom edge rides above it through
     `--floating-bottom-offset` (published by `index.css` via `:has()`), never
-    over it — the consent card and the Sentry feedback trigger both do.
+    over it — the consent card and the Sentry feedback trigger both do, and the
+    toasts sit 16px above the whole bottom stack (`AppToaster`).
   - **Overlays are a sheet on phones and a dialog from `sm`.** The `sm:` half
     has to _undo_ the sheet (`sm:w-[calc(100%-2rem)] sm:rounded-lg`), not just
     cap its width — `w-full` with only a `max-w` runs edge to edge on every
@@ -154,7 +146,10 @@ on its surface, in both modes.
     `wrap-anywhere`, or it runs past its card and is clipped mid-word.
   - **The end corner belongs to the feedback trigger and the edge handles.** A
     new floating surface takes the bottom-_start_ corner (`start-*`, so it
-    mirrors under RTL) — see `ConsentBanner`.
+    mirrors under RTL) — see `ConsentBanner`. The clinic bottom stack is the
+    designed exception: a floating "New" (phone) and the upload tray (every
+    width) claim the bottom-end corner while they show, and the trigger steps
+    aside for them in `index.css`.
 
 - **Not Claude-width by default.** Chat products cap ~720–768px for long answers.
   This product is a control surface — width is for tables and panels; constrain
@@ -169,8 +164,8 @@ Motion is **subtle, fast, and purposeful** — it orients, it doesn't perform.
   opacity fade** so copy stays visible if animation is skipped or reduced-motion
   short-circuits duration. `accordion` for disclosure; `shimmer` for skeleton
   loading. Overlays use the shadcn enter/exit utilities (`tw-animate-css`).
-- **Dashboard / product motion.** Prefer **Anime.js** for intentional numeric or
-  timeline motion (`useAnimeCountUp` on stats). Avoid stacking Framer-style page
+- **Product motion.** Prefer **Anime.js** for intentional numeric or timeline
+  motion (`useOnboardingStepMotion` on the onboarding steps). Avoid stacking Framer-style page
   fades on content shells.
 - **High-impact moments over confetti.** One well-orchestrated reveal on
   navigation reads as more polished than scattered micro-interactions. Prefer a
@@ -207,7 +202,12 @@ Motion is **subtle, fast, and purposeful** — it orients, it doesn't perform.
   for a spinner to flash over), then settles into the in-app one (keep the
   current screen ≤ 3s, 500ms minimum). The splash leaves within frames of the
   router settling (`markAppContentSettled`) rather than after a fixed grace
-  window, and fades in 200ms. While `/auth/refresh` is in flight the boot warms
+  window — but never before its wordmark lands (2,050ms; 500ms under reduced
+  motion) — and cross-fades out over 500ms while the app comes in over 450ms.
+  Its frames are CSS keyframes in `index.html`; on the org layout's first load
+  the React slot (`AppSplashSlot`) adds the greeting, bar and ticker, and a device
+  offline at mount holds the splash on its notice until Retry (KICKOFF §6.1).
+  While `/auth/refresh` is in flight the boot warms
   the chunks the destination will need (`preloadBootRoutes`, steered by a
   session _hint_ that never authorizes anything). Invariants, proven in a browser
   by `tests/e2e/boot-splash.e2e.test.ts`: the splash fades **exactly once**, and
@@ -218,36 +218,32 @@ Motion is **subtle, fast, and purposeful** — it orients, it doesn't perform.
 
 ## 6. Iconography
 
-- **One swappable surface.** Every icon flows through `@/shared/icons` (lint-
-  enforced). The default is **Lucide** (in the main bundle); **Tabler** and
-  **Phosphor** are lazy-loaded alternatives. Pick icons that read at 16px and
-  match the calm tone — line icons, consistent metaphors.
-- **Weight is an axis.** `--icon-stroke` drives Lucide/Tabler stroke width so the
-  icon weight tracks the overall look (Phosphor uses fixed path weights).
+- **One surface.** Every icon flows through `@/shared/icons` (lint-enforced) —
+  **Lucide**, named once for the app. Pick icons that read at 16px and match the
+  calm tone — line icons, consistent metaphors.
+- **Weight.** The look's thin **1.5** stroke (`--icon-stroke`), on the brand marks
+  too.
 - **Restraint.** Icons clarify; they don't decorate. Pair an icon with a label
   unless the glyph is unambiguous and space-constrained.
 
-## 7. Themeability & Shuffle (the expressive layer)
+## 7. Themeability (one look, two modes)
 
-The neutral foundation exists so the app can flex without breaking. Two surfaces
-drive it:
+The neutral foundation exists so the app could flex without breaking — and it
+did, through an Appearance studio and a Shuffle that rolled whole looks. Both are
+retired: the design has no theme studio, so the app wears one look,
+`clinozy-zinc-pastel`, and the user picks only the mode (Light · Dark · System),
+from the Account menu's pills or the Appearance drawer's Mode card. The drawer
+keeps the device's language, text direction, date-time and number preferences.
 
-- **Appearance studio** (Settings → Appearance): per-axis pickers for mode,
-  named presets, accent/chart hue, base colour, harmony, accent intensity, body +
-  heading fonts, radius, shape language, type scale, menu style, icon weight, icon
-  library, density, contrast, elevation, separation, motion, and focus ring — plus
-  toast preview (temporary). Every option list is imported from `presets.ts`.
-- **Shuffle**: generates a fresh _full look_ in one click (rolls generated axes +
-  orthogonal base/menu/icons) — the shadcn-create experience, applied inline on
-  `<html>` (CSP-safe) and persisted via `customTheme` + shareable `?theme=<seed>`.
+The axes stay **token-driven and orthogonal** in `index.css`, at the launch's
+defaults: contrast rules and slot hooks are fixed, and a component that honours
+the tokens (a named radius step, a `data-slot` on a surface, no hardcoded shadow)
+follows any future look for free. `VITE_THEME_LOCK=true` pins the mode: no surface
+offers Light / Dark / System, and the drawer's Mode card becomes the "managed by your
+organization" note.
 
-Because every axis is orthogonal and token-driven, Shuffle can't produce a broken
-screen: contrast rules and slot hooks are fixed; only _personality_ varies. When
-`VITE_THEME_LOCK=true`, the pickers and Shuffle hide and the app is pinned to the
-code-defined theme.
-
-**Catalog source of truth:** `src/shared/theme/presets.ts` and
-[theme-axis-audit-playbook.md](theme-axis-audit-playbook.md). Mechanics:
+**Catalog source of truth:** `src/shared/theme/presets.ts` (the one look) and
+[theme-axis-audit-playbook.md](theme-axis-audit-playbook.md) (the hooks). Mechanics:
 [theming.md](theming.md).
 
 ## 8. Principles checklist
@@ -266,14 +262,14 @@ code-defined theme.
 - Use raw palette classes (`bg-white`, `text-zinc-500`) or inline styles —
   `pnpm validate:tokens` will fail.
 - Introduce a second accent or a rainbow of status colours.
-- Add bespoke fonts outside the configured stacks / Shuffle catalog (CSP +
+- Add bespoke fonts outside the configured stacks (CSP +
   brand).
 - Animate for its own sake, or rely on colour alone to signal state.
 - Hand-edit vendored `components/ui/*` — go through the `shadcn` skill.
 
 ## See also
 
-- [theming.md](theming.md) — token map, shadcn-create adoption, Shuffle/icon engine.
+- [theming.md](theming.md) — token map, shadcn-create adoption, the one look and its axes.
 - [preset-product-design-rules.md](preset-product-design-rules.md) — **per-axis product floors** (type scale, density, WCAG, motion).
 - `agent-os/skills/frontend-design/SKILL.md` — making UI distinctive within these rails.
 - `agent-os/skills/web-design-guidelines` — accessibility/UX review criteria.

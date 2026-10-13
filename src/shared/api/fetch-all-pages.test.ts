@@ -4,9 +4,38 @@ import { z } from 'zod';
 const { getMock } = vi.hoisted(() => ({ getMock: vi.fn() }));
 vi.mock('@/core/http/fetch-client.ts', () => ({ apiClient: { get: getMock } }));
 
-import { fetchAllPages } from './fetch-all-pages.ts';
+import { collectAllPages, fetchAllPages } from './fetch-all-pages.ts';
 
 const row = z.object({ id: z.string() });
+
+describe('collectAllPages', () => {
+  it('reads from a null cursor and follows each page until next is null', async () => {
+    const pages: Record<string, { rows: string[]; next: string | null }> = {
+      start: { rows: ['a', 'b'], next: 'second' },
+      second: { rows: ['c'], next: null },
+    };
+    const readPage = vi.fn(async (cursor: string | null) => {
+      const page = pages[cursor ?? 'start'];
+      if (!page) throw new Error(`no page ${cursor}`);
+      return page;
+    });
+
+    await expect(collectAllPages(readPage, 'letters')).resolves.toEqual(['a', 'b', 'c']);
+    expect(readPage.mock.calls.map(([cursor]) => cursor)).toEqual([null, 'second']);
+  });
+
+  it('stops at the page cap with a warning when the cursor never ends', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const readPage = vi.fn(async () => ({ rows: ['x'], next: 'again' }));
+
+    const rows = await collectAllPages(readPage, 'loop');
+
+    expect(readPage).toHaveBeenCalledTimes(50);
+    expect(rows).toHaveLength(50);
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('loop'));
+    warn.mockRestore();
+  });
+});
 
 describe('fetchAllPages', () => {
   beforeEach(() => {

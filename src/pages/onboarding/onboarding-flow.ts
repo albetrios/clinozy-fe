@@ -37,18 +37,19 @@ export function deriveOnboardingSteps(
 
   const steps: OnboardingStep[] = ['welcome', 'profile', 'questions'];
 
-  if (mode === 'team-only') steps.push('workspace');
+  // Team-only: the wizard creates the person's first clinic and invites their team — unless they
+  // already belong to one (they accepted an invitation, D84), when it is only their profile.
+  if (mode === 'team-only' && !hasTeam) steps.push('workspace', 'invite');
 
-  if (mode === 'team-only' || (mode === 'personal-and-team' && hasTeam)) {
-    steps.push('invite');
-  }
+  if (mode === 'personal-and-team' && hasTeam) steps.push('invite');
 
   steps.push('done');
   return steps;
 }
 
 /**
- * Whether the finish step should create a team org via API.
+ * Whether the finish step should create a team org via API — in team-only mode,
+ * only for someone who belongs to no clinic yet.
  *
  * Takes the loaded context for the same reason {@link deriveOnboardingSteps}
  * does — this decision is only meaningful against a context we actually have,
@@ -56,11 +57,12 @@ export function deriveOnboardingSteps(
  */
 export function shouldCreateOrganizationOnFinish(
   flags: DeploymentFlags,
-  _organizations: readonly { type: OrganizationType }[],
+  organizations: readonly { type: OrganizationType }[],
 ): boolean {
   const mode = resolveDeploymentMode(flags);
   if (mode === 'personal-only') return false;
-  if (mode === 'team-only') return true;
+  // An invited person who joined a clinic never gets a second, empty one (D84).
+  if (mode === 'team-only') return !hasTeamOrganization(organizations);
   // Both: personal workspace is auto-provisioned on signup; team orgs are created
   // later from the organization switcher.
   return false;

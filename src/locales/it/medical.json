@@ -1,0 +1,681 @@
+{
+  "manifest": {
+    "title": "Farmacia"
+  },
+  "tabs": {
+    "label": "Sezioni della farmacia",
+    "sales": "Vendite",
+    "medicines": "Farmaci",
+    "purchases": "Acquisti",
+    "suppliers": "Fornitori",
+    "manufacturers": "Produttori",
+    "mrs": "Informatori",
+    "payments": "Pagamenti",
+    "groups": {
+      "selling": "Vendita",
+      "stock": "Scorte",
+      "buying": "Acquisto",
+      "money": "Denaro"
+    }
+  },
+  "search": {
+    "placeholder": "Cerca nome, composizione, fornitore…",
+    "label": "Cerca nella farmacia"
+  },
+  "create": {
+    "sale": "Nuova vendita",
+    "medicine": "Nuovo farmaco",
+    "purchaseOrder": "Nuovo ordine d’acquisto",
+    "supplier": "Nuovo fornitore",
+    "manufacturer": "Nuovo produttore",
+    "mr": "Nuovo informatore",
+    "menu": "Crea altro"
+  },
+  "viewActions": {
+    "reorderLow": "Riordina le scorte basse",
+    "sellAllDiscount": "Vendi tutto al 20% di sconto",
+    "removeDiscount": "Rimuovi lo sconto per scadenza",
+    "prescriptions": "Ricette da evadere",
+    "paymentReminders": "Invia promemoria di pagamento",
+    "payAllReceived": "Paga tutto il ricevuto · {{amount}}"
+  },
+  "filters": {
+    "all": "Tutti",
+    "any": "Qualsiasi",
+    "stock": "Scorte",
+    "lowStock": "Scorte basse",
+    "expiry": "Scadenza più vicina",
+    "within30": "Entro 30 giorni",
+    "within60": "Entro 60 giorni",
+    "within90": "Entro 90 giorni",
+    "status": "Stato",
+    "stage": "Fase",
+    "manufacturer": "Produttore",
+    "manufacturers": "Produttori",
+    "suppliers": "Fornitori",
+    "mrs": "Informatori"
+  },
+  "table": {
+    "percent": "{{value}}%",
+    "addPhone": "Aggiungi telefono",
+    "noValue": "—"
+  },
+  "empty": {
+    "hint": "Qui non c’è ancora niente. Prova un’altra scheda o un’altra ricerca.",
+    "store": "Niente in farmacia"
+  },
+  "bulk": {
+    "export": "Esporta",
+    "exported_one": "{{count}} riga esportata in CSV",
+    "exported_many": "{{count}} righe esportate in CSV",
+    "exported_other": "{{count}} righe esportate in CSV"
+  },
+  "toasts": {
+    "discountOn": "20% di sconto sui farmaci in scadenza",
+    "discountOnOne": "20% di sconto applicato a {{name}}",
+    "discountOff": "Sconto rimosso"
+  },
+  "sales": {
+    "records": "vendite",
+    "count_one": "{{count}} vendita",
+    "count_many": "{{count}} vendite",
+    "count_other": "{{count}} vendite",
+    "columns": {
+      "seq": "Vendita",
+      "customer": "Cliente",
+      "medicines": "Farmaci",
+      "bill": "Importo",
+      "margin": "Margine",
+      "status": "Stato",
+      "when": "Quando"
+    },
+    "patient": "Paziente",
+    "contact": "Contatto farmacia",
+    "line": "{{name}} ×{{qty}}",
+    "batches": "Lotti: {{batches}}",
+    "returned": "− {{amount}} reso",
+    "refunded": "{{amount}} rimborsato",
+    "statuses": {
+      "paid": "Pagato",
+      "unpaid": "Non pagato",
+      "returned": "Reso"
+    },
+    "rowActions": {
+      "collect": "Incassa {{amount}}",
+      "return": "Restituisci farmaci",
+      "print": "Stampa",
+      "void": "Annulla vendita"
+    }
+  },
+  "medicines": {
+    "records": "farmaci",
+    "empty": "Nessun farmaco corrisponde",
+    "columns": {
+      "seq": "ID",
+      "name": "Farmaco",
+      "manufacturer": "Produttore",
+      "stock": "Scorte",
+      "expiry": "Scadenza più vicina",
+      "mrp": "Prezzo max.",
+      "bestRate": "Prezzo migliore",
+      "margin": "Margine"
+    },
+    "needsMrp": "Mancano prezzo max. e composizione",
+    "stockLine": "{{count}} in magazzino · {{level}}",
+    "levels": {
+      "ok": "OK",
+      "low": "Basso",
+      "out": "Esaurito"
+    },
+    "expiry": "{{expiry}} · {{batch}}",
+    "noStock": "Nessuna scorta",
+    "discount": "−{{pct}}% per scadenza",
+    "rowActions": {
+      "returnExpiring": "Restituisci al fornitore le scorte in scadenza",
+      "discount": "Vendi al 20% di sconto (in scadenza)",
+      "removeDiscount": "Rimuovi lo sconto per scadenza",
+      "edit": "Modifica",
+      "delete": "Elimina"
+    }
+  },
+  "purchases": {
+    "records": "ordini d’acquisto",
+    "count_one": "{{count}} ordine",
+    "count_many": "{{count}} ordini",
+    "count_other": "{{count}} ordini",
+    "columns": {
+      "seq": "Ordine",
+      "supplier": "Fornitore",
+      "items": "Articoli",
+      "date": "Data",
+      "total": "Totale",
+      "stage": "Fase"
+    },
+    "items_one": "{{count}} articolo",
+    "items_many": "{{count}} articoli",
+    "items_other": "{{count}} articoli",
+    "free": "{{count}} omaggio",
+    "partPaid": "{{amount}} pagato",
+    "stages": {
+      "ordered": "Ordinato",
+      "received": "Ricevuto",
+      "paid": "Pagato",
+      "cancelled": "Annullato"
+    },
+    "rowActions": {
+      "receive": "Ricevi merce",
+      "edit": "Modifica",
+      "cancel": "Annulla ordine",
+      "pay": "Paga {{amount}}",
+      "view": "Visualizza"
+    }
+  },
+  "suppliers": {
+    "records": "fornitori",
+    "empty": "Nessun fornitore corrisponde",
+    "count_one": "{{count}} fornitore · {{payable}} da pagare",
+    "count_many": "{{count}} fornitori · {{payable}} da pagare",
+    "count_other": "{{count}} fornitori · {{payable}} da pagare",
+    "columns": {
+      "name": "Fornitore",
+      "manufacturers": "Produttori",
+      "orders": "Ordini",
+      "payable": "Da pagare",
+      "ageing": "Anzianità"
+    },
+    "orders_one": "{{count}} ordine",
+    "orders_many": "{{count}} ordini",
+    "orders_other": "{{count}} ordini",
+    "noOrders": "Nessun ordine",
+    "ageing_one": "{{count}} giorno",
+    "ageing_many": "{{count}} giorni",
+    "ageing_other": "{{count}} giorni",
+    "rowActions": {
+      "pay": "Paga {{amount}}",
+      "newOrder": "Nuovo ordine d’acquisto",
+      "edit": "Modifica",
+      "delete": "Elimina"
+    }
+  },
+  "manufacturers": {
+    "records": "produttori",
+    "empty": "Nessun produttore corrisponde",
+    "count_one": "{{count}} produttore",
+    "count_many": "{{count}} produttori",
+    "count_other": "{{count}} produttori",
+    "columns": {
+      "name": "Produttore",
+      "medicines": "Farmaci",
+      "suppliers": "Fornitori",
+      "mrs": "Informatori"
+    },
+    "medicines_one": "{{count}} farmaco",
+    "medicines_many": "{{count}} farmaci",
+    "medicines_other": "{{count}} farmaci",
+    "noMedicines": "Ancora nessuno",
+    "rowActions": {
+      "edit": "Modifica",
+      "delete": "Elimina"
+    }
+  },
+  "mrs": {
+    "records": "Informatori",
+    "empty": "Nessun informatore corrisponde",
+    "count_one": "{{count}} informatore",
+    "count_many": "{{count}} informatori",
+    "count_other": "{{count}} informatori",
+    "columns": {
+      "name": "Informatore",
+      "represents": "Rappresenta",
+      "lastVisit": "Ultima visita",
+      "nextVisit": "Prossima visita",
+      "samples": "Campioni"
+    },
+    "rowActions": {
+      "logVisit": "Registra visita",
+      "edit": "Modifica",
+      "delete": "Elimina"
+    }
+  },
+  "payments": {
+    "records": "pagamenti della farmacia",
+    "empty": "Ancora nessun pagamento della farmacia"
+  },
+  "drawers": {
+    "records": {
+      "medicine": "Farmaco",
+      "supplier": "Fornitore",
+      "manufacturer": "Produttore",
+      "mr": "Informatore",
+      "sale": "Vendita",
+      "purchaseOrder": "Ordine d’acquisto"
+    },
+    "saveChanges": "Salva modifiche",
+    "addName": "Aggiungi un nome",
+    "pickers": {
+      "searchManufacturer": "Cerca produttore",
+      "searchManufacturers": "Cerca produttori",
+      "searchSupplier": "Cerca fornitore",
+      "searchSuppliers": "Cerca fornitori",
+      "searchMrs": "Cerca informatori",
+      "medicineCount_one": "{{count}} farmaco",
+      "medicineCount_many": "{{count}} farmaci",
+      "medicineCount_other": "{{count}} farmaci",
+      "noPhone": "Ancora nessun telefono",
+      "distributes": "Distribuisce {{maker}}",
+      "otherSuppliers": "Altri fornitori",
+      "addManufacturer": "Aggiungi produttore",
+      "newManufacturer": "Nuovo produttore",
+      "addSupplier": "Aggiungi fornitore",
+      "newSupplier": "Nuovo fornitore",
+      "addMr": "Aggiungi informatore",
+      "newMr": "Nuovo informatore"
+    },
+    "quick": {
+      "manufacturer": "Produttore {{name}} aggiunto",
+      "supplier": "Fornitore {{name}} aggiunto · telefono e GST più tardi",
+      "mr": "Informatore {{name}} aggiunto",
+      "medicine": "{{name}} aggiunto · imposta il prezzo max. più tardi in Scorte"
+    },
+    "deleteConfirm": {
+      "medicine": "Eliminare questo farmaco?",
+      "supplier": "Eliminare questo fornitore?",
+      "manufacturer": "Eliminare questo produttore?",
+      "mr": "Eliminare questo informatore?",
+      "deleted": "{{name}} eliminato"
+    },
+    "manufacturer": {
+      "title": {
+        "create": "Nuovo produttore",
+        "edit": "Modifica produttore"
+      },
+      "sub": "Il marchio sulla confezione · collega fornitori e informatori",
+      "steps": {
+        "maker": "Produttore",
+        "connections": "Collegamenti"
+      },
+      "fields": {
+        "name": "Nome",
+        "colour": "Colore",
+        "suppliers": "Fornitori",
+        "suppliersHint": "chi lo distribuisce",
+        "mrs": "Informatori",
+        "mrsHint": "chi lo rappresenta",
+        "medicines": "Farmaci",
+        "medicineCount_one": "{{count}} farmaco in Scorte",
+        "medicineCount_many": "{{count}} farmaci in Scorte",
+        "medicineCount_other": "{{count}} farmaci in Scorte",
+        "noMedicines": "Ancora nessuno · aggiungili da Scorte"
+      },
+      "summary": {
+        "suppliers_one": "{{count}} fornitore",
+        "suppliers_many": "{{count}} fornitori",
+        "suppliers_other": "{{count}} fornitori",
+        "mrs_one": "{{count}} informatore",
+        "mrs_many": "{{count}} informatori",
+        "mrs_other": "{{count}} informatori"
+      },
+      "save": "Aggiungi produttore",
+      "saved": "Produttore salvato · collegamenti aggiornati"
+    },
+    "supplier": {
+      "title": {
+        "create": "Nuovo fornitore",
+        "edit": "Modifica fornitore"
+      },
+      "sub": "Grossista da cui acquisti",
+      "steps": {
+        "supplier": "Fornitore",
+        "distributes": "Distribuisce",
+        "account": "Conto"
+      },
+      "fields": {
+        "name": "Nome del grossista",
+        "phone": "Telefono",
+        "phoneHint": "10 cifre",
+        "gst": "Numero GST",
+        "manufacturers": "Produttori",
+        "manufacturersHint": "quanti vuoi",
+        "payable": "Da pagare",
+        "payableValue_one": "{{amount}} · {{count}} giorno",
+        "payableValue_many": "{{amount}} · {{count}} giorni",
+        "payableValue_other": "{{amount}} · {{count}} giorni",
+        "nothingDue": "Nulla da pagare",
+        "orders": "Ordini",
+        "ordersValue_one": "{{count}} ordine · {{amount}}",
+        "ordersValue_many": "{{count}} ordini · {{amount}}",
+        "ordersValue_other": "{{count}} ordini · {{amount}}",
+        "noOrders": "Ancora nessun ordine"
+      },
+      "account": {
+        "label": "Conto",
+        "reference": "Riferimento",
+        "date": "Data",
+        "stage": "Fase",
+        "amount": "Importo",
+        "balance": "Saldo",
+        "notBilled": "Non fatturato",
+        "due": "{{amount}} da pagare",
+        "paid": "Pagato",
+        "credit": "Credito · {{batch}}",
+        "creditStage": "Credito",
+        "adjusted": "Compensato"
+      },
+      "quickFill": {
+        "newOrder": "Nuovo ordine d’acquisto",
+        "pay": "Paga {{amount}}"
+      },
+      "save": "Aggiungi fornitore",
+      "saved": "Fornitore salvato"
+    },
+    "mr": {
+      "title": {
+        "create": "Nuovo informatore",
+        "edit": "Modifica informatore"
+      },
+      "sub": "Informatore scientifico",
+      "steps": {
+        "mr": "Informatore",
+        "represents": "Rappresenta"
+      },
+      "fields": {
+        "name": "Nome",
+        "phone": "Telefono",
+        "phoneHint": "10 cifre",
+        "nextVisit": "Prossima visita",
+        "manufacturers": "Produttori",
+        "manufacturersHint": "uno può rappresentarne molti"
+      },
+      "save": "Aggiungi informatore",
+      "saved": "Informatore salvato"
+    },
+    "visit": {
+      "title": "Registra visita",
+      "steps": {
+        "visit": "Visita",
+        "details": "Dettagli",
+        "notes": "Note"
+      },
+      "fields": {
+        "date": "Data",
+        "nextVisit": "Prossima visita",
+        "twoWeeks": "2 settimane",
+        "oneMonth": "1 mese",
+        "samples": "Campioni lasciati",
+        "samplesPlaceholder": "es. 4 tubetti di Azelan",
+        "note": "Nota"
+      },
+      "summary": "Prossima visita {{date}}",
+      "save": "Registra visita",
+      "saved": "Visita registrata · promemoria per il {{date}}",
+      "savedNoReminder": "Visita registrata"
+    },
+    "medicine": {
+      "title": {
+        "create": "Nuovo farmaco",
+        "edit": "Modifica farmaco"
+      },
+      "sub": "{{maker}} · {{composition}}",
+      "subNoComposition": "{{maker}} · composizione non indicata",
+      "steps": {
+        "main": "Farmaco, prezzo e scorte",
+        "batches": "Lotti e prezzi dei fornitori"
+      },
+      "groups": {
+        "medicine": "Farmaco",
+        "price": "Prezzo e scorte"
+      },
+      "fields": {
+        "name": "Nome",
+        "manufacturer": "Produttore",
+        "composition": "Composizione",
+        "compositionHint": "per i sostituti",
+        "compositionPlaceholder": "es. Tretinoina 0,025%",
+        "soldWith": "Vendita",
+        "prescriptionOnly": "Solo con ricetta",
+        "overTheCounter": "Da banco"
+      },
+      "price": {
+        "mrp": "Prezzo max.",
+        "inclGst": "GST incl.",
+        "gst": "GST",
+        "beforeGst": "Prima della GST",
+        "gstAmount": "GST {{pct}}%",
+        "bestBuyRate": "Miglior prezzo d’acquisto",
+        "addSupplierPrice": "Aggiungi un prezzo fornitore",
+        "margin": "Margine"
+      },
+      "stock": {
+        "title": "Livelli di scorta",
+        "now": "{{count}} in magazzino · {{state}}",
+        "states": {
+          "healthy": "Adeguato",
+          "reorder": "Da riordinare",
+          "overstocked": "Eccedenza",
+          "out": "Esaurito"
+        },
+        "reorderAt": "Riordina a",
+        "fillUpTo": "Riempi fino a",
+        "decreaseReorder": "Riduci il livello di riordino",
+        "increaseReorder": "Aumenta il livello di riordino",
+        "decreaseFill": "Riduci il livello di riempimento",
+        "increaseFill": "Aumenta il livello di riempimento",
+        "hintAlert": "Avviso di riordino quando la scorta scende a {{count}}.",
+        "hintOrder": "Ordina {{qty}} per arrivare a {{max}}. Compare in Scorte › Scorte basse."
+      },
+      "batches": {
+        "title": "Lotti",
+        "batch": "Lotto",
+        "expiry": "Scadenza",
+        "expiryPlaceholder": "MM/AA",
+        "qty": "Qtà",
+        "rate": "Prezzo",
+        "add": "Aggiungi lotto",
+        "total": "{{count}} in magazzino",
+        "expiryInvalid": "Inserisci la scadenza come MM/AA",
+        "batchMissing": "Inserisci il lotto"
+      },
+      "rates": {
+        "title": "Prezzi dei fornitori",
+        "supplier": "Fornitore",
+        "rate": "Prezzo",
+        "free": "Omaggio",
+        "leadDays": "Giorni di consegna",
+        "add": "Aggiungi prezzo fornitore",
+        "rateMissing": "Inserisci il prezzo di questo fornitore"
+      },
+      "badges": {
+        "inStock": "{{count}} in magazzino",
+        "best": "Migliore {{rate}} · {{supplier}}"
+      },
+      "save": "Aggiungi farmaco",
+      "toasts": {
+        "added": "{{name}} aggiunto",
+        "saved": "{{name}} salvato",
+        "enterMrp": "Inserisci il prezzo max.",
+        "enterRates": "Inserisci un prezzo per ogni fornitore",
+        "pickManufacturer": "Scegli un produttore"
+      }
+    },
+    "flowConfirm": {
+      "cancelOrder": "Annullare questo ordine d’acquisto?",
+      "voidSale": "Annullare questa vendita?",
+      "cancelled": "{{order}} annullato",
+      "voided": "Vendita #{{seq}} annullata"
+    },
+    "purchaseOrder": {
+      "title": {
+        "create": "Nuovo ordine d’acquisto",
+        "edit": "Modifica ordine d’acquisto"
+      },
+      "sub": "Ordina → ricevi → paga",
+      "steps": {
+        "order": "Ordine",
+        "items": "Articoli"
+      },
+      "fields": {
+        "supplier": "Fornitore",
+        "billNo": "N. fattura",
+        "date": "Data ordine",
+        "items": "Articoli",
+        "medicine": "Farmaco",
+        "selectMedicine": "Seleziona un farmaco…",
+        "searchMedicine": "Cerca farmaco",
+        "qty": "Qtà",
+        "free": "Omaggio",
+        "rate": "Prezzo",
+        "amount": "Importo",
+        "add": "Aggiungi farmaco",
+        "total": "Totale",
+        "fromSupplier": "Da {{supplier}}",
+        "otherMedicines": "Altri farmaci",
+        "inStock": "{{count}} in scorta · {{maker}}",
+        "outOfStock": "Esaurito · {{maker}}",
+        "addMedicine": "Aggiungi farmaco",
+        "newMedicine": "Nuovo farmaco",
+        "enterRate": "Inserisci il prezzo d’acquisto",
+        "peek_one": "{{count}} farmaco · {{amount}}",
+        "peek_many": "{{count}} farmaci · {{amount}}",
+        "peek_other": "{{count}} farmaci · {{amount}}",
+        "quickLine": "Scrivi farmaco, quantità, omaggio, prezzo · es. azel 20 +2 @180",
+        "quickHint": "20 = quantità · +2 = omaggio · @180 = prezzo",
+        "lowStockChip": "{{name}} · ne restano {{quantity}}",
+        "newMedicineName": "Nome del nuovo farmaco"
+      },
+      "quickFill": {
+        "reorder": "Riordina le scorte basse"
+      },
+      "rateFor": "Inserisci il prezzo per {{name}}",
+      "rateForCount_one": "Inserisci il prezzo per {{count}} farmaco",
+      "rateForCount_many": "Inserisci il prezzo per {{count}} farmaci",
+      "rateForCount_other": "Inserisci il prezzo per {{count}} farmaci",
+      "pickSupplier": "Scegli un fornitore",
+      "save": "Crea ordine",
+      "saved": "Ordine d’acquisto salvato",
+      "cancelOrder": "Annulla ordine"
+    },
+    "receive": {
+      "title": "Ricevi merce",
+      "sub": "{{supplier}} · spunta ogni articolo e inserisci lotto e scadenza",
+      "section": "Spunta ciò che è arrivato",
+      "arrived": "Arrivato",
+      "notArrived": "Non arrivato",
+      "medicine": "Farmaco",
+      "qty": "Qtà",
+      "free": "Omaggio",
+      "batch": "Lotto",
+      "expiry": "Scadenza",
+      "expiryPlaceholder": "MM/AA",
+      "enterExpiry": "Inserisci la scadenza",
+      "tickArrived": "Spunta ciò che è arrivato",
+      "addUnexpected": "Aggiungi articolo imprevisto",
+      "enterQuantity": "Inserisci una quantità",
+      "save": "Segna come ricevuto",
+      "saved": "Merce ricevuta · scorte e quantità omaggio aggiunte"
+    },
+    "orderView": {
+      "title": "Ordine d’acquisto",
+      "subReceived": "{{supplier}} · ricevuto, scorte aggiunte · articoli bloccati",
+      "subPaid": "{{supplier}} · pagato, bloccato",
+      "payable": "Da pagare {{amount}}",
+      "paid": "Pagato {{amount}}",
+      "paidOf": "Pagato {{paid}} di {{total}}",
+      "pay": "Paga {{amount}}",
+      "print": "Stampa"
+    },
+    "sale": {
+      "title": "Vendita",
+      "sub": "{{customer}} · {{when}} · una vendita si modifica con un reso, non si edita",
+      "walkIn": "Cliente occasionale",
+      "badges": {
+        "paid": "Pagato",
+        "unpaid": "Non pagato",
+        "returned": "Reso {{amount}}",
+        "invoice": "Fattura #{{seq}} · nella cartella del paziente"
+      },
+      "medicines": "Farmaci",
+      "medicine": "Farmaco",
+      "batch": "Lotto",
+      "qty": "Qtà",
+      "amount": "Importo",
+      "summary_one": "{{count}} farmaco · {{amount}}",
+      "summary_many": "{{count}} farmaci · {{amount}}",
+      "summary_other": "{{count}} farmaci · {{amount}}",
+      "collect": "Incassa {{amount}}",
+      "returnMedicines": "Restituisci farmaci",
+      "voidSale": "Annulla vendita",
+      "collected": "{{amount}} incassati"
+    },
+    "saleReturn": {
+      "title": "Reso del paziente",
+      "sub": "{{customer}} · le scorte rese tornano nel loro lotto",
+      "steps": {
+        "back": "Cosa torna",
+        "reason": "Motivo e rimborso"
+      },
+      "medicine": "Farmaco",
+      "batch": "Lotto",
+      "sold": "Venduto",
+      "refund": "Rimborso",
+      "return": "Reso",
+      "reason": "Motivo",
+      "reasons": {
+        "unused": "Non usato",
+        "reaction": "Reazione",
+        "rx_changed": "Il medico ha cambiato la ricetta",
+        "wrong_item": "Articolo sbagliato",
+        "damaged": "Danneggiato"
+      },
+      "refundBy": "Rimborsa con",
+      "peek_one": "{{count}} farmaco · {{amount}}",
+      "peek_many": "{{count}} farmaci · {{amount}}",
+      "peek_other": "{{count}} farmaci · {{amount}}",
+      "quickFill": "Restituisci tutto",
+      "save": "Rimborsa {{amount}}",
+      "summary": "{{reason}} · {{amount}}",
+      "nothing": "Inserisci cosa viene restituito",
+      "refunded": "{{amount}} rimborsati · scorte reintegrate",
+      "refundedWrittenOff": "{{amount}} rimborsati · scorte eliminate",
+      "lowered": "{{amount}} resi · scorte reintegrate",
+      "loweredWrittenOff": "{{amount}} resi · scorte eliminate"
+    },
+    "expiring": {
+      "title": "Restituisci scorte in scadenza",
+      "sub": "{{medicine}} · lotto {{batch}} · scade {{expiry}}",
+      "supplier": "Fornitore",
+      "boughtAt": "Acquistato a {{amount}}",
+      "quantity": "Quantità",
+      "of": "di {{count}}",
+      "creditNote": "Nota di credito",
+      "badges": {
+        "credit": "Credito {{amount}}",
+        "daysLeft_one": "{{count}} giorno rimasto",
+        "daysLeft_many": "{{count}} giorni rimasti",
+        "daysLeft_other": "{{count}} giorni rimasti"
+      },
+      "summary": "Il credito riduce quanto devi a {{supplier}}",
+      "save": "Restituisci e prendi il credito",
+      "saved": "{{count}} restituiti · {{amount}} di credito da {{supplier}}"
+    },
+    "prescriptions": {
+      "sub": "Ricetta {{rx}} · {{date}} · {{medicines}}"
+    },
+    "reminders": {
+      "title": "Promemoria di pagamento",
+      "summary_one": "{{count}} cliente deve {{amount}}",
+      "summary_many": "{{count}} clienti devono {{amount}}",
+      "summary_other": "{{count}} clienti devono {{amount}}",
+      "hint": "WhatsApp si apre con il promemoria già scritto: lo invii da lì.",
+      "dueOne": "{{amount}} da pagare · Vendita #{{seq}}",
+      "dueMany_one": "{{amount}} da pagare · {{count}} vendita",
+      "dueMany_many": "{{amount}} da pagare · {{count}} vendite",
+      "dueMany_other": "{{amount}} da pagare · {{count}} vendite",
+      "noPhone": "Nessun telefono salvato",
+      "whatsApp": "Ricorda a {{name}} su WhatsApp",
+      "call": "Chiama {{name}}",
+      "copy": "Copia il promemoria per {{name}}",
+      "copied": "Promemoria per {{name}} copiato",
+      "message": "Ciao {{name}}, le ricordiamo da {{clinic}} che restano da pagare {{amount}} per i suoi farmaci. Risponda qui per qualsiasi domanda. Grazie!"
+    }
+  }
+}

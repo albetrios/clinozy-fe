@@ -1,3 +1,4 @@
+import { DismissableLayer } from 'radix-ui/internal';
 import { createElement } from 'react';
 import { toast, Toaster as renderer } from 'sonner';
 
@@ -5,6 +6,13 @@ import { CustomToast, type ToastType } from './CustomToast.tsx';
 import type { NotifyOptions } from './notify.ts';
 
 export { renderer };
+
+/**
+ * The layer Sonner renders in: a Radix dismissable-layer branch, so a press on
+ * a toast — its text, a swipe, "Undo", "Retry" — is never an open drawer's or
+ * dialog's outside press. Loaded with the renderer, off the entry chunk.
+ */
+export const layer = DismissableLayer.Branch;
 
 /** Publish through Sonner only after its host has subscribed. */
 export function show(type: ToastType, message: string, opts: NotifyOptions) {
@@ -16,7 +24,7 @@ export function show(type: ToastType, message: string, opts: NotifyOptions) {
         title: message,
         description: opts.description,
         action: opts.action,
-        onDismiss: opts.onDismiss,
+        persistent: opts.duration === Number.POSITIVE_INFINITY,
       }),
     {
       id: opts.id,

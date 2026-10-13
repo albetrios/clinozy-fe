@@ -9,7 +9,13 @@ test.describe('Navigation', () => {
   });
 
   test('protected routes redirect to login when unauthenticated', async ({ page }) => {
-    for (const path of ['/', '/dashboard', '/onboarding', '/organization'] as const) {
+    for (const path of [
+      '/',
+      '/dashboard',
+      '/onboarding',
+      '/organization',
+      '/organization/acme/today',
+    ] as const) {
       await page.goto(path);
       await expect(page).toHaveURL(/\/login/, { timeout: 5000 });
       await expectLoginFormReady(page);
@@ -55,9 +61,22 @@ test.describe('Navigation', () => {
   });
 
   test('deeply nested unknown routes fall through to the 404 page', async ({ page }) => {
-    await page.goto('/organization/acme/does/not/exist');
+    await page.goto('/some/deeply/nested/unknown/route');
     await expect(page.getByTestId('not-found-page')).toBeVisible({ timeout: 5000 });
     await expect(page.getByRole('heading', { name: '404' })).toBeVisible();
+  });
+
+  test('an unknown path inside an organization asks a guest to sign in, keeping the path', async ({
+    page,
+  }) => {
+    // Inside an organization the shell's guard runs first, so a guest never reaches the
+    // 404 — and a member never does either: an unknown in-org path goes to their role
+    // home with "Page not found" (S:115, `app-dialog-routes.e2e.test.ts`).
+    await page.goto('/organization/acme/does/not/exist');
+    await expect(page).toHaveURL(/\/login\?redirect=/, { timeout: 10000 });
+    const redirect = new URL(page.url()).searchParams.get('redirect') ?? '';
+    expect(redirect).toContain('/organization/acme/does/not/exist');
+    await expectLoginFormReady(page);
   });
 
   test('404 page offers a labelled way home that lands on login when unauthenticated', async ({

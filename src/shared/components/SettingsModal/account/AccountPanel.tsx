@@ -5,43 +5,35 @@ import { useTranslation } from 'react-i18next';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import i18n from '@/lib/i18n/i18n.ts';
 import { LOCALE_KEYS, LOCALE_NS } from '@/lib/i18n/locale.constants.ts';
+import { copyText } from '@/lib/sensitive-clipboard.ts';
 import { authApi } from '@/shared/api/auth-api.ts';
 import { forceLogout } from '@/shared/auth/service.ts';
 import { getAccessToken } from '@/shared/auth/token.ts';
+import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
+import { ConfirmDialog } from '@/shared/components/ConfirmDialog/index.ts';
+import { SettingsCard } from '@/shared/components/SettingsCard/index.ts';
 import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { SectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/shared/components/ui/alert-dialog.tsx';
-import { Badge } from '@/shared/components/ui/badge.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/shared/components/ui/card.tsx';
 import { mapFrontendError } from '@/shared/errors/map-frontend-error.ts';
 import { Copy, ShieldCheck, Trash, TriangleAlert } from '@/shared/icons/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { useAuthStore } from '@/shared/store/useAuthStore/index.ts';
 
+import { AccountPrivacyCard } from './AccountPrivacyCard/index.ts';
+
+/**
+ * One fact about the account: the label muted at the start, the value at the
+ * end, a table row's `muted` hairline between rows.
+ */
 function InfoRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-center justify-between gap-4 py-2">
-      <span className="text-muted-foreground text-sm">{label}</span>
-      <span className="text-sm font-medium">{children}</span>
+    <div className="border-b-muted flex min-h-10 items-center justify-between gap-4 border-b py-1.5 last:border-b-0">
+      <dt className="text-muted-foreground text-body">{label}</dt>
+      <dd className="text-body flex min-w-0 justify-end font-medium">{children}</dd>
     </div>
   );
 }
@@ -67,10 +59,9 @@ export function AccountPanel() {
   const role = user?.role ?? 'user';
 
   const copyId = async () => {
-    try {
-      await navigator.clipboard.writeText(userId);
+    if (await copyText(userId)) {
       notify.success(i18n.t(ERRORS_KEYS.frontend.account.copySuccess, { ns: ERRORS_NS }));
-    } catch {
+    } else {
       notify.error(i18n.t(ERRORS_KEYS.frontend.account.copyFailed, { ns: ERRORS_NS }));
     }
   };
@@ -96,21 +87,27 @@ export function AccountPanel() {
   });
 
   return (
-    <div className="space-y-6" data-testid="settings-section-account">
+    <div className="flex flex-col gap-4" data-testid="settings-section-account">
       <SectionHeader
         title={t(accountPanels.title)}
         description={t(accountPanels.description)}
       />
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">{t(accountPanels.infoTitle)}</CardTitle>
-          <CardDescription>{t(accountPanels.infoDescription)}</CardDescription>
-        </CardHeader>
-        <CardContent className="divide-y">
+      <SettingsCard
+        title={t(accountPanels.infoTitle)}
+        description={t(accountPanels.infoDescription)}
+      >
+        <dl className="flex flex-col">
           <InfoRow label={t(accountPanels.accountIdLabel)}>
-            <span className="flex items-center gap-2">
-              <code className="bg-muted rounded-sm px-1.5 py-0.5 text-xs">{userId}</code>
+            <span className="flex min-w-0 items-center gap-1.5">
+              {/* An id is data: it reads left to right on any page (the mono
+                  kbd look of the design's ids, `preset.md:181`). */}
+              <code
+                dir="ltr"
+                className="bg-muted text-foreground-soft truncate rounded-md px-1.5 py-0.5 font-mono text-xs"
+              >
+                {userId}
+              </code>
               <Button
                 variant="ghost"
                 size="icon-sm"
@@ -122,74 +119,69 @@ export function AccountPanel() {
               </Button>
             </span>
           </InfoRow>
-          <InfoRow label={t(accountPanels.emailLabel)}>{email}</InfoRow>
+          <InfoRow label={t(accountPanels.emailLabel)}>
+            <span dir="ltr" className="truncate">
+              {email}
+            </span>
+          </InfoRow>
           <InfoRow label={t(accountPanels.roleLabel)}>
-            <Badge variant="secondary" className="capitalize">
+            <TonePill tone="neutral" size="sm" className="capitalize">
               {role}
-            </Badge>
+            </TonePill>
           </InfoRow>
           <InfoRow label={t(accountPanels.emailVerifiedLabel)}>
-            <Badge variant="success">
-              <ShieldCheck className="h-3 w-3" /> {t(accountPanels.verified)}
-            </Badge>
+            <TonePill tone="sage" size="sm" icon={<ShieldCheck />}>
+              {t(accountPanels.verified)}
+            </TonePill>
           </InfoRow>
-        </CardContent>
-      </Card>
+        </dl>
+      </SettingsCard>
 
-      <Card className="border-destructive/40" data-testid="danger-zone">
-        <CardHeader>
-          <CardTitle className="text-destructive flex items-center gap-2 text-base">
-            <TriangleAlert className="h-4 w-4" /> {t(accountPanels.dangerZone)}
-          </CardTitle>
-          <CardDescription>{t(accountPanels.dangerZoneDescription)}</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm font-medium">{t(accountPanels.deleteHeading)}</p>
-              <p className="text-muted-foreground text-sm">
-                {t(accountPanels.deleteBody)}
-              </p>
-            </div>
-            <Button
-              variant="destructive"
-              onClick={() => setConfirmDelete(true)}
-              data-testid="account-delete"
-            >
-              <Trash className="me-2 h-4 w-4" /> {t(accountPanels.deleteAction)}
-            </Button>
+      <AccountPrivacyCard />
+
+      <SettingsCard
+        variant="danger"
+        title={
+          <>
+            <TriangleAlert className="size-4 shrink-0" aria-hidden="true" />
+            {t(accountPanels.dangerZone)}
+          </>
+        }
+        description={t(accountPanels.dangerZoneDescription)}
+        data-testid="danger-zone"
+      >
+        <div className="border-destructive-border flex flex-col gap-3 border-t pt-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <p className="text-body font-medium">{t(accountPanels.deleteHeading)}</p>
+            <p className="text-muted-foreground text-xs leading-[1.45]">
+              {t(accountPanels.deleteBody)}
+            </p>
           </div>
-        </CardContent>
-      </Card>
+          <Button
+            variant="destructive"
+            onClick={() => setConfirmDelete(true)}
+            data-testid="account-delete"
+            className="self-start sm:self-auto"
+          >
+            <Trash className="size-4" aria-hidden="true" />
+            {t(accountPanels.deleteAction)}
+          </Button>
+        </div>
+      </SettingsCard>
 
-      <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t(accountPanels.deleteTitle)}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t(accountPanels.deleteDescription)}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel data-testid="account-delete-cancel">
-              {t(accountPanels.deleteCancel)}
-            </AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
-              onClick={(e) => {
-                // Keep the dialog open until the request resolves (success routes
-                // away; error stays so the user can retry).
-                e.preventDefault();
-                deleteAccount.mutate();
-              }}
-              isLoading={deleteAccount.isPending}
-              data-testid="account-delete-confirm"
-            >
-              {t(accountPanels.deleteConfirm)}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Open until the request resolves — success routes away; a failure stays
+          so the user can retry — and it cannot be dismissed meanwhile. */}
+      <ConfirmDialog
+        open={confirmDelete}
+        onOpenChange={setConfirmDelete}
+        title={t(accountPanels.deleteTitle)}
+        description={t(accountPanels.deleteDescription)}
+        cancelLabel={t(accountPanels.deleteCancel)}
+        confirmLabel={t(accountPanels.deleteConfirm)}
+        destructive
+        onConfirm={() => deleteAccount.mutateAsync()}
+        testIds={{ cancel: 'account-delete-cancel', accept: 'account-delete-confirm' }}
+      />
     </div>
   );
 }

@@ -1,0 +1,254 @@
+import { type KeyboardEvent, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import { cn } from '@/lib/utils.ts';
+import type { PatientPhotoAlbumCounts } from '@/shared/api/app/patient-images-contracts.ts';
+import { APP_KEYS, APP_NS } from '@/shared/app/app.constants.ts';
+import { Picker, type PickerOption } from '@/shared/components/Picker/index.ts';
+import { RoomViewTabs } from '@/shared/components/RoomToolbar/index.ts';
+import { Button } from '@/shared/components/ui/button.tsx';
+import { ChevronDown } from '@/shared/icons/index.ts';
+import type { PhotoSize } from '@/shared/store/useDevicePrefsStore/index.ts';
+
+import {
+  PATIENT_PHOTOS_KEYS,
+  PATIENT_PHOTOS_NS,
+} from '../../../shared/patient-photos.constants.ts';
+import { NO_VISIT, type PhotoAlbum } from '../../images.search.ts';
+import {
+  PHOTO_ALBUM_LOOK,
+  PHOTO_SIZE_LOOK,
+  PHOTO_SIZES,
+} from '../../shared/photo-looks.ts';
+import type { PhotoVisit } from '../../shared/photo-view.ts';
+import { PHOTO_TOOLBAR_TEST_IDS } from './photo-toolbar.constants.ts';
+
+const K = PATIENT_PHOTOS_KEYS;
+
+/** The visit filter's "All photos" key. */
+const ALL = 'all';
+
+const SIZE_KEYS: Readonly<Record<PhotoSize, { name: string; letter: string }>> = {
+  small: { name: K.sizes.small, letter: K.sizes.smallShort },
+  medium: { name: K.sizes.medium, letter: K.sizes.mediumShort },
+  large: { name: K.sizes.large, letter: K.sizes.largeShort },
+};
+
+/** Props of {@link PhotoToolbar}. */
+export interface PhotoToolbarProps {
+  album: PhotoAlbum;
+  /** The albums the member sees (Private only for Doctor, Admin, Owner). */
+  albums: readonly PhotoAlbum[];
+  onAlbumChange: (album: PhotoAlbum) => void;
+  /** The server's count of each album's photos (`meta.album_counts`): the tabs' chips; null until read. */
+  albumCounts: PatientPhotoAlbumCounts | null;
+  /** The server's count of the album's photos under the filter; none (0, or not told) shows no count. */
+  count: number | null;
+  /** The filter: a visit id, "none", or every photo (undefined). */
+  appointment: string | undefined;
+  /** The visits a photo can be filed under, latest first. */
+  visits: readonly PhotoVisit[];
+  onAppointmentChange: (appointment: string | undefined) => void;
+  /** "24 Sep" / "Today" for a visit's day. */
+  dayLabel: (date: string) => string;
+  size: PhotoSize;
+  onSizeChange: (size: PhotoSize) => void;
+}
+
+/**
+ * "24 Sep · Hydrafacial" over "#2790 · Completed": a visit's day, service, number and status.
+ * The design's per-visit photo count goes — the API counts photos by album only (G4).
+ */
+function useVisitOptions(
+  visits: readonly PhotoVisit[],
+  dayLabel: (date: string) => string,
+): PickerOption[] {
+  const { t } = useTranslation([PATIENT_PHOTOS_NS, APP_NS]);
+  return visits.map((visit) => ({
+    key: visit.appointmentId,
+    label: t(K.visitFilter.visit, {
+      day: dayLabel(visit.date),
+      service: visit.serviceLabel,
+    }),
+    sub: t(K.visitFilter.visitSub, {
+      seq: visit.seq,
+      status: t(APP_KEYS.appointments.statuses[visit.status], { ns: APP_NS }),
+    }),
+    tone: 'sky' as const,
+  }));
+}
+
+/** An album tab's count chip — the server's count — with its spoken "3 photos". */
+function AlbumCount({ count }: { count: number }) {
+  const { t } = useTranslation(PATIENT_PHOTOS_NS);
+  return (
+    <>
+      <span
+        aria-hidden="true"
+        data-slot="pill"
+        className="bg-muted text-muted-foreground text-tiny min-w-4 rounded-full px-1.25 text-center leading-[1.45] tabular-nums"
+      >
+        {count}
+      </span>
+      <span className="sr-only">{t(K.count, { count })}</span>
+    </>
+  );
+}
+
+/** S / M / L — radios that move with the arrow keys, focus following the pick. */
+function PhotoSizeRadios({
+  size,
+  onSizeChange,
+}: {
+  size: PhotoSize;
+  onSizeChange: (size: PhotoSize) => void;
+}) {
+  const { t } = useTranslation(PATIENT_PHOTOS_NS);
+  const refs = useRef(new Map<PhotoSize, HTMLButtonElement>());
+  const step = (event: KeyboardEvent<HTMLButtonElement>) => {
+    const forward = ['ArrowRight', 'ArrowDown'].includes(event.key);
+    if (!(forward || ['ArrowLeft', 'ArrowUp'].includes(event.key))) return;
+    event.preventDefault();
+    const index = PHOTO_SIZES.indexOf(size);
+    const next =
+      PHOTO_SIZES[(index + (forward ? 1 : -1) + PHOTO_SIZES.length) % PHOTO_SIZES.length];
+    if (!next) return;
+    refs.current.get(next)?.focus();
+    onSizeChange(next);
+  };
+  return (
+    <div
+      role="radiogroup"
+      aria-label={t(K.sizes.label)}
+      data-slot="segmented"
+      className="bg-card flex h-9 flex-none gap-0.5 rounded-lg border p-0.75"
+    >
+      {PHOTO_SIZES.map((option) => {
+        const checked = option === size;
+        const name = t(SIZE_KEYS[option].name);
+        return (
+          <button // NOSONAR(S6819): styled-button radiogroup; a native radio input cannot hold this segmented letter
+            key={option}
+            ref={(node) => {
+              if (node) refs.current.set(option, node);
+              else refs.current.delete(option);
+            }}
+            type="button"
+            role="radio"
+            aria-checked={checked}
+            aria-label={name}
+            title={name}
+            tabIndex={checked ? 0 : -1}
+            onClick={() => onSizeChange(option)}
+            onKeyDown={step}
+            data-testid={`${PHOTO_TOOLBAR_TEST_IDS.size}-${option}`}
+            className={cn(
+              'flex size-7 items-center justify-center rounded-md font-semibold transition-colors',
+              PHOTO_SIZE_LOOK[option].letter,
+              checked
+                ? 'bg-primary text-primary-foreground'
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+            )}
+          >
+            {t(SIZE_KEYS[option].letter)}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/**
+ * The Photos toolbar (H:828; `patient-file.md:61`): the album tabs on the
+ * segmented track — General `ImageIcon`, Private `Lock`, LHR `Sparkles` — each
+ * with the server's count, "3 photos", the visit filter "All photos ⌄" ("All
+ * photos" · "Not attached to a visit" · each visit a photo can be filed under),
+ * then the S / M / L radios at the end. It wraps on a phone.
+ */
+export function PhotoToolbar({
+  album,
+  albums,
+  onAlbumChange,
+  albumCounts,
+  count,
+  appointment,
+  visits,
+  onAppointmentChange,
+  dayLabel,
+  size,
+  onSizeChange,
+}: PhotoToolbarProps) {
+  const { t } = useTranslation(PATIENT_PHOTOS_NS);
+  const albumLabel = t(K.albums[album]);
+  const visitOptions = useVisitOptions(visits, dayLabel);
+  const albumCount = albumCounts?.[album] ?? null;
+  const options: PickerOption[] = [
+    {
+      key: ALL,
+      label: t(K.visitFilter.all),
+      sub:
+        albumCount === null
+          ? undefined
+          : t(K.visitFilter.allSub, { count: albumCount, album: albumLabel }),
+    },
+    { key: NO_VISIT, label: t(K.visitFilter.none), sub: t(K.visitFilter.noneSub) },
+    ...visitOptions,
+  ];
+
+  return (
+    <div className="flex flex-wrap items-center gap-2.5">
+      <div className="min-w-0 flex-none">
+        <RoomViewTabs
+          label={t(K.albumTabs)}
+          tabs={albums.map((id) => {
+            const tabCount = albumCounts?.[id] ?? null;
+            return {
+              id,
+              label: t(K.albums[id]),
+              icon: PHOTO_ALBUM_LOOK[id].icon,
+              badge: tabCount === null ? undefined : <AlbumCount count={tabCount} />,
+            };
+          })}
+          value={album}
+          onValueChange={(id) => onAlbumChange(id as PhotoAlbum)}
+          testIdPrefix={PHOTO_TOOLBAR_TEST_IDS.prefix}
+        />
+      </div>
+      {count ? (
+        <span className="text-detail text-muted-foreground whitespace-nowrap">
+          {t(K.count, { count })}
+        </span>
+      ) : null}
+      <Picker
+        label={t(K.visitFilter.label)}
+        value={appointment ?? ALL}
+        options={options}
+        onChange={(key) => onAppointmentChange(!key || key === ALL ? undefined : key)}
+        searchable={false}
+        size="md"
+        minWidth={300}
+        testId={PHOTO_TOOLBAR_TEST_IDS.visitFilter}
+        className="flex-none"
+        renderTrigger={({ open, selected }) => (
+          <Button
+            type="button"
+            variant="outline"
+            data-testid={PHOTO_TOOLBAR_TEST_IDS.visitFilter}
+            className="bg-card text-foreground hover:bg-muted gap-1.5 ps-3 pe-2.5 shadow-none"
+          >
+            {selected[0]?.label ?? t(K.visitFilter.all)}
+            <ChevronDown
+              aria-hidden="true"
+              className={cn(
+                'text-muted-foreground size-3.5 transition-transform duration-150',
+                open && 'rotate-180',
+              )}
+            />
+          </Button>
+        )}
+      />
+      <span className="flex-1" />
+      <PhotoSizeRadios size={size} onSizeChange={onSizeChange} />
+    </div>
+  );
+}

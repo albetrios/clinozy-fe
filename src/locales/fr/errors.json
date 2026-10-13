@@ -13,8 +13,11 @@
     "goHome": "Retour à l'accueil",
     "refresh": "Actualiser la page",
     "forbidden": "Vous n'avez pas l'autorisation d'accéder à cette page.",
+    "forbiddenTitle": "Pas d'accès à cette page",
     "signOut": "Se déconnecter",
-    "signingOut": "Déconnexion…"
+    "signingOut": "Déconnexion…",
+    "pageNotFound": "Page introuvable",
+    "recordNotFound": "{{record}} introuvable · il a peut-être été supprimé"
   },
   "widget": {
     "unavailable": "{{title}} indisponible",
@@ -25,19 +28,12 @@
     "pageContent": "Contenu de la page",
     "navigation": "Navigation",
     "emailBanner": "Vérification de l'e-mail",
-    "notifications": "Notifications",
     "organizationSwitcher": "Sélecteur d'organisation",
     "commandPalette": "Palette de commandes",
     "settings": "Paramètres",
     "appearance": "Apparence",
-    "analytics": "Analytique",
-    "members": "Membres",
-    "schedule": "Calendrier",
-    "highlights": "Points forts",
-    "themeShowcase": "Aperçu du thème",
     "sessionTimeout": "Minuteur de session",
     "securityCheck": "Vérification de sécurité",
-    "appearanceControls": "Commandes d'apparence",
     "payment": "Paiement",
     "cancellation": "Annulation"
   },
@@ -45,17 +41,7 @@
     "dismiss": "Fermer la notification",
     "undo": "Annuler",
     "undone": "Action annulée",
-    "processing": "Traitement…",
-    "preview": {
-      "successTitle": "Modifications enregistrées",
-      "successDescription": "Vos paramètres sont actifs.",
-      "errorTitle": "Une erreur s'est produite",
-      "errorDescription": "Veuillez réessayer.",
-      "warningTitle": "Attention",
-      "warningDescription": "Cette action nécessite une vérification.",
-      "infoTitle": "Le saviez-vous ?",
-      "infoDescription": "Mélanger modifie aussi ce design."
-    }
+    "processing": "Traitement…"
   },
   "api": {
     "fallback": "Une erreur s'est produite. Veuillez réessayer.",
@@ -69,7 +55,21 @@
     "http429": "Trop de requêtes. Veuillez patienter un instant et réessayer.",
     "http500": "Une erreur interne du serveur s'est produite. Réessayez plus tard.",
     "http502": "Le serveur est temporairement indisponible. Réessayez plus tard.",
-    "http503": "Le service est temporairement indisponible. Réessayez plus tard."
+    "http503": "Le service est temporairement indisponible. Réessayez plus tard.",
+    "reload": "Recharger",
+    "recordChanged": "Quelqu’un d’autre a enregistré ceci entre-temps. Rechargez pour voir ses modifications, puis refaites les vôtres.",
+    "reasons": {
+      "missingPermission": "Vous n'avez pas l'autorisation de faire cela. Demandez au propriétaire de la clinique ou à un administrateur.",
+      "ownerMembershipFixed": "Les rôles et le statut du propriétaire de la clinique ne peuvent pas être modifiés. Transférez d'abord la propriété.",
+      "ownerCannotLeave": "Le propriétaire de la clinique ne peut pas la quitter. Transférez d'abord la propriété.",
+      "ownerRoleFixed": "L'accès du rôle détenu par le propriétaire de la clinique ne peut pas être modifié.",
+      "systemRoleFixed": "Un rôle prédéfini ne peut être ni renommé ni supprimé.",
+      "roleLocked": "L'accès de ce rôle est fixe et ne peut pas être modifié.",
+      "seatLimitReached": "Votre forfait n'a plus de place libre. Ajoutez une place dans Paramètres › Facturation, puis invitez à nouveau.",
+      "membershipAlreadyExists": "Cette personne fait déjà partie de la clinique.",
+      "organizationSlugExists": "Cette URL de l'espace est déjà prise. Choisissez-en une autre.",
+      "disposableEmail": "Utilisez une adresse e-mail permanente — les adresses jetables ne sont pas acceptées."
+    }
   },
   "frontend": {
     "query": {
@@ -91,12 +91,7 @@
     },
     "account": {
       "copyFailed": "Impossible de copier dans le presse-papiers",
-      "themeCodeNumeric": "Entrez un code de thème numérique",
       "copySuccess": "ID du compte copié",
-      "themeLinkCopied": "Lien du thème copié",
-      "themeLinkCopiedDescription": "Partagez cette URL pour reproduire l'apparence.",
-      "notificationStylePreview": "Style de notification",
-      "notificationStylePreviewDescription": "{{variant}} — thématisé avec votre accent et vos couleurs sémantiques.",
       "accountDeletionPending": "Compte supprimé. Déconnexion…",
       "avatarInvalidType": "Veuillez choisir un fichier image.",
       "avatarTooLarge": "L'avatar doit faire moins de 2 Mo.",
@@ -122,7 +117,8 @@
         "updateRoleSuccess": "Rôle du membre mis à jour",
         "removeSuccess": "Membre retiré",
         "suspendSuccess": "Membre suspendu",
-        "reactivateSuccess": "Membre réactivé"
+        "reactivateSuccess": "Membre réactivé",
+        "updateSuccess": "Membre enregistré"
       },
       "roles": {
         "createFailed": "Impossible de créer le rôle",

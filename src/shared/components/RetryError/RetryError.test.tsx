@@ -38,4 +38,11 @@ describe('RetryError', () => {
     const results = await axe(container);
     expect(results).toHaveNoViolations();
   });
+
+  it("leads with the design's 40px tile in the blush tone of trouble", () => {
+    const { container } = render(<RetryError onRetry={() => {}} />);
+    const tile = container.querySelector('[aria-hidden="true"]');
+    expect(tile).toHaveClass('size-10', 'rounded-xl', 'bg-tone-blush');
+    expect(screen.getByText('Something went wrong.')).toHaveClass('text-detail');
+  });
 });

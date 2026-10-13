@@ -4,10 +4,8 @@ import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vitest';
 
-import { GENERATED_RADII } from './presets.ts';
-
 /**
- * The Corner radius and Shape axes are implemented in CSS, so this reads the
+ * The radius scale and the Shape axis are implemented in CSS, so this reads the
  * stylesheet: a contract that lives in `index.css` cannot be asserted through
  * jsdom, which resolves neither `@theme` nor `calc()`.
  */
@@ -48,18 +46,12 @@ describe('corner radius scale (index.css @theme)', () => {
     ['2xl', 1],
     ['3xl', 1.5],
     ['4xl', 2],
-  ])('--radius-%s is still Tailwind’s stock value on the default look', (step, stock) => {
-    // Nothing may move until the axis does.
-    expect(resolveRem(step, GENERATED_RADII.default?.base ?? Number.NaN)).toBe(stock);
+  ])('--radius-%s is Tailwind’s stock value on the look’s own 0.5rem', (step, stock) => {
+    expect(resolveRem(step, Number.parseFloat(radiusToken('lg')))).toBe(stock);
   });
 
-  it('every derived step is square under radius "None" and grows with "Round"', () => {
-    for (const step of ['xs', '2xl', '3xl', '4xl']) {
-      expect(resolveRem(step, GENERATED_RADII.sharp?.base ?? Number.NaN)).toBe(0);
-      expect(resolveRem(step, GENERATED_RADII.round?.base ?? Number.NaN)).toBeGreaterThan(
-        resolveRem(step, GENERATED_RADII.default?.base ?? Number.NaN),
-      );
-    }
+  it('the look’s `--radius-lg` is the 0.5rem every derived step is measured from', () => {
+    expect(radiusToken('lg')).toBe('0.5rem');
   });
 });
 
@@ -101,15 +93,11 @@ describe('Sharp shape coverage (index.css [data-shape="sharp"])', () => {
     'switch-thumb',
     'input-otp-slot',
     // round BY DESIGN — `rounded-full` in every other shape
-    'badge',
     'avatar',
     'avatar-fallback',
     'progress',
     'progress-indicator',
     'floating-edge',
-    // the vendored carousel re-slots its arrow <Button>s, so `button` misses them
-    'carousel-previous',
-    'carousel-next',
     'kbd',
     'pill',
     // tiles

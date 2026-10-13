@@ -1,0 +1,187 @@
+{
+  "manifest": {
+    "title": "リード"
+  },
+  "record": "リード",
+  "toasts": {
+    "created": "リード {{id}} を作成しました",
+    "saved": "リードを保存しました",
+    "statusChanged": "{{name}} → {{status}}",
+    "claimed": "{{name}} の担当になりました · {{owner}} は引き続き関与します",
+    "claimedUnowned": "{{name}} の担当になりました",
+    "released": "チームに開放しました · 誰でも引き受けられます",
+    "assigned": "{{name}} が担当になりました · 通知済み"
+  },
+  "list": {
+    "records": "リード",
+    "views": {
+      "label": "リードの表示",
+      "mine": "自分",
+      "unreplied": "未返信",
+      "all": "すべて",
+      "unrepliedCount_other": "未返信 {{count}} 件"
+    },
+    "search": {
+      "placeholder": "名前・電話番号・#ID で検索",
+      "label": "リードを検索"
+    },
+    "newLead": "新規リード",
+    "columns": {
+      "lead": "リード",
+      "status": "ステータス",
+      "source": "流入元",
+      "interests": "関心",
+      "team": "チーム",
+      "updated": "更新"
+    },
+    "empty": "一致するリードはありません",
+    "clearFilters": "フィルターをクリア",
+    "moreInterests_other": "他 {{count}} 件: {{list}}"
+  },
+  "team": {
+    "claim": "開放中 · 引き受ける",
+    "openHint": "誰も確保していません · 誰でも担当できます",
+    "openMine": "チームに開放",
+    "openMineHint": "確保期間が終了しました · 誰でも担当できます",
+    "releasesToday": "今日 {{time}} にチームへ戻ります",
+    "releasesTomorrow": "明日 {{time}} にチームへ戻ります",
+    "claimFirst": "{{first}} を引き受ける",
+    "takeOver": "{{first}} から引き継ぐ"
+  },
+  "filters": {
+    "status": "ステータス",
+    "source": "流入元 · 複数選択可",
+    "clear": "クリア",
+    "hold": {
+      "label": "担当 · 担当後の確保",
+      "any": "すべて",
+      "open": "引き受け可能",
+      "soon": "今日開放",
+      "held": "保持中"
+    },
+    "team": {
+      "label": "チーム · 担当または関与",
+      "anyone": "チームの誰でも",
+      "count_other": "{{count}} 人",
+      "search": "チームを検索",
+      "noMatch": "一致なし"
+    }
+  },
+  "drawer": {
+    "title": "リードを編集",
+    "sub": "変更してから「リードを保存」を押してください",
+    "idTooltip": "リード #{{seq}} · {{created}} 作成 · クリックしてコピー",
+    "idAria": "リード ID #{{seq}} をコピー",
+    "idCopied": "リード ID #{{seq}} をコピーしました",
+    "retarget": "リターゲット",
+    "panels": "リードのパネル",
+    "details": "詳細",
+    "chat": "チャット",
+    "resize": "パネルのサイズを変更",
+    "resizeHint": "ドラッグでサイズ変更 · ダブルクリックでリセット",
+    "cards": {
+      "details": "リードの詳細",
+      "progress": "進捗",
+      "info": "情報"
+    },
+    "source": "流入元",
+    "interests": "関心のある施術",
+    "people": "担当者と関係者",
+    "peopleAria": "担当者と関係者",
+    "addInvolved": "+ 関係者を追加",
+    "claim": "引き取る",
+    "release": "手放す",
+    "releaseHint": "チームの誰でも引き取れるようにする",
+    "progressAria": "リードの進捗",
+    "steps": {
+      "done": "完了",
+      "current": "現在",
+      "next": "次"
+    },
+    "stepTips": {
+      "done": "{{status}} · 完了",
+      "current": "{{status}} · 現在のステップ",
+      "next": "{{status}} に進める",
+      "byCheckIn": "来院済み · チェックイン時に設定されます"
+    },
+    "closeAs": "終了理由",
+    "info": {
+      "created": "作成日",
+      "lastActivity": "最新のアクティビティ",
+      "none": "まだありません",
+      "patient": "患者",
+      "linked": "リンク済み",
+      "notYet": "まだ",
+      "openTasks": "未完了のタスク",
+      "retargetReason": "リターゲットの理由"
+    },
+    "footer": {
+      "remove": "リードを削除",
+      "discard": "破棄",
+      "save": "リードを保存"
+    },
+    "popover": {
+      "title": "このリードの担当者",
+      "search": "チームを検索",
+      "assignedTo": "担当者 · 今このリードを対応している人",
+      "assign": "担当にする",
+      "assigned": "担当中",
+      "currentlyAssigned": "現在の担当者",
+      "assignTo": "{{name}} を担当にする",
+      "involved": "関係者 · このリードを対応した人",
+      "noMatch": "該当なし",
+      "note": "✓ 関係者 = このリードを対応したすべての人。返信・通話・メモ・予約で自動的に追加されます · 手動で追加することもできます"
+    },
+    "remove": {
+      "title": "このリードを削除しますか？",
+      "effect": "リードはすべての一覧と担当者のキューから外れます。チャット履歴は残ります。直後に通知から元に戻せます。",
+      "reasons": {
+        "duplicate": "重複",
+        "testEntry": "テスト入力",
+        "spam": "スパム",
+        "other": "その他"
+      },
+      "removed": "リード #{{seq}} を削除しました · {{reason}}"
+    }
+  },
+  "newLead": {
+    "title": "新しいリード",
+    "sub": "名前と携帯番号だけで始められます",
+    "contact": "連絡先",
+    "search": "名前または携帯番号で検索",
+    "searchAria": "既存の患者または連絡先を検索",
+    "quickStart": "クイックスタート",
+    "presets": {
+      "walkIn": "飛び込み",
+      "instagramDm": "Instagram の DM"
+    },
+    "presetHints": {
+      "walkIn": "今受付にいます · 流入元 飛び込み",
+      "instagramDm": "Instagram の DM"
+    },
+    "hits": {
+      "patient": "患者 · {{id}} · {{phone}}",
+      "contact": "{{id}} · {{phone}}",
+      "openLead": "対応中のリード · {{id}} · {{phone}}",
+      "open": "リードを開く",
+      "recreate": "リードを再作成",
+      "useContact": "連絡先を使う"
+    },
+    "noMatch": "一致する人はいません",
+    "more_other": " · 他 +{{count}}",
+    "change": "変更",
+    "changeTitle": "別の連絡先を選ぶ",
+    "afterContact": "連絡先のあと",
+    "detailsSummary": "流入元、関心、担当者",
+    "footer": "連絡先を 1 件作成または更新します",
+    "create": "リードを作成",
+    "toasts": {
+      "pickFirst": "先に連絡先を選ぶか追加してください",
+      "presetApplied": "プリセット「{{preset}}」を適用しました",
+      "existingPatient": "既存の患者 {{id}} · 新しいリードをリンクします",
+      "existingContact": "既存の連絡先 {{name}} を使います",
+      "missing": "名前と 10 桁の携帯番号を入力してください",
+      "open": "開く"
+    }
+  }
+}

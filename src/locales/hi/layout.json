@@ -1,68 +1,14 @@
 {
-  "brand": {
-    "name": "{{productName}}"
-  },
   "a11y": {
-    "skipToMain": "मुख्य सामग्री पर जाएँ",
-    "mainNavigation": "मुख्य नेविगेशन",
-    "sidebarNavigation": "साइडबार नेविगेशन",
-    "mobileNavigation": "मोबाइल नेविगेशन"
-  },
-  "auth": {
-    "switchToRegister": "खाता बनाएँ",
-    "switchToSignIn": "साइन इन",
-    "statusOperational": "सभी सिस्टम चालू हैं",
-    "badge": "ऑपरेशन, एक जगह",
-    "heroTitle": "आपके संगठन के लिए ऑपरेटिंग सिस्टम।",
-    "heroSubtitle": "सदस्य, भूमिकाएँ, बिलिंग और सुरक्षा — हर टीम के लिए तेज़, कीबोर्ड-फ़र्स्ट वर्कस्पेस।",
-    "features": {
-      "multiOrg": {
-        "title": "मल्टी-ऑर्ग डिज़ाइन",
-        "body": "टूल बदले बिना टीमें बदलें।"
-      },
-      "secure": {
-        "title": "डिफ़ॉल्ट रूप से सुरक्षित",
-        "body": "RBAC, MFA, पासकी और ऑडिट ट्रेल।"
-      },
-      "fast": {
-        "title": "हर जगह तेज़",
-        "body": "कीबोर्ड-फ़र्स्ट, रियल-टाइम काम के लिए बनाया गया।"
-      }
-    },
-    "stats": {
-      "teams": "टीमें",
-      "uptime": "अपटाइम",
-      "compliant": "अनुपालन"
-    }
+    "skipToMain": "मुख्य सामग्री पर जाएँ"
   },
   "app": {
     "search": "खोजें",
-    "searchPlaceholder": "खोजें...",
     "searchShortcutMac": "⌘K",
     "searchShortcutWindows": "Ctrl+K",
-    "userMenu": "उपयोगकर्ता मेनू",
     "userFallback": "उपयोगकर्ता",
     "settings": "सेटिंग्स",
     "logOut": "लॉग आउट",
-    "toggleSidebar": "साइडबार टॉगल करें",
-    "footerCopyright": "© {{year}} {{productName}} Platform",
-    "nav": {
-      "dashboard": "डैशबोर्ड"
-    },
-    "sidebar": {
-      "workspace": "वर्कस्पेस",
-      "menu": "मेनू",
-      "shortcuts": "शॉर्टकट"
-    },
-    "contextStrip": {
-      "label": "त्वरित पहुँच",
-      "labelSolo": "जाएँ",
-      "profile": "प्रोफ़ाइल",
-      "security": "सुरक्षा",
-      "billing": "बिलिंग",
-      "appearance": "दिखावट",
-      "shortcuts": "शॉर्टकट"
-    },
     "workspaceSwitch": {
       "preparing": "आपका कार्यक्षेत्र तैयार किया जा रहा है",
       "loadingAccess": "सदस्य और अनुमतियाँ लोड हो रही हैं",
@@ -74,7 +20,10 @@
       "personal": "व्यक्तिगत",
       "yourOrganizations": "आपके संगठन",
       "organizations": "संगठन",
-      "addOrganization": "संगठन जोड़ें"
+      "addOrganization": "संगठन जोड़ें",
+      "invited": "आमंत्रित",
+      "invitedRow": "आमंत्रित · {{roles}}",
+      "invitationCount": "आमंत्रण: {{count}}"
     },
     "notifications": {
       "title": "सूचनाएँ",
@@ -90,17 +39,15 @@
       "settingsLink": "सूचना सेटिंग्स"
     },
     "commandPalette": {
-      "ariaLabel": "कमांड पैलेट",
-      "placeholder": "कमांड टाइप करें या खोजें...",
+      "ariaLabel": "कमांड मेनू",
+      "placeholder": "खोजें या जाएँ…",
       "empty": "कोई परिणाम नहीं मिला।",
       "groups": {
-        "navigation": "नेविगेशन",
         "theme": "थीम",
         "account": "खाता",
         "organizations": "संगठन",
         "shortcuts": "शॉर्टकट"
       },
-      "dashboard": "डैशबोर्ड",
       "userSettings": "उपयोगकर्ता सेटिंग्स",
       "organizationSettings": "संगठन सेटिंग्स",
       "lightMode": "लाइट मोड",
@@ -118,6 +65,10 @@
       "commandPalette": "कमांड पैलेट खोलें",
       "showShortcuts": "कीबोर्ड शॉर्टकट दिखाएँ",
       "showShortcutsAlt": "कीबोर्ड शॉर्टकट दिखाएँ (वैकल्पिक)",
+      "allSections": "सभी अनुभाग खोलें या बंद करें",
+      "jumpToSection": "किसी अनुभाग पर जाएँ",
+      "listSearch": "सूची में खोजें",
+      "leadRows": "अगली या पिछली लीड (लीड्स में)",
       "closeDialog": "डायलॉग बंद करें"
     },
     "emailVerify": {
@@ -143,16 +94,64 @@
       "nameLabel": "संगठन का नाम",
       "slugLabel": "वर्कस्पेस URL (वैकल्पिक)",
       "submit": "संगठन बनाएँ",
-      "submitting": "बनाया जा रहा है…"
+      "submitting": "बनाया जा रहा है…",
+      "cancel": "रद्द करें"
     },
     "theme": {
       "light": "लाइट",
       "dark": "डार्क",
-      "system": "सिस्टम",
-      "shuffle": "थीम शफ़ल करें"
+      "system": "सिस्टम"
+    },
+    "sectionBar": {
+      "nav": "अनुभाग",
+      "allSections": "सभी अनुभाग",
+      "allSectionsTitle": "सभी अनुभाग (G)",
+      "more": "और",
+      "morePinned": "और पिन किए गए अनुभाग",
+      "tabTitle": "{{section}} · {{description}}",
+      "searchLabel": "खोजें या जाएँ (Command K)",
+      "searchTitleMac": "खोजें या जाएँ… (⌘K)",
+      "searchTitleWindows": "खोजें या जाएँ… (Ctrl K)",
+      "searchPlaceholder": "मरीज़, लीड खोजें…",
+      "pin": "बार में पिन करें",
+      "unpin": "बार से अनपिन करें",
+      "pinAria": "बार में पिन करें · {{section}}",
+      "unpinAria": "बार से अनपिन करें · {{section}}",
+      "pinFooter": "बार में रखने के लिए पिन करें",
+      "keysHint": "G · 1–9",
+      "account": "खाता",
+      "avatarLabel": "{{name}} · {{status}}",
+      "identityRole": "{{role}} · {{branch}}",
+      "status": "स्थिति",
+      "presence": {
+        "online": "ऑनलाइन",
+        "away": "दूर",
+        "busy": "व्यस्त"
+      },
+      "statusToast": "स्थिति · {{status}}",
+      "switchClinic": "क्लिनिक बदलें",
+      "security": "सुरक्षा",
+      "billing": "बिलिंग",
+      "devices": "डिवाइस",
+      "appearance": "दिखावट",
+      "appearanceLanguage": "दिखावट और भाषा",
+      "viewAs": {
+        "previewing": "{{role}} के रूप में पूर्वावलोकन",
+        "noSections": "कोई अनुभाग नहीं",
+        "exit": "पूर्वावलोकन से बाहर निकलें",
+        "exitToast": "अपनी पहुँच पर वापस"
+      },
+      "branch": {
+        "label": "शाखा · {{label}}",
+        "title": "शाखा · {{names}}",
+        "all": "सभी शाखाएँ",
+        "allSub": "संयुक्त दृश्य · {{count}} का कुल",
+        "viewGroup": "दृश्य",
+        "branchesGroup": "शाखाएँ",
+        "showingAll": "सभी शाखाएँ दिख रही हैं",
+        "showing": "{{names}} दिख रही हैं",
+        "keepOne": "कम से कम एक शाखा रखें"
+      }
     }
-  },
-  "public": {
-    "brandTagline": "आपकी टीम के लिए सुरक्षित वर्कस्पेस"
   }
 }

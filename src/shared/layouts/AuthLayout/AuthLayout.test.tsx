@@ -1,21 +1,35 @@
-import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { act, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
+import { PRODUCT_NAME } from '@/lib/product-identity.ts';
+import { pickerTestIds } from '@/shared/components/Picker/index.ts';
 import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
-import { useThemeStore } from '@/shared/store/useThemeStore/index.ts';
 import { renderWithProviders } from '@/tests/utils/renderWithProviders.tsx';
 
-import { AuthLayout, preloadAuthLayoutVariants } from './AuthLayout.tsx';
+import { AuthLayout } from './AuthLayout.tsx';
+
+const platformOverrides = vi.hoisted(() => ({ themeLock: false }));
+// The deployment's theme lock (`VITE_THEME_LOCK`), read per render.
+vi.mock('@/core/config/env.ts', async (importOriginal) => {
+  const actual = await importOriginal<{ platformConfig: Record<string, unknown> }>();
+  return {
+    ...actual,
+    platformConfig: {
+      ...actual.platformConfig,
+      get themeLock() {
+        return platformOverrides.themeLock;
+      },
+    },
+  };
+});
+
+const LANGUAGE = pickerTestIds('auth-locale-select');
 
 describe('AuthLayout', () => {
-  // Preload lazy shells so Suspense doesn't flake under full-suite contention.
-  beforeAll(async () => {
-    await preloadAuthLayoutVariants();
-  });
-
   beforeEach(() => {
-    // Default to the split variant; the shuffle-driven previews are opt-in below.
-    useThemeStore.setState({ authVariant: 0 });
+    platformOverrides.themeLock = false;
     useLocaleStore.setState({ locale: 'en', textDirection: 'auto' });
   });
 
@@ -26,87 +40,66 @@ describe('AuthLayout', () => {
       </AuthLayout>,
     );
 
-    expect(
-      await findByTestId('auth-layout', {}, { timeout: 15_000 }),
-    ).toBeInTheDocument();
+    expect(await findByTestId('auth-layout')).toBeInTheDocument();
     expect(await findByTestId('auth-form-container')).toBeInTheDocument();
     expect(getByText('Form content')).toBeInTheDocument();
   });
 
-  it('shows the brand value props', async () => {
-    const { findByText } = renderWithProviders(
+  it('is the launch canvas: the logo, the controls and one 360px card', async () => {
+    const { findByTestId, getByTestId } = renderWithProviders(
       <AuthLayout>
         <span>child</span>
       </AuthLayout>,
     );
 
+    const layout = await findByTestId('auth-layout');
+    expect(layout).toHaveClass('bg-canvas', 'min-h-dvh');
+    // The logo where the clinic header draws it.
+    expect(within(layout).getByRole('img', { name: PRODUCT_NAME })).toHaveAttribute(
+      'data-testid',
+      'brand-logo',
+    );
+    // Theme toggle and language picker sit at the header's end.
     expect(
-      await findByText('The operating system for your organization.'),
+      within(getByTestId('public-frame-controls')).getByTestId('theme-toggle'),
     ).toBeInTheDocument();
-    expect(await findByText('All systems operational')).toBeInTheDocument();
+    // The form sits in the "Signed out" card (H:515): 360px, the card slot.
+    const card = (await findByTestId('auth-form-container')).parentElement;
+    expect(card).toHaveAttribute('data-slot', 'card');
+    expect(card).toHaveClass('max-w-90', 'rounded-xl');
+    expect(within(layout).getByRole('main')).toHaveAttribute('id', 'main-content');
   });
 
-  it('keeps the split hero growing on big monitors (3xl / 4xl)', async () => {
-    // Without the tier the hero stayed a 28rem column pinned to the corner of a
-    // 1400px panel on a 2560px monitor.
-    const { findByText, findByTestId } = renderWithProviders(
+  it('on a theme-locked deployment, the header keeps the language picker and drops the theme toggle', async () => {
+    platformOverrides.themeLock = true;
+    const { findByTestId, getByTestId } = renderWithProviders(
       <AuthLayout>
         <span>child</span>
       </AuthLayout>,
     );
 
-    const headline = await findByText('The operating system for your organization.');
-    expect(headline).toHaveClass('xl:text-5xl', '3xl:text-6xl', '4xl:text-7xl');
-    expect(headline.closest('.max-w-md')).toHaveClass('3xl:max-w-xl', '4xl:max-w-2xl');
-    // The form column widens with it — a 420px form looks lost beside a 7xl hero.
-    expect((await findByTestId('auth-form-container')).parentElement).toHaveClass(
-      'max-w-[420px]',
-      '3xl:max-w-[480px]',
-    );
+    expect(await findByTestId('auth-layout')).toBeInTheDocument();
+    const controls = getByTestId('public-frame-controls');
+    expect(await within(controls).findByTestId(LANGUAGE.trigger)).toBeInTheDocument();
+    expect(within(controls).queryByTestId('theme-toggle')).not.toBeInTheDocument();
   });
 
-  it('tags the status chip as a pill, so the Sharp shape squares it', async () => {
-    const { findByText } = renderWithProviders(
-      <AuthLayout>
-        <span>child</span>
-      </AuthLayout>,
-    );
-
-    const chip = (await findByText('All systems operational')).closest('[data-slot]');
-    expect(chip).toHaveAttribute('data-slot', 'pill');
-    expect(chip).toHaveClass('rounded-full');
-  });
-
-  it('renders the spotlight preview variant (1)', async () => {
-    useThemeStore.setState({ authVariant: 1 });
+  it('shows the auth language picker in multi-locale builds, and it switches the UI', async () => {
+    const user = userEvent.setup();
     const { findByTestId } = renderWithProviders(
       <AuthLayout>
         <div>child</div>
       </AuthLayout>,
     );
     expect(await findByTestId('auth-layout')).toBeInTheDocument();
-    expect(await findByTestId('auth-form-container')).toBeInTheDocument();
-  });
+    // The picker loads on its own; until then an inert copy of its trigger holds the spot.
+    const trigger = await findByTestId(LANGUAGE.trigger);
+    expect(trigger).toHaveAccessibleName(/English/);
 
-  it('renders the minimal preview variant (2)', async () => {
-    useThemeStore.setState({ authVariant: 2 });
-    const { findByTestId } = renderWithProviders(
-      <AuthLayout>
-        <div>child</div>
-      </AuthLayout>,
-    );
-    expect(await findByTestId('auth-layout')).toBeInTheDocument();
-    expect(await findByTestId('auth-form-container')).toBeInTheDocument();
-  });
-
-  it('shows the auth locale select in multi-locale builds', async () => {
-    const { findByTestId } = renderWithProviders(
-      <AuthLayout>
-        <div>child</div>
-      </AuthLayout>,
-    );
-    expect(await findByTestId('auth-layout')).toBeInTheDocument();
-    expect(await findByTestId('auth-locale-select')).toBeInTheDocument();
+    await user.click(trigger);
+    await user.click(await findByTestId(LANGUAGE.option('de')));
+    await waitFor(() => expect(useLocaleStore.getState().locale).toBe('de'));
+    await act(() => useLocaleStore.getState().setLocale('en'));
   });
 
   it('has no accessibility violations', async () => {

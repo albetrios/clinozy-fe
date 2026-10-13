@@ -1,0 +1,599 @@
+{
+  "manifest": {
+    "title": "Aufgaben"
+  },
+  "ruleGroups": {
+    "leads": "Leads",
+    "appointments": "Termine",
+    "feedback": "Feedback",
+    "treatments": "Behandlungen",
+    "patients": "Patienten",
+    "team": "Team",
+    "payments": "Zahlungen",
+    "medical": "Medizin"
+  },
+  "rules": {
+    "reply": {
+      "label": "Unbeantwortete Nachrichten",
+      "description": "Ein Lead hat geschrieben und niemand hat geantwortet",
+      "how": {
+        "first": "Die letzte Nachricht rechts lesen",
+        "second": "Mit Preisen und zwei freien Terminen antworten",
+        "third": "Den Besuch buchen, wenn einer gewählt wird"
+      },
+      "outcomes": {
+        "bookedVisit": {
+          "label": "Besuch gebucht",
+          "effect": "Terminformular öffnet sich · Lead wechselt zu Nachfassen"
+        },
+        "notInterested": {
+          "label": "Kein Interesse",
+          "effect": "Lead-Status → Kein Interesse"
+        },
+        "spamOrWrongNumber": {
+          "label": "Spam oder falsche Nummer",
+          "effect": "Lead-Status → Ungültig"
+        }
+      }
+    },
+    "follow": {
+      "label": "Lead-Nachfassungen",
+      "description": "Das Nachfassdatum ist erreicht",
+      "how": {
+        "first": "Prüfen, wofür Interesse bestand",
+        "second": "Freundlich anrufen oder per WhatsApp erinnern",
+        "third": "Buchen, ein neues Nachfassdatum setzen oder den Lead schließen"
+      },
+      "outcomes": {
+        "bookedVisit": {
+          "label": "Besuch gebucht",
+          "effect": "Terminformular öffnet sich"
+        },
+        "callBackTomorrow": {
+          "label": "Morgen zurückrufen",
+          "effect": "Nachfassdatum → morgen 11:00"
+        },
+        "noAnswer": {
+          "label": "Keine Antwort",
+          "effect": "Anruf protokolliert · Aufgabe pausiert 3 Stunden"
+        },
+        "notInterested": {
+          "label": "Kein Interesse",
+          "effect": "Lead-Status → Kein Interesse"
+        }
+      }
+    },
+    "claim": {
+      "label": "Leads zum Übernehmen",
+      "description": "Der Verantwortliche war länger als die Haltefrist inaktiv",
+      "how": {
+        "first": "Den Chatverlauf ansehen",
+        "second": "Übernehmen, wenn du ihn betreuen kannst",
+        "third": "Sonst dem Team überlassen"
+      },
+      "outcomes": {
+        "claimIt": {
+          "label": "Übernehmen",
+          "effect": "Du wirst verantwortlich"
+        },
+        "leaveWithOwner": {
+          "label": "Beim Verantwortlichen lassen",
+          "effect": "Bis morgen ausgeblendet"
+        }
+      }
+    },
+    "failed": {
+      "label": "Nicht zugestellte Nachrichten",
+      "description": "Der Anbieter konnte eine Nachricht nicht zustellen",
+      "how": {
+        "first": "Die Mobilnummer prüfen",
+        "second": "Per WhatsApp oder SMS erneut senden",
+        "third": "Anrufen, wenn es wieder fehlschlägt"
+      },
+      "outcomes": {
+        "retrySend": {
+          "label": "Erneut senden",
+          "effect": "Sendet auf demselben Kanal erneut"
+        },
+        "calledInstead": {
+          "label": "Stattdessen angerufen",
+          "effect": "Anruf protokolliert"
+        },
+        "fixTheNumber": {
+          "label": "Nummer korrigieren",
+          "effect": "Öffnet den Datensatz zum Bearbeiten"
+        }
+      }
+    },
+    "confirm": {
+      "label": "Besuche bestätigen",
+      "description": "Ein Besuch in den nächsten 48 Stunden ist nicht bestätigt",
+      "automation": "Die Erinnerung senden und bei „Ja“ bestätigen",
+      "how": {
+        "first": "Die Erinnerung senden oder wiederholen",
+        "second": "Anrufen, wenn bis zum Abend keine Antwort kommt",
+        "third": "Den Termin verschieben, wenn sie nicht kommen können"
+      },
+      "outcomes": {
+        "confirmedOnCall": {
+          "label": "Telefonisch bestätigt",
+          "effect": "Termin → Bestätigt"
+        },
+        "moveToAnotherSlot": {
+          "label": "Auf anderen Termin verschieben",
+          "effect": "Öffnet den Termin zum Verschieben"
+        },
+        "cancelledByPatient": {
+          "label": "Vom Patienten abgesagt",
+          "effect": "Termin → Abgesagt · Zeitfenster frei"
+        },
+        "noAnswer": {
+          "label": "Keine Antwort",
+          "effect": "Anruf protokolliert · Aufgabe pausiert 3 Stunden"
+        }
+      }
+    },
+    "arrive": {
+      "label": "Angekommen oder nicht erschienen",
+      "description": "15 Minuten nach Beginn und nicht eingecheckt",
+      "how": {
+        "first": "Den Patienten anrufen",
+        "second": "Bei Ankunft als eingecheckt markieren",
+        "third": "Nach 30 Minuten als nicht erschienen markieren"
+      },
+      "outcomes": {
+        "checkedIn": {
+          "label": "Eingecheckt",
+          "effect": "Termin → Eingecheckt"
+        },
+        "runningLate": {
+          "label": "Verspätet sich",
+          "effect": "Aufgabe pausiert 30 Minuten"
+        },
+        "noShow": {
+          "label": "Nicht erschienen",
+          "effect": "Termin → Nicht erschienen · eine Neubuchungsaufgabe folgt"
+        }
+      }
+    },
+    "rebook": {
+      "label": "Nicht Erschienene neu buchen",
+      "description": "Der Patient hat den Besuch verpasst",
+      "how": {
+        "first": "Mit zwei freien Terminen anrufen oder per WhatsApp schreiben",
+        "second": "Den gewählten Termin buchen",
+        "third": "Schließen, wenn sie nicht wiederkommen"
+      },
+      "outcomes": {
+        "rebooked": {
+          "label": "Neu gebucht",
+          "effect": "Terminformular öffnet sich mit derselben Leistung"
+        },
+        "willCallBack": {
+          "label": "Ruft zurück",
+          "effect": "Aufgabe pausiert bis morgen"
+        },
+        "notComingBack": {
+          "label": "Kommt nicht wieder",
+          "effect": "Mit Grund geschlossen"
+        }
+      }
+    },
+    "feedback": {
+      "label": "Feedback einholen",
+      "description": "Ein Besuch wurde gestern abgeschlossen",
+      "automation": "Das Feedbackformular senden und bei 4–5★ schließen",
+      "how": {
+        "first": "Fragen, wie der Besuch war",
+        "second": "Bei 4–5★ um eine Google-Bewertung bitten",
+        "third": "Die nächste Sitzung buchen"
+      },
+      "outcomes": {
+        "happy": {
+          "label": "Zufrieden · 4–5★",
+          "effect": "Öffnet das Bewertungsprotokoll"
+        },
+        "unhappy": {
+          "label": "Unzufrieden",
+          "effect": "Erstellt eine Rückrufaufgabe für {{doctor}}"
+        },
+        "logCheckIn": {
+          "label": "Check-in erfassen",
+          "effect": "Wie es jetzt ist · was befolgt wurde · nächster Plan"
+        },
+        "sentTheForm": {
+          "label": "Formular gesendet",
+          "effect": "Pausiert bis morgen"
+        }
+      }
+    },
+    "aftercare": {
+      "label": "Nachsorgeanrufe",
+      "description": "Eine Behandlung erfordert einen Nachsorgeanruf",
+      "how": {
+        "first": "Anrufen und fragen, wie sich die Haut anfühlt",
+        "second": "Prüfen, ob die Nachsorge befolgt wurde",
+        "third": "Einen Check-in mit der Antwort erfassen"
+      },
+      "outcomes": {
+        "logCheckIn": {
+          "label": "Check-in erfassen",
+          "effect": "Wie es sich anfühlt · was befolgt wurde · nächster Plan"
+        },
+        "doingWell": {
+          "label": "Geht gut",
+          "effect": "Erfasst einen kurzen Check-in „Besser“"
+        },
+        "noAnswer": {
+          "label": "Keine Antwort",
+          "effect": "Anruf protokolliert · pausiert 3 Stunden"
+        }
+      }
+    },
+    "unhappy": {
+      "label": "Unzufriedene Patienten",
+      "description": "Ein Patient hat schlecht bewertet oder war unzufrieden",
+      "how": {
+        "first": "Zuerst das Feedback lesen",
+        "second": "Arzt oder Leitung ruft zurück",
+        "third": "Bei Bedarf einen Kontrollbesuch oder eine Gutschrift anbieten"
+      },
+      "outcomes": {
+        "calledResolved": {
+          "label": "Angerufen · gelöst",
+          "effect": "Mit deiner Notiz geschlossen"
+        },
+        "offeredReviewVisit": {
+          "label": "Kontrollbesuch angeboten",
+          "effect": "Terminformular öffnet sich"
+        }
+      }
+    },
+    "nextvisit": {
+      "label": "Nächster Besuch nicht festgelegt",
+      "description": "Ein Besuch ist abgeschlossen, aber es gibt weder ein Nachsorgedatum noch eine nächste Buchung",
+      "how": {
+        "first": "Prüfen, was der Arzt empfohlen hat",
+        "second": "Zwei Termine für den nächsten Besuch anbieten",
+        "third": "Ein Nachsorgedatum setzen, wenn sie noch nicht so weit sind"
+      },
+      "outcomes": {
+        "bookNextVisit": {
+          "label": "Nächsten Besuch buchen",
+          "effect": "Terminformular öffnet sich für {{first}}"
+        },
+        "setFollowUpDate": {
+          "label": "Nachsorgedatum setzen",
+          "effect": "Setzt die Nachsorge auf 2 Wochen ab heute"
+        },
+        "noFollowUpNeeded": {
+          "label": "Keine Nachsorge nötig",
+          "effect": "Geschlossen · Behandlung abgeschlossen"
+        }
+      }
+    },
+    "noreply": {
+      "label": "Stammpatienten ohne Rückmeldung",
+      "description": "Ein Paketpatient hat noch Sitzungen, seit über 30 Tagen keinen Besuch und nichts gebucht",
+      "how": {
+        "first": "Paket und letzten Besuch ansehen",
+        "second": "Einmal anrufen, dann ein Rückkehrangebot senden",
+        "third": "Schließen, wenn sie nicht wiederkommen"
+      },
+      "outcomes": {
+        "callNow": {
+          "label": "Jetzt anrufen",
+          "effect": "Öffnet die Patientenakte · den Anruf dort erfassen"
+        },
+        "sendOffer": {
+          "label": "Angebot senden",
+          "effect": "Pausiert eine Woche"
+        },
+        "notComingBack": {
+          "label": "Kommt nicht wieder",
+          "effect": "Mit Grund geschlossen"
+        }
+      },
+      "automation": "Einen Retargeting-Lead für das Team anlegen"
+    },
+    "manual": {
+      "label": "Von dir geplante Nachfassungen",
+      "description": "Nach dem Schließen einer anderen Aufgabe geplant",
+      "how": {
+        "first": "Das Geplante erledigen",
+        "second": "Festhalten, was passiert ist",
+        "third": "Bei Bedarf den nächsten Schritt planen"
+      },
+      "outcomes": {
+        "done": {
+          "label": "Erledigt",
+          "effect": "Geschlossen · den nächsten Schritt wählen"
+        },
+        "noAnswer": {
+          "label": "Keine Antwort",
+          "effect": "Pausiert 3 Stunden"
+        },
+        "bookedVisit": {
+          "label": "Besuch gebucht",
+          "effect": "Terminformular öffnet sich"
+        }
+      }
+    },
+    "payment": {
+      "label": "Zahlung fällig",
+      "description": "Eine Rechnung hat einen offenen Betrag",
+      "outcomes": {
+        "collectAtCheckout": {
+          "label": "Beim Checkout kassieren",
+          "effect": "Geschlossen · beim Checkout kassieren"
+        },
+        "sendUpiLink": {
+          "label": "UPI-Link senden",
+          "effect": "Geschlossen · Link im Chat senden"
+        },
+        "called": {
+          "label": "Angerufen",
+          "effect": "Mit deiner Notiz geschlossen"
+        }
+      },
+      "automation": "Eine Zahlungserinnerung per WhatsApp senden"
+    },
+    "settleBy": {
+      "label": "Offene Guthaben",
+      "description": "Das Fälligkeitsdatum eines offenen Guthabens ist erreicht",
+      "outcomes": {
+        "done": {
+          "label": "Erledigt",
+          "effect": "Geschlossen · in Zahlungen ausgleichen"
+        }
+      }
+    },
+    "medicalRepVisit": {
+      "label": "Pharmareferenten-Besuche",
+      "description": "Ein Pharmareferent kommt zu Besuch",
+      "outcomes": {
+        "done": {
+          "label": "Erledigt",
+          "effect": "Geschlossen · Besuch unter Medizin erfassen"
+        }
+      }
+    }
+  },
+  "snoozeOptions": {
+    "oneHour": "1 Stunde",
+    "threeHours": "3 Stunden",
+    "tomorrow": "Morgen 10:00",
+    "nextWeek": "Nächste Woche"
+  },
+  "followUpWhen": {
+    "inThreeHours": "In 3 Stunden",
+    "tomorrow": "Morgen 11 Uhr",
+    "inThreeDays": "In 3 Tagen",
+    "nextWeek": "Nächste Woche"
+  },
+  "record": "Aufgabe",
+  "views": {
+    "label": "Aufgabenansicht",
+    "queue": "Zu erledigen",
+    "snoozed": "Zurückgestellt",
+    "done": "Erledigt"
+  },
+  "search": {
+    "placeholder": "Aufgaben oder Personen suchen",
+    "label": "Aufgaben suchen"
+  },
+  "type": {
+    "label": "Aufgabentyp",
+    "all": "Alle Typen",
+    "count_one": "{{count}} Typ",
+    "count_other": "{{count}} Typen"
+  },
+  "scope": {
+    "label": "Umfang",
+    "mine": "Meine",
+    "everyone": "Alle"
+  },
+  "rulesPopover": {
+    "button": "Regeln",
+    "label": "Aufgabenregeln",
+    "title": "Was Aufgaben erstellt",
+    "description": "{{productName}} beobachtet Leads, Termine und Feedback und erstellt eine Aufgabe, sobald jemand handeln muss. Eine Aufgabe schließt sich selbst, wenn sich der Datensatz ändert.",
+    "line": "{{source}} · {{description}}",
+    "handle": "{{productName}} übernehmen lassen",
+    "handled": "{{productName}} übernimmt das",
+    "readOnly": "Nur Inhaber oder Admins können diese Regeln ändern"
+  },
+  "primary": {
+    "newTask": "Neue Aufgabe"
+  },
+  "groups": {
+    "overdue": "Überfällig",
+    "today": "Heute fällig",
+    "later": "Demnächst",
+    "snoozed": "Zurückgestellt",
+    "done": "Erledigt"
+  },
+  "row": {
+    "automation": "{{productName}} kann das erledigen",
+    "anyone": "Beliebig",
+    "was": "{{name}} · vorher {{first}}",
+    "result": "✓ {{result}}"
+  },
+  "sources": {
+    "lead": "Lead",
+    "appointment": "Termin",
+    "treatment": "Behandlung",
+    "patient": "Patient",
+    "invoice": "Rechnung",
+    "contact": "Kontakt",
+    "checkIn": "Check-in",
+    "review": "Bewertung",
+    "pendingCredit": "Guthaben",
+    "medicalRep": "Pharmareferent"
+  },
+  "due": {
+    "snoozed": "Zurückgestellt · {{label}}",
+    "done": "Erledigt · {{time}}",
+    "doneNow": "Erledigt · Jetzt",
+    "doneByClinozy": "Von {{productName}} erledigt",
+    "overdue": {
+      "minutes_one": "{{count}} Min. überfällig",
+      "minutes_other": "{{count}} Min. überfällig",
+      "hours_one": "{{count}} Std. überfällig",
+      "hours_other": "{{count}} Std. überfällig",
+      "days_one": "{{count}} Tag überfällig",
+      "days_other": "{{count}} Tage überfällig"
+    },
+    "soon": {
+      "minutes_one": "in {{count}} Min.",
+      "minutes_other": "in {{count}} Min.",
+      "hours_one": "in {{count}} Std.",
+      "hours_other": "in {{count}} Std."
+    }
+  },
+  "empty": {
+    "queue": "Gerade braucht Sie nichts. Neue Aufgaben erscheinen hier, sobald Leads schreiben, Besuche anstehen und Feedback eintrifft.",
+    "snoozed": "Keine zurückgestellten Aufgaben",
+    "done": "Heute noch nichts erledigt"
+  },
+  "newTask": {
+    "title": "Neue Aufgabe",
+    "sub": "Für {{person}} · erscheint in Aufgaben und in der Zeitleiste dieser Person",
+    "subNoPerson": "Erscheint in Aufgaben – und in der Zeitleiste der Person, wenn sie jemandem gilt",
+    "steps": {
+      "what": "Was zu tun ist",
+      "when": "Wann & wer",
+      "how": "Wie & Notizen"
+    },
+    "forField": {
+      "label": "Für",
+      "placeholder": "Eine Person auswählen",
+      "search": "Nach Name, Mobilnummer oder Nummer suchen",
+      "empty": "Geben Sie einen Namen, eine Mobilnummer oder eine Kontaktnummer ein"
+    },
+    "titleField": {
+      "label": "Titel",
+      "placeholder": "Was zu tun ist",
+      "fallback": "Nachfassen · {{first}}",
+      "missing": "Geben Sie einen Titel ein oder wählen Sie, für wen die Aufgabe ist"
+    },
+    "due": {
+      "label": "Fällig",
+      "today": "Heute 17 Uhr",
+      "tomorrow": "Morgen 11 Uhr",
+      "inThreeDays": "In 3 Tagen",
+      "nextWeek": "Nächste Woche",
+      "date": "Fälligkeitsdatum",
+      "time": "Fälligkeitszeit"
+    },
+    "owner": {
+      "label": "Zuweisen an",
+      "missing": "Wählen Sie, wer sie erledigt"
+    },
+    "priority": {
+      "label": "Priorität",
+      "normal": "Normal",
+      "high": "Hoch"
+    },
+    "notes": {
+      "label": "Aufgabennotizen",
+      "placeholder": "Notizen (optional)"
+    },
+    "footer": "↔ {{person}}",
+    "save": "Aufgabe hinzufügen",
+    "added": "Aufgabe für {{owner}} hinzugefügt · {{due}}"
+  },
+  "assignee": {
+    "you": "{{name}} (Sie)"
+  },
+  "drawer": {
+    "sub": "Erstellt von {{productName}} · {{rule}}",
+    "assignedTo": "Zugewiesen an",
+    "sections": {
+      "what": "1 · Was",
+      "how": "2 · Wie",
+      "close": "3 · Abschließen mit · dann das Nächste wählen"
+    },
+    "quote": "„{{message}}“",
+    "source": {
+      "appointment": "Termin öffnen",
+      "lead": "Lead öffnen",
+      "treatment": "Behandlung öffnen",
+      "patient": "Patient öffnen",
+      "invoice": "Rechnung öffnen",
+      "checkIn": "Check-in öffnen",
+      "review": "Bewertung öffnen"
+    },
+    "tiles": {
+      "visit": "Besuch",
+      "service": "Leistung",
+      "doctor": "Arzt",
+      "status": "Status",
+      "treatment": "Behandlung",
+      "doneOn": "Durchgeführt am",
+      "session": "Sitzung",
+      "therapist": "Therapeut",
+      "source": "Quelle",
+      "interestedIn": "Interessiert an",
+      "owner": "Zuständig",
+      "mobile": "Mobil"
+    },
+    "tileValues": {
+      "visit": "{{day}} · {{time}} · {{minutes}} Min.",
+      "session": "#{{number}}"
+    },
+    "outcomeNote": {
+      "label": "Notiz zum Ergebnis",
+      "placeholder": "Notiz zum Ergebnis hinzufügen (optional)"
+    },
+    "snooze": "Zurückstellen",
+    "assigned": "Zugewiesen",
+    "assignTip": "Diese Aufgabe jemand anderem geben",
+    "searchTeam": "Team durchsuchen",
+    "was": "Vorher {{names}}",
+    "close": "Schließen",
+    "subByHand": "Von Hand angelegt",
+    "assignGroups": {
+      "team": "Team",
+      "queues": "Rollen-Warteschlangen"
+    },
+    "deleteTitle": "Diese Aufgabe löschen?"
+  },
+  "toasts": {
+    "closed": "{{title}} · {{result}}",
+    "snoozed": "Zurückgestellt · {{label}}",
+    "claimed": "{{name}} gehört jetzt Ihnen",
+    "moved": "{{title}} → {{name}}",
+    "removed": "{{title}} entfernt",
+    "alreadyClosed": "Diese Aufgabe ist bereits abgeschlossen",
+    "claimNeedsLeads": "Einen Lead zu übernehmen erfordert Bearbeitungsrechte für Leads – frag einen Inhaber oder Admin",
+    "reassignNeedsLeads": "Die Aufgabe eines Leads zu verschieben erfordert Bearbeitungsrechte für Leads – frag einen Inhaber oder Admin"
+  },
+  "whatsNext": {
+    "title": "Wie geht es mit {{first}} weiter?",
+    "sub": "Abgeschlossen · {{title}} · {{result}}",
+    "section": "Nächste Aufgabe",
+    "step": {
+      "label": "Nächster Schritt",
+      "callAgain": "Erneut anrufen",
+      "sendWhatsApp": "WhatsApp senden",
+      "bookVisit": "Besuch buchen",
+      "collectPayment": "Zahlung einziehen",
+      "sendOffer": "Angebot senden"
+    },
+    "when": "Wann",
+    "owner": "Zugewiesen an",
+    "note": {
+      "label": "Notiz",
+      "placeholder": "z. B. Nach dem Peeling-Preis fragen"
+    },
+    "nothingNext": "Nichts weiter",
+    "create": "Aufgabe erstellen",
+    "pickStep": "Wählen Sie den nächsten Schritt",
+    "pickWhen": "Wählen Sie, wann",
+    "created": "Nächste Aufgabe gesetzt · {{step}} · {{when}}",
+    "taskTitle": "{{step}} · {{first}}",
+    "plannedAfter": "Geplant nach: {{after}}",
+    "titleNoPerson": "Wie geht es weiter?"
+  }
+}

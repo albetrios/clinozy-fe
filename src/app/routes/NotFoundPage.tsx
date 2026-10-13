@@ -5,8 +5,21 @@ import { useTranslation } from 'react-i18next';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { composePageTitle } from '@/lib/routes/page-head.ts';
 import { CaptchaSlot } from '@/shared/auth/captcha/CaptchaSlot.tsx';
+import { TonePill } from '@/shared/components/Cells/TonePill/index.ts';
+import { PublicFrame } from '@/shared/components/PublicFrame/index.ts';
+import {
+  FALLBACK_BUTTON_CLASS,
+  FallbackState,
+} from '@/shared/components/RouteErrorBoundary/index.ts';
+import { ThemeModeToggle } from '@/shared/components/ThemeModeToggle/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
+import { Compass } from '@/shared/icons/index.ts';
 
+/**
+ * The 404 (the `$` splat and every `notFound()`): the signed-out canvas with the
+ * design's empty state on it — the stone illustration, the status as a neutral
+ * pill inside the page's heading, "Page not found", the line and "Go home".
+ */
 export function Component() {
   const { t } = useTranslation(ERRORS_NS);
   // Set the title here, not only on the `$` route's head: notFound() thrown
@@ -18,21 +31,34 @@ export function Component() {
   }, []);
 
   return (
-    <div
-      className="flex min-h-screen flex-col items-center justify-center gap-4 p-6 text-center sm:p-8"
-      data-testid="not-found-page"
+    <PublicFrame
+      testId="not-found-page"
+      mainId="not-found-main"
+      controls={<ThemeModeToggle surface="frame" />}
     >
-      <h1 className="text-foreground text-5xl font-bold sm:text-6xl">404</h1>
-      <p className="text-muted-foreground max-w-md text-base sm:text-lg">
-        {t(ERRORS_KEYS.route.notFound)}
-      </p>
-      <Button asChild className="mt-4">
-        <Link to="/">{t(ERRORS_KEYS.route.goHome)}</Link>
-      </Button>
+      <FallbackState
+        headingLevel={1}
+        tone="stone"
+        icon={<Compass />}
+        title={
+          <>
+            <TonePill tone="neutral" size="sm" className="tabular-nums">
+              404
+            </TonePill>
+            {t(ERRORS_KEYS.route.pageNotFound)}
+          </>
+        }
+        description={t(ERRORS_KEYS.route.notFound)}
+        actions={
+          <Button asChild className={FALLBACK_BUTTON_CLASS}>
+            <Link to="/">{t(ERRORS_KEYS.route.goHome)}</Link>
+          </Button>
+        }
+      />
 
       {/* An escalated background Turnstile challenge renders here, below the action,
           instead of floating anywhere on its own. */}
       <CaptchaSlot testId="not-found-captcha-slot" />
-    </div>
+    </PublicFrame>
   );
 }

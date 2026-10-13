@@ -9,18 +9,16 @@ import {
   type UploadImageContentType,
 } from '@/shared/api/uploads-api.ts';
 import {
+  PersonAvatar,
+  personInitials,
+} from '@/shared/components/Cells/PersonAvatar/index.ts';
+import { SettingsCard } from '@/shared/components/SettingsCard/index.ts';
+import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { SectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/shared/components/ui/card.tsx';
 import {
   computeProfileCompleteness,
   type ProfileInput,
@@ -60,18 +58,20 @@ export function AccountProfilePanel() {
   const panels = SETTINGS_KEYS.panels.profile;
 
   return (
-    <div className="space-y-6" data-testid="settings-section-profile">
+    <div className="flex flex-col gap-4" data-testid="settings-section-profile">
       <SectionHeader
         title={t(panels.title)}
         description={t(panels.description)}
         meta={t(panels.completeness, { percent: completeness })}
       />
       <AvatarCard name={values.name} />
-      <ProfileForm
-        email={user?.email ?? ''}
-        defaultValues={seeded}
-        onValuesChange={setEdited}
-      />
+      <SettingsCard>
+        <ProfileForm
+          email={user?.email ?? ''}
+          defaultValues={seeded}
+          onValuesChange={setEdited}
+        />
+      </SettingsCard>
     </div>
   );
 }
@@ -99,7 +99,6 @@ function AvatarCard({ name }: { name: string }) {
   const uploadAvatar = useUploadUserAvatar();
   const removeAvatar = useRemoveUserAvatar();
   const busy = uploadAvatar.isPending || removeAvatar.isPending;
-  const initial = (name || '?').charAt(0).toUpperCase();
 
   function onAvatarFile(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -121,26 +120,26 @@ function AvatarCard({ name }: { name: string }) {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">{t(profile.avatarTitle)}</CardTitle>
-        <CardDescription>{t(profile.avatarDescription)}</CardDescription>
-      </CardHeader>
-      <CardContent className="flex items-center gap-4">
-        <div
-          data-slot="pill"
-          className="bg-muted flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-full"
+    <SettingsCard
+      title={t(profile.avatarTitle)}
+      description={t(profile.avatarDescription)}
+    >
+      <div className="flex flex-wrap items-center gap-4">
+        {/* The shared avatar is decorative; this frame names the picture. */}
+        <div // NOSONAR(S6819): frames a photo OR its initials — a native <img> cannot hold the initials
+          role="img"
+          aria-label={
+            name ? t(profile.avatarAlt, { name }) : t(profile.avatarAltFallback)
+          }
+          className="shrink-0"
           data-testid="user-avatar-preview"
         >
-          {avatarUrl ? (
-            <img
-              src={avatarUrl}
-              alt={name ? t(profile.avatarAlt, { name }) : t(profile.avatarAltFallback)}
-              className="size-full object-cover"
-            />
-          ) : (
-            <span className="text-muted-foreground text-xl font-semibold">{initial}</span>
-          )}
+          <PersonAvatar
+            initials={personInitials(name) || '?'}
+            tone="stone"
+            size="profile"
+            src={avatarUrl}
+          />
         </div>
         <div className="flex flex-wrap gap-2">
           <input
@@ -172,7 +171,7 @@ function AvatarCard({ name }: { name: string }) {
             </Button>
           ) : null}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </SettingsCard>
   );
 }

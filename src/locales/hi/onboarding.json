@@ -25,7 +25,7 @@
     },
     "done": {
       "title": "सब तैयार है",
-      "description": "समीक्षा करें और डैशबोर्ड पर जाएँ।"
+      "description": "समीक्षा करें और वर्कस्पेस पर जाएँ।"
     }
   },
   "welcome": {
@@ -98,7 +98,7 @@
   "actions": {
     "back": "वापस",
     "continue": "जारी रखें",
-    "enterDashboard": "डैशबोर्ड में प्रवेश करें",
+    "enterWorkspace": "वर्कस्पेस में प्रवेश करें",
     "settingUp": "सेटअप हो रहा है…"
   },
   "defaults": {

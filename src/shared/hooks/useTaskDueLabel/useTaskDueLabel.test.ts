@@ -1,0 +1,144 @@
+import { renderHook } from '@testing-library/react';
+import { afterEach, describe, expect, it } from 'vitest';
+
+import { PRODUCT_NAME } from '@/lib/product-identity.ts';
+import { useLocaleStore } from '@/shared/store/useLocaleStore/index.ts';
+import { fsi, withoutBidiMarks } from '@/tests/utils/bidi-marks.ts';
+
+import {
+  type TaskDueLabelInput,
+  useTaskDayTimeWords,
+  useTaskDueAtWords,
+  useTaskDueLabel,
+} from './useTaskDueLabel.ts';
+
+/** 10:30 in the clinic (Asia/Kolkata) on Sun 4 Oct 2026. */
+const NOW = new Date('2026-10-04T05:00:00.000Z');
+const at = (minutes: number) => new Date(NOW.getTime() + minutes * 60_000).toISOString();
+
+const open = (dueAt: string): TaskDueLabelInput => ({
+  status: 'open',
+  dueAt,
+  snoozeLabel: null,
+  isResolvedAutomatically: false,
+  resolvedAt: null,
+});
+
+/** The label's words and order as read — its time's isolate marks have their own test. */
+function label(task: TaskDueLabelInput): string {
+  const { result } = renderHook(() => useTaskDueLabel());
+  return withoutBidiMarks(result.current(task, NOW));
+}
+
+const initialHourCycle = useLocaleStore.getState().hourCycle;
+afterEach(() => useLocaleStore.setState({ hourCycle: initialHourCycle }));
+
+describe('useTaskDueLabel (tasks.md:58, 309)', () => {
+  it('says how late an overdue task is — minutes, hours, days', () => {
+    expect(label(open(at(-40)))).toBe('40 min overdue');
+    expect(label(open(at(-150)))).toBe('3 h overdue');
+    expect(label(open(at(-2 * 1440)))).toBe('2 d overdue');
+  });
+
+  it('counts down within 12 hours', () => {
+    expect(label(open(at(25)))).toBe('in 25 min');
+    expect(label(open(at(5 * 60)))).toBe('in 5 h');
+  });
+
+  it('names the clinic day and the time beyond that by the rooms’ one time rule', () => {
+    useLocaleStore.setState({ hourCycle: 'h12' });
+    // 22:31 tonight: "Today" with the time (tasks.md:58).
+    expect(label(open(at(721)))).toMatch(/^Today 10:31\s?pm$/i);
+    expect(label(open('2026-10-05T05:30:00.000Z'))).toMatch(/^Tomorrow 11:00\s?am$/i);
+    // A day ahead reads its date in the viewer's format locale ("Oct 7" in en-US, "7 Oct" in en-GB).
+    expect(label(open('2026-10-07T10:00:00.000Z'))).toMatch(/^(Oct 7|7 Oct) 3:30\s?pm$/i);
+    useLocaleStore.setState({ hourCycle: 'h23' });
+    expect(label(open('2026-10-05T12:30:00.000Z'))).toBe('Tomorrow 18:00');
+  });
+
+  it('reads a snooze, a close by the product, and a member’s close — "Now" for a minute', () => {
+    useLocaleStore.setState({ hourCycle: 'h23' });
+    expect(
+      label({ ...open(at(-30)), status: 'snoozed', snoozeLabel: '2 h · no answer' }),
+    ).toBe('Snoozed · 2 h · no answer');
+    expect(
+      label({ ...open(at(-30)), status: 'done', isResolvedAutomatically: true }),
+    ).toBe(`Done by ${PRODUCT_NAME}`);
+    expect(
+      label({
+        ...open(at(-30)),
+        status: 'done',
+        isResolvedAutomatically: false,
+        resolvedAt: at(0),
+      }),
+    ).toBe('Done · Now');
+    expect(
+      label({
+        ...open(at(-30)),
+        status: 'done',
+        isResolvedAutomatically: false,
+        resolvedAt: at(-90),
+      }),
+    ).toBe('Done · Today 09:00');
+    // Closed on another day: the day by the rooms' one time rule, with its time.
+    expect(
+      label({
+        ...open(at(-30)),
+        status: 'done',
+        isResolvedAutomatically: false,
+        resolvedAt: '2026-10-03T12:00:00.000Z',
+      }),
+    ).toBe('Done · Yesterday 17:30');
+  });
+});
+
+describe('useTaskDueLabel under today (the Today aside, Tasks’ "Due today")', () => {
+  it('reads today’s times bare and still names any other day', () => {
+    useLocaleStore.setState({ hourCycle: 'h23' });
+    const { result } = renderHook(() => useTaskDueLabel({ sameDay: true }));
+    expect(result.current(open(at(721)), NOW)).toBe('22:31');
+    // Another day is named, its time isolated beside the day word.
+    expect(result.current(open('2026-10-05T12:30:00.000Z'), NOW)).toBe(
+      `Tomorrow ${fsi('18:00')}`,
+    );
+    expect(
+      result.current(
+        {
+          ...open(at(-30)),
+          status: 'done',
+          isResolvedAutomatically: false,
+          resolvedAt: at(-90),
+        },
+        NOW,
+      ),
+    ).toBe('Done · 09:00');
+  });
+});
+
+describe('useTaskDueAtWords', () => {
+  it('words a picked day and time the way the due label does', () => {
+    useLocaleStore.setState({ hourCycle: 'h23' });
+    const { result } = renderHook(() => useTaskDueAtWords());
+    // The time is an isolated token beside its day word.
+    expect(result.current('2026-10-04', '17:00', NOW)).toBe(`Today ${fsi('17:00')}`);
+    expect(withoutBidiMarks(result.current('2026-10-05', '11:00', NOW))).toBe(
+      'Tomorrow 11:00',
+    );
+    expect(withoutBidiMarks(result.current('2026-10-07', '15:30', NOW))).toMatch(
+      /^(Oct 7|7 Oct) 15:30$/,
+    );
+  });
+});
+
+describe('useTaskDayTimeWords', () => {
+  it('words the day and the time apart', () => {
+    useLocaleStore.setState({ hourCycle: 'h23' });
+    const { result } = renderHook(() => useTaskDayTimeWords());
+    expect(result.current('2026-10-04', '11:30', NOW)).toEqual({
+      day: 'Today',
+      time: '11:30',
+    });
+    // The day by the rooms' one time rule: a past day of this week by its weekday.
+    expect(result.current('2026-10-01', '11:30', NOW).day).toBe('Thu');
+  });
+});

@@ -116,6 +116,24 @@ describe('useDataTableUrlState — writing to the URL', () => {
     });
   });
 
+  it('patches any key, not only the table keys — a room writes its filters here', () => {
+    const { result } = renderHook(() => useDataTableUrlState(true));
+
+    result.current.patchSearch({ status: ['new', 'vip'], created: undefined });
+
+    expect(navigateMock).toHaveBeenCalledWith(
+      expect.objectContaining({ to: '.', replace: true, hash: true }),
+    );
+    const updater = navigateMock.mock.calls.at(-1)?.[0]?.search as (
+      previous: Record<string, unknown>,
+    ) => Record<string, unknown>;
+    expect(updater({ q: 'ada', created: 'today', view: 'all' })).toEqual({
+      q: 'ada',
+      view: 'all',
+      status: ['new', 'vip'],
+    });
+  });
+
   it('never touches the URL when sync is off', () => {
     const { result } = renderHook(() => useDataTableUrlState(false));
 

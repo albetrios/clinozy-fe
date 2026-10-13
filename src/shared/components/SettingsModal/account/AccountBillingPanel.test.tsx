@@ -270,6 +270,93 @@ describe('AccountBillingPanel', () => {
     expect(screen.getByTestId('plan-pln_pro')).toHaveTextContent('Switch to Pro');
   });
 
+  it('draws the current plan with the ink edge', () => {
+    useSubscriptionMock.mockReturnValue({
+      data: SUB,
+      isPending: false,
+      isLoading: false,
+      isError: false,
+    });
+    setCanManage(true);
+    renderPanel();
+
+    const current = screen.getByText('Current plan').closest('[data-current]');
+    expect(current).toHaveClass('border-foreground', 'ring-1');
+  });
+
+  it('offers the cycle on a segmented track before there is a subscription', async () => {
+    const user = userEvent.setup();
+    useSubscriptionMock.mockReturnValue({
+      data: null,
+      isPending: false,
+      isLoading: false,
+      isError: false,
+    });
+    setCanManage(true);
+    renderPanel();
+
+    // Monthly · Yearly states which cycle is in force, and moves with a press.
+    expect(screen.getByTestId('billing-cycle-monthly')).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    await user.click(screen.getByTestId('billing-cycle-yearly'));
+    expect(screen.getByTestId('billing-cycle-yearly')).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(screen.getByTestId('billing-cycle-monthly')).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+    expect(screen.getByTestId('plan-options')).toHaveTextContent('/ yr');
+  });
+
+  /*
+   * clinozy-be's change-plan takes `plan_id` alone (400 on `billing_cycle`): a
+   * subscription keeps the cycle it was created on. A Monthly · Yearly switch
+   * next to "Switch to Pro" therefore priced a cycle the switch would not use —
+   * the card read "/ yr" and the subscription stayed monthly.
+   */
+  describe('with a subscription, its own cycle decides', () => {
+    const YEARLY_SUB = { ...SUB, billingCycle: 'yearly' as const };
+
+    it('hides the cycle switch and prices every card on the subscription cycle', () => {
+      useSubscriptionMock.mockReturnValue({
+        data: YEARLY_SUB,
+        isPending: false,
+        isLoading: false,
+        isError: false,
+      });
+      setCanManage(true);
+      renderPanel();
+
+      expect(screen.queryByTestId('billing-cycle-toggle')).not.toBeInTheDocument();
+      expect(screen.getByText('Billed yearly')).toBeInTheDocument();
+      expect(screen.getByTestId('plan-options')).toHaveTextContent('/ yr');
+      expect(screen.getByTestId('plan-options')).not.toHaveTextContent('/ mo');
+    });
+
+    it('switches plan on the subscription cycle', async () => {
+      useSubscriptionMock.mockReturnValue({
+        data: YEARLY_SUB,
+        isPending: false,
+        isLoading: false,
+        isError: false,
+      });
+      setCanManage(true);
+      selectPlanMutateAsync.mockResolvedValue({ ...YEARLY_SUB, planId: 'pln_pro' });
+      const user = userEvent.setup();
+      renderPanel();
+
+      await user.click(screen.getByTestId('plan-pln_pro'));
+      expect(selectPlanMutateAsync).toHaveBeenCalledWith({
+        planId: 'pln_pro',
+        billingCycle: 'yearly',
+      });
+    });
+  });
+
   it('switches plan when allowed', async () => {
     useSubscriptionMock.mockReturnValue({
       data: SUB,
@@ -303,6 +390,56 @@ describe('AccountBillingPanel', () => {
     renderPanel();
     expect(screen.getByTestId('billing-summary')).toBeInTheDocument();
     expect(screen.queryByTestId('plan-pln_pro')).not.toBeInTheDocument();
+  });
+
+  // Plan changes are a team-workspace act: a personal workspace that somehow holds
+  // subscription:manage still gets no plan buttons and no cycle switch.
+  it('offers no plan changes in a personal workspace, even with subscription:manage', () => {
+    useSubscriptionMock.mockReturnValue({
+      data: null,
+      isPending: false,
+      isLoading: false,
+      isError: false,
+    });
+    useAuthStore.setState({
+      user: { id: 'u', email: 'a@b.test', role: 'user' },
+      isAuthenticated: true,
+    });
+    useOrganizationStore.setState({
+      organizationType: 'PERSONAL',
+      permissions: ['subscription:manage'],
+    });
+    renderPanel();
+
+    expect(screen.getByTestId('plan-options')).toBeInTheDocument();
+    expect(screen.queryByTestId('plan-pln_pro')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('billing-cycle-toggle')).not.toBeInTheDocument();
+  });
+
+  it('states the seats used out of the plan seats in the summary', () => {
+    useSubscriptionMock.mockReturnValue({
+      data: SUB,
+      isPending: false,
+      isLoading: false,
+      isError: false,
+    });
+    setCanManage(true);
+    renderPanel();
+
+    expect(screen.getByTestId('billing-summary')).toHaveTextContent('1 of 3 seats used');
+  });
+
+  it('states an unlimited plan as ∞ seats', () => {
+    useSubscriptionMock.mockReturnValue({
+      data: { ...SUB, seatsTotal: null, seatsUsed: 4 },
+      isPending: false,
+      isLoading: false,
+      isError: false,
+    });
+    setCanManage(true);
+    renderPanel();
+
+    expect(screen.getByTestId('billing-summary')).toHaveTextContent('4 of ∞ seats used');
   });
 
   it('strips Stripe return params through the router after a succeeded redirect', () => {

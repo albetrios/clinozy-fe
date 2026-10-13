@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { axe } from 'vitest-axe';
 
 import { useOnboardingStore } from '@/shared/store/useOnboardingStore/index.ts';
 
@@ -72,5 +73,35 @@ describe('DoneStep', () => {
 
     render(<DoneStep steps={TEAM_ONLY_STEPS} />);
     expect(screen.getByText('Acme Inc.')).toBeInTheDocument();
+  });
+
+  it("lays the summary out as a drawer step's peek tiles", () => {
+    useOnboardingStore
+      .getState()
+      .patch({ firstName: 'Ada', organizationName: 'Acme Inc.' });
+    render(<DoneStep steps={TEAM_ONLY_STEPS} />);
+    const value = screen.getByText('Acme Inc.');
+    expect(value.tagName).toBe('DD');
+    expect(value).toHaveClass('text-detail', 'text-foreground');
+    const tile = value.parentElement;
+    expect(tile).toHaveClass('rounded-lg', 'border');
+    expect(tile).not.toHaveClass('border-dashed');
+    expect(tile?.querySelector('dt')).toHaveClass('uppercase', 'text-tiny');
+  });
+
+  it('draws a value not given on a dashed tile in the disabled ink', () => {
+    render(<DoneStep steps={TEAM_ONLY_STEPS} />);
+    const empties = screen.getAllByText('—');
+    expect(empties).toHaveLength(2); // name and organization
+    for (const empty of empties) {
+      expect(empty).toHaveClass('text-disabled');
+      expect(empty.parentElement).toHaveClass('border-dashed');
+    }
+  });
+
+  it('has no accessibility violations', async () => {
+    useOnboardingStore.getState().patch({ firstName: 'Ada', invites: ['a@b.test'] });
+    const { container } = render(<DoneStep steps={TEAM_ONLY_STEPS} />);
+    expect(await axe(container)).toHaveNoViolations();
   });
 });

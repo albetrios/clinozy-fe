@@ -1,0 +1,326 @@
+{
+  "manifest": {
+    "title": "الخدمات"
+  },
+  "offerLabels": {
+    "percentOff": "خصم {{value}}%",
+    "amountOff": "خصم {{amount}}",
+    "fixedAt": "بسعر {{amount}}",
+    "extraSessions_zero": "+{{count}} جلسة",
+    "extraSessions_one": "+{{count}} جلسة",
+    "extraSessions_two": "+{{count}} جلستان",
+    "extraSessions_few": "+{{count}} جلسات",
+    "extraSessions_many": "+{{count}} جلسة",
+    "extraSessions_other": "+{{count}} جلسة"
+  },
+  "toolbar": {
+    "tabsLabel": "أقسام الخدمات",
+    "tabOfferings": "الخدمات",
+    "tabOffers": "العروض",
+    "searchOfferings": "ابحث بالاسم أو بكلمة بحث",
+    "searchOffers": "ابحث في العروض أو الرموز",
+    "searchLabel": "البحث في الخدمات",
+    "newOffering": "خدمة جديدة",
+    "newOffer": "عرض جديد"
+  },
+  "catalogueCells": {
+    "allBranches": "كل الفروع"
+  },
+  "deleteConfirm": {
+    "offeringTitle": "حذف هذه الخدمة؟",
+    "offerTitle": "حذف هذا العرض؟"
+  },
+  "columns": {
+    "seq": "المعرّف",
+    "name": "الخدمة",
+    "category": "الفئة",
+    "price": "السعر",
+    "offer": "العرض",
+    "branches": "الفروع",
+    "duration": "المدة",
+    "sessions": "الجلسات",
+    "status": "الحالة",
+    "updated": "آخر تحديث"
+  },
+  "table": {
+    "records": "الخدمات"
+  },
+  "cells": {
+    "validDays_zero": "صالح لمدة {{count}} يوم",
+    "validDays_one": "صالح لمدة يوم واحد",
+    "validDays_two": "صالح لمدة يومين",
+    "validDays_few": "صالح لمدة {{count}} أيام",
+    "validDays_many": "صالح لمدة {{count}} يومًا",
+    "validDays_other": "صالح لمدة {{count}} يوم",
+    "validFor_zero": "صالح لمدة {{count}} يوم",
+    "validFor_one": "صالح لمدة يوم واحد",
+    "validFor_two": "صالح لمدة يومين",
+    "validFor_few": "صالح لمدة {{count}} أيام",
+    "validFor_many": "صالح لمدة {{count}} يومًا",
+    "validFor_other": "صالح لمدة {{count}} يوم",
+    "wasPrice": "كان {{price}} · خصم {{percent}}%",
+    "listPrice": "السعر الأساسي",
+    "minutes": "{{minutes}} د",
+    "sessions_zero": "{{count}} جلسة",
+    "sessions_one": "{{count}} جلسة",
+    "sessions_two": "{{count}} جلستان",
+    "sessions_few": "{{count}} جلسات",
+    "sessions_many": "{{count}} جلسة",
+    "sessions_other": "{{count}} جلسة",
+    "sessionsFree_zero": "{{sessions}} + {{count}} مجانًا",
+    "sessionsFree_one": "{{sessions}} + {{count}} مجانًا",
+    "sessionsFree_two": "{{sessions}} + {{count}} مجانًا",
+    "sessionsFree_few": "{{sessions}} + {{count}} مجانًا",
+    "sessionsFree_many": "{{sessions}} + {{count}} مجانًا",
+    "sessionsFree_other": "{{sessions}} + {{count}} مجانًا",
+    "active": "نشطة",
+    "inactive": "غير نشطة"
+  },
+  "rowActions": {
+    "edit": "تعديل",
+    "delete": "حذف"
+  },
+  "bulk": {
+    "export": "تصدير",
+    "exported_zero": "تم تصدير {{count}} صف بصيغة CSV",
+    "exported_one": "تم تصدير {{count}} صف بصيغة CSV",
+    "exported_two": "تم تصدير {{count}} صفين بصيغة CSV",
+    "exported_few": "تم تصدير {{count}} صفوف بصيغة CSV",
+    "exported_many": "تم تصدير {{count}} صفًا بصيغة CSV",
+    "exported_other": "تم تصدير {{count}} صف بصيغة CSV"
+  },
+  "empty": {
+    "title": "لا توجد خدمات بعد",
+    "description": "أضف العلاجات والباقات مع أسعارها ليمكن حجزها وإصدار فواتيرها.",
+    "noMatchTitle": "لا توجد خدمة مطابقة",
+    "noMatchDescription": "لا يوجد شيء هنا بعد. جرّب علامة تبويب أخرى أو بحثًا آخر.",
+    "newOffering": "خدمة جديدة"
+  },
+  "offers": {
+    "columns": {
+      "offer": "العرض",
+      "type": "النوع",
+      "appliesTo": "ينطبق على",
+      "branches": "الفروع",
+      "valid": "الصلاحية",
+      "status": "الحالة",
+      "updated": "آخر تحديث"
+    },
+    "table": {
+      "records": "العروض"
+    },
+    "cells": {
+      "more": "+{{count}}",
+      "range": "{{start}} – {{end}}",
+      "now": "الآن",
+      "noEnd": "بلا نهاية",
+      "endsToday": "ينتهي اليوم",
+      "endsTomorrow": "ينتهي غدًا",
+      "endsIn_zero": "ينتهي خلال {{count}} يوم",
+      "endsIn_one": "ينتهي خلال يوم واحد",
+      "endsIn_two": "ينتهي خلال يومين",
+      "endsIn_few": "ينتهي خلال {{count}} أيام",
+      "endsIn_many": "ينتهي خلال {{count}} يومًا",
+      "endsIn_other": "ينتهي خلال {{count}} يوم",
+      "startsOn": "يبدأ {{date}}",
+      "over": "انتهى",
+      "noOfferings": "لا توجد خدمات"
+    },
+    "rowActions": {
+      "edit": "تعديل",
+      "pause": "إيقاف مؤقت",
+      "resume": "استئناف",
+      "delete": "حذف"
+    },
+    "bulk": {
+      "export": "تصدير",
+      "exported_zero": "تم تصدير {{count}} صف بصيغة CSV",
+      "exported_one": "تم تصدير {{count}} صف بصيغة CSV",
+      "exported_two": "تم تصدير {{count}} صفين بصيغة CSV",
+      "exported_few": "تم تصدير {{count}} صفوف بصيغة CSV",
+      "exported_many": "تم تصدير {{count}} صفًا بصيغة CSV",
+      "exported_other": "تم تصدير {{count}} صف بصيغة CSV"
+    },
+    "empty": {
+      "title": "لا توجد عروض بعد",
+      "description": "لا يوجد شيء هنا بعد. جرّب علامة تبويب أخرى أو بحثًا آخر.",
+      "newOffer": "عرض جديد"
+    },
+    "record": "عرض"
+  },
+  "record": "خدمة",
+  "offeringDrawer": {
+    "title": {
+      "create": "خدمة جديدة",
+      "edit": "تعديل الخدمة"
+    },
+    "sub": "تُستخدم في المواعيد والفواتير والباقات",
+    "quickFill": {
+      "single": "جلسة واحدة",
+      "pack": "باقة 6 جلسات",
+      "lhr": "باقة 10 جلسات ليزر",
+      "consultation": "استشارة"
+    },
+    "steps": {
+      "main": "الخدمة والسعر والجلسات",
+      "timeDetails": "المدة والصلاحية والتفاصيل",
+      "offersTime": "العروض عليها والمدة والصلاحية",
+      "details": "التفاصيل"
+    },
+    "groups": {
+      "offering": "الخدمة",
+      "price": "السعر والجلسات",
+      "offers": "العروض عليها",
+      "time": "المدة والصلاحية",
+      "details": "التفاصيل"
+    },
+    "fields": {
+      "name": "الاسم",
+      "namePlaceholder": "مثال: ليزر الوجه كاملًا",
+      "category": "الفئة",
+      "colour": "اللون",
+      "colourHint": "يُستخدم لهذه الخدمة في كل مكان",
+      "availableAt": "متاحة في",
+      "availableAtHint": "تُخفى من المواعيد والفواتير في غيرها",
+      "price": "السعر",
+      "priceHint": "السعر الأساسي · يظهر على الفاتورة",
+      "offerPrice": "سعر العرض",
+      "offerPriceHint": "ما تُحصّله · اتركه فارغًا = السعر الأساسي",
+      "offerPriceBelow": "ما تُحصّله · أقل من الأساسي بـ {{percent}}%",
+      "sessions": "الجلسات",
+      "sessionsHint": "الجلسات المسموح بها مقابل فاتورة واحدة",
+      "gstRate": "نسبة GST",
+      "gst": "GST",
+      "gstInclusive": "شامل",
+      "gstExclusive": "غير شامل",
+      "floor": "أدنى سعر",
+      "floorShown": "ظاهر · تراه أنت فقط",
+      "floorHidden": "مخفي · اضغط للتعيين",
+      "floorHint": "لا يمكن للاستقبال الفوترة بأقل منه",
+      "billedToday": "المُحصّل اليوم",
+      "freeSessions_zero": "+{{count}} جلسة مجانية",
+      "freeSessions_one": "+{{count}} جلسة مجانية",
+      "freeSessions_two": "+{{count}} جلستان مجانيتان",
+      "freeSessions_few": "+{{count}} جلسات مجانية",
+      "freeSessions_many": "+{{count}} جلسة مجانية",
+      "freeSessions_other": "+{{count}} جلسة مجانية",
+      "belowList": "أقل من الأساسي بـ {{percent}}%",
+      "duration": "المدة",
+      "durationQuick": "{{minutes}} د",
+      "minutesUnit": "د",
+      "validity": "الصلاحية",
+      "validityHint": "0 = بلا انتهاء · تضيع الجلسات المتبقية بعدها",
+      "daysUnit": "يوم",
+      "days_zero": "{{count}} يوم",
+      "days_one": "يوم واحد",
+      "days_two": "يومان",
+      "days_few": "{{count}} أيام",
+      "days_many": "{{count}} يومًا",
+      "days_other": "{{count}} يوم",
+      "validityQuick": {
+        "none": "بلا",
+        "quarter": "3 أشهر",
+        "half": "6 أشهر",
+        "year": "سنة"
+      },
+      "searchTerms": "كلمات البحث",
+      "searchTermsHint": "مفصولة بفواصل",
+      "searchTermsPlaceholder": "ليزر، وجه، إزالة الشعر",
+      "description": "الوصف",
+      "descriptionPlaceholder": "ما الذي تشمله",
+      "status": "الحالة",
+      "active": "نشطة · قابلة للحجز",
+      "inactive": "غير نشطة · مخفية",
+      "gstChip": "{{value}}%",
+      "gstHint": "0% للاستشارة و18% لغيرها — إلى أن تختار نسبة"
+    },
+    "offerTill": "حتى {{date}}",
+    "untitled": "بلا اسم",
+    "save": {
+      "create": "إنشاء الخدمة",
+      "edit": "حفظ التغييرات",
+      "createAnother": "إنشاء وإضافة أخرى"
+    },
+    "toasts": {
+      "addName": "أضف اسمًا",
+      "addPrice": "أضف سعرًا",
+      "offerAbovePrice": "لا يمكن أن يزيد سعر العرض على السعر",
+      "floorAboveOffer": "لا يمكن أن يزيد أدنى سعر على سعر العرض",
+      "offerBelowFloor": "أقل من أدنى سعر لهذه الخدمة — اطلب ذلك من المالك أو المسؤول",
+      "floorAbovePrice": "لا يمكن أن يزيد أدنى سعر على السعر",
+      "floorNeedsPermission": "لا يسمح دورك بتغيير أدنى سعر — اطلب ذلك من المالك أو المسؤول"
+    }
+  },
+  "offerDrawer": {
+    "title": {
+      "create": "عرض جديد",
+      "edit": "تعديل العرض"
+    },
+    "sub": "سعر لفترة محدودة على خدمة أو أكثر · يُطبَّق تلقائيًا",
+    "untitled": "عرض جديد",
+    "steps": {
+      "offer": "العرض",
+      "where": "أين يُطبَّق",
+      "notes": "ملاحظات"
+    },
+    "fields": {
+      "name": "الاسم",
+      "namePlaceholder": "مثال: توهّج ديوالي",
+      "code": "الرمز",
+      "codeHint": "اختياري · للإعلانات",
+      "codePlaceholder": "GLOW20",
+      "type": "النوع",
+      "value": {
+        "percent": "الخصم",
+        "amount": "مبلغ الخصم",
+        "fixed": "سعر العرض",
+        "extra": "جلسات مجانية"
+      },
+      "percentQuick": "{{value}}%",
+      "sessionsUnit": "جلسات",
+      "colour": "اللون",
+      "colourHint": "يميّز هذا العرض على الخدمات والفواتير",
+      "offerings": "الخدمات",
+      "offeringsHint": "اختر واحدة أو أكثر",
+      "offeringsSearch": "ابحث في الخدمات",
+      "branches": "الفروع",
+      "branchesHint": "حيث يمكن للاستقبال استخدامه",
+      "starts": "يبدأ",
+      "ends": "ينتهي",
+      "previewPrice": "{{before}} ← {{after}}",
+      "previewSessions_zero": "{{before}} ← {{count}} جلسة",
+      "previewSessions_one": "{{before}} ← جلسة واحدة",
+      "previewSessions_two": "{{before}} ← جلستان",
+      "previewSessions_few": "{{before}} ← {{count}} جلسات",
+      "previewSessions_many": "{{before}} ← {{count}} جلسة",
+      "previewSessions_other": "{{before}} ← {{count}} جلسة",
+      "note": "ملاحظة",
+      "notePlaceholder": "لمن هو، وكيف يذكره الاستقبال",
+      "status": "الحالة",
+      "live": "مفعّل · يُطبَّق تلقائيًا",
+      "paused": "متوقف مؤقتًا"
+    },
+    "offeringCount_zero": "{{count}} خدمة",
+    "offeringCount_one": "خدمة واحدة",
+    "offeringCount_two": "خدمتان",
+    "offeringCount_few": "{{count}} خدمات",
+    "offeringCount_many": "{{count}} خدمة",
+    "offeringCount_other": "{{count}} خدمة",
+    "save": {
+      "create": "إنشاء العرض",
+      "edit": "حفظ العرض"
+    },
+    "toasts": {
+      "name": "سمِّ العرض",
+      "offerings": "اختر خدمة واحدة على الأقل",
+      "value": {
+        "percent": "حدّد الخصم",
+        "amount": "حدّد المبلغ",
+        "fixed": "حدّد المبلغ",
+        "extra": "حدّد الجلسات المجانية"
+      },
+      "endsBeforeStart": "ينتهي قبل أن يبدأ",
+      "offeringInactive": "{{name}} لم تعد نشطة — أزلها أو اختر غيرها"
+    }
+  }
+}

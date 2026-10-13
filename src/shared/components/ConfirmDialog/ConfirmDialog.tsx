@@ -1,93 +1,191 @@
-import { type ReactNode, useState } from 'react';
+import { type ReactNode, type RefObject, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/shared/components/ui/alert-dialog.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
 
-export interface ConfirmDialogProps {
+import {
+  CONFIRM_BUTTON_CLASS,
+  CONFIRM_KEYS,
+  CONFIRM_NS,
+  CONFIRM_TEST_IDS,
+  type ConfirmLayout,
+} from './confirm-dialog.constants.ts';
+import { ConfirmPanel } from './confirm-panel.tsx';
+import { runConfirmedWrite } from './confirmed-write.ts';
+import { ReasonConfirm, type ReasonConfirmProps } from './ReasonConfirm.tsx';
+
+/** A plain confirm's own test ids, for a surface whose specs already name them. */
+export type ConfirmTestIds = Partial<Record<'dialog' | 'cancel' | 'accept', string>>;
+
+/** The confirm every platform surface uses — `ConfirmDialog` without `reason`. */
+export interface PlainConfirmDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
   description?: ReactNode;
+  /** The action's label; "Confirm" by default. */
   confirmLabel?: string;
+  /** The dismiss button's label; "Cancel" by default. */
   cancelLabel?: string;
   /** Style the confirm button as a destructive (red) action. */
   destructive?: boolean;
+  /** The surface's own test ids; `confirm-dialog` / `-cancel` / `-accept` otherwise. */
+  testIds?: ConfirmTestIds;
+  /** Absent here: setting it switches to the reason confirm. */
+  reason?: never;
   /** Runs on confirm. If it resolves the dialog closes; if it throws it stays
    * open (the caller surfaces the error, e.g. via `notify`). */
   onConfirm: () => void | Promise<void>;
 }
 
 /**
- * Shared confirmation dialog for destructive / irreversible actions (remove a
- * member, delete a role or API key, delete an organization). Manages its own
- * busy state across the async confirm and blocks dismissal while in flight.
+ * Props of {@link ConfirmDialog}: the plain confirm, or — with `reason` — the
+ * reason confirm whose `onConfirm` receives the picked reason and note. Both
+ * take the same frame: the end panel from `md`, the bottom sheet below.
  */
-export function ConfirmDialog({
+export type ConfirmDialogProps = PlainConfirmDialogProps | ReasonConfirmProps;
+
+/** What the plain confirm's footer draws. */
+interface PlainConfirmFooterOptions {
+  busy: boolean;
+  destructive: boolean;
+  testIds: ConfirmTestIds | undefined;
+  /** "Cancel" — the initial focus. */
+  cancelRef: RefObject<HTMLButtonElement | null>;
+  cancelLabel: string;
+  confirmLabel: string;
+  onCancel: () => void;
+  onConfirm: () => Promise<void>;
+}
+
+/** The plain confirm's footer — Cancel and the action — sized for the frame's `layout`. */
+function plainConfirmFooter(
+  layout: ConfirmLayout,
+  {
+    busy,
+    destructive,
+    testIds,
+    cancelRef,
+    cancelLabel,
+    confirmLabel,
+    onCancel,
+    onConfirm,
+  }: PlainConfirmFooterOptions,
+) {
+  return (
+    <>
+      <Button
+        ref={cancelRef}
+        type="button"
+        variant="outline"
+        disabled={busy}
+        onClick={onCancel}
+        data-testid={testIds?.cancel ?? CONFIRM_TEST_IDS.cancel}
+        className={CONFIRM_BUTTON_CLASS[layout]}
+      >
+        {cancelLabel}
+      </Button>
+      <Button
+        type="button"
+        variant={destructive ? 'destructive' : 'default'}
+        onClick={onConfirm}
+        disabled={busy}
+        isLoading={busy}
+        data-testid={testIds?.accept ?? CONFIRM_TEST_IDS.accept}
+        className={CONFIRM_BUTTON_CLASS[layout]}
+      >
+        {confirmLabel}
+      </Button>
+    </>
+  );
+}
+
+/**
+ * The plain confirm in the confirm frame: title, optional description, Cancel
+ * and the action. Cancel takes the initial focus; on close focus goes back to
+ * whatever was focused when it opened.
+ */
+function PlainConfirmDialog({
   open,
   onOpenChange,
   title,
   description,
-  confirmLabel = 'Confirm',
-  cancelLabel = 'Cancel',
+  confirmLabel,
+  cancelLabel,
   destructive = false,
+  testIds,
   onConfirm,
-}: ConfirmDialogProps) {
+}: Omit<PlainConfirmDialogProps, 'reason'>) {
+  const { t } = useTranslation(CONFIRM_NS);
   const [busy, setBusy] = useState(false);
+  // `busy` lands a render late; the ref drops a second click inside that frame.
+  const busyRef = useRef(false);
+  const cancelRef = useRef<HTMLButtonElement>(null);
+
+  // Every exit — Cancel, ×, the backdrop, Esc — is held while the write runs.
+  const dismiss = () => {
+    if (!busyRef.current) onOpenChange(false);
+  };
 
   const handleConfirm = async () => {
+    if (busyRef.current) return;
+    busyRef.current = true;
     setBusy(true);
     try {
-      await onConfirm();
+      await runConfirmedWrite(onConfirm);
       onOpenChange(false);
     } catch {
       // Keep the dialog open — the caller is responsible for surfacing the error.
     } finally {
+      busyRef.current = false;
       setBusy(false);
     }
   };
 
   return (
-    <AlertDialog
+    <ConfirmPanel
       open={open}
-      onOpenChange={(next) => {
-        // Don't allow dismissal mid-flight.
-        if (!busy) onOpenChange(next);
-      }}
-    >
-      <AlertDialogContent data-testid="confirm-dialog">
-        <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
-          {description ? (
-            <AlertDialogDescription>{description}</AlertDialogDescription>
-          ) : (
-            <AlertDialogDescription className="sr-only">
-              Please confirm this action.
-            </AlertDialogDescription>
-          )}
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel disabled={busy} data-testid="confirm-cancel">
-            {cancelLabel}
-          </AlertDialogCancel>
-          <Button
-            variant={destructive ? 'destructive' : 'default'}
-            onClick={handleConfirm}
-            disabled={busy}
-            isLoading={busy}
-            data-testid="confirm-accept"
-          >
-            {confirmLabel}
-          </Button>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+      onDismiss={dismiss}
+      busy={busy}
+      title={title}
+      description={
+        description ? (
+          <div className="text-body text-muted-foreground-strong text-pretty">
+            {description}
+          </div>
+        ) : (
+          <div className="sr-only">{t(CONFIRM_KEYS.fallbackDescription)}</div>
+        )
+      }
+      initialFocusRef={cancelRef}
+      testId={testIds?.dialog ?? CONFIRM_TEST_IDS.dialog}
+      footer={(layout) =>
+        plainConfirmFooter(layout, {
+          busy,
+          destructive,
+          testIds,
+          cancelRef,
+          cancelLabel: cancelLabel ?? t(CONFIRM_KEYS.cancel),
+          confirmLabel: confirmLabel ?? t(CONFIRM_KEYS.accept),
+          onCancel: dismiss,
+          onConfirm: handleConfirm,
+        })
+      }
+    />
   );
+}
+
+/**
+ * Shared confirmation for destructive / irreversible actions, in one frame for
+ * every surface: a full-height panel at the inline end from `md`, a bottom
+ * sheet below (`ConfirmPanel`). By default the plain confirm (remove a member,
+ * delete a role or API key, delete an organization, discard changes); with
+ * `reason` the clinic rooms' reason confirm — the schema's `delete_reason`
+ * chips, a note, and Undo for 10s after the write (KICKOFF §3.5). Either way it
+ * holds its busy state across the async confirm and blocks dismissal while in
+ * flight.
+ */
+export function ConfirmDialog(props: ConfirmDialogProps) {
+  if (props.reason) return <ReasonConfirm {...props} />;
+  return <PlainConfirmDialog {...props} />;
 }

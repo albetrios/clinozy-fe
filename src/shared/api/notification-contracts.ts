@@ -29,7 +29,7 @@ export type NotificationCategory = z.infer<typeof notificationCategorySchema>;
  */
 const NOTIFICATION_TYPES_BY_CATEGORY: Record<NotificationCategory, readonly string[]> = {
   system: ['system.welcome', 'system.maintenance', 'webhook.delivery_failed'],
-  member: ['membership.invite_accepted'],
+  member: ['membership.invite_accepted', 'membership.invite_declined'],
   billing: [
     'billing.usage_threshold',
     'billing.payment_succeeded',

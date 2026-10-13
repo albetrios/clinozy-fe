@@ -11,17 +11,27 @@ Where a bare `/` lands, decided from the JWT-backed session context.
 1. `resolveRootRedirect()` → `ensureSessionContext()` (cache-first read of
    `me/context`: onboarding flag + deployment flags + active org; refetches only
    on a cold boot).
-2. `resolveRootTarget(ctx)`:
+2. `resolveRootTarget(ctx, { pendingInvitations })` (`resolveRootTargetWithInvitations` reads the
+   invitations only when there is no active team org — a failed read counts as none):
+   - **Invited with no clinic (D84):** pending invitations, a team deployment and no active team
+     org → `/organization`, the picker, which lists them with Accept / Decline. Checked _before_
+     onboarding: team-only onboarding creates a clinic, and an invitee must not get a second,
+     empty one. After an accept the clinic is active, so the next decision is onboarding (its
+     profile steps only — the workspace step is skipped for someone who belongs to a clinic) or
+     the clinic's home.
    - **Onboarding first, every mode:** `needsOnboarding(ctx)` (i.e.
      `!user.onboarding_completed`) → `/onboarding`. This is checked _before_ any
      active-org routing, so a personal deployment's auto-provisioned org does not
      short-circuit a fresh user past the wizard.
-   - Then by `(deploymentMode, activeOrg)`:
-     - `personal-only`: active PERSONAL → `/dashboard`; none → `/dashboard`.
-     - `team-only`: active TEAM with slug → `/organization/$slug/dashboard`; else
-       `/organization` (picker).
-     - `both`: PERSONAL active → `/dashboard`; TEAM active → `/organization/$slug/dashboard`.
-3. Resolver returns the redirect (`organizationDashboard(slug)` for team targets).
+   - Then the active org: a TEAM with a slug (outside a `personal-only`
+     deployment) → its home, `/organization/$slug` (`organizationHome(slug)`),
+     which sends the member on to their role home (D25: Today for most roles) —
+     or to the picker when they cannot read that org. Everything else — no active
+     org, a PERSONAL active org, a `personal-only` deployment — → `/organization`
+     (the picker): personal workspaces have no clinic (D44), and the picker's list
+     and "Create organization" lead into one.
+3. Resolver returns the redirect. The retired `/dashboard` URL redirects to `/`, so
+   it resolves the same way.
 
 Entry point: `organization-resolver.ts` · Ends at: a redirect target, never an island.
 

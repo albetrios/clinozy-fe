@@ -1,0 +1,195 @@
+{
+  "manifest": {
+    "title": "Prospects"
+  },
+  "record": "Prospect",
+  "toasts": {
+    "created": "Prospect {{id}} créé",
+    "saved": "Prospect enregistré",
+    "statusChanged": "{{name}} → {{status}}",
+    "claimed": "{{name}} est maintenant à vous · {{owner}} reste impliqué",
+    "claimedUnowned": "{{name}} est maintenant à vous",
+    "released": "Libéré pour l’équipe · tout le monde peut le prendre",
+    "assigned": "{{name}} est maintenant responsable · notifié"
+  },
+  "list": {
+    "records": "prospects",
+    "views": {
+      "label": "Vues des prospects",
+      "mine": "Les miens",
+      "unreplied": "Sans réponse",
+      "all": "Tous",
+      "unrepliedCount_one": "{{count}} sans réponse",
+      "unrepliedCount_many": "{{count}} sans réponse",
+      "unrepliedCount_other": "{{count}} sans réponse"
+    },
+    "search": {
+      "placeholder": "Rechercher nom, téléphone, #ID",
+      "label": "Rechercher des prospects"
+    },
+    "newLead": "Nouveau prospect",
+    "columns": {
+      "lead": "Prospect",
+      "status": "Statut",
+      "source": "Source",
+      "interests": "Intéressé par",
+      "team": "Équipe",
+      "updated": "Mis à jour"
+    },
+    "empty": "Aucun prospect ne correspond",
+    "clearFilters": "Effacer les filtres",
+    "moreInterests_one": "{{count}} de plus : {{list}}",
+    "moreInterests_many": "{{count}} de plus : {{list}}",
+    "moreInterests_other": "{{count}} de plus : {{list}}"
+  },
+  "team": {
+    "claim": "Ouvert · Prendre",
+    "openHint": "Personne ne le détient · tout le monde peut le prendre",
+    "openMine": "Ouvert à l’équipe",
+    "openMineHint": "Votre réservation a expiré · tout le monde peut le prendre",
+    "releasesToday": "Revient à l’équipe aujourd’hui à {{time}}",
+    "releasesTomorrow": "Revient à l’équipe demain à {{time}}",
+    "claimFirst": "Prendre {{first}}",
+    "takeOver": "Reprendre à {{first}}"
+  },
+  "filters": {
+    "status": "Statut",
+    "source": "Source · au choix",
+    "clear": "Effacer",
+    "hold": {
+      "label": "Propriété · réservé après une prise en charge",
+      "any": "Tous",
+      "open": "Ouverts à la prise",
+      "soon": "Libérés aujourd’hui",
+      "held": "Réservés"
+    },
+    "team": {
+      "label": "Équipe · responsable ou impliqué",
+      "anyone": "N’importe qui dans l’équipe",
+      "count_one": "{{count}} personne",
+      "count_many": "{{count}} personnes",
+      "count_other": "{{count}} personnes",
+      "search": "Rechercher dans l’équipe",
+      "noMatch": "Aucun résultat"
+    }
+  },
+  "drawer": {
+    "title": "Modifier le lead",
+    "sub": "Faites vos modifications, puis enregistrez le lead",
+    "idTooltip": "Lead #{{seq}} · créé {{created}} · cliquez pour copier",
+    "idAria": "Copier l’ID du lead #{{seq}}",
+    "idCopied": "ID du lead #{{seq}} copié",
+    "retarget": "Reciblage",
+    "panels": "Panneaux du lead",
+    "details": "Détails",
+    "chat": "Discussion",
+    "resize": "Redimensionner le panneau",
+    "resizeHint": "Faites glisser pour redimensionner · double-cliquez pour réinitialiser",
+    "cards": {
+      "details": "Détails du lead",
+      "progress": "Progression",
+      "info": "Infos"
+    },
+    "source": "Source",
+    "interests": "Intéressé par",
+    "people": "Assigné et impliqués",
+    "peopleAria": "Personnes assignées et impliquées",
+    "addInvolved": "+ Ajouter un impliqué",
+    "claim": "Récupérer",
+    "release": "Libérer",
+    "releaseHint": "Laissez n’importe qui de l’équipe le prendre",
+    "progressAria": "Progression du lead",
+    "steps": {
+      "done": "Fait",
+      "current": "En cours",
+      "next": "Suivant"
+    },
+    "stepTips": {
+      "done": "{{status}} · terminé",
+      "current": "{{status}} · étape en cours",
+      "next": "Passer à {{status}}",
+      "byCheckIn": "Clinique visitée · défini à l’arrivée du patient"
+    },
+    "closeAs": "Clore comme",
+    "info": {
+      "created": "Créé",
+      "lastActivity": "Dernière activité",
+      "none": "Aucun pour l’instant",
+      "patient": "Patient",
+      "linked": "Lié",
+      "notYet": "Pas encore",
+      "openTasks": "Tâches ouvertes",
+      "retargetReason": "Motif du reciblage"
+    },
+    "footer": {
+      "remove": "Supprimer le lead",
+      "discard": "Annuler",
+      "save": "Enregistrer le lead"
+    },
+    "popover": {
+      "title": "Personnes sur ce lead",
+      "search": "Rechercher dans l’équipe",
+      "assignedTo": "Assigné à · qui gère ce lead maintenant",
+      "assign": "Assigner",
+      "assigned": "Assigné",
+      "currentlyAssigned": "Assigné actuellement",
+      "assignTo": "Assigner à {{name}}",
+      "involved": "Impliqué · a travaillé sur ce lead",
+      "noMatch": "Aucun résultat",
+      "note": "✓ Impliqués = tous ceux qui ont travaillé sur ce lead. Ajoutés automatiquement quand ils répondent, appellent, notent ou réservent · vous pouvez aussi ajouter quelqu’un"
+    },
+    "remove": {
+      "title": "Supprimer ce lead ?",
+      "effect": "Le lead quitte toutes les listes et la file du responsable. L’historique de discussion est conservé. Vous pouvez annuler depuis la notification juste après.",
+      "reasons": {
+        "duplicate": "Doublon",
+        "testEntry": "Entrée de test",
+        "spam": "Spam",
+        "other": "Autre"
+      },
+      "removed": "Lead #{{seq}} supprimé · {{reason}}"
+    }
+  },
+  "newLead": {
+    "title": "Nouveau lead",
+    "sub": "Le nom et le mobile suffisent pour commencer",
+    "contact": "Contact",
+    "search": "Rechercher par nom ou mobile",
+    "searchAria": "Rechercher un patient ou un contact existant",
+    "quickStart": "Démarrage rapide",
+    "presets": {
+      "walkIn": "Visite spontanée",
+      "instagramDm": "DM Instagram"
+    },
+    "presetHints": {
+      "walkIn": "À l’accueil maintenant · source Visite spontanée",
+      "instagramDm": "DM sur Instagram"
+    },
+    "hits": {
+      "patient": "Patient · {{id}} · {{phone}}",
+      "contact": "{{id}} · {{phone}}",
+      "openLead": "Lead ouvert · {{id}} · {{phone}}",
+      "open": "Ouvrir le lead",
+      "recreate": "Recréer le lead",
+      "useContact": "Utiliser le contact"
+    },
+    "noMatch": "Aucune correspondance",
+    "more_one": " · +{{count}} autre",
+    "more_many": " · +{{count}} autres",
+    "more_other": " · +{{count}} autres",
+    "change": "Changer",
+    "changeTitle": "Choisir un autre contact",
+    "afterContact": "Après le contact",
+    "detailsSummary": "Source, intérêt et qui s’en occupe",
+    "footer": "Crée ou met à jour un contact",
+    "create": "Créer le lead",
+    "toasts": {
+      "pickFirst": "Choisissez ou ajoutez d’abord le contact",
+      "presetApplied": "Préréglage « {{preset}} » appliqué",
+      "existingPatient": "Patient existant {{id}} · le nouveau lead y sera lié",
+      "existingContact": "Contact existant utilisé : {{name}}",
+      "missing": "Ajoutez un nom et un mobile à 10 chiffres",
+      "open": "Ouvrir"
+    }
+  }
+}

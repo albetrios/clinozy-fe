@@ -1,0 +1,77 @@
+{
+  "manifest": {
+    "title": "Aujourd'hui"
+  },
+  "greeting": {
+    "morning": "Bonjour, {{name}}",
+    "afternoon": "Bon après-midi, {{name}}",
+    "evening": "Bonsoir, {{name}}",
+    "nobody": "l’équipe"
+  },
+  "pulse": "{{inClinic}} à la clinique · {{waiting}} en attente · {{arriving}} attendus · {{day}}, {{time}}",
+  "newBooking": "Nouvelle réservation",
+  "walkIn": "Visite spontanée",
+  "loading": "Chargement de la journée",
+  "lanes": {
+    "label": "Étapes",
+    "names": {
+      "enquiries": "Demandes",
+      "arriving": "Attendus",
+      "waiting": "En attente",
+      "withDoctor": "Avec le médecin",
+      "treatment": "Traitement",
+      "checkout": "Caisse",
+      "pharmacy": "Pharmacie"
+    },
+    "hints": {
+      "oldest": "la plus ancienne {{time}}",
+      "next": "prochain {{time}}",
+      "since": "depuis {{time}}",
+      "none": "—"
+    },
+    "more": "+{{more}}",
+    "count_one": "{{count}} personne",
+    "count_many": "{{count}} personnes",
+    "count_other": "{{count}} personnes",
+    "empty": "Personne ici pour le moment.",
+    "none": "L’activité de la clinique et les demandes ne font pas partie de votre rôle."
+  },
+  "actions": {
+    "book": "Réserver",
+    "checkIn": "Enregistrer l’arrivée",
+    "sendIn": "Faire entrer",
+    "openSession": "Ouvrir la séance",
+    "checkout": "Encaisser",
+    "dispense": "Délivrer"
+  },
+  "card": {
+    "service": "{{service}} · {{where}}",
+    "medicines_one": "{{count}} médicament prescrit",
+    "medicines_many": "{{count}} médicaments prescrits",
+    "medicines_other": "{{count}} médicaments prescrits"
+  },
+  "flags": {
+    "newLead": "Nouveau prospect",
+    "confirmed": "Confirmé",
+    "unconfirmed": "Non confirmé",
+    "waiting": "Attend depuis {{minutes}} min",
+    "inRoom": "En salle depuis {{minutes}} min",
+    "rxApproved": "Ordonnance validée {{time}}",
+    "toPay": "{{amount}} à payer"
+  },
+  "toasts": {
+    "checkedIn": "Arrivée de {{name}} enregistrée · file du médecin et salle prévenues",
+    "sentIn": "{{name}} envoyé(e) chez le médecin",
+    "noRecord": "Pas encore de dossier patient pour {{name}}",
+    "outcome": "{{name}} : {{result}}",
+    "snoozed": "Reportée · {{label}}"
+  },
+  "queue": {
+    "title": "File de travail",
+    "sub": "{{open}} ouvertes · chacune avec un responsable et une échéance",
+    "scope": "Tâches de qui",
+    "owner": "Responsable : {{name}}",
+    "you": "{{name}} (vous)",
+    "closed": "✓ {{result}}"
+  }
+}

@@ -25,7 +25,7 @@ interface PermissionGuardProps {
  * renders `fallback`.
  *
  * @example
- * <PermissionGuard permission="membership:manage">
+ * <PermissionGuard permission="membership:update">
  *   <InviteMemberButton />
  * </PermissionGuard>
  */

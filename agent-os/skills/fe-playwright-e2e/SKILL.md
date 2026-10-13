@@ -21,7 +21,10 @@ All values live in each repo's **`.env.local`** (gitignored dev file, `NODE_ENV=
   `VITE_TURNSTILE_SITE_KEY=1x00000000000000000000AA` (do **not** set `VITE_CAPTCHA_DISABLED`).
 
 Then: boot clinozy-be (`pnpm dev`, wait for `GET /readyz` → 200), and run `pnpm test:e2e` from
-clinozy-fe. `deployment-*.e2e.test.ts` auto-skip unless `me/context` matches their mode pair —
+clinozy-fe. The suite boots its own dev server on `:5180`; when clinozy-be's `ALLOWED_ORIGINS`
+admits only `:5173`, run against the dev server already up there instead —
+`E2E_BASE_URL=http://localhost:5173 pnpm test:e2e` (no `webServer`; the storage state follows the
+origin). `deployment-*.e2e.test.ts` auto-skip unless `me/context` matches their mode pair —
 swap the two `*_ORGANIZATION_ENABLED` values in clinozy-be's `.env.local` and restart to
 exercise personal-only / team-only. CI does the equivalent with `NODE_ENV=test`.
 
@@ -58,7 +61,13 @@ test('logs in', async ({ page }) => {
 
 **Helpers:** `tests/utils/e2e-hybrid.ts` — `AUTH_LABELS`, `LAYOUT_LABELS`, `expect*FormReady`, `expectHybridVisible`.
 
-**Auth flows:** `tests/utils/e2e-auth.ts` — `registerNewUserAndGoToDashboard`, `authenticateViaSignup`, `completeOnboardingWizard`, `navigateInApp` (client-side nav; avoids cold-load auth race — see `__clinozyFeRouter` in `src/main.tsx` dev hook). **All E2E requires clinozy-be** — `tests/e2e/global-setup.ts` fails fast when `/readyz` is down.
+**Auth flows:** `tests/utils/e2e-auth.ts` — `registerNewUserAndGoToToday`, `authenticateViaSignup`, `completeOnboardingWizard`, `navigateInApp` (client-side nav; avoids cold-load auth race — see `__clinozyFeRouter` in `src/main.tsx` dev hook). **All E2E requires clinozy-be** — `tests/e2e/global-setup.ts` fails fast when `/readyz` is down.
+
+**The clinic shell:** the section bar has no sidebar, bell or header theme toggle — the Account
+menu (`openAccountMenu`, `openNotificationCenter`, `chooseThemeMode` in `e2e-hybrid.ts`) holds
+them, and "Switch clinic" (`openOrganizationSwitcher`). A room spec starts from
+`openNewClinic(page)` (`tests/utils/e2e-app.ts`): a new owner of a new clinic on their role home,
+signed in through `page.request` so a cold `page.goto` (a deep link) restores the session.
 
 ## When to use which
 
@@ -68,18 +77,23 @@ test('logs in', async ({ page }) => {
 
 ## File layout
 
-| File                        | Scope                                   |
-| --------------------------- | --------------------------------------- |
-| `auth.e2e.test.ts`          | Unified login, OAuth, guards, email OTP |
-| `dashboard.e2e.test.ts`     | Shell + placeholder dashboard           |
-| `settings.e2e.test.ts`      | Hash modal `#settings/...`              |
-| `navigation.e2e.test.ts`    | 404, auth guards                        |
-| `organization.e2e.test.ts`  | Picker at `/organization`               |
-| `notifications.e2e.test.ts` | Notification center                     |
-| `org-switching.e2e.test.ts` | Dual-URL switcher                       |
-| `responsive.e2e.test.ts`    | 320px overflow                          |
-| `accessibility.e2e.test.ts` | Axe WCAG gate                           |
-| `visual.e2e.test.ts`        | Screenshots (reduced motion)            |
+| File                               | Scope                                                              |
+| ---------------------------------- | ------------------------------------------------------------------ |
+| `auth.e2e.test.ts`                 | Unified login, OAuth, guards, email OTP                            |
+| `home.e2e.test.ts`                 | Landing on Today in the clinic shell                               |
+| `app-rooms.e2e.test.ts`         | Launch smoke: every room, desktop + phone                          |
+| `app-writes.e2e.test.ts`        | Write flows: each room saves through its drawer, and a reload still lists it |
+| `app-roles.e2e.test.ts`         | Role QA: four presets' rooms, homes and controls by code (View-as) |
+| `app-dialog-routes.e2e.test.ts` | Dialog-route deep links (`S:115`)                                  |
+| `settings.e2e.test.ts`             | Hash modal `#settings/...`                                         |
+| `navigation.e2e.test.ts`           | 404, auth guards                                                   |
+| `organization.e2e.test.ts`         | Picker at `/organization`                                          |
+| `notifications.e2e.test.ts`        | Notification center                                                |
+| `org-switching.e2e.test.ts`        | Account menu › Switch clinic                                       |
+| `invitations.e2e.test.ts` | Invitations at sign-in: picker, accept, decline, Invited row (D84) |
+| `responsive.e2e.test.ts`           | 320px overflow                                                     |
+| `accessibility.e2e.test.ts`        | Axe WCAG gate: every room + its main drawer, light and dark        |
+| `visual.e2e.test.ts`               | Screenshots (reduced motion): every room, desktop/phone/dark       |
 
 ## Workflow (new spec)
 
@@ -149,8 +163,9 @@ undecided (`consent-card.e2e.test.ts`).
 `@theme` nor `calc()`, so a unit test can only pin the stylesheet's _text_. When the
 claim is "nothing on this screen still has X", ask the browser: one `page.evaluate` over
 `body *` that returns a description of every offender, asserted `toEqual([])` so the
-failure message **is** the to-do list (`theme-shape.e2e.test.ts` — it found three misses
-grep had not). Three rules keep such a sweep honest:
+failure message **is** the to-do list (the radius/shape sweep, `theme-shape.e2e.test.ts`
+until the theme studio retired — it found three misses grep had not). Three rules keep
+such a sweep honest:
 
 - **Exempt by rule, never by selector** ("at most 10px", "blurred", "dev tooling") — a
   selector list is an allowlist nobody reviews.
@@ -193,17 +208,22 @@ mid-close is swallowed.
 freshly issued code on `send-code` in its local/TEST mode (`debug_verification_code` — the
 field the sign-in form itself prefills from). `echoedVerificationCode(response)` in
 `tests/utils/e2e-session.ts` returns it, or `null` on a backend that does not echo;
-`createSessionViaEmailCode` prefers it and falls back to polling `auth.mail_outbox`. The
+`createSessionViaEmailCode` prefers it and falls back to polling `auth.mail_outbox`, and
+`loginViaEmailCodeUI` reads it from the form's own `send-code` answer the same way. The
 outbox is a second system with its own lag: late in a long suite that lag was the MFA spec's
-entire 90 s budget, while the backend had answered every request. A spec that needs a
+entire 90 s budget, while the backend had answered every request — and once the mail worker
+has sent a row it scrubs the row's HTML, so a poll that starts late finds nothing. A spec that needs a
 _fresh_ code still loops (the backend has a per-email issue window) — it just reads the
 answer it already has.
 
 **The dev server is part of the test.** "Failed to fetch dynamically imported module"
-behind a `504 (Outdated Optimize Dep)` is Vite re-optimizing mid-session because a
-lazy-only dependency was missing from `optimizeDeps.include` (`vite.config.ts`); every lazy
-chunk that pulls a pre-bundled dep then dies until the server restarts. Add the dependency
-there and restart with `--force`. The watcher also reloads pages when `coverage/` is
+behind a `504 (Outdated Optimize Dep)` means the dev server's pre-bundled deps changed
+mid-session; every lazy chunk that pulls one then dies until the server restarts with
+`--force`. Two causes so far: a lazy-only dependency missing from `optimizeDeps.include`
+(`vite.config.ts`) — add it there; and anything else writing `node_modules/.vite/deps` — a
+`createServer()` in a test left on Vite's default `cacheDir` rewrote it on every `pnpm test`
+(`tests/ci/i18n-build.policy.test.ts` now gives its servers their own `cacheDir`; a new
+test that starts Vite does the same). The watcher also reloads pages when `coverage/` is
 rewritten — do not run a coverage pass while a browser suite is using the same server.
 
 **Prove it bites.** Put the old behaviour back for one run and watch the spec fail.
@@ -232,7 +252,7 @@ await page.getByTestId('login-submit').click();
 
 | Resource          | Path                                      |
 | ----------------- | ----------------------------------------- |
-| Test IDs + naming | `agent-os/skills/fe-e2e-testids/SKILL.md`    |
+| Test IDs + naming | `agent-os/skills/fe-e2e-testids/SKILL.md` |
 | Hybrid helpers    | `tests/utils/e2e-hybrid.ts`               |
 | Auth helper       | `tests/utils/e2e-auth.ts`                 |
 | Config            | `playwright.config.ts`                    |

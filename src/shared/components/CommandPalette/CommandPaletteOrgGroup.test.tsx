@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { Command } from 'cmdk';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { Command, CommandList } from '@/shared/components/ui/command.tsx';
 import type * as MyOrganizationSummariesModule from '@/shared/tenancy/my-organization-summaries.ts';
 
 import { CommandPaletteOrgGroup } from './CommandPaletteOrgGroup.tsx';
@@ -25,10 +25,10 @@ function renderGroup(organizations: OrgRow[]) {
     data: organizations,
     isPending: false,
   });
-  // Command.Group/Separator require a cmdk <Command> root for context.
+  // CommandGroup/Separator need a cmdk root (ui/command) for context.
   return render(
     <Command>
-      <Command.List>
+      <CommandList>
         <CommandPaletteOrgGroup
           heading="Organizations"
           currentOrganizationLabel={(name) => `Current: ${name}`}
@@ -37,7 +37,7 @@ function renderGroup(organizations: OrgRow[]) {
           navigate={navigateMock as never}
           personalOrganizationsEnabled={true}
         />
-      </Command.List>
+      </CommandList>
     </Command>,
   );
 }
@@ -82,7 +82,7 @@ describe('CommandPaletteOrgGroup', () => {
     expect(screen.getByText('Switch to Globex')).toBeInTheDocument();
   });
 
-  it('selecting another organization navigates to its dashboard', () => {
+  it('selecting another organization navigates to its home', () => {
     renderGroup([
       { id: 'org_1', name: 'Acme', slug: 'acme', isActive: true },
       { id: 'org_2', name: 'Globex', slug: 'globex', isActive: false },
@@ -91,7 +91,7 @@ describe('CommandPaletteOrgGroup', () => {
     fireEvent.click(screen.getByText('Switch to Globex'));
 
     expect(navigateMock).toHaveBeenCalledWith({
-      to: '/organization/$organizationSlug/dashboard',
+      to: '/organization/$organizationSlug',
       params: { organizationSlug: 'globex' },
     });
   });

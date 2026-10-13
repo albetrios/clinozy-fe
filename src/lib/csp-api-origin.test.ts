@@ -63,6 +63,12 @@ describe('buildContentSecurityPolicy', () => {
     expect(policy).toContain(directive);
   });
 
+  it('lets the browser send uploads to S3 and show stored files from it — nothing else (D86)', () => {
+    expect(policy).toContain("img-src 'self' data: blob: https://*.amazonaws.com");
+    expect(policy).toMatch(/connect-src [^;]*https:\/\/\*\.amazonaws\.com/);
+    expect(policy).not.toMatch(/(?:script|frame|default)-src[^;]*amazonaws/);
+  });
+
   it('adds the API origin to connect-src', () => {
     expect(policy).toContain("connect-src 'self' https://api.example.com");
   });

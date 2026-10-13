@@ -75,7 +75,7 @@ Helpers: `shared/errors/rate-limit.ts` (`isRateLimitError`, `getRateLimitRetryAf
 3. Mutations stay **outside** the boundary.
 4. Custom `loading=` / `errorMessage=` only when defaults are wrong for the layout.
 
-Migrated reference panels: Settings org/account panels, dashboard widgets.
+Migrated reference panels: Settings org/account panels.
 
 ---
 
@@ -109,6 +109,16 @@ unresolved key leak) — fix it in clinozy-be's serializer, not with a per-key F
   giving the user NO feedback). Critical failures MUST render an inline `role="alert"`
   surface (`FormError` banner) as the reliable channel; keep the toast as a secondary echo.
   Clear the banner when the user retries / edits. (See the AuthForm/AuthEmailPanel banners.)
+- **A bare `form.reset(values)` on a mounted form** — a drawer's "Reload" after `409
+  record_changed`, a Quick fill, a template switch. It drops react-hook-form's field refs, and
+  under React Compiler (on in the app, off in Vitest) the memoized `{...form.register(…)}`
+  never registers again: the input keeps what was typed, typing stops reaching the form, and the
+  save sends something else than the screen. `{ keepFieldsRef: true }` alone covers only the
+  first reset of a session. Use `resetFormInPlace(form, values, options)` — or, for the
+  reload, `useEditingRecord` (`src/shared/hooks/useEditingRecord/`); its test does the
+  compiler's memoization by hand, since a drawer test in jsdom cannot see the bug. A `reset`
+  destructured from `useForm(…)` or a `form.reset(` call anywhere in app code fails
+  `tests/ci/form-reset.policy.test.ts`.
 - Inline `isLoading && <Skeleton>` + `isError && <p>` when `QueryBoundary` fits
 - Raw `fetch` for domain APIs (use `apiClient`; auth paths excepted)
 - Storing mutation errors only in Zustand

@@ -1,5 +1,11 @@
 # Preset product-design rules
 
+> **Status (2026-10, L-65):** the Appearance studio and Shuffle are retired. The app
+> wears one look, `clinozy-zinc-pastel`, at the launch's default for every axis
+> ([theming.md](theming.md) → _The axes, at the launch's defaults_). These floors still
+> bind that look — and any future one; the per-axis option ranges below describe the
+> catalogs the studio offered, kept as the reasoning behind the defaults.
+
 **What:** Canonical rules for configuring and consuming Appearance / Shuffle
 presets in a **product UI** (admin, dashboards, settings, data tools) — not
 marketing landings.
@@ -199,8 +205,8 @@ interactive control. Do not `outline-none` without a replacement ring/underline.
 
 ### Typography / fonts (`bodyFontId`, `headingFontId`)
 
-**Rule TY-1 — Web-safe stacks only** (`font-src 'self'`). Use `GENERATED_FONTS`
-catalog only.
+**Rule TY-1 — Same-origin fonts only** (`font-src 'self'`). Use the `GENERATED_FONTS`
+catalog only: self-hosted Inter, or a web-safe system stack — never a font CDN.
 
 **Rule TY-2 — Max two roles:** body (`--font-sans`) + heading (`--font-heading`).
 Mono is fixed for code.
@@ -296,16 +302,15 @@ or deploy lock `VITE_LAYOUT_WIDTH=full`. Do not mix contained + full per random 
 **Rule L-3 — Free responsive grid (preferred):** Compose pages with `grid-cols-1`,
 `sm:grid-cols-2`, `lg:grid-cols-3`, and occasional `col-span-2` on a **small**
 column count — not a global 12-column framework. Use `flex flex-wrap gap-*` for
-chip/action rows. Example: dashboard highlights `lg:grid-cols-3` + `lg:col-span-2`.
+chip/action rows. Example: a main column beside an aside, `lg:grid-cols-3` + `lg:col-span-2`.
 
 **Rule L-3b — 12-column (optional):** Only when a design truly needs fine-grained
 spans (e.g. 8+4 on a 12-track). Default product pages should not use `grid-cols-12`.
 
 **Rule L-4 — Auto-fit inside sections:** Quick actions, card galleries, and
-settings groups use **`repeat(auto-fit, minmax(min(100%, …), 1fr))`** via
-`src/lib/responsive-grid.ts` (`autoFitActionsGrid`, `autoFitCardsGrid`) or
-equivalent Tailwind arbitrary grids. Asymmetric pairs (highlight + stats) use
-`splitMainAsideGrid` (`2fr / 1fr` on `lg+`). Prefer **consistent `gap-*`**
+settings groups use **`repeat(auto-fit, minmax(min(100%, …), 1fr))`** as
+Tailwind arbitrary grids. Asymmetric pairs (highlight + stats) use
+`2fr / 1fr` on `lg+`. Prefer **consistent `gap-*`**
 (scales with density axis).
 
 **Rule L-5 — Prose cap for reading only:** Any multi-sentence description,
@@ -317,27 +322,25 @@ hero subcopy). Headings and data components stay full column width.
 
 **Rule L-7 — Responsive breakpoints:** Mobile = single column, full bleed with
 `p-4` shell padding. `lg` (1024px+) = multi-column page grids (e.g. 3-col +
-2+1 split). Sidebar collapse is layout-shell concern (`AppLayout`), not per-page:
-the sidebar is a **drawer below `lg`** and a permanent column from `lg` up; the
-bottom tab bar exists below `md`.
+2+1 split). Navigation is a layout-shell concern (`AppLayout`), not per-page:
+there is no sidebar — the section bar's one header holds the nav on every
+viewport, and the bottom tab bar exists below `md`.
 
 **Rule L-8 — Big monitors keep growing.** Tailwind's scale ends at `2xl` (1536px).
 `index.css` declares **`3xl` (1920px)** and **`4xl` (2560px)**; the contained
-column, the sidebar, the auth hero and large overlays use them. A layout that stops
+column, the auth hero and large overlays use them. A layout that stops
 at `2xl` covers well under half of an ultrawide and stops lining up with the header
 above it. Reading (~768px) and Full widths are unaffected — a measure does not grow
 with the glass.
 
 ### Current implementation map
 
-| Surface              | File                               | Width pattern                                                                         |
-| -------------------- | ---------------------------------- | ------------------------------------------------------------------------------------- |
-| Authenticated main   | `AppLayout.shared.tsx` → `AppMain` | Appearance → **Layout** (`layoutWidth` store); `data-layout-width` on `#main-content` |
-| Dashboard bento      | `Dashboard.tsx`                    | `splitMainAsideGrid` (2fr/1fr) + `autoFitActionsGrid` / `autoFitCardsGrid`            |
-| Section descriptions | `Dashboard.tsx` `SectionHeading`   | `max-w-prose`                                                                         |
-| Auth forms           | `AuthLayout` variants              | `max-w-md` / `max-w-[400px]`                                                          |
-| Public pages         | `PublicLayout`                     | `max-w-md`                                                                            |
-| Env override         | `core/config/env.ts`               | `VITE_LAYOUT_WIDTH=contained \| full \| reading` (locks Appearance picker)            |
+| Surface            | File                               | Width pattern                                                                         |
+| ------------------ | ---------------------------------- | ------------------------------------------------------------------------------------- |
+| Authenticated main | `AppLayout.shared.tsx` → `AppMain` | Appearance → **Layout** (`layoutWidth` store); `data-layout-width` on `#main-content` |
+| Auth forms         | `AuthLayout` variants              | `max-w-md` / `max-w-[400px]`                                                          |
+| Public pages       | `PublicLayout`                     | `max-w-md`                                                                            |
+| Env override       | `core/config/env.ts`               | `VITE_LAYOUT_WIDTH=contained \| full \| reading` (locks Appearance picker)            |
 
 **Appearance → Layout → Content width:** **Standard** (1536px) · **Full width** · **Reading** (~768px, Claude-style).
 

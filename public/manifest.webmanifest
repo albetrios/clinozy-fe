@@ -1,13 +1,13 @@
 {
   "name": "Clinozy",
   "short_name": "Clinozy",
-  "description": "Enterprise multi-tenant admin dashboard",
+  "description": "Runs a skin, hair and aesthetic clinic end to end — leads, appointments, patient files, prescriptions, the medical store, clinic stock, payments, tasks and offerings — in one app.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#ffffff",
-  "theme_color": "#0a0a0a",
+  "theme_color": "#18181b",
   "categories": ["business", "productivity"],
   "dir": "ltr",
   "lang": "en-US",
@@ -38,10 +38,10 @@
   "screenshots": [],
   "shortcuts": [
     {
-      "name": "Dashboard",
+      "name": "Home",
       "short_name": "Home",
       "url": "/",
-      "description": "Go to the main dashboard"
+      "description": "Open your clinic"
     }
   ]
 }

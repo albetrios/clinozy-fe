@@ -1,0 +1,135 @@
+{
+  "manifest": {
+    "title": "预约"
+  },
+  "record": "预约",
+  "records": "预约",
+  "toolbar": {
+    "viewsLabel": "视图",
+    "views": {
+      "agenda": "日程",
+      "day": "日",
+      "week": "周",
+      "month": "月"
+    },
+    "today": {
+      "day": "今天",
+      "week": "本周",
+      "month": "本月"
+    },
+    "jump": {
+      "day": "跳到今天",
+      "week": "跳到本周",
+      "month": "跳到本月"
+    },
+    "period": "时间范围",
+    "weekRange": "{{from}} – {{to}}",
+    "previous": {
+      "day": "前一天",
+      "week": "上一周",
+      "month": "上个月"
+    },
+    "next": {
+      "day": "后一天",
+      "week": "下一周",
+      "month": "下个月"
+    },
+    "search": "患者、电话或 #ID",
+    "searchLabel": "搜索预约",
+    "newAppointment": "新建预约"
+  },
+  "filters": {
+    "label": "预约筛选",
+    "previousMonth": "上个月",
+    "nextMonth": "下个月",
+    "upcoming": "即将到来（默认）",
+    "dayBooked_other": "{{date}} · 已预约 {{count}} 个",
+    "appointedTo": "负责人",
+    "allDoctors": "所有医生",
+    "searchTeam": "搜索团队",
+    "showAll": "显示全部",
+    "done": "完成",
+    "status": "状态",
+    "all": "全部",
+    "active": "进行中（未结束）"
+  },
+  "agenda": {
+    "columns": {
+      "time": "时间",
+      "contact": "联系人",
+      "service": "服务",
+      "doctor": "负责人",
+      "latest": "最新动态",
+      "quickView": "快速查看",
+      "status": "状态"
+    },
+    "minutes": "{{minutes}} 分钟",
+    "empty": "这里没有预约 · ",
+    "bookOne": "新建一个",
+    "day": {
+      "today": "今天",
+      "tomorrow": "明天",
+      "yesterday": "昨天",
+      "inDays_other": "{{count}} 天后",
+      "nextWeek": "下周",
+      "inWeeks_other": "{{count}} 周后",
+      "daysAgo_other": "{{count}} 天前"
+    },
+    "counts": {
+      "confirmed_other": "<n>{{count}}</n> 个已确认",
+      "awaiting_other": "<n>{{count}}</n> 个待回复",
+      "allSet": "· 全部就绪",
+      "confirmedHint_other": "{{count}} 个已确认",
+      "waitingHint_other": "{{count}} 个等待回复",
+      "hint": "{{confirmed}} · {{waiting}}"
+    },
+    "latest": {
+      "reminderSent": "✓ 提醒已发送",
+      "repliedYes": "✓ 已回复“是”",
+      "moved": "✓ 已改期",
+      "movedTimes": "✓ 已改期 ×{{times}}",
+      "checkedIn": "✓ 已签到"
+    },
+    "latestHints": {
+      "reminderSent": "提醒已发送",
+      "repliedYes": "通过 WhatsApp 回复“是”自动确认",
+      "moved": "从 {{day}} {{time}} 改期",
+      "checkedIn": "患者已签到"
+    },
+    "changeStatus": "更改状态 · {{status}}"
+  },
+  "status": {
+    "title": "更改状态",
+    "now": "当前：<b>{{status}}</b>",
+    "nowReason": "当前：<b>{{status}} · {{reason}}</b>",
+    "why": "为什么取消？",
+    "back": "返回"
+  },
+  "card": {
+    "when": "{{day}} · {{time}} · {{minutes}} 分钟",
+    "noUpdate": "暂无动态",
+    "open": "打开",
+    "reschedule": "改期",
+    "cancel": "取消",
+    "tracker": "状态"
+  },
+  "calendar": {
+    "dayLoad_other": "已预约 {{count}} 个 · {{hours}} 小时",
+    "free": "全天空闲",
+    "doctor": "医生",
+    "bookSlot": "点击空闲时段即可预约",
+    "newAt": "新建预约 · {{day}} · {{time}}",
+    "pastDay": "无法预约过去的日期",
+    "doctorBooked_other": "已预约 {{count}} 个",
+    "doctorFree": "空闲",
+    "chairTime_other": "已预约 {{count}} 个 · 占用 {{percent}}% 的诊椅时间",
+    "chairTimeOverlap_other": "已预约 {{count}} 个 · 占用 {{percent}}% 的诊椅时间 · 存在重叠预约",
+    "overlap": "重叠预约",
+    "more": "还有 {{count}} 个",
+    "dayCount_other": "{{day}} · {{count}} 个预约",
+    "openDay": "打开当天",
+    "block": "{{name}} · {{time}} · {{minutes}} 分钟 · {{service}} · {{doctor}} · {{status}}",
+    "blockClash": "{{name}} · {{time}} · {{minutes}} 分钟 · {{service}} · {{doctor}} · {{status}} · 与另一个预约重叠",
+    "blockTime": "{{time}} · {{minutes}} 分钟"
+  }
+}

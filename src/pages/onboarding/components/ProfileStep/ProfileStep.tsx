@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next';
 
-import { Input } from '@/shared/components/ui/input.tsx';
-import { Label } from '@/shared/components/ui/label.tsx';
+import { DrawerInput } from '@/shared/components/DrawerField/drawer-text-controls.tsx';
+// The field and its input by their own modules: onboarding stays free of the drawer controls.
+import { DrawerField } from '@/shared/components/DrawerField/DrawerField.tsx';
 import { useOnboardingStore } from '@/shared/store/useOnboardingStore/index.ts';
 
 import {
@@ -24,9 +25,11 @@ export function ProfileStep() {
   const patch = useOnboardingStore((s) => s.patch);
   return (
     <div className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="ob-first-name">{t(ONBOARDING_KEYS.profile.firstNameLabel)}</Label>
-        <Input
+      <DrawerField
+        label={t(ONBOARDING_KEYS.profile.firstNameLabel)}
+        htmlFor="ob-first-name"
+      >
+        <DrawerInput
           id="ob-first-name"
           value={firstName}
           onChange={(e) => patch({ firstName: e.target.value })}
@@ -34,10 +37,12 @@ export function ProfileStep() {
           autoComplete="given-name"
           data-testid={ONBOARDING_TEST_IDS.firstName}
         />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="ob-last-name">{t(ONBOARDING_KEYS.profile.lastNameLabel)}</Label>
-        <Input
+      </DrawerField>
+      <DrawerField
+        label={t(ONBOARDING_KEYS.profile.lastNameLabel)}
+        htmlFor="ob-last-name"
+      >
+        <DrawerInput
           id="ob-last-name"
           value={lastName}
           onChange={(e) => patch({ lastName: e.target.value })}
@@ -45,7 +50,7 @@ export function ProfileStep() {
           autoComplete="family-name"
           data-testid={ONBOARDING_TEST_IDS.lastName}
         />
-      </div>
+      </DrawerField>
     </div>
   );
 }

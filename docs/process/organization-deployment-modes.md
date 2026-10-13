@@ -4,7 +4,12 @@ How clinozy-fe should adapt signup, sign-in, onboarding, routing, and the org
 switcher when the backend deployment toggles **personal** and **team**
 organizations independently.
 
-> **Status:** Implemented (Phases 0–5). Deployment flags come from clinozy-be `GET /auth/me/context`.
+> **Status:** Implemented (Phases 0–5). clinozy-be does **not** serve the deployment flags — `GET /auth/me/context`
+> and `GET /users/me` carry no `capabilities` — so the build decides: `VITE_PERSONAL_ORGANIZATIONS` /
+> `VITE_TEAM_ORGANIZATIONS`, set to match the backend's `PERSONAL_ORGANIZATION_ENABLED` /
+> `TEAM_ORGANIZATION_ENABLED`. Unset, the client assumes both kinds (hybrid). Deployed and preview builds
+> take them from the GitHub Environment's variables (`reusable-netlify-deploy.yml`, `preview.yml`); Clinozy
+> runs team-only (`false` / `true`).
 >
 > **Implemented naming:** the proposed `capabilities` API shipped as
 > `src/shared/tenancy/deployment-mode.ts` (pure `resolveDeploymentMode` /
@@ -81,7 +86,8 @@ export function useDeploymentCapabilities(): DeploymentCapabilities;
    clinozy-be exposes on `user` (nested or top-level — confirm in Phase 0).
 2. **`GET /users/me`** — fallback: `personal_organization_id` +
    deployment booleans if present on profile.
-3. **Build-time defaults** — optional `VITE_*` mirrors for Storybook overrides; never override live API values in production.
+3. **Build-time values** — `VITE_PERSONAL_ORGANIZATIONS` / `VITE_TEAM_ORGANIZATIONS`. While clinozy-be serves no
+   flags (sources 1 and 2 find none), these are what decides the mode, in every environment.
 
 **E2E matrix:** run Playwright with clinozy-be toggling `PERSONAL_ORGANIZATION_ENABLED` /
 `TEAM_ORGANIZATION_ENABLED` (scheduled workflow) or unit-test `deployment-mode.ts` with
@@ -116,7 +122,7 @@ provider lists. Disabled methods omit UI; misconfiguration shows an empty state 
 > the backend `me/context.user.onboarding_completed` flag — **not** by whether the
 > user has a workspace. So a fresh user in _any_ mode is routed to `/onboarding`
 > first (even personal deployments, whose personal org is auto-provisioned at
-> signup and would otherwise short-circuit to `/dashboard`). Only the wizard
+> signup and would otherwise short-circuit past it). Only the wizard
 > **steps** differ per mode; `resolveRootTarget` checks onboarding before any
 > active-org routing, and the wizard's finish stamps the flag via
 > `POST /users/me/onboarding/complete`.
@@ -126,11 +132,11 @@ provider lists. Disabled methods omit UI; misconfiguration shows an empty state 
 | Area                 | Behavior                                                                                                                                                                                                                                                                                                                                                                                     |
 | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Signup / sign-in** | Standard auth; backend auto-provisions one PERSONAL org on account completion                                                                                                                                                                                                                                                                                                                |
-| **Post-auth**        | Fresh user (`onboarding_completed: false`) → `/onboarding`; once onboarded → `/dashboard` (personal org is the active org)                                                                                                                                                                                                                                                                   |
+| **Post-auth**        | Fresh user (`onboarding_completed: false`) → `/onboarding`; once onboarded → the `/organization` picker (the personal org is active, and it has no clinic)                                                                                                                                                                                                                                   |
 | **Onboarding**       | Runs; shows **welcome / profile / questions** only — skips **workspace** + **invite** steps (no team to create)                                                                                                                                                                                                                                                                              |
 | **Org switcher**     | **Hidden** — not in AppLayout, not in build-time chrome. User has one implicit workspace                                                                                                                                                                                                                                                                                                     |
 | **Create org**       | **Hidden** — no `CreateOrganizationDialog`, no `/create-organization` nav                                                                                                                                                                                                                                                                                                                    |
-| **URLs**             | Root space only (`/dashboard`, …). No `/organization/$slug` tree in nav; guard may still exist for deep links → 404 or redirect home                                                                                                                                                                                                                                                         |
+| **URLs**             | No clinic space: a `/organization/$slug` route redirects to the picker; the retired `/dashboard` redirects to `/`                                                                                                                                                                                                                                                                            |
 | **Settings**         | Billing under Account (`#settings/account/billing`). Of the Organization group only **Integrations** is shown — the api-key routes are organization-scope `both` on clinozy-be and a personal owner holds `api-key:*`; the panel's webhooks half gates itself on `webhook:read`, which a personal owner does not hold. General / Members / Roles hidden via `sectionsForOrgType('PERSONAL')` |
 
 ### Team only (`team-only`)
@@ -142,43 +148,43 @@ provider lists. Disabled methods omit UI; misconfiguration shows an empty state 
 | **Onboarding**       | Runs; **required** workspace step — user creates their first TEAM org (name + slug). Invite step included                  |
 | **Org switcher**     | Lists **team orgs only** (no Personal section). “Create organization” when allowed                                         |
 | **Create org**       | Available (creates TEAM via `POST /tenancy/organizations`)                                                                 |
-| **URLs**             | Slug space only (`/organization/$slug/dashboard`, …). Root `/dashboard` redirects into active team slug or onboarding      |
+| **URLs**             | Slug space only (`/organization/$slug`, its rooms …). The retired `/dashboard` redirects to `/`                            |
 | **Personal flows**   | Hide `switchToPersonal()`, personal section in switcher, any “Personal workspace” copy                                     |
 
 ### Both (`personal-and-team`) — current target shape
 
-| Area                 | Behavior                                                                                                                                                        |
-| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Signup / sign-in** | Standard auth; backend auto-provisions **personal workspace** (“Personal” / user name)                                                                          |
-| **Post-auth**        | Fresh user (`onboarding_completed: false`) → `/onboarding`; once onboarded, default active org = personal → root `/dashboard`; user may create/join teams       |
-| **Onboarding**       | Runs; shows **welcome / profile / questions** (personal workspace auto-provisioned, so **no** workspace-create step); teams are created later from the switcher |
-| **Org switcher**     | Personal section + Organizations section + Create team                                                                                                          |
-| **URLs**             | Dual-URL: PERSONAL → root; TEAM → `/organization/$slug/…` (existing `resolveRootTarget`)                                                                        |
+| Area                 | Behavior                                                                                                                                                           |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Signup / sign-in** | Standard auth; backend auto-provisions **personal workspace** (“Personal” / user name)                                                                             |
+| **Post-auth**        | Fresh user (`onboarding_completed: false`) → `/onboarding`; once onboarded, default active org = personal → the `/organization` picker; user may create/join teams |
+| **Onboarding**       | Runs; shows **welcome / profile / questions** (personal workspace auto-provisioned, so **no** workspace-create step); teams are created later from the switcher    |
+| **Org switcher**     | Personal section + Organizations section + Create team                                                                                                             |
+| **URLs**             | PERSONAL → the `/organization` picker; TEAM → `/organization/$slug/…` (`resolveRootTarget`)                                                                        |
 
 ---
 
 ## Resolver & guards (changes)
 
-| Component                                   | Change                                                                                                                                                                                    |
-| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `resolveRootTarget` / `resolveRootRedirect` | **Onboarding first** (`!user.onboarding_completed` → `/onboarding`) for every mode; only then branch on `deploymentMode` + active org (personal → `/dashboard`, team → slug, else picker) |
-| `$organizationSlug` org guard               | Team-only: reject/missing personal deep links. Personal-only: slug routes → redirect `/dashboard` or 404                                                                                  |
-| `OrganizationSwitcher`                      | Render `null` when `personal-only`; omit personal section when `team-only`; full UI when both                                                                                             |
-| `useCan({ teamOrganizationOnly: true })`    | Already uses `organizationType === 'TEAM'` — keep this; AND with deployment `teamOrganizations` flag for create-team entry points                                                         |
-| Route manifests                             | Optional `requiresTeamOrganizations: true` alongside `permission` — not a revival of per-org capabilities                                                                                 |
+| Component                                   | Change                                                                                                                                                                   |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `resolveRootTarget` / `resolveRootRedirect` | **Onboarding first** (`!user.onboarding_completed` → `/onboarding`) for every mode; only then branch on `deploymentMode` + active org (team → its home, else the picker) |
+| `$organizationSlug` org guard               | Team-only: reject/missing personal deep links. Personal-only: slug routes → redirect to the `/organization` picker                                                       |
+| `OrganizationSwitcher`                      | Render `null` when `personal-only`; omit personal section when `team-only`; full UI when both                                                                            |
+| `useCan({ teamOrganizationOnly: true })`    | Already uses `organizationType === 'TEAM'` — keep this; AND with deployment `teamOrganizations` flag for create-team entry points                                        |
+| Route manifests                             | Optional `requiresTeamOrganizations: true` alongside `permission` — not a revival of per-org capabilities                                                                |
 
 ---
 
 ## Onboarding step matrix
 
-| Step      | Personal only     | Team only                | Both                                                    |
-| --------- | ----------------- | ------------------------ | ------------------------------------------------------- |
-| welcome   | ✅                | ✅                       | ✅                                                      |
-| profile   | ✅                | ✅                       | ✅                                                      |
-| questions | ✅ (optional)     | ✅ (optional)            | ✅ (optional)                                           |
-| workspace | ❌ skip           | ✅ **required**          | ❌ skip (personal auto-provisioned; teams via switcher) |
-| invite    | ❌ skip           | ✅ optional              | ✅ only when a team org is already active               |
-| done      | ✅ → `/dashboard` | ✅ → team slug dashboard | ✅ → resolver target                                    |
+| Step      | Personal only   | Team only              | Both                                                    |
+| --------- | --------------- | ---------------------- | ------------------------------------------------------- |
+| welcome   | ✅              | ✅                     | ✅                                                      |
+| profile   | ✅              | ✅                     | ✅                                                      |
+| questions | ✅ (optional)   | ✅ (optional)          | ✅ (optional)                                           |
+| workspace | ❌ skip         | ✅ **required**        | ❌ skip (personal auto-provisioned; teams via switcher) |
+| invite    | ❌ skip         | ✅ optional            | ✅ only when a team org is already active               |
+| done      | ✅ → the picker | ✅ → the clinic's home | ✅ → resolver target                                    |
 
 Implement via `useOnboardingStore` step list derived from `deploymentMode` +
 `me/context` (has personal org? has any team org?).
@@ -187,15 +193,14 @@ Implement via `useOnboardingStore` step list derived from `deploymentMode` +
 
 ## Build-time vs runtime
 
-| Flag                | Runtime (API)                        | Build-time (optional override)                                     |
-| ------------------- | ------------------------------------ | ------------------------------------------------------------------ |
-| Org mode            | **Always** from `me/context`         | `VITE_PERSONAL_ORGANIZATIONS` / `VITE_TEAM_ORGANIZATIONS` when set |
-| Auth methods        | **Not from API** — env-only on FE    | `VITE_AUTH_*` per method / OAuth provider                          |
-| Org switcher chrome | Hidden at runtime when personal-only | Tree-shaking not required — conditional render is enough           |
+| Flag                | Runtime (API)                        | Build-time (optional override)                                       |
+| ------------------- | ------------------------------------ | -------------------------------------------------------------------- |
+| Org mode            | Not served by clinozy-be today       | `VITE_PERSONAL_ORGANIZATIONS` / `VITE_TEAM_ORGANIZATIONS` — set both |
+| Auth methods        | **Not from API** — env-only on FE    | `VITE_AUTH_*` per method / OAuth provider                            |
+| Org switcher chrome | Hidden at runtime when personal-only | Tree-shaking not required — conditional render is enough             |
 
-Do **not** fork separate production builds per mode unless product explicitly
-requires it; one bundle reading runtime capabilities is simpler and matches
-backend deployment toggles.
+One bundle per environment: until clinozy-be serves the capabilities, the mode is a build-time
+setting, so each environment's two variables must match its backend's toggles.
 
 ---
 
@@ -255,7 +260,7 @@ backend deployment toggles.
 ## Acceptance criteria (when implemented)
 
 1. With clinozy-be `personal_organizations: true`, `team_organizations: false` — no
-   org switcher, no create-team, onboarding skips workspace, `/` → `/dashboard`.
+   org switcher, no create-team, onboarding skips workspace, `/` → the `/organization` picker.
 2. With clinozy-be `personal_organizations: false`, `team_organizations: true` — no
    personal section, onboarding requires workspace create, `/` with no org →
    `/onboarding`.

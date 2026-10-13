@@ -1,6 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 
-import { registerNewUserAndGoToDashboard } from '@/tests/utils/e2e-auth.ts';
+import { registerNewUserAndGoToToday } from '@/tests/utils/e2e-auth.ts';
 import { byTestId, expectLoginFormReady } from '@/tests/utils/e2e-hybrid.ts';
 import { verifyDatabaseConnection } from '@/tests/utils/e2e-session.ts';
 
@@ -25,8 +25,27 @@ interface Box {
   height: number;
 }
 
+/**
+ * Where the element comes to rest. The card moves: it slides in, and its
+ * `duration-300` also times every transition, so when the tab bar mounts its
+ * `bottom` glides from 12px to clear of the bar over 300ms. A box read mid-move
+ * overlapped the bar — the flake. Wait out every running animation and
+ * transition (a new one can start as an old one ends), then measure.
+ */
 async function boxOf(page: Page, testId: string): Promise<Box> {
-  const box = await byTestId(page, testId).boundingBox();
+  const element = byTestId(page, testId);
+  await element.evaluate(async (node) => {
+    for (
+      let running = node.getAnimations();
+      running.length > 0;
+      running = node.getAnimations()
+    ) {
+      await Promise.all(
+        running.map((animation) => animation.finished.catch(() => undefined)),
+      );
+    }
+  });
+  const box = await element.boundingBox();
   if (!box) throw new Error(`${testId} has no layout box`);
   return box;
 }
@@ -128,6 +147,43 @@ test.describe('Cookie consent card', () => {
     await expect(byTestId(page, 'consent-banner')).toBeHidden();
   });
 
+  test('closing counts as declining, and is remembered (D161)', async ({ page }) => {
+    await page.goto('/login');
+    await expectLoginFormReady(page);
+
+    // a11y guard: the close button says what closing does.
+    await expect(
+      page.getByRole('button', { name: 'Close (counts as declining)' }),
+    ).toBeVisible();
+    await byTestId(page, 'consent-close').click();
+    await expect(byTestId(page, 'consent-banner')).toBeHidden();
+
+    await page.reload();
+    await expectLoginFormReady(page);
+    await expect(byTestId(page, 'consent-banner')).toBeHidden();
+    const stored = await page.evaluate(() => localStorage.getItem('clinozy-consent'));
+    expect(stored).toContain('"analyticsConsent":"denied"');
+  });
+
+  test('asks again once the answer is six months old (D161)', async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem(
+        'clinozy-consent',
+        JSON.stringify({
+          state: {
+            analyticsConsent: 'granted',
+            decidedAt: '2020-01-01T00:00:00.000Z',
+            policyVersion: 1,
+          },
+          version: 1,
+        }),
+      );
+    });
+    await page.goto('/login');
+    await expectLoginFormReady(page);
+    await expect(byTestId(page, 'consent-banner')).toBeVisible({ timeout: 15_000 });
+  });
+
   test('rides above the mobile tab bar instead of covering it', async ({ page }) => {
     test.setTimeout(120_000);
     expect(
@@ -139,7 +195,7 @@ test.describe('Cookie consent card', () => {
     // wizard, whose Continue button sits at the very end of the page, exactly
     // where a full-width card lands. The page reserves the card's height at its
     // end, so every step can still be scrolled clear of it and pressed.
-    await registerNewUserAndGoToDashboard(page);
+    await registerNewUserAndGoToToday(page);
     await expect(byTestId(page, 'consent-banner')).toBeVisible();
 
     const tabBar = await boxOf(page, 'mobile-bottom-bar');

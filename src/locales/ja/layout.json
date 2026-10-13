@@ -1,68 +1,14 @@
 {
-  "brand": {
-    "name": "{{productName}}"
-  },
   "a11y": {
-    "skipToMain": "メインコンテンツへスキップ",
-    "mainNavigation": "メインナビゲーション",
-    "sidebarNavigation": "サイドバーナビゲーション",
-    "mobileNavigation": "モバイルナビゲーション"
-  },
-  "auth": {
-    "switchToRegister": "アカウントを作成",
-    "switchToSignIn": "サインイン",
-    "statusOperational": "すべてのシステムが稼働中",
-    "badge": "オペレーションをひとつに",
-    "heroTitle": "組織のためのオペレーティングシステム。",
-    "heroSubtitle": "メンバー、ロール、請求、セキュリティ — すべてのチーム向けの高速でキーボードファーストなワークスペース。",
-    "features": {
-      "multiOrg": {
-        "title": "マルチ組織対応",
-        "body": "ツールを切り替えずにチームを切り替え。"
-      },
-      "secure": {
-        "title": "デフォルトで安全",
-        "body": "RBAC、MFA、パスキー、監査証跡。"
-      },
-      "fast": {
-        "title": "どこでも高速",
-        "body": "キーボードファーストのリアルタイム作業向けに構築。"
-      }
-    },
-    "stats": {
-      "teams": "チーム",
-      "uptime": "稼働率",
-      "compliant": "準拠"
-    }
+    "skipToMain": "メインコンテンツへスキップ"
   },
   "app": {
     "search": "検索",
-    "searchPlaceholder": "検索...",
     "searchShortcutMac": "⌘K",
     "searchShortcutWindows": "Ctrl+K",
-    "userMenu": "ユーザーメニュー",
     "userFallback": "ユーザー",
     "settings": "設定",
     "logOut": "ログアウト",
-    "toggleSidebar": "サイドバーを切り替え",
-    "footerCopyright": "© {{year}} {{productName}} Platform",
-    "nav": {
-      "dashboard": "ダッシュボード"
-    },
-    "sidebar": {
-      "workspace": "ワークスペース",
-      "menu": "メニュー",
-      "shortcuts": "ショートカット"
-    },
-    "contextStrip": {
-      "label": "クイックアクセス",
-      "labelSolo": "移動",
-      "profile": "プロフィール",
-      "security": "セキュリティ",
-      "billing": "請求",
-      "appearance": "外観",
-      "shortcuts": "ショートカット"
-    },
     "workspaceSwitch": {
       "preparing": "ワークスペースを準備しています",
       "loadingAccess": "メンバーと権限を読み込んでいます",
@@ -74,7 +20,10 @@
       "personal": "個人",
       "yourOrganizations": "あなたの組織",
       "organizations": "組織",
-      "addOrganization": "組織を追加"
+      "addOrganization": "組織を追加",
+      "invited": "招待",
+      "invitedRow": "招待中 · {{roles}}",
+      "invitationCount": "招待: {{count}}"
     },
     "notifications": {
       "title": "通知",
@@ -90,17 +39,15 @@
       "settingsLink": "通知設定"
     },
     "commandPalette": {
-      "ariaLabel": "コマンドパレット",
-      "placeholder": "コマンドを入力するか検索...",
+      "ariaLabel": "コマンドメニュー",
+      "placeholder": "検索または移動…",
       "empty": "結果が見つかりません。",
       "groups": {
-        "navigation": "ナビゲーション",
         "theme": "テーマ",
         "account": "アカウント",
         "organizations": "組織",
         "shortcuts": "ショートカット"
       },
-      "dashboard": "ダッシュボード",
       "userSettings": "ユーザー設定",
       "organizationSettings": "組織設定",
       "lightMode": "ライトモード",
@@ -118,6 +65,10 @@
       "commandPalette": "コマンドパレットを開く",
       "showShortcuts": "キーボードショートカットを表示",
       "showShortcutsAlt": "キーボードショートカットを表示（代替）",
+      "allSections": "すべてのセクションを開く・閉じる",
+      "jumpToSection": "セクションへ移動",
+      "listSearch": "リストを検索",
+      "leadRows": "次または前のリード（リード内）",
       "closeDialog": "ダイアログを閉じる"
     },
     "emailVerify": {
@@ -143,16 +94,64 @@
       "nameLabel": "組織名",
       "slugLabel": "ワークスペース URL（任意）",
       "submit": "組織を作成",
-      "submitting": "作成中…"
+      "submitting": "作成中…",
+      "cancel": "キャンセル"
     },
     "theme": {
       "light": "ライト",
       "dark": "ダーク",
-      "system": "システム",
-      "shuffle": "テーマをシャッフル"
+      "system": "システム"
+    },
+    "sectionBar": {
+      "nav": "セクション",
+      "allSections": "すべてのセクション",
+      "allSectionsTitle": "すべてのセクション (G)",
+      "more": "その他",
+      "morePinned": "その他の固定セクション",
+      "tabTitle": "{{section}} · {{description}}",
+      "searchLabel": "検索または移動 (Command K)",
+      "searchTitleMac": "検索または移動… (⌘K)",
+      "searchTitleWindows": "検索または移動… (Ctrl K)",
+      "searchPlaceholder": "患者、リードを検索…",
+      "pin": "バーに固定",
+      "unpin": "バーから固定解除",
+      "pinAria": "バーに固定 · {{section}}",
+      "unpinAria": "バーから固定解除 · {{section}}",
+      "pinFooter": "固定するとバーに残ります",
+      "keysHint": "G · 1–9",
+      "account": "アカウント",
+      "avatarLabel": "{{name}} · {{status}}",
+      "identityRole": "{{role}} · {{branch}}",
+      "status": "ステータス",
+      "presence": {
+        "online": "オンライン",
+        "away": "離席中",
+        "busy": "取り込み中"
+      },
+      "statusToast": "ステータス · {{status}}",
+      "switchClinic": "クリニックを切り替え",
+      "security": "セキュリティ",
+      "billing": "請求",
+      "devices": "デバイス",
+      "appearance": "外観",
+      "appearanceLanguage": "外観と言語",
+      "viewAs": {
+        "previewing": "{{role}} としてプレビュー中",
+        "noSections": "セクションなし",
+        "exit": "プレビューを終了",
+        "exitToast": "自分のアクセスに戻りました"
+      },
+      "branch": {
+        "label": "院 · {{label}}",
+        "title": "院 · {{names}}",
+        "all": "すべての院",
+        "allSub": "統合ビュー · {{count}}院の合計",
+        "viewGroup": "表示",
+        "branchesGroup": "院",
+        "showingAll": "すべての院を表示中",
+        "showing": "{{names}}を表示中",
+        "keepOne": "少なくとも1つの院を残してください"
+      }
     }
-  },
-  "public": {
-    "brandTagline": "チームのための安全なワークスペース"
   }
 }

@@ -51,7 +51,7 @@ export interface PlatformConfig {
   stripePublishableKey: string | undefined;
   /** Emit `[Module]` diagnostic console logs (off in production; on locally). */
   debugLogging: boolean;
-  /** Mount dev-only affordances — React Query Devtools, debug panels, theme shuffle. */
+  /** Mount dev-only affordances — React Query Devtools, debug panels. */
   devtools: boolean;
   /** Install Playwright E2E hooks (`navigateInApp`, `establishSession`) on `globalThis`. */
   e2eHooks: boolean;

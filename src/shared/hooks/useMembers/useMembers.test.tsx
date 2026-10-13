@@ -11,20 +11,26 @@ import type { ListPage } from '@/shared/api/fetch-list-page.ts';
 import { orgQueryKeys } from '@/shared/api/organization-query-keys.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
 
-const { listMembers, updateMemberRole, removeMember, updateMemberStatus } = vi.hoisted(
-  () => ({
-    listMembers: vi.fn(),
-    updateMemberRole: vi.fn(),
-    removeMember: vi.fn(),
-    updateMemberStatus: vi.fn(),
-  }),
-);
+const {
+  listMembers,
+  updateMember,
+  removeMember,
+  leaveOrganization,
+  invalidateSessionContext,
+} = vi.hoisted(() => ({
+  listMembers: vi.fn(),
+  updateMember: vi.fn(),
+  removeMember: vi.fn(),
+  leaveOrganization: vi.fn(),
+  invalidateSessionContext: vi.fn(),
+}));
 vi.mock('@/shared/api/organization-api.ts', () => ({
   listMembers,
-  updateMemberRole,
+  updateMember,
   removeMember,
-  updateMemberStatus,
+  leaveOrganization,
 }));
+vi.mock('@/shared/tenancy/session-context.ts', () => ({ invalidateSessionContext }));
 
 const { notifySuccess, notifyError } = vi.hoisted(() => ({
   notifySuccess: vi.fn(),
@@ -34,14 +40,17 @@ vi.mock('@/shared/notify/index.ts', () => ({
   notify: { success: notifySuccess, error: notifyError },
 }));
 
+import type { Member } from '@/shared/api/organization-contracts.ts';
+
 import {
+  useLeaveOrganization,
   useMembers,
   useRemoveMember,
-  useUpdateMemberRole,
-  useUpdateMemberStatus,
+  useUpdateMember,
+  withMemberChange,
 } from './useMembers.ts';
 
-type Row = { id: string; role?: string; status?: string };
+type Row = { id: string; roleIds?: string[]; roleId?: string; status?: string };
 
 const ORG = 'org_aaaaaaaaaaaaaaaaaaaaa';
 // The infinite list caches under the param-scoped child key; mutations patch it
@@ -109,36 +118,83 @@ describe('useMembers', () => {
   });
 });
 
-describe('useUpdateMemberRole', () => {
-  it('optimistically patches the role across the cached page and keeps it on success', async () => {
+describe('useUpdateMember', () => {
+  it('optimistically patches the roles across the cached page, the main role first, and keeps it', async () => {
     seedPage(client, [
-      { id: 'm_1', role: 'member' },
-      { id: 'm_2', role: 'member' },
+      { id: 'm_1', roleIds: ['rol_a'], roleId: 'rol_a' },
+      { id: 'm_2', roleIds: ['rol_a'], roleId: 'rol_a' },
     ]);
-    updateMemberRole.mockResolvedValue({ id: 'm_1', role: 'admin' });
-    const { result } = renderHook(() => useUpdateMemberRole(), { wrapper });
+    updateMember.mockResolvedValue({ id: 'm_1', roleIds: ['rol_b', 'rol_a'] });
+    const { result } = renderHook(() => useUpdateMember(), { wrapper });
 
-    result.current.mutate({ membershipId: 'm_1', role: 'admin' });
+    result.current.mutate({
+      membershipId: 'm_1',
+      change: { roleIds: ['rol_b', 'rol_a'] },
+    });
 
     await waitFor(() =>
-      expect(pageRows(client)?.find((m) => m.id === 'm_1')?.role).toBe('admin'),
+      expect(pageRows(client)?.find((m) => m.id === 'm_1')?.roleId).toBe('rol_b'),
     );
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(pageRows(client)?.find((m) => m.id === 'm_2')?.role).toBe('member');
-    expect(notifySuccess).toHaveBeenCalledTimes(1);
+    expect(pageRows(client)?.find((m) => m.id === 'm_2')?.roleId).toBe('rol_a');
+    expect(updateMember).toHaveBeenCalledWith(
+      expect.objectContaining({
+        membershipId: 'm_1',
+        change: { roleIds: ['rol_b', 'rol_a'] },
+        idempotencyKey: expect.any(String),
+      }),
+    );
+    expect(notifySuccess).toHaveBeenCalledWith('Member role updated');
   });
 
-  it('rolls back the role when the request fails', async () => {
-    seedPage(client, [{ id: 'm_1', role: 'member' }]);
-    updateMemberRole.mockRejectedValue(new Error('boom'));
-    const { result } = renderHook(() => useUpdateMemberRole(), { wrapper });
+  it('optimistically flips the status badge and says "suspended"', async () => {
+    seedPage(client, [{ id: 'm_1', status: 'active' }]);
+    updateMember.mockResolvedValue({ id: 'm_1', status: 'suspended' });
+    const { result } = renderHook(() => useUpdateMember(), { wrapper });
 
-    result.current.mutate({ membershipId: 'm_1', role: 'admin' });
+    result.current.mutate({ membershipId: 'm_1', change: { status: 'suspended' } });
+
+    await waitFor(() => expect(pageRows(client)?.[0]?.status).toBe('suspended'));
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(notifySuccess).toHaveBeenCalledWith('Member suspended');
+  });
+
+  it('says "saved" for any other change', async () => {
+    seedPage(client, [{ id: 'm_1' }]);
+    updateMember.mockResolvedValue({ id: 'm_1' });
+    const { result } = renderHook(() => useUpdateMember(), { wrapper });
+    await result.current.mutateAsync({
+      membershipId: 'm_1',
+      change: { commissionPercent: 10, roleIds: ['rol_a'] },
+    });
+    expect(notifySuccess).toHaveBeenCalledWith('Member saved');
+  });
+
+  it('rolls back when the request fails', async () => {
+    seedPage(client, [{ id: 'm_1', status: 'active' }]);
+    updateMember.mockRejectedValue(new Error('fail'));
+    const { result } = renderHook(() => useUpdateMember(), { wrapper });
+
+    result.current.mutate({ membershipId: 'm_1', change: { status: 'suspended' } });
 
     await waitFor(() => expect(result.current.isError).toBe(true));
-    expect(pageRows(client)?.[0]?.role).toBe('member');
+    expect(pageRows(client)?.[0]?.status).toBe('active');
     expect(notifyError).toHaveBeenCalledTimes(1);
     expect(notifySuccess).not.toHaveBeenCalled();
+  });
+});
+
+describe('withMemberChange', () => {
+  it('applies the change, never its expected updated_at', () => {
+    const member = {
+      id: 'm_1',
+      roleIds: ['rol_a'],
+      roleId: 'rol_a',
+      updatedAt: 'x',
+    } as Member;
+    expect(
+      withMemberChange(member, { roleIds: [], expectedUpdatedAt: 'y' }),
+    ).toMatchObject({ roleIds: [], roleId: '', updatedAt: 'x' });
   });
 });
 
@@ -148,7 +204,7 @@ describe('useRemoveMember', () => {
     removeMember.mockResolvedValue(undefined);
     const { result } = renderHook(() => useRemoveMember(), { wrapper });
 
-    result.current.mutate('m_1');
+    result.current.mutate({ membershipId: 'm_1', reason: 'not_needed' });
 
     await waitFor(() => expect(ids(client)).toEqual(['m_2']));
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
@@ -160,7 +216,7 @@ describe('useRemoveMember', () => {
     removeMember.mockRejectedValue(new Error('nope'));
     const { result } = renderHook(() => useRemoveMember(), { wrapper });
 
-    result.current.mutate('m_1');
+    result.current.mutate({ membershipId: 'm_1', reason: 'not_needed' });
 
     await waitFor(() => expect(result.current.isError).toBe(true));
     expect(ids(client)).toEqual(['m_1', 'm_2']);
@@ -168,27 +224,20 @@ describe('useRemoveMember', () => {
   });
 });
 
-describe('useUpdateMemberStatus', () => {
-  it('optimistically flips the status badge (suspend)', async () => {
-    seedPage(client, [{ id: 'm_1', status: 'active' }]);
-    updateMemberStatus.mockResolvedValue({ id: 'm_1', status: 'suspended' });
-    const { result } = renderHook(() => useUpdateMemberStatus(), { wrapper });
-
-    result.current.mutate({ membershipId: 'm_1', status: 'suspended' });
-
-    await waitFor(() => expect(pageRows(client)?.[0]?.status).toBe('suspended'));
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+describe('useLeaveOrganization', () => {
+  it('leaves, then drops the session context so the next guard reads it afresh', async () => {
+    leaveOrganization.mockResolvedValue(undefined);
+    const { result } = renderHook(() => useLeaveOrganization(), { wrapper });
+    await result.current.mutateAsync();
+    expect(leaveOrganization).toHaveBeenCalledTimes(1);
+    expect(invalidateSessionContext).toHaveBeenCalledTimes(1);
+    expect(notifySuccess).not.toHaveBeenCalled();
   });
 
-  it('rolls back the status when the request fails', async () => {
-    seedPage(client, [{ id: 'm_1', status: 'active' }]);
-    updateMemberStatus.mockRejectedValue(new Error('fail'));
-    const { result } = renderHook(() => useUpdateMemberStatus(), { wrapper });
-
-    result.current.mutate({ membershipId: 'm_1', status: 'suspended' });
-
-    await waitFor(() => expect(result.current.isError).toBe(true));
-    expect(pageRows(client)?.[0]?.status).toBe('active');
-    expect(notifyError).toHaveBeenCalledTimes(1);
+  it('keeps the session when clinozy-be refuses — the owner must transfer first', async () => {
+    leaveOrganization.mockRejectedValue(new Error('owner cannot leave'));
+    const { result } = renderHook(() => useLeaveOrganization(), { wrapper });
+    await expect(result.current.mutateAsync()).rejects.toThrow('owner cannot leave');
+    expect(invalidateSessionContext).not.toHaveBeenCalled();
   });
 });

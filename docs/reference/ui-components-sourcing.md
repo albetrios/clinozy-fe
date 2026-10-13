@@ -3,7 +3,7 @@
 ## Primary sources
 
 1. **[ui.shadcn.com](https://ui.shadcn.com)** — primitives, CLI, official blocks
-2. **[tablecn.com](https://tablecn.com)** — TanStack Table patterns (see `src/shared/components/DataTable/` + its `DataTableColumnHeader/`/`DataTablePagination/`/`DataTableToolbar/` siblings)
+2. **[tablecn.com](https://tablecn.com)** — TanStack Table patterns (see `src/shared/components/DataTable/` + its `DataTableColumnHeader/`/`DataTableColumnChooser/` siblings; the list toolbar is `RoomToolbar/`)
 
 ## Research ready-made blocks (in order)
 
@@ -28,6 +28,5 @@ Use `agent-os/skills/shadcn/SKILL.md` when choosing components.
 
 ## Stack notes
 
-- Charts: shadcn `chart` (Recharts), lazy-loaded on dashboard.
-- Motion: Anime.js for JS-driven motion (dashboard count-up, onboarding steps) + CSS / `tw-animate-css`.
+- Motion: Anime.js for JS-driven motion (onboarding steps) + CSS / `tw-animate-css`.
 - Tables: TanStack Table + shared data-table toolbar/pagination.

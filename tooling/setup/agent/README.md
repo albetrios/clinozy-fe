@@ -66,6 +66,23 @@ you a whole session over an optional linter.
 | `HEALTHCHECK_URL`            | Override the probe URL (default `http://localhost:<HEALTHCHECK_PORT>/`)                        |
 | `HEALTHCHECK_PORT`           | Port for the transient dev server (default `5173`; must be free — started with `--strictPort`) |
 
+## The session's `.env.local`
+
+A clinozy-fe cloud session is **frontend only**: no clinozy-be, so type-check, lint, unit tests,
+build and size all run, while sign-in, E2E and the signed-in screenshots need a Mac (or a session
+that also brings up clinozy-be). Step 7 writes `.env.local` with nothing to hand over:
+
+| Source                                                                | Keys                                                                                                                                                                                                                                                                                                                                     |
+| --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `envProfiles.local.defaults` (`env-schema.ts`)                        | `VITE_APP_ENV=local`, `VITE_DEV_API_URL=http://localhost:3000`, diagnostics + E2E hooks on, version check off, `BUILD_I18N_MODE=multi`, team-only (`VITE_TEAM_ORGANIZATIONS=true`, `VITE_PERSONAL_ORGANIZATIONS=false`), Turnstile on with Cloudflare's public always-pass **test** site key (pairs with clinozy-be's local test secret) |
+| `bootstrap.sh` (cloud only)                                           | `VITE_AUTH_OAUTH_GOOGLE=false`, `VITE_AUTH_OAUTH_GITHUB=false` — no provider sign-in can complete in a cloud session                                                                                                                                                                                                                     |
+| Schema defaults                                                       | Everything else (`VITE_AUTH_EMAIL`, `VITE_AUTH_PASSKEY`, layout, Sentry sample rates, all clinic rooms on)                                                                                                                                                                                                                               |
+| The environment's **variables** (optional, `setup:local` copies them) | `VITE_STRIPE_PUBLISHABLE_KEY` (a `pk_test_…` key, only to exercise billing), `VITE_POSTHOG_KEY` / `VITE_POSTHOG_HOST` (blank = analytics off). `VITE_SENTRY_DSN` stays blank (Sentry off).                                                                                                                                               |
+
+Never set in a cloud session: `SENTRY_AUTH_TOKEN` / `SENTRY_ORG` / `SENTRY_PROJECT`, `NETLIFY_*` and
+`RELEASE_PLEASE_TOKEN` (CI only), `SONAR_*` (the Docker gate is skipped), a **real** Turnstile key,
+`VITE_API_BASE_URL` and `VITE_CSP_REPORT_URI` (deploy only).
+
 ## Network allowlist
 
 Cloud environments restrict egress. Each host maps to one capability, and a
@@ -79,6 +96,7 @@ blocked host degrades exactly one step:
 | Distro apt mirrors                               | Step 2 packages         | Those tools are skipped      |
 | `astral.sh` / `pypi.org`                         | `uv` + headroom         | headroom MCP unavailable     |
 | `playwright.azureedge.net`, `cdn.playwright.dev` | E2E browsers            | E2E unavailable              |
+| `challenges.cloudflare.com`                      | The Turnstile widget    | `/login` shows no captcha    |
 
 Only the first two are required. In the Claude Code web UI: set Network access
 to **Custom**, add the hosts you want, and keep "Also include default list of

@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next';
 import { platformConfig } from '@/core/config/env.ts';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { Card, CardContent } from '@/shared/components/ui/card.tsx';
 import { reportError } from '@/shared/errors/errorHandler.ts';
 import { AlertTriangle, RotateCw } from '@/shared/icons/index.ts';
 
@@ -70,7 +69,7 @@ function SectionErrorFallback({
   if (variant === 'inline') {
     return (
       <div
-        className="text-muted-foreground flex min-w-0 items-center gap-1.5 rounded-md border border-dashed px-2 py-1"
+        className="text-muted-foreground border-border-strong flex min-w-0 items-center gap-1.5 rounded-lg border border-dashed px-2 py-1"
         data-testid={testId ?? 'widget-error'}
         role="alert"
       >
@@ -114,21 +113,31 @@ function SectionErrorFallback({
     );
   }
 
+  // The design's dashed card (EmptyState's `card` look; `_patterns.md:154`):
+  // 12px corners, a dashed `border-strong` edge, a 12.5px/600 title over a
+  // 12px line, then the way out — no lift, since it stands in for a section.
   return (
-    <Card className="border-dashed" data-testid={testId ?? 'widget-error'} role="alert">
-      <CardContent className="flex min-h-[120px] flex-col items-center justify-center gap-3 p-4 text-center">
-        <AlertTriangle className="text-muted-foreground size-7" aria-hidden="true" />
-        <div>
-          <p className="text-sm font-medium">{heading}</p>
-          <p className="text-muted-foreground mt-1 text-xs">
-            {t(ERRORS_KEYS.widget.message)}
-          </p>
-        </div>
-        <Button type="button" variant="outline" size="sm" onClick={resetErrorBoundary}>
-          {t(ERRORS_KEYS.widget.retry)}
-        </Button>
-      </CardContent>
-    </Card>
+    <div
+      // Its own slot, not `card`: a stand-in for a section stays flat under
+      // every elevation, but the axes can still find it.
+      data-slot="section-fallback"
+      className="border-border-strong bg-card flex min-h-[120px] flex-col items-center justify-center gap-2.5 rounded-xl border border-dashed px-3.5 py-4.5 text-center"
+      data-testid={testId ?? 'widget-error'}
+      role="alert"
+    >
+      <AlertTriangle className="text-muted-foreground size-4" aria-hidden="true" />
+      <div className="flex flex-col gap-1">
+        <p className="text-detail text-foreground-soft leading-[1.3] font-semibold">
+          {heading}
+        </p>
+        <p className="text-muted-foreground text-xs leading-[1.45] text-pretty">
+          {t(ERRORS_KEYS.widget.message)}
+        </p>
+      </div>
+      <Button type="button" variant="outline" size="sm" onClick={resetErrorBoundary}>
+        {t(ERRORS_KEYS.widget.retry)}
+      </Button>
+    </div>
   );
 }
 

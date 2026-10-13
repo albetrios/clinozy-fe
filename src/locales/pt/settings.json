@@ -44,7 +44,6 @@
       "recoveryTitle": "Salve seus códigos de recuperação",
       "recoveryDescription": "Guarde-os em um lugar seguro. Cada um funciona uma vez se você perder o dispositivo.",
       "done": "Concluído",
-      "cancel": "Cancelar",
       "verifyEnable": "Verificar e ativar",
       "codeLabel": "Digite o código de 6 dígitos",
       "codeAria": "Código do autenticador de seis dígitos",
@@ -67,7 +66,6 @@
       "addDescription": "Dê um nome para reconhecê-la depois. Seu dispositivo pedirá para criar a passkey.",
       "nameLabel": "Nome",
       "namePlaceholder": "MacBook Touch ID",
-      "cancel": "Cancelar",
       "submit": "Adicionar passkey"
     },
     "overview": {
@@ -109,12 +107,6 @@
       "sendFailed": "Não foi possível enviar o código. Tente novamente."
     }
   },
-  "discard": {
-    "title": "Descartar alterações não salvas?",
-    "description": "Você tem alterações não salvas. Sair desta seção as descartará.",
-    "stay": "Continuar editando",
-    "leave": "Descartar alterações"
-  },
   "dialog": {
     "title": "Configurações"
   },
@@ -150,7 +142,10 @@
       "cancelInviteDescription": "O link no e-mail deixará de funcionar. Você pode desfazer por alguns segundos após confirmar ou enviar um novo convite mais tarde.",
       "cancelInviteConfirm": "Cancelar convite",
       "cancelInviteKeep": "Manter convite",
-      "cancelInvitePending": "Cancelando o convite para {{email}}…"
+      "cancelInvitePending": "Cancelando o convite para {{email}}…",
+      "movedTitle": "Os membros agora ficam em Usuários",
+      "movedBody": "Convide pessoas, altere as funções delas, pause ou remova, e reenvie ou cancele convites — tudo pela Equipe.",
+      "open": "Abrir Usuários"
     },
     "roles": {
       "title": "Funções",
@@ -178,7 +173,10 @@
       "create": "Nova função",
       "roleFallback": "esta função",
       "permissionsLoading": "Carregando permissões…",
-      "permissionsLoadFailed": "Não foi possível carregar a lista de permissões. Tente novamente."
+      "permissionsLoadFailed": "Não foi possível carregar a lista de permissões. Tente novamente.",
+      "movedTitle": "As funções agora ficam em Usuários",
+      "movedBody": "Adicione, renomeie e exclua funções, e escolha o que cada uma pode fazer — as seções da clínica, Usuários e as permissões do espaço de trabalho — em Funções e acesso.",
+      "open": "Abrir Funções e acesso"
     },
     "listSort": {
       "label": "Ordenar por",
@@ -229,7 +227,15 @@
       "dangerZoneDescription": "Ações irreversíveis para sua conta.",
       "deleteHeading": "Excluir conta",
       "deleteBody": "Exclua permanentemente sua conta e todos os dados associados.",
-      "deleteAction": "Excluir conta"
+      "deleteAction": "Excluir conta",
+      "privacyTitle": "Privacidade",
+      "privacyDescription": "A sua escolha sobre a análise do produto e as gravações de sessão, guardada na sua conta.",
+      "analyticsLabel": "Análise do produto e gravações de sessão",
+      "analyticsHint": "Análise do PostHog e gravações de sessão do Sentry. Os relatórios de erros funcionam de qualquer forma.",
+      "consentGrantedOn": "Permitido em {{date}}",
+      "consentDeniedOn": "Recusado em {{date}}",
+      "consentUnanswered": "Ainda sem resposta",
+      "privacyPolicyLink": "Política de Privacidade"
     },
     "general": {
       "namePlaceholder": "Acme Inc.",
@@ -264,6 +270,7 @@
       "apiKeysNoResults": "Nenhuma chave de API correspondente",
       "apiKeysNoResultsDescription": "Nenhuma chave de API corresponde à sua pesquisa.",
       "apiKeyFallback": "esta chave de API",
+      "addedOn": "adicionada em <1></1>",
       "createApiKey": "Criar chave de API",
       "createApiKeyTitle": "Criar uma chave de API",
       "createApiKeyDescription": "Dê um nome à chave, escolha o que ela pode fazer e quanto tempo dura.",
@@ -299,7 +306,6 @@
       "addWebhookDescription": "Enviaremos os eventos selecionados para esta URL via POST.",
       "payloadUrlLabel": "URL de destino",
       "eventsLabel": "Eventos",
-      "cancel": "Cancelar",
       "createWebhook": "Criar webhook",
       "creating": "Criando…",
       "deleteWebhookAria": "Excluir o webhook {{url}}",
@@ -327,7 +333,6 @@
       "attemptCodeColumn": "Código",
       "attemptWhenColumn": "Quando",
       "attemptCountLabel": "Tentativa {{count}}",
-      "closeDialog": "Fechar",
       "eventsLoadFailed": "Não foi possível carregar a lista de eventos. Tente novamente.",
       "eventsLoading": "Carregando eventos…",
       "eventsEmpty": "Nenhum evento disponível para assinar."
@@ -351,12 +356,14 @@
         "email": "E-mail",
         "inApp": "No app",
         "desktop": "Área de trabalho"
-      }
+      },
+      "kind": "Notificação",
+      "loadFailed": "Não foi possível carregar suas preferências. Tente novamente.",
+      "desktopDenied": "As notificações na área de trabalho precisam da permissão do navegador. Ative-as nas configurações do navegador e depois ligue esta opção novamente."
     },
     "appearance": {
       "title": "Aparência",
-      "description": "Salvo neste dispositivo — as mudanças valem na hora.",
-      "shuffle": "Aleatório"
+      "description": "Salvo neste dispositivo — as mudanças valem na hora."
     },
     "sessions": {
       "title": "Sessões",
@@ -408,6 +415,13 @@
         "expires": "Vence em {{month}}/{{year}}",
         "defaultBadge": "Padrão"
       },
+      "paymentForm": {
+        "saveMethod": "Salvar forma de pagamento",
+        "savingMethod": "Salvando…",
+        "confirmPayment": "Confirmar pagamento",
+        "confirmingPayment": "Confirmando…",
+        "cancel": "Cancelar"
+      },
       "invoices": {
         "title": "Faturas",
         "description": "Data, vencimento, valor e status do seu provedor de cobrança.",
@@ -432,8 +446,7 @@
         "confirmTitle": "Cancelar assinatura?",
         "confirmDescription": "Seu workspace mantém acesso completo até {{date}}. Depois disso, a assinatura termina e os recursos pagos podem ficar limitados.",
         "keep": "Manter assinatura",
-        "confirm": "Confirmar cancelamento",
-        "cancelling": "Cancelando…"
+        "confirm": "Confirmar cancelamento"
       }
     }
   }

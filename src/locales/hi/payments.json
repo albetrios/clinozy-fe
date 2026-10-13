@@ -1,0 +1,466 @@
+{
+  "manifest": {
+    "title": "भुगतान"
+  },
+  "tabs": {
+    "label": "भुगतान के अनुभाग",
+    "ledger": "भुगतान",
+    "pending": "बाकी"
+  },
+  "search": {
+    "placeholder": "मरीज़, इनवॉइस या रसीद",
+    "label": "भुगतान खोजें"
+  },
+  "toolbar": {
+    "dayClose": "दिन का हिसाब",
+    "pay": "भुगतान करें",
+    "payTitle": "भुगतान · पैसा बाहर (किराया, सामान, विक्रेता, रिफ़ंड)",
+    "receive": "प्राप्त करें",
+    "receiveTitle": "प्राप्त करें · मरीज़ से आया पैसा",
+    "addPending": "बाकी जोड़ें",
+    "give": "देना",
+    "giveSub": "हम किसी मरीज़ या पक्ष को पैसा लौटाते हैं",
+    "take": "लेना",
+    "takeSub": "कोई मरीज़ या पक्ष हमें भुगतान करता है"
+  },
+  "columns": {
+    "ref": "संदर्भ",
+    "what": "क्या",
+    "when": "कब",
+    "party": "से / को",
+    "mode": "माध्यम",
+    "amount": "राशि",
+    "by": "द्वारा",
+    "who": "कौन",
+    "way": "किस ओर",
+    "why": "क्यों",
+    "since": "कब से",
+    "state": "स्थिति"
+  },
+  "filters": {
+    "show": "दिखाएँ",
+    "all": "सभी"
+  },
+  "directions": {
+    "received": "प्राप्त",
+    "paid": "भुगतान किया"
+  },
+  "kinds": {
+    "receipt": "प्राप्त",
+    "refund": "मरीज़ को रिफ़ंड",
+    "expense": "भुगतान किया",
+    "money_back": "पैसा वापस",
+    "reversal": "रिवर्सल"
+  },
+  "ledger": {
+    "records": "प्रविष्टियाँ",
+    "edited_one": "{{count}}× बदला गया · पिछला {{from}} → {{to}}",
+    "edited_other": "{{count}}× बदला गया · पिछला {{from}} → {{to}}",
+    "editSide": "{{amount}} {{modes}}",
+    "received": "+ {{amount}}",
+    "paid": "− {{amount}}",
+    "sub": {
+      "invoice": "इनवॉइस #{{seq}}",
+      "sale": "बिक्री · इनवॉइस #{{seq}}",
+      "refund": "रिफ़ंड · क्रेडिट नोट",
+      "refundNote": "रिफ़ंड · क्रेडिट नोट {{note}}",
+      "refundFor": "इनवॉइस #{{seq}} के लिए",
+      "moneyBack": "पैसा वापस",
+      "medicalBill": "मेडिकल PO #{{seq}} · बिल {{bill}}",
+      "stockBill": "स्टॉक PO #{{seq}} · बिल {{bill}}",
+      "fromCredit": "{{ref}} से",
+      "reversed": "रिवर्स किया गया",
+      "medicalOrder": "मेडिकल PO #{{seq}}",
+      "stockPurchase": "स्टॉक PO #{{seq}}"
+    },
+    "dayClosed": "{{ref}} · दिन बंद",
+    "dayClosedEdited_one": "{{ref}} · दिन बंद · {{count}}× बदला गया",
+    "dayClosedEdited_other": "{{ref}} · दिन बंद · {{count}}× बदला गया",
+    "creditEntry": "{{ref}} · {{credit}} से",
+    "fixedEntry": "{{ref}} · इसकी राशि नहीं बदल सकती · वापस लेने के लिए उसी दिन हटाएँ",
+    "search": "मरीज़, भुगतान पाने वाला या PAY- नंबर",
+    "count_one": "{{count}} प्रविष्टि",
+    "count_other": "{{count}} प्रविष्टियाँ"
+  },
+  "rowActions": {
+    "edit": "संपादित करें",
+    "delete": "हटाएँ",
+    "giveBack": "वापस दें",
+    "gotBack": "वापस मिला",
+    "useOnBill": "अगले बिल में इस्तेमाल करें",
+    "reverse": "रिवर्स करें"
+  },
+  "bulk": {
+    "export": "निर्यात करें",
+    "exported_one": "{{count}} पंक्ति CSV के रूप में निर्यात हुई",
+    "exported_other": "{{count}} पंक्तियाँ CSV के रूप में निर्यात हुईं"
+  },
+  "empty": {
+    "ledgerTitle": "कोई प्रविष्टि मेल नहीं खाती",
+    "pendingTitle": "कुछ भी बाकी नहीं",
+    "description": "यहाँ अभी कुछ नहीं है। कोई दूसरा टैब या खोज आज़माएँ।",
+    "receive": "प्राप्त करें"
+  },
+  "deleteEntry": {
+    "title": "यह भुगतान हटाएँ?",
+    "effect": "दिन बंद होने तक अनुमति है। हटाना ऑडिट लॉग में दर्ज रहता है।",
+    "effectInvoice": "दिन बंद होने तक अनुमति है। इनवॉइस #{{seq}} पर फिर से {{due}} बाकी होगा। हटाना ऑडिट लॉग में दर्ज रहता है।",
+    "reasons": {
+      "twice": "दो बार दर्ज हुआ",
+      "amount": "गलत राशि",
+      "party": "गलत मरीज़ या प्राप्तकर्ता"
+    },
+    "removed": "{{ref}} हटाया गया",
+    "removedInvoice": "{{ref}} हटाया गया · इनवॉइस बकाया वापस आया",
+    "blocked": {
+      "dayClosed": "{{ref}} · इसका दिन अब बंद है · इसकी जगह रिवर्स करें",
+      "moreThanPaid": "{{ref}} · यह पैसा एक रिफ़ंड से पहले ही लौटाया जा चुका है · पहले रिफ़ंड हटाएँ"
+    }
+  },
+  "dialog": {
+    "record": "भुगतान",
+    "credit": "बाकी",
+    "dayClosed": "दिन बंद · अब सहेजा नहीं जा सकता"
+  },
+  "pending": {
+    "records": "बाकी प्रविष्टियाँ",
+    "patient": "मरीज़",
+    "party": "सप्लायर / पक्ष",
+    "ways": {
+      "give": "देना",
+      "take": "लेना"
+    },
+    "wayTitles": {
+      "give": "हम उन्हें पैसा लौटाते हैं",
+      "take": "वे हमें भुगतान करते हैं"
+    },
+    "states": {
+      "open": "खुला",
+      "given_back": "लौटाया",
+      "got_back": "प्राप्त",
+      "used": "समायोजित"
+    },
+    "settledToday": "{{state}} · आज",
+    "adjusted": "{{amount}} समायोजित",
+    "invoice": "इनवॉइस #{{seq}}",
+    "byHand": "हाथ से",
+    "deleteTitle": "यह बाकी प्रविष्टि हटाएँ?",
+    "deleted": "{{ref}} हटाया गया",
+    "reasons": {
+      "charged_twice": "दो बार वसूला",
+      "advance_not_used": "अग्रिम इस्तेमाल नहीं हुआ",
+      "package_cancelled": "पैकेज रद्द हुआ",
+      "overpaid": "ज़्यादा भुगतान",
+      "returned_items": "लौटाया गया सामान",
+      "short_payment": "कम भुगतान",
+      "damaged_goods": "खराब सामान लौटाया",
+      "advance_given": "अग्रिम दिया",
+      "loan_to_staff": "स्टाफ़ को उधार",
+      "other": "अन्य"
+    },
+    "adjustedOn": "{{ref}} के {{amount}} इनवॉइस #{{seq}} में समायोजित",
+    "nothingDue": "{{name}} का कोई बकाया नहीं जिसमें समायोजित करें",
+    "search": "व्यक्ति, सप्लायर या CR-",
+    "fromEntry": "एक लेजर एंट्री से",
+    "forInvoice": "एक इनवॉइस के लिए",
+    "settledLocked": "{{ref}} · {{amount}} निपटाए गए · अब बदला नहीं जा सकता",
+    "conflicts": {
+      "settled": "{{ref}} का कुछ हिस्सा अब निपट चुका है · इसे बदला या हटाया नहीं जा सकता",
+      "closed": "{{ref}} पहले ही निपट चुका है",
+      "dayClosed": "इनवॉइस #{{seq}} की शाखा में आज का दिन बंद है · यह क्रेडिट लगाने के लिए उसे फिर खोलें",
+      "dueChanged": "इनवॉइस #{{seq}} का बकाया बदल गया · फिर से कोशिश करें"
+    }
+  },
+  "receive": {
+    "title": "भुगतान प्राप्त करें",
+    "titleEdit": "आया भुगतान बदलें",
+    "sub": "रसीद मरीज़ के लिए WhatsApp कतार में जाती है",
+    "subEdit": "दिन बंद होने तक खुला · हर बदलाव दर्ज होता है",
+    "section": "कौन भुगतान कर रहा है",
+    "branch": "शाखा",
+    "invoice": "इनवॉइस के बदले",
+    "invoiceOpen_one": "{{count}} खुला",
+    "invoiceOpen_other": "{{count}} खुले",
+    "invoiceChip": "{{id}} · {{due}}",
+    "pickPatientFirst": "पहले मरीज़ चुनें",
+    "nothingDue": "कोई बकाया नहीं",
+    "amount": "प्राप्त राशि",
+    "split": "बाँटें · माध्यम जोड़ें",
+    "total": "कुल {{total}}",
+    "totalDue": "कुल {{total}} · बकाया {{due}}",
+    "reference": "रेफ़रेंस",
+    "referenceHint": "UPI रेफ़ / कार्ड के आख़िरी 4",
+    "referencePlaceholder": "जैसे 4321",
+    "note": "नोट",
+    "notePlaceholder": "वैकल्पिक",
+    "quickFill": {
+      "full": "पूरा · {{amount}}",
+      "half": "आधा · {{amount}}",
+      "cashUpi": "नकद + UPI"
+    },
+    "save": "{{amount}} दर्ज करें",
+    "saveEdit": "{{amount}} सहेजें",
+    "summary": "{{modes}} · {{amount}}",
+    "received": "{{name}} से {{amount}} प्राप्त",
+    "updated": "{{ref}} अपडेट · बदलाव दर्ज",
+    "enterAmount": "राशि दर्ज करें",
+    "pickPatient": "मरीज़ चुनें",
+    "aboveDue": "{{due}} बकाया से ज़्यादा",
+    "moreThanDue": "इनवॉइस की अभी की बकाया राशि से ज़्यादा · इस बीच इसका भुगतान हुआ",
+    "totalAdvance": "कुल {{total}} · अग्रिम",
+    "advance": "अग्रिम · कोई इनवॉइस नहीं",
+    "invoicesFailed": "खुले इनवॉइस लोड नहीं हो सके"
+  },
+  "send": {
+    "title": "भुगतान भेजें",
+    "titleEdit": "गया भुगतान बदलें",
+    "sub": "क्लिनिक का ख़र्च · दिन बंद करने में दिखता है",
+    "steps": {
+      "bill": "बिल के बदले भुगतान",
+      "expense": "ख़र्च",
+      "payment": "भुगतान"
+    },
+    "bill": "सप्लायर का बिल",
+    "billHint_one": "{{count}} खुला · PO #, सप्लायर या बिल नं. खोजें",
+    "billHint_other": "{{count}} खुले · PO #, सप्लायर या बिल नं. खोजें",
+    "billPlaceholder": "PO #, सप्लायर या बिल नं. खोजें",
+    "otherSpend": "अन्य ख़र्च",
+    "otherSpendSub": "किसी PO के बदले नहीं",
+    "groups": {
+      "other": "अन्य",
+      "medical": "मेडिकल परचेज़ ऑर्डर",
+      "stock": "क्लिनिक स्टॉक परचेज़ ऑर्डर"
+    },
+    "billLabel": {
+      "medical": "मेडिकल PO #{{seq}} · {{supplier}}",
+      "stock": "स्टॉक PO #{{seq}} · {{supplier}}"
+    },
+    "billRef": {
+      "medical": "मेडिकल PO #{{seq}}",
+      "stock": "स्टॉक PO #{{seq}}"
+    },
+    "billNo": "बिल {{bill}}",
+    "daysPending_one": "{{count}} दिन से बाकी",
+    "daysPending_other": "{{count}} दिनों से बाकी",
+    "pendingToday": "आज",
+    "oldest": "सबसे पुराने बाकी",
+    "oldestChip": "#{{seq}} · {{supplier}} · {{due}} · {{age}}",
+    "category": "श्रेणी",
+    "paidTo": "किसे दिया",
+    "paidToPlaceholder": "विक्रेता या व्यक्ति",
+    "note": "नोट",
+    "notePlaceholder": "क्या ख़रीदा गया",
+    "amount": "राशि",
+    "date": "तारीख़",
+    "mode": "माध्यम",
+    "files": "बिल / रसीद",
+    "filesDrop": "बिल की फ़ोटो छोड़ें या चुनें",
+    "filesHint": "वैकल्पिक · JPG, PNG या PDF",
+    "filesRemove": "{{name}} हटाएँ",
+    "electricity": "बिजली",
+    "presets": {
+      "tea": "चाय और नाश्ता",
+      "courier": "कूरियर"
+    },
+    "save": "ख़र्च जोड़ें",
+    "saveEdit": "बदलाव सहेजें",
+    "another": "जोड़ें और एक और",
+    "added": "ख़र्च {{ref}} जोड़ा गया",
+    "paidBill": "{{bill}} के बदले {{amount}} दिए गए",
+    "saved": "{{ref}} सहेजा गया · बदलाव दर्ज",
+    "missing": "किसे दिया और कितना, यह जोड़ें",
+    "moreThanDue": "बिल की अभी की बकाया राशि से ज़्यादा · इस बीच इसका भुगतान हुआ",
+    "billsFailed": "खुले बिल लोड नहीं हो सके"
+  },
+  "credit": {
+    "title": "बाकी जोड़ें",
+    "titleEdit": "बाकी बदलें",
+    "sub": "क्लिनिक को लौटाना या लेना बाकी पैसा · बाद में बाकी से निपटाएँ",
+    "subEdit": "खुला रहने तक बदल सकते हैं · बदलाव दर्ज होते हैं",
+    "steps": {
+      "way": "किस तरफ़",
+      "why": "क्यों"
+    },
+    "way": "किस तरफ़",
+    "who": "कौन",
+    "whoPlaceholder": "मरीज़, संपर्क या सप्लायर खोजें",
+    "add": "जोड़ें",
+    "groups": {
+      "patients": "मरीज़",
+      "contacts": "संपर्क",
+      "suppliers": "सप्लायर और वेंडर"
+    },
+    "parties": {
+      "patient": "मरीज़ · {{id}}",
+      "contact": "संपर्क",
+      "contactPhone": "संपर्क · {{phone}}",
+      "vendor": "क्लिनिक वेंडर",
+      "supplier": "मेडिकल सप्लायर"
+    },
+    "amount": "राशि",
+    "reason": "वजह",
+    "invoice": "इनवॉइस के लिए",
+    "invoiceHint": "वैकल्पिक · रकम को एक बिल से जोड़ता है",
+    "noInvoice": "कोई इनवॉइस नहीं",
+    "invoicePaid": "{{bill}} · चुकाया",
+    "invoiceDue": "{{bill}} · {{due}} बकाया",
+    "settleBy": "कब तक निपटाएँ",
+    "note": "नोट",
+    "notePlaceholder": {
+      "give": "जैसे उसी UPI आईडी पर रिफ़ंड",
+      "take": "जैसे सप्लायर अगले बिल में समायोजित करेगा"
+    },
+    "problems": {
+      "who": "चुनें कौन",
+      "amount": "राशि डालें",
+      "reason": "वजह चुनें",
+      "otherNote": "“अन्य” के लिए नोट जोड़ें"
+    },
+    "save": {
+      "give": "सहेजें · बाद में दें",
+      "take": "सहेजें · बाद में लें"
+    },
+    "saveEdit": "बदलाव सहेजें",
+    "summary": {
+      "give": "{{name}} को {{amount}} लौटाने हैं",
+      "take": "{{name}} से {{amount}} लेने हैं"
+    },
+    "saved": {
+      "give": "{{ref}} सहेजा गया · {{name}} को {{amount}} देने हैं",
+      "take": "{{ref}} सहेजा गया · {{name}} से {{amount}} लेने हैं"
+    },
+    "updated": "{{ref}} अपडेट किया गया"
+  },
+  "dayClose": {
+    "title": "दिन का क्लोज़",
+    "day": "दिन",
+    "status": {
+      "open": "खुला",
+      "openAuto_one": "खुला · {{count}} घंटे में अपने-आप बंद होगा",
+      "openAuto_other": "खुला · {{count}} घंटे में अपने-आप बंद होगा",
+      "closedBy": "{{name}} ने बंद किया",
+      "closed": "बंद",
+      "forceClosed": "ज़बरदस्ती बंद"
+    },
+    "entries_one": "{{day}} को {{count}} एंट्री",
+    "entries_other": "{{day}} को {{count}} एंट्री",
+    "openDay_one": "{{day}} बंद नहीं · {{count}} घंटे बाकी · देखें",
+    "openDay_other": "{{day}} बंद नहीं · {{count}} घंटे बाकी · देखें",
+    "openDayTitle": "एंट्री देखें और बंद करें · समय ख़त्म होने पर यह अपने-आप बंद हो जाता है",
+    "previous": "पिछले क्लोज़",
+    "previousCash": "नकद {{amount}}",
+    "previousAuto": "अपने-आप बंद",
+    "previousTitle": "{{day}} देखें",
+    "closeDay": "दिन बंद करें",
+    "countFirst": "पहले नकद गिनें",
+    "closed": "दिन बंद",
+    "reopened": "दिन फिर से खोला गया",
+    "gate": {
+      "title": "शुरुआती नकद · {{day}}",
+      "sources": {
+        "carried": "{{day}} के क्लोज़ से आगे लाया गया",
+        "recounted": "दोबारा गिना गया",
+        "first": "पहले का कोई क्लोज़ नहीं · आगे लाने को कुछ नहीं"
+      },
+      "recount": "दोबारा गिनें",
+      "recountLabel": "शुरुआती नकद दोबारा गिनें",
+      "recountTitle": "मेल न खाए तो दोबारा गिनें",
+      "accept": "{{amount}} स्वीकारें",
+      "acceptRecount": "नई गिनती स्वीकारें",
+      "starting": "आप {{name}} के रूप में दिन शुरू कर रहे हैं · यह दिन पर दर्ज होता है",
+      "accepted": "शुरुआती नकद {{amount}} स्वीकार · {{time}} पर दर्ज"
+    },
+    "strip": {
+      "opening": "शुरुआती नकद",
+      "acceptedBy": "{{name}} ने स्वीकारा · {{time}}",
+      "cashInOut": "नकद आया · गया",
+      "cashIn": "+{{amount}}",
+      "cashOut": "−{{amount}}",
+      "expected": "दराज़ में अपेक्षित {{amount}}",
+      "counted": "अभी गिना",
+      "countPlaceholder": "दराज़ गिनें",
+      "countLabel": "गिना हुआ नकद",
+      "netByMode": "माध्यम के अनुसार नेट",
+      "staffTitle_one": "{{name}} · {{count}} एंट्री · {{amount}}",
+      "staffTitle_other": "{{name}} · {{count}} एंट्री · {{amount}}",
+      "staffOther": "टीम में नहीं",
+      "reason": "गिनती अलग क्यों है?",
+      "reasonPlaceholder": "क्या हुआ · जैसे दराज़ से ₹20 छुट्टे दिए",
+      "reasonFirst": "पहले बताएं कि गिनती अलग क्यों है"
+    },
+    "report": {
+      "title": "{{day}} बंद है",
+      "closedBy": "{{name}} ने बंद किया · {{time}}",
+      "autoClosed": "{{time}} पर बंद · छूट की अवधि के बाद अपने-आप",
+      "reopen": "फिर खोलें",
+      "acceptedBy": "{{name}} ने स्वीकारा",
+      "takenAsExpected": "अपेक्षित के रूप में लिया गया",
+      "received_one": "{{count}} मिला",
+      "received_other": "{{count}} मिले",
+      "paid_one": "{{count}} भुगतान",
+      "paid_other": "{{count}} भुगतान",
+      "cashCounted": "गिना नकद",
+      "expected": "अपेक्षित {{amount}}",
+      "difference": "अंतर",
+      "matched": "दराज़ मेल खाती है",
+      "extra": "दराज़ में ज़्यादा",
+      "short": "दराज़ में कम",
+      "log": "क्या हुआ",
+      "logAccepted": "{{name}} ने शुरुआती नकद {{amount}} स्वीकारा",
+      "logRecounted": "{{name}} ने शुरुआती नकद {{amount}} स्वीकारा (दोबारा गिना)",
+      "logMatched": "दराज़ {{amount}} गिनी गई · मेल खाती है",
+      "logExtra": "दराज़ {{amount}} गिनी गई · {{diff}} ज़्यादा",
+      "logShort": "दराज़ {{amount}} गिनी गई · {{diff}} कम",
+      "logClosed": "{{name}} ने दिन बंद किया",
+      "logAuto": "छूट की अवधि के बाद अपने-आप बंद · नकद अपेक्षित के रूप में लिया",
+      "openedAuto": "अपने-आप खुला",
+      "notCounted": "गिना नहीं गया",
+      "logOpened": "{{name}} ने दिन खोला",
+      "logReopened": "{{name}} ने दिन फिर से खोला · {{reason}}",
+      "logReason": "“{{reason}}”",
+      "someone": "कोई"
+    },
+    "review": {
+      "title": "हर एंट्री देखें",
+      "none": "कोई एंट्री नहीं",
+      "empty": "इस दिन कोई एंट्री नहीं",
+      "states": {
+        "canEdit": "बदला जा सकता है",
+        "canEditTitle": "दिन बंद होने तक बदला या हटाया जा सकता है",
+        "dayClosed": "दिन बंद",
+        "dayClosedTitle": "दिन बंद है · इसकी एंट्री बदली नहीं जा सकतीं",
+        "fromCredit": "{{credit}} से"
+      },
+      "count_one": "{{count}} एंट्री",
+      "count_other": "{{count}} एंट्री"
+    },
+    "previousNone": "इस दिन से पहले कोई क्लोज़ नहीं",
+    "refusals": {
+      "alreadyOpened": "इस बीच किसी ने यह दिन खोल दिया · अब वही दिख रहा है",
+      "alreadyClosed": "इस बीच किसी ने यह दिन बंद कर दिया · अब वही दिख रहा है",
+      "alreadyOpen": "यह दिन पहले ही फिर से खुल चुका है · अब वही दिख रहा है"
+    },
+    "reopen": {
+      "title": "यह दिन फिर से खोलें?",
+      "effect": "गिनती मिट जाती है और दिन बंद होने तक उसकी एंट्री फिर से बदली जा सकती हैं।",
+      "action": "दिन फिर खोलें",
+      "record": "{{branch}} · {{day}}",
+      "reasons": {
+        "miscounted": "गलत गिना",
+        "missed": "एक एंट्री छूट गई",
+        "wrongEntry": "एक एंट्री गलत है"
+      }
+    }
+  },
+  "reverseEntry": {
+    "title": "यह भुगतान रिवर्स करें?",
+    "effect": "इसका दिन बंद है, इसलिए यह जैसा है वैसा रहेगा। इसी राशि का एक रिवर्सल आज इसकी शाखा की बही में जुड़ेगा, और इसका भुगतान वापस हो जाएगा। दोनों प्रविष्टियाँ बनी रहेंगी।",
+    "action": "रिवर्स करें",
+    "reversed": "{{ref}} रिवर्स हुआ · {{reversal}}",
+    "blocked": {
+      "alreadyReversed": "{{ref}} पहले ही रिवर्स हो चुका है",
+      "dayOpen": "{{ref}} का दिन फिर से खुला है · इसकी जगह हटाएँ",
+      "dayClosed": "{{ref}} की शाखा में आज का दिन बंद है · रिवर्स करने के लिए इसे फिर से खोलें"
+    }
+  }
+}

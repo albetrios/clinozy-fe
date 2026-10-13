@@ -1,0 +1,50 @@
+{
+  "manifest": {
+    "title": "Pacientes"
+  },
+  "views": {
+    "label": "Visualizações de pacientes",
+    "all": "Todos",
+    "follow": "Retorno pendente",
+    "recall": "Reativação"
+  },
+  "search": {
+    "placeholder": "Nome, celular ou #ID",
+    "label": "Buscar pacientes"
+  },
+  "primary": {
+    "newPatient": "Novo paciente"
+  },
+  "columns": {
+    "seq": "ID",
+    "name": "Paciente",
+    "gender": "Gênero",
+    "types": "Tipo",
+    "status": "Status",
+    "conversion": "Conversão",
+    "age": "Idade",
+    "followUp": "Retorno",
+    "updated": "Atualizado"
+  },
+  "table": {
+    "records": "pacientes",
+    "age_one": "{{count}} ano",
+    "age_many": "{{count}} anos",
+    "age_other": "{{count}} anos"
+  },
+  "rowActions": {
+    "edit": "Editar",
+    "delete": "Excluir",
+    "newInvoice": "Nova fatura"
+  },
+  "bulk": {
+    "export": "Exportar",
+    "exported_one": "{{count}} linha exportada como CSV",
+    "exported_many": "{{count}} linhas exportadas como CSV",
+    "exported_other": "{{count}} linhas exportadas como CSV"
+  },
+  "empty": {
+    "title": "Nenhum paciente corresponde",
+    "description": "Ainda não há nada aqui. Tente outra aba ou busca."
+  }
+}

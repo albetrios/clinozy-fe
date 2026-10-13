@@ -45,20 +45,17 @@
     }
   },
   "authedRoutes": {
-    "/dashboard (personal)": {
-      "url": "/dashboard"
-    },
-    "/organization/:slug/dashboard": {
-      "url": "/organization/demo-org/dashboard"
+    "/organization/:slug/today": {
+      "url": "/organization/demo-org/today"
     },
     "#settings/account/profile": {
-      "url": "/dashboard#settings/account/profile"
+      "url": "/organization/demo-org/today#settings/account/profile"
     },
     "#settings/account/billing": {
-      "url": "/dashboard#settings/account/billing"
+      "url": "/organization/demo-org/today#settings/account/billing"
     },
     "#settings/organization/members": {
-      "url": "/organization/demo-org/dashboard#settings/organization/members"
+      "url": "/organization/demo-org/today#settings/organization/members"
     }
   }
 }

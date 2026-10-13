@@ -25,7 +25,7 @@
     },
     "done": {
       "title": "أنت جاهز",
-      "description": "راجع وانتقل إلى لوحة التحكم."
+      "description": "راجع وانتقل إلى مساحة عملك."
     }
   },
   "welcome": {
@@ -102,7 +102,7 @@
   "actions": {
     "back": "رجوع",
     "continue": "متابعة",
-    "enterDashboard": "الدخول إلى لوحة التحكم",
+    "enterWorkspace": "الدخول إلى مساحة العمل",
     "settingUp": "جارٍ الإعداد…"
   },
   "defaults": {

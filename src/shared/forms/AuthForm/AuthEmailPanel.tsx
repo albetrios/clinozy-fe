@@ -22,16 +22,17 @@ import { useCaptchaIntent } from '@/shared/auth/captcha/useCaptchaIntent/index.t
 import { stashMfaHandoff } from '@/shared/auth/mfa-handoff.ts';
 import { isSafeRedirectPath } from '@/shared/auth/redirect-safety.ts';
 import { establishSession } from '@/shared/auth/service.ts';
+import { DrawerInput } from '@/shared/components/DrawerField/drawer-text-controls.tsx';
+// The field and its input by their own modules: the sign-in chunk stays free of the drawer controls.
+import { DrawerField } from '@/shared/components/DrawerField/DrawerField.tsx';
 import { TotpCodeInput } from '@/shared/components/TotpCodeInput/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import { Input } from '@/shared/components/ui/input.tsx';
-import { Label } from '@/shared/components/ui/label.tsx';
 import { mapFrontendError } from '@/shared/errors/map-frontend-error.ts';
 import { FormError } from '@/shared/forms/FormError/index.ts';
 import { useCooldownClock } from '@/shared/hooks/useCooldownClock/index.ts';
 import { notify } from '@/shared/notify/index.ts';
 import { type MeContext, meContextQueryKey } from '@/shared/tenancy/me-context.ts';
-import { resolveRootTarget } from '@/shared/tenancy/organization-resolver.ts';
+import { resolveRootTargetWithInvitations } from '@/shared/tenancy/organization-resolver.ts';
 
 import {
   AUTH_CHALLENGE_KEYS,
@@ -55,8 +56,9 @@ function formatResendCooldown(remainingMs: number): string {
 /** Duration of the wrong-code shake; matches the `animate-otp-shake` keyframes. */
 const CODE_SHAKE_MS = 450;
 
+/** An inline text action in the verify footer's 12.5px lines — underlined ink, no box. */
 const inlineLinkClassName =
-  'text-foreground h-auto p-0 text-sm font-normal underline underline-offset-4 hover:text-foreground/80 disabled:pointer-events-none disabled:opacity-50';
+  'text-foreground text-detail h-auto p-0 font-medium underline underline-offset-4 hover:text-foreground/80 disabled:pointer-events-none disabled:opacity-50';
 
 const emailOnlySchema = z.object({
   email: z
@@ -97,16 +99,20 @@ function getRedirectPath(location: {
  * `/` resolver re-runs `hydrateSessionContext()` (a redundant me/context fetch —
  * `establishSession` populated it moments ago) and then throws a second redirect,
  * and `/login` stays mounted for that whole round-trip — the "flash of login"
- * after entering the code. `resolveRootTarget` is the exact decision the resolver
- * makes, run here on the context we already hold. A fresh signup still routes to
- * onboarding before any saved `redirect`.
+ * after entering the code. `resolveRootTargetWithInvitations` is the exact decision the
+ * resolver makes, run here on the context we already hold. A fresh signup still routes to
+ * onboarding before any saved `redirect` — unless they were invited and have no clinic,
+ * when the picker lists their invitations first.
  */
-function navigateAfterEmailLogin(
+async function navigateAfterEmailLogin(
   navigate: ReturnType<typeof useNavigate>,
   location: ReturnType<typeof useLocation>,
 ): Promise<void> {
   const ctx = queryClient.getQueryData<MeContext>(meContextQueryKey);
-  const rootTarget = ctx ? resolveRootTarget(ctx) : ({ to: '/' } as const);
+  // With pending invitations and no clinic, the picker lists them before onboarding (D84).
+  const rootTarget = ctx
+    ? await resolveRootTargetWithInvitations(ctx)
+    : ({ to: '/' } as const);
   if (rootTarget.to === '/onboarding') {
     // Forward the saved deep link through the wizard instead of dropping it —
     // finishing onboarding returns the user to the page they signed in for.
@@ -121,7 +127,7 @@ function navigateAfterEmailLogin(
   if (redirectPath) {
     return navigate({ to: redirectPath, replace: true });
   }
-  if (rootTarget.to === '/organization/$organizationSlug/dashboard') {
+  if (rootTarget.to === '/organization/$organizationSlug') {
     return navigate({ to: rootTarget.to, params: rootTarget.params, replace: true });
   }
   return navigate({ to: rootTarget.to, replace: true });
@@ -243,7 +249,7 @@ function VerifyStepFooter({
 }) {
   const { t } = useTranslation(AUTH_NS);
   return (
-    <footer className="flex flex-col gap-2.5 text-center text-sm lg:text-start">
+    <footer className="text-detail flex flex-col gap-1.5 border-t pt-4">
       <p className="text-muted-foreground text-pretty">
         {t(AUTH_KEYS.auth.email.resendHint)}{' '}
         <ResendHint
@@ -299,9 +305,13 @@ function EmailStepForm({
       <FormError message={formError} data-testid={AUTH_FORM_TEST_IDS.emailErrorBanner} />
       <form onSubmit={onSubmit}>
         <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="auth-email">{t(AUTH_KEYS.common.email)}</Label>
-            <Input
+          <DrawerField
+            label={t(AUTH_KEYS.common.email)}
+            htmlFor="auth-email"
+            error={translateFormMessage(emailError?.message)}
+            errorTestId={AUTH_FORM_TEST_IDS.emailError}
+          >
+            <DrawerInput
               id="auth-email"
               type="email"
               placeholder={t(AUTH_KEYS.common.emailPlaceholder)}
@@ -312,21 +322,17 @@ function EmailStepForm({
               {...register('email')}
               onFocus={() => onInteract?.()}
             />
-            {emailError ? (
-              <p
-                className="text-destructive text-xs"
-                role="alert"
-                data-testid={AUTH_FORM_TEST_IDS.emailError}
-              >
-                {translateFormMessage(emailError.message)}
-              </p>
-            ) : null}
-          </div>
+          </DrawerField>
 
           {/* Between the email field and its button: the challenge belongs to the
               action below it, and appearing here keeps it in the reading order the
               user is already following. Active only while THIS step raised it. */}
-          <CaptchaSlot active={captchaActive} testId={AUTH_FORM_TEST_IDS.captchaSlot} />
+          {/* `empty:hidden`: an idle slot takes no gap in the stack. */}
+          <CaptchaSlot
+            active={captchaActive}
+            testId={AUTH_FORM_TEST_IDS.captchaSlot}
+            className="empty:hidden"
+          />
 
           <AuthMethodButton
             type="submit"
@@ -561,8 +567,7 @@ export function AuthEmailPanel({
       data-testid={AUTH_FORM_TEST_IDS.emailVerifyPanel}
     >
       <FormError message={formError} data-testid={AUTH_FORM_TEST_IDS.emailErrorBanner} />
-      <div className="space-y-2 pt-2 text-start">
-        <Label htmlFor="auth-email-code">{t(AUTH_KEYS.auth.email.codeLabel)}</Label>
+      <DrawerField label={t(AUTH_KEYS.auth.email.codeLabel)} className="text-start">
         <TotpCodeInput
           value={verificationCode}
           onChange={setVerificationCode}
@@ -582,12 +587,13 @@ export function AuthEmailPanel({
           aria-label={t(AUTH_KEYS.auth.email.codeAria)}
           className="justify-start"
         />
-      </div>
+      </DrawerField>
 
       {/* Same position on the verify step: above the gated button. */}
       <CaptchaSlot
         active={challengeFor === AUTH_CHALLENGE_KEYS.emailVerify}
         testId={AUTH_FORM_TEST_IDS.captchaSlot}
+        className="empty:hidden"
       />
 
       <AuthMethodButton

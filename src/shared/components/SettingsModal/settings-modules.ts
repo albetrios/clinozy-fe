@@ -10,17 +10,13 @@ import type { SettingsSectionRef } from './settings-sections.ts';
 export function settingsSectionModuleKey(ref: SettingsSectionRef): string | undefined {
   if (ref.scope === 'account') {
     if (ref.section === 'billing') return 'billing';
+    // An account section since it moved out of Organization (a bookmarked
+    // `organization/integrations` hash resolves here too), so its gate lives here.
+    if (ref.section === 'integrations') return 'integrations';
     return undefined;
   }
 
-  switch (ref.section) {
-    case 'members':
-      return 'members';
-    case 'integrations':
-      return 'integrations';
-    default:
-      return undefined;
-  }
+  return ref.section === 'members' ? 'members' : undefined;
 }
 
 /** Whether L6b allows this settings section for the current deployment. */

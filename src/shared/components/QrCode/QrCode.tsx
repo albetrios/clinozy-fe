@@ -3,6 +3,7 @@ import QR from 'qrcode';
 import { type HTMLAttributes, useEffect, useState } from 'react';
 
 import { cn } from '@/lib/utils.ts';
+import { SkeletonBar } from '@/shared/components/SkeletonRows/index.ts';
 
 export type QrCodeProps = HTMLAttributes<HTMLDivElement> & {
   data: string;
@@ -78,12 +79,15 @@ export function QrCode({
   }, [data, foreground, background, robustness]);
 
   if (!svg) {
+    // One flat bar the size of the code while it is generated (`_patterns.md:282`).
     return (
       <div
-        className={cn('bg-muted size-full animate-pulse rounded-md', className)}
+        className={cn('size-full', className)}
         data-testid="qr-code-skeleton"
         {...props}
-      />
+      >
+        <SkeletonBar className="size-full" />
+      </div>
     );
   }
 

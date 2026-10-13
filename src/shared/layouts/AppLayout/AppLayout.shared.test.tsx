@@ -11,12 +11,6 @@ vi.mock('@/core/http/fetch-client.ts', () => ({
   apiClient: { get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() },
 }));
 
-// The verification banner is a sibling of the scrolling region and has nothing
-// to do with it; stubbing it keeps this file off the me/context + captcha graph.
-vi.mock('@/shared/components/EmailVerificationBanner/index.ts', () => ({
-  EmailVerificationBanner: () => null,
-}));
-
 const userA: AuthUser = { id: 'user-a', email: 'ada@example.com', role: 'user' };
 const userB: AuthUser = { id: 'user-b', email: 'bo@example.com', role: 'user' };
 
@@ -55,7 +49,7 @@ async function scrollMainTo(main: HTMLElement, top: number) {
   });
 }
 
-describe('AppMain — scroll restore across a shell swap', () => {
+describe('AppMain — scroll restore across a remount', () => {
   beforeEach(() => {
     // Reset the carried offset the way the app does, then start a session.
     signOut();
@@ -74,9 +68,10 @@ describe('AppMain — scroll restore across a shell swap', () => {
     await scrollMainTo(first.main, 240);
     first.view.unmount();
 
-    // A shell swap mounts a DIFFERENT <main>; the browser has nothing of its
-    // own to restore, so the position has to come from the layout. Breaking
-    // this is the regression the module-level offset exists to prevent.
+    // A shell rebuilt by its boundary's Retry mounts a DIFFERENT <main>; the
+    // browser has nothing of its own to restore, so the position has to come
+    // from the layout. Breaking this is the regression the module-level offset
+    // exists to prevent.
     const second = await mountMain();
     expect(second.main.scrollTop).toBe(240);
   });

@@ -1,16 +1,9 @@
 import { useEffect } from 'react';
 
+import { isEditableTarget } from '@/lib/editable-focus.ts';
 import { useUIStore } from '@/shared/store/useUIStore/index.ts';
 
 import { KeyboardShortcutsDialog } from './KeyboardShortcutsDialog.tsx';
-
-function isEditableTarget(target: EventTarget | null): boolean {
-  if (!(target instanceof HTMLElement)) return false;
-  const tag = target.tagName;
-  return (
-    tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || target.isContentEditable
-  );
-}
 
 /**
  * Static reference loaded with the deferred app layout, ready on the first keypress.

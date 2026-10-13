@@ -12,15 +12,9 @@ import { authApi } from '@/shared/api/auth-api.ts';
 import { createRole, inviteMember, listRoles } from '@/shared/api/organization-api.ts';
 import { isSafeRedirectPath } from '@/shared/auth/redirect-safety.ts';
 import { getAccessToken } from '@/shared/auth/token.ts';
+import { PublicCard, PublicCardHeader } from '@/shared/components/PublicFrame/index.ts';
 import { QueryBoundary } from '@/shared/components/QueryBoundary/index.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/shared/components/ui/card.tsx';
 import { SectionErrorBoundary } from '@/shared/components/WidgetErrorBoundary/index.ts';
 import { reportError } from '@/shared/errors/errorHandler.ts';
 import { mapFrontendError } from '@/shared/errors/map-frontend-error.ts';
@@ -157,7 +151,7 @@ async function persistOnboardingResult(input: {
       /*
        * Best-effort by design — a failed profile PATCH must never strand the
        * wizard. Best-effort is not the same as invisible though: the user's name
-       * silently failed to save and the dashboard then greeted them by their
+       * silently failed to save and Today then greeted them by their
        * email prefix, with nothing anywhere to say why (ONB-11).
        *
        * So: reported for us, and said out loud to the user. A warning, not an
@@ -277,7 +271,7 @@ function isOnboardingDirty(input: {
  * the personal fallback: an invited (or pre-provisioned) user finishing the
  * wizard was brought here to join that team — landing them on Personal hides
  * the very workspace they came for. With several teams no single one is the
- * obvious destination, so fall back to personal; the dashboard switcher lists
+ * obvious destination, so fall back to personal; the workspace switcher lists
  * them all.
  *
  * Gate the personal switch on the concrete `personalOrganizationId`, not the
@@ -333,11 +327,11 @@ function resolveInviteTargetOrganizationId(input: {
 }
 
 /**
- * An assignable (non-Owner) role id for onboarding invites. A freshly created
- * org seeds only the system **Owner** role (clinozy-be), so there is nothing to
- * invite anyone *as*: reuse an existing non-system role if the org already has
- * one, otherwise provision a default "Member" role. Scoped by the active-org
- * token, so the caller must switch to the new org first.
+ * The role onboarding invites go out with: the organization's own (non-preset) role if it has
+ * one, otherwise a default "Member" role created once with the onboarding default codes — the
+ * presets clinozy-be provisions (Owner, Admin, Doctor, …) each carry a clinic job, and the
+ * wizard does not ask which one an invitee does. Scoped by the active-organization token, so the
+ * caller must switch to the new organization first.
  */
 async function resolveInviteRoleId(): Promise<string> {
   const { rows } = await listRoles();
@@ -345,18 +339,20 @@ async function resolveInviteRoleId(): Promise<string> {
   if (existing) return existing.id;
 
   const created = await createRole({
-    name: i18n.t(ONBOARDING_KEYS.defaults.memberRoleName, { ns: ONBOARDING_NS }),
-    description: i18n.t(ONBOARDING_KEYS.defaults.memberRoleDescription, {
-      ns: ONBOARDING_NS,
-    }),
-    permissions: [...ONBOARDING_DEFAULT_MEMBER_PERMISSIONS],
+    input: {
+      name: i18n.t(ONBOARDING_KEYS.defaults.memberRoleName, { ns: ONBOARDING_NS }),
+      description: i18n.t(ONBOARDING_KEYS.defaults.memberRoleDescription, {
+        ns: ONBOARDING_NS,
+      }),
+      permissions: [...ONBOARDING_DEFAULT_MEMBER_PERMISSIONS],
+    },
   });
   return created.id;
 }
 
 /**
- * Send onboarding invites: create an INVITED membership per email
- * (`POST /organization/memberships` with a real `role_id`), all into one
+ * Send onboarding invites: create an invited membership per email
+ * (`POST /tenancy/organization/memberships` with `role_ids`), all into one
  * resolved role. Returns how many failed. Best-effort and non-blocking — a
  * failure (including not being able to provision a role) never strands the
  * wizard; the caller warns on partial failure and the user can resend from
@@ -373,7 +369,7 @@ async function sendOnboardingInvites(emails: string[]): Promise<number> {
   }
 
   const results = await Promise.allSettled(
-    emails.map((email) => inviteMember({ email, roleId })),
+    emails.map((email) => inviteMember({ invite: { email, roleIds: [roleId] } })),
   );
   return results.filter((result) => result.status === 'rejected').length;
 }
@@ -396,10 +392,10 @@ function navigateAfterOnboarding(
     return navigate({ to: redirectPath, replace: true });
   }
   const target = resolveRootTarget(ctx);
-  if (target.to === '/organization/$organizationSlug/dashboard') {
+  if (target.to === '/organization/$organizationSlug') {
     return navigate({ to: target.to, params: target.params, replace: true });
   }
-  if (target.to === '/dashboard' || target.to === '/organization') {
+  if (target.to === '/organization') {
     return navigate({ to: target.to, replace: true });
   }
   return navigate({ to: '/', replace: true });
@@ -480,9 +476,11 @@ function WizardActions(props: {
 }) {
   const { t } = useTranslation(ONBOARDING_NS);
   return (
-    <div className="flex items-center justify-between">
+    // The drawer footer's anatomy (`_patterns.md:35`): a hairline, 12px × the
+    // drawer's side inset, the outline "Back" and the primary at the end.
+    <footer className="flex items-center justify-between gap-2.5 border-t px-(--drawer-pad-x) py-3">
       <Button
-        variant="ghost"
+        variant="outline"
         onClick={props.onBack}
         disabled={props.isFirstStep || props.submitting}
         data-testid={ONBOARDING_TEST_IDS.back}
@@ -498,7 +496,7 @@ function WizardActions(props: {
         >
           {props.submitting
             ? t(ONBOARDING_KEYS.actions.settingUp)
-            : t(ONBOARDING_KEYS.actions.enterDashboard)}
+            : t(ONBOARDING_KEYS.actions.enterWorkspace)}
         </Button>
       ) : (
         <Button
@@ -509,20 +507,22 @@ function WizardActions(props: {
           {t(ONBOARDING_KEYS.actions.continue)}
         </Button>
       )}
-    </div>
+    </footer>
   );
 }
 
 function SessionContextGate({ query }: { query: UseQueryResult<MeContext> }) {
   const { t } = useTranslation(ONBOARDING_NS);
   return (
-    <Card className="w-full">
-      <CardContent className="py-2" data-testid={ONBOARDING_TEST_IDS.contextGate}>
-        <QueryBoundary query={query} errorMessage={t(ONBOARDING_KEYS.session.loadError)}>
-          {() => null}
-        </QueryBoundary>
-      </CardContent>
-    </Card>
+    <PublicCard
+      width="wizard"
+      className="py-2"
+      data-testid={ONBOARDING_TEST_IDS.contextGate}
+    >
+      <QueryBoundary query={query} errorMessage={t(ONBOARDING_KEYS.session.loadError)}>
+        {() => null}
+      </QueryBoundary>
+    </PublicCard>
   );
 }
 
@@ -562,7 +562,7 @@ function renderStep(
  * That screen is this wizard. Clearing `submitting` the moment `navigate()`
  * was *called* then put the Continue/Enter button back to its idle label, so
  * the finished wizard sat there looking untouched, a success toast beside it
- * and the URL already reading `/dashboard` — indistinguishable from a click
+ * and the URL already reading the destination — indistinguishable from a click
  * that did nothing, and reliably "fixed" by a manual reload (QA-V3-1).
  *
  * Covering it with the same overlay the organization switcher uses says what
@@ -690,17 +690,20 @@ function OnboardingCard({
   const { t } = useTranslation(ONBOARDING_NS);
   const metaKeys = getStepMetaKeys(step);
   return (
-    <Card className="w-full">
-      <CardHeader className="space-y-4">
+    // The 480px card on the signed-out canvas, built like a drawer: the step
+    // circles and the step's heading, the body, then the footer with its hairline.
+    <PublicCard width="wizard" className="gap-0 p-0">
+      <div className="flex flex-col gap-5 px-(--drawer-pad-x) pt-6 pb-5">
         <StepIndicator current={clampedIndex} steps={effectiveSteps} />
         <div ref={headerRef} className="transform-gpu">
-          <CardTitle data-testid={ONBOARDING_TEST_IDS.stepTitle}>
-            {t(metaKeys.title)}
-          </CardTitle>
-          <CardDescription>{t(metaKeys.description)}</CardDescription>
+          <PublicCardHeader
+            title={t(metaKeys.title)}
+            description={t(metaKeys.description)}
+            titleTestId={ONBOARDING_TEST_IDS.stepTitle}
+          />
         </div>
-      </CardHeader>
-      <CardContent className="space-y-6 overflow-hidden">
+      </div>
+      <div className="flex flex-col gap-5 overflow-hidden px-(--drawer-pad-x) pb-6">
         <div
           ref={stepBodyRef}
           className="transform-gpu"
@@ -730,32 +733,28 @@ function OnboardingCard({
                   carries the icon, the destructive tokens and role="alert"
                   without this page re-deciding any of it.
                 */}
-        <FormError
-          message={finishError}
-          className="mt-4"
-          data-testid={ONBOARDING_TEST_IDS.finishError}
-        />
+        <FormError message={finishError} data-testid={ONBOARDING_TEST_IDS.finishError} />
+      </div>
 
-        <WizardActions
-          isFirstStep={clampedIndex === 0}
-          isDoneStep={step === 'done'}
-          submitting={submitting}
-          canProceed={canProceed}
-          onBack={() => onStepIndexChange(Math.max(clampedIndex - 1, 0))}
-          onNext={() =>
-            onStepIndexChange(Math.min(clampedIndex + 1, effectiveSteps.length - 1))
-          }
-          onFinish={onFinish}
-        />
-      </CardContent>
-    </Card>
+      <WizardActions
+        isFirstStep={clampedIndex === 0}
+        isDoneStep={step === 'done'}
+        submitting={submitting}
+        canProceed={canProceed}
+        onBack={() => onStepIndexChange(Math.max(clampedIndex - 1, 0))}
+        onNext={() =>
+          onStepIndexChange(Math.min(clampedIndex + 1, effectiveSteps.length - 1))
+        }
+        onFinish={onFinish}
+      />
+    </PublicCard>
   );
 }
 
 /**
  * Multi-step, resumable onboarding wizard. Progress is persisted in
  * {@link useOnboardingStore}; the final step creates the organization, sends any
- * invitations, and navigates to the new organization's dashboard (the
+ * invitations, and navigates to the new organization's home (the
  * `$organizationSlug` guard syncs context, persists, and loads permissions).
  * Step UIs live in `components/` (folder-per-unit).
  */
@@ -813,7 +812,7 @@ export function OnboardingPage() {
    * permissive `DEFAULT_DEPLOYMENT_FLAGS` when it is missing — so a failed
    * me/context silently produced a `personal-and-team` flow: no workspace step,
    * no organization created, onboarding still stamped complete, and the user
-   * dropped on a personal dashboard the deployment may not even have.
+   * dropped on a personal workspace the deployment may not even have.
    *
    * `isError` counts even when a stale `data` is still cached (a background
    * refetch that failed): the wizard would otherwise submit against a context
@@ -859,7 +858,7 @@ export function OnboardingPage() {
    * `finishingRef` only covers the run itself: its `finally` fires the moment
    * `navigateAfterOnboarding` *starts* the navigation, while the destination's
    * guard chain is still awaiting the network. The wizard stays mounted and
-   * interactive for that whole stretch, so a second "Enter dashboard" click
+   * interactive for that whole stretch, so a second "Enter workspace" click
    * re-ran the ENTIRE finish. Org creation is idempotent (cached append +
    * existence check), but the profile PATCH, `completeOnboarding`, the org
    * switch, the analytics event and every invitation went out a SECOND time —
@@ -991,7 +990,7 @@ export function OnboardingPage() {
 
       // Awaited so the profile PATCH lands BEFORE the me/context refetch below —
       // unawaited, the refreshed context could still carry firstName: null and
-      // the dashboard would greet the user by their email prefix instead of the
+      // Today would greet the user by their email prefix instead of the
       // name they just typed. Still best-effort: every failure inside is
       // swallowed, so awaiting can never strand the wizard.
       await persistOnboardingResult({
@@ -1005,7 +1004,7 @@ export function OnboardingPage() {
 
       // Stamp onboarding complete on the backend BEFORE re-reading me/context, so
       // the refreshed context (and every later `/` resolve + workspace guard)
-      // reports onboarding done and routes to the dashboard instead of looping
+      // reports onboarding done and routes to the workspace instead of looping
       // back here. Awaited on purpose: a failure surfaces as the finish error and
       // keeps the user on the wizard to retry, rather than a silent redirect loop.
       const accessToken = getAccessToken();
@@ -1083,18 +1082,17 @@ export function OnboardingPage() {
   return (
     <>
       {guardDialog}
-      {/* No page-level background here. This island renders inside PublicLayout,
-          whose every variant already paints `bg-background` across a `min-h-dvh`
-          viewport — and it renders into `PublicMain`, which is `w-full max-w-md`.
-          A backdrop set here is therefore 448px wide over a full-width one: a
-          tinted vertical band down the middle of the page with visible seams,
-          which is exactly what `bg-muted/30` drew. Widening it cannot fix that
-          (`w-full` is still the 448px slot); the layout has to own the surface. */}
+      {/* No page-level background or height here. This island renders inside
+          PublicLayout, whose canvas paints the surface across a `min-h-dvh`
+          viewport and centres this column on it — a backdrop set here only ever
+          drew a band down the middle of the page (`bg-muted/30` did), and a
+          `min-h-screen` of its own stacked a second viewport under the header.
+          The layout owns the surface; the card brings its own 480px width. */}
       <div
-        className="flex min-h-screen items-center justify-center p-4"
+        className="flex w-full flex-col items-center"
         data-testid={ONBOARDING_TEST_IDS.page}
       >
-        <div ref={cardRef} className="w-full max-w-lg transform-gpu">
+        <div ref={cardRef} className="flex w-full transform-gpu justify-center">
           {contextReady ? (
             <OnboardingCard
               clampedIndex={clampedIndex}

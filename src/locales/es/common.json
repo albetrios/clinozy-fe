@@ -98,13 +98,24 @@
     "description": "Ya está lista una nueva versión de la aplicación.",
     "refresh": "Actualizar ahora"
   },
+  "cells": {
+    "patient": "Paciente",
+    "patientMark": "P",
+    "leadMark": "L",
+    "moreCount": "{{count}} más"
+  },
+  "emptyState": {
+    "fallbackTitle": "Aún no hay nada aquí",
+    "filteredTitle": "Sin coincidencias",
+    "filteredHint": "Nada coincide con estos filtros. Bórralos para volver a verlo todo.",
+    "clearFilters": "Borrar filtros"
+  },
   "a11y": {
     "close": "Cerrar",
     "loading": "Cargando",
     "loadingNamed": "Cargando {{name}}…",
     "loadingPage": "Cargando página",
     "toggleTheme": "Cambiar tema",
-    "openAppearance": "Abrir apariencia",
     "cookieConsent": "Consentimiento de cookies",
     "rowsPerPage": "Filas por página",
     "goFirstPage": "Ir a la primera página",
@@ -114,84 +125,152 @@
     "selectAll": "Seleccionar todo",
     "copyAccountId": "Copiar ID de cuenta",
     "onboardingProgress": "Progreso de incorporación",
-    "themeCode": "Código de tema",
     "mode": "Modo"
   },
   "appearance": {
     "themeTitle": "Tema",
     "themeLocked": "El tema lo gestiona la configuración de tu organización y no se puede cambiar aquí.",
-    "themeDescription": "Ajustes preestablecidos con nombre, o copia un enlace / pega un código de tema para reproducir un aspecto exacto.",
-    "presetAria": "Ajuste de acento con nombre",
-    "copyLink": "Copiar enlace",
-    "shuffleHint": "Usa Aleatorio para generar un código.",
-    "codeLabel": "Código: {{seed}}",
-    "codePlaceholder": "Pega un código de tema",
-    "apply": "Aplicar",
-    "pickAnyColour": "Elige cualquier color",
     "modeTitle": "Modo",
-    "modeDescription": "Guardado en este dispositivo.",
-    "colourTitle": "Color",
-    "colourDescription": "Acento, gráficos y la base neutra.",
-    "accentColour": "Color de acento",
-    "chartColour": "Color de gráficos",
-    "baseColour": "Color base",
-    "harmony": "Armonía",
-    "harmonyAria": "Armonía de color",
-    "accentIntensity": "Intensidad del acento",
-    "typeTitle": "Tipografía y forma",
-    "typeDescription": "Fuentes, radio de esquinas y superficie de menú.",
-    "bodyFont": "Fuente del cuerpo",
-    "headingFont": "Fuente de títulos",
-    "radius": "Radio",
-    "shapeLanguage": "Lenguaje de formas",
-    "typeScale": "Escala tipográfica",
-    "menu": "Menú",
-    "menuAria": "Estilo de menú",
-    "iconsTitle": "Iconos",
-    "iconsDescription": "Grosor de trazo, color y conjunto de iconos.",
-    "iconWeight": "Grosor de icono",
-    "iconColour": "Color de icono",
-    "iconLibrary": "Biblioteca de iconos",
-    "layoutTitle": "Diseño",
-    "layoutDescription": "Ancho del área de trabajo principal: estándar para paneles, lectura para texto enfocado.",
-    "contentWidth": "Ancho del contenido",
-    "dashboardTitle": "Panel",
-    "dashboardDescription": "Cómo organiza el panel sus secciones.",
-    "dashboardArrangement": "Disposición",
-    "surfaceTitle": "Superficie y movimiento",
-    "surfaceDescription": "Espaciado, profundidad, contraste y cómo se mueve.",
-    "density": "Densidad",
-    "contrast": "Contraste",
-    "elevation": "Elevación",
-    "separation": "Separación",
-    "separationAria": "Separación de superficies",
-    "motion": "Movimiento",
-    "focusRing": "Anillo de foco",
-    "notificationsTitle": "Notificaciones",
-    "notificationsDescription": "Elige o aleatoriza un diseño de notificación: las vistas previas usan tus tokens de tema en vivo.",
-    "toastDesign": "Diseño de notificación",
-    "position": "Posición",
-    "positionAria": "Posición de la notificación",
-    "previewSuccess": "Éxito",
-    "previewError": "Error",
-    "previewWarning": "Advertencia",
-    "previewInfo": "Información",
-    "shuffleSection": "Aleatorizar {{section}}",
-    "sectionColour": "color",
-    "sectionType": "tipografía y forma",
-    "sectionSurface": "superficie y movimiento",
-    "sectionDashboard": "diseño del panel",
-    "sectionNotifications": "estilo de notificación",
-    "custom": "Personalizado",
-    "customWith": "Personalizado — {{look}}"
+    "modeDescription": "Guardado en este dispositivo."
   },
   "table": {
-    "searchPlaceholder": "Buscar..."
+    "searchPlaceholder": "Buscar...",
+    "empty": "Sin resultados.",
+    "sortBy": "Ordenar por {{column}}",
+    "actions": "Acciones",
+    "moreActions": "Más acciones",
+    "columns": {
+      "trigger": "Mostrar u ocultar columnas",
+      "title": "Columnas · {{shown}} de {{total}} visibles",
+      "showAll": "Mostrar todas las columnas",
+      "recommendedHides": "El conjunto recomendado oculta {{count}}",
+      "tapForRecommended": "Toca de nuevo para el conjunto recomendado",
+      "allShown": "Las {{count}} columnas visibles",
+      "hiddenCount": "{{count}} ocultas",
+      "search": "Buscar columnas",
+      "shown": "{{shown}} de {{total}} visibles",
+      "viewGroup": "Vista",
+      "columnsGroup": "Columnas"
+    },
+    "fold": {
+      "showAll_one": "{{count}} columna en filas · Mostrar todo",
+      "showAll_many": "{{count}} columnas en filas · Mostrar todo",
+      "showAll_other": "{{count}} columnas en filas · Mostrar todo",
+      "showAllHint": "Mostrar todas las columnas lado a lado (desplaza en horizontal)",
+      "fitToWidth": "Ajustar al ancho",
+      "fitToWidthHint": "Plegar las columnas extra en cada fila"
+    },
+    "selection": {
+      "selectRow": "Seleccionar {{name}}",
+      "selected": "{{count}} seleccionados",
+      "selectAllCount": "Seleccionar los {{count}}",
+      "clear": "Borrar selección",
+      "clearHint": "Borrar selección · Esc",
+      "escape": "Esc",
+      "bulkActions": "Acciones en bloque"
+    },
+    "length": {
+      "allLoaded": "Todos los {{records}} cargados",
+      "loadingMore": "Cargando más {{records}}"
+    },
+    "savedViews": {
+      "label": "Vistas guardadas",
+      "apply": "Aplicar vista",
+      "remove": "Quitar vista",
+      "removed": "Vista quitada",
+      "defaultName": "Mi vista"
+    }
   },
   "consent": {
-    "description": "Usamos cookies de analítica de producto para mejorar {{productName}}. Las funciones esenciales y la supervisión de errores funcionan sin ellas.",
+    "description": "Con tu permiso, usamos la analítica de PostHog y las grabaciones de sesión de Sentry para mejorar {{productName}}. Todo lo demás, incluidos los informes de errores, funciona sin ellas. Cerrar esto equivale a no.",
     "privacyPolicy": "Política de privacidad",
     "accept": "Aceptar",
-    "decline": "Rechazar"
+    "decline": "Rechazar",
+    "closeAndDecline": "Cerrar (cuenta como rechazar)"
+  },
+  "confirm": {
+    "accept": "Confirmar",
+    "cancel": "Cancelar",
+    "fallbackDescription": "Confirma esta acción."
+  },
+  "picker": {
+    "placeholder": "Seleccionar…",
+    "search": "Buscar {{label}}",
+    "searchDefault": "Buscar",
+    "escKey": "Esc",
+    "options": "Opciones",
+    "recent": "Recientes",
+    "all": "Todos",
+    "create": "Crear «{{query}}»",
+    "createNamed": "{{label}} «{{query}}»",
+    "createFull": "Nuevo: {{label}}",
+    "createFullQuery": "{{label}} · «{{query}}»",
+    "fullDetails": "todos los detalles",
+    "empty": "Aún no hay nada para elegir",
+    "noResults": "No hay resultados para «{{query}}»",
+    "noResultsHint": "Revisa la ortografía o prueba con menos letras",
+    "noResultsRemoteHint": "Prueba con un nombre, un número de teléfono o un ID",
+    "loadingMore": "Cargando más",
+    "clear": "Borrar",
+    "triggerLabel": "{{label}} · {{value}}",
+    "date": {
+      "label": "Fecha",
+      "placeholder": "Elige una fecha",
+      "search": "Escribe una fecha · p. ej. 12 sep",
+      "today": "Hoy",
+      "tomorrow": "Mañana",
+      "yesterday": "Ayer",
+      "comingUp": "Próximamente",
+      "relative": "{{relative}} · {{date}}"
+    },
+    "time": {
+      "label": "Hora",
+      "placeholder": "Elige una hora"
+    }
+  },
+  "unsavedChanges": {
+    "title": "¿Descartar los cambios?",
+    "description": "Tus cambios no se han guardado y se perderán.",
+    "discard": "Descartar",
+    "keepEditing": "Seguir editando"
+  },
+  "uploadTray": {
+    "label": "Subidas",
+    "uploading": "Subiendo {{left}} de {{total}}…",
+    "complete": "Todas las subidas completadas",
+    "failed_one": "{{count}} subida fallida",
+    "failed_many": "{{count}} subidas fallidas",
+    "failed_other": "{{count}} subidas fallidas",
+    "skipped_one": "{{count}} archivo de más de {{limit}} omitido",
+    "skipped_many": "{{count}} archivos de más de {{limit}} omitidos",
+    "skipped_other": "{{count}} archivos de más de {{limit}} omitidos",
+    "show": "Mostrar subidas",
+    "hide": "Ocultar subidas",
+    "uploadFailed": "No se pudo subir",
+    "attachFailed": "No se pudo adjuntar",
+    "retry": "Reintentar {{name}}",
+    "remove": "Quitar {{name}}",
+    "stoppedBySwitch": "Subidas detenidas · cambiaste de espacio de trabajo",
+    "size": {
+      "kilobytes": "{{value}} KB",
+      "megabytes": "{{value}} MB"
+    }
+  },
+  "splash": {
+    "label": "Cargando {{productName}}",
+    "greeting": {
+      "morning": "Buenos días, {{name}}",
+      "afternoon": "Buenas tardes, {{name}}",
+      "evening": "Buenas noches, {{name}}"
+    },
+    "ticker": {
+      "opening": "Abriendo la agenda del {{weekday}}",
+      "syncing": "Sincronizando pacientes y prospectos",
+      "ready": "Todo listo"
+    },
+    "offline": {
+      "message": "No se puede conectar con {{productName}} · revisa la conexión a internet",
+      "retry": "Reintentar"
+    }
   }
 }

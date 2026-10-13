@@ -1,32 +1,19 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { copySensitiveText } from '@/lib/sensitive-clipboard.ts';
 import { cn } from '@/lib/utils.ts';
 import type { ApiKeyWithSecret } from '@/shared/api/organization-contracts.ts';
+import { DrawerField, DrawerInput } from '@/shared/components/DrawerField/index.ts';
+import { Picker } from '@/shared/components/Picker/index.ts';
+import { RecordDrawer } from '@/shared/components/RecordDrawer/index.ts';
 import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { Checkbox } from '@/shared/components/ui/checkbox.tsx';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/shared/components/ui/dialog.tsx';
-import { Input } from '@/shared/components/ui/input.tsx';
 import { Label } from '@/shared/components/ui/label.tsx';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/components/ui/select.tsx';
 import { mapApiError } from '@/shared/errors/errorHandler.ts';
 import { FormError } from '@/shared/forms/FormError/index.ts';
 import { useCreateApiKey } from '@/shared/hooks/useApiKeys/index.ts';
@@ -50,6 +37,12 @@ type ExpiryChoice = (typeof EXPIRY_CHOICES)[number]['value'] | typeof NEVER_EXPI
 
 const DEFAULT_EXPIRY: ExpiryChoice = 'ninety';
 
+/**
+ * Three fields, the scopes a checklist of many: a heavy field, so the drawer
+ * takes the everyday 680px (`_patterns.md:28`).
+ */
+const API_KEY_FORM_PROFILE = { fieldCount: 3, hasHeavyField: true } as const;
+
 function daysFor(choice: ExpiryChoice): number | null {
   return EXPIRY_CHOICES.find((option) => option.value === choice)?.days ?? null;
 }
@@ -64,7 +57,9 @@ interface SecretRevealProps {
 /**
  * The one and only sight of a new key's secret. clinozy-be stores a hash, so this
  * screen is the whole of the user's chance to keep it — hence the copy action,
- * the explicit acknowledgement, and a Done that stays disabled until then.
+ * the explicit acknowledgement, and a Done that stays disabled until then. Done
+ * closes the body, as the recovery codes' does: the drawer shows no footer here,
+ * because there is nothing to go back to.
  */
 function SecretReveal({
   secret,
@@ -82,68 +77,66 @@ function SecretReveal({
   }
 
   return (
-    <>
-      <DialogHeader>
-        <DialogTitle>{t(integrations.apiKeySecretTitle)}</DialogTitle>
-        <DialogDescription>{t(integrations.apiKeySecretDescription)}</DialogDescription>
-      </DialogHeader>
-      <div className="space-y-3">
-        <code
-          className="bg-muted block rounded-md p-3 font-mono text-xs break-all"
-          data-testid="apikey-secret"
+    <div className="flex flex-col gap-3">
+      <code
+        dir="ltr"
+        className="bg-canvas block rounded-lg border px-3 py-2.5 font-mono text-xs break-all"
+        data-testid="apikey-secret"
+      >
+        {secret}
+      </code>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={() => void copy()}
+        data-testid="apikey-secret-copy"
+        className="self-start"
+      >
+        <Copy className="size-4" />
+        {t(integrations.apiKeyCopy)}
+      </Button>
+      <div className="flex items-start gap-2">
+        <Checkbox
+          id="apikey-secret-ack"
+          checked={acknowledged}
+          onCheckedChange={(value) => onAcknowledge(value === true)}
+          data-testid="apikey-secret-ack"
+        />
+        <Label
+          htmlFor="apikey-secret-ack"
+          className="text-muted-foreground text-xs font-normal"
         >
-          {secret}
-        </code>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={() => void copy()}
-          data-testid="apikey-secret-copy"
-        >
-          <Copy className="me-1.5 size-4" />
-          {t(integrations.apiKeyCopy)}
-        </Button>
-        <div className="flex items-start gap-2">
-          <Checkbox
-            id="apikey-secret-ack"
-            checked={acknowledged}
-            onCheckedChange={(value) => onAcknowledge(value === true)}
-            data-testid="apikey-secret-ack"
-          />
-          <Label
-            htmlFor="apikey-secret-ack"
-            className="text-muted-foreground text-xs font-normal"
-          >
-            {t(integrations.apiKeySecretAck)}
-          </Label>
-        </div>
+          {t(integrations.apiKeySecretAck)}
+        </Label>
       </div>
-      <DialogFooter>
-        <Button
-          disabled={!acknowledged}
-          onClick={onDone}
-          data-testid="apikey-secret-done"
-        >
-          {t(integrations.apiKeySecretDone)}
-        </Button>
-      </DialogFooter>
-    </>
+      <Button
+        type="button"
+        disabled={!acknowledged}
+        onClick={onDone}
+        data-testid="apikey-secret-done"
+      >
+        {t(integrations.apiKeySecretDone)}
+      </Button>
+    </div>
   );
 }
 
 /**
- * Create an organization API key, then reveal its secret exactly once.
+ * Create an organization API key, then reveal its secret exactly once — a child
+ * drawer stacked on Settings (L-65), whose Back returns to the Integrations
+ * section.
  *
  * The integrations panel listed and revoked keys but offered no way to make
  * one, so the section opened on an empty state with no next action — the API
  * key that would fill it could only be created by calling the endpoint by hand.
  *
- * Two phases in one dialog, because they are one task: the form, then the
- * secret. The secret phase cannot be dismissed by Esc or the overlay and its
- * Done button stays disabled until the acknowledgement is ticked — clinozy-be
- * stores only a hash, so a secret dismissed by a stray keypress is gone for
- * good and the key has to be rotated. Same shape as the recovery-code reveal.
+ * Two phases in one drawer, because they are one task: the form, then the
+ * secret. The secret phase cannot be dismissed by the ×, Esc or the backdrop
+ * and its Done button stays disabled until the acknowledgement is ticked —
+ * clinozy-be stores only a hash, so a secret dismissed by a stray keypress is
+ * gone for good and the key has to be rotated. Same shape as the recovery-code
+ * reveal. While the create runs, the drawer holds every exit.
  *
  * Scopes are permission codes. clinozy-be refuses any the caller does not hold
  * themselves, so the picker offers the same assignable set the role editor uses
@@ -164,6 +157,8 @@ export function ApiKeyCreateDialog() {
   const [error, setError] = useState<string | null>(null);
   const [created, setCreated] = useState<ApiKeyWithSecret | null>(null);
   const [acknowledged, setAcknowledged] = useState(false);
+  // The name takes focus on open, as it did when this was a dialog.
+  const nameRef = useRef<HTMLInputElement>(null);
 
   function reset() {
     setName('');
@@ -204,29 +199,49 @@ export function ApiKeyCreateDialog() {
     );
   }
 
+  // Never while an unacknowledged secret is on screen: the ×, Back, Esc and the
+  // backdrop all come through here. (The drawer never calls it mid-create.)
+  function close() {
+    if (created && !acknowledged) return;
+    setOpen(false);
+    reset();
+  }
+
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(next) => {
-        // Never while the create is in flight, and never while an unacknowledged
-        // secret is on screen: both Esc and the overlay come through here.
-        if (create.isPending) return;
-        if (created && !acknowledged) return;
-        setOpen(next);
-        if (!next) reset();
-      }}
-    >
+    <>
       <Button
         size="sm"
         variant="outline"
         onClick={() => setOpen(true)}
         data-testid="apikey-create-open"
       >
-        <Plus className="me-1.5 size-4" />
+        <Plus className="size-4" />
         {t(integrations.createApiKey)}
       </Button>
 
-      <DialogContent data-testid="apikey-create-dialog">
+      <RecordDrawer
+        open={open}
+        onClose={close}
+        title={t(
+          created ? integrations.apiKeySecretTitle : integrations.createApiKeyTitle,
+        )}
+        sub={t(
+          created
+            ? integrations.apiKeySecretDescription
+            : integrations.createApiKeyDescription,
+        )}
+        content={API_KEY_FORM_PROFILE}
+        stacked
+        initialFocusRef={nameRef}
+        saveLabel={t(integrations.createApiKey)}
+        savingLabel={t(integrations.creating)}
+        onSave={submit}
+        saveState={create.isPending ? 'saving' : 'idle'}
+        saveTestId="apikey-create"
+        dismissTestId="apikey-cancel"
+        hideFooter={created !== null}
+        testId="apikey-create-dialog"
+      >
         {created ? (
           <SecretReveal
             secret={created.secret}
@@ -239,113 +254,80 @@ export function ApiKeyCreateDialog() {
           />
         ) : (
           <>
-            <DialogHeader>
-              <DialogTitle>{t(integrations.createApiKeyTitle)}</DialogTitle>
-              <DialogDescription>
-                {t(integrations.createApiKeyDescription)}
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="apikey-name">{t(integrations.apiKeyNameLabel)}</Label>
-                <Input
-                  id="apikey-name"
-                  value={name}
-                  onChange={(event) => setName(event.target.value)}
-                  placeholder={t(integrations.apiKeyNamePlaceholder)}
-                  data-testid="apikey-name"
-                />
-              </div>
+            <DrawerField label={t(integrations.apiKeyNameLabel)} htmlFor="apikey-name">
+              <DrawerInput
+                ref={nameRef}
+                id="apikey-name"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                placeholder={t(integrations.apiKeyNamePlaceholder)}
+                data-testid="apikey-name"
+              />
+            </DrawerField>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="apikey-expiry">{t(integrations.apiKeyExpiryLabel)}</Label>
-                <Select
-                  value={expiry}
-                  onValueChange={(value) => setExpiry(value as ExpiryChoice)}
-                >
-                  <SelectTrigger
-                    id="apikey-expiry"
-                    className="w-full"
-                    data-testid="apikey-expiry"
-                  >
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {EXPIRY_CHOICES.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {t(integrations.apiKeyExpiryDays, { count: option.days })}
-                      </SelectItem>
-                    ))}
-                    <SelectItem value={NEVER_EXPIRES}>
-                      {t(integrations.apiKeyExpiryNever)}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-1.5">
-                <Label>{t(integrations.apiKeyScopesLabel)}</Label>
-                <p className="text-muted-foreground text-xs">
-                  {t(integrations.apiKeyScopesHint)}
-                </p>
-                {assignable.isPending ? (
-                  <p className="text-muted-foreground text-xs">
-                    {t(SETTINGS_KEYS.panels.roles.permissionsLoading)}
-                  </p>
-                ) : null}
-                {assignable.isError ? (
-                  <p className="text-destructive text-xs" role="alert">
-                    {t(SETTINGS_KEYS.panels.roles.permissionsLoadFailed)}
-                  </p>
-                ) : null}
-                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                  {assignable.rows.map((entry) => (
-                    <div key={entry.code} className="flex items-center gap-2">
-                      <Checkbox
-                        id={`apikey-scope-${entry.code}`}
-                        checked={scopes.includes(entry.code)}
-                        onCheckedChange={() => toggleScope(entry.code)}
-                        data-testid={`apikey-scope-${entry.code}`}
-                      />
-                      <Label
-                        htmlFor={`apikey-scope-${entry.code}`}
-                        className={cn('text-muted-foreground text-xs font-normal')}
-                        title={entry.code}
-                      >
-                        {entry.name}
-                      </Label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <FormError message={error} data-testid="apikey-error" />
-            </div>
-            <DialogFooter>
-              <Button
-                variant="ghost"
-                onClick={() => {
-                  setOpen(false);
-                  reset();
+            <DrawerField
+              label={t(integrations.apiKeyExpiryLabel)}
+              htmlFor="apikey-expiry"
+            >
+              <Picker
+                id="apikey-expiry"
+                label={t(integrations.apiKeyExpiryLabel)}
+                value={expiry}
+                options={[
+                  ...EXPIRY_CHOICES.map((option) => ({
+                    key: option.value,
+                    label: t(integrations.apiKeyExpiryDays, { count: option.days }),
+                  })),
+                  { key: NEVER_EXPIRES, label: t(integrations.apiKeyExpiryNever) },
+                ]}
+                plain
+                onChange={(key) => {
+                  if (key) setExpiry(key as ExpiryChoice);
                 }}
-                disabled={create.isPending}
-                data-testid="apikey-cancel"
-              >
-                {t(integrations.cancel)}
-              </Button>
-              <Button
-                onClick={submit}
-                isLoading={create.isPending}
-                data-testid="apikey-create"
-              >
-                {create.isPending
-                  ? t(integrations.creating)
-                  : t(integrations.createApiKey)}
-              </Button>
-            </DialogFooter>
+                testId="apikey-expiry"
+                className="w-full"
+              />
+            </DrawerField>
+
+            <DrawerField label={t(integrations.apiKeyScopesLabel)}>
+              <p className="text-muted-foreground text-xs">
+                {t(integrations.apiKeyScopesHint)}
+              </p>
+              {assignable.isPending ? (
+                <p className="text-muted-foreground text-xs">
+                  {t(SETTINGS_KEYS.panels.roles.permissionsLoading)}
+                </p>
+              ) : null}
+              {assignable.isError ? (
+                <p className="text-destructive text-xs" role="alert">
+                  {t(SETTINGS_KEYS.panels.roles.permissionsLoadFailed)}
+                </p>
+              ) : null}
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                {assignable.rows.map((entry) => (
+                  <div key={entry.code} className="flex items-center gap-2">
+                    <Checkbox
+                      id={`apikey-scope-${entry.code}`}
+                      checked={scopes.includes(entry.code)}
+                      onCheckedChange={() => toggleScope(entry.code)}
+                      data-testid={`apikey-scope-${entry.code}`}
+                    />
+                    <Label
+                      htmlFor={`apikey-scope-${entry.code}`}
+                      className={cn('text-muted-foreground text-xs font-normal')}
+                      title={entry.code}
+                    >
+                      {entry.name}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </DrawerField>
+
+            <FormError message={error} data-testid="apikey-error" />
           </>
         )}
-      </DialogContent>
-    </Dialog>
+      </RecordDrawer>
+    </>
   );
 }

@@ -13,8 +13,11 @@
     "goHome": "Ir para o início",
     "refresh": "Atualizar página",
     "forbidden": "Você não tem permissão para acessar esta página.",
+    "forbiddenTitle": "Sem acesso a esta página",
     "signOut": "Sair",
-    "signingOut": "Saindo…"
+    "signingOut": "Saindo…",
+    "pageNotFound": "Página não encontrada",
+    "recordNotFound": "{{record}} não encontrado · pode ter sido excluído"
   },
   "widget": {
     "unavailable": "{{title}} indisponível",
@@ -25,19 +28,12 @@
     "pageContent": "Conteúdo da página",
     "navigation": "Navegação",
     "emailBanner": "Verificação de e-mail",
-    "notifications": "Notificações",
     "organizationSwitcher": "Seletor de organização",
     "commandPalette": "Paleta de comandos",
     "settings": "Configurações",
     "appearance": "Aparência",
-    "analytics": "Análises",
-    "members": "Membros",
-    "schedule": "Agenda",
-    "highlights": "Destaques",
-    "themeShowcase": "Vitrine de temas",
     "sessionTimeout": "Temporizador de sessão",
     "securityCheck": "Verificação de segurança",
-    "appearanceControls": "Controles de aparência",
     "payment": "Pagamento",
     "cancellation": "Cancelamento"
   },
@@ -45,17 +41,7 @@
     "dismiss": "Dispensar notificação",
     "undo": "Desfazer",
     "undone": "Ação cancelada",
-    "processing": "Processando…",
-    "preview": {
-      "successTitle": "Alterações salvas",
-      "successDescription": "Suas configurações estão ativas.",
-      "errorTitle": "Algo deu errado",
-      "errorDescription": "Tente novamente.",
-      "warningTitle": "Atenção",
-      "warningDescription": "Esta ação precisa de revisão.",
-      "infoTitle": "Você sabia?",
-      "infoDescription": "Embaralhar também muda este design."
-    }
+    "processing": "Processando…"
   },
   "api": {
     "fallback": "Algo deu errado. Tente novamente.",
@@ -69,7 +55,21 @@
     "http429": "Muitas solicitações. Aguarde um momento e tente novamente.",
     "http500": "Ocorreu um erro interno do servidor. Tente novamente mais tarde.",
     "http502": "O servidor está temporariamente indisponível. Tente novamente mais tarde.",
-    "http503": "O serviço está temporariamente indisponível. Tente novamente mais tarde."
+    "http503": "O serviço está temporariamente indisponível. Tente novamente mais tarde.",
+    "reload": "Recarregar",
+    "recordChanged": "Outra pessoa salvou isto nesse meio-tempo. Recarregue para ver as alterações dela e depois refaça as suas.",
+    "reasons": {
+      "missingPermission": "Você não tem permissão para fazer isso. Peça ao proprietário da clínica ou a um administrador.",
+      "ownerMembershipFixed": "Não é possível alterar as funções e o status do proprietário da clínica. Transfira a propriedade primeiro.",
+      "ownerCannotLeave": "O proprietário da clínica não pode sair. Transfira a propriedade primeiro.",
+      "ownerRoleFixed": "Não é possível alterar o acesso da função do proprietário da clínica.",
+      "systemRoleFixed": "Uma função predefinida não pode ser renomeada nem excluída.",
+      "roleLocked": "O acesso desta função é fixo e não pode ser alterado.",
+      "seatLimitReached": "Seu plano não tem vagas livres. Adicione uma vaga em Configurações › Faturamento e convide novamente.",
+      "membershipAlreadyExists": "Esta pessoa já está na clínica.",
+      "organizationSlugExists": "Essa URL do espaço já está em uso. Escolha outra.",
+      "disposableEmail": "Use um endereço de e-mail permanente — endereços descartáveis não são aceitos."
+    }
   },
   "frontend": {
     "query": {
@@ -91,12 +91,7 @@
     },
     "account": {
       "copyFailed": "Não foi possível copiar para a área de transferência",
-      "themeCodeNumeric": "Digite um código de tema numérico",
       "copySuccess": "ID da conta copiado",
-      "themeLinkCopied": "Link do tema copiado",
-      "themeLinkCopiedDescription": "Compartilhe esta URL para reproduzir a aparência.",
-      "notificationStylePreview": "Estilo de notificação",
-      "notificationStylePreviewDescription": "{{variant}} — tematizado com seu destaque e cores semânticas.",
       "accountDeletionPending": "Conta excluída. Saindo…",
       "avatarInvalidType": "Escolha um arquivo de imagem.",
       "avatarTooLarge": "O avatar deve ter menos de 2 MB.",
@@ -122,7 +117,8 @@
         "updateRoleSuccess": "Função do membro atualizada",
         "removeSuccess": "Membro removido",
         "suspendSuccess": "Membro suspenso",
-        "reactivateSuccess": "Membro reativado"
+        "reactivateSuccess": "Membro reativado",
+        "updateSuccess": "Membro salvo"
       },
       "roles": {
         "createFailed": "Não foi possível criar a função",

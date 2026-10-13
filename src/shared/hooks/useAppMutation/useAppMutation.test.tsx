@@ -209,6 +209,97 @@ describe('useAppMutation', () => {
     expect(errorMock).toHaveBeenCalledWith('nope');
   });
 
+  describe('optimisticQueries (every cached shape under a prefix)', () => {
+    type Row = { id: string; status: string };
+    /** The patch: the row with `id` flips to `done`, wherever it sits. */
+    const flip = (data: unknown, id: string): unknown => {
+      const patchRow = (row: Row) => (row.id === id ? { ...row, status: 'done' } : row);
+      if (Array.isArray(data)) return (data as Row[]).map(patchRow);
+      if (data && typeof data === 'object' && 'pages' in data) {
+        const infinite = data as { pages: { rows: Row[] }[] };
+        return {
+          ...infinite,
+          pages: infinite.pages.map((page) => ({
+            ...page,
+            rows: page.rows.map(patchRow),
+          })),
+        };
+      }
+      return patchRow(data as Row);
+    };
+    const seeded = () => {
+      const client = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
+      client.setQueryData(['things', 'list', { q: '' }], {
+        pages: [{ rows: [{ id: 'a', status: 'open' }], next: null, hasMore: false }],
+        pageParams: [undefined],
+      });
+      client.setQueryData(
+        ['things', 'range', 'week'],
+        [
+          { id: 'a', status: 'open' },
+          { id: 'b', status: 'open' },
+        ],
+      );
+      client.setQueryData(['things', 'detail', 'a'], { id: 'a', status: 'open' });
+      client.setQueryData(['other'], [{ id: 'a', status: 'open' }]);
+      return client;
+    };
+
+    it('patches the pages, the plain lists and the records alike, and keeps them', async () => {
+      const client = seeded();
+      const { result } = renderHook(
+        () =>
+          useAppMutation({
+            mutationFn: async (id: string) => id,
+            optimisticQueries: { queryKey: ['things'], update: flip },
+          }),
+        { wrapper: makeWrapper(client) },
+      );
+
+      await result.current.mutateAsync('a');
+
+      expect(client.getQueryData(['things', 'list', { q: '' }])).toMatchObject({
+        pages: [{ rows: [{ id: 'a', status: 'done' }] }],
+      });
+      expect(client.getQueryData(['things', 'range', 'week'])).toEqual([
+        { id: 'a', status: 'done' },
+        { id: 'b', status: 'open' },
+      ]);
+      expect(client.getQueryData(['things', 'detail', 'a'])).toEqual({
+        id: 'a',
+        status: 'done',
+      });
+      // Outside the prefix nothing moves.
+      expect(client.getQueryData(['other'])).toEqual([{ id: 'a', status: 'open' }]);
+    });
+
+    it('puts every patched query back when the write fails', async () => {
+      const client = seeded();
+      const { result } = renderHook(
+        () =>
+          useAppMutation({
+            mutationFn: async () => {
+              throw new Error('nope');
+            },
+            optimisticQueries: { queryKey: ['things'], update: flip },
+          }),
+        { wrapper: makeWrapper(client) },
+      );
+
+      await expect(result.current.mutateAsync('a')).rejects.toThrow('nope');
+
+      expect(client.getQueryData(['things', 'range', 'week'])).toEqual([
+        { id: 'a', status: 'open' },
+        { id: 'b', status: 'open' },
+      ]);
+      expect(client.getQueryData(['things', 'detail', 'a'])).toEqual({
+        id: 'a',
+        status: 'open',
+      });
+      expect(errorMock).toHaveBeenCalledWith('nope');
+    });
+  });
+
   // Double-submit protection. `disabled={isPending}` only takes effect after React
   // re-renders, so a second click in the same frame still reaches the handler — on
   // a checkout that is a second charge. The guard is a ref, so it holds synchronously.
@@ -576,6 +667,94 @@ describe('useAppMutation', () => {
 
     await result.current.mutateAsync(true).catch(() => undefined);
     expect(errorMock).toHaveBeenCalledWith(expect.any(String), { id: 'prefs' });
+  });
+
+  describe('the idempotency key of a user action', () => {
+    const keysOf = (mutationFn: ReturnType<typeof vi.fn>) =>
+      mutationFn.mock.calls.map(
+        (call) => (call[1] as { idempotencyKey: string }).idempotencyKey,
+      );
+
+    it('a retry of the same write sends the same key', async () => {
+      const client = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
+      const mutationFn = vi
+        .fn<
+          (vars: { name: string }, action: { idempotencyKey: string }) => Promise<string>
+        >()
+        .mockRejectedValueOnce(new Error('network down'))
+        .mockResolvedValueOnce('ok');
+      const { result } = renderHook(
+        () => useAppMutation({ mutationFn, notifyOnError: false }),
+        { wrapper: makeWrapper(client) },
+      );
+
+      await expect(result.current.mutateAsync({ name: 'Asha' })).rejects.toThrow();
+      await expect(result.current.mutateAsync({ name: 'Asha' })).resolves.toBe('ok');
+
+      const [first, retry] = keysOf(mutationFn);
+      expect(first).toMatch(/[0-9a-f-]{36}/);
+      expect(retry).toBe(first);
+    });
+
+    it('changed variables are a new action with a new key', async () => {
+      const client = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
+      const mutationFn = vi
+        .fn<
+          (vars: { name: string }, action: { idempotencyKey: string }) => Promise<string>
+        >()
+        .mockRejectedValueOnce(new Error('refused'))
+        .mockResolvedValueOnce('ok');
+      const { result } = renderHook(
+        () => useAppMutation({ mutationFn, notifyOnError: false }),
+        { wrapper: makeWrapper(client) },
+      );
+
+      await expect(result.current.mutateAsync({ name: 'Asha' })).rejects.toThrow();
+      await result.current.mutateAsync({ name: 'Asha Patel' });
+
+      const [first, second] = keysOf(mutationFn);
+      expect(second).not.toBe(first);
+    });
+
+    it('the same write again after a success is a new action', async () => {
+      const client = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
+      const mutationFn = vi.fn(
+        async (_vars: { name: string }, _action: { idempotencyKey: string }) => 'ok',
+      );
+      const { result } = renderHook(() => useAppMutation({ mutationFn }), {
+        wrapper: makeWrapper(client),
+      });
+
+      await result.current.mutateAsync({ name: 'Asha' });
+      await result.current.mutateAsync({ name: 'Asha' });
+
+      const [first, second] = keysOf(mutationFn);
+      expect(second).not.toBe(first);
+    });
+
+    it('variables with no stable form get a key per call', async () => {
+      const client = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
+      const mutationFn = vi
+        .fn<
+          (
+            vars: { run: () => void },
+            action: { idempotencyKey: string },
+          ) => Promise<string>
+        >()
+        .mockRejectedValueOnce(new Error('network down'))
+        .mockResolvedValueOnce('ok');
+      const { result } = renderHook(
+        () => useAppMutation({ mutationFn, notifyOnError: false }),
+        { wrapper: makeWrapper(client) },
+      );
+      const vars = { run: () => undefined };
+
+      await expect(result.current.mutateAsync(vars)).rejects.toThrow();
+      await result.current.mutateAsync(vars);
+
+      const [first, second] = keysOf(mutationFn);
+      expect(second).not.toBe(first);
+    });
   });
 
   it('omits the options argument entirely when no toast id is set', async () => {

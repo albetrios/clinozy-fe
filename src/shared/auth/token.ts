@@ -31,20 +31,43 @@ export const clearAccessToken = (): void => {
   accessToken = null;
 };
 
+/** The decoded JWT payload, or `null` when the token is malformed. Never verified — the server does that. */
+function decodePayload(token: string): Record<string, unknown> | null {
+  try {
+    const payload = token.split('.')[1];
+    if (!payload) return null;
+    const decoded: unknown = JSON.parse(
+      atob(payload.replace(/-/g, '+').replace(/_/g, '/')),
+    );
+    return decoded && typeof decoded === 'object'
+      ? (decoded as Record<string, unknown>)
+      : null;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Decode the JWT payload and extract the `exp` claim (seconds since epoch).
  * Returns `null` if the token is missing, malformed, or has no `exp`.
  */
 export function getTokenExpiry(): number | null {
   if (!accessToken) return null;
-  try {
-    const payload = accessToken.split('.')[1];
-    if (!payload) return null;
-    const decoded = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
-    return typeof decoded.exp === 'number' ? decoded.exp : null;
-  } catch {
-    return null;
-  }
+  const exp = decodePayload(accessToken)?.exp;
+  return typeof exp === 'number' ? exp : null;
+}
+
+/**
+ * The organization an access token is scoped to — clinozy-be's signed `org` claim (an
+ * organization public id) — or `null` when it names none or cannot be read.
+ *
+ * @remarks
+ * Read, never trusted: the server verifies the token. The refresh path uses it to notice a
+ * token minted for another organization than the one this tab shows (`shared/auth/service.ts`).
+ */
+export function organizationClaimOf(token: string): string | null {
+  const organization = decodePayload(token)?.org;
+  return typeof organization === 'string' ? organization : null;
 }
 
 /**

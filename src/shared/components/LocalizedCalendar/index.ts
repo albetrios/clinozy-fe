@@ -1,1 +1,2 @@
-export { LocalizedCalendar } from './LocalizedCalendar.tsx';
+export type { CalendarDayDots } from './calendar-parts-context.ts';
+export { LocalizedCalendar, type LocalizedCalendarProps } from './LocalizedCalendar.tsx';

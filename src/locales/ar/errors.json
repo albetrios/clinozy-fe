@@ -13,8 +13,11 @@
     "goHome": "الذهاب للرئيسية",
     "refresh": "تحديث الصفحة",
     "forbidden": "ليس لديك إذن للوصول إلى هذه الصفحة.",
+    "forbiddenTitle": "لا يمكن الوصول إلى هذه الصفحة",
     "signOut": "تسجيل الخروج",
-    "signingOut": "جارٍ تسجيل الخروج…"
+    "signingOut": "جارٍ تسجيل الخروج…",
+    "pageNotFound": "الصفحة غير موجودة",
+    "recordNotFound": "{{record}} غير موجود · ربما تم حذفه"
   },
   "widget": {
     "unavailable": "{{title}} غير متاح",
@@ -25,19 +28,12 @@
     "pageContent": "محتوى الصفحة",
     "navigation": "التنقل",
     "emailBanner": "التحقق من البريد",
-    "notifications": "الإشعارات",
     "organizationSwitcher": "مبدّل المؤسسة",
     "commandPalette": "لوحة الأوامر",
     "settings": "الإعدادات",
     "appearance": "المظهر",
-    "analytics": "التحليلات",
-    "members": "الأعضاء",
-    "schedule": "الجدول",
-    "highlights": "أبرز الميزات",
-    "themeShowcase": "عرض السمة",
     "sessionTimeout": "مؤقّت الجلسة",
     "securityCheck": "فحص الأمان",
-    "appearanceControls": "عناصر المظهر",
     "payment": "الدفع",
     "cancellation": "الإلغاء"
   },
@@ -45,17 +41,7 @@
     "dismiss": "إغلاق الإشعار",
     "undo": "تراجع",
     "undone": "تم إلغاء الإجراء",
-    "processing": "جارٍ المعالجة…",
-    "preview": {
-      "successTitle": "تم حفظ التغييرات",
-      "successDescription": "إعداداتك نشطة.",
-      "errorTitle": "حدث خطأ ما",
-      "errorDescription": "يُرجى المحاولة مرة أخرى.",
-      "warningTitle": "تنبيه",
-      "warningDescription": "يحتاج هذا الإجراء إلى مراجعة.",
-      "infoTitle": "هل تعلم؟",
-      "infoDescription": "الخلط يغيّر هذا التصميم أيضًا."
-    }
+    "processing": "جارٍ المعالجة…"
   },
   "api": {
     "fallback": "حدث خطأ ما. يُرجى المحاولة مرة أخرى.",
@@ -69,7 +55,21 @@
     "http429": "طلبات كثيرة جدًا. انتظر لحظة وحاول مرة أخرى.",
     "http500": "حدث خطأ داخلي في الخادم. حاول لاحقًا.",
     "http502": "الخادم غير متاح مؤقتًا. حاول لاحقًا.",
-    "http503": "الخدمة غير متاحة مؤقتًا. حاول لاحقًا."
+    "http503": "الخدمة غير متاحة مؤقتًا. حاول لاحقًا.",
+    "reload": "إعادة التحميل",
+    "recordChanged": "قام شخص آخر بحفظ هذا في الأثناء. أعد التحميل لرؤية تغييراته، ثم أجرِ تغييراتك مرة أخرى.",
+    "reasons": {
+      "missingPermission": "ليست لديك صلاحية للقيام بذلك. اطلب ذلك من مالك العيادة أو أحد المسؤولين.",
+      "ownerMembershipFixed": "لا يمكن تغيير أدوار مالك العيادة أو حالته. انقل الملكية أولًا.",
+      "ownerCannotLeave": "لا يمكن لمالك العيادة المغادرة. انقل الملكية أولًا.",
+      "ownerRoleFixed": "لا يمكن تغيير صلاحيات الدور الذي يشغله مالك العيادة.",
+      "systemRoleFixed": "لا يمكن إعادة تسمية دور جاهز أو حذفه.",
+      "roleLocked": "صلاحيات هذا الدور ثابتة ولا يمكن تغييرها.",
+      "seatLimitReached": "لا يوجد مقعد متاح في خطتك. أضف مقعدًا من الإعدادات › الفوترة، ثم أعد الدعوة.",
+      "membershipAlreadyExists": "هذا الشخص موجود بالفعل في العيادة.",
+      "organizationSlugExists": "رابط مساحة العمل هذا مستخدم بالفعل. اختر رابطًا آخر.",
+      "disposableEmail": "استخدم عنوان بريد إلكتروني دائمًا — العناوين المؤقتة غير مقبولة."
+    }
   },
   "frontend": {
     "query": {
@@ -91,12 +91,7 @@
     },
     "account": {
       "copyFailed": "تعذّر النسخ إلى الحافظة",
-      "themeCodeNumeric": "أدخل رمز مظهر رقميًا",
       "copySuccess": "تم نسخ معرّف الحساب",
-      "themeLinkCopied": "تم نسخ رابط المظهر",
-      "themeLinkCopiedDescription": "شارك هذا الرابط لإعادة إنتاج المظهر.",
-      "notificationStylePreview": "نمط الإشعار",
-      "notificationStylePreviewDescription": "{{variant}} — مُنمَّط بألوانك المميزة والدلالية.",
       "accountDeletionPending": "تم حذف الحساب. جارٍ تسجيل الخروج…",
       "avatarInvalidType": "يُرجى اختيار ملف صورة.",
       "avatarTooLarge": "يجب أن تكون الصورة الرمزية أقل من 2 ميجابايت.",
@@ -122,7 +117,8 @@
         "updateRoleSuccess": "تم تحديث دور العضو",
         "removeSuccess": "تمت إزالة العضو",
         "suspendSuccess": "تم تعليق العضو",
-        "reactivateSuccess": "تمت إعادة تفعيل العضو"
+        "reactivateSuccess": "تمت إعادة تفعيل العضو",
+        "updateSuccess": "تم حفظ العضو"
       },
       "roles": {
         "createFailed": "تعذّر إنشاء الدور",
