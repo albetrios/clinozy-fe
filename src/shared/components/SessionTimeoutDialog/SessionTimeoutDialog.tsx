@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { formatCountdown, secondsUntil } from '@/lib/countdown.ts';
 import { ERRORS_KEYS, ERRORS_NS } from '@/lib/i18n/errors.constants.ts';
 import { PRODUCT_NAMESPACE } from '@/lib/product-identity.ts';
 import { type IdleTimeoutHandle, startIdleTimeout } from '@/shared/auth/idle-timeout.ts';
@@ -39,14 +40,6 @@ const IDLE_ACTIVITY_STORAGE_KEY = `${PRODUCT_NAMESPACE}:last-activity`;
  *   session that is being torn down, and both buttons are dead.
  */
 type Phase = 'idle' | 'warning' | 'signing-out';
-
-function formatCountdown(seconds: number): string {
-  return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
-}
-
-function secondsUntil(deadline: number): number {
-  return Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
-}
 
 /**
  * The session timer sits outside the app-shell boundary (it must survive a

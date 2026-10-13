@@ -115,11 +115,13 @@ Every custom event includes **shared context** from `getAnalyticsContext()`:
 
 ### Deploy / version
 
-| Event                               | When                | Extra properties |
-| ----------------------------------- | ------------------- | ---------------- |
-| `deployment_update_available`       | New build detected  | `build_id`       |
-| `deployment_update_refresh_clicked` | User clicks Refresh | `build_id`       |
-| `deployment_update_dismissed`       | Toast dismissed     | `build_id`       |
+| Event                                       | When                          | Extra properties |
+| ------------------------------------------- | ----------------------------- | ---------------- |
+| `deployment_update_available`               | New build detected            | `build_id`       |
+| `deployment_update_refresh_clicked`         | User clicks Refresh           | `build_id`       |
+| `deployment_update_dismissed`               | Toast dismissed               | `build_id`       |
+| `deployment_update_required`                | Critical update counting down | `build_id`       |
+| `deployment_update_required_reload_clicked` | User clicks Update now        | `build_id`       |
 
 ### Performance
 

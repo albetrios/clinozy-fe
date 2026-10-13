@@ -1,6 +1,10 @@
 /// <reference lib="webworker" />
 import { ExpirationPlugin } from 'workbox-expiration';
-import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching';
+import {
+  cleanupOutdatedCaches,
+  matchPrecache,
+  precacheAndRoute,
+} from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
 import { CacheFirst, StaleWhileRevalidate } from 'workbox-strategies';
 
@@ -70,15 +74,26 @@ registerRoute(
   }),
 );
 
-// Offline fallback for navigation requests
+// Navigations go to the network first, so a deep link always gets the deployed
+// shell. A failed fetch is not proof of being offline — a stale DNS answer after
+// a record change, a captive portal or a TLS failure reject it while the device
+// is online — so the fallback is the precached app shell, the same index.html a
+// precached `/` is served from. It boots without the network and owns every
+// outcome: the splash's offline hold (AppSplashSlot) when the device reports no
+// connection, the OfflineIndicator after boot, real errors and retries
+// otherwise. offline.html is the last resort, for a worker with no shell cached.
+// Precache entries live under revisioned cache keys, so they are looked up with
+// matchPrecache — a plain caches.match('/offline.html') never hits.
+async function navigationFallback(): Promise<Response> {
+  return (
+    (await matchPrecache('index.html')) ??
+    (await matchPrecache('offline.html')) ??
+    new Response('Offline', { status: 503 })
+  );
+}
+
 self.addEventListener('fetch', (event) => {
   if (event.request.mode === 'navigate') {
-    event.respondWith(
-      fetch(event.request).catch(() =>
-        caches
-          .match('/offline.html')
-          .then((response) => response ?? new Response('Offline', { status: 503 })),
-      ),
-    );
+    event.respondWith(fetch(event.request).catch(navigationFallback));
   }
 });

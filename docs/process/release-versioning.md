@@ -39,3 +39,17 @@ One config, one manifest, one changelog — all on `main`:
    (`development--clinozy-fe.netlify.app`) — no release needed.
 
 `chore`/`docs`/`ci`/etc. commits do not bump the version, so they never open a release.
+
+## Critical releases (forced update)
+
+A release that open tabs must not keep running — a security fix, or a clinozy-be change
+an older bundle would break on — is marked **critical** in the PR that carries the fix:
+set `MINIMUM_SUPPORTED_VERSION` in
+[`src/core/version/minimum-version.constants.ts`](../../src/core/version/minimum-version.constants.ts)
+to the **patch bump of the current release** (manifest `1.12.0` → `1.12.1`). Whatever bump
+the Release PR then picks is at least that, so the release meets its own floor;
+`tests/ci/minimum-version.policy.test.ts` fails any higher value. Development deploys keep
+the old version until the release and advertise nothing. Once the release deploys, every
+tab on an older version shows **"Update required"**, counts down 60 seconds and reloads —
+see [frontend-platform.md → Critical updates](../reference/frontend-platform.md#critical-updates).
+Raise the floor, never lower it; a rollback rebuilds the older tag with that tag's floor.

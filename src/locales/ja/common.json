@@ -96,7 +96,14 @@
   "versionUpdate": {
     "title": "アップデートがあります",
     "description": "アプリの新しいバージョンが利用可能です。",
-    "refresh": "今すぐ更新"
+    "refresh": "今すぐ更新",
+    "required": {
+      "title": "アップデートが必要です",
+      "countdown": "{{time}} 後に再読み込み",
+      "saveFirst": "作業を保存してから更新してください",
+      "announcement": "{{productName}} に重要なアップデートがあります。{{time}} 後に再読み込みします。今すぐ作業を保存してください。",
+      "updateNow": "今すぐ更新"
+    }
   },
   "cells": {
     "patient": "患者",
