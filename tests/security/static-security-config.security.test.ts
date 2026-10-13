@@ -363,6 +363,20 @@ describe('supply-chain dependency floors (no downgrade past a known CVE)', () =>
   it('floors postcss >=8.5.18 via pnpm override (sourceMappingURL path traversal — GHSA-r28c-9q8g-f849)', () => {
     expect(atLeast(override('postcss'), [8, 5, 18])).toBe(true);
   });
+
+  it('floors seroval >=1.6.3 via pnpm override (thenable assimilation — GHSA-p6vx-979v-rg4c; TypedArray memory exhaustion — GHSA-jp82-f5mq-hwhp)', () => {
+    // solid-js 1.9.15 (← @tanstack/query-devtools) still asks for the 1.5 line.
+    expect(atLeast(override('seroval'), [1, 6, 3])).toBe(true);
+  });
+
+  it('floors source-map-js >=1.2.2 via pnpm override (indexed source-map offsets DoS — GHSA-68fv-2mgg-jv7q)', () => {
+    expect(atLeast(override('source-map-js'), [1, 2, 2])).toBe(true);
+  });
+
+  it('floors @modelcontextprotocol/sdk >=1.31.0 via pnpm override (OAuth credentials sent to a server-chosen authorization server — GHSA-6qxp-vccf-f47h)', () => {
+    // Reached through shadcn and tailwindcss-mcp-server (dev-only MCP tooling).
+    expect(atLeast(override('@modelcontextprotocol/sdk'), [1, 31, 0])).toBe(true);
+  });
 });
 
 /**
