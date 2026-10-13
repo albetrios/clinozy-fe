@@ -8,7 +8,7 @@
 | Opened | 2026-10-13 |
 | Branch | feat/drawer-step-pattern |
 | Baseline | launch-2026-09-30-jxmr |
-| Status | implementing |
+| Status | done |
 | Summary | One step pattern for every create and edit drawer — one open step at a time (the appointment form too), honest step states (no red before a step is reached, a saved record's steps read done), the same head with a chevron, and a redesigned collapsed step: label / value pairs without tile borders and one "Not filled: …" line in place of a dashed tile per empty field |
 | Drop placed | 2026-10-13 |
 | Drop source | /tmp/claude-0/-home-user/64bf0233-3e5b-5d73-beee-8c8f8a913952/scratchpad/brief |
@@ -23,3 +23,4 @@
 - 2026-10-13 · planning → ready-for-approval · — · Claude
 - 2026-10-13 · ready-for-approval → approved · — · Claude
 - 2026-10-13 · approved → implementing · — · Claude
+- 2026-10-13 · implementing → done · — · Claude

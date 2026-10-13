@@ -135,10 +135,11 @@ export interface DrawerStepPeekProps {
 /**
  * A collapsed step's summary — what the step holds, read at a glance: the
  * filled fields as label / value pairs on the card itself (no tile borders),
- * in as many columns as the drawer fits (two on a phone); an items table as one
- * row of chips; at most six pairs, then "+N more"; and every empty field folded
- * into one muted "Not filled: …" line instead of a dashed tile each. Nothing
- * filled renders nothing — the head then reads "Not filled yet".
+ * in as many columns as the drawer fits (a few values share the full width;
+ * two columns on a phone); an items table as one row of chips; at most six
+ * pairs, then "+N more"; and every empty field folded into one muted
+ * "Not filled: …" line instead of a dashed tile each. Nothing filled renders
+ * nothing — the head then reads "Not filled yet".
  */
 export function DrawerStepPeek({
   items,
@@ -165,7 +166,7 @@ export function DrawerStepPeek({
       data-testid={testId}
       className={cn('@container flex min-w-0 flex-col gap-2', className)}
     >
-      <dl className="grid grid-cols-[repeat(auto-fill,minmax(7.5rem,1fr))] gap-x-4 gap-y-2.5">
+      <dl className="grid grid-cols-[repeat(auto-fit,minmax(7.5rem,1fr))] gap-x-4 gap-y-2.5">
         {shown.map((item) => (
           <Pair key={`${item.kind}-${item.label}`} item={item} />
         ))}
