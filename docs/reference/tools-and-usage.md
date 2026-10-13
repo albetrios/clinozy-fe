@@ -207,7 +207,7 @@ All files in **`public/`** are served from the root of the built site. See **[pu
 | ---------------------------------------- | ---------------------------------------------------------------------------------------------------- |
 | **robots.txt**                           | Crawler rules (allow/disallow). Present in `public/`; update if you add a sitemap or restrict paths. |
 | **manifest.webmanifest**                 | PWA manifest — must match `buildWebManifest()` in `src/core/config/app-manifest.ts` (drift test).    |
-| **app-icon.svg**                         | Favicon + PWA SVG (Lucide Boxes on `#0a0a0a`). Regenerate PNGs with `rsvg-convert`.                  |
+| **app-icon.svg**                         | Favicon + PWA SVG (`ProductMark` on its `#18181b` tile). Regenerate PNGs with `rsvg-convert`.        |
 | **\_headers**                            | Security/response headers (e.g. Permissions-Policy). Applied by Netlify or static host.              |
 | **config.js**                            | Runtime config placeholder (`window.__CONFIG__`); overwritten by host if needed.                     |
 | **theme-init.js**                        | Prevents theme FOUC; applies `.dark` from localStorage before React.                                 |
