@@ -15,6 +15,7 @@ tooling/
 │   └── github/        # GitHub IaC sync (pnpm github:sync)
 ├── validate/          # Structure, tokens, env-example, health-check, pre-commit guard
 ├── sonar/             # Local SonarQube gate
+├── stryker/           # Vitest runner shim for the weekly mutation lane (stryker.config.json)
 ├── tsdoc-coverage/    # TSDoc budget ratchet
 ├── reports/           # Code review report generator
 ├── validate/

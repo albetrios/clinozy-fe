@@ -2893,7 +2893,7 @@ clinozy-fe/
 │   └── vite-env.d.ts
 ├── tests/
 │   ├── ci/
-│   │   └── [36 test files]
+│   │   └── [37 test files]
 │   ├── cross-browser/
 │   │   └── [2 test files]
 │   ├── e2e/
@@ -3084,6 +3084,8 @@ clinozy-fe/
 │   │   └── setup.config.json
 │   ├── sonar/
 │   │   └── sonar-gate.mjs
+│   ├── stryker/
+│   │   └── vitest-runner-shim.mjs
 │   ├── test/
 │   │   └── empty-env/
 │   │       └── .gitkeep
@@ -3163,7 +3165,6 @@ clinozy-fe/
 ├── SETUP.md
 ├── sonar-project.properties
 ├── stryker.config.json
-├── stryker.config.mjs
 ├── tsconfig.app.json
 ├── tsconfig.json
 ├── tsconfig.node.json

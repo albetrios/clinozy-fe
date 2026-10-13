@@ -1,9 +1,11 @@
 name: Mutation Test (Stryker)
 
 # Weekly mutation-score check over the pure runtime logic (rbac, auth, tenancy,
-# route helpers — the `mutate` list in stryker.config.json). Scheduled and
-# non-blocking: a failing run is a signal that tests assert too little, not a
-# merge gate. Thresholds (break: 70) live in stryker.config.json.
+# route helpers — the `mutate` list in stryker.config.json), killed by those
+# modules' own tests (the `testFiles` list). Scheduled and non-blocking: a failing
+# run is a signal that tests assert too little, not a merge gate. Thresholds
+# (break: 70) live in stryker.config.json; the config itself is pinned on the PR
+# gate by tests/ci/mutation-config.policy.test.ts.
 
 on:
   schedule:
@@ -27,9 +29,12 @@ jobs:
           fetch-depth: 1
       - uses: ./.github/actions/setup-node-pnpm
 
-      # Stryker is installed ad-hoc (too heavy for a regular devDependency);
-      # configuration lives in stryker.config.json.
-      - run: pnpm add -D @stryker-mutator/core @stryker-mutator/vitest-runner
+      # Stryker is installed ad-hoc (too heavy for a regular devDependency) and
+      # pinned, so a Stryker release cannot change the lane between two Mondays —
+      # bump core and the Vitest runner together (tests/ci/mutation-config.policy.test.ts).
+      # Configuration lives in stryker.config.json; the runner is wrapped by
+      # tooling/stryker/vitest-runner-shim.mjs until a release fixes it for Vitest 5.
+      - run: pnpm add -D @stryker-mutator/core@10.0.0 @stryker-mutator/vitest-runner@10.0.0
 
       - run: pnpm exec stryker run
 
