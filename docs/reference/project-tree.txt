@@ -289,9 +289,7 @@ clinozy-fe/
 ├── iterations/
 │   ├── change-cookie-consent-2026-10-13-fmal/
 │   │   ├── intake-files/
-│   │   │   ├── BRIEF.md
-│   │   │   ├── PRD.md
-│   │   │   └── schema-routes.md
+│   │   │   └── BRIEF.md
 │   │   ├── plans/
 │   │   │   └── decisions.md
 │   │   ├── AS-BUILT.md
