@@ -31,6 +31,7 @@ What was actually built, ledger row by ledger row, against the approved plan in
 ## Summary
 
 - **Planned, not built** (deferred, user OK): — every ledger row is done.
+- **Planned, not kept:** clinozy-be's copy of the iteration — withdrawn, the backend changes nothing (D20).
 - **Built, not planned:** the hover edges of coloured chips and the WhatsApp toggle (D17); the
   budget fit (#8, D18) — which also leaves `cn()`'s animation registry and the auth key table as
   they were on main.
