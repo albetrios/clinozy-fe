@@ -208,8 +208,8 @@ final confirmation (D9).
 | L-5 | Tests: tab bar unit tests (lens index/opacity, capsule test id, fade), bottom-stack CSS pins                                         | verify     | L-1–L-4    | fe-test-generation                    | `pnpm test` green                   | Claude   | done                         |
 | L-6 | Docs: the shell notes that describe the bar (`AppLayout` overview/layout docs, `docs/reference/design.md` screen tiers)              | copy       | L-1–L-4    | fe-documentation-maintenance          | `pnpm sync:check`, `pnpm docs:lint` | Claude   | done                         |
 | L-7 | Verify: the BRIEF acceptance in the running app (measurements + screenshots, light/dark, inset/no inset, RTL, Sharp, reduced motion) | verify     | L-1–L-6    | fe-kickoff-iteration                  | every §8 row proven                 | Claude   | done                         |
-| L-8 | Gates: static, unit, build, size                                                                                                     | gate       | L-7        | fe-before-commit-guard                | §8 last row green                   | Claude   | open                         |
-| L-9 | Close: `AS-BUILT.md` (rows, summary, Standing deviations), Status `done`                                                             | verify     | L-8        | fe-kickoff-iteration                  | README Status `done`                | Claude   | open                         |
+| L-8 | Gates: static, unit, build, size                                                                                                     | gate       | L-7        | fe-before-commit-guard                | §8 last row green                   | Claude   | done                         |
+| L-9 | Close: `AS-BUILT.md` (rows, summary, Standing deviations), Status `done`                                                             | verify     | L-8        | fe-kickoff-iteration                  | README Status `done`                | Claude   | done                         |
 
 ## Appendix A — Coverage matrix
 
