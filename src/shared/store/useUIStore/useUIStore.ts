@@ -1,7 +1,14 @@
 import { create } from 'zustand';
 
+import type { CriticalUpdateContext } from '@/core/version/check.ts';
 import { ANALYTICS_EVENTS } from '@/shared/analytics/analytics.constants.ts';
 import { captureAnalyticsEvent } from '@/shared/analytics/capture.ts';
+
+/** A critical update counting down in this tab — what the "Update required" notice shows. */
+export type CriticalUpdate = Pick<
+  CriticalUpdateContext,
+  'buildId' | 'reloadAt' | 'reloadNow'
+>;
 
 interface UIStore {
   commandPaletteOpen: boolean;
@@ -19,6 +26,11 @@ interface UIStore {
    * say; `null` = the file's own default for the viewport.
    */
   fileActivityOpen: boolean | null;
+  /**
+   * The critical update this tab is counting down to (`startVersionCheck`'s
+   * `onCriticalUpdate`); `null` while none is. Never cleared: the tab reloads.
+   */
+  criticalUpdate: CriticalUpdate | null;
 
   toggleCommandPalette: () => void;
   setCommandPaletteOpen: (open: boolean) => void;
@@ -28,6 +40,7 @@ interface UIStore {
   toggleAppearance: () => void;
   setPreviewRole: (roleId: string | null) => void;
   setFileActivityOpen: (open: boolean | null) => void;
+  setCriticalUpdate: (update: CriticalUpdate) => void;
 }
 
 /** Ephemeral, per-tab UI state: which overlays are open. */
@@ -37,6 +50,7 @@ export const useUIStore = create<UIStore>((set) => ({
   appearanceOpen: false,
   previewRole: null,
   fileActivityOpen: null,
+  criticalUpdate: null,
 
   toggleCommandPalette: () =>
     set((s) => {
@@ -62,4 +76,5 @@ export const useUIStore = create<UIStore>((set) => ({
     }),
   setPreviewRole: (previewRole) => set({ previewRole }),
   setFileActivityOpen: (fileActivityOpen) => set({ fileActivityOpen }),
+  setCriticalUpdate: (criticalUpdate) => set({ criticalUpdate }),
 }));

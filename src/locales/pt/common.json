@@ -96,7 +96,14 @@
   "versionUpdate": {
     "title": "Atualização disponível",
     "description": "Uma nova versão do aplicativo está pronta.",
-    "refresh": "Atualizar agora"
+    "refresh": "Atualizar agora",
+    "required": {
+      "title": "Atualização obrigatória",
+      "countdown": "Recarregando em {{time}}",
+      "saveFirst": "Salve seu trabalho e depois atualize",
+      "announcement": "{{productName}} precisa de uma atualização importante e será recarregado em {{time}}. Salve seu trabalho agora.",
+      "updateNow": "Atualizar agora"
+    }
   },
   "cells": {
     "patient": "Paciente",

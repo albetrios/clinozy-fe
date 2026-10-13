@@ -7,6 +7,13 @@ export const VERSION_CHECK_INITIAL_DELAY_MS = 2_000;
 export const VERSION_UPDATE_SNOOZE_MS = 15 * 60 * 1_000;
 
 /**
+ * A critical update's grace period: how long the "Update required" notice counts
+ * down before the tab reloads on its own — enough to press Save, too short to
+ * keep working on a release that must not stay in use.
+ */
+export const CRITICAL_UPDATE_GRACE_MS = 60_000;
+
+/**
  * Marks the buildId this tab has already reloaded for, so the deferred reload runs
  * at most once per advertised build.
  *

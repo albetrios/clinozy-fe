@@ -96,7 +96,14 @@
   "versionUpdate": {
     "title": "تحديث متوفّر",
     "description": "إصدار جديد من التطبيق جاهز.",
-    "refresh": "التحديث الآن"
+    "refresh": "التحديث الآن",
+    "required": {
+      "title": "التحديث مطلوب",
+      "countdown": "إعادة التحميل خلال {{time}}",
+      "saveFirst": "احفظ عملك، ثم حدِّث",
+      "announcement": "يحتاج {{productName}} إلى تحديث مهم وسيُعاد تحميله خلال {{time}}. احفظ عملك الآن.",
+      "updateNow": "التحديث الآن"
+    }
   },
   "cells": {
     "patient": "مريض",

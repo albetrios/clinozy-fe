@@ -160,6 +160,52 @@ Helpers: `tests/utils/e2e-auth.ts`, `tests/utils/axe-for-dialog.ts`.
 
 Contract drift (scheduled CI): `pnpm contracts:drift` vs `clinozy-be/docs/routes.txt`.
 
+## Mutation testing (Stryker, weekly)
+
+Stryker mutates the pure runtime logic and checks that its tests notice. CI:
+`.github/workflows/mutation-test.yml`, Mondays 05:00 UTC and `workflow_dispatch` — a report, never a
+merge gate. Config: `stryker.config.json`, pinned on the PR gate by
+`tests/ci/mutation-config.policy.test.ts`.
+
+| Setting            | Value                                                                                                                               |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `mutate`           | rbac, `env.ts`, the data provider, the app guards, `shared/auth`, `shared/tenancy`, `lib/routes`, `csv.ts`, `utils.ts` (`.ts` only) |
+| `testFiles`        | the `*.test.*` files of those folders + `tests/security/` — a module's own tests must kill its mutants                              |
+| `thresholds.break` | 70 — the run fails below a 70% score; never lowered                                                                                 |
+| `testRunner`       | `vitest-shim` (`tooling/stryker/vitest-runner-shim.mjs`) — the upstream runner plus its two missing Vitest 5 fixes                  |
+| `ignorePatterns`   | agent tooling (`.claude`, `.cursor`, `.mcp.json`, `agent-os`), docs, design intakes, build output                                   |
+
+Why each of those exists:
+
+- **`.mcp.json` ignored.** It is a tracked symlink to a gitignored file, so it dangles on a fresh
+  checkout and Stryker's sandbox copy failed with `ENOENT`. The policy test fails on any dangling
+  symlink left out of `ignorePatterns`.
+- **`testFiles`.** Without it the initial run takes every suite Vitest's `related` mode links to a
+  mutated file — `cn` (`lib/utils.ts`) and the auth/tenancy runtime are imported by nearly every
+  component — and Stryker's Vitest runner runs them on **one** thread, so it outgrew its 15-minute
+  limit. Scoped, it is 71 test files.
+- **The runner shim.** On Vitest 5 the runner's per-test filter matches nothing
+  ([stryker-js#6210](https://github.com/stryker-mutator/stryker-js/issues/6210)), so every covered
+  mutant ran zero tests and survived; and with `testFiles` a static mutant was activated after its
+  module had loaded ([#6144](https://github.com/stryker-mutator/stryker-js/issues/6144)). Delete the
+  shim once a runner release fixes both.
+
+Measured on `ubuntu-latest` (2026-10-13): 58 files, 1,894 mutants (1,602 scored, the rest are the
+excluded string/regex/template mutators), initial run ≈ 3 minutes, whole run 26 m 38 s, score
+**76.09%**. The 48 static mutants are about half of that time, because each reloads and reruns its
+module's tests. The job limit is 60 minutes and the initial-run limit 15.
+
+Run it locally — Stryker is installed ad hoc, as in CI, and never lands in the lockfile:
+
+```bash
+pnpm add -D @stryker-mutator/core@10.0.0 @stryker-mutator/vitest-runner@10.0.0
+pnpm exec stryker run                                                   # the whole lane
+pnpm exec stryker run --mutate src/lib/csv.ts --testFiles 'src/lib/csv*.test.ts'  # one module
+git checkout -- package.json pnpm-lock.yaml && pnpm install --frozen-lockfile
+```
+
+The report is `reports/mutation/mutation-report.html` (the CI run uploads it as `stryker-report`).
+
 ## Cross-browser smoke (production build)
 
 Playwright runs **Chromium, Firefox, and WebKit** against `pnpm preview` (static shell — no clinozy-be):
