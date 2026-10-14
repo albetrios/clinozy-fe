@@ -26,7 +26,7 @@ if (jsPaths.length === 0) {
 }
 
 // Budgets are a RATCHET (same philosophy as coverage thresholds): pinned just
-// above the measured first-paint size (JS ~243 kB gz, CSS ~36 kB gz) so any
+// above the measured first-paint size (JS ~238 kB gz, CSS ~35 kB gz) so any
 // regression trips CI immediately — lower as the bundle shrinks, never raise
 // to absorb growth.
 //
@@ -321,19 +321,21 @@ const config = [
      * lazy chunk had split `useTranslation` into a first-paint chunk of its own
      * (−0.37 kB). ~0.4 kB of headroom.
      *
-     * 245.0 → 245.2 kB: a declared exemption, itemised — "Report a bug" with native voice
-     * (iteration feat-bug-report-2026-10-13-dgnx), replacing Sentry's injected widget. Measured
-     * 245.08 kB, both ends built the same way (no env file, as CI):
-     * - Two glyphs in the icon registry (+0.08 kB, the `icons` chunk): `Bug` (the trigger) and
-     *   `Mic` (the voice button). The registry is one first-paint chunk, so any icon the app uses
-     *   anywhere lands in it; drawing them outside the registry would break the one-file
-     *   icon-library swap.
-     * Trimmed first: the widget, its voice hook and its motion stylesheet load on demand
-     * (`BugReportLazy`, its own `BugReport-*.css` — −0.85 kB of initial CSS); its copy rides the
-     * clinic shell's existing `app` namespace rather than a namespace of its own (a new one adds a
-     * loader per language to the entry, −0.04 kB). ~0.1 kB of headroom.
+     * 245.0 → 238.6 kB, lowered: measured 238.16 kB, from 244.67 kB on main
+     * (aeee944f), both built the same way (no env file, as CI). No module left
+     * the first paint — the same code ships in five files instead of 24:
+     * `vite.config.ts`'s `codeSplitting` collects the static entry graph in one
+     * `boot` group (emitted as the entry chunk) beside `vendor`, `zod` and
+     * `query`. The ~20 small chunks automatic splitting made of what the entry
+     * shares with lazy chunks each carried their own import and export
+     * bindings; in one chunk the minifier also inlines and mangles across them.
+     * Every lazy chunk now imports those modules from the entry chunk, which is
+     * loaded anyway. ~0.4 kB of headroom.
+     * "Report a bug" (iteration feat-bug-report-2026-10-13-dgnx) spends 0.08 kB of it: two
+     * registry glyphs, `Bug` (the trigger) and `Mic` (the voice button), in the first-paint
+     * `icons` chunk. The widget, its voice hook and its motion stylesheet load on demand.
      */
-    limit: '245.2 kB',
+    limit: '238.6 kB',
     gzip: true,
   },
   ...(cssPaths.length
@@ -485,8 +487,17 @@ const config = [
            * handle's slot, and the Appearance studio's controls — Tailwind emits
            * a file's classes whether or not anything mounts it. ~0.4 kB of
            * headroom.
+           *
+           * 35.9 → 35.7 kB, lowered: measured 35.25 kB, from 35.89 kB on main
+           * (aeee944f) — the cookie card (#57) and the sign-in showcase (#58)
+           * had used the headroom above. The retired base-colour picker's tint
+           * blocks (`[data-base='stone' | 'slate' | 'olive' | 'zinc' | 'warm']`,
+           * light and dark: ten blocks, −0.64 kB) left `index.css`; nothing has
+           * set `data-base` since the theme studio went (L-65), so no screen
+           * changes. `pnpm perf:routes`' `cssKb` (35.4, measured 34.8) keeps its
+           * pin — it only ever comes down. ~0.45 kB of headroom.
            */
-          limit: '35.9 kB',
+          limit: '35.7 kB',
           gzip: true,
         },
       ]

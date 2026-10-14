@@ -32,6 +32,15 @@ const CODE_TO_AUTH_KEY: Record<string, string> = {
     AUTH_KEYS.acceptInvite.errors.invalidOrExpired,
   [FRONTEND_ERROR_CODES.MEMBER_ROLE_REQUIRED]:
     ERRORS_KEYS.frontend.organization.roleRequired,
+  // The upload flow's own failures (`uploads-api.ts`) — before these, a refused or blocked
+  // storage write toasted its bare code, or the raw English "Network request failed".
+  [FRONTEND_ERROR_CODES.UPLOAD_STORAGE_UNREACHABLE]:
+    ERRORS_KEYS.frontend.upload.storageUnreachable,
+  [FRONTEND_ERROR_CODES.UPLOAD_STORAGE_REJECTED]:
+    ERRORS_KEYS.frontend.upload.storageRejected,
+  [FRONTEND_ERROR_CODES.UPLOAD_NOT_CONFIRMED]: ERRORS_KEYS.frontend.upload.notConfirmed,
+  [FRONTEND_ERROR_CODES.UPLOAD_INVALID_FILE_NAME]:
+    ERRORS_KEYS.frontend.upload.invalidFileName,
 };
 
 /**
