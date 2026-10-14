@@ -34,8 +34,9 @@ session's disk allowance reads 8.9% free); no repository change.
 
 - Planned, not built (deferred — user OK): none.
 - Built, not planned: `Permissions-Policy: microphone=(self)` (D16); the icon-only trigger (D18).
-  The size exemption (D17) is gone: after merging main, whose initial-JS budget dropped to
-  238.6 kB, the widget's ~0.25 kB fits the headroom (D19).
+  The size exemption (D17) became D19 (main lowered the budget to 238.6 kB) and then D20 after the
+  freeze, on the PR: CI measured 238.87 kB once #64, #70 and #71 had used main's headroom, so the
+  budget is 238.9 kB, itemised in `tooling/ci/run-size-limit.mjs`.
 - Not verified here: a real microphone in a real browser — jsdom has no speech recognition, so the
   voice path is proven with a stand-in recognizer; try it in Chrome or Safari (Firefox shows the
   textbox alone). Playwright E2E needs clinozy-be on `:3000` and was not run.

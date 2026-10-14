@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 /** How the report was written — clinozy-be `USER_BUG_REPORT_INPUT_METHODS`. */
-export const BUG_REPORT_INPUT_METHODS = ['typed', 'voice', 'mixed'] as const;
+const BUG_REPORT_INPUT_METHODS = ['typed', 'voice', 'mixed'] as const;
 
 /** One of {@link BUG_REPORT_INPUT_METHODS}. */
 export type BugReportInputMethod = (typeof BUG_REPORT_INPUT_METHODS)[number];
