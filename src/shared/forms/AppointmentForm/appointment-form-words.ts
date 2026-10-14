@@ -62,22 +62,6 @@ export function saveLabelText(
   return t(K.footer[kind], isolateValues(slot));
 }
 
-/** Step 1's summary when collapsed: service · doctor · length · “reason”, else "Not filled yet". */
-export function detailsSummaryText(
-  t: FormTranslate,
-  draft: AppointmentDraft,
-  doctor: AppointmentStaff | undefined,
-): string {
-  const reason = draft.reason.trim();
-  const summary = isolateJoin([
-    draft.serviceLabel,
-    doctor?.name ?? '',
-    t(K.footer.minutes, { minutes: draft.durationMin }),
-    reason ? `“${reason.slice(0, 40)}”` : '',
-  ]);
-  return summary || t(K.details.notFilled);
-}
-
 /**
  * The Rescheduled note (H:4142): "Rescheduled · was <day> <time> · …" — "needs
  * confirming again" for a Confirmed booking; `null` without a move.

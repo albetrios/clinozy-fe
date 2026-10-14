@@ -7,20 +7,13 @@ import { displayId } from '@/shared/api/app/app-display-id.ts';
 import { defaultBranchId } from '@/shared/app/app-branch.ts';
 import { SECTION_TONES } from '@/shared/app/app-tones.ts';
 import { DrawerStepBody } from '@/shared/components/DrawerField/index.ts';
-import {
-  type DrawerStep,
-  drawerStepSummary,
-} from '@/shared/components/DrawerSteps/index.ts';
+import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import type { QuickFillItem } from '@/shared/components/QuickFillRow/index.ts';
 import {
   type DrawerBadge,
   RecordDrawer,
   RecordDrawerPending,
 } from '@/shared/components/RecordDrawer/index.ts';
-import {
-  RECORD_DRAWER_KEYS,
-  RECORD_DRAWER_NS,
-} from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import { apiErrorReason, notifyError } from '@/shared/errors/errorHandler.ts';
 import type { HttpError } from '@/shared/errors/HttpError.ts';
 import { useBranches } from '@/shared/hooks/useBranches/index.ts';
@@ -168,10 +161,8 @@ function useSteps(
   vendorName: string | undefined,
 ): DrawerStep[] {
   const { t } = useTranslation(STOCK_DRAWERS_NS);
-  const { t: tDrawer } = useTranslation(RECORD_DRAWER_NS);
   const formatPaise = usePaiseFormat();
   const formatRupees = useRupeeFormat();
-  const notFilled = tDrawer(RECORD_DRAWER_KEYS.step.notFilled);
   const lines = pickedCount(values.lines);
   const billNo = values.billNo.trim();
   const bill = formatPaise(billOf(values));
@@ -182,7 +173,6 @@ function useSteps(
     {
       id: 'bill',
       title: t(K.steps.bill),
-      summary: drawerStepSummary([vendorName, billNo], notFilled),
       peek: [
         { kind: 'value', label: t(K.fields.vendor), value: vendorName ?? '' },
         { kind: 'value', label: t(K.fields.billNo), value: billNo },
@@ -197,13 +187,18 @@ function useSteps(
     {
       id: 'items',
       title: t(K.steps.items),
-      summary: lines > 0 ? t(K.fields.peek, { count: lines, amount: bill }) : notFilled,
+      peek: [
+        {
+          kind: 'value',
+          label: t(K.fields.items),
+          value: lines > 0 ? t(K.fields.peek, { count: lines, amount: bill }) : undefined,
+        },
+      ],
       content: <ItemsFields {...body} />,
     },
     {
       id: 'payment',
       title: t(K.steps.payment),
-      summary: drawerStepSummary([bill, paid], ''),
       peek: [
         { kind: 'value', label: t(K.fields.billAmount), value: bill },
         { kind: 'value', label: t(K.fields.paid), value: paid },

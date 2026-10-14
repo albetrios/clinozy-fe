@@ -360,13 +360,22 @@
       "edit": "Edit",
       "open": "Open",
       "missing": "Missing: {{fields, list(type: unit)}}",
-      "notFilled": "Not filled yet"
+      "notFilled": "Not filled yet",
+      "position": "Step {{number}} of {{total}}",
+      "state": {
+        "open": "In progress",
+        "done": "Complete",
+        "missing": "Needs attention",
+        "later": "Not started",
+        "locked": "Locked"
+      }
     },
     "peek": {
-      "empty": "Empty",
-      "added_one": "{{count}} added",
-      "added_other": "{{count}} added",
-      "noneYet": "None yet"
+      "more_one": "+{{count}} more",
+      "more_other": "+{{count}} more",
+      "notFilled": "Not filled: {{fields, list(type: unit)}}",
+      "notFilledCount_one": "{{count}} not filled",
+      "notFilledCount_other": "{{count}} not filled"
     },
     "stepper": {
       "decrease": "Decrease",
@@ -1060,8 +1069,6 @@
     },
     "details": {
       "title": "Appointment",
-      "notFilled": "Not filled yet",
-      "open": "Open",
       "type": "Type",
       "typeGroup": "Appointment type",
       "types": {
@@ -1107,6 +1114,7 @@
       "nextMonth": "Next month",
       "step": "Slot step",
       "stepOption": "{{minutes}} min",
+      "date": "Date",
       "time": "Time",
       "pickDate": "Pick a date to see times",
       "none": "No times to book on this day · pick another date",

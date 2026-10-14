@@ -353,6 +353,7 @@ export function NewLeadDrawer({
         openStep={contactSet ? 'details' : 'contact'}
         // The open step stays open: a tap on its head changes nothing (H:4135).
         onOpenStepChange={() => {}}
+        stepsCollapsible={false}
         initialFocusRef={searchRef}
         summary={t(K.footer)}
         saveLabel={t(K.create)}

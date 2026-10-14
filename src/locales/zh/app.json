@@ -359,12 +359,20 @@
       "edit": "编辑",
       "open": "打开",
       "missing": "缺少：{{fields, list(type: unit)}}",
-      "notFilled": "尚未填写"
+      "notFilled": "尚未填写",
+      "position": "第 {{number}} 步，共 {{total}} 步",
+      "state": {
+        "open": "进行中",
+        "done": "已完成",
+        "missing": "需要处理",
+        "later": "未开始",
+        "locked": "已锁定"
+      }
     },
     "peek": {
-      "empty": "空",
-      "added_other": "已添加 {{count}} 项",
-      "noneYet": "暂无"
+      "more_other": "另有 {{count}} 项",
+      "notFilled": "未填写：{{fields, list(type: unit)}}",
+      "notFilledCount_other": "{{count}} 项未填写"
     },
     "stepper": {
       "decrease": "减少",
@@ -1045,8 +1053,6 @@
     },
     "details": {
       "title": "预约",
-      "notFilled": "尚未填写",
-      "open": "打开",
       "type": "类型",
       "typeGroup": "预约类型",
       "types": {
@@ -1092,6 +1098,7 @@
       "nextMonth": "下个月",
       "step": "时段间隔",
       "stepOption": "{{minutes}} 分钟",
+      "date": "日期",
       "time": "时间",
       "pickDate": "选择日期以查看时间",
       "none": "当天没有可预约的时间 · 请选择其他日期",

@@ -33,6 +33,7 @@ import { footerSummary, formTitle, saveLabelText } from './appointment-form-word
 import {
   type AppointmentFormExits,
   type AppointmentFormUi,
+  type AppointmentStepId,
   CancelVisitConfirm,
   StatusBlock,
   StepsBlock,
@@ -73,27 +74,36 @@ interface SessionProps extends AppointmentFormProps {
   onCopyHere: (row: AppointmentRow) => void;
 }
 
-/** Step 1 starts collapsed from a chat, a task or a Copy, and once the visit is checked in. */
-function startsCollapsed(state: AppointmentFormState): boolean {
-  if (state.prefill.collapsed || state.prefill.copyOf) return true;
-  return (
-    state.edit && state.row !== undefined && isAppointmentSlotLocked(state.row.status)
-  );
+/**
+ * The step card open when the form opens: Date & time from a chat, a task, a
+ * Copy or a Reschedule (the time is what changes); none once the visit is
+ * checked in (its slot is locked); otherwise step 1.
+ */
+function startingStep(state: AppointmentFormState): AppointmentStepId {
+  if (
+    state.edit &&
+    state.row !== undefined &&
+    isAppointmentSlotLocked(state.row.status)
+  ) {
+    return '';
+  }
+  if (state.prefill.collapsed || state.prefill.copyOf || state.mode === 'reschedule') {
+    return 'slot';
+  }
+  return 'details';
 }
 
 /** The form's open and collapsed parts, and the stacked dialogs it raises. */
 function useFormUi(state: AppointmentFormState) {
-  // Step 1 follows the booking until the member toggles it: an Edit's booking
-  // can arrive after the drawer has opened.
-  const [detailsToggled, setDetailsToggled] = useState<boolean | null>(null);
-  const detailsOpen = detailsToggled ?? !startsCollapsed(state);
-  const setDetailsOpen = (next: boolean | ((open: boolean) => boolean)) =>
-    setDetailsToggled(typeof next === 'function' ? next(detailsOpen) : next);
+  // The starting step follows the booking until the member picks one: an Edit's
+  // booking can arrive after the drawer has opened.
+  const [picked, setPicked] = useState<AppointmentStepId | null>(null);
+  const openStep = picked ?? startingStep(state);
   const [pagedMonth, setPagedMonth] = useState<string | null>(null);
   const [asking, setAsking] = useState(false);
   const ui: AppointmentFormUi = {
-    detailsOpen,
-    setDetailsOpen,
+    openStep,
+    setOpenStep: setPicked,
     month: pagedMonth ?? civilMonthStart(state.draft.date ?? state.today),
     setMonth: setPagedMonth,
     askCancel: () => setAsking(true),
@@ -204,7 +214,10 @@ function useFormSave(
     source: state.mode === 'create' ? state.source : undefined,
     branchId: state.branchId,
     onProblem: (problem) => {
-      if (problem === 'doctor') ui.setDetailsOpen(true);
+      if (problem === 'doctor') ui.setOpenStep('details');
+      else if ((problem === 'slot' || problem === 'passed') && !state.locked) {
+        ui.setOpenStep('slot');
+      }
     },
     onDone: (outcome) => (onSaved ? onSaved(outcome) : onClose()),
   });

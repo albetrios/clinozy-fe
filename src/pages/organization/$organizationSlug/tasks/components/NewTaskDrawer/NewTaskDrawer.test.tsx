@@ -282,9 +282,8 @@ describe('NewTaskDrawer on clinozy-be (KICKOFF §6.10 New task, Q-T4)', () => {
     expect(step('what')).toHaveAttribute('data-state', 'open');
     expect(screen.queryByTestId('new-task-type-call_back')).toBeNull();
     expect(screen.queryByTestId('new-task-remind')).toBeNull();
-    await waitFor(() =>
-      expect(step('when')).toHaveTextContent('Tomorrow 11 am · Riya S.'),
-    );
+    await waitFor(() => expect(step('when')).toHaveTextContent('Riya S.'));
+    expect(step('when')).toHaveTextContent('Tomorrow 11 am');
     expect(step('how')).toHaveTextContent('Normal');
     expect(step('how')).not.toHaveTextContent('Remind');
     expect(await axeForDialog(drawer)).toHaveNoViolations();

@@ -361,14 +361,24 @@
       "edit": "Editar",
       "open": "Abrir",
       "missing": "Falta: {{fields, list(type: unit)}}",
-      "notFilled": "Aún sin completar"
+      "notFilled": "Aún sin completar",
+      "position": "Paso {{number}} de {{total}}",
+      "state": {
+        "open": "En curso",
+        "done": "Completo",
+        "missing": "Requiere atención",
+        "later": "Sin empezar",
+        "locked": "Bloqueado"
+      }
     },
     "peek": {
-      "empty": "Vacío",
-      "added_one": "{{count}} añadido",
-      "added_many": "{{count}} añadidos",
-      "added_other": "{{count}} añadidos",
-      "noneYet": "Ninguno aún"
+      "more_one": "+{{count}} más",
+      "more_many": "+{{count}} más",
+      "more_other": "+{{count}} más",
+      "notFilled": "Sin rellenar: {{fields, list(type: unit)}}",
+      "notFilledCount_one": "{{count}} sin rellenar",
+      "notFilledCount_many": "{{count}} sin rellenar",
+      "notFilledCount_other": "{{count}} sin rellenar"
     },
     "stepper": {
       "decrease": "Disminuir",
@@ -1075,8 +1085,6 @@
     },
     "details": {
       "title": "Cita",
-      "notFilled": "Aún sin rellenar",
-      "open": "Abrir",
       "type": "Tipo",
       "typeGroup": "Tipo de cita",
       "types": {
@@ -1122,6 +1130,7 @@
       "nextMonth": "Mes siguiente",
       "step": "Intervalo",
       "stepOption": "{{minutes}} min",
+      "date": "Fecha",
       "time": "Hora",
       "pickDate": "Elige una fecha para ver horarios",
       "none": "No hay horarios para reservar este día · elige otra fecha",

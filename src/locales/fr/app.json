@@ -361,14 +361,24 @@
       "edit": "Modifier",
       "open": "Ouvrir",
       "missing": "Manquant : {{fields, list(type: unit)}}",
-      "notFilled": "Pas encore rempli"
+      "notFilled": "Pas encore rempli",
+      "position": "Étape {{number}} sur {{total}}",
+      "state": {
+        "open": "En cours",
+        "done": "Terminée",
+        "missing": "À compléter",
+        "later": "Pas commencée",
+        "locked": "Verrouillée"
+      }
     },
     "peek": {
-      "empty": "Vide",
-      "added_one": "{{count}} ajouté",
-      "added_many": "{{count}} ajoutés",
-      "added_other": "{{count}} ajoutés",
-      "noneYet": "Aucun pour l’instant"
+      "more_one": "+{{count}} de plus",
+      "more_many": "+{{count}} de plus",
+      "more_other": "+{{count}} de plus",
+      "notFilled": "Non renseigné : {{fields, list(type: unit)}}",
+      "notFilledCount_one": "{{count}} non renseigné",
+      "notFilledCount_many": "{{count}} non renseignés",
+      "notFilledCount_other": "{{count}} non renseignés"
     },
     "stepper": {
       "decrease": "Diminuer",
@@ -1075,8 +1085,6 @@
     },
     "details": {
       "title": "Rendez-vous",
-      "notFilled": "Pas encore rempli",
-      "open": "Ouvrir",
       "type": "Type",
       "typeGroup": "Type de rendez-vous",
       "types": {
@@ -1122,6 +1130,7 @@
       "nextMonth": "Mois suivant",
       "step": "Pas des créneaux",
       "stepOption": "{{minutes}} min",
+      "date": "Date",
       "time": "Heure",
       "pickDate": "Choisissez une date pour voir les heures",
       "none": "Aucun horaire à réserver ce jour-là · choisissez une autre date",

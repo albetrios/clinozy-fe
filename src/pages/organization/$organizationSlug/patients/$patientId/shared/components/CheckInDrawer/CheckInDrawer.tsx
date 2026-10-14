@@ -77,7 +77,7 @@ const readCheckIn = (checkIn: PatientCheckIn, organizationId: string | null) => 
  * (KICKOFF §6.6 Drawers; H:4396; `patient-file.md:171–187, 383–390`): 680px,
  * "Aftercare check-in" when it follows a treatment, "Visit check-in"
  * otherwise; steps "How is it now" → "What they followed" → "Next plan of
- * action", each head naming its values. No feel → "Pick how it is now", no
+ * action", each peeking its values. No feel → "Pick how it is now", no
  * score → "Pick the patient’s score"; else "Check-in saved for Dharti Galani"
  * with " · 2 added to suggestions" and " · doctor call-back task created" when
  * the server set them off, or "Check-in updated".

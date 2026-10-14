@@ -5,18 +5,11 @@ import { useTranslation } from 'react-i18next';
 import type { MedicalPurchaseOrder } from '@/shared/api/app/app-schema.ts';
 import { SECTION_TONES } from '@/shared/app/app-tones.ts';
 import { DrawerStepBody } from '@/shared/components/DrawerField/index.ts';
-import {
-  type DrawerStep,
-  drawerStepSummary,
-} from '@/shared/components/DrawerSteps/index.ts';
+import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import {
   RecordDrawer,
   RecordDrawerPending,
 } from '@/shared/components/RecordDrawer/index.ts';
-import {
-  RECORD_DRAWER_KEYS,
-  RECORD_DRAWER_NS,
-} from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
@@ -102,16 +95,13 @@ function useSteps(
   supplierName: string | undefined,
 ): DrawerStep[] {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
-  const { t: tDrawer } = useTranslation(RECORD_DRAWER_NS);
   const formatPaise = usePaiseFormat();
-  const notFilled = tDrawer(RECORD_DRAWER_KEYS.step.notFilled);
   const picked = pickedLines(values.lines);
   const billNo = values.billNo.trim();
   return [
     {
       id: 'order',
       title: t(K.steps.order),
-      summary: drawerStepSummary([supplierName, billNo], notFilled),
       peek: [
         { kind: 'value', label: t(K.fields.supplier), value: supplierName ?? '' },
         { kind: 'value', label: t(K.fields.billNo), value: billNo },
@@ -126,13 +116,19 @@ function useSteps(
     {
       id: 'items',
       title: t(K.steps.items),
-      summary:
-        picked.length > 0
-          ? t(K.fields.peek, {
-              count: picked.length,
-              amount: formatPaise(orderTotal(values.lines)),
-            })
-          : notFilled,
+      peek: [
+        {
+          kind: 'value',
+          label: t(K.fields.items),
+          value:
+            picked.length > 0
+              ? t(K.fields.peek, {
+                  count: picked.length,
+                  amount: formatPaise(orderTotal(values.lines)),
+                })
+              : undefined,
+        },
+      ],
       content: <ItemsFields {...body} />,
     },
   ];

@@ -213,11 +213,10 @@ function useStepBodies(
   };
 }
 
-/** The step heads: each step's values, its peek, and its gap ("Missing: Price"). */
+/** The step heads: each step's peek and its gap ("Missing: Price"). */
 function useStepHeads(values: QuickOfferingValues) {
   const { t } = useTranslation(OFFERING_QUICK_CREATE_NS);
   const formatPaise = usePaiseFormat();
-  const notFilled = t(RECORD_DRAWER_KEYS.step.notFilled);
   const name = values.name.trim();
   const minutes = t(F.minutes, { minutes: values.durationMin });
   const category = t(APP_KEYS.offerings.categories[values.category]);
@@ -226,7 +225,6 @@ function useStepHeads(values: QuickOfferingValues) {
   return {
     offering: {
       peek: [{ kind: 'value' as const, label: t(F.name), value: name }],
-      summary: name || notFilled,
       missing: name ? [] : [t(F.name)],
     },
     details: {
@@ -239,12 +237,10 @@ function useStepHeads(values: QuickOfferingValues) {
           tone: OFFERING_CATEGORY_TONES[values.category],
         },
       ],
-      summary: `${minutes} · ${category}`,
       missing: [],
     },
     payment: {
       peek: [{ kind: 'value' as const, label: t(F.price), value: price }],
-      summary: price ?? notFilled,
       missing: price ? [] : [t(F.price)],
     },
   } satisfies Record<QuickStepId, Omit<DrawerStep, 'id' | 'title' | 'content'>>;

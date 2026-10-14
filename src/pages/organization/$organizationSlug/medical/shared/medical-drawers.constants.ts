@@ -228,7 +228,7 @@ export const MEDICAL_DRAWER_KEYS = {
       newMedicine: 'drawers.purchaseOrder.fields.newMedicine',
       /** The red rate cell's tooltip. */
       enterRate: 'drawers.purchaseOrder.fields.enterRate',
-      /** "2 medicines · ₹4,236" — the Items step's head (plural). */
+      /** "2 medicines · ₹4,236" — the Items step's peek (plural). */
       peek: 'drawers.purchaseOrder.fields.peek',
       /** The quick line's placeholder and its hint (`medical.md:261`). */
       quickLine: 'drawers.purchaseOrder.fields.quickLine',
@@ -342,8 +342,6 @@ export const MEDICAL_DRAWER_KEYS = {
       damaged: 'drawers.saleReturn.reasons.damaged',
     },
     refundBy: 'drawers.saleReturn.refundBy',
-    /** "1 medicine · ₹550" — the first step's head (plural). */
-    peek: 'drawers.saleReturn.peek',
     quickFill: 'drawers.saleReturn.quickFill',
     /** "Refund ₹550". */
     save: 'drawers.saleReturn.save',

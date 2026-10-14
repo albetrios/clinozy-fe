@@ -20,10 +20,7 @@ import {
   DrawerStepBody,
   useDrawerFieldIds,
 } from '@/shared/components/DrawerField/index.ts';
-import {
-  type DrawerStep,
-  drawerStepSummary,
-} from '@/shared/components/DrawerSteps/index.ts';
+import type { DrawerStep } from '@/shared/components/DrawerSteps/index.ts';
 import {
   PATIENT_DRAWER_KEYS,
   PATIENT_DRAWER_NS,
@@ -33,10 +30,6 @@ import {
   RecordDrawer,
   RecordDrawerPending,
 } from '@/shared/components/RecordDrawer/index.ts';
-import {
-  RECORD_DRAWER_KEYS,
-  RECORD_DRAWER_NS,
-} from '@/shared/components/RecordDrawer/record-drawer.constants.ts';
 import { useDrawerSave } from '@/shared/hooks/useDrawerSave/index.ts';
 import { useDrawerSession } from '@/shared/hooks/useDrawerSession/index.ts';
 import { useFormValues } from '@/shared/hooks/useFormValues/index.ts';
@@ -252,9 +245,10 @@ function DistributesFields({ form, idPrefix, testId, pickers, openChild }: BodyP
 }
 
 /** "₹827 · 5 days" / "Nothing due", "1 order · ₹4,236" / "No orders yet". */
-function useAccountWords(supplier: SupplierRow) {
+function useAccountWords(supplier: SupplierRow | null) {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
   const formatPaise = usePaiseFormat();
+  if (!supplier) return null;
   return {
     payable:
       supplier.payable > 0
@@ -278,6 +272,7 @@ function AccountFields({ supplier, testId }: { supplier: SupplierRow; testId: st
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
   const words = useAccountWords(supplier);
   const account = useSupplierAccount(supplier.id);
+  if (!words) return null;
   return (
     <DrawerFieldGrid>
       <DrawerField span="half" label={t(K.fields.payable)}>
@@ -310,18 +305,16 @@ function useSteps(
   readOnly: boolean,
 ): DrawerStep[] {
   const { t } = useTranslation(MEDICAL_DRAWERS_NS);
-  const { t: tDrawer } = useTranslation(RECORD_DRAWER_NS);
-  const notFilled = tDrawer(RECORD_DRAWER_KEYS.step.notFilled);
   const name = values.name.trim();
   const phone = storedPhoneOf(values.phone);
   const phoneText = phone ? formatAppPhone(phone) : '';
   const gst = values.gstNumber.trim();
   const makers = makerPills(body.pickers, values.manufacturerIds);
+  const account = useAccountWords(supplier);
   const steps: DrawerStep[] = [
     {
       id: 'supplier',
       title: t(K.steps.supplier),
-      summary: drawerStepSummary([name, phoneText, gst], notFilled),
       peek: [
         { kind: 'value', label: t(K.fields.name), value: name },
         { kind: 'value', label: t(K.fields.phone), value: phoneText },
@@ -337,11 +330,6 @@ function useSteps(
     {
       id: 'distributes',
       title: t(K.steps.distributes),
-      summary:
-        makers
-          .map((maker) => maker.label)
-          .slice(0, 4)
-          .join(' · ') || notFilled,
       peek: [{ kind: 'multi', label: t(K.fields.manufacturers), values: makers }],
       content: (
         <DrawerStepBody readOnly={readOnly}>
@@ -350,10 +338,14 @@ function useSteps(
       ),
     },
   ];
-  if (supplier) {
+  if (supplier && account) {
     steps.push({
       id: 'account',
       title: t(K.steps.account),
+      peek: [
+        { kind: 'value', label: t(K.fields.payable), value: account.payable },
+        { kind: 'value', label: t(K.fields.orders), value: account.orders },
+      ],
       content: <AccountFields supplier={supplier} testId={body.testId} />,
     });
   }

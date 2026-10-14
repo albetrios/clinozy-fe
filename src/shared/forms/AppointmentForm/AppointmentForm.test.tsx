@@ -423,8 +423,15 @@ async function form(drawer: string) {
   return panel;
 }
 
-/** A free start on the grid, by its time. */
+/** Opens step 2, Date & time, unless it is the open card already (one card is open at a time). */
+function openSlotStep(panel: HTMLElement) {
+  if (within(panel).getByTestId(IDS.slot).getAttribute('data-open') === 'true') return;
+  act(() => within(panel).getByTestId(IDS.slotToggle).click());
+}
+
+/** A free start on the grid, by its time — step 2 opened first. */
 async function slotAt(panel: HTMLElement, time: string) {
+  openSlotStep(panel);
   return waitFor(() => {
     const slot = within(panel)
       .queryAllByTestId(IDS.slotTime)
@@ -481,8 +488,16 @@ describe('AppointmentForm — New (KICKOFF §6.4)', () => {
       'Search patient or lead by name, phone, ID',
     );
     expect(within(panel).getByTestId(IDS.details)).toHaveAttribute('data-open', 'true');
+    // One card open at a time: Date & time waits, collapsed, behind "Next".
+    expect(within(panel).getByTestId(IDS.slot)).toHaveAttribute('data-open', 'false');
+    expect(within(panel).getByTestId(IDS.slot)).toHaveTextContent('Not filled yet');
     // The first of the team is the doctor until one is picked.
     expect(within(panel).getByTestId(IDS.doctor)).toHaveAccessibleName(/Nisha Shah/);
+    const next = within(panel).getByTestId(IDS.detailsNext);
+    expect(next).toHaveTextContent('Next: Date & time →');
+    act(() => next.click());
+    expect(within(panel).getByTestId(IDS.details)).toHaveAttribute('data-open', 'false');
+    expect(within(panel).getByTestId(IDS.slot)).toHaveAttribute('data-open', 'true');
     expect(within(panel).getByTestId(`${IDS.quickDate}-today`)).toHaveAttribute(
       'aria-pressed',
       'true',
@@ -535,11 +550,14 @@ describe('AppointmentForm — New (KICKOFF §6.4)', () => {
     renderNew({ prefill: { date: '2026-10-05' } });
     const panel = await form(NEW);
     await slotAt(panel, '10:00');
+    // Step 1 again (Date & time folds away), then back to the grid.
+    await user.click(within(panel).getByTestId(IDS.detailsToggle));
     await user.click(within(panel).getByTestId(IDS.doctor));
     await user.click(
       await screen.findByTestId(`${IDS.doctor}-option-${DOCTOR_ARJUN.id}`),
     );
     await user.click(within(panel).getByTestId(`${IDS.length}-45`));
+    await user.click(within(panel).getByTestId(IDS.detailsNext));
     await user.click(within(within(panel).getByTestId(IDS.slotStep)).getByText('15 min'));
     await waitFor(() =>
       expect(fetchAppointmentSlots).toHaveBeenLastCalledWith({
@@ -565,6 +583,7 @@ describe('AppointmentForm — New (KICKOFF §6.4)', () => {
     world.slots.set('2026-10-07', slotDay('2026-10-07', []));
     renderNew({ prefill: { date: '2026-10-05' } });
     const panel = await form(NEW);
+    openSlotStep(panel);
     const hint = await within(panel).findByTestId(IDS.slotHint);
     await waitFor(() =>
       expect(hint).toHaveTextContent('Closed for Diwali · pick another date'),
@@ -591,6 +610,7 @@ describe('AppointmentForm — New (KICKOFF §6.4)', () => {
     const user = setUser();
     renderNew();
     const panel = await form(NEW);
+    openSlotStep(panel);
     const calendar = within(panel).getByTestId(IDS.calendar);
     expect(calendar).toHaveAccessibleName('Calendar');
     const day = (iso: string) => calendarDay(calendar, iso);
@@ -725,7 +745,7 @@ describe('AppointmentForm — New (KICKOFF §6.4)', () => {
     const details = within(panel).getByTestId(IDS.details);
     expect(details).toHaveAttribute('data-open', 'false');
     expect(details).toHaveTextContent('LHR Treatment');
-    expect(details).toHaveTextContent('“Is laser safe for dark skin?”');
+    expect(details).toHaveTextContent('Is laser safe for dark skin?');
     expect(within(panel).getByTestId(IDS.slot)).toHaveAttribute('data-open', 'true');
   });
 

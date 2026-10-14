@@ -511,6 +511,25 @@ describe('RecordDrawer — saving', () => {
     expect(screen.getByTestId('pt-save')).toBeEnabled();
   });
 
+  it('flags every step still missing a required field once a save was tried, reached or not', async () => {
+    const steps: DrawerStep[] = [
+      ...STEPS,
+      { id: 'notes', title: 'Notes', missing: ['Note'], content: <p>notes body</p> },
+    ];
+    const { u } = await openDrawer({ steps, onSave: vi.fn() });
+
+    // Before a save: a step the user has not reached is never flagged.
+    expect(screen.getByTestId('pt-step-notes')).toHaveAttribute('data-status', 'later');
+    await u.click(screen.getByTestId('pt-save'));
+
+    // The save opened the first one; the other is flagged although never opened.
+    expect(screen.getByTestId('pt-step-clinic')).toHaveAttribute('data-status', 'open');
+    expect(screen.getByTestId('pt-step-notes')).toHaveAttribute('data-status', 'missing');
+    expect(screen.getByTestId('pt-step-notes-trigger')).toHaveTextContent(
+      'Missing: Note',
+    );
+  });
+
   it('saves once nothing required is missing', async () => {
     const onSave = vi.fn();
     const steps = STEPS.map((step) => ({ ...step, missing: [] }));
