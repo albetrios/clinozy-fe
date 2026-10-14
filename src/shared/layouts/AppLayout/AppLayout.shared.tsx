@@ -81,14 +81,23 @@ export function SearchTrigger({ className }: { className?: string }) {
   );
 }
 
+/** A slot: icon over label, above the lens; its ink fades with the lens's slide. */
 const tabSlotClassName =
-  'flex min-w-0 flex-col items-center justify-center gap-0.75 rounded-lg [-webkit-tap-highlight-color:transparent]';
-const tabPillClassName =
-  'flex h-7 w-11.5 items-center justify-center rounded-full transition-colors duration-160';
-/** The 10.5px label, centred; `WeightStableLabel` keeps its 600 width whatever its weight. */
-const tabLabelClassName = 'px-0.5 text-center text-tiny leading-[1.1]';
+  'relative flex min-w-0 flex-col items-center justify-center transition-colors duration-300 [-webkit-tap-highlight-color:transparent]';
+/**
+ * Icon over label; `tab-content` is what dips to 92% while the slot is
+ * pressed (`index.css`, not under reduced motion).
+ */
+const tabContentClassName = 'relative flex w-full min-w-0 flex-col items-center gap-0.5';
+const tabIconClassName = 'size-5.5 flex-none';
+/**
+ * The 10.5px label, centred and unpadded — the slot's full width is what fits
+ * "Appointments" at 390px; `WeightStableLabel` keeps its 600 width whatever
+ * its weight.
+ */
+const tabLabelClassName = 'text-center text-tiny leading-[1.1]';
 
-/** One tab-bar slot: a 46×28 icon pill over a 10.5px label, in the room's tone when current. */
+/** One tab-bar slot: a 22px icon over a 10.5px label, in the room's tone ink when current. */
 function TabBarItem({
   entry,
   current,
@@ -113,17 +122,39 @@ function TabBarItem({
         current ? tone.ink : 'text-muted-foreground-strong',
       )}
     >
-      <span
-        data-slot="pill"
-        className={cn(tabPillClassName, current ? tone.bg : 'text-muted-foreground')}
-      >
-        <entry.icon className="size-4" aria-hidden />
+      <span data-slot="tab-content" className={tabContentClassName}>
+        <entry.icon
+          className={cn(tabIconClassName, !current && 'text-muted-foreground')}
+          aria-hidden
+        />
+        <WeightStableLabel
+          label={t(entry.labelKey, { ns: entry.labelNs })}
+          className={cn(tabLabelClassName, current ? 'font-semibold' : 'font-medium')}
+        />
       </span>
-      <WeightStableLabel
-        label={t(entry.labelKey, { ns: entry.labelNs })}
-        className={cn(tabLabelClassName, current ? 'font-semibold' : 'font-medium')}
-      />
     </Link>
+  );
+}
+
+/**
+ * The selection lens: one capsule behind the current slot, in its room's
+ * tone. `index.css` places it from `data-lens` — a fifth of the bar per slot,
+ * mirrored for right-to-left — and slides it to the next slot when the room
+ * changes (320ms, the sheet curve); it fades out when no slot is current.
+ * Reduced motion cuts the transition, so it lands at once.
+ */
+function TabBarLens({ index, tone }: { index: number | null; tone: string | null }) {
+  return (
+    <span
+      aria-hidden
+      data-slot="pill"
+      data-lens={index ?? 'none'}
+      className={cn(
+        'pointer-events-none absolute rounded-full',
+        index === null && 'opacity-0',
+        tone ?? 'bg-muted',
+      )}
+    />
   );
 }
 
@@ -141,11 +172,14 @@ function SectionTabBar({
   const elsewhere =
     nav.current !== null && !slots.includes(nav.current) ? nav.current : null;
   const moreTone = elsewhere ? TONE_CLASSES[elsewhere.tone] : null;
-  let morePill = 'text-muted-foreground';
-  if (moreTone) morePill = moreTone.bg;
-  else if (moreOpen) morePill = 'bg-muted';
+  const pinnedIndex = nav.current === null ? -1 : slots.indexOf(nav.current);
+  let lensIndex: number | null = null;
+  if (elsewhere) lensIndex = 4;
+  else if (pinnedIndex !== -1) lensIndex = pinnedIndex;
+  const lensTone = nav.current ? TONE_CLASSES[nav.current.tone].bg : null;
   return (
     <>
+      <TabBarLens index={lensIndex} tone={lensTone} />
       {slots.map((entry) => (
         <TabBarItem
           key={entry.id}
@@ -167,17 +201,28 @@ function SectionTabBar({
           moreTone ? moreTone.ink : 'text-muted-foreground-strong',
         )}
       >
-        <span data-slot="pill" className={cn(tabPillClassName, morePill)}>
-          <Compass className="size-4.5" aria-hidden />
+        {/* Open from "More" while another room is current: a muted pressed capsule. */}
+        {moreOpen && !elsewhere ? (
+          <span
+            aria-hidden
+            data-slot="pill"
+            className="bg-muted absolute inset-0 rounded-full"
+          />
+        ) : null}
+        <span data-slot="tab-content" className={tabContentClassName}>
+          <Compass
+            className={cn(tabIconClassName, !moreTone && 'text-muted-foreground')}
+            aria-hidden
+          />
+          <WeightStableLabel
+            label={
+              elsewhere
+                ? t(elsewhere.labelKey, { ns: elsewhere.labelNs })
+                : t(LAYOUT_KEYS.app.sectionBar.more)
+            }
+            className={cn(tabLabelClassName, elsewhere ? 'font-semibold' : 'font-medium')}
+          />
         </span>
-        <WeightStableLabel
-          label={
-            elsewhere
-              ? t(elsewhere.labelKey, { ns: elsewhere.labelNs })
-              : t(LAYOUT_KEYS.app.sectionBar.more)
-          }
-          className={cn(tabLabelClassName, elsewhere ? 'font-semibold' : 'font-medium')}
-        />
       </button>
     </>
   );
@@ -192,8 +237,11 @@ export interface MobileNavSections {
 
 /**
  * The section bar's bottom tab bar on phones (the header nav hides below
- * `md`): 58px plus the safe area, `bg-card` with a top hairline — four pins +
- * "More" (D30).
+ * `md`): a floating glass capsule in the style of the iPhone tab bar
+ * (iteration change-floating-tab-bar) — 62px tall, 12px from the sides (the
+ * header's gutter, so the labels keep their width), lifted off the bottom by
+ * `--tab-bar-gap`, four pins + "More" (D30) over a sliding lens. A
+ * scroll-edge fade under it keeps it legible over a busy room.
  */
 export function MobileNav({
   organizationSlug,
@@ -208,12 +256,21 @@ export function MobileNav({
       aria-label={t(LAYOUT_KEYS.app.sectionBar.nav)}
       // `mobile-nav` is what `index.css` looks for to lift floating corner
       // surfaces (consent card, feedback trigger, notice pills, the floating
-      // "New") clear of this bar.
+      // "New") clear of this bar, and where it draws the bar: its geometry,
+      // the scroll-edge fade (this nav's `::before`) and the capsule's glass.
+      // The nav itself takes no taps: only the capsule does.
       data-slot="mobile-nav"
-      className="bg-card fixed inset-x-0 bottom-0 z-40 grid h-[calc(3.625rem+env(safe-area-inset-bottom))] grid-cols-5 border-t px-1 pt-1 pb-[env(safe-area-inset-bottom)] md:hidden"
-      data-testid="mobile-bottom-bar"
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-40 md:hidden"
     >
-      <SectionTabBar sections={sections} organizationSlug={organizationSlug} />
+      {/* `floating-edge`: the Sharp shape squares it, the Elevation axis owns
+          its shadow. */}
+      <div
+        data-slot="floating-edge"
+        data-testid="mobile-bottom-bar"
+        className="pointer-events-auto absolute inset-x-3 mx-auto grid max-w-md grid-cols-5 overflow-hidden rounded-full p-1"
+      >
+        <SectionTabBar sections={sections} organizationSlug={organizationSlug} />
+      </div>
     </nav>
   );
 }

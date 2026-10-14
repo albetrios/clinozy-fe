@@ -1502,12 +1502,93 @@
    without a tab bar (login, onboarding) reserves nothing. The tab bar is
    `md:hidden`, so the reservation ends at the same breakpoint. */
 :root:has([data-slot='mobile-nav']) {
-  /* The tab bar's 58px; each consumer adds env(safe-area-inset-bottom). */
-  --floating-bottom-offset: 3.625rem;
+  /* The floating capsule (change-floating-tab-bar): 62px tall, lifted 12px off
+     the bottom — or, over a home indicator, the safe-area inset less 12px, the
+     way the iPhone tab bar sits over it. The bar reads both. */
+  --tab-bar-height: 3.875rem;
+  --tab-bar-gap: max(0.75rem, calc(env(safe-area-inset-bottom, 0px) - 0.75rem));
+  /* The capsule's top edge less the inset: each consumer adds
+     env(safe-area-inset-bottom) itself. */
+  --floating-bottom-offset: calc(
+    var(--tab-bar-gap) + var(--tab-bar-height) - env(safe-area-inset-bottom, 0px)
+  );
 }
 @media (min-width: 48rem) {
   :root:has([data-slot='mobile-nav']) {
     --floating-bottom-offset: 0rem;
+  }
+}
+/* The bar itself. Its material is drawn here rather than in utilities: one
+   rule is a fraction of the first-paint CSS the utility set costs (`pnpm
+   size`), and it mixes no colour (each `color-mix()` ships twice). Tokens
+   only, so every preset and dark mode follow. The nav's `::before` is the
+   scroll-edge fade (the nav takes no taps); the capsule is glass — a blurred
+   backdrop under its `::before` at 72%, which carries a top sheen — with an
+   inset hairline that takes none of the slots' 54px. In dark the card is the
+   page colour, so the glass lifts to the muted surface. */
+[data-slot='mobile-nav'] {
+  height: calc(var(--tab-bar-gap) + var(--tab-bar-height) + 1.5rem);
+}
+[data-slot='mobile-nav']::before,
+[data-slot='mobile-nav'] > [data-slot='floating-edge']::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.9;
+  background: linear-gradient(transparent, var(--color-background));
+}
+[data-slot='mobile-nav'] > [data-slot='floating-edge'] {
+  --glass: var(--color-card);
+  --glass-sheen: var(--color-card);
+  bottom: var(--tab-bar-gap);
+  height: var(--tab-bar-height);
+  outline: 1px solid var(--color-border);
+  outline-offset: -1px;
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  backdrop-filter: blur(24px) saturate(1.5);
+}
+[data-slot='mobile-nav'] > [data-slot='floating-edge']::before {
+  opacity: 0.72;
+  background: linear-gradient(var(--glass-sheen), var(--glass) 33%);
+}
+.dark [data-slot='mobile-nav'] > [data-slot='floating-edge'] {
+  --glass: var(--color-muted);
+  --glass-sheen: var(--color-muted-strong);
+  outline-color: var(--color-border-strong);
+}
+/* The selection lens: a fifth of the bar per slot (`data-lens`), mirrored for
+   right-to-left, sliding on the sheet curve. Reduced motion cuts the
+   transition (below), so it lands at once. */
+[data-lens] {
+  inset-block: 0.25rem;
+  inset-inline-start: 0.25rem;
+  width: calc(20% - 0.1rem);
+  translate: calc(var(--lens, 0) * 100%);
+  /* translate, the tone's crossfade and the fade-out alike. */
+  transition: 320ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+[dir='rtl'] [data-lens] {
+  translate: calc(var(--lens, 0) * -100%);
+}
+[data-lens='1'] {
+  --lens: 1;
+}
+[data-lens='2'] {
+  --lens: 2;
+}
+[data-lens='3'] {
+  --lens: 3;
+}
+[data-lens='4'] {
+  --lens: 4;
+}
+/* A pressed slot's icon and label dip to 92% and spring back. */
+[data-slot='tab-content'] {
+  transition: scale 100ms;
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-slot='mobile-nav'] :active > [data-slot='tab-content'] {
+    scale: 0.92;
   }
 }
 /* The phone bottom stack (clinic screens, D30), bottom to top: tab bar →
@@ -1538,7 +1619,10 @@
     padding-bottom: var(--consent-card-height, 0px);
   }
   [data-slot='app-main'] {
-    padding-bottom: calc(5rem + var(--consent-card-height, 0px));
+    padding-bottom: calc(
+      var(--floating-bottom-offset, 0rem) + env(safe-area-inset-bottom, 0px) + 0.75rem +
+        var(--consent-card-height, 0px)
+    );
   }
 }
 
@@ -1546,7 +1630,8 @@
    positions itself from custom properties on its host — so it can be steered
    from here. It owns the bottom-END corner; lift it clear of the tab bar too. */
 #sentry-feedback {
-  --inset: auto 0 var(--floating-bottom-offset, 0rem) auto;
+  --inset: auto 0
+    calc(var(--floating-bottom-offset, 0rem) + env(safe-area-inset-bottom, 0px)) auto;
 }
 /* Below `sm` the consent card spans the full width, so the two would share a
    corner and the trigger lands on top of "Accept". The consent decision is a

@@ -44,13 +44,78 @@ function declarations(selector: string, media?: string): string {
 const PHONE = '(max-width: 47.9375rem) {\n  :root:has';
 
 describe('phone bottom stack (index.css)', () => {
-  it('the tab bar reserves its 58px below md and nothing from md', () => {
-    expect(declarations(":root:has([data-slot='mobile-nav'])")).toContain(
-      '--floating-bottom-offset: 3.625rem',
+  it('the floating tab bar declares its geometry and reserves its top edge below md, nothing from md', () => {
+    const bar = declarations(":root:has([data-slot='mobile-nav'])").replace(/\s+/g, ' ');
+    expect(bar).toContain('--tab-bar-height: 3.875rem');
+    expect(bar).toContain(
+      '--tab-bar-gap: max(0.75rem, calc(env(safe-area-inset-bottom, 0px) - 0.75rem))',
+    );
+    // Its top edge less the inset — every consumer adds the inset itself.
+    expect(bar).toContain(
+      '--floating-bottom-offset: calc( var(--tab-bar-gap) + var(--tab-bar-height) - env(safe-area-inset-bottom, 0px) )',
     );
     expect(
       declarations(":root:has([data-slot='mobile-nav'])", '(min-width: 48rem)'),
     ).toContain('--floating-bottom-offset: 0rem');
+  });
+
+  it('the page and the feedback trigger clear the capsule, inset included', () => {
+    const page = declarations(
+      "[data-slot='app-main']",
+      '(max-width: 39.9375rem)',
+    ).replace(/\s+/g, ' ');
+    expect(page).toContain(
+      'calc( var(--floating-bottom-offset, 0rem) + env(safe-area-inset-bottom, 0px) + 0.75rem + var(--consent-card-height, 0px) )',
+    );
+    expect(declarations('#sentry-feedback').replace(/\s+/g, ' ')).toContain(
+      'calc(var(--floating-bottom-offset, 0rem) + env(safe-area-inset-bottom, 0px))',
+    );
+  });
+
+  it('draws the capsule as glass on tokens, with no colour mixed', () => {
+    const capsule = declarations(
+      "[data-slot='mobile-nav'] > [data-slot='floating-edge']",
+    );
+    expect(capsule).toContain('bottom: var(--tab-bar-gap)');
+    expect(capsule).toContain('height: var(--tab-bar-height)');
+    expect(capsule).toContain('backdrop-filter: blur(24px) saturate(1.5)');
+    expect(capsule).toContain('outline-offset: -1px');
+    // The glass is the capsule's own `::before` at 72%, over a blurred backdrop
+    // (the first `::before` rule is the one it shares with the nav's fade).
+    expect(rules).toContain(
+      "[data-slot='mobile-nav'] > [data-slot='floating-edge']::before {\n  opacity: 0.72;",
+    );
+    expect(
+      declarations(".dark [data-slot='mobile-nav'] > [data-slot='floating-edge']"),
+    ).toContain('--glass: var(--color-muted)');
+    // Every `color-mix()` ships twice (a hex fallback plus an @supports copy).
+    const bar = rules.slice(
+      rules.indexOf("[data-slot='mobile-nav'] {"),
+      rules.indexOf("[dir='rtl'] [data-lens]"),
+    );
+    expect(bar).not.toContain('color-mix(');
+  });
+
+  it('places the lens a fifth of the bar per slot, mirrored for right-to-left', () => {
+    const lens = declarations('[data-lens]');
+    expect(lens).toContain('width: calc(20% - 0.1rem)');
+    expect(lens).toContain('translate: calc(var(--lens, 0) * 100%)');
+    expect(lens).toContain('transition: 320ms cubic-bezier(0.32, 0.72, 0, 1)');
+    expect(declarations("[dir='rtl'] [data-lens]")).toContain(
+      'translate: calc(var(--lens, 0) * -100%)',
+    );
+    for (const step of [1, 2, 3, 4]) {
+      expect(declarations(`[data-lens='${step}']`)).toContain(`--lens: ${step}`);
+    }
+  });
+
+  it('dips a pressed slot only when motion is allowed', () => {
+    expect(
+      declarations(
+        "[data-slot='mobile-nav'] :active > [data-slot='tab-content']",
+        '(prefers-reduced-motion: no-preference)',
+      ),
+    ).toContain('scale: 0.92');
   });
 
   it('a showing notice pill publishes 52px and a mounted "New" 60px, on phone only', () => {
