@@ -11,7 +11,7 @@ import {
   SETTINGS_KEYS,
   SETTINGS_NS,
 } from '@/shared/components/SettingsModal/settings.constants.ts';
-import { SectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
+import { SettingsSectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { ArrowUpRight, MapPin, ShieldCheck, Users } from '@/shared/icons/index.ts';
 import { useOrganizationStore } from '@/shared/store/useOrganizationStore/index.ts';
@@ -94,14 +94,12 @@ export function UsersRoomLinkCard({ target }: { target: UsersRoomTarget }) {
  * & access (`/users/roles`) — {@link UsersRoomLinkCard}.
  */
 export function UsersRoomLink({ section }: { section: 'members' | 'roles' }) {
-  const { t } = useTranslation(SETTINGS_NS);
-  const keys = PANELS[section];
   return (
     <section
       className="flex flex-col gap-4"
       data-testid={`settings-organization-${section}`}
     >
-      <SectionHeader title={t(keys.title)} description={t(keys.description)} />
+      <SettingsSectionHeader section={section} />
       <UsersRoomLinkCard target={section} />
     </section>
   );

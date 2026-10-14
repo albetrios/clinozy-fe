@@ -29,7 +29,7 @@ import {
 } from '@/shared/components/SettingsModal/settings.constants.ts';
 import { useRegisterSettingsDirty } from '@/shared/components/SettingsModal/settings-dirty.tsx';
 import { settingsHash } from '@/shared/components/SettingsModal/settings-hash-grammar.ts';
-import { SectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
+import { SettingsSectionHeader } from '@/shared/components/SettingsModal/SettingsPanelShell.tsx';
 import { Button } from '@/shared/components/ui/button.tsx';
 import { notifyError } from '@/shared/errors/errorHandler.ts';
 import { mapValidationErrors } from '@/shared/errors/map-validation-errors.ts';
@@ -92,7 +92,7 @@ export function OrganizationClinicPanel() {
 
   return (
     <div className="flex flex-col gap-4" data-testid="settings-section-org-clinic">
-      <SectionHeader title={t(K.title)} description={t(K.description)} />
+      <SettingsSectionHeader section="clinic" />
       {canManage ? null : (
         <p
           className="text-muted-foreground text-body"

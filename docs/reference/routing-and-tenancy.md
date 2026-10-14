@@ -255,6 +255,11 @@ is the separate `AppearanceDialog` on the root route.)
   `settings-sections.ts` + `settings-permissions.ts`, and panels as **flat files** under
   `account/` + `organization/` (the one sanctioned cohesive flat group —
   exempt from folder-per-unit; see fe-file-structure.mdc).
+- **One head row per section.** Every panel draws `SettingsSectionHeader` (`SettingsPanelShell.tsx`)
+  with its section, and so does the drawer's stand-in while that panel's code loads: the title, sub
+  line and meta come from `SETTINGS_SECTION_HEADING_KEYS`, so the header the user sees first is the
+  one that stays. Integrations' sub line follows `INTEGRATIONS_WEBHOOKS_CHECK`, the same check that
+  shows its webhooks; Profile's pill opens on the signed-in profile and then follows the form.
 - **Migration:** delete the 8 inline `/settings/*` routes in `routeTree.tsx`; update the
   "Chrome routes" section in `fe-file-structure.mdc` to describe hash-modal chrome.
 - **Escape hatch:** members / roles / billing / integrations may later be promoted to real pages

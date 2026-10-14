@@ -44,7 +44,7 @@ import type {
   SettingsSectionRef,
 } from './settings-sections.ts';
 import { SettingsNav } from './SettingsNav.tsx';
-import { SectionHeader } from './SettingsPanelShell.tsx';
+import { SettingsSectionHeader } from './SettingsPanelShell.tsx';
 
 /**
  * Global settings drawer — ONE drawer for account + organization settings,
@@ -369,12 +369,14 @@ const PANEL_LOADERS = {
 function SettingsContentLoading({ active }: { active: SettingsSectionRef }) {
   const { t } = useTranslation(SETTINGS_NS);
   const sectionLabel = t(SETTINGS_SECTION_LABEL_KEYS[active.section]);
-  // The header names the section; the skeleton below is the SAME component every
-  // panel draws while its own query resolves, so the shell-to-panel handoff
-  // swaps identical markup instead of one skeleton shape for another.
+  // The header is the section's own — title, sub line and meta from the same source
+  // the panel draws it from — so when the panel arrives the header stays exactly as it
+  // is (it used to be the nav label alone, and grew a line a beat later). The skeleton
+  // below is the SAME component every panel draws while its own query resolves, so the
+  // shell-to-panel handoff swaps identical markup instead of one shape for another.
   return (
     <div className="flex flex-col gap-4" data-testid="settings-content-loading">
-      <SectionHeader title={sectionLabel} />
+      <SettingsSectionHeader section={active.section} />
       {/* No width override here. The panel below draws the SAME component when its
           own query resolves, so any difference between the two — a max-width, a
           gap — makes the handoff look like a second skeleton replacing the first,

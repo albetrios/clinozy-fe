@@ -1,4 +1,4 @@
-import { act, fireEvent, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -151,6 +151,42 @@ describe('SettingsModal', () => {
     expect(live).not.toBeNull();
     expect(live).toHaveClass('sr-only');
     expect(live).toHaveTextContent(/Security/);
+  });
+
+  // The stand-in's head row IS the section's: the same title, sub line and meta, so the
+  // header does not grow a line (or change its title) when the panel's code arrives.
+  it.each([
+    [
+      'organization/general',
+      'Organization · General',
+      'Identity for your organization across the platform.',
+    ],
+    ['account/sessions', 'Sessions', 'Devices currently signed in to your account.'],
+    ['account/security', 'Security', 'Two-factor authentication and passkeys.'],
+  ])(
+    'draws the section’s whole head row while it loads: %s',
+    async (section, title, description) => {
+      useMeContextMock.mockReturnValue(meCtxLoading);
+      renderWithProviders(<SettingsModal />, {
+        initialEntries: [`/#settings/${section}`],
+      });
+      const standIn = await screen.findByTestId('settings-content-loading');
+      const header = within(standIn).getByRole('banner');
+      expect(within(header).getByRole('heading', { name: title })).toBeInTheDocument();
+      expect(within(header).getByText(description)).toBeInTheDocument();
+    },
+  );
+
+  it('draws Profile’s completeness pill while it loads', async () => {
+    useAuthStore.setState({
+      user: { ...USER, name: 'Riya Shah', jobTitle: 'Dermatologist' },
+    });
+    useMeContextMock.mockReturnValue(meCtxLoading);
+    renderWithProviders(<SettingsModal />, {
+      initialEntries: ['/#settings/account/profile'],
+    });
+    const standIn = await screen.findByTestId('settings-content-loading');
+    expect(within(standIn).getByText('Profile 100% complete')).toBeInTheDocument();
   });
 
   it('renders nothing without a settings hash', () => {
