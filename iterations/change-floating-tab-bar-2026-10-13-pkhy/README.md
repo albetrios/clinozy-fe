@@ -8,7 +8,7 @@
 | Opened | 2026-10-13 |
 | Branch | feat/floating-tab-bar |
 | Baseline | launch-2026-09-30-jxmr |
-| Status | done |
+| Status | frozen |
 | Summary | The phone tab bar becomes a floating glass capsule in the style of the latest iPhone tab bar — inset from the screen edges and lifted off the bottom, with a selection lens that slides to the current room in its tone; the phone bottom stack re-derives its clearance from it |
 | Drop placed | 2026-10-13 |
 | Drop source | /tmp/claude-0/-home-user/fd0b9893-5838-55b2-80de-6ad10a465d52/scratchpad/brief |
@@ -24,3 +24,4 @@
 - 2026-10-13 · ready-for-approval → approved · — · Claude
 - 2026-10-13 · approved → implementing · — · Claude
 - 2026-10-13 · implementing → done · — · Claude
+- 2026-10-14 · done → frozen · — · Claude
