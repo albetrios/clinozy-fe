@@ -98,6 +98,12 @@
       "avatarUpdated": "Avatar updated.",
       "avatarRemoved": "Avatar removed."
     },
+    "upload": {
+      "storageUnreachable": "Couldn't send the file to storage. Check your connection and try again; if it keeps failing, contact support.",
+      "storageRejected": "Storage refused the file. Try uploading it again.",
+      "notConfirmed": "The file couldn't be verified after upload. Try uploading it again.",
+      "invalidFileName": "Rename the file and try again: its name can't contain slashes, “..” or control characters."
+    },
     "hooks": {
       "passkeys": {
         "addFailed": "Could not add passkey",
